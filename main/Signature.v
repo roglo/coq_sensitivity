@@ -2826,41 +2826,6 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
-destruct n; [ now apply Nat.lt_1_r in Hkn; subst k | ].
-destruct n. {
-  cbn in Hkn.
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  flia Hkn.
-}
-destruct n. {
-  cbn in Hkn.
-  do 4 (destruct k; [ easy | ]).
-  do 2 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
-  flia Hkn.
-}
-destruct n. {
-  cbn in Hkn.
-  do 12 (destruct k; [ easy | ]).
-  do 12 apply Nat.succ_lt_mono in Hkn.
-  do 12 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
-  flia Hkn.
-}
-destruct n. {
-  cbn in Hkn.
-  do 48 (destruct k; [ easy | ]).
-  do 72 apply Nat.succ_lt_mono in Hkn.
-  do 48 rewrite <- Nat.add_1_r.
-  do 47 rewrite <- Nat.add_assoc.
-  cbn - [ canon_sym_gr_list fact ].
-...
-  do 48 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
-  flia Hkn.
-}
-...
-intros Hic Hop * Hkn.
-cbn.
-f_equal. {
   remember (k / n!) as i eqn:Hi.
   remember (k mod n!) as j eqn:Hj.
   assert (Hin : i ≤ n). {
@@ -2874,6 +2839,7 @@ f_equal. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
   clear k Hkn Hi Hj.
+...
   revert i j Hin Hjn.
   induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
   remember (i ?= succ_when_ge i (j / n!)) as is eqn:His; symmetry in His.
@@ -2990,6 +2956,42 @@ map (λ i,
     (seq 0 15))
   (seq 0 (S n))
 ).
+...
+...
+intros Hic Hop * Hkn.
+cbn.
+f_equal. {
+destruct n; [ now apply Nat.lt_1_r in Hkn; subst k | ].
+destruct n. {
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 4 (destruct k; [ easy | ]).
+  do 2 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 12 (destruct k; [ easy | ]).
+  do 12 apply Nat.succ_lt_mono in Hkn.
+  do 12 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 48 (destruct k; [ easy | ]).
+  do 72 apply Nat.succ_lt_mono in Hkn.
+  do 48 rewrite <- Nat.add_1_r.
+  do 47 rewrite <- Nat.add_assoc.
+  cbn - [ canon_sym_gr_list fact ].
+...
+  do 48 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
 ...
 Compute (
   let ro := test_ring_like_op in
