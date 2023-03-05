@@ -2850,6 +2850,9 @@ destruct n. {
   cbn in Hkn.
   do 48 (destruct k; [ easy | ]).
   do 72 apply Nat.succ_lt_mono in Hkn.
+  do 48 rewrite <- Nat.add_1_r.
+  do 47 rewrite <- Nat.add_assoc.
+  cbn - [ canon_sym_gr_list fact ].
 ...
   do 48 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
   flia Hkn.
