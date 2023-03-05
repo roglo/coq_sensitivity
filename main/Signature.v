@@ -2867,18 +2867,43 @@ f_equal. {
     clear His.
     rewrite map_map.
 ...
+    destruct i. {
+      cbn; clear Hin Hijn.
+      clear IHn Hjn.
+      remember (canon_sym_gr_list n (j mod n!)) as i eqn:Hi; clear Hi.
+      induction i; [ easy | ].
+      cbn; rewrite IHi.
+      unfold succ_when_ge.
+      unfold Nat.b2n.
+      do 2 rewrite if_leb_le_dec.
+      destruct (le_dec 0 _) as [H| H]; [ clear H | flia H ].
+      now rewrite Nat.add_1_r.
+    }
+    cbn.
+...
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        apply in_canon_sym_gr_list in Hk. 2: {
+          apply Nat.mod_upper_bound, fact_neq_0.
+        }
+        unfold succ_when_ge.
+        unfold Nat.b2n.
+        do 2 rewrite if_leb_le_dec.
+        destruct (le_dec 0 _) as [Hz| Hz]; [ | flia Hz ].
+        easy.
+      }
+...
     erewrite map_ext_in. 2: {
       intros k Hk.
       apply in_canon_sym_gr_list in Hk. 2: {
         apply Nat.mod_upper_bound, fact_neq_0.
       }
       unfold succ_when_ge, Nat.b2n.
-      rewrite if_leb_le_dec.
-      easy.
-    }
-...
+      do 2 rewrite if_leb_le_dec.
       destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. 2: {
         rewrite Nat.add_0_r.
+        apply Nat.nle_gt in Hjnk.
+        destruct (le_dec i k) as [Hik| Hik]. 2: {
         easy.
       }
       cbn.
