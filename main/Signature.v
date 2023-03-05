@@ -2839,7 +2839,7 @@ f_equal. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
   clear k Hkn Hi Hj.
-...
+Abort.
 (*
   Hin : i ≤ n
   Hjn : j < n!
@@ -2848,6 +2848,22 @@ f_equal. {
 *)
 End a.
 
+Compute (
+  let ro := test_ring_like_op in
+  let n := 5 in
+  map (λ j,
+    ((canon_sym_gr_list n j))
+  ) (seq 0 n!)
+).
+Compute (
+  let ro := test_ring_like_op in
+  let n := 5 in
+map (λ i,
+  map (λ j,
+    (map (succ_when_ge i) (canon_sym_gr_list n j))
+  ) (seq 0 n!)
+) (seq 0 (S n))
+).
 Compute (
   let ro := test_ring_like_op in
   let n := 5 in
