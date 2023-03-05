@@ -2826,7 +2826,6 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
-...
   remember (k / n!) as i eqn:Hi.
   remember (k mod n!) as j eqn:Hj.
   assert (Hin : i ≤ n). {
@@ -2867,6 +2866,29 @@ f_equal. {
     }
     clear His.
     rewrite map_map.
+    remember (λ k, _) as f; subst f.
+(*
+    unfold succ_when_ge, Nat.b2n.
+*)
+    erewrite map_ext_in. 2: {
+      intros k Hk.
+      apply in_canon_sym_gr_list in Hk. 2: {
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+...
+      do 2 rewrite if_leb_le_dec.
+...
+      destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. {
+        destruct (le_dec i (k + 1)) as [Hik| Hik]. 2: {
+          exfalso.
+          flia Hijn Hjnk Hik.
+        }
+        easy.
+      }
+      cbn.
+      rewrite Nat.add_0_r.
+      apply Nat.nle_gt in Hjnk.
+      destruct (le_dec i k) as [Hik| Hik].
 ...
 Abort. (*
 ...
