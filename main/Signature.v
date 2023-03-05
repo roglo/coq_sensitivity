@@ -2840,6 +2840,24 @@ f_equal. {
   }
   clear k Hkn Hi Hj.
 ...
+(*
+  Hin : i ≤ n
+  Hjn : j < n!
+  ============================
+  ε_aux i (map (succ_when_ge i) (canon_sym_gr_list n j)) = minus_one_pow i
+*)
+End a.
+
+Compute (
+  let ro := test_ring_like_op in
+  let n := 5 in
+map (λ i,
+  map (λ j,
+    (ε_aux ro i (map (succ_when_ge i) (canon_sym_gr_list n j)) = minus_one_pow ro i)
+  ) (seq 0 n!)
+) (seq 0 (S n))
+).
+...
   revert i j Hin Hjn.
   induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
   remember (i ?= succ_when_ge i (j / n!)) as is eqn:His; symmetry in His.
