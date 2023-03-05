@@ -2839,7 +2839,35 @@ f_equal. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
   clear k Hkn Hi Hj.
-Abort.
+  revert i j Hin Hjn.
+  induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
+  remember (i ?= succ_when_ge i (j / n!)) as is eqn:His; symmetry in His.
+  destruct is. {
+    apply Nat.compare_eq_iff in His.
+    exfalso.
+    unfold succ_when_ge in His.
+    unfold Nat.b2n in His.
+    rewrite if_leb_le_dec in His.
+    destruct (le_dec i (j / n!)) as [Hij| Hij]. {
+      rewrite His, Nat.add_1_r in Hij.
+      now apply Nat.nlt_ge in Hij; apply Hij.
+    }
+    rewrite His, Nat.add_0_r in Hij.
+    apply Nat.nle_gt in Hij.
+    now apply Nat.lt_irrefl in Hij.
+  } {
+    apply Nat.compare_lt_iff in His.
+    unfold succ_when_ge, Nat.b2n in His.
+    rewrite if_leb_le_dec in His.
+    destruct (le_dec i (j / n!)) as [Hijn| Hijn]. 2: {
+      apply Nat.nle_gt in Hijn.
+      rewrite Nat.add_0_r in His.
+      flia Hijn His.
+    }
+    clear His.
+    rewrite map_map.
+    remember (λ k, _) as f; subst f.
+...
 (*
   Hin : i ≤ n
   Hjn : j < n!
