@@ -2826,6 +2826,38 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
+destruct n; [ now apply Nat.lt_1_r in Hkn; subst k | ].
+destruct n. {
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 4 (destruct k; [ easy | ]).
+  do 2 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 12 (destruct k; [ easy | ]).
+  do 12 apply Nat.succ_lt_mono in Hkn.
+  do 12 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  do 48 (destruct k; [ easy | ]).
+  do 72 apply Nat.succ_lt_mono in Hkn.
+...
+  do 48 (destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ]).
+  flia Hkn.
+}
+...
+intros Hic Hop * Hkn.
+cbn.
+f_equal. {
   remember (k / n!) as i eqn:Hi.
   remember (k mod n!) as j eqn:Hj.
   assert (Hin : i ≤ n). {
