@@ -2826,6 +2826,7 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
+...
   remember (k / n!) as i eqn:Hi.
   remember (k mod n!) as j eqn:Hj.
   assert (Hin : i ≤ n). {
@@ -2867,61 +2868,7 @@ f_equal. {
     clear His.
     rewrite map_map.
 ...
-    destruct i. {
-      cbn; clear Hin Hijn.
-      clear IHn Hjn.
-      remember (canon_sym_gr_list n (j mod n!)) as i eqn:Hi; clear Hi.
-      induction i; [ easy | ].
-      cbn; rewrite IHi.
-      unfold succ_when_ge.
-      unfold Nat.b2n.
-      do 2 rewrite if_leb_le_dec.
-      destruct (le_dec 0 _) as [H| H]; [ clear H | flia H ].
-      now rewrite Nat.add_1_r.
-    }
-    cbn.
-...
-      erewrite map_ext_in. 2: {
-        intros k Hk.
-        apply in_canon_sym_gr_list in Hk. 2: {
-          apply Nat.mod_upper_bound, fact_neq_0.
-        }
-        unfold succ_when_ge.
-        unfold Nat.b2n.
-        do 2 rewrite if_leb_le_dec.
-        destruct (le_dec 0 _) as [Hz| Hz]; [ | flia Hz ].
-        easy.
-      }
-...
-    erewrite map_ext_in. 2: {
-      intros k Hk.
-      apply in_canon_sym_gr_list in Hk. 2: {
-        apply Nat.mod_upper_bound, fact_neq_0.
-      }
-      unfold succ_when_ge, Nat.b2n.
-      do 2 rewrite if_leb_le_dec.
-      destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. 2: {
-        rewrite Nat.add_0_r.
-        apply Nat.nle_gt in Hjnk.
-        destruct (le_dec i k) as [Hik| Hik]. 2: {
-        easy.
-      }
-      cbn.
-...
-      destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. {
-        rewrite if_leb_le_dec.
-        destruct (le_dec i (k + 1)) as [Hik| Hik]. 2: {
-          exfalso.
-          flia Hijn Hjnk Hik.
-        }
-        easy.
-      }
-      cbn.
-      rewrite Nat.add_0_r.
-      rewrite <- Nat.add_assoc.
-      f_equal.
-      apply Nat.nle_gt in Hjnk.
-
+Abort. (*
 ...
   Hin : i ≤ S n
   Hjn : j < (S n)!
@@ -2932,19 +2879,19 @@ f_equal. {
 *)
 End a.
 
-(**)
+(*
 Require Import RnglAlg.Zrl ZArith.
-(**)
+*)
 
 Compute (
-(**)
-  let ro := RnglAlg.Zrl.Z_ring_like_op in
 (*
-  let ro := test_ring_like_op in
+  let ro := RnglAlg.Zrl.Z_ring_like_op in
 *)
+  let ro := test_ring_like_op in
+(**)
   let n := 4 in
 let i := 1 in
-let j := 4 in
+let j := 24 in
 (i ≤ S n, j < (S n)!, i ≤ j / n!,
   ε_aux ro i (map (λ x : nat, succ_when_ge i (succ_when_ge (j / n!) x)) (canon_sym_gr_list n (j mod n!))) =
   minus_one_pow ro i)
