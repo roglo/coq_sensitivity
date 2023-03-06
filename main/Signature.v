@@ -2841,32 +2841,43 @@ f_equal. {
   clear k Hkn Hi Hj.
   revert i j Hin Hjn.
   induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
-  remember (i ?= succ_when_ge i (j / n!)) as is eqn:His; symmetry in His.
-  destruct is. {
-    apply Nat.compare_eq_iff in His.
+  remember (j / n!) as u eqn:Hu.
+  remember (j mod n!) as v eqn:Hv.
+  assert (Hun : u ≤ n). {
+    rewrite Hu.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+    now rewrite <- Nat.mul_comm, <- Nat_fact_succ.
+  }
+  assert (Hvn : v < n!). {
+    rewrite Hv.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  clear j Hjn Hu Hv.
+  move i before n; move u before i; move v before u.
+  rewrite map_map.
+  remember (i ?= succ_when_ge i u) as iu eqn:Hiu; symmetry in Hiu.
+  destruct iu. {
+    apply Nat.compare_eq_iff in Hiu.
     exfalso.
-    unfold succ_when_ge in His.
-    unfold Nat.b2n in His.
-    rewrite if_leb_le_dec in His.
-    destruct (le_dec i (j / n!)) as [Hij| Hij]. {
-      rewrite His, Nat.add_1_r in Hij.
-      now apply Nat.nlt_ge in Hij; apply Hij.
+    unfold succ_when_ge in Hiu.
+    unfold Nat.b2n in Hiu.
+    rewrite if_leb_le_dec in Hiu.
+    destruct (le_dec i u) as [H| H]. {
+      rewrite Hiu, Nat.add_1_r in H.
+      now apply Nat.nlt_ge in H; apply H.
     }
-    rewrite His, Nat.add_0_r in Hij.
-    apply Nat.nle_gt in Hij.
-    now apply Nat.lt_irrefl in Hij.
+    rewrite Nat.add_0_r in Hiu; subst u.
+    now apply H.
   } {
-    apply Nat.compare_lt_iff in His.
-    unfold succ_when_ge, Nat.b2n in His.
-    rewrite if_leb_le_dec in His.
-    destruct (le_dec i (j / n!)) as [Hijn| Hijn]. 2: {
-      apply Nat.nle_gt in Hijn.
-      rewrite Nat.add_0_r in His.
-      flia Hijn His.
-    }
-    clear His.
-    rewrite map_map.
+    apply Nat.compare_lt_iff in Hiu.
+    unfold succ_when_ge, Nat.b2n in Hiu.
+    rewrite if_leb_le_dec in Hiu.
+    destruct (le_dec i u) as [H| H]; [ clear H | flia Hiu H ].
     remember (λ k, _) as f; subst f.
+    erewrite map_ext_in. 2: {
+      intros k Hk.
+      apply in_canon_sym_gr_list in Hk; [ | easy ].
 ...
 (*
   Hin : i ≤ n
