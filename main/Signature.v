@@ -3056,6 +3056,16 @@ f_equal. {
     } {
       destruct (Nat.eq_dec u n) as [Hun1| Hun1]. {
         subst u.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+          unfold succ_when_ge at 2.
+          apply Nat.leb_gt in Hj.
+          rewrite Hj, Nat.add_0_r.
+          easy.
+        }
+Search (ε_aux _ (seq _ _)).
+Search (ε_aux _ (map _ _)).
 ...
         apply IHn; [ easy | ].
 ...
