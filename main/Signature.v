@@ -3064,8 +3064,48 @@ f_equal. {
           rewrite Hj, Nat.add_0_r.
           easy.
         }
-Search (ε_aux _ (seq _ _)).
-Search (ε_aux _ (map _ _)).
+        destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
+          subst i.
+          erewrite map_ext_in. 2: {
+            intros j Hj.
+            apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+            unfold succ_when_ge.
+            apply Nat.leb_gt in Hj.
+            now rewrite Hj, Nat.add_0_r.
+          }
+          rewrite map_id.
+          now apply (ε_aux_seq_out Hop).
+        }
+        rewrite (List_seq_cut i). 2: {
+          apply in_seq; split; [ easy | flia Hiu Hin' ].
+        }
+        rewrite Nat.sub_0_r; cbn.
+        rewrite map_app.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+          unfold succ_when_ge.
+          apply Nat.leb_gt in Hj.
+          now rewrite Hj, Nat.add_0_r.
+        }
+        rewrite map_id.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj.
+          rewrite Nat.add_comm, Nat.sub_add in Hj; [ | flia Hiu ].
+          unfold succ_when_ge.
+          destruct Hj as (Hj, Hjn).
+          apply Nat.leb_le in Hj; rewrite Hj; cbn.
+          now rewrite Nat.add_1_r.
+        }
+        rewrite seq_shift.
+Search (ε_aux _ _ = minus_one_pow _).
+Search (ε_aux _ (_ ++ _)).
+...
+        rewrite (ε_aux_app_comm Hop).
+        rewrite <- List_seq_shift'.
+Search ( map _ (seq _ _) = seq _ _).
+        rewrite <- seq_shift.
 ...
         apply IHn; [ easy | ].
 ...
