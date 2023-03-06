@@ -2871,9 +2871,17 @@ f_equal. {
     now apply H.
   } {
     apply Nat.compare_lt_iff in Hiu.
-(* équivalent d'un changement de variable par rapport à mon ancienne version
-   faut que je trie (canon_sym_gr_list n v) par exemple ?
-   pis faut un théorème pour ε_aux i (map f l) = ε_aux i (map f l') *)
+Theorem glop :
+  ∀ i f la lb,
+  permutation Nat.eqb la lb
+  → ε_aux i (map f la) = ε_aux i (map f lb).
+Proof.
+...
+rewrite glop with (lb := seq 0 n). 2: {
+  specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
+  unfold permut_seq in H1.
+  now rewrite canon_sym_gr_list_length in H1.
+}
 ...
     unfold succ_when_ge, Nat.b2n in Hiu.
     rewrite if_leb_le_dec in Hiu.
