@@ -2871,6 +2871,10 @@ f_equal. {
     now apply H.
   } {
     apply Nat.compare_lt_iff in Hiu.
+(* équivalent d'un changement de variable par rapport à mon ancienne version
+   faut que je trie (canon_sym_gr_list n v) par exemple ?
+   pis faut un théorème pour ε_aux i (map f l) = ε_aux i (map f l') *)
+...
     unfold succ_when_ge, Nat.b2n in Hiu.
     rewrite if_leb_le_dec in Hiu.
     destruct (le_dec i u) as [H| H]; [ clear H | flia Hiu H ].
