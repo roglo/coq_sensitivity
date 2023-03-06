@@ -2868,6 +2868,25 @@ rewrite <- Nat.add_succ_comm in Hi.
 now apply IHlen.
 Qed.
 
+Theorem ε_aux_app_all_gt_l :
+  rngl_has_opp = true →
+  ∀ i la lb,
+  (∀ j, j ∈ la → j < i)
+  → ε_aux i (la ++ lb) = (minus_one_pow (length la) * ε_aux i lb)%L.
+Proof.
+intros Hop * Hla.
+revert lb.
+induction la as [| a]; intros; cbn; [ symmetry; apply rngl_mul_1_l | ].
+specialize (Hla a (or_introl eq_refl)) as H1.
+apply Nat.compare_gt_iff in H1.
+rewrite H1.
+rewrite (minus_one_pow_succ Hop).
+rewrite (rngl_mul_opp_l Hop); f_equal.
+apply IHla.
+intros j Hj.
+now apply Hla; right.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -2952,10 +2971,7 @@ f_equal. {
         rewrite map_id.
         now apply (ε_aux_seq_out Hop).
       }
-Search (seq _ _ = _ ++ _).
-About List_seq_cut.
-...
-      rewrite (List_seq_cut3 i); [ | apply in_seq; flia Hin Hi ].
+      rewrite (List_seq_cut i); [ | apply in_seq; flia Hin Hi ].
       rewrite Nat.sub_0_r; cbn.
       rewrite map_app; cbn.
       erewrite map_ext_in. 2: {
@@ -2969,12 +2985,25 @@ About List_seq_cut.
         now rewrite Nat.add_0_r.
       }
       rewrite map_id.
-      unfold succ_when_ge at 1 2.
-      unfold Nat.b2n.
-      assert (H : ¬ n ≤ i) by flia Hin Hi.
-      apply Nat.leb_nle in H; rewrite H.
-      rewrite Nat.add_0_r, Nat.leb_refl.
-Search (ε_aux
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        apply in_seq in Hk.
+        rewrite Nat.add_comm, Nat.sub_add in Hk; [ | easy ].
+        unfold succ_when_ge at 2.
+        destruct Hk as (Hik, Hkn).
+        apply Nat.leb_gt in Hkn; rewrite Hkn, Nat.add_0_r.
+        unfold succ_when_ge.
+        apply Nat.leb_le in Hik; rewrite Hik; cbn.
+        easy.
+      }
+      assert (H : i < n) by flia Hin Hi.
+      clear Hin Hi; rename H into Hin.
+      rewrite (ε_aux_app_all_gt_l Hop). 2: {
+        intros j Hj.
+        now apply in_seq in Hj.
+      }
+      rewrite seq_length.
+      rewrite <- rngl_mul_1_r; f_equal.
 ...
       rewrite Nat.leb_refl.
       remember (i <=? i) as c eqn:Hc.

@@ -130,6 +130,20 @@ specialize (List_seq_shift_1 len sta 0 (Nat.le_0_l sta)) as H1.
 now rewrite Nat.sub_0_r in H1.
 Qed.
 
+Theorem List_seq_cut : ∀ i sta len,
+  i ∈ seq sta len
+  → seq sta len = seq sta (i - sta) ++ seq i (sta + len - i).
+Proof.
+intros * His.
+apply in_seq in His.
+replace len with (i - sta + (len - (i - sta))) at 1 by flia His.
+rewrite seq_app.
+f_equal.
+replace (sta + (i - sta)) with i by flia His.
+f_equal.
+flia His.
+Qed.
+
 Theorem List_seq_cut3 : ∀ i sta len,
   i ∈ seq sta len
   → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
