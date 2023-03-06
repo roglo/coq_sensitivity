@@ -3004,13 +3004,29 @@ f_equal. {
       }
       rewrite seq_length.
       rewrite <- rngl_mul_1_r; f_equal.
+      remember (n - i) as len eqn:Hlen.
+      replace n with (i + len) by flia Hlen Hin.
+      clear n Hin Hlen.
+      erewrite map_ext_in. 2: {
+        now intros k Hk; rewrite Nat.add_1_r.
+      }
+      rewrite seq_shift.
+      remember (S i) as j eqn:Hj.
+      assert (Hji : i < j) by flia Hj.
+      clear Hj.
+      revert j Hji.
+      induction len; intros; [ easy | cbn ].
+      apply Nat.compare_lt_iff in Hji; rewrite Hji.
+      apply Nat.compare_lt_iff in Hji.
+      apply IHlen; flia Hji.
+    }
+    assert (H : u < n) by flia Hun Hu.
+    clear Hun Hu; rename H into Hun.
+    revert i u Hiu Hun.
+    induction n; intros; [ easy | ].
+    rewrite seq_S.
+    rewrite map_app; cbn - [ succ_when_ge ].
 ...
-      rewrite Nat.leb_refl.
-      remember (i <=? i) as c eqn:Hc.
-      rewrite Nat.leb_refl in Hc; subst c.
-...
-    revert i u Hun Hiu.
-    induction n; intros. {
       apply Nat.le_0_r in Hun; subst u.
       unfold succ_when_ge, Nat.b2n in Hiu.
       destruct i; [ easy | now destruct i ].
