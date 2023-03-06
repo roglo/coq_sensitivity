@@ -2813,6 +2813,39 @@ destruct Hb as [Hb| Hb]. {
 }
 Qed.
 
+Theorem ε_aux_ext_in :
+  rngl_has_opp = true →
+  ∀ i f la lb,
+  permutation Nat.eqb la lb
+  → ε_aux i (map f la) = ε_aux i (map f lb).
+Proof.
+intros Hop * Hpab.
+revert lb Hpab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Haft).
+apply Nat.eqb_eq in Hx; subst x.
+specialize (IHla (bef ++ aft) Hpab) as H1.
+rewrite H1, Haft.
+remember (i ?= f a) as ifa eqn:Hifa; symmetry in Hifa.
+do 2 rewrite map_app; cbn; symmetry.
+destruct ifa. {
+  apply Nat.compare_eq_iff in Hifa; subst i.
+  apply (ε_aux_dup Hop).
+} {
+  apply Nat.compare_lt_iff in Hifa.
+  now apply ε_aux_app_cons_lt.
+} {
+  apply Nat.compare_gt_iff in Hifa.
+  now apply (ε_aux_app_cons_gt Hop).
+}
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -2871,17 +2904,22 @@ f_equal. {
     now apply H.
   } {
     apply Nat.compare_lt_iff in Hiu.
-Theorem glop :
-  ∀ i f la lb,
-  permutation Nat.eqb la lb
-  → ε_aux i (map f la) = ε_aux i (map f lb).
-Proof.
-...
-rewrite glop with (lb := seq 0 n). 2: {
-  specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
-  unfold permut_seq in H1.
-  now rewrite canon_sym_gr_list_length in H1.
-}
+    rewrite (ε_aux_ext_in Hop) with (lb := seq 0 n). 2: {
+      specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
+      unfold permut_seq in H1.
+      now rewrite canon_sym_gr_list_length in H1.
+    }
+    clear v IHn Hin Hvn.
+    revert i u Hun Hiu.
+    induction n; intros. {
+      apply Nat.le_0_r in Hun; subst u.
+      unfold succ_when_ge, Nat.b2n in Hiu.
+      destruct i; [ easy | now destruct i ].
+    }
+    rewrite seq_S.
+    rewrite map_app; cbn - [ succ_when_ge ].
+Search (ε_aux _ (_ ++ [_])).
+Search (ε (_ ++ [_])).
 ...
     unfold succ_when_ge, Nat.b2n in Hiu.
     rewrite if_leb_le_dec in Hiu.
