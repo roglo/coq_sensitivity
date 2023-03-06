@@ -2846,6 +2846,28 @@ destruct ifa. {
 }
 Qed.
 
+Theorem ε_aux_seq_out :
+  rngl_has_opp = true →
+  ∀ sta len i,
+  sta + len ≤ i
+  → ε_aux i (seq sta len) = minus_one_pow len.
+Proof.
+intros Hop * Hi.
+revert i sta Hi.
+induction len; intros; [ easy | cbn ].
+remember (i ?= sta) as is eqn:His; symmetry in His.
+destruct is. {
+  apply Nat.compare_eq_iff in His.
+  flia Hi His.
+} {
+  apply Nat.compare_lt_iff in His.
+  flia Hi His.
+}
+rewrite (minus_one_pow_succ Hop); f_equal.
+rewrite <- Nat.add_succ_comm in Hi.
+now apply IHlen.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -2910,6 +2932,54 @@ f_equal. {
       now rewrite canon_sym_gr_list_length in H1.
     }
     clear v IHn Hin Hvn.
+    remember (λ k, _) as f; subst f.
+    destruct (Nat.eq_dec u n) as [Hu| Hu]. {
+      subst u; clear Hun.
+      unfold succ_when_ge, Nat.b2n in Hiu.
+      rewrite if_leb_le_dec in Hiu.
+      destruct (le_dec i n) as [Hin| Hin]; [ clear Hiu | flia Hiu Hin ].
+      destruct (Nat.eq_dec i n) as [Hi| Hi]. {
+        subst i; clear Hin.
+        erewrite map_ext_in. 2: {
+          intros k Hk.
+          apply in_seq in Hk; destruct Hk as (_, Hk); cbn in Hk.
+          unfold succ_when_ge, Nat.b2n.
+          apply Nat.nle_gt in Hk.
+          apply Nat.leb_nle in Hk.
+          rewrite Hk, Nat.add_0_r, Hk.
+          now rewrite Nat.add_0_r.
+        }
+        rewrite map_id.
+        now apply (ε_aux_seq_out Hop).
+      }
+Search (seq _ _ = _ ++ _).
+About List_seq_cut.
+...
+      rewrite (List_seq_cut i); [ | apply in_seq; flia Hin Hi ].
+      rewrite Nat.sub_0_r; cbn.
+      rewrite map_app; cbn.
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        apply in_seq in Hk; destruct Hk as (_, Hk); cbn in Hk.
+        unfold succ_when_ge, Nat.b2n.
+        rewrite if_leb_le_dec.
+        destruct (le_dec n k) as [H| H]; [ flia Hin Hk H | clear H ].
+        rewrite Nat.add_0_r.
+        apply Nat.nle_gt, Nat.leb_nle in Hk; rewrite Hk.
+        now rewrite Nat.add_0_r.
+      }
+      rewrite map_id.
+      unfold succ_when_ge at 1 2.
+      unfold Nat.b2n.
+      assert (H : ¬ n ≤ i) by flia Hin Hi.
+      apply Nat.leb_nle in H; rewrite H.
+      rewrite Nat.add_0_r, Nat.leb_refl.
+Search (ε_aux
+...
+      rewrite Nat.leb_refl.
+      remember (i <=? i) as c eqn:Hc.
+      rewrite Nat.leb_refl in Hc; subst c.
+...
     revert i u Hun Hiu.
     induction n; intros. {
       apply Nat.le_0_r in Hun; subst u.

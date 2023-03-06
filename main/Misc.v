@@ -130,7 +130,7 @@ specialize (List_seq_shift_1 len sta 0 (Nat.le_0_l sta)) as H1.
 now rewrite Nat.sub_0_r in H1.
 Qed.
 
-Theorem List_seq_cut : ∀ i sta len,
+Theorem List_seq_cut3 : ∀ i sta len,
   i ∈ seq sta len
   → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
 Proof.
