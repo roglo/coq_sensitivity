@@ -1443,7 +1443,7 @@ rewrite HA; cbn.
 destruct M as (ll); cbn in Hir, Hj |-*.
 unfold mat_ncols; cbn.
 remember (seq 1 (length (hd [] ll))) as x eqn:Hx.
-rewrite List_seq_cut with (i := i); [ subst x | apply in_seq; flia Hir ].
+rewrite List_seq_cut3 with (i := i); [ subst x | apply in_seq; flia Hir ].
 rewrite Nat.sub_succ.
 do 2 rewrite map_app; cbn.
 rewrite Nat.eqb_refl.
@@ -1462,7 +1462,7 @@ erewrite map_ext_in with (l := seq (S i) _). 2: {
   easy.
 }
 rewrite List_map_nth_seq with (la := ll) (d := []) at 1.
-rewrite List_seq_cut with (i := i - 1); [ | apply in_seq; flia Hir ].
+rewrite List_seq_cut3 with (i := i - 1); [ | apply in_seq; flia Hir ].
 rewrite <- Nat.sub_succ_l; [ | easy ].
 rewrite Nat_sub_succ_1, Nat.add_0_l, Nat.sub_0_r.
 do 2 rewrite map_app.

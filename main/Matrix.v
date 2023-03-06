@@ -1120,7 +1120,7 @@ destruct V as (l); cbn in Hi |-*.
 rewrite map2_map_l.
 destruct i; [ easy | ].
 rewrite Nat_sub_succ_1.
-rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
+rewrite (List_seq_cut3 i); [ cbn | now apply in_seq ].
 rewrite Nat.sub_0_r.
 rewrite map2_app_l.
 rewrite seq_length.

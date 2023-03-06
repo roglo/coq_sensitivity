@@ -1827,12 +1827,12 @@ Theorem transposition_signature_lt :
 Proof.
 intros Hop * Hpq Hq.
 unfold transposition.
-rewrite (List_seq_cut p). 2: {
+rewrite (List_seq_cut3 p). 2: {
   apply in_seq.
   split; [ easy | cbn ].
   now transitivity q.
 }
-rewrite (List_seq_cut q (S p)). 2: {
+rewrite (List_seq_cut3 q (S p)). 2: {
   apply in_seq; cbn.
   split; [ easy | flia Hq ].
 }
@@ -2955,7 +2955,7 @@ f_equal. {
 Search (seq _ _ = _ ++ _).
 About List_seq_cut.
 ...
-      rewrite (List_seq_cut i); [ | apply in_seq; flia Hin Hi ].
+      rewrite (List_seq_cut3 i); [ | apply in_seq; flia Hin Hi ].
       rewrite Nat.sub_0_r; cbn.
       rewrite map_app; cbn.
       erewrite map_ext_in. 2: {

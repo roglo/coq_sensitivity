@@ -489,7 +489,7 @@ split. {
   intros Hs.
   generalize Hs; intros Hsv.
   move Hsv after Hs.
-  rewrite (List_seq_cut (sta + length la1)) in Hs. 2: {
+  rewrite (List_seq_cut3 (sta + length la1)) in Hs. 2: {
     apply in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
@@ -522,7 +522,7 @@ split. {
   }
   split; [ easy | ].
   rewrite <- Hx in Hs.
-  rewrite (List_seq_cut (S x + length la2)) in Hs. 2: {
+  rewrite (List_seq_cut3 (S x + length la2)) in Hs. 2: {
     apply in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
@@ -551,7 +551,7 @@ split. {
   now rewrite Nat.add_comm.
 } {
   intros (Hlen & Hx & Hy & Hla1 & Hla2 & Hla3).
-  rewrite (List_seq_cut x). 2: {
+  rewrite (List_seq_cut3 x). 2: {
     apply in_seq; rewrite Hx.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.

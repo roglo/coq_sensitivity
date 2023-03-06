@@ -1743,7 +1743,7 @@ subst lb.
 specialize (permutation_app_inv Heqb [] _ _ _ _ Hpab) as H.
 cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
 specialize (IHla _ Hpab) as H3.
-rewrite List_seq_cut with (i := length bef). 2: {
+rewrite List_seq_cut3 with (i := length bef). 2: {
   apply in_seq; split; [ easy | cbn ].
   rewrite H1, map_length.
   apply permutation_length in Hpab.
@@ -1795,7 +1795,7 @@ destruct (Nat.eq_dec (length aft) 0) as [Haz| Haz]. {
 }
 replace (seq 0 i ++ seq (S i) (length aft)) with
     (map f (seq 0 (i + length aft))). 2: {
-  rewrite List_seq_cut with (i := i). 2: {
+  rewrite List_seq_cut3 with (i := i). 2: {
     apply in_seq.
     split; [ easy | ].
     flia Haz.
