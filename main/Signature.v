@@ -3054,7 +3054,10 @@ f_equal. {
       apply Nat.compare_eq_iff in Hin1.
       flia Hiu Hun Hin1.
     } {
-      apply IHn; [ easy | ].
+      destruct (Nat.eq_dec u n) as [Hun1| Hun1]. {
+        subst u.
+...
+        apply IHn; [ easy | ].
 ...
       apply Nat.compare_lt_iff in Hin1.
 ...
