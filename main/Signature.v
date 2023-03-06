@@ -2887,6 +2887,17 @@ intros j Hj.
 now apply Hla; right.
 Qed.
 
+Theorem ε_aux_app_comm :
+  rngl_has_opp = true →
+  ∀ i la lb,
+  ε_aux i (la ++ lb) = ε_aux i (lb ++ la).
+Proof.
+intros Hop *.
+apply (ε_aux_permut Hop).
+apply permutation_app_comm.
+unfold equality; apply Nat.eqb_eq.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -3026,6 +3037,32 @@ f_equal. {
     induction n; intros; [ easy | ].
     rewrite seq_S.
     rewrite map_app; cbn - [ succ_when_ge ].
+    unfold succ_when_ge at 4.
+    apply -> Nat.lt_succ_r in Hun.
+    apply  Nat.leb_le in Hun; rewrite Hun; cbn.
+    unfold succ_when_ge at 3.
+    generalize Hiu; intros Hiu'.
+    unfold succ_when_ge, Nat.b2n in Hiu.
+    rewrite if_leb_le_dec in Hiu.
+    destruct (le_dec i u) as [H| H]; [ clear H | flia H Hiu ].
+    apply Nat.leb_le in Hun.
+    assert (H : i ≤ n + 1) by flia Hiu Hun.
+    apply Nat.leb_le in H; rewrite H; cbn.
+    rewrite (ε_aux_app_comm Hop); cbn.
+    remember (i ?= n + 1 + 1) as in1 eqn:Hin1; symmetry in Hin1.
+    destruct in1. {
+      apply Nat.compare_eq_iff in Hin1.
+      flia Hiu Hun Hin1.
+    } {
+      apply IHn; [ easy | ].
+...
+      apply Nat.compare_lt_iff in Hin1.
+...
+    clear H.
+    assert (H : i ≤ n + 1 + 1) by flia Hiu Hun.
+    apply Nat.cmopare_eqb_le.
+...
+Search ε_aux.
 ...
       apply Nat.le_0_r in Hun; subst u.
       unfold succ_when_ge, Nat.b2n in Hiu.
