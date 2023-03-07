@@ -3154,6 +3154,62 @@ f_equal. {
       subst i; clear Hin.
       rewrite (List_seq_cut u); [ | now apply in_seq ].
       rewrite Nat.sub_0_r, Nat.add_0_l.
+      rewrite map_app.
+      erewrite map_ext_in. 2: {
+        intros j Hj.
+        apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+        unfold succ_when_ge, Nat.b2n.
+        apply Nat.leb_gt in Hj; rewrite Hj.
+        apply Nat.leb_gt in Hj.
+        rewrite Nat.add_0_r.
+        assert (H : j < n) by flia Hiu Hj.
+        now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
+      }
+      rewrite map_id.
+      replace (n - u) with (S (n - S u)) by flia Hiu.
+      cbn.
+...
+      destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
+        subst u.
+        cbn; rewrite Nat.sub_0_r.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+          unfold succ_when_ge, Nat.b2n.
+          assert (H : 0 ≤ j) by easy.
+          apply Nat.leb_le in H; rewrite H; clear H.
+...
+      erewrite map_ext_in. 2: {
+        intros j Hj.
+        apply in_seq in Hj.
+        rewrite Nat.add_comm, Nat.sub_add in Hj; [ | flia Hiu ].
+        unfold succ_when_ge, Nat.b2n.
+        destruct Hj as (Huj, Hjn).
+        apply Nat.leb_le in Huj; rewrite Huj.
+        apply Nat.leb_le in Huj.
+        replace (if n <=? j + 1 then _ else _) with
+          (if j + 1 =? n then 1 else 0). 2: {
+          rewrite if_eqb_eq_dec, if_leb_le_dec.
+          destruct (Nat.eq_dec (j + 1) n) as [Hj1n| Hj1n]. {
+            rewrite Hj1n.
+            rewrite <- if_leb_le_dec.
+            now rewrite Nat.leb_refl.
+          }
+          destruct (le_dec n (j + 1)) as [Hnj1| Hnj1]; [ | easy ].
+          flia Hjn Hj1n Hnj1.
+        }
+        easy.
+      }
+...
+        apply Nat.leb_le in Huj.
+        assert (j + 1 ≤ n) by flia Hjn.
+
+        apply Nat.ltb_ge in H.
+
+; rewrite Hjn.
+        rewrite Nat.add_0_r.
+        assert (H : j < n) by flia Hiu Hj.
+        now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
 ...
   Hun : u ≤ n
   Hiu : i < succ_when_ge i u
