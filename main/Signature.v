@@ -2898,6 +2898,30 @@ apply permutation_app_comm.
 unfold equality; apply Nat.eqb_eq.
 Qed.
 
+Theorem ε_aux_all_gt :
+  ∀ i la,
+  (∀ j, j ∈ la → i < j)
+  → ε_aux i la = 1%L.
+Proof.
+intros * Hi.
+revert i Hi.
+induction la as [| a]; intros; [ easy | cbn ].
+remember (i ?= a) as ia eqn:Hia; symmetry in Hia.
+destruct ia. {
+  apply Nat.compare_eq_iff in Hia; subst a.
+  specialize (Hi i (or_introl eq_refl)).
+  now apply Nat.lt_irrefl in Hi.
+} {
+  apply IHla.
+  intros j Hj.
+  now apply Hi; right.
+} {
+  apply Nat.compare_gt_iff in Hia.
+  specialize (Hi a (or_introl eq_refl)).
+  flia Hi Hia.
+}
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -3099,32 +3123,53 @@ f_equal. {
           now rewrite Nat.add_1_r.
         }
         rewrite seq_shift.
-Search (ε_aux _ _ = minus_one_pow _).
-Search (ε_aux _ (_ ++ _)).
-...
-        rewrite (ε_aux_app_comm Hop).
-        rewrite <- List_seq_shift'.
-Search ( map _ (seq _ _) = seq _ _).
-        rewrite <- seq_shift.
-...
-        apply IHn; [ easy | ].
-...
-      apply Nat.compare_lt_iff in Hin1.
-...
-    clear H.
-    assert (H : i ≤ n + 1 + 1) by flia Hiu Hun.
-    apply Nat.cmopare_eqb_le.
-...
-Search ε_aux.
-...
-      apply Nat.le_0_r in Hun; subst u.
-      unfold succ_when_ge, Nat.b2n in Hiu.
-      destruct i; [ easy | now destruct i ].
+        rewrite (ε_aux_app_all_gt_l Hop). 2: {
+          intros j Hj.
+          now apply in_seq in Hj.
+        }
+        rewrite seq_length, <- rngl_mul_1_r; f_equal.
+        apply ε_aux_all_gt.
+        intros j Hj.
+        now apply in_seq in Hj.
+      }
+      apply IHn; [ easy | flia Hun Hun1 ].
+    } {
+      apply Nat.compare_gt_iff in Hin1.
+      apply Nat.leb_le in H.
+      flia H Hin1.
     }
-    rewrite seq_S.
-    rewrite map_app; cbn - [ succ_when_ge ].
-Search (ε_aux _ (_ ++ [_])).
-Search (ε (_ ++ [_])).
+  } {
+    apply Nat.compare_gt_iff in Hiu.
+    unfold succ_when_ge, Nat.b2n in Hiu.
+    rewrite if_leb_le_dec in Hiu.
+    destruct (le_dec i u) as [H| H]; [ flia H Hiu | clear H ].
+    rewrite Nat.add_0_r in Hiu.
+    rewrite (ε_aux_ext_in Hop) with (lb := seq 0 n). 2: {
+      specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
+      unfold permut_seq in H1.
+      now rewrite canon_sym_gr_list_length in H1.
+    }
+    clear v Hvn IHn Hun.
+    destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
+      subst i; clear Hin.
+      rewrite (List_seq_cut u); [ | now apply in_seq ].
+      rewrite Nat.sub_0_r, Nat.add_0_l.
+...
+  Hun : u ≤ n
+  Hiu : i < succ_when_ge i u
+  ============================
+  ε_aux i (map (λ x : nat, succ_when_ge i (succ_when_ge u x)) (seq 0 n)) = minus_one_pow i
+...
+...
+  Hin : i ≤ S n
+  Hiu : u < i
+  ============================
+  (- ε_aux i (map (λ x : nat, succ_when_ge i (succ_when_ge u x)) (seq 0 n)))%L = minus_one_pow i
+...
+  Hun : u ≤ n
+  Hiu : u < i
+  ============================
+  (- ε_aux i (map (λ x : nat, succ_when_ge i (succ_when_ge u x)) (seq 0 n)))%L = minus_one_pow i
 ...
     unfold succ_when_ge, Nat.b2n in Hiu.
     rewrite if_leb_le_dec in Hiu.
