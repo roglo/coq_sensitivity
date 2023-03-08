@@ -2940,7 +2940,7 @@ Theorem ε_of_sym_gr_permut_succ :
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
 intros Hic Hop * Hkn.
-cbn.
+clear Hic; cbn.
 f_equal. {
   remember (k / n!) as i eqn:Hi.
   remember (k mod n!) as j eqn:Hj.
@@ -3208,13 +3208,50 @@ f_equal. {
         }
         easy.
       }
+      assert (H : u + 1 < n) by flia Hiu Hu1n.
+      clear Hiu Hu1n; rename H into Hu1n.
+      destruct n; [ easy | ].
+      rewrite Nat.add_1_r in Hu1n.
+      apply Nat.succ_lt_mono in Hu1n.
+      rewrite (minus_one_pow_succ Hop); f_equal.
+      rewrite (ε_aux_app_all_gt_l Hop). 2: {
+        intros j Hj.
+        apply in_seq in Hj.
+        flia Hu1n Hj.
+      }
+      rewrite seq_length.
+      rewrite Nat.sub_succ_l; [ | flia Hu1n ].
+      rewrite seq_S.
+      rewrite Nat.add_comm, Nat.sub_add; [ | flia Hu1n ].
+      cbn - [ ε_aux ].
+      rewrite map_app; cbn.
+      rewrite Nat.add_1_r, Nat.eqb_refl.
+      erewrite map_ext_in. 2: {
+        intros i Hi.
+        apply in_seq in Hi.
+        rewrite Nat.add_1_r; cbn.
+        rewrite Nat.add_comm, Nat.sub_add in Hi; [ | flia Hi ].
+        destruct Hi as (Hui, Hin).
+        assert (H : i ≠ n) by flia Hin.
+        apply Nat.eqb_neq in H; rewrite H.
+        now rewrite Nat.add_0_r.
+      }
+      rewrite seq_shift.
+      rewrite (ε_aux_app_all_gt_l Hop). 2: {
+        intros j Hj.
+        apply in_seq in Hj; flia Hj.
+      }
+      rewrite seq_length.
+      rewrite ε_aux_all_gt. 2: {
+        intros j Hj.
+        destruct Hj as [Hj| Hj]; [ | easy ].
+        now subst j; rewrite Nat.add_1_r.
+      }
+      rewrite rngl_mul_1_r.
+Search (minus_one_pow _ * minus_one_pow _)%L.
 ...
-        apply Nat.leb_le in Huj.
-        assert (j + 1 ≤ n) by flia Hjn.
-
-        apply Nat.ltb_ge in H.
-
-; rewrite Hjn.
+      rewrite <- minus_one_pow_add.
+...
         rewrite Nat.add_0_r.
         assert (H : j < n) by flia Hiu Hj.
         now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
