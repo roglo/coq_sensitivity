@@ -2922,6 +2922,13 @@ destruct ia. {
 }
 Qed.
 
+Theorem succ_when_ge_id : ∀ k, succ_when_ge k k = k + 1.
+Proof.
+intros.
+unfold succ_when_ge.
+now rewrite Nat.leb_refl.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -3166,19 +3173,20 @@ f_equal. {
         now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
       }
       rewrite map_id.
-      replace (n - u) with (S (n - S u)) by flia Hiu.
-      cbn.
-...
-      destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
-        subst u.
-        cbn; rewrite Nat.sub_0_r.
-        erewrite map_ext_in. 2: {
-          intros j Hj.
-          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-          unfold succ_when_ge, Nat.b2n.
-          assert (H : 0 ≤ j) by easy.
-          apply Nat.leb_le in H; rewrite H; clear H.
-...
+      destruct (Nat.eq_dec (u + 1) n) as [Hu1n| Hu1n]. {
+        subst n.
+        rewrite Nat.add_comm, Nat.add_sub; cbn.
+        rewrite succ_when_ge_id.
+        rewrite <- Nat.add_1_r.
+        rewrite succ_when_ge_id.
+        rewrite <- Nat.add_assoc; cbn.
+        rewrite (ε_aux_app_comm Hop); cbn.
+        assert (H : u + 1 < u + 2) by flia.
+        apply Nat.compare_lt_iff in H; rewrite H.
+        rewrite Nat.add_1_r.
+        rewrite (ε_aux_seq_out Hop); [ | apply Nat.le_succ_diag_r ].
+        now rewrite minus_one_pow_succ.
+      }
       erewrite map_ext_in. 2: {
         intros j Hj.
         apply in_seq in Hj.
