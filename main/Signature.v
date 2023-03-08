@@ -3170,8 +3170,9 @@ f_equal. {
       now rewrite canon_sym_gr_list_length in H1.
     }
     clear v Hvn IHn Hun.
-    destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
+    destruct (Nat.eq_dec i (S n)) as [Hin'| Hin']. {
       subst i; clear Hin.
+...
       rewrite (List_seq_cut u); [ | now apply in_seq ].
       rewrite Nat.sub_0_r, Nat.add_0_l.
       rewrite map_app.
