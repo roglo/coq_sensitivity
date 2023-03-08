@@ -2929,6 +2929,19 @@ unfold succ_when_ge.
 now rewrite Nat.leb_refl.
 Qed.
 
+Theorem minus_one_pow_add :
+  rngl_has_opp = true →
+  ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
+Proof.
+intros Hop *.
+revert b.
+induction a; intros; cbn; [ now rewrite rngl_mul_1_l | ].
+rewrite (minus_one_pow_succ Hop).
+rewrite (minus_one_pow_succ Hop).
+rewrite IHa.
+now rewrite rngl_mul_opp_l.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
@@ -3248,7 +3261,10 @@ f_equal. {
         now subst j; rewrite Nat.add_1_r.
       }
       rewrite rngl_mul_1_r.
-Search (minus_one_pow _ * minus_one_pow _)%L.
+      rewrite <- (minus_one_pow_add Hop).
+      rewrite Nat.add_comm, Nat.sub_add; [ easy | ].
+      now apply Nat.lt_le_incl.
+    }
 ...
       rewrite <- minus_one_pow_add.
 ...
