@@ -2934,8 +2934,7 @@ Theorem minus_one_pow_add :
   ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
 Proof.
 intros Hop *.
-revert b.
-induction a; intros; cbn; [ now rewrite rngl_mul_1_l | ].
+induction a; cbn; [ now rewrite rngl_mul_1_l | ].
 rewrite (minus_one_pow_succ Hop).
 rewrite (minus_one_pow_succ Hop).
 rewrite IHa.
