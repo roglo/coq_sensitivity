@@ -3059,11 +3059,12 @@ f_equal. {
   } {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
+} {
+  apply ε_map_succ_when_ge.
+  apply permut_seq_NoDup.
+  apply canon_sym_gr_list_permut_seq.
+  apply Nat.mod_upper_bound, fact_neq_0.
 }
-apply ε_map_succ_when_ge.
-apply permut_seq_NoDup.
-apply canon_sym_gr_list_permut_seq.
-apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
 
 Theorem canon_sym_gr_surjective : ∀ n k j,
@@ -3100,63 +3101,19 @@ destruct IHla as [Hla| Hla]; rewrite Hla. {
   destruct IHla as [Haa| Haa]; rewrite Haa; [ now right | ].
   left; apply (rngl_opp_involutive Hop).
 } {
-...
-  rewrite rngl_mul_1_r.
   clear Hla.
-  induction la as [| b]; intros; [ now left | cbn ].
+  rewrite (rngl_mul_opp_r Hop), rngl_mul_1_r.
+  induction la as [| b]; intros; [ now right | cbn ].
   apply not_in_cons in Ha.
   destruct Ha as (Hab, Ha).
   apply NoDup_cons_iff in Hnd.
   destruct Hnd as (Hb, Hnd).
   specialize (IHla Ha Hnd).
-  destruct IHla as [Haa| Haa]; rewrite Haa. {
   remember (a ?= b) as ab eqn:Hc; symmetry in Hc.
-  destruct ab; [ | now left | now right ].
-  now apply Nat.compare_eq_iff in Hc.
-...
-unfold ε.
-destruct (le_dec (length σ) 1) as [Hn1| Hn1]. {
-  replace (length σ - 1) with 0 by flia Hn1.
-  now do 2 rewrite rngl_product_only_one; cbn; left.
+  destruct ab; [ now apply Nat.compare_eq_iff in Hc | easy | ].
+  destruct IHla as [Haa| Haa]; rewrite Haa; [ now right | ].
+  left; apply (rngl_opp_involutive Hop).
 }
-apply rngl_product_1_opp_1; [ easy | ].
-intros i Hi.
-apply rngl_product_1_opp_1; [ easy | ].
-intros j Hj.
-unfold sign_diff.
-rewrite if_ltb_lt_dec.
-remember (nth j σ 0 ?= nth i σ 0) as b eqn:Hb.
-symmetry in Hb.
-destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
-destruct b; [ | now right | now left ].
-apply Nat.compare_eq_iff in Hb.
-apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
-flia Hi Hj Hb Hij.
-Qed.
-
-Theorem NoDup_ε_1_opp_1 :
-  rngl_has_opp = true →
-  ∀ σ, NoDup σ → ε σ = 1%L ∨ ε σ = (-1)%L.
-Proof.
-intros Hop * Hσ.
-unfold ε.
-destruct (le_dec (length σ) 1) as [Hn1| Hn1]. {
-  replace (length σ - 1) with 0 by flia Hn1.
-  now do 2 rewrite rngl_product_only_one; cbn; left.
-}
-apply rngl_product_1_opp_1; [ easy | ].
-intros i Hi.
-apply rngl_product_1_opp_1; [ easy | ].
-intros j Hj.
-unfold sign_diff.
-rewrite if_ltb_lt_dec.
-remember (nth j σ 0 ?= nth i σ 0) as b eqn:Hb.
-symmetry in Hb.
-destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
-destruct b; [ | now right | now left ].
-apply Nat.compare_eq_iff in Hb.
-apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
-flia Hi Hj Hb Hij.
 Qed.
 
 Theorem ε_1_opp_1_NoDup :
@@ -3168,6 +3125,7 @@ Proof.
 intros Hop H10 Heq * Hσ.
 destruct (ListDec.NoDup_dec Nat.eq_dec σ) as [H1| H1]; [ easy | ].
 exfalso.
+...
 apply ε_when_dup in H1; [ | easy | easy ].
 rewrite H1 in Hσ.
 destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
