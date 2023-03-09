@@ -3000,18 +3000,57 @@ apply in_seq in Hj.
 flia Hj.
 Qed.
 
+Theorem ε_map_succ_when_ge :
+   ∀ i la,
+  NoDup la
+  → ε (map (succ_when_ge i) la) = ε la.
+Proof.
+intros * Ha.
+induction la as [| a]; [ easy | cbn ].
+apply NoDup_cons_iff in Ha.
+destruct Ha as (Ha, Hla).
+specialize (IHla Hla).
+rewrite IHla; f_equal.
+clear Ha IHla.
+induction la as [| b]; [ easy | cbn ].
+apply NoDup_cons_iff in Hla.
+destruct Hla as (Hb, Hla).
+specialize (IHla Hla).
+rewrite IHla.
+unfold succ_when_ge, Nat.b2n.
+do 2 rewrite if_leb_le_dec.
+destruct (le_dec i a) as [Hia| Hia]. {
+  destruct (le_dec i b) as [Hib| Hib]. {
+    now do 2 rewrite Nat.add_1_r.
+  }
+  assert (H : b < a) by flia Hia Hib.
+  apply Nat.compare_gt_iff in H; rewrite H; clear H.
+  rewrite Nat.add_0_r.
+  apply Nat.nle_gt in Hib.
+  assert (H : b < a + 1) by flia Hia Hib.
+  now apply Nat.compare_gt_iff in H; rewrite H.
+}
+apply Nat.nle_gt in Hia.
+destruct (le_dec i b) as [Hib| Hib]. {
+  assert (H : a < b) by flia Hia Hib.
+  apply Nat.compare_lt_iff in H; rewrite H; clear H.
+  rewrite Nat.add_0_r.
+  assert (H : a < b + 1) by flia Hia Hib.
+  now apply Nat.compare_lt_iff in H; rewrite H.
+}
+now do 2 rewrite Nat.add_0_r.
+Qed.
+
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ n k,
   k < (S n)!
   → ε (canon_sym_gr_list (S n) k) =
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
-intros Hic Hop * Hkn.
-clear Hic; cbn.
+intros Hop * Hkn; cbn.
 f_equal. {
   apply (ε_aux_map_succ_when_ge_canon_sym_gr_list Hop). {
     apply Nat.lt_succ_r.
@@ -3021,8 +3060,14 @@ f_equal. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
-Search (ε (map _ _)).
+apply ε_map_succ_when_ge.
+apply permut_seq_NoDup.
+apply canon_sym_gr_list_permut_seq.
+apply Nat.mod_upper_bound, fact_neq_0.
+Qed.
+
 ...
+
 End a.
 
 Compute (
