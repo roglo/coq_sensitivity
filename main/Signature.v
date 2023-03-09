@@ -3021,6 +3021,7 @@ f_equal. {
     apply Nat.mod_upper_bound, fact_neq_0.
   }
 }
+Search (ε (map _ _)).
 ...
 End a.
 
