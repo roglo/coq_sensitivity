@@ -3171,7 +3171,27 @@ f_equal. {
     clear v Hvn IHn Hun.
     destruct (Nat.eq_dec i (S n)) as [Hin'| Hin']. {
       subst i; clear Hin.
-...
+(**)
+      rewrite (minus_one_pow_succ Hop); f_equal.
+      apply -> Nat.lt_succ_r in Hiu.
+      destruct (Nat.eq_dec u n) as [Hun| Hun]. {
+        subst u; clear Hiu.
+        erewrite map_ext_in. 2: {
+          intros j Hj.
+          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+          unfold succ_when_ge, Nat.b2n.
+          apply Nat.leb_gt in Hj; rewrite Hj.
+          apply Nat.leb_gt in Hj.
+          rewrite Nat.add_0_r.
+          assert (H : j < S n) by flia Hj.
+          now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
+        }
+        rewrite map_id.
+        apply (ε_aux_seq_out Hop).
+        apply Nat.le_succ_diag_r.
+      }
+      assert (H : u < n) by flia Hiu Hun; clear Hiu Hun.
+      rename H into Hun.
       rewrite (List_seq_cut u); [ | now apply in_seq ].
       rewrite Nat.sub_0_r, Nat.add_0_l.
       rewrite map_app.
@@ -3182,10 +3202,11 @@ f_equal. {
         apply Nat.leb_gt in Hj; rewrite Hj.
         apply Nat.leb_gt in Hj.
         rewrite Nat.add_0_r.
-        assert (H : j < n) by flia Hiu Hj.
+        assert (H : j < S n) by flia Hun Hj.
         now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
       }
       rewrite map_id.
+...
       destruct (Nat.eq_dec (u + 1) n) as [Hu1n| Hu1n]. {
         subst n.
         rewrite Nat.add_comm, Nat.add_sub; cbn.
