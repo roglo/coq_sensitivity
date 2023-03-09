@@ -109,25 +109,15 @@ f_equal; f_equal; f_equal.
 flia.
 Qed.
 
-Theorem List_seq_shift' : ∀ len sta,
-  map (Nat.add sta) (seq 0 len) = seq sta len.
+Theorem List_seq_shift' : ∀ i sta len,
+  map (Nat.add i) (seq sta len) = seq (i + sta) len.
 Proof.
-assert (List_seq_shift_1 : ∀ len sta d,
-  d ≤ sta
-  → map (Nat.add (sta - d)) (seq d len) = seq sta len). {
-  intros * Hd.
-  revert sta d Hd.
-  induction len; intros; [ easy | cbn ].
-  rewrite Nat.sub_add; [ f_equal | easy ].
-  rewrite <- seq_shift, map_map.
-  symmetry.
-  rewrite <- IHlen with (d := S d); [ | flia Hd ].
-  cbn.
-  now rewrite <- seq_shift, map_map.
-}
 intros.
-specialize (List_seq_shift_1 len sta 0 (Nat.le_0_l sta)) as H1.
-now rewrite Nat.sub_0_r in H1.
+revert i sta.
+induction len; intros; [ easy | cbn ].
+f_equal.
+rewrite IHlen.
+now rewrite <- Nat.add_succ_comm.
 Qed.
 
 Theorem List_seq_cut : ∀ i sta len,
