@@ -2949,339 +2949,55 @@ Theorem ε_aux_map_succ_when_ge_canon_sym_gr_list :
   → ε_aux i (map (succ_when_ge i) (canon_sym_gr_list n j)) = minus_one_pow i.
 Proof.
 intros Hop * Hin Hjn.
-revert i j Hin Hjn.
-induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
-remember (j / n!) as u eqn:Hu.
-remember (j mod n!) as v eqn:Hv.
-assert (Hun : u ≤ n). {
-  rewrite Hu.
-  apply Nat.lt_succ_r.
-  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
-  now rewrite <- Nat.mul_comm, <- Nat_fact_succ.
-}
-assert (Hvn : v < n!). {
-  rewrite Hv.
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-clear j Hjn Hu Hv.
-move i before n; move u before i; move v before u.
-rewrite map_map.
-remember (i ?= succ_when_ge i u) as iu eqn:Hiu; symmetry in Hiu.
-destruct iu. {
-  apply Nat.compare_eq_iff in Hiu.
-  exfalso.
-  unfold succ_when_ge in Hiu.
-  unfold Nat.b2n in Hiu.
-  rewrite if_leb_le_dec in Hiu.
-  destruct (le_dec i u) as [H| H]. {
-    rewrite Hiu, Nat.add_1_r in H.
-    now apply Nat.nlt_ge in H; apply H.
-  }
-  rewrite Nat.add_0_r in Hiu; subst u.
-  now apply H.
-} {
-  apply Nat.compare_lt_iff in Hiu.
-  rewrite (ε_aux_ext_in Hop) with (lb := seq 0 n). 2: {
-    specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
-    unfold permut_seq in H1.
-    now rewrite canon_sym_gr_list_length in H1.
-  }
-  clear v IHn Hin Hvn.
-  remember (λ k, _) as f; subst f.
-  destruct (Nat.eq_dec u n) as [Hu| Hu]. {
-    subst u; clear Hun.
-    unfold succ_when_ge, Nat.b2n in Hiu.
-    rewrite if_leb_le_dec in Hiu.
-    destruct (le_dec i n) as [Hin| Hin]; [ clear Hiu | flia Hiu Hin ].
-    destruct (Nat.eq_dec i n) as [Hi| Hi]. {
-      subst i; clear Hin.
-      erewrite map_ext_in. 2: {
-        intros k Hk.
-        apply in_seq in Hk; destruct Hk as (_, Hk); cbn in Hk.
-        unfold succ_when_ge, Nat.b2n.
-        apply Nat.nle_gt in Hk.
-        apply Nat.leb_nle in Hk.
-        rewrite Hk, Nat.add_0_r, Hk.
-        now rewrite Nat.add_0_r.
-      }
-      rewrite map_id.
-      now apply (ε_aux_seq_out Hop).
-    }
-    rewrite (List_seq_cut i); [ | apply in_seq; flia Hin Hi ].
-    rewrite Nat.sub_0_r; cbn.
-    rewrite map_app; cbn.
-    erewrite map_ext_in. 2: {
-      intros k Hk.
-      apply in_seq in Hk; destruct Hk as (_, Hk); cbn in Hk.
-      unfold succ_when_ge, Nat.b2n.
-      rewrite if_leb_le_dec.
-      destruct (le_dec n k) as [H| H]; [ flia Hin Hk H | clear H ].
-      rewrite Nat.add_0_r.
-      apply Nat.nle_gt, Nat.leb_nle in Hk; rewrite Hk.
-      now rewrite Nat.add_0_r.
-    }
-    rewrite map_id.
-    erewrite map_ext_in. 2: {
-      intros k Hk.
-      apply in_seq in Hk.
-      rewrite Nat.add_comm, Nat.sub_add in Hk; [ | easy ].
-      unfold succ_when_ge at 2.
-      destruct Hk as (Hik, Hkn).
-      apply Nat.leb_gt in Hkn; rewrite Hkn, Nat.add_0_r.
-      unfold succ_when_ge.
-      apply Nat.leb_le in Hik; rewrite Hik; cbn.
-      easy.
-    }
-    assert (H : i < n) by flia Hin Hi.
-    clear Hin Hi; rename H into Hin.
-    rewrite (ε_aux_app_all_gt_l Hop). 2: {
-      intros j Hj.
-      now apply in_seq in Hj.
-    }
-    rewrite seq_length.
-    rewrite <- rngl_mul_1_r; f_equal.
-    remember (n - i) as len eqn:Hlen.
-    replace n with (i + len) by flia Hlen Hin.
-    clear n Hin Hlen.
-    erewrite map_ext_in. 2: {
-      now intros k Hk; rewrite Nat.add_1_r.
-    }
-    rewrite seq_shift.
-    remember (S i) as j eqn:Hj.
-    assert (Hji : i < j) by flia Hj.
-    clear Hj.
-    revert j Hji.
-    induction len; intros; [ easy | cbn ].
-    apply Nat.compare_lt_iff in Hji; rewrite Hji.
-    apply Nat.compare_lt_iff in Hji.
-    apply IHlen; flia Hji.
-  }
-  assert (H : u < n) by flia Hun Hu.
-  clear Hun Hu; rename H into Hun.
-  revert i u Hiu Hun.
-  induction n; intros; [ easy | ].
-  rewrite seq_S.
-  rewrite map_app; cbn - [ succ_when_ge ].
-  unfold succ_when_ge at 4.
-  apply -> Nat.lt_succ_r in Hun.
-  apply  Nat.leb_le in Hun; rewrite Hun; cbn.
-  unfold succ_when_ge at 3.
-  generalize Hiu; intros Hiu'.
-  unfold succ_when_ge, Nat.b2n in Hiu.
-  rewrite if_leb_le_dec in Hiu.
-  destruct (le_dec i u) as [H| H]; [ clear H | flia H Hiu ].
-  apply Nat.leb_le in Hun.
-  assert (H : i ≤ n + 1) by flia Hiu Hun.
-  apply Nat.leb_le in H; rewrite H; cbn.
-  rewrite (ε_aux_app_comm Hop); cbn.
-  remember (i ?= n + 1 + 1) as in1 eqn:Hin1; symmetry in Hin1.
-  destruct in1. {
-    apply Nat.compare_eq_iff in Hin1.
-    flia Hiu Hun Hin1.
+rewrite (ε_aux_permut Hop) with (lb := map (succ_when_ge i) (seq 0 n)). 2: {
+  apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+  apply permut_seq_permutation with (n := n). {
+    now apply canon_sym_gr_list_permut_seq_with_len.
   } {
-    destruct (Nat.eq_dec u n) as [Hun1| Hun1]. {
-      subst u.
-      erewrite map_ext_in. 2: {
-        intros j Hj.
-        apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-        unfold succ_when_ge at 2.
-        apply Nat.leb_gt in Hj.
-        rewrite Hj, Nat.add_0_r.
-        easy.
-      }
-      destruct (Nat.eq_dec i n) as [Hin'| Hin']. {
-        subst i.
-        erewrite map_ext_in. 2: {
-          intros j Hj.
-          apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-          unfold succ_when_ge.
-          apply Nat.leb_gt in Hj.
-          now rewrite Hj, Nat.add_0_r.
-        }
-        rewrite map_id.
-        now apply (ε_aux_seq_out Hop).
-      }
-      rewrite (List_seq_cut i). 2: {
-        apply in_seq; split; [ easy | flia Hiu Hin' ].
-      }
-      rewrite Nat.sub_0_r; cbn.
-      rewrite map_app.
-      erewrite map_ext_in. 2: {
-        intros j Hj.
-        apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-        unfold succ_when_ge.
-        apply Nat.leb_gt in Hj.
-        now rewrite Hj, Nat.add_0_r.
-      }
-      rewrite map_id.
-      erewrite map_ext_in. 2: {
-        intros j Hj.
-        apply in_seq in Hj.
-        rewrite Nat.add_comm, Nat.sub_add in Hj; [ | flia Hiu ].
-        unfold succ_when_ge.
-        destruct Hj as (Hj, Hjn).
-        apply Nat.leb_le in Hj; rewrite Hj; cbn.
-        now rewrite Nat.add_1_r.
-      }
-      rewrite seq_shift.
-      rewrite (ε_aux_app_all_gt_l Hop). 2: {
-        intros j Hj.
-        now apply in_seq in Hj.
-      }
-      rewrite seq_length, <- rngl_mul_1_r; f_equal.
-      apply ε_aux_all_gt.
-      intros j Hj.
-      now apply in_seq in Hj.
-    }
-    apply IHn; [ easy | flia Hun Hun1 ].
-  } {
-    apply Nat.compare_gt_iff in Hin1.
-    apply Nat.leb_le in H.
-    flia H Hin1.
+    apply seq_permut_seq_with_len.
   }
-} {
-  apply Nat.compare_gt_iff in Hiu.
-  unfold succ_when_ge, Nat.b2n in Hiu.
-  rewrite if_leb_le_dec in Hiu.
-  destruct (le_dec i u) as [H| H]; [ flia H Hiu | clear H ].
-  rewrite Nat.add_0_r in Hiu.
-  rewrite (ε_aux_ext_in Hop) with (lb := seq 0 n). 2: {
-    specialize (canon_sym_gr_list_permut_seq n Hvn) as H1.
-    unfold permut_seq in H1.
-    now rewrite canon_sym_gr_list_length in H1.
-  }
-  clear v Hvn IHn Hun.
-  destruct (Nat.eq_dec i (S n)) as [Hin'| Hin']. {
-    subst i; clear Hin.
-    rewrite (minus_one_pow_succ Hop); f_equal.
-    apply -> Nat.lt_succ_r in Hiu.
-    destruct (Nat.eq_dec u n) as [Hun| Hun]. {
-      subst u; clear Hiu.
-      erewrite map_ext_in. 2: {
-        intros j Hj.
-        apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-        unfold succ_when_ge, Nat.b2n.
-        apply Nat.leb_gt in Hj; rewrite Hj.
-        apply Nat.leb_gt in Hj.
-        rewrite Nat.add_0_r.
-        assert (H : j < S n) by flia Hj.
-        now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
-      }
-      rewrite map_id.
-      apply (ε_aux_seq_out Hop).
-      apply Nat.le_succ_diag_r.
-    }
-    assert (H : u < n) by flia Hiu Hun; clear Hiu Hun.
-    rename H into Hun.
-    rewrite (List_seq_cut u); [ | now apply in_seq ].
-    rewrite Nat.sub_0_r, Nat.add_0_l.
-    rewrite map_app.
-    erewrite map_ext_in. 2: {
-      intros j Hj.
-      apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-      unfold succ_when_ge, Nat.b2n.
-      apply Nat.leb_gt in Hj; rewrite Hj.
-      apply Nat.leb_gt in Hj.
-      rewrite Nat.add_0_r.
-      assert (H : j < S n) by flia Hun Hj.
-      now apply Nat.leb_gt in H; rewrite H, Nat.add_0_r.
-    }
-    rewrite map_id.
-    erewrite map_ext_in. 2: {
-      intros j Hj.
-      apply in_seq in Hj; destruct Hj as (Hju, Hjn).
-      rewrite Nat.add_comm, Nat.sub_add in Hjn; [ | flia Hun ].
-      unfold succ_when_ge, Nat.b2n.
-      apply Nat.leb_le in Hju; rewrite Hju.
-      rewrite Nat.add_1_r; cbn.
-      apply Nat.leb_gt in Hjn; rewrite Hjn.
-      now rewrite Nat.add_0_r.
-    }
-    rewrite seq_shift.
-    rewrite (ε_aux_app_all_gt_l Hop). 2: {
-      intros j Hj.
-      apply in_seq in Hj; flia Hj Hun.
-    }
-    rewrite seq_length.
-    apply Nat.lt_le_incl in Hun.
-    rewrite (ε_aux_seq_out Hop). 2: {
-      rewrite Nat.add_comm, <- Nat.add_1_r.
-      rewrite Nat.add_assoc, Nat.sub_add; [ | easy ].
-      now rewrite Nat.add_1_r.
-    }
-    rewrite <- (minus_one_pow_add Hop).
-    now rewrite Nat.add_comm, Nat.sub_add.
-  }
-  assert (H : i ≤ n) by flia Hin Hin'.
-  clear Hin Hin'; rename H into Hin.
-  rewrite (List_seq_cut u); [ | apply in_seq; flia Hiu Hin ].
-  rewrite Nat.sub_0_r, Nat.add_0_l.
-  rewrite map_app.
+}
+clear j Hjn.
+destruct (Nat.eq_dec i n) as [Hien| Hien]. {
+  subst i; clear Hin.
   erewrite map_ext_in. 2: {
     intros j Hj.
     apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-    unfold succ_when_ge, Nat.b2n.
-    apply Nat.leb_gt in Hj; rewrite Hj.
-    apply Nat.leb_gt in Hj.
-    rewrite Nat.add_0_r.
-    assert (H : j < i) by flia Hj Hiu.
-    apply Nat.leb_gt in H; rewrite H.
-    now rewrite Nat.add_0_r.
+    unfold succ_when_ge.
+    now apply Nat.leb_gt in Hj; rewrite Hj, Nat.add_0_r.
   }
   rewrite map_id.
-  rewrite (ε_aux_app_all_gt_l Hop). 2: {
-    intros j Hj.
-    apply in_seq in Hj; flia Hj Hiu.
-  }
-  rewrite seq_length.
-  rewrite (List_seq_cut (i - 1)). 2: {
-    apply in_seq.
-    flia Hiu Hin.
-  }
-  rewrite Nat.add_comm, Nat.sub_add; [ | flia Hiu Hin ].
-  rewrite map_app.
-  erewrite map_ext_in. 2: {
-    intros j Hj.
-    apply in_seq in Hj; destruct Hj as (Huj, Hjn).
-    rewrite Nat.add_comm, Nat.sub_add in Hjn; [ | flia Hiu Hin ].
-    unfold succ_when_ge, Nat.b2n.
-    apply Nat.leb_le in Huj; rewrite Huj.
-    apply Nat.leb_le in Huj.
-    assert (H : j + 1 < i) by flia Hjn.
-    apply Nat.leb_gt in H; rewrite H.
-    now rewrite Nat.add_0_r, Nat.add_1_r.
-  }
-  rewrite seq_shift.
-  rewrite (ε_aux_app_all_gt_l Hop). 2: {
-    intros j Hj.
-    apply in_seq in Hj; flia Hj Hiu.
-  }
-  rewrite seq_length.
-  rewrite rngl_mul_assoc.
-  rewrite <- (minus_one_pow_add Hop).
-  rewrite Nat.add_comm, Nat.sub_add; [ | flia Hiu ].
-  erewrite map_ext_in. 2: {
-    intros j Hj.
-    apply in_seq in Hj; destruct Hj as (Hij, Hjn).
-    rewrite Nat.add_comm, Nat.sub_add in Hjn; [ | flia Hiu Hin ].
-    unfold succ_when_ge, Nat.b2n.
-    assert (H : u ≤ j) by flia Hiu Hij.
-    apply Nat.leb_le in H; rewrite H; clear H.
-    assert (H : i ≤ j + 1) by flia Hij.
-    apply Nat.leb_le in H; rewrite H.
-    now rewrite <- Nat.add_assoc, Nat.add_comm.
-  }
-  rewrite List_seq_shift'.
-  rewrite Nat.add_comm, Nat.add_assoc, Nat.sub_add; [ | flia Hiu ].
-  rewrite ε_aux_all_gt. 2: {
-    intros j Hj.
-    apply in_seq in Hj; flia Hj.
-  }
-  rewrite rngl_mul_1_r.
-  destruct i; [ easy | ].
-  rewrite (minus_one_pow_succ Hop); f_equal.
-  now cbn; rewrite Nat.sub_0_r.
+  now apply (ε_aux_seq_out Hop).
 }
+assert (H : i < n) by flia Hin Hien.
+clear Hin Hien; rename H into Hin.
+rewrite (List_seq_cut i); [ | now apply in_seq ].
+rewrite Nat.sub_0_r, Nat.add_0_l.
+rewrite map_app.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+  unfold succ_when_ge, Nat.b2n.
+  now apply Nat.leb_gt in Hj; rewrite Hj, Nat.add_0_r.
+}
+rewrite map_id.
+rewrite (ε_aux_app_all_gt_l Hop). 2: {
+  intros j Hj.
+  now apply in_seq in Hj.
+}
+rewrite seq_length, <- rngl_mul_1_r; f_equal.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply in_seq in Hj; destruct Hj as (Hij, Hjn).
+  rewrite Nat.add_comm, Nat.sub_add in Hjn; [ | now apply Nat.lt_le_incl ].
+  unfold succ_when_ge.
+  now apply Nat.leb_le in Hij; rewrite Hij, Nat.add_1_r; cbn.
+}
+rewrite seq_shift.
+apply ε_aux_all_gt.
+intros j Hj.
+apply in_seq in Hj.
+flia Hj.
 Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
