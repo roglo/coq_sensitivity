@@ -2223,6 +2223,7 @@ rewrite Hal, <- Hbl in Hin.
 rewrite nth_indep with (d' := 0); [ symmetry | easy ].
 easy.
 Qed.
+*)
 
 Theorem comp_1_l : ∀ n l, AllLt l n → seq 0 n ° l = l.
 Proof.
@@ -2235,7 +2236,6 @@ erewrite map_ext_in. 2: {
 }
 apply map_id.
 Qed.
-*)
 
 Theorem comp_1_r : ∀ n la,
   length la = n
