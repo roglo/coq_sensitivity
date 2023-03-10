@@ -707,8 +707,6 @@ Qed.
 Theorem determinant_multilinear :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -719,8 +717,7 @@ Theorem determinant_multilinear :
        (a * det (mat_repl_vect i M U) +
         b * det (mat_repl_vect i M V))%L.
 Proof.
-intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
-clear Hic Hin H10.
+intros Hic Hop * Hsm Hr Hu Hv Hi.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -800,8 +797,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-...
-  rewrite (rngl_mul_comm Hic a).
+  rewrite <- (ε_mul_comm Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -830,7 +826,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic b).
+  rewrite <- (ε_mul_comm Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -883,7 +879,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
@@ -900,7 +895,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 symmetry.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
@@ -918,7 +912,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
@@ -942,8 +935,9 @@ remember
   (∏ (i0 = 2, p + 1),
    mat_el M (i0 - 1) (nth (i0 - 2) (canon_sym_gr_list n k) O + 1))
   as q eqn:Hq.
-rewrite (rngl_mul_mul_swap Hic _ _ q).
-do 3 rewrite (rngl_mul_comm Hic _ q).
+symmetry.
+rewrite (rngl_mul_comm Hic a).
+rewrite (rngl_mul_comm Hic b).
 do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
@@ -971,6 +965,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+symmetry.
 rewrite rngl_add_comm.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
