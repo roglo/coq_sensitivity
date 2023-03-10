@@ -1,3 +1,6 @@
+(* TODO: remove unused definitions and theorems when enough proofs have
+   been done in modules using it *)
+
 (* signatures *)
 
 Set Nested Proofs Allowed.
@@ -357,6 +360,35 @@ destruct (i ?= a); [ now right; left | | ]. {
 }
 Qed.
 
+Theorem ε_in :
+  rngl_has_opp = true →
+  ∀ la, ε la ∈ [-1; 0; 1]%L.
+Proof.
+intros Hop *.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+induction la as [| a]; cbn; [ now right; right; left | ].
+specialize (ε_aux_in Hop a la) as H1.
+destruct IHla as [H2| [H2| [H2| ]]]; [ | | | easy ]; rewrite <- H2. {
+  destruct H1 as [H1| [H1| [H1| ]]]; [ | | | easy ]; rewrite <- H1. {
+    right; right; left.
+    symmetry; apply (rngl_squ_opp_1 Hop).
+  } {
+    right; left.
+    symmetry; apply (rngl_mul_0_l Hos).
+  } {
+    left.
+    symmetry; apply rngl_mul_1_l.
+  }
+} {
+  right; left.
+  symmetry; apply (rngl_mul_0_r Hos).
+} {
+  now rewrite rngl_mul_1_r.
+}
+Qed.
+
 Theorem ε_aux_mul_comm :
   rngl_has_opp = true →
   ∀ i la a, (ε_aux i la * a = a * ε_aux i la)%L.
@@ -381,6 +413,21 @@ destruct H1 as [H1| H1]. {
 destruct H1 as [H1| H1]; [ | easy ].
 rewrite <- H1.
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
+Qed.
+
+Theorem ε_mul_comm :
+  rngl_has_opp = true →
+  ∀ la a, (ε la * a = a * ε la)%L.
+Proof.
+intros Hop *.
+induction la as [| b]. {
+  now cbn; rewrite rngl_mul_1_l, rngl_mul_1_r.
+}
+cbn.
+rewrite <- rngl_mul_assoc.
+do 2 rewrite (ε_aux_mul_comm Hop).
+rewrite IHla.
+symmetry; apply rngl_mul_assoc.
 Qed.
 
 Theorem ε_aux_app_lt_lt :
@@ -3196,6 +3243,7 @@ Arguments ε {T}%type {ro}.
 Arguments ε_nil {T ro rp}.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 *)
+Arguments ε_mul_comm {T ro rp} Hop la%list a%L.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hop (n k)%nat.
 (*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.

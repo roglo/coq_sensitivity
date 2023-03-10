@@ -377,13 +377,12 @@ Qed.
 (* det and det' are equal *)
 
 Theorem det_is_det' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det' M.
 Proof.
-intros Hic Hop * Hm.
+intros Hop * Hm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -397,7 +396,7 @@ induction n; intros. {
   rewrite rngl_summation_only_one.
   rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
   unfold ε, iter_seq, iter_list; unfold "<?"; cbn.
-  now do 3 rewrite rngl_mul_1_l.
+  symmetry; apply rngl_mul_1_l.
 }
 rewrite determinant_succ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -405,9 +404,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_product_only_one; cbn.
-  unfold ε; cbn.
-  do 2 rewrite rngl_product_only_one; cbn.
-  now rewrite rngl_mul_1_r.
+  now do 2 rewrite rngl_mul_1_r.
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -443,15 +440,15 @@ rewrite Nat.sub_diag.
 rewrite Nat.add_1_r.
 cbn - [ canon_sym_gr_list nth ].
 remember (mat_el M 1 _) as x eqn:Hx.
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (ε_mul_comm Hop).
 symmetry.
 rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (minus_one_pow_mul_comm Hop).
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
 (* separation factors "∏" and "ε" *)
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (ε_mul_comm Hop).
 rewrite <- rngl_mul_assoc.
 f_equal. {
   (* equality of the two "∏" *)
@@ -498,7 +495,7 @@ symmetry.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
-apply ε_of_sym_gr_permut_succ; [ easy | easy | ].
+apply ε_of_sym_gr_permut_succ; [ easy | ].
 apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
@@ -512,6 +509,7 @@ Theorem det'_is_det'' :
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop Heq *.
+...
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
