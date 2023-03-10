@@ -984,8 +984,6 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-...
-
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_swap_elem [] (mat_list_list M) (i1 - 1) (i2 - 1)).
 
@@ -1501,9 +1499,9 @@ intros Hif * Hpq Hp Hq Hsm.
 assert (H10 : rngl_characteristic ≠ 1). {
   now rewrite (cf_characteristic Hif).
 }
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
+specialize (Hos (or_introl Hop)).
 move Hos before Hif.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 rewrite det_is_det'; try now destruct Hif. 2: {
@@ -1542,7 +1540,7 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
+  destruct Hif as (Hic, _, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
@@ -1711,10 +1709,10 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
+  destruct Hif as (Hic, _, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
-  rewrite transposition_signature; try easy.
+  rewrite (transposition_signature Hop); [ easy | | easy | easy ].
   flia Hp Hq Hpq.
 }
 cbn - [ f ].
@@ -2264,6 +2262,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct Hσ.
     rewrite <- (permut_comp_assoc _ H); clear H; [ | easy | easy ].
     rewrite permut_comp_isort_rank_l; [ | easy ].
+...
     apply comp_1_r.
     destruct Hpμ; congruence.
   }

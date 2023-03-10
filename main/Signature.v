@@ -1679,6 +1679,7 @@ intros j Hj.
 do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
+*)
 
 Theorem transposition_permut_seq_with_len : ∀ p q n,
   p < n → q < n → permut_seq_with_len n (map (transposition p q) (seq 0 n)).
@@ -1721,9 +1722,7 @@ split. {
 }
 now rewrite map_length, seq_length.
 Qed.
-*)
 
-(*
 Theorem ε_aux_app : ∀ i p q,
   (∀ j k, j ∈ i :: p → k ∈ q → j < k)
   → ε_aux i (p ++ q) = ε_aux i p.
@@ -1818,9 +1817,19 @@ destruct (i ?= j). {
   destruct Hk; [ now left | now right; right ].
 }
 Qed.
-*)
 
-(*
+Theorem minus_one_pow_add :
+  rngl_has_opp = true →
+  ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
+Proof.
+intros Hop *.
+induction a; cbn; [ now rewrite rngl_mul_1_l | ].
+rewrite (minus_one_pow_succ Hop).
+rewrite (minus_one_pow_succ Hop).
+rewrite IHa.
+now rewrite rngl_mul_opp_l.
+Qed.
+
 Theorem ε_app2 :
   rngl_has_opp = true →
   ∀ p q,
@@ -1861,9 +1870,7 @@ cbn.
 do 2 rewrite rngl_mul_1_r.
 apply IHlen.
 Qed.
-*)
 
-(*
 Theorem transposition_signature_lt :
   rngl_has_opp = true →
   ∀ n p q,
@@ -2013,6 +2020,7 @@ intros i Hi.
 apply transposition_comm.
 Qed.
 
+(*
 Theorem comp_permut_seq : ∀ n σ₁ σ₂,
   permut_seq_with_len n σ₁
   → permut_seq_with_len n σ₂
@@ -2977,18 +2985,6 @@ unfold succ_when_ge.
 now rewrite Nat.leb_refl.
 Qed.
 
-Theorem minus_one_pow_add :
-  rngl_has_opp = true →
-  ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
-Proof.
-intros Hop *.
-induction a; cbn; [ now rewrite rngl_mul_1_l | ].
-rewrite (minus_one_pow_succ Hop).
-rewrite (minus_one_pow_succ Hop).
-rewrite IHa.
-now rewrite rngl_mul_opp_l.
-Qed.
-
 Theorem ε_aux_map_succ_when_ge_canon_sym_gr_list :
   rngl_has_opp = true →
   ∀ n i j,
@@ -3250,9 +3246,7 @@ Arguments map_nth_permut_seq n%nat [la lb]%list.
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
 *)
 Arguments sign_comp {T}%type {ro rp} Hop [la lb]%list.
-(*
-Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
-*)
+Arguments transposition_signature {T}%type {ro rp} Hop (n p q)%nat.
 Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].
 Arguments NoDup_ε_square {T}%type {ro rp} _ [σ].
 Arguments ε_when_dup {T ro rp} Hop [la]%list.
