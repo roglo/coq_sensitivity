@@ -505,11 +505,9 @@ Qed.
 
 Theorem det'_is_det'' :
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
-intros Hop Heq *.
-...
+intros Hop *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -605,7 +603,7 @@ assert (H1 :
   intros l Hl.
   destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
   assert (H : ε l = 0%L). {
-    apply ε_when_dup; [ easy | easy | ].
+    apply ε_when_dup; [ easy | ].
     intros Hnd.
     apply H1; clear H1.
     apply in_map_iff.
@@ -694,16 +692,14 @@ Qed.
 (* det and det'' are equal *)
 
 Theorem det_is_det'' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det'' M.
 Proof.
-intros Hic Hop Heq * Hm.
-rewrite det_is_det'; [ | easy | easy | easy ].
-now apply det'_is_det''.
+intros Hop * Hm.
+rewrite (det_is_det' Hop); [ | easy ].
+apply (det'_is_det'' Hop).
 Qed.
 
 (* multilinearity *)
@@ -724,6 +720,7 @@ Theorem determinant_multilinear :
         b * det (mat_repl_vect i M V))%L.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
+clear Hic Hin H10.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -803,6 +800,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
+...
   rewrite (rngl_mul_comm Hic a).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
@@ -990,6 +988,8 @@ rewrite rngl_add_comm.
 do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
+
+...
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_swap_elem [] (mat_list_list M) (i1 - 1) (i2 - 1)).

@@ -1019,14 +1019,14 @@ Qed.
 (*
 Theorem ε_nil : ε [] = 1%L.
 Proof. easy. Qed.
+*)
 
 Theorem ε_aux_map_S : ∀ i l,  ε_aux (S i) (map S l) = ε_aux i l.
 Proof.
 intros.
 revert i.
 induction l as [| j]; intros; [ easy | cbn ].
-rewrite IHl.
-now destruct (i ?= j).
+now rewrite IHl.
 Qed.
 
 Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
@@ -1037,7 +1037,6 @@ rewrite IHl.
 f_equal.
 apply ε_aux_map_S.
 Qed.
-*)
 
 (*
 Theorem minus_one_pow_succ_succ :
