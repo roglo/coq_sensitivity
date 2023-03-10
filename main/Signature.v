@@ -2709,6 +2709,7 @@ split. {
   }
 }
 Qed.
+*)
 
 Theorem ε_dup :
   rngl_has_opp = true →
@@ -2749,6 +2750,7 @@ subst la.
 apply (ε_dup Hop).
 Qed.
 
+(*
 Theorem comp_map : ∀ la lb,
   la ° lb = map (λ i, nth (nth i lb 0) la 0) (seq 0 (length lb)).
 Proof.
@@ -3119,21 +3121,19 @@ Qed.
 Theorem ε_1_opp_1_NoDup :
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
-  rngl_has_eqb = true →
   ∀ σ, ε σ = 1%L ∨ ε σ = (-1)%L → NoDup σ.
 Proof.
-intros Hop H10 Heq * Hσ.
+intros Hop H10 * Hσ.
 destruct (ListDec.NoDup_dec Nat.eq_dec σ) as [H1| H1]; [ easy | ].
 exfalso.
-...
-apply ε_when_dup in H1; [ | easy | easy ].
+apply (ε_when_dup Hop) in H1.
 rewrite H1 in Hσ.
 destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
-  now apply rngl_1_neq_0_iff in Hσ.
+  revert Hσ; apply rngl_1_neq_0_iff, H10.
 } {
-  rewrite <- rngl_opp_0 in Hσ; [ | easy ].
-  apply rngl_opp_inj in Hσ; [ | easy ].
-  now apply rngl_1_neq_0_iff in Hσ.
+  rewrite <- (rngl_opp_0 Hop) in Hσ.
+  apply (rngl_opp_inj Hop) in Hσ.
+  revert Hσ; apply rngl_1_neq_0_iff, H10.
 }
 Qed.
 
@@ -3191,22 +3191,29 @@ Qed.
 End a.
 
 Arguments ε {T}%type {ro}.
-Arguments sign_diff {T}%type {ro} (u v)%nat.
 
+(*
 Arguments ε_nil {T ro rp}.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
-Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hic Hop (n k)%nat.
+*)
+Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hop (n k)%nat.
+(*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.
 Arguments map_nth_permut_seq n%nat [la lb]%list.
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
-Arguments sign_comp {T}%type {ro rp} _ [la lb]%list.
+*)
+Arguments sign_comp {T}%type {ro rp} Hop [la lb]%list.
+(*
 Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
+*)
 Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].
 Arguments NoDup_ε_square {T}%type {ro rp} _ [σ].
-Arguments ε_when_dup {T ro rp} Hop Hde [la]%list.
+Arguments ε_when_dup {T ro rp} Hop [la]%list.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
-Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
+Arguments minus_one_pow_add {T}%type {ro rp} Hop (a b)%nat.
 Arguments minus_one_pow_mul_comm {T ro rp} Hop i%nat x%L.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
+(*
 Arguments minus_one_pow_succ_succ {T}%type {ro rp} _ i%nat.
+*)
