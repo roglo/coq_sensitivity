@@ -2262,7 +2262,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct Hσ.
     rewrite <- (permut_comp_assoc _ H); clear H; [ | easy | easy ].
     rewrite permut_comp_isort_rank_l; [ | easy ].
-...
     apply comp_1_r.
     destruct Hpμ; congruence.
   }
@@ -2271,7 +2270,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   replace (ε ((μ ° isort_rank Nat.leb σ) ° σ)) with
       (ε (μ ° isort_rank Nat.leb σ) * ε σ)%L. 2: {
     destruct Hσ.
-    rewrite <- sign_comp; [ easy | easy | ].
+    rewrite <- sign_comp; [ easy | now destruct Hif | ].
     now rewrite comp_length, isort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
@@ -2444,6 +2443,7 @@ apply (f_equal (comp_list l1)) in Hill.
 rewrite comp_isort_rank_r in Hill.
 rewrite permut_isort_leb in Hill; [ | easy ].
 apply (f_equal (λ l, comp_list l l2)) in Hill.
+...
 rewrite comp_1_l in Hill. 2: {
   now rewrite Hll; apply permut_seq_iff in Hpl2.
 }

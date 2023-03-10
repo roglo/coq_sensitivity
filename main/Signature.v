@@ -2020,7 +2020,6 @@ intros i Hi.
 apply transposition_comm.
 Qed.
 
-(*
 Theorem comp_permut_seq : ∀ n σ₁ σ₂,
   permut_seq_with_len n σ₁
   → permut_seq_with_len n σ₂
@@ -2064,6 +2063,7 @@ split. {
 }
 Qed.
 
+(*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list_scope.
 
 Theorem comp_permut_seq_with_len : ∀ n σ₁ σ₂,
@@ -2235,6 +2235,7 @@ erewrite map_ext_in. 2: {
 }
 apply map_id.
 Qed.
+*)
 
 Theorem comp_1_r : ∀ n la,
   length la = n
@@ -2247,6 +2248,7 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
+(*
 Arguments comp_1_r n%nat [la]%list.
 
 Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
@@ -3240,8 +3242,8 @@ Arguments ε_permut {T}%type {ro} (n k)%nat.
 *)
 Arguments ε_mul_comm {T ro rp} Hop la%list a%L.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hop (n k)%nat.
-(*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.
+(*
 Arguments map_nth_permut_seq n%nat [la lb]%list.
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
 *)
