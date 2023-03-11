@@ -2297,7 +2297,6 @@ split. {
   apply in_map_iff.
   exists (canon_sym_gr_list_inv n (isort_rank Nat.leb l ° σ)).
   rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
- ...
    apply comp_permut_seq_with_len; [ | easy ].
     apply isort_rank_permut_seq_with_len.
     now destruct Hl.
@@ -2427,12 +2426,12 @@ End a.
 Arguments det {T ro} M%M.
 Arguments det' {T}%type {ro} M%M.
 Arguments det'' {T}%type {ro} M%M.
-Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
+Arguments determinant_alternating {T}%type {ro rp} Hic Hop M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
-Arguments det_is_det' {T ro rp} Hic Hop M%M Hsm.
-Arguments det'_is_det'' {T ro rp} _ _ M%M.
-Arguments det_is_det'' {T ro rp} Hic Hop Heq M%M Hsm.
+Arguments det_is_det' {T ro rp} Hop M%M Hsm.
+Arguments det'_is_det'' {T ro rp} Hop M%M.
+Arguments det_is_det'' {T ro rp} Hop M%M Hsm.
 Arguments det_mI {T ro rp} _ n%nat.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.

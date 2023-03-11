@@ -316,7 +316,8 @@ destruct (le_dec (length la) sta) as [Hsla| Hsla]. {
     }
     easy.
   }
-  rewrite <- (List_seq_shift' len).
+  specialize (List_seq_shift' sta 0 len) as H1; rewrite Nat.add_0_r in H1.
+  rewrite <- H1. clear H1.
   rewrite List_fold_left_map.
   rewrite <- List_fold_left_map_nth_len.
   rewrite List_fold_left_nop_r.
@@ -671,7 +672,7 @@ assert (H : i < n) by flia Hin.
 specialize (IHi H); clear H.
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ det ].
-rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
+rewrite determinant_alternating; [ | easy | easy | flia | | | ]; cycle 1. {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
@@ -1043,7 +1044,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite map_length, butn_length, fold_mat_nrows.
   rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite Nat.add_comm.
-  rewrite minus_one_pow_add_r; [ | now destruct Hif ].
+  rewrite minus_one_pow_add; [ | now destruct Hif ].
   do 2 rewrite <- rngl_mul_assoc.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc.
@@ -1080,7 +1081,9 @@ rewrite fold_det.
 assert (H1 : 1 ≠ p) by flia Hlin Hi1.
 assert (H2 : p - 1 < mat_nrows M) by flia Hlin.
 apply Nat.neq_0_lt_0 in Hnz.
-rewrite <- (determinant_alternating Hif M H1); [ | easy | easy | easy ].
+assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+rewrite <- (determinant_alternating Hic Hop M H1); [ | easy | easy | easy ].
 unfold det.
 rewrite mat_swap_rows_nrows.
 remember (determinant_loop (mat_nrows M)) as x eqn:Hx.
@@ -1305,6 +1308,7 @@ Theorem determinant_with_row : in_charac_0_field →
 Proof.
 intros Hif * Hsm Hir.
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
+assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i; cbn - [ det ].
   unfold det.
@@ -1319,7 +1323,7 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   now cbn; rewrite Nat.sub_0_r.
 }
 apply rngl_opp_inj; [ easy | ].
-rewrite <- (determinant_alternating Hif M Hi1); [ | easy | flia Hir | easy ].
+rewrite <- (determinant_alternating Hic Hop M Hi1); [ | easy | flia Hir | easy ].
 unfold det at 1.
 rewrite mat_swap_rows_nrows.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
@@ -1332,7 +1336,7 @@ intros j Hj.
 rewrite <- rngl_mul_assoc; symmetry.
 rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite (Nat.add_comm i j).
-rewrite minus_one_pow_add_r; [ | easy ].
+rewrite minus_one_pow_add; [ | easy ].
 rewrite rngl_mul_opp_r; [ | easy ].
 rewrite <- rngl_mul_opp_l; [ | easy ].
 rewrite <- rngl_mul_opp_l; [ | easy ].

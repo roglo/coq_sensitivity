@@ -2063,7 +2063,6 @@ split. {
 }
 Qed.
 
-(*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list_scope.
 
 Theorem comp_permut_seq_with_len : ∀ n σ₁ σ₂,
@@ -2077,7 +2076,6 @@ unfold "°".
 rewrite map_length.
 now destruct Hp2.
 Qed.
-*)
 
 (*
 Theorem map_nth_permut_seq : ∀ n la lb,
@@ -2111,7 +2109,6 @@ split. {
 Qed.
 *)
 
-(*
 Theorem permut_comp_cancel_l : ∀ n la lb lc,
   NoDup la
   → length la = n
@@ -2223,7 +2220,6 @@ rewrite Hal, <- Hbl in Hin.
 rewrite nth_indep with (d' := 0); [ symmetry | easy ].
 easy.
 Qed.
-*)
 
 Theorem comp_1_l : ∀ n l, AllLt l n → seq 0 n ° l = l.
 Proof.
@@ -2248,15 +2244,16 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
-(*
 Arguments comp_1_r n%nat [la]%list.
 
+(*
 Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
 Proof.
 intros.
 apply isort_rank_permut_seq_with_len.
 apply isort_rank_length.
 Qed.
+*)
 
 Theorem permut_isort_rank_involutive : ∀ la,
   permut_seq la
@@ -2279,6 +2276,7 @@ rewrite isort_rank_length; symmetry.
 now apply permut_isort_leb.
 Qed.
 
+(*
 Theorem collapse_lt_compat : ∀ l i j,
   i < length l
   → j < length l
@@ -2489,6 +2487,7 @@ intros i j Hi Hj.
 rewrite collapse_length in Hi, Hj.
 now apply (collapse_keeps_order Hnd).
 Qed.
+*)
 
 Theorem permut_isort : ∀ ord,
   antisymmetric ord
@@ -2595,6 +2594,7 @@ apply isort_comp_permut_r.
 now rewrite Hal, <- Hbl.
 Qed.
 
+(*
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
 
 Theorem permut_collapse : ∀ la,
@@ -3245,8 +3245,8 @@ Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hop (n k)%nat.
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.
 (*
 Arguments map_nth_permut_seq n%nat [la lb]%list.
-Arguments permut_isort_rank_comp n%nat [la lb]%list.
 *)
+Arguments permut_isort_rank_comp n%nat [la lb]%list.
 Arguments sign_comp {T}%type {ro rp} Hop [la lb]%list.
 Arguments transposition_signature {T}%type {ro rp} Hop (n p q)%nat.
 Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].
