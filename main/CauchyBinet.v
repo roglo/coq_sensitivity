@@ -1849,7 +1849,8 @@ symmetry.
 apply (rngl_mul_summation_list_distr_r Hos).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_2 :
+  rngl_has_opp = true →
   ∀ m n A f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
@@ -1859,9 +1860,7 @@ Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
        ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))) *
     f jl.
 Proof.
-intros Hif * Hmz.
-assert (Hop : rngl_has_opp = true) by now destruct Hif.
-move Hop before Hif.
+intros Hop * Hmz.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
@@ -2125,15 +2124,14 @@ rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hit _ B Hmz Hcb Hbr Hbc).
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_5_1 Hop).
-...
+rewrite (Cauchy_Binet_formula_step_5_1 Hop Heb).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_2 Hif n A _ Hmz).
+rewrite (Cauchy_Binet_formula_step_5_2 Hop n A _ Hmz).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2149,6 +2147,7 @@ rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
+...
 rewrite (Cauchy_Binet_formula_step_5_4 Hif A _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
