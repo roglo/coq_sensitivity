@@ -1761,8 +1761,8 @@ now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_4 :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ m n f B, m ≠ 0 →
@@ -1774,7 +1774,7 @@ Lemma Cauchy_Binet_formula_step_4 :
     ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       ε kl * f kl * det (mat_select_rows (isort Nat.leb kl) B).
 Proof.
-intros Hic Hop Hch Hit * Hmz Hcb Hbr Hbc.
+intros Hop Hic Hch Hit * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
 intros la Hla.
 rewrite (det_isort_rows Hop Hic Hch Hit _ _ Hcb); cycle 1. {
@@ -1804,9 +1804,10 @@ Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
 Proof.
 intros Hif *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+assert (Heb : rngl_has_eqb = true) by now destruct Hif.
+specialize (Hos (or_introl Hop)).
+clear Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   now rewrite <- rngl_mul_assoc.
@@ -1814,8 +1815,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 remember (∑ (kl ∈ _), _) as x; subst x.
 rewrite rngl_summation_cart_prod_sub_lists_all_permut; cycle 1. {
-  now destruct Hif.
+  easy.
 } {
+  easy.
+...
   now destruct Hif.
 }
 (*
@@ -1853,6 +1856,8 @@ symmetry.
 apply rngl_mul_summation_list_distr_r.
 now destruct Hif.
 Qed.
+
+...
 
 Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 →
@@ -2073,8 +2078,12 @@ Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
-assert (Hch : rngl_characteristic ≠ 1). {
-  now destruct Hif; rewrite cf_characteristic.
+assert (Hch : rngl_characteristic = 0) by now destruct Hif.
+assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (Hit :
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
+  destruct Hif.
+  now apply Bool.orb_true_iff; left.
 }
 clear Hif.
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
@@ -2099,7 +2108,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hcra Hac) as H1.
   now rewrite Har in H1.
 }
-rewrite (Cauchy_Binet_formula_step_1 Hop Hch A B Hmz Har Hac Hbc).
+rewrite (Cauchy_Binet_formula_step_1 Hop H10 A B Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
@@ -2112,20 +2121,20 @@ rewrite (Cauchy_Binet_formula_step_2 Hop Hic n A B Hmz).
     (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_3 Hop Hch _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_3 Hop H10 _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-...
-rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hit _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
+...
 rewrite (Cauchy_Binet_formula_step_5_1 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
