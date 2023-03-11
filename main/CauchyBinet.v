@@ -1376,15 +1376,13 @@ Theorem fold_det''' : ∀ n M,
 Proof. now intros; subst n. Qed.
 
 Theorem det_is_det''' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ M, is_square_matrix M = true
   → det M = det''' M.
 Proof.
-intros Hic Hop Heq * Hm.
-...
-rewrite det_is_det''; [ | easy | easy | easy | easy ].
+intros Hop Heq * Hm.
+rewrite det_is_det''; [ | easy | easy ].
 unfold det'', det'''.
 unfold cart_prod_rep_seq.
 rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
@@ -1478,8 +1476,7 @@ specialize (isort_rank_map_add_compat 1 0 la) as H1.
 replace (add 1) with S in H1 by easy; rewrite H1.
 cbn; rewrite map_id; clear H1.
 rewrite fold_collapse.
-apply permut_collapse.
-now unfold permut_seq.
+now apply permut_collapse.
 Qed.
 
 Theorem mat_select_all_rows : ∀ A,
@@ -1861,6 +1858,8 @@ Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
     f jl.
 Proof.
 intros Hif * Hmz.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+move Hop before Hif.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
@@ -1932,7 +1931,7 @@ f_equal. {
     apply seq_NoDup.
   }
   symmetry.
-  rewrite (sign_comp Hif). 2: {
+  rewrite (sign_comp Hop). 2: {
     rewrite collapse_length, Hjm, <- Hkm.
     apply collapse_permut_seq_with_len.
   }

@@ -2586,7 +2586,6 @@ apply isort_comp_permut_r.
 now rewrite Hal, <- Hbl.
 Qed.
 
-(*
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
 
 Theorem permut_collapse : ∀ la,
@@ -2757,7 +2756,6 @@ split. {
   }
 }
 Qed.
-*)
 
 Theorem ε_dup :
   rngl_has_opp = true →
