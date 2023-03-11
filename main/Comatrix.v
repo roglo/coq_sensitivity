@@ -1427,15 +1427,15 @@ Qed.
 *)
 
 Theorem matrix_comatrix_transp_mul :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hic Hop Hch Hit * Hsm.
+intros Hop Hic Hch Hit * Hsm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1615,17 +1615,17 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem comatrix_transp_matrix_mul : in_charac_0_field →
+Theorem comatrix_transp_matrix_mul :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hif * Hsm.
-assert (Hop : rngl_has_opp = true) by now destruct Hif.
-assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
-assert (Hch : rngl_characteristic = 0) by now destruct Hif.
+intros Hop Hic Hch Hit * Hsm.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-clear Hif.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 destruct M as (ll); cbn - [ det ].
@@ -1757,8 +1757,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct Hj as (_, Hj); cbn in Hj.
   (* perhaps all of this below would be a "determinant_with_bad_col":
      perhaps a cool lemma to do? *)
-...
-  specialize (determinant_with_bad_row Hop Hic Hch) as H1.
+  specialize (determinant_with_bad_row Hop Hic Hch Hit) as H1.
   specialize (H1 (S i) (S j) (M⁺)%M).
   assert (Hsmt : is_square_matrix M⁺ = true). {
     now apply mat_transp_is_square.
@@ -1774,7 +1773,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (H1 H); clear H.
   erewrite rngl_summation_eq_compat in H1. 2: {
     intros k Hk.
-    rewrite <- determinant_transpose; [ | easy | ]. 2: {
+    rewrite <- determinant_transpose; [ | easy | easy | easy | ]. 2: {
       apply is_squ_mat_subm. {
         rewrite mat_transp_nrows, squ_mat_ncols; [ | easy ].
         flia Hk Hi.
@@ -1816,17 +1815,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-...
-
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
-Theorem mat_mul_inv_r : in_charac_0_field →
+Theorem mat_mul_inv_r :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  rngl_has_inv = true →
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
   → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
-intros Hif * Hsm Hdz.
+intros Hop Hic Hch Hiv Hit * Hsm Hdz.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
   unfold mat_nrows in Hrz.
@@ -1834,11 +1836,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   now destruct M as (ll); cbn in Hrz; subst ll.
 }
 unfold mat_inv.
-rewrite mat_mul_mul_scal_l; cycle 1. {
-  now destruct Hif.
-} {
-  now destruct Hif.
-} {
+rewrite (mat_mul_mul_scal_l Hop Hic); cycle 1. {
   apply squ_mat_is_corr.
   apply mat_transp_is_square.
   now apply comatrix_is_square.
@@ -1850,9 +1848,9 @@ rewrite mat_mul_mul_scal_l; cycle 1. {
   rewrite mat_transp_nrows; symmetry.
   apply comatrix_ncols.
 }
-rewrite matrix_comatrix_transp_mul; [ | easy | easy ].
+rewrite (matrix_comatrix_transp_mul Hop Hic Hch); [ | easy | easy ].
 rewrite mat_mul_scal_l_mul_assoc.
-rewrite rngl_mul_inv_l; [ | now destruct Hif | now destruct Hif ].
+rewrite rngl_mul_inv_l; [ | easy | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
@@ -1869,6 +1867,8 @@ rewrite mat_mul_scal_l_mul; [ | now destruct Hif | ]. 2: {
   apply mat_transp_is_square.
   now apply comatrix_is_square.
 }
+rewrite comatrix_transp_matrix_mul.
+...
 rewrite comatrix_transp_matrix_mul; [ | easy | easy ].
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
