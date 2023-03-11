@@ -2020,7 +2020,10 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_4 :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  rngl_characteristic ≠ 1 →
   ∀ m n A f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
@@ -2032,10 +2035,7 @@ Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
       det (mat_select_cols jl A) * f jl.
 Proof.
-intros Hif * Hmz Hnz Hca Har Hac.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop Heb H10 * Hmz Hnz Hca Har Hac.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
@@ -2043,7 +2043,7 @@ rewrite fold_det'''. 2: {
   rewrite mat_select_cols_nrows; [ easy | | congruence ].
   now apply sub_lists_of_seq_1_n_are_correct in Hjl.
 }
-rewrite <- det_is_det'''; try now destruct Hif.
+rewrite <- det_is_det'''; [ easy | easy | easy | ].
 generalize Hjl; intros H.
 apply in_sub_lists_of_seq_1_n_length in H.
 apply mat_select_cols_is_square; [ easy | congruence | ].
@@ -2147,8 +2147,7 @@ rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-...
-rewrite (Cauchy_Binet_formula_step_5_4 Hif A _ Hmz Hnz Hca Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_4 Hop Heb H10 A _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     det (mat_select_cols jl A) * det (mat_select_rows jl B) =
@@ -2156,8 +2155,6 @@ rewrite (Cauchy_Binet_formula_step_5_4 Hif A _ Hmz Hnz Hca Har Hac).
 *)
 easy.
 Qed.
-
-...
 
 End a.
 
