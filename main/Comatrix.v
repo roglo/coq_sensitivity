@@ -1013,6 +1013,8 @@ Theorem determinant_with_row : in_charac_0_field →
     minus_one_pow (i + j) * mat_el M i j * det (subm i j M).
 Proof.
 intros Hif * Hsm Hir.
+clear Hif.
+...
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
@@ -1068,7 +1070,8 @@ Qed.
 Theorem determinant_with_bad_row :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1077,7 +1080,7 @@ Theorem determinant_with_bad_row :
   → ∑ (j = 1, mat_nrows M),
     minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%L.
 Proof.
-intros Hic Hop H10 * Hsm Hir Hkr Hik.
+intros Hic Hop Hch Hit * Hsm Hir Hkr Hik.
 specialize (squ_mat_ncols _ Hsm) as Hc.
 remember
   (mk_mat
@@ -1107,8 +1110,11 @@ assert (Hira : mat_nrows A = mat_nrows M). {
   now subst A; cbn; rewrite List_map_seq_length.
 }
 assert (H1 : det A = 0%L). {
-...
-  apply determinant_same_rows with (p := i) (q := k); try easy. {
+  apply (determinant_same_rows Hic Hop Hch Hit) with (p := i) (q := k). {
+    easy.
+  } {
+    easy.
+  } {
     now rewrite Hira.
   } {
     now rewrite Hira.
@@ -1128,6 +1134,9 @@ assert (H1 : det A = 0%L). {
   apply Nat.neq_sym, Nat.eqb_neq in Hik.
   now rewrite Hik.
 }
+...
+rewrite determinant_with_row with (i := i) in H1; [ | | | ]. 2: {
+...
 rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | ]. 2: {
   now rewrite Hira.
 }

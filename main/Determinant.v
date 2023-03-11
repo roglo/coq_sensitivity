@@ -2434,7 +2434,7 @@ Arguments det' {T}%type {ro} M%M.
 Arguments det'' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} Hic Hop M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
-Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
+Arguments determinant_same_rows {T ro rp} Hic Hop Hch Hit M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T ro rp} Hop M%M Hsm.
 Arguments det'_is_det'' {T ro rp} Hop M%M.
