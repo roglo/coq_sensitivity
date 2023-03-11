@@ -1480,7 +1480,11 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Theorem determinant_same_rows : in_charac_0_field →
+Theorem determinant_same_rows :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
@@ -1489,9 +1493,8 @@ Theorem determinant_same_rows : in_charac_0_field →
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%L.
 Proof.
-intros Hif * Hsm Hpq Hpn Hqn Hjpq.
-destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+intros Hic Hop Hit Hch * Hsm Hpq Hpn Hqn Hjpq.
+clear Hit.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1541,10 +1544,18 @@ assert (HM : det M = (- det M)%L). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
+...
+Search rngl_characteristic.
+...
+Check rngl_add_move_0_r.
+...
 apply eq_rngl_add_same_0 in HM; try easy.
 apply Bool.orb_true_iff.
+left.
 now left.
 Qed.
+
+...
 
 (* transpositions list of permutation *)
 
@@ -1734,7 +1745,9 @@ intros i Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
-Theorem det_by_any_sym_gr : in_charac_0_field →
+Theorem det_by_any_sym_gr :
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → mat_nrows M = n
@@ -1744,11 +1757,8 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
       ∑ (k = 0, n! - 1),
         ε (nth k sg []) * ∏ (i = 1, n), mat_el M i ((nth k sg []).(i) + 1).
 Proof.
-intros Hif * Hnz Hr Hsm Hsg.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
-rewrite det_is_det'; try now destruct Hif.
+intros Hop H10 * Hnz Hr Hsm Hsg.
+rewrite (det_is_det' Hop); [ | easy ].
 unfold det'.
 rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
@@ -1863,7 +1873,9 @@ Qed.
 
 Theorem det_any_permut_l :
   let ron := nat_ring_like_op in
-  in_charac_0_field →
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T ro = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -1873,7 +1885,7 @@ Theorem det_any_permut_l :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k σ 0 + 1) (nth k μ 0 + 1)).
 Proof.
-intros ron Hif * Hnz Hr Hsm Hσ.
+intros ron Hic Hop H10 * Hnz Hr Hsm Hσ.
 subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
@@ -1901,11 +1913,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   replace (ε ((μ ° isort_rank Nat.leb σ) ° σ)) with
       (ε (μ ° isort_rank Nat.leb σ) * ε σ)%L. 2: {
     destruct Hσ.
-    rewrite <- sign_comp; [ easy | now destruct Hif | ].
+    rewrite <- sign_comp; [ easy | easy | ].
     now rewrite comp_length, isort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
-  rewrite NoDup_ε_square; [ | now destruct Hif | ]. 2: {
+  rewrite NoDup_ε_square; [ | easy | ]. 2: {
     destruct Hσ as (Hσ, _).
     now apply permut_seq_iff in Hσ.
   }
@@ -1944,7 +1956,7 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn.
-  rewrite rngl_product_map_permut; [ | now destruct Hif | easy ].
+  rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
 cbn.
@@ -1982,7 +1994,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-apply det_by_any_sym_gr; try easy.
+apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
   rewrite List_map_seq_length.
@@ -2086,7 +2098,9 @@ Qed.
 
 Theorem det_any_permut_r :
   let ron := nat_ring_like_op in
-  in_charac_0_field →
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T ro = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2096,7 +2110,7 @@ Theorem det_any_permut_r :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k μ 0 + 1) (nth k σ 0 + 1))%L.
 Proof.
-intros ron Hif * Hnz Hr Hsm Hσ; subst ron.
+intros ron Hic Hop H10 * Hnz Hr Hsm Hσ; subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : permut_seq_with_len n μ). {
@@ -2124,12 +2138,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite <- Hσν at 1.
   replace (ε ((σ ° isort_rank Nat.leb μ) ° μ)) with
       (ε (σ ° isort_rank Nat.leb μ) * ε μ)%L. 2: {
-    destruct Hif.
     rewrite <- sign_comp; [ easy | easy | ].
     rewrite comp_length, isort_rank_length.
     now destruct Hpμ.
   }
-  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
   rewrite NoDup_ε_square; [ | easy | ]. 2: {
@@ -2181,7 +2193,6 @@ erewrite rngl_summation_eq_compat. 2: {
     now rewrite canon_sym_gr_list_length.
   }
   cbn.
-  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
@@ -2221,7 +2232,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-apply det_by_any_sym_gr; try easy.
+apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
   rewrite List_map_seq_length.
@@ -2334,12 +2345,15 @@ split. {
 }
 Qed.
 
-Theorem determinant_transpose : in_charac_0_field →
+Theorem determinant_transpose :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M⁺ = det M.
 Proof.
-intros Hif * Hsm.
+intros Hic Hop H10 * Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold det.
@@ -2352,8 +2366,8 @@ assert (Hs : permut_seq_with_len n (seq 0 n)) by apply seq_permut_seq_with_len.
 assert (Hr' : mat_nrows M⁺ = n). {
   now rewrite mat_transp_nrows, squ_mat_ncols.
 }
-rewrite (det_any_permut_l Hif M Hnz Hr Hsm Hs).
-rewrite (det_any_permut_r Hif (M⁺)%M Hnz Hr' Hts Hs).
+rewrite (det_any_permut_l Hic Hop H10 M Hnz Hr Hsm Hs).
+rewrite (det_any_permut_r Hic Hop H10 (M⁺)%M Hnz Hr' Hts Hs).
 apply rngl_summation_list_eq_compat.
 intros p Hp.
 f_equal.
@@ -2381,15 +2395,18 @@ rewrite seq_nth; [ | now rewrite squ_mat_ncols ].
 now do 2 rewrite Nat.add_1_r.
 Qed.
 
-Theorem det_subm_transp : in_charac_0_field →
+Theorem det_subm_transp :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ i j (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M
   → 1 ≤ j ≤ mat_nrows M
   → det (subm j i M) = det (subm i j M⁺).
 Proof.
-intros Hif * Hsm Hi Hj.
-rewrite <- determinant_transpose; [ | easy | ]. 2: {
+intros Hic Hop H10 * Hsm Hi Hj.
+rewrite <- (determinant_transpose Hic Hop H10). 2: {
   rewrite squ_mat_ncols in Hi; [ | easy ].
   now apply is_squ_mat_subm.
 }

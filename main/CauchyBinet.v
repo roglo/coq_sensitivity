@@ -675,6 +675,8 @@ rewrite (ε_when_dup Hop). 2: {
 rewrite rngl_mul_0_l; [ | easy ].
 set (p1 := S (length l1)).
 set (q1 := S (length (l1 ++ a :: l2))).
+...
+apply (determinant_same_rows) with (p := p1) (q := q1); cycle 1. {
 apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
   unfold p1, q1.
   rewrite app_length; cbn; flia.
