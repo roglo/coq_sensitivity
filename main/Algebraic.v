@@ -104,6 +104,9 @@ assert (Hos : rngl_has_opp_or_subt = true). {
 set (rop := polyn_ring_like_op (cf_has_eqb Hif) Hos).
 set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
 specialize (Hcr rop rpp).
+Check cramer's_rule.
+About cramer's_rule.
+...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
     apply Hif.
@@ -114,6 +117,7 @@ assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
     destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
     now destruct s.
   } {
+...
 Set Printing All.
 (* ah mais non, les polynômes n'ont pas d'inverse ! *)
 ...

@@ -2506,6 +2506,8 @@ Qed.
 
 (* Cramer's rule *)
 
+...
+
 (* to be completed
 Theorem glop_cramer's_rule :
   ∀ (M : matrix T) (U V : vector T),
