@@ -1004,7 +1004,9 @@ determinant_with_bad_row
   → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%L
 *)
 
-Theorem determinant_with_row : in_charac_0_field →
+Theorem determinant_with_row :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   ∀ i (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1012,11 +1014,7 @@ Theorem determinant_with_row : in_charac_0_field →
     ∑ (j = 1, mat_nrows M),
     minus_one_pow (i + j) * mat_el M i j * det (subm i j M).
 Proof.
-intros Hif * Hsm Hir.
-clear Hif.
-...
-assert (Hop : rngl_has_opp = true) by now destruct Hif.
-assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
+intros Hop Hic * Hsm Hir.
 destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i; cbn - [ det ].
   unfold det.
@@ -1052,11 +1050,11 @@ rewrite <- rngl_mul_opp_l; [ | easy ].
 do 2 rewrite <- rngl_mul_assoc.
 rewrite minus_one_pow_succ; [ | easy ].
 f_equal.
-rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite (minus_one_pow_mul_comm Hop).
 rewrite <- rngl_mul_assoc.
 rewrite mat_el_mat_swap_rows; [ | flia Hj ].
 f_equal.
-rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite <- (minus_one_pow_mul_comm Hop).
 symmetry.
 rewrite mat_swap_rows_comm.
 rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; [ | flia Hir Hi1 ].
@@ -1068,8 +1066,8 @@ now apply Nat.leb_le in H; rewrite H.
 Qed.
 
 Theorem determinant_with_bad_row :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ i k (M : matrix T),
@@ -1080,7 +1078,7 @@ Theorem determinant_with_bad_row :
   → ∑ (j = 1, mat_nrows M),
     minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%L.
 Proof.
-intros Hic Hop Hch Hit * Hsm Hir Hkr Hik.
+intros Hop Hic Hch Hit * Hsm Hir Hkr Hik.
 specialize (squ_mat_ncols _ Hsm) as Hc.
 remember
   (mk_mat
@@ -1134,10 +1132,7 @@ assert (H1 : det A = 0%L). {
   apply Nat.neq_sym, Nat.eqb_neq in Hik.
   now rewrite Hik.
 }
-...
-rewrite determinant_with_row with (i := i) in H1; [ | | | ]. 2: {
-...
-rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | ]. 2: {
+rewrite (determinant_with_row Hop Hic) with (i := i) in H1; [ | easy | ]. 2: {
   now rewrite Hira.
 }
 rewrite <- H1 at 2.
@@ -1238,8 +1233,6 @@ f_equal. {
   apply Hcl, nth_In; flia Hu.
 }
 Qed.
-
-...
 
 (* to be completed
 Theorem glop_matrix_comatrix_transp_mul :
@@ -1436,12 +1429,13 @@ Qed.
 Theorem matrix_comatrix_transp_mul :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hic Hop H10 * Hsm.
+intros Hic Hop Hch Hit * Hsm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1611,9 +1605,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite Nat_sub_succ_1.
   }
   cbn - [ det ].
-Check determinant_with_bad_row.
-...
-  specialize (determinant_with_bad_row Hif) as H1.
+  specialize (determinant_with_bad_row Hop Hic Hch Hit) as H1.
   specialize (H1 (S j) (S i) M).
   apply H1; [ | flia Hj | flia Hi | flia Hij ].
   apply is_scm_mat_iff; cbn.
@@ -1623,18 +1615,19 @@ Check determinant_with_bad_row.
 }
 Qed.
 
-...
-
 Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
+assert (Hch : rngl_characteristic = 0) by now destruct Hif.
+assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+clear Hif.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
 destruct M as (ll); cbn - [ det ].
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
   apply length_zero_iff_nil in Hlz; subst ll; cbn.
@@ -1674,7 +1667,7 @@ rewrite <- seq_shift, map_map.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 move j before i.
-rewrite laplace_formula_on_cols with (j := S j); [ | easy | easy | ]. 2: {
+rewrite laplace_formula_on_cols with (j := S j); try easy. 2: {
   rewrite squ_mat_ncols; [ cbn | easy ].
   flia Hj.
 }
@@ -1693,7 +1686,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; rewrite δ_diag, rngl_mul_1_r.
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
-    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    rewrite rngl_mul_comm; [ | easy ].
     easy.
   }
   cbn - [ mat_el com ].
@@ -1752,7 +1745,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       now apply List_hd_in.
     }
     cbn - [ det ].
-    rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
     replace ll with (mat_list_list M) at 1 by now rewrite HM.
     rewrite fold_mat_el.
     rewrite <- HM.
@@ -1764,7 +1757,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct Hj as (_, Hj); cbn in Hj.
   (* perhaps all of this below would be a "determinant_with_bad_col":
      perhaps a cool lemma to do? *)
-  specialize (determinant_with_bad_row Hif) as H1.
+...
+  specialize (determinant_with_bad_row Hop Hic Hch) as H1.
   specialize (H1 (S i) (S j) (M⁺)%M).
   assert (Hsmt : is_square_matrix M⁺ = true). {
     now apply mat_transp_is_square.
@@ -1821,6 +1815,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   easy.
 }
 Qed.
+
+...
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
