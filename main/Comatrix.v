@@ -1817,18 +1817,14 @@ Qed.
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
-Theorem mat_mul_inv_r :
-  rngl_has_opp = true →
-  rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
-  rngl_has_inv = true →
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+Theorem mat_mul_inv_r : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
   → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
-intros Hop Hic Hch Hiv Hit * Hsm Hdz.
+intros Hif * Hsm Hdz.
+destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
   unfold mat_nrows in Hrz.
@@ -1848,7 +1844,9 @@ rewrite (mat_mul_mul_scal_l Hop Hic); cycle 1. {
   rewrite mat_transp_nrows; symmetry.
   apply comatrix_ncols.
 }
-rewrite (matrix_comatrix_transp_mul Hop Hic Hch); [ | easy | easy ].
+rewrite (matrix_comatrix_transp_mul Hop Hic Hch); [ | | easy ]. 2: {
+  now apply Bool.orb_true_iff; left.
+}
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | easy | easy ].
 now apply mat_mul_scal_1_l.
@@ -1861,17 +1859,18 @@ Theorem mat_mul_inv_l : in_charac_0_field →
   → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
+destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
 unfold mat_inv.
-rewrite mat_mul_scal_l_mul; [ | now destruct Hif | ]. 2: {
+rewrite mat_mul_scal_l_mul; [ | easy | ]. 2: {
   apply squ_mat_is_corr.
   apply mat_transp_is_square.
   now apply comatrix_is_square.
 }
-rewrite comatrix_transp_matrix_mul.
-...
-rewrite comatrix_transp_matrix_mul; [ | easy | easy ].
+rewrite (comatrix_transp_matrix_mul Hop Hic Hch); [ | | easy ]. 2: {
+  now apply Bool.orb_true_iff; left.
+}
 rewrite mat_mul_scal_l_mul_assoc.
-rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
+rewrite rngl_mul_inv_l; [ | easy | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
