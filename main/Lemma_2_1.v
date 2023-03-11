@@ -1008,7 +1008,11 @@ assert (Hdu : det U ≠ 0%L). {
     rewrite mat_transp_nrows.
     now apply squ_mat_ncols.
   }
-  rewrite (determinant_transpose Hif) in Huu; [ | easy ].
+  generalize Hif; intros H.
+  destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+  rewrite (determinant_transpose Hic Hop) in Huu; [ | | easy ]. 2: {
+    now rewrite Hch.
+  }
   rewrite det_mI in Huu; [ | easy ].
   intros H; rewrite H in Huu.
   rewrite rngl_mul_0_r in Huu; [ | easy ].

@@ -944,15 +944,15 @@ now apply det_subm_transp.
 Qed.
 
 Theorem laplace_formula_on_cols :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   rngl_characteristic ≠ 1 →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → 1 ≤ j ≤ mat_ncols M
   → det M = ∑ (i = 1, mat_nrows M), mat_el M i j * mat_el (com M) i j.
 Proof.
-intros Hic Hop H10 * Hsm Hj.
+intros Hop Hic H10 * Hsm Hj.
 rewrite <- (determinant_transpose Hic Hop H10); [ | easy ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -1829,19 +1829,22 @@ destruct i; [ easy | cbn; f_equal ].
 apply IHla.
 Qed.
 
-Theorem det_mat_repl_vect : in_charac_0_field →
+Theorem det_mat_repl_vect :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic ≠ 1 →
   ∀ M V,
   is_square_matrix M = true
   → vect_size V = mat_nrows M
   → ∀ k, 1 ≤ k ≤ mat_ncols M
   → det (mat_repl_vect k M V) = vect_el ((com M)⁺ • V) k.
 Proof.
-intros Hif * Hsm Hvm * Hk.
+intros Hop Hic H10 * Hsm Hvm * Hk.
 specialize (squ_mat_is_corr _ Hsm) as Hcm.
 move Hcm before Hsm.
 assert (Hk' : k - 1 < mat_ncols M) by flia Hk.
-...
-rewrite laplace_formula_on_cols with (j := k); [ | easy | | ]; cycle 1. {
+rewrite laplace_formula_on_cols with (j := k); [ | easy | easy | easy | | ];
+    cycle 1. {
   now apply mat_repl_vect_is_square.
 } {
   rewrite <- (squ_mat_ncols _ Hsm) in Hvm.
@@ -1885,7 +1888,7 @@ assert (Hi' : i - 1 < mat_nrows M) by flia Hi.
 rewrite fold_vect_el.
 rewrite <- Nat_succ_sub_succ_r; [ | flia Hi ].
 rewrite Nat.sub_0_r.
-rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite rngl_mul_comm; [ | easy ].
 f_equal.
 unfold com.
 cbn - [ det ].
@@ -1960,13 +1963,10 @@ Theorem cramer's_rule : in_charac_0_field →
   → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hif * Hsm Hum Hmz Hmuv k Hk.
-clear Hif.
 assert (Huv : vect_size V = vect_size U). {
   rewrite <- Hmuv; cbn.
   now rewrite map_length.
 }
-...
-Check mat_inv_det_comm.
 specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
 apply (f_equal (mat_mul_vect_r (M⁻¹)%M)) in Hmuv.
 rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
@@ -2018,17 +2018,17 @@ unfold rngl_div.
 rewrite (cf_has_inv Hif); f_equal.
 symmetry.
 rewrite <- (squ_mat_ncols _ Hsm) in Hk.
-apply (det_mat_repl_vect Hif); [ easy | congruence | easy ].
+destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
+assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+apply (det_mat_repl_vect Hop Hic H10); [ easy | congruence | easy ].
 Qed.
-
-...
 
 End a.
 
 Arguments com {T}%type {ro} M%M.
 Arguments cramer's_rule {T ro rp} _ [M%M U%V V%V] _ _ _ _ [i]%nat _.
 Arguments laplace_formula_on_cols {T}%type {ro rp} Hif M%M [j]%nat.
-Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
+Arguments laplace_formula_on_rows {T}%type {ro rp} Hic Hop M%M [i]%nat.
 Arguments mat_inv {T}%type {ro} M%M.
 Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
 
