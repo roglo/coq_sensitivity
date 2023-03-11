@@ -1016,10 +1016,8 @@ Qed.
 
 (* *)
 
-(*
 Theorem ε_nil : ε [] = 1%L.
 Proof. easy. Qed.
-*)
 
 Theorem ε_aux_map_S : ∀ i l,  ε_aux (S i) (map S l) = ε_aux i l.
 Proof.
@@ -2246,14 +2244,12 @@ Qed.
 
 Arguments comp_1_r n%nat [la]%list.
 
-(*
 Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
 Proof.
 intros.
 apply isort_rank_permut_seq_with_len.
 apply isort_rank_length.
 Qed.
-*)
 
 Theorem permut_isort_rank_involutive : ∀ la,
   permut_seq la
@@ -2276,7 +2272,6 @@ rewrite isort_rank_length; symmetry.
 now apply permut_isort_leb.
 Qed.
 
-(*
 Theorem collapse_lt_compat : ∀ l i j,
   i < length l
   → j < length l
@@ -2477,17 +2472,14 @@ assert (H : ε_aux a la = ε_aux b lb). {
 destruct c; [ easy | easy | now f_equal ].
 Qed.
 
-Theorem ε_collapse_ε :
-  rngl_has_opp_or_subt = true →
-  ∀ l, NoDup l → ε (collapse l) = ε l.
+Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
-intros Hos * Hnd.
+intros * Hnd.
 apply ε_keep_order; [ | apply collapse_length ].
 intros i j Hi Hj.
 rewrite collapse_length in Hi, Hj.
 now apply (collapse_keeps_order Hnd).
 Qed.
-*)
 
 Theorem permut_isort : ∀ ord,
   antisymmetric ord
@@ -3236,8 +3228,8 @@ End a.
 
 Arguments ε {T}%type {ro}.
 
+Arguments ε_nil {T ro}.
 (*
-Arguments ε_nil {T ro rp}.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 *)
 Arguments ε_mul_comm {T ro rp} Hop la%list a%L.

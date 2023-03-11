@@ -657,13 +657,14 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+move Hop before Hif.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
+specialize (Hos (or_introl Hop)).
 move Hos before Hif.
 apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
 destruct Hadk as (l1 & l2 & l3 & a & Ha).
-rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+rewrite (ε_when_dup Hop). 2: {
   intros H.
   rewrite Ha in H.
   apply NoDup_remove_2 in H.
@@ -733,13 +734,13 @@ intros Hif * Hcm Hac Hkl Hadk.
 assert (H10 : rngl_characteristic ≠ 1). {
   now rewrite (cf_characteristic Hif).
 }
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
+move Hop before Hif; move Hos before Hif.
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
-  cbn; rewrite ε_nil; symmetry.
+  cbn; symmetry.
   apply rngl_mul_1_l.
 }
 rewrite det_is_det''; try now destruct Hif. 2: {
@@ -814,7 +815,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
   intros la Hla.
   f_equal. {
     unfold g1.
-    rewrite (sign_comp Hif). 2: {
+    rewrite (sign_comp Hop). 2: {
       apply in_cart_prod_rep_seq_iff in Hla.
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
@@ -1301,7 +1302,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   destruct Hkl as (Hkl, Hsl).
   unfold g in Hsl.
   apply Bool.negb_true_iff in Hsl.
-  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+  rewrite ε_when_dup; [ | easy | ]. 2: {
     intros H.
     apply (no_dup_NoDup Nat.eqb_eq) in H.
     congruence.
@@ -1382,6 +1383,7 @@ Theorem det_is_det''' :
   → det M = det''' M.
 Proof.
 intros Hic Hop Heq * Hm.
+...
 rewrite det_is_det''; [ | easy | easy | easy | easy ].
 unfold det'', det'''.
 unfold cart_prod_rep_seq.
