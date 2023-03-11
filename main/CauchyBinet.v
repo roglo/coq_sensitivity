@@ -1793,7 +1793,9 @@ rewrite rngl_mul_assoc.
 now rewrite (rngl_mul_comm Hic _ (ε la)).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_1 :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
   ∀ m n A B,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -1802,25 +1804,16 @@ Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B).
 Proof.
-intros Hif *.
+intros Hop Heb *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (Hop : rngl_has_opp = true) by now destruct Hif.
-assert (Heb : rngl_has_eqb = true) by now destruct Hif.
 specialize (Hos (or_introl Hop)).
-clear Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
 remember (∑ (kl ∈ _), _) as x; subst x.
-rewrite rngl_summation_cart_prod_sub_lists_all_permut; cycle 1. {
-  easy.
-} {
-  easy.
-...
-  now destruct Hif.
-}
+rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl),
@@ -1853,11 +1846,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det ].
 symmetry.
-apply rngl_mul_summation_list_distr_r.
-now destruct Hif.
+apply (rngl_mul_summation_list_distr_r Hos).
 Qed.
-
-...
 
 Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 →
@@ -2079,6 +2069,7 @@ intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 assert (Hch : rngl_characteristic = 0) by now destruct Hif.
+assert (Heb : rngl_has_eqb = true) by now destruct Hif.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 assert (Hit :
   (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
@@ -2134,8 +2125,8 @@ rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hit _ B Hmz Hcb Hbr Hbc).
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
+rewrite (Cauchy_Binet_formula_step_5_1 Hop).
 ...
-rewrite (Cauchy_Binet_formula_step_5_1 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
