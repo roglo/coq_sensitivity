@@ -1962,9 +1962,8 @@ Theorem cramer's_rule_by_mul :
   → vect_size U = mat_nrows M
  → det M ≠ 0%L
   → (M • U)%V = V
-  → ∀ i,
-  1 ≤ i ≤ mat_nrows M
-  → (det M * vect_el U i)%L = det (mat_repl_vect i M V).
+  → ∀ i, 1 ≤ i ≤ mat_nrows M →
+  (det M * vect_el U i)%L = det (mat_repl_vect i M V).
 Proof.
 intros Hop Hic Hch Hti * Hsm Hum Hmz Hmuv k Hk.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
@@ -2019,9 +2018,8 @@ Theorem cramer's_rule :
   → vect_size U = mat_nrows M
  → det M ≠ 0%L
   → (M • U)%V = V
-  → ∀ i,
-  1 ≤ i ≤ mat_nrows M
-  → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
+  → ∀ i, 1 ≤ i ≤ mat_nrows M →
+  vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hop Hic Hiq Hch Hie * Hsm Hum Hmz Hmuv k Hk.
 assert (Hii :
