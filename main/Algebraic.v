@@ -104,12 +104,6 @@ assert (Hos : rngl_has_opp_or_subt = true). {
 set (rop := polyn_ring_like_op (cf_has_eqb Hif) Hos).
 set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
 specialize (Hcr rop rpp).
-Check cramer's_rule.
-About cramer's_rule.
-...
-vect_el U i = (det (mat_repl_vect i M V) / det M)%L
-I need a version of Cramer's rule without division : is it possible ?
-(vect_el U i * det M)%L = det (mat_repl_vect i M V) → without division ?
 ...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
