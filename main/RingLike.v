@@ -1018,15 +1018,13 @@ destruct iv. {
   assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%L). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
-  rewrite rngl_mul_0_r in H; [ | easy ].
   remember (rngl_eqb a 0%L) as az eqn:Haz; symmetry in Haz.
   destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
-  apply (rngl_eqb_neq Hde) in Haz.
+  apply (rngl_eqb_neq Hde) in Haz; right.
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
-  rewrite rngl_mul_1_l in H.
-  now right.
+  rewrite rngl_mul_1_l in H; rewrite H.
+  apply (rngl_mul_0_r Hmo).
 } {
-  cbn in Hdo.
   apply andb_prop in Hdo.
   destruct Hdo as (Hdi, Hde).
   specialize rngl_mul_div as H1.
