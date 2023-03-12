@@ -686,14 +686,14 @@ Qed.
 (* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
   → det M = ∑ (j = 1, mat_ncols M), mat_el M i j * mat_el (com M) i j.
 Proof.
-intros Hic Hop * Hsm Hlin.
+intros Hop Hic * Hsm Hlin.
 specialize (squ_mat_ncols M Hsm) as Hc.
 rewrite Hc.
 specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
@@ -962,7 +962,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det mat_el ].
-specialize (@laplace_formula_on_rows Hic Hop (M⁺)%M j) as H1.
+specialize (@laplace_formula_on_rows Hop Hic (M⁺)%M j) as H1.
 assert (H : is_square_matrix M⁺ = true) by now apply mat_transp_is_square.
 specialize (H1 H); clear H.
 rewrite mat_transp_nrows in H1.
@@ -2013,7 +2013,7 @@ Theorem cramer's_rule :
   rngl_mul_is_comm = true →
   rngl_has_inv_or_quot = true →
   rngl_characteristic = 0 →
-  rngl_has_eqb = true →
+  rngl_is_integral = true ∨ rngl_has_eqb = true →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2023,9 +2023,10 @@ Theorem cramer's_rule :
   1 ≤ i ≤ mat_nrows M
   → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
-intros Hop Hic Hiq Hch Heq * Hsm Hum Hmz Hmuv k Hk.
+intros Hop Hic Hiq Hch Hie * Hsm Hum Hmz Hmuv k Hk.
 assert (Hii :
   (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
+  destruct Hie as [Hit| Heq]; [ now rewrite Hit | ].
   rewrite Hiq, Heq.
   now apply Bool.orb_true_iff; right.
 }
@@ -2035,102 +2036,12 @@ rewrite (rngl_mul_comm Hic).
 apply (rngl_mul_div Hiq _ _ Hmz).
 Qed.
 
-...
-
-Theorem cramer's_rule : in_charac_0_field →
-  ∀ (M : matrix T) (U V : vector T),
-  is_square_matrix M = true
-  → vect_size U = mat_nrows M
- → det M ≠ 0%L
-  → (M • U)%V = V
-  → ∀ i,
-  1 ≤ i ≤ mat_nrows M
-  → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
-Proof.
-intros Hif * Hsm Hum Hmz Hmuv k Hk.
-generalize Hif; intros H.
-destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
-assert (Hiq : rngl_has_inv_or_quot = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-assert (Hii :
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
-  now rewrite Hit.
-}
-clear Hif.
-clear Hin.
-symmetry.
-rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmz Hmuv Hk).
-rewrite (rngl_mul_comm Hic).
-apply (rngl_mul_div Hiq _ _ Hmz).
-...
-intros Hif * Hsm Hum Hmz Hmuv k Hk.
-assert (Huv : vect_size V = vect_size U). {
-  rewrite <- Hmuv; cbn.
-  now rewrite map_length.
-}
-specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
-apply (f_equal (mat_mul_vect_r (M⁻¹)%M)) in Hmuv.
-rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
-  now destruct Hif.
-} {
-  apply mat_inv_is_corr.
-  now apply squ_mat_is_corr.
-} {
-  now apply squ_mat_is_corr.
-} {
-  rewrite mat_inv_ncols.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
-  now rewrite squ_mat_ncols in Hcz.
-} {
-  now rewrite squ_mat_ncols.
-}
-rewrite mat_mul_inv_l in Hmuv; [ | easy | easy | easy ].
-rewrite mat_vect_mul_1_l in Hmuv; [ | now destruct Hif | easy ].
-rewrite H1 in Hmuv.
-rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
-  now destruct Hif.
-} {
-  apply mat_transp_is_corr.
-  apply comatrix_is_correct.
-  now apply squ_mat_is_corr.
-} {
-  rewrite mat_transp_ncols.
-  rewrite comatrix_ncols, comatrix_nrows.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]. {
-    rewrite (squ_mat_ncols _ Hsm) in Hcz.
-    now rewrite Huv, Hum.
-  } {
-    now rewrite Huv.
-  }
-}
-rewrite Hmuv.
-rewrite vect_el_mul_scal_l. 2: {
-  split; [ easy | ].
-  rewrite vect_size_mat_mul_vect_r.
-  rewrite mat_transp_nrows.
-  rewrite comatrix_ncols.
-  now rewrite (squ_mat_ncols _ Hsm).
-}
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-rewrite rngl_div_1_l; [ | now destruct Hif ].
-unfold rngl_div.
-rewrite (cf_has_inv Hif); f_equal.
-symmetry.
-rewrite <- (squ_mat_ncols _ Hsm) in Hk.
-destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-apply (det_mat_repl_vect Hop Hic H10); [ easy | congruence | easy ].
-Qed.
-
 End a.
 
 Arguments com {T}%type {ro} M%M.
-Arguments cramer's_rule {T ro rp} _ [M%M U%V V%V] _ _ _ _ [i]%nat _.
-Arguments laplace_formula_on_cols {T}%type {ro rp} Hif M%M [j]%nat.
-Arguments laplace_formula_on_rows {T}%type {ro rp} Hic Hop M%M [i]%nat.
+Arguments cramer's_rule {T ro rp} Hop Hic Hiq Hch Hie [M%M U%V V%V].
+Arguments laplace_formula_on_cols {T ro rp} Hop Hic H10 M%M [j]%nat.
+Arguments laplace_formula_on_rows {T}%type {ro rp} Hop Hic M%M [i]%nat.
 Arguments mat_inv {T}%type {ro} M%M.
 Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
 
