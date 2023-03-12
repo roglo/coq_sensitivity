@@ -114,6 +114,11 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   now destruct s.
 }
 specialize (Hcr Hopp).
+generalize Hif; intros H.
+destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+specialize (Hcr Hic).
+assert (Hiqp : rngl_has_inv_or_quot = true). {
+  apply rngl_has_inv_or_quot_iff.
 ...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
