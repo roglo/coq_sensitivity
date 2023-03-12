@@ -1952,6 +1952,64 @@ Qed.
 
 (* Cramer's rule *)
 
+Theorem cramer's_rule_by_mul :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+  ∀ (M : matrix T) (U V : vector T),
+  is_square_matrix M = true
+  → vect_size U = mat_nrows M
+ → det M ≠ 0%L
+  → (M • U)%V = V
+  → ∀ i,
+  1 ≤ i ≤ mat_nrows M
+  → (det M * vect_el U i)%L = det (mat_repl_vect i M V).
+Proof.
+intros Hop Hic Hch Hti * Hsm Hum Hmz Hmuv k Hk.
+assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (Huv : vect_size V = vect_size U). {
+  rewrite <- Hmuv; cbn.
+  now rewrite map_length.
+}
+rewrite <- (squ_mat_ncols _ Hsm) in Hk.
+rewrite (det_mat_repl_vect Hop Hic H10); [ | easy | congruence | easy ].
+rewrite <- Hmuv.
+rewrite (mat_vect_mul_assoc Hop); cycle 1. {
+  apply mat_transp_is_corr.
+  apply comatrix_is_correct.
+  now apply squ_mat_is_corr.
+} {
+  now apply squ_mat_is_corr.
+} {
+  symmetry.
+  rewrite mat_transp_ncols.
+  rewrite comatrix_ncols.
+  rewrite comatrix_nrows.
+  rewrite squ_mat_ncols; [ | easy ].
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec _ _).
+} {
+  rewrite squ_mat_ncols; [ congruence | easy ].
+}
+rewrite (comatrix_transp_matrix_mul Hop Hic Hch); [ | easy | easy ].
+rewrite <- (mat_mul_scal_vect_assoc Hop); cycle 1. {
+  apply mI_is_correct_matrix.
+} {
+  rewrite mI_ncols; congruence.
+}
+rewrite vect_el_mul_scal_l. 2: {
+  split; [ easy | ].
+  rewrite vect_size_mat_mul_vect_r.
+  rewrite mI_nrows.
+  now rewrite <- squ_mat_ncols.
+}
+f_equal.
+now rewrite mat_vect_mul_1_l.
+Qed.
+
+...
+
 Theorem cramer's_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
