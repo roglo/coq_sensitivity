@@ -1627,12 +1627,12 @@ Proof.
 intros Hos Hii Hch * Haa.
 rewrite <- (rngl_mul_1_l a) in Haa.
 rewrite <- rngl_mul_add_distr_r in Haa.
-apply rngl_integral in Haa; [ | easy | easy ].
-destruct Haa as [Haa| Haa]; [ | easy ].
 specialize rngl_characteristic_prop as char_prop.
 rewrite Hch in char_prop; cbn in char_prop.
-specialize (char_prop 1); cbn in char_prop.
-now rewrite rngl_add_0_r in char_prop.
+specialize (char_prop 1) as H1; cbn in H1.
+rewrite rngl_add_0_r in H1.
+apply (rngl_integral Hos Hii) in Haa.
+now destruct Haa.
 Qed.
 
 Record in_charac_0_field :=
