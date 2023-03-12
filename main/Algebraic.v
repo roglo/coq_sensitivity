@@ -127,7 +127,9 @@ specialize (Hcr Hiqp Hch).
 specialize (Hcr (or_intror eq_refl)).
 Check @cramer's_rule.
 (* a version of Cramer's rule on lists instead of polynomials could
-   be cool, if feasible. With a "lap_norm" to ensure equality. *)
+   be cool, if feasible. With a "lap_norm" to ensure equality.
+   Problem: lists as polynomials (lap) are not "ring-like" objects
+   because of equality, among other things. *)
 ...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
