@@ -126,6 +126,7 @@ assert (Hiqp : rngl_has_inv_or_quot = true). {
 specialize (Hcr Hiqp Hch).
 specialize (Hcr (or_intror eq_refl)).
 Check @cramer's_rule.
+Check @cramer's_rule_by_mul.
 (* a version of Cramer's rule on lists instead of polynomials could
    be cool, if feasible. With a "lap_norm" to ensure equality.
    Problem: lists as polynomials (lap) are not "ring-like" objects
