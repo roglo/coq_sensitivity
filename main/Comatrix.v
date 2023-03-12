@@ -2008,6 +2008,33 @@ f_equal.
 now rewrite mat_vect_mul_1_l.
 Qed.
 
+Theorem cramer's_rule :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_has_inv_or_quot = true →
+  rngl_characteristic = 0 →
+  rngl_has_eqb = true →
+  ∀ (M : matrix T) (U V : vector T),
+  is_square_matrix M = true
+  → vect_size U = mat_nrows M
+ → det M ≠ 0%L
+  → (M • U)%V = V
+  → ∀ i,
+  1 ≤ i ≤ mat_nrows M
+  → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
+Proof.
+intros Hop Hic Hiq Hch Heq * Hsm Hum Hmz Hmuv k Hk.
+assert (Hii :
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
+  rewrite Hiq, Heq.
+  now apply Bool.orb_true_iff; right.
+}
+symmetry.
+rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmz Hmuv Hk).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_mul_div Hiq _ _ Hmz).
+Qed.
+
 ...
 
 Theorem cramer's_rule : in_charac_0_field →
@@ -2020,6 +2047,23 @@ Theorem cramer's_rule : in_charac_0_field →
   1 ≤ i ≤ mat_nrows M
   → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
+intros Hif * Hsm Hum Hmz Hmuv k Hk.
+generalize Hif; intros H.
+destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+assert (Hiq : rngl_has_inv_or_quot = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+assert (Hii :
+  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
+  now rewrite Hit.
+}
+clear Hif.
+clear Hin.
+symmetry.
+rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmz Hmuv Hk).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_mul_div Hiq _ _ Hmz).
+...
 intros Hif * Hsm Hum Hmz Hmuv k Hk.
 assert (Huv : vect_size V = vect_size U). {
   rewrite <- Hmuv; cbn.
