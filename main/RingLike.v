@@ -1008,9 +1008,8 @@ Theorem rngl_integral :
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral; [ now apply rngl_integral | ].
+destruct rngl_is_integral; [ now apply rngl_integral | cbn in Hdo ].
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
-cbn in Hdo.
 destruct iv. {
   remember rngl_has_eqb as de eqn:Hde; symmetry in Hde.
   destruct de; [ | now destruct rngl_has_inv_or_quot ].
