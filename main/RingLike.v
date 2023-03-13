@@ -399,6 +399,23 @@ rewrite H1 in H.
 apply H.
 Qed.
 
+Theorem rngl_mul_inv_r :
+  rngl_has_inv = true →
+  ∀ a : T, a ≠ 0%L → (a * a⁻¹ = 1)%L.
+Proof.
+intros Hiv * Haz.
+specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
+unfold rngl_div in rngl_mul_inv_r.
+rewrite Hiv in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic. {
+  rewrite (rngl_mul_comm Hic).
+  now apply (rngl_mul_inv_l Hiv).
+}
+cbn in rngl_mul_inv_r.
+now apply rngl_mul_inv_r.
+Qed.
+
 Theorem rngl_eqb_eq :
   rngl_has_eqb = true →
   ∀ a b : T, (a =? b)%L = true ↔ a = b.
@@ -999,6 +1016,68 @@ split. {
   rewrite rngl_mul_div in Habcd; [ easy | | easy ].
   now apply Hin'; left.
 }
+Qed.
+
+Theorem rngl_eq_mul_0_l :
+  rngl_has_opp_or_subt = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
+Proof.
+intros Hos Hii * Hab Hbz.
+specialize rngl_opt_integral as rngl_integral.
+destruct rngl_is_integral; [ now apply rngl_integral in Hab; destruct Hab | ].
+cbn in Hii; clear rngl_integral.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  apply (f_equal (λ x, (x * b⁻¹)%L)) in Hab.
+  rewrite <- rngl_mul_assoc in Hab.
+  rewrite rngl_mul_inv_r in Hab; [ | easy | easy ].
+  rewrite rngl_mul_1_r in Hab; rewrite Hab.
+  apply (rngl_mul_0_l Hos).
+}
+remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+destruct qu. {
+  specialize (rngl_mul_div Hii a b Hbz) as H1.
+  rewrite Hab in H1.
+  now rewrite rngl_div_0_l in H1.
+}
+apply rngl_has_inv_or_quot_iff in Hii.
+rewrite Hiv, Hqu in Hii.
+now destruct Hii.
+Qed.
+
+Theorem rngl_eq_mul_0_r :
+  rngl_has_opp_or_subt = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
+Proof.
+intros Hos Hii * Hab Haz.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic. {
+  rewrite (rngl_mul_comm Hic) in Hab.
+  now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
+}
+specialize rngl_opt_integral as rngl_integral.
+destruct rngl_is_integral; [ now apply rngl_integral in Hab; destruct Hab | ].
+cbn in Hii; clear rngl_integral.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  apply (f_equal (rngl_mul a⁻¹%L)) in Hab.
+  rewrite rngl_mul_assoc, (rngl_mul_0_r Hos) in Hab.
+  rewrite (rngl_mul_inv_l Hiv) in Hab; [ | easy ].
+  now rewrite rngl_mul_1_l in Hab.
+}
+remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+destruct qu. {
+  specialize rngl_opt_mul_quot_r as rngl_mul_quot_r.
+  rewrite Hqu, Hic in rngl_mul_quot_r; cbn in rngl_mul_quot_r.
+  specialize (rngl_mul_quot_r b a Haz) as H1.
+  rewrite Hab in H1.
+  now rewrite (rngl_div_0_l Hos Hii) in H1.
+}
+apply rngl_has_inv_or_quot_iff in Hii.
+rewrite Hiv, Hqu in Hii.
+now destruct Hii.
 Qed.
 
 Theorem rngl_integral :
@@ -1615,7 +1694,7 @@ Qed.
 
 Theorem eq_rngl_add_same_0 :
   rngl_has_opp_or_subt = true →
-  (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
   (a + a = 0)%L
@@ -1628,8 +1707,7 @@ specialize rngl_characteristic_prop as char_prop.
 rewrite Hch in char_prop; cbn in char_prop.
 specialize (char_prop 1) as H1; cbn in H1.
 rewrite rngl_add_0_r in H1.
-apply (rngl_integral Hos Hii) in Haa.
-now destruct Haa.
+now apply (rngl_eq_mul_0_r Hos Hii) in Haa.
 Qed.
 
 Record in_charac_0_field :=

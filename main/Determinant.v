@@ -1484,7 +1484,7 @@ Theorem determinant_same_rows :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
@@ -1493,7 +1493,7 @@ Theorem determinant_same_rows :
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%L.
 Proof.
-intros Hic Hop Hch Hit * Hsm Hpq Hpn Hqn Hjpq.
+intros Hic Hop Hch Hii * Hsm Hpq Hpn Hqn Hjpq.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1543,7 +1543,7 @@ assert (HM : det M = (- det M)%L). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-now apply eq_rngl_add_same_0 in HM.
+now apply (eq_rngl_add_same_0 Hos Hii Hch) in HM.
 Qed.
 
 (* transpositions list of permutation *)

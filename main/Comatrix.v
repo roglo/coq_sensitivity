@@ -1069,7 +1069,7 @@ Theorem determinant_with_bad_row :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1078,7 +1078,7 @@ Theorem determinant_with_bad_row :
   → ∑ (j = 1, mat_nrows M),
     minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%L.
 Proof.
-intros Hop Hic Hch Hit * Hsm Hir Hkr Hik.
+intros Hop Hic Hch Hii * Hsm Hir Hkr Hik.
 specialize (squ_mat_ncols _ Hsm) as Hc.
 remember
   (mk_mat
@@ -1108,7 +1108,7 @@ assert (Hira : mat_nrows A = mat_nrows M). {
   now subst A; cbn; rewrite List_map_seq_length.
 }
 assert (H1 : det A = 0%L). {
-  apply (determinant_same_rows Hic Hop Hch Hit) with (p := i) (q := k). {
+  apply (determinant_same_rows Hic Hop Hch Hii) with (p := i) (q := k). {
     easy.
   } {
     easy.
@@ -1238,12 +1238,12 @@ Theorem matrix_comatrix_transp_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hop Hic Hch Hit * Hsm.
+intros Hop Hic Hch Hii * Hsm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1413,7 +1413,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite Nat_sub_succ_1.
   }
   cbn - [ det ].
-  specialize (determinant_with_bad_row Hop Hic Hch Hit) as H1.
+  specialize (determinant_with_bad_row Hop Hic Hch Hii) as H1.
   specialize (H1 (S j) (S i) M).
   apply H1; [ | flia Hj | flia Hi | flia Hij ].
   apply is_scm_mat_iff; cbn.
@@ -1427,12 +1427,12 @@ Theorem comatrix_transp_matrix_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hop Hic Hch Hit * Hsm.
+intros Hop Hic Hch Hii * Hsm.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
@@ -1565,7 +1565,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct Hj as (_, Hj); cbn in Hj.
   (* perhaps all of this below would be a "determinant_with_bad_col":
      perhaps a cool lemma to do? *)
-  specialize (determinant_with_bad_row Hop Hic Hch Hit) as H1.
+  specialize (determinant_with_bad_row Hop Hic Hch Hii) as H1.
   specialize (H1 (S i) (S j) (M⁺)%M).
   assert (Hsmt : is_square_matrix M⁺ = true). {
     now apply mat_transp_is_square.
@@ -1956,7 +1956,7 @@ Theorem cramer's_rule_by_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -1965,7 +1965,7 @@ Theorem cramer's_rule_by_mul :
   → ∀ i, 1 ≤ i ≤ mat_nrows M →
   (det M * vect_el U i)%L = det (mat_repl_vect i M V).
 Proof.
-intros Hop Hic Hch Hti * Hsm Hum Hmz Hmuv k Hk.
+intros Hop Hic Hch Hii * Hsm Hum Hmz Hmuv k Hk.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 assert (Huv : vect_size V = vect_size U). {
   rewrite <- Hmuv; cbn.
@@ -1991,7 +1991,7 @@ rewrite (mat_vect_mul_assoc Hop); cycle 1. {
 } {
   rewrite squ_mat_ncols; [ congruence | easy ].
 }
-rewrite (comatrix_transp_matrix_mul Hop Hic Hch); [ | easy | easy ].
+rewrite (comatrix_transp_matrix_mul Hop Hic Hch Hii); [ | easy ].
 rewrite <- (mat_mul_scal_vect_assoc Hop); cycle 1. {
   apply mI_is_correct_matrix.
 } {
@@ -2022,10 +2022,8 @@ Theorem cramer's_rule :
   vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hop Hic Hiq Hch Hie * Hsm Hum Hmz Hmuv k Hk.
-assert (Hii :
-  (rngl_is_integral || rngl_has_inv_or_quot && rngl_has_eqb)%bool = true). {
+assert (Hii : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
   destruct Hie as [Hit| Heq]; [ now rewrite Hit | ].
-  rewrite Hiq, Heq.
   now apply Bool.orb_true_iff; right.
 }
 symmetry.
