@@ -1456,26 +1456,26 @@ Qed.
 
 Theorem rngl_inv_mul_distr :
   rngl_has_opp_or_subt = true →
-  rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
-intros Hom Hdo Hin * Haz Hbz.
+intros Hom Hin * Haz Hbz.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hin'.
 rewrite Hin in Hin'.
 specialize (Hin' (or_introl eq_refl)).
 move Hin' before Hin.
 specialize (rngl_mul_cancel_l Hin') as mul_cancel_l.
 specialize (rngl_div_diag Hin') as div_diag.
-specialize (rngl_integral Hom) as integral.
+specialize (rngl_eq_mul_0_l Hom) as integral.
+assert (H : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
+  now rewrite Hin'; destruct rngl_is_integral.
+}
+specialize (integral H); clear H.
 unfold rngl_div in div_diag.
 rewrite Hin in div_diag.
-rewrite Hdo in integral; cbn in integral.
-specialize (integral eq_refl).
 assert (Habz : (a * b)%L ≠ 0%L). {
   intros H.
-  specialize (integral a b H).
-  now destruct integral.
+  now specialize (integral a b H Hbz).
 }
 apply mul_cancel_l with (a := (a * b)%L); [ easy | ].
 unfold rngl_has_inv in Hin.
@@ -1799,7 +1799,7 @@ Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
 Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
 Arguments rngl_integral {T}%type {ro rp}.
-Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%L b%L.
+Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin a%L b%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%L.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.

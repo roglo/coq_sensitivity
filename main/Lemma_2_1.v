@@ -247,7 +247,7 @@ rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hin.
-rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
   intros H.
   apply rngl_integral in H; [ now destruct H | easy | ].
   now apply Bool.orb_true_iff; left.
