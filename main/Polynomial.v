@@ -3191,9 +3191,8 @@ apply (rngl_neqb_neq Heb) in Ha, Hb.
 apply (rngl_neqb_neq Heb).
 rewrite last_lap_mul.
 intros Hab.
-apply (rngl_integral Hos) in Hab; [ now destruct Hab | ].
+apply (rngl_eq_mul_0_r Hos) in Hab; [ easy | |  easy].
 apply Bool.orb_true_iff; right.
-rewrite Heb, Bool.andb_true_r.
 apply rngl_has_inv_or_quot_iff.
 now rewrite Hiv; left.
 Qed.

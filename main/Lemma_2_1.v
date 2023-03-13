@@ -249,8 +249,10 @@ unfold rngl_div.
 rewrite Hin.
 rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
   intros H.
-  apply rngl_integral in H; [ now destruct H | easy | ].
-  now apply Bool.orb_true_iff; left.
+  apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
+  apply Bool.orb_true_iff; right.
+  apply rngl_has_inv_or_quot_iff; left.
+  easy.
 } {
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
@@ -261,8 +263,10 @@ rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
 intros H; apply Hcz.
-apply rngl_integral in H; [ now destruct H | easy | ].
-now apply Bool.orb_true_iff; left.
+apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
+apply Bool.orb_true_iff; right.
+apply rngl_has_inv_or_quot_iff; left.
+easy.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
