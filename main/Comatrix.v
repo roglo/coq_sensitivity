@@ -2012,7 +2012,6 @@ Theorem cramer's_rule :
   rngl_mul_is_comm = true →
   rngl_has_inv_or_quot = true →
   rngl_characteristic = 0 →
-  rngl_is_integral = true ∨ rngl_has_eqb = true →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2021,21 +2020,21 @@ Theorem cramer's_rule :
   → ∀ i, 1 ≤ i ≤ mat_nrows M →
   vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
-intros Hop Hic Hiq Hch Hie * Hsm Hum Hmz Hmuv k Hk.
+intros Hop Hic Hiq Hch * Hsm Hum Hmz Hmuv k Hk.
 assert (Hii : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
-  destruct Hie as [Hit| Heq]; [ now rewrite Hit | ].
+  rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }
-symmetry.
 rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmz Hmuv Hk).
 rewrite (rngl_mul_comm Hic).
+symmetry.
 apply (rngl_mul_div Hiq _ _ Hmz).
 Qed.
 
 End a.
 
 Arguments com {T}%type {ro} M%M.
-Arguments cramer's_rule {T ro rp} Hop Hic Hiq Hch Hie [M%M U%V V%V].
+Arguments cramer's_rule {T ro rp} Hop Hic Hiq Hch [M%M U%V V%V].
 Arguments laplace_formula_on_cols {T ro rp} Hop Hic H10 M%M [j]%nat.
 Arguments laplace_formula_on_rows {T}%type {ro rp} Hop Hic M%M [i]%nat.
 Arguments mat_inv {T}%type {ro} M%M.
