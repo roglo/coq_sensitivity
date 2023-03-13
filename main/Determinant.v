@@ -377,13 +377,12 @@ Qed.
 (* det and det' are equal *)
 
 Theorem det_is_det' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det' M.
 Proof.
-intros Hic Hop * Hm.
+intros Hop * Hm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -397,7 +396,7 @@ induction n; intros. {
   rewrite rngl_summation_only_one.
   rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
   unfold ε, iter_seq, iter_list; unfold "<?"; cbn.
-  now do 3 rewrite rngl_mul_1_l.
+  symmetry; apply rngl_mul_1_l.
 }
 rewrite determinant_succ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -405,9 +404,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_product_only_one; cbn.
-  unfold ε; cbn.
-  do 2 rewrite rngl_product_only_one; cbn.
-  now rewrite rngl_mul_1_r.
+  now do 2 rewrite rngl_mul_1_r.
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -443,15 +440,15 @@ rewrite Nat.sub_diag.
 rewrite Nat.add_1_r.
 cbn - [ canon_sym_gr_list nth ].
 remember (mat_el M 1 _) as x eqn:Hx.
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (ε_mul_comm Hop).
 symmetry.
 rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (minus_one_pow_mul_comm Hop).
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
 (* separation factors "∏" and "ε" *)
-rewrite rngl_mul_comm; [ | easy ].
+rewrite (ε_mul_comm Hop).
 rewrite <- rngl_mul_assoc.
 f_equal. {
   (* equality of the two "∏" *)
@@ -498,7 +495,7 @@ symmetry.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
-apply ε_of_sym_gr_permut_succ; [ easy | easy | ].
+apply ε_of_sym_gr_permut_succ; [ easy | ].
 apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
@@ -508,10 +505,9 @@ Qed.
 
 Theorem det'_is_det'' :
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
-intros Hop Heq *.
+intros Hop *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -607,7 +603,7 @@ assert (H1 :
   intros l Hl.
   destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
   assert (H : ε l = 0%L). {
-    apply ε_when_dup; [ easy | easy | ].
+    apply ε_when_dup; [ easy | ].
     intros Hnd.
     apply H1; clear H1.
     apply in_map_iff.
@@ -696,16 +692,14 @@ Qed.
 (* det and det'' are equal *)
 
 Theorem det_is_det'' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det'' M.
 Proof.
-intros Hic Hop Heq * Hm.
-rewrite det_is_det'; [ | easy | easy | easy ].
-now apply det'_is_det''.
+intros Hop * Hm.
+rewrite (det_is_det' Hop); [ | easy ].
+apply (det'_is_det'' Hop).
 Qed.
 
 (* multilinearity *)
@@ -713,8 +707,6 @@ Qed.
 Theorem determinant_multilinear :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -725,7 +717,7 @@ Theorem determinant_multilinear :
        (a * det (mat_repl_vect i M U) +
         b * det (mat_repl_vect i M V))%L.
 Proof.
-intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
+intros Hic Hop * Hsm Hr Hu Hv Hi.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -805,7 +797,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic a).
+  rewrite <- (ε_mul_comm Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -834,7 +826,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic b).
+  rewrite <- (ε_mul_comm Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -887,7 +879,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
@@ -904,7 +895,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 symmetry.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
@@ -922,7 +912,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
@@ -946,8 +935,9 @@ remember
   (∏ (i0 = 2, p + 1),
    mat_el M (i0 - 1) (nth (i0 - 2) (canon_sym_gr_list n k) O + 1))
   as q eqn:Hq.
-rewrite (rngl_mul_mul_swap Hic _ _ q).
-do 3 rewrite (rngl_mul_comm Hic _ q).
+symmetry.
+rewrite (rngl_mul_comm Hic a).
+rewrite (rngl_mul_comm Hic b).
 do 5 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 f_equal.
@@ -975,6 +965,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+symmetry.
 rewrite rngl_add_comm.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
@@ -1132,12 +1123,9 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
-(* to be completed
-Theorem glop_determinant_alternating :
+Theorem determinant_alternating :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ (M : matrix T) p q,
   p ≠ q
   → 1 ≤ p ≤ mat_nrows M
@@ -1145,375 +1133,11 @@ Theorem glop_determinant_alternating :
   → is_square_matrix M = true
   → det (mat_swap_rows p q M) = (- det M)%L.
 Proof.
-intros Hic Hop Hin H10 * Hpq Hp Hq Hsm.
-clear Hin H10.
-remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-rewrite det_is_det'; [ | easy | easy | ]. 2: {
-  rewrite <- Hr in Hp, Hq.
-  now apply mat_swap_rows_is_square.
-}
-unfold det'.
-rewrite mat_swap_rows_nrows.
-rewrite Hr.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite (rngl_product_shift 1); [ | flia Hp ].
-  rewrite Nat.sub_diag.
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-cbn - [ mat_swap_rows ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_product_change_var with
-    (g := transposition (p - 1) (q - 1)) (h := transposition (p - 1) (q - 1)).
-  2: {
-    intros i Hi.
-    apply transposition_involutive.
-  }
-  rewrite Nat.sub_0_r.
-  rewrite <- Nat.sub_succ_l; [ | flia Hp ].
-  rewrite Nat_sub_succ_1.
-  easy.
-}
-cbn - [ mat_swap_rows ].
-assert (Hp' : p - 1 < n) by flia Hp.
-assert (Hq' : q - 1 < n) by flia Hq.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
-      (lb := seq 0 n); [ | easy | ]. 2: {
-    remember (map _ _) as la eqn:Hla.
-    replace n with (length la) by now rewrite Hla, List_map_seq_length.
-    subst la.
-    now apply transposition_permut_seq_with_len.
-  }
-  easy.
-}
-cbn - [ mat_swap_rows ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n!). {
-    specialize (fact_neq_0 n) as Hn.
-    flia Hk Hn.
-  }
-  erewrite rngl_product_list_eq_compat. 2: {
-    intros i Hi.
-    replace (mat_el _ _ _) with
-      (mat_el M (i + 1)
-         (nth (transposition (p - 1) (q - 1) i) (canon_sym_gr_list n k) 0 + 1)).
-    2: {
-      cbn.
-      unfold mat_el; f_equal.
-      unfold list_swap_elem.
-      do 2 rewrite Nat.add_sub.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        rewrite fold_mat_nrows, Hr.
-        apply in_seq in Hi.
-        now apply transposition_lt.
-      }
-      rewrite fold_mat_nrows, Hr.
-      unfold transposition.
-      do 2 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
-        subst i.
-        rewrite seq_nth; [ | easy ].
-        rewrite Nat.add_0_l.
-        rewrite Nat.eqb_refl.
-        apply Nat.neq_sym in Hpq.
-        destruct (Nat.eq_dec (q - 1) (p - 1)) as [H| H]; [ | easy ].
-        now rewrite H.
-      }
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
-        subst i.
-        rewrite seq_nth; [ | easy ].
-        rewrite Nat.add_0_l.
-        rewrite <- if_eqb_eq_dec.
-        now rewrite Nat.eqb_refl.
-      }
-      apply in_seq in Hi.
-      rewrite seq_nth; [ | easy ].
-      rewrite Nat.add_0_l.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ easy | clear H ].
-      now destruct (Nat.eq_dec i (q - 1)).
-    }
-    easy.
-  }
-  easy.
-}
-cbn.
-set (f := λ k, list_swap_elem 0 (canon_sym_gr_list n k) (p - 1) (q - 1)).
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  erewrite rngl_product_list_eq_compat. 2: {
-    intros i Hi.
-    apply in_seq in Hi.
-    replace (nth _ _ 0) with
-       (nth i (list_swap_elem 0 (canon_sym_gr_list n k) (p - 1) (q - 1)) 0).
-    2: {
-(* lemme à faire *)
-      unfold list_swap_elem.
-      rewrite (List_map_nth' 0). 2: {
-        now rewrite seq_length, canon_sym_gr_list_length.
-      }
-      rewrite seq_nth; [ easy | now rewrite canon_sym_gr_list_length ].
-    }
-    fold (f k).
-    easy.
-  }
-  easy.
-}
-cbn.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n!). {
-    specialize (fact_neq_0 n) as Hn.
-    flia Hk Hn.
-  }
-  erewrite rngl_product_seq_product; [ | flia Hp ].
-  rewrite Nat.add_0_l.
-  replace (canon_sym_gr_list n k) with
-     (map (λ i, nth (transposition (p - 1) (q - 1) i) (f k) 0) (seq 0 n)).
-  2: {
-    rewrite List_map_nth_seq with (d := 0).
-    rewrite canon_sym_gr_list_length.
-    apply map_ext_in.
-    intros i Hi; cbn.
-    apply in_seq in Hi.
-    unfold f, list_swap_elem.
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length, canon_sym_gr_list_length.
-      now apply transposition_lt.
-    }
-    rewrite seq_nth. 2: {
-      rewrite canon_sym_gr_list_length.
-      now apply transposition_lt.
-    }
-    rewrite Nat.add_0_l.
-    now rewrite transposition_involutive.
-  }
-  replace (map (λ i, nth (transposition (p - 1) (q - 1) i) (f k) 0) (seq 0 n))
-  with (f k ° map (λ i, transposition (p - 1) (q - 1) i) (seq 0 n)). 2: {
-    unfold "°"; cbn.
-    now rewrite map_map.
-  }
-About sign_comp.
-  rewrite sign_comp; [ | | ].
-...
-  rewrite sign_comp; [ | easy | ]. 2: {
-    split. 2: {
-      rewrite List_map_seq_length.
-      unfold f.
-      rewrite list_swap_elem_length.
-      symmetry.
-      apply canon_sym_gr_list_length.
-    }
-    apply permut_seq_iff.
-    split. {
-      intros i Hi.
-      rewrite List_map_seq_length.
-      apply In_nth with (d := 0) in Hi.
-      rewrite List_map_seq_length in Hi.
-      destruct Hi as (j & Hj & Hji).
-      rewrite (List_map_nth' 0) in Hji; [ | now rewrite seq_length ].
-      rewrite seq_nth in Hji; [ | easy ].
-      rewrite <- Hji.
-      now apply transposition_lt.
-    }
-    apply (NoDup_map_iff 0).
-    rewrite seq_length.
-    intros i j Hi Hj Hij.
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    cbn in Hij.
-    unfold transposition in Hij.
-    do 4 rewrite if_eqb_eq_dec in Hij.
-    destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
-      subst i.
-      destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
-      symmetry in Hij.
-      destruct (Nat.eq_dec j (q - 1)); [ | easy ].
-      congruence.
-    }
-    destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
-      subst i.
-      symmetry in Hij.
-      destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
-      now destruct (Nat.eq_dec j (q - 1)).
-    }
-    destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
-    now destruct (Nat.eq_dec j (q - 1)).
-  }
-  easy.
-}
-cbn.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k (_, Hk).
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
-  rewrite (rngl_mul_comm Hic (ε (f k))).
-  rewrite <- rngl_mul_assoc.
-  rewrite transposition_signature; try easy.
-  flia Hp Hq Hpq.
-}
-cbn - [ f ].
-rewrite <- rngl_mul_summation_distr_l; [ | easy ].
-rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-f_equal.
-rewrite rngl_mul_1_l.
-symmetry.
-set (g := λ k, canon_sym_gr_list_inv n (f k)).
-rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
-  intros k (_, Hk).
-  assert (Hkn : k < n!). {
-    specialize (fact_neq_0 n) as Hn.
-    flia Hk Hn.
-  }
-  unfold g, f.
-  unfold list_swap_elem.
-  do 2 rewrite canon_sym_gr_list_length.
-  erewrite map_ext_in. 2: {
-    intros i Hi; apply in_seq in Hi.
-    rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
-(* lemme à faire ? *)
-      split; [ | now rewrite map_length, seq_length ].
-      apply permut_seq_iff.
-      split. {
-        intros j Hj.
-        rewrite map_length, seq_length.
-        apply in_map_iff in Hj.
-        destruct Hj as (m & Hmj & Hm).
-        apply in_seq in Hm.
-        rewrite <- Hmj.
-        apply canon_sym_gr_list_ub; [ easy | ].
-        apply transposition_lt; [ flia Hp | flia Hq | easy ].
-      } {
-        apply (NoDup_map_iff 0).
-        rewrite seq_length.
-        intros u v Hu Hv Huv.
-        rewrite seq_nth in Huv; [ | easy ].
-        rewrite seq_nth in Huv; [ | easy ].
-        cbn in Huv.
-        now apply nth_transposition_canon_sym_gr_list_inj in Huv.
-      }
-    }
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply transposition_lt.
-    }
-    rewrite seq_nth. 2: {
-      now apply transposition_lt.
-    }
-    rewrite Nat.add_0_l.
-    rewrite transposition_involutive.
-    easy.
-  }
-  rewrite <- List_map_nth_seq'; [ | now rewrite canon_sym_gr_list_length ].
-  now apply canon_sym_gr_list_inv_canon_sym_gr_list.
-}
-rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
-rewrite Nat_sub_succ_1.
-rewrite (rngl_summation_list_permut _ Nat.eqb_eq) with (lb := seq 0 n!);
-    cycle 1. {
-  remember (map _ _) as la eqn:Hla.
-  replace n! with (length la) by now rewrite Hla, List_map_seq_length.
-  subst la.
-(* lemma to do? *)
-  unfold g, f.
-  apply permut_seq_iff.
-  split. {
-    intros i Hi.
-    rewrite map_length, seq_length.
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj).
-    apply in_seq in Hj.
-    rewrite <- Hji.
-    apply canon_sym_gr_list_inv_ub.
-    apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
-    now apply canon_sym_gr_list_permut_seq_with_len.
-  } {
-    apply (NoDup_map_iff 0).
-    rewrite seq_length.
-    intros i j Hi Hj Hij.
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    do 2 rewrite Nat.add_0_l in Hij.
-    apply rank_of_permut_in_canon_gr_list_inj in Hij; cycle 1. {
-      apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
-      now apply canon_sym_gr_list_permut_seq_with_len.
-    } {
-      apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
-      now apply canon_sym_gr_list_permut_seq_with_len.
-    }
-(* lemme à faire ? *)
-    unfold list_swap_elem in Hij.
-    do 2 rewrite canon_sym_gr_list_length in Hij.
-    apply nth_canon_sym_gr_list_inj2 with (n := n); [ easy | easy | ].
-    intros k Hkn.
-    apply ext_in_map with (a := transposition (p - 1) (q - 1) k) in Hij. 2: {
-      apply in_seq.
-      split; [ flia | ].
-      now apply transposition_lt.
-    }
-    now rewrite transposition_involutive in Hij.
-  }
-}
-rewrite det_is_det'; try now destruct Hif.
-unfold det'.
-rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
-rewrite Nat.add_0_l.
-rewrite Hr.
-apply rngl_summation_eq_compat.
-intros k Hk.
-assert (Hkn : k < n!). {
-  specialize (fact_neq_0 n) as Hn.
-  flia Hk Hn.
-}
-assert (Hc : canon_sym_gr_list n k = f (g k)). {
-  unfold g, f.
-  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
-    apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
-    now apply canon_sym_gr_list_permut_seq_with_len.
-  }
-  rewrite list_swap_elem_involutive; [ easy | | ]. {
-    now rewrite canon_sym_gr_list_length.
-  } {
-    now rewrite canon_sym_gr_list_length.
-  }
-}
-f_equal; [ now rewrite Hc | ].
-rewrite (rngl_product_shift 1); [ | flia Hp ].
-apply rngl_product_eq_compat.
-intros i Hi.
-rewrite Nat.add_comm, Nat.add_sub.
-now rewrite Hc.
-Qed.
-*)
-
-Theorem determinant_alternating : in_charac_0_field →
-  ∀ (M : matrix T) p q,
-  p ≠ q
-  → 1 ≤ p ≤ mat_nrows M
-  → 1 ≤ q ≤ mat_nrows M
-  → is_square_matrix M = true
-  → det (mat_swap_rows p q M) = (- det M)%L.
-Proof.
-intros Hif * Hpq Hp Hq Hsm.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hic Hop * Hpq Hp Hq Hsm.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-rewrite det_is_det'; try now destruct Hif. 2: {
+rewrite (det_is_det' Hop). 2: {
   rewrite <- Hr in Hp, Hq.
   now apply mat_swap_rows_is_square.
 }
@@ -1549,7 +1173,6 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
@@ -1718,15 +1341,14 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
-  rewrite transposition_signature; try easy.
+  rewrite (transposition_signature Hop); [ easy | | easy | easy ].
   flia Hp Hq Hpq.
 }
 cbn - [ f ].
 rewrite <- rngl_mul_summation_distr_l; [ | easy ].
-rewrite rngl_mul_opp_l; [ | now destruct Hif ].
+rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
@@ -1827,7 +1449,7 @@ rewrite (rngl_summation_list_permut _ Nat.eqb_eq) with (lb := seq 0 n!);
     now rewrite transposition_involutive in Hij.
   }
 }
-rewrite det_is_det'; try now destruct Hif.
+rewrite det_is_det'; [ | easy | easy ].
 unfold det'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -1858,7 +1480,11 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Theorem determinant_same_rows : in_charac_0_field →
+Theorem determinant_same_rows :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
@@ -1867,9 +1493,7 @@ Theorem determinant_same_rows : in_charac_0_field →
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%L.
 Proof.
-intros Hif * Hsm Hpq Hpn Hqn Hjpq.
-destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+intros Hic Hop Hch Hii * Hsm Hpq Hpn Hqn Hjpq.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -1919,9 +1543,7 @@ assert (HM : det M = (- det M)%L). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-apply eq_rngl_add_same_0 in HM; try easy.
-apply Bool.orb_true_iff.
-now left.
+now apply (eq_rngl_add_same_0 Hos Hii Hch) in HM.
 Qed.
 
 (* transpositions list of permutation *)
@@ -2112,7 +1734,9 @@ intros i Hi.
 now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
-Theorem det_by_any_sym_gr : in_charac_0_field →
+Theorem det_by_any_sym_gr :
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → mat_nrows M = n
@@ -2122,11 +1746,8 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
       ∑ (k = 0, n! - 1),
         ε (nth k sg []) * ∏ (i = 1, n), mat_el M i ((nth k sg []).(i) + 1).
 Proof.
-intros Hif * Hnz Hr Hsm Hsg.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
-rewrite det_is_det'; try now destruct Hif.
+intros Hop H10 * Hnz Hr Hsm Hsg.
+rewrite (det_is_det' Hop); [ | easy ].
 unfold det'.
 rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
@@ -2214,7 +1835,7 @@ split. {
   rewrite map_length.
   rewrite <- Hji.
   rewrite Hσ2, <- Hl2.
-  apply permut_list_ub; [ easy | ].
+  apply permut_seq_ub; [ easy | ].
   apply nth_In.
   rewrite Hl2, <- Hσ2.
   apply permut_seq_iff in Hσ1.
@@ -2241,7 +1862,9 @@ Qed.
 
 Theorem det_any_permut_l :
   let ron := nat_ring_like_op in
-  in_charac_0_field →
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T ro = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2251,7 +1874,7 @@ Theorem det_any_permut_l :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k σ 0 + 1) (nth k μ 0 + 1)).
 Proof.
-intros ron Hif * Hnz Hr Hsm Hσ.
+intros ron Hic Hop H10 * Hnz Hr Hsm Hσ.
 subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
@@ -2283,7 +1906,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     now rewrite comp_length, isort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
-  rewrite NoDup_ε_square; [ | now destruct Hif | ]. 2: {
+  rewrite NoDup_ε_square; [ | easy | ]. 2: {
     destruct Hσ as (Hσ, _).
     now apply permut_seq_iff in Hσ.
   }
@@ -2316,13 +1939,13 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite <- Hkj.
       destruct Hσ as (H1, H2).
       rewrite <- H2 in Hk.
-      apply permut_list_ub; [ easy | ].
+      apply permut_seq_ub; [ easy | ].
       now apply nth_In.
     }
     easy.
   }
   cbn.
-  rewrite rngl_product_map_permut; [ | now destruct Hif | easy ].
+  rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
 cbn.
@@ -2360,7 +1983,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-apply det_by_any_sym_gr; try easy.
+apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
   rewrite List_map_seq_length.
@@ -2464,7 +2087,9 @@ Qed.
 
 Theorem det_any_permut_r :
   let ron := nat_ring_like_op in
-  in_charac_0_field →
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T ro = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2474,7 +2099,7 @@ Theorem det_any_permut_r :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k μ 0 + 1) (nth k σ 0 + 1))%L.
 Proof.
-intros ron Hif * Hnz Hr Hsm Hσ; subst ron.
+intros ron Hic Hop H10 * Hnz Hr Hsm Hσ; subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : permut_seq_with_len n μ). {
@@ -2502,16 +2127,14 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite <- Hσν at 1.
   replace (ε ((σ ° isort_rank Nat.leb μ) ° μ)) with
       (ε (σ ° isort_rank Nat.leb μ) * ε μ)%L. 2: {
-    destruct Hif.
     rewrite <- sign_comp; [ easy | easy | ].
     rewrite comp_length, isort_rank_length.
     now destruct Hpμ.
   }
-  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
   rewrite NoDup_ε_square; [ | easy | ]. 2: {
-    apply permut_list_NoDup.
+    apply permut_seq_NoDup.
     now destruct Hpμ.
   }
   rewrite rngl_mul_1_l.
@@ -2554,12 +2177,11 @@ erewrite rngl_summation_eq_compat. 2: {
       flia Hi H.
     }
     rewrite <- Hkj.
-    apply permut_list_ub; [ apply Hc | ].
+    apply permut_seq_ub; [ apply Hc | ].
     apply nth_In.
     now rewrite canon_sym_gr_list_length.
   }
   cbn.
-  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
@@ -2599,7 +2221,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-apply det_by_any_sym_gr; try easy.
+apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
   rewrite List_map_seq_length.
@@ -2636,7 +2258,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-        apply permut_list_ub; [ | now apply nth_In ].
+        apply permut_seq_ub; [ | now apply nth_In ].
         apply isort_rank_permut_seq.
       }
       rewrite isort_rank_length.
@@ -2653,7 +2275,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-        apply permut_list_ub; [ | now apply nth_In ].
+        apply permut_seq_ub; [ | now apply nth_In ].
         apply isort_rank_permut_seq.
       }
       rewrite isort_rank_length.
@@ -2675,7 +2297,7 @@ split. {
   apply in_map_iff.
   exists (canon_sym_gr_list_inv n (isort_rank Nat.leb l ° σ)).
   rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
-    apply comp_permut_seq_with_len; [ | easy ].
+   apply comp_permut_seq_with_len; [ | easy ].
     apply isort_rank_permut_seq_with_len.
     now destruct Hl.
   }
@@ -2712,12 +2334,15 @@ split. {
 }
 Qed.
 
-Theorem determinant_transpose : in_charac_0_field →
+Theorem determinant_transpose :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M⁺ = det M.
 Proof.
-intros Hif * Hsm.
+intros Hic Hop H10 * Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold det.
@@ -2730,8 +2355,8 @@ assert (Hs : permut_seq_with_len n (seq 0 n)) by apply seq_permut_seq_with_len.
 assert (Hr' : mat_nrows M⁺ = n). {
   now rewrite mat_transp_nrows, squ_mat_ncols.
 }
-rewrite (det_any_permut_l Hif M Hnz Hr Hsm Hs).
-rewrite (det_any_permut_r Hif (M⁺)%M Hnz Hr' Hts Hs).
+rewrite (det_any_permut_l Hic Hop H10 M Hnz Hr Hsm Hs).
+rewrite (det_any_permut_r Hic Hop H10 (M⁺)%M Hnz Hr' Hts Hs).
 apply rngl_summation_list_eq_compat.
 intros p Hp.
 f_equal.
@@ -2759,15 +2384,18 @@ rewrite seq_nth; [ | now rewrite squ_mat_ncols ].
 now do 2 rewrite Nat.add_1_r.
 Qed.
 
-Theorem det_subm_transp : in_charac_0_field →
+Theorem det_subm_transp :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ i j (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M
   → 1 ≤ j ≤ mat_nrows M
   → det (subm j i M) = det (subm i j M⁺).
 Proof.
-intros Hif * Hsm Hi Hj.
-rewrite <- determinant_transpose; [ | easy | ]. 2: {
+intros Hic Hop H10 * Hsm Hi Hj.
+rewrite <- (determinant_transpose Hic Hop H10). 2: {
   rewrite squ_mat_ncols in Hi; [ | easy ].
   now apply is_squ_mat_subm.
 }
@@ -2804,12 +2432,12 @@ End a.
 Arguments det {T ro} M%M.
 Arguments det' {T}%type {ro} M%M.
 Arguments det'' {T}%type {ro} M%M.
-Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
+Arguments determinant_alternating {T}%type {ro rp} Hic Hop M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
-Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
+Arguments determinant_same_rows {T ro rp} Hic Hop Hch Hit M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
-Arguments det_is_det' {T ro rp} Hic Hop M%M Hsm.
-Arguments det'_is_det'' {T ro rp} _ _ M%M.
-Arguments det_is_det'' {T ro rp} Hic Hop Heq M%M Hsm.
+Arguments det_is_det' {T ro rp} Hop M%M Hsm.
+Arguments det'_is_det'' {T ro rp} Hop M%M.
+Arguments det_is_det'' {T ro rp} Hop M%M Hsm.
 Arguments det_mI {T ro rp} _ n%nat.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.

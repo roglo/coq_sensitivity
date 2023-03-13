@@ -104,6 +104,34 @@ assert (Hos : rngl_has_opp_or_subt = true). {
 set (rop := polyn_ring_like_op (cf_has_eqb Hif) Hos).
 set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
 specialize (Hcr rop rpp).
+cbn - [ det ] in Hcr.
+generalize Hif; intros H.
+destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
+  unfold rngl_has_opp; cbn.
+  unfold polyn_opt_opp_or_subt.
+  unfold rngl_has_opp in Hop.
+  destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
+  now destruct s.
+}
+specialize (Hcr Hopp Hic).
+assert (Hiqp : rngl_has_inv_or_quot = true). {
+  apply rngl_has_inv_or_quot_iff.
+  unfold rngl_has_inv, rngl_has_quot; cbn.
+  unfold polyn_opt_inv_or_quot.
+  rewrite Hic, Hop, Hin; cbn.
+  unfold rngl_has_inv in Hin.
+  destruct rngl_opt_inv_or_quot; [ now right | easy ].
+}
+specialize (Hcr Hiqp Hch).
+specialize (Hcr (or_intror eq_refl)).
+Check @cramer's_rule.
+Check @cramer's_rule_by_mul.
+(* a version of Cramer's rule on lists instead of polynomials could
+   be cool, if feasible. With a "lap_norm" to ensure equality.
+   Problem: lists as polynomials (lap) are not "ring-like" objects
+   because of equality, among other things. *)
+...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
     apply Hif.
@@ -115,6 +143,7 @@ assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
     now destruct s.
   } {
 Set Printing All.
+...
 (* ah mais non, les polynômes n'ont pas d'inverse ! *)
 ...
     specialize (cf_has_inv Hif) as H.

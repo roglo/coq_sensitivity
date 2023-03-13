@@ -647,7 +647,11 @@ rewrite nth_cart_prod_same_length with (n := n). {
 }
 Qed.
 
-Theorem det_isort_rows_with_dup : in_charac_0_field →
+Theorem det_isort_rows_with_dup :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -656,14 +660,13 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
   → det (mat_select_rows kl A) =
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
-intros Hif * Hcm Hac Hkl Hadk.
+intros Hop Hic Hch Hii * Hcm Hac Hkl Hadk.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
 destruct Hadk as (l1 & l2 & l3 & a & Ha).
-rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+rewrite (ε_when_dup Hop). 2: {
   intros H.
   rewrite Ha in H.
   apply NoDup_remove_2 in H.
@@ -674,7 +677,7 @@ rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
 rewrite rngl_mul_0_l; [ | easy ].
 set (p1 := S (length l1)).
 set (q1 := S (length (l1 ++ a :: l2))).
-apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
+apply (determinant_same_rows) with (p := p1) (q := q1); try easy; cycle 1. {
   unfold p1, q1.
   rewrite app_length; cbn; flia.
 } {
@@ -720,7 +723,10 @@ apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
 now apply mat_select_rows_is_square.
 Qed.
 
-Theorem det_isort_rows_no_dup : in_charac_0_field →
+Theorem det_isort_rows_no_dup :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic ≠ 1 →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -729,23 +735,18 @@ Theorem det_isort_rows_no_dup : in_charac_0_field →
   → det (mat_select_rows kl A) =
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
-intros Hif * Hcm Hac Hkl Hadk.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop Hic Hch * Hcm Hac Hkl Hadk.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
-  cbn; rewrite ε_nil; symmetry.
+  cbn; symmetry.
   apply rngl_mul_1_l.
 }
-rewrite det_is_det''; try now destruct Hif. 2: {
+rewrite det_is_det''; [ | easy | ]. 2: {
   now apply mat_select_rows_is_square.
 }
-rewrite det_is_det''; try now destruct Hif. 2: {
+rewrite det_is_det''; [ | easy | ]. 2: {
   apply mat_select_rows_is_square; [ easy | | ]. {
     now rewrite isort_length.
   } {
@@ -814,14 +815,14 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
   intros la Hla.
   f_equal. {
     unfold g1.
-    rewrite (sign_comp Hif). 2: {
+    rewrite (sign_comp Hop). 2: {
       apply in_cart_prod_rep_seq_iff in Hla.
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
       rewrite Hnc, Hn.
       apply collapse_permut_seq_with_len.
     }
-    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    rewrite (ε_mul_comm Hop).
     f_equal.
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
@@ -850,7 +851,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
   }
   rewrite rngl_product_change_var with (g := g2) (h := h2); [ | easy ].
   rewrite (rngl_product_list_permut _ Nat.eqb_eq)
-      with (lb := seq 1 n); [ | now destruct Hif | ]. {
+      with (lb := seq 1 n); [ | easy | ]. {
     rewrite rngl_product_seq_product; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     apply rngl_product_eq_compat.
@@ -1050,7 +1051,11 @@ split; intros Hla. {
 }
 Qed.
 
-Theorem det_isort_rows : in_charac_0_field →
+Theorem det_isort_rows :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -1058,10 +1063,11 @@ Theorem det_isort_rows : in_charac_0_field →
   → det (mat_select_rows kl A) =
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
-intros Hif * Hcm Hac Hkl.
+intros Hop Hic Hch Hii * Hcm Hac Hkl.
 remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
 destruct adk. {
-  now apply det_isort_rows_no_dup.
+  apply det_isort_rows_no_dup; try easy.
+  now intros H; rewrite H in Hch.
 } {
   now apply det_isort_rows_with_dup.
 }
@@ -1301,7 +1307,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   destruct Hkl as (Hkl, Hsl).
   unfold g in Hsl.
   apply Bool.negb_true_iff in Hsl.
-  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+  rewrite ε_when_dup; [ | easy | ]. 2: {
     intros H.
     apply (no_dup_NoDup Nat.eqb_eq) in H.
     congruence.
@@ -1375,14 +1381,13 @@ Theorem fold_det''' : ∀ n M,
 Proof. now intros; subst n. Qed.
 
 Theorem det_is_det''' :
-  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ M, is_square_matrix M = true
   → det M = det''' M.
 Proof.
-intros Hic Hop Heq * Hm.
-rewrite det_is_det''; [ | easy | easy | easy | easy ].
+intros Hop Heq * Hm.
+rewrite det_is_det''; [ | easy | easy ].
 unfold det'', det'''.
 unfold cart_prod_rep_seq.
 rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
@@ -1476,8 +1481,7 @@ specialize (isort_rank_map_add_compat 1 0 la) as H1.
 replace (add 1) with S in H1 by easy; rewrite H1.
 cbn; rewrite map_id; clear H1.
 rewrite fold_collapse.
-apply permut_collapse.
-now unfold permut_seq.
+now apply permut_collapse.
 Qed.
 
 Theorem mat_select_all_rows : ∀ A,
@@ -1531,7 +1535,9 @@ Qed.
 (* Cauchy-Binet formula in several steps *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-Lemma Cauchy_Binet_formula_step_1 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_1 :
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ m n A B, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
@@ -1540,10 +1546,7 @@ Lemma Cauchy_Binet_formula_step_1 : in_charac_0_field →
       ∑ (l ∈ cart_prod_rep_seq m),
         ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)).
 Proof.
-intros Hif * Hmz Har Hac Hbc.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop Hch * Hmz Har Hac Hbc.
 assert (Hab : is_square_matrix (A * B) = true). {
   apply is_scm_mat_iff.
   split. {
@@ -1563,7 +1566,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
     now rewrite List_map_seq_length.
   }
 }
-rewrite det_is_det''; try now destruct Hif.
+rewrite det_is_det''; [ | easy | easy ].
 unfold det''.
 rewrite mat_mul_nrows, Har.
 (*
@@ -1609,7 +1612,9 @@ assert (H : nth (i - 1) l 0 ∈ l). {
 now specialize (Hl _ H).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_2 :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   ∀ m n A B, m ≠ 0 →
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
@@ -1617,11 +1622,10 @@ Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
     (∏ (i = 1, m), mat_el A i kl.(i)) *
     (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
-intros Hif * Hmz.
+intros Hop Hic * Hmz.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   rewrite rngl_product_summation_distr_cart_prod; [ | easy | easy ].
@@ -1641,7 +1645,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros kl Hkl.
-    rewrite rngl_product_mul_distr; [ | now destruct Hif ].
+    rewrite rngl_product_mul_distr; [ | easy ].
     easy.
   }
   easy.
@@ -1695,16 +1699,18 @@ apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
   easy.
 }
 cbn.
 rewrite <- rngl_mul_summation_list_distr_r; [ | easy ].
-rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite rngl_mul_comm; [ | easy ].
 easy.
 Qed.
 
-Lemma Cauchy_Binet_formula_step_3 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_3 :
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
   ∀ m n f B, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1715,10 +1721,7 @@ Lemma Cauchy_Binet_formula_step_3 : in_charac_0_field →
     ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B).
 Proof.
-intros Hif * Hmz Hcb Hbr Hbc.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop Hch * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
 intros l Hl.
 f_equal.
@@ -1726,7 +1729,7 @@ generalize Hl; intros H.
 apply in_cart_prod_repeat_iff in H.
 destruct H as [H| H]; [ easy | ].
 destruct H as (_ & Hlm & Hln).
-rewrite det_is_det''; try now destruct Hif. 2: {
+rewrite det_is_det''; [ | easy | ]. 2: {
   apply mat_select_rows_is_square; [ easy | congruence | ].
   rewrite Hbr.
   intros j Hj.
@@ -1757,7 +1760,11 @@ rewrite seq_nth; [ | now rewrite Hbc ].
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-Lemma Cauchy_Binet_formula_step_4 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_4 :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_characteristic = 0 →
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   ∀ m n f B, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1767,10 +1774,10 @@ Lemma Cauchy_Binet_formula_step_4 : in_charac_0_field →
     ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       ε kl * f kl * det (mat_select_rows (isort Nat.leb kl) B).
 Proof.
-intros Hif * Hmz Hcb Hbr Hbc.
+intros Hop Hic Hch Hii * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
 intros la Hla.
-rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
+rewrite (det_isort_rows Hop Hic Hch Hii _ _ Hcb); cycle 1. {
   apply in_cart_prod_length in Hla.
   rewrite repeat_length in Hla.
   congruence.
@@ -1783,11 +1790,12 @@ rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
   now apply Hla.
 }
 rewrite rngl_mul_assoc.
-assert (H : rngl_mul_is_comm = true) by now destruct Hif.
-now rewrite (rngl_mul_comm H _ (ε la)).
+now rewrite (rngl_mul_comm Hic _ (ε la)).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_1 :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
   ∀ m n A B,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -1796,22 +1804,16 @@ Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B).
 Proof.
-intros Hif *.
+intros Hop Heb *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
 remember (∑ (kl ∈ _), _) as x; subst x.
-rewrite rngl_summation_cart_prod_sub_lists_all_permut; cycle 1. {
-  now destruct Hif.
-} {
-  now destruct Hif.
-}
+rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl),
@@ -1844,11 +1846,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det ].
 symmetry.
-apply rngl_mul_summation_list_distr_r.
-now destruct Hif.
+apply (rngl_mul_summation_list_distr_r Hos).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_2 :
+  rngl_has_opp = true →
   ∀ m n A f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
@@ -1858,7 +1860,7 @@ Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
        ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))) *
     f jl.
 Proof.
-intros Hif * Hmz.
+intros Hop * Hmz.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
@@ -1930,7 +1932,7 @@ f_equal. {
     apply seq_NoDup.
   }
   symmetry.
-  rewrite (sign_comp Hif). 2: {
+  rewrite (sign_comp Hop). 2: {
     rewrite collapse_length, Hjm, <- Hkm.
     apply collapse_permut_seq_with_len.
   }
@@ -2018,7 +2020,10 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_4 :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  rngl_characteristic ≠ 1 →
   ∀ m n A f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
@@ -2030,10 +2035,7 @@ Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
       det (mat_select_cols jl A) * f jl.
 Proof.
-intros Hif * Hmz Hnz Hca Har Hac.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop Heb H10 * Hmz Hnz Hca Har Hac.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
@@ -2041,7 +2043,7 @@ rewrite fold_det'''. 2: {
   rewrite mat_select_cols_nrows; [ easy | | congruence ].
   now apply sub_lists_of_seq_1_n_are_correct in Hjl.
 }
-rewrite <- det_is_det'''; try now destruct Hif.
+rewrite <- det_is_det'''; [ easy | easy | easy | ].
 generalize Hjl; intros H.
 apply in_sub_lists_of_seq_1_n_length in H.
 apply mat_select_cols_is_square; [ easy | congruence | ].
@@ -2063,6 +2065,16 @@ Theorem Cauchy_Binet_formula : in_charac_0_field →
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
+assert (Hch : rngl_characteristic = 0) by now destruct Hif.
+assert (Heb : rngl_has_eqb = true) by now destruct Hif.
+assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (Hii : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
+  destruct Hif.
+  now apply Bool.orb_true_iff; left.
+}
+clear Hif.
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   move Hmz at top; subst m.
   apply is_scm_mat_iff in Hcb.
@@ -2085,40 +2097,40 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hcra Hac) as H1.
   now rewrite Har in H1.
 }
-rewrite (Cauchy_Binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
+rewrite (Cauchy_Binet_formula_step_1 Hop H10 A B Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hmz).
+rewrite (Cauchy_Binet_formula_step_2 Hop Hic n A B Hmz).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
     (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_3 Hop H10 _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hii _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_5_1 Hif).
+rewrite (Cauchy_Binet_formula_step_5_1 Hop Heb).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_2 Hif n A _ Hmz).
+rewrite (Cauchy_Binet_formula_step_5_2 Hop n A _ Hmz).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2134,7 +2146,7 @@ rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_4 Hif A _ Hmz Hnz Hca Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_4 Hop Heb H10 A _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     det (mat_select_cols jl A) * det (mat_select_rows jl B) =

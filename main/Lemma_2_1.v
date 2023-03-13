@@ -247,10 +247,12 @@ rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hin.
-rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
   intros H.
-  apply rngl_integral in H; [ now destruct H | easy | ].
-  now apply Bool.orb_true_iff; left.
+  apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
+  apply Bool.orb_true_iff; right.
+  apply rngl_has_inv_or_quot_iff; left.
+  easy.
 } {
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
@@ -261,8 +263,10 @@ rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
 intros H; apply Hcz.
-apply rngl_integral in H; [ now destruct H | easy | ].
-now apply Bool.orb_true_iff; left.
+apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
+apply Bool.orb_true_iff; right.
+apply rngl_has_inv_or_quot_iff; left.
+easy.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
@@ -1008,7 +1012,11 @@ assert (Hdu : det U ≠ 0%L). {
     rewrite mat_transp_nrows.
     now apply squ_mat_ncols.
   }
-  rewrite (determinant_transpose Hif) in Huu; [ | easy ].
+  generalize Hif; intros H.
+  destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+  rewrite (determinant_transpose Hic Hop) in Huu; [ | | easy ]. 2: {
+    now rewrite Hch.
+  }
   rewrite det_mI in Huu; [ | easy ].
   intros H; rewrite H in Huu.
   rewrite rngl_mul_0_r in Huu; [ | easy ].

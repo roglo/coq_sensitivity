@@ -352,7 +352,7 @@ rewrite (fold_left_op_fun_from_d 1%L); cycle 1. {
 } {
   apply rngl_mul_assoc.
 }
-rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
   now apply Hnz; left.
 } {
   intros H1.

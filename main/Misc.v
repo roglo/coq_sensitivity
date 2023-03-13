@@ -109,28 +109,32 @@ f_equal; f_equal; f_equal.
 flia.
 Qed.
 
-Theorem List_seq_shift' : ∀ len sta,
-  map (Nat.add sta) (seq 0 len) = seq sta len.
+Theorem List_seq_shift' : ∀ i sta len,
+  map (Nat.add i) (seq sta len) = seq (i + sta) len.
 Proof.
-assert (List_seq_shift_1 : ∀ len sta d,
-  d ≤ sta
-  → map (Nat.add (sta - d)) (seq d len) = seq sta len). {
-  intros * Hd.
-  revert sta d Hd.
-  induction len; intros; [ easy | cbn ].
-  rewrite Nat.sub_add; [ f_equal | easy ].
-  rewrite <- seq_shift, map_map.
-  symmetry.
-  rewrite <- IHlen with (d := S d); [ | flia Hd ].
-  cbn.
-  now rewrite <- seq_shift, map_map.
-}
 intros.
-specialize (List_seq_shift_1 len sta 0 (Nat.le_0_l sta)) as H1.
-now rewrite Nat.sub_0_r in H1.
+revert i sta.
+induction len; intros; [ easy | cbn ].
+f_equal.
+rewrite IHlen.
+now rewrite <- Nat.add_succ_comm.
 Qed.
 
 Theorem List_seq_cut : ∀ i sta len,
+  i ∈ seq sta len
+  → seq sta len = seq sta (i - sta) ++ seq i (sta + len - i).
+Proof.
+intros * His.
+apply in_seq in His.
+replace len with (i - sta + (len - (i - sta))) at 1 by flia His.
+rewrite seq_app.
+f_equal.
+replace (sta + (i - sta)) with i by flia His.
+f_equal.
+flia His.
+Qed.
+
+Theorem List_seq_cut3 : ∀ i sta len,
   i ∈ seq sta len
   → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
 Proof.
@@ -978,6 +982,22 @@ destruct (lt_dec i (length l1)) as [Hil| Hil]. {
   rewrite Nat.sub_succ_l; [ | easy ].
   symmetry; apply app_assoc.
 }
+Qed.
+
+Theorem butn_app_cons :
+  ∀ A i b (la lb : list A),
+  i = length la
+  → butn i (la ++ b :: lb) = la ++ lb.
+Proof.
+intros * Hia.
+unfold butn.
+rewrite firstn_app.
+rewrite Hia, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite firstn_all2; [ | easy ].
+rewrite skipn_app.
+rewrite Nat.sub_succ_l, Nat.sub_diag; [ | easy ].
+rewrite skipn_all2; [ | flia ].
+now rewrite skipn_cons, skipn_O.
 Qed.
 
 (* end butn *)
