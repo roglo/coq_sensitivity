@@ -9,6 +9,7 @@ Import List ListNotations Init.Nat.
 Require Import Misc RingLike IterAdd IterMul.
 Require Import Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
+Import matrix_Notations.
 
 (* Sylvester matrix *)
 
@@ -95,7 +96,7 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
-specialize @cramer's_rule as Hcr.
+specialize @cramer's_rule_by_mul as Hcr.
 specialize (Hcr (polyn T)).
 assert (Hos : rngl_has_opp_or_subt = true). {
   apply rngl_has_opp_or_subt_iff; left.
@@ -114,8 +115,9 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
   now destruct s.
 }
-specialize (Hcr Hopp Hic).
-assert (Hiqp : rngl_has_inv_or_quot = true). {
+specialize (Hcr Hopp Hic Hch).
+assert (H : (@rngl_is_integral T ro rp || rngl_has_inv_or_quot)%bool = true). {
+  apply Bool.orb_true_iff; right.
   apply rngl_has_inv_or_quot_iff.
   unfold rngl_has_inv, rngl_has_quot; cbn.
   unfold polyn_opt_inv_or_quot.
@@ -123,48 +125,14 @@ assert (Hiqp : rngl_has_inv_or_quot = true). {
   unfold rngl_has_inv in Hin.
   destruct rngl_opt_inv_or_quot; [ now right | easy ].
 }
-specialize (Hcr Hiqp Hch).
-(**)
+specialize (Hcr H); clear H.
 assert
   (H : ∀ A (ro : ring_like_op A) (p q : list A),
      polyn_of_norm_lap p = polyn_of_norm_lap q → lap_norm p = lap_norm q). {
   intros * H.
   now apply eq_polyn_eq in H.
 }
-apply H.
-...
-assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
-  split. {
-    apply Hif.
-  } {
-    specialize (cf_has_opp Hif) as H.
-    unfold rngl_has_opp in H |-*; cbn.
-    unfold polyn_opt_opp_or_subt; cbn.
-    destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
-    now destruct s.
-  } {
-Set Printing All.
-...
-(* ah mais non, les polynômes n'ont pas d'inverse ! *)
-...
-    specialize (cf_has_inv Hif) as H.
-    unfold rngl_has_inv in H |-*; cbn.
-    unfold polyn_opt_inv_or_quot; cbn.
-    rewrite (cf_mul_is_comm Hif); cbn.
-    rewrite (cf_has_opp Hif); cbn.
-    rewrite (cf_has_inv Hif); cbn.
-    remember rngl_opt_inv_or_quot as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [inv_quot| ]; [ | easy ].
-    destruct inv_quot as [inv| ]; [ | easy ].
-...
-    destruct rngl_opt_inv_or_quot as [inv_quot| ]; [ | easy ].
-    destruct inv_quot as [inv| ]; [ | easy ].
-...
-specialize (cramer's_rule Hif) as Hcr.
-specialize (Hcr (mk_mat ll)).
-...
-specialize (Hcr (mk_vect (repeat 1%L (n + m)))).
+apply H; clear H.
 ...
 
 End a.
