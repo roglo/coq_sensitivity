@@ -81,7 +81,7 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
 Theorem lap_bezout_is_resultant : in_charac_0_field →
   ∀ (P Q U V : list T),
   lap_bezout_resultant_coeff P Q = (U, V)
-  → lap_norm (U * P + V * Q)%lap = [lap_resultant P Q].
+  → lap_norm (U * P + V * Q)%lap = lap_norm [lap_resultant P Q].
 Proof.
 intros Hif * Hbr.
 unfold lap_bezout_resultant_coeff in Hbr.
@@ -124,10 +124,14 @@ assert (Hiqp : rngl_has_inv_or_quot = true). {
   destruct rngl_opt_inv_or_quot; [ now right | easy ].
 }
 specialize (Hcr Hiqp Hch).
-(* a version of Cramer's rule on lists instead of polynomials could
-   be cool, if feasible. With a "lap_norm" to ensure equality.
-   Problem: lists as polynomials (lap) are not "ring-like" objects
-   because of equality, among other things. *)
+(**)
+assert
+  (H : ∀ A (ro : ring_like_op A) (p q : list A),
+     polyn_of_norm_lap p = polyn_of_norm_lap q → lap_norm p = lap_norm q). {
+  intros * H.
+  now apply eq_polyn_eq in H.
+}
+apply H.
 ...
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
