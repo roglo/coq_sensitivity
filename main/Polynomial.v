@@ -623,13 +623,10 @@ unfold rngl_div.
 rewrite Hiv.
 right.
 intros Hq.
-apply rngl_integral in Hq; [ | easy | ]. 2: {
+apply (rngl_eq_mul_0_l Hos) in Hq; [ easy | | ]. {
   apply Bool.orb_true_iff; right.
-  rewrite Heb, Bool.andb_true_r.
   now apply rngl_has_inv_or_quot_iff; left.
 }
-destruct Hq as [Hq| Hq]; [ easy | ].
-exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy ].
 Qed.
 
