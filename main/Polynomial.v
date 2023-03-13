@@ -698,7 +698,7 @@ right; cbn; rewrite last_last.
 now rewrite Hrz.
 Qed.
 
-(* polyn opposite or subtraction *)
+(* lap opposite or subtraction *)
 
 Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
@@ -708,7 +708,7 @@ Definition lap_opt_opp_or_subt :
   | None => None
   end.
 
-(* polyn quotient *)
+(* lap quotient *)
 
 Definition lap_opt_inv_or_quot :
   option ((list T → list T) + (list T → list T → list T)) :=
@@ -732,15 +732,9 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_one := lap_one;
      rngl_add := lap_add;
      rngl_mul := lap_mul;
-(**)
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
      rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
-(*
-     rngl_opt_opp_or_subt := None (*lap_opt_opp_or_subt*);
-     rngl_opt_inv_or_quot := None (*lap_opt_inv_or_quot*);
-     rngl_opt_eqb := None (*Some (lap_eqb rngl_zero rngl_eqb)*);
-*)
      rngl_opt_le := None |}.
 
 Declare Scope lap_scope.
