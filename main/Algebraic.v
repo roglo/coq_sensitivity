@@ -134,6 +134,8 @@ assert
 }
 apply H; clear H.
 Print polyn_one.
+Check @mk_polyn.
+Check mk_polyn.
 Search (_ → polyn _).
 ...
 remember (map (λ l, map (λ a, mkp a) l) ll) as sm.
