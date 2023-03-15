@@ -133,6 +133,10 @@ assert
   now apply eq_polyn_eq in H.
 }
 apply H; clear H.
+Print polyn_one.
+Search (_ → polyn _).
+...
+remember (map (λ l, map (λ a, mkp a) l) ll) as sm.
 ...
 
 End a.
