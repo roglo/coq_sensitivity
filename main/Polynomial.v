@@ -4360,16 +4360,15 @@ unfold polyn_one.
 rewrite IHn; cbn.
 rewrite fold_lap_norm.
 remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
-(**)
-rewrite if_bool_if_dec.
-...
-destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  rewrite (H1 1%L).
+  rewrite (H1 1%L), (rngl_eqb_refl Heb); cbn.
   destruct la as [| a]; [ now cbn; rewrite (rngl_eqb_refl Heb) | ].
   cbn; rewrite rev_involutive.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
+specialize (proj1 rngl_1_neq_0_iff Hc1) as H1.
+apply (rngl_eqb_neq Heb) in H1; rewrite H1; cbn.
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app.
 cbn.
@@ -4597,7 +4596,7 @@ Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
 Arguments polyn_zero {T ro}.
-Arguments polyn_one {T ro rp Heb}.
+Arguments polyn_one {T ro}.
 Arguments polyn_add {T ro} p1 p2.
 Arguments polyn_mul {T ro} p1 p2.
 Arguments polyn_quot {T ro rp Heb Hos} pa pb.
