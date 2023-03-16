@@ -654,7 +654,6 @@ Theorem List_rank_loop_if : ∀ A d f (l : list A) i j,
      j = i + length l).
 Proof.
 intros * Hi.
-(**)
 split. {
   intros p Hp.
   remember (p - i) as k eqn:Hk.

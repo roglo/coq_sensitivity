@@ -2071,7 +2071,6 @@ assert (Hll : length l1 = length l2). {
   now do 2 rewrite isort_rank_length in Hill.
 }
 apply (f_equal (comp_list l1)) in Hill.
-(**)
 rewrite comp_isort_rank_r in Hill.
 rewrite permut_isort_leb in Hill; [ | easy ].
 apply (f_equal (λ l, comp_list l l2)) in Hill.

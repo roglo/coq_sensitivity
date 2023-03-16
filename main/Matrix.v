@@ -1684,13 +1684,11 @@ f_equal.
 rewrite map_map.
 rewrite List_map_map_seq with (d := []).
 rewrite fold_mat_nrows.
-(**)
 symmetry.
 remember (seq 1 (mat_nrows A)) as x eqn:Hx.
 rewrite <- seq_shift in Hx; subst x.
 rewrite map_map.
 symmetry.
-(**)
 apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
@@ -1760,7 +1758,6 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 rewrite Hcbv.
 rewrite map2_map_l.
-(**)
 rewrite <- seq_shift.
 rewrite map2_map_l.
 rewrite map2_diag.

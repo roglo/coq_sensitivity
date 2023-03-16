@@ -1750,7 +1750,6 @@ rewrite <- (isort_rank_length Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_isort_rank _ _)) in Hij.
 Qed.
 
-(**)
 Theorem isort_rank_leb_seq : ∀ n, isort_rank Nat.leb (seq 0 n) = seq 0 n.
 Proof.
 intros.
