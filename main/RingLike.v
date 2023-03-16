@@ -1796,6 +1796,7 @@ Qed.
 Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%L.
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
+Arguments rngl_characteristic_1 {T ro rp} Hos _ x%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
 Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
 Arguments rngl_integral {T}%type {ro rp}.
