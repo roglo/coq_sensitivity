@@ -135,6 +135,7 @@ assert
 apply H; clear H.
 remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm.
 specialize (Hcr sm).
+(* U is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
 ...
 
 End a.
