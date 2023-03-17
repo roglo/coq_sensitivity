@@ -136,6 +136,12 @@ apply H; clear H.
 remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm.
 specialize (Hcr sm).
 (* U is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
+Check lap_power.
+About lap_power.
+Arguments lap_power {T ro} la%lap n%nat.
+remember (mk_vect (map (lap_power [0;1]%L) (rev (seq 0 (n + m))))) as u eqn:Hu.
+...
+specialize (Hcr u).
 ...
 
 End a.
