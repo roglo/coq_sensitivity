@@ -133,12 +133,8 @@ assert
   now apply eq_polyn_eq in H.
 }
 apply H; clear H.
-Print polyn_one.
-Check @mk_polyn.
-Check mk_polyn.
-Search (_ → polyn _).
-...
-remember (map (λ l, map (λ a, mkp a) l) ll) as sm.
+remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm.
+specialize (Hcr sm).
 ...
 
 End a.

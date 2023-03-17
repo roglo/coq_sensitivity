@@ -4592,4 +4592,5 @@ Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 
 Arguments mk_polyn {T ro} lap%lap.
+Arguments polyn_of_const {T ro} c%L.
 Arguments polyn_of_norm_lap {T ro} la%lap.
