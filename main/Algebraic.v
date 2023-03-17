@@ -133,15 +133,16 @@ assert
   now apply eq_polyn_eq in H.
 }
 apply H; clear H.
-remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm.
+remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm eqn:Hsm.
 specialize (Hcr sm).
-(* U is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
-Check lap_power.
-About lap_power.
-Arguments lap_power {T ro} la%lap n%nat.
-remember (mk_vect (map (lap_power [0;1]%L) (rev (seq 0 (n + m))))) as u eqn:Hu.
-...
+(* u is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
+remember
+  (mk_vect
+     (map (λ i, polyn_of_norm_lap (repeat 1%L i ++ [@rngl_one _ ro]))
+        (rev (seq 0 (n + m)))))
+  as u eqn:Hu.
 specialize (Hcr u).
+(* v is the vector [X^(m-1)P X^(m-2)P ... XP P X^(n-1)Q X^(n-2)Q ... XQ Q] *)
 ...
 
 End a.
