@@ -2359,9 +2359,11 @@ destruct j; [ now rewrite Nat.sub_0_r | ].
 now replace (i - j) with (S (i - S j)) by flia Hj.
 Qed.
 
+Definition lap_x_power n := repeat 0%L n ++ [1%L].
+
 Theorem lap_repeat_0_app_is_mul_power_l : ∀ n la,
   la ≠ []
-  → repeat 0%L n ++ la = ((repeat 0%L n ++ [1%L]) * la)%lap.
+  → repeat 0%L n ++ la = (lap_x_power n * la)%lap.
 Proof.
 intros * Haz.
 revert la Haz.
@@ -2393,7 +2395,7 @@ Qed.
 
 Theorem lap_repeat_0_app_is_mul_power_r : ∀ n la,
   la ≠ []
-  → repeat 0%L n ++ la = (la * (repeat 0%L n ++ [1%L]))%lap.
+  → repeat 0%L n ++ la = (la * lap_x_power n)%lap.
 Proof.
 intros * Haz.
 revert la Haz.
@@ -3657,6 +3659,7 @@ Arguments lap_mul_div {T ro rp} Heb Hos Hic Hop Hiv (la lb)%lap.
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
+Arguments lap_x_power {T ro} n%nat.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -3769,6 +3772,8 @@ Definition polyn_rem (pa pb : polyn T) : polyn T :=
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
+
+Definition polyn_x_power n := polyn_of_norm_lap (lap_x_power n).
 
 (* polyn opposite or subtraction *)
 
@@ -4581,6 +4586,7 @@ Arguments polyn_mul {T ro} p1 p2.
 Arguments polyn_quot {T ro rp Heb Hos} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
 Arguments polyn_ring_like_op {T ro rp} Heb Hos.
+Arguments polyn_x_power {T ro} n%nat.
 
 Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
