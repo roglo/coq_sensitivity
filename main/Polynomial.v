@@ -54,17 +54,6 @@ Compute (lap_eqb 0%Q Q.eqb [1;0;0;0] [1;0;3]).
 
 Definition lap_one := [1%L].
 
-Theorem polyn_one_prop :
-  rngl_characteristic ≠ 1 →
-  has_polyn_prop lap_one = true.
-Proof.
-intros Hc1.
-unfold lap_one.
-unfold has_polyn_prop; cbn.
-apply (rngl_neqb_neq Heb).
-now apply rngl_1_neq_0_iff.
-Qed.
-
 (* normalization *)
 
 Fixpoint strip_0s la :=
@@ -3649,7 +3638,6 @@ Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments polyn_norm_prop {T ro} la%lap.
-Arguments polyn_one_prop {T ro rp} Heb Hc1.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
 Arguments strip_0s {T ro} la%lap.
 
@@ -3745,8 +3733,6 @@ split; intros Hpq. {
 }
 Qed.
 
-Definition polyn_zero := mk_polyn [] eq_refl.
-
 Definition polyn_of_norm_lap la :=
   mk_polyn (lap_norm la) (polyn_norm_prop la).
 
@@ -3755,15 +3741,8 @@ Definition polyn_of_const c :=
 
 Arguments polyn_of_const c%L.
 
+Definition polyn_zero := mk_polyn [] eq_refl.
 Definition polyn_one := polyn_of_const 1.
-
-(*
-Definition polyn_one :=
-  match Nat.eq_dec rngl_characteristic 1 with
-  | left _ => polyn_zero
-  | right Hc1 => mk_polyn lap_one (polyn_one_prop Heb Hc1)
-  end.
-*)
 
 Definition polyn_norm la := mk_polyn (lap_norm la) (polyn_norm_prop la).
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
