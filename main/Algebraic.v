@@ -136,6 +136,14 @@ apply H; clear H.
 remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm eqn:Hsm.
 specialize (Hcr sm).
 (* u is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
+...
+(* ouais, zut *)
+Definition polyn_power p n :=
+  polyn_of_norm_lap (repeat 0%L n ++ p).
+remember
+  (mk_vect
+     (map (polyn_power polyn_one) (rev (seq 0 (n + m)))))
+  as u eqn:Hu.
 remember
   (mk_vect
      (map (λ i, polyn_of_norm_lap (repeat 1%L i ++ [@rngl_one _ ro]))
