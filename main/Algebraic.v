@@ -156,9 +156,19 @@ assert (H : is_square_matrix sm = true). {
     destruct (Nat.eq_dec (length ll) 0) as [Hllz| Hllz]; [ right | left ]. {
       now rewrite Hllz.
     }
-    destruct ll as [| la]; [ easy | ].
+    destruct ll as [| la]; [ easy | clear Hllz ].
     cbn.
     rewrite map_length.
+    apply Bool.negb_true_iff.
+    apply Nat.eqb_neq.
+    move Hll at bottom.
+    destruct P as [| a]. {
+      cbn in Hn; subst n.
+      unfold rlap_sylvester_list_list in Hll.
+      destruct Q as [| b]; [ easy | ].
+      cbn in Hll.
+      rewrite app_length in Hll; cbn in Hll.
+      rewrite Nat.add_sub, app_nil_r in Hll.
 Print rlap_sylvester_mat.
 Print rlap_sylvester_list_list.
 ...
