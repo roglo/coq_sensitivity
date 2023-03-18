@@ -135,10 +135,32 @@ assert
 apply H; clear H.
 remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm eqn:Hsm.
 specialize (Hcr sm).
+(* u is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
 remember (mk_vect (map (@polyn_x_power _ ro) (rev (seq 0 (n + m)))))
   as u eqn:Hu.
 specialize (Hcr u).
 (* v is the vector [X^(m-1)P X^(m-2)P ... XP P X^(n-1)Q X^(n-2)Q ... XQ Q] *)
+remember
+  (mk_vect
+     (map (λ i, polyn_of_norm_lap (lap_x_power i * P)%lap) (rev (seq 0 m)) ++
+     (map (λ i, polyn_of_norm_lap (lap_x_power i * Q)%lap) (rev (seq 0 n)))))
+  as v eqn:Hv.
+specialize (Hcr v).
+assert (H : is_square_matrix sm = true). {
+  rewrite Hsm.
+  apply Bool.andb_true_iff.
+  split. {
+    apply Bool.orb_true_iff.
+    unfold mat_nrows, mat_ncols; cbn.
+    rewrite map_length.
+    destruct (Nat.eq_dec (length ll) 0) as [Hllz| Hllz]; [ right | left ]. {
+      now rewrite Hllz.
+    }
+    destruct ll as [| la]; [ easy | ].
+    cbn.
+    rewrite map_length.
+Print rlap_sylvester_mat.
+Print rlap_sylvester_list_list.
 ...
 
 End a.
