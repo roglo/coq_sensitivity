@@ -206,6 +206,27 @@ assert (H : is_square_matrix sm = true). {
     rewrite Hll in Hla |-*.
     rewrite rlap_sylvester_list_list_length.
     do 2 rewrite rev_length.
+    apply in_app_or in Hla.
+    do 2 rewrite rev_length in Hla.
+    destruct Hla as [Hla| Hla]. {
+      apply in_map_iff in Hla.
+      destruct Hla as (i & Hi & His); subst la.
+      do 2 rewrite app_length.
+      rewrite rev_length.
+      do 2 rewrite repeat_length.
+      apply in_seq in His.
+      flia H2p His.
+    } {
+      apply in_map_iff in Hla.
+      destruct Hla as (i & Hi & His); subst la.
+      do 2 rewrite app_length.
+      rewrite rev_length.
+      do 2 rewrite repeat_length.
+      apply in_seq in His.
+      flia H2q His.
+    }
+  }
+}
 ...
 (*
 ...
