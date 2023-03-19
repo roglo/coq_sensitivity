@@ -160,6 +160,7 @@ remember
   as v eqn:Hv.
 specialize (Hcr v).
 assert (H : is_square_matrix sm = true). {
+  clear - H2p H2q Hll Hsm.
   rewrite Hsm.
   apply Bool.andb_true_iff.
   split. {
@@ -227,6 +228,7 @@ assert (H : is_square_matrix sm = true). {
     }
   }
 }
+specialize (Hcr H); clear H.
 ...
 (*
 ...
