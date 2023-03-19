@@ -245,6 +245,7 @@ assert (H : det sm ≠ 0%pol). {
   unfold rlap_sylvester_list_list.
   rewrite map_app.
   do 2 rewrite map_map.
+  do 2 rewrite rev_length.
 ...
 (*
 ...
