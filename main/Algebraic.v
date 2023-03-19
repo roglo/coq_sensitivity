@@ -161,6 +161,7 @@ assert (H : is_square_matrix sm = true). {
     rewrite map_length.
     apply Bool.negb_true_iff.
     apply Nat.eqb_neq.
+    intros H; apply length_zero_iff_nil in H; subst la.
     move Hll at bottom.
     destruct P as [| a]. {
       cbn in Hn; subst n.
@@ -169,6 +170,27 @@ assert (H : is_square_matrix sm = true). {
       cbn in Hll.
       rewrite app_length in Hll; cbn in Hll.
       rewrite Nat.add_sub, app_nil_r in Hll.
+      rewrite rev_length in Hll.
+      destruct Q as [| b2]; [ easy | ].
+      cbn in Hll.
+      do 2 rewrite Nat.sub_0_r in Hll.
+      injection Hll; clear Hll; intros H1 H2.
+      symmetry in H2.
+      assert (H : length Q = 0) by now destruct Q.
+      apply length_zero_iff_nil in H; subst Q.
+      clear H2.
+      cbn in H1.
+      subst ll.
+      cbn in Hsm, Hv.
+      move Hm at bottom.
+      cbn in Hm; subst m.
+      cbn in Hu, Hv.
+      unfold iter_seq, iter_list in HU, HV.
+      cbn in HU, HV.
+      rewrite rngl_summation_only_one in HU.
+      rewrite rngl_mul_1_l in HU.
+      subst U V.
+...
 Print rlap_sylvester_mat.
 Print rlap_sylvester_list_list.
 ...
