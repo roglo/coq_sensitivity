@@ -241,7 +241,10 @@ assert (H : vect_size u = mat_nrows sm). {
 }
 specialize (Hcr H); clear H.
 assert (H : det sm ≠ 0%pol). {
-  rewrite Hsm.
+  rewrite Hsm, Hll.
+  unfold rlap_sylvester_list_list.
+  rewrite map_app.
+  do 2 rewrite map_map.
 ...
 (*
 ...
