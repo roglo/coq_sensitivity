@@ -246,6 +246,11 @@ assert (H : det sm ≠ 0%pol). {
   rewrite map_app.
   do 2 rewrite map_map.
   do 2 rewrite rev_length.
+  destruct Q as [| b1]; [ easy | ].
+  cbn in H2q; apply Nat.succ_le_mono in H2q.
+  destruct Q as [| b2]; [ easy | clear H2q ].
+  cbn - [ det ].
+(* mouais, chais pas *)
 ...
 (*
 ...
