@@ -240,17 +240,8 @@ assert (H : vect_size u = mat_nrows sm). {
   now do 2 rewrite rev_length.
 }
 specialize (Hcr H); clear H.
-assert (H : det sm ≠ 0%pol). {
-  rewrite Hsm, Hll.
-  unfold rlap_sylvester_list_list.
-  rewrite map_app.
-  do 2 rewrite map_map.
-  do 2 rewrite rev_length.
-  destruct Q as [| b1]; [ easy | ].
-  cbn in H2q; apply Nat.succ_le_mono in H2q.
-  destruct Q as [| b2]; [ easy | clear H2q ].
-  cbn - [ det ].
-(* mouais, chais pas *)
+assert (H : (sm • u)%V = v). {
+  rewrite Hsm, Hu, Hv.
 ...
 (*
 ...

@@ -1960,12 +1960,11 @@ Theorem cramer's_rule_by_mul :
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M
- → det M ≠ 0%L
   → (M • U)%V = V
   → ∀ i, 1 ≤ i ≤ mat_nrows M →
   (det M * vect_el U i)%L = det (mat_repl_vect i M V).
 Proof.
-intros Hop Hic Hch Hii * Hsm Hum Hmz Hmuv k Hk.
+intros Hop Hic Hch Hii * Hsm Hum Hmuv k Hk.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 assert (Huv : vect_size V = vect_size U). {
   rewrite <- Hmuv; cbn.
@@ -2025,7 +2024,7 @@ assert (Hii : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
   rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }
-rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmz Hmuv Hk).
+rewrite <- (cramer's_rule_by_mul Hop Hic Hch Hii Hsm Hum Hmuv Hk).
 rewrite (rngl_mul_comm Hic).
 symmetry.
 apply (rngl_mul_div Hiq _ _ Hmz).
