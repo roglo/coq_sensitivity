@@ -6,7 +6,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
-Require Import Misc RingLike IterAdd IterMul.
+Require Import Misc RingLike IterAdd IterMul IterAnd.
 Require Import Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 Import matrix_Notations.
@@ -81,10 +81,12 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
 
 Theorem lap_bezout_is_resultant : in_charac_0_field →
   ∀ (P Q U V : list T),
-  lap_bezout_resultant_coeff P Q = (U, V)
+  2 ≤ length P
+  → 2 ≤ length Q
+  → lap_bezout_resultant_coeff P Q = (U, V)
   → lap_norm (U * P + V * Q)%lap = lap_norm [lap_resultant P Q].
 Proof.
-intros Hif * Hbr.
+intros Hif * H2p H2q Hbr.
 unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
@@ -156,56 +158,144 @@ assert (H : is_square_matrix sm = true). {
     destruct (Nat.eq_dec (length ll) 0) as [Hllz| Hllz]; [ right | left ]. {
       now rewrite Hllz.
     }
-    destruct ll as [| la]; [ easy | clear Hllz ].
-    cbn.
+    destruct ll as [| la]; [ easy | clear Hllz; cbn ].
     rewrite map_length.
     apply Bool.negb_true_iff.
     apply Nat.eqb_neq.
     intros H; apply length_zero_iff_nil in H; subst la.
     move Hll at bottom.
-    destruct P as [| a]. {
-      cbn in Hn; subst n.
-      unfold rlap_sylvester_list_list in Hll.
-      destruct Q as [| b]; [ easy | ].
-      cbn in Hll.
-      rewrite app_length in Hll; cbn in Hll.
-      rewrite Nat.add_sub, app_nil_r in Hll.
-      rewrite rev_length in Hll.
-      destruct Q as [| b2]; [ easy | ].
-      cbn in Hll.
-      do 2 rewrite Nat.sub_0_r in Hll.
-      injection Hll; clear Hll; intros H1 H2.
-      symmetry in H2.
-      assert (H : length Q = 0) by now destruct Q.
-      apply length_zero_iff_nil in H; subst Q.
-      clear H2.
-      cbn in H1.
-      subst ll.
-      cbn in Hsm, Hv.
-      move Hm at bottom.
-      cbn in Hm; subst m.
-      cbn in Hu, Hv.
-      unfold iter_seq, iter_list in HU, HV.
-      cbn in HU, HV.
-      rewrite rngl_summation_only_one in HU.
-      rewrite rngl_mul_1_l in HU.
-      subst U V.
+    destruct P as [| a1]; [ easy | ].
+    cbn in H2p; apply Nat.succ_le_mono in H2p.
+    destruct P as [| a2]; [ easy | clear H2p ].
+    destruct Q as [| b1]; [ easy | ].
+    cbn in H2q; apply Nat.succ_le_mono in H2q.
+    destruct Q as [| b2]; [ easy | clear H2q ].
+    cbn in Hll.
+    do 4 rewrite app_length in Hll.
+    do 2 rewrite rev_length in Hll.
+    cbn in Hll.
+    do 4 rewrite Nat.add_sub in Hll.
+    do 2 rewrite Nat.add_1_r in Hll.
+    cbn in Hll.
+    injection Hll; clear Hll; intros H1 H2.
+    now destruct (rev P).
+  } {
+    cbn; rewrite map_length.
+...
+(*
 ...
 Print rlap_sylvester_mat.
 Print rlap_sylvester_list_list.
 ...
+*)
+...
 
 End a.
 
-(*
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
     {rol : ring_like_op _} (l : list A) :=
   lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
-
 Definition lap_compose_y_div_x A {ro : ring_like_op A} (l : list A) :=
   map (λ i, repeat 0%L (length l - 1 - i) ++ [nth (length l - 1 - i) l 0%L])
     (seq 0 (length l)).
+Compute (
+  let qro := Q_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let (U, V) := lap_bezout_resultant_coeff (rev rla) (rev rlb) in
+  ((U * rev rla + V * rev rlb)%lap, lap_resultant rla rlb)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui !!! *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_div_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_div_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-4] in
+  let rlb := [1;0;0;0;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-4] in
+  let rlb := [1;0;0;0;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_div_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-2] in
+  let rlb := [1;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;0;-2] in
+  let rlb := [1;0;0;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := lap_bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Definition Q_list_ring_like_op : ring_like_op (list (list Q)) :=
+  @lap_ring_like_op (list Q) (@lap_ring_like_op Q Q_ring_like_op).
+Compute (
+  let qro := Q_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  ([[1];[];[1]] * [[3;0;3];[0;-2]] +
+     [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
+...
 
+(*
 (* polynomial cancelling the sum of zeros of two polynomials p and q *)
 (* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
    a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
@@ -283,10 +373,6 @@ Compute (
      : list Z * list Z
 *)
 *)
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
 
 Definition Q_r_algeb_add :=
   let qro := Q_ring_like_op in
@@ -299,9 +385,6 @@ Definition Q_r_algeb_mul :=
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   r_algeb_mul qro lro.
-
-Definition Q_list_ring_like_op : ring_like_op (list (list Q)) :=
-  @lap_ring_like_op (list Q) (@lap_ring_like_op Q Q_ring_like_op).
 
 Compute (
   let qro := Q_ring_like_op in
@@ -549,95 +632,6 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   lap_resultant (rev rla) (rev rlb)).
-Compute (
-  let qro := Q_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;-2] in
-  let (U, V) := lap_bezout_resultant_coeff (rev rla) (rev rlb) in
-  ((U * rev rla + V * rev rlb)%lap, lap_resultant rla rlb)).
-(* oui *)
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui !!! *)
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui *)
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;-4] in
-  let rlb := [1;0;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui *)
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;-4] in
-  let rlb := [1;0;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;-2] in
-  let rlb := [1;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui *)
-Compute (
-  let qro := Q_ring_like_op in
-  let lro := lap_ring_like_op in
-  let rla := [1;0;0;-2] in
-  let rlb := [1;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
-  let (U, V) := lap_bezout_resultant_coeff p q in
-  ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui *)
-Compute (
-  let qro := Q_ring_like_op in
-  let qlro := Q_list_ring_like_op in
-  ([[1];[];[1]] * [[3;0;3];[0;-2]] +
-     [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
 (*
   x²+1            -2yx+3y²+3
      x²-2yx+y²-2             2y+y²-3
