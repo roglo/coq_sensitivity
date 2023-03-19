@@ -229,6 +229,19 @@ assert (H : is_square_matrix sm = true). {
   }
 }
 specialize (Hcr H); clear H.
+assert (H : vect_size u = mat_nrows sm). {
+  rewrite Hu, Hsm; cbn.
+  do 2 rewrite map_length.
+  rewrite rev_length, seq_length.
+  symmetry.
+  rewrite Hll.
+  rewrite rlap_sylvester_list_list_length.
+  rewrite Hn, Hm.
+  now do 2 rewrite rev_length.
+}
+specialize (Hcr H); clear H.
+assert (H : det sm ≠ 0%pol). {
+  rewrite Hsm.
 ...
 (*
 ...
