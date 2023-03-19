@@ -63,6 +63,17 @@ Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
   rev (det (rlap_sylvester_mat' (rev p) (rev q))).
 *)
 
+Theorem rlap_sylvester_list_list_length :
+  ∀ rla rlb,
+  length (rlap_sylvester_list_list rla rlb) =
+    (length rla - 1) + (length rlb - 1).
+intros.
+unfold rlap_sylvester_list_list.
+rewrite app_length.
+do 2 rewrite List_map_seq_length.
+apply Nat.add_comm.
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -180,7 +191,21 @@ assert (H : is_square_matrix sm = true). {
     injection Hll; clear Hll; intros H1 H2.
     now destruct (rev P).
   } {
+    move Hll at bottom.
     cbn; rewrite map_length.
+    unfold iter_list.
+    rewrite List_fold_left_map.
+    specialize iter_list_eq_compat as H1.
+    unfold iter_list in H1.
+    erewrite H1; [ | now intros; rewrite map_length ].
+    clear H1.
+    rewrite fold_iter_list.
+    apply all_true_and_list_true_iff.
+    intros la Hla.
+    apply Nat.eqb_eq.
+    rewrite Hll in Hla |-*.
+    rewrite rlap_sylvester_list_list_length.
+    do 2 rewrite rev_length.
 ...
 (*
 ...
