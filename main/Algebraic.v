@@ -242,6 +242,20 @@ assert (H : vect_size u = mat_nrows sm). {
 specialize (Hcr H); clear H.
 assert (H : (sm • u)%V = v). {
   rewrite Hsm, Hu, Hv.
+  unfold mat_mul_vect_r; f_equal; cbn.
+  rewrite map_map.
+  unfold vect_dot_mul.
+  cbn - [ rngl_add rngl_zero ].
+  rewrite Hll.
+  unfold rlap_sylvester_list_list.
+  rewrite map_app.
+  do 2 rewrite map_map.
+  do 2 rewrite rev_length.
+  rewrite <- Hn, <- Hm.
+  f_equal. {
+    do 2 rewrite map_rev.
+    remember (λ i, _) as f in |-*; subst f.
+(* bon, chais pas *)
 ...
 (*
 ...
