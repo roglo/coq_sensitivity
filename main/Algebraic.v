@@ -253,9 +253,17 @@ assert (H : (sm • u)%V = v). {
   do 2 rewrite rev_length.
   rewrite <- Hn, <- Hm.
   f_equal. {
-    do 2 rewrite map_rev.
     remember (λ i, _) as f in |-*; subst f.
-(* bon, chais pas *)
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+      erewrite List_map_map_seq with (d := 0%L).
+      do 2 rewrite app_length.
+      do 2 rewrite repeat_length.
+      rewrite rev_length.
+      replace (i + (length P + (m - 1 - i))) with (n + m) by flia Hi H2p Hn.
+      rewrite map2_map_l.
+      rewrite map2_map_r.
 ...
 (*
 ...
