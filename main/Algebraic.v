@@ -276,6 +276,14 @@ rewrite map2_swap; symmetry.
 rewrite map2_swap; symmetry.
 revert la sta.
 induction len; intros; [ easy | ].
+(**)
+replace (sta + S len - 1) with (sta + len) by flia.
+cbn - [ map2 ].
+rewrite map2_app_l.
+rewrite rev_length, seq_length.
+rewrite IHlen.
+replace (S sta + len - 1) with (sta + len) by flia.
+...
 rewrite seq_S.
 rewrite map2_app_l.
 rewrite rev_app_distr.
