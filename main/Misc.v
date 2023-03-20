@@ -611,6 +611,30 @@ f_equal.
 apply IHl1.
 Qed.
 
+Theorem map2_app_r :
+  ∀ (A B C : Type) (l1 l2 : list B) (l : list A) (f : A → B → C),
+    map2 f l (l1 ++ l2) =
+    map2 f (firstn (length l1) l) l1 ++ map2 f (skipn (length l1) l) l2.
+Proof.
+intros.
+revert l2 l.
+induction l1 as [| a1]; intros; [ easy | cbn ].
+destruct l as [| a]; [ now rewrite map2_nil_l | cbn ].
+f_equal.
+apply IHl1.
+Qed.
+
+Theorem map2_swap : ∀ A B C (f : A → B → C) la lb,
+  map2 f la lb = map2 (λ a b, f b a) lb la.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; cbn; [ symmetry; apply map2_nil_r | ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
+
 Theorem repeat_app_map2 : ∀ A (la lb : list A) n,
   repeat (la ++ lb) n = map2 (λ x y, app x y) (repeat la n) (repeat lb n).
 Proof.

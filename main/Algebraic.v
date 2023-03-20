@@ -264,6 +264,43 @@ assert (H : (sm • u)%V = v). {
       replace (i + (length P + (m - 1 - i))) with (n + m) by flia Hi H2p Hn.
       rewrite map2_map_l.
       rewrite map2_map_r.
+Search (map2 _ (rev _)).
+Search (map2 _ _ (rev _)).
+Print map2.
+Theorem map2_rev_seq_r : ∀ A B (f : A → _ → B) la sta len,
+  map2 f la (rev (seq sta len)) =
+  map2 (λ a i, f a (sta + len - 1 - i)) la (seq sta len).
+Proof.
+intros.
+rewrite map2_swap; symmetry.
+rewrite map2_swap; symmetry.
+revert la sta.
+induction len; intros; [ easy | ].
+rewrite seq_S.
+rewrite map2_app_l.
+rewrite rev_app_distr.
+rewrite map2_app_l.
+rewrite IHlen.
+rewrite rev_length, seq_length.
+cbn - [ map2 firstn skipn ].
+...
+rewrite IHlen.
+...
+*)
+intros.
+rewrite map2_swap; symmetry.
+rewrite map2_swap; symmetry.
+revert sta len.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite map2_nil_r | ].
+revert sta.
+induction len; intros; [ easy | cbn ].
+Print map2.
+Search (map2 _ _ _ = map2 _ _ _).
+... ...
+      rewrite map2_rev_seq_r.
+      rewrite map2_diag.
+      cbn - [ rngl_add rngl_zero ].
+      easy.
 ...
 (*
 ...
@@ -275,9 +312,11 @@ Print rlap_sylvester_list_list.
 
 End a.
 
+(*
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
+*)
 Open Scope Q_scope.
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
     {rol : ring_like_op _} (l : list A) :=
