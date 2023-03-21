@@ -665,8 +665,7 @@ rewrite IHlen.
 rewrite <- seq_shift.
 rewrite map2_map_l.
 apply map2_ext_in.
-intros a2 b Ha Hb; f_equal.
-flia.
+intros; f_equal; flia.
 Qed.
 
 (* end map2 *)
@@ -1623,6 +1622,27 @@ Proof.
 intros * Hl.
 destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
+Qed.
+
+Theorem List_map_rev_seq : ∀ A (f : _ → A) sta len,
+  map f (rev (seq sta len)) = map (λ i, f (2 * sta + len - 1 - i)) (seq sta len).
+Proof.
+intros.
+revert sta.
+induction len; intros; [ easy | ].
+rewrite seq_S at 1.
+rewrite rev_app_distr.
+cbn.
+rewrite Nat.add_0_r.
+rewrite Nat.add_succ_r.
+rewrite Nat_sub_succ_1.
+rewrite Nat.add_shuffle0, Nat.add_sub.
+f_equal.
+rewrite IHlen.
+rewrite <- seq_shift.
+rewrite map_map.
+apply map_ext_in.
+intros; f_equal; flia.
 Qed.
 
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,

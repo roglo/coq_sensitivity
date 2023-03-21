@@ -281,6 +281,11 @@ assert (H : (sm • u)%V = v). {
       remember (∑ (j = _, _), _) as x in |-*; subst x.
       easy.
     }
+    rewrite List_map_rev_seq.
+    apply map_ext_in.
+    intros i Hi.
+    rewrite Nat.mul_0_r, Nat.add_0_l.
+    unfold polyn_of_norm_lap.
 ...
 (*
 ...
