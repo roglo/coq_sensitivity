@@ -643,6 +643,32 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
+Theorem map2_rev_seq_r : ∀ A B (f : A → _ → B) la sta len,
+  map2 f la (rev (seq sta len)) =
+  map2 (λ a i, f a (2 * sta + len - 1 - i)) la (seq sta len).
+Proof.
+intros.
+rewrite map2_swap; symmetry.
+rewrite map2_swap; symmetry.
+revert la sta.
+induction len; intros; [ easy | ].
+replace (2 * sta + S len - 1) with (2 * sta + len) by flia.
+rewrite seq_S at 1.
+cbn - [ map2 ].
+rewrite Nat.add_0_r.
+rewrite rev_app_distr.
+cbn - [ map2 ].
+cbn.
+destruct la as [| a]; [ easy | ].
+rewrite Nat.add_shuffle0, Nat.add_sub; f_equal.
+rewrite IHlen.
+rewrite <- seq_shift.
+rewrite map2_map_l.
+apply map2_ext_in.
+intros a2 b Ha Hb; f_equal.
+flia.
+Qed.
+
 (* end map2 *)
 
 (* rank: rank of the first element satisfying a predicate *)
