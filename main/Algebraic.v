@@ -120,7 +120,7 @@ set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
-destruct H as (Hic, Hop, Hin, Hit, Hde, Hch).
+destruct H as (Hic, Hop, Hin, Hit, Heb, Hch).
 assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   unfold rngl_has_opp; cbn.
   unfold polyn_opt_opp_or_subt.
@@ -284,8 +284,50 @@ assert (H : (sm • u)%V = v). {
     rewrite List_map_rev_seq.
     apply map_ext_in.
     intros i Hi.
+    apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     rewrite Nat.mul_0_r, Nat.add_0_l.
     unfold polyn_of_norm_lap.
+    rewrite rngl_summation_split with (j := i); [ | flia Hi ].
+    rewrite all_0_rngl_summation_0. 2: {
+      intros j Hj.
+      rewrite app_nth1; [ | rewrite repeat_length; flia Hj ].
+      rewrite nth_repeat; cbn.
+      unfold polyn_of_const; cbn.
+      unfold polyn_of_norm_lap; cbn.
+      apply eq_polyn_eq; cbn.
+      now rewrite (rngl_eqb_refl Heb).
+    }
+    rewrite rngl_add_0_l.
+    rewrite rngl_summation_shift with (s := i); [ | flia Hi ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth2; [ | rewrite repeat_length; flia Hj ].
+      rewrite repeat_length.
+      rewrite Nat_sub_sub_swap, Nat.add_comm, Nat.add_sub.
+      easy.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+    rewrite rngl_summation_split with (j := length P). 2: {
+      rewrite Hn; flia Hi.
+    }
+    rewrite all_0_rngl_summation_0 with (b := length P + 1). 2: {
+      intros j Hj.
+      rewrite app_nth2; [ | rewrite rev_length; flia Hj ].
+      rewrite nth_repeat; cbn.
+      unfold polyn_of_const; cbn.
+      unfold polyn_of_norm_lap; cbn.
+      apply eq_polyn_eq; cbn.
+      now rewrite (rngl_eqb_refl Heb).
+    }
+    rewrite rngl_add_0_r.
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite app_nth1; [ | rewrite rev_length; flia Hj ].
+      easy.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
 ...
 (*
 ...
