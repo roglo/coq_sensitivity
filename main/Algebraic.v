@@ -328,6 +328,36 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
+    rewrite Hn, Hm.
+    remember (length P) as n' eqn:Hn'.
+    remember (length Q) as m' eqn:Hm'.
+    move m' before n'; move n before m'; move m before n.
+    subst n m.
+    rename n' into n; rename m' into m.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      replace (n - 1 + (m - 1) - (j + i)) with
+        (m - 2 - i + (n - j)) by flia Hi Hj.
+      easy.
+    }
+    replace (m - 1 - 1) with (m - 2) by flia.
+    remember (m - 2 - i) as a eqn:Ha.
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+    rewrite rngl_summation_rtl.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite Nat_sub_sub_swap, Nat.add_sub.
+      replace (n - (n + 1 - j)) with (j - 1) by flia Hj.
+      rewrite rev_nth; [ | rewrite <- Hn'; flia Hj ].
+      rewrite <- Hn'.
+      replace (n - S (n - j)) with (j - 1) by flia Hj.
+Check @polyn_opt_mul_comm.
+...
+      rewrite (polyn_mul_comm Hic).
+      easy.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+Search polyn_x_power.
 ...
 (*
 ...
