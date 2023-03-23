@@ -351,9 +351,53 @@ assert (H : (sm • u)%V = v). {
       rewrite rev_nth; [ | rewrite <- Hn'; flia Hj ].
       rewrite <- Hn'.
       replace (n - S (n - j)) with (j - 1) by flia Hj.
-Check @polyn_opt_mul_comm.
-...
       rewrite (polyn_mul_comm Hic).
+Print polyn_x_power.
+Theorem polyn_x_power_add : ∀ a b,
+  polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
+Proof.
+intros.
+unfold polyn_x_power.
+Search lap_x_power.
+Theorem lap_x_power_add :
+  rngl_has_opp_or_subt = true →
+  ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
+Proof.
+intros Hos *.
+unfold lap_x_power.
+rewrite repeat_app.
+revert b.
+induction a; intros; cbn - [ lap_mul ]. {
+  rewrite (lap_mul_const_l Hos).
+  erewrite map_ext_in; [ | intros; apply rngl_mul_1_l ].
+  now rewrite map_id.
+}
+rewrite IHa.
+clear IHa.
+revert a.
+induction b; intros; cbn - [ lap_mul ]. {
+  rewrite (lap_mul_const_r Hos).
+  erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_r ].
+  rewrite map_id.
+  rewrite (lap_mul_const_r Hos).
+  erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_r ].
+  now rewrite map_id.
+}
+Search ((_ :: _) * _)%lap.
+(* ouais bin chais pas *)
+...
+Search ((_ ++ _) * _)%lap.
+Search (_ * (_ ++ _))%lap.
+...
+Search lap_mul.
+lap_mul_add_distr_l:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_has_eqb = true
+      → rngl_has_opp_or_subt = true → ∀ la lb lc : list T, (la * (lb + lc))%lap = (la * lb + la * lc)%lap
+... ...
+rewrite polyn_x_power_add.
+...
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.

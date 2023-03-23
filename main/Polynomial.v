@@ -3939,6 +3939,16 @@ apply eq_polyn_eq; cbn.
 now rewrite (lap_mul_comm Hic).
 Qed.
 
+Theorem polyn_mul_comm :
+  rngl_mul_is_comm = true →
+  ∀ a b : polyn T, (a * b)%pol = (b * a)%pol.
+Proof.
+intros Hic *.
+specialize polyn_opt_mul_comm as H1.
+rewrite Hic in H1.
+apply H1.
+Qed.
+
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
 
@@ -4576,6 +4586,9 @@ intros.
 
 End a.
 
+Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
+Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
+
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
@@ -4598,5 +4611,6 @@ Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 
 Arguments mk_polyn {T ro} lap%lap.
+Arguments polyn_mul_comm {T ro rp} Hic a b.
 Arguments polyn_of_const {T ro} c%L.
 Arguments polyn_of_norm_lap {T ro} la%lap.
