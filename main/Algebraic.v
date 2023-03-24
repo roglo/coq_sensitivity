@@ -389,6 +389,7 @@ assert (Ha : la ≠ []). {
 }
 clear a Hla IHa.
 move Hb after Ha.
+...
 revert lb Hb.
 induction la as [| a]; intros; [ easy | ].
 clear Ha.
