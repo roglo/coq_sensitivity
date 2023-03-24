@@ -366,6 +366,23 @@ Proof.
 intros Hos *.
 unfold lap_x_power.
 rewrite repeat_app.
+rewrite <- app_assoc.
+remember (repeat 0%L b ++ [1%L]) as la eqn:Hla.
+clear Hla b.
+revert la.
+induction a; intros; cbn - [ lap_mul ]. {
+  rewrite (lap_mul_const_l Hos).
+  erewrite map_ext_in; [ | intros; apply rngl_mul_1_l ].
+  now rewrite map_id.
+}
+rewrite IHa.
+remember (repeat 0%L a ++ [1%L]) as lb eqn:Hlb.
+clear a Hlb IHa.
+revert la.
+induction lb as [| b]; intros; cbn - [ lap_mul ]. {
+  rewrite lap_mul_0_l.
+  rewrite (lap_mul_const_l Hos).
+  erewrite map_ext_in; [ | now intros; rewrite (rngl_mul_0_l Hos) ].
 ...
 revert b.
 induction a; intros; cbn - [ lap_mul ]. {
