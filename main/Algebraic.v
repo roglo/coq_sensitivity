@@ -389,13 +389,17 @@ assert (Ha : la ≠ []). {
 }
 clear a Hla IHa.
 move Hb after Ha.
-...
-revert lb.
+revert lb Hb.
 induction la as [| a]; intros; [ easy | ].
-cbn - [ lap_mul ].
-  rewrite lap_mul_0_l.
-  rewrite (lap_mul_const_l Hos).
-  erewrite map_ext_in; [ | now intros; rewrite (rngl_mul_0_l Hos) ].
+clear Ha.
+cbn.
+destruct lb as [| b]; [ easy | clear Hb ].
+cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos); f_equal.
+rewrite Nat.sub_0_r.
+...
+, Nat.add_succ_r.
 ...
 revert b.
 induction a; intros; cbn - [ lap_mul ]. {
