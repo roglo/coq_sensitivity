@@ -389,6 +389,24 @@ assert (Ha : la ≠ []). {
 }
 clear a Hla IHa.
 move Hb after Ha.
+Theorem glop : ∀ la, la ≠ [] → 0%L :: la = ([0; 1]%L * la)%lap.
+Proof.
+intros * Hla.
+cbn.
+destruct la as [| a]; [ easy | clear Hla ].
+rewrite rngl_summation_only_one.
+rewrite rngl_mul_0_l.
+f_equal.
+cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, rngl_mul_0_l.
+rewrite rngl_add_0_l, rngl_mul_1_l.
+f_equal.
+... ...
+rewrite glop.
+rewrite (glop la).
+apply lap_mul_assoc.
+Search lap.
 ...
 revert lb Hb.
 induction la as [| a]; intros; [ easy | ].
