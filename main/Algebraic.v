@@ -376,8 +376,10 @@ induction a; intros; cbn - [ lap_mul ]. {
   now rewrite map_id.
 }
 rewrite IHa.
-remember (repeat 0%L a ++ [1%L]) as lb eqn:Hlb.
-clear a Hlb IHa.
+rename la into lb.
+remember (repeat 0%L a ++ [1%L]) as la eqn:Hla.
+clear a Hla IHa.
+...
 revert la.
 induction lb as [| b]; intros; cbn - [ lap_mul ]. {
   rewrite lap_mul_0_l.
