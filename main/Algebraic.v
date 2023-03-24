@@ -366,6 +366,7 @@ Proof.
 intros Hos *.
 unfold lap_x_power.
 rewrite repeat_app.
+...
 revert b.
 induction a; intros; cbn - [ lap_mul ]. {
   rewrite (lap_mul_const_l Hos).
@@ -374,6 +375,7 @@ induction a; intros; cbn - [ lap_mul ]. {
 }
 rewrite IHa.
 clear IHa.
+...
 revert a.
 induction b; intros; cbn - [ lap_mul ]. {
   rewrite (lap_mul_const_r Hos).
@@ -383,8 +385,16 @@ induction b; intros; cbn - [ lap_mul ]. {
   erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_r ].
   now rewrite map_id.
 }
+...
+rewrite IHb.
 Search ((_ :: _) * _)%lap.
-(* ouais bin chais pas *)
+Theorem glop : ∀ la lb,
+  0%L :: (la * lb)%lap = ((0%L :: la) * lb)%lap.
+Proof.
+intros.
+cbn.
+destruct lb as [| b]. {
+
 ...
 Search ((_ ++ _) * _)%lap.
 Search (_ * (_ ++ _))%lap.
