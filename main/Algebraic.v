@@ -454,7 +454,10 @@ assert (H : (sm • u)%V = v). {
     }
     apply eq_polyn_eq.
     cbn - [ rngl_zero rngl_add ].
-    rewrite lap_mul_norm_idemp_l.
+    rewrite (lap_mul_norm_idemp_l Heb Hos).
+    f_equal; f_equal; symmetry.
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+    rewrite Hn'.
 ...
 symmetry.
 rewrite <- (lap_mul_x_l Hos).
