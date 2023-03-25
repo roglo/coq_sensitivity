@@ -310,6 +310,15 @@ Proof. easy. Qed.
 Theorem lap_mul_0_r : ∀ la, lap_mul la [] = [].
 Proof. now intros; destruct la. Qed.
 
+Theorem eq_lap_mul_0 : ∀ la lb, lap_mul la lb = [] → la = [] ∨ lb = [].
+Proof.
+intros * Hab.
+destruct la as [| a]; [ now left | right ].
+destruct lb as [| b]; [ easy | exfalso ].
+cbn in Hab.
+now rewrite Nat.add_succ_r in Hab.
+Qed.
+
 Theorem strip_0s_length_le : ∀ l, length (strip_0s l) ≤ length l.
 Proof.
 intros.
@@ -1854,6 +1863,60 @@ Theorem lap_opt_mul_1_r :
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 apply lap_mul_1_r.
+Qed.
+
+Theorem lap_convol_mul_x_l :
+  ∀ la lb i len,
+  i = S (length la)
+  → len = length lb
+  → lap_convol_mul [0%L; 1%L] (la ++ lb) i len = lb.
+Proof.
+intros * Hi Hlen.
+revert la lb i Hi Hlen.
+induction len; intros. {
+  now symmetry in Hlen; apply length_zero_iff_nil in Hlen.
+}
+cbn.
+destruct lb as [| b]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+f_equal. {
+  rewrite (rngl_summation_split3 1); [ | flia Hi ].
+  rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_l, rngl_mul_1_l.
+  rewrite Hi, Nat_sub_succ_1.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag.
+  rewrite List_nth_0_cons.
+  rewrite all_0_rngl_summation_0; [ apply rngl_add_0_r | ].
+  intros j Hj.
+  destruct j; [ flia Hj | ].
+  destruct j; [ flia Hj | ].
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite (List_cons_is_app b).
+rewrite app_assoc.
+apply IHlen; [ | easy ].
+rewrite app_length, Nat.add_1_r.
+now f_equal.
+Qed.
+
+Theorem lap_mul_x_l :
+  ∀ la, la ≠ [] → ([0; 1]%L * la)%lap = 0%L :: la.
+Proof.
+intros * Hla; cbn.
+destruct la as [| a]; [ easy | clear Hla ].
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos).
+f_equal; cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+rewrite rngl_add_0_l, rngl_mul_1_l.
+f_equal.
+rewrite (List_cons_is_app a).
+now apply lap_convol_mul_x_l.
 Qed.
 
 (* distributivity *)
@@ -4586,8 +4649,10 @@ intros.
 
 End a.
 
+Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
+Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.

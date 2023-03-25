@@ -74,6 +74,48 @@ do 2 rewrite List_map_seq_length.
 apply Nat.add_comm.
 Qed.
 
+Theorem lap_x_power_add :
+  rngl_has_opp_or_subt = true →
+  rngl_has_eqb = true →
+  ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
+Proof.
+intros Hos Heb *.
+unfold lap_x_power.
+rewrite repeat_app.
+rewrite <- app_assoc.
+remember (repeat 0%L b ++ [1%L]) as la eqn:Hla.
+assert (Ha : la ≠ []). {
+  intros H; subst la.
+  now apply app_eq_nil in H.
+}
+clear Hla b.
+revert la Ha.
+induction a; intros; cbn - [ lap_mul ]. {
+  rewrite (lap_mul_const_l Hos).
+  erewrite map_ext_in; [ | intros; apply rngl_mul_1_l ].
+  now rewrite map_id.
+}
+rewrite IHa; [ | easy ].
+rename la into lb.
+rename Ha into Hb.
+remember (repeat 0%L a ++ [1%L]) as la eqn:Hla.
+assert (Ha : la ≠ []). {
+  intros H; subst la.
+  now apply app_eq_nil in H.
+}
+clear a Hla IHa.
+move Hb after Ha.
+rewrite <- (lap_mul_x_l Hos). 2: {
+  intros Hab.
+  apply eq_lap_mul_0 in Hab.
+  now destruct Hab.
+}
+symmetry.
+rewrite <- (lap_mul_x_l Hos); [ | easy ].
+symmetry.
+apply (lap_mul_assoc Heb Hos).
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -353,58 +395,28 @@ assert (H : (sm • u)%V = v). {
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
 Print polyn_x_power.
-Theorem polyn_x_power_add : ∀ a b,
-  polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
-Proof.
-intros.
-unfold polyn_x_power.
-Search lap_x_power.
-Theorem lap_x_power_add :
+Theorem polyn_x_power_add :
   rngl_has_opp_or_subt = true →
-  ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
+  rngl_has_eqb = true →
+  ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
-intros Hos *.
-unfold lap_x_power.
-rewrite repeat_app.
-rewrite <- app_assoc.
-remember (repeat 0%L b ++ [1%L]) as la eqn:Hla.
-assert (Ha : la ≠ []). {
-  intros H; subst la.
-  now apply app_eq_nil in H.
-}
-clear Hla b.
-revert la Ha.
-induction a; intros; cbn - [ lap_mul ]. {
-  rewrite (lap_mul_const_l Hos).
-  erewrite map_ext_in; [ | intros; apply rngl_mul_1_l ].
-  now rewrite map_id.
-}
-rewrite IHa; [ | easy ].
-rename la into lb.
-rename Ha into Hb.
-remember (repeat 0%L a ++ [1%L]) as la eqn:Hla.
-assert (Ha : la ≠ []). {
-  intros H; subst la.
-  now apply app_eq_nil in H.
-}
-clear a Hla IHa.
-move Hb after Ha.
-Theorem glop : ∀ la, la ≠ [] → 0%L :: la = ([0; 1]%L * la)%lap.
-Proof.
-intros * Hla.
-cbn.
-destruct la as [| a]; [ easy | clear Hla ].
-rewrite rngl_summation_only_one.
-rewrite rngl_mul_0_l.
+intros Hos Heb *.
+apply eq_polyn_eq; cbn.
 f_equal.
-cbn.
-unfold iter_seq, iter_list; cbn.
-rewrite rngl_add_0_l, rngl_mul_0_l.
-rewrite rngl_add_0_l, rngl_mul_1_l.
-f_equal.
+Search (lap_norm (lap_x_power _)).
+(* à prouver *)
+...
+intros Hos Heb *.
+unfold polyn_x_power.
+rewrite (lap_x_power_add Hos Heb).
+unfold polyn_of_norm_lap.
+apply eq_polyn_eq; cbn.
+rewrite lap_norm_involutive.
 ... ...
-rewrite glop.
-rewrite (glop la).
+rewrite polyn_x_power_add.
+...
+symmetry.
+rewrite <- (lap_mul_x_l Hos).
 apply lap_mul_assoc.
 Search lap.
 ...
