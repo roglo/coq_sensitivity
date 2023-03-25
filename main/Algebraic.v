@@ -442,11 +442,19 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
-    rewrite <- rngl_mul_summation_distr_l; [ | ]. 2: {
-...
-  Hos : @eq bool (@rngl_has_opp_or_subt T ro) true
-  ============================
-  @eq bool (@rngl_has_opp_or_subt (@polyn T ro) rop) true
+    rewrite <- rngl_mul_summation_distr_l. 2: {
+      clear - Hop.
+      unfold rngl_has_opp_or_subt in Hos |-*; cbn.
+      unfold rngl_has_opp in Hop.
+      subst rop.
+      unfold polyn_opt_opp_or_subt.
+      remember rngl_opt_opp_or_subt as x eqn:Hx.
+      destruct x as [x| ]; [ | easy ].
+      now destruct x.
+    }
+    apply eq_polyn_eq.
+    cbn - [ rngl_zero rngl_add ].
+    rewrite lap_mul_norm_idemp_l.
 ...
 symmetry.
 rewrite <- (lap_mul_x_l Hos).
