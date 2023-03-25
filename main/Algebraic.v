@@ -116,6 +116,49 @@ symmetry.
 apply (lap_mul_assoc Heb Hos).
 Qed.
 
+Theorem lap_norm_x_power :
+  rngl_characteristic ≠ 1 →
+  rngl_has_eqb = true →
+  ∀ la, lap_norm (lap_x_power la) = lap_x_power la.
+Proof.
+intros Hch Heb *.
+unfold lap_x_power.
+apply (has_polyn_prop_lap_norm Heb).
+unfold has_polyn_prop.
+apply Bool.orb_true_iff; right.
+rewrite last_last.
+apply (rngl_neqb_neq Heb).
+now apply rngl_1_neq_0_iff.
+Qed.
+
+Theorem polyn_x_power_add :
+  rngl_has_opp_or_subt = true →
+  rngl_has_eqb = true →
+  ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
+Proof.
+intros Hos Heb *.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  apply eq_polyn_eq.
+  apply (eq_list_eq 0%L). 2: {
+    intros i Hi.
+    rewrite H1; symmetry.
+    now rewrite H1.
+  }
+  cbn.
+  rewrite (lap_mul_norm_idemp_l Heb Hos).
+  rewrite (lap_mul_norm_idemp_r Heb Hos).
+  specialize (all_0_lap_norm_nil Heb) as H2.
+  rewrite (proj1 (H2 _)); [ | intros; apply H1 ].
+  rewrite (proj1 (H2 _)); [ | intros; apply H1 ].
+  easy.
+}
+apply eq_polyn_eq; cbn.
+f_equal.
+rewrite (lap_x_power_add Hos Heb).
+now do 2 rewrite (lap_norm_x_power Hch Heb).
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -394,26 +437,16 @@ assert (H : (sm • u)%V = v). {
       rewrite <- Hn'.
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
-Print polyn_x_power.
-Theorem polyn_x_power_add :
-  rngl_has_opp_or_subt = true →
-  rngl_has_eqb = true →
-  ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
-Proof.
-intros Hos Heb *.
-apply eq_polyn_eq; cbn.
-f_equal.
-Search (lap_norm (lap_x_power _)).
-(* à prouver *)
+      rewrite (polyn_x_power_add Hos Heb).
+      rewrite <- rngl_mul_assoc.
+      easy.
+    }
+    remember (∑ (j = _, _), _) as x in |-*; subst x.
+    rewrite <- rngl_mul_summation_distr_l; [ | ]. 2: {
 ...
-intros Hos Heb *.
-unfold polyn_x_power.
-rewrite (lap_x_power_add Hos Heb).
-unfold polyn_of_norm_lap.
-apply eq_polyn_eq; cbn.
-rewrite lap_norm_involutive.
-... ...
-rewrite polyn_x_power_add.
+  Hos : @eq bool (@rngl_has_opp_or_subt T ro) true
+  ============================
+  @eq bool (@rngl_has_opp_or_subt (@polyn T ro) rop) true
 ...
 symmetry.
 rewrite <- (lap_mul_x_l Hos).

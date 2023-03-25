@@ -41,6 +41,25 @@ Theorem Tauto_match_nat_same : ∀ A a (b : A),
   match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
 
+Theorem eq_list_eq : ∀ A d (la lb : list A),
+  length la = length lb
+  → (∀ i, i < length la → nth i la d = nth i lb d)
+  → la = lb.
+Proof.
+intros * Hlab Hab.
+revert lb Hlab Hab.
+induction la as [| a]; intros. {
+  now symmetry in Hlab; apply length_zero_iff_nil in Hlab.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab; apply Nat.succ_inj in Hlab.
+f_equal; [ now specialize (Hab 0 (Nat.lt_0_succ _)) | ].
+apply (IHla _ Hlab).
+intros i Hi.
+apply (Hab (S i)); cbn.
+now apply Nat.succ_lt_mono in Hi.
+Qed.
+
 Theorem List_fold_left_map :
   ∀ A B C (f : A → B → A) (g : C → B) (l : list C) a,
   fold_left f (map g l) a = fold_left (λ c b, f c (g b)) l a.
