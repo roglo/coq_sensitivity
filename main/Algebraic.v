@@ -457,6 +457,16 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_norm_idemp_l Heb Hos).
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
+    clear a Ha.
+    clear u v Hcr Hu Hv.
+    clear sm Hsm.
+    clear U V HU HV.
+    clear ll Hll.
+    clear i Hi.
+    clear rpp.
+    clear m Q Hm' H2q.
+    rename Hn' into Hn.
+    subst n.
 ...
 Theorem lap_rngl_summation :
   ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
