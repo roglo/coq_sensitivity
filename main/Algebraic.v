@@ -457,8 +457,7 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_norm_idemp_l Heb Hos).
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
-    apply (eq_list_eq 0%L).
-(**)
+...
 Theorem lap_rngl_summation :
   ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
   let rol := lap_ring_like_op in
@@ -466,14 +465,38 @@ Theorem lap_rngl_summation :
   ∀ b e f,
   lap (∑ (i = b, e), f i) = (∑ (i = b, e), lap (f i))%lap.
 Proof.
-Admitted.
+intros.
+unfold iter_seq, iter_list.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+revert b.
+induction n; intros; [ easy | ].
+rewrite seq_S; cbn.
+do 2 rewrite fold_left_app.
+cbn; rewrite IHn; cbn.
+apply (has_polyn_prop_lap_norm Heb).
+(* non, c'est faux, ça *)
+... ...
+(*
+    apply (eq_list_eq 0%L).
+*)
 specialize (lap_rngl_summation Heb Hos) as H1.
 cbn - [ rngl_zero rngl_add ] in H1.
 specialize (H1 1 n).
 cbn in H1 |-*.
 rewrite H1; clear H1.
 unfold iter_seq, iter_list; cbn.
+rewrite Nat.sub_0_r.
 remember (fold_left (λ la j, _) _ _) as x; subst x.
+...
+erewrite List_fold_left_ext_in. 2: {
+  intros b lb Hb.
+  rewrite (lap_mul_norm_idemp_l Heb Hos).
+...
+  replace (lap_x_power _ * _)%lap with
+    (lap_x_power (b - 1) * [nth (b - 1) P 0%L])%lap. 2: {
+    rewrite if_bool_if_dec.
+    destruct (Sumbool.sumbool_of_bool _) as [Hpz| Hpz]. {
 ...
 Theorem lap_rngl_summation :
   ∀ (rol : ring_like_op (list T)) (rop : ring_like_op (polyn T)) b e f,
