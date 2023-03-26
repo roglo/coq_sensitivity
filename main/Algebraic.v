@@ -457,12 +457,33 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_norm_idemp_l Heb Hos).
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
-    rewrite Hn'.
+    apply (eq_list_eq 0%L).
+(* ppp... je sais pas *)
 ...
-symmetry.
-rewrite <- (lap_mul_x_l Hos).
-apply lap_mul_assoc.
-Search lap.
+(*
+Theorem lap_rngl_summation :
+  ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
+  let rol := lap_ring_like_op in
+  let rop := polyn_ring_like_op Heb Hos in
+  ∀ b e f,
+  lap (∑ (i = b, e), f i) = (∑ (i = b, e), lap (f i))%lap.
+Proof.
+rewrite lap_rngl_summation.
+...
+*)
+Theorem lap_rngl_summation :
+  ∀ (rol : ring_like_op (list T)) (rop : ring_like_op (polyn T)) b e f,
+  lap (∑ (i = b, e), f i) = (∑ (i = b, e), lap (f i))%lap.
+Proof.
+intros.
+unfold iter_seq, iter_list.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+revert b.
+induction n; intros; cbn. {
+Set Printing All.
+... ...
+rewrite lap_rngl_summation with (rol := lap_ring_like_op).
 ...
 revert lb Hb.
 induction la as [| a]; intros; [ easy | ].
