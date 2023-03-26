@@ -458,9 +458,7 @@ assert (H : (sm • u)%V = v). {
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     apply (eq_list_eq 0%L).
-(* ppp... je sais pas *)
-...
-(*
+(**)
 Theorem lap_rngl_summation :
   ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
   let rol := lap_ring_like_op in
@@ -468,9 +466,15 @@ Theorem lap_rngl_summation :
   ∀ b e f,
   lap (∑ (i = b, e), f i) = (∑ (i = b, e), lap (f i))%lap.
 Proof.
-rewrite lap_rngl_summation.
+Admitted.
+specialize (lap_rngl_summation Heb Hos) as H1.
+cbn - [ rngl_zero rngl_add ] in H1.
+specialize (H1 1 n).
+cbn in H1 |-*.
+rewrite H1; clear H1.
+unfold iter_seq, iter_list; cbn.
+remember (fold_left (λ la j, _) _ _) as x; subst x.
 ...
-*)
 Theorem lap_rngl_summation :
   ∀ (rol : ring_like_op (list T)) (rop : ring_like_op (polyn T)) b e f,
   lap (∑ (i = b, e), f i) = (∑ (i = b, e), lap (f i))%lap.
@@ -482,7 +486,7 @@ clear e Hn.
 revert b.
 induction n; intros; cbn. {
 Set Printing All.
-... ...
+...
 rewrite lap_rngl_summation with (rol := lap_ring_like_op).
 ...
 revert lb Hb.
