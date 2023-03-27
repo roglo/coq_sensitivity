@@ -4653,6 +4653,7 @@ Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
+Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.

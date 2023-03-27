@@ -456,6 +456,7 @@ assert (H : (sm • u)%V = v). {
     cbn - [ rngl_zero rngl_add ].
     rewrite (lap_mul_norm_idemp_l Heb Hos).
     rewrite <- (lap_mul_norm_idemp_r Heb Hos _ P).
+    rewrite <- (lap_mul_norm_idemp_r Heb Hos).
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     clear a Ha.
@@ -468,6 +469,9 @@ assert (H : (sm • u)%V = v). {
     clear m Q Hm' H2q.
     rename Hn' into Hn.
     subst n.
+    apply (list_nth_lap_eq Heb).
+    intros i.
+Search (nth _ (lap _)).
 ...
 (*
 End a.
