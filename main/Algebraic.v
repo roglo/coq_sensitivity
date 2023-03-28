@@ -473,22 +473,6 @@ assert (H : (sm • u)%V = v). {
     intros i.
 Search (nth _ (lap _)).
 ...
-(*
-End a.
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  let pro := @polyn_ring_like_op _ qro qrp eq_refl eq_refl in
-  let P := [1;2;0;3;-1;0;0;0] in
-  lap_norm P = lap (∑ (j = 1, length P), (polyn_x_power (j - 1) * polyn_of_const (nth (j - 1) P 0%L))%pol)
-).
-*)
-...
 Theorem lap_rngl_summation :
   ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
   let rol := lap_ring_like_op in
