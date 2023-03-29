@@ -469,9 +469,35 @@ assert (H : (sm • u)%V = v). {
     clear m Q Hm' H2q.
     rename Hn' into Hn.
     subst n.
+...
     apply (list_nth_lap_eq Heb).
     intros i.
-Search (nth _ (lap _)).
+(**)
+Theorem nth_lap_rngl_summation :
+  nth i (lap (∑ (i =
+...
+    clear H2p.
+    revert i.
+    induction P as [| a la]; intros; [ easy | ].
+    cbn - [ rngl_zero rngl_add nth ].
+    destruct i. {
+      rewrite List_nth_0_cons.
+...
+    destruct (lt_dec i (length P)) as [Hip| Hip]. 2: {
+      apply Nat.nlt_ge in Hip.
+      rewrite nth_overflow; [ | easy ].
+      symmetry; apply nth_overflow.
+      revert i Hip.
+      induction P as [| a la]; intros; [ easy | ].
+      destruct la as [| a2]; intros; [ cbn in H2p; flia H2p | ].
+      clear H2p.
+      cbn - [ rngl_zero rngl_add ].
+      rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
+      cbn - [ rngl_zero rngl_add ].
+      rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
+      rewrite Nat_sub_succ_1.
+      rewrite Nat.sub_succ, Nat.sub_0_r.
+      cbn - [ rngl_zero rngl_add ] in IHla.
 ...
 Theorem lap_rngl_summation :
   ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
