@@ -470,35 +470,25 @@ assert (H : (sm • u)%V = v). {
     subst n.
     set
       (f :=
-         λ i,
+         λ (P : list T) i,
          (polyn_x_power (i - 1) * polyn_of_const (nth (i - 1) P 0%L))%pol).
     erewrite rngl_summation_eq_compat. 2: {
       intros i Hi.
-      fold (f i).
+      fold (f P i).
       easy.
     }
     specialize (lap_rngl_summation Heb Hos) as H1.
-    specialize (H1 1 (length P) f).
-    remember (@lap T ro (∑ (i = 1, @length T P), f i)) as x eqn:Hx.
+    specialize (H1 1 (length P) (f P)).
+    remember (@lap T ro (∑ (i = 1, @length T P), f P i)) as x eqn:Hx.
     rewrite H1; subst x; clear H1.
-(* ouais mais bon, qu'est-ce que je fais, maintenant ? *)
-...
-Check lap_rngl_summation.
-       @eq (list T)
-         (@lap_norm T ro
-            (@lap T ro
-               (@iter_seq (@polyn T ro) b e
-                  (fun (c : @polyn T ro) (i : nat) =>
-                   @rngl_add (@polyn T ro) rop c (f i))
-                  (@rngl_zero (@polyn T ro) rop))))
-  ============================
-  @eq (list T) (@lap_norm T ro P)
-    (@lap_norm T ro
-       (@lap T ro
-          (@iter_seq (@polyn T ro) (S O) (@length T P)
-             (fun (c : @polyn T ro) (i : nat) =>
-              @rngl_add (@polyn T ro) rop c (f i))
-             (@rngl_zero (@polyn T ro) rop))))
+    subst f.
+    cbn - [ rngl_zero rngl_add polyn_of_const ].
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      rewrite (lap_mul_norm_idemp_l Heb Hos).
+      easy.
+    }
+    cbn - [ rngl_zero rngl_add polyn_of_const ].
 ...
 rewrite (lap_rngl_summation Heb Hos).
 Check lap_rngl_summation.
