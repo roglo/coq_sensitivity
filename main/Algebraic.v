@@ -465,28 +465,70 @@ assert (H : (sm • u)%V = v). {
     clear U V HU HV.
     clear ll Hll.
     clear i Hi.
-    clear rpp.
     clear m Q Hm' H2q.
     rename Hn' into Hn.
     subst n.
+(**)
+Theorem lap_rngl_summation :
+  ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
+  let rol := lap_ring_like_op in
+  let rop := polyn_ring_like_op Heb Hos in
+  ∀ b e f,
+  lap_norm (lap (∑ (i = b, e), f i)) = lap_norm (∑ (i = b, e), lap (f i)).
+Proof.
+...
+set
+  (f := λ i, (polyn_x_power (i - 1) * polyn_of_const (nth (i - 1) P 0%L))%pol).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  fold (f i).
+  easy.
+}
+specialize (@lap_rngl_summation Heb Hos) as H1.
+specialize (H1 1 (length P) f).
+remember (@lap T ro (∑ (i = 1, @length T P), f i)) as x eqn:Hx.
+rewrite H1; subst x; clear H1.
+(* ouais mais bon, qu'est-ce que je fais, maintenant ? *)
+...
+Check lap_rngl_summation.
+       @eq (list T)
+         (@lap_norm T ro
+            (@lap T ro
+               (@iter_seq (@polyn T ro) b e
+                  (fun (c : @polyn T ro) (i : nat) =>
+                   @rngl_add (@polyn T ro) rop c (f i))
+                  (@rngl_zero (@polyn T ro) rop))))
+  ============================
+  @eq (list T) (@lap_norm T ro P)
+    (@lap_norm T ro
+       (@lap T ro
+          (@iter_seq (@polyn T ro) (S O) (@length T P)
+             (fun (c : @polyn T ro) (i : nat) =>
+              @rngl_add (@polyn T ro) rop c (f i))
+             (@rngl_zero (@polyn T ro) rop))))
+...
+rewrite (lap_rngl_summation Heb Hos).
+Check lap_rngl_summation.
+specialize (lap_rngl_summation Heb Hos) as H1.
+cbn - [ rngl_zero rngl_add ] in H1.
+specialize (H1 1 (length P)).
+cbn in H1 |-*.
+rewrite H1; clear H1.
+cbn.
 ...
     apply (list_nth_lap_eq Heb).
     intros i.
-(**)
-Theorem nth_lap_rngl_summation :
-  nth i (lap (∑ (i =
-...
-    clear H2p.
-    revert i.
-    induction P as [| a la]; intros; [ easy | ].
-    cbn - [ rngl_zero rngl_add nth ].
-    destruct i. {
-      rewrite List_nth_0_cons.
-...
     destruct (lt_dec i (length P)) as [Hip| Hip]. 2: {
       apply Nat.nlt_ge in Hip.
-      rewrite nth_overflow; [ | easy ].
-      symmetry; apply nth_overflow.
+      rewrite nth_overflow; [ symmetry | easy ].
+      apply nth_overflow.
+      transitivity (length P); [ | easy ].
+...
+      remember (∑ (j = _, _), _) as Q eqn:HQ.
+      symmetry in HQ.
+      destruct Q as (Q, Qp); cbn.
+      apply (f_equal (@lap)) in HQ.
+...
       revert i Hip.
       induction P as [| a la]; intros; [ easy | ].
       destruct la as [| a2]; intros; [ cbn in H2p; flia H2p | ].
@@ -516,7 +558,7 @@ rewrite seq_S; cbn.
 do 2 rewrite fold_left_app.
 cbn; rewrite IHn; cbn.
 apply (has_polyn_prop_lap_norm Heb).
-(* non, c'est faux, ça *)
+w(* non, c'est faux, ça *)
 ... ...
 (*
     apply (eq_list_eq 0%L).
