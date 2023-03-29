@@ -4534,118 +4534,27 @@ apply (has_polyn_prop_lap_norm Heb).
 apply lap_prop.
 Qed.
 
-(* to be completed
-Theorem polyn_compose_by_summation :
+Theorem lap_rngl_summation :
+  let rol := lap_ring_like_op in
   let rop := polyn_ring_like_op in
-  ∀ (p q : polyn T),
-  polyn_compose p q = ∑ (i = 0, length (lap p) - 1), (monom p i * q ^ i)%pol.
+  ∀ b e f,
+  lap_norm (lap (∑ (i = b, e), f i)) = lap_norm (∑ (i = b, e), lap (f i)).
 Proof.
-intros rop *.
-unfold iter_seq, iter_list.
-unfold polyn_compose, monom.
-rewrite Nat.sub_0_r.
-unfold lap_compose, polyn_of_norm_lap; cbn.
-rewrite polyn_add_0_l, polyn_mul_1_r.
-unfold rlap_compose.
-rewrite rev_involutive.
-unfold rlap_horner, iter_list.
-remember (length (lap p) - 1) as len eqn:Hlen.
-symmetry in Hlen.
-destruct len. {
-  cbn.
-  apply eq_polyn_eq; cbn.
-  apply Nat.sub_0_le in Hlen.
-  apply Nat.le_1_r in Hlen.
-  destruct Hlen as [Hlen| Hlen]. {
-    apply length_zero_iff_nil in Hlen.
-    rewrite Hlen; cbn.
-    now rewrite (rngl_eqb_refl Heb).
-  }
-  remember (lap p) as la eqn:Hla; symmetry in Hla.
-  clear p Hla.
-  destruct la as [| a]; [ easy | ].
-  destruct la; [ clear Hlen; cbn | easy ].
-  now destruct (a =? 0)%L.
-}
-cbn.
-destruct len. {
-  remember (lap p) as la eqn:Hla.
-  clear p Hla.
-  destruct la as [| a0]; [ easy | cbn ].
-  destruct la as [| a1]; [ easy | cbn ].
-  destruct la; [ clear Hlen; cbn | easy ].
-  unfold polyn_add, polyn_mul; cbn.
-  rewrite lap_mul_1_r, lap_norm_lap.
-  unfold polyn_norm.
-  apply eq_polyn_eq; cbn.
-  rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Hpz| Hpz]. {
-    apply (rngl_eqb_eq Heb) in Hpz; subst a0; cbn.
-    rewrite if_bool_if_dec.
-    destruct (Sumbool.sumbool_of_bool _) as [Hp1| Hp1]. {
-      apply (rngl_eqb_eq Heb) in Hp1; subst a1; cbn.
-      rewrite Nat.sub_0_r.
-      destruct (lap q) as [| b lb]; cbn. {
-        now rewrite (rngl_eqb_refl Heb).
-      }
-      rewrite rngl_summation_only_one, rngl_add_0_r, lap_add_0_r.
-      rewrite (rngl_mul_0_l Hos).
-      rewrite strip_0s_app; cbn.
-      rewrite (rngl_eqb_refl Heb).
-      rewrite lap_convol_mul_const_l; [ cbn | easy ].
-      rewrite <- map_rev.
-      remember (rev lb) as rlb eqn:Hlb; clear b lb Hlb.
-      induction rlb as [| b]; [ easy | cbn ].
-      rewrite (rngl_mul_0_l Hos), (rngl_eqb_refl Heb).
-      apply IHrlb.
-    }
-    destruct (lap q) as [| b lb]; cbn. {
-      now rewrite (rngl_eqb_refl Heb).
-    }
-    rewrite rngl_summation_only_one, rngl_add_0_r, lap_add_0_r.
-    f_equal.
-    now rewrite rev_involutive, strip_0s_idemp.
-  }
-  destruct (lap q) as [| b lb]; cbn. {
-    rewrite Hpz.
-    rewrite if_bool_if_dec.
-    now destruct (Sumbool.sumbool_of_bool _); cbn; rewrite Hpz.
-  }
-  rewrite rngl_summation_only_one, lap_add_0_r.
-  rewrite if_bool_if_dec.
-  rewrite strip_0s_app; cbn.
-  rewrite lap_convol_mul_const_l; [ cbn | easy ].
-  rewrite <- map_rev.
-  destruct (Sumbool.sumbool_of_bool _) as [H1z| H1z]. {
-    apply (rngl_eqb_eq Heb) in H1z; subst a1.
-    cbn; rewrite Hpz.
-    rewrite (rngl_mul_0_l Hos).
-    remember (rev lb) as rlb eqn:Hlb; clear b lb Hlb.
-    rewrite rngl_add_0_l, Hpz.
-    induction rlb as [| b]; [ easy | cbn ].
-    rewrite (rngl_mul_0_l Hos), (rngl_eqb_refl Heb).
-    apply IHrlb.
-  }
-  cbn.
-...
-
-Theorem polyn_horner_is_summation :
-  ∀ A (ro : @ring_like_op A) (rp : @ring_like_prop A ro) (p : polyn T) (x : A),
-  ∑ (i = 0, length (lap p) - 1), (nth i (lap p) 0 * x ^ i)%L = 0%L.
-...
-
-Theorem polyn_horner_is_summation :
-  ∀ A (ro : @ring_like_op A) (rp : @ring_like_prop A ro) (p : polyn T) (x : A),
-  lap_horner 0%L rngl_add rngl_mul (lap p) x =
-    ∑ (i = 0, length (lap p) - 1), (nth i (lap p) 0 * x ^ i)%L.
-Print rlap_horner.
-Print lap_compose.
-Proof.
-(* c'est un peu chiant, parce que ça ne pourra pas s'appliquer aux "lap"
-   parce qu'ils ne sont pas des espèces d'anneau *)
 intros.
-...
-*)
+unfold iter_seq, iter_list.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+cbn.
+revert b.
+induction n; intros; [ easy | ].
+rewrite seq_S; cbn.
+do 2 rewrite fold_left_app.
+cbn - [ lap_norm ].
+rewrite <- (lap_add_norm_idemp_l Heb).
+rewrite IHn.
+rewrite (lap_add_norm_idemp_l Heb).
+apply lap_norm_idemp.
+Qed.
 
 End a.
 
@@ -4653,6 +4562,7 @@ Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
+Arguments lap_rngl_summation {T ro rp} Heb Hos (b e)%nat.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 
 Declare Scope polyn_scope.

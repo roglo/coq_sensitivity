@@ -468,26 +468,19 @@ assert (H : (sm • u)%V = v). {
     clear m Q Hm' H2q.
     rename Hn' into Hn.
     subst n.
-(**)
-Theorem lap_rngl_summation :
-  ∀ (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_subt = true),
-  let rol := lap_ring_like_op in
-  let rop := polyn_ring_like_op Heb Hos in
-  ∀ b e f,
-  lap_norm (lap (∑ (i = b, e), f i)) = lap_norm (∑ (i = b, e), lap (f i)).
-Proof.
-...
-set
-  (f := λ i, (polyn_x_power (i - 1) * polyn_of_const (nth (i - 1) P 0%L))%pol).
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  fold (f i).
-  easy.
-}
-specialize (@lap_rngl_summation Heb Hos) as H1.
-specialize (H1 1 (length P) f).
-remember (@lap T ro (∑ (i = 1, @length T P), f i)) as x eqn:Hx.
-rewrite H1; subst x; clear H1.
+    set
+      (f :=
+         λ i,
+         (polyn_x_power (i - 1) * polyn_of_const (nth (i - 1) P 0%L))%pol).
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      fold (f i).
+      easy.
+    }
+    specialize (lap_rngl_summation Heb Hos) as H1.
+    specialize (H1 1 (length P) f).
+    remember (@lap T ro (∑ (i = 1, @length T P), f i)) as x eqn:Hx.
+    rewrite H1; subst x; clear H1.
 (* ouais mais bon, qu'est-ce que je fais, maintenant ? *)
 ...
 Check lap_rngl_summation.
