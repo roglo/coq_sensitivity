@@ -483,7 +483,7 @@ assert (H : (sm • u)%V = v). {
       fold (f P i).
       easy.
     }
-    specialize (lap_rngl_summation Heb Hos) as H1.
+    specialize (lap_norm_lap_rngl_summation Heb Hos) as H1.
     specialize (H1 1 (length P) (f P)).
     remember (@lap T ro (∑ (i = 1, @length T P), f P i)) as x eqn:Hx.
     rewrite H1; subst x; clear H1.
@@ -495,19 +495,15 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add polyn_of_const ].
-(*
-  ============================
-  lap_norm P =
-  lap_norm (∑ (i = 1, length P), lap_norm (lap_x_power (i - 1) * lap (polyn_of_const (nth (i - 1) P 0))))
-*)
-Theorem lap_norm_rngl_summation_idemp :
-  let rol := lap_ring_like_op in
-  ∀ b e f,
-  lap_norm (∑ (i = b, e), lap_norm (f i)) = lap_norm (∑ (i = b, e), f i).
-Proof.
-intros.
-... ...
-rewrite lap_norm_rngl_summation_idemp.
+    rewrite (lap_norm_rngl_summation_idemp Heb).
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      unfold polyn_of_const.
+      unfold polyn_of_norm_lap.
+      cbn - [ lap_norm ].
+      easy.
+    }
+    cbn - [ rngl_zero rngl_add lap_norm ].
 ...
 rewrite (lap_rngl_summation Heb Hos).
 Check lap_rngl_summation.

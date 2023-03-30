@@ -4534,7 +4534,7 @@ apply (has_polyn_prop_lap_norm Heb).
 apply lap_prop.
 Qed.
 
-Theorem lap_rngl_summation :
+Theorem lap_norm_lap_rngl_summation :
   let rol := lap_ring_like_op in
   let rop := polyn_ring_like_op in
   ∀ b e f,
@@ -4556,13 +4556,35 @@ rewrite (lap_add_norm_idemp_l Heb).
 apply lap_norm_idemp.
 Qed.
 
+Theorem lap_norm_rngl_summation_idemp :
+  let rol := lap_ring_like_op in
+  ∀ b e f,
+  lap_norm (∑ (i = b, e), lap_norm (f i)) = lap_norm (∑ (i = b, e), f i).
+Proof.
+intros.
+unfold iter_seq, iter_list.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+revert b.
+induction n; intros; [ easy | ].
+rewrite seq_S.
+do 2 rewrite fold_left_app.
+cbn - [ lap_norm ].
+rewrite <- (lap_add_norm_idemp_l Heb).
+rewrite IHn.
+rewrite (lap_add_norm_idemp_l Heb).
+rewrite (lap_add_norm_idemp_r Heb).
+easy.
+Qed.
+
 End a.
 
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
-Arguments lap_rngl_summation {T ro rp} Heb Hos (b e)%nat.
+Arguments lap_norm_lap_rngl_summation {T ro rp} Heb Hos (b e)%nat.
+Arguments lap_norm_rngl_summation_idemp {T ro rp} Heb (b e)%nat.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 
 Declare Scope polyn_scope.
