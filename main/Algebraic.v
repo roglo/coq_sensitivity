@@ -534,10 +534,29 @@ assert (H : (sm • u)%V = v). {
         easy.
       }
       rewrite Nat.add_comm, Nat.add_sub.
-      specialize (rngl_mul_summation_distr_l Hos ) as H1.
+      (* all these complications to rewrite with rngl_mul_summation_distr_l
+         on "lap" that is not a ring like *)
+      specialize mul_iter_list_distr_l as H1.
+      specialize (H1 (list T) nat [0; 1]%L (seq 1 (S (length la) - 1))).
+      specialize
+        (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L])%lap)).
+      specialize (H1 lap_add lap_mul).
+      specialize (H1 []).
+      rewrite lap_mul_0_r in H1.
+      cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ] in H1.
+      unfold iter_seq.
+      unfold iter_list in H1 |-*.
+      cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ].
+      rewrite <- H1; clear H1. 2: {
+        intros y z.
+        apply lap_mul_add_distr_l; [ easy | easy | easy ].
+      }
+      rewrite fold_iter_list.
+      rewrite fold_iter_seq.
+      (* end of all these complications *)
 ...
-      specialize (H1 [0; 1%L]).
-...
+      rewrite iter_seq_mul_summation_distr_l.
+......
       rewrite <- (rngl_mul_summation_distr_l Hos).
 ...
 (* requires ring_like_prop (list T) that does not exist *)
