@@ -4579,6 +4579,7 @@ Qed.
 
 End a.
 
+Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.

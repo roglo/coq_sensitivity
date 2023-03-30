@@ -504,6 +504,44 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add lap_norm ].
+    f_equal.
+    apply (eq_list_eq 0%L). {
+      clear H2p.
+      induction P as [| a la]; [ now rewrite rngl_summation_empty | ].
+      cbn - [ rngl_zero rngl_add lap_norm nth ].
+      rewrite rngl_summation_shift with (s := 1); [ | flia ].
+      rewrite Nat.sub_diag, Nat_sub_succ_1.
+      (* it is so sad that I cannot apply rngl_summation_split_first
+         because it requires that lap be a fully ring_like with all
+         properties of ring_like_prop are set; however add_0_l, add_0_r
+         and add_assoc work! *)
+      rewrite iter_seq_split_first; [ | | | | easy ]; cycle 1. {
+        apply lap_add_0_l.
+      } {
+        apply lap_add_0_r.
+      } {
+        apply lap_add_assoc.
+      }
+      rewrite List_nth_0_cons.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros i Hi.
+        rewrite <- Nat.add_sub_assoc; [ | easy ].
+        rewrite (lap_x_power_add Hos Heb).
+        rewrite List_nth_succ_cons.
+        rewrite <- (lap_mul_assoc Heb Hos).
+        unfold lap_x_power at 1.
+        cbn - [ lap_x_power lap_norm nth lap_mul ].
+        easy.
+      }
+      rewrite Nat.add_comm, Nat.add_sub.
+      specialize (rngl_mul_summation_distr_l Hos ) as H1.
+...
+      specialize (H1 [0; 1%L]).
+...
+      rewrite <- (rngl_mul_summation_distr_l Hos).
+...
+(* requires ring_like_prop (list T) that does not exist *)
+      rewrite rngl_summation_split_first.
 ...
 rewrite (lap_rngl_summation Heb Hos).
 Check lap_rngl_summation.
