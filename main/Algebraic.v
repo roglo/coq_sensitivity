@@ -565,7 +565,6 @@ assert (H : (sm • u)%V = v). {
       erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
       rewrite map_id.
       rewrite (lap_add_norm_idemp_l Heb).
-Search (lap_norm (_ + _)).
 ...
       rewrite lap_add_length.
       rewrite lap_mul_length.
