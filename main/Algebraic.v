@@ -504,7 +504,9 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add lap_norm ].
+(*
     f_equal.
+*)
     apply (eq_list_eq 0%L). {
       clear H2p.
       induction P as [| a la]; [ now rewrite rngl_summation_empty | ].
@@ -554,6 +556,29 @@ assert (H : (sm • u)%V = v). {
       rewrite fold_iter_list.
       rewrite fold_iter_seq.
       (* end of all these complications *)
+      cbn - [ lap_mul lap_norm ].
+      replace (@nil T) with (@rngl_zero (list T) lap_ring_like_op) at 4 by easy.
+      replace lap_add with (@rngl_add (list T) lap_ring_like_op) by easy.
+      unfold rngl_add at 1.
+      cbn - [ rngl_zero rngl_add lap_x_power lap_norm lap_mul ].
+      rewrite (lap_mul_const_l Hos).
+      erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
+      rewrite map_id.
+      rewrite (lap_add_norm_idemp_l Heb).
+Search (lap_norm (_ + _)).
+...
+      rewrite lap_add_length.
+      rewrite lap_mul_length.
+      rewrite app_length.
+      rewrite <- IHla.
+      remember (∑ (i = _, _), _) as x eqn:Hx.
+      symmetry in Hx.
+      destruct x. {
+        cbn.
+...
+        rewrite IHla; cbn.
+        rewrite rev_length; symmetry.
+        rewrite max_l; [ | easy ].
 ...
       rewrite iter_seq_mul_summation_distr_l.
 ......
