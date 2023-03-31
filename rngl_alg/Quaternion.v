@@ -5,6 +5,9 @@ Import List List.ListNotations.
 
 Require Import Main.RingLike Main.MyVector.
 
+Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
+  (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
+
 (* with this (personal) definition of "vect_mul", the product
    of two "quaternions" (quat_mul below) is the product of
    normal quaternions if vect_size = 3, but also the product
@@ -12,11 +15,7 @@ Require Import Main.RingLike Main.MyVector.
 Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 => mk_vect [0%L]
-  | 3 =>
-      mk_vect
-        [vect_el u 2 * vect_el v 3 - vect_el u 3 * vect_el v 2;
-         vect_el u 3 * vect_el v 1 - vect_el u 1 * vect_el v 3;
-         vect_el u 1 * vect_el v 2 - vect_el u 2 * vect_el v 1]%L
+  | 3 => mk_vect [vect_comm u v 2 3; vect_comm u v 3 1; vect_comm u v 1 2]
   | _ => mk_vect []
   end.
 
