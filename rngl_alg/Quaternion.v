@@ -16,8 +16,24 @@ Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 => mk_vect [0%L]
   | 3 => mk_vect [vect_comm u v 2 3; vect_comm u v 3 1; vect_comm u v 1 2]
+  | 7 =>
+      mk_vect
+        [vect_comm u v 2 4 + vect_comm u v 3 7 + vect_comm u v 5 6;
+         vect_comm u v 3 5 + vect_comm u v 4 1 + vect_comm u v 6 7;
+         vect_comm u v 4 6 + vect_comm u v 5 2 + vect_comm u v 7 1;
+         vect_comm u v 5 7 + vect_comm u v 6 3 + vect_comm u v 1 2;
+         vect_comm u v 6 1 + vect_comm u v 7 4 + vect_comm u v 2 3;
+         vect_comm u v 7 2 + vect_comm u v 1 5 + vect_comm u v 3 4;
+         vect_comm u v 1 3 + vect_comm u v 2 6 + vect_comm u v 4 5]%L
   | _ => mk_vect []
   end.
+
+...
+
+map
+  (λ i,
+     ∑ (j = 1, n / 2), vect_comm u v ((i + j - 1) mod n + 1) (
+  ) (seq 1 n).
 
 Notation "U * V" := (vect_mul U V) : V_scope.
 
