@@ -38,3 +38,5 @@ Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
 Definition Qi := mk_quat 0 (mk_vect [1; 0; 0]%L).
 Definition Qj := mk_quat 0 (mk_vect [0; 1; 0]%L).
 Definition Qk := mk_quat 0 (mk_vect [0; 0; 1]%L).
+
+(* to be completed... *)
