@@ -504,9 +504,41 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add lap_norm ].
-(*
+(* the "lap_norm" before the "(∑ (i = ..., ...), _)" could (should)
+   be removed *)
+    rewrite (has_polyn_prop_lap_norm Heb) with (la := ∑ (i = _, _), _). 2: {
+...
+      erewrite rngl_summation_eq_compat.
+        set (lro := @lap_ring_like_op T ro).
+        replace (_ * _)%lap with
+          (if (nth (i - 1) P 0 =? 0)%L then 0%L
+           else (lap_x_power (i - 1) * [nth (i - 1) P 0%L])%lap). 2: {
+          rewrite if_bool_if_dec.
+        destruct (Sumbool.sumbool_of_bool _) as [H1| H1]. {
+          apply (rngl_eqb_eq Heb) in H1.
+          rewrite H1; cbn.
+          rewrite (rngl_eqb_refl Heb); cbn.
+          symmetry.
+          apply lap_mul_0_r.
+        } {
+          now cbn; rewrite H1.
+        }
+      }
+      easy.
+    }
+
+       apply Bool.orb_true_iff.
+Search (_ → lap_norm _ = _).
+...
+lap_norm_rngl_summation_idemp:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_has_eqb = true
+      → ∀ (rol := lap_ring_like_op) (b e : nat) (f : nat → list T),
+          lap_norm (∑ (i = b, e), lap_norm (f i)) = lap_norm (∑ (i = b, e), f i)
+...
     f_equal.
-*)
+...
     apply (eq_list_eq 0%L). {
       clear H2p.
       induction P as [| a la]; [ now rewrite rngl_summation_empty | ].
