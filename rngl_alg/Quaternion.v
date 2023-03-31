@@ -7,8 +7,8 @@ Require Import Main.RingLike Main.MyVector.
 
 (* with this (personal) definition of "vect_mul", the product
    of two "quaternions" (quat_mul below) is the product of
-   complex numbers if vect_size = 1 and the product of normal
-   quaternions if vect_size = 3 *)
+   normal quaternions if vect_size = 3, but also the product
+   of complex numbers if vect_size = 1 *)
 Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 => mk_vect [0%L]
