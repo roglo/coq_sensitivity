@@ -5,11 +5,20 @@ Import List List.ListNotations.
 
 Require Import Main.RingLike Main.MyVector.
 
+(* with this (personal) definition of "vect_mul", the product
+   of two "quaternions" (quat_mul below) is the product of
+   complex numbers if vect_size = 1 and the product of normal
+   quaternions if vect_size = 3 *)
 Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
-  mk_vect
-    [vect_el u 2 * vect_el v 3 - vect_el u 3 * vect_el v 2;
-     vect_el u 3 * vect_el v 1 - vect_el u 1 * vect_el v 3;
-     vect_el u 1 * vect_el v 2 - vect_el u 2 * vect_el v 1]%L.
+  match vect_size u with
+  | 1 => mk_vect [0%L]
+  | 3 =>
+      mk_vect
+        [vect_el u 2 * vect_el v 3 - vect_el u 3 * vect_el v 2;
+         vect_el u 3 * vect_el v 1 - vect_el u 1 * vect_el v 3;
+         vect_el u 1 * vect_el v 2 - vect_el u 2 * vect_el v 1]%L
+  | _ => mk_vect []
+  end.
 
 Notation "U * V" := (vect_mul U V) : V_scope.
 
