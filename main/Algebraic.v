@@ -506,6 +506,13 @@ assert (H : (sm • u)%V = v). {
     cbn - [ rngl_zero rngl_add lap_norm ].
 (* the "lap_norm" before the "(∑ (i = ..., ...), _)" could (should)
    be removed *)
+Search (lap_norm (∑ (_ = _, _), _)).
+Theorem lap_norm_rngl_summation_norm :
+  (∀ i, b ≤ i ≤ e → lap_norm...
+  lap_norm (∑ (i = b, e) f i) = ∑ (i = b, e), f i.
+(* ah oui mais non, il faut garantir que f i + f j va pas faire un
+   truc non normalisé ! *)
+....
     rewrite (has_polyn_prop_lap_norm Heb) with (la := ∑ (i = _, _), _). 2: {
 ...
       erewrite rngl_summation_eq_compat.
