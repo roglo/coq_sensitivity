@@ -507,6 +507,19 @@ assert (H : (sm • u)%V = v). {
 (* the "lap_norm" before the "(∑ (i = ..., ...), _)" could (should)
    be removed *)
 Search (lap_norm (∑ (_ = _, _), _)).
+Search (lap_norm (_ ++ _)).
+    rewrite (has_polyn_prop_lap_norm Heb) with (la := ∑ (i = _, _), _). 2: {
+      apply Bool.orb_true_iff.
+Check list_eq_dec.
+Search lap.
+Search Forall.
+Check Forall_dec.
+Check (@Forall_dec T).
+...
+destruct (Forall_dec
+...
+destruct (list_eq_dec (rngl_eq_dec Heb) P []).
+...
 Theorem lap_norm_rngl_summation_norm :
   (∀ i, b ≤ i ≤ e → lap_norm...
   lap_norm (∑ (i = b, e) f i) = ∑ (i = b, e), f i.
