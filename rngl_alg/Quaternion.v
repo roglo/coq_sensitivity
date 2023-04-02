@@ -40,6 +40,11 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   | _ => mk_vect []
   end.
 
+(* TODO: find a general formula for vect_cross_prod that works
+   for any vector size, not only 1, 3 and 7 *)
+
+...
+
 Notation "U * V" := (vect_cross_prod U V) : V_scope.
 
 Record quat T := mk_quat { Qre : T; Qim : vector T }.
