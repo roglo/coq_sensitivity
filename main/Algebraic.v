@@ -326,6 +326,7 @@ assert (H : vect_size u = mat_nrows sm). {
 }
 specialize (Hcr H); clear H.
 assert (H : (sm • u)%V = v). {
+  clear - rpp Hsm Hu Hv Hll Hn Hm H2p H2q Hic Heb Hop.
   rewrite Hsm, Hu, Hv.
   unfold mat_mul_vect_r; f_equal; cbn.
   rewrite map_map.
@@ -337,7 +338,16 @@ assert (H : (sm • u)%V = v). {
   do 2 rewrite map_map.
   do 2 rewrite rev_length.
   rewrite <- Hn, <- Hm.
-  f_equal. {
+  assert (H :
+    ∀ (P Q : list T) n m, 2 ≤ length P → 2 ≤ length Q → n = length P - 1 → m = length Q - 1 →
+    map
+      (λ x : nat,
+         ∑ (t ∈ map2 polyn_mul (map polyn_of_const (repeat 0%L x ++ rev P ++ repeat 0%L (m - 1 - x)))
+                  (map polyn_x_power (rev (seq 0 (n + m))))),
+           t) (seq 0 m) =
+    map (λ i : nat, polyn_of_norm_lap (lap_x_power i * P)) (rev (seq 0 m))). {
+    clear P Q n m H2p H2q Hn Hm Hll Hv (*HU HV*) Hu.
+    intros * H2p H2q Hn Hm.
     erewrite map_ext_in. 2: {
       intros i Hi.
       apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -352,10 +362,10 @@ assert (H : (sm • u)%V = v). {
       rewrite map2_diag.
       cbn - [ rngl_add rngl_zero ].
       rewrite rngl_summation_list_map.
-      rewrite rngl_summation_seq_summation; [ | flia H2p H2q Hn Hm ].
+      rewrite rngl_summation_seq_summation; [ | flia H2p H2q Hn ].
       rewrite Nat.add_0_l.
       rewrite rngl_summation_rshift.
-      rewrite <- Nat.sub_succ_l; [ | flia H2p H2q Hn Hm ].
+      rewrite <- Nat.sub_succ_l; [ | flia H2p H2q Hn ].
       rewrite Nat_sub_succ_1.
       erewrite rngl_summation_eq_compat. 2: {
         intros j Hj.
@@ -459,10 +469,12 @@ assert (H : (sm • u)%V = v). {
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     clear a Ha.
-    clear u v Hcr Hu Hv.
+    clear u v (*Hcr*).
     clear sm Hsm.
-    clear U V HU HV.
-    clear ll Hll.
+(*
+    clear U V.
+*)
+    clear ll.
     clear i Hi.
     clear m Q Hm' H2q.
     rename Hn' into Hn.
@@ -569,6 +581,9 @@ assert (H : (sm • u)%V = v). {
     subst x.
     apply IHla.
   }
+  f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
+}
+
 ...
 
 End a.
