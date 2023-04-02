@@ -504,6 +504,71 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add lap_norm ].
+(**)
+    clear H2p.
+    induction P as [| a la ]; [ easy | ].
+    cbn - [ rngl_zero rngl_add lap_norm nth ].
+    rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
+    rewrite Nat.sub_diag, Nat_sub_succ_1.
+    (* it is so sad that I cannot apply rngl_summation_split_first
+       because it requires that lap be a fully ring_like with all
+       properties of ring_like_prop are set; however add_0_l, add_0_r
+       and add_assoc work! *)
+    rewrite iter_seq_split_first; [ | | | | easy ]; cycle 1. {
+      apply lap_add_0_l.
+    } {
+      apply lap_add_0_r.
+    } {
+      apply lap_add_assoc.
+    }
+    rewrite Nat.add_0_r, Nat.sub_diag.
+    unfold lap_x_power at 1.
+    rewrite List_nth_0_cons.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      rewrite <- Nat.add_sub_assoc; [ | easy ].
+      rewrite List_nth_succ_cons.
+      rewrite (lap_x_power_add Hos Heb).
+      unfold lap_x_power at 1.
+      cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
+      rewrite <- (lap_mul_assoc Heb Hos).
+      easy.
+    }
+    remember (λ j, _) as x in |-*; subst x.
+    cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
+    rewrite (lap_mul_const_l Hos).
+    erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
+    rewrite map_id.
+    (* all these complications to rewrite with rngl_mul_summation_distr_l
+       on "lap" that is not a ring like *)
+    specialize mul_iter_list_distr_l as H1.
+    specialize (H1 (list T) nat [0; 1]%L (seq 1 (S (length la) - 1))).
+    specialize
+      (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L])%lap)).
+    specialize (H1 lap_add lap_mul).
+    specialize (H1 []).
+    rewrite lap_mul_0_r in H1.
+    cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ] in H1.
+    unfold iter_seq.
+    unfold iter_list in H1 |-*.
+    cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ].
+    rewrite <- H1; clear H1. 2: {
+      intros y z.
+     apply lap_mul_add_distr_l; [ easy | easy | easy ].
+   }
+   rewrite fold_iter_list.
+    rewrite fold_iter_seq.
+    replace (@nil T) with (@rngl_zero (list T) lap_ring_like_op) at 3 by easy.
+    replace lap_add with (@rngl_add (list T) lap_ring_like_op) by easy.
+    (* end of all these complications *)
+    unfold rngl_add at 1.
+    cbn - [ rngl_zero rngl_add lap_x_power lap_norm lap_mul ].
+    rewrite (lap_add_norm_idemp_l Heb).
+... ...
+    remember (∑ (i = _, _), _) as x eqn:Hx in |-*.
+    cbn - [ lap_norm lap_add lap_mul ].
+    rewrite <- (lap_add_norm_idemp_r Heb); subst x.
+...
 (* the "lap_norm" before the "(∑ (i = ..., ...), _)" could (should)
    be removed *)
 Search (lap_norm (∑ (_ = _, _), _)).
