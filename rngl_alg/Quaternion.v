@@ -6,25 +6,26 @@ Import List List.ListNotations.
 Require Import Main.RingLike Main.MyVector.
 
 Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
+  let i := (i - 1) mod vect_size u + 1 in
+  let j := (j - 1) mod vect_size u + 1 in
   (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
 
 (* with this (personal) definition of "vect_mul", the product
    of two "quaternions" (quat_mul below) is the product of
    normal quaternions if vect_size = 3, but also the product
    of complex numbers if vect_size = 1 *)
+
 Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 => mk_vect [0%L]
   | 3 => mk_vect [vect_comm u v 2 3; vect_comm u v 3 1; vect_comm u v 1 2]
   | 7 =>
-      mk_vect
-        [vect_comm u v 2 4 + vect_comm u v 3 7 + vect_comm u v 5 6;
-         vect_comm u v 3 5 + vect_comm u v 4 1 + vect_comm u v 6 7;
-         vect_comm u v 4 6 + vect_comm u v 5 2 + vect_comm u v 7 1;
-         vect_comm u v 5 7 + vect_comm u v 6 3 + vect_comm u v 1 2;
-         vect_comm u v 6 1 + vect_comm u v 7 4 + vect_comm u v 2 3;
-         vect_comm u v 7 2 + vect_comm u v 1 5 + vect_comm u v 3 4;
-         vect_comm u v 1 3 + vect_comm u v 2 6 + vect_comm u v 4 5]%L
+      let vect_comm_3 i :=
+        (vect_comm u v (i + 1) (i + 3) +
+         vect_comm u v (i + 2) (i + 6) +
+         vect_comm u v (i + 4) (i + 5))%L
+      in
+      mk_vect (map vect_comm_3 (seq 1 7))
   | _ => mk_vect []
   end.
 
@@ -34,6 +35,8 @@ map
   (λ i,
      ∑ (j = 1, n / 2), vect_comm u v ((i + j - 1) mod n + 1) (
   ) (seq 1 n).
+
+...
 
 Notation "U * V" := (vect_mul U V) : V_scope.
 

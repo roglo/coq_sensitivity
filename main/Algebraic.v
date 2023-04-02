@@ -113,7 +113,7 @@ rewrite <- (lap_mul_x_l Hos). 2: {
 symmetry.
 rewrite <- (lap_mul_x_l Hos); [ | easy ].
 symmetry.
-apply (lap_mul_assoc Heb Hos).
+apply (lap_mul_assoc Hos Heb).
 Qed.
 
 Theorem lap_norm_x_power :
@@ -146,8 +146,8 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
     now rewrite H1.
   }
   cbn.
-  rewrite (lap_mul_norm_idemp_l Heb Hos).
-  rewrite (lap_mul_norm_idemp_r Heb Hos).
+  rewrite (lap_mul_norm_idemp_l Hos Heb).
+  rewrite (lap_mul_norm_idemp_r Hos Heb).
   specialize (all_0_lap_norm_nil Heb) as H2.
   rewrite (proj1 (H2 _)); [ | intros; apply H1 ].
   rewrite (proj1 (H2 _)); [ | intros; apply H1 ].
@@ -200,8 +200,8 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   apply rngl_has_opp_or_subt_iff; left.
   apply (cf_has_opp Hif).
 }
-set (rop := polyn_ring_like_op (cf_has_eqb Hif) Hos).
-set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
+set (rop := polyn_ring_like_op Hos (cf_has_eqb Hif)).
+set (rpp := @polyn_ring_like_prop T ro rp Hos (cf_has_eqb Hif)).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
@@ -338,7 +338,6 @@ assert (H : (sm • u)%V = v). {
   do 2 rewrite rev_length.
   rewrite <- Hn, <- Hm.
   f_equal. {
-    remember (λ i, _) as f in |-*; subst f.
     erewrite map_ext_in. 2: {
       intros i Hi.
       apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -454,9 +453,9 @@ assert (H : (sm • u)%V = v). {
     }
     apply eq_polyn_eq.
     cbn - [ rngl_zero rngl_add ].
-    rewrite (lap_mul_norm_idemp_l Heb Hos).
-    rewrite <- (lap_mul_norm_idemp_r Heb Hos _ P).
-    rewrite <- (lap_mul_norm_idemp_r Heb Hos).
+    rewrite (lap_mul_norm_idemp_l Hos Heb).
+    rewrite <- (lap_mul_norm_idemp_r Hos Heb _ P).
+    rewrite <- (lap_mul_norm_idemp_r Hos Heb).
     f_equal; f_equal; symmetry.
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     clear a Ha.
@@ -468,12 +467,6 @@ assert (H : (sm • u)%V = v). {
     clear m Q Hm' H2q.
     rename Hn' into Hn.
     subst n.
-(**)
-(*
-  ============================
-  lap_norm P =
-  lap_norm (lap (∑ (j = 1, length P), (polyn_x_power (j - 1) * polyn_of_const (nth (j - 1) P 0%L))%pol))
-*)
     set
       (f :=
          λ (P : list T) i,
@@ -483,7 +476,7 @@ assert (H : (sm • u)%V = v). {
       fold (f P i).
       easy.
     }
-    specialize (lap_norm_lap_rngl_summation Heb Hos) as H1.
+    specialize (lap_norm_lap_rngl_summation Hos Heb) as H1.
     specialize (H1 1 (length P) (f P)).
     remember (@lap T ro (∑ (i = 1, @length T P), f P i)) as x eqn:Hx.
     rewrite H1; subst x; clear H1.
@@ -491,7 +484,7 @@ assert (H : (sm • u)%V = v). {
     cbn - [ rngl_zero rngl_add polyn_of_const ].
     erewrite rngl_summation_eq_compat. 2: {
       intros i Hi.
-      rewrite (lap_mul_norm_idemp_l Heb Hos).
+      rewrite (lap_mul_norm_idemp_l Hos Heb).
       easy.
     }
     cbn - [ rngl_zero rngl_add polyn_of_const ].
@@ -504,8 +497,9 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     cbn - [ rngl_zero rngl_add lap_norm ].
+    clear H2p.
 (**)
-clear H2p.
+    clear - rp Hos Heb.
     induction P as [| a la ]; [ easy | ].
     cbn - [ rngl_zero rngl_add lap_norm nth ].
     rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
@@ -531,7 +525,7 @@ clear H2p.
       rewrite (lap_x_power_add Hos Heb).
       unfold lap_x_power at 1.
       cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
-      rewrite <- (lap_mul_assoc Heb Hos).
+      rewrite <- (lap_mul_assoc Hos Heb).
       easy.
     }
     remember (λ j, _) as x in |-*; subst x.
@@ -569,8 +563,8 @@ clear H2p.
     rewrite <- (lap_add_norm_idemp_r Heb); symmetry.
     rewrite <- (lap_add_norm_idemp_r Heb); symmetry.
     f_equal; f_equal.
-    rewrite <- (lap_mul_norm_idemp_r Heb Hos); symmetry.
-    rewrite <- (lap_mul_norm_idemp_r Heb Hos); symmetry.
+    rewrite <- (lap_mul_norm_idemp_r Hos Heb); symmetry.
+    rewrite <- (lap_mul_norm_idemp_r Hos Heb); symmetry.
     f_equal; f_equal.
     subst x.
     apply IHla.

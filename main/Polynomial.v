@@ -24,8 +24,8 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-Context {Heb : rngl_has_eqb = true}.
 Context {Hos : rngl_has_opp_or_subt = true}.
+Context {Heb : rngl_has_eqb = true}.
 
 Fixpoint lap_all_0 zero (eqb : T → T → bool) (la : list T) :=
   match la with
@@ -3706,19 +3706,19 @@ Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
 Arguments strip_0s {T ro} la%lap.
 
-Arguments lap_quot_is_norm {T ro rp} Heb Hos Hiv (la lb)%lap.
+Arguments lap_quot_is_norm {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
-Arguments lap_mul_norm_idemp_l {T ro rp} Heb Hos (la lb)%lap.
-Arguments lap_mul_norm_idemp_r {T ro rp} Heb Hos (la lb)%lap.
+Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
+Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
 Arguments has_polyn_prop_lap_norm {T ro rp} Heb la%lap.
-Arguments lap_quot_rem_prop {T ro rp} Heb Hos Hic Hop Hiv (la lb lq lr)%lap.
-Arguments lap_norm_mul {T ro rp} Heb Hos Hiv (la lb)%lap.
-Arguments lap_mul_div {T ro rp} Heb Hos Hic Hop Hiv (la lb)%lap.
+Arguments lap_quot_rem_prop {T ro rp} Hos Heb Hic Hop Hiv (la lb lq lr)%lap.
+Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
+Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
@@ -3754,8 +3754,8 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-Context {Heb : rngl_has_eqb = true}.
 Context {Hos : rngl_has_opp_or_subt = true}.
+Context {Heb : rngl_has_eqb = true}.
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -3822,7 +3822,7 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
   | left Hiv =>
       let lq := lap_quot (lap pa) (lap pb) in
       mk_polyn lq
-        (lap_quot_is_norm Heb Hos Hiv (lap pa) (lap pb) (lap_prop pa)
+        (lap_quot_is_norm Hos Heb Hiv (lap pa) (lap pb) (lap_prop pa)
            (lap_prop pb))
   | right _ =>
       polyn_zero
@@ -3940,8 +3940,8 @@ clear p2 Heqlb.
 clear p3 Heqlc.
 unfold polyn_norm at 1 3.
 apply eq_polyn_eq; cbn.
-rewrite (lap_mul_norm_idemp_l Heb Hos).
-rewrite (lap_mul_norm_idemp_r Heb Hos).
+rewrite (lap_mul_norm_idemp_l Hos Heb).
+rewrite (lap_mul_norm_idemp_r Hos Heb).
 now rewrite lap_mul_assoc.
 Qed.
 
@@ -3971,7 +3971,7 @@ Proof.
 intros.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
-rewrite (lap_mul_norm_idemp_r Heb Hos).
+rewrite (lap_mul_norm_idemp_r Hos Heb).
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite (lap_add_norm_idemp_r Heb).
 f_equal.
@@ -3984,7 +3984,7 @@ Proof.
 intros.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
-rewrite (lap_mul_norm_idemp_l Heb Hos).
+rewrite (lap_mul_norm_idemp_l Hos Heb).
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite (lap_add_norm_idemp_r Heb).
 f_equal.
@@ -4142,7 +4142,7 @@ destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
 destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
-specialize (lap_quot_rem_prop Heb Hos Hic Hop Hiv la lb) as H1.
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv la lb) as H1.
 specialize (H1 lq lr Hpa).
 assert (H : (last lb 0 ≠ 0)%L). {
   apply (rngl_neqb_neq Heb).
@@ -4199,7 +4199,7 @@ apply eq_polyn_eq; cbn.
 unfold polyn_norm; cbn.
 unfold polyn_quot; cbn.
 destruct (Sumbool.sumbool_of_bool _) as [Hiv2| Hiv2]. {
-  cbn; rewrite (lap_norm_mul Heb Hos Hiv _ _ pa pb).
+  cbn; rewrite (lap_norm_mul Hos Heb Hiv _ _ pa pb).
   now apply lap_mul_div.
 }
 now rewrite Hiv in Hiv2.
@@ -4598,11 +4598,11 @@ End a.
 
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
 Arguments lap_cons {T ro rp} Hos a%L la%lap.
-Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
+Arguments lap_mul_assoc {T ro rp} Hos Heb (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
-Arguments lap_norm_lap_rngl_summation {T ro rp} Heb Hos (b e)%nat.
+Arguments lap_norm_lap_rngl_summation {T ro rp} Hos Heb (b e)%nat.
 Arguments lap_norm_rngl_summation_idemp {T ro rp} Heb (b e)%nat.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 
@@ -4613,9 +4613,9 @@ Arguments polyn_zero {T ro}.
 Arguments polyn_one {T ro}.
 Arguments polyn_add {T ro} p1 p2.
 Arguments polyn_mul {T ro} p1 p2.
-Arguments polyn_quot {T ro rp Heb Hos} pa pb.
+Arguments polyn_quot {T ro rp Hos Heb} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
-Arguments polyn_ring_like_op {T ro rp} Heb Hos.
+Arguments polyn_ring_like_op {T ro rp} Hos Heb.
 Arguments polyn_x_power {T ro} n%nat.
 
 Notation "0" := polyn_zero : polyn_scope.
