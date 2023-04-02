@@ -97,6 +97,14 @@ destruct n; cbn. {
 f_equal. {
   rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
   f_equal.
+  rewrite map2_diag.
+  rewrite List_fold_left_map.
+  induction n; [ easy | cbn ].
+  now rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+}
+rewrite repeat_length.
+destruct n. {
+  cbn.
 ...
 
 (* to be completed... *)
