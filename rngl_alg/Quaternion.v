@@ -20,6 +20,46 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
    in complex numbers if vect_size = 1; perhaps also the product
    in octonions (to be verified) *)
 
+Definition glop i :=
+  let n := 7 in
+  let f i := (i - 1) mod n + 1 in
+  map (λ ij, (f (fst ij), f (snd ij)))
+    [(i + 2, i + 3); (i + 4, i + 6); (i + 5, i + 1)].
+
+Compute (map glop (seq 1 7)).
+Compute (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) []).
+Require Import Main.SortingFun.
+Check isort.
+Print SortingFun.
+Check pair_eqb.
+
+Definition pair_le '(a, b) '(c, d) :=
+  if lt_dec a c then true
+  else if lt_dec c a then false
+  else if lt_dec b d then true
+  else if lt_dec d b then false
+  else true.
+
+Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) [])).
+
+About member.
+
+(*
+Fixpoint pouet it n i d l :=
+  match it with
+  | 0 => []
+  | S it' =>
+      if le_dec (i + d) n then
+        if member (pair_eqb Nat.eqb Nat.eqb) (i, i + d) l then
+          pouet it' n i (d + 1) l
+*)
+
+...
+
+0 1
+0 2 / 1 5 / 3 4
+0 1 / 2 4 / 3 6 / 5 7
+
 Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 =>
@@ -28,13 +68,6 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   | 3 =>
       (* cross product in quaternions *)
       let f i := vect_comm u v (i + 1) (i + 2) in
-      mk_vect (map f (seq 1 (vect_size u)))
-  | 5 =>
-      (* cross product for... well, it does not exist *)
-      let f i :=
-        (vect_comm u v (i + 1) (i + 3) +
-         vect_comm u v (i + 2) (i + 4))%L
-      in
       mk_vect (map f (seq 1 (vect_size u)))
   | 7 =>
       (* cross product for octonions *)
