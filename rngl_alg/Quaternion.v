@@ -10,22 +10,23 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
   let j := (j - 1) mod vect_size u + 1 in
   (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
 
-(* with this (personal) definition of "vect_mul", the product
-   of two "quaternions" (quat_mul below) is the product of
-   normal quaternions if vect_size = 3, but also the product
-   of complex numbers if vect_size = 1 *)
+(* with this (personal) definition of "vect_cross_prod", the
+   product of two "quaternions" (quat_mul below) is the product
+   in normal quaternions if vect_size = 3, but also the product
+   in complex numbers if vect_size = 1; perhaps also the product
+   in octonions (to be verified) *)
 
-Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
+Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 =>
-      (* complex *)
+      (* cross product for complex *)
       mk_vect [0%L]
   | 3 =>
-      (* quaternion *)
+      (* cross product in quaternions *)
       let f i := vect_comm u v (i + 1) (i + 2) in
       mk_vect (map f (seq 1 (vect_size u)))
   | 7 =>
-      (* octonion *)
+      (* cross product for octonions *)
       let f i :=
         (vect_comm u v (i + 1) (i + 3) +
          vect_comm u v (i + 2) (i + 6) +
@@ -35,9 +36,7 @@ Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   | _ => mk_vect []
   end.
 
-...
-
-Notation "U * V" := (vect_mul U V) : V_scope.
+Notation "U * V" := (vect_cross_prod U V) : V_scope.
 
 Record quat T := mk_quat { Qre : T; Qim : vector T }.
 Arguments mk_quat {T} Qre%L Qim%V.
