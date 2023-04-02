@@ -17,24 +17,23 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
 
 Definition vect_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
-  | 1 => mk_vect [0%L]
-  | 3 => mk_vect [vect_comm u v 2 3; vect_comm u v 3 1; vect_comm u v 1 2]
+  | 1 =>
+      (* complex *)
+      mk_vect [0%L]
+  | 3 =>
+      (* quaternion *)
+      let f i := vect_comm u v (i + 1) (i + 2) in
+      mk_vect (map f (seq 1 (vect_size u)))
   | 7 =>
-      let vect_comm_3 i :=
+      (* octonion *)
+      let f i :=
         (vect_comm u v (i + 1) (i + 3) +
          vect_comm u v (i + 2) (i + 6) +
          vect_comm u v (i + 4) (i + 5))%L
       in
-      mk_vect (map vect_comm_3 (seq 1 7))
+      mk_vect (map f (seq 1 (vect_size u)))
   | _ => mk_vect []
   end.
-
-...
-
-map
-  (λ i,
-     ∑ (j = 1, n / 2), vect_comm u v ((i + j - 1) mod n + 1) (
-  ) (seq 1 n).
 
 ...
 
