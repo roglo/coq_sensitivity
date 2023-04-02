@@ -339,13 +339,20 @@ assert (H : (sm • u)%V = v). {
   do 2 rewrite rev_length.
   rewrite <- Hn, <- Hm.
   assert (H :
-    ∀ (P Q : list T) n m, 2 ≤ length P → 2 ≤ length Q → n = length P - 1 → m = length Q - 1 →
-    map
-      (λ x : nat,
-         ∑ (t ∈ map2 polyn_mul (map polyn_of_const (repeat 0%L x ++ rev P ++ repeat 0%L (m - 1 - x)))
-                  (map polyn_x_power (rev (seq 0 (n + m))))),
-           t) (seq 0 m) =
-    map (λ i : nat, polyn_of_norm_lap (lap_x_power i * P)) (rev (seq 0 m))). {
+    ∀ (P Q : list T) n m,
+    2 ≤ length P
+    → 2 ≤ length Q
+    → n = length P - 1
+    → m = length Q - 1 →
+      map
+        (λ i,
+           ∑ (t ∈
+              map2 polyn_mul
+                (map polyn_of_const
+                   (repeat 0%L i ++ rev P ++ repeat 0%L (m - 1 - i)))
+                (map polyn_x_power (rev (seq 0 (n + m))))),
+             t) (seq 0 m) =
+      map (λ i, polyn_of_norm_lap (lap_x_power i * P)) (rev (seq 0 m))). {
     clear P Q n m H2p H2q Hn Hm Hll Hv (*HU HV*) Hu.
     intros * H2p H2q Hn Hm.
     erewrite map_ext_in. 2: {
