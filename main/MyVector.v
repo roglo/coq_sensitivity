@@ -260,6 +260,18 @@ destruct uv. {
 }
 Qed.
 
+Theorem vect_mul_scal_0_l :
+  rngl_has_opp_or_subt = true →
+  ∀ v, (0%L × v)%V = mk_vect (repeat 0%L (vect_size v)).
+Proof.
+intros Hos *.
+unfold vect_mul_scal_l, vect_size; cbn; f_equal.
+erewrite map_ext_in; [ | intros; apply (rngl_mul_0_l Hos) ].
+destruct v as (la); cbn; symmetry.
+induction la as [| a]; [ easy | cbn ].
+now rewrite IHla.
+Qed.
+
 End a.
 
 Declare Scope V_scope.
@@ -270,6 +282,7 @@ Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_opp {T ro} V%V.
 Arguments vect_mul_scal_l {T ro} s%L V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
+Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.
 Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
