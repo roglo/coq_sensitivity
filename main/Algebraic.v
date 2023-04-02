@@ -564,9 +564,16 @@ assert (H : (sm • u)%V = v). {
     unfold rngl_add at 1.
     cbn - [ rngl_zero rngl_add lap_x_power lap_norm lap_mul ].
     rewrite (lap_add_norm_idemp_l Heb).
-... ...
     remember (∑ (i = _, _), _) as x eqn:Hx in |-*.
-    cbn - [ lap_norm lap_add lap_mul ].
+    destruct x as [| b lb]. {
+      cbn; f_equal.
+      rewrite strip_0s_app; cbn.
+      remember (strip_0s (rev la)) as lb eqn:Hlb.
+      symmetry in Hlb.
+      destruct lb as [| b]; [ easy | ].
+      exfalso.
+(* hou la la... *)
+... ...
     rewrite <- (lap_add_norm_idemp_r Heb); subst x.
 ...
 (* the "lap_norm" before the "(∑ (i = ..., ...), _)" could (should)
