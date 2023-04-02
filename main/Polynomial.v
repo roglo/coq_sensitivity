@@ -4577,9 +4577,27 @@ rewrite (lap_add_norm_idemp_r Heb).
 easy.
 Qed.
 
+Arguments lap_convol_mul_1_l {T ro rp} Hos la%lap (i len)%nat.
+Arguments lap_convol_mul_l_succ_l {T ro rp} Hos (la lb)%lap (i len)%nat.
+
+Theorem lap_cons : ∀ a la, a :: la = ([a] + [0; 1]%L * la)%lap.
+Proof.
+intros.
+destruct la as [| a2]; [ easy | cbn ].
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_mul_1_l.
+do 2 rewrite (rngl_mul_0_l Hos).
+do 2 rewrite rngl_add_0_r.
+rewrite rngl_add_0_l.
+f_equal; f_equal.
+rewrite (lap_convol_mul_l_succ_l Hos).
+now symmetry; apply (lap_convol_mul_1_l Hos).
+Qed.
+
 End a.
 
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
+Arguments lap_cons {T ro rp} Hos a%L la%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
