@@ -79,17 +79,24 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 move Hos before Hop.
+unfold vect_add; cbn.
+rewrite (rngl_mul_0_l Hos).
+unfold vect_dot_mul; cbn.
+rewrite rngl_mul_1_l.
+unfold iter_list; cbn.
+rewrite rngl_add_0_l.
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_add_0_l.
+unfold vect_mul_scal_l; cbn.
+unfold vect_add; cbn.
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_add_0_l.
 destruct n; cbn. {
-  rewrite (rngl_mul_0_l Hos).
-  unfold vect_dot_mul; cbn.
-  rewrite rngl_mul_1_l.
-  unfold iter_list; cbn.
-  rewrite rngl_add_0_l.
-  unfold rngl_sub.
-  rewrite Hop, rngl_add_0_l.
+  now rewrite rngl_add_0_l.
+}
+f_equal. {
+  rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
   f_equal.
-  rewrite (vect_mul_scal_0_l Hos).
-  cbn.
 ...
 
 (* to be completed... *)
