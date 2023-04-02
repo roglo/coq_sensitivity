@@ -56,9 +56,8 @@ Fixpoint pouet it n i d l :=
 
 ...
 
-0 1
-0 2 / 1 5 / 3 4
-0 1 / 2 4 / 3 6 / 5 7
+1 2
+1 3 / 2 6 / 4 5
 
 Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
