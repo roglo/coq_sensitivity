@@ -24,7 +24,12 @@ Definition glop i :=
   let n := 7 in
   let f i := (i - 1) mod n + 1 in
   map (λ ij, (f (fst ij), f (snd ij)))
+(*
+    [(i + 1, i + 2); (i + 4, i + 6); (i + 5, i + 3)].
     [(i + 2, i + 3); (i + 4, i + 6); (i + 5, i + 1)].
+*)
+    [(i + 1, i + 3); (i + 2, i + 6); (i + 4, i + 5)].
+(**)
 
 Compute (map glop (seq 1 7)).
 Compute (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) []).
@@ -41,6 +46,18 @@ Definition pair_le '(a, b) '(c, d) :=
   else true.
 
 Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) [])).
+(*
+     = [(1, 2); (1, 3); (1, 6); (2, 3); (2, 4); (2, 7); (3, 1); (3, 4); (3, 5); (4, 2); 
+       (4, 5); (4, 6); (5, 3); (5, 6); (5, 7); (6, 1); (6, 4); (6, 7); (7, 1); (7, 2); 
+       (7, 5)]
+     : list (nat * nat)
+*)
+(*
+     = [(1, 2); (1, 3); (1, 4); (2, 3); (2, 4); (2, 5); (3, 4); (3, 5); (3, 6); (4, 5); 
+       (4, 6); (4, 7); (5, 1); (5, 6); (5, 7); (6, 1); (6, 2); (6, 7); (7, 1); (7, 2); 
+       (7, 3)]
+     : list (nat * nat)
+*)
 
 About member.
 
@@ -59,13 +76,19 @@ Fixpoint pouet it n i d l :=
 1 2
 1 3 / 2 6 / 4 5
 
+0 2 / 1 5 / 3 4
+3 5 / 4 2 / 0 1
+0 1 / 3 5 / 4 2
+
+1 2 / 4 6 / 5 3
+
 Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u with
   | 1 =>
       (* cross product for complex *)
       mk_vect [0%L]
   | 3 =>
-      (* cross product in quaternions *)
+      (* cross product for quaternions *)
       let f i := vect_comm u v (i + 1) (i + 2) in
       mk_vect (map f (seq 1 (vect_size u)))
   | 7 =>
