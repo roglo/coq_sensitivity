@@ -29,6 +29,13 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
       (* cross product in quaternions *)
       let f i := vect_comm u v (i + 1) (i + 2) in
       mk_vect (map f (seq 1 (vect_size u)))
+  | 5 =>
+      (* cross product for... well, it does not exist *)
+      let f i :=
+        (vect_comm u v (i + 1) (i + 3) +
+         vect_comm u v (i + 2) (i + 4))%L
+      in
+      mk_vect (map f (seq 1 (vect_size u)))
   | 7 =>
       (* cross product for octonions *)
       let f i :=
