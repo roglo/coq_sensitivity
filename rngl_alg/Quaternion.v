@@ -15,10 +15,18 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
   (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
 
 Definition glop i :=
+  let n := 5 in
+  let f i := (i - 1) mod n + 1 in
+  map (λ ij, (f (fst ij), f (snd ij)))
+    [(i + 1, i + 4); (i + 2, i + 3)].
+
+(*
+Definition glop i :=
   let n := 7 in
   let f i := (i - 1) mod n + 1 in
   map (λ ij, (f (fst ij), f (snd ij)))
     [(i + 1, i + 3); (i + 2, i + 6); (i + 4, i + 5)].
+*)
 
 Compute (map glop (seq 1 7)).
 Compute (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) []).
@@ -34,7 +42,7 @@ Definition pair_le '(a, b) '(c, d) :=
   else if lt_dec d b then false
   else true.
 
-Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) [])).
+Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 5)) [])).
 (*
      = [(1, 2); (1, 3); (1, 5); (2, 3); (2, 4); (2, 6); (3, 4); (3, 5); (3, 7); (4, 1); 
        (4, 5); (4, 6); (5, 2); (5, 6); (5, 7); (6, 1); (6, 3); (6, 7); (7, 1); (7, 2); 
@@ -48,15 +56,22 @@ Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) [])
    in octonions if vect_size = 7 (to be verified) *)
 
 Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
-  match vect_size u with
-  | 1 =>
+  match vect_size u / 2 with
+  | 0 =>
       (* cross product for complex *)
       mk_vect [0%L]
-  | 3 =>
+  | 1 =>
       (* cross product for quaternions *)
       let f i := vect_comm u v (i + 1) (i + 2) in
       mk_vect (map f (seq 1 (vect_size u)))
-  | 7 =>
+  | 2 =>
+      (* cross product for sexonions *)
+      let f i :=
+        (vect_comm u v (i + 1) (i + 4) +
+         vect_comm u v (i + 2) (i + 3))%L
+      in
+      mk_vect (map f (seq 1 (vect_size u)))
+  | 3 =>
       (* cross product for octonions *)
       let f i :=
         (vect_comm u v (i + 1) (i + 3) +
@@ -70,14 +85,14 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
 (* TODO: find a general formula for vect_cross_prod that works
    for any vector size, not only 1, 3 and 7 *)
 
+(*
 Compute (let n := 7 in map (λ i, 2 ^ i) (seq 0 (n / 2))).
 ...
-
 Compute (let n := 7 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
 Compute (let n := 3 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
 Compute (let n := 1 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
-
 ...
+*)
 
 Notation "U * V" := (vect_cross_prod U V) : V_scope.
 
@@ -130,9 +145,7 @@ unfold vect_mul_scal_l; cbn.
 unfold vect_add; cbn.
 rewrite (rngl_mul_0_l Hos).
 rewrite rngl_add_0_l.
-destruct n; cbn. {
-  now rewrite rngl_add_0_l.
-}
+destruct n; cbn; [ now rewrite rngl_add_0_l | ].
 f_equal. {
   rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
   f_equal.
@@ -141,9 +154,54 @@ f_equal. {
   induction n; [ easy | cbn ].
   now rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
 }
-rewrite repeat_length.
 destruct n. {
-  cbn.
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  now rewrite (rngl_sub_0_r Hos).
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  now rewrite (rngl_sub_0_r Hos).
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 2 rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 2 rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
 ...
 
 (* to be completed... *)
