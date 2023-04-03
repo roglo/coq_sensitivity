@@ -15,21 +15,27 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
   (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
 
 Definition glop i :=
+  let n := 9 in
+  let f i := (i - 1) mod n + 1 in
+  map (λ ij, (f (fst ij), f (snd ij)))
+    [(i + 1, i + 4); (i + 2, i + 8); (i + 3, i + 5); (i + 6, i + 7)].
+
+(**)
+Definition glop' i :=
+  let n := 7 in
+  let f i := (i - 1) mod n + 1 in
+  map (λ ij, (f (fst ij), f (snd ij)))
+    [(i + 1, i + 3); (i + 2, i + 6); (i + 4, i + 5)].
+(**)
+
+Definition glop'' i :=
   let n := 5 in
   let f i := (i - 1) mod n + 1 in
   map (λ ij, (f (fst ij), f (snd ij)))
     [(i + 1, i + 4); (i + 2, i + 3)].
 
-(*
-Definition glop i :=
-  let n := 7 in
-  let f i := (i - 1) mod n + 1 in
-  map (λ ij, (f (fst ij), f (snd ij)))
-    [(i + 1, i + 3); (i + 2, i + 6); (i + 4, i + 5)].
-*)
-
 Compute (map glop (seq 1 7)).
-Compute (fold_left (λ la lb, app la lb) (map glop (seq 1 7)) []).
+Compute (fold_left (λ la lb, app la lb) (map glop (seq 1 9)) []).
 Require Import Main.SortingFun.
 Check isort.
 Print SortingFun.
@@ -42,11 +48,12 @@ Definition pair_le '(a, b) '(c, d) :=
   else if lt_dec d b then false
   else true.
 
-Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 5)) [])).
+Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 9)) [])).
 (*
-     = [(1, 2); (1, 3); (1, 5); (2, 3); (2, 4); (2, 6); (3, 4); (3, 5); (3, 7); (4, 1); 
-       (4, 5); (4, 6); (5, 2); (5, 6); (5, 7); (6, 1); (6, 3); (6, 7); (7, 1); (7, 2); 
-       (7, 4)]
+     = [(1, 2); (1, 3); (1, 5); (2, 3); (2, 4); (2, 6); 
+       (3, 4); (3, 5); (3, 7); (4, 1); (4, 5); (4, 6); 
+       (5, 2); (5, 6); (5, 7); (6, 1); (6, 3); (6, 7); 
+       (7, 1); (7, 2); (7, 4)]
 *)
 
 (* with this (personal) definition of "vect_cross_prod", the
@@ -77,6 +84,14 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
         (vect_comm u v (i + 1) (i + 3) +
          vect_comm u v (i + 2) (i + 6) +
          vect_comm u v (i + 4) (i + 5))%L
+      in
+      mk_vect (map f (seq 1 (vect_size u)))
+  | 4 =>
+      let f i :=
+        (vect_comm u v (i + 1) (i + 4) +
+         vect_comm u v (i + 2) (i + 8) +
+         vect_comm u v (i + 3) (i + 5) +
+         vect_comm u v (i + 6) (i + 7))%L
       in
       mk_vect (map f (seq 1 (vect_size u)))
   | _ => mk_vect []
@@ -202,6 +217,29 @@ destruct n. {
 }
 destruct n. {
   cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 3 rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 3 rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+...
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 3 rewrite rngl_add_0_l.
+}
 ...
 
 (* to be completed... *)
