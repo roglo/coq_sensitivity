@@ -69,29 +69,29 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
       mk_vect [0%L]
   | 1 =>
       (* cross product for quaternions *)
-      let f i := vect_comm u v (i + 1) (i + 2) in
+      let f i := vect_comm u v (i + 1) (i + 2) in (* Δ=1 *)
       mk_vect (map f (seq 1 (vect_size u)))
   | 2 =>
       (* cross product for sexonions *)
       let f i :=
-        (vect_comm u v (i + 1) (i + 4) +
-         vect_comm u v (i + 2) (i + 3))%L
+        (vect_comm u v (i + 1) (i + 4) +  (* Δ=3 *)
+         vect_comm u v (i + 2) (i + 3))%L (* Δ=1 *)
       in
       mk_vect (map f (seq 1 (vect_size u)))
   | 3 =>
       (* cross product for octonions *)
       let f i :=
-        (vect_comm u v (i + 1) (i + 3) +
-         vect_comm u v (i + 2) (i + 6) +
-         vect_comm u v (i + 4) (i + 5))%L
+        (vect_comm u v (i + 1) (i + 3) +  (* Δ=2 *)
+         vect_comm u v (i + 2) (i + 6) +  (* Δ=4 *)
+         vect_comm u v (i + 4) (i + 5))%L (* Δ=1 *)
       in
       mk_vect (map f (seq 1 (vect_size u)))
   | 4 =>
       let f i :=
-        (vect_comm u v (i + 1) (i + 3) +
-         vect_comm u v (i + 2) (i + 5) +
-         vect_comm u v (i + 4) (i + 8) +
-         vect_comm u v (i + 6) (i + 7))%L
+        (vect_comm u v (i + 1) (i + 3) +  (* Δ=2 *)
+         vect_comm u v (i + 2) (i + 5) +  (* Δ=3 *)
+         vect_comm u v (i + 4) (i + 8) +  (* Δ=4 *)
+         vect_comm u v (i + 6) (i + 7))%L (* Δ=1 *)
       in
       mk_vect (map f (seq 1 (vect_size u)))
   | _ => mk_vect []
