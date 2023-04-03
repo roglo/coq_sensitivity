@@ -70,6 +70,10 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
 (* TODO: find a general formula for vect_cross_prod that works
    for any vector size, not only 1, 3 and 7 *)
 
+Compute (let n := 7 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
+Compute (let n := 3 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
+Compute (let n := 1 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n / 2))).
+
 ...
 
 Notation "U * V" := (vect_cross_prod U V) : V_scope.
