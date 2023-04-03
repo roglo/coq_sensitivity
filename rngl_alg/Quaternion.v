@@ -18,7 +18,7 @@ Definition glop i :=
   let n := 9 in
   let f i := (i - 1) mod n + 1 in
   map (λ ij, (f (fst ij), f (snd ij)))
-    [(i + 1, i + 4); (i + 2, i + 8); (i + 3, i + 5); (i + 6, i + 7)].
+    [(i + 1, i + 3); (i + 2, i + 5); (i + 4, i + 8); (i + 6, i + 7)].
 
 (**)
 Definition glop' i :=
@@ -88,9 +88,9 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
       mk_vect (map f (seq 1 (vect_size u)))
   | 4 =>
       let f i :=
-        (vect_comm u v (i + 1) (i + 4) +
-         vect_comm u v (i + 2) (i + 8) +
-         vect_comm u v (i + 3) (i + 5) +
+        (vect_comm u v (i + 1) (i + 3) +
+         vect_comm u v (i + 2) (i + 5) +
+         vect_comm u v (i + 4) (i + 8) +
          vect_comm u v (i + 6) (i + 7))%L
       in
       mk_vect (map f (seq 1 (vect_size u)))
