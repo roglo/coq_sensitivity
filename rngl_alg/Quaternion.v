@@ -135,6 +135,23 @@ Definition Qi := mk_quat 0 (mk_vect [1; 0; 0]%L).
 Definition Qj := mk_quat 0 (mk_vect [0; 1; 0]%L).
 Definition Qk := mk_quat 0 (mk_vect [0; 0; 1]%L).
 
+End a.
+
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+
+Compute (
+  let qro := Q_ring_like_op in
+  map (λ n,
+  (quat_mul
+     (mk_quat 0 (mk_vect (0 :: 0 :: 1 :: repeat 0 n)))
+     (mk_quat 0 (mk_vect (1 :: repeat 0 (S (S n))))))%L)
+  (seq 0 10)).
+
+...
+
+
 Theorem quat_mul_1 :
   rngl_has_opp = true →
   ∀ n,
@@ -239,6 +256,16 @@ destruct n. {
   rewrite (rngl_sub_0_r Hos).
   now do 4 rewrite rngl_add_0_l.
 }
+destruct n. {
+  cbn; unfold vect_comm; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  now do 4 rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn; unfold vect_comm; cbn.
 ...
 
 (* to be completed... *)
