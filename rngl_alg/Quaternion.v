@@ -164,9 +164,11 @@ f_equal. {
 rewrite (vect_add_comm (a × v)%V).
 f_equal.
 Locate "*"%V.
-Theorem vect_cross_prod_comm :
+Theorem vect_cross_prod_anticomm :
   rngl_mul_is_comm = true →
-  ∀ u v, vect_size u = vect_size v → (u * v = - v * u)%V.
+  ∀ u v,
+  vect_size u = vect_size v
+  → (u * v = - v * u)%V.
 Proof.
 intros Hic * Huv.
 unfold "*"%V; f_equal.
