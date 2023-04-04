@@ -241,6 +241,15 @@ destruct n. {
   unfold rngl_sub.
   rewrite Hop.
   do 2 rewrite (rngl_opp_involutive Hop).
+  f_equal; rewrite rngl_add_comm. {
+    now f_equal; rewrite (rngl_mul_comm Hic).
+  } {
+    now f_equal; rewrite (rngl_mul_comm Hic).
+  }
+}
+destruct n. {
+(* ouais bon, ça a l'air bon, mais ça serait mieux avec une formule générale
+   pour le produit vectoriel *)
 ...
 revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
