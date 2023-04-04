@@ -165,13 +165,15 @@ rewrite (vect_add_comm (a × v)%V).
 f_equal.
 Locate "*"%V.
 Theorem vect_cross_prod_comm :
-  ∀ u v, vect_size u = vect_size v → (u * v = v * u)%V.
+  rngl_mul_is_comm = true →
+  ∀ u v, vect_size u = vect_size v → (u * v = - v * u)%V.
 Proof.
-intros * Huv.
+intros Hic * Huv.
 unfold "*"%V; f_equal.
 destruct u as (la).
 destruct v as (lb); cbn - [ "/" ].
 cbn in Huv.
+rewrite map_length.
 rewrite <- Huv.
 remember (length la / 2) as n eqn:Hn; symmetry in Hn.
 destruct n; [ easy | ].
@@ -181,10 +183,31 @@ destruct n. {
   intros i Hi.
   apply in_seq in Hi.
   unfold vect_comm; cbn.
+  rewrite map_length.
   do 5 rewrite Nat.add_sub.
-  rewrite <- Nat.add_sub_assoc; [ | now apply -> Nat.succ_le_mono ].
-  cbn.
+  rewrite <- Nat.add_sub_assoc; [ cbn | now apply -> Nat.succ_le_mono ].
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
   rewrite <- Huv.
+  destruct (Nat.eq_dec i (length la)) as [Hia| Hia]. {
+    rewrite <- Hia.
+    rewrite Nat.mod_same; [ | flia Hi ].
+    rewrite <- Nat.add_mod_idemp_l; [ | flia Hi ].
+    rewrite Nat.mod_same; [ | flia Hi ]; cbn.
+    rewrite <- Hia in Hn.
+    destruct i; [ easy | ].
+    destruct i; [ easy | ].
+    rewrite Nat.mod_1_l; [ | now apply -> Nat.succ_lt_mono ].
+Search (- _ - _)%L.
+rewrite <- rngl_opp_add_distr.
+...
+    rewrite (rngl_mul_comm Hic).
 ...
 revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
