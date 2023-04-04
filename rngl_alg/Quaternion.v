@@ -165,12 +165,13 @@ rewrite (vect_add_comm (a × v)%V).
 f_equal.
 Locate "*"%V.
 Theorem vect_cross_prod_anticomm :
+  rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ u v,
   vect_size u = vect_size v
   → (u * v = - v * u)%V.
 Proof.
-intros Hic * Huv.
+intros Hop Hic * Huv.
 unfold "*"%V; f_equal.
 destruct u as (la).
 destruct v as (lb); cbn - [ "/" ].
@@ -206,10 +207,19 @@ destruct n. {
     destruct i; [ easy | ].
     destruct i; [ easy | ].
     rewrite Nat.mod_1_l; [ | now apply -> Nat.succ_lt_mono ].
-Search (- _ - _)%L.
-rewrite <- rngl_opp_add_distr.
-...
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    unfold rngl_sub at 2.
+    rewrite Hop.
+    rewrite rngl_add_comm.
+    rewrite (rngl_opp_involutive Hop).
     rewrite (rngl_mul_comm Hic).
+    unfold rngl_sub at 1.
+    rewrite Hop.
+    f_equal; f_equal.
+    apply (rngl_mul_comm Hic).
+  }
+  rewrite Nat.mod_small; [ | flia Hi Hia ].
 ...
 revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
