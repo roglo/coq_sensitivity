@@ -198,28 +198,49 @@ destruct n. {
     rewrite <- Huv; flia Hi.
   }
   rewrite <- Huv.
-  destruct (Nat.eq_dec i (length la)) as [Hia| Hia]. {
-    rewrite <- Hia.
-    rewrite Nat.mod_same; [ | flia Hi ].
-    rewrite <- Nat.add_mod_idemp_l; [ | flia Hi ].
-    rewrite Nat.mod_same; [ | flia Hi ]; cbn.
-    rewrite <- Hia in Hn.
-    destruct i; [ easy | ].
-    destruct i; [ easy | ].
-    rewrite Nat.mod_1_l; [ | now apply -> Nat.succ_lt_mono ].
-    rewrite (rngl_mul_opp_l Hop).
-    rewrite (rngl_mul_opp_l Hop).
-    unfold rngl_sub at 2.
-    rewrite Hop.
-    rewrite rngl_add_comm.
-    rewrite (rngl_opp_involutive Hop).
-    rewrite (rngl_mul_comm Hic).
-    unfold rngl_sub at 1.
-    rewrite Hop.
-    f_equal; f_equal.
-    apply (rngl_mul_comm Hic).
+  do 2 rewrite (rngl_mul_opp_l Hop).
+  unfold rngl_sub at 2.
+  rewrite Hop.
+  rewrite rngl_add_comm.
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_mul_comm Hic).
+  unfold rngl_sub at 1.
+  rewrite Hop.
+  f_equal; f_equal.
+  apply (rngl_mul_comm Hic).
+}
+destruct n. {
+  f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  unfold vect_comm; cbn.
+  rewrite map_length.
+  do 9 rewrite Nat.add_sub.
+  rewrite <- Nat.add_sub_assoc; [ cbn | now apply -> Nat.succ_le_mono ].
+  rewrite <- Nat.add_sub_assoc; [ cbn | now apply -> Nat.succ_le_mono ].
+  rewrite <- Nat.add_sub_assoc; [ cbn | now apply -> Nat.succ_le_mono ].
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
   }
-  rewrite Nat.mod_small; [ | flia Hi Hia ].
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  rewrite List_map_nth' with (a := 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  rewrite <- Huv.
+  do 4 rewrite (rngl_mul_opp_l Hop).
+  unfold rngl_sub.
+  rewrite Hop.
+  do 2 rewrite (rngl_opp_involutive Hop).
 ...
 revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
