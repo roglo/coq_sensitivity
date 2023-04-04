@@ -590,7 +590,7 @@ assert (H : (sm • u)%V = v). {
   }
   f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
 }
-
+specialize (Hcr H); clear H.
 ...
 
 End a.
