@@ -135,6 +135,7 @@ Definition Qi := mk_quat 0 (mk_vect [1; 0; 0]%L).
 Definition Qj := mk_quat 0 (mk_vect [0; 1; 0]%L).
 Definition Qk := mk_quat 0 (mk_vect [0; 0; 1]%L).
 
+(*
 End a.
 
 Require Import RnglAlg.Qrl.
@@ -148,7 +149,51 @@ Compute (
      (mk_quat 0 (mk_vect (0 :: 0 :: 1 :: repeat 0 n)))
      (mk_quat 0 (mk_vect (1 :: repeat 0 (S (S n))))))%L)
   (seq 0 10)).
+*)
 
+Theorem quat_mul_comm :
+  rngl_mul_is_comm = true →
+  ∀ a b, quat_mul a b = quat_mul b a.
+Proof.
+intros Hic (a, u) (b, v); cbn.
+f_equal. {
+  rewrite (rngl_mul_comm Hic).
+  f_equal.
+  apply (vect_dot_mul_comm Hic).
+}
+rewrite (vect_add_comm (a × v)%V).
+f_equal.
+Locate "*"%V.
+Theorem vect_cross_prod_comm :
+  ∀ u v, vect_size u = vect_size v → (u * v = v * u)%V.
+Proof.
+intros * Huv.
+unfold "*"%V; f_equal.
+destruct u as (la).
+destruct v as (lb); cbn - [ "/" ].
+cbn in Huv.
+rewrite <- Huv.
+remember (length la / 2) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | ].
+destruct n. {
+  f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  unfold vect_comm; cbn.
+  do 5 rewrite Nat.add_sub.
+  rewrite <- Nat.add_sub_assoc; [ | now apply -> Nat.succ_le_mono ].
+  cbn.
+  rewrite <- Huv.
+...
+revert lb.
+induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
+destruct lb as [| b]; [ easy | cbn ].
+rewrite rngl_add_comm; f_equal.
+apply IHla.
+Qed.
+... ...
+apply (vect_cross_prod_comm Hic).
 ...
 
 

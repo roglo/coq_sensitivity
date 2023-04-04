@@ -272,6 +272,36 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
+Theorem vect_add_comm :
+  ∀ u v, vect_add u v = vect_add v u.
+Proof.
+intros.
+unfold vect_add; f_equal.
+destruct u as (la).
+destruct v as (lb); cbn.
+revert lb.
+induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
+destruct lb as [| b]; [ easy | cbn ].
+rewrite rngl_add_comm; f_equal.
+apply IHla.
+Qed.
+
+Theorem vect_dot_mul_comm :
+  rngl_mul_is_comm = true →
+  ∀ u v, ≺ u , v ≻ = ≺ v , u ≻.
+Proof.
+intros Hic *.
+unfold vect_dot_mul.
+destruct u as (la).
+destruct v as (lb); cbn.
+revert lb.
+induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
+destruct lb as [| b]; [ easy | cbn ].
+do 2 rewrite rngl_summation_list_cons.
+rewrite (rngl_mul_comm Hic); f_equal.
+apply IHla.
+Qed.
+
 End a.
 
 Declare Scope V_scope.
