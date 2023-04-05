@@ -130,8 +130,7 @@ Fixpoint pouet A (a : A) (la : list A) :=
   | [b] => [[(a, b)]]
   | b :: c :: lb =>
       map (λ lc, (a, b) :: lc) (pouet c lb) ++
-      map (λ lc, (a, c) :: lc) (pouet b lb) ++
-      map (λ lc, (b, c) :: lc) (pouet a lb)
+      map (λ lc, (a, c) :: lc) (pouet b lb)
   end.
 
 Compute (length (pouet 1 [2;3;4;5;6])).
