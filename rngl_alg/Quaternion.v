@@ -100,6 +100,32 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
 (* TODO: find a general formula for vect_cross_prod that works
    for any vector size, not only 1, 3 and 7 *)
 
+Fixpoint pouet A (a : A) (la : list A) :=
+  match la with
+  | [] => []
+  | [b] => [[(a, b)]]
+  | b :: c :: lb =>
+      map (λ lc, (a, b) :: lc) (pouet c lb) ++
+      map (λ lc, (a, c) :: lc) (pouet b lb) ++
+      map (λ lc, (b, c) :: lc) (pouet a lb)
+  end.
+
+Compute (length (pouet 1 [2])).
+Compute (length (pouet 1 [2;3;4])).
+Compute ((pouet 1 [2;3;4])).
+...
+Compute (length (pouet 1 [2;3;4;5;6])).
+Compute (length (pouet 1 [2;3;4;5;6;7;8])).
+
+...
+
+Fixpoint glop la :=
+  match l with
+  | a :: la' =>
+      pouet a la'
+
+...
+
 (*
 Compute (let n := 7 in map (λ i, 2 ^ i) (seq 0 (n / 2))).
 ...
