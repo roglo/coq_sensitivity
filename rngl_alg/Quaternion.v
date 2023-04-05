@@ -111,8 +111,8 @@ Fixpoint pouet A (a : A) (la : list A) :=
   end.
 
 Compute (length (pouet 1 [2])).
-Compute (length (pouet 1 [2;3;4])).
-Compute ((pouet 1 [2;3;4])).
+Compute (length (pouet 1 [2;3;4;5;6])).
+Compute ((pouet 1 [2;3;4;5;6])).
 ...
 Compute (length (pouet 1 [2;3;4;5;6])).
 Compute (length (pouet 1 [2;3;4;5;6;7;8])).
