@@ -100,6 +100,30 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
 (* TODO: find a general formula for vect_cross_prod that works
    for any vector size, not only 1, 3 and 7 *)
 
+(*
+[[([1;2]]; [3;4]]; [(1,3); (2,4)]; [(1,4); (2,3)]]
+
+[[([1;2]]; [3;4]; [5;6]];
+ [([1;2]]; [3;5]; [4;6]];
+ [([1;2]]; [3;6]; [4;5]];
+
+ [([1;3]]; [2;4]; [5;6]];
+ [([1;3]]; [2;5]; [4;6]];
+ [([1;3]]; [2;6]; [4;5]];
+
+ [([1;4]]; [2;3]; [5;6]];
+ [([1;4]]; [2;5]; [3;6]];
+ [([1;4]]; [2;6]; [3;5]];
+
+ [([1;5]]; [2;3]; [4;6]];
+ [([1;5]]; [2;4]; [3;6]];
+ [([1;5]]; [2;6]; [3;4]];
+
+ [([1;6]]; [2;3]; [4;5]];
+ [([1;6]]; [2;4]; [3;5]];
+ [([1;6]]; [2;5]; [3;4]];
+*)
+
 Fixpoint pouet A (a : A) (la : list A) :=
   match la with
   | [] => []
@@ -110,7 +134,6 @@ Fixpoint pouet A (a : A) (la : list A) :=
       map (λ lc, (b, c) :: lc) (pouet a lb)
   end.
 
-Compute (length (pouet 1 [2])).
 Compute (length (pouet 1 [2;3;4;5;6])).
 Compute ((pouet 1 [2;3;4;5;6])).
 ...
