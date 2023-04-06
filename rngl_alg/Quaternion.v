@@ -124,6 +124,17 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
  [([1;6]]; [2;5]; [3;4]];
 *)
 
+Fixpoint pouet A (a : A) (la : list A) :=
+  match la with
+  | [] => ([], None)
+  | [b] => ([(a, b)], None)
+  | b :: c :: lc =>
+      match pouet c lc with
+      | (ld, None) =>
+      (map (λ l, (a, b) :: l) (pouet c lc), Some (b, c, lc))
+  end.
+...
+
 Fixpoint pouet A it (a : A) (la : list A) :=
   match it with
   | 0 => []
