@@ -130,10 +130,15 @@ Fixpoint pouet A it (a : A) (la : list A) :=
   | [] => []
   | [b] => [[(a, b)]]
   | [b; c] => []
-  | b :: c :: d :: ld =>
-      map (λ l, (a, b) :: l) (pouet it' c (d :: ld)) ++
-      map (λ l, (a, c) :: l) (pouet it' b (d :: ld)) ++
-      map (λ l, (a, d) :: l) (pouet it' b (c :: ld))
+  | [b; c; d] =>
+      [[(a, b); (c, d)]] ++
+      [[(a, c); (b, d)]] ++
+      [[(a, d); (b, c)]]
+  | [b; c; d; e] => []
+  | b :: c :: d :: e :: ld =>
+      map (λ l, (a, b) :: l) (pouet it' c (d :: e :: ld)) ++
+      map (λ l, (a, c) :: l) (pouet it' b (d :: e :: ld)) ++
+      map (λ l, (a, d) :: l) (pouet it' b (c :: e :: ld))
   end
   end.
 
