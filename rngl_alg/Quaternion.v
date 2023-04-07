@@ -124,30 +124,34 @@ Compute (
  [(1,6); (2,5); (3,4)]]).
 *)
 
-Fixpoint gloup A (la : list A) :=
-  match la with
-  | [] => []
-  | a :: lb => (a, lb) :: map (λ al, (fst al, a :: snd al)) (gloup lb)
-  end.
-
-Fixpoint pouet A it (la : list A) : list (list (A * A)) :=
-  match it with 0 => [] | S it' =>
+Fixpoint comb_elem_rest A (la : list A) :=
   match la with
   | [] => []
   | a :: lb =>
-      let ll := gloup lb in
-      flat_map
-        (λ (bl : (A * list A)),
-           let ll' := (pouet it' (snd bl) : list (list (A * A))) in
-           match ll' with
-           | [] => [[(a, fst bl)]]
-           | _ => map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
-           end)
-        (ll : list (A * list A))
-  end end.
+      (a, lb) :: map (λ al, (fst al, a :: snd al)) (comb_elem_rest lb)
+  end.
 
-Compute (pouet 3 [1;2;3;4;5;6]).
-Compute (pouet 2 [1;2;3;4]).
+Fixpoint pair_comb_loop A it (la : list A) : list (list (A * A)) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] => []
+      | a :: lb =>
+          flat_map
+            (λ bl,
+              match pair_comb_loop it' (snd bl) with
+              | [] => [[(a, fst bl)]]
+              | ll' => map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
+              end)
+            (comb_elem_rest lb)
+      end
+  end.
+
+Definition pair_comb A (la : list A) := pair_comb_loop (length la) la.
+
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (pair_comb [1;2;3;4]).
 (*
 Compute (
 [[(1,2); (3,4); (5,6)];
