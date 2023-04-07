@@ -124,6 +124,29 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
  [([1;6]]; [2;5]; [3;4]];
 *)
 
+Fixpoint gloup A (la : list A) :=
+  match la with
+  | [] => []
+  | a :: lb => (a, lb) :: map (λ al, (fst al, a :: snd al)) (gloup lb)
+  end.
+
+Compute (gloup [2;3;4;5;6]).
+
+(* mouais, bon... *)
+
+Fixpoint pouet A (la : list A) : list (list (A * A)) :=
+  match la with
+  | [] => []
+  | a :: lb =>
+      let ll := gloup lb in
+      map
+        (λ (bl : (A * list A)),
+            map (λ (l : list (A * A)), (fst bl, l))
+              (pouet (snd bl) : list (list (A * A))))
+        (ll : list (A * list A))
+  end.
+...
+
 Fixpoint pouet A it (a : A) (bef : list A) (la : list A) :=
   match it with 0 => [] | S it' =>
   match la with
