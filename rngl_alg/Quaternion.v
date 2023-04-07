@@ -102,26 +102,26 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
 
 (*
 [[([1;2]]; [3;4]]; [(1,3); (2,4)]; [(1,4); (2,3)]]
+Compute (
+[[(1,2); (3,4); (5,6)];
+ [(1,2); (3,5); (4,6)];
+ [(1,2); (3,6); (4,5)];
 
-[[([1;2]]; [3;4]; [5;6]];
- [([1;2]]; [3;5]; [4;6]];
- [([1;2]]; [3;6]; [4;5]];
+ [(1,3); (2,4); (5,6)];
+ [(1,3); (2,5); (4,6)];
+ [(1,3); (2,6); (4,5)];
 
- [([1;3]]; [2;4]; [5;6]];
- [([1;3]]; [2;5]; [4;6]];
- [([1;3]]; [2;6]; [4;5]];
+ [(1,4); (2,3); (5,6)];
+ [(1,4); (2,5); (3,6)];
+ [(1,4); (2,6); (3,5)];
 
- [([1;4]]; [2;3]; [5;6]];
- [([1;4]]; [2;5]; [3;6]];
- [([1;4]]; [2;6]; [3;5]];
+ [(1,5); (2,3); (4,6)];
+ [(1,5); (2,4); (3,6)];
+ [(1,5); (2,6); (3,4)];
 
- [([1;5]]; [2;3]; [4;6]];
- [([1;5]]; [2;4]; [3;6]];
- [([1;5]]; [2;6]; [3;4]];
-
- [([1;6]]; [2;3]; [4;5]];
- [([1;6]]; [2;4]; [3;5]];
- [([1;6]]; [2;5]; [3;4]];
+ [(1,6); (2,3); (4,5)];
+ [(1,6); (2,4); (3,5)];
+ [(1,6); (2,5); (3,4)]]).
 *)
 
 Fixpoint gloup A (la : list A) :=
@@ -130,110 +130,43 @@ Fixpoint gloup A (la : list A) :=
   | a :: lb => (a, lb) :: map (λ al, (fst al, a :: snd al)) (gloup lb)
   end.
 
-Compute (gloup [2;3;4;5;6]).
-
-(* mouais, bon... *)
-
-Fixpoint pouet A (la : list A) : list (list (A * A)) :=
+Fixpoint pouet A it (la : list A) : list (list (A * A)) :=
+  match it with 0 => [] | S it' =>
   match la with
   | [] => []
   | a :: lb =>
       let ll := gloup lb in
-      map
+      flat_map
         (λ (bl : (A * list A)),
-            map (λ (l : list (A * A)), (fst bl, l))
-              (pouet (snd bl) : list (list (A * A))))
+           let ll' := (pouet it' (snd bl) : list (list (A * A))) in
+           match ll' with
+           | [] => [[(a, fst bl)]]
+           | _ => map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
+           end)
         (ll : list (A * list A))
-  end.
-...
-
-Fixpoint pouet A it (a : A) (bef : list A) (la : list A) :=
-  match it with 0 => [] | S it' =>
-  match la with
-  | [] => []
-  | [b] => [[(a, b)]]
-  | b :: c :: lc =>
-      map (λ l, (a, b) :: l) (pouet it' c [] (bef ++ lc)) ++
-      pouet it' a (b :: bef) (c :: lc)
   end end.
 
-Compute (length (pouet 42 1 [] [2;3;4;5;6])).
-Compute (pouet 42 1 [] [2;3;4;5;6]).
-...
+Compute (pouet 42 [1;2;3;4;5;6]).
+Compute (
+[[(1,2); (3,4); (5,6)];
+ [(1,2); (3,5); (4,6)];
+ [(1,2); (3,6); (4,5)];
 
-Fixpoint pouet A it (a : A) (la : list A) :=
-  match it with 0 => [] | S it' =>
-  match la with
-  | [] => []
-  | [b] => [[(a, b)]]
-  | [b; c] => []
-  | [b; c; d] =>
-      [[(a, b); (c, d)]] ++
-      [[(a, c); (b, d)]] ++
-      [[(a, d); (b, c)]]
-  | [b; c; d; e] => []
-  | b :: c :: d :: e :: f :: lf =>
-      map (λ l, (a, b) :: l) (pouet it' c (d :: e :: f :: lf)) ++
-      map (λ l, (a, c) :: l) (pouet it' b (d :: e :: f :: lf)) ++
-      map (λ l, (a, d) :: l) (pouet it' b (c :: e :: f :: lf))
-  end
-  end.
+ [(1,3); (2,4); (5,6)];
+ [(1,3); (2,5); (4,6)];
+ [(1,3); (2,6); (4,5)];
 
-Compute (length (pouet 42 1 [2;3;4;5;6])).
-Compute (pouet 42 1 [2;3;4;5;6]).
+ [(1,4); (2,3); (5,6)];
+ [(1,4); (2,5); (3,6)];
+ [(1,4); (2,6); (3,5)];
 
-...
+ [(1,5); (2,3); (4,6)];
+ [(1,5); (2,4); (3,6)];
+ [(1,5); (2,6); (3,4)];
 
-Fixpoint pouet A it (a : A) (la : list A) :=
-  match it with
-  | 0 => []
-  | S it' =>
-  match la with
-  | [] => []
-  | b :: lb =>
-      match lb with
-      | [] => [[(a, b)]]
-      | c :: lc =>
-          map (λ l, (a, b) :: l) (pouet it' c lc) ++
-          map (λ l, (a, c) :: l) (pouet it' b lc) ++
-          match lc with
-          | [] => []
-          | d :: ld =>
-              map (λ l, (a, d) :: l) (pouet it' b (c :: ld)) ++
-              match ld with
-              | [] => []
-              | e :: le =>
-                  map (λ l, (a, e) :: l) (pouet it' b (c :: d :: le)) ++
-...
-
-Fixpoint pouet A it (a : A) (la : list A) :=
-  match it with
-  | 0 => []
-  | S it' =>
-  match la with
-  | [] => []
-  | [b] => [[(a, b)]]
-  | [b; c] => []
-  | b :: c :: ((d :: lc) as lb) =>
-      map (λ l, (a, b) :: l) (pouet it' c lb) ++
-      map (λ l, (a, c) :: l) (pouet it' b lb) ++
-      map (λ l, (a, d) :: l) (pouet it' b (c :: lc))
-  end
-  end.
-
-Compute (length (pouet 42 1 [2;3;4;5;6])).
-Compute ((pouet 42 1 [2;3;4;5;6])).
-Compute ((pouet 42 1 [2;3;4])).
-...
-Compute (length (pouet 1 [2;3;4;5;6])).
-Compute (length (pouet 1 [2;3;4;5;6;7;8])).
-
-...
-
-Fixpoint glop la :=
-  match l with
-  | a :: la' =>
-      pouet a la'
+ [(1,6); (2,3); (4,5)];
+ [(1,6); (2,4); (3,5)];
+ [(1,6); (2,5); (3,4)]]).
 
 ...
 
