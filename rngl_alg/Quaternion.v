@@ -146,7 +146,9 @@ Fixpoint pouet A it (la : list A) : list (list (A * A)) :=
         (ll : list (A * list A))
   end end.
 
-Compute (pouet 42 [1;2;3;4;5;6]).
+Compute (pouet 3 [1;2;3;4;5;6]).
+Compute (pouet 2 [1;2;3;4]).
+(*
 Compute (
 [[(1,2); (3,4); (5,6)];
  [(1,2); (3,5); (4,6)];
@@ -167,6 +169,7 @@ Compute (
  [(1,6); (2,3); (4,5)];
  [(1,6); (2,4); (3,5)];
  [(1,6); (2,5); (3,4)]]).
+*)
 
 ...
 
