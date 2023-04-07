@@ -51,7 +51,7 @@ Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 11)) []
 
 Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
   let n := vect_size u in
-  let f i := ∑ (j = 1, n - 1), vect_comm u v (i + j) (i + n - 1 - j) in
+  let f i := ∑ (j = 1, n / 2), vect_comm u v (i + j) (i + n - j) in
   mk_vect (map f (seq 1 n)).
 
 Require Import RnglAlg.Qrl.
@@ -61,6 +61,17 @@ Import Q.Notations.
 Compute (
   let qro := Q_ring_like_op in
   vect_cross_prod (mk_vect [1]) (mk_vect [1]))%Q.
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [0;1;0]) (mk_vect [1;0;0]))%Q.
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;0;1]))%Q.
+
+(* ça a l'air d'être bien, ça ! *)
 
 ...
 
@@ -115,6 +126,19 @@ Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
       mk_vect (map f (seq 1 (vect_size u)))
   | _ => mk_vect []
   end.
+
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [1]) (mk_vect [1]))%Q.
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
+
+...
 
 (* TODO: find a general formula for vect_cross_prod that works
    for any vector size, not only 1, 3 and 7 *)
