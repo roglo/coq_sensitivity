@@ -175,8 +175,8 @@ Fixpoint has_no_dup (la : list nat) :=
 
 Compute (pair_comb [1;2;3;4;5;6]).
 Compute (map glip (pair_comb [1;2;3;4;5;6])).
-...
-Compute (filter has_no_dup (map glip (pair_comb [1;2;3;4;5;6]))).
+Compute (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
+Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6]))).
 
 ...
 
