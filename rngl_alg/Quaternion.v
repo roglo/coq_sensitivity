@@ -18,7 +18,7 @@ Definition glop i :=
   let n := 11 in
   let f i := (i - 1) mod n + 1 in
   map (λ ij, (f (fst ij), f (snd ij)))
-    [(i + 1, i + 4); (i + 2, i + 7); (i + 3, i + 5); (i + 6, i + 10); (i + 8, i + 9)].
+    [(i + 1, i + 10); (i + 2, i + 9); (i + 3, i + 8); (i + 4, i + 7); (i + 5, i + 6)].
 
 (*
 Definition glop i :=
@@ -46,6 +46,25 @@ Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 11)) []
        (5, 2); (5, 6); (5, 7); (6, 1); (6, 3); (6, 7); 
        (7, 1); (7, 2); (7, 4)]
 *)
+
+(* new version (experiment) *)
+
+Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
+  let n := vect_size u in
+  let f i := ∑ (j = 1, n - 1), vect_comm u v (i + j) (i + n - 1 - j) in
+  mk_vect (map f (seq 1 n)).
+
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+
+Compute (
+  let qro := Q_ring_like_op in
+  vect_cross_prod (mk_vect [1]) (mk_vect [1]))%Q.
+
+...
+
+(* old version *)
 
 (* with this (personal) definition of "vect_cross_prod", the
    product of two "quaternions" (quat_mul below) is the product
@@ -162,8 +181,6 @@ Fixpoint glip (la : list (nat * nat)) :=
   | [] => []
   | (a, b) :: lb => (b - a) :: glip lb
   end.
-
-Print member.
 
 Fixpoint has_no_dup (la : list nat) :=
   match la with
