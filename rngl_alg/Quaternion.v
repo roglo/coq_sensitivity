@@ -152,6 +152,34 @@ Definition pair_comb A (la : list A) := pair_comb_loop (length la) la.
 
 Compute (pair_comb [1;2;3;4;5;6]).
 Compute (pair_comb [1;2;3;4]).
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (pair_comb [1;2]).
+Compute (pair_comb [1;2;3;4]).
+Compute (pair_comb [1;2;3;4;5;6;7]).
+
+Fixpoint glip (la : list (nat * nat)) :=
+  match la with
+  | [] => []
+  | (a, b) :: lb => (b - a) :: glip lb
+  end.
+
+Print member.
+
+Fixpoint has_no_dup (la : list nat) :=
+  match la with
+  | [] => true
+  | a :: lb =>
+      if member Nat.eqb a lb then false
+      else has_no_dup lb
+  end.
+
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (map glip (pair_comb [1;2;3;4;5;6])).
+...
+Compute (filter has_no_dup (map glip (pair_comb [1;2;3;4;5;6]))).
+
+...
+
 (*
 Compute (
 [[(1,2); (3,4); (5,6)];
