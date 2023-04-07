@@ -71,8 +71,90 @@ Compute (
   let qro := Q_ring_like_op in
   vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;0;1]))%Q.
 
-(* ça a l'air d'être bien, ça ! *)
+Notation "U * V" := (vect_cross_prod U V) : V_scope.
 
+Record quat T := mk_quat { Qre : T; Qim : vector T }.
+Arguments mk_quat {T} Qre%L Qim%V.
+Arguments Qre {T} q%L.
+Arguments Qim {T} q%V.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+Definition quat_add '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
+  mk_quat (a₁ + a₂) (v₁ + v₂).
+
+Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
+  mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
+
+Theorem quat_mul_comm :
+  rngl_mul_is_comm = true →
+  ∀ a b, quat_mul a b = quat_mul b a.
+Proof.
+intros Hic (a, u) (b, v); cbn.
+f_equal. {
+  rewrite (rngl_mul_comm Hic).
+  f_equal.
+  apply (vect_dot_mul_comm Hic).
+}
+rewrite (vect_add_comm (a × v)%V).
+f_equal.
+Theorem vect_cross_prod_anticomm :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  ∀ u v,
+  vect_size u = vect_size v
+  → (u * v = - v * u)%V.
+Proof.
+intros Hop Hic * Huv.
+unfold "*"%V; f_equal.
+destruct u as (la).
+destruct v as (lb); cbn - [ "/" ].
+cbn in Huv.
+rewrite map_length.
+rewrite <- Huv.
+apply map_ext_in.
+intros i Hi.
+unfold vect_comm.
+cbn - [ "/" ].
+rewrite map_length.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  apply in_seq in Hi.
+  do 2 rewrite Nat.add_sub.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  apply in_seq in Hi.
+  do 2 rewrite Nat.add_sub.
+  rewrite (List_map_nth' 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  rewrite (List_map_nth' 0%L). 2: {
+    apply Nat.mod_upper_bound.
+    rewrite <- Huv; flia Hi.
+  }
+  unfold rngl_sub.
+  rewrite Hop.
+  do 2 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_add_comm.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+symmetry.
+remember (length lb) as n eqn:Hn.
+rename Hn into Hb; symmetry in Hb.
+rename Huv into Ha.
+move Ha after Hb.
+rewrite Ha in Hi |-*.
 ...
 
 (* old version *)
