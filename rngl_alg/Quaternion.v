@@ -131,7 +131,7 @@ Fixpoint pouet A it (a : A) (bef : list A) (la : list A) :=
   | [b] => [[(a, b)]]
   | b :: c :: lc =>
       map (λ l, (a, b) :: l) (pouet it' c [] (bef ++ lc)) ++
-      pouet it' a (bef ++ [b]) (c :: lc)
+      pouet it' a (b :: bef) (c :: lc)
   end end.
 
 Compute (length (pouet 42 1 [] [2;3;4;5;6])).
