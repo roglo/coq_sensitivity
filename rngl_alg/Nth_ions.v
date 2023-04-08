@@ -66,16 +66,15 @@ Declare Scope H_scope.
 Delimit Scope H_scope with H.
 Notation "U * V" := (nion_mul U V) : H_scope.
 
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
+Require Import ZArith.
+Require Import RnglAlg.Zrl.
+Open Scope Z_scope.
 
 (* trinions: i²=-1 j²=-1 ij=0 *)
 (* i and j are zero divisors *)
 (* not associative: (ii)j=-j, but i(ij)=0 *)
 Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let i := mk_nion 0 (mk_vect [1;0]) in
   let j := mk_nion 0 (mk_vect [0;1]) in
 (**)
@@ -83,7 +82,7 @@ Compute (
 
 (* quaternions *)
 Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let i := mk_nion 0 (mk_vect [1;0;0]) in
   let j := mk_nion 0 (mk_vect [0;1;0]) in
   let k := mk_nion 0 (mk_vect [0;0;1]) in
@@ -98,7 +97,7 @@ Compute (
 (* ii=-1 ij=0 ik=-j+l il=0 *)
 (* ji=0 jj=-1 jk=0 jl=i-k *)
 Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let i := mk_nion 0 (mk_vect [1;0;0;0]) in
   let j := mk_nion 0 (mk_vect [0;1;0;0]) in
   let k := mk_nion 0 (mk_vect [0;0;1;0]) in
@@ -107,7 +106,7 @@ Compute (
 
 (* sexinions *)
 Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let e1 := mk_nion 0 (mk_vect [1;0;0;0;0]) in
   let e2 := mk_nion 0 (mk_vect [0;1;0;0;0]) in
   let e3 := mk_nion 0 (mk_vect [0;0;1;0;0]) in
@@ -124,7 +123,7 @@ Compute (
 
 (* septinions *)
 Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let e1 := mk_nion 0 (mk_vect [1;0;0;0;0;0]) in
   let e2 := mk_nion 0 (mk_vect [0;1;0;0;0;0]) in
   let e3 := mk_nion 0 (mk_vect [0;0;1;0;0;0]) in
@@ -144,9 +143,8 @@ Compute (
 ...
 
 (* octonions *)
-...
 Time Compute (
-  let qro := Q_ring_like_op in
+  let ro := Z_ring_like_op in
   let e1 := mk_nion 0 (mk_vect [1;0;0;0;0;0;0]) in
   let e2 := mk_nion 0 (mk_vect [0;1;0;0;0;0;0]) in
   let e3 := mk_nion 0 (mk_vect [0;0;1;0;0;0;0]) in
@@ -157,7 +155,7 @@ Time Compute (
   (e1*e4)%H).
 
 (*
-Finished transaction in 30.245 secs (28.591u,1.65s) (successful)
+Finished transaction in 23.527 secs (22.043u,1.48s) (successful)
 *)
 
 (* e1*e1=-1 e1*e2=e5 e1*e3=-e2 e1*e4=e6 *)
