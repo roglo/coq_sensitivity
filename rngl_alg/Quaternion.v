@@ -145,6 +145,27 @@ Compute (
    e5*e1=e3 e5*e2=-e1 e5*e3=e4 e5*e4=-e2 e5*e5=-1
 *)
 
+(* septinions *)
+Compute (
+  let qro := Q_ring_like_op in
+  let e1 := mk_quat 0 (mk_vect [1;0;0;0;0;0]) in
+  let e2 := mk_quat 0 (mk_vect [0;1;0;0;0;0]) in
+  let e3 := mk_quat 0 (mk_vect [0;0;1;0;0;0]) in
+  let e4 := mk_quat 0 (mk_vect [0;0;0;1;0;0]) in
+  let e5 := mk_quat 0 (mk_vect [0;0;0;0;1;0]) in
+  let e6 := mk_quat 0 (mk_vect [0;0;0;0;0;1]) in
+  map (λ e, (e2*e)%H) [e1;e2;e3;e4;e5;e6]).
+
+(* e1*e1=-1 e1*e2=0 e1*e3=-e2+e5 e1*e4=0 e1*e5=-e3+e6 e1*e6=0
+   e2*e1=0 e2*e2=-1 e2*e3=0 e2*e4=-e3+e6 e2*e5=0 e2*e6=e1-e4
+...
+   e3*e1= e3*e2= e3*e3= e3*e4= e3*e5= e3*e6=
+   e4*e1= e4*e2= e4*e3= e4*e4= e4*e5= e4*e6=
+   e5*e1= e5*e2= e5*e3= e5*e4= e5*e5= e5*e6=
+*)
+
+...
+
 (* octonions *)
 ...
 Time Compute (
