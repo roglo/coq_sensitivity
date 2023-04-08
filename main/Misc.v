@@ -443,6 +443,22 @@ Proof. easy. Qed.
 Theorem List_cons_is_app : ∀ A (a : A) la, a :: la = [a] ++ la.
 Proof. easy. Qed.
 
+Theorem List_map_seq : ∀ A (f : _ → A) sta len,
+  map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
+Proof.
+intros.
+revert sta.
+induction len; intros; [ easy | cbn ].
+symmetry.
+rewrite <- seq_shift, map_map.
+rewrite Nat.add_0_r; f_equal.
+symmetry.
+rewrite IHlen.
+apply map_ext_in.
+intros i Hi.
+now rewrite Nat.add_succ_comm.
+Qed.
+
 (* map2: map with two lists *)
 
 Fixpoint map2 {A B C} (f : A → B → C) la lb :=
@@ -685,6 +701,27 @@ rewrite <- seq_shift.
 rewrite map2_map_l.
 apply map2_ext_in.
 intros; f_equal; flia.
+Qed.
+
+Theorem map2_map_min :
+  ∀ A B d la lb (f : A → A → B),
+  map2 f la lb =
+    map (λ i, f (nth i la d) (nth i lb d))
+      (seq 0 (min (length la) (length lb))).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+cbn - [ nth ].
+do 2 rewrite List_nth_0_cons.
+f_equal.
+rewrite List_map_seq.
+rewrite IHla.
+apply map_ext_in.
+intros i Hi.
+do 2 rewrite List_nth_succ_cons.
+easy.
 Qed.
 
 (* end map2 *)
@@ -1662,22 +1699,6 @@ rewrite <- seq_shift.
 rewrite map_map.
 apply map_ext_in.
 intros; f_equal; flia.
-Qed.
-
-Theorem List_map_seq : ∀ A (f : _ → A) sta len,
-  map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
-Proof.
-intros.
-revert sta.
-induction len; intros; [ easy | cbn ].
-symmetry.
-rewrite <- seq_shift, map_map.
-rewrite Nat.add_0_r; f_equal.
-symmetry.
-rewrite IHlen.
-apply map_ext_in.
-intros i Hi.
-now rewrite Nat.add_succ_comm.
 Qed.
 
 Theorem List_map_seq_length : ∀ A (f : _ → A) a len,

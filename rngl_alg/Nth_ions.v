@@ -5,6 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Import Init.Nat.
 
 Require Import Main.Misc Main.RingLike.
 Require Import Main.IterAdd Main.MyVector.
@@ -277,10 +278,10 @@ Proof.
 intros.
 unfold vect_dot_mul; cbn.
 rewrite <- rngl_summation_list_app.
-Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
-Search (∑ (_ ∈ map2 _ _), _).
-Search (map2 _ (map2 _ _ _)).
-Search (map2 _ _ _ ++ map2 _ _ _).
+do 4 rewrite (map2_map_min 0%L).
+rewrite map_length.
+rewrite seq_length.
+do 3 rewrite fold_vect_size.
 ... ...
 do 2 rewrite vect_dot_mul_add_l.
 ...
