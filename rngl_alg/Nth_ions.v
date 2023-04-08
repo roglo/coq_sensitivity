@@ -290,9 +290,8 @@ do 4 rewrite (map2_map_min 0%L).
 rewrite map_length.
 rewrite seq_length.
 do 3 rewrite rngl_summation_list_map.
-...
-remember (min (vect_size u) (vect_size v)) as m eqn:Hm; symmetry in Hm.
-destruct (le_dec (vect_size w) m) as [H1| H1]. {
+remember (min (length la) (length lb)) as m eqn:Hm; symmetry in Hm.
+destruct (le_dec (length lc) m) as [H1| H1]. {
   rewrite Nat.min_r; [ | easy ].
   rewrite Nat.min_r. 2: {
     transitivity m; [ easy | ].
@@ -304,8 +303,25 @@ destruct (le_dec (vect_size w) m) as [H1| H1]. {
     rewrite <- Hm.
     apply Nat.le_min_r.
   }
-  rewrite rngl_summation_list_app.
-Search (∑ (_ ∈ map _ _), _).
+  rewrite <- rngl_summation_list_add_distr.
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  assert (Him : i < m) by flia H1 Hi.
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  apply rngl_mul_add_distr_r.
+}
+apply Nat.nle_gt in H1.
+rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  easy.
+}
+cbn.
 ... ...
 do 2 rewrite vect_dot_mul_add_l.
 ...

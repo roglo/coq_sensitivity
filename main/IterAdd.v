@@ -708,6 +708,7 @@ Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_eq_compat {T ro} _ _ (b k)%nat.
 Arguments rngl_summation_filter {T ro rp} A%type l%list.
+Arguments rngl_summation_list_add_distr {T ro rp A} (g h)%function l%list.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_change_var {T ro} (A B)%type l%list.
 Arguments rngl_summation_list_concat {T ro rp} A%type ll%list.
