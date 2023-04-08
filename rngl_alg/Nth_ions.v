@@ -275,13 +275,37 @@ Search (vect_dot_mul).
 Theorem vect_dot_mul_add_l :
   ∀ u v w, ≺ u + v, w ≻ = (≺ u, w ≻ + ≺ v, w ≻)%L.
 Proof.
+(*
 intros.
+rewrite vect_dot_mul_dot_mul'.
+rewrite vect_dot_mul_dot_mul'.
+rewrite vect_dot_mul_dot_mul'.
+unfold vect_dot_mul'; cbn.
+rewrite map2_length.
+...
+*)
+intros (la) (lb) (lc).
 unfold vect_dot_mul; cbn.
-rewrite <- rngl_summation_list_app.
 do 4 rewrite (map2_map_min 0%L).
 rewrite map_length.
 rewrite seq_length.
-do 3 rewrite fold_vect_size.
+do 3 rewrite rngl_summation_list_map.
+...
+remember (min (vect_size u) (vect_size v)) as m eqn:Hm; symmetry in Hm.
+destruct (le_dec (vect_size w) m) as [H1| H1]. {
+  rewrite Nat.min_r; [ | easy ].
+  rewrite Nat.min_r. 2: {
+    transitivity m; [ easy | ].
+    rewrite <- Hm.
+    apply Nat.le_min_l.
+  }
+  rewrite Nat.min_r. 2: {
+    transitivity m; [ easy | ].
+    rewrite <- Hm.
+    apply Nat.le_min_r.
+  }
+  rewrite rngl_summation_list_app.
+Search (∑ (_ ∈ map _ _), _).
 ... ...
 do 2 rewrite vect_dot_mul_add_l.
 ...
