@@ -258,6 +258,8 @@ Theorem nion_mul_assoc :
   → nion_mul (nion_mul a b) c = nion_mul a (nion_mul b c).
 Proof.
 intros Hop Hic n (a, u) (b, v) (c, w) Hu Hv Hw; cbn in Hu, Hv, Hw |-*.
+f_equal. {
+  unfold vect_dot_mul.
 ...
 
 (* to be completed... *)
