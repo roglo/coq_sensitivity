@@ -140,7 +140,11 @@ Time Compute (
   let e7 := mk_quat 0 (mk_vect [0;0;0;0;0;0;1]) in
   (e1*e3)%H).
 
-(* e1*e1=-1 e1*e2=e5 e1*e3= *)
+(*
+Finished transaction in 30.245 secs (28.591u,1.65s) (successful)
+*)
+
+(* e1*e1=-1 e1*e2=e5 e1*e3=-e2 *)
 
 ...
 Theorem vect_cross_mul_anticomm :
