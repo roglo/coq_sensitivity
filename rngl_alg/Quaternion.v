@@ -90,18 +90,6 @@ Definition quat_add '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
 Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
   mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
-Theorem quat_mul_comm :
-  rngl_mul_is_comm = true →
-  ∀ a b, quat_mul a b = quat_mul b a.
-Proof.
-intros Hic (a, u) (b, v); cbn.
-f_equal. {
-  rewrite (rngl_mul_comm Hic).
-  f_equal.
-  apply (vect_dot_mul_comm Hic).
-}
-rewrite (vect_add_comm (a × v)%V).
-f_equal.
 Theorem vect_cross_prod_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -146,15 +134,34 @@ erewrite rngl_summation_eq_compat. 2: {
   do 2 rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_opp_involutive Hop).
   rewrite rngl_add_comm.
+  rewrite (fold_rngl_sub Hop).
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_comm Hic (nth _ lb _)).
   easy.
 }
-remember (∑ (j = _, _), _) as x; subst x.
-symmetry.
-remember (length lb) as n eqn:Hn.
-rename Hn into Hb; symmetry in Hb.
-rename Huv into Ha.
-move Ha after Hb.
-rewrite Ha in Hi |-*.
+rewrite <- Huv.
+easy.
+Qed.
+
+Theorem quat_mul_comm :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  ∀ a b,
+  vect_size (Qim a) = vect_size (Qim b)
+  → quat_mul a b = quat_mul b a.
+Proof.
+intros Hop Hic (a, u) (b, v) Huv; cbn in Huv |-*.
+move b before a.
+f_equal. {
+  rewrite (rngl_mul_comm Hic).
+  f_equal.
+  apply (vect_dot_mul_comm Hic).
+}
+rewrite (vect_add_comm (a × v)%V).
+f_equal.
+rewrite (vect_cross_prod_anticomm Hop Hic _ _ Huv).
+(* bizarre : normalement, les complexes (vect_size u = 1) sont commutatifs
+   mais les quaternions (vect_size u = 3) sont anticommutatifs *)
 ...
 
 (* old version *)

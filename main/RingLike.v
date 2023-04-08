@@ -1732,17 +1732,10 @@ Context {rp : ring_like_prop T}.
 Context {Hic : @rngl_mul_is_comm T ro rp = true}.
 Context {Hop : @rngl_has_opp T ro = true}.
 
-Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%L.
-Proof.
-intros.
-unfold rngl_sub.
-now rewrite Hop.
-Qed.
-
 Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%L = 0%L.
 Proof.
 intros.
-rewrite fold_rngl_sub; [ | easy ].
+rewrite (fold_rngl_sub Hop).
 apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
@@ -1755,7 +1748,7 @@ Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
      Rmul_comm := rngl_mul_comm Hic;
      Rmul_assoc := rngl_mul_assoc;
      Rdistr_l := rngl_mul_add_distr_r;
-     Rsub_def := rngl_Rsub_def;
+     Rsub_def x y := eq_sym (fold_rngl_sub Hop x y);
      Ropp_def := rngl_Ropp_def |}.
 
 Theorem rngl_pow_0_l :
