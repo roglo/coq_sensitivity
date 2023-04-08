@@ -148,7 +148,7 @@ Time Compute (
   let e5 := mk_nion 0 (mk_vect [0;0;0;0;1;0;0]) in
   let e6 := mk_nion 0 (mk_vect [0;0;0;0;0;1;0]) in
   let e7 := mk_nion 0 (mk_vect [0;0;0;0;0;0;1]) in
-  (e1*e4)%H).
+  (e3*e4)%H).
 
 (*
 Finished transaction in 23.527 secs (22.043u,1.48s) (successful)

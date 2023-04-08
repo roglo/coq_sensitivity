@@ -38,6 +38,9 @@ let vect_cross_mul (u : 'a vector) (v : 'a vector) =
 type 'a nion = { qre : 'a; qim : 'a vector };;
 let mk_nion r i = { qre = r; qim = i };;
 
+let nion_add {qre = a1; qim = v1} {qre = a2; qim = v2} =
+  mk_nion (a1 + a2) (vect_add v1 v2);;
+
 let nion_mul {qre = a1; qim = v1} {qre = a2; qim = v2} =
   mk_nion (a1 * a2 - vect_dot_mul v1 v2)
     (vect_add
@@ -51,5 +54,5 @@ let _e4 = mk_nion 0 (mk_vect [0;0;0;1;0;0;0]) in
 let _e5 = mk_nion 0 (mk_vect [0;0;0;0;1;0;0]) in
 let _e6 = mk_nion 0 (mk_vect [0;0;0;0;0;1;0]) in
 let _e7 = mk_nion 0 (mk_vect [0;0;0;0;0;0;1]) in
-nion_mul _e1 _e4;;
+List.map (fun e -> nion_mul _e3 e) [_e1;_e2;_e3;_e4;_e5;_e6;_e7];;
 
