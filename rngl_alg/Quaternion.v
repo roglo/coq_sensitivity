@@ -127,6 +127,20 @@ Compute (
   let l := mk_quat 0 (mk_vect [0;0;0;1]) in
   (j*l)%H).
 
+(* octonions *)
+Time Compute (
+  let qro := Q_ring_like_op in
+  let e1 := mk_quat 0 (mk_vect [1;0;0;0;0;0;0]) in
+  let e2 := mk_quat 0 (mk_vect [0;1;0;0;0;0;0]) in
+  let e3 := mk_quat 0 (mk_vect [0;0;1;0;0;0;0]) in
+  let e4 := mk_quat 0 (mk_vect [0;0;0;1;0;0;0]) in
+  let e5 := mk_quat 0 (mk_vect [0;0;0;0;1;0;0]) in
+  let e6 := mk_quat 0 (mk_vect [0;0;0;0;0;1;0]) in
+  let e7 := mk_quat 0 (mk_vect [0;0;0;0;0;0;1]) in
+  (e1*e3)%H).
+
+(* e1*e1=-1 e1*e2=e5 e1*e3= *)
+
 ...
 Theorem vect_cross_mul_anticomm :
   rngl_has_opp = true →
