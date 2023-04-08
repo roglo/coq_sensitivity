@@ -95,6 +95,40 @@ Definition quat_opp '(mk_quat a v) :=
 Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
   mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
+End a.
+
+Declare Scope H_scope.
+Delimit Scope H_scope with H.
+Notation "U * V" := (quat_mul U V) : H_scope.
+
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+
+(* trinions: i²=-1 j²=-1 ij=0 *)
+(* (i²)(j²)=1 i(ij)j=0 ⇒ not associative! *)
+(*
+  i(jj)=-i
+  (ij)j=0
+*)
+Compute (
+  let qro := Q_ring_like_op in
+  let i := mk_quat 0 (mk_vect [1;0]) in
+  let j := mk_quat 0 (mk_vect [0;1]) in
+(**)
+  (i * (j * j))%H).
+...
+  quat_mul (quat_mul i (quat_mul i j)) j
+(*
+  quat_mul (quat_mul i (quat_mul i j)) j
+*)
+(*
+  quat_mul (quat_mul i i) (quat_mul j j)
+*)
+).
+
+...
 Theorem vect_cross_mul_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
