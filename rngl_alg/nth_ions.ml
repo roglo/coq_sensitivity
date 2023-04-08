@@ -54,5 +54,6 @@ let _e4 = mk_nion 0 (mk_vect [0;0;0;1;0;0;0]) in
 let _e5 = mk_nion 0 (mk_vect [0;0;0;0;1;0;0]) in
 let _e6 = mk_nion 0 (mk_vect [0;0;0;0;0;1;0]) in
 let _e7 = mk_nion 0 (mk_vect [0;0;0;0;0;0;1]) in
-List.map (fun e -> nion_mul _e3 e) [_e1;_e2;_e3;_e4;_e5;_e6;_e7];;
+(List.map (fun e -> nion_mul _e1 e) [_e1;_e2;_e3;_e4;_e5;_e6;_e7],
+ List.map (fun e -> nion_mul _e3 e) [_e1;_e2;_e3;_e4;_e5;_e6;_e7]);;
 
