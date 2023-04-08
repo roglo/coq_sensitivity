@@ -1,5 +1,4 @@
-(* quaternions *)
-(* ... and other sorts of "...ions" *)
+(* complex, quaternion, octonions ... and other sorts of "...ions" *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
@@ -76,10 +75,10 @@ Compute (
 
 Notation "U * V" := (vect_cross_mul U V) : V_scope.
 
-Record quat T := mk_quat { Qre : T; Qim : vector T }.
-Arguments mk_quat {T} Qre%L Qim%V.
-Arguments Qre {T} q%L.
-Arguments Qim {T} q%V.
+Record nion T := mk_nion { Qre : T; Qim : vector T }.
+Arguments mk_nion {T} Qre%L Qim%V.
+Arguments Qre {T} n%L.
+Arguments Qim {T} n%V.
 
 Section a.
 
@@ -87,20 +86,20 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Definition quat_add '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
-  mk_quat (a₁ + a₂) (v₁ + v₂).
+Definition nion_add '(mk_nion a₁ v₁) '(mk_nion a₂ v₂) :=
+  mk_nion (a₁ + a₂) (v₁ + v₂).
 
-Definition quat_opp '(mk_quat a v) :=
-  mk_quat (- a) (- v).
+Definition nion_opp '(mk_nion a v) :=
+  mk_nion (- a) (- v).
 
-Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
-  mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
+Definition nion_mul '(mk_nion a₁ v₁) '(mk_nion a₂ v₂) :=
+  mk_nion ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
 End a.
 
 Declare Scope H_scope.
 Delimit Scope H_scope with H.
-Notation "U * V" := (quat_mul U V) : H_scope.
+Notation "U * V" := (nion_mul U V) : H_scope.
 
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
@@ -112,30 +111,43 @@ Open Scope Q_scope.
 (* not associative: (ii)j=-j, but i(ij)=0 *)
 Compute (
   let qro := Q_ring_like_op in
-  let i := mk_quat 0 (mk_vect [1;0]) in
-  let j := mk_quat 0 (mk_vect [0;1]) in
+  let i := mk_nion 0 (mk_vect [1;0]) in
+  let j := mk_nion 0 (mk_vect [0;1]) in
 (**)
   (i * (j * j))%H).
+
+(* quaternions *)
+Compute (
+  let qro := Q_ring_like_op in
+  let i := mk_nion 0 (mk_vect [1;0;0]) in
+  let j := mk_nion 0 (mk_vect [0;1;0]) in
+  let k := mk_nion 0 (mk_vect [0;0;1]) in
+  map (λ e, (k*e)%H) [i;j;k]).
+
+(* i*i=-1 i*j=k i*k=-j
+   j*i=-k j*j=-1 j*k=i
+   k*i=j k*j=-i k*k=-1
+*)
 
 (* quintinions *)
 (* ii=-1 ij=0 ik=-j+l il=0 *)
 (* ji=0 jj=-1 jk=0 jl=i-k *)
 Compute (
   let qro := Q_ring_like_op in
-  let i := mk_quat 0 (mk_vect [1;0;0;0]) in
-  let j := mk_quat 0 (mk_vect [0;1;0;0]) in
-  let k := mk_quat 0 (mk_vect [0;0;1;0]) in
-  let l := mk_quat 0 (mk_vect [0;0;0;1]) in
+  let i := mk_nion 0 (mk_vect [1;0;0;0]) in
+  let j := mk_nion 0 (mk_vect [0;1;0;0]) in
+  let k := mk_nion 0 (mk_vect [0;0;1;0]) in
+  let l := mk_nion 0 (mk_vect [0;0;0;1]) in
   (j*l)%H).
 
 (* sexinions *)
 Compute (
   let qro := Q_ring_like_op in
-  let e1 := mk_quat 0 (mk_vect [1;0;0;0;0]) in
-  let e2 := mk_quat 0 (mk_vect [0;1;0;0;0]) in
-  let e3 := mk_quat 0 (mk_vect [0;0;1;0;0]) in
-  let e4 := mk_quat 0 (mk_vect [0;0;0;1;0]) in
-  let e5 := mk_quat 0 (mk_vect [0;0;0;0;1]) in
+  let e1 := mk_nion 0 (mk_vect [1;0;0;0;0]) in
+  let e2 := mk_nion 0 (mk_vect [0;1;0;0;0]) in
+  let e3 := mk_nion 0 (mk_vect [0;0;1;0;0]) in
+  let e4 := mk_nion 0 (mk_vect [0;0;0;1;0]) in
+  let e5 := mk_nion 0 (mk_vect [0;0;0;0;1]) in
   map (λ e, (e5*e)%H) [e1;e2;e3;e4;e5]).
 
 (* e1*e1=-1 e1*e2=e4 e1*e3=-e2 e1*e4=e5 e1*e5=-e3
@@ -148,12 +160,12 @@ Compute (
 (* septinions *)
 Compute (
   let qro := Q_ring_like_op in
-  let e1 := mk_quat 0 (mk_vect [1;0;0;0;0;0]) in
-  let e2 := mk_quat 0 (mk_vect [0;1;0;0;0;0]) in
-  let e3 := mk_quat 0 (mk_vect [0;0;1;0;0;0]) in
-  let e4 := mk_quat 0 (mk_vect [0;0;0;1;0;0]) in
-  let e5 := mk_quat 0 (mk_vect [0;0;0;0;1;0]) in
-  let e6 := mk_quat 0 (mk_vect [0;0;0;0;0;1]) in
+  let e1 := mk_nion 0 (mk_vect [1;0;0;0;0;0]) in
+  let e2 := mk_nion 0 (mk_vect [0;1;0;0;0;0]) in
+  let e3 := mk_nion 0 (mk_vect [0;0;1;0;0;0]) in
+  let e4 := mk_nion 0 (mk_vect [0;0;0;1;0;0]) in
+  let e5 := mk_nion 0 (mk_vect [0;0;0;0;1;0]) in
+  let e6 := mk_nion 0 (mk_vect [0;0;0;0;0;1]) in
   map (λ e, (e2*e)%H) [e1;e2;e3;e4;e5;e6]).
 
 (* e1*e1=-1 e1*e2=0 e1*e3=-e2+e5 e1*e4=0 e1*e5=-e3+e6 e1*e6=0
@@ -170,13 +182,13 @@ Compute (
 ...
 Time Compute (
   let qro := Q_ring_like_op in
-  let e1 := mk_quat 0 (mk_vect [1;0;0;0;0;0;0]) in
-  let e2 := mk_quat 0 (mk_vect [0;1;0;0;0;0;0]) in
-  let e3 := mk_quat 0 (mk_vect [0;0;1;0;0;0;0]) in
-  let e4 := mk_quat 0 (mk_vect [0;0;0;1;0;0;0]) in
-  let e5 := mk_quat 0 (mk_vect [0;0;0;0;1;0;0]) in
-  let e6 := mk_quat 0 (mk_vect [0;0;0;0;0;1;0]) in
-  let e7 := mk_quat 0 (mk_vect [0;0;0;0;0;0;1]) in
+  let e1 := mk_nion 0 (mk_vect [1;0;0;0;0;0;0]) in
+  let e2 := mk_nion 0 (mk_vect [0;1;0;0;0;0;0]) in
+  let e3 := mk_nion 0 (mk_vect [0;0;1;0;0;0;0]) in
+  let e4 := mk_nion 0 (mk_vect [0;0;0;1;0;0;0]) in
+  let e5 := mk_nion 0 (mk_vect [0;0;0;0;1;0;0]) in
+  let e6 := mk_nion 0 (mk_vect [0;0;0;0;0;1;0]) in
+  let e7 := mk_nion 0 (mk_vect [0;0;0;0;0;0;1]) in
   (e1*e4)%H).
 
 (*
@@ -239,13 +251,13 @@ rewrite <- Huv.
 easy.
 Qed.
 
-Theorem quat_mul_comm_anticomm :
+Theorem nion_mul_comm_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ n a b,
   vect_size (Qim a) = n
   → vect_size (Qim b) = n
-  → quat_mul a b = if n <? 2 then quat_mul b a else quat_opp (quat_mul b a).
+  → nion_mul a b = if n <? 2 then nion_mul b a else nion_opp (nion_mul b a).
 Proof.
 intros Hop Hic n (a, u) (b, v) Hu Hv; cbn in Hu, Hv |-*.
 move b before a.
@@ -271,7 +283,7 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
 }
 apply Nat.nlt_ge in Hn2.
 f_equal. {
-(* ah oui, non, c'est pas anticommutatif, les quaternions *)
+(* ah oui, non, c'est pas anticommutatif, les nionernions *)
 ...
     f_equal. {
       f_equal.
@@ -303,8 +315,8 @@ apply Nat.nlt_ge in Hn2.
 (* old version *)
 
 (* with this (personal) definition of "vect_cross_mul", the
-   product of two "quaternions" (quat_mul below) is the product
-   in normal quaternions if vect_size = 3, but also the product
+   product of two "nionernions" (nion_mul below) is the product
+   in normal nionernions if vect_size = 3, but also the product
    in complex numbers if vect_size = 1; perhaps also the product
    in octonions if vect_size = 7 (to be verified) *)
 
@@ -314,7 +326,7 @@ Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
       (* cross product for complex *)
       mk_vect [0%L]
   | 1 =>
-      (* cross product for quaternions *)
+      (* cross product for nionernions *)
       let f i := vect_comm u v (i + 1) (i + 2) in (* Δ=1 *)
       mk_vect (map f (seq 1 (vect_size u)))
   | 2 =>
@@ -482,13 +494,13 @@ Compute (let n := 1 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n 
 
 Notation "U * V" := (vect_cross_mul U V) : V_scope.
 
-Record quat T := mk_quat { Qre : T; Qim : vector T }.
-Arguments mk_quat {T} Qre%L Qim%V.
+Record nion T := mk_nion { Qre : T; Qim : vector T }.
+Arguments mk_nion {T} Qre%L Qim%V.
 Arguments Qre {T} q%L.
 Arguments Qim {T} q%V.
 
-Declare Scope quat_scope.
-Delimit Scope quat_scope with H.
+Declare Scope nion_scope.
+Delimit Scope nion_scope with H.
 
 Section a.
 
@@ -496,15 +508,15 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Definition quat_add '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
-  mk_quat (a₁ + a₂) (v₁ + v₂).
+Definition nion_add '(mk_nion a₁ v₁) '(mk_nion a₂ v₂) :=
+  mk_nion (a₁ + a₂) (v₁ + v₂).
 
-Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
-  mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
+Definition nion_mul '(mk_nion a₁ v₁) '(mk_nion a₂ v₂) :=
+  mk_nion ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
-Definition Qi := mk_quat 0 (mk_vect [1; 0; 0]%L).
-Definition Qj := mk_quat 0 (mk_vect [0; 1; 0]%L).
-Definition Qk := mk_quat 0 (mk_vect [0; 0; 1]%L).
+Definition Qi := mk_nion 0 (mk_vect [1; 0; 0]%L).
+Definition Qj := mk_nion 0 (mk_vect [0; 1; 0]%L).
+Definition Qk := mk_nion 0 (mk_vect [0; 0; 1]%L).
 
 (*
 End a.
@@ -516,15 +528,15 @@ Import Q.Notations.
 Compute (
   let qro := Q_ring_like_op in
   map (λ n,
-  (quat_mul
-     (mk_quat 0 (mk_vect (0 :: 0 :: 1 :: repeat 0 n)))
-     (mk_quat 0 (mk_vect (1 :: repeat 0 (S (S n))))))%L)
+  (nion_mul
+     (mk_nion 0 (mk_vect (0 :: 0 :: 1 :: repeat 0 n)))
+     (mk_nion 0 (mk_vect (1 :: repeat 0 (S (S n))))))%L)
   (seq 0 10)).
 *)
 
-Theorem quat_mul_comm :
+Theorem nion_mul_comm :
   rngl_mul_is_comm = true →
-  ∀ a b, quat_mul a b = quat_mul b a.
+  ∀ a b, nion_mul a b = nion_mul b a.
 Proof.
 intros Hic (a, u) (b, v); cbn.
 f_equal. {
@@ -633,13 +645,13 @@ apply (vect_cross_mul_comm Hic).
 ...
 
 
-Theorem quat_mul_1 :
+Theorem nion_mul_1 :
   rngl_has_opp = true →
   ∀ n,
-  quat_mul
-    (mk_quat 0 (mk_vect (1%L :: repeat 0%L n)))
-    (mk_quat 0 (mk_vect (1%L :: repeat 0%L n))) =
-  mk_quat (-1)%L (mk_vect (repeat 0%L (S n))).
+  nion_mul
+    (mk_nion 0 (mk_vect (1%L :: repeat 0%L n)))
+    (mk_nion 0 (mk_vect (1%L :: repeat 0%L n))) =
+  mk_nion (-1)%L (mk_vect (repeat 0%L (S n))).
 Proof.
 intros Hop *.
 assert (Hos : rngl_has_opp_or_subt = true). {
