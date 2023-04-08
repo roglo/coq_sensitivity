@@ -16,7 +16,7 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
 
 Arguments vect_comm {T ro} (u v)%V (i j)%nat.
 
-(* vector product in any dimension (not only 3 and 7)
+(* vector cross product in any dimension (not only 3 and 7)
    the dimension is given through the size of the input vectors u and v *)
 Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   let n := vect_size u in
