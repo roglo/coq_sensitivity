@@ -270,60 +270,17 @@ f_equal. {
   f_equal.
   rewrite (rngl_mul_comm Hic).
   do 2 rewrite <- (vect_scal_mul_dot_mul_comm Hos).
-Search ( ≺ _ + _, _ ≻%V).
-Search (vect_dot_mul).
-Theorem vect_dot_mul_add_l :
-  ∀ u v w, ≺ u + v, w ≻ = (≺ u, w ≻ + ≺ v, w ≻)%L.
-Proof.
-(*
-intros.
-rewrite vect_dot_mul_dot_mul'.
-rewrite vect_dot_mul_dot_mul'.
-rewrite vect_dot_mul_dot_mul'.
-unfold vect_dot_mul'; cbn.
-rewrite map2_length.
-...
-*)
-intros (la) (lb) (lc).
-unfold vect_dot_mul; cbn.
-do 4 rewrite (map2_map_min 0%L).
-rewrite map_length.
-rewrite seq_length.
-do 3 rewrite rngl_summation_list_map.
-remember (min (length la) (length lb)) as m eqn:Hm; symmetry in Hm.
-destruct (le_dec (length lc) m) as [H1| H1]. {
-  rewrite Nat.min_r; [ | easy ].
-  rewrite Nat.min_r. 2: {
-    transitivity m; [ easy | ].
-    rewrite <- Hm.
-    apply Nat.le_min_l.
-  }
-  rewrite Nat.min_r. 2: {
-    transitivity m; [ easy | ].
-    rewrite <- Hm.
-    apply Nat.le_min_r.
-  }
-  rewrite <- rngl_summation_list_add_distr.
-  apply rngl_summation_list_eq_compat.
-  intros i Hi.
-  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-  assert (Him : i < m) by flia H1 Hi.
-  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  apply rngl_mul_add_distr_r.
+  rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
+  unfold vect_size; cbn.
+  rewrite map2_length.
+  do 2 rewrite map_length.
+  do 2 rewrite fold_vect_size.
+  rewrite Hv, Hu.
+  apply Nat.min_id.
+} {
+  unfold vect_size; cbn.
+  now rewrite List_map_seq_length.
 }
-apply Nat.nle_gt in H1.
-rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
-  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-  rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  easy.
-}
-cbn.
-... ...
-do 2 rewrite vect_dot_mul_add_l.
 ...
 
 (* to be completed... *)
