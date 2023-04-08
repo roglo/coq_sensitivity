@@ -56,6 +56,7 @@ Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   let f i := ∑ (j = 1, n / 2), vect_comm u v (i + j) (i + n - j) in
   mk_vect (map f (seq 1 n)).
 
+(*
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
@@ -166,7 +167,7 @@ Compute (
   let e4 := mk_nion 0 (mk_vect [0;0;0;1;0;0]) in
   let e5 := mk_nion 0 (mk_vect [0;0;0;0;1;0]) in
   let e6 := mk_nion 0 (mk_vect [0;0;0;0;0;1]) in
-  map (λ e, (e2*e)%H) [e1;e2;e3;e4;e5;e6]).
+  map (λ e, (e3*e)%H) [e1;e2;e3;e4;e5;e6]).
 
 (* e1*e1=-1 e1*e2=0 e1*e3=-e2+e5 e1*e4=0 e1*e5=-e3+e6 e1*e6=0
    e2*e1=0 e2*e2=-1 e2*e3=0 e2*e4=-e3+e6 e2*e5=0 e2*e6=e1-e4
@@ -762,3 +763,4 @@ destruct n. {
 ...
 
 (* to be completed... *)
+*)
