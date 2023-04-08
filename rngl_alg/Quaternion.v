@@ -14,6 +14,8 @@ Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
   let j := (j - 1) mod vect_size u + 1 in
   (vect_el u i * vect_el v j - vect_el u j * vect_el v i)%L.
 
+Arguments vect_comm {T ro} (u v)%V (i j)%nat.
+
 Definition glop i :=
   let n := 11 in
   let f i := (i - 1) mod n + 1 in
@@ -49,7 +51,7 @@ Compute (isort pair_le (fold_left (λ la lb, app la lb) (map glop (seq 1 11)) []
 
 (* new version (experiment) *)
 
-Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
+Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   let n := vect_size u in
   let f i := ∑ (j = 1, n / 2), vect_comm u v (i + j) (i + n - j) in
   mk_vect (map f (seq 1 n)).
@@ -60,18 +62,18 @@ Import Q.Notations.
 
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [1]) (mk_vect [1]))%Q.
+  vect_cross_mul (mk_vect [1]) (mk_vect [1]))%Q.
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
+  vect_cross_mul (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [0;1;0]) (mk_vect [1;0;0]))%Q.
+  vect_cross_mul (mk_vect [0;1;0]) (mk_vect [1;0;0]))%Q.
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;0;1]))%Q.
+  vect_cross_mul (mk_vect [1;0;0]) (mk_vect [0;0;1]))%Q.
 
-Notation "U * V" := (vect_cross_prod U V) : V_scope.
+Notation "U * V" := (vect_cross_mul U V) : V_scope.
 
 Record quat T := mk_quat { Qre : T; Qim : vector T }.
 Arguments mk_quat {T} Qre%L Qim%V.
@@ -87,10 +89,13 @@ Context {rp : ring_like_prop T}.
 Definition quat_add '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
   mk_quat (a₁ + a₂) (v₁ + v₂).
 
+Definition quat_opp '(mk_quat a v) :=
+  mk_quat (- a) (- v).
+
 Definition quat_mul '(mk_quat a₁ v₁) '(mk_quat a₂ v₂) :=
   mk_quat ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
-Theorem vect_cross_prod_anticomm :
+Theorem vect_cross_mul_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ u v,
@@ -143,36 +148,76 @@ rewrite <- Huv.
 easy.
 Qed.
 
-Theorem quat_mul_comm :
+Theorem quat_mul_comm_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
-  ∀ a b,
-  vect_size (Qim a) = vect_size (Qim b)
-  → quat_mul a b = quat_mul b a.
+  ∀ n a b,
+  vect_size (Qim a) = n
+  → vect_size (Qim b) = n
+  → quat_mul a b = if n <? 2 then quat_mul b a else quat_opp (quat_mul b a).
 Proof.
-intros Hop Hic (a, u) (b, v) Huv; cbn in Huv |-*.
+intros Hop Hic n (a, u) (b, v) Hu Hv; cbn in Hu, Hv |-*.
 move b before a.
+rewrite (rngl_mul_comm Hic).
+rewrite (vect_dot_mul_comm Hic).
+rewrite (vect_cross_mul_anticomm Hop Hic _ _); [ | congruence ].
+rewrite (vect_add_comm (a × v)%V).
+unfold vect_cross_mul.
+replace (vect_size (- v)) with (vect_size v). 2: {
+  cbn; f_equal; symmetry.
+  apply map_length.
+}
+rewrite if_ltb_lt_dec.
+rewrite Hv.
+destruct (lt_dec n 2) as [Hn2| Hn2]. {
+  f_equal; f_equal; f_equal.
+  apply map_ext_in.
+  intros i Hi.
+  rewrite Nat.div_small; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  easy.
+}
+apply Nat.nlt_ge in Hn2.
 f_equal. {
-  rewrite (rngl_mul_comm Hic).
-  f_equal.
-  apply (vect_dot_mul_comm Hic).
+(* ah oui, non, c'est pas anticommutatif, les quaternions *)
+...
+    f_equal. {
+      f_equal.
+    apply (vect_dot_mul_comm Hic).
 }
 rewrite (vect_add_comm (a × v)%V).
 f_equal.
-rewrite (vect_cross_prod_anticomm Hop Hic _ _ Huv).
-(* bizarre : normalement, les complexes (vect_size u = 1) sont commutatifs
-   mais les quaternions (vect_size u = 3) sont anticommutatifs *)
+rewrite (vect_cross_mul_anticomm Hop Hic _ _); [ | congruence ].
+unfold vect_cross_mul.
+f_equal.
+replace (vect_size (- v)) with (vect_size v). 2: {
+  cbn; f_equal; symmetry.
+  apply map_length.
+}
+rewrite Hv.
+destruct (lt_dec n 2) as [Hn2| Hn2]. {
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  destruct n; [ easy | ].
+  destruct n; [ | flia Hn2 ].
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  easy.
+}
+apply Nat.nlt_ge in Hn2.
 ...
 
 (* old version *)
 
-(* with this (personal) definition of "vect_cross_prod", the
+(* with this (personal) definition of "vect_cross_mul", the
    product of two "quaternions" (quat_mul below) is the product
    in normal quaternions if vect_size = 3, but also the product
    in complex numbers if vect_size = 1; perhaps also the product
    in octonions if vect_size = 7 (to be verified) *)
 
-Definition vect_cross_prod {T} {ro : ring_like_op T} (u v : vector T) :=
+Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   match vect_size u / 2 with
   | 0 =>
       (* cross product for complex *)
@@ -222,14 +267,14 @@ Import Q.Notations.
 
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [1]) (mk_vect [1]))%Q.
+  vect_cross_mul (mk_vect [1]) (mk_vect [1]))%Q.
 Compute (
   let qro := Q_ring_like_op in
-  vect_cross_prod (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
+  vect_cross_mul (mk_vect [1;0;0]) (mk_vect [0;1;0]))%Q.
 
 ...
 
-(* TODO: find a general formula for vect_cross_prod that works
+(* TODO: find a general formula for vect_cross_mul that works
    for any vector size, not only 1, 3 and 7 *)
 
 (*
@@ -344,7 +389,7 @@ Compute (let n := 1 in map (λ i, (2 ^ i, (2 ^ i * 3 - 1) mod n + 1)) (seq 0 (n 
 ...
 *)
 
-Notation "U * V" := (vect_cross_prod U V) : V_scope.
+Notation "U * V" := (vect_cross_mul U V) : V_scope.
 
 Record quat T := mk_quat { Qre : T; Qim : vector T }.
 Arguments mk_quat {T} Qre%L Qim%V.
@@ -399,7 +444,7 @@ f_equal. {
 rewrite (vect_add_comm (a × v)%V).
 f_equal.
 Locate "*"%V.
-Theorem vect_cross_prod_anticomm :
+Theorem vect_cross_mul_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ u v,
@@ -493,7 +538,7 @@ rewrite rngl_add_comm; f_equal.
 apply IHla.
 Qed.
 ... ...
-apply (vect_cross_prod_comm Hic).
+apply (vect_cross_mul_comm Hic).
 ...
 
 
