@@ -258,8 +258,31 @@ Theorem nion_mul_assoc :
   → nion_mul (nion_mul a b) c = nion_mul a (nion_mul b c).
 Proof.
 intros Hop Hic n (a, u) (b, v) (c, w) Hu Hv Hw; cbn in Hu, Hv, Hw |-*.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 f_equal. {
-  unfold vect_dot_mul.
+  rewrite (rngl_mul_sub_distr_r Hos).
+  rewrite (rngl_mul_sub_distr_l Hos).
+  rewrite rngl_mul_assoc.
+  do 2 rewrite <- (rngl_sub_add_distr Hos).
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite <- (vect_scal_mul_dot_mul_comm Hos).
+Search ( ≺ _ + _, _ ≻%V).
+Search (vect_dot_mul).
+Theorem vect_dot_mul_add_l :
+  ∀ u v w, ≺ u + v, w ≻ = (≺ u, w ≻ + ≺ v, w ≻)%L.
+Proof.
+intros.
+unfold vect_dot_mul; cbn.
+rewrite <- rngl_summation_list_app.
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+Search (∑ (_ ∈ map2 _ _), _).
+Search (map2 _ (map2 _ _ _)).
+Search (map2 _ _ _ ++ map2 _ _ _).
+... ...
+do 2 rewrite vect_dot_mul_add_l.
 ...
 
 (* to be completed... *)
