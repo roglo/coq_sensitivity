@@ -128,6 +128,7 @@ Compute (
   (j*l)%H).
 
 (* octonions *)
+...
 Time Compute (
   let qro := Q_ring_like_op in
   let e1 := mk_quat 0 (mk_vect [1;0;0;0;0;0;0]) in
