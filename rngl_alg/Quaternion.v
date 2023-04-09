@@ -293,6 +293,143 @@ rewrite rngl_summation_empty; [ | easy ].
 easy.
 Qed.
 
+Theorem vect_dot_cross_mul_assoc :
+  rngl_has_opp = true →
+  ∀ n u v w,
+  vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → n ≤ 3
+  → ≺ u * v, w ≻ = ≺ u, v * w ≻.
+Proof.
+intros Hop * Hu Hv Hw Hn3.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Hop.
+unfold vect_dot_mul.
+cbn - [ "/" ].
+rewrite Hu, Hv.
+rewrite map2_map_l, map2_map_r.
+rewrite (map2_map_min 0 0%L).
+rewrite (map2_map_min 0%L 0).
+rewrite seq_length.
+do 2 rewrite fold_vect_size.
+rewrite Hu, Hw.
+rewrite Nat.min_id.
+do 2 rewrite rngl_summation_list_map.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite seq_nth; [ | easy ].
+  easy.
+}
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite seq_nth; [ | easy ].
+  easy.
+}
+symmetry.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  easy.
+}
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite rngl_summation_seq_summation; [ | easy ].
+cbn - [ "/" "-" nth ].
+destruct u as (la).
+destruct v as (lb).
+destruct w as (lc).
+cbn in Hu, Hv, Hw.
+rename Hu into Ha; rename Hv into Hb; rename Hw into Hc.
+cbn - [ "/" "-" nth ].
+unfold vect_comm.
+unfold vect_el.
+cbn - [ "/" "-" nth ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_sub_succ_1.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat_sub_succ_1.
+    do 2 rewrite Nat.add_sub.
+    rewrite Ha.
+    easy.
+  }
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_sub_succ_1.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat_sub_succ_1.
+    do 2 rewrite Nat.add_sub.
+    rewrite Hb.
+    easy.
+  }
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  move Hn1 at top; subst n.
+  unfold iter_seq, iter_list; cbn.
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  easy.
+}
+destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+  move Hn2 at top; subst n.
+  clear Hn1 Hnz.
+  unfold iter_seq, iter_list; cbn.
+  do 4 rewrite (rngl_sub_diag Hos).
+  do 3 rewrite rngl_add_0_l.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  easy.
+}
+assert (H : n = 3) by flia Hn3 Hnz Hn1 Hn2.
+clear Hn3 Hnz Hn1 Hn2.
+move H at top; subst n.
+unfold iter_seq, iter_list; cbn.
+unfold rngl_sub; rewrite Hop.
+do 8 rewrite rngl_add_0_l.
+do 3 rewrite rngl_mul_add_distr_r.
+do 3 rewrite rngl_mul_add_distr_l.
+do 3 rewrite (rngl_mul_opp_l Hop).
+do 3 rewrite (rngl_mul_opp_r Hop).
+do 6 rewrite rngl_mul_assoc.
+remember (_ * _ * _)%L as x eqn:Hx.
+remember (_ * _ * _)%L as y eqn:Hy in |-*.
+remember (_ * _ * _)%L as z eqn:Hz in |-*.
+remember (_ * _ * _)%L as t eqn:Ht in |-*.
+remember (_ * _ * _)%L as u eqn:Hu in |-*.
+remember (_ * _ * _)%L as v eqn:Hv in |-*.
+clear Hx Hy Hz Ht Hu Hv.
+rewrite rngl_add_comm.
+do 5 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite (rngl_add_comm (- v)%L).
+rewrite (rngl_add_comm (- t)%L).
+do 6 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite (rngl_add_comm (- y)%L).
+rewrite (rngl_add_comm (- v)%L).
+do 4 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite (rngl_add_comm (- y)%L).
+apply rngl_add_assoc.
+Qed.
+
 Theorem nion_mul_assoc :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -356,127 +493,7 @@ f_equal. {
   f_equal; f_equal.
   rewrite rngl_add_comm.
   f_equal.
-  unfold vect_dot_mul.
-  cbn - [ "/" ].
-  rewrite Hu, Hv.
-  rewrite map2_map_l, map2_map_r.
-  rewrite (map2_map_min 0 0%L).
-  rewrite (map2_map_min 0%L 0).
-  rewrite seq_length.
-  do 2 rewrite fold_vect_size.
-  rewrite Hu, Hw.
-  rewrite Nat.min_id.
-  do 2 rewrite rngl_summation_list_map.
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros i Hi.
-    apply in_seq in Hi.
-    rewrite seq_nth; [ | easy ].
-    easy.
-  }
-  symmetry.
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros i Hi.
-    apply in_seq in Hi.
-    rewrite seq_nth; [ | easy ].
-    easy.
-  }
-  symmetry.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    move Hnz at top; subst n.
-    rewrite rngl_summation_list_empty; [ | easy ].
-    rewrite rngl_summation_list_empty; [ | easy ].
-    easy.
-  }
-  rewrite rngl_summation_seq_summation; [ | easy ].
-  rewrite rngl_summation_seq_summation; [ | easy ].
-  cbn - [ "/" "-" nth ].
-  destruct u as (la).
-  destruct v as (lb).
-  destruct w as (lc).
-  cbn in Hu, Hv, Hw.
-  rename Hu into Ha; rename Hv into Hb; rename Hw into Hc.
-  cbn - [ "/" "-" nth ].
-  unfold vect_comm.
-  unfold vect_el.
-  cbn - [ "/" "-" nth ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros j Hj.
-      rewrite Nat_sub_succ_1.
-      rewrite Nat_sub_sub_swap.
-      rewrite Nat_sub_succ_1.
-      do 2 rewrite Nat.add_sub.
-      rewrite Ha.
-      easy.
-    }
-    remember (∑ (j = _, _), _) as x; subst x.
-    easy.
-  }
-  symmetry.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros j Hj.
-      rewrite Nat_sub_succ_1.
-      rewrite Nat_sub_sub_swap.
-      rewrite Nat_sub_succ_1.
-      do 2 rewrite Nat.add_sub.
-      rewrite Hb.
-      easy.
-    }
-    remember (∑ (j = _, _), _) as x; subst x.
-    easy.
-  }
-  symmetry.
-  destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-    move Hn1 at top; subst n.
-    unfold iter_seq, iter_list; cbn.
-    rewrite (rngl_mul_0_l Hos).
-    rewrite (rngl_mul_0_r Hos).
-    easy.
-  }
-  destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-    move Hn2 at top; subst n.
-    clear Hn1 Hnz.
-    unfold iter_seq, iter_list; cbn.
-    do 4 rewrite (rngl_sub_diag Hos).
-    do 3 rewrite rngl_add_0_l.
-    do 2 rewrite (rngl_mul_0_l Hos).
-    do 2 rewrite (rngl_mul_0_r Hos).
-    easy.
-  }
-  assert (H : n = 3) by flia Hn3 Hnz Hn1 Hn2.
-  clear Hn3 Hnz Hn1 Hn2.
-  move H at top; subst n.
-  unfold iter_seq, iter_list; cbn.
-  unfold rngl_sub; rewrite Hop.
-  do 8 rewrite rngl_add_0_l.
-  do 3 rewrite rngl_mul_add_distr_r.
-  do 3 rewrite rngl_mul_add_distr_l.
-  do 3 rewrite (rngl_mul_opp_l Hop).
-  do 3 rewrite (rngl_mul_opp_r Hop).
-  do 6 rewrite rngl_mul_assoc.
-  remember (_ * _ * _)%L as x eqn:Hx.
-  remember (_ * _ * _)%L as y eqn:Hy in |-*.
-  remember (_ * _ * _)%L as z eqn:Hz in |-*.
-  remember (_ * _ * _)%L as t eqn:Ht in |-*.
-  remember (_ * _ * _)%L as u eqn:Hu in |-*.
-  remember (_ * _ * _)%L as v eqn:Hv in |-*.
-  clear Hx Hy Hz Ht Hu Hv.
-  rewrite rngl_add_comm.
-  do 5 rewrite <- rngl_add_assoc.
-  f_equal.
-  rewrite (rngl_add_comm (- v)%L).
-  rewrite (rngl_add_comm (- t)%L).
-  do 6 rewrite <- rngl_add_assoc.
-  f_equal.
-  rewrite (rngl_add_comm (- y)%L).
-  rewrite (rngl_add_comm (- v)%L).
-  do 4 rewrite <- rngl_add_assoc.
-  f_equal.
-  rewrite (rngl_add_comm (- y)%L).
-  apply rngl_add_assoc.
+  now apply (@vect_dot_cross_mul_assoc Hop n).
 }
 ...
 
