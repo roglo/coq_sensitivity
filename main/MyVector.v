@@ -142,12 +142,13 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "U + V" := (vect_add U V) : V_scope.
+Notation "U - V" := (vect_sub U V) : V_scope.
 
 Arguments vect_dot_mul (U V)%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.
 
-Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
+Theorem vect_mul_scal_l_assoc : ∀ (a b : T) (V : vector T),
   (a × (b × V))%V = ((a * b)%L × V)%V.
 Proof.
 intros.
@@ -381,6 +382,74 @@ unfold vect_size; cbn.
 apply map2_length.
 Qed.
 
+Theorem vect_mul_scal_l_add_distr_r :
+  ∀ a b u, ((a + b)%L × u)%V = (a × u + b × u)%V.
+Proof.
+intros.
+unfold "×", vect_add; cbn; f_equal.
+rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite map_length.
+rewrite Nat.min_id.
+rewrite List_map_map_seq with (d := 0%L).
+rewrite fold_vect_size.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+rewrite (List_map_nth' 0%L); [ | easy ].
+rewrite (List_map_nth' 0%L); [ | easy ].
+apply rngl_mul_add_distr_r.
+Qed.
+
+Theorem vect_mul_scal_l_sub_distr_r :
+  rngl_has_opp = true →
+  ∀ a b u, ((a - b)%L × u)%V = (a × u - b × u)%V.
+Proof.
+intros Hop *.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Hop.
+unfold "×", vect_sub, vect_add; cbn; f_equal.
+rewrite (map2_map_min 0%L 0%L).
+do 3 rewrite map_length.
+rewrite Nat.min_id.
+rewrite List_map_map_seq with (d := 0%L).
+rewrite fold_vect_size.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+rewrite (List_map_nth' 0%L); [ | easy ].
+rewrite (List_map_nth' 0%L); [ | now rewrite map_length ].
+rewrite (List_map_nth' 0%L); [ | easy ].
+rewrite (rngl_mul_sub_distr_r Hos).
+unfold rngl_sub.
+now rewrite Hop.
+Qed.
+
+Theorem vect_mul_scal_l_add_distr_l :
+  ∀ a u v, (a × (u + v) = a × u + a × v)%V.
+Proof.
+intros.
+unfold "×", vect_add; f_equal; cbn.
+rewrite (map2_map_min 0%L 0%L).
+rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite map_length.
+do 2 rewrite fold_vect_size.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+rewrite (List_map_nth' 0%L). 2: {
+  rewrite fold_vect_size.
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+rewrite (List_map_nth' 0%L). 2: {
+  rewrite fold_vect_size.
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+apply rngl_mul_add_distr_l.
+Qed.
+
 End a.
 
 Declare Scope V_scope.
@@ -396,6 +465,10 @@ Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
 Arguments vect_mul_scal_l {T ro} s%L V%V.
+Arguments vect_mul_scal_l_add_distr_l {T ro rp} a%L (u v)%V.
+Arguments vect_mul_scal_l_add_distr_r {T ro rp} (a b)%L u%V.
+Arguments vect_mul_scal_l_assoc {T ro rp} (a b)%L V%V.
+Arguments vect_mul_scal_l_sub_distr_r {T ro rp} Hop (a b)%L u%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
 Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.
 Arguments vect_opp {T ro} V%V.

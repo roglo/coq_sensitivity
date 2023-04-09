@@ -12,14 +12,14 @@ Nat_ggcd.vio: Nat_ggcd.v ../main/Misc.vio Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../main/Misc.vo Misc.vo
 Nrl.vio: Nrl.v ../main/Misc.vio ../main/RingLike.vio Misc.vio FermatLittle.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo ../main/RingLike.vo Misc.vo FermatLittle.vo
-Nth_ions.vio: Nth_ions.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio ../main/MyVector.vio ../main/SortingFun.vio
-Nth_ions.vo Nth_ions.glob Nth_ions.v.beautified Nth_ions.required_vo: Nth_ions.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/MyVector.vo ../main/SortingFun.vo
 PQ.vio: PQ.v ../main/Misc.vio Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../main/Misc.vo Misc.vo Nat_ggcd.vo
 Qrl.vio: Qrl.v ../main/RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v ../main/RingLike.vo Rational.vo
 QuadIntRl.vio: QuadIntRl.v ../main/Misc.vio ../main/RingLike.vio Misc.vio
 QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v ../main/Misc.vo ../main/RingLike.vo Misc.vo
+Quaternion.vio: Quaternion.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio ../main/MyVector.vio
+Quaternion.vo Quaternion.glob Quaternion.v.beautified Quaternion.required_vo: Quaternion.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/MyVector.vo
 Rational.vio: Rational.v ../main/Misc.vio Misc.vio GQ.vio
 Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v ../main/Misc.vo Misc.vo GQ.vo
 Rrl.vio: Rrl.v ../main/RingLike.vio ../main/Misc.vio ../main/IterAdd.vio ../main/NatRingLike.vio

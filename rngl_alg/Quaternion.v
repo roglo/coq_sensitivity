@@ -495,6 +495,9 @@ f_equal. {
   f_equal.
   now apply (@vect_dot_cross_mul_assoc Hop n).
 }
+rewrite (vect_mul_scal_l_sub_distr_r Hop).
+do 4 rewrite vect_mul_scal_l_add_distr_l.
+do 4 rewrite vect_mul_scal_l_assoc.
 ...
 
 (* to be completed... *)

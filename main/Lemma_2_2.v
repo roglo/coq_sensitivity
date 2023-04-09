@@ -1796,7 +1796,7 @@ assert (Hcs : mat_ncols (mA n) = vect_size V) by now rewrite mA_ncols.
 (* μ * μ = rngl_of_nat n *)
 apply vect_mul_scal_reg_r with (V := V); [ easy | easy | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
-rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
+rewrite <- vect_mul_scal_l_assoc.
 (* μ × (μ × V) = rngl_of_nat n × V *)
 rewrite <- Hav.
 (* μ × (mA n . V) = rngl_of_nat n × V *)
