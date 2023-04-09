@@ -505,6 +505,54 @@ f_equal. {
   rewrite (rngl_mul_comm Hic).
   do 3 rewrite <- vect_add_assoc.
   f_equal.
+  rewrite vect_add_comm, <- vect_add_assoc.
+  rewrite vect_add_comm.
+Theorem vect_cross_mul_add_distr_r :
+  ∀ u v w,
+  vect_size u = vect_size v
+  → ((u + v) * w = u * w + v * w)%V.
+Proof.
+intros * Huv.
+unfold vect_cross_mul, vect_add; cbn - [ "/" ].
+f_equal.
+rewrite map2_length.
+do 2 rewrite fold_vect_size.
+rewrite <- Huv, Nat.min_id.
+do 2 rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite List_map_seq_length.
+rewrite Nat.min_id.
+rewrite <- seq_shift.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+do 2 rewrite fold_vect_size.
+rewrite <- Huv, Nat.min_id.
+rewrite (List_map_nth' 0). 2: {
+  now rewrite List_map_seq_length.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0). 2: {
+  now rewrite List_map_seq_length.
+}
+cbn - [ "/" minus ].
+rewrite <- rngl_summation_add_distr.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite seq_nth; [ | easy ].
+  cbn - [ "-" ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  cbn - [ "-" ].
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+symmetry.
+... ...
+Search ((_ + _) * _)%V.
+Search (_ * (_ + _))%V.
+  rewrite vect_cross_mul_add_distr_r.
 ...
 
 (* to be completed... *)
