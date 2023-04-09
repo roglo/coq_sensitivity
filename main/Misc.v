@@ -704,9 +704,9 @@ intros; f_equal; flia.
 Qed.
 
 Theorem map2_map_min :
-  ∀ A B d la lb (f : A → A → B),
+  ∀ A B C ad bd la lb (f : A → B → C),
   map2 f la lb =
-    map (λ i, f (nth i la d) (nth i lb d))
+    map (λ i, f (nth i la ad) (nth i lb bd))
       (seq 0 (min (length la) (length lb))).
 Proof.
 intros.

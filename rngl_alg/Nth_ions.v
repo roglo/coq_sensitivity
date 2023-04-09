@@ -172,6 +172,19 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
+Theorem vect_cross_mul_size :
+  ∀ u v,
+  vect_size u ≤ vect_size v
+  → vect_size (u * v) = min (vect_size u) (vect_size v).
+Proof.
+intros * Huv.
+unfold vect_size; cbn - [ "/" ].
+rewrite List_map_seq_length.
+symmetry.
+do 2 rewrite fold_vect_size.
+now apply Nat.min_l.
+Qed.
+
 Theorem vect_cross_mul_anticomm :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -312,6 +325,54 @@ f_equal. {
 } {
   unfold vect_size; cbn.
   now rewrite List_map_seq_length.
+}
+rewrite (vect_scal_mul_dot_mul_comm Hos).
+rewrite (vect_scal_mul_dot_mul_comm Hos).
+rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
+  now rewrite vect_mul_scal_size.
+} {
+  now rewrite vect_mul_scal_size.
+}
+rewrite (vect_scal_mul_dot_mul_comm Hos).
+rewrite (vect_scal_mul_dot_mul_comm Hos).
+rewrite (vect_dot_mul_add_r n); [ | easy | | ]; cycle 1. {
+  rewrite vect_add_size.
+  do 2 rewrite vect_mul_scal_size.
+  rewrite Hw, Hv.
+  apply Nat.min_id.
+} {
+  rewrite vect_cross_mul_size; rewrite Hv, Hw; [ | easy ].
+  apply Nat.min_id.
+}
+rewrite (vect_dot_mul_add_r n); [ | easy | | ]; cycle 1. {
+  now rewrite vect_mul_scal_size.
+} {
+  now rewrite vect_mul_scal_size.
+}
+do 2 rewrite (vect_dot_mul_scal_mul_comm Hos Hic).
+rewrite rngl_add_comm.
+do 3 rewrite <- rngl_add_assoc.
+f_equal; f_equal.
+rewrite rngl_add_comm.
+f_equal.
+unfold vect_dot_mul.
+cbn - [ "/" ].
+rewrite Hu, Hv.
+rewrite map2_map_l, map2_map_r.
+rewrite (map2_map_min 0 0%L).
+rewrite (map2_map_min 0%L 0).
+rewrite seq_length.
+do 2 rewrite fold_vect_size.
+rewrite Hu, Hw.
+rewrite Nat.min_id.
+...
+Search (≺ _ * _, _ ≻).
+Search (≺ _, _ * _ ≻).
+Search (map2 _ (map _ _)).
+...
+apply map2_length.
+Qed.
+  now rewrite vect_mul_scal_size.
 }
 ...
 

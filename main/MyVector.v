@@ -314,7 +314,7 @@ Proof.
 intros n (la) (lb) (lc) Ha Hb Hc.
 cbn in Ha, Hb, Hc.
 unfold vect_dot_mul; cbn.
-do 4 rewrite (map2_map_min 0%L).
+do 4 rewrite (map2_map_min 0%L 0%L).
 rewrite List_map_seq_length.
 rewrite Ha, Hb, Hc.
 do 2 rewrite Nat.min_id.
@@ -326,6 +326,30 @@ apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
 apply rngl_mul_add_distr_r.
+Qed.
+
+Theorem vect_dot_mul_add_r :
+  ∀ n u v w,
+  vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → ≺ u, v + w ≻ = (≺ u, v ≻ + ≺ u, w ≻)%L.
+Proof.
+intros n (la) (lb) (lc) Ha Hb Hc.
+cbn in Ha, Hb, Hc.
+unfold vect_dot_mul; cbn.
+do 4 rewrite (map2_map_min 0%L 0%L).
+rewrite List_map_seq_length.
+rewrite Ha, Hb, Hc.
+do 2 rewrite Nat.min_id.
+do 3 rewrite rngl_summation_list_map.
+rewrite <- rngl_summation_list_add_distr.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+apply rngl_mul_add_distr_l.
 Qed.
 
 Theorem vect_opp_size : ∀ v, vect_size (vect_opp v) = vect_size v.
@@ -349,6 +373,14 @@ destruct (lt_dec (i - 1) (length (vect_list v))) as [Hil| Hil]. 2: {
 now rewrite (List_map_nth' 0%L).
 Qed.
 
+Theorem vect_add_size :
+  ∀ u v, vect_size (u + v) = min (vect_size u) (vect_size v).
+Proof.
+intros.
+unfold vect_size; cbn.
+apply map2_length.
+Qed.
+
 End a.
 
 Declare Scope V_scope.
@@ -358,6 +390,7 @@ Arguments vect_add {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
+Arguments vect_dot_mul_add_r {T ro rp} n%nat (u v w)%V.
 Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
