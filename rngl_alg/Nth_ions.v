@@ -393,6 +393,7 @@ destruct u as (la).
 destruct v as (lb).
 destruct w as (lc).
 cbn in Hu, Hv, Hw.
+rename Hu into Ha; rename Hv into Hb; rename Hw into Hc.
 cbn - [ "/" "-" nth ].
 unfold vect_comm.
 unfold vect_el.
@@ -405,7 +406,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite Nat_sub_sub_swap.
     rewrite Nat_sub_succ_1.
     do 2 rewrite Nat.add_sub.
-    rewrite Hu.
+    rewrite Ha.
     easy.
   }
   remember (∑ (j = _, _), _) as x; subst x.
@@ -420,7 +421,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite Nat_sub_sub_swap.
     rewrite Nat_sub_succ_1.
     do 2 rewrite Nat.add_sub.
-    rewrite Hv.
+    rewrite Hb.
     easy.
   }
   remember (∑ (j = _, _), _) as x; subst x.
@@ -451,6 +452,15 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   do 8 rewrite rngl_add_0_l.
   do 3 rewrite (rngl_mul_sub_distr_r Hos).
   do 3 rewrite (rngl_mul_sub_distr_l Hos).
+  do 6 rewrite rngl_mul_assoc.
+  remember (_ * _ * _)%L as x eqn:Hx.
+  remember (_ * _ * _)%L as y eqn:Hy in |-*.
+  remember (_ * _ * _)%L as z eqn:Hz in |-*.
+  remember (_ * _ * _)%L as t eqn:Ht in |-*.
+  remember (_ * _ * _)%L as u eqn:Hu in |-*.
+  remember (_ * _ * _)%L as v eqn:Hv in |-*.
+  clear Hx Hy Hz Ht Hu Hv
+(* ouais, ça va le faire, fastoche *)
 ...
 Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
 Search (≺ _ * _, _ ≻).
