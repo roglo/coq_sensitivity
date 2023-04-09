@@ -328,28 +328,51 @@ rewrite seq_nth; [ cbn | easy ].
 apply rngl_mul_add_distr_r.
 Qed.
 
+Theorem vect_opp_size : ∀ v, vect_size (vect_opp v) = vect_size v.
+Proof.
+intros.
+unfold vect_size; cbn.
+now rewrite map_length.
+Qed.
+
+Theorem vect_opp_el :
+  rngl_has_opp = true →
+  ∀ v i, vect_el (vect_opp v) i = (- vect_el v i)%L.
+Proof.
+intros Hop *; unfold vect_el; cbn.
+destruct (lt_dec (i - 1) (length (vect_list v))) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite map_length ].
+  rewrite nth_overflow; [ | easy ].
+  symmetry; apply (rngl_opp_0 Hop).
+}
+now rewrite (List_map_nth' 0%L).
+Qed.
+
 End a.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments vect_add {T}%type {ro} (U V)%V.
-Arguments vect_sub {T ro} U%V V%V.
-Arguments vect_opp {T ro} V%V.
-Arguments vect_mul_scal_l {T ro} s%L V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
-Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.
-Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
 Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%L (U V)%V.
-Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
+Arguments vect_mul_scal_l {T ro} s%L V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
+Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.
+Arguments vect_opp {T ro} V%V.
+Arguments vect_opp_el {T ro rp} Hop v%V i%nat.
+Arguments vect_opp_size {T ro} v%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%L (U V)%V.
 Arguments vect_size {T}%type v%V.
 Arguments vect_squ_norm {T}%type {ro} V%V.
+Arguments vect_sub {T ro} U%V V%V.
+Arguments vect_zero {T ro} n%nat.
 Arguments vector_eq {T}%type {ro} (U V)%V.
 
 Notation "U + V" := (vect_add U V) : V_scope.

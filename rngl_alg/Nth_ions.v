@@ -57,10 +57,16 @@ Definition nion_opp '(mk_nion a v) :=
 Definition nion_mul '(mk_nion a₁ v₁) '(mk_nion a₂ v₂) :=
   mk_nion ((a₁ * a₂)%L - ≺ v₁ , v₂ ≻) (a₁ × v₂ + a₂ × v₁ + v₁ * v₂).
 
+Definition nion_conj '(mk_nion a v) :=
+  mk_nion a (- v).
+
 End a.
 
 Declare Scope H_scope.
 Delimit Scope H_scope with H.
+
+Notation "- U" := (nion_opp U) : H_scope.
+Notation "U ∗" := (nion_conj U) (at level 1, format "U ∗") : H_scope.
 Notation "U * V" := (nion_mul U V) : H_scope.
 
 Require Import ZArith.
@@ -226,7 +232,7 @@ Theorem nion_mul_comm :
   vect_size (Qim a) = n
   → vect_size (Qim b) = n
   → n < 2
-  → nion_mul a b = nion_mul b a.
+  → (a * b)%H = (b * a)%H.
 Proof.
 intros Hop Hic n (a, u) (b, v) Hu Hv Hn; cbn in Hu, Hv |-*.
 move b before a.
@@ -235,14 +241,39 @@ rewrite (vect_dot_mul_comm Hic).
 rewrite (vect_cross_mul_anticomm Hop Hic _ _); [ | congruence ].
 rewrite (vect_add_comm (a × v)%V).
 unfold vect_cross_mul.
-replace (vect_size (- v)) with (vect_size v). 2: {
-  cbn; f_equal; symmetry.
-  apply map_length.
-}
+rewrite vect_opp_size.
 rewrite Hv.
 f_equal; f_equal; f_equal.
 apply map_ext_in.
 intros i Hi.
+apply in_seq in Hi.
+(*
+unfold vect_comm.
+rewrite vect_opp_size, Hv.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  do 2 rewrite (vect_opp_el Hop).
+  unfold vect_el.
+  do 2 rewrite Nat.add_sub.
+  do 2 rewrite (rngl_mul_opp_l Hop).
+  rewrite <- (rngl_opp_add_distr Hop).
+  rewrite rngl_add_comm.
+  rewrite (fold_rngl_sub Hop).
+  easy.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  unfold vect_el.
+  do 2 rewrite Nat.add_sub.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+symmetry.
+remember (∑ (j = _, _), _) as x; subst x.
+rewrite <- (rngl_opp_summation Hop).
+remember (∑ (j = _, _), _) as x; subst x.
+*)
 rewrite Nat.div_small; [ | easy ].
 rewrite rngl_summation_empty; [ | easy ].
 rewrite rngl_summation_empty; [ | easy ].
@@ -256,12 +287,13 @@ Theorem nion_mul_assoc :
   vect_size (Qim a) = n
   → vect_size (Qim b) = n
   → vect_size (Qim c) = n
-  → nion_mul (nion_mul a b) c = nion_mul a (nion_mul b c).
+  → ((a * b) * c)%H = (a * (b * c))%H.
 Proof.
 intros Hop Hic n (a, u) (b, v) (c, w) Hu Hv Hw; cbn in Hu, Hv, Hw |-*.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+move Hos before Hop.
 f_equal. {
   rewrite (rngl_mul_sub_distr_r Hos).
   rewrite (rngl_mul_sub_distr_l Hos).
