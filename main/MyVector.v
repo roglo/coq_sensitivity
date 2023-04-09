@@ -450,12 +450,45 @@ rewrite (List_map_nth' 0%L). 2: {
 apply rngl_mul_add_distr_l.
 Qed.
 
+Theorem vect_add_assoc :
+  ∀ u v w, (u + (v + w) = (u + v) + w)%V.
+Proof.
+intros.
+unfold vect_add; f_equal; cbn.
+do 4 rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite List_map_seq_length.
+do 3 rewrite fold_vect_size.
+rewrite Nat.min_assoc.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite <- Nat.min_assoc in Hi.
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+rewrite seq_nth. 2: {
+  rewrite <- Nat.min_assoc in Hi.
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+rewrite seq_nth. 2: {
+  now apply Nat.min_glb_lt_iff in Hi.
+}
+cbn.
+apply rngl_add_assoc.
+Qed.
+
 End a.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments vect_add {T}%type {ro} (U V)%V.
+Arguments vect_add_assoc {T ro rp} (u v w)%V.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.

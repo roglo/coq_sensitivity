@@ -498,6 +498,9 @@ f_equal. {
 rewrite (vect_mul_scal_l_sub_distr_r Hop).
 do 4 rewrite vect_mul_scal_l_add_distr_l.
 do 4 rewrite vect_mul_scal_l_assoc.
+unfold vect_sub.
+do 9 rewrite <- vect_add_assoc.
+f_equal.
 ...
 
 (* to be completed... *)
