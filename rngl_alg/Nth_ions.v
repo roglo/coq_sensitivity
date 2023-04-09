@@ -365,7 +365,94 @@ rewrite seq_length.
 do 2 rewrite fold_vect_size.
 rewrite Hu, Hw.
 rewrite Nat.min_id.
+do 2 rewrite rngl_summation_list_map.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite seq_nth; [ | easy ].
+  easy.
+}
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite seq_nth; [ | easy ].
+  easy.
+}
+symmetry.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  easy.
+}
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite rngl_summation_seq_summation; [ | easy ].
+cbn - [ "/" "-" nth ].
+destruct u as (la).
+destruct v as (lb).
+destruct w as (lc).
+cbn in Hu, Hv, Hw.
+cbn - [ "/" "-" nth ].
+unfold vect_comm.
+unfold vect_el.
+cbn - [ "/" "-" nth ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_sub_succ_1.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat_sub_succ_1.
+    do 2 rewrite Nat.add_sub.
+    rewrite Hu.
+    easy.
+  }
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite Nat_sub_succ_1.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat_sub_succ_1.
+    do 2 rewrite Nat.add_sub.
+    rewrite Hv.
+    easy.
+  }
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  move Hn1 at top; subst n.
+  unfold iter_seq, iter_list; cbn.
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  easy.
+}
+destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+  move Hn2 at top; subst n.
+  clear Hn1 Hnz.
+  unfold iter_seq, iter_list; cbn.
+  do 4 rewrite (rngl_sub_diag Hos).
+  do 3 rewrite rngl_add_0_l.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  easy.
+}
+destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+  move Hn3 at top; subst n.
+  clear Hn2 Hn1 Hnz.
+  unfold iter_seq, iter_list; cbn.
+  do 8 rewrite rngl_add_0_l.
+  do 3 rewrite (rngl_mul_sub_distr_r Hos).
+  do 3 rewrite (rngl_mul_sub_distr_l Hos).
 ...
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
 Search (≺ _ * _, _ ≻).
 Search (≺ _, _ * _ ≻).
 Search (map2 _ (map _ _)).
