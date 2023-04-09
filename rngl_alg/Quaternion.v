@@ -449,9 +449,12 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   move Hn3 at top; subst n.
   clear Hn2 Hn1 Hnz.
   unfold iter_seq, iter_list; cbn.
+  unfold rngl_sub; rewrite Hop.
   do 8 rewrite rngl_add_0_l.
-  do 3 rewrite (rngl_mul_sub_distr_r Hos).
-  do 3 rewrite (rngl_mul_sub_distr_l Hos).
+  do 3 rewrite rngl_mul_add_distr_r.
+  do 3 rewrite rngl_mul_add_distr_l.
+  do 3 rewrite (rngl_mul_opp_l Hop).
+  do 3 rewrite (rngl_mul_opp_r Hop).
   do 6 rewrite rngl_mul_assoc.
   remember (_ * _ * _)%L as x eqn:Hx.
   remember (_ * _ * _)%L as y eqn:Hy in |-*.
@@ -459,8 +462,50 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   remember (_ * _ * _)%L as t eqn:Ht in |-*.
   remember (_ * _ * _)%L as u eqn:Hu in |-*.
   remember (_ * _ * _)%L as v eqn:Hv in |-*.
-  clear Hx Hy Hz Ht Hu Hv
-(* ouais, ça va le faire, fastoche *)
+  clear Hx Hy Hz Ht Hu Hv.
+  rewrite rngl_add_comm.
+  do 5 rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite (rngl_add_comm (- v)%L).
+  rewrite (rngl_add_comm (- t)%L).
+  do 6 rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite (rngl_add_comm (- y)%L).
+  rewrite (rngl_add_comm (- v)%L).
+  do 4 rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite (rngl_add_comm (- y)%L).
+  apply rngl_add_assoc.
+}
+destruct (Nat.eq_dec n 4) as [Hn4| Hn4]. {
+  move Hn4 at top; subst n.
+  clear Hn3 Hn2 Hn1 Hnz.
+  unfold iter_seq, iter_list; cbn.
+  rewrite (rngl_sub_diag Hos).
+  unfold rngl_sub; rewrite Hop.
+  do 10 rewrite rngl_add_0_l.
+  rewrite rngl_add_0_r.
+  do 10 rewrite rngl_mul_add_distr_r.
+  do 12 rewrite rngl_mul_add_distr_l.
+  do 7 rewrite (rngl_mul_opp_l Hop).
+  do 8 rewrite (rngl_mul_opp_r Hop).
+  do 12 rewrite rngl_mul_assoc.
+  do 15 rewrite (fold_rngl_sub Hop).
+  do 7 rewrite (rngl_sub_diag Hos).
+  do 7 rewrite rngl_add_0_r.
+(* ah oui mais c'est peut-être faux, ça : n=4 correspond
+   aux quintinions, pas aus quaternions *)
+...
+  remember (_ * _ * _)%L as x eqn:Hx.
+  remember (_ * _ * _)%L as y eqn:Hy in |-*.
+  remember (_ * _ * _)%L as z eqn:Hz in |-*.
+  remember (_ * _ * _)%L as t eqn:Ht in |-*.
+  remember (_ * _ * _)%L as u eqn:Hu in |-*.
+  remember (_ * _ * _)%L as v eqn:Hv in |-*.
+  remember (_ * _ * _)%L as d eqn:Hd in |-*.
+  remember (_ * _ * _)%L as e eqn:He in |-*.
+  remember (_ * _ * _)%L as f eqn:Hf in |-*.
+  remember (_ * _ * _)%L as g eqn:Hg in |-*.
 ...
 Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
 Search (≺ _ * _, _ ≻).
