@@ -489,6 +489,7 @@ Delimit Scope V_scope with V.
 
 Arguments vect_add {T}%type {ro} (U V)%V.
 Arguments vect_add_assoc {T ro rp} (u v w)%V.
+Arguments vect_add_comm {T ro rp} (u v)%V.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
