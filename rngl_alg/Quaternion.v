@@ -840,6 +840,55 @@ symmetry.
 remember (∑ (j = _, _), _) as x; subst x.
 symmetry.
 rewrite Nat.add_0_l.
+unfold vect_comm, vect_el.
+rewrite Hu, Hv.
+cbn - [ "/" nth "-" ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat_sub_succ_1.
+  rewrite Nat_sub_sub_swap, Nat_sub_succ_1.
+  do 2 rewrite Nat.add_sub.
+  assert (Hnz : n ≠ 0) by flia Hi.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite List_map_seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite List_map_seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    do 2 rewrite Nat.add_sub.
+    rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+    cbn - [ "-" ].
+    rewrite Nat_sub_sub_swap.
+    do 2 rewrite Nat_sub_succ_1.
+    easy.
+  }
+  remember (∑ (k = _, _), _) as x.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    do 2 rewrite Nat.add_sub.
+    rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+    cbn - [ "-" ].
+    rewrite Nat_sub_sub_swap.
+    do 2 rewrite Nat_sub_succ_1.
+    easy.
+  }
+  remember (∑ (k = _, _), _) as y in |-*.
+  subst x y.
+  easy.
+}
+remember (∑ (j = _, _), _) as x in |-*; subst x.
 ...
 Theorem vect_cross_mul_mul_l :
   ∀ u v w,
