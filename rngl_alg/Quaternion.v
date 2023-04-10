@@ -627,6 +627,46 @@ do 2 rewrite Nat.add_sub.
 easy.
 Qed.
 
+Theorem vect_cross_scal_mul_assoc :
+  rngl_has_opp_or_subt = true →
+  rngl_mul_is_comm = true →
+  ∀ a u v,
+  vect_size u = vect_size v
+  → (u * (a × v) = a × (u * v))%V.
+Proof.
+intros Hos Hic * Huv.
+unfold "*"%V, "×"%V.
+f_equal.
+cbn - [ "/" ].
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+rewrite (rngl_mul_summation_distr_l Hos).
+apply rngl_summation_eq_compat.
+intros j Hj.
+unfold vect_comm; cbn.
+unfold vect_el.
+do 2 rewrite Nat.add_sub.
+assert (Huz : vect_size u ≠ 0) by flia Hi.
+rewrite (List_map_nth' 0%L). 2: {
+  rewrite fold_vect_size, <- Huv.
+  now apply Nat.mod_upper_bound.
+}
+rewrite (List_map_nth' 0%L). 2: {
+  rewrite fold_vect_size, <- Huv.
+  now apply Nat.mod_upper_bound.
+}
+remember (nth _ _ _) as x eqn:Hx.
+remember (nth _ _ _) as y eqn:Hy in |-*.
+remember (nth _ _ _) as z eqn:Hz in |-*.
+remember (nth _ _ _) as t eqn:Ht in |-*.
+rewrite (rngl_mul_sub_distr_l Hos).
+do 4 rewrite rngl_mul_assoc.
+do 2 rewrite (rngl_mul_comm Hic a).
+easy.
+Qed.
+
 Theorem nion_mul_assoc :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -740,14 +780,66 @@ f_equal. {
     rewrite Nat.min_id.
     apply Nat.min_id.
   }
-Search (_ * (_ × _))%V.
-Search ((_ × _) * _)%V.
+  rewrite (vect_cross_scal_mul_assoc Hos Hic); [ | now rewrite Hu ].
+  rewrite (vect_scal_cross_mul_assoc_l Hos).
+  do 3 rewrite <- vect_add_assoc.
+  f_equal.
+  rewrite vect_add_assoc.
+  rewrite (@vect_cross_mul_add_distr_l Hop n); [ | easy | | ]; cycle 1. {
+    now rewrite vect_mul_scal_size.
+  } {
+    rewrite vect_cross_mul_size; rewrite Hv, Hw; [ | easy ].
+    apply Nat.min_id.
+  }
+  rewrite (vect_cross_scal_mul_assoc Hos Hic); [ | congruence ].
+  rewrite (vect_scal_cross_mul_assoc_l Hos).
+  rewrite vect_add_comm.
+  rewrite <- vect_add_assoc.
+  f_equal.
+Search (≺ _, _ ≻ × _)%V.
+Search (_ × ≺ _, _ ≻)%V.
+Search (_ * (_ * _))%V.
+Search ((_ * _) * _)%V.
+Search (_ * _)%V.
+Theorem vect_cross_mul_assoc :
+  ∀ u v w,
+  vect_size u = vect_size v
+  → (u * (v * w) = (u * v) * w)%V.
+Proof.
+intros * Huv.
+unfold "*"%V; f_equal.
+cbn - [ "/" ].
+rewrite List_map_seq_length.
 ...
-∀ (a b : T) (V : vector T), (a × (b × V))%V = ((a * b) × V)%V
-Search ((_ * _) × _)%V.
-vect_mul_scal_l_assoc:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → ∀ (a b : T) (V : vector T), (a × (b × V))%V = ((a * b) × V)%V
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+apply rngl_summation_eq_compat.
+intros j Hj.
+unfold vect_comm.
+cbn - [ "/" ].
+rewrite map_length.
+do 4 rewrite Nat.add_sub.
+rewrite seq_length.
+rewrite <- Huv.
+assert (Huz : vect_size u ≠ 0) by flia Hi.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+unfold vect_el.
 ...
 
 (* to be completed... *)
