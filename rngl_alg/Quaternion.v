@@ -430,6 +430,101 @@ rewrite (rngl_add_comm (- y)%L).
 apply rngl_add_assoc.
 Qed.
 
+Theorem vect_cross_mul_add_distr_l :
+  rngl_has_opp = true →
+  ∀ n u v w,
+  vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → (u * (v + w))%V = (u * v + u * w)%V.
+Proof.
+intros Hop * Hu Hv Hw.
+unfold vect_cross_mul, vect_add; cbn - [ "/" ].
+f_equal.
+do 2 rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite List_map_seq_length.
+rewrite Nat.min_id.
+rewrite <- seq_shift.
+rewrite map_map.
+do 2 rewrite fold_vect_size.
+rewrite Hu, Hv, Hw, Nat.min_id.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+rewrite (List_map_nth' 0). 2: {
+  now rewrite List_map_seq_length.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0). 2: {
+  now rewrite List_map_seq_length.
+}
+cbn - [ "/" minus ].
+rewrite <- rngl_summation_add_distr.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite seq_nth; [ | easy ].
+  cbn - [ "-" ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  cbn - [ "-" ].
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+symmetry.
+apply rngl_summation_eq_compat.
+intros j Hj.
+unfold vect_comm.
+cbn - [ "-" ].
+do 2 rewrite Nat.add_sub.
+rewrite Nat_sub_sub_swap.
+do 2 rewrite Nat_sub_succ_1.
+rewrite Hu.
+assert (Hnz : n ≠ 0) by flia Hi.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+unfold vect_el.
+do 2 rewrite Nat.add_sub.
+...
+rewrite List_map_seq_length.
+rewrite <- Huv.
+rewrite Nat_sub_sub_swap.
+do 2 rewrite Nat_sub_succ_1.
+do 2 rewrite Nat.add_sub.
+assert (Huz : vect_size u ≠ 0) by flia Hi.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  now apply Nat.mod_upper_bound.
+}
+rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+cbn.
+unfold vect_el.
+do 2 rewrite Nat.add_sub.
+remember (nth _ _ _) as x eqn:Hx.
+remember (nth _ _ _) as y eqn:Hy in |-*.
+remember (nth _ _ _) as z eqn:Hz in |-*.
+remember (nth _ _ _) as t eqn:Ht in |-*.
+remember (nth _ _ _) as a eqn:Ha in |-*.
+remember (nth _ _ _) as b eqn:Hb in |-*.
+do 2 rewrite rngl_mul_add_distr_r.
+unfold rngl_sub.
+rewrite Hop.
+do 2 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite (rngl_opp_add_distr Hop).
+unfold rngl_sub; rewrite Hop.
+rewrite (rngl_add_comm (- (t * b))%L).
+rewrite <- rngl_add_assoc.
+easy.
+...
+
 Theorem vect_cross_mul_add_distr_r :
   rngl_has_opp = true →
   ∀ u v w,
@@ -511,6 +606,37 @@ rewrite (rngl_opp_add_distr Hop).
 unfold rngl_sub; rewrite Hop.
 rewrite (rngl_add_comm (- (t * b))%L).
 rewrite <- rngl_add_assoc.
+easy.
+Qed.
+
+Theorem vect_scal_cross_mul_assoc_l :
+  rngl_has_opp_or_subt = true →
+  ∀ a u v, (a × (u * v) = (a × u) * v)%V.
+Proof.
+intros Hos *.
+unfold "×", "*"%V.
+f_equal; cbn - [ "/" ].
+rewrite map_length.
+rewrite fold_vect_size.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+rewrite (rngl_mul_summation_distr_l Hos).
+apply rngl_summation_eq_compat.
+intros j Hj.
+unfold vect_comm; cbn.
+rewrite map_length.
+do 2 rewrite Nat.add_sub.
+rewrite fold_vect_size.
+assert (Hsz : vect_size u ≠ 0) by flia Hi.
+rewrite (List_map_nth' 0%L); [ | now apply Nat.mod_upper_bound ].
+rewrite (List_map_nth' 0%L); [ | now apply Nat.mod_upper_bound ].
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- (rngl_mul_sub_distr_l Hos).
+f_equal.
+unfold vect_el.
+do 2 rewrite Nat.add_sub.
 easy.
 Qed.
 
@@ -598,6 +724,35 @@ f_equal. {
     rewrite vect_cross_mul_size; [ | now rewrite Hu, Hv ].
     now rewrite Hu, Hv, Nat.min_id, Nat.min_id.
   }
+  do 2 rewrite (vect_scal_cross_mul_assoc_l Hos).
+  do 3 rewrite <- vect_add_assoc.
+  f_equal.
+  rewrite (vect_cross_mul_add_distr_r Hop). 2: {
+    rewrite vect_mul_scal_size.
+    rewrite vect_cross_mul_size; rewrite Hu, Hv; [ | easy ].
+    symmetry; apply Nat.min_id.
+  }
+  do 3 rewrite vect_add_assoc.
+  rewrite vect_add_comm.
+  rewrite vect_add_assoc.
+  rewrite vect_add_comm.
+  rewrite (vect_mul_scal_l_sub_distr_r Hop).
+  rewrite (rngl_mul_comm Hic).
+  unfold vect_sub.
+  do 3 rewrite <- vect_add_assoc.
+  f_equal.
+  rewrite vect_add_comm; symmetry.
+  rewrite vect_add_comm; symmetry.
+Search (_ * (_ + _))%V.
+Search ((_ + _) * _)%V.
+... ...
+  rewrite vect_cross_mul_add_distr_l.
+...
+∀ (a b : T) (V : vector T), (a × (b × V))%V = ((a * b) × V)%V
+Search ((_ * _) × _)%V.
+vect_mul_scal_l_assoc:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → ∀ (a b : T) (V : vector T), (a × (b × V))%V = ((a * b) × V)%V
 ...
 
 (* to be completed... *)
