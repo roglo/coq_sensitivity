@@ -485,19 +485,6 @@ rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply Nat.mod_upper_bound.
 }
-unfold vect_el.
-do 2 rewrite Nat.add_sub.
-...
-rewrite List_map_seq_length.
-rewrite <- Huv.
-rewrite Nat_sub_sub_swap.
-do 2 rewrite Nat_sub_succ_1.
-do 2 rewrite Nat.add_sub.
-assert (Huz : vect_size u ≠ 0) by flia Hi.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply Nat.mod_upper_bound.
-}
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply Nat.mod_upper_bound.
@@ -513,17 +500,17 @@ remember (nth _ _ _) as z eqn:Hz in |-*.
 remember (nth _ _ _) as t eqn:Ht in |-*.
 remember (nth _ _ _) as a eqn:Ha in |-*.
 remember (nth _ _ _) as b eqn:Hb in |-*.
-do 2 rewrite rngl_mul_add_distr_r.
+do 2 rewrite rngl_mul_add_distr_l.
 unfold rngl_sub.
 rewrite Hop.
 do 2 rewrite <- rngl_add_assoc.
 f_equal.
 rewrite (rngl_opp_add_distr Hop).
 unfold rngl_sub; rewrite Hop.
-rewrite (rngl_add_comm (- (t * b))%L).
+rewrite (rngl_add_comm (- (t * a))%L).
 rewrite <- rngl_add_assoc.
 easy.
-...
+Qed.
 
 Theorem vect_cross_mul_add_distr_r :
   rngl_has_opp = true →
@@ -743,10 +730,18 @@ f_equal. {
   f_equal.
   rewrite vect_add_comm; symmetry.
   rewrite vect_add_comm; symmetry.
-Search (_ * (_ + _))%V.
-Search ((_ + _) * _)%V.
-... ...
-  rewrite vect_cross_mul_add_distr_l.
+  rewrite (@vect_cross_mul_add_distr_l Hop n); [ | easy | | ]; cycle 1. {
+    now rewrite vect_mul_scal_size.
+  } {
+    rewrite vect_add_size.
+    rewrite vect_mul_scal_size.
+    rewrite Hv.
+    rewrite vect_cross_mul_size; rewrite Hv, Hw; [ | easy ].
+    rewrite Nat.min_id.
+    apply Nat.min_id.
+  }
+Search (_ * (_ × _))%V.
+Search ((_ × _) * _)%V.
 ...
 ∀ (a b : T) (V : vector T), (a × (b × V))%V = ((a * b) × V)%V
 Search ((_ * _) × _)%V.
