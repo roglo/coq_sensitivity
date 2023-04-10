@@ -217,6 +217,34 @@ apply iter_seq_distr. {
 }
 Qed.
 
+Theorem rngl_opp_summation_list :
+  rngl_has_opp = true →
+  ∀ A (f : A → T) l, (- (∑ (i ∈ l), f i))%L = ∑ (i ∈ l), - f i.
+Proof.
+intros Hop *.
+rewrite iter_list_inv. 2: {
+  intros.
+  rewrite (fold_rngl_sub Hop).
+  rewrite rngl_add_comm.
+  apply (rngl_opp_add_distr Hop).
+}
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
+Theorem rngl_summation_list_sub_distr :
+  rngl_has_opp = true →
+  ∀ A g h (l : list A),
+  (∑ (i ∈ l), (g i - h i) =
+  (∑ (i ∈ l), g i) - ∑ (i ∈ l), h i)%L.
+Proof.
+intros Hop *.
+unfold rngl_sub.
+rewrite Hop.
+rewrite rngl_summation_list_add_distr.
+rewrite (rngl_opp_summation_list Hop).
+easy.
+Qed.
+
 Theorem rngl_summation_shift : ∀ s b g k,
   s ≤ b ≤ k
   → ∑ (i = b, k), g i = ∑ (i = b - s, k - s), g (s + i)%nat.
@@ -239,15 +267,14 @@ Theorem rngl_opp_summation :
   rngl_has_opp = true →
   ∀ b e f, ((- ∑ (i = b, e), f i) = ∑ (i = b, e), (- f i))%L.
 Proof.
-intros Hro *.
-apply iter_seq_inv. {
-  now apply rngl_opp_0.
-} {
+intros Hop *.
+rewrite iter_seq_inv. 2: {
   intros.
-  rewrite fold_rngl_sub; [ | easy ].
+  rewrite (fold_rngl_sub Hop).
   rewrite rngl_add_comm.
-  now apply rngl_opp_add_distr.
+  apply (rngl_opp_add_distr Hop).
 }
+now rewrite (rngl_opp_0 Hop).
 Qed.
 
 Theorem rngl_summation_rtl : ∀ g b k,
@@ -703,7 +730,8 @@ Arguments rngl_mul_summation_list_distr_l {T ro rp}.
 Arguments rngl_mul_summation_list_distr_r {T ro rp}.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
-Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
+Arguments rngl_opp_summation {T ro rp} Hop (b e)%nat.
+Arguments rngl_opp_summation_list {T ro rp} Hop.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_eq_compat {T ro} _ _ (b k)%nat.
@@ -718,6 +746,7 @@ Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} [A]%type _ _ (la lb)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
+Arguments rngl_summation_list_sub_distr {T ro rp} Hop.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.

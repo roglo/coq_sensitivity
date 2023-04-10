@@ -2263,23 +2263,26 @@ intros.
 now apply iter_list_distr.
 Qed.
 
-Theorem iter_seq_inv : ∀ T d op inv b e f
-  (inv_d : inv d = d)
+Theorem iter_list_inv : ∀ T A d op inv (f : A → T) l
   (inv_op_distr : ∀ a b, inv (op a b) = op (inv a) (inv b)),
-  inv (iter_seq b e (λ (c : T) (i : nat), op c (f i)) d) =
-  iter_seq b e (λ (c : T) (i : nat), op c (inv (f i))) d.
+  inv (iter_list l (λ (c : T) i, op c (f i)) d) =
+  iter_list l (λ (c : T) i, op c (inv (f i))) (inv d).
 Proof.
 intros.
-unfold iter_seq, iter_list.
-remember (S e - b) as len.
-clear e Heqlen.
-revert b.
-induction len; intros; [ now apply inv_d | ].
-rewrite seq_S; cbn.
-rewrite fold_left_app; cbn.
-rewrite fold_left_app; cbn.
-rewrite <- IHlen.
+unfold iter_list.
+revert d.
+induction l as [| a la]; intros; [ easy | cbn ].
+rewrite IHla.
 now rewrite inv_op_distr.
+Qed.
+
+Theorem iter_seq_inv : ∀ T d op inv b e f
+  (inv_op_distr : ∀ a b, inv (op a b) = op (inv a) (inv b)),
+  inv (iter_seq b e (λ (c : T) (i : nat), op c (f i)) d) =
+  iter_seq b e (λ (c : T) (i : nat), op c (inv (f i))) (inv d).
+Proof.
+intros.
+now apply iter_list_inv.
 Qed.
 
 Theorem iter_seq_rtl : ∀ T d op b k f
