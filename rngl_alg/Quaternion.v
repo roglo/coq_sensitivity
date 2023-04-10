@@ -797,10 +797,81 @@ f_equal. {
   rewrite <- vect_add_assoc.
   f_equal.
 Theorem vect_cross_mul_mul_r :
-  ∀ u v w,
-  (u * (v * w) = ≺ u, w ≻ × v - ≺ u, v ≻ × w)%V.
+  rngl_has_opp = true →
+  ∀ n u v w,
+  vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → (u * (v * w) = ≺ u, w ≻ × v - ≺ u, v ≻ × w)%V.
 Proof.
-intros.
+intros Hop * Hu Hv Hw.
+unfold "*"%V, vect_dot_mul, "×"%V, vect_sub, vect_add.
+rewrite Hu, Hv.
+cbn - [ "/" ].
+f_equal.
+rewrite map_map.
+rewrite (map2_map_min 0%L 0%L).
+do 2 rewrite map_length.
+do 2 rewrite fold_vect_size.
+rewrite Hv, Hw.
+rewrite Nat.min_id.
+symmetry.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  rewrite (List_map_nth' 0%L); [ | now rewrite fold_vect_size, Hv ].
+  rewrite (List_map_nth' 0%L); [ | now rewrite fold_vect_size, Hw ].
+  rewrite (fold_rngl_sub Hop).
+  easy.
+}
+symmetry.
+rewrite <- seq_shift.
+rewrite map_map.
+unfold vect_comm, vect_el.
+rewrite Hu, Hv.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  do 2 rewrite Nat.add_sub.
+  rewrite Nat.add_succ_l, Nat_sub_succ_1.
+  rewrite Nat.add_succ_l, Nat_sub_sub_swap, Nat_sub_succ_1.
+  cbn - [ "/" ].
+  rewrite map_map.
+  assert (Hnz : n ≠ 0) by flia Hi.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    now apply Nat.mod_upper_bound.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    do 2 rewrite Nat.add_sub.
+    rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+    cbn - [ "-" ].
+    easy.
+  }
+  remember (∑ (k = _, _), _) as x.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    do 2 rewrite Nat.add_sub.
+    rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
+    cbn - [ "-" ].
+    easy.
+  }
+  remember (∑ (k = _, _), _) as y in |-*.
+  subst x y.
+  easy.
+}
+cbn - [ "/" "-" ].
+...
+erewrite rngl_summation_eq_compat.
+apply map_ext_in.
+intros i Hi.
 ...
 Theorem vect_cross_mul_mul_l :
   ∀ u v w,
