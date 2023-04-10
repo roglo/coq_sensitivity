@@ -796,11 +796,34 @@ f_equal. {
   rewrite vect_add_comm.
   rewrite <- vect_add_assoc.
   f_equal.
+Theorem vect_cross_mul_mul_r :
+  ∀ u v w,
+  (u * (v * w) = ≺ u, w ≻ × v - ≺ u, v ≻ × w)%V.
+Proof.
+intros.
+...
+Theorem vect_cross_mul_mul_l :
+  ∀ u v w,
+  ((u * v) * w = ≺ u, w ≻ × v - ≺ v, w ≻ × u)%V.
+... ...
+rewrite vect_cross_mul_mul_r.
+rewrite vect_cross_mul_mul_l.
+unfold vect_sub.
+do 2 rewrite <- vect_add_assoc.
+f_equal.
+apply vect_add_comm.
+}
+Qed.
+Inspect 1.
+(* bizarre, c'est pas censé marcher pour n = 2 *)
+...
 Search (≺ _, _ ≻ × _)%V.
 Search (_ × ≺ _, _ ≻)%V.
 Search (_ * (_ * _))%V.
 Search ((_ * _) * _)%V.
 Search (_ * _)%V.
+...
+(* non, le produit vectoriel n'est pas associatif *)
 Theorem vect_cross_mul_assoc :
   ∀ u v w,
   vect_size u = vect_size v
