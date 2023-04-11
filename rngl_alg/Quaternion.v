@@ -1028,6 +1028,17 @@ f_equal. {
 }
 Qed.
 
+Theorem nion_mul_altern :
+  ∀ n a b,
+  vect_size (Qim a) = n
+  → vect_size (Qim b) = n
+  → ((a * b) * b)%H = (a * (b * b))%H.
+Proof.
+intros n (a, u) (b, v) Ha Hb.
+(* supposed to be true when n = 7 *)
+cbn in Ha, Hb |-*.
+f_equal. {
+
 ...
 
 (* to be completed... *)
