@@ -502,6 +502,19 @@ rewrite (vect_opp_el Hop).
 apply (rngl_mul_opp_l Hop).
 Qed.
 
+Theorem vect_mul_scal_l_opp_l :
+  rngl_has_opp = true →
+  ∀ a u, ((- a)%L × u = - (a × u))%V.
+Proof.
+intros Hop *.
+unfold vect_mul_scal_l, vect_opp; cbn.
+f_equal.
+rewrite map_map.
+apply map_ext_in.
+intros b Hb.
+apply (rngl_mul_opp_l Hop).
+Qed.
+
 End a.
 
 Declare Scope V_scope.
@@ -524,6 +537,7 @@ Arguments vect_mul_scal_l {T ro} s%L V%V.
 Arguments vect_mul_scal_l_add_distr_l {T ro rp} a%L (u v)%V.
 Arguments vect_mul_scal_l_add_distr_r {T ro rp} (a b)%L u%V.
 Arguments vect_mul_scal_l_assoc {T ro rp} (a b)%L V%V.
+Arguments vect_mul_scal_l_opp_l {T ro rp} Hop a%L u%V.
 Arguments vect_mul_scal_l_sub_distr_r {T ro rp} Hop (a b)%L u%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
 Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.

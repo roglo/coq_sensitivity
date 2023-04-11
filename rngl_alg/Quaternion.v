@@ -1,4 +1,4 @@
-(* complex, quaternion, octonions ... and other sorts of "...ions" *)
+(* complex, quaternion, octonions ... and other sorts of "...nions" *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
@@ -851,17 +851,52 @@ destruct Hn2 as [Hn2| Hn2]; [ now symmetry in Hn2 | ].
 easy.
 Qed.
 
+Theorem vect_cross_mul_mul_l :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  ∀ n u v w,
+  n ∈ [0; 1; 3]
+  → vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → ((u * v) * w = ≺ u, w ≻ × v - ≺ v, w ≻ × u)%V.
+Proof.
+intros Hop Hic * Hn Hu Hv Hw.
+rewrite (vect_cross_mul_anticomm Hop Hic). 2: {
+  rewrite vect_cross_mul_size; rewrite Hu, Hv; [ | easy ].
+  now rewrite Hw; apply Nat.min_l.
+}
+rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)); cycle 1. {
+  congruence.
+} {
+  rewrite vect_opp_size; congruence.
+} {
+  easy.
+} {
+  congruence.
+}
+do 2 rewrite (vect_opp_dot_mul_l Hop).
+rewrite (vect_dot_mul_comm Hic).
+unfold vect_sub.
+rewrite (vect_mul_scal_l_opp_l Hop).
+rewrite vect_add_comm.
+f_equal.
+rewrite <- (vect_mul_scal_l_opp_l Hop).
+rewrite (vect_dot_mul_comm Hic).
+now rewrite (rngl_opp_involutive Hop).
+Qed.
+
 Theorem nion_mul_assoc :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ n a b c,
-  vect_size (Qim a) = n
+  n ∈ [0; 1; 3]
+  → vect_size (Qim a) = n
   → vect_size (Qim b) = n
   → vect_size (Qim c) = n
-  → n ≤ 3
   → ((a * b) * c)%H = (a * (b * c))%H.
 Proof.
-intros Hop Hic n (a, u) (b, v) (c, w) Hu Hv Hw Hn3; cbn in Hu, Hv, Hw |-*.
+intros Hop Hic n (a, u) (b, v) (c, w) Hn3 Hu Hv Hw; cbn in Hu, Hv, Hw |-*.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -914,7 +949,11 @@ f_equal. {
   f_equal; f_equal.
   rewrite rngl_add_comm.
   f_equal.
-  now apply (@vect_dot_cross_mul_assoc Hop n).
+  apply (@vect_dot_cross_mul_assoc Hop n); [ easy | easy | easy | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n; apply -> Nat.succ_le_mono | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n; apply -> Nat.succ_le_mono | ].
+  easy.
 } {
   rewrite (vect_mul_scal_l_sub_distr_r Hop).
   do 4 rewrite vect_mul_scal_l_add_distr_l.
@@ -980,96 +1019,17 @@ f_equal. {
   rewrite vect_add_comm.
   rewrite <- vect_add_assoc.
   f_equal.
-Theorem vect_cross_mul_mul_l :
-  rngl_has_opp = true →
-  rngl_mul_is_comm = true →
-  ∀ n u v w,
-  n ∈ [0; 1; 3]
-  → vect_size u = n
-  → vect_size v = n
-  → vect_size w = n
-  → ((u * v) * w = ≺ u, w ≻ × v - ≺ v, w ≻ × u)%V.
-Proof.
-intros Hop Hic * Hn Hu Hv Hw.
-rewrite (vect_cross_mul_anticomm Hop Hic). 2: {
-  rewrite vect_cross_mul_size; rewrite Hu, Hv; [ | easy ].
-  now rewrite Hw; apply Nat.min_l.
-}
-rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)); cycle 1. {
-  congruence.
-} {
-  rewrite vect_opp_size; congruence.
-} {
-  easy.
-} {
-  congruence.
-}
-do 2 rewrite (vect_opp_dot_mul_l Hop).
-rewrite (vect_dot_mul_comm Hic).
-unfold vect_sub.
-Search (- _ × _)%V.
-Search ((- _) × _)%V.
-...
-rewrite vect_add_comm.
-f_equal.
-... ...
-rewrite vect_cross_mul_mul_r.
-rewrite vect_cross_mul_mul_l.
-unfold vect_sub.
-do 2 rewrite <- vect_add_assoc.
-f_equal.
-apply vect_add_comm.
+  rewrite (@vect_cross_mul_mul_r Hop Hic n); [ | easy | easy | easy | easy ].
+  rewrite (@vect_cross_mul_mul_l Hop Hic n); [ | easy | easy | easy | easy ].
+  unfold vect_sub.
+  do 2 rewrite <- vect_add_assoc.
+  f_equal.
+  apply vect_add_comm.
 }
 Qed.
+
 Inspect 1.
-(* bizarre, c'est pas censé marcher pour n = 2 *)
-...
-Search (≺ _, _ ≻ × _)%V.
-Search (_ × ≺ _, _ ≻)%V.
-Search (_ * (_ * _))%V.
-Search ((_ * _) * _)%V.
-Search (_ * _)%V.
-...
-(* non, le produit vectoriel n'est pas associatif *)
-Theorem vect_cross_mul_assoc :
-  ∀ u v w,
-  vect_size u = vect_size v
-  → (u * (v * w) = (u * v) * w)%V.
-Proof.
-intros * Huv.
-unfold "*"%V; f_equal.
-cbn - [ "/" ].
-rewrite List_map_seq_length.
-...
-apply map_ext_in.
-intros i Hi.
-apply in_seq in Hi.
-apply rngl_summation_eq_compat.
-intros j Hj.
-unfold vect_comm.
-cbn - [ "/" ].
-rewrite map_length.
-do 4 rewrite Nat.add_sub.
-rewrite seq_length.
-rewrite <- Huv.
-assert (Huz : vect_size u ≠ 0) by flia Hi.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply Nat.mod_upper_bound.
-}
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply Nat.mod_upper_bound.
-}
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply Nat.mod_upper_bound.
-}
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply Nat.mod_upper_bound.
-}
-unfold vect_el.
+
 ...
 
 (* to be completed... *)
