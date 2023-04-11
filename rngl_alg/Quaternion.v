@@ -1029,15 +1029,88 @@ f_equal. {
 Qed.
 
 Theorem nion_mul_altern :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
   ∀ n a b,
   vect_size (Qim a) = n
   → vect_size (Qim b) = n
   → ((a * b) * b)%H = (a * (b * b))%H.
 Proof.
-intros n (a, u) (b, v) Ha Hb.
+intros Hop Hic n (a, u) (b, v) Hu Hv.
 (* supposed to be true when n = 7 *)
-cbn in Ha, Hb |-*.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+cbn in Hu, Hv |-*.
 f_equal. {
+  rewrite (rngl_mul_sub_distr_r Hos).
+  rewrite (rngl_mul_sub_distr_l Hos).
+  rewrite rngl_mul_assoc.
+  do 2 rewrite <- (rngl_sub_add_distr Hos).
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite <- (vect_scal_mul_dot_mul_comm Hos).
+  rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
+    unfold vect_size; cbn.
+    rewrite map2_length.
+    do 2 rewrite map_length.
+    do 2 rewrite fold_vect_size.
+    rewrite Hv, Hu.
+    apply Nat.min_id.
+  } {
+    unfold vect_size; cbn.
+    now rewrite List_map_seq_length.
+  }
+  rewrite (vect_scal_mul_dot_mul_comm Hos).
+  rewrite (vect_scal_mul_dot_mul_comm Hos).
+  rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
+    now rewrite vect_mul_scal_size.
+  } {
+    now rewrite vect_mul_scal_size.
+  }
+  rewrite (vect_scal_mul_dot_mul_comm Hos).
+  rewrite (vect_scal_mul_dot_mul_comm Hos).
+  rewrite (vect_dot_mul_add_r n); [ | easy | | ]; cycle 1. {
+    rewrite vect_add_size.
+    rewrite vect_mul_scal_size.
+    rewrite Hv.
+    apply Nat.min_id.
+  } {
+    rewrite vect_cross_mul_size; rewrite Hv; [ | easy ].
+    apply Nat.min_id.
+  }
+  rewrite (vect_dot_mul_add_r n); [ | easy | | ]; cycle 1. {
+    now rewrite vect_mul_scal_size.
+  } {
+    now rewrite vect_mul_scal_size.
+  }
+  rewrite (vect_dot_mul_scal_mul_comm Hos Hic).
+  rewrite rngl_add_comm.
+  do 3 rewrite <- rngl_add_assoc.
+  f_equal; f_equal.
+  rewrite rngl_add_comm.
+  f_equal.
+...
+  apply (@vect_dot_cross_mul_assoc Hop n); [ easy | easy | easy | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n; apply -> Nat.succ_le_mono | ].
+  destruct Hn3 as [Hn3| Hn3]; [ now subst n; apply -> Nat.succ_le_mono | ].
+  easy.
+} {
+  rewrite (vect_mul_scal_l_sub_distr_r Hop).
+  do 4 rewrite vect_mul_scal_l_add_distr_l.
+  do 4 rewrite vect_mul_scal_l_assoc.
+  unfold vect_sub.
+  do 9 rewrite <- vect_add_assoc.
+  f_equal.
+  rewrite vect_add_comm.
+  rewrite (rngl_mul_comm Hic).
+  do 3 rewrite <- vect_add_assoc.
+  f_equal.
+  rewrite vect_add_comm, <- vect_add_assoc.
+  rewrite vect_add_comm.
+  rewrite (vect_cross_mul_add_distr_r Hop). 2: {
+    rewrite vect_mul_scal_size.
 
 ...
 
