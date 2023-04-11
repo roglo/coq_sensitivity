@@ -1028,8 +1028,6 @@ f_equal. {
 }
 Qed.
 
-Inspect 1.
-
 ...
 
 (* to be completed... *)
