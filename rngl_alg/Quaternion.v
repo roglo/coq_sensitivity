@@ -1005,6 +1005,13 @@ rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)); cycle 1. {
   congruence.
 }
 do 2 rewrite (vect_opp_dot_mul_l Hop).
+rewrite (vect_dot_mul_comm Hic).
+unfold vect_sub.
+Search (- _ × _)%V.
+Search ((- _) × _)%V.
+...
+rewrite vect_add_comm.
+f_equal.
 ... ...
 rewrite vect_cross_mul_mul_r.
 rewrite vect_cross_mul_mul_l.

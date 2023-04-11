@@ -514,6 +514,7 @@ Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
 Arguments vect_dot_mul_add_r {T ro rp} n%nat (u v w)%V.
+Arguments vect_dot_mul_comm {T ro rp} Hic (u v)%V.
 Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
