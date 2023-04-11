@@ -983,13 +983,28 @@ f_equal. {
 Theorem vect_cross_mul_mul_l :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
-  ∀ u v w,
-  ((u * v) * w = ≺ u, w ≻ × v - ≺ v, w ≻ × u)%V.
+  ∀ n u v w,
+  n ∈ [0; 1; 3]
+  → vect_size u = n
+  → vect_size v = n
+  → vect_size w = n
+  → ((u * v) * w = ≺ u, w ≻ × v - ≺ v, w ≻ × u)%V.
 Proof.
-intros Hop Hic *.
-rewrite vect_cross_mul_anticomm.
-rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)).
-(* etc. etc. *)
+intros Hop Hic * Hn Hu Hv Hw.
+rewrite (vect_cross_mul_anticomm Hop Hic). 2: {
+  rewrite vect_cross_mul_size; rewrite Hu, Hv; [ | easy ].
+  now rewrite Hw; apply Nat.min_l.
+}
+rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)); cycle 1. {
+  congruence.
+} {
+  rewrite vect_opp_size; congruence.
+} {
+  easy.
+} {
+  congruence.
+}
+do 2 rewrite (vect_opp_dot_mul_l Hop).
 ... ...
 rewrite vect_cross_mul_mul_r.
 rewrite vect_cross_mul_mul_l.
