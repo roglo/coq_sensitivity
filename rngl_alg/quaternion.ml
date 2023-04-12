@@ -105,9 +105,10 @@ let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in
 let (a, b) = (mk_octo (), mk_octo ()) in
 (a, b, nion_mul_2 (nion_mul_2 a b) b, nion_mul_2 a (nion_mul_2 b b));
 
-value e n i = repeat 0 (i - 1) @ [1 :: repeat 0 (n - i)];
+value e n i =
+  mk_nion 0 (repeat 0 (i - 1) @ [1 :: repeat 0 (n - i)]);
 
-let a = mk_nion 0 (e 7 1) in nion_mul_2 a a;
+let a = e 7 1 in nion_mul_2 a a;
 
 (* essai du mien à la main *)
 
@@ -136,11 +137,11 @@ let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in
 let (a, b) = (mk_octo (), mk_octo ()) in
 (a, b, nion_mul_3 (nion_mul_3 a b) b, nion_mul_3 a (nion_mul_3 b b));
 
-let a = mk_nion 0 (e 7 1) in nion_mul_3 a a;
+let a = e 7 1 in nion_mul_3 a a;
 
 (* *)
 
-vect_cross_mul_2 (e 7 1) (e 7 2);
+nion_mul_2 (e 7 1) (e 7 2);
 (* ah, tiens, ça colle pas avec celui de wikipedia *)
 (* ah si, faut regarder la section "Expression à l'aide des coordonnées" *)
 
@@ -148,20 +149,17 @@ vect_cross_mul_2 (e 7 1) (e 7 2);
 
 (* chez moi, e2 e7 = e1 *)
 "*** e2 e7 = e1";
-my_vect_cross_mul (e 7 2) (e 7 7);
-vect_cross_mul (e 7 2) (e 7 7);
+nion_mul_3 (e 7 2) (e 7 7);
+nion_mul (e 7 2) (e 7 7);
 
 (* mais j'ai aussi e1 e7 = - e4 *)
 "*** e1 e7 = - e4";
-vect_cross_mul (e 7 1) (e 7 7);
+nion_mul (e 7 1) (e 7 7);
 
 (* du coup, (e2 e7) e7 = e1 e7 = - e4 *)
 "*** (e2 e7) e7 = - e4";
-vect_cross_mul (vect_cross_mul (e 7 2) (e 7 7)) (e 7 7);
+nion_mul (nion_mul (e 7 2) (e 7 7)) (e 7 7);
 
 (* cependant, e2 (e7 e7) = - e2 *)
 "*** e2 (e7 e7) = - e2";
-vect_cross_mul (e 7 2) (vect_cross_mul (e 7 7) (e 7 7));
-
-(* ah non, je dis des conneries, l'alternativité concerne les octonions
-   pas les vecteurs *)
+nion_mul (e 7 2) (nion_mul (e 7 7) (e 7 7));
