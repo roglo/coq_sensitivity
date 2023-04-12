@@ -1,5 +1,10 @@
 (* complex, quaternion, octonions ... and other sorts of "...nions" *)
 
+(* incorrect definition ; the multiplication of my "octonions"
+   are not alternative *)
+
+...
+
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 

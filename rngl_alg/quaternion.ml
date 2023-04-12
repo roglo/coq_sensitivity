@@ -10,7 +10,8 @@ let vect_list v = v.vect_list;;
 let vect_size v = List.length v.vect_list;;
 
 let vect_el (v : int vector) i =
-  List.nth (vect_list v) (i - 1);;
+  if i < 1 || i > vect_size v then failwith "vect_el"
+  else List.nth (vect_list v) (i - 1);;
 
 let vect_dot_mul (u : 'a vector) (v : 'a vector) =
   List.fold_left (fun a b -> a + b) 0
@@ -69,9 +70,10 @@ let (a, b) = (mk_octo (), mk_octo ()) in (a, b, nion_mul (nion_mul a b) b, nion_
 
 (* essai comme celui de wikipedia *)
 
-(*
+"***** celui de wikipedia...";;
+
 let vect_cross_mul_2 (u : 'a vector) (v : 'a vector) =
-  if vect_size u <> 7 then failwith "vect_cross_mul_2"
+  if vect_size u <> 7 || vect_size v <> 7 then failwith "vect_cross_mul_2"
   else
     let c i j = vect_comm u v i j in
     mk_vect
@@ -95,12 +97,15 @@ let nion_mul_2 {qre = a1; qim = v1} {qre = a2; qim = v2} =
 let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in (a, b, c, nion_mul_2 (nion_mul_2 a b) c, nion_mul_2 a (nion_mul_2 b c));;
 
 let (a, b) = (mk_octo (), mk_octo ()) in (a, b, nion_mul_2 (nion_mul_2 a b) b, nion_mul_2 a (nion_mul_2 b b));;
-*)
+
+let a = mk_nion 0 (mk_vect [1;0;0;0;0;0;0]) in nion_mul_2 a a;;
 
 (* essai du mien à la main *)
 
+"***** le mien...";;
+
 let vect_cross_mul_3 (u : 'a vector) (v : 'a vector) =
-  if vect_size u <> 7 then failwith "vect_cross_mul_3"
+  if vect_size u <> 7 || vect_size v <> 7 then failwith "vect_cross_mul_3"
   else
     let c i j = vect_comm u v i j in
     mk_vect
@@ -124,3 +129,13 @@ let nion_mul_3 {qre = a1; qim = v1} {qre = a2; qim = v2} =
 let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in (a, b, c, nion_mul_3 (nion_mul_3 a b) c, nion_mul_3 a (nion_mul_3 b c));;
 
 let (a, b) = (mk_octo (), mk_octo ()) in (a, b, nion_mul_3 (nion_mul_3 a b) b, nion_mul_3 a (nion_mul_3 b b));;
+
+let a = mk_nion 0 (mk_vect [1;0;0;0;0;0;0]) in nion_mul_3 a a;;
+
+(* *)
+
+vect_cross_mul_2 (mk_vect [1;0;0;0;0;0;0]) (mk_vect [0;1;0;0;0;0;0]);;
+(* ah, tiens, ça colle pas avec celui de wikipedia *)
+(* ah si, faut regarder la section "Expression à l'aide des coordonnées" *)
+
+(* bon, toute ma réflexion est à recommencer *)
