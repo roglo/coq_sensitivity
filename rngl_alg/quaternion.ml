@@ -86,8 +86,12 @@ value vect_cross_mul_2 (u : list α) (v : list α) =
   if List.length u <> 7 || List.length v <> 7 then failwith "vect_cross_mul_2"
   else
     let c i j = vect_comm u v i j in
-    [c 2 4 + c 3 7 + c 5 6; c 3 5 + c 4 1 + c 6 7; c 4 6 + c 5 2 + c 7 1;
-     c 5 7 + c 6 3 + c 1 2; c 6 1 + c 7 4 + c 2 3; c 7 2 + c 1 5 + c 3 4;
+    [c 2 4 + c 3 7 + c 5 6;
+     c 3 5 + c 4 1 + c 6 7;
+     c 4 6 + c 5 2 + c 7 1;
+     c 5 7 + c 6 3 + c 1 2;
+     c 6 1 + c 7 4 + c 2 3;
+     c 7 2 + c 1 5 + c 3 4;
      c 1 3 + c 2 6 + c 4 5]
 ;
 
@@ -112,19 +116,19 @@ let a = e 7 1 in nion_mul_2 a a;
 
 (* essai du mien à la main *)
 
-"***** le mien...";
+"***** let's test that...";
 
 value my_vect_cross_mul (u : list α) (v : list α) =
   if List.length u <> 7 || List.length v <> 7 then failwith "my_vect_cross_mul"
   else
     let c i j = vect_comm u v i j in
-    [c 2 7 + c 3 6 + c 4 5;
-     c 3 1 + c 4 7 + c 5 6;
-     c 4 2 + c 5 1 + c 6 7;
-     c 5 3 + c 6 2 + c 7 1;
-     c 6 4 + c 7 3 + c 1 2;
-     c 7 5 + c 1 4 + c 2 3;
-     c 1 6 + c 2 5 + c 3 4]
+    [c 2 6 + c 3 4 + c 5 7; (* c (1+1) (1+5) + c (2+1) (2+2) + c (4+1) (3+4) *)
+     c 3 7 + c 4 5 + c 6 1;
+     c 4 1 + c 5 6 + c 7 2;
+     c 5 2 + c 6 7 + c 1 3;
+     c 6 3 + c 7 1 + c 2 4;
+     c 7 4 + c 1 2 + c 3 5;
+     c 1 5 + c 2 3 + c 4 6]
 ;
 
 my_vect_cross_mul (qim (mk_octo ())) (qim (mk_octo ()));
