@@ -135,13 +135,12 @@ value nion_mul_3 {qre = a1; qim = v1} {qre = a2; qim = v2} =
        (my_vect_cross_mul v1 v2))
 ;
 
-"*** alternativity ?";
-
-let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in
-(a, b, c, nion_mul_3 (nion_mul_3 a b) c, nion_mul_3 a (nion_mul_3 b c));
+"*** my alternativity ?";
 
 let (a, b) = (mk_octo (), mk_octo ()) in
 (a, b, nion_mul_3 (nion_mul_3 a b) b, nion_mul_3 a (nion_mul_3 b b));
+
+"*** end my alternativity";
 
 let a = e 7 1 in nion_mul_3 a a;
 
