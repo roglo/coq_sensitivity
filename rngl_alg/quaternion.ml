@@ -118,8 +118,12 @@ value my_vect_cross_mul (u : list α) (v : list α) =
   if List.length u <> 7 || List.length v <> 7 then failwith "my_vect_cross_mul"
   else
     let c i j = vect_comm u v i j in
-    [c 2 7 + c 3 6 + c 4 5; c 3 1 + c 4 7 + c 5 6; c 4 2 + c 5 1 + c 6 7;
-     c 5 3 + c 6 2 + c 7 1; c 6 4 + c 7 3 + c 1 2; c 7 5 + c 1 4 + c 2 3;
+    [c 2 7 + c 3 6 + c 4 5;
+     c 3 1 + c 4 7 + c 5 6;
+     c 4 2 + c 5 1 + c 6 7;
+     c 5 3 + c 6 2 + c 7 1;
+     c 6 4 + c 7 3 + c 1 2;
+     c 7 5 + c 1 4 + c 2 3;
      c 1 6 + c 2 5 + c 3 4]
 ;
 
