@@ -135,6 +135,8 @@ value nion_mul_3 {qre = a1; qim = v1} {qre = a2; qim = v2} =
        (my_vect_cross_mul v1 v2))
 ;
 
+"*** alternativity ?";
+
 let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in
 (a, b, c, nion_mul_3 (nion_mul_3 a b) c, nion_mul_3 a (nion_mul_3 b c));
 
@@ -162,8 +164,8 @@ nion_mul (e 7 1) (e 7 7);
 
 (* du coup, (e2 e7) e7 = e1 e7 = - e4 *)
 "*** (e2 e7) e7 = - e4";
-nion_mul (nion_mul (e 7 2) (e 7 7)) (e 7 7);
+nion_mul_3 (nion_mul_3 (e 7 2) (e 7 7)) (e 7 7);
 
 (* cependant, e2 (e7 e7) = - e2 *)
 "*** e2 (e7 e7) = - e2";
-nion_mul (e 7 2) (nion_mul (e 7 7) (e 7 7));
+nion_mul_3 (e 7 2) (nion_mul_3 (e 7 7) (e 7 7));
