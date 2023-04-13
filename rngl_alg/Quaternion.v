@@ -1,10 +1,5 @@
 (* complex, quaternion, octonions ... and other sorts of "...nions" *)
 
-(* incorrect definition ; the multiplication of my "octonions"
-   are not alternative *)
-
-...
-
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
@@ -14,6 +9,65 @@ Import Init.Nat.
 
 Require Import Main.Misc Main.RingLike.
 Require Import Main.IterAdd Main.MyVector.
+
+Fixpoint comb_elem_rest A (la : list A) :=
+  match la with
+  | [] => []
+  | a :: lb =>
+      (a, lb) :: map (λ al, (fst al, a :: snd al)) (comb_elem_rest lb)
+  end.
+
+Fixpoint pair_comb_loop A it (la : list A) : list (list (A * A)) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] => []
+      | a :: lb =>
+          flat_map
+            (λ bl,
+              match pair_comb_loop it' (snd bl) with
+              | [] => [[(a, fst bl)]]
+              | ll' => map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
+              end)
+            (comb_elem_rest lb)
+      end
+  end.
+
+Definition pair_comb A (la : list A) := pair_comb_loop (length la) la.
+
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (pair_comb [1;2;3;4]).
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (pair_comb [1;2]).
+Compute (pair_comb [1;2;3;4]).
+Compute (pair_comb [1;2;3;4;5;6;7]).
+
+Fixpoint glip (la : list (nat * nat)) :=
+  match la with
+  | [] => []
+  | (a, b) :: lb => (b - a) :: glip lb
+  end.
+
+Fixpoint has_no_dup (la : list nat) :=
+  match la with
+  | [] => true
+  | a :: lb =>
+      if member Nat.eqb a lb then false
+      else has_no_dup lb
+  end.
+
+Compute (pair_comb [1;2;3;4;5;6]).
+Compute (map glip (pair_comb [1;2;3;4;5;6])).
+Compute (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
+Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6]))).
+
+...
+
+(* incorrect definition ; the multiplication of my "octonions"
+   are not alternative *)
+
+...
 
 Definition vect_comm {T} {ro : ring_like_op T} (u v : vector T) i j :=
   let i := (i - 1) mod vect_size u + 1 in
