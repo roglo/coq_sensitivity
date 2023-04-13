@@ -1,11 +1,11 @@
 (* ocaml -I +camlp5 camlp5r.cma *)
 
 value rec seq start len =
-  match len with
-  [ 0 → []
-  | _ →
-      let len0 = len - 1 in
-      [start :: seq (start + 1) len0] ]
+  if len < 0 then failwith "seq"
+  else if len = 0 then []
+  else
+    let len0 = len - 1 in
+    [start :: seq (start + 1) len0]
 ;
 
 value repeat (x : α) (n : int) = List.map (fun _ → x) (seq 0 n);
