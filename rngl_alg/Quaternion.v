@@ -60,7 +60,7 @@ Fixpoint has_no_dup (la : list nat) :=
 Compute (pair_comb [1;2;3;4;5;6]).
 Compute (map glip (pair_comb [1;2;3;4;5;6])).
 Compute (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
-Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb (seq 1 7)))).
+Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb (seq 1 6)))).
 
 ...
 
@@ -75,6 +75,10 @@ trouver une fonction qui fasse ça :
 6 → [(1, 3); (2, 6); (4, 5)]
 7 → [(1, 3); (2, 6); (4, 5)]
 8 → ?
+
+ou
+6 → [(1, 5); (2, 3); (4, 6)]
+7 → [(1, 5); (2, 3); (4, 6)]
 
 ...
 
