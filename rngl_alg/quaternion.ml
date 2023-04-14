@@ -68,6 +68,7 @@ let _e7 = mk_nion 0 [0; 0; 0; 0; 0; 0; 1] in
  List.map (fun e → nion_mul _e3 e) [_e1; _e2; _e3; _e4; _e5; _e6; _e7]);
 
 value r _ = Random.int 10 - 5;
+value mk_nth n = mk_nion (r ()) (List.map r (seq 1 n));
 value mk_octo () = mk_nion (r ()) (List.map r (seq 1 7));
 
 let (a, b, c) = (mk_octo (), mk_octo (), mk_octo ()) in
@@ -118,11 +119,22 @@ let a = e 7 1 in nion_mul_2 a a;
 
 "***** let's test that...";
 
+value n = 7;
+
 value my_vect_cross_mul (u : list α) (v : list α) =
-  let n = 7 in
   if List.length u <> n || List.length v <> n then failwith "my_vect_cross_mul"
   else
     let c i j = vect_comm u v i j in
+(* essai avec n = 8
+    [c 2 4 + c 3 7 + c 5 6;
+     c 3 5 + c 4 8 + c 6 7;
+     c 4 6 + c 5 1 + c 7 8;
+     c 5 7 + c 6 2 + c 8 1;
+     c 6 8 + c 7 3 + c 1 2;
+     c 7 1 + c 8 4 + c 2 3;
+     c 8 2 + c 1 5 + c 3 4;
+     c 1 3 + c 2 6 + c 4 5]
+*)
     [c 2 6 + c 3 4 + c 5 7;
      c 3 7 + c 4 5 + c 6 1;
      c 4 1 + c 5 6 + c 7 2;
@@ -130,9 +142,10 @@ value my_vect_cross_mul (u : list α) (v : list α) =
      c 6 3 + c 7 1 + c 2 4;
      c 7 4 + c 1 2 + c 3 5;
      c 1 5 + c 2 3 + c 4 6]
+(**)
 ;
 
-my_vect_cross_mul (qim (mk_octo ())) (qim (mk_octo ()));
+my_vect_cross_mul (qim (mk_nth n)) (qim (mk_nth n));
 
 value nion_mul_3 {qre = a1; qim = v1} {qre = a2; qim = v2} =
   mk_nion (a1 * a2 - vect_dot_mul v1 v2)
@@ -142,12 +155,12 @@ value nion_mul_3 {qre = a1; qim = v1} {qre = a2; qim = v2} =
 
 "*** my alternativity ?";
 
-let (a, b) = (mk_octo (), mk_octo ()) in
+let (a, b) = (mk_nth n, mk_nth n) in
 (a, b, nion_mul_3 (nion_mul_3 a b) b, nion_mul_3 a (nion_mul_3 b b));
 
 "*** end my alternativity";
 
-let a = e 7 1 in nion_mul_3 a a;
+let a = e n 1 in nion_mul_3 a a;
 
 (* *)
 
@@ -159,7 +172,7 @@ nion_mul_2 (e 7 1) (e 7 2);
 
 (* chez moi, e2 e7 = e1 *)
 "*** e2 e7 = e1";
-nion_mul_3 (e 7 2) (e 7 7);
+nion_mul_3 (e n 2) (e n 7);
 nion_mul (e 7 2) (e 7 7);
 
 (* mais j'ai aussi e1 e7 = - e4 *)
