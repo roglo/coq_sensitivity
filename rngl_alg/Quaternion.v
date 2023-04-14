@@ -64,6 +64,20 @@ Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb
 
 ...
 
+trouver une fonction qui fasse ça :
+
+0 → []
+1 → []
+2 → [(1, 2)]
+3 → [(1, 2)]
+4 → [(1, 4); (2, 3)]
+5 → [(1, 4); (2, 3)]
+6 → [(1, 3); (2, 6); (4, 5)]
+7 → [(1, 3); (2, 6); (4, 5)]
+8 → ?
+
+...
+
 (* incorrect definition ; the multiplication of my "octonions"
    are not alternative *)
 
