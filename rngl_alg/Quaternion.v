@@ -64,6 +64,8 @@ Compute (filter (λ ij, has_no_dup (snd ij)) (map (λ i, (i, glip i)) (pair_comb
 
 ...
 
+([(1, 4); (2, 6); (3, 5)], [3; 4; 2]);
+
 trouver une fonction qui fasse ça :
 
 0 → []
