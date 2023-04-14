@@ -119,10 +119,11 @@ let a = e 7 1 in nion_mul_2 a a;
 "***** let's test that...";
 
 value my_vect_cross_mul (u : list α) (v : list α) =
-  if List.length u <> 7 || List.length v <> 7 then failwith "my_vect_cross_mul"
+  let n = 7 in
+  if List.length u <> n || List.length v <> n then failwith "my_vect_cross_mul"
   else
     let c i j = vect_comm u v i j in
-    [c 2 6 + c 3 4 + c 5 7; (* c (1+1) (1+5) + c (2+1) (2+2) + c (4+1) (3+4) *)
+    [c 2 6 + c 3 4 + c 5 7;
      c 3 7 + c 4 5 + c 6 1;
      c 4 1 + c 5 6 + c 7 2;
      c 5 2 + c 6 7 + c 1 3;
