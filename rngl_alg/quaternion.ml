@@ -142,15 +142,15 @@ value my_vect_cross_mul (u : list α) (v : list α) =
      c 6 3 + c 7 1 + c 2 4;
      c 7 4 + c 1 2 + c 3 5;
      c 1 5 + c 2 3 + c 4 6]
-(* essai avec n = 8, mais en essayant de refaire l'aternativité
+(* essai avec n = 7, mais en essayant de refaire l'aternativité
    à la main
-    [c 2 5 + c 3 7 + c 4 6;
-     c 5 1 + (* 3 4 6 7 *)
-     c 7 1 + (* 2 4 5 6 *)
-     c 6 1 + (* 2 3 4 7 *)
-     c 1 2 + (* 3 4 6 7 *) → donc non
+    [c 2 7 + c 3 6 + c 4 5;
+     c 7 1 + 3 4 5 6 bof
+     c 6 1 +
+     c 5 1 +
      c 1 4 +
      c 1 3 +
+     c 1 2 +
 *)
 ;
 
