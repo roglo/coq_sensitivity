@@ -4613,6 +4613,7 @@ Arguments polyn_zero {T ro}.
 Arguments polyn_one {T ro}.
 Arguments polyn_add {T ro} p1 p2.
 Arguments polyn_mul {T ro} p1 p2.
+Arguments polyn_norm {T ro} la%lap.
 Arguments polyn_quot {T ro rp Hos Heb} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
 Arguments polyn_ring_like_op {T ro rp} Hos Heb.
