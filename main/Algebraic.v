@@ -611,7 +611,8 @@ assert
   unfold polyn_mul.
   cbn - [ det ].
   rewrite (has_polyn_prop_lap_norm Heb).
-Search (polyn_norm (_ * _)).
+  unfold polyn_norm.
+Search (lap_norm (_ * _)).
 ...
   rewrite <- Hcr; [ | easy ]; f_equal.
   rewrite (List_map_nth' 0). 2: {
