@@ -606,14 +606,6 @@ assert
    (det sm * polyn_of_norm_lap (lap_x_power (n + m - i)))%pol =
     det (mat_repl_vect i sm v)). {
   intros i Hi.
-(**)
-  unfold polyn_of_norm_lap.
-  unfold polyn_mul.
-  cbn - [ det ].
-  rewrite (has_polyn_prop_lap_norm Heb).
-  unfold polyn_norm.
-Search (lap_norm (_ * _)).
-...
   rewrite <- Hcr; [ | easy ]; f_equal.
   rewrite (List_map_nth' 0). 2: {
     rewrite rev_length, seq_length.
