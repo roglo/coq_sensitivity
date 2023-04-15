@@ -592,6 +592,13 @@ assert (H : (sm • u)%V = v). {
 }
 specialize (Hcr H); clear H.
 move Hcr at bottom.
+replace (mat_nrows sm) with (n + m) in Hcr. 2: {
+  rewrite Hsm, Hll; cbn.
+  rewrite map_length.
+  rewrite rlap_sylvester_list_list_length.
+  do 2 rewrite rev_length.
+  now rewrite <- Hn, <- Hm.
+}
 ...
 
 End a.
