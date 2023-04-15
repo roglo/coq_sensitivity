@@ -599,6 +599,24 @@ replace (mat_nrows sm) with (n + m) in Hcr. 2: {
   do 2 rewrite rev_length.
   now rewrite <- Hn, <- Hm.
 }
+rewrite Hu in Hcr.
+cbn - [ det ] in Hcr.
+assert
+  (H : ∀ i, 1 ≤ i ≤ n + m →
+   (det sm * polyn_of_norm_lap (lap_x_power (n + m - i)))%pol =
+    det (mat_repl_vect i sm v)). {
+  intros i Hi.
+  rewrite <- Hcr; [ | easy ]; f_equal.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite rev_length, seq_length.
+    flia Hi.
+  }
+  unfold polyn_x_power.
+  rewrite List_rev_seq_nth; [ | flia Hi ].
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  now rewrite Nat_sub_succ_1, Nat.add_0_l.
+}
+clear Hcr; rename H into Hcr.
 ...
 
 End a.

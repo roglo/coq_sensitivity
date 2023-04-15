@@ -1767,6 +1767,28 @@ rewrite repeat_cons; f_equal.
 apply IHn.
 Qed.
 
+Theorem List_rev_seq_nth :
+  ∀ len sta n d, n < len → nth n (rev (seq sta len)) d = sta + len - S n.
+Proof.
+intros * Hn.
+revert sta.
+induction len; intros; [ easy | ].
+cbn.
+destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
+  subst n.
+  rewrite app_nth2. 2: {
+    now rewrite rev_length, seq_length; unfold ge.
+  }
+  rewrite rev_length, seq_length, Nat.sub_diag; cbn.
+  now rewrite Nat.add_sub.
+}
+assert (H : n < len) by flia Hn Hnl.
+specialize (IHlen H).
+rewrite app_nth1; [ | now rewrite rev_length, seq_length ].
+rewrite IHlen.
+now rewrite Nat.add_succ_r.
+Qed.
+
 Theorem List_nth_repeat : ∀ A (a d : A) i n,
   nth i (repeat a n) d = if lt_dec i n then a else d.
 Proof.
