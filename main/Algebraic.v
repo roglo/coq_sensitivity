@@ -617,7 +617,16 @@ assert
   now rewrite Nat_sub_succ_1, Nat.add_0_l.
 }
 clear Hcr; rename H into Hcr.
-Print polyn_of_norm_lap.
+assert
+  (H : ∀ i, 1 ≤ i ≤ n + m →
+   polyn_norm (lap (det sm) * lap_x_power (n + m - i)) =
+    det (mat_repl_vect i sm v)). {
+  intros i Hi.
+  rewrite <- Hcr; [ | easy ].
+  unfold polyn_mul; cbn.
+  rewrite lap_norm_x_power; [ easy | now rewrite Hch | easy ].
+}
+clear Hcr; rename H into Hcr.
 ...
 
 End a.
