@@ -590,6 +590,8 @@ assert (H : (sm • u)%V = v). {
   }
   f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
 }
+unfold polyn_of_norm_lap.
+apply eq_polyn_eq; cbn - [ det lap_norm ].
 specialize (Hcr H); clear H.
 move Hcr at bottom.
 replace (mat_nrows sm) with (n + m) in Hcr. 2: {
@@ -625,6 +627,17 @@ assert
   rewrite <- Hcr; [ | easy ].
   unfold polyn_mul; cbn.
   rewrite lap_norm_x_power; [ easy | now rewrite Hch | easy ].
+}
+clear Hcr; rename H into Hcr.
+assert
+  (H : ∀ i, 1 ≤ i ≤ n + m →
+    lap_norm (lap (det sm) * lap_x_power (n + m - i)) =
+    lap (det (mat_repl_vect i sm v))). {
+  intros i Hi.
+  specialize (Hcr i Hi).
+  unfold polyn_norm in Hcr.
+  apply (f_equal (λ p, lap p)) in Hcr.
+  easy.
 }
 clear Hcr; rename H into Hcr.
 ...
