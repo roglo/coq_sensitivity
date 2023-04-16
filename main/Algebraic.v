@@ -603,7 +603,7 @@ rewrite Hu in Hcr.
 cbn - [ det ] in Hcr.
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
-   (det sm * polyn_of_norm_lap (lap_x_power (n + m - i)))%pol =
+    (det sm * polyn_of_norm_lap (lap_x_power (n + m - i)))%pol =
     det (mat_repl_vect i sm v)). {
   intros i Hi.
   rewrite <- Hcr; [ | easy ]; f_equal.
@@ -619,7 +619,7 @@ assert
 clear Hcr; rename H into Hcr.
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
-   polyn_norm (lap (det sm) * lap_x_power (n + m - i)) =
+    polyn_norm (lap (det sm) * lap_x_power (n + m - i)) =
     det (mat_repl_vect i sm v)). {
   intros i Hi.
   rewrite <- Hcr; [ | easy ].
