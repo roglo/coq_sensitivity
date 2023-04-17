@@ -116,19 +116,35 @@ symmetry.
 apply (lap_mul_assoc Hos Heb).
 Qed.
 
+Theorem lap_x_power_has_polyn_prop :
+  rngl_characteristic ≠ 1 →
+  rngl_has_eqb = true →
+  ∀ n, has_polyn_prop (lap_x_power n) = true.
+Proof.
+intros Hch Heb *.
+apply Bool.orb_true_iff.
+right.
+destruct n; cbn. {
+  apply (rngl_neqb_neq Heb).
+  now apply rngl_1_neq_0_iff.
+}
+rewrite last_last.
+remember (repeat 0%L n ++ [1%L]) as la eqn:Hla; symmetry in Hla.
+destruct la as [| a]. {
+  now apply app_eq_nil in Hla.
+}
+apply (rngl_neqb_neq Heb).
+now apply rngl_1_neq_0_iff.
+Qed.
+
 Theorem lap_norm_x_power :
   rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
-  ∀ la, lap_norm (lap_x_power la) = lap_x_power la.
+  ∀ n, lap_norm (lap_x_power n) = lap_x_power n.
 Proof.
 intros Hch Heb *.
-unfold lap_x_power.
 apply (has_polyn_prop_lap_norm Heb).
-unfold has_polyn_prop.
-apply Bool.orb_true_iff; right.
-rewrite last_last.
-apply (rngl_neqb_neq Heb).
-now apply rngl_1_neq_0_iff.
+apply (lap_x_power_has_polyn_prop Hch Heb).
 Qed.
 
 Theorem polyn_x_power_add :
@@ -157,6 +173,22 @@ apply eq_polyn_eq; cbn.
 f_equal.
 rewrite (lap_x_power_add Hos Heb).
 now do 2 rewrite (lap_norm_x_power Hch Heb).
+Qed.
+
+Theorem lap_norm_mul_x_power_r :
+  rngl_has_opp_or_subt = true →
+  rngl_has_inv = true →
+  rngl_characteristic ≠ 1 →
+  rngl_has_eqb = true →
+  ∀ la n,
+  lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
+Proof.
+intros Hos Hiv Hch Heb *.
+rewrite <- (lap_mul_norm_idemp_l Hos Heb).
+rewrite (lap_norm_mul Hos Heb Hiv); [ easy | | ]. {
+  apply polyn_norm_prop.
+}
+apply (lap_x_power_has_polyn_prop Hch Heb).
 Qed.
 
 (* U and V such that PU+QV=res(P,Q) *)
@@ -631,28 +663,19 @@ assert
 clear Hcr; rename H into Hcr.
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
-    lap_norm (lap (det sm) * lap_x_power (n + m - i)) =
-    lap (det (mat_repl_vect i sm v))). {
+     (lap_norm (lap (det sm)) * lap_x_power (n + m - i))%lap =
+     lap (det (mat_repl_vect i sm v))). {
   intros i Hi.
   specialize (Hcr i Hi).
   unfold polyn_norm in Hcr.
   apply (f_equal (λ p, lap p)) in Hcr.
+  cbn - [ det ] in Hcr.
+  rewrite (lap_norm_mul_x_power_r Hos Hin) in Hcr; [ | | easy ]. 2: {
+    now rewrite Hch.
+  }
   easy.
 }
 clear Hcr; rename H into Hcr.
-Theorem glop :
-  rngl_has_opp_or_subt = true →
-  rngl_has_inv = true →
-  rngl_has_eqb = true →
-  ∀ la n,
-  lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
-Proof.
-intros Hos Hiv Heb *.
-rewrite <- (lap_mul_norm_idemp_l Hos Heb).
-rewrite (lap_norm_mul Hos Heb Hiv); [ easy | | ]. {
-  apply polyn_norm_prop.
-} {
-Search (has_polyn_prop (lap_x_power _)).
 ...
 
 End a.
