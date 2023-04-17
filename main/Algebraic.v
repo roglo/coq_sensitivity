@@ -640,6 +640,19 @@ assert
   easy.
 }
 clear Hcr; rename H into Hcr.
+Theorem glop :
+  rngl_has_opp_or_subt = true →
+  rngl_has_inv = true →
+  rngl_has_eqb = true →
+  ∀ la n,
+  lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
+Proof.
+intros Hos Hiv Heb *.
+rewrite <- (lap_mul_norm_idemp_l Hos Heb).
+rewrite (lap_norm_mul Hos Heb Hiv); [ easy | | ]. {
+  apply polyn_norm_prop.
+} {
+Search (has_polyn_prop (lap_x_power _)).
 ...
 
 End a.
