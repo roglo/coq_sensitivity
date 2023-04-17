@@ -676,6 +676,20 @@ assert
   easy.
 }
 clear Hcr; rename H into Hcr.
+assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
+  rewrite Hsm.
+  unfold polyn_of_const.
+  unfold polyn_of_norm_lap.
+  apply eq_polyn_eq.
+  cbn - [ det lap_norm ].
+Search (map (λ _, map _ _)).
+(* bof... bon, faut voir *)
+...
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H1| H1]. {
+    cbn.
+    rewrite map_length.
+    cbn in H1.
 ...
 
 End a.
