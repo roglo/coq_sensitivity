@@ -385,8 +385,13 @@ rewrite minus_one_pow_succ. {
     rewrite H; cbn.
     unfold polyn_of_const.
     unfold polyn_of_norm_lap; cbn.
+...
+Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
+...
 Search (lap (- _)).
-    rewrite rngl_eqb_refl.
+rewrite lap_polyn_opp.
+...
+    rewrite (rngl_eqb_refl Heb).
 ...
     unfold minus_one_pow in H.
     destruct (n mod 2). {
@@ -394,7 +399,6 @@ Search (lap (- _)).
 ...
 subst rpp.
 subst Hos.
-Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
 ...
 rewrite <- lap_polyn_opp.
 apply has_polyn_prop_lap_norm.
