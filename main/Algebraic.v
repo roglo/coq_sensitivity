@@ -340,10 +340,19 @@ intros.
 induction n; [ easy | ].
 rewrite (minus_one_pow_succ Hop).
 rewrite (polyn_of_const_opp Hop Heb).
-rewrite IHn; symmetry.
+rewrite IHn.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop).
 set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+rewrite minus_one_pow_succ. {
+  apply eq_polyn_eq.
+  cbn.
+Search (lap_norm (- _)).
+...
+unfold polyn_opp.
+Set Printing All.
+...
 unfold rop; cbn.
+...
 Set Printing All.
 ...
 apply minus_one_pow_succ.
