@@ -297,6 +297,58 @@ f_equal.
 now do 2 rewrite rngl_summation_list_only_one.
 Qed.
 
+Theorem polyn_of_const_opp :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ a, polyn_of_const (- a) = (- polyn_of_const a)%pol.
+Proof.
+intros Hop Heb *.
+apply eq_polyn_eq; cbn.
+do 2 rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
+  apply (rngl_eqb_eq Heb) in Ha.
+  destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]; [ easy | ].
+  apply (rngl_eqb_neq Heb) in Hb.
+  apply (f_equal rngl_opp) in Ha.
+  rewrite (rngl_opp_involutive Hop) in Ha.
+  now rewrite (rngl_opp_0 Hop) in Ha.
+} {
+  apply (rngl_eqb_neq Heb) in Ha.
+  destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]. {
+    apply (rngl_eqb_eq Heb) in Hb.
+    now rewrite Hb, (rngl_opp_0 Hop) in Ha.
+  }
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hc| Hc]; [ | easy ].
+  now apply (rngl_eqb_eq Heb) in Hc.
+}
+Qed.
+
+Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
+  match rngl_has_opp_or_subt_iff with
+  | conj x x0 => x0
+  end (or_introl Hop).
+
+Theorem polyn_of_const_minus_one_pow :
+  ∀ (Hop : rngl_has_opp = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
+  ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite (minus_one_pow_succ Hop).
+rewrite (polyn_of_const_opp Hop Heb).
+rewrite IHn; symmetry.
+set (Hos := rngl_has_opp_has_opp_or_subt Hop).
+set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+unfold rop; cbn.
+Set Printing All.
+...
+apply minus_one_pow_succ.
+...
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -810,6 +862,7 @@ assert
   rewrite (polyn_of_const_rngl_summation Hos Heb).
   apply rngl_summation_eq_compat.
   intros i Hi.
+  rewrite (polyn_of_const_mul Hii Hos Heb).
   rewrite (polyn_of_const_mul Hii Hos Heb).
 ...
   rewrite (List_map_nth' []).
