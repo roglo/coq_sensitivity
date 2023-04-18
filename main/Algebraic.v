@@ -230,6 +230,45 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem polyn_of_const_mul :
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ a b,
+  polyn_of_const (a * b) = (polyn_of_const a * polyn_of_const b)%L.
+Proof.
+intros Hii *.
+apply eq_polyn_eq; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]; [ easy | ].
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]; [ easy | ].
+  apply (rngl_eqb_eq Heb) in Hab.
+  apply (rngl_eqb_neq Heb) in Ha, Hb.
+  now apply (rngl_eq_mul_0_r Hos) in Hab.
+}
+apply (rngl_eqb_neq Heb) in Hab.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
+  apply (rngl_eqb_eq Heb) in Ha; subst a.
+  now rewrite (rngl_mul_0_l Hos) in Hab.
+}
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]. {
+  apply (rngl_eqb_eq Heb) in Hb; subst b.
+  now rewrite (rngl_mul_0_r Hos) in Hab.
+}
+cbn.
+rewrite rngl_summation_only_one.
+rewrite if_bool_if_dec.
+apply (rngl_eqb_neq Heb) in Hab.
+destruct (Sumbool.sumbool_of_bool _); [ | easy ].
+congruence.
+Qed.
+
 Theorem polyn_of_const_rngl_summation :
   ∀ (Hos : rngl_has_opp_or_subt = true),
   ∀ (Heb : rngl_has_eqb = true),
@@ -746,6 +785,7 @@ clear Hcr; rename H into Hcr.
 assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
 Theorem det_polyn_of_const :
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic ≠ 1 →
   ∀ (Hos : rngl_has_opp_or_subt = true),
   ∀ (Heb : rngl_has_eqb = true),
@@ -754,7 +794,7 @@ Theorem det_polyn_of_const :
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
-intros Hch *.
+intros Hii Hch *.
 cbn.
 rewrite map_length.
 assert
@@ -770,6 +810,7 @@ assert
   rewrite (polyn_of_const_rngl_summation Hos Heb).
   apply rngl_summation_eq_compat.
   intros i Hi.
+  rewrite (polyn_of_const_mul Hii Hos Heb).
 ...
   rewrite (List_map_nth' []).
 ...
