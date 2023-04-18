@@ -383,23 +383,30 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   clear H2.
   rewrite polyn_add_comm in H3; [ | easy ].
   rewrite polyn_add_0_l in H3; [ | easy | easy ].
-  destruct n; cbn. {
-    now apply (f_equal lap) in H3.
-  }
+  destruct n; cbn; [ now apply (f_equal lap) in H3 | ].
   set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
   rewrite minus_one_pow_succ. 2: {
     unfold rop; cbn.
     unfold Hos; cbn.
-Set Printing All.
-cbn.
-unfold polyn_ring_like_op.
-cbn.
-unfold rngl_has_opp_has_opp_or_subt.
-cbn.
-(* chais pas, j'comprends plus rien à ce qui se passe *)
+    clear Hos rop rpp.
+    unfold rngl_has_opp; cbn.
+    unfold polyn_opt_opp_or_subt; cbn.
+    unfold rngl_has_opp in Hop; cbn in Hop.
+    remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+    destruct os as [os| ]; [ | easy ].
+    now destruct os.
+  }
+  destruct n; cbn. {
+    rewrite H3.
+    unfold polyn_zero; cbn.
+    subst rop.
+    unfold rngl_opp; cbn.
+    unfold polyn_opt_opp_or_subt; cbn.
+    destruct rngl_opt_opp_or_subt; [ | easy ].
+    now destruct s.
+  }
 ...
 clear - rop.
-
 ...
   apply rngl_1_neq_0_iff in Hch; [ easy | ].
 ...
