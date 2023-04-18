@@ -230,6 +230,34 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem polyn_of_const_rngl_summation :
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ b e f,
+  polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
+Proof.
+intros.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+revert b.
+induction n; intros. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply eq_polyn_eq; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
+rewrite seq_S.
+rewrite rngl_summation_list_app.
+set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+rewrite rngl_summation_list_app.
+rewrite (polyn_of_const_add Hos Heb).
+rewrite IHn.
+f_equal.
+now do 2 rewrite rngl_summation_list_only_one.
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -739,32 +767,11 @@ assert
   revert ll.
   induction len; intros; [ easy | ].
   cbn - [ rngl_zero rngl_add ].
-Search polyn_of_const.
-Theorem polyn_of_const_rngl_summation :
-  ∀ (Hos : rngl_has_opp_or_subt = true),
-  ∀ (Heb : rngl_has_eqb = true),
-  ∀ (rop := polyn_ring_like_op Hos Heb),
-  ∀ b e f,
-  polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
-Proof.
-intros.
-unfold iter_seq.
-remember (S e - b) as n eqn:Hn.
-clear e Hn.
-revert b.
-induction n; intros. {
-  rewrite rngl_summation_list_empty; [ | easy ].
-  rewrite rngl_summation_list_empty; [ | easy ].
-  apply eq_polyn_eq; cbn.
-  now rewrite (rngl_eqb_refl Heb).
-}
-rewrite seq_S.
-rewrite rngl_summation_list_app.
-set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
-rewrite rngl_summation_list_app.
-rewrite (polyn_of_const_add Hos Heb).
-rewrite IHn.
-f_equal.
+  rewrite (polyn_of_const_rngl_summation Hos Heb).
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+...
+  rewrite (List_map_nth' []).
 ...
 induction ll as [| la]. {
   apply eq_polyn_eq; cbn.
