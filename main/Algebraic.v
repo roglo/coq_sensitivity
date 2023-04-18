@@ -678,18 +678,27 @@ assert
 clear Hcr; rename H into Hcr.
 assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
-  unfold polyn_of_const.
-  unfold polyn_of_norm_lap.
-  apply eq_polyn_eq.
-  cbn - [ det lap_norm ].
-Search (map (λ _, map _ _)).
-(* bof... bon, faut voir *)
-...
+Theorem det_polyn_of_const :
+  rngl_characteristic ≠ 1 →
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ (ll : list (list T)),
+  det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
+  polyn_of_const (det {| mat_list_list := ll |}).
+Proof.
+intros Hch *.
+induction ll as [| la]. {
+  apply eq_polyn_eq; cbn.
   rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [H1| H1]. {
-    cbn.
-    rewrite map_length.
-    cbn in H1.
+  destruct (Sumbool.sumbool_of_bool _) as [H1| H1]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H1.
+  now apply rngl_1_neq_0_iff in Hch.
+}
+cbn.
+rewrite map_length.
+... ...
+apply det_polyn_of_const.
 ...
 
 End a.
