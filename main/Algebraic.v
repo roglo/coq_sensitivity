@@ -368,6 +368,58 @@ Theorem polyn_of_const_minus_one_pow :
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
 intros.
+set (Hos := rngl_has_opp_has_opp_or_subt Hop) in rop.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  apply eq_polyn_eq; cbn.
+  rewrite (H1 (minus_one_pow n)).
+  rewrite (rngl_eqb_refl Heb); cbn.
+  specialize @polyn_characteristic_prop as H2.
+  specialize (H2 T ro rp Hos Heb).
+  cbn in H2.
+  rewrite Hch in H2.
+  cbn in H2.
+  destruct H2 as (H2, H3).
+  clear H2.
+  rewrite polyn_add_comm in H3; [ | easy ].
+  rewrite polyn_add_0_l in H3; [ | easy | easy ].
+  destruct n; cbn. {
+    now apply (f_equal lap) in H3.
+  }
+  set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+  rewrite minus_one_pow_succ. 2: {
+    unfold rop; cbn.
+    unfold Hos; cbn.
+Set Printing All.
+cbn.
+unfold polyn_ring_like_op.
+cbn.
+unfold rngl_has_opp_has_opp_or_subt.
+cbn.
+(* chais pas, j'comprends plus rien à ce qui se passe *)
+...
+clear - rop.
+
+...
+  apply rngl_1_neq_0_iff in Hch; [ easy | ].
+...
+  exfalso; apply H; [ | easy ].
+...
+
+  rewrite if_bool_if_dec.
+Search (rngl_characteristic = 1).
+apply eq_polyn_eq; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [H| H]. {
+  apply (rngl_eqb_eq Heb) in H.
+  induction n; cbn in H. {
+...
+unfold rop.
+cbn.
+unfold rngl_has_opp_has_opp_or_subt.
+cbn.
+...
+intros.
 induction n; [ easy | ].
 rewrite (minus_one_pow_succ Hop).
 rewrite (polyn_of_const_opp Hop Heb).
@@ -375,8 +427,11 @@ rewrite IHn.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop).
 set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
 rewrite minus_one_pow_succ. {
+unfold rop.
+unfold polyn_opp.
   apply eq_polyn_eq; cbn.
   rewrite (lap_norm_opp Hop Heb).
+...
   rewrite <- IHn.
   cbn.
   rewrite if_bool_if_dec.
@@ -385,6 +440,9 @@ rewrite minus_one_pow_succ. {
     rewrite H; cbn.
     unfold polyn_of_const.
     unfold polyn_of_norm_lap; cbn.
+Set Printing All.
+    remember (@rngl_eqb T ro (@rngl_zero T ro) (@rngl_zero T ro)) as x eqn:Hx.
+    rewrite if_bool_if_dec.
 ...
 Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
 ...
