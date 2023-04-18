@@ -376,6 +376,21 @@ set (Hos := rngl_has_opp_has_opp_or_subt Hop).
 set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
 rewrite minus_one_pow_succ. {
   apply eq_polyn_eq; cbn.
+  rewrite (lap_norm_opp Hop Heb).
+  rewrite <- IHn.
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H| H]. {
+    apply (rngl_eqb_eq Heb) in H.
+    rewrite H; cbn.
+    unfold polyn_of_const.
+    unfold polyn_of_norm_lap; cbn.
+Search (lap (- _)).
+    rewrite rngl_eqb_refl.
+...
+    unfold minus_one_pow in H.
+    destruct (n mod 2). {
+      cbn.
 ...
 subst rpp.
 subst Hos.
@@ -383,8 +398,6 @@ Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
 ...
 rewrite <- lap_polyn_opp.
 apply has_polyn_prop_lap_norm.
-
-  rewrite (lap_norm_opp Hop Heb).
 ...
 About lap.
 ...
