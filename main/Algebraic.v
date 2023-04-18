@@ -191,6 +191,45 @@ rewrite (lap_norm_mul Hos Heb Hiv); [ easy | | ]. {
 apply (lap_x_power_has_polyn_prop Hch Heb).
 Qed.
 
+Theorem polyn_of_const_add :
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ a b,
+  polyn_of_const (a + b) = (polyn_of_const a + polyn_of_const b)%L.
+Proof.
+intros.
+apply eq_polyn_eq; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
+    apply (rngl_eqb_eq Heb) in Ha; subst a.
+    now rewrite rngl_add_0_l in Hab; rewrite Hab.
+  }
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]. {
+    apply (rngl_eqb_eq Heb) in Hb; subst b.
+    now rewrite rngl_add_0_r, Ha in Hab.
+  }
+  cbn.
+  now rewrite Hab.
+} {
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
+    apply (rngl_eqb_eq Heb) in Ha; subst a.
+    rewrite rngl_add_0_l in Hab; rewrite Hab.
+    now rewrite rngl_add_0_l; cbn; rewrite Hab.
+  }
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]. {
+    apply (rngl_eqb_eq Heb) in Hb; subst b.
+    now rewrite rngl_add_0_r; cbn; rewrite Ha.
+  }
+  now cbn; rewrite Hab.
+}
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -688,6 +727,45 @@ Theorem det_polyn_of_const :
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hch *.
+cbn.
+rewrite map_length.
+assert
+  (H :
+     ∀ len,
+     determinant_loop len
+        {| mat_list_list := map (λ l : list T, map polyn_of_const l) ll |} =
+     polyn_of_const (determinant_loop len {| mat_list_list := ll |})). {
+  intros.
+  revert ll.
+  induction len; intros; [ easy | ].
+  cbn - [ rngl_zero rngl_add ].
+Search polyn_of_const.
+Theorem polyn_of_const_rngl_summation :
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ b e f,
+  polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
+Proof.
+intros.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+clear e Hn.
+revert b.
+induction n; intros. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply eq_polyn_eq; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
+rewrite seq_S.
+rewrite rngl_summation_list_app.
+set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+rewrite rngl_summation_list_app.
+rewrite (polyn_of_const_add Hos Heb).
+rewrite IHn.
+f_equal.
+...
 induction ll as [| la]. {
   apply eq_polyn_eq; cbn.
   rewrite if_bool_if_dec.
