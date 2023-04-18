@@ -325,6 +325,37 @@ destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
 }
 Qed.
 
+Theorem lap_norm_opp :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ la, lap_norm (- la) = (- lap_norm la)%lap.
+Proof.
+intros Hop Heb *.
+unfold lap_norm, lap_opp.
+rewrite map_rev; f_equal.
+rewrite <- map_rev.
+remember (rev la) as lb eqn:Hlb.
+clear la Hlb; rename lb into la.
+induction la as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hoaz| Hoaz]. {
+  apply (rngl_eqb_eq Heb) in Hoaz.
+  apply (f_equal rngl_opp) in Hoaz.
+  rewrite (rngl_opp_involutive Hop) in Hoaz.
+  rewrite (rngl_opp_0 Hop) in Hoaz.
+  apply (rngl_eqb_eq Heb) in Hoaz; rewrite Hoaz.
+  apply IHla.
+} {
+  apply (rngl_eqb_neq Heb) in Hoaz.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz; subst a.
+    now rewrite (rngl_opp_0 Hop) in Hoaz.
+  }
+  easy.
+}
+Qed.
+
 Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
   match rngl_has_opp_or_subt_iff with
   | conj x x0 => x0
@@ -344,9 +375,32 @@ rewrite IHn.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop).
 set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
 rewrite minus_one_pow_succ. {
-  apply eq_polyn_eq.
-  cbn.
-Search (lap_norm (- _)).
+  apply eq_polyn_eq; cbn.
+...
+subst rpp.
+subst Hos.
+Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
+...
+rewrite <- lap_polyn_opp.
+apply has_polyn_prop_lap_norm.
+
+  rewrite (lap_norm_opp Hop Heb).
+...
+About lap.
+...
+Check lap_polyn_opp.
+About lap.
+unfold rop.
+cbn.
+unfold polyn_ring_like_op.
+cbn.
+rewrite lap_polyn_opp.
+...
+unfold rop.
+Set Printing All.
+Search (lap (minus_one_pow _)).
+...
+rewrite lap_norm_opp.
 ...
 unfold polyn_opp.
 Set Printing All.

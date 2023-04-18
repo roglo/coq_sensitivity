@@ -4609,6 +4609,7 @@ Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
+Arguments lap {T ro} p%pol.
 Arguments polyn_zero {T ro}.
 Arguments polyn_one {T ro}.
 Arguments polyn_add {T ro} p1 p2.
