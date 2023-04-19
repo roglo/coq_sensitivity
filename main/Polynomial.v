@@ -3920,7 +3920,7 @@ Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => None
+  | Some (inr _) => None (* TODO: to be updated like for lap_opt_opp_or_subt *)
   | None => None
   end.
 
