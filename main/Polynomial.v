@@ -4607,6 +4607,25 @@ intros (la, pa) (lb, pb).
 unfold polyn_subt.
 apply eq_polyn_eq; cbn - [ lap_norm ].
 move lb before la.
+clear pb.
+revert lb.
+induction la as [| a]; intros. {
+  rewrite lap_add_0_l.
+  unfold lap_norm.
+  induction lb as [| b] using rev_ind; [ easy | ].
+  rewrite rev_app_distr; cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. 2: {
+    cbn.
+    rewrite rev_involutive.
+    rewrite lap_subt_diag; [ | easy | easy ].
+    rewrite List_rev_repeat.
+    apply List_rev_rev.
+    rewrite rev_involutive.
+    apply eq_strip_0s_nil; [ easy | easy | ].
+    intros i.
+    apply nth_repeat.
+  }
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
