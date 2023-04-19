@@ -392,16 +392,6 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   rewrite (H1 (minus_one_pow n)).
   rewrite (rngl_eqb_refl Heb); cbn.
   specialize @polyn_characteristic_prop as H2.
-(*
-  specialize (H2 T ro rp Hos Heb).
-  cbn in H2.
-  rewrite Hch in H2.
-  cbn in H2.
-  destruct H2 as (H2, H3).
-  clear H2.
-  rewrite polyn_add_comm in H3; [ | easy ].
-  rewrite polyn_add_0_l in H3; [ | easy | easy ].
-*)
   set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
   specialize (H2 (polyn T) rop rpp).
   assert (Hosp : @rngl_has_opp_or_subt (polyn T) rop = true). {
@@ -412,6 +402,11 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   specialize (H2 Hebp).
   cbn in H2.
   rewrite Hch in H2.
+  cbn in H2.
+  destruct H2 as (_, H2).
+  (* faudrait un polyn_add_0_r *)
+  rewrite polyn_add_comm in H2; [ | easy ].
+  rewrite polyn_add_0_l in H2; [ | easy | easy ].
 ...
     unfold rngl_has_opp_or_subt; cbn.
     unfold polyn_opt_opp_or_subt.
