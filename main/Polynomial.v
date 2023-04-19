@@ -528,7 +528,6 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrab; clear Hrab; intros; subst cq rlr.
 rewrite lap_sub_length, map_length.
-(**)
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op; [ now rewrite Nat.max_l | ].
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
@@ -584,15 +583,13 @@ now apply rlap_rem_loop_prop in Hqr.
 Qed.
 
 Theorem lap_rem_length_lt :
-  rngl_has_opp = true →
-  rngl_mul_is_comm = true →
   ∀ la lb lq lr : list T,
   lb ≠ []
   → has_polyn_prop lb = true
   → lap_quot_rem la lb = (lq, lr)
   → length lr < length lb.
 Proof.
-intros Hop Hco * Hbz Hbn Hab.
+intros * Hbz Hbn Hab.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -2762,7 +2759,7 @@ Theorem rlap_quot_rem_step_Some :
     length rla = S (length rlr) ∧
     cq = (hd 0 rla / hd 0 rlb)%L.
 Proof.
-intros Hco Hop Hiv * Hbz Hrl.
+intros Hic Hop Hiv * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
 rewrite if_bool_if_dec in Hrl.
@@ -2783,7 +2780,7 @@ rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
 replace (b * cq)%L with (b * (a / b))%L by now rewrite Hcq.
-rewrite (rngl_mul_div_r Hco Hiv _ _ Hbz).
+rewrite (rngl_mul_div_r Hic Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
@@ -2840,15 +2837,13 @@ now rewrite rev_lap_add.
 Qed.
 
 Theorem rlap_quot_rem_length :
-  rngl_mul_is_comm = true →
-  rngl_has_opp = true →
   ∀ it (rla rlb rlq rlr : list T),
   hd 0%L rlb ≠ 0%L
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → length rlq = length rla - (length rlb - 1).
 Proof.
-intros Hco Hop * Hbn Hqr Hit.
+intros * Hbn Hqr Hit.
 destruct rlb as [| b]; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
 cbn in Hbn.
@@ -2934,7 +2929,7 @@ move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
 generalize Hqr; intros Hqrb.
-apply (rlap_quot_rem_length Hco Hop _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
+apply (rlap_quot_rem_length _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply lt_le_S.
@@ -3043,8 +3038,12 @@ Theorem lap_quot_rem_prop :
     has_polyn_prop lq = true.
 Proof.
 intros Hco Hop Hiv * Ha Hb Hr Hab.
+clear Hos.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert (Hrb : length lr < length lb). {
-  eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
+  eapply lap_rem_length_lt; [ | | apply Hab ]. {
     now intros H; subst lb.
   } {
     unfold has_polyn_prop.
@@ -3186,18 +3185,27 @@ apply rlap_rem_prop in Hqr. 2: {
 rewrite rev_length in Hqr; cbn in Hqr; flia Hqr.
 Qed.
 
+Theorem lap_subt_diag :
+  ∀ la, lap_subt la la = repeat 0%L (length la).
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+rewrite (rngl_sub_diag Hos).
+now f_equal.
+Qed.
+
 Theorem lap_add_sub :
-  rngl_has_opp = true →
   ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
-intros Hop *.
+intros.
 unfold lap_sub.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op. {
 rewrite <- lap_add_assoc.
 rewrite (lap_add_opp_r Hop).
 destruct (le_dec (length lb) (length la)) as [Hlba| Hlba]. {
   rewrite lap_add_repeat_0_r; [ | easy ].
   rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-  rewrite Hop.
   symmetry; apply app_nil_r.
 }
 apply Nat.nle_gt in Hlba.
@@ -3205,9 +3213,22 @@ replace (length lb) with (length la + (length lb - length la)) at 1
   by flia Hlba.
 rewrite repeat_app.
 rewrite lap_add_app_r; [ | now rewrite repeat_length ].
-rewrite Hop.
 f_equal.
 now apply lap_add_repeat_0_r.
+}
+remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+destruct su. {
+  revert lb.
+  induction la as [| a]; intros; cbn. {
+    rewrite Nat.sub_0_r.
+    apply lap_subt_diag.
+  }
+  destruct lb as [| b]; cbn; [ now rewrite app_nil_r | ].
+  rewrite (rngl_add_sub Hos); f_equal.
+  apply IHla.
+}
+apply rngl_has_opp_or_subt_iff in Hos.
+destruct Hos; congruence.
 Qed.
 
 Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
@@ -3278,15 +3299,14 @@ apply last_lap_convol_mul_last; flia.
 Qed.
 
 Theorem lap_add_move_l :
-  rngl_has_opp = true →
   ∀ la lb lc : list T,
   (la + lb)%lap = lc
   → lb ++ repeat 0%L (length la - length lb) = (lc - la)%lap.
 Proof.
-intros Hop * Hab.
+intros * Hab.
 subst lc.
 symmetry; rewrite lap_add_comm.
-now rewrite (lap_add_sub Hop).
+now rewrite lap_add_sub.
 Qed.
 
 Theorem lap_mul_has_polyn_prop :
@@ -3375,7 +3395,7 @@ destruct H1 as (Hab & Hrb & pq).
 move pq before pb.
 generalize Hab; intros Hab1.
 symmetry in Hab1.
-apply (lap_add_move_l Hop) in Hab1.
+apply lap_add_move_l in Hab1.
 symmetry in Hab1.
 rewrite (lap_mul_comm Hco) in Hab1.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hab1.
