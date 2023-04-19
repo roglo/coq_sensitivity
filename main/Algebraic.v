@@ -397,6 +397,10 @@ Proof.
 intros.
 subst rop.
 unfold rngl_has_opp_or_subt in Hos |-*; cbn.
+Print polyn_opt_opp_or_subt.
+(* ah bon ? il peut y avoir une soustraction dans T sans qu'il y en
+   ait dans "polyn T" ? *)
+...
 unfold polyn_opt_opp_or_subt.
 remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
 destruct os; [ | easy ].
