@@ -4625,6 +4625,22 @@ induction la as [| a]; intros. {
     now rewrite rev_length.
   }
   rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
+(**)
+Theorem nth_lap_subt_norm_diag :
+  ∀ i la, nth i (lap_subt (lap_norm la) la) 0%L = 0%L.
+Proof.
+intros.
+induction la as [| a] using rev_ind; cbn. {
+  apply Tauto_match_nat_same.
+}
+unfold lap_norm.
+rewrite rev_app_distr; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+... ...
+apply nth_lap_subt_norm_diag.
+...
   rewrite lap_subt_length.
   rewrite rev_length.
   rewrite fold_lap_norm.
