@@ -3848,6 +3848,8 @@ Definition polyn_opt_opp_or_subt :
   | None => None
   end.
 
+(* no subtraction in polynomial if no opposite in T : e.g. x-x² *)
+
 (* polyn quotient *)
 
 Definition polyn_opt_inv_or_quot :
