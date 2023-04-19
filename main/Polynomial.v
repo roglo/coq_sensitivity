@@ -4612,17 +4612,43 @@ revert lb.
 induction la as [| a]; intros. {
   rewrite lap_add_0_l.
   unfold lap_norm.
-  induction lb as [| b] using rev_ind; [ easy | ].
-  rewrite rev_app_distr; cbn.
   apply List_rev_rev.
   rewrite rev_involutive; cbn.
+(**)
+  apply eq_strip_0s_nil; [ easy | easy | ].
+  intros i.
+  destruct (lt_dec i (length (strip_0s (rev lb)))) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil.
+    apply nth_overflow.
+    rewrite rev_length.
+    rewrite lap_subt_length.
+    now rewrite rev_length.
+  }
+  rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
+  rewrite lap_subt_length.
+  rewrite rev_length.
+  rewrite fold_lap_norm.
+...
+  induction lb as [| b] using rev_ind; [ easy | ].
+  rewrite rev_app_distr; cbn.
   apply eq_strip_0s_nil; [ easy | easy | ].
   intros i.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
     apply (rngl_eqb_eq Heb) in Hbz; subst b.
-    rewrite rev_nth. 2: {
-      rewrite lap_subt_length, rev_length.
+Search (strip_0s _ = []).
+...
+    destruct (lt_dec i (length (strip_0s (rev lb)))) as [Hil| Hil]. 2: {
+      apply Nat.nlt_ge in Hil.
+      apply nth_overflow.
+      rewrite rev_length.
+      rewrite lap_subt_length.
+      now rewrite rev_length.
+    }
+    rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
+    rewrite lap_subt_length.
+    rewrite rev_length.
+Search (length (strip_0s _)).
 ... ...
   } {
     cbn.
