@@ -375,6 +375,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   rewrite (H1 (minus_one_pow n)).
   rewrite (rngl_eqb_refl Heb); cbn.
   specialize @polyn_characteristic_prop as H2.
+(*
   specialize (H2 T ro rp Hos Heb).
   cbn in H2.
   rewrite Hch in H2.
@@ -383,6 +384,50 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   clear H2.
   rewrite polyn_add_comm in H3; [ | easy ].
   rewrite polyn_add_0_l in H3; [ | easy | easy ].
+*)
+  set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+  specialize (H2 (polyn T) rop rpp).
+  assert (Hosp : @rngl_has_opp_or_subt (polyn T) rop = true). {
+Theorem polyn_has_opp_or_subt :
+  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  @rngl_has_opp_or_subt (polyn T) rop = true.
+Proof.
+intros.
+subst rop.
+unfold rngl_has_opp_or_subt in Hos |-*; cbn.
+unfold polyn_opt_opp_or_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os; [ | easy ].
+cbn in Hos.
+Print polyn_ring_like_op.
+Print polyn_opt_opp_or_subt.
+...
+clear Hos.
+destruct s as [opp| subt]; [ easy | ].
+...
+specialize (polyn_has_opp_or_subt) as H3.
+specialize (H3 Hos Heb).
+now cbn in H3.
+...
+    unfold rngl_has_opp_or_subt; cbn.
+    unfold polyn_opt_opp_or_subt.
+    unfold rngl_has_opp in Hop.
+    clear rop rpp H2.
+    destruct rngl_opt_opp_or_subt.
+    unfold rop, polyn_ring_like_op.
+    cbn.
+Set Printing All.
+cbn.
+...
+(**)
+specialize rngl_characteristic_1 as H2.
+Search (1 = 0)%L.
+remember (@rngl_characteristic (polyn T) rop rpp) as ch eqn:Hch'; symmetry in Hch'.
+destruct (Nat.eq_dec ch 1) as [H4| H4]. {
+  move H4 at top; subst ch.
+...
   destruct n; cbn; [ now apply (f_equal lap) in H3 | ].
   set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
   rewrite minus_one_pow_succ. 2: {
