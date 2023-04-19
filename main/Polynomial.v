@@ -4614,8 +4614,17 @@ induction la as [| a]; intros. {
   unfold lap_norm.
   induction lb as [| b] using rev_ind; [ easy | ].
   rewrite rev_app_distr; cbn.
+  apply List_rev_rev.
+  rewrite rev_involutive; cbn.
+  apply eq_strip_0s_nil; [ easy | easy | ].
+  intros i.
   rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. 2: {
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+    apply (rngl_eqb_eq Heb) in Hbz; subst b.
+    rewrite rev_nth. 2: {
+      rewrite lap_subt_length, rev_length.
+... ...
+  } {
     cbn.
     rewrite rev_involutive.
     rewrite lap_subt_diag; [ | easy | easy ].
