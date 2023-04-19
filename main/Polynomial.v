@@ -159,14 +159,29 @@ Fixpoint lap_add la lb :=
       end
   end.
 
+Fixpoint lap_subt la lb :=
+  match la with
+  | [] => [] (* x-x²=x the same way 1-2=0 in nat *)
+  | a1 :: bl1 =>
+      match lb with
+      | [] => la
+      | a2 :: bl2 => (a1 - a2)%L :: lap_subt bl1 bl2
+      end
+  end.
+
 Definition lap_opp la := map rngl_opp la.
-Definition lap_sub la lb := lap_add la (lap_opp lb).
+Definition lap_sub la lb :=
+  if rngl_has_opp then lap_add la (lap_opp lb)
+  else if rngl_has_subt then lap_subt la lb
+  else [].
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
 
+(*
 Theorem fold_lap_sub : ∀ la lb, lap_add la (lap_opp lb) = lap_sub la lb.
 Proof. easy. Qed.
+*)
 
 (* multiplication *)
 
@@ -344,14 +359,30 @@ induction la as [| a]; [ easy | cbn ].
 f_equal; apply IHla.
 Qed.
 
-Theorem lap_sub_length : ∀ la lb,
-  length (lap_sub la lb) = max (length la) (length lb).
+Theorem lap_subt_length : ∀ la lb, length (lap_subt la lb) = length la.
 Proof.
 intros.
 revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite lap_opp_length | ].
+induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
+Qed.
+
+Theorem lap_sub_length : ∀ la lb,
+  length (lap_sub la lb) =
+    if rngl_has_opp then max (length la) (length lb)
+    else if rngl_has_subt then length la
+    else 0.
+Proof.
+intros.
+unfold lap_sub.
+destruct rngl_has_opp. {
+  revert lb.
+  induction la as [| a]; intros; [ apply lap_opp_length | cbn ].
+  destruct lb as [| b]; [ easy | cbn ].
+  f_equal; apply IHla.
+}
+destruct rngl_has_subt; [ apply lap_subt_length | easy ].
 Qed.
 
 Theorem all_0_lap_norm_nil : ∀ la,
@@ -497,7 +528,13 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrab; clear Hrab; intros; subst cq rlr.
 rewrite lap_sub_length, map_length.
-now rewrite Nat.max_l.
+(**)
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op; [ now rewrite Nat.max_l | ].
+remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+destruct su; [ easy | ].
+apply rngl_has_opp_or_subt_iff in Hos.
+destruct Hos; congruence.
 Qed.
 
 Theorem rlap_rem_loop_prop : ∀ it rla rlb rlq rlr,
@@ -702,7 +739,7 @@ Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl lap_opp)
-  | Some (inr _) => None
+  | Some (inr _) => Some (inr lap_subt)
   | None => None
   end.
 
@@ -1979,6 +2016,7 @@ Theorem list_nth_lap_sub :
 Proof.
 intros Hop *.
 unfold lap_sub.
+rewrite Hop.
 rewrite list_nth_lap_add.
 rewrite (list_nth_lap_opp Hop).
 now rewrite (fold_rngl_sub Hop).
@@ -2198,6 +2236,7 @@ Proof.
 intros Hop *.
 unfold lap_sub.
 rewrite <- (lap_mul_opp_r Hop).
+rewrite Hop.
 now rewrite <- lap_mul_add_distr_l.
 Qed.
 
@@ -2342,16 +2381,25 @@ Qed.
 
 (* *)
 
+(*
 Theorem lap_opt_has_no_subt : ∀ P,
   let _ := lap_ring_like_op in
   if rngl_has_subt then P else not_applicable.
 Proof.
 intros.
 unfold rngl_has_subt; cbn.
+unfold rngl_has_opp_or_subt in Hos.
+unfold lap_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ easy | ].
+...
+intros.
+unfold rngl_has_subt; cbn.
 unfold lap_opt_opp_or_subt.
 destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
+*)
 
 Theorem lap_opt_has_no_inv : ∀ P,
   let _ := lap_ring_like_op in
@@ -2590,8 +2638,30 @@ Theorem rev_lap_sub : ∀ la lb,
 Proof.
 intros * Hab.
 unfold lap_sub.
-rewrite rev_lap_add; [ | now rewrite lap_opp_length ].
-now rewrite rev_lap_opp.
+destruct rngl_has_opp. {
+  rewrite rev_lap_add; [ | now rewrite lap_opp_length ].
+  now rewrite rev_lap_opp.
+}
+destruct rngl_has_subt; [ | easy ].
+revert lb Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+rewrite IHla; [ | easy ].
+clear IHla.
+rewrite <- (rev_length la) in Hab.
+rewrite <- (rev_length lb) in Hab.
+remember (rev la) as lc.
+remember (rev lb) as ld.
+clear la lb Heqlc Heqld.
+rename lc into la; rename ld into lb.
+revert lb Hab.
+induction la as [| a']; intros; cbn. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b']; [ easy | cbn ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+now f_equal; apply IHla.
 Qed.
 
 Theorem lap_add_norm : ∀ la lb,
@@ -2647,6 +2717,7 @@ Theorem rev_lap_sub_norm :
 Proof.
 intros Hop *.
 unfold lap_sub.
+rewrite Hop.
 rewrite rev_lap_add_norm.
 rewrite lap_opp_length.
 f_equal.
@@ -2665,6 +2736,7 @@ Theorem lap_sub_add :
 Proof.
 intros Hop * Hba.
 unfold lap_sub.
+rewrite Hop.
 rewrite <- lap_add_assoc.
 rewrite (lap_add_opp_l Hop).
 revert lb Hba.
@@ -2723,9 +2795,7 @@ rewrite <- List_rev_repeat.
 rewrite <- rev_app_distr.
 rewrite <- Hrlc.
 subst x.
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-cbn.
-rewrite fold_lap_sub.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ cbn | easy ].
 assert (Hca : length rlc = length rla). {
   rewrite Hrlc, app_length, map_length, repeat_length.
   now rewrite Nat.add_comm, Nat.sub_add.
@@ -2734,9 +2804,11 @@ rewrite <- rev_lap_sub; [ | easy ].
 rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
   rewrite lap_sub_length.
+  rewrite Hop.
   now rewrite Hca, Nat.max_id.
 }
 rewrite lap_sub_length, map_length.
+rewrite Hop.
 rewrite Nat.max_l; [ | easy ].
 split; [ | easy ].
 f_equal.
@@ -2758,6 +2830,7 @@ rewrite lap_sub_length in Hrlac.
 rewrite lap_add_length in Hrlac.
 rewrite Nat.max_l in Hrlac; [| apply Nat.le_max_l ].
 rewrite Nat.max_l in Hrlac; [ | easy ].
+rewrite Hop in Hrlac.
 destruct rlac as [| ac]; intros. {
   apply length_zero_iff_nil in Hrlac; subst rlc; cbn.
   rewrite lap_add_0_l in Hab.
@@ -2873,6 +2946,7 @@ apply IHit in Hqr. 2: {
   apply Nat.ltb_ge in Hab.
   injection Hqrlr; clear Hqrlr; intros; subst cq rlr.
   rewrite lap_sub_length.
+  rewrite Hop.
   now cbn; rewrite map_length, Nat.max_l.
 }
 rewrite Hqrlr', Hqr.
@@ -3123,6 +3197,7 @@ rewrite (lap_add_opp_r Hop).
 destruct (le_dec (length lb) (length la)) as [Hlba| Hlba]. {
   rewrite lap_add_repeat_0_r; [ | easy ].
   rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite Hop.
   symmetry; apply app_nil_r.
 }
 apply Nat.nle_gt in Hlba.
@@ -3130,6 +3205,7 @@ replace (length lb) with (length la + (length lb - length la)) at 1
   by flia Hlba.
 rewrite repeat_app.
 rewrite lap_add_app_r; [ | now rewrite repeat_length ].
+rewrite Hop.
 f_equal.
 now apply lap_add_repeat_0_r.
 Qed.
