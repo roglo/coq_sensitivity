@@ -3794,6 +3794,7 @@ Arguments lap_one {T ro}.
 Arguments lap_opp {T ro} la%lap.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_norm {T ro} la%lap.
+Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
@@ -4586,7 +4587,27 @@ Qed.
 
 (* *)
 
-Definition polyn_opt_has_no_subt (_ : True) := 12.
+Theorem eq_nth_lap_subt_0 :
+  ∀ la lb,
+  (∀ i, nth i la 0%L = nth i lb 0%L)
+  → ∀ i, nth i (lap_subt la lb) 0%L = 0%L.
+Proof.
+intros * Hab *.
+revert i lb Hab.
+induction la as [| a]; intros; cbn. {
+  apply Tauto_match_nat_same.
+}
+destruct lb as [| b]. {
+  now rewrite Hab, nth_overflow.
+}
+destruct i; cbn. {
+  specialize (Hab 0); cbn in Hab; subst b.
+  apply (rngl_sub_diag Hos).
+}
+apply IHla.
+intros j.
+now specialize (Hab (S j)).
+Qed.
 
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
@@ -4614,7 +4635,6 @@ induction la as [| a]; intros. {
   unfold lap_norm.
   apply List_rev_rev.
   rewrite rev_involutive; cbn.
-(**)
   apply eq_strip_0s_nil; [ easy | easy | ].
   intros i.
   destruct (lt_dec i (length (strip_0s (rev lb)))) as [Hil| Hil]. 2: {
@@ -4625,25 +4645,30 @@ induction la as [| a]; intros. {
     now rewrite rev_length.
   }
   rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
-(**)
-Theorem nth_lap_subt_norm_diag :
-  ∀ i la, nth i (lap_subt (lap_norm la) la) 0%L = 0%L.
-Proof.
-intros.
-induction la as [| a] using rev_ind; cbn. {
-  apply Tauto_match_nat_same.
-}
-unfold lap_norm.
-rewrite rev_app_distr; cbn.
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
-... ...
-apply nth_lap_subt_norm_diag.
-...
-  rewrite lap_subt_length.
-  rewrite rev_length.
+  apply eq_nth_lap_subt_0.
+  intros j.
   rewrite fold_lap_norm.
+  clear Hil.
+  induction lb as [| b] using rev_ind; [ easy | cbn ].
+  unfold lap_norm.
+  rewrite rev_app_distr; cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+    apply (rngl_eqb_eq Heb) in Hbz; subst b.
+    rewrite fold_lap_norm.
+    rewrite IHlb.
+    destruct (lt_dec j (length lb)) as [Hjl| Hjl]. {
+      now rewrite app_nth1.
+    }
+    apply Nat.nlt_ge in Hjl.
+    rewrite nth_overflow; [ | easy ].
+    rewrite app_nth2; [ symmetry | easy ].
+    destruct (j - length lb); [ easy | cbn ].
+    apply Tauto_match_nat_same.
+  }
+  cbn.
+  now rewrite rev_involutive.
+}
 ...
   induction lb as [| b] using rev_ind; [ easy | ].
   rewrite rev_app_distr; cbn.
@@ -4678,6 +4703,8 @@ Search (length (strip_0s _)).
     apply nth_repeat.
   }
 ...
+
+Definition polyn_opt_has_no_subt (_ : True) := 12.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
