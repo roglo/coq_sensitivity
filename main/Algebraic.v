@@ -325,6 +325,23 @@ destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
 }
 Qed.
 
+Theorem polyn_has_opp_or_subt :
+  ∀ (Hop : rngl_has_opp = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (Hos := rngl_has_opp_has_opp_or_subt Hop),
+  ∀ (rop := polyn_ring_like_op Hos Heb),
+  @rngl_has_opp_or_subt (polyn T) rop = true.
+Proof.
+intros.
+subst rop Hos.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_opp_or_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
+destruct os; [ | easy ].
+now destruct s.
+Qed.
+
 Theorem lap_norm_opp :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -388,32 +405,13 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
   specialize (H2 (polyn T) rop rpp).
   assert (Hosp : @rngl_has_opp_or_subt (polyn T) rop = true). {
-Theorem polyn_has_opp_or_subt :
-  ∀ (Hos : rngl_has_opp_or_subt = true),
-  ∀ (Heb : rngl_has_eqb = true),
-  ∀ (rop := polyn_ring_like_op Hos Heb),
-  @rngl_has_opp_or_subt (polyn T) rop = true.
-Proof.
-intros.
-subst rop.
-unfold rngl_has_opp_or_subt in Hos |-*; cbn.
-Print polyn_opt_opp_or_subt.
-(* ah bon ? il peut y avoir une soustraction dans T sans qu'il y en
-   ait dans "polyn T" ? *)
-...
-unfold polyn_opt_opp_or_subt.
-remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
-destruct os; [ | easy ].
-cbn in Hos.
-Print polyn_ring_like_op.
-Print polyn_opt_opp_or_subt.
-...
-clear Hos.
-destruct s as [opp| subt]; [ easy | ].
-...
-specialize (polyn_has_opp_or_subt) as H3.
-specialize (H3 Hos Heb).
-now cbn in H3.
+    now specialize (polyn_has_opp_or_subt Hop Heb) as H3.
+  }
+  specialize (H2 Hosp).
+  assert (Hebp : @rngl_has_eqb (polyn T) rop = true) by easy.
+  specialize (H2 Hebp).
+  cbn in H2.
+  rewrite Hch in H2.
 ...
     unfold rngl_has_opp_or_subt; cbn.
     unfold polyn_opt_opp_or_subt.
