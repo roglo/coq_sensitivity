@@ -863,6 +863,14 @@ induction la as [| la]; [ easy | cbn ].
 now rewrite rngl_add_0_l; f_equal.
 Qed.
 
+Theorem map2_rngl_add_0_r :
+  ∀ la, map2 rngl_add la (repeat 0%L (length la)) = la.
+Proof.
+intros.
+induction la as [| la]; [ easy | cbn ].
+now rewrite rngl_add_0_r; f_equal.
+Qed.
+
 Theorem fold_lap_add :
   ∀ la lb,
   map2 rngl_add (la ++ repeat 0%L (length lb - length la))
@@ -917,41 +925,41 @@ Proof.
 intros al1 al2 al3.
 revert al2 al3.
 induction al1; intros; [ now do 2 rewrite lap_add_0_l | ].
-cbn - [ "-" ].
+cbn.
 destruct al2. {
   cbn.
   rewrite Nat.sub_0_r, app_nil_r.
-  rewrite map2_length.
-  rewrite repeat_length.
-  rewrite Nat.min_id.
-  rewrite map2_length.
-  rewrite app_nil_r.
-  rewrite repeat_length.
+  rewrite map2_length, repeat_length, Nat.min_id.
+  rewrite map2_length, app_nil_r, repeat_length.
   rewrite Nat.min_id.
   rewrite map2_rngl_add_0_l.
   rewrite rngl_add_0_r.
   remember (al3 ++ _) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]; [ easy | ].
   f_equal.
-...
-  rewrite lap_add_0_l.
-  cbn - [ "-" ].
-  rewrite map2_length.
-  rewrite repeat_length.
+  now rewrite map2_rngl_add_0_r.
+}
+destruct al3. {
   cbn.
-...
-destruct al2; [ easy | cbn ].
-destruct al3; [ easy | cbn ].
-rewrite rngl_add_assoc.
-now rewrite IHal1.
-...
-intros al1 al2 al3.
-revert al2 al3.
-induction al1; intros; [ easy | ].
-destruct al2; [ easy | cbn ].
-destruct al3; [ easy | cbn ].
-rewrite rngl_add_assoc.
-now rewrite IHal1.
+  rewrite rngl_add_assoc; f_equal.
+  do 2 rewrite map2_length.
+  rewrite app_nil_r, repeat_length, Nat.min_id.
+  rewrite map2_rngl_add_0_r, app_nil_r.
+  do 2 rewrite app_length, repeat_length.
+  rewrite fold_lap_add.
+  rewrite min_add_sub_max.
+  rewrite <- lap_add_length.
+  now rewrite map2_rngl_add_0_r.
+}
+cbn.
+rewrite rngl_add_assoc; f_equal.
+do 2 rewrite map2_length.
+do 4 rewrite app_length, repeat_length.
+do 2 rewrite min_add_sub_max.
+do 2 rewrite fold_lap_add.
+do 2 rewrite <- lap_add_length.
+do 2 rewrite fold_lap_add.
+apply IHal1.
 Qed.
 
 (* addition to 0 *)
@@ -1930,6 +1938,7 @@ Qed.
 Theorem lap_add_const_l : ∀ a la, ([a] + la)%lap = (a + hd 0 la)%L :: tl la.
 Proof.
 intros.
+...
 destruct la as [| b]; cbn; f_equal; symmetry; apply rngl_add_0_r.
 Qed.
 
