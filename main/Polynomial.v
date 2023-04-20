@@ -1938,15 +1938,19 @@ Qed.
 Theorem lap_add_const_l : ∀ a la, ([a] + la)%lap = (a + hd 0 la)%L :: tl la.
 Proof.
 intros.
-...
-destruct la as [| b]; cbn; f_equal; symmetry; apply rngl_add_0_r.
+destruct la as [| b]; [ easy | ].
+cbn; f_equal.
+rewrite Nat.sub_0_r, app_nil_r.
+apply map2_rngl_add_0_l.
 Qed.
 
 Theorem lap_add_const_r : ∀ a la, (la + [a])%lap = (hd 0 la + a)%L :: tl la.
 Proof.
 intros.
-destruct la as [| b]; cbn; f_equal; [ symmetry; apply rngl_add_0_l | ].
-apply lap_add_0_r.
+destruct la as [| b]; [ easy | ].
+cbn; f_equal.
+rewrite Nat.sub_0_r, app_nil_r.
+apply map2_rngl_add_0_r.
 Qed.
 
 Theorem lap_mul_const_l : ∀ a la, ([a] * la)%lap = map (λ b, (a * b)%L) la.
@@ -2076,6 +2080,7 @@ Proof.
 intros k la lb.
 revert la lb.
 induction k; intros. {
+...
   destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
   destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
   easy.
