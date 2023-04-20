@@ -2160,8 +2160,7 @@ Proof.
 intros la lb lc i len.
 revert la lb lc i.
 induction len; intros; [ easy | cbn ].
-...
-rewrite IHlen; f_equal.
+rewrite <- IHlen; f_equal.
 rewrite <- rngl_summation_add_distr.
 apply rngl_summation_eq_compat; intros j (_, Hj).
 now rewrite rngl_mul_add_distr_r.
@@ -2173,8 +2172,8 @@ Theorem lap_add_lap_convol_mul_r : ∀ la lb lc i len,
 Proof.
 intros la lb lc i len.
 revert la lb lc i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
+induction len; intros; [ easy | cbn ].
+rewrite <- IHlen; f_equal.
 rewrite <- rngl_summation_add_distr.
 apply rngl_summation_eq_compat; intros j (_, Hj).
 now rewrite rngl_mul_add_distr_l.
@@ -2186,6 +2185,7 @@ Proof.
 intros la lb lc.
 unfold lap_mul.
 destruct la as [| a]; [ easy | ].
+...
 destruct lb as [| b]; [ easy | ].
 destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
 move b before a; move c before b.
