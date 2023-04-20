@@ -2278,13 +2278,14 @@ Theorem lap_norm_mul_add_distr_r : ∀ la lb lc : list T,
 Proof.
 intros la lb lc.
 unfold lap_mul.
-...
-destruct la as [| a]; [ easy | ].
+destruct la as [| a]; [ now do 2 rewrite lap_add_0_l | ].
 destruct lb as [| b]. {
   cbn.
   destruct lc as [| c]; [ easy | ].
   cbn; rewrite Nat.sub_0_r.
-  now rewrite lap_add_0_r.
+  rewrite rngl_add_0_r, app_nil_r, map2_length, repeat_length.
+  rewrite Nat.min_id, Nat.sub_0_r, lap_add_0_r.
+  now rewrite map2_rngl_add_0_r.
 }
 destruct lc as [| c]; [ easy | ].
 move b before a; move c before b.
@@ -2329,6 +2330,7 @@ Proof.
 intros la lb lc.
 apply eq_lap_norm_eq_length. 2: {
   destruct la as [| a]; [ easy | ].
+...
   destruct lb as [| b]; [ easy | ].
   destruct lc as [| c]. {
     now cbn; rewrite lap_add_0_r.
