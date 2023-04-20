@@ -2666,10 +2666,15 @@ intros * Hca.
 revert lb lc Hca.
 induction la as [| a]; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hca; subst lc.
-...
-  now rewrite lap_add_0_r.
+  cbn.
+  rewrite app_nil_r, Nat.sub_0_r.
+  apply map2_rngl_add_0_r.
 }
-destruct lc as [| c]; [ easy | ].
+destruct lc as [| c]. {
+  cbn.
+  now do 2 rewrite app_nil_r, map2_rngl_add_0_r.
+}
+cbn.
 cbn in Hca |-*; f_equal.
 apply Nat.succ_le_mono in Hca.
 now apply IHla.
@@ -2681,6 +2686,7 @@ Theorem lap_add_app_r : ∀ la lb lc,
 Proof.
 intros * Hab.
 revert lb lc Hab.
+...
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hab; apply Nat.succ_le_mono in Hab.
