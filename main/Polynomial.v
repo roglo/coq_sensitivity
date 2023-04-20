@@ -149,31 +149,21 @@ Qed.
 
 (* addition *)
 
-Fixpoint lap_add la lb :=
-  match la with
-  | [] => lb
-  | a1 :: bl1 =>
-      match lb with
-      | [] => la
-      | a2 :: bl2 => (a1 + a2)%L :: lap_add bl1 bl2
-      end
-  end.
+Definition lap_add la lb :=
+  map2 rngl_add
+    (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)).
 
-Fixpoint lap_subt la lb :=
-  match la with
-  | [] => [] (* x-x²=x the same way 1-2=0 in nat *)
-  | a1 :: bl1 =>
-      match lb with
-      | [] => la
-      | a2 :: bl2 => (a1 - a2)%L :: lap_subt bl1 bl2
-      end
-  end.
+Definition lap_subt la lb :=
+  map2 rngl_subt
+    (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)).
 
 Definition lap_opp la := map rngl_opp la.
 Definition lap_sub la lb :=
   if rngl_has_opp then lap_add la (lap_opp lb)
   else if rngl_has_subt then lap_subt la lb
-  else [].
+  else repeat 0%L (max (length la) (length lb)).
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
@@ -314,10 +304,21 @@ Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 *)
 
 Theorem lap_add_0_l : ∀ la, lap_add [] la = la.
-Proof. easy. Qed.
+Proof.
+intros; cbn.
+rewrite Nat.sub_0_r, app_nil_r.
+induction la as [| a]; [ easy | cbn ].
+now rewrite rngl_add_0_l; f_equal.
+Qed.
 
 Theorem lap_add_0_r : ∀ la, lap_add la [] = la.
-Proof. intros; now destruct la. Qed.
+Proof.
+intros.
+unfold lap_add; cbn.
+rewrite Nat.sub_0_r, app_nil_r.
+induction la as [| a]; [ easy | cbn ].
+now rewrite rngl_add_0_r; f_equal.
+Qed.
 
 Theorem lap_mul_0_l : ∀ la, lap_mul [] la = [].
 Proof. easy. Qed.
@@ -342,14 +343,43 @@ destruct (a =? 0)%L; cbn; [ | easy ].
 flia IHl.
 Qed.
 
+(* could be moved to Misc.v *)
+Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.
+Proof.
+intros.
+destruct (le_dec a b) as [Hab| Hab]. {
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  rewrite Nat.add_0_r, Nat.min_id; symmetry.
+  now apply Nat.max_r.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hab.
+  rewrite Nat.min_comm, Nat.max_comm.
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  rewrite Nat.add_0_r, Nat.min_id; symmetry.
+  now apply Nat.max_r.
+}
+Qed.
+
 Theorem lap_add_length : ∀ la lb,
   length (lap_add la lb) = max (length la) (length lb).
 Proof.
 intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal; apply IHla.
+unfold lap_add.
+rewrite map2_length.
+do 2 rewrite app_length, repeat_length.
+apply min_add_sub_max.
+Qed.
+
+Theorem lap_subt_length : ∀ la lb,
+  length (lap_subt la lb) = max (length la) (length lb).
+Proof.
+intros.
+unfold lap_subt.
+rewrite map2_length.
+do 2 rewrite app_length, repeat_length.
+apply min_add_sub_max.
 Qed.
 
 Theorem lap_opp_length : ∀ la, length (lap_opp la) = length la.
@@ -359,30 +389,14 @@ induction la as [| a]; [ easy | cbn ].
 f_equal; apply IHla.
 Qed.
 
-Theorem lap_subt_length : ∀ la lb, length (lap_subt la lb) = length la.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal; apply IHla.
-Qed.
-
 Theorem lap_sub_length : ∀ la lb,
-  length (lap_sub la lb) =
-    if rngl_has_opp then max (length la) (length lb)
-    else if rngl_has_subt then length la
-    else 0.
+  length (lap_sub la lb) = max (length la) (length lb).
 Proof.
 intros.
 unfold lap_sub.
-destruct rngl_has_opp. {
-  revert lb.
-  induction la as [| a]; intros; [ apply lap_opp_length | cbn ].
-  destruct lb as [| b]; [ easy | cbn ].
-  f_equal; apply IHla.
-}
-destruct rngl_has_subt; [ apply lap_subt_length | easy ].
+destruct rngl_has_opp; [ now rewrite lap_add_length, lap_opp_length | ].
+destruct rngl_has_subt; [ now rewrite lap_subt_length | ].
+now rewrite repeat_length.
 Qed.
 
 Theorem all_0_lap_norm_nil : ∀ la,
@@ -528,12 +542,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrab; clear Hrab; intros; subst cq rlr.
 rewrite lap_sub_length, map_length.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op; [ now rewrite Nat.max_l | ].
-remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
-destruct su; [ easy | ].
-apply rngl_has_opp_or_subt_iff in Hos.
-destruct Hos; congruence.
+now rewrite max_l.
 Qed.
 
 Theorem rlap_rem_loop_prop : ∀ it rla rlb rlq rlr,
@@ -794,10 +803,11 @@ Theorem lap_add_comm : ∀ al1 al2,
   lap_add al1 al2 = lap_add al2 al1.
 Proof.
 intros al1 al2.
-revert al2.
-induction al1; intros; [ now destruct al2 | ].
-destruct al2; [ easy | cbn ].
-now rewrite rngl_add_comm, IHal1.
+unfold lap_add.
+rewrite map2_swap.
+apply map2_ext_in.
+intros * Ha Hb.
+apply rngl_add_comm.
 Qed.
 
 (* associativity of addition *)
@@ -822,6 +832,19 @@ Qed.
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
+intros.
+unfold lap_add.
+Search (length (lap_norm _)).
+Search (lap_norm _ = lap_norm _).
+Search (map2 _ (_ ++ _)).
+unfold lap_norm.
+f_equal.
+Search (rev (map2 _ _ _)).
+...
+do 2 rewrite map2_app_l.
+Search (lap_norm (_ ++ _)).
+rewrite map2_app_l, map2_app_r.
+...
 intros.
 unfold lap_norm; f_equal.
 revert la.
