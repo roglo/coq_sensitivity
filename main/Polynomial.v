@@ -855,35 +855,24 @@ rewrite skipn_all.
 easy.
 Qed.
 
+Theorem map2_rngl_add_0_l :
+  ∀ la, map2 rngl_add (repeat 0%L (length la)) la = la.
+Proof.
+intros.
+induction la as [| la]; [ easy | cbn ].
+now rewrite rngl_add_0_l; f_equal.
+Qed.
+
+Theorem fold_lap_add :
+  ∀ la lb,
+  map2 rngl_add (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)) =
+  lap_add la lb.
+Proof. easy. Qed.
+
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
-intros.
-unfold lap_add.
-Search (length (lap_norm _)).
-Search (lap_norm _ = lap_norm _).
-Search (map2 _ (_ ++ _)).
-unfold lap_norm.
-f_equal.
-rewrite rev_map2. 2: {
-  rewrite rev_length.
-  do 2 rewrite app_length.
-  do 2 rewrite repeat_length.
-  rewrite rev_length.
-  rewrite Nat.add_comm.
-(* ah bin non ça marche pas ; faudrait un rev_map2 qui
-   n'impose pas que les deux listes soient de la même
-   taille *)
-...
-do 2 rewrite rev_app_distr.
-rewrite rev_length.
-rewrite rev_involutive.
-Search (rev (map2 _ _ _)).
-...
-do 2 rewrite map2_app_l.
-Search (lap_norm (_ ++ _)).
-rewrite map2_app_l, map2_app_r.
-...
 intros.
 unfold lap_norm; f_equal.
 revert la.
@@ -893,6 +882,7 @@ induction lb as [| b]; intros. {
 }
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app; cbn.
+rewrite fold_lap_add.
 rewrite <- IHlb.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
@@ -901,6 +891,8 @@ destruct lc as [| c]. {
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
     subst a; rewrite rngl_add_0_l; cbn.
+    rewrite app_nil_r, rngl_add_0_l, Nat.sub_0_r.
+    rewrite map2_rngl_add_0_l.
     now rewrite strip_0s_app.
   }
   cbn.
@@ -922,6 +914,37 @@ Qed.
 Theorem lap_add_assoc : ∀ al1 al2 al3,
   (al1 + (al2 + al3))%lap = ((al1 + al2) + al3)%lap.
 Proof.
+intros al1 al2 al3.
+revert al2 al3.
+induction al1; intros; [ now do 2 rewrite lap_add_0_l | ].
+cbn - [ "-" ].
+destruct al2. {
+  cbn.
+  rewrite Nat.sub_0_r, app_nil_r.
+  rewrite map2_length.
+  rewrite repeat_length.
+  rewrite Nat.min_id.
+  rewrite map2_length.
+  rewrite app_nil_r.
+  rewrite repeat_length.
+  rewrite Nat.min_id.
+  rewrite map2_rngl_add_0_l.
+  rewrite rngl_add_0_r.
+  remember (al3 ++ _) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]; [ easy | ].
+  f_equal.
+...
+  rewrite lap_add_0_l.
+  cbn - [ "-" ].
+  rewrite map2_length.
+  rewrite repeat_length.
+  cbn.
+...
+destruct al2; [ easy | cbn ].
+destruct al3; [ easy | cbn ].
+rewrite rngl_add_assoc.
+now rewrite IHal1.
+...
 intros al1 al2 al3.
 revert al2 al3.
 induction al1; intros; [ easy | ].
