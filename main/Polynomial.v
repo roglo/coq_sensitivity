@@ -829,6 +829,32 @@ rewrite rev_involutive.
 now rewrite strip_0s_idemp.
 Qed.
 
+Theorem rev_map2 : ∀ A B C (f : A → B → C) la lb,
+  length la = length lb
+  → rev (map2 f la lb) = map2 f (rev la) (rev lb).
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; cbn; [ symmetry; apply map2_nil_r | ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+rewrite (IHla _ Hab).
+rewrite map2_app_l.
+rewrite firstn_app.
+do 2 rewrite rev_length.
+rewrite Hab, Nat.sub_diag; cbn.
+rewrite app_nil_r.
+rewrite <- (rev_length lb).
+rewrite firstn_all.
+f_equal.
+rewrite rev_length.
+rewrite skipn_app.
+rewrite rev_length, Nat.sub_diag; cbn.
+rewrite <- (rev_length lb).
+rewrite skipn_all.
+easy.
+Qed.
+
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
@@ -839,6 +865,19 @@ Search (lap_norm _ = lap_norm _).
 Search (map2 _ (_ ++ _)).
 unfold lap_norm.
 f_equal.
+rewrite rev_map2. 2: {
+  rewrite rev_length.
+  do 2 rewrite app_length.
+  do 2 rewrite repeat_length.
+  rewrite rev_length.
+  rewrite Nat.add_comm.
+(* ah bin non ça marche pas ; faudrait un rev_map2 qui
+   n'impose pas que les deux listes soient de la même
+   taille *)
+...
+do 2 rewrite rev_app_distr.
+rewrite rev_length.
+rewrite rev_involutive.
 Search (rev (map2 _ _ _)).
 ...
 do 2 rewrite map2_app_l.
