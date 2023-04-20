@@ -2185,9 +2185,14 @@ Proof.
 intros la lb lc.
 unfold lap_mul.
 destruct la as [| a]; [ easy | ].
-...
-destruct lb as [| b]; [ easy | ].
-destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
+destruct lb as [| b]; [ now do 2 rewrite lap_add_0_l | ].
+destruct lc as [| c]. {
+  cbn.
+  rewrite rngl_add_0_r.
+  do 2 rewrite app_nil_r.
+  do 3 rewrite Nat.sub_0_r.
+  now do 2 rewrite map2_rngl_add_0_r.
+}
 move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
 remember (b :: lb) as lb' eqn:Hlb'.
@@ -2273,6 +2278,7 @@ Theorem lap_norm_mul_add_distr_r : ∀ la lb lc : list T,
 Proof.
 intros la lb lc.
 unfold lap_mul.
+...
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]. {
   cbn.
