@@ -2367,19 +2367,23 @@ Theorem lap_mul_add_distr_r : ∀ la lb lc,
 Proof.
 intros la lb lc.
 apply eq_lap_norm_eq_length. 2: {
-...
-  destruct la as [| a]; [ easy | ].
+  destruct la as [| a]. {
+    rewrite lap_mul_0_l.
+    now do 2 rewrite lap_add_0_l.
+  }
   destruct lb as [| b]. {
-    destruct lc as [| c]; [ easy | ].
-    now cbn; rewrite lap_add_0_r.
+    rewrite lap_mul_0_l.
+    now do 2 rewrite lap_add_0_r.
   }
   cbn.
   destruct lc as [| c]; [ easy | ].
   cbn; do 3 rewrite Nat.sub_0_r.
   do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
   rewrite lap_convol_mul_length.
-  do 2 rewrite lap_add_length; cbn.
+  do 2 rewrite map2_length.
+  do 4 rewrite app_length, repeat_length.
   do 2 rewrite lap_convol_mul_length.
+  do 2 rewrite min_add_sub_max.
   now rewrite Nat.add_max_distr_r.
 }
 apply lap_norm_mul_add_distr_r.
@@ -2662,6 +2666,7 @@ intros * Hca.
 revert lb lc Hca.
 induction la as [| a]; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hca; subst lc.
+...
   now rewrite lap_add_0_r.
 }
 destruct lc as [| c]; [ easy | ].
