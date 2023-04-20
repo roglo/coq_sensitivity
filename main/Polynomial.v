@@ -2080,13 +2080,24 @@ Proof.
 intros k la lb.
 revert la lb.
 induction k; intros. {
-...
-  destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
+  destruct la as [| a]; cbn. {
+    rewrite rngl_add_0_l, Nat.sub_0_r, app_nil_r.
+    f_equal.
+    apply map2_rngl_add_0_l.
+  }
   destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
   easy.
 } {
-  destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
-  destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
+  destruct la as [| a]; cbn. {
+    rewrite rngl_add_0_l, Nat.sub_0_r, app_nil_r.
+    f_equal.
+    apply map2_rngl_add_0_l.
+  }
+  destruct lb as [| b]; cbn. {
+    rewrite app_nil_r, rngl_add_0_r.
+    f_equal.
+    apply map2_rngl_add_0_r.
+  }
   apply IHk.
 }
 Qed.
@@ -2148,7 +2159,8 @@ Theorem lap_add_lap_convol_mul_l : ∀ la lb lc i len,
 Proof.
 intros la lb lc i len.
 revert la lb lc i.
-induction len; intros; [ reflexivity | simpl ].
+induction len; intros; [ easy | cbn ].
+...
 rewrite IHlen; f_equal.
 rewrite <- rngl_summation_add_distr.
 apply rngl_summation_eq_compat; intros j (_, Hj).
