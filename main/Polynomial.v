@@ -4862,8 +4862,9 @@ move lb before la.
 clear pb.
 revert lb.
 induction la as [| a]; intros. {
-...
-  rewrite lap_add_0_l.
+  cbn - [ lap_norm ].
+  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  rewrite fold_lap_subt.
   unfold lap_norm.
   apply List_rev_rev.
   rewrite rev_involutive; cbn.
@@ -4871,10 +4872,19 @@ induction la as [| a]; intros. {
   intros i.
   destruct (lt_dec i (length (strip_0s (rev lb)))) as [Hil| Hil]. 2: {
     apply Nat.nlt_ge in Hil.
+...
     apply nth_overflow.
     rewrite rev_length.
     rewrite lap_subt_length.
-    now rewrite rev_length.
+    rewrite rev_length.
+...
+    rewrite max_r; [ | rewrite <- (rev_length lb); apply strip_0s_length_le ].
+    etransitivity; [ | apply Hil ].
+...
+Search (length (strip_0s _)).
+etransitivity.
+2: apply strip_0s_length_le.
+...
   }
   rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
   apply eq_nth_lap_subt_0.
