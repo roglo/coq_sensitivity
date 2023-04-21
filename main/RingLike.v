@@ -1200,6 +1200,23 @@ apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
+Theorem rngl_subt_0_r :
+  rngl_has_subt = true →
+  ∀ a, rngl_subt a 0%L = a.
+Proof.
+intros Hsu *.
+specialize rngl_opt_add_sub as H1.
+rewrite Hsu in H1.
+unfold rngl_sub in H1.
+rewrite Hsu in H1.
+unfold rngl_has_subt in Hsu.
+unfold rngl_has_opp in H1.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt ]; [ easy | ].
+specialize (H1 a 0%L).
+now rewrite rngl_add_0_r in H1.
+Qed.
+
 Theorem rngl_sub_0_r :
   rngl_has_opp_or_subt = true →
   ∀ a, (a - 0 = a)%L.
@@ -1823,3 +1840,4 @@ Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%L b%L.
 Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
+Arguments rngl_subt_0_r {T ro rp} Hsu a%L.

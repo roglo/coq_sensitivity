@@ -871,6 +871,15 @@ induction la as [| la]; [ easy | cbn ].
 now rewrite rngl_add_0_r; f_equal.
 Qed.
 
+Theorem map2_rngl_subt_0_r :
+  rngl_has_subt = true →
+  ∀ la, map2 rngl_subt la (repeat 0%L (length la)) = la.
+Proof.
+intros Hsu *.
+induction la as [| la]; [ easy | cbn ].
+now rewrite (rngl_subt_0_r Hsu); f_equal.
+Qed.
+
 Theorem fold_lap_add :
   ∀ la lb,
   map2 rngl_add (la ++ repeat 0%L (length lb - length la))
@@ -3354,6 +3363,17 @@ rewrite IHla; f_equal.
 apply (rngl_subt_diag Hos).
 Qed.
 
+Theorem lap_subt_0_r :
+  rngl_has_subt = true →
+  ∀ la, lap_subt la [] = la.
+Proof.
+intros Hsu *.
+unfold lap_subt.
+rewrite Nat.sub_0_r; cbn.
+rewrite app_nil_r.
+apply (map2_rngl_subt_0_r Hsu).
+Qed.
+
 Theorem lap_add_sub :
   ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
@@ -3387,10 +3407,14 @@ destruct su. {
     cbn - [ lap_subt ].
     rewrite rngl_add_0_r, app_nil_r.
     rewrite map2_rngl_add_0_r.
-...
-  destruct lb as [| b]; cbn; [ now rewrite app_nil_r | ].
-  rewrite (rngl_add_sub Hos); f_equal.
-  apply IHla.
+    apply (lap_subt_0_r Hsu).
+  }
+  cbn.
+  rewrite fold_lap_add, fold_lap_subt.
+  rewrite IHla; f_equal.
+  specialize (rngl_add_sub Hos a b) as H1.
+  unfold rngl_sub in H1.
+  now rewrite Hop, Hsu in H1.
 }
 apply rngl_has_opp_or_subt_iff in Hos.
 destruct Hos; congruence.
@@ -3783,6 +3807,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
 Proof.
 intros * Hab.
+...
 destruct la as [| a]; cbn in Hab; [ subst lb; easy | ].
 now destruct lb.
 Qed.
