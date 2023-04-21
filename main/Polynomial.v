@@ -3807,8 +3807,10 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
 Proof.
 intros * Hab.
-...
-destruct la as [| a]; cbn in Hab; [ subst lb; easy | ].
+destruct la as [| a]; cbn in Hab. {
+  rewrite Nat.sub_0_r, app_nil_r in Hab.
+  now rewrite map2_rngl_add_0_l in Hab.
+}
 now destruct lb.
 Qed.
 
@@ -4011,6 +4013,7 @@ Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
 Arguments lap_x_power {T ro} n%nat.
+Arguments map2_rngl_add_0_l {T ro rp} la%lap.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -4208,6 +4211,7 @@ Proof.
 intros (la, lapr) (lb, lbpr) (lc, lcpr).
 apply eq_polyn_eq.
 cbn - [ lap_norm ].
+do 4 rewrite fold_lap_add.
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite (lap_add_norm_idemp_r Heb).
 now rewrite lap_add_assoc.
@@ -4217,6 +4221,8 @@ Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
 Proof.
 intros (la, lapr).
 apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r.
+rewrite map2_rngl_add_0_l.
 now apply has_polyn_prop_lap_norm.
 Qed.
 
@@ -4263,7 +4269,7 @@ Theorem polyn_mul_add_distr_l : ∀ pa pb pc,
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
-rewrite fold_lap_norm.
+rewrite fold_lap_norm, fold_lap_add.
 rewrite (lap_mul_norm_idemp_r Hos Heb).
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite (lap_add_norm_idemp_r Heb).
@@ -4276,7 +4282,7 @@ Theorem polyn_mul_add_distr_r :
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
-rewrite fold_lap_norm.
+rewrite fold_lap_norm, fold_lap_add.
 rewrite (lap_mul_norm_idemp_l Hos Heb).
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite (lap_add_norm_idemp_r Heb).
@@ -4355,6 +4361,7 @@ Proof.
 intros Hop *.
 apply eq_polyn_eq.
 destruct a as (la, Ha); cbn.
+rewrite fold_lap_add.
 do 2 rewrite fold_lap_norm.
 rewrite (lap_add_norm_idemp_l Heb).
 now apply lap_norm_add_opp_l.
@@ -4461,7 +4468,7 @@ specialize (H1 H); clear H.
 destruct H1 as (H1, H2).
 split; [ | easy ].
 apply eq_polyn_eq; cbn.
-rewrite fold_lap_norm.
+rewrite fold_lap_norm, fold_lap_add.
 rewrite (lap_add_norm_idemp_l Heb).
 rewrite <- H1; symmetry.
 now apply has_polyn_prop_lap_norm.
@@ -4651,7 +4658,7 @@ remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
 apply (rngl_eqb_neq Heb) in H11; rewrite H11.
 cbn - [ lap_add ].
 destruct la as [| a]; cbn. {
-  rewrite H11.
+  rewrite rngl_add_0_r, H11.
   cbn; f_equal; symmetry.
   rewrite <- rngl_add_0_r.
   apply rngl_add_compat_l.
@@ -4677,7 +4684,7 @@ destruct lb as [| b]. {
     cbn - [ lap_add ] in Hla.
     remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]; cbn in Hla. {
-      rewrite H11 in Hla.
+      rewrite rngl_add_0_r, H11 in Hla.
       cbn in Hla.
       injection Hla; clear Hla; intros Hla; symmetry in Hla.
       rewrite <- rngl_add_0_r in Hla.
@@ -4687,6 +4694,7 @@ destruct lb as [| b]. {
     }
     now specialize (Hbef (S (S i)) Hi) as H1.
   }
+  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l, Hlb.
   f_equal.
   apply rngl_add_compat_l; symmetry.
   destruct i; [ easy | ].
@@ -4715,6 +4723,7 @@ remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
   rewrite (H1 1%L), (rngl_eqb_refl Heb); cbn.
+...
   destruct la as [| a]; [ now cbn; rewrite (rngl_eqb_refl Heb) | ].
   cbn; rewrite rev_involutive.
   now rewrite strip_0s_idemp, rngl_add_0_l.
