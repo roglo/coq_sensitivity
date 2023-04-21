@@ -4810,17 +4810,21 @@ induction la as [| a]; intros; cbn. {
     rewrite <- Hab, List_nth_nil.
     rewrite List_nth_repeat.
     destruct (lt_dec _ _) as [H| H]; [ clear H | easy ].
-...
     unfold rngl_subt.
     unfold rngl_has_opp_or_subt in Hos.
-    destruct rngl_opt_opp_or_subt; [ | easy ].
-    destruct s; [ easy | ].
-...
-    apply (rngl_subt_0_r ).
-...
-  apply Tauto_match_nat_same.
+    specialize (rngl_add_sub Hos 0 0) as H1.
+    rewrite rngl_add_0_r in H1.
+    unfold rngl_sub, rngl_has_opp, rngl_has_subt, rngl_subt in H1.
+    remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+    destruct os as [os| ]; [ | easy ].
+    now destruct os.
+  }
+  apply Nat.nlt_ge in Hil.
+  apply nth_overflow.
+  now rewrite map2_length, repeat_length, Nat.min_id.
 }
 destruct lb as [| b]. {
+...
   now rewrite Hab, nth_overflow.
 }
 destruct i; cbn. {
