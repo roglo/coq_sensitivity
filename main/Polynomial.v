@@ -878,6 +878,13 @@ Theorem fold_lap_add :
   lap_add la lb.
 Proof. easy. Qed.
 
+Theorem fold_lap_subt :
+  ∀ la lb,
+  map2 rngl_subt (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)) =
+  lap_subt la lb.
+Proof. easy. Qed.
+
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
@@ -2735,8 +2742,7 @@ induction la as [| a]; intros. {
   now apply Nat.le_0_r in Hlen; subst len.
 }
 cbn.
-...
-destruct len; [ easy | cbn ].
+destruct len; [ now rewrite lap_add_0_l | cbn ].
 cbn in Hlen; apply Nat.succ_le_mono in Hlen.
 rewrite rngl_add_0_l; f_equal.
 now apply IHla.
@@ -2757,10 +2763,11 @@ Theorem rev_lap_add : ∀ la lb,
 Proof.
 intros * Hab.
 revert lb Hab.
-induction la as [| a]; intros; [ easy | cbn ].
+induction la as [| a]; intros; [ now do 2 rewrite lap_add_0_l | cbn ].
 destruct lb as [| b]; [ easy | ].
 cbn in Hab |-*.
 apply Nat.succ_inj in Hab.
+do 2 rewrite fold_lap_add.
 rewrite IHla; [ | easy ].
 rewrite lap_add_app_app; [ easy | ].
 now do 2 rewrite rev_length.
@@ -2776,11 +2783,17 @@ destruct rngl_has_opp. {
   rewrite rev_lap_add; [ | now rewrite lap_opp_length ].
   now rewrite rev_lap_opp.
 }
-destruct rngl_has_subt; [ | easy ].
+destruct rngl_has_subt. 2: {
+  do 2 rewrite rev_length.
+  now rewrite List_rev_repeat.
+}
 revert lb Hab.
-induction la as [| a]; intros; [ easy | cbn ].
+induction la as [| a]; intros; cbn. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hab; apply Nat.succ_inj in Hab.
+do 2 rewrite fold_lap_subt.
 rewrite IHla; [ | easy ].
 clear IHla.
 rewrite <- (rev_length la) in Hab.
@@ -2807,11 +2820,15 @@ intros.
 revert lb.
 induction la as [| a]; intros. {
   cbn; rewrite Nat.sub_0_r, app_nil_r.
+  rewrite fold_lap_add.
+  rewrite map2_rngl_add_0_l.
   now symmetry; apply lap_add_repeat_0_l.
 }
 cbn.
 destruct lb as [| b]. {
   cbn; rewrite app_nil_r, rngl_add_0_r; f_equal.
+  rewrite fold_lap_add.
+  rewrite map2_rngl_add_0_r.
   now symmetry; apply lap_add_repeat_0_r.
 }
 cbn; f_equal.
@@ -2877,6 +2894,7 @@ revert lb Hba.
 induction la as [| a]; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
 }
+...
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hba; apply Nat.succ_le_mono in Hba.
 rewrite rngl_add_0_r; f_equal.
