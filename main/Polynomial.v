@@ -2686,8 +2686,7 @@ Theorem lap_add_app_r : ∀ la lb lc,
 Proof.
 intros * Hab.
 revert lb lc Hab.
-...
-induction la as [| a]; intros; [ easy | cbn ].
+induction la as [| a]; intros; [ now do 2 rewrite lap_add_0_l | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hab; apply Nat.succ_le_mono in Hab.
 f_equal.
@@ -2736,6 +2735,7 @@ induction la as [| a]; intros. {
   now apply Nat.le_0_r in Hlen; subst len.
 }
 cbn.
+...
 destruct len; [ easy | cbn ].
 cbn in Hlen; apply Nat.succ_le_mono in Hlen.
 rewrite rngl_add_0_l; f_equal.
