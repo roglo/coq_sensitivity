@@ -3379,11 +3379,15 @@ now apply lap_add_repeat_0_r.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
 destruct su. {
   revert lb.
-  induction la as [| a]; intros; cbn. {
-    rewrite Nat.sub_0_r.
-...
+  induction la as [| a]; intros. {
+    rewrite lap_add_0_l, app_nil_l, Nat.sub_0_r.
     apply lap_subt_diag.
   }
+  destruct lb as [| b]. {
+    cbn - [ lap_subt ].
+    rewrite rngl_add_0_r, app_nil_r.
+    rewrite map2_rngl_add_0_r.
+...
   destruct lb as [| b]; cbn; [ now rewrite app_nil_r | ].
   rewrite (rngl_add_sub Hos); f_equal.
   apply IHla.
