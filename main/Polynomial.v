@@ -2894,9 +2894,12 @@ revert lb Hba.
 induction la as [| a]; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
 }
-...
-destruct lb as [| b]; [ easy | cbn ].
-cbn in Hba; apply Nat.succ_le_mono in Hba.
+destruct lb as [| b]. {
+  rewrite app_nil_l, repeat_length; cbn.
+  rewrite rngl_add_0_r, app_nil_r.
+  now rewrite map2_rngl_add_0_r.
+}
+cbn in Hba |-*; apply Nat.succ_le_mono in Hba.
 rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
@@ -2956,6 +2959,7 @@ rewrite <- rev_lap_sub; [ | easy ].
 rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
   rewrite lap_sub_length.
+...
   rewrite Hop.
   now rewrite Hca, Nat.max_id.
 }
