@@ -4723,9 +4723,13 @@ remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
   rewrite (H1 1%L), (rngl_eqb_refl Heb); cbn.
-...
-  destruct la as [| a]; [ now cbn; rewrite (rngl_eqb_refl Heb) | ].
+  rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  rewrite fold_lap_norm.
+  destruct la as [| a]. {
+    now cbn; rewrite rngl_add_0_l, (rngl_eqb_refl Heb).
+  }
   cbn; rewrite rev_involutive.
+  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
 specialize (proj1 rngl_1_neq_0_iff Hc1) as H1.
@@ -4736,14 +4740,20 @@ cbn.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ cbn | easy ].
+  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ cbn | ]. 2: {
+    now rewrite Hlb.
+  }
   apply (rngl_eqb_eq Heb) in Haz; subst a.
-  now rewrite rngl_add_0_r.
+  now rewrite rngl_add_0_r, H1, Hlb.
 }
 cbn; rewrite rev_app_distr; cbn.
+rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
 rewrite rev_app_distr; cbn.
 rewrite rev_involutive.
 rewrite if_bool_if_dec.
+rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+rewrite Hlb.
 destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
 apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
@@ -4794,6 +4804,8 @@ Proof.
 intros * Hab *.
 revert i lb Hab.
 induction la as [| a]; intros; cbn. {
+  rewrite Nat.sub_0_r, app_nil_r.
+...
   apply Tauto_match_nat_same.
 }
 destruct lb as [| b]. {
