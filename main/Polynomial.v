@@ -3137,37 +3137,39 @@ rewrite rev_length in Hba; cbn in Hba.
 apply Nat.succ_le_mono in Hba.
 destruct lb as [| b]. {
   cbn.
+  rewrite rev_length.
   specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
   clear Hlb IHla.
-...
-  rewrite if_bool_if_dec, lap_add_comm.
+  rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
     apply (rngl_eqb_eq Heb) in Hcz; subst c; cbn.
-    rewrite rngl_add_0_r; f_equal.
-    symmetry.
+    rewrite app_nil_r; f_equal.
+    rewrite map2_rngl_add_0_r.
+    rewrite fold_lap_add; symmetry.
     clear a.
     revert la Hba.
-    induction lc as [| c]; intros; [ apply lap_add_0_l | cbn ].
+    induction lc as [| c]; intros; [ apply lap_add_0_r | cbn ].
     destruct la as [| a]; [ easy | ].
     cbn in Hba.
     apply Nat.succ_le_mono in Hba.
     specialize (H1 0) as H2; cbn in H2.
-    subst c; rewrite rngl_add_0_l; f_equal.
+    subst c; cbn; rewrite rngl_add_0_r; f_equal.
     apply IHlc; [ | easy ].
     intros i.
     now specialize (H1 (S i)).
   } {
     cbn; f_equal; clear c Hcz.
-    rewrite lap_add_0_r.
+    rewrite app_nil_r, Nat.sub_0_r.
+    rewrite map2_rngl_add_0_r, fold_lap_add.
     symmetry.
     clear a.
     revert la Hba.
-    induction lc as [| c]; intros; [ apply lap_add_0_l | cbn ].
+    induction lc as [| c]; intros; [ apply lap_add_0_r | cbn ].
     destruct la as [| a]; [ easy | ].
     cbn in Hba.
     apply Nat.succ_le_mono in Hba.
     specialize (H1 0) as H2; cbn in H2.
-    subst c; rewrite rngl_add_0_l; f_equal.
+    subst c; cbn; rewrite rngl_add_0_r; f_equal.
     apply IHlc; [ | easy ].
     intros i.
     now specialize (H1 (S i)).
@@ -3175,6 +3177,7 @@ destruct lb as [| b]. {
 }
 rewrite <- Hlb.
 rewrite rev_app_distr; cbn; f_equal.
+do 2 rewrite fold_lap_add.
 rewrite IHla; [ | now rewrite rev_length ].
 now rewrite rev_involutive.
 Qed.
@@ -3344,9 +3347,11 @@ Theorem lap_subt_diag :
   ∀ la, lap_subt la la = repeat 0%L (length la).
 Proof.
 intros.
+unfold lap_subt.
+rewrite Nat.sub_diag, app_nil_r.
 induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_sub_diag Hos).
-now f_equal.
+rewrite IHla; f_equal.
+apply (rngl_subt_diag Hos).
 Qed.
 
 Theorem lap_add_sub :
@@ -3376,6 +3381,7 @@ destruct su. {
   revert lb.
   induction la as [| a]; intros; cbn. {
     rewrite Nat.sub_0_r.
+...
     apply lap_subt_diag.
   }
   destruct lb as [| b]; cbn; [ now rewrite app_nil_r | ].
