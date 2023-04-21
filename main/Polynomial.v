@@ -2959,12 +2959,9 @@ rewrite <- rev_lap_sub; [ | easy ].
 rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
   rewrite lap_sub_length.
-...
-  rewrite Hop.
   now rewrite Hca, Nat.max_id.
 }
 rewrite lap_sub_length, map_length.
-rewrite Hop.
 rewrite Nat.max_l; [ | easy ].
 split; [ | easy ].
 f_equal.
@@ -2986,7 +2983,6 @@ rewrite lap_sub_length in Hrlac.
 rewrite lap_add_length in Hrlac.
 rewrite Nat.max_l in Hrlac; [| apply Nat.le_max_l ].
 rewrite Nat.max_l in Hrlac; [ | easy ].
-rewrite Hop in Hrlac.
 destruct rlac as [| ac]; intros. {
   apply length_zero_iff_nil in Hrlac; subst rlc; cbn.
   rewrite lap_add_0_l in Hab.
@@ -3100,7 +3096,6 @@ apply IHit in Hqr. 2: {
   apply Nat.ltb_ge in Hab.
   injection Hqrlr; clear Hqrlr; intros; subst cq rlr.
   rewrite lap_sub_length.
-  rewrite Hop.
   now cbn; rewrite map_length, Nat.max_l.
 }
 rewrite Hqrlr', Hqr.
@@ -3144,6 +3139,7 @@ destruct lb as [| b]. {
   cbn.
   specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
   clear Hlb IHla.
+...
   rewrite if_bool_if_dec, lap_add_comm.
   destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
     apply (rngl_eqb_eq Heb) in Hcz; subst c; cbn.
