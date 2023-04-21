@@ -4014,6 +4014,7 @@ Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
 Arguments lap_x_power {T ro} n%nat.
 Arguments map2_rngl_add_0_l {T ro rp} la%lap.
+Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -4797,11 +4798,12 @@ Qed.
 (* *)
 
 Theorem eq_nth_lap_subt_0 :
+  rngl_has_subt = true →
   ∀ la lb,
   (∀ i, nth i la 0%L = nth i lb 0%L)
   → ∀ i, nth i (lap_subt la lb) 0%L = 0%L.
 Proof.
-intros * Hab *.
+intros Hsu * Hab *.
 revert i lb Hab.
 induction la as [| a]; intros; cbn. {
   rewrite Nat.sub_0_r, app_nil_r.
@@ -4824,12 +4826,14 @@ induction la as [| a]; intros; cbn. {
   now rewrite map2_length, repeat_length, Nat.min_id.
 }
 destruct lb as [| b]. {
-...
-  now rewrite Hab, nth_overflow.
+  cbn - [ nth ].
+  rewrite app_nil_r, (rngl_subt_0_r Hsu).
+  rewrite (map2_rngl_subt_0_r Hsu).
+  now rewrite Hab, List_nth_nil.
 }
 destruct i; cbn. {
   specialize (Hab 0); cbn in Hab; subst b.
-  apply (rngl_sub_diag Hos).
+  apply (rngl_subt_diag Hos).
 }
 apply IHla.
 intros j.
@@ -4858,6 +4862,7 @@ move lb before la.
 clear pb.
 revert lb.
 induction la as [| a]; intros. {
+...
   rewrite lap_add_0_l.
   unfold lap_norm.
   apply List_rev_rev.
