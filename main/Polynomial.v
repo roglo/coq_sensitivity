@@ -4805,6 +4805,18 @@ intros * Hab *.
 revert i lb Hab.
 induction la as [| a]; intros; cbn. {
   rewrite Nat.sub_0_r, app_nil_r.
+  destruct (lt_dec i (length lb)) as [Hil| Hil]. {
+    rewrite (map2_nth _ _ _ 0%L 0%L); [ | now rewrite repeat_length | easy ].
+    rewrite <- Hab, List_nth_nil.
+    rewrite List_nth_repeat.
+    destruct (lt_dec _ _) as [H| H]; [ clear H | easy ].
+...
+    unfold rngl_subt.
+    unfold rngl_has_opp_or_subt in Hos.
+    destruct rngl_opt_opp_or_subt; [ | easy ].
+    destruct s; [ easy | ].
+...
+    apply (rngl_subt_0_r ).
 ...
   apply Tauto_match_nat_same.
 }
