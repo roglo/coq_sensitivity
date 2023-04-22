@@ -4846,6 +4846,38 @@ Theorem polyn_opt_add_sub :
   else not_applicable.
 Proof.
 intros; subst rop.
+remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+destruct su; [ | easy ].
+intros (la, pa) (lb, pb).
+move lb before la; cbn.
+unfold rngl_sub.
+rewrite Hsu.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  move Hsu at bottom.
+  unfold polyn_ring_like_op in Hop, Hsu.
+  cbn in Hop, Hsu.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  cbn in Hop, Hsu.
+  unfold polyn_opt_opp_or_subt in Hop, Hsu.
+  cbn in Hop, Hsu.
+  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
+}
+move Hop after Hsu.
+...
+unfold rngl_subt.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_subt in Hsu.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ easy | ].
+clear Hop Hsu.
+specialize (rngl_add_sub Hos) as H1.
+...
+intros; subst rop.
+remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+destruct su; [ | easy ].
 unfold rngl_has_subt; cbn.
 unfold rngl_sub, rngl_has_opp; cbn.
 unfold polyn_opt_opp_or_subt.
@@ -4870,23 +4902,21 @@ induction la as [| a]; intros. {
   rewrite rev_involutive; cbn.
   apply eq_strip_0s_nil; [ easy | easy | ].
   intros i.
-  destruct (lt_dec i (length (strip_0s (rev lb)))) as [Hil| Hil]. 2: {
+  destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
     apply Nat.nlt_ge in Hil.
-...
     apply nth_overflow.
     rewrite rev_length.
     rewrite lap_subt_length.
     rewrite rev_length.
-...
-    rewrite max_r; [ | rewrite <- (rev_length lb); apply strip_0s_length_le ].
-    etransitivity; [ | apply Hil ].
-...
-Search (length (strip_0s _)).
-etransitivity.
-2: apply strip_0s_length_le.
-...
+    rewrite max_r; [ easy | ].
+    rewrite <- (rev_length lb); apply strip_0s_length_le.
   }
-  rewrite rev_nth; [ | now rewrite lap_subt_length, rev_length ].
+  rewrite rev_nth. 2: {
+    rewrite lap_subt_length, rev_length.
+    rewrite max_r; [ easy | ].
+    rewrite <- (rev_length lb); apply strip_0s_length_le.
+  }
+...
   apply eq_nth_lap_subt_0.
   intros j.
   rewrite fold_lap_norm.
