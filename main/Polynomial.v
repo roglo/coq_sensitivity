@@ -4913,6 +4913,8 @@ destruct lb as [| b]. {
 }
 cbn - [ lap_subt lap_norm ].
 rewrite fold_lap_add.
+cbn - [ lap_subt ].
+rewrite strip_0s_app.
 ...
 intros; subst rop.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
