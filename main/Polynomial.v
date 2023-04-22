@@ -3986,6 +3986,7 @@ Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
+Arguments lap_add_0_r {T ro rp} la%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
@@ -4894,26 +4895,22 @@ destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_subt lap_norm lap_add ].
 revert lb pb.
-induction la as [| a]; intros. {
+induction la as [| a] using rev_ind; intros. {
   rewrite lap_add_0_l.
   rewrite (has_polyn_prop_lap_norm Heb lb pb).
   rewrite (lap_subt_diag Hos).
   apply (lap_norm_repeat_0 Heb).
 }
 destruct lb as [| b]. {
-  cbn - [ lap_subt lap_norm ].
-  rewrite rngl_add_0_r, app_nil_r.
+  rewrite lap_add_0_r.
   rewrite lap_subt_0_r. 2: {
     unfold rngl_has_subt; cbn.
     now rewrite Hos'.
   }
-  rewrite map2_rngl_add_0_r.
   rewrite lap_norm_idemp.
   now apply (has_polyn_prop_lap_norm Heb).
 }
-cbn - [ lap_subt lap_norm ].
-rewrite fold_lap_add.
-cbn - [ lap_subt ].
+...
 rewrite strip_0s_app.
 ...
 intros; subst rop.
