@@ -4894,6 +4894,46 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_subt lap_norm lap_add ].
+(**)
+unfold lap_add.
+remember (la ++ repeat _ _) as lc eqn:Hlc.
+remember (lb ++ repeat _ _) as ld eqn:Hld.
+replace la with (lap_norm lc). 2: {
+  rewrite Hlc.
+  rewrite <- (lap_norm_app_0_r Heb). {
+    now apply (has_polyn_prop_lap_norm Heb).
+  }
+  intros i.
+  rewrite List_nth_repeat.
+  now destruct (lt_dec _ _).
+}
+replace lb with (lap_norm ld). 2: {
+  rewrite Hld.
+  rewrite <- (lap_norm_app_0_r Heb). {
+    now apply (has_polyn_prop_lap_norm Heb).
+  }
+  intros i.
+  rewrite List_nth_repeat.
+  now destruct (lt_dec _ _).
+}
+assert (Hcd : length lc = length ld). {
+  rewrite Hlc, Hld.
+  do 2 rewrite  app_length, repeat_length.
+  flia.
+}
+clear la lb pa pb Hlc Hld.
+rename lc into la; rename ld into lb; rename Hcd into Hab.
+revert lb Hab.
+induction la as [| a] using rev_ind; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b] using rev_ind. {
+  now rewrite app_length, Nat.add_comm in Hab.
+}
+clear IHlb.
+do 2 rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
   rewrite lap_add_0_l.
