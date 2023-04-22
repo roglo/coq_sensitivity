@@ -724,6 +724,23 @@ do 2 rewrite List_nth_succ_cons.
 easy.
 Qed.
 
+Theorem map2_app_app :
+  ∀ A B C la lb lc ld (f : A → B → C),
+  length la = length lb
+  → length lc = length ld
+  → map2 f (la ++ lc) (lb ++ ld) =
+    map2 f la lb ++ map2 f lc ld.
+Proof.
+intros * Hab Hcd.
+revert lb lc ld Hab Hcd.
+induction la as [| a]; intros; cbn. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b]; [ easy | cbn ].
+cbn in Hab; apply Nat.succ_inj in Hab; f_equal.
+now apply IHla.
+Qed.
+
 (* end map2 *)
 
 (* rank: rank of the first element satisfying a predicate *)

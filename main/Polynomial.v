@@ -4933,6 +4933,28 @@ destruct lb as [| b] using rev_ind. {
 clear IHlb.
 do 2 rewrite app_length, Nat.add_1_r in Hab.
 apply Nat.succ_inj in Hab.
+rewrite map2_app_app; [ cbn | easy | easy ].
+unfold lap_norm at 2 3; cbn.
+do 2 rewrite rev_app_distr.
+cbn - [ lap_norm lap_subt ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
+  apply (rngl_eqb_eq Heb) in Habz.
+  rewrite fold_lap_norm.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+    apply (rngl_eqb_eq Heb) in Hbz.
+    subst b; rewrite rngl_add_0_r in Habz; subst a.
+    rewrite fold_lap_norm.
+    rewrite IHla; [ | easy ].
+    apply (lap_norm_app_0_r Heb).
+    intros.
+    destruct i; [ easy | cbn ].
+    apply Tauto_match_nat_same.
+  } {
+    cbn.
+    rewrite rev_involutive.
+Search (_ + _ = 0)%L.
 ...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
