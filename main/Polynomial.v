@@ -3976,45 +3976,47 @@ Print rlap_compose.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
+Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments eval_lap {T ro} la%lap x%L.
 Arguments eval_rlap {T ro} rla%lap x%L.
 Arguments has_polyn_prop {T ro} la%lap.
-Arguments lap_add {T ro} (la lb)%lap.
-Arguments lap_sub {T ro} (la lb)%lap.
-Arguments lap_subt {T ro} (la lb)%lap.
-Arguments lap_one {T ro}.
-Arguments lap_opp {T ro} la%lap.
-Arguments lap_mul {T ro} (la lb)%lap.
-Arguments lap_norm {T ro} la%lap.
-Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
-Arguments lap_quot_rem {T ro} (la lb)%lap.
-Arguments lap_quot {T ro} (la lb)%lap.
-Arguments lap_rem {T ro} (la lb)%lap.
-Arguments lap_compose {T ro} (la lb)%lap.
-Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
-Arguments polyn_norm_prop {T ro} la%lap.
-Arguments rlap_compose {T ro} (rla rlb)%lap.
-Arguments strip_0s {T ro} la%lap.
+Arguments has_polyn_prop_lap_norm {T ro rp} Heb la%lap.
 
-Arguments lap_quot_is_norm {T ro rp} Hos Heb Hiv (la lb)%lap.
-Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
+Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
+Arguments lap_add_0_l {T ro rp} la%lap.
+Arguments lap_compose {T ro} (la lb)%lap.
+Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
+Arguments lap_mul {T ro} (la lb)%lap.
+Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
 Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
-Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
-Arguments has_polyn_prop_lap_norm {T ro rp} Heb la%lap.
-Arguments lap_quot_rem_prop {T ro rp} Hos Heb Hic Hop Hiv (la lb lq lr)%lap.
+Arguments lap_norm {T ro} la%lap.
+Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
-Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
-Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
+Arguments lap_one {T ro}.
+Arguments lap_opp {T ro} la%lap.
+Arguments lap_quot {T ro} (la lb)%lap.
+Arguments lap_quot_is_norm {T ro rp} Hos Heb Hiv (la lb)%lap.
+Arguments lap_quot_rem {T ro} (la lb)%lap.
+Arguments lap_quot_rem_prop {T ro rp} Hos Heb Hic Hop Hiv (la lb lq lr)%lap.
+Arguments lap_rem {T ro} (la lb)%lap.
+Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
+Arguments lap_sub {T ro} (la lb)%lap.
+Arguments lap_subt {T ro} (la lb)%lap.
 Arguments lap_x_power {T ro} n%nat.
+
+Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments map2_rngl_add_0_l {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
+Arguments polyn_norm_prop {T ro} la%lap.
+Arguments rlap_compose {T ro} (rla rlb)%lap.
+Arguments strip_0s {T ro} la%lap.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -4882,6 +4884,14 @@ destruct os as [opp| subt]. {
   now rewrite Hos' in Hop.
 }
 unfold polyn_subt.
+cbn - [ lap_subt ].
+destruct a as (la, pa).
+destruct b as (lb, pb).
+move lb before la.
+cbn - [ lap_subt lap_norm lap_add ].
+revert lb pb.
+induction la as [| a]; intros. {
+  rewrite lap_add_0_l.
 ...
 intros; subst rop.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
