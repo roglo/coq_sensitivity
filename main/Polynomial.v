@@ -4866,6 +4866,24 @@ destruct op. {
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
 move Hop after Hsu.
+apply eq_polyn_eq; cbn.
+unfold rngl_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]. 2: {
+  unfold rngl_has_opp_or_subt in Hos.
+  unfold polyn_ring_like_op in Hos'.
+  cbn in Hos'.
+  unfold polyn_opt_opp_or_subt in Hos'.
+  exfalso.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  clear Hop Hsu.
+  destruct rngl_opt_opp_or_subt; [ | easy ].
+  now destruct s.
+}
+destruct os as [opp| subt]. {
+...
+destruct os as [opp| subt]; [ easy | ].
 ...
 unfold rngl_subt.
 unfold rngl_has_opp in Hop.
