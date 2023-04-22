@@ -4011,10 +4011,12 @@ Arguments lap_ring_like_op {T ro}.
 Arguments lap_sub {T ro} (la lb)%lap.
 Arguments lap_subt {T ro} (la lb)%lap.
 Arguments lap_subt_diag {T ro rp} Hos la%lap.
+Arguments lap_subt_0_r {T ro rp} Hsu la%lap.
 Arguments lap_x_power {T ro} n%nat.
 
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments map2_rngl_add_0_l {T ro rp} la%lap.
+Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
@@ -4898,6 +4900,19 @@ induction la as [| a]; intros. {
   rewrite (lap_subt_diag Hos).
   apply (lap_norm_repeat_0 Heb).
 }
+destruct lb as [| b]. {
+  cbn - [ lap_subt lap_norm ].
+  rewrite rngl_add_0_r, app_nil_r.
+  rewrite lap_subt_0_r. 2: {
+    unfold rngl_has_subt; cbn.
+    now rewrite Hos'.
+  }
+  rewrite map2_rngl_add_0_r.
+  rewrite lap_norm_idemp.
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+cbn - [ lap_subt lap_norm ].
+rewrite fold_lap_add.
 ...
 intros; subst rop.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
