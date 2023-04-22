@@ -4141,7 +4141,7 @@ Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => Some (inr polyn_subt)
+  | Some (inr _) => None (*Some (inr polyn_subt)*)
   | None => None
   end.
 
@@ -4388,7 +4388,7 @@ destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
 
-(*
+(**)
 Theorem polyn_opt_has_no_subt : ∀ P,
   let _ := polyn_ring_like_op in
   if rngl_has_subt then P else not_applicable.
@@ -4399,7 +4399,7 @@ unfold polyn_opt_opp_or_subt.
 destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
-*)
+(**)
 
 Theorem polyn_opt_has_no_inv : ∀ P,
   let _ := polyn_ring_like_op in
@@ -4840,6 +4840,7 @@ intros j.
 now specialize (Hab (S j)).
 Qed.
 
+(*
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
@@ -4995,6 +4996,7 @@ Search (length (strip_0s _)).
 ...
 
 Definition polyn_opt_has_no_subt (_ : True) := 12.
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -5012,11 +5014,11 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-(*
-     rngl_opt_add_sub := polyn_opt_has_no_subt _;
-*)
-     rngl_opt_add_sub := polyn_opt_add_sub;
 (**)
+     rngl_opt_add_sub := polyn_opt_has_no_subt _;
+(*
+     rngl_opt_add_sub := polyn_opt_add_sub;
+*)
      rngl_opt_sub_sub_sub_add := polyn_opt_has_no_subt _;
      rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
@@ -5103,14 +5105,15 @@ Arguments lap_convol_mul_l_succ_l {T ro rp} Hos (la lb)%lap (i len)%nat.
 Theorem lap_cons : ∀ a la, a :: la = ([a] + [0; 1]%L * la)%lap.
 Proof.
 intros.
-destruct la as [| a2]; [ easy | cbn ].
+destruct la as [| a2]; [ now cbn; rewrite rngl_add_0_r | cbn ].
 unfold iter_seq, iter_list; cbn.
 rewrite rngl_mul_1_l.
-do 2 rewrite (rngl_mul_0_l Hos).
-do 2 rewrite rngl_add_0_r.
-rewrite rngl_add_0_l.
+do 2 rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+do 3 rewrite rngl_add_0_l.
+rewrite app_nil_r.
 f_equal; f_equal.
 rewrite (lap_convol_mul_l_succ_l Hos).
+rewrite map2_rngl_add_0_l.
 now symmetry; apply (lap_convol_mul_1_l Hos).
 Qed.
 
