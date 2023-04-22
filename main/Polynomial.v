@@ -4141,7 +4141,7 @@ Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => None (*Some (inr polyn_subt)*)
+  | Some (inr _) => Some (inr polyn_subt)
   | None => None
   end.
 
@@ -4388,7 +4388,7 @@ destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
 
-(**)
+(*
 Theorem polyn_opt_has_no_subt : ∀ P,
   let _ := polyn_ring_like_op in
   if rngl_has_subt then P else not_applicable.
@@ -4399,7 +4399,7 @@ unfold polyn_opt_opp_or_subt.
 destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
-(**)
+*)
 
 Theorem polyn_opt_has_no_inv : ∀ P,
   let _ := polyn_ring_like_op in
@@ -4840,12 +4840,49 @@ intros j.
 now specialize (Hab (S j)).
 Qed.
 
-(*
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
   else not_applicable.
 Proof.
+intros; subst rop.
+remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+destruct su; [ | easy ].
+intros.
+apply eq_polyn_eq; cbn.
+unfold rngl_sub.
+rewrite Hsu.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  move Hsu at bottom.
+  unfold polyn_ring_like_op in Hop, Hsu.
+  cbn in Hop, Hsu.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  cbn in Hop, Hsu.
+  unfold polyn_opt_opp_or_subt in Hop, Hsu.
+  cbn in Hop, Hsu.
+  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
+}
+move Hop after Hsu.
+specialize (rngl_add_sub Hos) as H1.
+unfold rngl_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]. 2: {
+  unfold rngl_has_opp_or_subt in Hos.
+  clear - Hos Hos'.
+  now rewrite Hos' in Hos.
+}
+destruct os as [opp| subt]. {
+  unfold rngl_has_opp in Hop; cbn in Hop.
+  unfold polyn_opt_opp_or_subt in Hop.
+  exfalso; clear - Hop Hos'.
+  now rewrite Hos' in Hop.
+}
+unfold polyn_subt.
+...
 intros; subst rop.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
 destruct su; [ | easy ].
@@ -4996,7 +5033,6 @@ Search (length (strip_0s _)).
 ...
 
 Definition polyn_opt_has_no_subt (_ : True) := 12.
-*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -5014,11 +5050,11 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-(**)
-     rngl_opt_add_sub := polyn_opt_has_no_subt _;
 (*
-     rngl_opt_add_sub := polyn_opt_add_sub;
+     rngl_opt_add_sub := polyn_opt_has_no_subt _;
 *)
+     rngl_opt_add_sub := polyn_opt_add_sub;
+(**)
      rngl_opt_sub_sub_sub_add := polyn_opt_has_no_subt _;
      rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
