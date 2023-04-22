@@ -3997,6 +3997,7 @@ Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm {T ro} la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
+Arguments lap_norm_repeat_0 {T ro rp} Heb n%nat.
 Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments lap_one {T ro}.
 Arguments lap_opp {T ro} la%lap.
@@ -4009,6 +4010,7 @@ Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
 Arguments lap_ring_like_op {T ro}.
 Arguments lap_sub {T ro} (la lb)%lap.
 Arguments lap_subt {T ro} (la lb)%lap.
+Arguments lap_subt_diag {T ro rp} Hos la%lap.
 Arguments lap_x_power {T ro} n%nat.
 
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
@@ -4892,6 +4894,10 @@ cbn - [ lap_subt lap_norm lap_add ].
 revert lb pb.
 induction la as [| a]; intros. {
   rewrite lap_add_0_l.
+  rewrite (has_polyn_prop_lap_norm Heb lb pb).
+  rewrite (lap_subt_diag Hos).
+  apply (lap_norm_repeat_0 Heb).
+}
 ...
 intros; subst rop.
 remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
