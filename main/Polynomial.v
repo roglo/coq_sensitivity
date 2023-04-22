@@ -4933,7 +4933,7 @@ destruct lb as [| b] using rev_ind. {
 clear IHlb.
 do 2 rewrite app_length, Nat.add_1_r in Hab.
 apply Nat.succ_inj in Hab.
-rewrite map2_app_app; [ cbn | easy | easy ].
+rewrite map2_app_app; [ cbn | easy ].
 unfold lap_norm at 2 3; cbn.
 do 2 rewrite rev_app_distr.
 cbn - [ lap_norm lap_subt ].
@@ -4954,6 +4954,10 @@ destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
   } {
     cbn.
     rewrite rev_involutive.
+...
+    rewrite <- (app_nil_r (map2 rngl_add la lb)).
+    unfold lap_subt.
+    rewrite map2_app_app.
 Search (_ + _ = 0)%L.
 ...
 revert lb pb.
