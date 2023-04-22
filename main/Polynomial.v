@@ -4901,7 +4901,7 @@ induction la as [| a] using rev_ind; intros. {
   rewrite (lap_subt_diag Hos).
   apply (lap_norm_repeat_0 Heb).
 }
-destruct lb as [| b]. {
+destruct lb as [| b] using rev_ind. {
   rewrite lap_add_0_r.
   rewrite lap_subt_0_r. 2: {
     unfold rngl_has_subt; cbn.
@@ -4910,6 +4910,9 @@ destruct lb as [| b]. {
   rewrite lap_norm_idemp.
   now apply (has_polyn_prop_lap_norm Heb).
 }
+unfold lap_add.
+do 2 rewrite app_length.
+cbn.
 ...
 rewrite strip_0s_app.
 ...
