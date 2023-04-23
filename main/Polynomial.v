@@ -4872,7 +4872,33 @@ destruct op. {
   cbn in Hop, Hsu.
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
-move Hop after Hsu.
+rename Hop into Hopp.
+rename Hsu into Hsup.
+move Hopp after Hsup.
+assert (Hop : @rngl_has_opp T ro = false). {
+  unfold rngl_has_opp_or_subt in Hos.
+  unfold rngl_has_subt in Hsup.
+  unfold rngl_has_opp.
+  unfold bool_of_option in Hos.
+  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
+  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
+  clear - Hos Hsup.
+  destruct rngl_opt_opp_or_subt; [ | easy ].
+  now destruct s.
+}
+move Hop before Hsup.
+assert (Hsu : @rngl_has_subt T ro = true). {
+  unfold rngl_has_opp_or_subt in Hos.
+  unfold rngl_has_subt in Hsup.
+  unfold rngl_has_subt.
+  unfold bool_of_option in Hos.
+  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
+  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
+  clear - Hos Hsup.
+  destruct rngl_opt_opp_or_subt; [ | easy ].
+  now destruct s.
+}
+move Hsu before Hop.
 specialize (rngl_add_sub Hos) as H1.
 unfold rngl_subt; cbn.
 unfold polyn_opt_opp_or_subt.
@@ -4954,6 +4980,28 @@ destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
   } {
     cbn.
     rewrite rev_involutive.
+specialize (H1 a b) as H2.
+rewrite Habz in H2.
+destruct la as [| a2]. {
+  symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hzb| Hzb]. {
+    apply (rngl_eqb_eq Heb) in Hzb.
+    rewrite if_bool_if_dec.
+    destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | ].
+    unfold rngl_sub in H2.
+    rewrite Hop, Hsu in H2.
+    rewrite <- H2, Hzb in Haz.
+    now apply (rngl_eqb_neq Heb) in Haz.
+  } {
+    apply (rngl_eqb_neq Heb) in Hbz.
+    rewrite if_bool_if_dec.
+    destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+      apply (rngl_eqb_eq Heb) in Haz.
+      move Haz at top; subst a.
+      now rewrite rngl_add_0_l in Habz.
+    }
 ...
     rewrite <- (app_nil_r (map2 rngl_add la lb)).
     unfold lap_subt.
