@@ -4980,15 +4980,16 @@ destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
   } {
     cbn.
     rewrite rev_involutive.
-...
+clear IHla.
 specialize (H1 a b) as H2.
 rewrite Habz in H2.
-destruct la as [| a2] using rev_ind. {
+apply (rngl_eqb_neq Heb) in Hbz.
+...
+induction la as [| a2] using rev_ind. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
   cbn.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hzb| Hzb]. {
-    apply (rngl_eqb_eq Heb) in Hzb.
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | ].
     unfold rngl_sub in H2.
