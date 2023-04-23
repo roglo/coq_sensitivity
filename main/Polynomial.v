@@ -4980,14 +4980,14 @@ destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
   } {
     cbn.
     rewrite rev_involutive.
-specialize (H1 a b) as H2.
-rewrite Habz in H2.
-apply (rngl_eqb_neq Heb) in Hbz.
-specialize (H1 b a) as H3.
-rewrite rngl_add_comm, Habz in H3.
-...
+    specialize (H1 a b) as H2.
+    rewrite Habz in H2.
+    apply (rngl_eqb_neq Heb) in Hbz.
+    specialize (H1 b a) as H3.
+    rewrite rngl_add_comm, Habz in H3.
 clear IHla.
-induction la as [| a2] using rev_ind. {
+revert lb Hab.
+induction la as [| a2] using rev_ind; intros. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
   cbn.
   rewrite if_bool_if_dec.
@@ -4996,10 +4996,8 @@ induction la as [| a2] using rev_ind. {
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | ].
     unfold rngl_sub in H2.
     rewrite Hop, Hsu in H2.
-    rewrite <- H2, Hzb in Haz.
-    now apply (rngl_eqb_neq Heb) in Haz.
+    now rewrite <- H2, Hzb in Haz.
   } {
-    apply (rngl_eqb_neq Heb) in Hbz.
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
       apply (rngl_eqb_eq Heb) in Haz.
@@ -5012,13 +5010,30 @@ induction la as [| a2] using rev_ind. {
     now rewrite Hop, Hsu.
   }
 }
-clear IHla0.
 destruct lb as [| b2] using rev_ind; [ now destruct la | ].
 clear IHlb.
 do 2 rewrite app_length, Nat.add_1_r in Hab.
 apply Nat.succ_inj in Hab.
 rewrite map2_app_app; [ | easy ].
 cbn.
+unfold lap_norm at 2.
+rewrite rev_app_distr; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hab2| Hab2]. {
+  rewrite fold_lap_subt.
+  do 2 rewrite fold_lap_norm.
+  apply (rngl_eqb_eq Heb) in Hab2.
+  move Hab2 before Habz.
+  move b2 before a2.
+  move b before a.
+  move lb before la.
+  do 2 rewrite <- app_assoc.
+  cbn.
+...
+  Habz : (a + b)%L = 0%L
+  Hab2 : (a2 + b2)%L = 0%L
+  ============================
+  lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ [b2; b])) = lap_norm (la ++ [a2; a])
 ...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
