@@ -5002,11 +5002,13 @@ destruct la as [| a2]. {
       move Haz at top; subst a.
       now rewrite rngl_add_0_l in Habz.
     }
-...
-    rewrite <- (app_nil_r (map2 rngl_add la lb)).
-    unfold lap_subt.
-    rewrite map2_app_app.
-Search (_ + _ = 0)%L.
+    apply (rngl_eqb_neq Heb) in Haz.
+    f_equal; f_equal; rewrite <- H2.
+    unfold rngl_sub.
+    now rewrite Hop, Hsu.
+  }
+}
+destruct lb as [| b2]. {
 ...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
