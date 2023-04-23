@@ -4980,9 +4980,10 @@ destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. {
   } {
     cbn.
     rewrite rev_involutive.
+...
 specialize (H1 a b) as H2.
 rewrite Habz in H2.
-destruct la as [| a2]. {
+destruct la as [| a2] using rev_ind. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
   cbn.
   rewrite if_bool_if_dec.
@@ -5008,7 +5009,13 @@ destruct la as [| a2]. {
     now rewrite Hop, Hsu.
   }
 }
-destruct lb as [| b2]. {
+clear IHla0.
+destruct lb as [| b2] using rev_ind; [ now destruct la | ].
+clear IHlb.
+do 2 rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+rewrite map2_app_app; [ | easy ].
+cbn.
 ...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
