@@ -5087,6 +5087,8 @@ induction la as [| a]; intros; cbn. {
         rewrite <- H1.
         unfold rngl_sub.
         rewrite Hop, Hsu.
+apply (f_equal (λ l, nth i l 0%L)) in Hla.
+rewrite List_nth_nil in Hla.
 ...
 specialize (H1 0%L (nth 0 lc 0%L) d).
 rewrite Hcd in H1.
