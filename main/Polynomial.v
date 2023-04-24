@@ -5064,20 +5064,22 @@ induction la as [| a]; intros; cbn. {
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [Hdz| Hdz]. {
       symmetry; apply (all_0_lap_norm_nil Heb).
+      apply (rngl_eqb_eq Heb) in Hdz.
       intros i.
       specialize (Hcd i).
       destruct i. {
         cbn in Hcd.
-        apply (rngl_eqb_eq Heb) in Hdz.
         specialize rngl_opt_sub_add_distr as H1.
         rewrite Hsu in H1.
-unfold rngl_sub in H1.
-rewrite Hop, Hsu in H1.
-specialize (H1 0%L d (nth 0 lc 0%L)) as H2.
-rewrite Hdz in H2.
-rewrite rngl_add_comm, Hcd in H2.
-rewrite (rngl_subt_0_r Hsu) in H2; symmetry in H2.
-Search (rngl_subt _ _ = 0%L).
+        unfold rngl_sub in H1.
+        rewrite Hop, Hsu in H1.
+        specialize (Has (nth 0 lc 0%L) d) as H2.
+        rewrite Hcd in H2.
+        rewrite <- H2.
+        unfold rngl_sub.
+        now rewrite Hop, Hsu.
+      }
+      cbn in Hcd.
 ...
 specialize (H1 0%L (nth 0 lc 0%L) d).
 rewrite Hcd in H1.
