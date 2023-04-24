@@ -5030,19 +5030,63 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab2| Hab2]. {
   do 2 rewrite <- app_assoc.
   cbn.
 Theorem lap_norm_subt_add_app :
+  (∀ a b : T, (a + b - b)%L = a) →
   ∀ la lb lc ld,
   length la = length lb
   → (∀ i, (nth i lc 0 + nth i ld 0 = 0)%L)
   → lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ ld)) =
     lap_norm (la ++ lc).
 Proof.
-intros * Hab Hcd.
+intros Has * Hab Hcd.
 revert lb lc ld Hab Hcd.
 induction la as [| a]; intros; cbn. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
   rewrite Nat.sub_0_r, app_nil_r.
   do 2 rewrite fold_lap_norm.
-(* a - (a + b) = 0 ? *)
+  revert lc Hcd.
+  induction ld as [| d]; intros; cbn. {
+    symmetry.
+    apply eq_list_eq with (d := 0%L). {
+      cbn; induction lc as [| c]; [ easy | cbn ].
+      rewrite strip_0s_app.
+      remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
+      destruct ld as [| d]; cbn. {
+        rewrite rev_length.
+        rewrite if_bool_if_dec.
+        destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]; [ easy | ].
+        specialize (Hcd 0); cbn in Hcd.
+        rewrite rngl_add_0_r in Hcd.
+        now apply (rngl_eqb_neq Heb) in Hcz.
+      }
+      exfalso.
+      clear IHlc.
+      induction lc as [| c'] using rev_ind; [ easy | cbn ].
+      rewrite rev_app_distr in Hld; cbn in Hld.
+      rewrite if_bool_if_dec in Hld.
+      destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+        apply IHlc; [ | easy ].
+        intros i.
+        specialize (Hcd i).
+        rewrite app_comm_cons in Hcd.
+        destruct (lt_dec i (length (c :: lc))) as [Hil| Hil]. {
+          now rewrite app_nth1 in Hcd.
+        }
+        apply Nat.nlt_ge in Hil.
+        rewrite List_nth_nil, rngl_add_0_r.
+        now apply nth_overflow.
+      }
+      injection Hld; clear Hld; intros; subst c' ld.
+      specialize (Hcd (length (c :: lc))).
+      rewrite List_nth_nil, rngl_add_0_r in Hcd.
+      rewrite app_comm_cons in Hcd.
+      rewrite app_nth2 in Hcd; [ | now unfold ge ].
+      rewrite Nat.sub_diag in Hcd; cbn in Hcd.
+      now apply (rngl_eqb_neq Heb) in Hcz.
+    }
+    intros i Hi.
+...
+    induction lc as [| c]; [ easy | cbn ].
+    rewrite strip_0s_app; cbn.
 ... ...
 apply lap_norm_subt_add_app; [ easy | ].
 ...
