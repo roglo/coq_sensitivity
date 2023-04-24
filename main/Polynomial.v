@@ -5031,14 +5031,16 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab2| Hab2]. {
   cbn.
 Theorem lap_norm_subt_add_app :
   rngl_has_subt = true →
-  (∀ a b : T, (a + b - b)%L = a) →
   ∀ la lb lc ld,
   length la = length lb
   → (∀ i, (nth i lc 0 + nth i ld 0 = 0)%L)
   → lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ ld)) =
     lap_norm (la ++ lc).
 Proof.
-intros Hsu Has * Hab Hcd.
+intros Hsu * Hab Hcd.
+specialize rngl_opt_add_sub as Has.
+specialize rngl_opt_sub_add_distr as Hsa.
+rewrite Hsu in Has, Hsa.
 assert (Hop : rngl_has_opp = false). {
   unfold rngl_has_subt in Hsu.
   unfold rngl_has_opp.
@@ -5080,8 +5082,9 @@ induction la as [| a]; intros; cbn. {
         now rewrite Hop, Hsu.
       } {
         cbn in Hcd.
-        specialize rngl_opt_sub_add_distr as H1.
-        rewrite Hsu in H1.
+...
+specialize (Has (nth (S i) lc 0%L) d) as H2.
+rewrite Hcd in H2.
 ...
         unfold rngl_sub in H1.
         rewrite Hop, Hsu in H1.
