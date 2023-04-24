@@ -5029,11 +5029,22 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab2| Hab2]. {
   move lb before la.
   do 2 rewrite <- app_assoc.
   cbn.
-...
-  Habz : (a + b)%L = 0%L
-  Hab2 : (a2 + b2)%L = 0%L
-  ============================
-  lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ [b2; b])) = lap_norm (la ++ [a2; a])
+Theorem lap_norm_subt_add_app :
+  ∀ la lb lc ld,
+  length la = length lb
+  → (∀ i, (nth i lc 0 + nth i ld 0 = 0)%L)
+  → lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ ld)) =
+    lap_norm (la ++ lc).
+Proof.
+intros * Hab Hcd.
+revert lb lc ld Hab Hcd.
+induction la as [| a]; intros; cbn. {
+  symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
+  rewrite Nat.sub_0_r, app_nil_r.
+  do 2 rewrite fold_lap_norm.
+(* a - (a + b) = 0 ? *)
+... ...
+apply lap_norm_subt_add_app; [ easy | ].
 ...
 revert lb pb.
 induction la as [| a] using rev_ind; intros. {
