@@ -5089,6 +5089,19 @@ induction la as [| a]; intros; cbn. {
    a-(a+b)=0 ou a-(a+b)=kb (pour un certain k) ? Cet axiome permettrait-
    il de prouver a-b-c = a-c-b ? Je crois que non, non plus, mais faut
    voir *)
+Check Nat.sub_add_distr.
+Check rngl_sub_add_distr.
+Check Nat_sub_sub_swap.
+Search (_ - _ - _)%L.
+About rngl_opt_sub_sub_sub_add.
+...
+should have the same name.
+rngl_opt_sub_sub_sub_add:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → if rngl_has_subt then ∀ a b c : T, (a - b - c)%L = (a - (b + c))%L else not_applicable
+rngl_sub_add_distr:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_opp_or_subt = true → ∀ a b c : T, (a - (b + c))%L = (a - b - c)%L
 ...
     induction lc as [| c]; [ easy | cbn ].
     rewrite strip_0s_app; cbn.
