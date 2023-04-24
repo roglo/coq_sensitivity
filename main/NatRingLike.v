@@ -62,13 +62,6 @@ intros.
 apply Nat.mul_sub_distr_l.
 Qed.
 
-Theorem Nat_sub_sub_sub_add : ∀ a b c, a - b - c = a - (b + c).
-Proof.
-intros.
-symmetry.
-apply Nat.sub_add_distr.
-Qed.
-
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -86,7 +79,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := Nat.add_sub;
-     rngl_opt_sub_sub_sub_add := Nat_sub_sub_sub_add;
+     rngl_opt_sub_add_distr := Nat.sub_add_distr;
      rngl_opt_mul_sub_distr_l := Nat_mul_sub_distr_l;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;

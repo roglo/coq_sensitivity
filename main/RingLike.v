@@ -244,8 +244,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_add_sub :
       if rngl_has_subt then ∀ a b, (a + b - b)%L = a
       else not_applicable;
-    rngl_opt_sub_sub_sub_add :
-      if rngl_has_subt then ∀ a b c, ((a - b) - c = a - (b + c))%L
+    rngl_opt_sub_add_distr :
+      if rngl_has_subt then ∀ a b c, (a - (b + c) = a - b - c)%L
       else not_applicable;
     rngl_opt_mul_sub_distr_l :
       if rngl_has_subt then ∀ a b c : T, (a * (b - c) = a * b - a * c)%L
@@ -1284,9 +1284,9 @@ destruct op. {
 remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_sub_sub_sub_add as H1.
+  specialize rngl_opt_sub_add_distr as H1.
   rewrite Hmo in H1.
-  rewrite <- H1.
+  rewrite H1.
   rewrite rngl_add_comm.
   rewrite rngl_add_sub; [ easy | easy ].
 }
@@ -1574,7 +1574,7 @@ destruct op. {
 remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_sub_sub_sub_add as H1.
+  specialize rngl_opt_sub_add_distr as H1.
   now rewrite Hmo in H1.
 }
 apply rngl_has_opp_or_subt_iff in Hos.

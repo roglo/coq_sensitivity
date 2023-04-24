@@ -709,7 +709,7 @@ Definition mat_ring_like_prop eqb (n : nat) :
      rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r eqb;
      rngl_opt_add_opp_l := squ_mat_opt_add_opp_l eqb;
      rngl_opt_add_sub := NA;
-     rngl_opt_sub_sub_sub_add := NA;
+     rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
