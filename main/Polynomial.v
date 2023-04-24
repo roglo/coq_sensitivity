@@ -5082,15 +5082,9 @@ induction la as [| a]; intros; cbn. {
         now rewrite Hop, Hsu.
       } {
         cbn in Hcd.
-...
-specialize (Has (nth (S i) lc 0%L) d) as H2.
-rewrite Hcd in H2.
-...
-        unfold rngl_sub in H1.
-        rewrite Hop, Hsu in H1.
-        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H2.
-        rewrite Hcd in H2.
-        rewrite <- H2.
+        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H1.
+        rewrite Hcd in H1.
+        rewrite <- H1.
         unfold rngl_sub.
         rewrite Hop, Hsu.
 ...
