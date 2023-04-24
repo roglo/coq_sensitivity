@@ -5084,6 +5084,11 @@ induction la as [| a]; intros; cbn. {
       now apply (rngl_eqb_neq Heb) in Hcz.
     }
     intros i Hi.
+(* au fait, rien à voir, mais peut-on prouver, dans ma soustraction
+   que a-b-c = a-c-b ? J'ai l'impression que non. Faut-il ajouter que
+   a-(a+b)=0 ou a-(a+b)=kb (pour un certain k) ? Cet axiome permettrait-
+   il de prouver a-b-c = a-c-b ? Je crois que non, non plus, mais faut
+   voir *)
 ...
     induction lc as [| c]; [ easy | cbn ].
     rewrite strip_0s_app; cbn.
