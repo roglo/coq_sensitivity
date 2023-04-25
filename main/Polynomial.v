@@ -5162,6 +5162,21 @@ induction la as [| a]; intros; cbn. {
     }
     cbn.
     rewrite strip_0s_app.
+    remember (strip_0s (rev lc)) as lb eqn:Hlb; symmetry in Hlb.
+    destruct lb as [| b]. {
+      cbn.
+      rewrite if_bool_if_dec.
+      destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+        apply (rngl_eqb_eq Heb) in Hcz; subst c.
+        specialize (Hcd 0) as H1; cbn in H1.
+        rewrite rngl_add_0_l in H1; subst d.
+        apply (rngl_eqb_neq Heb) in Hdz.
+        specialize (Has 0%L 0%L) as H2; cbn in H2.
+        rewrite rngl_add_0_l in H2.
+        unfold rngl_sub in H2.
+        now rewrite Hop, Hsu in H2.
+      }
+      specialize (Hcd 0) as H1; cbn in H1.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
