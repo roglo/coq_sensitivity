@@ -5183,6 +5183,8 @@ induction la as [| a]; intros; cbn. {
       unfold rngl_sub.
       now rewrite Hop, Hsu.
     }
+    exfalso.
+    apply (rngl_eqb_neq Heb) in Hdz.
 Search (strip_0s _ = _ :: _).
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
