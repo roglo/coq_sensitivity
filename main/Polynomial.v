@@ -5150,6 +5150,7 @@ induction la as [| a]; intros; cbn. {
         now rewrite Hop, Hsu.
       }
     }
+    cbn; symmetry.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
