@@ -5176,7 +5176,14 @@ induction la as [| a]; intros; cbn. {
         unfold rngl_sub in H2.
         now rewrite Hop, Hsu in H2.
       }
-      specialize (Hcd 0) as H1; cbn in H1.
+      specialize (Hcd 0) as H1; cbn in H1 |-*.
+      f_equal.
+      specialize (Has c d) as H2.
+      rewrite H1 in H2; subst c.
+      unfold rngl_sub.
+      now rewrite Hop, Hsu.
+    }
+Search (strip_0s _ = _ :: _).
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
