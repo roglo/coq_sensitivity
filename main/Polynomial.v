@@ -5130,6 +5130,26 @@ induction la as [| a]; intros; cbn. {
         specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H1.
         rewrite rev_length, map2_length, repeat_length, Nat.min_id in H1.
         specialize (all_same_repeat 0%L 0%L) as H2.
+        specialize (H2 (rev (map2 rngl_subt (repeat 0%L (length ld)) ld))).
+        rewrite rev_length, map2_length, repeat_length, Nat.min_id in H2.
+        specialize (proj1 H2 H1) as H3.
+        apply (f_equal (λ l, rev l)) in H3.
+        rewrite rev_involutive, List_rev_repeat in H3.
+        apply (f_equal (λ l, nth i l 0%L)) in H3.
+        rewrite List_nth_repeat in H3.
+        rewrite (map2_nth _ _ _ 0%L 0%L) in H3; [ | | easy ]. 2: {
+          now rewrite repeat_length.
+        }
+        rewrite List_nth_repeat in H3.
+        rewrite <- if_ltb_lt_dec in H3.
+        rewrite Tauto.if_same in H3.
+        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H4.
+        rewrite Hcd in H4.
+        rewrite <- H4.
+        unfold rngl_sub.
+        now rewrite Hop, Hsu.
+      }
+    }
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
