@@ -1358,22 +1358,19 @@ apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-Theorem all_0_all_rev_0 : ∀ la : list T,
-  (∀ i, nth i la 0%L = 0%L)
-  ↔ (∀ i, nth i (rev la) 0%L = 0%L).
+Theorem all_0_all_rev_0 : ∀ A (d a : A) la,
+  (∀ i, i < length la → nth i la d = a)
+  ↔ (∀ i, i < length la → nth i (rev la) d = a).
 Proof.
 intros *.
-split; intros H i. {
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite rev_nth; [ apply H | easy ].
-  }
-  apply nth_overflow; rewrite rev_length; flia Hila.
+split; intros H i Hi. {
+  rewrite rev_nth; [ apply H | easy ].
+  now apply Nat.sub_lt.
 } {
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite <- (rev_involutive la).
-    rewrite rev_nth; [ apply H | now rewrite rev_length ].
-  }
-  apply nth_overflow; flia Hila.
+  rewrite <- (rev_involutive la).
+  rewrite rev_nth; [ apply H | now rewrite rev_length ].
+  rewrite rev_length.
+  now apply Nat.sub_lt.
 }
 Qed.
 
@@ -1382,14 +1379,13 @@ Theorem eq_strip_0s_rev_nil : ∀ la,
 Proof.
 intros.
 split; intros Hla. {
-About all_0_all_rev_0.
-...
   apply all_0_all_rev_0.
-  apply (eq_strip_0s_nil 0%L).
+  rewrite <- rev_length.
+  now apply (eq_strip_0s_nil 0%L).
 } {
-  apply eq_strip_0s_nil.
+  apply (eq_strip_0s_nil 0%L).
   apply all_0_all_rev_0.
-  now rewrite rev_involutive.
+  now rewrite rev_length, rev_involutive.
 }
 Qed.
 
@@ -1403,9 +1399,9 @@ unfold lap_norm.
 remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   cbn.
-  specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
-  destruct lb as [| b]; [ easy | ].
-  cbn.
+  specialize (proj1 (eq_strip_0s_nil 0%L _) Hlc) as H1.
+  rewrite rev_length in H1.
+  destruct lb as [| b]; [ easy | cbn ].
   rewrite fold_lap_norm.
   symmetry; apply lap_convol_mul_0_r.
   intros i.
@@ -1416,6 +1412,8 @@ destruct lc as [| c]. {
     apply Nat.nle_gt in Hib.
     now rewrite nth_overflow.
   }
+  assert (H : length lb - i < S (length lb)) by flia Hib.
+  specialize (H1 H).
   now replace (length lb - (length lb - i)) with i in H1 by flia Hib.
 }
 cbn.
@@ -1436,7 +1434,13 @@ destruct lc as [| c]. {
   apply List_eq_rev_nil in Hlc.
   specialize (proj1 (eq_strip_0s_rev_nil lb) Hlc) as H1.
   clear Hlc; rename H1 into Hlb.
-  now rewrite lap_convol_mul_0_r.
+  rewrite lap_convol_mul_0_r; [ easy | ].
+  intros i.
+  destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil.
+    now apply nth_overflow.
+  }
+  now apply Hlb.
 }
 cbn.
 rewrite fold_lap_norm.
@@ -3174,11 +3178,13 @@ destruct lb as [| b]. {
     destruct la as [| a]; [ easy | ].
     cbn in Hba.
     apply Nat.succ_le_mono in Hba.
-    specialize (H1 0) as H2; cbn in H2.
+    specialize (H1 0 (Nat.lt_0_succ _)) as H2; cbn in H2.
     subst c; cbn; rewrite rngl_add_0_r; f_equal.
     apply IHlc; [ | easy ].
-    intros i.
-    now specialize (H1 (S i)).
+    intros i Hi.
+    apply Nat.succ_lt_mono in Hi.
+    specialize (H1 (S i) Hi).
+    apply H1.
   } {
     cbn; f_equal; clear c Hcz.
     rewrite app_nil_r, Nat.sub_0_r.
@@ -3190,11 +3196,12 @@ destruct lb as [| b]. {
     destruct la as [| a]; [ easy | ].
     cbn in Hba.
     apply Nat.succ_le_mono in Hba.
-    specialize (H1 0) as H2; cbn in H2.
+    specialize (H1 0 (Nat.lt_0_succ _)) as H2; cbn in H2.
     subst c; cbn; rewrite rngl_add_0_r; f_equal.
     apply IHlc; [ | easy ].
-    intros i.
-    now specialize (H1 (S i)).
+    intros i Hi.
+    apply Nat.succ_lt_mono in Hi.
+    now specialize (H1 (S i) Hi).
   }
 }
 rewrite <- Hlb.
@@ -3990,7 +3997,7 @@ Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
-Arguments eq_strip_0s_nil {T ro rp} Heb la%lap.
+Arguments eq_strip_0s_nil {T ro rp} Heb d%L la%lap.
 Arguments eval_lap {T ro} la%lap x%L.
 Arguments eval_rlap {T ro} rla%lap x%L.
 Arguments has_polyn_prop {T ro} la%lap.
@@ -4861,6 +4868,25 @@ intros j.
 now specialize (Hab (S j)).
 Qed.
 
+Theorem all_same_repeat :
+  ∀ A (d a : A) la,
+  (∀ i, i < length la → nth i la d = a) ↔ la = repeat a (length la).
+Proof.
+intros.
+split; intros Ha. {
+  apply (eq_list_eq d); [ symmetry; apply repeat_length | ].
+  intros i Hi.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i (length la)) as [H| H]; [ clear H | easy ].
+  now apply Ha.
+} {
+  intros i Hi.
+  apply (f_equal (λ l, nth i l d)) in Ha.
+  rewrite List_nth_repeat in Ha.
+  now destruct (lt_dec i (length la)).
+}
+Qed.
+
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
@@ -5101,31 +5127,10 @@ induction la as [| a]; intros; cbn. {
           rewrite (nth_overflow ld) in Hcd; [ | easy ].
           now rewrite rngl_add_0_r in Hcd.
         }
-        specialize (proj1 (eq_strip_0s_nil Heb _) Hla) as H1.
-Check eq_strip_0s_nil.
+        specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H1.
+        rewrite rev_length, map2_length, repeat_length, Nat.min_id in H1.
+        specialize (all_same_repeat 0%L 0%L) as H2.
 ...
-Search (strip_0s _ = []).
-Search repeat.
-Theorem all_same_repeat :
-  ∀ A (d a : A) la,
-  (∀ i, i < length la → nth i la d = a) ↔ la = repeat a (length la).
-Proof.
-intros.
-split; intros Ha. {
-  apply (eq_list_eq d); [ symmetry; apply repeat_length | ].
-  intros i Hi.
-  rewrite List_nth_repeat.
-  destruct (lt_dec i (length la)) as [H| H]; [ clear H | easy ].
-  now apply Ha.
-} {
-  intros i Hi.
-  apply (f_equal (λ l, nth i l d)) in Ha.
-  rewrite List_nth_repeat in Ha.
-  now destruct (lt_dec i (length la)).
-}
-Qed.
-specialize (all_same_repeat 0%L 0%L) as H2.
-
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
 rewrite rev_involutive, List_rev_repeat in H1.
