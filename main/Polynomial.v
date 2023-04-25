@@ -75,19 +75,20 @@ induction la as [| a]; intros; [ easy | cbn ].
 destruct (a =? 0)%L; [ apply IHla | easy ].
 Qed.
 
-Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] ↔ ∀ i, nth i la 0%L = 0%L.
+Theorem eq_strip_0s_nil : ∀ d la,
+  strip_0s la = [] ↔ ∀ i, i < length la → nth i la d = 0%L.
 Proof.
 intros.
 split. {
-  intros Hla *.
-  revert i.
+  intros Hla * Hil.
+  revert i Hil.
   induction la as [| a]; intros; [ now destruct i | cbn ].
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
   apply (rngl_eqb_eq Heb) in Haz.
-  destruct i; [ easy | ].
+  destruct i; [ easy | cbn in Hil ].
+  apply Nat.succ_lt_mono in Hil.
   now apply IHla.
 } {
   intros Hla.
@@ -95,11 +96,12 @@ split. {
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply IHla.
-    intros i.
-    now specialize (Hla (S i)).
+    intros i Hil.
+    apply Nat.succ_le_mono in Hil.
+    apply (Hla (S i) Hil).
   }
   apply (rngl_eqb_neq Heb) in Haz.
-  now specialize (Hla 0).
+  now specialize (Hla 0 (Nat.lt_0_succ _)).
 }
 Qed.
 
@@ -418,15 +420,12 @@ split; intros Hla. {
   exfalso.
   assert (H : strip_0s (rev la) = []). {
     clear - rp Heb Hla.
-    apply eq_strip_0s_nil.
-    intros i.
-    destruct (lt_dec i (length la)) as [Hila| Hila]. {
-      rewrite rev_nth; [ | easy ].
-      specialize (Hla (S (length la - S i))).
-      now cbn in Hla.
-    }
-    apply Nat.nlt_ge in Hila.
-    rewrite nth_overflow; [ easy | now rewrite rev_length ].
+    apply (eq_strip_0s_nil 0%L).
+    intros i Hil.
+    rewrite rev_length in Hil.
+    rewrite rev_nth; [ | easy ].
+    specialize (Hla (S (length la - S i))).
+    now cbn in Hla.
   }
   now rewrite Hlb in H.
 } {
@@ -437,11 +436,13 @@ split; intros Hla. {
   }
   unfold lap_norm in Hla.
   apply List_eq_rev_nil in Hla.
-  apply eq_strip_0s_nil with (i := length la - S i) in Hla.
-  rewrite rev_nth in Hla; [ | flia Hila ].
-  rewrite <- Nat_succ_sub_succ_r in Hla; [ | easy ].
-  rewrite Nat_sub_sub_distr in Hla; [ | flia Hila ].
-  now rewrite Nat.add_comm, Nat.add_sub in Hla.
+  apply (eq_strip_0s_nil 0%L) with (i := length la - S i) in Hla. {
+    rewrite rev_nth in Hla; [ | flia Hila ].
+    rewrite <- Nat_succ_sub_succ_r in Hla; [ | easy ].
+    rewrite Nat_sub_sub_distr in Hla; [ | flia Hila ].
+    now rewrite Nat.add_comm, Nat.add_sub in Hla.
+  }
+  now rewrite rev_length; apply Nat.sub_lt.
 }
 Qed.
 
@@ -465,11 +466,12 @@ destruct lb as [| b]. {
     assert (H : lap_norm la = []). {
       apply all_0_lap_norm_nil.
       intros i.
-      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
+      specialize (proj1 (eq_strip_0s_nil 0%L _) Hlb) as H1.
       destruct (lt_dec i (length la)) as [Hila| Hila]. {
         rewrite <- (rev_involutive la).
         rewrite rev_nth; rewrite rev_length; [ | easy ].
         apply H1.
+        now rewrite rev_length; apply Nat.sub_lt.
       }
       apply Nat.nlt_ge in Hila.
       now rewrite nth_overflow.
@@ -481,11 +483,12 @@ destruct lb as [| b]. {
     assert (H : lap_norm la = []). {
       apply all_0_lap_norm_nil.
       intros i.
-      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
+      specialize (proj1 (eq_strip_0s_nil 0%L _) Hlb) as H1.
       destruct (lt_dec i (length la)) as [Hila| Hila]. {
         rewrite <- (rev_involutive la).
         rewrite rev_nth; rewrite rev_length; [ | easy ].
         apply H1.
+        now rewrite rev_length; apply Nat.sub_lt.
       }
       apply Nat.nlt_ge in Hila.
       now rewrite nth_overflow.
@@ -1289,14 +1292,18 @@ destruct lc as [| c]. {
     rewrite lap_convol_mul_0_l; [ easy | ].
     intros i; cbn.
     destruct i; [ easy | ].
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    specialize (proj1 (eq_strip_0s_nil 0%L _) Hlc) as H1.
     destruct (lt_dec i (length la)) as [Hil| Hil]. {
       specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
+      rewrite rev_length in H1.
+      assert (H : length la - S i < length la) by now apply Nat.sub_lt.
+      specialize (H1 H); clear H.
+      rewrite rev_nth in H1. {
+        rewrite <- Nat_succ_sub_succ_r in H1; [ | easy ].
+        rewrite Nat_sub_sub_distr in H1; [ | now apply Nat.lt_le_incl ].
+        now rewrite Nat.add_comm, Nat.add_sub in H1.
       }
-      now rewrite rev_length.
+      now apply Nat.sub_lt.
     }
     apply Nat.nlt_ge in Hil.
     now rewrite nth_overflow.
@@ -1308,14 +1315,18 @@ destruct lc as [| c]. {
   rewrite fold_lap_norm.
   rewrite (lap_convol_mul_cons_with_0_l _ la). 2: {
     intros i.
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    specialize (proj1 (eq_strip_0s_nil 0%L _) Hlc) as H1.
     destruct (lt_dec i (length la)) as [Hil| Hil]. {
       specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
+      rewrite rev_length in H1.
+      assert (H : length la - S i < length la) by now apply Nat.sub_lt.
+      specialize (H1 H); clear H.
+      rewrite rev_nth in H1. {
+        rewrite <- Nat_succ_sub_succ_r in H1; [ | easy ].
+        rewrite Nat_sub_sub_distr in H1; [ | now apply Nat.lt_le_incl ].
+        now rewrite Nat.add_comm, Nat.add_sub in H1.
       }
-      now rewrite rev_length.
+      now apply Nat.sub_lt.
     }
     apply Nat.nlt_ge in Hil.
     now rewrite nth_overflow.
@@ -1367,12 +1378,14 @@ split; intros H i. {
 Qed.
 
 Theorem eq_strip_0s_rev_nil : ∀ la,
-  strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%L = 0%L.
+  strip_0s (rev la) = [] ↔ ∀ i, i < length la → nth i la 0%L = 0%L.
 Proof.
 intros.
 split; intros Hla. {
+About all_0_all_rev_0.
+...
   apply all_0_all_rev_0.
-  now apply eq_strip_0s_nil.
+  apply (eq_strip_0s_nil 0%L).
 } {
   apply eq_strip_0s_nil.
   apply all_0_all_rev_0.
@@ -3977,6 +3990,7 @@ Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
+Arguments eq_strip_0s_nil {T ro rp} Heb la%lap.
 Arguments eval_lap {T ro} la%lap x%L.
 Arguments eval_rlap {T ro} rla%lap x%L.
 Arguments has_polyn_prop {T ro} la%lap.
@@ -5082,11 +5096,58 @@ induction la as [| a]; intros; cbn. {
         now rewrite Hop, Hsu.
       } {
         cbn in Hcd.
-        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H1.
-        rewrite Hcd in H1.
-        rewrite <- H1.
+        destruct (lt_dec i (length ld)) as [Hil| Hil]. 2: {
+          apply Nat.nlt_ge in Hil.
+          rewrite (nth_overflow ld) in Hcd; [ | easy ].
+          now rewrite rngl_add_0_r in Hcd.
+        }
+        specialize (proj1 (eq_strip_0s_nil Heb _) Hla) as H1.
+Check eq_strip_0s_nil.
+...
+Search (strip_0s _ = []).
+Search repeat.
+Theorem all_same_repeat :
+  ∀ A (d a : A) la,
+  (∀ i, i < length la → nth i la d = a) ↔ la = repeat a (length la).
+Proof.
+intros.
+split; intros Ha. {
+  apply (eq_list_eq d); [ symmetry; apply repeat_length | ].
+  intros i Hi.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i (length la)) as [H| H]; [ clear H | easy ].
+  now apply Ha.
+} {
+  intros i Hi.
+  apply (f_equal (λ l, nth i l d)) in Ha.
+  rewrite List_nth_repeat in Ha.
+  now destruct (lt_dec i (length la)).
+}
+Qed.
+specialize (all_same_repeat 0%L 0%L) as H2.
+
+apply (all_same_repeat 0%L 0%L) in H1.
+apply (f_equal (λ l, rev l)) in H1.
+rewrite rev_involutive, List_rev_repeat in H1.
+Search (map2 rngl_subt).
+apply (f_equal (λ l, nth i l 0%L)) in H1.
+Search (nth _ (map2 _ _ _)).
+rewrite (map2_nth _ _ _ 0%L 0%L) in H1; [ | | easy ]. 2: {
+  now rewrite repeat_length.
+}
+rewrite rev_length in H1.
+rewrite map2_length in H1.
+rewrite repeat_length in H1.
+rewrite Nat.min_id in H1.
+rewrite List_nth_repeat in H1.
+destruct (lt_dec i (length ld)) as [H| H]; [ | flia Hil H ].
+clear H.
+        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H2.
+        rewrite Hcd in H2.
+        rewrite <- H2.
         unfold rngl_sub.
-        rewrite Hop, Hsu.
+        now rewrite Hop, Hsu.
+...
 apply (f_equal (λ l, nth i l 0%L)) in Hla.
 rewrite List_nth_nil in Hla.
 ...
