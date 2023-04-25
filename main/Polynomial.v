@@ -5151,6 +5151,17 @@ induction la as [| a]; intros; cbn. {
       }
     }
     cbn; symmetry.
+    destruct lc as [| c]. {
+      specialize (Hcd 0) as H1; cbn in H1.
+      rewrite rngl_add_0_l in H1; subst d.
+      apply (rngl_eqb_neq Heb) in Hdz.
+      specialize (Has 0%L 0%L) as H1.
+      rewrite rngl_add_0_r in H1.
+      unfold rngl_sub in H1.
+      now rewrite Hop, Hsu in H1.
+    }
+    cbn.
+    rewrite strip_0s_app.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
