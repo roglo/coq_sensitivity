@@ -4197,8 +4197,6 @@ Definition polyn_opt_opp_or_subt :
 
 (* polyn quotient *)
 
-(* à voir... *)
-(* si j'ai un inverse, est-ce que j'ai une division euclidienne ? *)
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match Sumbool.sumbool_of_bool rngl_mul_is_comm with
@@ -4217,8 +4215,6 @@ Definition polyn_opt_inv_or_quot :
       end
   | right _ => None
   end.
-
-...
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
@@ -5473,6 +5469,36 @@ Theorem polyn_opt_quot_mul :
   else not_applicable.
 Proof.
 intros.
+remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+destruct qu; [ | easy ].
+intros * Hbz Hcz; cbn.
+unfold rngl_div.
+rewrite Hqu.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  unfold rngl_has_quot in Hqu.
+  unfold rngl_has_inv in Hiv.
+  destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+  now destruct iq.
+}
+unfold rngl_quot; cbn.
+unfold rngl_has_quot in Hqu; cbn in Hqu.
+rename Hiv into Hivp.
+unfold rngl_has_inv in Hivp; cbn in Hivp.
+unfold polyn_opt_inv_or_quot in Hqu, Hivp |-*.
+cbn in Hqu |-*.
+unfold polyn_quot.
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hic| Hic]. {
+  destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]. {
+    destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv| Hiv]. {
+      remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
+      destruct iq as [iq| ]; [ | easy ].
+      clear Hqu Hivp.
+      apply eq_polyn_eq; cbn.
+...
+Search (_ / _)%lap.
+...
+intros.
 subst rop.
 cbn.
 unfold polyn_ring_like_op; cbn.
@@ -5489,7 +5515,7 @@ destruct (Sumbool.sumbool_of_bool (@rngl_mul_is_comm T ro rp)) as [H1| H1]. {
       intros * Hbz Hqz.
 Search (_ / (_ * _))%pol.
 Search (_ / _ / _)%pol.
-      admit.
+...
     }
 ...
 
