@@ -5247,7 +5247,15 @@ induction la as [| a]; intros; cbn. {
     rewrite Hop, Hsu, H4 in H5.
     now symmetry in H5.
   }
+(**)
+  apply (eq_strip_0s_cons Heb) in Hla.
+  rewrite rev_length, map2_length, repeat_length, Nat.min_id in Hla.
+...
   rewrite rev_app_distr; cbn.
+  replace (rev la ++ [a]) with (rev (a :: la)) by easy.
+  rewrite <- Hla.
+  rewrite fold_lap_norm.
+  destruct lc as [| c]. {
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
