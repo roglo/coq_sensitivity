@@ -394,6 +394,36 @@ cbn; symmetry.
 apply Nat.sub_diag.
 Qed.
 
+Theorem Zn_opt_quot_mul :
+  let roz := Zn_ring_like_op n in
+  if rngl_has_quot then
+    ∀ a b c : Zn n, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  else not_applicable.
+Proof.
+intros; cbn.
+remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+destruct qu; [ | easy ].
+intros * Hbz Hcz.
+apply Zn_eq; cbn.
+unfold rngl_div; cbn.
+specialize Zn_opt_mul_div as H1.
+fold roz in H1.
+cbn in H1.
+unfold rngl_div in H1.
+rewrite Hqu in H1 |-*.
+remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  unfold rngl_has_quot in Hqu.
+  unfold rngl_has_inv in Hiv.
+  destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+  now destruct iq.
+}
+unfold rngl_quot in H1 |-*.
+unfold rngl_has_quot in Hqu.
+destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+destruct iq as [| quot]; [ easy | ].
+...
+
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
@@ -418,6 +448,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
+     rngl_opt_quot_mul := Zn_opt_quot_mul;
      rngl_opt_eqb_eq := Zn_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

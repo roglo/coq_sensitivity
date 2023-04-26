@@ -72,6 +72,17 @@ apply Heab.
 now apply Z.le_antisymm; apply Z.lt_le_incl.
 Qed.
 
+Theorem Z_opt_quot_mul :
+  let roz := Z_ring_like_op in
+  if rngl_has_quot then
+    ∀ a b c : Z, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  else not_applicable.
+Proof.
+intros; cbn.
+intros * Hbz Hcz.
+now symmetry; apply Z.quot_quot.
+Qed.
+
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -96,6 +107,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := Z.quot_mul;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_mul := Z_opt_quot_mul;
      rngl_opt_eqb_eq := Z.eqb_eq;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;

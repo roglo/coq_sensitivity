@@ -91,6 +91,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_mul := NA;
      rngl_opt_eqb_eq := Q.eqb_eq;
      rngl_opt_le_dec := Q.le_dec;
      rngl_opt_integral := NA;
