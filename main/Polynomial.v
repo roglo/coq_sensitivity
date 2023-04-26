@@ -5217,13 +5217,6 @@ induction la as [| a]; intros; cbn. {
     specialize (Hcd (S (length lc - S i))) as H1.
     cbn in H1.
     rewrite Hi in H1.
-(*
-    destruct (lt_dec (length lc - S i) (length ld)) as [Hcid| Hcid]. 2: {
-      apply Nat.nlt_ge in Hcid.
-      rewrite nth_overflow in H1; [ | easy ].
-      now rewrite rngl_add_0_r in H1.
-    }
-*)
     specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H2.
     rewrite rev_length, map2_length, repeat_length, Nat.min_id in H2.
     specialize (all_same_repeat 0%L 0%L) as H3.
@@ -5247,6 +5240,14 @@ induction la as [| a]; intros; cbn. {
     clear H.
     move H1 at bottom.
     move Hbz at bottom.
+    remember (length lc - S i) as j eqn:Hj.
+    specialize (Has (nth j lc 0%L) (nth j ld 0%L)) as H5.
+    rewrite Hi, H1 in H5.
+    unfold rngl_sub in H5.
+    rewrite Hop, Hsu, H4 in H5.
+    now symmetry in H5.
+  }
+  rewrite rev_app_distr; cbn.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
