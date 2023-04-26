@@ -4197,6 +4197,8 @@ Definition polyn_opt_opp_or_subt :
 
 (* polyn quotient *)
 
+(* à voir... *)
+(* si j'ai un inverse, est-ce que j'ai une division euclidienne ? *)
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match Sumbool.sumbool_of_bool rngl_mul_is_comm with
@@ -4215,6 +4217,8 @@ Definition polyn_opt_inv_or_quot :
       end
   | right _ => None
   end.
+
+...
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
@@ -5462,6 +5466,33 @@ Search (length (strip_0s _)).
 Definition polyn_opt_has_no_subt (_ : True) := 12.
 *)
 
+Theorem polyn_opt_quot_mul :
+  let rop := polyn_ring_like_op in
+  if rngl_has_quot then
+    ∀ a b c : polyn T, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  else not_applicable.
+Proof.
+intros.
+subst rop.
+cbn.
+unfold polyn_ring_like_op; cbn.
+unfold polyn_opt_inv_or_quot.
+cbn.
+destruct (Sumbool.sumbool_of_bool (@rngl_mul_is_comm T ro rp)) as [H1| H1]. {
+  destruct (Sumbool.sumbool_of_bool (@rngl_has_opp T ro)) as [H2| H2]. {
+    destruct (Sumbool.sumbool_of_bool (@rngl_has_inv T ro)) as [H3| H3]. {
+      cbn.
+      unfold rngl_has_quot.
+      unfold rngl_has_inv in H3.
+      destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+      destruct iq; [ cbn; clear H3 | easy ].
+      intros * Hbz Hqz.
+Search (_ / (_ * _))%pol.
+Search (_ / _ / _)%pol.
+      admit.
+    }
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -5490,6 +5521,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
+     rngl_opt_quot_mul := polyn_opt_quot_mul;
      rngl_opt_eqb_eq := polyn_opt_eqb_eq;
      rngl_opt_le_dec := polyn_opt_le_dec;
      rngl_opt_integral := polyn_opt_integral;

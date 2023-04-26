@@ -62,6 +62,17 @@ intros.
 apply Nat.mul_sub_distr_l.
 Qed.
 
+Theorem Nat_opt_quot_mul :
+  let ro := nat_ring_like_op in
+  if rngl_has_quot then
+    ∀ a b c : nat, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  else not_applicable.
+Proof.
+intros; cbn.
+intros * Hbz Hcz.
+symmetry; apply (Nat.div_div _ _ _ Hbz Hcz).
+Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -86,6 +97,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := Nat_mul_div;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_quot_mul := Nat_opt_quot_mul;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
