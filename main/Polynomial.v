@@ -106,6 +106,52 @@ split. {
 Qed.
 
 Theorem eq_strip_0s_cons : ∀ la lb b,
+  strip_0s la = b :: lb
+  → b ≠ 0%L ∧
+    ∃ i,
+    i < length la ∧
+    (∀ j, j < i → nth j la 0%L ≠ 0%L) ∧
+    nth i la 0%L = b.
+Proof.
+intros * Hab.
+induction la as [| a]; [ easy | ].
+cbn in Hab.
+destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
+  rewrite Haz in Hab.
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  specialize (IHla Hab).
+  destruct IHla as (Hbz & i & Hil & Hbef & Hi).
+  split; [ easy | ].
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i; clear Hbef.
+    exists 0.
+    split; [ cbn; easy | ].
+    split; [ easy | cbn ].
+(* bon, chais pas, j'comprends rien *)
+...
+    destruct la as [| a]; [ easy | ].
+    cbn in Hab, Hi; subst a.
+    apply (rngl_eqb_neq Heb) in Hbz.
+    rewrite Hbz in Hab.
+    injection Hab; clear Hab; intros; subst lb.
+...
+    destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
+...
+  exists (S i).
+  split; [ | easy ].
+  intros j Hj.
+  destruct j. {
+    cbn.
+...
+intros H; subst b.
+induction la as [| a]; [ easy | cbn in Hab ].
+rewrite if_bool_if_dec in Hab.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ congruence | ].
+injection Hab; clear Hab; intros Hab Ha; subst a.
+now rewrite (rngl_eqb_refl Heb) in Haz.
+Qed.
+
+Theorem eq_strip_0s_cons : ∀ la lb b,
   strip_0s la = b :: lb → b ≠ 0%L.
 Proof.
 intros * Hab.
@@ -5185,6 +5231,9 @@ induction la as [| a]; intros; cbn. {
     }
     exfalso.
     apply (rngl_eqb_neq Heb) in Hdz.
+(* b + un certain élément dans ld = 0 *)
+(* 0 - cet élément = 0 *)
+(* b ≠ 0 *)
 Search (strip_0s _ = _ :: _).
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
