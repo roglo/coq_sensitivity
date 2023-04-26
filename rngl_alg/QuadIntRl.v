@@ -1119,7 +1119,108 @@ Theorem quad_int_quot_mul :
 Proof.
 intros; subst ro; cbn.
 intros * Hbz Hcz.
-Search (_ ÷ (_ * _))%QI.
+Check quad_int_quot_mul_cancel_l.
+specialize quad_int_quot_mul_cancel_l as H1.
+specialize (H1 a (a ÷ b)%QI).
+(* ouais bon, c'est un peu du bricolage *)
+...
+intros; subst ro; cbn.
+intros * Hbz Hcz.
+(*
+Check glip.
+*)
+unfold qi_mul, qi_quot; cbn.
+destruct a as (a, a').
+destruct b as (b, b').
+destruct c as (c, c'); cbn.
+do 2 rewrite Z.mul_opp_r, Z.add_opp_r.
+remember (a * _ - _) as z eqn:Hz.
+ring_simplify in Hz; subst z.
+remember ((b * c + _) * _ - _) as z eqn:Hz.
+ring_simplify in Hz; subst z.
+remember (a * - _ + _) as z eqn:Hz.
+ring_simplify in Hz; subst z.
+...
+f_equal. {
+  do 5 rewrite Z.mul_opp_r, Z.add_opp_r.
+  remember
+    (a * (b * c + d * b' * c') - d * a' * (b * c' + b' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    ((b * c + d * b' * c') * (b * c + d * b' * c') -
+     d * (b * c' + b' * c) * (b * c' + b' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  do 14 rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+...
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    ((a * b + d * a' * b') * (a * c + d * a' * c') -
+     d * (a * b' + a' * b) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  do 3 rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  replace (b * d * a' ^ 2 * c) with (d * a' ^ 2 * (b * c)) by flia.
+  replace (d ^ 2 * a' ^ 2 * b' * c') with
+    (d * a' ^ 2 * (d * (b' * c'))) by flia.
+  rewrite <- Z.sub_sub_distr.
+  rewrite <- Z.mul_sub_distr_l.
+  rewrite <- Z.mul_sub_distr_r.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c ^ 2 - d * c' ^ 2)) by flia.
+  do 2 rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.quot_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+} {
+  do 4 rewrite Z.mul_opp_r.
+  do 2 rewrite Z.add_opp_r.
+  remember
+    ((a * c + d * a' * c') * (a * c + d * a' * c') -
+     d * (a * c' + a' * c) * (a * c' + a' * c)) as z eqn:Hz.
+  ring_simplify in Hz.
+  subst z.
+  remember
+    (- ((a * b + d * a' * b') * (a * c' + a' * c)) +
+     (a * b' + a' * b) * (a * c + d * a' * c')) as z eqn:Hz.
+  ring_simplify in Hz; subst z.
+  replace
+    (- a ^ 2 * b * c' + a ^ 2 * b' * c + b * d * a' ^ 2 * c' -
+     d * a' ^ 2 * b' * c)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (b' * c - b * c')) by flia.
+  replace
+    (a ^ 2 * c ^ 2 - a ^ 2 * d * c' ^ 2 - c ^ 2 * d * a' ^ 2 +
+     d ^ 2 * a' ^ 2 * c' ^ 2)
+  with
+    ((a ^ 2 - d * a' ^ 2) * (c * c - d * c' * c')) by flia.
+  rewrite Z.add_opp_l.
+  rewrite <- Z.mul_assoc.
+  do 2 rewrite <- Z.pow_2_r.
+  rewrite Z.quot_mul_cancel_l; [ easy | | ]. {
+    intros H; apply Hcz; clear Hcz.
+    now apply eq_quad_int_norm_zero in H.
+  } {
+    intros H; apply Haz; clear Haz.
+    now apply eq_quad_int_norm_zero in H.
+  }
+}
+Qed.
 ...
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
