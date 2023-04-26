@@ -5213,6 +5213,40 @@ induction la as [| a]; intros; cbn. {
     apply (eq_strip_0s_cons Heb) in Hlb.
     destruct Hlb as (Hbz & i & Hil & Hbef & Hi).
     rewrite rev_length in Hil.
+    rewrite rev_nth in Hi; [ | easy ].
+    specialize (Hcd (S (length lc - S i))) as H1.
+    cbn in H1.
+    rewrite Hi in H1.
+(*
+    destruct (lt_dec (length lc - S i) (length ld)) as [Hcid| Hcid]. 2: {
+      apply Nat.nlt_ge in Hcid.
+      rewrite nth_overflow in H1; [ | easy ].
+      now rewrite rngl_add_0_r in H1.
+    }
+*)
+    specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H2.
+    rewrite rev_length, map2_length, repeat_length, Nat.min_id in H2.
+    specialize (all_same_repeat 0%L 0%L) as H3.
+    specialize (H3 (rev (map2 rngl_subt (repeat 0%L (length ld)) ld))).
+    rewrite rev_length, map2_length, repeat_length, Nat.min_id in H3.
+    specialize (proj1 H3 H2) as H4.
+    apply (f_equal (λ l, rev l)) in H4.
+    rewrite rev_involutive, List_rev_repeat in H4.
+    apply (f_equal (λ l, nth (length lc - S i) l 0%L)) in H4.
+    rewrite List_nth_repeat in H4.
+    destruct (lt_dec (length lc - S i) (length ld)) as [Hcid| Hcid]. 2: {
+      apply Nat.nlt_ge in Hcid.
+      rewrite nth_overflow in H1; [ | easy ].
+      now rewrite rngl_add_0_r in H1.
+    }
+    rewrite (map2_nth _ _ _ 0%L 0%L) in H4; [ | | easy ]. 2: {
+      now rewrite repeat_length.
+    }
+    rewrite List_nth_repeat in H4.
+    destruct (lt_dec (length lc - S i) (length ld)) as [H| H]; [ | easy ].
+    clear H.
+    move H1 at bottom.
+    move Hbz at bottom.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
