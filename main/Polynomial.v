@@ -5495,8 +5495,11 @@ destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hic| Hic]. {
       destruct iq as [iq| ]; [ | easy ].
       clear Hqu Hivp.
       apply eq_polyn_eq; cbn.
-...
-Search (_ / _)%lap.
+      rewrite (lap_norm_mul Hos Heb Hiv); cycle 1. {
+        apply lap_prop.
+      } {
+        apply lap_prop.
+      }
 ...
 intros.
 subst rop.
