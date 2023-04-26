@@ -110,57 +110,32 @@ Theorem eq_strip_0s_cons : ∀ la lb b,
   → b ≠ 0%L ∧
     ∃ i,
     i < length la ∧
-    (∀ j, j < i → nth j la 0%L ≠ 0%L) ∧
+    (∀ j, j < i → nth j la 0%L = 0%L) ∧
     nth i la 0%L = b.
 Proof.
 intros * Hab.
 induction la as [| a]; [ easy | ].
 cbn in Hab.
+rewrite if_bool_if_dec in Hab.
 destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
-  rewrite Haz in Hab.
   apply (rngl_eqb_eq Heb) in Haz; subst a.
   specialize (IHla Hab).
   destruct IHla as (Hbz & i & Hil & Hbef & Hi).
   split; [ easy | ].
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    subst i; clear Hbef.
-    exists 0.
-    split; [ cbn; easy | ].
-    split; [ easy | cbn ].
-(* bon, chais pas, j'comprends rien *)
-...
-    destruct la as [| a]; [ easy | ].
-    cbn in Hab, Hi; subst a.
-    apply (rngl_eqb_neq Heb) in Hbz.
-    rewrite Hbz in Hab.
-    injection Hab; clear Hab; intros; subst lb.
-...
-    destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
-...
   exists (S i).
+  cbn - [ nth ].
+  split; [ now apply -> Nat.succ_lt_mono | ].
   split; [ | easy ].
   intros j Hj.
-  destruct j. {
-    cbn.
-...
-intros H; subst b.
-induction la as [| a]; [ easy | cbn in Hab ].
-rewrite if_bool_if_dec in Hab.
-destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ congruence | ].
-injection Hab; clear Hab; intros Hab Ha; subst a.
-now rewrite (rngl_eqb_refl Heb) in Haz.
-Qed.
-
-Theorem eq_strip_0s_cons : ∀ la lb b,
-  strip_0s la = b :: lb → b ≠ 0%L.
-Proof.
-intros * Hab.
-intros H; subst b.
-induction la as [| a]; [ easy | cbn in Hab ].
-rewrite if_bool_if_dec in Hab.
-destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ congruence | ].
-injection Hab; clear Hab; intros Hab Ha; subst a.
-now rewrite (rngl_eqb_refl Heb) in Haz.
+  destruct j; [ easy | cbn ].
+  apply Nat.succ_lt_mono in Hj.
+  now apply Hbef.
+}
+injection Hab; clear Hab; intros; subst b lb.
+apply (rngl_eqb_neq Heb) in Haz.
+split; [ easy | ].
+exists 0.
+now cbn.
 Qed.
 
 Definition lap_norm la := rev (strip_0s (rev la)).
@@ -4043,6 +4018,7 @@ Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
+Arguments eq_strip_0s_cons {T ro rp} Heb la%lap [lb]%lap [b]%L.
 Arguments eq_strip_0s_nil {T ro rp} Heb d%L la%lap.
 Arguments eval_lap {T ro} la%lap x%L.
 Arguments eval_rlap {T ro} rla%lap x%L.
@@ -5231,10 +5207,12 @@ induction la as [| a]; intros; cbn. {
     }
     exfalso.
     apply (rngl_eqb_neq Heb) in Hdz.
-(* b + un certain élément dans ld = 0 *)
-(* 0 - cet élément = 0 *)
-(* b ≠ 0 *)
-Search (strip_0s _ = _ :: _).
+    (* b + un certain élément dans ld = 0 *)
+    (* 0 - cet élément = 0 *)
+    (* b ≠ 0 *)
+    apply (eq_strip_0s_cons Heb) in Hlb.
+    destruct Hlb as (Hbz & i & Hil & Hbef & Hi).
+    rewrite rev_length in Hil.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
