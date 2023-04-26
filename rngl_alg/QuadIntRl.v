@@ -950,7 +950,7 @@ Z.quot_quot: ∀ a b c : Z, b ≠ 0 → c ≠ 0 → a ÷ b ÷ c = a ÷ (b * c)
 (* dois-je prendre ce théorème ci-dessous comme propriété
    de base pour la "division" dans mes espèces d'anneaux ? *)
 
-Theorem glop : ∀ a b c : quad_int d,
+Theorem quad_int_quot_mul_cancel_l : ∀ a b c : quad_int d,
   a ≠ 0%QI
   → c ≠ 0%QI
   → ((a * b) ÷ (a * c) = b ÷ c)%QI.
@@ -1111,6 +1111,17 @@ f_equal. {
 }
 Qed.
 
+Theorem quad_int_quot_mul :
+  let ro := @quad_int_ring_like_op d in
+  if rngl_has_quot then
+    ∀ a b c : quad_int d, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  else not_applicable.
+Proof.
+intros; subst ro; cbn.
+intros * Hbz Hcz.
+Search (_ ÷ (_ * _))%QI.
+...
+
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
@@ -1136,7 +1147,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := quad_int_mul_div;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_quot_mul := NA;
+     rngl_opt_quot_mul := quad_int_quot_mul;
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
