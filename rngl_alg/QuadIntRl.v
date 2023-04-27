@@ -1162,6 +1162,15 @@ Check @rngl_opt_mul_quot_r.
 Check @rngl_opt_quot_mul.
 Check @rngl_opt_mul_div.
 Check square_free_not_mul_square.
+Compute (
+  let d := 7 in
+  let '(a, a') := (3, 4) in
+  let '(b, b') := (5, 6) in
+  let '(c, c') := (3, 4) in
+  let z3 := a * b - d * a' * b' in
+  let z4 := b ^ 2 - d * b' ^ 2 in
+  let z5 := a' * b - a * b' in
+  (z3 * c - z5 * c' * d) ÷ z4 = c * (z3 ÷ z4) - c' * d * (z5 ÷ z4)).
 ...
 f_equal. {
   do 5 rewrite Z.mul_opp_r, Z.add_opp_r.
