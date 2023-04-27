@@ -5559,6 +5559,9 @@ specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
 remember (lap_quot_rem lb lc) as qr eqn:Hqr.
 destruct qr as (lq, lr).
 specialize (H1 lc lb lq lr).
+enough (H : lc = (lb * lq + lr)%lap).
+rewrite H.
+(* Hmm... perhaps I should make an induction up to lr=0 ? *)
 ...
 remember (lap_quot_rem (la * lb + lc) lb) as qr eqn:Hqr.
 symmetry in Hqr.
