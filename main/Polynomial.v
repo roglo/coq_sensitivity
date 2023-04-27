@@ -3245,8 +3245,8 @@ Theorem lap_quot_rem_prop :
     length lr < length lb ∧
     has_polyn_prop lq = true.
 Proof.
-intros Hco Hop Hiv * Ha Hb Hr Hab.
 clear Hos.
+intros Hco Hop Hiv * Ha Hb Hr Hab.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -5551,8 +5551,73 @@ Theorem lap_div_add_l :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_mul_is_comm = true →
-  ∀ la lb lc : list T, lb ≠ [] → ((la * lb + lc) / lb = la + lc / lb)%lap.
+  ∀ la lb lc : list T,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop lc = true
+  → lb ≠ []
+  → ((la * lb + lc) / lb = la + lc / lb)%lap.
 Proof.
+intros Hop Hiv Hic * pa pb pc Hbz.
+clear Hos.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Heb.
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
+remember (lap_quot_rem lc lb) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (lq, lr).
+specialize (H1 lc lb lq lr pc).
+assert (H : last lb 0%L ≠ 0%L). {
+  apply Bool.orb_true_iff in pb.
+  destruct pb as [pb| pb]; [ now apply is_empty_list_empty in pb | ].
+  now apply (rngl_neqb_neq Heb) in pb.
+}
+specialize (H1 H); clear H.
+assert (pr : has_polyn_prop lr = true). {
+  specialize (lap_rem_is_norm Heb lc lb pc pb) as H2.
+  assert (H : lr = (lc mod lb)%lap). {
+    unfold lap_rem.
+    unfold lap_quot_rem in Hqr.
+    destruct (rlap_quot_rem _ _).
+    now injection Hqr.
+  }
+  now rewrite <- H in H2.
+}
+specialize (H1 pr Hqr).
+destruct H1 as (Hlc & Hrb & pq).
+move pq before pc; move pr before pq.
+...
+  specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
+  assert (H : lr = ((la * lb) mod lb)%lap). {
+    unfold lap_rem.
+    unfold lap_quot_rem in Hqr.
+    destruct (rlap_quot_rem _ _).
+    now injection Hqr.
+  }
+  now rewrite <- H in H2.
+}
+unfold lap_quot_rem in Hqr.
+Search rlap_quot_rem.
+Search lap_quot_rem.
+...
+  apply (lap_quot_rem_prop Hos Heb Hic Hop Hiv _ _ _ _ pb) in Hqr.
+Check lap_rem_is_norm.
+Search lap_quot_rem.
+Search (has_polyn_prop (_ mod _)).
+Search (has_polyn_prop _ = true).
+lap_rem_is_norm:
+...
+remember (length lc) as n eqn:Hn; symmetry in Hn.
+revert lc Hn.
+induction n; intros. {
+  apply length_zero_iff_nil in Hn; subst lc.
+  rewrite lap_quot_0_l.
+  do 2 rewrite lap_add_0_r.
+  apply (lap_mul_div Hos Heb Hic Hop Hiv _ _ pa pb Hbz).
+}
+destruct lc as [| c]; [ easy | ].
+...
 intros Hop Hiv Hic * Hbz.
 specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
 (**)
@@ -5572,7 +5637,6 @@ Print rlap_quot_rem_loop.
 ...
 specialize (H1 (la * lb + lc)%lap lb lq lr).
 assert (H : has_polyn_prop (la * lb + lc) = true). {
-
 ..
 specialize (H1 pa).
 assert (H : last (lb * lc)%lap 0%L ≠ 0%L). {
