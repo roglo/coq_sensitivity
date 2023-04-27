@@ -4628,7 +4628,8 @@ Theorem polyn_opt_integral :
   else not_applicable.
 Proof.
 intros rop; subst rop.
-destruct (Sumbool.sumbool_of_bool rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_is_integral) as [Hii| Hii];
+  rewrite Hii; [ | easy ].
 intros * Hab.
 cbn in Hab.
 apply (f_equal lap) in Hab.
@@ -5462,6 +5463,117 @@ Search (length (strip_0s _)).
 Definition polyn_opt_has_no_subt (_ : True) := 12.
 *)
 
+Theorem lap_quot_0_l :
+  ∀ la, ([] / la)%lap = [].
+Proof.
+intros.
+unfold lap_quot; cbn.
+remember (rlap_quot_rem_step _ _ _) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (q, rlr).
+destruct q; [ | easy ].
+now destruct (rev la).
+Qed.
+
+Theorem lap_quot_mul :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_mul_is_comm = true →
+  ∀ la lb lc,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop lc = true
+  → lb ≠ []
+  → lc ≠ []
+  → (la / (lb * lc))%lap = (la / lb / lc)%lap.
+Proof.
+intros Hop Hiv Hic * pa pb pc Hbz Hcz.
+clear Hos.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Heb.
+destruct (Nat.eq_dec (length la) 0) as [H| H]. {
+  apply length_zero_iff_nil in H.
+  subst la; cbn.
+  now do 3 rewrite lap_quot_0_l.
+}
+assert (Haz : la ≠ []) by now intros H1; apply H; subst la.
+clear H; move Haz after Hbz.
+remember (lap_quot_rem la (lb * lc)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (lq, lr).
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
+specialize (H1 la (lb * lc)%lap lq lr).
+specialize (H1 pa).
+assert (H : last (lb * lc)%lap 0%L ≠ 0%L). {
+  rewrite (last_lap_mul Hos).
+  intros Hbc.
+  apply (rngl_integral Hos) in Hbc. 2: {
+    apply Bool.orb_true_iff; right.
+    rewrite Heb, Bool.andb_true_r.
+    now apply rngl_has_inv_or_quot_iff; left.
+  }
+  destruct Hbc as [Hb| Hc]. {
+    apply Bool.orb_true_iff in pb.
+    destruct pb as [pb| pb]; [ now apply is_empty_list_empty in pb | ].
+    rewrite Hb in pb.
+    now apply (rngl_neqb_neq Heb) in pb.
+  } {
+    apply Bool.orb_true_iff in pc.
+    destruct pc as [pc| pc]; [ now apply is_empty_list_empty in pc | ].
+    rewrite Hc in pc.
+    now apply (rngl_neqb_neq Heb) in pc.
+  }
+}
+specialize (H1 H); clear H.
+assert (pr : has_polyn_prop lr = true). {
+...
+  specialize (lap_rem_is_norm (la * lb)%lap lb) as H2.
+  specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
+  assert (H : lr = ((la * lb) mod lb)%lap). {
+    unfold lap_rem.
+    unfold lap_quot_rem in Hqr.
+    destruct (rlap_quot_rem _ _).
+    now injection Hqr.
+  }
+  now rewrite <- H in H2.
+}
+move lq before lb; move lr before lq.
+move pr before pb.
+specialize (H1 pr Hqr).
+destruct H1 as (Hab & Hrb & pq).
+move pq before pb.
+generalize Hab; intros Hab1.
+symmetry in Hab1.
+apply lap_add_move_l in Hab1.
+symmetry in Hab1.
+rewrite (lap_mul_comm Hco) in Hab1.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hab1.
+...
+
+(*
+End a.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Arguments lap_add {T ro} (la lb)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+Arguments rlap_quot_rem {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
+Compute (
+  let qro := Q_ring_like_op in
+  let la := [7;2;23] in
+  let lb := [0;5] in
+  let lc := [1;2] in
+  (la / (lb * lc))%lap = (la / lb / lc)%lap).
+*)
+
+(*
 Theorem polyn_opt_quot_mul :
   let rop := polyn_ring_like_op in
   if rngl_has_quot then
@@ -5500,6 +5612,10 @@ destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hic| Hic]. {
       } {
         apply lap_prop.
       }
+      destruct a as (la, pa).
+      destruct b as (lb, pb).
+      destruct c as (lc, pc).
+      cbn in Hbz, Hcz |-*.
 ...
 intros.
 subst rop.
@@ -5521,6 +5637,7 @@ Search (_ / _ / _)%pol.
 ...
     }
 ...
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
