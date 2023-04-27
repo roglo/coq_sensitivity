@@ -4031,10 +4031,13 @@ Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
 Arguments lap_add_0_r {T ro rp} la%lap.
+Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
+Arguments lap_mul_add_distr_l {T ro rp} Hos Heb (la lb lc)%lap.
 Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
+Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments lap_mul_has_polyn_prop {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
@@ -4044,7 +4047,6 @@ Arguments lap_norm {T ro} la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_norm_repeat_0 {T ro rp} Heb n%nat.
-Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments lap_one {T ro}.
 Arguments lap_opp {T ro} la%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
@@ -5586,7 +5588,12 @@ assert (pr : has_polyn_prop lr = true). {
 }
 specialize (H1 pr Hqr).
 destruct H1 as (Hlc & Hrb & pq).
+move lq before lc; move lr before lq.
 move pq before pc; move pr before pq.
+rewrite Hlc.
+rewrite lap_add_assoc.
+rewrite (lap_mul_comm Hic la).
+rewrite <- (lap_mul_add_distr_l Hos Heb).
 ...
   specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
   assert (H : lr = ((la * lb) mod lb)%lap). {
