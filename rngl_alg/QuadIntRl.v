@@ -1161,6 +1161,7 @@ Search (_ * (_ ÷ _)).
 Check @rngl_opt_mul_quot_r.
 Check @rngl_opt_quot_mul.
 Check @rngl_opt_mul_div.
+Check square_free_not_mul_square.
 ...
 f_equal. {
   do 5 rewrite Z.mul_opp_r, Z.add_opp_r.
