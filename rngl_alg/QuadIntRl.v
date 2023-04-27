@@ -1131,42 +1131,33 @@ f_equal. {
   remember ((b * b + _)) as z4 eqn:Hz4.
   remember (a * - b' + _) as z5 eqn:Hz5.
   remember (c * c + _) as z6 eqn:Hz6.
-  ring_simplify in Hz1.
-  ring_simplify in Hz2.
-  ring_simplify in Hz3.
-  ring_simplify in Hz4.
-  ring_simplify in Hz5.
-  ring_simplify in Hz6.
-  move Hz2 at bottom.
-  rewrite Z.mul_comm in Hz2.
-  ring_simplify in Hz2.
-  rewrite <- Z.mul_assoc in Hz2.
-  rewrite <- Z.mul_sub_distr_l in Hz2.
-  rewrite <- Z.sub_sub_distr in Hz2.
-  rewrite (Z.mul_comm _ (c' ^ 2)) in Hz2.
-  rewrite (Z.mul_comm (d ^ 2)) in Hz2.
-  rewrite <- Z.mul_assoc in Hz2.
-  rewrite <- Z.mul_sub_distr_l in Hz2.
-  rewrite (Z.pow_2_r d) in Hz2.
-  rewrite (Z.mul_comm (b ^ 2)) in Hz2.
-  rewrite <- Z.mul_assoc in Hz2.
-  rewrite <- Z.mul_sub_distr_l in Hz2.
-  rewrite Z.mul_assoc in Hz2.
-  rewrite <- Z.mul_sub_distr_r in Hz2.
-  rewrite (Z.mul_comm _ d) in Hz2.
-  rewrite <- Hz6, <- Hz4 in Hz2.
-  rewrite Z.mul_comm in Hz2.
-  subst z2.
+  assert (H : z1 = z3 * c - z5 * c' * d) by flia Hz1 Hz3 Hz5.
+  move H before Hz1; clear Hz1; rename H into Hz1.
+  assert (H : z2 = z4 * z6) by flia Hz2 Hz4 Hz6.
+  move H before Hz2; clear Hz2; rename H into Hz2.
+  subst z1 z2.
   rewrite <- Z.quot_quot; cycle 1. {
     subst z4.
     intros H; apply Hbz.
-    now apply eq_quad_int_norm_zero.
+    apply eq_quad_int_norm_zero; flia H.
   } {
     subst z6.
     intros H; apply Hcz.
-    now apply eq_quad_int_norm_zero.
+    apply eq_quad_int_norm_zero; flia H.
   }
   f_equal.
+  clear z6 Hz6.
+  rewrite Z.mul_opp_r.
+  rewrite Z.add_opp_r.
+  rewrite (Z.mul_comm (d * _)).
+  rewrite Z.mul_assoc.
+  rewrite (Z.mul_comm (_ ÷ _)).
+  rewrite Z.add_comm in Hz5.
+  ring_simplify in Hz3.
+  ring_simplify in Hz4.
+  ring_simplify in Hz5.
+Search ((_ + _) ÷ _).
+Search (_ * (_ ÷ _)).
 ...
 f_equal. {
   do 5 rewrite Z.mul_opp_r, Z.add_opp_r.
