@@ -4026,6 +4026,7 @@ Arguments has_polyn_prop {T ro} la%lap.
 Arguments has_polyn_prop_lap_norm {T ro rp} Heb la%lap.
 
 Arguments lap_add {T ro} (la lb)%lap.
+Arguments lap_add_move_l {T ro rp} Hos (la lb lc)%lap.
 Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
@@ -4034,6 +4035,7 @@ Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
+Arguments lap_mul_has_polyn_prop {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
@@ -5528,10 +5530,9 @@ assert (H : last (lb * lc)%lap 0%L ≠ 0%L). {
 }
 specialize (H1 H); clear H.
 assert (pr : has_polyn_prop lr = true). {
-...
-  specialize (lap_rem_is_norm (la * lb)%lap lb) as H2.
-  specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
-  assert (H : lr = ((la * lb) mod lb)%lap). {
+  specialize (lap_rem_is_norm Heb la (lb * lc)%lap pa) as H2.
+  specialize (H2 (lap_mul_has_polyn_prop Hos Heb Hiv lb lc pb pc)).
+  assert (H : lr = (la mod (lb * lc))%lap). {
     unfold lap_rem.
     unfold lap_quot_rem in Hqr.
     destruct (rlap_quot_rem _ _).
@@ -5540,16 +5541,64 @@ assert (pr : has_polyn_prop lr = true). {
   now rewrite <- H in H2.
 }
 move lq before lb; move lr before lq.
-move pr before pb.
+move pr before pc.
 specialize (H1 pr Hqr).
 destruct H1 as (Hab & Hrb & pq).
 move pq before pb.
+(**)
+rewrite Hab.
+Theorem lap_div_add_l :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_mul_is_comm = true →
+  ∀ la lb lc : list T, lb ≠ [] → ((la * lb + lc) / lb = la + lc / lb)%lap.
+Proof.
+intros Hop Hiv Hic * Hbz.
+remember (lap_quot_rem (la * lb + lc) lb) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (lq, lr).
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
+specialize (H1 (la * lb + lc)%lap lb lq lr).
+...
+specialize (H1 pa).
+assert (H : last (lb * lc)%lap 0%L ≠ 0%L). {
+  rewrite (last_lap_mul Hos).
+... ...
+rewrite (lap_mul_comm Hic).
+rewrite lap_div_add_l.
+...
+Require Import ZArith.
+Search ((_ * _ + _) / _)%Z.
+Search ((_ * _ + _) / _)%nat.
+Search ((_ * _ + _) / _)%lap.
+Search ((_ + _ * _) / _)%lap.
+Search ((_ + _) / _)%lap.
+...
 generalize Hab; intros Hab1.
+symmetry in Hab1.
+apply (lap_add_move_l Hos) in Hab1.
+symmetry in Hab1.
+rewrite (lap_mul_comm Hic) in Hab1.
+...
+rewrite <- (lap_mul_sub_distr_l _ Hop) in Hab1.
+...
 symmetry in Hab1.
 apply lap_add_move_l in Hab1.
 symmetry in Hab1.
 rewrite (lap_mul_comm Hco) in Hab1.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hab1.
+apply (f_equal lap_norm) in Hab1.
+rewrite <- lap_norm_app_0_r in Hab1 by apply nth_repeat.
+rewrite (has_polyn_prop_lap_norm lr pr) in Hab1.
+rewrite <- lap_mul_norm_idemp_r in Hab1.
+rewrite (lap_norm_mul Hiv) in Hab1; [ | easy | apply polyn_norm_prop ].
+generalize Hab1; intros Hab2.
+apply (f_equal length) in Hab2.
+rewrite lap_mul_length in Hab2.
+destruct lb as [| b]; [ easy | clear Hbz ].
+remember (lap_norm (la - lq)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. 2: {
+  rewrite app_length in Hab2; cbn in Hab2.
 ...
 
 (*
