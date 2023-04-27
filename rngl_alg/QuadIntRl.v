@@ -1119,27 +1119,54 @@ Theorem quad_int_quot_mul :
 Proof.
 intros; subst ro; cbn.
 intros * Hbz Hcz.
-Check quad_int_quot_mul_cancel_l.
-specialize quad_int_quot_mul_cancel_l as H1.
-specialize (H1 a (a ÷ b)%QI).
-(* ouais bon, c'est un peu du bricolage *)
-...
-intros; subst ro; cbn.
-intros * Hbz Hcz.
-(*
-Check glip.
-*)
 unfold qi_mul, qi_quot; cbn.
 destruct a as (a, a').
 destruct b as (b, b').
 destruct c as (c, c'); cbn.
 do 2 rewrite Z.mul_opp_r, Z.add_opp_r.
-remember (a * _ - _) as z eqn:Hz.
-ring_simplify in Hz; subst z.
-remember ((b * c + _) * _ - _) as z eqn:Hz.
-ring_simplify in Hz; subst z.
-remember (a * - _ + _) as z eqn:Hz.
-ring_simplify in Hz; subst z.
+f_equal. {
+  remember (a * _ - _) as z1 eqn:Hz1.
+  remember ((b * c + _) * _ - _) as z2 eqn:Hz2.
+  remember (a * b + _) as z3 eqn:Hz3.
+  remember ((b * b + _)) as z4 eqn:Hz4.
+  remember (a * - b' + _) as z5 eqn:Hz5.
+  remember (c * c + _) as z6 eqn:Hz6.
+  ring_simplify in Hz1.
+  ring_simplify in Hz2.
+  ring_simplify in Hz3.
+  ring_simplify in Hz4.
+  ring_simplify in Hz5.
+  ring_simplify in Hz6.
+  move Hz2 at bottom.
+  rewrite Z.mul_comm in Hz2.
+  ring_simplify in Hz2.
+  rewrite <- Z.mul_assoc in Hz2.
+  rewrite <- Z.mul_sub_distr_l in Hz2.
+  rewrite <- Z.sub_sub_distr in Hz2.
+  rewrite (Z.mul_comm _ (c' ^ 2)) in Hz2.
+  rewrite (Z.mul_comm (d ^ 2)) in Hz2.
+  rewrite <- Z.mul_assoc in Hz2.
+  rewrite <- Z.mul_sub_distr_l in Hz2.
+  rewrite (Z.pow_2_r d) in Hz2.
+  rewrite (Z.mul_comm (b ^ 2)) in Hz2.
+  rewrite <- Z.mul_assoc in Hz2.
+  rewrite <- Z.mul_sub_distr_l in Hz2.
+  rewrite Z.mul_assoc in Hz2.
+  rewrite <- Z.mul_sub_distr_r in Hz2.
+  rewrite (Z.mul_comm _ d) in Hz2.
+  rewrite <- Hz6, <- Hz4 in Hz2.
+  rewrite Z.mul_comm in Hz2.
+  subst z2.
+  rewrite <- Z.quot_quot; cycle 1. {
+    subst z4.
+    intros H; apply Hbz.
+    now apply eq_quad_int_norm_zero.
+  } {
+    subst z6.
+    intros H; apply Hcz.
+    now apply eq_quad_int_norm_zero.
+  }
+  f_equal.
 ...
 f_equal. {
   do 5 rewrite Z.mul_opp_r, Z.add_opp_r.
