@@ -5554,12 +5554,23 @@ Theorem lap_div_add_l :
   ∀ la lb lc : list T, lb ≠ [] → ((la * lb + lc) / lb = la + lc / lb)%lap.
 Proof.
 intros Hop Hiv Hic * Hbz.
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
+(**)
+remember (lap_quot_rem lb lc) as qr eqn:Hqr.
+destruct qr as (lq, lr).
+specialize (H1 lc lb lq lr).
+...
 remember (lap_quot_rem (la * lb + lc) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr).
-specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
-specialize (H1 (la * lb + lc)%lap lb lq lr).
+Print lap_quot_rem.
+Print rlap_quot_rem.
+Print rlap_quot_rem_loop.
 ...
+specialize (H1 (la * lb + lc)%lap lb lq lr).
+assert (H : has_polyn_prop (la * lb + lc) = true). {
+
+..
 specialize (H1 pa).
 assert (H : last (lb * lc)%lap 0%L ≠ 0%L). {
   rewrite (last_lap_mul Hos).
