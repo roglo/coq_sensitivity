@@ -5595,6 +5595,7 @@ rewrite lap_add_assoc.
 rewrite (lap_mul_comm Hic la).
 rewrite <- (lap_mul_add_distr_l Hos Heb).
 rewrite (lap_mul_comm Hic).
+...
 remember (la + lq)%lap as la' eqn:Hla'.
 ...
   specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
