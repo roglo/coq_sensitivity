@@ -9,7 +9,20 @@ Require Import Utf8.
 
 Require Import Main.RingLike.
 
-Definition I_ring_like_op A (ro : ring_like_op A) : ring_like_op A :=
+Record ideal A {ro : ring_like_op A} := mk_I
+  { i_type : A → bool;
+    i_prop :
+      ∀ a b, i_type a = true → i_type b = true → i_type (a * b)%L = true }.
+
+Arguments ideal A%type {ro}.
+
+Definition I_zero A {ro : ring_like_op A} : ideal A :=
+  mk_I (λ a, ...
+
+Definition I_ring_like_op A (ro : ring_like_op A) : ring_like_op (ideal A) :=
+  {| rngl_zero := I_zero |}.
+
+...
   {| rngl_zero := 0%L;
      rngl_one := 1%L;
      rngl_add := rngl_add;
