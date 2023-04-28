@@ -17,15 +17,20 @@ Record ideal A {ro : ring_like_op A} := mk_I
 Arguments ideal A%type {ro}.
 Arguments mk_I A%type {ro}.
 
-Definition glop A {ro : ring_like_op A} (a b : A) :
-  (rngl_eqb a =? 0)%L = true
-  → (rngl_eqb b =? 0)%L = true
-  → (rngl_eqb (a * b) =? 0)%L = true.
+Definition I_zero_prop A {ro : ring_like_op A} : ∀ (a b : A),
+  (a =? 0)%L = true
+  → (b =? 0)%L = true
+  → ((a * b) =? 0)%L = true.
+intros * Ha Hb.
+apply rngl_eqb_eq in Ha.
+...
+
+Arguments I_zero_prop A%type {ro}.
 
 Definition I_zero A {ro : ring_like_op A} : ideal A :=
   mk_I A
-    (λ a, (rngl_eqb a =? 0)%L)
-    (glop A).
+    (λ a, (a =? 0)%L)
+    (I_zero_prop A).
 
 ...
 
