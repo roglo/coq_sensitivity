@@ -16,6 +16,7 @@ Class ideal A {ro : ring_like_op A} := mk_I
 
 Arguments ideal A%type {ro}.
 Arguments mk_I A%type {ro}.
+Arguments i_type {A ro} ideal.
 
 Theorem I_zero_prop_l A {ro : ring_like_op A} {rp : ring_like_prop A}
    (Hos : rngl_has_opp_or_subt = true) (Heb : rngl_has_eqb = true) :
@@ -55,15 +56,17 @@ Definition I_one A {ro : ring_like_op A} {rp : ring_like_prop A} :
       ideal A :=
   mk_I A (λ a, true) (λ _ _ _, eq_refl) (λ _ _ _, eq_refl).
 
-(*
 Theorem I_add_prop_l :
-  ∀ A {ro : ring_like_op A} (a b : ideal A) (c d : A),
-  (i_type a || i_type b)%bool = true → (i_type a || i_type b)%bool = true.
+  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+  ∀ a b : A,
+  (i_type Ia b || i_type Ib b)%bool = true
+  → (i_type Ia (a * b)%L || i_type Ib (a * b)%L)%bool = true.
+Proof.
+intros * Hab.
 ...
-*)
 
-Definition I_add A {ro : ring_like_op A} (a b : ideal A) : ideal A :=
-  mk_I A (λ c, c = ...
+Definition I_add A {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
+  mk_I A (λ c : A, (i_type Ia c || i_type Ib c)%bool) (I_add_prop_l Ia Ib).
 
 ...
 
