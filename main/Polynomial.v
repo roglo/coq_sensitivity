@@ -4068,6 +4068,8 @@ Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
+Arguments rlap_quot_rem {T ro} (rla rlb)%lap.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%lap.
 Arguments strip_0s {T ro} la%lap.
 
 Notation "1" := lap_one : lap_scope.
@@ -5560,6 +5562,21 @@ Theorem lap_div_add_l :
   → lb ≠ []
   → ((la * lb + lc) / lb = la + lc / lb)%lap.
 Proof.
+(*
+intros Hop Hiv Hic * pa pb pc Hbz.
+clear Hos.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Heb.
+unfold lap_quot.
+remember (rlap_quot_rem _ _) as qr eqn:Hqr.
+remember (rlap_quot_rem _ _) as qr' eqn:Hqr' in |-*.
+symmetry in Hqr, Hqr'.
+destruct qr as (q, r).
+destruct qr' as (q', r').
+...
+*)
 intros Hop Hiv Hic * pa pb pc Hbz.
 clear Hos.
 assert (Hos : rngl_has_opp_or_subt = true). {
@@ -5595,7 +5612,6 @@ rewrite lap_add_assoc.
 rewrite (lap_mul_comm Hic la).
 rewrite <- (lap_mul_add_distr_l Hos Heb).
 rewrite (lap_mul_comm Hic).
-...
 remember (la + lq)%lap as la' eqn:Hla'.
 ...
   specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
