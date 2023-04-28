@@ -80,9 +80,39 @@ apply Bool.orb_true_iff.
 now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_r.
 Qed.
 
+Theorem I_mul_prop_l :
+  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+  ∀ a b : A,
+  (i_type Ia b && i_type Ib b)%bool = true
+  → (i_type Ia (a * b)%L && i_type Ib (a * b)%L)%bool = true.
+Proof.
+intros * Hab.
+apply Bool.andb_true_iff in Hab.
+apply Bool.andb_true_iff.
+destruct Hab as (Ha, Hb).
+now split; apply i_prop_l.
+Qed.
+
+Theorem I_mul_prop_r :
+  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+  ∀ a b : A,
+  (i_type Ia a && i_type Ib a)%bool = true
+  → (i_type Ia (a * b)%L && i_type Ib (a * b)%L)%bool = true.
+Proof.
+intros * Hab.
+apply Bool.andb_true_iff in Hab.
+apply Bool.andb_true_iff.
+destruct Hab as (Ha, Hb).
+now split; apply i_prop_r.
+Qed.
+
 Definition I_add {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
   mk_I A (λ c : A, (i_type Ia c || i_type Ib c)%bool)
     (I_add_prop_l Ia Ib) (I_add_prop_r Ia Ib).
+
+Definition I_mul {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
+  mk_I A (λ c : A, (i_type Ia c && i_type Ib c)%bool)
+    (I_mul_prop_l Ia Ib) (I_mul_prop_r Ia Ib).
 
 Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
     (Hos : rngl_has_opp_or_subt = true) (Heb : rngl_has_eqb = true) :
@@ -90,7 +120,7 @@ Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
   {| rngl_zero := I_zero Hos Heb;
      rngl_one := I_one;
      rngl_add := I_add;
-     rngl_mul := ?rngl_mul;
+     rngl_mul := I_mul;
      rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
      rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
      rngl_opt_eqb := ?rngl_opt_eqb;
