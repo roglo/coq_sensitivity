@@ -121,19 +121,7 @@ Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
      rngl_one := I_one;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
-     rngl_opt_eqb := ?rngl_opt_eqb;
-     rngl_opt_le := ?rngl_opt_le |}.
-
-...
-  {| rngl_zero := 0%L;
-     rngl_one := 1%L;
-     rngl_add := rngl_add;
-     rngl_mul := rngl_mul;
      rngl_opt_opp_or_subt := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
-
-(* bof, chuis pas sûr que ça soye ça *)
