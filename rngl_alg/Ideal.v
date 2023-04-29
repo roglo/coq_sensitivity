@@ -10,13 +10,13 @@ Require Import Utf8.
 Require Import Main.RingLike.
 
 Class ideal A {ro : ring_like_op A} := mk_I
-  { i_type : A → bool;
-    i_prop_l : ∀ a b, i_type b = true → i_type (a * b)%L = true;
-    i_prop_r : ∀ a b, i_type a = true → i_type (a * b)%L = true }.
+  { i_mem : A → bool;
+    i_prop_l : ∀ a b, i_mem b = true → i_mem (a * b)%L = true;
+    i_prop_r : ∀ a b, i_mem a = true → i_mem (a * b)%L = true }.
 
 Arguments ideal A%type {ro}.
 Arguments mk_I A%type {ro}.
-Arguments i_type {A ro} ideal.
+Arguments i_mem {A ro} ideal.
 
 Theorem I_zero_prop_l A {ro : ring_like_op A} {rp : ring_like_prop A}
    (Hos : rngl_has_opp_or_subt = true) (Heb : rngl_has_eqb = true) :
@@ -59,8 +59,8 @@ Definition I_one A {ro : ring_like_op A} {rp : ring_like_prop A} :
 Theorem I_add_prop_l :
   ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
-  (i_type Ia b || i_type Ib b)%bool = true
-  → (i_type Ia (a * b)%L || i_type Ib (a * b)%L)%bool = true.
+  (i_mem Ia b || i_mem Ib b)%bool = true
+  → (i_mem Ia (a * b)%L || i_mem Ib (a * b)%L)%bool = true.
 Proof.
 intros * Hab.
 apply Bool.orb_true_iff in Hab.
@@ -71,8 +71,8 @@ Qed.
 Theorem I_add_prop_r :
   ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
-  (i_type Ia a || i_type Ib a)%bool = true
-  → (i_type Ia (a * b)%L || i_type Ib (a * b)%L)%bool = true.
+  (i_mem Ia a || i_mem Ib a)%bool = true
+  → (i_mem Ia (a * b)%L || i_mem Ib (a * b)%L)%bool = true.
 Proof.
 intros * Hab.
 apply Bool.orb_true_iff in Hab.
@@ -83,8 +83,8 @@ Qed.
 Theorem I_mul_prop_l :
   ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
-  (i_type Ia b && i_type Ib b)%bool = true
-  → (i_type Ia (a * b)%L && i_type Ib (a * b)%L)%bool = true.
+  (i_mem Ia b && i_mem Ib b)%bool = true
+  → (i_mem Ia (a * b)%L && i_mem Ib (a * b)%L)%bool = true.
 Proof.
 intros * Hab.
 apply Bool.andb_true_iff in Hab.
@@ -96,8 +96,8 @@ Qed.
 Theorem I_mul_prop_r :
   ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
-  (i_type Ia a && i_type Ib a)%bool = true
-  → (i_type Ia (a * b)%L && i_type Ib (a * b)%L)%bool = true.
+  (i_mem Ia a && i_mem Ib a)%bool = true
+  → (i_mem Ia (a * b)%L && i_mem Ib (a * b)%L)%bool = true.
 Proof.
 intros * Hab.
 apply Bool.andb_true_iff in Hab.
@@ -107,11 +107,11 @@ now split; apply i_prop_r.
 Qed.
 
 Definition I_add {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
-  mk_I A (λ c : A, (i_type Ia c || i_type Ib c)%bool)
+  mk_I A (λ c : A, (i_mem Ia c || i_mem Ib c)%bool)
     (I_add_prop_l Ia Ib) (I_add_prop_r Ia Ib).
 
 Definition I_mul {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
-  mk_I A (λ c : A, (i_type Ia c && i_type Ib c)%bool)
+  mk_I A (λ c : A, (i_mem Ia c && i_mem Ib c)%bool)
     (I_mul_prop_l Ia Ib) (I_mul_prop_r Ia Ib).
 
 Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
@@ -125,3 +125,15 @@ Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
+
+Require Import ZArith.
+Require Import Zrl.
+Definition ZI := I_ring_like_op Z_ring_like_prop eq_refl eq_refl.
+
+Compute (i_mem (@rngl_zero _ ZI)).
+Compute (i_mem (@rngl_one _ ZI)).
+Compute (
+  let ro := ZI in
+  i_mem (@rngl_one _ ZI + @rngl_one _ ZI)%L).
+
+(* ouais, chais pas *)
