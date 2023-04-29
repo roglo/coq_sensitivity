@@ -5612,6 +5612,37 @@ rewrite lap_add_assoc.
 rewrite (lap_mul_comm Hic la).
 rewrite <- (lap_mul_add_distr_l Hos Heb).
 rewrite (lap_mul_comm Hic).
+specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
+remember ((la + lq) * lb + lr)%lap as la' eqn:Hla'.
+remember (lap_quot_rem la' lb) as qr eqn:Hqr'; symmetry in Hqr'.
+destruct qr as (lq', lr').
+specialize (H1 la' lb lq' lr').
+assert (H : has_polyn_prop la' = true). {
+  subst la'.
+Theorem lap_add_has_polyn_prop :
+  ∀ la lb,
+  length lb < length la
+  → has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop (la + lb) = true.
+(* not sure it resolves my problem *)
+... ...
+  remember (la + lq)%lap as laq eqn:Hlaq; symmetry in Hlaq.
+  destruct laq as [| aq]; [ now rewrite lap_mul_0_l, lap_add_0_l | ].
+  apply lap_add_has_polyn_prop. {
+    rewrite lap_mul_length.
+    destruct lb as [| b]; [ easy | ].
+    cbn; rewrite Nat.sub_0_r.
+    rewrite app_length; cbn.
+    cbn in Hrb; flia Hrb.
+  } {
+    rewrite <- Hlaq.
+    apply (lap_mul_has_polyn_prop Hos Heb Hiv); [ | easy ].
+...
+    apply lap_add_has_polyn_prop; [ | easy | easy ].
+...
+assert (H : last lb 0%L ≠ 0%L). {
+...
 remember (la + lq)%lap as la' eqn:Hla'.
 ...
   specialize (H2 (lap_mul_has_polyn_prop Hiv la lb pa pb) pb).
