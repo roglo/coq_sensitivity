@@ -716,7 +716,9 @@ Definition mat_ring_like_prop eqb (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
+(*
      rngl_opt_quot_mul := NA;
+*)
      rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

@@ -91,7 +91,9 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
+(*
      rngl_opt_quot_mul := NA;
+*)
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := Rmult_integral;

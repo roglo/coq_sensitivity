@@ -1177,8 +1177,6 @@ Compute (
 ...
 *)
 
-(* quad_int_quot_mul is false
-
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
@@ -1204,7 +1202,9 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := quad_int_mul_div;
      rngl_opt_mul_quot_r := NA;
+(*
      rngl_opt_quot_mul := quad_int_quot_mul;
+*)
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
@@ -1218,6 +1218,5 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-*)
 
 End a.

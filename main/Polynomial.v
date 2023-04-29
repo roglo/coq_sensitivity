@@ -5481,6 +5481,7 @@ destruct q; [ | easy ].
 now destruct (rev la).
 Qed.
 
+(*
 Theorem lap_quot_mul :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -5612,6 +5613,7 @@ rewrite lap_add_assoc.
 rewrite (lap_mul_comm Hic la).
 rewrite <- (lap_mul_add_distr_l Hos Heb).
 rewrite (lap_mul_comm Hic).
+...
 specialize (lap_quot_rem_prop Hos Heb Hic Hop Hiv) as H1.
 remember ((la + lq) * lb + lr)%lap as la' eqn:Hla'.
 remember (lap_quot_rem la' lb) as qr eqn:Hqr'; symmetry in Hqr'.
@@ -5756,6 +5758,7 @@ Compute (
   let lc := [1;2] in
   (la / (lb * lc))%lap = (la / lb / lc)%lap).
 *)
+*)
 
 (*
 Theorem polyn_opt_quot_mul :
@@ -5851,7 +5854,9 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
+(*
      rngl_opt_quot_mul := polyn_opt_quot_mul;
+*)
      rngl_opt_eqb_eq := polyn_opt_eqb_eq;
      rngl_opt_le_dec := polyn_opt_le_dec;
      rngl_opt_integral := polyn_opt_integral;

@@ -430,7 +430,9 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
+(*
      rngl_opt_quot_mul := Zn_opt_quot_mul;
+*)
      rngl_opt_eqb_eq := Zn_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
@@ -525,7 +527,9 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_div := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
+(*
      rngl_opt_quot_mul := NA;
+*)
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lcm_opt_integral;
      rngl_opt_alg_closed := NA;
