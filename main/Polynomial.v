@@ -5260,6 +5260,10 @@ induction la as [| a]; intros; cbn. {
   rewrite rev_length, map2_length, repeat_length, Nat.min_id in Hla.
   destruct Hla as (Haz & i & Hil & Hbef & Hi).
 ...
+}
+destruct lb as [| b]; [ easy | ].
+do 2 rewrite fold_lap_norm.
+...
   rewrite rev_app_distr; cbn.
   replace (rev la ++ [a]) with (rev (a :: la)) by easy.
   rewrite <- Hla.
