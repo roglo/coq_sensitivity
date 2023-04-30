@@ -5119,11 +5119,11 @@ assert (Hop : rngl_has_opp = false). {
   now destruct os.
 }
 move Hop after Hsu.
+unfold lap_norm at 1 3; f_equal.
 revert lb lc ld Hab Hcd Hacd.
-induction la as [| a]; intros; cbn. {
+induction la as [| a] using rev_ind; intros; cbn. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
   rewrite Nat.sub_0_r, app_nil_r.
-  f_equal.
   revert lc Hcd Hacd.
   induction ld as [| d]; intros. {
     now apply length_zero_iff_nil in Hcd; subst lc.
@@ -5141,8 +5141,26 @@ induction la as [| a]; intros; cbn. {
   rewrite Hop, Hsu in H1; rewrite <- H1.
   now cbn; rewrite strip_0s_app.
 }
-destruct lb as [| b]; [ easy | ].
-do 2 rewrite fold_lap_norm.
+rewrite app_length, Nat.add_1_r in Hab.
+destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+rewrite map2_app_app; [ cbn | easy ].
+remember ((a + b) =? 0)%L as abz eqn:Habz.
+symmetry in Habz.
+destruct abz. {
+  apply (rngl_eqb_eq Heb) in Habz.
+  rewrite Habz.
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+    intros; cbn.
+    destruct i; [ easy | now destruct i ].
+  }
+  do 2 rewrite <- app_assoc.
+  apply IHla; [ easy | now cbn; f_equal | ].
+  intros i.
+  destruct i; [ easy | apply Hacd ].
+}
+rewrite (has_polyn_prop_lap_norm Heb). 2: {
 ...
   rewrite rev_app_distr; cbn.
   replace (rev la ++ [a]) with (rev (a :: la)) by easy.

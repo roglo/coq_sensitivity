@@ -1846,6 +1846,7 @@ Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_characteristic_1 {T ro rp} Hos _ x%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
+Arguments rngl_eqb_eq {T ro rp} Heb (a b)%L.
 Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin a%L b%L.
