@@ -5167,12 +5167,17 @@ rewrite (has_polyn_prop_lap_norm Heb). 2: {
   now apply (rngl_neqb_neq Heb).
 }
 do 2 rewrite <- app_assoc; cbn.
-...
-  rewrite rev_app_distr; cbn.
-  replace (rev la ++ [a]) with (rev (a :: la)) by easy.
-  rewrite <- Hla.
-  rewrite fold_lap_norm.
-  destruct lc as [| c]. {
+(**)
+clear IHla.
+revert a b lb lc ld Habz Hab Hcd Hacd.
+induction la as [| a2] using rev_ind; intros; cbn. {
+  symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
+  rewrite Nat.sub_0_r, app_nil_r.
+  specialize (Has a b) as H1.
+  unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1.
+  rewrite H1; clear H1.
+  f_equal; f_equal; f_equal.
 ...
 apply (all_same_repeat 0%L 0%L) in H1.
 apply (f_equal (λ l, rev l)) in H1.
