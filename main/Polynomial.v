@@ -5103,11 +5103,12 @@ Theorem lap_norm_subt_add_app :
   rngl_has_subt = true →
   ∀ la lb lc ld,
   length la = length lb
+  → length lc = length ld
   → (∀ i, (nth i lc 0 + nth i ld 0 = 0)%L)
   → lap_norm (lap_subt (lap_norm (map2 rngl_add la lb)) (lb ++ ld)) =
     lap_norm (la ++ lc).
 Proof.
-intros Hsu * Hab Hcd.
+intros Hsu * Hab Hcd Hacd.
 specialize rngl_opt_add_sub as Has.
 specialize rngl_opt_sub_add_distr as Hsa.
 rewrite Hsu in Has, Hsa.
@@ -5118,17 +5119,17 @@ assert (Hop : rngl_has_opp = false). {
   now destruct os.
 }
 move Hop after Hsu.
-revert lb lc ld Hab Hcd.
+revert lb lc ld Hab Hcd Hacd.
 induction la as [| a]; intros; cbn. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
   rewrite Nat.sub_0_r, app_nil_r.
   do 2 rewrite fold_lap_norm.
-  revert lc Hcd.
+  revert lc Hcd Hacd.
   induction ld as [| d]; intros; cbn. {
     symmetry; apply (all_0_lap_norm_nil Heb).
     intros i.
-    specialize (Hcd i).
-    now rewrite List_nth_nil, rngl_add_0_r in Hcd.
+    specialize (Hacd i).
+    now rewrite List_nth_nil, rngl_add_0_r in Hacd.
   }
   rewrite strip_0s_app.
   remember (strip_0s _) as la eqn:Hla; symmetry in Hla.
@@ -5138,24 +5139,24 @@ induction la as [| a]; intros; cbn. {
       symmetry; apply (all_0_lap_norm_nil Heb).
       apply (rngl_eqb_eq Heb) in Hdz.
       intros i.
-      specialize (Hcd i).
+      specialize (Hacd i).
       destruct i. {
-        cbn in Hcd.
+        cbn in Hacd.
         specialize rngl_opt_sub_add_distr as H1.
         rewrite Hsu in H1.
         unfold rngl_sub in H1.
         rewrite Hop, Hsu in H1.
         specialize (Has (nth 0 lc 0%L) d) as H2.
-        rewrite Hcd in H2.
+        rewrite Hacd in H2.
         rewrite <- H2.
         unfold rngl_sub.
         now rewrite Hop, Hsu.
       } {
-        cbn in Hcd.
+        cbn in Hacd.
         destruct (lt_dec i (length ld)) as [Hil| Hil]. 2: {
           apply Nat.nlt_ge in Hil.
-          rewrite (nth_overflow ld) in Hcd; [ | easy ].
-          now rewrite rngl_add_0_r in Hcd.
+          rewrite (nth_overflow ld) in Hacd; [ | easy ].
+          now rewrite rngl_add_0_r in Hacd.
         }
         specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H1.
         rewrite rev_length, map2_length, repeat_length, Nat.min_id in H1.
@@ -5174,7 +5175,7 @@ induction la as [| a]; intros; cbn. {
         rewrite <- if_ltb_lt_dec in H3.
         rewrite Tauto.if_same in H3.
         specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H4.
-        rewrite Hcd in H4.
+        rewrite Hacd in H4.
         rewrite <- H4.
         unfold rngl_sub.
         now rewrite Hop, Hsu.
@@ -5182,7 +5183,7 @@ induction la as [| a]; intros; cbn. {
     }
     cbn; symmetry.
     destruct lc as [| c]. {
-      specialize (Hcd 0) as H1; cbn in H1.
+      specialize (Hacd 0) as H1; cbn in H1.
       rewrite rngl_add_0_l in H1; subst d.
       apply (rngl_eqb_neq Heb) in Hdz.
       specialize (Has 0%L 0%L) as H1.
@@ -5198,7 +5199,7 @@ induction la as [| a]; intros; cbn. {
       rewrite if_bool_if_dec.
       destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
         apply (rngl_eqb_eq Heb) in Hcz; subst c.
-        specialize (Hcd 0) as H1; cbn in H1.
+        specialize (Hacd 0) as H1; cbn in H1.
         rewrite rngl_add_0_l in H1; subst d.
         apply (rngl_eqb_neq Heb) in Hdz.
         specialize (Has 0%L 0%L) as H2; cbn in H2.
@@ -5206,7 +5207,7 @@ induction la as [| a]; intros; cbn. {
         unfold rngl_sub in H2.
         now rewrite Hop, Hsu in H2.
       }
-      specialize (Hcd 0) as H1; cbn in H1 |-*.
+      specialize (Hacd 0) as H1; cbn in H1 |-*.
       f_equal.
       specialize (Has c d) as H2.
       rewrite H1 in H2; subst c.
@@ -5222,7 +5223,7 @@ induction la as [| a]; intros; cbn. {
     destruct Hlb as (Hbz & i & Hil & Hbef & Hi).
     rewrite rev_length in Hil.
     rewrite rev_nth in Hi; [ | easy ].
-    specialize (Hcd (S (length lc - S i))) as H1.
+    specialize (Hacd (S (length lc - S i))) as H1.
     cbn in H1.
     rewrite Hi in H1.
     specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H2.
