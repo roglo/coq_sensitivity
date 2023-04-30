@@ -5161,6 +5161,12 @@ destruct abz. {
   destruct i; [ easy | apply Hacd ].
 }
 rewrite (has_polyn_prop_lap_norm Heb). 2: {
+  apply Bool.orb_true_iff; right.
+  rewrite last_last.
+  apply (rngl_eqb_neq Heb) in Habz.
+  now apply (rngl_neqb_neq Heb).
+}
+do 2 rewrite <- app_assoc; cbn.
 ...
   rewrite rev_app_distr; cbn.
   replace (rev la ++ [a]) with (rev (a :: la)) by easy.
