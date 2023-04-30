@@ -5123,144 +5123,23 @@ revert lb lc ld Hab Hcd Hacd.
 induction la as [| a]; intros; cbn. {
   symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb; cbn.
   rewrite Nat.sub_0_r, app_nil_r.
-  do 2 rewrite fold_lap_norm.
+  f_equal.
   revert lc Hcd Hacd.
-  induction ld as [| d]; intros; cbn. {
-    symmetry; apply (all_0_lap_norm_nil Heb).
-    intros i.
-    specialize (Hacd i).
-    now rewrite List_nth_nil, rngl_add_0_r in Hacd.
+  induction ld as [| d]; intros. {
+    now apply length_zero_iff_nil in Hcd; subst lc.
   }
+  cbn.
   rewrite strip_0s_app.
-  remember (strip_0s _) as la eqn:Hla; symmetry in Hla.
-  destruct la as [| a]; cbn. {
-    rewrite if_bool_if_dec.
-    destruct (Sumbool.sumbool_of_bool _) as [Hdz| Hdz]. {
-      symmetry; apply (all_0_lap_norm_nil Heb).
-      apply (rngl_eqb_eq Heb) in Hdz.
-      intros i.
-      specialize (Hacd i).
-      destruct i. {
-        cbn in Hacd.
-        specialize rngl_opt_sub_add_distr as H1.
-        rewrite Hsu in H1.
-        unfold rngl_sub in H1.
-        rewrite Hop, Hsu in H1.
-        specialize (Has (nth 0 lc 0%L) d) as H2.
-        rewrite Hacd in H2.
-        rewrite <- H2.
-        unfold rngl_sub.
-        now rewrite Hop, Hsu.
-      } {
-        cbn in Hacd.
-        destruct (lt_dec i (length ld)) as [Hil| Hil]. 2: {
-          apply Nat.nlt_ge in Hil.
-          rewrite (nth_overflow ld) in Hacd; [ | easy ].
-          now rewrite rngl_add_0_r in Hacd.
-        }
-        specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H1.
-        rewrite rev_length, map2_length, repeat_length, Nat.min_id in H1.
-        specialize (all_same_repeat 0%L 0%L) as H2.
-        specialize (H2 (rev (map2 rngl_subt (repeat 0%L (length ld)) ld))).
-        rewrite rev_length, map2_length, repeat_length, Nat.min_id in H2.
-        specialize (proj1 H2 H1) as H3.
-        apply (f_equal (λ l, rev l)) in H3.
-        rewrite rev_involutive, List_rev_repeat in H3.
-        apply (f_equal (λ l, nth i l 0%L)) in H3.
-        rewrite List_nth_repeat in H3.
-        rewrite (map2_nth _ _ _ 0%L 0%L) in H3; [ | | easy ]. 2: {
-          now rewrite repeat_length.
-        }
-        rewrite List_nth_repeat in H3.
-        rewrite <- if_ltb_lt_dec in H3.
-        rewrite Tauto.if_same in H3.
-        specialize (Has (nth (S i) lc 0%L) (nth i ld 0%L)) as H4.
-        rewrite Hacd in H4.
-        rewrite <- H4.
-        unfold rngl_sub.
-        now rewrite Hop, Hsu.
-      }
-    }
-    cbn; symmetry.
-    destruct lc as [| c]. {
-      specialize (Hacd 0) as H1; cbn in H1.
-      rewrite rngl_add_0_l in H1; subst d.
-      apply (rngl_eqb_neq Heb) in Hdz.
-      specialize (Has 0%L 0%L) as H1.
-      rewrite rngl_add_0_r in H1.
-      unfold rngl_sub in H1.
-      now rewrite Hop, Hsu in H1.
-    }
-    cbn.
-    rewrite strip_0s_app.
-    remember (strip_0s (rev lc)) as lb eqn:Hlb; symmetry in Hlb.
-    destruct lb as [| b]. {
-      cbn.
-      rewrite if_bool_if_dec.
-      destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-        apply (rngl_eqb_eq Heb) in Hcz; subst c.
-        specialize (Hacd 0) as H1; cbn in H1.
-        rewrite rngl_add_0_l in H1; subst d.
-        apply (rngl_eqb_neq Heb) in Hdz.
-        specialize (Has 0%L 0%L) as H2; cbn in H2.
-        rewrite rngl_add_0_l in H2.
-        unfold rngl_sub in H2.
-        now rewrite Hop, Hsu in H2.
-      }
-      specialize (Hacd 0) as H1; cbn in H1 |-*.
-      f_equal.
-      specialize (Has c d) as H2.
-      rewrite H1 in H2; subst c.
-      unfold rngl_sub.
-      now rewrite Hop, Hsu.
-    }
-    exfalso.
-    apply (rngl_eqb_neq Heb) in Hdz.
-    (* b + un certain élément dans ld = 0 *)
-    (* 0 - cet élément = 0 *)
-    (* b ≠ 0 *)
-    apply (eq_strip_0s_cons Heb) in Hlb.
-    destruct Hlb as (Hbz & i & Hil & Hbef & Hi).
-    rewrite rev_length in Hil.
-    rewrite rev_nth in Hi; [ | easy ].
-    specialize (Hacd (S (length lc - S i))) as H1.
-    cbn in H1.
-    rewrite Hi in H1.
-    specialize (proj1 (eq_strip_0s_nil Heb 0%L _) Hla) as H2.
-    rewrite rev_length, map2_length, repeat_length, Nat.min_id in H2.
-    specialize (all_same_repeat 0%L 0%L) as H3.
-    specialize (H3 (rev (map2 rngl_subt (repeat 0%L (length ld)) ld))).
-    rewrite rev_length, map2_length, repeat_length, Nat.min_id in H3.
-    specialize (proj1 H3 H2) as H4.
-    apply (f_equal (λ l, rev l)) in H4.
-    rewrite rev_involutive, List_rev_repeat in H4.
-    apply (f_equal (λ l, nth (length lc - S i) l 0%L)) in H4.
-    rewrite List_nth_repeat in H4.
-    destruct (lt_dec (length lc - S i) (length ld)) as [Hcid| Hcid]. 2: {
-      apply Nat.nlt_ge in Hcid.
-      rewrite nth_overflow in H1; [ | easy ].
-      now rewrite rngl_add_0_r in H1.
-    }
-    rewrite (map2_nth _ _ _ 0%L 0%L) in H4; [ | | easy ]. 2: {
-      now rewrite repeat_length.
-    }
-    rewrite List_nth_repeat in H4.
-    destruct (lt_dec (length lc - S i) (length ld)) as [H| H]; [ | easy ].
-    clear H.
-    move H1 at bottom.
-    move Hbz at bottom.
-    remember (length lc - S i) as j eqn:Hj.
-    specialize (Has (nth j lc 0%L) (nth j ld 0%L)) as H5.
-    rewrite Hi, H1 in H5.
-    unfold rngl_sub in H5.
-    rewrite Hop, Hsu, H4 in H5.
-    now symmetry in H5.
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hcd; apply Nat.succ_inj in Hcd.
+  rewrite (IHld lc Hcd). 2: {
+    intros i; apply (Hacd (S i)).
   }
-(**)
-  apply (eq_strip_0s_cons Heb) in Hla.
-  rewrite rev_length, map2_length, repeat_length, Nat.min_id in Hla.
-  destruct Hla as (Haz & i & Hil & Hbef & Hi).
-...
+  specialize (Hacd 0) as H1; cbn in H1.
+  apply (rngl_add_sub_eq_r Hos) in H1.
+  symmetry in H1; unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1; rewrite <- H1.
+  now cbn; rewrite strip_0s_app.
 }
 destruct lb as [| b]; [ easy | ].
 do 2 rewrite fold_lap_norm.
