@@ -4045,6 +4045,7 @@ Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm {T ro} la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
+Arguments lap_norm_length_le {T ro rp} Heb la%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_norm_repeat_0 {T ro rp} Heb n%nat.
 Arguments lap_one {T ro}.
@@ -4992,6 +4993,51 @@ move lb before la.
 cbn - [ lap_subt lap_norm lap_add ].
 (**)
 unfold lap_add.
+(**)
+unfold lap_subt.
+destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
+  generalize Hab; intros H.
+  apply Nat.sub_0_le in H; rewrite H; clear H.
+  rewrite app_nil_r.
+  remember (la ++ repeat _ _) as lc eqn:Hlc.
+  replace la with (lap_norm lc). 2: {
+    rewrite Hlc.
+    rewrite <- (lap_norm_app_0_r Heb). {
+      now apply (has_polyn_prop_lap_norm Heb).
+    }
+    intros i.
+    rewrite List_nth_repeat.
+    now destruct (lt_dec _ _).
+  }
+  assert (Hcd : length lc = length lb). {
+    rewrite Hlc.
+    rewrite  app_length, repeat_length.
+    flia Hab.
+  }
+  clear la pa Hab Hlc.
+  rename lc into la; move la after lb.
+  assert (H : length (lap_norm (map2 rngl_add la lb)) ≤ length lb). {
+    etransitivity; [ apply (lap_norm_length_le Heb) | ].
+    rewrite map2_length.
+    apply Nat.le_min_r.
+  }
+  apply Nat.sub_0_le in H; rewrite H; clear H.
+  rewrite app_nil_r.
+  remember (length lb - length _) as n eqn:Hn.
+  clear Hn.
+  revert n lb pb Hcd.
+  induction la as [| a] using rev_ind; intros; cbn. {
+    symmetry in Hcd; apply length_zero_iff_nil in Hcd; subst lb; cbn.
+    now destruct n.
+  }
+  rewrite app_length, Nat.add_1_r in Hcd.
+  destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+  rewrite app_length, Nat.add_1_r in Hcd.
+  apply Nat.succ_inj in Hcd.
+  rewrite (map2_app_app la lb); [ | easy ].
+  cbn.
+(* pffff... j'y arriverai jamais... *)
+...
 (*
 unfold lap_subt.
 *)
@@ -5020,8 +5066,8 @@ assert (Hcd : length lc = length ld). {
   do 2 rewrite  app_length, repeat_length.
   flia.
 }
-...
 clear la lb pa pb Hlc Hld.
+...
 rename lc into la; rename ld into lb; rename Hcd into Hab.
 revert lb Hab.
 induction la as [| a] using rev_ind; intros. {
