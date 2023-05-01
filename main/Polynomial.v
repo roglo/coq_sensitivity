@@ -5020,6 +5020,7 @@ assert (Hcd : length lc = length ld). {
   do 2 rewrite  app_length, repeat_length.
   flia.
 }
+...
 clear la lb pa pb Hlc Hld.
 rename lc into la; rename ld into lb; rename Hcd into Hab.
 revert lb Hab.
