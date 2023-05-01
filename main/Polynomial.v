@@ -4992,6 +4992,9 @@ move lb before la.
 cbn - [ lap_subt lap_norm lap_add ].
 (**)
 unfold lap_add.
+(*
+unfold lap_subt.
+*)
 remember (la ++ repeat _ _) as lc eqn:Hlc.
 remember (lb ++ repeat _ _) as ld eqn:Hld.
 replace la with (lap_norm lc). 2: {
