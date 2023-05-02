@@ -4917,6 +4917,26 @@ split; intros Ha. {
 }
 Qed.
 
+Theorem lap_opt_add_sub :
+  rngl_has_subt = true →
+  ∀ la lb : list T,
+  (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
+Proof.
+intros Hsu *.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  move Hsu at bottom.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
+}
+move Hop after Hsu.
+unfold lap_sub.
+rewrite Hop, Hsu.
+unfold lap_subt.
+...
+
 (**)
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
