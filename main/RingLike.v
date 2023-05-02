@@ -101,7 +101,7 @@ Definition rngl_opp {T} {R : ring_like_op T} a :=
   | _ => rngl_zero
   end.
 
-Definition rngl_subt {T} {R : ring_like_op T} a b :=
+Definition rngl_subt {T} {ro : ring_like_op T} a b :=
   match rngl_opt_opp_or_subt with
   | Some (inr rngl_subt) => rngl_subt a b
   | _ => rngl_zero
@@ -1861,4 +1861,5 @@ Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%L b%L.
 Arguments rngl_sub_0_l {T ro rp} Hos a%L.
 Arguments rngl_sub_0_r {T ro rp} Hos a%L.
 Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
+Arguments rngl_subt {T ro} (a b)%L.
 Arguments rngl_subt_0_r {T ro rp} Hsu a%L.
