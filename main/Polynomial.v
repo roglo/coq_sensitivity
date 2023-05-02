@@ -4990,10 +4990,6 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 (**)
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
@@ -5119,6 +5115,12 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 (*
 unfold lap_subt.
 *)
+(**)
+specialize (lap_opt_add_sub Hsu) as H2.
+unfold lap_sub in H2.
+rewrite Hop, Hsu in H2.
+unfold lap_add in H2.
+...
 remember (la ++ repeat _ _) as lc eqn:Hlc.
 remember (lb ++ repeat _ _) as ld eqn:Hld.
 replace la with (lap_norm lc). 2: {
@@ -5145,6 +5147,8 @@ assert (Hcd : length lc = length ld). {
   flia.
 }
 clear la lb pa pb Hlc Hld.
+...
+
 ...
 rename lc into la; rename ld into lb; rename Hcd into Hab.
 revert lb Hab.
