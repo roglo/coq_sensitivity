@@ -5116,20 +5116,22 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 unfold lap_subt.
 *)
 (**)
-specialize (lap_opt_add_sub Hsu) as H2.
-unfold lap_sub in H2.
-rewrite Hop, Hsu in H2.
-unfold lap_add in H2.
 (**)
-destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. {
+destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
+  remember (map2 _ _ _) as x eqn:Hx.
+  rewrite (has_polyn_prop_lap_norm Heb x); subst x. 2: {
+    unfold has_polyn_prop.
+... ...
+  }
+  specialize (lap_opt_add_sub Hsu) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite fold_lap_add.
+  rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+...
   rewrite Hab, Nat.sub_diag.
   do 2 rewrite app_nil_r.
-...
-remember (map2 _ _ _) as x eqn:Hx.
-rewrite (has_polyn_prop_lap_norm Heb x). 2: {
-  subst x.
-  (* si la et lb ont la même longueur, chuis emmerdé ;
-     s'ils ont des longueurs différentes, ça devrait le faire *)
 ...
 remember (la ++ repeat _ _) as lc eqn:Hlc.
 remember (lb ++ repeat _ _) as ld eqn:Hld.
