@@ -4993,7 +4993,7 @@ move lb before la.
 cbn - [ lap_subt lap_norm lap_add ].
 (**)
 unfold lap_add.
-(**)
+(*
 unfold lap_subt.
 destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   generalize Hab; intros H.
@@ -5038,6 +5038,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   cbn.
 (* pffff... j'y arriverai jamais... *)
 ...
+*)
 (*
 unfold lap_subt.
 *)
