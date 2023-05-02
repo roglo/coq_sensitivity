@@ -4934,7 +4934,17 @@ destruct op. {
 move Hop after Hsu.
 unfold lap_sub.
 rewrite Hop, Hsu.
-unfold lap_subt.
+unfold lap_add, lap_subt.
+rewrite map2_length.
+do 2 rewrite app_length, repeat_length.
+rewrite min_add_sub_max.
+rewrite <- Nat.sub_min_distr_l.
+rewrite Nat.sub_diag, Nat.min_0_r.
+rewrite <- Nat.sub_max_distr_r.
+rewrite Nat.sub_diag, Nat.max_0_r.
+destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
+rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+do 2 rewrite app_nil_r.
 ...
 
 (**)
