@@ -5175,6 +5175,22 @@ destruct pb as [pb| pb]. {
 rewrite last_last in pa, pb.
 apply (rngl_neqb_neq Heb) in pa, pb.
 move Hlab before pb.
+Search (lap_subt _ (_ ++ _)).
+Search lap_subt.
+Theorem glop :
+  ∀ la lb lc,
+  length la ≤ length lb
+  → lap_subt la (lb ++ lc) =
+    lap_subt la lb ++ repeat 0%L (length lb - length la) ++ lc.
+(* ouais, non, c'est "-lc" et non pas "lc"
+   et puis le reste... à voir *)
+...
+rewrite glop. 2: {
+  etransitivity.
+  apply (lap_norm_length_le Heb).
+  now rewrite lap_add_length, Hab, Nat.max_id.
+}
+...
 revert a b lb Hab pa pb Hlab.
 induction la as [| a2] using rev_ind; intros. {
   apply Nat.eq_sym, length_zero_iff_nil in Hab; subst lb; cbn.
