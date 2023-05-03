@@ -5181,15 +5181,29 @@ Theorem glop :
   ∀ la lb lc,
   length la ≤ length lb
   → lap_subt la (lb ++ lc) =
-    lap_subt la lb ++ repeat 0%L (length lb - length la) ++ lc.
-(* ouais, non, c'est "-lc" et non pas "lc"
-   et puis le reste... à voir *)
-...
+    lap_subt la lb ++ repeat 0%L (length lb - length la) ++
+      map (rngl_subt 0) lc.
+Proof.
+intros * Hab.
+... ...
 rewrite glop. 2: {
   etransitivity.
   apply (lap_norm_length_le Heb).
   now rewrite lap_add_length, Hab, Nat.max_id.
 }
+cbn.
+generalize Hlab; intros H.
+Search (_ + _ = _ → _)%L.
+apply (rngl_add_sub_eq_r Hos) in H.
+unfold rngl_sub in H.
+rewrite app_assoc.
+rewrite Hop, Hsu in H; rewrite H; clear H.
+rewrite (has_polyn_prop_lap_norm Heb). 2: {
+  apply Bool.orb_true_iff; right.
+  rewrite last_last.
+  now apply (rngl_neqb_neq Heb).
+}
+f_equal.
 ...
 revert a b lb Hab pa pb Hlab.
 induction la as [| a2] using rev_ind; intros. {
