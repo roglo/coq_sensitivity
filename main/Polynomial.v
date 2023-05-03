@@ -4032,6 +4032,7 @@ Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
 Arguments lap_add_0_r {T ro rp} la%lap.
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
+Arguments lap_add_app_l {T ro rp} (la lb lc)%lap.
 Arguments lap_add_app_r {T ro rp} (la lb lc)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
@@ -5086,6 +5087,29 @@ destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
   now apply (has_polyn_prop_lap_norm Heb).
 }
+destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
+  rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
+    unfold has_polyn_prop in pa |-*.
+    apply Bool.orb_true_iff in pa.
+    apply Bool.orb_true_iff; right.
+    destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+    rewrite app_length, Nat.add_1_r in Hba.
+    apply -> Nat.lt_succ_r in Hba.
+    rewrite lap_add_app_l; [ | easy ].
+    destruct pa as [pa| pa]. {
+      apply is_empty_list_empty in pa.
+      now destruct la.
+    }
+    now rewrite last_last in pa |-*.
+  }
+  specialize (lap_opt_add_sub Hsu) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2; rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+apply Nat.nlt_ge in Hab, Hba.
+apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
 ...
 destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
   remember (map2 _ _ _) as x eqn:Hx.
