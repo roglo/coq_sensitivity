@@ -5146,12 +5146,12 @@ destruct pab as (Heab, Hlab).
 apply Bool.negb_false_iff in Hlab.
 apply (rngl_eqb_eq Heb) in Hlab.
 destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
-  rewrite lap_add_0_r in Heab, Hlab.
   rewrite lap_add_0_r.
   rewrite (lap_subt_0_r Hsu).
   rewrite lap_norm_idemp.
   now apply (has_polyn_prop_lap_norm Heb).
 }
+clear Heab.
 destruct la as [| a] using rev_ind; [ | clear IHla ]. {
   now rewrite app_length in Hab; destruct lb.
 }
@@ -5160,7 +5160,6 @@ apply Nat.succ_inj in Hab.
 rewrite lap_add_app_app; [ cbn | easy ].
 rewrite lap_add_app_app in Hlab; [ cbn in Hlab | easy ].
 rewrite last_last in Hlab; rewrite Hlab.
-Search (lap_norm (_ ++ _)).
 rewrite <- (lap_norm_app_0_r Heb). 2: {
   now intros; destruct i; [ | destruct i ].
 }
