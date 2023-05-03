@@ -5165,8 +5165,7 @@ destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite (rngl_subt_diag Hos).
   rewrite <- (lap_norm_app_0_r Heb). 2: {
     intros.
-    destruct i; [ easy | cbn ].
-    now destruct i.
+    destruct i; [ easy | now destruct i ].
   }
   rewrite (has_polyn_prop_lap_norm Heb). 2: {
     unfold has_polyn_prop.
