@@ -5083,6 +5083,32 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add ].
+(**)
+remember (has_polyn_prop (la + lb)) as ab eqn:pab; symmetry in pab.
+destruct ab. {
+  rewrite (has_polyn_prop_lap_norm Heb (la + lb)); [ | easy ].
+  specialize (lap_opt_add_sub Hsu la lb) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+    intros; rewrite List_nth_repeat.
+    now destruct (lt_dec _ _).
+  }
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+apply Bool.orb_false_iff in pab.
+destruct pab as (Hab, Hlab).
+apply Bool.negb_false_iff in Hlab.
+apply (rngl_eqb_eq Heb) in Hlab.
+destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
+  rewrite lap_add_0_r in Hab, Hlab.
+  rewrite lap_add_0_r.
+  rewrite (lap_subt_0_r Hsu).
+  rewrite lap_norm_idemp.
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+...
 destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
     unfold has_polyn_prop in pb |-*.
