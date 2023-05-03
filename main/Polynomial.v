@@ -2764,6 +2764,23 @@ cbn; f_equal.
 now apply IHla.
 Qed.
 
+Theorem lap_subt_app_app :
+  ∀ la lb lc ld,
+  length la = length lb
+  → lap_subt (la ++ lc) (lb ++ ld) = lap_subt la lb ++ lap_subt lc ld.
+Proof.
+intros * Hab.
+revert lb lc ld Hab.
+induction la as [| a]; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hab.
+apply Nat.succ_inj in Hab.
+cbn; f_equal.
+now apply IHla.
+Qed.
+
 Theorem lap_opp_app_distr : ∀ la lb,
   (- (la ++ lb) = (- la) ++ (- lb))%lap.
 Proof.
@@ -5110,6 +5127,48 @@ destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
 }
 apply Nat.nlt_ge in Hab, Hba.
 apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
+clear pb.
+revert lb Hab.
+induction la as [| a] using rev_ind; intros; cbn. {
+  now apply Nat.eq_sym, length_zero_iff_nil in Hab; subst lb; cbn.
+}
+assert (Haz : a ≠ 0%L). {
+  apply Bool.orb_true_iff in pa.
+  destruct pa as [pa| pa]. {
+    apply is_empty_list_empty in pa.
+    now apply app_eq_nil in pa.
+  }
+  rewrite last_last in pa.
+  now apply (rngl_neqb_neq Heb) in pa.
+}
+rewrite app_length, Nat.add_1_r in Hab.
+destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+rewrite lap_add_app_app; [ cbn | easy ].
+unfold lap_norm at 2.
+rewrite rev_app_distr.
+cbn - [ lap_norm lap_subt ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Habz| Habz]. 2: {
+  cbn - [ lap_norm lap_subt ].
+  rewrite rev_involutive.
+  rewrite lap_subt_app_app. 2: {
+    rewrite lap_add_length, Hab.
+    apply Nat.max_id.
+  }
+  cbn.
+  specialize (H1 a b) as H2.
+  unfold rngl_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2; clear H2.
+  specialize (lap_opt_add_sub Hsu) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2, Hab, Nat.sub_diag, app_nil_r.
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+rewrite fold_lap_norm.
 ...
 destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
   remember (map2 _ _ _) as x eqn:Hx.
