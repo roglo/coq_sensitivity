@@ -4032,6 +4032,7 @@ Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
 Arguments lap_add_0_r {T ro rp} la%lap.
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
+Arguments lap_add_app_r {T ro rp} (la lb lc)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
@@ -5063,126 +5064,28 @@ cbn - [ lap_subt ].
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
-cbn - [ lap_subt lap_norm lap_add ].
-(**)
-unfold lap_add.
-(*
-unfold lap_subt.
-destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
-  generalize Hab; intros H.
-  apply Nat.sub_0_le in H; rewrite H; clear H.
-  rewrite app_nil_r.
-  remember (la ++ repeat _ _) as lc eqn:Hlc.
-  replace la with (lap_norm lc). 2: {
-    rewrite Hlc.
-    rewrite <- (lap_norm_app_0_r Heb). {
-      now apply (has_polyn_prop_lap_norm Heb).
-    }
-    intros i.
-    rewrite List_nth_repeat.
-    now destruct (lt_dec _ _).
-  }
-  assert (Hcd : length lc = length lb). {
-    rewrite Hlc.
-    rewrite  app_length, repeat_length.
-    flia Hab.
-  }
-  clear la pa Hab Hlc.
-  rename lc into la; move la after lb.
-  assert (H : length (lap_norm (map2 rngl_add la lb)) ≤ length lb). {
-    etransitivity; [ apply (lap_norm_length_le Heb) | ].
-    rewrite map2_length.
-    apply Nat.le_min_r.
-  }
-  apply Nat.sub_0_le in H; rewrite H; clear H.
-  rewrite app_nil_r.
-  remember (length lb - length _) as n eqn:Hn.
-  clear Hn.
-  revert n lb pb Hcd.
-  induction la as [| a] using rev_ind; intros; cbn. {
-    symmetry in Hcd; apply length_zero_iff_nil in Hcd; subst lb; cbn.
-    now destruct n.
-  }
-  rewrite app_length, Nat.add_1_r in Hcd.
-  destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-  rewrite app_length, Nat.add_1_r in Hcd.
-  apply Nat.succ_inj in Hcd.
-  rewrite (map2_app_app la lb); [ | easy ].
-  cbn.
-(* pffff... j'y arriverai jamais... *)
-...
-*)
-(*
-unfold lap_subt.
-*)
-(**)
+cbn - [ lap_norm lap_add ].
 destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
-  generalize Hab; intros H; apply Nat.lt_le_incl, Nat.sub_0_le in H.
-  rewrite H, app_nil_r; clear H.
-  destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-  rewrite app_length, Nat.add_1_r in Hab |-*.
-  apply -> Nat.lt_succ_r in Hab.
-  rewrite Nat.sub_succ_l; [ | easy ].
-  rewrite <- List_rev_repeat; cbn.
-  rewrite List_rev_repeat.
-  rewrite app_assoc.
-  rewrite map2_app_app. 2: {
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm.
-    apply Nat.add_sub.
-  }
-  cbn.
-  rewrite rngl_add_0_l.
-  remember (map2 _ _ _) as x eqn:Hx.
-  rewrite (has_polyn_prop_lap_norm Heb (x ++ _)). 2: {
+  rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
     unfold has_polyn_prop in pb |-*.
     apply Bool.orb_true_iff in pb.
     apply Bool.orb_true_iff; right.
+    destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+    rewrite app_length, Nat.add_1_r in Hab.
+    apply -> Nat.lt_succ_r in Hab.
+    rewrite lap_add_app_r; [ | easy ].
     destruct pb as [pb| pb]. {
       apply is_empty_list_empty in pb.
       now destruct lb.
     }
     now rewrite last_last in pb |-*.
   }
-  unfold lap_subt.
-  do 2 rewrite app_length, Nat.add_1_r.
-  cbn; rewrite Hx.
-  rewrite map2_length, app_length, repeat_length.
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-  rewrite Nat.sub_diag.
-  do 2 rewrite app_nil_r.
-  rewrite <- Hx.
-  rewrite map2_app_app. 2: {
-    subst x; rewrite map2_length.
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    apply Nat.min_id.
-  }
-  cbn.
-  rewrite (rngl_subt_diag Hos).
-  rewrite <- (lap_norm_app_0_r Heb). 2: {
-    intros.
-    destruct i; [ easy | now destruct i ].
-  }
-  rewrite (has_polyn_prop_lap_norm Heb). 2: {
-    unfold has_polyn_prop.
-    apply Bool.orb_true_iff.
-    destruct lb as [| b'] using rev_ind. {
-      apply Nat.le_0_r in Hab.
-      apply length_zero_iff_nil in Hab; subst la.
-      now left; cbn in Hx; subst x.
-    }
-    clear IHlb; right.
-...
-    destruct pb as [pb| pb]. {
-      apply is_empty_list_empty in pb.
-      now destruct lb.
-    }
-    rewrite last_last in pb.
-    rewrite map2_app_app.
+  specialize (lap_opt_add_sub Hsu) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2; rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
+  now apply (has_polyn_prop_lap_norm Heb).
+}
 ...
 destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
   remember (map2 _ _ _) as x eqn:Hx.
