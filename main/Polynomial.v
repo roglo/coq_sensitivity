@@ -5154,7 +5154,36 @@ destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite Nat.sub_diag.
   do 2 rewrite app_nil_r.
   rewrite <- Hx.
+  rewrite map2_app_app. 2: {
+    subst x; rewrite map2_length.
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    apply Nat.min_id.
+  }
+  cbn.
+  rewrite (rngl_subt_diag Hos).
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+    intros.
+    destruct i; [ easy | cbn ].
+    now destruct i.
+  }
   rewrite (has_polyn_prop_lap_norm Heb). 2: {
+    unfold has_polyn_prop.
+    apply Bool.orb_true_iff.
+    destruct lb as [| b'] using rev_ind. {
+      apply Nat.le_0_r in Hab.
+      apply length_zero_iff_nil in Hab; subst la.
+      now left; cbn in Hx; subst x.
+    }
+    clear IHlb; right.
+...
+    destruct pb as [pb| pb]. {
+      apply is_empty_list_empty in pb.
+      now destruct lb.
+    }
+    rewrite last_last in pb.
+    rewrite map2_app_app.
 ...
 destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
   remember (map2 _ _ _) as x eqn:Hx.
