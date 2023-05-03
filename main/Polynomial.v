@@ -5083,32 +5083,6 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add ].
-(**)
-remember (has_polyn_prop (la + lb)) as ab eqn:pab; symmetry in pab.
-destruct ab. {
-  rewrite (has_polyn_prop_lap_norm Heb (la + lb)); [ | easy ].
-  specialize (lap_opt_add_sub Hsu la lb) as H2.
-  unfold lap_sub in H2.
-  rewrite Hop, Hsu in H2.
-  rewrite H2.
-  rewrite <- (lap_norm_app_0_r Heb). 2: {
-    intros; rewrite List_nth_repeat.
-    now destruct (lt_dec _ _).
-  }
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-apply Bool.orb_false_iff in pab.
-destruct pab as (Hab, Hlab).
-apply Bool.negb_false_iff in Hlab.
-apply (rngl_eqb_eq Heb) in Hlab.
-destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
-  rewrite lap_add_0_r in Hab, Hlab.
-  rewrite lap_add_0_r.
-  rewrite (lap_subt_0_r Hsu).
-  rewrite lap_norm_idemp.
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-...
 destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
     unfold has_polyn_prop in pb |-*.
@@ -5153,6 +5127,44 @@ destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
 }
 apply Nat.nlt_ge in Hab, Hba.
 apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
+(**)
+remember (has_polyn_prop (la + lb)) as ab eqn:pab; symmetry in pab.
+destruct ab. {
+  rewrite (has_polyn_prop_lap_norm Heb (la + lb)); [ | easy ].
+  specialize (lap_opt_add_sub Hsu la lb) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+    intros; rewrite List_nth_repeat.
+    now destruct (lt_dec _ _).
+  }
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+apply Bool.orb_false_iff in pab.
+destruct pab as (Heab, Hlab).
+apply Bool.negb_false_iff in Hlab.
+apply (rngl_eqb_eq Heb) in Hlab.
+destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
+  rewrite lap_add_0_r in Heab, Hlab.
+  rewrite lap_add_0_r.
+  rewrite (lap_subt_0_r Hsu).
+  rewrite lap_norm_idemp.
+  now apply (has_polyn_prop_lap_norm Heb).
+}
+destruct la as [| a] using rev_ind; [ | clear IHla ]. {
+  now rewrite app_length in Hab; destruct lb.
+}
+do 2 rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+rewrite lap_add_app_app; [ cbn | easy ].
+rewrite lap_add_app_app in Hlab; [ cbn in Hlab | easy ].
+rewrite last_last in Hlab; rewrite Hlab.
+Search (lap_norm (_ ++ _)).
+rewrite <- (lap_norm_app_0_r Heb). 2: {
+  now intros; destruct i; [ | destruct i ].
+}
+...
 clear pb.
 revert lb Hab.
 induction la as [| a] using rev_ind; intros; cbn. {
