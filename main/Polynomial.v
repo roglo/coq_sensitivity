@@ -5116,7 +5116,46 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 unfold lap_subt.
 *)
 (**)
-(**)
+destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
+  generalize Hab; intros H; apply Nat.lt_le_incl, Nat.sub_0_le in H.
+  rewrite H, app_nil_r; clear H.
+  destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+  rewrite app_length, Nat.add_1_r in Hab |-*.
+  apply -> Nat.lt_succ_r in Hab.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite <- List_rev_repeat; cbn.
+  rewrite List_rev_repeat.
+  rewrite app_assoc.
+  rewrite map2_app_app. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm.
+    apply Nat.add_sub.
+  }
+  cbn.
+  rewrite rngl_add_0_l.
+  remember (map2 _ _ _) as x eqn:Hx.
+  rewrite (has_polyn_prop_lap_norm Heb (x ++ _)). 2: {
+    unfold has_polyn_prop in pb |-*.
+    apply Bool.orb_true_iff in pb.
+    apply Bool.orb_true_iff; right.
+    destruct pb as [pb| pb]. {
+      apply is_empty_list_empty in pb.
+      now destruct lb.
+    }
+    now rewrite last_last in pb |-*.
+  }
+  unfold lap_subt.
+  do 2 rewrite app_length, Nat.add_1_r.
+  cbn; rewrite Hx.
+  rewrite map2_length, app_length, repeat_length.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+  rewrite Nat.sub_diag.
+  do 2 rewrite app_nil_r.
+  rewrite <- Hx.
+  rewrite (has_polyn_prop_lap_norm Heb). 2: {
+...
 destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. 2: {
   remember (map2 _ _ _) as x eqn:Hx.
   rewrite (has_polyn_prop_lap_norm Heb x); subst x. 2: {
