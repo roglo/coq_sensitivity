@@ -5163,6 +5163,34 @@ rewrite last_last in Hlab; rewrite Hlab.
 rewrite <- (lap_norm_app_0_r Heb). 2: {
   now intros; destruct i; [ | destruct i ].
 }
+apply Bool.orb_true_iff in pa, pb.
+destruct pa as [pa| pa]. {
+  apply is_empty_list_empty in pa.
+  now destruct la.
+}
+destruct pb as [pb| pb]. {
+  apply is_empty_list_empty in pb.
+  now destruct lb.
+}
+rewrite last_last in pa, pb.
+apply (rngl_neqb_neq Heb) in pa, pb.
+move Hlab before pb.
+revert a b lb Hab pa pb Hlab.
+induction la as [| a2] using rev_ind; intros. {
+  apply Nat.eq_sym, length_zero_iff_nil in Hab; subst lb; cbn.
+  apply (rngl_add_sub_eq_r Hos) in Hlab.
+  unfold rngl_sub in Hlab.
+  rewrite Hop, Hsu in Hlab.
+  rewrite Hlab.
+  now apply (rngl_eqb_neq Heb) in pa; rewrite pa.
+}
+destruct lb as [| b2] using rev_ind; [ now destruct la | clear IHlb ].
+do 2 rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+do 2 rewrite <- app_assoc.
+cbn.
+rewrite lap_add_app_app; [ | easy ].
+cbn.
 ...
 clear pb.
 revert lb Hab.
