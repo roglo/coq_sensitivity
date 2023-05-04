@@ -2134,53 +2134,7 @@ rewrite (lap_add_opp_l Hop).
 apply lap_norm_repeat_0.
 Qed.
 
-(*
-Theorem lap_opt_add_opp_l :
-  let rol := lap_ring_like_op in
-  if rngl_has_opp then ∀ a : list T, (- a + a)%L = 0%L else not_applicable.
-Proof.
-intros rol; subst rol.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-intros.
-destruct op; [ | easy ].
-intros la.
-unfold rngl_opp; cbn.
-unfold lap_opt_opp_or_subt.
-specialize lap_add_opp_l as add_opp_l.
-unfold rngl_has_opp in Hop, add_opp_l.
-cbn in Hop, add_opp_l.
-unfold lap_opt_opp_or_subt in Hop, add_opp_l.
-destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
-destruct opp as [opp| ]; [ | easy ].
-rewrite add_opp_l; [ | easy ].
-(* question of equality *)
-...
-  ============================
-  repeat 0%L (length la) = []
-Qed.
-*)
-
 (* *)
-
-(*
-Theorem lap_opt_has_no_subt : ∀ P,
-  let _ := lap_ring_like_op in
-  if rngl_has_subt then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_subt; cbn.
-unfold rngl_has_opp_or_subt in Hos.
-unfold lap_opt_opp_or_subt.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ easy | ].
-...
-intros.
-unfold rngl_has_subt; cbn.
-unfold lap_opt_opp_or_subt.
-destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
-*)
 
 Theorem lap_opt_has_no_inv : ∀ P,
   let _ := lap_ring_like_op in
@@ -3306,71 +3260,6 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
-(*
-Theorem lap_opt_mul_div :
-  let lop := lap_ring_like_op in
-  if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
-  else not_applicable.
-Proof.
-intros rol; subst rol.
-unfold rngl_has_quot; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| ]; [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| ]; [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv| ]; [ | easy ].
-remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
-destruct iq as [inv| ]; [ | easy ].
-intros a b Hbz.
-unfold rngl_div, rngl_has_inv; cbn.
-unfold lap_opt_inv_or_quot.
-unfold rngl_has_quot, lap_opt_inv_or_quot; cbn.
-unfold rngl_quot; cbn.
-unfold lap_opt_inv_or_quot.
-rewrite Hco, Hop, Hiv, Hiq.
-destruct (Sumbool.sumbool_of_bool true) as [H| H]; [ clear H | easy ].
-apply lap_mul_div; try easy.
-...
-Qed.
-*)
-
-(*
-Theorem lap_opt_mul_quot_r :
-  let rol := lap_ring_like_op in
-  if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
-    ∀ a b, b ≠ 0%L → (b * a / b)%L = a
-  else not_applicable.
-Proof.
-(*
-easy.
-*)
-intros rol.
-unfold rngl_has_quot; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| Hco];
-  rewrite Hco; [ | easy ].
-now rewrite Bool.andb_false_r.
-Qed.
-*)
-
-(*
-Theorem lap_opt_eqb_eq :
-  let rol := lap_ring_like_op in
-  if rngl_has_eqb then ∀ a b, (a =? b)%L = true ↔ a = b
-  else not_applicable.
-Proof.
-intros rol; subst rol.
-intros a b; cbn.
-...
-apply lap_eqb_eq.
-intros c d.
-split; intros Hcd. {
-  now apply (rngl_eqb_eq Heb) in Hcd.
-}
-subst c.
-now apply rngl_eqb_eq.
-Qed.
-*)
-
 Theorem lap_opt_le_dec :
   let rol := lap_ring_like_op in
   if rngl_has_dec_le then ∀ a b, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
@@ -3443,53 +3332,6 @@ intros; cbn.
 now destruct (rngl_of_nat i).
 Qed.
 
-(*
-Check rngl_opt_add_opp_l.
-Check rngl_opt_mul_div.
-Check rngl_opt_eqb_eq.
-*)
-
-(*
-Definition lap_ring_like_prop : ring_like_prop (list T) :=
-  let rol := lap_ring_like_op in
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := rngl_has_dec_le;
-     rngl_is_integral := rngl_is_integral;
-     rngl_is_alg_closed := false;
-     rngl_characteristic := 0;
-     rngl_add_comm := lap_add_comm;
-     rngl_add_assoc := lap_add_assoc;
-     rngl_add_0_l := lap_add_0_l;
-     rngl_mul_assoc := lap_mul_assoc;
-     rngl_mul_1_l := lap_mul_1_l;
-     rngl_mul_add_distr_l := lap_mul_add_distr_l;
-     rngl_opt_mul_comm := lap_opt_mul_comm;
-     rngl_opt_mul_1_r := lap_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := NA; (*lap_opt_add_opp_l;*)
-     rngl_opt_add_sub := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_sub_sub_sub_add := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_sub_distr_l := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_sub_distr_r := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_inv_l := NA; (*lap_opt_has_no_inv _;*)
-     rngl_opt_mul_inv_r := NA; (*lap_opt_has_no_inv_and _ _;*)
-     rngl_opt_mul_div := NA; (*lap_opt_mul_div;*)
-     rngl_opt_mul_quot_r := lap_opt_mul_quot_r;
-     rngl_opt_eqb_eq := NA; (*lap_opt_eqb_eq;*)
-     rngl_opt_le_dec := lap_opt_le_dec;
-     rngl_opt_integral := lap_opt_integral;
-     rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := lap_characteristic_prop;
-     rngl_opt_le_refl := NA;
-     rngl_opt_le_antisymm := NA;
-     rngl_opt_le_trans := NA;
-     rngl_opt_add_le_compat := NA;
-     rngl_opt_mul_le_compat_nonneg := NA;
-     rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA |}.
-*)
-
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
 Proof.
 intros * Hab.
@@ -3534,109 +3376,6 @@ now rewrite IHla.
 Qed.
 
 End a.
-
-(* examples *)
-
-(* polynomials of nat *)
-
-(* commented because locally don't want to depend here on NatRingLike
-Require Import NatRingLike.
-
-Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
-  @polyn_ring_like_op _ nat_ring_like_op nat_ring_like_prop
-    eq_refl eq_refl.
-
-Definition nat_polyn_ring_like_prop : ring_like_prop (polyn nat) :=
-  @polyn_ring_like_prop _ nat_ring_like_op nat_ring_like_prop
-    eq_refl eq_refl.
-*)
-
-(* polynomials of Z *)
-
-(* commented because locally don't want to depend here on ZArith & Zrl
-Require Import ZArith.
-Require Import RnglAlg.Zrl.
-
-Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
-  @polyn_ring_like_op Z Z_ring_like_op Z_ring_like_prop
-    eq_refl eq_refl.
-
-Definition Z_polyn_ring_like_prop : ring_like_prop (polyn Z) :=
-  @polyn_ring_like_prop Z Z_ring_like_op Z_ring_like_prop
-    eq_refl eq_refl.
-*)
-
-(* polynomials of Q *)
-
-(* commented because don't want to depend here on Rational & Qrl
-Require Import RnglAlg.Rational.
-Require Import RnglAlg.Qrl.
-
-Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
-  @polyn_ring_like_op _ Q_ring_like_op Q_ring_like_prop
-    eq_refl eq_refl.
-
-Definition Q_polyn_ring_like_prop : ring_like_prop (polyn Q) :=
-  @polyn_ring_like_prop _ Q_ring_like_op Q_ring_like_prop
-    eq_refl eq_refl.
-*)
-
-(* polynomials of square matrices *)
-
-(* locally don't want this module to depend on Matrix & MatRl
-Require Import Matrix.
-Require Import RnglAlg.MatRl.
-
-Definition mat_polyn_ring_like_op n T ro rp eqb
-  (Hop : rngl_has_opp = true) :
-    ring_like_op (polyn (square_matrix n T)) :=
-  @polyn_ring_like_op _
-    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
-    eq_refl eq_refl.
-
-Definition mat_polyn_ring_like_prop n T ro rp eqb
-  (Hop : rngl_has_opp = true) :
-    ring_like_prop (polyn (square_matrix n T)) :=
-  @polyn_ring_like_prop _
-    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
-    eq_refl eq_refl.
-*)
-
-(* square matrices of polynomials *)
-
-(* locally don't want this module to depend on Matrix & MatRl
-Require Import Matrix.
-Require Import RnglAlg.MatRl.
-
-Definition mat_of_polyn_ring_like_op n T
-  (ro : ring_like_op T) (rp : ring_like_prop T) eqb
-  (Heq : rngl_has_eqb = true)
-  (Hos : rngl_has_opp_or_subt = true) :
-    ring_like_op (square_matrix n (polyn T)) :=
-  mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
-
-Theorem polyn_has_opp :
-  ∀ T (ro : ring_like_op T) (rp : ring_like_prop T) Heq Hop,
-  @rngl_has_opp (polyn T)
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop)) = true.
-Proof.
-intros.
-unfold rngl_has_opp in Hop |-*.
-unfold polyn_ring_like_op; cbn.
-unfold polyn_opt_opp_or_subt; cbn.
-remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
-destruct os as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Definition mat_of_polyn_ring_like_prop n T ro rp eqb
-  (Heq : rngl_has_eqb = true) (Hop : rngl_has_opp = true) :
-    ring_like_prop (square_matrix n (polyn T)) :=
-  @mat_ring_like_prop _
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))
-    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_subt Hop))
-    (polyn_has_opp rp Heq Hop) (polyn_eqb eqb) n.
-*)
 
 (* to be completed
 
@@ -5422,3 +5161,106 @@ Arguments mk_polyn {T ro} lap%lap.
 Arguments polyn_mul_comm {T ro rp} Hic a b.
 Arguments polyn_of_const {T ro} c%L.
 Arguments polyn_of_norm_lap {T ro} la%lap.
+
+(* examples *)
+
+(* polynomials of nat *)
+
+(* commented because locally don't want to depend here on NatRingLike
+Require Import NatRingLike.
+
+Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
+  @polyn_ring_like_op _ nat_ring_like_op nat_ring_like_prop
+    eq_refl eq_refl.
+
+Definition nat_polyn_ring_like_prop : ring_like_prop (polyn nat) :=
+  @polyn_ring_like_prop _ nat_ring_like_op nat_ring_like_prop
+    eq_refl eq_refl.
+*)
+
+(* polynomials of Z *)
+
+(* commented because locally don't want to depend here on ZArith & Zrl
+Require Import ZArith.
+Require Import RnglAlg.Zrl.
+
+Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
+  @polyn_ring_like_op Z Z_ring_like_op Z_ring_like_prop
+    eq_refl eq_refl.
+
+Definition Z_polyn_ring_like_prop : ring_like_prop (polyn Z) :=
+  @polyn_ring_like_prop Z Z_ring_like_op Z_ring_like_prop
+    eq_refl eq_refl.
+*)
+
+(* polynomials of Q *)
+
+(* commented because don't want to depend here on Rational & Qrl
+Require Import RnglAlg.Rational.
+Require Import RnglAlg.Qrl.
+
+Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
+  @polyn_ring_like_op _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
+
+Definition Q_polyn_ring_like_prop : ring_like_prop (polyn Q) :=
+  @polyn_ring_like_prop _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
+*)
+
+(* polynomials of square matrices *)
+
+(* locally don't want this module to depend on Matrix & MatRl
+Require Import Matrix.
+Require Import RnglAlg.MatRl.
+
+Definition mat_polyn_ring_like_op n T ro rp eqb
+  (Hop : rngl_has_opp = true) :
+    ring_like_op (polyn (square_matrix n T)) :=
+  @polyn_ring_like_op _
+    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
+    eq_refl eq_refl.
+
+Definition mat_polyn_ring_like_prop n T ro rp eqb
+  (Hop : rngl_has_opp = true) :
+    ring_like_prop (polyn (square_matrix n T)) :=
+  @polyn_ring_like_prop _
+    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
+    eq_refl eq_refl.
+*)
+
+(* square matrices of polynomials *)
+
+(* locally don't want this module to depend on Matrix & MatRl
+Require Import Matrix.
+Require Import RnglAlg.MatRl.
+
+Definition mat_of_polyn_ring_like_op n T
+  (ro : ring_like_op T) (rp : ring_like_prop T) eqb
+  (Heq : rngl_has_eqb = true)
+  (Hos : rngl_has_opp_or_subt = true) :
+    ring_like_op (square_matrix n (polyn T)) :=
+  mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
+
+Theorem polyn_has_opp :
+  ∀ T (ro : ring_like_op T) (rp : ring_like_prop T) Heq Hop,
+  @rngl_has_opp (polyn T)
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop)) = true.
+Proof.
+intros.
+unfold rngl_has_opp in Hop |-*.
+unfold polyn_ring_like_op; cbn.
+unfold polyn_opt_opp_or_subt; cbn.
+remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
+destruct os as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Definition mat_of_polyn_ring_like_prop n T ro rp eqb
+  (Heq : rngl_has_eqb = true) (Hop : rngl_has_opp = true) :
+    ring_like_prop (square_matrix n (polyn T)) :=
+  @mat_ring_like_prop _
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))
+    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_subt Hop))
+    (polyn_has_opp rp Heq Hop) (polyn_eqb eqb) n.
+*)
