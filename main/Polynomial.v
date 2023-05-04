@@ -5009,7 +5009,36 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 }
 Qed.
 
-(**)
+Theorem lap_subt_app_r :
+  ∀ la lb lc,
+  length la ≤ length lb
+  → lap_subt la (lb ++ lc) = lap_subt la lb ++ map (rngl_subt 0) lc.
+Proof.
+intros * Hab.
+revert lb lc Hab.
+induction la as [| a]; intros. {
+  cbn.
+  do 2 rewrite app_nil_r, Nat.sub_0_r.
+  rewrite app_length.
+  rewrite repeat_app.
+  rewrite map2_app_app; [ | apply repeat_length ].
+  f_equal.
+  rewrite (map2_map_min 0%L 0%L).
+  rewrite repeat_length, Nat.min_id.
+  symmetry.
+  rewrite (List_map_map_seq 0%L).
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  rewrite List_nth_repeat.
+  now destruct (lt_dec _ _).
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hab; apply Nat.succ_le_mono in Hab.
+cbn; do 2 rewrite fold_lap_subt.
+now f_equal; apply IHla.
+Qed.
+
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
@@ -5175,40 +5204,15 @@ destruct pb as [pb| pb]. {
 rewrite last_last in pa, pb.
 apply (rngl_neqb_neq Heb) in pa, pb.
 move Hlab before pb.
-Theorem glop :
-  ∀ la lb lc,
-  length la ≤ length lb
-  → lap_subt la (lb ++ lc) = lap_subt la lb ++ map (rngl_subt 0) lc.
-Proof.
-intros * Hab.
-revert lb lc Hab.
-induction la as [| a]; intros. {
-  cbn.
-  do 2 rewrite app_nil_r, Nat.sub_0_r.
-  rewrite app_length.
-  rewrite repeat_app.
-  rewrite map2_app_app; [ | apply repeat_length ].
-  f_equal.
-  rewrite (map2_map_min 0%L 0%L).
-  rewrite repeat_length, Nat.min_id.
-  symmetry.
-  rewrite (List_map_map_seq 0%L).
-  apply map_ext_in.
-...
-Check List_map_seq.
-rewrite List_map_seq.
-... ...
-rewrite glop. 2: {
+rewrite lap_subt_app_r. 2: {
   etransitivity.
   apply (lap_norm_length_le Heb).
   now rewrite lap_add_length, Hab, Nat.max_id.
 }
 cbn.
 generalize Hlab; intros H.
-Search (_ + _ = _ → _)%L.
 apply (rngl_add_sub_eq_r Hos) in H.
 unfold rngl_sub in H.
-rewrite app_assoc.
 rewrite Hop, Hsu in H; rewrite H; clear H.
 rewrite (has_polyn_prop_lap_norm Heb). 2: {
   apply Bool.orb_true_iff; right.
@@ -5216,6 +5220,7 @@ rewrite (has_polyn_prop_lap_norm Heb). 2: {
   now apply (rngl_neqb_neq Heb).
 }
 f_equal.
+clear a b pa pb Hlab.
 ...
 revert a b lb Hab pa pb Hlab.
 induction la as [| a2] using rev_ind; intros. {
