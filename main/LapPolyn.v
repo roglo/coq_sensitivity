@@ -1111,6 +1111,8 @@ Arguments lap_convol_mul_const_l {T ro rp} Hos a%L la%lap (i len)%nat.
 Arguments lap_convol_mul_const_r {T ro rp} Hos a%L la%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
+Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
+Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm {T ro} la%lap.

@@ -1951,7 +1951,7 @@ rewrite (lap_mul_assoc Heb Hos); cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
   now intros H; apply app_eq_nil in H.
 }
-rewrite lap_mul_const_r.
+rewrite (lap_mul_const_r Hos).
 do 2 rewrite map_app; cbn.
 rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
@@ -2007,8 +2007,6 @@ destruct rlac as [| ac]; intros. {
   rewrite lap_add_0_l in Hab.
   now apply Nat.le_0_r, length_zero_iff_nil in Hab; subst rlb.
 }
-...
-rewrite rev_lap_add.
 now rewrite rev_lap_add.
 Qed.
 
@@ -4501,8 +4499,6 @@ Qed.
 End a.
 
 Arguments lap_cons {T ro rp} Hos a%L la%lap.
-Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
-Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
 Arguments lap_norm_lap_rngl_summation {T ro rp} Hos Heb (b e)%nat.
 Arguments lap_norm_rngl_summation_idemp {T ro rp} Heb (b e)%nat.
