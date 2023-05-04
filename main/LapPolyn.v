@@ -472,7 +472,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
 (* commutativity of addition *)
 
 Theorem lap_add_comm : ∀ al1 al2,
-  lap_add al1 al2 = lap_add al2 al1.
+  (al1 + al2)%lap = (al2 + al1)%lap.
 Proof.
 intros al1 al2.
 unfold lap_add.
@@ -517,7 +517,7 @@ Theorem fold_lap_add :
 Proof. easy. Qed.
 
 Theorem lap_add_assoc : ∀ al1 al2 al3,
-  lap_add al1 (lap_add al2 al3) = lap_add (lap_add al1 al2) al3.
+  (al1 + (al2 + al3))%lap = (al1 + al2 + al3)%lap.
 Proof.
 intros al1 al2 al3.
 revert al2 al3.
@@ -857,8 +857,7 @@ Qed.
 
 Theorem lap_norm_mul_assoc :
   rngl_has_opp_or_subt = true →
-  ∀ la lb lc,
-  lap_norm (lap_mul la (lap_mul lb lc)) = lap_norm (lap_mul (lap_mul la lb) lc).
+  ∀ la lb lc, lap_norm (la * (lb * lc)) = lap_norm (la * lb * lc).
 Proof.
 intros Hos la lb lc.
 unfold lap_mul.
@@ -970,8 +969,7 @@ Qed.
 
 Theorem lap_mul_assoc :
   rngl_has_opp_or_subt = true →
-  ∀ la lb lc,
-  lap_mul la (lap_mul lb lc) = lap_mul (lap_mul la lb) lc.
+  ∀ la lb lc, (la * (lb * lc))%lap = (la * lb * lc)%lap.
 Proof.
 intros Hos *.
 apply eq_lap_norm_eq_length. 2: {
@@ -1048,7 +1046,7 @@ Qed.
 
 Theorem lap_mul_const_l :
   rngl_has_opp_or_subt = true →
-  ∀ a la, lap_mul [a] la = map (λ b, (a * b)%L) la.
+  ∀ a la, ([a] * la)%lap = map (λ b : T, (a * b)%L) la.
 Proof.
 intros Hos *.
 unfold lap_mul.
@@ -1058,7 +1056,7 @@ Qed.
 
 Theorem lap_mul_const_r :
   rngl_has_opp_or_subt = true →
-  ∀ a la, lap_mul la [a] = map (λ b, (b * a)%L) la.
+  ∀ a la, (la * [a])%lap = map (λ b : T, (b * a)%L) la.
 Proof.
 intros Hos *.
 unfold lap_mul.
@@ -1069,7 +1067,7 @@ Qed.
 
 Theorem lap_mul_1_l :
   rngl_has_opp_or_subt = true →
-  ∀ la, lap_mul lap_one la = la.
+  ∀ la, (1 * la)%lap = la.
 Proof.
 intros Hos *.
 unfold lap_one.
@@ -1081,7 +1079,7 @@ Qed.
 
 Theorem lap_mul_1_r :
   rngl_has_opp_or_subt = true →
-  ∀ la, lap_mul la lap_one = la.
+  ∀ la, (la * 1)%lap = la.
 Proof.
 intros Hos *.
 unfold lap_one.
@@ -1190,7 +1188,7 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 Qed.
 
 Theorem lap_add_norm_idemp_l : ∀ la lb,
-  lap_norm (lap_add (lap_norm la) lb) = lap_norm (lap_add la lb).
+  lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
 intros.
 unfold lap_norm; f_equal.
@@ -1252,8 +1250,7 @@ induction k; intros. {
 Qed.
 
 Theorem lap_convol_mul_lap_add_r : ∀ la lb lc i len,
-  lap_convol_mul la (lap_add lb lc) i len =
-  lap_convol_mul_add_r la lb lc i len.
+  lap_convol_mul la (lb + lc) i len = lap_convol_mul_add_r la lb lc i len.
 Proof.
 intros la lb lc i len.
 revert la lb lc i.
@@ -1265,7 +1262,7 @@ now rewrite list_nth_lap_add.
 Qed.
 
 Theorem lap_add_lap_convol_mul_r : ∀ la lb lc i len,
-  lap_add (lap_convol_mul la lb i len) (lap_convol_mul la lc i len) =
+  (lap_convol_mul la lb i len + lap_convol_mul la lc i len)%lap =
   lap_convol_mul_add_r la lb lc i len.
 Proof.
 intros la lb lc i len.
@@ -1279,9 +1276,7 @@ Qed.
 
 Theorem lap_norm_mul_add_distr_l :
   rngl_has_opp_or_subt = true →
-  ∀ la lb lc,
-  lap_norm (lap_mul la (lap_add lb lc)) =
-  lap_norm (lap_add (lap_mul la lb) (lap_mul la lc)).
+  ∀ la lb lc, lap_norm (la * (lb + lc)) = lap_norm (la * lb + la * lc).
 Proof.
 intros Hos la lb lc.
 unfold lap_mul.
@@ -1335,8 +1330,7 @@ Qed.
 
 Theorem lap_mul_add_distr_l :
   rngl_has_opp_or_subt = true →
-  ∀ la lb lc,
-  lap_mul la (lap_add lb lc) = lap_add (lap_mul la lb) (lap_mul la lc).
+  ∀ la lb lc, (la * (lb + lc))%lap = (la * lb + la * lc)%lap.
 Proof.
 intros Hos la lb lc.
 apply eq_lap_norm_eq_length. 2: {
@@ -1381,7 +1375,7 @@ now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
 Theorem lap_mul_comm : rngl_mul_is_comm = true →
-  ∀ a b, lap_mul a b = lap_mul b a.
+  ∀ la lb, (la * lb)%lap = (lb * la)%lap.
 Proof.
 intros Hic la lb.
 unfold lap_mul.
@@ -1392,7 +1386,7 @@ now rewrite lap_convol_mul_comm.
 Qed.
 
 Theorem lap_opt_mul_comm :
-  if rngl_mul_is_comm then ∀ a b : list T, lap_mul a b = lap_mul b a
+  if rngl_mul_is_comm then ∀ a b : list T, (a * b)%lap = (b * a)%lap
   else not_applicable.
 Proof.
 remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
@@ -1405,7 +1399,7 @@ Qed.
 
 Theorem lap_opt_mul_1_r :
   rngl_has_opp_or_subt = true →
-  if rngl_mul_is_comm then not_applicable else ∀ a, lap_mul a lap_one = a.
+  if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
 Proof.
 intros Hos.
 destruct rngl_mul_is_comm; [ easy | ].
@@ -1415,7 +1409,7 @@ Qed.
 (* *)
 
 Theorem lap_convol_mul_lap_add_l : ∀ la lb lc i len,
-  lap_convol_mul (lap_add la lb) lc i len = lap_convol_mul_add_l la lb lc i len.
+  lap_convol_mul (la + lb) lc i len = lap_convol_mul_add_l la lb lc i len.
 Proof.
 intros la lb lc i len.
 revert la lb lc i.
@@ -1427,7 +1421,7 @@ now rewrite list_nth_lap_add.
 Qed.
 
 Theorem lap_add_lap_convol_mul_l : ∀ la lb lc i len,
-  lap_add (lap_convol_mul la lc i len) (lap_convol_mul lb lc i len) =
+  (lap_convol_mul la lc i len + lap_convol_mul lb lc i len)%lap =
   lap_convol_mul_add_l la lb lc i len.
 Proof.
 intros la lb lc i len.
@@ -1442,8 +1436,7 @@ Qed.
 Theorem lap_norm_mul_add_distr_r :
   rngl_has_opp_or_subt = true →
   ∀ la lb lc : list T,
-  lap_norm (lap_mul (lap_add la lb) lc) =
-  lap_norm (lap_add (lap_mul la lc) (lap_mul lb lc)).
+  lap_norm ((la + lb) * lc) = lap_norm (la * lc + lb * lc).
 Proof.
 intros Hos la lb lc.
 unfold lap_mul.
@@ -1495,8 +1488,7 @@ Qed.
 
 Theorem lap_mul_add_distr_r :
   rngl_has_opp_or_subt = true →
-  ∀ la lb lc,
-  lap_mul (lap_add la lb) lc = lap_add (lap_mul la lc) (lap_mul lb lc).
+  ∀ la lb lc, ((la + lb) * lc)%lap = (la * lc + lb * lc)%lap.
 Proof.
 intros Hos la lb lc.
 apply eq_lap_norm_eq_length. 2: {
@@ -1525,8 +1517,7 @@ Qed.
 Theorem lap_opt_mul_add_distr_r :
   rngl_has_opp_or_subt = true →
   if rngl_mul_is_comm then not_applicable
-  else
-    ∀ a b c, lap_mul (lap_add a b) c = lap_add (lap_mul a c) (lap_mul b c).
+  else ∀ a b c, ((a + b) * c)%lap = (a * c + b * c)%lap.
 Proof.
 intros Hos.
 destruct rngl_mul_is_comm; [ easy | ].
@@ -1588,8 +1579,7 @@ Qed.
 
 Theorem last_lap_mul :
   rngl_has_opp_or_subt = true →
-  ∀ la lb,
-  last (lap_mul la lb) 0%L = (last la 0%L * last lb 0%L)%L.
+  ∀ la lb, last (la * lb)%lap 0%L = (last la 0 * last lb 0)%L.
 Proof.
 intros Hos *.
 unfold lap_mul.
@@ -1744,7 +1734,7 @@ Arguments lap_convol_mul_more {T ro rp} Heb Hos n%nat (la lb)%lap (i len)%nat.
 Arguments lap_convol_mul_add_l {T ro} (al1 al2 al3)%lap (i len)%nat.
 Arguments lap_mul_add_distr_l {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
-Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
+Arguments lap_mul_comm {T ro rp} Hic (la lb)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
