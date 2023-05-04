@@ -5039,6 +5039,69 @@ cbn; do 2 rewrite fold_lap_subt.
 now f_equal; apply IHla.
 Qed.
 
+Theorem lap_norm_add_subt :
+  rngl_has_subt = true →
+  ∀ la lb,
+  length la = length lb
+  → lap_subt (lap_norm (la + lb)) lb = la.
+Proof.
+clear Hos.
+intros Hsu * Hab.
+assert (Hop : rngl_has_opp = false). {
+  unfold rngl_has_subt in Hsu.
+  unfold rngl_has_opp.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
+move Hop after Hsu.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+specialize (rngl_add_sub Hos) as H1.
+revert lb Hab.
+induction la as [| a] using rev_ind; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+rewrite app_length, Nat.add_1_r in Hab.
+destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+rewrite app_length, Nat.add_1_r in Hab.
+apply Nat.succ_inj in Hab.
+rewrite lap_add_app_app; [ cbn | easy ].
+remember (rngl_eqb (a + b)%L 0%L) as abz eqn:Habz; symmetry in Habz.
+destruct abz. {
+  apply (rngl_eqb_eq Heb) in Habz; rewrite Habz.
+  rewrite <- (lap_norm_app_0_r Heb). 2: {
+    intros; destruct i; [ easy | now destruct i ].
+  }
+  rewrite lap_subt_app_r. 2: {
+    etransitivity; [ apply (lap_norm_length_le Heb) | ].
+    now rewrite lap_add_length, Hab, Nat.max_id.
+  }
+  cbn.
+  f_equal; [ now apply IHla | f_equal ].
+  apply (rngl_add_sub_eq_r Hos) in Habz.
+  unfold rngl_sub in Habz.
+  now rewrite Hop, Hsu in Habz.
+}
+rewrite (has_polyn_prop_lap_norm Heb). 2: {
+  apply Bool.orb_true_iff; right.
+  rewrite last_last.
+  apply (rngl_neqb_neq Heb).
+  now apply (rngl_eqb_neq Heb).
+}
+rewrite lap_subt_app_app. 2: {
+  now rewrite lap_add_length, Hab, Nat.max_id.
+}
+cbn.
+specialize (H1 a b) as H2.
+unfold rngl_sub in H2.
+rewrite Hop, Hsu in H2; rewrite H2.
+f_equal.
+specialize (lap_opt_add_sub Hsu la lb) as H3.
+unfold lap_sub in H3.
+now rewrite Hop, Hsu, Hab, Nat.sub_diag, app_nil_r in H3.
+Qed.
+
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
@@ -5220,49 +5283,7 @@ rewrite (has_polyn_prop_lap_norm Heb). 2: {
   now apply (rngl_neqb_neq Heb).
 }
 f_equal.
-clear a b pa pb Hlab.
-revert lb Hab.
-induction la as [| a] using rev_ind; intros. {
-  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
-}
-rewrite app_length, Nat.add_1_r in Hab.
-destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-rewrite app_length, Nat.add_1_r in Hab.
-apply Nat.succ_inj in Hab.
-rewrite lap_add_app_app; [ cbn | easy ].
-remember (rngl_eqb (a + b)%L 0%L) as abz eqn:Habz; symmetry in Habz.
-destruct abz. {
-  apply (rngl_eqb_eq Heb) in Habz; rewrite Habz.
-  rewrite <- (lap_norm_app_0_r Heb). 2: {
-    intros; destruct i; [ easy | now destruct i ].
-  }
-  rewrite lap_subt_app_r. 2: {
-    etransitivity; [ apply (lap_norm_length_le Heb) | ].
-    now rewrite lap_add_length, Hab, Nat.max_id.
-  }
-  cbn.
-  f_equal; [ now apply IHla | f_equal ].
-  apply (rngl_add_sub_eq_r Hos) in Habz.
-  unfold rngl_sub in Habz.
-  now rewrite Hop, Hsu in Habz.
-}
-rewrite (has_polyn_prop_lap_norm Heb). 2: {
-  apply Bool.orb_true_iff; right.
-  rewrite last_last.
-  apply (rngl_neqb_neq Heb).
-  now apply (rngl_eqb_neq Heb).
-}
-rewrite lap_subt_app_app. 2: {
-  now rewrite lap_add_length, Hab, Nat.max_id.
-}
-cbn.
-specialize (H1 a b) as H2.
-unfold rngl_sub in H2.
-rewrite Hop, Hsu in H2; rewrite H2.
-f_equal.
-specialize (lap_opt_add_sub Hsu la lb) as H3.
-unfold lap_sub in H3.
-now rewrite Hop, Hsu, Hab, Nat.sub_diag, app_nil_r in H3.
+now apply (lap_norm_add_subt Hsu).
 Qed.
 
 Theorem lap_quot_0_l :
