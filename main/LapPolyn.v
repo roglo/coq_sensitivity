@@ -301,3 +301,4 @@ Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Arguments strip_0s {T ro} la%list.
+Arguments strip_0s_length_le {T ro} l%list.

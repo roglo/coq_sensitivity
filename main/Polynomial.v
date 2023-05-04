@@ -2530,17 +2530,16 @@ revert len Hlen.
 induction la as [| a]; intros. {
   now apply Nat.le_0_r in Hlen; subst len.
 }
-(*
 cbn.
+(**)
 destruct len. {
   cbn - [ lap_add ].
   now rewrite lap_add_0_l.
 }
 cbn.
-*)
+(*
 destruct len; [ now rewrite lap_add_0_l | cbn ].
-...
-(**)
+*)
 cbn in Hlen; apply Nat.succ_le_mono in Hlen.
 rewrite rngl_add_0_l; f_equal.
 now apply IHla.
@@ -2561,7 +2560,15 @@ Theorem rev_lap_add : ∀ la lb,
 Proof.
 intros * Hab.
 revert lb Hab.
+(**)
+induction la as [| a]; intros. {
+  cbn - [ lap_add ].
+  now do 2 rewrite lap_add_0_l.
+}
+cbn.
+(*
 induction la as [| a]; intros; [ now do 2 rewrite lap_add_0_l | cbn ].
+*)
 destruct lb as [| b]; [ easy | ].
 cbn in Hab |-*.
 apply Nat.succ_inj in Hab.
@@ -2673,6 +2680,9 @@ f_equal.
 rewrite lap_opp_app_distr.
 rewrite rev_lap_opp.
 f_equal.
+(**)
+unfold lap_opp.
+(**)
 rewrite map_opp_repeat.
 now rewrite rngl_opp_0.
 Qed.
@@ -3051,6 +3061,9 @@ destruct Hr as [Hr| Hr]. {
   do 2 rewrite rev_involutive in H1.
   destruct Hqr' as [Hqr'| Hqr']. {
     subst rlq.
+(**)
+    cbn in H1 |-*.
+(**)
     rewrite lap_mul_0_r.
     rewrite lap_mul_0_r, lap_add_0_l in H1.
     symmetry in H1; apply List_rev_symm in H1; subst rlr.
@@ -3065,7 +3078,13 @@ destruct Hr as [Hr| Hr]. {
     now rewrite Ha in Hr.
   }
   rewrite <- lap_add_rev_strip in H1. {
+(**)
+    rewrite Hr in H1.
+    cbn in H1.
+    rewrite lap_add_0_r in H1.
+(*
     rewrite Hr, lap_add_0_r in H1.
+*)
     split; [ easy | ].
     apply Bool.orb_true_iff; right.
     rewrite List_last_rev.
@@ -5019,7 +5038,11 @@ Theorem lap_quot_0_l :
 Proof.
 intros.
 unfold lap_quot; cbn.
+(**)
+remember (rlap_quot_rem_step _ _) as x eqn:Hx.
+(*
 remember (rlap_quot_rem_step _ _ _) as x eqn:Hx.
+*)
 symmetry in Hx.
 destruct x as (q, rlr).
 destruct q; [ | easy ].
