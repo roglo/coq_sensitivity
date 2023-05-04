@@ -982,56 +982,6 @@ rewrite Nat.sub_0_r, app_length; cbn.
 now rewrite Nat.add_succ_r.
 Qed.
 
-Theorem lap_convol_mul_const_l : ∀ a la i len,
-  length la = i + len
-  → lap_convol_mul [a] la i len =
-    map (λ b, (a * b)%L) (skipn i la).
-Proof.
-intros * Hlen.
-revert i Hlen.
-induction len; intros. {
-  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
-  now rewrite skipn_all.
-}
-cbn - [ nth ].
-rewrite rngl_summation_split_first; [ | easy ].
-rewrite all_0_rngl_summation_0. 2: {
-  intros j Hj.
-  destruct j; [ flia Hj | cbn ].
-  rewrite Tauto_match_nat_same.
-  now apply rngl_mul_0_l.
-}
-rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
-rewrite IHlen; [ | now rewrite Nat.add_succ_r in Hlen ].
-symmetry.
-rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
-Qed.
-
-Theorem lap_convol_mul_const_r : ∀ a la i len,
-  length la = i + len
-  → lap_convol_mul la [a] i len =
-    map (λ b, (b * a)%L) (skipn i la).
-Proof.
-intros * Hlen.
-revert i Hlen.
-induction len; intros. {
-  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
-  now rewrite skipn_all.
-}
-cbn - [ nth ].
-rewrite rngl_summation_split_last; [ | easy ].
-rewrite all_0_rngl_summation_0. 2: {
-  intros j Hj.
-  replace (i - (j - 1)) with (S (i - j)) by flia Hj; cbn.
-  rewrite Tauto_match_nat_same.
-  now apply rngl_mul_0_r.
-}
-rewrite Nat.sub_diag, rngl_add_0_l; cbn.
-rewrite IHlen; [ | flia Hlen ].
-symmetry.
-rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
-Qed.
-
 Theorem lap_convol_mul_1_l : ∀ la i len,
   length la = i + len
   → lap_convol_mul [1%L] la i len = skipn i la.
@@ -1074,43 +1024,6 @@ destruct la as [| b]; [ easy | ].
 cbn; f_equal.
 rewrite Nat.sub_0_r, app_nil_r.
 apply map2_rngl_add_0_r.
-Qed.
-
-Theorem lap_mul_const_l : ∀ a la, ([a] * la)%lap = map (λ b, (a * b)%L) la.
-Proof.
-intros.
-unfold lap_mul.
-destruct la as [| b]; [ easy | ].
-now rewrite lap_convol_mul_const_l.
-Qed.
-
-Theorem lap_mul_const_r : ∀ a la, (la * [a])%lap = map (λ b, (b * a)%L) la.
-Proof.
-intros.
-unfold lap_mul.
-destruct la as [| b]; [ easy | ].
-rewrite Nat.add_sub.
-now rewrite lap_convol_mul_const_r.
-Qed.
-
-Theorem lap_mul_1_l : ∀ la, (1 * la)%lap = la.
-Proof.
-intros.
-unfold lap_one.
-rewrite lap_mul_const_l.
-induction la as [| a]; [ easy | cbn ].
-rewrite rngl_mul_1_l; f_equal.
-apply IHla.
-Qed.
-
-Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
-Proof.
-intros.
-unfold lap_one.
-rewrite lap_mul_const_r; cbn.
-induction la as [| a]; [ easy | cbn ].
-rewrite rngl_mul_1_r; f_equal.
-apply IHla.
 Qed.
 
 Theorem lap_opt_mul_1_r :

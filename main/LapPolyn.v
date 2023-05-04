@@ -949,10 +949,111 @@ apply eq_lap_norm_eq_length. 2: {
 apply (lap_norm_mul_assoc Hos).
 Qed.
 
+(* multiplication by 1 *)
+
+Theorem lap_convol_mul_const_l :
+  rngl_has_opp_or_subt = true →
+  ∀ a la i len,
+  length la = i + len
+  → lap_convol_mul [a] la i len =
+    map (λ b, (a * b)%L) (skipn i la).
+Proof.
+intros Hos * Hlen.
+revert i Hlen.
+induction len; intros. {
+  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
+  now rewrite skipn_all.
+}
+cbn - [ nth ].
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros j Hj.
+  destruct j; [ flia Hj | cbn ].
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
+rewrite IHlen; [ | now rewrite Nat.add_succ_r in Hlen ].
+symmetry.
+rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
+Qed.
+
+Theorem lap_convol_mul_const_r :
+  rngl_has_opp_or_subt = true →
+  ∀ a la i len,
+  length la = i + len
+  → lap_convol_mul la [a] i len =
+    map (λ b, (b * a)%L) (skipn i la).
+Proof.
+intros Hos * Hlen.
+revert i Hlen.
+induction len; intros. {
+  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
+  now rewrite skipn_all.
+}
+cbn - [ nth ].
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros j Hj.
+  replace (i - (j - 1)) with (S (i - j)) by flia Hj; cbn.
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_r Hos).
+}
+rewrite Nat.sub_diag, rngl_add_0_l; cbn.
+rewrite IHlen; [ | flia Hlen ].
+symmetry.
+rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
+Qed.
+
+Theorem lap_mul_const_l :
+  rngl_has_opp_or_subt = true →
+  ∀ a la, lap_mul [a] la = map (λ b, (a * b)%L) la.
+Proof.
+intros Hos *.
+unfold lap_mul.
+destruct la as [| b]; [ easy | ].
+now rewrite (lap_convol_mul_const_l Hos).
+Qed.
+
+Theorem lap_mul_const_r :
+  rngl_has_opp_or_subt = true →
+  ∀ a la, lap_mul la [a] = map (λ b, (b * a)%L) la.
+Proof.
+intros Hos *.
+unfold lap_mul.
+destruct la as [| b]; [ easy | ].
+rewrite Nat.add_sub.
+now rewrite (lap_convol_mul_const_r Hos).
+Qed.
+
+Theorem lap_mul_1_l :
+  rngl_has_opp_or_subt = true →
+  ∀ la, lap_mul lap_one la = la.
+Proof.
+intros Hos *.
+unfold lap_one.
+rewrite (lap_mul_const_l Hos).
+induction la as [| a]; [ easy | cbn ].
+rewrite rngl_mul_1_l; f_equal.
+apply IHla.
+Qed.
+
+...
+
+Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
+Proof.
+intros.
+unfold lap_one.
+rewrite lap_mul_const_r; cbn.
+induction la as [| a]; [ easy | cbn ].
+rewrite rngl_mul_1_r; f_equal.
+apply IHla.
+Qed.
+
 (* lap ring-like properties: actually not done because some axioms in laps
    are false *)
 
-(*
+(**)
 Definition lap_ring_like_prop : ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -991,7 +1092,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-*)
+(**)
 
 End a.
 
