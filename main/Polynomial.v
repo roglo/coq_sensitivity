@@ -4945,6 +4945,8 @@ f_equal; [ | apply IHla ].
 now apply rngl_subt_diag.
 Qed.
 
+(**)
+
 Theorem lap_opt_add_sub :
   rngl_has_subt = true →
   ∀ la lb : list T,
@@ -4960,6 +4962,11 @@ destruct op. {
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
 move Hop after Hsu.
+clear Hos.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+move Hos after Heb.
 unfold lap_sub.
 rewrite Hop, Hsu.
 unfold lap_add, lap_subt.
@@ -4977,7 +4984,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   induction la as [| a]; intros; cbn. {
     rewrite Nat.sub_0_r.
     rewrite map2_rngl_add_0_l.
-    apply map2_rngl_subt_diag.
+    now apply map2_rngl_subt_diag.
   }
   destruct lb as [| b]; [ easy | cbn ].
   cbn in Hab.
@@ -5045,7 +5052,6 @@ Theorem lap_norm_add_subt :
   length la = length lb
   → lap_subt (lap_norm (la + lb)) lb = la.
 Proof.
-clear Hos.
 intros Hsu * Hab.
 assert (Hop : rngl_has_opp = false). {
   unfold rngl_has_subt in Hsu.
@@ -5054,6 +5060,7 @@ assert (Hop : rngl_has_opp = false). {
   now destruct os.
 }
 move Hop after Hsu.
+clear Hos.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
@@ -5101,6 +5108,8 @@ specialize (lap_opt_add_sub Hsu la lb) as H3.
 unfold lap_sub in H3.
 now rewrite Hop, Hsu, Hab, Nat.sub_diag, app_nil_r in H3.
 Qed.
+
+Check polyn_ring_like_op.
 
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
@@ -5219,7 +5228,6 @@ destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
 }
 apply Nat.nlt_ge in Hab, Hba.
 apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
-(**)
 remember (has_polyn_prop (la + lb)) as ab eqn:pab; symmetry in pab.
 destruct ab. {
   rewrite (has_polyn_prop_lap_norm Heb (la + lb)); [ | easy ].
