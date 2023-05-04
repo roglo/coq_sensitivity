@@ -1508,7 +1508,7 @@ rewrite Nat.add_comm, Nat.add_sub.
 rewrite Hc.
 rewrite <- seq_shift, map_map; cbn.
 erewrite map_ext_in; [ | now intros; rewrite Nat.sub_0_r ].
-specialize (List_map_nth_seq (nth i lla [])) as H1.
+specialize (List_map_nth_seq 0%L (nth i lla [])) as H1.
 rewrite Hcla in H1 by now apply nth_In.
 rewrite <- H1.
 now symmetry; apply nth_indep.

@@ -31,8 +31,8 @@ intros * Heq Huv.
 destruct U as (lu).
 destruct V as (lv).
 cbn in Heq, Huv; f_equal.
-rewrite (List_map_nth_seq _ 0%L); symmetry.
-rewrite (List_map_nth_seq _ 0%L); symmetry.
+rewrite (List_map_nth_seq 0%L); symmetry.
+rewrite (List_map_nth_seq 0%L); symmetry.
 rewrite <- Huv.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.

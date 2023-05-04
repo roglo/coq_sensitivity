@@ -1000,7 +1000,7 @@ rewrite <- rngl_mul_assoc; f_equal; cbn; f_equal.
    the one to the other *)
 apply (ε_aux_permut Hop).
 unfold "°".
-rewrite (List_map_nth_seq (removelast la) 0) at 1.
+rewrite (List_map_nth_seq 0 (removelast la)) at 1.
 rewrite Hra.
 apply permutation_map with (eqba := Nat.eqb). {
   unfold equality; apply Nat.eqb_eq.

@@ -1724,7 +1724,7 @@ intros.
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem List_map_map_seq : ∀ A B (f : A → B) d la,
+Theorem List_map_map_seq : ∀ A B d (f : A → B) la,
   map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
 Proof.
 intros.
@@ -1734,7 +1734,7 @@ rewrite <- seq_shift.
 now rewrite map_map.
 Qed.
 
-Theorem List_map_nth_seq : ∀ A (la : list A) d,
+Theorem List_map_nth_seq : ∀ A d (la : list A),
   la = map (λ i, nth i la d) (seq 0 (length la)).
 Proof.
 intros.
@@ -1744,7 +1744,7 @@ rewrite <- seq_shift.
 now rewrite map_map.
 Qed.
 
-Theorem List_map_nth_seq' : ∀ A (la : list A) d n,
+Theorem List_map_nth_seq' : ∀ A d (la : list A) n,
   n = length la
   → la = map (λ i, nth i la d) (seq 0 n).
 Proof.

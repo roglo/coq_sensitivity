@@ -1505,7 +1505,7 @@ assert (HM : det M = (- det M)%L). {
   f_equal.
   destruct M as (ll); cbn in *.
   unfold mat_swap_rows; cbn; f_equal.
-  rewrite (List_map_nth_seq ll) with (d := []) at 1.
+  rewrite (List_map_nth_seq [] ll) at 1.
   apply map_ext_in.
   intros i Hi; apply in_seq in Hi.
   unfold transposition.
@@ -1619,8 +1619,8 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
   cbn in *.
   unfold subm; f_equal.
   cbn - [ butn ].
-  rewrite (List_map_nth_seq lla []).
-  rewrite (List_map_nth_seq llb []).
+  rewrite (List_map_nth_seq [] lla).
+  rewrite (List_map_nth_seq [] llb).
   rewrite Hra, Hrb.
   do 2 rewrite <- map_butn.
   do 2 rewrite map_map.
@@ -1630,8 +1630,8 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
     subst u; cbn in Hu.
     now apply in_seq in Hu.
   }
-  rewrite (List_map_nth_seq (nth u lla []) 0%L).
-  rewrite (List_map_nth_seq (nth u llb []) 0%L).
+  rewrite (List_map_nth_seq 0%L (nth u lla [])).
+  rewrite (List_map_nth_seq 0%L (nth u llb [])).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
@@ -1661,8 +1661,8 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
   cbn in *.
   unfold subm; f_equal.
   cbn - [ butn ].
-  rewrite (List_map_nth_seq lla []).
-  rewrite (List_map_nth_seq llc []).
+  rewrite (List_map_nth_seq [] lla).
+  rewrite (List_map_nth_seq [] llc).
   rewrite Hra, Hrc.
   do 2 rewrite <- map_butn.
   do 2 rewrite map_map.
@@ -1672,8 +1672,8 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
     subst u; cbn in Hu.
     now apply in_seq in Hu.
   }
-  rewrite (List_map_nth_seq (nth u lla []) 0%L).
-  rewrite (List_map_nth_seq (nth u llc []) 0%L).
+  rewrite (List_map_nth_seq 0%L (nth u lla [])).
+  rewrite (List_map_nth_seq 0%L (nth u llc [])).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.

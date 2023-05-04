@@ -2783,7 +2783,7 @@ unfold "•"%V, vect_zero; cbn; f_equal.
 unfold vect_dot_mul; cbn.
 rewrite (List_repeat_as_map _ (mat_nrows _)).
 destruct M as (lla); cbn.
-rewrite (List_map_nth_seq lla) with (d := []) at 1.
+rewrite (List_map_nth_seq [] lla) at 1.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi.
@@ -3009,7 +3009,7 @@ destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
 }
 destruct M as (ll); cbn.
 unfold mat_transp, mat_ncols; cbn; f_equal.
-rewrite (List_map_nth_seq ll []) at 2.
+rewrite (List_map_nth_seq [] ll) at 2.
 rewrite List_map_seq_length.
 rewrite (List_map_hd 0). 2: {
   rewrite seq_length.
@@ -3036,7 +3036,7 @@ erewrite map_ext_in. 2: {
 destruct ll as [| l]; [ easy | ].
 unfold mat_ncols in Hcz; cbn in Hcz.
 cbn - [ nth ].
-rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%L) at 1.
+rewrite (List_map_nth_seq 0%L (nth i (l :: ll) [])) at 1.
 apply is_scm_mat_iff in Hcm.
 unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
 destruct Hcm as (_, Hcl).

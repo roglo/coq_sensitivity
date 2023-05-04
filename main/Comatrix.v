@@ -35,7 +35,7 @@ intros.
 destruct M as (ll); cbn.
 unfold mat_swap_rows; f_equal.
 cbn - [ list_swap_elem ].
-rewrite (List_map_nth_seq ll (nth i ll [])) at 2.
+rewrite (List_map_nth_seq (nth i ll []) ll) at 2.
 unfold list_swap_elem.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.

@@ -5175,16 +5175,28 @@ destruct pb as [pb| pb]. {
 rewrite last_last in pa, pb.
 apply (rngl_neqb_neq Heb) in pa, pb.
 move Hlab before pb.
-Search (lap_subt _ (_ ++ _)).
-Search lap_subt.
 Theorem glop :
   ∀ la lb lc,
   length la ≤ length lb
-  → lap_subt la (lb ++ lc) =
-    lap_subt la lb ++ repeat 0%L (length lb - length la) ++
-      map (rngl_subt 0) lc.
+  → lap_subt la (lb ++ lc) = lap_subt la lb ++ map (rngl_subt 0) lc.
 Proof.
 intros * Hab.
+revert lb lc Hab.
+induction la as [| a]; intros. {
+  cbn.
+  do 2 rewrite app_nil_r, Nat.sub_0_r.
+  rewrite app_length.
+  rewrite repeat_app.
+  rewrite map2_app_app; [ | apply repeat_length ].
+  f_equal.
+  rewrite (map2_map_min 0%L 0%L).
+  rewrite repeat_length, Nat.min_id.
+  symmetry.
+  rewrite (List_map_map_seq 0%L).
+  apply map_ext_in.
+...
+Check List_map_seq.
+rewrite List_map_seq.
 ... ...
 rewrite glop. 2: {
   etransitivity.
