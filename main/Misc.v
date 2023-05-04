@@ -742,6 +742,24 @@ Qed.
 
 (* end map2 *)
 
+Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.
+Proof.
+intros.
+destruct (le_dec a b) as [Hab| Hab]. {
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  rewrite Nat.add_0_r, Nat.min_id; symmetry.
+  now apply Nat.max_r.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hab.
+  rewrite Nat.min_comm, Nat.max_comm.
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  rewrite Nat.add_0_r, Nat.min_id; symmetry.
+  now apply Nat.max_r.
+}
+Qed.
+
 (* rank: rank of the first element satisfying a predicate *)
 (* like "find" but returning the rank, not the element itself *)
 

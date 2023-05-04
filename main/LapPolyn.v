@@ -55,6 +55,7 @@ Qed.
 
 (* *)
 
+Definition lap_zero : list T := [].
 Definition lap_one := [1%L].
 
 (* addition *)
@@ -195,6 +196,7 @@ Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Arguments strip_0s {T ro} la%list.
 
+Notation "0" := lap_zero : lap_scope.
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
@@ -212,6 +214,7 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
+Local Existing Instance Q_ring_like_op.
 Compute (rlap_quot_rem [1] [2]).
 Compute (rlap_quot_rem [1;0;1;1;0] [1;0;1;0;0]).
 Compute (rlap_quot_rem [1;1;1] [1;1;0]).
@@ -260,7 +263,7 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
 
-Theorem lap_add_0_l : ∀ la, lap_add [] la = la.
+Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.
 intros; cbn.
 rewrite Nat.sub_0_r, app_nil_r.
@@ -268,7 +271,7 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite rngl_add_0_l; f_equal.
 Qed.
 
-Theorem lap_add_0_r : ∀ la, lap_add la [] = la.
+Theorem lap_add_0_r : ∀ la, (la + 0)%lap = la.
 Proof.
 intros.
 unfold lap_add; cbn.
@@ -277,13 +280,13 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite rngl_add_0_r; f_equal.
 Qed.
 
-Theorem lap_mul_0_l : ∀ la, lap_mul [] la = [].
+Theorem lap_mul_0_l : ∀ la, (0 * la = 0)%lap.
 Proof. easy. Qed.
 
-Theorem lap_mul_0_r : ∀ la, lap_mul la [] = [].
+Theorem lap_mul_0_r : ∀ la, (la * 0 = 0)%lap.
 Proof. now intros; destruct la. Qed.
 
-Theorem eq_lap_mul_0 : ∀ la lb, lap_mul la lb = [] → la = [] ∨ lb = [].
+Theorem eq_lap_mul_0 : ∀ la lb, (la * lb = 0)%lap → la = 0%lap ∨ lb = 0%lap.
 Proof.
 intros * Hab.
 destruct la as [| a]; [ now left | right ].
@@ -298,25 +301,6 @@ intros.
 induction l as [| a]; [ easy | cbn ].
 destruct (a =? 0)%L; cbn; [ | easy ].
 flia IHl.
-Qed.
-
-(* could be moved to Misc.v *)
-Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.
-Proof.
-intros.
-destruct (le_dec a b) as [Hab| Hab]. {
-  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
-  rewrite Nat.add_0_r, Nat.min_id; symmetry.
-  now apply Nat.max_r.
-} {
-  apply Nat.nle_gt, Nat.lt_le_incl in Hab.
-  rewrite Nat.min_comm, Nat.max_comm.
-  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
-  rewrite Nat.add_0_r, Nat.min_id; symmetry.
-  now apply Nat.max_r.
-}
 Qed.
 
 Theorem lap_add_length : ∀ la lb,
