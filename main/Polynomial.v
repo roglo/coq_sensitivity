@@ -266,75 +266,7 @@ rewrite (lap_norm_app_repeat_0 la) at 2.
 rewrite app_length; flia.
 Qed.
 
-Theorem rlap_quot_rem_step_None : ∀ la lb lr,
-  rlap_quot_rem_step la lb = (None, lr)
-  → lb = [] ∧ lr = [] ∨ la = [] ∧ lr = [] ∨ length la < length lb ∧ lr = la.
-Proof.
-intros * Hrl.
-destruct lb as [| b]. {
-  injection Hrl; clear Hrl; intros; subst.
-  now left.
-}
-destruct la as [| a]. {
-  injection Hrl; clear Hrl; intros; subst.
-  now right; left.
-}
-cbn in Hrl |-*; right; right.
-rewrite if_ltb_lt_dec in Hrl.
-destruct (lt_dec _ _) as [Hab| Hab]; [ | easy ].
-injection Hrl; clear Hrl; intros; subst lr.
-split; [ | easy ].
-now apply Nat.succ_lt_mono in Hab.
-Qed.
-
-Theorem rlap_quot_rem_step_length_r_a : ∀ rla rlb rlr cq,
-  rlap_quot_rem_step rla rlb = (Some cq, rlr)
-  → S (length rlr) = length rla.
-Proof.
-intros * Hrab.
-unfold rlap_quot_rem_step in Hrab.
-destruct rlb as [| b]; [ easy | ].
-destruct rla as [| a]; [ easy | ].
-rewrite if_bool_if_dec in Hrab.
-destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
-apply Nat.ltb_ge in Hab.
-injection Hrab; clear Hrab; intros; subst cq rlr.
-rewrite lap_sub_length, map_length.
-now rewrite max_l.
-Qed.
-
-Theorem rlap_rem_loop_prop : ∀ it rla rlb rlq rlr,
-  rlb ≠ []
-  → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
-  → S (length rla) ≤ it
-  → length rlr < length rlb.
-Proof.
-intros * Hbz Hqr Hit.
-revert rla rlq rlr Hqr Hit.
-induction it; intros; [ easy | ].
-cbn in Hqr.
-remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'; symmetry in Hqr'.
-destruct qr as (q, rlr').
-destruct q as [cq| ]. 2: {
-  injection Hqr; clear Hqr; intros; subst rlq rlr'.
-  apply rlap_quot_rem_step_None in Hqr'.
-  destruct Hqr' as [(H1, H2)| Hqr]; [ easy | ].
-  destruct Hqr as [(H1, H2)| Hqr]. {
-    subst rla rlr.
-    destruct rlb; [ easy | ].
-    cbn; easy.
-  }
-  now destruct Hqr as (H1, H2); subst rlr.
-}
-remember (rlap_quot_rem_loop it rlr' rlb) as qr eqn:Hqr''.
-symmetry in Hqr''.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr''.
-apply IHit in Hqr''; [ easy | ].
-apply rlap_quot_rem_step_length_r_a in Hqr'.
-rewrite Hqr'.
-now apply Nat.succ_le_mono in Hit.
-Qed.
+(*here*)
 
 Theorem rlap_rem_prop : ∀ rla rlb rlq rlr,
   rlb ≠ []
