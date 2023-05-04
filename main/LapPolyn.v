@@ -7,7 +7,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List ListNotations.
+Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd.
 
@@ -304,7 +304,7 @@ flia IHl.
 Qed.
 
 Theorem lap_add_length : ∀ la lb,
-  length (lap_add la lb) = max (length la) (length lb).
+  length (la + lb)%lap = max (length la) (length lb).
 Proof.
 intros.
 unfold lap_add.
@@ -323,7 +323,7 @@ do 2 rewrite app_length, repeat_length.
 apply min_add_sub_max.
 Qed.
 
-Theorem lap_opp_length : ∀ la, length (lap_opp la) = length la.
+Theorem lap_opp_length : ∀ la, length (- la)%lap = length la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
@@ -331,7 +331,7 @@ f_equal; apply IHla.
 Qed.
 
 Theorem lap_sub_length : ∀ la lb,
-  length (lap_sub la lb) = max (length la) (length lb).
+  length (la - lb)%lap = max (length la) (length lb).
 Proof.
 intros.
 unfold lap_sub.
