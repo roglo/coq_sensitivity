@@ -184,13 +184,13 @@ Arguments eval_lap {T ro} la%lap x%L.
 Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
-Arguments lap_opp {T ro} la%lap.
-Arguments lap_quot {T ro} (la lb)%lap.
-Arguments lap_sub {T ro} (la lb)%lap.
-Arguments lap_subt {T ro} (la lb)%lap.
 Arguments lap_norm {T ro} la%lap.
 Arguments lap_one {T ro}.
+Arguments lap_opp {T ro} la%lap.
+Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
+Arguments lap_sub {T ro} (la lb)%lap.
+Arguments lap_subt {T ro} (la lb)%lap.
 Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Arguments strip_0s {T ro} la%list.
