@@ -7,12 +7,9 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List ListNotations (*Init.Nat*).
+Import List ListNotations.
 
-Require Import Misc RingLike IterAdd (*IterAnd*).
-(*
-Require Import PermutationFun SortingFun.
-*)
+Require Import Misc RingLike IterAdd.
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
@@ -22,9 +19,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-(*
-Context {Hos : rngl_has_opp_or_subt = true}.
-*)
 Context {Heb : rngl_has_eqb = true}.
 
 (* normalization: lap not ending with 0s *)
@@ -58,6 +52,10 @@ rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | cbn ].
 now rewrite Haz.
 Qed.
+
+(* *)
+
+Definition lap_one := [1%L].
 
 (* addition *)
 
@@ -156,6 +154,57 @@ Definition lap_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   rev (strip_0s rlr).
 
+(* evaluation of a polynomial in x *)
+(* and composition of polynomials *)
+
+Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
+  iter_list rla (λ accu a, add (mul accu x) a) zero.
+
+Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
+  rlap_horner zero add mul (rev la) x.
+
+Definition eval_rlap :=
+  rlap_horner 0%L rngl_add rngl_mul.
+
+Definition eval_lap la x :=
+  eval_rlap (rev la) x.
+
+Definition rlap_compose rla rlb :=
+  rlap_horner [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
+
+Definition lap_compose la lb :=
+  rlap_compose (rev la) (rev lb).
+
+End a.
+
+Declare Scope lap_scope.
+Delimit Scope lap_scope with lap.
+
+Arguments eval_lap {T ro} la%lap x%L.
+Arguments lap_add {T ro} (la lb)%lap.
+Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
+Arguments lap_mul {T ro} (la lb)%lap.
+Arguments lap_opp {T ro} la%lap.
+Arguments lap_quot {T ro} (la lb)%lap.
+Arguments lap_sub {T ro} (la lb)%lap.
+Arguments lap_subt {T ro} (la lb)%lap.
+Arguments lap_norm {T ro} la%lap.
+Arguments lap_one {T ro}.
+Arguments lap_rem {T ro} (la lb)%lap.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
+Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
+Arguments strip_0s {T ro} la%list.
+
+Notation "1" := lap_one : lap_scope.
+Notation "- a" := (lap_opp a) : lap_scope.
+Notation "a + b" := (lap_add a b) : lap_scope.
+Notation "a - b" := (lap_sub a b) : lap_scope.
+Notation "a * b" := (lap_mul a b) : lap_scope.
+Notation "a / b" := (lap_quot a b) : lap_scope.
+Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
+Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
+  lap_scope.
+
 (*
 End a.
 Arguments lap_add {T ro} (la lb)%list.
@@ -209,6 +258,13 @@ Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
 Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 ...
 *)
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+Context {Heb : rngl_has_eqb = true}.
 
 Theorem lap_add_0_l : ∀ la, lap_add [] la = la.
 Proof.
@@ -377,8 +433,6 @@ apply rlap_quot_rem_step_length_r_a in Hqr'.
 rewrite Hqr'.
 now apply Nat.succ_le_mono in Hit.
 Qed.
-
-Definition lap_one := [1%L].
 
 (* lap opposite or subtraction *)
 
@@ -1685,27 +1739,6 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_not_le := NA |}.
 *)
 
-(* evaluation of a polynomial in x *)
-(* and composition of polynomials *)
-
-Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
-  iter_list rla (λ accu a, add (mul accu x) a) zero.
-
-Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
-  rlap_horner zero add mul (rev la) x.
-
-Definition eval_rlap :=
-  rlap_horner 0%L rngl_add rngl_mul.
-
-Definition eval_lap la x :=
-  eval_rlap (rev la) x.
-
-Definition rlap_compose rla rlb :=
-  rlap_horner [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
-
-Definition lap_compose la lb :=
-  rlap_compose (rev la) (rev lb).
-
 (* roots *)
 
 Theorem eval_lap_is_rngl_eval_polyn :
@@ -1720,23 +1753,17 @@ Qed.
 
 End a.
 
-Declare Scope lap_scope.
-Delimit Scope lap_scope with lap.
-
 Arguments eq_lap_norm_eq_length {T ro rp} Heb (la lb)%lap.
-Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
 Arguments lap_add_comm {T ro rp} (al1 al2)%lap.
 Arguments lap_add_length {T ro} (la lb)%lap.
 Arguments lap_add_norm_idemp_l {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
 Arguments lap_add_0_r {T ro rp} la%lap.
-Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_convol_mul_const_l {T ro rp} Hos a%L la%lap (i len)%nat.
 Arguments lap_convol_mul_const_r {T ro rp} Hos a%L la%lap (i len)%nat.
 Arguments lap_convol_mul_more {T ro rp} Heb Hos n%nat (la lb)%lap (i len)%nat.
 Arguments lap_convol_mul_add_l {T ro} (al1 al2 al3)%lap (i len)%nat.
-Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_mul_add_distr_l {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
@@ -1744,15 +1771,8 @@ Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
-Arguments lap_norm {T ro} la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
-Arguments lap_one {T ro}.
-Arguments lap_opp {T ro} la%lap.
-Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
-Arguments lap_rem {T ro} (la lb)%lap.
-Arguments lap_sub {T ro} (la lb)%lap.
-Arguments lap_subt {T ro} (la lb)%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
@@ -1760,17 +1780,4 @@ Arguments map2_rngl_add_0_l {T ro rp} la%lap.
 Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
-Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
-Arguments strip_0s {T ro} la%list.
 Arguments strip_0s_length_le {T ro} l%list.
-
-Notation "1" := lap_one : lap_scope.
-Notation "- a" := (lap_opp a) : lap_scope.
-Notation "a + b" := (lap_add a b) : lap_scope.
-Notation "a - b" := (lap_sub a b) : lap_scope.
-Notation "a * b" := (lap_mul a b) : lap_scope.
-Notation "a / b" := (lap_quot a b) : lap_scope.
-Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
-Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
-  lap_scope.
