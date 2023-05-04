@@ -1038,13 +1038,13 @@ rewrite rngl_mul_1_l; f_equal.
 apply IHla.
 Qed.
 
-...
-
-Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
+Theorem lap_mul_1_r :
+  rngl_has_opp_or_subt = true →
+  ∀ la, lap_mul la lap_one = la.
 Proof.
-intros.
+intros Hos *.
 unfold lap_one.
-rewrite lap_mul_const_r; cbn.
+rewrite (lap_mul_const_r Hos).
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_r; f_equal.
 apply IHla.
@@ -1053,7 +1053,7 @@ Qed.
 (* lap ring-like properties: actually not done because some axioms in laps
    are false *)
 
-(**)
+(*
 Definition lap_ring_like_prop : ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -1092,7 +1092,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-(**)
+*)
 
 End a.
 
@@ -1107,8 +1107,12 @@ Arguments lap_add_length {T ro} (la lb)%lap.
 Arguments lap_add_0_l {T ro rp} la%lap.
 Arguments lap_add_0_r {T ro rp} la%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
+Arguments lap_convol_mul_const_l {T ro rp} Hos a%L la%lap (i len)%nat.
+Arguments lap_convol_mul_const_r {T ro rp} Hos a%L la%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
+Arguments lap_mul_1_l {T ro rp} Hos la%lap.
+Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm {T ro} la%lap.
 Arguments lap_one {T ro}.
 Arguments lap_opp {T ro} la%lap.

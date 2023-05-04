@@ -987,7 +987,7 @@ Theorem lap_convol_mul_1_l : ∀ la i len,
   → lap_convol_mul [1%L] la i len = skipn i la.
 Proof.
 intros * Hlen.
-rewrite lap_convol_mul_const_l; [ | easy ].
+rewrite (lap_convol_mul_const_l Hos); [ | easy ].
 erewrite map_ext_in. 2: {
   intros a Ha.
   now rewrite rngl_mul_1_l.
@@ -1000,7 +1000,7 @@ Theorem lap_convol_mul_1_r : ∀ la i len,
   → lap_convol_mul la [1%L] i len = skipn i la.
 Proof.
 intros * Hlen.
-rewrite lap_convol_mul_const_r; [ | easy ].
+rewrite (lap_convol_mul_const_r Hos); [ | easy ].
 erewrite map_ext_in. 2: {
   intros a Ha.
   now rewrite rngl_mul_1_r.
@@ -1030,7 +1030,7 @@ Theorem lap_opt_mul_1_r :
   if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
-apply lap_mul_1_r.
+apply (lap_mul_1_r Hos).
 Qed.
 
 Theorem lap_convol_mul_x_l :
@@ -2007,6 +2007,8 @@ destruct rlac as [| ac]; intros. {
   rewrite lap_add_0_l in Hab.
   now apply Nat.le_0_r, length_zero_iff_nil in Hab; subst rlb.
 }
+...
+rewrite rev_lap_add.
 now rewrite rev_lap_add.
 Qed.
 
@@ -2803,8 +2805,6 @@ Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments lap_mul_has_polyn_prop {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
 Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
-Arguments lap_mul_1_l {T ro rp} Hos la%lap.
-Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_norm_length_le {T ro rp} Heb la%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
