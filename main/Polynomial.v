@@ -28,24 +28,6 @@ Context (rp : ring_like_prop T).
 Context {Hos : rngl_has_opp_or_subt = true}.
 Context {Heb : rngl_has_eqb = true}.
 
-Fixpoint lap_all_0 zero (eqb : T → T → bool) (la : list T) :=
-  match la with
-  | [] => true
-  | a :: la' => if eqb a zero then lap_all_0 zero eqb la' else false
-  end.
-
-Fixpoint lap_eqb zero (eqb : T → _) (la lb : list T) :=
-  match la with
-  | [] => lap_all_0 zero eqb lb
-  | a :: la' =>
-      match lb with
-      | [] => lap_all_0 zero eqb la
-      | b :: lb' => if eqb a b then lap_eqb zero eqb la' lb' else false
-      end
-  end.
-
-Definition lap_one := [1%L].
-
 (* normalization *)
 
 Lemma strip_0s_app : ∀ la lb,
@@ -428,45 +410,6 @@ destruct (Sumbool.sumbool_of_bool _) as [Hrz| Hrz]. {
 right; cbn; rewrite last_last.
 now rewrite Hrz.
 Qed.
-
-(* lap opposite or subtraction *)
-
-Definition lap_opt_opp_or_subt :
-  option ((list T → list T) + (list T → list T → list T)) :=
-  match rngl_opt_opp_or_subt with
-  | Some (inl _) => Some (inl lap_opp)
-  | Some (inr _) => Some (inr lap_subt)
-  | None => None
-  end.
-
-(* lap quotient *)
-
-Definition lap_opt_inv_or_quot :
-  option ((list T → list T) + (list T → list T → list T)) :=
-  match Sumbool.sumbool_of_bool rngl_has_opp with
-  | left Hop =>
-      match Sumbool.sumbool_of_bool rngl_has_inv with
-      | left Hiv =>
-          match rngl_opt_inv_or_quot with
-          | Some _ => Some (inr lap_quot)
-          | None => None
-          end
-      | right _ => None
-      end
-  | right _ => None
-  end.
-
-(* ring-like operators *)
-
-Definition lap_ring_like_op : ring_like_op (list T) :=
-  {| rngl_zero := [];
-     rngl_one := lap_one;
-     rngl_add := lap_add;
-     rngl_mul := lap_mul;
-     rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
-     rngl_opt_le := None |}.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -3747,7 +3690,6 @@ Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_norm_length_le {T ro rp} Heb la%lap.
 Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_norm_repeat_0 {T ro rp} Heb n%nat.
-Arguments lap_one {T ro}.
 Arguments lap_quot_is_norm {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_quot_rem_prop {T ro rp} Hos Heb Hic Hop Hiv (la lb lq lr)%lap.
 Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
