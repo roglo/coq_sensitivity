@@ -206,14 +206,8 @@ Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
   lap_scope.
 
 (*
-End a.
-Arguments lap_add {T ro} (la lb)%list.
-Arguments lap_sub {T ro} (la lb)%list.
-Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
