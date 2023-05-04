@@ -12,6 +12,8 @@ IterAnd.vio: IterAnd.v Misc.vio
 IterAnd.vo IterAnd.glob IterAnd.v.beautified IterAnd.required_vo: IterAnd.v Misc.vo
 IterMul.vio: IterMul.v Misc.vio RingLike.vio PermutationFun.vio IterAdd.vio
 IterMul.vo IterMul.glob IterMul.v.beautified IterMul.required_vo: IterMul.v Misc.vo RingLike.vo PermutationFun.vo IterAdd.vo
+LapPolyn.vio: LapPolyn.v Misc.vio RingLike.vio IterAdd.vio
+LapPolyn.vo LapPolyn.glob LapPolyn.v.beautified LapPolyn.required_vo: LapPolyn.v Misc.vo RingLike.vo IterAdd.vo
 Lemma_2_1.vio: Lemma_2_1.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio Signature.vio Determinant.vio Comatrix.vio CauchyBinet.vio
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo MyVector.vo Matrix.vo Signature.vo Determinant.vo Comatrix.vo CauchyBinet.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio MyVector.vio Matrix.vio IterAdd.vio
@@ -30,8 +32,8 @@ PermutationFun.vio: PermutationFun.v Misc.vio
 PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
-Polynomial.vio: Polynomial.v Misc.vio RingLike.vio IterAdd.vio IterAnd.vio PermutationFun.vio SortingFun.vio
-Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo RingLike.vo IterAdd.vo IterAnd.vo PermutationFun.vo SortingFun.vo
+Polynomial.vio: Polynomial.v Misc.vio RingLike.vio IterAdd.vio IterAnd.vio PermutationFun.vio SortingFun.vio LapPolyn.vio
+Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo RingLike.vo IterAdd.vo IterAnd.vo PermutationFun.vo SortingFun.vo LapPolyn.vo
 RingLike.vio: RingLike.v 
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio SortingFun.vio IterAdd.vio NatRingLike.vio
