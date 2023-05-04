@@ -1685,6 +1685,39 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_not_le := NA |}.
 *)
 
+(* evaluation of a polynomial in x *)
+(* and composition of polynomials *)
+
+Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
+  iter_list rla (λ accu a, add (mul accu x) a) zero.
+
+Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
+  rlap_horner zero add mul (rev la) x.
+
+Definition eval_rlap :=
+  rlap_horner 0%L rngl_add rngl_mul.
+
+Definition eval_lap la x :=
+  eval_rlap (rev la) x.
+
+Definition rlap_compose rla rlb :=
+  rlap_horner [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
+
+Definition lap_compose la lb :=
+  rlap_compose (rev la) (rev lb).
+
+(* roots *)
+
+Theorem eval_lap_is_rngl_eval_polyn :
+  ∀ la x, eval_lap la x = rngl_eval_polyn la x.
+Proof.
+intros.
+unfold eval_lap, eval_rlap, rlap_horner, iter_list.
+induction la as [| a]; [ easy | cbn ].
+rewrite fold_left_app; cbn.
+now rewrite IHla.
+Qed.
+
 End a.
 
 Declare Scope lap_scope.
@@ -1731,3 +1764,13 @@ Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Arguments strip_0s {T ro} la%list.
 Arguments strip_0s_length_le {T ro} l%list.
+
+Notation "1" := lap_one : lap_scope.
+Notation "- a" := (lap_opp a) : lap_scope.
+Notation "a + b" := (lap_add a b) : lap_scope.
+Notation "a - b" := (lap_sub a b) : lap_scope.
+Notation "a * b" := (lap_mul a b) : lap_scope.
+Notation "a / b" := (lap_quot a b) : lap_scope.
+Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
+Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
+  lap_scope.

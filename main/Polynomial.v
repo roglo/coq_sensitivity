@@ -392,14 +392,6 @@ right; cbn; rewrite last_last.
 now rewrite Hrz.
 Qed.
 
-Notation "1" := lap_one : lap_scope.
-Notation "- a" := (lap_opp a) : lap_scope.
-Notation "a + b" := (lap_add a b) : lap_scope.
-Notation "a - b" := (lap_sub a b) : lap_scope.
-Notation "a * b" := (lap_mul a b) : lap_scope.
-Notation "a / b" := (lap_quot a b) : lap_scope.
-Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
-
 Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
 Proof.
 intros.
@@ -2168,39 +2160,6 @@ destruct la as [| a]; cbn in Hab. {
 now destruct lb.
 Qed.
 
-(* evaluation of a polynomial in x *)
-(* and composition of polynomials *)
-
-Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
-  iter_list rla (λ accu a, add (mul accu x) a) zero.
-
-Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
-  rlap_horner zero add mul (rev la) x.
-
-Definition eval_rlap :=
-  rlap_horner 0%L rngl_add rngl_mul.
-
-Definition eval_lap la x :=
-  eval_rlap (rev la) x.
-
-Definition rlap_compose rla rlb :=
-  rlap_horner [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
-
-Definition lap_compose la lb :=
-  rlap_compose (rev la) (rev lb).
-
-(* roots *)
-
-Theorem eval_lap_is_rngl_eval_polyn :
-  ∀ la x, eval_lap la x = rngl_eval_polyn la x.
-Proof.
-intros.
-unfold eval_lap, eval_rlap, rlap_horner, iter_list.
-induction la as [| a]; [ easy | cbn ].
-rewrite fold_left_app; cbn.
-now rewrite IHla.
-Qed.
-
 End a.
 
 (* to be completed
@@ -2257,16 +2216,6 @@ Arguments lap_x_power {T ro} n%nat.
 
 Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
-
-Notation "1" := lap_one : lap_scope.
-Notation "- a" := (lap_opp a) : lap_scope.
-Notation "a + b" := (lap_add a b) : lap_scope.
-Notation "a - b" := (lap_sub a b) : lap_scope.
-Notation "a * b" := (lap_mul a b) : lap_scope.
-Notation "a / b" := (lap_quot a b) : lap_scope.
-Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
-Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
-  lap_scope.
 
 (* polynomials *)
 
