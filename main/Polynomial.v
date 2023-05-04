@@ -911,13 +911,6 @@ rewrite Nat.sub_0_r, app_nil_r.
 apply map2_rngl_add_0_r.
 Qed.
 
-Theorem lap_opt_mul_1_r :
-  if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
-Proof.
-destruct rngl_mul_is_comm; [ easy | ].
-apply (lap_mul_1_r Hos).
-Qed.
-
 Theorem lap_convol_mul_x_l :
   ∀ la lb i len,
   i = S (length la)
@@ -999,31 +992,6 @@ rewrite (list_nth_lap_opp Hop).
 now rewrite (fold_rngl_sub Hop).
 Qed.
 
-Theorem lap_convol_mul_lap_add_l : ∀ la lb lc i len,
-  lap_convol_mul (la + lb)%lap lc i len = lap_convol_mul_add_l la lb lc i len.
-Proof.
-intros la lb lc i len.
-revert la lb lc i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
-apply rngl_summation_eq_compat; intros j (_, Hj).
-f_equal.
-now rewrite list_nth_lap_add.
-Qed.
-
-Theorem lap_add_lap_convol_mul_l : ∀ la lb lc i len,
-  (lap_convol_mul la lc i len + lap_convol_mul lb lc i len)%lap =
-  lap_convol_mul_add_l la lb lc i len.
-Proof.
-intros la lb lc i len.
-revert la lb lc i.
-induction len; intros; [ easy | cbn ].
-rewrite <- IHlen; f_equal.
-rewrite <- rngl_summation_add_distr.
-apply rngl_summation_eq_compat; intros j (_, Hj).
-now rewrite rngl_mul_add_distr_r.
-Qed.
-
 Theorem lap_mul_opp_r :
   rngl_has_opp = true →
   ∀ la lb, (la * - lb = - (la * lb))%lap.
@@ -1065,57 +1033,6 @@ destruct (lt_dec k (length lb)) as [Hklb| Hklb]. 2: {
 now rewrite (List_map_nth' 0%L).
 Qed.
 
-Theorem lap_norm_mul_add_distr_r : ∀ la lb lc : list T,
-  lap_norm ((la + lb) * lc) = lap_norm (la * lc + lb * lc).
-Proof.
-intros la lb lc.
-unfold lap_mul.
-destruct la as [| a]; [ now do 2 rewrite lap_add_0_l | ].
-destruct lb as [| b]. {
-  cbn.
-  destruct lc as [| c]; [ easy | ].
-  cbn; rewrite Nat.sub_0_r.
-  rewrite rngl_add_0_r, app_nil_r, map2_length, repeat_length.
-  rewrite Nat.min_id, Nat.sub_0_r, lap_add_0_r.
-  now rewrite map2_rngl_add_0_r.
-}
-destruct lc as [| c]; [ easy | ].
-move b before a; move c before b.
-remember (a :: la) as la' eqn:Hla'.
-remember (b :: lb) as lb' eqn:Hlb'.
-remember (c :: lc) as lc' eqn:Hlc'.
-remember (length (la' + lb')%lap + length lc' - 1) as labc.
-remember (length la' + length lc' - 1) as lac.
-remember (length lb' + length lc' - 1) as lbc.
-rewrite Heqlabc.
-remember (la' + lb')%lap as lab.
-symmetry in Heqlab.
-destruct lab as [| ab]; [ now subst la' lb' | ].
-rewrite <- Heqlab in Heqlabc |-*.
-rewrite (lap_convol_mul_more Heb Hos) with (n := (lac + lbc)%nat). 2: {
-  subst; flia.
-}
-rewrite <- Heqlabc.
-symmetry.
-rewrite Heqlab.
-rewrite <- (lap_add_norm_idemp_l Heb).
-rewrite (lap_convol_mul_more Heb Hos) with (n := (labc + lbc)%nat); [ | now subst lac ].
-rewrite <- Heqlab.
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite lap_add_comm.
-rewrite <- (lap_add_norm_idemp_l Heb).
-rewrite Heqlbc.
-rewrite (lap_convol_mul_more Heb Hos) with (n := (labc + lac)%nat); [ | flia ].
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite <- Heqlbc.
-rewrite Nat.add_comm.
-rewrite lap_add_comm.
-rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
-symmetry.
-rewrite lap_convol_mul_lap_add_l.
-now rewrite lap_add_lap_convol_mul_l.
-Qed.
-
 Theorem lap_mul_sub_distr_l :
   rngl_has_opp = true →
   ∀ la lb lc, (la * (lb - lc))%lap = (la * lb - la * lc)%lap.
@@ -1125,80 +1042,6 @@ unfold lap_sub.
 rewrite <- (lap_mul_opp_r Hop).
 rewrite Hop.
 now rewrite <- lap_mul_add_distr_l.
-Qed.
-
-Theorem lap_mul_add_distr_r : ∀ la lb lc,
-  ((la + lb) * lc)%lap = (la * lc + lb * lc)%lap.
-Proof.
-intros la lb lc.
-apply (eq_lap_norm_eq_length Heb). 2: {
-  destruct la as [| a]. {
-    rewrite lap_mul_0_l.
-    now do 2 rewrite lap_add_0_l.
-  }
-  destruct lb as [| b]. {
-    rewrite lap_mul_0_l.
-    now do 2 rewrite lap_add_0_r.
-  }
-  cbn.
-  destruct lc as [| c]; [ easy | ].
-  cbn; do 3 rewrite Nat.sub_0_r.
-  do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
-  rewrite lap_convol_mul_length.
-  do 2 rewrite map2_length.
-  do 4 rewrite app_length, repeat_length.
-  do 2 rewrite lap_convol_mul_length.
-  do 2 rewrite min_add_sub_max.
-  now rewrite Nat.add_max_distr_r.
-}
-apply lap_norm_mul_add_distr_r.
-Qed.
-
-Theorem lap_opt_mul_add_distr_r :
-   if rngl_mul_is_comm then not_applicable
-   else ∀ a b c : list T, ((a + b) * c)%lap = (a * c + b * c)%lap.
-Proof.
-destruct rngl_mul_is_comm; [ easy | ].
-apply lap_mul_add_distr_r.
-Qed.
-
-(* optional multiplication commutativity *)
-
-Theorem lap_convol_mul_comm : rngl_mul_is_comm = true →
-  ∀ l1 l2 i len,
-  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
-Proof.
-intros Hic l1 l2 i len.
-revert i.
-induction len; intros; [ easy | cbn ].
-rewrite IHlen; f_equal.
-rewrite rngl_summation_rtl.
-apply rngl_summation_eq_compat; intros j (_, Hj).
-rewrite Nat.add_0_r.
-rewrite (rngl_mul_comm Hic).
-rewrite Nat_sub_sub_distr; [ | easy ].
-now rewrite Nat.add_comm, Nat.add_sub.
-Qed.
-
-Theorem lap_mul_comm : rngl_mul_is_comm = true →
-  ∀ a b, lap_mul a b = lap_mul b a.
-Proof.
-intros Hic la lb.
-unfold lap_mul.
-destruct la as [| a]; [ now destruct lb | cbn ].
-rewrite <- Nat.add_succ_comm; cbn.
-rewrite (Nat.add_comm (length lb)).
-now rewrite lap_convol_mul_comm.
-Qed.
-
-Theorem lap_opt_mul_comm :
-  if rngl_mul_is_comm then ∀ a b : list T, (a * b)%lap = (b * a)%lap
-  else not_applicable.
-Proof.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ | easy ].
-intros.
-apply (lap_mul_comm Hic).
 Qed.
 
 (* optional left addition of opposite; not existing if there is
@@ -2171,73 +2014,6 @@ apply rngl_has_opp_or_subt_iff in Hos.
 destruct Hos; congruence.
 Qed.
 
-Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
-  len ≠ 0
-  → length la + length lb + 1 = i + len
-  → last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%L.
-Proof.
-intros * Hlen Hlab.
-revert la lb i Hlab.
-induction len; intros; [ easy | clear Hlen ].
-cbn.
-destruct len. {
-  cbn.
-  rewrite rngl_summation_split3 with (j := length la); [ | flia Hlab ].
-  rewrite app_nth2; [ | now unfold ge ].
-  rewrite Nat.sub_diag; cbn.
-  replace (i - length la) with (length lb) by flia Hlab.
-  rewrite app_nth2; [ | now unfold ge ].
-  rewrite Nat.sub_diag; cbn.
-  rewrite all_0_rngl_summation_0. 2: {
-    intros j Hj.
-    rewrite (nth_overflow (lb ++ [b])). 2: {
-      rewrite app_length; cbn; flia Hlab Hj.
-    }
-    apply (rngl_mul_0_r Hos).
-  }
-  rewrite rngl_add_0_l.
-  rewrite all_0_rngl_summation_0. 2: {
-    intros j Hj.
-    rewrite (nth_overflow (la ++ [a])). 2: {
-      now rewrite app_length.
-    }
-    apply (rngl_mul_0_l Hos).
-  }
-  apply rngl_add_0_r.
-}
-rewrite IHlen; [ easy | easy | flia Hlab ].
-Qed.
-
-Theorem last_lap_mul : ∀ la lb,
-  last (la * lb)%lap 0%L = (last la 0%L * last lb 0%L)%L.
-Proof.
-intros.
-unfold lap_mul.
-destruct la as [| a] using rev_ind. {
-  now symmetry; apply rngl_mul_0_l.
-}
-clear IHla.
-destruct lb as [| b] using rev_ind. {
-  cbn.
-  rewrite rngl_mul_0_r; [ | easy ].
-  now destruct (la ++ [a]).
-}
-clear IHlb.
-move b before a.
-remember (la ++ [a]) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [| c]; [ now apply app_eq_nil in Hlc | ].
-remember (lb ++ [b]) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
-rewrite <- Hlc, <- Hld.
-clear c d lc ld Hlc Hld.
-do 2 rewrite last_last.
-do 2 rewrite app_length.
-cbn.
-apply last_lap_convol_mul_last; flia.
-Qed.
-
 Theorem lap_add_move_l :
   ∀ la lb lc : list T,
   (la + lb)%lap = lc
@@ -2273,7 +2049,7 @@ destruct Hb as [Hb| Hb]. {
 right.
 apply (rngl_neqb_neq Heb) in Ha, Hb.
 apply (rngl_neqb_neq Heb).
-rewrite last_lap_mul.
+rewrite (last_lap_mul Hos).
 intros Hab.
 apply (rngl_eq_mul_0_r Hos) in Hab; [ easy | |  easy].
 apply Bool.orb_true_iff; right.
@@ -2371,56 +2147,6 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
-Theorem lap_opt_le_dec :
-  let rol := lap_ring_like_op in
-  if rngl_has_dec_le then ∀ a b, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-  else not_applicable.
-Proof.
-intros rol; subst rol.
-destruct rngl_has_dec_le; [ | easy ].
-now intros; right; cbn.
-Qed.
-
-Theorem lap_opt_integral :
-  let rol := lap_ring_like_op in
-  if rngl_is_integral then
-    ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
-Proof.
-intros rol; subst rol.
-remember rngl_is_integral as it eqn:Hii; symmetry in Hii.
-destruct it; [ | easy ].
-intros la lb Hab.
-cbn in Hab.
-enough (H : la = [] ∨ lb = []). {
-  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
-  easy.
-  easy.
-}
-destruct la as [| a] using rev_ind; [ now left | clear IHla ].
-destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
-specialize (last_lap_mul (la ++ [a]) (lb ++ [b])) as H2.
-do 2 rewrite last_last in H2.
-rewrite Hab in H2.
-symmetry in H2; cbn in H2.
-apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
-destruct H2 as [H2| H2]. {
-  subst a.
-  unfold lap_mul in Hab; cbn in Hab.
-  destruct la as [| a']; [ now destruct lb | ].
-  cbn in Hab.
-  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
-  now destruct lb.
-} {
-  subst b.
-  unfold lap_mul in Hab; cbn in Hab.
-  destruct la as [| a']; [ now destruct lb | ].
-  cbn in Hab.
-  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
-  now destruct lb.
-}
-Qed.
-
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op in
   ∀ n, rngl_of_nat n = if Nat.eq_dec n 0 then [] else [rngl_of_nat n].
@@ -2430,17 +2156,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 induction n; [ easy | clear Hnz; cbn ].
 destruct n; [ now cbn; rewrite rngl_add_0_r | ].
 now rewrite IHn.
-Qed.
-
-Theorem lap_characteristic_prop :
-  let rol := lap_ring_like_op in
-  if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-  else (∀ i : nat, 0 < i < 0 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 0 = 0%L.
-Proof.
-intros; subst rol.
-cbn - [ rngl_of_nat ].
-intros; cbn.
-now destruct (rngl_of_nat i).
 Qed.
 
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
@@ -2525,7 +2240,6 @@ Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_app_l {T ro rp} (la lb lc)%lap.
 Arguments lap_add_app_r {T ro rp} (la lb lc)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
-Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
 Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
 Arguments lap_mul_has_polyn_prop {T ro rp} Hos Heb Hiv (la lb)%lap.
 Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
@@ -2541,7 +2255,6 @@ Arguments lap_subt_diag {T ro rp} Hos la%lap.
 Arguments lap_subt_0_r {T ro rp} Hsu la%lap.
 Arguments lap_x_power {T ro} n%nat.
 
-Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
 

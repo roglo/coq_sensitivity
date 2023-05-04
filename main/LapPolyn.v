@@ -1330,11 +1330,322 @@ apply eq_lap_norm_eq_length. 2: {
 apply (lap_norm_mul_add_distr_l Hos).
 Qed.
 
+(* optional multiplication commutativity *)
+
+Theorem lap_convol_mul_comm : rngl_mul_is_comm = true →
+  ∀ l1 l2 i len,
+  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
+Proof.
+intros Hic l1 l2 i len.
+revert i.
+induction len; intros; [ easy | cbn ].
+rewrite IHlen; f_equal.
+rewrite rngl_summation_rtl.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+rewrite Nat.add_0_r.
+rewrite (rngl_mul_comm Hic).
+rewrite Nat_sub_sub_distr; [ | easy ].
+now rewrite Nat.add_comm, Nat.add_sub.
+Qed.
+
+Theorem lap_mul_comm : rngl_mul_is_comm = true →
+  ∀ a b, lap_mul a b = lap_mul b a.
+Proof.
+intros Hic la lb.
+unfold lap_mul.
+destruct la as [| a]; [ now destruct lb | cbn ].
+rewrite <- Nat.add_succ_comm; cbn.
+rewrite (Nat.add_comm (length lb)).
+now rewrite lap_convol_mul_comm.
+Qed.
+
+Theorem lap_opt_mul_comm :
+  if rngl_mul_is_comm then ∀ a b : list T, lap_mul a b = lap_mul b a
+  else not_applicable.
+Proof.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
+apply (lap_mul_comm Hic).
+Qed.
+
+(* multiplication with 1 *)
+
+Theorem lap_opt_mul_1_r :
+  rngl_has_opp_or_subt = true →
+  if rngl_mul_is_comm then not_applicable else ∀ a, lap_mul a lap_one = a.
+Proof.
+intros Hos.
+destruct rngl_mul_is_comm; [ easy | ].
+apply (lap_mul_1_r Hos).
+Qed.
+
+(* *)
+
+Theorem lap_convol_mul_lap_add_l : ∀ la lb lc i len,
+  lap_convol_mul (lap_add la lb) lc i len = lap_convol_mul_add_l la lb lc i len.
+Proof.
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+f_equal.
+now rewrite list_nth_lap_add.
+Qed.
+
+Theorem lap_add_lap_convol_mul_l : ∀ la lb lc i len,
+  lap_add (lap_convol_mul la lc i len) (lap_convol_mul lb lc i len) =
+  lap_convol_mul_add_l la lb lc i len.
+Proof.
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ easy | cbn ].
+rewrite <- IHlen; f_equal.
+rewrite <- rngl_summation_add_distr.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+now rewrite rngl_mul_add_distr_r.
+Qed.
+
+Theorem lap_norm_mul_add_distr_r :
+  rngl_has_opp_or_subt = true →
+  ∀ la lb lc : list T,
+  lap_norm (lap_mul (lap_add la lb) lc) =
+  lap_norm (lap_add (lap_mul la lc) (lap_mul lb lc)).
+Proof.
+intros Hos la lb lc.
+unfold lap_mul.
+destruct la as [| a]; [ now do 2 rewrite lap_add_0_l | ].
+destruct lb as [| b]. {
+  cbn.
+  destruct lc as [| c]; [ easy | ].
+  cbn; rewrite Nat.sub_0_r.
+  rewrite rngl_add_0_r, app_nil_r, map2_length, repeat_length.
+  rewrite Nat.min_id, Nat.sub_0_r, lap_add_0_r.
+  now rewrite map2_rngl_add_0_r.
+}
+destruct lc as [| c]; [ easy | ].
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length (lap_add la' lb') + length lc' - 1) as labc.
+remember (length la' + length lc' - 1) as lac.
+remember (length lb' + length lc' - 1) as lbc.
+rewrite Heqlabc.
+remember (lap_add la' lb') as lab.
+symmetry in Heqlab.
+destruct lab as [| ab]; [ now subst la' lb' | ].
+rewrite <- Heqlab in Heqlabc |-*.
+rewrite (lap_convol_mul_more Hos) with (n := (lac + lbc)%nat). 2: {
+  subst; flia.
+}
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- lap_add_norm_idemp_l.
+rewrite (lap_convol_mul_more Hos) with (n := (labc + lbc)%nat); [ | now subst lac ].
+rewrite <- Heqlab.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_comm.
+rewrite <- lap_add_norm_idemp_l.
+rewrite Heqlbc.
+rewrite (lap_convol_mul_more Hos) with (n := (labc + lac)%nat); [ | flia ].
+rewrite lap_add_norm_idemp_l.
+rewrite <- Heqlbc.
+rewrite Nat.add_comm.
+rewrite lap_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite lap_convol_mul_lap_add_l.
+now rewrite lap_add_lap_convol_mul_l.
+Qed.
+
+Theorem lap_mul_add_distr_r :
+  rngl_has_opp_or_subt = true →
+  ∀ la lb lc,
+  lap_mul (lap_add la lb) lc = lap_add (lap_mul la lc) (lap_mul lb lc).
+Proof.
+intros Hos la lb lc.
+apply eq_lap_norm_eq_length. 2: {
+  destruct la as [| a]. {
+    rewrite lap_mul_0_l.
+    now do 2 rewrite lap_add_0_l.
+  }
+  destruct lb as [| b]. {
+    rewrite lap_mul_0_l.
+    now do 2 rewrite lap_add_0_r.
+  }
+  cbn.
+  destruct lc as [| c]; [ easy | ].
+  cbn; do 3 rewrite Nat.sub_0_r.
+  do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
+  rewrite lap_convol_mul_length.
+  do 2 rewrite map2_length.
+  do 4 rewrite app_length, repeat_length.
+  do 2 rewrite lap_convol_mul_length.
+  do 2 rewrite min_add_sub_max.
+  now rewrite Nat.add_max_distr_r.
+}
+apply (lap_norm_mul_add_distr_r Hos).
+Qed.
+
+Theorem lap_opt_mul_add_distr_r :
+  rngl_has_opp_or_subt = true →
+  if rngl_mul_is_comm then not_applicable
+  else
+    ∀ a b c, lap_mul (lap_add a b) c = lap_add (lap_mul a c) (lap_mul b c).
+Proof.
+intros Hos.
+destruct rngl_mul_is_comm; [ easy | ].
+apply (lap_mul_add_distr_r Hos).
+Qed.
+
+(* *)
+
+Theorem lap_opt_le_dec :
+  let rol := lap_ring_like_op in
+  if rngl_has_dec_le then ∀ a b, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
+  else not_applicable.
+Proof.
+intros rol; subst rol.
+destruct rngl_has_dec_le; [ | easy ].
+now intros; right; cbn.
+Qed.
+
+(* *)
+
+Theorem last_lap_convol_mul_last :
+  rngl_has_opp_or_subt = true →
+  ∀ la lb a b i len d,
+  len ≠ 0
+  → length la + length lb + 1 = i + len
+  → last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%L.
+Proof.
+intros Hos * Hlen Hlab.
+revert la lb i Hlab.
+induction len; intros; [ easy | clear Hlen ].
+cbn.
+destruct len. {
+  cbn.
+  rewrite rngl_summation_split3 with (j := length la); [ | flia Hlab ].
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
+  replace (i - length la) with (length lb) by flia Hlab.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite (nth_overflow (lb ++ [b])). 2: {
+      rewrite app_length; cbn; flia Hlab Hj.
+    }
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite (nth_overflow (la ++ [a])). 2: {
+      now rewrite app_length.
+    }
+    apply (rngl_mul_0_l Hos).
+  }
+  apply rngl_add_0_r.
+}
+rewrite IHlen; [ easy | easy | flia Hlab ].
+Qed.
+
+Theorem last_lap_mul :
+  rngl_has_opp_or_subt = true →
+  ∀ la lb,
+  last (lap_mul la lb) 0%L = (last la 0%L * last lb 0%L)%L.
+Proof.
+intros Hos *.
+unfold lap_mul.
+destruct la as [| a] using rev_ind. {
+  now symmetry; apply (rngl_mul_0_l Hos).
+}
+clear IHla.
+destruct lb as [| b] using rev_ind. {
+  cbn.
+  rewrite rngl_mul_0_r; [ | easy ].
+  now destruct (la ++ [a]).
+}
+clear IHlb.
+move b before a.
+remember (la ++ [a]) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ now apply app_eq_nil in Hlc | ].
+remember (lb ++ [b]) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
+rewrite <- Hlc, <- Hld.
+clear c d lc ld Hlc Hld.
+do 2 rewrite last_last.
+do 2 rewrite app_length.
+cbn.
+apply (last_lap_convol_mul_last Hos); flia.
+Qed.
+
+Theorem lap_opt_integral :
+  rngl_has_opp_or_subt = true →
+  let rol := lap_ring_like_op in
+  if rngl_is_integral then
+    ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
+  else not_applicable.
+Proof.
+intros Hos rol; subst rol.
+remember rngl_is_integral as it eqn:Hii; symmetry in Hii.
+destruct it; [ | easy ].
+intros la lb Hab.
+cbn in Hab.
+enough (H : la = [] ∨ lb = []). {
+  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
+  easy.
+  easy.
+}
+destruct la as [| a] using rev_ind; [ now left | clear IHla ].
+destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
+specialize (last_lap_mul Hos (la ++ [a]) (lb ++ [b])) as H2.
+do 2 rewrite last_last in H2.
+rewrite Hab in H2.
+symmetry in H2; cbn in H2.
+apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
+destruct H2 as [H2| H2]. {
+  subst a.
+  unfold lap_mul in Hab; cbn in Hab.
+  destruct la as [| a']; [ now destruct lb | ].
+  cbn in Hab.
+  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
+  now destruct lb.
+} {
+  subst b.
+  unfold lap_mul in Hab; cbn in Hab.
+  destruct la as [| a']; [ now destruct lb | ].
+  cbn in Hab.
+  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
+  now destruct lb.
+}
+Qed.
+
+(* *)
+
+Theorem lap_characteristic_prop :
+  let rol := lap_ring_like_op in
+  if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  else (∀ i : nat, 0 < i < 0 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 0 = 0%L.
+Proof.
+intros; subst rol.
+cbn - [ rngl_of_nat ].
+intros; cbn.
+now destruct (rngl_of_nat i).
+Qed.
+
 (* lap ring-like properties: actually not done because some axioms in laps
    are false *)
 
 (*
-Definition lap_ring_like_prop : ring_like_prop (list T) :=
+Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
+    ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -1344,12 +1655,12 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_add_comm := lap_add_comm;
      rngl_add_assoc := lap_add_assoc;
      rngl_add_0_l := lap_add_0_l;
-     rngl_mul_assoc := lap_mul_assoc;
-     rngl_mul_1_l := lap_mul_1_l;
-     rngl_mul_add_distr_l := lap_mul_add_distr_l;
+     rngl_mul_assoc := lap_mul_assoc Hos;
+     rngl_mul_1_l := lap_mul_1_l Hos;
+     rngl_mul_add_distr_l := lap_mul_add_distr_l Hos;
      rngl_opt_mul_comm := lap_opt_mul_comm;
-     rngl_opt_mul_1_r := lap_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
+     rngl_opt_mul_1_r := lap_opt_mul_1_r Hos;
+     rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r Hos;
      rngl_opt_add_opp_l := NA; (*lap_opt_add_opp_l;*)
      rngl_opt_add_sub := NA; (*lap_opt_has_no_subt _;*)
      rngl_opt_sub_add_distr := NA; (*lap_opt_has_no_subt _;*)
@@ -1358,7 +1669,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_inv_l := NA; (*lap_opt_has_no_inv _;*)
      rngl_opt_mul_inv_r := NA; (*lap_opt_has_no_inv_and _ _;*)
      rngl_opt_mul_div := NA; (*lap_opt_mul_div;*)
-     rngl_opt_mul_quot_r := lap_opt_mul_quot_r;
+     rngl_opt_mul_quot_r := NA; (*lap_opt_mul_quot_r;*)
      rngl_opt_eqb_eq := NA; (*lap_opt_eqb_eq;*)
      rngl_opt_le_dec := lap_opt_le_dec;
      rngl_opt_integral := lap_opt_integral;
@@ -1395,6 +1706,7 @@ Arguments lap_convol_mul_add_l {T ro} (al1 al2 al3)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_mul_add_distr_l {T ro rp} Heb Hos (la lb lc)%lap.
 Arguments lap_mul_assoc {T ro rp} Heb Hos (la lb lc)%lap.
+Arguments lap_mul_comm {T ro rp} Hic (a b)%lap.
 Arguments lap_mul_const_l {T ro rp} Hos a la%lap.
 Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
@@ -1408,6 +1720,7 @@ Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_sub {T ro} (la lb)%lap.
 Arguments lap_subt {T ro} (la lb)%lap.
+Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 Arguments map2_rngl_add_0_l {T ro rp} la%lap.
