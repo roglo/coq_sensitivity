@@ -12,9 +12,6 @@ Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
 Require Import LapPolyn.
 
-(* (lap : list as polynomial) *)
-(* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
-
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
 Definition has_polyn_prop T {ro : ring_like_op T} (la : list T) :=
