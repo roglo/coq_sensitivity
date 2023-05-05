@@ -1822,12 +1822,21 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     rewrite (Nat.add_comm (length la)), Nat.add_sub, Nat.min_id.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
-...
-Check map2_ext_in.
-About map2_ext_in.
-...
     apply map2_ext_in.
-    intros i j Hi Hj.
+    intros (i, j) Hi; cbn.
+    assert (H : i = j). {
+      remember (length lc) as len in Hi; clear Heqlen.
+      remember 0 as sta in Hi; clear Heqsta.
+      revert sta Hi.
+      induction len; intros; [ easy | ].
+      cbn in Hi.
+      destruct Hi as [Hi| Hi]; [ now injection Hi; intros; subst i | ].
+      now apply IHlen in Hi.
+    }
+    subst j.
+    apply in_combine_l in Hi.
+    apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+...
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
     rewrite (map2_nth _ _ _ 0%L 0%L); [ | | easy ]. 2: {
