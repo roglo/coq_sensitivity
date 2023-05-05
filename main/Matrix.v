@@ -1124,8 +1124,10 @@ rewrite (List_seq_cut3 i); [ cbn | now apply in_seq ].
 rewrite Nat.sub_0_r.
 rewrite map2_app_l.
 rewrite seq_length.
+(**)
 erewrite map2_ext_in. 2: {
-  intros j k Hj Hk; apply in_seq in Hj.
+  intros (j, a) Hj; cbn.
+  apply in_combine_l, in_seq in Hj.
   destruct Hj as (_, Hj); cbn in Hj.
   rewrite δ_ndiag; [ | flia Hj ].
   now rewrite rngl_mul_0_l.
@@ -1152,7 +1154,8 @@ cbn.
 rewrite δ_diag.
 rewrite rngl_mul_1_l.
 erewrite map2_ext_in. 2: {
-  intros j k Hj Hk; apply in_seq in Hj.
+  intros (j, a) Hj; cbn.
+  apply in_combine_l, in_seq in Hj.
   destruct Hj as (Hj, _).
   rewrite δ_ndiag; [ | flia Hj ].
   now rewrite rngl_mul_0_l.
@@ -1621,12 +1624,12 @@ intros.
 unfold "+"%M, "×"%M; cbn.
 f_equal.
 rewrite map2_map_l, map2_map_r, map_map2.
-apply map2_ext_in.
 rename a into c.
-intros la lb Hla Hlb.
+apply map2_ext_in.
+intros (la, lb) Hlab; cbn.
 rewrite map2_map_l, map2_map_r, map_map2.
 apply map2_ext_in.
-intros a b Ha Hb.
+intros (a, b) Hab; cbn.
 apply rngl_mul_add_distr_l.
 Qed.
 

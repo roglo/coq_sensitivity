@@ -478,7 +478,7 @@ intros al1 al2.
 unfold lap_add.
 rewrite map2_swap.
 apply map2_ext_in.
-intros * Ha Hb.
+intros (a, b) Hab; cbn.
 apply rngl_add_comm.
 Qed.
 
@@ -1803,6 +1803,58 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     assert (Hac : length la ≤ length lc) by now transitivity (length lb).
     rewrite (proj2 (Nat.sub_0_le _ _) Hac); cbn.
     rewrite app_nil_r.
+    rewrite Nat.max_r; [ | flia Hbc ].
+    rewrite Nat.min_r; [ | flia Hab ].
+    rewrite (map2_map2_seq_r _ 0%L).
+    rewrite map2_length, app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+    rewrite (map2_map2_seq_l _ 0%L).
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    symmetry.
+    rewrite (map2_map2_seq_r _ 0%L).
+    rewrite (map2_map2_seq_l _ 0%L).
+    rewrite app_length, map2_length, app_length.
+    do 2 rewrite repeat_length.
+    rewrite (Nat.add_sub_assoc (length la)); [ | easy ].
+    rewrite (Nat.add_comm (length la)), Nat.add_sub, Nat.min_id.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+...
+Check map2_ext_in.
+About map2_ext_in.
+...
+    apply map2_ext_in.
+    intros i j Hi Hj.
+    apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+    apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+    rewrite (map2_nth _ _ _ 0%L 0%L); [ | | easy ]. 2: {
+      rewrite app_length, repeat_length.
+      now rewrite Nat.add_comm, Nat.sub_add.
+    }
+    destruct (lt_dec i (length la)) as [Hia| Hia]. {
+      rewrite app_nth1. 2: {
+        rewrite map2_length, app_length, repeat_length.
+        rewrite Nat.add_sub_assoc; [ | easy ].
+        rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+        now apply (lt_le_trans _ (length la)).
+      }
+      rewrite app_nth1; [ | easy ].
+      rewrite (map2_nth _ _ _ 0%L 0%L); cycle 1. {
+        rewrite app_length.
+        apply (lt_le_trans _ (length la)); [ easy | ].
+        apply Nat.le_add_r.
+      } {
+        now apply (lt_le_trans _ (length la)).
+      }
+      rewrite app_nth1; [ | easy ].
+      specialize (rngl_sub_add_distr Hos) as H1.
+      unfold rngl_sub in H1.
+      rewrite Hop, Hsu in H1.
+      rewrite <- H1.
+      f_equal; f_equal.
 ...
 
 (* lap ring-like properties *)

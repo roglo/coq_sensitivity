@@ -588,6 +588,42 @@ split. {
 Qed.
 
 Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
+  (∀ ab, ab ∈ combine la lb → f (fst ab) (snd ab) = g (fst ab) (snd ab))
+  → map2 f la lb = map2 g la lb.
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | ].
+f_equal. {
+  apply (Hab _ (or_introl eq_refl)).
+}
+apply IHla.
+intros i Hi.
+now apply Hab; right.
+Qed.
+
+(*
+Theorem map2_ext_in : ∀ A B C da db (f g : A → B → C) la lb,
+  (∀ i, i < min (length la) (length lb)
+   → f (nth i la da) (nth i lb db) = g (nth i la da) (nth i lb db))
+  → map2 f la lb = map2 g la lb.
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | ].
+specialize (Hab 0) as H; cbn in H; rewrite H; [ clear H | easy ].
+f_equal.
+apply IHla.
+intros i Hi.
+specialize (Hab (S i)) as H; cbn in H; apply H.
+now apply Nat.succ_lt_mono in Hi.
+Qed.
+*)
+
+(*
+Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
   (∀ a b, a ∈ la → b ∈ lb → f a b = g a b) → map2 f la lb = map2 g la lb.
 Proof.
 intros * Hab.
@@ -599,6 +635,7 @@ apply IHla.
 intros a' b' Ha' Hb'.
 now apply Hab; right.
 Qed.
+*)
 
 Theorem map2_diag : ∀ A B (f : A → A → B) la,
   map2 f la la = map (λ i, f i i) la.
@@ -699,8 +736,10 @@ rewrite Nat.add_shuffle0, Nat.add_sub; f_equal.
 rewrite IHlen.
 rewrite <- seq_shift.
 rewrite map2_map_l.
+clear a.
 apply map2_ext_in.
-intros; f_equal; flia.
+intros (i, a) Hia; cbn.
+f_equal; flia.
 Qed.
 
 Theorem map2_map_min :

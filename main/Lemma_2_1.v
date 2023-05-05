@@ -188,28 +188,32 @@ do 3 rewrite map2_map_r.
 do 2 rewrite map2_map_l.
 f_equal. {
   rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
-    intros i j Hi Hj.
+    intros (i, j) Hi; cbn.
+    apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
     rewrite rngl_mul_0_r; [ | easy ].
     now apply rngl_mul_0_l.
   }
   symmetry.
   rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
-    intros i j Hi Hj.
+    intros (i, j) Hi.
+    apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
     now apply rngl_mul_0_l.
   }
   easy.
 } {
   rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
-    intros i j Hi Hj.
+    intros (i, j) Hi; cbn.
+    apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
     rewrite rngl_mul_0_r; [ | easy ].
     now apply rngl_mul_0_l.
   }
   symmetry.
   rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
-    intros i j Hi Hj.
+    intros (i, j) Hi; cbn.
+    apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
     now apply rngl_mul_0_l.
   }
