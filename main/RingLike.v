@@ -1765,6 +1765,35 @@ rewrite rngl_add_0_r in H1.
 now apply (rngl_eq_mul_0_r Hos Hii) in Haa.
 Qed.
 
+(* *)
+
+Theorem rngl_pow_0_l :
+  rngl_has_opp_or_subt = true →
+  ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
+Proof.
+intros Hos *.
+destruct n; [ easy | cbn ].
+apply (rngl_mul_0_l Hos).
+Qed.
+
+Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
+Proof. easy. Qed.
+
+(* *)
+
+Theorem rngl_has_subt_has_no_opp :
+  rngl_has_subt = true
+  → rngl_has_opp = false.
+Proof.
+intros * Hsu.
+unfold rngl_has_subt in Hsu.
+unfold rngl_has_opp.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+(* *)
+
 Record in_charac_0_field :=
   { cf_mul_is_comm : rngl_mul_is_comm = true;
     cf_has_opp : rngl_has_opp = true;
@@ -1806,18 +1835,6 @@ Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
      Rsub_def x y := eq_sym (fold_rngl_sub Hop x y);
      Ropp_def := rngl_Ropp_def |}.
 
-Theorem rngl_pow_0_l :
-  rngl_has_opp_or_subt = true →
-  ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
-Proof.
-intros Hos *.
-destruct n; [ easy | cbn ].
-apply (rngl_mul_0_l Hos).
-Qed.
-
-Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
-Proof. easy. Qed.
-
 End a.
 
 (* code to be added to be able to use the Coq tactic "ring"
@@ -1848,6 +1865,7 @@ Arguments rngl_characteristic_1 {T ro rp} Hos _ x%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
 Arguments rngl_eqb_eq {T ro rp} Heb (a b)%L.
 Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
+Arguments rngl_has_subt_has_no_opp {T ro} Hsu.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin a%L b%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
@@ -1863,3 +1881,4 @@ Arguments rngl_sub_0_r {T ro rp} Hos a%L.
 Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
 Arguments rngl_subt {T ro} (a b)%L.
 Arguments rngl_subt_0_r {T ro rp} Hsu a%L.
+

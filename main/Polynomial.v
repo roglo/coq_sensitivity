@@ -3195,59 +3195,45 @@ unfold lap_sub in H3.
 now rewrite Hop, Hsu, Hab, Nat.sub_diag, app_nil_r in H3.
 Qed.
 
+Theorem rngl_has_opp_rngl_polyn_has_opp :
+  let rop := polyn_ring_like_op in
+  @rngl_has_opp T ro = @rngl_has_opp (polyn T) rop.
+Proof.
+intros.
+unfold rngl_has_opp; cbn.
+unfold polyn_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem rngl_has_subt_rngl_polyn_has_subt :
+  let rop := polyn_ring_like_op in
+  @rngl_has_subt T ro = @rngl_has_subt (polyn T) rop.
+Proof.
+intros.
+unfold rngl_has_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
   else not_applicable.
 Proof.
-intros; subst rop.
-remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+intros.
+remember rngl_has_subt as su eqn:Hsup; symmetry in Hsup.
 destruct su; [ | easy ].
+specialize (rngl_has_subt_has_no_opp Hsup) as Hopp.
+specialize rngl_has_opp_rngl_polyn_has_opp as Hop; cbn in Hop.
+specialize rngl_has_subt_rngl_polyn_has_subt as Hsu; cbn in Hsu.
+fold rop in Hop; rewrite Hopp in Hop.
+fold rop in Hsu; rewrite Hsup in Hsu.
 intros.
 apply eq_polyn_eq; cbn.
 unfold rngl_sub.
-rewrite Hsu.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  move Hsu at bottom.
-  unfold polyn_ring_like_op in Hop, Hsu.
-  cbn in Hop, Hsu.
-  unfold rngl_has_opp in Hop.
-  unfold rngl_has_subt in Hsu.
-  cbn in Hop, Hsu.
-  unfold polyn_opt_opp_or_subt in Hop, Hsu.
-  cbn in Hop, Hsu.
-  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
-}
-rename Hop into Hopp.
-rename Hsu into Hsup.
-move Hopp after Hsup.
-assert (Hop : @rngl_has_opp T ro = false). {
-  unfold rngl_has_opp_or_subt in Hos.
-  unfold rngl_has_subt in Hsup.
-  unfold rngl_has_opp.
-  unfold bool_of_option in Hos.
-  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
-  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
-  clear - Hos Hsup.
-  destruct rngl_opt_opp_or_subt; [ | easy ].
-  now destruct s.
-}
-move Hop before Hsup.
-assert (Hsu : @rngl_has_subt T ro = true). {
-  unfold rngl_has_opp_or_subt in Hos.
-  unfold rngl_has_subt in Hsup.
-  unfold rngl_has_subt.
-  unfold bool_of_option in Hos.
-  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
-  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
-  clear - Hos Hsup.
-  destruct rngl_opt_opp_or_subt; [ | easy ].
-  now destruct s.
-}
-move Hsu before Hop.
-specialize (rngl_add_sub Hos) as H1.
+rewrite Hopp, Hsup.
 unfold rngl_subt; cbn.
 unfold polyn_opt_opp_or_subt.
 remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
@@ -3263,11 +3249,11 @@ destruct os as [opp| subt]. {
   now rewrite Hos' in Hop.
 }
 unfold polyn_subt.
-cbn - [ lap_subt ].
+(**)
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
-cbn - [ lap_norm lap_add ].
+cbn - [ lap_norm lap_add lap_subt ].
 destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
     unfold has_polyn_prop in pb |-*.
@@ -3285,7 +3271,8 @@ destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   }
   specialize (lap_opt_add_sub Hsu) as H2.
   unfold lap_sub in H2.
-  rewrite Hop, Hsu in H2; rewrite H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2.
   rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
   now apply (has_polyn_prop_lap_norm Heb).
 }
@@ -3397,6 +3384,86 @@ Theorem polyn_opt_sub_add_distr :
   if rngl_has_subt then ∀ a b c : polyn T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
+intros.
+remember rngl_has_subt as su eqn:Hsup; symmetry in Hsup.
+destruct su; [ | easy ].
+specialize (rngl_has_subt_has_no_opp Hsup) as Hopp.
+specialize rngl_has_opp_rngl_polyn_has_opp as Hop; cbn in Hop.
+specialize rngl_has_subt_rngl_polyn_has_subt as Hsu; cbn in Hsu.
+fold rop in Hop; rewrite Hopp in Hop.
+fold rop in Hsu; rewrite Hsup in Hsu.
+intros.
+apply eq_polyn_eq; cbn.
+unfold rngl_sub.
+rewrite Hopp, Hsup.
+unfold rngl_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]. 2: {
+  unfold rngl_has_opp_or_subt in Hos.
+  clear - Hos Hos'.
+  now rewrite Hos' in Hos.
+}
+destruct os as [opp| subt]. {
+  unfold rngl_has_opp in Hop; cbn in Hop.
+  unfold polyn_opt_opp_or_subt in Hop.
+  exfalso; clear - Hop Hos'.
+  now rewrite Hos' in Hop.
+}
+unfold polyn_subt.
+(**)
+destruct a as (la, pa).
+destruct b as (lb, pb).
+destruct c as (lc, pc).
+move lb before la; move lc before lb.
+cbn - [ lap_norm lap_add lap_subt ].
+destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
+...
+rewrite Hopp, Hsup.
+assert (Hop : @rngl_has_opp T ro = false). {
+  unfold rngl_has_opp_or_subt in Hos.
+  unfold rngl_has_subt in Hsup.
+  unfold rngl_has_opp.
+  unfold bool_of_option in Hos.
+  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
+  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
+  clear - Hos Hsup.
+  destruct rngl_opt_opp_or_subt; [ | easy ].
+  now destruct s.
+}
+move Hop before Hsup.
+assert (Hsu : @rngl_has_subt T ro = true). {
+  unfold rngl_has_opp_or_subt in Hos.
+  unfold rngl_has_subt in Hsup.
+  unfold rngl_has_subt.
+  unfold bool_of_option in Hos.
+  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
+  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
+  clear - Hos Hsup.
+  destruct rngl_opt_opp_or_subt; [ | easy ].
+  now destruct s.
+}
+move Hsu before Hop.
+...
+specialize rngl_opt_sub_add_distr as H1.
+rewrite Hsu in H1.
+(**)
+unfold rngl_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+generalize Hos; intros H.
+unfold rngl_has_opp_or_subt in H.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ easy | clear H ].
+cbn - [ lap_norm ].
+destruct a as (la, pa).
+destruct b as (lb, pb).
+destruct c as (lc, pc).
+move lb before la; move lc before lb.
+cbn - [ lap_norm lap_add ].
+...
+destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
+  rewrite (has_polyn_prop_lap_norm Heb (lb + lc)). 2: {
 ...
 
 Definition polyn_opt_has_no_subt (_ : True) := 12.
