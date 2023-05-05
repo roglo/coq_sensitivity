@@ -3022,85 +3022,7 @@ split; intros Ha. {
 }
 Qed.
 
-Theorem map2_rngl_subt_diag :
-  ∀ la, map2 rngl_subt la la = repeat 0%L (length la).
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-f_equal; [ | apply IHla ].
-now apply rngl_subt_diag.
-Qed.
-
 (**)
-
-Theorem lap_opt_add_sub :
-  rngl_has_subt = true →
-  ∀ la lb : list T,
-  (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
-Proof.
-intros Hsu *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  move Hsu at bottom.
-  unfold rngl_has_opp in Hop.
-  unfold rngl_has_subt in Hsu.
-  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
-}
-move Hop after Hsu.
-clear Hos.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; right.
-}
-move Hos after Heb.
-unfold lap_sub.
-rewrite Hop, Hsu.
-unfold lap_add, lap_subt.
-rewrite map2_length.
-do 2 rewrite app_length, repeat_length.
-rewrite min_add_sub_max.
-rewrite <- Nat.sub_min_distr_l.
-rewrite Nat.sub_diag, Nat.min_0_r.
-rewrite <- Nat.sub_max_distr_r.
-rewrite Nat.sub_diag, Nat.max_0_r.
-destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
-  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
-  do 2 rewrite app_nil_r.
-  revert lb Hab.
-  induction la as [| a]; intros; cbn. {
-    rewrite Nat.sub_0_r.
-    rewrite map2_rngl_add_0_l.
-    now apply map2_rngl_subt_diag.
-  }
-  destruct lb as [| b]; [ easy | cbn ].
-  cbn in Hab.
-  apply Nat.succ_le_mono in Hab.
-  f_equal; [ | now apply IHla ].
-  specialize (rngl_add_sub Hos) as H1.
-  unfold rngl_sub in H1.
-  rewrite Hop, Hsu in H1.
-  apply H1.
-} {
-  apply Nat.nle_gt, Nat.lt_le_incl in Hab.
-  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
-  do 2 rewrite app_nil_r.
-  revert lb Hab.
-  induction la as [| a]; intros; [ easy | cbn ].
-  destruct lb as [| b]; cbn. {
-    rewrite rngl_add_0_r.
-    rewrite (rngl_subt_0_r Hsu); f_equal.
-    rewrite map2_rngl_add_0_r.
-    apply (map2_rngl_subt_0_r Hsu).
-  }
-  cbn in Hab.
-  apply Nat.succ_le_mono in Hab.
-  f_equal; [ | now apply IHla ].
-  specialize (rngl_add_sub Hos) as H1.
-  unfold rngl_sub in H1.
-  rewrite Hop, Hsu in H1.
-  apply H1.
-}
-Qed.
 
 Theorem lap_subt_app_r :
   ∀ la lb lc,
@@ -3417,13 +3339,30 @@ destruct b as (lb, pb).
 destruct c as (lc, pc).
 move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
-destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
+destruct (lt_dec (length lb) (length lc)) as [Hbc| Hbc]. {
+  rewrite (has_polyn_prop_lap_norm Heb (lb + lc)). 2: {
+    unfold has_polyn_prop in pb |-*.
+    apply Bool.orb_true_iff in pc.
+    apply Bool.orb_true_iff; right.
+    destruct lc as [| c] using rev_ind; [ easy | clear IHlc ].
+    rewrite app_length, Nat.add_1_r in Hbc.
+    apply -> Nat.lt_succ_r in Hbc.
+    rewrite lap_add_app_r; [ | easy ].
+    destruct pc as [pc| pc]. {
+      apply is_empty_list_empty in pc.
+      now destruct lc.
+    }
+    now rewrite last_last in pc |-*.
+  }
 ...
-  ============================
-  lap_norm (lap_subt (lap_norm (la + lb)) lb) = la
-  ============================
-  lap_norm (lap_subt la (lap_norm (lb + lc))) =
-  lap_norm (lap_subt (lap_norm (lap_subt la lb)) lc)
+  specialize (lap_opt_sub_add_distr Hsu) as H2.
+...
+  specialize (lap_opt_add_sub Hsu) as H2.
+  unfold lap_sub in H2.
+  rewrite Hop, Hsu in H2.
+  rewrite H2.
+  rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
+  now apply (has_polyn_prop_lap_norm Heb).
 ...
 specialize rngl_opt_sub_add_distr as H1.
 rewrite Hsu in H1.

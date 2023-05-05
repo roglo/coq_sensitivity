@@ -1688,6 +1688,123 @@ destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
+(* *)
+
+Theorem map2_rngl_subt_diag :
+  rngl_has_opp_or_subt = true →
+  ∀ la, map2 rngl_subt la la = repeat 0%L (length la).
+Proof.
+intros Hos *.
+induction la as [| a]; [ easy | cbn ].
+f_equal; [ | apply IHla ].
+now apply rngl_subt_diag.
+Qed.
+
+Theorem lap_opt_add_sub :
+  rngl_has_subt = true →
+  ∀ la lb : list T,
+  (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
+Proof.
+intros Hsu *.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  move Hsu at bottom.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
+}
+move Hop after Hsu.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+move Hos after Heb.
+unfold lap_sub.
+rewrite Hop, Hsu.
+unfold lap_add, lap_subt.
+rewrite map2_length.
+do 2 rewrite app_length, repeat_length.
+rewrite min_add_sub_max.
+rewrite <- Nat.sub_min_distr_l.
+rewrite Nat.sub_diag, Nat.min_0_r.
+rewrite <- Nat.sub_max_distr_r.
+rewrite Nat.sub_diag, Nat.max_0_r.
+destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  do 2 rewrite app_nil_r.
+  revert lb Hab.
+  induction la as [| a]; intros; cbn. {
+    rewrite Nat.sub_0_r.
+    rewrite map2_rngl_add_0_l.
+    now apply map2_rngl_subt_diag.
+  }
+  destruct lb as [| b]; [ easy | cbn ].
+  cbn in Hab.
+  apply Nat.succ_le_mono in Hab.
+  f_equal; [ | now apply IHla ].
+  specialize (rngl_add_sub Hos) as H1.
+  unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1.
+  apply H1.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hab.
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  do 2 rewrite app_nil_r.
+  revert lb Hab.
+  induction la as [| a]; intros; [ easy | cbn ].
+  destruct lb as [| b]; cbn. {
+    rewrite rngl_add_0_r.
+    rewrite (rngl_subt_0_r Hsu); f_equal.
+    rewrite map2_rngl_add_0_r.
+    apply (map2_rngl_subt_0_r Hsu).
+  }
+  cbn in Hab.
+  apply Nat.succ_le_mono in Hab.
+  f_equal; [ | now apply IHla ].
+  specialize (rngl_add_sub Hos) as H1.
+  unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1.
+  apply H1.
+}
+Qed.
+
+Theorem lap_opt_sub_add_distr :
+  rngl_has_subt = true →
+  ∀ la lb lc : list T, (la - (lb + lc))%lap = (la - lb - lc)%lap.
+Proof.
+intros Hsu *.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  move Hsu at bottom.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_has_subt in Hsu.
+  destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
+}
+move Hop after Hsu.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+move Hos after Heb.
+unfold lap_sub.
+rewrite Hop, Hsu.
+unfold lap_add, lap_subt.
+do 2 rewrite map2_length.
+do 4 rewrite app_length, repeat_length.
+do 2 rewrite min_add_sub_max.
+do 2 rewrite <- Nat.sub_min_distr_l.
+do 2 rewrite <- Nat.sub_max_distr_r.
+destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
+  rewrite (proj2 (Nat.sub_0_le _ _) Hab).
+  do 2 rewrite app_nil_r.
+  destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
+    rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
+    rewrite app_nil_r.
+    assert (Hac : length la ≤ length lc) by now transitivity (length lb).
+    rewrite (proj2 (Nat.sub_0_le _ _) Hac); cbn.
+    rewrite app_nil_r.
+...
+
 (* lap ring-like properties *)
 
 Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
@@ -1763,6 +1880,7 @@ Arguments lap_mul_const_r {T ro rp} Hos a la%lap.
 Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
+Arguments lap_opt_add_sub {T ro rp} Hsu (la lb)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.
@@ -1772,3 +1890,4 @@ Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments strip_0s_length_le {T ro} l%list.
+
