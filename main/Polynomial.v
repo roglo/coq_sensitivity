@@ -1079,32 +1079,6 @@ Qed.
 
 (* *)
 
-Theorem lap_opt_has_no_inv : ∀ P,
-  let _ := lap_ring_like_op in
-  if rngl_has_inv then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_inv; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]; [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
-now destruct rngl_opt_inv_or_quot.
-Qed.
-
-Theorem lap_opt_has_no_inv_and : ∀ e P,
-  let _ := lap_ring_like_op in
-  if (rngl_has_inv && e)%bool then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_inv; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
-now destruct rngl_opt_inv_or_quot.
-Qed.
-
-(* *)
-
 Theorem map_opp_repeat : ∀ (x : T) n,
   map rngl_opp (repeat x n) = repeat (rngl_opp x) n.
 Proof.

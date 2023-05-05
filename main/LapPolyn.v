@@ -416,16 +416,15 @@ Qed.
 
 Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
-  match rngl_opt_opp_or_subt with
-  | Some (inl _) => Some (inl lap_opp)
-  | Some (inr _) => Some (inr lap_subt)
-  | None => None
-  end.
+  None.
 
 (* lap quotient *)
 
 Definition lap_opt_inv_or_quot :
   option ((list T → list T) + (list T → list T → list T)) :=
+(**)
+  None.
+(*
   match Sumbool.sumbool_of_bool rngl_has_opp with
   | left Hop =>
       match Sumbool.sumbool_of_bool rngl_has_inv with
@@ -438,6 +437,7 @@ Definition lap_opt_inv_or_quot :
       end
   | right _ => None
   end.
+*)
 
 (**)
 
@@ -466,7 +466,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_mul := lap_mul;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
+     rngl_opt_eqb := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
      rngl_opt_le := None |}.
 
 (* commutativity of addition *)
@@ -1662,10 +1662,34 @@ intros; cbn.
 now destruct (rngl_of_nat i).
 Qed.
 
-(* lap ring-like properties: actually not done because some axioms in laps
-   are false *)
+(* *)
 
-(*
+Theorem lap_opt_has_no_inv : ∀ P,
+  let _ := lap_ring_like_op in
+  if rngl_has_inv then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_inv; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
+now destruct rngl_opt_inv_or_quot.
+Qed.
+
+Theorem lap_opt_has_no_inv_and : ∀ e P,
+  let _ := lap_ring_like_op in
+  if (rngl_has_inv && e)%bool then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_inv; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
+now destruct rngl_opt_inv_or_quot.
+Qed.
+
+(* lap ring-like properties *)
+
 Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
@@ -1683,18 +1707,18 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_mul_comm := lap_opt_mul_comm;
      rngl_opt_mul_1_r := lap_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r Hos;
-     rngl_opt_add_opp_l := NA; (*lap_opt_add_opp_l;*)
-     rngl_opt_add_sub := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_sub_add_distr := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_sub_distr_l := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_sub_distr_r := NA; (*lap_opt_has_no_subt _;*)
-     rngl_opt_mul_inv_l := NA; (*lap_opt_has_no_inv _;*)
-     rngl_opt_mul_inv_r := NA; (*lap_opt_has_no_inv_and _ _;*)
-     rngl_opt_mul_div := NA; (*lap_opt_mul_div;*)
-     rngl_opt_mul_quot_r := NA; (*lap_opt_mul_quot_r;*)
-     rngl_opt_eqb_eq := NA; (*lap_opt_eqb_eq;*)
+     rngl_opt_add_opp_l := NA;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
+     rngl_opt_mul_sub_distr_l := NA;
+     rngl_opt_mul_sub_distr_r := NA;
+     rngl_opt_mul_inv_l := lap_opt_has_no_inv False;
+     rngl_opt_mul_inv_r := lap_opt_has_no_inv_and false False;
+     rngl_opt_mul_div := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := lap_opt_le_dec;
-     rngl_opt_integral := lap_opt_integral;
+     rngl_opt_integral := lap_opt_integral Hos;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := lap_characteristic_prop;
      rngl_opt_le_refl := NA;
@@ -1705,7 +1729,6 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-*)
 
 (* roots *)
 
