@@ -1881,4 +1881,3 @@ Arguments rngl_sub_0_r {T ro rp} Hos a%L.
 Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
 Arguments rngl_subt {T ro} (a b)%L.
 Arguments rngl_subt_0_r {T ro rp} Hsu a%L.
-
