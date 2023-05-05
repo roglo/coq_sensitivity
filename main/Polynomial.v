@@ -3419,31 +3419,11 @@ move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
 destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
 ...
-rewrite Hopp, Hsup.
-assert (Hop : @rngl_has_opp T ro = false). {
-  unfold rngl_has_opp_or_subt in Hos.
-  unfold rngl_has_subt in Hsup.
-  unfold rngl_has_opp.
-  unfold bool_of_option in Hos.
-  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
-  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
-  clear - Hos Hsup.
-  destruct rngl_opt_opp_or_subt; [ | easy ].
-  now destruct s.
-}
-move Hop before Hsup.
-assert (Hsu : @rngl_has_subt T ro = true). {
-  unfold rngl_has_opp_or_subt in Hos.
-  unfold rngl_has_subt in Hsup.
-  unfold rngl_has_subt.
-  unfold bool_of_option in Hos.
-  unfold polyn_ring_like_op in Hsup; cbn in Hsup.
-  unfold polyn_opt_opp_or_subt in Hsup; cbn in Hsup.
-  clear - Hos Hsup.
-  destruct rngl_opt_opp_or_subt; [ | easy ].
-  now destruct s.
-}
-move Hsu before Hop.
+  ============================
+  lap_norm (lap_subt (lap_norm (la + lb)) lb) = la
+  ============================
+  lap_norm (lap_subt la (lap_norm (lb + lc))) =
+  lap_norm (lap_subt (lap_norm (lap_subt la lb)) lc)
 ...
 specialize rngl_opt_sub_add_distr as H1.
 rewrite Hsu in H1.
