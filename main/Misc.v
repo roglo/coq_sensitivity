@@ -1881,6 +1881,17 @@ rewrite Nat.add_succ_r; cbn.
 apply IHla.
 Qed.
 
+Theorem List_nth_app_repeat_r :
+  ∀ A (d : A) i n la,
+  nth i (la ++ repeat d n) d = nth i la d.
+Proof.
+intros.
+destruct (lt_dec i (length la)) as [Hila| Hila]; [ now apply app_nth1 | ].
+apply Nat.nlt_ge in Hila.
+rewrite app_nth2; [ | easy ].
+now rewrite nth_repeat, nth_overflow.
+Qed.
+
 Theorem List_app_eq_app' :
   ∀ (X : Type) (x1 x2 y1 y2 : list X),
     length x1 = length y1
