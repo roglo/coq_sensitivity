@@ -1904,7 +1904,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   apply Nat.nle_gt in Hbc.
   apply Nat.lt_le_incl in Hbc.
   rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
-  rewrite app_nil_r.
+  rewrite Nat.min_0_r, app_nil_r.
   rewrite (map2_map2_seq_r _ 0%L).
   rewrite map2_length, app_length, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
@@ -1981,6 +1981,9 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   apply Nat.nle_gt in Hca.
+  apply Nat.lt_le_incl in Hca.
+  rewrite (proj2 (Nat.sub_0_le _ _) Hca); cbn.
+  rewrite app_nil_r.
 ...
 
 (* lap ring-like properties *)
