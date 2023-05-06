@@ -1913,7 +1913,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite app_length, repeat_length.
   destruct (le_dec (length lc) (length la)) as [Hca| Hca]. {
     rewrite (proj2 (Nat.sub_0_le _ _) Hca); cbn.
-    rewrite app_nil_r.
+    rewrite Nat.max_0_r, app_nil_r.
     symmetry.
     rewrite (map2_map2_seq_l _ 0%L).
     rewrite (map2_map2_seq_r _ 0%L).
@@ -1922,15 +1922,11 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
     rewrite app_length, repeat_length.
     symmetry.
-    rewrite <- Nat.add_max_distr_l, Nat.add_0_r.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
     rewrite <- Nat.add_max_distr_l.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
-    rewrite (Nat.max_l (length lb)); [ | easy ].
     rewrite (Nat.max_r (length la)); [ | easy ].
     apply map2_ext_in.
     intros (i, j) Hi; cbn.
@@ -1970,17 +1966,21 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
       apply H1.
     }
     apply Nat.nlt_ge in Hilc.
-...
-    rewrite app_nth2; [ | ].
-    rewrite nth_repeat.
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ | | easy ]. 2: {
+    rewrite (map2_nth _ _ _ 0%L 0%L); [ | easy | ]. 2: {
       rewrite app_length, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub.
     }
-    destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-      rewrite app_nth1; [ | easy ].
-      rewrite app_nth1. 2: {
+    rewrite (app_nth2 lc); [ | easy ].
+    rewrite (app_nth2 lc); [ | easy ].
+    do 2 rewrite nth_repeat.
+    rewrite rngl_add_0_r, (rngl_subt_0_r Hsu).
+    rewrite (map2_nth _ _ _ 0%L 0%L); [ easy | | easy ].
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  apply Nat.nle_gt in Hca.
 ...
 
 (* lap ring-like properties *)
