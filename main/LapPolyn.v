@@ -2021,7 +2021,27 @@ destruct (le_dec (length la) (length lc)) as [Hac| Hac]. {
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-  rewrite (map2_nth 0%L 0%L); [ | | easy ].
+  rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  specialize (rngl_sub_add_distr Hos) as H1.
+  unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1.
+  rewrite H1.
+  f_equal. (* c'est osé, ça *)
+...
+  rewrite (app_nth2 (map2 _ _ _)); cycle 1. {
+    rewrite map2_length, app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+...
+  rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
 ...
   destruct (lt_dec i (length la)) as [Hila| Hila]. {
     rewrite app_nth1; [ | easy ].
