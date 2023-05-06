@@ -3333,12 +3333,21 @@ destruct os as [opp| subt]. {
   now rewrite Hos' in Hop.
 }
 unfold polyn_subt.
-(**)
 destruct a as (la, pa).
 destruct b as (lb, pb).
 destruct c as (lc, pc).
 move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
+(**)
+Theorem lap_norm_subt_norm_l :
+  ∀ la lb,
+  lap_norm (lap_subt (lap_norm la) lb) =
+  lap_norm (lap_subt la lb).
+Proof.
+intros.
+... ...
+rewrite lap_norm_subt_norm_l.
+...
 destruct (lt_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   rewrite (has_polyn_prop_lap_norm Heb (lb + lc)). 2: {
     unfold has_polyn_prop in pb |-*.
