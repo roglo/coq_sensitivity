@@ -2031,7 +2031,64 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
 }
 apply Nat.nle_gt in Hbc.
 apply Nat.lt_le_incl in Hbc.
-...
+rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
+rewrite Nat.add_0_r, app_nil_r.
+rewrite Nat.add_sub_assoc; [ | easy ].
+rewrite (Nat.add_comm (length lc)), Nat.add_sub, Nat.min_id.
+rewrite Nat.min_l; [ | now apply Nat.sub_le_mono_l ].
+rewrite Nat.add_sub_assoc; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+apply map2_ext_in.
+intros (i, j) Hi; cbn.
+assert (H : i = j) by now apply in_combine_same in Hi.
+subst j.
+apply in_combine_l in Hi.
+apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+do 2 rewrite List_nth_app_repeat_r.
+symmetry.
+rewrite (map2_nth 0%L 0%L ); [ | easy | ]. 2: {
+  rewrite app_length, repeat_length.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+rewrite List_nth_app_repeat_r.
+destruct (lt_dec i (length lc)) as [Hilc| Hilc]. {
+  assert (Hilb : i < length lb) by now apply (lt_le_trans _ (length lc)).
+  rewrite (map2_nth 0%L 0%L ); [ | easy | ]. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  rewrite List_nth_app_repeat_r.
+  specialize (rngl_sub_add_distr Hos) as H1.
+  unfold rngl_sub in H1.
+  rewrite Hop, Hsu in H1.
+  apply H1.
+}
+apply Nat.nlt_ge in Hilc.
+rewrite (nth_overflow lc); [ | easy ].
+rewrite (rngl_subt_0_r Hsu).
+destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
+  rewrite (map2_nth 0%L 0%L ); [ | easy | ]. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  rewrite List_nth_app_repeat_r.
+  rewrite (nth_overflow lc); [ | easy ].
+  now rewrite rngl_add_0_r.
+}
+apply Nat.nlt_ge in Hilb.
+rewrite (nth_overflow lb); [ | easy ].
+rewrite (rngl_subt_0_r Hsu).
+rewrite (nth_overflow (map2 _ _ _)). 2: {
+  rewrite map2_length, app_length, repeat_length.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+}
+apply (rngl_subt_0_r Hsu).
+Qed.
 
 (* lap ring-like properties *)
 
@@ -2109,6 +2166,7 @@ Arguments lap_mul_1_l {T ro rp} Hos la%lap.
 Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_opt_add_sub {T ro rp} Hsu (la lb)%lap.
+Arguments lap_opt_sub_add_distr {T ro rp} Hsu (la lb lc)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.

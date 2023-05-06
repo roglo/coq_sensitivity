@@ -2971,7 +2971,7 @@ revert i lb Hab.
 induction la as [| a]; intros; cbn. {
   rewrite Nat.sub_0_r, app_nil_r.
   destruct (lt_dec i (length lb)) as [Hil| Hil]. {
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ | now rewrite repeat_length | easy ].
+    rewrite (map2_nth 0%L 0%L); [ | now rewrite repeat_length | easy ].
     rewrite <- Hab, List_nth_nil.
     rewrite List_nth_repeat.
     destruct (lt_dec _ _) as [H| H]; [ clear H | easy ].
@@ -3354,8 +3354,10 @@ destruct (lt_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     }
     now rewrite last_last in pc |-*.
   }
-...
-  specialize (lap_opt_sub_add_distr Hsu) as H2.
+  specialize (lap_opt_sub_add_distr Hsu) as H1.
+  unfold lap_sub in H1.
+  rewrite Hop, Hsu in H1.
+  rewrite H1.
 ...
   specialize (lap_opt_add_sub Hsu) as H2.
   unfold lap_sub in H2.
