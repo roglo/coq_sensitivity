@@ -3340,11 +3340,31 @@ move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
 (**)
 Theorem lap_norm_subt_norm_l :
+  rngl_has_subt = true →
   ∀ la lb,
   lap_norm (lap_subt (lap_norm la) lb) =
   lap_norm (lap_subt la lb).
 Proof.
-intros.
+intros Hsu *.
+unfold lap_norm; f_equal.
+revert lb.
+induction la as [| a] using rev_ind; intros; [ easy | cbn ].
+destruct lb as [| b] using rev_ind; cbn. {
+  do 2 rewrite (lap_subt_0_r Hsu).
+  rewrite rev_involutive.
+  now rewrite strip_0s_idemp.
+}
+clear IHlb.
+rewrite rev_unit; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+  rewrite rev_length, app_length, Nat.add_1_r; cbn.
+  rewrite rev_map2. 2: {
+    do 2 rewrite app_length, repeat_length.
+    rewrite rev_length, app_length, Nat.add_1_r.
+...
+    rewrite Nat.add_sub_assoc.
+    rewrite (Nat.add_comm (S (length lb))), Nat.add_sub.
 ... ...
 rewrite lap_norm_subt_norm_l.
 ...
