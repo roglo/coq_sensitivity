@@ -603,39 +603,14 @@ intros i Hi.
 now apply Hab; right.
 Qed.
 
-(*
-Theorem map2_ext_in : ∀ A B C da db (f g : A → B → C) la lb,
-  (∀ i, i < min (length la) (length lb)
-   → f (nth i la da) (nth i lb db) = g (nth i la da) (nth i lb db))
-  → map2 f la lb = map2 g la lb.
+Theorem in_combine_same :
+  ∀ A (i j : A) l, (i, j) ∈ combine l l → i = j.
 Proof.
-intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | ].
-specialize (Hab 0) as H; cbn in H; rewrite H; [ clear H | easy ].
-f_equal.
-apply IHla.
-intros i Hi.
-specialize (Hab (S i)) as H; cbn in H; apply H.
-now apply Nat.succ_lt_mono in Hi.
+intros * Hij.
+induction l as [| a la]; [ easy | cbn in Hij ].
+destruct Hij as [Hij| Hij]; [ now injection Hij; intros; subst i j | ].
+now apply IHla.
 Qed.
-*)
-
-(*
-Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
-  (∀ a b, a ∈ la → b ∈ lb → f a b = g a b) → map2 f la lb = map2 g la lb.
-Proof.
-intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | ].
-f_equal; [ now apply Hab; left | ].
-apply IHla.
-intros a' b' Ha' Hb'.
-now apply Hab; right.
-Qed.
-*)
 
 Theorem map2_diag : ∀ A B (f : A → A → B) la,
   map2 f la la = map (λ i, f i i) la.

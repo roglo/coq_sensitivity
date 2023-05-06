@@ -1824,15 +1824,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     rewrite Nat.add_comm, Nat.add_sub.
     apply map2_ext_in.
     intros (i, j) Hi; cbn.
-    assert (H : i = j). {
-      remember (length lc) as len in Hi; clear Heqlen.
-      remember 0 as sta in Hi; clear Heqsta.
-      revert sta Hi.
-      induction len; intros; [ easy | ].
-      cbn in Hi.
-      destruct Hi as [Hi| Hi]; [ now injection Hi; intros; subst i | ].
-      now apply IHlen in Hi.
-    }
+    assert (H : i = j) by now apply in_combine_same in Hi.
     subst j.
     apply in_combine_l in Hi.
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -1925,15 +1917,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   symmetry.
   apply map2_ext_in.
   intros (i, j) Hi; cbn.
-  assert (H : i = j). {
-    remember (length lb) as len in Hi; clear Heqlen.
-    remember 0 as sta in Hi; clear Heqsta.
-    revert sta Hi.
-    induction len; intros; [ easy | ].
-    cbn in Hi.
-    destruct Hi as [Hi| Hi]; [ now injection Hi; intros; subst i | ].
-    now apply IHlen in Hi.
-  }
+  assert (H : i = j) by now apply in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2009,15 +1993,7 @@ destruct (le_dec (length la) (length lc)) as [Hac| Hac]. {
   rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
   apply map2_ext_in.
   intros (i, j) Hi; cbn.
-  assert (H : i = j). {
-    remember (length lc) as len in Hi; clear Heqlen.
-    remember 0 as sta in Hi; clear Heqsta.
-    revert sta Hi.
-    induction len; intros; [ easy | ].
-    cbn in Hi.
-    destruct Hi as [Hi| Hi]; [ now injection Hi; intros; subst i | ].
-    now apply IHlen in Hi.
-  }
+  assert (H : i = j) by now apply in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2073,135 +2049,21 @@ rewrite Nat.add_0_r.
 do 2 rewrite app_nil_r.
 rewrite (Nat.add_sub_assoc _ (length la)); [ | easy ].
 rewrite (Nat.add_comm _ (length la)), Nat.add_sub.
-...
-  rewrite Nat.add_comm, Nat.add_sub.
-  assert (Hbc : length lb ≤ length lc) by now transitivity (length la).
+destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
+  rewrite Nat.add_0_r.
   rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite app_nil_r, Nat.add_0_r.
-  rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
+  rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
+  rewrite Nat.min_r; [ | now apply Nat.sub_le_mono_l ].
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
   apply map2_ext_in.
   intros (i, j) Hi; cbn.
-  assert (H : i = j). {
+  assert (H : i = j) by now apply in_combine_same in Hi.
+  subst j.
+  apply in_combine_l in Hi.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 ...
-  specialize (rngl_sub_0_l Hos) as H1.
-  unfold rngl_sub in H1 at 1.
-  rewrite Hop, Hsu in H1.
-  do 2 rewrite H1.
-...
-  rewrite (app_nth2 (map2 _ _ _)); cycle 1. {
-    rewrite map2_length, app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-...
-...
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite app_nth1; [ | easy ].
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ | easy | ]. 2: {
-      rewrite app_length, repeat_length.
-...
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub.
-...
-    rewrite (map2_map2_seq_r _ 0%L).
-    rewrite map2_length, app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-    rewrite (map2_map2_seq_l _ 0%L).
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    symmetry.
-    rewrite (map2_map2_seq_r _ 0%L).
-...
-rewrite Nat.add_comm, Nat.sub_add.
-rewrite (Nat.add_sub_assoc (length la)); [ | ].
-  rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-  rewrite app_length, repeat_length.
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub.
-  symmetry.
-...
-specialize (rngl_sub_add_distr Hos) as H1.
-unfold rngl_sub in H1.
-rewrite Hop, Hsu in H1.
-rewrite H1.
-...
-  rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
-  do 2 rewrite app_nil_r.
-  rewrite (map2_map2_seq_r _ 0%L).
-  rewrite map2_length, app_length, repeat_length.
-...
-  rewrite (app_nth2 la); [ | easy ].
-    rewrite rngl_add_0_r, (rngl_subt_0_r Hsu).
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ easy | | easy ].
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-...
-    rewrite app_nth1; [ | easy ].
-      rewrite app_nth1; [ | easy ].
-      specialize (rngl_sub_add_distr Hos) as H1.
-      unfold rngl_sub in H1.
-      rewrite Hop, Hsu in H1.
-      apply H1.
-    }
-    apply Nat.nlt_ge in Hilc.
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ | easy | ]. 2: {
-      rewrite app_length, repeat_length.
-      rewrite Nat.add_sub_assoc; [ | easy ].
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    rewrite (app_nth2 lc); [ | easy ].
-    rewrite (app_nth2 lc); [ | easy ].
-    do 2 rewrite nth_repeat.
-    rewrite rngl_add_0_r, (rngl_subt_0_r Hsu).
-    rewrite (map2_nth _ _ _ 0%L 0%L); [ easy | | easy ].
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-...
-  rewrite <- Nat.add_max_distr_l.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite (Nat.max_r (length la)); [ | easy ].
-    apply map2_ext_in.
-...
-  destruct (le_dec (length lc) (length la)) as [Hca| Hca]. {
-    rewrite (proj2 (Nat.sub_0_le _ _) Hca); cbn.
-    rewrite Nat.max_0_r, app_nil_r.
-    symmetry.
-    rewrite (map2_map2_seq_l _ 0%L).
-    rewrite (map2_map2_seq_r _ 0%L).
-    rewrite map2_length, app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-    rewrite app_length, repeat_length.
-    symmetry.
-    rewrite <- Nat.add_max_distr_l.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite (Nat.max_r (length la)); [ | easy ].
-    apply map2_ext_in.
-    intros (i, j) Hi; cbn.
-    assert (H : i = j). {
-      remember (length lb) as len in Hi; clear Heqlen.
-      remember 0 as sta in Hi; clear Heqsta.
-      revert sta Hi.
-      induction len; intros; [ easy | ].
-      cbn in Hi.
-      destruct Hi as [Hi| Hi]; [ now injection Hi; intros; subst i | ].
-      now apply IHlen in Hi.
-    }
-    subst j.
-    apply in_combine_l in Hi.
-    apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     destruct (lt_dec i (length lc)) as [Hilc| Hilc]. {
       assert (Hila : i < length la). {
         now apply (lt_le_trans _ (length lc)).
