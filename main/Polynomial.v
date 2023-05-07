@@ -3022,6 +3022,110 @@ split; intros Ha. {
 }
 Qed.
 
+Theorem lap_norm_subt_norm_l :
+  rngl_has_subt = true →
+  ∀ la lb,
+  lap_norm (lap_subt (lap_norm la) lb) =
+  lap_norm (lap_subt la lb).
+Proof.
+intros Hsu *.
+revert lb.
+induction la as [| a] using rev_ind; intros; [ easy | cbn ].
+unfold lap_norm at 2.
+rewrite rev_unit; cbn - [ lap_subt ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  rewrite fold_lap_norm.
+  rewrite IHla.
+  destruct (le_dec (S (length la)) (length lb)) as [Hsab| Hsab]. {
+    unfold lap_subt.
+    rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | flia Hsab ].
+    rewrite app_nil_r.
+    rewrite app_length, Nat.add_1_r.
+    rewrite (proj2 (Nat.sub_0_le (S (length la)) _)); [ | easy ].
+    rewrite app_nil_r.
+    rewrite <- app_assoc.
+    rewrite <- Nat.sub_succ.
+    now rewrite Nat.sub_succ_l.
+  }
+  apply Nat.nle_gt in Hsab.
+  apply -> Nat.lt_succ_r in Hsab.
+  unfold lap_subt.
+  rewrite app_length, Nat.add_1_r.
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite app_nil_r.
+  rewrite (proj2 (Nat.sub_0_le (length lb) _)); [ | flia Hsab ].
+  rewrite app_nil_r.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  cbn.
+  rewrite repeat_cons, app_assoc.
+  rewrite map2_app_app. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    symmetry; rewrite Nat.add_comm; apply Nat.add_sub.
+  }
+  cbn.
+  rewrite (rngl_subt_0_r Hsu).
+  rewrite (lap_norm_app_0_r Heb); [ easy | ].
+  intros; destruct i; [ easy | now destruct i ].
+}
+f_equal; f_equal; cbn; f_equal.
+apply rev_involutive.
+Qed.
+
+Theorem lap_norm_subt_norm_r :
+  rngl_has_subt = true →
+  ∀ la lb,
+  lap_norm (lap_subt la (lap_norm lb)) =
+  lap_norm (lap_subt la lb).
+Proof.
+intros Hsu *.
+revert la.
+induction lb as [| b] using rev_ind; intros; [ easy | cbn ].
+unfold lap_norm at 2.
+rewrite rev_unit; cbn - [ lap_subt ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+  apply (rngl_eqb_eq Heb) in Hbz; subst b.
+  rewrite fold_lap_norm.
+  rewrite IHlb.
+  destruct (le_dec (S (length lb)) (length la)) as [Hsba| Hsba]. {
+    unfold lap_subt.
+    rewrite (proj2 (Nat.sub_0_le (length lb) _)); [ | flia Hsba ].
+    rewrite app_nil_r.
+    rewrite app_length, Nat.add_1_r.
+    rewrite (proj2 (Nat.sub_0_le (S (length lb)) _)); [ | easy ].
+    rewrite app_nil_r.
+    rewrite <- app_assoc.
+    rewrite <- Nat.sub_succ.
+    now rewrite Nat.sub_succ_l.
+  }
+  apply Nat.nle_gt in Hsba.
+  apply -> Nat.lt_succ_r in Hsba.
+  unfold lap_subt.
+  rewrite app_length, Nat.add_1_r.
+  rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | easy ].
+  rewrite app_nil_r.
+  rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | flia Hsba ].
+  rewrite app_nil_r.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  cbn.
+  rewrite repeat_cons, app_assoc.
+  rewrite map2_app_app. 2: {
+    rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm; apply Nat.add_sub.
+  }
+  cbn.
+  rewrite (rngl_subt_0_r Hsu).
+  rewrite (lap_norm_app_0_r Heb); [ easy | ].
+  intros; destruct i; [ easy | now destruct i ].
+}
+f_equal; f_equal; cbn; f_equal.
+apply rev_involutive.
+Qed.
+
 (**)
 
 Theorem lap_subt_app_r :
@@ -3171,236 +3275,17 @@ destruct os as [opp| subt]. {
   now rewrite Hos' in Hop.
 }
 unfold polyn_subt.
-(**)
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add lap_subt ].
-destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
-  rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
-    unfold has_polyn_prop in pb |-*.
-    apply Bool.orb_true_iff in pb.
-    apply Bool.orb_true_iff; right.
-    destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-    rewrite app_length, Nat.add_1_r in Hab.
-    apply -> Nat.lt_succ_r in Hab.
-    rewrite lap_add_app_r; [ | easy ].
-    destruct pb as [pb| pb]. {
-      apply is_empty_list_empty in pb.
-      now destruct lb.
-    }
-    now rewrite last_last in pb |-*.
-  }
-  specialize (lap_opt_add_sub Hsu) as H2.
-  unfold lap_sub in H2.
-  rewrite Hop, Hsu in H2.
-  rewrite H2.
-  rewrite (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
-  rewrite (has_polyn_prop_lap_norm Heb (la + lb)). 2: {
-    unfold has_polyn_prop in pa |-*.
-    apply Bool.orb_true_iff in pa.
-    apply Bool.orb_true_iff; right.
-    destruct la as [| a] using rev_ind; [ easy | clear IHla ].
-    rewrite app_length, Nat.add_1_r in Hba.
-    apply -> Nat.lt_succ_r in Hba.
-    rewrite lap_add_app_l; [ | easy ].
-    destruct pa as [pa| pa]. {
-      apply is_empty_list_empty in pa.
-      now destruct la.
-    }
-    now rewrite last_last in pa |-*.
-  }
-  specialize (lap_opt_add_sub Hsu) as H2.
-  unfold lap_sub in H2.
-  rewrite Hop, Hsu in H2; rewrite H2.
-  rewrite (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-apply Nat.nlt_ge in Hab, Hba.
-apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
-remember (has_polyn_prop (la + lb)) as ab eqn:pab; symmetry in pab.
-destruct ab. {
-  rewrite (has_polyn_prop_lap_norm Heb (la + lb)); [ | easy ].
-  specialize (lap_opt_add_sub Hsu la lb) as H2.
-  unfold lap_sub in H2.
-  rewrite Hop, Hsu in H2.
-  rewrite H2.
-  rewrite (lap_norm_app_0_r Heb). 2: {
-    intros; rewrite List_nth_repeat.
-    now destruct (lt_dec _ _).
-  }
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-apply Bool.orb_false_iff in pab.
-destruct pab as (Heab, Hlab).
-apply Bool.negb_false_iff in Hlab.
-apply (rngl_eqb_eq Heb) in Hlab.
-destruct lb as [| b] using rev_ind; [ | clear IHlb ]. {
-  rewrite lap_add_0_r.
-  rewrite (lap_subt_0_r Hsu).
-  rewrite lap_norm_idemp.
-  now apply (has_polyn_prop_lap_norm Heb).
-}
-clear Heab.
-destruct la as [| a] using rev_ind; [ | clear IHla ]. {
-  now rewrite app_length in Hab; destruct lb.
-}
-do 2 rewrite app_length, Nat.add_1_r in Hab.
-apply Nat.succ_inj in Hab.
-rewrite lap_add_app_app; [ cbn | easy ].
-rewrite lap_add_app_app in Hlab; [ cbn in Hlab | easy ].
-rewrite last_last in Hlab; rewrite Hlab.
-rewrite (lap_norm_app_0_r Heb). 2: {
-  now intros; destruct i; [ | destruct i ].
-}
-apply Bool.orb_true_iff in pa, pb.
-destruct pa as [pa| pa]. {
-  apply is_empty_list_empty in pa.
-  now destruct la.
-}
-destruct pb as [pb| pb]. {
-  apply is_empty_list_empty in pb.
-  now destruct lb.
-}
-rewrite last_last in pa, pb.
-apply (rngl_neqb_neq Heb) in pa, pb.
-move Hlab before pb.
-rewrite lap_subt_app_r. 2: {
-  etransitivity.
-  apply (lap_norm_length_le Heb).
-  now rewrite lap_add_length, Hab, Nat.max_id.
-}
-cbn.
-generalize Hlab; intros H.
-apply (rngl_add_sub_eq_r Hos) in H.
-unfold rngl_sub in H.
-rewrite Hop, Hsu in H; rewrite H; clear H.
-rewrite (has_polyn_prop_lap_norm Heb). 2: {
-  apply Bool.orb_true_iff; right.
-  rewrite last_last.
-  now apply (rngl_neqb_neq Heb).
-}
-f_equal.
-now apply (lap_norm_add_subt Hsu).
-Qed.
-
-Theorem lap_quot_0_l :
-  ∀ la, ([] / la)%lap = [].
-Proof.
-intros.
-unfold lap_quot; cbn.
-remember (rlap_quot_rem_step _ _) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (q, rlr).
-destruct q; [ | easy ].
-now destruct (rev la).
-Qed.
-
-Theorem lap_norm_subt_norm_l :
-  rngl_has_subt = true →
-  ∀ la lb,
-  lap_norm (lap_subt (lap_norm la) lb) =
-  lap_norm (lap_subt la lb).
-Proof.
-intros Hsu *.
-revert lb.
-induction la as [| a] using rev_ind; intros; [ easy | cbn ].
-unfold lap_norm at 2.
-rewrite rev_unit; cbn - [ lap_subt ].
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
-  rewrite fold_lap_norm.
-  rewrite IHla.
-  destruct (le_dec (S (length la)) (length lb)) as [Hsab| Hsab]. {
-    unfold lap_subt.
-    rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | flia Hsab ].
-    rewrite app_nil_r.
-    rewrite app_length, Nat.add_1_r.
-    rewrite (proj2 (Nat.sub_0_le (S (length la)) _)); [ | easy ].
-    rewrite app_nil_r.
-    rewrite <- app_assoc.
-    rewrite <- Nat.sub_succ.
-    now rewrite Nat.sub_succ_l.
-  }
-  apply Nat.nle_gt in Hsab.
-  apply -> Nat.lt_succ_r in Hsab.
-  unfold lap_subt.
-  rewrite app_length, Nat.add_1_r.
-  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-  rewrite app_nil_r.
-  rewrite (proj2 (Nat.sub_0_le (length lb) _)); [ | flia Hsab ].
-  rewrite app_nil_r.
-  rewrite Nat.sub_succ_l; [ | easy ].
-  cbn.
-  rewrite repeat_cons, app_assoc.
-  rewrite map2_app_app. 2: {
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    symmetry; rewrite Nat.add_comm; apply Nat.add_sub.
-  }
-  cbn.
-  rewrite (rngl_subt_0_r Hsu).
-  rewrite (lap_norm_app_0_r Heb); [ easy | ].
-  intros; destruct i; [ easy | now destruct i ].
-}
-f_equal; f_equal; cbn; f_equal.
-apply rev_involutive.
-Qed.
-
-Theorem lap_norm_subt_norm_r :
-  rngl_has_subt = true →
-  ∀ la lb,
-  lap_norm (lap_subt la (lap_norm lb)) =
-  lap_norm (lap_subt la lb).
-Proof.
-intros Hsu *.
-revert la.
-induction lb as [| b] using rev_ind; intros; [ easy | cbn ].
-unfold lap_norm at 2.
-rewrite rev_unit; cbn - [ lap_subt ].
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
-  apply (rngl_eqb_eq Heb) in Hbz; subst b.
-  rewrite fold_lap_norm.
-  rewrite IHlb.
-  destruct (le_dec (S (length lb)) (length la)) as [Hsba| Hsba]. {
-    unfold lap_subt.
-    rewrite (proj2 (Nat.sub_0_le (length lb) _)); [ | flia Hsba ].
-    rewrite app_nil_r.
-    rewrite app_length, Nat.add_1_r.
-    rewrite (proj2 (Nat.sub_0_le (S (length lb)) _)); [ | easy ].
-    rewrite app_nil_r.
-    rewrite <- app_assoc.
-    rewrite <- Nat.sub_succ.
-    now rewrite Nat.sub_succ_l.
-  }
-  apply Nat.nle_gt in Hsba.
-  apply -> Nat.lt_succ_r in Hsba.
-  unfold lap_subt.
-  rewrite app_length, Nat.add_1_r.
-  rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | easy ].
-  rewrite app_nil_r.
-  rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | flia Hsba ].
-  rewrite app_nil_r.
-  rewrite Nat.sub_succ_l; [ | easy ].
-  cbn.
-  rewrite repeat_cons, app_assoc.
-  rewrite map2_app_app. 2: {
-    rewrite app_length, repeat_length.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    rewrite Nat.add_comm; apply Nat.add_sub.
-  }
-  cbn.
-  rewrite (rngl_subt_0_r Hsu).
-  rewrite (lap_norm_app_0_r Heb); [ easy | ].
-  intros; destruct i; [ easy | now destruct i ].
-}
-f_equal; f_equal; cbn; f_equal.
-apply rev_involutive.
+rewrite (lap_norm_subt_norm_l Hsu).
+specialize (lap_opt_add_sub Hsu) as H2.
+unfold lap_sub in H2.
+rewrite Hop, Hsu in H2.
+rewrite H2.
+rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
+now apply (has_polyn_prop_lap_norm Heb).
 Qed.
 
 (* *)
@@ -3442,7 +3327,6 @@ destruct b as (lb, pb).
 destruct c as (lc, pc).
 move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
-(**)
 rewrite (lap_norm_subt_norm_l Hsu).
 rewrite (lap_norm_subt_norm_r Hsu).
 specialize (lap_opt_sub_add_distr Hsu) as H1.
