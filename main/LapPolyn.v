@@ -1947,12 +1947,26 @@ assert (Hos : rngl_has_opp_or_subt = true). {
 move Hos after Heb.
 unfold lap_sub.
 rewrite Hop, Hsu.
+...
+destruct la as [| a]. {
+  do 2 rewrite (lap_subt_0_l Hsu).
+  unfold lap_subt; cbn.
+  rewrite map_length.
+...
+apply eq_lap_norm_eq_length. 2: {
+...
+}
+...
 unfold lap_add, lap_subt.
 do 2 rewrite map2_length.
 do 4 rewrite app_length, repeat_length.
 do 2 rewrite min_add_sub_max.
 do 2 rewrite <- Nat.sub_min_distr_l.
 do 2 rewrite <- Nat.sub_max_distr_r.
+(*
+rewrite fold_lap_subt.
+rewrite fold_lap_add.
+*)
 destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite (proj2 (Nat.sub_0_le _ _) Hab).
   do 2 rewrite app_nil_r.

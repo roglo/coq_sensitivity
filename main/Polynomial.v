@@ -3209,8 +3209,17 @@ cbn - [ lap_norm lap_add lap_subt ].
 rewrite (lap_subt_norm_idemp_l Heb Hsu).
 rewrite (lap_subt_norm_idemp_r Heb Hsu).
 rewrite (lap_mul_norm_idemp_r Hos Heb).
+(*
+Search (_ * lap_subt _ _)%lap.
+Search (lap_subt (_ * _)%lap).
+Check lap_mul_add_distr_l.
+specialize (lap_opt_sub_add_distr Hsu) as H1.
+*)
 ...
-specialize (lap_opt_add_sub Hsu) as H2.
+Theorem lap_mul_subt_distr_l :
+  ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
+...
+specialize (lap_opt_mul_subt_distr_l Hsu) as H2.
 unfold lap_sub in H2.
 rewrite Hop, Hsu in H2.
 rewrite H2.
