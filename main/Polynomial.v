@@ -3362,6 +3362,12 @@ destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
   rewrite rev_map2. 2: {
     do 2 rewrite app_length, repeat_length.
     rewrite rev_length, app_length, Nat.add_1_r.
+    remember (length (strip_0s (rev la))) as len eqn:Hlen.
+    symmetry in Hlen.
+    destruct len; cbn; [ now rewrite Nat.add_0_r | ].
+    f_equal; flia.
+  }
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
 ...
     rewrite Nat.add_sub_assoc.
     rewrite (Nat.add_comm (S (length lb))), Nat.add_sub.
