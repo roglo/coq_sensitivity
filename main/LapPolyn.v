@@ -1133,7 +1133,7 @@ Qed.
 
 Theorem lap_norm_app_0_r : ∀ la lb,
   (∀ i, nth i lb 0%L = 0%L)
-  → lap_norm la = lap_norm (la ++ lb).
+  → lap_norm (la ++ lb) = lap_norm la.
 Proof.
 intros * Hlb.
 unfold lap_norm; f_equal.
@@ -1141,7 +1141,7 @@ induction la as [| a]. {
   cbn; symmetry.
   induction lb as [| b]; [ easy | cbn ].
   rewrite strip_0s_app.
-  rewrite IHlb. 2: {
+  rewrite <- IHlb. 2: {
     intros i.
     now specialize (Hlb (S i)).
   }
@@ -1165,7 +1165,7 @@ induction n; [ rewrite Nat.add_0_r; reflexivity | idtac ].
 rewrite Nat.add_succ_r.
 rewrite lap_convol_mul_succ.
 rewrite IHn.
-apply lap_norm_app_0_r.
+symmetry; apply lap_norm_app_0_r.
 intros j.
 rewrite all_0_rngl_summation_0. {
   destruct j; [ easy | now destruct j ].

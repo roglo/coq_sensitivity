@@ -2079,7 +2079,7 @@ symmetry in Hab1.
 rewrite (lap_mul_comm Hco) in Hab1.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hab1.
 apply (f_equal lap_norm) in Hab1.
-rewrite <- (lap_norm_app_0_r Heb) in Hab1 by apply nth_repeat.
+rewrite (lap_norm_app_0_r Heb) in Hab1 by apply nth_repeat.
 rewrite (has_polyn_prop_lap_norm lr pr) in Hab1.
 rewrite <- lap_mul_norm_idemp_r in Hab1.
 rewrite (lap_norm_mul Hiv) in Hab1; [ | easy | apply polyn_norm_prop ].
@@ -3085,7 +3085,7 @@ rewrite lap_add_app_app; [ cbn | easy ].
 remember (rngl_eqb (a + b)%L 0%L) as abz eqn:Habz; symmetry in Habz.
 destruct abz. {
   apply (rngl_eqb_eq Heb) in Habz; rewrite Habz.
-  rewrite <- (lap_norm_app_0_r Heb). 2: {
+  rewrite (lap_norm_app_0_r Heb). 2: {
     intros; destruct i; [ easy | now destruct i ].
   }
   rewrite lap_subt_app_r. 2: {
@@ -3195,7 +3195,7 @@ destruct (lt_dec (length la) (length lb)) as [Hab| Hab]. {
   unfold lap_sub in H2.
   rewrite Hop, Hsu in H2.
   rewrite H2.
-  rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
+  rewrite (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
   now apply (has_polyn_prop_lap_norm Heb).
 }
 destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
@@ -3216,7 +3216,7 @@ destruct (lt_dec (length lb) (length la)) as [Hba| Hba]. {
   specialize (lap_opt_add_sub Hsu) as H2.
   unfold lap_sub in H2.
   rewrite Hop, Hsu in H2; rewrite H2.
-  rewrite <- (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
+  rewrite (lap_norm_app_0_r Heb); [ | apply nth_repeat ].
   now apply (has_polyn_prop_lap_norm Heb).
 }
 apply Nat.nlt_ge in Hab, Hba.
@@ -3228,7 +3228,7 @@ destruct ab. {
   unfold lap_sub in H2.
   rewrite Hop, Hsu in H2.
   rewrite H2.
-  rewrite <- (lap_norm_app_0_r Heb). 2: {
+  rewrite (lap_norm_app_0_r Heb). 2: {
     intros; rewrite List_nth_repeat.
     now destruct (lt_dec _ _).
   }
@@ -3253,7 +3253,7 @@ apply Nat.succ_inj in Hab.
 rewrite lap_add_app_app; [ cbn | easy ].
 rewrite lap_add_app_app in Hlab; [ cbn in Hlab | easy ].
 rewrite last_last in Hlab; rewrite Hlab.
-rewrite <- (lap_norm_app_0_r Heb). 2: {
+rewrite (lap_norm_app_0_r Heb). 2: {
   now intros; destruct i; [ | destruct i ].
 }
 apply Bool.orb_true_iff in pa, pb.
@@ -3433,6 +3433,14 @@ destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
   rewrite app_nil_r.
   rewrite Nat.sub_succ_l; [ | easy ].
   cbn.
+  destruct (Nat.eq_dec (length la) (length lb)) as [Hab| Hab]. {
+    rewrite Hab, Nat.sub_diag, app_nil_r; cbn.
+    rewrite map2_app_app; [ cbn | easy ].
+    rewrite (rngl_subt_0_r Hsu).
+    symmetry.
+    apply (lap_norm_app_0_r Heb).
+    intros; destruct i; [ easy | now destruct i ].
+  }
 ...
 intros Hsu *.
 unfold lap_norm; f_equal.
