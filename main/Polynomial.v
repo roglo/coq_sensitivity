@@ -3345,6 +3345,7 @@ Theorem lap_norm_subt_norm_l :
   lap_norm (lap_subt (lap_norm la) lb) =
   lap_norm (lap_subt la lb).
 Proof.
+(*
 intros Hsu *.
 unfold lap_subt.
 assert
@@ -3399,6 +3400,39 @@ induction lb as [| b] using rev_ind; intros. {
 }
 destruct la as [| a] using rev_ind; intros; [ easy | cbn ].
 clear IHla.
+...
+*)
+intros Hsu *.
+revert lb.
+induction la as [| a] using rev_ind; intros; [ easy | cbn ].
+unfold lap_norm at 2.
+rewrite rev_unit; cbn - [ lap_subt ].
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  rewrite fold_lap_norm.
+  rewrite IHla.
+  destruct (le_dec (S (length la)) (length lb)) as [Hsab| Hsab]. {
+    unfold lap_subt.
+    rewrite (proj2 (Nat.sub_0_le (length la) _)); [ | flia Hsab ].
+    rewrite app_nil_r.
+    rewrite app_length, Nat.add_1_r.
+    rewrite (proj2 (Nat.sub_0_le (S (length la)) _)); [ | easy ].
+    rewrite app_nil_r.
+    rewrite <- app_assoc.
+    rewrite <- Nat.sub_succ.
+    now rewrite Nat.sub_succ_l.
+  }
+  apply Nat.nle_gt in Hsab.
+  apply -> Nat.lt_succ_r in Hsab.
+  unfold lap_subt.
+  rewrite app_length, Nat.add_1_r.
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite app_nil_r.
+  rewrite (proj2 (Nat.sub_0_le (length lb) _)); [ | flia Hsab ].
+  rewrite app_nil_r.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  cbn.
 ...
 intros Hsu *.
 unfold lap_norm; f_equal.
