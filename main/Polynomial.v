@@ -3056,8 +3056,6 @@ rewrite Hab, Nat.sub_diag in H2.
 now do 2 rewrite app_nil_r in H2.
 Qed.
 
-(********)
-
 Theorem rngl_has_opp_rngl_polyn_has_opp :
   let rop := polyn_ring_like_op in
   @rngl_has_opp T ro = @rngl_has_opp (polyn T) rop.
