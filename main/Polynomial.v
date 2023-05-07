@@ -3381,6 +3381,14 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   }
   now rewrite app_nil_r.
 }
+apply Nat.nle_gt in Hab.
+generalize Hab; intros H.
+apply Nat.lt_le_incl in H.
+rewrite (proj2 (Nat.sub_0_le _ _) H); clear H.
+rewrite app_nil_r.
+destruct (le_dec (length (lap_norm la)) (length lb)) as [Hnab| Hnab]. {
+  rewrite (proj2 (Nat.sub_0_le _ _) Hnab).
+  rewrite app_nil_r.
 ...
 intros Hsu *.
 unfold lap_norm; f_equal.
