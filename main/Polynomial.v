@@ -3170,6 +3170,54 @@ rewrite Hop, Hsu in H1.
 f_equal; apply H1.
 Qed.
 
+Theorem polyn_opt_mul_subt_distr_l :
+  let rop := polyn_ring_like_op in
+  if rngl_has_subt then ∀ a b c : polyn T, (a * (b - c))%L = (a * b - a * c)%L
+  else not_applicable.
+Proof.
+intros rop.
+remember rngl_has_subt as su eqn:Hsup; symmetry in Hsup.
+destruct su; [ | easy ].
+specialize (rngl_has_subt_has_no_opp Hsup) as Hopp.
+specialize rngl_has_opp_rngl_polyn_has_opp as Hop; cbn in Hop.
+specialize rngl_has_subt_rngl_polyn_has_subt as Hsu; cbn in Hsu.
+fold rop in Hop; rewrite Hopp in Hop.
+fold rop in Hsu; rewrite Hsup in Hsu.
+intros.
+apply eq_polyn_eq; cbn.
+unfold rngl_sub.
+rewrite Hopp, Hsup.
+unfold rngl_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]. 2: {
+  unfold rngl_has_opp_or_subt in Hos.
+  clear - Hos Hos'.
+  now rewrite Hos' in Hos.
+}
+destruct os as [opp| subt]. {
+  unfold rngl_has_opp in Hop; cbn in Hop.
+  unfold polyn_opt_opp_or_subt in Hop.
+  exfalso; clear - Hop Hos'.
+  now rewrite Hos' in Hop.
+}
+unfold polyn_subt.
+destruct a as (la, pa).
+destruct b as (lb, pb).
+move lb before la.
+cbn - [ lap_norm lap_add lap_subt ].
+rewrite (lap_subt_norm_idemp_l Heb Hsu).
+rewrite (lap_subt_norm_idemp_r Heb Hsu).
+rewrite (lap_mul_norm_idemp_r Hos Heb).
+...
+specialize (lap_opt_add_sub Hsu) as H2.
+unfold lap_sub in H2.
+rewrite Hop, Hsu in H2.
+rewrite H2.
+rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
+now apply (has_polyn_prop_lap_norm Heb).
+...
+
 Definition polyn_opt_has_no_subt (_ : True) := 12.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
@@ -3190,8 +3238,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
      rngl_opt_add_sub := polyn_opt_add_sub;
      rngl_opt_sub_add_distr := polyn_opt_sub_add_distr;
-     rngl_opt_mul_sub_distr_l := 42;
-     rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
+     rngl_opt_mul_sub_distr_l := polyn_opt_mul_subt_distr_l;
+     rngl_opt_mul_sub_distr_r := 42;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
