@@ -95,6 +95,9 @@ Proof. easy. Qed.
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
 
+Theorem fold_lap_norm : ∀ la, rev (strip_0s (rev la)) = lap_norm la.
+Proof. easy. Qed.
+
 (* multiplication *)
 
 Fixpoint lap_convol_mul la lb i len :=
@@ -1223,19 +1226,47 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 }
 Qed.
 
-Theorem lap_add_norm_idemp_l : ∀ la lb,
-  lap_norm (lap_norm la + lb) = lap_norm (la + lb).
+(* *)
+
+Theorem lap_norm_map2_app_app_idemp_l :
+  ∀ f, (∀ a, f a 0%L = a) →
+  ∀ la lb,
+  lap_norm
+    (map2 f
+       (lap_norm la ++ repeat 0%L (length lb - length (lap_norm la)))
+       (lb ++ repeat 0%L (length (lap_norm la) - length lb))) =
+  lap_norm
+    (map2 f (la ++ repeat 0%L (length lb - length la))
+       (lb ++ repeat 0%L (length la - length lb))).
 Proof.
-intros.
+intros * Hf *.
 unfold lap_norm; f_equal.
 revert la.
 induction lb as [| b]; intros. {
-  do 2 rewrite lap_add_0_r.
-  now rewrite rev_involutive, strip_0s_idemp.
+  cbn.
+  do 2 rewrite app_nil_r, Nat.sub_0_r.
+  rewrite rev_map2. 2: {
+    unfold lap_norm.
+    now rewrite repeat_length, rev_length.
+  }
+  rewrite rev_map2; [ | symmetry; apply repeat_length ].
+  do 2 rewrite List_rev_repeat.
+  unfold lap_norm.
+  rewrite rev_involutive, rev_length.
+  rewrite <- (rev_length la).
+  remember (rev la) as lb eqn:Hlb.
+  clear la Hlb.
+  rename lb into la.
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  rewrite Hf.
+  rewrite (rngl_eqb_refl Heb).
+  apply IHla.
 }
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app; cbn.
-rewrite fold_lap_add.
 rewrite <- IHlb.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
@@ -1253,6 +1284,77 @@ destruct lc as [| c]. {
 cbn.
 rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
+Qed.
+
+Theorem lap_norm_map2_app_app_idemp_r :
+  ∀ f, (∀ a, f a 0%L = a) →
+  ∀ la lb,
+  lap_norm
+    (map2 f (la ++ repeat 0%L (length (lap_norm lb) - length la))
+       (lap_norm lb ++ repeat 0%L (length la - length (lap_norm lb)))) =
+  lap_norm
+    (map2 f (la ++ repeat 0%L (length lb - length la))
+       (lb ++ repeat 0%L (length la - length lb))).
+Proof.
+intros * Hf *.
+unfold lap_norm; f_equal.
+revert lb.
+induction la as [| a]; intros. {
+  cbn.
+  do 2 rewrite app_nil_r, Nat.sub_0_r.
+  rewrite rev_length.
+  rewrite fold_lap_norm.
+  rewrite rev_map2. 2: {
+    unfold lap_norm.
+    now rewrite repeat_length, rev_length.
+  }
+  rewrite rev_map2; [ | apply repeat_length ].
+  do 2 rewrite List_rev_repeat.
+  unfold lap_norm.
+  rewrite rev_involutive.
+  rewrite <- (rev_length lb).
+  remember (rev lb) as la eqn:Hla.
+  clear lb Hla.
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  rewrite Hf.
+  rewrite (rngl_eqb_refl Heb).
+  apply IHla.
+}
+destruct lb as [| b]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHla.
+remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+    cbn.
+    apply (rngl_eqb_eq Heb) in Hbz.
+    subst b; cbn.
+    rewrite app_nil_r, Hf, Nat.sub_0_r.
+    rewrite rev_map2; [ | symmetry; apply repeat_length ].
+    rewrite List_rev_repeat.
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+
+(* *)
+
+Theorem lap_add_norm_idemp_l : ∀ la lb,
+  lap_norm (lap_norm la + lb) = lap_norm (la + lb).
+Proof.
+intros.
+apply lap_norm_map2_app_app_idemp_l.
+apply rngl_add_0_r.
 Qed.
 
 Theorem lap_subt_norm_idemp_l :
@@ -1261,32 +1363,8 @@ Theorem lap_subt_norm_idemp_l :
   lap_norm (lap_subt (lap_norm la) lb) = lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
-unfold lap_norm; f_equal.
-revert la.
-induction lb as [| b]; intros. {
-  do 2 rewrite (lap_subt_0_r Hsu).
-  now rewrite rev_involutive, strip_0s_idemp.
-}
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-rewrite fold_lap_subt.
-rewrite <- IHlb.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-    apply (rngl_eqb_eq Heb) in Haz.
-    subst a; cbn.
-    rewrite app_nil_r, Nat.sub_0_r.
-    now rewrite strip_0s_app.
-  }
-  cbn.
-  now rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
+apply lap_norm_map2_app_app_idemp_l.
+apply (rngl_subt_0_r Hsu).
 Qed.
 
 Theorem lap_subt_norm_idemp_r :
@@ -1295,42 +1373,8 @@ Theorem lap_subt_norm_idemp_r :
   lap_norm (lap_subt la (lap_norm lb)) = lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
-unfold lap_norm; f_equal.
-revert lb.
-induction la as [| a]; intros. {
-  do 2 rewrite (lap_subt_0_l Hsu).
-  rewrite map_rev, rev_involutive.
-  rewrite <- map_rev.
-  induction lb as [| b] using rev_ind; [ easy | cbn ].
-  rewrite rev_app_distr; cbn.
-  rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Hbz; subst b.
-  rewrite (rngl_subt_0_r Hsu).
-  now rewrite (rngl_eqb_refl Heb).
-}
-destruct lb as [| b]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-rewrite fold_lap_subt.
-rewrite <- IHla.
-remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
-    apply (rngl_eqb_eq Heb) in Hbz.
-    subst b; cbn.
-    rewrite app_nil_r, (rngl_subt_0_r Hsu).
-    rewrite (lap_subt_0_r Hsu).
-    rewrite (map2_rngl_subt_0_r Hsu).
-    now rewrite strip_0s_app.
-  }
-  cbn.
-  now rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
+apply lap_norm_map2_app_app_idemp_r.
+apply (rngl_subt_0_r Hsu).
 Qed.
 
 (* *)
