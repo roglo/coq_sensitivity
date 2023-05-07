@@ -423,13 +423,6 @@ rewrite skipn_all.
 easy.
 Qed.
 
-Theorem fold_lap_subt :
-  ∀ la lb,
-  map2 rngl_subt (la ++ repeat 0%L (length lb - length la))
-    (lb ++ repeat 0%L (length la - length lb)) =
-  lap_subt la lb.
-Proof. easy. Qed.
-
 Theorem lap_add_norm_idemp_r : ∀ la lb,
   lap_norm (la + lap_norm lb) = lap_norm (la + lb).
 Proof.
@@ -1920,17 +1913,6 @@ rewrite IHla; f_equal.
 apply (rngl_subt_diag Hos).
 Qed.
 
-Theorem lap_subt_0_r :
-  rngl_has_subt = true →
-  ∀ la, lap_subt la [] = la.
-Proof.
-intros Hsu *.
-unfold lap_subt.
-rewrite Nat.sub_0_r; cbn.
-rewrite app_nil_r.
-apply (map2_rngl_subt_0_r Hsu).
-Qed.
-
 Theorem lap_add_sub :
   ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
@@ -3022,6 +3004,7 @@ split; intros Ha. {
 }
 Qed.
 
+(*
 Theorem lap_norm_subt_norm_l :
   rngl_has_subt = true →
   ∀ la lb,
@@ -3029,6 +3012,8 @@ Theorem lap_norm_subt_norm_l :
   lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
+apply (lap_subt_norm_idemp_l Heb Hsu).
+...
 revert lb.
 induction la as [| a] using rev_ind; intros; [ easy | cbn ].
 unfold lap_norm at 2.
@@ -3125,6 +3110,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
 f_equal; f_equal; cbn; f_equal.
 apply rev_involutive.
 Qed.
+*)
 
 (**)
 
@@ -3279,7 +3265,7 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add lap_subt ].
-rewrite (lap_norm_subt_norm_l Hsu).
+rewrite (lap_subt_norm_idemp_l Heb Hsu).
 specialize (lap_opt_add_sub Hsu) as H2.
 unfold lap_sub in H2.
 rewrite Hop, Hsu in H2.
@@ -3327,8 +3313,8 @@ destruct b as (lb, pb).
 destruct c as (lc, pc).
 move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
-rewrite (lap_norm_subt_norm_l Hsu).
-rewrite (lap_norm_subt_norm_r Hsu).
+rewrite (lap_subt_norm_idemp_l Heb Hsu).
+rewrite (lap_subt_norm_idemp_r Heb Hsu).
 specialize (lap_opt_sub_add_distr Hsu) as H1.
 unfold lap_sub in H1.
 rewrite Hop, Hsu in H1.

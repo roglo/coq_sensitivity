@@ -76,6 +76,22 @@ Definition lap_sub la lb :=
   else if rngl_has_subt then lap_subt la lb
   else repeat 0%L (max (length la) (length lb)).
 
+(* *)
+
+Theorem fold_lap_add :
+  ∀ la lb,
+  map2 rngl_add (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)) =
+  lap_add la lb.
+Proof. easy. Qed.
+
+Theorem fold_lap_subt :
+  ∀ la lb,
+  map2 rngl_subt (la ++ repeat 0%L (length lb - length la))
+    (lb ++ repeat 0%L (length la - length lb)) =
+  lap_subt la lb.
+Proof. easy. Qed.
+
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
 
@@ -295,6 +311,42 @@ cbn in Hab.
 now rewrite Nat.add_succ_r in Hab.
 Qed.
 
+(**)
+
+Theorem map2_rngl_subt_0_r :
+  rngl_has_subt = true →
+  ∀ la, map2 rngl_subt la (repeat 0%L (length la)) = la.
+Proof.
+intros Hsu *.
+induction la as [| la]; [ easy | cbn ].
+now rewrite (rngl_subt_0_r Hsu); f_equal.
+Qed.
+
+Theorem lap_subt_0_l :
+  rngl_has_subt = true →
+  ∀ la, lap_subt 0 la = map (rngl_subt 0) la.
+Proof.
+intros Hsu *.
+induction la as [| a]; [ easy | cbn ].
+f_equal; rewrite app_nil_r.
+unfold lap_subt in IHla.
+cbn in IHla.
+now rewrite Nat.sub_0_r, app_nil_r in IHla.
+Qed.
+
+Theorem lap_subt_0_r :
+  rngl_has_subt = true →
+  ∀ la, lap_subt la 0 = la.
+Proof.
+intros Hsu *.
+unfold lap_subt.
+rewrite Nat.sub_0_r; cbn.
+rewrite app_nil_r.
+apply (map2_rngl_subt_0_r Hsu).
+Qed.
+
+(**)
+
 Theorem strip_0s_length_le : ∀ l, length (strip_0s l) ≤ length l.
 Proof.
 intros.
@@ -499,22 +551,6 @@ intros.
 induction la as [| la]; [ easy | cbn ].
 now rewrite rngl_add_0_r; f_equal.
 Qed.
-
-Theorem map2_rngl_subt_0_r :
-  rngl_has_subt = true →
-  ∀ la, map2 rngl_subt la (repeat 0%L (length la)) = la.
-Proof.
-intros Hsu *.
-induction la as [| la]; [ easy | cbn ].
-now rewrite (rngl_subt_0_r Hsu); f_equal.
-Qed.
-
-Theorem fold_lap_add :
-  ∀ la lb,
-  map2 rngl_add (la ++ repeat 0%L (length lb - length la))
-    (lb ++ repeat 0%L (length la - length lb)) =
-  lap_add la lb.
-Proof. easy. Qed.
 
 Theorem lap_add_assoc : ∀ al1 al2 al3,
   (al1 + (al2 + al3))%lap = (al1 + al2 + al3)%lap.
@@ -1207,9 +1243,8 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
-    subst a; rewrite rngl_add_0_l; cbn.
-    rewrite app_nil_r, rngl_add_0_l, Nat.sub_0_r.
-    rewrite map2_rngl_add_0_l.
+    subst a; cbn.
+    rewrite app_nil_r, Nat.sub_0_r.
     now rewrite strip_0s_app.
   }
   cbn.
@@ -1219,6 +1254,86 @@ cbn.
 rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
+
+Theorem lap_subt_norm_idemp_l :
+  rngl_has_subt = true →
+  ∀ la lb,
+  lap_norm (lap_subt (lap_norm la) lb) = lap_norm (lap_subt la lb).
+Proof.
+intros Hsu *.
+unfold lap_norm; f_equal.
+revert la.
+induction lb as [| b]; intros. {
+  do 2 rewrite (lap_subt_0_r Hsu).
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite fold_lap_subt.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz.
+    subst a; cbn.
+    rewrite app_nil_r, Nat.sub_0_r.
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+
+Theorem lap_subt_norm_idemp_r :
+  rngl_has_subt = true →
+  ∀ la lb,
+  lap_norm (lap_subt la (lap_norm lb)) = lap_norm (lap_subt la lb).
+Proof.
+intros Hsu *.
+unfold lap_norm; f_equal.
+revert lb.
+induction la as [| a]; intros. {
+  do 2 rewrite (lap_subt_0_l Hsu).
+  rewrite map_rev, rev_involutive.
+  rewrite <- map_rev.
+  induction lb as [| b] using rev_ind; [ easy | cbn ].
+  rewrite rev_app_distr; cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Hbz; subst b.
+  rewrite (rngl_subt_0_r Hsu).
+  now rewrite (rngl_eqb_refl Heb).
+}
+destruct lb as [| b]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite fold_lap_subt.
+rewrite <- IHla.
+remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
+    apply (rngl_eqb_eq Heb) in Hbz.
+    subst b; cbn.
+    rewrite app_nil_r, (rngl_subt_0_r Hsu).
+    rewrite (lap_subt_0_r Hsu).
+    rewrite (map2_rngl_subt_0_r Hsu).
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+
+(* *)
 
 Theorem list_nth_lap_add : ∀ k la lb,
   (List.nth k (lap_add la lb) 0 =
@@ -2168,6 +2283,9 @@ Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_opt_add_sub {T ro rp} Hsu (la lb)%lap.
 Arguments lap_opt_sub_add_distr {T ro rp} Hsu (la lb lc)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
+Arguments lap_subt_norm_idemp_l {T ro rp} Heb Hsu (la lb)%lap.
+Arguments lap_subt_norm_idemp_r {T ro rp} Heb Hsu (la lb)%lap.
+Arguments lap_subt_0_r {T ro rp} Hsu la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
 Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
@@ -2176,4 +2294,3 @@ Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments strip_0s_length_le {T ro} l%list.
-
