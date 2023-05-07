@@ -3346,6 +3346,8 @@ Theorem lap_norm_subt_norm_l :
   lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
+...
+intros Hsu *.
 unfold lap_norm; f_equal.
 revert lb.
 induction la as [| a] using rev_ind; intros; [ easy | cbn ].
