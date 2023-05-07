@@ -3346,6 +3346,43 @@ Theorem lap_norm_subt_norm_l :
   lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
+unfold lap_subt.
+assert
+  (∀ n, length la ≤ n →
+   lap_norm la ++ repeat 0%L (n - length (lap_norm la)) =
+   la ++ repeat 0%L (n - length la)). {
+  intros * Hn.
+  revert n Hn.
+  induction la as [| a] using rev_ind; intros; [ easy | ].
+  unfold lap_norm.
+  rewrite rev_unit; cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz; subst a.
+    rewrite fold_lap_norm.
+    rewrite app_length, Nat.add_1_r in Hn.
+    rewrite IHla; [ | flia Hn ].
+    rewrite <- app_assoc; f_equal; cbn.
+    rewrite app_length, Nat.add_1_r; cbn.
+    destruct n; [ easy | ].
+    apply Nat.succ_le_mono in Hn.
+    now rewrite Nat.sub_succ_l.
+  }
+  cbn.
+  now rewrite rev_involutive.
+}
+destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
+  rewrite H; [ | easy ].
+...
+intros Hsu *.
+unfold lap_norm; f_equal.
+revert la.
+induction lb as [| b] using rev_ind; intros. {
+  do 2 rewrite (lap_subt_0_r Hsu).
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+destruct la as [| a] using rev_ind; intros; [ easy | cbn ].
+clear IHla.
 ...
 intros Hsu *.
 unfold lap_norm; f_equal.
