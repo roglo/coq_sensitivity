@@ -620,7 +620,7 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem map2_map2_seq_l : ∀ A B C (f : A → B → C) d la lb,
+Theorem map2_map2_seq_l : ∀ A B C d (f : A → B → C) la lb,
   map2 f la lb = map2 (λ i b, f (nth i la d) b) (seq 0 (length la)) lb.
 Proof.
 intros.
@@ -633,7 +633,7 @@ rewrite map2_map_l.
 apply IHla.
 Qed.
 
-Theorem map2_map2_seq_r : ∀ A B C (f : A → B → C) d la lb,
+Theorem map2_map2_seq_r : ∀ A B C d (f : A → B → C) la lb,
   map2 f la lb = map2 (λ a i, f a (nth i lb d)) la (seq 0 (length lb)).
 Proof.
 intros.

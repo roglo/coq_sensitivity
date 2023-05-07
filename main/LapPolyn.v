@@ -1804,17 +1804,17 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     rewrite app_nil_r.
     rewrite Nat.max_r; [ | flia Hbc ].
     assert (Hac : length la ≤ length lc) by now transitivity (length lb).
-    rewrite (map2_map2_seq_r _ 0%L).
+    rewrite (map2_map2_seq_r 0%L).
     rewrite map2_length, app_length, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-    rewrite (map2_map2_seq_l _ 0%L).
+    rewrite (map2_map2_seq_l 0%L).
     rewrite app_length, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     symmetry.
-    rewrite (map2_map2_seq_r _ 0%L).
-    rewrite (map2_map2_seq_l _ 0%L).
+    rewrite (map2_map2_seq_r 0%L).
+    rewrite (map2_map2_seq_l 0%L).
     symmetry.
     rewrite app_length, map2_length, app_length.
     do 2 rewrite repeat_length.
@@ -1864,17 +1864,17 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   rewrite Nat.max_l; [ | flia Hbc ].
   rewrite (proj2 (Nat.sub_0_le _ _) Hbc); cbn.
   do 2 rewrite app_nil_r.
-  rewrite (map2_map2_seq_r _ 0%L).
+  rewrite (map2_map2_seq_r 0%L).
   rewrite map2_length, app_length, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-  rewrite (map2_map2_seq_l _ 0%L).
+  rewrite (map2_map2_seq_l 0%L).
   rewrite app_length, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   symmetry.
-  rewrite (map2_map2_seq_l _ 0%L).
-  rewrite (map2_map2_seq_r _ 0%L).
+  rewrite (map2_map2_seq_l 0%L).
+  rewrite (map2_map2_seq_r 0%L).
   rewrite map2_length, app_length, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
@@ -1914,14 +1914,14 @@ rewrite Nat.max_l; [ | flia Hab ].
 rewrite (Nat.min_l (length lc - length la)); [ | flia Hab ].
 rewrite (proj2 (Nat.sub_0_le _ _) Hab).
 rewrite app_nil_r.
-rewrite (map2_map2_seq_l _ 0%L).
-rewrite (map2_map2_seq_r _ 0%L).
+rewrite (map2_map2_seq_l 0%L).
+rewrite (map2_map2_seq_r 0%L).
 do 2 rewrite app_length, repeat_length.
 rewrite map2_length.
 do 2 rewrite app_length, repeat_length.
 symmetry.
-rewrite (map2_map2_seq_l _ 0%L).
-rewrite (map2_map2_seq_r _ 0%L).
+rewrite (map2_map2_seq_l 0%L).
+rewrite (map2_map2_seq_r 0%L).
 do 2 rewrite app_length, repeat_length.
 rewrite map2_length.
 rewrite app_length, repeat_length.

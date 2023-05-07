@@ -3372,7 +3372,29 @@ assert
   now rewrite rev_involutive.
 }
 destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
-  rewrite H; [ | easy ].
+  rewrite H; [ clear H | easy ].
+(**)
+f_equal.
+rewrite (map2_map2_seq_l 0%L).
+...
+  unfold lap_norm; f_equal.
+  rewrite rev_map2. 2: {
+    rewrite rev_length.
+    do 2 rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite (proj2 (Nat.sub_0_le _ _)); [ now rewrite Nat.add_0_r | ].
+    rewrite <- (rev_length la) in Hab.
+    etransitivity; [ | apply Hab ].
+    apply strip_0s_length_le.
+  }
+  rewrite rev_map2. 2: {
+    do 2 rewrite app_length, repeat_length.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite (proj2 (Nat.sub_0_le _ _)); [ now rewrite Nat.add_0_r | easy ].
+  }
+  rewrite rev_length.
 ...
 intros Hsu *.
 unfold lap_norm; f_equal.
