@@ -670,6 +670,25 @@ cbn.
 now rewrite IHlen.
 Qed.
 
+Theorem lap_mul_length : ∀ la lb,
+  length (la * lb)%lap =
+    match length la with
+    | 0 => 0
+    | S a =>
+        match length lb with
+        | 0 => 0
+        | S b => S (a + b)
+        end
+    end.
+Proof.
+intros.
+unfold lap_mul.
+destruct la; [ easy | ].
+destruct lb; [ easy | ].
+rewrite lap_convol_mul_length; cbn.
+now rewrite Nat.add_succ_r, Nat.sub_0_r.
+Qed.
+
 Theorem list_nth_lap_eq : ∀ la lb,
   (∀ i, (List.nth i la 0 = List.nth i lb 0)%L)
   → lap_norm la = lap_norm lb.
@@ -2355,7 +2374,37 @@ Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
 Proof.
-intros.
+intros Hsu *.
+apply eq_lap_norm_eq_length. 2: {
+  unfold lap_subt.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]. {
+    rewrite lap_mul_0_r.
+    cbn - [ lap_mul ].
+    do 2 rewrite Nat.sub_0_r, app_nil_r.
+    rewrite map2_length, repeat_length, Nat.min_id.
+    do 2 rewrite lap_mul_length.
+    now cbn; rewrite map2_length, repeat_length, Nat.min_id.
+  }
+  destruct lc as [| c]. {
+    rewrite lap_mul_0_r.
+    cbn - [ lap_mul ].
+    rewrite Nat.sub_0_r.
+    do 2 rewrite app_nil_r.
+    rewrite map2_length, repeat_length, Nat.min_id.
+    do 2 rewrite lap_mul_length.
+    now cbn; rewrite map2_length, repeat_length, Nat.min_id.
+  }
+  cbn.
+  do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
+  do 2 rewrite lap_convol_mul_length.
+  do 2 rewrite map2_length.
+  do 4 rewrite app_length.
+  do 2 rewrite lap_convol_mul_length.
+  do 4 rewrite repeat_length.
+  do 2 rewrite min_add_sub_max.
+  now rewrite Nat.add_max_distr_l.
+}
 ...
 
 (* lap ring-like properties *)
