@@ -2460,17 +2460,23 @@ destruct lb as [| b]. {
   cbn.
   do 4 rewrite Nat.sub_0_r.
   do 2 rewrite app_nil_r.
-  destruct lc as [| c]; [ easy | cbn ].
+  destruct lc as [| c]; [ easy | ].
+  move c before a.
+  remember (lap_convol_mul _ _ _ _) as x.
+  cbn; subst x.
   rewrite map2_length, repeat_length, Nat.min_id.
+  cbn - [ map2 repeat ].
+  rewrite lap_convol_mul_length.
+  remember (length la + S (length lc)) as n eqn:Hn.
+...
   rewrite Nat.add_succ_r; cbn.
   do 2 rewrite rngl_summation_only_one.
   cbn.
   do 2 rewrite (rngl_subt_0_l Hsu).
   do 2 rewrite rngl_mul_assoc.
   rewrite (rngl_mul_0_sub_1_comm Hos a); f_equal.
-  move c before a.
   rewrite lap_convol_mul_length.
-Search (map2 rngl_subt).
+Search (lap_convol_mul _ _ (S _)).
 ...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
