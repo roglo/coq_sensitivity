@@ -2370,6 +2370,79 @@ Qed.
 
 (* *)
 
+Theorem lap_norm_mul_subt_distr_l :
+  rngl_has_subt = true →
+  ∀ la lb lc,
+  lap_norm (la * lap_subt lb lc) =
+  lap_norm (lap_subt (la * lb) (la * lc)).
+Proof.
+intros Hsu *.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+unfold lap_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]. {
+  do 2 rewrite (lap_subt_0_l Hsu).
+  destruct lc as [| c]; [ easy | ].
+  cbn - [ lap_norm ].
+  rewrite map_length, Nat.sub_0_r.
+  rewrite Nat.add_succ_r.
+  cbn - [ lap_norm ].
+  do 2 rewrite rngl_summation_only_one.
+  do 2 rewrite (rngl_subt_0_l Hsu).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_0_sub_1_comm Hos a).
+Search (lap_norm (_ :: _)).
+  cbn - [ lap_norm ].
+...
+destruct lc as [| c]. {
+  cbn.
+  rewrite rngl_add_0_r.
+  do 2 rewrite app_nil_r.
+  do 3 rewrite Nat.sub_0_r.
+  now do 2 rewrite map2_rngl_add_0_r.
+}
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length la' + length (lap_add lb' lc') - 1) as labc.
+remember (length la' + length lb' - 1) as lab.
+remember (length la' + length lc' - 1) as lac.
+rewrite Heqlabc.
+remember (lap_add lb' lc') as lbc.
+symmetry in Heqlbc.
+destruct lbc as [| bc]. {
+  cbn.
+  now subst lb' lc'.
+}
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite (lap_convol_mul_more Hos) with (n := (lab + lac)%nat). 2: {
+  subst; flia.
+}
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- lap_add_norm_idemp_l.
+rewrite (lap_convol_mul_more Hos) with (n := (labc + lac)%nat); [ | flia ].
+rewrite <- Heqlab.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_comm.
+rewrite <- lap_add_norm_idemp_l.
+rewrite Heqlac.
+rewrite (lap_convol_mul_more Hos) with (n := (labc + lab)%nat); [ | flia ].
+rewrite lap_add_norm_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite lap_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite lap_convol_mul_lap_add_r.
+now rewrite lap_add_lap_convol_mul_r.
+Qed.
+...
+
 Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
@@ -2405,6 +2478,9 @@ apply eq_lap_norm_eq_length. 2: {
   do 2 rewrite min_add_sub_max.
   now rewrite Nat.add_max_distr_l.
 }
+... ...
+apply (lap_norm_mul_subt_distr_l Hsu).
+Qed.
 ...
 
 (* lap ring-like properties *)

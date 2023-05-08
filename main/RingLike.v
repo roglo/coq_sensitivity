@@ -1271,6 +1271,40 @@ apply rngl_has_opp_or_subt_iff in Hos.
 destruct Hos; congruence.
 Qed.
 
+Theorem rngl_mul_0_sub_1_comm :
+  rngl_has_opp_or_subt = true →
+  ∀ a, ((0 - 1) * a = a * (0 - 1))%L.
+Proof.
+intros Hos *.
+rewrite (rngl_mul_sub_distr_l Hos).
+rewrite (rngl_mul_sub_distr_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_mul_0_r Hos).
+now rewrite rngl_mul_1_l, rngl_mul_1_r.
+Qed.
+
+Theorem rngl_subt_0_l :
+  rngl_has_subt = true
+  → ∀ a, rngl_subt 0%L a = ((0 - 1) * a)%L.
+Proof.
+intros Hsu *.
+assert (Hop : rngl_has_opp = false). {
+  unfold rngl_has_subt in Hsu.
+  unfold rngl_has_opp.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
+move Hop after Hsu.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+rewrite (rngl_mul_sub_distr_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_mul_1_l.
+unfold rngl_sub.
+now rewrite Hop, Hsu.
+Qed.
+
 Theorem rngl_sub_0_l :
   rngl_has_opp_or_subt = true
   → ∀ a, (0 - a = (0 - 1) * a)%L.
@@ -1869,15 +1903,17 @@ Arguments rngl_has_subt_has_no_opp {T ro} Hsu.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin a%L b%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
-Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%L.
-Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
 Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%L.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
+Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%L.
+Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
+Arguments rngl_mul_0_sub_1_comm {T ro rp} Hos a%L.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%L b%L.
+Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
 Arguments rngl_sub_0_l {T ro rp} Hos a%L.
 Arguments rngl_sub_0_r {T ro rp} Hos a%L.
-Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
 Arguments rngl_subt {T ro} (a b)%L.
+Arguments rngl_subt_0_l {T ro rp} Hsu a%L.
 Arguments rngl_subt_0_r {T ro rp} Hsu a%L.
