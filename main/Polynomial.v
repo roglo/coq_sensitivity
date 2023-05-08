@@ -945,58 +945,6 @@ rewrite (list_nth_lap_opp Hop).
 now rewrite (fold_rngl_sub Hop).
 Qed.
 
-Theorem lap_mul_opp_r :
-  rngl_has_opp = true →
-  ∀ la lb, (la * - lb = - (la * lb))%lap.
-Proof.
-intros Hop *.
-unfold lap_opp, lap_mul.
-destruct la as [| a]; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-do 2 rewrite Nat.sub_0_r.
-rewrite map_length.
-remember 0 as i in |-*; clear Heqi.
-remember (length la + S (length lb)) as len; clear Heqlen.
-revert i.
-induction len; intros; [ easy | cbn ].
-f_equal; [ | apply IHlen ].
-rewrite (rngl_opp_summation Hop).
-apply rngl_summation_eq_compat.
-intros j Hj.
-destruct j. {
-  rewrite Nat.sub_0_r.
-  rewrite <- (rngl_mul_opp_r Hop); f_equal.
-  destruct i; [ easy | cbn ].
-  destruct (lt_dec i (length lb)) as [Hilb| Hilb]. 2: {
-    apply Nat.nlt_ge in Hilb.
-    rewrite nth_overflow; [ | now rewrite map_length ].
-    rewrite nth_overflow; [ | easy ].
-    symmetry; apply (rngl_opp_0 Hop).
-  }
-  now rewrite (List_map_nth' 0%L).
-}
-rewrite <- (rngl_mul_opp_r Hop); f_equal.
-destruct (i - S j) as [| k]; [ easy | ].
-destruct (lt_dec k (length lb)) as [Hklb| Hklb]. 2: {
-  apply Nat.nlt_ge in Hklb.
-  rewrite nth_overflow; [ | now rewrite map_length ].
-  rewrite nth_overflow; [ | easy ].
-  symmetry; apply (rngl_opp_0 Hop).
-}
-now rewrite (List_map_nth' 0%L).
-Qed.
-
-Theorem lap_mul_sub_distr_l :
-  rngl_has_opp = true →
-  ∀ la lb lc, (la * (lb - lc))%lap = (la * lb - la * lc)%lap.
-Proof.
-intros Hop *.
-unfold lap_sub.
-rewrite <- (lap_mul_opp_r Hop).
-rewrite Hop.
-now rewrite <- lap_mul_add_distr_l.
-Qed.
-
 (* optional left addition of opposite; not existing if there is
    no opposite *)
 
@@ -3209,15 +3157,9 @@ cbn - [ lap_norm lap_add lap_subt ].
 rewrite (lap_subt_norm_idemp_l Heb Hsu).
 rewrite (lap_subt_norm_idemp_r Heb Hsu).
 rewrite (lap_mul_norm_idemp_r Hos Heb).
-(*
-Search (_ * lap_subt _ _)%lap.
-Search (lap_subt (_ * _)%lap).
-Check lap_mul_add_distr_l.
-specialize (lap_opt_sub_add_distr Hsu) as H1.
-*)
-...
-Theorem lap_mul_subt_distr_l :
-  ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
+... ...
+f_equal.
+apply (lap_mul_subt_distr_l Hsu).
 ...
 specialize (lap_opt_mul_subt_distr_l Hsu) as H2.
 unfold lap_sub in H2.
