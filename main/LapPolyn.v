@@ -2370,6 +2370,7 @@ Qed.
 
 (* *)
 
+(*
 Theorem lap_norm_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc,
@@ -2442,11 +2443,35 @@ rewrite lap_convol_mul_lap_add_r.
 now rewrite lap_add_lap_convol_mul_r.
 Qed.
 ...
+*)
 
 Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
 Proof.
+intros Hsu *.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; right.
+}
+move Hos after Heb.
+unfold lap_mul, lap_subt.
+destruct la as [| a]; [ easy | cbn ].
+destruct lb as [| b]. {
+  cbn.
+  do 4 rewrite Nat.sub_0_r.
+  do 2 rewrite app_nil_r.
+  destruct lc as [| c]; [ easy | cbn ].
+  rewrite map2_length, repeat_length, Nat.min_id.
+  rewrite Nat.add_succ_r; cbn.
+  do 2 rewrite rngl_summation_only_one.
+  cbn.
+  do 2 rewrite (rngl_subt_0_l Hsu).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_0_sub_1_comm Hos a); f_equal.
+  move c before a.
+  rewrite lap_convol_mul_length.
+Search (map2 rngl_subt).
+...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
   unfold lap_subt.
