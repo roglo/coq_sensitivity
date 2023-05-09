@@ -2646,9 +2646,10 @@ revert la lb.
 induction i; intros. {
   do 3 rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
-Check map2_nth.
-(* est-ce qu'on peut en avoir une version sans "n < length la" et
-   l'autre ? *)
+(**)
+  rewrite (map2_nth2 0%L 0%L); cycle 1. {
+    intros.
+    specialize (Hfm 1%L b 0%L) as H1.
 ...
   destruct (lt_dec 0 (length lb)) as [Hbz| Hbz]. 2: {
     apply Nat.nlt_ge in Hbz.

@@ -471,12 +471,67 @@ Fixpoint map2 {A B C} (f : A → B → C) la lb :=
       end
   end.
 
+Theorem map2_nil_l : ∀ A B C (f : A → B → C) la, map2 f [] la = [].
+Proof.
+intros.
+now destruct la.
+Qed.
+
+Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].
+Proof.
+intros.
+now destruct la.
+Qed.
+
 Theorem map2_nth : ∀ A B C a b c (f : A → B → C) la lb n,
   n < length la
   → n < length lb
   → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
 Proof.
 intros * Hla Hlb.
+revert n lb Hla Hlb.
+induction la as [| a']; intros; [ easy | cbn ].
+destruct lb as [| b']; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+cbn in Hla, Hlb.
+apply Nat.succ_lt_mono in Hla.
+apply Nat.succ_lt_mono in Hlb.
+destruct n; [ now apply IHla | ].
+now apply IHla.
+Qed.
+
+Theorem map2_nth2 : ∀ A B C a b c (f : A → B → C) la lb n,
+  (∀ b, f a b = c)
+  → (∀ a, f a b = c)
+  → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
+Proof.
+intros * Hac Hbc.
+destruct (lt_dec n (length la)) as [Hla| Hla]. 2: {
+  apply Nat.nlt_ge in Hla.
+  rewrite (nth_overflow la); [ | easy ].
+  rewrite Hac.
+  revert n lb Hla.
+  induction la as [| a']; intros; [ now destruct n | cbn ].
+  destruct n; [ easy | ].
+  cbn in Hla; apply Nat.succ_le_mono in Hla.
+  destruct lb as [| b']; [ easy | cbn ].
+  now apply IHla.
+}
+destruct (lt_dec n (length lb)) as [Hlb| Hlb]. 2: {
+  apply Nat.nlt_ge in Hlb.
+  rewrite (nth_overflow lb); [ | easy ].
+  rewrite Hbc.
+  clear Hla.
+  revert n la Hlb.
+  induction lb as [| b']; intros. {
+    rewrite map2_nil_r.
+    now destruct n.
+  }
+  destruct n; [ easy | ].
+  cbn in Hlb; apply Nat.succ_le_mono in Hlb.
+  destruct la as [| a']; [ easy | cbn ].
+  now apply IHlb.
+}
 revert n lb Hla Hlb.
 induction la as [| a']; intros; [ easy | cbn ].
 destruct lb as [| b']; [ easy | cbn ].
@@ -540,18 +595,6 @@ revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
-Qed.
-
-Theorem map2_nil_l : ∀ A B C (f : A → B → C) la, map2 f [] la = [].
-Proof.
-intros.
-now destruct la.
-Qed.
-
-Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].
-Proof.
-intros.
-now destruct la.
 Qed.
 
 Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
