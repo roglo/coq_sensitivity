@@ -2612,6 +2612,13 @@ rewrite (Nat.add_comm _ (length la)).
 cbn - [ map2 ].
 Search (map2 _ (lap_convol_mul _ _ _ _)).
 Search (map _ (lap_convol_mul _ _ _ _)).
+lap_convol_mul_map2:
+  rngl_has_opp_or_subt = true
+  → ∀ f g
+        → ∀ (la lb : list T) (i len : nat),
+            lap_convol_mul la (map f lb) i len =
+            map f (lap_convol_mul la lb i len)
+rewrite (map2_map_min 0%L 0%L (lap_convol_mul _ _ _ _ ++ _)).
 ...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
