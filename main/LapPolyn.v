@@ -2384,6 +2384,94 @@ Qed.
 
 (* *)
 
+Theorem lap_convol_mul_map :
+  rngl_has_opp_or_subt = true →
+  ∀ f,
+  (∀ la lb, f (la + lb)%L = (f la + f lb)%L)
+  → (∀ la lb, f (la * lb)%L = (la * f lb)%L)
+  → ∀ la lb i len,
+    lap_convol_mul la (map f lb) i len =
+    map f (lap_convol_mul la lb i len).
+Proof.
+intros Hos * Hfa Hfm *.
+assert (Hfz : f 0%L = 0%L). {
+  specialize (Hfm 0%L 0%L) as H1.
+  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
+}
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+f_equal; [ | apply IHlen ].
+clear IHlen len.
+revert la lb.
+induction i; intros. {
+  do 2 rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  symmetry.
+  rewrite Hfm; f_equal.
+  destruct (lt_dec 0 (length lb)) as [Hlb| Hlb]. {
+    now rewrite (List_map_nth' 0%L).
+  }
+  apply Nat.nlt_ge in Hlb.
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlb; subst lb.
+}
+destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
+  apply length_zero_iff_nil in Haz; subst la.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply (rngl_mul_0_l Hos).
+  }
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply (rngl_mul_0_l Hos).
+  }
+  easy.
+}
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite (rngl_summation_split_first 0); [ | easy ].
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1, Nat.sub_0_r.
+remember (∑ (j = _, S _), _) as x; cbn; subst x.
+specialize (IHi (tl la) lb).
+erewrite rngl_summation_eq_compat in IHi. 2: {
+  intros j Hj.
+  rewrite <- (List_nth_succ_cons (hd 0%L la)).
+  replace (hd _ _ :: tl _) with la by now destruct la.
+  easy.
+}
+rewrite IHi.
+rewrite Hfa.
+rewrite Hfm.
+f_equal. {
+  f_equal.
+  destruct (lt_dec (S i) (length lb)) as [Hib| Hib]. 2: {
+    apply Nat.nlt_ge in Hib.
+    rewrite (nth_overflow (map _ _)); [ | now rewrite map_length ].
+    rewrite (nth_overflow lb); [ | easy ].
+    now rewrite Hfz.
+  }
+  now rewrite (List_map_nth' 0%L).
+}
+f_equal.
+rewrite (rngl_summation_shift 1 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
+apply rngl_summation_eq_compat.
+intros j Hj.
+f_equal.
+destruct la; [ | easy ].
+cbn - [ nth ].
+rewrite nth_overflow; [ | easy ].
+rewrite nth_overflow; [ | easy ].
+easy.
+Qed.
+
 (*
 Theorem lap_norm_mul_subt_distr_l :
   rngl_has_subt = true →
@@ -2486,80 +2574,18 @@ destruct lb as [| b]. {
   rewrite (map2_rngl_subt_0_l Hsu). 2: {
     symmetry; apply lap_convol_mul_length.
   }
-Search (lap_convol_mul _ (map _ _)).
-Search (map _ (lap_convol_mul _ _ _)).
-Print lap_convol_mul.
-Theorem lap_convol_mul_map :
-  rngl_has_opp_or_subt = true →
-  ∀ f,
-  (∀ la lb, f (la * lb)%L = (la * f lb)%L)
-  → ∀ la lb i len,
-    lap_convol_mul la (map f lb) i len =
-    map f (lap_convol_mul la lb i len).
-Proof.
-intros Hos * Hf *.
-revert la lb i.
-induction len; intros; [ easy | cbn ].
-f_equal; [ | apply IHlen ].
-clear IHlen len.
-revert la lb.
-induction i; intros. {
-  do 2 rewrite rngl_summation_only_one.
-  rewrite Nat.sub_diag.
-  symmetry.
-  rewrite Hf; f_equal.
-  destruct (lt_dec 0 (length lb)) as [Hlb| Hlb]. {
-    now rewrite (List_map_nth' 0%L).
+  apply (lap_convol_mul_map Hos). {
+    clear n la Hn; intros.
+    apply rngl_mul_add_distr_l.
+  } {
+    clear n la Hn; intros.
+    do 2 rewrite rngl_mul_assoc.
+    now rewrite (rngl_mul_0_sub_1_comm Hos).
   }
-  apply Nat.nlt_ge in Hlb.
-  apply Nat.le_0_r, length_zero_iff_nil in Hlb; subst lb.
+}
+cbn - [ "-" ].
+destruct lc as [| c]. {
   cbn.
-  specialize (Hf 0%L 0%L) as H1.
-  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
-}
-destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
-  apply length_zero_iff_nil in Haz; subst la.
-  rewrite all_0_rngl_summation_0. 2: {
-    intros j Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply (rngl_mul_0_l Hos).
-  }
-  rewrite all_0_rngl_summation_0. 2: {
-    intros j Hj.
-    rewrite nth_overflow; [ | easy ].
-    apply (rngl_mul_0_l Hos).
-  }
-  symmetry.
-  specialize (Hf 0%L 0%L) as H1.
-  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
-}
-rewrite rngl_summation_split_first; [ | easy ].
-rewrite (rngl_summation_shift 1). 2: {
-  split; [ easy | ].
-  now apply -> Nat.succ_le_mono.
-}
-rewrite Nat.sub_diag, Nat.sub_succ.
-do 2 rewrite Nat.sub_0_r.
-remember (∑ (j = _, S _), _) as x; cbn; subst x.
-specialize (IHi (tl la) lb).
-erewrite rngl_summation_eq_compat in IHi. 2: {
-  intros j Hj.
-  rewrite <- (List_nth_succ_cons (hd 0%L la)).
-  replace (hd _ _ :: tl _) with la by now destruct la.
-  easy.
-}
-rewrite IHi.
-... ...
-apply lap_convol_mul_map.
-...
-  rewrite Nat.add_succ_r; cbn.
-  do 2 rewrite rngl_summation_only_one.
-  cbn.
-  do 2 rewrite (rngl_subt_0_l Hsu).
-  do 2 rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_0_sub_1_comm Hos a); f_equal.
-  rewrite lap_convol_mul_length.
-Search (lap_convol_mul _ _ (S _)).
 ...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
