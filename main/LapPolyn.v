@@ -2517,6 +2517,38 @@ induction i; intros. {
   specialize (Hf 0%L 0%L) as H1.
   now do 2 rewrite (rngl_mul_0_l Hos) in H1.
 }
+destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
+  apply length_zero_iff_nil in Haz; subst la.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply (rngl_mul_0_l Hos).
+  }
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite nth_overflow; [ | easy ].
+    apply (rngl_mul_0_l Hos).
+  }
+  symmetry.
+  specialize (Hf 0%L 0%L) as H1.
+  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
+}
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat.sub_succ.
+do 2 rewrite Nat.sub_0_r.
+remember (∑ (j = _, S _), _) as x; cbn; subst x.
+specialize (IHi (tl la) lb).
+erewrite rngl_summation_eq_compat in IHi. 2: {
+  intros j Hj.
+  rewrite <- (List_nth_succ_cons (hd 0%L la)).
+  replace (hd _ _ :: tl _) with la by now destruct la.
+  easy.
+}
+rewrite IHi.
 ... ...
 apply lap_convol_mul_map.
 ...
