@@ -316,6 +316,20 @@ Qed.
 
 (**)
 
+Theorem map2_rngl_subt_0_l :
+  rngl_has_subt = true →
+  ∀ n la,
+  n = length la
+  → map2 rngl_subt (repeat 0%L n) la =
+  map (rngl_mul (0 - 1)%L) la.
+Proof.
+intros Hsu * Hn.
+subst n.
+induction la as [| a]; [ easy | cbn ].
+rewrite (rngl_subt_0_l Hsu); f_equal.
+apply IHla.
+Qed.
+
 Theorem map2_rngl_subt_0_r :
   rngl_has_subt = true →
   ∀ la, map2 rngl_subt la (repeat 0%L (length la)) = la.
@@ -2468,6 +2482,12 @@ destruct lb as [| b]. {
   cbn - [ map2 repeat ].
   rewrite lap_convol_mul_length.
   remember (length la + S (length lc)) as n eqn:Hn.
+  rewrite (map2_rngl_subt_0_l Hsu); [ | easy ].
+  rewrite (map2_rngl_subt_0_l Hsu). 2: {
+    symmetry; apply lap_convol_mul_length.
+  }
+Search (lap_convol_mul _ (map _ _)).
+Print lap_convol_mul.
 ...
   rewrite Nat.add_succ_r; cbn.
   do 2 rewrite rngl_summation_only_one.
