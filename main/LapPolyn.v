@@ -2612,12 +2612,54 @@ rewrite (Nat.add_comm _ (length la)).
 cbn - [ map2 ].
 Search (map2 _ (lap_convol_mul _ _ _ _)).
 Search (map _ (lap_convol_mul _ _ _ _)).
-lap_convol_mul_map2:
+Check lap_convol_mul_map.
+Theorem lap_convol_mul_map2 :
   rngl_has_opp_or_subt = true
-  → ∀ f g
-        → ∀ (la lb : list T) (i len : nat),
-            lap_convol_mul la (map f lb) i len =
-            map f (lap_convol_mul la lb i len)
+  → ∀ f,
+    (∀ a b c, (a * f b c)%L = f (a * b)%L (a * c)%L)
+  → ∀ (la lb lc : list T) (i len : nat),
+    lap_convol_mul la (map2 f lb lc) i len =
+    map2 f
+      (lap_convol_mul la lb i len)
+      (lap_convol_mul la lc i len).
+Proof.
+intros Hos * Hf *.
+assert (Hfz : ∀ a, f 0%L a = 0%L). {
+  intros.
+  specialize (Hf a 0%L 1%L) as H1.
+  rewrite (rngl_mul_0_r Hos), rngl_mul_1_r in H1.
+  rewrite <- H1; clear H1.
+...
+  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
+}
+*)
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+f_equal; [ | apply IHlen ].
+clear IHlen len.
+revert la lb.
+induction i; intros. {
+  do 3 rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  destruct (lt_dec 0 (length lb)) as [Hbz| Hbz]. 2: {
+    apply Nat.nlt_ge in Hbz.
+    apply Nat.le_0_r, length_zero_iff_nil in Hbz; subst lb.
+    rewrite List_nth_nil.
+    rewrite (rngl_mul_0_r Hos).
+    rewrite List_nth_nil.
+    rewrite (rngl_mul_0_r Hos).
+    symmetry.
+(*
+*)
+    rewrite Hf; f_equal.
+    apply (rngl_mul_0_r Hos).
+  }
+...
+  rewrite (map2_nth 0%L 0%L).
+  apply Hf.
+... ...
+rewrite (lap_convol_mul_map2 Hos).
+...
 rewrite (map2_map_min 0%L 0%L (lap_convol_mul _ _ _ _ ++ _)).
 ...
 intros Hsu *.
