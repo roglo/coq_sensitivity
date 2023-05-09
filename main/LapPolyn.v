@@ -2630,9 +2630,6 @@ assert (Hfz : ∀ a, f 0%L a = 0%L). {
   rewrite (rngl_mul_0_r Hos), rngl_mul_1_r in H1.
   rewrite <- H1; clear H1.
 ...
-  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
-}
-*)
 revert la lb i.
 induction len; intros; [ easy | cbn ].
 f_equal; [ | apply IHlen ].
