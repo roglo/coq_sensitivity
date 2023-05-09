@@ -323,8 +323,7 @@ Theorem map2_rngl_subt_0_l :
   → map2 rngl_subt (repeat 0%L n) la =
   map (rngl_mul (0 - 1)%L) la.
 Proof.
-intros Hsu * Hn.
-subst n.
+intros Hsu * Hn; subst n.
 induction la as [| a]; [ easy | cbn ].
 rewrite (rngl_subt_0_l Hsu); f_equal.
 apply IHla.
@@ -332,9 +331,11 @@ Qed.
 
 Theorem map2_rngl_subt_0_r :
   rngl_has_subt = true →
-  ∀ la, map2 rngl_subt la (repeat 0%L (length la)) = la.
+  ∀ n la,
+  n = length la
+  → map2 rngl_subt la (repeat 0%L n) = la.
 Proof.
-intros Hsu *.
+intros Hsu * Hn; subst n.
 induction la as [| la]; [ easy | cbn ].
 now rewrite (rngl_subt_0_r Hsu); f_equal.
 Qed.
@@ -359,7 +360,7 @@ intros Hsu *.
 unfold lap_subt.
 rewrite Nat.sub_0_r; cbn.
 rewrite app_nil_r.
-apply (map2_rngl_subt_0_r Hsu).
+now apply (map2_rngl_subt_0_r Hsu).
 Qed.
 
 (**)
@@ -1948,7 +1949,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
     rewrite rngl_add_0_r.
     rewrite (rngl_subt_0_r Hsu); f_equal.
     rewrite map2_rngl_add_0_r.
-    apply (map2_rngl_subt_0_r Hsu).
+    now apply (map2_rngl_subt_0_r Hsu).
   }
   cbn in Hab.
   apply Nat.succ_le_mono in Hab.
@@ -2583,9 +2584,34 @@ destruct lb as [| b]. {
     now rewrite (rngl_mul_0_sub_1_comm Hos).
   }
 }
-cbn - [ "-" ].
+move b before a.
 destruct lc as [| c]. {
-  cbn.
+  cbn - [ map2 repeat ].
+  do 3 rewrite Nat.sub_0_r.
+  do 2 rewrite app_nil_r.
+  rewrite map2_length, repeat_length, Nat.min_id.
+  rewrite lap_convol_mul_length.
+  remember (lap_convol_mul _ _ _ _) as x.
+  cbn; subst x.
+  rewrite (map2_rngl_subt_0_r Hsu); [ | easy ].
+  rewrite (map2_rngl_subt_0_r Hsu); [ easy | ].
+  symmetry; apply lap_convol_mul_length.
+}
+remember (lap_convol_mul _ _ _ _) as x; cbn; subst x.
+do 2 rewrite lap_convol_mul_length.
+rewrite map2_length.
+do 3 rewrite Nat.sub_0_r.
+do 2 rewrite app_length.
+do 2 rewrite repeat_length.
+rewrite (Nat.add_comm (length la) (S (length lc))).
+rewrite Nat.sub_add_distr, Nat.add_sub, Nat.sub_succ.
+rewrite (Nat.add_comm _ (length la)).
+rewrite (Nat.add_comm (length la) (S (length lb))).
+rewrite Nat.sub_add_distr, Nat.add_sub, Nat.sub_succ.
+rewrite (Nat.add_comm _ (length la)).
+cbn - [ map2 ].
+Search (map2 _ (lap_convol_mul _ _ _ _)).
+Search (map _ (lap_convol_mul _ _ _ _)).
 ...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
