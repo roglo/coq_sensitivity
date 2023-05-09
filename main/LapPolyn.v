@@ -2487,7 +2487,38 @@ destruct lb as [| b]. {
     symmetry; apply lap_convol_mul_length.
   }
 Search (lap_convol_mul _ (map _ _)).
+Search (map _ (lap_convol_mul _ _ _)).
 Print lap_convol_mul.
+Theorem lap_convol_mul_map :
+  rngl_has_opp_or_subt = true →
+  ∀ f,
+  (∀ la lb, f (la * lb)%L = (la * f lb)%L)
+  → ∀ la lb i len,
+    lap_convol_mul la (map f lb) i len =
+    map f (lap_convol_mul la lb i len).
+Proof.
+intros Hos * Hf *.
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+f_equal; [ | apply IHlen ].
+clear IHlen len.
+revert la lb.
+induction i; intros. {
+  do 2 rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  symmetry.
+  rewrite Hf; f_equal.
+  destruct (lt_dec 0 (length lb)) as [Hlb| Hlb]. {
+    now rewrite (List_map_nth' 0%L).
+  }
+  apply Nat.nlt_ge in Hlb.
+  apply Nat.le_0_r, length_zero_iff_nil in Hlb; subst lb.
+  cbn.
+  specialize (Hf 0%L 0%L) as H1.
+  now do 2 rewrite (rngl_mul_0_l Hos) in H1.
+}
+... ...
+apply lap_convol_mul_map.
 ...
   rewrite Nat.add_succ_r; cbn.
   do 2 rewrite rngl_summation_only_one.
