@@ -2616,20 +2616,28 @@ Check lap_convol_mul_map.
 Theorem lap_convol_mul_map2 :
   rngl_has_opp_or_subt = true
   → ∀ f,
-    (∀ a b c, (a * f b c)%L = f (a * b)%L (a * c)%L)
-  → ∀ (la lb lc : list T) (i len : nat),
-    lap_convol_mul la (map2 f lb lc) i len =
-    map2 f
-      (lap_convol_mul la lb i len)
-      (lap_convol_mul la lc i len).
+(*
+    (∀ a b c, f a (b + c)%L = f a (f b c))
+    → *) (∀ a b c, (a * f b c)%L = f (a * b)%L (a * c)%L)
+    → ∀ (la lb lc : list T) (i len : nat),
+      lap_convol_mul la (map2 f lb lc) i len =
+      map2 f
+        (lap_convol_mul la lb i len)
+        (lap_convol_mul la lc i len).
 Proof.
-intros Hos * Hf *.
+intros Hos * (*Hfa*) Hfm *.
+(*
 assert (Hfz : ∀ a, f 0%L a = 0%L). {
   intros.
-  specialize (Hf a 0%L 1%L) as H1.
+...
+  specialize (Hfa 0%L a 0%L) as H1.
+  intros.
+  specialize (Hfm a 0%L 1%L) as H1.
   rewrite (rngl_mul_0_r Hos), rngl_mul_1_r in H1.
   rewrite <- H1; clear H1.
+  specialize (Hfa 0%L) as H1.
 ...
+*)
 revert la lb i.
 induction len; intros; [ easy | cbn ].
 f_equal; [ | apply IHlen ].
@@ -2646,8 +2654,7 @@ induction i; intros. {
     rewrite List_nth_nil.
     rewrite (rngl_mul_0_r Hos).
     symmetry.
-(*
-*)
+...
     rewrite Hf; f_equal.
     apply (rngl_mul_0_r Hos).
   }
@@ -2656,6 +2663,8 @@ induction i; intros. {
   apply Hf.
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
+Search (rngl_subt (_ + _)%L _).
+Check rngl_add_sub.
 ...
 rewrite (map2_map_min 0%L 0%L (lap_convol_mul _ _ _ _ ++ _)).
 ...
