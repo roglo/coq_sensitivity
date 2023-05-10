@@ -2385,7 +2385,7 @@ Qed.
 
 (* *)
 
-Theorem lap_convol_mul_map :
+Theorem lap_convol_mul_map_r :
   rngl_has_opp_or_subt = true →
   ∀ f,
   (∀ la lb, f (la + lb)%L = (f la + f lb)%L)
@@ -2419,12 +2419,12 @@ destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
   apply length_zero_iff_nil in Haz; subst la.
   rewrite all_0_rngl_summation_0. 2: {
     intros j Hj.
-    rewrite nth_overflow; [ | easy ].
+    rewrite List_nth_nil.
     apply (rngl_mul_0_l Hos).
   }
   rewrite all_0_rngl_summation_0. 2: {
     intros j Hj.
-    rewrite nth_overflow; [ | easy ].
+    rewrite List_nth_nil.
     apply (rngl_mul_0_l Hos).
   }
   easy.
@@ -2472,6 +2472,8 @@ rewrite nth_overflow; [ | easy ].
 rewrite nth_overflow; [ | easy ].
 easy.
 Qed.
+
+...
 
 (*
 Theorem lap_norm_mul_subt_distr_l :
@@ -2575,7 +2577,7 @@ destruct lb as [| b]. {
   rewrite (map2_rngl_subt_0_l Hsu). 2: {
     symmetry; apply lap_convol_mul_length.
   }
-  apply (lap_convol_mul_map Hos). {
+  apply (lap_convol_mul_map_r Hos). {
     clear n la Hn; intros.
     apply rngl_mul_add_distr_l.
   } {
@@ -2610,6 +2612,10 @@ rewrite (Nat.add_comm (length la) (S (length lb))).
 rewrite Nat.sub_add_distr, Nat.add_sub, Nat.sub_succ.
 rewrite (Nat.add_comm _ (length la)).
 cbn - [ map2 ].
+(**)
+rewrite (map2_map_min 0%L 0%L).
+Check lap_convol_mul_map_r.
+...
 Search (map2 _ (lap_convol_mul _ _ _ _)).
 Search (map _ (lap_convol_mul _ _ _ _)).
 Check lap_convol_mul_map.
@@ -2646,11 +2652,14 @@ revert la lb.
 induction i; intros. {
   do 3 rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
-(**)
+(*
+...
   rewrite (map2_nth2 0%L 0%L); cycle 1. {
     intros.
+...
     specialize (Hfm 1%L b 0%L) as H1.
 ...
+*)
   destruct (lt_dec 0 (length lb)) as [Hbz| Hbz]. 2: {
     apply Nat.nlt_ge in Hbz.
     apply Nat.le_0_r, length_zero_iff_nil in Hbz; subst lb.
