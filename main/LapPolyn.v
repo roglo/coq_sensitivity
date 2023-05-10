@@ -2385,6 +2385,119 @@ Qed.
 
 (* *)
 
+Theorem lap_convol_mul_map_l :
+  rngl_has_opp_or_subt = true →
+  ∀ f,
+  (∀ la lb, f (la + lb)%L = (f la + f lb)%L)
+  → (∀ la lb, f (la * lb)%L = (f la * lb)%L)
+  → ∀ la lb i len,
+    lap_convol_mul (map f la) lb i len =
+    map f (lap_convol_mul la lb i len).
+Proof.
+intros Hos * Hfa Hfm *.
+assert (Hfz : f 0%L = 0%L). {
+  specialize (Hfm 0%L 0%L) as H1.
+  now do 2 rewrite (rngl_mul_0_r Hos) in H1.
+}
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+f_equal; [ | apply IHlen ].
+clear IHlen len.
+revert la lb.
+Print lap_convol_mul.
+induction i; intros. {
+  do 2 rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
+  symmetry.
+  rewrite Hfm; f_equal.
+  destruct (lt_dec 0 (length la)) as [Hla| Hla]. {
+    now rewrite (List_map_nth' 0%L).
+  }
+  apply Nat.nlt_ge in Hla.
+  now apply Nat.le_0_r, length_zero_iff_nil in Hla; subst la.
+}
+destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
+  apply length_zero_iff_nil in Hbz; subst lb.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite List_nth_nil.
+    apply (rngl_mul_0_r Hos).
+  }
+  easy.
+}
+rewrite rngl_summation_rtl.
+rewrite Nat.add_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat_sub_sub_distr; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite (rngl_summation_split_first 0); [ | easy ].
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1, Nat.sub_0_r.
+remember (∑ (j = _, S _), _) as x; cbn; subst x.
+rewrite rngl_summation_rtl.
+rewrite Nat.add_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat_sub_sub_distr; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+specialize (IHi la (tl lb)).
+erewrite rngl_summation_eq_compat in IHi. 2: {
+  intros j Hj.
+  remember (nth j _ _) as x.
+  rewrite <- (List_nth_succ_cons (hd 0%L lb)).
+  subst x.
+  replace (hd _ _ :: tl _) with lb by now destruct lb.
+  easy.
+}
+rewrite IHi.
+rewrite Hfa.
+rewrite Hfm.
+f_equal. {
+...
+  f_equal.
+  destruct (lt_dec (S i) (length lb)) as [Hib| Hib]. 2: {
+    apply Nat.nlt_ge in Hib.
+    rewrite (nth_overflow (map _ _)); [ | now rewrite map_length ].
+    rewrite (nth_overflow lb); [ | easy ].
+    now rewrite Hfz.
+  }
+  now rewrite (List_map_nth' 0%L).
+}
+f_equal.
+rewrite (rngl_summation_shift 1 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
+apply rngl_summation_eq_compat.
+intros j Hj.
+f_equal.
+destruct la; [ | easy ].
+cbn - [ nth ].
+rewrite nth_overflow; [ | easy ].
+rewrite nth_overflow; [ | easy ].
+easy.
+Qed.
+
+...
+*)
+
 Theorem lap_convol_mul_map_r :
   rngl_has_opp_or_subt = true →
   ∀ f,
