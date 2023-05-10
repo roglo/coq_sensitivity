@@ -753,6 +753,7 @@ Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
 Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
+Arguments rngl_summation_split_last {T ro} (b k)%nat g.
 Arguments rngl_summation_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
 Arguments rngl_summation_summation_exch {T ro rp} g k%nat.

@@ -2430,21 +2430,42 @@ destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
   }
   easy.
 }
-rewrite rngl_summation_rtl.
-rewrite Nat.add_0_r.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite Nat_sub_sub_distr; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub.
-  easy.
-}
-remember (∑ (j = _, _), _) as x; subst x.
-rewrite rngl_summation_split_first; [ | easy ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite (rngl_summation_split_first 0); [ | easy ].
 rewrite (rngl_summation_shift 1). 2: {
   split; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+rewrite Nat.sub_diag, Nat.sub_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+remember (∑ (j = _, _), _) as x; subst x.
+specialize (IHi la (tl lb)).
+erewrite rngl_summation_eq_compat in IHi. 2: {
+  intros j Hj.
+  remember (nth j _ _) as x.
+  rewrite <- (List_nth_succ_cons (hd 0%L lb)).
+  subst x.
+  replace (hd _ _ :: tl _) with lb by now destruct lb.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  easy.
+}
+rewrite IHi.
+rewrite Hfa.
+rewrite Hfm.
+...
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite (rngl_summation_split_first 0); [ | easy ].
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+...
 rewrite Nat.sub_diag, Nat_sub_succ_1, Nat.sub_0_r.
 remember (∑ (j = _, S _), _) as x; cbn; subst x.
 rewrite rngl_summation_rtl.
@@ -2468,6 +2489,20 @@ erewrite rngl_summation_eq_compat in IHi. 2: {
 rewrite IHi.
 rewrite Hfa.
 rewrite Hfm.
+...
+  Haz : length la ≠ 0
+  IHi : ∑ (i0 = 0, i), (λ j : nat, nth (S j) la 0 * nth (i - j) (map f lb) 0) i0 =
+        f (∑ (j = 0, i), nth j (tl la) 0 * nth (i - j) lb 0)
+  ============================
+  (nth 0 la 0 * nth (S i) (map f lb) 0 + f (∑ (j = 0, i), nth j (tl la) 0 * nth (i - j) lb 0))%L =
+  (nth 0 la 0 * f (nth (S i) lb 0) + f (∑ (j = 1, S i), nth j la 0 * nth (S i - j) lb 0))%L
+...
+  Hbz : length lb ≠ 0
+  IHi : ∑ (i0 = 0, i), (λ j : nat, nth j (map f la) 0 * nth (S (i - j)) lb 0) i0 =
+        f (∑ (j = 0, i), nth j la 0 * nth (i - j) (tl lb) 0)
+  ============================
+  (nth (S i) (map f la) 0 * nth 0 lb 0 + f (∑ (j = 0, i), nth j la 0 * nth (i - j) (tl lb) 0))%L =
+  (f (nth 0 la 0) * nth (S i) lb 0 + f (∑ (j = 1, S i), nth j la 0 * nth (S i - j) lb 0))%L
 f_equal. {
 ...
   f_equal.
@@ -2560,6 +2595,13 @@ erewrite rngl_summation_eq_compat in IHi. 2: {
 rewrite IHi.
 rewrite Hfa.
 rewrite Hfm.
+...
+  Hbz : length lb ≠ 0
+  IHi : ∑ (i0 = 0, i), (λ j : nat, nth j (map f la) 0 * nth (S (i - j)) lb 0) i0 =
+        f (∑ (j = 0, i), nth j la 0 * nth (i - j) (tl lb) 0)
+  ============================
+  (nth (S i) (map f la) 0 * nth 0 lb 0 + f (∑ (j = 0, i), nth j la 0 * nth (i - j) (tl lb) 0))%L =
+  (f (nth 0 la 0) * nth (S i) lb 0 + f (∑ (j = 1, S i), nth j la 0 * nth (S i - j) lb 0))%L
 f_equal. {
   f_equal.
   destruct (lt_dec (S i) (length lb)) as [Hib| Hib]. 2: {
