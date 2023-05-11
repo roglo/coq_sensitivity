@@ -2737,7 +2737,6 @@ destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
   }
   easy.
 }
-...
 rewrite rngl_summation_split_first; [ | easy ].
 rewrite (rngl_summation_shift 1). 2: {
   split; [ easy | ].
@@ -2746,7 +2745,13 @@ rewrite (rngl_summation_shift 1). 2: {
 rewrite Nat.sub_diag, Nat_sub_succ_1.
 remember (f _ _) as x in |-*; cbn; subst x.
 specialize (IHi (tl la) lb lc Hbc) as H1.
-destruct (
+erewrite rngl_summation_eq_compat in H1. 2: {
+  intros j Hj.
+  rewrite <- (List_nth_succ_cons (hd 0%L la)).
+  replace (hd _ _ :: tl _) with la by now destruct la.
+  easy.
+}
+rewrite H1; clear H1.
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
