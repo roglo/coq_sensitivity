@@ -1,7 +1,6 @@
 (* Testing if a list is a permutation of another one *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Require FinFun.
@@ -10,7 +9,7 @@ Import List List.ListNotations.
 
 Require Import Misc.
 
-Definition reflexive A (rel : A → A → bool) :=
+Definition reflexive {A} (rel : A → A → bool) :=
   ∀ a, rel a a = true.
 
 Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
@@ -23,7 +22,8 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
       end
   end.
 
-Definition permutation A (eqb : A → _) la lb := is_permutation eqb la lb = true.
+Definition permutation {A} (eqb : A → _) la lb :=
+  is_permutation eqb la lb = true.
 
 (*
 Require Import Relations.
@@ -116,7 +116,7 @@ destruct lxl as [((bef, x), aft)| ]. {
 
 (* *)
 
-Theorem permutation_cons_inv : ∀ A (eqb : A → _),
+Theorem permutation_cons_inv : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb a,
   permutation eqb (a :: la) (a :: lb) → permutation eqb la lb.
@@ -127,7 +127,7 @@ cbn in Hpab.
 now rewrite (equality_refl Heqb) in Hpab.
 Qed.
 
-Theorem permutation_app_inv_aux : ∀ A (eqb : A → _),
+Theorem permutation_app_inv_aux : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb lc ld a,
   a ∉ la
@@ -363,7 +363,7 @@ Qed.
 
 (* *)
 
-Theorem permutation_refl : ∀ A (eqb : A → _),
+Theorem permutation_refl : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l, permutation eqb l l.
 Proof.
@@ -373,9 +373,9 @@ apply permutation_cons_l_iff; cbn.
 now rewrite (equality_refl Heqb).
 Qed.
 
-Theorem permutation_in_iff : ∀ A (eqb : A → _),
+Theorem permutation_in_iff : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ la lb, permutation eqb la lb → ∀ a, a ∈ la ↔ a ∈ lb.
+  ∀ [la lb], permutation eqb la lb → ∀ a, a ∈ la ↔ a ∈ lb.
 Proof.
 intros * Heqb * Hpab a.
 revert a lb Hpab.
@@ -408,7 +408,7 @@ split. {
 }
 Qed.
 
-Theorem permutation_sym : ∀ A (eqb : A → _),
+Theorem permutation_sym : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb, permutation eqb la lb → permutation eqb lb la.
 Proof.
@@ -435,15 +435,15 @@ intros H; specialize (H1 _ H).
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
-Theorem permutation_nil_l : ∀ A (eqb : A → _) l,
+Theorem permutation_nil_l : ∀ {A} {eqb : A → _} l,
   permutation eqb [] l → l = [].
 Proof. now intros; destruct l. Qed.
 
-Theorem permutation_nil_r : ∀ A (eqb : A → _) l,
+Theorem permutation_nil_r : ∀ {A} {eqb : A → _} l,
   permutation eqb l [] → l = [].
 Proof. now intros; destruct l. Qed.
 
-Theorem permutation_trans : ∀ A (eqb : A → _),
+Theorem permutation_trans : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb lc,
   permutation eqb la lb → permutation eqb lb lc → permutation eqb la lc.
@@ -519,10 +519,10 @@ Add Parametric Relation : (list A) (permutation eqb)
 
 (* theorems equivalent to Permutation type *)
 
-Theorem permutation_nil_nil : ∀ A (eqb : A → _), permutation eqb [] [].
+Theorem permutation_nil_nil : ∀ {A} {eqb : A → _}, permutation eqb [] [].
 Proof. easy. Qed.
 
-Theorem permutation_skip : ∀ A (eqb : A → _),
+Theorem permutation_skip : ∀ {A} {eqb : A → _},
   reflexive eqb
   → ∀ a la lb, permutation eqb la lb → permutation eqb (a :: la) (a :: lb).
 Proof.
@@ -531,7 +531,7 @@ apply permutation_cons_l_iff; cbn.
 now rewrite Heqb.
 Qed.
 
-Theorem permutation_swap : ∀ A (eqb : A → _),
+Theorem permutation_swap : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ a b la, permutation eqb (b :: a :: la) (a :: b :: la).
 Proof.
@@ -546,7 +546,7 @@ Qed.
 
 (* *)
 
-Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+Theorem permutation_add_inv : ∀ {A} {eqb : A → _} (Heqb : equality eqb),
   ∀ a la lb,
   permutation eqb la lb
   → ∀ lc ld,
@@ -581,7 +581,7 @@ Qed.
 
 (* *)
 
-Theorem permutation_app_tail : ∀ A (eqb : A → _),
+Theorem permutation_app_tail : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l l' tl,
   permutation eqb l l' → permutation eqb (l ++ tl) (l' ++ tl).
@@ -649,7 +649,7 @@ specialize (Hbef' H); clear H.
 now rewrite (equality_refl Heqb) in Hbef'.
 Qed.
 
-Theorem permutation_app_head : ∀ A (eqb : A → _),
+Theorem permutation_app_head : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l tl tl',
   permutation eqb tl tl' → permutation eqb (l ++ tl) (l ++ tl').
@@ -662,7 +662,7 @@ rewrite (equality_refl Heqb).
 now apply IHl.
 Qed.
 
-Theorem permutation_app : ∀ A (eqb : A → _),
+Theorem permutation_app : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l m l' m',
   permutation eqb l l'
@@ -676,7 +676,7 @@ apply (permutation_trans Heqb) with (lb := l ++ m'). {
 now apply permutation_app_tail.
 Qed.
 
-Theorem permutation_cons_append : ∀ A (eqb : A → _),
+Theorem permutation_cons_append : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l x, permutation eqb (x :: l) (l ++ [x]).
 Proof.
@@ -688,7 +688,7 @@ apply permutation_skip; [ | easy ].
 now unfold reflexive; apply equality_refl.
 Qed.
 
-Theorem permutation_app_comm : ∀ A (eqb : A → _),
+Theorem permutation_app_comm : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l l', permutation eqb (l ++ l') (l' ++ l).
 Proof.
@@ -775,7 +775,7 @@ rewrite <- Hlen, H2.
 do 3 rewrite app_length; cbn; flia.
 Qed.
 
-Theorem permutation_cons_app : ∀ A (eqb : A → _),
+Theorem permutation_cons_app : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l l1 l2 a,
   permutation eqb l (l1 ++ l2)
@@ -826,7 +826,7 @@ specialize (Hbef H).
 now rewrite equality_refl in Hbef.
 Qed.
 
-Theorem permutation_middle : ∀ A (eqb : A → _),
+Theorem permutation_middle : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb a,
   permutation eqb (a :: la ++ lb) (la ++ a :: lb).
@@ -836,7 +836,7 @@ apply (permutation_cons_app Heqb).
 now apply permutation_refl.
 Qed.
 
-Theorem permutation_elt : ∀ A (eqb : A → _),
+Theorem permutation_elt : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ (la lb lc ld : list A) (a : A),
   permutation eqb (la ++ lb) (lc ++ ld)
@@ -850,7 +850,7 @@ eapply (permutation_trans Heqb). {
 now apply (permutation_cons_app Heqb).
 Qed.
 
-Theorem permutation_rev_l : ∀ A (eqb : A → _),
+Theorem permutation_rev_l : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l, permutation eqb (rev l) l.
 Proof.
@@ -864,7 +864,7 @@ apply permutation_skip; [ | easy ].
 now unfold reflexive; apply equality_refl.
 Qed.
 
-Theorem permutation_rev_r : ∀ A (eqb : A → _),
+Theorem permutation_rev_r : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l, permutation eqb l (rev l).
 Proof.
@@ -877,7 +877,7 @@ apply permutation_skip; [ | easy ].
 now unfold reflexive; apply equality_refl.
 Qed.
 
-Theorem permutation_length : ∀ A (eqb : A → _) la lb,
+Theorem permutation_length : ∀ {A} {eqb : A → _} {la lb},
   permutation eqb la lb → length la = length lb.
 Proof.
 intros * Hpab.
@@ -896,7 +896,7 @@ rewrite Nat.add_succ_r, <- app_length; f_equal.
 now apply IHla.
 Qed.
 
-Theorem permutation_app_inv : ∀ A (eqb : A → _),
+Theorem permutation_app_inv : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb lc ld a,
   permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
@@ -919,7 +919,7 @@ apply (H1 a _ _ Hp (la ++ lb) (lc ++ ld)). {
 }
 Qed.
 
-Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
+Theorem permutation_app_inv_l : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l l1 l2,
   permutation eqb (l ++ l1) (l ++ l2) → permutation eqb l1 l2.
@@ -934,7 +934,7 @@ rewrite app_nil_l in H12.
 now apply IHl.
 Qed.
 
-Theorem permutation_app_inv_r : ∀ A (eqb : A → _),
+Theorem permutation_app_inv_r : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l l1 l2,
   permutation eqb (l1 ++ l) (l2 ++ l) → permutation eqb l1 l2.
@@ -946,7 +946,7 @@ eapply (permutation_trans Heqb); [ apply Hll | ].
 now apply permutation_app_comm.
 Qed.
 
-Theorem permutation_length_1 : ∀ A (eqb : A → _),
+Theorem permutation_length_1 : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ a b,
   permutation eqb [a] [b] → a = b.
@@ -957,7 +957,7 @@ remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now apply Heqb in Hab | easy ].
 Qed.
 
-Theorem permutation_length_1_inv_l : ∀ A (eqb : A → _) (Heqb : equality eqb),
+Theorem permutation_length_1_inv_l : ∀ {A} {eqb : A → _} (Heqb : equality eqb),
   ∀ a l, permutation eqb [a] l → l = [a].
 Proof.
 intros * Heqb * Ha.
@@ -973,7 +973,7 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
-Theorem permutation_length_1_inv_r : ∀ A (eqb : A → _) (Heqb : equality eqb),
+Theorem permutation_length_1_inv_r : ∀ {A} {eqb : A → _} (Heqb : equality eqb),
   ∀ a l, permutation eqb l [a] → l = [a].
 Proof.
 intros * Heqb * Ha.
@@ -981,7 +981,7 @@ apply (permutation_sym Heqb) in Ha.
 now apply permutation_length_1_inv_l in Ha.
 Qed.
 
-Theorem NoDup_permutation : ∀ A (eqb : A → _),
+Theorem NoDup_permutation : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   NoDup la
@@ -1031,7 +1031,7 @@ apply IHHna. {
 }
 Qed.
 
-Theorem NoDup_permutation_bis : ∀ A (eqb : A → _),
+Theorem NoDup_permutation_bis : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   NoDup la
@@ -1048,9 +1048,9 @@ split; [ apply Hiab | ].
 now apply NoDup_length_incl.
 Qed.
 
-Theorem permutation_NoDup : ∀ A (eqb : A → _),
+Theorem permutation_NoDup : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ la lb,
+  ∀ [la lb],
   permutation eqb la lb → NoDup la → NoDup lb.
 Proof.
 intros * Heqb * Hpab Hla.
@@ -1088,7 +1088,7 @@ apply Hpab in H.
 now apply NoDup_cons_iff in Hla.
 Qed.
 
-Theorem permutation_map : ∀ A B (eqba : A → _) (eqbb : B → _),
+Theorem permutation_map : ∀ {A B} [eqba : A → _] [eqbb : B → _],
   equality eqba →
   equality eqbb →
   ∀ (f : A → B) (la lb : list A),
@@ -1199,7 +1199,7 @@ Fixpoint filter_Some {A} (lao : list (option A)) :=
   | None :: lao' => filter_Some lao'
   end.
 
-Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
+Theorem fold_permutation_assoc : ∀ {A} {eqb : A → _} la lb,
   permutation_assoc_loop eqb la (map Some lb) = permutation_assoc eqb la lb.
 Proof. easy. Qed.
 
@@ -1227,7 +1227,7 @@ induction la as [| a]; [ easy | cbn ].
 now f_equal.
 Qed.
 
-Theorem permutation_assoc_loop_length : ∀ A (eqb : A → _),
+Theorem permutation_assoc_loop_length : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lbo,
   permutation eqb la (filter_Some lbo)
@@ -1269,9 +1269,9 @@ rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 
-Theorem permutation_assoc_length : ∀ A (eqb : A → _),
+Theorem permutation_assoc_length : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ la lb,
+  ∀ {la lb},
   permutation eqb la lb
   → length (permutation_assoc eqb la lb) = length la.
 Proof.
@@ -1280,7 +1280,7 @@ apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
 
-Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
+Theorem permutation_assoc_loop_ub : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lbo i,
   permutation eqb la (filter_Some lbo)
@@ -1321,7 +1321,7 @@ rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 
-Theorem permutation_assoc_loop_None_inside : ∀ A (eqb : A → _),
+Theorem permutation_assoc_loop_None_inside : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lbo lco,
   permutation_assoc_loop eqb la (lbo ++ None :: lco) =
@@ -1593,7 +1593,7 @@ destruct xo as [x| ]; [ | apply IHl1 ].
 cbn; f_equal; apply IHl1.
 Qed.
 
-Theorem permutation_assoc_loop_nth_nth : ∀ A (eqb : A → _),
+Theorem permutation_assoc_loop_nth_nth : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ d la lbo i j,
   permutation eqb la (filter_Some lbo)
@@ -1707,9 +1707,9 @@ rewrite filter_Some_app in Hla; cbn in Hla.
 now do 2 rewrite filter_Some_map_Some in Hla.
 Qed.
 
-Theorem permutation_permutation_assoc : ∀ A (eqb : A → _),
+Theorem permutation_permutation_assoc : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ la lb,
+  ∀ {la lb},
   permutation eqb la lb
   → permutation Nat.eqb (permutation_assoc eqb la lb) (seq 0 (length la)).
 Proof.
@@ -1845,9 +1845,9 @@ rewrite fold_permutation_assoc.
 now apply IHla.
 Qed.
 
-Theorem map_permutation_assoc : ∀ A (eqb : A → _),
+Theorem map_permutation_assoc : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ d la lb,
+  ∀ d [la lb],
   permutation eqb la lb
   → la = map (λ i, nth i lb d) (permutation_assoc eqb la lb).
 Proof.
@@ -1940,7 +1940,7 @@ erewrite map_ext_in. 2: {
 now apply IHla.
 Qed.
 
-Theorem permutation_fun_nth : ∀ A (eqb : A → _),
+Theorem permutation_fun_nth : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ d la lb i,
   permutation eqb la lb
@@ -1976,7 +1976,7 @@ rewrite (List_map_nth' d) in Hij. {
 now rewrite (permutation_length Hpab) in Hi.
 Qed.
 
-Theorem permutation_nth : ∀ A (eqb : A → _),
+Theorem permutation_nth : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb d,
   permutation eqb la lb
@@ -2238,7 +2238,7 @@ split. {
 }
 Qed.
 
-Theorem permutation_partition : ∀ A (eqb : A → _),
+Theorem permutation_partition : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ f la lb lc,
   partition f la = (lb, lc)
@@ -2300,7 +2300,7 @@ Theorem fold_apply_transp_list : ∀ A trl (la : list A),
   apply_transp_list trl la.
 Proof. easy. Qed.
 
-Theorem transp_loop_shift : ∀ A (eqb : A → _),
+Theorem transp_loop_shift : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ i la lb,
   transp_loop eqb i la lb = shift_transp i (transp_list eqb la lb).
@@ -2386,7 +2386,7 @@ apply Nat.succ_lt_mono in Hk.
 now apply nth_indep.
 Qed.
 
-Theorem in_transp_loop_length : ∀ A (eqb : A → _),
+Theorem in_transp_loop_length : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   length la = length lb
@@ -2427,7 +2427,7 @@ rewrite app_length in H1 |-*; cbn in H1 |-*.
 now rewrite Nat.add_succ_r.
 Qed.
 
-Theorem in_transp_list_length : ∀ A (eqb : A → _),
+Theorem in_transp_list_length : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   length la = length lb
@@ -2439,7 +2439,7 @@ intros * Heqb * Hlab * Htab.
 apply (in_transp_loop_length Heqb la lb Hlab i j 0 Htab).
 Qed.
 
-Theorem permutation_transp_list : ∀ A (eqb : A → _),
+Theorem permutation_transp_list : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   permutation eqb la lb
@@ -2600,7 +2600,7 @@ rewrite <- Hl2.
 now replace (i - S len1 - len2) with (S (i - S len1 - S len2)) by flia Hi2.
 Qed.
 
-Theorem permutation_transp_inside : ∀ A (eqb : A → _),
+Theorem permutation_transp_inside : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ l1 l2 l3 x y,
   permutation eqb (l1 ++ y :: l2 ++ x :: l3) (l1 ++ x :: l2 ++ y :: l3).
@@ -2619,7 +2619,7 @@ apply (permutation_app_head Heqb).
 apply (permutation_app_comm Heqb).
 Qed.
 
-Theorem permutation_swap_any : ∀ A (eqb : A → _),
+Theorem permutation_swap_any : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ i j la,
   i < j < length la
@@ -2650,7 +2650,7 @@ rewrite swap_d_inside.
 now apply permutation_transp_inside.
 Qed.
 
-Theorem iter_list_permut : ∀ A (eqb : A → _),
+Theorem iter_list_permut : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ T (d : T) (op : T → T → T) (l1 l2 : list A) f
   (op_d_l : ∀ x, op d x = x)
@@ -2709,7 +2709,7 @@ f_equal.
 apply op_comm.
 Qed.
 
-Theorem incl_incl_permutation : ∀ A (eqb : A → _),
+Theorem incl_incl_permutation : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb, NoDup la → NoDup lb → la ⊂ lb → lb ⊂ la → permutation eqb la lb.
 Proof.
@@ -2768,7 +2768,7 @@ apply IHla. {
 }
 Qed.
 
-Theorem permutation_firstn : ∀ A (eqb : A → _) d,
+Theorem permutation_firstn : ∀ {A} {eqb : A → _} d,
   equality eqb →
   ∀ P n la lb,
   (∀ i, i < n → P (nth i la d) ∧ P (nth i lb d))
@@ -2865,7 +2865,7 @@ apply IHla; [ | | easy | easy ]. {
 }
 Qed.
 
-Theorem permutation_app_permutation_l : ∀ A (eqb : A → _),
+Theorem permutation_app_permutation_l : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb lc ld,
   permutation eqb (la ++ lb) (lc ++ ld)
@@ -2899,7 +2899,7 @@ rewrite app_assoc in H.
 now apply IHla in H.
 Qed.
 
-Theorem permutation_filter : ∀ A (eqb : A → _),
+Theorem permutation_filter : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ f la lb,
   permutation eqb la lb
@@ -2931,7 +2931,7 @@ Qed.
 
 Require Import Permutation.
 
-Theorem Permutation_permutation : ∀ A (eqb : A → _),
+Theorem Permutation_permutation : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb, Permutation la lb ↔ permutation eqb la lb.
 Proof.

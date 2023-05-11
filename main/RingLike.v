@@ -1892,6 +1892,7 @@ easy.
 Qed.
 *)
 
+(*
 Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%L.
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
@@ -1902,18 +1903,25 @@ Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
 Arguments rngl_has_subt_has_no_opp {T ro} Hsu.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin a%L b%L.
+*)
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
+(*
 Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%L.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%L.
+*)
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
+(*
 Arguments rngl_mul_0_sub_1_comm {T ro rp} Hos a%L.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%L b%L.
 Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.
 Arguments rngl_sub_0_l {T ro rp} Hos a%L.
 Arguments rngl_sub_0_r {T ro rp} Hos a%L.
+*)
 Arguments rngl_subt {T ro} (a b)%L.
+(*
 Arguments rngl_subt_0_l {T ro rp} Hsu a%L.
 Arguments rngl_subt_0_r {T ro rp} Hsu a%L.
+*)
