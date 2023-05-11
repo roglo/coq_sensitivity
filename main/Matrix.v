@@ -1,7 +1,6 @@
 (* matrices *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
@@ -15,6 +14,9 @@ Require Import MyVector Signature.
 
 Record matrix T := mk_mat
   { mat_list_list : list (list T) }.
+
+Arguments mk_mat [T]%type mat_list_list%list.
+Arguments mat_list_list [T]%type m.
 
 Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
 Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
@@ -305,6 +307,8 @@ Record square_matrix n T :=
   { sm_mat : matrix T;
     sm_prop : (mat_nrows sm_mat =? n) && is_square_matrix sm_mat = true }.
 
+Arguments sm_mat [n]%nat [T]%type s.
+
 Theorem square_matrix_eq {n T} : ∀ (MA MB : square_matrix n T),
   sm_mat MA = sm_mat MB
   → MA = MB.
@@ -362,7 +366,7 @@ Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
+Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
 (* addition *)
@@ -638,33 +642,43 @@ End a.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
+Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hop : @rngl_has_opp T ro = true}.
+Context (Hop : @rngl_has_opp T ro = true).
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
+(*
 Arguments δ {T ro} (i j)%nat.
 
+*)
 Arguments matrix_eq {T}%type {ro} (MA MB)%M.
+(*
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
+*)
 Arguments mat_mul_scal_l {T ro} s%L M%M.
+(*
 Arguments mat_list_list [T]%type m%M.
+*)
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
+(*
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments vect_zero {T ro} n%nat.
+*)
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
+(*
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
+*)
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -672,7 +686,9 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+(*
 Arguments mat_mul_vect_r {T ro} M%M V%V.
+*)
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : V_scope.
@@ -2763,7 +2779,7 @@ rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
 easy.
 Qed.
 
-Theorem List_repeat_as_map : ∀ A (a : A) n,
+Theorem List_repeat_as_map : ∀ [A] (a : A) n,
   repeat a n = map (λ _, a) (seq 0 n).
 Proof.
 intros.
@@ -3059,6 +3075,7 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
+(*
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
@@ -3111,6 +3128,7 @@ Arguments mZ {T ro} (m n)%nat.
 Arguments squ_mat_ncols {T}%type M%M.
 Arguments subm {T} i%nat j%nat M%M.
 Arguments δ {T}%type {ro} (i j)%nat.
+*)
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
