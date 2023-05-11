@@ -3,7 +3,6 @@
 (* ideals on a RingLike *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8.
 
@@ -71,18 +70,46 @@ Definition I_zero A {ro : ring_like_op A} {rp : ring_like_prop A}
     (I_zero_prop_mul_l A Hos Heb)
     (I_zero_prop_mul_r A Hos Heb).
 
-Definition I_one {A} {ro : ring_like_op A} {rp : ring_like_prop A} :
+Definition I_one A {ro : ring_like_op A} {rp : ring_like_prop A} :
     ideal A :=
   mk_I A (λ a, true) (λ _ _ _ _, eq_refl) (λ _ _ _, eq_refl)
     (λ _ _ _, eq_refl).
 
+(**)
+
 ...
 
-About I_zero.
-About I_one.
+Definition I_add {A} {ro : ring_like_op A} (Ia : ideal A) (a b : Ia) :=
+  (a + b)%L.
 
-Theorem I_add_prop_l :
-  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+...
+
+Definition I_add {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
+  mk_I A (λ c : A, (i_mem Ia c || i_mem Ib c)%bool)
+    (I_add_prop_add Ia Ib) (I_add_prop_mul_l Ia Ib) (I_add_prop_mul_r Ia Ib).
+
+...
+
+Theorem I_add_prop_add :
+  ∀ [A] {ro : ring_like_op A} (Ia Ib : ideal A),
+  ∀ (a b : A),
+  (i_mem Ia a || i_mem Ib a)%bool = true
+  → (i_mem Ia b || i_mem Ib b)%bool = true
+  → (i_mem Ia (a + b)%L || i_mem Ib (a + b)%L)%bool = true.
+Proof.
+intros * Ha Hb.
+apply Bool.orb_true_iff in Ha, Hb.
+apply Bool.orb_true_iff.
+destruct Ha as [Ha| Ha]. {
+  destruct Hb as [Hb| Hb]. {
+...
+    apply i_prop_add.
+...
+now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_mul_l.
+...
+
+Theorem I_add_prop_mul_l :
+  ∀ [A] {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
   (i_mem Ia b || i_mem Ib b)%bool = true
   → (i_mem Ia (a * b)%L || i_mem Ib (a * b)%L)%bool = true.
@@ -90,11 +117,11 @@ Proof.
 intros * Hab.
 apply Bool.orb_true_iff in Hab.
 apply Bool.orb_true_iff.
-now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_l.
+now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_mul_l.
 Qed.
 
-Theorem I_add_prop_r :
-  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+Theorem I_add_prop_mul_r :
+  ∀ [A] {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
   (i_mem Ia a || i_mem Ib a)%bool = true
   → (i_mem Ia (a * b)%L || i_mem Ib (a * b)%L)%bool = true.
@@ -102,11 +129,11 @@ Proof.
 intros * Hab.
 apply Bool.orb_true_iff in Hab.
 apply Bool.orb_true_iff.
-now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_r.
+now destruct Hab as [Hab| Hab]; [ left | right ]; apply i_prop_mul_r.
 Qed.
 
 Theorem I_mul_prop_l :
-  ∀ A {ro : ring_like_op A} (Ia Ib : ideal A),
+  ∀ [A] {ro : ring_like_op A} (Ia Ib : ideal A),
   ∀ a b : A,
   (i_mem Ia b && i_mem Ib b)%bool = true
   → (i_mem Ia (a * b)%L && i_mem Ib (a * b)%L)%bool = true.
@@ -115,7 +142,7 @@ intros * Hab.
 apply Bool.andb_true_iff in Hab.
 apply Bool.andb_true_iff.
 destruct Hab as (Ha, Hb).
-now split; apply i_prop_l.
+now split; apply i_prop_mul_l.
 Qed.
 
 Theorem I_mul_prop_r :
@@ -128,16 +155,21 @@ intros * Hab.
 apply Bool.andb_true_iff in Hab.
 apply Bool.andb_true_iff.
 destruct Hab as (Ha, Hb).
-now split; apply i_prop_r.
+now split; apply i_prop_mul_r.
 Qed.
+
+...
 
 Definition I_add {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
   mk_I A (λ c : A, (i_mem Ia c || i_mem Ib c)%bool)
-    (I_add_prop_l Ia Ib) (I_add_prop_r Ia Ib).
+    (I_add_prop_add Ia Ib) (I_add_prop_mul_l Ia Ib) (I_add_prop_mul_r Ia Ib).
 
 Definition I_mul {A} {ro : ring_like_op A} (Ia Ib : ideal A) : ideal A :=
   mk_I A (λ c : A, (i_mem Ia c && i_mem Ib c)%bool)
+42
     (I_mul_prop_l Ia Ib) (I_mul_prop_r Ia Ib).
+
+...
 
 Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
     (Hos : rngl_has_opp_or_subt = true) (Heb : rngl_has_eqb = true) :
