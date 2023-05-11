@@ -2766,6 +2766,12 @@ rewrite (rngl_summation_shift 1 1). 2: {
 }
 rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
 ...
+Search (_ + (_ - _))%L.
+Search (_ - (_ - _))%L.
+...
+a + (b - c)
+a - (b - c)
+...
 rngl_add_sub_simpl_l:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
