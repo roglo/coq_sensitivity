@@ -1,11 +1,9 @@
 (* Theorems of general usage, which could be (or not) in Coq library *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith Psatz.
 Import List List.ListNotations Init.Nat.
-Arguments length {A}.
 
 Global Hint Resolve Nat.le_0_l : core.
 Global Hint Resolve Nat.lt_0_succ : core.
@@ -206,7 +204,7 @@ intros.
 now destruct (Sumbool.sumbool_of_bool b); subst b.
 Qed.
 
-Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
+Theorem if_eqb_eq_dec : ∀ {A} i j (a b : A),
   (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
 Proof.
 intros.
@@ -354,10 +352,11 @@ Proof. now intros; destruct i. Qed.
 Theorem List_nth_0_cons : ∀ A (a : A) la d, nth 0 (a :: la) d = a.
 Proof. easy. Qed.
 
-Theorem List_nth_succ_cons : ∀ A (a : A) la i, nth (S i) (a :: la) = nth i la.
+Theorem List_nth_succ_cons : ∀ {A} (a : A) la i,
+  nth (S i) (a :: la) = nth i la.
 Proof. easy. Qed.
 
-Theorem List_map_nth' : ∀ A B a b (f : A → B) l n,
+Theorem List_map_nth' : ∀ {A B} a b (f : A → B) l n,
   n < length l → nth n (map f l) b = f (nth n l a).
 Proof.
 intros * Hnl.
@@ -369,7 +368,7 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
-Theorem List_map_hd : ∀ A B a b (f : A → B) l,
+Theorem List_map_hd : ∀ {A B} a b (f : A → B) l,
   0 < length l → hd b (map f l) = f (hd a l).
 Proof.
 intros.
@@ -440,7 +439,7 @@ Qed.
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
-Theorem List_cons_is_app : ∀ A (a : A) la, a :: la = [a] ++ la.
+Theorem List_cons_is_app : ∀ {A} (a : A) la, a :: la = [a] ++ la.
 Proof. easy. Qed.
 
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
@@ -483,7 +482,7 @@ intros.
 now destruct la.
 Qed.
 
-Theorem map2_nth : ∀ A B C a b c (f : A → B → C) la lb n,
+Theorem map2_nth : ∀ {A B C} a b c (f : A → B → C) la lb n,
   n < length la
   → n < length lb
   → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
@@ -663,7 +662,7 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem map2_map2_seq_l : ∀ A B C d (f : A → B → C) la lb,
+Theorem map2_map2_seq_l : ∀ {A B C} d (f : A → B → C) la lb,
   map2 f la lb = map2 (λ i b, f (nth i la d) b) (seq 0 (length la)) lb.
 Proof.
 intros.
@@ -676,7 +675,7 @@ rewrite map2_map_l.
 apply IHla.
 Qed.
 
-Theorem map2_map2_seq_r : ∀ A B C d (f : A → B → C) la lb,
+Theorem map2_map2_seq_r : ∀ {A B C} d (f : A → B → C) la lb,
   map2 f la lb = map2 (λ a i, f a (nth i lb d)) la (seq 0 (length lb)).
 Proof.
 intros.
@@ -761,7 +760,7 @@ f_equal; flia.
 Qed.
 
 Theorem map2_map_min :
-  ∀ A B C ad bd la lb (f : A → B → C),
+  ∀ {A B C} ad bd la lb (f : A → B → C),
   map2 f la lb =
     map (λ i, f (nth i la ad) (nth i lb bd))
       (seq 0 (min (length la) (length lb))).
@@ -846,15 +845,15 @@ Qed.
 (* rank: rank of the first element satisfying a predicate *)
 (* like "find" but returning the rank, not the element itself *)
 
-Fixpoint List_rank_loop i A (f : A → bool) (l : list A) : nat :=
+Fixpoint List_rank_loop i [A] (f : A → bool) (l : list A) : nat :=
   match l with
   | [] => i
   | x :: tl => if f x then i else List_rank_loop (S i) f tl
 end.
 
-Definition List_rank := List_rank_loop 0.
+Definition List_rank [A] := @List_rank_loop 0 A.
 
-Theorem List_rank_loop_interv : ∀ A f (l : list A) i,
+Theorem List_rank_loop_interv : ∀ {A} f (l : list A) i,
   i ≤ List_rank_loop i f l ≤ i + length l.
 Proof.
 intros.
@@ -923,7 +922,7 @@ apply IHk in Hi; cbn.
 now do 2 rewrite <- Nat.add_succ_comm.
 Qed.
 
-Theorem List_rank_if : ∀ A d f (l : list A) i,
+Theorem List_rank_if : ∀ {A} d f (l : list A) {i},
   List_rank f l = i
   → (∀ j, j < i → f (nth j l d) = false) ∧
     (i < length l ∧ f (nth i l d) = true ∨ i = length l).
@@ -967,7 +966,7 @@ rewrite skipn_cons.
 apply IHla.
 Qed.
 
-Theorem List_skipn_is_cons : ∀ A (d : A) la n,
+Theorem List_skipn_is_cons : ∀ {A} (d : A) la n,
   n < length la
   → skipn n la = nth n la d :: skipn (S n) la.
 Proof.
@@ -1243,7 +1242,7 @@ Proof. easy. Qed.
 
 (* repeat_apply: applying a function n times *)
 
-Fixpoint repeat_apply A n (f : A → A) a :=
+Fixpoint repeat_apply {A} n (f : A → A) a :=
   match n with
   | 0 => a
   | S n' => repeat_apply n' f (f a)
@@ -1280,13 +1279,14 @@ Definition equivalence {A} (eqv : A → A → bool) :=
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 
-Theorem equality_refl {A} (eqb : A → _) : equality eqb → ∀ a, eqb a a = true.
+Theorem equality_refl {A} {eqb : A → _} : equality eqb → ∀ a, eqb a a = true.
 Proof.
 intros * Heqb *.
 now apply Heqb.
 Qed.
 
-Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
+Theorem equality_in_dec :
+  ∀ {A} {eqb : A → _} (Heqb : equality eqb) (a : A) la,
   { a ∈ la } + { a ∉ la }.
 Proof.
 intros.
@@ -1342,7 +1342,7 @@ Definition comparator {A} (compare : A → _) :=
 
 (* list_eqv *)
 
-Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
+Fixpoint list_eqv {A} (eqv : A → A → bool) la lb :=
   match la with
   | [] =>
       match lb with
@@ -1356,7 +1356,7 @@ Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
       end
   end.
 
-Theorem list_eqb_eq : ∀ A (eqb : A → _),
+Theorem list_eqb_eq : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb, list_eqv eqb la lb = true ↔ la = lb.
 Proof.
@@ -1376,7 +1376,7 @@ split; intros Hlab. {
 }
 Qed.
 
-Theorem list_eqb_neq : ∀ A (eqb : A → _),
+Theorem list_eqb_neq : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb, list_eqv eqb la lb = false → la ≠ lb.
 Proof.
@@ -1417,7 +1417,7 @@ Qed.
 
 (* list_leb *)
 
-Fixpoint list_leb A (leb : A → A → bool) la lb :=
+Fixpoint list_leb {A} (leb : A → A → bool) la lb :=
   match la with
   | [] => true
   | a :: la' =>
@@ -1434,7 +1434,7 @@ Fixpoint list_leb A (leb : A → A → bool) la lb :=
 
 (* list_ltb *)
 
-Fixpoint list_ltb A (ltb : A → A → bool) la lb :=
+Fixpoint list_ltb {A} (ltb : A → A → bool) la lb :=
   match lb with
   | [] => false
   | b :: lb' =>
@@ -1485,7 +1485,7 @@ Qed.
 
 (* end pair_eqb *)
 
-Definition unsome A (d : A) o :=
+Definition unsome {A} (d : A) o :=
   match o with
   | Some x => x
   | None => d
@@ -1547,7 +1547,7 @@ split. {
 }
 Qed.
 
-Theorem extract_None_iff : ∀ A (f : A → _) l,
+Theorem extract_None_iff : ∀ {A} (f : A → _) l,
   extract f l = None ↔ ∀ a, a ∈ l → f a = false.
 Proof.
 intros.
@@ -1573,13 +1573,13 @@ Qed.
 
 (* member: a computable "In" *)
 
-Fixpoint member A (eqb : A → A → bool) a la :=
+Fixpoint member {A} (eqb : A → A → bool) a la :=
   match la with
   | [] => false
   | b :: lb => if eqb a b then true else member eqb a lb
   end.
 
-Theorem member_true_iff : ∀ A (eqb : A → _),
+Theorem member_true_iff : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
 Proof.
@@ -1608,7 +1608,7 @@ split. {
 }
 Qed.
 
-Theorem member_false_iff : ∀ A (eqb : A → _),
+Theorem member_false_iff : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ a la, member eqb a la = false ↔ ∀ b, b ∈ la → a ≠ b.
 Proof.
@@ -1641,13 +1641,13 @@ Qed.
 
 (* no_dup: a computable "NoDup" *)
 
-Fixpoint no_dup A (eqb : A → A → bool) la :=
+Fixpoint no_dup {A} (eqb : A → A → bool) la :=
   match la with
   | [] => true
   | a :: la' => if member eqb a la' then false else no_dup eqb la'
   end.
 
-Theorem no_dup_NoDup : ∀ A (eqb : A → _),
+Theorem no_dup_NoDup : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la, no_dup eqb la = true ↔ NoDup la.
 Proof.
@@ -1674,7 +1674,7 @@ split; intros Hla. {
 }
 Qed.
 
-Theorem no_dup_false_iff : ∀ A (eqb : A → _),
+Theorem no_dup_false_iff : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la, no_dup eqb la = false ↔
   ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
@@ -1835,7 +1835,7 @@ rewrite <- seq_shift.
 now rewrite map_map.
 Qed.
 
-Theorem List_map_nth_seq : ∀ A d (la : list A),
+Theorem List_map_nth_seq : ∀ {A} d (la : list A),
   la = map (λ i, nth i la d) (seq 0 (length la)).
 Proof.
 intros.
@@ -2061,7 +2061,7 @@ f_equal; f_equal.
 flia Hlen.
 Qed.
 
-Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
+Theorem fold_left_op_fun_from_d : ∀ {T A} d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
@@ -2706,7 +2706,7 @@ rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
 
-Theorem in_cart_prod_iff : ∀ A (d : A) ll la,
+Theorem in_cart_prod_iff : ∀ {A} (d : A) ll la,
   la ∈ cart_prod ll
   ↔ length la = length ll ∧ ∀ i, i < length la → nth i la d ∈ nth i ll [].
 Proof.
@@ -2745,7 +2745,7 @@ Qed.
 
 (* end cart_prod *)
 
-Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
+Theorem NoDup_filter {A} : ∀ (f : A → _) {l}, NoDup l → NoDup (filter f l).
 Proof.
 intros * Hnd.
 induction l as [| a l]; [ easy | cbn ].
@@ -3142,8 +3142,6 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
-Arguments iter_list {A B}%type l%list f%function : simpl never.
-Arguments iter_shift {T}%type s [b k]%nat.
 Arguments "<?" : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.

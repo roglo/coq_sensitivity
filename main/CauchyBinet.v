@@ -1993,7 +1993,7 @@ intros i Hi.
 rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
   rewrite Hjm.
   assert (Hklen : length kl = m). {
-    apply (f_equal length) in Hkl.
+    apply (f_equal (λ l, length l)) in Hkl.
     now rewrite isort_length, seq_length in Hkl.
   }
   rewrite <- Hklen in Hpk.

@@ -194,7 +194,7 @@ Theorem eq_isort_rank_nil : ∀ A (rel : A → _) l,
   isort_rank rel l = [] → l = [].
 Proof.
 intros * Hl.
-apply (f_equal length) in Hl.
+apply (f_equal (λ l, length l)) in Hl.
 rewrite isort_rank_length in Hl.
 now apply length_zero_iff_nil in Hl.
 Qed.

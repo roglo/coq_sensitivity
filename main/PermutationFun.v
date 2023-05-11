@@ -1305,7 +1305,7 @@ destruct x as [b| ]; [ | easy ].
 apply Heqb in H; subst b.
 destruct i. {
   rewrite List_nth_0_cons.
-  apply (f_equal length) in Hlb.
+  apply (f_equal (λ l, length l)) in Hlb.
   rewrite app_length in Hlb; cbn in Hlb.
   rewrite Hlb; flia.
 }
@@ -2030,7 +2030,7 @@ split. {
     apply Nat.eqb_eq in H; subst x.
     rewrite if_eqb_eq_dec in Hij.
     destruct (Nat.eq_dec (length bef) (length la)) as [Hba| Hba]. {
-      apply (f_equal length) in Hp.
+      apply (f_equal (λ l, length l)) in Hp.
       rewrite (permutation_assoc_length Heqb Hpab), app_length in Hp.
       cbn in Hp; flia Hp Hba.
     }
@@ -2051,7 +2051,7 @@ split. {
     apply Nat.eqb_eq in H; subst x.
     rewrite if_eqb_eq_dec in Hij.
     destruct (Nat.eq_dec (length bef') (length la)) as [Hba'| Hba']. {
-      apply (f_equal length) in Hp'.
+      apply (f_equal (λ l, length l)) in Hp'.
       rewrite (permutation_assoc_length Heqb Hpab), app_length in Hp'.
       cbn in Hp'; flia Hp' Hba'.
     }

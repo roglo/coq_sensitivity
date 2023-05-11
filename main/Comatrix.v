@@ -585,7 +585,7 @@ rewrite determinant_alternating; [ | easy | easy | flia | | | ]; cycle 1. {
         now rewrite fold_mat_nrows.
       }
       cbn in Hc'.
-      apply (f_equal length) in Hc'.
+      apply (f_equal (λ l, length l)) in Hc'.
       rewrite Hc in Hc'. 2: {
         apply nth_In.
         rewrite fold_mat_nrows.
@@ -595,7 +595,7 @@ rewrite determinant_alternating; [ | easy | easy | flia | | | ]; cycle 1. {
     }
     apply Nat.nle_gt in Hri.
     cbn in Hc'.
-    apply (f_equal length) in Hc'.
+    apply (f_equal (λ l, length l)) in Hc'.
     rewrite Hc in Hc'. 2: {
       apply nth_In.
       rewrite fold_mat_nrows.

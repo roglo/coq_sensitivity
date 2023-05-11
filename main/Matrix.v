@@ -2624,7 +2624,7 @@ split. {
     now rewrite fold_mat_nrows, smat_nrows.
   }
   apply map_eq_nil in Hco.
-  apply (f_equal length) in Hco.
+  apply (f_equal (λ l, length l)) in Hco.
   rewrite fold_mat_ncols in Hco.
   rewrite smat_ncols in Hco.
   now rewrite Hco in Hnz.

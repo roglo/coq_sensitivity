@@ -2296,7 +2296,7 @@ apply (permutation_trans Heqb) with (lb := l'). 2: {
   subst l'.
   rewrite split_list_split_list_inv; [ easy | ].
   apply split_list_lengths in Hla.
-  apply (f_equal length) in Hlc, Hld.
+  apply (f_equal (λ l, length l)) in Hlc, Hld.
   rewrite msort_loop_length in Hlc, Hld.
   now rewrite Hlc, Hld.
 }

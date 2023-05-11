@@ -514,7 +514,7 @@ split. {
   injection Hs; clear Hs; intros Hs Hx; symmetry in Hx.
   move Hx after Hla1.
   split. {
-    apply (f_equal length) in Hsv.
+    apply (f_equal (λ l, length l)) in Hsv.
     rewrite seq_length in Hsv.
     rewrite app_length in Hsv; cbn in Hsv.
     rewrite app_length in Hsv; cbn in Hsv.
@@ -526,7 +526,7 @@ split. {
     apply in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
-    apply (f_equal length) in Hs.
+    apply (f_equal (λ l, length l)) in Hs.
     rewrite seq_length in Hs.
     rewrite app_length in Hs.
     cbn in Hs; flia Hs.
@@ -540,7 +540,7 @@ split. {
   rewrite Nat.add_sub_assoc in Hla3. 2: {
     rewrite Hx, <- Nat.add_succ_r.
     apply Nat.add_le_mono_l.
-    apply (f_equal length) in Hsv.
+    apply (f_equal (λ l, length l)) in Hsv.
     rewrite seq_length, app_length in Hsv; cbn in Hsv.
     flia Hsv.
   }

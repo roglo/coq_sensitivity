@@ -932,14 +932,14 @@ rewrite <- List_last_nth.
 (* we know that "la" without its last element (its n-th element) has
    length "n"... *)
 assert (Hra : length (removelast la) = n). {
-  apply (f_equal length) in H4.
+  apply (f_equal (λ l, length l)) in H4.
   rewrite app_length, Nat.add_1_r in H4.
   rewrite Hla in H4.
   now apply Nat.succ_inj in H4.
 }
 (* and that "lb1++lb2" also has length "n" *)
 assert (Hbbl : length (lb1 ++ lb2) = n). {
-  apply (f_equal length) in Hlb.
+  apply (f_equal (λ l, length l)) in Hlb.
   rewrite app_length in Hlb; cbn in Hlb.
   rewrite Nat.add_succ_r, <- app_length in Hlb.
   destruct Hbp as (Hbp1, Hbp2).

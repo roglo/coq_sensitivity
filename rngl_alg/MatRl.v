@@ -563,7 +563,32 @@ Theorem mat_opt_eqb_eq : ∀ eqb n,
         (@eq (square_matrix n T) a b)
   | false => not_applicable
   end.
-Admitted.
+(*
+  if rngl_has_eqb
+  then ∀ a b : square_matrix n T, (a =? b)%L = true ↔ a = b
+  else not_applicable
+*)
+Proof.
+cbn; intros.
+remember rngl_has_eqb as eb eqn:Heb; symmetry in Heb.
+destruct eb. {
+  assert (Heq : equality eqb). {
+    unfold equality.
+    specialize rngl_opt_eqb_eq as H1.
+    rewrite Heb in H1.
+(* bon. à voir... *)
+...
+    apply (rngl_eqb_eq Heb).
+...
+split; intros Hab. {
+  apply (mat_eqb_eq Heb) in Hab.
+  now apply square_matrix_eq.
+} {
+  subst b; cbn.
+  unfold square_matrix_eqb.
+  now apply mat_eqb_eq.
+}
+Qed.
 
 Theorem squ_mat_characteristic_prop :
   ∀ eqb n,
