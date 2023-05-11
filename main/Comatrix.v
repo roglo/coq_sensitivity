@@ -1,7 +1,6 @@
 (* comatrices *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
@@ -15,8 +14,8 @@ Import matrix_Notations.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 Definition com (M : matrix T) : matrix T :=
   mk_mat
@@ -1957,11 +1956,11 @@ Theorem cramer's_rule_by_mul :
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
-  ∀ (M : matrix T) (U V : vector T),
+  ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
   → vect_size U = mat_nrows M
   → (M • U)%V = V
-  → ∀ i, 1 ≤ i ≤ mat_nrows M →
+  → ∀ [i], 1 ≤ i ≤ mat_nrows M →
   (det M * vect_el U i)%L = det (mat_repl_vect i M V).
 Proof.
 intros Hop Hic Hch Hii * Hsm Hum Hmuv k Hk.
@@ -2032,12 +2031,14 @@ Qed.
 
 End a.
 
+(*
 Arguments com {T}%type {ro} M%M.
 Arguments cramer's_rule {T ro rp} Hop Hic Hiq Hch [M%M U%V V%V].
 Arguments laplace_formula_on_cols {T ro rp} Hop Hic H10 M%M [j]%nat.
 Arguments laplace_formula_on_rows {T}%type {ro rp} Hop Hic M%M [i]%nat.
 Arguments mat_inv {T}%type {ro} M%M.
 Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
+*)
 
 Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
 
