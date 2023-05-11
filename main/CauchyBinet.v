@@ -809,8 +809,7 @@ assert (Hhg : ∀ l, l ∈ cart_prod_rep_seq n → h1 (g1 l) = l). {
   now destruct Hl.
 }
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
-rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
-    with (lb := cart_prod_rep_seq n); [ | easy | ]. {
+rewrite (rngl_summation_list_permut Heql) with (lb := cart_prod_rep_seq n). {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
@@ -1290,7 +1289,7 @@ assert (Hel : equality (list_eqv eqb)). {
   apply Nat.eqb_eq.
 }
 set (g := no_dup Nat.eqb).
-erewrite (rngl_summation_list_permut _ Hel). 2: {
+erewrite (rngl_summation_list_permut Hel). 2: {
   assert (H : ∀ ll,
     permutation (list_eqv eqb) ll
       (filter g ll ++ filter (λ l, negb (g l)) ll)). {
@@ -1332,7 +1331,7 @@ assert (Hel : equality (list_eqv eqb)). {
 }
 rewrite rngl_summation_cart_prod_repeat_filter_no_dup; [ | easy ].
 rewrite rngl_summation_summation_list_flat_map; cbn.
-apply (rngl_summation_list_permut _ Hel).
+apply (rngl_summation_list_permut Hel).
 apply permutation_no_dup_cart_prod_repeat_flat_all_permut_sub_lists.
 Qed.
 

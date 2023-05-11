@@ -22,9 +22,9 @@ Notation "'∑' ( i ∈ l ) , g" :=
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
+Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hom : rngl_has_opp_or_subt = true}.
+Context (Hom : rngl_has_opp_or_subt = true).
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c + f i) l a =
@@ -598,7 +598,7 @@ f_equal. {
 }
 Qed.
 
-Theorem rngl_summation_list_permut : ∀ A (eqb : A → _),
+Theorem rngl_summation_list_permut : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ (la lb : list A) f,
   permutation eqb la lb
@@ -723,6 +723,7 @@ Qed.
 
 End a.
 
+(*
 Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.
 Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
 Arguments rngl_summation_list_split_first {T}%type {ro rp} A%type l%list.
@@ -759,3 +760,4 @@ Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
 Arguments rngl_summation_summation_exch {T ro rp} g k%nat.
 Arguments rngl_summation_summation_list_flat_map {T ro rp} (A B)%type la%list.
 Arguments rngl_summation_summation_list_swap {T ro rp} (_ _)%type (_ _)%list.
+*)
