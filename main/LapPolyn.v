@@ -2740,8 +2740,7 @@ destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
 }
 rewrite rngl_summation_split_first; [ | easy ].
 rewrite (rngl_summation_shift 1). 2: {
-  split; [ easy | ].
-  now apply -> Nat.succ_le_mono.
+  split; [ easy | now apply -> Nat.succ_le_mono ].
 }
 rewrite Nat.sub_diag, Nat_sub_succ_1.
 remember (f _ _) as x in |-*; cbn; subst x.
@@ -2757,6 +2756,15 @@ rewrite (rngl_summation_split_first 0 (S i)); [ | easy ].
 rewrite (rngl_summation_split_first 0 (S i)); [ | easy ].
 rewrite Nat.sub_0_r.
 rewrite Hfd.
+rewrite (rngl_summation_shift 1 1). 2: {
+  split; [ easy | now apply -> Nat.succ_le_mono ].
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+remember (∑ (j = 1, _), _) as x; cbn; subst x.
+rewrite (rngl_summation_shift 1 1). 2: {
+  split; [ easy | now apply -> Nat.succ_le_mono ].
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
