@@ -10,7 +10,6 @@
    Bj1j2…jm denotes the m×m matrix consisting of rows j1,j2,…,jm of B. *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations Init.Nat.
@@ -377,8 +376,8 @@ Qed.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 (* submatrix with list rows jl *)
 Definition mat_select_rows (jl : list nat) (M : matrix T) :=
@@ -396,8 +395,8 @@ Arguments mat_select_cols {T ro} jl%list M%M.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 
@@ -1534,7 +1533,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_1 :
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
-  ∀ m n A B, m ≠ 0 →
+  ∀ [m n A B], m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
   → mat_ncols B = m
@@ -1611,7 +1610,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_2 :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
-  ∀ m n A B, m ≠ 0 →
+  ∀ [m n A B], m ≠ 0 →
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
@@ -1707,7 +1706,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_3 :
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
-  ∀ m n f B, m ≠ 0 →
+  ∀ [m n] f [B], m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
   → mat_ncols B = m
@@ -1761,7 +1760,7 @@ Lemma Cauchy_Binet_formula_step_4 :
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
-  ∀ m n f B, m ≠ 0 →
+  ∀ [m n] [B] f, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
   → mat_ncols B = m
@@ -1846,7 +1845,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_5_2 :
   rngl_has_opp = true →
-  ∀ m n A f, m ≠ 0 →
+  ∀ [m n A] f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     f jl =
@@ -1959,7 +1958,7 @@ rewrite (List_map_nth' 0); [ flia | flia Hi ].
 Qed.
 
 Lemma Cauchy_Binet_formula_step_5_3 :
-  ∀ m n A f, m ≠ 0 →
+  ∀ [m n A] f, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
   → ∑ (jl ∈ sub_lists_of_seq_1_n n m),
@@ -2018,7 +2017,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_5_4 :
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
-  ∀ m n A f, m ≠ 0 → n ≠ 0 →
+  ∀ [m n A] f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
   → mat_ncols A = n
@@ -2090,26 +2089,26 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hcra Hac) as H1.
   now rewrite Har in H1.
 }
-rewrite (Cauchy_Binet_formula_step_1 Hop H10 A B Hmz Har Hac Hbc).
+rewrite (Cauchy_Binet_formula_step_1 Hop H10 Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_2 Hop Hic n A B Hmz).
+rewrite (Cauchy_Binet_formula_step_2 Hop Hic Hmz).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
     (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_3 Hop H10 _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_3 Hop H10 _ Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hii _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hop Hic Hch Hii _ Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -2123,7 +2122,7 @@ rewrite (Cauchy_Binet_formula_step_5_1 Hop).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_2 Hop n A _ Hmz).
+rewrite (Cauchy_Binet_formula_step_5_2 Hop _ Hmz).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2131,7 +2130,7 @@ rewrite (Cauchy_Binet_formula_step_5_2 Hop n A _ Hmz).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_3 _ Hmz Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2139,7 +2138,7 @@ rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_5_4 Hop H10 A _ Hmz Hnz Hca Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_4 Hop H10 _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     det (mat_select_cols jl A) * det (mat_select_rows jl B) =
@@ -2155,11 +2154,11 @@ Arguments Cauchy_Binet_formula {T ro rp} _ [m n]%nat.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 Corollary determinant_mul : in_charac_0_field →
-  ∀ A B,
+  ∀ [A B],
   is_square_matrix A = true
   → is_square_matrix B = true
   → mat_nrows A = mat_nrows B
@@ -2224,4 +2223,6 @@ Qed.
 
 End a.
 
+(*
 Arguments determinant_mul {T ro rp} _ (A B)%M.
+*)
