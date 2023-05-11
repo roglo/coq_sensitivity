@@ -2765,6 +2765,8 @@ rewrite (rngl_summation_shift 1 1). 2: {
   split; [ easy | now apply -> Nat.succ_le_mono ].
 }
 rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
+(* mmm... has_subt semble insuffisant ; faut has_opp, je pense
+   donc ça va pas *)
 ...
 Search (_ + (_ - _))%L.
 Search (_ - (_ - _))%L.
