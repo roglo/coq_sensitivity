@@ -11,7 +11,6 @@
  *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import Init.Nat List List.ListNotations.
