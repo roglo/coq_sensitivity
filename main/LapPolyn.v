@@ -2694,6 +2694,7 @@ Theorem lap_convol_mul_map2 :
   rngl_has_opp_or_subt = true
   → ∀ f,
     (∀ a b c, (a * f b c)%L = f (a * b)%L (a * c)%L)
+    → (∀ a b c, f a (b + c)%L = f a (f b c))
     → ∀ (la lb lc : list T) (i len : nat),
       length lb = length lc
       → lap_convol_mul la (map2 f lb lc) i len =
@@ -2701,7 +2702,7 @@ Theorem lap_convol_mul_map2 :
           (lap_convol_mul la lb i len)
           (lap_convol_mul la lc i len).
 Proof.
-intros Hos * Hfm * Hbc.
+intros Hos * Hfm Hfd * Hbc.
 assert (Hfz : f 0%L 0%L = 0%L). {
   specialize (Hfm 0%L 1%L 1%L) as H1.
   now do 2 rewrite (rngl_mul_0_l Hos) in H1.
@@ -2752,6 +2753,10 @@ erewrite rngl_summation_eq_compat in H1. 2: {
   easy.
 }
 rewrite H1; clear H1.
+rewrite (rngl_summation_split_first 0 (S i)); [ | easy ].
+rewrite (rngl_summation_split_first 0 (S i)); [ | easy ].
+rewrite Nat.sub_0_r.
+rewrite Hfd.
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
