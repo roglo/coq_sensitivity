@@ -1,7 +1,6 @@
 (* determinant *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
@@ -19,8 +18,8 @@ Definition set_minus {A} (eqb : A → _) E F :=
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 (*
  * three definitions of determinant
@@ -357,7 +356,7 @@ unfold cart_prod_rep_seq.
 apply NoDup_cart_prod_repeat.
 Qed.
 
-Theorem cart_prod_rep_seq_inj : ∀ n i j,
+Theorem cart_prod_rep_seq_inj : ∀ [n i j],
   n ≠ 0
   → i < n ^ n
   → j < n ^ n
@@ -2354,8 +2353,8 @@ assert (Hs : permut_seq_with_len n (seq 0 n)) by apply seq_permut_seq_with_len.
 assert (Hr' : mat_nrows M⁺ = n). {
   now rewrite mat_transp_nrows, squ_mat_ncols.
 }
-rewrite (det_any_permut_l Hic Hop H10 M Hnz Hr Hsm Hs).
-rewrite (det_any_permut_r Hic Hop H10 (M⁺)%M Hnz Hr' Hts Hs).
+rewrite (det_any_permut_l Hic Hop H10 _ M _ Hnz Hr Hsm Hs).
+rewrite (det_any_permut_r Hic Hop H10 _ (M⁺)%M _ Hnz Hr' Hts Hs).
 apply rngl_summation_list_eq_compat.
 intros p Hp.
 f_equal.
@@ -2429,9 +2428,12 @@ Qed.
 End a.
 
 Arguments det {T ro} M%M.
+(*
 Arguments det' {T}%type {ro} M%M.
 Arguments det'' {T}%type {ro} M%M.
-Arguments determinant_alternating {T}%type {ro rp} Hic Hop M%M [p q]%nat.
+*)
+Arguments determinant_alternating {T ro rp} Hic Hop M%M [p q]%nat.
+(*
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T ro rp} Hic Hop Hch Hit M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
@@ -2440,3 +2442,4 @@ Arguments det'_is_det'' {T ro rp} Hop M%M.
 Arguments det_is_det'' {T ro rp} Hop M%M Hsm.
 Arguments det_mI {T ro rp} _ n%nat.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
+*)
