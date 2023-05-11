@@ -2429,7 +2429,6 @@ destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
   }
   easy.
 }
-(**)
 rewrite rngl_summation_split_first; [ | easy ].
 rewrite (rngl_summation_shift 1). 2: {
   split; [ easy | ].
@@ -2725,6 +2724,29 @@ induction i; intros. {
   rewrite (map2_nth 0%L 0%L); [ | easy | congruence ].
   apply Hfm.
 }
+destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
+  apply length_zero_iff_nil in Haz; subst la.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj; rewrite List_nth_nil; apply (rngl_mul_0_l Hos).
+  }
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj; rewrite List_nth_nil; apply (rngl_mul_0_l Hos).
+  }
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj; rewrite List_nth_nil; apply (rngl_mul_0_l Hos).
+  }
+  easy.
+}
+...
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+remember (f _ _) as x in |-*; cbn; subst x.
+specialize (IHi (tl la) lb lc Hbc) as H1.
+destruct (
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
