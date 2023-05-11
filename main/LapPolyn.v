@@ -2765,6 +2765,14 @@ rewrite (rngl_summation_shift 1 1). 2: {
   split; [ easy | now apply -> Nat.succ_le_mono ].
 }
 rewrite Nat.sub_diag, Nat_sub_succ_1; cbn.
+...
+rngl_add_sub_simpl_l:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_has_opp_or_subt = true
+      → ∀ a b c : T, (a + b - (a + c))%L = (b - c)%L
+Check rngl_add_sub_assoc.
+(a + b) - c = a + (b - c) ?
 ... ...
 rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
