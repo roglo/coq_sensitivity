@@ -2634,6 +2634,23 @@ Theorem lap_mul_subt_distr_l :
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
 Proof.
 intros Hsu *.
+Abort.
+End a.
+Require Import NatRingLike.
+Check lap_subt.
+Compute (
+  let ro := nat_ring_like_op in
+  let la := [1;1] in
+  let lb := [2] in
+  let lc := [0;1] in
+  (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap).
+(*
+     = [2; 2; 0] = [2; 1; 0]
+c'est donc faux
+*)
+(x+1)*(2-x) = (x+1)(2+(0-1)x) = (0-1)x²+(2+(0-1))x+2
+(x+1)*2-(x+1)x = (2x+2)-(x²+x) = (0-1)x²+x+2
+...
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
@@ -2691,6 +2708,7 @@ rewrite (Nat.add_comm (length la) (S (length lb))).
 rewrite Nat.sub_add_distr, Nat.add_sub, Nat.sub_succ.
 rewrite (Nat.add_comm _ (length la)).
 cbn - [ map2 ].
+...
 Theorem lap_convol_mul_map2 :
   rngl_has_opp_or_subt = true
   → ∀ f,
