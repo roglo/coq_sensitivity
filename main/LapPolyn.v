@@ -2644,6 +2644,11 @@ Compute (
   let lb := [2] in
   let lc := [0;1] in
   (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap).
+...
+a+(b-c) = a-c+b ? : faux dans les nat
+a+(b-c) = a+b-c ? : faux dans les nat
+Compute (1+(0-1)=1-1+0).
+Compute (1+(0-1)=1+0-1).
 (*
      = [2; 2; 0] = [2; 1; 0]
 c'est donc faux
