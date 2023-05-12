@@ -163,7 +163,7 @@ split. {
 }
 Qed.
 
-Theorem matrix_eq : ∀ T (ro : ring_like_op T) MA MB,
+Theorem matrix_eq : ∀ {T} {ro : ring_like_op T} MA MB,
   (∀ i j, 1 ≤ i ≤ mat_nrows MA → 1 ≤ j ≤ mat_ncols MB →
    mat_el MA i j = mat_el MB i j)
   → is_correct_matrix MA = true
@@ -3077,8 +3077,10 @@ Delimit Scope M_scope with M.
 
 (*
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
+*)
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
+(*
 Arguments mat_add_0_l {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_add_swap {T}%type {ro rp} (MA MB MC)%M.
@@ -3100,13 +3102,17 @@ Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%L (MA MB)%M.
 Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%L M%M.
 Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%L M%M.
 Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%L (MA MB)%M.
+*)
 Arguments mat_mul_scal_l {T ro} s%L M%M.
+(*
 Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hop a%L MA%M V%V.
 Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%L MA%M V%V.
+*)
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_ncols {T}%type M%M.
 Arguments mat_nrows {T}%type M%M.
+(*
 Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
 Arguments mat_repl_vect_ncols {T ro} [k]%nat M%M V%V.
@@ -3126,7 +3132,9 @@ Arguments minus_one_pow {T ro}.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments squ_mat_ncols {T}%type M%M.
+*)
 Arguments subm {T} i%nat j%nat M%M.
+(*
 Arguments δ {T}%type {ro} (i j)%nat.
 *)
 
