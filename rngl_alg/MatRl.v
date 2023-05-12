@@ -555,7 +555,7 @@ apply List_hd_in, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
 
-Theorem mat_opt_eqb_eq : ∀ eqb n,
+Theorem mat_opt_eqb_eq : ∀ eqb (Heq : equality eqb) n,
   match @rngl_has_eqb (square_matrix n T) (@mat_ring_like_op eqb n) return Prop with
   | true =>
       forall a b : square_matrix n T,
@@ -570,18 +570,8 @@ Theorem mat_opt_eqb_eq : ∀ eqb n,
 *)
 Proof.
 cbn; intros.
-remember rngl_has_eqb as eb eqn:Heb; symmetry in Heb.
-destruct eb. {
-  assert (Heq : equality eqb). {
-    unfold equality.
-    specialize rngl_opt_eqb_eq as H1.
-    rewrite Heb in H1.
-(* bon. à voir... *)
-...
-    apply (rngl_eqb_eq Heb).
-...
 split; intros Hab. {
-  apply (mat_eqb_eq Heb) in Hab.
+  apply mat_eqb_eq in Hab; [ | easy ].
   now apply square_matrix_eq.
 } {
   subst b; cbn.
@@ -715,7 +705,7 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
-Definition mat_ring_like_prop eqb (n : nat) :
+Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
   let rom := mat_ring_like_op eqb in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
@@ -744,7 +734,7 @@ Definition mat_ring_like_prop eqb (n : nat) :
 (*
      rngl_opt_quot_mul := NA;
 *)
-     rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb n;
+     rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb Heq n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
