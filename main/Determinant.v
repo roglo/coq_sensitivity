@@ -1775,11 +1775,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     split. {
       apply Hsg; rewrite <- Hji.
-      now apply (sym_gr_inv_lt _ Hnz).
+      now apply (sym_gr_inv_lt Hnz).
     } {
       destruct Hsg as (H1 & H2 & H3).
       apply H1; rewrite <- Hji.
-      now apply (sym_gr_inv_lt _ Hnz).
+      now apply (sym_gr_inv_lt Hnz).
     }
   }
   easy.
@@ -1803,7 +1803,7 @@ split. {
   apply in_seq in Hj.
   rewrite <- Hji.
   rewrite <- sym_gr_size with (sg := sg); [ | easy ].
-  now apply (sym_gr_inv_lt _ Hnz).
+  now apply (sym_gr_inv_lt Hnz).
 } {
   apply (NoDup_map_iff 0).
   rewrite seq_length.

@@ -1,7 +1,6 @@
 (* permutations of sequences of natural numbers between 0 and n-1 *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
@@ -21,7 +20,7 @@ Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associat
 Definition permut_seq l := permutation Nat.eqb l (seq 0 (length l)).
 Definition permut_seq_with_len n f := permut_seq f ∧ length f = n.
 
-Theorem permut_seq_NoDup : ∀ l, permut_seq l → NoDup l.
+Theorem permut_seq_NoDup : ∀ {l}, permut_seq l → NoDup l.
 Proof.
 intros * Hp.
 unfold permut_seq in Hp.
@@ -135,7 +134,9 @@ Proof.
 intros * Hnd.
 now apply NoDup_nth.
 Qed.
+(*
 Arguments NoDup_nat : clear implicits.
+*)
 
 Theorem nat_NoDup : ∀ l,
   (∀ i j, i < length l → j < length l → nth i l 0 = nth j l 0 → i = j)
@@ -145,7 +146,7 @@ intros * Hnd.
 now apply NoDup_nth in Hnd.
 Qed.
 
-Theorem permut_list_without : ∀ n l,
+Theorem permut_list_without : ∀ [n l],
   permut_seq l
   → n < length l
   → (∀ i, i < length l → nth i l 0 ≠ n)
@@ -226,7 +227,7 @@ intros i.
 now destruct (Nat.eq_dec (nth i l 0) n) as [H| H]; [ right | left ].
 Qed.
 
-Theorem permut_comp_assoc : ∀ n f g h,
+Theorem permut_comp_assoc : ∀ n [f g h],
   length g = n
   → length h = n
   → permut_seq h
@@ -242,7 +243,9 @@ rewrite Hg, <- Hh.
 now apply permut_seq_ub.
 Qed.
 
+(*
 Arguments permut_comp_assoc n%nat [f g h]%list.
+*)
 
 (*
    Canonical Symmetric Group.
@@ -342,7 +345,7 @@ Qed.
 
 (* *)
 
-Theorem perm_assoc_permut_seq : ∀ A (eqb : A → _),
+Theorem perm_assoc_permut_seq : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ la lb,
   permutation eqb la lb
@@ -412,7 +415,7 @@ Qed.
 
 (* *)
 
-Theorem permut_isort_leb : ∀ l,
+Theorem permut_isort_leb : ∀ [l],
   permut_seq l
   → isort Nat.leb l = seq 0 (length l).
 Proof.
@@ -431,7 +434,7 @@ rename l' into l.
 now apply sorted_permut.
 Qed.
 
-Theorem permut_comp_isort_rank_r : ∀ l,
+Theorem permut_comp_isort_rank_r : ∀ [l],
   permut_seq l
   → l ° isort_rank Nat.leb l = seq 0 (length l).
 Proof.
@@ -469,7 +472,7 @@ apply isort_rank_ub.
 now intros H; subst l.
 Qed.
 
-Theorem permut_comp_isort_rank_l : ∀ l,
+Theorem permut_comp_isort_rank_l : ∀ [l],
   permut_seq l
   → isort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
@@ -788,7 +791,7 @@ split; [ | apply seq_length ].
 apply seq_permut_seq.
 Qed.
 
-Theorem sym_gr_inv_lt : ∀ n sg v,
+Theorem sym_gr_inv_lt : ∀ [n] {sg v},
   n ≠ 0
   → is_sym_gr_list n sg
   → sym_gr_inv sg v < length sg.
@@ -812,7 +815,7 @@ apply (Hsurj (seq 0 n)).
 apply seq_permut_seq_with_len.
 Qed.
 
-Theorem nth_sym_gr_inv_sym_gr : ∀ sg l n,
+Theorem nth_sym_gr_inv_sym_gr : ∀ [sg] [l] [n],
   is_sym_gr_list n sg
   → permut_seq_with_len n l
   → nth (sym_gr_inv sg l) sg [] = l.
@@ -870,7 +873,7 @@ specialize (H1 _ Hi).
 now apply (list_eqb_neq Nat.eqb_eq) in H1.
 Qed.
 
-Theorem length_of_empty_sym_gr : ∀ sg,
+Theorem length_of_empty_sym_gr : ∀ [sg],
   is_sym_gr_list 0 sg → length sg = 1.
 Proof.
 intros * Hsg.
@@ -1562,7 +1565,7 @@ f_equal.
 apply canon_sym_gr_sub_canon_permut_list.
 Qed.
 
-Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
+Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ [n sg],
   is_sym_gr_list n sg
   → ∀ k : fin_t n!,
       (sym_gr_inv sg
@@ -1587,7 +1590,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 now apply sym_gr_inv_lt with (n := n).
 Qed.
 
-Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
+Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ [n sg],
   is_sym_gr_list n sg
   → ∀ k : fin_t (length sg),
       (canon_sym_gr_list_inv n (nth (proj1_sig k) sg []) <? n!)
@@ -1602,14 +1605,14 @@ specialize (Hsg k pk).
 now apply canon_sym_gr_list_inv_ub.
 Qed.
 
-Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
+Definition rank_in_sym_gr_of_rank_in_canon_sym_gr [n sg]
     (Hsg : is_sym_gr_list n sg) (k : fin_t n!) : fin_t (length sg) :=
   exist (λ a : nat, (a <? length sg) = true)
     (sym_gr_inv sg
       (nth (proj1_sig k) (canon_sym_gr_list_list n) []))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
-Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
+Definition rank_in_canon_sym_gr_of_rank_in_sym_gr [n sg]
     (Hsg : is_sym_gr_list n sg) (k : fin_t (length sg)) : fin_t n! :=
   exist (λ a : nat, (a <? n!) = true)
     (canon_sym_gr_list_inv n (nth (proj1_sig k) sg []))
@@ -1937,7 +1940,7 @@ Print permut_seq.
 ...
 *)
 
-Theorem isort_rank_permut_seq_with_len : ∀ A (rel : A → _) n l,
+Theorem isort_rank_permut_seq_with_len : ∀ {A} (rel : A → _) n [l],
   length l = n
   → permut_seq_with_len n (isort_rank rel l).
 Proof.
@@ -1961,9 +1964,11 @@ split. {
 apply isort_rank_length.
 Qed.
 
+(*
 Arguments isort_rank_permut_seq_with_len {A} rel n%nat [l]%list.
+*)
 
-Theorem isort_rank_permut_seq : ∀ A (rel : A → _) l,
+Theorem isort_rank_permut_seq : ∀ {A} (rel : A → _) l,
   permut_seq (isort_rank rel l).
 Proof.
 intros.
@@ -2335,4 +2340,6 @@ apply H1; [ | | easy ]. {
 }
 Qed.
 
+(*
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
+*)

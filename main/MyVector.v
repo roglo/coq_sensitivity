@@ -1,7 +1,6 @@
 (* vectors *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import Init.Nat.
@@ -13,6 +12,9 @@ Require Import RingLike IterAdd.
 Record vector T := mk_vect
   { vect_list : list T }.
 
+Arguments mk_vect [T]%type.
+Arguments vect_list [T]%type.
+
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
 Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
@@ -22,7 +24,7 @@ Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
 
-Theorem vector_eq : ∀ T {ro : ring_like_op T} (U V : vector T),
+Theorem vector_eq : ∀ {T} {ro : ring_like_op T} (U V : vector T),
   (∀ i, 1 ≤ i ≤ vect_size U → vect_el U i = vect_el V i)
   → vect_size U = vect_size V
   → U = V.
@@ -46,7 +48,7 @@ Qed.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
+Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
 Theorem fold_vect_el : ∀ (V : vector T) i,
@@ -136,7 +138,9 @@ Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments vect_dot_mul (U V)%V.
+(*
 Arguments vector_eq {T}%type {ro} (U V)%V.
+*)
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
@@ -145,8 +149,10 @@ Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
 
+(*
 Arguments vect_dot_mul (U V)%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
+*)
 Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_assoc : ∀ (a b : T) (V : vector T),
@@ -520,17 +526,22 @@ End a.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
+(*
 Arguments vect_add {T}%type {ro} (U V)%V.
 Arguments vect_add_assoc {T ro rp} (u v w)%V.
 Arguments vect_add_comm {T ro rp} (u v)%V.
+*)
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
+(*
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
 Arguments vect_dot_mul_add_r {T ro rp} n%nat (u v w)%V.
 Arguments vect_dot_mul_comm {T ro rp} Hic (u v)%V.
 Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
+*)
 Arguments vect_el {T}%type {ro} V%V i%nat.
+(*
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
 Arguments vect_list [T]%type v%V.
 Arguments vect_mul_scal_l {T ro} s%L V%V.
@@ -546,11 +557,14 @@ Arguments vect_opp_dot_mul_l {T ro rp} Hop (u v)%V.
 Arguments vect_opp_el {T ro rp} Hop v%V i%nat.
 Arguments vect_opp_size {T ro} v%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%L (U V)%V.
+*)
 Arguments vect_size {T}%type v%V.
+(*
 Arguments vect_squ_norm {T}%type {ro} V%V.
 Arguments vect_sub {T ro} U%V V%V.
 Arguments vect_zero {T ro} n%nat.
 Arguments vector_eq {T}%type {ro} (U V)%V.
+*)
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.

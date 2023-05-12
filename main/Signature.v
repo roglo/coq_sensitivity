@@ -1,7 +1,6 @@
 (* signatures *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith Init.Nat.
 Import List List.ListNotations.
@@ -13,8 +12,8 @@ Require Import IterMul PermutSeq.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 (* version of signature (parity) of a list of nat *)
 
@@ -111,7 +110,7 @@ Qed.
 
 Theorem ε_app_cons :
   rngl_has_opp = true →
-  ∀ n la lb,
+  ∀ {n} la lb,
   (∀ a, a ∈ la ++ lb → a < n)
   → ε (la ++ n :: lb) = (minus_one_pow (length lb) * ε (la ++ lb))%L.
 Proof.
@@ -296,7 +295,7 @@ split. {
 }
 Qed.
 
-Theorem permut_without_highest : ∀ n l,
+Theorem permut_without_highest : ∀ {n l},
   permut_seq_with_len (S n) l
   → ∃ i, i < length l ∧ nth i l 0 = n ∧ permut_seq_with_len n (butn i l).
 Proof.
@@ -808,7 +807,7 @@ apply (ε_aux_app_cons_ε_aux_app_app Hop).
 Qed.
 
 Theorem ε_aux_app_cons_lt :
-  ∀ i j la lb,
+  ∀ {i j} la lb,
   i < j
   → ε_aux i (la ++ j :: lb) = ε_aux i (la ++ lb).
 Proof.
@@ -820,7 +819,7 @@ Qed.
 
 Theorem ε_aux_app_cons_gt :
   rngl_has_opp = true →
-  ∀ i j la lb,
+  ∀ {i j} la lb,
   j < i
   → ε_aux i (la ++ j :: lb) = (- ε_aux i (la ++ lb))%L.
 Proof.
@@ -1225,7 +1224,7 @@ Qed.
 
 Theorem transposition_signature_lt :
   rngl_has_opp = true →
-  ∀ n p q,
+  ∀ {n p q},
   p < q
   → q < n
   → ε (map (transposition p q) (seq 0 n)) = (-1)%L.
@@ -1415,7 +1414,9 @@ split. {
 }
 Qed.
 
+(*
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list_scope.
+*)
 
 Theorem comp_permut_seq_with_len : ∀ n σ₁ σ₂,
   permut_seq_with_len n σ₁
@@ -1553,7 +1554,7 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-Theorem comp_1_r : ∀ n la,
+Theorem comp_1_r : ∀ n {la},
   length la = n
   → la ° seq 0 n = la.
 Proof.
@@ -1564,7 +1565,9 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
+(*
 Arguments comp_1_r n%nat [la]%list.
+*)
 
 Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
 Proof.
@@ -1573,7 +1576,7 @@ apply isort_rank_permut_seq_with_len.
 apply isort_rank_length.
 Qed.
 
-Theorem permut_isort_rank_involutive : ∀ la,
+Theorem permut_isort_rank_involutive : ∀ {la},
   permut_seq la
   → isort_rank Nat.leb (isort_rank Nat.leb la) = la.
 Proof.
@@ -1694,7 +1697,7 @@ rewrite <- Hlr in Hc2.
 now apply Nat.nle_gt in Hc2.
 Qed.
 
-Theorem collapse_keeps_order : ∀ l,
+Theorem collapse_keeps_order : ∀ {l},
   NoDup l
   → ∀ i j,  i < length l → j < length l
   → (nth i (collapse l) 0 ?= nth j (collapse l) 0) =
@@ -1803,7 +1806,7 @@ rewrite collapse_length in Hi, Hj.
 now apply (collapse_keeps_order Hnd).
 Qed.
 
-Theorem permut_isort : ∀ ord,
+Theorem permut_isort : ∀ {ord},
   antisymmetric ord
   → transitive ord
   → total_relation ord
@@ -1908,7 +1911,9 @@ apply isort_comp_permut_r.
 now rewrite Hal, <- Hbl.
 Qed.
 
+(*
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
+*)
 
 Theorem permut_collapse : ∀ la,
   permut_seq la
@@ -2415,7 +2420,7 @@ f_equal. {
 }
 Qed.
 
-Theorem canon_sym_gr_surjective : ∀ n k j,
+Theorem canon_sym_gr_surjective : ∀ {n k j},
   k < fact n
   → j < n
   → ∃ i : nat, i < n ∧ nth i (canon_sym_gr_list n k) 0 = j.
@@ -2500,6 +2505,7 @@ Qed.
 
 End a.
 
+(*
 Arguments ε {T}%type {ro}.
 
 Arguments ε_nil {T ro}.
@@ -2517,3 +2523,4 @@ Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_add {T}%type {ro rp} Hop (a b)%nat.
 Arguments minus_one_pow_mul_comm {T ro rp} Hop i%nat x%L.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
+*)
