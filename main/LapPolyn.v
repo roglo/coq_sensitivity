@@ -2649,6 +2649,9 @@ Compute (
 c'est donc faux
 a(b-c)=ab-ac marche pour la soustraction dans ℕ mais ne marche pas pour
 la soustraction dans ℕ[x]
+peut-être que ma multiplication de polynômes est pas correcte ? qu'elle
+serait calculée dans le mauvais ordre ? chais pas, mais faut que
+j'investigue dans ce sens d'abord.
 *)
 (x+1)*(2-x) = (x+1)(2+(0-1)x) = (0-1)x²+(2+(0-1))x+2
 (x+1)*2-(x+1)x = (2x+2)-(x²+x) = (0-1)x²+x+2
