@@ -17,9 +17,9 @@ Require Import Misc RingLike IterAdd.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
-Context {Heb : rngl_has_eqb = true}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context (Heb : rngl_has_eqb = true).
 
 (* normalization: lap not ending with 0s *)
 
@@ -278,9 +278,9 @@ Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
-Context {Heb : rngl_has_eqb = true}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context (Heb : rngl_has_eqb = true).
 
 Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.
@@ -2628,6 +2628,7 @@ Qed.
 ...
 *)
 
+(*
 Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
@@ -2823,6 +2824,7 @@ apply eq_lap_norm_eq_length. 2: {
 apply (lap_norm_mul_subt_distr_l Hsu).
 Qed.
 ...
+*)
 
 (* lap ring-like properties *)
 
@@ -2910,6 +2912,6 @@ Arguments list_nth_lap_add {T ro rp} k%nat (la lb)%lap.
 Arguments list_nth_lap_eq {T ro rp} Heb (la lb)%lap.
 Arguments map2_rngl_add_0_l {T ro rp} la%lap.
 Arguments map2_rngl_add_0_r {T ro rp} la%lap.
-Arguments map2_rngl_subt_0_r {T ro rp} Hsu la%lap.
+Arguments map2_rngl_subt_0_r {T ro rp} Hsu [n]%nat la%lap.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments strip_0s_length_le {T ro} l%list.

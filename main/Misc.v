@@ -39,7 +39,7 @@ Theorem Tauto_match_nat_same : ∀ A a (b : A),
   match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
 
-Theorem eq_list_eq : ∀ A d (la lb : list A),
+Theorem eq_list_eq : ∀ {A} d (la lb : list A),
   length la = length lb
   → (∀ i, i < length la → nth i la d = nth i lb d)
   → la = lb.
@@ -1825,7 +1825,7 @@ intros.
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem List_map_map_seq : ∀ A B d (f : A → B) la,
+Theorem List_map_map_seq : ∀ {A B} d (f : A → B) la,
   map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
 Proof.
 intros.
@@ -1875,7 +1875,7 @@ intros * Hab.
 now subst lb; rewrite rev_involutive.
 Qed.
 
-Theorem List_rev_repeat : ∀ A (x : A) n,
+Theorem List_rev_repeat : ∀ {A} (x : A) n,
   rev (repeat x n) = repeat x n.
 Proof.
 intros.

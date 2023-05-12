@@ -1946,6 +1946,7 @@ erewrite map_ext_in. 2: {
   rewrite butn_0_cons.
   now rewrite fold_butn.
 }
+unfold mat_nrows.
 now rewrite <- List_map_map_seq.
 Qed.
 

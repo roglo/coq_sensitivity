@@ -3075,9 +3075,7 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-(*
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
-*)
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
 (*

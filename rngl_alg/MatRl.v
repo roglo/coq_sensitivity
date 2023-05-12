@@ -93,7 +93,7 @@ Definition smI n : square_matrix n T :=
 
 Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
-  {| sm_mat := (sm_mat MA + sm_mat MB);
+  {| sm_mat := sm_mat MA + sm_mat MB;
      sm_prop := square_matrix_add_prop MA MB |}.
 
 Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
@@ -474,7 +474,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   do 2 rewrite fold_mat_nrows.
   now rewrite Hra.
 }
-apply mat_mul_add_distr_r; [ easy | | | | | ]. {
+apply mat_mul_add_distr_r. {
   apply is_scm_mat_iff.
   split; [ easy | ].
   intros l Hl.
@@ -538,7 +538,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in Hr.
   now rewrite Hr.
 }
-apply mat_add_opp_l; [ easy | easy | | easy | ]. 2: {
+apply mat_add_opp_l; [ easy | | easy | ]. 2: {
   unfold mat_ncols.
   rewrite Hr in Hc.
   symmetry; apply Hc.
