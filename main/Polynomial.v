@@ -2204,7 +2204,7 @@ Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => None (*Some (inr polyn_subt)*)
+  | Some (inr _) => (*None*) Some (inr polyn_subt)
   | None => None
   end.
 
@@ -2450,19 +2450,6 @@ destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
-
-(**)
-Theorem polyn_opt_has_no_subt : ∀ P,
-  let _ := polyn_ring_like_op in
-  if rngl_has_subt then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_subt; cbn.
-unfold polyn_opt_opp_or_subt.
-destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
-(**)
 
 Theorem polyn_opt_has_no_inv : ∀ P,
   let _ := polyn_ring_like_op in
@@ -3015,7 +3002,7 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
-(*
+(**)
 Theorem rngl_has_subt_rngl_polyn_has_subt :
   let rop := polyn_ring_like_op in
   @rngl_has_subt T ro = @rngl_has_subt (polyn T) rop.
@@ -3026,9 +3013,9 @@ unfold polyn_opt_opp_or_subt.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
-*)
+(**)
 
-(*
+(**)
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
@@ -3073,11 +3060,11 @@ rewrite H2.
 rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
 now apply (has_polyn_prop_lap_norm Heb).
 Qed.
-*)
+(**)
 
 (* *)
 
-(*
+(**)
 Theorem polyn_opt_sub_add_distr :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b c : polyn T, (a - (b + c))%L = (a - b - c)%L
@@ -3122,9 +3109,9 @@ unfold lap_sub in H1.
 rewrite Hop, Hsu in H1.
 f_equal; apply H1.
 Qed.
-*)
+(**)
 
-(*
+(**)
 Theorem polyn_opt_mul_subt_distr_l :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b c : polyn T, (a * (b - c))%L = (a * b - a * c)%L
@@ -3175,11 +3162,22 @@ rewrite H2.
 rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
 now apply (has_polyn_prop_lap_norm Heb).
 ...
-*)
+(**)
 
 (*
-Definition polyn_opt_has_no_subt (_ : True) := 12.
+Theorem polyn_opt_has_no_subt : ∀ P,
+  let _ := polyn_ring_like_op in
+  if rngl_has_subt then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
 *)
+Definition polyn_opt_has_no_subt (_ : True) := 12.
+(**)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -3197,21 +3195,21 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-(*
+(**)
      rngl_opt_add_sub := polyn_opt_add_sub;
-*)
+(*
      rngl_opt_add_sub := polyn_opt_has_no_subt _;
+*)
 (**)
-(*
      rngl_opt_sub_add_distr := polyn_opt_sub_add_distr;
-*)
-     rngl_opt_sub_add_distr := polyn_opt_has_no_subt _;
-(**)
 (*
-     rngl_opt_mul_sub_distr_l := polyn_opt_mul_subt_distr_l;
+     rngl_opt_sub_add_distr := polyn_opt_has_no_subt _;
 *)
-     rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
 (**)
+     rngl_opt_mul_sub_distr_l := polyn_opt_mul_subt_distr_l;
+(*
+     rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
+*)
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
 (**)
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;

@@ -2628,7 +2628,7 @@ Qed.
 ...
 *)
 
-(*
+(**)
 Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
@@ -2824,7 +2824,6 @@ apply eq_lap_norm_eq_length. 2: {
 apply (lap_norm_mul_subt_distr_l Hsu).
 Qed.
 ...
-*)
 
 (* lap ring-like properties *)
 
