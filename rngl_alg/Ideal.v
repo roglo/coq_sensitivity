@@ -19,6 +19,30 @@ Arguments ideal A%type {ro}.
 Arguments mk_I A%type {ro}.
 Arguments i_mem {A ro} ideal.
 
+Print rngl_zero.
+
+Definition I_zero {A} {ro : ring_like_op A} (Ia : ideal A) : A.
+
+(* chais pas ce que je fous, mais je fais n'importe quoi *)
+
+...
+
+Definition I_ring_like_op A (ro : ring_like_op A) (rp : ring_like_prop A)
+    (Hos : rngl_has_opp_or_subt = true) (Heb : rngl_has_eqb = true) :
+      ring_like_op (ideal A) :=
+  {| rngl_zero := rngl_zero;
+     rngl_one := rngl_one;
+     rngl_add |}.
+...
+  {| rngl_zero := I_zero Hos Heb;
+     rngl_one := I_one;
+     rngl_add := I_add;
+     rngl_mul := I_mul;
+     rngl_opt_opp_or_subt := None;
+     rngl_opt_inv_or_quot := None;
+     rngl_opt_eqb := None;
+     rngl_opt_le := None |}.
+...
 
 Theorem I_zero_prop_add A {ro : ring_like_op A} {rp : ring_like_prop A}
     (Heb : rngl_has_eqb = true) :
