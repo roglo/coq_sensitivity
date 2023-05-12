@@ -316,6 +316,7 @@ Qed.
 
 (**)
 
+(*
 Theorem map2_rngl_subt_0_l :
   rngl_has_subt = true →
   ∀ n la,
@@ -328,6 +329,7 @@ induction la as [| a]; [ easy | cbn ].
 rewrite (rngl_subt_0_l Hsu); f_equal.
 apply IHla.
 Qed.
+*)
 
 Theorem map2_rngl_subt_0_r :
   rngl_has_subt = true →
@@ -2634,7 +2636,7 @@ Theorem lap_mul_subt_distr_l :
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
 Proof.
 intros Hsu *.
-Abort.
+...
 End a.
 Require Import NatRingLike.
 Check lap_subt.

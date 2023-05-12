@@ -91,8 +91,10 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := Nat.add_sub;
      rngl_opt_sub_add_distr := Nat.sub_add_distr;
+(*
      rngl_opt_mul_sub_distr_l := Nat_mul_sub_distr_l;
      rngl_opt_mul_sub_distr_r := NA;
+*)
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := Nat_mul_div;

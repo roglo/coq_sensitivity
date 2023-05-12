@@ -247,6 +247,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_sub_add_distr :
       if rngl_has_subt then ∀ a b c, (a - (b + c) = a - b - c)%L
       else not_applicable;
+(*
     rngl_opt_mul_sub_distr_l :
       if rngl_has_subt then ∀ a b c : T, (a * (b - c) = a * b - a * c)%L
       else not_applicable;
@@ -255,6 +256,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         if rngl_mul_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%L
       else not_applicable;
+*)
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L
@@ -970,23 +972,13 @@ now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_sub_distr_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp = true →
   ∀ a b c, (a * (b - c) = a * b - a * c)%L.
 Proof.
-intros Hom *.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_mul_add_distr_l.
-  now rewrite rngl_mul_opp_r.
-}
-remember rngl_has_subt as mo eqn:Hmo; symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_mul_sub_distr_l as H1.
-  now rewrite Hmo in H1.
-}
-apply rngl_has_opp_or_subt_iff in Hom.
-destruct Hom; congruence.
+intros Hop *.
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_mul_add_distr_l.
+now rewrite rngl_mul_opp_r.
 Qed.
 
 Theorem rngl_div_mul :
@@ -1240,73 +1232,30 @@ now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_sub_distr_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp = true →
   ∀ a b c, ((a - b) * c = a * c - b * c)%L.
 Proof.
-intros Hos *.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. {
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_mul_add_distr_r.
-  now rewrite rngl_mul_opp_l.
-}
-remember rngl_has_subt as mo eqn:Hmo; symmetry in Hmo.
-destruct mo. {
-  remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-  destruct ic. {
-    specialize rngl_opt_mul_comm as rngl_mul_comm.
-    rewrite Hic in rngl_mul_comm.
-    rewrite rngl_mul_comm.
-    rewrite rngl_mul_sub_distr_l; [ | easy ].
-    rewrite (rngl_mul_comm c a).
-    rewrite (rngl_mul_comm c b).
-    easy.
-  } {
-    specialize rngl_opt_mul_sub_distr_r as H1.
-    rewrite Hmo, Hic in H1.
-    apply H1.
-  }
-}
-apply rngl_has_opp_or_subt_iff in Hos.
-destruct Hos; congruence.
+intros Hop *.
+unfold rngl_sub; rewrite Hop.
+rewrite rngl_mul_add_distr_r.
+now rewrite rngl_mul_opp_l.
 Qed.
 
 Theorem rngl_mul_0_sub_1_comm :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp = true →
   ∀ a, ((0 - 1) * a = a * (0 - 1))%L.
 Proof.
-intros Hos *.
-rewrite (rngl_mul_sub_distr_l Hos).
-rewrite (rngl_mul_sub_distr_r Hos).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_mul_0_r Hos).
+intros Hop *.
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite rngl_mul_0_l; [ | now apply rngl_has_opp_or_subt_iff; left ].
+rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
-Theorem rngl_subt_0_l :
-  rngl_has_subt = true
-  → ∀ a, rngl_subt 0%L a = ((0 - 1) * a)%L.
-Proof.
-intros Hsu *.
-assert (Hop : rngl_has_opp = false). {
-  unfold rngl_has_subt in Hsu.
-  unfold rngl_has_opp.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  now destruct os.
-}
-move Hop after Hsu.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; right.
-}
-rewrite (rngl_mul_sub_distr_r Hos).
-rewrite (rngl_mul_0_l Hos).
-rewrite rngl_mul_1_l.
-unfold rngl_sub.
-now rewrite Hop, Hsu.
-Qed.
-
+(*
 Theorem rngl_sub_0_l :
-  rngl_has_opp_or_subt = true
+  rngl_has_opp = true
   → ∀ a, (0 - a = (0 - 1) * a)%L.
 Proof.
 intros Hos *.
@@ -1314,6 +1263,7 @@ rewrite (rngl_mul_sub_distr_r Hos).
 rewrite (rngl_mul_0_l Hos).
 now rewrite rngl_mul_1_l.
 Qed.
+*)
 
 Theorem rngl_sub_0_r :
   rngl_has_opp_or_subt = true →

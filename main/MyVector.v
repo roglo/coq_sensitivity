@@ -428,7 +428,7 @@ apply in_seq in Hi.
 rewrite (List_map_nth' 0%L); [ | easy ].
 rewrite (List_map_nth' 0%L); [ | now rewrite map_length ].
 rewrite (List_map_nth' 0%L); [ | easy ].
-rewrite (rngl_mul_sub_distr_r Hos).
+rewrite (rngl_mul_sub_distr_r Hop).
 unfold rngl_sub.
 now rewrite Hop.
 Qed.
