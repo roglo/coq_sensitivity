@@ -8,22 +8,34 @@ Require Import Utf8.
 
 Require Import Main.RingLike.
 
-Class ideal A {ro : ring_like_op A} := mk_I
-  { i_mem : A → bool;
+Class ideal {A} {ro : ring_like_op A} (i_mem : A → bool) := mk_I
+  { i_zero_in : i_mem rngl_zero = true;
+    i_one_in : i_mem rngl_one = true;
     i_prop_add :
       ∀ a b, i_mem a = true → i_mem b = true → i_mem (a + b)%L = true;
     i_prop_mul_l : ∀ a b, i_mem b = true → i_mem (a * b)%L = true;
     i_prop_mul_r : ∀ a b, i_mem a = true → i_mem (a * b)%L = true }.
 
-Arguments ideal A%type {ro}.
-Arguments mk_I A%type {ro}.
-Arguments i_mem {A ro} ideal.
+Definition I_zero {A} {ro : ring_like_op A} {P} (Ia : ideal P) := rngl_zero.
+Definition I_one {A} {ro : ring_like_op A} {P} (Ia : ideal P) := rngl_one.
 
-Print rngl_zero.
+Theorem I_zero_in :
+  ∀ {A} {ro : ring_like_op A} P (Ia : ideal P),
+  P (I_zero Ia) = true.
+Proof.
+intros.
+unfold I_zero; cbn.
+now destruct Ia.
+Qed.
 
-Definition I_zero {A} {ro : ring_like_op A} (Ia : ideal A) : A.
-
-(* chais pas ce que je fous, mais je fais n'importe quoi *)
+Theorem I_one_in :
+  ∀ {A} {ro : ring_like_op A} P (Ia : ideal P),
+  P (I_one Ia) = true.
+Proof.
+intros.
+unfold I_one; cbn.
+now destruct Ia.
+Qed.
 
 ...
 
