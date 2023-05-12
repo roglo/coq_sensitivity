@@ -2630,7 +2630,7 @@ Qed.
 ...
 *)
 
-(**)
+(*
 Theorem lap_mul_subt_distr_l :
   rngl_has_subt = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
@@ -2854,6 +2854,7 @@ apply eq_lap_norm_eq_length. 2: {
 apply (lap_norm_mul_subt_distr_l Hsu).
 Qed.
 ...
+*)
 
 (* lap ring-like properties *)
 
@@ -2877,8 +2878,10 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
+(*
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
+*)
      rngl_opt_mul_inv_l := lap_opt_has_no_inv False;
      rngl_opt_mul_inv_r := lap_opt_has_no_inv_and false False;
      rngl_opt_mul_div := NA;

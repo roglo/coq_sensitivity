@@ -3111,7 +3111,7 @@ f_equal; apply H1.
 Qed.
 (**)
 
-(**)
+(*
 Theorem polyn_opt_mul_subt_distr_l :
   let rop := polyn_ring_like_op in
   if rngl_has_subt then ∀ a b c : polyn T, (a * (b - c))%L = (a * b - a * c)%L
@@ -3162,7 +3162,7 @@ rewrite H2.
 rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
 now apply (has_polyn_prop_lap_norm Heb).
 ...
-(**)
+*)
 
 (*
 Theorem polyn_opt_has_no_subt : ∀ P,
@@ -3205,13 +3205,13 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
 (*
      rngl_opt_sub_add_distr := polyn_opt_has_no_subt _;
 *)
-(**)
-     rngl_opt_mul_sub_distr_l := polyn_opt_mul_subt_distr_l;
 (*
+     rngl_opt_mul_sub_distr_l := polyn_opt_mul_subt_distr_l;
      rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
 *)
+(*
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
-(**)
+*)
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
