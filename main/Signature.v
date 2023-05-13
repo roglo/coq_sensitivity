@@ -1414,10 +1414,6 @@ split. {
 }
 Qed.
 
-(*
-Arguments comp_permut_seq n%nat [σ₁ σ₂]%list_scope.
-*)
-
 Theorem comp_permut_seq_with_len : ∀ n σ₁ σ₂,
   permut_seq_with_len n σ₁
   → permut_seq_with_len n σ₂
@@ -1564,10 +1560,6 @@ unfold "°"; cbn.
 symmetry.
 apply List_map_nth_seq.
 Qed.
-
-(*
-Arguments comp_1_r n%nat [la]%list.
-*)
 
 Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
 Proof.
@@ -1910,10 +1902,6 @@ rewrite comp_isort_rank_r.
 apply isort_comp_permut_r.
 now rewrite Hal, <- Hbl.
 Qed.
-
-(*
-Arguments permut_isort_rank_comp n%nat [la lb]%list.
-*)
 
 Theorem permut_collapse : ∀ la,
   permut_seq la
@@ -2504,23 +2492,3 @@ destruct H1 as [H1| H1]; rewrite H1. {
 Qed.
 
 End a.
-
-(*
-Arguments ε {T}%type {ro}.
-
-Arguments ε_nil {T ro}.
-Arguments ε_mul_comm {T ro rp} Hop la%list a%L.
-Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hop (n k)%nat.
-Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.
-Arguments permut_isort_rank_comp n%nat [la lb]%list.
-Arguments sign_comp {T}%type {ro rp} Hop [la lb]%list.
-Arguments transposition_signature {T}%type {ro rp} Hop (n p q)%nat.
-Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].
-Arguments NoDup_ε_square {T}%type {ro rp} _ [σ].
-Arguments ε_when_dup {T ro rp} Hop [la]%list.
-
-Arguments minus_one_pow {T}%type {ro} n%nat.
-Arguments minus_one_pow_add {T}%type {ro rp} Hop (a b)%nat.
-Arguments minus_one_pow_mul_comm {T ro rp} Hop i%nat x%L.
-Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
-*)

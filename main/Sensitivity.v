@@ -181,9 +181,6 @@ Fixpoint nth_find_all_loop {A} (f : A → bool) l i :=
   end.
 
 Definition nth_find_all {A} f l := @nth_find_all_loop A f l 0.
-(*
-Arguments nth_find_all [A]%type_scope _%function_scope _%list_scope.
-*)
 
 (**)
 
@@ -194,9 +191,6 @@ Fixpoint nth_find_loop {A} (f : A → bool) l i :=
   end.
 
 Definition nth_find {A} f l := @nth_find_loop A f l 0.
-(*
-Arguments nth_find [A]%type_scope _%function_scope _%list_scope.
-*)
 
 (**)
 
