@@ -848,7 +848,7 @@ rewrite (rngl_summation_list_permut Heql) with (lb := cart_prod_rep_seq n). {
     rewrite isort_rank_length, <- Hn; flia Hi.
   }
   rewrite rngl_product_change_var with (g := g2) (h := h2); [ | easy ].
-  rewrite (rngl_product_list_permut _ Nat.eqb_eq)
+  rewrite (rngl_product_list_permut Nat.eqb_eq)
       with (lb := seq 1 n); [ | easy | ]. {
     rewrite rngl_product_seq_product; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.

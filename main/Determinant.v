@@ -1172,7 +1172,7 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+  rewrite (rngl_product_list_permut Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
     replace n with (length la) by now rewrite Hla, List_map_seq_length.
@@ -1718,7 +1718,7 @@ Theorem rngl_product_map_permut :
 Proof.
 intros Hic * Hσ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+rewrite (rngl_product_list_permut Nat.eqb_eq) with
     (lb := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
