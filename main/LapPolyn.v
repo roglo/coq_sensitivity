@@ -4,7 +4,6 @@
    is not zero is not tested. It is going to be tested in Polynomial.v. *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
@@ -177,7 +176,7 @@ Definition lap_rem la lb :=
 (* evaluation of a polynomial in x *)
 (* and composition of polynomials *)
 
-Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
+Definition rlap_horner {A} (zero : A) (add mul : A → A → A) rla x :=
   iter_list rla (λ accu a, add (mul accu x) a) zero.
 
 Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
@@ -200,20 +199,26 @@ End a.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
+(*
 Arguments eval_lap {T ro} la%lap x%L.
+*)
 Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_norm {T ro} la%lap.
+(*
 Arguments lap_one {T ro}.
 Arguments lap_opp {T ro} la%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_sub {T ro} (la lb)%lap.
+*)
 Arguments lap_subt {T ro} (la lb)%lap.
+(*
 Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Arguments strip_0s {T ro} la%list.
+*)
 
 Notation "0" := lap_zero : lap_scope.
 Notation "1" := lap_one : lap_scope.
@@ -2914,6 +2919,7 @@ Qed.
 
 End a.
 
+(*
 Arguments eq_lap_norm_eq_length {T ro rp} Heb (la lb)%lap.
 Arguments lap_add_assoc {T ro rp} (al1 al2 al3)%lap.
 Arguments lap_add_comm {T ro rp} (al1 al2)%lap.
@@ -2935,7 +2941,9 @@ Arguments lap_mul_1_r {T ro rp} Hos la%lap.
 Arguments lap_norm_app_0_r {T ro rp} Heb (la lb)%lap.
 Arguments lap_opt_add_sub {T ro rp} Hsu (la lb)%lap.
 Arguments lap_opt_sub_add_distr {T ro rp} Hsu (la lb lc)%lap.
+*)
 Arguments lap_quot_rem {T ro} (la lb)%lap.
+(*
 Arguments lap_subt_norm_idemp_l {T ro rp} Heb Hsu (la lb)%lap.
 Arguments lap_subt_norm_idemp_r {T ro rp} Heb Hsu (la lb)%lap.
 Arguments lap_subt_0_r {T ro rp} Hsu la%lap.
@@ -2947,3 +2955,4 @@ Arguments map2_rngl_add_0_r {T ro rp} la%lap.
 Arguments map2_rngl_subt_0_r {T ro rp} Hsu [n]%nat la%lap.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments strip_0s_length_le {T ro} l%list.
+*)

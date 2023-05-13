@@ -3,7 +3,6 @@
    https://eccc.weizmann.ac.il/report/2020/002/?fbclid=IwAR19mpxfIuoSaWq3HO8MdV8i8x_xlvwMKHjfElzBUK0GditlyaLeJiC8gJY *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
@@ -181,8 +180,10 @@ Fixpoint nth_find_all_loop {A} (f : A → bool) l i :=
       else nth_find_all_loop f l' (i + 1)
   end.
 
-Definition nth_find_all A f l := @nth_find_all_loop A f l 0.
+Definition nth_find_all {A} f l := @nth_find_all_loop A f l 0.
+(*
 Arguments nth_find_all [A]%type_scope _%function_scope _%list_scope.
+*)
 
 (**)
 
@@ -192,8 +193,10 @@ Fixpoint nth_find_loop {A} (f : A → bool) l i :=
   | a :: l' => if f a then i else nth_find_loop f l' (i + 1)
   end.
 
-Definition nth_find A f l := @nth_find_loop A f l 0.
+Definition nth_find {A} f l := @nth_find_loop A f l 0.
+(*
 Arguments nth_find [A]%type_scope _%function_scope _%list_scope.
+*)
 
 (**)
 
@@ -375,7 +378,7 @@ destruct (f a); [ flia Hij H1 | ].
 now specialize (IHl i (j + 1) Hij1).
 Qed.
 
-Theorem not_in_nth_find_all_loop : ∀ A f (l : list A) i j,
+Theorem not_in_nth_find_all_loop : ∀ {A} f (l : list A) {i j},
   i < j → i ∉ nth_find_all_loop f l j.
 Proof.
 intros * Hij.
@@ -425,7 +428,7 @@ specialize (H1 H); clear H.
 now replace (b - (k + 1)) with bk in H1 by flia Hbk1.
 Qed.
 
-Theorem in_nth_find_all_loop_eqb_if : ∀ a l d,
+Theorem in_nth_find_all_loop_eqb_if : ∀ {a} l d,
   a < length l
   → a + d ∈ nth_find_all_loop (Nat.eqb (nth a l 0)) l d.
 Proof.
@@ -1064,7 +1067,7 @@ Theorem eq_nth_find_all_nil : ∀ A f (l : list A),
   nth_find_all f l = [] ↔ ∀ i, i ∈ l → f i = false.
 Proof. intros; apply eq_nth_find_all_loop_nil. Qed.
 
-Theorem eq_nth_find_all_loop_cons : ∀ A f j (d : A) l l' i,
+Theorem eq_nth_find_all_loop_cons : ∀ {A} f j (d : A) l l' i,
   nth_find_all_loop f l i = j :: l' ↔
     i ≤ j < i + length l ∧
     (∀ k, i + k < j → f (nth k l d) = false) ∧
@@ -1215,7 +1218,7 @@ split. {
 }
 Qed.
 
-Theorem in_nth_nth_find_loop : ∀ ll i d,
+Theorem in_nth_nth_find_loop : ∀ ll {i} d,
   (∀ i, i < length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
   → i < length ll
   → i ∈ nth (nth_find_loop (nat_in_list i) ll d - d) ll [].

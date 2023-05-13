@@ -1,7 +1,6 @@
 (* Sorting algorithms : bubble, selection, insertion, merge *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
@@ -11,23 +10,23 @@ Require Import Misc PermutationFun.
 
 (* relation properties *)
 
-Definition irreflexive A (rel : A → A → bool) :=
+Definition irreflexive {A} (rel : A → A → bool) :=
   ∀ a, rel a a = false.
 
-Definition antisymmetric A (rel : A → A → bool) :=
+Definition antisymmetric {A} (rel : A → A → bool) :=
   ∀ a b, rel a b = true → rel b a = true → a = b.
 
 (* https://ncatlab.org/nlab/show/connected+relation *)
-Definition connected_relation A (rel : A → A → bool) :=
+Definition connected_relation {A} (rel : A → A → bool) :=
   ∀ a b, rel a b = false → rel b a = false → a = b.
 
-Definition transitive A (rel : A → A → bool) :=
+Definition transitive {A} (rel : A → A → bool) :=
   ∀ a b c, rel a b = true → rel b c = true → rel a c = true.
 
 Definition total_relation {A} (rel : A → _) := ∀ a b,
   (rel a b || rel b a)%bool = true.
 
-Theorem total_relation_is_reflexive : ∀ A (rel : A → _),
+Theorem total_relation_is_reflexive : ∀ {A} {rel : A → _},
   total_relation rel → reflexive rel.
 Proof.
 intros * Htot a.
@@ -45,21 +44,21 @@ Fixpoint is_sorted {A} (rel : A → A → bool) l :=
   | a :: (b :: _) as la => (rel a b && is_sorted rel la)%bool
   end.
 
-Fixpoint all_sorted A (rel : A → A → bool) a l :=
+Fixpoint all_sorted {A} (rel : A → A → bool) a l :=
   match l with
   | [] => true
   | b :: l' => (rel a b && all_sorted rel a l')%bool
   end.
 
-Fixpoint is_strongly_sorted A (rel : A → A → bool) l :=
+Fixpoint is_strongly_sorted {A} (rel : A → A → bool) l :=
   match l with
   | [] => true
   | a :: l' => (all_sorted rel a l' && is_strongly_sorted rel l')%bool
   end.
 
-Definition sorted A (rel : A → _) l :=
+Definition sorted {A} (rel : A → _) l :=
   is_sorted rel l = true.
-Definition strongly_sorted A (rel : A → _) l :=
+Definition strongly_sorted {A} (rel : A → _) l :=
   is_strongly_sorted rel l = true.
 
 Theorem fold_sorted : ∀ A f (l : list A), (is_sorted f l = true) = sorted f l.
@@ -74,7 +73,7 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-Theorem sorted_strongly_sorted : ∀ A (rel : A → A → bool),
+Theorem sorted_strongly_sorted : ∀ [A] {rel : A → A → bool},
   transitive rel →
   ∀ l, sorted rel l → strongly_sorted rel l.
 Proof.
@@ -133,7 +132,7 @@ cbn in Hsal.
 now apply Bool.andb_true_iff in Hsal.
 Qed.
 
-Theorem sorted_cons_iff : ∀ (A : Type) (rel : A → A → bool),
+Theorem sorted_cons_iff : ∀ {A} {rel : A → _},
   transitive rel
   → ∀ a la,
       sorted rel (a :: la) ↔
@@ -214,9 +213,9 @@ intros.
 apply Bool.andb_true_iff.
 Qed.
 
-Theorem sorted_extends : ∀ A (rel : A → _),
+Theorem sorted_extends : ∀ {A} {rel : A → _},
   transitive rel →
-  ∀ a l,
+  ∀ {a l},
   sorted rel (a :: l)
   → ∀ b, b ∈ l → rel a b = true.
 Proof.
@@ -233,7 +232,7 @@ destruct Hsort as (Hcd, Hsort).
 split; [ now apply Htra with (b := c) | easy ].
 Qed.
 
-Theorem sorted_NoDup : ∀ A (rel : A → A → bool),
+Theorem sorted_NoDup : ∀ {A} {rel : A → _},
   irreflexive rel →
   transitive rel →
   ∀ l, sorted rel l → NoDup l.
@@ -249,7 +248,7 @@ specialize (sorted_extends Htra Hsort _ Ha) as H1.
 now rewrite Hirr in H1.
 Qed.
 
-Theorem sorted_app_iff : ∀ A (rel : A → _),
+Theorem sorted_app_iff : ∀ {A} {rel : A → _},
   transitive rel →
   ∀ la lb,
   sorted rel (la ++ lb) ↔
@@ -317,9 +316,9 @@ split. {
 }
 Qed.
 
-Theorem sorted_trans : ∀ A (rel : A → _),
+Theorem sorted_trans : ∀ {A} {rel : A → _},
   transitive rel →
-  ∀ a b la,
+  ∀ {a b la},
   sorted rel (a :: la ++ [b]) →
   rel a b = true.
 Proof.
@@ -351,7 +350,7 @@ remember (b :: la) as lb; cbn in Hs; subst lb.
 rewrite <- app_comm_cons in Hs.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
-specialize (sorted_trans Htra _ _ Hs) as Hba.
+specialize (sorted_trans Htra Hs) as Hba.
 specialize (Hant a b Hab Hba) as H1; subst b.
 f_equal.
 now apply IHla.
@@ -757,7 +756,7 @@ injection Hla; clear Hla; intros; subst la lb.
 now apply sorted_cons_cons_split_list' with (l := l).
 Qed.
 
-Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
+Theorem sorted_merge_loop_cons_cons_r_aux : ∀ {A} {rel : A → _},
   antisymmetric rel →
   transitive rel →
   ∀ n it l la lb a b,
@@ -921,10 +920,10 @@ specialize (sorted_merge_loop_cons_cons_r_aux Hant Htra 0) as H1.
 now apply (H1 it l).
 Qed.
 
-Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
+Theorem sorted_merge_loop_cons_cons : ∀ {A} {rel : A → _},
   antisymmetric rel →
   transitive rel →
-  ∀ it l la lb a b,
+  ∀ {it l la lb a b},
   length l ≤ it
   → sorted rel (a :: b :: l)
   → split_list l = (la, lb)
@@ -1116,7 +1115,7 @@ apply sorted_merge; [ easy | | ]. {
 }
 Qed.
 
-Theorem merge_loop_when_sorted : ∀ A (rel : A → _),
+Theorem merge_loop_when_sorted : ∀ {A} {rel : A → _},
   antisymmetric rel →
   transitive rel →
   ∀ it l la lb,
@@ -1339,7 +1338,7 @@ Qed.
 
 (* *)
 
-Theorem in_isort_insert_id : ∀ A (rel : A → _) a l,
+Theorem in_isort_insert_id : ∀ {A} (rel : A → _) a l,
   a ∈ isort_insert rel a l.
 Proof.
 intros.
@@ -1347,7 +1346,7 @@ induction l as [| b]; [ now left | cbn ].
 now destruct (rel a b); [ left | right ].
 Qed.
 
-Theorem permutation_cons_isort_insert_id : ∀ A (eqb rel : A → _),
+Theorem permutation_cons_isort_insert_id : ∀ {A} {eqb : A → _} (rel : A → _),
   equality eqb →
   ∀ a la,
   permutation eqb (a :: la) (isort_insert rel a la).
@@ -1361,7 +1360,7 @@ apply permutation_skip; [ | easy ].
 now unfold reflexive; apply equality_refl.
 Qed.
 
-Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
+Theorem permutation_cons_isort_insert : ∀ {A} {eqb : A → _} (rel : A → _),
   equality eqb →
   ∀ a la lb,
   permutation eqb la lb → permutation eqb (a :: la) (isort_insert rel a lb).
@@ -1466,7 +1465,7 @@ Qed.
 (* *)
 
 Theorem select_first_permutation :
-  ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ {A} {eqb : A → _} (rel : A → _) (Heqb : equality eqb),
   ∀ a b la lb,
   select_first rel a la = (b, lb)
   → permutation eqb (a :: la) (b :: lb).
@@ -1554,7 +1553,7 @@ apply permutation_skip; [ | easy ].
 now unfold reflexive; apply equality_refl.
 Qed.
 
-Theorem select_first_if : ∀ A (rel : A → _),
+Theorem select_first_if : ∀ {A} {rel : A → _},
   transitive rel →
   total_relation rel →
   ∀ a b la lb,
@@ -1737,8 +1736,8 @@ destruct ab. {
 }
 Qed.
 
-Theorem select_first_sorted : ∀ A rel,
-  transitive rel → ∀ (a b : A) la lb,
+Theorem select_first_sorted : ∀ {A rel},
+  transitive rel → ∀ {a b : A} {la lb},
   sorted rel (a :: la)
   → select_first rel a la = (b, lb)
   → a = b ∧ la = lb.
@@ -1843,7 +1842,7 @@ unfold sorted in IHla |-*; cbn in IHla |-*.
 now rewrite (IHla eq_refl), Hab.
 Qed.
 
-Theorem bsort_swap_Some : ∀ A (rel : A → _) la lb,
+Theorem bsort_swap_Some : ∀ {A} {rel : A → _} {la lb},
   bsort_swap rel la = Some lb
   → is_sorted rel la = false ∧
     ∃ a b lc ld, rel a b = false ∧
@@ -1900,19 +1899,19 @@ rewrite Hlc, Hle.
 easy.
 Qed.
 
-Fixpoint nb_nrel A (rel : A → A → bool) a l :=
+Fixpoint nb_nrel {A} (rel : A → A → bool) a l :=
   match l with
   | [] => 0
   | b :: l' => (if rel a b then 0 else 1) + nb_nrel rel a l'
   end.
 
-Fixpoint nb_disorder A (rel : A → _) l :=
+Fixpoint nb_disorder {A} (rel : A → _) l :=
   match l with
   | [] => 0
   | a :: l' => nb_nrel rel a l' + nb_disorder rel l'
   end.
 
-Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
+Theorem nb_disorder_le_square : ∀ {A} (rel : A → _) l,
   nb_disorder rel l ≤ length l * length l.
 Proof.
 intros.
@@ -1926,7 +1925,7 @@ induction l as [| b]; [ easy | cbn ].
 destruct (rel a b); cbn; flia IHl.
 Qed.
 
-Theorem bsort_swap_nb_disorder : ∀ A (rel : A → _),
+Theorem bsort_swap_nb_disorder : ∀ {A} {rel : A → _},
   total_relation rel →
   ∀ la lb it,
   bsort_swap rel la = Some lb
@@ -1954,7 +1953,7 @@ destruct ab. {
   cbn in Hit'; rewrite Hab, Nat.add_0_l in Hit'.
   subst it'; cbn.
   assert (H : nb_nrel rel a la = nb_nrel rel a lc). {
-    specialize (bsort_swap_Some _ _ Hlc) as H2.
+    specialize (bsort_swap_Some Hlc) as H2.
     destruct H2 as (Hsf & a' & b' & ld & le & H2).
     destruct H2 as (Hab' & Hst & Hbla & Hlc').
     subst lc.
@@ -1980,7 +1979,7 @@ destruct ab. {
     cbn - [ nb_disorder ] in Hnd.
     rewrite Hab, Nat.add_0_l in Hnd.
     assert (H' : nb_disorder rel (b :: la) ≠ 0). {
-      specialize (bsort_swap_Some _ _ Hlc) as H2.
+      specialize (bsort_swap_Some Hlc) as H2.
       destruct H2 as (Hsf & a' & b' & lab & ld & H2).
       destruct H2 as (Hab' & Hst & Hla & Hld).
       rewrite Hla.
@@ -2071,8 +2070,8 @@ Qed.
 (* *)
 
 Theorem permutation_merge_loop_aux :
-  ∀ A (eqb rel : A → _) (Heqb : equality eqb),
-  ∀ it la lb lc,
+  ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ {it} la lb lc,
   length la + length lc ≤ it
   → permutation eqb (la ++ lb ++ lc) (lb ++ merge_loop rel it la lc).
 Proof.
@@ -2191,7 +2190,7 @@ eapply (permutation_trans Heqb); [ | now apply permutation_merge_loop ].
 now apply split_list_permutation.
 Qed.
 
-Theorem permutation_merge : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permutation_merge : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
   ∀ l la lb,
   split_list l = (la, lb)
   → permutation eqb l (merge rel la lb).
@@ -2228,7 +2227,7 @@ Theorem split_list_inv_nil_r : ∀ A (la : list A), split_list_inv la [] = la.
 Proof. now intros; destruct la. Qed.
 
 Theorem permutation_split_list_inv_split_list_inv :
-  ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ {A} {eqb : A → _} (Heqb : equality eqb),
   ∀ la lb lc ld,
   permutation eqb la lc
   → permutation eqb lb ld
@@ -2377,7 +2376,7 @@ apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
-Theorem sorted_sorted_permuted_not_antisym_1 : ∀ A (eqb leb : A → A → bool),
+Theorem sorted_sorted_permuted_not_antisym_1 : ∀ {A} {eqb leb : A → _},
   equality eqb →
   reflexive leb →
   transitive leb →
@@ -2671,7 +2670,7 @@ split. {
 }
 Qed.
 
-Theorem sorted_sorted_permuted : ∀ A (eqb rel : A → _),
+Theorem sorted_sorted_permuted : ∀ [A] {eqb rel : A → _},
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -2765,7 +2764,7 @@ Qed.
 
 (* unicity of sorting algorithm *)
 
-Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
+Theorem sorted_unique : ∀ {A} {eqb rel : A → _},
   equality eqb →
   reflexive rel →
   antisymmetric rel →
@@ -2836,7 +2835,7 @@ Qed.
 
 (* *)
 
-Theorem sorted_isort : ∀ A (rel : A → _),
+Theorem sorted_isort : ∀ [A] {rel : A → _},
   total_relation rel
   → ∀ l, sorted rel (isort rel l).
 Proof.
@@ -2845,7 +2844,7 @@ induction l as [| a]; [ easy | cbn ].
 now apply sorted_isort_insert.
 Qed.
 
-Theorem sorted_ssort : ∀ A (rel : A → _),
+Theorem sorted_ssort : ∀ [A] {rel : A → _},
   transitive rel →
   total_relation rel →
   ∀ l, sorted rel (ssort rel l).
@@ -2854,7 +2853,7 @@ intros * Htr Htot *.
 now apply sorted_ssort_loop.
 Qed.
 
-Theorem sorted_bsort : ∀ A (rel : A → _),
+Theorem sorted_bsort : ∀ [A] {rel : A → _},
   total_relation rel →
   ∀ l, sorted rel (bsort rel l).
 Proof.
@@ -2862,7 +2861,7 @@ intros * Htot *.
 now apply sorted_bsort_loop.
 Qed.
 
-Theorem sorted_msort : ∀ A (rel : A → _),
+Theorem sorted_msort : ∀ [A] {rel : A → _},
   total_relation rel →
   ∀ l, sorted rel (msort rel l).
 Proof.
@@ -2919,14 +2918,14 @@ Proof.
 intros * Hant Htra Htot *.
 split; [ now apply msort_when_sorted | ].
 intros Hs.
-specialize (sorted_msort) as H1.
+specialize sorted_msort as H1.
 specialize (H1 _ rel Htot l).
 now rewrite Hs in H1.
 Qed.
 
 (* *)
 
-Theorem permuted_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_isort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
   ∀ l, permutation eqb l (isort rel l).
 Proof.
 intros.
@@ -2934,21 +2933,21 @@ induction l as [| a]; [ apply (permutation_refl Heqb) | cbn ].
 now apply permutation_cons_isort_insert.
 Qed.
 
-Theorem permuted_ssort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_ssort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
   ∀ l, permutation eqb l (ssort rel l).
 Proof.
 intros.
 now apply permuted_ssort_loop.
 Qed.
 
-Theorem permuted_bsort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_bsort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
   ∀ l, permutation eqb l (bsort rel l).
 Proof.
 intros.
 now apply permuted_bsort_loop.
 Qed.
 
-Theorem permuted_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_msort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
   ∀ l, permutation eqb l (msort rel l).
 Proof.
 intros.
@@ -2957,7 +2956,7 @@ Qed.
 
 (* *)
 
-Theorem isort_when_permuted : ∀ A (eqb rel : A → _),
+Theorem isort_when_permuted : ∀ {A} [eqb rel : A → _],
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3047,7 +3046,7 @@ Qed.
 
 (* *)
 
-Theorem permut_if_isort : ∀ A (eqb rel : A → _),
+Theorem permut_if_isort : ∀ {A} {eqb : A → _} rel,
   equality eqb →
   ∀ la lb,
   isort rel la = isort rel lb
@@ -3631,7 +3630,7 @@ destruct Hla as (Hab, Hla); subst b.
 now apply eq_isort_nil in Hla; subst la.
 Qed.
 
-Theorem eq_isort_insert_cons_iff : ∀ A (rel : A → _),
+Theorem eq_isort_insert_cons_iff : ∀ {A} {rel : A → _},
   reflexive rel →
   ∀ a b la lb,
   isort_insert rel a la = b :: lb
@@ -3752,7 +3751,7 @@ apply sorted_cons in Hs.
 now apply IHl.
 Qed.
 
-Theorem sorted_isort_insert_filter : ∀ A (rel : A → _),
+Theorem sorted_isort_insert_filter : ∀ {A} {rel : A → _},
   transitive rel →
   ∀ f a la,
   sorted rel la
@@ -3947,7 +3946,7 @@ rewrite <- Nat.add_succ_comm.
 now replace (S (length la)) with (length (a :: la)).
 Qed.
 
-Theorem permutation_app_merge : ∀ A (eqb rel : A → _),
+Theorem permutation_app_merge : ∀ {A} {eqb : A → _} rel,
   equality eqb →
   ∀ la lb,
   permutation eqb (la ++ lb) (merge rel la lb).

@@ -3,7 +3,6 @@
 (* polynomials on a RingLike *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
@@ -14,16 +13,16 @@ Require Import LapPolyn.
 
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
-Definition has_polyn_prop T {ro : ring_like_op T} (la : list T) :=
+Definition has_polyn_prop {T} {ro : ring_like_op T} (la : list T) :=
   (is_empty_list la || (last la 0 ≠? 0)%L)%bool.
 
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
-Context {Hos : rngl_has_opp_or_subt = true}.
-Context {Heb : rngl_has_eqb = true}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context (Hos : rngl_has_opp_or_subt = true).
+Context (Heb : rngl_has_eqb = true).
 
 Theorem eq_strip_0s_nil : ∀ d la,
   strip_0s la = [] ↔ ∀ i, i < length la → nth i la d = 0%L.
@@ -1458,7 +1457,7 @@ now rewrite rev_lap_add.
 Qed.
 
 Theorem rlap_quot_rem_length :
-  ∀ it (rla rlb rlq rlr : list T),
+  ∀ {it} {rla rlb : list T} rlq rlr,
   hd 0%L rlb ≠ 0%L
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
@@ -2058,6 +2057,7 @@ Print rlap_compose.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
+(*
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments eq_strip_0s_cons {T ro rp} Heb la%lap [lb]%lap [b]%L.
 Arguments eq_strip_0s_nil {T ro rp} Heb d%L la%lap.
@@ -2088,6 +2088,7 @@ Arguments lap_x_power {T ro} n%nat.
 
 Arguments polyn_norm_prop {T ro} la%lap.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
+*)
 
 (* polynomials *)
 
@@ -2101,16 +2102,22 @@ Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
     lap_prop : has_polyn_prop lap = true }.
 
+Arguments mk_polyn {T ro} lap%lap.
+Arguments lap {T ro}.
+Arguments lap_prop {T ro}.
+
+(*
 Arguments polyn T {ro}.
 Arguments mk_polyn {T ro} lap%list.
+*)
 
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
-Context {Hos : rngl_has_opp_or_subt = true}.
-Context {Heb : rngl_has_eqb = true}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context (Hos : rngl_has_opp_or_subt = true).
+Context (Heb : rngl_has_eqb = true).
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -2477,8 +2484,10 @@ destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
+(*
 Arguments lap {T ro} p%pol.
 Arguments polyn_quot_rem (pa pb)%pol.
+*)
 
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -2839,7 +2848,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
-  rewrite (lap_rngl_of_nat rp).
+  rewrite lap_rngl_of_nat.
   destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Heb).
@@ -3292,8 +3301,10 @@ rewrite (lap_add_norm_idemp_r Heb).
 easy.
 Qed.
 
+(*
 Arguments lap_convol_mul_1_l {T ro rp} Hos la%lap (i len)%nat.
 Arguments lap_convol_mul_l_succ_l {T ro rp} Hos (la lb)%lap (i len)%nat.
+*)
 
 Theorem lap_cons : ∀ a la, a :: la = ([a] + [0; 1]%L * la)%lap.
 Proof.
@@ -3312,14 +3323,17 @@ Qed.
 
 End a.
 
+(*
 Arguments lap_cons {T ro rp} Hos a%L la%lap.
 Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
 Arguments lap_norm_lap_rngl_summation {T ro rp} Hos Heb (b e)%nat.
 Arguments lap_norm_rngl_summation_idemp {T ro rp} Heb (b e)%nat.
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
+(*
 Arguments lap {T ro} p%pol.
 Arguments polyn_zero {T ro}.
 Arguments polyn_one {T ro}.
@@ -3330,6 +3344,7 @@ Arguments polyn_quot {T ro rp Hos Heb} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
 Arguments polyn_ring_like_op {T ro rp} Hos Heb.
 Arguments polyn_x_power {T ro} n%nat.
+*)
 
 Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
@@ -3341,10 +3356,12 @@ Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 
+(*
 Arguments mk_polyn {T ro} lap%lap.
 Arguments polyn_mul_comm {T ro rp} Hic a b.
 Arguments polyn_of_const {T ro} c%L.
 Arguments polyn_of_norm_lap {T ro} la%lap.
+*)
 
 (* examples *)
 
