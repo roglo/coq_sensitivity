@@ -2222,7 +2222,3 @@ now rewrite mat_select_all_cols.
 Qed.
 
 End a.
-
-(*
-Arguments determinant_mul {T ro rp} _ (A B)%M.
-*)

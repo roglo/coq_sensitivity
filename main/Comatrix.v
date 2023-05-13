@@ -2032,15 +2032,6 @@ Qed.
 
 End a.
 
-(*
-Arguments com {T}%type {ro} M%M.
-Arguments cramer's_rule {T ro rp} Hop Hic Hiq Hch [M%M U%V V%V].
-Arguments laplace_formula_on_cols {T ro rp} Hop Hic H10 M%M [j]%nat.
-Arguments laplace_formula_on_rows {T}%type {ro rp} Hop Hic M%M [i]%nat.
-Arguments mat_inv {T}%type {ro} M%M.
-Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
-*)
-
 Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
 
 (* tests
