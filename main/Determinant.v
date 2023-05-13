@@ -78,7 +78,9 @@ Definition det' (M : matrix T) :=
     ε (canon_sym_gr_list n k) *
     ∏ (i = 1, n), mat_el M i ((canon_sym_gr_list n k).(i) + 1).
 
+(*
 Arguments det' M%M.
+*)
 
 (* definition 3
    determinant by sum of products like in definition 2, but running with all
@@ -121,9 +123,6 @@ Compute (length (cart_prod [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
 Compute (length (cart_prod [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
 Compute (length (cart_prod [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
 Compute (length (cart_prod [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
-Arguments det {T ro} M%M.
-Arguments det' {T ro} M%M.
-Arguments det'' {T ro} M%M.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
@@ -2428,18 +2427,4 @@ Qed.
 End a.
 
 Arguments det {T ro} M%M.
-(*
-Arguments det' {T}%type {ro} M%M.
-Arguments det'' {T}%type {ro} M%M.
-*)
 Arguments determinant_alternating {T ro rp} Hic Hop M%M [p q]%nat.
-(*
-Arguments determinant_loop {T}%type {ro} n%nat M%M.
-Arguments determinant_same_rows {T ro rp} Hic Hop Hch Hit M [p q]%nat.
-Arguments determinant_transpose {T ro rp} _ M%M.
-Arguments det_is_det' {T ro rp} Hop M%M Hsm.
-Arguments det'_is_det'' {T ro rp} Hop M%M.
-Arguments det_is_det'' {T ro rp} Hop M%M Hsm.
-Arguments det_mI {T ro rp} _ n%nat.
-Arguments det_subm_transp {T ro rp} _ [i j]%nat.
-*)
