@@ -416,23 +416,80 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   unfold rngl_opp; cbn.
   unfold polyn_opt_opp_or_subt.
   subst Hos; cbn.
-Set Printing All.
+  specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as H2.
+  unfold rngl_has_opp_or_subt in H2.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  destruct os as [opp| subt ]; [ | easy ].
+  subst rop; cbn.
+  now rewrite (rngl_eqb_refl Heb); cbn.
+}
+apply eq_polyn_eq; cbn.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hmz| Hmz]; cbn. {
+  apply (rngl_eqb_eq Heb) in Hmz.
+  subst rop; cbn.
+  unfold polyn_ring_like_op; cbn.
+  unfold Hos; cbn.
+  unfold minus_one_pow in Hmz |-*.
+  destruct (n mod 2); cbn. {
+    now apply (rngl_eqb_eq Heb) in Hmz; rewrite Hmz.
+  }
+  apply (f_equal rngl_opp) in Hmz.
+  rewrite (rngl_opp_involutive Hop) in Hmz.
+  rewrite (rngl_opp_0 Hop) in Hmz.
+  now apply rngl_1_neq_0_iff in Hch.
+}
+unfold minus_one_pow.
+destruct (n mod 2) as [| m]; cbn. {
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H10| H10]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H10.
+  now apply rngl_1_neq_0_iff in Hch.
+}
+unfold rngl_opp; cbn.
+specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as H2.
+unfold rngl_has_opp_or_subt in H2.
+unfold polyn_opt_opp_or_subt; cbn.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt ]. {
+  subst rop; cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H10| H10]. {
+    apply (rngl_eqb_eq Heb) in H10.
+    now apply rngl_1_neq_0_iff in Hch.
+  }
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H11| H11]. {
+    apply (rngl_eqb_eq Heb) in H11.
+    apply (f_equal rngl_opp) in H11.
+    rewrite (rngl_opp_involutive Hop) in H11.
+    rewrite (rngl_opp_0 Hop) in H11.
+    now apply rngl_1_neq_0_iff in Hch.
+  }
+  cbn; f_equal.
 ...
-  rewrite Hos.
-  rewrite (H1 1%L), (rngl_eqb_refl Heb).
-  rewrite (H1 1%L), (rngl_eqb_refl Heb).
-  rewrite (H1 1%
-  rewrite (minus_one_pow_succ Hop).
+    now apply rngl_1_neq_0_iff in Hch.
+  }
+  cbn.
 ...
-    unfold rngl_has_opp_or_subt; cbn.
-    unfold polyn_opt_opp_or_subt.
-    unfold rngl_has_opp in Hop.
-    clear rop rpp H2.
-    destruct rngl_opt_opp_or_subt.
-    unfold rop, polyn_ring_like_op.
+  rewrite (rngl_eqb_refl Heb); cbn.
+...
+unfold polyn_opt_opp_or_subt.
+unfold rngl_opp.
+destruct rngl_opt_opp_or_subt as [os | ]. {
+  destruct os as [opp| subt]. {
     cbn.
-Set Printing All.
 cbn.
+unfold polyn_opp; cbn.
+...
+
+  apply (rngl_eqb_eq Heb) in Hmz; rewrite Hmz.
+  }
+  apply (f_equal rngl_opp) in Hmz.
+  rewrite (rngl_opp_involutive Hop) in Hmz.
+  rewrite (rngl_opp_0 Hop) in Hmz.
+  now apply rngl_1_neq_0_iff in Hch.
 ...
 (**)
 specialize rngl_characteristic_1 as H2.
