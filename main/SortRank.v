@@ -3,7 +3,6 @@
    operator, returns the sorted list  *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
@@ -44,7 +43,7 @@ induction lrank as [| ib]; [ easy | cbn ].
 destruct (rel (f ia) (f ib)); [ easy | now cbn; f_equal ].
 Qed.
 
-Theorem isort_rank_length : ∀ A rel (l : list A),
+Theorem isort_rank_length : ∀ {A} rel (l : list A),
   length (isort_rank rel l) = length l.
 Proof.
 intros.
@@ -175,7 +174,7 @@ subst ib; apply Hia.
 now left.
 Qed.
 
-Theorem NoDup_isort_rank : ∀ A rel (l : list A), NoDup (isort_rank rel l).
+Theorem NoDup_isort_rank : ∀ {A} rel (l : list A), NoDup (isort_rank rel l).
 Proof.
 intros.
 induction l as [| d]; [ constructor | ].
@@ -211,7 +210,7 @@ Qed.
 
 (* *)
 
-Theorem isort_isort_rank : ∀ A (rel : A → A → bool) (d : A) l,
+Theorem isort_isort_rank : ∀ {A} (rel : A → A → bool) (d : A) l,
   isort rel l = map (λ i, nth i l d) (isort_rank rel l).
 Proof.
 intros.
@@ -321,7 +320,7 @@ destruct ab; [ easy | ].
 rewrite Ha in Hab; [ easy | now left ].
 Qed.
 
-Theorem eq_sorted_isort_rank_seq : ∀ (rel : nat → _),
+Theorem eq_sorted_isort_rank_seq : ∀ {rel : nat → _},
   transitive rel →
   ∀ la, sorted rel la
   → isort_rank rel la = seq 0 (length la).
