@@ -414,6 +414,9 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   clear - H1 Heb.
   rewrite (H1 1%L).
   unfold rngl_opp; cbn.
+  unfold polyn_opt_opp_or_subt.
+  subst Hos; cbn.
+Set Printing All.
 ...
   rewrite Hos.
   rewrite (H1 1%L), (rngl_eqb_refl Heb).
