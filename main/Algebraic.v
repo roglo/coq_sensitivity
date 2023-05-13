@@ -450,7 +450,8 @@ unfold rngl_opp; cbn.
 specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as H2.
 unfold rngl_has_opp_or_subt in H2.
 unfold polyn_opt_opp_or_subt; cbn.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+destruct os as [os| ]; [ | easy ].
 destruct os as [opp| subt ]. {
   subst rop; cbn.
   rewrite if_bool_if_dec.
@@ -468,6 +469,7 @@ destruct os as [opp| subt ]. {
     now apply rngl_1_neq_0_iff in Hch.
   }
   cbn; f_equal.
+  subst Hos.
 ...
     now apply rngl_1_neq_0_iff in Hch.
   }
