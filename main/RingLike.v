@@ -157,7 +157,7 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
-Theorem rngl_has_opp_has_opp_or_subt : ∀ T (ro : ring_like_op T),
+Theorem rngl_has_opp_has_opp_or_subt : ∀ {T} {ro : ring_like_op T},
   rngl_has_opp = true → rngl_has_opp_or_subt = true.
 Proof.
 intros * Hop.

@@ -3359,7 +3359,9 @@ Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 (*
 Arguments mk_polyn {T ro} lap%lap.
 Arguments polyn_mul_comm {T ro rp} Hic a b.
+*)
 Arguments polyn_of_const {T ro} c%L.
+(*
 Arguments polyn_of_norm_lap {T ro} la%lap.
 *)
 

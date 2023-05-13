@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul IterAnd.
-Require Import Polynomial Matrix Determinant Comatrix.
+Require Import LapPolyn Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 Import matrix_Notations.
 
@@ -113,7 +113,7 @@ rewrite <- (lap_mul_x_l Hos). 2: {
 symmetry.
 rewrite <- (lap_mul_x_l Hos); [ | easy ].
 symmetry.
-apply (lap_mul_assoc Hos Heb).
+apply (lap_mul_assoc Heb Hos).
 Qed.
 
 Theorem lap_x_power_has_polyn_prop :
@@ -219,12 +219,12 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
   destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
     apply (rngl_eqb_eq Heb) in Ha; subst a.
     rewrite rngl_add_0_l in Hab; rewrite Hab.
-    now rewrite rngl_add_0_l; cbn; rewrite Hab.
+    now cbn; rewrite rngl_add_0_l; rewrite Hab.
   }
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hb| Hb]. {
     apply (rngl_eqb_eq Heb) in Hb; subst b.
-    now rewrite rngl_add_0_r; cbn; rewrite Ha.
+    now cbn; rewrite rngl_add_0_r; rewrite Ha.
   }
   now cbn; rewrite Hab.
 }
@@ -405,8 +405,8 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   cbn in H2.
   destruct H2 as (_, H2).
   (* faudrait un polyn_add_0_r *)
-  rewrite polyn_add_comm in H2; [ | easy ].
-  rewrite polyn_add_0_l in H2; [ | easy | easy ].
+  rewrite polyn_add_comm in H2.
+  rewrite polyn_add_0_l in H2; [ | easy ].
 ...
     unfold rngl_has_opp_or_subt; cbn.
     unfold polyn_opt_opp_or_subt.
