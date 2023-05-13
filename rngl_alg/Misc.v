@@ -1,7 +1,6 @@
 (* Theorems of general usage, which could be (or not) in Coq library *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Require Import Main.Misc Main.PermutationFun.
