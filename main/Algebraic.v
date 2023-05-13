@@ -1,7 +1,6 @@
 (* attempt to define algebraic numbers *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
