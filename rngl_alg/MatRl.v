@@ -1,7 +1,6 @@
 (* square matrix ring like algebra *)
 
 Set Nested Proofs Allowed.
-Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
@@ -14,9 +13,9 @@ Import matrix_Notations.
 Section a.
 
 Context {T : Type}.
-Context (ro : ring_like_op T).
+Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hop : @rngl_has_opp T ro = true}.
+Context (Hop : @rngl_has_opp T ro = true).
 
 Theorem mZ_is_square_matrix : ∀ n,
   (mat_nrows (mZ n n) =? n) && is_square_matrix (mZ n n) = true.
@@ -46,7 +45,7 @@ cbn; rewrite List_map_seq_length.
 apply Nat.eqb_refl.
 Qed.
 
-Theorem square_matrix_add_prop : ∀ n (MA MB : square_matrix n T),
+Theorem square_matrix_add_prop : ∀ {n} (MA MB : square_matrix n T),
   (mat_nrows (sm_mat MA + sm_mat MB) =? n) &&
   is_square_matrix (sm_mat MA + sm_mat MB) = true.
 Proof.
@@ -60,7 +59,7 @@ do 2 rewrite smat_nrows.
 apply Nat.min_id.
 Qed.
 
-Theorem square_matrix_mul_prop : ∀ n (MA MB : square_matrix n T),
+Theorem square_matrix_mul_prop : ∀ {n} (MA MB : square_matrix n T),
   (mat_nrows (sm_mat MA * sm_mat MB) =? n) &&
   is_square_matrix (sm_mat MA * sm_mat MB) = true.
 Proof.
@@ -72,7 +71,7 @@ rewrite List_map_seq_length.
 apply smat_nrows.
 Qed.
 
-Theorem square_matrix_opp_prop : ∀ n (M : square_matrix n T),
+Theorem square_matrix_opp_prop : ∀ {n} (M : square_matrix n T),
   (mat_nrows (- sm_mat M) =? n) && is_square_matrix (- sm_mat M) = true.
 Proof.
 intros.
@@ -266,7 +265,7 @@ split. {
 Qed.
 
 Theorem squ_mat_add_comm :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (MA MB : square_matrix n T), (MA + MB)%L = (MB + MA)%L.
 Proof.
@@ -276,7 +275,7 @@ apply mat_add_comm.
 Qed.
 
 Theorem squ_mat_add_assoc :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (MA MB MC : square_matrix n T), (MA + (MB + MC) = (MA + MB) + MC)%L.
 Proof.
@@ -286,7 +285,7 @@ apply mat_add_assoc.
 Qed.
 
 Theorem squ_mat_add_0_l :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (M : square_matrix n T), (0 + M)%L = M.
 Proof.
@@ -302,7 +301,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_assoc :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (MA MB MC : square_matrix n T), (MA * (MB * MC) = (MA * MB) * MC)%L.
 Proof.
@@ -348,7 +347,7 @@ apply mat_mul_assoc; [ easy | | | ]. {
 Qed.
 
 Theorem squ_mat_mul_1_l :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (M : square_matrix n T), (1 * M)%L = M.
 Proof.
@@ -359,7 +358,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (MA MB MC : square_matrix n T), (MA * (MB + MC) = MA * MB + MA * MC)%L.
 Proof.
@@ -430,7 +429,7 @@ apply mat_mul_add_distr_l. {
 Qed.
 
 Theorem squ_mat_mul_1_r :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (M : square_matrix n T), (M * 1)%L = M.
 Proof.
@@ -441,7 +440,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_r :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   ∀ (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%L.
@@ -509,7 +508,7 @@ apply mat_mul_add_distr_r. {
 Qed.
 
 Theorem squ_mat_opt_add_opp_l :
-  ∀ n eqb,
+  ∀ {n} eqb,
   let rom := mat_ring_like_op eqb in
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op eqb) then
     ∀ M : square_matrix n T, (- M + M)%L = 0%L
