@@ -138,9 +138,6 @@ Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments vect_dot_mul (U V)%V.
-(*
-Arguments vector_eq {T}%type {ro} (U V)%V.
-*)
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
@@ -149,10 +146,6 @@ Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
 
-(*
-Arguments vect_dot_mul (U V)%V.
-Arguments vect_el {T}%type {ro} V%V i%nat.
-*)
 Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_assoc : ∀ (a b : T) (V : vector T),
@@ -526,45 +519,9 @@ End a.
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
-(*
-Arguments vect_add {T}%type {ro} (U V)%V.
-Arguments vect_add_assoc {T ro rp} (u v w)%V.
-Arguments vect_add_comm {T ro rp} (u v)%V.
-*)
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
-(*
-Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
-Arguments vect_dot_mul_add_l {T ro rp} n%nat (u v w)%V.
-Arguments vect_dot_mul_add_r {T ro rp} n%nat (u v w)%V.
-Arguments vect_dot_mul_comm {T ro rp} Hic (u v)%V.
-Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%L (U V)%V.
-*)
 Arguments vect_el {T}%type {ro} V%V i%nat.
-(*
-Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
-Arguments vect_list [T]%type v%V.
-Arguments vect_mul_scal_l {T ro} s%L V%V.
-Arguments vect_mul_scal_l_add_distr_l {T ro rp} a%L (u v)%V.
-Arguments vect_mul_scal_l_add_distr_r {T ro rp} (a b)%L u%V.
-Arguments vect_mul_scal_l_assoc {T ro rp} (a b)%L V%V.
-Arguments vect_mul_scal_l_opp_l {T ro rp} Hop a%L u%V.
-Arguments vect_mul_scal_l_sub_distr_r {T ro rp} Hop (a b)%L u%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%L.
-Arguments vect_mul_scal_0_l {T ro rp} Hos v%V.
-Arguments vect_opp {T ro} V%V.
-Arguments vect_opp_dot_mul_l {T ro rp} Hop (u v)%V.
-Arguments vect_opp_el {T ro rp} Hop v%V i%nat.
-Arguments vect_opp_size {T ro} v%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%L (U V)%V.
-*)
 Arguments vect_size {T}%type v%V.
-(*
-Arguments vect_squ_norm {T}%type {ro} V%V.
-Arguments vect_sub {T ro} U%V V%V.
-Arguments vect_zero {T ro} n%nat.
-Arguments vector_eq {T}%type {ro} (U V)%V.
-*)
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.

@@ -2057,39 +2057,6 @@ Print rlap_compose.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
-(*
-Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
-Arguments eq_strip_0s_cons {T ro rp} Heb la%lap [lb]%lap [b]%L.
-Arguments eq_strip_0s_nil {T ro rp} Heb d%L la%lap.
-Arguments eval_lap {T ro} la%lap x%L.
-Arguments eval_rlap {T ro} rla%lap x%L.
-Arguments has_polyn_prop {T ro} la%lap.
-Arguments has_polyn_prop_lap_norm {T ro rp} Heb la%lap.
-
-Arguments lap_add_move_l {T ro rp} Hos (la lb lc)%lap.
-Arguments lap_add_norm_idemp_r {T ro rp} Heb (la lb)%lap.
-Arguments lap_add_app_l {T ro rp} (la lb lc)%lap.
-Arguments lap_add_app_r {T ro rp} (la lb lc)%lap.
-Arguments lap_compose {T ro} (la lb)%lap.
-Arguments lap_mul_div {T ro rp} Hos Heb Hic Hop Hiv (la lb)%lap.
-Arguments lap_mul_has_polyn_prop {T ro rp} Hos Heb Hiv (la lb)%lap.
-Arguments lap_mul_norm_idemp_l {T ro rp} Hos Heb (la lb)%lap.
-Arguments lap_mul_norm_idemp_r {T ro rp} Hos Heb (la lb)%lap.
-Arguments lap_norm_length_le {T ro rp} Heb la%lap.
-Arguments lap_norm_mul {T ro rp} Hos Heb Hiv (la lb)%lap.
-Arguments lap_norm_repeat_0 {T ro rp} Heb n%nat.
-Arguments lap_quot_is_norm {T ro rp} Hos Heb Hiv (la lb)%lap.
-Arguments lap_quot_rem_prop {T ro rp} Hos Heb Hic Hop Hiv (la lb lq lr)%lap.
-Arguments lap_rem_is_norm {T ro rp} Heb (la lb)%lap.
-Arguments lap_ring_like_op {T ro}.
-Arguments lap_subt_diag {T ro rp} Hos la%lap.
-Arguments lap_subt_0_r {T ro rp} Hsu la%lap.
-Arguments lap_x_power {T ro} n%nat.
-
-Arguments polyn_norm_prop {T ro} la%lap.
-Arguments rlap_compose {T ro} (rla rlb)%lap.
-*)
-
 (* polynomials *)
 
 (* TODO: use an intermediate type like this:
@@ -2105,11 +2072,6 @@ Record polyn T {ro : ring_like_op T} := mk_polyn
 Arguments mk_polyn {T ro} lap%lap.
 Arguments lap {T ro}.
 Arguments lap_prop {T ro}.
-
-(*
-Arguments polyn T {ro}.
-Arguments mk_polyn {T ro} lap%list.
-*)
 
 Section a.
 
@@ -2483,11 +2445,6 @@ destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
 destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
-
-(*
-Arguments lap {T ro} p%pol.
-Arguments polyn_quot_rem (pa pb)%pol.
-*)
 
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -3301,11 +3258,6 @@ rewrite (lap_add_norm_idemp_r Heb).
 easy.
 Qed.
 
-(*
-Arguments lap_convol_mul_1_l {T ro rp} Hos la%lap (i len)%nat.
-Arguments lap_convol_mul_l_succ_l {T ro rp} Hos (la lb)%lap (i len)%nat.
-*)
-
 Theorem lap_cons : ∀ a la, a :: la = ([a] + [0; 1]%L * la)%lap.
 Proof.
 intros.
@@ -3323,28 +3275,8 @@ Qed.
 
 End a.
 
-(*
-Arguments lap_cons {T ro rp} Hos a%L la%lap.
-Arguments lap_mul_x_l {T ro rp} Hos [la]%lap.
-Arguments lap_norm_lap_rngl_summation {T ro rp} Hos Heb (b e)%nat.
-Arguments lap_norm_rngl_summation_idemp {T ro rp} Heb (b e)%nat.
-*)
-
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
-
-(*
-Arguments lap {T ro} p%pol.
-Arguments polyn_zero {T ro}.
-Arguments polyn_one {T ro}.
-Arguments polyn_add {T ro} p1 p2.
-Arguments polyn_mul {T ro} p1 p2.
-Arguments polyn_norm {T ro} la%lap.
-Arguments polyn_quot {T ro rp Hos Heb} pa pb.
-Arguments polyn_rem {T ro rp Heb} pa pb.
-Arguments polyn_ring_like_op {T ro rp} Hos Heb.
-Arguments polyn_x_power {T ro} n%nat.
-*)
 
 Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
@@ -3356,14 +3288,7 @@ Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 
-(*
-Arguments mk_polyn {T ro} lap%lap.
-Arguments polyn_mul_comm {T ro rp} Hic a b.
-*)
 Arguments polyn_of_const {T ro} c%L.
-(*
-Arguments polyn_of_norm_lap {T ro} la%lap.
-*)
 
 (* examples *)
 

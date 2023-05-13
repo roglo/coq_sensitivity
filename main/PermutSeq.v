@@ -134,9 +134,6 @@ Proof.
 intros * Hnd.
 now apply NoDup_nth.
 Qed.
-(*
-Arguments NoDup_nat : clear implicits.
-*)
 
 Theorem nat_NoDup : ∀ l,
   (∀ i j, i < length l → j < length l → nth i l 0 = nth j l 0 → i = j)
@@ -242,10 +239,6 @@ rewrite (List_map_nth' 0); [ easy | ].
 rewrite Hg, <- Hh.
 now apply permut_seq_ub.
 Qed.
-
-(*
-Arguments permut_comp_assoc n%nat [f g h]%list.
-*)
 
 (*
    Canonical Symmetric Group.
@@ -1964,10 +1957,6 @@ split. {
 apply isort_rank_length.
 Qed.
 
-(*
-Arguments isort_rank_permut_seq_with_len {A} rel n%nat [l]%list.
-*)
-
 Theorem isort_rank_permut_seq : ∀ {A} (rel : A → _) l,
   permut_seq (isort_rank rel l).
 Proof.
@@ -2339,7 +2328,3 @@ apply H1; [ | | easy ]. {
   now rewrite Hj'; apply canon_sym_gr_list_ub.
 }
 Qed.
-
-(*
-Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
-*)
