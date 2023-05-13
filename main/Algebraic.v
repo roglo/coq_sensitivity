@@ -406,6 +406,20 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   (* faudrait un polyn_add_0_r *)
   rewrite polyn_add_comm in H2.
   rewrite polyn_add_0_l in H2; [ | easy ].
+  unfold minus_one_pow.
+  destruct (n mod 2); cbn. {
+    now rewrite (H1 1%L), (rngl_eqb_refl Heb).
+  }
+  unfold polyn_one, polyn_of_const, polyn_of_norm_lap; cbn.
+  clear - H1 Heb.
+  rewrite (H1 1%L).
+  unfold rngl_opp; cbn.
+...
+  rewrite Hos.
+  rewrite (H1 1%L), (rngl_eqb_refl Heb).
+  rewrite (H1 1%L), (rngl_eqb_refl Heb).
+  rewrite (H1 1%
+  rewrite (minus_one_pow_succ Hop).
 ...
     unfold rngl_has_opp_or_subt; cbn.
     unfold polyn_opt_opp_or_subt.
