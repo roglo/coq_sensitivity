@@ -909,8 +909,8 @@ Theorem rngl_mul_0_r :
   rngl_has_opp_or_subt = true →
   ∀ a, (a * 0 = 0)%L.
 Proof.
-intros Hom *.
-apply (rngl_add_cancel_r Hom _ _ (a * 1)%L).
+intros Hos *.
+apply (rngl_add_cancel_r Hos _ _ (a * 1)%L).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
