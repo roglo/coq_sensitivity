@@ -351,6 +351,10 @@ f_equal.
 apply mul_add_distr_r.
 Qed.
 
+(* drawback: requires that 0 is absorbing for multiplication *)
+(* should use mul_iter_list_distr_l_test instead of mul_iter_list_distr_l
+   but the test "if length..." complicates the theorems using it *)
+(* same problem with _r versions *)
 Theorem rngl_mul_summation_list_distr_l : ∀ A a (la : list A) f,
   (a * (∑ (i ∈ la), f i) = ∑ (i ∈ la), a * f i)%L.
 Proof.
