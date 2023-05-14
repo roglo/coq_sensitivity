@@ -781,10 +781,18 @@ assert (H : (sm • u)%V = v). {
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
       rewrite (polyn_x_power_add Hos Heb).
+(**)
+      rewrite <- (polyn_mul_assoc Hos Heb).
+(*
       rewrite <- rngl_mul_assoc.
+*)
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
+(* below works only if polyn_ring_like_prop is declared as Canonical
+   Structure, and use of rngl_mul_assoc below, I don't know why *)
+(* I have the same problem with a summation on laps further *)
+...
     rewrite <- rngl_mul_summation_distr_l. 2: {
       clear - Hop.
       unfold rngl_has_opp_or_subt in Hos |-*; cbn.
@@ -879,6 +887,55 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_const_l Hos).
     erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
     rewrite map_id.
+(**)
+specialize (@rngl_mul_summation_distr_l (list T)) as H1.
+specialize (H1 lap_ring_like_op (lap_ring_like_prop Heb Hos)).
+assert (H : @rngl_has_opp_or_subt (list T) lap_ring_like_op = true).
+admit.
+specialize (H1 H); clear H.
+specialize (H1 [0%L; 1%L] 1 (length la)).
+specialize (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L]))%lap).
+remember [0;1]%L as x in H1; subst x.
+cbn - [ lap_norm rngl_zero rngl_add lap_mul ].
+...
+rewrite <- H1.
+remember
+         (@iter_seq (list T) (S O) (@length T la)
+            (fun (c : list T) (i : nat) =>
+             @rngl_add (list T) (@lap_ring_like_op T ro) c
+               (@rngl_mul (list T) (@lap_ring_like_op T ro)
+                  (@cons T (@rngl_zero T ro)
+                     (@cons T (@rngl_one T ro) (@nil T)))
+                  (@lap_mul T ro (@lap_x_power T ro (sub i (S O)))
+                     (@lap_norm T ro
+                        (@cons T (@nth T (sub i (S O)) la (@rngl_zero T ro))
+                           (@nil T))))))
+            (@rngl_zero (list T) (@lap_ring_like_op T ro)))
+as x eqn:Hx.
+remember
+(@iter_seq (list T) (S O) (@length T la)
+             (fun (j : list T) (i : nat) =>
+              @rngl_add (list T) (@lap_ring_like_op T ro) j
+                (@lap_mul T ro
+                   (@cons T (@rngl_zero T ro)
+                      (@cons T (@rngl_one T ro) (@nil T)))
+                   (@lap_mul T ro (@lap_x_power T ro (Nat.sub i (S O)))
+                      (@lap_norm T ro
+                         (@cons T
+                            (@nth T (Nat.sub i (S O)) la (@rngl_zero T ro))
+                            (@nil T))))))
+             (@rngl_zero (list T) (@lap_ring_like_op T ro)))
+as y eqn:Hy.
+move y before x.
+move Hy before Hx.
+unfold lap_ring_like_op in Hy.
+cbn - [ lap_norm rngl_zero rngl_add lap_mul ] in Hy.
+rewrite <- H1.
+...
+cbn - [ lap_norm rngl_zero rngl_add lap_mul ].
+...
+rewrite <- rngl_mul_summation_distr_l.
+...
     (* all these complications to rewrite with rngl_mul_summation_distr_l
        on "lap" that is not a ring like *)
     specialize mul_iter_list_distr_l as H1.

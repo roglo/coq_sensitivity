@@ -2208,8 +2208,9 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
      rngl_opt_le := None |}.
 
-(* allows to use ring-like theorems on polynomials *)
+(* allows to use ring-like theorems on polynomials
 Canonical Structure polyn_ring_like_op.
+*)
 
 (* to search for ring-like polynomials operators in the context *)
 (*
@@ -2236,6 +2237,17 @@ Proof.
 intros.
 unfold "+"%pol.
 now rewrite lap_add_comm.
+Qed.
+
+(* had to add this version for polyn_ring_like_prop, I don't know
+   why (othewize, Coq error). Not required for polyn_add_assoc, I
+   don't understand. *)
+Theorem polyn_add_comm' :
+  let rop := polyn_ring_like_op in
+  ∀ a b : polyn T, (a + b)%L = (b + a)%L.
+Proof.
+intros.
+apply polyn_add_comm.
 Qed.
 
 Theorem polyn_add_assoc : ∀ pa pb pc,
@@ -3151,7 +3163,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
-     rngl_add_comm := polyn_add_comm;
+     rngl_add_comm := polyn_add_comm';
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
