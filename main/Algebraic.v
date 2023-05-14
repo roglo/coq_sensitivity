@@ -905,8 +905,10 @@ assert (H : (sm • u)%V = v). {
     rewrite (rngl_summation_seq_summation 1 (length la)) in H1; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub in H1.
     fold rol rpl in H1.
-    rewrite <- H1.
+    rewrite <- H1; clear H1.
 (* ah putain, j'en ai chié. Mais j'y suis arrivé *)
+...
+    rewrite <- lap_add_norm_idemp_r.
 ...
 (**)
 specialize (@rngl_mul_summation_distr_l (list T)) as H1.
