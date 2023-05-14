@@ -3289,6 +3289,7 @@ Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
 
 Arguments polyn_of_const {T ro} c%L.
+Arguments polyn_of_norm_lap {T ro} la%lap.
 
 (* examples *)
 

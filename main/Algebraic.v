@@ -452,164 +452,39 @@ unfold rngl_has_opp_or_subt in H2.
 unfold polyn_opt_opp_or_subt; cbn.
 remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
 destruct os as [os| ]; [ | easy ].
+subst rop; cbn.
 destruct os as [opp| subt ]. {
-  subst rop; cbn.
+  assert (Hoo : ∀ x, opp x = rngl_opp x). {
+    intros.
+    unfold rngl_opp.
+    now rewrite Hos'.
+  }
+  cbn - [ lap_norm ].
+  unfold rngl_opp.
+  rewrite Hos'.
+  unfold lap_norm at 2.
+  cbn - [ lap_norm ].
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [H10| H10]. {
     apply (rngl_eqb_eq Heb) in H10.
     now apply rngl_1_neq_0_iff in Hch.
   }
   cbn.
+  rewrite Hoo.
   rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [H11| H11]. {
-    apply (rngl_eqb_eq Heb) in H11.
-    apply (f_equal rngl_opp) in H11.
-    rewrite (rngl_opp_involutive Hop) in H11.
-    rewrite (rngl_opp_0 Hop) in H11.
-    now apply rngl_1_neq_0_iff in Hch.
-  }
-  cbn; f_equal.
-  subst Hos.
-...
-    now apply rngl_1_neq_0_iff in Hch.
-  }
-  cbn.
-...
-  rewrite (rngl_eqb_refl Heb); cbn.
-...
-unfold polyn_opt_opp_or_subt.
-unfold rngl_opp.
-destruct rngl_opt_opp_or_subt as [os | ]. {
-  destruct os as [opp| subt]. {
-    cbn.
-cbn.
-unfold polyn_opp; cbn.
-...
-
-  apply (rngl_eqb_eq Heb) in Hmz; rewrite Hmz.
-  }
-  apply (f_equal rngl_opp) in Hmz.
-  rewrite (rngl_opp_involutive Hop) in Hmz.
-  rewrite (rngl_opp_0 Hop) in Hmz.
+  destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H11.
+  apply (f_equal rngl_opp) in H11.
+  rewrite (rngl_opp_involutive Hop) in H11.
+  rewrite (rngl_opp_0 Hop) in H11.
   now apply rngl_1_neq_0_iff in Hch.
-...
-(**)
-specialize rngl_characteristic_1 as H2.
-Search (1 = 0)%L.
-remember (@rngl_characteristic (polyn T) rop rpp) as ch eqn:Hch'; symmetry in Hch'.
-destruct (Nat.eq_dec ch 1) as [H4| H4]. {
-  move H4 at top; subst ch.
-...
-  destruct n; cbn; [ now apply (f_equal lap) in H3 | ].
-  set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
-  rewrite minus_one_pow_succ. 2: {
-    unfold rop; cbn.
-    unfold Hos; cbn.
-    clear Hos rop rpp.
-    unfold rngl_has_opp; cbn.
-    unfold polyn_opt_opp_or_subt; cbn.
-    unfold rngl_has_opp in Hop; cbn in Hop.
-    remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
-    destruct os as [os| ]; [ | easy ].
-    now destruct os.
-  }
-  destruct n; cbn. {
-    rewrite H3.
-    unfold polyn_zero; cbn.
-    subst rop.
-    unfold rngl_opp; cbn.
-    unfold polyn_opt_opp_or_subt; cbn.
-    destruct rngl_opt_opp_or_subt; [ | easy ].
-    now destruct s.
-  }
-...
-clear - rop.
-...
-  apply rngl_1_neq_0_iff in Hch; [ easy | ].
-...
-  exfalso; apply H; [ | easy ].
-...
-
-  rewrite if_bool_if_dec.
-Search (rngl_characteristic = 1).
-apply eq_polyn_eq; cbn.
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [H| H]. {
-  apply (rngl_eqb_eq Heb) in H.
-  induction n; cbn in H. {
-...
-unfold rop.
-cbn.
-unfold rngl_has_opp_has_opp_or_subt.
-cbn.
-...
-intros.
-induction n; [ easy | ].
-rewrite (minus_one_pow_succ Hop).
-rewrite (polyn_of_const_opp Hop Heb).
-rewrite IHn.
-set (Hos := rngl_has_opp_has_opp_or_subt Hop).
-set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
-rewrite minus_one_pow_succ. {
-unfold rop.
-unfold polyn_opp.
-  apply eq_polyn_eq; cbn.
-  rewrite (lap_norm_opp Hop Heb).
-...
-  rewrite <- IHn.
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (Sumbool.sumbool_of_bool _) as [H| H]. {
-    apply (rngl_eqb_eq Heb) in H.
-    rewrite H; cbn.
-    unfold polyn_of_const.
-    unfold polyn_of_norm_lap; cbn.
-Set Printing All.
-    remember (@rngl_eqb T ro (@rngl_zero T ro) (@rngl_zero T ro)) as x eqn:Hx.
-    rewrite if_bool_if_dec.
-...
-Theorem lap_polyn_opp : ∀ p, lap (- p) = (- lap p)%lap.
-...
-Search (lap (- _)).
-rewrite lap_polyn_opp.
-...
-    rewrite (rngl_eqb_refl Heb).
-...
-    unfold minus_one_pow in H.
-    destruct (n mod 2). {
-      cbn.
-...
-subst rpp.
-subst Hos.
-...
-rewrite <- lap_polyn_opp.
-apply has_polyn_prop_lap_norm.
-...
-About lap.
-...
-Check lap_polyn_opp.
-About lap.
-unfold rop.
-cbn.
-unfold polyn_ring_like_op.
-cbn.
-rewrite lap_polyn_opp.
-...
-unfold rop.
-Set Printing All.
-Search (lap (minus_one_pow _)).
-...
-rewrite lap_norm_opp.
-...
-unfold polyn_opp.
-Set Printing All.
-...
-unfold rop; cbn.
-...
-Set Printing All.
-...
-apply minus_one_pow_succ.
-...
+}
+generalize Hop; intros Hsu.
+apply rngl_has_opp_has_no_subt in Hsu.
+move Hsu before Hop.
+unfold rngl_has_subt in Hsu.
+now rewrite Hos' in Hsu.
+Qed.
 
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
@@ -996,7 +871,7 @@ assert (H : (sm • u)%V = v). {
       rewrite (lap_x_power_add Hos Heb).
       unfold lap_x_power at 1.
       cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
-      rewrite <- (lap_mul_assoc Hos Heb).
+      rewrite <- (lap_mul_assoc Heb Hos).
       easy.
     }
     remember (λ j, _) as x in |-*; subst x.
@@ -1017,6 +892,7 @@ assert (H : (sm • u)%V = v). {
     unfold iter_seq.
     unfold iter_list in H1 |-*.
     cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ].
+...
     rewrite <- H1; clear H1. 2: {
       intros y z.
      apply lap_mul_add_distr_l; [ easy | easy | easy ].

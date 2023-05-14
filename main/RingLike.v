@@ -1776,6 +1776,17 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+Theorem rngl_has_opp_has_no_subt :
+  rngl_has_opp = true
+  → rngl_has_subt = false.
+Proof.
+intros * Hop.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=
