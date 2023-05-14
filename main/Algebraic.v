@@ -882,6 +882,12 @@ assert (H : (sm • u)%V = v). {
     rewrite map_id.
     replace (@lap_mul T ro) with (@rngl_mul (list T) (@lap_ring_like_op T ro)) by easy.
     set (rpl := @lap_ring_like_prop T ro rp Heb Hos).
+(**)
+    specialize mul_iter_list_distr_l_test as H1.
+    specialize (H1 T T 0%L rngl_add rngl_mul rngl_add_0_l).
+    specialize (H1 rngl_mul_add_distr_l).
+    specialize (H1 a la).
+...
     rewrite <- (rngl_mul_summation_distr_l). 2: {
 Print lap_ring_like_op.
 Print lap_opt_opp_or_subt.

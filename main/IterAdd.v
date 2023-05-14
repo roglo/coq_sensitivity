@@ -292,6 +292,33 @@ apply iter_seq_rtl. {
 }
 Qed.
 
+Theorem mul_iter_list_distr_l_test : ∀ A B d
+    (add mul : A → A → A)
+    (add_0_l : ∀ x, add d x = x)
+    (mul_add_distr_l : ∀ x y z, mul x (add y z) = add (mul x y) (mul x z)),
+  ∀  a (la : list B) f,
+  mul a (iter_list la (λ c i, add c (f i)) d) =
+  if length la =? 0 then mul a d
+  else iter_list la (λ c i, add c (mul a (f i))) d.
+Proof.
+intros.
+clear Hom.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+  now apply Nat.eqb_eq, length_zero_iff_nil in Haz; subst la.
+}
+apply Nat.eqb_neq in Haz.
+unfold iter_list.
+destruct la as [| b]; intros; [ easy | cbn; clear Haz ].
+do 2 rewrite add_0_l.
+remember (f b) as a1 eqn:H; clear b H.
+revert a1.
+induction la as [| a2]; intros; [ easy | cbn ].
+rewrite IHla.
+f_equal.
+apply mul_add_distr_l.
+Qed.
+
 Theorem mul_iter_list_distr_l : ∀ A B a (la : list B) f
     (add mul : A → A → A) d
     (mul_add_distr_l : ∀ y z, mul a (add y z) = add (mul a y) (mul a z)),
