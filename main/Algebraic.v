@@ -884,16 +884,29 @@ assert (H : (sm • u)%V = v). {
     set (rpl := @lap_ring_like_prop T ro rp Heb Hos).
 (**)
     specialize mul_iter_list_distr_l_test as H1.
-    specialize (H1 T T 0%L rngl_add rngl_mul rngl_add_0_l).
-    specialize (H1 rngl_mul_add_distr_l).
-    specialize (H1 a la).
-...
-    rewrite <- (rngl_mul_summation_distr_l). 2: {
-Print lap_ring_like_op.
-Print lap_opt_opp_or_subt.
-...
-      cbn.
-(* chiasse *)
+    specialize (H1 (list T) nat).
+    specialize (H1 (@rngl_zero _ lap_ring_like_op)).
+    specialize (H1 (@rngl_add _ lap_ring_like_op)).
+    specialize (H1 (@rngl_mul _ lap_ring_like_op)).
+    specialize (H1 lap_add_0_l (lap_mul_add_distr_l Heb Hos)).
+    specialize (H1 [0; 1]%L (seq 1 (length la))).
+    rewrite seq_length in H1.
+    set (rol := lap_ring_like_op).
+    specialize (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0]))%L).
+    rewrite if_bool_if_dec in H1.
+    destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
+      apply Nat.eqb_eq, length_zero_iff_nil in Haz; subst la.
+      unfold iter_seq, iter_list; cbn - [ lap_norm ].
+      rewrite lap_add_0_r.
+      symmetry; apply lap_norm_idemp.
+    }
+    apply Nat.eqb_neq in Haz.
+    rewrite (rngl_summation_seq_summation 1 (length la)) in H1; [ | easy ].
+    rewrite (rngl_summation_seq_summation 1 (length la)) in H1; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub in H1.
+    fold rol rpl in H1.
+    rewrite <- H1.
+(* ah putain, j'en ai chié. Mais j'y suis arrivé *)
 ...
 (**)
 specialize (@rngl_mul_summation_distr_l (list T)) as H1.
