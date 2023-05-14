@@ -781,18 +781,11 @@ assert (H : (sm • u)%V = v). {
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
       rewrite (polyn_x_power_add Hos Heb).
-(**)
-      rewrite <- (polyn_mul_assoc Hos Heb).
-(*
+      replace polyn_mul with rngl_mul by easy.
       rewrite <- rngl_mul_assoc.
-*)
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
-(* below works only if polyn_ring_like_prop is declared as Canonical
-   Structure, and use of rngl_mul_assoc below, I don't know why *)
-(* I have the same problem with a summation on laps further *)
-...
     rewrite <- rngl_mul_summation_distr_l. 2: {
       clear - Hop.
       unfold rngl_has_opp_or_subt in Hos |-*; cbn.
@@ -887,11 +880,20 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_const_l Hos).
     erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
     rewrite map_id.
+    replace (@lap_mul T ro) with (@rngl_mul (list T) (@lap_ring_like_op T ro)) by easy.
+    set (rpl := @lap_ring_like_prop T ro rp Heb Hos).
+    rewrite <- (rngl_mul_summation_distr_l). 2: {
+Print lap_ring_like_op.
+Print lap_opt_opp_or_subt.
+...
+      cbn.
+(* chiasse *)
+...
 (**)
 specialize (@rngl_mul_summation_distr_l (list T)) as H1.
 specialize (H1 lap_ring_like_op (lap_ring_like_prop Heb Hos)).
 assert (H : @rngl_has_opp_or_subt (list T) lap_ring_like_op = true).
-admit.
+...
 specialize (H1 H); clear H.
 specialize (H1 [0%L; 1%L] 1 (length la)).
 specialize (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L]))%lap).
@@ -958,7 +960,7 @@ rewrite <- rngl_mul_summation_distr_l.
     rewrite fold_iter_seq.
     replace (@nil T) with (@rngl_zero (list T) lap_ring_like_op) at 3 by easy.
     replace lap_add with (@rngl_add (list T) lap_ring_like_op) by easy.
-    (* end of all these complications *)
+...
     unfold rngl_add at 1.
     cbn - [ rngl_zero rngl_add lap_x_power lap_norm lap_mul ].
     rewrite (lap_add_norm_idemp_l Heb).
