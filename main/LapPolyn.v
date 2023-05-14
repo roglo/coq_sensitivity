@@ -478,15 +478,15 @@ Qed.
 
 Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
-(*
+(**)
   None.
-*)
+(*
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl lap_opp)
   | Some (inr _) => None
   | None => None
   end.
-(**)
+*)
 
 (* lap quotient *)
 
@@ -2854,24 +2854,6 @@ Qed.
 ...
 *)
 
-Theorem lap_opt_add_opp_l :
-  let rol := lap_ring_like_op in
-  if rngl_has_opp then ∀ a : list T, (- a + a)%L = 0%L else not_applicable.
-Proof.
-intros.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op; [ | easy ].
-intros; cbn.
-unfold rngl_opp.
-unfold rngl_has_opp in Hop.
-remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
-destruct os as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ | easy ].
-subst rol.
-replace opp with lap_opp.
-(* ouais mais non, ça fait pas la liste vide *)
-...
-
 (* lap ring-like properties *)
 
 Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
@@ -2891,11 +2873,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_opt_mul_comm := lap_opt_mul_comm;
      rngl_opt_mul_1_r := lap_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r Hos;
-(*
      rngl_opt_add_opp_l := NA;
-*)
-     rngl_opt_add_opp_l := lap_opt_add_opp_l;
-(**)
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
 (*
