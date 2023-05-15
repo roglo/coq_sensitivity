@@ -2913,3 +2913,11 @@ Qed.
 End a.
 
 Arguments lap_quot_rem {T ro} (la lb)%lap.
+
+(*
+Notation "'∑' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, (c + g)%lap) [])
+  (at level 45, i at level 0, b at level 60, e at level 60,
+   right associativity,
+   format "'[hv  ' ∑  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'") : lap_scope.
+*)

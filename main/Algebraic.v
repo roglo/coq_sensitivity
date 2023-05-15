@@ -914,6 +914,9 @@ assert (H : (sm • u)%V = v). {
     rewrite <- H1; clear H1.
     (* end of processus *)
     replace (@rngl_add _ rol) with (@lap_add _ ro) by easy.
+Show.
+cbn - [ lap_norm iter_seq lap_add lap_mul ].
+...
     rewrite <- (lap_add_norm_idemp_r Heb).
     replace (@lap_add _ ro) with (@rngl_add _ rol) by easy.
     (**)
