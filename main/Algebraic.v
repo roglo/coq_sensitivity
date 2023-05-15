@@ -914,9 +914,6 @@ assert (H : (sm • u)%V = v). {
     rewrite <- H1; clear H1.
     (* end of processus *)
     replace (@rngl_add _ rol) with (@lap_add _ ro) by easy.
-Show.
-cbn - [ lap_norm iter_seq lap_add lap_mul ].
-...
     rewrite <- (lap_add_norm_idemp_r Heb).
     replace (@lap_add _ ro) with (@rngl_add _ rol) by easy.
     (**)
@@ -1036,21 +1033,23 @@ assert
     set (rpp := polyn_ring_like_prop Hos Heb).
     rewrite rngl_mul_0_r; [ | easy ].
     rewrite rngl_mul_0_l; [ | easy ].
-(**)
+    (**)
     unfold polyn_of_const.
     remember (polyn_of_norm_lap [@rngl_zero _ ro]) as x eqn:Hx.
-    unfold polyn_of_norm_lap in Hx.
-    cbn in Hx.
-    apply (f_equal lap) in Hx.
-    cbn in Hx.
-    rewrite (rngl_eqb_refl Heb) in Hx.
-    cbn in Hx.
+    unfold polyn_of_norm_lap in Hx; cbn in Hx.
+    apply (f_equal lap) in Hx; cbn in Hx.
+    rewrite (rngl_eqb_refl Heb) in Hx; cbn in Hx.
     destruct x as (x, y).
     cbn in Hx; subst x; cbn.
-Search (mk_polyn []).
-...
-    rewrite if_bool_if_dec in Hx.
-    rewrite (rngl_eqb_refl Heb) in Hx.
+    (**)
+    replace (@mk_polyn T ro (@nil T) y) with (@rngl_zero _ rop). 2: {
+      now apply eq_polyn_eq.
+    }
+    replace polyn_mul with rngl_mul by easy.
+    rewrite (rngl_mul_0_r Hosp).
+    rewrite (rngl_mul_0_l Hosp).
+    easy.
+  }
 ...
 remember (lap_norm [_]) as x eqn:Hx.
     cbn - [ lap_norm ].
