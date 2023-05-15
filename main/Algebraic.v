@@ -962,7 +962,6 @@ assert
   now rewrite Nat_sub_succ_1, Nat.add_0_l.
 }
 clear Hcr; rename H into Hcr.
-...
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
     polyn_norm (lap (det sm) * lap_x_power (n + m - i)) =
@@ -1000,8 +999,15 @@ Theorem det_polyn_of_const :
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
-intros Hii Hch *.
-cbn.
+intros Hii Hch *; cbn.
+assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
+  unfold rngl_has_opp_or_subt; cbn.
+  unfold polyn_opt_opp_or_subt.
+  unfold rngl_has_opp_or_subt in Hos.
+  clear - Hos.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
 rewrite map_length.
 assert
   (H :
@@ -1018,7 +1024,43 @@ assert
   intros i Hi.
   rewrite (polyn_of_const_mul Hii Hos Heb).
   rewrite (polyn_of_const_mul Hii Hos Heb).
+  destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
+    apply length_zero_iff_nil in Hlz; subst ll.
+    do 2 rewrite List_nth_nil.
+    cbn.
+    replace (@polyn_zero T ro) with (@rngl_zero _ rop) by easy.
+    replace polyn_mul with rngl_mul by easy.
+    set (rpp := polyn_ring_like_prop Hos Heb).
+    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_l; [ | easy ].
+(**)
+    unfold polyn_of_const.
+    remember (polyn_of_norm_lap [@rngl_zero _ ro]) as x eqn:Hx.
+    unfold polyn_of_norm_lap in Hx.
+    cbn in Hx.
 ...
+    rewrite if_bool_if_dec in Hx.
+    rewrite (rngl_eqb_refl Heb) in Hx.
+...
+remember (lap_norm [_]) as x eqn:Hx.
+    cbn - [ lap_norm ].
+    replace (@polyn_zero T ro) with (@rngl_zero _ rop) by easy.
+    replace polyn_mul with rngl_mul by easy.
+    rewrite rngl_mul_0_r.
+...
+      rewrite Hos.
+...
+rewrite polyn_mul_0_r.
+...
+    set (rol := polyn_ring_like_op Hos Heb).
+rewrite rngl_mul_0_r.
+...
+    unfold polyn_of_const.
+    unfold polyn_of_norm_lap.
+...
+remember (nth 0 (map _ _) _) as x eqn:Hx.
+rewrite (List_map_nth' []) in Hx.
+  cbn.
   rewrite (List_map_nth' []).
 ...
 induction ll as [| la]. {
