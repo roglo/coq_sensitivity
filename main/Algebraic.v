@@ -880,9 +880,15 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_const_l Hos).
     erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
     rewrite map_id.
-    replace (@lap_mul T ro) with (@rngl_mul (list T) (@lap_ring_like_op T ro)) by easy.
+    (* cannot apply rngl_mul_summation_list_distr because it requires
+       rngl_has_opp_or_subt, which is false on laps *)
+    (* mul_iter_list_distr_l_test is more general, does not requires
+       that, but I must decompose the whole processus ; I should make
+       a lemma *)
+    replace (@lap_mul T ro) with (@rngl_mul (list T) (@lap_ring_like_op T ro))
+      by easy.
     set (rpl := @lap_ring_like_prop T ro rp Heb Hos).
-(**)
+    (**)
     specialize mul_iter_list_distr_l_test as H1.
     specialize (H1 (list T) nat).
     specialize (H1 (@rngl_zero _ lap_ring_like_op)).
@@ -906,9 +912,20 @@ assert (H : (sm • u)%V = v). {
     rewrite Nat.add_comm, Nat.add_sub in H1.
     fold rol rpl in H1.
     rewrite <- H1; clear H1.
-(* ah putain, j'en ai chié. Mais j'y suis arrivé *)
-...
-    rewrite <- lap_add_norm_idemp_r.
+    (* end of processus *)
+    replace (@rngl_add _ rol) with (@lap_add _ ro) by easy.
+    rewrite <- (lap_add_norm_idemp_r Heb).
+    replace (@lap_add _ ro) with (@rngl_add _ rol) by easy.
+    (**)
+    replace (@rngl_mul _ rol) with (@lap_mul _ ro) by easy.
+    rewrite <- (lap_mul_norm_idemp_r Hos Heb).
+    (**)
+    remember (lap_norm (∑ (i = _, _), _)) as x eqn:Hx.
+    rewrite <- IHla.
+    (**)
+    rewrite (lap_mul_norm_idemp_r Hos Heb).
+    replace (@rngl_add _ rol) with (@lap_add _ ro) by easy.
+    rewrite (lap_add_norm_idemp_r Heb).
 ...
 (**)
 specialize (@rngl_mul_summation_distr_l (list T)) as H1.
