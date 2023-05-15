@@ -1009,48 +1009,48 @@ assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
   now destruct os.
 }
 rewrite map_length.
-assert
-  (H :
-     ∀ len,
-     determinant_loop len
-        {| mat_list_list := map (λ l : list T, map polyn_of_const l) ll |} =
-     polyn_of_const (determinant_loop len {| mat_list_list := ll |})). {
-  intros.
-  revert ll.
-  induction len; intros; [ easy | ].
-  cbn - [ rngl_zero rngl_add ].
-  rewrite (polyn_of_const_rngl_summation Hos Heb).
-  apply rngl_summation_eq_compat.
-  intros i Hi.
-  rewrite (polyn_of_const_mul Hii Hos Heb).
-  rewrite (polyn_of_const_mul Hii Hos Heb).
-  destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
-    apply length_zero_iff_nil in Hlz; subst ll.
-    do 2 rewrite List_nth_nil.
-    cbn.
-    replace (@polyn_zero T ro) with (@rngl_zero _ rop) by easy.
-    replace polyn_mul with rngl_mul by easy.
-    set (rpp := polyn_ring_like_prop Hos Heb).
-    rewrite rngl_mul_0_r; [ | easy ].
-    rewrite rngl_mul_0_l; [ | easy ].
-    (**)
-    unfold polyn_of_const.
-    remember (polyn_of_norm_lap [@rngl_zero _ ro]) as x eqn:Hx.
-    unfold polyn_of_norm_lap in Hx; cbn in Hx.
-    apply (f_equal lap) in Hx; cbn in Hx.
-    rewrite (rngl_eqb_refl Heb) in Hx; cbn in Hx.
-    destruct x as (x, y).
-    cbn in Hx; subst x; cbn.
-    (**)
-    replace (@mk_polyn T ro (@nil T) y) with (@rngl_zero _ rop). 2: {
-      now apply eq_polyn_eq.
-    }
-    replace polyn_mul with rngl_mul by easy.
-    rewrite (rngl_mul_0_r Hosp).
-    rewrite (rngl_mul_0_l Hosp).
-    easy.
+(**)
+remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+revert ll Hlen.
+induction len; intros; [ easy | ].
+cbn - [ rngl_zero rngl_add ].
+rewrite (polyn_of_const_rngl_summation Hos Heb).
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite (polyn_of_const_mul Hii Hos Heb).
+rewrite (polyn_of_const_mul Hii Hos Heb).
+rewrite (List_map_nth' []); [ | now rewrite Hlen ].
+rewrite <- List_hd_nth_0.
+...
+(*
+destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
+  apply length_zero_iff_nil in Hlz; subst ll.
+  do 2 rewrite List_nth_nil.
+  cbn.
+  replace (@polyn_zero T ro) with (@rngl_zero _ rop) by easy.
+  replace polyn_mul with rngl_mul by easy.
+  set (rpp := polyn_ring_like_prop Hos Heb).
+  rewrite rngl_mul_0_r; [ | easy ].
+  rewrite rngl_mul_0_l; [ | easy ].
+  (**)
+  unfold polyn_of_const.
+  remember (polyn_of_norm_lap [@rngl_zero _ ro]) as x eqn:Hx.
+  unfold polyn_of_norm_lap in Hx; cbn in Hx.
+  apply (f_equal lap) in Hx; cbn in Hx.
+  rewrite (rngl_eqb_refl Heb) in Hx; cbn in Hx.
+  destruct x as (x, y).
+  cbn in Hx; subst x; cbn.
+  (**)
+  replace (@mk_polyn T ro (@nil T) y) with (@rngl_zero _ rop). 2: {
+    now apply eq_polyn_eq.
   }
-  rewrite (List_map_nth' []); [ | now apply Nat.neq_0_lt_0 ].
+  replace polyn_mul with rngl_mul by easy.
+  rewrite (rngl_mul_0_r Hosp).
+  rewrite (rngl_mul_0_l Hosp).
+  easy.
+}
+*)
+rewrite (List_map_nth' []); [ | apply Nat.neq_0_lt_0 ].
   rewrite <- List_hd_nth_0.
   rewrite (List_map_nth' 0%L). 2: {
 ...
