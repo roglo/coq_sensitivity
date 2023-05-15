@@ -926,92 +926,10 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_mul_norm_idemp_r Hos Heb).
     replace (@rngl_add _ rol) with (@lap_add _ ro) by easy.
     rewrite (lap_add_norm_idemp_r Heb).
-...
-(**)
-specialize (@rngl_mul_summation_distr_l (list T)) as H1.
-specialize (H1 lap_ring_like_op (lap_ring_like_prop Heb Hos)).
-assert (H : @rngl_has_opp_or_subt (list T) lap_ring_like_op = true).
-...
-specialize (H1 H); clear H.
-specialize (H1 [0%L; 1%L] 1 (length la)).
-specialize (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L]))%lap).
-remember [0;1]%L as x in H1; subst x.
-cbn - [ lap_norm rngl_zero rngl_add lap_mul ].
-...
-rewrite <- H1.
-remember
-         (@iter_seq (list T) (S O) (@length T la)
-            (fun (c : list T) (i : nat) =>
-             @rngl_add (list T) (@lap_ring_like_op T ro) c
-               (@rngl_mul (list T) (@lap_ring_like_op T ro)
-                  (@cons T (@rngl_zero T ro)
-                     (@cons T (@rngl_one T ro) (@nil T)))
-                  (@lap_mul T ro (@lap_x_power T ro (sub i (S O)))
-                     (@lap_norm T ro
-                        (@cons T (@nth T (sub i (S O)) la (@rngl_zero T ro))
-                           (@nil T))))))
-            (@rngl_zero (list T) (@lap_ring_like_op T ro)))
-as x eqn:Hx.
-remember
-(@iter_seq (list T) (S O) (@length T la)
-             (fun (j : list T) (i : nat) =>
-              @rngl_add (list T) (@lap_ring_like_op T ro) j
-                (@lap_mul T ro
-                   (@cons T (@rngl_zero T ro)
-                      (@cons T (@rngl_one T ro) (@nil T)))
-                   (@lap_mul T ro (@lap_x_power T ro (Nat.sub i (S O)))
-                      (@lap_norm T ro
-                         (@cons T
-                            (@nth T (Nat.sub i (S O)) la (@rngl_zero T ro))
-                            (@nil T))))))
-             (@rngl_zero (list T) (@lap_ring_like_op T ro)))
-as y eqn:Hy.
-move y before x.
-move Hy before Hx.
-unfold lap_ring_like_op in Hy.
-cbn - [ lap_norm rngl_zero rngl_add lap_mul ] in Hy.
-rewrite <- H1.
-...
-cbn - [ lap_norm rngl_zero rngl_add lap_mul ].
-...
-rewrite <- rngl_mul_summation_distr_l.
-...
-    (* all these complications to rewrite with rngl_mul_summation_distr_l
-       on "lap" that is not a ring like *)
-    specialize mul_iter_list_distr_l as H1.
-    specialize (H1 (list T) nat [0; 1]%L (seq 1 (S (length la) - 1))).
-    specialize
-      (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0%L])%lap)).
-    specialize (H1 lap_add lap_mul).
-    specialize (H1 []).
-    rewrite lap_mul_0_r in H1.
-    cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ] in H1.
-    unfold iter_seq.
-    unfold iter_list in H1 |-*.
-    cbn - [ lap_add lap_mul lap_x_power lap_norm seq minus ].
-...
-    rewrite <- H1; clear H1. 2: {
-      intros y z.
-     apply lap_mul_add_distr_l; [ easy | easy | easy ].
-    }
-    rewrite fold_iter_list.
-    rewrite fold_iter_seq.
-    replace (@nil T) with (@rngl_zero (list T) lap_ring_like_op) at 3 by easy.
-    replace lap_add with (@rngl_add (list T) lap_ring_like_op) by easy.
-...
-    unfold rngl_add at 1.
-    cbn - [ rngl_zero rngl_add lap_x_power lap_norm lap_mul ].
     rewrite (lap_add_norm_idemp_l Heb).
-    remember (∑ (i = _, _), _) as x eqn:Hx in |-*.
-    rewrite (lap_cons Hos).
-    rewrite <- (lap_add_norm_idemp_r Heb); symmetry.
-    rewrite <- (lap_add_norm_idemp_r Heb); symmetry.
-    f_equal; f_equal.
-    rewrite <- (lap_mul_norm_idemp_r Hos Heb); symmetry.
-    rewrite <- (lap_mul_norm_idemp_r Hos Heb); symmetry.
-    f_equal; f_equal.
-    subst x.
-    apply IHla.
+    (**)
+    f_equal.
+    apply (lap_cons Hos).
   }
   f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
 }
@@ -1044,6 +962,7 @@ assert
   now rewrite Nat_sub_succ_1, Nat.add_0_l.
 }
 clear Hcr; rename H into Hcr.
+...
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
     polyn_norm (lap (det sm) * lap_x_power (n + m - i)) =
