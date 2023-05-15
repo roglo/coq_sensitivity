@@ -616,13 +616,4 @@ Qed.
 
 End a.
 
-(*
-Arguments rngl_product_change_var {T ro} [A]%type [b e]%nat.
-Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
-Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
-Arguments rngl_product_list_only_one {T ro rp} A%type.
-Arguments rngl_product_list_permut {T ro rp} [A]%type _ _ _ (la lb)%list.
-Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
-Arguments rngl_product_summation_distr_cart_prod {T ro rp} _ (m n)%nat.
-*)
 Arguments rngl_product_list_permut {T ro rp A eqb} Heb Hic (la lb)%list.
