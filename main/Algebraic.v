@@ -1038,6 +1038,13 @@ assert
     remember (polyn_of_norm_lap [@rngl_zero _ ro]) as x eqn:Hx.
     unfold polyn_of_norm_lap in Hx.
     cbn in Hx.
+    apply (f_equal lap) in Hx.
+    cbn in Hx.
+    rewrite (rngl_eqb_refl Heb) in Hx.
+    cbn in Hx.
+    destruct x as (x, y).
+    cbn in Hx; subst x; cbn.
+Search (mk_polyn []).
 ...
     rewrite if_bool_if_dec in Hx.
     rewrite (rngl_eqb_refl Heb) in Hx.
