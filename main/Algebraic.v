@@ -1050,6 +1050,9 @@ assert
     rewrite (rngl_mul_0_l Hosp).
     easy.
   }
+  rewrite (List_map_nth' []); [ | now apply Nat.neq_0_lt_0 ].
+  rewrite <- List_hd_nth_0.
+  rewrite (List_map_nth' 0%L). 2: {
 ...
 remember (lap_norm [_]) as x eqn:Hx.
     cbn - [ lap_norm ].
