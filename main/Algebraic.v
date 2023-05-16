@@ -1011,18 +1011,25 @@ Theorem det_polyn_of_const :
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hii Hch *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+(*
 assert (Hos : @rngl_has_opp_or_subt T ro = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+  unfold rngl_has_opp_or_subt.
+  unfold rngl_has_opp in Hop.
+  clear - Hop.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
 }
-...
+*)
 replace rop with (polyn_ring_like_op Hos Heb). 2: {
   subst rop.
   unfold polyn_ring_like_op; cbn.
   f_equal.
   unfold rngl_has_opp_has_opp_or_subt.
   unfold rngl_has_opp_or_subt in Hos.
-  rewrite
-  clear - Hos.
+...
+  clear Hop.
+...
   destruct rngl_opt_opp_or_subt.
 ...
   replace (polyn_opt_inv_or_quot (rngl_has_opp_has_opp_or_subt Hop) Heb)
@@ -1044,8 +1051,8 @@ replace rop with (polyn_ring_like_op Hos Heb). 2: {
   clear - Hop.
   destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
   now destruct os.
-
 Set Printing All.
+...
 subst rop.
 set (rop := polyn_ring_like_op Hos Heb).
 assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
