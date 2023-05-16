@@ -372,10 +372,21 @@ destruct (Sumbool.sumbool_of_bool _) as [Hoaz| Hoaz]. {
 }
 Qed.
 
+Theorem rngl_has_opp_has_opp_or_subt :
+  rngl_has_opp = true → rngl_has_opp_or_subt = true.
+Proof.
+intros Hop.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_opp_or_subt.
+now destruct rngl_opt_opp_or_subt.
+Defined.
+
+(*
 Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
   match rngl_has_opp_or_subt_iff with
   | conj x x0 => x0
   end (or_introl Hop).
+*)
 
 Theorem polyn_of_const_minus_one_pow :
   ∀ (Hop : rngl_has_opp = true),
@@ -992,19 +1003,56 @@ assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
 Theorem det_polyn_of_const :
   (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic ≠ 1 →
-  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Hop : rngl_has_opp = true),
   ∀ (Heb : rngl_has_eqb = true),
-  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ (ll : list (list T)),
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hii Hch *; cbn.
+assert (Hos : @rngl_has_opp_or_subt T ro = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+...
+replace rop with (polyn_ring_like_op Hos Heb). 2: {
+  subst rop.
+  unfold polyn_ring_like_op; cbn.
+  f_equal.
+  unfold rngl_has_opp_has_opp_or_subt.
+  unfold rngl_has_opp_or_subt in Hos.
+  rewrite
+  clear - Hos.
+  destruct rngl_opt_opp_or_subt.
+...
+  replace (polyn_opt_inv_or_quot (rngl_has_opp_has_opp_or_subt Hop) Heb)
+    with (polyn_opt_inv_or_quot Hos Heb); [ easy | ].
+  unfold rngl_has_opp_has_opp_or_subt.
+  unfold polyn_opt_inv_or_quot.
+...
+  unfold rngl_has_opp_or_subt_iff.
+  replace (rngl_has_opp_has_opp_or_subt Hos Heb) with
+    (polyn_opt_inv_or_quot Hos Heb).
+
+  unfold rngl_has_opp_has_opp_or_subt.
+  unfold polyn_opt_inv_or_quot.
+  cbn.
+...
+  unfold rngl_has_opp_has_opp_or_subt; cbn.
+  unfold polyn_opt_opp_or_subt.
+  unfold rngl_has_opp in Hop.
+  clear - Hop.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+
+Set Printing All.
+subst rop.
+set (rop := polyn_ring_like_op Hos Heb).
 assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
   unfold rngl_has_opp_or_subt; cbn.
   unfold polyn_opt_opp_or_subt.
-  unfold rngl_has_opp_or_subt in Hos.
-  clear - Hos.
+  unfold rngl_has_opp in Hop.
+  clear - Hop.
   destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
   now destruct os.
 }
@@ -1015,12 +1063,31 @@ revert ll Hlen.
 induction len; intros; [ easy | ].
 cbn - [ rngl_zero rngl_add ].
 rewrite (polyn_of_const_rngl_summation Hos Heb).
+...
 apply rngl_summation_eq_compat.
+...
+Unable to unify "polyn_ring_like_op Hos Heb" with
+ "polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb".
+...
+Unable to unify "polyn_ring_like_op Hos Heb" with "rop".
+...
 intros i Hi.
 rewrite (polyn_of_const_mul Hii Hos Heb).
 rewrite (polyn_of_const_mul Hii Hos Heb).
 rewrite (List_map_nth' []); [ | now rewrite Hlen ].
-rewrite <- List_hd_nth_0.
+rewrite <- List_hd_nth_0; cbn.
+do 2 rewrite <- (polyn_mul_assoc Hos Heb).
+f_equal. {
+  symmetry.
+  specialize polyn_of_const_minus_one_pow as H1.
+  cbn in H1.
+...
+Set Printing All.
+  unfold rngl_has_opp in H1.
+}
+  rewrite (polyn_of_const_minus_one_pow Hos Heb).
+Search polyn_of_const.
+Search minus_one_pow.
 ...
 (*
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
