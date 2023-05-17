@@ -497,6 +497,78 @@ unfold rngl_has_subt in Hsu.
 now rewrite Hos' in Hsu.
 Qed.
 
+Theorem det_polyn_of_const :
+  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  rngl_characteristic ≠ 1 →
+  ∀ (Hop : rngl_has_opp = true),
+  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
+  ∀ (ll : list (list T)),
+  det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
+  polyn_of_const (det {| mat_list_list := ll |}).
+Proof.
+intros Hii Hch *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+replace rop with (polyn_ring_like_op Hos Heb). 2: {
+  subst rop.
+  unfold polyn_ring_like_op; cbn.
+  f_equal.
+  unfold rngl_has_opp_has_opp_or_subt.
+  unfold rngl_has_opp_or_subt in Hos.
+  f_equal.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}
+subst rop.
+set (rop := polyn_ring_like_op Hos Heb).
+assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
+  unfold rngl_has_opp_or_subt; cbn.
+  unfold polyn_opt_opp_or_subt.
+  unfold rngl_has_opp in Hop.
+  clear - Hop.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
+rewrite map_length.
+(**)
+remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+revert ll Hlen.
+induction len; intros; [ easy | ].
+cbn - [ rngl_zero rngl_add ].
+rewrite (polyn_of_const_rngl_summation Hos Heb).
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite (polyn_of_const_mul Hii Hos Heb).
+rewrite (polyn_of_const_mul Hii Hos Heb).
+rewrite (List_map_nth' []); [ | now rewrite Hlen ].
+rewrite <- List_hd_nth_0; cbn.
+do 2 rewrite <- (polyn_mul_assoc Hos Heb).
+f_equal. {
+  symmetry.
+  apply (polyn_of_const_minus_one_pow Hop Heb).
+}
+f_equal. {
+  destruct (lt_dec (i - 1) (length (hd [] ll))) as [Hil| Hil]. {
+    now rewrite (List_map_nth' 0%L).
+  }
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite map_length ].
+  rewrite nth_overflow; [ | easy ].
+  symmetry.
+  apply eq_polyn_eq; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
+destruct ll as [| la]; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+unfold subm; cbn.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros lb Hlb.
+  now rewrite <- map_butn.
+}
+rewrite <- map_map.
+rewrite IHlen; [ easy | now rewrite map_length ].
+Qed.
+
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
@@ -552,7 +624,8 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   now destruct s.
 }
 specialize (Hcr Hopp Hic Hch).
-assert (H : (@rngl_is_integral T ro rp || rngl_has_inv_or_quot)%bool = true). {
+assert
+    (Hiq : (@rngl_is_integral T ro rp || rngl_has_inv_or_quot)%bool = true). {
   apply Bool.orb_true_iff; right.
   apply rngl_has_inv_or_quot_iff.
   unfold rngl_has_inv, rngl_has_quot; cbn.
@@ -561,7 +634,7 @@ assert (H : (@rngl_is_integral T ro rp || rngl_has_inv_or_quot)%bool = true). {
   unfold rngl_has_inv in Hin.
   destruct rngl_opt_inv_or_quot; [ now right | easy ].
 }
-specialize (Hcr H); clear H.
+specialize (Hcr Hiq).
 assert
   (H : ∀ A (ro : ring_like_op A) (p q : list A),
      polyn_of_norm_lap p = polyn_of_norm_lap q → lap_norm p = lap_norm q). {
@@ -1000,66 +1073,26 @@ assert
 clear Hcr; rename H into Hcr.
 assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
-Theorem det_polyn_of_const :
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
-  rngl_characteristic ≠ 1 →
-  ∀ (Hop : rngl_has_opp = true),
-  ∀ (Heb : rngl_has_eqb = true),
-  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
-  ∀ (ll : list (list T)),
-  det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
-  polyn_of_const (det {| mat_list_list := ll |}).
-Proof.
-intros Hii Hch *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-replace rop with (polyn_ring_like_op Hos Heb). 2: {
-  subst rop.
-  unfold polyn_ring_like_op; cbn.
-  f_equal.
-  unfold rngl_has_opp_has_opp_or_subt.
-  unfold rngl_has_opp_or_subt in Hos.
-  f_equal.
-  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-}
-subst rop.
-set (rop := polyn_ring_like_op Hos Heb).
-assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
-  unfold rngl_has_opp_or_subt; cbn.
-  unfold polyn_opt_opp_or_subt.
-  unfold rngl_has_opp in Hop.
-  clear - Hop.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  now destruct os.
-}
-rewrite map_length.
-(**)
-remember (length ll) as len eqn:Hlen; symmetry in Hlen.
-revert ll Hlen.
-induction len; intros; [ easy | ].
-cbn - [ rngl_zero rngl_add ].
-rewrite (polyn_of_const_rngl_summation Hos Heb).
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite (polyn_of_const_mul Hii Hos Heb).
-rewrite (polyn_of_const_mul Hii Hos Heb).
-rewrite (List_map_nth' []); [ | now rewrite Hlen ].
-rewrite <- List_hd_nth_0; cbn.
-do 2 rewrite <- (polyn_mul_assoc Hos Heb).
-f_equal. {
-  symmetry.
-  apply (polyn_of_const_minus_one_pow Hop Heb).
-}
-f_equal. {
-  destruct (lt_dec (i - 1) (length (hd [] ll))) as [Hil| Hil]. {
-    now rewrite (List_map_nth' 0%L).
-  }
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite map_length ].
-  rewrite nth_overflow; [ | easy ].
-  symmetry.
-  apply eq_polyn_eq; cbn.
-  now rewrite (rngl_eqb_refl Heb).
-}
+  specialize (det_polyn_of_const) as H1.
+...
+  specialize (H1 Hiq).
+...
+move Hiq at bottom.
+progress unfold rop in Hiq.
+cbn in Hiq.
+Set Printing All.
+unfold polyn_ring_like_op in Hiq.
+cbn in Hiq.
+unfold rngl_has_inv_or_quot in Hiq.
+cbn in Hiq.
+unfold polyn_opt_inv_or_quot in Hiq.
+cbn in Hiq.
+Unset Printing All.
+rewrite Hic, Hop, Hin in Hiq.
+cbn in Hiq.
+...
+  apply (det_polyn_of_const _ _ Hop Heb).
+
 ...
 Set Printing All.
   unfold rngl_has_opp in H1.
