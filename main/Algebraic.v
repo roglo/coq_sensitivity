@@ -1012,47 +1012,15 @@ Theorem det_polyn_of_const :
 Proof.
 intros Hii Hch *; cbn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-(*
-assert (Hos : @rngl_has_opp_or_subt T ro = true). {
-  unfold rngl_has_opp_or_subt.
-  unfold rngl_has_opp in Hop.
-  clear - Hop.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  now destruct os.
-}
-*)
 replace rop with (polyn_ring_like_op Hos Heb). 2: {
   subst rop.
   unfold polyn_ring_like_op; cbn.
   f_equal.
   unfold rngl_has_opp_has_opp_or_subt.
   unfold rngl_has_opp_or_subt in Hos.
-...
-  clear Hop.
-...
-  destruct rngl_opt_opp_or_subt.
-...
-  replace (polyn_opt_inv_or_quot (rngl_has_opp_has_opp_or_subt Hop) Heb)
-    with (polyn_opt_inv_or_quot Hos Heb); [ easy | ].
-  unfold rngl_has_opp_has_opp_or_subt.
-  unfold polyn_opt_inv_or_quot.
-...
-  unfold rngl_has_opp_or_subt_iff.
-  replace (rngl_has_opp_has_opp_or_subt Hos Heb) with
-    (polyn_opt_inv_or_quot Hos Heb).
-
-  unfold rngl_has_opp_has_opp_or_subt.
-  unfold polyn_opt_inv_or_quot.
-  cbn.
-...
-  unfold rngl_has_opp_has_opp_or_subt; cbn.
-  unfold polyn_opt_opp_or_subt.
-  unfold rngl_has_opp in Hop.
-  clear - Hop.
-  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-  now destruct os.
-Set Printing All.
-...
+  f_equal.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+}
 subst rop.
 set (rop := polyn_ring_like_op Hos Heb).
 assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
@@ -1070,14 +1038,7 @@ revert ll Hlen.
 induction len; intros; [ easy | ].
 cbn - [ rngl_zero rngl_add ].
 rewrite (polyn_of_const_rngl_summation Hos Heb).
-...
 apply rngl_summation_eq_compat.
-...
-Unable to unify "polyn_ring_like_op Hos Heb" with
- "polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb".
-...
-Unable to unify "polyn_ring_like_op Hos Heb" with "rop".
-...
 intros i Hi.
 rewrite (polyn_of_const_mul Hii Hos Heb).
 rewrite (polyn_of_const_mul Hii Hos Heb).
@@ -1086,8 +1047,19 @@ rewrite <- List_hd_nth_0; cbn.
 do 2 rewrite <- (polyn_mul_assoc Hos Heb).
 f_equal. {
   symmetry.
-  specialize polyn_of_const_minus_one_pow as H1.
-  cbn in H1.
+  apply (polyn_of_const_minus_one_pow Hop Heb).
+}
+f_equal. {
+  destruct (lt_dec (i - 1) (length (hd [] ll))) as [Hil| Hil]. {
+    now rewrite (List_map_nth' 0%L).
+  }
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite map_length ].
+  rewrite nth_overflow; [ | easy ].
+  symmetry.
+  apply eq_polyn_eq; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
 ...
 Set Printing All.
   unfold rngl_has_opp in H1.
