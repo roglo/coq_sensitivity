@@ -624,9 +624,11 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   now destruct s.
 }
 specialize (Hcr Hopp Hic Hch).
-assert
-    (Hiq : (@rngl_is_integral T ro rp || rngl_has_inv_or_quot)%bool = true). {
-  apply Bool.orb_true_iff; right.
+assert (Hiq : @rngl_has_inv_or_quot T ro = true). {
+  apply rngl_has_inv_or_quot_iff.
+  now rewrite Hin; left.
+}
+assert (Hiqp : @rngl_has_inv_or_quot (@polyn T ro) rop = true). {
   apply rngl_has_inv_or_quot_iff.
   unfold rngl_has_inv, rngl_has_quot; cbn.
   unfold polyn_opt_inv_or_quot.
@@ -634,7 +636,8 @@ assert
   unfold rngl_has_inv in Hin.
   destruct rngl_opt_inv_or_quot; [ now right | easy ].
 }
-specialize (Hcr Hiq).
+rewrite Hiqp, Bool.orb_comm in Hcr.
+specialize (Hcr eq_refl).
 assert
   (H : ∀ A (ro : ring_like_op A) (p q : list A),
      polyn_of_norm_lap p = polyn_of_norm_lap q → lap_norm p = lap_norm q). {
@@ -1074,32 +1077,13 @@ clear Hcr; rename H into Hcr.
 assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
   specialize (det_polyn_of_const) as H1.
-...
-  specialize (H1 Hiq).
-...
-move Hiq at bottom.
-progress unfold rop in Hiq.
-cbn in Hiq.
-Set Printing All.
-unfold polyn_ring_like_op in Hiq.
-cbn in Hiq.
-unfold rngl_has_inv_or_quot in Hiq.
-cbn in Hiq.
-unfold polyn_opt_inv_or_quot in Hiq.
-cbn in Hiq.
-Unset Printing All.
-rewrite Hic, Hop, Hin in Hiq.
-cbn in Hiq.
-...
-  apply (det_polyn_of_const _ _ Hop Heb).
-
-...
-Set Printing All.
-  unfold rngl_has_opp in H1.
+  rewrite Hiq, Bool.orb_comm in H1.
+  specialize (H1 eq_refl).
+  rewrite Hch in H1.
+  specialize (H1 (Nat.neq_0_succ _) Hop Heb).
+  cbn - [ det ] in H1.
+  apply H1.
 }
-  rewrite (polyn_of_const_minus_one_pow Hos Heb).
-Search polyn_of_const.
-Search minus_one_pow.
 ...
 (*
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
