@@ -76,25 +76,25 @@ Qed.
 
 (* ideal ring like prop *)
 
-Theorem I_add_comm :
-  let roi := I_ring_like_op in
+Theorem I_add_comm : let roi := I_ring_like_op in
   ∀ a b : ideal P, (a + b)%L = (b + a)%L.
 Proof. intros; apply eq_ideal_eq, rngl_add_comm. Qed.
 
-Theorem I_add_assoc :
-  let roi := I_ring_like_op in
+Theorem I_add_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_add_assoc. Qed.
 
-Theorem I_add_0_l :
-  let roi := I_ring_like_op in
+Theorem I_add_0_l : let roi := I_ring_like_op in
   ∀ a : ideal P, (0 + a)%L = a.
 Proof. intros; apply eq_ideal_eq, rngl_add_0_l. Qed.
 
-Theorem I_mul_assoc :
-  let roi := I_ring_like_op in
+Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
+
+Theorem I_mul_1_l : let roi := I_ring_like_op in
+  ∀ a : ideal P, (1 * a)%L = a.
+Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := false;
@@ -106,8 +106,8 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
-     rngl_mul_1_l := 42;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_mul_1_l := I_mul_1_l;
+     rngl_mul_add_distr_l := 42;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
