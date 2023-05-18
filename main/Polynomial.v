@@ -2173,7 +2173,7 @@ Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => (*None*) Some (inr polyn_subt)
+  | Some (inr _) => Some (inr polyn_subt)
   | None => None
   end.
 
