@@ -1031,7 +1031,7 @@ replace (mat_nrows sm) with (n + m) in Hcr. 2: {
   do 2 rewrite rev_length.
   now rewrite <- Hn, <- Hm.
 }
-rewrite Hu in Hcr.
+subst u.
 cbn - [ det ] in Hcr.
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
