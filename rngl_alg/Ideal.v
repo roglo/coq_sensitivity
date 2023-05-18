@@ -8,7 +8,7 @@ Require Import Utf8.
 
 Require Import Main.RingLike.
 
-Class ideal {A} {ro : ring_like_op A} (P : A → bool) := mk_I
+Class ideal_prop {A} {ro : ring_like_op A} (P : A → bool) := mk_I
   { i_zero_in : P rngl_zero = true;
     i_one_in : P rngl_one = true;
     i_prop_add :
@@ -22,54 +22,54 @@ Record ideal_elem {A} (P : A → bool) := mk_ie
 
 (* 0 and 1 *)
 
-Theorem I_zero_in :
-  ∀ {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P),
+Theorem I_zero_prop :
+  ∀ {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P},
   P 0%L = true.
-Proof. now intros; destruct Ia. Qed.
+Proof. now intros; destruct ip. Qed.
 
-Theorem I_one_in :
-  ∀ {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P),
+Theorem I_one_prop :
+  ∀ {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P},
   P 1%L = true.
-Proof. now intros; destruct Ia. Qed.
+Proof. now intros; destruct ip. Qed.
 
-Definition I_zero {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P)
+Definition I_zero {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P}
   : ideal_elem P :=
-  mk_ie A P 0%L (I_zero_in Ia).
+  mk_ie A P 0%L I_zero_prop.
 
-Definition I_one {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P)
+Definition I_one {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P}
   : ideal_elem P :=
-  mk_ie A P 1%L (I_one_in Ia).
+  mk_ie A P 1%L I_one_prop.
 
 (* addition *)
 
-Definition I_add_prop {A} {ro : ring_like_op A} {P} (Ia : ideal P) a b
+Definition I_add_prop {A} {ro : ring_like_op A} {P} {ip : ideal_prop P} a b
   : P (ie_value P a + ie_value P b)%L = true :=
   i_prop_add (ie_value P a) (ie_value P b) (ie_prop P a) (ie_prop P b).
 
-Definition I_add {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P)
+Definition I_add {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P}
     (a b : ideal_elem P)
   : ideal_elem P :=
-  mk_ie A P (ie_value P a + ie_value P b)%L (I_add_prop Ia a b).
+  mk_ie A P (ie_value P a + ie_value P b)%L (I_add_prop a b).
 
 (* multiplication *)
 
-Definition I_mul_prop {A} {ro : ring_like_op A} {P} (Ia : ideal P) a b
+Definition I_mul_prop {A} {ro : ring_like_op A} {P} {ip : ideal_prop P} a b
   : P (ie_value P a * ie_value P b)%L = true :=
   i_prop_mul_l (ie_value P a) (ie_value P b) (ie_prop P b).
 
-Definition I_mul {A} {ro : ring_like_op A} {P : A → bool} (Ia : ideal P)
+Definition I_mul {A} {ro : ring_like_op A} {P : A → bool} {ip : ideal_prop P}
     (a b : ideal_elem P)
   : ideal_elem P :=
-  mk_ie A P (ie_value P a * ie_value P b)%L (I_mul_prop Ia a b).
+  mk_ie A P (ie_value P a * ie_value P b)%L (I_mul_prop a b).
 
 (* ideal ring like op *)
 
 Definition I_ring_like_op {A} {ro : ring_like_op A} {P : A → bool}
-    (Ia : ideal P) : ring_like_op (ideal_elem P) :=
-  {| rngl_zero := I_zero Ia;
-     rngl_one := I_one Ia;
-     rngl_add := I_add Ia;
-     rngl_mul := I_mul Ia;
+    (ip : ideal_prop P) : ring_like_op (ideal_elem P) :=
+  {| rngl_zero := I_zero;
+     rngl_one := I_one;
+     rngl_add := I_add;
+     rngl_mul := I_mul;
      rngl_opt_opp_or_subt := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
