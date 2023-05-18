@@ -1061,8 +1061,8 @@ assert
 clear Hcr; rename H into Hcr.
 assert
   (H : ∀ i, 1 ≤ i ≤ n + m →
-     (lap_norm (lap (det sm)) * lap_x_power (n + m - i))%lap =
-     lap (det (mat_repl_vect i sm v))). {
+     lap (det (mat_repl_vect i sm v)) =
+     (lap_norm (lap (det sm)) * lap_x_power (n + m - i))%lap). {
   intros i Hi.
   specialize (Hcr i Hi).
   unfold polyn_norm in Hcr.
@@ -1096,6 +1096,8 @@ destruct (Sumbool.sumbool_of_bool _) as [Hdz| Hdz]. {
   specialize (lap_norm_repeat_0 Heb 1) as H1.
   cbn - [ lap_norm ] in H1.
   rewrite H1; clear H1.
+  rewrite H in Hcr.
+  cbn - [ det ] in Hcr.
 ...
 }
 ... ...
