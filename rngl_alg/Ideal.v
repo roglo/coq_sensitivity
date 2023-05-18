@@ -20,36 +20,33 @@ Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
     i_prop_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
     i_prop_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
 
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {P : T → bool}.
+Context {ip : ideal_prop P}.
+
 (* 0 and 1 *)
 
-Definition I_zero {T} {ro : ring_like_op T} {P : T → bool} {ip : ideal_prop P}
-  : ideal P :=
-  mk_I 0 i_zero_in.
-
-Definition I_one {T} {ro : ring_like_op T} {P : T → bool} {ip : ideal_prop P}
-  : ideal P :=
-  mk_I 1 i_one_in.
+Definition I_zero : ideal P := mk_I 0 i_zero_in.
+Definition I_one : ideal P := mk_I 1 i_one_in.
 
 (* addition *)
 
-Definition I_add {T} {ro : ring_like_op T} {P : T → bool} {ip : ideal_prop P}
-    (a b : ideal P)
-  : ideal P :=
+Definition I_add (a b : ideal P): ideal P :=
   mk_I (i_val P a + i_val P b)
     (i_prop_add (i_val P a) (i_val P b) (i_mem P a) (i_mem P b)).
 
 (* multiplication *)
 
-Definition I_mul {T} {ro : ring_like_op T} {P : T → bool} {ip : ideal_prop P}
-    (a b : ideal P)
-  : ideal P :=
+Definition I_mul (a b : ideal P) : ideal P :=
   mk_I (i_val P a * i_val P b)
     (i_prop_mul_l (i_val P a) (i_val P b) (i_mem P b)).
 
 (* ideal ring like op *)
 
-Definition I_ring_like_op {T} {ro : ring_like_op T} {P : T → bool}
-    (ip : ideal_prop P) : ring_like_op (ideal P) :=
+Definition I_ring_like_op : ring_like_op (ideal P) :=
   {| rngl_zero := I_zero;
      rngl_one := I_one;
      rngl_add := I_add;
@@ -58,3 +55,5 @@ Definition I_ring_like_op {T} {ro : ring_like_op T} {P : T → bool}
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
+
+...
