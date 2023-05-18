@@ -5,7 +5,6 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8.
-
 Require Import Main.RingLike.
 
 Record ideal {A} (P : A → bool) := mk_I
