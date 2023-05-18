@@ -8,6 +8,10 @@ Require Import Utf8.
 
 Require Import Main.RingLike.
 
+Record ideal_elem {A} (P : A → bool) := mk_ie
+  { ie_value : A;
+    ie_prop : P ie_value = true }.
+
 Class ideal_prop {A} {ro : ring_like_op A} (P : A → bool) := mk_I
   { i_zero_in : P rngl_zero = true;
     i_one_in : P rngl_one = true;
@@ -15,10 +19,6 @@ Class ideal_prop {A} {ro : ring_like_op A} (P : A → bool) := mk_I
       ∀ a b, P a = true → P b = true → P (a + b)%L = true;
     i_prop_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
     i_prop_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
-
-Record ideal_elem {A} (P : A → bool) := mk_ie
-  { ie_value : A;
-    ie_prop : P ie_value = true }.
 
 (* 0 and 1 *)
 
