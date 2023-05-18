@@ -96,6 +96,10 @@ Theorem I_mul_1_l : let roi := I_ring_like_op in
   ∀ a : ideal P, (1 * a)%L = a.
 Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
 
+Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
+  ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
+Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_l. Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := false;
      rngl_has_dec_le := false;
@@ -107,9 +111,9 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
      rngl_mul_1_l := I_mul_1_l;
-     rngl_mul_add_distr_l := 42;
-     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
-     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+     rngl_mul_add_distr_l := I_mul_add_distr_l;
+     rngl_opt_mul_comm := NA;
+     rngl_opt_mul_1_r := 42;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
