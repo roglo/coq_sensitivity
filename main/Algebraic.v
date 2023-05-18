@@ -596,6 +596,7 @@ intros Hif * H2p H2q Hbr.
 unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
+symmetry in HU, HV.
 subst rol.
 remember (length P - 1) as n eqn:Hn.
 remember (length Q - 1) as m eqn:Hm.
