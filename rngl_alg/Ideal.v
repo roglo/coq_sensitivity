@@ -85,6 +85,15 @@ apply eq_ideal_eq; cbn.
 apply rngl_add_comm.
 Qed.
 
+Theorem I_add_assoc :
+  let roi := I_ring_like_op in
+  ∀ a b c : ideal P, (a + (b + c))%L = (a + b + c)%L.
+Proof.
+intros; cbn.
+apply eq_ideal_eq; cbn.
+apply rngl_add_assoc.
+Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := false;
      rngl_has_dec_le := false;
@@ -92,8 +101,8 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := I_add_comm;
-     rngl_add_assoc := 42;
-     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_add_assoc := I_add_assoc;
+     rngl_add_0_l := 42;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
