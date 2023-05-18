@@ -1075,7 +1075,7 @@ assert
   easy.
 }
 clear Hcr; rename H into Hcr.
-assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
+assert (Hdm : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
   specialize det_polyn_of_const as H1.
   rewrite Hiq, Bool.orb_comm in H1.
@@ -1085,19 +1085,19 @@ assert (H : det sm = polyn_of_const (det (mk_mat ll))). {
   cbn - [ det ] in H1.
   apply H1.
 }
-unfold polyn_of_const in H.
-unfold polyn_of_norm_lap in H.
-apply (f_equal lap) in H.
-cbn - [ det ] in H.
-rewrite if_bool_if_dec in H.
+unfold polyn_of_const in Hdm.
+unfold polyn_of_norm_lap in Hdm.
+apply (f_equal lap) in Hdm.
+cbn - [ det ] in Hdm.
+rewrite if_bool_if_dec in Hdm.
 destruct (Sumbool.sumbool_of_bool _) as [Hdz| Hdz]. {
-  cbn in H.
+  cbn in Hdm.
   apply (rngl_eqb_eq Heb) in Hdz.
   rewrite Hdz.
   specialize (lap_norm_repeat_0 Heb 1) as H1.
   cbn - [ lap_norm ] in H1.
   rewrite H1; clear H1.
-  rewrite H in Hcr.
+  rewrite Hdm in Hcr.
   cbn - [ det ] in Hcr.
 ...
 }
