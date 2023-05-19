@@ -16,12 +16,12 @@ Arguments i_val {T P} i%L.
 Arguments i_mem {T P} i%L.
 
 Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
-  { i_zero_in : P rngl_zero = true;
-    i_one_in : P rngl_one = true;
-    i_prop_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
-    i_prop_opp : ∀ a, P a = true → P (- a)%L = true;
-    i_prop_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
-    i_prop_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
+  { ip_zero : P rngl_zero = true;
+    ip_one : P rngl_one = true;
+    ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
+    ip_opp : ∀ a, P a = true → P (- a)%L = true;
+    ip_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
+    ip_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
 
 Section a.
 
@@ -33,25 +33,23 @@ Context {ip : ideal_prop P}.
 
 (* 0 and 1 *)
 
-Definition I_zero : ideal P := mk_I 0 i_zero_in.
-Definition I_one : ideal P := mk_I 1 i_one_in.
+Definition I_zero : ideal P := mk_I 0 ip_zero.
+Definition I_one : ideal P := mk_I 1 ip_one.
 
 (* addition *)
 
 Definition I_add (a b : ideal P): ideal P :=
-  mk_I (i_val a + i_val b)
-    (i_prop_add (i_val a) (i_val b) (i_mem a) (i_mem b)).
+  mk_I (i_val a + i_val b) (ip_add (i_val a) (i_val b) (i_mem a) (i_mem b)).
 
 (* multiplication *)
 
 Definition I_mul (a b : ideal P) : ideal P :=
-  mk_I (i_val a * i_val b)
-    (i_prop_mul_l (i_val a) (i_val b) (i_mem b)).
+  mk_I (i_val a * i_val b) (ip_mul_l (i_val a) (i_val b) (i_mem b)).
 
 (* opposite *)
 
 Definition I_opp (a : ideal P) : ideal P :=
-  mk_I (- i_val a) (i_prop_opp (i_val a) (i_mem a)).
+  mk_I (- i_val a) (ip_opp (i_val a) (i_mem a)).
 
 (* ideal ring like op *)
 
@@ -63,7 +61,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
-       | Some (inr _) => None (*Some (inr polyn_subt)*)
+       | Some (inr _) => None (*Some (inr I_subt)*)
        | None => None
        end;
      rngl_opt_inv_or_quot := None;
@@ -133,12 +131,21 @@ intros; apply eq_ideal_eq, (rngl_add_opp_l Hop).
 Qed.
 
 Theorem I_opt_add_sub : let roi := I_ring_like_op in
-  if rngl_has_subt then ∀ a b : ideal P, (a + b - b)%L = a else not_applicable.
+  if rngl_has_subt then ∀ a b : ideal P, (a + b - b)%L = a
+  else not_applicable.
 Proof.
 intros.
-specialize (eq_refl (@rngl_has_subt T ro)) as Hsu.
-unfold rngl_has_subt in Hsu at 2.
-unfold rngl_has_subt, rngl_subt; cbn.
+unfold rngl_has_subt; cbn.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem I_opt_sub_add_distr : let roi := I_ring_like_op in
+  if rngl_has_subt then ∀ a b c : ideal P, (a - (b + c))%L = (a - b - c)%L
+  else not_applicable.
+Proof.
+intros.
+unfold rngl_has_subt; cbn.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
@@ -160,8 +167,8 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := I_opt_add_opp_l;
      rngl_opt_add_sub := I_opt_add_sub;
-     rngl_opt_sub_add_distr := 42;
-     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_sub_add_distr := I_opt_sub_add_distr;
+     rngl_opt_mul_inv_l := 42;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
