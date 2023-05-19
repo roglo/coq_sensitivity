@@ -132,6 +132,17 @@ destruct os as [opp| subt]; [ | easy ].
 intros; apply eq_ideal_eq, (rngl_add_opp_l Hop).
 Qed.
 
+Theorem I_opt_add_sub : let roi := I_ring_like_op in
+  if rngl_has_subt then ∀ a b : ideal P, (a + b - b)%L = a else not_applicable.
+Proof.
+intros.
+specialize (eq_refl (@rngl_has_subt T ro)) as Hsu.
+unfold rngl_has_subt in Hsu at 2.
+unfold rngl_has_subt, rngl_subt; cbn.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := false;
      rngl_has_dec_le := false;
@@ -148,8 +159,8 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := I_opt_add_opp_l;
-     rngl_opt_add_sub := 42;
-     rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
+     rngl_opt_add_sub := I_opt_add_sub;
+     rngl_opt_sub_add_distr := 42;
      rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
