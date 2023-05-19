@@ -141,13 +141,37 @@ Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_l. Qed.
 
+Theorem I_opt_mul_comm : let roi := I_ring_like_op in
+  if rngl_mul_is_comm then ∀ a b : ideal P, (a * b)%L = (b * a)%L
+  else not_applicable.
+Proof.
+intros.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+intros; apply eq_ideal_eq; cbn.
+now apply rngl_mul_comm.
+Qed.
+
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
-  ∀ a : ideal P, (a * 1)%L = a.
-Proof. intros; apply eq_ideal_eq, rngl_mul_1_r. Qed.
+  if rngl_mul_is_comm then not_applicable else ∀ a : ideal P, (a * 1)%L = a.
+Proof.
+intros.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ easy | ].
+intros; apply eq_ideal_eq; cbn.
+apply rngl_mul_1_r.
+Qed.
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
-  ∀ a b c : ideal P, ((a + b) * c)%L = (a * c + b * c)%L.
-Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_r. Qed.
+  if rngl_mul_is_comm then not_applicable
+  else ∀ a b c : ideal P, ((a + b) * c)%L = (a * c + b * c)%L.
+Proof.
+intros.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ easy | ].
+intros; apply eq_ideal_eq; cbn.
+apply rngl_mul_add_distr_r.
+Qed.
 
 Theorem I_opt_add_opp_l : let roi := I_ring_like_op in
   if rngl_has_opp then ∀ a : ideal P, (- a + a)%L = 0%L else not_applicable.
@@ -268,7 +292,7 @@ split. {
 Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
-  {| rngl_mul_is_comm := false;
+  {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
      rngl_is_integral := false;
      rngl_is_alg_closed := false;
@@ -279,7 +303,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_mul_assoc := I_mul_assoc;
      rngl_mul_1_l := I_mul_1_l;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
-     rngl_opt_mul_comm := NA;
+     rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := I_opt_add_opp_l;
