@@ -166,39 +166,34 @@ Theorem I_opt_add_sub : let roi := I_ring_like_op in
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
-destruct su; [ | easy ].
+remember rngl_has_subt as sui eqn:Hsui; symmetry in Hsui.
+destruct sui; [ | easy ].
+specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
+assert (Hsu : @rngl_has_subt T ro = true). {
+  unfold rngl_has_subt in Hsui |-*.
+  cbn in Hsui.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
 specialize (rngl_has_subt_has_no_opp Hsu) as Hop.
 intros.
 apply eq_ideal_eq; cbn.
 specialize rngl_opt_add_sub as H1.
 unfold rngl_has_subt in H1.
 unfold rngl_sub, rngl_subt.
-rewrite Hop, Hsu.
-unfold rngl_has_subt in Hsu.
-unfold rngl_has_opp in Hop.
-subst roi.
-cbn in H1 |-*.
+rewrite Hopi, Hsui.
+unfold rngl_sub in H1.
+rewrite Hsu, Hop in H1.
+progress unfold rngl_has_subt in Hsui, Hsu.
+progress unfold rngl_has_opp in Hopi, Hop.
+progress unfold roi.
+progress unfold roi in Hopi.
+progress unfold roi in Hsui.
+cbn in Hsui, Hopi, Hsu, Hop |-*.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 destruct os as [opp| subt]; [ easy | ].
-destruct rngl_opt_opp_or_subt as [os| ]. 2: {
-  cbn.
-...
-specialize rngl_opt_add_sub as H1.
-unfold rngl_has_subt, rngl_sub, rngl_subt, rngl_has_opp, rngl_has_subt in H1.
-unfold rngl_has_subt, rngl_sub, rngl_subt, rngl_has_opp, rngl_has_subt; cbn.
-unfold rngl_subt.
-unfold I_subt.
-unfold rngl_subt.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ easy | ].
-intros.
-apply eq_ideal_eq; cbn.
-unfold rngl_subt.
-
-
-
-now destruct os.
+unfold I_subt, I_add; cbn.
+apply H1.
 Qed.
 
 Theorem I_opt_sub_add_distr : let roi := I_ring_like_op in
@@ -208,6 +203,7 @@ Proof.
 intros.
 unfold rngl_has_subt; cbn.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+...
 now destruct os.
 Qed.
 
