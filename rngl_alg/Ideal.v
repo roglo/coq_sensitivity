@@ -201,10 +201,34 @@ Theorem I_opt_sub_add_distr : let roi := I_ring_like_op in
   else not_applicable.
 Proof.
 intros.
-unfold rngl_has_subt; cbn.
+remember rngl_has_subt as sui eqn:Hsui; symmetry in Hsui.
+destruct sui; [ | easy ].
+specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
+assert (Hsu : @rngl_has_subt T ro = true). {
+  unfold rngl_has_subt in Hsui |-*.
+  cbn in Hsui.
+  destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+  now destruct os.
+}
+specialize (rngl_has_subt_has_no_opp Hsu) as Hop.
+intros.
+apply eq_ideal_eq; cbn.
+specialize rngl_opt_sub_add_distr as H1.
+unfold rngl_has_subt in H1.
+unfold rngl_sub, rngl_subt.
+rewrite Hopi, Hsui.
+unfold rngl_sub in H1.
+rewrite Hsu, Hop in H1.
+progress unfold rngl_has_subt in Hsui, Hsu.
+progress unfold rngl_has_opp in Hopi, Hop.
+progress unfold roi.
+progress unfold roi in Hopi.
+progress unfold roi in Hsui.
+cbn in Hsui, Hopi, Hsu, Hop |-*.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-...
-now destruct os.
+destruct os as [opp| subt]; [ easy | ].
+unfold I_subt, I_add; cbn.
+apply H1.
 Qed.
 
 Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
