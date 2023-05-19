@@ -82,6 +82,14 @@ Qed.
 Definition I_subt (a b : ideal P) : ideal P :=
   mk_I (rngl_subt (i_val a) (i_val b)) (I_subt_prop a b).
 
+(* less equal *)
+
+Definition I_opt_le : option (ideal P → ideal P → Prop) :=
+  match rngl_opt_le with
+  | Some le => Some (λ a b : ideal P, le (i_val a) (i_val b))
+  | None => None
+  end.
+
 (* ideal ring like op *)
 
 Definition I_ring_like_op : ring_like_op (ideal P) :=
@@ -97,7 +105,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
        end;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
-     rngl_opt_le := None |}.
+     rngl_opt_le := I_opt_le |}.
 
 (* equality in ideals is equivalent to equality in their values,
    because the proof of their properties (i_mem), being an equality
@@ -255,6 +263,30 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
+(*
+Theorem I_opt_le_dec : let roi := I_ring_like_op in
+  if rngl_has_dec_le then ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
+   else not_applicable.
+Proof.
+intros.
+remember rngl_has_dec_le as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
+intros.
+specialize rngl_opt_le_dec as H1.
+rewrite Hde in H1.
+specialize (H1 (i_val a) (i_val b)).
+destruct H1; [ left | right ].
+cbn.
+...
+apply eq_ideal_eq in H; cbn in H.
+specialize rngl_opt_integral as H1.
+rewrite Hit in H1.
+specialize (H1 _ _ H).
+now destruct H1; [ left | right ]; apply eq_ideal_eq.
+Qed.
+...
+*)
+
 Theorem I_opt_integral : let roi := I_ring_like_op in
   if rngl_is_integral then
     ∀ a b : ideal P, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
@@ -264,12 +296,12 @@ Proof.
 intros.
 remember rngl_is_integral as it eqn:Hit; symmetry in Hit.
 destruct it; [ | easy ].
-intros.
-cbn in H.
-apply eq_ideal_eq in H; cbn in H.
+intros * Hab.
+cbn in Hab.
+apply eq_ideal_eq in Hab; cbn in Hab.
 specialize rngl_opt_integral as H1.
 rewrite Hit in H1.
-specialize (H1 _ _ H).
+specialize (H1 _ _ Hab).
 now destruct H1; [ left | right ]; apply eq_ideal_eq.
 Qed.
 
@@ -336,7 +368,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
-     rngl_opt_le_refl := NA;
+     rngl_opt_le_refl := 42;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
      rngl_opt_add_le_compat := NA;
