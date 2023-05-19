@@ -255,6 +255,24 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
+Theorem I_opt_integral : let roi := I_ring_like_op in
+  if rngl_is_integral then
+    ∀ a b : ideal P, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
+  else
+    not_applicable.
+Proof.
+intros.
+remember rngl_is_integral as it eqn:Hit; symmetry in Hit.
+destruct it; [ | easy ].
+intros.
+cbn in H.
+apply eq_ideal_eq in H; cbn in H.
+specialize rngl_opt_integral as H1.
+rewrite Hit in H1.
+specialize (H1 _ _ H).
+now destruct H1; [ left | right ]; apply eq_ideal_eq.
+Qed.
+
 Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
   ∀ i, i_val (rngl_of_nat i) = rngl_of_nat i.
 Proof.
@@ -294,7 +312,7 @@ Qed.
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
-     rngl_is_integral := false;
+     rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := I_add_comm;
@@ -315,7 +333,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
      rngl_opt_le_refl := NA;
