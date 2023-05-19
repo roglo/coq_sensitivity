@@ -150,6 +150,13 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
+  ∀ i, i_val (rngl_of_nat i) = rngl_of_nat i.
+Proof.
+intros.
+induction i; [ easy | now cbn; rewrite IHi ].
+Qed.
+
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if Nat.eqb rngl_characteristic 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
@@ -163,8 +170,21 @@ destruct ch. {
   apply Nat_eqb_eq in Hch.
   intros i Hi.
   apply eq_ideal_eq in Hi; cbn in Hi.
+  rewrite rngl_of_nat_ideal in Hi.
   cbn in characteristic_prop.
-...
+  now apply (characteristic_prop i).
+}
+destruct characteristic_prop as (H1, H2).
+split. {
+  intros i Hi H.
+  apply eq_ideal_eq in H; cbn in H.
+  apply (H1 i Hi).
+  now rewrite rngl_of_nat_ideal in H.
+} {
+  apply eq_ideal_eq; cbn.
+  now rewrite rngl_of_nat_ideal.
+}
+Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := false;
@@ -194,10 +214,12 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
      rngl_opt_le_refl := NA;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le |}.
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA |}.
+
+End a.
