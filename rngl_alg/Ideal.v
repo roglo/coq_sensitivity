@@ -59,6 +59,99 @@ unfold rngl_has_opp in H1.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | apply ip_zero ].
 destruct os as [opp| subt]; [ | apply ip_zero ].
 apply H1, a.
+Show Proof.
+Definition I_opp_prop' (a : ideal P) : P (- i_val a)%L = true :=
+   let H1 :
+     if rngl_has_opp
+     then ∀ a0 : T, P a0 = true → P (- a0)%L = true
+     else not_applicable := ip_opp
+   in
+   match rngl_opt_opp_or_subt
+      as o0
+      return
+        ((if match o0 with
+             | Some (inl _) => true
+             | _ => false
+             end
+          then
+           ∀ a0 : T,
+             P a0 = true
+             → P
+                 match o0 with
+                 | Some (inl rngl_opp) => rngl_opp a0
+                 | _ => 0%L
+                 end = true
+          else not_applicable)
+         → P
+             match o0 with
+             | Some (inl rngl_opp) => rngl_opp (i_val a)
+             | _ => 0%L
+             end = true)
+    with
+    | Some os =>
+        λ (H2 : if
+                  match os with
+                  | inl _ => true
+                  | inr _ => false
+                  end
+                then
+                  ∀ a1 : T,
+                    P a1 = true
+                    → P
+                        match os with
+                        | inl rngl_opp =>
+                            rngl_opp a1
+                        | inr _ => 0%L
+                        end = true
+                else not_applicable),
+        match os as s
+          return
+          ((if match s with
+               | inl _ => true
+               | inr _ => false
+               end
+            then
+              ∀ a1 : T,
+                P a1 = true
+                → P
+                    match s with
+                    | inl rngl_opp => rngl_opp a1
+                    | inr _ => 0%L
+                    end = true
+            else not_applicable)
+           → P
+               match s with
+               | inl rngl_opp => rngl_opp (i_val a)
+               | inr _ => 0%L
+               end = true)
+        with
+        | inl opp => λ H3, H3 (i_val a) (i_mem a)
+        | inr b => λ _, ip_zero
+        end H2
+    | None => λ _, ip_zero
+    end H1.
+...
+Theorem I_opp_prop'' : ∀ a : ideal P, P (- i_val a)%L = true.
+Proof.
+intros a.
+remember (I_opp_prop' a) as x eqn:Hx.
+unfold I_opp_prop' in Hx.
+cbn in Hx.
+...
+Theorem I_opp_prop' : ∀ a : ideal P, P (- i_val a)%L = true.
+Proof.
+intros.
+specialize ip_opp as H1.
+unfold rngl_opp in H1 |-*.
+unfold rngl_has_opp in H1.
+unfold rngl_opp.
+refine (
+  match rngl_opt_opp_or_subt with
+  | Some (inl opp) => _ opp
+  | Some (inr subt) => _ subt
+  | None => _
+  end). 3: {
+...
 Qed.
 
 Definition I_opp (a : ideal P) : ideal P :=
