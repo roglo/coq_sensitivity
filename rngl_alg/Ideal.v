@@ -19,7 +19,9 @@ Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;
     ip_one : P rngl_one = true;
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
-    ip_opp : ∀ a, P a = true → P (- a)%L = true;
+    ip_opp :
+      if rngl_has_opp then ∀ a, P a = true → P (- a)%L = true
+      else not_applicable;
     ip_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
     ip_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.
 
@@ -48,8 +50,36 @@ Definition I_mul (a b : ideal P) : ideal P :=
 
 (* opposite *)
 
+Theorem I_opp_prop : ∀ a : ideal P, P (- i_val a)%L = true.
+Proof.
+intros.
+specialize ip_opp as H1.
+unfold rngl_opp in H1 |-*.
+unfold rngl_has_opp in H1.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | apply ip_zero ].
+destruct os as [opp| subt]; [ | apply ip_zero ].
+apply H1, a.
+Qed.
+
+Definition I_opp (a : ideal P) : ideal P :=
+  mk_I (- i_val a) (I_opp_prop a).
+
+(*
 Definition I_opp (a : ideal P) : ideal P :=
   mk_I (- i_val a) (ip_opp (i_val a) (i_mem a)).
+*)
+
+(* subtraction
+
+Theorem glop : ∀ (a b : ideal P), P (rngl_subt (i_val a) (i_val b)) = true.
+Proof.
+intros.
+...
+
+Definition I_sub (a b : ideal P) : ideal P :=
+  mk_I (rngl_subt (i_val a) (i_val b)) (glop a b).
+...
+*)
 
 (* ideal ring like op *)
 
@@ -61,7 +91,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
-       | Some (inr _) => None (*Some (inr I_subt)*)
+       | Some (inr _) => None (*Some (inr 42)*)
        | None => None
        end;
      rngl_opt_inv_or_quot := None;
