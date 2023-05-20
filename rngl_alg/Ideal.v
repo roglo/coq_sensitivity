@@ -272,7 +272,6 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
-(*
 Theorem I_opt_le_dec : let roi := I_ring_like_op in
   if rngl_has_dec_le then ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
    else not_applicable.
@@ -284,17 +283,19 @@ intros.
 specialize rngl_opt_le_dec as H1.
 rewrite Hde in H1.
 specialize (H1 (i_val a) (i_val b)).
-destruct H1; [ left | right ].
-cbn.
-...
-apply eq_ideal_eq in H; cbn in H.
-specialize rngl_opt_integral as H1.
-rewrite Hit in H1.
-specialize (H1 _ _ H).
-now destruct H1; [ left | right ]; apply eq_ideal_eq.
+destruct H1 as [H1| H1]; [ left | right ]. {
+  progress unfold rngl_le; cbn.
+  progress unfold I_opt_le.
+  progress unfold rngl_le in H1.
+  now destruct rngl_opt_le.
+} {
+  intros H; apply H1; clear H1; rename H into H1.
+  progress unfold rngl_le in H1;   cbn in H1.
+  progress unfold I_opt_le in H1.
+  progress unfold rngl_le.
+  now destruct rngl_opt_le.
+}
 Qed.
-...
-*)
 
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
   if rngl_has_eqb then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
@@ -548,7 +549,7 @@ Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := false;
+     rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
@@ -569,7 +570,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := I_opt_eqb_eq;
-     rngl_opt_le_dec := NA;
+     rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
