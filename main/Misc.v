@@ -108,7 +108,7 @@ Theorem fold_iter_seq' : ∀ A b len f (d : A),
     else iter_seq b (b + len - 1) f d.
 Proof.
 intros.
-unfold iter_seq.
+progress unfold iter_seq.
 f_equal; f_equal.
 remember (b + len =? 0) as x eqn:Hx; symmetry in Hx.
 destruct x. {
@@ -172,7 +172,7 @@ Theorem iter_shift : ∀ {T} s b k f (d : T),
     iter_seq (b - s) (k - s) (λ c i, f c (s + i)) d.
 Proof.
 intros * (Hsb, Hbk).
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 replace (S (k - s) - (b - s)) with (S (k - b)) by flia Hsb Hbk.
 rewrite <- Nat.sub_succ_l; [ | easy ].
 remember (S k - b)%nat as len; clear Heqlen.
@@ -1014,7 +1014,7 @@ Proof. easy. Qed.
 Theorem butn_succ_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
 Proof.
 intros.
-unfold butn.
+progress unfold butn.
 now rewrite firstn_cons, skipn_cons.
 Qed.
 
@@ -1045,7 +1045,7 @@ Theorem butn_length : ∀ A n (l : list A),
   length (butn n l) = length l - Nat.b2n (n <? length l).
 Proof.
 intros.
-unfold Nat.b2n; rewrite if_bool_if_dec.
+progress unfold Nat.b2n; rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool (n <? length l)) as [Hnl| Hnl]. 2: {
   apply Nat.ltb_ge in Hnl; rewrite Nat.sub_0_r.
   now rewrite butn_out.
@@ -1144,7 +1144,7 @@ destruct n. {
   destruct (le_dec sta i) as [H| H]; [ | easy ].
   now apply Nat.leb_le in H; rewrite H.
 }
-unfold Nat.b2n.
+progress unfold Nat.b2n.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
   apply Nat.ltb_lt in Hn.
@@ -1153,7 +1153,7 @@ destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
   apply Nat.succ_lt_mono in Hn.
   rewrite IHlen.
   destruct len; [ easy | ].
-  unfold Nat.b2n.
+  progress unfold Nat.b2n.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec n (S len)) as [H| H]; [ clear H | easy ].
   rewrite Nat_sub_succ_1; cbn - [ "<=?" ].
@@ -1185,7 +1185,7 @@ Theorem butn_app : ∀ A (l1 l2 : list A) i,
 Proof.
 intros.
 rewrite if_ltb_lt_dec.
-unfold butn.
+progress unfold butn.
 rewrite firstn_app, skipn_app.
 destruct (lt_dec i (length l1)) as [Hil| Hil]. {
   rewrite (proj2 (Nat.sub_0_le i _)); [ | now apply Nat.lt_le_incl ].
@@ -1210,7 +1210,7 @@ Theorem butn_app_cons :
   → butn i (la ++ b :: lb) = la ++ lb.
 Proof.
 intros * Hia.
-unfold butn.
+progress unfold butn.
 rewrite firstn_app.
 rewrite Hia, Nat.sub_diag, firstn_O, app_nil_r.
 rewrite firstn_all2; [ | easy ].
@@ -1395,7 +1395,7 @@ split. {
   now apply list_eqb_eq.
 } {
   intros Heqb a b.
-  unfold equality in Heqb.
+  progress unfold equality in Heqb.
   split. {
     intros Hab.
     specialize (Heqb [a] [b]).
@@ -1461,7 +1461,7 @@ Theorem pair_eqb_eq : ∀ A B (eqba : A → _) (eqbb : B → _),
 Proof.
 intros * Heqba Heqbb *.
 split; intros Hab. {
-  unfold pair_eqb in Hab.
+  progress unfold pair_eqb in Hab.
   destruct a as (a1, a2).
   destruct b as (b1, b2).
   cbn in Hab.
@@ -1472,7 +1472,7 @@ split; intros Hab. {
   congruence.
 } {
   subst b.
-  unfold pair_eqb.
+  progress unfold pair_eqb.
   destruct a as (a1, a2); cbn.
   apply Bool.andb_true_iff.
   split. {
@@ -1894,7 +1894,7 @@ cbn.
 destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
   subst n.
   rewrite app_nth2. 2: {
-    now rewrite rev_length, seq_length; unfold ge.
+    now rewrite rev_length, seq_length; progress unfold ge.
   }
   rewrite rev_length, seq_length, Nat.sub_diag; cbn.
   now rewrite Nat.add_sub.
@@ -2044,7 +2044,7 @@ Proof.
 intros.
 destruct la as [| a] using rev_ind; [ easy | cbn ].
 rewrite last_last, app_length, Nat.add_sub.
-rewrite app_nth2; [ | now unfold ge ].
+rewrite app_nth2; [ | now progress unfold ge ].
 now rewrite Nat.sub_diag.
 Qed.
 
@@ -2056,7 +2056,7 @@ Theorem iter_list_seq : ∀ T d (op : T → T → T) b len f,
     iter_seq b (b + len - 1) (λ c i, op c (f i)) d.
 Proof.
 intros * Hlen.
-unfold iter_seq.
+progress unfold iter_seq.
 f_equal; f_equal.
 flia Hlen.
 Qed.
@@ -2084,7 +2084,7 @@ Theorem iter_list_op_fun_from_d : ∀ T A d op a l (f : A → _)
   op a (iter_list l (λ (c : T) (i : A), op c (f i)) d).
 Proof.
 intros.
-unfold iter_list.
+progress unfold iter_list.
 revert a.
 induction l as [| x l]; intros; [ symmetry; apply op_d_r | cbn ].
 rewrite IHl; symmetry; rewrite IHl.
@@ -2100,7 +2100,7 @@ Theorem iter_list_all_d : ∀ T A d op (l : list A) f
   → iter_list l (λ (c : T) i, op c (f i)) d = d.
 Proof.
 intros * op_d_l op_d_r op_assoc Hz.
-unfold iter_list.
+progress unfold iter_list.
 induction l as [| a]; [ easy | cbn ].
 rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 rewrite IHl. {
@@ -2135,7 +2135,7 @@ Theorem iter_list_split_first : ∀ T A d op l z f
     op (f (hd z l)) (iter_list (tl l) (λ (c : T) (i : A), op c (f i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc Hl.
-unfold iter_list.
+progress unfold iter_list.
 destruct l as [| a]; [ easy | cbn ].
 rewrite op_d_l.
 now rewrite fold_left_op_fun_from_d with (d := d).
@@ -2150,7 +2150,7 @@ Theorem iter_seq_split_first : ∀ T d op b k g
     op (g b) (iter_seq (S b) k (λ (c : T) (i : nat), op c (g i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc Hbk.
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 remember (S k - b) as len eqn:Hlen.
 replace (S k - S b) with (len - 1) by flia Hlen.
 assert (H : len ≠ 0) by flia Hlen Hbk.
@@ -2173,7 +2173,7 @@ Theorem iter_list_split_last : ∀ T A d (op : T → T → T) l (g : A → T) z,
     op (iter_list (removelast l) (λ c i, op c (g i)) d) (g (last l z)).
 Proof.
 intros * Hlz.
-unfold iter_list.
+progress unfold iter_list.
 induction l as [| a] using rev_ind; [ easy | clear IHl Hlz ].
 rewrite removelast_last.
 rewrite last_last.
@@ -2186,7 +2186,7 @@ Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
     op (iter_seq (S b) k (λ (c : T) (i : nat), op c (g (i - 1)%nat)) d) (g k).
 Proof.
 intros * Hbk.
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 remember (S k - S b) as len eqn:Hlen.
 rewrite Nat.sub_succ in Hlen.
 replace (S k - b) with (S len) by flia Hbk Hlen.
@@ -2211,7 +2211,7 @@ Theorem iter_seq_split : ∀ T d op j g b k
       (iter_seq (j + 1) k (λ (c : T) (i : nat), op c (g i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc (Hbj, Hjk).
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 remember (S j - b) as len1 eqn:Hlen1.
 remember (S k - b) as len2 eqn:Hlen2.
 move len2 before len1.
@@ -2254,7 +2254,7 @@ Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
   iter_list (la ++ lb) f d = iter_list lb f (iter_list la f d).
 Proof.
 intros.
-unfold iter_list.
+progress unfold iter_list.
 now rewrite fold_left_app.
 Qed.
 
@@ -2266,7 +2266,7 @@ Theorem iter_list_cons : ∀ A B d op (a : B) la f
   op (f a) (iter_list la (λ (c : A) i, op c (f i)) d).
 Proof.
 intros.
-unfold iter_list; cbn.
+progress unfold iter_list; cbn.
 rewrite op_d_l.
 now apply (fold_left_op_fun_from_d d).
 Qed.
@@ -2277,7 +2277,7 @@ Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
     iter_list l (λ c i, op c (h i)) d.
 Proof.
 intros * Hgh.
-unfold iter_list.
+progress unfold iter_list.
 revert d.
 induction l as [| a]; intros; [ easy | cbn ].
 rewrite Hgh; [ | now left ].
@@ -2305,7 +2305,7 @@ Theorem iter_seq_succ_succ : ∀ {T} (d : T) b k f,
   iter_seq b k (λ c i, f c (S i)) d.
 Proof.
 intros.
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 rewrite Nat.sub_succ.
 remember (S k - b)%nat as len; clear Heqlen.
 rewrite <- seq_shift.
@@ -2317,7 +2317,7 @@ Theorem iter_seq_succ_succ' : ∀ {T} (d : T) b k f,
   iter_seq b k (λ c i, f c i) d.
 Proof.
 intros.
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 rewrite Nat.sub_succ.
 rewrite <- seq_shift.
 rewrite List_fold_left_map.
@@ -2340,7 +2340,7 @@ Theorem iter_seq_empty : ∀ T d (op : T → T → T) b k g,
   → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d = d.
 Proof.
 intros * Hkb.
-unfold iter_seq.
+progress unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
@@ -2349,7 +2349,7 @@ Theorem iter_list_only_one : ∀ T A d (op : T → T → T) (g : A → T) a
   iter_list [a] (λ c i, op c (g i)) d = g a.
 Proof.
 intros * op_d_l.
-unfold iter_list; cbn.
+progress unfold iter_list; cbn.
 apply op_d_l.
 Qed.
 
@@ -2358,7 +2358,7 @@ Theorem iter_seq_only_one : ∀ T d (op : T → T → T) g n
   iter_seq n n (λ c i, op c (g i)) d = g n.
 Proof.
 intros * op_d_l.
-unfold iter_seq.
+progress unfold iter_seq.
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite Nat.sub_diag.
 now apply iter_list_only_one.
@@ -2373,7 +2373,7 @@ Theorem iter_list_distr : ∀ T A d op g h (l : list A)
     (iter_list l (λ (c : T) (i : A), op c (h i)) d).
 Proof.
 intros.
-unfold iter_list.
+progress unfold iter_list.
 induction l as [| a]; [ symmetry; apply op_d_l | cbn ].
 rewrite (fold_left_op_fun_from_d d); [ | easy | | easy ]. 2: {
   intros; rewrite op_comm; apply op_d_l.
@@ -2419,7 +2419,7 @@ Theorem iter_list_inv : ∀ T A d op inv (f : A → T) l
   iter_list l (λ (c : T) i, op c (inv (f i))) (inv d).
 Proof.
 intros.
-unfold iter_list.
+progress unfold iter_list.
 revert d.
 induction l as [| a la]; intros; [ easy | cbn ].
 rewrite IHla.
@@ -2445,12 +2445,12 @@ Theorem iter_seq_rtl : ∀ T d op b k f
 Proof.
 intros.
 destruct (le_dec (S k) b) as [Hkb| Hkb]. {
-  unfold iter_seq.
+  progress unfold iter_seq.
   now replace (S k - b) with 0 by flia Hkb.
 }
 apply Nat.nle_gt in Hkb.
 apply -> Nat.lt_succ_r in Hkb.
-unfold iter_seq, iter_list.
+progress unfold iter_seq, iter_list.
 remember (S k - b) as len eqn:Hlen.
 replace k with (b + len - 1) by flia Hkb Hlen.
 clear Hlen Hkb.
@@ -2492,7 +2492,7 @@ Theorem max_list_app : ∀ A (la lb : list A) f,
 Proof.
 intros.
 rewrite iter_list_app.
-unfold iter_list.
+progress unfold iter_list.
 apply fold_left_max_from_0.
 Qed.
 
@@ -2599,7 +2599,7 @@ Theorem App_list_app : ∀ A B (la lb : list A) (f : A → list B),
 Proof.
 intros.
 rewrite iter_list_app.
-unfold iter_list.
+progress unfold iter_list.
 rewrite fold_left_op_fun_from_d with (d := []); [ easy | easy | | ]. {
   apply app_nil_r.
 } {
@@ -3056,7 +3056,7 @@ Theorem to_radix_inv_to_radix : ∀ n k,
   k < n ^ n → to_radix_inv n (to_radix n k) = k.
 Proof.
 intros * Hkn.
-unfold to_radix.
+progress unfold to_radix.
 rewrite to_radix_inv_to_radix_loop.
 now apply Nat.mod_small.
 Qed.
@@ -3067,7 +3067,7 @@ Theorem to_radix_to_radix_inv : ∀ n l,
   → to_radix n (to_radix_inv n l) = l.
 Proof.
 intros * Hlen Hl.
-unfold to_radix.
+progress unfold to_radix.
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
 do 2 rewrite Nat.add_0_r in H1.
@@ -3085,7 +3085,7 @@ Qed.
 Theorem to_radix_length : ∀ n l, length (to_radix n l) = n.
 Proof.
 intros.
-unfold to_radix.
+progress unfold to_radix.
 apply to_radix_loop_length.
 Qed.
 

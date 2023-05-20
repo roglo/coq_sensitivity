@@ -48,7 +48,7 @@ Theorem prime_mul_inv_l_mod : ∀ p a,
   → (inv_mod a p * a) mod p = 1.
 Proof.
 intros * Hp Haz.
-unfold inv_mod.
+progress unfold inv_mod.
 rewrite Nat_pow_mod_is_pow_mod; [ | now intros H; subst p ].
 rewrite Nat.mul_mod_idemp_l; [ | now intros H; subst p ].
 replace a with (a ^ 1); [ | apply Nat.pow_1_r ].
@@ -272,7 +272,7 @@ Theorem Zn_opt_mul_inv_l :
   else not_applicable.
 Proof.
 intros.
-unfold rngl_has_inv; cbn.
+progress unfold rngl_has_inv; cbn.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
 destruct p; [ cbn | easy ].
@@ -289,17 +289,17 @@ rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
   flia Hn2.
 }
-unfold rngl_inv.
+progress unfold rngl_inv.
 cbn - [ "/" "mod" ].
 rewrite Hp.
 cbn - [ "/" "mod" ].
-unfold "<?".
+progress unfold "<?".
 cbn - [ "/" "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].
   destruct n'; [ easy | ].
-  unfold at_least_1.
+  progress unfold at_least_1.
   rewrite Nat.sub_succ.
   now rewrite Nat.sub_0_r.
 }
@@ -310,7 +310,7 @@ apply Zn_eq; cbn; symmetry.
 rewrite Nat.sub_diag; symmetry.
 destruct a; [ easy | exfalso ].
 apply Nat.ltb_lt in Ha.
-unfold at_least_1 in Ha.
+progress unfold at_least_1 in Ha.
 apply Nat.mod_divides in H; [ | flia Hn2 ].
 destruct H as (c, Hc).
 replace (S (S (n - 2))) with n in Ha by flia Hn2.
@@ -334,7 +334,7 @@ Theorem Zn_opt_mul_div :
   else not_applicable.
 Proof.
 intros.
-unfold rngl_has_quot; cbn.
+progress unfold rngl_has_quot; cbn.
 remember (is_prime n) as p eqn:Hp; symmetry in Hp.
 now destruct p.
 Qed.
@@ -378,7 +378,7 @@ split. {
   cbn; intros H.
   specialize (@proj1_sig_Zn_of_nat i) as H1.
   subst roz.
-  unfold Zn in H.
+  progress unfold Zn in H.
   rewrite H in H1.
   cbn - [ "mod" ] in H1.
   symmetry in H1.
@@ -401,8 +401,8 @@ Theorem Zn_opt_quot_mul :
   else not_applicable.
 Proof.
 intros.
-unfold rngl_has_quot.
-unfold roz; cbn.
+progress unfold rngl_has_quot.
+progress unfold roz; cbn.
 now destruct (is_prime n).
 Qed.
 

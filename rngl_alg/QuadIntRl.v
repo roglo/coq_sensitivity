@@ -207,7 +207,7 @@ Qed.
 Theorem quad_int_add_comm : ∀ a b : quad_int d, (a + b)%QI = (b + a)%QI.
 Proof.
 intros; cbn.
-unfold "+"%QI.
+progress unfold "+"%QI.
 now rewrite Z.add_comm, (Z.add_comm (qi_im b)).
 Qed.
 
@@ -216,7 +216,7 @@ Theorem quad_int_add_assoc :
   ∀ a b c : quad_int d, (a + (b + c))%L = (a + b + c)%L.
 Proof.
 intros; cbn.
-unfold "+"%QI; cbn.
+progress unfold "+"%QI; cbn.
 now do 2 rewrite Z.add_assoc.
 Qed.
 
@@ -225,7 +225,7 @@ Theorem quad_int_add_0_l :
   ∀ a : quad_int d, (0 + a)%L = a.
 Proof.
 intros; cbn.
-unfold "+"%QI; cbn.
+progress unfold "+"%QI; cbn.
 now destruct a.
 Qed.
 
@@ -233,7 +233,7 @@ Theorem quad_int_mul_assoc : ∀ a b c : quad_int d,
   (a * (b * c))%QI = (a * b * c)%QI.
 Proof.
 intros; cbn.
-unfold "*"%QI; cbn.
+progress unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
@@ -242,7 +242,7 @@ Theorem quad_int_mul_1_l :
   ∀ a : quad_int d, (1 * a)%L = a.
 Proof.
 intros; cbn.
-unfold "*"%QI.
+progress unfold "*"%QI.
 destruct a as (a, a'); cbn.
 rewrite Z.mul_0_r, Z.mul_0_l, Z.add_0_r.
 now destruct a, a'.
@@ -253,14 +253,14 @@ Theorem quad_int_mul_add_distr_l :
   ∀ a b c : quad_int d, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 intros; cbn.
-unfold "*"%QI, "+"%QI; cbn.
+progress unfold "*"%QI, "+"%QI; cbn.
 f_equal; ring.
 Qed.
 
 Theorem quad_int_mul_comm : ∀ a b : quad_int d, (a * b)%QI = (b * a)%QI.
 Proof.
 intros; cbn.
-unfold "*"%QI; cbn.
+progress unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
@@ -269,7 +269,7 @@ Theorem quad_int_add_opp_l :
   ∀ a : quad_int d, (- a + a)%L = 0%L.
 Proof.
 intros; cbn.
-unfold qi_opp, "+"%QI, "0"%QI; cbn.
+progress unfold qi_opp, "+"%QI, "0"%QI; cbn.
 f_equal; ring.
 Qed.
 
@@ -277,14 +277,14 @@ Theorem quad_int_add_sub_assoc: ∀ a b c : quad_int d,
   (a + (b - c))%QI = (a + b - c)%QI.
 Proof.
 intros.
-unfold qi_sub, qi_opp, qi_add; cbn.
+progress unfold qi_sub, qi_opp, qi_add; cbn.
 f_equal; ring.
 Qed.
 
 Theorem quad_int_add_sub : ∀ a b : quad_int d, (a + b - b = a)%QI.
 Proof.
 intros.
-unfold qi_sub, qi_opp, qi_add; cbn.
+progress unfold qi_sub, qi_opp, qi_add; cbn.
 destruct a as (a, a'); cbn.
 f_equal; ring.
 Qed.
@@ -292,14 +292,14 @@ Qed.
 Theorem quad_int_mul_0_r : ∀ a : quad_int d, (a * 0 = 0)%QI.
 Proof.
 intros.
-unfold "*"%QI, "0"%QI; cbn.
+progress unfold "*"%QI, "0"%QI; cbn.
 f_equal; ring.
 Qed.
 
 Theorem quad_int_sub_0_r : ∀ a : quad_int d, (a - 0 = a)%QI.
 Proof.
 intros.
-unfold qi_sub, "+"%QI, qi_opp; cbn.
+progress unfold qi_sub, "+"%QI, qi_opp; cbn.
 do 2 rewrite Z.add_0_r.
 now destruct a.
 Qed.
@@ -307,7 +307,7 @@ Qed.
 Theorem quad_int_mul_opp_l : ∀ (a b : quad_int d), (- a * b = - (a * b))%QI.
 Proof.
 intros.
-unfold qi_opp, qi_mul; cbn.
+progress unfold qi_opp, qi_mul; cbn.
 f_equal; ring.
 Qed.
 
@@ -315,7 +315,7 @@ Theorem quad_int_mul_add_distr_r : ∀ (a b c : quad_int d),
   ((a + b) * c = a * c + b * c)%QI.
 Proof.
 intros.
-unfold qi_add, qi_mul; cbn.
+progress unfold qi_add, qi_mul; cbn.
 f_equal; ring.
 Qed.
 
@@ -323,7 +323,7 @@ Theorem quad_int_mul_sub_distr_r : ∀ (a b c : quad_int d),
   ((a - b) * c = a * c - b * c)%QI.
 Proof.
 intros.
-unfold qi_sub.
+progress unfold qi_sub.
 rewrite quad_int_mul_add_distr_r.
 f_equal.
 apply quad_int_mul_opp_l.
@@ -354,7 +354,7 @@ Theorem quad_int_mul_re_im : ∀ a b c,
  (〈 (a * b) + (a * c) √ d 〉 = 〈 a + 0 √ d 〉 * 〈 b + c √ d 〉)%QI.
 Proof.
 intros.
-unfold qi_mul; cbn.
+progress unfold qi_mul; cbn.
 rewrite Z.mul_0_r.
 rewrite Z.mul_0_l.
 now do 2 rewrite Z.add_0_r.
@@ -364,7 +364,7 @@ Theorem quad_int_add_sub_swap : ∀ a b c : quad_int d,
   (a + b - c = a - c + b)%QI.
 Proof.
 intros.
-unfold qi_sub, qi_add; cbn.
+progress unfold qi_sub, qi_add; cbn.
 f_equal; ring.
 Qed.
 
@@ -372,7 +372,7 @@ Theorem quad_int_add_add_swap : ∀ a b c : quad_int d,
   (a + b + c = a + c + b)%QI.
 Proof.
 intros.
-unfold qi_add; cbn.
+progress unfold qi_add; cbn.
 f_equal; ring.
 Qed.
 
@@ -380,14 +380,14 @@ Theorem quad_int_mul_mul_swap : ∀ a b c : quad_int d,
   (a * b * c = a * c * b)%QI.
 Proof.
 intros.
-unfold qi_mul; cbn.
+progress unfold qi_mul; cbn.
 f_equal; ring.
 Qed.
 
 Theorem quad_int_sub_diag : ∀ a : quad_int d, (a - a = 0)%QI.
 Proof.
 intros.
-unfold qi_sub, qi_add, qi_zero; cbn.
+progress unfold qi_sub, qi_add, qi_zero; cbn.
 f_equal; ring.
 Qed.
 
@@ -407,14 +407,14 @@ Qed.
 Theorem quad_int_mul_0_l : ∀ a : quad_int d, (0 * a = 0)%QI.
 Proof.
 intros.
-unfold qi_mul, qi_zero; cbn.
+progress unfold qi_mul, qi_zero; cbn.
 f_equal; ring.
 Qed.
 
 Theorem quad_int_add_0_r : ∀ a : quad_int d, (a + 0 = a)%QI.
 Proof.
 intros.
-unfold qi_add; cbn.
+progress unfold qi_add; cbn.
 do 2 rewrite Z.add_0_r.
 apply qi_re_im.
 Qed.
@@ -423,14 +423,14 @@ Theorem qi_conj_mul : ∀ a b : quad_int d,
   (qi_conj (a * b) = qi_conj a * qi_conj b)%QI.
 Proof.
 intros.
-unfold qi_conj, qi_mul; cbn.
+progress unfold qi_conj, qi_mul; cbn.
 f_equal; ring.
 Qed.
 
 Theorem qi_conj_involutive : ∀ a : quad_int d, qi_conj (qi_conj a) = a.
 Proof.
 intros.
-unfold qi_conj; cbn.
+progress unfold qi_conj; cbn.
 rewrite Z.opp_involutive.
 apply qi_re_im.
 Qed.
@@ -438,7 +438,7 @@ Qed.
 Theorem quad_int_mul_re_re : ∀ a b, (〈 a 〉 * 〈 b 〉 = 〈 (a * b) 〉)%QI.
 Proof.
 intros.
-unfold qi_mul; cbn.
+progress unfold qi_mul; cbn.
 f_equal; ring.
 Qed.
 
@@ -469,7 +469,7 @@ Theorem nat_square_free_bnat_square_free : ∀ n,
 Proof.
 clear.
 intros.
-unfold nat_square_free, bnat_square_free.
+progress unfold nat_square_free, bnat_square_free.
 split; intros Hn. {
   destruct Hn as (Hnz, Hn).
   apply Bool.andb_true_iff.
@@ -550,8 +550,7 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
   apply Nat.eq_mul_0 in Habc.
   destruct Habc as [Habc| Habc]; [ | easy].
   apply Nat.eq_mul_0 in Habc.
-  unfold nat_square_free in Hsqfb.
-  unfold is_square in Hsqfb.
+  progress unfold is_square in Hsqfb.
   destruct Habc as [H| H]; [ | easy ].
   now exfalso; apply Hsqfb; exists 0.
 }
@@ -812,7 +811,7 @@ Theorem quad_int_characteristic_prop :
 Proof.
 (* proof perhaps a little bit complicated; maybe simpler proof to find *)
 intros * Hi; cbn in Hi.
-unfold qi_add, qi_zero in Hi.
+progress unfold qi_add, qi_zero in Hi.
 remember 1%QI as one eqn:Hone.
 injection Hi; clear Hi; intros H1 H2.
 remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
@@ -859,7 +858,7 @@ Theorem quad_int_mul_div :
   ∀ a b : quad_int d, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros * Hbz; cbn.
-unfold "*"%QI, "÷"%QI; cbn.
+progress unfold "*"%QI, "÷"%QI; cbn.
 destruct a as (a, a').
 destruct b as (b, b'); cbn.
 assert (Hbz' : b ^ 2 - d * b' ^ 2 ≠ 0). {
@@ -900,7 +899,7 @@ Theorem quad_int_mul_quot_l : ∀ a b : quad_int d,
   → (a * b ÷ a)%QI = b.
 Proof.
 intros * Haz.
-unfold qi_mul, qi_quot; cbn.
+progress unfold qi_mul, qi_quot; cbn.
 destruct a as (a, a').
 destruct b as (b, b'); cbn.
 f_equal. {
@@ -956,7 +955,7 @@ Theorem quad_int_quot_mul_cancel_l : ∀ a b c : quad_int d,
   → ((a * b) ÷ (a * c) = b ÷ c)%QI.
 Proof.
 intros * Haz Hcz.
-unfold qi_mul, qi_quot; cbn.
+progress unfold qi_mul, qi_quot; cbn.
 destruct a as (a, a').
 destruct b as (b, b').
 destruct c as (c, c'); cbn.
@@ -1035,7 +1034,7 @@ Theorem glip : ∀ a b c : quad_int d,
   → ((a * b) / (a * c) = b / c)%QI.
 Proof.
 intros * Haz Hcz.
-unfold qi_mul, qi_div; cbn.
+progress unfold qi_mul, qi_div; cbn.
 destruct a as (a, a').
 destruct b as (b, b').
 destruct c as (c, c'); cbn.
@@ -1120,7 +1119,7 @@ Theorem quad_int_quot_mul :
 Proof.
 intros; subst ro; cbn.
 intros * Hbz Hcz.
-unfold qi_mul, qi_quot; cbn.
+progress unfold qi_mul, qi_quot; cbn.
 destruct a as (a, a').
 destruct b as (b, b').
 destruct c as (c, c'); cbn.

@@ -202,9 +202,9 @@ Proof. easy. Qed.
 
 Theorem PQeq_trans : ∀ x y z : PQ, (x == y)%PQ → (y == z)%PQ → (x == z)%PQ.
 Proof.
-unfold "==".
+progress unfold "==".
 intros * Hxy Hyz.
-unfold nd in *.
+progress unfold nd in *.
 apply (Nat.mul_cancel_l _ _ (nn (PQnum1 y) + 1)); [ flia | ].
 rewrite Nat.mul_assoc, Nat.mul_shuffle0, Hyz.
 rewrite Nat.mul_shuffle0, <- Nat.mul_assoc, Hxy.
@@ -256,7 +256,7 @@ Theorem PQcompare_gt_iff : ∀ x y, PQcompare x y = Gt ↔ (x > y)%PQ.
 Proof. intros; apply Nat.compare_gt_iff. Qed.
 
 Theorem PQle_refl : ∀ x, (x ≤ x)%PQ.
-Proof. now unfold "≤"%PQ. Qed.
+Proof. now progress unfold "≤"%PQ. Qed.
 
 Theorem PQnlt_ge : ∀ x y, ¬ (x < y)%PQ ↔ (y ≤ x)%PQ.
 Proof.
@@ -275,7 +275,7 @@ Qed.
 Theorem PQlt_le_dec : ∀ x y : PQ, {(x < y)%PQ} + {(y ≤ x)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
-unfold PQlt, PQle, nd; simpl.
+progress unfold PQlt, PQle, nd; simpl.
 destruct (lt_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
   as [H1| H1].
 -now left.
@@ -286,7 +286,7 @@ Arguments PQlt_le_dec x%PQ y%PQ.
 Theorem PQle_lt_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {(y < x)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
-unfold PQlt, PQle, nd; simpl.
+progress unfold PQlt, PQle, nd; simpl.
 destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
   as [H1| H1].
 -now left.
@@ -297,7 +297,7 @@ Arguments PQle_lt_dec x%PQ y%PQ.
 Theorem PQle_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {¬ (x ≤ y)%PQ}.
 Proof.
 intros (xn, xd) (yn, yd).
-unfold PQlt, PQle, nd; simpl.
+progress unfold PQlt, PQle, nd; simpl.
 destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
   as [H1| H1].
 -now left.
@@ -328,8 +328,8 @@ Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 < y1)%PQ → (x2 < y2)%PQ). {
   intros x1q x2q y1q y2q Hx Hy Hxy.
-  unfold "<"%PQ, nd in Hxy |-*.
-  unfold "=="%PQ, nd in Hx, Hy.
+  progress unfold "<"%PQ, nd in Hxy |-*.
+  progress unfold "=="%PQ, nd in Hx, Hy.
   split_var x1q; split_var x2q; split_var y1q; split_var y2q.
   move Hx before Hy.
   apply (Nat.mul_lt_mono_pos_l y1q0); [ easy | ].
@@ -370,8 +370,8 @@ Proof.
 assert (H : ∀ x1 x2 y1 y2,
   (x1 == x2)%PQ → (y1 == y2)%PQ → (x1 ≤ y1)%PQ → (x2 ≤ y2)%PQ). {
   intros x1q x2q y1q y2q Hx Hy Hxy.
-  unfold "≤"%PQ, nd in Hxy |-*.
-  unfold "=="%PQ, nd in Hx, Hy.
+  progress unfold "≤"%PQ, nd in Hxy |-*.
+  progress unfold "=="%PQ, nd in Hx, Hy.
   split_var x1q; split_var x2q; split_var y1q; split_var y2q.
   move Hx before Hy.
   apply (Nat.mul_le_mono_pos_l _ _ y1q0); [ easy | ].
@@ -411,9 +411,9 @@ Global Instance PQadd_morph : Proper (PQeq ==> PQeq ==> PQeq) PQadd.
 Proof.
 intros x1q x2q Hx y1q y2q Hy.
 move Hx before Hy.
-unfold "+"%PQ.
-unfold "==", nd in Hx, Hy |-*.
-unfold PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "+"%PQ.
+progress unfold "==", nd in Hx, Hy |-*.
+progress unfold PQadd_num1, PQadd_den1, nd; simpl.
 rewrite Nat.sub_add; [ | do 4 rewrite Nat.add_1_r; simpl; flia ].
 rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ].
 rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ].
@@ -437,10 +437,10 @@ Proof.
 intros * H1 Hx Hy.
 generalize H1; intros H2; move H2 before H1.
 rewrite Hx, Hy in H2.
-unfold "-"%PQ.
-unfold "==", nd in Hx, Hy |-*.
-unfold "<"%PQ, nd in H1, H2.
-unfold PQsub_num1, PQadd_den1, nd; simpl.
+progress unfold "-"%PQ.
+progress unfold "==", nd in Hx, Hy |-*.
+progress unfold "<"%PQ, nd in H1, H2.
+progress unfold PQsub_num1, PQadd_den1, nd; simpl.
 do 4 rewrite Nat.add_1_r in H1, H2, Hx, Hy.
 do 12 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | flia H1 ]).
@@ -478,9 +478,9 @@ Arguments PQsub_morph x1%PQ x2%PQ y1%PQ y2%PQ.
  *)
 Global Instance PQmul_morph : Proper (PQeq ==> PQeq ==> PQeq) PQmul.
 Proof.
-unfold "*"%PQ.
-unfold "==", nd; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold "*"%PQ.
+progress unfold "==", nd; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
 intros x1 x2 Hx y1 y2 Hy; simpl.
 move Hx before Hy.
 do 4 rewrite Nat.add_1_r in Hx, Hy.
@@ -526,8 +526,8 @@ Ltac PQtac3 :=
 Theorem PQmul_one_r : ∀ x y, (x * PQone y == x)%PQ.
 Proof.
 intros.
-unfold "*"%PQ, "==", PQone, nd; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold "*"%PQ, "==", PQone, nd; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
 PQtac1; repeat PQtac2; PQtac3.
 apply Nat.mul_shuffle0.
 Qed.
@@ -536,10 +536,10 @@ Theorem PQle_antisymm_eq : ∀ x y,
   (x ≤ y)%PQ → (y ≤ x)%PQ → (x * PQone y = y * PQone x)%PQ.
 Proof.
 intros x y Hxy Hyx.
-unfold PQone, "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQone, "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
 specialize (Nat.le_antisymm _ _ Hxy Hyx) as H.
-unfold nd in H; rewrite H.
+progress unfold nd in H; rewrite H.
 f_equal.
 now rewrite Nat.mul_comm.
 Qed.
@@ -553,9 +553,9 @@ Qed.
 Theorem PQadd_comm : ∀ x y, (x + y)%PQ = (y + x)%PQ.
 Proof.
 intros.
-unfold "+"%PQ; f_equal.
--now unfold PQadd_num1, nd; rewrite Nat.add_comm.
--now unfold PQadd_den1, nd; rewrite Nat.mul_comm.
+progress unfold "+"%PQ; f_equal.
+-now progress unfold PQadd_num1, nd; rewrite Nat.add_comm.
+-now progress unfold PQadd_den1, nd; rewrite Nat.mul_comm.
 Qed.
 
 Theorem PQadd_add_swap : ∀ x y z, (x + y + z)%PQ = (x + z + y)%PQ.
@@ -589,7 +589,7 @@ Proof. intros * Hxy; now apply Nat.lt_le_incl. Qed.
 Theorem PQle_trans : ∀ x y z, (x ≤ y)%PQ → (y ≤ z)%PQ → (x ≤ z)%PQ.
 Proof.
 intros * Hxy Hyz.
-unfold "≤"%PQ, nd in Hxy, Hyz |-*.
+progress unfold "≤"%PQ, nd in Hxy, Hyz |-*.
 apply (Nat.mul_le_mono_pos_r _ _ (nn (PQden1 y) + 1)); [ flia | ].
 rewrite Nat.mul_shuffle0.
 apply
@@ -604,7 +604,7 @@ Arguments PQle_trans x%PQ y%PQ z%PQ.
 Theorem PQlt_trans : ∀ x y z, (x < y)%PQ → (y < z)%PQ → (x < z)%PQ.
 Proof.
 intros * Hxy Hyz.
-unfold "<"%PQ, nd in Hxy, Hyz |-*.
+progress unfold "<"%PQ, nd in Hxy, Hyz |-*.
 apply (Nat.mul_lt_mono_pos_r (nn (PQden1 y) + 1)); [ flia | ].
 rewrite Nat.mul_shuffle0.
 apply
@@ -619,8 +619,8 @@ Arguments PQlt_trans x%PQ y%PQ z%PQ.
 Theorem PQle_lt_trans : ∀ x y z, (x ≤ y)%PQ → (y < z)%PQ → (x < z)%PQ.
 Proof.
 intros * Hxy Hyz.
-unfold "<"%PQ, nd in Hyz |-*.
-unfold "≤"%PQ, nd in Hxy.
+progress unfold "<"%PQ, nd in Hyz |-*.
+progress unfold "≤"%PQ, nd in Hxy.
 apply (Nat.mul_lt_mono_pos_r (nn (PQden1 y) + 1)); [ flia | ].
 rewrite Nat.mul_shuffle0.
 apply
@@ -634,8 +634,8 @@ Qed.
 Theorem PQlt_le_trans : ∀ x y z, (x < y)%PQ → (y ≤ z)%PQ → (x < z)%PQ.
 Proof.
 intros * Hxy Hyz.
-unfold "<"%PQ, nd in Hxy |-*.
-unfold "≤"%PQ, nd in Hyz.
+progress unfold "<"%PQ, nd in Hxy |-*.
+progress unfold "≤"%PQ, nd in Hyz.
 apply (Nat.mul_lt_mono_pos_r (nn (PQden1 y) + 1)); [ flia | ].
 rewrite Nat.mul_shuffle0.
 apply
@@ -685,7 +685,7 @@ Arguments PQcompare_morph x1%PQ x2%PQ Hx%PQ y1%PQ y2%PQ Hy%PQ : rename.
 
 Theorem PQadd_lt_mono_r : ∀ x y z, (x < y)%PQ ↔ (x + z < y + z)%PQ.
 Proof.
-unfold "<"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "<"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
 intros *.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
@@ -718,7 +718,7 @@ Qed.
 
 Theorem PQadd_le_mono_r : ∀ x y z, (x ≤ y ↔ x + z ≤ y + z)%PQ.
 Proof.
-unfold "≤"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "≤"%PQ, "+"%PQ, PQadd_num1, PQadd_den1, nd; simpl.
 intros *.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
@@ -760,10 +760,10 @@ Theorem PQsub_add_eq : ∀ x y,
   (y < x)%PQ → (x - y + y = x * PQone y * PQone y)%PQ.
 Proof.
 intros x y Hxy.
-unfold "<"%PQ, nd in Hxy.
-unfold "+"%PQ, "-"%PQ, "==", nd; simpl.
-unfold PQsub_num1, PQadd_num1, PQadd_den1, nd; simpl.
-unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1; simpl.
+progress unfold "<"%PQ, nd in Hxy.
+progress unfold "+"%PQ, "-"%PQ, "==", nd; simpl.
+progress unfold PQsub_num1, PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1; simpl.
 do 4 rewrite Nat.add_1_r in Hxy.
 f_equal.
 PQtac1; repeat PQtac2; [ | flia Hxy ].
@@ -787,7 +787,7 @@ intros * Hzx Hzy.
 split.
 -intros Hxy.
  revert Hzx Hxy Hzy.
- unfold "≤"%PQ, "<"%PQ, "-"%PQ, PQsub_num1, PQadd_den1, nd; simpl.
+ progress unfold "≤"%PQ, "<"%PQ, "-"%PQ, PQsub_num1, PQadd_den1, nd; simpl.
  do 10 rewrite Nat.add_1_r.
  intros.
  rewrite <- Nat.sub_succ_l; [ | flia Hzx ].
@@ -823,7 +823,7 @@ intros * Hzx Hzy.
 split.
 -intros Hxy.
  revert Hzx Hxy Hzy.
- unfold "≤"%PQ, "<"%PQ, "-"%PQ, PQsub_num1, PQadd_den1, nd; simpl.
+ progress unfold "≤"%PQ, "<"%PQ, "-"%PQ, PQsub_num1, PQadd_den1, nd; simpl.
  do 10 rewrite Nat.add_1_r.
  intros.
  rewrite <- Nat.sub_succ_l; [ | flia Hzx ].
@@ -869,8 +869,8 @@ Qed.
 Theorem PQadd_no_neutral : ∀ x y, (y + x ≠≠ x)%PQ.
 Proof.
 intros x y Hxy.
-unfold "+"%PQ, "=="%PQ, nd in Hxy; simpl in Hxy.
-unfold PQadd_num1, PQadd_den1, nd in Hxy.
+progress unfold "+"%PQ, "=="%PQ, nd in Hxy; simpl in Hxy.
+progress unfold PQadd_num1, PQadd_den1, nd in Hxy.
 do 6 rewrite Nat.add_1_r in Hxy.
 do 2 (rewrite <- Nat.sub_succ_l in Hxy; [ | simpl; flia ]).
 do 2 rewrite Nat_sub_succ_1 in Hxy.
@@ -899,7 +899,7 @@ Theorem PQadd_sub_same_eq : ∀ px py pz,
   → (px + py - pz = px * PQone py * PQone pz)%PQ.
 Proof.
 intros * Hyz.
-unfold "*"%PQ, PQmul_num1, PQmul_den1.
+progress unfold "*"%PQ, PQmul_num1, PQmul_den1.
 revert Hyz.
 PQtac1; intros; PQtac2; [ | simpl; flia ].
 PQtac3; do 2 PQtac2; PQtac3; f_equal.
@@ -920,8 +920,8 @@ Qed.
 Theorem PQlt_add_r : ∀ x y, (x < x + y)%PQ.
 Proof.
 intros.
-unfold "<"%PQ, "+"%PQ; simpl.
-unfold PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "<"%PQ, "+"%PQ; simpl.
+progress unfold PQadd_num1, PQadd_den1, nd; simpl.
 do 6 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 2 (rewrite Nat_sub_succ_1).
@@ -941,8 +941,8 @@ Qed.
 Theorem PQle_add_r : ∀ x y, (x ≤ x + y)%PQ.
 Proof.
 intros.
-unfold "≤"%PQ, "+"%PQ; simpl.
-unfold PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold "≤"%PQ, "+"%PQ; simpl.
+progress unfold PQadd_num1, PQadd_den1, nd; simpl.
 do 6 rewrite Nat.add_1_r.
 do 2 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 2 (rewrite Nat_sub_succ_1).
@@ -1051,7 +1051,7 @@ rewrite Nat.mul_shuffle0 in H.
 apply Nat.add_cancel_l in H.
 setoid_rewrite Nat.mul_shuffle0 in H.
 apply Nat.mul_cancel_r in H; [ | easy ].
-unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1; simpl.
+progress unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1; simpl.
 PQtac1; rewrite H; f_equal.
 now rewrite Nat.mul_comm.
 Qed.
@@ -1061,7 +1061,7 @@ Proof.
 intros.
 split; intros H; [ | now rewrite H ].
 specialize (PQadd_cancel_l_eq _ _ _ H) as H1.
-unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1 in H1; simpl in H1.
+progress unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1 in H1; simpl in H1.
 injection H1; clear H1; intros H1 H2.
 revert H2; PQtac1; intros.
 simpl in H2; simpl; do 2 rewrite Nat.sub_0_r in H2.
@@ -1117,32 +1117,32 @@ Qed.
 Theorem PQmul_comm : ∀ x y, (x * y = y * x)%PQ.
 Proof.
 intros.
-unfold "*"%PQ; f_equal.
--now unfold PQmul_num1; simpl; rewrite Nat.mul_comm.
--now unfold PQmul_den1; simpl; rewrite Nat.mul_comm.
+progress unfold "*"%PQ; f_equal.
+-now progress unfold PQmul_num1; simpl; rewrite Nat.mul_comm.
+-now progress unfold PQmul_den1; simpl; rewrite Nat.mul_comm.
 Qed.
 
 Theorem PQmul_1_l : ∀ a, (1 * a)%PQ = a.
 Proof.
 intros.
-unfold "*"%PQ.
-unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold "*"%PQ.
+progress unfold PQmul_num1, PQmul_den1; simpl.
 do 2 rewrite Nat.add_0_r, Nat.add_sub.
 now destruct a, PQnum2, PQden2.
 Qed.
 
 Theorem PQmul_assoc : ∀ x y z, (x * (y * z) = (x * y) * z)%PQ.
 intros.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl; PQtac1; repeat PQtac2; f_equal.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl; PQtac1; repeat PQtac2; f_equal.
 -now rewrite Nat.mul_assoc.
 -now rewrite Nat.mul_assoc.
 Qed.
 
 Theorem PQmul_mul_swap : ∀ x y z, (x * y * z = x * z * y)%PQ.
 intros.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl; PQtac1; repeat PQtac2; f_equal.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl; PQtac1; repeat PQtac2; f_equal.
 -now rewrite Nat.mul_shuffle0.
 -now rewrite Nat.mul_shuffle0.
 Qed.
@@ -1151,8 +1151,8 @@ Theorem PQmul_le_mono : ∀ x y z t,
   (x ≤ y)%PQ → (z ≤ t)%PQ → (x * z ≤ y * t)%PQ.
 Proof.
 intros *.
-unfold "≤"%PQ, nd; cbn.
-unfold PQmul_num1, PQmul_den1.
+progress unfold "≤"%PQ, nd; cbn.
+progress unfold PQmul_num1, PQmul_den1.
 do 12 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | cbn; flia ]).
 do 4 rewrite Nat_sub_succ_1.
@@ -1167,8 +1167,8 @@ Qed.
 Theorem PQmul_le_mono_l : ∀ x y z, (x ≤ y ↔ z * x ≤ z * y)%PQ.
 Proof.
 intros *.
-unfold "≤"%PQ, nd; simpl.
-unfold PQmul_num1, PQmul_den1.
+progress unfold "≤"%PQ, nd; simpl.
+progress unfold PQmul_num1, PQmul_den1.
 do 10 rewrite Nat.add_1_r.
 do 4 (rewrite <- Nat.sub_succ_l; [ | simpl; flia ]).
 do 4 rewrite Nat_sub_succ_1.
@@ -1195,8 +1195,8 @@ Theorem PQmul_add_distr_l_eq : ∀ x y z,
   (x * (y + z) * PQone x = x * y + x * z)%PQ.
 Proof.
 intros.
-unfold "==", "*"%PQ, "+"%PQ, nd; simpl.
-unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
+progress unfold "==", "*"%PQ, "+"%PQ, nd; simpl.
+progress unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
 PQtac1; do 2 PQtac2; [ | simpl; flia ].
 PQtac3; do 6 PQtac2.
 PQtac3; f_equal; [ | now rewrite Nat.mul_shuffle0 ].
@@ -1210,8 +1210,8 @@ Theorem PQmul_sub_distr_l_eq : ∀ x y z,
   (z < y → x * (y - z) * PQone x = x * y - x * z)%PQ.
 Proof.
 intros *.
-unfold "==", "*"%PQ, "+"%PQ, "<"%PQ, nd; simpl.
-unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
+progress unfold "==", "*"%PQ, "+"%PQ, "<"%PQ, nd; simpl.
+progress unfold PQmul_num1, PQadd_den1, PQadd_num1, PQmul_den1, nd; simpl.
 PQtac1; intros Hzy.
 repeat PQtac2.
 -repeat rewrite Nat.mul_assoc; f_equal.
@@ -1238,7 +1238,7 @@ Theorem PQmul_cancel_l_eq : ∀ x y z,
   (z * x == z * y)%PQ → (x * PQone y = y * PQone x)%PQ.
 Proof.
 intros * H.
-revert H; unfold "*"%PQ, PQmul_num1, PQmul_den1.
+revert H; progress unfold "*"%PQ, PQmul_num1, PQmul_den1.
 destruct x as (xn, xd).
 destruct y as (yn, yd).
 destruct z as (zn, zd); simpl.
@@ -1258,7 +1258,7 @@ Proof.
 intros.
 split; intros H; [ | now rewrite H ].
 specialize (PQmul_cancel_l_eq _ _ _ H) as H1.
-unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1 in H1; simpl in H1.
+progress unfold "*"%PQ, PQone, PQmul_num1, PQmul_den1 in H1; simpl in H1.
 injection H1; clear H1; intros H1 H2.
 revert H2; PQtac1; intros.
 simpl in H2; simpl; do 2 rewrite Nat.sub_0_r in H2.
@@ -1266,7 +1266,7 @@ now rewrite H2.
 Qed.
 
 Theorem PQinv_involutive : ∀ x, (¹/ ¹/ x = x)%PQ.
-Proof. intros. unfold PQinv; now destruct x. Qed.
+Proof. intros. progress unfold PQinv; now destruct x. Qed.
 
 (* *)
 
@@ -1287,9 +1287,9 @@ Qed.
 Theorem PQmul_lt_cancel_l : ∀ x y z, (x * y < x * z)%PQ ↔ (y < z)%PQ.
 Proof.
 intros.
-unfold "<"%PQ, nd.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1.
+progress unfold "<"%PQ, nd.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1.
 rewrite Nat.sub_add; [ | destruct (PQnum1 x); simpl; flia ].
 rewrite Nat.sub_add; [ | destruct (PQden1 x); simpl; flia ].
 rewrite Nat.sub_add; [ | destruct (PQnum1 x); simpl; flia ].
@@ -1327,8 +1327,8 @@ Arguments PQred x%PQ.
 Global Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
-unfold "=="%PQ, nd in Hxy |-*; simpl in *.
-unfold PQred; simpl.
+progress unfold "=="%PQ, nd in Hxy |-*; simpl in *.
+progress unfold PQred; simpl.
 remember (ggcd (nn xn + 1) (nn xd + 1)) as g1 eqn:Hg1; symmetry in Hg1.
 remember (ggcd (nn yn + 1) (nn yd + 1)) as g2 eqn:Hg2; symmetry in Hg2.
 move g2 before g1.
@@ -1364,7 +1364,7 @@ Compute (PQH (PQred (PQF 2 3))).
 Theorem PQred_idemp : ∀ x, PQred (PQred x) = PQred x.
 Proof.
 intros (xn, xd).
-unfold PQred; simpl.
+progress unfold PQred; simpl.
 remember (ggcd (nn xn + 1) (nn xd + 1)) as g eqn:Hg1.
 destruct g as (g1, (aa1, bb1)); simpl.
 assert (Haa1 : aa1 ≠ 0). {
@@ -1410,10 +1410,10 @@ Qed.
 Theorem PQred_add_mul_one_l : ∀ x y a, PQred (x + y) = PQred (PQmake a a * x + y).
 Proof.
 intros (xn, xd) (yn, yd) a.
-unfold PQred; simpl.
-unfold "*"%PQ, PQ_of_nat.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQadd_num1, PQadd_den1, nd; simpl.
+progress unfold PQred; simpl.
+progress unfold "*"%PQ, PQ_of_nat.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQadd_num1, PQadd_den1, nd; simpl.
 PQtac1.
 PQtac2; [ PQtac2 | simpl; flia ].
 PQtac2; [ | simpl; flia ].
@@ -1432,10 +1432,10 @@ Theorem PQred_sub_mul_one_l : ∀ x y a,
   (y < x)%PQ -> PQred (x - y) = PQred (PQmake a a * x - y).
 Proof.
 intros (xn, xd) (yn, yd) a Hyx.
-unfold PQred; simpl.
-unfold "*"%PQ, PQ_of_nat.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQsub_num1, PQadd_den1, nd; simpl.
+progress unfold PQred; simpl.
+progress unfold "*"%PQ, PQ_of_nat.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQsub_num1, PQadd_den1, nd; simpl.
 revert Hyx; PQtac1; intros.
 PQtac2; [ PQtac2 | flia Hyx ].
 PQtac2.
@@ -1461,10 +1461,10 @@ Theorem PQred_sub_mul_one_r : ∀ x y a,
   (y < x)%PQ -> PQred (x - y) = PQred (x - PQmake a a * y).
 Proof.
 intros (xn, xd) (yn, yd) a Hyx.
-unfold PQred; simpl.
-unfold "*"%PQ, PQ_of_nat.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQsub_num1, PQadd_den1, nd; simpl.
+progress unfold PQred; simpl.
+progress unfold "*"%PQ, PQ_of_nat.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQsub_num1, PQadd_den1, nd; simpl.
 revert Hyx; PQtac1; intros.
 PQtac2; [ PQtac2 | flia Hyx ].
 destruct a as (a).
@@ -1491,9 +1491,9 @@ Qed.
 Theorem PQred_mul_mul_one_l : ∀ x y a, PQred (x * y) = PQred (PQmake a a * x * y).
 Proof.
 intros (xn, xd) (yn, yd) a.
-unfold PQred; simpl.
-unfold "*"%PQ, PQ_of_nat.
-unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQred; simpl.
+progress unfold "*"%PQ, PQ_of_nat.
+progress unfold PQmul_num1, PQmul_den1; simpl.
 PQtac1.
 do 6 PQtac2.
 do 2 rewrite <- Nat.mul_assoc.
@@ -1504,10 +1504,10 @@ Qed.
 Theorem PQred_eq : ∀ x, (PQred x == x)%PQ.
 Proof.
 intros (xn, xd).
-unfold PQred; simpl.
+progress unfold PQred; simpl.
 remember (ggcd (nn xn + 1) (nn xd + 1)) as g eqn:Hg; symmetry in Hg.
 destruct g as (g, (aa, bb)).
-unfold "=="%PQ, nd; simpl.
+progress unfold "=="%PQ, nd; simpl.
 specialize (ggcd_correct_divisors (nn xn + 1) (nn xd + 1)) as H.
 rewrite Hg in H.
 destruct H as (Hxn, Hxd).
@@ -1549,9 +1549,9 @@ rewrite (PQred_add_mul_one_l (PQred x) y (mknn (a - 1))).
 f_equal; f_equal.
 destruct x as (xn, xd).
 simpl in Ha.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQred; simpl.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQred; simpl.
 specialize (ggcd_split (nn xn + 1) (nn xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
@@ -1596,9 +1596,9 @@ rewrite (PQred_sub_mul_one_l (PQred x) y (mknn (a - 1))); cycle 1. {
 }
 destruct x as (xn, xd).
 simpl in Ha.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQred; simpl.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQred; simpl.
 specialize (ggcd_split (nn xn + 1) (nn xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
@@ -1643,9 +1643,9 @@ rewrite (PQred_sub_mul_one_r x (PQred y) (mknn (a - 1))); cycle 1. {
 }
 destruct y as (yn, yd).
 simpl in Ha.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQred; simpl.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQred; simpl.
 specialize (ggcd_split (nn yn + 1) (nn yd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
@@ -1706,9 +1706,9 @@ remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as a eqn:Ha.
 rewrite (PQred_mul_mul_one_l (PQred x) y (mknn (a - 1))).
 destruct x as ((xn), (xd)).
 simpl in Ha.
-unfold "*"%PQ; simpl.
-unfold PQmul_num1, PQmul_den1; simpl.
-unfold PQred; simpl.
+progress unfold "*"%PQ; simpl.
+progress unfold PQmul_num1, PQmul_den1; simpl.
+progress unfold PQred; simpl.
 specialize (ggcd_split (xn + 1) (xd + 1) a Ha) as H.
 rewrite H; simpl.
 destruct a.
@@ -1783,7 +1783,7 @@ Theorem PQred_gcd : ∀ x,
   Nat.gcd (nn (PQnum1 (PQred x)) + 1) (nn (PQden1 (PQred x)) + 1) = 1.
 Proof.
 intros.
-unfold PQred.
+progress unfold PQred.
 remember (ggcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as g eqn:Hg1.
 destruct g as (g1, (aa1, bb1)); simpl.
 remember (Nat.gcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1)) as g eqn:Hg.
@@ -1806,7 +1806,7 @@ Proof.
 intros x Hx.
 destruct x as ((xn), (xd)).
 rewrite <- ggcd_gcd in Hx.
-unfold PQred.
+progress unfold PQred.
 remember ggcd as f; cbn in Hx; cbn; subst f.
 remember (ggcd (xn + 1) (xd + 1)) as g eqn:Hg.
 destruct g as (g, (aa, bb)); cbn in Hx; subst g.
@@ -1821,7 +1821,7 @@ Theorem PQeq_red_l : ∀ x y,
   x = PQred x → (x == y)%PQ → ∃ a, y = (a ╱ a * x)%PQ.
 Proof.
 intros * Hx Hxy.
-unfold "=="%PQ, nd in Hxy.
+progress unfold "=="%PQ, nd in Hxy.
 specialize (PQred_gcd x) as Hg.
 rewrite <- Hx in Hg.
 destruct x as ((xn), (xd)), y as ((yn), (yd)).
@@ -1834,7 +1834,7 @@ assert (Hd : Nat.divide (xn + 1) ((xd + 1) * (yn + 1))). {
 specialize (Nat.gauss _ _ _ Hd Hg) as H1.
 destruct H1 as (c, Hc).
 exists (mknn (c - 1)).
-unfold "*"%PQ; cbn.
+progress unfold "*"%PQ; cbn.
 rewrite Nat.sub_add; cycle 1. {
   destruct c; [ now rewrite Nat.add_1_r in Hc | flia ].
 }
@@ -1859,7 +1859,7 @@ destruct H1 as ((c), Hc).
 destruct H2 as ((d), Hd).
 move d before c.
 destruct x as ((xn), (xd)), y as ((yn), (yd)).
-unfold "*"%PQ in Hc, Hd.
+progress unfold "*"%PQ in Hc, Hd.
 cbn in Hc, Hd.
 injection Hc; clear Hc; intros H1 H2.
 injection Hd; clear Hd; intros H3 H4.
@@ -1894,7 +1894,7 @@ Qed.
 Theorem PQred_diag : ∀ x, PQred (x ╱ x) = 1%PQ.
 Proof.
 intros (x).
-unfold PQred.
+progress unfold PQred.
 cbn - [ ggcd ].
 rewrite ggcd_diag; [ easy | flia ].
 Qed.
@@ -1902,6 +1902,6 @@ Qed.
 Theorem PQle_decidable : ∀ x y, Decidable.decidable (x ≤ y)%PQ.
 Proof.
 intros.
-unfold Decidable.decidable.
+progress unfold Decidable.decidable.
 apply Nat.le_decidable.
 Qed.

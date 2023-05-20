@@ -518,8 +518,8 @@ End Qadd_assoc_lem.
 Theorem eqb_eq : ∀ x y, (x =? y)%Q = true ↔ x = y.
 Proof.
 intros.
-unfold "=?"%Q.
-unfold compare.
+progress unfold "=?"%Q.
+progress unfold compare.
 destruct x as [| x| x]; [ now destruct y | | ]. {
   destruct y as [| y| y]; [ easy | | easy ].
   remember (GQcompare x y) as c eqn:Hc; symmetry in Hc.
@@ -558,7 +558,6 @@ Qed.
 Theorem add_comm : ∀ x y, (x + y = y + x)%Q.
 Proof.
 intros.
-unfold "+".
 destruct x as [| px| px], y as [| py| py]; try easy; simpl.
 -f_equal; apply GQadd_comm.
 -now rewrite GQcompare_swap; destruct (GQcompare py px).
@@ -569,7 +568,7 @@ Qed.
 Theorem add_add_swap : ∀ x y z, (x + y + z = x + z + y)%Q.
 Proof.
 intros.
-unfold "+"%Q.
+progress unfold "+"%Q.
 destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -now rewrite GQadd_comm.
 -now rewrite GQcompare_swap; destruct (GQcompare pz py).
@@ -630,7 +629,6 @@ Proof. easy. Qed.
 Theorem mul_comm : ∀ x y, (x * y = y * x)%Q.
 Proof.
 intros.
-unfold "*".
 destruct x as [| px| px], y as [| py| py]; try easy; simpl;
 f_equal; apply GQmul_comm.
 Qed.
@@ -638,7 +636,7 @@ Qed.
 Theorem mul_mul_swap : ∀ x y z, (x * y * z = x * z * y)%Q.
 Proof.
 intros.
-unfold "*"%Q.
+progress unfold "*"%Q.
 destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl;
 f_equal; apply GQmul_mul_swap.
 Qed.
@@ -657,8 +655,8 @@ Qed.
 Theorem mul_1_l : ∀ a, (1 * a)%Q = a.
 Proof.
 intros.
-unfold "*"%Q; simpl.
-unfold Qadd_mul_def.NQmul_pos_l.
+progress unfold "*"%Q; simpl.
+progress unfold Qadd_mul_def.NQmul_pos_l.
 destruct a; [ easy | | ]; now rewrite GQmul_1_l.
 Qed.
 
@@ -672,7 +670,7 @@ Qed.
 Theorem mul_inv_r : ∀ x, x ≠ 0%Q → (x / x = 1)%Q.
 Proof.
 intros * Hx.
-unfold div.
+progress unfold div.
 destruct x as [| gx| gx]; [ easy | | ].
 -cbn; f_equal; apply GQmul_inv_r.
 -cbn; f_equal; apply GQmul_inv_r.
@@ -691,13 +689,13 @@ intros.
 destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -f_equal; apply GQmul_add_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_pos_l.
+ progress unfold Qadd_mul_def.NQmul_pos_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
  +now f_equal; apply GQmul_sub_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_pos_l.
+ progress unfold Qadd_mul_def.NQmul_pos_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
@@ -705,13 +703,13 @@ destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -f_equal; apply GQmul_add_distr_l.
 -f_equal; apply GQmul_add_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_neg_l.
+ progress unfold Qadd_mul_def.NQmul_neg_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
  +now f_equal; apply GQmul_sub_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_neg_l.
+ progress unfold Qadd_mul_def.NQmul_neg_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
@@ -739,7 +737,7 @@ Global Hint Resolve le_refl : core.
 Theorem le_antisymm : ∀ x y, (x ≤ y)%Q → (y ≤ x)%Q → x = y.
 Proof.
 intros * Hxy Hyx.
-unfold "≤"%Q in Hxy, Hyx.
+progress unfold "≤"%Q in Hxy, Hyx.
 destruct x as [| px| px], y as [| py| py]; try easy; simpl.
 -f_equal; now apply GQle_antisymm.
 -f_equal; now apply GQle_antisymm.
@@ -748,7 +746,7 @@ Qed.
 Theorem le_trans: ∀ x y z, (x ≤ y)%Q → (y ≤ z)%Q → (x ≤ z)%Q.
 Proof.
 intros * Hxy Hyz.
-unfold "≤"%Q in *.
+progress unfold "≤"%Q in *.
 destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQle_trans; [ apply Hxy | apply Hyz ].
 -eapply GQle_trans; [ apply Hyz | apply Hxy ].
@@ -766,7 +764,7 @@ Qed.
 Theorem lt_trans: ∀ x y z, (x < y)%Q → (y < z)%Q → (x < z)%Q.
 Proof.
 intros * Hxy Hyz.
-unfold "≤"%Q in *.
+progress unfold "<"%Q in *.
 destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQlt_trans; [ apply Hxy | apply Hyz ].
 -eapply GQlt_trans; [ apply Hyz | apply Hxy ].
@@ -776,7 +774,7 @@ Arguments lt_trans x%Q y%Q z%Q.
 Theorem le_lt_trans: ∀ x y z, (x ≤ y)%Q → (y < z)%Q → (x < z)%Q.
 Proof.
 intros * Hxy Hyz.
-unfold "≤"%Q, "<"%Q in *.
+progress unfold "≤"%Q, "<"%Q in *.
 destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQle_lt_trans; [ apply Hxy | apply Hyz ].
 -eapply GQlt_le_trans; [ apply Hyz | apply Hxy ].
@@ -786,7 +784,7 @@ Arguments le_lt_trans x%Q y%Q z%Q.
 Theorem lt_le_trans : ∀ x y z, (x < y)%Q → (y ≤ z)%Q → (x < z)%Q.
 Proof.
 intros * Hxy Hyz.
-unfold "≤"%Q, "<"%Q in *.
+progress unfold "≤"%Q, "<"%Q in *.
 destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQlt_le_trans; [ apply Hxy | apply Hyz ].
 -eapply GQle_lt_trans; [ apply Hyz | apply Hxy ].
@@ -882,14 +880,14 @@ Proof. intros; apply add_assoc. Qed.
 Theorem add_sub_swap : ∀ x y z, (x + y - z)%Q = (x - z + y)%Q.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 apply add_add_swap.
 Qed.
 
 Theorem sub_sub_swap : ∀ x y z, (x - y - z = x - z - y)%Q.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 apply add_add_swap.
 Qed.
 
@@ -911,7 +909,7 @@ Qed.
 Theorem sub_add : ∀ a b, (a - b + b)%Q = a.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 rewrite add_add_swap, <- add_assoc.
 now rewrite add_opp_r, sub_diag, add_0_r.
 Qed.
@@ -919,7 +917,7 @@ Qed.
 Theorem add_sub : ∀ a b, (a + b - b)%Q = a.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 rewrite <- add_assoc.
 now rewrite add_opp_r, sub_diag, add_0_r.
 Qed.
@@ -928,7 +926,7 @@ Theorem le_add_l : ∀ x y, (0 ≤ y)%Q → (x ≤ y + x)%Q.
 Proof.
 intros * Hy.
 destruct y as [| py| py]; [ apply le_refl | | easy ].
-simpl; unfold Qadd_mul_def.NQadd_pos_l.
+simpl; progress unfold Qadd_mul_def.NQadd_pos_l.
 destruct x as [| px| px]; [ easy | apply GQle_add_l | simpl ].
 remember (GQcompare py px) as b eqn:Hb; symmetry in Hb.
 destruct b; GQcompare_iff; [ easy | | easy ].
@@ -1493,14 +1491,14 @@ Qed.
 
 Theorem sub_cancel_l : ∀ x y z, (x - y = x - z)%Q ↔ (y = z)%Q.
 Proof.
-unfold sub.
+progress unfold sub.
 split; intros H; [ | now subst y ].
 now apply add_cancel_l, opp_inj in H.
 Qed.
 
 Theorem sub_cancel_r : ∀ x y z, (x - z = y - z)%Q ↔ (x = y)%Q.
 Proof.
-unfold sub.
+progress unfold sub.
 split; intros H; [ | now subst y ].
 now apply add_cancel_r in H.
 Qed.
@@ -1551,7 +1549,7 @@ Qed.
 Theorem opp_sub_distr : ∀ x y, (- (x - y))%Q = (- x + y)%Q.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 rewrite opp_add_distr.
 apply sub_opp_r.
 Qed.
@@ -1559,7 +1557,7 @@ Qed.
 Theorem sub_add_distr : ∀ x y z, (x - (y + z))%Q = (x - y - z)%Q.
 Proof.
 intros.
-unfold sub.
+progress unfold sub.
 rewrite opp_add_distr.
 apply add_assoc.
 Qed.
@@ -1567,7 +1565,7 @@ Qed.
 Theorem sub_sub_distr : ∀ x y z, (x - (y - z))%Q = (x - y + z)%Q.
 Proof.
 intros.
-unfold sub at 2.
+progress unfold sub at 2.
 rewrite sub_add_distr.
 now rewrite sub_opp_r.
 Qed.
@@ -1618,7 +1616,7 @@ Theorem mul_pair : ∀ x y z t,
   y ≠ 0 → t ≠ 0 → ((x // y) * (z // t) = (x * z) // (y * t))%Q.
 Proof.
 intros * Hy Ht; simpl.
-unfold "*"%GQ, "//"%Q; simpl.
+progress unfold "*"%GQ, "//"%Q; simpl.
 destruct x; [ easy | ].
 destruct z; [ now rewrite Nat.mul_0_r | simpl ].
 f_equal.
@@ -1630,7 +1628,7 @@ Proof.
 intros.
 destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_pos_l.
+ progress unfold Qadd_mul_def.NQmul_pos_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
@@ -1638,13 +1636,13 @@ destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -f_equal; apply GQmul_add_distr_l.
 -f_equal; apply GQmul_add_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_pos_l.
+ progress unfold Qadd_mul_def.NQmul_pos_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
  +now f_equal; apply GQmul_sub_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_neg_l.
+ progress unfold Qadd_mul_def.NQmul_neg_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
@@ -1652,7 +1650,7 @@ destruct x as [| px| px], y as [| py| py], z as [| pz| pz]; try easy; simpl.
 -f_equal; apply GQmul_add_distr_l.
 -f_equal; apply GQmul_add_distr_l.
 -rewrite GQcompare_mul_cancel_l.
- unfold Qadd_mul_def.NQmul_neg_l.
+ progress unfold Qadd_mul_def.NQmul_neg_l.
  remember (GQcompare py pz) as b eqn:Hb; symmetry in Hb.
  destruct b; GQcompare_iff; [ easy | | ].
  +now f_equal; apply GQmul_sub_distr_l.
@@ -1786,7 +1784,7 @@ Theorem le_pair : ∀ x y z t,
   y ≠ 0 → t ≠ 0 → (x // y ≤ z // t)%Q ↔ x * t ≤ y * z.
 Proof.
 intros * Hy Ht.
-unfold "≤"%Q.
+progress unfold "≤"%Q.
 remember (x // y)%Q as a eqn:Ha; symmetry in Ha.
 remember (z // t)%Q as b eqn:Hb; symmetry in Hb.
 move b before a.
@@ -1813,7 +1811,7 @@ Theorem lt_pair : ∀ a b c d,
   b ≠ 0 → d ≠ 0 → (a // b < c // d)%Q ↔ a * d < b * c.
 Proof.
 intros * Hb Hd.
-unfold "<"%GQ, "//"%Q; simpl.
+progress unfold "<"%GQ, "//"%Q; simpl.
 destruct a.
 -destruct c; [ now rewrite Nat.mul_0_r | simpl ].
  split; [ intros _ | easy ].
@@ -1877,7 +1875,7 @@ Qed.
 Theorem pair_diag : ∀ a, a ≠ 0 → (a // a = 1)%Q.
 Proof.
 intros.
-unfold "//"%Q.
+progress unfold "//"%Q.
 destruct a; [ easy | ].
 now rewrite GQpair_diag.
 Qed.
@@ -1982,10 +1980,10 @@ Theorem add_pair : ∀ a b c d,
   b ≠ 0 → d ≠ 0 → (a // b + c // d = (a * d + b * c) // (b * d))%Q.
 Proof.
 intros * Hb Hd.
-unfold "+"%Q.
+progress unfold "+"%Q.
 remember (a // b)%Q as ab eqn:Hab; symmetry in Hab.
 destruct ab as [| pab| pab]; [ | | now destruct a ].
--unfold "//"%Q in Hab.
+-progress unfold "//"%Q in Hab.
  destruct a; [ simpl | easy ].
  rewrite <- mul_pair; [ | easy | easy ].
  rewrite pair_diag; [ | easy ].
@@ -1993,14 +1991,14 @@ destruct ab as [| pab| pab]; [ | | now destruct a ].
 -remember (c // d)%Q as cd eqn:Hcd; symmetry in Hcd.
  move cd before pab.
  destruct cd as [| pcd| pcd]; [ | | now destruct c ].
- +unfold "//"%Q in Hcd.
+ +progress unfold "//"%Q in Hcd.
   destruct c; [ | easy ].
   rewrite Nat.mul_0_r, Nat.add_0_r; simpl.
   rewrite <- mul_pair; [ | easy | easy ].
   rewrite pair_diag; [ | easy ].
   now rewrite mul_1_r.
- +unfold Qadd_mul_def.NQadd_pos_l.
-  unfold "//"%Q.
+ +progress unfold Qadd_mul_def.NQadd_pos_l.
+  progress unfold "//"%Q.
   remember (a * d + b * c) as e eqn:He; symmetry in He.
   destruct e.
   *apply Nat.eq_add_0 in He.
@@ -2025,7 +2023,7 @@ Proof.
 intros * Hb Hd Hle.
 destruct b; [ flia Hb | ].
 destruct d; [ flia Hd | ].
-unfold sub.
+progress unfold sub.
 destruct a. {
   destruct c; [ easy | cbn in Hle; flia Hle ].
 }
@@ -2041,7 +2039,7 @@ injection Hab; clear Hab; intros Hab; subst pab.
   rewrite pair_diag; [ | easy ].
   now rewrite mul_1_r.
  +remember (S a) as sa; remember (S b) as sb; simpl; subst sa sb.
-  unfold "//"%Q.
+  progress unfold "//"%Q.
   remember (S a * S d - S b * S c) as x eqn:Hx; symmetry in Hx.
   destruct x.
   *assert (H : S a * S d = S b * S c) by flia Hle Hx.
@@ -2071,7 +2069,7 @@ Proof.
 intros * Hb Hd Hlt.
 destruct b; [ flia Hb | ].
 destruct d; [ flia Hd | ].
-unfold sub.
+progress unfold sub.
 destruct a.
 -destruct c; [ now rewrite Nat.mul_0_r | ].
  remember (S b) as x; simpl; subst x.
@@ -2086,7 +2084,7 @@ destruct a.
  injection Hab; clear Hab; intros Hab; subst pab.
  destruct c; [ now rewrite Nat.mul_0_r in Hlt | ].
  remember (S a) as sa; remember (S b) as sb; simpl; subst sa sb.
- unfold "//"%Q.
+ progress unfold "//"%Q.
  remember (S b * S c - S a * S d) as x eqn:Hx; symmetry in Hx.
  destruct x; [ flia Hlt Hx | ].
  remember (GQcompare (S a // S b) (S c // S d)) as b1 eqn:Hb1.
@@ -2175,9 +2173,9 @@ Theorem den_neq_0 : ∀ x, den x ≠ 0.
 Proof.
 intros x.
 destruct x; [ easy | | ].
--unfold den, GQden.
+-progress unfold den, GQden.
  now rewrite Nat.add_1_r.
--unfold den, GQden.
+-progress unfold den, GQden.
  now rewrite Nat.add_1_r.
 Qed.
 
@@ -2205,9 +2203,9 @@ destruct b. {
   rewrite den_0, Nat.gcd_1_r, num_pair_1_r.
   symmetry; apply Nat.div_1_r.
 }
-unfold "//"%Q.
+progress unfold "//"%Q.
 rewrite Nat.max_r; [ | flia ].
-unfold num.
+progress unfold num.
 now rewrite GQnum_pair.
 Qed.
 
@@ -2223,8 +2221,8 @@ destruct a.
   rewrite Nat.gcd_0_r.
   rewrite Nat.div_0_l; [ | easy ].
   now rewrite den_pair_1_r.
- +unfold "//"%Q.
-  unfold den.
+ +progress unfold "//"%Q.
+  progress unfold den.
   rewrite GQden_pair.
   remember Nat.gcd as f.
   remember Nat.max as g; cbn; subst f g.
@@ -2242,7 +2240,7 @@ Theorem num_den : ∀ x, (0 ≤ x)%Q → x = (num x // den x)%Q.
 Proof.
 intros x Hx.
 destruct x as [| px| px]; [ easy | | easy ].
-unfold num, den, "//"%Q.
+progress unfold num, den, "//"%Q.
 remember (GQnum px) as a eqn:Ha; symmetry in Ha.
 destruct a; [ now apply GQnum_neq_0 in Ha | ].
 rewrite <- Ha; f_equal.
@@ -2253,7 +2251,7 @@ Theorem num_den_neg : ∀ x, (x < 0)%Q → x = (- num x // den x)%Q.
 Proof.
 intros x Hx.
 destruct x as [| px| px]; [ easy | easy | ].
-unfold num, den, "//"%Q.
+progress unfold num, den, "//"%Q.
 remember (GQnum px) as a eqn:Ha; symmetry in Ha.
 destruct a; [ now apply GQnum_neq_0 in Ha | cbn ].
 rewrite <- Ha; f_equal.
@@ -2288,7 +2286,7 @@ Qed.
 Theorem le_decidable : ∀ x y, Decidable.decidable (x ≤ y)%Q.
 Proof.
 intros.
-unfold Decidable.decidable.
+progress unfold Decidable.decidable.
 destruct x as [| xp| xp], y as [| yp| yp]; (try now left); (try now right).
 -apply GQle_decidable.
 -apply GQle_decidable.
@@ -2394,7 +2392,7 @@ intros * Hbz.
 destruct (zerop a) as [Ha| Ha].
 -subst a; destruct b; [ easy | cbn; now rewrite Nat.sub_diag ].
 -destruct a; [ easy | clear Ha ].
- unfold frac; cbn.
+ progress unfold frac; cbn.
  destruct b; [ easy | clear Hbz ].
  rewrite GQnum_pair.
  rewrite GQden_pair.
@@ -2421,7 +2419,7 @@ Qed.
 Theorem intg_frac : ∀ x, (0 ≤ x)%Q → x = (intg x // 1 + frac x)%Q.
 Proof.
 intros * Hx.
-unfold intg, frac.
+progress unfold intg, frac.
 rewrite add_pair; [ | easy | pauto ].
 do 2 rewrite Nat.mul_1_l.
 rewrite Nat.mul_comm.
@@ -2450,9 +2448,9 @@ destruct x as [| px| px]; [ easy | | easy ].
 rewrite (GQnum_den px) in Hx.
 apply (GQpair_lt_nat_r _ _ 1) in Hx; [ | easy | easy | easy ].
 rewrite Nat.mul_1_r in Hx.
-unfold frac; cbn.
+progress unfold frac; cbn.
 rewrite Nat.mod_small; [ | easy ].
-unfold "//"%Q.
+progress unfold "//"%Q.
 remember (GQnum px) as nx eqn:Hnx.
 remember (GQden px) as dx eqn:Hdx.
 symmetry in Hnx, Hdx.
@@ -2479,9 +2477,9 @@ destruct x as [| px| px].
  rewrite <- (GQpair_add_l _ 1) in H2; [ | easy | easy | easy ].
  apply GQpair_lt_nat_r in H2; [ | easy | easy | easy ].
  rewrite Nat.mul_comm in H2.
- unfold frac; cbn.
+ progress unfold frac; cbn.
  rewrite (Nat_mod_less_small (S n)); [ | easy ].
- unfold "//"%Q.
+ progress unfold "//"%Q.
  remember (GQnum px) as nx eqn:Hnx.
  remember (GQden px) as dx eqn:Hdx.
  symmetry in Hnx, Hdx.
@@ -2516,7 +2514,7 @@ destruct x as [| px| px].
  --now intros H3; rewrite H3 in Hx.
  --now intros H3; rewrite H3, Nat.mul_0_r in H2.
  --rewrite Nat.mul_comm, Nat.mul_1_r.
-   unfold GQgt in Hc.
+   progress unfold GQgt in Hc.
    apply -> GQlt_pair in Hc; [ | | | easy | easy ].
   ++now rewrite Nat.mul_1_l in Hc.
   ++now intros H; rewrite H, Nat.mul_comm in H2.
@@ -2540,7 +2538,7 @@ Proof. easy. Qed.
 Theorem frac_of_nat : ∀ n, frac (n // 1) = 0%Q.
 Proof.
 intros.
-unfold frac.
+progress unfold frac.
 rewrite num_pair_1_r.
 rewrite den_pair_1_r.
 now rewrite Nat.mod_1_r.
@@ -2549,7 +2547,7 @@ Qed.
 Theorem frac_ge_0 : ∀ x, (0 ≤ frac x)%Q.
 Proof.
 intros.
-unfold frac.
+progress unfold frac.
 apply (le_pair 0 1); [ easy | easy | ].
 rewrite Nat.mul_1_l; cbn; flia.
 Qed.
@@ -2559,7 +2557,7 @@ Global Hint Resolve frac_ge_0 : core.
 Theorem frac_lt_1 : ∀ x, (frac x < 1)%Q.
 Proof.
 intros.
-unfold frac.
+progress unfold frac.
 apply (lt_pair _ _ 1 1); [ easy | easy | ].
 do 2 rewrite Nat.mul_1_r.
 now apply Nat.mod_upper_bound.
@@ -2568,7 +2566,7 @@ Qed.
 Theorem frac_le : ∀ x, (0 ≤ x)%Q → (frac x ≤ x)%Q.
 Proof.
 intros x Hx.
-unfold frac.
+progress unfold frac.
 destruct x as [| xp| xp]; [ easy | | easy ].
 cbn.
 rewrite num_den; [ | easy ].
@@ -2581,11 +2579,11 @@ Theorem intg_small : ∀ x, (0 ≤ x < 1)%Q → intg x = 0.
 Proof.
 intros * (Hx1, Hx2).
 destruct x as [| xp| xp]; [ easy | | easy ].
-unfold intg; cbn.
+progress unfold intg; cbn.
 apply Nat.div_small.
-unfold "<"%Q in Hx2; cbn in Hx2.
-unfold "<"%GQ in Hx2; cbn in Hx2.
-unfold PQ.PQlt, PQ.nd in Hx2; cbn in Hx2.
+progress unfold "<"%Q in Hx2; cbn in Hx2.
+progress unfold "<"%GQ in Hx2; cbn in Hx2.
+progress unfold PQ.PQlt, PQ.nd in Hx2; cbn in Hx2.
 now rewrite Nat.mul_1_r, Nat.add_0_r in Hx2.
 Qed.
 
@@ -2605,7 +2603,7 @@ Theorem eq_intg_0 : ∀ x, (0 ≤ x)%Q → intg x = 0 → (x < 1)%Q.
 Proof.
 intros * Hx1 Hx2.
 destruct x as [| x| x]; [ easy | | easy ].
-unfold intg in Hx2; cbn in Hx2; cbn.
+progress unfold intg in Hx2; cbn in Hx2; cbn.
 rewrite (GQnum_den x).
 apply (GQlt_pair _ _ 1 1); [ easy | easy | easy | easy | ].
 do 2 rewrite Nat.mul_1_r.
@@ -2622,7 +2620,7 @@ Qed.
 Theorem intg_lt_lt : ∀ a b, (0 ≤ a)%Q → intg a < b → (a < b // 1)%Q.
 Proof.
 intros * Ha Hab.
-unfold intg in Hab.
+progress unfold intg in Hab.
 rewrite (num_den a); [ | easy ].
 apply lt_pair; [ easy | easy | ].
 rewrite Nat.mul_1_r.
@@ -2642,7 +2640,7 @@ Theorem frac_add_nat_l : ∀ a x, (0 ≤ x)%Q →
   frac (a // 1 + x)%Q = frac x.
 Proof.
 intros * Hx.
-unfold frac.
+progress unfold frac.
 apply eq_pair; [ pauto | pauto | ].
 rewrite (num_den x); [ | easy ].
 rewrite add_pair; [ | easy | pauto ].
@@ -2687,7 +2685,7 @@ Theorem frac_sub_nat_r : ∀ a x, (0 ≤ x)%Q → (a // 1 ≤ x)%Q →
   frac (x - a // 1)%Q = frac x.
 Proof.
 intros * Hx Hax.
-unfold frac.
+progress unfold frac.
 apply eq_pair; [ pauto | pauto | ].
 rewrite (num_den x); [ | easy ].
 assert (Haxl : a * den x ≤ num x). {
@@ -2741,7 +2739,7 @@ Theorem intg_interv : ∀ n x, (0 ≤ x)%Q →
 Proof.
 intros * Hxz.
 split; intros Hx.
--unfold intg.
+-progress unfold intg.
  replace x with (num x // den x)%Q in Hx; cycle 1. {
    now symmetry; apply num_den.
  }
@@ -2774,9 +2772,9 @@ Theorem intg_add_frac : ∀ x y,
 Proof.
 intros.
 destruct (lt_le_dec (frac x + frac y) 1) as [H1| H1].
--unfold intg.
+-progress unfold intg.
  rewrite Nat.div_small; [ easy | ].
- unfold "<"%Q in H1.
+ progress unfold "<"%Q in H1.
  remember (frac x + frac y)%Q as z eqn:Hz.
  symmetry in Hz.
  destruct z as [| zp| zp]; [ cbn; pauto | | ].
@@ -2794,7 +2792,7 @@ destruct (lt_le_dec (frac x + frac y) 1) as [H1| H1].
     apply add_le_mono; apply frac_ge_0.
   }
   now rewrite Hz in H.
--unfold intg.
+-progress unfold intg.
  rewrite (Nat_div_less_small 1); [ easy | ].
  rewrite Nat.mul_1_l; cbn in H1.
  remember (frac x + frac y)%Q as z eqn:Hz.
@@ -2920,7 +2918,7 @@ Qed.
 Theorem intg_pair : ∀ a b, b ≠ 0 → intg (a // b) = a / b.
 Proof.
 intros * Hbz.
-unfold intg.
+progress unfold intg.
 rewrite num_pair, den_pair.
 rewrite Nat.max_r; [ | flia Hbz ].
 rewrite Nat.max_r; cycle 1. {

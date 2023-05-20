@@ -252,7 +252,7 @@ Theorem vect_cross_mul_size :
   → vect_size (u * v) = min (vect_size u) (vect_size v).
 Proof.
 intros * Huv.
-unfold vect_size; cbn - [ "/" ].
+progress unfold vect_size; cbn - [ "/" ].
 rewrite List_map_seq_length.
 symmetry.
 do 2 rewrite fold_vect_size.
@@ -267,7 +267,7 @@ Theorem vect_cross_mul_anticomm :
   → (u * v = - v * u)%V.
 Proof.
 intros Hop Hic * Huv.
-unfold "*"%V; f_equal.
+progress unfold "*"%V; f_equal.
 destruct u as (la).
 destruct v as (lb); cbn - [ "/" ].
 cbn in Huv.
@@ -275,7 +275,7 @@ rewrite map_length.
 rewrite <- Huv.
 apply map_ext_in.
 intros i Hi.
-unfold vect_comm.
+progress unfold vect_comm.
 cbn - [ "/" ].
 rewrite map_length.
 erewrite rngl_summation_eq_compat. 2: {
@@ -298,7 +298,7 @@ erewrite rngl_summation_eq_compat. 2: {
     apply Nat.mod_upper_bound.
     rewrite <- Huv; flia Hi.
   }
-  unfold rngl_sub.
+  progress unfold rngl_sub.
   rewrite Hop.
   do 2 rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_opp_involutive Hop).
@@ -327,7 +327,7 @@ rewrite (rngl_mul_comm Hic).
 rewrite (vect_dot_mul_comm Hic).
 rewrite (vect_cross_mul_anticomm Hop Hic _ _); [ | congruence ].
 rewrite (vect_add_comm (a × v)%V).
-unfold vect_cross_mul.
+progress unfold vect_cross_mul.
 rewrite vect_opp_size.
 rewrite Hv.
 f_equal; f_equal; f_equal.
@@ -335,12 +335,12 @@ apply map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 (*
-unfold vect_comm.
+progress unfold vect_comm.
 rewrite vect_opp_size, Hv.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   do 2 rewrite (vect_opp_el Hop).
-  unfold vect_el.
+  progress unfold vect_el.
   do 2 rewrite Nat.add_sub.
   do 2 rewrite (rngl_mul_opp_l Hop).
   rewrite <- (rngl_opp_add_distr Hop).
@@ -351,7 +351,7 @@ erewrite rngl_summation_eq_compat. 2: {
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  unfold vect_el.
+  progress unfold vect_el.
   do 2 rewrite Nat.add_sub.
   easy.
 }
@@ -381,7 +381,7 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 move Hos before Hop.
-unfold vect_dot_mul.
+progress unfold vect_dot_mul.
 cbn - [ "/" ].
 rewrite Hu, Hv.
 rewrite map2_map_l, map2_map_r.
@@ -421,8 +421,8 @@ destruct w as (lc).
 cbn in Hu, Hv, Hw.
 rename Hu into Ha; rename Hv into Hb; rename Hw into Hc.
 cbn - [ "/" "-" nth ].
-unfold vect_comm.
-unfold vect_el.
+progress unfold vect_comm.
+progress unfold vect_el.
 cbn - [ "/" "-" nth ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -456,7 +456,7 @@ erewrite rngl_summation_eq_compat. 2: {
 symmetry.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   move Hn1 at top; subst n.
-  unfold iter_seq, iter_list; cbn.
+  progress unfold iter_seq, iter_list; cbn.
   rewrite (rngl_mul_0_l Hos).
   rewrite (rngl_mul_0_r Hos).
   easy.
@@ -464,7 +464,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
 destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
   move Hn2 at top; subst n.
   clear Hn1 Hnz.
-  unfold iter_seq, iter_list; cbn.
+  progress unfold iter_seq, iter_list; cbn.
   do 4 rewrite (rngl_sub_diag Hos).
   do 3 rewrite rngl_add_0_l.
   do 2 rewrite (rngl_mul_0_l Hos).
@@ -474,8 +474,8 @@ destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
 assert (H : n = 3) by flia Hn3 Hnz Hn1 Hn2.
 clear Hn3 Hnz Hn1 Hn2.
 move H at top; subst n.
-unfold iter_seq, iter_list; cbn.
-unfold rngl_sub; rewrite Hop.
+progress unfold iter_seq, iter_list; cbn.
+progress unfold rngl_sub; rewrite Hop.
 do 8 rewrite rngl_add_0_l.
 do 3 rewrite rngl_mul_add_distr_r.
 do 3 rewrite rngl_mul_add_distr_l.
@@ -513,7 +513,7 @@ Theorem vect_cross_mul_add_distr_l :
   → (u * (v + w))%V = (u * v + u * w)%V.
 Proof.
 intros Hop * Hu Hv Hw.
-unfold vect_cross_mul, vect_add; cbn - [ "/" ].
+progress unfold vect_cross_mul, vect_add; cbn - [ "/" ].
 f_equal.
 do 2 rewrite (map2_map_min 0%L 0%L).
 do 2 rewrite List_map_seq_length.
@@ -548,7 +548,7 @@ remember (∑ (j = _, _), _) as x; subst x.
 symmetry.
 apply rngl_summation_eq_compat.
 intros j Hj.
-unfold vect_comm.
+progress unfold vect_comm.
 cbn - [ "-" ].
 do 2 rewrite Nat.add_sub.
 rewrite Nat_sub_sub_swap.
@@ -566,7 +566,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
 rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
 cbn.
-unfold vect_el.
+progress unfold vect_el.
 do 2 rewrite Nat.add_sub.
 remember (nth _ _ _) as x eqn:Hx.
 remember (nth _ _ _) as y eqn:Hy in |-*.
@@ -575,12 +575,12 @@ remember (nth _ _ _) as t eqn:Ht in |-*.
 remember (nth _ _ _) as a eqn:Ha in |-*.
 remember (nth _ _ _) as b eqn:Hb in |-*.
 do 2 rewrite rngl_mul_add_distr_l.
-unfold rngl_sub.
+progress unfold rngl_sub.
 rewrite Hop.
 do 2 rewrite <- rngl_add_assoc.
 f_equal.
 rewrite (rngl_opp_add_distr Hop).
-unfold rngl_sub; rewrite Hop.
+progress unfold rngl_sub; rewrite Hop.
 rewrite (rngl_add_comm (- (t * a))%L).
 rewrite <- rngl_add_assoc.
 easy.
@@ -593,7 +593,7 @@ Theorem vect_cross_mul_add_distr_r :
   → ((u + v) * w = u * w + v * w)%V.
 Proof.
 intros Hop * Huv.
-unfold vect_cross_mul, vect_add; cbn - [ "/" ].
+progress unfold vect_cross_mul, vect_add; cbn - [ "/" ].
 f_equal.
 rewrite map2_length.
 do 2 rewrite fold_vect_size.
@@ -631,7 +631,7 @@ remember (∑ (j = _, _), _) as x; subst x.
 symmetry.
 apply rngl_summation_eq_compat.
 intros j Hj.
-unfold vect_comm.
+progress unfold vect_comm.
 cbn - [ "-" ].
 rewrite List_map_seq_length.
 rewrite <- Huv.
@@ -650,7 +650,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
 rewrite seq_nth; [ | now apply Nat.mod_upper_bound ].
 cbn.
-unfold vect_el.
+progress unfold vect_el.
 do 2 rewrite Nat.add_sub.
 remember (nth _ _ _) as x eqn:Hx.
 remember (nth _ _ _) as y eqn:Hy in |-*.
@@ -659,12 +659,12 @@ remember (nth _ _ _) as t eqn:Ht in |-*.
 remember (nth _ _ _) as a eqn:Ha in |-*.
 remember (nth _ _ _) as b eqn:Hb in |-*.
 do 2 rewrite rngl_mul_add_distr_r.
-unfold rngl_sub.
+progress unfold rngl_sub.
 rewrite Hop.
 do 2 rewrite <- rngl_add_assoc.
 f_equal.
 rewrite (rngl_opp_add_distr Hop).
-unfold rngl_sub; rewrite Hop.
+progress unfold rngl_sub; rewrite Hop.
 rewrite (rngl_add_comm (- (t * b))%L).
 rewrite <- rngl_add_assoc.
 easy.
@@ -675,7 +675,7 @@ Theorem vect_scal_cross_mul_assoc_l :
   ∀ a u v, (a × (u * v) = (a × u) * v)%V.
 Proof.
 intros Hos *.
-unfold "×", "*"%V.
+progress unfold "×", "*"%V.
 f_equal; cbn - [ "/" ].
 rewrite map_length.
 rewrite fold_vect_size.
@@ -686,7 +686,7 @@ apply in_seq in Hi.
 rewrite (rngl_mul_summation_distr_l Hos).
 apply rngl_summation_eq_compat.
 intros j Hj.
-unfold vect_comm; cbn.
+progress unfold vect_comm; cbn.
 rewrite map_length.
 do 2 rewrite Nat.add_sub.
 rewrite fold_vect_size.
@@ -696,7 +696,7 @@ rewrite (List_map_nth' 0%L); [ | now apply Nat.mod_upper_bound ].
 do 2 rewrite <- rngl_mul_assoc.
 rewrite <- (rngl_mul_sub_distr_l Hos).
 f_equal.
-unfold vect_el.
+progress unfold vect_el.
 do 2 rewrite Nat.add_sub.
 easy.
 Qed.
@@ -709,7 +709,7 @@ Theorem vect_cross_scal_mul_assoc :
   → (u * (a × v) = a × (u * v))%V.
 Proof.
 intros Hos Hic * Huv.
-unfold "*"%V, "×"%V.
+progress unfold "*"%V, "×"%V.
 f_equal.
 cbn - [ "/" ].
 rewrite map_map.
@@ -719,8 +719,8 @@ apply in_seq in Hi.
 rewrite (rngl_mul_summation_distr_l Hos).
 apply rngl_summation_eq_compat.
 intros j Hj.
-unfold vect_comm; cbn.
-unfold vect_el.
+progress unfold vect_comm; cbn.
+progress unfold vect_el.
 do 2 rewrite Nat.add_sub.
 assert (Huz : vect_size u ≠ 0) by flia Hi.
 rewrite (List_map_nth' 0%L). 2: {
@@ -756,7 +756,7 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 move Hos before Hop.
-unfold "*"%V, vect_dot_mul, "×"%V, vect_sub, vect_add.
+progress unfold "*"%V, vect_dot_mul, "×"%V, vect_sub, vect_add.
 rewrite Hu, Hv.
 cbn - [ "/" ].
 f_equal.
@@ -787,7 +787,7 @@ symmetry.
 remember (∑ (j = _, _), _) as x; subst x.
 symmetry.
 rewrite Nat.add_0_l.
-unfold vect_comm, vect_el.
+progress unfold vect_comm, vect_el.
 rewrite Hu, Hv.
 cbn - [ "/" nth "-" ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -859,7 +859,7 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   cbn - [ "mod" ].
   destruct i. {
     cbn.
-    unfold iter_seq, iter_list; cbn.
+    progress unfold iter_seq, iter_list; cbn.
     rewrite (rngl_mul_mul_swap Hic).
     rewrite (rngl_sub_diag Hos).
     rewrite (rngl_mul_mul_swap Hic).
@@ -872,13 +872,13 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
     remember (_ * _ * _)%L as y eqn:Hy in |-*.
     remember (_ * _ * _)%L as z eqn:Hz in |-*.
     remember (_ * _ * _)%L as t eqn:Ht in |-*.
-    unfold rngl_sub; rewrite Hop.
+    progress unfold rngl_sub; rewrite Hop.
     rewrite <- rngl_add_assoc; f_equal.
     apply rngl_add_comm.
   }
   destruct i. {
     cbn.
-    unfold iter_seq, iter_list; cbn.
+    progress unfold iter_seq, iter_list; cbn.
     do 2 rewrite (rngl_mul_sub_distr_l Hos).
     rewrite (rngl_sub_sub_distr Hop).
     do 4 rewrite rngl_mul_assoc.
@@ -891,7 +891,7 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
     remember (_ * _ * _)%L as y eqn:Hy in |-*.
     remember (_ * _ * _)%L as z eqn:Hz in |-*.
     remember (_ * _ * _)%L as t eqn:Ht in |-*.
-    unfold rngl_sub; rewrite Hop.
+    progress unfold rngl_sub; rewrite Hop.
     rewrite rngl_add_comm.
     do 2 rewrite <- rngl_add_assoc.
     f_equal.
@@ -899,7 +899,7 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   }
   destruct i. {
     cbn.
-    unfold iter_seq, iter_list; cbn.
+    progress unfold iter_seq, iter_list; cbn.
     do 2 rewrite (rngl_mul_sub_distr_l Hos).
     rewrite (rngl_sub_sub_distr Hop).
     do 4 rewrite rngl_mul_assoc.
@@ -912,7 +912,7 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
     remember (_ * _ * _)%L as y eqn:Hy in |-*.
     remember (_ * _ * _)%L as z eqn:Hz in |-*.
     remember (_ * _ * _)%L as t eqn:Ht in |-*.
-    unfold rngl_sub; rewrite Hop.
+    progress unfold rngl_sub; rewrite Hop.
     rewrite <- rngl_add_assoc.
     f_equal.
     apply rngl_add_comm.
@@ -951,7 +951,7 @@ rewrite (@vect_cross_mul_mul_r Hop Hic (vect_size u)); cycle 1. {
 }
 do 2 rewrite (vect_opp_dot_mul_l Hop).
 rewrite (vect_dot_mul_comm Hic).
-unfold vect_sub.
+progress unfold vect_sub.
 rewrite (vect_mul_scal_l_opp_l Hop).
 rewrite vect_add_comm.
 f_equal.
@@ -984,14 +984,14 @@ f_equal. {
   rewrite (rngl_mul_comm Hic).
   do 2 rewrite <- (vect_scal_mul_dot_mul_comm Hos).
   rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
-    unfold vect_size; cbn.
+    progress unfold vect_size; cbn.
     rewrite map2_length.
     do 2 rewrite map_length.
     do 2 rewrite fold_vect_size.
     rewrite Hv, Hu.
     apply Nat.min_id.
   } {
-    unfold vect_size; cbn.
+    progress unfold vect_size; cbn.
     now rewrite List_map_seq_length.
   }
   rewrite (vect_scal_mul_dot_mul_comm Hos).
@@ -1032,7 +1032,7 @@ f_equal. {
   rewrite (vect_mul_scal_l_sub_distr_r Hop).
   do 4 rewrite vect_mul_scal_l_add_distr_l.
   do 4 rewrite vect_mul_scal_l_assoc.
-  unfold vect_sub.
+  progress unfold vect_sub.
   do 9 rewrite <- vect_add_assoc.
   f_equal.
   rewrite vect_add_comm.
@@ -1062,7 +1062,7 @@ f_equal. {
   rewrite vect_add_comm.
   rewrite (vect_mul_scal_l_sub_distr_r Hop).
   rewrite (rngl_mul_comm Hic).
-  unfold vect_sub.
+  progress unfold vect_sub.
   do 3 rewrite <- vect_add_assoc.
   f_equal.
   rewrite vect_add_comm; symmetry.
@@ -1095,7 +1095,7 @@ f_equal. {
   f_equal.
   rewrite (@vect_cross_mul_mul_r Hop Hic n); [ | easy | easy | easy | easy ].
   rewrite (@vect_cross_mul_mul_l Hop Hic n); [ | easy | easy | easy | easy ].
-  unfold vect_sub.
+  progress unfold vect_sub.
   do 2 rewrite <- vect_add_assoc.
   f_equal.
   apply vect_add_comm.
@@ -1125,14 +1125,14 @@ f_equal. {
   rewrite (rngl_mul_comm Hic).
   do 2 rewrite <- (vect_scal_mul_dot_mul_comm Hos).
   rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
-    unfold vect_size; cbn.
+    progress unfold vect_size; cbn.
     rewrite map2_length.
     do 2 rewrite map_length.
     do 2 rewrite fold_vect_size.
     rewrite Hv, Hu.
     apply Nat.min_id.
   } {
-    unfold vect_size; cbn.
+    progress unfold vect_size; cbn.
     now rewrite List_map_seq_length.
   }
   rewrite (vect_scal_mul_dot_mul_comm Hos).
@@ -1174,7 +1174,7 @@ f_equal. {
   rewrite (vect_mul_scal_l_sub_distr_r Hop).
   do 4 rewrite vect_mul_scal_l_add_distr_l.
   do 4 rewrite vect_mul_scal_l_assoc.
-  unfold vect_sub.
+  progress unfold vect_sub.
   do 9 rewrite <- vect_add_assoc.
   f_equal.
   rewrite vect_add_comm.
