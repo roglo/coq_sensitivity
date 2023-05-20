@@ -364,25 +364,6 @@ induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
 
-Theorem I_opt_alg_closed : let roi := I_ring_like_op in
-  if rngl_is_alg_closed then
-    ∀ l : list (ideal P), 0 < length l →
-    ∃ x : ideal P, rngl_eval_polyn l x = 0%L
-  else not_applicable.
-Proof.
-intros.
-remember rngl_is_alg_closed as ac eqn:Hac; symmetry in Hac.
-destruct ac; [ | easy ].
-intros la Hla.
-specialize rngl_opt_alg_closed as H1.
-rewrite Hac in H1.
-specialize (H1 (List_map i_val la)).
-rewrite List_map_length in H1.
-specialize (H1 Hla).
-destruct H1 as (a & Ha).
-(* peut-on prouver P a ? c'est pas gagné, faut voir... *)
-...
-
 Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
   ∀ i, i_val (rngl_of_nat i) = rngl_of_nat i.
 Proof.
@@ -584,7 +565,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
-     rngl_is_alg_closed := rngl_is_alg_closed;
+     rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
@@ -605,7 +586,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_eqb_eq := I_opt_eqb_eq;
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
-     rngl_opt_alg_closed := I_opt_alg_closed;
+     rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
