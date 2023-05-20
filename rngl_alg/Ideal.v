@@ -2,6 +2,11 @@
 
 (* ideals on a RingLike *)
 
+(* actually, an ideal on A is not guaranteed to be a sub-ring of A,
+   because it may not contain 1 (e.g. 1 ∉ 2ℤ); it is just a
+   pseudo-ring that may or may not contain the multiplicative
+   identity *)
+
 Set Nested Proofs Allowed.
 
 Require Import Utf8.
@@ -17,7 +22,7 @@ Arguments i_mem {T P} i%L.
 
 Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;
-    ip_one : P rngl_one = true;
+    ip_one : P rngl_one = true; (* not sure, actually: to be fixed *)
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
     ip_opp_or_subt :
       match rngl_opt_opp_or_subt with
@@ -39,7 +44,15 @@ Context {ip : ideal_prop P}.
 (* 0 and 1 *)
 
 Definition I_zero : ideal P := mk_I 0 ip_zero.
+(*
+Definition I_one : ideal P :=
+  match Bool.bool_dec (P 1%L) true with
+  | left ip_one => mk_I 1 ip_one
+  | right _ => I_zero
+  end.
+*)
 Definition I_one : ideal P := mk_I 1 ip_one.
+(**)
 
 (* addition *)
 
@@ -152,6 +165,15 @@ Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
 Theorem I_mul_1_l : let roi := I_ring_like_op in
   ∀ a : ideal P, (1 * a)%L = a.
+(*
+intros.
+apply eq_ideal_eq.
+cbn; unfold I_one.
+destruct (Bool.bool_dec (P 1%L) true) as [| P1]; [ apply rngl_mul_1_l | cbn ].
+apply Bool.not_true_is_false in P1.
+destruct ip.
+...
+*)
 Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
 
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
