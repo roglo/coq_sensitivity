@@ -324,18 +324,12 @@ split; intros Hab. {
   apply eq_ideal_eq in Hab.
   apply H1 in Hab.
   progress unfold rngl_eqb.
-  progress unfold rngl_has_eqb in Hebi.
-  destruct rngl_opt_eqb as [eqb| ]; [ | easy ].
-...
-progress unfold roi in Hab; cbn in Hab.
-progress unfold I_ring_like_op in Hab; cbn in Hab.
-  destruct a, b; cbn in Hab |-*.
-...
-  apply (rngl_eqb_eq Heb) in Hab.
-
-  apply eq_ideal_eq, (rngl_eqb_eq Heb).
+  progress unfold rngl_has_eqb in Hebi; cbn in Hebi.
+  progress unfold rngl_eqb in Hab.
+  progress unfold roi; cbn.
+  now destruct rngl_opt_eqb.
 }
-...
+Qed.
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
   if rngl_is_integral then
