@@ -395,6 +395,113 @@ intros * Hab Hbc.
 now apply (H1 _ (i_val b)).
 Qed.
 
+Theorem I_opt_add_le_compat : let roi := I_ring_like_op in
+  if rngl_is_ordered then
+    ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_add_le_compat as H1.
+progress unfold rngl_is_ordered in H1.
+progress unfold rngl_is_ordered.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+cbn in H1.
+intros * Hab Hbc.
+now apply (H1 _ (i_val b)).
+Qed.
+
+Theorem I_opt_mul_le_compat_nonneg : let roi := I_ring_like_op in
+  if (rngl_is_ordered && rngl_has_opp)%bool then
+    ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_mul_le_compat_nonneg as H1.
+progress unfold rngl_is_ordered, rngl_has_opp in H1.
+progress unfold rngl_is_ordered, rngl_has_opp.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ | easy ].
+cbn in H1 |-*.
+intros * Hab Hbc.
+now apply H1.
+Qed.
+
+Theorem I_opt_mul_le_compat_nonpos : let roi := I_ring_like_op in
+  if (rngl_is_ordered && rngl_has_opp)%bool then
+    ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_mul_le_compat_nonpos as H1.
+progress unfold rngl_is_ordered, rngl_has_opp in H1.
+progress unfold rngl_is_ordered, rngl_has_opp.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ | easy ].
+cbn in H1 |-*.
+intros * Hab Hbc.
+now apply H1.
+Qed.
+
+Theorem I_opt_mul_le_compat : let roi := I_ring_like_op in
+  if (rngl_is_ordered && negb rngl_has_opp)%bool then
+    ∀ a b c d : ideal P, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_mul_le_compat as H1.
+progress unfold rngl_is_ordered, rngl_has_opp in H1.
+progress unfold rngl_is_ordered, rngl_has_opp.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_opp_or_subt as [os| ]. {
+  destruct os as [opp| subt]; [ easy | ].
+  cbn in H1 |-*.
+  intros * Hab Hbc.
+  now apply H1.
+} {
+  cbn in H1 |-*.
+  intros * Hab Hbc.
+  now apply H1.
+}
+Qed.
+
+Theorem I_opt_not_le : let roi := I_ring_like_op in
+  if rngl_is_ordered then ∀ a b : ideal P, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_not_le as H1.
+progress unfold rngl_is_ordered, rngl_has_opp in H1.
+progress unfold rngl_is_ordered, rngl_has_opp.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+cbn in H1 |-*.
+intros * Hab.
+specialize (H1 (i_val a) (i_val b) Hab).
+destruct H1 as [H1| H1]; [ | now right ].
+now apply eq_ideal_eq in H1; left.
+Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
@@ -425,10 +532,10 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;
-     rngl_opt_add_le_compat := NA;
-     rngl_opt_mul_le_compat_nonneg := NA;
-     rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA |}.
+     rngl_opt_add_le_compat := I_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := I_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := I_opt_mul_le_compat;
+     rngl_opt_not_le := I_opt_not_le |}.
 
 End a.
