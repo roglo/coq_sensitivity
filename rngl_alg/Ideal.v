@@ -341,6 +341,60 @@ split. {
 }
 Qed.
 
+Theorem I_opt_le_refl : let roi := I_ring_like_op in
+  if rngl_is_ordered then ∀ a : ideal P, (a ≤ a)%L else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_le_refl as H1.
+progress unfold rngl_is_ordered in H1.
+progress unfold rngl_is_ordered.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+cbn in H1.
+intros.
+apply H1.
+Qed.
+
+Theorem I_opt_le_antisymm : let roi := I_ring_like_op in
+  if rngl_is_ordered then ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_le_antisymm as H1.
+progress unfold rngl_is_ordered in H1.
+progress unfold rngl_is_ordered.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+cbn in H1.
+intros.
+apply eq_ideal_eq.
+now apply H1.
+Qed.
+
+Theorem I_opt_le_trans : let roi := I_ring_like_op in
+  if rngl_is_ordered then ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_le_trans as H1.
+progress unfold rngl_is_ordered in H1.
+progress unfold rngl_is_ordered.
+progress unfold roi; cbn.
+progress unfold rngl_le; cbn.
+progress unfold I_opt_le.
+progress unfold rngl_le in H1.
+destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+cbn in H1.
+intros * Hab Hbc.
+now apply (H1 _ (i_val b)).
+Qed.
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
@@ -368,9 +422,9 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := I_characteristic_prop;
-     rngl_opt_le_refl := 42;
-     rngl_opt_le_antisymm := NA;
-     rngl_opt_le_trans := NA;
+     rngl_opt_le_refl := I_opt_le_refl;
+     rngl_opt_le_antisymm := I_opt_le_antisymm;
+     rngl_opt_le_trans := I_opt_le_trans;
      rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
