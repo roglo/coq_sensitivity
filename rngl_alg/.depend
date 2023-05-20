@@ -4,6 +4,8 @@ GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
 GaussIntRl.vio: GaussIntRl.v ../main/RingLike.vio
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v ../main/RingLike.vo
+Ideal.vio: Ideal.v ../main/RingLike.vio
+Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v ../main/RingLike.vo
 MatRl.vio: MatRl.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio ../main/Matrix.vio
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/Matrix.vo
 Misc.vio: Misc.v ../main/Misc.vio ../main/PermutationFun.vio
