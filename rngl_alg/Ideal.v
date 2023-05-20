@@ -82,6 +82,11 @@ Qed.
 Definition I_subt (a b : ideal P) : ideal P :=
   mk_I (rngl_subt (i_val a) (i_val b)) (I_subt_prop a b).
 
+(* computable equality eqb *)
+
+Definition I_eqb (eqb : T → T → bool) (a b : ideal P) : bool :=
+  eqb (i_val a) (i_val b).
+
 (* less equal *)
 
 Definition I_opt_le : option (ideal P → ideal P → Prop) :=
@@ -104,7 +109,11 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
        | None => None
        end;
      rngl_opt_inv_or_quot := None;
-     rngl_opt_eqb := None;
+     rngl_opt_eqb :=
+       match rngl_opt_eqb with
+       | Some eqb => Some (I_eqb eqb)
+       | None => None
+       end;
      rngl_opt_le := I_opt_le |}.
 
 (* equality in ideals is equivalent to equality in their values,
@@ -286,6 +295,47 @@ now destruct H1; [ left | right ]; apply eq_ideal_eq.
 Qed.
 ...
 *)
+
+Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
+  if rngl_has_eqb then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
+  else not_applicable.
+Proof.
+intros.
+remember rngl_has_eqb as ebi eqn:Hebi; symmetry in Hebi.
+destruct ebi; [ | easy ].
+assert (Heb : @rngl_has_eqb T ro = true). {
+  progress unfold roi in Hebi.
+  progress unfold I_ring_like_op in Hebi.
+  progress unfold rngl_has_eqb in Hebi |-*.
+  cbn in Hebi.
+  now destruct rngl_opt_eqb.
+}
+specialize (rngl_eqb_eq Heb) as H1.
+intros.
+split; intros Hab. {
+  apply eq_ideal_eq.
+  progress unfold rngl_eqb in Hab.
+  progress unfold rngl_eqb in H1.
+  cbn in Hab.
+  progress unfold rngl_has_eqb in Heb.
+  destruct rngl_opt_eqb as [eqb| ]; [ | easy ].
+  now apply H1.
+} {
+  apply eq_ideal_eq in Hab.
+  apply H1 in Hab.
+  progress unfold rngl_eqb.
+  progress unfold rngl_has_eqb in Hebi.
+  destruct rngl_opt_eqb as [eqb| ]; [ | easy ].
+...
+progress unfold roi in Hab; cbn in Hab.
+progress unfold I_ring_like_op in Hab; cbn in Hab.
+  destruct a, b; cbn in Hab |-*.
+...
+  apply (rngl_eqb_eq Heb) in Hab.
+
+  apply eq_ideal_eq, (rngl_eqb_eq Heb).
+}
+...
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
   if rngl_is_integral then
@@ -524,7 +574,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := NA;
+     rngl_opt_eqb_eq := I_opt_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
