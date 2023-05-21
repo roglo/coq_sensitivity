@@ -531,9 +531,9 @@ Fixpoint lap_eqb zero (eqb : T → _) (la lb : list T) :=
 
 Definition lap_ring_like_op : ring_like_op (list T) :=
   {| rngl_zero := [];
-     rngl_one := lap_one;
      rngl_add := lap_add;
      rngl_mul := lap_mul;
+     rngl_opt_one := Some lap_one;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
      rngl_opt_eqb := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
@@ -1139,26 +1139,28 @@ now rewrite (lap_convol_mul_const_r Hos).
 Qed.
 
 Theorem lap_mul_1_l :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   ∀ la, (1 * la)%lap = la.
 Proof.
-intros Hos *.
+intros Hon Hos *.
 unfold lap_one.
 rewrite (lap_mul_const_l Hos).
 induction la as [| a]; [ easy | cbn ].
-rewrite rngl_mul_1_l; f_equal.
+rewrite (rngl_mul_1_l Hon); f_equal.
 apply IHla.
 Qed.
 
 Theorem lap_mul_1_r :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   ∀ la, (la * 1)%lap = la.
 Proof.
-intros Hos *.
+intros Hon Hos *.
 unfold lap_one.
 rewrite (lap_mul_const_r Hos).
 induction la as [| a]; [ easy | cbn ].
-rewrite rngl_mul_1_r; f_equal.
+rewrite (rngl_mul_1_r Hon); f_equal.
 apply IHla.
 Qed.
 
@@ -1591,12 +1593,13 @@ Qed.
 (* multiplication with 1 *)
 
 Theorem lap_opt_mul_1_r :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
 Proof.
-intros Hos.
+intros Hon Hos.
 destruct rngl_mul_is_comm; [ easy | ].
-apply (lap_mul_1_r Hos).
+apply (lap_mul_1_r Hon Hos).
 Qed.
 
 (* *)
@@ -2856,7 +2859,8 @@ Qed.
 
 (* lap ring-like properties *)
 
-Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
+Definition lap_ring_like_prop
+    (Hon : rngl_has_1 = true) (Hos : rngl_has_opp_or_subt = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2868,10 +2872,10 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt = true) :
      rngl_add_assoc := lap_add_assoc;
      rngl_add_0_l := lap_add_0_l;
      rngl_mul_assoc := lap_mul_assoc Hos;
-     rngl_mul_1_l := lap_mul_1_l Hos;
+     rngl_opt_mul_1_l := lap_mul_1_l Hon Hos;
      rngl_mul_add_distr_l := lap_mul_add_distr_l Hos;
      rngl_opt_mul_comm := lap_opt_mul_comm;
-     rngl_opt_mul_1_r := lap_opt_mul_1_r Hos;
+     rngl_opt_mul_1_r := lap_opt_mul_1_r Hon Hos;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r Hos;
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := NA;

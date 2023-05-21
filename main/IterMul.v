@@ -24,6 +24,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c * f i) l a =
@@ -31,9 +32,9 @@ Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -45,9 +46,9 @@ Theorem all_1_rngl_product_1 : ∀ b e f,
 Proof.
 intros * Hz.
 apply iter_seq_all_d; [ | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -59,9 +60,9 @@ Theorem all_1_rngl_product_list_1 : ∀ A (l : list A) f,
 Proof.
 intros * Hz.
 apply iter_list_all_d; [ | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -73,9 +74,9 @@ Theorem rngl_product_split_first : ∀ b k g,
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -95,9 +96,9 @@ Theorem rngl_product_split : ∀ j g b k,
 Proof.
 intros * Hbjk.
 apply iter_seq_split; [ | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -110,9 +111,9 @@ Theorem rngl_product_split3 : ∀ j g b k,
 Proof.
 intros * Hj.
 apply iter_seq_split3; [ | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -143,7 +144,7 @@ Theorem rngl_product_list_cons : ∀ A (a : A) la f,
 Proof.
 intros.
 unfold iter_list; cbn.
-rewrite rngl_mul_1_l.
+rewrite (rngl_mul_1_l Hon).
 now apply fold_left_rngl_mul_fun_from_1.
 Qed.
 
@@ -193,7 +194,7 @@ Theorem rngl_product_list_mul_distr :
 Proof.
 intros Hic *.
 apply iter_list_distr. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
   now apply rngl_mul_comm.
 } {
@@ -209,7 +210,7 @@ Theorem rngl_product_mul_distr :
 Proof.
 intros Hic g h b k.
 apply iter_seq_distr. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
   now apply rngl_mul_comm.
 } {
@@ -263,11 +264,11 @@ Proof.
 intros Hom Hin H10 * Hz.
 induction l as [| a]; [ now apply rngl_1_neq_0_iff in Hz | ].
 unfold iter_list in Hz; cbn in Hz.
-rewrite rngl_mul_1_l in Hz.
+rewrite (rngl_mul_1_l Hon) in Hz.
 rewrite (fold_left_op_fun_from_d 1%L) in Hz; cycle 1. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -307,9 +308,9 @@ Theorem rngl_product_list_permut : ∀ {A} {eqb : A → _},
 Proof.
 intros * Heqb Hic * Hl.
 apply (iter_list_permut Heqb); [ | | | | easy ]. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   now apply rngl_mul_comm.
 } {
@@ -342,13 +343,16 @@ Theorem rngl_inv_product_list :
   → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%L.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
+assert (Hi1 : rngl_has_inv_and_1 = true). {
+  now apply rngl_has_inv_and_1_iff.
+}
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
-rewrite rngl_mul_1_l.
+rewrite (rngl_mul_1_l Hon).
 rewrite (fold_left_op_fun_from_d 1%L); cycle 1. {
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 } {
-  apply rngl_mul_1_r.
+  apply (rngl_mul_1_r Hon).
 } {
   apply rngl_mul_assoc.
 }
@@ -394,7 +398,7 @@ clear e Hlen.
 revert b Hnz.
 induction len; intros. {
   cbn.
-  do 2 rewrite rngl_mul_1_l.
+  do 2 rewrite (rngl_mul_1_l Hon).
   now rewrite Nat.add_0_r, Nat.add_sub.
 }
 symmetry.
@@ -408,7 +412,7 @@ rewrite IHlen. 2: {
   apply Hnz; flia Hi.
 }
 cbn - [ "-" ].
-do 2 rewrite rngl_mul_1_l.
+do 2 rewrite (rngl_mul_1_l Hon).
 replace (b + (b + S len) - (b + S len)) with b by flia.
 f_equal.
 replace (S (b + S (b + len)) - S b) with (S (b + len)) by flia.
@@ -504,7 +508,7 @@ revert b Hf.
 induction len; intros. {
   cbn.
   unfold iter_list; cbn.
-  rewrite rngl_mul_1_l.
+  rewrite (rngl_mul_1_l Hon).
   apply Hf; flia.
 }
 remember (S len) as x; cbn; subst x.
@@ -520,14 +524,14 @@ assert (H : ∀ i, S b ≤ i ≤ S b + len → f i = 1%L ∨ f i = (-1)%L). {
 }
 specialize (H2 H); clear H.
 destruct H1 as [H1| H1]; rewrite H1. {
-  now rewrite rngl_mul_1_l.
+  now rewrite (rngl_mul_1_l Hon).
 } {
   destruct H2 as [H2| H2]; rewrite H2; [ right | left ]. {
     rewrite rngl_mul_opp_l; [ | easy ].
-    now rewrite rngl_mul_1_l.
+    now rewrite (rngl_mul_1_l Hon).
   } {
     rewrite rngl_mul_opp_opp; [ | easy ].
-    apply rngl_mul_1_l.
+    apply (rngl_mul_1_l Hon).
   }
 }
 Qed.
@@ -537,13 +541,13 @@ Theorem rngl_product_list_only_one : ∀ A g (a : A),
 Proof.
 intros.
 unfold iter_list; cbn.
-apply rngl_mul_1_l.
+apply (rngl_mul_1_l Hon).
 Qed.
 
 Theorem rngl_product_only_one : ∀ g n, (∏ (i = n, n), g i = g n)%L.
 Proof.
 intros g n.
-apply iter_seq_only_one, rngl_mul_1_l.
+apply iter_seq_only_one, (rngl_mul_1_l Hon).
 Qed.
 
 End a.
@@ -555,6 +559,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 Theorem rngl_product_summation_distr_cart_prod :
   rngl_has_opp_or_subt = true →
@@ -578,7 +583,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ nth ].
 destruct m. {
   cbn in Hll; subst ll.
-  rewrite rngl_product_only_one.
+  rewrite (rngl_product_only_one Hon).
   rewrite fold_iter_seq'.
   cbn - [ nth ].
   rewrite Nat.sub_0_r.
@@ -588,7 +593,7 @@ destruct m. {
   now rewrite rngl_product_only_one, Nat.sub_diag.
 }
 specialize (IHm (Nat.neq_succ_0 _)).
-rewrite rngl_product_split_first; [ | now apply -> Nat.succ_le_mono ].
+rewrite rngl_product_split_first; [ | easy | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_product_shift 1); [ | flia ].
 do 2 rewrite Nat_sub_succ_1.
 rewrite IHm.
@@ -601,7 +606,7 @@ intros i Hi.
 apply rngl_summation_list_eq_compat.
 intros l Hl.
 symmetry.
-rewrite rngl_product_split_first; [ | flia ].
+rewrite rngl_product_split_first; [ | easy | flia ].
 rewrite List_nth_0_cons.
 f_equal.
 rewrite (rngl_product_shift 1); [ | flia ].
@@ -616,4 +621,4 @@ Qed.
 
 End a.
 
-Arguments rngl_product_list_permut {T ro rp A eqb} Heb Hic (la lb)%list.
+Arguments rngl_product_list_permut {T ro rp} Hon {A eqb} Heb Hic (la lb)%list.

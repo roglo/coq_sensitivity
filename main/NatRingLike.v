@@ -9,9 +9,9 @@ Require Import Misc RingLike.
 
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
-     rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
+     rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := Some (inr Nat.sub);
      rngl_opt_inv_or_quot := Some (inr Nat.div);
      rngl_opt_eqb := Some Nat.eqb;
@@ -83,7 +83,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_add_assoc := Nat.add_assoc;
      rngl_add_0_l := Nat.add_0_l;
      rngl_mul_assoc := Nat.mul_assoc;
-     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_opt_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
