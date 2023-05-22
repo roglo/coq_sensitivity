@@ -186,17 +186,11 @@ intros; apply eq_ideal_eq; cbn.
 now apply rngl_mul_comm.
 Qed.
 
-(*
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm then not_applicable else ∀ a : ideal P, (a * 1)%L = a.
-Proof.
-intros.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ easy | ].
-intros; apply eq_ideal_eq; cbn.
-apply rngl_mul_1_r.
-Qed.
-*)
+  if rngl_mul_is_comm then not_applicable
+  else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
+  else not_applicable.
+Proof. now intros; destruct rngl_mul_is_comm. Qed.
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
@@ -584,8 +578,6 @@ destruct H1 as [H1| H1]; [ | now right ].
 now apply eq_ideal_eq in H1; left.
 Qed.
 
-Check rngl_opt_mul_1_r.
-...
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -599,7 +591,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_1_l := NA;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
-     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := I_opt_add_opp_l;
      rngl_opt_add_sub := I_opt_add_sub;
