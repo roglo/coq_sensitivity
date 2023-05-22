@@ -20,6 +20,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 (*
  * three definitions of determinant
@@ -392,17 +393,17 @@ revert M Hm Hr.
 induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
-  rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
+  rewrite all_1_rngl_product_1; [ | easy | intros * Hi; flia Hi ].
   unfold ε, iter_seq, iter_list; unfold "<?"; cbn.
-  symmetry; apply rngl_mul_1_l.
+  symmetry; apply (rngl_mul_1_l Hon).
 }
 rewrite determinant_succ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_product_only_one; cbn.
-  now do 2 rewrite rngl_mul_1_r.
+  rewrite (rngl_product_only_one Hon); cbn.
+  now do 2 rewrite (rngl_mul_1_r Hon).
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -433,20 +434,20 @@ apply rngl_summation_eq_compat.
 intros k Hk.
 (* elimination of "mat_el M 1 (1 + k / (n!)" *)
 symmetry.
-rewrite rngl_product_split_first; [ | flia ].
+rewrite (rngl_product_split_first Hon); [ | flia ].
 rewrite Nat.sub_diag.
 rewrite Nat.add_1_r.
 cbn - [ canon_sym_gr_list nth ].
 remember (mat_el M 1 _) as x eqn:Hx.
-rewrite (ε_mul_comm Hop).
+rewrite (ε_mul_comm Hon Hop).
 symmetry.
 rewrite <- rngl_mul_assoc.
-rewrite (minus_one_pow_mul_comm Hop).
+rewrite (minus_one_pow_mul_comm Hon Hop).
 do 3 rewrite <- rngl_mul_assoc.
 f_equal.
 (* elimination done *)
 (* separation factors "∏" and "ε" *)
-rewrite (ε_mul_comm Hop).
+rewrite (ε_mul_comm Hon Hop).
 rewrite <- rngl_mul_assoc.
 f_equal. {
   (* equality of the two "∏" *)
@@ -493,7 +494,7 @@ symmetry.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
-apply ε_of_sym_gr_permut_succ; [ easy | ].
+apply (ε_of_sym_gr_permut_succ Hon); [ easy | ].
 apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
@@ -795,7 +796,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  rewrite <- (ε_mul_comm Hop).
+  rewrite <- (ε_mul_comm Hon Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -824,7 +825,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  rewrite <- (ε_mul_comm Hop).
+  rewrite <- (ε_mul_comm Hon Hop).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
@@ -861,7 +862,7 @@ assert (Hkn : k < fact n). {
 assert (H : i - 1 < n) by flia Hi.
 specialize (canon_sym_gr_surjective Hkn H) as Hp; clear H.
 destruct Hp as (p & Hp & Hpp).
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
+rewrite (rngl_product_split Hon (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
@@ -878,7 +879,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 rewrite rngl_add_comm.
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
+rewrite (rngl_product_split Hon (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
@@ -895,7 +896,7 @@ erewrite rngl_product_eq_compat. 2: {
 }
 rewrite rngl_add_comm.
 symmetry.
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
+rewrite (rngl_product_split Hon (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
@@ -1171,7 +1172,7 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite (rngl_product_list_permut Nat.eqb_eq) with
+  rewrite (rngl_product_list_permut Hon Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
     replace n with (length la) by now rewrite Hla, List_map_seq_length.
@@ -1290,7 +1291,7 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
-  rewrite sign_comp; [ | easy | ]. 2: {
+  rewrite (sign_comp Hon); [ | easy | ]. 2: {
     split. 2: {
       rewrite List_map_seq_length.
       unfold f.
@@ -1341,14 +1342,14 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
-  rewrite (transposition_signature Hop); [ easy | | easy | easy ].
+  rewrite (transposition_signature Hon Hop); [ easy | | easy | easy ].
   flia Hp Hq Hpq.
 }
 cbn - [ f ].
 rewrite <- rngl_mul_summation_distr_l; [ | easy ].
 rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
-rewrite rngl_mul_1_l.
+rewrite (rngl_mul_1_l Hon).
 symmetry.
 set (g := λ k, canon_sym_gr_list_inv n (f k)).
 rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
@@ -1541,7 +1542,7 @@ assert (HM : det M = (- det M)%L). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-now apply (eq_rngl_add_same_0 Hos Hii Hch) in HM.
+now apply (eq_rngl_add_same_0 Hon Hos Hii Hch) in HM.
 Qed.
 
 (* transpositions list of permutation *)
@@ -1717,7 +1718,7 @@ Theorem rngl_product_map_permut :
 Proof.
 intros Hic * Hσ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite (rngl_product_list_permut Nat.eqb_eq) with
+rewrite (rngl_product_list_permut Hon Nat.eqb_eq) with
     (lb := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
@@ -1900,15 +1901,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   replace (ε ((μ ° isort_rank Nat.leb σ) ° σ)) with
       (ε (μ ° isort_rank Nat.leb σ) * ε σ)%L. 2: {
     destruct Hσ.
-    rewrite <- sign_comp; [ easy | easy | ].
+    rewrite <- (sign_comp Hon); [ easy | easy | ].
     now rewrite comp_length, isort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
-  rewrite NoDup_ε_square; [ | easy | ]. 2: {
+  rewrite (NoDup_ε_square Hon); [ | easy | ]. 2: {
     destruct Hσ as (Hσ, _).
     now apply permut_seq_iff in Hσ.
   }
-  rewrite rngl_mul_1_r.
+  rewrite (rngl_mul_1_r Hon).
   easy.
 }
 cbn.
@@ -2124,17 +2125,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite <- Hσν at 1.
   replace (ε ((σ ° isort_rank Nat.leb μ) ° μ)) with
       (ε (σ ° isort_rank Nat.leb μ) * ε μ)%L. 2: {
-    rewrite <- sign_comp; [ easy | easy | ].
+    rewrite <- (sign_comp Hon); [ easy | easy | ].
     rewrite comp_length, isort_rank_length.
     now destruct Hpμ.
   }
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
-  rewrite NoDup_ε_square; [ | easy | ]. 2: {
+  rewrite (NoDup_ε_square Hon); [ | easy | ]. 2: {
     apply permut_seq_NoDup.
     now destruct Hpμ.
   }
-  rewrite rngl_mul_1_l.
+  rewrite (rngl_mul_1_l Hon).
   easy.
 }
 cbn.
@@ -2409,9 +2410,9 @@ induction n; intros; [ easy | ].
 rewrite determinant_succ.
 rewrite rngl_summation_split_first; [ | flia ].
 replace (minus_one_pow 2) with 1%L by easy.
-rewrite rngl_mul_1_l.
+rewrite (rngl_mul_1_l Hon).
 rewrite mat_el_mI_diag; [ | flia ].
-rewrite rngl_mul_1_l.
+rewrite (rngl_mul_1_l Hon).
 rewrite all_0_rngl_summation_0. 2: {
   intros i Hi.
   rewrite mat_el_mI_ndiag; [ | easy | flia Hi | flia Hi ].
@@ -2427,4 +2428,4 @@ Qed.
 End a.
 
 Arguments det {T ro} M%M.
-Arguments determinant_alternating {T ro rp} Hic Hop M%M [p q]%nat.
+Arguments determinant_alternating {T ro rp} Hon Hic Hop M%M [p q]%nat.
