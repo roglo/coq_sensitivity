@@ -162,9 +162,9 @@ Definition having_eucl_div :=
 
 Definition quad_int_ring_like_op d : ring_like_op (quad_int d) :=
   {| rngl_zero := @qi_zero d;
-     rngl_one := @qi_one d;
      rngl_add := @qi_add d;
      rngl_mul := @qi_mul d;
+     rngl_opt_one := Some (@qi_one d);
      rngl_opt_opp_or_subt := Some (inl (@qi_opp d));
      rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
      rngl_opt_eqb := None; (* to be improved, perhaps *)
@@ -1187,7 +1187,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_add_assoc := @quad_int_add_assoc d;
      rngl_add_0_l := @quad_int_add_0_l d;
      rngl_mul_assoc := @quad_int_mul_assoc d;
-     rngl_mul_1_l := @quad_int_mul_1_l d;
+     rngl_opt_mul_1_l := @quad_int_mul_1_l d;
      rngl_mul_add_distr_l := @quad_int_mul_add_distr_l d;
      rngl_opt_mul_comm := @quad_int_mul_comm d;
      rngl_opt_mul_1_r := NA;
@@ -1195,17 +1195,10 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_add_opp_l := @quad_int_add_opp_l d;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := quad_int_mul_div;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := quad_int_quot_mul;
-*)
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

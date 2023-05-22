@@ -11,9 +11,9 @@ Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level)
 
 Canonical Structure Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
-     rngl_one := 1%Z;
      rngl_add := Z.add;
      rngl_mul := Z.mul;
+     rngl_opt_one := Some 1%Z;
      rngl_opt_opp_or_subt := Some (inl Z.opp);
      rngl_opt_inv_or_quot := Some (inr Z.quot);
      rngl_opt_eqb := Some Z.eqb;
@@ -93,7 +93,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_add_assoc := Z.add_assoc;
      rngl_add_0_l := Z.add_0_l;
      rngl_mul_assoc := Z.mul_assoc;
-     rngl_mul_1_l := Z.mul_1_l;
+     rngl_opt_mul_1_l := Z.mul_1_l;
      rngl_mul_add_distr_l := Z.mul_add_distr_l;
      rngl_opt_mul_comm := Z.mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -101,17 +101,10 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_add_opp_l := Z.add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := Z.quot_mul;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := Z_opt_quot_mul;
-*)
      rngl_opt_eqb_eq := Z.eqb_eq;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;

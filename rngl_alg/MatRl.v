@@ -15,6 +15,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : @rngl_has_1 T ro = true).
 Context (Hop : @rngl_has_opp T ro = true).
 
 Theorem mZ_is_square_matrix : ∀ n,
@@ -110,9 +111,9 @@ Definition square_matrix_eqb eqb {n} (A B : square_matrix n T) :=
 
 Definition mat_ring_like_op eqb {n} : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
-     rngl_one := smI n;
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
+     rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some (square_matrix_eqb eqb);
@@ -353,7 +354,7 @@ Theorem squ_mat_mul_1_l :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply mat_mul_1_l; [ easy | | symmetry; apply smat_nrows ].
+apply (mat_mul_1_l Hon); [ easy | | symmetry; apply smat_nrows ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -435,7 +436,7 @@ Theorem squ_mat_mul_1_r :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply mat_mul_1_r; [ easy | | symmetry; apply smat_ncols ].
+apply (mat_mul_1_r Hon); [ easy | | symmetry; apply smat_ncols ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -716,7 +717,7 @@ Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
      rngl_add_assoc := squ_mat_add_assoc eqb;
      rngl_add_0_l := squ_mat_add_0_l eqb;
      rngl_mul_assoc := squ_mat_mul_assoc eqb;
-     rngl_mul_1_l := squ_mat_mul_1_l eqb;
+     rngl_opt_mul_1_l := squ_mat_mul_1_l eqb;
      rngl_mul_add_distr_l := squ_mat_mul_add_distr_l eqb;
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := squ_mat_mul_1_r eqb;
@@ -724,17 +725,10 @@ Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
      rngl_opt_add_opp_l := squ_mat_opt_add_opp_l eqb;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := NA;
-*)
      rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb Heq n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

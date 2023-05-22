@@ -112,9 +112,9 @@ Definition I_opt_le : option (ideal P → ideal P → Prop) :=
 
 Definition I_ring_like_op : ring_like_op (ideal P) :=
   {| rngl_zero := I_zero;
-     rngl_one := I_one;
      rngl_add := I_add;
      rngl_mul := I_mul;
+     rngl_opt_one := Some I_one;
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
@@ -174,6 +174,7 @@ apply Bool.not_true_is_false in P1.
 destruct ip.
 ...
 *)
+...
 Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
 
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in

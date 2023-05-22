@@ -4,9 +4,9 @@ Require Import Main.RingLike.
 
 Canonical Structure reals_ring_like_op : ring_like_op R :=
   {| rngl_zero := R0;
-     rngl_one := R1;
      rngl_add := Rplus;
      rngl_mul := Rmult;
+     rngl_opt_one := Some R1;
      rngl_opt_opp_or_subt := Some (inl Ropp);
      rngl_opt_inv_or_quot := Some (inl Rinv);
      rngl_opt_eqb := None;
@@ -77,7 +77,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_add_assoc := Rplus_assoc';
      rngl_add_0_l := Rplus_0_l;
      rngl_mul_assoc := Rmult_assoc';
-     rngl_mul_1_l := Rmult_1_l;
+     rngl_opt_mul_1_l := Rmult_1_l;
      rngl_mul_add_distr_l := Rmult_plus_distr_l;
      rngl_opt_mul_comm := Rmult_comm;
      rngl_opt_mul_1_r := NA;
@@ -85,17 +85,10 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_add_opp_l := Rplus_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := Rinv_l;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := NA;
-*)
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := Rmult_integral;

@@ -105,9 +105,9 @@ Definition Zn_eqb n (a b : Zn n) : bool :=
 
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;
-     rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
+     rngl_opt_one := Some (Zn_of_nat n 1);
      rngl_opt_opp_or_subt :=
        Some (inl (Zn_opp n));
      rngl_opt_inv_or_quot :=
@@ -268,7 +268,8 @@ Qed.
 
 Theorem Zn_opt_mul_inv_l :
   let roz := Zn_ring_like_op n in
-  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
+  if (rngl_has_inv && rngl_has_1)%bool then
+    ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
 intros.
@@ -321,7 +322,7 @@ Qed.
 
 Theorem Zn_opt_mul_inv_r :
   let roz := Zn_ring_like_op n in
-  if (rngl_has_inv && negb true)%bool then
+  if (rngl_has_inv && rngl_has_1 && negb true)%bool then
     ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
   else not_applicable.
 Proof.
@@ -416,7 +417,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
      rngl_mul_assoc := Zn_mul_assoc;
-     rngl_mul_1_l := Zn_mul_1_l;
+     rngl_opt_mul_1_l := Zn_mul_1_l;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
      rngl_opt_mul_comm := Zn_mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -424,17 +425,10 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_add_opp_l := Zn_add_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
-(*
-     rngl_opt_quot_mul := Zn_opt_quot_mul;
-*)
      rngl_opt_eqb_eq := Zn_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
@@ -465,9 +459,9 @@ End a.
 
 Definition lcm_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 1;
-     rngl_one := 1;
      rngl_add := Nat.lcm;
      rngl_mul := Nat.mul;
+     rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
@@ -514,7 +508,7 @@ Definition lcm_ring_like_prop :=
      rngl_add_assoc := Nat.lcm_assoc;
      rngl_add_0_l := Nat.lcm_1_l;
      rngl_mul_assoc := Nat.mul_assoc;
-     rngl_mul_1_l := Nat.mul_1_l;
+     rngl_opt_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := lcm_mul_add_distr_l;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -522,18 +516,11 @@ Definition lcm_ring_like_prop :=
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := NA;
-*)
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lcm_opt_integral;
      rngl_opt_alg_closed := NA;
