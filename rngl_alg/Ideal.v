@@ -2,11 +2,6 @@
 
 (* ideals on a RingLike *)
 
-(* actually, an ideal on A is not guaranteed to be a sub-ring of A,
-   because it may not contain 1 (e.g. 1 ∉ 2ℤ); it is just a
-   pseudo-ring that may or may not contain the multiplicative
-   identity *)
-
 Set Nested Proofs Allowed.
 
 Require Import Utf8.
@@ -22,7 +17,6 @@ Arguments i_mem {T P} i%L.
 
 Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;
-    ip_one : P rngl_one = true; (* not sure, actually: to be fixed *)
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
     ip_opp_or_subt :
       match rngl_opt_opp_or_subt with
@@ -50,9 +44,8 @@ Definition I_one : ideal P :=
   | left ip_one => mk_I 1 ip_one
   | right _ => I_zero
   end.
-*)
 Definition I_one : ideal P := mk_I 1 ip_one.
-(**)
+*)
 
 (* addition *)
 
@@ -114,7 +107,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_one := Some I_one;
+     rngl_opt_one := None;
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
@@ -163,6 +156,7 @@ Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
+(*
 Theorem I_mul_1_l : let roi := I_ring_like_op in
   ∀ a : ideal P, (1 * a)%L = a.
 (*
@@ -174,8 +168,8 @@ apply Bool.not_true_is_false in P1.
 destruct ip.
 ...
 *)
-...
 Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
+*)
 
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
@@ -192,6 +186,7 @@ intros; apply eq_ideal_eq; cbn.
 now apply rngl_mul_comm.
 Qed.
 
+(*
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable else ∀ a : ideal P, (a * 1)%L = a.
 Proof.
@@ -201,6 +196,7 @@ destruct ic; [ easy | ].
 intros; apply eq_ideal_eq; cbn.
 apply rngl_mul_1_r.
 Qed.
+*)
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
@@ -387,13 +383,16 @@ induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
 
+(*
 Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
   ∀ i, i_val (rngl_of_nat i) = rngl_of_nat i.
 Proof.
 intros.
 induction i; [ easy | now cbn; rewrite IHi ].
 Qed.
+*)
 
+(*
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if Nat.eqb rngl_characteristic 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
@@ -422,6 +421,7 @@ split. {
   now rewrite rngl_of_nat_ideal.
 }
 Qed.
+*)
 
 Theorem I_opt_le_refl : let roi := I_ring_like_op in
   if rngl_is_ordered then ∀ a : ideal P, (a ≤ a)%L else not_applicable.
@@ -584,6 +584,8 @@ destruct H1 as [H1| H1]; [ | now right ].
 now apply eq_ideal_eq in H1; left.
 Qed.
 
+Check rngl_opt_mul_1_r.
+...
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -594,10 +596,10 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
-     rngl_mul_1_l := I_mul_1_l;
+     rngl_opt_mul_1_l := NA;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
-     rngl_opt_mul_1_r := I_opt_mul_1_r;
+     rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := I_opt_add_opp_l;
      rngl_opt_add_sub := I_opt_add_sub;
@@ -610,7 +612,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := I_characteristic_prop;
+     rngl_characteristic_prop := 42;
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;

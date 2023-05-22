@@ -265,7 +265,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_mul_is_comm then ∀ a b, (a * b = b * a)%L else not_applicable;
     (* when multiplication is not commutative *)
     rngl_opt_mul_1_r :
-      if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1 = a)%L;
+      if rngl_mul_is_comm then not_applicable
+      else if rngl_has_1 then ∀ a, (a * 1 = a)%L
+      else not_applicable;
     rngl_opt_mul_add_distr_r :
       if rngl_mul_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%L;
@@ -394,8 +396,8 @@ Proof.
 intros Hon *.
 specialize rngl_opt_mul_1_l as H1.
 specialize rngl_opt_mul_1_r as H2.
+rewrite Hon in H1, H2.
 remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-rewrite Hon in H1.
 destruct ic; [ | easy ].
 now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
