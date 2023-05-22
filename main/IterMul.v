@@ -343,9 +343,6 @@ Theorem rngl_inv_product_list :
   → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%L.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
-assert (Hi1 : rngl_has_inv_and_1 = true). {
-  now apply rngl_has_inv_and_1_iff.
-}
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
 rewrite (rngl_mul_1_l Hon).
@@ -356,7 +353,7 @@ rewrite (fold_left_op_fun_from_d 1%L); cycle 1. {
 } {
   apply rngl_mul_assoc.
 }
-rewrite rngl_inv_mul_distr; [ | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
   now apply Hnz; left.
 } {
   intros H1.
