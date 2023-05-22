@@ -386,7 +386,6 @@ induction i; [ easy | now cbn; rewrite IHi ].
 Qed.
 *)
 
-(*
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if Nat.eqb rngl_characteristic 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
@@ -400,6 +399,7 @@ destruct ch. {
   apply Nat_eqb_eq in Hch.
   intros i Hi.
   apply eq_ideal_eq in Hi; cbn in Hi.
+...
   rewrite rngl_of_nat_ideal in Hi.
   cbn in characteristic_prop.
   now apply (characteristic_prop i).
