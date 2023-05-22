@@ -26,6 +26,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 Fixpoint map3 {A} f (la lb : list A) : list A :=
   match la with
@@ -521,7 +522,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     rewrite rngl_add_comm.
     rewrite IHn; [ | easy | easy ].
-    rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
+    rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon).
     f_equal.
     rewrite (rngl_summation_shift (2 ^ n)). 2: {
       split; [ flia | ].
@@ -563,7 +564,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       rewrite rngl_add_0_l.
       rewrite Nat_sub_succ_1.
-      rewrite δ_diag, rngl_mul_1_l.
+      rewrite δ_diag, (rngl_mul_1_l Hon).
       rewrite all_0_rngl_summation_0. 2: {
         intros j Hj.
         rewrite δ_ndiag; [ | flia Hj ].
@@ -668,7 +669,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       flia Hk.
     }
     rewrite Nat.add_sub.
-    rewrite δ_diag, rngl_mul_1_r.
+    rewrite δ_diag, (rngl_mul_1_r Hon).
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
@@ -684,7 +685,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite (rngl_summation_split3 i). 2: {
       split; [ easy | flia Hin ].
     }
-    rewrite δ_diag, rngl_mul_1_l.
+    rewrite δ_diag, (rngl_mul_1_l Hon).
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
@@ -769,7 +770,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       split; [ flia | cbn; flia Hkn ].
     }
     do 2 rewrite Nat.add_sub.
-    rewrite δ_diag, rngl_mul_1_r.
+    rewrite δ_diag, (rngl_mul_1_r Hon).
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj Hkn ].
@@ -827,7 +828,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite seq_nth. 2: {
       apply le_pow_succ_sub_1_lt; flia Hi.
     }
-    rewrite δ_diag, rngl_mul_1_l.
+    rewrite δ_diag, (rngl_mul_1_l Hon).
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite app_nth1. 2: {
@@ -934,7 +935,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     } {
       apply le_pow_succ_sub_1_lt; flia Hk.
     }
-    rewrite rngl_mul_add_distr_r, rngl_mul_1_l, rngl_add_comm.
+    rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon), rngl_add_comm.
     f_equal. 2: {
       f_equal; unfold δ; symmetry.
       rewrite if_eqb_eq_dec.
@@ -1030,7 +1031,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_r.
-    rewrite Nat.add_sub, δ_diag, rngl_mul_1_r.
+    rewrite Nat.add_sub, δ_diag, (rngl_mul_1_r Hon).
     unfold δ; symmetry.
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec i k) as [Hik| Hik]. {
@@ -1605,8 +1606,8 @@ destruct n. {
     apply (f_equal (rngl_mul (μ⁻¹)%L)) in Hμ.
     rewrite rngl_mul_0_r in Hμ; [ | easy ].
     rewrite rngl_mul_assoc in Hμ.
-    rewrite rngl_mul_inv_l in Hμ; [ | easy | easy ].
-    now rewrite rngl_mul_1_l in Hμ.
+    rewrite (rngl_mul_inv_l Hon) in Hμ; [ | easy | easy ].
+    now rewrite (rngl_mul_1_l Hon) in Hμ.
   }
   subst μ.
   apply vector_eq; [ | cbn; rewrite map_length; easy ].
@@ -1726,8 +1727,8 @@ rewrite mat_mul_mul_scal_l; [ | easy | easy | | | ]; cycle 1. {
 } {
   now rewrite mA_ncols, mI_nrows.
 }
-rewrite mat_mul_1_r; [ | easy | easy | symmetry; apply mA_ncols ].
-rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
+rewrite (mat_mul_1_r Hon); [ | easy | easy | symmetry; apply mA_ncols ].
+rewrite (mat_mul_1_r Hon); [ | easy | | ]; cycle 1. {
   apply mI_is_correct_matrix.
 } {
   symmetry; apply mI_ncols.
@@ -1743,9 +1744,9 @@ rewrite mat_mul_add_distr_l; [ | easy | easy | | | | ]; cycle 1. {
   rewrite mA_ncols.
   now rewrite mat_mul_scal_l_ncols, mI_ncols.
 }
-rewrite mat_mul_1_l; [ | easy | easy | symmetry; apply mA_nrows ].
-rewrite mat_mul_1_l; [ | easy | easy | easy ].
-rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
+rewrite (mat_mul_1_l Hon); [ | easy | easy | symmetry; apply mA_nrows ].
+rewrite (mat_mul_1_l Hon); [ | easy | easy | easy ].
+rewrite (mat_mul_1_r Hon); [ | easy | | ]; cycle 1. {
   now apply mat_opp_is_correct.
 } {
   unfold mat_ncols; cbn.
@@ -1785,6 +1786,9 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (μ * μ)%L = rngl_of_nat n.
 Proof.
 intros Hic Hop Heq Hin * Hvs Hvr Hav.
+assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
 specialize (Hiq (or_introl Hin)).
 move Hiq before Hin.
@@ -1915,7 +1919,7 @@ split. {
   }
   rewrite seq_app in H2.
   cbn in H2.
-  rewrite rngl_mul_1_l in H2.
+  rewrite (rngl_mul_1_l Hon) in H2.
   rewrite rngl_summation_list_cons in H2.
   rewrite all_0_rngl_summation_list_0 in H2. 2: {
     intros i Hi.
