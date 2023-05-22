@@ -1919,7 +1919,8 @@ Proof. easy. Qed.
 (* *)
 
 Record in_charac_0_field :=
-  { cf_mul_is_comm : rngl_mul_is_comm = true;
+  { cf_has_1 : rngl_has_1 = true;
+    cf_mul_is_comm : rngl_mul_is_comm = true;
     cf_has_opp : rngl_has_opp = true;
     cf_has_inv : rngl_has_inv = true;
     cf_is_integral : rngl_is_integral = true;
