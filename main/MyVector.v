@@ -161,14 +161,14 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
-  rngl_has_inv_or_quot = true →
+  rngl_has_inv_and_1_or_quot = true →
   rngl_has_eqb = true →
   ∀ (V : vector T) a b,
   V ≠ vect_zero (vect_size V)
   → (a × V = b × V)%V
   → a = b.
 Proof.
-intros Hii Heq * Hvz Habv.
+intros Hi1 Heq * Hvz Habv.
 unfold vect_mul_scal_l in Habv.
 injection Habv; clear Habv; intros Habv.
 specialize (ext_in_map Habv) as H1.
@@ -191,7 +191,7 @@ specialize (H2 H); clear H.
 remember (rngl_eqb (vect_el V i) 0%L) as vz eqn:Hvz; symmetry in Hvz.
 destruct vz; [ now apply rngl_eqb_eq | ].
 apply (rngl_eqb_neq Heq) in Hvz.
-now apply rngl_mul_cancel_r in H2.
+now apply (rngl_mul_cancel_r Hi1) in H2.
 Qed.
 
 Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
