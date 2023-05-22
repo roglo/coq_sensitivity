@@ -397,6 +397,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 
@@ -677,7 +678,7 @@ rewrite rngl_mul_0_l; [ | easy ].
 set (p1 := S (length l1)).
 set (q1 := S (length (l1 ++ a :: l2))).
 apply (determinant_same_rows) with (p := p1) (q := q1); try easy; cycle 1. {
-  unfold p1, q1.
+  progress unfold p1, q1.
   rewrite app_length; cbn; flia.
 } {
   rewrite Ha.
@@ -740,12 +741,12 @@ specialize (Hos (or_introl Hop)).
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; symmetry.
-  apply rngl_mul_1_l.
+  apply (rngl_mul_1_l Hon).
 }
-rewrite det_is_det''; [ | easy | ]. 2: {
+rewrite (det_is_det'' Hon); [ | easy | ]. 2: {
   now apply mat_select_rows_is_square.
 }
-rewrite det_is_det''; [ | easy | ]. 2: {
+rewrite (det_is_det'' Hon); [ | easy | ]. 2: {
   apply mat_select_rows_is_square; [ easy | | ]. {
     now rewrite isort_length.
   } {
@@ -813,14 +814,14 @@ rewrite (rngl_summation_list_permut Heql) with (lb := cart_prod_rep_seq n). {
   intros la Hla.
   f_equal. {
     unfold g1.
-    rewrite (sign_comp Hop). 2: {
+    rewrite (sign_comp Hon Hop). 2: {
       apply in_cart_prod_rep_seq_iff in Hla.
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
       rewrite Hnc, Hn.
       apply collapse_permut_seq_with_len.
     }
-    rewrite (ε_mul_comm Hop).
+    rewrite (ε_mul_comm Hon Hop).
     f_equal.
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
@@ -848,7 +849,7 @@ rewrite (rngl_summation_list_permut Heql) with (lb := cart_prod_rep_seq n). {
     rewrite isort_rank_length, <- Hn; flia Hi.
   }
   rewrite rngl_product_change_var with (g := g2) (h := h2); [ | easy ].
-  rewrite (rngl_product_list_permut Nat.eqb_eq)
+  rewrite (rngl_product_list_permut Hon Nat.eqb_eq)
       with (lb := seq 1 n); [ | easy | ]. {
     rewrite rngl_product_seq_product; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
@@ -1382,7 +1383,7 @@ Theorem det_is_det''' :
   → det M = det''' M.
 Proof.
 intros Hop * Hm.
-rewrite det_is_det''; [ | easy | easy ].
+rewrite (det_is_det'' Hon); [ | easy | easy ].
 unfold det'', det'''.
 unfold cart_prod_rep_seq.
 rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy ].
@@ -1561,7 +1562,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
     now rewrite List_map_seq_length.
   }
 }
-rewrite det_is_det''; [ | easy | easy ].
+rewrite (det_is_det'' Hon); [ | easy | easy ].
 unfold det''.
 rewrite mat_mul_nrows, Har.
 (*
@@ -1623,7 +1624,7 @@ specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_product_summation_distr_cart_prod; [ | easy | easy ].
+  rewrite (rngl_product_summation_distr_cart_prod Hon); [ | easy | easy ].
   remember (∑ (kl ∈ _), _) as x; subst x.
   easy.
 }
@@ -1640,7 +1641,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros kl Hkl.
-    rewrite rngl_product_mul_distr; [ | easy ].
+    rewrite (rngl_product_mul_distr Hon); [ | easy ].
     easy.
   }
   easy.
@@ -1724,7 +1725,7 @@ generalize Hl; intros H.
 apply in_cart_prod_repeat_iff in H.
 destruct H as [H| H]; [ easy | ].
 destruct H as (_ & Hlm & Hln).
-rewrite det_is_det''; [ | easy | ]. 2: {
+rewrite (det_is_det'' Hon); [ | easy | ]. 2: {
   apply mat_select_rows_is_square; [ easy | congruence | ].
   rewrite Hbr.
   intros j Hj.
@@ -1926,7 +1927,7 @@ f_equal. {
     apply seq_NoDup.
   }
   symmetry.
-  rewrite (sign_comp Hop). 2: {
+  rewrite (sign_comp Hon Hop). 2: {
     rewrite collapse_length, Hjm, <- Hkm.
     apply collapse_permut_seq_with_len.
   }
@@ -1937,7 +1938,7 @@ f_equal. {
     unfold collapse; rewrite Hsj.
     apply isort_rank_leb_seq.
   }
-  now rewrite ε_seq, rngl_mul_1_l.
+  now rewrite ε_seq, (rngl_mul_1_l Hon).
 }
 apply rngl_product_eq_compat.
 intros i Hi.
@@ -2080,7 +2081,7 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   apply length_zero_iff_nil in Har, Hbr.
   subst lla llb; cbn.
   rewrite rngl_summation_list_only_one; cbn.
-  symmetry; apply rngl_mul_1_l.
+  symmetry; apply (rngl_mul_1_l Hon).
 }
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
@@ -2149,13 +2150,14 @@ Qed.
 
 End a.
 
-Arguments Cauchy_Binet_formula {T ro rp} _ [m n]%nat.
+Arguments Cauchy_Binet_formula {T ro rp} Hon _ [m n]%nat.
 
 Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context (Hon : rngl_has_1 = true).
 
 Corollary determinant_mul : in_charac_0_field →
   ∀ [A B],
@@ -2176,7 +2178,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   cbn in *.
   apply length_zero_iff_nil in Har, Hbr.
   subst lla llb; cbn.
-  symmetry; apply rngl_mul_1_l.
+  symmetry; apply (rngl_mul_1_l Hon).
 }
 specialize (squ_mat_ncols A Hsma) as Hac.
 specialize (squ_mat_ncols B Hsmb) as Hbc.
@@ -2203,7 +2205,7 @@ specialize Cauchy_Binet_formula as H1.
 remember (mat_nrows A) as n eqn:Hn.
 rename Hn into Hra; rename Hrab into Hrb.
 symmetry in Hra, Hrb.
-specialize (H1 Hif n n A B).
+specialize (H1 Hon Hif n n A B).
 assert (H : is_correct_matrix A = true) by now apply squ_mat_is_corr.
 specialize (H1 H); clear H.
 assert (H : is_correct_matrix B = true) by now apply squ_mat_is_corr.
