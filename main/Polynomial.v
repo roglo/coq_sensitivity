@@ -259,22 +259,24 @@ apply strip_0s_length_le.
 Qed.
 
 Theorem rlap_quot_prop :
-  rngl_has_inv = true →
+  rngl_has_inv_and_1 = true →
   ∀ la lb lq lr,
   la = [] ∨ hd 0%L la ≠ 0%L
   → lb = [] ∨ hd 0%L lb ≠ 0%L
   → rlap_quot_rem la lb = (lq, lr)
   → lq = [] ∨ hd 0%L lq ≠ 0%L.
 Proof.
-intros Hiv * Ha Hb Hab.
+intros Hi1 * Ha Hb Hab.
+assert (Hon : rngl_has_1 = true) by now apply rngl_has_inv_and_1_iff in Hi1.
+assert (Hiv : rngl_has_inv = true) by now apply rngl_has_inv_and_1_iff in Hi1.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
-  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   destruct lq as [| q]; [ now left | right; cbn ].
   destruct Hb as [Hb| Hb]; [ now subst lb | ].
   destruct lb as [| b]; [ easy | cbn in Hb ].
   now specialize (H1 b).
 }
-move Hch before Hiv.
+move Hch before Hi1.
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
@@ -312,19 +314,19 @@ right.
 intros Hq.
 apply (rngl_eq_mul_0_l Hos) in Hq; [ easy | | ]. {
   apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_or_quot_iff; left.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 apply rngl_inv_neq_0; [ easy | easy | easy ].
 Qed.
 
 Theorem lap_quot_is_norm :
-  rngl_has_inv = true →
+  rngl_has_inv_and_1 = true →
   ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
   → has_polyn_prop (lap_quot la lb) = true.
 Proof.
-intros Hiv * Ha Hb.
+intros Hi1 * Ha Hb.
 unfold lap_quot.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -333,7 +335,7 @@ unfold has_polyn_prop.
 apply Bool.orb_true_iff.
 destruct rlq as [| q]; [ now left | right ].
 cbn; rewrite last_last.
-apply (rlap_quot_prop Hiv) in Hqr; cycle 1. {
+apply (rlap_quot_prop Hi1) in Hqr; cycle 1. {
   apply Bool.orb_true_iff in Ha.
   destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
   destruct la as [| a] using rev_ind. {
@@ -819,11 +821,13 @@ rewrite Nat.sub_0_r, app_length; cbn.
 now rewrite Nat.add_succ_r.
 Qed.
 
-Theorem lap_convol_mul_1_l : ∀ la i len,
+Theorem lap_convol_mul_1_l :
+  rngl_has_1 = true →
+  ∀ la i len,
   length la = i + len
   → lap_convol_mul [1%L] la i len = skipn i la.
 Proof.
-intros * Hlen.
+intros Hon * Hlen.
 rewrite (lap_convol_mul_const_l Hos); [ | easy ].
 erewrite map_ext_in. 2: {
   intros a Ha.
@@ -832,11 +836,13 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-Theorem lap_convol_mul_1_r : ∀ la i len,
+Theorem lap_convol_mul_1_r :
+  rngl_has_1 = true →
+  ∀ la i len,
   length la = i + len
   → lap_convol_mul la [1%L] i len = skipn i la.
 Proof.
-intros * Hlen.
+intros Hon * Hlen.
 rewrite (lap_convol_mul_const_r Hos); [ | easy ].
 erewrite map_ext_in. 2: {
   intros a Ha.
@@ -864,12 +870,13 @@ apply map2_rngl_add_0_r.
 Qed.
 
 Theorem lap_convol_mul_x_l :
+  rngl_has_1 = true →
   ∀ la lb i len,
   i = S (length la)
   → len = length lb
   → lap_convol_mul [0%L; 1%L] (la ++ lb) i len = lb.
 Proof.
-intros * Hi Hlen.
+intros Hon * Hi Hlen.
 revert la lb i Hi Hlen.
 induction len; intros. {
   now symmetry in Hlen; apply length_zero_iff_nil in Hlen.
@@ -882,7 +889,7 @@ f_equal. {
   rewrite (rngl_summation_split3 1); [ | flia Hi ].
   rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_l, rngl_mul_1_l.
+  rewrite rngl_add_0_l, (rngl_mul_1_l Hon).
   rewrite Hi, Nat_sub_succ_1.
   rewrite app_nth2; [ | now unfold ge ].
   rewrite Nat.sub_diag.
@@ -902,19 +909,20 @@ now f_equal.
 Qed.
 
 Theorem lap_mul_x_l :
+  rngl_has_1 = true →
   ∀ la, la ≠ [] → ([0; 1]%L * la)%lap = 0%L :: la.
 Proof.
-intros * Hla; cbn.
+intros Hon * Hla; cbn.
 destruct la as [| a]; [ easy | clear Hla ].
 rewrite rngl_summation_only_one.
 rewrite (rngl_mul_0_l Hos).
 f_equal; cbn.
 unfold iter_seq, iter_list; cbn.
 rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-rewrite rngl_add_0_l, rngl_mul_1_l.
+rewrite rngl_add_0_l, (rngl_mul_1_l Hon).
 f_equal.
 rewrite (List_cons_is_app a).
-now apply lap_convol_mul_x_l.
+now apply (lap_convol_mul_x_l Hon).
 Qed.
 
 Theorem list_nth_lap_opp :
@@ -1035,17 +1043,19 @@ Qed.
 
 Definition lap_x_power n := repeat 0%L n ++ [1%L].
 
-Theorem lap_repeat_0_app_is_mul_power_l : ∀ n la,
+Theorem lap_repeat_0_app_is_mul_power_l :
+  rngl_has_1 = true →
+  ∀ n la,
   la ≠ []
   → repeat 0%L n ++ la = (lap_x_power n * la)%lap.
 Proof.
-intros * Haz.
+intros Hon * Haz.
 revert la Haz.
 induction n; intros. {
   destruct la as [| a]; [ easy | clear Haz; cbn ].
   rewrite rngl_summation_only_one.
-  rewrite rngl_mul_1_l; f_equal.
-  now rewrite lap_convol_mul_1_l.
+  rewrite (rngl_mul_1_l Hon); f_equal.
+  now rewrite (lap_convol_mul_1_l Hon).
 }
 cbn.
 destruct la as [| a]; [ easy | clear Haz ].
@@ -1067,18 +1077,20 @@ rewrite (rngl_mul_0_l Hos); f_equal.
 apply lap_convol_mul_l_succ_l.
 Qed.
 
-Theorem lap_repeat_0_app_is_mul_power_r : ∀ n la,
+Theorem lap_repeat_0_app_is_mul_power_r :
+  rngl_has_1 = true →
+  ∀ n la,
   la ≠ []
   → repeat 0%L n ++ la = (la * lap_x_power n)%lap.
 Proof.
-intros * Haz.
+intros Hon * Haz.
 revert la Haz.
 induction n; intros. {
   destruct la as [| a]; [ easy | clear Haz; cbn ].
   rewrite Nat.sub_0_r, Nat.add_1_r; cbn.
   rewrite rngl_summation_only_one.
-  rewrite rngl_mul_1_r; f_equal.
-  now rewrite lap_convol_mul_1_r.
+  rewrite (rngl_mul_1_r Hon); f_equal.
+  now rewrite (lap_convol_mul_1_r Hon).
 }
 cbn.
 destruct la as [| a]; [ easy | clear Haz ].
@@ -1382,7 +1394,8 @@ Theorem rlap_quot_rem_step_Some :
     length rla = S (length rlr) ∧
     cq = (hd 0 rla / hd 0 rlb)%L.
 Proof.
-intros Hic Hop Hiv * Hbz Hrl.
+intros Hi1 Hop Hiv * Hbz Hrl.
+assert (Hon : rngl_has_1 = true) by now apply rngl_has_inv_and_1_iff in Hi1.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
 rewrite if_bool_if_dec in Hrl.
@@ -1392,7 +1405,8 @@ injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
 remember (a / b)%L as cq eqn:Hcq.
 move b before a.
 cbn; rewrite List_rev_repeat.
-rewrite lap_repeat_0_app_is_mul_power_l; [ | easy ].
+...
+rewrite (lap_repeat_0_app_is_mul_power_l Hon); [ | easy ].
 rewrite (lap_mul_assoc Heb Hos); cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
   now intros H; apply app_eq_nil in H.
