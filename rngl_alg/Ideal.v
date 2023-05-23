@@ -386,6 +386,7 @@ induction i; [ easy | now cbn; rewrite IHi ].
 Qed.
 *)
 
+(*
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if Nat.eqb rngl_characteristic 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
@@ -604,7 +605,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := 42;
+     rngl_characteristic_prop := NA;
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;
