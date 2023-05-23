@@ -240,10 +240,10 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
-Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
+Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
   match n with
-  | 0 => 0%L
-  | S n' => (rngl_one + rngl_of_nat n')%L
+  | 0 => a
+  | S n' => (a + rngl_mul_nat a n')%L
   end.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
@@ -318,10 +318,19 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
+(**)
+      if Nat.eqb (rngl_characteristic) 0 then
+        ∀ a, a ≠ 0%L → ∀ i, rngl_mul_nat a i ≠ 0%L
+      else
+        ∀ a, a ≠ 0%L →
+        (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat a i ≠ 0%L) ∧
+        rngl_mul_nat a rngl_characteristic = 0%L;
+(*
       if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%L
       else
         (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
         rngl_of_nat rngl_characteristic = 0%L;
+*)
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%L else not_applicable;
@@ -641,14 +650,18 @@ rewrite rngl_add_comm.
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_1_neq_0_iff : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
+Theorem rngl_1_neq_0_iff :
+  rngl_has_1 = true → rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
 Proof.
+intros Hon.
 specialize rngl_characteristic_prop as H1.
 split. {
   intros Hc.
   remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
   destruct cz. {
-    specialize (H1 0); cbn in H1.
+    specialize (H1 1%L).
+...
+    specialize (H1 1%L  0); cbn in H1.
     now rewrite rngl_add_0_r in H1.
   }
   destruct H1 as (Hbef, H1).
