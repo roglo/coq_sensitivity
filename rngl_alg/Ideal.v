@@ -38,14 +38,6 @@ Context {ip : ideal_prop P}.
 (* 0 and 1 *)
 
 Definition I_zero : ideal P := mk_I 0 ip_zero.
-(*
-Definition I_one : ideal P :=
-  match Bool.bool_dec (P 1%L) true with
-  | left ip_one => mk_I 1 ip_one
-  | right _ => I_zero
-  end.
-Definition I_one : ideal P := mk_I 1 ip_one.
-*)
 
 (* addition *)
 
@@ -155,21 +147,6 @@ Proof. intros; apply eq_ideal_eq, rngl_add_0_l. Qed.
 Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
-
-(*
-Theorem I_mul_1_l : let roi := I_ring_like_op in
-  ∀ a : ideal P, (1 * a)%L = a.
-(*
-intros.
-apply eq_ideal_eq.
-cbn; unfold I_one.
-destruct (Bool.bool_dec (P 1%L) true) as [| P1]; [ apply rngl_mul_1_l | cbn ].
-apply Bool.not_true_is_false in P1.
-destruct ip.
-...
-*)
-Proof. intros; apply eq_ideal_eq, rngl_mul_1_l. Qed.
-*)
 
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
@@ -376,47 +353,6 @@ intros.
 induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
-
-(*
-Theorem rngl_of_nat_ideal : let roi := I_ring_like_op in
-  ∀ i, i_val (rngl_of_nat i) = rngl_of_nat i.
-Proof.
-intros.
-induction i; [ easy | now cbn; rewrite IHi ].
-Qed.
-*)
-
-(*
-Theorem I_characteristic_prop : let roi := I_ring_like_op in
-  if Nat.eqb rngl_characteristic 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-  else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
-    rngl_of_nat rngl_characteristic = 0%L.
-Proof.
-intros; cbn.
-specialize rngl_characteristic_prop as characteristic_prop.
-remember (Nat.eqb rngl_characteristic 0) as ch eqn:Hch; symmetry in Hch.
-destruct ch. {
-  apply Nat_eqb_eq in Hch.
-  intros i Hi.
-  apply eq_ideal_eq in Hi; cbn in Hi.
-...
-  rewrite rngl_of_nat_ideal in Hi.
-  cbn in characteristic_prop.
-  now apply (characteristic_prop i).
-}
-destruct characteristic_prop as (H1, H2).
-split. {
-  intros i Hi H.
-  apply eq_ideal_eq in H; cbn in H.
-  apply (H1 i Hi).
-  now rewrite rngl_of_nat_ideal in H.
-} {
-  apply eq_ideal_eq; cbn.
-  now rewrite rngl_of_nat_ideal.
-}
-Qed.
-*)
 
 Theorem I_opt_le_refl : let roi := I_ring_like_op in
   if rngl_is_ordered then ∀ a : ideal P, (a ≤ a)%L else not_applicable.
