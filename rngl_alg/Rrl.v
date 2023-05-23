@@ -20,10 +20,11 @@ Proof. intros; now rewrite Rmult_assoc. Qed.
 
 Theorem Rcharacteristic_prop :
   let ror := reals_ring_like_op in
-  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
 Proof.
 intros.
-assert (H : ∀ n, rngl_of_nat n = INR n). {
+cbn - [ rngl_mul_nat ].
+assert (H : ∀ n, rngl_mul_nat R1 n = INR n). {
   intros.
   induction n; [ easy | cbn ].
   destruct n; [ apply Rplus_0_r | ].

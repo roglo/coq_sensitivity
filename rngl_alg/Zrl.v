@@ -28,16 +28,16 @@ Proof. now apply Z.eq_mul_0. Qed.
 
 Theorem Z_characteristic_prop :
   let roz := Z_ring_like_op in
-  ∀ i, rngl_of_nat (S i) ≠ 0%Z.
+  ∀ i, rngl_mul_nat 1 (S i) ≠ 0%Z.
 Proof.
 intros.
 cbn - [ Z.add ].
-assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
+assert (Hz : ∀ i, (0 <= rngl_mul_nat 1 i)%Z). {
   clear i; intros.
   cbn - [ Z.add ].
   induction i; [ easy | ].
   cbn - [ Z.add ].
-  now destruct (rngl_of_nat i).
+  now destruct (rngl_mul_nat 1%Z i).
 }
 intros H.
 specialize (Hz i).

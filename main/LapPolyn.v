@@ -147,7 +147,7 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
 
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
-  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
+  | 0 => ([], [rngl_mul_nat 1 97]) (* algo err: not enough iterations *)
   | S it' =>
       let (q, rlr) := rlap_quot_rem_step rla rlb in
       match q with
@@ -1849,13 +1849,15 @@ Qed.
 
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
-  if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-  else (∀ i : nat, 0 < i < 0 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 0 = 0%L.
+  if 0 =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+  else
+    (∀ i : nat, 0 < i < 0 → rngl_mul_nat 1 i ≠ 0%L) ∧
+    rngl_mul_nat 1 0 = 0%L.
 Proof.
 intros; subst rol.
-cbn - [ rngl_of_nat ].
+cbn - [ rngl_mul_nat ].
 intros; cbn.
-now destruct (rngl_of_nat i).
+now destruct (rngl_mul_nat 1%lap i).
 Qed.
 
 (* *)

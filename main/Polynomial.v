@@ -2029,9 +2029,9 @@ Qed.
 
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op in
-  ∀ n, rngl_of_nat n = if Nat.eq_dec n 0 then [] else [rngl_of_nat n].
+  ∀ n, rngl_mul_nat 1 n = if Nat.eq_dec n 0 then [] else [rngl_mul_nat 1 n].
 Proof.
-intros.
+intros; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 induction n; [ easy | clear Hnz; cbn ].
 destruct n; [ now cbn; rewrite rngl_add_0_r | ].
@@ -2674,9 +2674,9 @@ Qed.
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
   rngl_characteristic = 0
-  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
+  → ∀ i, i ≠ 0 → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
 Proof.
-intros rop Hch * Hiz.
+intros rop Hch * Hiz; cbn.
 subst rop.
 induction i; [ easy | clear Hiz; cbn ].
 assert (H : rngl_characteristic ≠ 1) by now rewrite Hch.
@@ -2697,9 +2697,9 @@ Qed.
 Theorem lap_polyn_rngl_of_nat_2 :
   let rop := polyn_ring_like_op in
   ∀ i, 0 < i < rngl_characteristic
-  → lap (rngl_of_nat i) = [rngl_of_nat i].
+  → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
 Proof.
-intros * Hi.
+intros * Hi; cbn.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   flia Hi Hc1.
 }
@@ -2714,9 +2714,9 @@ destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
 clear Hchz.
 destruct Hch as (Hbef, Hch).
 induction i; [ easy | cbn ].
-remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
+remember (lap (rngl_mul_nat 1%pol i)) as la eqn:Hla; symmetry in Hla.
 apply (rngl_eqb_neq Heb) in H11; rewrite H11.
-cbn - [ lap_add ].
+cbn - [ lap_add rngl_mul_nat ].
 destruct la as [| a]; cbn. {
   rewrite rngl_add_0_r, H11.
   cbn; f_equal; symmetry.
@@ -2742,7 +2742,7 @@ destruct lb as [| b]. {
     cbn in Hla.
     rewrite H11 in Hla.
     cbn - [ lap_add ] in Hla.
-    remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
+    remember (lap (rngl_mul_nat 1%pol i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]; cbn in Hla. {
       rewrite rngl_add_0_r, H11 in Hla.
       cbn in Hla.
@@ -2772,14 +2772,13 @@ Qed.
 Theorem lap_polyn_rngl_of_nat :
   let lop := lap_ring_like_op in
   let rop := polyn_ring_like_op in
-  ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
+  ∀ n, lap (rngl_mul_nat 1 n) = lap_norm (rngl_mul_nat 1 n).
 Proof.
-intros.
+intros; cbn.
 induction n; [ easy | cbn ].
-unfold polyn_one.
 rewrite IHn; cbn.
 rewrite fold_lap_norm.
-remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
+remember (@rngl_mul_nat _ lop 1%lap n) as la eqn:Hla; symmetry in Hla.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 1%L), (rngl_eqb_refl Heb); cbn.
@@ -2821,10 +2820,10 @@ Qed.
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
-  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
   else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
-    rngl_of_nat rngl_characteristic = 0%L.
+    (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
+    rngl_mul_nat 1 rngl_characteristic = 0%L.
 Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.

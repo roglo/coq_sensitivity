@@ -240,10 +240,10 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
-Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
+Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
   match n with
   | 0 => 0%L
-  | S n' => (rngl_one + rngl_of_nat n')%L
+  | S n' => (a + rngl_mul_nat a n')%L
   end.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
@@ -319,10 +319,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* characteristic *)
     rngl_characteristic_prop :
       if rngl_has_1 then
-        if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%L
+        if Nat.eqb (rngl_characteristic) 0 then
+          ∀ i, rngl_mul_nat 1%L (S i) ≠ 0%L
         else
-          (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
-          rngl_of_nat rngl_characteristic = 0%L
+          (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat 1%L i ≠ 0%L) ∧
+          rngl_mul_nat 1%L rngl_characteristic = 0%L
       else not_applicable;
     (* when ordered *)
     rngl_opt_le_refl :
@@ -1779,10 +1780,12 @@ rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
 Qed.
 
+Arguments rngl_mul_nat {T ro} a%L n%nat.
+
 Theorem eq_rngl_of_nat_0 :
   rngl_has_1 = true →
   rngl_characteristic = 0 →
-  ∀ i, rngl_of_nat i = 0%L → i = 0.
+  ∀ i, rngl_mul_nat 1 i = 0%L → i = 0.
 Proof.
 intros Hon Hch * Hi.
 induction i; [ easy | exfalso ].
@@ -1797,7 +1800,7 @@ Theorem rngl_of_nat_inj :
   rngl_has_opp_or_subt = true →
   rngl_characteristic = 0 →
   ∀ i j,
-  rngl_of_nat i = rngl_of_nat j
+  rngl_mul_nat 1 i = rngl_mul_nat 1 j
   → i = j.
 Proof.
 intros Hon Hom Hch * Hij.
@@ -1997,5 +2000,6 @@ Qed.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
+Arguments rngl_mul_nat {T ro} a%L n%nat.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
 Arguments rngl_subt {T ro} (a b)%L.

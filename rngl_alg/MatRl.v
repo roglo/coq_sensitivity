@@ -135,9 +135,9 @@ Existing Instance mat_ring_like_op.
 
 Theorem mat_ncols_of_nat eqb {n} : ∀ i,
   let rom := mat_ring_like_op eqb in
-  mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
+  mat_ncols (@sm_mat n T (rngl_mul_nat 1 i)) = n.
 Proof.
-intros.
+intros; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
 induction i; [ now apply mZ_ncols | cbn ].
 rewrite mat_add_ncols.
@@ -149,9 +149,9 @@ Theorem sm_mat_of_nat :
   ∀ eqb n,
   let rom := mat_ring_like_op eqb in
   ∀ m,
-  sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
+  sm_mat (rngl_mul_nat 1 m : square_matrix n T) = (rngl_mul_nat 1 m × mI n)%M.
 (*
-  ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
+  ∀ n m : nat, sm_mat (rngl_mul_nat 1 m) = (rngl_mul_nat 1 m × mI n)%M
 *)
 Proof.
 intros; cbn.
@@ -177,11 +177,12 @@ Theorem mat_el_of_nat_diag {n} : ∀ eqb m i,
   1 ≤ i ≤ n
   → mat_el
       (sm_mat
-         (@rngl_of_nat (square_matrix n T) (mat_ring_like_op eqb) m)) i i =
-    rngl_of_nat m.
+         (@rngl_mul_nat (square_matrix n T) (mat_ring_like_op eqb)
+            (smI _) m)) i i =
+    rngl_mul_nat 1 m.
 (*
   ∀ m i : nat, 1 ≤ i ≤ n →
-  mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+  mat_el (sm_mat (rngl_mul_nat 1 m)) i i = rngl_mul_nat 1 m
 *)
 Proof.
 intros * Hin.
@@ -202,7 +203,7 @@ Theorem rngl_of_nat_is_correct_matrix :
   ∀ eqb n,
   let rom := mat_ring_like_op eqb in
   rngl_characteristic = 0
-  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)) = true.
+  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_mul_nat 1 i)) = true.
 Proof.
 intros eqb n rom Hch *.
 apply is_scm_mat_iff.
@@ -252,7 +253,7 @@ split. {
   intros l Hl.
   subst rom.
   rewrite mat_ncols_of_nat.
-  remember (rngl_of_nat i) as M eqn:HM.
+  remember (rngl_mul_nat 1 i) as M eqn:HM.
   destruct M as (M, Hm); cbn in Hl.
   clear HM.
   apply Bool.andb_true_iff in Hm.
@@ -584,10 +585,10 @@ Theorem squ_mat_characteristic_prop :
   ∀ eqb n,
   let rom := @mat_ring_like_op eqb n in
   let ch := if n =? 0 then 1 else rngl_characteristic in
-  if ch =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  if ch =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
   else
-   (∀ i : nat, 0 < i < ch → rngl_of_nat i ≠ 0%L)
-   ∧ rngl_of_nat ch = 0%L.
+   (∀ i : nat, 0 < i < ch → rngl_mul_nat 1 i ≠ 0%L)
+   ∧ rngl_mul_nat 1 ch = 0%L.
 Proof.
 intros eqb n rom *.
 specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
@@ -633,8 +634,8 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (rngl_of_nat i)) 1 1) with
-    (@rngl_of_nat T ro i) in Hi. 2: {
+  replace (mat_el (sm_mat (rngl_mul_nat (smI _) i)) 1 1) with
+    (@rngl_mul_nat T ro 1 i) in Hi. 2: {
     symmetry.
     clear Hi.
     induction i. {

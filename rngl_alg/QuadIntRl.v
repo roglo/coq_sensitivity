@@ -807,14 +807,14 @@ Qed.
 
 Theorem quad_int_characteristic_prop :
   let ro := @quad_int_ring_like_op d in
-  ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
+  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%QI.
 Proof.
 (* proof perhaps a little bit complicated; maybe simpler proof to find *)
 intros * Hi; cbn in Hi.
 progress unfold qi_add, qi_zero in Hi.
 remember 1%QI as one eqn:Hone.
 injection Hi; clear Hi; intros H1 H2.
-remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
+remember (qi_re (rngl_mul_nat one i)) as z eqn:Hz; symmetry in Hz.
 destruct z as [| p| p]; [ now subst one | | ]. {
   rewrite Z.add_comm in H2.
   subst one; cbn in H2.
@@ -827,7 +827,7 @@ destruct z as [| p| p]; [ now subst one | | ]. {
   apply Z.nle_gt in H3; apply H3; clear H3.
   clear H1 Hz H2 p.
   induction i; [ easy | cbn ].
-  remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
+  remember (qi_re (rngl_mul_nat 1%QI i)) as z eqn:Hz; symmetry in Hz.
   destruct z as [| p| p]; [ easy | | ]. {
     apply Pos2Z.is_nonneg.
   } {

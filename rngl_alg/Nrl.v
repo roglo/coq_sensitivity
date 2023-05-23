@@ -351,7 +351,7 @@ Qed.
 
 Theorem proj1_sig_Zn_of_nat :
   let roz := Zn_ring_like_op n in
-  ∀ i, proj1_sig (rngl_of_nat i) = i mod at_least_1 n.
+  ∀ i, proj1_sig (rngl_mul_nat 1 i) = i mod at_least_1 n.
 Proof.
 intros.
 induction i. {
@@ -368,10 +368,10 @@ Qed.
 
 Theorem Zn_characteristic_prop :
   let roz := Zn_ring_like_op n in
-  if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  if at_least_1 n =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
   else
-    (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%L) ∧
-    rngl_of_nat (at_least_1 n) = 0%L.
+    (∀ i : nat, 0 < i < at_least_1 n → rngl_mul_nat 1 i ≠ 0%L) ∧
+    rngl_mul_nat 1 (at_least_1 n) = 0%L.
 Proof.
 intros.
 split. {
@@ -380,6 +380,7 @@ split. {
   specialize (@proj1_sig_Zn_of_nat i) as H1.
   subst roz.
   progress unfold Zn in H.
+  cbn - [ "mod" ] in H1.
   rewrite H in H1.
   cbn - [ "mod" ] in H1.
   symmetry in H1.
@@ -491,8 +492,8 @@ Qed.
 
 Theorem lcm_characteristic_prop :
   let rol := lcm_ring_like_op in
-  if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-  else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 1 = 0%L.
+  if 1 =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+  else (∀ i : nat, 0 < i < 1 → rngl_mul_nat 1 i ≠ 0%L) ∧ rngl_mul_nat 1 1 = 0%L.
 Proof.
 split; [ intros * Hi; flia Hi | easy ].
 Qed.

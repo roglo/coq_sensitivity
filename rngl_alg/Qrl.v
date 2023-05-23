@@ -23,16 +23,16 @@ Global Existing Instance Q_ring_like_op.
 
 Theorem Q_characteristic_prop :
   let roq := Q_ring_like_op in
-  ∀ i, rngl_of_nat (S i) ≠ 0%Q.
+  ∀ i, rngl_mul_nat 1 (S i) ≠ 0%Q.
 Proof.
 intros.
 cbn - [ Q.add ].
-assert (Hz : ∀ i, (0 ≤ rngl_of_nat i)%Q). {
+assert (Hz : ∀ i, (0 ≤ rngl_mul_nat 1 i)%Q). {
   clear i; intros.
   cbn - [ Q.add ].
   induction i; [ easy | ].
   cbn - [ Q.add ].
-  now destruct (rngl_of_nat i).
+  now destruct (rngl_mul_nat 1%Q i).
 }
 intros H.
 specialize (Hz i).
@@ -85,17 +85,10 @@ Definition Q_ring_like_prop :=
      rngl_opt_add_opp_l := Q.add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := Q.mul_inv_l;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_quot_mul := NA;
-*)
      rngl_opt_eqb_eq := Q.eqb_eq;
      rngl_opt_le_dec := Q.le_dec;
      rngl_opt_integral := NA;

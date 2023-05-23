@@ -26,7 +26,7 @@ Proof. now intros; apply Nat.eq_mul_0. Qed.
 
 Theorem nat_characteristic_prop :
   let ro := nat_ring_like_op in
-  ∀ i, rngl_of_nat (S i) ≠ 0.
+  ∀ i, rngl_mul_nat 1 (S i) ≠ 0.
 Proof. easy. Qed.
 
 Theorem Nat_mul_div :
