@@ -2471,11 +2471,11 @@ exfalso.
 apply (ε_when_dup Hop) in H1.
 rewrite H1 in Hσ.
 destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
-  revert Hσ; apply rngl_1_neq_0_iff, H10.
+  revert Hσ; apply (rngl_1_neq_0_iff Hon), H10.
 } {
   rewrite <- (rngl_opp_0 Hop) in Hσ.
   apply (rngl_opp_inj Hop) in Hσ.
-  revert Hσ; apply rngl_1_neq_0_iff, H10.
+  revert Hσ; apply (rngl_1_neq_0_iff Hon), H10.
 }
 Qed.
 

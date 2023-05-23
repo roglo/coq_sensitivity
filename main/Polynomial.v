@@ -2326,7 +2326,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   exfalso; apply lapr.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply rngl_1_neq_0_iff, (rngl_eqb_neq Heb) in Hch; rewrite Hch.
+apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Heb) in Hch; rewrite Hch.
 cbn - [ lap_mul ].
 rewrite (lap_mul_1_l Hon Hos).
 now apply (has_polyn_prop_lap_norm Heb).
@@ -2397,7 +2397,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   exfalso; apply pa.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply rngl_1_neq_0_iff, (rngl_eqb_neq Heb) in Hch; rewrite Hch.
+apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Heb) in Hch; rewrite Hch.
 cbn - [ lap_mul ].
 rewrite (lap_mul_1_r Hon Hos).
 apply (has_polyn_prop_lap_norm Heb).
@@ -2680,7 +2680,7 @@ intros rop Hch * Hiz.
 subst rop.
 induction i; [ easy | clear Hiz; cbn ].
 assert (H : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj1 rngl_1_neq_0_iff H) as H1; clear H.
+specialize (proj1 (rngl_1_neq_0_iff Hon) H) as H1; clear H.
 apply (rngl_eqb_neq Heb) in H1; rewrite H1.
 cbn - [ lap_add ].
 destruct i; [ now cbn; rewrite rngl_add_0_r, H1 | ].
@@ -2690,7 +2690,7 @@ destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
 clear IHi; exfalso.
 apply (rngl_eqb_eq Heb) in H11.
 specialize rngl_characteristic_prop as H2.
-rewrite Hch in H2; cbn in H2.
+rewrite Hon, Hch in H2; cbn in H2.
 now specialize (H2 (S i)).
 Qed.
 
@@ -2703,8 +2703,9 @@ intros * Hi.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   flia Hi Hc1.
 }
-specialize (proj1 rngl_1_neq_0_iff Hc1) as H11.
+specialize (proj1 (rngl_1_neq_0_iff Hon) Hc1) as H11.
 specialize rngl_characteristic_prop as Hch.
+rewrite Hon in Hch; cbn in Hch.
 rewrite if_bool_if_dec in Hch.
 destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
   apply Nat.eqb_eq in Hchz.
@@ -2791,7 +2792,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
-specialize (proj1 rngl_1_neq_0_iff Hc1) as H1.
+specialize (proj1 (rngl_1_neq_0_iff Hon) Hc1) as H1.
 apply (rngl_eqb_neq Heb) in H1; rewrite H1; cbn.
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app.
@@ -2827,6 +2828,7 @@ Theorem polyn_characteristic_prop :
 Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1; cbn in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   intros i.

@@ -246,7 +246,7 @@ split. {
   subst rom.
   rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
   specialize rngl_characteristic_prop as H1.
-  rewrite Hch in H1; cbn in H1.
+  rewrite Hon, Hch in H1; cbn in H1.
   now apply (H1 i).
 } {
   intros l Hl.
@@ -602,6 +602,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 apply Nat.neq_0_lt_0 in Hnz.
 specialize @rngl_characteristic_prop as H1.
 specialize (H1 T ro rp).
+rewrite Hon in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   intros i Hi.

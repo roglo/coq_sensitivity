@@ -318,10 +318,12 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
-      if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%L
-      else
-        (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
-        rngl_of_nat rngl_characteristic = 0%L;
+      if rngl_has_1 then
+        if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%L
+        else
+          (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
+          rngl_of_nat rngl_characteristic = 0%L
+      else not_applicable;
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%L else not_applicable;
@@ -641,9 +643,12 @@ rewrite rngl_add_comm.
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_1_neq_0_iff : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
+Theorem rngl_1_neq_0_iff :
+  rngl_has_1 = true → rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
 Proof.
+intros Hon.
 specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1.
 split. {
   intros Hc.
   remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
@@ -1029,7 +1034,7 @@ Theorem rngl_characteristic_1 :
 Proof.
 intros Hon Hos Hch *.
 specialize (rngl_characteristic_prop) as H1.
-rewrite Hch in H1; cbn in H1.
+rewrite Hon, Hch in H1; cbn in H1.
 destruct H1 as (_, H1).
 rewrite rngl_add_0_r in H1.
 assert (H : (x * 0)%L = x). {
@@ -1775,25 +1780,27 @@ apply rngl_add_add_swap.
 Qed.
 
 Theorem eq_rngl_of_nat_0 :
+  rngl_has_1 = true →
   rngl_characteristic = 0 →
   ∀ i, rngl_of_nat i = 0%L → i = 0.
 Proof.
-intros Hch * Hi.
+intros Hon Hch * Hi.
 induction i; [ easy | exfalso ].
 cbn in Hi.
 specialize rngl_characteristic_prop as rngl_char_prop.
-rewrite Hch in rngl_char_prop.
+rewrite Hon, Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
 
 Theorem rngl_of_nat_inj :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   rngl_characteristic = 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
   → i = j.
 Proof.
-intros Hom Hch * Hij.
+intros Hon Hom Hch * Hij.
 revert i Hij.
 induction j; intros. {
   cbn in Hij.
@@ -1893,7 +1900,7 @@ intros Hon Hos Hii Hch * Haa.
 rewrite <- (rngl_mul_1_l Hon a) in Haa.
 rewrite <- rngl_mul_add_distr_r in Haa.
 specialize rngl_characteristic_prop as char_prop.
-rewrite Hch in char_prop; cbn in char_prop.
+rewrite Hon, Hch in char_prop; cbn in char_prop.
 specialize (char_prop 1) as H1; cbn in H1.
 rewrite rngl_add_0_r in H1.
 apply (rngl_eq_mul_0_r Hos) in Haa; [ easy | | easy ].
