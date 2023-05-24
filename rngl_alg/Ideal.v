@@ -4,8 +4,8 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8.
-Require Import Main.RingLike.
+Require Import Utf8 Arith.
+Require Import Main.Misc Main.RingLike.
 
 Record ideal {T} (P : T → bool) := mk_I
   { i_val : T;
@@ -340,6 +340,33 @@ specialize (H1 _ _ Hab).
 now destruct H1; [ left | right ]; apply eq_ideal_eq.
 Qed.
 
+(*
+Theorem I_characteristic_prop : let roi := I_ring_like_op in
+  if rngl_has_1 then
+    if Nat.eqb rngl_characteristic 0 then ∀ i, rngl_mul_nat 1 (S i) ≠ 0%L
+    else
+      (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
+      rngl_mul_nat 1 rngl_characteristic = 0%L
+  else
+    ∀ k : nat,
+    (∀ a : ideal P, rngl_mul_nat a k = 0%L)
+    → ∃ m : nat, m ≠ 0 ∧ k = m * rngl_characteristic.
+Proof.
+intros; cbn.
+intros k Hk; cbn.
+specialize rngl_characteristic_prop as H1.
+cbn in H1.
+remember rngl_has_1 as on eqn:Hon; symmetry in Hon.
+destruct on. {
+  rewrite if_bool_if_dec in H1.
+  destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+    apply Nat.eqb_eq in Hcz.
+    rewrite Hcz.
+Search (_ → ideal _).
+    specialize (Hk
+...
+*)
+
 Fixpoint List_map {A B} (f : A → B) l :=
   match l with
   | nil => nil
@@ -541,7 +568,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := NA;
+     rngl_characteristic_prop := NA; (*I_characteristic_prop;*)
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;

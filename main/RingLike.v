@@ -335,7 +335,11 @@ https://en.wikipedia.org/wiki/Characteristic_(algebra)#Equivalent_characterizati
           (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat 1%L i ≠ 0%L) ∧
           rngl_mul_nat 1%L rngl_characteristic = 0%L
       else not_applicable;
-(**)
+(*
+      ∀ k : nat,
+      (∀ a : T, rngl_mul_nat a k = 0%L)
+      → ∃ m, m ≠ 0 ∧ k = m * rngl_characteristic;
+*)
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%L else not_applicable;
