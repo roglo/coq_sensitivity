@@ -320,9 +320,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_characteristic_prop :
 (*
 https://en.wikipedia.org/wiki/Characteristic_(algebra)#Equivalent_characterizations
+      ∀ k : nat,
+      (∀ a : T, rngl_mul_nat a k = 0%L)
+      → ∃ m, m ≠ 0 ∧ k = m * rngl_characteristic;
+...
       ∀ n : nat,
       (∀ a : T, rngl_mul_nat a n = 0%L)
-      → ∃ k, n = k * rngl_characteristic;
+      → ∃ k, k ≠ 0 ∧ n = k * rngl_characteristic;
 *)
       if rngl_has_1 then
         if Nat.eqb (rngl_characteristic) 0 then
@@ -656,12 +660,20 @@ Theorem rngl_1_neq_0_iff :
 Proof.
 intros Hon.
 specialize rngl_characteristic_prop as H1.
+(**)
 rewrite Hon in H1.
+(**)
 split. {
   intros Hc.
   remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
   destruct cz. {
+(**)
     specialize (H1 0); cbn in H1.
+(*
+specialize (H1 0 (λ _, eq_refl)) as H2.
+destruct H2 as (k & Hkz & Hk).
+...
+*)
     now rewrite rngl_add_0_r in H1.
   }
   destruct H1 as (Hbef, H1).
