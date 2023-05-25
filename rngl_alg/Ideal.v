@@ -99,7 +99,15 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_one := None;
+     rngl_opt_one :=
+       match rngl_opt_one  with
+       | Some one =>
+           match Bool.bool_dec (P one) true with
+           | left ip_one => Some (mk_I one ip_one)
+           | right _ => None
+           end
+       | None => None
+       end;
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
@@ -130,6 +138,12 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
+Theorem neq_ideal_neq : ∀ (a b : ideal P), i_val a ≠ i_val b ↔ a ≠ b.
+Proof.
+intros.
+now split; intros Hab H; apply Hab, eq_ideal_eq.
+Qed.
+
 (* ideal ring like prop *)
 
 Theorem I_add_comm : let roi := I_ring_like_op in
@@ -148,6 +162,33 @@ Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
+Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
+  if rngl_has_1 then ∀ a : ideal P, (1 * a)%L = a
+  else not_applicable.
+Proof.
+intros; cbn.
+remember rngl_has_1 as oni eqn:Honi; symmetry in Honi.
+destruct oni; [ | easy ].
+intros.
+apply eq_ideal_eq; cbn.
+progress unfold roi.
+progress unfold I_ring_like_op.
+progress unfold rngl_one.
+cbn.
+progress unfold rngl_has_1 in Honi.
+progress unfold roi in Honi.
+cbn in Honi.
+specialize (rngl_mul_1_l) as H2.
+progress unfold rngl_has_1 in H2.
+progress unfold rngl_one in H2.
+remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
+destruct on as [one| ]; [ | easy ].
+cbn in Honi.
+destruct (Bool.bool_dec (P one) true) as [H1| H1]; [ cbn | easy ].
+clear Honi.
+now apply H2.
+Qed.
+
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b + c))%L = (a * b + a * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_l. Qed.
@@ -163,11 +204,22 @@ intros; apply eq_ideal_eq; cbn.
 now apply rngl_mul_comm.
 Qed.
 
+(*
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
   else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
   else not_applicable.
 Proof. now intros; destruct rngl_mul_is_comm. Qed.
+*)
+
+Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
+  if rngl_mul_is_comm then not_applicable
+  else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
+  else not_applicable.
+Proof.
+intros; cbn.
+destruct rngl_mul_is_comm; [ easy | ].
+...
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
@@ -340,30 +392,42 @@ specialize (H1 _ _ Hab).
 now destruct H1; [ left | right ]; apply eq_ideal_eq.
 Qed.
 
+Theorem i_val_rngl_mul_nat : let roi := I_ring_like_op in
+  ∀ a i, i_val (rngl_mul_nat a i) = rngl_mul_nat (i_val a) i.
+Proof.
+intros.
+induction i; [ easy | cbn ].
+f_equal; apply IHi.
+Qed.
+
 (*
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if rngl_has_1 then
-    if Nat.eqb rngl_characteristic 0 then ∀ i, rngl_mul_nat 1 (S i) ≠ 0%L
-    else
-      (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
-      rngl_mul_nat 1 rngl_characteristic = 0%L
+   if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+   else
+     (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
+     rngl_mul_nat 1 rngl_characteristic = 0%L
   else
-    ∀ k : nat,
-    (∀ a : ideal P, rngl_mul_nat a k = 0%L)
-    → ∃ m : nat, m ≠ 0 ∧ k = m * rngl_characteristic.
+   if rngl_characteristic =? 0 then
+     ∀ a : ideal P, a ≠ 0%L → ∀ i : nat, rngl_mul_nat a (S i) ≠ 0%L
+   else
+     ∀ a : ideal P, a ≠ 0%L →
+     (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat a i ≠ 0%L) ∧
+     rngl_mul_nat a rngl_characteristic = 0%L.
 Proof.
 intros; cbn.
-intros k Hk; cbn.
 specialize rngl_characteristic_prop as H1.
 cbn in H1.
-remember rngl_has_1 as on eqn:Hon; symmetry in Hon.
-destruct on. {
-  rewrite if_bool_if_dec in H1.
-  destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-    apply Nat.eqb_eq in Hcz.
-    rewrite Hcz.
-Search (_ → ideal _).
-    specialize (Hk
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+  intros a Haz i.
+  apply Nat.eqb_eq in Hcz.
+  rewrite Hcz in H1; cbn in H1.
+  apply neq_ideal_neq; cbn.
+  apply neq_ideal_neq in Haz; cbn in Haz.
+  rewrite i_val_rngl_mul_nat.
+  remember rngl_has_1 as on eqn:Hon; symmetry in Hon.
+  destruct on; [ | now apply H1 ].
 ...
 *)
 
@@ -552,7 +616,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
      rngl_mul_assoc := I_mul_assoc;
-     rngl_opt_mul_1_l := NA;
+     rngl_opt_mul_1_l := I_opt_mul_1_l;
      rngl_mul_add_distr_l := I_mul_add_distr_l;
      rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := I_opt_mul_1_r;
