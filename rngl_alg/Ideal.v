@@ -204,14 +204,6 @@ intros; apply eq_ideal_eq; cbn.
 now apply rngl_mul_comm.
 Qed.
 
-(*
-Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm then not_applicable
-  else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
-  else not_applicable.
-Proof. now intros; destruct rngl_mul_is_comm. Qed.
-*)
-
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
   else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
@@ -219,7 +211,20 @@ Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
 Proof.
 intros; cbn.
 destruct rngl_mul_is_comm; [ easy | ].
-...
+progress unfold rngl_one.
+progress unfold rngl_has_1.
+specialize rngl_mul_1_r as H1.
+progress unfold rngl_has_1 in H1.
+progress unfold rngl_one in H1.
+progress unfold roi.
+cbn.
+remember rngl_opt_one as oni eqn:Honi; symmetry in Honi.
+destruct oni as [one| ]; [ cbn | easy ].
+destruct (Bool.bool_dec (P one) true) as [H2| H2]; [ cbn | easy ].
+intros.
+apply eq_ideal_eq; cbn.
+now apply H1.
+Qed.
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
@@ -400,7 +405,6 @@ induction i; [ easy | cbn ].
 f_equal; apply IHi.
 Qed.
 
-(*
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if rngl_has_1 then
    if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
@@ -417,9 +421,54 @@ Theorem I_characteristic_prop : let roi := I_ring_like_op in
 Proof.
 intros; cbn.
 specialize rngl_characteristic_prop as H1.
+progress unfold rngl_has_1; cbn.
+progress unfold rngl_has_1 in H1; cbn in H1.
+progress unfold rngl_one in H1; cbn in H1.
+progress unfold rngl_one; cbn.
+remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
+destruct on as [one| ]. {
+  cbn in H1.
+  destruct (Bool.bool_dec _ _) as [H2| H2]; cbn. {
+    rewrite if_bool_if_dec in H1 |-*.
+    destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+      intros i.
+      apply neq_ideal_neq; cbn.
+      rewrite i_val_rngl_mul_nat; cbn.
+      apply H1.
+    }
+    destruct H1 as (H1, H3).
+    split. {
+      intros i Hi.
+      apply neq_ideal_neq; cbn.
+      rewrite i_val_rngl_mul_nat; cbn.
+      now apply H1.
+    }
+    apply eq_ideal_eq; cbn.
+    now rewrite i_val_rngl_mul_nat; cbn.
+  }
+  rewrite if_bool_if_dec in H1 |-*.
+    destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+      intros a Ha *.
+      apply neq_ideal_neq; cbn.
+      rewrite i_val_rngl_mul_nat; cbn.
+...
+      apply H1.
+    }
+    destruct H1 as (H1, H3).
+    split. {
+      intros i Hi.
+      apply neq_ideal_neq; cbn.
+      rewrite i_val_rngl_mul_nat; cbn.
+      now apply H1.
+    }
+    apply eq_ideal_eq; cbn.
+    now rewrite i_val_rngl_mul_nat; cbn.
+...
+remember rngl_has_1 as on eqn:Hon.
 cbn in H1.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+...
   intros a Haz i.
   apply Nat.eqb_eq in Hcz.
   rewrite Hcz in H1; cbn in H1.
@@ -632,7 +681,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := NA; (*I_characteristic_prop;*)
+     rngl_characteristic_prop := I_characteristic_prop;
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;
