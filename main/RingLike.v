@@ -1032,7 +1032,7 @@ Theorem rngl_add_cancel_r :
   ∀ a b c, (a + c = b + c)%L → (a = b)%L.
 Proof.
 intros Hom * Habc.
-eapply rngl_sub_compat_l with (c := c) in Habc.
+apply rngl_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
