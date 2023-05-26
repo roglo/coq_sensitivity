@@ -1054,9 +1054,9 @@ rewrite <- (rngl_add_0_r 0%L).
 rewrite rngl_mul_add_distr_l.
 rewrite rngl_add_0_r.
 specialize (rngl_add_sub_same Hos (a * 0)%L) as H1.
-(*
 apply (f_equal (λ x, (x + a * 0)%L)) in H1.
-*)
+rewrite <- H1.
+...
 remember (_ - _)%L as x in H1.
 rewrite <- (rngl_add_0_r (_ * _)%L) in H1.
 subst x.
