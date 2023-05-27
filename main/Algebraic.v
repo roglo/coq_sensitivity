@@ -74,11 +74,12 @@ apply Nat.add_comm.
 Qed.
 
 Theorem lap_x_power_add :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   rngl_has_eqb = true →
   ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
 Proof.
-intros Hos Heb *.
+intros Hon Hos Heb *.
 unfold lap_x_power.
 rewrite repeat_app.
 rewrite <- app_assoc.
@@ -91,7 +92,7 @@ clear Hla b.
 revert la Ha.
 induction a; intros; cbn - [ lap_mul ]. {
   rewrite (lap_mul_const_l Hos).
-  erewrite map_ext_in; [ | intros; apply rngl_mul_1_l ].
+  erewrite map_ext_in; [ | intros; apply (rngl_mul_1_l Hon) ].
   now rewrite map_id.
 }
 rewrite IHa; [ | easy ].
@@ -104,23 +105,24 @@ assert (Ha : la ≠ []). {
 }
 clear a Hla IHa.
 move Hb after Ha.
-rewrite <- (lap_mul_x_l Hos). 2: {
+rewrite <- (lap_mul_x_l Hos Hon). 2: {
   intros Hab.
   apply eq_lap_mul_0 in Hab.
   now destruct Hab.
 }
 symmetry.
-rewrite <- (lap_mul_x_l Hos); [ | easy ].
+rewrite <- (lap_mul_x_l Hos Hon); [ | easy ].
 symmetry.
 apply (lap_mul_assoc Heb Hos).
 Qed.
 
 Theorem lap_x_power_has_polyn_prop :
+  rngl_has_1 = true →
   rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
   ∀ n, has_polyn_prop (lap_x_power n) = true.
 Proof.
-intros Hch Heb *.
+intros Hon Hch Heb *.
 apply Bool.orb_true_iff.
 right.
 destruct n; cbn. {
@@ -137,23 +139,25 @@ now apply rngl_1_neq_0_iff.
 Qed.
 
 Theorem lap_norm_x_power :
+  rngl_has_1 = true →
   rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
   ∀ n, lap_norm (lap_x_power n) = lap_x_power n.
 Proof.
-intros Hch Heb *.
+intros Hon Hch Heb *.
 apply (has_polyn_prop_lap_norm Heb).
-apply (lap_x_power_has_polyn_prop Hch Heb).
+apply (lap_x_power_has_polyn_prop Hon Hch Heb).
 Qed.
 
 Theorem polyn_x_power_add :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   rngl_has_eqb = true →
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
-intros Hos Heb *.
+intros Hon Hos Heb *.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
-  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq.
   apply (eq_list_eq 0%L). 2: {
     intros i Hi.
@@ -170,11 +174,12 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
 }
 apply eq_polyn_eq; cbn.
 f_equal.
-rewrite (lap_x_power_add Hos Heb).
-now do 2 rewrite (lap_norm_x_power Hch Heb).
+rewrite (lap_x_power_add Hon Hos Heb).
+now do 2 rewrite (lap_norm_x_power Hon Hch Heb).
 Qed.
 
 Theorem lap_norm_mul_x_power_r :
+  rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
@@ -182,12 +187,12 @@ Theorem lap_norm_mul_x_power_r :
   ∀ la n,
   lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
 Proof.
-intros Hos Hiv Hch Heb *.
+intros Hon Hos Hiv Hch Heb *.
 rewrite <- (lap_mul_norm_idemp_l Hos Heb).
-rewrite (lap_norm_mul Hos Heb Hiv); [ easy | | ]. {
+rewrite (lap_norm_mul Hos Heb Hon Hiv); [ easy | | ]. {
   apply polyn_norm_prop.
 }
-apply (lap_x_power_has_polyn_prop Hch Heb).
+apply (lap_x_power_has_polyn_prop Hon Hch Heb).
 Qed.
 
 Theorem polyn_of_const_add :
@@ -230,7 +235,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 Qed.
 
 Theorem polyn_of_const_mul :
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true →
   ∀ (Hos : rngl_has_opp_or_subt = true),
   ∀ (Heb : rngl_has_eqb = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
@@ -269,13 +274,14 @@ congruence.
 Qed.
 
 Theorem polyn_of_const_rngl_summation :
+  rngl_has_1 = true →
   ∀ (Hos : rngl_has_opp_or_subt = true),
   ∀ (Heb : rngl_has_eqb = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ b e f,
   polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
 Proof.
-intros.
+intros Hon *.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
 clear e Hn.
@@ -288,7 +294,7 @@ induction n; intros. {
 }
 rewrite seq_S.
 rewrite rngl_summation_list_app.
-set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
 rewrite rngl_summation_list_app.
 rewrite (polyn_of_const_add Hos Heb).
 rewrite IHn.
@@ -389,25 +395,27 @@ Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
 *)
 
 Theorem polyn_of_const_minus_one_pow :
+  rngl_has_1 = true →
   ∀ (Hop : rngl_has_opp = true),
   ∀ (Heb : rngl_has_eqb = true),
   ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
-intros.
+intros Hon *.
+assert (Honp : @rngl_has_1 _ rop = true) by easy.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop) in rop.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
-  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq; cbn.
   rewrite (H1 (minus_one_pow n)).
   rewrite (rngl_eqb_refl Heb); cbn.
   specialize @polyn_characteristic_prop as H2.
-  set (rpp := @polyn_ring_like_prop T ro rp Hos Heb).
+  set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
   specialize (H2 (polyn T) rop rpp).
   assert (Hosp : @rngl_has_opp_or_subt (polyn T) rop = true). {
     now specialize (polyn_has_opp_or_subt Hop Heb) as H3.
   }
-  specialize (H2 Hosp).
+  specialize (H2 Honp Hosp).
   assert (Hebp : @rngl_has_eqb (polyn T) rop = true) by easy.
   specialize (H2 Hebp).
   cbn in H2.
@@ -498,6 +506,7 @@ now rewrite Hos' in Hsu.
 Qed.
 
 Theorem det_polyn_of_const :
+  rngl_has_1 = true →
   (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic ≠ 1 →
   ∀ (Hop : rngl_has_opp = true),
@@ -507,7 +516,7 @@ Theorem det_polyn_of_const :
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
-intros Hii Hch *; cbn.
+intros Hon Hii Hch *; cbn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 replace rop with (polyn_ring_like_op Hos Heb). 2: {
   subst rop.
@@ -529,14 +538,22 @@ assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
   now destruct os.
 }
 rewrite map_length.
-(**)
 remember (length ll) as len eqn:Hlen; symmetry in Hlen.
 revert ll Hlen.
 induction len; intros; [ easy | ].
 cbn - [ rngl_zero rngl_add ].
-rewrite (polyn_of_const_rngl_summation Hos Heb).
+rewrite (polyn_of_const_rngl_summation Hon Hos Heb).
 apply rngl_summation_eq_compat.
 intros i Hi.
+assert (Hi1 : (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true). {
+  apply Bool.orb_true_iff in Hii.
+  apply Bool.orb_true_iff.
+  destruct Hii as [Hii | Hii]; [ now left | right ].
+  apply rngl_has_inv_or_quot_iff in Hii.
+  apply rngl_has_inv_and_1_or_quot_iff.
+...
+  destruct Hii; [ | right ].
+...
 rewrite (polyn_of_const_mul Hii Hos Heb).
 rewrite (polyn_of_const_mul Hii Hos Heb).
 rewrite (List_map_nth' []); [ | now rewrite Hlen ].
@@ -593,6 +610,7 @@ Theorem lap_bezout_is_resultant : in_charac_0_field →
   → lap_norm (U * P + V * Q)%lap = lap_norm [lap_resultant P Q].
 Proof.
 intros Hif * H2p H2q Hbr.
+clear Hon.
 unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
@@ -612,7 +630,7 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   apply (cf_has_opp Hif).
 }
 set (rop := polyn_ring_like_op Hos (cf_has_eqb Hif)).
-set (rpp := @polyn_ring_like_prop T ro rp Hos (cf_has_eqb Hif)).
+set (rpp := @polyn_ring_like_prop T ro rp Hon Hos (cf_has_eqb Hif)).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
