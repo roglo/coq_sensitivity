@@ -2999,9 +2999,12 @@ rewrite Hab, Nat.sub_diag in H2.
 now do 2 rewrite app_nil_r in H2.
 Qed.
 
+Arguments rngl_has_opp T {R}.
+Arguments rngl_has_subt T {R}.
+
 Theorem rngl_has_opp_rngl_polyn_has_opp :
   let rop := polyn_ring_like_op in
-  @rngl_has_opp T ro = @rngl_has_opp (polyn T) rop.
+  rngl_has_opp T = rngl_has_opp (polyn T).
 Proof.
 intros.
 unfold rngl_has_opp; cbn.
@@ -3010,10 +3013,9 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
-(**)
 Theorem rngl_has_subt_rngl_polyn_has_subt :
   let rop := polyn_ring_like_op in
-  @rngl_has_subt T ro = @rngl_has_subt (polyn T) rop.
+  rngl_has_subt T = rngl_has_subt (polyn T).
 Proof.
 intros.
 unfold rngl_has_subt; cbn.
@@ -3021,16 +3023,14 @@ unfold polyn_opt_opp_or_subt.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
-(**)
 
-(**)
 Theorem polyn_opt_add_sub :
   let rop := polyn_ring_like_op in
-  if rngl_has_subt then ∀ a b : polyn T, (a + b - b)%L = a
+  if rngl_has_subt (polyn T) then ∀ a b : polyn T, (a + b - b)%L = a
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_subt as su eqn:Hsup; symmetry in Hsup.
+remember (rngl_has_subt (polyn T)) as su eqn:Hsup; symmetry in Hsup.
 destruct su; [ | easy ].
 specialize (rngl_has_subt_has_no_opp Hsup) as Hopp.
 specialize rngl_has_opp_rngl_polyn_has_opp as Hop; cbn in Hop.
@@ -3072,14 +3072,14 @@ Qed.
 
 (* *)
 
-(**)
 Theorem polyn_opt_sub_add_distr :
   let rop := polyn_ring_like_op in
-  if rngl_has_subt then ∀ a b c : polyn T, (a - (b + c))%L = (a - b - c)%L
+  if rngl_has_subt (polyn T) then
+    ∀ a b c : polyn T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_subt as su eqn:Hsup; symmetry in Hsup.
+remember (rngl_has_subt (polyn T)) as su eqn:Hsup; symmetry in Hsup.
 destruct su; [ | easy ].
 specialize (rngl_has_subt_has_no_opp Hsup) as Hopp.
 specialize rngl_has_opp_rngl_polyn_has_opp as Hop; cbn in Hop.
