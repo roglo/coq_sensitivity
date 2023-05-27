@@ -448,9 +448,14 @@ destruct on as [one| ]. {
   }
   rewrite if_bool_if_dec in H1 |-*.
     destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+      apply Nat.eqb_eq in Hcz.
       intros a Ha *.
       apply neq_ideal_neq; cbn.
       rewrite i_val_rngl_mul_nat; cbn.
+      apply neq_ideal_neq in Ha; cbn in Ha.
+      apply Bool.not_true_iff_false in H2.
+...
+Set Printing All.
 ...
       apply H1.
     }
