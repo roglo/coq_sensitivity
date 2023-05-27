@@ -77,6 +77,9 @@ ou
 
 3 → [(1, 5); (2, 3); (4, 6)]
 
+parce que ça permettrait de générer des octonions dont la multiplication
+serait bien alternative.
+
 ...
 
 (* incorrect definition ; the multiplication of my "octonions"
