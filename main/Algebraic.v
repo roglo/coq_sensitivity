@@ -545,23 +545,25 @@ cbn - [ rngl_zero rngl_add ].
 rewrite (polyn_of_const_rngl_summation Hon Hos Heb).
 apply rngl_summation_eq_compat.
 intros i Hi.
-assert (Hi1 : (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true). {
+assert
+  (Hi1 :
+    (@rngl_is_integral T ro rp ||
+     @rngl_has_inv_and_1_or_quot T ro)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii | Hii]; [ now left | right ].
   apply rngl_has_inv_or_quot_iff in Hii.
   apply rngl_has_inv_and_1_or_quot_iff.
-...
-  destruct Hii; [ | right ].
-...
-rewrite (polyn_of_const_mul Hii Hos Heb).
-rewrite (polyn_of_const_mul Hii Hos Heb).
+  now destruct Hii; [ left | right ].
+}
+rewrite (polyn_of_const_mul Hi1 Hos Heb).
+rewrite (polyn_of_const_mul Hi1 Hos Heb).
 rewrite (List_map_nth' []); [ | now rewrite Hlen ].
 rewrite <- List_hd_nth_0; cbn.
 do 2 rewrite <- (polyn_mul_assoc Hos Heb).
 f_equal. {
   symmetry.
-  apply (polyn_of_const_minus_one_pow Hop Heb).
+  apply (polyn_of_const_minus_one_pow Hon Hop Heb).
 }
 f_equal. {
   destruct (lt_dec (i - 1) (length (hd [] ll))) as [Hil| Hil]. {
@@ -610,7 +612,6 @@ Theorem lap_bezout_is_resultant : in_charac_0_field →
   → lap_norm (U * P + V * Q)%lap = lap_norm [lap_resultant P Q].
 Proof.
 intros Hif * H2p H2q Hbr.
-clear Hon.
 unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
@@ -629,12 +630,14 @@ assert (Hos : rngl_has_opp_or_subt = true). {
   apply rngl_has_opp_or_subt_iff; left.
   apply (cf_has_opp Hif).
 }
-set (rop := polyn_ring_like_op Hos (cf_has_eqb Hif)).
-set (rpp := @polyn_ring_like_prop T ro rp Hon Hos (cf_has_eqb Hif)).
+assert (Hon : rngl_has_1 = true) by apply (cf_has_1 Hif).
+assert (Heb : rngl_has_eqb = true) by apply (cf_has_eqb Hif).
+set (rop := polyn_ring_like_op Hos Heb).
+set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
-destruct H as (Hic, Hop, Hin, Hit, Heb, Hch).
+destruct H as (_, Hic, Hop, Hin, Hit, _, Hch).
 assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   unfold rngl_has_opp; cbn.
   unfold polyn_opt_opp_or_subt.
@@ -642,7 +645,7 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
   now destruct s.
 }
-specialize (Hcr Hopp Hic Hch).
+specialize (Hcr eq_refl Hopp Hic Hch).
 assert (Hiq : @rngl_has_inv_or_quot T ro = true). {
   apply rngl_has_inv_or_quot_iff.
   now rewrite Hin; left.
@@ -886,7 +889,7 @@ assert (H : (sm • u)%V = v). {
       rewrite <- Hn'.
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
-      rewrite (polyn_x_power_add Hos Heb).
+      rewrite (polyn_x_power_add Hon Hos Heb).
       replace polyn_mul with rngl_mul by easy.
       rewrite <- rngl_mul_assoc.
       easy.
@@ -952,7 +955,7 @@ assert (H : (sm • u)%V = v). {
     cbn - [ rngl_zero rngl_add lap_norm ].
     clear H2p.
 (**)
-    clear - rp Hos Heb.
+    clear - rp Hon Hos Heb.
     induction P as [| a la ]; [ easy | ].
     cbn - [ rngl_zero rngl_add lap_norm nth ].
     rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
@@ -975,7 +978,7 @@ assert (H : (sm • u)%V = v). {
       intros i Hi.
       rewrite <- Nat.add_sub_assoc; [ | easy ].
       rewrite List_nth_succ_cons.
-      rewrite (lap_x_power_add Hos Heb).
+      rewrite (lap_x_power_add Hon Hos Heb).
       unfold lap_x_power at 1.
       cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
       rewrite <- (lap_mul_assoc Heb Hos).
@@ -984,7 +987,7 @@ assert (H : (sm • u)%V = v). {
     remember (λ j, _) as x in |-*; subst x.
     cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
     rewrite (lap_mul_const_l Hos).
-    erewrite map_ext_in; [ | now intros; rewrite rngl_mul_1_l ].
+    erewrite map_ext_in; [ | now intros; rewrite (rngl_mul_1_l Hon) ].
     rewrite map_id.
     (* cannot apply rngl_mul_summation_list_distr because it requires
        rngl_has_opp_or_subt, which is false on laps *)
@@ -993,8 +996,7 @@ assert (H : (sm • u)%V = v). {
        a lemma *)
     replace (@lap_mul T ro) with (@rngl_mul (list T) (@lap_ring_like_op T ro))
       by easy.
-    set (rpl := @lap_ring_like_prop T ro rp Heb Hos).
-    (**)
+    set (rpl := @lap_ring_like_prop T ro rp Heb Hon Hos).
     specialize mul_iter_list_distr_l_test as H1.
     specialize (H1 (list T) nat).
     specialize (H1 (@rngl_zero _ lap_ring_like_op)).
@@ -1035,7 +1037,7 @@ assert (H : (sm • u)%V = v). {
     rewrite (lap_add_norm_idemp_l Heb).
     (**)
     f_equal.
-    apply (lap_cons Hos).
+    apply (lap_cons Hon Hos).
   }
   f_equal; [ now apply (H P Q) | now rewrite Nat.add_comm; apply (H Q P) ].
 }
@@ -1075,6 +1077,7 @@ assert
   intros i Hi.
   rewrite <- Hcr; [ | easy ].
   unfold polyn_mul; cbn.
+...
   rewrite lap_norm_x_power; [ easy | now rewrite Hch | easy ].
 }
 clear Hcr; rename H into Hcr.
