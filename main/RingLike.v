@@ -961,10 +961,23 @@ Theorem rngl_mul_cancel_l :
   → b = c.
 Proof.
 intros Hii * Haz Habc.
+(*
+clear Hii.
+*)
 remember rngl_has_inv as iv eqn:Hiv.
 symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 = true). {
+(*
+progress unfold rngl_has_inv in Hiv.
+progress unfold rngl_has_1.
+remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ clear Hiv | easy ].
+remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
+destruct on; [ easy | ].
+...
+*)
     apply rngl_has_inv_and_1_or_quot_iff in Hii.
     destruct Hii as [| Hii]; [ easy | ].
     apply rngl_has_quot_has_no_inv in Hii.
