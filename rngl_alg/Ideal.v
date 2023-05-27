@@ -456,7 +456,7 @@ destruct on as [one| ]. {
       apply Bool.not_true_iff_false in H2.
       specialize (H1 i) as H3.
       intros H4; apply H3; clear H3.
-      apply rngl_mul_cancel_l with (a := i_val a).
+      apply rngl_mul_cancel_l with (a := i_val a); [ | easy | ].
 Search (_ * _ = _ * _)%L.
 ...
 Set Printing All.
