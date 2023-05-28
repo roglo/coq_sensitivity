@@ -273,16 +273,20 @@ destruct (Sumbool.sumbool_of_bool _); [ | easy ].
 congruence.
 Qed.
 
+Arguments in_charac_0_field T {ro rp}.
 Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
 Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
+Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
+Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_and_1_or_quot T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_is_integral T {ro ring_like_prop}.
+Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 
 Theorem polyn_of_const_rngl_summation :
   rngl_has_1 T = true →
@@ -415,7 +419,7 @@ Proof.
 intros Hon *.
 assert (Honp : rngl_has_1 (polyn T) = true) by easy.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop) in rop.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq; cbn.
   rewrite (H1 (minus_one_pow n)).
@@ -518,7 +522,7 @@ Qed.
 Theorem det_polyn_of_const :
   rngl_has_1 T = true →
   (rngl_is_integral T || rngl_has_inv_or_quot T)%bool = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Heb),
@@ -612,7 +616,7 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
      let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
      (minus_one_pow (m + n + i + 1) * (repeat 0%L j ++ [det s']))%lap).
 
-Theorem lap_bezout_is_resultant : in_charac_0_field →
+Theorem lap_bezout_is_resultant : in_charac_0_field T →
   ∀ (P Q U V : list T),
   2 ≤ length P
   → 2 ≤ length Q
