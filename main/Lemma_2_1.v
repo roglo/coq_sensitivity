@@ -1102,7 +1102,7 @@ assert
     now apply Nat.eqb_neq in Hnz; rewrite Hnz.
   }
 (* here I am waiting for me to have implemented:
-   - polynomials
+   - polynomials → ok
    - characteristic polynomials
    - proof that all polynomials of degree n have n roots
    - building eigenvalues and eigenvectors
