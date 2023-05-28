@@ -1,0 +1,44 @@
+4 cordes à mon arc, où il faudrait que j'avance :
+- les quaternions :
+  * j'avais inventé un système pour définir les n-nions, un truc général qui
+    donne :
+    1/ les complexes si n=2
+    2/ les quaternions si n=4
+    3/ les octonions si n=8
+    etc.
+      Ça marche, sauf que la multiplication de mes octonions n'est
+    pas alternative (a * (a * b) = (a * a) * b), alors que la définition
+    standard l'est. Ma formule n'est donc pas géniale.
+      La multiplication de mon système marche bien, elle est générale.
+    Elle suppose la définition du produit vectoriel en toutes dimensions
+    alors qu'elle n'est censée être "bonne" qu'en dimensions 3 et 7,
+    permettant de définir les quaternions et les octonions.
+      Je cherche donc une formule ; y a ça indiqué dans mon code.
+- les idéaux :
+  * faits, mais
+    1/ problème de définition de la caractéristique si on est dans un
+       pseudo-anneau, car dans un idéal, on n'a pas forcément 1 (élément
+       neutre de la multiplication).
+    2/ savoir quel théorème serait intéressant et rigolo à démontrer ;
+       selon Aymeric, faut que je regarde les idéaux principaux ; mais
+       il semble qu'il faille faire des polynômes ; je pourrais le
+       faire, j'en ai, mais ils sont pas complèment au point : il
+       faudrait par exemple, que je n'impose pas qu'ils aient forcément
+       un 1.
+    3/ faudrait que je fasse un ou des exemples d'idéaux (des algèbres)
+       parce que, pour l'instant, c'est que de la théorie ; et, par
+       pitié, pas seulement sur ℤ, car ses idéaux sont tous de la forme
+       nZ, ce qui n'est pas très intéressant.
+- les nombres algébriques :
+  * bloqué sur la preuve que la somme de deux algébriques (et le produit)
+    est algébrique ; y a un truc à finir ; bloqué sur un cas de déterminant
+    de machin-truc est nul ;
+  * une fois ces preuves faites, ça n'ira pas forcément très loin parce
+    que j'ai décidé de les définir sans utiliser les nombres réels, et
+    donc je ne sais pas comment représenter un nombre algébrique : il
+    faut, certes, un polynôme, mais il faut aussi une numérotation de
+    ses racines et un algorithme trouvant ce numéro pour une somme et
+    pour un produit d'algébriques.
+- le théorème de sensibilité
+  * je me balade avec le quotient de Rayleigh, où il faut que je démontre
+    chais plus quoi pour démonter chais plus quoi d'autre.
