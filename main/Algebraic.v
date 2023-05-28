@@ -274,6 +274,7 @@ congruence.
 Qed.
 
 Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
+Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv_and_1_or_quot T {R}.
@@ -287,7 +288,7 @@ Theorem polyn_of_const_rngl_summation :
   rngl_has_1 T = true →
   ∀ (Hos : rngl_has_opp_or_subt T = true),
   ∀ (Heb : rngl_has_eqb T = true),
-  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ (rop := polyn_ring_like_op T Hos Heb),
   ∀ b e f,
   polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
 Proof.
@@ -344,7 +345,7 @@ Theorem polyn_has_opp_or_subt :
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Heb : rngl_has_eqb T = true),
   ∀ (Hos := rngl_has_opp_has_opp_or_subt Hop),
-  ∀ (rop := polyn_ring_like_op Hos Heb),
+  ∀ (rop := polyn_ring_like_op T Hos Heb),
   rngl_has_opp_or_subt (polyn T) = true.
 Proof.
 intros.
@@ -408,7 +409,7 @@ Theorem polyn_of_const_minus_one_pow :
   rngl_has_1 T = true →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Heb : rngl_has_eqb T = true),
-  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
+  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
 intros Hon *.
@@ -520,14 +521,14 @@ Theorem det_polyn_of_const :
   rngl_characteristic ≠ 1 →
   ∀ (Hop : rngl_has_opp T = true),
   ∀ (Heb : rngl_has_eqb T = true),
-  ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
+  ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ (ll : list (list T)),
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hon Hii Hch *; cbn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-replace rop with (polyn_ring_like_op Hos Heb). 2: {
+replace rop with (polyn_ring_like_op T Hos Heb). 2: {
   subst rop.
   unfold polyn_ring_like_op; cbn.
   f_equal.
@@ -537,7 +538,7 @@ replace rop with (polyn_ring_like_op Hos Heb). 2: {
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }
 subst rop.
-set (rop := polyn_ring_like_op Hos Heb).
+set (rop := polyn_ring_like_op T Hos Heb).
 assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
   unfold rngl_has_opp_or_subt; cbn.
   unfold polyn_opt_opp_or_subt.
@@ -638,7 +639,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 }
 assert (Hon : rngl_has_1 T = true) by apply (cf_has_1 Hif).
 assert (Heb : rngl_has_eqb T = true) by apply (cf_has_eqb Hif).
-set (rop := polyn_ring_like_op Hos Heb).
+set (rop := polyn_ring_like_op T Hos Heb).
 set (rpp := polyn_ring_like_prop T Hon Hos Heb).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
@@ -1083,8 +1084,7 @@ assert
   intros i Hi.
   rewrite <- Hcr; [ | easy ].
   unfold polyn_mul; cbn.
-...
-  rewrite lap_norm_x_power; [ easy | now rewrite Hch | easy ].
+  rewrite lap_norm_x_power; [ easy | easy | now rewrite Hch | easy ].
 }
 clear Hcr; rename H into Hcr.
 assert
@@ -1096,7 +1096,7 @@ assert
   unfold polyn_norm in Hcr.
   apply (f_equal (λ p, lap p)) in Hcr.
   cbn - [ det ] in Hcr.
-  rewrite (lap_norm_mul_x_power_r Hos Hin) in Hcr; [ | | easy ]. 2: {
+  rewrite (lap_norm_mul_x_power_r Hon Hos Hin) in Hcr; [ | | easy ]. 2: {
     now rewrite Hch.
   }
   easy.
@@ -1106,7 +1106,7 @@ assert (Hdm : det sm = polyn_of_const (det (mk_mat ll))). {
   rewrite Hsm.
   specialize det_polyn_of_const as H1.
   rewrite Hiq, Bool.orb_comm in H1.
-  specialize (H1 eq_refl).
+  specialize (H1 Hon eq_refl).
   rewrite Hch in H1.
   specialize (H1 (Nat.neq_0_succ _) Hop Heb).
   cbn - [ det ] in H1.
