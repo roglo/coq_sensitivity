@@ -13,7 +13,8 @@
       La multiplication de mon système marche bien, elle est générale.
     Elle suppose la définition du produit vectoriel en toutes dimensions
     alors qu'elle n'est censée être "bonne" qu'en dimensions 3 et 7,
-    permettant de définir les quaternions et les octonions.
+    permettant de définir pour ces cas-là les quaternions et les
+    octonions.
       Je cherche donc une formule ; y a ça indiqué dans mon code.
 
 - les idéaux :
@@ -30,7 +31,7 @@
     3/ faudrait que je fasse un ou des exemples d'idéaux (des algèbres)
        parce que, pour l'instant, c'est que de la théorie ; et, par
        pitié, pas seulement sur ℤ, car ses idéaux sont tous de la forme
-       nZ, ce qui n'est pas très intéressant.
+       nℤ, ce qui n'est pas très intéressant.
 
 - les nombres algébriques :
   * bloqué sur la preuve que la somme de deux algébriques (et le produit)
