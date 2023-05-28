@@ -273,10 +273,20 @@ destruct (Sumbool.sumbool_of_bool _); [ | easy ].
 congruence.
 Qed.
 
+Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
+Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
+Arguments rngl_has_eqb T {R}.
+Arguments rngl_has_inv_and_1_or_quot T {R}.
+Arguments rngl_has_inv_or_quot T {R}.
+Arguments rngl_has_opp T {R}.
+Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_1 T {ro}.
+Arguments rngl_is_integral T {ro ring_like_prop}.
+
 Theorem polyn_of_const_rngl_summation :
-  rngl_has_1 = true →
-  ∀ (Hos : rngl_has_opp_or_subt = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  rngl_has_1 T = true →
+  ∀ (Hos : rngl_has_opp_or_subt T = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ b e f,
   polyn_of_const (∑ (i = b, e), f i) = ∑ (i = b, e), polyn_of_const (f i).
@@ -294,7 +304,7 @@ induction n; intros. {
 }
 rewrite seq_S.
 rewrite rngl_summation_list_app.
-set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
+set (rpp := polyn_ring_like_prop T Hon Hos Heb).
 rewrite rngl_summation_list_app.
 rewrite (polyn_of_const_add Hos Heb).
 rewrite IHn.
@@ -303,8 +313,8 @@ now do 2 rewrite rngl_summation_list_only_one.
 Qed.
 
 Theorem polyn_of_const_opp :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
+  rngl_has_opp T = true →
+  rngl_has_eqb T = true →
   ∀ a, polyn_of_const (- a) = (- polyn_of_const a)%pol.
 Proof.
 intros Hop Heb *.
@@ -331,11 +341,11 @@ destruct (Sumbool.sumbool_of_bool _) as [Ha| Ha]. {
 Qed.
 
 Theorem polyn_has_opp_or_subt :
-  ∀ (Hop : rngl_has_opp = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (Hop : rngl_has_opp T = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (Hos := rngl_has_opp_has_opp_or_subt Hop),
   ∀ (rop := polyn_ring_like_op Hos Heb),
-  @rngl_has_opp_or_subt (polyn T) rop = true.
+  rngl_has_opp_or_subt (polyn T) = true.
 Proof.
 intros.
 subst rop Hos.
@@ -348,8 +358,8 @@ now destruct s.
 Qed.
 
 Theorem lap_norm_opp :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
+  rngl_has_opp T = true →
+  rngl_has_eqb T = true →
   ∀ la, lap_norm (- la) = (- lap_norm la)%lap.
 Proof.
 intros Hop Heb *.
@@ -379,7 +389,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hoaz| Hoaz]. {
 Qed.
 
 Theorem rngl_has_opp_has_opp_or_subt :
-  rngl_has_opp = true → rngl_has_opp_or_subt = true.
+  rngl_has_opp T = true → rngl_has_opp_or_subt T = true.
 Proof.
 intros Hop.
 unfold rngl_has_opp in Hop.
@@ -395,28 +405,27 @@ Definition rngl_has_opp_has_opp_or_subt (Hop : rngl_has_opp = true) :=
 *)
 
 Theorem polyn_of_const_minus_one_pow :
-  rngl_has_1 = true →
-  ∀ (Hop : rngl_has_opp = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  rngl_has_1 T = true →
+  ∀ (Hop : rngl_has_opp T = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ n, polyn_of_const (minus_one_pow n) = minus_one_pow n.
 Proof.
 intros Hon *.
-assert (Honp : @rngl_has_1 _ rop = true) by easy.
+assert (Honp : rngl_has_1 (polyn T) = true) by easy.
 set (Hos := rngl_has_opp_has_opp_or_subt Hop) in rop.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq; cbn.
   rewrite (H1 (minus_one_pow n)).
   rewrite (rngl_eqb_refl Heb); cbn.
-  specialize @polyn_characteristic_prop as H2.
-  set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
-  specialize (H2 (polyn T) rop rpp).
-  assert (Hosp : @rngl_has_opp_or_subt (polyn T) rop = true). {
+  set (rpp := polyn_ring_like_prop T Hon Hos Heb).
+  specialize (polyn_characteristic_prop (polyn T)) as H2.
+  assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
     now specialize (polyn_has_opp_or_subt Hop Heb) as H3.
   }
   specialize (H2 Honp Hosp).
-  assert (Hebp : @rngl_has_eqb (polyn T) rop = true) by easy.
+  assert (Hebp : rngl_has_eqb (polyn T) = true) by easy.
   specialize (H2 Hebp).
   cbn in H2.
   rewrite Hch in H2.
@@ -506,11 +515,11 @@ now rewrite Hos' in Hsu.
 Qed.
 
 Theorem det_polyn_of_const :
-  rngl_has_1 = true →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  rngl_has_1 T = true →
+  (rngl_is_integral T || rngl_has_inv_or_quot T)%bool = true →
   rngl_characteristic ≠ 1 →
-  ∀ (Hop : rngl_has_opp = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (Hop : rngl_has_opp T = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op (rngl_has_opp_has_opp_or_subt Hop) Heb),
   ∀ (ll : list (list T)),
   det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
@@ -529,7 +538,7 @@ replace rop with (polyn_ring_like_op Hos Heb). 2: {
 }
 subst rop.
 set (rop := polyn_ring_like_op Hos Heb).
-assert (Hosp : @rngl_has_opp_or_subt (@polyn T ro) rop = true). {
+assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
   unfold rngl_has_opp_or_subt; cbn.
   unfold polyn_opt_opp_or_subt.
   unfold rngl_has_opp in Hop.
@@ -546,9 +555,7 @@ rewrite (polyn_of_const_rngl_summation Hon Hos Heb).
 apply rngl_summation_eq_compat.
 intros i Hi.
 assert
-  (Hi1 :
-    (@rngl_is_integral T ro rp ||
-     @rngl_has_inv_and_1_or_quot T ro)%bool = true). {
+  (Hi1 : (rngl_is_integral T || rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii | Hii]; [ now left | right ].
@@ -624,21 +631,20 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
-specialize @cramer's_rule_by_mul as Hcr.
-specialize (Hcr (polyn T)).
-assert (Hos : rngl_has_opp_or_subt = true). {
+specialize (@cramer's_rule_by_mul (polyn T)) as Hcr.
+assert (Hos : rngl_has_opp_or_subt T = true). {
   apply rngl_has_opp_or_subt_iff; left.
   apply (cf_has_opp Hif).
 }
-assert (Hon : rngl_has_1 = true) by apply (cf_has_1 Hif).
-assert (Heb : rngl_has_eqb = true) by apply (cf_has_eqb Hif).
+assert (Hon : rngl_has_1 T = true) by apply (cf_has_1 Hif).
+assert (Heb : rngl_has_eqb T = true) by apply (cf_has_eqb Hif).
 set (rop := polyn_ring_like_op Hos Heb).
-set (rpp := @polyn_ring_like_prop T ro rp Hon Hos Heb).
+set (rpp := polyn_ring_like_prop T Hon Hos Heb).
 specialize (Hcr rop rpp).
 cbn - [ det ] in Hcr.
 generalize Hif; intros H.
 destruct H as (_, Hic, Hop, Hin, Hit, _, Hch).
-assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
+assert (Hopp : rngl_has_opp (polyn T) = true). {
   unfold rngl_has_opp; cbn.
   unfold polyn_opt_opp_or_subt.
   unfold rngl_has_opp in Hop.
@@ -646,11 +652,11 @@ assert (Hopp : @rngl_has_opp (@polyn T ro) rop = true). {
   now destruct s.
 }
 specialize (Hcr eq_refl Hopp Hic Hch).
-assert (Hiq : @rngl_has_inv_or_quot T ro = true). {
+assert (Hiq : rngl_has_inv_or_quot T = true). {
   apply rngl_has_inv_or_quot_iff.
   now rewrite Hin; left.
 }
-assert (Hiqp : @rngl_has_inv_or_quot (@polyn T ro) rop = true). {
+assert (Hiqp : rngl_has_inv_or_quot (polyn T) = true). {
   apply rngl_has_inv_or_quot_iff.
   unfold rngl_has_inv, rngl_has_quot; cbn.
   unfold polyn_opt_inv_or_quot.
