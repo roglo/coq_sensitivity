@@ -1,4 +1,5 @@
 4 cordes à mon arc, où il faudrait que j'avance :
+
 - les quaternions :
   * j'avais inventé un système pour définir les n-nions, un truc général qui
     donne :
@@ -14,6 +15,7 @@
     alors qu'elle n'est censée être "bonne" qu'en dimensions 3 et 7,
     permettant de définir les quaternions et les octonions.
       Je cherche donc une formule ; y a ça indiqué dans mon code.
+
 - les idéaux :
   * faits, mais
     1/ problème de définition de la caractéristique si on est dans un
@@ -29,6 +31,7 @@
        parce que, pour l'instant, c'est que de la théorie ; et, par
        pitié, pas seulement sur ℤ, car ses idéaux sont tous de la forme
        nZ, ce qui n'est pas très intéressant.
+
 - les nombres algébriques :
   * bloqué sur la preuve que la somme de deux algébriques (et le produit)
     est algébrique ; y a un truc à finir ; bloqué sur un cas de déterminant
@@ -39,6 +42,7 @@
     faut, certes, un polynôme, mais il faut aussi une numérotation de
     ses racines et un algorithme trouvant ce numéro pour une somme et
     pour un produit d'algébriques.
+
 - le théorème de sensibilité
   * je me balade avec le quotient de Rayleigh, où il faut que je démontre
     chais plus quoi pour démonter chais plus quoi d'autre.
