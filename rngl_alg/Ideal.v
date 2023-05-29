@@ -166,6 +166,7 @@ Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_1 T {ro}.
+Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
   if rngl_has_1 (ideal P) then ∀ a : ideal P, (1 * a)%L = a
@@ -174,6 +175,12 @@ Proof.
 intros; cbn.
 remember (rngl_has_1 _) as oni eqn:Honi; symmetry in Honi.
 destruct oni; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honi |-*.
+  progress unfold roi in Honi; cbn in Honi.
+  progress unfold I_opt_one in Honi; cbn in Honi.
+  now destruct rngl_opt_one.
+}
 intros.
 apply eq_ideal_eq; cbn.
 progress unfold roi.
@@ -186,9 +193,11 @@ cbn.
 progress unfold rngl_has_1 in Honi.
 progress unfold roi in Honi; cbn in Honi.
 (**)
+progress unfold rngl_has_1 in Hon.
 remember I_opt_one as ion eqn:Hion; symmetry in Hion.
-destruct ion; [ | easy ].
 progress unfold I_opt_one in Hion.
+destruct ion; [ | easy ].
+destruct (rngl_opt_one T); [ | easy ].
 ...
 progress unfold I_opt_one in Honi.
 cbn in Honi.
