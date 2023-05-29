@@ -334,13 +334,17 @@ https://en.wikipedia.org/wiki/Characteristic_(algebra)#Equivalent_characterizati
         else
           (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat 1%L i ≠ 0%L) ∧
           rngl_mul_nat 1%L rngl_characteristic = 0%L
-      else (*not_applicable;*)
+      else
+(**)
+        not_applicable;
+(*
         if Nat.eqb (rngl_characteristic) 0 then
           ∀ a, a ≠ 0%L → ∀ i, rngl_mul_nat a (S i) ≠ 0%L
         else
           ∀ a, a ≠ 0%L →
           (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat a i ≠ 0%L) ∧
           rngl_mul_nat a rngl_characteristic = 0%L;
+*)
 (*
       ∀ k : nat,
       (∀ a : T, rngl_mul_nat a k = 0%L)

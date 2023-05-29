@@ -38,6 +38,15 @@ Context {ip : ideal_prop P}.
 (* 0 and 1 *)
 
 Definition I_zero : ideal P := mk_I 0 ip_zero.
+Definition I_opt_one : option (ideal P) :=
+  match rngl_opt_one  with
+  | Some one =>
+      match Bool.bool_dec (P one) true with
+      | left ip_one => Some (mk_I one ip_one)
+      | right _ => None
+      end
+  | None => None
+  end.
 
 (* addition *)
 
@@ -99,15 +108,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
   {| rngl_zero := I_zero;
      rngl_add := I_add;
      rngl_mul := I_mul;
-     rngl_opt_one :=
-       match rngl_opt_one  with
-       | Some one =>
-           match Bool.bool_dec (P one) true with
-           | left ip_one => Some (mk_I one ip_one)
-           | right _ => None
-           end
-       | None => None
-       end;
+     rngl_opt_one := I_opt_one;
      rngl_opt_opp_or_subt :=
        match rngl_opt_opp_or_subt with
        | Some (inl _) => Some (inl I_opp)
@@ -162,26 +163,40 @@ Theorem I_mul_assoc : let roi := I_ring_like_op in
   ∀ a b c : ideal P, (a * (b * c))%L = (a * b * c)%L.
 Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
+
+Arguments rngl_characteristic T {ro ring_like_prop}.
+Arguments rngl_has_1 T {ro}.
+
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
-  if rngl_has_1 then ∀ a : ideal P, (1 * a)%L = a
+  if rngl_has_1 (ideal P) then ∀ a : ideal P, (1 * a)%L = a
   else not_applicable.
 Proof.
 intros; cbn.
-remember rngl_has_1 as oni eqn:Honi; symmetry in Honi.
+remember (rngl_has_1 _) as oni eqn:Honi; symmetry in Honi.
 destruct oni; [ | easy ].
 intros.
 apply eq_ideal_eq; cbn.
 progress unfold roi.
 progress unfold I_ring_like_op.
+(*
+progress unfold I_opt_one.
+*)
 progress unfold rngl_one.
 cbn.
 progress unfold rngl_has_1 in Honi.
-progress unfold roi in Honi.
+progress unfold roi in Honi; cbn in Honi.
+(**)
+remember I_opt_one as ion eqn:Hion; symmetry in Hion.
+destruct ion; [ | easy ].
+progress unfold I_opt_one in Hion.
+...
+progress unfold I_opt_one in Honi.
 cbn in Honi.
 specialize (rngl_mul_1_l) as H2.
 progress unfold rngl_has_1 in H2.
 progress unfold rngl_one in H2.
 remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
+...
 destruct on as [one| ]; [ | easy ].
 cbn in Honi.
 destruct (Bool.bool_dec (P one) true) as [H1| H1]; [ cbn | easy ].
@@ -405,6 +420,45 @@ induction i; [ easy | cbn ].
 f_equal; apply IHi.
 Qed.
 
+Theorem I_characteristic_prop : let roi := I_ring_like_op in
+  if rngl_has_1 (ideal P) then
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    else
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L) ∧
+      rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+  else not_applicable.
+Proof.
+intros; cbn.
+remember (rngl_has_1 (ideal P)) as oni eqn:Honi; symmetry in Honi.
+destruct oni; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honi |-*.
+  progress unfold roi in Honi; cbn in Honi.
+  now destruct rngl_opt_one.
+}
+specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1.
+rewrite if_bool_if_dec in H1 |-*.
+destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+  apply Nat.eqb_eq in Hcz.
+  intros.
+  apply neq_ideal_neq; cbn.
+  specialize (H1 i) as H2.
+  cbn in H2.
+Print I_ring_like_op.
+...
+replace (@rngl_one (ideal P) roi) with [@rngl_one T ro]. 2: {
+  progress unfold roi; cbn.
+Set Printing All.
+...
+  progress unfold I_ring_like_op; cbn.
+  apply neq_ideal_neq in H2.
+
+  rewrite i_val_rngl_mul_nat; cbn.
+  apply H1.
+...
+(*
+...
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if rngl_has_1 then
    if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
@@ -669,7 +723,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
-     rngl_characteristic := rngl_characteristic;
+     rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := I_add_comm;
      rngl_add_assoc := I_add_assoc;
      rngl_add_0_l := I_add_0_l;
