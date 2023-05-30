@@ -182,9 +182,9 @@ assert (Hon : rngl_has_1 T = true). {
   now destruct rngl_opt_one.
 }
 intros.
+apply eq_ideal_eq; cbn.
 specialize (rngl_mul_1_l Hon (i_val a)) as H1.
 progress unfold rngl_one in H1.
-apply eq_ideal_eq; cbn.
 progress unfold roi.
 progress unfold I_ring_like_op.
 progress unfold rngl_one; cbn.
@@ -224,19 +224,34 @@ Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
 Proof.
 intros; cbn.
 destruct rngl_mul_is_comm; [ easy | ].
-progress unfold rngl_one.
-progress unfold rngl_has_1.
-specialize rngl_mul_1_r as H1.
-progress unfold rngl_has_1 in H1.
-progress unfold rngl_one in H1.
-progress unfold roi; cbn.
-remember rngl_opt_one as oni eqn:Honi; symmetry in Honi.
-...
-destruct oni as [one| ]; [ cbn | easy ].
-destruct (Bool.bool_dec (P one) true) as [H2| H2]; [ cbn | easy ].
+(**)
+remember (rngl_has_1 _) as oni eqn:Honi; symmetry in Honi.
+destruct oni; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honi |-*.
+  progress unfold roi in Honi; cbn in Honi.
+  progress unfold I_opt_one in Honi; cbn in Honi.
+  now destruct rngl_opt_one.
+}
 intros.
 apply eq_ideal_eq; cbn.
-now apply H1.
+specialize (rngl_mul_1_r Hon (i_val a)) as H1.
+progress unfold rngl_one in H1.
+progress unfold roi.
+progress unfold I_ring_like_op.
+progress unfold rngl_one; cbn.
+progress unfold rngl_has_1 in Honi.
+progress unfold roi in Honi; cbn in Honi.
+progress unfold rngl_has_1 in Hon.
+remember I_opt_one as ion eqn:Hion; symmetry in Hion.
+progress unfold I_opt_one in Hion.
+destruct ion as [ione| ]; [ | easy ].
+clear Honi.
+destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+clear Hon.
+destruct (Bool.bool_dec _ _) as [Hone| ]; [ | easy ].
+injection Hion; clear Hion; intros; subst ione; cbn.
+easy.
 Qed.
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
@@ -432,7 +447,8 @@ destruct oni; [ | easy ].
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honi |-*.
   progress unfold roi in Honi; cbn in Honi.
-  now destruct rngl_opt_one.
+  progress unfold I_opt_one in Honi.
+  now destruct (rngl_opt_one T).
 }
 specialize rngl_characteristic_prop as H1.
 rewrite Hon in H1.
