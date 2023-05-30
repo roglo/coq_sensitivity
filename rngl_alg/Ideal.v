@@ -459,17 +459,18 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   apply neq_ideal_neq; cbn.
   specialize (H1 i) as H2.
   cbn in H2.
-Print I_ring_like_op.
-...
-replace (@rngl_one (ideal P) roi) with [@rngl_one T ro]. 2: {
-  progress unfold roi; cbn.
-Set Printing All.
-...
-  progress unfold I_ring_like_op; cbn.
-  apply neq_ideal_neq in H2.
-
   rewrite i_val_rngl_mul_nat; cbn.
-  apply H1.
+  progress unfold roi.
+  progress unfold I_ring_like_op.
+  progress unfold rngl_one; cbn.
+  progress unfold I_opt_one.
+  progress unfold rngl_has_1 in Hon.
+  progress unfold rngl_one in H2.
+  progress unfold rngl_has_1 in Honi; cbn in Honi.
+  progress unfold I_opt_one in Honi.
+  destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+  now destruct (Bool.bool_dec (P one) true).
+}
 ...
 (*
 ...
