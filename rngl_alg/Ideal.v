@@ -453,6 +453,13 @@ assert (Hon : rngl_has_1 T = true). {
 specialize rngl_characteristic_prop as H1.
 rewrite Hon in H1.
 rewrite if_bool_if_dec in H1 |-*.
+progress unfold roi.
+progress unfold I_ring_like_op.
+progress unfold rngl_one; cbn.
+progress unfold I_opt_one.
+progress unfold rngl_has_1 in Hon.
+progress unfold rngl_has_1 in Honi; cbn in Honi.
+progress unfold I_opt_one in Honi.
 destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   apply Nat.eqb_eq in Hcz.
   intros.
@@ -460,14 +467,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   specialize (H1 i) as H2.
   cbn in H2.
   rewrite i_val_rngl_mul_nat; cbn.
-  progress unfold roi.
-  progress unfold I_ring_like_op.
-  progress unfold rngl_one; cbn.
-  progress unfold I_opt_one.
-  progress unfold rngl_has_1 in Hon.
   progress unfold rngl_one in H2.
-  progress unfold rngl_has_1 in Honi; cbn in Honi.
-  progress unfold I_opt_one in Honi.
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   now destruct (Bool.bool_dec (P one) true).
 }
@@ -477,26 +477,12 @@ split. {
   specialize (Hbef i Hi) as H1.
   apply neq_ideal_neq.
   rewrite i_val_rngl_mul_nat; cbn.
-  progress unfold roi.
-  progress unfold I_ring_like_op.
-  progress unfold rngl_one; cbn.
-  progress unfold I_opt_one.
-  progress unfold rngl_has_1 in Hon.
-  progress unfold rngl_has_1 in Honi; cbn in Honi.
-  progress unfold I_opt_one in Honi.
   progress unfold rngl_one in H1.
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   now destruct (Bool.bool_dec (P one) true).
 }
 apply eq_ideal_eq.
 rewrite i_val_rngl_mul_nat; cbn.
-progress unfold roi.
-progress unfold I_ring_like_op.
-progress unfold rngl_one; cbn.
-progress unfold I_opt_one; cbn.
-progress unfold rngl_has_1 in Hon.
-progress unfold rngl_has_1 in Honi; cbn in Honi.
-progress unfold I_opt_one in Honi.
 progress unfold rngl_one in Hch.
 destruct (rngl_opt_one T) as [one| ]; [ | easy ].
 now destruct (Bool.bool_dec (P one) true).

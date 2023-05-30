@@ -48,6 +48,5 @@
   * je me balade avec le quotient de Rayleigh, où il faut que je démontre
     chais plus quoi pour démonter chais plus quoi d'autre.
 
-- faudrait que je résolve le characteristic_prop (comment le définir
-  correctement) par Ideal.v pour en faire une version LapPolyn.v et
-  Polynomial.v qui inclue le cas rngl_has_1 = false.
+- faire une version LapPolyn.v et Polynomial.v qui inclue le cas
+  rngl_has_1 = false.
