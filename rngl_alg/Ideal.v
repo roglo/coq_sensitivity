@@ -182,35 +182,24 @@ assert (Hon : rngl_has_1 T = true). {
   now destruct rngl_opt_one.
 }
 intros.
+specialize (rngl_mul_1_l Hon (i_val a)) as H1.
+progress unfold rngl_one in H1.
 apply eq_ideal_eq; cbn.
 progress unfold roi.
 progress unfold I_ring_like_op.
-(*
-progress unfold I_opt_one.
-*)
-progress unfold rngl_one.
-cbn.
+progress unfold rngl_one; cbn.
 progress unfold rngl_has_1 in Honi.
 progress unfold roi in Honi; cbn in Honi.
-(**)
 progress unfold rngl_has_1 in Hon.
 remember I_opt_one as ion eqn:Hion; symmetry in Hion.
 progress unfold I_opt_one in Hion.
-destruct ion; [ | easy ].
-destruct (rngl_opt_one T); [ | easy ].
-...
-progress unfold I_opt_one in Honi.
-cbn in Honi.
-specialize (rngl_mul_1_l) as H2.
-progress unfold rngl_has_1 in H2.
-progress unfold rngl_one in H2.
-remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
-...
-destruct on as [one| ]; [ | easy ].
-cbn in Honi.
-destruct (Bool.bool_dec (P one) true) as [H1| H1]; [ cbn | easy ].
+destruct ion as [ione| ]; [ | easy ].
 clear Honi.
-now apply H2.
+destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+clear Hon.
+destruct (Bool.bool_dec _ _) as [Hone| ]; [ | easy ].
+injection Hion; clear Hion; intros; subst ione; cbn.
+easy.
 Qed.
 
 Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
@@ -230,7 +219,7 @@ Qed.
 
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
   if rngl_mul_is_comm then not_applicable
-  else if rngl_has_1 then ∀ a : ideal P, (a * 1)%L = a
+  else if rngl_has_1 (ideal P) then ∀ a : ideal P, (a * 1)%L = a
   else not_applicable.
 Proof.
 intros; cbn.
@@ -240,9 +229,9 @@ progress unfold rngl_has_1.
 specialize rngl_mul_1_r as H1.
 progress unfold rngl_has_1 in H1.
 progress unfold rngl_one in H1.
-progress unfold roi.
-cbn.
+progress unfold roi; cbn.
 remember rngl_opt_one as oni eqn:Honi; symmetry in Honi.
+...
 destruct oni as [one| ]; [ cbn | easy ].
 destruct (Bool.bool_dec (P one) true) as [H2| H2]; [ cbn | easy ].
 intros.
