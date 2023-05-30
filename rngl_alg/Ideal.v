@@ -471,92 +471,36 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   now destruct (Bool.bool_dec (P one) true).
 }
-...
-(*
-...
-Theorem I_characteristic_prop : let roi := I_ring_like_op in
-  if rngl_has_1 then
-   if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
-   else
-     (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
-     rngl_mul_nat 1 rngl_characteristic = 0%L
-  else
-   if rngl_characteristic =? 0 then
-     ∀ a : ideal P, a ≠ 0%L → ∀ i : nat, rngl_mul_nat a (S i) ≠ 0%L
-   else
-     ∀ a : ideal P, a ≠ 0%L →
-     (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat a i ≠ 0%L) ∧
-     rngl_mul_nat a rngl_characteristic = 0%L.
-Proof.
-intros; cbn.
-specialize rngl_characteristic_prop as H1.
-progress unfold rngl_has_1; cbn.
-progress unfold rngl_has_1 in H1; cbn in H1.
-progress unfold rngl_one in H1; cbn in H1.
+destruct H1 as (Hbef, Hch).
+split. {
+  intros i Hi.
+  specialize (Hbef i Hi) as H1.
+  apply neq_ideal_neq.
+  rewrite i_val_rngl_mul_nat; cbn.
+  progress unfold roi.
+  progress unfold I_ring_like_op.
+  progress unfold rngl_one; cbn.
+  progress unfold I_opt_one.
+  progress unfold rngl_has_1 in Hon.
+  progress unfold rngl_has_1 in Honi; cbn in Honi.
+  progress unfold I_opt_one in Honi.
+  progress unfold rngl_one in H1.
+  destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+  now destruct (Bool.bool_dec (P one) true).
+}
+apply eq_ideal_eq.
+rewrite i_val_rngl_mul_nat; cbn.
+progress unfold roi.
+progress unfold I_ring_like_op.
 progress unfold rngl_one; cbn.
-remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
-destruct on as [one| ]. {
-  cbn in H1.
-  destruct (Bool.bool_dec _ _) as [H2| H2]; cbn. {
-    rewrite if_bool_if_dec in H1 |-*.
-    destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-      intros i.
-      apply neq_ideal_neq; cbn.
-      rewrite i_val_rngl_mul_nat; cbn.
-      apply H1.
-    }
-    destruct H1 as (H1, H3).
-    split. {
-      intros i Hi.
-      apply neq_ideal_neq; cbn.
-      rewrite i_val_rngl_mul_nat; cbn.
-      now apply H1.
-    }
-    apply eq_ideal_eq; cbn.
-    now rewrite i_val_rngl_mul_nat; cbn.
-  }
-  rewrite if_bool_if_dec in H1 |-*.
-    destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-      apply Nat.eqb_eq in Hcz.
-      intros a Ha *.
-      apply neq_ideal_neq; cbn.
-      rewrite i_val_rngl_mul_nat; cbn.
-      apply neq_ideal_neq in Ha; cbn in Ha.
-      apply Bool.not_true_iff_false in H2.
-      specialize (H1 i) as H3.
-      intros H4; apply H3; clear H3.
-      apply rngl_mul_cancel_l with (a := i_val a); [ | easy | ].
-Search (_ * _ = _ * _)%L.
-...
-Set Printing All.
-...
-      apply H1.
-    }
-    destruct H1 as (H1, H3).
-    split. {
-      intros i Hi.
-      apply neq_ideal_neq; cbn.
-      rewrite i_val_rngl_mul_nat; cbn.
-      now apply H1.
-    }
-    apply eq_ideal_eq; cbn.
-    now rewrite i_val_rngl_mul_nat; cbn.
-...
-remember rngl_has_1 as on eqn:Hon.
-cbn in H1.
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-...
-  intros a Haz i.
-  apply Nat.eqb_eq in Hcz.
-  rewrite Hcz in H1; cbn in H1.
-  apply neq_ideal_neq; cbn.
-  apply neq_ideal_neq in Haz; cbn in Haz.
-  rewrite i_val_rngl_mul_nat.
-  remember rngl_has_1 as on eqn:Hon; symmetry in Hon.
-  destruct on; [ | now apply H1 ].
-...
-*)
+progress unfold I_opt_one; cbn.
+progress unfold rngl_has_1 in Hon.
+progress unfold rngl_has_1 in Honi; cbn in Honi.
+progress unfold I_opt_one in Honi.
+progress unfold rngl_one in Hch.
+destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+now destruct (Bool.bool_dec (P one) true).
+Qed.
 
 Fixpoint List_map {A B} (f : A → B) l :=
   match l with
