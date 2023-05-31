@@ -822,6 +822,16 @@ rewrite skipn_all.
 easy.
 Qed.
 
+Theorem eq_map2_nil : ∀ A B C (f : A → B → C) la lb,
+  map2 f la lb = [] → la = [] ∨ lb = [].
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ now left | right ].
+cbn in Hab.
+now destruct lb.
+Qed.
+
 (* end map2 *)
 
 Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.
