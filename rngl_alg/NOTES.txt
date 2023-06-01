@@ -47,3 +47,16 @@
 - le théorème de sensibilité
   * je me balade avec le quotient de Rayleigh, où il faut que je démontre
     chais plus quoi pour démonter chais plus quoi d'autre.
+      Dans Lemma_2_1.v j'ai un commentaire qui dit
+        here I am waiting for me to have implemented:
+        - polynomials → ok
+        - characteristic polynomials
+        - proof that all polynomials of degree n have n roots
+        - building eigenvalues and eigenvectors
+        - diagonalization
+        - and then U and D are the result of this diagonalization
+    j'en suis à la 2e étape, "characteristic polynomials", mais en fait,
+    je ne vois pas bien comment le mettre en œuvre, dans quel fichier
+    (Matrix.v ?) et comment il va résoudre la suite ; je le vois
+    vaguement mais j'aimerais voir comment ça se connecte avec
+    là où j'en suis dans Lemma_2_1.v.
