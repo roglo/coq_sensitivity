@@ -2027,15 +2027,30 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
+Arguments rngl_has_1 T {ro}.
+Arguments rngl_opt_one T {ring_like_op}.
+
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op in
+  rngl_has_1 (list T) = true →
   ∀ n, rngl_mul_nat 1 n = if Nat.eq_dec n 0 then [] else [rngl_mul_nat 1 n].
 Proof.
-intros; cbn.
+intros * Honl *; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 induction n; [ easy | clear Hnz; cbn ].
-destruct n; [ now cbn; rewrite rngl_add_0_r | ].
-now rewrite IHn.
+(**)
+destruct n. {
+  cbn; rewrite rngl_add_0_r, lap_add_0_r.
+  progress unfold rngl_one; cbn.
+  progress unfold lap_opt_one.
+  progress unfold rngl_has_1 in Honl; cbn in Honl.
+  progress unfold lap_opt_one in Honl.
+  now destruct (rngl_opt_one T).
+}
+rewrite IHn; [ | easy ].
+progress unfold rngl_one; cbn.
+progress unfold lap_opt_one.
+now destruct (rngl_opt_one T).
 Qed.
 
 Theorem eq_lap_add_nil : ∀ la lb, (la + lb = [])%lap → la = [] ∧ lb = [].
@@ -2769,19 +2784,31 @@ specialize (IHi H); clear H.
 now injection IHi; clear IHi; intros; subst a la.
 Qed.
 
+Arguments rngl_has_1 T {ro}.
+
 Theorem lap_polyn_rngl_of_nat :
   let lop := lap_ring_like_op in
   let rop := polyn_ring_like_op in
   ∀ n, lap (rngl_mul_nat 1 n) = lap_norm (rngl_mul_nat 1 n).
 Proof.
 intros; cbn.
-induction n; [ easy | cbn ].
+induction n; [ easy | ].
+cbn - [ lap ].
+unfold polyn_add.
 rewrite IHn; cbn.
 rewrite fold_lap_norm.
-remember (@rngl_mul_nat _ lop 1%lap n) as la eqn:Hla; symmetry in Hla.
+remember (rngl_mul_nat 1 n) as la eqn:Hla; symmetry in Hla.
+progress unfold rngl_one.
+progress unfold lop; cbn.
+progress unfold lap_opt_one.
+generalize Hon; intros H.
+progress unfold rngl_has_1 in H.
+specialize (proj1 (rngl_1_neq_0_iff Hon)) as H1.
+progress unfold rngl_one in H1.
+destruct rngl_opt_one as [one| ]; [ cbn; clear H | easy ].
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (H1 1%L), (rngl_eqb_refl Heb); cbn.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
+  rewrite (H2 one), (rngl_eqb_refl Heb); cbn.
   rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   rewrite fold_lap_norm.
   destruct la as [| a]. {
@@ -2791,7 +2818,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
   rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
-specialize (proj1 (rngl_1_neq_0_iff Hon) Hc1) as H1.
+specialize (H1 Hc1).
 apply (rngl_eqb_neq Heb) in H1; rewrite H1; cbn.
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app.
@@ -2818,14 +2845,23 @@ apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
-Theorem polyn_characteristic_prop :
-  let rop := polyn_ring_like_op in
-  if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
-  else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L) ∧
-    rngl_mul_nat 1 rngl_characteristic = 0%L.
+Theorem polyn_characteristic_prop : let rop := polyn_ring_like_op in
+  if rngl_has_1 (polyn T) then
+    if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    else
+      (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L)
+       ∧ rngl_mul_nat 1 rngl_characteristic = 0%L
+  else not_applicable.
 Proof.
 intros rop; subst rop.
+set (rol := lap_ring_like_op).
+assert (Honl : rngl_has_1 (list T) = true). {
+  progress unfold rngl_has_1; cbn.
+  progress unfold lap_opt_one; cbn.
+  progress unfold rngl_has_1 in Hon.
+  now destruct rngl_opt_one.
+}
+cbn - [ rngl_mul_nat ].
 specialize rngl_characteristic_prop as H1.
 rewrite Hon in H1; cbn in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
@@ -2847,7 +2883,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
-  rewrite lap_rngl_of_nat.
+  rewrite (lap_rngl_of_nat Honl).
   destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Heb).

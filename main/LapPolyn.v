@@ -55,7 +55,7 @@ Qed.
 (* *)
 
 Definition lap_zero : list T := [].
-Definition lap_one := [1%L].
+Definition lap_one : list T := [1%L].
 
 (* addition *)
 
@@ -115,6 +115,14 @@ Definition lap_mul la lb :=
       | [] => []
       | _ => lap_convol_mul la lb 0 (length la + length lb - 1)
       end
+  end.
+
+(* *)
+
+Definition lap_opt_one :=
+  match rngl_opt_one with
+  | Some one => Some [one]
+  | None => None
   end.
 
 (* power *)
@@ -533,7 +541,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
   {| rngl_zero := [];
      rngl_add := lap_add;
      rngl_mul := lap_mul;
-     rngl_opt_one := Some lap_one;
+     rngl_opt_one := lap_opt_one;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
      rngl_opt_eqb := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
@@ -1138,32 +1146,6 @@ rewrite Nat.add_sub.
 now rewrite (lap_convol_mul_const_r Hos).
 Qed.
 
-Theorem lap_mul_1_l :
-  rngl_has_1 = true →
-  rngl_has_opp_or_subt = true →
-  ∀ la, (1 * la)%lap = la.
-Proof.
-intros Hon Hos *.
-unfold lap_one.
-rewrite (lap_mul_const_l Hos).
-induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_mul_1_l Hon); f_equal.
-apply IHla.
-Qed.
-
-Theorem lap_mul_1_r :
-  rngl_has_1 = true →
-  rngl_has_opp_or_subt = true →
-  ∀ la, (la * 1)%lap = la.
-Proof.
-intros Hon Hos *.
-unfold lap_one.
-rewrite (lap_mul_const_r Hos).
-induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_mul_1_r Hon); f_equal.
-apply IHla.
-Qed.
-
 (* distributivity *)
 
 Fixpoint lap_convol_mul_add_l (al1 al2 al3 : list T) i len :=
@@ -1228,8 +1210,13 @@ do 2 rewrite strip_0s_app.
 now rewrite IHla.
 Qed.
 
+Arguments rngl_characteristic T {ro ring_like_prop}.
+Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_1 T {ro}.
+Arguments rngl_opt_one T {ring_like_op}.
+
 Theorem lap_convol_mul_more :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ n la lb i len,
   length la + length lb - 1 ≤ i + len
   → lap_norm (lap_convol_mul la lb i len) =
@@ -1470,7 +1457,7 @@ now rewrite rngl_mul_add_distr_l.
 Qed.
 
 Theorem lap_norm_mul_add_distr_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb lc, lap_norm (la * (lb + lc)) = lap_norm (la * lb + la * lc).
 Proof.
 intros Hos la lb lc.
@@ -1524,7 +1511,7 @@ now rewrite lap_add_lap_convol_mul_r.
 Qed.
 
 Theorem lap_mul_add_distr_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb lc, (la * (lb + lc))%lap = (la * lb + la * lc)%lap.
 Proof.
 intros Hos la lb lc.
@@ -1592,14 +1579,88 @@ Qed.
 
 (* multiplication with 1 *)
 
-Theorem lap_opt_mul_1_r :
-  rngl_has_1 = true →
-  rngl_has_opp_or_subt = true →
-  if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
+Theorem lap_opt_mul_1_l : let rol := lap_ring_like_op in
+  rngl_has_opp_or_subt T = true →
+  if rngl_has_1 (list T) then ∀ la : list T, (1 * la)%L = la
+  else not_applicable.
 Proof.
-intros Hon Hos.
-destruct rngl_mul_is_comm; [ easy | ].
-apply (lap_mul_1_r Hon Hos).
+intros * Hos *.
+remember (rngl_has_1 (list T)) as onl eqn:Honl; symmetry in Honl.
+destruct onl; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honl |-*.
+  progress unfold rol in Honl; cbn in Honl.
+  progress unfold lap_opt_one in Honl.
+  now destruct rngl_opt_one.
+}
+intros; cbn.
+replace (@rngl_one (list T) rol) with [@rngl_one T ro]. 2: {
+  progress unfold rngl_one; cbn.
+  progress unfold lap_opt_one; cbn.
+  progress unfold rngl_has_1 in Hon.
+  now destruct rngl_opt_one.
+}
+rewrite (lap_mul_const_l Hos).
+induction la as [| a]; [ easy | cbn ].
+f_equal; [ | apply IHla ].
+apply (rngl_mul_1_l Hon).
+Qed.
+
+Theorem lap_opt_mul_1_r : let rol := lap_ring_like_op in
+  rngl_has_opp_or_subt T = true →
+  if rngl_mul_is_comm then not_applicable
+  else
+   if rngl_has_1 (list T) then ∀ la : list T, (la * 1)%L = la
+   else not_applicable.
+Proof.
+intros * Hos.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ easy | ].
+remember (rngl_has_1 (list T)) as onl eqn:Honl; symmetry in Honl.
+destruct onl; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honl |-*.
+  progress unfold rol in Honl; cbn in Honl.
+  progress unfold lap_opt_one in Honl.
+  now destruct rngl_opt_one.
+}
+intros; cbn.
+replace (@rngl_one (list T) rol) with [@rngl_one T ro]. 2: {
+  progress unfold rngl_one; cbn.
+  progress unfold lap_opt_one; cbn.
+  progress unfold rngl_has_1 in Hon.
+  now destruct rngl_opt_one.
+}
+rewrite (lap_mul_const_r Hos).
+induction la as [| a]; [ easy | cbn ].
+f_equal; [ | apply IHla ].
+apply (rngl_mul_1_r Hon).
+Qed.
+
+Theorem lap_mul_1_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ la, (1 * la)%lap = la.
+Proof.
+intros Hon Hos *.
+unfold lap_one.
+rewrite (lap_mul_const_l Hos).
+induction la as [| a]; [ easy | cbn ].
+rewrite (rngl_mul_1_l Hon); f_equal.
+apply IHla.
+Qed.
+
+Theorem lap_mul_1_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ la, (la * 1)%lap = la.
+Proof.
+intros Hon Hos *.
+unfold lap_one.
+rewrite (lap_mul_const_r Hos).
+induction la as [| a]; [ easy | cbn ].
+rewrite (rngl_mul_1_r Hon); f_equal.
+apply IHla.
 Qed.
 
 (* *)
@@ -1630,7 +1691,7 @@ now rewrite rngl_mul_add_distr_r.
 Qed.
 
 Theorem lap_norm_mul_add_distr_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb lc : list T,
   lap_norm ((la + lb) * lc) = lap_norm (la * lc + lb * lc).
 Proof.
@@ -1683,7 +1744,7 @@ now rewrite lap_add_lap_convol_mul_l.
 Qed.
 
 Theorem lap_mul_add_distr_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb lc, ((la + lb) * lc)%lap = (la * lc + lb * lc)%lap.
 Proof.
 intros Hos la lb lc.
@@ -1711,7 +1772,7 @@ apply (lap_norm_mul_add_distr_r Hos).
 Qed.
 
 Theorem lap_opt_mul_add_distr_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   if rngl_mul_is_comm then not_applicable
   else ∀ a b c, ((a + b) * c)%lap = (a * c + b * c)%lap.
 Proof.
@@ -1735,7 +1796,7 @@ Qed.
 (* *)
 
 Theorem last_lap_convol_mul_last :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb a b i len d,
   len ≠ 0
   → length la + length lb + 1 = i + len
@@ -1774,7 +1835,7 @@ rewrite IHlen; [ easy | easy | flia Hlab ].
 Qed.
 
 Theorem last_lap_mul :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb, last (la * lb)%lap 0%L = (last la 0 * last lb 0)%L.
 Proof.
 intros Hos *.
@@ -1805,7 +1866,7 @@ apply (last_lap_convol_mul_last Hos); flia.
 Qed.
 
 Theorem lap_opt_integral :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   let rol := lap_ring_like_op in
   if rngl_is_integral then
     ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
@@ -1849,15 +1910,52 @@ Qed.
 
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
-  if 0 =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
-  else
-    (∀ i : nat, 0 < i < 0 → rngl_mul_nat 1 i ≠ 0%L) ∧
-    rngl_mul_nat 1 0 = 0%L.
+  if rngl_has_1 (list T) then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+  else not_applicable.
 Proof.
-intros; subst rol.
-cbn - [ rngl_mul_nat ].
-intros; cbn.
-now destruct (rngl_mul_nat 1%lap i).
+intros.
+remember (rngl_has_1 (list T)) as onl eqn:Honl; symmetry in Honl.
+destruct onl; [ | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honl |-*.
+  progress unfold rol in Honl; cbn in Honl.
+  progress unfold lap_opt_one in Honl.
+  now destruct (rngl_opt_one T).
+}
+specialize rngl_characteristic_prop as H1.
+intros i.
+remember (S i) as j eqn:Hj.
+rewrite Hon in H1.
+rewrite if_bool_if_dec in H1.
+progress unfold rol.
+progress unfold lap_ring_like_op.
+progress unfold rngl_one; cbn - [ lap_add ].
+progress unfold lap_opt_one.
+progress unfold rngl_has_1 in Hon.
+progress unfold rngl_has_1 in Honl; cbn in Honl.
+progress unfold lap_opt_one in Honl.
+destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+  apply Nat.eqb_eq in Hcz.
+  intros.
+  specialize (H1 i) as H2.
+  rewrite <- Hj in H2.
+  progress unfold rngl_one in H2.
+  destruct (rngl_opt_one T) as [one| ]; [ | easy ].
+  intros H3; apply H2; clear H2.
+  destruct j; [ easy | ].
+  remember [one] as x; cbn in H3; subst x.
+  unfold lap_add in H3.
+  cbn - [ map2 "-" ] in H3.
+  apply eq_map2_nil in H3.
+  destruct H3 as [H3| H3]; [ easy | ].
+  apply app_eq_nil in H3.
+  destruct H3 as (H2, H3).
+  now rewrite H2 in H3.
+}
+destruct H1 as (H1, H2).
+destruct (rngl_opt_one T); [ | easy ].
+subst j; cbn.
+now destruct (rngl_mul_nat [t] i).
 Qed.
 
 (* *)
@@ -1889,7 +1987,7 @@ Qed.
 (* *)
 
 Theorem map2_rngl_subt_diag :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la, map2 rngl_subt la la = repeat 0%L (length la).
 Proof.
 intros Hos *.
@@ -1913,7 +2011,7 @@ destruct op. {
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
 move Hop after Hsu.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
 move Hos after Heb.
@@ -1980,7 +2078,7 @@ destruct op. {
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
 move Hop after Hsu.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
 move Hos after Heb.
@@ -2322,7 +2420,7 @@ destruct op. {
   destruct rngl_opt_opp_or_subt; [ now destruct s | easy ].
 }
 move Hop after Hsu.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
 move Hos after Heb.
@@ -2382,7 +2480,7 @@ intros Hop *.
 unfold lap_sub.
 rewrite <- (lap_mul_opp_r Hop).
 rewrite Hop.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 apply (lap_mul_add_distr_l Hos).
@@ -2391,7 +2489,7 @@ Qed.
 (* *)
 
 Theorem lap_convol_mul_map_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ f,
   (∀ la lb, f (la + lb)%L = (f la + f lb)%L)
   → (∀ la lb, f (la * lb)%L = (f la * lb)%L)
@@ -2473,7 +2571,7 @@ now do 2 rewrite List_nth_nil.
 Qed.
 
 Theorem lap_convol_mul_map_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ f,
   (∀ la lb, f (la + lb)%L = (f la + f lb)%L)
   → (∀ la lb, f (la * lb)%L = (la * f lb)%L)
@@ -2566,7 +2664,7 @@ Theorem lap_norm_mul_subt_distr_l :
   lap_norm (lap_subt (la * lb) (la * lc)).
 Proof.
 intros Hsu *.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
 unfold lap_mul.
@@ -2666,7 +2764,7 @@ j'investigue dans ce sens d'abord.
 (x+1)*(2-x) = (x+1)(2+(0-1)x) = (0-1)x²+(2+(0-1))x+2
 (x+1)*2-(x+1)x = (2x+2)-(x²+x) = (0-1)x²+x+2
 ...
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
 move Hos after Heb.
@@ -2725,7 +2823,7 @@ rewrite (Nat.add_comm _ (length la)).
 cbn - [ map2 ].
 ...
 Theorem lap_convol_mul_map2 :
-  rngl_has_opp_or_subt = true
+  rngl_has_opp_or_subt T = true
   → ∀ f,
     (∀ a b c, (a * f b c)%L = f (a * b)%L (a * c)%L)
     → (∀ a b c, f a (b + c)%L = f a (f b c))
@@ -2811,7 +2909,7 @@ a - (b - c)
 rngl_add_sub_simpl_l:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
-    → rngl_has_opp_or_subt = true
+    → rngl_has_opp_or_subt T = true
       → ∀ a b c : T, (a + b - (a + c))%L = (b - c)%L
 Check rngl_add_sub_assoc.
 (a + b) - c = a + (b - c) ?
@@ -2861,8 +2959,7 @@ Qed.
 
 (* lap ring-like properties *)
 
-Definition lap_ring_like_prop
-    (Hon : rngl_has_1 = true) (Hos : rngl_has_opp_or_subt = true) :
+Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2874,18 +2971,14 @@ Definition lap_ring_like_prop
      rngl_add_assoc := lap_add_assoc;
      rngl_add_0_l := lap_add_0_l;
      rngl_mul_assoc := lap_mul_assoc Hos;
-     rngl_opt_mul_1_l := lap_mul_1_l Hon Hos;
+     rngl_opt_mul_1_l := lap_opt_mul_1_l Hos;
      rngl_mul_add_distr_l := lap_mul_add_distr_l Hos;
      rngl_opt_mul_comm := lap_opt_mul_comm;
-     rngl_opt_mul_1_r := lap_opt_mul_1_r Hon Hos;
+     rngl_opt_mul_1_r := lap_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r Hos;
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-(*
-     rngl_opt_mul_sub_distr_l := NA;
-     rngl_opt_mul_sub_distr_r := NA;
-*)
      rngl_opt_mul_inv_l := lap_opt_has_no_inv False;
      rngl_opt_mul_inv_r := lap_opt_has_no_inv_and false False;
      rngl_opt_mul_div := NA;
