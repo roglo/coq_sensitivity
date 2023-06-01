@@ -47,6 +47,3 @@
 - le théorème de sensibilité
   * je me balade avec le quotient de Rayleigh, où il faut que je démontre
     chais plus quoi pour démonter chais plus quoi d'autre.
-
-- faire une version LapPolyn.v et Polynomial.v qui inclue le cas
-  rngl_has_1 = false.
