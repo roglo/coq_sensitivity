@@ -114,6 +114,7 @@ Definition in_ordered_field :=
   rngl_has_dec_le = true ∧
   rngl_is_integral = true ∧
   rngl_has_inv = true ∧
+  rngl_characteristic = 0 ∧
   rngl_is_ordered = true.
 
 Theorem eq_vect_squ_0 :
@@ -1044,16 +1045,19 @@ Qed.
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 (* https://ecroot.math.gatech.edu/notes_linear.pdf *)
 
-(* to be completed
-Theorem Rayleigh_quotient_from_dot_mul :
+(* to be completed *)
+Theorem Rayleigh_quotient_from_dot_mul : in_ordered_field →
   ∀ n (M : matrix T) D U v,
   vect_size v = n
   → Rayleigh_quotient M v = (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L.
 Proof.
-intros * Hsv.
+intros Hof * Hsv.
+assert (Hcf : in_charac_0_field) by now destruct Hof.
 unfold Rayleigh_quotient.
 assert (Hdm : D = (U * M * U⁺)%M). {
   assert (M = (U⁺ * D * U)%M). {
+    specialize (diagonalized_matrix_prop Hcf) as H1.
+    specialize (H1 n M).
 ...
   rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
     rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
