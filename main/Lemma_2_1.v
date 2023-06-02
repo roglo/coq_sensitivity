@@ -55,7 +55,7 @@ now rewrite butn_nil.
 Qed.
 
 (* to be completed
-Theorem eigenvalues :
+Theorem exist_eigenvalues :
   rngl_is_alg_closed = true →
   ∀ n (M : matrix T),
   is_square_matrix M = true
