@@ -1045,6 +1045,22 @@ Qed.
 (* https://ecroot.math.gatech.edu/notes_linear.pdf *)
 
 (* to be completed
+Theorem Rayleigh_quotient_from_dot_mul :
+  ∀ n (M : matrix T) D U v,
+  vect_size v = n
+  → Rayleigh_quotient M v = (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L.
+Proof.
+intros * Hsv.
+unfold Rayleigh_quotient.
+assert (Hdm : D = (U * M * U⁺)%M). {
+  assert (M = (U⁺ * D * U)%M). {
+...
+  rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
+    rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
+    rewrite Huu1.
+    rewrite mat_mul_1_l; [ | easy | | ]. 2: {
+...
+
 Theorem Rayleigh_quotient_from_ortho :
   ∀ n (M : matrix T) eigen_val eigen_vect U x y,
   U = mat_with_vect n eigen_vect
@@ -1052,6 +1068,8 @@ Theorem Rayleigh_quotient_from_ortho :
   → Rayleigh_quotient M x =
       ((∑ (i = 1, n), eigen_val.(i) * (vect_el y i) ^ 2) /
        (∑ (i = 1, n), vect_el y i ^ 2))%L.
+Proof.
+intros * HU Hy.
 ...
 
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
