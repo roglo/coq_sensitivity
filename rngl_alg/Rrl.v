@@ -212,15 +212,77 @@ Definition complex_mul {T} {ro : ring_like_op T} (ca cb : complex T) :=
   {| re := (re ca * re cb - im ca * im cb)%L;
      im := (re ca * im cb + im ca * re cb)%L |}.
 
-(* to be completed
+Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
+    option ((complex T → complex T) + (complex T → complex T → complex T)) :=
+  match rngl_opt_opp_or_subt with
+  | Some (inl opp) =>
+      Some (inl (λ c, mk_c (opp (re c)) (opp (im c))))
+  | Some (inr subt) =>
+      Some (inr (λ c d, mk_c (subt (re c) (re d)) (subt (im c) (im d))))
+  | None =>
+      None
+  end.
+
+Definition complex_opt_inv_or_quot {T} {ro : ring_like_op T} :
+    option ((complex T → complex T) + (complex T → complex T → complex T)) :=
+  match rngl_opt_inv_or_quot with
+  | Some (inl inv) => None (* à voir *)
+  | Some (inr quot) => None (* à voir *)
+  | None => None
+  end.
+
+Definition complex_opt_eqb {T} {ro : ring_like_op T} :
+    option (complex T → complex T → bool) :=
+  match rngl_opt_eqb with
+  | Some eqb => Some (λ c d, (eqb (re c) (re d) && eqb (im c) (im d))%bool)
+  | None => None
+  end.
+
 Definition complex_ring_like_op T {ro : ring_like_op T} :
     ring_like_op (complex T) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
      rngl_opt_one := complex_opt_one;
-     rngl_opt_opp_or_subt := 42;
-     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
-     rngl_opt_eqb := ?rngl_opt_eqb;
-     rngl_opt_le := ?rngl_opt_le |}.
+     rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
+     rngl_opt_eqb := complex_opt_eqb;
+     rngl_opt_le := None |}.
+
+(* to be completed
+Definition complex_ring_like_prop T {ro : ring_like_op T} :=
+  {| rngl_mul_is_comm := rngl_mul_is_comm;
+     rngl_has_dec_le := false;
+     rngl_is_integral := 42;
+     rngl_is_alg_closed := ?rngl_is_alg_closed;
+     rngl_characteristic := ?rngl_characteristic;
+     rngl_add_comm := ?rngl_add_comm;
+     rngl_add_assoc := ?rngl_add_assoc;
+     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_mul_assoc := ?rngl_mul_assoc;
+     rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
+     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
+     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+     rngl_opt_mul_div := ?rngl_opt_mul_div;
+     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le |}.
 *)
