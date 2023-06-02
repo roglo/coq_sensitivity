@@ -54,6 +54,20 @@ unfold subm, mZ; cbn.
 now rewrite butn_nil.
 Qed.
 
+(* to be completed
+Theorem eigenvalues :
+  rngl_is_alg_closed = true →
+  ∀ n (M : matrix T),
+  is_square_matrix M = true
+  → mat_nrows M = n
+  → ∃ ev, ev = 0.
+Proof.
+intros Hac * Hsm Hr.
+specialize rngl_opt_alg_closed as H1.
+rewrite Hac in H1.
+...
+*)
+
 Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
@@ -1058,6 +1072,7 @@ assert (Hdm : D = (U * M * U⁺)%M). {
   assert (M = (U⁺ * D * U)%M). {
     specialize (diagonalized_matrix_prop Hcf) as H1.
     specialize (H1 n M).
+Print eigenvalues_and_norm_vectors.
 ...
   rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
     rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
