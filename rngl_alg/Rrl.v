@@ -202,6 +202,9 @@ Arguments im {T} c%L.
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
 
+Definition complex_opt_one {T} {ro : ring_like_op T} : option (complex T) :=
+  Some {| re := rngl_one; im := rngl_zero |}.
+
 Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
   {| re := re ca + re cb; im := im ca + im cb |}.
 
@@ -215,8 +218,8 @@ Definition complex_ring_like_op T {ro : ring_like_op T} :
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
-     rngl_opt_one := 42;
-     rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
+     rngl_opt_one := complex_opt_one;
+     rngl_opt_opp_or_subt := 42;
      rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
      rngl_opt_eqb := ?rngl_opt_eqb;
      rngl_opt_le := ?rngl_opt_le |}.
