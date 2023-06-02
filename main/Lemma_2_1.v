@@ -1045,7 +1045,7 @@ Qed.
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 (* https://ecroot.math.gatech.edu/notes_linear.pdf *)
 
-(* to be completed *)
+(* to be completed
 Theorem Rayleigh_quotient_from_dot_mul : in_ordered_field →
   ∀ n (M : matrix T) D U v,
   vect_size v = n
