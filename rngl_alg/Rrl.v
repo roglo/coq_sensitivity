@@ -190,3 +190,34 @@ Compute (nat_of_list_nat [6]).
 ...
 Compute (nat_of_list_Z [6]).
 *)
+
+(* complex numbers *)
+(* see also Quaternions.v *)
+
+Record complex T := mk_c {re : T; im : T}.
+Arguments mk_c {T} re%L im%L.
+Arguments re {T} c%L.
+Arguments im {T} c%L.
+
+Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
+  {| re := rngl_zero; im := rngl_zero |}.
+
+Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
+  {| re := re ca + re cb; im := im ca + im cb |}.
+
+Definition complex_mul {T} {ro : ring_like_op T} (ca cb : complex T) :=
+  {| re := (re ca * re cb - im ca * im cb)%L;
+     im := (re ca * im cb + im ca * re cb)%L |}.
+
+(* to be completed
+Definition complex_ring_like_op T {ro : ring_like_op T} :
+    ring_like_op (complex T) :=
+  {| rngl_zero := complex_zero;
+     rngl_add := complex_add;
+     rngl_mul := complex_mul;
+     rngl_opt_one := 42;
+     rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
+     rngl_opt_eqb := ?rngl_opt_eqb;
+     rngl_opt_le := ?rngl_opt_le |}.
+*)
