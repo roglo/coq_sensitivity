@@ -1046,11 +1046,11 @@ Qed.
 
 (* to be completed
 Theorem Rayleigh_quotient_from_ortho :
-  ∀ n (M : matrix T) U evect eval x y,
-  U = mat_with_vect n evect
+  ∀ n (M : matrix T) eigen_val eigen_vect U x y,
+  U = mat_with_vect n eigen_vect
   → y = (U⁺ • x)%M
   → Rayleigh_quotient M x =
-      ((∑ (i = 1, n), eval.(i) * (vect_el y i) ^ 2) /
+      ((∑ (i = 1, n), eigen_val.(i) * (vect_el y i) ^ 2) /
        (∑ (i = 1, n), vect_el y i ^ 2))%L.
 ...
 
