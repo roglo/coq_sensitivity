@@ -357,6 +357,28 @@ do 2 rewrite (rngl_mul_0_l Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
 
+Theorem complex_mul_add_distr_l {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_opp T = true →
+  ∀ a b c : complex T, (a * (b + c))%L = (a * b + a * c)%L.
+Proof.
+intros * Hop *; cbn.
+apply eq_complex_eq; cbn.
+progress unfold rngl_sub; rewrite Hop.
+do 4 rewrite rngl_mul_add_distr_l.
+rewrite (rngl_opp_add_distr Hop).
+progress unfold rngl_sub; rewrite Hop.
+do 4 rewrite <- rngl_add_assoc.
+split; f_equal. {
+  now rewrite rngl_add_assoc, rngl_add_comm.
+} {
+  rewrite rngl_add_comm.
+  rewrite <- rngl_add_assoc; f_equal.
+  apply rngl_add_comm.
+}
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -373,8 +395,8 @@ Definition complex_ring_like_prop T
      rngl_add_0_l := complex_add_0_l;
      rngl_mul_assoc := complex_mul_assoc Hop;
      rngl_opt_mul_1_l := complex_opt_mul_1_l Hos;
-     rngl_mul_add_distr_l := 42;
-     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+     rngl_mul_add_distr_l := complex_mul_add_distr_l Hop;
+     rngl_opt_mul_comm := 42;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
