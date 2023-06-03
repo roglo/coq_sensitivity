@@ -202,11 +202,28 @@ Arguments mk_c {T} re%L im%L.
 Arguments re {T} complex%L.
 Arguments im {T} complex%L.
 
+Arguments rngl_has_opp T {R}.
+Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_1 T {ro}.
+Arguments rngl_opt_one T {ring_like_op}.
+
+Theorem eq_complex_eq {T} :
+  ∀ a b : complex T, re a = re b ∧ im a = im b ↔ a = b.
+Proof.
+intros.
+split; intros Hab; [ | now subst ].
+destruct a, b; cbn in Hab.
+now f_equal.
+Qed.
+
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
 
 Definition complex_opt_one {T} {ro : ring_like_op T} : option (complex T) :=
-  Some {| re := rngl_one; im := rngl_zero |}.
+  match rngl_opt_one T with
+  | Some one => Some {| re := one; im := rngl_zero |}
+  | None => None
+  end.
 
 Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
   {| re := re ca + re cb; im := im ca + im cb |}.
@@ -277,11 +294,8 @@ Proof.
 intros; cbn.
 progress unfold complex_add; cbn.
 do 2 rewrite rngl_add_0_l.
-now destruct a.
+now apply eq_complex_eq.
 Qed.
-
-Arguments rngl_has_opp T {R}.
-Arguments rngl_has_opp_or_subt T {R}.
 
 (* to be completed *)
 Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
@@ -314,14 +328,41 @@ f_equal. {
 }
 Qed.
 
+Theorem complex_opt_mul_1_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_opp_or_subt T = true →
+  if rngl_has_1 (complex T) then ∀ a : complex T, (1 * a)%L = a
+  else not_applicable.
+Proof.
+intros * Hos.
+remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
+destruct onc; [ | easy ].
+intros; cbn.
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honc; cbn in Honc.
+  progress unfold complex_opt_one in Honc.
+  progress unfold rngl_has_1.
+  now destruct rngl_opt_one.
+}
+progress unfold complex_mul.
+apply eq_complex_eq; cbn.
+specialize (rngl_mul_1_l Hon) as H1.
+unfold rngl_has_1 in Hon.
+progress unfold "1"%L in H1; cbn in H1.
+progress unfold "1"%L; cbn.
+progress unfold complex_opt_one; cbn.
+destruct rngl_opt_one as [one| ]; [ cbn | easy ].
+do 2 rewrite H1.
+do 2 rewrite (rngl_mul_0_l Hos).
+now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
-(*
-  let rom := complex_ring_like_op T in
-*)
   ring_like_prop (complex T) :=
+  let Hos := rngl_has_opp_has_opp_or_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
      rngl_is_integral := rngl_is_integral;
@@ -331,8 +372,8 @@ Definition complex_ring_like_prop T
      rngl_add_assoc := complex_add_assoc;
      rngl_add_0_l := complex_add_0_l;
      rngl_mul_assoc := complex_mul_assoc Hop;
-     rngl_opt_mul_1_l := 42;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_opt_mul_1_l := complex_opt_mul_1_l Hos;
+     rngl_mul_add_distr_l := 42;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
