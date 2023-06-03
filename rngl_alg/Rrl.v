@@ -2,7 +2,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
 Require Import Main.RingLike.
 
-Canonical Structure reals_ring_like_op : ring_like_op R :=
+Definition reals_ring_like_op : ring_like_op R :=
   {| rngl_zero := R0;
      rngl_add := Rplus;
      rngl_mul := Rmult;
@@ -69,6 +69,7 @@ now apply Rlt_asym in Hba.
 Qed.
 
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
+  let ro := reals_ring_like_op in
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
      rngl_is_integral := true;
@@ -194,10 +195,10 @@ Compute (nat_of_list_Z [6]).
 (* complex numbers *)
 (* see also Quaternions.v *)
 
-Record complex T := mk_c {re : T; im : T}.
+Class complex T := mk_c {re : T; im : T}.
 Arguments mk_c {T} re%L im%L.
-Arguments re {T} c%L.
-Arguments im {T} c%L.
+Arguments re {T} complex%L.
+Arguments im {T} complex%L.
 
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
@@ -249,15 +250,27 @@ Definition complex_ring_like_op T {ro : ring_like_op T} :
      rngl_opt_eqb := complex_opt_eqb;
      rngl_opt_le := None |}.
 
+Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  ∀ a b, (a + b)%L = (b + a)%L.
+Proof.
+intros; cbn.
+unfold complex_add.
+f_equal; apply rngl_add_comm.
+Qed.
+
 (* to be completed
-Definition complex_ring_like_prop T {ro : ring_like_op T} :=
+Definition complex_ring_like_prop T
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let rom := complex_ring_like_op T in
+  ring_like_prop (complex T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
-     rngl_is_integral := 42;
-     rngl_is_alg_closed := ?rngl_is_alg_closed;
-     rngl_characteristic := ?rngl_characteristic;
-     rngl_add_comm := ?rngl_add_comm;
-     rngl_add_assoc := ?rngl_add_assoc;
+     rngl_is_integral := rngl_is_integral;
+     rngl_is_alg_closed := true;
+     rngl_characteristic := rngl_characteristic;
+     rngl_add_comm := complex_add_comm;
+     rngl_add_assoc := 42;
      rngl_add_0_l := ?rngl_add_0_l;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
