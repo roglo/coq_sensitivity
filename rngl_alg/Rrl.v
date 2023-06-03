@@ -205,6 +205,7 @@ Arguments im {T} complex%L.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_1 T {ro}.
+Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem eq_complex_eq {T} :
@@ -379,13 +380,64 @@ split; f_equal. {
 }
 Qed.
 
+Theorem complex_opt_mul_comm {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  if rngl_mul_is_comm T then ∀ a b : complex T, (a * b)%L = (b * a)%L
+  else not_applicable.
+Proof.
+intros; cbn.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
+apply eq_complex_eq; cbn.
+do 2 rewrite (rngl_mul_comm Hic (re b)).
+do 2 rewrite (rngl_mul_comm Hic (im b)).
+split; [ easy | ].
+apply rngl_add_comm.
+Qed.
+
+Theorem complex_opt_mul_1_r {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_opp_or_subt T = true →
+  if rngl_mul_is_comm T then not_applicable
+  else if rngl_has_1 (complex T) then ∀ a : complex T, (a * 1)%L = a
+  else not_applicable.
+Proof.
+intros * Hos.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ easy | ].
+remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
+destruct onc; [ | easy ].
+intros.
+apply eq_complex_eq; cbn.
+progress unfold "1"%L; cbn.
+progress unfold complex_opt_one.
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honc; cbn in Honc.
+  progress unfold complex_opt_one in Honc.
+  progress unfold rngl_has_1.
+  now destruct rngl_opt_one.
+}
+specialize (rngl_mul_1_r Hon) as H1.
+unfold rngl_has_1 in Honc.
+cbn in Honc.
+progress unfold complex_opt_one in Honc.
+progress unfold "1"%L in H1.
+destruct (rngl_opt_one T) as [one| ]; [ cbn | easy ].
+do 2 rewrite H1.
+do 2 rewrite (rngl_mul_0_r Hos).
+now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
   ring_like_prop (complex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
+  {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := true;
@@ -396,9 +448,9 @@ Definition complex_ring_like_prop T
      rngl_mul_assoc := complex_mul_assoc Hop;
      rngl_opt_mul_1_l := complex_opt_mul_1_l Hos;
      rngl_mul_add_distr_l := complex_mul_add_distr_l Hop;
-     rngl_opt_mul_comm := 42;
-     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+     rngl_opt_mul_comm := complex_opt_mul_comm;
+     rngl_opt_mul_1_r := complex_opt_mul_1_r Hos;
+     rngl_opt_mul_add_distr_r := 42;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
      rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
