@@ -194,6 +194,8 @@ Compute (nat_of_list_Z [6]).
 
 (* complex numbers *)
 (* see also Quaternions.v *)
+(* since it does not depend on real numbers, this code
+   could reside elsewhere *)
 
 Class complex T := mk_c {re : T; im : T}.
 Arguments mk_c {T} re%L im%L.
@@ -255,14 +257,25 @@ Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   ∀ a b, (a + b)%L = (b + a)%L.
 Proof.
 intros; cbn.
-unfold complex_add.
+progress unfold complex_add.
 f_equal; apply rngl_add_comm.
+Qed.
+
+Theorem complex_add_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  ∀ a b c : complex T, (a + (b + c))%L = (a + b + c)%L.
+Proof.
+intros; cbn.
+progress unfold complex_add; cbn.
+f_equal; apply rngl_add_assoc.
 Qed.
 
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T} :
+(*
   let rom := complex_ring_like_op T in
+*)
   ring_like_prop (complex T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
@@ -270,8 +283,8 @@ Definition complex_ring_like_prop T
      rngl_is_alg_closed := true;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
-     rngl_add_assoc := 42;
-     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_add_assoc := complex_add_assoc;
+     rngl_add_0_l := 42;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
