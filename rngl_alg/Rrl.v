@@ -202,6 +202,7 @@ Arguments mk_c {T} re%L im%L.
 Arguments re {T} complex%L.
 Arguments im {T} complex%L.
 
+Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_inv T {R}.
@@ -221,23 +222,29 @@ destruct a, b; cbn in Hab.
 now f_equal.
 Qed.
 
-(*
-Theorem neq_complex_neq {T} :
+Theorem neq_complex_neq {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_eqb T = true →
   ∀ a b : complex T, re a ≠ re b ∨ im a ≠ im b ↔ a ≠ b.
 Proof.
-intros.
+intros Heb *.
 split; intros Hab. {
   intros H; subst b.
   now destruct Hab.
 }
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
-...
-split; intros Hab; [ | now subst ].
-destruct a, b; cbn in Hab.
-now f_equal.
+remember (rngl_eqb ra rb) as e eqn:He.
+symmetry in He.
+destruct e. {
+  apply (rngl_eqb_eq Heb) in He.
+  right.
+  intros Hi; apply Hab; clear Hab.
+  now subst.
+} {
+  apply (rngl_eqb_neq Heb) in He.
+  now left.
+}
 Qed.
-*)
 
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
@@ -637,6 +644,8 @@ rewrite (rngl_mul_comm Hic), H1. 2: {
   intros H.
   destruct a as (ra, ia).
   cbn in H.
+  apply neq_complex_neq in Haz.
+  cbn in Haz.
 ...
   destruct iq as [inv| quot]; [ cbn | easy ].
 ...
