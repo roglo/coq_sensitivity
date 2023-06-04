@@ -268,7 +268,7 @@ Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
 
 Definition complex_inv {T} {ro : ring_like_op T} (a : complex T) :=
   let d := (re a * re a + im a * im a)%L in
-  mk_c (re a / d) (- im a / d)%L.
+  mk_c (re a / d)%L (- im a / d)%L.
 
 Definition complex_opt_inv_or_quot {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
@@ -550,7 +550,8 @@ Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   rngl_has_inv T = true →
   rngl_mul_is_comm T = true →
-  ∀ a : complex T, a ≠ 0%L → re a⁻¹ = ((re a)/(re a * re a + im a * im a))%L.
+  ∀ a : complex T, a ≠ 0%L →
+  re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
 Proof.
 intros * Hiv Hic * Haz.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
@@ -595,11 +596,13 @@ Qed.
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
   if (rngl_has_inv (complex T) && rngl_has_1 (complex T))%bool then
     ∀ a : complex T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
-intros.
+intros * Hop Hic.
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
@@ -620,11 +623,19 @@ assert (Hiv : rngl_has_inv T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
-...
-rewrite (complex_inv_re Hiv); [ | easy ].
-rewrite (complex_inv_im Hiv); [ | easy ].
+rewrite (complex_inv_re Hiv Hic); [ | easy ].
+rewrite (complex_inv_im Hiv Hic); [ | easy ].
 unfold rngl_div.
 rewrite Hiv.
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_mul_swap Hic (re a)).
+rewrite (rngl_mul_mul_swap Hic (im a)).
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite (rngl_opp_involutive Hop).
+rewrite <- rngl_mul_add_distr_r.
+rewrite (rngl_mul_comm Hic), H1. 2: {
+  intros H.
 ...
   destruct iq as [inv| quot]; [ cbn | easy ].
 ...
