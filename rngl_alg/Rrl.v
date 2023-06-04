@@ -502,6 +502,22 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+Theorem complex_opt_sub_add_distr {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_subt T = false →
+  if rngl_has_subt (complex T) then
+    ∀ a b c : complex T, (a - (b + c))%L = (a - b - c)%L
+  else not_applicable.
+Proof.
+intros * Hsu.
+progress unfold rngl_has_subt; cbn.
+progress unfold complex_opt_opp_or_subt.
+progress unfold rngl_has_subt in Hsu.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -525,8 +541,8 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_add_distr_r := complex_opt_mul_add_distr_r Hop;
      rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
      rngl_opt_add_sub := complex_opt_add_sub Hsu;
-     rngl_opt_sub_add_distr := 42;
-     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
+     rngl_opt_mul_inv_l := 42;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
