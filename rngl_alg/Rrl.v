@@ -204,6 +204,7 @@ Arguments im {T} complex%L.
 
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_opt_one T {ring_like_op}.
@@ -486,12 +487,28 @@ destruct os as [opp| subt]; [ cbn | easy ].
 now do 2 rewrite H1.
 Qed.
 
+Theorem complex_opt_add_sub {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_subt T = false →
+  if rngl_has_subt (complex T) then ∀ a b : complex T, (a + b - b)%L = a
+  else not_applicable.
+Proof.
+intros * Hsu.
+progress unfold rngl_has_subt; cbn.
+progress unfold complex_opt_opp_or_subt.
+progress unfold rngl_has_subt in Hsu.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
   ring_like_prop (complex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
+  let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
      rngl_is_integral := rngl_is_integral;
@@ -507,8 +524,8 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_1_r := complex_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := complex_opt_mul_add_distr_r Hop;
      rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
-     rngl_opt_add_sub := 42;
-     rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
+     rngl_opt_add_sub := complex_opt_add_sub Hsu;
+     rngl_opt_sub_add_distr := 42;
      rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
