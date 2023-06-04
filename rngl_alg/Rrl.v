@@ -461,6 +461,31 @@ split; f_equal. {
 }
 Qed.
 
+Theorem complex_opt_add_opp_l {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_opp T = true →
+  if rngl_has_opp (complex T) then ∀ a : complex T, (- a + a)%L = 0%L
+  else not_applicable.
+Proof.
+intros * Hop.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+remember (rngl_has_opp (complex T)) as opc eqn:Hopc; symmetry in Hopc.
+destruct opc; [ | easy ].
+intros.
+apply eq_complex_eq; cbn.
+specialize (rngl_add_opp_l Hop) as H1.
+progress unfold rngl_opp; cbn.
+progress unfold complex_opt_opp_or_subt; cbn.
+progress unfold rngl_has_opp in Hop.
+progress unfold rngl_opp in H1.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os as [opp| subt]; [ cbn | easy ].
+now do 2 rewrite H1.
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -481,8 +506,8 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_comm := complex_opt_mul_comm;
      rngl_opt_mul_1_r := complex_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := complex_opt_mul_add_distr_r Hop;
-     rngl_opt_add_opp_l := 42;
-     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
+     rngl_opt_add_sub := 42;
      rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
      rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
