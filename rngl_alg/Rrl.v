@@ -327,7 +327,6 @@ do 2 rewrite rngl_add_0_l.
 now apply eq_complex_eq.
 Qed.
 
-(* to be completed *)
 Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
@@ -636,6 +635,8 @@ rewrite (rngl_opp_involutive Hop).
 rewrite <- rngl_mul_add_distr_r.
 rewrite (rngl_mul_comm Hic), H1. 2: {
   intros H.
+  destruct a as (ra, ia).
+  cbn in H.
 ...
   destruct iq as [inv| quot]; [ cbn | easy ].
 ...
