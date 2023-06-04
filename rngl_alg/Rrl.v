@@ -209,6 +209,7 @@ Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
+Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem eq_complex_eq {T} :
@@ -267,7 +268,7 @@ Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
 
 Definition complex_opt_inv_or_quot {T} {ro : ring_like_op T} :
     option ((complex T → complex T) + (complex T → complex T → complex T)) :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inl inv) => None (* à voir *)
   | Some (inr quot) => None (* à voir *)
   | None => None
@@ -566,18 +567,22 @@ assert (Hiv : rngl_has_inv T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
-Theorem complex_inv_re {T}
-  {ro : ring_like_op T} {roc : ring_like_op (complex T)} :
+Theorem complex_inv_re {T} {ro : ring_like_op T} :
+  let roc := complex_ring_like_op T in
   rngl_has_inv T = true →
-  ∀ a : complex T, re a⁻¹ = (re a)⁻¹%L.
+  ∀ a : complex T, a ≠ 0%L → re a⁻¹ = (re a)⁻¹%L.
 Proof.
-intros * Hiv *.
+intros * Hiv * Haz.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_has_inv_or_quot in Hiq.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]. {
+  destruct iq as [inv| quot]; [ cbn | easy ].
 ...
-progress unfold rngl_inv.
-destruct rngl_opt_inv_or_quot as [iq| ].
+About rngl_opt_inv_or_quot.
 ...
 rewrite complex_inv_re.
 rewrite H1.
