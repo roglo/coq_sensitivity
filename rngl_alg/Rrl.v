@@ -266,10 +266,17 @@ Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
       None
   end.
 
-Definition complex_opt_inv_or_quot {T} {ro : ring_like_op T} :
+Definition complex_inv {T} {ro : ring_like_op T} (a : complex T) :=
+  let d := (re a * re a + im a * im a)%L in
+  mk_c (re a / d) (- im a / d)%L.
+
+Definition complex_opt_inv_or_quot {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
     option ((complex T → complex T) + (complex T → complex T → complex T)) :=
   match rngl_opt_inv_or_quot T with
-  | Some (inl inv) => None (* à voir *)
+  | Some (inl _) =>
+      if rngl_mul_is_comm T then Some (inl complex_inv)
+      else None
   | Some (inr quot) => None (* à voir *)
   | None => None
   end.
@@ -281,8 +288,8 @@ Definition complex_opt_eqb {T} {ro : ring_like_op T} :
   | None => None
   end.
 
-Definition complex_ring_like_op T {ro : ring_like_op T} :
-    ring_like_op (complex T) :=
+Definition complex_ring_like_op T
+  {ro : ring_like_op T} {rp : ring_like_prop T} : ring_like_op (complex T) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
@@ -539,6 +546,52 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_inv T = true →
+  rngl_mul_is_comm T = true →
+  ∀ a : complex T, a ≠ 0%L → re a⁻¹ = ((re a)/(re a * re a + im a * im a))%L.
+Proof.
+intros * Hiv Hic * Haz.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold rngl_div.
+rewrite Hiv, Hic.
+generalize Hiv; intros H.
+progress unfold rngl_has_inv in H.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+symmetry; apply (fold_rngl_div Hiv).
+Qed.
+
+Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_inv T = true →
+  rngl_mul_is_comm T = true →
+  ∀ a : complex T, a ≠ 0%L →
+  im a⁻¹ = ((- im a)/(re a * re a + im a * im a))%L.
+Proof.
+intros * Hiv Hic * Haz.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold rngl_div.
+rewrite Hiv, Hic.
+generalize Hiv; intros H.
+progress unfold rngl_has_inv in H.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+symmetry; apply (fold_rngl_div Hiv).
+Qed.
+
+(* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
@@ -567,19 +620,12 @@ assert (Hiv : rngl_has_inv T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
-Theorem complex_inv_re {T} {ro : ring_like_op T} :
-  let roc := complex_ring_like_op T in
-  rngl_has_inv T = true →
-  ∀ a : complex T, a ≠ 0%L → re a⁻¹ = (re a)⁻¹%L.
-Proof.
-intros * Hiv * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]. {
+...
+rewrite (complex_inv_re Hiv); [ | easy ].
+rewrite (complex_inv_im Hiv); [ | easy ].
+unfold rngl_div.
+rewrite Hiv.
+...
   destruct iq as [inv| quot]; [ cbn | easy ].
 ...
 About rngl_opt_inv_or_quot.
@@ -595,8 +641,9 @@ Set Printing All.
 specialize (H1 (re a)) as H.
 cbn in H.
 ...
+*)
 
-(* to be completed *)
+(* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
