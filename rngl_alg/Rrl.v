@@ -209,6 +209,7 @@ Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
+Arguments rngl_is_ordered T {R}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
@@ -604,11 +605,13 @@ Theorem complex_opt_mul_inv_l {T}
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
+  rngl_has_eqb T = true →
+  rngl_is_ordered T = true →
   if (rngl_has_inv (complex T) && rngl_has_1 (complex T))%bool then
     ∀ a : complex T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
-intros * Hop Hic.
+intros * Hop Hic Heb Hor.
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
@@ -641,11 +644,16 @@ rewrite Hop.
 rewrite (rngl_opp_involutive Hop).
 rewrite <- rngl_mul_add_distr_r.
 rewrite (rngl_mul_comm Hic), H1. 2: {
-  intros H.
+  intros Hri.
   destruct a as (ra, ia).
-  cbn in H.
-  apply neq_complex_neq in Haz.
+  cbn in Hri.
+  apply (rngl_eq_add_0 Hor) in Hri.
+Search (_ ≤ _ * _)%L.
+...
+  apply (neq_complex_neq Heb) in Haz.
   cbn in Haz.
+  destruct Haz as [Hr| Hi]. {
+Search rngl_is_ordered.
 ...
   destruct iq as [inv| quot]; [ cbn | easy ].
 ...
