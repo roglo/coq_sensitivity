@@ -253,11 +253,17 @@ Qed.
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
 
+(*
 Definition complex_opt_one {T} {ro : ring_like_op T} : option (complex T) :=
   match rngl_opt_one T with
   | Some one => Some {| re := one; im := rngl_zero |}
   | None => None
   end.
+*)
+Definition complex_opt_one {T} {ro : ring_like_op T} : option (complex T) :=
+  if rngl_has_1 T then Some {| re := rngl_one; im := rngl_zero |}
+  else None.
+(**)
 
 Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
   {| re := re ca + re cb; im := im ca + im cb |}.
@@ -381,18 +387,15 @@ intros; cbn.
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honc; cbn in Honc.
   progress unfold complex_opt_one in Honc.
-  progress unfold rngl_has_1.
-  now destruct rngl_opt_one.
+  now destruct (rngl_has_1 T).
 }
 progress unfold complex_mul.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_1_l Hon) as H1.
-unfold rngl_has_1 in Hon.
 progress unfold "1"%L in H1; cbn in H1.
 progress unfold "1"%L; cbn.
 progress unfold complex_opt_one; cbn.
-destruct rngl_opt_one as [one| ]; [ cbn | easy ].
-do 2 rewrite H1.
+rewrite Hon; cbn.
 do 2 rewrite (rngl_mul_0_l Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
@@ -456,15 +459,10 @@ progress unfold complex_opt_one.
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honc; cbn in Honc.
   progress unfold complex_opt_one in Honc.
-  progress unfold rngl_has_1.
-  now destruct rngl_opt_one.
+  now destruct (rngl_has_1 T).
 }
+rewrite Hon; cbn.
 specialize (rngl_mul_1_r Hon) as H1.
-unfold rngl_has_1 in Honc.
-cbn in Honc.
-progress unfold complex_opt_one in Honc.
-progress unfold "1"%L in H1.
-destruct (rngl_opt_one T) as [one| ]; [ cbn | easy ].
 do 2 rewrite H1.
 do 2 rewrite (rngl_mul_0_r Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
@@ -622,8 +620,7 @@ destruct onc; [ cbn | easy ].
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honc; cbn in Honc.
   progress unfold complex_opt_one in Honc.
-  progress unfold rngl_has_1.
-  now destruct rngl_opt_one.
+  now destruct (rngl_has_1 T).
 }
 assert (Hiv : rngl_has_inv T = true). {
   progress unfold rngl_has_inv in Hivc; cbn in Hivc.
@@ -674,6 +671,9 @@ progress unfold rngl_has_1 in Hon.
 remember (rngl_opt_one T) as on eqn:H2; symmetry in H2.
 destruct on as [one| ]; [ cbn | easy ].
 progress unfold complex_opt_one.
+progress unfold rngl_has_1.
+rewrite H2; cbn.
+progress unfold "1"%L.
 now rewrite H2.
 Qed.
 
