@@ -586,7 +586,7 @@ destruct iq as [inv| quot]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
@@ -599,6 +599,7 @@ Theorem complex_opt_mul_inv_l {T}
   else not_applicable.
 Proof.
 intros * Hop Heb Hor Hdl.
+clear Heb.
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
@@ -647,6 +648,9 @@ rewrite <- rngl_mul_add_distr_r.
 rewrite (rngl_mul_comm Hic), H1. 2: {
   intros Hri.
   apply (eq_rngl_add_square_0 Hop Hor Hdl) in Hri. 2: {
+(**)
+rewrite His; cbn.
+...
     apply Bool.orb_true_iff; right.
     now rewrite His, Heb.
   }
@@ -671,6 +675,7 @@ rewrite H2; cbn.
 progress unfold "1"%L.
 now rewrite H2.
 Qed.
+*)
 
 (* to be completed
 Definition complex_ring_like_prop T
