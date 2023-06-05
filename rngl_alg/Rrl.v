@@ -253,19 +253,10 @@ Qed.
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
 
-(*
-Definition complex_opt_one {T} {ro : ring_like_op T} : option (complex T) :=
-  match rngl_opt_one T with
-  | Some one => Some {| re := one; im := rngl_zero |}
-  | None => None
-  end.
-*)
 Definition complex_opt_one {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   option (complex T) :=
-  if (rngl_has_1 T && rngl_mul_is_comm T)%bool then
-    Some {| re := rngl_one; im := rngl_zero |}
+  if rngl_has_1 T then Some {| re := rngl_one; im := rngl_zero |}
   else None.
-(**)
 
 Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
   {| re := re ca + re cb; im := im ca + im cb |}.
@@ -391,19 +382,13 @@ assert (Hon : rngl_has_1 T = true). {
   progress unfold complex_opt_one in Honc.
   now destruct (rngl_has_1 T).
 }
-assert (Hic : rngl_mul_is_comm T = true). {
-  progress unfold rngl_has_1 in Honc; cbn in Honc.
-  progress unfold complex_opt_one in Honc.
-  rewrite Bool.andb_comm in Honc.
-  now destruct (rngl_mul_is_comm T).
-}
 progress unfold complex_mul.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_1_l Hon) as H1.
 progress unfold "1"%L in H1; cbn in H1.
 progress unfold "1"%L; cbn.
 progress unfold complex_opt_one; cbn.
-rewrite Hon, Hic; cbn.
+rewrite Hon; cbn.
 do 2 rewrite (rngl_mul_0_l Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
@@ -460,7 +445,17 @@ remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ easy | ].
 unfold rngl_has_1; cbn.
 unfold complex_opt_one; cbn.
-now rewrite Bool.andb_comm, Hic; cbn.
+(**)
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+destruct on; [ cbn | easy ].
+intros.
+apply eq_complex_eq; cbn.
+progress unfold "1"%L; cbn.
+progress unfold complex_opt_one.
+rewrite Hon; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
 Qed.
 
 Theorem complex_opt_mul_add_distr_r {T}
@@ -591,6 +586,7 @@ destruct iq as [inv| quot]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
+(* to be completed *)
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
@@ -629,9 +625,12 @@ intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
 assert (Hic : rngl_mul_is_comm T = true). {
-  progress unfold rngl_has_1 in Honc; cbn in Honc.
-  progress unfold complex_opt_one in Honc.
-  rewrite Hon in Honc.
+  progress unfold rngl_has_inv in Hivc; cbn in Hivc.
+  progress unfold complex_opt_inv_or_quot in Hivc.
+  progress unfold rngl_has_inv_and_1_or_quot in His.
+  rewrite Hon in His.
+  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+  destruct iq as [inv| quot]; [ | easy ].
   now destruct (rngl_mul_is_comm T).
 }
 rewrite (complex_inv_re Hiv Hic); [ | easy ].
@@ -669,7 +668,6 @@ destruct on as [one| ]; [ cbn | easy ].
 progress unfold complex_opt_one.
 progress unfold rngl_has_1.
 rewrite H2; cbn.
-rewrite Hic; cbn.
 progress unfold "1"%L.
 now rewrite H2.
 Qed.
