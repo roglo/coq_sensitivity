@@ -580,12 +580,8 @@ Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   im a⁻¹ = ((- im a)/(re a * re a + im a * im a))%L.
 Proof.
 intros * Hiv Hic * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
 progress unfold rngl_inv; cbn.
 progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_div.
 rewrite Hiv, Hic.
 generalize Hiv; intros H.
@@ -595,12 +591,11 @@ destruct iq as [inv| quot]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rngl_has_dec_le T = true →
@@ -608,7 +603,7 @@ Theorem complex_opt_mul_inv_l {T}
     ∀ a : complex T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
-intros * Hop Hic Heb Hor Hdl.
+intros * Hop Heb Hor Hdl.
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
@@ -634,6 +629,12 @@ assert (His : rngl_has_inv_and_1_or_quot T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
+assert (Hic : rngl_mul_is_comm T = true). {
+  progress unfold rngl_has_1 in Honc; cbn in Honc.
+  progress unfold complex_opt_one in Honc.
+  rewrite Hon in Honc.
+  now destruct (rngl_mul_is_comm T).
+}
 rewrite (complex_inv_re Hiv Hic); [ | easy ].
 rewrite (complex_inv_im Hiv Hic); [ | easy ].
 unfold rngl_div.
@@ -669,10 +670,10 @@ destruct on as [one| ]; [ cbn | easy ].
 progress unfold complex_opt_one.
 progress unfold rngl_has_1.
 rewrite H2; cbn.
+rewrite Hic; cbn.
 progress unfold "1"%L.
 now rewrite H2.
 Qed.
-*)
 
 (* to be completed
 Definition complex_ring_like_prop T
@@ -698,7 +699,7 @@ Definition complex_ring_like_prop T
      rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
      rngl_opt_add_sub := complex_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
-     rngl_opt_mul_inv_l := 42; (*complex_opt_mul_inv_l Hop;*)
+     rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
      rngl_opt_mul_inv_r := 42;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
