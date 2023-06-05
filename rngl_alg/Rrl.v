@@ -662,8 +662,14 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
+Theorem rngl_square_ge_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_dec_le T = true
+  → ∀ a, (0 ≤ a * a)%L.
+Proof.
+intros * Hdl *.
   destruct (rngl_le_dec Hdl 0%L a) as [Hap| Han]. {
     specialize rngl_opt_mul_le_compat_nonneg as H2.
+...
     rewrite Hor, Hop in H2; cbn in H2.
     specialize (H2 0%L 0%L a a).
     rewrite (rngl_mul_0_l Hos) in H2.
