@@ -1974,6 +1974,69 @@ Qed.
 Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
 Proof. easy. Qed.
 
+Theorem rngl_square_ge_0 :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  rngl_has_dec_le = true
+  → ∀ a, (0 ≤ a * a)%L.
+Proof.
+intros * Hop Hor Hdl *.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (rngl_le_dec Hdl 0%L a) as [Hap| Han]. {
+  specialize rngl_opt_mul_le_compat_nonneg as H2.
+  rewrite Hor, Hop in H2; cbn in H2.
+  specialize (H2 0%L 0%L a a).
+  rewrite (rngl_mul_0_l Hos) in H2.
+  apply H2. {
+    split; [ apply (rngl_le_refl Hor) | easy ].
+  } {
+    split; [ apply (rngl_le_refl Hor) | easy ].
+  }
+}
+apply (rngl_not_le Hor) in Han.
+destruct Han as [Han| Han]. {
+  subst a; rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_refl Hor).
+} {
+  specialize rngl_opt_mul_le_compat_nonpos as H2.
+  rewrite Hor, Hop in H2; cbn in H2.
+  specialize (H2 0%L 0%L a a).
+  rewrite (rngl_mul_0_l Hos) in H2.
+  apply H2. {
+    split; [ easy | apply (rngl_le_refl Hor) ].
+  } {
+    split; [ easy | apply (rngl_le_refl Hor) ].
+  }
+}
+Qed.
+
+Theorem eq_rngl_add_square_0 :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  rngl_has_dec_le = true →
+  (rngl_is_integral || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool =
+    true →
+  ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
+Proof.
+intros * Hop Hor Hdl Hii * Hab.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
+  apply (rngl_square_ge_0 Hop Hor Hdl).
+} {
+  apply (rngl_square_ge_0 Hop Hor Hdl).
+}
+destruct Hab as (Ha, Hb).
+split. {
+  now apply (rngl_integral Hos Hii) in Ha; destruct Ha.
+} {
+  now apply (rngl_integral Hos Hii) in Hb; destruct Hb.
+}
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=

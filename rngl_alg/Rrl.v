@@ -207,9 +207,11 @@ Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_inv T {R}.
+Arguments rngl_has_inv_and_1_or_quot T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
+Arguments rngl_is_integral T {ro ring_like_prop}.
 Arguments rngl_is_ordered T {R}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
@@ -634,6 +636,9 @@ assert (Hiv : rngl_has_inv T = true). {
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (His : rngl_has_inv_and_1_or_quot T = true). {
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
@@ -650,74 +655,14 @@ rewrite (rngl_opp_involutive Hop).
 rewrite <- rngl_mul_add_distr_r.
 rewrite (rngl_mul_comm Hic), H1. 2: {
   intros Hri.
-Theorem eq_rngl_add_square_0 {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  rngl_has_dec_le T = true →
-  ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
-Proof.
-intros * Hop Hor Hdl * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+  apply (eq_rngl_add_square_0 Hop Hor Hdl) in Hri. 2: {
+    apply Bool.orb_true_iff; right.
+    now rewrite His, Heb.
+  }
+  destruct Hri as (Hra, Hia); apply Haz.
+  apply eq_complex_eq.
+  now rewrite Hra, Hia.
 }
-apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
-Theorem rngl_square_ge_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_dec_le T = true
-  → ∀ a, (0 ≤ a * a)%L.
-Proof.
-intros * Hdl *.
-  destruct (rngl_le_dec Hdl 0%L a) as [Hap| Han]. {
-    specialize rngl_opt_mul_le_compat_nonneg as H2.
-...
-    rewrite Hor, Hop in H2; cbn in H2.
-    specialize (H2 0%L 0%L a a).
-    rewrite (rngl_mul_0_l Hos) in H2.
-    apply H2. {
-      split; [ apply (rngl_le_refl Hor) | easy ].
-    } {
-      split; [ apply (rngl_le_refl Hor) | easy ].
-    }
-  }
-  apply (rngl_not_le Hor) in Han.
-  destruct Han as [Han| Han]. {
-    subst a; rewrite (rngl_mul_0_l Hos).
-    apply (rngl_le_refl Hor).
-  } {
-    specialize rngl_opt_mul_le_compat_nonpos as H2.
-    rewrite Hor, Hop in H2; cbn in H2.
-    specialize (H2 0%L 0%L a a).
-    rewrite (rngl_mul_0_l Hos) in H2.
-    apply H2. {
-      split; [ easy | apply (rngl_le_refl Hor) ].
-    } {
-      split; [ easy | apply (rngl_le_refl Hor) ].
-    }
-  }
-} {
-  rewrite rngl_add_comm in Hab.
-(* pareil que plus haut ; faut que je fasse un assert ∀ *)
-... ...
-  apply eq_rngl_add_square_0 in Hri.
-...
-  destruct a as (ra, ia).
-  cbn in Hri.
-  apply (rngl_eq_add_0 Hor) in Hri; cycle 1. {
-    destruct (rngl_le_dec Hdl 0%L ra) as [Hap| Han]. {
-      specialize rngl_opt_mul_le_compat_nonneg as H2.
-      rewrite Hor, Hop in H2; cbn in H2.
-      specialize (H2 0%L 0%L ra ra).
-      rewrite (rngl_mul_0_l Hos) in H2.
-      apply H2. {
-        split; [ apply (rngl_le_refl Hor) | easy ].
-      } {
-        split; [ apply (rngl_le_refl Hor) | easy ].
-      }
-    }
-Search rngl_is_ordered.
-Check rngl_le_dec.
-...
-Search (_ ≤ _ * _)%L.
 ...
   apply (neq_complex_neq Heb) in Haz.
   cbn in Haz.
