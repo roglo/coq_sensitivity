@@ -602,7 +602,6 @@ destruct iq as [inv| quot]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
-(* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
@@ -663,28 +662,20 @@ rewrite (rngl_mul_comm Hic), H1. 2: {
   apply eq_complex_eq.
   now rewrite Hra, Hia.
 }
-...
-  apply (neq_complex_neq Heb) in Haz.
-  cbn in Haz.
-  destruct Haz as [Hr| Hi]. {
-Search rngl_is_ordered.
-...
-  destruct iq as [inv| quot]; [ cbn | easy ].
-...
-About rngl_opt_inv_or_quot.
-...
-rewrite complex_inv_re.
-rewrite H1.
-...
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-(**)
-Set Printing All.
-...
-specialize (H1 (re a)) as H.
-cbn in H.
-...
-*)
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_mul_swap Hic).
+rewrite rngl_mul_assoc.
+rewrite (fold_rngl_sub Hop).
+rewrite (rngl_sub_diag Hos).
+progress unfold "1"%L.
+progress unfold "0"%L.
+progress unfold rngl_has_1 in Hon.
+remember (rngl_opt_one T) as on eqn:H2; symmetry in H2.
+destruct on as [one| ]; [ cbn | easy ].
+progress unfold complex_opt_one.
+now rewrite H2.
+Qed.
 
 (* to be completed
 Definition complex_ring_like_prop T
@@ -695,7 +686,7 @@ Definition complex_ring_like_prop T
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
-     rngl_is_integral := rngl_is_integral;
+     rngl_is_integral := rngl_is_integral T;
      rngl_is_alg_closed := true;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
@@ -710,7 +701,7 @@ Definition complex_ring_like_prop T
      rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
      rngl_opt_add_sub := complex_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
-     rngl_opt_mul_inv_l := complex_opt_mul_inv_l;
+     rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
      rngl_opt_mul_inv_r := 42;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
