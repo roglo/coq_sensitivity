@@ -645,10 +645,23 @@ progress unfold rngl_sub.
 rewrite Hop.
 rewrite (rngl_opp_involutive Hop).
 rewrite <- rngl_mul_add_distr_r.
-rewrite (rngl_mul_comm Hic), H1. 2: {
+rewrite (rngl_mul_comm Hic).
+split. {
+  progress unfold "1"%L; cbn.
+  progress unfold complex_opt_one.
+  rewrite Hon; cbn.
+  apply H1.
   intros Hri.
   apply (eq_rngl_add_square_0 Hop Hor Hdl) in Hri. 2: {
 (**)
+(* Si un anneau a un inverse, c'est un corps, il est forcément
+   intègre, non ? *)
+Theorem glop : ∀ T {ro : ring_like_op T} {rp : ring_like_prop T},
+  rngl_has_inv T = true → rngl_is_integral T = true.
+Proof.
+intros * Hiv.
+Search rngl_is_integral.
+...
 rewrite His; cbn.
 ...
     apply Bool.orb_true_iff; right.
