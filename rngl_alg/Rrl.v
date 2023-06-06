@@ -105,93 +105,6 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := Ropt_not_le |}.
 
-(* experiment, to make, perhaps, an implementation of algebraic numbers
-   where a first step is to generate all monic polynomials with values
-   in ℕ; since monic, it is not required to append the coefficient 1 to
-   the list representing the polynomial, so we have to generate all
-   lists of nat *)
-
-Require Import Arith.
-Import List List.ListNotations.
-Require Import Main.Misc Main.IterAdd Main.NatRingLike.
-
-(* I don't know how to call that; I temporarily call it "step". It is
-   a number associated with a list; the next list must have a "step"
-   whose value is nat successor (next of a step 42 must have a step 43 *)
-Definition step l :=
-  let ron := nat_ring_like_op in
-  length l + ∑ (i = 1, length l), l.(i).
-
-(* I implemented that some years ago (hott.v in my reals) *)
-
-Fixpoint nat_of_list_nat l :=
-  match l with
-  | [] => 0
-  | a :: l => 2 ^ a * (2 * nat_of_list_nat l + 1)
-  end.
-
-Fixpoint how_many_times_div_by_2_aux iter n :=
-  match iter with
-  | 0 => 0
-  | S i =>
-      match n with
-      | 0 => 0
-      | S m =>
-          if Nat.even n then
-            1 + how_many_times_div_by_2_aux i (Nat.div2 n)
-          else 0
-      end
-  end.
-
-Definition how_many_times_div_by_2 n := how_many_times_div_by_2_aux n n.
-
-Fixpoint odd_part_of_nat_aux it n :=
-  match it with
-  | 0 => 42
-  | S it' =>
-      match n with
-      | 0 => 0
-      | S m =>
-          if Nat.even n then odd_part_of_nat_aux it' (Nat.div2 n)
-          else n
-      end
-  end.
-
-Definition odd_part_of_nat n := odd_part_of_nat_aux n n.
-
-Fixpoint list_nat_of_nat_aux it n :=
-  match it with
-  | 0 => [42]
-  | S it' =>
-      if n =? 0 then []
-      else
-        how_many_times_div_by_2 n ::
-        list_nat_of_nat_aux it' (Nat.div2 (odd_part_of_nat n))
-  end.
-
-Definition list_nat_of_nat n := list_nat_of_nat_aux (n + 1) n.
-
-Require Import ZArith.
-
-Definition Z_of_nat n :=
-  if Nat.odd n then (- Z.of_nat (Nat.div2 (n + 1)))%Z
-  else Z.of_nat (Nat.div2 (n + 1)).
-Definition list_Z_of_nat n := map Z_of_nat (list_nat_of_nat n).
-
-(*
-Compute (list_nat_of_nat 2023).
-Compute (nat_of_list_nat [0; 0; 0; 2; 0; 0; 0; 0; 0]%nat).
-Compute (map list_nat_of_nat (seq 0 100)).
-Open Scope Z_scope.
-Compute (map Z_of_nat (seq 0 10)).
-Compute (map list_Z_of_nat (seq 0 100)).
-Close Scope Z_scope.
-Compute (map (λ l, (l, step l, nat_of_list_nat l)) (map list_nat_of_nat (seq 0 100))).
-Compute (nat_of_list_nat [6]).
-...
-Compute (nat_of_list_Z [6]).
-*)
-
 (* complex numbers *)
 (* see also Quaternions.v *)
 
@@ -254,18 +167,17 @@ Definition complex_opt_opp_or_subt :
   option ((complex → complex) + (complex → complex → complex)) :=
   Some (inl (λ c, mk_c (- re c) (- im c))).
 
-(*
-About Rsqrt.
-Print nonnegreal.
-Search Rsqrt.
-Search nonnegreal.
+Definition Rsqrt' (a : R) :=
+  match Rle_dec R0 a with
+  | left Hle => Rsqrt (mknonnegreal a Hle)
+  | right _ => R0
+  end.
 
 Definition complex_inv (a : complex) :=
-  let d := Rsqrt (re a * re a + im a * im a) in
+  let d := Rsqrt' (re a * re a + im a * im a) in
   mk_c (re a / d) (- im a / d).
 
-...
-
+(* to be completed
 Definition complex_opt_inv_or_quot {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
     option ((complex T → complex T) + (complex T → complex T → complex T)) :=
