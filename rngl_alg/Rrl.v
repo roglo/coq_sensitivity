@@ -194,14 +194,10 @@ Compute (nat_of_list_Z [6]).
 
 (* complex numbers *)
 (* see also Quaternions.v *)
-(* since it does not depend on real numbers, this code
-   could reside elsewhere *)
 
-Class complex T := mk_c {re : T; im : T}.
-Arguments mk_c {T} re%L im%L.
-Arguments re {T} complex%L.
-Arguments im {T} complex%L.
+Record complex := mk_c {re : R; im : R}.
 
+(*
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_opp T {R}.
@@ -216,9 +212,10 @@ Arguments rngl_is_ordered T {R}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
+*)
 
-Theorem eq_complex_eq {T} :
-  ∀ a b : complex T, re a = re b ∧ im a = im b ↔ a = b.
+Theorem eq_complex_eq :
+  ∀ a b : complex, re a = re b ∧ im a = im b ↔ a = b.
 Proof.
 intros.
 split; intros Hab; [ | now subst ].
@@ -226,59 +223,48 @@ destruct a, b; cbn in Hab.
 now f_equal.
 Qed.
 
-Theorem neq_complex_neq {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_eqb T = true →
-  ∀ a b : complex T, re a ≠ re b ∨ im a ≠ im b ↔ a ≠ b.
+Theorem neq_complex_neq :
+  ∀ a b : complex, re a ≠ re b ∨ im a ≠ im b ↔ a ≠ b.
 Proof.
-intros Heb *.
+intros *.
 split; intros Hab. {
   intros H; subst b.
   now destruct Hab.
 }
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
-remember (rngl_eqb ra rb) as e eqn:He.
-symmetry in He.
-destruct e. {
-  apply (rngl_eqb_eq Heb) in He.
-  right.
-  intros Hi; apply Hab; clear Hab.
-  now subst.
-} {
-  apply (rngl_eqb_neq Heb) in He.
-  now left.
-}
+destruct (Req_dec ra rb) as [Hr| Hr]; [ | now left ].
+right.
+intros Hi; apply Hab.
+now subst.
 Qed.
 
-Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
-  {| re := rngl_zero; im := rngl_zero |}.
+Definition complex_zero : complex := {| re := R0; im := R0 |}.
 
-Definition complex_opt_one {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  option (complex T) :=
-  if rngl_has_1 T then Some {| re := rngl_one; im := rngl_zero |}
-  else None.
+Definition complex_opt_one : option complex := Some {| re := R1; im := R0 |}.
 
-Definition complex_add {T} {ro : ring_like_op T} (ca cb : complex T) :=
+Definition complex_add (ca cb : complex) : complex :=
   {| re := re ca + re cb; im := im ca + im cb |}.
 
-Definition complex_mul {T} {ro : ring_like_op T} (ca cb : complex T) :=
-  {| re := (re ca * re cb - im ca * im cb)%L;
-     im := (re ca * im cb + im ca * re cb)%L |}.
+Definition complex_mul (ca cb : complex) : complex :=
+  {| re := (re ca * re cb - im ca * im cb);
+     im := (re ca * im cb + im ca * re cb) |}.
 
-Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
-    option ((complex T → complex T) + (complex T → complex T → complex T)) :=
-  match rngl_opt_opp_or_subt with
-  | Some (inl opp) =>
-      Some (inl (λ c, mk_c (opp (re c)) (opp (im c))))
-  | Some (inr subt) =>
-      Some (inr (λ c d, mk_c (subt (re c) (re d)) (subt (im c) (im d))))
-  | None =>
-      None
-  end.
+Definition complex_opt_opp_or_subt :
+  option ((complex → complex) + (complex → complex → complex)) :=
+  Some (inl (λ c, mk_c (- re c) (- im c))).
 
-Definition complex_inv {T} {ro : ring_like_op T} (a : complex T) :=
-  let d := (re a * re a + im a * im a)%L in
-  mk_c (re a / d)%L (- im a / d)%L.
+(*
+About Rsqrt.
+Print nonnegreal.
+Search Rsqrt.
+Search nonnegreal.
+
+Definition complex_inv (a : complex) :=
+  let d := Rsqrt (re a * re a + im a * im a) in
+  mk_c (re a / d) (- im a / d).
+
+...
 
 Definition complex_opt_inv_or_quot {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
@@ -731,4 +717,5 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le |}.
+*)
 *)
