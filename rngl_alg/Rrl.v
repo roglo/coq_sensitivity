@@ -177,18 +177,11 @@ Definition complex_inv (a : complex) :=
   let d := Rsqrt' (re a * re a + im a * im a) in
   mk_c (re a / d) (- im a / d).
 
-(* to be completed
-Definition complex_opt_inv_or_quot {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-    option ((complex T → complex T) + (complex T → complex T → complex T)) :=
-  match rngl_opt_inv_or_quot T with
-  | Some (inl _) =>
-      if rngl_mul_is_comm T then Some (inl complex_inv)
-      else None
-  | Some (inr quot) => None (* à voir *)
-  | None => None
-  end.
+Definition complex_opt_inv_or_quot :
+  option ((complex → complex) + (complex → complex → complex)) :=
+  Some (inl complex_inv).
 
+(* to be completed
 Definition complex_opt_eqb {T} {ro : ring_like_op T} :
     option (complex T → complex T → bool) :=
   match rngl_opt_eqb with
