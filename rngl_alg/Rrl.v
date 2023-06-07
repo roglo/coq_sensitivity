@@ -4,13 +4,28 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import Reals.Cauchy.ConstructiveCauchyReals.
 Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
+Require Import QArith.
 Require Import Main.RingLike.
 
 Locate "/".
 
 Definition glop (x : CReal) : CReal.
 specialize (CReal_inv x) as H1.
+Search CReal.
+Check CReal_inv.
+Search (_ # _)%CReal.
+...
+CReal_inv: ∀ x : CReal, (x # inject_Q 0)%CReal → CReal
+Check CReal_lt.
+Show.
+...
 Search CReal_appart.
+Search CReal.
+...
+Search CReal.
+specialize (CReal_inv x) as H1.
+Search CReal_appart.
+Search CReal.
 ...
 
 Set Printing All.
