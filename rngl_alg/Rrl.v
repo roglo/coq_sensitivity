@@ -14,9 +14,12 @@ specialize (CReal_inv x) as H1.
 Search CReal.
 Check CReal_inv.
 Search (_ # _)%CReal.
+Search (_ < _)%CReal.
+Check CRealLt_dec.
+specialize (CRealLt_dec 0 x) as H2.
+Search (inject_Q).
 ...
 CReal_inv: ∀ x : CReal, (x # inject_Q 0)%CReal → CReal
-Check CReal_lt.
 Show.
 ...
 Search CReal_appart.
