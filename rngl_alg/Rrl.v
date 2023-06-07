@@ -7,10 +7,28 @@ Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
 Require Import QArith.
 Require Import Main.RingLike.
 
-Locate "/".
+Axiom CReal_eq_dec : ∀ a b : CReal, ({a = b} + {¬ (a = b)})%CReal.
 
 Definition glop (x : CReal) : CReal.
-specialize (CReal_inv x) as H1.
+destruct (CReal_eq_dec x 0%CReal) as [Hxz| Hxz]. {
+  apply (inject_Q 0).
+}
+apply (CReal_inv x).
+unfold CReal_appart.
+destruct x.
+unfold inject_Q.
+cbn.
+...
+(* bon, fait chier *)
+Search CReal.
+Search ((_ <= _)%CReal ∨ _).
+...
+Search CReal_appart.
+...
+Locate "+".
+Check "+"%CReal.
+  apply "0"%CReal.
+...
 Search CReal.
 Check CReal_inv.
 Search (_ # _)%CReal.
