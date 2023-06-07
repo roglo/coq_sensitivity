@@ -181,25 +181,17 @@ Definition complex_opt_inv_or_quot :
   option ((complex → complex) + (complex → complex → complex)) :=
   Some (inl complex_inv).
 
-(* to be completed
-Definition complex_opt_eqb {T} {ro : ring_like_op T} :
-    option (complex T → complex T → bool) :=
-  match rngl_opt_eqb with
-  | Some eqb => Some (λ c d, (eqb (re c) (re d) && eqb (im c) (im d))%bool)
-  | None => None
-  end.
-
-Definition complex_ring_like_op T
-  {ro : ring_like_op T} {rp : ring_like_prop T} : ring_like_op (complex T) :=
+Definition complex_ring_like_op : ring_like_op (complex) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
      rngl_opt_one := complex_opt_one;
      rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
      rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
-     rngl_opt_eqb := complex_opt_eqb;
+     rngl_opt_eqb := None;
      rngl_opt_le := None |}.
 
+(* to be completed
 Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   ∀ a b, (a + b)%L = (b + a)%L.
