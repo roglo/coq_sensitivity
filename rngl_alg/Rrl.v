@@ -1,3 +1,61 @@
+(* to be tested
+Set Nested Proofs Allowed.
+(* Coq reals as Cauchy sequences *)
+Require Import Utf8.
+Require Import Reals.Cauchy.ConstructiveCauchyReals.
+Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
+Require Import Main.RingLike.
+
+Locate "/".
+
+Definition glop (x : CReal) : CReal.
+specialize (CReal_inv x) as H1.
+Search CReal_appart.
+...
+
+Set Printing All.
+Check CReal_inv.
+Check CReal_appart.
+About CReal_inv.
+Print CReal_opp.
+Print CReal_inv.
+Search CReal_inv.
+Search (CReal → CReal).
+...
+
+Definition CReal_inv' x :=
+  match ... with
+  |
+
+Definition reals_ring_like_op : ring_like_op CReal :=
+  {| rngl_zero := 0%CReal;
+     rngl_add := CReal_plus;
+     rngl_mul := CReal_mult;
+     rngl_opt_one := Some 1%CReal;
+     rngl_opt_opp_or_subt := Some (inl CReal_opp);
+     rngl_opt_inv_or_quot := Some (inl CReal_inv);
+     rngl_opt_eqb := ?rngl_opt_eqb;
+     rngl_opt_le := ?rngl_opt_le |}.
+...
+
+(* Coq construtive reals *)
+Require Import Utf8.
+Require Import Reals.Abstract.ConstructiveReals.
+Require Import Main.RingLike.
+
+Definition reals_ring_like_op : ring_like_op ConstructiveReals :=
+  {| rngl_zero := 0%ConstructiveReals;
+     rngl_add := CRplus;
+     rngl_mul := 42;
+     rngl_opt_one := ?rngl_opt_one;
+     rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
+     rngl_opt_eqb := ?rngl_opt_eqb;
+     rngl_opt_le := ?rngl_opt_le |}.
+...
+*)
+
+(* "classical" Coq reals *)
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
 Require Import Main.RingLike.
