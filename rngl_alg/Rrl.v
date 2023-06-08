@@ -108,6 +108,36 @@ rewrite CReal_mult_1_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
+Theorem CReal_mul_add_distr_l : let ro := CReal_ring_like_op in
+  ∀ a b c : CReal, (a * (b + c))%L = (a * b + a * c)%L.
+Proof.
+cbn; intros.
+apply CReal_eq.
+intros H1.
+rewrite CReal_mult_plus_distr_l in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
+Theorem CReal_mul_comm : let ro := CReal_ring_like_op in
+  ∀ a b : CReal, (a * b)%L = (b * a)%L.
+Proof.
+cbn; intros.
+apply CReal_eq.
+intros H1.
+rewrite CReal_mult_comm in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
+Theorem CReal_add_opp_l : let ro := CReal_ring_like_op in
+  ∀ a : CReal, (- a + a)%L = 0%L.
+Proof.
+cbn; intros.
+apply CReal_eq.
+intros H1.
+rewrite CReal_plus_opp_l in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
 (* to be completed
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
@@ -120,14 +150,14 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_add_0_l := CReal_add_0_l;
      rngl_mul_assoc := CReal_mul_assoc;
      rngl_opt_mul_1_l := CReal_mul_1_l;
-     rngl_mul_add_distr_l := 42;
-     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
-     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
-     rngl_opt_add_sub := ?rngl_opt_add_sub;
-     rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
-     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_mul_add_distr_l := CReal_mul_add_distr_l;
+     rngl_opt_mul_comm := CReal_mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_l := CReal_add_opp_l;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
+     rngl_opt_mul_inv_l := 42;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
