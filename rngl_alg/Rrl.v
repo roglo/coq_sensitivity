@@ -1,67 +1,40 @@
-(* to be tested
-Set Nested Proofs Allowed.
 (* Coq reals as Cauchy sequences *)
+Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import Reals.Cauchy.ConstructiveCauchyReals.
 Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
 Require Import QArith.
 Require Import Main.RingLike.
 
-Axiom CReal_eq_dec : ∀ a b : CReal, ({a = b} + {¬ (a = b)})%CReal.
+Axiom CReal_appart_or_eq : ∀ x y, (x # y)%CReal + (x = y).
 
-Definition glop (x : CReal) : CReal.
-destruct (CReal_eq_dec x 0%CReal) as [Hxz| Hxz]. {
-  apply (inject_Q 0).
-}
-apply (CReal_inv x).
-unfold CReal_appart.
-destruct x.
-unfold inject_Q.
-cbn.
-...
-(* bon, fait chier *)
-Search CReal.
-Search ((_ <= _)%CReal ∨ _).
-...
-Search CReal_appart.
-...
-Locate "+".
-Check "+"%CReal.
-  apply "0"%CReal.
-...
-Search CReal.
-Check CReal_inv.
-Search (_ # _)%CReal.
-Search (_ < _)%CReal.
-Check CRealLt_dec.
-specialize (CRealLt_dec 0 x) as H2.
-Search (inject_Q).
-...
-CReal_inv: ∀ x : CReal, (x # inject_Q 0)%CReal → CReal
-Show.
-...
-Search CReal_appart.
-Search CReal.
-...
-Search CReal.
-specialize (CReal_inv x) as H1.
-Search CReal_appart.
-Search CReal.
-...
+Definition CReal_inv' (x : CReal) : CReal :=
+  match CReal_appart_or_eq x 0%CReal with
+  | inl H => CReal_inv x H
+  | inr _ => inject_Q 0
+  end.
 
-Set Printing All.
-Check CReal_inv.
-Check CReal_appart.
-About CReal_inv.
-Print CReal_opp.
-Print CReal_inv.
-Search CReal_inv.
-Search (CReal → CReal).
-...
+Definition CReal_eqb x y :=
+  match CReal_appart_or_eq x y with
+  | inl _ => false
+  | inr _ => true
+  end.
 
-Definition CReal_inv' x :=
-  match ... with
-  |
+Theorem CReal_eqb_refl : ∀ x, CReal_eqb x x = true.
+Proof.
+intros.
+unfold CReal_eqb.
+destruct (CReal_appart_or_eq x x) as [Hxx| Hxx]; [ exfalso | easy ].
+now destruct Hxx; apply (CRealLt_irrefl x).
+Qed.
+
+Theorem CReal_eqb_eq : ∀ x y, CReal_eqb x y = true ↔ x = y.
+Proof.
+intros.
+split; intros Hxy; [ | subst y; apply CReal_eqb_refl ].
+unfold CReal_eqb in Hxy.
+now destruct (CReal_appart_or_eq x y).
+Qed.
 
 Definition reals_ring_like_op : ring_like_op CReal :=
   {| rngl_zero := 0%CReal;
@@ -69,28 +42,50 @@ Definition reals_ring_like_op : ring_like_op CReal :=
      rngl_mul := CReal_mult;
      rngl_opt_one := Some 1%CReal;
      rngl_opt_opp_or_subt := Some (inl CReal_opp);
-     rngl_opt_inv_or_quot := Some (inl CReal_inv);
-     rngl_opt_eqb := ?rngl_opt_eqb;
-     rngl_opt_le := ?rngl_opt_le |}.
-...
+     rngl_opt_inv_or_quot := Some (inl CReal_inv');
+     rngl_opt_eqb := Some CReal_eqb;
+     rngl_opt_le := Some CRealLe |}.
 
-(* Coq construtive reals *)
-Require Import Utf8.
-Require Import Reals.Abstract.ConstructiveReals.
-Require Import Main.RingLike.
-
-Definition reals_ring_like_op : ring_like_op ConstructiveReals :=
-  {| rngl_zero := 0%ConstructiveReals;
-     rngl_add := CRplus;
-     rngl_mul := 42;
-     rngl_opt_one := ?rngl_opt_one;
-     rngl_opt_opp_or_subt := ?rngl_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
-     rngl_opt_eqb := ?rngl_opt_eqb;
-     rngl_opt_le := ?rngl_opt_le |}.
+(* to be completed
+Definition reals_ring_like_prop : ring_like_op CReal :=
+  {| rngl_mul_is_comm := true;
+     rngl_has_dec_le := 42;
+     rngl_is_integral := ?rngl_is_integral;
+     rngl_is_alg_closed := ?rngl_is_alg_closed;
+     rngl_characteristic := ?rngl_characteristic;
+     rngl_add_comm := ?rngl_add_comm;
+     rngl_add_assoc := ?rngl_add_assoc;
+     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_mul_assoc := ?rngl_mul_assoc;
+     rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
+     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_sub_add_distr := ?rngl_opt_sub_add_distr;
+     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+     rngl_opt_mul_div := ?rngl_opt_mul_div;
+     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le |}.
 ...
 *)
 
+(*
 (* "classical" Coq reals *)
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
@@ -708,5 +703,6 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le |}.
+*)
 *)
 *)
