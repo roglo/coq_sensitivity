@@ -8,12 +8,6 @@ Require Import Main.RingLike.
 
 Axiom CReal_appart_or_eq : ∀ x y, (x # y)%CReal + (x = y).
 
-Definition CReal_inv' (x : CReal) : CReal :=
-  match CReal_appart_or_eq x 0%CReal with
-  | inl H => CReal_inv x H
-  | inr _ => inject_Q 0
-  end.
-
 Definition CReal_eqb x y :=
   match CReal_appart_or_eq x y with
   | inl _ => false
@@ -36,7 +30,19 @@ unfold CReal_eqb in Hxy.
 now destruct (CReal_appart_or_eq x y).
 Qed.
 
-Definition reals_ring_like_op : ring_like_op CReal :=
+Theorem CReal_eq : ∀ x y, ((x # y)%CReal → False) → x = y.
+Proof.
+intros * Hxy.
+now destruct (CReal_appart_or_eq x y).
+Qed.
+
+Definition CReal_inv' (x : CReal) : CReal :=
+  match CReal_appart_or_eq x 0%CReal with
+  | inl H => CReal_inv x H
+  | inr _ => inject_Q 0
+  end.
+
+Definition CReal_ring_like_op : ring_like_op CReal :=
   {| rngl_zero := 0%CReal;
      rngl_add := CReal_plus;
      rngl_mul := CReal_mult;
@@ -46,16 +52,36 @@ Definition reals_ring_like_op : ring_like_op CReal :=
      rngl_opt_eqb := Some CReal_eqb;
      rngl_opt_le := Some CRealLe |}.
 
+Theorem CReal_add_comm : let ro := CReal_ring_like_op in
+  ∀ a b : CReal, (a + b)%L = (b + a)%L.
+Proof.
+intros; cbn.
+apply CReal_eq.
+intros H1.
+rewrite CReal_plus_comm in H1.
+now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+Qed.
+
+Theorem CReal_add_assoc : let ro := CReal_ring_like_op in
+  ∀ a b c : CReal, (a + (b + c))%L = (a + b + c)%L.
+Proof.
+intros; cbn.
+apply CReal_eq.
+intros H1.
+rewrite CReal_plus_assoc in H1.
+now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+Qed.
+
 (* to be completed
-Definition reals_ring_like_prop : ring_like_op CReal :=
+Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := 42;
-     rngl_is_integral := ?rngl_is_integral;
-     rngl_is_alg_closed := ?rngl_is_alg_closed;
-     rngl_characteristic := ?rngl_characteristic;
-     rngl_add_comm := ?rngl_add_comm;
-     rngl_add_assoc := ?rngl_add_assoc;
-     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_has_dec_le := true;
+     rngl_is_integral := true;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := 0;
+     rngl_add_comm := CReal_add_comm;
+     rngl_add_assoc := CReal_add_assoc;
+     rngl_add_0_l := 42;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
