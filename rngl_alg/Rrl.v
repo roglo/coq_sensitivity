@@ -170,6 +170,16 @@ apply CRealLe_refl.
 Qed.
 
 (* to be completed
+Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
+  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
+Proof.
+intros * H1.
+induction i. {
+  cbn in H1.
+...
+  apply CReal_eq in H1.
+...
+
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -195,9 +205,9 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_eqb_eq := CReal_eqb_eq;
      rngl_opt_le_dec := CReal_le_dec;
      rngl_opt_integral := NA;
-     rngl_opt_alg_closed := 42;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
-     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_alg_closed := NA;
+     rngl_characteristic_prop := CReal_characteristic_prop;
+     rngl_opt_le_refl := 42;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
      rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
