@@ -22,14 +22,6 @@ destruct (CReal_appart_or_eq x x) as [Hxx| Hxx]; [ exfalso | easy ].
 now destruct Hxx; apply (CRealLt_irrefl x).
 Qed.
 
-Theorem CReal_eqb_eq : ∀ x y, CReal_eqb x y = true ↔ x = y.
-Proof.
-intros.
-split; intros Hxy; [ | subst y; apply CReal_eqb_refl ].
-unfold CReal_eqb in Hxy.
-now destruct (CReal_appart_or_eq x y).
-Qed.
-
 Theorem CReal_eq : ∀ x y, ((x # y)%CReal → False) → x = y.
 Proof.
 intros * Hxy.
@@ -150,7 +142,30 @@ rewrite CReal_inv_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
+Theorem CReal_eqb_eq : ∀ x y, CReal_eqb x y = true ↔ x = y.
+Proof.
+intros.
+split; intros Hxy; [ | subst y; apply CReal_eqb_refl ].
+unfold CReal_eqb in Hxy.
+now destruct (CReal_appart_or_eq x y).
+Qed.
+
 (* to be completed
+Theorem CReal_le_dec : let ro := CReal_ring_like_op in
+  ∀ a b : CReal, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
+Proof.
+cbn; intros.
+Search CRealLe.
+Search ({(_ <= _)%CReal} + {_}).
+...
+apply CReal_eq.
+intros H1.
+unfold CReal_inv' in H1.
+destruct (CReal_appart_or_eq _ _) as [H2| H2]; [ | easy ].
+rewrite CReal_inv_l in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -173,8 +188,8 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := 42;
-     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_eqb_eq := CReal_eqb_eq;
+     rngl_opt_le_dec := 42;
      rngl_opt_integral := ?rngl_opt_integral;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;
      rngl_characteristic_prop := ?rngl_characteristic_prop;
