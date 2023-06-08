@@ -138,6 +138,18 @@ rewrite CReal_plus_opp_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
+Theorem CReal_mul_inv_l : let ro := CReal_ring_like_op in
+  ∀ a : CReal, a ≠ 0%L → (a⁻¹ * a)%L = 1%L.
+Proof.
+cbn; intros * Haz.
+apply CReal_eq.
+intros H1.
+unfold CReal_inv' in H1.
+destruct (CReal_appart_or_eq _ _) as [H2| H2]; [ | easy ].
+rewrite CReal_inv_l in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
 (* to be completed
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
@@ -157,11 +169,11 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_add_opp_l := CReal_add_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := 42;
-     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
-     rngl_opt_mul_div := ?rngl_opt_mul_div;
-     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
-     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_mul_inv_l := CReal_mul_inv_l;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_div := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := 42;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
      rngl_opt_integral := ?rngl_opt_integral;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;
