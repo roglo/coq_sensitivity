@@ -22,6 +22,24 @@ destruct (CReal_appart_or_eq x x) as [Hxx| Hxx]; [ exfalso | easy ].
 now destruct Hxx; apply (CRealLt_irrefl x).
 Qed.
 
+Theorem CReal_appart_irrefl : ∀ x, (x # x)%CReal → False.
+Proof.
+intros * H1.
+now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+Qed.
+
+Theorem eq_CReal_eq : ∀ x y, ((x # y)%CReal → False) ↔ x = y.
+Proof.
+intros.
+split. {
+  intros Hxy.
+  now destruct (CReal_appart_or_eq x y).
+} {
+  intros H1; subst y.
+  apply CReal_appart_irrefl.
+}
+Qed.
+
 Theorem CReal_eq : ∀ x y, ((x # y)%CReal → False) → x = y.
 Proof.
 intros * Hxy.
@@ -47,12 +65,6 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
 (*
 Print Assumptions CReal_ring_like_op.
 *)
-
-Theorem CReal_appart_irrefl : ∀ x, (x # x)%CReal → False.
-Proof.
-intros * H1.
-now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
-Qed.
 
 Theorem CReal_add_comm : let ro := CReal_ring_like_op in
   ∀ a b : CReal, (a + b)%L = (b + a)%L.
@@ -176,8 +188,13 @@ Proof.
 intros * H1.
 induction i. {
   cbn in H1.
-...
-  apply CReal_eq in H1.
+  apply eq_CReal_eq in H1; [ easy | ].
+  clear H1 H; right.
+  rewrite <- CReal_plus_0_l at 1.
+  apply CReal_plus_lt_compat_r.
+  now apply inject_Q_lt.
+}
+remember (S i) as si; cbn in H1; subst si.
 ...
 
 Definition CReal_ring_like_prop : ring_like_op CReal :=
