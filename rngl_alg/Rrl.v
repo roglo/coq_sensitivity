@@ -208,7 +208,7 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
 ...
 *)
 
-(*
+(**)
 (* "classical" Coq reals *)
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
@@ -223,6 +223,10 @@ Definition reals_ring_like_op : ring_like_op R :=
      rngl_opt_inv_or_quot := Some (inl Rinv);
      rngl_opt_eqb := None;
      rngl_opt_le := Some Rle |}.
+
+(*
+Print Assumptions reals_ring_like_op.
+*)
 
 Theorem Rplus_assoc' : ∀ a b c : R, (a + (b + c))%R = (a + b + c)%R.
 Proof. intros; now rewrite Rplus_assoc. Qed.
@@ -402,6 +406,10 @@ Definition complex_ring_like_op : ring_like_op (complex) :=
      rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
+
+(*
+Print Assumptions complex_ring_like_op.
+*)
 
 (* to be completed
 Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
@@ -826,6 +834,5 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le |}.
-*)
 *)
 *)
