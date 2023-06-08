@@ -52,6 +52,12 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_eqb := Some CReal_eqb;
      rngl_opt_le := Some CRealLe |}.
 
+Theorem CReal_appart_irrefl : ∀ x, (x # x)%CReal → False.
+Proof.
+intros * H1.
+now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+Qed.
+
 Theorem CReal_add_comm : let ro := CReal_ring_like_op in
   ∀ a b : CReal, (a + b)%L = (b + a)%L.
 Proof.
@@ -59,7 +65,7 @@ intros; cbn.
 apply CReal_eq.
 intros H1.
 rewrite CReal_plus_comm in H1.
-now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+now apply CReal_appart_irrefl in H1.
 Qed.
 
 Theorem CReal_add_assoc : let ro := CReal_ring_like_op in
@@ -69,7 +75,37 @@ intros; cbn.
 apply CReal_eq.
 intros H1.
 rewrite CReal_plus_assoc in H1.
-now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
+Theorem CReal_add_0_l : let ro := CReal_ring_like_op in
+  ∀ a : CReal, (0 + a)%L = a.
+Proof.
+intros; cbn.
+apply CReal_eq.
+intros H1.
+rewrite CReal_plus_0_l in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
+Theorem CReal_mul_assoc : let ro := CReal_ring_like_op in
+  ∀ a b c : CReal, (a * (b * c))%L = (a * b * c)%L.
+Proof.
+intros; cbn.
+apply CReal_eq.
+intros H1.
+rewrite CReal_mult_assoc in H1.
+now apply CReal_appart_irrefl in H1.
+Qed.
+
+Theorem CReal_mul_1_l : let ro := CReal_ring_like_op in
+  ∀ a : CReal, (1 * a)%L = a.
+Proof.
+cbn; intros.
+apply CReal_eq.
+intros H1.
+rewrite CReal_mult_1_l in H1.
+now apply CReal_appart_irrefl in H1.
 Qed.
 
 (* to be completed
@@ -81,10 +117,10 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_characteristic := 0;
      rngl_add_comm := CReal_add_comm;
      rngl_add_assoc := CReal_add_assoc;
-     rngl_add_0_l := 42;
-     rngl_mul_assoc := ?rngl_mul_assoc;
-     rngl_opt_mul_1_l := ?rngl_opt_mul_1_l;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_add_0_l := CReal_add_0_l;
+     rngl_mul_assoc := CReal_mul_assoc;
+     rngl_opt_mul_1_l := CReal_mul_1_l;
+     rngl_mul_add_distr_l := 42;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
