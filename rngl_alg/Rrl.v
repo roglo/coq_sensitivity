@@ -155,8 +155,20 @@ Theorem CReal_le_dec : let ro := CReal_ring_like_op in
   ∀ a b : CReal, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
 Proof.
 cbn; intros.
+destruct (CReal_appart_or_eq a b) as [Hab| Hab]. 2: {
+  subst b; left.
+  apply CRealLe_refl.
+}
+Search (_ < _)%CReal.
+Search CRealLtProp.
+...
 Search CRealLe.
 Search ({(_ <= _)%CReal} + {_}).
+Search ((_ < _)%CReal + _)%type.
+specialize (CRealLt_dec a (a + 1) b) as H1.
+Search CReal_appart.
+...
+specialize (CRealLt_dec a b b) as H1.
 ...
 apply CReal_eq.
 intros H1.
