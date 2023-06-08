@@ -2645,12 +2645,12 @@ Qed.
 
 Theorem polyn_opt_integral :
   let _ := polyn_ring_like_op in
-  if rngl_is_integral then
+  if rngl_is_integral_domain then
     ∀ a b : polyn T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
   else not_applicable.
 Proof.
 intros rop; subst rop.
-destruct (Sumbool.sumbool_of_bool rngl_is_integral) as [Hii| Hii];
+destruct (Sumbool.sumbool_of_bool rngl_is_integral_domain) as [Hii| Hii];
   rewrite Hii; [ | easy ].
 intros * Hab.
 cbn in Hab.
@@ -3226,7 +3226,7 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
-     rngl_is_integral := rngl_is_integral;
+     rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm';

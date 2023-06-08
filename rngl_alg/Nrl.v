@@ -411,7 +411,7 @@ Qed.
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
-     rngl_is_integral := false;
+     rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := at_least_1 n;
      rngl_add_comm := Zn_add_comm;
@@ -502,7 +502,7 @@ Definition lcm_ring_like_prop :=
   let rol := lcm_ring_like_op in
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
-     rngl_is_integral := true;
+     rngl_is_integral_domain := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 1;
      rngl_add_comm := Nat.lcm_comm;

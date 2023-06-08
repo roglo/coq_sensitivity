@@ -1077,7 +1077,7 @@ Theorem determinant_with_bad_row :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1247,7 +1247,7 @@ Theorem matrix_comatrix_transp_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
@@ -1437,7 +1437,7 @@ Theorem comatrix_transp_matrix_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
@@ -1642,7 +1642,7 @@ Theorem mat_mul_inv_r : in_charac_0_field →
   → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
-destruct Hif as (Hon, Hic, Hop, Hin, Hit, Hde, Hch).
+destruct Hif as (Hon, Hic, Hop, Hin, Hde, Hch).
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
   unfold mat_nrows in Hrz.
@@ -1663,7 +1663,8 @@ rewrite (mat_mul_mul_scal_l Hop Hic); cycle 1. {
   apply comatrix_ncols.
 }
 rewrite (matrix_comatrix_transp_mul Hon Hop Hic Hch); [ | | easy ]. 2: {
-  now apply Bool.orb_true_iff; left.
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_or_quot_iff; left.
 }
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
@@ -1677,7 +1678,7 @@ Theorem mat_mul_inv_l : in_charac_0_field →
   → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
-destruct Hif as (Hon, Hic, Hop, Hin, Hit, Hde, Hch).
+destruct Hif as (Hon, Hic, Hop, Hin, Hde, Hch).
 unfold mat_inv.
 rewrite mat_mul_scal_l_mul; [ | easy | ]. 2: {
   apply squ_mat_is_corr.
@@ -1685,7 +1686,8 @@ rewrite mat_mul_scal_l_mul; [ | easy | ]. 2: {
   now apply comatrix_is_square.
 }
 rewrite (comatrix_transp_matrix_mul Hon Hop Hic Hch); [ | | easy ]. 2: {
-  now apply Bool.orb_true_iff; left.
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_or_quot_iff; left.
 }
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
@@ -1723,9 +1725,12 @@ Theorem mat_inv_det_comm : in_charac_0_field →
 Proof.
 intros Hif * Hsm Hmz.
 generalize Hif; intros H.
-destruct H as (Hon, Hic, Hop, Hin, Hit, Hde, Hch).
+destruct H as (Hon, Hic, Hop, Hin, Hde, Hch).
 specialize (matrix_comatrix_transp_mul Hon Hop Hic Hch) as H1.
-specialize (H1 (proj2 (Bool.orb_true_iff _ _) (or_introl Hit))).
+assert (Hiq : rngl_has_inv_or_quot = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+specialize (H1 (proj2 (Bool.orb_true_iff _ _) (or_intror Hiq))).
 specialize (H1 M Hsm).
 specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
 apply (f_equal (mat_mul M⁻¹)) in H1.
@@ -1968,7 +1973,7 @@ Theorem cramer's_rule_by_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2038,7 +2043,7 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].
 }
-assert (Hii : (rngl_is_integral || rngl_has_inv_or_quot)%bool = true). {
+assert (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true). {
   rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }

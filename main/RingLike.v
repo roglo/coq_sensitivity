@@ -249,7 +249,7 @@ Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_has_dec_le : bool;
-    rngl_is_integral : bool;
+    rngl_is_integral_domain : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%L;
@@ -308,7 +308,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
-      if rngl_is_integral then
+      if rngl_is_integral_domain then
         ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L
       else not_applicable;
     (* when algebraically closed *)
@@ -1195,12 +1195,12 @@ Qed.
 
 Theorem rngl_eq_mul_0_l :
   rngl_has_opp_or_subt = true →
-  (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
   ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
 Proof.
 intros Hos Hii * Hab Hbz.
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral; [ now apply rngl_integral in Hab; destruct Hab | ].
+destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
 cbn in Hii; clear rngl_integral.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
@@ -1229,7 +1229,7 @@ Qed.
 
 Theorem rngl_eq_mul_0_r :
   rngl_has_opp_or_subt = true →
-  (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
   ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
 Proof.
 intros Hos Hii * Hab Haz.
@@ -1239,7 +1239,7 @@ destruct ic. {
   now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
 }
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral; [ now apply rngl_integral in Hab; destruct Hab | ].
+destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
 cbn in Hii; clear rngl_integral.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
@@ -1269,13 +1269,13 @@ Qed.
 
 Theorem rngl_integral :
   rngl_has_opp_or_subt = true →
-  (rngl_is_integral ||
+  (rngl_is_integral_domain ||
    rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral; [ now apply rngl_integral | cbn in Hdo ].
+destruct rngl_is_integral_domain; [ now apply rngl_integral | cbn in Hdo ].
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 = true). {
@@ -1736,8 +1736,8 @@ assert (Hid : rngl_has_inv_and_1_or_quot = true). {
 }
 specialize (rngl_div_diag Hon Hiq) as div_diag.
 specialize (rngl_eq_mul_0_l Hom) as integral.
-assert (H : (rngl_is_integral || rngl_has_inv_and_1_or_quot)%bool = true). {
-  now rewrite Hid; destruct rngl_is_integral.
+assert (H : (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true). {
+  now rewrite Hid; destruct rngl_is_integral_domain.
 }
 specialize (integral H); clear H.
 unfold rngl_div in div_diag.
@@ -1939,7 +1939,7 @@ Qed.
 Theorem eq_rngl_add_same_0 :
   rngl_has_1 = true →
   rngl_has_opp_or_subt = true →
-  (rngl_is_integral || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
   (a + a = 0)%L
@@ -1953,7 +1953,7 @@ rewrite Hon, Hch in char_prop; cbn in char_prop.
 specialize (char_prop 1) as H1; cbn in H1.
 rewrite rngl_add_0_r in H1.
 apply (rngl_eq_mul_0_r Hos) in Haa; [ easy | | easy ].
-destruct rngl_is_integral; [ easy | ].
+destruct rngl_is_integral_domain; [ easy | ].
 cbn in Hii |-*.
 apply rngl_has_inv_or_quot_iff in Hii.
 apply rngl_has_inv_and_1_or_quot_iff.
@@ -2016,7 +2016,7 @@ Theorem eq_rngl_add_square_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
   rngl_has_dec_le = true →
-  (rngl_is_integral || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool =
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
@@ -2044,7 +2044,6 @@ Record in_charac_0_field :=
     cf_mul_is_comm : rngl_mul_is_comm = true;
     cf_has_opp : rngl_has_opp = true;
     cf_has_inv : rngl_has_inv = true;
-    cf_is_integral : rngl_is_integral = true;
     cf_has_eqb : rngl_has_eqb = true;
     cf_characteristic : rngl_characteristic = 0 }.
 

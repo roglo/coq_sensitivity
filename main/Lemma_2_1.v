@@ -126,7 +126,6 @@ Definition in_ordered_field :=
   rngl_has_opp = true ∧
   rngl_has_eqb = true ∧
   rngl_has_dec_le = true ∧
-  rngl_is_integral = true ∧
   rngl_has_inv = true ∧
   rngl_characteristic = 0 ∧
   rngl_is_ordered = true.
@@ -134,7 +133,7 @@ Definition in_ordered_field :=
 Theorem eq_vect_squ_0 :
   rngl_has_opp = true →
   rngl_has_dec_le = true →
-  rngl_is_integral = true →
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   rngl_is_ordered = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
@@ -178,9 +177,7 @@ destruct i. {
 }
 rewrite Nat_sub_succ_1.
 destruct i. {
-  apply rngl_integral in Haz; [ | easy | ]. 2: {
-    now apply Bool.orb_true_iff; left.
-  }
+  apply rngl_integral in Haz; [ | easy | easy ].
   now destruct Haz.
 }
 cbn.
@@ -245,7 +242,7 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hon & Hic & Hop & Heq & Hld & Hdo & Hin & Hor).
+destruct Hof as (Hon & Hic & Hop & Heq & Hld & Hin & Hch & Hor).
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -274,7 +271,11 @@ rewrite (rngl_inv_mul_distr Hon Hos Hin); cycle 1. {
   easy.
 } {
   intros H.
-  apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
+  apply eq_vect_squ_0 in H; [ | easy | easy | | easy ]. 2: {
+    apply Bool.orb_true_iff; right.
+    rewrite Heq, Bool.andb_true_iff; split; [ | easy ].
+    now apply rngl_has_inv_and_1_or_quot_iff; left.
+  }
   now rewrite Hsr in H.
 }
 rewrite rngl_mul_assoc.
@@ -293,7 +294,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_dec_le = true →
-  rngl_is_integral = true →
+  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   rngl_has_inv = true →
   rngl_is_ordered = true →
   ∀ (M : matrix T) V μ,
@@ -312,7 +313,12 @@ rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply (rngl_mul_div Hi1).
 intros H.
-now apply eq_vect_squ_0 in H.
+apply eq_vect_squ_0 in H; [ easy | easy | easy | | easy ].
+apply Bool.orb_true_iff in Hdo.
+apply Bool.orb_true_iff.
+destruct Hdo as [Hdo| Hdo]; [ now left | right ].
+rewrite Hdo, Bool.andb_true_r.
+now apply rngl_has_inv_and_1_or_quot_iff; left.
 Qed.
 
 Definition is_orthogonal_matrix (M : matrix T) :=
@@ -1008,7 +1014,7 @@ assert (Hdu : det U ≠ 0%L). {
     now apply squ_mat_ncols.
   }
   generalize Hif; intros H.
-  destruct H as (Hon, Hic, Hop, Hin, Hit, Hde, Hch).
+  destruct H as (Hon, Hic, Hop, Hin, Hde, Hch).
   rewrite (determinant_transpose Hon Hic Hop) in Huu; [ | | easy ]. 2: {
     now rewrite Hch.
   }
