@@ -44,6 +44,10 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_eqb := Some CReal_eqb;
      rngl_opt_le := Some CRealLe |}.
 
+(*
+Print Assumptions CReal_ring_like_op.
+*)
+
 Theorem CReal_appart_irrefl : ∀ x, (x # x)%CReal → False.
 Proof.
 intros * H1.
