@@ -297,6 +297,29 @@ Print Assumptions CReal_ring_like_prop.
 
 Record CComplex := mk_cc {cre : CReal; cim : CReal}.
 
+Definition CComplex_zero : CComplex := {| cre := 0%CReal; cim := 0%CReal |}.
+
+Definition CComplex_one : CComplex := {| cre := 1%CReal; cim := 0%CReal |}.
+
+Definition CComplex_add (ca cb : CComplex) : CComplex :=
+  {| cre := cre ca + cre cb; cim := cim ca + cim cb |}.
+
+Definition CComplex_mul (ca cb : CComplex) : CComplex :=
+  {| cre := cre ca * cre cb - cim ca * cim cb;
+     cim := cre ca * cim cb + cim ca * cre cb |}.
+
+(* to be completed
+Definition CComplex_ring_like_op : ring_like_op CComplex :=
+  {| rngl_zero := CComplex_zero;
+     rngl_add := CComplex_add;
+     rngl_mul := CComplex_mul;
+     rngl_opt_one := Some CComplex_one;
+     rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
+     rngl_opt_eqb := None;
+     rngl_opt_le := None |}.
+*)
+
 (**)
 (* "classical" Coq reals *)
 Set Nested Proofs Allowed.
