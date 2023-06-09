@@ -203,6 +203,8 @@ progress unfold complex_add.
 f_equal; apply Rplus_comm.
 Qed.
 
+(* see if I can add rngl_sqrt ? *)
+
 (* to be completed
 Theorem complex_add_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
