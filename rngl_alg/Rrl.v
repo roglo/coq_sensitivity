@@ -160,7 +160,7 @@ Qed.
 
 Definition complex_zero : complex := {| re := R0; im := R0 |}.
 
-Definition complex_opt_one : option complex := Some {| re := R1; im := R0 |}.
+Definition complex_one : complex := {| re := R1; im := R0 |}.
 
 Definition complex_add (ca cb : complex) : complex :=
   {| re := re ca + re cb; im := im ca + im cb |}.
@@ -169,9 +169,7 @@ Definition complex_mul (ca cb : complex) : complex :=
   {| re := (re ca * re cb - im ca * im cb);
      im := (re ca * im cb + im ca * re cb) |}.
 
-Definition complex_opt_opp_or_subt :
-  option ((complex → complex) + (complex → complex → complex)) :=
-  Some (inl (λ c, mk_c (- re c) (- im c))).
+Definition complex_opp c := mk_c (- re c) (- im c).
 
 Definition Rsqrt' (a : R) :=
   match Rle_dec R0 a with
@@ -183,17 +181,13 @@ Definition complex_inv (a : complex) :=
   let d := Rsqrt' (re a * re a + im a * im a) in
   mk_c (re a / d) (- im a / d).
 
-Definition complex_opt_inv_or_quot :
-  option ((complex → complex) + (complex → complex → complex)) :=
-  Some (inl complex_inv).
-
 Definition complex_ring_like_op : ring_like_op (complex) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
-     rngl_opt_one := complex_opt_one;
-     rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
+     rngl_opt_one := Some complex_one;
+     rngl_opt_opp_or_subt := Some (inl complex_opp);
+     rngl_opt_inv_or_quot := Some (inl complex_inv);
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
 
@@ -201,16 +195,15 @@ Definition complex_ring_like_op : ring_like_op (complex) :=
 Print Assumptions complex_ring_like_op.
 *)
 
-(* to be completed
-Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+Theorem complex_add_comm : let roc := complex_ring_like_op in
   ∀ a b, (a + b)%L = (b + a)%L.
 Proof.
 intros; cbn.
 progress unfold complex_add.
-f_equal; apply rngl_add_comm.
+f_equal; apply Rplus_comm.
 Qed.
 
+(* to be completed
 Theorem complex_add_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   ∀ a b c : complex T, (a + (b + c))%L = (a + b + c)%L.
@@ -478,6 +471,7 @@ destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
 destruct iq as [inv| quot]; [ | easy ].
 symmetry; apply (fold_rngl_div Hiv).
 Qed.
+*)
 
 (* to be completed
 Theorem complex_opt_mul_inv_l {T}
@@ -584,15 +578,10 @@ Qed.
 *)
 
 (* to be completed
-Definition complex_ring_like_prop T
-  {ro : ring_like_op T} {rp : ring_like_prop T}
-  (Hop : rngl_has_opp T = true) :
-  ring_like_prop (complex T) :=
-  let Hos := rngl_has_opp_has_opp_or_subt Hop in
-  let Hsu := rngl_has_opp_has_no_subt Hop in
-  {| rngl_mul_is_comm := rngl_mul_is_comm T;
+Definition complex_ring_like_prop : ring_like_prop complex :=
+  {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := false;
-     rngl_is_integral := rngl_is_integral T;
+     rngl_is_integral_domain := false;
      rngl_is_alg_closed := true;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
@@ -624,5 +613,4 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le |}.
-*)
 *)
