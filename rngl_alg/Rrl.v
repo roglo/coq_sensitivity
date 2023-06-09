@@ -201,6 +201,15 @@ apply CReal_plus_lt_compat_l with (x := 1%CReal) in IHi.
 now rewrite CReal_plus_0_r in IHi.
 Qed.
 
+Theorem CReal_le_antisymm : let ro := CReal_ring_like_op in
+  ∀ a b : CReal, (a ≤ b)%L → (b ≤ a)%L → a = b.
+Proof.
+cbn; intros * Hab Hba.
+apply eq_CReal_eq.
+intros H1.
+now destruct H1.
+Qed.
+
 (* to be completed
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
@@ -230,8 +239,8 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := CReal_characteristic_prop;
      rngl_opt_le_refl := CRealLe_refl;
-     rngl_opt_le_antisymm := 42;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_le_antisymm := CReal_le_antisymm;
+     rngl_opt_le_trans := 42;
      rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
