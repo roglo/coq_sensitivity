@@ -3,6 +3,8 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import Reals.Cauchy.ConstructiveCauchyReals.
 Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
+Require Import Reals.Cauchy.ConstructiveCauchyAbs.
+Require Import Reals.Cauchy.ConstructiveRcomplete.
 Require Import QArith.
 Require Import Main.RingLike.
 
@@ -308,13 +310,21 @@ Definition CComplex_mul (ca cb : CComplex) : CComplex :=
   {| cre := cre ca * cre cb - cim ca * cim cb;
      cim := cre ca * cim cb + cim ca * cre cb |}.
 
+Definition CComplex_opp c := mk_cc (- cre c) (- cim c).
+
+(* problem : the square root is not defined in CReal.
+   Nor exp, ln, sin, cos, and so on; hard to make
+   interesting mathematics with them *)
+
+(* here, in complex numbers, no square root means no inverse *)
+
 (* to be completed
 Definition CComplex_ring_like_op : ring_like_op CComplex :=
   {| rngl_zero := CComplex_zero;
      rngl_add := CComplex_add;
      rngl_mul := CComplex_mul;
      rngl_opt_one := Some CComplex_one;
-     rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
+     rngl_opt_opp_or_subt := Some (inl CComplex_opp);
      rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
