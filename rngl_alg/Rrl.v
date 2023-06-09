@@ -245,6 +245,12 @@ apply CReal_le_trans with (y := (- a * - d)%CReal). {
 Qed.
 
 (* to be completed
+Theorem CReal_mul_le_compat : let ro := CReal_ring_like_op in
+  ∀ a b c d : CReal, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
+Proof.
+cbn; intros * Hac Hbd.
+...
+
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
