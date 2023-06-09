@@ -222,7 +222,6 @@ apply CReal_le_trans with (y := (a * d)%CReal). {
 }
 Qed.
 
-(* to be completed
 Theorem CReal_mul_le_compat_nonpos : let ro := CReal_ring_like_op in
   ∀ a b c d : CReal, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
@@ -233,15 +232,19 @@ rewrite CReal_opp_mult_distr_l.
 rewrite CReal_opp_mult_distr_r.
 rewrite CReal_opp_mult_distr_l.
 rewrite CReal_opp_mult_distr_r.
+destruct Hac as (Hca, Haz).
+destruct Hbd as (Hdb, Hbz).
+apply CReal_opp_ge_le_contravar in Hca, Haz, Hdb, Hbz.
+rewrite <- opp_inject_Q in Haz, Hbz.
 apply CReal_le_trans with (y := (- a * - d)%CReal). {
-  apply CReal_mult_le_compat_l.
-...
+  now apply CReal_mult_le_compat_l.
 } {
   apply CReal_mult_le_compat_r; [ | easy ].
-  now apply CReal_le_trans with (y := b).
+  now apply CReal_le_trans with (y := (- b)%CReal).
 }
 Qed.
 
+(* to be completed
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -274,8 +277,8 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_le_trans := CReal_le_trans;
      rngl_opt_add_le_compat := CReal_plus_le_compat;
      rngl_opt_mul_le_compat_nonneg := CReal_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := 42;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_mul_le_compat_nonpos := CReal_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := 42;
      rngl_opt_not_le := ?rngl_opt_not_le |}.
 ...
 *)
