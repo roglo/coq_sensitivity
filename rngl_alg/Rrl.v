@@ -1,4 +1,5 @@
 (* Coq reals as Cauchy sequences *)
+
 Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import Reals.Cauchy.ConstructiveCauchyReals.
@@ -318,7 +319,7 @@ Definition CComplex_opp c := mk_cc (- cre c) (- cim c).
 
 (* here, in complex numbers, no square root means no inverse *)
 
-(* to be completed
+(*
 Definition CComplex_ring_like_op : ring_like_op CComplex :=
   {| rngl_zero := CComplex_zero;
      rngl_add := CComplex_add;
@@ -330,8 +331,8 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_opt_le := None |}.
 *)
 
-(**)
-(* "classical" Coq reals *)
+(* Classical Reals defined by axioms *)
+
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
 Require Import Main.RingLike.
