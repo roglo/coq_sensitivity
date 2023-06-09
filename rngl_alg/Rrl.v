@@ -28,6 +28,12 @@ intros * H1.
 now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
 Qed.
 
+Theorem CReal_appart_sym : ∀ x y, (x # y)%CReal → (y # x)%CReal.
+Proof.
+intros * Hxy.
+now destruct Hxy; [ right | left ].
+Qed.
+
 Theorem eq_CReal_eq : ∀ x y, ((x # y)%CReal → False) ↔ x = y.
 Proof.
 intros.
@@ -38,12 +44,6 @@ split. {
   intros H1; subst y.
   apply CReal_appart_irrefl.
 }
-Qed.
-
-Theorem CReal_eq : ∀ x y, ((x # y)%CReal → False) → x = y.
-Proof.
-intros * Hxy.
-now destruct (CReal_appart_or_eq x y).
 Qed.
 
 Definition CReal_inv' (x : CReal) : CReal :=
@@ -70,7 +70,7 @@ Theorem CReal_add_comm : let ro := CReal_ring_like_op in
   ∀ a b : CReal, (a + b)%L = (b + a)%L.
 Proof.
 intros; cbn.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_plus_comm in H1.
 now apply CReal_appart_irrefl in H1.
@@ -80,7 +80,7 @@ Theorem CReal_add_assoc : let ro := CReal_ring_like_op in
   ∀ a b c : CReal, (a + (b + c))%L = (a + b + c)%L.
 Proof.
 intros; cbn.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_plus_assoc in H1.
 now apply CReal_appart_irrefl in H1.
@@ -90,7 +90,7 @@ Theorem CReal_add_0_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, (0 + a)%L = a.
 Proof.
 intros; cbn.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_plus_0_l in H1.
 now apply CReal_appart_irrefl in H1.
@@ -100,7 +100,7 @@ Theorem CReal_mul_assoc : let ro := CReal_ring_like_op in
   ∀ a b c : CReal, (a * (b * c))%L = (a * b * c)%L.
 Proof.
 intros; cbn.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_mult_assoc in H1.
 now apply CReal_appart_irrefl in H1.
@@ -110,7 +110,7 @@ Theorem CReal_mul_1_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, (1 * a)%L = a.
 Proof.
 cbn; intros.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_mult_1_l in H1.
 now apply CReal_appart_irrefl in H1.
@@ -120,7 +120,7 @@ Theorem CReal_mul_add_distr_l : let ro := CReal_ring_like_op in
   ∀ a b c : CReal, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 cbn; intros.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_mult_plus_distr_l in H1.
 now apply CReal_appart_irrefl in H1.
@@ -130,7 +130,7 @@ Theorem CReal_mul_comm : let ro := CReal_ring_like_op in
   ∀ a b : CReal, (a * b)%L = (b * a)%L.
 Proof.
 cbn; intros.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_mult_comm in H1.
 now apply CReal_appart_irrefl in H1.
@@ -140,7 +140,7 @@ Theorem CReal_add_opp_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, (- a + a)%L = 0%L.
 Proof.
 cbn; intros.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 rewrite CReal_plus_opp_l in H1.
 now apply CReal_appart_irrefl in H1.
@@ -150,7 +150,7 @@ Theorem CReal_mul_inv_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, a ≠ 0%L → (a⁻¹ * a)%L = 1%L.
 Proof.
 cbn; intros * Haz.
-apply CReal_eq.
+apply eq_CReal_eq.
 intros H1.
 unfold CReal_inv' in H1.
 destruct (CReal_appart_or_eq _ _) as [H2| H2]; [ | easy ].
@@ -181,27 +181,27 @@ subst b; left.
 apply CRealLe_refl.
 Qed.
 
-(* to be completed
 Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
 Proof.
 intros * H1.
 apply eq_CReal_eq in H1; [ easy | clear H1 H ].
-cbn.
-(* bof, chais pas *)
-...
-intros * H1.
+right.
+cbn - [ rngl_mul_nat ].
 induction i. {
-  cbn in H1.
-  apply eq_CReal_eq in H1; [ easy | ].
-  clear H1 H; right.
   rewrite <- CReal_plus_0_l at 1.
   apply CReal_plus_lt_compat_r.
   now apply inject_Q_lt.
 }
-remember (S i) as si; cbn in IHi, H1; subst si.
-...
+remember (S i) as si; cbn; subst si.
+apply CReal_lt_trans with (y := 1%CReal). {
+  now apply inject_Q_lt.
+}
+apply CReal_plus_lt_compat_l with (x := 1%CReal) in IHi.
+now rewrite CReal_plus_0_r in IHi.
+Qed.
 
+(* to be completed
 Definition CReal_ring_like_prop : ring_like_op CReal :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := true;
@@ -228,9 +228,9 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_le_dec := CReal_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := 42; (*CReal_characteristic_prop;*)
-     rngl_opt_le_refl := 42;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_characteristic_prop := CReal_characteristic_prop;
+     rngl_opt_le_refl := CRealLe_refl;
+     rngl_opt_le_antisymm := 42;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
      rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
