@@ -293,6 +293,10 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
 Print Assumptions CReal_ring_like_prop.
 *)
 
+(* complex *)
+
+Record CComplex := mk_cc {cre : CReal; cim : CReal}.
+
 (**)
 (* "classical" Coq reals *)
 Set Nested Proofs Allowed.
