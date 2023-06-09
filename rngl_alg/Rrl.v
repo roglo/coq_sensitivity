@@ -186,6 +186,11 @@ Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
 Proof.
 intros * H1.
+apply eq_CReal_eq in H1; [ easy | clear H1 H ].
+cbn.
+(* bof, chais pas *)
+...
+intros * H1.
 induction i. {
   cbn in H1.
   apply eq_CReal_eq in H1; [ easy | ].
@@ -194,7 +199,7 @@ induction i. {
   apply CReal_plus_lt_compat_r.
   now apply inject_Q_lt.
 }
-remember (S i) as si; cbn in H1; subst si.
+remember (S i) as si; cbn in IHi, H1; subst si.
 ...
 
 Definition CReal_ring_like_prop : ring_like_op CReal :=
@@ -223,7 +228,7 @@ Definition CReal_ring_like_prop : ring_like_op CReal :=
      rngl_opt_le_dec := CReal_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := CReal_characteristic_prop;
+     rngl_characteristic_prop := 42; (*CReal_characteristic_prop;*)
      rngl_opt_le_refl := 42;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
