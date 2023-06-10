@@ -352,6 +352,23 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
+Theorem complex_inv_re {T} {ro : ring_like_op T} :
+  let roc := complex_ring_like_op T in
+  rngl_has_inv T = true →
+  ∀ a : complex T, a ≠ 0%L →
+  re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
+Proof.
+intros * Hiv * Haz.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold rngl_has_inv in Hiv.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
+Qed.
+
 (* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
@@ -381,24 +398,8 @@ assert (Hiv : rngl_has_inv T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
-Theorem complex_inv_re {T} {ro : ring_like_op T} :
-  let roc := complex_ring_like_op T in
-  rngl_has_inv T = true →
-  ∀ a : complex T, a ≠ 0%L → re a⁻¹ = (re a)⁻¹%L.
-Proof.
-intros * Hiv * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]. {
-  destruct iq as [inv| quot]; [ cbn | easy ].
+rewrite (complex_inv_re Hiv); [ | now intros H; subst a ].
 ...
-About rngl_opt_inv_or_quot.
-...
-rewrite complex_inv_re.
 rewrite H1.
 ...
 progress unfold rngl_inv; cbn.
