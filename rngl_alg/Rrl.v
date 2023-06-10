@@ -300,32 +300,15 @@ do 2 rewrite (Rmult_comm (im b)).
 now rewrite Rplus_comm.
 Qed.
 
-(* to be completed
-Theorem complex_opt_add_opp_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp T = true →
-  if rngl_has_opp complex then ∀ a : complex, (- a + a)%L = 0%L
-  else not_applicable.
+Theorem complex_add_opp_l : let roc := complex_ring_like_op in
+  ∀ a : complex, (- a + a)%L = 0%L.
 Proof.
-intros * Hop.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-remember (rngl_has_opp complex) as opc eqn:Hopc; symmetry in Hopc.
-destruct opc; [ | easy ].
-intros.
+intros; cbn.
 apply eq_complex_eq; cbn.
-specialize (rngl_add_opp_l Hop) as H1.
-progress unfold rngl_opp; cbn.
-progress unfold complex_opt_opp_or_subt; cbn.
-progress unfold rngl_has_opp in Hop.
-progress unfold rngl_opp in H1.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os as [opp| subt]; [ cbn | easy ].
-now do 2 rewrite H1.
+now do 2 rewrite Rplus_opp_l.
 Qed.
 
+(* to be completed
 Theorem complex_opt_add_sub {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op in
@@ -506,7 +489,7 @@ Qed.
 
 (* to be completed
 Definition complex_ring_like_prop : ring_like_prop complex :=
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
+  {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := true;
@@ -520,9 +503,9 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_opt_mul_comm := complex_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
-     rngl_opt_add_sub := complex_opt_add_sub Hsu;
-     rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
+     rngl_opt_add_opp_l := complex_add_opp_l;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
      rngl_opt_mul_inv_r := 42;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
