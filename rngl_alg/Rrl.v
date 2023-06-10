@@ -181,7 +181,7 @@ Definition complex_inv (a : complex) :=
   let d := Rsqrt' (re a * re a + im a * im a) in
   mk_c (re a / d) (- im a / d).
 
-Definition complex_ring_like_op : ring_like_op (complex) :=
+Definition complex_ring_like_op : ring_like_op complex :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
@@ -203,32 +203,27 @@ progress unfold complex_add.
 f_equal; apply Rplus_comm.
 Qed.
 
-(* see if I can add rngl_sqrt ? *)
+Theorem complex_add_assoc : let roc := complex_ring_like_op in
+  ∀ a b c : complex, (a + (b + c))%L = (a + b + c)%L.
+Proof.
+intros; cbn.
+apply eq_complex_eq; cbn.
+split; symmetry; apply Rplus_assoc.
+Qed.
+
+Theorem complex_add_0_l : let roc := complex_ring_like_op in
+  ∀ a : complex, (0 + a)%L = a.
+Proof.
+intros; cbn.
+apply eq_complex_eq; cbn.
+split; apply Rplus_0_l.
+Qed.
 
 (* to be completed
-Theorem complex_add_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
-  ∀ a b c : complex T, (a + (b + c))%L = (a + b + c)%L.
-Proof.
-intros; cbn.
-progress unfold complex_add; cbn.
-f_equal; apply rngl_add_assoc.
-Qed.
-
-Theorem complex_add_0_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
-  ∀ a : complex T, (0 + a)%L = a.
-Proof.
-intros; cbn.
-progress unfold complex_add; cbn.
-do 2 rewrite rngl_add_0_l.
-now apply eq_complex_eq.
-Qed.
-
 Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp T = true →
-  ∀ a b c : complex T, (a * (b * c))%L = (a * b * c)%L.
+  ∀ a b c : complex, (a * (b * c))%L = (a * b * c)%L.
 Proof.
 intros * Hop *; cbn.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -256,13 +251,13 @@ f_equal. {
 Qed.
 
 Theorem complex_opt_mul_1_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp_or_subt T = true →
-  if rngl_has_1 (complex T) then ∀ a : complex T, (1 * a)%L = a
+  if rngl_has_1 complex then ∀ a : complex, (1 * a)%L = a
   else not_applicable.
 Proof.
 intros * Hos.
-remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
+remember (rngl_has_1 complex) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ | easy ].
 intros; cbn.
 assert (Hon : rngl_has_1 T = true). {
@@ -283,9 +278,9 @@ Qed.
 
 Theorem complex_mul_add_distr_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp T = true →
-  ∀ a b c : complex T, (a * (b + c))%L = (a * b + a * c)%L.
+  ∀ a b c : complex, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 intros * Hop *; cbn.
 apply eq_complex_eq; cbn.
@@ -305,8 +300,8 @@ Qed.
 
 Theorem complex_opt_mul_comm {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
-  if rngl_mul_is_comm T then ∀ a b : complex T, (a * b)%L = (b * a)%L
+  let roc := complex_ring_like_op in
+  if rngl_mul_is_comm T then ∀ a b : complex, (a * b)%L = (b * a)%L
   else not_applicable.
 Proof.
 intros; cbn.
@@ -322,10 +317,10 @@ Qed.
 
 Theorem complex_opt_mul_1_r {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp_or_subt T = true →
   if rngl_mul_is_comm T then not_applicable
-  else if rngl_has_1 (complex T) then ∀ a : complex T, (a * 1)%L = a
+  else if rngl_has_1 complex then ∀ a : complex, (a * 1)%L = a
   else not_applicable.
 Proof.
 intros * Hos.
@@ -348,10 +343,10 @@ Qed.
 
 Theorem complex_opt_mul_add_distr_r {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp T = true →
   if rngl_mul_is_comm T then not_applicable
-  else ∀ a b c : complex T, ((a + b) * c)%L = (a * c + b * c)%L.
+  else ∀ a b c : complex, ((a + b) * c)%L = (a * c + b * c)%L.
 Proof.
 intros * Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
@@ -378,16 +373,16 @@ Qed.
 
 Theorem complex_opt_add_opp_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp T = true →
-  if rngl_has_opp (complex T) then ∀ a : complex T, (- a + a)%L = 0%L
+  if rngl_has_opp complex then ∀ a : complex, (- a + a)%L = 0%L
   else not_applicable.
 Proof.
 intros * Hop.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-remember (rngl_has_opp (complex T)) as opc eqn:Hopc; symmetry in Hopc.
+remember (rngl_has_opp complex) as opc eqn:Hopc; symmetry in Hopc.
 destruct opc; [ | easy ].
 intros.
 apply eq_complex_eq; cbn.
@@ -403,9 +398,9 @@ Qed.
 
 Theorem complex_opt_add_sub {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_subt T = false →
-  if rngl_has_subt (complex T) then ∀ a b : complex T, (a + b - b)%L = a
+  if rngl_has_subt complex then ∀ a b : complex, (a + b - b)%L = a
   else not_applicable.
 Proof.
 intros * Hsu.
@@ -418,10 +413,10 @@ Qed.
 
 Theorem complex_opt_sub_add_distr {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_subt T = false →
-  if rngl_has_subt (complex T) then
-    ∀ a b c : complex T, (a - (b + c))%L = (a - b - c)%L
+  if rngl_has_subt complex then
+    ∀ a b c : complex, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
 intros * Hsu.
@@ -433,10 +428,10 @@ now destruct os.
 Qed.
 
 Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_inv T = true →
   rngl_mul_is_comm T = true →
-  ∀ a : complex T, a ≠ 0%L →
+  ∀ a : complex, a ≠ 0%L →
   re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
 Proof.
 intros * Hiv Hic * Haz.
@@ -456,10 +451,10 @@ symmetry; apply (fold_rngl_div Hiv).
 Qed.
 
 Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_inv T = true →
   rngl_mul_is_comm T = true →
-  ∀ a : complex T, a ≠ 0%L →
+  ∀ a : complex, a ≠ 0%L →
   im a⁻¹ = ((- im a)/(re a * re a + im a * im a))%L.
 Proof.
 intros * Hiv Hic * Haz.
@@ -478,20 +473,20 @@ Qed.
 (* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op T in
+  let roc := complex_ring_like_op in
   rngl_has_opp T = true →
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rngl_has_dec_le T = true →
-  if (rngl_has_inv (complex T) && rngl_has_1 (complex T))%bool then
-    ∀ a : complex T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
+  if (rngl_has_inv complex && rngl_has_1 complex)%bool then
+    ∀ a : complex, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
 intros * Hop Heb Hor Hdl.
 clear Heb.
-remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
+remember (rngl_has_inv complex) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
-remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
+remember (rngl_has_1 complex) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honc; cbn in Honc.
