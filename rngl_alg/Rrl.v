@@ -259,7 +259,7 @@ split. {
 }
 Qed.
 
-Theorem complex_opt_mul_1_l : let roc := complex_ring_like_op in
+Theorem complex_mul_1_l : let roc := complex_ring_like_op in
   ∀ a : complex, (1 * a)%L = a.
 Proof.
 intros; cbn.
@@ -290,7 +290,7 @@ split. {
 }
 Qed.
 
-Theorem complex_opt_mul_comm : let roc := complex_ring_like_op in
+Theorem complex_mul_comm : let roc := complex_ring_like_op in
   ∀ a b : complex, (a * b)%L = (b * a)%L.
 Proof.
 intros; cbn.
@@ -301,62 +301,6 @@ now rewrite Rplus_comm.
 Qed.
 
 (* to be completed
-Theorem complex_opt_mul_1_r {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp_or_subt T = true →
-  if rngl_mul_is_comm T then not_applicable
-  else if rngl_has_1 complex then ∀ a : complex, (a * 1)%L = a
-  else not_applicable.
-Proof.
-intros * Hos.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ easy | ].
-unfold rngl_has_1; cbn.
-unfold complex_opt_one; cbn.
-(**)
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-destruct on; [ cbn | easy ].
-intros.
-apply eq_complex_eq; cbn.
-progress unfold "1"%L; cbn.
-progress unfold complex_opt_one.
-rewrite Hon; cbn.
-do 2 rewrite (rngl_mul_1_r Hon).
-do 2 rewrite (rngl_mul_0_r Hos).
-now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
-Qed.
-
-Theorem complex_opt_mul_add_distr_r {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp T = true →
-  if rngl_mul_is_comm T then not_applicable
-  else ∀ a b c : complex, ((a + b) * c)%L = (a * c + b * c)%L.
-Proof.
-intros * Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ easy | ].
-intros.
-apply eq_complex_eq; cbn.
-do 4 rewrite rngl_mul_add_distr_r.
-progress unfold rngl_sub.
-rewrite Hop.
-rewrite (rngl_opp_add_distr Hop).
-do 4 rewrite <- rngl_add_assoc.
-split; f_equal. {
-  progress unfold rngl_sub.
-  rewrite Hop.
-  do 2 rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap; f_equal.
-  apply rngl_add_comm.
-} {
-  rewrite rngl_add_comm.
-  rewrite <- rngl_add_assoc; f_equal.
-  apply rngl_add_comm.
-}
-Qed.
-
 Theorem complex_opt_add_opp_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op in
@@ -571,11 +515,11 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_add_assoc := complex_add_assoc;
      rngl_add_0_l := complex_add_0_l;
      rngl_mul_assoc := complex_mul_assoc;
-     rngl_opt_mul_1_l := complex_opt_mul_1_l;
+     rngl_opt_mul_1_l := complex_mul_1_l;
      rngl_mul_add_distr_l := complex_mul_add_distr_l;
-     rngl_opt_mul_comm := complex_opt_mul_comm;
-     rngl_opt_mul_1_r := complex_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := complex_opt_mul_add_distr_r Hop;
+     rngl_opt_mul_comm := complex_mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := complex_opt_add_opp_l Hop;
      rngl_opt_add_sub := complex_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
