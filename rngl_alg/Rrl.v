@@ -220,23 +220,29 @@ split; apply Rplus_0_l.
 Qed.
 
 (* to be completed
-Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp T = true →
+Theorem complex_mul_assoc : let roc := complex_ring_like_op in
   ∀ a b c : complex, (a * (b * c))%L = (a * b * c)%L.
 Proof.
-intros * Hop *; cbn.
+intros; cbn.
+apply eq_complex_eq; cbn.
+(*
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 progress unfold complex_mul; cbn.
-do 2 rewrite (rngl_mul_sub_distr_l Hop).
-do 2 rewrite (rngl_mul_sub_distr_r Hop).
-do 2 rewrite rngl_mul_add_distr_l.
-do 2 rewrite rngl_mul_add_distr_r.
-do 8 rewrite rngl_mul_assoc.
-do 2 rewrite <- (rngl_sub_add_distr Hos).
-f_equal. {
+*)
+do 2 rewrite Rmult_minus_distr_l.
+do 2 rewrite Rmult_minus_distr_r.
+do 2 rewrite Rmult_plus_distr_l.
+do 2 rewrite Rmult_plus_distr_r.
+do 8 rewrite Rmult_assoc.
+split. {
+...
+  rewrite Rplus_comm.
+  progress unfold Rminus.
+...
+  f_equal.
+  rewrite Rplus_assoc.
   f_equal.
   do 2 rewrite rngl_add_assoc.
   now rewrite rngl_add_comm, rngl_add_assoc.
