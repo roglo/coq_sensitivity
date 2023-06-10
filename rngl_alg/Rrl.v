@@ -10,10 +10,11 @@ Arguments mk_c {T} re%L im%L.
 Arguments re {T} complex%L.
 Arguments im {T} complex%L.
 
-Arguments rngl_has_opp T {R}.
-Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
+Arguments rngl_has_opp T {R}.
+Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
@@ -29,23 +30,24 @@ destruct a, b; cbn in Hab.
 now f_equal.
 Qed.
 
-(*
-Theorem neq_complex_neq {T} :
+Theorem neq_complex_neq {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_eqb T = true →
   ∀ a b : complex T, re a ≠ re b ∨ im a ≠ im b ↔ a ≠ b.
 Proof.
-intros.
+intros * Heb *.
 split; intros Hab. {
   intros H; subst b.
   now destruct Hab.
 }
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
-...
-split; intros Hab; [ | now subst ].
-destruct a, b; cbn in Hab.
-now f_equal.
+destruct (rngl_eq_dec Heb ra rb) as [Hrab| Hrab]. {
+  subst rb; right.
+  now intros Hiab; apply Hab; clear Hab; subst ib.
+} {
+  now left.
+}
 Qed.
-*)
 
 Definition complex_zero {T} {ro : ring_like_op T} : complex T :=
   {| re := rngl_zero; im := rngl_zero |}.
@@ -128,7 +130,6 @@ do 2 rewrite rngl_add_0_l.
 now apply eq_complex_eq.
 Qed.
 
-(* to be completed *)
 Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
@@ -415,7 +416,7 @@ Definition complex_ring_like_prop T
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
-     rngl_is_integral := rngl_is_integral;
+     rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := true;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
