@@ -259,33 +259,17 @@ split. {
 }
 Qed.
 
-(* to be completed
-Theorem complex_opt_mul_1_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp_or_subt T = true →
-  if rngl_has_1 complex then ∀ a : complex, (1 * a)%L = a
-  else not_applicable.
+Theorem complex_opt_mul_1_l : let roc := complex_ring_like_op in
+  ∀ a : complex, (1 * a)%L = a.
 Proof.
-intros * Hos.
-remember (rngl_has_1 complex) as onc eqn:Honc; symmetry in Honc.
-destruct onc; [ | easy ].
 intros; cbn.
-assert (Hon : rngl_has_1 T = true). {
-  progress unfold rngl_has_1 in Honc; cbn in Honc.
-  progress unfold complex_opt_one in Honc.
-  now destruct (rngl_has_1 T).
-}
-progress unfold complex_mul.
 apply eq_complex_eq; cbn.
-specialize (rngl_mul_1_l Hon) as H1.
-progress unfold "1"%L in H1; cbn in H1.
-progress unfold "1"%L; cbn.
-progress unfold complex_opt_one; cbn.
-rewrite Hon; cbn.
-do 2 rewrite (rngl_mul_0_l Hos).
-now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+do 2 rewrite Rmult_1_l.
+do 2 rewrite Rmult_0_l.
+now rewrite Rminus_0_r, Rplus_0_r.
 Qed.
 
+(* to be completed
 Theorem complex_mul_add_distr_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op in
@@ -595,7 +579,7 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_add_assoc := complex_add_assoc;
      rngl_add_0_l := complex_add_0_l;
      rngl_mul_assoc := complex_mul_assoc;
-     rngl_opt_mul_1_l := complex_opt_mul_1_l Hos;
+     rngl_opt_mul_1_l := complex_opt_mul_1_l;
      rngl_mul_add_distr_l := complex_mul_add_distr_l Hop;
      rngl_opt_mul_comm := complex_opt_mul_comm;
      rngl_opt_mul_1_r := complex_opt_mul_1_r Hos;
