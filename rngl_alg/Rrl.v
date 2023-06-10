@@ -76,10 +76,14 @@ Definition complex_opt_opp_or_subt {T} {ro : ring_like_op T} :
       None
   end.
 
+Definition complex_inv {T} {ro : ring_like_op T} a :=
+  let d := (re a * re a + im a * im a)%L in
+  mk_c (re a / d) (- im a / d)%L.
+
 Definition complex_opt_inv_or_quot {T} {ro : ring_like_op T} :
     option ((complex T → complex T) + (complex T → complex T → complex T)) :=
   match rngl_opt_inv_or_quot T with
-  | Some (inl inv) => None (* à voir *)
+  | Some (inl inv) => Some (inl complex_inv)
   | Some (inr quot) => None (* à voir *)
   | None => None
   end.
