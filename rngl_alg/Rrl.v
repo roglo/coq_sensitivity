@@ -18,6 +18,21 @@ Definition reals_ring_like_op : ring_like_op R :=
 Print Assumptions reals_ring_like_op.
 *)
 
+Theorem Rminus_plus_distr : ∀ x y z, (x - (y + z) = x - y - z)%R.
+Proof.
+intros.
+unfold Rminus.
+rewrite Ropp_plus_distr.
+symmetry; apply Rplus_assoc.
+Qed.
+
+Theorem Rplus_minus_distr : ∀ x y z, (x + (y - z) = x + y - z)%R.
+Proof.
+intros.
+unfold Rminus.
+symmetry; apply Rplus_assoc.
+Qed.
+
 Theorem Rplus_assoc' : ∀ a b c : R, (a + (b + c))%R = (a + b + c)%R.
 Proof. intros; now rewrite Rplus_assoc. Qed.
 
@@ -219,43 +234,32 @@ apply eq_complex_eq; cbn.
 split; apply Rplus_0_l.
 Qed.
 
-(* to be completed
 Theorem complex_mul_assoc : let roc := complex_ring_like_op in
   ∀ a b c : complex, (a * (b * c))%L = (a * b * c)%L.
 Proof.
 intros; cbn.
 apply eq_complex_eq; cbn.
-(*
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-progress unfold complex_mul; cbn.
-*)
 do 2 rewrite Rmult_minus_distr_l.
 do 2 rewrite Rmult_minus_distr_r.
 do 2 rewrite Rmult_plus_distr_l.
 do 2 rewrite Rmult_plus_distr_r.
-do 8 rewrite Rmult_assoc.
+do 8 rewrite <- Rmult_assoc.
+rewrite Rplus_comm.
+do 2 rewrite Rminus_plus_distr.
 split. {
-...
+  f_equal.
+  rewrite <- Rminus_plus_distr.
   rewrite Rplus_comm.
-  progress unfold Rminus.
-...
-  f_equal.
-  rewrite Rplus_assoc.
-  f_equal.
-  do 2 rewrite rngl_add_assoc.
-  now rewrite rngl_add_comm, rngl_add_assoc.
+  apply Rminus_plus_distr.
 } {
-  unfold rngl_sub; rewrite Hop.
-  do 2 rewrite <- rngl_add_assoc.
+  progress unfold Rminus.
+  do 2 rewrite Rplus_assoc.
   f_equal.
-  do 2 rewrite rngl_add_assoc.
-  rewrite rngl_add_comm.
-  now rewrite rngl_add_assoc.
+  now rewrite <- Rplus_assoc, Rplus_comm.
 }
 Qed.
 
+(* to be completed
 Theorem complex_opt_mul_1_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op in
   rngl_has_opp_or_subt T = true →
@@ -590,7 +594,7 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_add_comm := complex_add_comm;
      rngl_add_assoc := complex_add_assoc;
      rngl_add_0_l := complex_add_0_l;
-     rngl_mul_assoc := complex_mul_assoc Hop;
+     rngl_mul_assoc := complex_mul_assoc;
      rngl_opt_mul_1_l := complex_opt_mul_1_l Hos;
      rngl_mul_add_distr_l := complex_mul_add_distr_l Hop;
      rngl_opt_mul_comm := complex_opt_mul_comm;
