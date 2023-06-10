@@ -269,29 +269,28 @@ do 2 rewrite Rmult_0_l.
 now rewrite Rminus_0_r, Rplus_0_r.
 Qed.
 
-(* to be completed
-Theorem complex_mul_add_distr_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp T = true →
+Theorem complex_mul_add_distr_l : let roc := complex_ring_like_op in
   ∀ a b c : complex, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
-intros * Hop *; cbn.
+intros; cbn.
 apply eq_complex_eq; cbn.
-progress unfold rngl_sub; rewrite Hop.
-do 4 rewrite rngl_mul_add_distr_l.
-rewrite (rngl_opp_add_distr Hop).
-progress unfold rngl_sub; rewrite Hop.
-do 4 rewrite <- rngl_add_assoc.
-split; f_equal. {
-  now rewrite rngl_add_assoc, rngl_add_comm.
+do 4 rewrite Rmult_plus_distr_l.
+rewrite Rminus_plus_distr.
+rewrite Rplus_minus_distr.
+split. {
+  f_equal.
+  progress unfold Rminus.
+  do 2 rewrite Rplus_assoc.
+  f_equal; apply Rplus_comm.
 } {
-  rewrite rngl_add_comm.
-  rewrite <- rngl_add_assoc; f_equal.
-  apply rngl_add_comm.
+  do 2 rewrite Rplus_assoc.
+  f_equal.
+  rewrite Rplus_comm, Rplus_assoc.
+  f_equal; apply Rplus_comm.
 }
 Qed.
 
+(* to be completed
 Theorem complex_opt_mul_comm {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} :
   let roc := complex_ring_like_op in
@@ -580,7 +579,7 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_add_0_l := complex_add_0_l;
      rngl_mul_assoc := complex_mul_assoc;
      rngl_opt_mul_1_l := complex_opt_mul_1_l;
-     rngl_mul_add_distr_l := complex_mul_add_distr_l Hop;
+     rngl_mul_add_distr_l := complex_mul_add_distr_l;
      rngl_opt_mul_comm := complex_opt_mul_comm;
      rngl_opt_mul_1_r := complex_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := complex_opt_mul_add_distr_r Hop;
