@@ -33,6 +33,14 @@ unfold Rminus.
 symmetry; apply Rplus_assoc.
 Qed.
 
+Theorem Rmult_mult_swap : ∀ x y z, (x * y * z = x * z * y)%R.
+Proof.
+intros.
+do 2 rewrite Rmult_assoc.
+f_equal.
+apply Rmult_comm.
+Qed.
+
 Theorem Rplus_assoc' : ∀ a b c : R, (a + (b + c))%R = (a + b + c)%R.
 Proof. intros; now rewrite Rplus_assoc. Qed.
 
@@ -309,92 +317,52 @@ now do 2 rewrite Rplus_opp_l.
 Qed.
 
 (* to be completed
-Theorem complex_opt_add_sub {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_subt T = false →
-  if rngl_has_subt complex then ∀ a b : complex, (a + b - b)%L = a
-  else not_applicable.
+Theorem complex_mul_inv_l : let roc := complex_ring_like_op in
+  ∀ a : complex, a ≠ 0%L → (a⁻¹ * a)%L = 1%L.
 Proof.
-intros * Hsu.
-progress unfold rngl_has_subt; cbn.
-progress unfold complex_opt_opp_or_subt.
-progress unfold rngl_has_subt in Hsu.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem complex_opt_sub_add_distr {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_subt T = false →
-  if rngl_has_subt complex then
-    ∀ a b c : complex, (a - (b + c))%L = (a - b - c)%L
-  else not_applicable.
-Proof.
-intros * Hsu.
-progress unfold rngl_has_subt; cbn.
-progress unfold complex_opt_opp_or_subt.
-progress unfold rngl_has_subt in Hsu.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_inv T = true →
-  rngl_mul_is_comm T = true →
-  ∀ a : complex, a ≠ 0%L →
-  re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
-Proof.
-intros * Hiv Hic * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
+cbn; intros * Haz.
+apply eq_complex_eq; cbn.
+unfold Rsqrt'.
+remember (_ + _)%R as m eqn:Hm.
+destruct (Rle_dec R0 m) as [Hmz| Hmz]. 2: {
+  exfalso; apply Hmz; clear Hmz; subst m.
+  rewrite <- (Rplus_0_l R0); cbn.
+  unfold IZR.
+  apply Rplus_le_compat. {
+    replace (_ * _)%R with (Rsqr (re a)) by easy.
+    apply Rle_0_sqr.
+  } {
+    replace (_ * _)%R with (Rsqr (im a)) by easy.
+    apply Rle_0_sqr.
+  }
 }
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_has_inv_or_quot in Hiq.
-progress unfold rngl_div.
-rewrite Hiv, Hic.
-generalize Hiv; intros H.
-progress unfold rngl_has_inv in H.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ | easy ].
-symmetry; apply (fold_rngl_div Hiv).
-Qed.
+unfold Rdiv.
+do 2 rewrite <- Ropp_mult_distr_l.
+unfold Rminus.
+rewrite Ropp_involutive.
+rewrite (Rmult_mult_swap (re a)).
+rewrite (Rmult_mult_swap (im a)).
+rewrite <- Rmult_plus_distr_r, <- Hm.
+(* mais putain, chuis nul, y a pas de racine carrée ! *)
+...
+do 2 rewrite (Rmult_mult_swap (im a)).
 
-Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_inv T = true →
-  rngl_mul_is_comm T = true →
-  ∀ a : complex, a ≠ 0%L →
-  im a⁻¹ = ((- im a)/(re a * re a + im a * im a))%L.
-Proof.
-intros * Hiv Hic * Haz.
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-progress unfold rngl_div.
-rewrite Hiv, Hic.
-generalize Hiv; intros H.
-progress unfold rngl_has_inv in H.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ | easy ].
-symmetry; apply (fold_rngl_div Hiv).
-Qed.
-*)
-
-(* to be completed
-Theorem complex_opt_mul_inv_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  let roc := complex_ring_like_op in
-  rngl_has_opp T = true →
-  rngl_has_eqb T = true →
-  rngl_is_ordered T = true →
-  rngl_has_dec_le T = true →
-  if (rngl_has_inv complex && rngl_has_1 complex)%bool then
-    ∀ a : complex, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
-  else not_applicable.
-Proof.
+rewrite (Rmult_mult_swap (im a)).
+...
+Search (Rsqr _ = _ * _)%R.
+Search (_ * _ = Rsqr _)%R.
+Search (_ ^ _ = _ * _)%R.
+Search (_ * _ = _ ^ _)%R.
+Search Rsqr.
+Print Rsqr.
+fold Rsqr.
+...
+Rle_0_sqr: ∀ r : R, (0 <= r²)%R
+Search (_ <= _ * _)%R.
+Search (0 <= _ * _)%R.
+Search (R0 <= _ * _)%R.
+Search (_ * _ <= _ * _)%R.
+...
 intros * Hop Heb Hor Hdl.
 clear Heb.
 remember (rngl_has_inv complex) as ivc eqn:Hivc; symmetry in Hivc.
@@ -484,6 +452,81 @@ progress unfold rngl_has_1.
 rewrite H2; cbn.
 progress unfold "1"%L.
 now rewrite H2.
+Qed.
+*)
+
+(* to be completed
+Theorem complex_opt_add_sub {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op in
+  rngl_has_subt T = false →
+  if rngl_has_subt complex then ∀ a b : complex, (a + b - b)%L = a
+  else not_applicable.
+Proof.
+intros * Hsu.
+progress unfold rngl_has_subt; cbn.
+progress unfold complex_opt_opp_or_subt.
+progress unfold rngl_has_subt in Hsu.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem complex_opt_sub_add_distr {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op in
+  rngl_has_subt T = false →
+  if rngl_has_subt complex then
+    ∀ a b c : complex, (a - (b + c))%L = (a - b - c)%L
+  else not_applicable.
+Proof.
+intros * Hsu.
+progress unfold rngl_has_subt; cbn.
+progress unfold complex_opt_opp_or_subt.
+progress unfold rngl_has_subt in Hsu.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op in
+  rngl_has_inv T = true →
+  rngl_mul_is_comm T = true →
+  ∀ a : complex, a ≠ 0%L →
+  re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
+Proof.
+intros * Hiv Hic * Haz.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_has_inv_or_quot in Hiq.
+progress unfold rngl_div.
+rewrite Hiv, Hic.
+generalize Hiv; intros H.
+progress unfold rngl_has_inv in H.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+symmetry; apply (fold_rngl_div Hiv).
+Qed.
+
+Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  let roc := complex_ring_like_op in
+  rngl_has_inv T = true →
+  rngl_mul_is_comm T = true →
+  ∀ a : complex, a ≠ 0%L →
+  im a⁻¹ = ((- im a)/(re a * re a + im a * im a))%L.
+Proof.
+intros * Hiv Hic * Haz.
+progress unfold rngl_inv; cbn.
+progress unfold complex_opt_inv_or_quot.
+progress unfold rngl_div.
+rewrite Hiv, Hic.
+generalize Hiv; intros H.
+progress unfold rngl_has_inv in H.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+symmetry; apply (fold_rngl_div Hiv).
 Qed.
 *)
 
