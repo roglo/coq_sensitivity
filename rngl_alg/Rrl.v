@@ -15,6 +15,7 @@ Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_opp_or_subt T {R}.
+Arguments rngl_has_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
@@ -510,7 +511,8 @@ Qed.
 Theorem complex_opt_mul_inv_r {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
-  if (rngl_has_inv (complex T) && rngl_has_1 (complex T) && negb (rngl_mul_is_comm T))%bool then
+  if (rngl_has_inv (complex T) && rngl_has_1 (complex T) &&
+      negb (rngl_mul_is_comm T))%bool then
     ∀ a : complex T, a ≠ 0%L → (a / a)%L = 1%L
   else not_applicable.
 Proof.
@@ -534,6 +536,40 @@ progress unfold complex_opt_inv_or_quot in Hivc.
 rewrite Hic in Hivc.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
 now destruct iq.
+Qed.
+
+Theorem complex_opt_mul_div {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := complex_ring_like_op T in
+  if rngl_has_quot (complex T) then
+    ∀ a b : complex T, b ≠ 0%L → (a * b / b)%L = a
+  else not_applicable.
+Proof.
+progress unfold rngl_has_quot; cbn.
+progress unfold complex_opt_inv_or_quot.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+now destruct (rngl_has_mod_intgl T).
+Qed.
+
+Theorem complex_opt_mul_quot_r {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := complex_ring_like_op T in
+  if (rngl_has_quot (complex T) && negb (rngl_mul_is_comm T))%bool then
+    ∀ a b : complex T, b ≠ 0%L → (b * a / b)%L = a
+  else not_applicable.
+Proof.
+progress unfold rngl_has_quot; cbn.
+progress unfold complex_opt_inv_or_quot.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [iq| ]; [ | easy ].
+destruct iq as [inv| quot]; [ | easy ].
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+now destruct (rngl_has_mod_intgl T).
 Qed.
 
 (* to be completed
@@ -562,9 +598,9 @@ Definition complex_ring_like_prop T
      rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
      rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
      rngl_opt_mul_inv_r := complex_opt_mul_inv_r;
-     rngl_opt_mul_div := 42;
-     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
-     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_mul_div := complex_opt_mul_div;
+     rngl_opt_mul_quot_r := complex_opt_mul_quot_r;
+     rngl_opt_eqb_eq := 42;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
      rngl_opt_integral := ?rngl_opt_integral;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;
