@@ -84,7 +84,7 @@ Definition rngl_module_zero T {ro : ring_like_op T} :=
   ∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L.
 
 Definition rngl_module_zero_dec T {ro : ring_like_op T} :=
-  {rngl_module_zero T} + {¬ rngl_module_zero T}.
+  {rngl_module_zero T} + {True}.
 
 Definition complex_opt_inv_or_quot {T}
   {ro : ring_like_op T} {rp : ring_like_prop T}
