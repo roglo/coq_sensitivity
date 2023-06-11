@@ -507,7 +507,6 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem complex_opt_mul_inv_r {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
@@ -530,44 +529,12 @@ destruct ic; [ now rewrite Bool.andb_false_r | ].
 rewrite Bool.andb_true_r.
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
-remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
-destruct onc; [ cbn | easy ].
-assert (Hon : rngl_has_1 T = true). {
-  progress unfold rngl_has_1 in Honc; cbn in Honc.
-  progress unfold complex_opt_one in Honc.
-  progress unfold rngl_has_1.
-  now destruct rngl_opt_one.
-}
-assert (Hiv : rngl_has_inv T = true). {
-  progress unfold rngl_has_inv in Hivc; cbn in Hivc.
-  progress unfold complex_opt_inv_or_quot in Hivc.
-  progress unfold rngl_has_inv.
-  destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
-  now destruct iq.
-}
-intros * Haz.
-apply eq_complex_eq; cbn.
-unfold rngl_div; rewrite Hivc; cbn.
-specialize (rngl_mul_inv_r Hon Hiv) as H1.
-...
-rewrite (complex_inv_re Hic Hiv Hmi); [ | now intros H; subst a ].
-rewrite (complex_inv_im Hic Hiv Hmi); [ | now intros H; subst a ].
-progress unfold rngl_sub.
-progress unfold rngl_div.
-rewrite Hop, Hiv.
-rewrite (rngl_mul_mul_swap Hic (re a)).
-do 2 rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_mul_swap Hic (im a)).
-rewrite (rngl_opp_involutive Hop).
-rewrite <- rngl_mul_add_distr_r.
-rewrite (rngl_mul_comm Hic).
-split. {
-  progress unfold "1"%L; cbn.
-  progress unfold complex_opt_one.
-  progress unfold rngl_has_1 in Hon.
-  progress unfold "1"%L in H1.
-...
-*)
+progress unfold rngl_has_inv in Hivc; cbn in Hivc.
+progress unfold complex_opt_inv_or_quot in Hivc.
+rewrite Hic in Hivc.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+now destruct iq.
+Qed.
 
 (* to be completed
 Definition complex_ring_like_prop T
@@ -594,8 +561,8 @@ Definition complex_ring_like_prop T
      rngl_opt_add_sub := complex_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := complex_opt_sub_add_distr Hsu;
      rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;
-     rngl_opt_mul_inv_r := 42;
-     rngl_opt_mul_div := ?rngl_opt_mul_div;
+     rngl_opt_mul_inv_r := complex_opt_mul_inv_r;
+     rngl_opt_mul_div := 42;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
