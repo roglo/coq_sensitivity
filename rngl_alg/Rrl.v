@@ -19,6 +19,7 @@ Arguments rngl_has_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_has_1 T {ro}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
+Arguments rngl_opt_eqb T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 
@@ -106,7 +107,7 @@ Definition complex_opt_inv_or_quot {T}
 
 Definition complex_opt_eqb {T} {ro : ring_like_op T} :
     option (complex T → complex T → bool) :=
-  match rngl_opt_eqb with
+  match rngl_opt_eqb T with
   | Some eqb => Some (λ c d, (eqb (re c) (re d) && eqb (im c) (im d))%bool)
   | None => None
   end.
@@ -572,6 +573,37 @@ destruct ic; [ | easy ].
 now destruct (rngl_has_mod_intgl T).
 Qed.
 
+Theorem complex_opt_eqb_eq {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := complex_ring_like_op T in
+  if rngl_has_eqb (complex T) then
+    ∀ a b : complex T, (a =? b)%L = true ↔ a = b
+  else not_applicable.
+Proof.
+progress unfold rngl_has_eqb; cbn.
+progress unfold complex_opt_eqb.
+specialize rngl_eqb_eq as H1.
+progress unfold rngl_has_eqb in H1.
+progress unfold rngl_eqb in H1.
+remember (rngl_opt_eqb T) as eb eqn:Heb; symmetry in Heb.
+destruct eb as [eqb| ]; [ cbn | easy ].
+specialize (H1 eq_refl).
+intros.
+progress unfold rngl_eqb; cbn.
+progress unfold complex_opt_eqb.
+rewrite Heb.
+split; intros Hab. {
+  apply eq_complex_eq.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Hr, Hi).
+  now split; apply H1.
+} {
+  subst b.
+  apply Bool.andb_true_iff.
+  now split; apply H1.
+}
+Qed.
+
 (* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -600,9 +632,9 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_inv_r := complex_opt_mul_inv_r;
      rngl_opt_mul_div := complex_opt_mul_div;
      rngl_opt_mul_quot_r := complex_opt_mul_quot_r;
-     rngl_opt_eqb_eq := 42;
-     rngl_opt_le_dec := ?rngl_opt_le_dec;
-     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_eqb_eq := complex_opt_eqb_eq;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := 42;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;
      rngl_characteristic_prop := ?rngl_characteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
