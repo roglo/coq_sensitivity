@@ -415,7 +415,6 @@ rewrite Hic, Hmi.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
 Qed.
 
-(* to be completed
 Theorem complex_opt_mul_inv_l {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
@@ -453,12 +452,15 @@ assert (Hiv : rngl_has_inv T = true). {
   destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
   now destruct iq.
 }
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert (Hic : rngl_mul_is_comm T = true). {
   progress unfold rngl_has_inv in Hivc; cbn in Hivc.
   progress unfold complex_opt_inv_or_quot in Hivc.
   remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
-  destruct iq as [inv| quot]; [ | easy ].
-  destruct inv; [ | easy ].
+  destruct iq as [iq| ]; [ | easy ].
+  destruct iq; [ | easy ].
   now destruct (rngl_mul_is_comm T).
 }
 intros * Haz.
@@ -479,7 +481,7 @@ split. {
   progress unfold "1"%L; cbn.
   progress unfold complex_opt_one.
   progress unfold rngl_has_1 in Hon.
-  unfold "1"%L in H1.
+  progress unfold "1"%L in H1.
   remember (rngl_opt_one T) as x eqn:Hx; symmetry in Hx.
   destruct x as [one| ]; [ | easy ].
   rewrite H1; [ easy | ].
@@ -490,8 +492,20 @@ split. {
   apply Haz.
   now apply eq_complex_eq; cbn.
 } {
-...
-*)
+  progress unfold "1"%L; cbn.
+  progress unfold complex_opt_one.
+  progress unfold rngl_has_1 in Hon.
+  progress unfold "1"%L in H1.
+  remember (rngl_opt_one T) as x eqn:Hx; symmetry in Hx.
+  destruct x as [one| ]; [ cbn | easy ].
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_comm Hic).
+  rewrite (fold_rngl_sub Hop).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_mul_swap Hic).
+  apply (rngl_sub_diag Hos).
+}
+Qed.
 
 (* to be completed
 Definition complex_ring_like_prop T
