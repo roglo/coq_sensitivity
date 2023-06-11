@@ -80,12 +80,23 @@ Definition complex_inv {T} {ro : ring_like_op T} a :=
   let d := (re a * re a + im a * im a)%L in
   mk_c (re a / d) (- im a / d)%L.
 
+Definition rngl_module_zero T {ro : ring_like_op T} :=
+  ∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L.
+
+Definition rngl_module_zero_dec T {ro : ring_like_op T} :=
+  {rngl_module_zero T} + {¬ rngl_module_zero T}.
+
 Definition complex_opt_inv_or_quot {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T}
+(*
+  (rmz : rngl_module_zero_dec T)
+*) :
   option ((complex T → complex T) + (complex T → complex T → complex T)) :=
   match rngl_opt_inv_or_quot T with
   | Some (inl inv) =>
-      if rngl_mul_is_comm T then Some (inl complex_inv) else None
+      if rngl_mul_is_comm T then
+        (*if rmz then*) Some (inl complex_inv) (*else None*)
+      else None
   | Some (inr quot) =>
       None (* à voir *)
   | None =>
@@ -100,14 +111,18 @@ Definition complex_opt_eqb {T} {ro : ring_like_op T} :
   end.
 
 Definition complex_ring_like_op T
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T}
+(*
+  (rmz : rngl_module_zero_dec T)
+*)
+  :
   ring_like_op (complex T) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
      rngl_opt_one := complex_opt_one;
      rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
+     rngl_opt_inv_or_quot := complex_opt_inv_or_quot (*rmz*);
      rngl_opt_eqb := complex_opt_eqb;
      rngl_opt_le := None |}.
 
@@ -448,22 +463,12 @@ split. {
   progress unfold "1"%L; cbn.
   progress unfold complex_opt_one.
   progress unfold rngl_has_1 in Hon.
-...
-  destruct (rngl_opt_one T); [ cbn | easy ].
-rewrite H1.
-  apply H1.
-  intros Hri.
-  apply (eq_rngl_add_square_0 Hop Hor Hdl) in Hri. 2: {
-...
-rewrite H1.
-...
-progress unfold rngl_inv; cbn.
-progress unfold complex_opt_inv_or_quot.
-(**)
-Set Printing All.
-...
-specialize (H1 (re a)) as H.
-cbn in H.
+  unfold "1"%L in H1.
+  remember (rngl_opt_one T) as x eqn:Hx; symmetry in Hx.
+  destruct x as [one| ]; [ | easy ].
+  rewrite H1; [ easy | ].
+  intros H2.
+Print rngl_module_zero.
 ...
 *)
 
