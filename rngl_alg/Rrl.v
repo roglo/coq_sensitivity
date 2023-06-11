@@ -606,26 +606,6 @@ split; intros Hab. {
 Qed.
 
 (* to be completed
-Theorem complex_opt_integral {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
-  let roc := complex_ring_like_op T in
-  if rngl_is_integral_domain T then ∀ a b : complex T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
-Proof.
-remember (rngl_is_integral_domain T) as id eqn:Hid; symmetry in Hid.
-destruct id; [ cbn | easy ].
-intros * Hab.
-apply eq_complex_eq in Hab; cbn in Hab.
-destruct Hab as (Hrr, Hri).
-destruct a as (ra, ia).
-destruct b as (rb, ib); cbn in Hrr, Hri |-*.
-specialize rngl_opt_integral as H1.
-rewrite Hid in H1.
-specialize rngl_mod_intgl_prop as H2.
-...
-*)
-
-(* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
@@ -634,7 +614,7 @@ Definition complex_ring_like_prop T
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
-     rngl_is_integral_domain := rngl_is_integral_domain T;
+     rngl_is_integral_domain := false; (* to be investigated *)
      rngl_is_alg_closed := true;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
@@ -655,8 +635,8 @@ Definition complex_ring_like_prop T
      rngl_opt_mul_quot_r := complex_opt_mul_quot_r;
      rngl_opt_eqb_eq := complex_opt_eqb_eq;
      rngl_opt_le_dec := NA;
-     rngl_opt_integral := 42;
-     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
+     rngl_opt_integral := NA;
+     rngl_opt_alg_closed := 42;
      rngl_characteristic_prop := ?rngl_characteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
