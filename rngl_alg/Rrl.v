@@ -80,22 +80,22 @@ Definition complex_inv {T} {ro : ring_like_op T} a :=
   let d := (re a * re a + im a * im a)%L in
   mk_c (re a / d) (- im a / d)%L.
 
-Definition rngl_module_zero T {ro : ring_like_op T} :=
-  ∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L.
+Class mod_integral T {ro : ring_like_op T} :=
+  { rngl_has_mod_intgl : bool;
+    rngl_mod_intgl_prop :
+      if rngl_has_mod_intgl then
+        ∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L
+      else not_applicable }.
 
-Definition rngl_module_zero_dec T {ro : ring_like_op T} :=
-  {rngl_module_zero T} + {True}.
+Arguments rngl_has_mod_intgl T {ro mod_integral}.
 
 Definition complex_opt_inv_or_quot {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T}
-(*
-  (rmz : rngl_module_zero_dec T)
-*) :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   option ((complex T → complex T) + (complex T → complex T → complex T)) :=
   match rngl_opt_inv_or_quot T with
   | Some (inl inv) =>
       if rngl_mul_is_comm T then
-        (*if rmz then*) Some (inl complex_inv) (*else None*)
+        if rngl_has_mod_intgl T then Some (inl complex_inv) else None
       else None
   | Some (inr quot) =>
       None (* à voir *)
@@ -111,22 +111,19 @@ Definition complex_opt_eqb {T} {ro : ring_like_op T} :
   end.
 
 Definition complex_ring_like_op T
-  {ro : ring_like_op T} {rp : ring_like_prop T}
-(*
-  (rmz : rngl_module_zero_dec T)
-*)
-  :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   ring_like_op (complex T) :=
   {| rngl_zero := complex_zero;
      rngl_add := complex_add;
      rngl_mul := complex_mul;
      rngl_opt_one := complex_opt_one;
      rngl_opt_opp_or_subt := complex_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := complex_opt_inv_or_quot (*rmz*);
+     rngl_opt_inv_or_quot := complex_opt_inv_or_quot;
      rngl_opt_eqb := complex_opt_eqb;
      rngl_opt_le := None |}.
 
-Theorem complex_add_comm {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_add_comm {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   ∀ a b, (a + b)%L = (b + a)%L.
 Proof.
@@ -135,7 +132,8 @@ progress unfold complex_add.
 f_equal; apply rngl_add_comm.
 Qed.
 
-Theorem complex_add_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_add_assoc {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   ∀ a b c : complex T, (a + (b + c))%L = (a + b + c)%L.
 Proof.
@@ -144,7 +142,8 @@ progress unfold complex_add; cbn.
 f_equal; apply rngl_add_assoc.
 Qed.
 
-Theorem complex_add_0_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_add_0_l {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   ∀ a : complex T, (0 + a)%L = a.
 Proof.
@@ -154,7 +153,8 @@ do 2 rewrite rngl_add_0_l.
 now apply eq_complex_eq.
 Qed.
 
-Theorem complex_mul_assoc {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_mul_assoc {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   ∀ a b c : complex T, (a * (b * c))%L = (a * b * c)%L.
@@ -184,7 +184,8 @@ f_equal. {
 }
 Qed.
 
-Theorem complex_opt_mul_1_l {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_opt_mul_1_l {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp_or_subt T = true →
   if rngl_has_1 (complex T) then ∀ a : complex T, (1 * a)%L = a
@@ -214,7 +215,7 @@ now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
 
 Theorem complex_mul_add_distr_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   ∀ a b c : complex T, (a * (b + c))%L = (a * b + a * c)%L.
@@ -236,7 +237,7 @@ split; f_equal. {
 Qed.
 
 Theorem complex_opt_mul_comm {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   if rngl_mul_is_comm T then ∀ a b : complex T, (a * b)%L = (b * a)%L
   else not_applicable.
@@ -253,7 +254,7 @@ apply rngl_add_comm.
 Qed.
 
 Theorem complex_opt_mul_1_r {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp_or_subt T = true →
   if rngl_mul_is_comm T then not_applicable
@@ -287,7 +288,7 @@ now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
 Qed.
 
 Theorem complex_opt_mul_add_distr_r {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   if rngl_mul_is_comm T then not_applicable
@@ -317,7 +318,7 @@ split; f_equal. {
 Qed.
 
 Theorem complex_opt_add_opp_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   if rngl_has_opp (complex T) then ∀ a : complex T, (- a + a)%L = 0%L
@@ -342,7 +343,7 @@ now do 2 rewrite H1.
 Qed.
 
 Theorem complex_opt_add_sub {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_subt T = false →
   if rngl_has_subt (complex T) then ∀ a b : complex T, (a + b - b)%L = a
@@ -357,7 +358,7 @@ now destruct os.
 Qed.
 
 Theorem complex_opt_sub_add_distr {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_subt T = false →
   if rngl_has_subt (complex T) then
@@ -372,14 +373,16 @@ destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 now destruct os.
 Qed.
 
-Theorem complex_inv_re {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_inv_re {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
+  rngl_has_mod_intgl T = true →
   ∀ a : complex T, a ≠ 0%L →
   re a⁻¹ = (re a / (re a * re a + im a * im a))%L.
 Proof.
-intros * Hic Hiv * Haz.
+intros * Hic Hiv Hmi * Haz.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -387,18 +390,20 @@ progress unfold rngl_inv; cbn.
 progress unfold complex_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hic.
+rewrite Hic, Hmi.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
 Qed.
 
-Theorem complex_inv_im {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem complex_inv_im {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
+  rngl_has_mod_intgl T = true →
   ∀ a : complex T, a ≠ 0%L →
   im a⁻¹ = (- im a / (re a * re a + im a * im a))%L.
 Proof.
-intros * Hic Hiv * Haz.
+intros * Hic Hiv Hmi * Haz.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -406,13 +411,13 @@ progress unfold rngl_inv; cbn.
 progress unfold complex_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hic.
+rewrite Hic, Hmi.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
 Qed.
 
 (* to be completed
 Theorem complex_opt_mul_inv_l {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
   rngl_has_opp T = true →
   if (rngl_has_inv (complex T) && rngl_has_1 (complex T))%bool then
@@ -420,6 +425,17 @@ Theorem complex_opt_mul_inv_l {T}
   else not_applicable.
 Proof.
 intros * Hop.
+remember (rngl_has_mod_intgl T) as hmi eqn:Hmi; symmetry in Hmi.
+destruct hmi. 2: {
+  progress unfold rngl_inv; cbn.
+  progress unfold complex_opt_inv_or_quot; cbn.
+  progress unfold rngl_has_inv; cbn.
+  progress unfold complex_opt_inv_or_quot; cbn.
+  rewrite Hmi.
+  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+  destruct iq as [inv| quot]; [ | easy ].
+  now destruct (rngl_mul_is_comm T).
+}
 remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
@@ -448,8 +464,8 @@ assert (Hic : rngl_mul_is_comm T = true). {
 intros * Haz.
 apply eq_complex_eq; cbn.
 specialize (rngl_mul_inv_l Hon Hiv) as H1.
-rewrite (complex_inv_re Hic Hiv); [ | now intros H; subst a ].
-rewrite (complex_inv_im Hic Hiv); [ | now intros H; subst a ].
+rewrite (complex_inv_re Hic Hiv Hmi); [ | now intros H; subst a ].
+rewrite (complex_inv_im Hic Hiv Hmi); [ | now intros H; subst a ].
 progress unfold rngl_sub.
 progress unfold rngl_div.
 rewrite Hop, Hiv.
@@ -468,7 +484,12 @@ split. {
   destruct x as [one| ]; [ | easy ].
   rewrite H1; [ easy | ].
   intros H2.
-Print rngl_module_zero.
+  specialize rngl_mod_intgl_prop as H3.
+  rewrite Hmi in H3.
+  apply H3 in H2.
+  apply Haz.
+  now apply eq_complex_eq; cbn.
+} {
 ...
 *)
 
