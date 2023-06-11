@@ -605,18 +605,18 @@ split; intros Hab. {
 }
 Qed.
 
-(*
+(* to be completed
 Theorem complex_opt_integral {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := complex_ring_like_op T in
-  if (rngl_is_integral_domain T && rngl_has_mod_intgl T)%bool then
+  if (rngl_is_integral_domain T && negb (rngl_has_inv (complex T)))%bool then
     ∀ a b : complex T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
   else not_applicable.
 Proof.
 remember (rngl_is_integral_domain T) as id eqn:Hid; symmetry in Hid.
 destruct id; [ cbn | easy ].
-remember (rngl_has_mod_intgl T) as hmi eqn:Hmi; symmetry in Hmi.
-destruct hmi; [ | easy ].
+remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
+destruct ivc; [ easy | cbn ].
 intros * Hab.
 apply eq_complex_eq in Hab; cbn in Hab.
 destruct Hab as (Hrr, Hri).
@@ -624,8 +624,15 @@ destruct a as (ra, ia).
 destruct b as (rb, ib); cbn in Hrr, Hri |-*.
 specialize rngl_opt_integral as H1.
 rewrite Hid in H1.
-specialize rngl_mod_intgl_prop as H2.
-rewrite Hmi in H2.
+progress unfold rngl_has_inv in Hivc; cbn in Hivc.
+progress unfold complex_opt_inv_or_quot in Hivc.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [iq| ]. {
+  destruct iq as [inv| quot]. {
+    remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+    destruct ic. {
+      remember (rngl_has_mod_intgl T) as hmi eqn:Hmi; symmetry in Hmi.
+      destruct hmi; [ easy | ].
 ...
 *)
 
