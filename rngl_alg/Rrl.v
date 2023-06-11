@@ -508,6 +508,68 @@ split. {
 Qed.
 
 (* to be completed
+Theorem complex_opt_mul_inv_r {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := complex_ring_like_op T in
+  if (rngl_has_inv (complex T) && rngl_has_1 (complex T) && negb (rngl_mul_is_comm T))%bool then
+    ∀ a : complex T, a ≠ 0%L → (a / a)%L = 1%L
+  else not_applicable.
+Proof.
+cbn.
+remember (rngl_has_mod_intgl T) as hmi eqn:Hmi; symmetry in Hmi.
+destruct hmi. 2: {
+  progress unfold rngl_has_inv; cbn.
+  progress unfold complex_opt_inv_or_quot; cbn.
+  rewrite Hmi.
+  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+  destruct iq as [inv| quot]; [ | easy ].
+  now destruct (rngl_mul_is_comm T).
+}
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ now rewrite Bool.andb_false_r | ].
+rewrite Bool.andb_true_r.
+remember (rngl_has_inv (complex T)) as ivc eqn:Hivc; symmetry in Hivc.
+destruct ivc; [ | easy ].
+remember (rngl_has_1 (complex T)) as onc eqn:Honc; symmetry in Honc.
+destruct onc; [ cbn | easy ].
+assert (Hon : rngl_has_1 T = true). {
+  progress unfold rngl_has_1 in Honc; cbn in Honc.
+  progress unfold complex_opt_one in Honc.
+  progress unfold rngl_has_1.
+  now destruct rngl_opt_one.
+}
+assert (Hiv : rngl_has_inv T = true). {
+  progress unfold rngl_has_inv in Hivc; cbn in Hivc.
+  progress unfold complex_opt_inv_or_quot in Hivc.
+  progress unfold rngl_has_inv.
+  destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+  now destruct iq.
+}
+intros * Haz.
+apply eq_complex_eq; cbn.
+unfold rngl_div; rewrite Hivc; cbn.
+specialize (rngl_mul_inv_r Hon Hiv) as H1.
+...
+rewrite (complex_inv_re Hic Hiv Hmi); [ | now intros H; subst a ].
+rewrite (complex_inv_im Hic Hiv Hmi); [ | now intros H; subst a ].
+progress unfold rngl_sub.
+progress unfold rngl_div.
+rewrite Hop, Hiv.
+rewrite (rngl_mul_mul_swap Hic (re a)).
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_mul_swap Hic (im a)).
+rewrite (rngl_opp_involutive Hop).
+rewrite <- rngl_mul_add_distr_r.
+rewrite (rngl_mul_comm Hic).
+split. {
+  progress unfold "1"%L; cbn.
+  progress unfold complex_opt_one.
+  progress unfold rngl_has_1 in Hon.
+  progress unfold "1"%L in H1.
+...
+*)
+
+(* to be completed
 Definition complex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
