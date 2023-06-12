@@ -646,7 +646,6 @@ destruct iq as [iq| ]. {
 ...
 *)
 
-(* to be completed
 Theorem GComplex_characteristic_prop {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := GComplex_ring_like_op T in
@@ -665,6 +664,19 @@ progress unfold GComplex_opt_one.
 remember (rngl_opt_one T) as on eqn:Hon; symmetry in Hon.
 destruct on as [one| ]; [ | easy ].
 cbn - [ rngl_mul_nat ] in H1 |-*.
+assert
+  (Hr :
+    ∀ n,
+    @rngl_mul_nat _ (GComplex_ring_like_op T) (mk_gc 1 0) n =
+    mk_gc (rngl_mul_nat 1 n) 0). {
+  intros.
+  induction n; [ easy | cbn ].
+  rewrite IHn.
+  progress unfold GComplex_add; cbn.
+  now rewrite rngl_add_0_l.
+}
+unfold "1"%L in Hr.
+rewrite Hon in Hr.
 remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   cbn - [ rngl_mul_nat ] in H1 |-*; intros.
@@ -677,20 +689,7 @@ destruct ch. {
   progress unfold GComplex_opt_one in H2.
   progress unfold "1"%L.
   rewrite Hon in H2 |-*; cbn - [ rngl_mul_nat ] in H2 |-*.
-  assert
-    (H :
-      ∀ n,
-      @rngl_mul_nat _ (GComplex_ring_like_op T) (mk_gc 1 0) n =
-      mk_gc (rngl_mul_nat 1 n) 0). {
-    intros.
-    induction n; [ easy | cbn ].
-    rewrite IHn.
-    progress unfold GComplex_add; cbn.
-    now rewrite rngl_add_0_l.
-  }
-  unfold "1"%L in H.
-  rewrite Hon in H.
-  now rewrite H in H2.
+  now rewrite Hr in H2.
 } {
   cbn - [ rngl_mul_nat ] in H1 |-*.
   destruct H1 as (H1, H2).
@@ -698,12 +697,29 @@ destruct ch. {
     intros i Hi.
     apply neq_GComplex_neq.
     cbn; left.
-...
-*)
+    specialize (H1 i Hi).
+    intros H3; apply H1; clear H1.
+    progress unfold "1"%L.
+    rewrite Hon.
+    progress unfold "1"%L in H3; cbn in H3.
+    progress unfold GComplex_opt_one in H3.
+    rewrite Hon in H3.
+    now rewrite Hr in H3; cbn in H3.
+  } {
+    apply eq_GComplex_eq.
+    cbn - [ rngl_mul_nat ].
+    progress unfold "1"%L; cbn - [ rngl_mul_nat ].
+    progress unfold GComplex_opt_one.
+    progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
+    rewrite Hon in H2 |-*.
+    now rewrite Hr.
+  }
+}
+Qed.
 
-(* to be completed
+(* to be completed *)
 Definition GComplex_ring_like_prop T
-  {ro : ring_like_op T} {rp : ring_like_prop T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T}
   (Hop : rngl_has_opp T = true) :
   ring_like_prop (GComplex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
@@ -733,17 +749,15 @@ Definition GComplex_ring_like_prop T
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := 42;
-     rngl_opt_le_refl := ?rngl_opt_le_refl;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le |}.
-*)
-
+     rngl_characteristic_prop := GComplex_characteristic_prop;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA |}.
 
 (* Coq reals as Cauchy sequences *)
 
