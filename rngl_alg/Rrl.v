@@ -646,7 +646,7 @@ Definition complex_ring_like_prop T
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
-     rngl_is_alg_closed := true;
+     rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := complex_add_comm;
      rngl_add_assoc := complex_add_assoc;
@@ -667,8 +667,8 @@ Definition complex_ring_like_prop T
      rngl_opt_eqb_eq := complex_opt_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
-     rngl_opt_alg_closed := 42;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_alg_closed := NA;
+     rngl_characteristic_prop := 42;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
