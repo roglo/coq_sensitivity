@@ -688,7 +688,22 @@ Qed.
 
 (* algebraically closed *)
 
+Definition modl {T} {ro : ring_like_op T} (z : GComplex T) :=
+  (gre z * gre z + gim z * gim z)%L.
+
 (* to be completed
+Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := GComplex_ring_like_op T in
+  rngl_has_opp T = true →
+  rngl_has_inv (GComplex T) = true →
+  rngl_has_1 (GComplex T) = true →
+  ∀ la, 1 < length la → llast la 0%L ≠ 0%L →
+  ∀ mz, ∃ z₀, ∀ z, (modl z₀ ≤ modl z → mz ≤ modl (rngl_eval_polyn la z))%L.
+Proof.
+intros * Hop Hivc Honc * Hla Hl1 *.
+...
+
 Theorem GComplex_opt_alg_closed {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := GComplex_ring_like_op T in
@@ -705,10 +720,8 @@ destruct op; [ | easy ].
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
-destruct onc; [ | easy ].
-cbn.
-intros la Hla Hlz.
-Check rngl_eval_polyn.
+destruct onc; [ cbn | easy ].
+intros la Hla Hl1.
 ...
 *)
 
