@@ -615,37 +615,6 @@ split; intros Hab. {
 }
 Qed.
 
-(* to be completed
-Theorem GComplex_opt_integral {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
-  let roc := GComplex_ring_like_op T in
-  if (rngl_is_integral_domain T && negb (rngl_has_inv (GComplex T)))%bool then
-    ∀ a b : GComplex T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
-Proof.
-remember (rngl_is_integral_domain T) as id eqn:Hid; symmetry in Hid.
-destruct id; [ cbn | easy ].
-remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
-destruct ivc; [ easy | cbn ].
-intros * Hab.
-apply eq_GComplex_eq in Hab; cbn in Hab.
-destruct Hab as (Hrr, Hri).
-destruct a as (ra, ia).
-destruct b as (rb, ib); cbn in Hrr, Hri |-*.
-specialize rngl_opt_integral as H1.
-rewrite Hid in H1.
-progress unfold rngl_has_inv in Hivc; cbn in Hivc.
-progress unfold GComplex_opt_inv_or_quot in Hivc.
-remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
-destruct iq as [iq| ]. {
-  destruct iq as [inv| quot]. {
-    remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-    destruct ic. {
-      remember (rngl_has_mod_intgl T) as hmi eqn:Hmi; symmetry in Hmi.
-      destruct hmi; [ easy | ].
-...
-*)
-
 Theorem GComplex_characteristic_prop {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := GComplex_ring_like_op T in
@@ -724,9 +693,10 @@ Theorem GComplex_opt_alg_closed {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   let roc := GComplex_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
-      rngl_has_1 (GComplex T))%bool then
-    ∀ l : list (GComplex T),
-      llast l 0%L ≠ 0%L → ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
+      rngl_has_1 (GComplex T))%bool
+  then
+    ∀ l : list (GComplex T), 1 < length l → llast l 0%L ≠ 0%L →
+    ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
   else not_applicable.
 Proof.
 intros; cbn.
@@ -737,7 +707,7 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ | easy ].
 cbn.
-intros la Hla.
+intros la Hla Hlz.
 Check rngl_eval_polyn.
 ...
 *)
@@ -775,7 +745,7 @@ Definition GComplex_ring_like_prop T
      rngl_opt_eqb_eq := GComplex_opt_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
-     rngl_opt_alg_closed := NA;
+     rngl_opt_alg_closed := GComplex_opt_alg_closed;
      rngl_characteristic_prop := GComplex_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;

@@ -321,20 +321,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then
-        ∀ l : list T, llast l 0%L ≠ 0%L → ∃ x, rngl_eval_polyn l x = 0%L
+        ∀ l : list T, 1 < length l → llast l 0%L ≠ 0%L →
+        ∃ x, rngl_eval_polyn l x = 0%L
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
-(*
-https://en.wikipedia.org/wiki/Characteristic_(algebra)#Equivalent_characterizations
-      ∀ k : nat,
-      (∀ a : T, rngl_mul_nat a k = 0%L)
-      → ∃ m, m ≠ 0 ∧ k = m * rngl_characteristic;
-...
-      ∀ n : nat,
-      (∀ a : T, rngl_mul_nat a n = 0%L)
-      → ∃ k, k ≠ 0 ∧ n = k * rngl_characteristic;
-*)
       if rngl_has_1 then
         if Nat.eqb (rngl_characteristic) 0 then
           ∀ i, rngl_mul_nat 1%L (S i) ≠ 0%L
@@ -342,21 +333,7 @@ https://en.wikipedia.org/wiki/Characteristic_(algebra)#Equivalent_characterizati
           (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat 1%L i ≠ 0%L) ∧
           rngl_mul_nat 1%L rngl_characteristic = 0%L
       else
-(**)
         not_applicable;
-(*
-        if Nat.eqb (rngl_characteristic) 0 then
-          ∀ a, a ≠ 0%L → ∀ i, rngl_mul_nat a (S i) ≠ 0%L
-        else
-          ∀ a, a ≠ 0%L →
-          (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat a i ≠ 0%L) ∧
-          rngl_mul_nat a rngl_characteristic = 0%L;
-*)
-(*
-      ∀ k : nat,
-      (∀ a : T, rngl_mul_nat a k = 0%L)
-      → ∃ m, m ≠ 0 ∧ k = m * rngl_characteristic;
-*)
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%L else not_applicable;
