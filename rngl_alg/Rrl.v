@@ -13,6 +13,7 @@ Arguments mk_gc {T} gre%L gim%L.
 Arguments gre {T} GComplex%L.
 Arguments gim {T} GComplex%L.
 
+Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
@@ -37,14 +38,18 @@ now f_equal.
 Qed.
 
 Theorem neq_GComplex_neq {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_eqb T = true →
-  ∀ a b : GComplex T, gre a ≠ gre b ∨ gim a ≠ gim b ↔ a ≠ b.
+  ∀ a b : GComplex T, gre a ≠ gre b ∨ gim a ≠ gim b → a ≠ b.
 Proof.
-intros * Heb *.
-split; intros Hab. {
-  intros H; subst b.
-  now destruct Hab.
-}
+intros * Hab.
+intros H; subst b.
+now destruct Hab.
+Qed.
+
+Theorem neq_neq_GComplex {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_eqb T = true →
+  ∀ a b : GComplex T, a ≠ b → gre a ≠ gre b ∨ gim a ≠ gim b.
+Proof.
+intros * Heb * Hab.
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
 destruct (rngl_eq_dec Heb ra rb) as [Hrab| Hrab]. {
@@ -642,6 +647,62 @@ destruct iq as [iq| ]. {
 *)
 
 (* to be completed
+Theorem GComplex_characteristic_prop {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := GComplex_ring_like_op T in
+  if rngl_has_1 (GComplex T) then
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    else
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
+      ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+  else not_applicable.
+Proof.
+cbn - [ rngl_mul_nat ].
+specialize (rngl_characteristic_prop) as H1.
+progress unfold rngl_has_1 in H1.
+progress unfold rngl_has_1; cbn - [ rngl_mul_nat ].
+progress unfold GComplex_opt_one.
+remember (rngl_opt_one T) as on eqn:Hon; symmetry in Hon.
+destruct on as [one| ]; [ | easy ].
+cbn - [ rngl_mul_nat ] in H1 |-*.
+remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+destruct ch. {
+  cbn - [ rngl_mul_nat ] in H1 |-*; intros.
+  apply neq_GComplex_neq.
+  cbn - [ rngl_mul_nat ].
+  left.
+  specialize (H1 i).
+  intros H2; apply H1; clear H1.
+(**)
+  progress unfold "1"%L in H2; cbn in H2.
+  progress unfold GComplex_opt_one in H2.
+  progress unfold "1"%L.
+  rewrite Hon in H2 |-*; cbn in H2 |-*.
+...
+  induction i; cbn. {
+    cbn in H2.
+    progress unfold "1"%L in H2; cbn in H2.
+    progress unfold GComplex_opt_one in H2.
+    progress unfold "1"%L.
+    now rewrite Hon in H2 |-*; cbn in H2 |-*.
+  }
+...
+  remember (rngl_mul_nat 1 (S i)) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as (rx, ix).
+  cbn in H2; subst rx.
+  apply eq_GComplex_eq in Hx.
+  cbn - [ rngl_mul_nat ] in Hx.
+  destruct Hx as (Hx, Hy).
+...
+  Hx : gre (rngl_mul_nat 1 (S i)) = 0%L
+  Hy : gim (rngl_mul_nat 1 (S i)) = ix
+  ============================
+  rngl_mul_nat 1 (S i) = 0%L
+...
+*)
+
+(* to be completed
 Definition GComplex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T}
   (Hop : rngl_has_opp T = true) :
@@ -652,7 +713,7 @@ Definition GComplex_ring_like_prop T
      rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
-     rngl_characteristic := rngl_characteristic;
+     rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := GComplex_add_comm;
      rngl_add_assoc := GComplex_add_assoc;
      rngl_add_0_l := GComplex_add_0_l;
