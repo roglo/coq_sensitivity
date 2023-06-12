@@ -674,10 +674,23 @@ destruct ch. {
   specialize (H1 i).
   intros H2; apply H1; clear H1.
 (**)
-  progress unfold "1"%L in H2; cbn in H2.
+  progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
   progress unfold GComplex_opt_one in H2.
   progress unfold "1"%L.
-  rewrite Hon in H2 |-*; cbn in H2 |-*.
+  rewrite Hon in H2 |-*; cbn - [ rngl_mul_nat ] in H2 |-*.
+  assert
+    (H :
+      ∀ n,
+      @rngl_mul_nat _ (GComplex_ring_like_op T) (mk_gc 1 0) n =
+      mk_gc (rngl_mul_nat 1 n) 0). {
+    intros.
+    induction n; [ easy | cbn ].
+    destruct n; cbn.
+...
+    destruct n; [ apply Rplus_0_r | ].
+  rewrite IHn.
+  apply Rplus_comm.
+}
 ...
   induction i; cbn. {
     cbn in H2.
