@@ -717,7 +717,18 @@ destruct ch. {
 }
 Qed.
 
-(* to be completed *)
+(* algebraically closed *)
+
+(* to be completed
+Theorem GComplex_opt_alg_closed :
+  if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
+      rngl_has_1 (GComplex T))%bool then
+   ∀ l : list (GComplex T),
+     0 < length l → ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
+  else not_applicable.
+*)
+
+(* to be completed
 Definition GComplex_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T}
   (Hop : rngl_has_opp T = true) :
@@ -727,7 +738,9 @@ Definition GComplex_ring_like_prop T
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
-     rngl_is_alg_closed := false;
+     rngl_is_alg_closed :=
+       (rngl_has_opp T && rngl_has_inv (GComplex T) &&
+        rngl_has_1 (GComplex T))%bool;
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := GComplex_add_comm;
      rngl_add_assoc := GComplex_add_assoc;
@@ -758,6 +771,7 @@ Definition GComplex_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
+*)
 
 (* Coq reals as Cauchy sequences *)
 
