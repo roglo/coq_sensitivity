@@ -673,7 +673,6 @@ destruct ch. {
   left.
   specialize (H1 i).
   intros H2; apply H1; clear H1.
-(**)
   progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
   progress unfold GComplex_opt_one in H2.
   progress unfold "1"%L.
@@ -685,33 +684,20 @@ destruct ch. {
       mk_gc (rngl_mul_nat 1 n) 0). {
     intros.
     induction n; [ easy | cbn ].
-    destruct n; cbn.
-...
-    destruct n; [ apply Rplus_0_r | ].
-  rewrite IHn.
-  apply Rplus_comm.
-}
-...
-  induction i; cbn. {
-    cbn in H2.
-    progress unfold "1"%L in H2; cbn in H2.
-    progress unfold GComplex_opt_one in H2.
-    progress unfold "1"%L.
-    now rewrite Hon in H2 |-*; cbn in H2 |-*.
+    rewrite IHn.
+    progress unfold GComplex_add; cbn.
+    now rewrite rngl_add_0_l.
   }
-...
-  remember (rngl_mul_nat 1 (S i)) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x as (rx, ix).
-  cbn in H2; subst rx.
-  apply eq_GComplex_eq in Hx.
-  cbn - [ rngl_mul_nat ] in Hx.
-  destruct Hx as (Hx, Hy).
-...
-  Hx : gre (rngl_mul_nat 1 (S i)) = 0%L
-  Hy : gim (rngl_mul_nat 1 (S i)) = ix
-  ============================
-  rngl_mul_nat 1 (S i) = 0%L
+  unfold "1"%L in H.
+  rewrite Hon in H.
+  now rewrite H in H2.
+} {
+  cbn - [ rngl_mul_nat ] in H1 |-*.
+  destruct H1 as (H1, H2).
+  split. {
+    intros i Hi.
+    apply neq_GComplex_neq.
+    cbn; left.
 ...
 *)
 
