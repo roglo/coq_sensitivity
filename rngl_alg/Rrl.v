@@ -720,12 +720,26 @@ Qed.
 (* algebraically closed *)
 
 (* to be completed
-Theorem GComplex_opt_alg_closed :
+Theorem GComplex_opt_alg_closed {T}
+  {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
+  let roc := GComplex_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool then
-   ∀ l : list (GComplex T),
-     0 < length l → ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
+    ∀ l : list (GComplex T),
+      llast l 0%L ≠ 0%L → ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
   else not_applicable.
+Proof.
+intros; cbn.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+destruct op; [ | easy ].
+remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
+destruct ivc; [ | easy ].
+remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
+destruct onc; [ | easy ].
+cbn.
+intros la Hla.
+Check rngl_eval_polyn.
+...
 *)
 
 (* to be completed

@@ -196,6 +196,13 @@ Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   | cons a l' => rngl_add (rngl_mul (rngl_eval_polyn l' x) x) a
   end.
 
+Fixpoint llast {A} (l : list A) d :=
+  match l with
+  | nil => d
+  | cons a nil => a
+  | cons _ l' => llast l' d
+  end.
+
 Definition rngl_has_eqb {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_eqb.
 
@@ -314,7 +321,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then
-        ∀ l, 0 < length l → ∃ x, rngl_eval_polyn l x = 0%L
+        ∀ l : list T, llast l 0%L ≠ 0%L → ∃ x, rngl_eval_polyn l x = 0%L
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
