@@ -67,7 +67,10 @@ Definition GComplex_one {T} {ro : ring_like_op T} : GComplex T :=
   {| gre := rngl_one; gim := rngl_zero |}.
 
 Definition GComplex_opt_one {T} {ro : ring_like_op T} : option (GComplex T) :=
-  if rngl_has_1 T then Some GComplex_one else None.
+  match rngl_opt_one T with
+  | Some one => Some (mk_gc one rngl_zero)
+  | None => None
+  end.
 
 Definition GComplex_add {T} {ro : ring_like_op T} (ca cb : GComplex T) :=
   {| gre := gre ca + gre cb; gim := gim ca + gim cb |}.
@@ -221,11 +224,7 @@ progress unfold rngl_has_1 in Hon.
 progress unfold "1"%L in H1; cbn in H1.
 progress unfold "1"%L; cbn.
 progress unfold GComplex_opt_one; cbn.
-progress unfold rngl_has_1.
-remember (rngl_opt_one T) as on eqn:Hon'; symmetry in Hon'.
-destruct on as [one| ]; [ cbn | easy ].
-progress unfold rngl_one.
-rewrite Hon'.
+destruct (rngl_opt_one T) as [one| ]; [ cbn | easy ].
 do 2 rewrite H1.
 do 2 rewrite (rngl_mul_0_l Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
@@ -290,7 +289,6 @@ progress unfold GComplex_opt_one.
 assert (Hon : rngl_has_1 T = true). {
   progress unfold rngl_has_1 in Honc; cbn in Honc.
   progress unfold GComplex_opt_one in Honc.
-  progress unfold rngl_has_1 in Honc; cbn in Honc.
   progress unfold rngl_has_1.
   now destruct (rngl_opt_one T).
 }
@@ -299,12 +297,8 @@ unfold rngl_has_1 in Honc.
 cbn in Honc.
 progress unfold GComplex_opt_one in Honc.
 progress unfold "1"%L in H1.
-progress unfold rngl_has_1 in Honc.
-progress unfold rngl_has_1.
 remember (rngl_opt_one T) as on eqn:Hon'; symmetry in Hon'.
 destruct on as [one| ]; [ cbn | easy ].
-progress unfold "1"%L.
-rewrite Hon'.
 do 2 rewrite H1.
 do 2 rewrite (rngl_mul_0_r Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
@@ -506,9 +500,6 @@ split. {
   progress unfold GComplex_opt_one.
   progress unfold rngl_has_1 in Hon.
   progress unfold "1"%L in H1.
-  progress unfold rngl_has_1.
-  progress unfold GComplex_one.
-  progress unfold "1"%L.
   remember (rngl_opt_one T) as x eqn:Hx; symmetry in Hx.
   destruct x as [one| ]; [ cbn | easy ].
   rewrite H1; [ easy | ].
@@ -523,8 +514,6 @@ split. {
   progress unfold GComplex_opt_one.
   progress unfold rngl_has_1 in Hon.
   progress unfold "1"%L in H1.
-  progress unfold rngl_has_1.
-  progress unfold GComplex_one.
   remember (rngl_opt_one T) as x eqn:Hx; symmetry in Hx.
   destruct x as [one| ]; [ cbn | easy ].
   rewrite (rngl_mul_opp_l Hop).
@@ -646,7 +635,6 @@ specialize (rngl_characteristic_prop) as H1.
 progress unfold rngl_has_1 in H1.
 progress unfold rngl_has_1; cbn - [ rngl_mul_nat ].
 progress unfold GComplex_opt_one.
-progress unfold rngl_has_1.
 remember (rngl_opt_one T) as on eqn:Hon; symmetry in Hon.
 destruct on as [one| ]; [ | easy ].
 cbn - [ rngl_mul_nat ] in H1 |-*.
@@ -674,9 +662,6 @@ destruct ch. {
   progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
   progress unfold GComplex_opt_one in H2.
   progress unfold "1"%L.
-  progress unfold rngl_has_1 in H2.
-  progress unfold GComplex_one in H2.
-  progress unfold "1"%L in H2.
   rewrite Hon in H2 |-*; cbn - [ rngl_mul_nat ] in H2 |-*.
   now rewrite Hr in H2.
 } {
@@ -692,9 +677,6 @@ destruct ch. {
     rewrite Hon.
     progress unfold "1"%L in H3; cbn in H3.
     progress unfold GComplex_opt_one in H3.
-    progress unfold rngl_has_1 in H3.
-    progress unfold GComplex_one in H3.
-    progress unfold "1"%L in H3.
     rewrite Hon in H3; cbn in H3.
     now rewrite Hr in H3; cbn in H3.
   } {
@@ -703,9 +685,6 @@ destruct ch. {
     progress unfold "1"%L; cbn - [ rngl_mul_nat ].
     progress unfold GComplex_opt_one.
     progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
-    progress unfold rngl_has_1.
-    progress unfold GComplex_one.
-    progress unfold "1"%L.
     rewrite Hon in H2 |-*.
     now rewrite Hr.
   }
@@ -724,8 +703,8 @@ Fixpoint GComplex_power {T} {ro : ring_like_op T} (z : GComplex T) n :=
   end.
 
 (* to be completed
-Theorem glop {T} : ∀ n, n ≠ 0 →
-  ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power x n = z.
+Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
+  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power x n = z.
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
