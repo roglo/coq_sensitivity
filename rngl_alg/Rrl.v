@@ -126,6 +126,12 @@ Definition GComplex_opt_eqb {T} {ro : ring_like_op T} :
       None
   end.
 
+Declare Scope GComplex_scope.
+Delimit Scope GComplex_scope with C.
+
+Notation "x + y" := (GComplex_add x y) : GComplex_scope.
+Notation "x * y" := (GComplex_mul x y) : GComplex_scope.
+
 Definition GComplex_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {mi : mod_integral T} :
   ring_like_op (GComplex T) :=
@@ -696,15 +702,17 @@ Qed.
 Definition modl {T} {ro : ring_like_op T} (z : GComplex T) :=
   (gre z * gre z + gim z * gim z)%L.
 
-Fixpoint GComplex_power {T} {ro : ring_like_op T} (z : GComplex T) n :=
+Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   match n with
   | 0 => GComplex_one
-  | S n' => GComplex_mul z (GComplex_power z n')
+  | S n' => (z * GComplex_power_nat z n')%C
   end.
 
 (* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
-  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power x n = z.
+  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
+Proof.
+intros * Hnz *.
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
