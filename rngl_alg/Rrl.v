@@ -713,6 +713,12 @@ Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
 Proof.
 intros * Hnz *.
+Check acos.
+Theorem glop :
+  ∀ z ρ θ,
+  ρ = (gre z * gre z + gim z + gim z)%L
+  → θ = acos (gre z)
+  → z = mk_gc (ρ * cos θ) (ρ * sin θ).
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
