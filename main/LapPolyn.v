@@ -1783,18 +1783,6 @@ Qed.
 
 (* *)
 
-Theorem lap_opt_le_dec :
-  let rol := lap_ring_like_op in
-  if rngl_has_dec_le then ∀ a b, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-  else not_applicable.
-Proof.
-intros rol; subst rol.
-destruct rngl_has_dec_le; [ | easy ].
-now intros; right; cbn.
-Qed.
-
-(* *)
-
 Theorem last_lap_convol_mul_last :
   rngl_has_opp_or_subt T = true →
   ∀ la lb a b i len d,
@@ -2963,7 +2951,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := rngl_has_dec_le;
+     rngl_has_dec_le := false;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -2984,7 +2972,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
-     rngl_opt_le_dec := lap_opt_le_dec;
+     rngl_opt_le_dec := NA;
      rngl_opt_integral := lap_opt_integral Hos;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := lap_characteristic_prop;
