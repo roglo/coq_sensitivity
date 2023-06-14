@@ -708,7 +708,7 @@ Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   | S n' => (z * GComplex_power_nat z n')%C
   end.
 
-(* to be completed *)
+(* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
 Proof.
