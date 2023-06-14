@@ -410,6 +410,7 @@ Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
+     rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := at_least_1 n;
@@ -430,7 +431,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_eqb_eq := Zn_eqb_eq;
-     rngl_opt_le_dec := None;
+     rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Zn_characteristic_prop;
@@ -500,6 +501,7 @@ Qed.
 Definition lcm_ring_like_prop :=
   let rol := lcm_ring_like_op in
   {| rngl_mul_is_comm := true;
+     rngl_has_dec_le := false;
      rngl_is_integral_domain := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 1;
@@ -520,7 +522,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_div := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_le_dec := None;
+     rngl_opt_le_dec := NA;
      rngl_opt_integral := lcm_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := lcm_characteristic_prop;

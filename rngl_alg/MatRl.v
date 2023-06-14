@@ -711,6 +711,7 @@ Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
   let rom := mat_ring_like_op eqb in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
+     rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
@@ -731,7 +732,7 @@ Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb Heq n;
-     rngl_opt_le_dec := None;
+     rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := @squ_mat_characteristic_prop eqb n;
