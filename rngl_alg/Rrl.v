@@ -718,9 +718,9 @@ intros * Hnz *.
 Check acos.
 Theorem polar {T} {ro : ring_like_op T} :
   ∀ z ρ θ,
-  ρ = rngl_sqrt (gre z * gre z + gim z + gim z)
-  → θ = rngl_acos (rngl_div (gre z) ρ)
-  → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
+  ρ = rl_sqrt (gre z * gre z + gim z + gim z)
+  → θ = rl_acos (gre z / ρ)
+  → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
