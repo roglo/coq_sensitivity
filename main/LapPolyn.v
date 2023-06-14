@@ -314,21 +314,6 @@ Qed.
 
 (**)
 
-(*
-Theorem map2_rngl_subt_0_l :
-  rngl_has_subt = true →
-  ∀ n la,
-  n = length la
-  → map2 rngl_subt (repeat 0%L n) la =
-  map (rngl_mul (0 - 1)%L) la.
-Proof.
-intros Hsu * Hn; subst n.
-induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_subt_0_l Hsu); f_equal.
-apply IHla.
-Qed.
-*)
-
 Theorem map2_rngl_subt_0_r :
   rngl_has_subt = true →
   ∀ n la,
