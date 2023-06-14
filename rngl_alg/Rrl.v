@@ -96,13 +96,13 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   mk_gc (gre a / d) (- gim a / d)%L.
 
 Class real_like_prop T {ro : ring_like_op T} :=
-  { rl_has_mod_intgl : bool;
-    rl_mod_intgl_prop :
-      if rl_has_mod_intgl then
-        ∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L
-      else not_applicable }.
+  { rl_opt_mod_intgl_prop :
+      option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L) }.
 
-Arguments rl_has_mod_intgl T {ro real_like_prop}.
+Arguments rl_opt_mod_intgl_prop T {ro real_like_prop}.
+
+Definition rl_has_mod_intgl T {ro : ring_like_op T} {rl : real_like_prop T} :=
+  bool_of_option (rl_opt_mod_intgl_prop T).
 
 Definition GComplex_opt_inv_or_quot {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -511,8 +511,9 @@ split. {
   destruct x as [one| ]; [ cbn | easy ].
   rewrite H1; [ easy | ].
   intros H2.
-  specialize rl_mod_intgl_prop as H3.
-  rewrite Hrl in H3.
+  generalize Hrl; intros H.
+  unfold rl_has_mod_intgl in H.
+  destruct (rl_opt_mod_intgl_prop T) as [H3| ]; [ clear H | easy ].
   apply H3 in H2.
   apply Haz.
   now apply eq_GComplex_eq; cbn.
