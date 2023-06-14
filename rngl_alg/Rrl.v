@@ -96,10 +96,24 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   mk_gc (gre a / d) (- gim a / d)%L.
 
 Class real_like_prop T {ro : ring_like_op T} :=
-  { rl_opt_mod_intgl_prop :
-      option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L) }.
+  { rl_has_trigo : bool;
+    rl_exp : T → T;
+    rl_ln : T → T;
+    rl_cos : T → T;
+    rl_sin : T → T;
+    rl_acos : T → T;
+    rl_opt_mod_intgl_prop :
+      option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L);
+    rl_cos_acos :
+      if rl_has_trigo then ∀ x : T, rl_cos (rl_acos x) = x
+      else not_applicable }.
 
+Arguments rl_acos {T ro real_like_prop} x%L.
+Arguments rl_cos {T ro real_like_prop} x%L.
+Arguments rl_exp {T ro real_like_prop} x%L.
 Arguments rl_opt_mod_intgl_prop T {ro real_like_prop}.
+Arguments rl_ln {T ro real_like_prop} x%L.
+Arguments rl_sin {T ro real_like_prop} x%L.
 
 Definition rl_has_mod_intgl T {ro : ring_like_op T} {rl : real_like_prop T} :=
   bool_of_option (rl_opt_mod_intgl_prop T).
@@ -710,17 +724,35 @@ Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   | S n' => (z * GComplex_power_nat z n')%C
   end.
 
+Definition rl_pow {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} (x y : T) :=
+  rl_exp (y * rl_ln x).
+
+Definition rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} (x : T) :=
+  rl_pow x (1 / (1 + 1))%L.
+
+Arguments rl_pow {T ro rp rl} (x y)%L.
+Arguments rl_sqrt {T ro rp rl} x%L.
+
 (* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
 Proof.
 intros * Hnz *.
-Check acos.
-Theorem polar {T} {ro : ring_like_op T} :
-  ∀ z ρ θ,
-  ρ = rl_sqrt (gre z * gre z + gim z + gim z)
+Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rl_has_trigo = true →
+  ∀ (z : GComplex T) ρ θ,
+  ρ = rl_sqrt (gre z * gre z + gim z * gim z)%L
   → θ = rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
+Proof.
+intros * Htr * Hρ Hθ.
+subst ρ θ.
+specialize rl_cos_acos as H1.
+rewrite Htr in H1.
+rewrite H1.
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
