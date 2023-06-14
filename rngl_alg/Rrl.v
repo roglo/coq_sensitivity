@@ -1067,7 +1067,6 @@ Qed.
 
 Definition CReal_ring_like_prop : ring_like_prop CReal :=
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := true;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -1088,7 +1087,7 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := CReal_eqb_eq;
-     rngl_opt_le_dec := CReal_le_dec;
+     rngl_opt_le_dec := Some CReal_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := CReal_characteristic_prop;
@@ -1250,7 +1249,6 @@ Qed.
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   let ro := reals_ring_like_op in
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -1271,7 +1269,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
-     rngl_opt_le_dec := NA;
+     rngl_opt_le_dec := None;
      rngl_opt_integral := Rmult_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Rcharacteristic_prop;

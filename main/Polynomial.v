@@ -2633,16 +2633,6 @@ subst c.
 now apply rngl_eqb_eq.
 Qed.
 
-Theorem polyn_opt_le_dec :
-  let _ := polyn_ring_like_op in
-  if rngl_has_dec_le then ∀ a b : polyn T, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-  else not_applicable.
-Proof.
-intros rop; subst rop.
-destruct rngl_has_dec_le; [ | easy ].
-now intros; right; cbn.
-Qed.
-
 Theorem polyn_opt_integral :
   let _ := polyn_ring_like_op in
   if rngl_is_integral_domain then
@@ -3225,7 +3215,6 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
@@ -3246,7 +3235,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
      rngl_opt_eqb_eq := polyn_opt_eqb_eq;
-     rngl_opt_le_dec := polyn_opt_le_dec;
+     rngl_opt_le_dec := None;
      rngl_opt_integral := polyn_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := polyn_characteristic_prop;

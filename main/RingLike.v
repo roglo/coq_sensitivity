@@ -255,7 +255,6 @@ Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
-    rngl_has_dec_le : bool;
     rngl_is_integral_domain : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
@@ -311,8 +310,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
-      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
-      else not_applicable;
+      option (∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L);
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral_domain then
@@ -362,6 +360,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_is_ordered then
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%L
       else not_applicable }.
+
+Definition rngl_has_dec_le {T}
+  {ro : ring_like_op T } {rp : ring_like_prop T} :=
+  bool_of_option rngl_opt_le_dec.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -533,8 +535,8 @@ Theorem rngl_le_dec :
   ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
 Proof.
 intros H1 *.
-specialize rngl_opt_le_dec as H.
-rewrite H1 in H.
+progress unfold rngl_has_dec_le in H1.
+destruct rngl_opt_le_dec as [H| ]; [ | easy ].
 apply H.
 Qed.
 

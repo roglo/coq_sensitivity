@@ -347,17 +347,12 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
-Theorem I_opt_le_dec : let roi := I_ring_like_op in
-  if rngl_has_dec_le then ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-   else not_applicable.
+Theorem I_le_dec : let roi := I_ring_like_op in
+  (∀ a b : T, {(a ≤ b)%L} + {¬ (a ≤ b)%L})
+  → ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
 Proof.
-intros.
-remember rngl_has_dec_le as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros.
-specialize rngl_opt_le_dec as H1.
-rewrite Hde in H1.
-specialize (H1 (i_val a) (i_val b)).
+intros * Hde *.
+specialize (Hde (i_val a) (i_val b)) as H1.
 destruct H1 as [H1| H1]; [ left | right ]. {
   progress unfold rngl_le; cbn.
   progress unfold I_opt_le.
@@ -371,6 +366,13 @@ destruct H1 as [H1| H1]; [ left | right ]. {
   now destruct rngl_opt_le.
 }
 Qed.
+
+Definition I_opt_le_dec : let roi := I_ring_like_op in
+  option (∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}) :=
+  match @rngl_opt_le_dec T ro rp with
+  | Some Hde => Some (I_le_dec Hde)
+  | None => None
+  end.
 
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
   if rngl_has_eqb then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
@@ -665,7 +667,6 @@ Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
