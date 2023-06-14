@@ -708,13 +708,7 @@ Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   | S n' => (z * GComplex_power_nat z n')%C
   end.
 
-(* to be completed
-- wikipedia tells me that to prove that ℂ is algebraically closed, we need
-  this lemma : that each complex has an nth root; ok, but this is false
-  for algebraic numbers, which is however an algebraically closed set.
-  Moivre formula, sinus and cosinus, exponential do not apply to algebraic
-  closed numbers!! How do I prove that algebraic numbers are algebraically
-  closed?
+(* to be completed *)
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
 Proof.
