@@ -759,25 +759,7 @@ Definition rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 Arguments rl_pow {T ro rp rl} (x y)%L.
 Arguments rl_sqrt {T ro rp rl} x%L.
 
-Theorem rl_exp_0_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  {rl : real_like_prop T} :
-  rngl_has_opp_or_subt T = true →
-  rl_has_trigo = true →
-  rl_exp 0 ≠ 0%L.
-Proof.
-intros * Hos Htr *.
-specialize rl_exp_not_all_0 as H1.
-specialize rl_exp_add as H2.
-rewrite Htr in H1, H2.
-destruct H1 as (y, H1).
-specialize (H2 y 0%L) as H3.
-rewrite rngl_add_0_r in H3.
-intros H4.
-rewrite H4 in H3.
-now rewrite (rngl_mul_0_r Hos) in H3.
-Qed.
-
-Theorem rl_exp_0_eq_1 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+Theorem rl_exp_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_inv_or_quot T = true →
@@ -799,6 +781,34 @@ rewrite rngl_add_0_l in H3.
 apply (f_equal (λ x, (x / rl_exp y)%L)) in H3.
 rewrite rngl_div_diag in H3; [ | easy | easy | easy ].
 now rewrite rngl_mul_div in H3.
+Qed.
+
+Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rl_has_trigo = true →
+  ∀ x : T, rl_exp x ≠ 0%L.
+Proof.
+intros * Hon Hop Hiv H10 Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+intros Hxz.
+specialize rl_exp_add as Hadd.
+rewrite Htr in Hadd.
+specialize (Hadd x (- x)%L) as H3.
+rewrite (fold_rngl_sub Hop) in H3.
+rewrite (rngl_sub_diag Hos) in H3.
+rewrite (rl_exp_0 Hon Hiq Htr) in H3.
+rewrite Hxz in H3.
+rewrite (rngl_mul_0_l Hos) in H3.
+now revert H3; apply (rngl_1_neq_0_iff Hon).
 Qed.
 
 (* to be completed
@@ -826,38 +836,7 @@ rewrite H1.
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   progress unfold rl_sqrt.
   progress unfold rl_pow.
-Search rl_exp.
-Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  {rl : real_like_prop T} :
-  rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot)%bool = true →
-  rl_has_trigo = true →
-  ∀ x : T, rl_exp x ≠ 0%L.
-Proof.
-intros * Hos Hii Htr *.
-rewrite <- (rngl_add_0_r x).
-specialize rl_exp_not_all_0 as Hnz.
-specialize rl_exp_continuous as Hcont.
-specialize rl_exp_add as Hadd.
-rewrite Htr in Hnz, Hcont, Hadd.
-rewrite Hadd.
-destruct Hnz as (y, Hy).
-destruct Hcont as (z, Hz).
-specialize (Hadd x y) as H1.
-intros H2.
-apply (rngl_eq_mul_0_r Hos Hii) in H2. 2: {
-  intros Hxz; rewrite Hxz in H1.
-  rewrite (rngl_mul_0_l Hos) in H1.
-(* ouais, chais pas ; j'ai ajouté tout un bordel pour dire que ml_exp
-   était continue en un point, espérant que ça allait débloquer ce
-   truc, mais chuis pas sûr *)
-...
-intros H4.
-rewrite H4 in H3.
-now rewrite (rngl_mul_0_r Hos) in H3.
-Qed.
-... ...
-apply rl_exp_neq_0.
+  apply (rl_exp_neq_0 Hon).
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
