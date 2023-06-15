@@ -3,7 +3,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
-Require Import Main.RingLike.
+Require Import Main.Misc Main.RingLike.
 
 (* general complex whose real and imaginary parts are of type T
    that is not necessarily the real numbers *)
@@ -137,8 +137,10 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
       else not_applicable;
     rl_exp_ln :
-      if rl_has_trigo then
-        ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
+      if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
+      else not_applicable;
+    rl_ln_exp :
+      if rl_has_trigo then ∀ x : T, rl_ln (rl_exp x) = x
       else not_applicable }.
 
 Arguments rl_acos {T ro rp real_like_prop} x%L.
@@ -764,7 +766,7 @@ Definition rl_pow {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 
 Definition rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} (x : T) :=
-  rl_pow x (1 / (1 + 1))%L.
+  if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L.
 
 Arguments rl_pow {T ro rp rl} (x y)%L.
 Arguments rl_sqrt {T ro rp rl} x%L.
@@ -821,6 +823,23 @@ rewrite (rngl_mul_0_l Hos) in H3.
 now revert H3; apply (rngl_1_neq_0_iff Hon).
 Qed.
 
+Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rl_has_trigo = true →
+  ∀ x y, (0 < x)%L → (0 < y)%L →
+  rl_ln (x * y) = (rl_ln x + rl_ln y)%L.
+Proof.
+intros * Htr * Hx Hy.
+specialize rl_exp_ln as H1.
+specialize rl_ln_exp as H2.
+specialize rl_exp_add as H3.
+rewrite Htr in H1, H2, H3.
+rewrite <- (H2 (_ + _)%L).
+f_equal.
+rewrite H3.
+now rewrite (H1 _ Hx), (H1 _ Hy).
+Qed.
+
 (* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
@@ -832,14 +851,16 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
+  rngl_has_eqb T = true →
   rl_has_trigo = true →
+  rl_has_mod_intgl T = true →
   ∀ (z : GComplex T) ρ θ,
   z ≠ GComplex_zero
   → ρ = rl_sqrt (gre z * gre z + gim z * gim z)%L
   → θ = rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Htr * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -855,6 +876,20 @@ rewrite H1.
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   progress unfold rl_sqrt.
   progress unfold rl_pow.
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [H2| H2]. {
+    apply (rngl_eqb_eq Heb) in H2.
+    generalize Hmi; intros H.
+    progress unfold rl_has_mod_intgl in H.
+    remember (rl_opt_mod_intgl_prop T) as mi eqn:Hmi1.
+    symmetry in Hmi1.
+    destruct mi as [mi| ]; [ clear H | easy ].
+    apply mi in H2.
+    apply (neq_neq_GComplex Heb) in Hz.
+    cbn in Hz.
+    now destruct Hz.
+  }
+  apply (rngl_eqb_neq Heb) in H2.
   apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
 }
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -889,20 +924,10 @@ destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
 destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
   clear H.
   rewrite <- (rngl_mul_opp_opp Hop x).
-Check rl_exp_add.
-Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  {rl : real_like_prop T} :
-  rl_has_trigo = true →
-  ∀ x y, rl_ln (x * y) = (rl_ln x + rl_ln y)%L.
-Proof.
-intros * Htr *.
-specialize rl_exp_ln as H1.
-rewrite Htr in H1.
-... ...
-rewrite (rl_ln_mul Htr).
-rewrite <- (rngl_mul_1_l Hon (rl_ln (- x))).
-rewrite <- rngl_mul_add_distr_r.
-rewrite rngl_mul_assoc.
+  rewrite (rl_ln_mul Htr).
+  rewrite <- (rngl_mul_1_l Hon (rl_ln (- x))).
+  rewrite <- rngl_mul_add_distr_r.
+  rewrite rngl_mul_assoc.
 ...
 Search ((1 + 1) * _)%L.
 Search (_ * (1 + 1))%L.
