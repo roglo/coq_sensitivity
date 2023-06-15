@@ -218,6 +218,12 @@ Definition rngl_le {T} {R : ring_like_op T} a b :=
   | None => False
   end.
 
+Definition rngl_lt {T} {R : ring_like_op T} a b :=
+  match rngl_opt_le with
+  | Some rngl_le => rngl_le a b ∧ a ≠ b
+  | None => False
+  end.
+
 Definition rngl_is_ordered {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_le.
 
@@ -234,6 +240,7 @@ Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
+Notation "a < b" := (rngl_lt a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
   ring_like_scope.

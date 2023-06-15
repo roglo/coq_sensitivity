@@ -95,7 +95,17 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-Class real_like_prop T {ro : ring_like_op T} :=
+Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  (x y : T) :=
+  match Bool.bool_dec rngl_has_dec_le true with
+  | left Hde => if rngl_le_dec Hde x y then true else false
+  | right _ => false
+  end.
+
+Definition rngl_abs {T} {ro : ring_like_op T} {rp : ring_like_prop T} x :=
+  if rngl_le_dec' x 0%L then (- x)%L else x.
+
+Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
     rl_exp : T → T;
     rl_ln : T → T;
@@ -106,16 +116,30 @@ Class real_like_prop T {ro : ring_like_op T} :=
       option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L);
     rl_cos_acos :
       if rl_has_trigo then ∀ x : T, rl_cos (rl_acos x) = x
+      else not_applicable;
+    rl_exp_not_all_0 :
+      if rl_has_trigo then ∃ x, rl_exp x ≠ 0%L else not_applicable;
+    rl_exp_continuous :
+      if rl_has_trigo then
+        ∃ a : T,
+        ∀ ε : T, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+        ∀ x : T, (rngl_abs (x - a)%L < η)%L
+        → (rngl_abs (rl_exp x - rl_exp a)%L < ε)%L
+      else not_applicable;
+    rl_exp_add :
+      if rl_has_trigo then
+        ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
       else not_applicable }.
 
-Arguments rl_acos {T ro real_like_prop} x%L.
-Arguments rl_cos {T ro real_like_prop} x%L.
-Arguments rl_exp {T ro real_like_prop} x%L.
-Arguments rl_opt_mod_intgl_prop T {ro real_like_prop}.
-Arguments rl_ln {T ro real_like_prop} x%L.
-Arguments rl_sin {T ro real_like_prop} x%L.
+Arguments rl_acos {T ro rp real_like_prop} x%L.
+Arguments rl_cos {T ro rp real_like_prop} x%L.
+Arguments rl_exp {T ro rp real_like_prop} x%L.
+Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
+Arguments rl_ln {T ro rp real_like_prop} x%L.
+Arguments rl_sin {T ro rp real_like_prop} x%L.
 
-Definition rl_has_mod_intgl T {ro : ring_like_op T} {rl : real_like_prop T} :=
+Definition rl_has_mod_intgl T {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option (rl_opt_mod_intgl_prop T).
 
 Definition GComplex_opt_inv_or_quot {T}
@@ -715,7 +739,7 @@ Qed.
 
 (* algebraically closed *)
 
-Definition modl {T} {ro : ring_like_op T} (z : GComplex T) :=
+Definition gc_modl {T} {ro : ring_like_op T} (z : GComplex T) :=
   (gre z * gre z + gim z * gim z)%L.
 
 Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
@@ -735,6 +759,48 @@ Definition rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 Arguments rl_pow {T ro rp rl} (x y)%L.
 Arguments rl_sqrt {T ro rp rl} x%L.
 
+Theorem rl_exp_0_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_opp_or_subt T = true →
+  rl_has_trigo = true →
+  rl_exp 0 ≠ 0%L.
+Proof.
+intros * Hos Htr *.
+specialize rl_exp_not_all_0 as H1.
+specialize rl_exp_add as H2.
+rewrite Htr in H1, H2.
+destruct H1 as (y, H1).
+specialize (H2 y 0%L) as H3.
+rewrite rngl_add_0_r in H3.
+intros H4.
+rewrite H4 in H3.
+now rewrite (rngl_mul_0_r Hos) in H3.
+Qed.
+
+Theorem rl_exp_0_eq_1 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_inv_or_quot T = true →
+  rl_has_trigo = true →
+  rl_exp 0 = 1%L.
+Proof.
+intros * Hon Hiq Htr *.
+assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
+  apply rngl_has_inv_or_quot_iff in Hiq.
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now destruct Hiq; [ left | right ].
+}
+specialize rl_exp_not_all_0 as H1.
+specialize rl_exp_add as H2.
+rewrite Htr in H1, H2.
+destruct H1 as (y, H1).
+specialize (H2 0%L y) as H3.
+rewrite rngl_add_0_l in H3.
+apply (f_equal (λ x, (x / rl_exp y)%L)) in H3.
+rewrite rngl_div_diag in H3; [ | easy | easy | easy ].
+now rewrite rngl_mul_div in H3.
+Qed.
+
 (* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
@@ -742,17 +808,56 @@ Proof.
 intros * Hnz *.
 Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
   rl_has_trigo = true →
   ∀ (z : GComplex T) ρ θ,
-  ρ = rl_sqrt (gre z * gre z + gim z * gim z)%L
+  z ≠ GComplex_zero
+  → ρ = rl_sqrt (gre z * gre z + gim z * gim z)%L
   → θ = rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
-intros * Htr * Hρ Hθ.
+intros * Hic Hon Hiv Htr * Hz Hρ Hθ.
 subst ρ θ.
 specialize rl_cos_acos as H1.
 rewrite Htr in H1.
 rewrite H1.
+rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+  progress unfold rl_sqrt.
+  progress unfold rl_pow.
+Search rl_exp.
+Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot)%bool = true →
+  rl_has_trigo = true →
+  ∀ x : T, rl_exp x ≠ 0%L.
+Proof.
+intros * Hos Hii Htr *.
+rewrite <- (rngl_add_0_r x).
+specialize rl_exp_not_all_0 as Hnz.
+specialize rl_exp_continuous as Hcont.
+specialize rl_exp_add as Hadd.
+rewrite Htr in Hnz, Hcont, Hadd.
+rewrite Hadd.
+destruct Hnz as (y, Hy).
+destruct Hcont as (z, Hz).
+specialize (Hadd x y) as H1.
+intros H2.
+apply (rngl_eq_mul_0_r Hos Hii) in H2. 2: {
+  intros Hxz; rewrite Hxz in H1.
+  rewrite (rngl_mul_0_l Hos) in H1.
+(* ouais, chais pas ; j'ai ajouté tout un bordel pour dire que ml_exp
+   était continue en un point, espérant que ça allait débloquer ce
+   truc, mais chuis pas sûr *)
+...
+intros H4.
+rewrite H4 in H3.
+now rewrite (rngl_mul_0_r Hos) in H3.
+Qed.
+... ...
+apply rl_exp_neq_0.
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
@@ -762,7 +867,8 @@ Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
   rngl_has_inv (GComplex T) = true →
   rngl_has_1 (GComplex T) = true →
   ∀ la, 1 < length la → llast la 0%L ≠ 0%L →
-  ∀ mz, ∃ z₀, ∀ z, (modl z₀ ≤ modl z → mz ≤ modl (rngl_eval_polyn la z))%L.
+  ∀ mz, ∃ z₀, ∀ z, (gc_modl z₀ ≤ gc_modl z →
+  mz ≤ gc_modl (rngl_eval_polyn la z))%L.
 Proof.
 intros * Hop Hivc Honc * Hla Hl1 *.
 ...
