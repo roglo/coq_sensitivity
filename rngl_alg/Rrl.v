@@ -95,6 +95,7 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
+(*
 Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   (x y : T) :=
   match Bool.bool_dec rngl_has_dec_le true with
@@ -104,6 +105,7 @@ Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 
 Definition rngl_abs {T} {ro : ring_like_op T} {rp : ring_like_prop T} x :=
   if rngl_le_dec' x 0%L then (- x)%L else x.
+*)
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
@@ -119,6 +121,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       else not_applicable;
     rl_exp_not_all_0 :
       if rl_has_trigo then ∃ x, rl_exp x ≠ 0%L else not_applicable;
+(*
     rl_exp_continuous :
       if rl_has_trigo then
         ∃ a : T,
@@ -126,6 +129,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
         ∀ x : T, (rngl_abs (x - a)%L < η)%L
         → (rngl_abs (rl_exp x - rl_exp a)%L < ε)%L
       else not_applicable;
+*)
     rl_exp_add :
       if rl_has_trigo then
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
