@@ -95,7 +95,6 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-(*
 Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   (x y : T) :=
   match Bool.bool_dec rngl_has_dec_le true with
@@ -105,7 +104,6 @@ Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 
 Definition rngl_abs {T} {ro : ring_like_op T} {rp : ring_like_prop T} x :=
   if rngl_le_dec' x 0%L then (- x)%L else x.
-*)
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
@@ -116,6 +114,10 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_acos : T → T;
     rl_opt_mod_intgl_prop :
       option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L);
+    rl_cos2_sin2 :
+      if rl_has_trigo then
+        ∀ x : T, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L
+      else not_applicable;
     rl_cos_acos :
       if rl_has_trigo then ∀ x : T, rl_cos (rl_acos x) = x
       else not_applicable;
@@ -133,6 +135,10 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_exp_add :
       if rl_has_trigo then
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
+      else not_applicable;
+    rl_exp_ln :
+      if rl_has_trigo then
+        ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
       else not_applicable }.
 
 Arguments rl_acos {T ro rp real_like_prop} x%L.
@@ -851,6 +857,59 @@ rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   progress unfold rl_pow.
   apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
 }
+Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_opp_or_subt T = true →
+  rl_has_trigo = true →
+  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
+Proof.
+intros * Hos Htr *.
+specialize rl_cos2_sin2 as H1.
+specialize rl_cos_acos as H2.
+rewrite Htr in H1, H2.
+specialize (H1 (rl_acos x)).
+rewrite H2 in H1.
+apply (rngl_add_sub_eq_l Hos) in H1.
+rewrite H1.
+Theorem rm_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_dec_le = true →
+  rl_has_trigo = true →
+  ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
+Proof.
+intros * Hon Hop Hde Htr *.
+progress unfold rl_sqrt.
+progress unfold rl_pow.
+progress unfold rngl_squ.
+progress unfold rngl_abs.
+progress unfold rngl_le_dec'.
+destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
+destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
+  clear H.
+  rewrite <- (rngl_mul_opp_opp Hop x).
+Check rl_exp_add.
+Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rl_has_trigo = true →
+  ∀ x y, rl_ln (x * y) = (rl_ln x + rl_ln y)%L.
+Proof.
+intros * Htr *.
+specialize rl_exp_ln as H1.
+rewrite Htr in H1.
+... ...
+rewrite (rl_ln_mul Htr).
+rewrite <- (rngl_mul_1_l Hon (rl_ln (- x))).
+rewrite <- rngl_mul_add_distr_r.
+rewrite rngl_mul_assoc.
+...
+Search ((1 + 1) * _)%L.
+Search (_ * (1 + 1))%L.
+rewrite rngl_mul_add_distr_l.
+specialize rl_exp_add as H2.
+rewrite Htr in H2.
+rewrite H2.
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
