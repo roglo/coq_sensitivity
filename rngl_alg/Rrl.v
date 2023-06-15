@@ -910,12 +910,56 @@ Theorem rm_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eqb T = true →
+  rngl_is_ordered = true →
   rngl_has_dec_le = true →
   rl_has_trigo = true →
   ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
 Proof.
-intros * Hon Hop Hde Htr *.
+intros * Hon Hop Hiv Heb Hor Hde Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 progress unfold rl_sqrt.
+destruct (rngl_eq_dec Heb x 0%L) as [Hxz| Hxz]. {
+  subst x.
+  progress unfold rngl_squ.
+  progress unfold rngl_abs.
+  progress unfold rngl_le_dec'.
+  destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
+  destruct (rngl_le_dec _ _ _) as [H2| H2]. 2: {
+    exfalso; apply H2.
+    apply (rngl_le_refl Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_eqb_refl Heb).
+  symmetry; apply (rngl_opp_0 Hop).
+}
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [H3| H3]. {
+  apply (rngl_eqb_eq Heb) in H3.
+  progress unfold rngl_squ in H3.
+  apply (rngl_integral Hos) in H3; [ now destruct H3 | ].
+  apply Bool.orb_true_iff; right.
+  apply Bool.andb_true_iff.
+  split; [ | easy ].
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 2) as [H2| Hc2]. {
+  specialize rngl_characteristic_prop as Hch.
+  rewrite Hon in Hch.
+  rewrite if_bool_if_dec in Hch.
+  destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
+    rewrite H2 in Hcz.
+    now apply Nat.eqb_eq in Hcz.
+  }
+  destruct Hch as (Hch, Hch2).
+  rewrite H2 in Hch, Hch2.
+  cbn in Hch2.
+  rewrite rngl_add_0_r in Hch2.
+...
+apply (rngl_eqb_neq Heb) in H3.
 progress unfold rl_pow.
 progress unfold rngl_squ.
 progress unfold rngl_abs.
@@ -923,11 +967,41 @@ progress unfold rngl_le_dec'.
 destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
 destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
   clear H.
+  assert (Hxl : (x < 0)%L). {
+    progress unfold rngl_lt.
+    progress unfold rngl_is_ordered in Hor.
+    progress unfold rngl_le in H1.
+    now destruct rngl_opt_le.
+  }
+  assert (Hlx : (0 < -x)%L). {
+    apply (rngl_add_le_compat Hor (- x)%L (- x)%L) in H1. 2: {
+      apply (rngl_le_refl Hor).
+    }
+    rewrite (rngl_add_opp_l Hop) in H1.
+    rewrite rngl_add_0_r in H1.
+    progress unfold rngl_lt.
+    progress unfold rngl_is_ordered in Hor.
+    progress unfold rngl_le in H1.
+    destruct rngl_opt_le; [ | easy ].
+    split; [ easy | ].
+    intros H.
+    apply (f_equal rngl_opp) in H.
+    rewrite (rngl_opp_0 Hop) in H.
+    rewrite (rngl_opp_involutive Hop) in H.
+    now symmetry in H.
+  }
   rewrite <- (rngl_mul_opp_opp Hop x).
-  rewrite (rl_ln_mul Htr).
+  rewrite (rl_ln_mul Htr _ _ Hlx Hlx).
   rewrite <- (rngl_mul_1_l Hon (rl_ln (- x))).
   rewrite <- rngl_mul_add_distr_r.
   rewrite rngl_mul_assoc.
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+...
+rewrite (rngl_mul_1_l Hon).
+specialize rl_exp_ln as H2.
+rewrite Htr in H2.
+apply (H2 _ Hlx).
+  rewrite (rngl_div_mul Hon Hiv). 2: {
 ...
 Search ((1 + 1) * _)%L.
 Search (_ * (1 + 1))%L.
