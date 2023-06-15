@@ -824,6 +824,7 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
+  rngl_has_opp T = true →
   rngl_has_inv T = true →
   rl_has_trigo = true →
   ∀ (z : GComplex T) ρ θ,
@@ -832,7 +833,15 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   → θ = rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
-intros * Hic Hon Hiv Htr * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Htr * Hz Hρ Hθ.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
+  specialize (rngl_characteristic_1 Hon Hos H10) as H1.
+  destruct z as (rz, iz).
+  f_equal; rewrite H1; apply H1.
+}
 subst ρ θ.
 specialize rl_cos_acos as H1.
 rewrite Htr in H1.
@@ -840,7 +849,8 @@ rewrite H1.
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   progress unfold rl_sqrt.
   progress unfold rl_pow.
-  apply (rl_exp_neq_0 Hon).
+  apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
+}
 ...
 
 Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
