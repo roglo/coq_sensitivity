@@ -1041,9 +1041,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
   destruct z as (rz, iz).
   f_equal; rewrite H1; apply H1.
 }
-subst ρ θ.
+subst θ.
 rewrite (rl_cos_acos Htr).
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+  subst ρ.
   progress unfold rl_sqrt.
   progress unfold rl_pow.
   rewrite if_bool_if_dec.
