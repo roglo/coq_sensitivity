@@ -112,11 +112,19 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_cos : T → T;
     rl_sin : T → T;
     rl_acos : T → T;
+    rl_atan2 : T → T → T;
     rl_opt_mod_intgl_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
     rl_opt_cos2_sin2 :
       if rl_has_trigo then
         ∀ x : T, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L
+      else not_applicable;
+    rl_opt_cos_atan2 :
+      if rl_has_trigo then
+        let rl_pow x y := rl_exp (y * rl_ln x)%L in
+        let rl_sqrt x := if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L in
+        ∀ x y,
+        rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L
       else not_applicable;
     rl_opt_cos_acos :
       if rl_has_trigo then ∀ x : T, rl_cos (rl_acos x) = x
@@ -1012,6 +1020,16 @@ rewrite (rngl_mul_1_l Hon).
 now apply (rl_exp_ln Htr).
 Qed.
 
+Theorem fold_rl_pow {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  ∀ x y, rl_exp (y * rl_ln x) = rl_pow x y.
+Proof. easy. Qed.
+
+Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  ∀ x, (if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L) = rl_sqrt x.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
@@ -1029,9 +1047,11 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ (z : GComplex T) ρ θ,
   z ≠ GComplex_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
-  → θ =
-      (*if rngl_le_dec (gim z) 0 then (- rl_acos (gre z / ρ))%L
-      else*) rl_acos (gre z / ρ)
+(**)
+  → θ = rl_atan2 (gim z) (gre z)
+(*
+  → θ = rl_acos (gre z / ρ)
+*)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
@@ -1044,7 +1064,19 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
   f_equal; rewrite H1; apply H1.
 }
 subst θ.
+(*
 rewrite (rl_cos_acos Htr).
+*)
+specialize rl_opt_cos_atan2 as H1.
+rewrite Htr in H1.
+cbn in H1.
+assert (H2 : ∀ x y : T, rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L). {
+  intros; apply H1.
+}
+clear H1; rename H2 into rl_cos_atan2.
+rewrite rl_cos_atan2.
+rewrite <- Hρ.
+(**)
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   subst ρ.
   progress unfold rl_sqrt.
