@@ -111,7 +111,6 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_ln : T → T;
     rl_cos : T → T;
     rl_sin : T → T;
-    rl_acos : T → T;
     rl_atan2 : T → T → T;
     rl_opt_mod_intgl_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
@@ -126,20 +125,8 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
         ∀ x y,
         rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L
       else not_applicable;
-    rl_opt_cos_acos :
-      if rl_has_trigo then ∀ x : T, rl_cos (rl_acos x) = x
-      else not_applicable;
     rl_opt_exp_not_all_0 :
       if rl_has_trigo then ∃ x, rl_exp x ≠ 0%L else not_applicable;
-(*
-    rl_exp_continuous :
-      if rl_has_trigo then
-        ∃ a : T,
-        ∀ ε : T, (0 < ε)%L → ∃ η, (0 < η)%L ∧
-        ∀ x : T, (rngl_abs (x - a)%L < η)%L
-        → (rngl_abs (rl_exp x - rl_exp a)%L < ε)%L
-      else not_applicable;
-*)
     rl_opt_exp_add :
       if rl_has_trigo then
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
@@ -151,7 +138,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_trigo then ∀ x : T, rl_ln (rl_exp x) = x
       else not_applicable }.
 
-Arguments rl_acos {T ro rp real_like_prop} x%L.
+Arguments rl_atan2 {T ro rp real_like_prop} (x y)%L.
 Arguments rl_cos {T ro rp real_like_prop} x%L.
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
@@ -815,6 +802,17 @@ specialize rl_opt_ln_exp as H1.
 now rewrite Htr in H1.
 Qed.
 
+Theorem rl_cos_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rl_has_trigo = true →
+  ∀ x y : T, rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L.
+Proof.
+intros * Htr.
+specialize rl_opt_cos_atan2 as H1.
+now rewrite Htr in H1.
+Qed.
+
+(*
 Theorem rl_cos_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rl_has_trigo = true → ∀ x : T, rl_cos (rl_acos x) = x.
@@ -823,6 +821,7 @@ intros * Htr.
 specialize rl_opt_cos_acos as H1.
 now rewrite Htr in H1.
 Qed.
+*)
 
 Theorem rl_cos2_sin2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1064,19 +1063,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
   f_equal; rewrite H1; apply H1.
 }
 subst θ.
-(*
-rewrite (rl_cos_acos Htr).
-*)
-specialize rl_opt_cos_atan2 as H1.
-rewrite Htr in H1.
-cbn in H1.
-assert (H2 : ∀ x y : T, rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L). {
-  intros; apply H1.
-}
-clear H1; rename H2 into rl_cos_atan2.
-rewrite rl_cos_atan2.
+rewrite (rl_cos_atan2 Htr).
 rewrite <- Hρ.
-(**)
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   subst ρ.
   progress unfold rl_sqrt.
@@ -1097,7 +1085,8 @@ rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   apply (rngl_eqb_neq Heb) in H2.
   apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
 }
-Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+Check rl_cos_atan2.
+Theorem rl_sin_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1107,12 +1096,14 @@ Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_is_ordered = true →
   rngl_has_dec_le = true →
   rl_has_trigo = true →
-  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
+  ∀ x y, rl_sin (rl_atan2 y x) = (y / rl_sqrt (rngl_squ x + rngl_squ y))%L.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Hle Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+specialize (rl_cos2_sin2 Htr (rl_atan2 y x)) as H1.
+...
 specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
 rewrite (rl_cos_acos Htr) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
