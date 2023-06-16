@@ -1046,11 +1046,7 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ (z : GComplex T) ρ θ,
   z ≠ GComplex_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
-(**)
   → θ = rl_atan2 (gim z) (gre z)
-(*
-  → θ = rl_acos (gre z / ρ)
-*)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
@@ -1103,6 +1099,9 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rl_cos2_sin2 Htr (rl_atan2 y x)) as H1.
+rewrite (rl_cos_atan2 Htr) in H1.
+apply (rngl_add_sub_eq_l Hos) in H1.
+remember (rl_sqrt _) as ρ eqn:Hρ.
 ...
 specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
 rewrite (rl_cos_acos Htr) in H1.
