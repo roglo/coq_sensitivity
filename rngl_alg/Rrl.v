@@ -1030,8 +1030,8 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   z ≠ GComplex_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
   → θ =
-      if rngl_le_dec Hde (gim z) 0 then (- rl_acos (gre z / ρ))%L
-      else rl_acos (gre z / ρ)
+      (*if rngl_le_dec (gim z) 0 then (- rl_acos (gre z / ρ))%L
+      else*) rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
