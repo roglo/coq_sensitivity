@@ -113,7 +113,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_sin : T → T;
     rl_acos : T → T;
     rl_opt_mod_intgl_prop :
-      option (∀ a b : T, (a * a + b * b = 0 → a = 0 ∧ b = 0)%L);
+      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
     rl_opt_cos2_sin2 :
       if rl_has_trigo then
         ∀ x : T, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L
@@ -1028,8 +1028,10 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_has_mod_intgl T = true →
   ∀ (z : GComplex T) ρ θ,
   z ≠ GComplex_zero
-  → ρ = rl_sqrt (gre z * gre z + gim z * gim z)%L
-  → θ = rl_acos (gre z / ρ)
+  → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
+  → θ =
+      if rngl_le_dec Hde (gim z) 0 then (- rl_acos (gre z / ρ))%L
+      else rl_acos (gre z / ρ)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
