@@ -111,19 +111,16 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_ln : T → T;
     rl_cos : T → T;
     rl_sin : T → T;
-    rl_atan2 : T → T → T;
+    rl_acos : T → T;
     rl_opt_mod_intgl_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
     rl_opt_cos2_sin2 :
       if rl_has_trigo then
         ∀ x : T, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L
       else not_applicable;
-    rl_opt_cos_atan2 :
+    rl_opt_cos_acos :
       if rl_has_trigo then
-        let rl_pow x y := rl_exp (y * rl_ln x)%L in
-        let rl_sqrt x := if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L in
-        ∀ x y,
-        rl_cos (rl_atan2 y x) = (x / rl_sqrt (rngl_squ x + rngl_squ y))%L
+        ∀ x, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x
       else not_applicable;
     rl_opt_exp_not_all_0 :
       if rl_has_trigo then ∃ x, rl_exp x ≠ 0%L else not_applicable;
@@ -138,7 +135,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_trigo then ∀ x : T, rl_ln (rl_exp x) = x
       else not_applicable }.
 
-Arguments rl_atan2 {T ro rp real_like_prop} (x y)%L.
+Arguments rl_acos {T ro rp real_like_prop} x%L.
 Arguments rl_cos {T ro rp real_like_prop} x%L.
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
@@ -802,6 +799,7 @@ specialize rl_opt_ln_exp as H1.
 now rewrite Htr in H1.
 Qed.
 
+(*
 Theorem rl_cos_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rl_has_trigo = true →
@@ -811,17 +809,16 @@ intros * Htr.
 specialize rl_opt_cos_atan2 as H1.
 now rewrite Htr in H1.
 Qed.
+*)
 
-(*
 Theorem rl_cos_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∀ x : T, rl_cos (rl_acos x) = x.
+  rl_has_trigo = true → ∀ x : T, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_cos_acos as H1.
 now rewrite Htr in H1.
 Qed.
-*)
 
 Theorem rl_cos2_sin2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1045,7 +1042,9 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ (z : GComplex T) ρ θ,
   z ≠ GComplex_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
-  → θ = rl_atan2 (gim z) (gre z)
+  → θ =
+      if rngl_leb 0 (gim z) then rl_acos (gim z / ρ)
+      else (- rl_acos (gre z / ρ))%L
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
@@ -1089,11 +1088,10 @@ Theorem rl_sin_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_characteristic T ≠ 2 →
   rngl_has_eqb T = true →
   rngl_is_ordered = true →
-  rngl_has_dec_le = true →
   rl_has_trigo = true →
   ∀ x y, rl_sin (rl_atan2 y x) = (y / rl_sqrt (rngl_squ x + rngl_squ y))%L.
 Proof.
-intros * Hon Hop Hiv Hc2 Heb Hor Hle Htr *.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
