@@ -54,6 +54,7 @@ intros * Hac Hbd.
 now apply Z.mul_le_mono_nonneg.
 Qed.
 
+(*
 Theorem Z_mul_le_compat_nonpos :
   let roz := Z_ring_like_op in
   ∀ a b c d, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
@@ -62,6 +63,7 @@ intros * Hac Hbd.
 ...
 now apply Z.mul_le_mono_nonpos.
 Qed.
+*)
 
 Theorem Z_not_le : ∀ a b, ¬ (a ≤ b)%Z → a = b ∨ (b ≤ a)%Z.
 Proof.
@@ -82,6 +84,41 @@ Proof.
 intros; cbn.
 intros * Hbz Hcz.
 now symmetry; apply Z.quot_quot.
+Qed.
+
+Theorem Z_opt_le_dec : ∀ a b : Z, {(a <=? b)%Z = true} + {(a <=? b)%Z ≠ true}.
+Proof.
+intros.
+specialize (Z_le_dec a b) as H1.
+destruct H1 as [H1| H1]; [ left | right ]. {
+  now apply Z.leb_le.
+} {
+  intros H2.
+  now apply Z.leb_le in H2.
+}
+Qed.
+
+Theorem Z_le_refl : ∀ a : Z, (a <=? a)%Z = true.
+Proof.
+intros.
+apply Z.leb_le, Z.le_refl.
+Qed.
+
+Theorem Z_le_antisymm :
+  ∀ a b : Z, (a <=? b)%Z = true → (b <=? a)%Z = true → a = b.
+Proof.
+intros * Hab Hba.
+apply Z.leb_le in Hab, Hba.
+now apply Z.le_antisymm.
+Qed.
+
+Theorem Z_le_trans :
+  ∀ a b c : Z, (a <=? b)%Z = true → (b <=? c)%Z = true → (a <=? c)%Z = true.
+Proof.
+intros * Hab Hbc.
+apply Z.leb_le in Hab, Hbc.
+apply Z.leb_le.
+now apply (Z.le_trans _ b).
 Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
@@ -106,15 +143,15 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_div := Z.quot_mul;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Z.eqb_eq;
-     rngl_opt_le_dec := Z_le_dec;
+     rngl_opt_le_dec := Z_opt_le_dec;
      rngl_opt_integral := Z_eq_mul_0;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Z_characteristic_prop;
-     rngl_opt_le_refl := Z.le_refl;
-     rngl_opt_le_antisymm := Z.le_antisymm;
-     rngl_opt_le_trans := Z.le_trans;
+     rngl_opt_le_refl := Z_le_refl;
+     rngl_opt_le_antisymm := Z_le_antisymm;
+     rngl_opt_le_trans := Z_le_trans;
      rngl_opt_add_le_compat := Z.add_le_mono;
      rngl_opt_mul_le_compat_nonneg := Z_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := Z_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat_nonpos := 42; (*Z_mul_le_compat_nonpos;*)
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := Z_not_le |}.
