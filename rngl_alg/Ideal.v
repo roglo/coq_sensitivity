@@ -166,6 +166,7 @@ Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_1 T {ro}.
+Arguments rngl_is_ordered T {R}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem I_opt_mul_1_l : let roi := I_ring_like_op in
@@ -348,15 +349,19 @@ apply H1.
 Qed.
 
 Theorem I_opt_le_dec : let roi := I_ring_like_op in
-  if rngl_has_dec_le then ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-   else not_applicable.
+  if rngl_is_ordered (ideal P) then
+    ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
+  else not_applicable.
 Proof.
 intros.
-remember rngl_has_dec_le as de eqn:Hde; symmetry in Hde.
+remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
 destruct de; [ | easy ].
 intros.
 specialize rngl_opt_le_dec as H1.
-rewrite Hde in H1.
+progress unfold rngl_is_ordered in Hde; cbn in Hde.
+progress unfold I_opt_le in Hde.
+progress unfold rngl_is_ordered in H1.
+destruct rngl_opt_le; [ cbn in H1 | easy ].
 specialize (H1 (i_val a) (i_val b)).
 destruct H1 as [H1| H1]; [ left | right ]. {
   progress unfold rngl_le; cbn.
@@ -503,7 +508,8 @@ now f_equal.
 Qed.
 
 Theorem I_opt_le_refl : let roi := I_ring_like_op in
-  if rngl_is_ordered then ∀ a : ideal P, (a ≤ a)%L else not_applicable.
+  if rngl_is_ordered (ideal P) then ∀ a : ideal P, (a ≤ a)%L
+  else not_applicable.
 Proof.
 intros.
 specialize rngl_opt_le_refl as H1.
@@ -520,7 +526,8 @@ apply H1.
 Qed.
 
 Theorem I_opt_le_antisymm : let roi := I_ring_like_op in
-  if rngl_is_ordered then ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b
+  if rngl_is_ordered (ideal P) then
+    ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b
   else not_applicable.
 Proof.
 intros.
@@ -539,7 +546,8 @@ now apply H1.
 Qed.
 
 Theorem I_opt_le_trans : let roi := I_ring_like_op in
-  if rngl_is_ordered then ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
+  if rngl_is_ordered (ideal P) then
+    ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
   else not_applicable.
 Proof.
 intros.
@@ -557,7 +565,7 @@ now apply (H1 _ (i_val b)).
 Qed.
 
 Theorem I_opt_add_le_compat : let roi := I_ring_like_op in
-  if rngl_is_ordered then
+  if rngl_is_ordered (ideal P) then
     ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L
   else not_applicable.
 Proof.
@@ -576,7 +584,7 @@ now apply (H1 _ (i_val b)).
 Qed.
 
 Theorem I_opt_mul_le_compat_nonneg : let roi := I_ring_like_op in
-  if (rngl_is_ordered && rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && rngl_has_opp)%bool then
     ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -597,7 +605,7 @@ now apply H1.
 Qed.
 
 Theorem I_opt_mul_le_compat_nonpos : let roi := I_ring_like_op in
-  if (rngl_is_ordered && rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && rngl_has_opp)%bool then
     ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -618,7 +626,7 @@ now apply H1.
 Qed.
 
 Theorem I_opt_mul_le_compat : let roi := I_ring_like_op in
-  if (rngl_is_ordered && negb rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && negb rngl_has_opp)%bool then
     ∀ a b c d : ideal P, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -644,7 +652,8 @@ destruct rngl_opt_opp_or_subt as [os| ]. {
 Qed.
 
 Theorem I_opt_not_le : let roi := I_ring_like_op in
-  if rngl_is_ordered then ∀ a b : ideal P, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L
+  if rngl_is_ordered (ideal P) then
+    ∀ a b : ideal P, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L
   else not_applicable.
 Proof.
 intros.
@@ -665,7 +674,6 @@ Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;

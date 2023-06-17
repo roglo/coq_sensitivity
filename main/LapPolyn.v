@@ -2936,7 +2936,6 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

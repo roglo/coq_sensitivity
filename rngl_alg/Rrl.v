@@ -97,7 +97,7 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
 
 Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   (x y : T) :=
-  match Bool.bool_dec rngl_has_dec_le true with
+  match Bool.bool_dec rngl_is_ordered true with
   | left Hde => if rngl_le_dec Hde x y then true else false
   | right _ => false
   end.
@@ -902,11 +902,10 @@ Theorem rl_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_characteristic T ≠ 2 →
   rngl_has_eqb T = true →
   rngl_is_ordered = true →
-  rngl_has_dec_le = true →
   rl_has_trigo = true →
   ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
 Proof.
-intros * Hon Hop Hiv Hc2 Heb Hor Hde Htr *.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1456,7 +1455,6 @@ Qed.
 
 Definition CReal_ring_like_prop : ring_like_prop CReal :=
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := true;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -1639,7 +1637,6 @@ Qed.
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   let ro := reals_ring_like_op in
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -1660,7 +1657,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
-     rngl_opt_le_dec := NA;
+     rngl_opt_le_dec := Rle_dec;
      rngl_opt_integral := Rmult_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Rcharacteristic_prop;

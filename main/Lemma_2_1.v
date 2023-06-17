@@ -89,17 +89,16 @@ Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
 Arguments Rayleigh_quotient M%M v%V.
 
 Theorem rngl_0_le_squ :
-  rngl_has_dec_le = true →
   rngl_has_opp = true →
   rngl_is_ordered = true →
   ∀ n, (0 ≤ n * n)%L.
 Proof.
-intros Hld Hop Hor *.
+intros Hop Hor *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 rewrite <- (rngl_mul_0_r Hos 0).
-destruct (rngl_le_dec Hld 0%L n) as [Hnz| Hnz]. {
+destruct (rngl_le_dec Hor 0%L n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
   } {
@@ -125,19 +124,18 @@ Definition in_ordered_field :=
   rngl_mul_is_comm = true ∧
   rngl_has_opp = true ∧
   rngl_has_eqb = true ∧
-  rngl_has_dec_le = true ∧
   rngl_has_inv = true ∧
   rngl_characteristic = 0 ∧
   rngl_is_ordered = true.
 
 Theorem eq_vect_squ_0 :
   rngl_has_opp = true →
-  rngl_has_dec_le = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain ||
+   rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   rngl_is_ordered = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
-intros Hop Hed Hdo Hor * Hvvz.
+intros Hop Hdo Hor * Hvvz.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -242,7 +240,7 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hon & Hic & Hop & Heq & Hld & Hin & Hch & Hor).
+destruct Hof as (Hon & Hic & Hop & Heq & Hin & Hch & Hor).
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -271,7 +269,7 @@ rewrite (rngl_inv_mul_distr Hon Hos Hin); cycle 1. {
   easy.
 } {
   intros H.
-  apply eq_vect_squ_0 in H; [ | easy | easy | | easy ]. 2: {
+  apply eq_vect_squ_0 in H; [ | easy | | easy ]. 2: {
     apply Bool.orb_true_iff; right.
     rewrite Heq, Bool.andb_true_iff; split; [ | easy ].
     now apply rngl_has_inv_and_1_or_quot_iff; left.
@@ -293,7 +291,6 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_has_1 = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_dec_le = true →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   rngl_has_inv = true →
   rngl_is_ordered = true →
@@ -302,7 +299,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hon Hic Hop Hii Hdo Hin Hdl * Hvz Hmv.
+intros Hon Hic Hop Hii Hin Hdo * Hvz Hmv.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -313,11 +310,11 @@ rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply (rngl_mul_div Hi1).
 intros H.
-apply eq_vect_squ_0 in H; [ easy | easy | easy | | easy ].
-apply Bool.orb_true_iff in Hdo.
+apply eq_vect_squ_0 in H; [ easy | easy | | easy ].
+apply Bool.orb_true_iff in Hii.
 apply Bool.orb_true_iff.
-destruct Hdo as [Hdo| Hdo]; [ now left | right ].
-rewrite Hdo, Bool.andb_true_r.
+destruct Hii as [Hii| Hii]; [ now left | right ].
+rewrite Hii, Bool.andb_true_r.
 now apply rngl_has_inv_and_1_or_quot_iff; left.
 Qed.
 

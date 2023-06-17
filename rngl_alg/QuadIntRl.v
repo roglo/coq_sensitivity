@@ -1179,7 +1179,6 @@ Compute (
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

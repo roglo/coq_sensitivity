@@ -69,7 +69,6 @@ Qed.
 
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := true;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

@@ -262,7 +262,6 @@ Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
-    rngl_has_dec_le : bool;
     rngl_is_integral_domain : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
@@ -318,7 +317,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
-      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
+      if rngl_is_ordered then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
       else not_applicable;
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
@@ -536,7 +535,7 @@ destruct ab; [ now left; apply rngl_eqb_eq | now right; apply rngl_eqb_neq ].
 Qed.
 
 Theorem rngl_le_dec :
-  rngl_has_dec_le = true →
+  rngl_is_ordered = true →
   ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
 Proof.
 intros H1 *.
@@ -1968,14 +1967,13 @@ Proof. easy. Qed.
 Theorem rngl_square_ge_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
-  rngl_has_dec_le = true
-  → ∀ a, (0 ≤ a * a)%L.
+  ∀ a, (0 ≤ a * a)%L.
 Proof.
-intros * Hop Hor Hdl *.
+intros * Hop Hor *.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-destruct (rngl_le_dec Hdl 0%L a) as [Hap| Han]. {
+destruct (rngl_le_dec Hor 0%L a) as [Hap| Han]. {
   specialize rngl_opt_mul_le_compat_nonneg as H2.
   rewrite Hor, Hop in H2; cbn in H2.
   specialize (H2 0%L 0%L a a).
@@ -2006,19 +2004,18 @@ Qed.
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
-  rngl_has_dec_le = true →
   (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
-intros * Hop Hor Hdl Hii * Hab.
+intros * Hop Hor Hii * Hab.
 assert (Hos : rngl_has_opp_or_subt = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor Hdl).
+  apply (rngl_square_ge_0 Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor Hdl).
+  apply (rngl_square_ge_0 Hop Hor).
 }
 destruct Hab as (Ha, Hb).
 split. {

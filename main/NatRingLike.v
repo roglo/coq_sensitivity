@@ -75,7 +75,6 @@ Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
-     rngl_has_dec_le := true;
      rngl_is_integral_domain := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

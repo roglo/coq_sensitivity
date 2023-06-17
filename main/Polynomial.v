@@ -3215,7 +3215,6 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic;
