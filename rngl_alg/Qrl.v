@@ -7,6 +7,12 @@ Require Import Utf8.
 Require Import Main.RingLike Rational.
 Import Q.Notations.
 
+Definition Q_leb (x y : Q) :=
+  match Q.le_dec x y with
+  | left _ => true
+  | right _ => false
+  end.
+
 Canonical Structure Q_ring_like_op : ring_like_op Q :=
   {| rngl_zero := 0%Q;
      rngl_add := Q.add;
@@ -15,7 +21,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_opp_or_subt := Some (inl Q.opp);
      rngl_opt_inv_or_quot := Some (inl Q.inv);
      rngl_opt_eqb := Some Q.eqb;
-     rngl_opt_le := Some Q.le |}.
+     rngl_opt_leb := Some Q_leb |}.
 
 (*
 Global Existing Instance Q_ring_like_op.
@@ -42,29 +48,118 @@ apply Q.lt_sub_lt_add_r.
 now rewrite Q.sub_diag.
 Qed.
 
-Theorem Q_mul_le_compat_nonneg : ∀ a b c d,
-  (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%Q.
+Theorem Q_mul_le_compat_nonneg :
+  ∀ a b c d : Q,
+  Q_leb 0%Q a = true ∧ Q_leb a c = true
+  → Q_leb 0%Q b = true ∧ Q_leb b d = true
+  → Q_leb (a * b)%Q (c * d)%Q = true.
 Proof.
 intros * Hac Hbd.
+progress unfold Q_leb in Hac.
+progress unfold Q_leb in Hbd.
+progress unfold Q_leb.
+destruct (Q.le_dec 0 a) as [Hza| ]; [ | easy ].
+destruct (Q.le_dec 0 b) as [Hzb| ]; [ | easy ].
+destruct Hac as (_, Hac).
+destruct Hbd as (_, Hbd).
+destruct (Q.le_dec a c) as [Hac'| ]; [ | easy ].
+destruct (Q.le_dec b d) as [Hbd'| ]; [ | easy ].
+clear Hac Hbd.
+destruct (Q.le_dec (a * b) (c * d)) as [| H3]; [ easy | ].
+exfalso; apply H3.
 now apply Q.mul_le_mono_nonneg.
 Qed.
 
 Theorem Q_mul_le_compat_nonpos :
-  let roq := Q_ring_like_op in
-  ∀ a b c d, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
+  ∀ a b c d : Q,
+  Q_leb c a = true ∧ Q_leb a 0%Q = true
+  → Q_leb d b = true ∧ Q_leb b 0%Q = true
+  → Q_leb (a * b)%Q (c * d)%Q = true.
 Proof.
-intros * Hac Hbd.
+intros * Hca Hdb.
+progress unfold Q_leb in Hca.
+progress unfold Q_leb in Hdb.
+progress unfold Q_leb.
+destruct (Q.le_dec c a) as [Hca'| ]; [ | easy ].
+destruct (Q.le_dec d b) as [Hdb'| ]; [ | easy ].
+destruct Hca as (_, Hca).
+destruct Hdb as (_, Hdb).
+destruct (Q.le_dec a 0) as [Haz| ]; [ | easy ].
+destruct (Q.le_dec b 0) as [Hbz| ]; [ | easy ].
+clear Hca Hdb.
+destruct (Q.le_dec (a * b) (c * d)) as [| H3]; [ easy | ].
+exfalso; apply H3.
 now apply Q.mul_le_mono_nonpos.
 Qed.
 
-Theorem Q_not_le : ∀ a b, ¬ (a ≤ b)%Q → a = b ∨ (b ≤ a)%Q.
+Theorem Q_not_le :
+  ∀ a b : Q, Q_leb a b ≠ true → a = b ∨ Q_leb b a = true.
 Proof.
 intros * Hab.
-destruct (Q.eq_dec a b) as [Heab| Heab]; [ now left | right ].
-apply Q.nle_gt in Hab.
-apply Q.nlt_ge; intros Hba.
-apply Heab.
+progress unfold Q_leb in Hab.
+progress unfold Q_leb.
+destruct (Q.le_dec a b) as [| Hab']; [ easy | clear Hab ].
+apply Q.nle_gt in Hab'.
+destruct (Q.le_dec b a) as [Hba| Hba]; [ now right | left ].
+apply Q.nle_gt in Hba.
 now apply Q.le_antisymm; apply Q.lt_le_incl.
+Qed.
+
+Theorem Q_le_dec :
+  ∀ a b : Q, {Q_leb a b = true} + {Q_leb a b ≠ true}.
+Proof.
+intros.
+unfold Q_leb.
+now destruct (Q.le_dec a b); [ left | right ].
+Qed.
+
+Theorem Q_le_refl : ∀ a : Q, Q_leb a a = true.
+Proof.
+intros.
+progress unfold Q_leb.
+destruct (Q.le_dec a a) as [H| H]; [ easy | ].
+exfalso; apply H.
+apply Q.le_refl.
+Qed.
+
+Theorem Q_le_antisymm :
+  ∀ a b : Q, Q_leb a b = true → Q_leb b a = true → a = b.
+Proof.
+intros * Hab Hba.
+progress unfold Q_leb in Hab.
+progress unfold Q_leb in Hba.
+destruct (Q.le_dec a b) as [H1| ]; [ | easy ].
+destruct (Q.le_dec b a) as [H2| ]; [ | easy ].
+now apply Q.le_antisymm.
+Qed.
+
+Theorem Q_le_trans :
+  ∀ a b c : Q, Q_leb a b = true → Q_leb b c = true → Q_leb a c = true.
+Proof.
+intros * Hab Hbc.
+progress unfold Q_leb in Hab.
+progress unfold Q_leb in Hbc.
+progress unfold Q_leb.
+destruct (Q.le_dec a b) as [H1| ]; [ | easy ].
+destruct (Q.le_dec b c) as [H2| ]; [ | easy ].
+destruct (Q.le_dec a c) as [| H3]; [ easy | ].
+exfalso; apply H3.
+now apply (Q.le_trans _ b).
+Qed.
+
+Theorem Q_add_le_compat :
+  ∀ a b c d : Q,
+  Q_leb a b = true → Q_leb c d = true → Q_leb (a + c)%Q (b + d)%Q = true.
+Proof.
+intros * Hab Hcd.
+progress unfold Q_leb in Hab.
+progress unfold Q_leb in Hcd.
+progress unfold Q_leb.
+destruct (Q.le_dec a b) as [H1| ]; [ | easy ].
+destruct (Q.le_dec c d) as [H2| ]; [ | easy ].
+destruct (Q.le_dec (a + c) (b + d)) as [| H3]; [ easy | ].
+exfalso; apply H3.
+now apply Q.add_le_mono.
 Qed.
 
 Definition Q_ring_like_prop :=
@@ -89,14 +184,14 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Q.eqb_eq;
-     rngl_opt_le_dec := Q.le_dec;
+     rngl_opt_le_dec := Q_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Q_characteristic_prop;
-     rngl_opt_le_refl := Q.le_refl;
-     rngl_opt_le_antisymm := Q.le_antisymm;
-     rngl_opt_le_trans := Q.le_trans;
-     rngl_opt_add_le_compat := Q.add_le_mono;
+     rngl_opt_le_refl := Q_le_refl;
+     rngl_opt_le_antisymm := Q_le_antisymm;
+     rngl_opt_le_trans := Q_le_trans;
+     rngl_opt_add_le_compat := Q_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;

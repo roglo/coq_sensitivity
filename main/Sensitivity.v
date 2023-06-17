@@ -1575,8 +1575,12 @@ rewrite Nat.mul_0_r, fold_iter_seq.
 specialize @rngl_summation_le_compat as H1.
 specialize (H1 nat).
 specialize (H1 nat_ring_like_op nat_ring_like_prop).
-apply (H1 eq_refl).
+cbn in H1.
+specialize (H1 eq_refl).
+apply Nat.leb_le.
+apply H1.
 intros i Hi.
+apply Nat.leb_le.
 apply Nat.mul_le_mono_r; flia.
 Qed.
 

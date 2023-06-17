@@ -530,7 +530,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
      rngl_opt_eqb := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (* commutativity of addition *)
 

@@ -97,7 +97,7 @@ Definition I_eqb (eqb : T → T → bool) (a b : ideal P) : bool :=
 (* less equal *)
 
 Definition I_opt_le : option (ideal P → ideal P → Prop) :=
-  match rngl_opt_le with
+  match rngl_opt_leb with
   | Some le => Some (λ a b : ideal P, le (i_val a) (i_val b))
   | None => None
   end.

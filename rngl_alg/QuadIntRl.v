@@ -168,7 +168,7 @@ Definition quad_int_ring_like_op d : ring_like_op (quad_int d) :=
      rngl_opt_opp_or_subt := Some (inl (@qi_opp d));
      rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
      rngl_opt_eqb := None; (* to be improved, perhaps *)
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (*
 Compute (mk_qi (-1) (- 36) 242 ÷ mk_qi (-1) 50 50)%QI.

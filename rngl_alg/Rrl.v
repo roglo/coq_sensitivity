@@ -185,7 +185,7 @@ Definition GComplex_ring_like_op T
      rngl_opt_opp_or_subt := GComplex_opt_opp_or_subt;
      rngl_opt_inv_or_quot := GComplex_opt_inv_or_quot;
      rngl_opt_eqb := GComplex_opt_eqb;
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 Theorem GComplex_add_comm {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -966,7 +966,7 @@ destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
     progress unfold rngl_lt.
     progress unfold rngl_is_ordered in Hor.
     progress unfold rngl_le in H1.
-    now destruct rngl_opt_le.
+    now destruct rngl_opt_leb.
   }
   assert (Hlx : (0 < -x)%L). {
     apply (rngl_add_le_compat Hor (- x)%L (- x)%L) in H1. 2: {

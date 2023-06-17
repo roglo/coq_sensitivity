@@ -117,7 +117,7 @@ Definition mat_ring_like_op eqb {n} : ring_like_op (square_matrix n T) :=
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some (square_matrix_eqb eqb);
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (*
 Canonical Structure mat_ring_like_op.

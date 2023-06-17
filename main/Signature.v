@@ -65,7 +65,7 @@ Definition test_ring_like_op :=
      rngl_opt_opp_or_subt := Some (inl test_opp);
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := None;
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (* *)
 

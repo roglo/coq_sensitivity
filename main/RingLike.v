@@ -60,7 +60,7 @@ Class ring_like_op T :=
     rngl_opt_opp_or_subt : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
     rngl_opt_eqb : option (T → T → bool);
-    rngl_opt_le : option (T → T → Prop) }.
+    rngl_opt_leb : option (T → T → bool) }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with L.
@@ -213,19 +213,31 @@ Definition rngl_eqb {T} {R : ring_like_op T} a b :=
   end.
 
 Definition rngl_le {T} {R : ring_like_op T} a b :=
-  match rngl_opt_le with
-  | Some rngl_le => rngl_le a b
+  match rngl_opt_leb with
+  | Some rngl_leb => rngl_leb a b = true
   | None => False
   end.
 
 Definition rngl_lt {T} {R : ring_like_op T} a b :=
-  match rngl_opt_le with
-  | Some rngl_le => rngl_le a b ∧ a ≠ b
+  match rngl_opt_leb with
+  | Some rngl_leb => rngl_leb b a = false
   | None => False
   end.
 
+Definition rngl_leb {T} {R : ring_like_op T} a b :=
+  match rngl_opt_leb with
+  | Some rngl_leb => rngl_leb a b
+  | None => false
+  end.
+
+Definition rngl_ltb {T} {R : ring_like_op T} a b :=
+  match rngl_opt_leb with
+  | Some rngl_leb => negb (rngl_leb b a)
+  | None => false
+  end.
+
 Definition rngl_is_ordered {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_le.
+  bool_of_option rngl_opt_leb.
 
 Definition rngl_one {T} {ro : ring_like_op T} :=
   match rngl_opt_one with
@@ -249,6 +261,8 @@ Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%L (at level 70, b at next leve
 
 Notation "a =? b" := (rngl_eqb a b) (at level 70) : ring_like_scope.
 Notation "a ≠? b" := (negb (rngl_eqb a b)) (at level 70) : ring_like_scope.
+Notation "a ≤? b" := (rngl_leb a b) (at level 70) : ring_like_scope.
+Notation "a <? b" := (rngl_ltb a b) (at level 70) : ring_like_scope.
 
 Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 

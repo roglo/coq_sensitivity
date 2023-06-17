@@ -17,7 +17,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_opp_or_subt := Some (inl Z.opp);
      rngl_opt_inv_or_quot := Some (inr Z.quot);
      rngl_opt_eqb := Some Z.eqb;
-     rngl_opt_le := Some Z.le |}.
+     rngl_opt_leb := Some Z.leb |}.
 
 (*
 Global Existing Instance Z_ring_like_op.
@@ -59,6 +59,7 @@ Theorem Z_mul_le_compat_nonpos :
   ∀ a b c d, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
 Proof.
 intros * Hac Hbd.
+...
 now apply Z.mul_le_mono_nonpos.
 Qed.
 

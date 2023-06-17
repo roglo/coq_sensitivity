@@ -15,7 +15,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp_or_subt := Some (inr Nat.sub);
      rngl_opt_inv_or_quot := Some (inr Nat.div);
      rngl_opt_eqb := Some Nat.eqb;
-     rngl_opt_le := Some Nat.le |}.
+     rngl_opt_leb := Some Nat.leb |}.
 
 (*
 Global Existing Instance nat_ring_like_op.
@@ -37,20 +37,25 @@ intros * Hbz.
 now apply Nat.div_mul.
 Qed.
 
-Theorem Nat_mul_le_compat : ∀ a b c d,
-  a ≤ c → b ≤ d → a * b ≤ c * d.
+Theorem Nat_mul_le_compat :
+  ∀ a b c d : nat,
+  (a <=? c) = true → (b <=? d) = true → (a * b <=? c * d) = true.
 Proof.
-intros * Hac Hbd.
+intros * Hab Hcd.
+apply Nat.leb_le in Hab, Hcd.
+apply Nat.leb_le.
 now apply Nat.mul_le_mono.
 Qed.
 
-Theorem Nat_not_le : ∀ a b, ¬ a ≤ b → a = b ∨ b ≤ a.
+Theorem Nat_not_le :
+  ∀ a b : nat, (a <=? b) ≠ true → a = b ∨ (b <=? a) = true.
 Proof.
 intros * Hab.
 destruct (Nat.eq_dec a b) as [Heab| Heab]; [ now left | right ].
-apply Nat.nle_gt in Hab.
-apply Nat.nlt_ge; intros Hba.
-apply Heab.
+apply Bool.not_false_iff_true.
+intros Hba; apply Heab; clear Heab.
+apply Bool.not_true_iff_false in Hab.
+apply Nat.leb_gt in Hab, Hba.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
@@ -71,6 +76,40 @@ Proof.
 intros; cbn.
 intros * Hbz Hcz.
 symmetry; apply (Nat.div_div _ _ _ Hbz Hcz).
+Qed.
+
+Theorem Nat_opt_le_dec :
+  ∀ a b : nat, {(a <=? b) = true} + {(a <=? b) ≠ true}.
+Proof.
+intros.
+apply Bool.bool_dec.
+Qed.
+
+Theorem Nat_le_antisymm :
+  ∀ a b : nat, (a <=? b) = true → (b <=? a) = true → a = b.
+Proof.
+intros * Hab Hba.
+apply Nat.leb_le in Hab, Hba.
+now apply Nat.le_antisymm.
+Qed.
+
+Theorem Nat_le_trans :
+  ∀ a b c : nat, (a <=? b) = true → (b <=? c) = true → (a <=? c) = true.
+Proof.
+intros * Hab Hbc.
+apply Nat.leb_le in Hab, Hbc.
+apply Nat.leb_le.
+now apply (Nat.le_trans _ b).
+Qed.
+
+Theorem Nat_add_le_compat :
+  ∀ a b c d : nat,
+  (a <=? b) = true → (c <=? d) = true → (a + c <=? b + d) = true.
+Proof.
+intros * Hab Hcd.
+apply Nat.leb_le in Hab, Hcd.
+apply Nat.leb_le.
+now apply Nat.add_le_mono.
 Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
@@ -95,14 +134,14 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_div := Nat_mul_div;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
-     rngl_opt_le_dec := le_dec;
+     rngl_opt_le_dec := Nat_opt_le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := nat_characteristic_prop;
-     rngl_opt_le_refl := Nat.le_refl;
-     rngl_opt_le_antisymm := Nat.le_antisymm;
-     rngl_opt_le_trans := Nat.le_trans;
-     rngl_opt_add_le_compat := Nat.add_le_mono;
+     rngl_opt_le_refl := Nat.leb_refl;
+     rngl_opt_le_antisymm := Nat_le_antisymm;
+     rngl_opt_le_trans := Nat_le_trans;
+     rngl_opt_add_le_compat := Nat_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := Nat_mul_le_compat;

@@ -2244,7 +2244,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_opp_or_subt := polyn_opt_opp_or_subt;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
      rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (* allows to use ring-like theorems on polynomials
 Canonical Structure polyn_ring_like_op.
