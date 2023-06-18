@@ -144,140 +144,49 @@ Arguments rl_sin {T ro rp real_like_prop} x%L.
 
 Arguments rngl_is_ordered T {R}.
 
-(* to be completed
 Theorem rngl_abs_le {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x y, (- x ≤ y ≤ x ↔ rngl_abs y ≤ x)%L.
 Proof.
-intros * Hop Hor *.
+intros * Hon Hop Hor *.
+progress unfold rngl_abs.
+progress unfold rngl_le_dec'.
+destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
 split. {
   intros (Hxy, Hyx).
-  unfold rngl_abs.
-  unfold rngl_le_dec'.
-  destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
+  destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]; [ | easy ].
+  apply (rngl_opp_le_mono Hon Hop Hor).
+  now rewrite (rngl_opp_involutive Hop).
+} {
+  intros Hyx.
   destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
-Theorem rngl_opp_le_mono {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ x y, (x ≤ y ↔ - y ≤ - x)%L.
-Proof.
-intros * Hon Hop Hor *.
-clear Hon.
-split; intros Hxy. {
+    split. {
+      apply (rngl_opp_le_mono Hon Hop Hor) in Hyx.
+      now rewrite (rngl_opp_involutive Hop) in Hyx.
+    } {
+      apply (rngl_le_trans Hor _ 0%L); [ easy | ].
+      apply (rngl_le_trans Hor _ (- y)%L); [ | easy ].
+      apply (rngl_le_0_sub Hop Hor) in Hyz.
+      progress unfold rngl_sub in Hyz.
+      rewrite Hop in Hyz.
+      now rewrite rngl_add_0_l in Hyz.
+    }
+  }
+  split; [ | easy ].
+  apply (rngl_not_le Hor) in Hyz.
+  destruct Hyz as (Hyz, Hzy).
+  apply (rngl_le_trans Hor _ 0%L); [ | easy ].
   apply (rngl_le_0_sub Hop Hor).
   progress unfold rngl_sub.
   rewrite Hop.
   rewrite (rngl_opp_involutive Hop).
-Require Import ZArith.
-Print Z.opp_le_mono.
-...
-  specialize (rngl_add_le_compat Hor 0%L (- x)%L 0%L y) as H1.
-...
-  specialize (rngl_add_le_compat Hor x y (- x)%L (- x)%L Hxy) as H1.
-  specialize (H1 (rngl_le_refl Hor _)).
-  do 2 rewrite (fold_rngl_sub Hop) in H1.
-...
-  apply (rngl_add_le_compat Hor x y (- x)%L (- x)%L (rngl_le_refl Hor _)) in Hxy.
-Check rngl_add_le_compat.
-Search (_ - - _)%L.
-  rewrite fold_rngl_sub.
-...
-Require Import ZArith.
-Print Z.le_0_sub.
-Check Z.add_le_mono_r.
-Search (_ + _ ≤ _ + _)%L.
-Check rngl_add_le_compat_r.
-...
-Check rngl_not_le.
-
-Search (- _ <= - _)%Z.
-Print Z.opp_le_mono.
-Check Z.sub_opp_r.
-Check Z.le_0_sub.
-Theorem rngl_le_0_sub
-Print Z.le_0_sub.
-Check Z.add_le_mono.
-     : ∀ n m : Z, (0 <= m - n)%Z ↔ (n <= m)%Z
-
-Check Z.add_opp_l.
-Check Z.le_0_sub.
-             (- m <= - n)%Z (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.sub_opp_r (- n) m)
-          ((λ lemma : (0 <= - n - - m)%Z ↔ (- m <= - n)%Z,
-              Morphisms.trans_co_eq_inv_impl_morphism RelationClasses.iff_Transitive (0 <= - n - - m)%Z
-                (- m <= - n)%Z lemma (- m <= - n)%Z (- m <= - n)%Z (Morphisms.eq_proper_proxy (- m <= - n)%Z))
-             (Z.le_0_sub (- m) (- n)) (RelationClasses.reflexivity (- m <= - n)%Z))))
-          (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.add_opp_l m n)
-       (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.le_0_sub n m)
-...
-
-Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_opp T = true →
-  ∀ a b c, (a ≤ b + c → a - b ≤ c)%L.
-Proof.
-intros * Hop * Habc.
-unfold rngl_sub.
-rewrite Hop.
-Search (_ + _ ≤ _)%L.
-...
-rewrite <- (rngl_add_0_l (- y)%L).
-rewrite (fold_rngl_sub Hop).
-apply glop.
-rewrite (fold_rngl_sub Hop).
-...
-  rewrite <- (rngl_mul_1_l Hon (- y)%L).
-  rewrite <- (rngl_mul_1_l Hon (- x)%L).
-  do 2 rewrite (rngl_mul_opp_r Hop).
-  do 2 rewrite <- (rngl_mul_opp_l Hop).
-  apply (rngl_mul_le_compat_nonpos Hor Hop).
-...
-Search rngl_le.
-  progress unfold rngl_le in Hxy.
-  progress unfold rngl_le.
-rngl_opt_mul_le_compat_nonpos:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → if (rngl_is_ordered T && rngl_has_opp T)%bool
-      then ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-      else not_applicable
-rngl_opt_mul_le_compat_nonneg:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → if (rngl_is_ordered T && rngl_has_opp T)%bool
-      then ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-      else not_applicable
-rngl_mul_le_compat_nonpos:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_is_ordered T = true
-      → rngl_has_opp T = true → ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-rngl_mul_le_compat_nonneg:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_is_ordered T = true
-      → rngl_has_opp T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-...
-  specialize (rngl_not_le Hor) as H1.
-  specialize (H1 (- x) (- y))%L.
-...
-progress unfold rngl_le.
-Search rngl_opt_leb.
-  rewrite <- (rngl_add_0_l (- y)%L).
-  rewrite <- (rngl_add_0_l (- x)%L).
-Search (_ ≤ _ + _)%L.
-Search (_ - _ ≤ _)%L.
-...
-Search (_ - _ ≤ _ - _)%L.
-Search (- _ ≤ _)%L.
-Search (_ ≤ - _)%L.
-Check rngl_add_le_compat.
-... ...
-apply (rngl_opp_le_mono Hor).
-now rewrite (rngl_opp_involutive Hop).
-...
-*)
+  rewrite rngl_add_0_l.
+  now apply (rngl_le_trans Hor _ y).
+}
+Qed.
 
 Definition rl_has_mod_intgl T {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :=

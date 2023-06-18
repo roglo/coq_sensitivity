@@ -1853,6 +1853,32 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_opp_le_mono :
+  rngl_has_1 = true →
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ x y, (x ≤ y ↔ - y ≤ - x)%L.
+Proof.
+intros * Hon Hop Hor *.
+clear Hon.
+split; intros Hxy. {
+  apply (rngl_le_0_sub Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_add_comm, (fold_rngl_sub Hop).
+  now apply (rngl_le_0_sub Hop Hor).
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_add_comm.
+  rewrite <- (rngl_opp_involutive Hop y).
+  rewrite (fold_rngl_sub Hop).
+  now apply (rngl_le_0_sub Hop Hor).
+}
+Qed.
+
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem eq_rngl_of_nat_0 :
