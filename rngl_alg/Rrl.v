@@ -167,6 +167,52 @@ Proof.
 intros * Hon Hop Hor *.
 clear Hon.
 split; intros Hxy. {
+  apply (rngl_le_0_sub Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite (rngl_opp_involutive Hop).
+Require Import ZArith.
+Print Z.opp_le_mono.
+...
+  specialize (rngl_add_le_compat Hor 0%L (- x)%L 0%L y) as H1.
+...
+  specialize (rngl_add_le_compat Hor x y (- x)%L (- x)%L Hxy) as H1.
+  specialize (H1 (rngl_le_refl Hor _)).
+  do 2 rewrite (fold_rngl_sub Hop) in H1.
+...
+  apply (rngl_add_le_compat Hor x y (- x)%L (- x)%L (rngl_le_refl Hor _)) in Hxy.
+Check rngl_add_le_compat.
+Search (_ - - _)%L.
+  rewrite fold_rngl_sub.
+...
+Require Import ZArith.
+Print Z.le_0_sub.
+Check Z.add_le_mono_r.
+Search (_ + _ ≤ _ + _)%L.
+Check rngl_add_le_compat_r.
+...
+Check rngl_not_le.
+
+Search (- _ <= - _)%Z.
+Print Z.opp_le_mono.
+Check Z.sub_opp_r.
+Check Z.le_0_sub.
+Theorem rngl_le_0_sub
+Print Z.le_0_sub.
+Check Z.add_le_mono.
+     : ∀ n m : Z, (0 <= m - n)%Z ↔ (n <= m)%Z
+
+Check Z.add_opp_l.
+Check Z.le_0_sub.
+             (- m <= - n)%Z (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.sub_opp_r (- n) m)
+          ((λ lemma : (0 <= - n - - m)%Z ↔ (- m <= - n)%Z,
+              Morphisms.trans_co_eq_inv_impl_morphism RelationClasses.iff_Transitive (0 <= - n - - m)%Z
+                (- m <= - n)%Z lemma (- m <= - n)%Z (- m <= - n)%Z (Morphisms.eq_proper_proxy (- m <= - n)%Z))
+             (Z.le_0_sub (- m) (- n)) (RelationClasses.reflexivity (- m <= - n)%Z))))
+          (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.add_opp_l m n)
+       (Morphisms.eq_proper_proxy (- m <= - n)%Z)) (Z.le_0_sub n m)
+...
+
 Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   rngl_has_opp T = true →
   ∀ a b c, (a ≤ b + c → a - b ≤ c)%L.

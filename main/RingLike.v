@@ -1831,6 +1831,28 @@ rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
 Qed.
 
+Theorem rngl_le_0_sub :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ a b : T, (0 ≤ b - a ↔ a ≤ b)%L.
+Proof.
+intros * Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_add_le_compat Hor) as H1.
+split; intros Hab. {
+  specialize (H1 0%L (b - a)%L a a Hab (rngl_le_refl Hor _)).
+  rewrite <- (rngl_sub_sub_distr Hop) in H1.
+  rewrite (rngl_sub_diag Hos) in H1.
+  now rewrite rngl_add_0_l, (rngl_sub_0_r Hos) in H1.
+} {
+  specialize (H1 a b (- a)%L (- a)%L Hab (rngl_le_refl Hor _)).
+  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  now rewrite (rngl_sub_diag Hos) in H1.
+}
+Qed.
+
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem eq_rngl_of_nat_0 :
