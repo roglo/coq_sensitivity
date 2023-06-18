@@ -96,9 +96,9 @@ Definition I_eqb (eqb : T → T → bool) (a b : ideal P) : bool :=
 
 (* less equal *)
 
-Definition I_opt_le : option (ideal P → ideal P → Prop) :=
+Definition I_opt_leb : option (ideal P → ideal P → bool) :=
   match rngl_opt_leb with
-  | Some le => Some (λ a b : ideal P, le (i_val a) (i_val b))
+  | Some leb => Some (λ a b : ideal P, leb (i_val a) (i_val b))
   | None => None
   end.
 
@@ -121,7 +121,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
        | Some eqb => Some (I_eqb eqb)
        | None => None
        end;
-     rngl_opt_le := I_opt_le |}.
+     rngl_opt_leb := I_opt_leb |}.
 
 (* equality in ideals is equivalent to equality in their values,
    because the proof of their properties (i_mem), being an equality
@@ -359,21 +359,21 @@ destruct de; [ | easy ].
 intros.
 specialize rngl_opt_le_dec as H1.
 progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_le in Hde.
+progress unfold I_opt_leb in Hde.
 progress unfold rngl_is_ordered in H1.
-destruct rngl_opt_le; [ cbn in H1 | easy ].
+destruct rngl_opt_leb; [ cbn in H1 | easy ].
 specialize (H1 (i_val a) (i_val b)).
 destruct H1 as [H1| H1]; [ left | right ]. {
   progress unfold rngl_le; cbn.
-  progress unfold I_opt_le.
+  progress unfold I_opt_leb.
   progress unfold rngl_le in H1.
-  now destruct rngl_opt_le.
+  now destruct rngl_opt_leb.
 } {
   intros H; apply H1; clear H1; rename H into H1.
   progress unfold rngl_le in H1;   cbn in H1.
-  progress unfold I_opt_le in H1.
+  progress unfold I_opt_leb in H1.
   progress unfold rngl_le.
-  now destruct rngl_opt_le.
+  now destruct rngl_opt_leb.
 }
 Qed.
 
@@ -517,9 +517,9 @@ progress unfold rngl_is_ordered in H1.
 progress unfold rngl_is_ordered.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1.
 intros.
 apply H1.
@@ -536,9 +536,9 @@ progress unfold rngl_is_ordered in H1.
 progress unfold rngl_is_ordered.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1.
 intros.
 apply eq_ideal_eq.
@@ -556,9 +556,9 @@ progress unfold rngl_is_ordered in H1.
 progress unfold rngl_is_ordered.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1.
 intros * Hab Hbc.
 now apply (H1 _ (i_val b)).
@@ -575,9 +575,9 @@ progress unfold rngl_is_ordered in H1.
 progress unfold rngl_is_ordered.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1.
 intros * Hab Hbc.
 now apply (H1 _ (i_val b)).
@@ -594,9 +594,9 @@ progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 destruct os as [opp| subt]; [ | easy ].
 cbn in H1 |-*.
@@ -615,9 +615,9 @@ progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 destruct os as [opp| subt]; [ | easy ].
 cbn in H1 |-*.
@@ -636,9 +636,9 @@ progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 destruct rngl_opt_opp_or_subt as [os| ]. {
   destruct os as [opp| subt]; [ easy | ].
   cbn in H1 |-*.
@@ -662,9 +662,9 @@ progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
 progress unfold roi; cbn.
 progress unfold rngl_le; cbn.
-progress unfold I_opt_le.
+progress unfold I_opt_leb.
 progress unfold rngl_le in H1.
-destruct rngl_opt_le as [le| ]; [ cbn | easy ].
+destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1 |-*.
 intros * Hab.
 specialize (H1 (i_val a) (i_val b) Hab).
