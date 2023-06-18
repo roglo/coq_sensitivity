@@ -1108,7 +1108,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
 }
 apply (rngl_abs_le Hon Hop Hor).
 ...
-Search (_ + _ = 0)%L.
+rngl_abs (x / y) ≤ 1 ↔ rngl_abs x ≤ rngl_abs y
 ...
 
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
