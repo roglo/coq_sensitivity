@@ -980,17 +980,19 @@ destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
     }
     rewrite (rngl_add_opp_l Hop) in H1.
     rewrite rngl_add_0_r in H1.
+    specialize rngl_opt_le_antisymm as H2.
+    rewrite Hor in H2.
+    progress unfold rngl_le in H2.
     progress unfold rngl_lt.
     progress unfold rngl_is_ordered in Hor.
     progress unfold rngl_le in H1.
     destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
-...
-    split; [ easy | ].
+    apply Bool.not_true_iff_false.
     intros H.
-    apply (f_equal rngl_opp) in H.
-    rewrite (rngl_opp_0 Hop) in H.
-    rewrite (rngl_opp_involutive Hop) in H.
-    now symmetry in H.
+    specialize (H2 _ _ H H1).
+    apply (f_equal rngl_opp) in H2.
+    rewrite (rngl_opp_0 Hop) in H2.
+    now rewrite (rngl_opp_involutive Hop) in H2.
   }
   rewrite <- (rngl_mul_opp_opp Hop x).
   rewrite (rl_ln_mul Htr _ _ Hlx Hlx).
@@ -1007,11 +1009,15 @@ clear H.
 apply (rngl_not_le Hor) in H1.
 destruct H1 as [H1| H1]; [ easy | ].
 assert (Hxl : (0 < x)%L). {
+  specialize rngl_opt_le_antisymm as H2.
+  rewrite Hor in H2.
+  progress unfold rngl_le in H2.
   progress unfold rngl_lt.
   progress unfold rngl_le in H1.
-  destruct rngl_opt_le; [ | easy ].
-  split; [ easy | ].
-  now intros H; symmetry in H.
+  destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
+  apply Bool.not_true_iff_false.
+  intros H.
+  now specialize (H2 _ _ H H1).
 }
 rewrite (rl_ln_mul Htr _ _ Hxl Hxl).
 rewrite <- (rngl_mul_1_l Hon (rl_ln x)).
@@ -1265,7 +1271,7 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_opp_or_subt := Some (inl CReal_opp);
      rngl_opt_inv_or_quot := Some (inl CReal_inv');
      rngl_opt_eqb := Some CReal_eqb;
-     rngl_opt_le := Some CRealLe |}.
+     rngl_opt_leb := None (*Some CRealLe*) |}.
 
 (*
 Print Assumptions CReal_ring_like_op.
@@ -1371,6 +1377,7 @@ unfold CReal_eqb in Hxy.
 now destruct (CReal_appart_or_eq x y).
 Qed.
 
+(*
 Theorem CReal_le_dec : let ro := CReal_ring_like_op in
   ∀ a b : CReal, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
 Proof.
@@ -1385,6 +1392,7 @@ destruct (CReal_appart_or_eq a b) as [Hab| Hab]. {
 subst b; left.
 apply CRealLe_refl.
 Qed.
+*)
 
 Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
@@ -1415,6 +1423,7 @@ intros H1.
 now destruct H1.
 Qed.
 
+(*
 Theorem CReal_mul_le_compat_nonneg : let ro := CReal_ring_like_op in
   ∀ a b c d : CReal, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
@@ -1426,7 +1435,9 @@ apply CReal_le_trans with (y := (a * d)%CReal). {
   now apply CReal_le_trans with (y := b).
 }
 Qed.
+*)
 
+(*
 Theorem CReal_mul_le_compat_nonpos : let ro := CReal_ring_like_op in
   ∀ a b c d : CReal, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
@@ -1448,7 +1459,9 @@ apply CReal_le_trans with (y := (- a * - d)%CReal). {
   now apply CReal_le_trans with (y := (- b)%CReal).
 }
 Qed.
+*)
 
+(*
 Theorem CReal_not_le : let ro := CReal_ring_like_op in
   ∀ a b : CReal, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L.
 Proof.
@@ -1457,6 +1470,7 @@ destruct (CReal_appart_or_eq a b) as [Haeb| Haeb]; [ | now left ].
 right.
 now destruct Haeb as [H1| H1]; apply CRealLt_asym in H1.
 Qed.
+*)
 
 Definition CReal_ring_like_prop : ring_like_prop CReal :=
   {| rngl_mul_is_comm := true;
@@ -1480,18 +1494,18 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := CReal_eqb_eq;
-     rngl_opt_le_dec := CReal_le_dec;
+     rngl_opt_le_dec := NA; (*CReal_le_dec;*)
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := CReal_characteristic_prop;
-     rngl_opt_le_refl := CRealLe_refl;
-     rngl_opt_le_antisymm := CReal_le_antisymm;
-     rngl_opt_le_trans := CReal_le_trans;
-     rngl_opt_add_le_compat := CReal_plus_le_compat;
-     rngl_opt_mul_le_compat_nonneg := CReal_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := CReal_mul_le_compat_nonpos;
+     rngl_opt_le_refl := NA; (*CRealLe_refl;*)
+     rngl_opt_le_antisymm := NA; (*CReal_le_antisymm;*)
+     rngl_opt_le_trans := NA; (*CReal_le_trans;*)
+     rngl_opt_add_le_compat := NA; (*CReal_plus_le_compat;*)
+     rngl_opt_mul_le_compat_nonneg := NA; (*CReal_mul_le_compat_nonneg;*)
+     rngl_opt_mul_le_compat_nonpos := NA; (*CReal_mul_le_compat_nonpos;*)
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := CReal_not_le |}.
+     rngl_opt_not_le := NA (*CReal_not_le*) |}.
 
 (*
 Print Assumptions CReal_ring_like_prop.
@@ -1526,7 +1540,7 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_opt_opp_or_subt := Some (inl CComplex_opp);
      rngl_opt_inv_or_quot := Some (inl CComplex_inv);
      rngl_opt_eqb := None;
-     rngl_opt_le := None |}.
+     rngl_opt_leb := None |}.
 
 (* to be completed
 
@@ -1554,7 +1568,7 @@ Definition reals_ring_like_op : ring_like_op R :=
      rngl_opt_opp_or_subt := Some (inl Ropp);
      rngl_opt_inv_or_quot := Some (inl Rinv);
      rngl_opt_eqb := None;
-     rngl_opt_le := Some Rle |}.
+     rngl_opt_leb := None (*Some Rle*) |}.
 
 (*
 Print Assumptions reals_ring_like_op.
@@ -1606,6 +1620,7 @@ rewrite H.
 now apply not_0_INR.
 Qed.
 
+(*
 Theorem Ropt_mul_le_compat_nonneg :
   let ror := reals_ring_like_op in
   ∀ a b c d : R, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
@@ -1613,7 +1628,9 @@ Proof.
 intros * Hac Hbd.
 now apply Rmult_le_compat.
 Qed.
+*)
 
+(*
 Theorem Ropt_mul_le_compat_nonpos :
   let ror := reals_ring_like_op in
   ∀ a b c d : R, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
@@ -1626,7 +1643,9 @@ rewrite (Rmult_comm a), (Rmult_comm c).
 apply Rmult_le_compat_neg_l; [ | easy ].
 now apply Rle_trans with (r2 := b).
 Qed.
+*)
 
+(*
 Theorem Ropt_not_le :
   let ror := reals_ring_like_op in
   ∀ a b : R, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L.
@@ -1638,6 +1657,7 @@ specialize (Rle_or_lt b a) as H1.
 destruct H1 as [| Hba]; [ now right | left ].
 now apply Rlt_asym in Hba.
 Qed.
+*)
 
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   let ro := reals_ring_like_op in
@@ -1662,18 +1682,18 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
-     rngl_opt_le_dec := Rle_dec;
+     rngl_opt_le_dec := NA; (*Rle_dec;*)
      rngl_opt_integral := Rmult_integral;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := Rcharacteristic_prop;
-     rngl_opt_le_refl := Rle_refl;
-     rngl_opt_le_antisymm := Rle_antisym;
-     rngl_opt_le_trans := Rle_trans;
-     rngl_opt_add_le_compat := Rplus_le_compat;
-     rngl_opt_mul_le_compat_nonneg := Ropt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := Ropt_mul_le_compat_nonpos;
+     rngl_opt_le_refl := NA; (*Rle_refl;*)
+     rngl_opt_le_antisymm := NA; (*Rle_antisym;*)
+     rngl_opt_le_trans := NA; (*Rle_trans;*)
+     rngl_opt_add_le_compat := NA; (*Rplus_le_compat;*)
+     rngl_opt_mul_le_compat_nonneg := NA; (*Ropt_mul_le_compat_nonneg;*)
+     rngl_opt_mul_le_compat_nonpos := NA; (*Ropt_mul_le_compat_nonpos;*)
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := Ropt_not_le |}.
+     rngl_opt_not_le := NA (*Ropt_not_le*) |}.
 
 (* complex numbers *)
 (* see also Quaternions.v *)
