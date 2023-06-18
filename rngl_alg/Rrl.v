@@ -142,6 +142,24 @@ Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
 Arguments rl_ln {T ro rp real_like_prop} x%L.
 Arguments rl_sin {T ro rp real_like_prop} x%L.
 
+Arguments rngl_is_ordered T {R}.
+
+(* to be completed
+Theorem rngl_abs_le {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_is_ordered T = true →
+  ∀ x y, (- x ≤ y ≤ x ↔ rngl_abs y ≤ x)%L.
+Proof.
+intros * Hor *.
+split. {
+  intros (Hxy, Hyx).
+  unfold rngl_abs.
+  unfold rngl_le_dec'.
+  destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
+  destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
+...
+*)
+
 Definition rl_has_mod_intgl T {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option (rl_opt_mod_intgl_prop T).
@@ -898,7 +916,7 @@ Theorem rl_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
   rngl_has_eqb T = true →
-  rngl_is_ordered = true →
+  rngl_is_ordered T = true →
   rl_has_trigo = true →
   ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
 Proof.
@@ -1057,8 +1075,8 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
   destruct Hxy; subst x y.
   now destruct Hxyz.
 }
-unfold rl_pow.
-Search rl_exp.
+... ...
+apply rngl_abs_le.
 ...
 Search (_ + _ = 0)%L.
 ...
