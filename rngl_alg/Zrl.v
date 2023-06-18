@@ -72,11 +72,12 @@ now apply Z.mul_le_mono_nonpos.
 Qed.
 
 Theorem Z_not_le :
-  ∀ a b : Z, (a <=? b)%Z ≠ true → a = b ∨ (b <=? a)%Z = true.
+  ∀ a b : Z, (a <=? b)%Z ≠ true → a ≠ b ∧ (b <=? a)%Z = true.
 Proof.
 intros * Hab.
 apply Bool.not_true_iff_false in Hab.
-apply Z.leb_gt in Hab; right.
+apply Z.leb_gt in Hab.
+split; [ now intros H; subst b; apply Z.lt_irrefl in Hab | ].
 now apply Z.leb_le, Z.lt_le_incl.
 Qed.
 

@@ -1007,7 +1007,7 @@ destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
 }
 clear H.
 apply (rngl_not_le Hor) in H1.
-destruct H1 as [H1| H1]; [ easy | ].
+destruct H1 as (_, H1).
 assert (Hxl : (0 < x)%L). {
   specialize rngl_opt_le_antisymm as H2.
   rewrite Hor in H2.

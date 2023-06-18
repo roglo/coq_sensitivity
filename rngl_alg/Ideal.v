@@ -653,7 +653,7 @@ Qed.
 
 Theorem I_opt_not_le : let roi := I_ring_like_op in
   if rngl_is_ordered (ideal P) then
-    ∀ a b : ideal P, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L
+    ∀ a b : ideal P, ¬ (a ≤ b)%L → a ≠ b ∧ (b ≤ a)%L
   else not_applicable.
 Proof.
 intros.
@@ -668,8 +668,8 @@ destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
 cbn in H1 |-*.
 intros * Hab.
 specialize (H1 (i_val a) (i_val b) Hab).
-destruct H1 as [H1| H1]; [ | now right ].
-now apply eq_ideal_eq in H1; left.
+destruct H1 as (H1, H2).
+now apply neq_ideal_neq in H1.
 Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=

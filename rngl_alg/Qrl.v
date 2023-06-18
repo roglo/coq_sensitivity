@@ -93,16 +93,20 @@ now apply Q.mul_le_mono_nonpos.
 Qed.
 
 Theorem Q_not_le :
-  ∀ a b : Q, Q_leb a b ≠ true → a = b ∨ Q_leb b a = true.
+  ∀ a b : Q, Q_leb a b ≠ true → a ≠ b ∧ Q_leb b a = true.
 Proof.
 intros * Hab.
 progress unfold Q_leb in Hab.
 progress unfold Q_leb.
 destruct (Q.le_dec a b) as [| Hab']; [ easy | clear Hab ].
 apply Q.nle_gt in Hab'.
-destruct (Q.le_dec b a) as [Hba| Hba]; [ now right | left ].
-apply Q.nle_gt in Hba.
-now apply Q.le_antisymm; apply Q.lt_le_incl.
+destruct (Q.le_dec b a) as [Hba| Hba]. {
+  split; [ | easy ].
+  intros H; subst b.
+  now apply Q.lt_irrefl in Hab'.
+}
+exfalso; apply Hba.
+now apply Q.lt_le_incl.
 Qed.
 
 Theorem Q_le_dec :
