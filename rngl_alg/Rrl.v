@@ -147,16 +147,41 @@ Arguments rngl_is_ordered T {R}.
 (* to be completed
 Theorem rngl_abs_le {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x y, (- x ≤ y ≤ x ↔ rngl_abs y ≤ x)%L.
 Proof.
-intros * Hor *.
+intros * Hop Hor *.
 split. {
   intros (Hxy, Hyx).
   unfold rngl_abs.
   unfold rngl_le_dec'.
   destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
   destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
+Theorem rngl_opp_le_mono {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ x y, (x ≤ y ↔ - y ≤ - x)%L.
+Proof.
+intros * Hop Hor *.
+split; intros Hxy. {
+  specialize (rngl_not_le Hor) as H1.
+  specialize (H1 (- x) (- y))%L.
+...
+progress unfold rngl_le.
+Search rngl_opt_leb.
+  rewrite <- (rngl_add_0_l (- y)%L).
+  rewrite <- (rngl_add_0_l (- x)%L).
+Search (_ ≤ _ + _)%L.
+Search (_ - _ ≤ _)%L.
+...
+Search (_ - _ ≤ _ - _)%L.
+Search (- _ ≤ _)%L.
+Search (_ ≤ - _)%L.
+Check rngl_add_le_compat.
+... ...
+apply (rngl_opp_le_mono Hor).
+now rewrite (rngl_opp_involutive Hop).
 ...
 *)
 
