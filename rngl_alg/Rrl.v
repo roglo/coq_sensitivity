@@ -963,13 +963,16 @@ destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
 destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
   clear H.
   assert (Hxl : (x < 0)%L). {
+    specialize rngl_opt_le_antisymm as H2.
+    rewrite Hor in H2.
+    progress unfold rngl_le in H2.
     progress unfold rngl_lt.
     progress unfold rngl_is_ordered in Hor.
     progress unfold rngl_le in H1.
     destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
-Print rngl_opt_leb.
-...
-    now destruct rngl_opt_leb.
+    apply Bool.not_true_iff_false.
+    intros H4.
+    now specialize (H2 x 0%L H1 H4).
   }
   assert (Hlx : (0 < -x)%L). {
     apply (rngl_add_le_compat Hor (- x)%L (- x)%L) in H1. 2: {
@@ -980,7 +983,8 @@ Print rngl_opt_leb.
     progress unfold rngl_lt.
     progress unfold rngl_is_ordered in Hor.
     progress unfold rngl_le in H1.
-    destruct rngl_opt_le; [ | easy ].
+    destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
+...
     split; [ easy | ].
     intros H.
     apply (f_equal rngl_opp) in H.
