@@ -1096,6 +1096,28 @@ destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
   }
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 2 →
+  rngl_has_eqb T = true →
+  rngl_is_ordered = true →
+  rl_has_trigo = true →
+  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
+Proof.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
+rewrite (rl_cos_acos Htr) in H1.
+apply (rngl_add_sub_eq_l Hos) in H1.
+rewrite H1.
+rewrite (rl_sqrt_squ Hon Hop Hiv Hc2 Heb Hor Htr).
+(* acos est dans [0,Π[, donc sin est >0 *)
+...
+Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
   ∀ x, rl_sin (rl_acos x) = rl_sqrt (1 - rngl_squ x)%L.
 ... ...
 rewrite rl_sin_acos.
