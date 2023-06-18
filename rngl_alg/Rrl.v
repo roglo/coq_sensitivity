@@ -1087,12 +1087,15 @@ Proof. easy. Qed.
 (* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   rngl_has_eqb T = true →
+  rngl_is_ordered T = true →
   rl_has_mod_intgl T = true →
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros * Heb Hmi * Hxyz.
+intros * Hon Hop Heb Hor Hmi * Hxyz.
 unfold rl_sqrt.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
@@ -1103,8 +1106,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
   destruct Hxy; subst x y.
   now destruct Hxyz.
 }
-... ...
-apply rngl_abs_le.
+apply (rngl_abs_le Hon Hop Hor).
 ...
 Search (_ + _ = 0)%L.
 ...
