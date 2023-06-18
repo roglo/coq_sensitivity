@@ -247,6 +247,7 @@ Definition rngl_one {T} {ro : ring_like_op T} :=
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
+Notation "2" := (rngl_add rngl_one rngl_one) : ring_like_scope.
 Notation "a + b" := (rngl_add a b) : ring_like_scope.
 Notation "a - b" := (rngl_sub a b) : ring_like_scope.
 Notation "a * b" := (rngl_mul a b) : ring_like_scope.
