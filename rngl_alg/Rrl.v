@@ -1039,6 +1039,30 @@ Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 Proof. easy. Qed.
 
 (* to be completed
+Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_eqb T = true →
+  rl_has_mod_intgl T = true →
+  ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
+  (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
+Proof.
+intros * Heb Hmi * Hxyz.
+unfold rl_sqrt.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
+  apply (rngl_eqb_eq Heb) in Hxy.
+  progress unfold rl_has_mod_intgl in Hmi.
+  destruct (rl_opt_mod_intgl_prop T) as [H1| ]; [ | easy ].
+  apply H1 in Hxy.
+  destruct Hxy; subst x y.
+  now destruct Hxyz.
+}
+unfold rl_pow.
+Search rl_exp.
+...
+Search (_ + _ = 0)%L.
+...
+
 Theorem all_GComplex_has_nth_root {T} {ro : ring_like_op T} :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, GComplex_power_nat x n = z.
 Proof.
@@ -1071,9 +1095,16 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
 }
 subst θ.
 (**)
+assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
+  subst ρ.
+... ...
+apply rl_sqrt_div_squ_squ.
+}
+...
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
   rewrite (rl_cos_acos Htr).
+...
   rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
     subst ρ.
     progress unfold rl_sqrt.
@@ -1094,6 +1125,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
     apply (rngl_eqb_neq Heb) in H2.
     apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
   }
+...
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1103,14 +1135,15 @@ Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_eqb T = true →
   rngl_is_ordered = true →
   rl_has_trigo = true →
-  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
+  ∀ x, (-1 ≤ x ≤ 1)%L →
+  rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
 Proof.
-intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr * Hx1.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
-rewrite (rl_cos_acos Htr) in H1.
+rewrite (rl_cos_acos Htr _ Hx1) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
 rewrite H1.
 rewrite (rl_sqrt_squ Hon Hop Hiv Hc2 Heb Hor Htr).
