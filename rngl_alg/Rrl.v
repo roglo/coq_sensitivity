@@ -159,12 +159,60 @@ split. {
   destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
   destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
 Theorem rngl_opp_le_mono {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x y, (x ≤ y ↔ - y ≤ - x)%L.
 Proof.
-intros * Hop Hor *.
+intros * Hon Hop Hor *.
+clear Hon.
 split; intros Hxy. {
+Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp T = true →
+  ∀ a b c, (a ≤ b + c → a - b ≤ c)%L.
+Proof.
+intros * Hop * Habc.
+unfold rngl_sub.
+rewrite Hop.
+Search (_ + _ ≤ _)%L.
+...
+rewrite <- (rngl_add_0_l (- y)%L).
+rewrite (fold_rngl_sub Hop).
+apply glop.
+rewrite (fold_rngl_sub Hop).
+...
+  rewrite <- (rngl_mul_1_l Hon (- y)%L).
+  rewrite <- (rngl_mul_1_l Hon (- x)%L).
+  do 2 rewrite (rngl_mul_opp_r Hop).
+  do 2 rewrite <- (rngl_mul_opp_l Hop).
+  apply (rngl_mul_le_compat_nonpos Hor Hop).
+...
+Search rngl_le.
+  progress unfold rngl_le in Hxy.
+  progress unfold rngl_le.
+rngl_opt_mul_le_compat_nonpos:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → if (rngl_is_ordered T && rngl_has_opp T)%bool
+      then ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
+      else not_applicable
+rngl_opt_mul_le_compat_nonneg:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → if (rngl_is_ordered T && rngl_has_opp T)%bool
+      then ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+      else not_applicable
+rngl_mul_le_compat_nonpos:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true
+      → rngl_has_opp T = true → ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
+rngl_mul_le_compat_nonneg:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true
+      → rngl_has_opp T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+...
   specialize (rngl_not_le Hor) as H1.
   specialize (H1 (- x) (- y))%L.
 ...
