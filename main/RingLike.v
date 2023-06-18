@@ -380,7 +380,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     rngl_opt_not_le :
       if rngl_is_ordered then
-        ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%L
+        ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L
       else not_applicable }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
@@ -610,7 +610,7 @@ Qed.
 
 Theorem rngl_not_le :
   rngl_is_ordered = true →
-  ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%L.
+  ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L.
 Proof.
 intros Hor *.
 specialize rngl_opt_not_le as H.
@@ -1999,19 +1999,15 @@ destruct (rngl_le_dec Hor 0%L a) as [Hap| Han]. {
   }
 }
 apply (rngl_not_le Hor) in Han.
-destruct Han as [Han| Han]. {
-  subst a; rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_refl Hor).
+destruct Han as (Haz, Han).
+specialize rngl_opt_mul_le_compat_nonpos as H2.
+rewrite Hor, Hop in H2; cbn in H2.
+specialize (H2 0%L 0%L a a).
+rewrite (rngl_mul_0_l Hos) in H2.
+apply H2. {
+  split; [ easy | apply (rngl_le_refl Hor) ].
 } {
-  specialize rngl_opt_mul_le_compat_nonpos as H2.
-  rewrite Hor, Hop in H2; cbn in H2.
-  specialize (H2 0%L 0%L a a).
-  rewrite (rngl_mul_0_l Hos) in H2.
-  apply H2. {
-    split; [ easy | apply (rngl_le_refl Hor) ].
-  } {
-    split; [ easy | apply (rngl_le_refl Hor) ].
-  }
+  split; [ easy | apply (rngl_le_refl Hor) ].
 }
 Qed.
 

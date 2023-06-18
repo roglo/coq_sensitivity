@@ -48,15 +48,16 @@ now apply Nat.mul_le_mono.
 Qed.
 
 Theorem Nat_not_le :
-  ∀ a b : nat, (a <=? b) ≠ true → a = b ∨ (b <=? a) = true.
+  ∀ a b : nat, (a <=? b) ≠ true → a ≠ b ∧ (b <=? a) = true.
 Proof.
 intros * Hab.
-destruct (Nat.eq_dec a b) as [Heab| Heab]; [ now left | right ].
-apply Bool.not_false_iff_true.
-intros Hba; apply Heab; clear Heab.
 apply Bool.not_true_iff_false in Hab.
-apply Nat.leb_gt in Hab, Hba.
-now apply Nat.le_antisymm; apply Nat.lt_le_incl.
+apply Nat.leb_gt in Hab.
+split. {
+  now intros H; subst b; apply Nat.lt_irrefl in Hab.
+}
+apply Nat.leb_le.
+now apply Nat.lt_le_incl.
 Qed.
 
 Theorem Nat_mul_sub_distr_l :

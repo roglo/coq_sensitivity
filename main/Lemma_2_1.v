@@ -107,14 +107,10 @@ destruct (rngl_le_dec Hor 0%L n) as [Hnz| Hnz]. {
 } {
   apply rngl_mul_le_compat_nonpos; [ easy | easy | | ]. {
     split; [ | now apply rngl_le_refl ].
-    apply rngl_not_le in Hnz; [ | easy ].
-    destruct Hnz as [Hnz| Hnz]; [ | easy ].
-    now rewrite <- Hnz; apply rngl_le_refl.
+    now apply rngl_not_le in Hnz.
   } {
     split; [ | now apply rngl_le_refl ].
-    apply rngl_not_le in Hnz; [ | easy ].
-    destruct Hnz as [Hnz| Hnz]; [ | easy ].
-    now rewrite <- Hnz; apply rngl_le_refl.
+    now apply rngl_not_le in Hnz.
   }
 }
 Qed.
