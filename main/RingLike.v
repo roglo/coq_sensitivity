@@ -609,6 +609,17 @@ rewrite Hor, Hop in H.
 apply H.
 Qed.
 
+Theorem rngl_mul_le_compat :
+  rngl_is_ordered = true →
+  rngl_has_opp = false →
+  ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
+Proof.
+intros Hor Hop * Hac Hbd.
+specialize rngl_opt_mul_le_compat as H.
+rewrite Hor, Hop in H.
+now apply H.
+Qed.
+
 Theorem rngl_not_le :
   rngl_is_ordered = true →
   ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L.

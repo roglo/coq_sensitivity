@@ -1107,7 +1107,38 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
   now destruct Hxyz.
 }
 apply (rngl_abs_le Hon Hop Hor).
+Theorem rngl_abs_div {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ x y, rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
+Proof.
+intros * Hop Hor *.
+progress unfold rngl_abs.
+progress unfold rngl_le_dec'.
+destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
+destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
+  destruct (rngl_le_dec _ y _) as [Hy| Hy]. {
+    destruct (rngl_le_dec _ _ _) as [Hxy| Hxy]. {
+      progress unfold rngl_div in Hxy.
+      remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
+      destruct iv. {
+Search (_ * _ ≤ _)%L.
+About rngl_opt_mul_le_compat.
 ...
+        rewrite (rngl_mul_opp_l Hop).
+...
+rngl_mul_le_compat_nonneg:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true
+      → rngl_has_opp T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+rngl_mul_le_compat_nonpos:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true
+      → rngl_has_opp T = true → ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
+... ...
+rewrite rngl_abs_div.
 rngl_abs (x / y) ≤ 1 ↔ rngl_abs x ≤ rngl_abs y
 ...
 
