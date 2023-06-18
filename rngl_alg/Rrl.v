@@ -1056,8 +1056,8 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   z ≠ GComplex_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
   → θ =
-      if rngl_leb 0 (gim z) then rl_acos (gim z / ρ)
-      else (- rl_acos (gre z / ρ))%L
+      (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)
+       else (- rl_acos (gre z / ρ))%L)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
@@ -1070,6 +1070,36 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
   f_equal; rewrite H1; apply H1.
 }
 subst θ.
+(**)
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
+  rewrite (rl_cos_acos Htr).
+  rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+    subst ρ.
+    progress unfold rl_sqrt.
+    progress unfold rl_pow.
+    rewrite if_bool_if_dec.
+    destruct (Sumbool.sumbool_of_bool _) as [H2| H2]. {
+      apply (rngl_eqb_eq Heb) in H2.
+      generalize Hmi; intros H.
+      progress unfold rl_has_mod_intgl in H.
+      remember (rl_opt_mod_intgl_prop T) as mi eqn:Hmi1.
+      symmetry in Hmi1.
+      destruct mi as [mi| ]; [ clear H | easy ].
+      apply mi in H2.
+      apply (neq_neq_GComplex Heb) in Hz.
+      cbn in Hz.
+      now destruct Hz.
+    }
+    apply (rngl_eqb_neq Heb) in H2.
+    apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
+  }
+Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1 - rngl_squ x)%L.
+... ...
+rewrite rl_sin_acos.
+...
 rewrite (rl_cos_atan2 Htr).
 rewrite <- Hρ.
 rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
