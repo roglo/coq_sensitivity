@@ -966,6 +966,9 @@ destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
     progress unfold rngl_lt.
     progress unfold rngl_is_ordered in Hor.
     progress unfold rngl_le in H1.
+    destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
+Print rngl_opt_leb.
+...
     now destruct rngl_opt_leb.
   }
   assert (Hlx : (0 < -x)%L). {
