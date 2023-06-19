@@ -203,6 +203,21 @@ Fixpoint llast {A} (l : list A) d :=
   | cons _ l' => llast l' d
   end.
 
+Theorem Nat_eq_dec : ∀ n m : nat, {n = m} + {n ≠ m}.
+Proof.
+intros.
+revert m.
+induction n; intros; cbn. {
+  now destruct m; [ left | right ].
+}
+destruct m; [ now right | ].
+destruct (IHn m) as [H1| H1]; [ now left; subst m | right ].
+intros H; apply H1; clear H1.
+now injection H.
+Qed.
+
+(**)
+
 Definition rngl_has_eqb {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_eqb.
 
@@ -577,6 +592,44 @@ rewrite H1 in H.
 apply H.
 Qed.
 
+Theorem rngl_lt_iff :
+  rngl_is_ordered = true → ∀ a b, (a < b ↔ a ≤ b ∧ a ≠ b)%L.
+Proof.
+intros * Hor a b.
+progress unfold rngl_lt.
+progress unfold rngl_le.
+specialize rngl_opt_not_le as H1.
+specialize rngl_opt_le_antisymm as H2.
+rewrite Hor in H1, H2.
+progress unfold rngl_le in H1.
+progress unfold rngl_le in H2.
+destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
+split. {
+  intros Hab.
+  specialize (H1 b a) as H3.
+  rewrite Hab in H3.
+  assert (H : false ≠ true) by easy.
+  specialize (H3 H); clear H.
+  split; [ easy | ].
+  destruct H3; congruence.
+} {
+  intros (H3, H4).
+  remember (rngl_leb b a) as x eqn:Hx; symmetry in Hx.
+  destruct x; [ | easy ].
+  now specialize (H2 _ _ H3 Hx).
+}
+Qed.
+
+Theorem rngl_lt_irrefl :
+  rngl_is_ordered = true → ∀ a : T, ¬ (a < a)%L.
+Proof.
+intros * Hor a Ha.
+unfold rngl_lt in Ha.
+specialize (rngl_le_refl Hor a) as H1.
+unfold rngl_le in H1.
+destruct rngl_opt_leb; congruence.
+Qed.
+
 Theorem rngl_add_le_compat :
   rngl_is_ordered = true →
   ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L.
@@ -683,45 +736,6 @@ Proof.
 intros a; simpl.
 rewrite rngl_add_comm.
 apply rngl_add_0_l.
-Qed.
-
-Theorem rngl_1_neq_0_iff :
-  rngl_has_1 = true → rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
-Proof.
-intros Hon.
-specialize rngl_characteristic_prop as H1.
-(**)
-rewrite Hon in H1.
-(**)
-split. {
-  intros Hc.
-  remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
-  destruct cz. {
-(**)
-    specialize (H1 0); cbn in H1.
-(*
-specialize (H1 0 (λ _, eq_refl)) as H2.
-destruct H2 as (k & Hkz & Hk).
-...
-*)
-    now rewrite rngl_add_0_r in H1.
-  }
-  destruct H1 as (Hbef, H1).
-  destruct rngl_characteristic as [| n]; [ easy | ].
-  destruct n; [ easy | ].
-  specialize (Hbef 1).
-  cbn in Hbef.
-  rewrite rngl_add_0_r in Hbef.
-  apply Hbef.
-  unfold lt.
-  split; [ easy | ].
-  do 2 apply le_n_S.
-  destruct n; [ easy | apply le_0_n ].
-} {
-  intros H10 Hc.
-  rewrite Hc in H1; cbn in H1.
-  now rewrite rngl_add_0_r in H1.
-}
 Qed.
 
 Theorem rngl_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%L.
@@ -1106,6 +1120,54 @@ assert (H : (x * 0)%L = x). {
 }
 rewrite <- H.
 apply (rngl_mul_0_r Hos).
+Qed.
+
+Theorem rngl_1_neq_0_iff :
+  rngl_has_1 = true → rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
+Proof.
+intros Hon.
+specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1.
+split. {
+  intros Hc.
+  remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
+  destruct cz. {
+    specialize (H1 0); cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+  }
+  destruct H1 as (Hbef, H1).
+  destruct rngl_characteristic as [| n]; [ easy | ].
+  destruct n; [ easy | ].
+  specialize (Hbef 1).
+  cbn in Hbef.
+  rewrite rngl_add_0_r in Hbef.
+  apply Hbef.
+  unfold lt.
+  split; [ easy | ].
+  do 2 apply le_n_S.
+  destruct n; [ easy | apply le_0_n ].
+} {
+  intros H10 Hc.
+  rewrite Hc in H1; cbn in H1.
+  now rewrite rngl_add_0_r in H1.
+}
+Qed.
+
+Theorem rngl_1_eq_0_iff :
+  rngl_has_1 = true →
+  rngl_has_opp_or_subt = true →
+  rngl_characteristic = 1 ↔ (1 = 0)%L.
+Proof.
+intros Hon Hos.
+split. {
+  intros Hc.
+  specialize (rngl_characteristic_1 Hon Hos Hc) as H1.
+  apply H1.
+} {
+  intros H10.
+  destruct (Nat_eq_dec rngl_characteristic 1) as [H1| H1]; [ easy | ].
+  now apply (rngl_1_neq_0_iff Hon) in H1.
+}
 Qed.
 
 Theorem rngl_add_move_0_r :
@@ -2113,6 +2175,45 @@ destruct H1 as (H1, H2).
 specialize (rngl_mul_nonpos_nonpos Hop Hor) as H3.
 specialize (H3 1 1 H2 H2)%L.
 now rewrite (rngl_mul_1_l Hon) in H3.
+Qed.
+
+Theorem rngl_inv_lt_0_compat :
+  rngl_has_1 = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_ordered = true →
+  ∀ a, (0 < a → 0 < a⁻¹)%L.
+Proof.
+intros * Hon Hop Hiv Hor.
+intros * Hza.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Haz : a ≠ 0%L). {
+  intros H; subst a.
+  now apply (rngl_lt_irrefl Hor) in Hza.
+}
+specialize (rngl_inv_neq_0 Hon Hos Hiv) as H1.
+destruct (rngl_le_dec Hor 0 a⁻¹)%L as [H2| H2]. {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; symmetry in H; revert H.
+  now apply H1.
+}
+apply (rngl_not_le Hor) in H2.
+destruct H2 as (H2, H3).
+specialize (rngl_mul_nonneg_nonpos Hop Hor) as H4.
+assert (H : (0 ≤ a)%L) by now apply (rngl_lt_iff Hor) in Hza.
+specialize (H4 _ _ H H3); clear H.
+rewrite (rngl_mul_inv_r Hon Hiv a Haz) in H4.
+specialize (rngl_0_le_1 Hon Hop Hor) as H5.
+specialize rngl_opt_le_antisymm as H6.
+rewrite Hor in H6.
+specialize (H6 _ _ H4 H5).
+clear H4 H5.
+apply (rngl_1_eq_0_iff Hon Hos) in H6.
+specialize (rngl_characteristic_1 Hon Hos H6) as H4.
+exfalso; apply Haz, H4.
 Qed.
 
 Theorem rngl_square_ge_0 :
