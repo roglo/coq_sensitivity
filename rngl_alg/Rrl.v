@@ -1119,11 +1119,23 @@ destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
 destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
   destruct (rngl_le_dec _ y _) as [Hy| Hy]. {
     destruct (rngl_le_dec _ _ _) as [Hxy| Hxy]. {
+      clear H.
       progress unfold rngl_div in Hxy.
       remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
       destruct iv. {
-Search (_ * _ ≤ _)%L.
-About rngl_opt_mul_le_compat.
+        specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
+        specialize (H1 0 0 x y⁻¹)%L.
+        assert (H : (x ≤ 0 ≤ 0)%L). {
+          split; [ easy | apply (rngl_le_refl Hor) ].
+        }
+        specialize (H1 H); clear H.
+        assert (H : (y⁻¹ ≤ 0 ≤ 0)%L). {
+          split; [ | apply (rngl_le_refl Hor) ].
+Search (_⁻¹ ≤ _)%L.
+Check rngl_not_le.
+...
+        exfalso.
+Check rngl_mul_le_compat_nonneg.
 ...
         rewrite (rngl_mul_opp_l Hop).
 ...
