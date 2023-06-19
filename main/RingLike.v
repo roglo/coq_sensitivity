@@ -2036,6 +2036,28 @@ Qed.
 Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
 Proof. easy. Qed.
 
+(* *)
+
+Theorem rngl_mul_nonneg_nonneg :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a * b)%L.
+Proof.
+intros * Hop Hor * Ha Hb.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (H1 0 0 a b)%L.
+assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
+specialize (H1 H); clear H.
+assert (H : (0 ≤ 0 ≤ b)%L) by now split; [ apply (rngl_le_refl Hor) | ].
+specialize (H1 H); clear H.
+now rewrite (rngl_mul_0_l Hos) in H1.
+Qed.
+
+(* perhaps provable with rngl_mul_nonneg_nonneg and
+   rngl_mul_nonpos_nonpos? *)
 Theorem rngl_square_ge_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →

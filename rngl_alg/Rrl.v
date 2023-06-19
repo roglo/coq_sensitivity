@@ -1143,6 +1143,11 @@ Theorem rngl_inv_le_0_compat {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
 Proof.
 intros * Hop Hor * Hza.
 Search rngl_inv.
+Check rngl_mul_nonneg_nonneg.
+...
+Require Import ZArith.
+Search (0 <= _ * _)%Z.
+Z.mul_nonneg_nonneg: ∀ n m : Z, (0 <= n)%Z → (0 <= m)%Z → (0 <= n * m)%Z
 ...
 Check rngl_mul_le_compat_nonneg.
 specialize (rngl_mul_le_compat_nonneg Hor Hop 0 (a⁻¹) 1 (a⁻¹))%L as H1.
