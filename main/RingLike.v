@@ -1864,14 +1864,12 @@ split; intros Hab. {
 }
 Qed.
 
-Theorem rngl_opp_le_mono :
-  rngl_has_1 = true →
+Theorem rngl_opp_le_compat :
   rngl_has_opp = true →
   rngl_is_ordered = true →
   ∀ x y, (x ≤ y ↔ - y ≤ - x)%L.
 Proof.
-intros * Hon Hop Hor *.
-clear Hon.
+intros * Hop Hor *.
 split; intros Hxy. {
   apply (rngl_le_0_sub Hop Hor).
   progress unfold rngl_sub.

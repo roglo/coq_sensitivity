@@ -146,25 +146,24 @@ Arguments rngl_is_ordered T {R}.
 
 Theorem rngl_abs_le {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x y, (- x ≤ y ≤ x ↔ rngl_abs y ≤ x)%L.
 Proof.
-intros * Hon Hop Hor *.
+intros * Hop Hor *.
 progress unfold rngl_abs.
 progress unfold rngl_le_dec'.
 destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
 split. {
   intros (Hxy, Hyx).
   destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]; [ | easy ].
-  apply (rngl_opp_le_mono Hon Hop Hor).
+  apply (rngl_opp_le_compat Hop Hor).
   now rewrite (rngl_opp_involutive Hop).
 } {
   intros Hyx.
   destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
     split. {
-      apply (rngl_opp_le_mono Hon Hop Hor) in Hyx.
+      apply (rngl_opp_le_compat Hop Hor) in Hyx.
       now rewrite (rngl_opp_involutive Hop) in Hyx.
     } {
       apply (rngl_le_trans Hor _ 0%L); [ easy | ].
@@ -1106,13 +1105,14 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
   destruct Hxy; subst x y.
   now destruct Hxyz.
 }
-apply (rngl_abs_le Hon Hop Hor).
+apply (rngl_abs_le Hop Hor).
 Theorem rngl_abs_div {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ x y, rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
+  ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
-intros * Hop Hor *.
+intros * Hon Hop Hor * Hyz.
 progress unfold rngl_abs.
 progress unfold rngl_le_dec'.
 destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
@@ -1131,6 +1131,29 @@ destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
         specialize (H1 H); clear H.
         assert (H : (y⁻¹ ≤ 0 ≤ 0)%L). {
           split; [ | apply (rngl_le_refl Hor) ].
+          apply (rngl_opp_le_compat Hop Hor).
+          rewrite (rngl_opp_0 Hop).
+          rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
+          apply (rngl_opp_le_compat Hop Hor) in Hy.
+          rewrite (rngl_opp_0 Hop) in Hy.
+Theorem rngl_inv_le_0_compat {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  ∀ a, (0 ≤ a → 0 ≤ a⁻¹)%L.
+Proof.
+intros * Hza.
+...
+(*
+Check rngl_inv_le_0_compat.
+*)
+Require Import QArith.
+Search (_ <= / _)%Q.
+Print Qinv_le_0_compat.
+Qinv_le_0_compat
+     : ∀ a : Q, 0 <= a → 0 <= / a
+...
+Check Qopp_le_compat.
+
+Search (_ * _ == 1)%Q.
+Search (/ _)%Q.
 Search (_⁻¹ ≤ _)%L.
 Check rngl_not_le.
 ...
