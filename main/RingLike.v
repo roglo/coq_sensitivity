@@ -2056,38 +2056,76 @@ specialize (H1 H); clear H.
 now rewrite (rngl_mul_0_l Hos) in H1.
 Qed.
 
-(* perhaps provable with rngl_mul_nonneg_nonneg and
-   rngl_mul_nonpos_nonpos? *)
+Theorem rngl_mul_nonpos_nonpos :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ a b, (a ≤ 0 → b ≤ 0 → 0 ≤ a * b)%L.
+Proof.
+intros * Hop Hor * Ha Hb.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
+specialize (H1 0 0 a b)%L.
+assert (H : (a ≤ 0 ≤ 0)%L) by now split; [ | apply (rngl_le_refl Hor) ].
+specialize (H1 H); clear H.
+assert (H : (b ≤ 0 ≤ 0)%L) by now split; [ | apply (rngl_le_refl Hor) ].
+specialize (H1 H); clear H.
+now rewrite (rngl_mul_0_l Hos) in H1.
+Qed.
+
+Theorem rngl_mul_nonneg_nonpos :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ a b, (0 ≤ a → b ≤ 0 → a * b ≤ 0)%L.
+Proof.
+intros * Hop Hor * Ha Hb.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (H1 0 0 a (- b))%L.
+assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
+specialize (H1 H); clear H.
+assert (H : (0 ≤ 0 ≤ - b)%L). {
+  split; [ apply (rngl_le_refl Hor) | ].
+  apply (rngl_opp_le_compat Hop Hor) in Hb.
+  now rewrite (rngl_opp_0 Hop) in Hb.
+}
+specialize (H1 H); clear H.
+rewrite (rngl_mul_0_l Hos) in H1.
+rewrite (rngl_mul_opp_r Hop) in H1.
+apply (rngl_opp_le_compat Hop Hor) in H1.
+rewrite (rngl_opp_involutive Hop) in H1.
+now rewrite (rngl_opp_0 Hop) in H1.
+Qed.
+
+Theorem rngl_0_le_1 :
+  rngl_has_1 = true →
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  (0 ≤ 1)%L.
+Proof.
+intros Hon Hop Hor.
+destruct (rngl_le_dec Hor 0%L 1%L) as [| H1]; [ easy | ].
+apply (rngl_not_le Hor) in H1.
+destruct H1 as (H1, H2).
+specialize (rngl_mul_nonpos_nonpos Hop Hor) as H3.
+specialize (H3 1 1 H2 H2)%L.
+now rewrite (rngl_mul_1_l Hon) in H3.
+Qed.
+
 Theorem rngl_square_ge_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
   ∀ a, (0 ≤ a * a)%L.
 Proof.
 intros * Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
 destruct (rngl_le_dec Hor 0%L a) as [Hap| Han]. {
-  specialize rngl_opt_mul_le_compat_nonneg as H2.
-  rewrite Hor, Hop in H2; cbn in H2.
-  specialize (H2 0%L 0%L a a).
-  rewrite (rngl_mul_0_l Hos) in H2.
-  apply H2. {
-    split; [ apply (rngl_le_refl Hor) | easy ].
-  } {
-    split; [ apply (rngl_le_refl Hor) | easy ].
-  }
-}
-apply (rngl_not_le Hor) in Han.
-destruct Han as (Haz, Han).
-specialize rngl_opt_mul_le_compat_nonpos as H2.
-rewrite Hor, Hop in H2; cbn in H2.
-specialize (H2 0%L 0%L a a).
-rewrite (rngl_mul_0_l Hos) in H2.
-apply H2. {
-  split; [ easy | apply (rngl_le_refl Hor) ].
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
-  split; [ easy | apply (rngl_le_refl Hor) ].
+  apply (rngl_not_le Hor) in Han.
+  now apply (rngl_mul_nonpos_nonpos Hop Hor).
 }
 Qed.
 
