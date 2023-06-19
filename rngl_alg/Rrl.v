@@ -1137,13 +1137,24 @@ destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
           apply (rngl_opp_le_compat Hop Hor) in Hy.
           rewrite (rngl_opp_0 Hop) in Hy.
 Theorem rngl_inv_le_0_compat {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   ∀ a, (0 ≤ a → 0 ≤ a⁻¹)%L.
 Proof.
-intros * Hza.
+intros * Hop Hor * Hza.
+Search rngl_inv.
 ...
+Check rngl_mul_le_compat_nonneg.
+specialize (rngl_mul_le_compat_nonneg Hor Hop 0 (a⁻¹) 1 (a⁻¹))%L as H1.
+...
+About rngl_inv_neq_0.
+Check rngl_mul_move_1_r.
 (*
 Check rngl_inv_le_0_compat.
 *)
+Require Import Rational.
+Import Q.Notations.
+Search Q.inv.
 Require Import QArith.
 Search (_ <= / _)%Q.
 Print Qinv_le_0_compat.
