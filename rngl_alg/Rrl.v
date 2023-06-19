@@ -1136,12 +1136,24 @@ destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
           rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
           apply (rngl_opp_le_compat Hop Hor) in Hy.
           rewrite (rngl_opp_0 Hop) in Hy.
-Theorem rngl_inv_le_0_compat {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem rngl_inv_lt_0_compat {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ a, (0 ≤ a → 0 ≤ a⁻¹)%L.
+  ∀ a, (a ≠ 0 → 0 ≤ a → 0 ≤ a⁻¹)%L.
 Proof.
-intros * Hop Hor * Hza.
+intros * Hon Hop Hiv Hor * Haz Hza.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+rewrite <- (rngl_mul_inv_l Hon Hiv a Haz) in H1.
+destruct (rngl_le_dec Hor 0 a⁻¹)%L as [H2| H2]; [ easy | ].
+apply (rngl_not_le Hor) in H2.
+destruct H2 as (H2, H3).
+specialize (rngl_mul_nonneg_nonpos Hop Hor) as H4.
+specialize (H4 _ _ Hza H3).
+Check rngl_not_le.
+...
+About rngl_squ_opp_1.
 Search rngl_inv.
 Check rngl_mul_nonneg_nonneg.
 ...
