@@ -1124,9 +1124,9 @@ assert (Hiq : rngl_has_inv_and_1_or_quot = true). {
 progress unfold rngl_abs.
 progress unfold rngl_le_dec'.
 destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
-destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
-  destruct (rngl_le_dec _ y _) as [Hy| Hy]. {
-    destruct (rngl_le_dec _ _ _) as [Hxy| Hxy]. {
+destruct (rngl_le_dec _ x 0)%L as [Hx| Hx]. {
+  destruct (rngl_le_dec _ y 0)%L as [Hy| Hy]. {
+    destruct (rngl_le_dec _ (x / y) 0)%L as [Hxy| Hxy]. {
       clear H.
       progress unfold rngl_div in Hxy.
       rewrite Hiv in Hxy.
@@ -1177,21 +1177,26 @@ destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
         exfalso; revert H2.
         now apply (rngl_inv_neq_0 Hon Hos Hiv).
       }
+    } {
+      clear H.
+      unfold rngl_div.
+      rewrite Hiv.
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite <- (rngl_mul_opp_r Hop).
+      f_equal.
+      rewrite (rngl_opp_inv Hon Hop Hiv). 2: {
+        intros H.
+        apply (f_equal rngl_opp) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        now rewrite (rngl_opp_involutive Hop) in H.
+      }
+      now rewrite (rngl_opp_involutive Hop).
     }
-    clear H.
-    unfold rngl_div.
-    rewrite Hiv.
-    rewrite (rngl_mul_opp_l Hop).
-    rewrite <- (rngl_mul_opp_r Hop).
-    f_equal.
-    rewrite (rngl_opp_inv Hon Hop Hiv). 2: {
-      intros H.
-      apply (f_equal rngl_opp) in H.
-      rewrite (rngl_opp_0 Hop) in H.
-      now rewrite (rngl_opp_involutive Hop) in H.
-    }
-    now rewrite (rngl_opp_involutive Hop).
-  }
+  } {
+    destruct (rngl_le_dec _ (x / y) 0)%L as [Hxy| Hxy]. {
+      clear H.
+      apply (rngl_not_le Hor) in Hy.
+      destruct Hy as (_, Hy).
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.
