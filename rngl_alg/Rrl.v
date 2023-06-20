@@ -1214,18 +1214,38 @@ destruct (Sumbool.sumbool_of_bool (x ≤? _)%L) as [Hx| Hx]. {
     }
   }
 }
+apply rngl_leb_nle in Hx.
+apply (rngl_not_le Hor) in Hx.
+destruct Hx as (Hxz, Hx).
 destruct (Sumbool.sumbool_of_bool (y ≤? _)%L) as [Hy| Hy]. {
-  apply rngl_leb_nle in Hx.
-  apply (rngl_not_le Hor) in Hx.
-  destruct Hx as (Hxz, Hx).
   apply rngl_leb_le in Hy.
   destruct (Sumbool.sumbool_of_bool (x / y ≤? _)%L) as [Hxy| Hxy]. {
     apply rngl_leb_le in Hxy.
-    progress unfold rngl_div in Hxy.
-    rewrite Hiv in Hxy.
-...
-      unfold rngl_div.
-      specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Hy Hx) as H1.
+    progress unfold rngl_div.
+    rewrite Hiv.
+    rewrite <- (rngl_mul_opp_r Hop).
+    f_equal.
+    now apply (rngl_opp_inv Hon Hop Hiv).
+  } {
+    apply rngl_leb_nle in Hxy.
+    exfalso; apply Hxy; clear Hxy.
+    progress unfold rngl_div.
+    rewrite Hiv.
+    apply (rngl_mul_nonneg_nonpos Hop Hor _ _ Hx).
+    apply (rngl_lt_le_incl Hor).
+    apply (rngl_inv_lt_0_compat Hon Hop Hiv Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ easy | congruence ].
+  }
+}
+apply rngl_leb_nle in Hy.
+apply (rngl_not_le Hor) in Hy.
+destruct Hy as (_, Hy).
+destruct (Sumbool.sumbool_of_bool (x / y ≤? _)%L) as [Hxy| Hxy]. {
+  apply rngl_leb_le in Hxy.
+  unfold rngl_div in Hxy.
+  rewrite Hiv in Hxy.
+  specialize (rngl_mul_nonneg_nonneg Hop Hor _ _ Hx Hy) as H1.
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.
