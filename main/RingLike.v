@@ -1988,6 +1988,35 @@ split; intros Hxy. {
 }
 Qed.
 
+Theorem rngl_opp_lt_compat :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ x y, (x < y ↔ - y < - x)%L.
+Proof.
+intros * Hop Hor *.
+split; intros Hxy. {
+  apply (rngl_lt_iff Hor) in Hxy.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_opp_le_compat Hop Hor).
+    now do 2 rewrite (rngl_opp_involutive Hop).
+  } {
+    intros H; symmetry in H.
+    apply (f_equal rngl_opp) in H.
+    now do 2 rewrite (rngl_opp_involutive Hop) in H.
+  }
+} {
+  apply (rngl_lt_iff Hor) in Hxy.
+  apply (rngl_lt_iff Hor).
+  split. {
+    now apply (rngl_opp_le_compat Hop Hor).
+  } {
+    intros H; symmetry in H.
+    now apply (f_equal rngl_opp) in H.
+  }
+}
+Qed.
+
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem eq_rngl_of_nat_0 :
@@ -2200,6 +2229,32 @@ rewrite (rngl_opp_involutive Hop) in H1.
 now rewrite (rngl_opp_0 Hop) in H1.
 Qed.
 
+Theorem rngl_mul_nonpos_nonneg :
+  rngl_has_opp = true →
+  rngl_is_ordered = true →
+  ∀ a b, (a ≤ 0 → 0 ≤ b → a * b ≤ 0)%L.
+Proof.
+intros * Hop Hor * Ha Hb.
+assert (Hos : rngl_has_opp_or_subt = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (H1 0 0 (- a) b)%L.
+assert (H : (0 ≤ 0 ≤ - a)%L). {
+  split; [ apply (rngl_le_refl Hor) | ].
+  apply (rngl_opp_le_compat Hop Hor) in Ha.
+  now rewrite (rngl_opp_0 Hop) in Ha.
+}
+specialize (H1 H); clear H.
+assert (H : (0 ≤ 0 ≤ b)%L) by now split; [ apply (rngl_le_refl Hor) | ].
+specialize (H1 H); clear H.
+rewrite (rngl_mul_0_l Hos) in H1.
+rewrite (rngl_mul_opp_l Hop) in H1.
+apply (rngl_opp_le_compat Hop Hor) in H1.
+rewrite (rngl_opp_involutive Hop) in H1.
+now rewrite (rngl_opp_0 Hop) in H1.
+Qed.
+
 Theorem rngl_0_le_1 :
   rngl_has_1 = true →
   rngl_has_opp = true →
@@ -2215,7 +2270,7 @@ specialize (H3 1 1 H2 H2)%L.
 now rewrite (rngl_mul_1_l Hon) in H3.
 Qed.
 
-Theorem rngl_inv_lt_0_compat :
+Theorem rngl_0_lt_inv_compat :
   rngl_has_1 = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2252,6 +2307,25 @@ clear H4 H5.
 apply (rngl_1_eq_0_iff Hon Hos) in H6.
 specialize (rngl_characteristic_1 Hon Hos H6) as H4.
 exfalso; apply Haz, H4.
+Qed.
+
+Theorem rngl_inv_lt_0_compat :
+  rngl_has_1 = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_ordered = true →
+  ∀ a, (a < 0 → a⁻¹ < 0)%L.
+Proof.
+intros * Hon Hop Hiv Hor.
+intros * Hza.
+specialize (rngl_0_lt_inv_compat Hon Hop Hiv Hor) as H2.
+specialize (H2 (- a))%L.
+apply (rngl_opp_lt_compat Hop Hor).
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_opp_inv Hon Hop Hiv); [ | now apply rngl_lt_iff ].
+apply H2.
+apply (rngl_opp_lt_compat Hop Hor) in Hza.
+now rewrite (rngl_opp_0 Hop) in Hza.
 Qed.
 
 Theorem rngl_lt_le_incl :
