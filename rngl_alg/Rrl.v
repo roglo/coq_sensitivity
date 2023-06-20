@@ -1109,10 +1109,18 @@ apply (rngl_abs_le Hop Hor).
 Theorem rngl_abs_div {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
-intros * Hon Hop Hor * Hyz.
+intros * Hon Hop Hiv Heb Hor * Hyz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_and_1_or_quot = true). {
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 progress unfold rngl_abs.
 progress unfold rngl_le_dec'.
 destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
@@ -1121,22 +1129,69 @@ destruct (rngl_le_dec _ x _) as [Hx| Hx]. {
     destruct (rngl_le_dec _ _ _) as [Hxy| Hxy]. {
       clear H.
       progress unfold rngl_div in Hxy.
-      remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
-      destruct iv. {
-        specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
-        specialize (H1 0 0 x y⁻¹)%L.
-        assert (H : (x ≤ 0 ≤ 0)%L). {
-          split; [ easy | apply (rngl_le_refl Hor) ].
-        }
-        specialize (H1 H); clear H.
-        assert (H : (y⁻¹ ≤ 0 ≤ 0)%L). {
-          split; [ | apply (rngl_le_refl Hor) ].
-          apply (rngl_opp_le_compat Hop Hor).
-          rewrite (rngl_opp_0 Hop).
-          rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
-          apply (rngl_opp_le_compat Hop Hor) in Hy.
-          rewrite (rngl_opp_0 Hop) in Hy.
-          specialize (rngl_inv_lt_0_compat Hon Hop Hiv Hor) as H2.
+      rewrite Hiv in Hxy.
+      specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
+      specialize (H1 0 0 x y⁻¹)%L.
+      assert (H : (x ≤ 0 ≤ 0)%L). {
+        split; [ easy | apply (rngl_le_refl Hor) ].
+      }
+      specialize (H1 H); clear H.
+      assert (H : (y⁻¹ ≤ 0 ≤ 0)%L). {
+        split; [ | apply (rngl_le_refl Hor) ].
+        apply (rngl_opp_le_compat Hop Hor).
+        rewrite (rngl_opp_0 Hop).
+        rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
+        apply (rngl_opp_le_compat Hop Hor) in Hy.
+        rewrite (rngl_opp_0 Hop) in Hy.
+        specialize (rngl_inv_lt_0_compat Hon Hop Hiv Hor) as H2.
+        apply (rngl_lt_le_incl Hor).
+        apply H2.
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H.
+        apply (f_equal rngl_opp) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        rewrite (rngl_opp_involutive Hop) in H.
+        now symmetry in H.
+      }
+      specialize (H1 H); clear H.
+      rewrite (rngl_mul_0_l Hos) in H1.
+      specialize (rngl_opt_le_antisymm) as H2.
+      rewrite Hor in H2.
+      specialize (H2 _ _ Hxy H1).
+      apply (rngl_integral Hos) in H2. 2: {
+        apply Bool.orb_true_iff; right.
+        now apply Bool.andb_true_iff.
+      }
+      destruct H2 as [H2| H2]. {
+        subst x.
+        rewrite (rngl_div_0_l Hos Hiq _ Hyz).
+        rewrite (rngl_opp_0 Hop).
+        symmetry.
+        apply (rngl_div_0_l Hos Hiq).
+        intros H.
+        apply (f_equal rngl_opp) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        now rewrite (rngl_opp_involutive Hop) in H.
+      } {
+        exfalso; revert H2.
+        now apply (rngl_inv_neq_0 Hon Hos Hiv).
+      }
+    }
+    clear H.
+    unfold rngl_div.
+    rewrite Hiv.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite <- (rngl_mul_opp_r Hop).
+    f_equal.
+    rewrite (rngl_opp_inv Hon Hop Hiv). 2: {
+      intros H.
+      apply (f_equal rngl_opp) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      now rewrite (rngl_opp_involutive Hop) in H.
+    }
+    now rewrite (rngl_opp_involutive Hop).
+  }
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.

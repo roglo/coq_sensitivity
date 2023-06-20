@@ -2216,6 +2216,14 @@ specialize (rngl_characteristic_1 Hon Hos H6) as H4.
 exfalso; apply Haz, H4.
 Qed.
 
+Theorem rngl_lt_le_incl :
+  rngl_is_ordered = true →
+  ∀ a b, (a < b → a ≤ b)%L.
+Proof.
+intros Hor * Hab.
+now apply (rngl_lt_iff Hor) in Hab.
+Qed.
+
 Theorem rngl_square_ge_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
