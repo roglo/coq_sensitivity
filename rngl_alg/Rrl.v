@@ -1123,12 +1123,13 @@ assert (Hiq : rngl_has_inv_and_1_or_quot = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 progress unfold rngl_abs.
-progress unfold rngl_le_dec'.
-destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
-destruct (rngl_le_dec _ x 0)%L as [Hx| Hx]. {
-  destruct (rngl_le_dec _ y 0)%L as [Hy| Hy]. {
-    destruct (rngl_le_dec _ (x / y) 0)%L as [Hxy| Hxy]. {
-      clear H.
+do 3 rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool (x ≤? _)%L) as [Hx| Hx]. {
+  apply rngl_leb_le in Hx.
+  destruct (Sumbool.sumbool_of_bool (y ≤? _)%L) as [Hy| Hy]. {
+    apply rngl_leb_le in Hy.
+    destruct (Sumbool.sumbool_of_bool (x / y ≤? _)%L) as [Hxy| Hxy]. {
+      apply rngl_leb_le in Hxy.
       progress unfold rngl_div in Hxy.
       rewrite Hiv in Hxy.
       specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
@@ -1179,7 +1180,6 @@ destruct (rngl_le_dec _ x 0)%L as [Hx| Hx]. {
         now apply (rngl_inv_neq_0 Hon Hos Hiv).
       }
     } {
-      clear H.
       unfold rngl_div.
       rewrite Hiv.
       rewrite (rngl_mul_opp_l Hop).
@@ -1194,10 +1194,23 @@ destruct (rngl_le_dec _ x 0)%L as [Hx| Hx]. {
       now rewrite (rngl_opp_involutive Hop).
     }
   } {
-    destruct (rngl_le_dec _ (x / y) 0)%L as [Hxy| Hxy]. {
-      clear H.
-      apply (rngl_not_le Hor) in Hy.
-      destruct Hy as (_, Hy).
+    apply rngl_leb_nle in Hy.
+    apply (rngl_not_le Hor) in Hy.
+    destruct Hy as (_, Hy).
+    destruct (Sumbool.sumbool_of_bool (x / y ≤? _)%L) as [Hxy| Hxy]. {
+      apply rngl_leb_le in Hxy.
+      progress unfold rngl_div.
+      rewrite Hiv.
+      now rewrite (rngl_mul_opp_l Hop).
+    } {
+      apply rngl_leb_nle in Hxy.
+      exfalso; apply Hxy; clear Hxy.
+      progress unfold rngl_div.
+      rewrite Hiv.
+Search (0 ≤ _⁻¹)%L.
+...
+      unfold rngl_div.
+      specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Hy Hx) as H1.
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.
