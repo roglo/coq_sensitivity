@@ -1145,29 +1145,8 @@ destruct (Sumbool.sumbool_of_bool (x ≤? _)%L) as [Hx| Hx]. {
         rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
         apply (rngl_opp_le_compat Hop Hor) in Hy.
         rewrite (rngl_opp_0 Hop) in Hy.
-Search (0 ≤ _⁻¹)%L.
-Search (0 < _⁻¹)%L.
-...
-        apply rngl_0_lt_inv_compat.
-...
-        specialize (rngl_inv_lt_0_compat Hon Hop Hiv Hor) as H2.
-clear - rp Hon Hop Hiv Hor Hos Hyz Hy.
-Search (0 < _⁻¹)%L.
-About rngl_inv_lt_0_compat.
-...
-Search (_⁻¹ < 0)%L.
-Search (_⁻¹ ≠ 0)%L.
-(*
-specialize (rngl_inv_neq_0 Hon Hos Hiv _ Hyz) as Hy'.
-*)
-        apply (rngl_opp_le_compat Hop Hor).
-        rewrite (rngl_opp_0 Hop).
-        rewrite (rngl_opp_inv Hon Hop Hiv _ Hyz).
-        apply (rngl_opp_le_compat Hop Hor) in Hy.
-        rewrite (rngl_opp_0 Hop) in Hy.
-        specialize (rngl_inv_lt_0_compat Hon Hop Hiv Hor) as H2.
         apply (rngl_lt_le_incl Hor).
-        apply H2.
+        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
         apply (rngl_lt_iff Hor).
         split; [ easy | ].
         intros H.
@@ -1228,7 +1207,22 @@ specialize (rngl_inv_neq_0 Hon Hos Hiv _ Hyz) as Hy'.
       progress unfold rngl_div.
       rewrite Hiv.
       apply (rngl_mul_nonpos_nonneg Hop Hor _ _ Hx).
-Search (0 ≤ _⁻¹)%L.
+      apply (rngl_lt_le_incl Hor).
+      apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ easy | congruence ].
+    }
+  }
+}
+destruct (Sumbool.sumbool_of_bool (y ≤? _)%L) as [Hy| Hy]. {
+  apply rngl_leb_nle in Hx.
+  apply (rngl_not_le Hor) in Hx.
+  destruct Hx as (Hxz, Hx).
+  apply rngl_leb_le in Hy.
+  destruct (Sumbool.sumbool_of_bool (x / y ≤? _)%L) as [Hxy| Hxy]. {
+    apply rngl_leb_le in Hxy.
+    progress unfold rngl_div in Hxy.
+    rewrite Hiv in Hxy.
 ...
       unfold rngl_div.
       specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Hy Hx) as H1.
