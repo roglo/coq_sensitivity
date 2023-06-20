@@ -95,15 +95,20 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
+(*
 Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   (x y : T) :=
   match Bool.bool_dec rngl_is_ordered true with
   | left Hde => if rngl_le_dec Hde x y then true else false
   | right _ => false
   end.
+*)
 
 Definition rngl_abs {T} {ro : ring_like_op T} {rp : ring_like_prop T} x :=
+  if rngl_leb x 0%L then (- x)%L else x.
+(*
   if rngl_le_dec' x 0%L then (- x)%L else x.
+*)
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
@@ -152,16 +157,17 @@ Theorem rngl_abs_le {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 Proof.
 intros * Hop Hor *.
 progress unfold rngl_abs.
-progress unfold rngl_le_dec'.
-destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
 split. {
   intros (Hxy, Hyx).
-  destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]; [ | easy ].
+  rewrite if_bool_if_dec.
+  destruct (Sumbool.sumbool_of_bool _) as [Hyz| ]; [ | easy ].
   apply (rngl_opp_le_compat Hop Hor).
   now rewrite (rngl_opp_involutive Hop).
 } {
   intros Hyx.
-  destruct (rngl_le_dec H1 y 0%L) as [Hyz| Hyz]. {
+  rewrite if_bool_if_dec in Hyx.
+  destruct (Sumbool.sumbool_of_bool _) as [Hyz| Hyz]. {
+    apply rngl_leb_le in Hyz.
     split. {
       apply (rngl_opp_le_compat Hop Hor) in Hyx.
       now rewrite (rngl_opp_involutive Hop) in Hyx.
@@ -175,6 +181,7 @@ split. {
     }
   }
   split; [ | easy ].
+  apply rngl_leb_nle in Hyz.
   apply (rngl_not_le Hor) in Hyz.
   destruct Hyz as (Hyz, Hzy).
   apply (rngl_le_trans Hor _ 0%L); [ | easy ].
@@ -956,14 +963,9 @@ destruct (rngl_eq_dec Heb x 0%L) as [Hxz| Hxz]. {
   subst x.
   progress unfold rngl_squ.
   progress unfold rngl_abs.
-  progress unfold rngl_le_dec'.
-  destruct (Bool.bool_dec _ _) as [H1| H1]; [ | easy ].
-  destruct (rngl_le_dec _ _ _) as [H2| H2]. 2: {
-    exfalso; apply H2.
-    apply (rngl_le_refl Hor).
-  }
   rewrite (rngl_mul_0_l Hos).
   rewrite (rngl_eqb_refl Heb).
+  rewrite (rngl_leb_refl Hor).
   symmetry; apply (rngl_opp_0 Hop).
 }
 assert (H2z : (1 + 1)%L ≠ 0%L). {
@@ -1003,10 +1005,9 @@ apply (rngl_eqb_neq Heb) in H3.
 progress unfold rl_pow.
 progress unfold rngl_squ.
 progress unfold rngl_abs.
-progress unfold rngl_le_dec'.
-destruct (Bool.bool_dec _ _) as [H| H]; [ | easy ].
-destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
-  clear H.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool _) as [H1| H1]. {
+  apply rngl_leb_le in H1.
   assert (Hxl : (x < 0)%L). {
     specialize rngl_opt_le_antisymm as H2.
     rewrite Hor in H2.
@@ -1050,7 +1051,7 @@ destruct (rngl_le_dec H x 0%L) as [H1| H1]. {
   rewrite Htr in H2.
   now apply H2.
 }
-clear H.
+apply rngl_leb_nle in H1.
 apply (rngl_not_le Hor) in H1.
 destruct H1 as (_, H1).
 assert (Hxl : (0 < x)%L). {

@@ -216,6 +216,9 @@ intros H; apply H1; clear H1.
 now injection H.
 Qed.
 
+Theorem Bool_not_true_iff_false : ∀ b : bool, b ≠ true ↔ b = false.
+Proof. now intros; destruct b. Qed.
+
 (**)
 
 Definition rngl_has_eqb {T} {R : ring_like_op T} :=
@@ -562,6 +565,41 @@ Proof.
 intros Heq *.
 remember (rngl_eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now left; apply rngl_eqb_eq | now right; apply rngl_eqb_neq ].
+Qed.
+
+Theorem rngl_leb_le :
+  ∀ a b, (a ≤? b)%L = true ↔ (a ≤ b)%L.
+Proof.
+intros.
+progress unfold rngl_leb.
+progress unfold rngl_le.
+now split; intros Hab; destruct rngl_opt_leb.
+Qed.
+
+Theorem rngl_leb_nle :
+  ∀ a b, (a ≤? b)%L = false ↔ ¬ (a ≤ b)%L.
+Proof.
+intros.
+progress unfold rngl_leb.
+progress unfold rngl_le.
+split; intros Hab. {
+  apply Bool_not_true_iff_false in Hab.
+  now destruct rngl_opt_leb.
+} {
+  apply Bool_not_true_iff_false.
+  now destruct rngl_opt_leb.
+}
+Qed.
+
+Theorem rngl_leb_refl :
+  rngl_is_ordered = true →
+  ∀ a, (a ≤? a)%L = true.
+Proof.
+intros Hor *.
+apply rngl_leb_le.
+specialize rngl_opt_le_refl as H1.
+rewrite Hor in H1.
+apply H1.
 Qed.
 
 Theorem rngl_le_dec :
