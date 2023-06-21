@@ -127,7 +127,7 @@ Definition in_ordered_field :=
 Theorem eq_vect_squ_0 :
   rngl_has_opp = true →
   (rngl_is_integral_domain ||
-   rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+   rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
   rngl_is_ordered = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.

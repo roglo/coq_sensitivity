@@ -828,7 +828,7 @@ Theorem rl_exp_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_exp 0 = 1%L.
 Proof.
 intros * Hon Hiq Htr *.
-assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_or_quot_iff in Hiq.
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].
@@ -1864,7 +1864,6 @@ Arguments rngl_has_dec_le T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_has_inv T {R}.
-Arguments rngl_has_inv_and_1_or_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_is_integral T {ro ring_like_prop}.
 Arguments rngl_is_ordered T {R}.

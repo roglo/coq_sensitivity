@@ -74,7 +74,7 @@ Definition rngl_has_opp_or_subt T {R : ring_like_op T} :=
 Definition rngl_has_inv_or_quot T {R : ring_like_op T} :=
   bool_of_option rngl_opt_inv_or_quot.
 
-Definition rngl_has_inv_and_1_or_quot {T} {R : ring_like_op T} :=
+Definition rngl_has_inv_and_1_or_quot T {R : ring_like_op T} :=
   match rngl_opt_inv_or_quot with
   | Some (inl _) => rngl_has_1 T
   | Some (inr _) => true
@@ -168,7 +168,7 @@ now destruct inv_quot; [ left | right ].
 Qed.
 
 Theorem rngl_has_inv_and_1_or_quot_iff {T} {R : ring_like_op T} :
-  rngl_has_inv_and_1_or_quot = true
+  rngl_has_inv_and_1_or_quot T = true
   ↔ rngl_has_inv = true ∧ rngl_has_1 T = true ∨ rngl_has_quot = true.
 Proof.
 progress unfold rngl_has_inv_and_1_or_quot, bool_of_option.
@@ -959,7 +959,7 @@ destruct Hom; congruence.
 Qed.
 
 Theorem rngl_mul_div :
-  rngl_has_inv_and_1_or_quot = true →
+  rngl_has_inv_and_1_or_quot T = true →
   ∀ a b : T, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros Hii a b Hbz.
@@ -1040,7 +1040,7 @@ destruct Hom; congruence.
 Qed.
 
 Theorem rngl_mul_cancel_l :
-  rngl_has_inv_and_1_or_quot = true →
+  rngl_has_inv_and_1_or_quot T = true →
   ∀ a b c, a ≠ 0%L
   → (a * b = a * c)%L
   → b = c.
@@ -1277,7 +1277,7 @@ Qed.
 
 Theorem rngl_div_0_l :
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv_and_1_or_quot = true →
+  rngl_has_inv_and_1_or_quot T = true →
   ∀ a, a ≠ 0%L → (0 / a)%L = 0%L.
 Proof.
 intros Hos Hiv * Haz.
@@ -1310,7 +1310,7 @@ split. {
 } {
   intros Habcd.
   apply (f_equal (λ x, rngl_div x d)) in Habcd.
-  assert (Hiq : rngl_has_inv_and_1_or_quot = true). {
+  assert (Hiq : rngl_has_inv_and_1_or_quot T = true). {
     apply rngl_has_inv_and_1_or_quot_iff.
     now left; rewrite Hiv, Hon.
   }
@@ -1324,7 +1324,7 @@ Qed.
 
 Theorem rngl_eq_mul_0_l :
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
 Proof.
 intros Hos Hii * Hab Hbz.
@@ -1358,7 +1358,7 @@ Qed.
 
 Theorem rngl_eq_mul_0_r :
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
 Proof.
 intros Hos Hii * Hab Haz.
@@ -1399,7 +1399,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
-   rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+   rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
 intros Hmo Hdo * Hab.
@@ -1408,7 +1408,7 @@ destruct rngl_is_integral_domain; [ now apply rngl_integral | cbn in Hdo ].
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
-    remember rngl_has_inv_and_1_or_quot as iq eqn:Hiq.
+    remember (rngl_has_inv_and_1_or_quot T) as iq eqn:Hiq.
     symmetry in Hiq.
     destruct iq; [ cbn in Hdo | easy ].
     apply rngl_has_inv_and_1_or_quot_iff in Hiq.
@@ -1466,7 +1466,7 @@ split. {
 Qed.
 
 Theorem rngl_mul_cancel_r :
-  rngl_has_inv_and_1_or_quot = true →
+  rngl_has_inv_and_1_or_quot T = true →
   ∀ a b c, c ≠ 0%L
   → (a * c = b * c)%L
   → a = b.
@@ -1688,7 +1688,7 @@ Theorem rngl_div_1_r :
   ∀ a, (a / 1 = a)%L.
 Proof.
 intros Hon Hiq H10 *.
-assert (Hid : rngl_has_inv_and_1_or_quot = true). {
+assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_or_quot_iff in Hiq.
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].
@@ -1860,12 +1860,13 @@ intros Hon Hom Hiv * Haz Hbz.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
-assert (Hid : rngl_has_inv_and_1_or_quot = true). {
+assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 specialize (rngl_div_diag Hon Hiq) as div_diag.
 specialize (rngl_eq_mul_0_l Hom) as integral.
-assert (H : (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true). {
+assert
+  (H : (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true). {
   now rewrite Hid; destruct rngl_is_integral_domain.
 }
 specialize (integral H); clear H.
@@ -2078,7 +2079,7 @@ intros Hon Hop Hiv * Haz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-assert (Hid : rngl_has_inv_and_1_or_quot = true). {
+assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
@@ -2388,7 +2389,8 @@ Qed.
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool =
+  (rngl_is_integral_domain ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
@@ -2467,7 +2469,7 @@ intros * Hon Hop Hiv Heb Hor * Hyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-assert (Hiq : rngl_has_inv_and_1_or_quot = true). {
+assert (Hiq : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 progress unfold rngl_abs.

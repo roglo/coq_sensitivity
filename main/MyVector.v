@@ -161,7 +161,7 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_mul_scal_reg_r :
-  rngl_has_inv_and_1_or_quot = true →
+  rngl_has_inv_and_1_or_quot T = true →
   rngl_has_eqb = true →
   ∀ (V : vector T) a b,
   V ≠ vect_zero (vect_size V)

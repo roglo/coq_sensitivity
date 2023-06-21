@@ -2038,7 +2038,7 @@ Theorem cramer's_rule :
   vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hon Hop Hic Hiq Hch * Hsm Hum Hmz Hmuv k Hk.
-assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_or_quot_iff in Hiq.
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].

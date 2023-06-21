@@ -1786,7 +1786,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (μ * μ)%L = rngl_mul_nat 1 n.
 Proof.
 intros Hic Hop Heq Hin * Hvs Hvr Hav.
-assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.

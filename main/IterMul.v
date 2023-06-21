@@ -256,7 +256,7 @@ Qed.
 Theorem rngl_product_list_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
-   rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+   rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
   rngl_characteristic ≠ 1 →
   ∀ A (l : list A) f,
   (∏ (i ∈ l), f i)%L = 0%L
@@ -287,7 +287,7 @@ Qed.
 Theorem rngl_product_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
-     rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+     rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
   rngl_characteristic ≠ 1 →
   ∀ b e f,
   (∏ (i = b, e), f i = 0)%L
@@ -363,7 +363,7 @@ rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
   assert
     (Hit' :
        (rngl_is_integral_domain ||
-          rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true). {
+          rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true). {
     apply Bool.orb_true_iff in Hit.
     apply Bool.orb_true_iff.
     destruct Hit as [Hit| Hit]; [ now left | right ].
