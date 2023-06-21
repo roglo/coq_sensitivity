@@ -402,6 +402,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L
       else not_applicable }.
 
+Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 
 Definition rngl_abs {T} {ro : ring_like_op T} x :=
@@ -426,7 +427,7 @@ Context {rp : ring_like_prop T}.
 (* theorems *)
 
 Theorem rngl_mul_comm :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ a b, (a * b = b * a)%L.
 Proof.
 intros H1 *.
@@ -453,7 +454,7 @@ intros Hon *.
 specialize rngl_opt_mul_1_l as H1.
 specialize rngl_opt_mul_1_r as H2.
 rewrite Hon in H1, H2.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ | easy ].
 now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
@@ -463,7 +464,7 @@ Theorem rngl_mul_add_distr_r : ∀ x y z,
 Proof.
 intros x y z; simpl.
 specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
-remember rngl_mul_is_comm as ic eqn:Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic.
 symmetry in Hic.
 destruct ic. {
   rewrite rngl_mul_comm; [ | easy ].
@@ -505,7 +506,7 @@ intros Hon Hiv * Haz.
 specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
 unfold rngl_div in rngl_mul_inv_r.
 rewrite Hiv in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic. {
   rewrite (rngl_mul_comm Hic).
   now apply (rngl_mul_inv_l Hon Hiv).
@@ -800,7 +801,7 @@ rewrite H; reflexivity.
 Qed.
 
 Theorem rngl_mul_mul_swap :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ n m p, (n * m * p = n * p * m)%L.
 Proof.
 intros Hic n m p; simpl.
@@ -810,7 +811,7 @@ rewrite H; reflexivity.
 Qed.
 
 Theorem rngl_div_div_swap :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   ∀ a b c,
   (a / b / c = a / c / b)%L.
@@ -914,7 +915,7 @@ Proof.
 intros Hon Hiq * Haz.
 remember (rngl_has_inv T) as ai eqn:Hai; symmetry in Hai.
 destruct ai. {
-  remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+  remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
     unfold rngl_div; rewrite Hai.
     rewrite rngl_mul_comm; [ | easy ].
@@ -995,7 +996,7 @@ Qed.
 
 Theorem rngl_mul_div_r :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   ∀ a b : T,
   b ≠ 0%L
@@ -1066,7 +1067,7 @@ remember (rngl_has_quot T) as qu eqn:Hqu.
 symmetry in Hqu.
 destruct qu. {
   apply (f_equal (λ x, rngl_div x a)) in Habc.
-  remember rngl_mul_is_comm as ic eqn:Hic.
+  remember (rngl_mul_is_comm T) as ic eqn:Hic.
   symmetry in Hic.
   destruct ic. {
     do 2 rewrite (rngl_mul_comm Hic a) in Habc.
@@ -1280,7 +1281,7 @@ Qed.
 
 Theorem rngl_div_div_mul_mul :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   ∀ a b c d,
   b ≠ 0%L
@@ -1351,7 +1352,7 @@ Theorem rngl_eq_mul_0_r :
   ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
 Proof.
 intros Hos Hii * Hab Haz.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic. {
   rewrite (rngl_mul_comm Hic) in Hab.
   now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
@@ -2086,7 +2087,7 @@ assert (Hoaz : (- a)%L ≠ 0%L). {
 }
 apply (rngl_mul_cancel_l Hid (- a)%L); [ easy | ].
 specialize (rngl_opt_mul_inv_r) as H2.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 rewrite Hon, Hiv in H2; cbn in H2.
 rewrite rngl_mul_opp_opp; [ | easy ].
 destruct ic. {
@@ -2605,7 +2606,7 @@ Qed.
 
 Record in_charac_0_field :=
   { cf_has_1 : rngl_has_1 T = true;
-    cf_mul_is_comm : rngl_mul_is_comm = true;
+    cf_mul_is_comm : rngl_mul_is_comm T = true;
     cf_has_opp : rngl_has_opp T = true;
     cf_has_inv : rngl_has_inv T = true;
     cf_has_eqb : rngl_has_eqb = true;

@@ -1522,7 +1522,8 @@ Qed.
 
 (* optional multiplication commutativity *)
 
-Theorem lap_convol_mul_comm : rngl_mul_is_comm = true →
+Theorem lap_convol_mul_comm :
+  rngl_mul_is_comm T = true →
   ∀ l1 l2 i len,
   lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
 Proof.
@@ -1538,7 +1539,8 @@ rewrite Nat_sub_sub_distr; [ | easy ].
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-Theorem lap_mul_comm : rngl_mul_is_comm = true →
+Theorem lap_mul_comm :
+  rngl_mul_is_comm T = true →
   ∀ la lb, (la * lb)%lap = (lb * la)%lap.
 Proof.
 intros Hic la lb.
@@ -1550,10 +1552,10 @@ now rewrite lap_convol_mul_comm.
 Qed.
 
 Theorem lap_opt_mul_comm :
-  if rngl_mul_is_comm then ∀ a b : list T, (a * b)%lap = (b * a)%lap
+  if rngl_mul_is_comm T then ∀ a b : list T, (a * b)%lap = (b * a)%lap
   else not_applicable.
 Proof.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ | easy ].
 intros.
 apply (lap_mul_comm Hic).
@@ -1590,13 +1592,13 @@ Qed.
 
 Theorem lap_opt_mul_1_r : let rol := lap_ring_like_op in
   rngl_has_opp_or_subt T = true →
-  if rngl_mul_is_comm then not_applicable
+  if rngl_mul_is_comm T then not_applicable
   else
    if rngl_has_1 (list T) then ∀ la : list T, (la * 1)%L = la
    else not_applicable.
 Proof.
 intros * Hos.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ easy | ].
 remember (rngl_has_1 (list T)) as onl eqn:Honl; symmetry in Honl.
 destruct onl; [ | easy ].
@@ -1755,7 +1757,7 @@ Qed.
 
 Theorem lap_opt_mul_add_distr_r :
   rngl_has_opp_or_subt T = true →
-  if rngl_mul_is_comm then not_applicable
+  if rngl_mul_is_comm T then not_applicable
   else ∀ a b c, ((a + b) * c)%lap = (a * c + b * c)%lap.
 Proof.
 intros Hos.
@@ -2906,7 +2908,7 @@ Qed.
 Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
+  {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

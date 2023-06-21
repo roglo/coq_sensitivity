@@ -1578,7 +1578,7 @@ now rewrite List_map_seq_length, Nat.min_id.
 Qed.
 
 Theorem An_eigen_equation_for_sqrt_n :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eqb = true →
@@ -1775,7 +1775,7 @@ now rewrite mat_mul_scal_1_l.
 Qed.
 
 Theorem A_n_eigenvalue_squared_is_n :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_eqb = true →
   rngl_has_inv T = true →
@@ -1824,7 +1824,7 @@ Definition is_eigenvector_of_An n μ (V : vector T) :=
   vect_size V = 2 ^ n ∧ V ≠ vect_zero (2 ^ n) ∧ (mA n • V = μ × V)%V.
 
 Theorem μ_is_ev_of_An_iff_μ2_eq_n :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_eqb = true →
   rngl_has_inv T = true →

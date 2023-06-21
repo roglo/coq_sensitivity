@@ -1382,7 +1382,7 @@ Qed.
 
 Theorem rlap_quot_rem_step_Some :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ rla rlb rlr cq,
@@ -1522,7 +1522,7 @@ Qed.
 
 Theorem rlap_quot_rem_loop_prop :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ it (rla rlb rlq rlr : list T),
@@ -1665,7 +1665,7 @@ Qed.
 
 Theorem lap_quot_rem_prop :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ la lb lq lr : list T,
@@ -1950,7 +1950,7 @@ Qed.
 
 Theorem lap_mul_div :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ la lb,
@@ -2218,7 +2218,7 @@ Definition polyn_opt_opp_or_subt :
 
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match Sumbool.sumbool_of_bool rngl_mul_is_comm with
+  match Sumbool.sumbool_of_bool (rngl_mul_is_comm T) with
   | left Hco =>
       match Sumbool.sumbool_of_bool (rngl_has_opp T) with
       | left Hop =>
@@ -2373,10 +2373,10 @@ now rewrite lap_mul_add_distr_r.
 Qed.
 
 Theorem polyn_opt_mul_comm :
-  if rngl_mul_is_comm then ∀ a b : polyn T, (a * b)%pol = (b * a)%pol
+  if rngl_mul_is_comm T then ∀ a b : polyn T, (a * b)%pol = (b * a)%pol
   else not_applicable.
 Proof.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ | easy ].
 intros.
 apply eq_polyn_eq; cbn.
@@ -2384,7 +2384,7 @@ now rewrite (lap_mul_comm Hic).
 Qed.
 
 Theorem polyn_mul_comm :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ a b : polyn T, (a * b)%pol = (b * a)%pol.
 Proof.
 intros Hic *.
@@ -2419,7 +2419,7 @@ now destruct a.
 Qed.
 
 Theorem polyn_opt_mul_1_r :
-  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%pol = a.
+  if rngl_mul_is_comm T then not_applicable else ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 now apply polyn_mul_1_r.
@@ -2429,7 +2429,7 @@ Qed.
    is commutative *)
 
 Theorem polyn_opt_mul_add_distr_r :
-   if rngl_mul_is_comm then not_applicable
+   if rngl_mul_is_comm T then not_applicable
    else ∀ a b c : polyn T, ((a + b) * c)%pol = (a * c + b * c)%pol.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
@@ -2478,7 +2478,7 @@ Proof.
 intros.
 progress unfold rngl_has_inv; cbn.
 progress unfold polyn_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hic| Hic]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| Hop]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
@@ -2492,14 +2492,14 @@ Proof.
 intros.
 progress unfold rngl_has_inv; cbn.
 progress unfold polyn_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm); [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)); [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)); [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
 Theorem polyn_quot_rem_prop :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ pa pb pq pr : polyn T,
@@ -2552,7 +2552,7 @@ Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 
 Theorem polyn_mul_div :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   ∀ a b,
@@ -2590,7 +2590,7 @@ Proof.
 intros rop; subst rop.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hco| ]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| ]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)) as [Hiv| ]; [ | easy ].
 remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
@@ -2608,7 +2608,7 @@ Qed.
 
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
-  if (rngl_has_quot (polyn T) && negb rngl_mul_is_comm)%bool then
+  if (rngl_has_quot (polyn T) && negb (rngl_mul_is_comm T))%bool then
     ∀ a b, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
@@ -3211,7 +3211,7 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 (**)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
+  {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;

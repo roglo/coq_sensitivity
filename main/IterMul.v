@@ -187,7 +187,7 @@ now apply iter_seq_empty.
 Qed.
 
 Theorem rngl_product_list_mul_distr :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ A g h (l : list A),
   (∏ (i ∈ l), (g i * h i) =
   (∏ (i ∈ l), g i) * ∏ (i ∈ l), h i)%L.
@@ -203,7 +203,7 @@ apply iter_list_distr. {
 Qed.
 
 Theorem rngl_product_mul_distr :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ g h b k,
   (∏ (i = b, k), (g i * h i) =
   (∏ (i = b, k), g i) * ∏ (i = b, k), h i)%L.
@@ -303,7 +303,7 @@ Qed.
 
 Theorem rngl_product_list_permut : ∀ {A} {eqb : A → _},
   equality eqb →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ (la lb : list A) f,
   permutation eqb la lb
   → ∏ (i ∈ la), f i = ∏ (i ∈ lb), f i.
@@ -437,7 +437,7 @@ Qed.
 Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   equality eqb →
   rngl_has_opp_or_subt T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
@@ -453,7 +453,7 @@ Qed.
 
 Theorem rngl_inv_product_comm :
   rngl_has_opp_or_subt T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
@@ -470,7 +470,7 @@ Qed.
 
 Theorem rngl_product_div_distr :
   rngl_has_opp_or_subt T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →

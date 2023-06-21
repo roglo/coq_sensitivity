@@ -205,18 +205,18 @@ Theorem I_mul_add_distr_l : let roi := I_ring_like_op in
 Proof. intros; apply eq_ideal_eq, rngl_mul_add_distr_l. Qed.
 
 Theorem I_opt_mul_comm : let roi := I_ring_like_op in
-  if rngl_mul_is_comm then ∀ a b : ideal P, (a * b)%L = (b * a)%L
+  if rngl_mul_is_comm T then ∀ a b : ideal P, (a * b)%L = (b * a)%L
   else not_applicable.
 Proof.
 intros.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ | easy ].
 intros; apply eq_ideal_eq; cbn.
 now apply rngl_mul_comm.
 Qed.
 
 Theorem I_opt_mul_1_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm then not_applicable
+  if rngl_mul_is_comm T then not_applicable
   else if rngl_has_1 (ideal P) then ∀ a : ideal P, (a * 1)%L = a
   else not_applicable.
 Proof.
@@ -253,7 +253,7 @@ easy.
 Qed.
 
 Theorem I_opt_mul_add_distr_r : let roi := I_ring_like_op in
-  if rngl_mul_is_comm then not_applicable
+  if rngl_mul_is_comm T then not_applicable
   else ∀ a b c : ideal P, ((a + b) * c)%L = (a * c + b * c)%L.
 Proof.
 intros.
@@ -672,7 +672,7 @@ now apply neq_ideal_neq in H1.
 Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
-  {| rngl_mul_is_comm := rngl_mul_is_comm;
+  {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;

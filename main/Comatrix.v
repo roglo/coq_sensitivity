@@ -518,7 +518,7 @@ Qed.
 
 Theorem determinant_circular_shift_rows :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ (M : matrix T) i,
   i < mat_nrows M
@@ -654,7 +654,7 @@ Qed.
 
 Theorem determinant_subm_mat_swap_rows_0_i :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ (M : matrix T) i j,
   is_square_matrix M = true
@@ -690,7 +690,7 @@ Qed.
 Theorem laplace_formula_on_rows :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -897,7 +897,7 @@ Qed.
 
 Theorem comatrix_transpose :
   rngl_has_1 T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_characteristic T ≠ 1 →
   ∀ M,
@@ -951,7 +951,7 @@ Qed.
 Theorem laplace_formula_on_cols :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T ≠ 1 →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
@@ -1013,7 +1013,7 @@ determinant_with_bad_row
 Theorem determinant_with_row :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ i (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1075,7 +1075,7 @@ Qed.
 Theorem determinant_with_bad_row :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic _ = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ i k (M : matrix T),
@@ -1245,7 +1245,7 @@ Qed.
 Theorem matrix_comatrix_transp_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
@@ -1435,7 +1435,7 @@ Qed.
 Theorem comatrix_transp_matrix_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
@@ -1847,7 +1847,7 @@ Qed.
 Theorem det_mat_repl_vect :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T ≠ 1 →
   ∀ M V,
   is_square_matrix M = true
@@ -1971,7 +1971,7 @@ Qed.
 Theorem cramer's_rule_by_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [M : matrix T] [U V : vector T],
@@ -2026,7 +2026,7 @@ Qed.
 Theorem cramer's_rule :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_inv_or_quot T = true →
   rngl_characteristic T = 0 →
   ∀ (M : matrix T) (U V : vector T),

@@ -704,7 +704,7 @@ Qed.
 (* multilinearity *)
 
 Theorem determinant_multilinear :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
@@ -1123,7 +1123,7 @@ now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
 Theorem determinant_alternating :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ (M : matrix T) p q,
   p ≠ q
@@ -1480,7 +1480,7 @@ now rewrite Hc.
 Qed.
 
 Theorem determinant_same_rows :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
@@ -1711,7 +1711,7 @@ now apply rngl_summation_add_distr.
 Qed.
 
 Theorem rngl_product_map_permut :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
    ∀ n f σ,
   permut_seq_with_len n σ
   → ∏ (i ∈ map (λ i, nth i σ 0) (seq 0 n)), f i = ∏ (i = 1, n), f (i - 1)%nat.
@@ -1861,7 +1861,7 @@ Qed.
 
 Theorem det_any_permut_l :
   let ron := nat_ring_like_op in
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   @rngl_has_opp T ro = true →
   rngl_characteristic T ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
@@ -2085,7 +2085,7 @@ Qed.
 
 Theorem det_any_permut_r :
   let ron := nat_ring_like_op in
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   @rngl_has_opp T ro = true →
   rngl_characteristic T ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
@@ -2333,7 +2333,7 @@ split. {
 Qed.
 
 Theorem determinant_transpose :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_characteristic T ≠ 1 →
   ∀ (M : matrix T),
@@ -2383,7 +2383,7 @@ now do 2 rewrite Nat.add_1_r.
 Qed.
 
 Theorem det_subm_transp :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_characteristic T ≠ 1 →
   ∀ i j (M : matrix T),

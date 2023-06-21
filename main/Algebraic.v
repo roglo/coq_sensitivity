@@ -118,7 +118,7 @@ Qed.
 
 Theorem lap_x_power_has_polyn_prop :
   rngl_has_1 T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   rngl_has_eqb = true →
   ∀ n, has_polyn_prop (lap_x_power n) = true.
 Proof.
@@ -140,7 +140,7 @@ Qed.
 
 Theorem lap_norm_x_power :
   rngl_has_1 T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   rngl_has_eqb = true →
   ∀ n, lap_norm (lap_x_power n) = lap_x_power n.
 Proof.
@@ -156,7 +156,7 @@ Theorem polyn_x_power_add :
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
 intros Hon Hos Heb *.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   apply eq_polyn_eq.
   apply (eq_list_eq 0%L). 2: {
@@ -182,7 +182,7 @@ Theorem lap_norm_mul_x_power_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   rngl_has_inv T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   rngl_has_eqb = true →
   ∀ la n,
   lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
@@ -279,7 +279,6 @@ Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
-Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 
 Theorem polyn_of_const_rngl_summation :
   rngl_has_1 T = true →

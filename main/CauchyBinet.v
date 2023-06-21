@@ -652,7 +652,7 @@ Qed.
 Theorem det_isort_rows_with_dup :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
@@ -729,7 +729,7 @@ Qed.
 Theorem det_isort_rows_no_dup :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T ≠ 1 →
   ∀ A kl,
   is_correct_matrix A = true
@@ -1057,7 +1057,7 @@ Qed.
 Theorem det_isort_rows :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
@@ -1618,7 +1618,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ [m n A B], m ≠ 0 →
   ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
@@ -1768,7 +1768,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_4 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [m n] [B] f, m ≠ 0 →
@@ -2073,7 +2073,7 @@ Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hon : rngl_has_1 T = true) by now destruct Hif.
 assert (Hop : rngl_has_opp T = true) by now destruct Hif.
-assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
+assert (Hic : rngl_mul_is_comm T = true) by now destruct Hif.
 assert (Hch : rngl_characteristic T = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
 assert

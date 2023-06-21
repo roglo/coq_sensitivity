@@ -199,7 +199,7 @@ Proof. now intros; cbn; rewrite map_length. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_has_opp_or_subt T = true →
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%L.
 Proof.
@@ -290,7 +290,7 @@ apply IHla.
 Qed.
 
 Theorem vect_dot_mul_comm :
-  rngl_mul_is_comm = true →
+  rngl_mul_is_comm T = true →
   ∀ u v, ≺ u , v ≻ = ≺ v , u ≻.
 Proof.
 intros Hic *.
