@@ -235,7 +235,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]. {
 Qed.
 
 Theorem polyn_of_const_mul :
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ (Hos : rngl_has_opp_or_subt T = true),
   ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
@@ -277,7 +277,6 @@ Arguments in_charac_0_field T {ro rp}.
 Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
 Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
-Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Theorem polyn_of_const_rngl_summation :
   rngl_has_1 T = true →

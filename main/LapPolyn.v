@@ -1840,12 +1840,12 @@ Qed.
 Theorem lap_opt_integral :
   rngl_has_opp_or_subt T = true →
   let rol := lap_ring_like_op in
-  if rngl_is_integral_domain then
+  if rngl_is_integral_domain T then
     ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
   else not_applicable.
 Proof.
 intros Hos rol; subst rol.
-remember rngl_is_integral_domain as it eqn:Hii; symmetry in Hii.
+remember (rngl_is_integral_domain T) as it eqn:Hii; symmetry in Hii.
 destruct it; [ | easy ].
 intros la lb Hab.
 cbn in Hab.
@@ -2909,7 +2909,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := rngl_is_integral_domain;
+     rngl_is_integral_domain := rngl_is_integral_domain T;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := lap_add_comm;

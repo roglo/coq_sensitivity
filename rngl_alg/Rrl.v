@@ -14,7 +14,6 @@ Arguments mk_gc {T} gre%L gim%L.
 Arguments gre {T} GComplex%L.
 Arguments gim {T} GComplex%L.
 
-Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_opt_eqb T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.

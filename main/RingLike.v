@@ -404,6 +404,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
 
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
+Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Definition rngl_abs {T} {ro : ring_like_op T} x :=
   if rngl_leb x 0%L then (- x)%L else x.
@@ -1314,7 +1315,7 @@ Qed.
 
 Theorem rngl_eq_mul_0_l :
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
 Proof.
 intros Hos Hii * Hab Hbz.
@@ -1348,7 +1349,7 @@ Qed.
 
 Theorem rngl_eq_mul_0_r :
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
 Proof.
 intros Hos Hii * Hab Haz.
@@ -1388,7 +1389,7 @@ Qed.
 
 Theorem rngl_integral :
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain ||
+  (rngl_is_integral_domain T ||
    rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
@@ -1856,7 +1857,7 @@ assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
 specialize (rngl_div_diag Hon Hiq) as div_diag.
 specialize (rngl_eq_mul_0_l Hom) as integral.
 assert
-  (H : (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true). {
+  (H : (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true). {
   now rewrite Hid; destruct rngl_is_integral_domain.
 }
 specialize (integral H); clear H.
@@ -2132,7 +2133,7 @@ Qed.
 Theorem eq_rngl_add_same_0 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   rngl_characteristic T = 0 →
   ∀ a,
   (a + a = 0)%L
@@ -2379,7 +2380,7 @@ Qed.
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain ||
+  (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.

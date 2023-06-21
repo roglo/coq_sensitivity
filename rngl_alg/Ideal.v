@@ -411,13 +411,13 @@ split; intros Hab. {
 Qed.
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
-  if rngl_is_integral_domain then
+  if rngl_is_integral_domain T then
     ∀ a b : ideal P, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
   else
     not_applicable.
 Proof.
 intros.
-remember rngl_is_integral_domain as it eqn:Hit; symmetry in Hit.
+remember (rngl_is_integral_domain T) as it eqn:Hit; symmetry in Hit.
 destruct it; [ | easy ].
 intros * Hab.
 cbn in Hab.
@@ -672,7 +672,7 @@ Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := rngl_is_integral_domain;
+     rngl_is_integral_domain := rngl_is_integral_domain T;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := I_add_comm;

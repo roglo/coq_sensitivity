@@ -1077,7 +1077,7 @@ Theorem determinant_with_bad_row :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_characteristic _ = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1247,7 +1247,7 @@ Theorem matrix_comatrix_transp_mul :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
@@ -1437,7 +1437,7 @@ Theorem comatrix_transp_matrix_mul :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
@@ -1973,7 +1973,7 @@ Theorem cramer's_rule_by_mul :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_characteristic T = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true →
   ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2044,7 +2044,7 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   now destruct Hiq; [ left | right ].
 }
 assert
-  (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true). {
+  (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true). {
   rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }
