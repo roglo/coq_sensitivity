@@ -377,13 +377,13 @@ destruct H1 as [H1| H1]; [ left | right ]. {
 Qed.
 
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
-  if rngl_has_eqb then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
+  if rngl_has_eqb (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_eqb as ebi eqn:Hebi; symmetry in Hebi.
+remember (rngl_has_eqb (ideal P)) as ebi eqn:Hebi; symmetry in Hebi.
 destruct ebi; [ | easy ].
-assert (Heb : @rngl_has_eqb T ro = true). {
+assert (Heb : rngl_has_eqb T = true). {
   progress unfold roi in Hebi.
   progress unfold I_ring_like_op in Hebi.
   progress unfold rngl_has_eqb in Hebi |-*.

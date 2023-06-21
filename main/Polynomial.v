@@ -22,7 +22,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eqb = true).
+Context (Heb : rngl_has_eqb T = true).
 
 Theorem eq_strip_0s_nil : ∀ d la,
   strip_0s la = [] ↔ ∀ i, i < length la → nth i la d = 0%L.
@@ -2111,7 +2111,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eqb = true).
+Context (Heb : rngl_has_eqb T = true).
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -2621,7 +2621,7 @@ Qed.
 
 Theorem polyn_opt_eqb_eq :
   let rop := polyn_ring_like_op in
-  if rngl_has_eqb then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
+  if rngl_has_eqb (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -3413,7 +3413,7 @@ Require Import RnglAlg.MatRl.
 
 Definition mat_of_polyn_ring_like_op n T
   (ro : ring_like_op T) (rp : ring_like_prop T) eqb
-  (Heq : rngl_has_eqb = true)
+  (Heq : rngl_has_eqb T = true)
   (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_op (square_matrix n (polyn T)) :=
   mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
@@ -3433,7 +3433,7 @@ now destruct os.
 Qed.
 
 Definition mat_of_polyn_ring_like_prop n T ro rp eqb
-  (Heq : rngl_has_eqb = true) (Hop : rngl_has_opp T = true) :
+  (Heq : rngl_has_eqb T = true) (Hop : rngl_has_opp T = true) :
     ring_like_prop (square_matrix n (polyn T)) :=
   @mat_ring_like_prop _
     (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))

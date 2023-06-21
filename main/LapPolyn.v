@@ -18,7 +18,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Heb : rngl_has_eqb = true).
+Context (Heb : rngl_has_eqb T = true).
 
 (* normalization: lap not ending with 0s *)
 
@@ -278,7 +278,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Heb : rngl_has_eqb = true).
+Context (Heb : rngl_has_eqb T = true).
 
 Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.

@@ -256,7 +256,7 @@ Qed.
 Theorem rngl_product_list_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
-   rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
+   rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true →
   rngl_characteristic T ≠ 1 →
   ∀ A (l : list A) f,
   (∏ (i ∈ l), f i)%L = 0%L
@@ -287,7 +287,7 @@ Qed.
 Theorem rngl_product_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
+     rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true →
   rngl_characteristic T ≠ 1 →
   ∀ b e f,
   (∏ (i = b, e), f i = 0)%L
@@ -339,7 +339,7 @@ Theorem rngl_inv_product_list :
   rngl_has_opp_or_subt T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%L)
   → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%L.
@@ -363,7 +363,7 @@ rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
   assert
     (Hit' :
        (rngl_is_integral_domain ||
-          rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true). {
+          rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true). {
     apply Bool.orb_true_iff in Hit.
     apply Bool.orb_true_iff.
     destruct Hit as [Hit| Hit]; [ now left | right ].
@@ -387,7 +387,7 @@ Theorem rngl_inv_product :
   rngl_has_opp_or_subt T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%L)
   → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f (b + e - i)%nat)⁻¹))%L.
@@ -440,7 +440,7 @@ Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   ∀ (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%L)
   → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ l), (( f i)⁻¹))%L.
@@ -456,7 +456,7 @@ Theorem rngl_inv_product_comm :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%L)
   → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f i)⁻¹))%L.
@@ -473,7 +473,7 @@ Theorem rngl_product_div_distr :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
+  (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   ∀ b e f g,
   (∀ i, b ≤ i ≤ e → g i ≠ 0%L)
   → (∏ (i = b, e), (f i / g i))%L =

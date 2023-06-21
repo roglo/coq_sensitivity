@@ -76,7 +76,7 @@ Qed.
 Theorem lap_x_power_add :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
 Proof.
 intros Hon Hos Heb *.
@@ -119,7 +119,7 @@ Qed.
 Theorem lap_x_power_has_polyn_prop :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ n, has_polyn_prop (lap_x_power n) = true.
 Proof.
 intros Hon Hch Heb *.
@@ -141,7 +141,7 @@ Qed.
 Theorem lap_norm_x_power :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ n, lap_norm (lap_x_power n) = lap_x_power n.
 Proof.
 intros Hon Hch Heb *.
@@ -152,7 +152,7 @@ Qed.
 Theorem polyn_x_power_add :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
 intros Hon Hos Heb *.
@@ -183,7 +183,7 @@ Theorem lap_norm_mul_x_power_r :
   rngl_has_opp_or_subt T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ la n,
   lap_norm (la * lap_x_power n) = (lap_norm la * lap_x_power n)%lap.
 Proof.
@@ -197,7 +197,7 @@ Qed.
 
 Theorem polyn_of_const_add :
   ∀ (Hos : rngl_has_opp_or_subt T = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ a b,
   polyn_of_const (a + b) = (polyn_of_const a + polyn_of_const b)%L.
@@ -237,7 +237,7 @@ Qed.
 Theorem polyn_of_const_mul :
   (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ (Hos : rngl_has_opp_or_subt T = true),
-  ∀ (Heb : rngl_has_eqb = true),
+  ∀ (Heb : rngl_has_eqb T = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ a b,
   polyn_of_const (a * b) = (polyn_of_const a * polyn_of_const b)%L.
@@ -277,7 +277,6 @@ Arguments in_charac_0_field T {ro rp}.
 Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
 Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
-Arguments rngl_has_eqb T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Theorem polyn_of_const_rngl_summation :
@@ -1835,7 +1834,7 @@ Qed.
 
 (* to be completed
 Theorem glop :
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ p q,
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -2248,7 +2247,7 @@ Compute (
 
 Theorem single_has_polyn_prop :
   ∀ T op (rp : ring_like_prop T),
-  rngl_has_eqb = true →
+  rngl_has_eqb T = true →
   ∀ c, c ≠ 0%L → @has_polyn_prop T op [c] = true.
 Proof.
 intros T op rp Heb * Hcz; cbn.
@@ -2257,7 +2256,7 @@ now apply rngl_eqb_neq.
 Qed.
 
 Definition polyn_of_const {T} (ro : ring_like_op T) rp
-    (Heb : rngl_has_eqb = true) (c : T) :=
+    (Heb : rngl_has_eqb T = true) (c : T) :=
   match rngl_eq_dec Heb c 0 with
   | left _ => 0%pol
   | right Hcz => mk_polyn [c] (single_has_polyn_prop rp Heb Hcz)
@@ -2565,7 +2564,7 @@ Print polyn_of_const.
 Check rngl_eq_dec.
 Print rngl_eq_dec.
 Definition rngl_eq_dec' T (ro : ring_like_op T) (rp : ring_like_prop T)
-    (Heq : rngl_has_eqb = true) (a b : T) :=
+    (Heq : rngl_has_eqb T = true) (a b : T) :=
   (if (a =? b)%L as b0 return ((a =? b)%L = b0 → {a = b} + {a ≠ b}) then
      λ Hab1, left (match rngl_eqb_eq Heq a b with conj x _ => x Hab1 end)
    else
