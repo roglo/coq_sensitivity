@@ -268,7 +268,7 @@ Theorem rlap_quot_prop :
   → lq = [] ∨ hd 0%L lq ≠ 0%L.
 Proof.
 intros Hon Hiv * Ha Hb Hab.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
   destruct lq as [| q]; [ now left | right; cbn ].
   destruct Hb as [Hb| Hb]; [ now subst lb | ].
@@ -2332,7 +2332,7 @@ intros (la, lapr).
 unfold "*"%pol.
 unfold polyn_one.
 apply eq_polyn_eq; cbn.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   rewrite (rngl_characteristic_1 Hon Hos Hch 1), (rngl_eqb_refl Heb); cbn.
   apply Bool.orb_true_iff in lapr.
   destruct lapr as [lapr| lapr]; [ now apply is_empty_list_empty in lapr | ].
@@ -2401,7 +2401,7 @@ Proof.
 intros.
 apply eq_polyn_eq; cbn.
 unfold polyn_one.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   destruct a as (la, pa); cbn.
   apply Bool.orb_true_iff in pa.
   destruct pa as [pa| pa]. {
@@ -2680,13 +2680,13 @@ Qed.
 
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
-  rngl_characteristic = 0
+  rngl_characteristic T = 0
   → ∀ i, i ≠ 0 → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
 Proof.
 intros rop Hch * Hiz; cbn.
 subst rop.
 induction i; [ easy | clear Hiz; cbn ].
-assert (H : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (H : rngl_characteristic T ≠ 1) by now rewrite Hch.
 specialize (proj1 (rngl_1_neq_0_iff Hon) H) as H1; clear H.
 apply (rngl_eqb_neq Heb) in H1; rewrite H1.
 cbn - [ lap_add ].
@@ -2703,11 +2703,11 @@ Qed.
 
 Theorem lap_polyn_rngl_of_nat_2 :
   let rop := polyn_ring_like_op in
-  ∀ i, 0 < i < rngl_characteristic
+  ∀ i, 0 < i < rngl_characteristic T
   → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
 Proof.
 intros * Hi; cbn.
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   flia Hi Hc1.
 }
 specialize (proj1 (rngl_1_neq_0_iff Hon) Hc1) as H11.
@@ -2730,7 +2730,7 @@ destruct la as [| a]; cbn. {
   rewrite <- rngl_add_0_r.
   apply rngl_add_compat_l.
   destruct i; [ easy | ].
-  assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+  assert (H : 0 < S i < rngl_characteristic T) by flia Hi.
   now specialize (IHi H).
 }
 symmetry; apply List_rev_symm; symmetry; cbn.
@@ -2742,7 +2742,7 @@ destruct lb as [| b]. {
   destruct (Sumbool.sumbool_of_bool _) as [H12| H12]. {
     exfalso; apply (rngl_eqb_eq Heb) in H12.
     destruct i; [ easy | ].
-    assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+    assert (H : 0 < S i < rngl_characteristic T) by flia Hi.
     specialize (IHi H); clear H.
     injection IHi; clear IHi; intros; subst a la.
     clear Hlb.
@@ -2765,13 +2765,13 @@ destruct lb as [| b]. {
   f_equal.
   apply rngl_add_compat_l; symmetry.
   destruct i; [ easy | ].
-  assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+  assert (H : 0 < S i < rngl_characteristic T) by flia Hi.
   specialize (IHi H).
   now injection IHi; clear IHi; intros; subst a la.
 }
 exfalso.
 destruct i; [ easy | ].
-assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+assert (H : 0 < S i < rngl_characteristic T) by flia Hi.
 specialize (IHi H); clear H.
 now injection IHi; clear IHi; intros; subst a la.
 Qed.
@@ -2796,7 +2796,7 @@ progress unfold rngl_has_1 in H.
 specialize (proj1 (rngl_1_neq_0_iff Hon)) as H1.
 progress unfold rngl_one in H1.
 destruct rngl_opt_one as [one| ]; [ cbn; clear H | easy ].
-destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
   rewrite (H2 one), (rngl_eqb_refl Heb); cbn.
   rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
@@ -2837,10 +2837,10 @@ Qed.
 
 Theorem polyn_characteristic_prop : let rop := polyn_ring_like_op in
   if rngl_has_1 (polyn T) then
-    if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
     else
-      (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat 1 i ≠ 0%L)
-       ∧ rngl_mul_nat 1 rngl_characteristic = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
+       ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -2855,7 +2855,7 @@ cbn - [ rngl_mul_nat ].
 specialize rngl_characteristic_prop as H1.
 rewrite Hon in H1; cbn in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
-destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hcz| Hcz]. {
   intros i.
   specialize (H1 i) as H.
   intros Hi; apply H; clear H.
@@ -3214,7 +3214,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_is_integral_domain := rngl_is_integral_domain;
      rngl_is_alg_closed := false;
-     rngl_characteristic := rngl_characteristic;
+     rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := polyn_add_comm';
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;

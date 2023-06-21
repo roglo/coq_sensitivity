@@ -899,7 +899,7 @@ Theorem comatrix_transpose :
   rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ M,
   is_square_matrix M = true
   → com M⁺ = (com M)⁺%M.
@@ -952,7 +952,7 @@ Theorem laplace_formula_on_cols :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → 1 ≤ j ≤ mat_ncols M
@@ -1076,7 +1076,7 @@ Theorem determinant_with_bad_row :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic _ = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
@@ -1246,7 +1246,7 @@ Theorem matrix_comatrix_transp_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -1436,14 +1436,14 @@ Theorem comatrix_transp_matrix_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hon Hop Hic Hch Hii * Hsm.
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 destruct M as (ll); cbn - [ det ].
@@ -1848,7 +1848,7 @@ Theorem det_mat_repl_vect :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ M V,
   is_square_matrix M = true
   → vect_size V = mat_nrows M
@@ -1972,7 +1972,7 @@ Theorem cramer's_rule_by_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
@@ -1982,7 +1982,7 @@ Theorem cramer's_rule_by_mul :
   (det M * vect_el U i)%L = det (mat_repl_vect i M V).
 Proof.
 intros Hon Hop Hic Hch Hii * Hsm Hum Hmuv k Hk.
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
 assert (Huv : vect_size V = vect_size U). {
   rewrite <- Hmuv; cbn.
   now rewrite map_length.
@@ -2028,7 +2028,7 @@ Theorem cramer's_rule :
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   rngl_has_inv_or_quot T = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M

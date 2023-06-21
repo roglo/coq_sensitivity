@@ -277,7 +277,6 @@ Arguments in_charac_0_field T {ro rp}.
 Arguments polyn_characteristic_prop T {ro rp} Hon Hos Heb.
 Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
-Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.

@@ -202,7 +202,7 @@ Qed.
 Theorem rngl_of_nat_is_correct_matrix :
   ∀ eqb n,
   let rom := mat_ring_like_op eqb in
-  rngl_characteristic = 0
+  rngl_characteristic T = 0
   → ∀ i, is_correct_matrix (@sm_mat n T (rngl_mul_nat 1 i)) = true.
 Proof.
 intros eqb n rom Hch *.
@@ -584,7 +584,7 @@ Qed.
 Theorem squ_mat_characteristic_prop :
   ∀ eqb n,
   let rom := @mat_ring_like_op eqb n in
-  let ch := if n =? 0 then 1 else rngl_characteristic in
+  let ch := if n =? 0 then 1 else rngl_characteristic T in
   if ch =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
   else
    (∀ i : nat, 0 < i < ch → rngl_mul_nat 1 i ≠ 0%L)
@@ -605,7 +605,7 @@ specialize @rngl_characteristic_prop as H1.
 specialize (H1 T ro rp).
 rewrite Hon in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
-destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
+destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   intros i Hi.
   apply (f_equal (λ M, mat_el (sm_mat M) 1 1)) in Hi.
   cbn in Hi.
@@ -713,7 +713,7 @@ Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
   {| rngl_mul_is_comm := false;
      rngl_is_integral_domain := false;
      rngl_is_alg_closed := false;
-     rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
+     rngl_characteristic := if n =? 0 then 1 else rngl_characteristic T;
      rngl_add_comm := squ_mat_add_comm eqb;
      rngl_add_assoc := squ_mat_add_assoc eqb;
      rngl_add_0_l := squ_mat_add_0_l eqb;

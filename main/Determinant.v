@@ -1482,7 +1482,7 @@ Qed.
 Theorem determinant_same_rows :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
@@ -1735,7 +1735,7 @@ Qed.
 
 Theorem det_by_any_sym_gr :
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → mat_nrows M = n
@@ -1863,7 +1863,7 @@ Theorem det_any_permut_l :
   let ron := nat_ring_like_op in
   rngl_mul_is_comm = true →
   @rngl_has_opp T ro = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2087,7 +2087,7 @@ Theorem det_any_permut_r :
   let ron := nat_ring_like_op in
   rngl_mul_is_comm = true →
   @rngl_has_opp T ro = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2335,7 +2335,7 @@ Qed.
 Theorem determinant_transpose :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M⁺ = det M.
@@ -2385,7 +2385,7 @@ Qed.
 Theorem det_subm_transp :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ i j (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M

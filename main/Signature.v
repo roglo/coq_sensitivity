@@ -2462,7 +2462,7 @@ Qed.
 
 Theorem ε_1_opp_1_NoDup :
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ σ, ε σ = 1%L ∨ ε σ = (-1)%L → NoDup σ.
 Proof.
 intros Hop H10 * Hσ.

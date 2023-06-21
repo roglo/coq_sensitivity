@@ -653,7 +653,7 @@ Theorem det_isort_rows_with_dup :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
@@ -730,7 +730,7 @@ Theorem det_isort_rows_no_dup :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -1058,7 +1058,7 @@ Theorem det_isort_rows :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
@@ -1540,7 +1540,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ [m n A B], m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
@@ -1715,7 +1715,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_3 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ [m n] f [B], m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1769,7 +1769,7 @@ Lemma Cauchy_Binet_formula_step_4 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [m n] [B] f, m ≠ 0 →
   is_correct_matrix B = true
@@ -2029,7 +2029,7 @@ Qed.
 Lemma Cauchy_Binet_formula_step_5_4 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ [m n A] f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
@@ -2074,8 +2074,8 @@ intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hon : rngl_has_1 T = true) by now destruct Hif.
 assert (Hop : rngl_has_opp T = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
-assert (Hch : rngl_characteristic = 0) by now destruct Hif.
-assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
+assert (Hch : rngl_characteristic T = 0) by now destruct Hif.
+assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
 assert
   (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true). {
   destruct Hif.

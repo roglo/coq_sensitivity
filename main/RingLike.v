@@ -402,6 +402,8 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L
       else not_applicable }.
 
+Arguments rngl_characteristic T {ro ring_like_prop}.
+
 Definition rngl_abs {T} {ro : ring_like_op T} x :=
   if rngl_leb x 0%L then (- x)%L else x.
 
@@ -1144,7 +1146,7 @@ Qed.
 Theorem rngl_characteristic_1 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_characteristic = 1 →
+  rngl_characteristic T = 1 →
   ∀ x, x = 0%L.
 Proof.
 intros Hon Hos Hch *.
@@ -1161,14 +1163,14 @@ apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem rngl_1_neq_0_iff :
-  rngl_has_1 T = true → rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
+  rngl_has_1 T = true → rngl_characteristic T ≠ 1 ↔ (1 ≠ 0)%L.
 Proof.
 intros Hon.
 specialize rngl_characteristic_prop as H1.
 rewrite Hon in H1.
 split. {
   intros Hc.
-  remember (Nat.eqb rngl_characteristic 0) as cz eqn:Hcz; symmetry in Hcz.
+  remember (Nat.eqb (rngl_characteristic T) 0) as cz eqn:Hcz; symmetry in Hcz.
   destruct cz. {
     specialize (H1 0); cbn in H1.
     now rewrite rngl_add_0_r in H1.
@@ -1194,7 +1196,7 @@ Qed.
 Theorem rngl_1_eq_0_iff :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_characteristic = 1 ↔ (1 = 0)%L.
+  rngl_characteristic T = 1 ↔ (1 = 0)%L.
 Proof.
 intros Hon Hos.
 split. {
@@ -1203,7 +1205,7 @@ split. {
   apply H1.
 } {
   intros H10.
-  destruct (Nat_eq_dec rngl_characteristic 1) as [H1| H1]; [ easy | ].
+  destruct (Nat_eq_dec (rngl_characteristic T) 1) as [H1| H1]; [ easy | ].
   now apply (rngl_1_neq_0_iff Hon) in H1.
 }
 Qed.
@@ -1639,7 +1641,7 @@ Qed.
 Theorem rngl_inv_1 :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   (1⁻¹ = 1)%L.
 Proof.
 intros Hon Hiv H10.
@@ -1671,7 +1673,7 @@ Qed.
 Theorem rngl_div_1_r :
   rngl_has_1 T = true →
   rngl_has_inv_or_quot T = true →
-  rngl_characteristic ≠ 1 →
+  rngl_characteristic T ≠ 1 →
   ∀ a, (a / 1 = a)%L.
 Proof.
 intros Hon Hiq H10 *.
@@ -1754,7 +1756,7 @@ Theorem rngl_inv_neq_0 :
   ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
 intros Hon Hom Hiv * Haz H1.
-remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   apply Nat_eqb_eq in Hch.
   now specialize (rngl_characteristic_1 Hon Hom Hch a).
@@ -1774,7 +1776,7 @@ Theorem rngl_inv_involutive :
   ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
 intros Hon Hos Hiv * Hxz.
-remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   apply Nat_eqb_eq in Hch.
   exfalso; apply Hxz.
@@ -2020,7 +2022,7 @@ Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem eq_rngl_of_nat_0 :
   rngl_has_1 T = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   ∀ i, rngl_mul_nat 1 i = 0%L → i = 0.
 Proof.
 intros Hon Hch * Hi.
@@ -2034,7 +2036,7 @@ Qed.
 Theorem rngl_of_nat_inj :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   ∀ i j,
   rngl_mul_nat 1 i = rngl_mul_nat 1 j
   → i = j.
@@ -2069,7 +2071,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
-remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   apply Nat_eqb_eq in Hch.
   exfalso; apply Haz.
@@ -2130,7 +2132,7 @@ Theorem eq_rngl_add_same_0 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
-  rngl_characteristic = 0 →
+  rngl_characteristic T = 0 →
   ∀ a,
   (a + a = 0)%L
   → a = 0%L.
@@ -2607,7 +2609,7 @@ Record in_charac_0_field :=
     cf_has_opp : rngl_has_opp T = true;
     cf_has_inv : rngl_has_inv T = true;
     cf_has_eqb : rngl_has_eqb = true;
-    cf_characteristic : rngl_characteristic = 0 }.
+    cf_characteristic : rngl_characteristic T = 0 }.
 
 End a.
 

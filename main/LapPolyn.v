@@ -1195,7 +1195,6 @@ do 2 rewrite strip_0s_app.
 now rewrite IHla.
 Qed.
 
-Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem lap_convol_mul_more :

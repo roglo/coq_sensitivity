@@ -121,7 +121,7 @@ Definition in_ordered_field :=
   rngl_has_opp T = true ∧
   rngl_has_eqb = true ∧
   rngl_has_inv T = true ∧
-  rngl_characteristic = 0 ∧
+  rngl_characteristic T = 0 ∧
   rngl_is_ordered = true.
 
 Theorem eq_vect_squ_0 :
@@ -961,7 +961,7 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
   → (M = U * D * U⁻¹)%M.
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
-assert (H10 : rngl_characteristic ≠ 1). {
+assert (H10 : rngl_characteristic T ≠ 1). {
   now rewrite (cf_characteristic Hif).
 }
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
