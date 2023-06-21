@@ -2342,6 +2342,32 @@ intros Hor * Hab.
 now apply (rngl_lt_iff Hor) in Hab.
 Qed.
 
+Theorem rngl_div_le_1 :
+  rngl_has_1 = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_ordered = true →
+  ∀ a b, (b ≠ 0 → 0 ≤ a ≤ b → a / b ≤ 1)%L.
+Proof.
+intros * Hon Hop Hiv Hor * Hbz (Hza, Hab).
+unfold rngl_div.
+rewrite Hiv.
+specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (H1 a b⁻¹ b b⁻¹)%L.
+assert (H : (0 ≤ a ≤ b)%L) by easy.
+specialize (H1 H); clear H.
+assert (H : (0 ≤ b⁻¹ ≤ b⁻¹)%L). {
+  split; [ | apply (rngl_le_refl Hor) ].
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ | congruence ].
+  now apply (rngl_le_trans Hor _ a).
+}
+specialize (H1 H); clear H.
+now rewrite (rngl_mul_inv_r Hon Hiv) in H1.
+Qed.
+
 Theorem rngl_square_ge_0 :
   rngl_has_opp = true →
   rngl_is_ordered = true →

@@ -95,19 +95,11 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-(*
-Definition rngl_le_dec' {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  (x y : T) :=
-  match Bool.bool_dec rngl_is_ordered true with
-  | left Hde => if rngl_le_dec Hde x y then true else false
-  | right _ => false
-  end.
-*)
-
 Definition rngl_abs {T} {ro : ring_like_op T} {rp : ring_like_prop T} x :=
   if rngl_leb x 0%L then (- x)%L else x.
+
 (*
-  if rngl_le_dec' x 0%L then (- x)%L else x.
+Notation "∥ a ∥" := (rngl_abs a).
 *)
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
@@ -1284,7 +1276,8 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
   }
   apply (rl_pow_neq_0 Hon Hop Hiv Hch Htr).
 }
-Search (_ / _ ≤ 1)%L.
+apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
+Search (0 ≤ rngl_abs _)%L.
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.
