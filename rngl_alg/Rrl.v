@@ -1059,10 +1059,49 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
   apply (rl_pow_neq_0 Hon Hop Hiv Hch Htr).
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
-  split. {
+  split; [ apply (rngl_0_le_abs Hop Hor) | ].
+Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_opp T = true →
+  rngl_has_eqb T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ b → a ≤ rngl_abs (rl_sqrt (rngl_squ a + b)))%L.
+Proof.
+intros * Hop Heb Hor * Hzb.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+unfold rl_sqrt.
+remember (rngl_squ _ + _ =? _)%L as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply (rngl_eqb_eq Heb) in Hab.
+  rewrite (rngl_abs_0 Hop).
+  apply (rngl_add_sub_eq_l Hos) in Hab.
+  progress unfold rngl_sub in Hab.
+  rewrite Hop, rngl_add_0_l in Hab.
+  subst b.
+  apply (rngl_opp_le_compat Hop Hor) in Hzb.
+  rewrite (rngl_opp_involutive Hop) in Hzb.
+  rewrite (rngl_opp_0 Hop) in Hzb.
+  specialize (rngl_square_ge_0 Hop Hor a) as H1.
+  unfold rngl_squ in Hzb.
+  specialize (rngl_le_antisymm Hor _ _ Hzb H1) as H2.
+  specialize (rngl_integral Hos) as H3.
 ...
-Theorem rngl_0_le_abs :
-  ∀ a
+Check rngl_le_add_le_sub_r.
+Search (_ + _ = _ → _)%L.
+apply rngl_le_add
+Search (_ + _ ≤ _)%L.
+...
+  apply (rngl_le_trans Hor _ (rngl_squ a)). {
+... ...
+specialize (glop (rngl_abs x) (rngl_squ y)) as H1.
+assert (H : (0 ≤ rngl_squ y)%L). {
+  progress unfold rngl_squ.
+  apply (rngl_square_ge_0 Hop Hor).
+}
+specialize (H1 H); clear H.
+unfold rl_sqrt in H1.
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.

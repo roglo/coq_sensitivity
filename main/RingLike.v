@@ -2402,7 +2402,51 @@ split. {
 }
 Qed.
 
+Theorem rngl_le_add_le_sub_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a + b ≤ c → a ≤ c - b)%L.
+Proof.
+intros Hop Hor * Habc.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_add_le_compat Hor) as H1.
+specialize (H1 (a + b) c (- b) (- b) Habc)%L.
+specialize (H1 (rngl_le_refl Hor _)).
+do 2 rewrite (fold_rngl_sub Hop) in H1.
+now rewrite (rngl_add_sub Hos) in H1.
+Qed.
+
 (* abs *)
+
+Theorem rngl_abs_0 :
+  rngl_has_opp T = true →
+  rngl_abs 0%L = 0%L.
+Proof.
+intros Hop.
+progress unfold rngl_abs.
+rewrite (rngl_opp_0 Hop).
+now destruct (0 ≤? 0)%L.
+Qed.
+
+Theorem rngl_0_le_abs :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ rngl_abs a)%L.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+destruct az. {
+  apply rngl_leb_le in Haz.
+  apply (rngl_opp_le_compat Hop Hor) in Haz.
+  now rewrite (rngl_opp_0 Hop) in Haz.
+} {
+  apply rngl_leb_nle in Haz.
+  now apply (rngl_not_le Hor) in Haz.
+}
+Qed.
 
 Theorem rngl_abs_le :
   rngl_has_opp T = true →
