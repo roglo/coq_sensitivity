@@ -259,7 +259,7 @@ apply strip_0s_length_le.
 Qed.
 
 Theorem rlap_quot_prop :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_inv = true →
   ∀ la lb lq lr,
   la = [] ∨ hd 0%L la ≠ 0%L
@@ -318,7 +318,7 @@ apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
 Theorem lap_quot_is_norm :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_inv = true →
   ∀ la lb,
   has_polyn_prop la = true
@@ -821,7 +821,7 @@ now rewrite Nat.add_succ_r.
 Qed.
 
 Theorem lap_convol_mul_1_l :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ la i len,
   length la = i + len
   → lap_convol_mul [1%L] la i len = skipn i la.
@@ -836,7 +836,7 @@ apply map_id.
 Qed.
 
 Theorem lap_convol_mul_1_r :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ la i len,
   length la = i + len
   → lap_convol_mul la [1%L] i len = skipn i la.
@@ -869,7 +869,7 @@ apply map2_rngl_add_0_r.
 Qed.
 
 Theorem lap_convol_mul_x_l :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ la lb i len,
   i = S (length la)
   → len = length lb
@@ -908,7 +908,7 @@ now f_equal.
 Qed.
 
 Theorem lap_mul_x_l :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ la, la ≠ [] → ([0; 1]%L * la)%lap = 0%L :: la.
 Proof.
 intros Hon * Hla; cbn.
@@ -1043,7 +1043,7 @@ Qed.
 Definition lap_x_power n := repeat 0%L n ++ [1%L].
 
 Theorem lap_repeat_0_app_is_mul_power_l :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ n la,
   la ≠ []
   → repeat 0%L n ++ la = (lap_x_power n * la)%lap.
@@ -1077,7 +1077,7 @@ apply lap_convol_mul_l_succ_l.
 Qed.
 
 Theorem lap_repeat_0_app_is_mul_power_r :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   ∀ n la,
   la ≠ []
   → repeat 0%L n ++ la = (la * lap_x_power n)%lap.
@@ -1381,7 +1381,7 @@ now apply IHla.
 Qed.
 
 Theorem rlap_quot_rem_step_Some :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1521,7 +1521,7 @@ now rewrite Hrr in Hqrlr.
 Qed.
 
 Theorem rlap_quot_rem_loop_prop :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1664,7 +1664,7 @@ now rewrite rev_involutive.
 Qed.
 
 Theorem lap_quot_rem_prop :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1903,7 +1903,7 @@ now rewrite lap_add_sub.
 Qed.
 
 Theorem lap_mul_has_polyn_prop :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_inv = true →
   ∀ la lb,
   has_polyn_prop la = true
@@ -1936,7 +1936,7 @@ now left; rewrite Hon, Hiv.
 Qed.
 
 Theorem lap_norm_mul :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_inv = true →
   ∀ la lb,
   has_polyn_prop la = true
@@ -1949,7 +1949,7 @@ now apply (lap_mul_has_polyn_prop Hon Hiv).
 Qed.
 
 Theorem lap_mul_div :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2027,7 +2027,6 @@ rewrite (list_nth_lap_sub Hop) in H1.
 now apply -> (rngl_sub_move_0_r Hop) in H1.
 Qed.
 
-Arguments rngl_has_1 T {ro}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem lap_rngl_of_nat :
@@ -2110,7 +2109,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 = true).
+Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_subt = true).
 Context (Heb : rngl_has_eqb = true).
 
@@ -2180,7 +2179,7 @@ Definition polyn_sub p1 p2 :=
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
-  match Sumbool.sumbool_of_bool rngl_has_1 with
+  match Sumbool.sumbool_of_bool (rngl_has_1 T) with
   | left Hon =>
       match Sumbool.sumbool_of_bool rngl_has_inv with
       | left Hiv =>
@@ -2472,7 +2471,7 @@ Qed.
 
 Theorem polyn_opt_has_no_inv : ∀ P,
   let rop := polyn_ring_like_op in
-  if (rngl_has_inv && rngl_has_1)%bool then P else not_applicable.
+  if (rngl_has_inv && rngl_has_1 (polyn T))%bool then P else not_applicable.
 Proof.
 intros.
 unfold rngl_has_inv; cbn.
@@ -2485,7 +2484,8 @@ Qed.
 
 Theorem polyn_opt_has_no_inv_and : ∀ e P,
   let rop := polyn_ring_like_op in
-  if (rngl_has_inv && rngl_has_1 && e)%bool then P else not_applicable.
+  if (rngl_has_inv && rngl_has_1 (polyn T) && e)%bool then P
+  else not_applicable.
 Proof.
 intros.
 unfold rngl_has_inv; cbn.
@@ -2523,7 +2523,7 @@ specialize (H1 H Hpr); clear H.
 assert (H : lap_quot_rem la lb = (lq, lr)). {
   unfold polyn_quot_rem in Hab.
   unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
-  destruct (Sumbool.sumbool_of_bool rngl_has_1) as [Hon2| Hon2]. {
+  destruct (Sumbool.sumbool_of_bool (rngl_has_1 T)) as [Hon2| Hon2]. {
     destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv2| Hiv2]. {
       injection Hab; clear Hab; intros; subst lr lq.
       unfold lap_quot_rem.
@@ -2773,8 +2773,6 @@ assert (H : 0 < S i < rngl_characteristic) by flia Hi.
 specialize (IHi H); clear H.
 now injection IHi; clear IHi; intros; subst a la.
 Qed.
-
-Arguments rngl_has_1 T {ro}.
 
 Theorem lap_polyn_rngl_of_nat :
   let lop := lap_ring_like_op in

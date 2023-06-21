@@ -20,7 +20,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 = true).
+Context (Hon : rngl_has_1 T = true).
 
 (*
  * three definitions of determinant

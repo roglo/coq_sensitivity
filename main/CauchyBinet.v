@@ -650,7 +650,7 @@ rewrite nth_cart_prod_same_length with (n := n). {
 Qed.
 
 Theorem det_isort_rows_with_dup :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -727,7 +727,7 @@ now apply mat_select_rows_is_square.
 Qed.
 
 Theorem det_isort_rows_no_dup :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic ≠ 1 →
@@ -1055,7 +1055,7 @@ split; intros Hla. {
 Qed.
 
 Theorem det_isort_rows :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -1383,7 +1383,7 @@ Theorem fold_det''' : ∀ n M,
 Proof. now intros; subst n. Qed.
 
 Theorem det_is_det''' :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   ∀ M, is_square_matrix M = true
   → det M = det''' M.
@@ -1538,7 +1538,7 @@ Qed.
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
 Lemma Cauchy_Binet_formula_step_1 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n A B], m ≠ 0 →
@@ -1616,7 +1616,7 @@ now specialize (Hl _ H).
 Qed.
 
 Lemma Cauchy_Binet_formula_step_2 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ [m n A B], m ≠ 0 →
@@ -1713,7 +1713,7 @@ easy.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_3 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n] f [B], m ≠ 0 →
@@ -1766,7 +1766,7 @@ now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_4 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -1855,7 +1855,7 @@ apply (rngl_mul_summation_list_distr_r Hos).
 Qed.
 
 Lemma Cauchy_Binet_formula_step_5_2 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   ∀ [m n A] f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
@@ -2027,7 +2027,7 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 Qed.
 
 Lemma Cauchy_Binet_formula_step_5_4 :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n A] f, m ≠ 0 → n ≠ 0 →
@@ -2071,7 +2071,7 @@ Theorem Cauchy_Binet_formula : in_charac_0_field →
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
-assert (Hon : rngl_has_1 = true) by now destruct Hif.
+assert (Hon : rngl_has_1 T = true) by now destruct Hif.
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 assert (Hch : rngl_characteristic = 0) by now destruct Hif.
@@ -2172,7 +2172,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 (*
-Context (Hon : rngl_has_1 = true).
+Context (Hon : rngl_has_1 T = true).
 *)
 
 Corollary determinant_mul : in_charac_0_field →

@@ -1197,7 +1197,6 @@ Qed.
 
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_opp_or_subt T {R}.
-Arguments rngl_has_1 T {ro}.
 Arguments rngl_opt_one T {ring_like_op}.
 
 Theorem lap_convol_mul_more :

@@ -165,7 +165,6 @@ Proof. intros; apply eq_ideal_eq, rngl_mul_assoc. Qed.
 
 
 Arguments rngl_characteristic T {ro ring_like_prop}.
-Arguments rngl_has_1 T {ro}.
 Arguments rngl_is_ordered T {R}.
 Arguments rngl_opt_one T {ring_like_op}.
 

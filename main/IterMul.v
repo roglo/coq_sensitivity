@@ -24,7 +24,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 = true).
+Context (Hon : rngl_has_1 T = true).
 
 Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c * f i) l a =
@@ -567,7 +567,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hon : rngl_has_1 = true).
+Context (Hon : rngl_has_1 T = true).
 
 Theorem rngl_product_summation_distr_cart_prod :
   rngl_has_opp_or_subt = true →

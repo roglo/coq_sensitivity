@@ -517,7 +517,7 @@ apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
 Theorem determinant_circular_shift_rows :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (M : matrix T) i,
@@ -653,7 +653,7 @@ now symmetry; apply rngl_mul_opp_l.
 Qed.
 
 Theorem determinant_subm_mat_swap_rows_0_i :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (M : matrix T) i j,
@@ -688,7 +688,7 @@ Qed.
 (* Laplace formulas *)
 
 Theorem laplace_formula_on_rows :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ (M : matrix T) i,
@@ -896,7 +896,7 @@ now rewrite <- Hil; rewrite List_map_seq_length.
 Qed.
 
 Theorem comatrix_transpose :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_characteristic ≠ 1 →
@@ -949,7 +949,7 @@ now apply (det_subm_transp Hon Hic Hop H10).
 Qed.
 
 Theorem laplace_formula_on_cols :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic ≠ 1 →
@@ -1011,7 +1011,7 @@ determinant_with_bad_row
 *)
 
 Theorem determinant_with_row :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   ∀ i (M : matrix T),
@@ -1073,7 +1073,7 @@ now apply Nat.leb_le in H; rewrite H.
 Qed.
 
 Theorem determinant_with_bad_row :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -1243,7 +1243,7 @@ f_equal. {
 Qed.
 
 Theorem matrix_comatrix_transp_mul :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -1433,7 +1433,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 Qed.
 
 Theorem comatrix_transp_matrix_mul :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -1845,7 +1845,7 @@ apply IHla.
 Qed.
 
 Theorem det_mat_repl_vect :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic ≠ 1 →
@@ -1969,7 +1969,7 @@ Qed.
 (* Cramer's rule *)
 
 Theorem cramer's_rule_by_mul :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
@@ -2024,7 +2024,7 @@ now rewrite mat_vect_mul_1_l.
 Qed.
 
 Theorem cramer's_rule :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_has_inv_or_quot = true →

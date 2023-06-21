@@ -116,7 +116,7 @@ destruct (rngl_le_dec Hor 0%L n) as [Hnz| Hnz]. {
 Qed.
 
 Definition in_ordered_field :=
-  rngl_has_1 = true ∧
+  rngl_has_1 T = true ∧
   rngl_mul_is_comm = true ∧
   rngl_has_opp = true ∧
   rngl_has_eqb = true ∧
@@ -284,7 +284,7 @@ easy.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
@@ -502,7 +502,7 @@ Qed.
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
-  rngl_has_1 = true →
+  rngl_has_1 T = true →
   rngl_mul_is_comm = true →
   rngl_has_opp_or_subt = true →
   rngl_has_eqb = true →
