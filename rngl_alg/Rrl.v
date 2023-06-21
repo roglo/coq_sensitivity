@@ -16,7 +16,6 @@ Arguments gim {T} GComplex%L.
 
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
-Arguments rngl_has_inv T {R}.
 Arguments rngl_has_quot T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
@@ -1860,7 +1859,6 @@ Record complex := mk_c {re : R; im : R}.
 (*
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
-Arguments rngl_has_inv T {R}.
 Arguments rngl_is_integral T {ro ring_like_prop}.
 Arguments rngl_is_ordered T {R}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.

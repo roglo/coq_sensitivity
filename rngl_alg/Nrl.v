@@ -268,7 +268,7 @@ Qed.
 
 Theorem Zn_opt_mul_inv_l :
   let roz := Zn_ring_like_op n in
-  if (rngl_has_inv && rngl_has_1 _)%bool then
+  if (rngl_has_inv _ && rngl_has_1 _)%bool then
     ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
@@ -322,7 +322,7 @@ Qed.
 
 Theorem Zn_opt_mul_inv_r :
   let roz := Zn_ring_like_op n in
-  if (rngl_has_inv && rngl_has_1 _ && negb true)%bool then
+  if (rngl_has_inv _ && rngl_has_1 _ && negb true)%bool then
     ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
   else not_applicable.
 Proof.

@@ -93,7 +93,7 @@ Definition rngl_has_subt T {R : ring_like_op T} :=
   | _ => false
   end.
 
-Definition rngl_has_inv {T} {R : ring_like_op T} :=
+Definition rngl_has_inv T {R : ring_like_op T} :=
   match rngl_opt_inv_or_quot with
   | Some (inl _) => true
   | _ => false
@@ -135,7 +135,7 @@ Definition rngl_sub {T} {ro : ring_like_op T} a b :=
   else rngl_zero.
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
-  if rngl_has_inv then rngl_mul a (rngl_inv b)
+  if rngl_has_inv T then rngl_mul a (rngl_inv b)
   else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
 
@@ -155,7 +155,7 @@ Qed.
 
 Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
   rngl_has_inv_or_quot T = true
-  ↔ rngl_has_inv = true ∨ rngl_has_quot = true.
+  ↔ rngl_has_inv T = true ∨ rngl_has_quot = true.
 Proof.
 unfold rngl_has_inv_or_quot, bool_of_option.
 unfold rngl_has_inv, rngl_has_quot.
@@ -169,7 +169,7 @@ Qed.
 
 Theorem rngl_has_inv_and_1_or_quot_iff {T} {R : ring_like_op T} :
   rngl_has_inv_and_1_or_quot T = true
-  ↔ rngl_has_inv = true ∧ rngl_has_1 T = true ∨ rngl_has_quot = true.
+  ↔ rngl_has_inv T = true ∧ rngl_has_1 T = true ∨ rngl_has_quot = true.
 Proof.
 progress unfold rngl_has_inv_and_1_or_quot, bool_of_option.
 progress unfold rngl_has_inv, rngl_has_quot.
@@ -329,11 +329,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if (rngl_has_inv && rngl_has_1 T)%bool then
+      if (rngl_has_inv T && rngl_has_1 T)%bool then
         ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L
       else not_applicable;
     rngl_opt_mul_inv_r :
-      if (rngl_has_inv && rngl_has_1 T && negb rngl_mul_is_comm)%bool then
+      if (rngl_has_inv T && rngl_has_1 T && negb rngl_mul_is_comm)%bool then
         ∀ a : T, a ≠ 0%L → (a / a = 1)%L
       else not_applicable;
     (* when has division (quot) *)
@@ -485,7 +485,7 @@ Qed.
 
 Theorem rngl_mul_inv_l :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L.
 Proof.
 intros Hon Hiv *.
@@ -496,7 +496,7 @@ Qed.
 
 Theorem rngl_mul_inv_r :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a : T, a ≠ 0%L → (a * a⁻¹ = 1)%L.
 Proof.
 intros Hon Hiv * Haz.
@@ -760,7 +760,7 @@ Qed.
 
 Theorem rngl_has_quot_has_no_inv :
   rngl_has_quot = true
-  → rngl_has_inv = false.
+  → rngl_has_inv T = false.
 Proof.
 intros * Hqu.
 progress unfold rngl_has_quot in Hqu.
@@ -770,7 +770,7 @@ now destruct iq.
 Qed.
 
 Theorem rngl_has_inv_has_no_quot :
-  rngl_has_inv = true
+  rngl_has_inv T = true
   → rngl_has_quot = false.
 Proof.
 intros * Hiv.
@@ -809,7 +809,7 @@ Qed.
 
 Theorem rngl_div_div_swap :
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b c,
   (a / b / c = a / c / b)%L.
 Proof.
@@ -841,7 +841,7 @@ now unfold rngl_sub; rewrite Hro.
 Qed.
 
 Theorem fold_rngl_div :
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b, (a * b⁻¹)%L = (a / b)%L.
 Proof.
 intros Hin *.
@@ -910,7 +910,7 @@ Theorem rngl_div_diag :
   ∀ a : T, a ≠ 0%L → (a / a = 1)%L.
 Proof.
 intros Hon Hiq * Haz.
-remember rngl_has_inv as ai eqn:Hai; symmetry in Hai.
+remember (rngl_has_inv T) as ai eqn:Hai; symmetry in Hai.
 destruct ai. {
   remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
@@ -963,7 +963,7 @@ Theorem rngl_mul_div :
   ∀ a b : T, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros Hii a b Hbz.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hiq : rngl_has_inv_or_quot T = true). {
     now apply rngl_has_inv_or_quot_iff; left.
@@ -994,7 +994,7 @@ Qed.
 Theorem rngl_mul_div_r :
   rngl_has_1 T = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b : T,
   b ≠ 0%L
   → (b * (a / b))%L = a.
@@ -1046,23 +1046,10 @@ Theorem rngl_mul_cancel_l :
   → b = c.
 Proof.
 intros Hii * Haz Habc.
-(*
-clear Hii.
-*)
-remember rngl_has_inv as iv eqn:Hiv.
+remember (rngl_has_inv T) as iv eqn:Hiv.
 symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
-(*
-progress unfold rngl_has_inv in Hiv.
-progress unfold rngl_has_1 T.
-remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
-destruct iq as [iq| ]; [ | easy ].
-destruct iq as [inv| quot]; [ clear Hiv | easy ].
-remember rngl_opt_one as on eqn:Hon; symmetry in Hon.
-destruct on; [ easy | ].
-...
-*)
     apply rngl_has_inv_and_1_or_quot_iff in Hii.
     destruct Hii as [| Hii]; [ easy | ].
     apply rngl_has_quot_has_no_inv in Hii.
@@ -1264,7 +1251,7 @@ Qed.
 
 Theorem rngl_div_mul :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b, b ≠ 0%L → (a / b * b)%L = a.
 Proof.
 intros Hon Hiv * Hbz.
@@ -1292,7 +1279,7 @@ Qed.
 Theorem rngl_div_div_mul_mul :
   rngl_has_1 T = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b c d,
   b ≠ 0%L
   → d ≠ 0%L
@@ -1331,7 +1318,7 @@ intros Hos Hii * Hab Hbz.
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
 cbn in Hii; clear rngl_integral.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
     apply rngl_has_inv_and_1_or_quot_iff in Hii.
@@ -1370,7 +1357,7 @@ destruct ic. {
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
 cbn in Hii; clear rngl_integral.
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
     apply rngl_has_inv_and_1_or_quot_iff in Hii.
@@ -1405,7 +1392,7 @@ Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
 destruct rngl_is_integral_domain; [ now apply rngl_integral | cbn in Hdo ].
-remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
+remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
     remember (rngl_has_inv_and_1_or_quot T) as iq eqn:Hiq.
@@ -1479,7 +1466,7 @@ easy.
 Qed.
 
 Theorem rngl_div_compat_l :
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b c, c ≠ 0%L → (a = b)%L → (a / c = b / c)%L.
 Proof.
 intros Hin a b c Hcz Hab.
@@ -1651,7 +1638,7 @@ Qed.
 
 Theorem rngl_inv_1 :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (1⁻¹ = 1)%L.
 Proof.
@@ -1672,7 +1659,7 @@ Qed.
 
 Theorem rngl_div_1_l :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a, (1 / a = a⁻¹)%L.
 Proof.
 intros Hon Hiv *.
@@ -1700,7 +1687,7 @@ Qed.
 
 Theorem rngl_mul_move_1_r :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b : T, b ≠ 0%L → (a * b)%L = 1%L ↔ a = (b⁻¹)%L.
 Proof.
 intros Hon Hiv * Hbz.
@@ -1763,7 +1750,7 @@ Qed.
 Theorem rngl_inv_neq_0 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
 intros Hon Hom Hiv * Haz H1.
@@ -1783,7 +1770,7 @@ Qed.
 Theorem rngl_inv_involutive :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
 intros Hon Hos Hiv * Hxz.
@@ -1841,7 +1828,7 @@ Qed.
 Theorem rngl_inv_inj :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →(a⁻¹ = b⁻¹)%L → a = b.
 Proof.
 intros Hon Hom Hiv * Haz Hbz H.
@@ -1853,7 +1840,7 @@ Qed.
 Theorem rngl_inv_mul_distr :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
 intros Hon Hom Hiv * Haz Hbz.
@@ -2072,7 +2059,7 @@ Qed.
 Theorem rngl_opp_inv :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ a, a ≠ 0%L → (- a⁻¹ = (- a)⁻¹)%L.
 Proof.
 intros Hon Hop Hiv * Haz.
@@ -2118,7 +2105,7 @@ Qed.
 
 Theorem rngl_div_mul_div :
   rngl_has_1 T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ x y z, y ≠ 0%L → ((x / y) * (y / z))%L = (x / z)%L.
 Proof.
 intros Hon Hiv * Hs.
@@ -2285,7 +2272,7 @@ Qed.
 Theorem rngl_0_lt_inv_compat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_is_ordered = true →
   ∀ a, (0 < a → 0 < a⁻¹)%L.
 Proof.
@@ -2322,7 +2309,7 @@ Qed.
 Theorem rngl_inv_lt_0_compat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_is_ordered = true →
   ∀ a, (a < 0 → a⁻¹ < 0)%L.
 Proof.
@@ -2349,7 +2336,7 @@ Qed.
 Theorem rngl_div_le_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_is_ordered = true →
   ∀ a b, (b ≠ 0 → 0 ≤ a ≤ b → a / b ≤ 1)%L.
 Proof.
@@ -2460,7 +2447,7 @@ Qed.
 Theorem rngl_abs_div :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_has_eqb = true →
   rngl_is_ordered = true →
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
@@ -2618,7 +2605,7 @@ Record in_charac_0_field :=
   { cf_has_1 : rngl_has_1 T = true;
     cf_mul_is_comm : rngl_mul_is_comm = true;
     cf_has_opp : rngl_has_opp T = true;
-    cf_has_inv : rngl_has_inv = true;
+    cf_has_inv : rngl_has_inv T = true;
     cf_has_eqb : rngl_has_eqb = true;
     cf_characteristic : rngl_characteristic = 0 }.
 

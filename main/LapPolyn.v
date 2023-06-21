@@ -1931,32 +1931,6 @@ Qed.
 
 (* *)
 
-Theorem lap_opt_has_no_inv : ∀ P,
-  let _ := lap_ring_like_op in
-  if rngl_has_inv then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_inv; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| Hop]; [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
-now destruct rngl_opt_inv_or_quot.
-Qed.
-
-Theorem lap_opt_has_no_inv_and : ∀ e P,
-  let _ := lap_ring_like_op in
-  if (rngl_has_inv && e)%bool then P else not_applicable.
-Proof.
-intros.
-unfold rngl_has_inv; cbn.
-unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)); [ | easy ].
-destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
-now destruct rngl_opt_inv_or_quot.
-Qed.
-
-(* *)
-
 Theorem map2_rngl_subt_diag :
   rngl_has_opp_or_subt T = true →
   ∀ la, map2 rngl_subt la la = repeat 0%L (length la).
@@ -2949,8 +2923,8 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_add_opp_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := lap_opt_has_no_inv False;
-     rngl_opt_mul_inv_r := lap_opt_has_no_inv_and false False;
+     rngl_opt_mul_inv_l := NA;
+     rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;

@@ -337,7 +337,7 @@ Qed.
 
 Theorem rngl_inv_product_list :
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   ∀ A (l : list A) f,
@@ -385,7 +385,7 @@ Qed.
 
 Theorem rngl_inv_product :
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   ∀ b e f,
@@ -438,7 +438,7 @@ Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   equality eqb →
   rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   ∀ (l : list A) f,
@@ -454,7 +454,7 @@ Qed.
 Theorem rngl_inv_product_comm :
   rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   ∀ b e f,
@@ -471,7 +471,7 @@ Qed.
 Theorem rngl_product_div_distr :
   rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   ∀ b e f g,

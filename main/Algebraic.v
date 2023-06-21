@@ -181,7 +181,7 @@ Qed.
 Theorem lap_norm_mul_x_power_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
   ∀ la n,
@@ -279,7 +279,6 @@ Arguments polyn_ring_like_op T {ro rp} Hos Heb.
 Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
-Arguments rngl_has_inv T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 

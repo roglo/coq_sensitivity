@@ -120,7 +120,7 @@ Definition in_ordered_field :=
   rngl_mul_is_comm = true ∧
   rngl_has_opp T = true ∧
   rngl_has_eqb = true ∧
-  rngl_has_inv = true ∧
+  rngl_has_inv T = true ∧
   rngl_characteristic = 0 ∧
   rngl_is_ordered = true.
 
@@ -288,7 +288,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_is_ordered = true →
   ∀ (M : matrix T) V μ,
   V ≠ vect_zero (vect_size V)
@@ -506,7 +506,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_mul_is_comm = true →
   rngl_has_opp_or_subt T = true →
   rngl_has_eqb = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ n (M : matrix T) ev eV A,
   is_symm_mat M
   → mat_nrows M = n

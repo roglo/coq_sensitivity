@@ -1580,7 +1580,7 @@ Qed.
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_has_eqb = true →
   ∀ n μ, (μ * μ)%L = rngl_mul_nat 1 n →
   match n with
@@ -1778,7 +1778,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
   rngl_has_eqb = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   ∀ n μ (V : vector T),
   vect_size V = 2 ^ n
   → V ≠ vect_zero (2 ^ n)
@@ -1827,7 +1827,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_mul_is_comm = true →
   rngl_has_opp T = true →
   rngl_has_eqb = true →
-  rngl_has_inv = true →
+  rngl_has_inv T = true →
   rngl_characteristic ≠ 1 →
   ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_mul_nat 1 n)%L.
