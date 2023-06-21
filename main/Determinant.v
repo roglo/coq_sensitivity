@@ -2401,7 +2401,7 @@ now rewrite mat_subm_transp.
 Qed.
 
 Theorem det_mI :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ n, det (mI n) = 1%L.
 Proof.
 intros Hop *; cbn.

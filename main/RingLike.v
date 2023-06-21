@@ -68,7 +68,7 @@ Delimit Scope ring_like_scope with L.
 Definition rngl_has_1 T {ro : ring_like_op T} :=
   bool_of_option rngl_opt_one.
 
-Definition rngl_has_opp_or_subt {T} {R : ring_like_op T} :=
+Definition rngl_has_opp_or_subt T {R : ring_like_op T} :=
   bool_of_option rngl_opt_opp_or_subt.
 
 Definition rngl_has_inv_or_quot {T} {R : ring_like_op T} :=
@@ -140,7 +140,7 @@ Definition rngl_div {T} {R : ring_like_op T} a b :=
   else rngl_zero.
 
 Theorem rngl_has_opp_or_subt_iff {T} {R : ring_like_op T} :
-  rngl_has_opp_or_subt = true
+  rngl_has_opp_or_subt T = true
   ↔ rngl_has_opp = true ∨ rngl_has_subt = true.
 Proof.
 unfold rngl_has_opp_or_subt, bool_of_option.
@@ -182,7 +182,7 @@ now destruct inv_quot; [ left | right ].
 Qed.
 
 Theorem rngl_has_opp_has_opp_or_subt : ∀ {T} {ro : ring_like_op T},
-  rngl_has_opp = true → rngl_has_opp_or_subt = true.
+  rngl_has_opp = true → rngl_has_opp_or_subt T = true.
 Proof.
 intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
@@ -849,7 +849,7 @@ now unfold rngl_div; rewrite Hin.
 Qed.
 
 Theorem rngl_sub_diag :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a, (a - a = 0)%L.
 Proof.
 intros Hos *.
@@ -874,7 +874,7 @@ destruct Hos; congruence.
 Qed.
 
 Theorem rngl_subt_diag :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a, rngl_subt a a = 0%L.
 Proof.
 intros Hos *.
@@ -934,7 +934,7 @@ destruct Hiq; congruence.
 Qed.
 
 Theorem rngl_add_sub :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b, (a + b - b = a)%L.
 Proof.
 intros Hom *.
@@ -1009,7 +1009,7 @@ apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_add_cancel_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + b = a + c)%L → (b = c)%L.
 Proof.
 intros Hom * Habc.
@@ -1100,7 +1100,7 @@ destruct Hii as [(H1, H2)| ]; congruence.
 Qed.
 
 Theorem rngl_add_sub_eq_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + b = c → c - a = b)%L.
 Proof.
 intros Hom * Hab.
@@ -1110,7 +1110,7 @@ now apply rngl_add_sub.
 Qed.
 
 Theorem rngl_add_sub_eq_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
    ∀ a b c, (a + b = c → c - b = a)%L.
 Proof.
 intros Hom * Hab.
@@ -1126,7 +1126,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_add_cancel_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + c = b + c)%L → (a = b)%L.
 Proof.
 intros Hom * Habc.
@@ -1135,7 +1135,7 @@ now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a, (a * 0 = 0)%L.
 Proof.
 intros Hos *.
@@ -1145,7 +1145,7 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_mul_0_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a, (0 * a = 0)%L.
 Proof.
 intros Hom a.
@@ -1156,7 +1156,7 @@ Qed.
 
 Theorem rngl_characteristic_1 :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_characteristic = 1 →
   ∀ x, x = 0%L.
 Proof.
@@ -1206,7 +1206,7 @@ Qed.
 
 Theorem rngl_1_eq_0_iff :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_characteristic = 1 ↔ (1 = 0)%L.
 Proof.
 intros Hon Hos.
@@ -1276,7 +1276,7 @@ apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_div_0_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv_and_1_or_quot = true →
   ∀ a, a ≠ 0%L → (0 / a)%L = 0%L.
 Proof.
@@ -1323,7 +1323,7 @@ split. {
 Qed.
 
 Theorem rngl_eq_mul_0_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
   ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
 Proof.
@@ -1357,7 +1357,7 @@ now destruct Hii.
 Qed.
 
 Theorem rngl_eq_mul_0_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
   ∀ a b, (a * b = 0)%L → a ≠ 0%L → b = 0%L.
 Proof.
@@ -1397,7 +1397,7 @@ now destruct Hii.
 Qed.
 
 Theorem rngl_integral :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
    rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
@@ -1573,7 +1573,7 @@ Qed.
 *)
 
 Theorem rngl_sub_0_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a, (a - 0 = a)%L.
 Proof.
 intros Hom *.
@@ -1618,7 +1618,7 @@ now apply Hop'; left.
 Qed.
 
 Theorem rngl_add_sub_simpl_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b c : T, (a + b - (a + c) = b - c)%L.
 Proof.
 intros Hom *.
@@ -1762,7 +1762,7 @@ Qed.
 
 Theorem rngl_inv_neq_0 :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
@@ -1782,7 +1782,7 @@ Qed.
 
 Theorem rngl_inv_involutive :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
@@ -1840,7 +1840,7 @@ Qed.
 
 Theorem rngl_inv_inj :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →(a⁻¹ = b⁻¹)%L → a = b.
 Proof.
@@ -1852,7 +1852,7 @@ Qed.
 
 Theorem rngl_inv_mul_distr :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
@@ -1916,7 +1916,7 @@ now rewrite rngl_opp_involutive.
 Qed.
 
 Theorem rngl_sub_add_distr :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b c, (a - (b + c) = a - b - c)%L.
 Proof.
 intros Hos *.
@@ -1959,7 +1959,7 @@ Theorem rngl_le_0_sub :
   ∀ a b : T, (0 ≤ b - a ↔ a ≤ b)%L.
 Proof.
 intros * Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rngl_add_le_compat Hor) as H1.
@@ -2045,7 +2045,7 @@ Qed.
 
 Theorem rngl_of_nat_inj :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_characteristic = 0 →
   ∀ i j,
   rngl_mul_nat 1 i = rngl_mul_nat 1 j
@@ -2075,7 +2075,7 @@ Theorem rngl_opp_inv :
   ∀ a, a ≠ 0%L → (- a⁻¹ = (- a)⁻¹)%L.
 Proof.
 intros Hon Hop Hiv * Haz.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 assert (Hid : rngl_has_inv_and_1_or_quot = true). {
@@ -2140,7 +2140,7 @@ Qed.
 
 Theorem eq_rngl_add_same_0 :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
@@ -2165,7 +2165,7 @@ Qed.
 (* *)
 
 Theorem rngl_pow_0_l :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
 Proof.
 intros Hos *.
@@ -2184,7 +2184,7 @@ Theorem rngl_mul_nonneg_nonneg :
   ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a * b)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
@@ -2202,7 +2202,7 @@ Theorem rngl_mul_nonpos_nonpos :
   ∀ a b, (a ≤ 0 → b ≤ 0 → 0 ≤ a * b)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
@@ -2220,7 +2220,7 @@ Theorem rngl_mul_nonneg_nonpos :
   ∀ a b, (0 ≤ a → b ≤ 0 → a * b ≤ 0)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
@@ -2246,7 +2246,7 @@ Theorem rngl_mul_nonpos_nonneg :
   ∀ a b, (a ≤ 0 → 0 ≤ b → a * b ≤ 0)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
@@ -2290,7 +2290,7 @@ Theorem rngl_0_lt_inv_compat :
 Proof.
 intros * Hon Hop Hiv Hor.
 intros * Hza.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 assert (Haz : a ≠ 0%L). {
@@ -2393,7 +2393,7 @@ Theorem eq_rngl_add_square_0 :
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
 intros * Hop Hor Hii * Hab.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
@@ -2464,7 +2464,7 @@ Theorem rngl_abs_div :
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
 intros * Hon Hop Hiv Heb Hor * Hyz.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 assert (Hiq : rngl_has_inv_and_1_or_quot = true). {

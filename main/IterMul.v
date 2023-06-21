@@ -254,7 +254,7 @@ now rewrite Nat.add_1_r.
 Qed.
 
 Theorem rngl_product_list_integral :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain ||
    rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   rngl_characteristic ≠ 1 →
@@ -285,8 +285,9 @@ split; [ now right | easy ].
 Qed.
 
 Theorem rngl_product_integral :
-  rngl_has_opp_or_subt = true →
-  (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain ||
+     rngl_has_inv_and_1_or_quot && rngl_has_eqb)%bool = true →
   rngl_characteristic ≠ 1 →
   ∀ b e f,
   (∏ (i = b, e), f i = 0)%L
@@ -335,7 +336,7 @@ flia Hi.
 Qed.
 
 Theorem rngl_inv_product_list :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
@@ -383,7 +384,7 @@ apply fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
@@ -435,7 +436,7 @@ Qed.
 
 Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   equality eqb →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
@@ -451,7 +452,7 @@ now apply permutation_rev_l.
 Qed.
 
 Theorem rngl_inv_product_comm :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
@@ -468,7 +469,7 @@ apply Hnz; flia Hi.
 Qed.
 
 Theorem rngl_product_div_distr :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
@@ -570,7 +571,7 @@ Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 
 Theorem rngl_product_summation_distr_cart_prod :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =

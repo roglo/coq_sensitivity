@@ -19,7 +19,6 @@ Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_opp T {R}.
-Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_quot T {R}.
 Arguments rngl_has_subt T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
@@ -1865,7 +1864,6 @@ Record complex := mk_c {re : R; im : R}.
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_opp T {R}.
-Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_and_1_or_quot T {R}.
 Arguments rngl_has_inv_or_quot T {R}.

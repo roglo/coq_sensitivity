@@ -75,7 +75,7 @@ Qed.
 
 Theorem lap_x_power_add :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_eqb = true →
   ∀ a b, lap_x_power (a + b) = (lap_x_power a * lap_x_power b)%lap.
 Proof.
@@ -151,7 +151,7 @@ Qed.
 
 Theorem polyn_x_power_add :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_eqb = true →
   ∀ a b, polyn_x_power (a + b) = (polyn_x_power a * polyn_x_power b)%pol.
 Proof.
@@ -180,7 +180,7 @@ Qed.
 
 Theorem lap_norm_mul_x_power_r :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
@@ -196,7 +196,7 @@ apply (lap_x_power_has_polyn_prop Hon Hch Heb).
 Qed.
 
 Theorem polyn_of_const_add :
-  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Hos : rngl_has_opp_or_subt T = true),
   ∀ (Heb : rngl_has_eqb = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ a b,
@@ -236,7 +236,7 @@ Qed.
 
 Theorem polyn_of_const_mul :
   (rngl_is_integral_domain || rngl_has_inv_and_1_or_quot)%bool = true →
-  ∀ (Hos : rngl_has_opp_or_subt = true),
+  ∀ (Hos : rngl_has_opp_or_subt T = true),
   ∀ (Heb : rngl_has_eqb = true),
   ∀ (rop := polyn_ring_like_op Hos Heb),
   ∀ a b,
@@ -283,7 +283,6 @@ Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_and_1_or_quot T {R}.
 Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_opp T {R}.
-Arguments rngl_has_opp_or_subt T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 
@@ -1787,7 +1786,7 @@ Qed.
 
 (*
 Theorem last_lap_mul_const_l_add_const_r :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ a b la,
   last ([a] * la + [b])%lap 0%L =
     match length la with
@@ -1864,7 +1863,7 @@ destruct pb as [pb| pb]. {
 right.
 apply (rngl_neqb_neq Heb) in pa, pb.
 Theorem last_lap_compose :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ la lb,
   last (la ° lb)%lap 0%L =
     match length lb with

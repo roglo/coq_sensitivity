@@ -24,7 +24,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hom : rngl_has_opp_or_subt = true).
+Context (Hom : rngl_has_opp_or_subt T = true).
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c + f i) l a =

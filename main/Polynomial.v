@@ -21,7 +21,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hos : rngl_has_opp_or_subt = true).
+Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Heb : rngl_has_eqb = true).
 
 Theorem eq_strip_0s_nil : ∀ d la,
@@ -1679,7 +1679,7 @@ Theorem lap_quot_rem_prop :
 Proof.
 clear Hos.
 intros Hon Hco Hop Hiv * Ha Hb Hr Hab.
-assert (Hos : rngl_has_opp_or_subt = true). {
+assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 assert (Hrb : length lr < length lb). {
@@ -2110,7 +2110,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
-Context (Hos : rngl_has_opp_or_subt = true).
+Context (Hos : rngl_has_opp_or_subt T = true).
 Context (Heb : rngl_has_eqb = true).
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
@@ -3415,7 +3415,7 @@ Require Import RnglAlg.MatRl.
 Definition mat_of_polyn_ring_like_op n T
   (ro : ring_like_op T) (rp : ring_like_prop T) eqb
   (Heq : rngl_has_eqb = true)
-  (Hos : rngl_has_opp_or_subt = true) :
+  (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_op (square_matrix n (polyn T)) :=
   mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
 

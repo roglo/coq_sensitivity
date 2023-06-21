@@ -181,7 +181,7 @@ flia Hi.
 Qed.
 
 Theorem Rayleigh_quotient_mul_scal_l_zero :
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ c M,
   Rayleigh_quotient M (c × vect_zero (mat_nrows M)) =
   Rayleigh_quotient M (vect_zero (mat_nrows M)).
@@ -417,7 +417,7 @@ Qed.
 
 Theorem mat_mul_vect_dot_vect :
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ (M : matrix T) U V,
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -504,7 +504,7 @@ Qed.
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_has_1 T = true →
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
@@ -673,7 +673,7 @@ Qed.
    see the comment for the theorem below *)
 Lemma diagonalized_matrix_prop_1 :
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_subt = true →
+  rngl_has_opp_or_subt T = true →
   ∀ n (M : matrix T) ev eV D U,
   mat_nrows M = n
   → length eV = n
@@ -1120,7 +1120,7 @@ assert
            (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
-  assert (Hos : rngl_has_opp_or_subt = true). {
+  assert (Hos : rngl_has_opp_or_subt T = true). {
     now apply rngl_has_opp_or_subt_iff; left.
   }
   unfold eigenvalues_and_norm_vectors in HeV.
