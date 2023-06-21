@@ -123,8 +123,6 @@ Arguments rl_ln {T ro rp real_like_prop} x%L.
 Arguments rl_sin {T ro rp real_like_prop} x%L.
 Arguments rl_has_trigo T {ro rp real_like_prop}.
 
-Arguments rngl_is_ordered T {R}.
-
 Definition rl_has_mod_intgl T {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option (rl_opt_mod_intgl_prop T).
@@ -1855,7 +1853,6 @@ Record complex := mk_c {re : R; im : R}.
 (*
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
 Arguments rngl_is_integral T {ro ring_like_prop}.
-Arguments rngl_is_ordered T {R}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 *)

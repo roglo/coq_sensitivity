@@ -90,7 +90,7 @@ Arguments Rayleigh_quotient M%M v%V.
 
 Theorem rngl_0_le_squ :
   rngl_has_opp T = true →
-  rngl_is_ordered = true →
+  rngl_is_ordered T = true →
   ∀ n, (0 ≤ n * n)%L.
 Proof.
 intros Hop Hor *.
@@ -122,13 +122,13 @@ Definition in_ordered_field :=
   rngl_has_eqb T = true ∧
   rngl_has_inv T = true ∧
   rngl_characteristic T = 0 ∧
-  rngl_is_ordered = true.
+  rngl_is_ordered T = true.
 
 Theorem eq_vect_squ_0 :
   rngl_has_opp T = true →
   (rngl_is_integral_domain ||
    rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true →
-  rngl_is_ordered = true →
+  rngl_is_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
 intros Hop Hdo Hor * Hvvz.
@@ -289,7 +289,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   rngl_has_opp T = true →
   (rngl_is_integral_domain || rngl_has_eqb T)%bool = true →
   rngl_has_inv T = true →
-  rngl_is_ordered = true →
+  rngl_is_ordered T = true →
   ∀ (M : matrix T) V μ,
   V ≠ vect_zero (vect_size V)
   → (M • V = μ × V)%V

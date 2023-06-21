@@ -714,7 +714,7 @@ flia Hi.
 Qed.
 
 Theorem rngl_summation_le_compat :
-  rngl_is_ordered = true →
+  rngl_is_ordered T = true →
   ∀ b e g h,
   (∀ i, b ≤ i ≤ e → (g i ≤ h i)%L)
   → (∑ (i = b, e), g i ≤ ∑ (i = b, e), h i)%L.
