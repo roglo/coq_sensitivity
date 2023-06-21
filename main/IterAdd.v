@@ -218,7 +218,7 @@ apply iter_seq_distr. {
 Qed.
 
 Theorem rngl_opp_summation_list :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ A (f : A → T) l, (- (∑ (i ∈ l), f i))%L = ∑ (i ∈ l), - f i.
 Proof.
 intros Hop *.
@@ -232,7 +232,7 @@ now rewrite (rngl_opp_0 Hop).
 Qed.
 
 Theorem rngl_summation_list_sub_distr :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ A g h (l : list A),
   (∑ (i ∈ l), (g i - h i) =
   (∑ (i ∈ l), g i) - ∑ (i ∈ l), h i)%L.
@@ -264,7 +264,7 @@ now rewrite Nat_sub_succ_1.
 Qed.
 
 Theorem rngl_opp_summation :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ b e f, ((- ∑ (i = b, e), f i) = ∑ (i = b, e), (- f i))%L.
 Proof.
 intros Hop *.

@@ -338,7 +338,7 @@ Qed.
 (* "We prove by induction that A_n^2 = nI" *)
 
 Theorem lemma_2_A_n_2_eq_n_I :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n, (mA n * mA n)%M = (rngl_mul_nat 1 n × mI (2 ^ n))%M.
 Proof.
 intros Hop *.
@@ -1579,7 +1579,7 @@ Qed.
 
 Theorem An_eigen_equation_for_sqrt_n :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_has_inv = true →
   rngl_has_eqb = true →
   ∀ n μ, (μ * μ)%L = rngl_mul_nat 1 n →
@@ -1776,7 +1776,7 @@ Qed.
 
 Theorem A_n_eigenvalue_squared_is_n :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n μ (V : vector T),
@@ -1825,7 +1825,7 @@ Definition is_eigenvector_of_An n μ (V : vector T) :=
 
 Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →

@@ -89,7 +89,7 @@ Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
 Arguments Rayleigh_quotient M%M v%V.
 
 Theorem rngl_0_le_squ :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_is_ordered = true →
   ∀ n, (0 ≤ n * n)%L.
 Proof.
@@ -118,14 +118,14 @@ Qed.
 Definition in_ordered_field :=
   rngl_has_1 T = true ∧
   rngl_mul_is_comm = true ∧
-  rngl_has_opp = true ∧
+  rngl_has_opp T = true ∧
   rngl_has_eqb = true ∧
   rngl_has_inv = true ∧
   rngl_characteristic = 0 ∧
   rngl_is_ordered = true.
 
 Theorem eq_vect_squ_0 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   (rngl_is_integral_domain ||
    rngl_has_inv_and_1_or_quot T && rngl_has_eqb)%bool = true →
   rngl_is_ordered = true →
@@ -286,7 +286,7 @@ Qed.
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_has_1 T = true →
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   (rngl_is_integral_domain || rngl_has_eqb)%bool = true →
   rngl_has_inv = true →
   rngl_is_ordered = true →
@@ -965,7 +965,7 @@ assert (H10 : rngl_characteristic ≠ 1). {
   now rewrite (cf_characteristic Hif).
 }
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
+assert (H : rngl_has_opp T = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {

@@ -361,7 +361,7 @@ now rewrite map_length.
 Qed.
 
 Theorem vect_opp_el :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ v i, vect_el (vect_opp v) i = (- vect_el v i)%L.
 Proof.
 intros Hop *; unfold vect_el; cbn.
@@ -401,7 +401,7 @@ apply rngl_mul_add_distr_r.
 Qed.
 
 Theorem vect_mul_scal_l_sub_distr_r :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a b u, ((a - b)%L × u)%V = (a × u - b × u)%V.
 Proof.
 intros Hop *.
@@ -483,7 +483,7 @@ apply rngl_add_assoc.
 Qed.
 
 Theorem vect_opp_dot_mul_l :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ u v, (≺ - u, v ≻ = - ≺ u, v ≻)%L.
 Proof.
 intros Hop *.
@@ -502,7 +502,7 @@ apply (rngl_mul_opp_l Hop).
 Qed.
 
 Theorem vect_mul_scal_l_opp_l :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a u, ((- a)%L × u = - (a × u))%V.
 Proof.
 intros Hop *.

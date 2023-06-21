@@ -376,7 +376,7 @@ Qed.
 (* det and det' are equal *)
 
 Theorem det_is_det' :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det' M.
@@ -503,7 +503,7 @@ Qed.
 (* det' and det'' are equal *)
 
 Theorem det'_is_det'' :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop *.
@@ -691,7 +691,7 @@ Qed.
 (* det and det'' are equal *)
 
 Theorem det_is_det'' :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det'' M.
@@ -705,7 +705,7 @@ Qed.
 
 Theorem determinant_multilinear :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -1124,7 +1124,7 @@ Qed.
 
 Theorem determinant_alternating :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ (M : matrix T) p q,
   p ≠ q
   → 1 ≤ p ≤ mat_nrows M
@@ -1481,7 +1481,7 @@ Qed.
 
 Theorem determinant_same_rows :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T) p q,
@@ -1734,7 +1734,7 @@ now rewrite Nat.sub_succ, Nat.sub_0_r.
 Qed.
 
 Theorem det_by_any_sym_gr :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
@@ -2334,7 +2334,7 @@ Qed.
 
 Theorem determinant_transpose :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -2384,7 +2384,7 @@ Qed.
 
 Theorem det_subm_transp :
   rngl_mul_is_comm = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ i j (M : matrix T),
   is_square_matrix M = true

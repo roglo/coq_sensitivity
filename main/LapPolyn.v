@@ -71,7 +71,7 @@ Definition lap_subt la lb :=
 
 Definition lap_opp la := map rngl_opp la.
 Definition lap_sub la lb :=
-  if rngl_has_opp then lap_add la (lap_opp lb)
+  if rngl_has_opp T then lap_add la (lap_opp lb)
   else if rngl_has_subt then lap_subt la lb
   else repeat 0%L (max (length la) (length lb)).
 
@@ -1938,7 +1938,7 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| Hop]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
@@ -1950,7 +1950,7 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)); [ | easy ].
 destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
@@ -1973,7 +1973,7 @@ Theorem lap_opt_add_sub :
   (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
 intros Hsu *.
-remember rngl_has_opp as op eqn:Hop.
+remember (rngl_has_opp T) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   move Hsu at bottom.
@@ -2040,7 +2040,7 @@ Theorem lap_subt_add_distr :
   ∀ la lb lc, lap_subt la (lb + lc) = lap_subt (lap_subt la lb) lc.
 Proof.
 intros Hsu *.
-remember rngl_has_opp as op eqn:Hop.
+remember (rngl_has_opp T) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   move Hsu at bottom.
@@ -2382,7 +2382,7 @@ Theorem lap_opt_sub_add_distr :
   ∀ la lb lc : list T, (la - (lb + lc))%lap = (la - lb - lc)%lap.
 Proof.
 intros Hsu *.
-remember rngl_has_opp as op eqn:Hop.
+remember (rngl_has_opp T) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   move Hsu at bottom.
@@ -2403,7 +2403,7 @@ Qed.
 (* *)
 
 Theorem lap_mul_opp_r :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la lb, (la * - lb = - (la * lb))%lap.
 Proof.
 intros Hop *.
@@ -2444,7 +2444,7 @@ now rewrite (List_map_nth' 0%L).
 Qed.
 
 Theorem lap_mul_sub_distr_l :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la lb lc, (la * (lb - lc))%lap = (la * lb - la * lc)%lap.
 Proof.
 intros Hop *.

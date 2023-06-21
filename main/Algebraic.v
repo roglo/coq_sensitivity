@@ -280,7 +280,6 @@ Arguments polyn_ring_like_prop T {ro rp} Hon Hos Heb.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv T {R}.
-Arguments rngl_has_opp T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 

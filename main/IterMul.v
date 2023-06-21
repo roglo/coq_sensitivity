@@ -496,7 +496,7 @@ now apply iter_list_seq.
 Qed.
 
 Theorem rngl_product_1_opp_1 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i = 1%L ∨ f i = (-1)%L)
   → (∏ (i = b, e), f i = 1)%L ∨ (∏ (i = b, e), f i = -1)%L.

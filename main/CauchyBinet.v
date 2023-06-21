@@ -651,7 +651,7 @@ Qed.
 
 Theorem det_isort_rows_with_dup :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
@@ -728,7 +728,7 @@ Qed.
 
 Theorem det_isort_rows_no_dup :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   rngl_characteristic ≠ 1 →
   ∀ A kl,
@@ -1056,7 +1056,7 @@ Qed.
 
 Theorem det_isort_rows :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
@@ -1277,7 +1277,7 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
 Qed.
 
 Theorem rngl_summation_cart_prod_repeat_filter_no_dup :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n m f,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * f kl =
@@ -1323,7 +1323,7 @@ easy.
 Qed.
 
 Theorem rngl_summation_cart_prod_sub_lists_all_permut :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n m f,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)), ε kl * f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
@@ -1384,7 +1384,7 @@ Proof. now intros; subst n. Qed.
 
 Theorem det_is_det''' :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ M, is_square_matrix M = true
   → det M = det''' M.
 Proof.
@@ -1539,7 +1539,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_1 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n A B], m ≠ 0 →
   mat_nrows A = m
@@ -1617,7 +1617,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_2 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   ∀ [m n A B], m ≠ 0 →
   ∑ (l ∈ cart_prod_rep_seq m),
@@ -1714,7 +1714,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_3 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n] f [B], m ≠ 0 →
   is_correct_matrix B = true
@@ -1767,7 +1767,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_4 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
   (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
@@ -1800,7 +1800,7 @@ now rewrite (rngl_mul_comm Hic _ (ε la)).
 Qed.
 
 Lemma Cauchy_Binet_formula_step_5_1 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ m n A B,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -1856,7 +1856,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_5_2 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ [m n A] f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
@@ -2028,7 +2028,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_5_4 :
   rngl_has_1 T = true →
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ [m n A] f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
@@ -2072,7 +2072,7 @@ Theorem Cauchy_Binet_formula : in_charac_0_field →
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hon : rngl_has_1 T = true) by now destruct Hif.
-assert (Hop : rngl_has_opp = true) by now destruct Hif.
+assert (Hop : rngl_has_opp T = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 assert (Hch : rngl_characteristic = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.

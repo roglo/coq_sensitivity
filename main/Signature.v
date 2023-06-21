@@ -70,7 +70,7 @@ Definition test_ring_like_op :=
 (* *)
 
 Theorem minus_one_pow_mul_comm :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i x, (minus_one_pow i * x = x * minus_one_pow i)%L.
 Proof.
 intros Hop *.
@@ -85,7 +85,7 @@ now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
 Theorem minus_one_pow_succ :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%L.
 Proof.
 intros Hop *.
@@ -112,7 +112,7 @@ flia H1.
 Qed.
 
 Theorem ε_app_cons :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ {n} la lb,
   (∀ a, a ∈ la ++ lb → a < n)
   → ε (la ++ n :: lb) = (minus_one_pow (length lb) * ε (la ++ lb))%L.
@@ -167,7 +167,7 @@ destruct c; [ easy | | ]. {
 Qed.
 
 Theorem ε_aux_dup :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i l1 l2, ε_aux i (l1 ++ i :: l2) = 0%L.
 Proof.
 intros Hop *.
@@ -179,7 +179,7 @@ apply (rngl_opp_0 Hop).
 Qed.
 
 Theorem minus_one_pow_mul_same :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i, (minus_one_pow i * minus_one_pow i = 1)%L.
 Proof.
 intros Hop *.
@@ -339,7 +339,7 @@ Theorem fold_ε_cons : ∀ i q, (ε_aux i q * ε q)%L = ε (i :: q).
 Proof. easy. Qed.
 
 Theorem ε_aux_in :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i la, ε_aux i la ∈ [-1; 0; 1]%L.
 Proof.
 intros Hop *.
@@ -360,7 +360,7 @@ destruct (i ?= a); [ now right; left | | ]. {
 Qed.
 
 Theorem ε_in :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la, ε la ∈ [-1; 0; 1]%L.
 Proof.
 intros Hop *.
@@ -389,7 +389,7 @@ destruct IHla as [H2| [H2| [H2| ]]]; [ | | | easy ]; rewrite <- H2. {
 Qed.
 
 Theorem ε_aux_mul_comm :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i la a, (ε_aux i la * a = a * ε_aux i la)%L.
 Proof.
 intros Hop *.
@@ -415,7 +415,7 @@ now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
 Theorem ε_mul_comm :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la a, (ε la * a = a * ε la)%L.
 Proof.
 intros Hop *.
@@ -456,7 +456,7 @@ now rewrite IHla.
 Qed.
 
 Theorem ε_aux_app_lt_gt :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a b c la,
   a < c
   → c < b
@@ -513,7 +513,7 @@ now rewrite IHla.
 Qed.
 
 Theorem ε_aux_mul_ε_app_from_ε_cons_app_lt :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a b la,
   a < b
   → (ε_aux a la * ε (la ++ [b]))%L = (- ε (b :: la ++ [a]))%L.
@@ -616,7 +616,7 @@ now apply ε_aux_app_gt_gt.
 Qed.
 
 Theorem ε_aux_mul_ε_app_from_ε_cons_app_gt :
-  rngl_has_opp = true
+  rngl_has_opp T = true
   → ∀ a b la,
   b < a
   → (ε_aux a la * ε (la ++ [b]))%L = ε (b :: la ++ [a]).
@@ -719,7 +719,7 @@ now apply ε_aux_app_gt_gt.
 Qed.
 
 Theorem ε_cons_from_ε_app :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a la, ε (a :: la) = (minus_one_pow (length la) * ε (la ++ [a]))%L.
 Proof.
 intros Hop *; cbn.
@@ -764,7 +764,7 @@ destruct c. {
 Qed.
 
 Theorem ε_aux_app_cons_ε_aux_app_app :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a b la lb,
   ε_aux a (la ++ b :: lb) = ε_aux a (la ++ lb ++ [b]).
 Proof.
@@ -787,7 +787,7 @@ destruct aa. {
 Qed.
 
 Theorem ε_app_cons2 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la lb a,
   ε (la ++ a :: lb) = (minus_one_pow (length lb) * ε (la ++ lb ++ [a]))%L.
 Proof.
@@ -821,7 +821,7 @@ now apply Nat.compare_lt_iff in Hij; rewrite Hij.
 Qed.
 
 Theorem ε_aux_app_cons_gt :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ {i j} la lb,
   j < i
   → ε_aux i (la ++ j :: lb) = (- ε_aux i (la ++ lb))%L.
@@ -837,7 +837,7 @@ symmetry; apply (rngl_opp_0 Hop).
 Qed.
 
 Theorem ε_aux_permut :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i la lb,
   permutation Nat.eqb la lb
   → ε_aux i la = ε_aux i lb.
@@ -871,7 +871,7 @@ destruct ia. {
 Qed.
 
 Theorem sign_comp :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la lb,
   permut_seq_with_len (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
@@ -1130,7 +1130,7 @@ now apply ε_aux_app.
 Qed.
 
 Theorem ε_aux_app2 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i p q,
   (∀ j k, j ∈ i :: p → k ∈ q → k < j)
   → ε_aux i (p ++ q) = (minus_one_pow (length q) * ε_aux i p)%L.
@@ -1173,7 +1173,7 @@ destruct (i ?= j). {
 Qed.
 
 Theorem minus_one_pow_add :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
 Proof.
 intros Hop *.
@@ -1185,7 +1185,7 @@ now rewrite rngl_mul_opp_l.
 Qed.
 
 Theorem ε_app2 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ p q,
   (∀ i j, i ∈ p → j ∈ q → j < i)
   → ε (p ++ q) = (minus_one_pow (length p * length q) * ε p * ε q)%L.
@@ -1226,7 +1226,7 @@ apply IHlen.
 Qed.
 
 Theorem transposition_signature_lt :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ {n p q},
   p < q
   → q < n
@@ -1354,7 +1354,7 @@ now apply minus_one_pow_mul_same.
 Qed.
 
 Theorem transposition_signature :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n p q,
   p ≠ q
   → p < n
@@ -2076,7 +2076,7 @@ split. {
 Qed.
 
 Theorem ε_dup :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i l1 l2 l3, ε (l1 ++ i :: l2 ++ i :: l3) = 0%L.
 Proof.
 intros Hop *.
@@ -2095,7 +2095,7 @@ apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem ε_when_dup :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ la,
   ¬ NoDup la
   → ε la = 0%L.
@@ -2170,7 +2170,7 @@ destruct Hb as [Hb| Hb]. {
 Qed.
 
 Theorem ε_aux_ext_in :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i f la lb,
   permutation Nat.eqb la lb
   → ε_aux i (map f la) = ε_aux i (map f lb).
@@ -2203,7 +2203,7 @@ destruct ifa. {
 Qed.
 
 Theorem ε_aux_seq_out :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ sta len i,
   sta + len ≤ i
   → ε_aux i (seq sta len) = minus_one_pow len.
@@ -2225,7 +2225,7 @@ now apply IHlen.
 Qed.
 
 Theorem ε_aux_app_all_gt_l :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i la lb,
   (∀ j, j ∈ la → j < i)
   → ε_aux i (la ++ lb) = (minus_one_pow (length la) * ε_aux i lb)%L.
@@ -2244,7 +2244,7 @@ now apply Hla; right.
 Qed.
 
 Theorem ε_aux_app_comm :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ i la lb,
   ε_aux i (la ++ lb) = ε_aux i (lb ++ la).
 Proof.
@@ -2286,7 +2286,7 @@ now rewrite Nat.leb_refl.
 Qed.
 
 Theorem ε_aux_map_succ_when_ge_canon_sym_gr_list :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n i j,
   i ≤ n
   → j < n!
@@ -2388,7 +2388,7 @@ Qed.
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ n k,
   k < (S n)!
   → ε (canon_sym_gr_list (S n) k) =
@@ -2423,7 +2423,7 @@ now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
 Theorem NoDup_ε_1_opp_1 :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ σ, NoDup σ → ε σ = 1%L ∨ ε σ = (-1)%L.
 Proof.
 intros Hop * Hσ.
@@ -2461,7 +2461,7 @@ destruct IHla as [Hla| Hla]; rewrite Hla. {
 Qed.
 
 Theorem ε_1_opp_1_NoDup :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   rngl_characteristic ≠ 1 →
   ∀ σ, ε σ = 1%L ∨ ε σ = (-1)%L → NoDup σ.
 Proof.
@@ -2480,7 +2480,7 @@ destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
 Qed.
 
 Theorem NoDup_ε_square :
-  rngl_has_opp = true →
+  rngl_has_opp T = true →
   ∀ σ, NoDup σ → (ε σ * ε σ = 1)%L.
 Proof.
 intros Hop * Hσ.

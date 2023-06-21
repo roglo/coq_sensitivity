@@ -266,7 +266,8 @@ apply rngl_mul_add_distr_r.
 Qed.
 
 Theorem I_opt_add_opp_l : let roi := I_ring_like_op in
-  if rngl_has_opp then ∀ a : ideal P, (- a + a)%L = 0%L else not_applicable.
+  if rngl_has_opp (ideal P) then ∀ a : ideal P, (- a + a)%L = 0%L
+  else not_applicable.
 Proof.
 intros.
 specialize (eq_refl (@rngl_has_opp T ro)) as Hop.
@@ -583,7 +584,7 @@ now apply (H1 _ (i_val b)).
 Qed.
 
 Theorem I_opt_mul_le_compat_nonneg : let roi := I_ring_like_op in
-  if (rngl_is_ordered (ideal P) && rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && rngl_has_opp (ideal P))%bool then
     ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -604,7 +605,7 @@ now apply H1.
 Qed.
 
 Theorem I_opt_mul_le_compat_nonpos : let roi := I_ring_like_op in
-  if (rngl_is_ordered (ideal P) && rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && rngl_has_opp (ideal P))%bool then
     ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
@@ -625,7 +626,7 @@ now apply H1.
 Qed.
 
 Theorem I_opt_mul_le_compat : let roi := I_ring_like_op in
-  if (rngl_is_ordered (ideal P) && negb rngl_has_opp)%bool then
+  if (rngl_is_ordered (ideal P) && negb (rngl_has_opp (ideal P)))%bool then
     ∀ a b c d : ideal P, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
