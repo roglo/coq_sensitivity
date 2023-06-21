@@ -1851,7 +1851,6 @@ Record complex := mk_c {re : R; im : R}.
 
 (*
 Arguments rngl_has_dec_le T {ro ring_like_prop}.
-Arguments rngl_is_integral T {ro ring_like_prop}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 *)
@@ -2122,10 +2121,10 @@ split. {
 (* Si un anneau a un inverse, c'est un corps, il est forcément
    intègre, non ? *)
 Theorem glop : ∀ T {ro : ring_like_op T} {rp : ring_like_prop T},
-  rngl_has_inv T = true → rngl_is_integral T = true.
+  rngl_has_inv T = true → rngl_is_integral_domain T = true.
 Proof.
 intros * Hiv.
-Search rngl_is_integral.
+Search rngl_is_integral_domain.
 ...
 rewrite His; cbn.
 ...
