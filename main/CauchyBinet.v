@@ -654,7 +654,7 @@ Theorem det_isort_rows_with_dup :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -1059,7 +1059,7 @@ Theorem det_isort_rows :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ A kl,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -1770,7 +1770,7 @@ Lemma Cauchy_Binet_formula_step_4 :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [m n] [B] f, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -2076,7 +2076,8 @@ assert (Hop : rngl_has_opp = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm = true) by now destruct Hif.
 assert (Hch : rngl_characteristic = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-assert (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true). {
+assert
+  (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true). {
   destruct Hif.
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_or_quot_iff; left.

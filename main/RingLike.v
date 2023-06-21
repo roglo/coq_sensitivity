@@ -71,7 +71,7 @@ Definition rngl_has_1 T {ro : ring_like_op T} :=
 Definition rngl_has_opp_or_subt T {R : ring_like_op T} :=
   bool_of_option rngl_opt_opp_or_subt.
 
-Definition rngl_has_inv_or_quot {T} {R : ring_like_op T} :=
+Definition rngl_has_inv_or_quot T {R : ring_like_op T} :=
   bool_of_option rngl_opt_inv_or_quot.
 
 Definition rngl_has_inv_and_1_or_quot {T} {R : ring_like_op T} :=
@@ -154,7 +154,7 @@ now destruct opp_subt; [ left | right ].
 Qed.
 
 Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
-  rngl_has_inv_or_quot = true
+  rngl_has_inv_or_quot T = true
   ↔ rngl_has_inv = true ∨ rngl_has_quot = true.
 Proof.
 unfold rngl_has_inv_or_quot, bool_of_option.
@@ -906,7 +906,7 @@ Qed.
 
 Theorem rngl_div_diag :
   rngl_has_1 T = true →
-  rngl_has_inv_or_quot = true →
+  rngl_has_inv_or_quot T = true →
   ∀ a : T, a ≠ 0%L → (a / a = 1)%L.
 Proof.
 intros Hon Hiq * Haz.
@@ -965,7 +965,7 @@ Proof.
 intros Hii a b Hbz.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
-  assert (Hiq : rngl_has_inv_or_quot = true). {
+  assert (Hiq : rngl_has_inv_or_quot T = true). {
     now apply rngl_has_inv_or_quot_iff; left.
   }
   assert (Hon : rngl_has_1 T = true). {
@@ -1656,7 +1656,7 @@ Theorem rngl_inv_1 :
   (1⁻¹ = 1)%L.
 Proof.
 intros Hon Hiv H10.
-assert (Hiq : rngl_has_inv_or_quot = true). {
+assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
 specialize (rngl_div_diag Hon) as H.
@@ -1683,7 +1683,7 @@ Qed.
 
 Theorem rngl_div_1_r :
   rngl_has_1 T = true →
-  rngl_has_inv_or_quot = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic ≠ 1 →
   ∀ a, (a / 1 = a)%L.
 Proof.
@@ -1857,7 +1857,7 @@ Theorem rngl_inv_mul_distr :
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
 intros Hon Hom Hiv * Haz Hbz.
-assert (Hiq : rngl_has_inv_or_quot = true). {
+assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
 assert (Hid : rngl_has_inv_and_1_or_quot = true). {
@@ -2130,7 +2130,7 @@ Qed.
 
 Theorem eq_rngl_div_1 :
   rngl_has_1 T = true →
-  rngl_has_inv_or_quot = true →
+  rngl_has_inv_or_quot T = true →
    ∀ a b, b ≠ 0%L → a = b → (a / b = 1)%L.
 Proof.
 intros Hon Hiv * Hbz Hab.
@@ -2141,7 +2141,7 @@ Qed.
 Theorem eq_rngl_add_same_0 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
   (a + a = 0)%L

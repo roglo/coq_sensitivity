@@ -1077,7 +1077,7 @@ Theorem determinant_with_bad_row :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
@@ -1247,7 +1247,7 @@ Theorem matrix_comatrix_transp_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
@@ -1437,7 +1437,7 @@ Theorem comatrix_transp_matrix_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
@@ -1727,7 +1727,7 @@ intros Hif * Hsm Hmz.
 generalize Hif; intros H.
 destruct H as (Hon, Hic, Hop, Hin, Hde, Hch).
 specialize (matrix_comatrix_transp_mul Hon Hop Hic Hch) as H1.
-assert (Hiq : rngl_has_inv_or_quot = true). {
+assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
 specialize (H1 (proj2 (Bool.orb_true_iff _ _) (or_intror Hiq))).
@@ -1973,7 +1973,7 @@ Theorem cramer's_rule_by_mul :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ [M : matrix T] [U V : vector T],
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2027,7 +2027,7 @@ Theorem cramer's_rule :
   rngl_has_1 T = true →
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv_or_quot = true →
+  rngl_has_inv_or_quot T = true →
   rngl_characteristic = 0 →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
@@ -2043,7 +2043,8 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].
 }
-assert (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true). {
+assert
+  (Hii : (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true). {
   rewrite Hiq.
   now apply Bool.orb_true_iff; right.
 }

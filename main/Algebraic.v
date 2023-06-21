@@ -281,7 +281,6 @@ Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_has_eqb T {R}.
 Arguments rngl_has_inv T {R}.
 Arguments rngl_has_inv_and_1_or_quot T {R}.
-Arguments rngl_has_inv_or_quot T {R}.
 Arguments rngl_has_opp T {R}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.

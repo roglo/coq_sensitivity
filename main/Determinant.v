@@ -1483,7 +1483,7 @@ Theorem determinant_same_rows :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_characteristic = 0 →
-  (rngl_is_integral_domain || rngl_has_inv_or_quot)%bool = true →
+  (rngl_is_integral_domain || rngl_has_inv_or_quot T)%bool = true →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
