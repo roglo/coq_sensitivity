@@ -620,6 +620,16 @@ rewrite Hor in H.
 apply H.
 Qed.
 
+Theorem rngl_le_antisymm :
+  rngl_is_ordered = true →
+  ∀ a b, (a ≤ b → b ≤ a → a = b)%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_le_antisymm as H.
+rewrite Hor in H.
+apply H.
+Qed.
+
 Theorem rngl_le_trans :
   rngl_is_ordered = true →
    ∀ a b c : T, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L.
@@ -637,8 +647,8 @@ intros * Hor a b.
 progress unfold rngl_lt.
 progress unfold rngl_le.
 specialize rngl_opt_not_le as H1.
-specialize rngl_opt_le_antisymm as H2.
-rewrite Hor in H1, H2.
+specialize (rngl_le_antisymm Hor) as H2.
+rewrite Hor in H1.
 progress unfold rngl_le in H1.
 progress unfold rngl_le in H2.
 destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
@@ -1876,16 +1886,14 @@ Theorem rngl_eq_add_0 :
   ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
 intros Hor * Haz Hbz Hab.
-specialize rngl_opt_le_antisymm as rngl_le_antisymm.
-rewrite Hor in rngl_le_antisymm.
 split. {
-  apply rngl_le_antisymm in Haz; [ easy | ].
+  apply (rngl_le_antisymm Hor) in Haz; [ easy | ].
   rewrite <- Hab.
   remember (a + b)%L as ab.
   rewrite <- (rngl_add_0_r a); subst ab.
   apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
 } {
-  apply rngl_le_antisymm in Hbz; [ easy | ].
+  apply (rngl_le_antisymm Hor) in Hbz; [ easy | ].
   rewrite <- Hab.
   remember (a + b)%L as ab.
   rewrite <- (rngl_add_0_l b); subst ab.
@@ -2300,9 +2308,7 @@ assert (H : (0 ≤ a)%L) by now apply (rngl_lt_iff Hor) in Hza.
 specialize (H4 _ _ H H3); clear H.
 rewrite (rngl_mul_inv_r Hon Hiv a Haz) in H4.
 specialize (rngl_0_le_1 Hon Hop Hor) as H5.
-specialize rngl_opt_le_antisymm as H6.
-rewrite Hor in H6.
-specialize (H6 _ _ H4 H5).
+specialize (rngl_le_antisymm Hor _ _ H4 H5) as H6.
 clear H4 H5.
 apply (rngl_1_eq_0_iff Hon Hos) in H6.
 specialize (rngl_characteristic_1 Hon Hos H6) as H4.
