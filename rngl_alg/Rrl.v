@@ -146,6 +146,7 @@ Arguments rl_exp {T ro rp real_like_prop} x%L.
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
 Arguments rl_ln {T ro rp real_like_prop} x%L.
 Arguments rl_sin {T ro rp real_like_prop} x%L.
+Arguments rl_has_trigo T {ro rp real_like_prop}.
 
 Arguments rngl_is_ordered T {R}.
 
@@ -817,7 +818,7 @@ Arguments rl_sqrt {T ro rp rl} x%L.
 
 Theorem rl_exp_not_all_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∃ x : T, rl_exp x ≠ 0%L.
+  rl_has_trigo T = true → ∃ x : T, rl_exp x ≠ 0%L.
 Proof.
 intros * Htr.
 specialize rl_opt_exp_not_all_0 as H1.
@@ -826,7 +827,7 @@ Qed.
 
 Theorem rl_exp_add {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∀ x y : T, rl_exp (x + y) = (rl_exp x * rl_exp y)%L.
+  rl_has_trigo T = true → ∀ x y : T, rl_exp (x + y) = (rl_exp x * rl_exp y)%L.
 Proof.
 intros * Htr.
 specialize rl_opt_exp_add as H1.
@@ -835,7 +836,7 @@ Qed.
 
 Theorem rl_exp_ln {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x.
+  rl_has_trigo T = true → ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_exp_ln as H1.
@@ -844,7 +845,7 @@ Qed.
 
 Theorem rl_ln_exp {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∀ x : T, rl_ln (rl_exp x) = x.
+  rl_has_trigo T = true → ∀ x : T, rl_ln (rl_exp x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_ln_exp as H1.
@@ -865,7 +866,7 @@ Qed.
 
 Theorem rl_cos_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true → ∀ x : T, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x.
+  rl_has_trigo T = true → ∀ x : T, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_cos_acos as H1.
@@ -874,7 +875,7 @@ Qed.
 
 Theorem rl_cos2_sin2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true →
+  rl_has_trigo T = true →
   ∀ x, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L.
 Proof.
 intros * Htr.
@@ -886,7 +887,7 @@ Theorem rl_exp_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_inv_or_quot T = true →
-  rl_has_trigo = true →
+  rl_has_trigo T = true →
   rl_exp 0 = 1%L.
 Proof.
 intros * Hon Hiq Htr *.
@@ -910,7 +911,7 @@ Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
-  rl_has_trigo = true →
+  rl_has_trigo T = true →
   ∀ x : T, rl_exp x ≠ 0%L.
 Proof.
 intros * Hon Hop Hiv H10 Htr *.
@@ -930,9 +931,23 @@ rewrite (rngl_mul_0_l Hos) in H3.
 now revert H3; apply (rngl_1_neq_0_iff Hon).
 Qed.
 
+Theorem rl_pow_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rl_has_trigo T = true →
+  ∀ x y, rl_pow x y ≠ 0%L.
+Proof.
+intros * Hon Hop Hiv Hch Htr *.
+unfold rl_pow.
+apply (rl_exp_neq_0 Hon Hop Hiv Hch Htr).
+Qed.
+
 Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo = true →
+  rl_has_trigo T = true →
   ∀ x y, (0 < x)%L → (0 < y)%L →
   rl_ln (x * y) = (rl_ln x + rl_ln y)%L.
 Proof.
@@ -951,7 +966,7 @@ Theorem rl_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_characteristic T ≠ 2 →
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
-  rl_has_trigo = true →
+  rl_has_trigo T = true →
   ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
@@ -1243,10 +1258,14 @@ Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rl_has_mod_intgl T = true →
+  rl_has_trigo T = true →
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros * Hon Hop Hiv Heb Hor Hmi * Hxyz.
+intros * Hon Hop Hiv Heb Hor Hmi Htr * Hxyz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 unfold rl_sqrt.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
@@ -1259,7 +1278,13 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
 }
 apply (rngl_abs_le Hop Hor).
 rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
-Search rl_pow.
+  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
+    specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
+    now rewrite (H1 x), (H1 y) in Hxyz; destruct Hxyz.
+  }
+  apply (rl_pow_neq_0 Hon Hop Hiv Hch Htr).
+}
+Search (_ / _ ≤ 1)%L.
 ...
 intros * Hon Hop Hiv Hor * Haz Hza.
 specialize (rngl_0_le_1 Hon Hop Hor) as H1.
