@@ -83,7 +83,7 @@ Qed.
 
 Theorem Z_opt_quot_mul :
   let roz := Z_ring_like_op in
-  if rngl_has_quot then
+  if rngl_has_quot Z then
     ∀ a b c : Z, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
   else not_applicable.
 Proof.

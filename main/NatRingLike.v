@@ -70,7 +70,7 @@ Qed.
 
 Theorem Nat_opt_quot_mul :
   let ro := nat_ring_like_op in
-  if rngl_has_quot then
+  if rngl_has_quot _ then
     ∀ a b c : nat, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
   else not_applicable.
 Proof.

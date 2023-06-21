@@ -331,7 +331,7 @@ Qed.
 
 Theorem Zn_opt_mul_div :
   let roz := Zn_ring_like_op n in
-  if rngl_has_quot then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
+  if rngl_has_quot (Zn n) then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
 intros.
@@ -342,7 +342,7 @@ Qed.
 
 Theorem Zn_opt_mul_quot_r :
   let roz := Zn_ring_like_op n in
-  if (rngl_has_quot && negb true)%bool then
+  if (rngl_has_quot (Zn n) && negb true)%bool then
     ∀ a b : Zn n, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
@@ -398,7 +398,7 @@ Qed.
 
 Theorem Zn_opt_quot_mul :
   let roz := Zn_ring_like_op n in
-  if rngl_has_quot then
+  if rngl_has_quot (Zn n) then
     ∀ a b c : Zn n, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
   else not_applicable.
 Proof.

@@ -2584,7 +2584,7 @@ Qed.
 
 Theorem polyn_opt_mul_div :
   let _ := polyn_ring_like_op in
-  if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
+  if rngl_has_quot (polyn T) then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -2608,7 +2608,7 @@ Qed.
 
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
-  if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
+  if (rngl_has_quot (polyn T) && negb rngl_mul_is_comm)%bool then
     ∀ a b, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.

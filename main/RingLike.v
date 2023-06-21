@@ -99,7 +99,7 @@ Definition rngl_has_inv T {R : ring_like_op T} :=
   | _ => false
   end.
 
-Definition rngl_has_quot {T} {R : ring_like_op T} :=
+Definition rngl_has_quot T {R : ring_like_op T} :=
   match rngl_opt_inv_or_quot with
   | Some (inr _) => true
   | _ => false
@@ -136,7 +136,7 @@ Definition rngl_sub {T} {ro : ring_like_op T} a b :=
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv T then rngl_mul a (rngl_inv b)
-  else if rngl_has_quot then rngl_quot a b
+  else if rngl_has_quot T then rngl_quot a b
   else rngl_zero.
 
 Theorem rngl_has_opp_or_subt_iff {T} {R : ring_like_op T} :
@@ -155,7 +155,7 @@ Qed.
 
 Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
   rngl_has_inv_or_quot T = true
-  ↔ rngl_has_inv T = true ∨ rngl_has_quot = true.
+  ↔ rngl_has_inv T = true ∨ rngl_has_quot T = true.
 Proof.
 unfold rngl_has_inv_or_quot, bool_of_option.
 unfold rngl_has_inv, rngl_has_quot.
@@ -169,7 +169,7 @@ Qed.
 
 Theorem rngl_has_inv_and_1_or_quot_iff {T} {R : ring_like_op T} :
   rngl_has_inv_and_1_or_quot T = true
-  ↔ rngl_has_inv T = true ∧ rngl_has_1 T = true ∨ rngl_has_quot = true.
+  ↔ rngl_has_inv T = true ∧ rngl_has_1 T = true ∨ rngl_has_quot T = true.
 Proof.
 progress unfold rngl_has_inv_and_1_or_quot, bool_of_option.
 progress unfold rngl_has_inv, rngl_has_quot.
@@ -338,10 +338,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* when has division (quot) *)
     rngl_opt_mul_div :
-      if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
+      if rngl_has_quot T then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
       else not_applicable;
     rngl_opt_mul_quot_r :
-      if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
+      if (rngl_has_quot T && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%L → (b * a / b)%L = a
       else not_applicable;
     (* when equality is calculable *)
@@ -759,7 +759,7 @@ now destruct os.
 Qed.
 
 Theorem rngl_has_quot_has_no_inv :
-  rngl_has_quot = true
+  rngl_has_quot T = true
   → rngl_has_inv T = false.
 Proof.
 intros * Hqu.
@@ -771,7 +771,7 @@ Qed.
 
 Theorem rngl_has_inv_has_no_quot :
   rngl_has_inv T = true
-  → rngl_has_quot = false.
+  → rngl_has_quot T = false.
 Proof.
 intros * Hiv.
 progress unfold rngl_has_inv in Hiv.
@@ -922,7 +922,7 @@ destruct ai. {
   rewrite Hai, Hon, Hic in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
   now apply rngl_mul_inv_r.
 }
-remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
   specialize rngl_opt_mul_div as rngl_mul_div.
   rewrite Hqu in rngl_mul_div.
@@ -981,7 +981,7 @@ destruct iv. {
   rewrite rngl_div_diag; [ | easy | easy | easy ].
   now apply rngl_mul_1_r.
 }
-remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
   specialize rngl_opt_mul_div as mul_div.
   rewrite Hqu in mul_div.
@@ -1060,7 +1060,7 @@ destruct iv. {
   rewrite rngl_mul_inv_l in Habc; [ | easy | easy | easy ].
   now do 2 rewrite (rngl_mul_1_l Hon) in Habc.
 }
-remember rngl_has_quot as qu eqn:Hqu.
+remember (rngl_has_quot T) as qu eqn:Hqu.
 symmetry in Hqu.
 destruct qu. {
   apply (f_equal (λ x, rngl_div x a)) in Habc.
@@ -1332,7 +1332,7 @@ destruct iv. {
   rewrite (rngl_mul_1_r Hon) in Hab; rewrite Hab.
   apply (rngl_mul_0_l Hos).
 }
-remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
   specialize (rngl_mul_div Hii a b Hbz) as H1.
   rewrite Hab in H1.
@@ -1370,7 +1370,7 @@ destruct iv. {
   rewrite (rngl_mul_inv_l Hon Hiv) in Hab; [ | easy ].
   now rewrite rngl_mul_1_l in Hab.
 }
-remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
   specialize rngl_opt_mul_quot_r as rngl_mul_quot_r.
   rewrite Hqu, Hic in rngl_mul_quot_r; cbn in rngl_mul_quot_r.
