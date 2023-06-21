@@ -1867,7 +1867,7 @@ rewrite lap_add_app_r; [ | now rewrite repeat_length ].
 f_equal.
 now apply lap_add_repeat_0_r.
 }
-remember rngl_has_subt as su eqn:Hsu; symmetry in Hsu.
+remember (rngl_has_subt T) as su eqn:Hsu; symmetry in Hsu.
 destruct su. {
   revert lb.
   induction la as [| a]; intros. {
@@ -2173,7 +2173,7 @@ Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 Definition polyn_subt p1 p2 := polyn_norm (lap_subt (lap p1) (lap p2)).
 Definition polyn_sub p1 p2 :=
   if rngl_has_opp T then polyn_add p1 (polyn_opp p2)
-  else if rngl_has_subt then polyn_subt p1 p2
+  else if rngl_has_subt T then polyn_subt p1 p2
   else polyn_zero.
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
@@ -2882,7 +2882,7 @@ Qed.
 (* *)
 
 Theorem eq_nth_lap_subt_0 :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb,
   (∀ i, nth i la 0%L = nth i lb 0%L)
   → ∀ i, nth i (lap_subt la lb) 0%L = 0%L.
@@ -2976,7 +2976,7 @@ now f_equal; apply IHla.
 Qed.
 
 Theorem lap_norm_add_subt :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb,
   length la = length lb
   → lap_subt (lap_norm (la + lb)) lb = la.
@@ -3023,8 +3023,6 @@ unfold lap_add in H2.
 rewrite Hab, Nat.sub_diag in H2.
 now do 2 rewrite app_nil_r in H2.
 Qed.
-
-Arguments rngl_has_subt T {R}.
 
 Theorem rngl_has_opp_rngl_polyn_has_opp :
   let rop := polyn_ring_like_op in

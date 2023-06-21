@@ -72,7 +72,7 @@ Definition lap_subt la lb :=
 Definition lap_opp la := map rngl_opp la.
 Definition lap_sub la lb :=
   if rngl_has_opp T then lap_add la (lap_opp lb)
-  else if rngl_has_subt then lap_subt la lb
+  else if rngl_has_subt T then lap_subt la lb
   else repeat 0%L (max (length la) (length lb)).
 
 (* *)
@@ -315,7 +315,7 @@ Qed.
 (**)
 
 Theorem map2_rngl_subt_0_r :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ n la,
   n = length la
   → map2 rngl_subt la (repeat 0%L n) = la.
@@ -326,7 +326,7 @@ now rewrite (rngl_subt_0_r Hsu); f_equal.
 Qed.
 
 Theorem lap_subt_0_l :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la, lap_subt 0 la = map (rngl_subt 0) la.
 Proof.
 intros Hsu *.
@@ -338,7 +338,7 @@ now rewrite Nat.sub_0_r, app_nil_r in IHla.
 Qed.
 
 Theorem lap_subt_0_r :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la, lap_subt la 0 = la.
 Proof.
 intros Hsu *.
@@ -1364,7 +1364,7 @@ apply rngl_add_0_r.
 Qed.
 
 Theorem lap_subt_norm_idemp_l :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb,
   lap_norm (lap_subt (lap_norm la) lb) = lap_norm (lap_subt la lb).
 Proof.
@@ -1374,7 +1374,7 @@ apply (rngl_subt_0_r Hsu).
 Qed.
 
 Theorem lap_subt_norm_idemp_r :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb,
   lap_norm (lap_subt la (lap_norm lb)) = lap_norm (lap_subt la lb).
 Proof.
@@ -1968,7 +1968,7 @@ now apply rngl_subt_diag.
 Qed.
 
 Theorem lap_opt_add_sub :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb : list T,
   (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
@@ -2036,7 +2036,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
 Qed.
 
 Theorem lap_subt_add_distr :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb lc, lap_subt la (lb + lc) = lap_subt (lap_subt la lb) lc.
 Proof.
 intros Hsu *.
@@ -2378,7 +2378,7 @@ easy.
 Qed.
 
 Theorem lap_opt_sub_add_distr :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb lc : list T, (la - (lb + lc))%lap = (la - lb - lc)%lap.
 Proof.
 intros Hsu *.
@@ -2629,7 +2629,7 @@ Qed.
 
 (*
 Theorem lap_norm_mul_subt_distr_l :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb lc,
   lap_norm (la * lap_subt lb lc) =
   lap_norm (lap_subt (la * lb) (la * lc)).
@@ -2704,7 +2704,7 @@ Qed.
 
 (*
 Theorem lap_mul_subt_distr_l :
-  rngl_has_subt = true →
+  rngl_has_subt T = true →
   ∀ la lb lc, (la * lap_subt lb lc = lap_subt (la * lb) (la * lc))%lap.
 Proof.
 intros Hsu *.

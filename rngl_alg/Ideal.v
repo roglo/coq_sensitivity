@@ -279,11 +279,11 @@ intros; apply eq_ideal_eq, (rngl_add_opp_l Hop).
 Qed.
 
 Theorem I_opt_add_sub : let roi := I_ring_like_op in
-  if rngl_has_subt then ∀ a b : ideal P, (a + b - b)%L = a
+  if rngl_has_subt (ideal P) then ∀ a b : ideal P, (a + b - b)%L = a
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_subt as sui eqn:Hsui; symmetry in Hsui.
+remember (rngl_has_subt (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
 destruct sui; [ | easy ].
 specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
 assert (Hsu : @rngl_has_subt T ro = true). {
@@ -314,11 +314,12 @@ apply H1.
 Qed.
 
 Theorem I_opt_sub_add_distr : let roi := I_ring_like_op in
-  if rngl_has_subt then ∀ a b c : ideal P, (a - (b + c))%L = (a - b - c)%L
+  if rngl_has_subt (ideal P) then
+    ∀ a b c : ideal P, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
 intros.
-remember rngl_has_subt as sui eqn:Hsui; symmetry in Hsui.
+remember (rngl_has_subt (ideal P)) as sui eqn:Hsui; symmetry in Hsui.
 destruct sui; [ | easy ].
 specialize (rngl_has_subt_has_no_opp Hsui) as Hopi.
 assert (Hsu : @rngl_has_subt T ro = true). {
