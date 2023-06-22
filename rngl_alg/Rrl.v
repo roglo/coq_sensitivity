@@ -1201,6 +1201,18 @@ Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
   ∀ x, (0 ≤ x → 1 ≤ rl_exp x)%L.
 Proof.
 intros * Hzx.
+...
+Theorem glop {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  ∀ x ε, (0 < ε → ε < rl_exp (x + ε) - rl_exp x)%L.
+Proof.
+intros * Hon * Hε.
+rewrite rl_exp_add.
+remember (_ * _)%L as z.
+rewrite <- (rngl_mul_1_r Hon (rl_exp x)).
+subst z.
+rewrite <- rngl_mul_sub_distr_l.
 ... ...
 now apply rl_exp_nonneg_ge_1.
 ... ...
