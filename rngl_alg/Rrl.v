@@ -1169,6 +1169,28 @@ destruct ab. {
 rewrite (rngl_abs_nonneg Hop Hor). 2: {
   apply (rl_pow_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
 }
+unfold rl_pow.
+destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
+  apply (rngl_le_trans Hor _ 0%L); [ easy | ].
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+}
+apply (rngl_nle_gt Hor) in Haz.
+...
+Check Nat.nle_gt.
+...
+apply rngl_leb_nle in Haz.
+Search ((_ ≤? _)%L).
+apply (rngl_not_le Hor) in Haz.
+rewrite fold_rngl_lt in Haz.
+Theorem rl_exp_increasing {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ a b, (a ≤ b → rl_exp a ≤ rl_exp b)%L.
+... ...
+Search rl_ln.
+specialize rl_opt_exp_ln as H1.
+rewrite Htr in H1.
+rewrite <- (H1 a) at 1.
+apply rl_exp_increasing.
 ... ...
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.

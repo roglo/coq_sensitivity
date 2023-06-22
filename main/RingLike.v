@@ -2418,6 +2418,24 @@ do 2 rewrite (fold_rngl_sub Hop) in H1.
 now rewrite (rngl_add_sub Hos) in H1.
 Qed.
 
+Theorem rngl_nle_gt :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply (rngl_not_le Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  intros H1.
+  apply (rngl_lt_iff Hor) in Hab.
+  destruct Hab as (H2, H3).
+  now apply H3, (rngl_le_antisymm Hor).
+}
+Qed.
+
 (* abs *)
 
 Theorem rngl_abs_0 :
