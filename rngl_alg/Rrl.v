@@ -1184,9 +1184,9 @@ Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
-  ∀ a b, (a ≤ b → rl_exp a ≤ rl_exp b)%L.
+  (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Hor Htr * Hab.
+intros * Hon Hop Hiv Hc1 Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
 rewrite <- (rngl_sub_add Hop b a).
 rewrite (rl_exp_add Htr).
@@ -1198,9 +1198,9 @@ apply (rngl_mul_le_compat_nonneg Hor Hop). 2: {
 split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
-  ∀ x, (0 ≤ x → 1 ≤ rl_exp x)%L.
+  (1 < rl_exp 1 → ∀ x, 0 ≤ x → 1 ≤ rl_exp x)%L.
 Proof.
-intros * Hzx.
+intros * He1 * Hzx.
 ...
 Theorem glop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
