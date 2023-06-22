@@ -1175,21 +1175,38 @@ destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
   apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
 }
 apply (rngl_nle_gt Hor) in Haz.
-...
-Check Nat.nle_gt.
-...
-apply rngl_leb_nle in Haz.
-Search ((_ ≤? _)%L).
-apply (rngl_not_le Hor) in Haz.
-rewrite fold_rngl_lt in Haz.
 Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_characteristic T ≠ 2 →
+  rngl_is_ordered T = true →
+  rl_has_trigo T = true →
   ∀ a b, (a ≤ b → rl_exp a ≤ rl_exp b)%L.
+Proof.
+intros * Hon Hop Hiv Hc1 Hc2 Hor Htr * Hab.
+apply (rngl_le_0_sub Hop Hor) in Hab.
+rewrite <- (rngl_sub_add Hop b a).
+rewrite (rl_exp_add Htr).
+rewrite <- (rngl_mul_1_l Hon) at 1.
+apply (rngl_mul_le_compat_nonneg Hor Hop). 2: {
+  split; [ | apply (rngl_le_refl Hor) ].
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+}
+split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ x, (0 ≤ x → 1 ≤ rl_exp x)%L.
+Proof.
+intros * Hzx.
 ... ...
-Search rl_ln.
+now apply rl_exp_nonneg_ge_1.
+... ...
 specialize rl_opt_exp_ln as H1.
 rewrite Htr in H1.
-rewrite <- (H1 a) at 1.
+rewrite <- (H1 a Haz) at 1.
 apply rl_exp_increasing.
 ... ...
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
