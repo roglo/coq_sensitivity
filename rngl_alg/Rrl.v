@@ -832,6 +832,39 @@ rewrite (rngl_div_diag Hon Hiq _ H1) in H2.
 now rewrite (rngl_mul_div Hi1) in H2.
 Qed.
 
+(* to be completed
+Theorem rl_exp_gt_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rl_has_trigo T = true →
+  ∀ x : T, (0 < rl_exp x)%L.
+Proof.
+intros * Hon Hop Hiv H10 Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+specialize (rl_exp_add Htr x (- x)%L) as H3.
+rewrite (fold_rngl_sub Hop) in H3.
+rewrite (rngl_sub_diag Hos) in H3.
+rewrite (rl_exp_0 Hon Hiq Htr) in H3.
+...
+specialize (rngl_mul_nonneg_nonneg Hop) as H1.
+...
+Search (_ * _ = 1)%L.
+...
+rewrite Hxz in H3.
+rewrite (rngl_mul_0_l Hos) in H3.
+now revert H3; apply (rngl_1_neq_0_iff Hon).
+Qed.
+...
+*)
+
 Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -857,6 +890,25 @@ rewrite Hxz in H3.
 rewrite (rngl_mul_0_l Hos) in H3.
 now revert H3; apply (rngl_1_neq_0_iff Hon).
 Qed.
+
+(* to be completed
+Theorem rl_pow_gt_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rl_has_trigo T = true →
+  ∀ x y, (0 < rl_pow x y)%L.
+Proof.
+intros * Hon Hop Hiv Hch Htr *.
+unfold rl_pow.
+Search (0 < rl_exp _)%L.
+apply (rl_exp_neq_0 Hon Hop Hiv Hch Htr).
+Qed.
+
+...
+*)
 
 Theorem rl_pow_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1060,18 +1112,19 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
-Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  {rl : real_like_prop T} :
+Theorem le_rngl_abs_rl_sqrt_add {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ b → a ≤ rngl_abs (rl_sqrt (rngl_squ a + b)))%L.
 Proof.
-intros * Hop Heb Hor * Hzb.
+intros * Hop Hi1 Heb Hor * Hzb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-unfold rl_sqrt.
+progress unfold rl_sqrt.
 remember (rngl_squ _ + _ =? _)%L as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply (rngl_eqb_eq Heb) in Hab.
@@ -1087,15 +1140,22 @@ destruct ab. {
   unfold rngl_squ in Hzb.
   specialize (rngl_le_antisymm Hor _ _ Hzb H1) as H2.
   specialize (rngl_integral Hos) as H3.
-...
-Check rngl_le_add_le_sub_r.
-Search (_ + _ = _ → _)%L.
-apply rngl_le_add
-Search (_ + _ ≤ _)%L.
-...
-  apply (rngl_le_trans Hor _ (rngl_squ a)). {
+  rewrite Hi1, Heb in H3; cbn in H3.
+  rewrite Bool.orb_true_r in H3.
+  specialize (H3 eq_refl).
+  apply H3 in H2.
+  destruct H2; subst a; apply (rngl_le_refl Hor).
+}
+rewrite (rngl_abs_nonneg Hop Hor). 2: {
+Search (0 ≤ rl_pow _)%L.
+  apply rl_pow_ge_0.
 ... ...
-specialize (glop (rngl_abs x) (rngl_squ y)) as H1.
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+specialize (le_rngl_abs_rl_sqrt_add Hop Hi1 Heb Hor) as H1.
+specialize (H1 (rngl_abs x) (rngl_squ y)) as H1.
 assert (H : (0 ≤ rngl_squ y)%L). {
   progress unfold rngl_squ.
   apply (rngl_square_ge_0 Hop Hor).

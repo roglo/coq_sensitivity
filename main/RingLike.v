@@ -2448,6 +2448,21 @@ destruct az. {
 }
 Qed.
 
+Theorem rngl_abs_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ a)%L → rngl_abs a = a.
+Proof.
+intros Hop Hor * Hza.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+destruct az; [ | easy ].
+apply rngl_leb_le in Haz.
+apply (rngl_le_antisymm Hor _ _ Hza) in Haz.
+subst a.
+apply (rngl_opp_0 Hop).
+Qed.
+
 Theorem rngl_abs_le :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
