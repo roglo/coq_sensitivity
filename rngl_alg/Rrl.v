@@ -84,7 +84,7 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-Definition continuous_in {T} {ro : ring_like_op T} f a :=
+Definition continuous_at {T} {ro : ring_like_op T} f a :=
   ∀ ε : T, (0 < ε)%L → ∃ η, (0 < η)%L ∧
   ∀ x : T, (rngl_abs (x - a) ≤ η)%L → (rngl_abs (f x - f a) ≤ ε)%L.
 
@@ -111,8 +111,8 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_trigo then
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
       else not_applicable;
-    rl_exp_continuous :
-      if rl_has_trigo then ∃ a : T, continuous_in rl_exp a
+    rl_exp_continuous_at :
+      if rl_has_trigo then ∃ a : T, continuous_at rl_exp a
       else not_applicable;
     rl_opt_exp_ln :
       if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
@@ -1095,6 +1095,16 @@ Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
 Proof. easy. Qed.
 
 (* to be completed
+Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rl_has_trigo T = true → ∀ a, continuous_at rl_exp a.
+Proof.
+intros * Htr *.
+specialize rl_exp_continuous_at as H1.
+rewrite Htr in H1.
+destruct H1 as (b, Hb).
+...
+
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
