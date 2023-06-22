@@ -84,6 +84,10 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
+Definition continuous_in {T} {ro : ring_like_op T} f a :=
+  ∀ ε : T, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+  ∀ x : T, (rngl_abs (x - a) ≤ η)%L → (rngl_abs (f x - f a) ≤ ε)%L.
+
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
     rl_exp : T → T;
@@ -106,6 +110,9 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_exp_add :
       if rl_has_trigo then
         ∀ x y : T, (rl_exp (x + y) = rl_exp x * rl_exp y)%L
+      else not_applicable;
+    rl_exp_continuous :
+      if rl_has_trigo then ∃ a : T, continuous_in rl_exp a
       else not_applicable;
     rl_opt_exp_ln :
       if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
