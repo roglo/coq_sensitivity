@@ -849,10 +849,30 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+(**)
+specialize (rl_exp_add Htr x x)%L as H1.
+...
+destruct (Nat.eq_dec (rngl_characteristic T) 2) as [Hc2| Hc2]. {
+...
+assert (H : ∀ x, x = (x / 2 + x / 2)%L). {
+  clear x; intros.
+  apply (rngl_mul_cancel_r Hi1) with (c := 2%L). 2: {
+    rewrite rngl_mul_add_distr_r.
+    rewrite (rngl_div_mul Hon Hiv).
+    rewrite rngl_mul_add_distr_l.
+    now rewrite (rngl_mul_1_r Hon).
+...
+specialize (rl_exp_add Htr (x / 2) (x / 2))%L as H1.
+...
 specialize (rl_exp_add Htr x (- x)%L) as H3.
 rewrite (fold_rngl_sub Hop) in H3.
 rewrite (rngl_sub_diag Hos) in H3.
 rewrite (rl_exp_0 Hon Hiq Htr) in H3.
+Search rl_exp.
 ...
 specialize (rngl_mul_nonneg_nonneg Hop) as H1.
 ...
