@@ -1106,6 +1106,10 @@ destruct H1 as (b, Hb).
 progress unfold continuous_at in Hb.
 progress unfold continuous_at.
 intros ε Hε.
+specialize (Hb (ε + rngl_abs (rl_exp b - rl_exp a))%L).
+assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L) by ...admit.
+specialize (Hb H); clear H.
+destruct Hb as (η & Hzη & Hη).
 ...
 
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
