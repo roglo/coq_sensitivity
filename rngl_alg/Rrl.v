@@ -1148,7 +1148,11 @@ assert (H : (rngl_abs (x - b) ≤ η)%L). {
   apply (rngl_le_refl Hor).
 }
 specialize (H1 H).
-(* ah merde, ça marche pas *)
+specialize (rngl_abs_triangle Hop Hor) as H2.
+specialize (H2 (rl_exp x)).
+specialize (H2 (- rl_exp a))%L.
+rewrite (fold_rngl_sub Hop) in H2.
+eapply (rngl_le_trans Hor); [ apply H2 | ].
 ...
   specialize (rngl_add_le_compat Hor) as H2.
   specialize (H2 (rngl_abs (x - a))%L).
