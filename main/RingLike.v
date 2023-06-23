@@ -738,6 +738,28 @@ rewrite Hor in H.
 apply H.
 Qed.
 
+(*
+Theorem rngl_not_lt :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ a < b → a = b ∨ b < a)%L.
+Proof.
+intros Hor * Hab.
+specialize rngl_opt_not_le as H1.
+rewrite Hor in H1.
+specialize (H1 b a).
+...
+progress unfold rngl_lt in Hab.
+progress unfold rngl_le in H1.
+progress unfold rngl_lt.
+destruct rngl_opt_leb as [rngl_leb| ].
+...
+rewrite Hor in H.
+intros H1.
+...
+apply H.
+Qed.
+*)
+
 (* *)
 
 Theorem rngl_has_subt_has_no_opp :
@@ -2436,6 +2458,29 @@ split; intros Hab. {
 }
 Qed.
 
+(* to be completed
+Theorem rngl_nlt_ge :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ (a < b) ↔ b ≤ a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+Inspect 1.
+Search (not (_ < _))%L.
+  apply (rngl_not_le Hor).
+  intros H1; apply Hab; clear Hab.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  intros H1.
+  apply (rngl_lt_iff Hor) in Hab.
+  destruct Hab as (H2, H3).
+  now apply H3, (rngl_le_antisymm Hor).
+}
+Qed.
+*)
+
 Theorem rngl_lt_le_trans :
   rngl_is_ordered T = true →
    ∀ a b c : T, (a < b)%L → (b ≤ c)%L → (a < c)%L.
@@ -2794,8 +2839,6 @@ destruct abz. {
     now apply -> (rngl_opp_lt_compat Hop Hor).
   }
   apply (rngl_leb_gt Hor) in Hbz.
-...
-  apply (rngl_nlt_ge Hor) in Habz.
 ...
 *)
 
