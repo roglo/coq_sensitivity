@@ -2470,6 +2470,15 @@ split. {
 }
 Qed.
 
+Theorem rngl_lt_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a < b)%L → (b < c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+apply (rngl_le_lt_trans Hor _ b); [ | easy ].
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_le_add_r :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ b → a ≤ a + b)%L.
@@ -2492,6 +2501,24 @@ rewrite (rngl_opp_0 Hop).
 now destruct (0 ≤? 0)%L.
 Qed.
 
+Theorem rngl_leb_gt :
+  rngl_is_ordered T = true →
+  ∀ a b, ((a ≤? b) = false ↔ b < a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply rngl_leb_nle in Hab.
+  apply (rngl_not_le Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  apply rngl_leb_nle.
+  intros H1.
+  now apply (rngl_nle_gt Hor) in Hab.
+}
+Qed.
+
 Theorem rngl_0_le_abs :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2505,8 +2532,8 @@ destruct az. {
   apply (rngl_opp_le_compat Hop Hor) in Haz.
   now rewrite (rngl_opp_0 Hop) in Haz.
 } {
-  apply rngl_leb_nle in Haz.
-  now apply (rngl_not_le Hor) in Haz.
+  apply (rngl_leb_gt Hor) in Haz.
+  now apply (rngl_lt_le_incl Hor).
 }
 Qed.
 
@@ -2556,16 +2583,13 @@ split. {
     }
   }
   split; [ | easy ].
-  apply rngl_leb_nle in Hyz.
-  apply (rngl_not_le Hor) in Hyz.
-  destruct Hyz as (Hyz, Hzy).
-  apply (rngl_le_trans Hor _ 0%L); [ | easy ].
-  apply (rngl_le_0_sub Hop Hor).
-  progress unfold rngl_sub.
-  rewrite Hop.
-  rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_add_0_l.
-  now apply (rngl_le_trans Hor _ y).
+  apply (rngl_leb_gt Hor) in Hyz.
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_le_lt_trans Hor _ 0)%L; [ | easy ].
+  rewrite <- (rngl_opp_0 Hop).
+  apply -> (rngl_opp_le_compat Hop Hor).
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_trans Hor _ y)%L.
 }
 Qed.
 
@@ -2655,9 +2679,7 @@ destruct xz. {
       now rewrite (rngl_opp_involutive Hop).
     }
   } {
-    apply rngl_leb_nle in Hy.
-    apply (rngl_not_le Hor) in Hy.
-    destruct Hy as (_, Hy).
+    apply (rngl_leb_gt Hor) in Hy.
     destruct xyz. {
       apply rngl_leb_le in Hxy.
       progress unfold rngl_div.
@@ -2670,15 +2692,16 @@ destruct xz. {
       rewrite Hiv.
       apply (rngl_mul_nonpos_nonneg Hop Hor _ _ Hx).
       apply (rngl_lt_le_incl Hor).
-      apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-      apply (rngl_lt_iff Hor).
-      split; [ easy | congruence ].
+      now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
     }
   }
 }
+apply (rngl_leb_gt Hor) in Hx.
+(*
 apply rngl_leb_nle in Hx.
 apply (rngl_not_le Hor) in Hx.
 destruct Hx as (Hxz, Hx).
+*)
 destruct yz. {
   apply rngl_leb_le in Hy.
   destruct xyz. {
@@ -2693,6 +2716,7 @@ destruct yz. {
     exfalso; apply Hxy; clear Hxy.
     progress unfold rngl_div.
     rewrite Hiv.
+    apply (rngl_lt_le_incl Hor) in Hx.
     apply (rngl_mul_nonneg_nonpos Hop Hor _ _ Hx).
     apply (rngl_lt_le_incl Hor).
     apply (rngl_inv_lt_0_compat Hon Hop Hiv Hor).
@@ -2700,6 +2724,7 @@ destruct yz. {
     split; [ easy | congruence ].
   }
 }
+(* ... *)
 apply rngl_leb_nle in Hy.
 apply (rngl_not_le Hor) in Hy.
 destruct Hy as (_, Hy).
@@ -2713,16 +2738,66 @@ assert (Hzy : (0 < y)%L). {
 }
 specialize (rngl_0_lt_inv_compat Hon Hop Hiv Hor _ Hzy) as Hy'.
 apply (rngl_lt_le_incl Hor) in Hy'.
-specialize (rngl_mul_nonneg_nonneg Hop Hor _ _ Hx Hy') as H1.
+generalize Hx; intros Hx'.
+apply (rngl_lt_le_incl Hor) in Hx'.
+specialize (rngl_mul_nonneg_nonneg Hop Hor _ _ Hx' Hy') as H1.
 specialize (rngl_le_antisymm Hor _ _ Hxy H1) as H2.
 apply (rngl_integral Hos) in H2. 2: {
   rewrite Hiq, Heb.
   now destruct rngl_is_integral_domain.
 }
-destruct H2 as [H2| H2]; [ easy | ].
-exfalso; revert H2.
-now apply (rngl_inv_neq_0 Hon Hos Hiv).
+destruct H2 as [H2| H2]. {
+  now subst x; apply (rngl_lt_irrefl Hor) in Hx.
+} {
+  exfalso; revert H2.
+  now apply (rngl_inv_neq_0 Hon Hos Hiv).
+}
 Qed.
+
+(* to be completed
+Theorem rngl_abs_triangle :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (rngl_abs (a + b) ≤ rngl_abs a + rngl_abs b)%L.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+remember (b ≤? 0)%L as bz eqn:Hbz; symmetry in Hbz.
+remember (a + b ≤? 0)%L as abz eqn:Habz; symmetry in Habz.
+destruct abz. {
+  apply rngl_leb_le in Habz.
+  destruct az. {
+    apply rngl_leb_le in Haz.
+    rewrite (rngl_opp_add_distr Hop).
+    progress unfold rngl_sub.
+    rewrite Hop.
+    rewrite rngl_add_comm.
+    apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
+    destruct bz; [ apply (rngl_le_refl Hor) | ].
+    apply (rngl_leb_gt Hor) in Hbz.
+    apply (rngl_lt_le_incl Hor).
+    apply (rngl_lt_trans Hor _ 0)%L; [ | easy ].
+    rewrite <- (rngl_opp_0 Hop).
+    now apply -> (rngl_opp_lt_compat Hop Hor).
+  }
+  apply (rngl_leb_gt Hor) in Haz.
+  destruct bz. {
+    rewrite rngl_add_comm.
+    rewrite (rngl_opp_add_distr Hop).
+    progress unfold rngl_sub.
+    rewrite Hop.
+    apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
+    apply (rngl_lt_le_incl Hor).
+    apply (rngl_lt_trans Hor _ 0)%L; [ | easy ].
+    rewrite <- (rngl_opp_0 Hop).
+    now apply -> (rngl_opp_lt_compat Hop Hor).
+  }
+  apply (rngl_leb_gt Hor) in Hbz.
+...
+  apply (rngl_nlt_ge Hor) in Habz.
+...
+*)
 
 (* *)
 

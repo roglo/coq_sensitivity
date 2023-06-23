@@ -1117,13 +1117,21 @@ assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L). {
 }
 specialize (Hb H); clear H.
 destruct Hb as (η & Hzη & Hη).
-...
-exists (η + rngl_abs (a - b))%L.
+exists (η - rngl_abs (a - b))%L.
 split. 2: {
 intros x Hx.
 specialize (Hη x) as H1.
 assert (H : (rngl_abs (x - b) ≤ η)%L). {
-rngl_abs (a - b) ≤ rngl_abs (x - a) + rngl_abs (x - b)
+Require Import ZArith.
+Check Z.abs.
+Search (Z.abs _ <= _)%Z.
+... ...
+eapply (rngl_le_trans Hor).
+replace (x - b)%L with ((x - a) + (a - b))%L.
+apply rngl_abs_triangle.
+...
+Search (rngl_abs _ ≤ rngl_abs _ + _)%L.
+rngl_abs (x - b) ≤ rngl_abs (x - a) + rngl_abs (a - b)
 ...
 
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
