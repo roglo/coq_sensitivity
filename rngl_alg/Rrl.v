@@ -1097,9 +1097,12 @@ Proof. easy. Qed.
 (* to be completed
 Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo T = true → ∀ a, continuous_at rl_exp a.
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rl_has_trigo T = true →
+  ∀ a, continuous_at rl_exp a.
 Proof.
-intros * Htr *.
+intros * Hop Hor Htr *.
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
 destruct H1 as (b, Hb).
@@ -1107,9 +1110,20 @@ progress unfold continuous_at in Hb.
 progress unfold continuous_at.
 intros ε Hε.
 specialize (Hb (ε + rngl_abs (rl_exp b - rl_exp a))%L).
-assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L) by ...admit.
+assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L). {
+  apply (rngl_lt_le_trans Hor _ ε _ Hε).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_abs Hop Hor).
+}
 specialize (Hb H); clear H.
 destruct Hb as (η & Hzη & Hη).
+...
+exists (η + rngl_abs (a - b))%L.
+split. 2: {
+intros x Hx.
+specialize (Hη x) as H1.
+assert (H : (rngl_abs (x - b) ≤ η)%L). {
+rngl_abs (a - b) ≤ rngl_abs (x - a) + rngl_abs (x - b)
 ...
 
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}

@@ -2436,6 +2436,50 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_lt_le_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a < b)%L → (b ≤ c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+specialize rngl_opt_le_trans as H1.
+rewrite Hor in H1.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_le_trans Hor _ b); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  intros H; subst c.
+  now apply (rngl_nle_gt Hor) in Hab.
+}
+Qed.
+
+Theorem rngl_le_lt_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a ≤ b)%L → (b < c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+specialize rngl_opt_le_trans as H1.
+rewrite Hor in H1.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_le_trans Hor _ b); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  intros H; subst c.
+  now apply (rngl_nle_gt Hor) in Hbc.
+}
+Qed.
+
+Theorem rngl_le_add_r :
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ b → a ≤ a + b)%L.
+Proof.
+intros Hor * Hbz.
+remember (a + b)%L as c.
+rewrite <- (rngl_add_0_r a); subst c.
+apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
+Qed.
+
 (* abs *)
 
 Theorem rngl_abs_0 :
