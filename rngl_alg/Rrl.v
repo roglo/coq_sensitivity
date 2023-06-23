@@ -1103,6 +1103,9 @@ Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ a, continuous_at rl_exp a.
 Proof.
 intros * Hop Hor Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
 destruct H1 as (b, Hb).
@@ -1122,13 +1125,49 @@ split. 2: {
 intros x Hx.
 specialize (Hη x) as H1.
 assert (H : (rngl_abs (x - b) ≤ η)%L). {
+  eapply (rngl_le_trans Hor). {
+    replace (x - b)%L with ((x - a) + (a - b))%L. 2: {
+      progress unfold rngl_sub.
+      rewrite Hop.
+      rewrite rngl_add_assoc.
+      do 3 rewrite (fold_rngl_sub Hop).
+      now rewrite (rngl_sub_add Hop).
+    }
+    apply (rngl_abs_triangle Hop Hor).
+  }
+  apply (rngl_le_trans Hor _ (rngl_abs (a - b) + η - rngl_abs (a - b)))%L. {
+    rewrite rngl_add_comm.
+    progress unfold rngl_sub.
+    rewrite Hop.
+    rewrite <- rngl_add_assoc.
+    do 3 rewrite (fold_rngl_sub Hop).
+    apply (rngl_add_le_compat Hor); [ | easy ].
+    apply (rngl_le_refl Hor).
+  }
+  rewrite rngl_add_comm, (rngl_add_sub Hos).
+  apply (rngl_le_refl Hor).
+}
+specialize (H1 H).
+(* ah merde, ça marche pas *)
+...
+  specialize (rngl_add_le_compat Hor) as H2.
+  specialize (H2 (rngl_abs (x - a))%L).
+  specialize (H2 (η - rngl_abs (a - b))%L).
+  specialize (H2 0)%L.
+  specialize (H2 (rngl_abs (a - b)))%L.
+  specialize (H2 Hx).
+  specialize (rngl_0_le_abs Hop Hor (a - b))%L as H.
+  specialize (H2 H); clear H.
+  rewrite rngl_add_0_r in H2.
+  rewrite (rngl_sub_add Hop) in H2.
+Search (_ ≤ _ + _)%L.
 Require Import ZArith.
-Check Z.abs.
-Search (Z.abs _ <= _)%Z.
-... ...
-eapply (rngl_le_trans Hor).
-replace (x - b)%L with ((x - a) + (a - b))%L.
-apply rngl_abs_triangle.
+Search (_ ≤ _ - _)%Z.
+...
+  eapply (rngl_add_le_compat Hor) with (b := (- rngl_abs (a - b))%L) in Hx.
+Search (_ ≤ _ = _ ↔ _)%L.
+Search (_ ↔ _ ≤ _ = _)%L.
+
 ...
 Search (rngl_abs _ ≤ rngl_abs _ + _)%L.
 rngl_abs (x - b) ≤ rngl_abs (x - a) + rngl_abs (a - b)
