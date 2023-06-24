@@ -1169,7 +1169,16 @@ assert (
   rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in Hη. 2: {
     apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
   }
-Search (_ * _ ≤ _ * _)%L.
+... ...
+  apply rngl_mul_le_mono_pos_r in Hη; [ easy | ].
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  } {
+    apply not_eq_sym.
+    apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
+  }
+}
 ...
 Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (n * p <= m * p)%Z
 ...

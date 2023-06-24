@@ -675,6 +675,32 @@ split. {
 }
 Qed.
 
+Theorem rngl_lt_eq_cases :
+  rngl_is_ordered T = true → ∀ a b : T, (a ≤ b)%L ↔ (a < b)%L ∨ a = b.
+Proof.
+intros Hor *.
+progress unfold rngl_lt.
+progress unfold rngl_le.
+specialize rngl_opt_not_le as H1.
+specialize (rngl_le_antisymm Hor) as H2.
+specialize (rngl_le_refl Hor) as H3.
+rewrite Hor in H1.
+progress unfold rngl_le in H1.
+progress unfold rngl_le in H2.
+progress unfold rngl_le in H3.
+destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
+split. {
+  intros H.
+  remember (rngl_leb b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | now left ].
+  now specialize (H2 _ _ H Hba); right.
+} {
+  intros H.
+  destruct H as [H4| H4]; [ now apply H1; rewrite H4 | ].
+  subst b; apply H3.
+}
+Qed.
+
 Theorem rngl_lt_irrefl :
   rngl_is_ordered T = true → ∀ a : T, ¬ (a < a)%L.
 Proof.
@@ -2935,6 +2961,57 @@ destruct Haz as (Haz, Hza).
 specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Haz Hbz) as H1.
 now apply (rngl_nlt_ge Hor) in H1.
 Qed.
+
+(* to be completed
+Theorem rngl_mul_le_mono_pos_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T, (0 < c)%L → (a ≤ b)%L ↔ (c * a ≤ c * b)%L.
+Proof.
+intros Hop Hor * Hc.
+split; intros Hab. {
+  apply (rngl_lt_eq_cases Hor) in Hab.
+...
+Require Import ZArith.
+Print Z.mul_le_mono_pos_l.
+Check Z.lt_eq_cases.
+...
+Search (_ ≤ _ ↔ _)%L.
+Search (_ ↔ _ ≤ _)%L.
+Search (_ ↔ _ < _)%L.
+Search (_ < _ ↔ _)%L.
+Theorem
+  (λ lemma : (n <= m)%Z ↔ (n < m)%Z ∨ n = m,
+apply
+...
+  remember (0 ≤? a)%L as za eqn:Hza; symmetry in Hza.
+  destruct za. {
+...
+
+Theorem rngl_mul_le_mono_pos_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T, (0 < c)%L → (a ≤ b)%L ↔ (a * c ≤ b * c)%L.
+Proof.
+intros Hop Hor * Hc.
+split; intros Hab. {
+  remember (0 ≤? a)%L as za eqn:Hza; symmetry in Hza.
+  destruct za. {
+    apply rngl_leb_le in Hza.
+    apply (rngl_mul_le_compat_nonneg Hor Hop); [ easy | ].
+    split; [ | apply (rngl_le_refl Hor) ].
+    now apply (rngl_lt_le_incl Hor).
+  } {
+    apply (rngl_leb_gt Hor) in Hza.
+Search (_ * _ ≤ _ * _)%L.
+Require Import ZArith.
+Search (_ * _ <= _ * _)%Z.
+Print Z.mul_le_mono_pos_r.
+Check Z.mul_le_mono_pos_l.
+...
+    apply (rngl_mul_le_compat_nonneg Hor Hop); [ | ].
+...
+*)
 
 (* *)
 
