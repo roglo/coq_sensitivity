@@ -1112,6 +1112,7 @@ destruct H1 as (b, Hb).
 progress unfold continuous_at in Hb.
 progress unfold continuous_at.
 intros ε Hε.
+...
 specialize (Hb (ε + rngl_abs (rl_exp b - rl_exp a))%L) as H1.
 assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L). {
   apply (rngl_lt_le_trans Hor _ ε _ Hε).
