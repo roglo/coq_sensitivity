@@ -1171,6 +1171,14 @@ assert (
   }
 Search (_ * _ ≤ _ * _)%L.
 ...
+Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (n * p <= m * p)%Z
+...
+Search (_ ↔ _ * _ <= _ * _)%Z.
+Z.mul_le_mono_neg_r: ∀ n m p : Z, (p < 0)%Z → (n <= m)%Z ↔ (m * p <= n * p)%Z
+Z.mul_le_mono_neg_l: ∀ n m p : Z, (p < 0)%Z → (n <= m)%Z ↔ (p * m <= p * n)%Z
+Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (n * p <= m * p)%Z
+Z.mul_le_mono_pos_l: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (p * n <= p * m)%Z
+...
   rewrite <- (rl_exp_add Htr).
   now apply Hη.
 }
