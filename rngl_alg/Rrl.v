@@ -1115,6 +1115,18 @@ Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ x, (if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L) = rl_sqrt x.
 Proof. easy. Qed.
 
+Theorem rl_ln_1 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_inv_or_quot T = true →
+  rl_has_trigo T = true →
+  rl_ln 1 = 0%L.
+Proof.
+intros * Hon Hiq Htr.
+rewrite <- (rl_exp_0 Hon Hiq Htr).
+apply (rl_ln_exp Htr).
+Qed.
+
 (* to be completed
 Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1131,6 +1143,9 @@ Proof.
 intros * Hon Hop Hiv Hc1 Hc2 Heb Hor Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
 }
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
@@ -1197,6 +1212,28 @@ assert (
     apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
   }
 }
+specialize (Hb' (rngl_abs (rl_exp ε - 1)%L)) as H1.
+assert (H : (0 < rngl_abs (rl_exp ε - 1))%L). {
+  unfold rngl_abs.
+  remember (rl_exp ε - 1 ≤? 0)%L as ee eqn:Hee; symmetry in Hee.
+  destruct ee. {
+    apply rngl_leb_le in Hee.
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_lt_compat Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H2.
+    apply -> (rngl_sub_move_0_r Hop) in H2.
+    apply (f_equal rl_ln) in H2.
+    rewrite (rl_ln_exp Htr) in H2.
+    rewrite (rl_ln_1 Hon Hiq Htr) in H2.
+    now rewrite H2 in Hε; apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  now apply (rngl_leb_gt Hor) in Hee.
+}
+specialize (H1 H); clear H.
+destruct H1 as (η & Hzη & Hη).
+(* ah oui mais non *)
 ...
 assert (
   Hb' : ∀ ε : T, (0 < ε)%L →
