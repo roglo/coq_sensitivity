@@ -1112,6 +1112,22 @@ destruct H1 as (b, Hb).
 progress unfold continuous_at in Hb.
 progress unfold continuous_at.
 intros ε Hε.
+assert (
+  Hb' : ∀ ε : T, (0 < ε)%L →
+    ∃ η : T, (0 < η)%L ∧
+    (∀ x : T, (rngl_abs (x - a) ≤ η)%L →
+       (rngl_abs (rl_exp (x - a + b) - rl_exp b) ≤ ε))%L). {
+  clear ε Hε.
+  intros ε Hε.
+  specialize (Hb ε Hε) as H1.
+  destruct H1 as (η & Hzη & Hη).
+  exists η.
+  split; [ easy | ].
+  intros x Hx.
+  specialize (Hη (x - a + b))%L.
+  rewrite (rngl_add_sub Hos) in Hη.
+  now apply Hη.
+}
 ...
 specialize (Hb (ε + rngl_abs (rl_exp b - rl_exp a))%L) as H1.
 assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L). {
