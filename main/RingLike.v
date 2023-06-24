@@ -2015,6 +2015,34 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_lt_0_sub :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < b - a ↔ a < b)%L.
+Proof.
+intros * Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+split; intros Hab. {
+  apply (rngl_lt_iff Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  destruct Hab as (Hab, Habz).
+  split; [ now apply (rngl_le_0_sub Hop Hor) | ].
+  intros H; subst b.
+  now rewrite (rngl_sub_diag Hos) in Habz.
+} {
+  apply (rngl_lt_iff Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  destruct Hab as (Hab, Habz).
+  split; [ now apply (rngl_le_0_sub Hop Hor) | ].
+  apply not_eq_sym.
+  intros H1.
+  apply Habz; symmetry.
+  now apply (rngl_sub_move_0_r Hop).
+}
+Qed.
+
 Theorem rngl_opp_le_compat :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2962,7 +2990,49 @@ specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Haz Hbz) as H1.
 now apply (rngl_nlt_ge Hor) in H1.
 Qed.
 
+Theorem rngl_mul_pos_pos :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b : T, (0 < a)%L → (0 < b)%L → (0 < a * b)%L.
+Proof.
+intros Hop Hor Hii * Haz Hbz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply (rngl_lt_iff Hor) in Haz.
+apply (rngl_lt_iff Hor) in Hbz.
+apply (rngl_lt_iff Hor).
+destruct Haz as (Haz, Hza).
+destruct Hbz as (Hbz, Hzb).
+split. {
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
+apply not_eq_sym in Hza, Hzb.
+apply not_eq_sym.
+intros Hab.
+now apply (rngl_eq_mul_0_l Hos) in Hab.
+Qed.
+
 (* to be completed
+Theorem rngl_mul_lt_mono_pos_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b c : T, (0 < a)%L → (b < c)%L ↔ (a * b < a * c)%L.
+Proof.
+intros Hop Hor Hii * Ha.
+split; intros Hbc. {
+  apply (rngl_lt_0_sub Hop Hor).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+  now apply (rngl_lt_0_sub Hop Hor).
+} {
+...
+rngl_mul_nonneg_nonneg:
+  rngl_has_opp T = true → rngl_is_ordered T = true → ∀ a b : T, (0 ≤ a)%L → (0 ≤ b)%L → (0 ≤ a * b)%L
+...
+
 Theorem rngl_mul_le_mono_pos_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2971,9 +3041,16 @@ Proof.
 intros Hop Hor * Hc.
 split; intros Hab. {
   apply (rngl_lt_eq_cases Hor) in Hab.
+  destruct Hab as [Hab| Hab]; [ | subst b; apply (rngl_le_refl Hor) ].
 ...
+  apply (rngl_lt_eq_cases Hor); left.
+... ...
+  now apply rngl_mul_lt_mono_pos_l.
+}
 Require Import ZArith.
 Print Z.mul_le_mono_pos_l.
+Check Z.mul_lt_mono_pos_l.
+...
 Check Z.lt_eq_cases.
 ...
 Search (_ ≤ _ ↔ _)%L.
