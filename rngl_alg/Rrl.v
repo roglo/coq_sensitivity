@@ -1097,14 +1097,23 @@ Proof. easy. Qed.
 (* to be completed
 Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_characteristic T ≠ 2 →
+  rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ a, continuous_at rl_exp a.
 Proof.
-intros * Hop Hor Htr *.
+intros * Hon Hop Hiv Hc1 Hc2 Heb Hor Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
 }
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
@@ -1116,7 +1125,60 @@ assert (
   Hb' : ∀ ε : T, (0 < ε)%L →
     ∃ η : T, (0 < η)%L ∧
     (∀ x : T, (rngl_abs (x - a) ≤ η)%L →
-       (rngl_abs (rl_exp (x - a + b) - rl_exp b) ≤ ε))%L). {
+       (rngl_abs (rl_exp (x - a) - 1) ≤ ε))%L). {
+  clear ε Hε.
+  intros ε Hε.
+  specialize (Hb (ε * rl_exp b))%L as H1.
+  assert (H : (0 < ε * rl_exp b)%L). {
+    apply (rngl_lt_iff Hor).
+    split. {
+      rewrite <- (rngl_mul_0_l Hos 0)%L.
+      apply (rngl_mul_le_compat_nonneg Hor Hop). {
+        split; [ apply (rngl_le_refl Hor) | ].
+        now apply (rngl_lt_le_incl Hor).
+      } {
+        split; [ apply (rngl_le_refl Hor) | ].
+        apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+      }
+    }
+    apply not_eq_sym.
+    intros H2.
+    apply (rngl_integral Hos) in H2. 2: {
+      rewrite Hi1, Heb.
+      apply Bool.orb_true_r.
+    }
+    destruct H2 as [H2| H2]. {
+      now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
+    } {
+      revert H2.
+      apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
+    }
+  }
+  specialize (H1 H); clear H.
+  destruct H1 as (η & Hzη & Hη).
+  exists η.
+  split; [ easy | ].
+  intros x Hx.
+  specialize (Hη (x - a + b))%L.
+  rewrite (rngl_add_sub Hos) in Hη.
+  specialize (Hη Hx).
+  rewrite <- (rngl_mul_1_l Hon (rl_exp b)) in Hη at 1.
+  rewrite (rl_exp_add Htr) in Hη.
+  rewrite <- (rngl_mul_sub_distr_r Hop) in Hη.
+  rewrite (rngl_abs_mul Hop Hi1 Hor) in Hη.
+  rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in Hη. 2: {
+    apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  }
+Search (_ * _ ≤ _ * _)%L.
+...
+  rewrite <- (rl_exp_add Htr).
+  now apply Hη.
+}
+assert (
+  Hb' : ∀ ε : T, (0 < ε)%L →
+    ∃ η : T, (0 < η)%L ∧
+    (∀ x : T, (rngl_abs (x - a) ≤ η)%L →
+       (rngl_abs ((rl_exp (x - a) - 1) * rl_exp b) ≤ ε))%L). {
   clear ε Hε.
   intros ε Hε.
   specialize (Hb ε Hε) as H1.
@@ -1126,6 +1188,9 @@ assert (
   intros x Hx.
   specialize (Hη (x - a + b))%L.
   rewrite (rngl_add_sub Hos) in Hη.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rl_exp_add Htr).
   now apply Hη.
 }
 ...

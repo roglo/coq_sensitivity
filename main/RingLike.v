@@ -2864,6 +2864,78 @@ rewrite (rngl_opp_involutive Hop).
 now rewrite (rngl_opp_0 Hop).
 Qed.
 
+Theorem rngl_abs_mul :
+  rngl_has_opp T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (rngl_abs (a * b) = rngl_abs a * rngl_abs b)%L.
+Proof.
+intros Hop Hi1 Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+remember (b ≤? 0)%L as bz eqn:Hbz; symmetry in Hbz.
+remember (a * b ≤? 0)%L as abz eqn:Habz; symmetry in Habz.
+destruct abz. {
+  apply rngl_leb_le in Habz.
+  destruct az. {
+    rewrite (rngl_mul_opp_l Hop).
+    apply rngl_leb_le in Haz.
+    destruct bz; [ | easy ].
+    rewrite (rngl_mul_opp_r Hop).
+    apply rngl_leb_le in Hbz.
+    specialize (rngl_mul_nonpos_nonpos Hop Hor _ _ Haz Hbz) as H1.
+    apply (rngl_le_antisymm Hor _ _ Habz) in H1.
+    rewrite H1.
+    now do 2 rewrite (rngl_opp_0 Hop).
+  }
+  apply (rngl_leb_gt Hor) in Haz.
+  destruct bz; [ now rewrite (rngl_mul_opp_r Hop) | ].
+  apply (rngl_leb_gt Hor) in Hbz.
+  apply (rngl_nlt_ge Hor) in Habz.
+  exfalso; apply Habz; clear Habz.
+  apply (rngl_lt_iff Hor).
+  split. {
+    now apply (rngl_mul_nonneg_nonneg Hop Hor); apply (rngl_lt_le_incl Hor).
+  }
+  apply not_eq_sym.
+  intros H1.
+  apply (rngl_eq_mul_0_l Hos) in H1. {
+    now subst a; apply (rngl_lt_irrefl Hor) in Haz.
+  } {
+    rewrite Hi1.
+    now destruct (rngl_is_integral_domain T).
+  } {
+    intros H; subst b.
+    now apply (rngl_lt_irrefl Hor) in Hbz.
+  }
+}
+apply (rngl_leb_gt Hor) in Habz.
+destruct az. {
+  rewrite (rngl_mul_opp_l Hop).
+  apply rngl_leb_le in Haz.
+  destruct bz. {
+    rewrite (rngl_mul_opp_r Hop).
+    symmetry.
+    apply (rngl_opp_involutive Hop).
+  }
+  apply (rngl_leb_gt Hor) in Hbz.
+  apply (rngl_lt_iff Hor) in Hbz.
+  destruct Hbz as (Hbz, Hzb).
+  specialize (rngl_mul_nonpos_nonneg Hop Hor _ _ Haz Hbz) as H1.
+  now apply (rngl_nlt_ge Hor) in H1.
+}
+apply (rngl_leb_gt Hor) in Haz.
+destruct bz; [ | easy ].
+apply rngl_leb_le in Hbz.
+apply (rngl_lt_iff Hor) in Haz.
+destruct Haz as (Haz, Hza).
+specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Haz Hbz) as H1.
+now apply (rngl_nlt_ge Hor) in H1.
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=
