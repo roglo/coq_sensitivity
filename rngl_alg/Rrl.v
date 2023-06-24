@@ -913,6 +913,27 @@ rewrite (rl_exp_add Htr).
 apply (rngl_square_ge_0 Hop Hor).
 Qed.
 
+Theorem rl_exp_gt_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+  {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_characteristic T ≠ 2 →
+  rngl_is_ordered T = true →
+  rl_has_trigo T = true →
+  ∀ x : T, (0 < rl_exp x)%L.
+Proof.
+intros * Hon Hop Hiv Hc1 Hc2 Hor Htr *.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+} {
+  apply not_eq_sym.
+  apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
+}
+Qed.
+
 Theorem rl_pow_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1169,28 +1190,14 @@ assert (
   rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in Hη. 2: {
     apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
   }
-... ...
-  apply rngl_mul_le_mono_pos_r in Hη; [ easy | ].
-  apply (rngl_lt_iff Hor).
-  split. {
-    apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rngl_mul_le_mono_pos_r Hop Hor) in Hη; [ easy | | ]. {
+    rewrite Hi1.
+    apply Bool.orb_true_r.
   } {
-    apply not_eq_sym.
-    apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
+    apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
   }
 }
 ...
-Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (n * p <= m * p)%Z
-...
-Search (_ ↔ _ * _ <= _ * _)%Z.
-Z.mul_le_mono_neg_r: ∀ n m p : Z, (p < 0)%Z → (n <= m)%Z ↔ (m * p <= n * p)%Z
-Z.mul_le_mono_neg_l: ∀ n m p : Z, (p < 0)%Z → (n <= m)%Z ↔ (p * m <= p * n)%Z
-Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (n * p <= m * p)%Z
-Z.mul_le_mono_pos_l: ∀ n m p : Z, (0 < p)%Z → (n <= m)%Z ↔ (p * n <= p * m)%Z
-...
-  rewrite <- (rl_exp_add Htr).
-  now apply Hη.
-}
 assert (
   Hb' : ∀ ε : T, (0 < ε)%L →
     ∃ η : T, (0 < η)%L ∧
