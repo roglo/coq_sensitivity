@@ -839,6 +839,41 @@ rewrite (rngl_div_diag Hon Hiq _ H1) in H2.
 now rewrite (rngl_mul_div Hi1) in H2.
 Qed.
 
+(* to be completed
+Theorem rngl_characteristic_1_not_trigo {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_characteristic T = 1 →
+  rl_has_trigo T = false.
+Proof.
+intros * Hon Hos Hc1.
+(* ptet qu'on n'a pas besoin de Hos *)
+specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1.
+rewrite Hc1 in H1.
+cbn in H1.
+destruct H1 as (_, H1).
+rewrite rngl_add_0_r in H1.
+apply Bool.not_true_iff_false.
+intros Htr.
+specialize (rl_exp_not_all_0 Htr) as H2.
+destruct H2 as (a, Ha).
+Search rl_exp.
+Check rl_exp_0.
+...
+exfalso; apply Ha, H1.
+...
+intros * Hon Hos Hc1.
+specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+apply Bool.not_true_iff_false.
+intros Htr.
+specialize (rl_exp_not_all_0 Htr) as H2.
+destruct H2 as (a, Ha).
+exfalso; apply Ha, H1.
+Qed.
+*)
+
 Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
