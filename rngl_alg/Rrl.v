@@ -1139,7 +1139,7 @@ Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_has_trigo T = true →
   ∀ a, continuous_at rl_exp a.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Heb Hor Htr *.
+intros * Hon Hop Hiv Hc1 Hc2 Heb Hor Htr b.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1152,12 +1152,12 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
 }
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
-destruct H1 as (b, Hb).
-progress unfold continuous_at in Hb.
+destruct H1 as (a, Ha).
+progress unfold continuous_at in Ha.
 progress unfold continuous_at.
 intros ε Hε.
-specialize (Hb (ε * rl_exp (b - a))%L) as H1.
-assert (H : (0 < ε * rl_exp (b - a))%L). {
+specialize (Ha (ε * rl_exp (a - b))%L) as H1.
+assert (H : (0 < ε * rl_exp (a - b))%L). {
   apply (rngl_mul_pos_pos Hop Hor); [ | easy | ]. {
     rewrite Hi1.
     apply Bool.orb_true_r.
@@ -1170,17 +1170,17 @@ destruct H1 as (η & Hzη & Hη).
 exists η.
 split; [ easy | ].
 intros x Hxη.
-specialize (Hη (x - a + b))%L as H1.
+specialize (Hη (x - b + a))%L as H1.
 rewrite (rngl_add_sub Hos) in H1.
 specialize (H1 Hxη).
-rewrite <- (rngl_mul_1_l Hon (rl_exp b)) in H1.
+rewrite <- (rngl_mul_1_l Hon (rl_exp a)) in H1.
 rewrite <- (rl_exp_0 Hon Hiq Htr) in H1.
-rewrite <- (rngl_sub_diag Hos a) in H1.
+rewrite <- (rngl_sub_diag Hos b) in H1.
 progress unfold rngl_sub in H1 at 2 3.
 rewrite Hop in H1.
 rewrite <- (rl_exp_add Htr) in H1.
 rewrite (rngl_add_add_swap x) in H1.
-rewrite (rngl_add_add_swap a) in H1.
+rewrite (rngl_add_add_swap b) in H1.
 do 2 rewrite <- rngl_add_assoc in H1.
 rewrite (fold_rngl_sub Hop) in H1.
 do 2 rewrite (rl_exp_add Htr) in H1.
