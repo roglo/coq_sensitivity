@@ -870,17 +870,25 @@ Theorem rl_exp_ge_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ x : T, (0 ≤ rl_exp x)%L.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Hor Htr *.
+intros * Hon Hop Hiv Hc2 Hor Htr *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1.
+  apply (rngl_le_refl Hor).
+}
+move Hc1 after Hc2.
 assert (H20 : (2 ≠ 0)%L). {
   specialize rngl_characteristic_prop as H1.
   rewrite Hon in H1.
@@ -927,7 +935,7 @@ Proof.
 intros * Hon Hop Hiv Hc1 Hc2 Hor Htr *.
 apply (rngl_lt_iff Hor).
 split. {
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 } {
   apply not_eq_sym.
   apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
@@ -953,15 +961,14 @@ Theorem rl_pow_ge_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ x y, (0 ≤ rl_pow x y)%L.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Hor Htr *.
+intros * Hon Hop Hiv Hc2 Hor Htr *.
 unfold rl_pow.
-apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 Qed.
 
 Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -1194,7 +1201,7 @@ do 2 rewrite (rl_exp_add Htr) in H1.
 rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
 rewrite (rngl_abs_mul Hop Hi1 Hor) in H1.
 rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in H1. 2: {
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
   rewrite Hi1.
