@@ -1009,7 +1009,7 @@ destruct (rngl_eq_dec Heb x 0%L) as [Hxz| Hxz]. {
   rewrite (rngl_leb_refl Hor).
   symmetry; apply (rngl_opp_0 Hop).
 }
-assert (H2z : (1 + 1)%L ≠ 0%L). {
+assert (H2z : 2%L ≠ 0%L). {
   specialize rngl_characteristic_prop as H2.
   rewrite Hon in H2.
   rewrite if_bool_if_dec in H2.
