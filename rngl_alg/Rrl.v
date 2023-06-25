@@ -844,16 +844,21 @@ Theorem rl_exp_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rl_has_trigo T = true →
   ∀ x : T, rl_exp x ≠ 0%L.
 Proof.
-intros * Hon Hop Hiv H10 Htr *.
+intros * Hon Hop Hiv Htr *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  specialize (rl_exp_not_all_0 Htr) as H2.
+  destruct H2 as (a, Ha).
+  exfalso; apply Ha, H1.
 }
 intros Hxz.
 specialize (rl_exp_add Htr x (- x)%L) as H3.
@@ -926,19 +931,18 @@ Theorem rl_exp_gt_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ x : T, (0 < rl_exp x)%L.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Hor Htr *.
+intros * Hon Hop Hiv Hc2 Hor Htr *.
 apply (rngl_lt_iff Hor).
 split. {
   apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 } {
   apply not_eq_sym.
-  apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
+  apply (rl_exp_neq_0 Hon Hop Hiv Htr).
 }
 Qed.
 
@@ -947,13 +951,12 @@ Theorem rl_pow_neq_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rl_has_trigo T = true →
   ∀ x y, rl_pow x y ≠ 0%L.
 Proof.
-intros * Hon Hop Hiv Hch Htr *.
+intros * Hon Hop Hiv Htr *.
 unfold rl_pow.
-apply (rl_exp_neq_0 Hon Hop Hiv Hch Htr).
+apply (rl_exp_neq_0 Hon Hop Hiv Htr).
 Qed.
 
 Theorem rl_pow_ge_0 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -1156,14 +1159,6 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  progress unfold continuous_at.
-  intros ε Hε.
-  rewrite H1 in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-move Hc1 after Hc2.
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
 destruct H1 as (a, Ha).
@@ -1176,7 +1171,7 @@ assert (H : (0 < ε * rl_exp (a - b))%L). {
     rewrite Hi1.
     apply Bool.orb_true_r.
   } {
-    apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+    apply (rl_exp_gt_0 Hon Hop Hiv Hc2 Hor Htr).
   }
 }
 specialize (H1 H); clear H.
@@ -1207,7 +1202,7 @@ apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
   rewrite Hi1.
   apply Bool.orb_true_r.
 } {
-  apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_exp_gt_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 Qed.
 
@@ -1240,11 +1235,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
 }
 apply (rngl_abs_le Hop Hor).
 rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
-  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
-    specialize (rngl_characteristic_1 Hon Hos Hch) as H1.
-    now rewrite (H1 x), (H1 y) in Hxyz; destruct Hxyz.
-  }
-  apply (rl_pow_neq_0 Hon Hop Hiv Hch Htr).
+  apply (rl_pow_neq_0 Hon Hop Hiv Htr).
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
@@ -1254,13 +1245,12 @@ Theorem le_rngl_abs_rl_sqrt_add {T} {ro : ring_like_op T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eqb T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ a b, (0 ≤ b → a ≤ rngl_abs (rl_sqrt (rngl_squ a + b)))%L.
 Proof.
-intros * Hon Hop Hiv Heb Hc1 Hc2 Hor Htr * Hzb.
+intros * Hon Hop Hiv Heb Hc2 Hor Htr * Hzb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1291,12 +1281,12 @@ destruct ab. {
   destruct H2; subst a; apply (rngl_le_refl Hor).
 }
 rewrite (rngl_abs_nonneg Hop Hor). 2: {
-  apply (rl_pow_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_pow_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 unfold rl_pow.
 destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
   apply (rngl_le_trans Hor _ 0%L); [ easy | ].
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 apply (rngl_nle_gt Hor) in Haz.
 Theorem rl_exp_increasing {T} {ro : ring_like_op T}
@@ -1304,20 +1294,19 @@ Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Hor Htr He1 * Hab.
+intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
 rewrite <- (rngl_sub_add Hop b a).
 rewrite (rl_exp_add Htr).
 rewrite <- (rngl_mul_1_l Hon) at 1.
 apply (rngl_mul_le_compat_nonneg Hor Hop). 2: {
   split; [ | apply (rngl_le_refl Hor) ].
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
