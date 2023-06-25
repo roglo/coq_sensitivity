@@ -1127,7 +1127,6 @@ rewrite <- (rl_exp_0 Hon Hiq Htr).
 apply (rl_ln_exp Htr).
 Qed.
 
-(* to be completed
 Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1157,170 +1156,48 @@ destruct H1 as (b, Hb).
 progress unfold continuous_at in Hb.
 progress unfold continuous_at.
 intros ε Hε.
-assert (
-  Hb' : ∀ ε : T, (0 < ε)%L →
-    ∃ η : T, (0 < η)%L ∧
-    (∀ x : T, (rngl_abs (x - a) ≤ η)%L →
-       (rngl_abs (rl_exp (x - a) - 1) ≤ ε))%L). {
-  clear ε Hε.
-  intros ε Hε.
-  specialize (Hb (ε * rl_exp b))%L as H1.
-  assert (H : (0 < ε * rl_exp b)%L). {
-    apply (rngl_lt_iff Hor).
-    split. {
-      rewrite <- (rngl_mul_0_l Hos 0)%L.
-      apply (rngl_mul_le_compat_nonneg Hor Hop). {
-        split; [ apply (rngl_le_refl Hor) | ].
-        now apply (rngl_lt_le_incl Hor).
-      } {
-        split; [ apply (rngl_le_refl Hor) | ].
-        apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
-      }
-    }
-    apply not_eq_sym.
-    intros H2.
-    apply (rngl_integral Hos) in H2. 2: {
-      rewrite Hi1, Heb.
-      apply Bool.orb_true_r.
-    }
-    destruct H2 as [H2| H2]. {
-      now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
-    } {
-      revert H2.
-      apply (rl_exp_neq_0 Hon Hop Hiv Hc1 Htr).
-    }
-  }
-  specialize (H1 H); clear H.
-  destruct H1 as (η & Hzη & Hη).
-  exists η.
-  split; [ easy | ].
-  intros x Hx.
-  specialize (Hη (x - a + b))%L.
-  rewrite (rngl_add_sub Hos) in Hη.
-  specialize (Hη Hx).
-  rewrite <- (rngl_mul_1_l Hon (rl_exp b)) in Hη at 1.
-  rewrite (rl_exp_add Htr) in Hη.
-  rewrite <- (rngl_mul_sub_distr_r Hop) in Hη.
-  rewrite (rngl_abs_mul Hop Hi1 Hor) in Hη.
-  rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in Hη. 2: {
-    apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
-  }
-  apply (rngl_mul_le_mono_pos_r Hop Hor) in Hη; [ easy | | ]. {
+specialize (Hb (ε * rl_exp (b - a))%L) as H1.
+assert (H : (0 < ε * rl_exp (b - a))%L). {
+  apply (rngl_mul_pos_pos Hop Hor); [ | easy | ]. {
     rewrite Hi1.
     apply Bool.orb_true_r.
   } {
     apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
   }
 }
-specialize (Hb' (rngl_abs (rl_exp ε - 1)%L)) as H1.
-assert (H : (0 < rngl_abs (rl_exp ε - 1))%L). {
-  unfold rngl_abs.
-  remember (rl_exp ε - 1 ≤? 0)%L as ee eqn:Hee; symmetry in Hee.
-  destruct ee. {
-    apply rngl_leb_le in Hee.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_lt_compat Hop Hor).
-    apply (rngl_lt_iff Hor).
-    split; [ easy | ].
-    intros H2.
-    apply -> (rngl_sub_move_0_r Hop) in H2.
-    apply (f_equal rl_ln) in H2.
-    rewrite (rl_ln_exp Htr) in H2.
-    rewrite (rl_ln_1 Hon Hiq Htr) in H2.
-    now rewrite H2 in Hε; apply (rngl_lt_irrefl Hor) in Hε.
-  }
-  now apply (rngl_leb_gt Hor) in Hee.
-}
 specialize (H1 H); clear H.
 destruct H1 as (η & Hzη & Hη).
-(* ah oui mais non *)
-...
-assert (
-  Hb' : ∀ ε : T, (0 < ε)%L →
-    ∃ η : T, (0 < η)%L ∧
-    (∀ x : T, (rngl_abs (x - a) ≤ η)%L →
-       (rngl_abs ((rl_exp (x - a) - 1) * rl_exp b) ≤ ε))%L). {
-  clear ε Hε.
-  intros ε Hε.
-  specialize (Hb ε Hε) as H1.
-  destruct H1 as (η & Hzη & Hη).
-  exists η.
-  split; [ easy | ].
-  intros x Hx.
-  specialize (Hη (x - a + b))%L.
-  rewrite (rngl_add_sub Hos) in Hη.
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite <- (rl_exp_add Htr).
-  now apply Hη.
+exists η.
+split; [ easy | ].
+intros x Hxη.
+specialize (Hη (x - a + b))%L as H1.
+rewrite (rngl_add_sub Hos) in H1.
+specialize (H1 Hxη).
+rewrite <- (rngl_mul_1_l Hon (rl_exp b)) in H1.
+rewrite <- (rl_exp_0 Hon Hiq Htr) in H1.
+rewrite <- (rngl_sub_diag Hos a) in H1.
+progress unfold rngl_sub in H1 at 2 3.
+rewrite Hop in H1.
+rewrite <- (rl_exp_add Htr) in H1.
+rewrite (rngl_add_add_swap x) in H1.
+rewrite (rngl_add_add_swap a) in H1.
+do 2 rewrite <- rngl_add_assoc in H1.
+rewrite (fold_rngl_sub Hop) in H1.
+do 2 rewrite (rl_exp_add Htr) in H1.
+rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
+rewrite (rngl_abs_mul Hop Hi1 Hor) in H1.
+rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in H1. 2: {
+  apply (rl_exp_ge_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
 }
-...
-specialize (Hb (ε + rngl_abs (rl_exp b - rl_exp a))%L) as H1.
-assert (H : (0 < ε + rngl_abs (rl_exp b - rl_exp a))%L). {
-  apply (rngl_lt_le_trans Hor _ ε _ Hε).
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_abs Hop Hor).
+apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
+  rewrite Hi1.
+  apply Bool.orb_true_r.
+} {
+  apply (rl_exp_gt_0 Hon Hop Hiv Hc1 Hc2 Hor Htr).
 }
-specialize (H1 H); clear H.
-destruct H1 as (η & Hzη & Hη).
-...
-exists (η - rngl_abs (a - b))%L.
-split. 2: {
-intros x Hx.
-specialize (Hη x) as H1.
-assert (H : (rngl_abs (x - b) ≤ η)%L). {
-  eapply (rngl_le_trans Hor). {
-    replace (x - b)%L with ((x - a) + (a - b))%L. 2: {
-      progress unfold rngl_sub.
-      rewrite Hop.
-      rewrite rngl_add_assoc.
-      do 3 rewrite (fold_rngl_sub Hop).
-      now rewrite (rngl_sub_add Hop).
-    }
-    apply (rngl_abs_triangle Hop Hor).
-  }
-  apply (rngl_le_trans Hor _ (rngl_abs (a - b) + η - rngl_abs (a - b)))%L. {
-    rewrite rngl_add_comm.
-    progress unfold rngl_sub.
-    rewrite Hop.
-    rewrite <- rngl_add_assoc.
-    do 3 rewrite (fold_rngl_sub Hop).
-    apply (rngl_add_le_compat Hor); [ | easy ].
-    apply (rngl_le_refl Hor).
-  }
-  rewrite rngl_add_comm, (rngl_add_sub Hos).
-  apply (rngl_le_refl Hor).
-}
-specialize (H1 H).
-specialize (rngl_abs_triangle Hop Hor) as H2.
-specialize (H2 (rl_exp x)).
-specialize (H2 (- rl_exp a))%L.
-rewrite (fold_rngl_sub Hop) in H2.
-eapply (rngl_le_trans Hor); [ apply H2 | ].
-...
-  specialize (rngl_add_le_compat Hor) as H2.
-  specialize (H2 (rngl_abs (x - a))%L).
-  specialize (H2 (η - rngl_abs (a - b))%L).
-  specialize (H2 0)%L.
-  specialize (H2 (rngl_abs (a - b)))%L.
-  specialize (H2 Hx).
-  specialize (rngl_0_le_abs Hop Hor (a - b))%L as H.
-  specialize (H2 H); clear H.
-  rewrite rngl_add_0_r in H2.
-  rewrite (rngl_sub_add Hop) in H2.
-Search (_ ≤ _ + _)%L.
-Require Import ZArith.
-Search (_ ≤ _ - _)%Z.
-...
-  eapply (rngl_add_le_compat Hor) with (b := (- rngl_abs (a - b))%L) in Hx.
-Search (_ ≤ _ = _ ↔ _)%L.
-Search (_ ↔ _ ≤ _ = _)%L.
+Qed.
 
-...
-Search (rngl_abs _ ≤ rngl_abs _ + _)%L.
-rngl_abs (x - b) ≤ rngl_abs (x - a) + rngl_abs (a - b)
-...
-
+(* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
