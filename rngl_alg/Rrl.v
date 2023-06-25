@@ -1132,14 +1132,13 @@ Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_characteristic T ≠ 2 →
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ a, continuous_at rl_exp a.
 Proof.
-intros * Hon Hop Hiv Hc1 Hc2 Heb Hor Htr b.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr b.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1150,6 +1149,14 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  progress unfold continuous_at.
+  intros ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+move Hc1 after Hc2.
 specialize rl_exp_continuous_at as H1.
 rewrite Htr in H1.
 destruct H1 as (a, Ha).
