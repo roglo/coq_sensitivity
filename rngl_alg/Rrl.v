@@ -86,7 +86,10 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
 
 Definition is_Cauchy_sequence {T} {ro : ring_like_op T} (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
+  ∃ N : nat, ∀ n, N ≤ n → ∀ k, (rngl_abs (u (n + k)%nat - u n) ≤ ε)%L.
+(*
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
+*)
 
 Definition is_limit_when_tending_to {T} {ro : ring_like_op T} f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
