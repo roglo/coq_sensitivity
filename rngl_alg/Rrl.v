@@ -84,16 +84,17 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-Definition is_Cauchy_sequence {T} {ro : ring_like_op T} u :=
-  (∀ ε, 0 < ε → ∃ N, ∀ m n, N < m → N < n → rngl_abs (u m - u n) ≤ ε)%L.
+Definition is_Cauchy_sequence {T} {ro : ring_like_op T} (u : nat → T) :=
+  ∀ ε : T, (0 < ε)%L →
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
 
 Definition is_limit_when_tending_to {T} {ro : ring_like_op T} f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x, rngl_abs (x - a) ≤ η → rngl_abs (f x - l) ≤ ε)%L.
 
 Definition is_limit_when_tending_to_inf {T} {ro : ring_like_op T} f l :=
-  (∀ ε, 0 < ε → ∃ a,
-   ∀ x, a < x → rngl_abs (f x - l) ≤ ε)%L.
+  ∀ ε, (0 < ε)%L → ∃ a,
+  ∀ x, a < x → (rngl_abs (f x - l) ≤ ε)%L.
 
 Definition is_complete T {ro : ring_like_op T} :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
@@ -1366,6 +1367,11 @@ Theorem glop {T} {ro : ring_like_op T}
 Proof.
 intros Hc.
 unfold is_complete in Hc.
+assert
+  (H :
+    is_Cauchy_sequence
+      (λ n, (rngl_mul_nat 1 n * rl_exp (1 / rngl_mul_nat 1 n - 1)))%L). {
+  intros ε Hε.
 ...
 Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
