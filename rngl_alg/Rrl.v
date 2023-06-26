@@ -1341,6 +1341,20 @@ move x after He1.
 Print is_limit_when_tending_to.
 Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ f', is_derivative rl_exp f' →
+  ∀ x, f' x = (f' 0 * rl_exp x)%L.
+Proof.
+intros * Hff' *.
+progress unfold is_derivative in Hff'.
+Theorem rl_exp_derivative_exists {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∃ f', is_derivative rl_exp f'.
+Proof.
+intros.
+progress unfold is_derivative.
+...
+Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
   ∃ c, is_derivative rl_exp (λ x, rl_exp x * c)%L.
 Proof.
 intros.
