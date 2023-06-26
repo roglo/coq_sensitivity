@@ -2136,6 +2136,15 @@ apply rngl_add_cancel_l in Hij; [ | easy ].
 now apply IHj.
 Qed.
 
+Theorem rngl_mul_nat_add_r : ∀ a m n,
+  rngl_mul_nat a (m + n) = (rngl_mul_nat a m + rngl_mul_nat a n)%L.
+Proof.
+intros.
+induction m; cbn; [ now rewrite rngl_add_0_l | ].
+rewrite IHm.
+apply rngl_add_assoc.
+Qed.
+
 Theorem rngl_opp_inv :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

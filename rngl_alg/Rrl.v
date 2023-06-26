@@ -1376,6 +1376,12 @@ assert
       (λ n, (rngl_mul_nat 1 n * rl_exp (1 / rngl_mul_nat 1 n - 1)))%L). {
   intros ε Hε.
 ...
+exists 0.
+intros.
+rewrite rngl_mul_nat_add_r.
+rewrite rngl_mul_add_distr_r.
+Print rngl_mul_nat.
+...
 Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   ∃ c, is_derivative rl_exp (λ x, rl_exp x * c)%L.
