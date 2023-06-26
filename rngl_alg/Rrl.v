@@ -84,14 +84,24 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
+Definition is_limit_when_tending_to {T} {ro : ring_like_op T} f a l :=
+  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
+   ∀ x, rngl_abs (x - a) ≤ η → rngl_abs (f x - l) ≤ ε)%L.
+
 Definition continuous_at {T} {ro : ring_like_op T} f a :=
+  is_limit_when_tending_to f a (f a).
+(*
   ∀ ε : T, (0 < ε)%L → ∃ η, (0 < η)%L ∧
   ∀ x : T, (rngl_abs (x - a) ≤ η)%L → (rngl_abs (f x - f a) ≤ ε)%L.
+*)
+
+Definition is_derivative {T} {ro : ring_like_op T} f f' :=
+  ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_trigo : bool;
     rl_exp : T → T;
-    rl_ln : T → T;
+    rl_log : T → T;
     rl_cos : T → T;
     rl_sin : T → T;
     rl_acos : T → T;
@@ -115,17 +125,17 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_trigo then ∃ a : T, continuous_at rl_exp a
       else not_applicable;
     rl_opt_exp_ln :
-      if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x
+      if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_log x) = x
       else not_applicable;
     rl_opt_ln_exp :
-      if rl_has_trigo then ∀ x : T, rl_ln (rl_exp x) = x
+      if rl_has_trigo then ∀ x : T, rl_log (rl_exp x) = x
       else not_applicable }.
 
 Arguments rl_acos {T ro rp real_like_prop} x%L.
 Arguments rl_cos {T ro rp real_like_prop} x%L.
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
-Arguments rl_ln {T ro rp real_like_prop} x%L.
+Arguments rl_log {T ro rp real_like_prop} x%L.
 Arguments rl_sin {T ro rp real_like_prop} x%L.
 Arguments rl_has_trigo T {ro rp real_like_prop}.
 
@@ -741,7 +751,7 @@ Fixpoint GComplex_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
 
 Definition rl_pow {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} (x y : T) :=
-  rl_exp (y * rl_ln x).
+  rl_exp (y * rl_log x).
 
 Definition rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} (x : T) :=
@@ -770,16 +780,16 @@ Qed.
 
 Theorem rl_exp_ln {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo T = true → ∀ x : T, (0 < x)%L → rl_exp (rl_ln x) = x.
+  rl_has_trigo T = true → ∀ x : T, (0 < x)%L → rl_exp (rl_log x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_exp_ln as H1.
 now rewrite Htr in H1.
 Qed.
 
-Theorem rl_ln_exp {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+Theorem rl_log_exp {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  rl_has_trigo T = true → ∀ x : T, rl_ln (rl_exp x) = x.
+  rl_has_trigo T = true → ∀ x : T, rl_log (rl_exp x) = x.
 Proof.
 intros * Htr.
 specialize rl_opt_ln_exp as H1.
@@ -987,14 +997,14 @@ unfold rl_pow.
 apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 Qed.
 
-Theorem rl_ln_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+Theorem rl_log_mul {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rl_has_trigo T = true →
   ∀ x y, (0 < x)%L → (0 < y)%L →
-  rl_ln (x * y) = (rl_ln x + rl_ln y)%L.
+  rl_log (x * y) = (rl_log x + rl_log y)%L.
 Proof.
 intros * Htr * Hx Hy.
-rewrite <- (rl_ln_exp Htr (_ + _)%L).
+rewrite <- (rl_log_exp Htr (_ + _)%L).
 f_equal.
 rewrite (rl_exp_add Htr).
 now rewrite (rl_exp_ln Htr _ Hx), (rl_exp_ln Htr _ Hy).
@@ -1096,8 +1106,8 @@ destruct (Sumbool.sumbool_of_bool _) as [H1| H1]. {
     now rewrite (rngl_opp_involutive Hop) in H2.
   }
   rewrite <- (rngl_mul_opp_opp Hop x).
-  rewrite (rl_ln_mul Htr _ _ Hlx Hlx).
-  rewrite <- (rngl_mul_1_l Hon (rl_ln (- x))).
+  rewrite (rl_log_mul Htr _ _ Hlx Hlx).
+  rewrite <- (rngl_mul_1_l Hon (rl_log (- x))).
   rewrite <- rngl_mul_add_distr_r.
   rewrite rngl_mul_assoc.
   rewrite (rngl_div_mul Hon Hiv _ _ H2z).
@@ -1119,8 +1129,8 @@ assert (Hxl : (0 < x)%L). {
   intros H.
   now specialize (H2 _ _ H H1).
 }
-rewrite (rl_ln_mul Htr _ _ Hxl Hxl).
-rewrite <- (rngl_mul_1_l Hon (rl_ln x)).
+rewrite (rl_log_mul Htr _ _ Hxl Hxl).
+rewrite <- (rngl_mul_1_l Hon (rl_log x)).
 rewrite <- rngl_mul_add_distr_r.
 rewrite rngl_mul_assoc.
 rewrite (rngl_div_mul Hon Hiv _ _ H2z).
@@ -1130,7 +1140,7 @@ Qed.
 
 Theorem fold_rl_pow {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  ∀ x y, rl_exp (y * rl_ln x) = rl_pow x y.
+  ∀ x y, rl_exp (y * rl_log x) = rl_pow x y.
 Proof. easy. Qed.
 
 Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -1138,16 +1148,16 @@ Theorem fold_rl_sqrt {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ x, (if (x =? 0)%L then 0%L else rl_pow x (1 / (1 + 1))%L) = rl_sqrt x.
 Proof. easy. Qed.
 
-Theorem rl_ln_1 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+Theorem rl_log_1 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
   rngl_has_inv_or_quot T = true →
   rl_has_trigo T = true →
-  rl_ln 1 = 0%L.
+  rl_log 1 = 0%L.
 Proof.
 intros * Hon Hiq Htr.
 rewrite <- (rl_exp_0 Hon Hiq Htr).
-apply (rl_ln_exp Htr).
+apply (rl_log_exp Htr).
 Qed.
 
 Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -1327,6 +1337,14 @@ Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
   (1 < rl_exp 1 → ∀ x, 0 ≤ x → 1 ≤ rl_exp x)%L.
 Proof.
 intros * He1 * Hzx.
+move x after He1.
+Print is_limit_when_tending_to.
+Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∃ c, is_derivative rl_exp (λ x, rl_exp x * c)%L.
+Proof.
+intros.
+unfold is_derivative.
 ...
 Theorem glop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
