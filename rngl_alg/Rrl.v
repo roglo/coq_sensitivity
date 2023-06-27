@@ -86,18 +86,19 @@ Definition GComplex_inv {T} {ro : ring_like_op T} a :=
 
 Definition is_Cauchy_sequence {T} {ro : ring_like_op T} (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
-  ∃ N : nat, ∀ n, N ≤ n → ∀ k, (rngl_abs (u (n + k)%nat - u n) ≤ ε)%L.
 (*
-  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
+  ∃ N : nat, ∀ n, N ≤ n → ∀ k, (rngl_abs (u (n + k)%nat - u n) ≤ ε)%L.
 *)
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
+(**)
 
 Definition is_limit_when_tending_to {T} {ro : ring_like_op T} f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x, rngl_abs (x - a) ≤ η → rngl_abs (f x - l) ≤ ε)%L.
 
 Definition is_limit_when_tending_to_inf {T} {ro : ring_like_op T} f l :=
-  ∀ ε, (0 < ε)%L → ∃ a,
-  ∀ x, a < x → (rngl_abs (f x - l) ≤ ε)%L.
+  ∀ ε, (0 < ε)%L → ∃ N,
+  ∀ n, N < n → (rngl_abs (f n - l) ≤ ε)%L.
 
 Definition is_complete T {ro : ring_like_op T} :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
@@ -1370,6 +1371,22 @@ Theorem glop {T} {ro : ring_like_op T}
 Proof.
 intros Hc.
 unfold is_complete in Hc.
+Print is_limit_when_tending_to_inf.
+Theorem glop {T} {ro : ring_like_op T} :
+  ∀ f a l,
+  is_limit_when_tending_to f a l
+  → is_limit_when_tending_to_inf (λ n, f (a + 1 / rngl_mul_nat 1 n)%L) l.
+Proof.
+intros * Hlim.
+progress unfold is_limit_when_tending_to in Hlim.
+progress unfold is_limit_when_tending_to_inf.
+intros ε Hε.
+specialize (Hlim ε Hε).
+destruct Hlim as (η & Hzη & Hη).
+(* hou, là... j'ai peur qu'il faille ajouter que T est archimédien... *)
+(* pourquoi pas, mais bon... *)
+...
+exists (1 / η).
 ...
 assert
   (H :
