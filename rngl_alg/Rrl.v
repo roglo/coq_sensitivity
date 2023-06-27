@@ -1367,25 +1367,38 @@ Print is_derivative.
 Theorem glop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   is_complete T →
-  ∃ c, (is_limit_when_tending_to (λ ε, (rl_exp ε - 1) / ε) 0 c)%L.
+  ∃ c, (is_limit_when_tending_to (λ x, (rl_exp x - 1) / x) 0 c)%L.
 Proof.
 intros Hc.
 unfold is_complete in Hc.
-Print is_limit_when_tending_to_inf.
-Theorem glop {T} {ro : ring_like_op T} :
+Print is_limit_when_tending_to.
+Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
   ∀ f a l,
   is_limit_when_tending_to f a l
   → is_limit_when_tending_to_inf (λ n, f (a + 1 / rngl_mul_nat 1 n)%L) l.
 Proof.
-intros * Hlim.
+intros Hos Hor * Hlim.
 progress unfold is_limit_when_tending_to in Hlim.
 progress unfold is_limit_when_tending_to_inf.
 intros ε Hε.
 specialize (Hlim ε Hε).
 destruct Hlim as (η & Hzη & Hη).
+specialize (Hη (a + η)%L).
+rewrite rngl_add_comm in Hη at 1.
+rewrite (rngl_add_sub Hos) in Hη.
+assert (H : (rngl_abs η ≤ η)%L). {
+  unfold rngl_abs.
+  remember (η ≤? 0)%L as ηz eqn:Hηz; symmetry in Hηz.
+  destruct ηz; [ | apply (rngl_le_refl Hor) ].
+  apply rngl_leb_le in Hηz.
+  now apply (rngl_nlt_ge Hor) in Hηz.
+}
+specialize (Hη H); clear H.
+...
 (* hou, là... j'ai peur qu'il faille ajouter que T est archimédien... *)
 (* pourquoi pas, mais bon... *)
-...
 exists (1 / η).
 ...
 assert
