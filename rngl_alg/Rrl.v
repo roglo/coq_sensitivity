@@ -1366,10 +1366,11 @@ Print is_derivative.
 Theorem glop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   is_complete T →
-  ∃ c, (is_limit_when_tending_to (λ ε, ((rl_exp ε - 1) / ε)) 0 c)%L.
+  ∃ c, (is_limit_when_tending_to (λ ε, (rl_exp ε - 1) / ε) 0 c)%L.
 Proof.
 intros Hc.
 unfold is_complete in Hc.
+...
 assert
   (H :
     is_Cauchy_sequence
