@@ -135,10 +135,10 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_exp_continuous_at :
       if rl_has_trigo then ∃ a : T, continuous_at rl_exp a
       else not_applicable;
-    rl_opt_exp_ln :
+    rl_opt_exp_log :
       if rl_has_trigo then ∀ x : T, (0 < x)%L → rl_exp (rl_log x) = x
       else not_applicable;
-    rl_opt_ln_exp :
+    rl_opt_log_exp :
       if rl_has_trigo then ∀ x : T, rl_log (rl_exp x) = x
       else not_applicable }.
 
@@ -794,7 +794,7 @@ Theorem rl_exp_ln {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_has_trigo T = true → ∀ x : T, (0 < x)%L → rl_exp (rl_log x) = x.
 Proof.
 intros * Htr.
-specialize rl_opt_exp_ln as H1.
+specialize rl_opt_exp_log as H1.
 now rewrite Htr in H1.
 Qed.
 
@@ -803,7 +803,7 @@ Theorem rl_log_exp {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_has_trigo T = true → ∀ x : T, rl_log (rl_exp x) = x.
 Proof.
 intros * Htr.
-specialize rl_opt_ln_exp as H1.
+specialize rl_opt_log_exp as H1.
 now rewrite Htr in H1.
 Qed.
 

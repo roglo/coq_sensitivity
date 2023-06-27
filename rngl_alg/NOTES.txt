@@ -60,3 +60,29 @@
     (Matrix.v ?) et comment il va résoudre la suite ; je le vois
     vaguement mais j'aimerais voir comment ça se connecte avec
     là où j'en suis dans Lemma_2_1.v.
+
+Journal
+
+mardi 27 juin 2023 09:40
+
+Je suis sur Rrl.v où j'essaie de fabriquer des nombres complexes et y
+prouver qu'ils sont algébriquement clos. Pour cela, j'ai défini une
+notion d"espèce de réels" qui possède des fonctions trigonométriques
+(sin, cos) ainsi que l'exponentielle. Cette dernière est définie par
+trois axiomes.
+
+J'ai aussi défini le log, fonction réciproque de l'exponentielle, car
+j'ai besoin, pour les complexes, de définir la racine carrée. Or √x,
+c'est x^(1/2), donc e^(1/2 log x).
+
+Mais c'est embêtant, parce que si l'exponentielle a une réciproque,
+ça veut dire qu'elle est monotone. Or, cette monotonie, j'aurais
+aimé la démontrer par la dérivée et non pas par mes axiomes de exp
+et de log. Donc de ne pas définir de log.
+
+Bon, aussi, je me retrouve à devoir définir la notion de corps
+complet, donc de suites de Cauchy. Or, les limites des suites de
+Cauchy sont quand un entier tend vers l'infini. Pour la dérivée,
+en revanche, j'ai besoin de convergence vers une valeur finie.
+Cela risque de m'imposer d'avoir à ajouter que T est achimédien.
+J'en suis là.
