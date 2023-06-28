@@ -1342,9 +1342,17 @@ Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr He1 * Hab.
+destruct (rngl_eq_dec Heb a b) as [Haeb| Haeb]. {
+  subst b; apply (rngl_le_refl Hor).
+}
+apply (rngl_lt_eq_cases Hor) in Hab.
+destruct Hab as [Hab| Hab]; [ clear Haeb | easy ].
+apply (rngl_lt_le_incl Hor).
 specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
 progress unfold continuous_at in H1.
 progress unfold is_limit_when_tending_to in H1.
+specialize (H1 a) as Ha.
+specialize (H1 b) as Hb.
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
