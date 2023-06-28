@@ -1336,10 +1336,16 @@ Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
+  rngl_has_eqb T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
 Proof.
+intros * Hon Hop Hiv Hc2 Heb Hor Htr He1 * Hab.
+specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr b) as H1.
+progress unfold continuous_at in H1.
+progress unfold is_limit_when_tending_to in H1.
+...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
 rewrite <- (rngl_sub_add Hop b a).
@@ -1352,12 +1358,32 @@ apply (rngl_mul_le_compat_nonneg Hor Hop). 2: {
 split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 2 →
+  rngl_has_eqb T = true →
+  rngl_is_ordered T = true →
+  rl_has_trigo T = true →
   (1 < rl_exp 1 → ∀ x, 0 ≤ x → 1 ≤ rl_exp x)%L.
 Proof.
-intros * He1 * Hzx.
+intros Hon Hop Hiv Hc2 Heb Hor Htr * He1 * Hzx.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
 move x after He1.
 (* since rl_log is supposed to be the inverse of rl_exp,
    rl_exp must be monotonic. No need to use derivative. *)
+...
+specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
+progress unfold continuous_at in H1.
+progress unfold is_limit_when_tending_to in H1.
+specialize (H1 0)%L as H2.
+specialize (H2 (rl_exp x - rl_exp 1))%L.
+assert (H : (0 < rl_exp 1 - 1)%L) by _admit.
+specialize (H2 H); clear H.
+destruct H2 as (η & Hzη & Hη).
+rewrite (rl_exp_0 Hon Hiq Htr) in Hη.
 ...
 Print is_limit_when_tending_to.
 Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
