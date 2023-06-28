@@ -1353,6 +1353,9 @@ progress unfold continuous_at in H1.
 progress unfold is_limit_when_tending_to in H1.
 specialize (H1 a) as Ha.
 specialize (H1 b) as Hb.
+(*
+https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
+*)
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
