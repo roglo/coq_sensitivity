@@ -1277,6 +1277,7 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
+...
 Theorem le_rngl_abs_rl_sqrt_add {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1327,6 +1328,7 @@ destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
   apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 apply (rngl_nle_gt Hor) in Haz.
+...
 Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_1 T = true →
