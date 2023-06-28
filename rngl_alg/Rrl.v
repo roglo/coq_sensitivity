@@ -1277,7 +1277,6 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
-...
 Theorem le_rngl_abs_rl_sqrt_add {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1328,7 +1327,9 @@ destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
   apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
 apply (rngl_nle_gt Hor) in Haz.
-...
+specialize rl_opt_exp_log as H1.
+rewrite Htr in H1.
+rewrite <- (H1 a Haz) at 1.
 Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1355,6 +1356,9 @@ Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
 Proof.
 intros * He1 * Hzx.
 move x after He1.
+(* since rl_log is supposed to be the inverse of rl_exp,
+   rl_exp must be monotonic. No need to use derivative. *)
+...
 Print is_limit_when_tending_to.
 Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
