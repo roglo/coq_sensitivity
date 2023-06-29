@@ -1371,6 +1371,7 @@ progress unfold rngl_min in Hfab.
 progress unfold rngl_max in Hfab.
 remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
 destruct ab. {
+(* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_eqb T = true →
@@ -1405,6 +1406,15 @@ assert (H : (a < b)%L). {
   now apply (rngl_lt_irrefl Hor) in Hfau.
 }
 move H before Hab; clear Hab; rename H into Hab.
+set (s := { x | (a ≤ x ≤ b ∧ f x < u)%L }).
+assert (Hs : s). {
+  exists a.
+  split; [ | easy ].
+  split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
+}
+assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
+  now intros; destruct x.
+}
 ... ...
   now apply intermediate_value_le.
 ...
