@@ -1376,12 +1376,13 @@ Theorem intermediate_value_le {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
   rngl_has_eqb T = true →
   rngl_is_ordered T = true →
+  is_complete T →
   ∀ f, continuous f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros * Heb Hor * Hfc * Hab Hfab.
+intros * Heb Hor Hco * Hfc * Hab Hfab.
 destruct (rngl_eq_dec Heb (f a) u) as [Hau| Hau]. {
   exists a.
   split; [ | easy ].
@@ -1415,7 +1416,10 @@ assert (Hs : s). {
 assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
   now intros; destruct x.
 }
-... ...
+(* "Since s is non-empty and bounded above by b, by completeness, the
+    supremum c = sup s exists" *)
+unfold is_complete in Hco.
+.... ...
   now apply intermediate_value_le.
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
