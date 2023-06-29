@@ -1364,9 +1364,23 @@ Theorem intermediate_value {T} {ro : ring_like_op T}
   ∀ f, continuous f
   → ∀ a b u, (a ≤ b)%L
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
-  → ∃ c, (a ≤ u ≤ b)%L ∧ f c = u.
+  → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
 intros * Hfc * Hab Hfab.
+progress unfold rngl_min in Hfab.
+progress unfold rngl_max in Hfab.
+remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
+destruct ab. {
+Theorem intermediate_value_le {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ f, continuous f
+  → ∀ a b u, (a ≤ b)%L
+  → (f a ≤ u ≤ f b)%L
+  → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
+Proof.
+intros * Hfc * Hab Hfab.
+... ...
+  now apply intermediate_value_le.
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
