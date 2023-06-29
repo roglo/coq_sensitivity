@@ -1247,6 +1247,10 @@ apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
 }
 Qed.
 
+Definition rngl_is_supremum {T} {ro : ring_like_op T} P c :=
+  (∀ x,  P x → (x ≤ c)%L) ∧
+  (∀ c', (∀ x, P x → (x ≤ c')%L → (c ≤ c')%L))%L.
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1418,7 +1422,23 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
 }
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
-unfold is_complete in Hco.
+Theorem exists_supremum {T} {ro : ring_like_op T}  :
+  is_complete T →
+  ∀ P (Hne : {x : T | P x}) b,
+  (∀ x : {x : T | P x}, (proj1_sig x ≤ b)%L)
+  → ∃ c, rngl_is_supremum P c.
+Proof.
+intros Hco * Hne * HP.
+...
+(* "That is, c is the smallest number that is greater than or equal to
+    every member of s" *)
+assert
+  (∃ c,
+    (∀ x : s, (proj1_sig x ≤ c)%L) ∧
+    (∀ c', (∀ x : s, (proj1_sig x ≤ c')%L → (c ≤ c')%L))). {
+    set (Ps := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L) in s.
+    assert (∃ c, rngl_is_supremum Ps c). {
+subst s.
 .... ...
   now apply intermediate_value_le.
 ...
