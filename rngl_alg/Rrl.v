@@ -1424,12 +1424,16 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
     supremum c = sup s exists" *)
 Theorem exists_supremum {T} {ro : ring_like_op T}  :
   is_complete T →
-  ∀ P (Hne : {x : T | P x}) b,
+  ∀ P (a : {x : T | P x}) b,
   (∀ x : {x : T | P x}, (proj1_sig x ≤ b)%L)
   → ∃ c, rngl_is_supremum P c.
 Proof.
-intros Hco * Hne * HP.
-...
+intros Hco * a * HP.
+specialize (HP a) as H1.
+destruct a as (a, Ha); cbn in H1.
+progress unfold rngl_is_supremum.
+progress unfold is_complete in Hco.
+... ...
 (* "That is, c is the smallest number that is greater than or equal to
     every member of s" *)
 assert
