@@ -1422,6 +1422,10 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
 }
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
+progress unfold is_complete in Hco.
+...
+(* je suis pas sûr que ce théorème ci-dessous soit bon ; peut-être faut-il
+   que "P" ne soit pas n'importe quel prédicat, mais un truc avec ≤ *)
 Theorem exists_supremum {T} {ro : ring_like_op T}  :
   is_complete T →
   ∀ P (a : {x : T | P x}) b,
