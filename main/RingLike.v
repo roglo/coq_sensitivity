@@ -277,6 +277,8 @@ Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
   ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%L (at level 70, b at next level) :
   ring_like_scope.
+Notation "a < b < c" := (a < b ∧ b < c)%L (at level 70, b at next level) :
+  ring_like_scope.
 
 Notation "a =? b" := (rngl_eqb a b) (at level 70) : ring_like_scope.
 Notation "a ≠? b" := (negb (rngl_eqb a b)) (at level 70) : ring_like_scope.

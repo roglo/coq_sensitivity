@@ -1373,12 +1373,38 @@ remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
 destruct ab. {
 Theorem intermediate_value_le {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
+  rngl_has_eqb T = true →
+  rngl_is_ordered T = true →
   ∀ f, continuous f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros * Hfc * Hab Hfab.
+intros * Heb Hor * Hfc * Hab Hfab.
+destruct (rngl_eq_dec Heb (f a) u) as [Hau| Hau]. {
+  exists a.
+  split; [ | easy ].
+  split; [ apply (rngl_le_refl Hor) | easy ].
+}
+destruct (rngl_eq_dec Heb (f b) u) as [Hbu| Hbu]. {
+  exists b.
+  split; [ | easy ].
+  split; [ easy | apply (rngl_le_refl Hor) ].
+}
+assert (H : (f a < u < f b)%L). {
+  apply not_eq_sym in Hbu.
+  now split; apply (rngl_lt_iff Hor).
+}
+clear Hfab Hau Hbu; rename H into Hfab.
+assert (H : (a < b)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; subst b.
+  destruct Hfab as (Hfau, Hfua).
+  apply (rngl_lt_trans Hor u) in Hfau; [ | easy ].
+  now apply (rngl_lt_irrefl Hor) in Hfau.
+}
+move H before Hab; clear Hab; rename H into Hab.
 ... ...
   now apply intermediate_value_le.
 ...
