@@ -407,7 +407,11 @@ Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Definition rngl_abs {T} {ro : ring_like_op T} x :=
-  if rngl_leb x 0%L then (- x)%L else x.
+  if (x ≤? 0)%L then (- x)%L else x.
+Definition rngl_min {T} {ro : ring_like_op T} (a b : T) :=
+  if (a ≤? b)%L then a else b.
+Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
+  if (a ≤? b)%L then b else a.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with

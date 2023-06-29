@@ -106,6 +106,9 @@ Definition is_complete T {ro : ring_like_op T} :=
 Definition continuous_at {T} {ro : ring_like_op T} f a :=
   is_limit_when_tending_to f a (f a).
 
+Definition continuous {T} {ro : ring_like_op T} f :=
+  ∀ a, continuous_at f a.
+
 Definition is_derivative {T} {ro : ring_like_op T} f f' :=
   ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
 
@@ -1356,6 +1359,14 @@ specialize (H1 b) as Hb.
 (*
 https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
 *)
+Theorem intermediate_value {T} {ro : ring_like_op T}
+  {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ f, continuous f
+  → ∀ a b u, (a ≤ b)%L
+  → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
+  → ∃ c, (a ≤ u ≤ b)%L ∧ f c = u.
+Proof.
+intros * Hfc * Hab Hfab.
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
 apply (rngl_le_0_sub Hop Hor) in Hab.
