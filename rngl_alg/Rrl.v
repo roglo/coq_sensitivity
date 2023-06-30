@@ -1423,6 +1423,7 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
 progress unfold is_complete in Hco.
+destruct Hs as (c & Hacb & Hc).
 ...
 (* je suis pas sûr que ce théorème ci-dessous soit bon ; peut-être faut-il
    que "P" ne soit pas n'importe quel prédicat, mais un truc avec ≤ *)
