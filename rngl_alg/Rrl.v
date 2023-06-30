@@ -1422,8 +1422,22 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
 }
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
-progress unfold is_complete in Hco.
-destruct Hs as (c & Hacb & Hc).
+assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
+  unfold rngl_is_supremum.
+  progress unfold is_complete in Hco.
+  destruct Hs as (c & Hacb & Hc).
+Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
+  match n with
+  | 0 => lb
+  | S n' =>
+      let x := ((lb + ub) / 2)%L in
+      if P x then bisection P x ub n'
+      else bisection P lb x n'
+  end.
+  set (v := bisection (λ x : T, (f x <? u)%L) c b).
+  assert (H : is_Cauchy_sequence v). {
+    unfold is_Cauchy_sequence.
+    intros ε Hε.
 ...
 (* je suis pas sûr que ce théorème ci-dessous soit bon ; peut-être faut-il
    que "P" ne soit pas n'importe quel prédicat, mais un truc avec ≤ *)
