@@ -1438,20 +1438,8 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
   assert (H : is_Cauchy_sequence v). {
     unfold is_Cauchy_sequence.
     intros ε Hε.
-...
-(* je suis pas sûr que ce théorème ci-dessous soit bon ; peut-être faut-il
-   que "P" ne soit pas n'importe quel prédicat, mais un truc avec ≤ *)
-Theorem exists_supremum {T} {ro : ring_like_op T}  :
-  is_complete T →
-  ∀ P (a : {x : T | P x}) b,
-  (∀ x : {x : T | P x}, (proj1_sig x ≤ b)%L)
-  → ∃ c, rngl_is_supremum P c.
-Proof.
-intros Hco * a * HP.
-specialize (HP a) as H1.
-destruct a as (a, Ha); cbn in H1.
-progress unfold rngl_is_supremum.
-progress unfold is_complete in Hco.
+    (* n = int ((b - c) / ε + 1) *)
+    (* pour que "int" existe, il faut que T soit archimédien *)
 ... ...
 (* "That is, c is the smallest number that is greater than or equal to
     every member of s" *)
