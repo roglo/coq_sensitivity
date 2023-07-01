@@ -125,105 +125,85 @@ destruct qn as [| qn| qn]. {
   } {
     apply (f_equal Z.opp) in Hz.
     cbn in Hz.
-Search (- (_ / _))%Z.
-...
-    cbn in Hz; rewrite Pos2Z.inj_gcd in Hz; cbn in Hz.
-    rewrite Hqn.
-Search (Z.pos (Pos.gcd _ _)).
     rewrite <- Zdiv.Z_div_zero_opp_full in Hz. 2: {
-...
-...
-    rewrite <- Z.div_opp_l_z in Hz; [ | easy | ]. 2: {
-Search (_ / _ = Z.pos _)%Z.
-...
-    specialize (Zdiv.Z_div_nonneg_nonneg) as H1.
-    remember (Z.pos _) as x eqn:Hx in Hz.
-    remember (Z.pos _) as y eqn:Hy in Hz.
-    specialize (H1 x y).
-    assert (H : (0 <= x)%Z) by now subst x.
-    specialize (H1 H); clear H.
-    assert (H : (0 <= y)%Z) by now subst y.
-    specialize (H1 H); clear H.
-    now rewrite Hz in H1.
-  }
-...
-Print Module Z2Pos.
-...
-apply Z2Pos.inj_iff in Hz.
-cbn in Hz.
-...
-Search (Pos.gcd _ _ = Pos.gcd _ _).
-Search (Z.gcd _ _ = Z.gcd _ _).
-rewrite Pos.gcd_com.
-...
-Search Pos.gcd.
-  ============================
-  (Pos.gcd qn (Qden q) <= Qden q)%positive
-...
       rewrite Pos2Z.inj_gcd.
-...
-unfold Z.gcd.
-Print QDen.
-Search (Z.pos _ <= Z.pos _)%Z.
-...
-Search (Z.gcd _ _ <= _)%Z.
-Search (Z.gcd (_ / _)).
-Z.gcd_div_factor:
-  ∀ a b c : Z,
-    (0 < c)%Z
-    → (c | a)%Z → (c | b)%Z → Z.gcd (a / c) (b / c) = (Z.gcd a b / c)%Z
-Z.gcd_div_gcd:
-  ∀ a b g : Z, g ≠ 0%Z → g = Z.gcd a b → Z.gcd (a / g) (b / g) = 1%Z
-...
-    apply Z.bezout_1_gcd.
-    unfold Z.Bezout.
-...
-Search (Z.gcd _ _ = 1)%Z.
-Search (Z.pos _ = Z.pos _).
-Search Pos.gcd.
-Search (_ = 1)%positive.
-Search (_ * Pos.gcd _ _)%positive.
-Pos.mul_eq_1_r:
-  ∀ p q : positive, (p * q)%positive = 1%positive → q = 1%positive
-Pos.mul_eq_1_l:
-  ∀ p q : positive, (p * q)%positive = 1%positive → p = 1%positive
-...
-Require Import ZArith.
-Search (_ / _)%Z.
-Search (_ / Z.gcd _ _)%Z.
-Search (_ / _ = _ → _)%Z.
-Search (_ = _ / _ → _)%Z.
-Search (_ / _ = _ ↔ _)%Z.
-Search (_ = _ / _ ↔ _)%Z.
-Search (_ ↔ _ / _ = _)%Z.
-Search (_ ↔ _ = _ / _)%Z.
-...
-Search (_ mod _ = 0)%Z.
-Zdiv.Z_div_exact_full_2:
-  ∀ a b : Z, b ≠ 0%Z → (a mod b)%Z = 0%Z → a = (b * (a / b))%Z
-Zdiv.Zmod_divides:
-  ∀ a b : Z, b ≠ 0%Z → (a mod b)%Z = 0%Z ↔ (∃ c : Z, a = (b * c)%Z)
-Z.mod_opp_r_nz:
-Search ((_ | _)%positive ↔ _).
-Search (_ ↔ (_ | _)%positive).
-Search ((_ | _)%positive -> _).
-Search ((_ | _)%Z ↔ _).
-Search (_ ↔ (_ | _)%Z).
-Search ((_ | _)%Z → _).
-...
-Search (Pos.gcd _ _ <= _)%positive.
-Search (Pos.gcd).
-Search Z.gcd.
-Search (Z.gcd _ _ <= _)%Z.
-Search (_ < Z.gcd _ _)%Z.
-...
-  rewrite <- Hqn.
-Search (_ / Z.gcd _ _)%Z.
-...
+      rewrite <- Z.gcd_opp_l.
+      rewrite Pos2Z.opp_pos.
+      apply Znumtheory.Zdivide_mod.
+      apply Z.gcd_divide_l.
+    }
+    cbn in Hz.
+    apply (f_equal Z.to_pos) in Hz.
+    cbn in Hz.
+    rewrite <- Hz.
+    rewrite Pos2Z.inj_gcd.
+    rewrite <- Z2Pos.inj_gcd; cycle 1. {
+      apply Z.div_str_pos.
+      split; [ easy | ].
+      apply Znumtheory.Zdivide_le; [ easy | easy | ].
+      apply Z.gcd_divide_l.
+    } {
+      apply Z.div_str_pos.
+      split; [ easy | ].
+      apply Znumtheory.Zdivide_le; [ easy | easy | ].
+      apply Z.gcd_divide_r.
+    }
+    rewrite Z.gcd_div_factor; [ | easy | | ]; cycle 1. {
+      apply Z.gcd_divide_l.
+    } {
+      apply Z.gcd_divide_r.
+    }
+    now rewrite Z.div_same.
+  }
+}
+Qed.
 
 Definition QG_of_Q (q : Q) :=
   let g := Z_pos_gcd (Qnum q) (Qden q) in
   mk_qg (Qmake (Qnum q / Zpos g) (Z.to_pos (Zpos (Qden q) / Zpos g)%Z))
     (QG_of_Q_prop q).
+
+Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
+Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
+
+Theorem QG_add_comm : ∀ a b, QG_add a b = QG_add b a.
+Proof.
+intros.
+apply eq_QG_eq; cbn.
+f_equal. {
+  f_equal; [ apply Z.add_comm | ].
+  f_equal.
+  f_equal; [ apply Z.add_comm | apply Pos.mul_comm ].
+} {
+  f_equal.
+  f_equal; [ f_equal; apply Pos.mul_comm | ].
+  f_equal.
+  progress unfold Z_pos_gcd.
+  rewrite Z.add_comm.
+  remember (_ + _)%Z as x.
+  destruct x; [ apply Pos.mul_comm | | ]; now rewrite Pos.mul_comm.
+}
+Qed.
+
+Theorem QG_add_assoc : ∀ a b c, QG_add a (QG_add b c) = QG_add (QG_add a b) c.
+Proof.
+intros.
+apply eq_QG_eq; cbn.
+f_equal. {
+  f_equal. {
+...
+  f_equal; [ apply Z.add_comm | ].
+  f_equal.
+  f_equal; [ apply Z.add_comm | apply Pos.mul_comm ].
+} {
+  f_equal.
+  f_equal; [ f_equal; apply Pos.mul_comm | ].
+  f_equal.
+  progress unfold Z_pos_gcd.
+  rewrite Z.add_comm.
+  remember (_ + _)%Z as x.
+  destruct x; [ apply Pos.mul_comm | | ]; now rewrite Pos.mul_comm.
+}
+Qed.
 
 ...
