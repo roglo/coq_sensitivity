@@ -92,4 +92,4 @@ samedi 1er juillet 2023 10:17
 Truc à faire : faire une version de mes rationnels en utilisant
 les rationels normaux de Coq et ajoutant le champ comme quoi le
 pgcd des deux nombres est 1, ce qui permet l'usage de = à la place
-de ==.
+de ==. Commencé avec QG.v.
