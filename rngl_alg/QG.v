@@ -4,6 +4,7 @@
    use normal equality instead of ==. Therefore rewrite is
    possible. *)
 
+Set Nested Proofs Allowed.
 Set Implicit Arguments.
 Require Import Utf8.
 
@@ -30,10 +31,38 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
 Qed.
 
-Search (positive → positive → positive).
-Print positive.
-Search (Z → positive).
-Print Z.to_pos.
+Theorem Pos_gcd_comm : ∀ a b, Pos.gcd a b = Pos.gcd b a.
+Proof.
+intros.
+apply Pos2Z.inj.
+do 2 rewrite Pos2Z.inj_gcd.
+apply Z.gcd_comm.
+Qed.
+
+Theorem Pos_gcd_le_l : ∀ a b, (Pos.gcd a b <= a)%positive.
+Proof.
+intros.
+specialize (Pos.gcd_divide_l a b) as H1.
+apply Z.divide_Zpos in H1.
+apply Znumtheory.Zdivide_mod in H1.
+apply Zdiv.Zmod_divides in H1; [ | easy ].
+destruct H1 as (c & Hc).
+destruct c as [| c| c]; [ easy | | easy ].
+cbn in Hc.
+apply Pos2Z.inj in Hc.
+rewrite Hc at 2.
+remember (_ * _)%positive as x.
+rewrite <- (Pos.mul_1_r (Pos.gcd _ _)); subst x.
+apply Pos.mul_le_mono_l.
+apply Pos.le_1_l.
+Qed.
+
+Theorem Pos_gcd_le_r : ∀ a b, (Pos.gcd a b <= b)%positive.
+Proof.
+intros.
+rewrite Pos_gcd_comm.
+apply Pos_gcd_le_l.
+Qed.
 
 Theorem QG_of_Q_prop : ∀ q,
   let g := Z_pos_gcd (Qnum q) (Qden q) in
@@ -47,9 +76,6 @@ remember (Qnum q) as qn eqn:Hqn; symmetry in Hqn.
 destruct qn as [| qn| qn]. {
   now cbn; rewrite Z.div_same.
 } {
-(*
-  rewrite Pos2Z.inj_gcd.
-*)
   remember (Z.pos qn / _)%Z as z eqn:Hz; symmetry in Hz.
   destruct z as [| z| z]. {
     apply Z.div_small_iff in Hz; [ | easy ].
@@ -57,32 +83,39 @@ destruct qn as [| qn| qn]. {
     exfalso.
     apply Z.nle_gt in Hz2; apply Hz2; clear Hz2.
     apply Pos2Z.pos_le_pos.
-    specialize Pos.gcd_divide_l as H1.
-    specialize (H1 qn (Qden q)).
-    apply Z.divide_Zpos in H1.
-    apply Znumtheory.Zdivide_mod in H1.
-    apply Zdiv.Zmod_divides in H1; [ | easy ].
-    destruct H1 as (c & Hc).
-    destruct c as [| c| c]; [ easy | | easy ].
-    cbn in Hc.
-    apply Pos2Z.inj in Hc.
-    rewrite Hc at 2.
-    specialize (Pos.mul_le_mono_l (Pos.gcd qn (Qden q)) 1 c) as H1.
-    rewrite Pos.mul_1_r in H1.
-    apply H1.
-    apply Pos.le_1_l.
+    apply Pos_gcd_le_l.
   } {
     apply Pos2Z.inj; cbn.
-(*
-...
-    cbn in Hz.
-...
-*)
     rewrite Pos2Z.inj_gcd.
+    rewrite <- Hz.
     rewrite Z2Pos.id. 2: {
       apply Z.div_str_pos.
       split; [ easy | ].
+      apply Pos2Z.pos_le_pos.
+      apply Pos_gcd_le_r.
+    }
+    now apply Z.gcd_div_gcd.
+  } {
+Search (Z.pos _ / Z.pos _)%Z.
+...
+Print Module Z2Pos.
+...
+apply Z2Pos.inj_iff in Hz.
+cbn in Hz.
+...
+Search (Pos.gcd _ _ = Pos.gcd _ _).
+Search (Z.gcd _ _ = Z.gcd _ _).
+rewrite Pos.gcd_com.
+...
+Search Pos.gcd.
+  ============================
+  (Pos.gcd qn (Qden q) <= Qden q)%positive
+...
       rewrite Pos2Z.inj_gcd.
+...
+unfold Z.gcd.
+Print QDen.
+Search (Z.pos _ <= Z.pos _)%Z.
 ...
 Search (Z.gcd _ _ <= _)%Z.
 Search (Z.gcd (_ / _)).
