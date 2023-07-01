@@ -673,7 +673,7 @@ Qed.
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain T;
-     rngl_is_archimedian := false;
+     rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := I_add_comm;
@@ -705,6 +705,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := I_opt_mul_le_compat;
      rngl_opt_not_le := I_opt_not_le;
-     rngl_opt_archimedian := NA |}.
+     rngl_opt_archimedean := NA |}.
 
 End a.

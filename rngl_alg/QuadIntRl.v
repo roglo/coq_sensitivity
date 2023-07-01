@@ -1180,7 +1180,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
-     rngl_is_archimedian := false;
+     rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := @quad_int_add_comm d;
@@ -1212,6 +1212,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA;
-     rngl_opt_archimedian := NA |}.
+     rngl_opt_archimedean := NA |}.
 
 End a.

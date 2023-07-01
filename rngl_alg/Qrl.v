@@ -169,7 +169,7 @@ Qed.
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
-     rngl_is_archimedian := true;
+     rngl_is_archimedean := false; (* to be implemented *)
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := Q.add_comm;
@@ -201,4 +201,4 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := Q_not_le;
-     rngl_opt_archimedian := NA |}.
+     rngl_opt_archimedean := NA |}.
