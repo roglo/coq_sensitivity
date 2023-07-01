@@ -22,7 +22,7 @@
    to true or false.
    There are many other properties that are implemented here or could be
    implemented :
-     - archimedian or not
+     - archimedean or not
      - with calculable equality or not
      - commutative or not
      - with some characteristic
@@ -298,6 +298,7 @@ Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_is_integral_domain : bool;
+    rngl_is_archimedean : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%L;
@@ -402,6 +403,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_not_le :
       if rngl_is_ordered T then
         ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L
+      else not_applicable;
+    (* archimedean *)
+    rngl_opt_archimedean :
+      if (rngl_is_archimedean && rngl_is_ordered T)%bool then
+        ∀ ε, (0 < ε)%L → ∀ n, ∃ m, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L
       else not_applicable }.
 
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.

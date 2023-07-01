@@ -137,9 +137,103 @@ apply Z.leb_le.
 now apply Z.add_le_mono.
 Qed.
 
+(* code borrowed from my application "coq_real" *)
+
+Theorem nat_archimedean : ∀ a b, (0 < a → ∃ n, n * a > b)%nat.
+Proof.
+intros * Ha.
+exists (S b); simpl.
+induction b; [ now rewrite Nat.add_0_r | ].
+simpl; rewrite <- Nat.add_1_l.
+now apply Nat.add_le_lt_mono.
+Qed.
+
+Theorem Pos2Nat_neq_0 : ∀ a, Pos.to_nat a ≠ 0%nat.
+Proof.
+intros.
+specialize (Pos2Nat.is_pos a) as Ha.
+now intros H; rewrite H in Ha.
+Qed.
+
+Theorem Pos_archimedean : ∀ a b, (∃ n, Pos.of_nat n * a > b)%positive.
+Proof.
+intros.
+specialize (Pos2Nat.is_pos a) as Ha.
+specialize (nat_archimedean (Pos.to_nat a) (Pos.to_nat b) Ha) as (m, Hm).
+exists m.
+replace a with (Pos.of_nat (Pos.to_nat a)) by apply Pos2Nat.id.
+rewrite <- Pos2Nat.id.
+rewrite <- Nat2Pos.inj_mul.
+ unfold Pos.gt.
+ rewrite <- Nat2Pos.inj_compare; [ now apply Nat.compare_gt_iff | | ].
+  destruct m; [ easy | ].
+  apply Nat.neq_mul_0.
+  split; [ apply Nat.neq_succ_0 | ].
+  apply Pos2Nat_neq_0.
+
+  apply Pos2Nat_neq_0.
+
+ intros H; rewrite H in Hm; simpl in Hm.
+ apply gt_not_le in Hm; apply Hm.
+ apply Nat.lt_le_incl.
+ apply Pos2Nat.is_pos.
+
+ apply Pos2Nat_neq_0.
+Qed.
+
+Theorem Z_archimedean' : ∀ a b, (0 < a → ∃ n, Z.of_nat n * a > b)%Z.
+Proof.
+intros * Ha.
+destruct b as [| b| b].
+ exists 1%nat.
+ rewrite Z.mul_1_l.
+ now apply Z.lt_gt.
+
+ destruct a as [| a| a]; [ easy | | ].
+  specialize (Pos_archimedean a b) as (m, Hm).
+  destruct m; [ now exists 1%nat | ].
+  exists (S m).
+  apply Pos2Nat.inj_gt in Hm.
+  rewrite Pos2Nat.inj_mul in Hm.
+  rewrite Nat2Pos.id in Hm; [ | apply Nat.neq_succ_0 ].
+  rewrite <- positive_nat_Z.
+  rewrite <- Nat2Z.inj_mul.
+  rewrite <- positive_nat_Z.
+  now apply Nat2Z.inj_gt.
+
+  apply Z.nle_gt in Ha.
+  exfalso; apply Ha.
+  apply Pos2Z.neg_is_nonpos.
+
+ exists 1%nat.
+ rewrite Z.mul_1_l.
+ apply Z.lt_gt.
+ eapply Z.lt_trans; [ | eassumption ].
+ apply Pos2Z.neg_is_neg.
+Qed.
+
+(* end borrowed code *)
+
+Theorem Z_archimedean :
+  let ro := Z_ring_like_op in
+  ∀ ε : Z, (0 < ε)%L →
+  ∀ n : nat, ∃ m : nat, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L.
+Proof.
+intros * Hε *.
+cbn in Hε.
+apply Z.leb_gt in Hε.
+specialize (Z_archimedean' ε) as H1.
+specialize (H1 (Z.of_nat n) Hε).
+destruct H1 as (m & Hm).
+exists m; cbn.
+progress unfold ">"%Z in Hm.
+apply Z.compare_gt_iff in Hm.
+...
+
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := true;
+     rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := Z.add_comm;
@@ -170,4 +264,5 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_le_compat_nonneg := Z_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Z_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := Z_not_le |}.
+     rngl_opt_not_le := Z_not_le;
+     rngl_opt_archimedean := Z_archimedean |}.

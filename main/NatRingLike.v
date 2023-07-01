@@ -113,9 +113,24 @@ apply Nat.leb_le.
 now apply Nat.add_le_mono.
 Qed.
 
+Theorem nat_archimedean :
+  let ro := nat_ring_like_op in
+   ∀ ε : nat, (0 < ε)%L →
+   ∀ n : nat, ∃ m : nat, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L.
+Proof.
+intros * Hε *.
+apply Nat.leb_gt in Hε.
+exists (S n).
+apply Nat.leb_gt; cbn.
+induction n; [ now rewrite Nat.add_0_r | ].
+cbn; rewrite <- Nat.add_1_l.
+now apply Nat.add_le_lt_mono.
+Qed.
+
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := true;
+     rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := Nat.add_comm;
@@ -146,7 +161,8 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := Nat_mul_le_compat;
-     rngl_opt_not_le := Nat_not_le |}.
+     rngl_opt_not_le := Nat_not_le;
+     rngl_opt_archimedean := nat_archimedean |}.
 
 (*
 Global Existing Instance nat_ring_like_prop.

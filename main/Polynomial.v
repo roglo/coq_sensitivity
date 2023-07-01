@@ -3213,6 +3213,7 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain T;
+     rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
      rngl_add_comm := polyn_add_comm';
@@ -3243,7 +3244,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA |}.
+     rngl_opt_not_le := NA;
+     rngl_opt_archimedean := NA |}.
 
 Definition eval_polyn pol :=
   eval_lap (lap pol).

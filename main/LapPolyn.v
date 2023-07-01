@@ -2910,6 +2910,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain T;
+     rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := lap_add_comm;
@@ -2940,7 +2941,8 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA |}.
+     rngl_opt_not_le := NA;
+     rngl_opt_archimedean := NA |}.
 
 (* roots *)
 

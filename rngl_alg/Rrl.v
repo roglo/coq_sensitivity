@@ -2184,7 +2184,8 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_le_compat_nonneg := NA; (*CReal_mul_le_compat_nonneg;*)
      rngl_opt_mul_le_compat_nonpos := NA; (*CReal_mul_le_compat_nonpos;*)
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA (*CReal_not_le*) |}.
+     rngl_opt_not_le := NA (*CReal_not_le*);
+     rngl_opt_archimedian := NA |}.
 
 (*
 Print Assumptions CReal_ring_like_prop.
