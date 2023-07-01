@@ -189,6 +189,15 @@ Theorem QG_add_assoc : ∀ a b c, QG_add a (QG_add b c) = QG_add (QG_add a b) c.
 Proof.
 intros.
 apply eq_QG_eq; cbn.
+remember (Z.pos (Z_pos_gcd _ _)) as XXXXX in |-*.
+remember (Z.pos (Z_pos_gcd _ _)) as YYYYY in |-*.
+remember (Z.pos (Z_pos_gcd _ _)) as ZZZZZ in |-*.
+remember (Z.pos (Z_pos_gcd _ _)) as TTTTT in |-*.
+f_equal.
+...
+remember (Z.pos _) as YYYYY in |-*.
+remember (Z.pos _) as ZZZZZ in |-*.
+...
 f_equal. {
   f_equal. {
 ...
