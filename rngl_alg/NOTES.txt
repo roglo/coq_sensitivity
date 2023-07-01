@@ -87,7 +87,7 @@ en revanche, j'ai besoin de convergence vers une valeur finie.
 Cela risque de m'imposer d'avoir à ajouter que T est achimédien.
 J'en suis là.
 
-samedi 1er juillet 2023
+samedi 1er juillet 2023 10:17
 
 Truc à faire : faire une version de mes rationnels en utilisant
 les rationels normaux de Coq et ajoutant le champ comme quoi le
