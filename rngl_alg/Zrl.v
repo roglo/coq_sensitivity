@@ -1,5 +1,6 @@
 (* ℤ is a ring-like, i.e. a ring *)
 
+Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import ZArith.
 
@@ -214,6 +215,21 @@ Qed.
 
 (* end borrowed code *)
 
+Theorem rngl_mul_nat_Z :
+  let ro := Z_ring_like_op in
+  ∀ z n, rngl_mul_nat z n = (Z.of_nat n * z)%Z.
+Proof.
+intros.
+induction n; intros; [ easy | ].
+cbn - [ "*"%Z ].
+rewrite IHn.
+rewrite <- (Z.mul_1_l z) at 1.
+rewrite <- Z.mul_add_distr_r.
+f_equal.
+rewrite Z.add_1_l.
+now rewrite <- Nat2Z.inj_succ.
+Qed.
+
 Theorem Z_archimedean :
   let ro := Z_ring_like_op in
   ∀ ε : Z, (0 < ε)%L →
@@ -228,7 +244,10 @@ destruct H1 as (m & Hm).
 exists m; cbn.
 progress unfold ">"%Z in Hm.
 apply Z.compare_gt_iff in Hm.
-...
+apply Z.leb_gt.
+do 2 rewrite rngl_mul_nat_Z.
+now rewrite Z.mul_1_r.
+Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
