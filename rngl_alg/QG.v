@@ -43,6 +43,30 @@ Proof.
 intros; cbn.
 progress unfold g; cbn.
 progress unfold Z_pos_gcd.
+remember (Qnum q) as qn eqn:Hqn; symmetry in Hqn.
+destruct qn as [| qn| qn]. {
+  now cbn; rewrite Z.div_same.
+} {
+  rewrite Pos2Z.inj_gcd.
+  remember (Z.pos qn / _)%Z as z eqn:Hz; symmetry in Hz.
+  destruct z as [| z| z]. {
+    apply Z.div_small_iff in Hz; [ | easy ].
+    destruct Hz as [(Hz1, Hz2)| Hz]. {
+      exfalso.
+      apply Z.nle_gt in Hz2; apply Hz2; clear Hz2.
+      apply Pos2Z.pos_le_pos.
+      specialize Pos.gcd_divide_l as H1.
+      specialize (H1 qn (Qden q)).
+Search ((_ | _)%positive → _).
+...
+Search (Pos.gcd _ _ <= _)%positive.
+Search (Pos.gcd).
+Search Z.gcd.
+Search (Z.gcd _ _ <= _)%Z.
+Search (_ < Z.gcd _ _)%Z.
+...
+  rewrite <- Hqn.
+Search (_ / Z.gcd _ _)%Z.
 ...
 
 Definition QG_of_Q (q : Q) :=
