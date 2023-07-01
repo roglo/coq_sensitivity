@@ -1,3 +1,9 @@
+(* Attempt to implement rationals with the normal rationals of
+   coq (library QArith) together with a field saying that the
+   numerator and the denominator are coprimes. This allows to
+   use normal equality instead of ==. Therefore rewrite is
+   possible. *)
+
 Set Implicit Arguments.
 Require Import Utf8.
 
