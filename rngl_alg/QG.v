@@ -96,7 +96,56 @@ destruct qn as [| qn| qn]. {
     }
     now apply Z.gcd_div_gcd.
   } {
-Search (Z.pos _ / Z.pos _)%Z.
+    specialize (Zdiv.Z_div_nonneg_nonneg) as H1.
+    remember (Z.pos _) as x eqn:Hx in Hz.
+    remember (Z.pos _) as y eqn:Hy in Hz.
+    specialize (H1 x y).
+    assert (H : (0 <= x)%Z) by now subst x.
+    specialize (H1 H); clear H.
+    assert (H : (0 <= y)%Z) by now subst y.
+    specialize (H1 H); clear H.
+    now rewrite Hz in H1.
+  }
+} {
+  remember (Z.neg qn / _)%Z as z eqn:Hz; symmetry in Hz.
+  destruct z as [| z| z]. {
+    apply Z.div_small_iff in Hz; [ | easy ].
+    now destruct Hz.
+  } {
+    apply Pos2Z.inj; cbn.
+    rewrite Pos2Z.inj_gcd.
+    rewrite <- Hz.
+    rewrite Z2Pos.id. 2: {
+      apply Z.div_str_pos.
+      split; [ easy | ].
+      apply Pos2Z.pos_le_pos.
+      apply Pos_gcd_le_r.
+    }
+    now apply Z.gcd_div_gcd.
+  } {
+    apply (f_equal Z.opp) in Hz.
+    cbn in Hz.
+Search (- (_ / _))%Z.
+...
+    cbn in Hz; rewrite Pos2Z.inj_gcd in Hz; cbn in Hz.
+    rewrite Hqn.
+Search (Z.pos (Pos.gcd _ _)).
+    rewrite <- Zdiv.Z_div_zero_opp_full in Hz. 2: {
+...
+...
+    rewrite <- Z.div_opp_l_z in Hz; [ | easy | ]. 2: {
+Search (_ / _ = Z.pos _)%Z.
+...
+    specialize (Zdiv.Z_div_nonneg_nonneg) as H1.
+    remember (Z.pos _) as x eqn:Hx in Hz.
+    remember (Z.pos _) as y eqn:Hy in Hz.
+    specialize (H1 x y).
+    assert (H : (0 <= x)%Z) by now subst x.
+    specialize (H1 H); clear H.
+    assert (H : (0 <= y)%Z) by now subst y.
+    specialize (H1 H); clear H.
+    now rewrite Hz in H1.
+  }
 ...
 Print Module Z2Pos.
 ...
