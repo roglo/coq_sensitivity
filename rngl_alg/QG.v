@@ -188,7 +188,19 @@ Qed.
 Theorem QG_add_assoc : ∀ a b c, QG_add a (QG_add b c) = QG_add (QG_add a b) c.
 Proof.
 intros.
+apply eq_QG_eq.
+unfold QG_add.
+Search (QG_of_Q (_ + QG_of_Q _)).
+Theorem QG_of_Q_add_r :
+  ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
+Proof.
+intros; cbn.
+... ...
+rewrite QG_of_Q_add_r.
+...
 apply eq_QG_eq; cbn.
+Check Qplus_assoc.
+
 remember (Z.pos (Z_pos_gcd _ _)) as XXXXX in |-*.
 remember (Z.pos (Z_pos_gcd _ _)) as YYYYY in |-*.
 remember (Z.pos (Z_pos_gcd _ _)) as ZZZZZ in |-*.
