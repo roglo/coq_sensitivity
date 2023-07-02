@@ -20,17 +20,6 @@ Definition Z_pos_gcd z p :=
 Record QG := mk_qg
   {qg_q : Q; qg_gcd : Z_pos_gcd (Qnum qg_q) (Qden qg_q) = 1%positive}.
 
-Theorem eq_QG_eq : ∀ q1 q2, q1 = q2 ↔ qg_q q1 = qg_q q2.
-Proof.
-intros.
-split; intros Hq; [ now subst q2 | ].
-destruct q1 as (q1, Hq1).
-destruct q2 as (q2, Hq2).
-cbn in Hq; subst q2.
-f_equal.
-apply (Eqdep_dec.UIP_dec Pos.eq_dec).
-Qed.
-
 Theorem Pos_gcd_comm : ∀ a b, Pos.gcd a b = Pos.gcd b a.
 Proof.
 intros.
@@ -163,6 +152,46 @@ Definition QG_of_Q (q : Q) :=
   mk_qg (Qmake (Qnum q / Zpos g) (Z.to_pos (Zpos (Qden q) / Zpos g)%Z))
     (QG_of_Q_prop q).
 
+Theorem eq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 = qg_q q2.
+Proof.
+intros.
+split; intros Hq; [ now subst q2 | ].
+destruct q1 as (q1, Hq1).
+destruct q2 as (q2, Hq2).
+cbn in Hq; subst q2.
+f_equal.
+apply (Eqdep_dec.UIP_dec Pos.eq_dec).
+Qed.
+
+Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
+Proof.
+intros (xn, xd) (yn, yd) Hxy.
+progress unfold "=="%Q in Hxy.
+cbn in Hxy.
+apply eq_QG_eq; cbn.
+...
+intros a b Hab.
+unfold "=="%Q in Hab.
+destruct a as (an, ad).
+destruct b as (bn, bd).
+cbn in Hab.
+progress unfold QG_of_Q.
+cbn.
+apply eq_QG_eq; cbn.
+...
+
+(*
+Theorem glop : ∀ q1 q2, q1 == q2 ↔ qg_q (QG_of_Q q1) = qg_q (QG_of_Q q2).
+Proof.
+intros.
+split; intros Hq. {
+  setoid_rewrite Hq.
+...
+split; intros Hq. 2: {
+  apply eq_QG_eq in Hq.
+...
+*)
+
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 
@@ -191,16 +220,24 @@ intros.
 apply eq_QG_eq.
 unfold QG_add.
 Search (QG_of_Q (_ + QG_of_Q _)).
-Theorem QG_of_Q_add_r :
+Theorem QG_of_Q_add_idemp_r :
   ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
 Proof.
 intros; cbn.
+Admitted.
+Theorem QG_of_Q_add_idemp_l :
+  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
+Proof.
+intros; cbn.
+Admitted.
 ... ...
-rewrite QG_of_Q_add_r.
+rewrite QG_of_Q_add_idemp_r.
+rewrite QG_of_Q_add_idemp_l.
+now rewrite Qplus_assoc.
+... ...
+apply glop.
+apply Qplus_assoc.
 ...
-apply eq_QG_eq; cbn.
-Check Qplus_assoc.
-
 remember (Z.pos (Z_pos_gcd _ _)) as XXXXX in |-*.
 remember (Z.pos (Z_pos_gcd _ _)) as YYYYY in |-*.
 remember (Z.pos (Z_pos_gcd _ _)) as ZZZZZ in |-*.
