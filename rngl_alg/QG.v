@@ -234,6 +234,84 @@ Theorem Z_of_nat_gcd :
   ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
 Proof.
 intros.
+unfold Z.gcd.
+remember (Z.of_nat a) as x eqn:Hx; symmetry in Hx.
+destruct x as [| x| x]. {
+  rewrite Z_abs_of_nat.
+  now destruct a.
+} {
+  remember (Z.of_nat b) as y eqn:Hy; symmetry in Hy.
+  destruct y as [| y| y]. {
+    destruct b; [ now rewrite Nat.gcd_0_r | easy ].
+  } {
+    rewrite Pos2Z.inj_gcd.
+    apply (f_equal Z.to_nat) in Hx, Hy.
+    rewrite Nat2Z.id in Hx, Hy.
+    subst a b.
+    do 2 rewrite Z2Nat.inj_pos.
+Theorem Nat_gcd_pos :
+  ∀ x y, Nat.gcd (Pos.to_nat x) (Pos.to_nat y) = Pos.to_nat (Pos.gcd x y).
+Proof.
+intros.
+unfold Pos.gcd.
+remember (Pos.size_nat x + Pos.size_nat y)%nat as n eqn:Hn.
+symmetry in Hn.
+revert x y Hn.
+induction n; intros; cbn; [ now destruct x | ].
+destruct x as [x| x| ]; [ | | easy ]. {
+  cbn in Hn.
+  apply Nat.succ_inj in Hn.
+  destruct y as [y| y| ]. {
+    cbn in Hn.
+    remember (x ?= y)%positive as xy eqn:Hxy; symmetry in Hxy.
+    destruct xy as [xy| xy| ]. {
+      apply Pos.compare_eq in Hxy; subst y.
+      now rewrite Nat.gcd_diag.
+    } {
+      apply -> Pos.compare_lt_iff in Hxy.
+...
+  rewrite Pos2Nat.inj_1.
+  apply Nat.eq_add_0 in Hn.
+  destruct Hn as (Hx, Hy).
+  destruct x as [x| x| ]; [ easy | easy | easy ].
+Theorem eq_pos_size_nat_0 :
+  ∀ x, Pos.size_nat x = 0%nat → x = 1%positive.
+Proof.
+intros * Hx.
+now destruct x.
+destruct x as [x| x| ]; [ easy | easy | easy ].
+... ...
+  now apply eq_pos_size_nat_0 in Hx, Hy; subst x y.
+}
+...
+apply eq_pos_size_nat_0 in Hx.
+  revert y Hy.
+  induction x as [x| x| ]; intros; [ | easy | easy ].
+  destruct y as [y| y| ]; intros; [ | easy | easy ].
+Print Pos.size_nat.
+...
+intros.
+destruct x as [x| x| ]; intros; cbn; [ | | easy ]. {
+  destruct y as [y| y| ]. {
+    remember (x ?= y)%positive as xy eqn:Hxy; symmetry in Hxy.
+    destruct xy. {
+      apply Pos.compare_eq in Hxy; subst y.
+      now rewrite Nat.gcd_diag.
+    } {
+      apply -> Pos.compare_lt_iff in Hxy.
+      remember (Pos.size_nat x + Pos.size_nat y~1)%nat as n eqn:Hn.
+... ...
+    rewrite Nat_gcd_pos.
+    now rewrite positive_nat_Z.
+  }
+...
+induction a; [ now rewrite Z_abs_of_nat | ].
+unfold Z.gcd.
+cbn - [ Nat.gcd Z.gcd ].
+rewrite Zpos_P_of_succ_nat.
+rewrite <- Nat2Z.inj_succ.
+...
+intros.
 remember (a + b)%nat as c eqn:Hc.
 assert (H : (a + b)%nat ≤ c) by now subst; apply Nat.le_refl.
 clear Hc; rename H into Hc.
