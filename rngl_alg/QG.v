@@ -255,12 +255,15 @@ Proof.
 intros.
 unfold Pos.gcd.
 remember (Pos.size_nat x + Pos.size_nat y)%nat as n eqn:Hn.
-symmetry in Hn.
+assert (H : (Pos.size_nat x + Pos.size_nat y ≤ n)%nat). {
+  now rewrite Hn; apply Nat.le_refl.
+}
+clear Hn; rename H into Hn.
 revert x y Hn.
 induction n; intros; cbn; [ now destruct x | ].
 destruct x as [x| x| ]; [ | | easy ]. {
   cbn in Hn.
-  apply Nat.succ_inj in Hn.
+  apply Nat.succ_le_mono in Hn.
   destruct y as [y| y| ]. {
     cbn in Hn.
     remember (x ?= y)%positive as xy eqn:Hxy; symmetry in Hxy.
@@ -269,6 +272,22 @@ destruct x as [x| x| ]; [ | | easy ]. {
       now rewrite Nat.gcd_diag.
     } {
       apply -> Pos.compare_lt_iff in Hxy.
+...
+      rewrite <- IHn. 2: {
+        eapply Nat.le_trans; [ | apply Hn ].
+        rewrite Nat.add_comm.
+        rewrite <- Nat.add_succ_comm.
+        apply Nat.add_le_mono; [ apply Nat.le_refl | ].
+        apply Pos.size_nat_monotone.
+        now apply Pos.sub_decr.
+      }
+Search (_~1)%positive.
+gcd (2m+1) (2n+1) =? gcd (m-n) (2n+1)
+2m-2n
+Search (Pos.to_nat (_ - _)).
+replace (y - x)%positive
+      rewrite Pos2Nat.inj_sub; [ | easy ].
+Search (Nat.gcd _ (_ - _)).
 ...
   rewrite Pos2Nat.inj_1.
   apply Nat.eq_add_0 in Hn.
