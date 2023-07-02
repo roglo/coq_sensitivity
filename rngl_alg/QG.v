@@ -163,6 +163,15 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
 Qed.
 
+Theorem Z_mul_div_eq_l :
+  ∀ a b c : Z, a ≠ 0%Z → (a * b)%Z = c → (c / a)%Z = b.
+Proof.
+intros * Haz Habc.
+apply (f_equal (λ x, Z.div x a)) in Habc.
+rewrite Z.mul_comm in Habc.
+now rewrite Z.div_mul in Habc.
+Qed.
+
 Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
@@ -175,15 +184,25 @@ f_equal. {
     cbn in Hxy.
     do 2 rewrite Pos2Z.inj_mul in Hxy.
     do 2 rewrite Pos2Z.inj_gcd.
-Theorem glop :
-  ∀ x y z, y ≠ 0%Z → (x = y * z)%Z → (x / y = z)%Z.
-Proof.
-intros * Hyz Hxyz.
-apply (f_equal (λ x, Z.div x y)) in Hxyz.
-rewrite Z.mul_comm in Hxyz.
-now rewrite Z.div_mul in Hxyz.
-Qed.
-apply glop. 2: {
+(**)
+remember (Z.pos xn) as a.
+remember (Z.pos xd) as b.
+remember (Z.pos yn) as c.
+remember (Z.pos yd) as d.
+    apply Z_mul_div_eq_l; [ now subst a b | ].
+...
+specialize (Z.div_mod a (Z.gcd a b)) as H1.
+assert (H : Z.gcd a b ≠ 0%Z) by now subst a b d.
+specialize (H1 H); clear H.
+rewrite H1 at 1.
+Search ((_ * _ + _) / _)%Z.
+rewrite Z.mul_comm.
+rewrite Z.div_add_l.
+
+specialize (H1 (Z.pos xn)).
+...
+    apply Z_mul_div_eq_l; [ easy | ].
+Search (_ * (_ / _))%Z.
 ...
     specialize (Z.gcd_divide_l (Z.pos xn) (Z.pos xd)) as H1.
     apply Znumtheory.Zdivide_Zdiv_eq in H1.
