@@ -217,9 +217,25 @@ specialize (H1 _ _ _ _ Hxy).
 apply (f_equal Z.of_nat) in H1.
 do 2 rewrite Nat2Z.inj_div in H1.
 do 2 rewrite positive_nat_Z in H1.
+(*
+Theorem Pos_of_nat_gcd :
+  ∀ a b, a ≠ 0%nat → b ≠ 0%nat →
+  Pos.of_nat (Nat.gcd a b) = Pos.gcd (Pos.of_nat a) (Pos.of_nat b).
+Proof.
+intros * Haz Hbz.
+revert b Hbz.
+induction a; intros; [ easy | ].
+clear Haz.
+cbn.
+Search Nat.divmod.
+...
+*)
 Theorem Z_of_nat_gcd :
   ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
 Proof.
+intros.
+...
+(*
 intros.
 remember (Z.of_nat a) as x eqn:Hx; symmetry in Hx.
 revert a b Hx.
@@ -232,12 +248,19 @@ induction x as [| x| x]; intros; cbn. {
     destruct b; [ now rewrite Nat.gcd_0_r | easy ].
   } {
     rewrite Pos2Z.inj_gcd.
+apply (f_equal Z.to_nat) in Hx, Hy.
+rewrite Nat2Z.id in Hx, Hy.
+subst a b.
+Search (Z.to_nat (Z.pos _)).
+do 2 rewrite Z2Nat.inj_pos.
+Search (Nat.gcd (Pos.to_nat _)).
+Search (Nat.gcd (Z.to_nat _)).
 ...
     rewrite <- Hx, <- Hy.
 Search (Z.gcd (Z.of_nat _)).
 Search (Z.of_nat (Nat.gcd _ _)).
 ...
-(*
+*)
 intros.
 remember (Nat.gcd a b) as g eqn:Hg; symmetry in Hg.
 revert a b Hg.
@@ -247,6 +270,7 @@ induction g; intros; cbn. {
 }
 rewrite Zpos_P_of_succ_nat.
 rewrite <- Nat2Z.inj_succ.
+cbn.
 rewrite <- Hg.
 rewrite <- IHg.
 ...
@@ -269,6 +293,16 @@ revert b.
 induction a; intros. {
   now rewrite Z_abs_of_nat.
 }
+cbn.
+specialize Nat.divmod_spec as H1.
+specialize (H1 b a 0%nat a (Nat.le_refl _)).
+remember (Nat.divmod _ _ _ _) as d eqn:Hd; symmetry in Hd.
+destruct d as (x, y); cbn.
+rewrite Nat.mul_0_r, Nat.sub_diag in H1.
+do 2 rewrite Nat.add_0_r in H1.
+destruct H1 as (H1, H2).
+Search (Z.gcd (_ - _))%Z.
+...
 cbn - [ Nat.modulo ].
 remember (Z.of_nat b) as y eqn:Hy; symmetry in Hy.
 apply (f_equal Z.to_nat) in Hy.
