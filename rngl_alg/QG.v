@@ -237,6 +237,21 @@ intros.
 remember (a + b)%nat as c eqn:Hc.
 assert (H : (a + b)%nat ≤ c) by now subst; apply Nat.le_refl.
 clear Hc; rename H into Hc.
+revert a b Hc.
+induction c; intros; cbn. {
+  apply Nat.le_0_r in Hc.
+  apply Nat.eq_add_0 in Hc.
+  destruct Hc; now subst a b.
+}
+destruct a; [ now cbn; rewrite Z_abs_of_nat | ].
+cbn in Hc; apply Nat.succ_le_mono in Hc.
+destruct b; [ now rewrite Nat.gcd_0_r, Z.gcd_0_r | ].
+cbn - [ Nat.modulo ].
+rewrite IHc. 2: {
+  assert (H : (S b mod S a ≤ S b)%nat). {
+    now apply Nat.mod_le.
+  }
+(* fuck you *)
 ...
 (*
 intros.
