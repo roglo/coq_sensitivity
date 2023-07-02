@@ -175,7 +175,28 @@ f_equal. {
     cbn in Hxy.
     do 2 rewrite Pos2Z.inj_mul in Hxy.
     do 2 rewrite Pos2Z.inj_gcd.
+Theorem glop :
+  ∀ x y z, y ≠ 0%Z → (x = y * z)%Z → (x / y = z)%Z.
+Proof.
+intros * Hyz Hxyz.
+apply (f_equal (λ x, Z.div x y)) in Hxyz.
+rewrite Z.mul_comm in Hxyz.
+now rewrite Z.div_mul in Hxyz.
+Qed.
+apply glop. 2: {
+...
+    specialize (Z.gcd_divide_l (Z.pos xn) (Z.pos xd)) as H1.
+    apply Znumtheory.Zdivide_Zdiv_eq in H1.
+Search (_ | _)%Z.
+Znumtheory.Zdivide_Zdiv_eq: ∀ a b : Z, (0 < a)%Z → (a | b)%Z → b = (a * (b / a))%Z
+specia
+Z.gcd_divide_r: ∀ a b : Z, (Z.gcd a b | b)%Z
+Search (_ = _ / _)%Q.
+Search Z.gcd.
+...
 Search (_ / _)%Q.
+remember (Z.pos xn) as a.
+remember (Z.pos xd) as b.
 Search (_ / Z.gcd _ _)%Z.
 Search (Z.pos (_ * _)).
 ...
