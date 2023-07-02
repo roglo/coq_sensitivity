@@ -166,6 +166,20 @@ Qed.
 Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
+apply eq_QG_eq; cbn.
+f_equal. {
+  unfold Z_pos_gcd.
+  destruct xn as [| xn| xn]; [ now destruct yn | | ]. {
+    destruct yn as [| yn| yn]; [ easy | | easy ].
+    progress unfold Qeq in Hxy.
+    cbn in Hxy.
+    do 2 rewrite Pos2Z.inj_mul in Hxy.
+    do 2 rewrite Pos2Z.inj_gcd.
+Search (_ / _)%Q.
+Search (_ / Z.gcd _ _)%Z.
+Search (Z.pos (_ * _)).
+...
+intros (xn, xd) (yn, yd) Hxy.
 progress unfold "=="%Q in Hxy.
 cbn in Hxy.
 apply eq_QG_eq; cbn.
