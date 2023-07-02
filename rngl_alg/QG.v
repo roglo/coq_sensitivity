@@ -234,6 +234,9 @@ Theorem Z_of_nat_gcd :
   ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
 Proof.
 intros.
+remember (a + b)%nat as c eqn:Hc.
+assert (H : (a + b)%nat ≤ c) by now subst; apply Nat.le_refl.
+clear Hc; rename H into Hc.
 ...
 (*
 intros.
