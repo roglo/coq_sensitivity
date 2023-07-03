@@ -315,6 +315,34 @@ Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
+specialize (Nat.gcd_bezout a (b * c)) as H1.
+destruct H1 as [H1| H1]. {
+  destruct H1 as (u & v & Huv).
+  move u before c; move v before u.
+(*
+  apply Nat.add_sub_eq_r in Huv.
+*)
+  remember (Nat.gcd a (b * c)) as d eqn:Hd; symmetry in Hd.
+  move d before c.
+  rewrite Nat.mul_assoc in Huv.
+  specialize (Nat.gcd_bezout a c) as H2.
+  destruct H2 as [H2| H2]. {
+    destruct H2 as (u' & v' & Huv').
+    move u' before v; move v' before u'.
+(*
+    symmetry in Huv'.
+    apply Nat.add_sub_eq_r in Huv'.
+*)
+    remember (Nat.gcd a c) as e eqn:He; symmetry in He.
+    move e before d; move He before Hd.
+    apply (f_equal (Nat.mul u')) in Huv.
+    apply (f_equal (Nat.mul u)) in Huv'.
+    rewrite Nat.mul_add_distr_l in Huv, Huv'.
+    do 3 rewrite Nat.mul_assoc in Huv.
+    do 2 rewrite Nat.mul_assoc in Huv'.
+    rewrite (Nat.mul_comm u') in Huv.
+...
+intros * Hab.
 specialize (Nat_gcd_iff a c) as H1.
 specialize (H1 (Nat.gcd a c)).
 assert (H : Nat.gcd a c ≠ 0%nat). {
@@ -322,13 +350,13 @@ assert (H : Nat.gcd a c ≠ 0%nat). {
   apply Nat.gcd_eq_0 in H.
   destruct H; subst a c.
   cbn in Hab; subst b.
-  admit.
+  _admit.
 }
 specialize (proj1 (H1 H) eq_refl) as H2; clear H H1.
 destruct H2 as (H1 & H2 & H3).
 specialize (Nat_gcd_iff a (b * c)) as H4.
 specialize (H4 (Nat.gcd a (b * c))).
-assert (H : Nat.gcd a (b * c) ≠ 0%nat) by admit.
+assert (H : Nat.gcd a (b * c) ≠ 0%nat) by _admit.
 specialize (proj1 (H4 H) eq_refl) as H5; clear H H4.
 destruct H5 as (H4 & H5 & H6).
 unfold Nat.divide in H1, H2, H4, H5.
