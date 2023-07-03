@@ -291,11 +291,39 @@ Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
+Theorem glip :
+  ∀ a b c,
+  Nat.gcd a b = c ↔
+  Nat.divide c a ∧ Nat.divide c b ∧ Nat.gcd (a / c) (b / c) = 1%nat.
+Admitted.
+specialize (proj1 (glip a c _) eq_refl) as H1.
+destruct H1 as (H1 & H2 & H3).
+specialize (proj1 (glip a (b * c) _) eq_refl) as H4.
+destruct H4 as (H4 & H5 & H6).
+unfold Nat.divide in H1, H2, H4, H5.
+destruct H1 as (a1, Ha1).
+destruct H2 as (c1, Hc1); rewrite Hc1 at 1.
+destruct H4 as (a2, Ha2).
+destruct H5 as (bc1, Hbc1); rewrite Hbc1.
+rewrite Hc1 in Hbc1 at 1.
+...
+Nat.divide_mul_split:
+  ∀ n m p : nat,
+    n ≠ 0%nat
+    → Nat.divide n (m * p)
+      → ∃ q r : nat, n = (q * r)%nat ∧ Nat.divide q m ∧ Nat.divide r p
+...
+revert b c Hab.
+induction a; intros. {
+  now cbn in Hab; subst b; rewrite Nat.mul_1_l.
+}
+cbn - [ "mod" ].
+...
+intros * Hab.
 revert a c Hab.
 induction b; intros. {
   now rewrite Nat.gcd_0_r in Hab; subst a.
 }
-(* bon, fait chier *)
 ...
 Nat.gcd_add_diag_r: ∀ n m : nat, Nat.gcd n (m + n) = Nat.gcd n m
 ...
