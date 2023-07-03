@@ -305,6 +305,20 @@ destruct H1 as (a1, Ha1).
 destruct H2 as (c1, Hc1); rewrite Hc1 at 1.
 destruct H4 as (a2, Ha2).
 destruct H5 as (bc1, Hbc1); rewrite Hbc1.
+move a1 before c; move c1 before a1; move a2 before c1; move bc1 before a2.
+rewrite Ha1 in H3 at 1.
+rewrite Nat.div_mul in H3.
+rewrite Hc1 in H3 at 1.
+rewrite Nat.div_mul in H3.
+rewrite Ha2 in H6 at 1.
+rewrite Nat.div_mul in H6.
+rewrite Hbc1 in H6 at 1.
+rewrite Nat.div_mul in H6.
+apply (f_equal (Nat.mul a2)) in Hbc1.
+do 2 rewrite Nat.mul_assoc in Hbc1.
+rewrite (Nat.mul_shuffle0 _ bc1) in Hbc1.
+rewrite <- Ha2 in Hbc1.
+...
 rewrite Hc1 in Hbc1 at 1.
 ...
 Nat.divide_mul_split:
