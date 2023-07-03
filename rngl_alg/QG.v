@@ -272,7 +272,9 @@ destruct x as [x| x| ]; [ | | easy ]. {
       now rewrite Nat.gcd_diag.
     } {
       apply -> Pos.compare_lt_iff in Hxy.
-...
+      do 2 rewrite Pos2Nat.inj_xI.
+      rewrite <- Nat.add_1_r.
+      rewrite <- (Nat.add_1_r (_ * _)).
       rewrite <- IHn. 2: {
         eapply Nat.le_trans; [ | apply Hn ].
         rewrite Nat.add_comm.
@@ -281,6 +283,36 @@ destruct x as [x| x| ]; [ | | easy ]. {
         apply Pos.size_nat_monotone.
         now apply Pos.sub_decr.
       }
+      rewrite Pos2Nat.inj_xI.
+      rewrite <- (Nat.add_1_r (_ * _)).
+      rewrite Pos2Nat.inj_sub; [ | easy ].
+      rewrite (Nat.gcd_comm (_ - _)).
+Theorem glop :
+  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
+Proof.
+intros * Hab.
+revert a c Hab.
+induction b; intros. {
+  now rewrite Nat.gcd_0_r in Hab; subst a.
+}
+(* bon, fait chier *)
+...
+Nat.gcd_add_diag_r: ∀ n m : nat, Nat.gcd n (m + n) = Nat.gcd n m
+...
+Search Nat.gcd.
+Search (Nat.gcd _ (_ + _)%nat).
+...
+intros * Hab.
+specialize (Nat.gcd_bezout a b) as H1.
+rewrite Hab in H1.
+destruct H1 as [H1| H1]. {
+  unfold Nat.Bezout in H1.
+  destruct H1 as (d & e & H1).
+... ...
+symmetry.
+rewrite (glop _ _ 2%nat).
+Search (Nat.gcd (_ mod _)).
+Search (Z.gcd (_ * _)).
 Search (_~1)%positive.
 gcd (2m+1) (2n+1) =? gcd (m-n) (2n+1)
 2m-2n
