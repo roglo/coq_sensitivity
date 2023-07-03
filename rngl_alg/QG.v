@@ -163,6 +163,30 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
 Qed.
 
+Theorem Nat_gcd_iff :
+  ∀ a b c, c ≠ 0%nat →
+  Nat.gcd a b = c ↔
+  Nat.divide c a ∧ Nat.divide c b ∧ Nat.gcd (a / c) (b / c) = 1%nat.
+Proof.
+intros * Hcz.
+split; intros Habc. {
+  subst c.
+  split; [ apply Nat.gcd_divide_l | ].
+  split; [ apply Nat.gcd_divide_r | ].
+  now apply Nat.gcd_div_gcd.
+} {
+  destruct Habc as (Hca & Hcb & Habc).
+  destruct Hca as (ca, Hca).
+  destruct Hcb as (cb, Hcb).
+  subst a b.
+  rewrite Nat.gcd_mul_mono_r.
+  rewrite Nat.div_mul in Habc; [ | easy ].
+  rewrite Nat.div_mul in Habc; [ | easy ].
+  rewrite Habc.
+  apply Nat.mul_1_l.
+}
+Qed.
+
 (* should be added in coq library ZArith *)
 
 Theorem Z_mul_div_eq_l :
@@ -291,15 +315,22 @@ Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
-Theorem glip :
-  ∀ a b c,
-  Nat.gcd a b = c ↔
-  Nat.divide c a ∧ Nat.divide c b ∧ Nat.gcd (a / c) (b / c) = 1%nat.
-Admitted.
-specialize (proj1 (glip a c _) eq_refl) as H1.
-destruct H1 as (H1 & H2 & H3).
-specialize (proj1 (glip a (b * c) _) eq_refl) as H4.
-destruct H4 as (H4 & H5 & H6).
+specialize (Nat_gcd_iff a c) as H1.
+specialize (H1 (Nat.gcd a c)).
+assert (H : Nat.gcd a c ≠ 0%nat). {
+  intros H.
+  apply Nat.gcd_eq_0 in H.
+  destruct H; subst a c.
+  cbn in Hab; subst b.
+  admit.
+}
+specialize (proj1 (H1 H) eq_refl) as H2; clear H H1.
+destruct H2 as (H1 & H2 & H3).
+specialize (Nat_gcd_iff a (b * c)) as H4.
+specialize (H4 (Nat.gcd a (b * c))).
+assert (H : Nat.gcd a (b * c) ≠ 0%nat) by admit.
+specialize (proj1 (H4 H) eq_refl) as H5; clear H H4.
+destruct H5 as (H4 & H5 & H6).
 unfold Nat.divide in H1, H2, H4, H5.
 destruct H1 as (a1, Ha1).
 destruct H2 as (c1, Hc1); rewrite Hc1 at 1.
@@ -318,6 +349,8 @@ apply (f_equal (Nat.mul a2)) in Hbc1.
 do 2 rewrite Nat.mul_assoc in Hbc1.
 rewrite (Nat.mul_shuffle0 _ bc1) in Hbc1.
 rewrite <- Ha2 in Hbc1.
+move H3 before H6.
+move Ha2 before Ha1.
 ...
 rewrite Hc1 in Hbc1 at 1.
 ...
