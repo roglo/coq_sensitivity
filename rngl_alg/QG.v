@@ -335,6 +335,30 @@ destruct H1 as [H1| H1]. {
 *)
     remember (Nat.gcd a c) as e eqn:He; symmetry in He.
     move e before d; move He before Hd.
+(**)
+    symmetry in Huv, Huv'.
+    apply Nat.add_sub_eq_r in Huv, Huv'.
+    rewrite <- Huv, <- Huv'.
+(*
+    apply (f_equal (Nat.mul v')) in Huv.
+    apply (f_equal (Nat.mul (v * b))) in Huv'.
+*)
+    specialize (Nat.gcd_bezout a b) as H1.
+    destruct H1 as [H1| H1]. {
+      destruct H1 as (u'' & v'' & Huv'').
+      move u'' before v'; move v'' before u''.
+      rewrite Hab in Huv''.
+apply Nat.add_sub_eq_r.
+rewrite <- Nat.add_sub_swap.
+apply Nat.add_sub_eq_r.
+Search (_ - _ = _ → _)%nat.
+apply Nat.add_sub_eq_nz. 2: {
+rewrite Nat.add_sub_swap.
+rewrite <- Nat.mul_sub_distr_r.
+rewrite Nat.add_comm.
+apply Nat.add_sub_eq_nz. 2: {
+rewrite <- Nat.mul_sub_distr_r.
+...
     apply (f_equal (Nat.mul u')) in Huv.
     apply (f_equal (Nat.mul u)) in Huv'.
     rewrite Nat.mul_add_distr_l in Huv, Huv'.
