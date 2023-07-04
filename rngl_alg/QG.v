@@ -562,6 +562,15 @@ Theorem Nat_div_gcd : ∀ a b c d,
   (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
 Proof.
 intros * Hadbc.
+...
+Theorem Nat_div_gcd : ∀ a b c d,
+  (d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
+Proof.
+intros * Hdz Hadbc.
+apply Nat.mul_cancel_l with (p := d); [ easy | ].
+Search (_ * (_ / _))%nat.
+rewrite <- Nat.divide_div_mul_exact.
+rewrite Nat.mul_comm, Hadbc.
 Search (_ / Nat.gcd _ _)%nat.
 ... ...
     specialize Nat_div_gcd as H1.
