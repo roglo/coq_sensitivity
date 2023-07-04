@@ -315,6 +315,47 @@ Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
+unfold Nat.divide.
+remember (Nat.gcd a c) as d eqn:Hd; symmetry in Hd.
+remember (Nat.gcd a (b * c)) as e eqn:He; symmetry in He.
+move d before c; move e before d.
+destruct (Nat.eq_dec d 0) as [Hdz| Hdz]. {
+  move Hdz at top; subst d.
+  apply Nat.gcd_eq_0 in Hd.
+  destruct Hd; subst a c.
+  now rewrite Nat.mul_0_r in He; subst e.
+}
+destruct (Nat.eq_dec e 0) as [Hez| Hez]. {
+  move Hez at top; subst e.
+  apply Nat.gcd_eq_0 in He.
+  destruct He as (H & He); subst a.
+  cbn in Hd, Hab.
+  subst c b.
+  now rewrite Nat.mul_1_l in He.
+}
+apply Nat_gcd_iff in Hd; [ | easy ].
+apply Nat_gcd_iff in He; [ | easy ].
+destruct Hd as (Hda & Hdc & Hacd).
+destruct He as (Hea & Hec & Hace).
+destruct Hda as (da & Hda).
+destruct Hdc as (dc & Hdc).
+destruct Hea as (ea & Hea).
+destruct Hec as (ec & Hec).
+move da before e; move dc before da.
+move ea before dc; move ec before ea.
+rewrite Hda, Hdc in Hacd.
+rewrite Nat.div_mul in Hacd; [ | easy ].
+rewrite Nat.div_mul in Hacd; [ | easy ].
+rewrite Hea, Hec in Hace.
+rewrite Nat.div_mul in Hace; [ | easy ].
+rewrite Nat.div_mul in Hace; [ | easy ].
+move Hacd before Hace.
+rewrite Hda in Hea.
+...
+Theorem glop :
+  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
+Proof.
+intros * Hab.
 specialize (Nat.gcd_bezout a (b * c)) as H1.
 destruct H1 as [H1| H1]. {
   destruct H1 as (u & v & Huv).
