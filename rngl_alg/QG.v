@@ -317,6 +317,55 @@ destruct H1 as [H1| H1]. {
 }
 Qed.
 
+Theorem Nat_gcd_1_gcd_mul_r :
+  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
+Proof.
+intros * Hab.
+destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]. {
+  congruence.
+}
+destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hacz| Hacz]. {
+  rewrite Hacz; symmetry.
+  apply Nat.gcd_eq_0 in Hacz.
+  destruct Hacz; subst; cbn.
+  apply Nat.mul_0_r.
+}
+destruct (Nat.eq_dec (Nat.gcd a c) 1) as [Hac1| Hac1]. {
+  rewrite Hac1; symmetry.
+  now apply Nat_gcd_mul_r.
+}
+specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hacz eq_refl) as H1.
+remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
+remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
+specialize (Nat_gcd_mul_r a' b c') as H2.
+assert (Ha : a = (a' * Nat.gcd a c)%nat). {
+  rewrite Ha', Nat.mul_comm.
+  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+    apply Nat.gcd_divide_l.
+  }
+  now rewrite Nat.mul_comm, Nat.div_mul.
+}
+assert (Hc : c = (c' * Nat.gcd a c)%nat). {
+  rewrite Hc', Nat.mul_comm.
+  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+    apply Nat.gcd_divide_r.
+  }
+  now rewrite Nat.mul_comm, Nat.div_mul.
+}
+assert (Ha'b : Nat.gcd a' b = 1%nat). {
+  rewrite Ha in Hab.
+  now apply Nat_eq_gcd_mul_1 in Hab.
+}
+specialize (H2 Ha'b H1).
+symmetry.
+rewrite Hc at 1.
+rewrite Ha at 1.
+rewrite Nat.mul_assoc.
+rewrite Nat.gcd_mul_mono_r.
+rewrite H2.
+apply Nat.mul_1_l.
+Qed.
+
 (* should be added in coq library ZArith *)
 
 Theorem Z_mul_div_eq_l :
@@ -415,6 +464,47 @@ assert (H : (Pos.size_nat x + Pos.size_nat y ≤ n)%nat). {
 clear Hn; rename H into Hn.
 revert x y Hn.
 induction n; intros; cbn; [ now destruct x | ].
+assert (Hgp : ∀ x y,
+  Pos.size_nat x + S (Pos.size_nat y) ≤ n
+  → (x < y)%positive
+  → Nat.gcd (Pos.to_nat x~1) (Pos.to_nat y~1) =
+     Pos.to_nat (Pos.gcdn n (y - x) x~1)). {
+  clear x y Hn.
+  intros * Hn Hxy.
+  do 2 rewrite Pos2Nat.inj_xI.
+  rewrite <- Nat.add_1_r.
+  rewrite <- (Nat.add_1_r (_ * _)).
+  rewrite <- IHn. 2: {
+    eapply Nat.le_trans; [ | apply Hn ].
+    rewrite Nat.add_comm.
+    rewrite <- Nat.add_succ_comm.
+    apply Nat.add_le_mono; [ apply Nat.le_refl | ].
+    apply Pos.size_nat_monotone.
+    now apply Pos.sub_decr.
+  }
+  rewrite Pos2Nat.inj_xI.
+  rewrite <- (Nat.add_1_r (_ * _)).
+  rewrite Pos2Nat.inj_sub; [ | easy ].
+  rewrite (Nat.gcd_comm (_ - _)).
+  symmetry.
+  rewrite (Nat_gcd_1_gcd_mul_r _ 2%nat). 2: {
+    rewrite Nat.gcd_comm, Nat.add_comm, Nat.mul_comm.
+    now rewrite Nat.gcd_add_mult_diag_r.
+  }
+  symmetry.
+  rewrite Nat.add_comm.
+  rewrite <- Nat.gcd_sub_diag_r. 2: {
+    rewrite Nat.add_comm.
+    apply Nat.add_le_mono_r.
+    apply Nat.mul_le_mono_l.
+    apply Pos2Nat.inj_lt in Hxy.
+    now apply Nat.lt_le_incl.
+  }
+  rewrite Nat.sub_add_distr.
+  rewrite Nat.add_sub.
+  rewrite <- Nat.mul_sub_distr_l.
+  easy.
+}
 destruct x as [x| x| ]; [ | | easy ]. {
   cbn in Hn.
   apply Nat.succ_le_mono in Hn.
@@ -426,112 +516,14 @@ destruct x as [x| x| ]; [ | | easy ]. {
       now rewrite Nat.gcd_diag.
     } {
       apply -> Pos.compare_lt_iff in Hxy.
-      do 2 rewrite Pos2Nat.inj_xI.
-      rewrite <- Nat.add_1_r.
-      rewrite <- (Nat.add_1_r (_ * _)).
-      rewrite <- IHn. 2: {
-        eapply Nat.le_trans; [ | apply Hn ].
-        rewrite Nat.add_comm.
-        rewrite <- Nat.add_succ_comm.
-        apply Nat.add_le_mono; [ apply Nat.le_refl | ].
-        apply Pos.size_nat_monotone.
-        now apply Pos.sub_decr.
-      }
-      rewrite Pos2Nat.inj_xI.
-      rewrite <- (Nat.add_1_r (_ * _)).
-      rewrite Pos2Nat.inj_sub; [ | easy ].
-      rewrite (Nat.gcd_comm (_ - _)).
-      symmetry.
-Theorem glop :
-  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
-Proof.
-intros * Hab.
-destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]. {
-  congruence.
-}
-destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hacz| Hacz]. {
-  rewrite Hacz; symmetry.
-  apply Nat.gcd_eq_0 in Hacz.
-  destruct Hacz; subst; cbn.
-  apply Nat.mul_0_r.
-}
-destruct (Nat.eq_dec (Nat.gcd a c) 1) as [Hac1| Hac1]. {
-  rewrite Hac1; symmetry.
-  now apply Nat_gcd_mul_r.
-}
-(*
-Search (Nat.gcd (_ * _)).
-specialize (Nat.gcd_mul_mono_r a c) as H1.
-Search
-*)
-specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hacz eq_refl) as H1.
-remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
-remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
-specialize (Nat_gcd_mul_r a' b c') as H2.
-assert (Ha : a = (a' * Nat.gcd a c)%nat). {
-  rewrite Ha', Nat.mul_comm.
-  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
-    apply Nat.gcd_divide_l.
-  }
-  now rewrite Nat.mul_comm, Nat.div_mul.
-}
-assert (Hc : c = (c' * Nat.gcd a c)%nat). {
-  rewrite Hc', Nat.mul_comm.
-  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
-    apply Nat.gcd_divide_r.
-  }
-  now rewrite Nat.mul_comm, Nat.div_mul.
-}
-assert (Ha'b : Nat.gcd a' b = 1%nat). {
-  rewrite Ha in Hab.
-  now apply Nat_eq_gcd_mul_1 in Hab.
-}
-specialize (H2 Ha'b H1).
-...
-rewrite Hc at 1.
-rewrite Ha at 1.
-rewrite Nat.gcd_mul_mono_r.
-...
-  assert (Hb : b = (b' * Nat.gcd a c)%nat). {
-    rewrite Hb', Nat.mul_comm.
-    rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
-      apply Nat.gcd_divide_l.
+      now apply Hgp.
+    } {
+      rewrite <- Nat.add_succ_comm, Nat.add_comm in Hn.
+      apply -> Pos.compare_gt_iff in Hxy.
+      rewrite Nat.gcd_comm.
+      now apply Hgp.
     }
-    now rewrite Nat.mul_comm, Nat.div_mul.
-  }
-  rewrite Ha in Hab.
-Nat.divide_div_mul_exact: ∀ a b c : nat, b ≠ 0%nat → Nat.divide b a → (c * a / b)%nat = (c * (a / b))%nat
-Search (_ / _)%nat.
-Search (_ / _ = _ / _)%nat.
-Search (_ / _ * _)%nat.
-rewrite
-...
-Search (Nat.gcd (_ / _)).
-Check Nat_gcd_mul_r.
-...
-specialize (Nat.gcd_div_gcd a b (Nat.gcd a b) Habz eq_refl) as H1.
-remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
-remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
-remember (b / Nat.gcd a b)%nat as b' eqn:Hb'.
-specialize (Nat_gcd_mul_r a' b' c') as H3.
-...
-Nat.gcd_div_gcd: ∀ a b g : nat, g ≠ 0%nat → g = Nat.gcd a b → Nat.gcd (a / g) (b / g) = 1%nat
-Nat.gcd_mul_mono_l: ∀ n m p : nat, Nat.gcd (p * n) (p * m) = (p * Nat.gcd n m)%nat
-Nat.gcd_mul_mono_r: ∀ n m p : nat, Nat.gcd (n * p) (m * p) = (Nat.gcd n m * p)%nat
-Nat.gcd_div_swap: ∀ a b : nat, (a / Nat.gcd a b * b)%nat = (a * (b / Nat.gcd a b))%nat
-...
-symmetry.
-rewrite glop  with (b := 2%nat).
-symmetry.
-rewrite <- Nat.gcd_sub_diag_r.
-rewrite Nat.add_comm.
-rewrite Nat.sub_add_distr.
-rewrite Nat.add_sub.
-rewrite <- Nat.mul_sub_distr_l.
-easy.
-(* ouais *)
-*)
-Check Nat_gcd_mul_r.
+  } {
 ...
 rewrite Nat.sub_add_distr in H3.
     apply Nat.add_sub_eq_r in H3.
