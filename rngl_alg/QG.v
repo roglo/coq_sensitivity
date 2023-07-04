@@ -312,6 +312,119 @@ destruct x as [x| x| ]; [ | | easy ]. {
       rewrite Pos2Nat.inj_sub; [ | easy ].
       rewrite (Nat.gcd_comm (_ - _)).
 Theorem glop :
+  ∀ a b c,
+  Nat.gcd a b = 1%nat → Nat.gcd a c = 1%nat → Nat.gcd a (b * c) = 1%nat.
+Proof.
+intros * Hab Hac.
+destruct (Nat.eq_dec a 1) as [Ha1| Ha1]; [ now subst a | ].
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  subst c.
+  now rewrite Nat.mul_0_r.
+}
+specialize (Nat.gcd_bezout a b) as H1.
+specialize (Nat.gcd_bezout a c) as H2.
+rewrite Hab in H1.
+rewrite Hac in H2.
+destruct H1 as [H1| H1]. {
+  destruct H2 as [H2| H2]. {
+(*
+Theorem glop :
+  ∀ a b c,
+  Nat.Bezout a b 1
+  → Nat.Bezout a c 1
+  → Nat.gcd a (b * c) = 1%nat.
+Proof.
+intros * H1 H2.
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  subst c; rewrite Nat.mul_0_r.
+  rewrite Nat.gcd_0_r.
+  destruct H2 as (u & v & Huv).
+  rewrite Nat.mul_0_r, Nat.add_0_r in Huv.
+  now apply Nat.eq_mul_1 in Huv.
+}
+*)
+    destruct H1 as (u1 & v1 & H1).
+    symmetry in H1.
+    apply Nat.add_sub_eq_r in H1.
+    destruct H2 as (u2 & v2 & H2).
+    symmetry in H2.
+    apply Nat.add_sub_eq_r in H2.
+    specialize (f_equal2_mult _ _ _ _ H1 H2) as H3.
+    rewrite Nat.mul_1_l in H3.
+    rewrite Nat.mul_sub_distr_l in H3.
+    rewrite H1, Nat.mul_1_l in H3 at 1.
+    rewrite Nat.mul_sub_distr_r in H3.
+    rewrite Nat.mul_shuffle0 in H3.
+    rewrite Nat.mul_assoc in H3.
+    apply Nat.add_sub_eq_nz in H3; [ | easy ].
+    rewrite <- Nat.add_sub_swap in H3. 2: {
+      rewrite (Nat.mul_comm _ a).
+      do 3 rewrite Nat.mul_assoc.
+      rewrite <- Nat.mul_assoc.
+      rewrite <- (Nat.mul_assoc (a * u1)).
+      apply Nat.mul_le_mono_r.
+      apply Nat.add_sub_eq_nz in H1; [ | easy ].
+      rewrite (Nat.mul_comm a).
+      rewrite <- H1.
+      apply Nat.le_add_r.
+    }
+    apply Nat.add_sub_eq_nz in H3. 2: {
+      intros H4.
+      apply Nat.eq_mul_0 in H4.
+      destruct H4 as [H4| H4]; [ now rewrite H4 in H2 | ].
+      now rewrite H4, Nat.mul_0_r in H1.
+    }
+    apply Nat.add_sub_eq_r in H3.
+    rewrite Nat.add_sub_swap in H3. 2: {
+      apply Nat.add_sub_eq_nz in H1; [ | easy ].
+      rewrite (Nat.mul_comm (_ * _ * _)).
+      do 2 rewrite Nat.mul_assoc.
+      rewrite (Nat.mul_comm a).
+      rewrite <- H1.
+      apply Nat.add_sub_eq_nz in H2; [ | easy ].
+      rewrite <- H2.
+      do 2 rewrite Nat.mul_add_distr_r.
+      rewrite Nat.mul_1_l.
+      rewrite Nat.add_comm.
+      apply Nat.add_le_mono_r.
+      apply Nat.le_succ_l.
+      apply Nat.neq_0_lt_0.
+      intros H4.
+      apply Nat.eq_mul_0 in H4.
+      destruct H4 as [H4| H4]; [ | easy ].
+      apply Nat.eq_mul_0 in H4.
+      destruct H4 as [H4| H4]. 2: {
+        subst v2.
+        rewrite Nat.mul_0_l, Nat.add_0_l in H2.
+        symmetry in H2.
+        now apply Nat.eq_mul_1 in H2.
+      }
+      rewrite H4 in H1.
+      symmetry in H1.
+      now apply Nat.eq_mul_1 in H1.
+    }
+    rewrite <- Nat.mul_sub_distr_r in H3.
+    rewrite Nat.mul_assoc in H3.
+    rewrite (Nat.mul_shuffle0 v1) in H3.
+    rewrite <- (Nat.mul_assoc (v1 * v2)) in H3.
+    rewrite Nat.gcd_comm.
+    apply Nat.bezout_1_gcd.
+    exists (v1 * v2)%nat.
+    exists (u1 * v2 * c - u2)%nat.
+    symmetry in H3; rewrite Nat.add_comm in H3.
+    easy.
+  }
+...
+rewrite Nat.sub_add_distr in H3.
+    apply Nat.add_sub_eq_r in H3.
+Search (_ * _ = _ * _)%nat.
+...
+Nat.gcd_bezout:
+  ∀ n m : nat, Nat.Bezout n m (Nat.gcd n m) ∨ Nat.Bezout m n (Nat.gcd n m)
+Nat.bezout_1_gcd: ∀ n m : nat, Nat.Bezout n m 1 → Nat.gcd n m = 1%nat
+...
+...
+Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
@@ -340,6 +453,7 @@ rewrite Hab in H1.
 specialize (Nat.gcd_bezout_pos a c Haz) as H2.
 destruct H2 as (u' & v' & H2).
 rewrite Hac in H2.
+Search Nat.Bezout.
 ...
 rewrite <- Nat.gcd_add_mult_diag_r with (p := (b * c)%nat).
 rewrite (Nat.mul_comm b).
