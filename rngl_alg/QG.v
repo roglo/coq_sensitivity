@@ -386,72 +386,6 @@ specialize (Nat2Z.is_nonneg a) as H1.
 now rewrite Hx in H1.
 Qed.
 
-(* end of should be added in coq library ZArith *)
-
-Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
-Proof.
-intros (xn, xd) (yn, yd) Hxy.
-apply eq_QG_eq; cbn.
-f_equal. {
-  unfold Z_pos_gcd.
-  destruct xn as [| xn| xn]; [ now destruct yn | | ]. {
-    destruct yn as [| yn| yn]; [ easy | | easy ].
-    progress unfold Qeq in Hxy.
-    cbn in Hxy.
-    do 2 rewrite Pos2Z.inj_mul in Hxy.
-    do 2 rewrite Pos2Z.inj_gcd.
-(*
-remember (Z.pos xn) as a.
-remember (Z.pos xd) as b.
-remember (Z.pos yn) as c.
-remember (Z.pos yd) as d.
-subst a b c d.
-*)
-Theorem Nat_div_gcd : ∀ a b c d,
-  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
-Admitted.
-apply (f_equal Z.to_nat) in Hxy.
-cbn in Hxy.
-do 2 rewrite Pos2Nat.inj_mul in Hxy.
-symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
-symmetry in Hxy.
-specialize Nat_div_gcd as H1.
-specialize (H1 _ _ _ _ Hxy).
-apply (f_equal Z.of_nat) in H1.
-do 2 rewrite Nat2Z.inj_div in H1.
-do 2 rewrite positive_nat_Z in H1.
-(*
-Theorem Pos_of_nat_gcd :
-  ∀ a b, a ≠ 0%nat → b ≠ 0%nat →
-  Pos.of_nat (Nat.gcd a b) = Pos.gcd (Pos.of_nat a) (Pos.of_nat b).
-Proof.
-intros * Haz Hbz.
-revert b Hbz.
-induction a; intros; [ easy | ].
-clear Haz.
-cbn.
-Search Nat.divmod.
-...
-*)
-Theorem Z_of_nat_gcd :
-  ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
-Proof.
-intros.
-unfold Z.gcd.
-remember (Z.of_nat a) as x eqn:Hx; symmetry in Hx.
-destruct x as [| x| x]. {
-  rewrite Z_abs_of_nat.
-  now destruct a.
-} {
-  remember (Z.of_nat b) as y eqn:Hy; symmetry in Hy.
-  destruct y as [| y| y]. {
-    destruct b; [ now rewrite Nat.gcd_0_r | easy ].
-  } {
-    rewrite Pos2Z.inj_gcd.
-    apply (f_equal Z.to_nat) in Hx, Hy.
-    rewrite Nat2Z.id in Hx, Hy.
-    subst a b.
-    do 2 rewrite Z2Nat.inj_pos.
 Theorem Nat_gcd_pos :
   ∀ x y, Nat.gcd (Pos.to_nat x) (Pos.to_nat y) = Pos.to_nat (Pos.gcd x y).
 Proof.
@@ -524,312 +458,57 @@ destruct x as [x| x| ]; [ | | easy ]. {
       now apply Hgp.
     }
   } {
-...
-rewrite Nat.sub_add_distr in H3.
-    apply Nat.add_sub_eq_r in H3.
-Search (_ * _ = _ * _)%nat.
-...
-Nat.gcd_bezout:
-  ∀ n m : nat, Nat.Bezout n m (Nat.gcd n m) ∨ Nat.Bezout m n (Nat.gcd n m)
-Nat.bezout_1_gcd: ∀ n m : nat, Nat.Bezout n m 1 → Nat.gcd n m = 1%nat
-...
-...
-Theorem glop :
-  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
-Proof.
-intros * Hab.
-Check Nat.gcd_add_mult_diag_r.
-Search (Nat.gcd _ (_ + _))%nat.
-Search (Nat.gcd _ (_ - _))%nat.
-Check Nat.gauss.
-Search (Nat.gcd _ (_ *  _))%nat.
-Theorem glop :
-  ∀ a b c, (Nat.gcd a b = 1 → Nat.gcd a c = 1 → Nat.gcd a (b * c) = 1)%nat.
-Proof.
-intros * Hab Hac.
-destruct (Nat.eq_dec a 0%nat) as [Haz| Haz]. {
-  subst a.
-  now cbn in Hac, Hab; subst b c.
-}
-Search (Nat.gcd _ (_ * _))%nat.
-Search (Nat.gcd _ _ = 1)%nat.
-apply Nat.bezout_1_gcd.
-unfold Nat.Bezout.
-Search Nat.Bezout.
-apply Nat.neq_0_lt_0 in Haz.
-specialize (Nat.gcd_bezout_pos a b Haz) as H1.
-destruct H1 as (u & v & H1).
-rewrite Hab in H1.
-specialize (Nat.gcd_bezout_pos a c Haz) as H2.
-destruct H2 as (u' & v' & H2).
-rewrite Hac in H2.
-Search Nat.Bezout.
-...
-rewrite <- Nat.gcd_add_mult_diag_r with (p := (b * c)%nat).
-rewrite (Nat.mul_comm b).
-remember (c * b * a)%nat as x.
-rewrite <- (Nat.mul_1_r c) at 1; subst x.
-rewrite <- Nat.mul_assoc.
-rewrite <- Nat.mul_add_distr_l.
-Search (Nat.gcd _ (_ * _))%nat.
-...
-Nat.gcd_add_mult_diag_r: ∀ n m p : nat, Nat.gcd n (m + p * n) = Nat.gcd n m
-...
-intros * Hab.
-unfold Nat.divide.
-remember (Nat.gcd a c) as d eqn:Hd; symmetry in Hd.
-remember (Nat.gcd a (b * c)) as e eqn:He; symmetry in He.
-move d before c; move e before d.
-destruct (Nat.eq_dec d 0) as [Hdz| Hdz]. {
-  move Hdz at top; subst d.
-  apply Nat.gcd_eq_0 in Hd.
-  destruct Hd; subst a c.
-  now rewrite Nat.mul_0_r in He; subst e.
-}
-destruct (Nat.eq_dec e 0) as [Hez| Hez]. {
-  move Hez at top; subst e.
-  apply Nat.gcd_eq_0 in He.
-  destruct He as (H & He); subst a.
-  cbn in Hd, Hab.
-  subst c b.
-  now rewrite Nat.mul_1_l in He.
-}
-apply Nat_gcd_iff in Hd; [ | easy ].
-apply Nat_gcd_iff in He; [ | easy ].
-destruct Hd as (Hda & Hdc & Hacd).
-destruct He as (Hea & Hec & Hace).
-destruct Hda as (da & Hda).
-destruct Hdc as (dc & Hdc).
-destruct Hea as (ea & Hea).
-destruct Hec as (ec & Hec).
-move da before e; move dc before da.
-move ea before dc; move ec before ea.
-rewrite Hda, Hdc in Hacd.
-rewrite Nat.div_mul in Hacd; [ | easy ].
-rewrite Nat.div_mul in Hacd; [ | easy ].
-rewrite Hea, Hec in Hace.
-rewrite Nat.div_mul in Hace; [ | easy ].
-rewrite Nat.div_mul in Hace; [ | easy ].
-move Hacd before Hace.
-specialize (Nat.gcd_bezout a b) as H1.
-rewrite Hab in H1.
-destruct H1 as [H1| H1]. {
-  destruct H1 as (u & v & Huv).
-  move u before ec; move v before u.
-  apply -> (Nat.mul_cancel_l d e da). 2: {
-    intros H; subst da.
-    rewrite Nat.mul_0_l in Hda; subst a.
-    now rewrite Nat.mul_0_r in Huv.
+    cbn in Hn.
+    rewrite Pos2Nat.inj_xI.
+    rewrite Pos2Nat.inj_xO.
+    rewrite <- Nat_gcd_1_gcd_mul_r. 2: {
+      rewrite <- Nat.add_1_l, Nat.gcd_comm, Nat.mul_comm.
+      apply Nat.gcd_add_mult_diag_r.
+    }
+    rewrite <- Nat.add_succ_comm in Hn.
+    rewrite <- Pos2Nat.inj_xI.
+    now apply IHn.
+  } {
+    rewrite Pos2Nat.inj_1.
+    apply Nat.gcd_1_r.
   }
-  rewrite <- Hda.
-  rewrite Hea.
-  f_equal.
-Search (Nat.gcd _ (_ + _)%nat).
-Nat.gcd_add_mult_diag_r: ∀ n m p : nat, Nat.gcd n (m + p * n) = Nat.gcd n m
-...
-Theorem glop :
-  ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
-Proof.
-intros * Hab.
-specialize (Nat.gcd_bezout a (b * c)) as H1.
-destruct H1 as [H1| H1]. {
-  destruct H1 as (u & v & Huv).
-  move u before c; move v before u.
-(*
-  apply Nat.add_sub_eq_r in Huv.
-*)
-  remember (Nat.gcd a (b * c)) as d eqn:Hd; symmetry in Hd.
-  move d before c.
-  rewrite Nat.mul_assoc in Huv.
-  specialize (Nat.gcd_bezout a c) as H2.
-  destruct H2 as [H2| H2]. {
-    destruct H2 as (u' & v' & Huv').
-    move u' before v; move v' before u'.
-(*
-    symmetry in Huv'.
-    apply Nat.add_sub_eq_r in Huv'.
-*)
-    remember (Nat.gcd a c) as e eqn:He; symmetry in He.
-    move e before d; move He before Hd.
-(**)
-    symmetry in Huv, Huv'.
-    apply Nat.add_sub_eq_r in Huv, Huv'.
-    rewrite <- Huv, <- Huv'.
-(*
-    apply (f_equal (Nat.mul v')) in Huv.
-    apply (f_equal (Nat.mul (v * b))) in Huv'.
-*)
-    specialize (Nat.gcd_bezout a b) as H1.
-    destruct H1 as [H1| H1]. {
-      destruct H1 as (u'' & v'' & Huv'').
-      move u'' before v'; move v'' before u''.
-      rewrite Hab in Huv''.
-apply Nat.add_sub_eq_r.
-rewrite <- Nat.add_sub_swap.
-apply Nat.add_sub_eq_r.
-Search (_ - _ = _ → _)%nat.
-apply Nat.add_sub_eq_nz. 2: {
-rewrite Nat.add_sub_swap.
-rewrite <- Nat.mul_sub_distr_r.
-rewrite Nat.add_comm.
-apply Nat.add_sub_eq_nz. 2: {
-rewrite <- Nat.mul_sub_distr_r.
-...
-    apply (f_equal (Nat.mul u')) in Huv.
-    apply (f_equal (Nat.mul u)) in Huv'.
-    rewrite Nat.mul_add_distr_l in Huv, Huv'.
-    do 3 rewrite Nat.mul_assoc in Huv.
-    do 2 rewrite Nat.mul_assoc in Huv'.
-    rewrite (Nat.mul_comm u') in Huv.
-...
-intros * Hab.
-specialize (Nat_gcd_iff a c) as H1.
-specialize (H1 (Nat.gcd a c)).
-assert (H : Nat.gcd a c ≠ 0%nat). {
-  intros H.
-  apply Nat.gcd_eq_0 in H.
-  destruct H; subst a c.
-  cbn in Hab; subst b.
-  _admit.
-}
-specialize (proj1 (H1 H) eq_refl) as H2; clear H H1.
-destruct H2 as (H1 & H2 & H3).
-specialize (Nat_gcd_iff a (b * c)) as H4.
-specialize (H4 (Nat.gcd a (b * c))).
-assert (H : Nat.gcd a (b * c) ≠ 0%nat) by _admit.
-specialize (proj1 (H4 H) eq_refl) as H5; clear H H4.
-destruct H5 as (H4 & H5 & H6).
-unfold Nat.divide in H1, H2, H4, H5.
-destruct H1 as (a1, Ha1).
-destruct H2 as (c1, Hc1); rewrite Hc1 at 1.
-destruct H4 as (a2, Ha2).
-destruct H5 as (bc1, Hbc1); rewrite Hbc1.
-move a1 before c; move c1 before a1; move a2 before c1; move bc1 before a2.
-rewrite Ha1 in H3 at 1.
-rewrite Nat.div_mul in H3.
-rewrite Hc1 in H3 at 1.
-rewrite Nat.div_mul in H3.
-rewrite Ha2 in H6 at 1.
-rewrite Nat.div_mul in H6.
-rewrite Hbc1 in H6 at 1.
-rewrite Nat.div_mul in H6.
-apply (f_equal (Nat.mul a2)) in Hbc1.
-do 2 rewrite Nat.mul_assoc in Hbc1.
-rewrite (Nat.mul_shuffle0 _ bc1) in Hbc1.
-rewrite <- Ha2 in Hbc1.
-move H3 before H6.
-move Ha2 before Ha1.
-...
-rewrite Hc1 in Hbc1 at 1.
-...
-Nat.divide_mul_split:
-  ∀ n m p : nat,
-    n ≠ 0%nat
-    → Nat.divide n (m * p)
-      → ∃ q r : nat, n = (q * r)%nat ∧ Nat.divide q m ∧ Nat.divide r p
-...
-revert b c Hab.
-induction a; intros. {
-  now cbn in Hab; subst b; rewrite Nat.mul_1_l.
-}
-cbn - [ "mod" ].
-...
-intros * Hab.
-revert a c Hab.
-induction b; intros. {
-  now rewrite Nat.gcd_0_r in Hab; subst a.
-}
-...
-Nat.gcd_add_diag_r: ∀ n m : nat, Nat.gcd n (m + n) = Nat.gcd n m
-...
-Search Nat.gcd.
-Search (Nat.gcd _ (_ + _)%nat).
-...
-intros * Hab.
-specialize (Nat.gcd_bezout a b) as H1.
-rewrite Hab in H1.
-destruct H1 as [H1| H1]. {
-  unfold Nat.Bezout in H1.
-  destruct H1 as (d & e & H1).
-... ...
-symmetry.
-rewrite (glop _ _ 2%nat).
-Search (Nat.gcd (_ mod _)).
-Search (Z.gcd (_ * _)).
-Search (_~1)%positive.
-gcd (2m+1) (2n+1) =? gcd (m-n) (2n+1)
-2m-2n
-Search (Pos.to_nat (_ - _)).
-replace (y - x)%positive
-      rewrite Pos2Nat.inj_sub; [ | easy ].
-Search (Nat.gcd _ (_ - _)).
-...
-  rewrite Pos2Nat.inj_1.
-  apply Nat.eq_add_0 in Hn.
-  destruct Hn as (Hx, Hy).
-  destruct x as [x| x| ]; [ easy | easy | easy ].
-Theorem eq_pos_size_nat_0 :
-  ∀ x, Pos.size_nat x = 0%nat → x = 1%positive.
-Proof.
-intros * Hx.
-now destruct x.
-destruct x as [x| x| ]; [ easy | easy | easy ].
-... ...
-  now apply eq_pos_size_nat_0 in Hx, Hy; subst x y.
-}
-...
-apply eq_pos_size_nat_0 in Hx.
-  revert y Hy.
-  induction x as [x| x| ]; intros; [ | easy | easy ].
-  destruct y as [y| y| ]; intros; [ | easy | easy ].
-Print Pos.size_nat.
-...
-intros.
-destruct x as [x| x| ]; intros; cbn; [ | | easy ]. {
+} {
+  cbn in Hn.
+  apply Nat.succ_le_mono in Hn.
   destruct y as [y| y| ]. {
-    remember (x ?= y)%positive as xy eqn:Hxy; symmetry in Hxy.
-    destruct xy. {
-      apply Pos.compare_eq in Hxy; subst y.
-      now rewrite Nat.gcd_diag.
-    } {
-      apply -> Pos.compare_lt_iff in Hxy.
-      remember (Pos.size_nat x + Pos.size_nat y~1)%nat as n eqn:Hn.
-... ...
-    rewrite Nat_gcd_pos.
-    now rewrite positive_nat_Z.
+    rewrite Pos2Nat.inj_xI.
+    rewrite Pos2Nat.inj_xO.
+    rewrite Nat.gcd_comm.
+    rewrite <- Nat_gcd_1_gcd_mul_r. 2: {
+      rewrite <- Nat.add_1_l, Nat.gcd_comm, Nat.mul_comm.
+      apply Nat.gcd_add_mult_diag_r.
+    }
+    rewrite Nat.gcd_comm.
+    rewrite <- Pos2Nat.inj_xI.
+    now apply IHn.
+  } {
+    do 3 rewrite Pos2Nat.inj_xO.
+    rewrite Nat.gcd_mul_mono_l.
+    f_equal.
+    apply IHn.
+    cbn in Hn.
+    eapply Nat.le_trans; [ | apply Hn ].
+    apply Nat.add_le_mono_l.
+    apply Nat.le_succ_diag_r.
+  } {
+    rewrite Pos2Nat.inj_1.
+    apply Nat.gcd_1_r.
   }
-...
-induction a; [ now rewrite Z_abs_of_nat | ].
-unfold Z.gcd.
-cbn - [ Nat.gcd Z.gcd ].
-rewrite Zpos_P_of_succ_nat.
-rewrite <- Nat2Z.inj_succ.
-...
-intros.
-remember (a + b)%nat as c eqn:Hc.
-assert (H : (a + b)%nat ≤ c) by now subst; apply Nat.le_refl.
-clear Hc; rename H into Hc.
-revert a b Hc.
-induction c; intros; cbn. {
-  apply Nat.le_0_r in Hc.
-  apply Nat.eq_add_0 in Hc.
-  destruct Hc; now subst a b.
 }
-destruct a; [ now cbn; rewrite Z_abs_of_nat | ].
-cbn in Hc; apply Nat.succ_le_mono in Hc.
-destruct b; [ now rewrite Nat.gcd_0_r, Z.gcd_0_r | ].
-cbn - [ Nat.modulo ].
-rewrite IHc. 2: {
-  assert (H : (S b mod S a ≤ S b)%nat). {
-    now apply Nat.mod_le.
-  }
-(* fuck you *)
-...
-(*
+Qed.
+
+Theorem Z_of_nat_gcd :
+  ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
+Proof.
 intros.
+unfold Z.gcd.
 remember (Z.of_nat a) as x eqn:Hx; symmetry in Hx.
-revert a b Hx.
-induction x as [| x| x]; intros; cbn. {
+destruct x as [| x| x]. {
   rewrite Z_abs_of_nat.
   now destruct a.
 } {
@@ -838,91 +517,62 @@ induction x as [| x| x]; intros; cbn. {
     destruct b; [ now rewrite Nat.gcd_0_r | easy ].
   } {
     rewrite Pos2Z.inj_gcd.
-apply (f_equal Z.to_nat) in Hx, Hy.
-rewrite Nat2Z.id in Hx, Hy.
-subst a b.
-Search (Z.to_nat (Z.pos _)).
-do 2 rewrite Z2Nat.inj_pos.
-Search (Nat.gcd (Pos.to_nat _)).
-Search (Nat.gcd (Z.to_nat _)).
-...
-    rewrite <- Hx, <- Hy.
-Search (Z.gcd (Z.of_nat _)).
-Search (Z.of_nat (Nat.gcd _ _)).
-...
-*)
-intros.
-remember (Nat.gcd a b) as g eqn:Hg; symmetry in Hg.
-revert a b Hg.
-induction g; intros; cbn. {
-  apply Nat.gcd_eq_0 in Hg.
-  now destruct Hg; subst a b.
-}
-rewrite Zpos_P_of_succ_nat.
-rewrite <- Nat2Z.inj_succ.
-cbn.
-rewrite <- Hg.
-rewrite <- IHg.
-...
-*)
-(*
-intros.
-revert a.
-induction b; intros. {
-  cbn.
-  rewrite Nat.gcd_0_r.
-  rewrite Z.gcd_0_r.
-  now rewrite Z_abs_of_nat.
-}
-cbn.
-rewrite Zpos_P_of_succ_nat.
-...
-*)
-intros.
-revert b.
-induction a; intros. {
-  now rewrite Z_abs_of_nat.
-}
-cbn.
-specialize Nat.divmod_spec as H1.
-specialize (H1 b a 0%nat a (Nat.le_refl _)).
-remember (Nat.divmod _ _ _ _) as d eqn:Hd; symmetry in Hd.
-destruct d as (x, y); cbn.
-rewrite Nat.mul_0_r, Nat.sub_diag in H1.
-do 2 rewrite Nat.add_0_r in H1.
-destruct H1 as (H1, H2).
-Search (Z.gcd (_ - _))%Z.
-...
-cbn - [ Nat.modulo ].
-remember (Z.of_nat b) as y eqn:Hy; symmetry in Hy.
-apply (f_equal Z.to_nat) in Hy.
-rewrite Nat2Z.id in Hy.
-subst b.
-destruct y as [| y| y]. {
-  now rewrite Nat.mod_0_l.
+    apply (f_equal Z.to_nat) in Hx, Hy.
+    rewrite Nat2Z.id in Hx, Hy.
+    subst a b.
+    do 2 rewrite Z2Nat.inj_pos.
+    rewrite Nat_gcd_pos.
+    now rewrite positive_nat_Z.
+  } {
+    specialize (Pos2Z.neg_is_neg y) as H1.
+    rewrite <- Hy in H1.
+    apply Z.nle_gt in H1.
+    exfalso; apply H1.
+    apply Nat2Z.is_nonneg.
+  }
 } {
-  rewrite Nat.gcd_mod; [ | easy ].
-  rewrite Z2Nat.inj_pos.
-  rewrite Pos2Z.inj_gcd.
-  rewrite Zpos_P_of_succ_nat.
-  rewrite <- Nat2Z.inj_succ.
-Search (Z.of_nat (Nat.gcd _ _)).
-...
-  rewrite <- Pos.succ_of_nat.
-Search (Pos.gcd (Pos.succ _)).
-Search (Nat.gcd _ (Pos.to_nat _)).
-Search (Nat.gcd _ (S _)).
-...
+  specialize (Pos2Z.neg_is_neg x) as H1.
+  rewrite <- Hx in H1.
+  apply Z.nle_gt in H1.
+  exfalso; apply H1.
+  apply Nat2Z.is_nonneg.
+}
+Qed.
 
-  apply (f_equal Z.to_nat) in Hy.
-...
-  specialize (Nat2Z.is_nonneg b) as H1.
-  now rewrite Hy in H1.
-...
-do 2 rewrite Z_of_nat_gcd in H1.
-Search (Z.of_nat (Pos.to_nat _)).
-do 4 rewrite positive_nat_Z in H1.
-easy.
+(* end of should be added in coq library ZArith *)
+
+Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
+Proof.
+intros (xn, xd) (yn, yd) Hxy.
+apply eq_QG_eq; cbn.
+f_equal. {
+  unfold Z_pos_gcd.
+  destruct xn as [| xn| xn]; [ now destruct yn | | ]. {
+    destruct yn as [| yn| yn]; [ easy | | easy ].
+    progress unfold Qeq in Hxy.
+    cbn in Hxy.
+    do 2 rewrite Pos2Z.inj_mul in Hxy.
+    do 2 rewrite Pos2Z.inj_gcd.
+    apply (f_equal Z.to_nat) in Hxy.
+    cbn in Hxy.
+    do 2 rewrite Pos2Nat.inj_mul in Hxy.
+    symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
+    symmetry in Hxy.
+Theorem Nat_div_gcd : ∀ a b c d,
+  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
+Proof.
+intros * Hadbc.
+Search (_ / Nat.gcd _ _)%nat.
+... ...
+    specialize Nat_div_gcd as H1.
+    specialize (H1 _ _ _ _ Hxy).
+    apply (f_equal Z.of_nat) in H1.
+    do 2 rewrite Nat2Z.inj_div in H1.
+    do 2 rewrite positive_nat_Z in H1.
+    do 2 rewrite Z_of_nat_gcd in H1.
+    do 4 rewrite positive_nat_Z in H1.
+    easy.
+  }
 ...
 symmetry in H1.
 ...
