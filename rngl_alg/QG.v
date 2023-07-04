@@ -350,7 +350,11 @@ rewrite Hea, Hec in Hace.
 rewrite Nat.div_mul in Hace; [ | easy ].
 rewrite Nat.div_mul in Hace; [ | easy ].
 move Hacd before Hace.
-rewrite Hda in Hea.
+specialize (Nat.gcd_bezout a b) as H1.
+rewrite Hab in H1.
+destruct H1 as [H1| H1]. {
+  destruct H1 as (u & v & Huv).
+  move u before ec; move v before u.
 ...
 Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
