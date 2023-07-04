@@ -295,6 +295,28 @@ apply Nat_Bezout_mul. {
 }
 Qed.
 
+Theorem Nat_eq_gcd_mul_1 :
+  ∀ a b c, Nat.gcd (a * b) c = 1%nat → Nat.gcd a c = 1%nat.
+Proof.
+intros * Habc.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
+apply Nat.bezout_1_gcd.
+specialize (Nat.gcd_bezout (a * b) c) as H1.
+rewrite Habc in H1.
+destruct H1 as [H1| H1]. {
+  destruct H1 as (u & v & Huv).
+  exists (u * b)%nat, v.
+  rewrite <- Huv.
+  now rewrite Nat.mul_shuffle0, Nat.mul_assoc.
+} {
+  destruct H1 as (u & v & Huv).
+  apply (Nat.bezout_comm _ _ _ Haz).
+  exists u, (v * b)%nat.
+  rewrite Huv.
+  now rewrite Nat.mul_shuffle0, Nat.mul_assoc.
+}
+Qed.
+
 (* should be added in coq library ZArith *)
 
 Theorem Z_mul_div_eq_l :
@@ -437,10 +459,57 @@ destruct (Nat.eq_dec (Nat.gcd a c) 1) as [Hac1| Hac1]. {
   rewrite Hac1; symmetry.
   now apply Nat_gcd_mul_r.
 }
+(*
+Search (Nat.gcd (_ * _)).
+specialize (Nat.gcd_mul_mono_r a c) as H1.
+Search
+*)
+specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hacz eq_refl) as H1.
+remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
+remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
+specialize (Nat_gcd_mul_r a' b c') as H2.
+assert (Ha : a = (a' * Nat.gcd a c)%nat). {
+  rewrite Ha', Nat.mul_comm.
+  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+    apply Nat.gcd_divide_l.
+  }
+  now rewrite Nat.mul_comm, Nat.div_mul.
+}
+assert (Hc : c = (c' * Nat.gcd a c)%nat). {
+  rewrite Hc', Nat.mul_comm.
+  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+    apply Nat.gcd_divide_r.
+  }
+  now rewrite Nat.mul_comm, Nat.div_mul.
+}
+assert (Ha'b : Nat.gcd a' b = 1%nat). {
+  rewrite Ha in Hab.
+  now apply Nat_eq_gcd_mul_1 in Hab.
+}
+specialize (H2 Ha'b H1).
+...
+rewrite Hc at 1.
+rewrite Ha at 1.
+rewrite Nat.gcd_mul_mono_r.
+...
+  assert (Hb : b = (b' * Nat.gcd a c)%nat). {
+    rewrite Hb', Nat.mul_comm.
+    rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+      apply Nat.gcd_divide_l.
+    }
+    now rewrite Nat.mul_comm, Nat.div_mul.
+  }
+  rewrite Ha in Hab.
+Nat.divide_div_mul_exact: ∀ a b c : nat, b ≠ 0%nat → Nat.divide b a → (c * a / b)%nat = (c * (a / b))%nat
+Search (_ / _)%nat.
+Search (_ / _ = _ / _)%nat.
+Search (_ / _ * _)%nat.
+rewrite
+...
 Search (Nat.gcd (_ / _)).
+Check Nat_gcd_mul_r.
 ...
 specialize (Nat.gcd_div_gcd a b (Nat.gcd a b) Habz eq_refl) as H1.
-specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hacz eq_refl) as H2.
 remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
 remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
 remember (b / Nat.gcd a b)%nat as b' eqn:Hb'.
