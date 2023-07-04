@@ -315,6 +315,43 @@ Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
+Check Nat.gcd_add_mult_diag_r.
+Search (Nat.gcd _ (_ + _))%nat.
+Search (Nat.gcd _ (_ - _))%nat.
+Check Nat.gauss.
+Search (Nat.gcd _ (_ *  _))%nat.
+Theorem glop :
+  ∀ a b c, (Nat.gcd a b = 1 → Nat.gcd a c = 1 → Nat.gcd a (b * c) = 1)%nat.
+Proof.
+intros * Hab Hac.
+destruct (Nat.eq_dec a 0%nat) as [Haz| Haz]. {
+  subst a.
+  now cbn in Hac, Hab; subst b c.
+}
+Search (Nat.gcd _ (_ * _))%nat.
+Search (Nat.gcd _ _ = 1)%nat.
+apply Nat.bezout_1_gcd.
+unfold Nat.Bezout.
+Search Nat.Bezout.
+apply Nat.neq_0_lt_0 in Haz.
+specialize (Nat.gcd_bezout_pos a b Haz) as H1.
+destruct H1 as (u & v & H1).
+rewrite Hab in H1.
+specialize (Nat.gcd_bezout_pos a c Haz) as H2.
+destruct H2 as (u' & v' & H2).
+rewrite Hac in H2.
+...
+rewrite <- Nat.gcd_add_mult_diag_r with (p := (b * c)%nat).
+rewrite (Nat.mul_comm b).
+remember (c * b * a)%nat as x.
+rewrite <- (Nat.mul_1_r c) at 1; subst x.
+rewrite <- Nat.mul_assoc.
+rewrite <- Nat.mul_add_distr_l.
+Search (Nat.gcd _ (_ * _))%nat.
+...
+Nat.gcd_add_mult_diag_r: ∀ n m p : nat, Nat.gcd n (m + p * n) = Nat.gcd n m
+...
+intros * Hab.
 unfold Nat.divide.
 remember (Nat.gcd a c) as d eqn:Hd; symmetry in Hd.
 remember (Nat.gcd a (b * c)) as e eqn:He; symmetry in He.
@@ -355,6 +392,16 @@ rewrite Hab in H1.
 destruct H1 as [H1| H1]. {
   destruct H1 as (u & v & Huv).
   move u before ec; move v before u.
+  apply -> (Nat.mul_cancel_l d e da). 2: {
+    intros H; subst da.
+    rewrite Nat.mul_0_l in Hda; subst a.
+    now rewrite Nat.mul_0_r in Huv.
+  }
+  rewrite <- Hda.
+  rewrite Hea.
+  f_equal.
+Search (Nat.gcd _ (_ + _)%nat).
+Nat.gcd_add_mult_diag_r: ∀ n m p : nat, Nat.gcd n (m + p * n) = Nat.gcd n m
 ...
 Theorem glop :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
