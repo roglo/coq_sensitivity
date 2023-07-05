@@ -274,7 +274,7 @@ symmetry in H3; rewrite Nat.add_comm in H3.
 easy.
 Qed.
 
-Theorem Nat_gcd_mul_r :
+Theorem Nat_gcd_mul_r_1 :
   ∀ a b c,
   Nat.gcd a b = 1%nat → Nat.gcd a c = 1%nat → Nat.gcd a (b * c) = 1%nat.
 Proof.
@@ -317,7 +317,7 @@ destruct H1 as [H1| H1]. {
 }
 Qed.
 
-Theorem Nat_gcd_1_gcd_mul_r :
+Theorem Nat_gcd_mul_r :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
@@ -332,12 +332,12 @@ destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hacz| Hacz]. {
 }
 destruct (Nat.eq_dec (Nat.gcd a c) 1) as [Hac1| Hac1]. {
   rewrite Hac1; symmetry.
-  now apply Nat_gcd_mul_r.
+  now apply Nat_gcd_mul_r_1.
 }
 specialize (Nat.gcd_div_gcd a c (Nat.gcd a c) Hacz eq_refl) as H1.
 remember (a / Nat.gcd a c)%nat as a' eqn:Ha'.
 remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
-specialize (Nat_gcd_mul_r a' b c') as H2.
+specialize (Nat_gcd_mul_r_1 a' b c') as H2.
 assert (Ha : a = (a' * Nat.gcd a c)%nat). {
   rewrite Ha', Nat.mul_comm.
   rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
@@ -421,7 +421,7 @@ assert (Hgp : ∀ x y,
   rewrite Pos2Nat.inj_sub; [ | easy ].
   rewrite (Nat.gcd_comm (_ - _)).
   symmetry.
-  rewrite (Nat_gcd_1_gcd_mul_r _ 2%nat). 2: {
+  rewrite (Nat_gcd_mul_r _ 2%nat). 2: {
     rewrite Nat.gcd_comm, Nat.add_comm, Nat.mul_comm.
     now rewrite Nat.gcd_add_mult_diag_r.
   }
@@ -461,7 +461,7 @@ destruct x as [x| x| ]; [ | | easy ]. {
     cbn in Hn.
     rewrite Pos2Nat.inj_xI.
     rewrite Pos2Nat.inj_xO.
-    rewrite <- Nat_gcd_1_gcd_mul_r. 2: {
+    rewrite <- Nat_gcd_mul_r. 2: {
       rewrite <- Nat.add_1_l, Nat.gcd_comm, Nat.mul_comm.
       apply Nat.gcd_add_mult_diag_r.
     }
@@ -479,7 +479,7 @@ destruct x as [x| x| ]; [ | | easy ]. {
     rewrite Pos2Nat.inj_xI.
     rewrite Pos2Nat.inj_xO.
     rewrite Nat.gcd_comm.
-    rewrite <- Nat_gcd_1_gcd_mul_r. 2: {
+    rewrite <- Nat_gcd_mul_r. 2: {
       rewrite <- Nat.add_1_l, Nat.gcd_comm, Nat.mul_comm.
       apply Nat.gcd_add_mult_diag_r.
     }
@@ -598,6 +598,7 @@ destruct H1 as [H1| H1]. {
   destruct H2 as [H2| H2]. {
     destruct H1 as (u1 & v1 & Huv1).
     destruct H2 as (u2 & v2 & Huv2).
+Check Nat_gcd_mul_r.
 ...
 Theorem Nat_div_gcd : ∀ a b c d,
   (d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
