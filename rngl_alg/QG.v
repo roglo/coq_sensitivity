@@ -366,6 +366,21 @@ rewrite H2.
 apply Nat.mul_1_l.
 Qed.
 
+Theorem Nat_div_gcd_1 : ∀ a b c d,
+  (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
+Proof.
+intros * Hadbc Hab Hcd.
+specialize (Nat.gauss a b c) as H1.
+rewrite <- Hadbc in H1.
+assert (H : Nat.divide a (a * d)) by (exists d; apply Nat.mul_comm).
+specialize (H1 H Hab); clear H.
+specialize (Nat.gauss c d a) as H2.
+rewrite Nat.mul_comm, Hadbc in H2.
+assert (H : Nat.divide c (b * c)) by now exists b.
+specialize (H2 H Hcd); clear H.
+now apply Nat.divide_antisym.
+Qed.
+
 (* should be added in coq library ZArith *)
 
 Theorem Z_mul_div_eq_l :
@@ -559,59 +574,12 @@ f_equal. {
     symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
     symmetry in Hxy.
 (**)
-Theorem Nat_div_gcd_1 : ∀ a b c d,
-  (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
-Proof.
-intros * Hadbc Hab Hcd.
-specialize (Nat.gcd_bezout a b) as H1.
-specialize (Nat.gcd_bezout c d) as H2.
-rewrite Hab in H1.
-rewrite Hcd in H2.
-destruct H1 as [H1| H1]. {
-  destruct H2 as [H2| H2]. {
-    destruct H1 as (u1 & v1 & Huv1).
-    destruct H2 as (u2 & v2 & Huv2).
-    apply (f_equal (Nat.mul (u2 * d))) in Huv1.
-    apply (f_equal (Nat.mul (u1 * b))) in Huv2.
-    rewrite Nat.mul_shuffle0 in Huv1, Huv2.
-    rewrite Nat.mul_assoc in Huv1, Huv2.
-    rewrite <- Nat.mul_assoc in Huv1, Huv2.
-    rewrite (Nat.mul_comm u2) in Huv1.
-    rewrite (Nat.mul_comm c) in Huv2.
-    rewrite Hadbc in Huv1.
-    rewrite Huv1 in Huv2.
-    do 2 rewrite Nat.mul_add_distr_l in Huv2.
-    do 2 rewrite Nat.mul_1_r in Huv2.
-    rewrite Nat.mul_shuffle0 in Huv2.
-    rewrite (Nat.mul_shuffle0 u1) in Huv2.
-    do 2 rewrite Nat.mul_assoc in Huv2.
-    rewrite <- (Nat.mul_shuffle0 (u1 * v2)) in Huv2.
-    do 2 rewrite <- (Nat.mul_assoc _ b d) in Huv2.
-...
-Search Nat.Bezout.
-Search (Nat.gcd _ _ = _)%nat.
-apply Nat.
-specialize Nat_gcd_mul_r as H1.
-specialize (H1 _ _ _ Hab Hcd).
-...
-Compute (
-  let a := 2 * 3 * 5 in
-  let b := 5 * 11 in
-  let c := 2 * 3 * 7 in
-  let d := 7 * 11 in
-  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
-Compute (
-  let a := 2 * 3 in
-  let b := 11 in
-  let c := 2 * 3 in
-  let d := 11 in
-  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
-...
-*)
+Check Nat_div_gcd_1.
 Theorem Nat_div_gcd : ∀ a b c d,
   (a * b * c * d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
 Proof.
 intros * Habcdz Hadbc.
+...
 destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]. {
   apply Nat.gcd_eq_0 in Habz.
   destruct Habz; subst a.
