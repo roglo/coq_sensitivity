@@ -654,14 +654,28 @@ destruct (Nat.eq_dec (Nat.gcd a b) 1) as [Hab1| Hb1]. {
     specialize (Nat.gcd_bezout c d) as H4.
     destruct H4 as [H4| H4]. {
       destruct H4 as (u' & v' & H4).
+(**)
+      destruct (lt_dec v v') as [Hvv| Hvv]. {
+        apply Nat.add_sub_eq_r; symmetry.
+...
       symmetry in H4.
       apply Nat.add_sub_eq_r in H4.
       rewrite <- H4.
       rewrite (Nat.mul_comm d).
+      destruct (le_dec (v' * d) (u' * c)) as [Hvu| Hvu]. 2: {
+        apply Nat.nle_gt in Hvu.
+        rewrite (proj2 (Nat.sub_0_le (u' * c) (v' * d))) in H4. 2: {
+          now apply Nat.lt_le_incl.
+        }
+        symmetry in H4.
+        now apply Nat.gcd_eq_0 in H4.
+      }
       apply Nat.add_sub_eq_r.
-      destruct (le_dec (v' * d) (u' * c)) as [Hvu| Hvu]. {
-        rewrite <- Nat.add_sub_swap; [ | easy ].
-        rewrite <- Nat.add_sub_assoc; [ | ].
+      rewrite <- Nat.add_sub_swap; [ | easy ].
+      destruct (le_dec v' v) as [Hvv| Hvv]. 2: {
+        apply Nat.nle_gt in Hvv.
+...
+      rewrite <- Nat.add_sub_assoc; [ | ].
 ...
 specialize (Nat.gcd_divide_l a b) as H1.
 specialize (Nat.gcd_divide_l c d) as H2.
