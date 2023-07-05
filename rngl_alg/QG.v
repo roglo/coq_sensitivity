@@ -589,8 +589,91 @@ Compute (
 ...
 *)
 Theorem Nat_div_gcd : ∀ a b c d,
-  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
+  (a * b * c * d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
 Proof.
+intros * Habcdz Hadbc.
+destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]. {
+  apply Nat.gcd_eq_0 in Habz.
+  destruct Habz; subst a.
+  now rewrite Nat.mul_0_l in Habcdz.
+}
+destruct (Nat.eq_dec (Nat.gcd c d) 0) as [Hcdz| Hcdz]. {
+  apply Nat.gcd_eq_0 in Hcdz.
+  destruct Hcdz; subst d.
+  now rewrite Nat.mul_0_r in Habcdz.
+}
+Theorem Nat_mul_gcd_cross : ∀ a b c d,
+  (a * d = b * c → a * Nat.gcd c d = c * Nat.gcd a b)%nat.
+Proof.
+intros * Hadbc.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
+  subst a; rewrite Nat.mul_0_l in Hadbc.
+  now symmetry; rewrite Nat.mul_comm.
+}
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+  subst b; cbn in Hadbc.
+  apply Nat.eq_mul_0 in Hadbc.
+  destruct Hadbc; subst; [ easy | ].
+  do 2 rewrite Nat.gcd_0_r.
+  apply Nat.mul_comm.
+}
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  now subst c; rewrite Nat.mul_0_r in Hadbc; cbn.
+}
+destruct (Nat.eq_dec d 0) as [Hdz| Hdz]. {
+  subst d; rewrite Nat.mul_0_r in Hadbc.
+  rewrite Nat.gcd_0_r.
+  symmetry in Hadbc; apply Nat.eq_mul_0 in Hadbc.
+  destruct Hadbc; [ easy | subst c ].
+  now rewrite Nat.mul_comm.
+}
+destruct (Nat.eq_dec (Nat.gcd a b) 1) as [Hab1| Hb1]. {
+  rewrite Hab1, Nat.mul_1_r.
+  specialize (Nat.gcd_bezout a b) as H1.
+  rewrite Hab1 in H1.
+  destruct H1 as [H1| H1]. {
+    destruct H1 as (u & v & H1).
+    generalize Hadbc; intros H2.
+    apply (f_equal (Nat.mul d)) in H1.
+    apply (f_equal (Nat.mul u)) in H2.
+    rewrite Nat.mul_comm, <- Nat.mul_assoc in H1.
+    rewrite H2 in H1.
+    rewrite Nat.mul_add_distr_l in H1.
+    rewrite Nat.mul_1_r in H1.
+    symmetry in H1.
+    apply Nat.add_sub_eq_r in H1.
+    rewrite Nat.mul_assoc, Nat.mul_shuffle0 in H1.
+    rewrite Nat.mul_assoc, <- Nat.mul_sub_distr_r in H1.
+    generalize Hadbc; intros H3.
+    rewrite <- H1 in H3.
+    rewrite (Nat.mul_comm b) in H3.
+    rewrite Nat.mul_assoc in H3.
+    apply Nat.mul_cancel_r in H3; [ | easy ].
+    rewrite <- H3 at 2.
+    f_equal; symmetry.
+    specialize (Nat.gcd_bezout c d) as H4.
+    destruct H4 as [H4| H4]. {
+      destruct H4 as (u' & v' & H4).
+      symmetry in H4.
+      apply Nat.add_sub_eq_r in H4.
+      rewrite <- H4.
+      rewrite (Nat.mul_comm d).
+      apply Nat.add_sub_eq_r.
+      destruct (le_dec (v' * d) (u' * c)) as [Hvu| Hvu]. {
+        rewrite <- Nat.add_sub_swap; [ | easy ].
+        rewrite <- Nat.add_sub_assoc; [ | ].
+...
+specialize (Nat.gcd_divide_l a b) as H1.
+specialize (Nat.gcd_divide_l c d) as H2.
+destruct H1 as (u & Ha).
+destruct H2 as (v & Hc).
+move u before d; move v before u.
+rewrite Ha at 1; rewrite Hc at 1.
+rewrite Nat.div_mul; [ | easy ].
+rewrite Nat.div_mul; [ | easy ].
+rewrite Ha, Hc in Hadbc.
+Search (Nat.gcd _ _ * Nat.gcd _ _)%nat.
+...
 intros * Hadbc.
 specialize (Nat.gcd_bezout a b) as H1.
 specialize (Nat.gcd_bezout c d) as H2.
