@@ -558,7 +558,7 @@ f_equal. {
     do 2 rewrite Pos2Nat.inj_mul in Hxy.
     symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
     symmetry in Hxy.
-(*
+(**)
 Theorem Nat_div_gcd_1 : ∀ a b c d,
   (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
 Proof.
@@ -573,6 +573,20 @@ destruct H1 as [H1| H1]. {
     destruct H2 as (u2 & v2 & Huv2).
     apply (f_equal (Nat.mul (u2 * d))) in Huv1.
     apply (f_equal (Nat.mul (u1 * b))) in Huv2.
+    rewrite Nat.mul_shuffle0 in Huv1, Huv2.
+    rewrite Nat.mul_assoc in Huv1, Huv2.
+    rewrite <- Nat.mul_assoc in Huv1, Huv2.
+    rewrite (Nat.mul_comm u2) in Huv1.
+    rewrite (Nat.mul_comm c) in Huv2.
+    rewrite Hadbc in Huv1.
+    rewrite Huv1 in Huv2.
+    do 2 rewrite Nat.mul_add_distr_l in Huv2.
+    do 2 rewrite Nat.mul_1_r in Huv2.
+    rewrite Nat.mul_shuffle0 in Huv2.
+    rewrite (Nat.mul_shuffle0 u1) in Huv2.
+    do 2 rewrite Nat.mul_assoc in Huv2.
+    rewrite <- (Nat.mul_shuffle0 (u1 * v2)) in Huv2.
+    do 2 rewrite <- (Nat.mul_assoc _ b d) in Huv2.
 ...
 Search Nat.Bezout.
 Search (Nat.gcd _ _ = _)%nat.
@@ -585,6 +599,12 @@ Compute (
   let b := 5 * 11 in
   let c := 2 * 3 * 7 in
   let d := 7 * 11 in
+  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
+Compute (
+  let a := 2 * 3 in
+  let b := 11 in
+  let c := 2 * 3 in
+  let d := 11 in
   (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
 ...
 *)
