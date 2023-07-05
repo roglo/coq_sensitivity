@@ -573,18 +573,19 @@ destruct H1 as [H1| H1]. {
     destruct H2 as (u2 & v2 & Huv2).
     apply (f_equal (Nat.mul (u2 * d))) in Huv1.
     apply (f_equal (Nat.mul (u1 * b))) in Huv2.
-Compute (
-  let a := 15 in
-  let b := 10 in
-  let c := 3 in
-  let d := 2 in
-  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
 ...
 Search Nat.Bezout.
 Search (Nat.gcd _ _ = _)%nat.
 apply Nat.
 specialize Nat_gcd_mul_r as H1.
 specialize (H1 _ _ _ Hab Hcd).
+...
+Compute (
+  let a := 2 * 3 * 5 in
+  let b := 5 * 11 in
+  let c := 2 * 3 * 7 in
+  let d := 7 * 11 in
+  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
 ...
 *)
 Theorem Nat_div_gcd : ∀ a b c d,
