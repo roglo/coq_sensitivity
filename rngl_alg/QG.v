@@ -558,10 +558,45 @@ f_equal. {
     do 2 rewrite Pos2Nat.inj_mul in Hxy.
     symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
     symmetry in Hxy.
+(*
+Theorem Nat_div_gcd_1 : ∀ a b c d,
+  (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
+Proof.
+intros * Hadbc Hab Hcd.
+specialize (Nat.gcd_bezout a b) as H1.
+specialize (Nat.gcd_bezout c d) as H2.
+rewrite Hab in H1.
+rewrite Hcd in H2.
+destruct H1 as [H1| H1]. {
+  destruct H2 as [H2| H2]. {
+    destruct H1 as (u1 & v1 & Huv1).
+    destruct H2 as (u2 & v2 & Huv2).
+    apply (f_equal (Nat.mul (u2 * d))) in Huv1.
+    apply (f_equal (Nat.mul (u1 * b))) in Huv2.
+Compute (
+  let a := 15 in
+  let b := 10 in
+  let c := 3 in
+  let d := 2 in
+  (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d))%nat.
+...
+Search Nat.Bezout.
+Search (Nat.gcd _ _ = _)%nat.
+apply Nat.
+specialize Nat_gcd_mul_r as H1.
+specialize (H1 _ _ _ Hab Hcd).
+...
+*)
 Theorem Nat_div_gcd : ∀ a b c d,
   (a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
 Proof.
 intros * Hadbc.
+specialize (Nat.gcd_bezout a b) as H1.
+specialize (Nat.gcd_bezout c d) as H2.
+destruct H1 as [H1| H1]. {
+  destruct H2 as [H2| H2]. {
+    destruct H1 as (u1 & v1 & Huv1).
+    destruct H2 as (u2 & v2 & Huv2).
 ...
 Theorem Nat_div_gcd : ∀ a b c d,
   (d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
