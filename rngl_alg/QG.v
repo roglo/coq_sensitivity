@@ -624,6 +624,10 @@ remember (Z.pos xn) as a.
 remember (Z.pos xd) as b.
 remember (Z.pos yn) as c.
 remember (Z.pos yd) as d.
+Search (_ / Z.gcd _ _)%Z.
+...
+Theorem Z_div_gcd :
+...
     apply Z_mul_div_eq_l; [ now subst a b | ].
 Search (positive → nat).
 ...
