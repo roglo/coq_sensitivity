@@ -824,6 +824,38 @@ f_equal. {
   }
 }
 Qed.
+Theorem QG_of_Q_add_idemp_l :
+  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
+Proof.
+intros.
+intros; cbn.
+destruct a as (an, ad).
+destruct b as (bn, bd).
+cbn.
+unfold Z_pos_gcd.
+destruct an as [| an| an]; cbn. {
+  rewrite Z.div_same; [ cbn | easy ].
+  rewrite Qplus_0_l.
+  progress unfold "+"%Q; cbn.
+  rewrite Z.mul_comm.
+  now rewrite Qreduce_l.
+} {
+  rewrite Pos2Z.inj_gcd.
+  now rewrite Q_num_den_div_gcd.
+} {
+  rewrite Pos2Z.inj_gcd.
+  rewrite <- Z.gcd_opp_l.
+  now rewrite Q_num_den_div_gcd.
+}
+Qed.
+
+Theorem QG_of_Q_add_idemp_r :
+  ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
+intros.
+rewrite Qplus_comm.
+rewrite (Qplus_comm a).
+apply QG_of_Q_add_idemp_l.
+Qed.
 
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
@@ -852,72 +884,7 @@ Proof.
 intros.
 apply eq_QG_eq.
 unfold QG_add.
-Search (QG_of_Q (_ + QG_of_Q _)).
-Theorem QG_of_Q_add_idemp_r :
-  ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
-Proof.
-intros; cbn.
-destruct a as (an, ad).
-destruct b as (bn, bd).
-cbn.
-unfold Z_pos_gcd.
-destruct bn as [| bn| bn]; cbn. {
-  rewrite Z.div_same; [ cbn | easy ].
-  rewrite Qplus_0_r.
-  progress unfold "+"%Q; cbn.
-  rewrite Z.add_0_r.
-  now rewrite Qreduce_r.
-} {
-  rewrite Pos2Z.inj_gcd.
-  now rewrite Q_num_den_div_gcd.
-} {
-  rewrite Pos2Z.inj_gcd.
-...
-Check Qreduce_r.
-Search (_ / _ # _ / _)%Q.
-Search (_ # Z.to_pos _).
-remember (Z.pos (Pos.gcd bn bd)) as g eqn:Hg.
-Search (Z.to_pos (_ / _)).
-...
-Theorem QG_of_Q_add_idemp_l :
-  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
-Proof.
-intros; cbn.
-... ...
 rewrite QG_of_Q_add_idemp_r.
 rewrite QG_of_Q_add_idemp_l.
 now rewrite Qplus_assoc.
 Qed.
-
-Inspect 1.
-... ...
-apply glop.
-apply Qplus_assoc.
-...
-remember (Z.pos (Z_pos_gcd _ _)) as XXXXX in |-*.
-remember (Z.pos (Z_pos_gcd _ _)) as YYYYY in |-*.
-remember (Z.pos (Z_pos_gcd _ _)) as ZZZZZ in |-*.
-remember (Z.pos (Z_pos_gcd _ _)) as TTTTT in |-*.
-f_equal.
-...
-remember (Z.pos _) as YYYYY in |-*.
-remember (Z.pos _) as ZZZZZ in |-*.
-...
-f_equal. {
-  f_equal. {
-...
-  f_equal; [ apply Z.add_comm | ].
-  f_equal.
-  f_equal; [ apply Z.add_comm | apply Pos.mul_comm ].
-} {
-  f_equal.
-  f_equal; [ f_equal; apply Pos.mul_comm | ].
-  f_equal.
-  progress unfold Z_pos_gcd.
-  rewrite Z.add_comm.
-  remember (_ + _)%Z as x.
-  destruct x; [ apply Pos.mul_comm | | ]; now rewrite Pos.mul_comm.
-}
-Qed.
-
-...
