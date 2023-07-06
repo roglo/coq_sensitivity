@@ -612,12 +612,27 @@ f_equal. {
     progress unfold Qeq in Hxy.
     cbn in Hxy.
     do 2 rewrite Pos2Z.inj_mul in Hxy.
+    symmetry in Hxy; rewrite Z.mul_comm in Hxy.
+    symmetry in Hxy.
+(*
     apply (f_equal Z.to_nat) in Hxy.
     cbn in Hxy.
     do 2 rewrite Pos2Nat.inj_mul in Hxy.
-    symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
-    symmetry in Hxy.
-Search (_ / _ * _)%Z.
+*)
+(**)
+    do 2 rewrite Pos2Z.inj_gcd.
+Theorem Z_div_gcd : ∀ a b c d : Z,
+  (a * b * c * d)%Z ≠ 0%Z
+  → (a * d)%Z = (b * c)%Z
+  → (a / Z.gcd a b)%Z = (c / Z.gcd c d)%Z.
+Proof.
+intros * Habcdz Hadbc.
+... ...
+    now apply Z_div_gcd.
+...
+  ============================
+  (Z.pos xn * Z.pos yd)%Z = (Z.pos xd * Z.pos yn)%Z
+
 ...
 Print Z.div.
 unfold Z.div.
@@ -694,13 +709,6 @@ remember (Z.pos yn) as c.
 remember (Z.pos yd) as d.
 Search (_ / Z.gcd _ _)%Z.
 Check Nat_div_gcd.
-Theorem Z_div_gcd : ∀ a b c d : Z,
-  (a * b * c * d)%Z ≠ 0%Z
-  → (a * d)%Z = (b * c)%Z
-  → (a / Z.gcd a b)%Z = (c / Z.gcd c d)%Z.
-Proof.
-intros * Habcdz Hadbc.
-...
 Z_of_nat_gcd: ∀ a b : nat, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b)
 ...
     apply Z_mul_div_eq_l; [ now subst a b | ].
