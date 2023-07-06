@@ -1,4 +1,4 @@
-(* Attempt to implement rationals with the normal rationals of
+(* implementation of rationals with the normal rationals of
    coq (library QArith) together with a field saying that the
    numerator and the denominator are coprimes. This allows to
    use normal equality instead of ==. Therefore rewrite is
@@ -824,6 +824,7 @@ f_equal. {
   }
 }
 Qed.
+
 Theorem QG_of_Q_add_idemp_l :
   ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
 Proof.
@@ -857,6 +858,39 @@ rewrite (Qplus_comm a).
 apply QG_of_Q_add_idemp_l.
 Qed.
 
+Theorem QG_of_Q_mul_idemp_l :
+  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) * b) = QG_of_Q (a * b).
+Proof.
+intros.
+intros; cbn.
+destruct a as (an, ad).
+destruct b as (bn, bd).
+cbn.
+progress unfold Z_pos_gcd.
+destruct an as [| an| an]; cbn. {
+  rewrite Z.div_same; [ cbn | easy ].
+  rewrite Qmult_0_l.
+  progress unfold "*"%Q; cbn.
+  symmetry.
+  now rewrite Qreduce_zero.
+} {
+  rewrite Pos2Z.inj_gcd.
+  now rewrite Q_num_den_div_gcd.
+} {
+  rewrite Pos2Z.inj_gcd.
+  rewrite <- Z.gcd_opp_l.
+  now rewrite Q_num_den_div_gcd.
+}
+Qed.
+
+Theorem QG_of_Q_mul_idemp_r :
+  ∀ a b, QG_of_Q (a * qg_q (QG_of_Q b)) = QG_of_Q (a * b).
+intros.
+rewrite Qmult_comm.
+rewrite (Qmult_comm a).
+apply QG_of_Q_mul_idemp_l.
+Qed.
+
 Theorem QG_of_q_qg_q : ∀ a, QG_of_Q (qg_q a) = a.
 Proof.
 intros.
@@ -870,7 +904,7 @@ Qed.
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
-Definition QG_inv (a : QG) := QG_of_Q (1 / qg_q a).
+Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
 
 Theorem QG_add_comm : ∀ a b, QG_add a b = QG_add b a.
 Proof.
@@ -918,10 +952,9 @@ Theorem QG_mul_assoc : ∀ a b c, QG_mul a (QG_mul b c) = QG_mul (QG_mul a b) c.
 Proof.
 intros.
 progress unfold QG_mul.
-...
 rewrite QG_of_Q_mul_idemp_r.
-rewrite QG_of_Q_add_idemp_l.
-now rewrite Qplus_assoc.
+rewrite QG_of_Q_mul_idemp_l.
+now rewrite Qmult_assoc.
 Qed.
 
 Definition QG_1 := QG_of_Q 1.
@@ -929,16 +962,34 @@ Definition QG_1 := QG_of_Q 1.
 Theorem QG_mul_1_l : ∀ a, QG_mul QG_1 a = a.
 Proof.
 intros.
-progress unfold QG_add.
-rewrite Qplus_0_l.
+progress unfold QG_mul.
+rewrite Qmult_1_l.
 apply QG_of_q_qg_q.
 Qed.
 
-Theorem QG_mul_inv_l : ∀ a, QG_mul (QG_inv a) a = QG_1.
+Theorem QG_mul_inv_l : ∀ a, a ≠ QG_0 → QG_mul (QG_inv a) a = QG_1.
+Proof.
+intros * Haz.
+progress unfold QG_mul.
+progress unfold QG_inv.
+rewrite Qmult_comm.
+rewrite QG_of_Q_mul_idemp_r.
+rewrite Qmult_inv_r; [ easy | ].
+intros H1.
+apply Haz; clear Haz.
+rewrite <- (QG_of_q_qg_q a).
+rewrite <- QG_of_q_qg_q.
+now rewrite H1.
+Qed.
+
+Theorem QG_mul_add_distr_l : ∀ a b c,
+  QG_mul a (QG_add b c) = QG_add (QG_mul a b) (QG_mul a c).
 Proof.
 intros.
-progress unfold QG_add, QG_opp.
-rewrite Qplus_comm.
+progress unfold QG_mul.
+progress unfold QG_add.
+rewrite QG_of_Q_mul_idemp_r.
+rewrite QG_of_Q_add_idemp_l.
 rewrite QG_of_Q_add_idemp_r.
-now rewrite Qplus_opp_r.
+now rewrite Qmult_plus_distr_r.
 Qed.
