@@ -717,32 +717,40 @@ progress unfold "=="; cbn.
 remember (Z.pos y) as z.
 assert (Hzz : (0 < z)%Z) by now subst z.
 clear y Heqz; rename z into y.
-rewrite Z2Pos.id.
+rewrite Z2Pos.id. 2: {
+  specialize (Z.gcd_divide_r x y) as H1.
+  destruct H1 as (k, Hk).
+  rewrite Hk at 1.
+  rewrite Z.div_mul. 2: {
+    intros H.
+    apply Z.gcd_eq_0 in H.
+    now destruct H; subst.
+  }
+  destruct k as [| k| k]; [ | easy | ]. {
+    now cbn in Hk; subst y.
+  } {
+    exfalso; apply Z.nle_gt in Hzz; apply Hzz; clear Hzz.
+    rewrite Hk; clear Hk.
+    specialize (Z.gcd_nonneg x y) as H1.
+    now destruct (Z.gcd x y).
+  }
+}
 rewrite Z.mul_comm.
-rewrite <- Z.divide_div_mul_exact.
-rewrite <- Z.divide_div_mul_exact.
+rewrite <- Z.divide_div_mul_exact; cycle 1. {
+  intros H.
+  apply Z.gcd_eq_0 in H.
+  now destruct H; subst.
+} {
+  apply Z.gcd_divide_l.
+}
+rewrite <- Z.divide_div_mul_exact; cycle 1. {
+  intros H.
+  apply Z.gcd_eq_0 in H.
+  now destruct H; subst.
+} {
+  apply Z.gcd_divide_r.
+}
 now rewrite Z.mul_comm.
-intros H.
-apply Z.gcd_eq_0 in H.
-now destruct H; subst.
-apply Z.gcd_divide_r.
-intros H.
-apply Z.gcd_eq_0 in H.
-now destruct H; subst.
-apply Z.gcd_divide_l.
-specialize (Z.gcd_divide_r x y) as H1.
-destruct H1 as (k, Hk).
-rewrite Hk at 1.
-rewrite Z.div_mul.
-destruct k as [| k| k]; [ | easy | ].
-now cbn in Hk; subst y.
-exfalso; apply Z.nle_gt in Hzz; apply Hzz; clear Hzz.
-rewrite Hk; clear Hk.
-specialize (Z.gcd_nonneg x y) as H1.
-now destruct (Z.gcd x y).
-intros H.
-apply Z.gcd_eq_0 in H.
-now destruct H; subst.
 Qed.
 
 Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
