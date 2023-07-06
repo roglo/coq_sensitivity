@@ -366,6 +366,7 @@ rewrite H2.
 apply Nat.mul_1_l.
 Qed.
 
+(*
 Theorem Nat_div_gcd_1 : ∀ a b c d,
   (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
 Proof.
@@ -380,6 +381,7 @@ assert (H : Nat.divide c (b * c)) by now exists b.
 specialize (H2 H Hcd); clear H.
 now apply Nat.divide_antisym.
 Qed.
+*)
 
 Theorem Nat_div_gcd : ∀ a b c d,
   (a * b * c * d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
@@ -397,6 +399,20 @@ assert (Hgcdz : gcd ≠ 0%nat). {
   apply Nat.gcd_eq_0 in H.
   now destruct H; subst d; rewrite Nat.mul_0_r in Habcdz.
 }
+(**)
+specialize (Nat.gauss (a / gab) (b / gab) (c / gcd)) as H1.
+rewrite Hgab in H1.
+rewrite Nat.gcd_div_gcd in H1; [ | congruence | easy ].
+...
+rewrite <- Hadbc in H1.
+assert (H : Nat.divide a (a * d)) by (exists d; apply Nat.mul_comm).
+specialize (H1 H Hab); clear H.
+specialize (Nat.gauss c d a) as H2.
+rewrite Nat.mul_comm, Hadbc in H2.
+assert (H : Nat.divide c (b * c)) by now exists b.
+specialize (H2 H Hcd); clear H.
+now apply Nat.divide_antisym.
+...
 apply Nat_div_gcd_1 with (b := (b / gab)%nat) (d := (d / gcd)%nat); cycle 1. {
   now apply Nat.gcd_div_gcd.
 } {
@@ -599,6 +615,17 @@ destruct x as [| x| x]. {
 }
 Qed.
 
+Theorem Z_div_gcd : ∀ a b c d : Z,
+  (0 < a)%Z
+  → (0 < b)%Z
+  → (0 < c)%Z
+  → (0 < d)%Z
+  → (a * d)%Z = (b * c)%Z
+  → (a / Z.gcd a b)%Z = (c / Z.gcd c d)%Z.
+Proof.
+intros * Hap Hbp Hcp Hdp Hadbc.
+...
+
 (* end of should be added in coq library ZArith *)
 
 Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
@@ -621,12 +648,8 @@ f_equal. {
 *)
 (**)
     do 2 rewrite Pos2Z.inj_gcd.
-Theorem Z_div_gcd : ∀ a b c d : Z,
-  (a * b * c * d)%Z ≠ 0%Z
-  → (a * d)%Z = (b * c)%Z
-  → (a / Z.gcd a b)%Z = (c / Z.gcd c d)%Z.
-Proof.
-intros * Habcdz Hadbc.
+Check Nat_div_gcd.
+Check Z_div_gcd.
 ... ...
     now apply Z_div_gcd.
 ...
