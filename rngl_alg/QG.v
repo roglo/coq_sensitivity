@@ -735,150 +735,50 @@ f_equal. {
     do 2 rewrite Pos2Z.inj_gcd.
     do 2 rewrite <- Pos2Z.opp_pos.
     rewrite Z.div_opp_l_z; [ | easy | ]. 2: {
-specialize (Z.gcd_divide_l (Z.pos xn) (Z.pos xd)) as H1.
-...
-Search (_ mod Z.gcd _ _)%Z.
-Search (_ / Z.gcd _ _)%Z.
-easy.
-rewrite Zdiv.Z_div_zero
-...
-    apply Z_div_gcd.
+      apply Z.mod_divide; [ easy | ].
+      apply Z.gcd_divide_l.
+    }
+    rewrite Z.div_opp_l_z; [ | easy | ]. 2: {
+      apply Z.mod_divide; [ easy | ].
+      apply Z.gcd_divide_l.
+    }
+    f_equal.
     now apply Z_div_gcd.
-...
-Print Z.div.
-unfold Z.div.
-Search Z.div_eucl.
-Theorem Z_div_eucl_div :
-  ∀ a b c d, Z.div_eucl a b = Z.div_eucl c d → (a / b = c / d)%Z.
-Proof.
-intros * Habcd.
-unfold Z.div.
-destruct (Z.div_eucl a b).
-destruct (Z.div_eucl c d).
-now injection Habcd.
-Qed.
-apply Z_div_eucl_div.
-Check Pos.divide.
-Theorem glop :
-  Pos.divide x y → Z.div_eucl (Z.pos x) (Z.pos y)
-cbn.
-Search Z.pos_div_eucl.
-Theorem glop :
-  ∀ x y, Z.pos_div_eucl x (Z.pos y) = (0, 0)%Z.
-Proof.
-intros.
-destruct x as [x| x| ]. {
-  cbn.
-  remember (Z.pos_div_eucl x (Z.pos y)) as qr eqn:Hqr.
-  symmetry in Hqr.
-  destruct qr as (q, r).
-  destruct r as [| r| r]. {
-    cbn.
-...
-destruct xn as [xn| xn| ]. {
-  cbn - [ Pos.gcd ].
-...
-Search Z.div_eucl.
-Print Z.div_eucl.
-cbn.
-...
-Search Pos.gcd.
-Nat_gcd_pos: ∀ x y : positive, Nat.gcd (Pos.to_nat x) (Pos.to_nat y) = Pos.to_nat (Pos.gcd x y)
-Theorem Z_pos_div :
-  ∀ x y, (Z.pos x / y = fst (Z.pos_div_eucl x y))%Z.
-Proof.
-intros.
-unfold Z.div.
-unfold Z.div_eucl.
-destruct y as [| y| y]; [ | easy | ]. {
-  destruct x as [x| x| ]; cbn. {
-    remember (Z.pos_div_eucl x 0) as qr eqn:Hqr.
-    symmetry in Hqr.
-    destruct qr as (q, r).
-    destruct r as [| r| r]. {
-      cbn.
-      destruct
-...
-Compute (
-  let x := 28%positive in
-  let y := 3%positive in
-  (Z.pos x / Z.pos y = fst (Z.pos_div_eucl x (Z.pos y))))%Z.
-...
-Locate "/".
-Print Z.div_eucl.
-Check Z.pos_div_eucl.
-Search Z.pos_div_eucl.
-Search (Z.pos _ / Z.pos _)%Z.
-Search (_ / _)%positive.
-...
+  }
+} {
+  progress unfold "==" in Hxy.
+  cbn in Hxy.
+  f_equal.
+  progress unfold Z_pos_gcd.
+  destruct xn as [| xn| xn]; cbn. {
+    destruct yn as [| yn| yn]; cbn; [ | easy | easy ].
+    rewrite Z.div_same; [ | easy ].
+    rewrite Z.div_same; [ | easy ].
+    easy.
+  } {
+    destruct yn as [| yn| yn]; cbn; [ easy | | easy ].
     do 2 rewrite Pos2Z.inj_gcd.
-...
-(**)
-remember (Z.pos xn) as a.
-remember (Z.pos xd) as b.
-remember (Z.pos yn) as c.
-remember (Z.pos yd) as d.
-Search (_ / Z.gcd _ _)%Z.
-Check Nat_div_gcd.
-Z_of_nat_gcd: ∀ a b : nat, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b)
-...
-    apply Z_mul_div_eq_l; [ now subst a b | ].
-Search (positive → nat).
-...
-specialize (Z.div_mod a (Z.gcd a b)) as H1.
-assert (H : Z.gcd a b ≠ 0%Z) by now subst a b d.
-specialize (H1 H); clear H.
-rewrite H1 at 1.
-Search ((_ * _ + _) / _)%Z.
-rewrite Z.mul_comm.
-rewrite Z.div_add_l.
-
-specialize (H1 (Z.pos xn)).
-...
-    apply Z_mul_div_eq_l; [ easy | ].
-Search (_ * (_ / _))%Z.
-...
-    specialize (Z.gcd_divide_l (Z.pos xn) (Z.pos xd)) as H1.
-    apply Znumtheory.Zdivide_Zdiv_eq in H1.
-Search (_ | _)%Z.
-Znumtheory.Zdivide_Zdiv_eq: ∀ a b : Z, (0 < a)%Z → (a | b)%Z → b = (a * (b / a))%Z
-specia
-Z.gcd_divide_r: ∀ a b : Z, (Z.gcd a b | b)%Z
-Search (_ = _ / _)%Q.
-Search Z.gcd.
-...
-Search (_ / _)%Q.
-remember (Z.pos xn) as a.
-remember (Z.pos xd) as b.
-Search (_ / Z.gcd _ _)%Z.
-Search (Z.pos (_ * _)).
-...
-intros (xn, xd) (yn, yd) Hxy.
-progress unfold "=="%Q in Hxy.
-cbn in Hxy.
-apply eq_QG_eq; cbn.
-...
-intros a b Hab.
-unfold "=="%Q in Hab.
-destruct a as (an, ad).
-destruct b as (bn, bd).
-cbn in Hab.
-progress unfold QG_of_Q.
-cbn.
-apply eq_QG_eq; cbn.
-...
-
-(*
-Theorem glop : ∀ q1 q2, q1 == q2 ↔ qg_q (QG_of_Q q1) = qg_q (QG_of_Q q2).
-Proof.
-intros.
-split; intros Hq. {
-  setoid_rewrite Hq.
-...
-split; intros Hq. 2: {
-  apply eq_QG_eq in Hq.
-...
-*)
+    rewrite Z.gcd_comm.
+    rewrite (Z.gcd_comm (Z.pos yn)).
+    symmetry in Hxy.
+    rewrite Z.mul_comm in Hxy.
+    now apply Z_div_gcd.
+  } {
+    destruct yn as [| yn| yn]; cbn; [ easy | easy | ].
+    do 2 rewrite <- Pos2Z.opp_pos in Hxy.
+    do 2 rewrite Z.mul_opp_l in Hxy.
+    injection Hxy; clear Hxy; intros Hxy.
+    apply (f_equal Z.pos) in Hxy.
+    do 2 rewrite Pos2Z.inj_mul in Hxy.
+    do 2 rewrite Pos2Z.inj_gcd.
+    rewrite Z.gcd_comm.
+    rewrite (Z.gcd_comm (Z.pos yn)).
+    symmetry in Hxy.
+    rewrite Z.mul_comm in Hxy.
+    now apply Z_div_gcd.
+  }
+}
+Qed.
 
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
@@ -912,16 +812,18 @@ Theorem QG_of_Q_add_idemp_r :
   ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
 Proof.
 intros; cbn.
-Admitted.
+...
 Theorem QG_of_Q_add_idemp_l :
   ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
 Proof.
 intros; cbn.
-Admitted.
 ... ...
 rewrite QG_of_Q_add_idemp_r.
 rewrite QG_of_Q_add_idemp_l.
 now rewrite Qplus_assoc.
+Qed.
+
+Inspect 1.
 ... ...
 apply glop.
 apply Qplus_assoc.
