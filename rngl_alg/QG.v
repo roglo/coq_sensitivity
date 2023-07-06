@@ -708,6 +708,43 @@ Qed.
 
 (* end of should be added in coq library ZArith *)
 
+Theorem Q_num_den_div_gcd :
+  ∀ x y,
+  x / Z.gcd x (Z.pos y) # Z.to_pos (Z.pos y / Z.gcd x (Z.pos y)) == x # y.
+Proof.
+intros.
+progress unfold "=="; cbn.
+remember (Z.pos y) as z.
+assert (Hzz : (0 < z)%Z) by now subst z.
+clear y Heqz; rename z into y.
+rewrite Z2Pos.id.
+rewrite Z.mul_comm.
+rewrite <- Z.divide_div_mul_exact.
+rewrite <- Z.divide_div_mul_exact.
+now rewrite Z.mul_comm.
+intros H.
+apply Z.gcd_eq_0 in H.
+now destruct H; subst.
+apply Z.gcd_divide_r.
+intros H.
+apply Z.gcd_eq_0 in H.
+now destruct H; subst.
+apply Z.gcd_divide_l.
+specialize (Z.gcd_divide_r x y) as H1.
+destruct H1 as (k, Hk).
+rewrite Hk at 1.
+rewrite Z.div_mul.
+destruct k as [| k| k]; [ | easy | ].
+now cbn in Hk; subst y.
+exfalso; apply Z.nle_gt in Hzz; apply Hzz; clear Hzz.
+rewrite Hk; clear Hk.
+specialize (Z.gcd_nonneg x y) as H1.
+now destruct (Z.gcd x y).
+intros H.
+apply Z.gcd_eq_0 in H.
+now destruct H; subst.
+Qed.
+
 Global Instance GQ_of_eq_morph : Proper (Qeq ==> eq) QG_of_Q.
 Proof.
 intros (xn, xd) (yn, yd) Hxy.
@@ -823,7 +860,10 @@ destruct bn as [| bn| bn]; cbn. {
   rewrite Z.add_0_r.
   now rewrite Qreduce_r.
 } {
-  unfold Z.to_pos.
+  rewrite Pos2Z.inj_gcd.
+  now rewrite Q_num_den_div_gcd.
+} {
+  rewrite Pos2Z.inj_gcd.
 ...
 Check Qreduce_r.
 Search (_ / _ # _ / _)%Q.
