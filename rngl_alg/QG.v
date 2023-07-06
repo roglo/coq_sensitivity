@@ -450,7 +450,7 @@ Theorem Nat_gcd_pos :
   ∀ x y, Nat.gcd (Pos.to_nat x) (Pos.to_nat y) = Pos.to_nat (Pos.gcd x y).
 Proof.
 intros.
-unfold Pos.gcd.
+progress unfold Pos.gcd.
 remember (Pos.size_nat x + Pos.size_nat y)%nat as n eqn:Hn.
 assert (H : (Pos.size_nat x + Pos.size_nat y ≤ n)%nat). {
   now rewrite Hn; apply Nat.le_refl.
@@ -566,7 +566,7 @@ Theorem Z_of_nat_gcd :
   ∀ a b, Z.of_nat (Nat.gcd a b) = Z.gcd (Z.of_nat a) (Z.of_nat b).
 Proof.
 intros.
-unfold Z.gcd.
+progress unfold Z.gcd.
 remember (Z.of_nat a) as x eqn:Hx; symmetry in Hx.
 destruct x as [| x| x]. {
   rewrite Z_abs_of_nat.
@@ -758,7 +758,7 @@ Proof.
 intros (xn, xd) (yn, yd) Hxy.
 apply eq_QG_eq; cbn.
 f_equal. {
-  unfold Z_pos_gcd.
+  progress unfold Z_pos_gcd.
   destruct xn as [| xn| xn]; [ now destruct yn | | ]. {
     destruct yn as [| yn| yn]; [ easy | | easy ].
     progress unfold Qeq in Hxy.
@@ -832,7 +832,7 @@ intros; cbn.
 destruct a as (an, ad).
 destruct b as (bn, bd).
 cbn.
-unfold Z_pos_gcd.
+progress unfold Z_pos_gcd.
 destruct an as [| an| an]; cbn. {
   rewrite Z.div_same; [ cbn | easy ].
   rewrite Qplus_0_l.
@@ -857,34 +857,88 @@ rewrite (Qplus_comm a).
 apply QG_of_Q_add_idemp_l.
 Qed.
 
+Theorem QG_of_q_qg_q : ∀ a, QG_of_Q (qg_q a) = a.
+Proof.
+intros.
+apply eq_QG_eq.
+destruct a as (a, ap); cbn.
+rewrite ap.
+do 2 rewrite Z.div_1_r.
+now destruct a.
+Qed.
+
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
+Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
+Definition QG_inv (a : QG) := QG_of_Q (1 / qg_q a).
 
 Theorem QG_add_comm : ∀ a b, QG_add a b = QG_add b a.
 Proof.
 intros.
-apply eq_QG_eq; cbn.
-f_equal. {
-  f_equal; [ apply Z.add_comm | ].
-  f_equal.
-  f_equal; [ apply Z.add_comm | apply Pos.mul_comm ].
-} {
-  f_equal.
-  f_equal; [ f_equal; apply Pos.mul_comm | ].
-  f_equal.
-  progress unfold Z_pos_gcd.
-  rewrite Z.add_comm.
-  remember (_ + _)%Z as x.
-  destruct x; [ apply Pos.mul_comm | | ]; now rewrite Pos.mul_comm.
-}
+progress unfold QG_add.
+now rewrite Qplus_comm.
 Qed.
 
 Theorem QG_add_assoc : ∀ a b c, QG_add a (QG_add b c) = QG_add (QG_add a b) c.
 Proof.
 intros.
-apply eq_QG_eq.
-unfold QG_add.
+progress unfold QG_add.
 rewrite QG_of_Q_add_idemp_r.
 rewrite QG_of_Q_add_idemp_l.
 now rewrite Qplus_assoc.
+Qed.
+
+Definition QG_0 := QG_of_Q 0.
+
+Theorem QG_add_0_l : ∀ a, QG_add QG_0 a = a.
+Proof.
+intros.
+progress unfold QG_add.
+rewrite Qplus_0_l.
+apply QG_of_q_qg_q.
+Qed.
+
+Theorem QG_add_opp_l : ∀ a, QG_add (QG_opp a) a = QG_0.
+Proof.
+intros.
+progress unfold QG_add, QG_opp.
+rewrite Qplus_comm.
+rewrite QG_of_Q_add_idemp_r.
+now rewrite Qplus_opp_r.
+Qed.
+
+Theorem QG_mul_comm : ∀ a b, QG_mul a b = QG_mul b a.
+Proof.
+intros.
+progress unfold QG_mul.
+now rewrite Qmult_comm.
+Qed.
+
+Theorem QG_mul_assoc : ∀ a b c, QG_mul a (QG_mul b c) = QG_mul (QG_mul a b) c.
+Proof.
+intros.
+progress unfold QG_mul.
+...
+rewrite QG_of_Q_mul_idemp_r.
+rewrite QG_of_Q_add_idemp_l.
+now rewrite Qplus_assoc.
+Qed.
+
+Definition QG_1 := QG_of_Q 1.
+
+Theorem QG_mul_1_l : ∀ a, QG_mul QG_1 a = a.
+Proof.
+intros.
+progress unfold QG_add.
+rewrite Qplus_0_l.
+apply QG_of_q_qg_q.
+Qed.
+
+Theorem QG_mul_inv_l : ∀ a, QG_mul (QG_inv a) a = QG_1.
+Proof.
+intros.
+progress unfold QG_add, QG_opp.
+rewrite Qplus_comm.
+rewrite QG_of_Q_add_idemp_r.
+now rewrite Qplus_opp_r.
 Qed.
