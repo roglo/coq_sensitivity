@@ -812,6 +812,24 @@ Theorem QG_of_Q_add_idemp_r :
   ∀ a b, QG_of_Q (a + qg_q (QG_of_Q b)) = QG_of_Q (a + b).
 Proof.
 intros; cbn.
+destruct a as (an, ad).
+destruct b as (bn, bd).
+cbn.
+unfold Z_pos_gcd.
+destruct bn as [| bn| bn]; cbn. {
+  rewrite Z.div_same; [ cbn | easy ].
+  rewrite Qplus_0_r.
+  progress unfold "+"%Q; cbn.
+  rewrite Z.add_0_r.
+  now rewrite Qreduce_r.
+} {
+  unfold Z.to_pos.
+...
+Check Qreduce_r.
+Search (_ / _ # _ / _)%Q.
+Search (_ # Z.to_pos _).
+remember (Z.pos (Pos.gcd bn bd)) as g eqn:Hg.
+Search (Z.to_pos (_ / _)).
 ...
 Theorem QG_of_Q_add_idemp_l :
   ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
