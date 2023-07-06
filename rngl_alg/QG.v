@@ -366,7 +366,6 @@ rewrite H2.
 apply Nat.mul_1_l.
 Qed.
 
-(*
 Theorem Nat_div_gcd_1 : ∀ a b c d,
   (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
 Proof.
@@ -381,7 +380,6 @@ assert (H : Nat.divide c (b * c)) by now exists b.
 specialize (H2 H Hcd); clear H.
 now apply Nat.divide_antisym.
 Qed.
-*)
 
 Theorem Nat_div_gcd : ∀ a b c d,
   (a * b * c * d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
@@ -399,20 +397,6 @@ assert (Hgcdz : gcd ≠ 0%nat). {
   apply Nat.gcd_eq_0 in H.
   now destruct H; subst d; rewrite Nat.mul_0_r in Habcdz.
 }
-(**)
-specialize (Nat.gauss (a / gab) (b / gab) (c / gcd)) as H1.
-rewrite Hgab in H1.
-rewrite Nat.gcd_div_gcd in H1; [ | congruence | easy ].
-...
-rewrite <- Hadbc in H1.
-assert (H : Nat.divide a (a * d)) by (exists d; apply Nat.mul_comm).
-specialize (H1 H Hab); clear H.
-specialize (Nat.gauss c d a) as H2.
-rewrite Nat.mul_comm, Hadbc in H2.
-assert (H : Nat.divide c (b * c)) by now exists b.
-specialize (H2 H Hcd); clear H.
-now apply Nat.divide_antisym.
-...
 apply Nat_div_gcd_1 with (b := (b / gab)%nat) (d := (d / gcd)%nat); cycle 1. {
   now apply Nat.gcd_div_gcd.
 } {
@@ -615,6 +599,27 @@ destruct x as [| x| x]. {
 }
 Qed.
 
+Theorem Z_div_gcd_1 : ∀ a b c d,
+  (0 < a * c → a * d = b * c → Z.gcd a b = 1 → Z.gcd c d = 1 → a = c)%Z.
+Proof.
+intros * Hacp Hadbc Hab Hcd.
+specialize (Z.gauss a b c) as H1.
+rewrite <- Hadbc in H1.
+assert (H : Z.divide a (a * d)) by (exists d; apply Z.mul_comm).
+specialize (H1 H Hab); clear H.
+specialize (Z.gauss c d a) as H2.
+rewrite Z.mul_comm, Hadbc in H2.
+assert (H : Z.divide c (b * c)) by now exists b.
+specialize (H2 H Hcd); clear H.
+apply Z.divide_antisym in H1; [ | easy ].
+destruct H1 as [H1| H1]; [ easy | ].
+rewrite H1 in Hacp.
+rewrite Z.mul_opp_r in Hacp.
+exfalso; apply Z.nle_gt in Hacp; apply Hacp.
+apply Z.opp_nonpos_nonneg.
+apply Z.square_nonneg.
+Qed.
+
 Theorem Z_div_gcd : ∀ a b c d : Z,
   (0 < a)%Z
   → (0 < b)%Z
@@ -624,7 +629,82 @@ Theorem Z_div_gcd : ∀ a b c d : Z,
   → (a / Z.gcd a b)%Z = (c / Z.gcd c d)%Z.
 Proof.
 intros * Hap Hbp Hcp Hdp Hadbc.
-...
+remember (Z.gcd a b) as gab eqn:Hgab.
+remember (Z.gcd c d) as gcd eqn:Hgcd.
+assert (Hgabz : gab ≠ 0%Z). {
+  intros H; subst gab.
+  apply Z.gcd_eq_0 in H.
+  now destruct H; subst a; apply Z.lt_irrefl in Hap.
+}
+assert (Hgcdz : gcd ≠ 0%Z). {
+  intros H; subst gcd.
+  apply Z.gcd_eq_0 in H.
+  now destruct H; subst c; apply Z.lt_irrefl in Hcp.
+}
+apply Z_div_gcd_1 with (b := (b / gab)%Z) (d := (d / gcd)%Z); cycle 2. {
+  now apply Z.gcd_div_gcd.
+} {
+  now apply Z.gcd_div_gcd.
+} {
+  apply Z.mul_pos_pos. {
+    apply Z.div_str_pos.
+    split. {
+      specialize (Z.lt_total 0 gab) as H1.
+      destruct H1 as [H1| H1]; [ easy | ].
+      destruct H1 as [H1| H1]; [ now symmetry in H1 | ].
+      apply Z.nle_gt in H1; exfalso; apply H1.
+      rewrite Hgab.
+      apply Z.gcd_nonneg.
+    } {
+      rewrite Hgab.
+      destruct a as [| a| a]; [ easy | | easy ].
+      destruct b as [| b| b]; [ easy | | easy ].
+      rewrite <- Pos2Z.inj_gcd.
+      apply Pos2Z.pos_le_pos.
+      apply Pos_gcd_le_l.
+    }
+  } {
+    apply Z.div_str_pos.
+    split. {
+      specialize (Z.lt_total 0 gcd) as H1.
+      destruct H1 as [H1| H1]; [ easy | ].
+      destruct H1 as [H1| H1]; [ now symmetry in H1 | ].
+      apply Z.nle_gt in H1; exfalso; apply H1.
+      rewrite Hgcd.
+      apply Z.gcd_nonneg.
+    } {
+      rewrite Hgcd.
+      destruct c as [| c| c]; [ easy | | easy ].
+      destruct d as [| d| d]; [ easy | | easy ].
+      rewrite <- Pos2Z.inj_gcd.
+      apply Pos2Z.pos_le_pos.
+      apply Pos_gcd_le_l.
+    }
+  }
+}
+rewrite <- Z.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite Hgcd.
+  apply Z.gcd_divide_r.
+}
+rewrite <- Z.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite Hgcd.
+  apply Z.gcd_divide_l.
+}
+f_equal.
+rewrite Z.mul_comm.
+rewrite <- Z.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite Hgab.
+  apply Z.gcd_divide_l.
+}
+rewrite (Z.mul_comm _ c).
+rewrite <- Z.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite Hgab.
+  apply Z.gcd_divide_r.
+}
+f_equal.
+rewrite Z.mul_comm, Hadbc.
+apply Z.mul_comm.
+Qed.
 
 (* end of should be added in coq library ZArith *)
 
@@ -641,21 +721,9 @@ f_equal. {
     do 2 rewrite Pos2Z.inj_mul in Hxy.
     symmetry in Hxy; rewrite Z.mul_comm in Hxy.
     symmetry in Hxy.
-(*
-    apply (f_equal Z.to_nat) in Hxy.
-    cbn in Hxy.
-    do 2 rewrite Pos2Nat.inj_mul in Hxy.
-*)
-(**)
     do 2 rewrite Pos2Z.inj_gcd.
-Check Nat_div_gcd.
-Check Z_div_gcd.
-... ...
     now apply Z_div_gcd.
-...
-  ============================
-  (Z.pos xn * Z.pos yd)%Z = (Z.pos xd * Z.pos yn)%Z
-
+  }
 ...
 Print Z.div.
 unfold Z.div.
