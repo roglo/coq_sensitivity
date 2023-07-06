@@ -612,12 +612,81 @@ f_equal. {
     progress unfold Qeq in Hxy.
     cbn in Hxy.
     do 2 rewrite Pos2Z.inj_mul in Hxy.
-    do 2 rewrite Pos2Z.inj_gcd.
     apply (f_equal Z.to_nat) in Hxy.
     cbn in Hxy.
     do 2 rewrite Pos2Nat.inj_mul in Hxy.
     symmetry in Hxy; rewrite Nat.mul_comm in Hxy.
     symmetry in Hxy.
+Search (_ / _ * _)%Z.
+...
+Print Z.div.
+unfold Z.div.
+Search Z.div_eucl.
+Theorem Z_div_eucl_div :
+  ∀ a b c d, Z.div_eucl a b = Z.div_eucl c d → (a / b = c / d)%Z.
+Proof.
+intros * Habcd.
+unfold Z.div.
+destruct (Z.div_eucl a b).
+destruct (Z.div_eucl c d).
+now injection Habcd.
+Qed.
+apply Z_div_eucl_div.
+Check Pos.divide.
+Theorem glop :
+  Pos.divide x y → Z.div_eucl (Z.pos x) (Z.pos y)
+cbn.
+Search Z.pos_div_eucl.
+Theorem glop :
+  ∀ x y, Z.pos_div_eucl x (Z.pos y) = (0, 0)%Z.
+Proof.
+intros.
+destruct x as [x| x| ]. {
+  cbn.
+  remember (Z.pos_div_eucl x (Z.pos y)) as qr eqn:Hqr.
+  symmetry in Hqr.
+  destruct qr as (q, r).
+  destruct r as [| r| r]. {
+    cbn.
+...
+destruct xn as [xn| xn| ]. {
+  cbn - [ Pos.gcd ].
+...
+Search Z.div_eucl.
+Print Z.div_eucl.
+cbn.
+...
+Search Pos.gcd.
+Nat_gcd_pos: ∀ x y : positive, Nat.gcd (Pos.to_nat x) (Pos.to_nat y) = Pos.to_nat (Pos.gcd x y)
+Theorem Z_pos_div :
+  ∀ x y, (Z.pos x / y = fst (Z.pos_div_eucl x y))%Z.
+Proof.
+intros.
+unfold Z.div.
+unfold Z.div_eucl.
+destruct y as [| y| y]; [ | easy | ]. {
+  destruct x as [x| x| ]; cbn. {
+    remember (Z.pos_div_eucl x 0) as qr eqn:Hqr.
+    symmetry in Hqr.
+    destruct qr as (q, r).
+    destruct r as [| r| r]. {
+      cbn.
+      destruct
+...
+Compute (
+  let x := 28%positive in
+  let y := 3%positive in
+  (Z.pos x / Z.pos y = fst (Z.pos_div_eucl x (Z.pos y))))%Z.
+...
+Locate "/".
+Print Z.div_eucl.
+Check Z.pos_div_eucl.
+Search Z.pos_div_eucl.
+Search (Z.pos _ / Z.pos _)%Z.
+Search (_ / _)%positive.
+...
+    do 2 rewrite Pos2Z.inj_gcd.
+...
 (**)
 remember (Z.pos xn) as a.
 remember (Z.pos xd) as b.
