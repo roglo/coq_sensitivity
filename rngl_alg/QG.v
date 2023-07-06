@@ -723,7 +723,27 @@ f_equal. {
     symmetry in Hxy.
     do 2 rewrite Pos2Z.inj_gcd.
     now apply Z_div_gcd.
-  }
+  } {
+    destruct yn as [| yn| yn]; [ easy | easy | ].
+    progress unfold Qeq in Hxy.
+    cbn in Hxy.
+    injection Hxy; clear Hxy; intros Hxy.
+    apply (f_equal Z.pos) in Hxy.
+    do 2 rewrite Pos2Z.inj_mul in Hxy.
+    symmetry in Hxy; rewrite Z.mul_comm in Hxy.
+    symmetry in Hxy.
+    do 2 rewrite Pos2Z.inj_gcd.
+    do 2 rewrite <- Pos2Z.opp_pos.
+    rewrite Z.div_opp_l_z; [ | easy | ]. 2: {
+specialize (Z.gcd_divide_l (Z.pos xn) (Z.pos xd)) as H1.
+...
+Search (_ mod Z.gcd _ _)%Z.
+Search (_ / Z.gcd _ _)%Z.
+easy.
+rewrite Zdiv.Z_div_zero
+...
+    apply Z_div_gcd.
+    now apply Z_div_gcd.
 ...
 Print Z.div.
 unfold Z.div.
