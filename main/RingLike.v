@@ -188,12 +188,6 @@ intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
-Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
-  match l with
-  | nil => rngl_zero
-  | cons a l' => rngl_add (rngl_mul (rngl_eval_polyn l' x) x) a
-  end.
-
 Require Import Arith.
 
 Definition rngl_has_eqb T {R : ring_like_op T} :=
@@ -264,11 +258,21 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
+(* TODO: write with List.fold_left *)
+
+Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
+  match l with
+  | nil => 0%L
+  | cons a l' => (rngl_eval_polyn l' x * x + a)%L
+  end.
+
 Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
   match n with
   | 0 => 0%L
   | S n' => (a + rngl_mul_nat a n')%L
   end.
+
+(* end TODO: write with List.fold_left *)
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
