@@ -1,4 +1,4 @@
-TARGET=Qrl.vo Zrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo Rrl.vo Ideal.vo
+TARGET=Qrl.vo Zrl.vo Nrl.vo MatRl.vo QuadIntRl.vo GaussIntRl.vo Rrl.vo Ideal.vo QG.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 

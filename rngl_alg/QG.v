@@ -1034,6 +1034,7 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
 
+(* to be completed
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -1070,3 +1071,4 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le;
      rngl_opt_archimedean := ?rngl_opt_archimedean |}.
+*)
