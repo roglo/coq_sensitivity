@@ -901,19 +901,32 @@ do 2 rewrite Z.div_1_r.
 now destruct a.
 Qed.
 
+Definition QG_0 := QG_of_Q 0.
+Definition QG_1 := QG_of_Q 1.
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
 Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
 
-Theorem QG_add_comm : ∀ a b, QG_add a b = QG_add b a.
+Declare Scope QG_scope.
+Delimit Scope QG_scope with QG.
+
+Notation "0" := QG_0 : QG_scope.
+Notation "1" := QG_1 : QG_scope.
+Notation "- a" := (QG_opp a) : QG_scope.
+Notation "a + b" := (QG_add a b) : QG_scope.
+Notation "a * b" := (QG_mul a b) : QG_scope.
+Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
+  QG_scope.
+
+Theorem QG_add_comm : ∀ a b : QG, (a + b)%QG = (b + a)%QG.
 Proof.
 intros.
 progress unfold QG_add.
 now rewrite Qplus_comm.
 Qed.
 
-Theorem QG_add_assoc : ∀ a b c, QG_add a (QG_add b c) = QG_add (QG_add a b) c.
+Theorem QG_add_assoc : ∀ a b c : QG, (a + (b + c))%QG = (a + b + c)%QG.
 Proof.
 intros.
 progress unfold QG_add.
@@ -922,9 +935,7 @@ rewrite QG_of_Q_add_idemp_l.
 now rewrite Qplus_assoc.
 Qed.
 
-Definition QG_0 := QG_of_Q 0.
-
-Theorem QG_add_0_l : ∀ a, QG_add QG_0 a = a.
+Theorem QG_add_0_l : ∀ a : QG, (0 + a)%QG = a.
 Proof.
 intros.
 progress unfold QG_add.
@@ -932,7 +943,7 @@ rewrite Qplus_0_l.
 apply QG_of_q_qg_q.
 Qed.
 
-Theorem QG_add_opp_l : ∀ a, QG_add (QG_opp a) a = QG_0.
+Theorem QG_add_opp_l : ∀ a : QG, (- a + a)%QG = 0%QG.
 Proof.
 intros.
 progress unfold QG_add, QG_opp.
@@ -941,14 +952,14 @@ rewrite QG_of_Q_add_idemp_r.
 now rewrite Qplus_opp_r.
 Qed.
 
-Theorem QG_mul_comm : ∀ a b, QG_mul a b = QG_mul b a.
+Theorem QG_mul_comm : ∀ a b : QG, (a * b)%QG = (b * a)%QG.
 Proof.
 intros.
 progress unfold QG_mul.
 now rewrite Qmult_comm.
 Qed.
 
-Theorem QG_mul_assoc : ∀ a b c, QG_mul a (QG_mul b c) = QG_mul (QG_mul a b) c.
+Theorem QG_mul_assoc : ∀ a b c : QG, (a * (b * c))%QG = (a * b * c)%QG.
 Proof.
 intros.
 progress unfold QG_mul.
@@ -957,9 +968,7 @@ rewrite QG_of_Q_mul_idemp_l.
 now rewrite Qmult_assoc.
 Qed.
 
-Definition QG_1 := QG_of_Q 1.
-
-Theorem QG_mul_1_l : ∀ a, QG_mul QG_1 a = a.
+Theorem QG_mul_1_l : ∀ a : QG, (1 * a)%QG = a.
 Proof.
 intros.
 progress unfold QG_mul.
@@ -967,7 +976,7 @@ rewrite Qmult_1_l.
 apply QG_of_q_qg_q.
 Qed.
 
-Theorem QG_mul_inv_l : ∀ a, a ≠ QG_0 → QG_mul (QG_inv a) a = QG_1.
+Theorem QG_mul_inv_l : ∀ a : QG, a ≠ 0%QG → (a⁻¹ * a)%QG = 1%QG.
 Proof.
 intros * Haz.
 progress unfold QG_mul.
@@ -982,8 +991,7 @@ rewrite <- QG_of_q_qg_q.
 now rewrite H1.
 Qed.
 
-Theorem QG_mul_add_distr_l : ∀ a b c,
-  QG_mul a (QG_add b c) = QG_add (QG_mul a b) (QG_mul a c).
+Theorem QG_mul_add_distr_l :  ∀ a b c, (a * (b + c))%QG = (a * b + a * c)%QG.
 Proof.
 intros.
 progress unfold QG_mul.
