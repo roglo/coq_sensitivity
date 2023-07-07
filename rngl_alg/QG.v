@@ -321,9 +321,7 @@ Theorem Nat_gcd_mul_r :
   ∀ a b c, Nat.gcd a b = 1%nat → Nat.gcd a c = Nat.gcd a (b * c).
 Proof.
 intros * Hab.
-destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]. {
-  congruence.
-}
+destruct (Nat.eq_dec (Nat.gcd a b) 0) as [Habz| Habz]; [ congruence | ].
 destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hacz| Hacz]. {
   rewrite Hacz; symmetry.
   apply Nat.gcd_eq_0 in Hacz.
@@ -505,7 +503,7 @@ destruct x as [x| x| ]; [ | | easy ]. {
   destruct y as [y| y| ]. {
     cbn in Hn.
     remember (x ?= y)%positive as xy eqn:Hxy; symmetry in Hxy.
-    destruct xy as [xy| xy| ]. {
+    destruct xy. {
       apply Pos.compare_eq in Hxy; subst y.
       now rewrite Nat.gcd_diag.
     } {
@@ -907,6 +905,13 @@ Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
 Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
+(*
+Definition QG_eqb (a b : QG) :=
+  (Qnum (qg_q a) =? Qnum (qg_q b))%Z &&
+  (Qden (qg_q a) =? Qden (qg_q b))%positive.
+*)
+Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
+Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
 
 Declare Scope QG_scope.
 Delimit Scope QG_scope with QG.
@@ -918,6 +923,7 @@ Notation "a + b" := (QG_add a b) : QG_scope.
 Notation "a * b" := (QG_mul a b) : QG_scope.
 Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
   QG_scope.
+Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
 
 Theorem QG_add_comm : ∀ a b : QG, (a + b)%QG = (b + a)%QG.
 Proof.
@@ -1001,3 +1007,66 @@ rewrite QG_of_Q_add_idemp_l.
 rewrite QG_of_Q_add_idemp_r.
 now rewrite Qmult_plus_distr_r.
 Qed.
+
+Theorem QG_eqb_eq : ∀ a b : QG, (a =? b)%QG = true ↔ a = b.
+Proof.
+intros.
+split; intros Hab. {
+  apply Qeq_bool_iff in Hab.
+  rewrite <- (QG_of_q_qg_q a).
+  rewrite <- (QG_of_q_qg_q b).
+  now rewrite Hab.
+} {
+  subst b.
+  now apply Qeq_bool_iff.
+}
+Qed.
+
+Require Import Main.RingLike.
+
+Definition QG_ring_like_op : ring_like_op QG :=
+  {| rngl_zero := 0%QG;
+     rngl_add := QG_add;
+     rngl_mul := QG_mul;
+     rngl_opt_one := Some 1%QG;
+     rngl_opt_opp_or_subt := Some (inl QG_opp);
+     rngl_opt_inv_or_quot := Some (inl QG_inv);
+     rngl_opt_eqb := Some QG_eqb;
+     rngl_opt_leb := Some QG_leb |}.
+
+Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
+  {| rngl_mul_is_comm := true;
+     rngl_is_integral_domain := false;
+     rngl_is_archimedean := true;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := 0;
+     rngl_add_comm := QG_add_comm;
+     rngl_add_assoc := QG_add_assoc;
+     rngl_add_0_l := QG_add_0_l;
+     rngl_mul_assoc := QG_mul_assoc;
+     rngl_opt_mul_1_l := QG_mul_1_l;
+     rngl_mul_add_distr_l := QG_mul_add_distr_l;
+     rngl_opt_mul_comm := QG_mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_l := QG_add_opp_l;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
+     rngl_opt_mul_inv_l := QG_mul_inv_l;
+     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_div := NA;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := QG_eqb_eq;
+     rngl_opt_le_dec := 42;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le;
+     rngl_opt_archimedean := ?rngl_opt_archimedean |}.
