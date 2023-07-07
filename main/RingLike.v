@@ -188,8 +188,8 @@ intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
-(* could be written with List.fold_right but this module is not
-   supposed to include the module List (nor Nat) *)
+(* preventing using Arith *)
+
 Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   match l with
   | nil => rngl_zero
@@ -219,7 +219,34 @@ Qed.
 Theorem Bool_not_true_iff_false : ∀ b : bool, b ≠ true ↔ b = false.
 Proof. now intros; destruct b. Qed.
 
-(**)
+Theorem Nat_eqb_eq : ∀ a b, Nat.eqb a b = true ↔ a = b.
+Proof.
+intros.
+split; intros Hab. {
+  revert b Hab.
+  induction a; intros; [ now destruct b | ].
+  destruct b; [ easy | cbn in Hab ].
+  now f_equal; apply IHa.
+} {
+  now subst b; induction a.
+}
+Qed.
+
+Theorem Nat_eqb_neq : ∀ a b, Nat.eqb a b = false ↔ a ≠ b.
+Proof.
+intros.
+split; intros Hab. {
+  intros H.
+  apply Nat_eqb_eq in H.
+  now rewrite Hab in H.
+} {
+  remember (Nat.eqb a b) as ab eqn:Heab; symmetry in Heab.
+  destruct ab; [ | easy ].
+  now apply Nat_eqb_eq in Heab.
+}
+Qed.
+
+(* end preventing Arith *)
 
 Definition rngl_has_eqb T {R : ring_like_op T} :=
   bool_of_option rngl_opt_eqb.
@@ -775,28 +802,6 @@ specialize rngl_opt_not_le as H.
 rewrite Hor in H.
 apply H.
 Qed.
-
-(*
-Theorem rngl_not_lt :
-  rngl_is_ordered T = true →
-  ∀ a b, (¬ a < b → a = b ∨ b < a)%L.
-Proof.
-intros Hor * Hab.
-specialize rngl_opt_not_le as H1.
-rewrite Hor in H1.
-specialize (H1 b a).
-...
-progress unfold rngl_lt in Hab.
-progress unfold rngl_le in H1.
-progress unfold rngl_lt.
-destruct rngl_opt_leb as [rngl_leb| ].
-...
-rewrite Hor in H.
-intros H1.
-...
-apply H.
-Qed.
-*)
 
 (* *)
 
@@ -1611,18 +1616,6 @@ rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
-(*
-Theorem rngl_sub_0_l :
-  rngl_has_opp T = true
-  → ∀ a, (0 - a = (0 - 1) * a)%L.
-Proof.
-intros Hos *.
-rewrite (rngl_mul_sub_distr_r Hos).
-rewrite (rngl_mul_0_l Hos).
-now rewrite rngl_mul_1_l.
-Qed.
-*)
-
 Theorem rngl_sub_0_r :
   rngl_has_opp_or_subt T = true →
   ∀ a, (a - 0 = a)%L.
@@ -1782,33 +1775,6 @@ apply (rngl_add_move_0_r Hro).
 rewrite (fold_rngl_sub Hro).
 apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
-Qed.
-
-Theorem Nat_eqb_eq : ∀ a b, Nat.eqb a b = true ↔ a = b.
-Proof.
-intros.
-split; intros Hab. {
-  revert b Hab.
-  induction a; intros; [ now destruct b | ].
-  destruct b; [ easy | cbn in Hab ].
-  now f_equal; apply IHa.
-} {
-  now subst b; induction a.
-}
-Qed.
-
-Theorem Nat_eqb_neq : ∀ a b, Nat.eqb a b = false ↔ a ≠ b.
-Proof.
-intros.
-split; intros Hab. {
-  intros H.
-  apply Nat_eqb_eq in H.
-  now rewrite Hab in H.
-} {
-  remember (Nat.eqb a b) as ab eqn:Heab; symmetry in Heab.
-  destruct ab; [ | easy ].
-  now apply Nat_eqb_eq in Heab.
-}
 Qed.
 
 Theorem rngl_inv_neq_0 :
@@ -3180,7 +3146,6 @@ split; intros Hab. {
 }
 Qed.
 
-(* to be completed *)
 Theorem rngl_mul_le_mono_pos_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
