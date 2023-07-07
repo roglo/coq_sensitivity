@@ -1049,6 +1049,18 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_leb := Some QG_leb |}.
 
 (* to be completed
+Theorem QG_characteristic_prop :
+  let ro := QG_ring_like_op in
+  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
+Proof.
+intros * H1.
+subst ro; cbn in H1.
+induction i; cbn in H1; [ easy | ].
+unfold QG_add in H1.
+cbn in H1.
+rewrite H1 in IHi.
+...
+
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -1073,9 +1085,9 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := QG_eqb_eq;
      rngl_opt_le_dec := QG_le_dec;
-     rngl_opt_integral := 42;
-     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_integral := NA;
+     rngl_opt_alg_closed := NA;
+     rngl_characteristic_prop := QG_characteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
@@ -1085,9 +1097,4 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le;
      rngl_opt_archimedean := ?rngl_opt_archimedean |}.
-*)
-
-(* truc de Sarah... parait qu'on peut définir les ensembles quotients avec
-   des axiomes
-Axiom Quo : ∀ (T : Type) (eq : T → T → Prop) (P : Equivalence eq), Type.
 *)
