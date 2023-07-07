@@ -1086,3 +1086,8 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_not_le := ?rngl_opt_not_le;
      rngl_opt_archimedean := ?rngl_opt_archimedean |}.
 *)
+
+(* truc de Sarah... parait qu'on peut définir les ensembles quotients avec
+   des axiomes
+Axiom Quo : ∀ (T : Type) (eq : T → T → Prop) (P : Equivalence eq), Type.
+*)
