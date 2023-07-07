@@ -910,8 +910,10 @@ Definition QG_eqb (a b : QG) :=
   (Qnum (qg_q a) =? Qnum (qg_q b))%Z &&
   (Qden (qg_q a) =? Qden (qg_q b))%positive.
 *)
+
 Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
 Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
+Definition QG_le a b := QG_leb a b = true.
 
 Declare Scope QG_scope.
 Delimit Scope QG_scope with QG.
@@ -923,7 +925,10 @@ Notation "a + b" := (QG_add a b) : QG_scope.
 Notation "a * b" := (QG_mul a b) : QG_scope.
 Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
   QG_scope.
+
 Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
+Notation "a ≤? b" := (QG_leb a b) (at level 70) : QG_scope.
+Notation "a ≤ b" := (QG_le a b) : QG_scope.
 
 Theorem QG_add_comm : ∀ a b : QG, (a + b)%QG = (b + a)%QG.
 Proof.
@@ -1022,6 +1027,15 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem QG_le_dec : ∀ a b : QG, {(a ≤ b)%QG} + {¬ (a ≤ b)%QG}.
+Proof.
+intros.
+unfold QG_le.
+apply Bool.bool_dec.
+Qed.
+
+(* *)
+
 Require Import Main.RingLike.
 
 Definition QG_ring_like_op : ring_like_op QG :=
@@ -1058,8 +1072,8 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := QG_eqb_eq;
-     rngl_opt_le_dec := 42;
-     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_le_dec := QG_le_dec;
+     rngl_opt_integral := 42;
      rngl_opt_alg_closed := ?rngl_opt_alg_closed;
      rngl_characteristic_prop := ?rngl_characteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
