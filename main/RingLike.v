@@ -188,65 +188,13 @@ intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
-(* preventing using Arith *)
-
 Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   match l with
   | nil => rngl_zero
   | cons a l' => rngl_add (rngl_mul (rngl_eval_polyn l' x) x) a
   end.
 
-Fixpoint llast {A} (l : list A) d :=
-  match l with
-  | nil => d
-  | cons a nil => a
-  | cons _ l' => llast l' d
-  end.
-
-Theorem Nat_eq_dec : ∀ n m : nat, {n = m} + {n ≠ m}.
-Proof.
-intros.
-revert m.
-induction n; intros; cbn. {
-  now destruct m; [ left | right ].
-}
-destruct m; [ now right | ].
-destruct (IHn m) as [H1| H1]; [ now left; subst m | right ].
-intros H; apply H1; clear H1.
-now injection H.
-Qed.
-
-Theorem Bool_not_true_iff_false : ∀ b : bool, b ≠ true ↔ b = false.
-Proof. now intros; destruct b. Qed.
-
-Theorem Nat_eqb_eq : ∀ a b, Nat.eqb a b = true ↔ a = b.
-Proof.
-intros.
-split; intros Hab. {
-  revert b Hab.
-  induction a; intros; [ now destruct b | ].
-  destruct b; [ easy | cbn in Hab ].
-  now f_equal; apply IHa.
-} {
-  now subst b; induction a.
-}
-Qed.
-
-Theorem Nat_eqb_neq : ∀ a b, Nat.eqb a b = false ↔ a ≠ b.
-Proof.
-intros.
-split; intros Hab. {
-  intros H.
-  apply Nat_eqb_eq in H.
-  now rewrite Hab in H.
-} {
-  remember (Nat.eqb a b) as ab eqn:Heab; symmetry in Heab.
-  destruct ab; [ | easy ].
-  now apply Nat_eqb_eq in Heab.
-}
-Qed.
-
-(* end preventing Arith *)
+Require Import Arith.
 
 Definition rngl_has_eqb T {R : ring_like_op T} :=
   bool_of_option rngl_opt_eqb.
@@ -390,7 +338,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then
-        ∀ l : list T, 1 < length l → llast l 0%L ≠ 0%L →
+        ∀ l : list T, 1 < length l → List.last l 0%L ≠ 0%L →
         ∃ x, rngl_eval_polyn l x = 0%L
       else not_applicable;
     (* characteristic *)
@@ -629,10 +577,10 @@ intros.
 progress unfold rngl_leb.
 progress unfold rngl_le.
 split; intros Hab. {
-  apply Bool_not_true_iff_false in Hab.
+  apply Bool.not_true_iff_false in Hab.
   now destruct rngl_opt_leb.
 } {
-  apply Bool_not_true_iff_false.
+  apply Bool.not_true_iff_false.
   now destruct rngl_opt_leb.
 }
 Qed.
@@ -1272,7 +1220,7 @@ split. {
   apply H1.
 } {
   intros H10.
-  destruct (Nat_eq_dec (rngl_characteristic T) 1) as [H1| H1]; [ easy | ].
+  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H1| H1]; [ easy | ].
   now apply (rngl_1_neq_0_iff Hon) in H1.
 }
 Qed.
@@ -1786,10 +1734,10 @@ Proof.
 intros Hon Hom Hiv * Haz H1.
 remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
-  apply Nat_eqb_eq in Hch.
+  apply Nat.eqb_eq in Hch.
   now specialize (rngl_characteristic_1 Hon Hom Hch a).
 }
-apply Nat_eqb_neq in Hch.
+apply Nat.eqb_neq in Hch.
 symmetry in H1.
 apply (rngl_mul_move_1_r Hon Hiv _ _ Haz) in H1.
 rewrite (rngl_mul_0_l Hom) in H1.
@@ -1806,11 +1754,11 @@ Proof.
 intros Hon Hos Hiv * Hxz.
 remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
-  apply Nat_eqb_eq in Hch.
+  apply Nat.eqb_eq in Hch.
   exfalso; apply Hxz.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply Nat_eqb_neq in Hch.
+apply Nat.eqb_neq in Hch.
 symmetry.
 specialize (rngl_div_diag Hon) as div_diag.
 unfold rngl_div in div_diag.
@@ -2138,11 +2086,11 @@ assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
 }
 remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
-  apply Nat_eqb_eq in Hch.
+  apply Nat.eqb_eq in Hch.
   exfalso; apply Haz.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply Nat_eqb_neq in Hch.
+apply Nat.eqb_neq in Hch.
 assert (Hoaz : (- a)%L ≠ 0%L). {
   intros H.
   apply (f_equal rngl_opp) in H.
