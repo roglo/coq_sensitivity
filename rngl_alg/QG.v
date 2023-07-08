@@ -1103,10 +1103,22 @@ destruct xn as [| xn| xn]. {
     apply Z.nle_gt in H3; apply H3.
     now apply Z.div_pos.
   } {
+(**)
+    induction i; [ easy | ].
+    cbn in Hy; apply IHi; clear IHi.
+    rewrite Z.mul_1_r in Hy.
+    remember (qg_q (rngl_mul_nat 1%QG i)) as q eqn:Hq.
+    symmetry in Hq.
+    destruct q as (qn, qd).
+    cbn in Hy.
+    destruct qn as [| qn| qn]. {
+      cbn in Hy.
+      injection Hy; clear Hy; intros H1 H2.
+...
     injection Hx; clear Hx; intros H1 H2.
     specialize (Pos2Z.neg_is_neg xn) as H3.
     rewrite <- H2 in H3.
-    apply Z.nle_gt in H3; apply H3.
+    apply Z.nle_gt in H3; apply H3; clear H3.
     apply Z.div_pos; [ | easy ].
 ...
 Search Z.pos_sub.
