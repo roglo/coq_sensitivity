@@ -597,6 +597,14 @@ destruct x as [| x| x]. {
 }
 Qed.
 
+Theorem Pos_gcd_diag : ∀ a, Pos.gcd a a = a.
+Proof.
+intros.
+apply Pos2Nat.inj.
+rewrite <- Nat_gcd_pos.
+now rewrite Nat.gcd_diag.
+Qed.
+
 Theorem Z_div_gcd_1 : ∀ a b c d,
   (0 < a * c → a * d = b * c → Z.gcd a b = 1 → Z.gcd c d = 1 → a = c)%Z.
 Proof.
@@ -1058,7 +1066,33 @@ subst ro; cbn in H1.
 induction i; cbn in H1; [ easy | ].
 unfold QG_add in H1.
 cbn in H1.
-rewrite H1 in IHi.
+rewrite Z.mul_1_r in H1.
+unfold QG_add in IHi.
+cbn in IHi.
+unfold QG_add in IHi.
+remember (qg_q (rngl_mul_nat 1%QG i)) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (xn, xd).
+cbn in H1.
+destruct xn as [| xn| xn]. {
+  cbn in H1.
+  rewrite Pos_gcd_diag in H1.
+  now rewrite Z.div_same in H1.
+} {
+  cbn in H1.
+  rewrite Pos2Z.inj_gcd in H1.
+Search (Z.pos (_ + _)).
+rewrite Pos2Z.inj_add in H1.
+Search (Z.gcd _ (_ + _)).
+rewrite Z.gcd_comm in H1.
+Search (Z.gcd _ (_ - _)).
+rewrite <- Z.gcd_sub_diag_r in H1.
+rewrite Z.add_comm in H1.
+rewrite Z.add_simpl_r in H1.
+...
+Check Nat_gcd_pos.
+Check Pos_
+Check Pos2Nat.inj.
 ...
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
