@@ -1063,6 +1063,7 @@ Theorem QG_characteristic_prop :
 Proof.
 intros * H1.
 cbn in H1.
+...
 progress unfold QG_add in H1.
 apply eq_QG_eq in H1.
 cbn in H1.
@@ -1103,7 +1104,6 @@ destruct xn as [| xn| xn]. {
     apply Z.nle_gt in H3; apply H3.
     now apply Z.div_pos.
   } {
-(**)
     induction i; [ easy | ].
     cbn in Hy; apply IHi; clear IHi.
     rewrite Z.mul_1_r in Hy.
@@ -1112,8 +1112,31 @@ destruct xn as [| xn| xn]. {
     destruct q as (qn, qd).
     cbn in Hy.
     destruct qn as [| qn| qn]. {
+      exfalso.
       cbn in Hy.
       injection Hy; clear Hy; intros H1 H2.
+      specialize (Pos2Z.neg_is_neg yn) as H3.
+      rewrite <- H2 in H3.
+      apply Z.nle_gt in H3; apply H3.
+      now apply Z.div_pos.
+    } {
+      exfalso.
+      cbn in Hy.
+      injection Hy; clear Hy; intros H1 H2.
+      specialize (Pos2Z.neg_is_neg yn) as H3.
+      rewrite <- H2 in H3.
+      apply Z.nle_gt in H3; apply H3.
+      now apply Z.div_pos.
+    } {
+      injection Hy; clear Hy; intros H1 H2.
+      injection Hx; clear Hx; intros H3 H4.
+      rewrite <- H1, <- H2.
+      f_equal. {
+...
+Search (Z.neg _ = _ )%Z.
+Search (_ / _)%Z.
+Search (Z.neg _ < 0)%Z.
+Z.div_pos: ∀ a b : Z, (0 <= a)%Z → (0 < b)%Z → (0 <= a / b)%Z
 ...
     injection Hx; clear Hx; intros H1 H2.
     specialize (Pos2Z.neg_is_neg xn) as H3.
