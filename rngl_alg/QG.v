@@ -1056,20 +1056,17 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
 
-(* to be completed
+(* to be completed *)
 Theorem QG_characteristic_prop :
   let ro := QG_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
 Proof.
 intros * H1.
-subst ro; cbn in H1.
-induction i; cbn in H1; [ easy | ].
-unfold QG_add in H1.
+cbn in H1.
+progress unfold QG_add in H1.
+apply eq_QG_eq in H1.
 cbn in H1.
 rewrite Z.mul_1_r in H1.
-unfold QG_add in IHi.
-cbn in IHi.
-unfold QG_add in IHi.
 remember (qg_q (rngl_mul_nat 1%QG i)) as x eqn:Hx.
 symmetry in Hx.
 destruct x as (xn, xd).
@@ -1080,6 +1077,75 @@ destruct xn as [| xn| xn]. {
   now rewrite Z.div_same in H1.
 } {
   cbn in H1.
+  injection H1; clear H1; intros H1 H2.
+  rewrite Pos2Z.inj_gcd in H2.
+  apply Z.div_small_iff in H2; [ | easy ].
+  destruct H2 as [H2| H2]; [ | easy ].
+  specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
+  apply Z.divide_pos_le in H3; [ | easy ].
+  now apply Z.nlt_ge in H3.
+} {
+  clear H1.
+  destruct i; [ easy | cbn in Hx ].
+  rewrite Z.mul_1_r in Hx.
+  remember (qg_q (rngl_mul_nat 1%QG i)) as y eqn:Hy.
+  symmetry in Hy.
+  destruct y as (yn, yd).
+  cbn in Hx.
+  destruct yn as [| yn| yn]; cbn in Hx. {
+    injection Hx; clear Hx; intros H1 H2.
+    rewrite Pos_gcd_diag in H2.
+    now rewrite Z.div_same in H2.
+  } {
+    injection Hx; clear Hx; intros H1 H2.
+    specialize (Pos2Z.neg_is_neg xn) as H3.
+    rewrite <- H2 in H3.
+    apply Z.nle_gt in H3; apply H3.
+    now apply Z.div_pos.
+  } {
+    injection Hx; clear Hx; intros H1 H2.
+    specialize (Pos2Z.neg_is_neg xn) as H3.
+    rewrite <- H2 in H3.
+    apply Z.nle_gt in H3; apply H3.
+    apply Z.div_pos; [ | easy ].
+...
+Search Z.pos_sub.
+Search (0 <= Z.pos_sub _ _)%Z.
+...
+    rewrite Pos2Z.inj_gcd in H2.
+    specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
+    apply Z.divide_pos_le in H3; [ | easy ].
+  now apply Z.nlt_ge in H3.
+...
+    rewrite Pos.div_diag in H2.
+Search (0 <= _ / _)%Z.
+specialize (Z.div_pos (Z.pos yd) (Z.pos (Pos.gcd yd yd
+...
+  injection H1; clear H1; intros H1 H2.
+  progress unfold Z_pos_gcd in H2.
+  specialize (Z.pos_sub_discr xd xn) as H3.
+  remember (Z.pos_sub xd xn) as y eqn:Hy; symmetry in Hy.
+  destruct y as [| y| y]. {
+    subst xd.
+clear H1 H2 Hy.
+cbn in Hx.
+Search (Z.pos_sub _ _).
+    destruct xn as [xn| xn| ]. {
+      cbn in Hy.
+...
+rewrite Z.pos_sub_gt in H1.
+
+  injection H1; clear H1; intros H1 H2.
+  rewrite Pos2Z.inj_gcd in H2.
+  apply Z.div_small_iff in H2; [ | easy ].
+  destruct H2 as [H2| H2]; [ | easy ].
+  specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
+  apply Z.divide_pos_le in H3; [ | easy ].
+  now apply Z.nlt_ge in H3.
+...
+Search (_ # _ = 0)%Q.
+Search (Z.pos _ / Z.pos _)%Z.
+...
   rewrite Pos2Z.inj_gcd in H1.
 Search (Z.pos (_ + _)).
 rewrite Pos2Z.inj_add in H1.
