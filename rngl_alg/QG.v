@@ -1056,7 +1056,7 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
 
-(* to be completed *)
+(* to be completed
 Theorem QG_characteristic_prop :
   let ro := QG_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
