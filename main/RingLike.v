@@ -258,13 +258,10 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
-(* TODO: write with List.fold_left *)
+Definition rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
+  List.fold_right (λ a acc, (acc * x + a)%L) 0%L l.
 
-Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
-  match l with
-  | nil => 0%L
-  | cons a l' => (rngl_eval_polyn l' x * x + a)%L
-  end.
+(* TODO: write with List.fold_right *)
 
 Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
   match n with
@@ -272,7 +269,7 @@ Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
   | S n' => (a + rngl_mul_nat a n')%L
   end.
 
-(* end TODO: write with List.fold_left *)
+(* end TODO: write with List.fold_right *)
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
