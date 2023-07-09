@@ -94,3 +94,17 @@ les rationels normaux de Coq et ajoutant le champ comme quoi le
 pgcd des deux nombres est 1, ce qui permet l'usage de = à la place
 de ==. Commencé avec QG.v. 7 juillet : ça a l'air de marcher.
 Peut-être qu'il faudrait les utiliser dans mon théorème de Puiseux.
+
+dimanche 9 juillet 2023 10:10
+
+Rien à voir avec Coq, mais je me suis intéressé aux généralisations
+du théorème des deux carrés de Fermat :
+  si p ≡ 1 mod 3 alors p est de la forme x2 + 3y2
+  si p ≡ 1 ou 3 mod 8 alors p est de la forme x2 + 2y2
+J'aimerais le tester (trouver x et y en fonction de p) et aussi sur
+les nombres non premiers (quelles conditions pour que ça marche aussi
+pour eux, comme pour le théorème des deux carrés). Faudrait que je
+programme ça en OCaml.
+  J'ai bien un code (répertoire "factor") mais il est écrit dans ma
+syntaxe révisée et j'ai peur que les modifs de Chet Murthy fassent que
+ça ne fonctionne plus.

@@ -1056,6 +1056,31 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
 
+Theorem Q_characteristic_prop :
+  ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
+Proof.
+intros.
+enough (H : ¬ mul_nat 0 Qplus 1 (S i) == 0). {
+  intros H1; apply H.
+  now rewrite H1.
+}
+intros H1.
+assert (Hle : ∀ i, (0 <= mul_nat 0 Qplus 1 i)%Q). {
+  clear i H1; intros.
+  induction i; cbn; [ easy | ].
+  eapply Qle_trans; [ apply IHi | ].
+  apply Qle_minus_iff.
+  rewrite <- Qplus_assoc.
+  rewrite Qplus_opp_r.
+  easy.
+}
+cbn in H1.
+specialize (Hle i).
+apply (Qplus_le_r _ _ 1) in Hle.
+rewrite Qplus_0_r in Hle.
+now rewrite H1 in Hle.
+Qed.
+
 (* to be completed
 Theorem QG_characteristic_prop :
   let ro := QG_ring_like_op in
