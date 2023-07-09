@@ -913,11 +913,7 @@ Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
 Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
 Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
-(*
-Definition QG_eqb (a b : QG) :=
-  (Qnum (qg_q a) =? Qnum (qg_q b))%Z &&
-  (Qden (qg_q a) =? Qden (qg_q b))%positive.
-*)
+Definition QG_sub (a b : QG) := QG_add a (QG_opp b).
 
 Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
 Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
@@ -930,6 +926,7 @@ Notation "0" := QG_0 : QG_scope.
 Notation "1" := QG_1 : QG_scope.
 Notation "- a" := (QG_opp a) : QG_scope.
 Notation "a + b" := (QG_add a b) : QG_scope.
+Notation "a - b" := (QG_sub a b) : QG_scope.
 Notation "a * b" := (QG_mul a b) : QG_scope.
 Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
   QG_scope.
@@ -1100,10 +1097,34 @@ assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
   clear i H1; intros.
   induction i; cbn; [ easy | ].
   eapply QG_le_trans; [ apply IHi | ].
+Check Qle_minus_iff.
+Search (_ <= _ ↔ 0 <= _)%Z.
+Search (_ <= _ - _ ↔ _ <= _)%nat.
+Theorem QG_le_0_sub : ∀ x y : QG, (0 ≤ y - x)%QG ↔ (x ≤ y)%QG.
+Proof.
+intros.
+split; intros Hxy. {
+destruct x as (x, xp).
+destruct y as (y, yp).
+cbn.
+cbn in Hxy.
+progress unfold QG_sub in Hxy.
+progress unfold QG_opp in Hxy.
+cbn in Hxy.
+progress unfold QG_add in Hxy.
+cbn - [ QG_of_Q ] in Hxy.
+Search (QG_of_Q (_ + _)).
+rewrite QG_of_Q_add_idemp_r in Hxy.
+  apply Qle_bool_iff in Hxy.
+  apply Qle_bool_iff.
+  apply Qle_minus_iff in Hxy.
+  apply Qle_minus_iff.
 ...
-Search "≤"%QG.
+Search (qg_q (_ - _)).
+Search (qg_q (_ + _)).
+... ...
+  apply QG_le_0_sub.
 ...
-  eapply QG_le_trans; [ apply IHi | ].
   apply Qle_minus_iff.
   rewrite <- Qplus_assoc.
   rewrite Qplus_opp_r.
