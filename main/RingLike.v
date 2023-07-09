@@ -261,15 +261,14 @@ Inductive not_applicable := NA.
 Definition rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   List.fold_right (λ a acc, (acc * x + a)%L) 0%L l.
 
-(* TODO: write with List.fold_right *)
-
-Fixpoint rngl_mul_nat {T} {ro : ring_like_op T} a n :=
+Fixpoint mul_nat {T} (zero : T) (add : T → T → T) a n :=
   match n with
-  | 0 => 0%L
-  | S n' => (a + rngl_mul_nat a n')%L
+  | 0 => zero
+  | S n' => add a (mul_nat zero add a n')
   end.
 
-(* end TODO: write with List.fold_right *)
+Definition rngl_mul_nat {T} {ro : ring_like_op T} :=
+  mul_nat 0%L rngl_add.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;

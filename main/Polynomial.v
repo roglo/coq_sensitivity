@@ -2756,6 +2756,7 @@ destruct lb as [| b]. {
       injection Hla; clear Hla; intros Hla; symmetry in Hla.
       rewrite <- rngl_add_0_r in Hla.
       apply (rngl_add_cancel_l Hos) in Hla.
+      cbn in H12.
       rewrite Hla in H12.
       apply (Hbef 2); [ flia Hi | easy ].
     }
