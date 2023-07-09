@@ -1042,6 +1042,14 @@ unfold QG_le.
 apply Bool.bool_dec.
 Qed.
 
+Theorem QG_le_trans : ∀ x y z : QG, (x ≤ y → y ≤ z → x ≤ z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply Qle_bool_iff in Hxy, Hyz.
+apply Qle_bool_iff.
+now apply (Qle_trans _ (qg_q y)).
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -1091,6 +1099,8 @@ cbn in H1.
 assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
   clear i H1; intros.
   induction i; cbn; [ easy | ].
+  eapply QG_le_trans; [ apply IHi | ].
+...
 Search "≤"%QG.
 ...
   eapply QG_le_trans; [ apply IHi | ].
