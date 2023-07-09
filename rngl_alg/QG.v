@@ -1088,6 +1088,17 @@ Theorem QG_characteristic_prop :
 Proof.
 intros * H1.
 cbn in H1.
+assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
+  clear i H1; intros.
+  induction i; cbn; [ easy | ].
+Search "≤"%QG.
+...
+  eapply QG_le_trans; [ apply IHi | ].
+  apply Qle_minus_iff.
+  rewrite <- Qplus_assoc.
+  rewrite Qplus_opp_r.
+  easy.
+}
 ...
 progress unfold QG_add in H1.
 apply eq_QG_eq in H1.
