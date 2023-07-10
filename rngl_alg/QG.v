@@ -1107,33 +1107,38 @@ Theorem QG_le_0_sub : ∀ x y : QG, (0 ≤ y - x)%QG ↔ (x ≤ y)%QG.
 Proof.
 intros.
 split; intros Hxy. {
-destruct x as (x, xp).
-destruct y as (y, yp).
-cbn.
-cbn in Hxy.
-progress unfold QG_sub in Hxy.
-progress unfold QG_opp in Hxy.
-cbn in Hxy.
-progress unfold QG_add in Hxy.
+  destruct x as (x, xp).
+  destruct y as (y, yp).
+  cbn.
+  cbn in Hxy.
+  progress unfold QG_sub in Hxy.
+  progress unfold QG_opp in Hxy.
+  cbn in Hxy.
+  progress unfold QG_add in Hxy.
   apply Qle_bool_iff; cbn.
-cbn - [ QG_of_Q ] in Hxy.
-rewrite QG_of_Q_add_idemp_r in Hxy.
+  cbn - [ QG_of_Q ] in Hxy.
+  rewrite QG_of_Q_add_idemp_r in Hxy.
+(**)
+  apply Qle_minus_iff.
+  remember (y + - x) as yx eqn:Hyx.
+  clear - Hxy.
+...
   apply Qle_bool_iff in Hxy.
   apply Qle_minus_iff in Hxy.
-  apply Qle_minus_iff.
-progress unfold "0"%QG in Hxy.
-progress unfold QG_of_Q in Hxy at 2.
-progress unfold Qopp in Hxy at 2.
-cbn - [ QG_of_Q ] in Hxy.
-rewrite Qplus_0_r in Hxy.
-Search (QG_of_Q (_ + _)).
+  progress unfold "0"%QG in Hxy.
+  progress unfold QG_of_Q in Hxy at 2.
+  progress unfold Qopp in Hxy at 2.
+  cbn - [ QG_of_Q ] in Hxy.
+  rewrite Qplus_0_r in Hxy.
+  remember (y + - x) as yx eqn:Hyx.
+  progress unfold Qle in Hxy.
+  cbn in Hxy.
+  rewrite Z.mul_1_r in Hxy.
+...
+  Search (QG_of_Q (_ + _)).
 Search (qg_q (QG_of_Q _)).
-remember (y + - x) as yx eqn:Hyx.
-progress unfold Qle in Hxy.
-cbn in Hxy.
-rewrite Z.mul_1_r in Hxy.
-Locate "<=".
-Search (_ <= _ / _)%Z.
+Search (_ ≤ _ / _ ↔ _)%Z.
+Search (_ ↔ _ ≤ _ / _)%Z.
 ...
 Search (0 <= _)%Q.
 Search Qle_bool_iff.
