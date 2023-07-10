@@ -23,6 +23,9 @@ Definition Z_pos_gcd z p :=
 Record QG := mk_qg
   {qg_q : Q; qg_gcd : Z_pos_gcd (Qnum qg_q) (Qden qg_q) = 1%positive}.
 
+Theorem Z_pos_gcd_opp_l : ∀ z p, Z_pos_gcd (- z) p = Z_pos_gcd z p.
+Proof. now intros; destruct z. Qed.
+
 Theorem Pos_gcd_comm : ∀ a b, Pos.gcd a b = Pos.gcd b a.
 Proof.
 intros.
@@ -1195,6 +1198,66 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
 
+Theorem qg_q_opp : ∀ a, qg_q (- a)%QG = - qg_q a.
+Proof.
+intros.
+destruct a as (a, Hap); cbn.
+rewrite Z_pos_gcd_opp_l.
+rewrite Hap.
+now do 2 rewrite Z.div_1_r.
+Qed.
+
+Theorem QG_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%QG.
+Proof.
+intros.
+progress unfold QG_sub.
+progress unfold QG_opp.
+progress unfold QG_add.
+rewrite QG_of_Q_opp.
+rewrite QG_of_Q_qg_q, QG_of_Q_opp.
+rewrite QG_of_Q_qg_q, QG_of_Q_opp.
+rewrite QG_of_Q_qg_q.
+do 2 rewrite qg_q_opp.
+rewrite <- Qopp_plus.
+symmetry; apply QG_of_Q_opp.
+Qed.
+
+Theorem QG_add_le_mono_l : ∀ a b c : QG, (b ≤ c)%QG ↔ (a + b ≤ a + c)%QG.
+Proof.
+intros.
+split; intros Hbc. {
+  apply -> QG_le_0_sub.
+  rewrite QG_add_comm.
+  progress unfold QG_sub.
+  rewrite QG_opp_add_distr.
+  progress unfold QG_sub.
+  rewrite QG_add_assoc.
+  rewrite QG_add_comm.
+  rewrite <- QG_add_assoc.
+  rewrite (QG_add_comm a).
+  rewrite QG_add_opp_l.
+  rewrite (QG_add_comm c).
+  rewrite QG_add_0_l.
+  rewrite QG_add_comm.
+  now apply QG_le_0_sub.
+} {
+  apply QG_le_0_sub in Hbc.
+  rewrite QG_add_comm in Hbc.
+  progress unfold QG_sub in Hbc.
+  rewrite QG_opp_add_distr in Hbc.
+  progress unfold QG_sub in Hbc.
+  rewrite QG_add_assoc in Hbc.
+  rewrite QG_add_comm in Hbc.
+  rewrite <- QG_add_assoc in Hbc.
+  rewrite (QG_add_comm a) in Hbc.
+  rewrite QG_add_opp_l in Hbc.
+  rewrite (QG_add_comm c) in Hbc.
+  rewrite QG_add_0_l in Hbc.
+  rewrite QG_add_comm in Hbc.
+  now apply -> QG_le_0_sub in Hbc.
+}
+Qed.
+
 Theorem Q_characteristic_prop :
   ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
 Proof.
@@ -1220,7 +1283,6 @@ rewrite Qplus_0_r in Hle.
 now rewrite H1 in Hle.
 Qed.
 
-(* to be completed
 Theorem QG_characteristic_prop :
   let ro := QG_ring_like_op in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
@@ -1239,284 +1301,14 @@ assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
   easy.
 }
 specialize (Hle i).
-Theorem QG_add_le_mono_l : ∀ a b c : QG, (b ≤ c)%QG ↔ (a + b ≤ a + c)%QG.
-Proof.
-intros.
-split; intros Hbc. {
-  apply -> QG_le_0_sub.
-  rewrite QG_add_comm.
-  progress unfold QG_sub.
-Search (- (_ + _))%QG.
-Search (- (_ + _))%Q.
-Search (- (_ + _))%Z.
-Theorem QG_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%QG.
-Proof.
-intros.
-progress unfold QG_sub.
-progress unfold QG_opp.
-progress unfold QG_add.
-rewrite QG_of_Q_opp.
-rewrite QG_of_Q_qg_q, QG_of_Q_opp.
-rewrite QG_of_Q_qg_q, QG_of_Q_opp.
-rewrite QG_of_Q_qg_q.
-Theorem qg_q_opp : ∀ a, qg_q (- a)%QG = - qg_q a.
-Proof.
-intros.
-destruct a as (a, ap).
-cbn.
-Search (- _ / _)%Q.
-Search Z_pos_gcd.
-progress unfold QG_opp.
-...
-rewrite QG_of_Q_opp.
-...
-rewrite QG_of_Q_qg_q.
-...
-Search (QG_of_Q (- _)).
-destruct a as (an, ad); cbn.
-cbn.
-... ...
-Search (qg_q (- _))%QG.
-...
-do 2 rewrite qg_q_opp.
-rewrite <- Qopp_plus.
-symmetry; apply QG_of_Q_opp.
-...
-rewrite QG_of_Q_qg_q, QG_of_Q_opp.
-rewrite QG_of_Q_qg_q.
-rewrite QG_of_Q_opp.
-rewrite QG_of_Q_qg_q.
-...
-  ============================
-  (- QG_of_Q (qg_q a + qg_q b))%QG = QG_of_Q (qg_q (- a)%QG + qg_q (- b)%QG)
-...
-do 3 rewrite QG_of_Q_opp.
-...
-do 3 rewrite QG_of_Q_qg_q.
+apply (QG_add_le_mono_l 1%QG) in Hle.
+rewrite (QG_add_comm 1 0)%QG in Hle.
+rewrite QG_add_0_l in Hle.
+cbn in Hle.
+now rewrite H1 in Hle.
+Qed.
 
-
-(* ah putain fait chier *)
-  ============================
-  QG_of_Q (- qg_q (a + b)%QG) = (QG_of_Q (- qg_q a) + QG_of_Q (- qg_q b))%QG
-...
-rewrite QG_of_Q_add_idemp_l.
-...
- rewrite Q_num_den_div_gcd.
-Check Q_num_den_div_gcd.
-...
-  unfold QG_of_Q.
-  cbn.
-Search QG_of_Q.
-...
-Search (QG_of_Q (0 # _)).
-...
-Search (- 0)%Q.
-  cbn.
-  rewrite Q_opp_0.
-...
-cbn - [ qg_q ].
-Search (- _ # _)%Q.
-f_equal.
-
-cbn.
-Check Q_num_den_div_gcd.
-...
-destruct a as (an, ad).
-destruct an as [| an| an]; cbn. {
-  rewrite Z.div_same; [ cbn | easy ].
-  rewrite Qplus_0_l.
-  progress unfold "+"%Q; cbn.
-  rewrite Z.mul_comm.
-  now rewrite Qreduce_l.
-} {
-  rewrite Pos2Z.inj_gcd.
-  now rewrite Q_num_den_div_gcd.
-} {
-  rewrite Pos2Z.inj_gcd.
-  rewrite <- Z.gcd_opp_l.
-  now rewrite Q_num_den_div_gcd.
-}
-... ...
-progress unfold QG_sub.
-progress unfold QG_add.
-progress unfold QG_opp.
-rewrite QG_of_Q_add_idemp_l.
-rewrite QG_of_Q_add_idemp_r.
-rewrite <- Qopp_plus.
-do 2 rewrite QG_of_Q_opp.
-f_equal.
-now rewrite QG_of_Q_qg_q.
-...
-Search (QG_of_Q (- _))%Q.
-Search QG_of_Q.
-...
-remember (qg_q a + qg_q b)%Q as x.
-...
-f_equal.
-f_equal.
-...
-rewrite <- QG_of_q_qg_q.
-
-rewrite <- QG_of_q_qg_q.
-rewrite <- (QG_of_q_qg_q (- _))%QG.
-Search (qg_q (- _)%QG).
-...
-rewrite Qopp_plus.
- (- _))%QG.
-Proof.
-...
-apply eq_QG_eq.
-...
-rewrite Qopp_plus.
-...
-  apply Qle_bool_iff.
-Search (_ ≤ _)%QG.
-...
-  progress unfold Qle.
-apply Z.mul_le_mono_nonneg.
-...
-Search (_ * _ ≤ _ * _)%Z.
-...
-  unfold QG_add.
-Search (qg_q (QG_of_Q _)).
-Search (QG_of_Q (_ + _)).
-  rewrite QG_of_Q_add_idemp_r.
-
-Theorem QG_of_Q_add_idemp_l :
-  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
-
-
-...
-Search (_ + _ ≤ _ + _)%QG.
-Search (_ + _ ≤ _ + _)%Z.
-...
-Z.add_le_mono_l: ∀ n m p : Z, (n ≤ m)%Z ↔ (p + n ≤ p + m)%Z
-...
-cbn in H1.
-destruct xn as [| xn| xn]. {
-  cbn in H1.
-  rewrite Pos_gcd_diag in H1.
-  now rewrite Z.div_same in H1.
-} {
-  cbn in H1.
-  injection H1; clear H1; intros H1 H2.
-  rewrite Pos2Z.inj_gcd in H2.
-  apply Z.div_small_iff in H2; [ | easy ].
-  destruct H2 as [H2| H2]; [ | easy ].
-  specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
-  apply Z.divide_pos_le in H3; [ | easy ].
-  now apply Z.nlt_ge in H3.
-} {
-  clear H1.
-  destruct i; [ easy | cbn in Hx ].
-  rewrite Z.mul_1_r in Hx.
-  remember (qg_q (rngl_mul_nat 1%QG i)) as y eqn:Hy.
-  symmetry in Hy.
-  destruct y as (yn, yd).
-  cbn in Hx.
-  destruct yn as [| yn| yn]; cbn in Hx. {
-    injection Hx; clear Hx; intros H1 H2.
-    rewrite Pos_gcd_diag in H2.
-    now rewrite Z.div_same in H2.
-  } {
-    injection Hx; clear Hx; intros H1 H2.
-    specialize (Pos2Z.neg_is_neg xn) as H3.
-    rewrite <- H2 in H3.
-    apply Z.nle_gt in H3; apply H3.
-    now apply Z.div_pos.
-  } {
-    induction i; [ easy | ].
-    cbn in Hy; apply IHi; clear IHi.
-    rewrite Z.mul_1_r in Hy.
-    remember (qg_q (rngl_mul_nat 1%QG i)) as q eqn:Hq.
-    symmetry in Hq.
-    destruct q as (qn, qd).
-    cbn in Hy.
-    destruct qn as [| qn| qn]. {
-      exfalso.
-      cbn in Hy.
-      injection Hy; clear Hy; intros H1 H2.
-      specialize (Pos2Z.neg_is_neg yn) as H3.
-      rewrite <- H2 in H3.
-      apply Z.nle_gt in H3; apply H3.
-      now apply Z.div_pos.
-    } {
-      exfalso.
-      cbn in Hy.
-      injection Hy; clear Hy; intros H1 H2.
-      specialize (Pos2Z.neg_is_neg yn) as H3.
-      rewrite <- H2 in H3.
-      apply Z.nle_gt in H3; apply H3.
-      now apply Z.div_pos.
-    } {
-      injection Hy; clear Hy; intros H1 H2.
-      injection Hx; clear Hx; intros H3 H4.
-      rewrite <- H1, <- H2.
-      f_equal. {
-...
-Search (Z.neg _ = _ )%Z.
-Search (_ / _)%Z.
-Search (Z.neg _ < 0)%Z.
-Z.div_pos: ∀ a b : Z, (0 <= a)%Z → (0 < b)%Z → (0 <= a / b)%Z
-...
-    injection Hx; clear Hx; intros H1 H2.
-    specialize (Pos2Z.neg_is_neg xn) as H3.
-    rewrite <- H2 in H3.
-    apply Z.nle_gt in H3; apply H3; clear H3.
-    apply Z.div_pos; [ | easy ].
-...
-Search Z.pos_sub.
-Search (0 <= Z.pos_sub _ _)%Z.
-...
-    rewrite Pos2Z.inj_gcd in H2.
-    specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
-    apply Z.divide_pos_le in H3; [ | easy ].
-  now apply Z.nlt_ge in H3.
-...
-    rewrite Pos.div_diag in H2.
-Search (0 <= _ / _)%Z.
-specialize (Z.div_pos (Z.pos yd) (Z.pos (Pos.gcd yd yd
-...
-  injection H1; clear H1; intros H1 H2.
-  progress unfold Z_pos_gcd in H2.
-  specialize (Z.pos_sub_discr xd xn) as H3.
-  remember (Z.pos_sub xd xn) as y eqn:Hy; symmetry in Hy.
-  destruct y as [| y| y]. {
-    subst xd.
-clear H1 H2 Hy.
-cbn in Hx.
-Search (Z.pos_sub _ _).
-    destruct xn as [xn| xn| ]. {
-      cbn in Hy.
-...
-rewrite Z.pos_sub_gt in H1.
-
-  injection H1; clear H1; intros H1 H2.
-  rewrite Pos2Z.inj_gcd in H2.
-  apply Z.div_small_iff in H2; [ | easy ].
-  destruct H2 as [H2| H2]; [ | easy ].
-  specialize (Z.gcd_divide_l (Z.pos (xd + xn)) (Z.pos xd)) as H3.
-  apply Z.divide_pos_le in H3; [ | easy ].
-  now apply Z.nlt_ge in H3.
-...
-Search (_ # _ = 0)%Q.
-Search (Z.pos _ / Z.pos _)%Z.
-...
-  rewrite Pos2Z.inj_gcd in H1.
-Search (Z.pos (_ + _)).
-rewrite Pos2Z.inj_add in H1.
-Search (Z.gcd _ (_ + _)).
-rewrite Z.gcd_comm in H1.
-Search (Z.gcd _ (_ - _)).
-rewrite <- Z.gcd_sub_diag_r in H1.
-rewrite Z.add_comm in H1.
-rewrite Z.add_simpl_r in H1.
-...
-Check Nat_gcd_pos.
-Check Pos_
-Check Pos2Nat.inj.
-...
-
+(* to be completed
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -1544,7 +1336,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := QG_characteristic_prop;
-     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_refl := 42;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
      rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
