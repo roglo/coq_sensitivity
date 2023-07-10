@@ -155,6 +155,34 @@ Definition QG_of_Q (q : Q) :=
   mk_qg (Qmake (Qnum q / Zpos g) (Z.to_pos (Zpos (Qden q) / Zpos g)%Z))
     (QG_of_Q_prop q).
 
+Definition QG_0 := QG_of_Q 0.
+Definition QG_1 := QG_of_Q 1.
+Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
+Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
+Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
+Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
+Definition QG_sub (a b : QG) := QG_add a (QG_opp b).
+
+Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
+Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
+Definition QG_le a b := QG_leb a b = true.
+
+Declare Scope QG_scope.
+Delimit Scope QG_scope with QG.
+
+Notation "0" := QG_0 : QG_scope.
+Notation "1" := QG_1 : QG_scope.
+Notation "- a" := (QG_opp a) : QG_scope.
+Notation "a + b" := (QG_add a b) : QG_scope.
+Notation "a - b" := (QG_sub a b) : QG_scope.
+Notation "a * b" := (QG_mul a b) : QG_scope.
+Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
+  QG_scope.
+
+Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
+Notation "a ≤? b" := (QG_leb a b) (at level 70) : QG_scope.
+Notation "a ≤ b" := (QG_le a b) : QG_scope.
+
 Theorem eq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 = qg_q q2.
 Proof.
 intros.
@@ -164,6 +192,13 @@ destruct q2 as (q2, Hq2).
 cbn in Hq; subst q2.
 f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
+Qed.
+
+Theorem QG_of_Q_0 : ∀ d, QG_of_Q (0 # d) = QG_of_Q 0.
+Proof.
+intros.
+apply eq_QG_eq; cbn.
+now rewrite (Z.div_same (Z.pos d)).
 Qed.
 
 Theorem Nat_gcd_iff :
@@ -876,10 +911,30 @@ f_equal. {
 }
 Qed.
 
+Theorem QG_of_Q_opp : ∀ a, QG_of_Q (- a) = (- QG_of_Q a)%QG.
+Proof.
+intros.
+unfold QG_opp.
+destruct a as (an, ad); cbn.
+destruct an as [| an| an]. {
+  unfold Qopp; cbn.
+  rewrite QG_of_Q_0; symmetry.
+  now rewrite QG_of_Q_0.
+} {
+  cbn.
+  rewrite Pos2Z.inj_gcd.
+  now rewrite Q_num_den_div_gcd.
+} {
+  cbn.
+  rewrite Pos2Z.inj_gcd.
+  rewrite <- Z.gcd_opp_l.
+  now rewrite Q_num_den_div_gcd.
+}
+Qed.
+
 Theorem QG_of_Q_add_idemp_l :
   ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
 Proof.
-intros.
 intros; cbn.
 destruct a as (an, ad).
 destruct b as (bn, bd).
@@ -942,7 +997,7 @@ rewrite (Qmult_comm a).
 apply QG_of_Q_mul_idemp_l.
 Qed.
 
-Theorem QG_of_q_qg_q : ∀ a, QG_of_Q (qg_q a) = a.
+Theorem QG_of_Q_qg_q : ∀ a, QG_of_Q (qg_q a) = a.
 Proof.
 intros.
 apply eq_QG_eq.
@@ -952,33 +1007,7 @@ do 2 rewrite Z.div_1_r.
 now destruct a.
 Qed.
 
-Definition QG_0 := QG_of_Q 0.
-Definition QG_1 := QG_of_Q 1.
-Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
-Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
-Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
-Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
-Definition QG_sub (a b : QG) := QG_add a (QG_opp b).
-
-Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
-Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
-Definition QG_le a b := QG_leb a b = true.
-
-Declare Scope QG_scope.
-Delimit Scope QG_scope with QG.
-
-Notation "0" := QG_0 : QG_scope.
-Notation "1" := QG_1 : QG_scope.
-Notation "- a" := (QG_opp a) : QG_scope.
-Notation "a + b" := (QG_add a b) : QG_scope.
-Notation "a - b" := (QG_sub a b) : QG_scope.
-Notation "a * b" := (QG_mul a b) : QG_scope.
-Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
-  QG_scope.
-
-Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
-Notation "a ≤? b" := (QG_leb a b) (at level 70) : QG_scope.
-Notation "a ≤ b" := (QG_le a b) : QG_scope.
+(* *)
 
 Theorem QG_add_comm : ∀ a b : QG, (a + b)%QG = (b + a)%QG.
 Proof.
@@ -1001,7 +1030,7 @@ Proof.
 intros.
 progress unfold QG_add.
 rewrite Qplus_0_l.
-apply QG_of_q_qg_q.
+apply QG_of_Q_qg_q.
 Qed.
 
 Theorem QG_add_opp_l : ∀ a : QG, (- a + a)%QG = 0%QG.
@@ -1034,7 +1063,7 @@ Proof.
 intros.
 progress unfold QG_mul.
 rewrite Qmult_1_l.
-apply QG_of_q_qg_q.
+apply QG_of_Q_qg_q.
 Qed.
 
 Theorem QG_mul_inv_l : ∀ a : QG, a ≠ 0%QG → (a⁻¹ * a)%QG = 1%QG.
@@ -1047,8 +1076,8 @@ rewrite QG_of_Q_mul_idemp_r.
 rewrite Qmult_inv_r; [ easy | ].
 intros H1.
 apply Haz; clear Haz.
-rewrite <- (QG_of_q_qg_q a).
-rewrite <- QG_of_q_qg_q.
+rewrite <- (QG_of_Q_qg_q a).
+rewrite <- QG_of_Q_qg_q.
 now rewrite H1.
 Qed.
 
@@ -1068,8 +1097,8 @@ Proof.
 intros.
 split; intros Hab. {
   apply Qeq_bool_iff in Hab.
-  rewrite <- (QG_of_q_qg_q a).
-  rewrite <- (QG_of_q_qg_q b).
+  rewrite <- (QG_of_Q_qg_q a).
+  rewrite <- (QG_of_Q_qg_q b).
   now rewrite Hab.
 } {
   subst b.
@@ -1223,9 +1252,75 @@ Search (- (_ + _))%Z.
 Theorem QG_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%QG.
 Proof.
 intros.
+progress unfold QG_sub.
+progress unfold QG_opp.
+do 3 rewrite QG_of_Q_opp.
+progress unfold QG_opp.
+do 3 rewrite QG_of_Q_qg_q.
+(* ah putain fait chier *)
+...
+rewrite QG_of_Q_add_idemp_l.
+...
+ rewrite Q_num_den_div_gcd.
+Check Q_num_den_div_gcd.
+...
+  unfold QG_of_Q.
+  cbn.
+Search QG_of_Q.
+...
+Search (QG_of_Q (0 # _)).
+...
+Search (- 0)%Q.
+  cbn.
+  rewrite Q_opp_0.
+...
+cbn - [ qg_q ].
+Search (- _ # _)%Q.
+f_equal.
+
+cbn.
+Check Q_num_den_div_gcd.
+...
+destruct a as (an, ad).
+destruct an as [| an| an]; cbn. {
+  rewrite Z.div_same; [ cbn | easy ].
+  rewrite Qplus_0_l.
+  progress unfold "+"%Q; cbn.
+  rewrite Z.mul_comm.
+  now rewrite Qreduce_l.
+} {
+  rewrite Pos2Z.inj_gcd.
+  now rewrite Q_num_den_div_gcd.
+} {
+  rewrite Pos2Z.inj_gcd.
+  rewrite <- Z.gcd_opp_l.
+  now rewrite Q_num_den_div_gcd.
+}
+... ...
+progress unfold QG_sub.
+progress unfold QG_add.
+progress unfold QG_opp.
+rewrite QG_of_Q_add_idemp_l.
+rewrite QG_of_Q_add_idemp_r.
+rewrite <- Qopp_plus.
+do 2 rewrite QG_of_Q_opp.
+f_equal.
+now rewrite QG_of_Q_qg_q.
+...
+Search (QG_of_Q (- _))%Q.
+Search QG_of_Q.
+...
+remember (qg_q a + qg_q b)%Q as x.
+...
+f_equal.
+f_equal.
 ...
 rewrite <- QG_of_q_qg_q.
+
+rewrite <- QG_of_q_qg_q.
 rewrite <- (QG_of_q_qg_q (- _))%QG.
+Search (qg_q (- _)%QG).
+...
 rewrite Qopp_plus.
  (- _))%QG.
 Proof.
