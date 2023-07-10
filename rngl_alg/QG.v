@@ -1112,13 +1112,30 @@ progress unfold QG_sub in Hxy.
 progress unfold QG_opp in Hxy.
 cbn in Hxy.
 progress unfold QG_add in Hxy.
+  apply Qle_bool_iff; cbn.
 cbn - [ QG_of_Q ] in Hxy.
-Search (QG_of_Q (_ + _)).
 rewrite QG_of_Q_add_idemp_r in Hxy.
   apply Qle_bool_iff in Hxy.
-  apply Qle_bool_iff.
   apply Qle_minus_iff in Hxy.
   apply Qle_minus_iff.
+progress unfold "0"%QG in Hxy.
+progress unfold QG_of_Q in Hxy at 2.
+progress unfold Qopp in Hxy at 2.
+cbn - [ QG_of_Q ] in Hxy.
+rewrite Qplus_0_r in Hxy.
+Search (QG_of_Q (_ + _)).
+Search (qg_q (QG_of_Q _)).
+remember (y + - x) as yx eqn:Hyx.
+...
+cbn in Hxy.
+...
+cbn in Hxy.
+destruct x as (xn, xd).
+destruct y as (yn, yd).
+cbn.
+cbn in Hxy.
+...
+cbn - [ QG_of_Q ] in Hxy.
 ...
 Search (qg_q (_ - _)).
 Search (qg_q (_ + _)).
