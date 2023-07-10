@@ -720,35 +720,24 @@ Theorem Z_le_0_div_nonneg_r :
   ∀ x y, (0 < y → 0 ≤ x / y ↔ 0 ≤ x)%Z.
 Proof.
 intros * Hy.
+progress unfold Z.div.
+specialize (Zdiv.Z_div_mod x y) as H1.
+apply Z.lt_gt in Hy.
+specialize (H1 Hy).
+apply Z.gt_lt in Hy.
+remember (Z.div_eucl x y) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, r); cbn.
+destruct H1 as (Hq, Hr).
+clear Hqr.
+subst x.
 split. {
-  intros Hxy.
-  progress unfold Z.div in Hxy.
-  remember (Z.div_eucl x y) as qr eqn:Hqr.
-  symmetry in Hqr.
-  destruct qr as (q, r); cbn in Hxy.
-  specialize (Zdiv.Z_div_mod x y) as H1.
-  apply Z.lt_gt in Hy.
-  specialize (H1 Hy).
-  apply Z.gt_lt in Hy.
-  rewrite Hqr in H1.
-  destruct H1 as (H1, H2).
-  subst x.
+  intros Hq.
   apply Z.add_nonneg_nonneg; [ | easy ].
   apply Z.mul_nonneg_nonneg; [ | easy ].
   now apply Z.lt_le_incl.
 } {
-  intros Hx.
-  progress unfold Z.div.
-  remember (Z.div_eucl x y) as qr eqn:Hqr.
-  symmetry in Hqr.
-  destruct qr as (q, r); cbn.
-  specialize (Zdiv.Z_div_mod x y) as H1.
-  apply Z.lt_gt in Hy.
-  specialize (H1 Hy).
-  apply Z.gt_lt in Hy.
-  rewrite Hqr in H1.
-  destruct H1 as (H1, H2).
-  subst x.
+  intros Hyqr.
 ...
   apply Z.add_nonneg_cases in Hx.
   destruct H
