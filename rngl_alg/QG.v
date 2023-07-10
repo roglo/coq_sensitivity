@@ -9,6 +9,9 @@ Set Implicit Arguments.
 Require Import Utf8.
 
 Require Import QArith.
+Notation "x ≤ y" := (Z.le x y) : Z_scope.
+Notation "x ≤ y" := (Qle x y) : Q_scope.
+Notation "x ≤ y" := (Nat.le x y) : nat_scope.
 
 Definition Z_pos_gcd z p :=
   match z with
@@ -457,7 +460,7 @@ clear Hn; rename H into Hn.
 revert x y Hn.
 induction n; intros; cbn; [ now destruct x | ].
 assert (Hgp : ∀ x y,
-  Pos.size_nat x + S (Pos.size_nat y) ≤ n
+  (Pos.size_nat x + S (Pos.size_nat y) ≤ n)%nat
   → (x < y)%positive
   → Nat.gcd (Pos.to_nat x~1) (Pos.to_nat y~1) =
      Pos.to_nat (Pos.gcdn n (y - x) x~1)). {
@@ -1126,6 +1129,17 @@ rewrite Qplus_0_r in Hxy.
 Search (QG_of_Q (_ + _)).
 Search (qg_q (QG_of_Q _)).
 remember (y + - x) as yx eqn:Hyx.
+progress unfold Qle in Hxy.
+cbn in Hxy.
+rewrite Z.mul_1_r in Hxy.
+Locate "<=".
+Search (_ <= _ / _)%Z.
+...
+Search (0 <= _)%Q.
+Search Qle_bool_iff.
+cbn in Hxy.
+apply Qle_bool_iff in Hxy.
+cbn in Hxy.
 ...
 cbn in Hxy.
 ...
