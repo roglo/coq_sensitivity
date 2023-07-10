@@ -1122,6 +1122,33 @@ split; intros Hxy. {
   apply Qle_minus_iff.
   remember (y + - x) as yx eqn:Hyx.
   clear - Hxy.
+  rename yx into x; rename Hxy into Hx.
+(*?!*)
+  apply Qle_bool_iff in Hx.
+  remember (qg_q 0%QG) as y.
+  cbn in Heqy; subst y.
+  progress unfold Qle in Hx |-*.
+  cbn in Hx |-*.
+  rewrite Z.mul_1_r in Hx |-*.
+  destruct x as (xn, xd).
+  cbn in Hx |-*.
+  remember (Z_pos_gcd _ _) as y eqn:Hy.
+  clear Hy xd.
+  rename xn into x; rename y into p.
+(*?!*)
+  destruct xn as [| xn| xn]; [ easy | easy | exfalso ].
+  apply Z.nlt_ge in Hx.
+  apply Hx; clear Hx.
+...
+Search (Z.to_nat (_ / _)).
+rewrite Z2Nat.inj_div in Hx.
+cbn in Hx.
+
+Z2Nat.id: ∀ n : Z, (0 ≤ n)%Z → Z.of_nat (Z.to_nat n) = n
+...
+  apply Qle_bool_iff in Hx.
+  cbn in Hx.
+  apply Qle_bool_iff in Hx.
 ...
   apply Qle_bool_iff in Hxy.
   apply Qle_minus_iff in Hxy.
