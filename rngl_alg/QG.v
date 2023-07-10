@@ -715,7 +715,6 @@ rewrite Z.mul_comm, Hadbc.
 apply Z.mul_comm.
 Qed.
 
-(* to be completed
 Theorem Z_le_0_div_nonneg_r :
   ∀ x y, (0 < y → 0 ≤ x / y ↔ 0 ≤ x)%Z.
 Proof.
@@ -738,34 +737,25 @@ split. {
   now apply Z.lt_le_incl.
 } {
   intros Hyqr.
-...
-  apply Z.mul_le_mono_pos_l with (p := y); [ easy | ].
-  rewrite Z.mul_0_r.
-...
-  apply Z.add_nonneg_cases in Hx.
-  destruct H
-  eapply Z.add_nonneg_nonneg in Hx.
-  apply Z.add_nonneg_nonneg; [ | easy ].
-  apply Z.mul_nonneg_nonneg; [ | easy ].
-  now apply Z.lt_le_incl.
-...
-intros * Hy Hxy.
-progress unfold Z.div in Hxy.
-remember (Z.div_eucl x y) as qr eqn:Hqr.
-symmetry in Hqr.
-destruct qr as (q, r); cbn in Hxy.
-specialize (Zdiv.Z_div_mod x y) as H1.
-apply Z.lt_gt in Hy.
-specialize (H1 Hy).
-apply Z.gt_lt in Hy.
-rewrite Hqr in H1.
-destruct H1 as (H1, H2).
-subst x.
-apply Z.add_nonneg_nonneg; [ | easy ].
-apply Z.mul_nonneg_nonneg; [ | easy ].
-now apply Z.lt_le_incl.
+  apply Z.le_sub_le_add_l in Hyqr.
+  rewrite Z.sub_0_l in Hyqr.
+  rewrite <- Z.mul_opp_r in Hyqr.
+  apply Z.nlt_ge.
+  intros Hq.
+  apply Z.opp_lt_mono in Hq.
+  rewrite Z.opp_0 in Hq.
+  remember (- q)%Z as x.
+  clear q Heqx.
+  move x after y.
+  move r before y.
+  destruct Hr as (Hrz, Hry).
+  assert (H1 : (y * x < y)%Z) by now apply (Z.le_lt_trans _ r).
+  rewrite <- Z.mul_1_r in H1.
+  apply Z.mul_lt_mono_pos_l in H1; [ | easy ].
+  destruct x as [| x| x]; [ easy | | easy ].
+  now destruct x.
+}
 Qed.
-*)
 
 (* end of should be added in coq library ZArith *)
 
@@ -1102,59 +1092,6 @@ apply Qle_bool_iff.
 now apply (Qle_trans _ (qg_q y)).
 Qed.
 
-(* *)
-
-Require Import Main.RingLike.
-
-Definition QG_ring_like_op : ring_like_op QG :=
-  {| rngl_zero := 0%QG;
-     rngl_add := QG_add;
-     rngl_mul := QG_mul;
-     rngl_opt_one := Some 1%QG;
-     rngl_opt_opp_or_subt := Some (inl QG_opp);
-     rngl_opt_inv_or_quot := Some (inl QG_inv);
-     rngl_opt_eqb := Some QG_eqb;
-     rngl_opt_leb := Some QG_leb |}.
-
-Theorem Q_characteristic_prop :
-  ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
-Proof.
-intros.
-enough (H : ¬ mul_nat 0 Qplus 1 (S i) == 0). {
-  intros H1; apply H.
-  now rewrite H1.
-}
-intros H1.
-assert (Hle : ∀ i, (0 <= mul_nat 0 Qplus 1 i)%Q). {
-  clear i H1; intros.
-  induction i; cbn; [ easy | ].
-  eapply Qle_trans; [ apply IHi | ].
-  apply Qle_minus_iff.
-  rewrite <- Qplus_assoc.
-  rewrite Qplus_opp_r.
-  easy.
-}
-cbn in H1.
-specialize (Hle i).
-apply (Qplus_le_r _ _ 1) in Hle.
-rewrite Qplus_0_r in Hle.
-now rewrite H1 in Hle.
-Qed.
-
-(* to be completed
-Theorem QG_characteristic_prop :
-  let ro := QG_ring_like_op in
-  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
-Proof.
-intros * H1.
-cbn in H1.
-assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
-  clear i H1; intros.
-  induction i; cbn; [ easy | ].
-  eapply QG_le_trans; [ apply IHi | ].
-Check Qle_minus_iff.
-Search (_ <= _ ↔ 0 <= _)%Z.
-Search (_ <= _ - _ ↔ _ <= _)%nat.
 Theorem QG_le_0_sub : ∀ x y : QG, (0 ≤ y - x)%QG ↔ (x ≤ y)%QG.
 Proof.
 intros.
@@ -1211,74 +1148,115 @@ split; intros Hxy. {
   remember (Z_pos_gcd _ _) as y eqn:Hy.
   clear Hy xd.
   rename xn into x; rename y into p.
-...
-  apply Z_le_0_div_nonneg_r.
-...
-  destruct xn as [| xn| xn]; [ easy | easy | exfalso ].
-  apply Z.nlt_ge in Hx.
-  apply Hx; clear Hx.
-...
-Search (Z.to_nat (_ / _)).
-rewrite Z2Nat.inj_div in Hx.
-cbn in Hx.
+  now apply Z_le_0_div_nonneg_r.
+}
+Qed.
 
-Z2Nat.id: ∀ n : Z, (0 ≤ n)%Z → Z.of_nat (Z.to_nat n) = n
-...
-  apply Qle_bool_iff in Hx.
-  cbn in Hx.
-  apply Qle_bool_iff in Hx.
-...
-  apply Qle_bool_iff in Hxy.
-  apply Qle_minus_iff in Hxy.
-  progress unfold "0"%QG in Hxy.
-  progress unfold QG_of_Q in Hxy at 2.
-  progress unfold Qopp in Hxy at 2.
-  cbn - [ QG_of_Q ] in Hxy.
-  rewrite Qplus_0_r in Hxy.
-  remember (y + - x) as yx eqn:Hyx.
-  progress unfold Qle in Hxy.
-  cbn in Hxy.
-  rewrite Z.mul_1_r in Hxy.
-...
-  Search (QG_of_Q (_ + _)).
-Search (qg_q (QG_of_Q _)).
-Search (_ ≤ _ / _ ↔ _)%Z.
-Search (_ ↔ _ ≤ _ / _)%Z.
-...
-Search (0 <= _)%Q.
-Search Qle_bool_iff.
-cbn in Hxy.
-apply Qle_bool_iff in Hxy.
-cbn in Hxy.
-...
-cbn in Hxy.
-...
-cbn in Hxy.
-destruct x as (xn, xd).
-destruct y as (yn, yd).
-cbn.
-cbn in Hxy.
-...
-cbn - [ QG_of_Q ] in Hxy.
-...
-Search (qg_q (_ - _)).
-Search (qg_q (_ + _)).
-... ...
-  apply QG_le_0_sub.
-...
+(* *)
+
+Require Import Main.RingLike.
+
+Definition QG_ring_like_op : ring_like_op QG :=
+  {| rngl_zero := 0%QG;
+     rngl_add := QG_add;
+     rngl_mul := QG_mul;
+     rngl_opt_one := Some 1%QG;
+     rngl_opt_opp_or_subt := Some (inl QG_opp);
+     rngl_opt_inv_or_quot := Some (inl QG_inv);
+     rngl_opt_eqb := Some QG_eqb;
+     rngl_opt_leb := Some QG_leb |}.
+
+Theorem Q_characteristic_prop :
+  ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
+Proof.
+intros.
+enough (H : ¬ mul_nat 0 Qplus 1 (S i) == 0). {
+  intros H1; apply H.
+  now rewrite H1.
+}
+intros H1.
+assert (Hle : ∀ i, (0 <= mul_nat 0 Qplus 1 i)%Q). {
+  clear i H1; intros.
+  induction i; cbn; [ easy | ].
+  eapply Qle_trans; [ apply IHi | ].
   apply Qle_minus_iff.
   rewrite <- Qplus_assoc.
   rewrite Qplus_opp_r.
   easy.
 }
-...
-progress unfold QG_add in H1.
-apply eq_QG_eq in H1.
 cbn in H1.
-rewrite Z.mul_1_r in H1.
-remember (qg_q (rngl_mul_nat 1%QG i)) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (xn, xd).
+specialize (Hle i).
+apply (Qplus_le_r _ _ 1) in Hle.
+rewrite Qplus_0_r in Hle.
+now rewrite H1 in Hle.
+Qed.
+
+(* to be completed
+Theorem QG_characteristic_prop :
+  let ro := QG_ring_like_op in
+  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
+Proof.
+intros * H1.
+cbn in H1.
+assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
+  clear i H1; intros.
+  induction i; cbn; [ easy | ].
+  eapply QG_le_trans; [ apply IHi | ].
+  apply QG_le_0_sub.
+  unfold QG_sub.
+  rewrite <- QG_add_assoc, QG_add_comm.
+  rewrite (QG_add_comm _ (- _))%QG.
+  rewrite QG_add_opp_l, QG_add_0_l.
+  easy.
+}
+specialize (Hle i).
+Theorem QG_add_le_mono_l : ∀ a b c : QG, (b ≤ c)%QG ↔ (a + b ≤ a + c)%QG.
+Proof.
+intros.
+split; intros Hbc. {
+  apply -> QG_le_0_sub.
+  rewrite QG_add_comm.
+  progress unfold QG_sub.
+Search (- (_ + _))%QG.
+Search (- (_ + _))%Q.
+Search (- (_ + _))%Z.
+Theorem QG_opp_add_distr : ∀ a b, (- (a + b) = - a - b)%QG.
+Proof.
+intros.
+...
+rewrite <- QG_of_q_qg_q.
+rewrite <- (QG_of_q_qg_q (- _))%QG.
+rewrite Qopp_plus.
+ (- _))%QG.
+Proof.
+...
+apply eq_QG_eq.
+...
+rewrite Qopp_plus.
+...
+  apply Qle_bool_iff.
+Search (_ ≤ _)%QG.
+...
+  progress unfold Qle.
+apply Z.mul_le_mono_nonneg.
+...
+Search (_ * _ ≤ _ * _)%Z.
+...
+  unfold QG_add.
+Search (qg_q (QG_of_Q _)).
+Search (QG_of_Q (_ + _)).
+  rewrite QG_of_Q_add_idemp_r.
+
+Theorem QG_of_Q_add_idemp_l :
+  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) + b) = QG_of_Q (a + b).
+
+
+...
+Search (_ + _ ≤ _ + _)%QG.
+Search (_ + _ ≤ _ + _)%Z.
+...
+Z.add_le_mono_l: ∀ n m p : Z, (n ≤ m)%Z ↔ (p + n ≤ p + m)%Z
+...
 cbn in H1.
 destruct xn as [| xn| xn]. {
   cbn in H1.
