@@ -739,6 +739,9 @@ split. {
 } {
   intros Hyqr.
 ...
+  apply Z.mul_le_mono_pos_l with (p := y); [ easy | ].
+  rewrite Z.mul_0_r.
+...
   apply Z.add_nonneg_cases in Hx.
   destruct H
   eapply Z.add_nonneg_nonneg in Hx.
