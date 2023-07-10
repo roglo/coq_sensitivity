@@ -1254,10 +1254,50 @@ Proof.
 intros.
 progress unfold QG_sub.
 progress unfold QG_opp.
-do 3 rewrite QG_of_Q_opp.
+progress unfold QG_add.
+rewrite QG_of_Q_opp.
+rewrite QG_of_Q_qg_q, QG_of_Q_opp.
+rewrite QG_of_Q_qg_q, QG_of_Q_opp.
+rewrite QG_of_Q_qg_q.
+Theorem qg_q_opp : ∀ a, qg_q (- a)%QG = - qg_q a.
+Proof.
+intros.
+destruct a as (a, ap).
+cbn.
+Search (- _ / _)%Q.
+Search Z_pos_gcd.
 progress unfold QG_opp.
+...
+rewrite QG_of_Q_opp.
+...
+rewrite QG_of_Q_qg_q.
+...
+Search (QG_of_Q (- _)).
+destruct a as (an, ad); cbn.
+cbn.
+... ...
+Search (qg_q (- _))%QG.
+...
+do 2 rewrite qg_q_opp.
+rewrite <- Qopp_plus.
+symmetry; apply QG_of_Q_opp.
+...
+rewrite QG_of_Q_qg_q, QG_of_Q_opp.
+rewrite QG_of_Q_qg_q.
+rewrite QG_of_Q_opp.
+rewrite QG_of_Q_qg_q.
+...
+  ============================
+  (- QG_of_Q (qg_q a + qg_q b))%QG = QG_of_Q (qg_q (- a)%QG + qg_q (- b)%QG)
+...
+do 3 rewrite QG_of_Q_opp.
+...
 do 3 rewrite QG_of_Q_qg_q.
+
+
 (* ah putain fait chier *)
+  ============================
+  QG_of_Q (- qg_q (a + b)%QG) = (QG_of_Q (- qg_q a) + QG_of_Q (- qg_q b))%QG
 ...
 rewrite QG_of_Q_add_idemp_l.
 ...
