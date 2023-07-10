@@ -715,6 +715,66 @@ rewrite Z.mul_comm, Hadbc.
 apply Z.mul_comm.
 Qed.
 
+(* to be completed
+Theorem Z_le_0_div_nonneg_r :
+  ∀ x y, (0 < y → 0 ≤ x / y ↔ 0 ≤ x)%Z.
+Proof.
+intros * Hy.
+split. {
+  intros Hxy.
+  progress unfold Z.div in Hxy.
+  remember (Z.div_eucl x y) as qr eqn:Hqr.
+  symmetry in Hqr.
+  destruct qr as (q, r); cbn in Hxy.
+  specialize (Zdiv.Z_div_mod x y) as H1.
+  apply Z.lt_gt in Hy.
+  specialize (H1 Hy).
+  apply Z.gt_lt in Hy.
+  rewrite Hqr in H1.
+  destruct H1 as (H1, H2).
+  subst x.
+  apply Z.add_nonneg_nonneg; [ | easy ].
+  apply Z.mul_nonneg_nonneg; [ | easy ].
+  now apply Z.lt_le_incl.
+} {
+  intros Hx.
+  progress unfold Z.div.
+  remember (Z.div_eucl x y) as qr eqn:Hqr.
+  symmetry in Hqr.
+  destruct qr as (q, r); cbn.
+  specialize (Zdiv.Z_div_mod x y) as H1.
+  apply Z.lt_gt in Hy.
+  specialize (H1 Hy).
+  apply Z.gt_lt in Hy.
+  rewrite Hqr in H1.
+  destruct H1 as (H1, H2).
+  subst x.
+...
+  apply Z.add_nonneg_cases in Hx.
+  destruct H
+  eapply Z.add_nonneg_nonneg in Hx.
+  apply Z.add_nonneg_nonneg; [ | easy ].
+  apply Z.mul_nonneg_nonneg; [ | easy ].
+  now apply Z.lt_le_incl.
+...
+intros * Hy Hxy.
+progress unfold Z.div in Hxy.
+remember (Z.div_eucl x y) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, r); cbn in Hxy.
+specialize (Zdiv.Z_div_mod x y) as H1.
+apply Z.lt_gt in Hy.
+specialize (H1 Hy).
+apply Z.gt_lt in Hy.
+rewrite Hqr in H1.
+destruct H1 as (H1, H2).
+subst x.
+apply Z.add_nonneg_nonneg; [ | easy ].
+apply Z.mul_nonneg_nonneg; [ | easy ].
+now apply Z.lt_le_incl.
+Qed.
+*)
+
 (* end of should be added in coq library ZArith *)
 
 Theorem Q_num_den_div_gcd :
@@ -1118,12 +1178,10 @@ split; intros Hxy. {
   apply Qle_bool_iff; cbn.
   cbn - [ QG_of_Q ] in Hxy.
   rewrite QG_of_Q_add_idemp_r in Hxy.
-(**)
   apply Qle_minus_iff.
   remember (y + - x) as yx eqn:Hyx.
   clear - Hxy.
   rename yx into x; rename Hxy into Hx.
-(*?!*)
   apply Qle_bool_iff in Hx.
   remember (qg_q 0%QG) as y.
   cbn in Heqy; subst y.
@@ -1135,7 +1193,35 @@ split; intros Hxy. {
   remember (Z_pos_gcd _ _) as y eqn:Hy.
   clear Hy xd.
   rename xn into x; rename y into p.
-(*?!*)
+  now apply Z_le_0_div_nonneg_r in Hx.
+} {
+  destruct x as (x, xp).
+  destruct y as (y, yp).
+  progress unfold QG_sub.
+  progress unfold QG_opp.
+  cbn.
+  progress unfold QG_add.
+  apply Qle_bool_iff in Hxy; cbn in Hxy.
+  cbn - [ QG_of_Q ].
+  rewrite QG_of_Q_add_idemp_r.
+  apply Qle_minus_iff in Hxy.
+  remember (y + - x) as yx eqn:Hyx.
+  clear - Hxy.
+  rename yx into x; rename Hxy into Hx.
+  apply Qle_bool_iff.
+  remember (qg_q 0%QG) as y.
+  cbn in Heqy; subst y.
+  progress unfold Qle in Hx |-*.
+  cbn in Hx |-*.
+  rewrite Z.mul_1_r in Hx |-*.
+  destruct x as (xn, xd).
+  cbn in Hx |-*.
+  remember (Z_pos_gcd _ _) as y eqn:Hy.
+  clear Hy xd.
+  rename xn into x; rename y into p.
+...
+  apply Z_le_0_div_nonneg_r.
+...
   destruct xn as [| xn| xn]; [ easy | easy | exfalso ].
   apply Z.nlt_ge in Hx.
   apply Hx; clear Hx.
