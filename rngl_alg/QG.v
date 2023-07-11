@@ -1358,6 +1358,44 @@ destruct an as [| an| an]; [ easy | | ]. {
   apply Hbn.
 }
 ...
+  Hb : match bn with
+       | 0%Z => bd
+       | Z.pos zp | Z.neg zp => Pos.gcd zp bd
+       end = 1%positive
+  ============================
+  (Z.pos an * bn /
+   Z.pos match Z.pos an * bn with
+         | 0%Z => ad * bd
+         | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
+         end * Z.pos (ad * bd))%Z =
+  (Z.pos an * bn *
+   Z.pos
+     (Z.to_pos
+        (Z.pos (ad * bd) /
+         Z.pos match Z.pos an * bn with
+               | 0%Z => ad * bd
+               | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
+               end)))%Z
+...
+  Hb : match bn with
+       | 0%Z => bd
+       | Z.pos zp | Z.neg zp => Pos.gcd zp bd
+       end = 1%positive
+  ============================
+  (Z.neg an * bn /
+   Z.pos match Z.neg an * bn with
+         | 0%Z => ad * bd
+         | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
+         end * Z.pos (ad * bd))%Z =
+  (Z.neg an * bn *
+   Z.pos
+     (Z.to_pos
+        (Z.pos (ad * bd) /
+         Z.pos match Z.neg an * bn with
+               | 0%Z => ad * bd
+               | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
+               end)))%Z
+...
 
 Theorem QG_of_Q_qg_q_mul :
   ∀ a b : QG, QG_of_Q (qg_q a * qg_q b) = (a * b)%QG.
