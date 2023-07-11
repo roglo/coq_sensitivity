@@ -185,6 +185,8 @@ Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
 Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
 Notation "a ≤? b" := (QG_leb a b) (at level 70) : QG_scope.
 Notation "a ≤ b" := (QG_le a b) : QG_scope.
+Notation "a ≤ b ≤ c" := (QG_le a b ∧ QG_le b c)
+  (at level 70, b at next level) : QG_scope.
 
 Theorem eq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 = qg_q q2.
 Proof.
@@ -1289,6 +1291,42 @@ apply QG_le_trans with (y := (b + c)%QG). {
 }
 Qed.
 
+(* to be completed
+Theorem QG_opp_involutive: ∀ a : QG, (- - a)%QG = a.
+Proof.
+...
+
+Theorem QG_mul_le_compat_nonneg :
+  ∀ a b c d : QG, (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%QG.
+Proof.
+intros * Hac Hbd.
+apply QG_le_trans with (y := (c * b)%QG). {
+...
+
+Theorem QG_mul_le_compat_nonpos :
+  ∀ a b c d : QG, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%QG.
+Proof.
+intros * Hac Hbd.
+apply QG_le_trans with (y := (c * b)%QG). {
+Theorem QG_mul_opp_l : ∀ a b : QG, (- a * b = - (a * b))%QG.
+...
+Search (- - _)%QG.
+Search (- - _)%Q.
+Search (- - _)%Z.
+rewrite <- (QG_opp_involutive a).
+rewrite QG_mul_opp_l.
+rewrite <- (QG_opp_involutive c).
+rewrite (QG_mul_opp_l (- c))%QG.
+rewrite <- (QG_opp_involutive b).
+rewrite QG_mul_comm.
+rewrite QG_mul_opp_l.
+rewrite (QG_mul_comm (- c))%QG.
+rewrite (QG_mul_opp_l (- b))%QG.
+do 2 rewrite QG_opp_involutive.
+apply QG_mul_le_compat_nonneg.
+...
+*)
+
 Theorem Q_characteristic_prop :
   ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
 Proof.
@@ -1371,9 +1409,9 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_le_antisymm := QG_le_antisymm;
      rngl_opt_le_trans := QG_le_trans;
      rngl_opt_add_le_compat := QG_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := 42;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le;
+     rngl_opt_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := 42;
      rngl_opt_archimedean := ?rngl_opt_archimedean |}.
 *)
