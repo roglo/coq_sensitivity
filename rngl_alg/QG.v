@@ -1291,9 +1291,50 @@ apply QG_le_trans with (y := (b + c)%QG). {
 }
 Qed.
 
-(* to be completed
 Theorem QG_opp_involutive: ∀ a : QG, (- - a)%QG = a.
 Proof.
+intros.
+progress unfold QG_opp.
+rewrite (QG_of_Q_opp (qg_q a)).
+rewrite qg_q_opp.
+rewrite Qopp_opp.
+now do 2 rewrite QG_of_Q_qg_q.
+Qed.
+
+(* to be completed
+Theorem QG_of_Q_qg_q_mul :
+  ∀ a b : QG, QG_of_Q (qg_q a * qg_q b) = (a * b)%QG.
+Proof.
+intros.
+rewrite <- QG_of_Q_qg_q.
+Search (qg_q (_ * _)%QG).
+rewrite <- QG_of_Q_mul_idemp_l.
+...
+
+Theorem QG_mul_opp_l : ∀ a b : QG, (- a * b = - (a * b))%QG.
+Proof.
+intros.
+rewrite <- QG_of_Q_qg_q.
+symmetry.
+rewrite <- QG_of_Q_qg_q_mul.
+rewrite <- QG_of_Q_opp.
+...
+rewrite qg_q_opp.
+rewrite <- QG_of_Q_opp.
+Search (qg_q (_ * _)%QG).
+rewrite QG_of_Q_qg_q_mul.
+rewrite <- QG_of_Q_opp.
+Search (- (_ * _))%Q.
+...
+progress unfold QG_opp.
+do 2 rewrite QG_of_Q_opp.
+rewrite QG_of_Q_mul_idemp_l.
+Theorem QG_of_Q_mul_idemp_l :
+  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) * b) = QG_of_Q (a * b).
+...
+rewrite QG_of_Q_qg_q.
+rewrite QG_of_Q_opp.
+rewrite QG_of_Q_qg_q.
 ...
 
 Theorem QG_mul_le_compat_nonneg :
@@ -1308,22 +1349,17 @@ Theorem QG_mul_le_compat_nonpos :
 Proof.
 intros * Hac Hbd.
 apply QG_le_trans with (y := (c * b)%QG). {
-Theorem QG_mul_opp_l : ∀ a b : QG, (- a * b = - (a * b))%QG.
-...
-Search (- - _)%QG.
-Search (- - _)%Q.
-Search (- - _)%Z.
-rewrite <- (QG_opp_involutive a).
-rewrite QG_mul_opp_l.
-rewrite <- (QG_opp_involutive c).
-rewrite (QG_mul_opp_l (- c))%QG.
-rewrite <- (QG_opp_involutive b).
-rewrite QG_mul_comm.
-rewrite QG_mul_opp_l.
-rewrite (QG_mul_comm (- c))%QG.
-rewrite (QG_mul_opp_l (- b))%QG.
-do 2 rewrite QG_opp_involutive.
-apply QG_mul_le_compat_nonneg.
+  rewrite <- (QG_opp_involutive a).
+  rewrite QG_mul_opp_l.
+  rewrite <- (QG_opp_involutive c).
+  rewrite (QG_mul_opp_l (- c))%QG.
+  rewrite <- (QG_opp_involutive b).
+  rewrite QG_mul_comm.
+  rewrite QG_mul_opp_l.
+  rewrite (QG_mul_comm (- c))%QG.
+  rewrite (QG_mul_opp_l (- b))%QG.
+  do 2 rewrite QG_opp_involutive.
+  apply QG_mul_le_compat_nonneg.
 ...
 *)
 
