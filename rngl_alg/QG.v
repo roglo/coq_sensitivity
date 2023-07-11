@@ -12,6 +12,7 @@ Require Import QArith.
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 Notation "x ≤ y" := (Qle x y) : Q_scope.
 Notation "x ≤ y" := (Nat.le x y) : nat_scope.
+Notation "x ≤ y" := (Pos.le x y) : positive_scope.
 
 Definition Z_pos_gcd z p :=
   match z with
@@ -1302,12 +1303,51 @@ now do 2 rewrite QG_of_Q_qg_q.
 Qed.
 
 (* to be completed
+Theorem qg_q_mul :
+  ∀ a b, (qg_q (a * b)%QG == qg_q a * qg_q b)%Q.
+Proof.
+intros.
+destruct a as (a, Ha).
+destruct b as (b, Hb).
+move b before a.
+progress unfold "==".
+cbn.
+progress unfold Z_pos_gcd.
+progress unfold Z_pos_gcd in Ha.
+progress unfold Z_pos_gcd in Hb.
+destruct a as (an, ad).
+destruct b as (bn, bd).
+cbn in Ha, Hb; cbn.
+destruct an as [| an| an]; [ easy | | ]. {
+  destruct bn as [| bn| bn]; [ easy | | ]. {
+    cbn.
+    rewrite Pos2Z.inj_gcd.
+    rewrite Z.gcd_div_swap.
+    rewrite Z.lcm_equiv1; [ | now rewrite <- Pos2Z.inj_gcd ].
+...
+    remember (an * bn)%positive as abn.
+    remember (ad * bd)%positive as abd.
+    rewrite Pos2Z.inj_mul.
+    subst abn abd.
+    rewrite Z2Pos.id.
+    apply Z.divide_div_mul_exact.
+    now intros H; apply Z.gcd_eq_0_l in H.
+    apply Z.gcd_divide_r.
+    apply Z.div_str_pos.
+    rewrite <- Pos2Z.inj_gcd.
+    split; [ easy | ].
+    apply Pos2Z.pos_le_pos.
+    apply Pos_gcd_le_r.
+  } {
+...
+
 Theorem QG_of_Q_qg_q_mul :
   ∀ a b : QG, QG_of_Q (qg_q a * qg_q b) = (a * b)%QG.
 Proof.
 intros.
 rewrite <- QG_of_Q_qg_q.
-Search (qg_q (_ * _)%QG).
+rewrite qg_q_mul.
+...
 rewrite <- QG_of_Q_mul_idemp_l.
 ...
 
