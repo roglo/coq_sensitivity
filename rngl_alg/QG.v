@@ -1319,8 +1319,15 @@ destruct a as (an, ad).
 destruct b as (bn, bd).
 cbn in Ha, Hb; cbn.
 destruct an as [| an| an]; [ easy | | ]. {
-  destruct bn as [| bn| bn]; [ easy | | ]. {
-    cbn.
+  clear Ha Hb.
+  assert (Hbn : ∀ bn,
+    (Z.pos (an * bn) / Z.pos (Pos.gcd (an * bn) (ad * bd)) *
+       Z.pos (ad * bd))%Z =
+    Z.pos
+      (an * bn *
+       Z.to_pos
+         (Z.pos (ad * bd) / Z.pos (Pos.gcd (an * bn) (ad * bd))))). {
+    clear bn; intros.
     rewrite Pos2Z.inj_gcd.
     rewrite Z.gcd_div_swap.
     rewrite Z.lcm_equiv1; [ | now rewrite <- Pos2Z.inj_gcd ].
@@ -1337,7 +1344,19 @@ destruct an as [| an| an]; [ easy | | ]. {
     }
     apply Z.divide_div_mul_exact; [ | apply Z.gcd_divide_r ].
     now intros H; apply Z.gcd_eq_0_l in H.
-  } {
+  }
+  destruct bn as [| bn| bn]; [ easy | apply Hbn | ].
+  cbn.
+  do 2 rewrite <- Pos2Z.opp_pos.
+  rewrite Z.div_opp_l_z; [ | easy | ]. 2: {
+    rewrite Pos2Z.inj_gcd.
+    apply Z.mod_divide; [ now intros H; apply Z.gcd_eq_0_l in H | ].
+    apply Z.gcd_divide_l.
+  }
+  rewrite Z.mul_opp_l.
+  f_equal.
+  apply Hbn.
+}
 ...
 
 Theorem QG_of_Q_qg_q_mul :
