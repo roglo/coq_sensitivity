@@ -1302,9 +1302,8 @@ rewrite Qopp_opp.
 now do 2 rewrite QG_of_Q_qg_q.
 Qed.
 
-(* to be completed
-Theorem qg_q_mul :
-  ∀ a b, (qg_q (a * b)%QG == qg_q a * qg_q b)%Q.
+(* to be completed *)
+Theorem qg_q_mul : ∀ a b, (qg_q (a * b)%QG == qg_q a * qg_q b)%Q.
 Proof.
 intros.
 destruct a as (a, Ha).
@@ -1312,14 +1311,18 @@ destruct b as (b, Hb).
 move b before a.
 progress unfold "==".
 cbn.
-progress unfold Z_pos_gcd.
-progress unfold Z_pos_gcd in Ha.
-progress unfold Z_pos_gcd in Hb.
+clear Ha Hb.
 destruct a as (an, ad).
-destruct b as (bn, bd).
-cbn in Ha, Hb; cbn.
-destruct an as [| an| an]; [ easy | | ]. {
-  clear Ha Hb.
+destruct b as (bn, bd); cbn.
+assert (Han : ∀ an,
+  (Z.pos an * bn / Z.pos (Z_pos_gcd (Z.pos an * bn) (ad * bd)) *
+     Z.pos (ad * bd))%Z =
+  (Z.pos an * bn *
+     Z.pos
+       (Z.to_pos
+          (Z.pos (ad * bd) /
+           Z.pos (Z_pos_gcd (Z.pos an * bn) (ad * bd)))))%Z). {
+  clear an; intros.
   assert (Hbn : ∀ bn,
     (Z.pos (an * bn) / Z.pos (Pos.gcd (an * bn) (ad * bd)) *
        Z.pos (ad * bd))%Z =
@@ -1357,53 +1360,37 @@ destruct an as [| an| an]; [ easy | | ]. {
   f_equal.
   apply Hbn.
 }
-...
-  Hb : match bn with
-       | 0%Z => bd
-       | Z.pos zp | Z.neg zp => Pos.gcd zp bd
-       end = 1%positive
-  ============================
-  (Z.pos an * bn /
-   Z.pos match Z.pos an * bn with
-         | 0%Z => ad * bd
-         | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
-         end * Z.pos (ad * bd))%Z =
-  (Z.pos an * bn *
-   Z.pos
-     (Z.to_pos
-        (Z.pos (ad * bd) /
-         Z.pos match Z.pos an * bn with
-               | 0%Z => ad * bd
-               | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
-               end)))%Z
-...
-  Hb : match bn with
-       | 0%Z => bd
-       | Z.pos zp | Z.neg zp => Pos.gcd zp bd
-       end = 1%positive
-  ============================
-  (Z.neg an * bn /
-   Z.pos match Z.neg an * bn with
-         | 0%Z => ad * bd
-         | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
-         end * Z.pos (ad * bd))%Z =
-  (Z.neg an * bn *
-   Z.pos
-     (Z.to_pos
-        (Z.pos (ad * bd) /
-         Z.pos match Z.neg an * bn with
-               | 0%Z => ad * bd
-               | Z.pos zp | Z.neg zp => Pos.gcd zp (ad * bd)
-               end)))%Z
-...
+destruct an as [| an| an]; [ easy | apply Han | ].
+rewrite <- Pos2Z.opp_pos.
+rewrite Z.mul_opp_l.
+rewrite Z_pos_gcd_opp_l.
+rewrite Z.div_opp_l_z; [ | easy | ]. 2: {
+  remember (Z.pos an * bn)%Z as x.
+  progress unfold Z_pos_gcd.
+  destruct x as [| x| x]; [ easy | | ]. {
+    rewrite Pos2Z.inj_gcd.
+    apply Z.mod_divide; [ now intros H; apply Z.gcd_eq_0_l in H | ].
+    apply Z.gcd_divide_l.
+  } {
+    rewrite <- Pos2Z.opp_pos.
+    apply Z.mod_opp_l_z; [ easy | ].
+    rewrite Pos2Z.inj_gcd.
+    apply Z.mod_divide; [ now intros H; apply Z.gcd_eq_0_l in H | ].
+    apply Z.gcd_divide_l.
+  }
+}
+do 2 rewrite Z.mul_opp_l.
+f_equal.
+apply Han.
+Qed.
 
+(* to be completed
 Theorem QG_of_Q_qg_q_mul :
   ∀ a b : QG, QG_of_Q (qg_q a * qg_q b) = (a * b)%QG.
 Proof.
 intros.
 rewrite <- QG_of_Q_qg_q.
 rewrite qg_q_mul.
-...
 rewrite <- QG_of_Q_mul_idemp_l.
 ...
 
