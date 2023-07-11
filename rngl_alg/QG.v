@@ -1324,20 +1324,19 @@ destruct an as [| an| an]; [ easy | | ]. {
     rewrite Pos2Z.inj_gcd.
     rewrite Z.gcd_div_swap.
     rewrite Z.lcm_equiv1; [ | now rewrite <- Pos2Z.inj_gcd ].
-...
     remember (an * bn)%positive as abn.
     remember (ad * bd)%positive as abd.
     rewrite Pos2Z.inj_mul.
     subst abn abd.
-    rewrite Z2Pos.id.
-    apply Z.divide_div_mul_exact.
+    rewrite Z2Pos.id. 2: {
+      apply Z.div_str_pos.
+      rewrite <- Pos2Z.inj_gcd.
+      split; [ easy | ].
+      apply Pos2Z.pos_le_pos.
+      apply Pos_gcd_le_r.
+    }
+    apply Z.divide_div_mul_exact; [ | apply Z.gcd_divide_r ].
     now intros H; apply Z.gcd_eq_0_l in H.
-    apply Z.gcd_divide_r.
-    apply Z.div_str_pos.
-    rewrite <- Pos2Z.inj_gcd.
-    split; [ easy | ].
-    apply Pos2Z.pos_le_pos.
-    apply Pos_gcd_le_r.
   } {
 ...
 
