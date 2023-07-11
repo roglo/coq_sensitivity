@@ -1116,6 +1116,23 @@ unfold QG_le.
 apply Bool.bool_dec.
 Qed.
 
+Theorem QG_le_refl : ∀ a : QG, (a ≤ a)%QG.
+Proof.
+intros.
+apply Qle_bool_iff.
+apply Qle_refl.
+Qed.
+
+Theorem QG_le_antisymm : ∀ a b : QG, (a ≤ b → b ≤ a → a = b)%QG.
+Proof.
+intros * Hab Hba.
+apply Qle_bool_iff in Hab, Hba.
+apply Qle_antisym in Hab; [ | easy ].
+rewrite <- QG_of_Q_qg_q.
+rewrite <- (QG_of_Q_qg_q a).
+now rewrite Hab.
+Qed.
+
 Theorem QG_le_trans : ∀ x y z : QG, (x ≤ y → y ≤ z → x ≤ z)%QG.
 Proof.
 intros * Hxy Hyz.
@@ -1222,6 +1239,9 @@ rewrite <- Qopp_plus.
 symmetry; apply QG_of_Q_opp.
 Qed.
 
+Theorem fold_QG_sub : ∀ a b, (a + - b = a - b)%QG.
+Proof. easy. Qed.
+
 Theorem QG_add_le_mono_l : ∀ a b c : QG, (b ≤ c)%QG ↔ (a + b ≤ a + c)%QG.
 Proof.
 intros.
@@ -1255,6 +1275,17 @@ split; intros Hbc. {
   rewrite QG_add_0_l in Hbc.
   rewrite QG_add_comm in Hbc.
   now apply -> QG_le_0_sub in Hbc.
+}
+Qed.
+
+Theorem QG_add_le_compat : ∀ a b c d : QG, (a ≤ b → c ≤ d → a + c ≤ b + d)%QG.
+Proof.
+intros * Hab Hcd.
+apply QG_le_trans with (y := (b + c)%QG). {
+  rewrite (QG_add_comm a), (QG_add_comm b).
+  now apply QG_add_le_mono_l.
+} {
+  now apply QG_add_le_mono_l.
 }
 Qed.
 
@@ -1336,11 +1367,11 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := QG_characteristic_prop;
-     rngl_opt_le_refl := 42;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_le_refl := QG_le_refl;
+     rngl_opt_le_antisymm := QG_le_antisymm;
+     rngl_opt_le_trans := QG_le_trans;
+     rngl_opt_add_le_compat := QG_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := 42;
      rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
      rngl_opt_not_le := ?rngl_opt_not_le;
