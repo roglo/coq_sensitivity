@@ -1384,42 +1384,38 @@ f_equal.
 apply Han.
 Qed.
 
-(* to be completed
 Theorem QG_of_Q_qg_q_mul :
   ∀ a b : QG, QG_of_Q (qg_q a * qg_q b) = (a * b)%QG.
 Proof.
 intros.
 rewrite <- QG_of_Q_qg_q.
 rewrite qg_q_mul.
-rewrite <- QG_of_Q_mul_idemp_l.
-...
+now rewrite <- QG_of_Q_mul_idemp_l.
+Qed.
+
+Theorem Q_mul_opp_l : ∀ n m : Q, (- n * m)%Q == (- (n * m))%Q.
+Proof.
+intros.
+progress unfold "=="%Q; cbn.
+f_equal.
+apply Z.mul_opp_l.
+Qed.
 
 Theorem QG_mul_opp_l : ∀ a b : QG, (- a * b = - (a * b))%QG.
 Proof.
 intros.
-rewrite <- QG_of_Q_qg_q.
-symmetry.
+rewrite <- QG_of_Q_qg_q; symmetry.
+rewrite <- QG_of_Q_qg_q; symmetry.
+rewrite <- QG_of_Q_qg_q_mul.
 rewrite <- QG_of_Q_qg_q_mul.
 rewrite <- QG_of_Q_opp.
-...
+rewrite QG_of_Q_qg_q.
+rewrite QG_of_Q_qg_q.
 rewrite qg_q_opp.
-rewrite <- QG_of_Q_opp.
-Search (qg_q (_ * _)%QG).
-rewrite QG_of_Q_qg_q_mul.
-rewrite <- QG_of_Q_opp.
-Search (- (_ * _))%Q.
-...
-progress unfold QG_opp.
-do 2 rewrite QG_of_Q_opp.
-rewrite QG_of_Q_mul_idemp_l.
-Theorem QG_of_Q_mul_idemp_l :
-  ∀ a b, QG_of_Q (qg_q (QG_of_Q a) * b) = QG_of_Q (a * b).
-...
-rewrite QG_of_Q_qg_q.
-rewrite QG_of_Q_opp.
-rewrite QG_of_Q_qg_q.
-...
+now rewrite Q_mul_opp_l.
+Qed.
 
+(* to be completed
 Theorem QG_mul_le_compat_nonneg :
   ∀ a b c d : QG, (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%QG.
 Proof.
