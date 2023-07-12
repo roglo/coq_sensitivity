@@ -1293,7 +1293,13 @@ rewrite Qopp_opp.
 now do 2 rewrite QG_of_Q_qg_q.
 Qed.
 
-(* to be completed *)
+Theorem Z_pos_pos_gcd : ∀ a b, Z.pos (Z_pos_gcd a b) = Z.gcd a (Z.pos b).
+Proof.
+intros.
+unfold Z_pos_gcd.
+now destruct a.
+Qed.
+
 Theorem qg_q_add : ∀ a b, qg_q (a + b) == qg_q a + qg_q b.
 Proof.
 intros.
@@ -1315,7 +1321,23 @@ assert (Han : ∀ an ad bn bd,
               (ad * bd)))))%Z). {
   clear.
   intros.
-... ...
+  rewrite Z2Pos.id. 2: {
+    apply Z.div_str_pos.
+    split; [ easy | ].
+    apply Pos2Z.pos_le_pos.
+    progress unfold Z_pos_gcd.
+    remember (_ + _)%Z as x.
+    destruct x as [| x| x]; [ apply Pos.le_refl | | ]. {
+      apply Pos_gcd_le_r.
+    } {
+      apply Pos_gcd_le_r.
+    }
+  }
+  remember (_ + _)%Z as x.
+  rewrite Z_pos_pos_gcd.
+  rewrite Z.lcm_equiv2; [ | now rewrite <- Z_pos_pos_gcd ].
+  rewrite Z.lcm_equiv1; [ easy | ].
+  now rewrite <- Z_pos_pos_gcd.
 }
 destruct a as (an, ad).
 destruct b as (bn, bd); cbn in Ha, Hb |-*.
@@ -1353,20 +1375,7 @@ destruct an as [| an| an]; [ | | ]. {
   f_equal.
   apply Han.
 }
-...
-    rewrite Pos2Z.inj_gcd.
-    apply Z.mod_divide; [ now intros H; apply Z.gcd_eq_0_l in H | ].
-    apply Z.gcd_divide_l.
-  }
-Search (- _ / _)%Z.
-...
-  rewrite fold_Z_sub.
-Search (- (_ + _))%Z.
-Search (- _ - _)%Q.
-Check Z.sub_opp_l.
-  do 10 rewrite Z.sub_opp_l.
-...
-*)
+Qed.
 
 Theorem qg_q_mul : ∀ a b, qg_q (a * b) == qg_q a * qg_q b.
 Proof.
@@ -1632,6 +1641,16 @@ cbn in Hle.
 now rewrite H1 in Hle.
 Qed.
 
+Theorem qg_q_mul_nat :
+  ∀ a n, qg_q (mul_nat 0%QG QG_add a n) == mul_nat 0%Q Qplus (qg_q a) n.
+Proof.
+intros.
+induction n; [ easy | ].
+cbn - [ QG_add ].
+rewrite qg_q_add.
+now rewrite IHn.
+Qed.
+
 (* to be completed
 Theorem QG_archimedean :
   let ro := QG_ring_like_op in
@@ -1655,16 +1674,8 @@ apply Qnot_lt_le.
 apply Qle_not_lt in H1.
 intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
-Theorem qg_q_mul_nat :
-  ∀ a n, qg_q (mul_nat 0%QG QG_add a n) == mul_nat 0%Q Qplus (qg_q a) n.
-Proof.
-intros.
-induction n; [ easy | ].
-cbn - [ QG_add ].
-Search (qg_q (_ + _)%QG).
-Search (qg_q (_ * _)%QG).
-...
 do 2 rewrite qg_q_mul_nat.
+cbn.
 ...
 *)
 
