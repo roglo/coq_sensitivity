@@ -1498,6 +1498,21 @@ apply QG_le_trans with (y := (c * b)%QG). {
 }
 Qed.
 
+Theorem QG_not_le : ∀ a b : QG, (¬ (a ≤ b) → a ≠ b ∧ b ≤ a)%QG.
+Proof.
+intros * Hab.
+split. {
+  intros H1; apply Hab; clear Hab; subst b.
+  apply QG_le_refl.
+}
+apply Qle_bool_iff.
+apply Qnot_lt_le.
+intros H1.
+apply Hab; clear Hab.
+apply Qle_bool_iff.
+now apply Qlt_le_weak.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -1538,6 +1553,34 @@ now rewrite H1 in Hle.
 Qed.
 
 (* to be completed
+Theorem QG_archimedean :
+  let ro := QG_ring_like_op in
+  ∀ ε : QG, (0 < ε)%L →
+  ∀ n : nat, ∃ m : nat, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L.
+Proof.
+intros * Hε *.
+destruct ε as ((εn , εd), Hεp).
+cbn in Hεp.
+exists (n * Pos.to_nat εd / Z.to_nat εn + 1)%nat.
+cbn in Hε |-*.
+progress unfold "≤?"%QG in Hε.
+progress unfold "≤?"%QG.
+cbn in Hε |-*.
+apply not_true_iff_false in Hε.
+apply not_true_iff_false.
+intros H1; apply Hε; clear Hε.
+apply Qle_bool_iff in H1.
+apply Qle_bool_iff.
+apply Qnot_lt_le.
+apply Qle_not_lt in H1.
+intros Hε; apply H1; clear H1.
+unfold rngl_mul_nat.
+cbn.
+(* ah, fait chier, faut réfléchir *)
+...
+*)
+
+(* to be completed
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -1572,6 +1615,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := 42;
-     rngl_opt_archimedean := ?rngl_opt_archimedean |}.
+     rngl_opt_not_le := QG_not_le;
+     rngl_opt_archimedean := QG_archimedean |}.
 *)
