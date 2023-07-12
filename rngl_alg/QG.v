@@ -1474,12 +1474,13 @@ split; intros Hab. {
 }
 Qed.
 
-(* to be completed
 Theorem QG_mul_le_compat_nonpos :
   ∀ a b c d : QG, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%QG.
 Proof.
 intros * Hac Hbd.
-apply QG_le_trans with (y := (c * b)%QG). {
+assert (Hle : ∀ a b c, (c ≤ a ≤ 0 → b ≤ 0 → a * b ≤ c * b)%QG). {
+  clear.
+  intros * Hac Hbz.
   rewrite <- (QG_opp_involutive a).
   rewrite QG_mul_opp_l.
   rewrite <- (QG_opp_involutive c).
@@ -1495,15 +1496,22 @@ apply QG_le_trans with (y := (c * b)%QG). {
     apply QG_opp_le_mono.
     now rewrite QG_opp_involutive.
   }
-...
-Search (- _ ≤ - _)%QG.
-Search (_ ≤ - _)%QG.
-Search (- _ ≤ _)%QG.
-Search (- _ ≤ - _)%Z.
-Search (_ ≤ - _)%Z.
-Search (- _ ≤ _)%Z.
-...
-*)
+  split. {
+    apply QG_opp_le_mono.
+    now rewrite QG_opp_involutive.
+  } {
+    now apply -> QG_opp_le_mono.
+  }
+}
+apply QG_le_trans with (y := (c * b)%QG). {
+  now apply Hle.
+} {
+  do 2 rewrite (QG_mul_comm c).
+  assert (Hcz : (c ≤ 0)%QG) by now apply QG_le_trans with (y := a).
+  destruct Hac as (Hca, Haz).
+  now apply Hle.
+}
+Qed.
 
 Theorem Q_characteristic_prop :
   ∀ i, mul_nat 0 Qplus 1 (S i) ≠ 0.
