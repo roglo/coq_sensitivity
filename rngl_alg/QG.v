@@ -1415,14 +1415,66 @@ rewrite qg_q_opp.
 now rewrite Q_mul_opp_l.
 Qed.
 
-(* to be completed
+Theorem QG_mul_nonneg_nonneg : ∀ a b : QG, (0 ≤ a → 0 ≤ b → 0 ≤ a * b)%QG.
+Proof.
+intros * Ha Hb.
+apply Qle_bool_iff in Ha, Hb.
+apply Qle_bool_iff.
+cbn in Ha, Hb.
+cbn - [ QG_mul ].
+rewrite qg_q_mul.
+now apply Qmult_le_0_compat.
+Qed.
+
 Theorem QG_mul_le_compat_nonneg :
   ∀ a b c d : QG, (0 ≤ a ≤ c → 0 ≤ b ≤ d → a * b ≤ c * d)%QG.
 Proof.
 intros * Hac Hbd.
 apply QG_le_trans with (y := (c * b)%QG). {
-...
+  rewrite (QG_mul_comm a).
+  rewrite (QG_mul_comm c).
+  apply QG_le_0_sub.
+  progress unfold QG_sub.
+  rewrite (QG_mul_comm _ a).
+  rewrite <- QG_mul_opp_l.
+  rewrite (QG_mul_comm _ b).
+  rewrite <- QG_mul_add_distr_l.
+  rewrite fold_QG_sub.
+  apply QG_mul_nonneg_nonneg; [ easy | now apply QG_le_0_sub ].
+} {
+  apply QG_le_0_sub.
+  progress unfold QG_sub.
+  rewrite (QG_mul_comm _ b).
+  rewrite <- QG_mul_opp_l.
+  rewrite (QG_mul_comm _ c).
+  rewrite <- QG_mul_add_distr_l.
+  rewrite fold_QG_sub.
+  apply QG_mul_nonneg_nonneg; [ | now apply QG_le_0_sub ].
+  eapply QG_le_trans; [ apply Hac | easy ].
+}
+Qed.
 
+Theorem QG_opp_le_mono: ∀ a b : QG, (a ≤ b ↔ - b ≤ - a)%QG.
+Proof.
+intros.
+split; intros Hab. {
+  apply QG_le_0_sub.
+  progress unfold QG_sub.
+  rewrite QG_opp_involutive.
+  rewrite QG_add_comm.
+  rewrite fold_QG_sub.
+  now apply <- QG_le_0_sub.
+} {
+  apply QG_le_0_sub in Hab.
+  progress unfold QG_sub in Hab.
+  rewrite QG_opp_involutive in Hab.
+  rewrite QG_add_comm in Hab.
+  rewrite fold_QG_sub in Hab.
+  now apply -> QG_le_0_sub in Hab.
+}
+Qed.
+
+(* to be completed
 Theorem QG_mul_le_compat_nonpos :
   ∀ a b c d : QG, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%QG.
 Proof.
@@ -1438,7 +1490,18 @@ apply QG_le_trans with (y := (c * b)%QG). {
   rewrite (QG_mul_comm (- c))%QG.
   rewrite (QG_mul_opp_l (- b))%QG.
   do 2 rewrite QG_opp_involutive.
-  apply QG_mul_le_compat_nonneg.
+  apply QG_mul_le_compat_nonneg. {
+    split; [ | apply QG_le_refl ].
+    apply QG_opp_le_mono.
+    now rewrite QG_opp_involutive.
+  }
+...
+Search (- _ ≤ - _)%QG.
+Search (_ ≤ - _)%QG.
+Search (- _ ≤ _)%QG.
+Search (- _ ≤ - _)%Z.
+Search (_ ≤ - _)%Z.
+Search (- _ ≤ _)%Z.
 ...
 *)
 
