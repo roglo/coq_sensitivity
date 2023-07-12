@@ -1676,6 +1676,14 @@ intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
 do 2 rewrite qg_q_mul_nat.
 cbn.
+Search (_ < _ # _)%Q.
+Search Qarchimedean.
+...
+Qarchimedean: ∀ q : Q, {p : positive | q < Z.pos p # 1}
+...
+induction n; cbn. {
+  rewrite Nat.div_0_l; cbn; [ now rewrite Qplus_0_r | ].
+  intros H1.
 ...
 *)
 
