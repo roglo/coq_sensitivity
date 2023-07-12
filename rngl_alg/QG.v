@@ -1302,7 +1302,6 @@ rewrite Qopp_opp.
 now do 2 rewrite QG_of_Q_qg_q.
 Qed.
 
-(* to be completed *)
 Theorem qg_q_mul : ∀ a b, (qg_q (a * b)%QG == qg_q a * qg_q b)%Q.
 Proof.
 intros.
