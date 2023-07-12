@@ -1293,7 +1293,7 @@ rewrite Qopp_opp.
 now do 2 rewrite QG_of_Q_qg_q.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem qg_q_add : ∀ a b, qg_q (a + b) == qg_q a + qg_q b.
 Proof.
 intros.
@@ -1313,6 +1313,8 @@ assert (Han : ∀ an ad bn bd,
          Z.pos
            (Z_pos_gcd (Z.pos an * Z.pos bd + bn * Z.pos ad)
               (ad * bd)))))%Z). {
+  clear.
+  intros.
 ... ...
 }
 destruct a as (an, ad).
