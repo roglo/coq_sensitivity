@@ -1676,8 +1676,24 @@ intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
 do 2 rewrite qg_q_mul_nat.
 cbn.
+rewrite Nat.add_1_r.
+remember (S _) as m.
+rewrite <- (Nat2Pos.id m); subst m; [ | easy ].
+rewrite <- Pos.of_nat_succ.
+Search Pos.of_succ_nat.
+Print Pos.of_succ_nat.
+...
+Search (Pos.of_nat (S _)).
+rewrite (Nat2Pos.inj_succ (_ / _)).
+...
+rewrite Pos.of_succ_nat.
+...
 Search (_ < _ # _)%Q.
 Search Qarchimedean.
+Search (nat → positive).
+Search Pos.of_nat.
+Check Nat2Pos.id.
+Pos.of_nat_succ: ∀ n : nat, Pos.of_succ_nat n = Pos.of_nat (S n)
 ...
 Qarchimedean: ∀ q : Q, {p : positive | q < Z.pos p # 1}
 ...
