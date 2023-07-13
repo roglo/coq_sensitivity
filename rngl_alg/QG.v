@@ -1694,12 +1694,12 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now rewrite Qplus_0_r.
 }
 rewrite Nat2Pos.inj_add; [ | | easy ]. 2: {
-intros Hn.
-apply Nat.div_small_iff in Hn. 2: {
-  destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-  apply Nat.neq_0_lt_0.
-  apply Pos2Nat.is_pos.
-}
+  intros Hn.
+  apply Nat.div_small_iff in Hn. 2: {
+    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+    apply Nat.neq_0_lt_0.
+    apply Pos2Nat.is_pos.
+  }
 ...
 rewrite <- Pos.of_nat_succ.
 rewrite Pos.of_nat_succ.
