@@ -1696,6 +1696,16 @@ remember (mul_nat _ _ _ _) as x in |-*.
 rewrite Q_mul_nat_add_r; subst x.
 rewrite Qplus_assoc.
 apply Qplus_le_l.
+destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
+... ...
+  eapply Qle_trans; [ apply H1 | ].
+  rewrite Qplus_comm.
+  apply Qle_minus_iff.
+  rewrite <- Qplus_assoc.
+  rewrite Qplus_opp_r.
+  rewrite Qplus_0_r.
+...
+}
 ...
 rewrite Nat.add_1_r.
 remember (S _) as m.
