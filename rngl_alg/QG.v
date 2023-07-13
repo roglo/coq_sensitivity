@@ -1676,10 +1676,20 @@ intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
 do 2 rewrite qg_q_mul_nat.
 cbn.
+(**)
+rewrite (Nat.add_1_r (_ / _)).
+induction n; cbn; [ now rewrite Qplus_0_r | ].
+eapply Qlt_trans; [ apply Qplus_lt_r, IHn | ].
+...
 rewrite Nat.add_1_r.
 remember (S _) as m.
 rewrite <- (Nat2Pos.id m); subst m; [ | easy ].
 rewrite <- Nat.add_1_r.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  cbn; rewrite Pos2Nat.inj_1; cbn.
+  now rewrite Qplus_0_r.
+}
 assert (Hεnz : Z.to_nat εn ≠ 0%nat). {
   progress unfold Qlt in Hε.
   cbn in Hε.
@@ -1687,11 +1697,6 @@ assert (Hεnz : Z.to_nat εn ≠ 0%nat). {
   destruct εn as [| εn| εn]; [ easy | cbn | easy ].
   apply Nat.neq_0_lt_0.
   apply Pos2Nat.is_pos.
-}
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  cbn; rewrite Pos2Nat.inj_1; cbn.
-  now rewrite Qplus_0_r.
 }
 rewrite Nat2Pos.inj_add; [ | | easy ]. 2: {
   intros Hn.
