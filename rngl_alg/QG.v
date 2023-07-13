@@ -1651,6 +1651,17 @@ rewrite qg_q_add.
 now rewrite IHn.
 Qed.
 
+Theorem Q_mul_nat_add_r : ∀ a m n,
+  mul_nat 0 Qplus a (m + n) ==
+    mul_nat 0 Qplus a m + mul_nat 0 Qplus a n.
+Proof.
+intros.
+revert n.
+induction m; intros; [ now rewrite Qplus_0_l | cbn ].
+rewrite IHm.
+apply Qplus_assoc.
+Qed.
+
 (* to be completed
 Theorem QG_archimedean :
   let ro := QG_ring_like_op in
@@ -1679,7 +1690,12 @@ cbn.
 (**)
 rewrite (Nat.add_1_r (_ / _)).
 induction n; cbn; [ now rewrite Qplus_0_r | ].
-eapply Qlt_trans; [ apply Qplus_lt_r, IHn | ].
+eapply Qlt_le_trans; [ apply Qplus_lt_r, IHn | ].
+rewrite <- Nat.add_assoc.
+remember (mul_nat _ _ _ _) as x in |-*.
+rewrite Q_mul_nat_add_r; subst x.
+rewrite Qplus_assoc.
+apply Qplus_le_l.
 ...
 rewrite Nat.add_1_r.
 remember (S _) as m.
