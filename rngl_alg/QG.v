@@ -1679,8 +1679,39 @@ cbn.
 rewrite Nat.add_1_r.
 remember (S _) as m.
 rewrite <- (Nat2Pos.id m); subst m; [ | easy ].
+rewrite <- Nat.add_1_r.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite Nat.div_0_l. 2: {
+    progress unfold Qlt in Hε.
+    cbn in Hε.
+    rewrite Z.mul_1_r in Hε.
+    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+    apply Nat.neq_0_lt_0.
+    apply Pos2Nat.is_pos.
+  }
+  cbn; rewrite Pos2Nat.inj_1; cbn.
+  now rewrite Qplus_0_r.
+}
+rewrite Nat2Pos.inj_add; [ | | easy ]. 2: {
+intros Hn.
+apply Nat.div_small_iff in Hn. 2: {
+  destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+  apply Nat.neq_0_lt_0.
+  apply Pos2Nat.is_pos.
+}
+...
 rewrite <- Pos.of_nat_succ.
-Search Pos.of_succ_nat.
+rewrite Pos.of_nat_succ.
+rewrite <- Nat.add_1_r.
+rewrite Nat2Pos.inj_add; [ | | easy ].
+...
+Search (Pos.of_nat (_ + _)).
+Pos.of_nat_succ: ∀ n : nat, Pos.of_succ_nat n = Pos.of_nat (S n)
+: ∀ n m : nat, Pos.of_succ_nat n = Pos.of_succ_nat m → n = m
+...
+Search (Pos.of_succ_nat (_ / _))%nat.
+...
 Print Pos.of_succ_nat.
 ...
 Search (Pos.of_nat (S _)).
