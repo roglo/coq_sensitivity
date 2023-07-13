@@ -1660,7 +1660,7 @@ Proof.
 intros * Hε *.
 destruct ε as ((εn , εd), Hεp).
 cbn in Hεp.
-exists (n * Pos.to_nat εd / Z.to_nat εn + 1)%nat.
+exists (n * (Pos.to_nat εd / Z.to_nat εn + 1) + 1)%nat.
 cbn in Hε |-*.
 progress unfold "≤?"%QG in Hε.
 progress unfold "≤?"%QG.
@@ -1680,51 +1680,27 @@ rewrite Nat.add_1_r.
 remember (S _) as m.
 rewrite <- (Nat2Pos.id m); subst m; [ | easy ].
 rewrite <- Nat.add_1_r.
+assert (Hεnz : Z.to_nat εn ≠ 0%nat). {
+  progress unfold Qlt in Hε.
+  cbn in Hε.
+  rewrite Z.mul_1_r in Hε.
+  destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+  apply Nat.neq_0_lt_0.
+  apply Pos2Nat.is_pos.
+}
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
-  rewrite Nat.div_0_l. 2: {
-    progress unfold Qlt in Hε.
-    cbn in Hε.
-    rewrite Z.mul_1_r in Hε.
-    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-    apply Nat.neq_0_lt_0.
-    apply Pos2Nat.is_pos.
-  }
   cbn; rewrite Pos2Nat.inj_1; cbn.
   now rewrite Qplus_0_r.
 }
 rewrite Nat2Pos.inj_add; [ | | easy ]. 2: {
   intros Hn.
-  apply Nat.div_small_iff in Hn. 2: {
-    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-    apply Nat.neq_0_lt_0.
-    apply Pos2Nat.is_pos.
-  }
-...
-rewrite <- Pos.of_nat_succ.
-rewrite Pos.of_nat_succ.
-rewrite <- Nat.add_1_r.
-rewrite Nat2Pos.inj_add; [ | | easy ].
-...
-Search (Pos.of_nat (_ + _)).
-Pos.of_nat_succ: ∀ n : nat, Pos.of_succ_nat n = Pos.of_nat (S n)
-: ∀ n m : nat, Pos.of_succ_nat n = Pos.of_succ_nat m → n = m
-...
-Search (Pos.of_succ_nat (_ / _))%nat.
-...
-Print Pos.of_succ_nat.
-...
-Search (Pos.of_nat (S _)).
-rewrite (Nat2Pos.inj_succ (_ / _)).
-...
-rewrite Pos.of_succ_nat.
-...
-Search (_ < _ # _)%Q.
-Search Qarchimedean.
-Search (nat → positive).
-Search Pos.of_nat.
-Check Nat2Pos.id.
-Pos.of_nat_succ: ∀ n : nat, Pos.of_succ_nat n = Pos.of_nat (S n)
+  rewrite Nat.add_1_r in Hn.
+  apply Nat.eq_mul_0 in Hn.
+  now destruct Hn.
+}
+cbn.
+rewrite Nat2Pos.inj_mul; [ | easy | now rewrite Nat.add_1_r ].
 ...
 Qarchimedean: ∀ q : Q, {p : positive | q < Z.pos p # 1}
 ...
