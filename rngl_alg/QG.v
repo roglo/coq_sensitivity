@@ -1711,6 +1711,9 @@ apply Qplus_le_l.
 destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
   eapply Qle_trans; [ | apply Qplus_le_l, Qlt_le_weak, Hε ].
   rewrite Qplus_0_l.
+(**)
+  assert (H2 : (0 < Pos.to_nat εd / Z.to_nat εn)%nat). {
+...
   rewrite nat_of_inv_Q.
   remember (εn # εd) as ε eqn:Hεnd.
   clear εn εd Hεp Hεnd IHn.
