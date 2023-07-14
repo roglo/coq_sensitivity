@@ -1731,7 +1731,34 @@ cbn.
 rewrite Z.mul_1_r.
 rewrite Pos.mul_1_r.
 rewrite nat_of_inv_Q.
-(* pffff.... *)
+progress unfold Qinv.
+cbn.
+destruct εn as [| εn| εn]; [ easy | | easy ].
+cbn - [ Z.mul ].
+rewrite Nat2Z.inj_add.
+cbn - [ Z.mul ].
+rewrite Nat2Z.inj_mul.
+rewrite Z.mul_add_distr_l.
+rewrite Z.mul_1_r.
+rewrite Z.mul_assoc.
+rewrite (Z.mul_comm (Z.pos εn)).
+rewrite <- Z.mul_assoc.
+remember (Z.pos εn * _)%Z as x.
+apply Z.le_lt_trans with (m := (Z.of_nat n * x)%Z). 2: {
+  now apply Z.lt_add_pos_r.
+}
+apply Z.mul_le_mono_nonneg_l; [ apply Nat2Z.is_nonneg | ].
+subst x.
+rewrite Nat2Z.inj_add.
+cbn - [ Z.mul ].
+rewrite Z.mul_add_distr_l.
+rewrite Z.mul_1_r.
+rewrite Nat2Z.inj_div.
+do 2 rewrite positive_nat_Z.
+Search (_ * (_ / _))%Z.
+(* plein de trucs possibles à voir... *)
+...
+Search (Z.of_nat (Pos.to_nat _)).
 ...
 rewrite nat_of_inv_Q.
 remember (εn # εd) as ε eqn:Hεnd.
