@@ -1713,10 +1713,29 @@ destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
   rewrite Qplus_0_l.
 (**)
   assert (H2 : (0 < Pos.to_nat εd / Z.to_nat εn)%nat). {
+    progress unfold Qlt in H1; cbn in H1.
+    rewrite Z.mul_1_r in H1.
+    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+    progress unfold Z.lt in H1.
+    progress unfold "?="%Z in H1.
+    apply -> Pos.compare_lt_iff in H1.
+    apply Pos2Nat.inj_lt in H1.
+    apply Nat.div_str_pos.
+    split; [ | now apply Nat.lt_le_incl ].
+    apply Pos2Nat.is_pos.
+  }
+  remember (Pos.to_nat _ / _)%nat as x.
 ...
-  rewrite nat_of_inv_Q.
-  remember (εn # εd) as ε eqn:Hεnd.
-  clear εn εd Hεp Hεnd IHn.
+  clear Heqx IHn.
+  destruct x; [ easy | cbn ].
+  clear H2.
+...
+    rewrite nat_of_inv_Q.
+    progress unfold Qinv; cbn.
+    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
+...
+    remember (εn # εd) as ε eqn:Hεnd.
+    clear εn εd Hεp Hεnd IHn.
 ... ...
 } {
   eapply Qle_trans; [ apply H1 | ].
