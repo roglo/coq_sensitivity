@@ -1663,6 +1663,7 @@ rewrite qg_q_add.
 now rewrite IHn.
 Qed.
 
+(* perhaps useless
 Theorem Q_mul_nat_add_r : ∀ a m n,
   mul_nat 0 Qplus a (m + n) ==
     mul_nat 0 Qplus a m + mul_nat 0 Qplus a n.
@@ -1672,6 +1673,29 @@ revert n.
 induction m; intros; [ now rewrite Qplus_0_l | cbn ].
 rewrite IHm.
 apply Qplus_assoc.
+Qed.
+*)
+
+Theorem Q_mul_nat : ∀ a n, mul_nat 0 Qplus a n == a * (Z.of_nat n # 1).
+Proof.
+intros.
+induction n; cbn; [ symmetry; apply Qmult_0_r | ].
+rewrite IHn; clear IHn.
+progress unfold "==".
+cbn.
+rewrite Pos.mul_1_r.
+rewrite Pos2Z.inj_mul.
+do 2 rewrite <- Z.mul_assoc.
+rewrite <- Z.mul_add_distr_l.
+rewrite <- Z.mul_assoc.
+f_equal.
+rewrite Z.mul_assoc.
+f_equal.
+rewrite <- (Z.mul_1_l (QDen a)) at 1.
+rewrite <- Z.mul_add_distr_r.
+f_equal.
+rewrite Zpos_P_of_succ_nat.
+apply Z.add_comm.
 Qed.
 
 (* to be completed
@@ -1700,6 +1724,29 @@ unfold rngl_mul_nat; cbn.
 do 2 rewrite qg_q_mul_nat.
 cbn.
 (**)
+do 2 rewrite Q_mul_nat.
+rewrite Qmult_1_l.
+progress unfold Qlt.
+cbn.
+rewrite Z.mul_1_r.
+rewrite Pos.mul_1_r.
+rewrite nat_of_inv_Q.
+(* pffff.... *)
+...
+rewrite nat_of_inv_Q.
+remember (εn # εd) as ε eqn:Hεnd.
+clear εn εd Hεp Hεnd.
+destruct n. {
+  cbn.
+  now rewrite Qplus_0_r.
+}
+destruct n. {
+  cbn.
+  rewrite Qplus_0_r.
+  rewrite Nat.add_0_r.
+  rewrite Nat.add_1_r.
+  cbn.
+...
 rewrite (Nat.add_1_r (_ / _)).
 induction n; cbn; [ now rewrite Qplus_0_r | ].
 eapply Qlt_le_trans; [ apply Qplus_lt_r, IHn | ].
@@ -1709,6 +1756,10 @@ rewrite Q_mul_nat_add_r; subst x.
 rewrite Qplus_assoc.
 apply Qplus_le_l.
 destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
+(**)
+  rewrite nat_of_inv_Q.
+  remember (εn # εd) as ε eqn:Hεnd.
+...
   eapply Qle_trans; [ | apply Qplus_le_l, Qlt_le_weak, Hε ].
   rewrite Qplus_0_l.
 (**)
@@ -1725,9 +1776,9 @@ destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
     apply Pos2Nat.is_pos.
   }
   remember (Pos.to_nat _ / _)%nat as x.
+  destruct x; [ easy | cbn ].
 ...
   clear Heqx IHn.
-  destruct x; [ easy | cbn ].
   clear H2.
 ...
     rewrite nat_of_inv_Q.
