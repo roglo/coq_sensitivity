@@ -1602,6 +1602,18 @@ apply Qle_bool_iff.
 now apply Qlt_le_weak.
 Qed.
 
+Theorem nat_of_inv_Q :
+  ∀ n d,
+  (Pos.to_nat d / Z.to_nat n =
+     Z.to_nat (Qnum (/ (n # d))) / Pos.to_nat (Qden (/ (n # d))))%nat.
+Proof.
+intros.
+destruct n as [| n| n]; [ easy | easy | cbn ].
+symmetry; apply Nat.div_0_l.
+apply Nat.neq_0_lt_0.
+apply Pos2Nat.is_pos.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -1699,14 +1711,6 @@ apply Qplus_le_l.
 destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
   eapply Qle_trans; [ | apply Qplus_le_l, Qlt_le_weak, Hε ].
   rewrite Qplus_0_l.
-Theorem nat_of_inv_Q :
-  ∀ n d, (n < Z.pos d)%Z
-  → (Pos.to_nat d / Z.to_nat n)%nat = Z.to_nat (Qnum (/ (n # d))).
-Proof.
-intros * Hdn.
-destruct n as [| n| n]; [ easy | cbn | easy ].
-(* faut voir à voir, là... *)
-... ...
   rewrite nat_of_inv_Q.
   remember (εn # εd) as ε eqn:Hεnd.
   clear εn εd Hεp Hεnd IHn.
