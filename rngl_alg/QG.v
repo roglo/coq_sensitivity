@@ -1697,7 +1697,21 @@ rewrite Q_mul_nat_add_r; subst x.
 rewrite Qplus_assoc.
 apply Qplus_le_l.
 destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
+  eapply Qle_trans; [ | apply Qplus_le_l, Qlt_le_weak, Hε ].
+  rewrite Qplus_0_l.
+Theorem nat_of_inv_Q :
+  ∀ n d, (n < Z.pos d)%Z
+  → (Pos.to_nat d / Z.to_nat n)%nat = Z.to_nat (Qnum (/ (n # d))).
+Proof.
+intros * Hdn.
+destruct n as [| n| n]; [ easy | cbn | easy ].
+(* faut voir à voir, là... *)
 ... ...
+  rewrite nat_of_inv_Q.
+  remember (εn # εd) as ε eqn:Hεnd.
+  clear εn εd Hεp Hεnd IHn.
+... ...
+} {
   eapply Qle_trans; [ apply H1 | ].
   rewrite Qplus_comm.
   apply Qle_minus_iff.
