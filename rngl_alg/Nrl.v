@@ -5,7 +5,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Main.Misc Main.RingLike Misc FermatLittle.
+Require Import Main.Misc Misc FermatLittle.
 
 (*
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
@@ -103,22 +103,6 @@ Definition Zn_div n (a b : Zn n) : Zn n :=
 Definition Zn_eqb n (a b : Zn n) : bool :=
   proj1_sig a =? proj1_sig b.
 
-Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
-  {| rngl_zero := Zn_of_nat n 0;
-     rngl_add := Zn_add n;
-     rngl_mul := Zn_mul n;
-     rngl_opt_one := Some (Zn_of_nat n 1);
-     rngl_opt_opp_or_subt :=
-       Some (inl (Zn_opp n));
-     rngl_opt_inv_or_quot :=
-       if is_prime n then Some (inl (Zn_inv n)) else None;
-     rngl_opt_eqb := Some (Zn_eqb n);
-     rngl_opt_leb := None |}.
-
-(*
-Global Existing Instance Zn_ring_like_op.
-*)
-
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
 intros * Hab.
@@ -137,21 +121,47 @@ intros H; apply Hab.
 now destruct H.
 Qed.
 
-Section a.
+Theorem Zn_add_comm : ∀ n (a b : Zn n), Zn_add n a b = Zn_add n b a.
+Proof.
+intros n (a, Ha) (b, Hb).
+apply Zn_eq; cbn - [ "mod" ].
+now rewrite Nat.add_comm.
+Qed.
 
-Context {n : nat}.
+(* *)
+
+Require Import Main.RingLike.
+
+Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
+  {| rngl_zero := Zn_of_nat n 0;
+     rngl_add := Zn_add n;
+     rngl_mul := Zn_mul n;
+     rngl_opt_one := Some (Zn_of_nat n 1);
+     rngl_opt_opp_or_subt :=
+       Some (inl (Zn_opp n));
+     rngl_opt_inv_or_quot :=
+       if is_prime n then Some (inl (Zn_inv n)) else None;
+     rngl_opt_eqb := Some (Zn_eqb n);
+     rngl_opt_leb := None |}.
 (*
 Context (ro := Zn_ring_like_op n).
 Existing Instance ro.
 *)
 
-Theorem Zn_add_comm :
+Section a.
+
+Context {n : nat}.
+
+(*
+Global Existing Instance Zn_ring_like_op.
+*)
+
+Theorem Zn_add_comm' :
   let roz := Zn_ring_like_op n in
   ∀ (a b : Zn n), (a + b = b + a)%L.
 Proof.
-intros roz (a, Ha) (b, Hb).
-apply Zn_eq; cbn - [ "mod" ].
-now rewrite Nat.add_comm.
+intros.
+apply Zn_add_comm.
 Qed.
 
 Theorem Zn_add_assoc :
@@ -167,7 +177,7 @@ Qed.
 
 Theorem Zn_add_0_l :
   let roz := Zn_ring_like_op n in
-  ∀ (a : Zn n), (0 + a = a)%L.
+ ∀ (a : Zn n), (0 + a = a)%L.
 Proof.
 intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
@@ -179,7 +189,7 @@ now apply Nat.ltb_lt in Ha.
 Qed.
 
 Theorem Zn_mul_assoc :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%L.
 Proof.
 intros roz *.
@@ -190,7 +200,7 @@ now rewrite Nat.mul_assoc.
 Qed.
 
 Theorem Zn_mul_1_l :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ (a : Zn n), (1 * a = a)%L.
 Proof.
 intros roz *.
@@ -203,7 +213,7 @@ now apply Nat.mod_small.
 Qed.
 
 Theorem Zn_mul_add_distr_l :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ (a b c : Zn n), (a * (b + c) = a * b + a * c)%L.
 Proof.
 intros roz *.
@@ -215,7 +225,7 @@ now rewrite Nat.mul_add_distr_l.
 Qed.
 
 Theorem Zn_mul_comm :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ (a b : Zn n), (a * b = b * a)%L.
 Proof.
 intros roz (a, Ha) (b, Hb).
@@ -224,7 +234,7 @@ now rewrite Nat.mul_comm.
 Qed.
 
 Theorem Zn_add_opp_l :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ (a : Zn n), (- a + a = 0)%L.
 Proof.
 intros roz (a, Ha).
@@ -239,7 +249,7 @@ now apply Nat.mod_same.
 Qed.
 
 Theorem Zn_eqb_eq :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   ∀ a b : Zn n, (a =? b)%L = true ↔ a = b.
 Proof.
 intros roz (a, Ha) (b, Hb); cbn.
@@ -273,6 +283,7 @@ Theorem Zn_opt_mul_inv_l :
   else not_applicable.
 Proof.
 intros.
+subst roz.
 progress unfold rngl_has_inv; cbn.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
@@ -330,7 +341,7 @@ now intros; rewrite Bool.andb_false_r.
 Qed.
 
 Theorem Zn_opt_mul_div :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   if rngl_has_quot (Zn n) then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
@@ -341,7 +352,7 @@ now destruct p.
 Qed.
 
 Theorem Zn_opt_mul_quot_r :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   if (rngl_has_quot (Zn n) && negb true)%bool then
     ∀ a b : Zn n, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
@@ -399,7 +410,7 @@ apply Nat.sub_diag.
 Qed.
 
 Theorem Zn_opt_quot_mul :
-  let roz := Zn_ring_like_op n in
+  let roz := Zn_ring_like_op in
   if rngl_has_quot (Zn n) then
     ∀ a b c : Zn n, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
   else not_applicable.
@@ -416,7 +427,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := at_least_1 n;
-     rngl_add_comm := Zn_add_comm;
+     rngl_add_comm := Zn_add_comm';
      rngl_add_assoc := Zn_add_assoc;
      rngl_add_0_l := Zn_add_0_l;
      rngl_mul_assoc := Zn_mul_assoc;
