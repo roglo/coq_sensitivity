@@ -170,6 +170,7 @@ Definition QG_sub (a b : QG) := QG_add a (QG_opp b).
 Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
 Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
 Definition QG_le a b := QG_leb a b = true.
+Definition QG_lt a b := QG_leb b a = false.
 
 Declare Scope QG_scope.
 Delimit Scope QG_scope with QG.
@@ -185,7 +186,9 @@ Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
 
 Notation "a =? b" := (QG_eqb a b) (at level 70) : QG_scope.
 Notation "a ≤? b" := (QG_leb a b) (at level 70) : QG_scope.
+Notation "a <? b" := (negb (QG_leb b a)) (at level 70) : QG_scope.
 Notation "a ≤ b" := (QG_le a b) : QG_scope.
+Notation "a < b" := (QG_lt a b) : QG_scope.
 Notation "a ≤ b ≤ c" := (QG_le a b ∧ QG_le b c)
   (at level 70, b at next level) : QG_scope.
 
@@ -1707,33 +1710,16 @@ rewrite Zpos_P_of_succ_nat.
 apply Z.add_comm.
 Qed.
 
-(* *)
-
-Require Import Main.RingLike.
-
-Definition QG_ring_like_op : ring_like_op QG :=
-  {| rngl_zero := 0%QG;
-     rngl_add := QG_add;
-     rngl_mul := QG_mul;
-     rngl_opt_one := Some 1%QG;
-     rngl_opt_opp_or_subt := Some (inl QG_opp);
-     rngl_opt_inv_or_quot := Some (inl QG_inv);
-     rngl_opt_eqb := Some QG_eqb;
-     rngl_opt_leb := Some QG_leb |}.
-
 Theorem QG_archimedean :
-  let ro := QG_ring_like_op in
-  ∀ ε : QG, (0 < ε)%L →
-  ∀ n : nat, ∃ m : nat, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L.
+  ∀ ε : QG, (0 < ε)%QG →
+  ∀ n, ∃ m : nat,
+  (List.fold_right QG_add 0 (List.repeat 1 n) <
+     List.fold_right QG_add 0 (List.repeat ε m))%QG.
 Proof.
 intros * Hε *.
 destruct ε as ((εn , εd), Hεp).
 cbn in Hεp.
 exists (n * (Pos.to_nat εd / Z.to_nat εn + 1) + 1)%nat.
-cbn in Hε |-*.
-progress unfold "≤?"%QG in Hε.
-progress unfold "≤?"%QG.
-cbn in Hε |-*.
 apply not_true_iff_false in Hε.
 apply not_true_iff_false.
 intros H1; apply Hε; clear Hε.
@@ -1742,8 +1728,6 @@ apply Qle_bool_iff.
 apply Qnot_lt_le.
 apply Qle_not_lt in H1.
 intros Hε; apply H1; clear H1.
-unfold rngl_mul_nat; cbn.
-progress unfold mul_nat.
 do 2 rewrite qg_q_mul_nat.
 cbn.
 do 2 rewrite Q_mul_nat.
@@ -1782,6 +1766,20 @@ apply Z.add_le_mono_l.
 apply Z.lt_le_incl.
 now apply Z.mod_pos_bound.
 Qed.
+
+(* *)
+
+Require Import Main.RingLike.
+
+Definition QG_ring_like_op : ring_like_op QG :=
+  {| rngl_zero := 0%QG;
+     rngl_add := QG_add;
+     rngl_mul := QG_mul;
+     rngl_opt_one := Some 1%QG;
+     rngl_opt_opp_or_subt := Some (inl QG_opp);
+     rngl_opt_inv_or_quot := Some (inl QG_inv);
+     rngl_opt_eqb := Some QG_eqb;
+     rngl_opt_leb := Some QG_leb |}.
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
