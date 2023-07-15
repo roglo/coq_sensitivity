@@ -469,7 +469,10 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   apply neq_ideal_neq; cbn.
   specialize (H1 i) as H2.
   cbn in H2.
-  rewrite i_val_rngl_mul_nat; cbn.
+  specialize i_val_rngl_mul_nat as H3.
+  progress unfold rngl_mul_nat in H3.
+  progress unfold mul_nat in H3; cbn in H3.
+  rewrite H3; cbn.
   progress unfold rngl_one in H2.
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   now destruct (Bool.bool_dec (P one) true).

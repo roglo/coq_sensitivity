@@ -709,6 +709,8 @@ assert
     @rngl_mul_nat _ (gc_ring_like_op T) (mk_gc 1 0) n =
     mk_gc (rngl_mul_nat 1 n) 0). {
   intros.
+  progress unfold rngl_mul_nat.
+  progress unfold mul_nat; cbn.
   induction n; [ easy | cbn ].
   rewrite IHn.
   progress unfold gc_add; cbn.
@@ -2292,6 +2294,8 @@ intros.
 cbn - [ rngl_mul_nat ].
 assert (H : ∀ n, rngl_mul_nat R1 n = INR n). {
   intros.
+  progress unfold rngl_mul_nat.
+  progress unfold mul_nat; cbn.
   induction n; [ easy | cbn ].
   destruct n; [ apply Rplus_0_r | ].
   rewrite IHn.

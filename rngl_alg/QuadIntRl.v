@@ -814,7 +814,7 @@ intros * Hi; cbn in Hi.
 progress unfold qi_add, qi_zero in Hi.
 remember 1%QI as one eqn:Hone.
 injection Hi; clear Hi; intros H1 H2.
-remember (qi_re (rngl_mul_nat one i)) as z eqn:Hz; symmetry in Hz.
+remember (qi_re (fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
 destruct z as [| p| p]; [ now subst one | | ]. {
   rewrite Z.add_comm in H2.
   subst one; cbn in H2.
@@ -827,7 +827,7 @@ destruct z as [| p| p]; [ now subst one | | ]. {
   apply Z.nle_gt in H3; apply H3; clear H3.
   clear H1 Hz H2 p.
   induction i; [ easy | cbn ].
-  remember (qi_re (rngl_mul_nat 1%QI i)) as z eqn:Hz; symmetry in Hz.
+  remember (qi_re (fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
   destruct z as [| p| p]; [ easy | | ]. {
     apply Pos2Z.is_nonneg.
   } {

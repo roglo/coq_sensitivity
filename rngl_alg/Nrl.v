@@ -354,6 +354,8 @@ Theorem proj1_sig_Zn_of_nat :
   ∀ i, proj1_sig (rngl_mul_nat 1 i) = i mod at_least_1 n.
 Proof.
 intros.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn - [ "mod" ].
 induction i. {
   cbn - [ "mod" ].
   now rewrite Nat.mod_0_l.
