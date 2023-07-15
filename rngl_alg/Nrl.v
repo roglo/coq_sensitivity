@@ -128,6 +128,16 @@ apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.add_comm.
 Qed.
 
+Theorem Zn_add_assoc :
+  ∀ n a b c, Zn_add n a (Zn_add n b c) = Zn_add n (Zn_add n a b) c.
+Proof.
+intros.
+apply Zn_eq; cbn - [ "mod" ].
+rewrite Nat.add_mod_idemp_l; [ | easy ].
+rewrite Nat.add_mod_idemp_r; [ | easy ].
+now rewrite Nat.add_assoc.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -143,37 +153,10 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
        if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
      rngl_opt_leb := None |}.
-(*
-Context (ro := Zn_ring_like_op n).
-Existing Instance ro.
-*)
 
 Section a.
 
 Context {n : nat}.
-
-(*
-Global Existing Instance Zn_ring_like_op.
-*)
-
-Theorem Zn_add_comm' :
-  let roz := Zn_ring_like_op n in
-  ∀ (a b : Zn n), (a + b = b + a)%L.
-Proof.
-intros.
-apply Zn_add_comm.
-Qed.
-
-Theorem Zn_add_assoc :
-  let roz := Zn_ring_like_op n in
-  ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%L.
-Proof.
-intros roz *.
-apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.add_mod_idemp_l; [ | easy ].
-rewrite Nat.add_mod_idemp_r; [ | easy ].
-now rewrite Nat.add_assoc.
-Qed.
 
 Theorem Zn_add_0_l :
   let roz := Zn_ring_like_op n in
@@ -421,14 +404,16 @@ progress unfold roz; cbn.
 now destruct (is_prime n).
 Qed.
 
-Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
+Set Printing All.
+
+Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := at_least_1 n;
-     rngl_add_comm := Zn_add_comm';
-     rngl_add_assoc := Zn_add_assoc;
+     rngl_add_comm := Zn_add_comm n;
+     rngl_add_assoc := Zn_add_assoc n;
      rngl_add_0_l := Zn_add_0_l;
      rngl_mul_assoc := Zn_mul_assoc;
      rngl_opt_mul_1_l := Zn_mul_1_l;
