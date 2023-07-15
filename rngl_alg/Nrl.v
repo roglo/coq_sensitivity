@@ -185,6 +185,14 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
+Theorem Zn_mul_comm :
+  ∀ n (a b : Zn n), Zn_mul n a b = Zn_mul n b a.
+Proof.
+intros n (a, Ha) (b, Hb).
+apply Zn_eq; cbn - [ "mod" ].
+now rewrite Nat.mul_comm.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -204,15 +212,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_mul_comm :
-  let roz := Zn_ring_like_op in
-  ∀ (a b : Zn n), (a * b = b * a)%L.
-Proof.
-intros roz (a, Ha) (b, Hb).
-apply Zn_eq; cbn - [ "mod" ].
-now rewrite Nat.mul_comm.
-Qed.
 
 Theorem Zn_add_opp_l :
   let roz := Zn_ring_like_op in
@@ -416,7 +415,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_mul_assoc := Zn_mul_assoc n;
      rngl_opt_mul_1_l := Zn_mul_1_l n;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l n;
-     rngl_opt_mul_comm := Zn_mul_comm;
+     rngl_opt_mul_comm := Zn_mul_comm n;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_l := Zn_add_opp_l;
