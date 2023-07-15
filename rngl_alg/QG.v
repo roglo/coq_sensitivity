@@ -1672,22 +1672,10 @@ cbn in H1.
 now rewrite H1 in Hle.
 Qed.
 
-(* *)
-
-Require Import Main.RingLike.
-
-Definition QG_ring_like_op : ring_like_op QG :=
-  {| rngl_zero := 0%QG;
-     rngl_add := QG_add;
-     rngl_mul := QG_mul;
-     rngl_opt_one := Some 1%QG;
-     rngl_opt_opp_or_subt := Some (inl QG_opp);
-     rngl_opt_inv_or_quot := Some (inl QG_inv);
-     rngl_opt_eqb := Some QG_eqb;
-     rngl_opt_leb := Some QG_leb |}.
-
 Theorem qg_q_mul_nat :
-  ∀ a n, qg_q (mul_nat 0%QG QG_add a n) == mul_nat 0%Q Qplus (qg_q a) n.
+  ∀ a n,
+  qg_q (List.fold_right QG_add 0%QG (List.repeat a n)) ==
+  List.fold_right Qplus 0 (List.repeat (qg_q a) n).
 Proof.
 intros.
 induction n; [ easy | ].
@@ -1696,7 +1684,8 @@ rewrite qg_q_add.
 now rewrite IHn.
 Qed.
 
-Theorem Q_mul_nat : ∀ a n, mul_nat 0 Qplus a n == a * (Z.of_nat n # 1).
+Theorem Q_mul_nat : ∀ a n,
+  List.fold_right Qplus 0 (List.repeat a n) == a * (Z.of_nat n # 1).
 Proof.
 intros.
 induction n; cbn; [ symmetry; apply Qmult_0_r | ].
@@ -1717,6 +1706,20 @@ f_equal.
 rewrite Zpos_P_of_succ_nat.
 apply Z.add_comm.
 Qed.
+
+(* *)
+
+Require Import Main.RingLike.
+
+Definition QG_ring_like_op : ring_like_op QG :=
+  {| rngl_zero := 0%QG;
+     rngl_add := QG_add;
+     rngl_mul := QG_mul;
+     rngl_opt_one := Some 1%QG;
+     rngl_opt_opp_or_subt := Some (inl QG_opp);
+     rngl_opt_inv_or_quot := Some (inl QG_inv);
+     rngl_opt_eqb := Some QG_eqb;
+     rngl_opt_leb := Some QG_leb |}.
 
 Theorem QG_archimedean :
   let ro := QG_ring_like_op in
@@ -1740,6 +1743,7 @@ apply Qnot_lt_le.
 apply Qle_not_lt in H1.
 intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
+progress unfold mul_nat.
 do 2 rewrite qg_q_mul_nat.
 cbn.
 do 2 rewrite Q_mul_nat.
