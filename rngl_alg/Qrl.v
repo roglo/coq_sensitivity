@@ -35,10 +35,12 @@ intros.
 cbn - [ Q.add ].
 assert (Hz : ∀ i, (0 ≤ rngl_mul_nat 1 i)%Q). {
   clear i; intros.
+  progress unfold rngl_mul_nat.
+  progress unfold mul_nat.
   cbn - [ Q.add ].
   induction i; [ easy | ].
   cbn - [ Q.add ].
-  now destruct (rngl_mul_nat 1%Q i).
+  now destruct (List.fold_right _ _ _).
 }
 intros H.
 specialize (Hz i).

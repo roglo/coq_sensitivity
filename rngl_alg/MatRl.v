@@ -138,6 +138,8 @@ Theorem mat_ncols_of_nat eqb {n} : ∀ i,
   mat_ncols (@sm_mat n T (rngl_mul_nat 1 i)) = n.
 Proof.
 intros; cbn.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
 induction i; [ now apply mZ_ncols | cbn ].
 rewrite mat_add_ncols.
@@ -155,6 +157,8 @@ Theorem sm_mat_of_nat :
 *)
 Proof.
 intros; cbn.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
@@ -245,7 +249,10 @@ split. {
   }
   rewrite mat_el_mI_diag in Hlla; [ | easy ].
   subst rom.
-  rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
+  specialize (@mat_el_of_nat_diag n eqb) as H1.
+  progress unfold rngl_mul_nat in H1.
+  progress unfold mul_nat in H1; cbn in H1.
+  rewrite H1 in Hlla; [ clear H1 | easy ].
   specialize rngl_characteristic_prop as H1.
   rewrite Hon, Hch in H1; cbn in H1.
   now apply (H1 i).
@@ -629,15 +636,20 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     subst rom.
-    now rewrite mat_ncols_of_nat.
+    specialize (@mat_ncols_of_nat eqb) as H2.
+    progress unfold rngl_mul_nat in H2.
+    progress unfold mul_nat in H2; cbn in H2.
+    now rewrite H2.
   }
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (rngl_mul_nat (smI _) i)) 1 1) with
+  replace (mat_el (sm_mat (fold_right _ _ _)) 1 1) with
     (@rngl_mul_nat T ro 1 i) in Hi. 2: {
     symmetry.
     clear Hi.
+    progress unfold rngl_mul_nat.
+    progress unfold mul_nat; cbn.
     induction i. {
       cbn.
       rewrite List_nth_repeat.
@@ -649,7 +661,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-      now apply rngl_of_nat_is_correct_matrix.
+      specialize (rngl_of_nat_is_correct_matrix eqb) as H2.
+      progress unfold rngl_mul_nat in H2.
+      progress unfold mul_nat in H2; cbn in H2.
+      now apply H2.
     } {
       now rewrite mI_nrows.
     } {

@@ -261,11 +261,8 @@ Inductive not_applicable := NA.
 Definition rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   List.fold_right (λ a acc, (acc * x + a)%L) 0%L l.
 
-Fixpoint mul_nat {T} (zero : T) (add : T → T → T) a n :=
-  match n with
-  | 0 => zero
-  | S n' => add a (mul_nat zero add a n')
-  end.
+Definition mul_nat {T} (zero : T) (add : T → T → T) a n :=
+  List.fold_right add zero (List.repeat a n).
 
 Definition rngl_mul_nat {T} {ro : ring_like_op T} :=
   mul_nat 0%L rngl_add.
@@ -2066,9 +2063,10 @@ Theorem rngl_mul_nat_add_r : ∀ a m n,
   rngl_mul_nat a (m + n) = (rngl_mul_nat a m + rngl_mul_nat a n)%L.
 Proof.
 intros.
+unfold rngl_mul_nat, mul_nat.
 induction m; cbn; [ now rewrite rngl_add_0_l | ].
-rewrite IHm.
-apply rngl_add_assoc.
+rewrite <- rngl_add_assoc; f_equal.
+apply IHm.
 Qed.
 
 Theorem rngl_opp_inv :

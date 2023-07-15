@@ -1199,7 +1199,6 @@ induction la as [| a]; intros. {
   now apply Nat.le_0_r in Hlen; subst len.
 }
 cbn.
-(**)
 destruct len. {
   cbn - [ lap_add ].
   now rewrite lap_add_0_l.
@@ -1228,7 +1227,6 @@ Theorem rev_lap_add : ∀ la lb,
 Proof.
 intros * Hab.
 revert lb Hab.
-(**)
 induction la as [| a]; intros. {
   cbn - [ lap_add ].
   now do 2 rewrite lap_add_0_l.
@@ -1348,9 +1346,7 @@ f_equal.
 rewrite lap_opp_app_distr.
 rewrite rev_lap_opp.
 f_equal.
-(**)
 unfold lap_opp.
-(**)
 rewrite map_opp_repeat.
 now rewrite rngl_opp_0.
 Qed.
@@ -1732,9 +1728,7 @@ destruct Hr as [Hr| Hr]. {
   do 2 rewrite rev_involutive in H1.
   destruct Hqr' as [Hqr'| Hqr']. {
     subst rlq.
-(**)
     cbn in H1 |-*.
-(**)
     rewrite lap_mul_0_r.
     rewrite lap_mul_0_r, lap_add_0_l in H1.
     symmetry in H1; apply List_rev_symm in H1; subst rlr.
@@ -1749,7 +1743,6 @@ destruct Hr as [Hr| Hr]. {
     now rewrite Ha in Hr.
   }
   rewrite <- lap_add_rev_strip in H1. {
-(**)
     rewrite Hr in H1.
     cbn in H1.
     rewrite lap_add_0_r in H1.
@@ -2036,8 +2029,9 @@ Theorem lap_rngl_of_nat :
 Proof.
 intros * Honl *; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 induction n; [ easy | clear Hnz; cbn ].
-(**)
 destruct n. {
   cbn; rewrite rngl_add_0_r, lap_add_0_r.
   progress unfold rngl_one; cbn.
@@ -2685,6 +2679,8 @@ Theorem lap_polyn_rngl_of_nat_char_0 :
 Proof.
 intros rop Hch * Hiz; cbn.
 subst rop.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 induction i; [ easy | clear Hiz; cbn ].
 assert (H : rngl_characteristic T ≠ 1) by now rewrite Hch.
 specialize (proj1 (rngl_1_neq_0_iff Hon) H) as H1; clear H.
@@ -2720,11 +2716,16 @@ destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
 }
 clear Hchz.
 destruct Hch as (Hbef, Hch).
+progress unfold rngl_mul_nat.
+progress unfold mul_nat.
 induction i; [ easy | cbn ].
-remember (lap (rngl_mul_nat 1%pol i)) as la eqn:Hla; symmetry in Hla.
+cbn in IHi.
+remember (lap (fold_right polyn_add 0%pol (repeat 1%pol i))) as la eqn:Hla.
+symmetry in Hla.
 apply (rngl_eqb_neq Heb) in H11; rewrite H11.
 cbn - [ lap_add rngl_mul_nat ].
-destruct la as [| a]; cbn. {
+destruct la as [| a]. {
+  cbn.
   rewrite rngl_add_0_r, H11.
   cbn; f_equal; symmetry.
   rewrite <- rngl_add_0_r.
@@ -2746,10 +2747,11 @@ destruct lb as [| b]. {
     specialize (IHi H); clear H.
     injection IHi; clear IHi; intros; subst a la.
     clear Hlb.
-    cbn in Hla.
+    cbn - [ lap_add ] in Hla.
     rewrite H11 in Hla.
     cbn - [ lap_add ] in Hla.
-    remember (lap (rngl_mul_nat 1%pol i)) as lb eqn:Hlb; symmetry in Hlb.
+    remember (lap (fold_right polyn_add 0%pol _)) as lb eqn:Hlb.
+    symmetry in Hlb.
     destruct lb as [| b]; cbn in Hla. {
       rewrite rngl_add_0_r, H11 in Hla.
       cbn in Hla.
@@ -2783,12 +2785,14 @@ Theorem lap_polyn_rngl_of_nat :
   ∀ n, lap (rngl_mul_nat 1 n) = lap_norm (rngl_mul_nat 1 n).
 Proof.
 intros; cbn.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 induction n; [ easy | ].
-cbn - [ lap ].
-unfold polyn_add.
+cbn - [ lap_add ].
 rewrite IHn; cbn.
 rewrite fold_lap_norm.
-remember (rngl_mul_nat 1 n) as la eqn:Hla; symmetry in Hla.
+remember (fold_right lap_add [] (repeat 1%L n)) as la eqn:Hla.
+symmetry in Hla.
 progress unfold rngl_one.
 progress unfold lop; cbn.
 progress unfold lap_opt_one.

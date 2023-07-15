@@ -1898,7 +1898,6 @@ specialize rngl_characteristic_prop as H1.
 intros i.
 remember (S i) as j eqn:Hj.
 rewrite Hon in H1.
-rewrite if_bool_if_dec in H1.
 progress unfold rol.
 progress unfold lap_ring_like_op.
 progress unfold rngl_one; cbn - [ lap_add ].
@@ -1906,6 +1905,7 @@ progress unfold lap_opt_one.
 progress unfold rngl_has_1 in Hon.
 progress unfold rngl_has_1 in Honl; cbn in Honl.
 progress unfold lap_opt_one in Honl.
+rewrite if_bool_if_dec in H1.
 destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   apply Nat.eqb_eq in Hcz.
   intros.
@@ -1927,7 +1927,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
 destruct H1 as (H1, H2).
 destruct (rngl_opt_one T); [ | easy ].
 subst j; cbn.
-now destruct (rngl_mul_nat [t] i).
+now destruct (fold_right lap_add [] (repeat [t] i)).
 Qed.
 
 (* *)

@@ -35,10 +35,12 @@ intros.
 cbn - [ Z.add ].
 assert (Hz : ∀ i, (0 <= rngl_mul_nat 1 i)%Z). {
   clear i; intros.
+  progress unfold rngl_mul_nat.
+  progress unfold mul_nat.
   cbn - [ Z.add ].
   induction i; [ easy | ].
   cbn - [ Z.add ].
-  now destruct (rngl_mul_nat 1%Z i).
+  now destruct (List.fold_right _ _ _).
 }
 intros H.
 specialize (Hz i).
@@ -220,6 +222,8 @@ Theorem rngl_mul_nat_Z :
   ∀ z n, rngl_mul_nat z n = (Z.of_nat n * z)%Z.
 Proof.
 intros.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
 induction n; intros; [ easy | ].
 cbn - [ "*"%Z ].
 rewrite IHn.
