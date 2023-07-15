@@ -1654,6 +1654,24 @@ rewrite QG_add_opp_r.
 apply QG_add_0_l.
 Qed.
 
+Theorem QG_characteristic_prop :
+  ∀ i, List.fold_right QG_add 0%QG (List.repeat 1%QG (S i)) ≠ 0%QG.
+Proof.
+intros * H1.
+assert (Hle : ∀ i, (0 ≤ List.fold_right QG_add 0 (List.repeat 1 i))%QG). {
+  clear i H1; intros.
+  induction i; cbn; [ easy | ].
+  eapply QG_le_trans; [ apply IHi | ].
+  apply QG_le_0_sub.
+  now rewrite QG_add_sub.
+}
+specialize (Hle i).
+apply (QG_add_le_mono_l 1%QG) in Hle.
+rewrite QG_add_0_r in Hle.
+cbn in H1.
+now rewrite H1 in Hle.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -1667,28 +1685,6 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_inv_or_quot := Some (inl QG_inv);
      rngl_opt_eqb := Some QG_eqb;
      rngl_opt_leb := Some QG_leb |}.
-
-Theorem QG_characteristic_prop :
-  let ro := QG_ring_like_op in
-  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
-Proof.
-intros * H1.
-cbn in H1.
-assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
-  clear i H1; intros.
-  induction i; cbn; [ easy | ].
-  eapply QG_le_trans; [ apply IHi | ].
-  apply QG_le_0_sub.
-  now rewrite QG_add_sub.
-}
-specialize (Hle i).
-apply (QG_add_le_mono_l 1%QG) in Hle.
-rewrite QG_add_0_r in Hle.
-cbn in Hle.
-progress unfold rngl_mul_nat in Hle.
-progress unfold mul_nat in Hle; cbn in Hle.
-now rewrite H1 in Hle.
-Qed.
 
 Theorem qg_q_mul_nat :
   ∀ a n, qg_q (mul_nat 0%QG QG_add a n) == mul_nat 0%Q Qplus (qg_q a) n.
