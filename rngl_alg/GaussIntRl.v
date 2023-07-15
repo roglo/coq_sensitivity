@@ -1,6 +1,5 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
-Require Import Main.RingLike.
 Open Scope Z_scope.
 
 Record gauss_int := mk_gi { gi_re : Z; gi_im : Z }.
@@ -60,6 +59,8 @@ Definition gi_eucl_div α β :=
 Definition gi_div α β := fst (gi_eucl_div α β).
 
 Notation "α / β" := (gi_div α β) : G_scope.
+
+Require Import Main.RingLike.
 
 Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
   {| rngl_zero := gi_zero;
