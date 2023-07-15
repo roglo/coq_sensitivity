@@ -207,6 +207,23 @@ rewrite Nat.sub_add. 2: {
 now apply Nat.mod_same.
 Qed.
 
+Theorem Zn_eqb_eq :
+  ∀ n (a b : Zn n), Zn_eqb n a b = true ↔ a = b.
+Proof.
+intros n (a, Ha) (b, Hb); cbn.
+split. {
+  intros Hab.
+  apply Nat.eqb_eq in Hab; subst b.
+  apply eq_exist_uncurried.
+  exists eq_refl.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+} {
+  intros Hab.
+  apply Nat.eqb_eq.
+  now injection Hab.
+}
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -226,24 +243,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_eqb_eq :
-  let roz := Zn_ring_like_op in
-  ∀ a b : Zn n, (a =? b)%L = true ↔ a = b.
-Proof.
-intros roz (a, Ha) (b, Hb); cbn.
-split. {
-  intros Hab.
-  apply Nat.eqb_eq in Hab; subst b.
-  apply eq_exist_uncurried.
-  exists eq_refl.
-  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-} {
-  intros Hab.
-  apply Nat.eqb_eq.
-  now injection Hab.
-}
-Qed.
 
 Theorem Zn_eq_dec : ∀ (a b : Zn n), ({a = b} + {a ≠ b})%L.
 Proof.
@@ -424,7 +423,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
-     rngl_opt_eqb_eq := Zn_eqb_eq;
+     rngl_opt_eqb_eq := Zn_eqb_eq n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
