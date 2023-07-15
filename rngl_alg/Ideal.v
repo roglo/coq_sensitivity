@@ -5,7 +5,8 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Require Import Main.Misc Main.RingLike.
+Require Import Main.Misc.
+Require Import Main.RingLike.
 
 Record ideal {T} (P : T → bool) := mk_I
   { i_val : T;
