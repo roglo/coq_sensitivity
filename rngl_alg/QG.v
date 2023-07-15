@@ -1556,15 +1556,9 @@ apply QG_le_trans with (y := (c * b)%QG). {
   apply QG_le_0_sub.
   rewrite <- QG_mul_sub_distr_r.
   apply QG_mul_nonneg_nonneg; [ now apply QG_le_0_sub | easy ].
-(**)
 } {
   apply QG_le_0_sub.
-  progress unfold QG_sub.
-  rewrite (QG_mul_comm _ b).
-  rewrite <- QG_mul_opp_l.
-  rewrite (QG_mul_comm _ c).
-  rewrite <- QG_mul_add_distr_l.
-  rewrite fold_QG_sub.
+  rewrite <- QG_mul_sub_distr_l.
   apply QG_mul_nonneg_nonneg; [ | now apply QG_le_0_sub ].
   eapply QG_le_trans; [ apply Hac | easy ].
 }
