@@ -161,6 +161,18 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_assoc.
 Qed.
 
+Theorem Zn_mul_1_l :
+  ∀ n (a : Zn n), Zn_mul n (Zn_of_nat n 1) a = a.
+Proof.
+intros.
+apply Zn_eq; cbn - [ "mod" ].
+rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.mul_1_l.
+destruct a as (a, Ha); cbn - [ "mod" ].
+apply Nat.ltb_lt in Ha.
+now apply Nat.mod_small.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -180,19 +192,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_mul_1_l :
-  let roz := Zn_ring_like_op in
-  ∀ (a : Zn n), (1 * a = a)%L.
-Proof.
-intros roz *.
-apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
-rewrite Nat.mul_1_l.
-destruct a as (a, Ha); cbn - [ "mod" ].
-apply Nat.ltb_lt in Ha.
-now apply Nat.mod_small.
-Qed.
 
 Theorem Zn_mul_add_distr_l :
   let roz := Zn_ring_like_op in
@@ -415,7 +414,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_add_assoc := Zn_add_assoc n;
      rngl_add_0_l := Zn_add_0_l n;
      rngl_mul_assoc := Zn_mul_assoc n;
-     rngl_opt_mul_1_l := Zn_mul_1_l;
+     rngl_opt_mul_1_l := Zn_mul_1_l n;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
      rngl_opt_mul_comm := Zn_mul_comm;
      rngl_opt_mul_1_r := NA;
