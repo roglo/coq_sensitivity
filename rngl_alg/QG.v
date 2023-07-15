@@ -1685,6 +1685,8 @@ specialize (Hle i).
 apply (QG_add_le_mono_l 1%QG) in Hle.
 rewrite QG_add_0_r in Hle.
 cbn in Hle.
+progress unfold rngl_mul_nat in Hle.
+progress unfold mul_nat in Hle; cbn in Hle.
 now rewrite H1 in Hle.
 Qed.
 
