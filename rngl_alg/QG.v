@@ -1124,8 +1124,6 @@ do 3 rewrite (QG_mul_comm _ c).
 apply QG_mul_add_distr_l.
 Qed.
 
-(**)
-
 Theorem QG_eqb_eq : ∀ a b : QG, (a =? b)%QG = true ↔ a = b.
 Proof.
 intros.
@@ -1596,22 +1594,19 @@ assert (Hle : ∀ a b c, (c ≤ a ≤ 0 → b ≤ 0 → a * b ≤ c * b)%QG). {
   rewrite <- (QG_opp_involutive c).
   rewrite (QG_mul_opp_l (- c))%QG.
   rewrite <- (QG_opp_involutive b).
-  rewrite QG_mul_comm.
-  rewrite QG_mul_opp_l.
-  rewrite (QG_mul_comm (- c))%QG.
-  rewrite (QG_mul_opp_l (- b))%QG.
+  do 2 rewrite (QG_mul_opp_r _ (- b))%QG.
   do 2 rewrite QG_opp_involutive.
   apply QG_mul_le_compat_nonneg. {
-    split; [ | apply QG_le_refl ].
-    apply QG_opp_le_mono.
-    now rewrite QG_opp_involutive.
+    split. {
+      apply QG_opp_le_mono.
+      now rewrite QG_opp_involutive.
+    } {
+      now apply -> QG_opp_le_mono.
+    }
   }
-  split. {
-    apply QG_opp_le_mono.
-    now rewrite QG_opp_involutive.
-  } {
-    now apply -> QG_opp_le_mono.
-  }
+  split; [ | apply QG_le_refl ].
+  apply QG_opp_le_mono.
+  now rewrite QG_opp_involutive.
 }
 apply QG_le_trans with (y := (c * b)%QG). {
   now apply Hle.
@@ -1650,6 +1645,15 @@ apply Nat.neq_0_lt_0.
 apply Pos2Nat.is_pos.
 Qed.
 
+Theorem QG_add_sub : ∀ a b, (a + b - b)%QG = a.
+Proof.
+intros.
+progress unfold QG_sub.
+rewrite <- QG_add_assoc, QG_add_comm.
+rewrite QG_add_opp_r.
+apply QG_add_0_l.
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -1675,16 +1679,11 @@ assert (Hle : ∀ i, (0 ≤ rngl_mul_nat 1 i)%QG). {
   induction i; cbn; [ easy | ].
   eapply QG_le_trans; [ apply IHi | ].
   apply QG_le_0_sub.
-  unfold QG_sub.
-  rewrite <- QG_add_assoc, QG_add_comm.
-  rewrite (QG_add_comm _ (- _))%QG.
-  rewrite QG_add_opp_l, QG_add_0_l.
-  easy.
+  now rewrite QG_add_sub.
 }
 specialize (Hle i).
 apply (QG_add_le_mono_l 1%QG) in Hle.
-rewrite (QG_add_comm 1 0)%QG in Hle.
-rewrite QG_add_0_l in Hle.
+rewrite QG_add_0_r in Hle.
 cbn in Hle.
 now rewrite H1 in Hle.
 Qed.
