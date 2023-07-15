@@ -1663,19 +1663,6 @@ rewrite qg_q_add.
 now rewrite IHn.
 Qed.
 
-(* perhaps useless
-Theorem Q_mul_nat_add_r : ∀ a m n,
-  mul_nat 0 Qplus a (m + n) ==
-    mul_nat 0 Qplus a m + mul_nat 0 Qplus a n.
-Proof.
-intros.
-revert n.
-induction m; intros; [ now rewrite Qplus_0_l | cbn ].
-rewrite IHm.
-apply Qplus_assoc.
-Qed.
-*)
-
 Theorem Q_mul_nat : ∀ a n, mul_nat 0 Qplus a n == a * (Z.of_nat n # 1).
 Proof.
 intros.
@@ -1698,7 +1685,6 @@ rewrite Zpos_P_of_succ_nat.
 apply Z.add_comm.
 Qed.
 
-(* to be completed
 Theorem QG_archimedean :
   let ro := QG_ring_like_op in
   ∀ ε : QG, (0 < ε)%L →
@@ -1723,7 +1709,6 @@ intros Hε; apply H1; clear H1.
 unfold rngl_mul_nat; cbn.
 do 2 rewrite qg_q_mul_nat.
 cbn.
-(**)
 do 2 rewrite Q_mul_nat.
 rewrite Qmult_1_l.
 progress unfold Qlt.
@@ -1755,111 +1740,12 @@ rewrite Z.mul_add_distr_l.
 rewrite Z.mul_1_r.
 rewrite Nat2Z.inj_div.
 do 2 rewrite positive_nat_Z.
-Search (_ * (_ / _))%Z.
-(* plein de trucs possibles à voir... *)
-...
-Search (Z.of_nat (Pos.to_nat _)).
-...
-rewrite nat_of_inv_Q.
-remember (εn # εd) as ε eqn:Hεnd.
-clear εn εd Hεp Hεnd.
-destruct n. {
-  cbn.
-  now rewrite Qplus_0_r.
-}
-destruct n. {
-  cbn.
-  rewrite Qplus_0_r.
-  rewrite Nat.add_0_r.
-  rewrite Nat.add_1_r.
-  cbn.
-...
-rewrite (Nat.add_1_r (_ / _)).
-induction n; cbn; [ now rewrite Qplus_0_r | ].
-eapply Qlt_le_trans; [ apply Qplus_lt_r, IHn | ].
-rewrite <- Nat.add_assoc.
-remember (mul_nat _ _ _ _) as x in |-*.
-rewrite Q_mul_nat_add_r; subst x.
-rewrite Qplus_assoc.
-apply Qplus_le_l.
-destruct (Qlt_le_dec (εn # εd) 1) as [H1| H1]. {
-(**)
-  rewrite nat_of_inv_Q.
-  remember (εn # εd) as ε eqn:Hεnd.
-...
-  eapply Qle_trans; [ | apply Qplus_le_l, Qlt_le_weak, Hε ].
-  rewrite Qplus_0_l.
-(**)
-  assert (H2 : (0 < Pos.to_nat εd / Z.to_nat εn)%nat). {
-    progress unfold Qlt in H1; cbn in H1.
-    rewrite Z.mul_1_r in H1.
-    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-    progress unfold Z.lt in H1.
-    progress unfold "?="%Z in H1.
-    apply -> Pos.compare_lt_iff in H1.
-    apply Pos2Nat.inj_lt in H1.
-    apply Nat.div_str_pos.
-    split; [ | now apply Nat.lt_le_incl ].
-    apply Pos2Nat.is_pos.
-  }
-  remember (Pos.to_nat _ / _)%nat as x.
-  destruct x; [ easy | cbn ].
-...
-  clear Heqx IHn.
-  clear H2.
-...
-    rewrite nat_of_inv_Q.
-    progress unfold Qinv; cbn.
-    destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-...
-    remember (εn # εd) as ε eqn:Hεnd.
-    clear εn εd Hεp Hεnd IHn.
-... ...
-} {
-  eapply Qle_trans; [ apply H1 | ].
-  rewrite Qplus_comm.
-  apply Qle_minus_iff.
-  rewrite <- Qplus_assoc.
-  rewrite Qplus_opp_r.
-  rewrite Qplus_0_r.
-...
-}
-...
-rewrite Nat.add_1_r.
-remember (S _) as m.
-rewrite <- (Nat2Pos.id m); subst m; [ | easy ].
-rewrite <- Nat.add_1_r.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  cbn; rewrite Pos2Nat.inj_1; cbn.
-  now rewrite Qplus_0_r.
-}
-assert (Hεnz : Z.to_nat εn ≠ 0%nat). {
-  progress unfold Qlt in Hε.
-  cbn in Hε.
-  rewrite Z.mul_1_r in Hε.
-  destruct εn as [| εn| εn]; [ easy | cbn | easy ].
-  apply Nat.neq_0_lt_0.
-  apply Pos2Nat.is_pos.
-}
-rewrite Nat2Pos.inj_add; [ | | easy ]. 2: {
-  intros Hn.
-  rewrite Nat.add_1_r in Hn.
-  apply Nat.eq_mul_0 in Hn.
-  now destruct Hn.
-}
-cbn.
-rewrite Nat2Pos.inj_mul; [ | easy | now rewrite Nat.add_1_r ].
-...
-Qarchimedean: ∀ q : Q, {p : positive | q < Z.pos p # 1}
-...
-induction n; cbn. {
-  rewrite Nat.div_0_l; cbn; [ now rewrite Qplus_0_r | ].
-  intros H1.
-...
-*)
+rewrite (Z.div_mod (Z.pos εd) (Z.pos εn)) at 1; [ | easy ].
+apply Z.add_le_mono_l.
+apply Z.lt_le_incl.
+now apply Z.mod_pos_bound.
+Qed.
 
-(* to be completed
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -1896,4 +1782,3 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := QG_not_le;
      rngl_opt_archimedean := QG_archimedean |}.
-*)
