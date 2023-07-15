@@ -224,6 +224,16 @@ split. {
 }
 Qed.
 
+Theorem Zn_eq_dec : ∀ n (a b : Zn n), {a = b} + {a ≠ b}.
+Proof.
+intros n (a, Ha) (b, Hb).
+destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
+  now apply Zn_eq.
+} {
+  now apply Zn_neq.
+}
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -243,16 +253,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_eq_dec : ∀ (a b : Zn n), ({a = b} + {a ≠ b})%L.
-Proof.
-intros (a, Ha) (b, Hb).
-destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
-  now apply Zn_eq.
-} {
-  now apply Zn_neq.
-}
-Qed.
 
 Theorem Zn_opt_mul_inv_l :
   let roz := Zn_ring_like_op n in
