@@ -399,8 +399,6 @@ progress unfold roz; cbn.
 now destruct (is_prime n).
 Qed.
 
-Set Printing All.
-
 Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
