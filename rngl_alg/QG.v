@@ -1044,6 +1044,13 @@ rewrite Qplus_0_l.
 apply QG_of_Q_qg_q.
 Qed.
 
+Theorem QG_add_0_r : ∀ a : QG, (a + 0)%QG = a.
+Proof.
+intros.
+rewrite QG_add_comm.
+apply QG_add_0_l.
+Qed.
+
 Theorem QG_add_opp_l : ∀ a : QG, (- a + a)%QG = 0%QG.
 Proof.
 intros.
@@ -1051,6 +1058,13 @@ progress unfold QG_add, QG_opp.
 rewrite Qplus_comm.
 rewrite QG_of_Q_add_idemp_r.
 now rewrite Qplus_opp_r.
+Qed.
+
+Theorem QG_add_opp_r : ∀ a : QG, (a + - a)%QG = 0%QG.
+Proof.
+intros.
+rewrite QG_add_comm.
+apply QG_add_opp_l.
 Qed.
 
 Theorem QG_mul_comm : ∀ a b : QG, (a * b)%QG = (b * a)%QG.
@@ -1102,6 +1116,15 @@ rewrite QG_of_Q_add_idemp_l.
 rewrite QG_of_Q_add_idemp_r.
 now rewrite Qmult_plus_distr_r.
 Qed.
+
+Theorem QG_mul_add_distr_r :  ∀ a b c, ((a + b) * c)%QG = (a * c + b * c)%QG.
+Proof.
+intros.
+do 3 rewrite (QG_mul_comm _ c).
+apply QG_mul_add_distr_l.
+Qed.
+
+(**)
 
 Theorem QG_eqb_eq : ∀ a b : QG, (a =? b)%QG = true ↔ a = b.
 Proof.
@@ -1248,10 +1271,8 @@ split; intros Hbc. {
   rewrite QG_add_assoc.
   rewrite QG_add_comm.
   rewrite <- QG_add_assoc.
-  rewrite (QG_add_comm a).
-  rewrite QG_add_opp_l.
-  rewrite (QG_add_comm c).
-  rewrite QG_add_0_l.
+  rewrite QG_add_opp_r.
+  rewrite QG_add_0_r.
   rewrite QG_add_comm.
   now apply QG_le_0_sub.
 } {
@@ -1263,21 +1284,25 @@ split; intros Hbc. {
   rewrite QG_add_assoc in Hbc.
   rewrite QG_add_comm in Hbc.
   rewrite <- QG_add_assoc in Hbc.
-  rewrite (QG_add_comm a) in Hbc.
-  rewrite QG_add_opp_l in Hbc.
-  rewrite (QG_add_comm c) in Hbc.
-  rewrite QG_add_0_l in Hbc.
+  rewrite QG_add_opp_r in Hbc.
+  rewrite QG_add_0_r in Hbc.
   rewrite QG_add_comm in Hbc.
   now apply -> QG_le_0_sub in Hbc.
 }
+Qed.
+
+Theorem QG_add_le_mono_r : ∀ a b c : QG, (a ≤ b)%QG ↔ (a + c ≤ b + c)%QG.
+Proof.
+intros.
+do 2 rewrite (QG_add_comm _ c).
+apply QG_add_le_mono_l.
 Qed.
 
 Theorem QG_add_le_compat : ∀ a b c d : QG, (a ≤ b → c ≤ d → a + c ≤ b + d)%QG.
 Proof.
 intros * Hab Hcd.
 apply QG_le_trans with (y := (b + c)%QG). {
-  rewrite (QG_add_comm a), (QG_add_comm b).
-  now apply QG_add_le_mono_l.
+  now apply QG_add_le_mono_r.
 } {
   now apply QG_add_le_mono_l.
 }
@@ -1489,6 +1514,29 @@ rewrite qg_q_opp.
 now rewrite Q_mul_opp_l.
 Qed.
 
+Theorem QG_mul_opp_r : ∀ a b : QG, (a * - b = - (a * b))%QG.
+Proof.
+intros.
+do 2 rewrite (QG_mul_comm a).
+apply QG_mul_opp_l.
+Qed.
+
+Theorem QG_mul_sub_distr_l :  ∀ a b c, (a * (b - c))%QG = (a * b - a * c)%QG.
+Proof.
+intros.
+progress unfold QG_sub.
+rewrite QG_mul_add_distr_l.
+f_equal.
+apply QG_mul_opp_r.
+Qed.
+
+Theorem QG_mul_sub_distr_r :  ∀ a b c, ((a - b) * c)%QG = (a * c - b * c)%QG.
+Proof.
+intros.
+do 3 rewrite (QG_mul_comm _ c).
+apply QG_mul_sub_distr_l.
+Qed.
+
 Theorem QG_mul_nonneg_nonneg : ∀ a b : QG, (0 ≤ a → 0 ≤ b → 0 ≤ a * b)%QG.
 Proof.
 intros * Ha Hb.
@@ -1505,16 +1553,10 @@ Theorem QG_mul_le_compat_nonneg :
 Proof.
 intros * Hac Hbd.
 apply QG_le_trans with (y := (c * b)%QG). {
-  rewrite (QG_mul_comm a).
-  rewrite (QG_mul_comm c).
   apply QG_le_0_sub.
-  progress unfold QG_sub.
-  rewrite (QG_mul_comm _ a).
-  rewrite <- QG_mul_opp_l.
-  rewrite (QG_mul_comm _ b).
-  rewrite <- QG_mul_add_distr_l.
-  rewrite fold_QG_sub.
-  apply QG_mul_nonneg_nonneg; [ easy | now apply QG_le_0_sub ].
+  rewrite <- QG_mul_sub_distr_r.
+  apply QG_mul_nonneg_nonneg; [ now apply QG_le_0_sub | easy ].
+(**)
 } {
   apply QG_le_0_sub.
   progress unfold QG_sub.
