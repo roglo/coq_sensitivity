@@ -1446,7 +1446,9 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
        "nlab" calls "<" a "quasiorder"; contradictory with "wikipedia"
      that says that a quasiorder is another name for preorder, that is
      supposed to be reflexive, not irreflexive!
-       What a mess! *)
+       https://ncatlab.org/nlab/show/quasiorder
+       https://ncatlab.org/nlab/show/preorder
+     What a mess! *)
 ...
 Check rngl_lt_antisymm.
   apply rngl_lt_ in Hufb.
