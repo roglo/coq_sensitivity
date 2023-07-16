@@ -25,7 +25,7 @@
     2/ savoir quel théorème serait intéressant et rigolo à démontrer ;
        selon Aymeric, faut que je regarde les idéaux principaux ; mais
        il semble qu'il faille faire des polynômes ; je pourrais le
-       faire, j'en ai, mais ils sont pas complèment au point : il
+       faire, j'en ai, mais ils sont pas complètement au point : il
        faudrait par exemple, que je n'impose pas qu'ils aient forcément
        un 1.
     3/ faudrait que je fasse un ou des exemples d'idéaux (des algèbres)
@@ -94,6 +94,12 @@ les rationels normaux de Coq et ajoutant le champ comme quoi le
 pgcd des deux nombres est 1, ce qui permet l'usage de = à la place
 de ==. Commencé avec QG.v. 7 juillet : ça a l'air de marcher.
 Peut-être qu'il faudrait les utiliser dans mon théorème de Puiseux.
+16 juillet : c'est même une espèce d'anneau avec - et j'en suis
+content toute la partie ring_like (espèce d'anneau) à la fin avec
+juste Require Import RingLike et definition QG_ring_like_op et
+QG_ring_like_prop, donc notions bien séparée qui pourrait d'ailleurs
+se retrouver dans un autre fichier, permettant à QG.v d'être
+mis dans la bibliothèque standard de Coq.
 
 dimanche 9 juillet 2023 10:10
 
@@ -107,4 +113,4 @@ pour eux, comme pour le théorème des deux carrés). Faudrait que je
 programme ça en OCaml.
   J'ai bien un code (répertoire "factor") mais il est écrit dans ma
 syntaxe révisée et j'ai peur que les modifs de Chet Murthy fassent que
-ça ne fonctionne plus.
+ça ne compile plus.
