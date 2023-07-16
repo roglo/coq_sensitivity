@@ -234,42 +234,44 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 }
 Qed.
 
-(* *)
+Definition Zn_opt_inv_or_quot n :=
+  if is_prime n then Some (inl (Zn_inv n) : _ + (Zn n → Zn n → Zn n))
+  else None.
 
-Require Import Main.RingLike.
+Definition Zn_has_inv n :=
+  match Zn_opt_inv_or_quot n with
+  | Some (inl _) => true
+  | _ => false
+  end.
 
-Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
-  {| rngl_zero := Zn_of_nat n 0;
-     rngl_add := Zn_add n;
-     rngl_mul := Zn_mul n;
-     rngl_opt_one := Some (Zn_of_nat n 1);
-     rngl_opt_opp_or_subt :=
-       Some (inl (Zn_opp n));
-     rngl_opt_inv_or_quot :=
-       if is_prime n then Some (inl (Zn_inv n)) else None;
-     rngl_opt_eqb := Some (Zn_eqb n);
-     rngl_opt_leb := None |}.
+Definition Zn_inv' n a :=
+  match Zn_opt_inv_or_quot n with
+  | Some (inl rngl_inv) => rngl_inv a
+  | _ => Zn_of_nat n 0
+  end.
 
-Section a.
-
-Context {n : nat}.
+Definition Zn_has_1 (n : nat) := true.
 
 Theorem Zn_opt_mul_inv_l :
-  let roz := Zn_ring_like_op n in
-  if (rngl_has_inv _ && rngl_has_1 _)%bool then
-    ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
+  ∀ {not_applicable : Prop} (NA : not_applicable) n,
+  if (Zn_has_inv n && Zn_has_1 n)%bool then
+    ∀ a : Zn n,
+    a ≠ Zn_of_nat n 0
+    → Zn_mul n (Zn_inv' n a) a = Zn_of_nat n 1
   else not_applicable.
 Proof.
 intros.
-subst roz.
-progress unfold rngl_has_inv; cbn.
+progress unfold Zn_has_inv.
+progress unfold Zn_has_1.
+progress unfold Zn_inv'.
+progress unfold Zn_opt_inv_or_quot.
 remember (is_prime n) as p eqn:Hp.
 symmetry in Hp.
 destruct p; [ cbn | easy ].
 intros * Haz.
 destruct (lt_dec n 2) as [Hn2| Hn2]. {
   destruct n; [ easy | ].
-  destruct n0; [ easy | ].
+  destruct n; [ easy | ].
   do 2 apply Nat.succ_lt_mono in Hn2.
   easy.
 }
@@ -279,12 +281,6 @@ rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
   flia Hn2.
 }
-progress unfold rngl_inv.
-cbn - [ "/" "mod" ].
-rewrite Hp.
-cbn - [ "/" "mod" ].
-progress unfold "<?".
-cbn - [ "/" "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].
@@ -293,8 +289,10 @@ replace (at_least_1 n) with n. 2: {
   rewrite Nat.sub_succ.
   now rewrite Nat.sub_0_r.
 }
+unfold at_least_1.
+destruct a as (a, Ha); cbn - [ "mod" ].
+rewrite <- Nat_succ_sub_succ_r; [ rewrite Nat.sub_0_r | flia Hn2 ].
 apply prime_mul_inv_l_mod; [ easy | ].
-destruct a as (a, Ha); cbn.
 intros H; apply Haz; clear Haz.
 apply Zn_eq; cbn; symmetry.
 rewrite Nat.sub_diag; symmetry.
@@ -308,6 +306,35 @@ rewrite Hc in Ha.
 apply Nat.nle_gt in Ha; apply Ha.
 destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
+
+(*
+Theorem Zn_opt_mul_inv_r :
+  let roz := Zn_ring_like_op n in
+  if (rngl_has_inv _ && rngl_has_1 _ && negb true)%bool then
+    ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
+  else not_applicable.
+Proof.
+now intros; rewrite Bool.andb_false_r.
+Qed.
+*)
+
+(* *)
+
+Require Import Main.RingLike.
+
+Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
+  {| rngl_zero := Zn_of_nat n 0;
+     rngl_add := Zn_add n;
+     rngl_mul := Zn_mul n;
+     rngl_opt_one := Some (Zn_of_nat n 1);
+     rngl_opt_opp_or_subt := Some (inl (Zn_opp n));
+     rngl_opt_inv_or_quot := Zn_opt_inv_or_quot n;
+     rngl_opt_eqb := Some (Zn_eqb n);
+     rngl_opt_leb := None |}.
+
+Section a.
+
+Context {n : nat}.
 
 Theorem Zn_opt_mul_inv_r :
   let roz := Zn_ring_like_op n in
@@ -325,6 +352,7 @@ Theorem Zn_opt_mul_div :
 Proof.
 intros.
 progress unfold rngl_has_quot; cbn.
+progress unfold Zn_opt_inv_or_quot.
 remember (is_prime n) as p eqn:Hp; symmetry in Hp.
 now destruct p.
 Qed.
@@ -396,6 +424,7 @@ Proof.
 intros.
 progress unfold rngl_has_quot.
 progress unfold roz; cbn.
+progress unfold Zn_opt_inv_or_quot.
 now destruct (is_prime n).
 Qed.
 
@@ -417,7 +446,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_add_opp_l := Zn_add_opp_l n;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
+     rngl_opt_mul_inv_l := Zn_opt_mul_inv_l NA n;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
