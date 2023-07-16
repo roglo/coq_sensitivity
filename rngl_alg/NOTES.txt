@@ -114,3 +114,15 @@ programme ça en OCaml.
   J'ai bien un code (répertoire "factor") mais il est écrit dans ma
 syntaxe révisée et j'ai peur que les modifs de Chet Murthy fassent que
 ça ne compile plus.
+
+dimanche 16 juillet 2023 11:07
+
+Déprime. Plus trop d'idées. Inspiré par QG.v, j'avais essayé de faire
+des versions d'algèbres de ring-like sur d'autres fichiers que QG.v,
+en particulier Nrl.v, pour que la partie ring-like soit à terme juste
+formée des définitions de son ring_like_op et ring_like_prop, mais ça
+se révèle finalement un peu merdique, peu convainquant.
+
+Faudrait que je retourne à d'autres activités, par exemple les
+complexes dans Rrl.v (voir mardi 27 juin ci-dessus). Bon, un peu
+la flemme, faut que je me force.
