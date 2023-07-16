@@ -8,10 +8,6 @@ Require Import Utf8 Arith.
 Require Import Main.Misc Misc FermatLittle.
 
 (*
-Canonical Structure nat_ring_like_op : ring_like_op nat :=
-  ...
-Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
-  ...
 have been moved to NatRingLike.v in directory ../main
 *)
 
@@ -307,16 +303,13 @@ apply Nat.nle_gt in Ha; apply Ha.
 destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
-(*
 Theorem Zn_opt_mul_inv_r :
-  let roz := Zn_ring_like_op n in
-  if (rngl_has_inv _ && rngl_has_1 _ && negb true)%bool then
-    ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
+  ∀ {not_applicable : Prop} (NA : not_applicable) n {P},
+  if (Zn_has_inv n && true && false)%bool then P
   else not_applicable.
 Proof.
 now intros; rewrite Bool.andb_false_r.
 Qed.
-*)
 
 (* *)
 
@@ -335,15 +328,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_opt_mul_inv_r :
-  let roz := Zn_ring_like_op n in
-  if (rngl_has_inv _ && rngl_has_1 _ && negb true)%bool then
-    ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
-  else not_applicable.
-Proof.
-now intros; rewrite Bool.andb_false_r.
-Qed.
 
 Theorem Zn_opt_mul_div :
   let roz := Zn_ring_like_op in
@@ -447,7 +431,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l NA n;
-     rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
+     rngl_opt_mul_inv_r := Zn_opt_mul_inv_r NA n;
      rngl_opt_mul_div := Zn_opt_mul_div;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_eqb_eq := Zn_eqb_eq n;
