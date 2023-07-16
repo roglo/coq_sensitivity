@@ -1262,7 +1262,7 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* to be completed *)
+(* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
