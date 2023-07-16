@@ -1262,7 +1262,7 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* to be completed
+(* to be completed *)
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1428,17 +1428,46 @@ assert (Hs : s). {
   split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
 }
-assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
+assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
+  intros.
+  destruct x as (x & (Hax & Hxb) & Hx); cbn.
+  destruct Hfab as (Hfau & Hufb).
+  apply (rngl_lt_eq_cases Hor) in Hxb.
+  destruct Hxb as [Hxb| Hxb]; [ easy | subst x ].
+  move Hufb at bottom.
+  (* the properties "f b < u" and "u < f b" are contradictory, but how to
+     call it? Can it be "antisymmetry", proving then that u = f b, what
+     is true since it is contradictory with both hypotheses?
+       Or another property directly telling that it is a contradiction?
+     What is the name of this property of "lt"?
+       Main.SortingFun.v speaks about the different properties of "<"
+     and "≤", but not in the context of ring-likes (rngl_lt and rngl_le);
+     moreover, it does not answer this question.
+       "nlab" calls "<" a "quasiorder"; contradictory with "wikipedia"
+     that says that a quasiorder is another name for preorder, that is
+     supposed to be reflexive, not irreflexive!
+       What a mess! *)
+...
+Check rngl_lt_antisymm.
+  apply rngl_lt_ in Hufb.
+
   now intros; destruct x.
 }
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
 assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
   unfold rngl_is_supremum.
-...
   progress unfold is_complete in Hco.
-  destruct Hs as (c & Hacb & Hc).
-  set (v := bisection (λ x : T, (f x <? u)%L) c b).
+  (* some random "d" in S, and then "c" is going to be in the
+     interval [d, b] *)
+  destruct Hs as (d & Hadb & Hd).
+  (* cannot do a bisection in the interval [d, b] since, picking a
+     point in the middle of the interval, while doing it (in the
+     middle of [d, b] in the first iteration), we can fall into a
+     point that is not in S *)
+Print bisection.
+...
+  set (v := bisection (λ x : T, (f x <? u)%L) d b).
   assert (H : is_Cauchy_sequence v). {
     unfold is_Cauchy_sequence.
     intros ε Hε.
