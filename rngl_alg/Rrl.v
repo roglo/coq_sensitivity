@@ -1253,6 +1253,15 @@ Definition rngl_is_supremum {T} {ro : ring_like_op T} P c :=
   (∀ x,  P x → (x ≤ c)%L) ∧
   (∀ c', (∀ x, P x → (x ≤ c')%L → (c ≤ c')%L))%L.
 
+Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
+  match n with
+  | 0 => lb
+  | S n' =>
+      let x := ((lb + ub) / 2)%L in
+      if P x then bisection P x ub n'
+      else bisection P lb x n'
+  end.
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1428,20 +1437,12 @@ assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c
   unfold rngl_is_supremum.
   progress unfold is_complete in Hco.
   destruct Hs as (c & Hacb & Hc).
-Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
-  match n with
-  | 0 => lb
-  | S n' =>
-      let x := ((lb + ub) / 2)%L in
-      if P x then bisection P x ub n'
-      else bisection P lb x n'
-  end.
   set (v := bisection (λ x : T, (f x <? u)%L) c b).
   assert (H : is_Cauchy_sequence v). {
     unfold is_Cauchy_sequence.
     intros ε Hε.
-    (* n = int ((b - c) / ε + 1) *)
-    (* pour que "int" existe, il faut que T soit archimédien *)
+    (* N = int ((b - c) / ε + 1)
+      mais pour que "int" existe, il faut que T soit archimédien *)
 ... ...
 (* "That is, c is the smallest number that is greater than or equal to
     every member of s" *)
