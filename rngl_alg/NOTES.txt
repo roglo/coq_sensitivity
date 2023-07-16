@@ -126,3 +126,12 @@ se révèle finalement un peu merdique, peu convainquant.
 Faudrait que je retourne à d'autres activités, par exemple les
 complexes dans Rrl.v (voir mardi 27 juin ci-dessus). Bon, un peu
 la flemme, faut que je me force.
+
+dimanche 16 juillet 2023 13:20
+
+Désespoir. Revenant à Rrl.v, où je suis censé prouver le théorème des
+valeurs intermédiaires, je m'aperçois tout de même que c'est assez
+compliqué. Entre la complétude, l'archimédianité, la dichotomie
+(bisection en anglais, voir "méthode de dichotomie" sur wikipédia),
+faut réfléchir à coups de dessins sur un papier, et chuis pas sûr que
+la valeur de N que je propose en commentaire soit la bonne. Pffff....
