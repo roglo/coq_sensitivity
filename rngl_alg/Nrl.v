@@ -240,6 +240,12 @@ Definition Zn_has_inv n :=
   | _ => false
   end.
 
+Definition Zn_has_quot n :=
+  match Zn_opt_inv_or_quot n with
+  | Some (inr _) => true
+  | _ => false
+  end.
+
 Definition Zn_inv' n a :=
   match Zn_opt_inv_or_quot n with
   | Some (inl rngl_inv) => rngl_inv a
@@ -311,6 +317,16 @@ Proof.
 now intros; rewrite Bool.andb_false_r.
 Qed.
 
+Theorem Zn_opt_mul_div :
+  ∀ {not_applicable : Prop} (NA : not_applicable) n {P},
+  if Zn_has_quot n then P else not_applicable.
+Proof.
+intros.
+progress unfold Zn_has_quot; cbn.
+progress unfold Zn_opt_inv_or_quot.
+now destruct (is_prime n).
+Qed.
+
 (* *)
 
 Require Import Main.RingLike.
@@ -328,18 +344,6 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
 Section a.
 
 Context {n : nat}.
-
-Theorem Zn_opt_mul_div :
-  let roz := Zn_ring_like_op in
-  if rngl_has_quot (Zn n) then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
-  else not_applicable.
-Proof.
-intros.
-progress unfold rngl_has_quot; cbn.
-progress unfold Zn_opt_inv_or_quot.
-remember (is_prime n) as p eqn:Hp; symmetry in Hp.
-now destruct p.
-Qed.
 
 Theorem Zn_opt_mul_quot_r :
   let roz := Zn_ring_like_op in
@@ -432,7 +436,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l NA n;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r NA n;
-     rngl_opt_mul_div := Zn_opt_mul_div;
+     rngl_opt_mul_div := Zn_opt_mul_div NA n;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_eqb_eq := Zn_eqb_eq n;
      rngl_opt_le_dec := NA;
