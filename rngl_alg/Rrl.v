@@ -1435,15 +1435,18 @@ assert (Hs' : ∀ x : s, (proj1_sig x ≤ b)%L). {
     supremum c = sup s exists" *)
 assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
   unfold rngl_is_supremum.
+...
   progress unfold is_complete in Hco.
   destruct Hs as (c & Hacb & Hc).
   set (v := bisection (λ x : T, (f x <? u)%L) c b).
   assert (H : is_Cauchy_sequence v). {
     unfold is_Cauchy_sequence.
     intros ε Hε.
+(*
     rename v into v'; rename u into v; rename v' into u.
     rename b into b'; rename c into b; rename b' into c.
-    (* N = int ((c - b) / ε + 1)
+*)
+    (* N = int ((b - c) / ε + 1)
       mais pour que "int" existe, il faut que T soit archimédien *)
 ... ...
 (* "That is, c is the smallest number that is greater than or equal to
