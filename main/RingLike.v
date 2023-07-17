@@ -695,6 +695,17 @@ unfold rngl_le in H1.
 destruct rngl_opt_leb; congruence.
 Qed.
 
+Theorem rngl_lt_asymm :
+  rngl_is_ordered T = true →
+  ∀ a b, (a < b → ¬ b < a)%L.
+Proof.
+intros Hor * Hab Hba.
+apply (rngl_lt_iff Hor) in Hab, Hba.
+destruct Hab as (Hab, Hnab).
+destruct Hba as (Hba, _).
+now apply Hnab, (rngl_le_antisymm Hor).
+Qed.
+
 Theorem rngl_add_le_compat :
   rngl_is_ordered T = true →
   ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L.

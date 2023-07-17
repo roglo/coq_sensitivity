@@ -1435,25 +1435,7 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
   apply (rngl_lt_eq_cases Hor) in Hxb.
   destruct Hxb as [Hxb| Hxb]; [ easy | subst x ].
   move Hufb at bottom.
-  (* the properties "f b < u" and "u < f b" are contradictory, but how to
-     call it? Can it be "antisymmetry", proving then that u = f b, what
-     is true since it is contradictory with both hypotheses?
-       Or another property directly telling that it is a contradiction?
-     What is the name of this property of "lt"?
-       Main.SortingFun.v speaks about the different properties of "<"
-     and "≤", but not in the context of ring-likes (rngl_lt and rngl_le);
-     moreover, it does not answer this question.
-       "nlab" calls "<" a "quasiorder"; contradictory with "wikipedia"
-     that says that a quasiorder is another name for preorder, that is
-     supposed to be reflexive, not irreflexive!
-       https://ncatlab.org/nlab/show/quasiorder
-       https://ncatlab.org/nlab/show/preorder
-     What a mess! *)
-...
-Check rngl_lt_antisymm.
-  apply rngl_lt_ in Hufb.
-
-  now intros; destruct x.
+  now apply (rngl_lt_asymm Hor) in Hx.
 }
 (* "Since s is non-empty and bounded above by b, by completeness, the
     supremum c = sup s exists" *)
