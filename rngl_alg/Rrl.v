@@ -1437,8 +1437,8 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
   move Hufb at bottom.
   now apply (rngl_lt_asymm Hor) in Hx.
 }
-(* "Since s is non-empty and bounded above by b, by completeness, the
-    supremum c = sup s exists" *)
+(* "Since S is non-empty and bounded above by b, by completeness, the
+    supremum c = sup S exists" *)
 assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
   unfold rngl_is_supremum.
   progress unfold is_complete in Hco.
