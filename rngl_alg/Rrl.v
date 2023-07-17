@@ -1442,6 +1442,7 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
 assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
   unfold rngl_is_supremum.
   progress unfold is_complete in Hco.
+...
   (* some random "d" in S, and then "c" is going to be in the
      interval [d, b] *)
   destruct Hs as (d & Hadb & Hd).
