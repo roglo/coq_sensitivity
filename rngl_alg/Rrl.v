@@ -1447,6 +1447,16 @@ assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
+Fixpoint AnBn n P An Bn :=
+  match n with
+  | 0 => (An, Bn)
+  | S n' =>
+      let A := ((An + Bn) / 2)%L in
+      if is_upper_bound P A
+      (* ah, crotte, il faut que ce soit décidable
+         ou calculable, mais il s'agit d'un forall
+         sur un ensemble infini, ça peut pas se faire
+         avec un simple rngl_eqb *)
 ...
   (* some random "d" in S, and then "c" is going to be in the
      interval [d, b] *)
