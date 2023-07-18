@@ -1439,6 +1439,11 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
+(* There is supposed to be a proof of that in
+   https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences
+   but there is a problem in this proof in the sentence "suppose that S
+   has an upper bound B1", because S may have no upper bound belonging to
+   S. For example, the set ]0,1[ *)
 assert (Hc : ∃ c, rngl_is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
   unfold rngl_is_supremum.
   progress unfold is_complete in Hco.
