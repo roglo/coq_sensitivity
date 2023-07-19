@@ -145,20 +145,20 @@ lui-même pour montrer que "a ≤ √(a²+b²)", lui-même pour montrer que "a
 / √(a²+b²)" est compris entre -1 et 1, lui-même étant un des nombreux
 lemmes pour prouver le théorème de d'Alembert-Gauss).
 
-C'est dans Rrl.v. Sur une preuve de la borne supérieur trouvée sur
+C'est dans Rrl.v. Sur une preuve de la borne supérieure trouvée sur
 l'internet, il semble qu'il faille que la propriété "être un majorant"
 (be an upper bound) doive être décidable, car cette preuve se base sur
 un combo de deux suites An et Bn, où cette décidabilité est utilisée
 pour le fabriquer.
 
-Or, dans mes espèces d'anneau, c'est pas prévu, ça ! Mon inégalité est
-décidable, certes (faudra quand même que dans l'algèbre des réels,
+Or, dans mes espèces d'anneaux, c'est pas prévu, ça ! Mon inégalité
+est décidable, certes (faudra quand même que dans l'algèbre des réels,
 l'utilisateur se le mette comme axiome), et donc aussi l'inégalité
-dans un ensemble fini (suffit de faire un "et" entre toutes les
-valeurs), mais pas dans un ensemble infini. En plus, celui-là, il est
-puissance du continu.
+entre une valeur et une autre valeur dans un ensemble fini (suffit de
+faire un "et" entre toutes les valeurs), mais pas dans un ensemble
+infini. En plus, celui-là, il est puissance du continu.
 
 J'ai donc peur que pour les preuves de tout ce merdier, il faille
 passer en logique classique (tiers exclu), et même, pire, que ce soit
-décidable (∀ P, {P} + {¬P}(, ce qui, bon, ne me surprend pas de la
+décidable (∀ P, {P} + {¬P}), ce qui, bon, ne me surprend pas de la
 part des nombres réels, mais ça faiche, quand même. Berk !
