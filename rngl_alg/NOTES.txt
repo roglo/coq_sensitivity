@@ -143,7 +143,7 @@ nécessaire, apparemment, pour le théorème des valeurs intermédiaires,
 lui-même nécessaire pour prouver que l'exponentielle est croissante,
 lui-même pour montrer que "a ≤ √(a²+b²)", lui-même pour montrer que "a
 / √(a²+b²)" est compris entre -1 et 1, lui-même étant un des nombreux
-lemmes pour prouver le théorème de d'Alembert-Gauss).
+lemmes pour prouver le théorème de d'Alembert-Gauss.
 
 C'est dans Rrl.v. Sur une preuve de la borne supérieure trouvée sur
 l'internet, il semble qu'il faille que la propriété "être un majorant"

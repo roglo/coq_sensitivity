@@ -1265,6 +1265,31 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
+(*
+Definition Nat_eqb' a b :=
+  if Nat.eq_dec a b then true else false.
+
+Theorem Nat_eq_dec' : ∀ a b : nat, {a = b} + {a ≠ b}.
+Proof.
+intros.
+remember (a =? b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ left | right ].
+now apply Nat.eqb_eq in Hab.
+now apply Nat.eqb_neq in Hab.
+Qed.
+
+About Nat.eq_dec.
+Lemma eq_dec : forall n m : nat, {n = m} + {n <> m}.
+Proof.
+  intro n; induction n as [|n IHn]; intro m; destruct m as [|m].
+  - now left.
+  - now right.
+  - now right.
+  - destruct (IHn m); [left|right]; auto.
+Defined.
+...
+*)
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
