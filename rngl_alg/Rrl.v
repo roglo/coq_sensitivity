@@ -1265,31 +1265,6 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(*
-Definition Nat_eqb' a b :=
-  if Nat.eq_dec a b then true else false.
-
-Theorem Nat_eq_dec' : ∀ a b : nat, {a = b} + {a ≠ b}.
-Proof.
-intros.
-remember (a =? b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ left | right ].
-now apply Nat.eqb_eq in Hab.
-now apply Nat.eqb_neq in Hab.
-Qed.
-
-About Nat.eq_dec.
-Lemma eq_dec : forall n m : nat, {n = m} + {n <> m}.
-Proof.
-  intro n; induction n as [|n IHn]; intro m; destruct m as [|m].
-  - now left.
-  - now right.
-  - now right.
-  - destruct (IHn m); [left|right]; auto.
-Defined.
-...
-*)
-
 (* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
@@ -1472,19 +1447,6 @@ assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
-Search ({∀ _, _} + { ∃ _, _}).
-Definition LPO := ∀ (u : nat → nat), ( ∀ i, u i = O ) + { i : nat | u i ≠ O }.
-Definition glop := ∀ A (P : A → Prop), {∀ a, P a} + {∃ a, ¬ P a}.
-Theorem glop_LPO : glop → LPO.
-Proof.
-intros H1.
-unfold glop in H1.
-unfold LPO.
-intros u.
-specialize (H1 nat (λ i, u i = 0)) as H2.
-cbn in H2.
-destruct H2 as [H2| H2]; [ now left | right ].
-...
 Fixpoint AnBn n P An Bn :=
   match n with
   | 0 => (An, Bn)
