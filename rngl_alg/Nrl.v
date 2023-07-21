@@ -338,7 +338,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_one := Some (Zn_of_nat n 1);
      rngl_opt_opp_or_subt := Some (inl (Zn_opp n));
      rngl_opt_inv_or_quot := Zn_opt_inv_or_quot n;
-     rngl_opt_eqb := Some (Zn_eqb n);
+     rngl_opt_eq_dec := Some (Zn_eq_dec n);
      rngl_opt_leb := None |}.
 
 Section a.
@@ -438,7 +438,6 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r NA n;
      rngl_opt_mul_div := Zn_opt_mul_div NA n;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
-     rngl_opt_eqb_eq := Zn_eqb_eq n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
@@ -474,7 +473,7 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := None;
      rngl_opt_inv_or_quot := None;
-     rngl_opt_eqb := Some Nat.eqb;
+     rngl_opt_eq_dec := Some Nat.eq_dec;
      rngl_opt_leb := None |}.
 
 Section a.
@@ -529,7 +528,6 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
-     rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lcm_opt_integral;

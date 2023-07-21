@@ -205,6 +205,27 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
 Qed.
 
+Theorem qeq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 == qg_q q2.
+Proof.
+intros.
+split; intros Hq; [ now subst q2 | ].
+destruct q1 as ((qn1, qd1), Hq1).
+destruct q2 as ((qn2, qd2), Hq2).
+move qn2 before qn1.
+move qd2 before qd1.
+cbn in *.
+apply eq_QG_eq; cbn.
+progress unfold "==" in Hq.
+cbn in Hq.
+progress unfold Z_pos_gcd in Hq1.
+progress unfold Z_pos_gcd in Hq2.
+specialize (Z.gauss qn1 (Z.pos qd1) (Z.pos qd2)) as H1.
+...
+f_equal.
+apply (Eqdep_dec.UIP_dec Pos.eq_dec).
+apply (Eqdep_dec.UIP_dec Pos.eq_dec).
+Qed.
+
 Theorem QG_of_Q_0 : ∀ d, QG_of_Q (0 # d) = QG_of_Q 0.
 Proof.
 intros.
@@ -924,6 +945,23 @@ f_equal. {
   }
 }
 Qed.
+
+Theorem QG_eq_dec : ∀ q1 q2 : QG, {q1 = q2} + {q1 ≠ q2}.
+Proof.
+(*
+intros.
+specialize (Qeq_dec (qg_q q1) (qg_q q2)) as H1.
+destruct H1 as [H1| H1]; [ left | right ]. {
+  apply eq_QG_eq; cbn.
+...
+*)
+intros (q1, Hq1) (q2, Hq2).
+specialize (Qeq_dec q1 q2) as H1.
+destruct H1 as [H1| H1]; [ left | right ]. {
+  apply eq_QG_eq; cbn.
+  progress unfold "==" in H1.
+Search QG.
+...
 
 Theorem QG_of_Q_opp : ∀ a, QG_of_Q (- a) = (- QG_of_Q a)%QG.
 Proof.
@@ -1778,7 +1816,11 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_one := Some 1%QG;
      rngl_opt_opp_or_subt := Some (inl QG_opp);
      rngl_opt_inv_or_quot := Some (inl QG_inv);
+(**)
+     rngl_opt_eq_dec := Some QG_eqb;
+(*
      rngl_opt_eqb := Some QG_eqb;
+*)
      rngl_opt_leb := Some QG_leb |}.
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=

@@ -14,7 +14,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := Some (inr Nat.sub);
      rngl_opt_inv_or_quot := Some (inr Nat.div);
-     rngl_opt_eqb := Some Nat.eqb;
+     rngl_opt_eq_dec := Some Nat.eq_dec;
      rngl_opt_leb := Some Nat.leb |}.
 
 (*
@@ -149,7 +149,6 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := Nat_mul_div;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_le_dec := Nat_opt_le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
      rngl_opt_alg_closed := NA;

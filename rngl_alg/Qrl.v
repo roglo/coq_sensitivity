@@ -20,7 +20,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_one := Some 1%Q;
      rngl_opt_opp_or_subt := Some (inl Q.opp);
      rngl_opt_inv_or_quot := Some (inl Q.inv);
-     rngl_opt_eqb := Some Q.eqb;
+     rngl_opt_eq_dec := Some Q.eq_dec;
      rngl_opt_leb := Some Q_leb |}.
 
 (*
@@ -190,7 +190,6 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := Q.eqb_eq;
      rngl_opt_le_dec := Q_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;

@@ -28,6 +28,19 @@ Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
 Definition mat_eqb {T} (eqb : T → T → bool) (A B : matrix T) :=
   list_eqv (list_eqv eqb) (mat_list_list A) (mat_list_list B).
 
+Theorem mat_eq_dec {T} (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
+  (A B : matrix T) : {A = B} + {A ≠ B}.
+Proof.
+specialize (list_eq_dec (list_eq_dec eq_dec)) as H1.
+specialize (H1 (mat_list_list A) (mat_list_list B)).
+destruct A as (lla).
+destruct B as (llb).
+cbn in H1.
+destruct H1 as [H1| H1]; [ now left; subst llb | right ].
+intros H; apply H1.
+now injection H.
+Qed.
+
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
 

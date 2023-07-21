@@ -22,7 +22,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eqb T = true).
+Context (Heb : rngl_has_eq_dec T = true).
 
 Theorem eq_strip_0s_nil : ∀ d la,
   strip_0s la = [] ↔ ∀ i, i < length la → nth i la d = 0%L.
@@ -2105,7 +2105,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eqb T = true).
+Context (Heb : rngl_has_eq_dec T = true).
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -2124,6 +2124,20 @@ cbn in Hab.
 subst lb.
 f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+Theorem polyn_eq_dec : ∀ P Q : polyn T, {P = Q} + {P ≠ Q}.
+Proof.
+intros.
+unfold rngl_has_eq_dec in Heb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+specialize (list_eq_dec rngl_eq_dec (lap P) (lap Q)) as H1.
+destruct H1 as [H1| H1]. {
+  now apply eq_polyn_eq in H1; left.
+} {
+  right; intros H; apply H1.
+  now apply eq_polyn_eq.
+}
 Qed.
 
 (* polyn_eqb is an equality *)
@@ -2236,7 +2250,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_one := Some polyn_one;
      rngl_opt_opp_or_subt := polyn_opt_opp_or_subt;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
-     rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
+     rngl_opt_eq_dec := Some polyn_eq_dec;
      rngl_opt_leb := None |}.
 
 (* allows to use ring-like theorems on polynomials
@@ -2615,18 +2629,12 @@ Qed.
 
 Theorem polyn_opt_eqb_eq :
   let rop := polyn_ring_like_op in
-  if rngl_has_eqb (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
+  if rngl_has_eq_dec (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros rop; subst rop.
 intros a b; cbn.
-apply polyn_eqb_eq.
-intros c d.
-split; intros Hcd. {
-  now apply (rngl_eqb_eq Heb) in Hcd.
-}
-subst c.
-now apply rngl_eqb_eq.
+now destruct (polyn_eq_dec a b).
 Qed.
 
 Theorem polyn_opt_integral :
@@ -3237,7 +3245,6 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
-     rngl_opt_eqb_eq := polyn_opt_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := polyn_opt_integral;
      rngl_opt_alg_closed := NA;
@@ -3420,7 +3427,7 @@ Require Import RnglAlg.MatRl.
 
 Definition mat_of_polyn_ring_like_op n T
   (ro : ring_like_op T) (rp : ring_like_prop T) eqb
-  (Heq : rngl_has_eqb T = true)
+  (Heq : rngl_has_eq_dec T = true)
   (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_op (square_matrix n (polyn T)) :=
   mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
@@ -3440,7 +3447,7 @@ now destruct os.
 Qed.
 
 Definition mat_of_polyn_ring_like_prop n T ro rp eqb
-  (Heq : rngl_has_eqb T = true) (Hop : rngl_has_opp T = true) :
+  (Heq : rngl_has_eq_dec T = true) (Hop : rngl_has_opp T = true) :
     ring_like_prop (square_matrix n (polyn T)) :=
   @mat_ring_like_prop _
     (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))

@@ -103,27 +103,6 @@ Definition I_opt_leb : option (ideal P → ideal P → bool) :=
   | None => None
   end.
 
-(* ideal ring like op *)
-
-Definition I_ring_like_op : ring_like_op (ideal P) :=
-  {| rngl_zero := I_zero;
-     rngl_add := I_add;
-     rngl_mul := I_mul;
-     rngl_opt_one := I_opt_one;
-     rngl_opt_opp_or_subt :=
-       match rngl_opt_opp_or_subt with
-       | Some (inl _) => Some (inl I_opp)
-       | Some (inr _) => Some (inr I_subt)
-       | None => None
-       end;
-     rngl_opt_inv_or_quot := None;
-     rngl_opt_eqb :=
-       match rngl_opt_eqb with
-       | Some eqb => Some (I_eqb eqb)
-       | None => None
-       end;
-     rngl_opt_leb := I_opt_leb |}.
-
 (* equality in ideals is equivalent to equality in their values,
    because the proof of their properties (i_mem), being an equality
    between booleans, is unique *)
@@ -145,6 +124,42 @@ Proof.
 intros.
 now split; intros Hab H; apply Hab, eq_ideal_eq.
 Qed.
+
+(* eq_dec *)
+
+Definition I_eq_dec (eq_dec : ∀ a b : T, {a = b} + {a ≠ b}) (a b : ideal P) :=
+  eq_dec (i_val a) (i_val b).
+
+Theorem I_opt_eq_dec : option (∀ a b : ideal P, {a = b} + {a ≠ b}).
+Proof.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | apply None ].
+specialize (I_eq_dec rngl_eq_dec) as H1.
+eapply Some.
+intros.
+specialize (H1 a b).
+destruct H1 as [H1| H1]; [ left | right ]. {
+  now apply eq_ideal_eq.
+} {
+  now apply neq_ideal_neq.
+}
+Qed.
+
+(* ideal ring like op *)
+
+Definition I_ring_like_op : ring_like_op (ideal P) :=
+  {| rngl_zero := I_zero;
+     rngl_add := I_add;
+     rngl_mul := I_mul;
+     rngl_opt_one := I_opt_one;
+     rngl_opt_opp_or_subt :=
+       match rngl_opt_opp_or_subt with
+       | Some (inl _) => Some (inl I_opp)
+       | Some (inr _) => Some (inr I_subt)
+       | None => None
+       end;
+     rngl_opt_inv_or_quot := None;
+     rngl_opt_eq_dec := I_opt_eq_dec;
+     rngl_opt_leb := I_opt_leb |}.
 
 (* ideal ring like prop *)
 
@@ -377,37 +392,27 @@ destruct H1 as [H1| H1]; [ left | right ]. {
 Qed.
 
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
-  if rngl_has_eqb (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
+  if rngl_has_eq_dec (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros.
-remember (rngl_has_eqb (ideal P)) as ebi eqn:Hebi; symmetry in Hebi.
+remember (rngl_has_eq_dec (ideal P)) as ebi eqn:Hebi; symmetry in Hebi.
 destruct ebi; [ | easy ].
-assert (Heb : rngl_has_eqb T = true). {
-  progress unfold roi in Hebi.
-  progress unfold I_ring_like_op in Hebi.
-  progress unfold rngl_has_eqb in Hebi |-*.
-  cbn in Hebi.
-  now destruct rngl_opt_eqb.
-}
-specialize (rngl_eqb_eq Heb) as H1.
 intros.
 split; intros Hab. {
   apply eq_ideal_eq.
   progress unfold rngl_eqb in Hab.
-  progress unfold rngl_eqb in H1.
   cbn in Hab.
-  progress unfold rngl_has_eqb in Heb.
-  destruct rngl_opt_eqb as [eqb| ]; [ | easy ].
-  now apply H1.
+  destruct I_opt_eq_dec as [I_eq_dec| ]; [ | easy ].
+  destruct (I_eq_dec a b); [ now subst b | easy ].
 } {
   apply eq_ideal_eq in Hab.
-  apply H1 in Hab.
   progress unfold rngl_eqb.
-  progress unfold rngl_has_eqb in Hebi; cbn in Hebi.
-  progress unfold rngl_eqb in Hab.
+  progress unfold rngl_has_eq_dec in Hebi; cbn in Hebi.
   progress unfold roi; cbn.
-  now destruct rngl_opt_eqb.
+  destruct I_opt_eq_dec as [I_eq_dec| ]; [ | easy ].
+  destruct (I_eq_dec a b) as [H1| H1]; [ easy | ].
+  now apply eq_ideal_eq in Hab.
 }
 Qed.
 
@@ -696,7 +701,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := I_opt_eqb_eq;
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;

@@ -18,7 +18,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Heb : rngl_has_eqb T = true).
+Context (Heb : rngl_has_eq_dec T = true).
 
 (* normalization: lap not ending with 0s *)
 
@@ -278,7 +278,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Heb : rngl_has_eqb T = true).
+Context (Heb : rngl_has_eq_dec T = true).
 
 Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.
@@ -529,7 +529,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_opt_one := lap_opt_one;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_eqb := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
+     rngl_opt_eq_dec := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
      rngl_opt_leb := None |}.
 
 (* commutativity of addition *)
@@ -2929,7 +2929,6 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lap_opt_integral Hos;
      rngl_opt_alg_closed := NA;

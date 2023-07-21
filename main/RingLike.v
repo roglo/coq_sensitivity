@@ -59,7 +59,7 @@ Class ring_like_op T :=
     rngl_opt_one : option T;
     rngl_opt_opp_or_subt : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
-    rngl_opt_eqb : option (T → T → bool);
+    rngl_opt_eq_dec : option (∀ a b : T, {a = b} + {a ≠ b});
     rngl_opt_leb : option (T → T → bool) }.
 
 Declare Scope ring_like_scope.
@@ -190,12 +190,13 @@ Qed.
 
 Require Import Arith.
 
-Definition rngl_has_eqb T {R : ring_like_op T} :=
-  bool_of_option rngl_opt_eqb.
+Definition rngl_has_eq_dec T {R : ring_like_op T} :=
+  bool_of_option rngl_opt_eq_dec.
 
 Definition rngl_eqb {T} {R : ring_like_op T} a b :=
-  match rngl_opt_eqb with
-  | Some rngl_eqb => rngl_eqb a b
+  match rngl_opt_eq_dec with
+  | Some rngl_eq_dec =>
+      match rngl_eq_dec a b with left _ => true | right _ => false end
   | None => false
   end.
 
@@ -318,10 +319,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_mul_quot_r :
       if (rngl_has_quot T && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%L → (b * a / b)%L = a
-      else not_applicable;
-    (* when equality is calculable *)
-    rngl_opt_eqb_eq :
-      if rngl_has_eqb T then ∀ a b : T, (a =? b)%L = true ↔ a = b
       else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
@@ -501,61 +498,84 @@ rewrite Hon in rngl_mul_inv_r.
 now apply rngl_mul_inv_r.
 Qed.
 
+(*
+Theorem rngl_opt_eqb_eq :
+  if rngl_has_eq_dec T then ∀ a b : T, (a =? b)%L = true ↔ a = b
+  else not_applicable.
+Proof.
+remember (rngl_has_eq_dec T) as ed eqn:Hed.
+symmetry in Hed.
+progress unfold rngl_has_eq_dec in Hed.
+destruct ed; [ | easy ].
+intros.
+remember (rngl_eqb a b) as eb eqn:Heb.
+symmetry in Heb.
+unfold rngl_eqb in Heb.
+destruct eb. {
+  split; [ | easy ].
+  intros _.
+  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+  now destruct (rngl_eq_dec a b).
+} {
+  split; [ easy | ].
+  intros Hab; exfalso.
+  subst b.
+  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+  now destruct (rngl_eq_dec a a).
+}
+Qed.
+*)
+
 Theorem rngl_eqb_eq :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   ∀ a b : T, (a =? b)%L = true ↔ a = b.
 Proof.
-intros Heqb *.
-specialize rngl_opt_eqb_eq as H.
-now rewrite Heqb in H.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
 Qed.
 
 Theorem rngl_eqb_neq :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   ∀ a b : T, (a =? b)%L = false ↔ a ≠ b.
 Proof.
-intros Heqb *.
-split; intros Hab. {
-  intros H.
-  apply (rngl_eqb_eq Heqb) in H.
-  congruence.
-} {
-  remember (a =? b)%L as x eqn:Hx.
-  symmetry in Hx.
-  destruct x; [ | easy ].
-  exfalso; apply Hab.
-  now apply rngl_eqb_eq.
-}
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
 Qed.
 
 Theorem rngl_neqb_neq :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   ∀ a b : T, (a ≠? b)%L = true ↔ a ≠ b.
 Proof.
-intros Heqb *.
-split; intros Hab. {
-  intros H.
-  apply (rngl_eqb_eq Heqb) in H.
-  now rewrite H in Hab.
-} {
-  apply (rngl_eqb_neq Heqb) in Hab.
-  now rewrite Hab.
-}
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
 Qed.
 
 Theorem rngl_eqb_refl :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   ∀ a, (a =? a)%L = true.
 Proof.
 intros Heqb *.
 now apply (rngl_eqb_eq Heqb).
 Qed.
 
-Theorem rngl_eq_dec : rngl_has_eqb T = true → ∀ a b : T, {a = b} + {a ≠ b}.
+Theorem rngl_eq_dec : rngl_has_eq_dec T = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
-intros Heq *.
-remember (rngl_eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now left; apply rngl_eqb_eq | now right; apply rngl_eqb_neq ].
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+apply rngl_eq_dec.
 Qed.
 
 Theorem rngl_leb_le :
@@ -1411,7 +1431,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp_or_subt T = true →
   (rngl_is_integral_domain T ||
-   rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool = true →
+   rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
 intros Hmo Hdo * Hab.
@@ -1428,7 +1448,7 @@ destruct iv. {
     apply rngl_has_quot_has_no_inv in Hiq.
     congruence.
   }
-  remember (rngl_has_eqb T) as de eqn:Hde; symmetry in Hde.
+  remember (rngl_has_eq_dec T) as de eqn:Hde; symmetry in Hde.
   destruct de; [ | now destruct rngl_has_inv_and_1_or_quot ].
   cbn; clear rngl_integral.
   assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%L). {
@@ -2401,7 +2421,7 @@ Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eqb T)%bool =
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
@@ -2634,7 +2654,7 @@ Theorem rngl_abs_div :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
@@ -3145,7 +3165,7 @@ Record in_charac_0_field :=
     cf_mul_is_comm : rngl_mul_is_comm T = true;
     cf_has_opp : rngl_has_opp T = true;
     cf_has_inv : rngl_has_inv T = true;
-    cf_has_eqb : rngl_has_eqb T = true;
+    cf_has_eq_dec : rngl_has_eq_dec T = true;
     cf_characteristic : rngl_characteristic T = 0 }.
 
 End a.

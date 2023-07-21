@@ -14,7 +14,7 @@ Arguments mk_gc {T} gre%L gim%L.
 Arguments gre {T} GComplex%L.
 Arguments gim {T} GComplex%L.
 
-Arguments rngl_opt_eqb T {ring_like_op}.
+Arguments rngl_opt_eq_dec T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 
@@ -36,7 +36,7 @@ now destruct Hab.
 Qed.
 
 Theorem neq_neq_GComplex {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   ∀ a b : GComplex T, a ≠ b → gre a ≠ gre b ∨ gim a ≠ gim b.
 Proof.
 intros * Heb * Hab.
@@ -171,14 +171,28 @@ Definition gc_opt_inv_or_quot {T}
       None
   end.
 
-Definition gc_opt_eqb {T} {ro : ring_like_op T} :
-    option (GComplex T → GComplex T → bool) :=
-  match rngl_opt_eqb T with
-  | Some eqb =>
-      Some (λ c d, (eqb (gre c) (gre d) && eqb (gim c) (gim d))%bool)
-  | None =>
-      None
-  end.
+Theorem gc_opt_eq_dec {T} {ro : ring_like_op T} :
+  option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
+Proof.
+remember (rngl_opt_eq_dec T) as ed eqn:Hed; symmetry in Hed.
+destruct ed as [rngl_eq_dec| ]; [ | apply None ].
+apply Some.
+intros.
+destruct a as (ra, ia).
+destruct b as (rb, ib).
+specialize (rngl_eq_dec ra rb) as H1.
+specialize (rngl_eq_dec ia ib) as H2.
+destruct H1 as [H1| H1]. {
+  subst rb.
+  destruct H2 as [H2| H2]; [ now subst ib; left | right ].
+  intros H; apply H2.
+  now injection H.
+} {
+  right.
+  intros H; apply H1.
+  now injection H.
+}
+Qed.
 
 Declare Scope gc_scope.
 Delimit Scope gc_scope with C.
@@ -195,7 +209,7 @@ Definition gc_ring_like_op T
      rngl_opt_one := gc_opt_one;
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot;
-     rngl_opt_eqb := gc_opt_eqb;
+     rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
 Definition gc_exp {T} {ro : ring_like_op T} {rp : ring_like_prop T}
@@ -654,10 +668,11 @@ destruct ic; [ | easy ].
 now destruct (rl_has_mod_intgl T).
 Qed.
 
+(*
 Theorem gc_opt_eqb_eq {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
   let roc := gc_ring_like_op T in
-  if rngl_has_eqb (GComplex T) then
+  if rngl_has_eq_dec (GComplex T) then
     ∀ a b : GComplex T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
@@ -684,6 +699,7 @@ split; intros Hab. {
   now split; apply H1.
 }
 Qed.
+*)
 
 Theorem gc_characteristic_prop {T}
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -1036,7 +1052,7 @@ Theorem rl_sqrt_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ x : T, rl_sqrt (rngl_squ x) = rngl_abs x.
@@ -1186,7 +1202,7 @@ Theorem rl_exp_continuous {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   ∀ a, continuous_at rl_exp a.
@@ -1271,7 +1287,7 @@ Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_mod_intgl T = true →
   rl_has_trigo T = true →
@@ -1303,7 +1319,7 @@ Theorem le_rngl_abs_rl_sqrt_add {T} {ro : ring_like_op T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
@@ -1357,7 +1373,7 @@ Theorem rl_exp_increasing {T} {ro : ring_like_op T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
@@ -1392,7 +1408,7 @@ destruct ab. {
 (* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le {T} {ro : ring_like_op T}
   {rp : ring_like_prop T} {rl : real_like_prop T} :
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   is_complete T →
   ∀ f, continuous f
@@ -1506,7 +1522,7 @@ Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
   (1 < rl_exp 1 → ∀ x, 0 ≤ x → 1 ≤ rl_exp x)%L.
@@ -1704,7 +1720,7 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rl_has_trigo = true →
   rl_has_mod_intgl T = true →
   ∀ (z : GComplex T) ρ θ,
@@ -1763,7 +1779,7 @@ Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered = true →
   rl_has_trigo = true →
   ∀ x, (-1 ≤ x ≤ 1)%L →
@@ -1815,7 +1831,7 @@ Theorem rl_sin_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  rngl_has_eqb T = true →
+  rngl_has_eq_dec T = true →
   rngl_is_ordered = true →
   rl_has_trigo = true →
   ∀ x y, rl_sin (rl_atan2 y x) = (y / rl_sqrt (rngl_squ x + rngl_squ y))%L.
@@ -1969,6 +1985,15 @@ split. {
 }
 Qed.
 
+Theorem CReal_eq_dec : ∀ a b : CReal, {a = b} + {a ≠ b}.
+Proof.
+intros.
+specialize (CReal_appart_or_eq a b) as H1.
+destruct H1 as [H1| H1]; [ right | now left ].
+intros H; subst b.
+now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
+Qed.
+
 Definition CReal_inv' (x : CReal) : CReal :=
   match CReal_appart_or_eq x 0%CReal with
   | inl H => CReal_inv x H
@@ -1986,7 +2011,7 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_one := Some 1%CReal;
      rngl_opt_opp_or_subt := Some (inl CReal_opp);
      rngl_opt_inv_or_quot := Some (inl CReal_inv');
-     rngl_opt_eqb := Some CReal_eqb;
+     rngl_opt_eq_dec := Some CReal_eq_dec;
      rngl_opt_leb := None (*Some CRealLe*) |}.
 
 (*
@@ -2210,7 +2235,6 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := CReal_eqb_eq;
      rngl_opt_le_dec := NA; (*CReal_le_dec;*)
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
@@ -2257,7 +2281,7 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_opt_one := Some CComplex_one;
      rngl_opt_opp_or_subt := Some (inl CComplex_opp);
      rngl_opt_inv_or_quot := Some (inl CComplex_inv);
-     rngl_opt_eqb := None;
+     rngl_opt_eq_dec := None;
      rngl_opt_leb := None |}.
 
 (* to be completed
@@ -2285,7 +2309,7 @@ Definition reals_ring_like_op : ring_like_op R :=
      rngl_opt_one := Some R1;
      rngl_opt_opp_or_subt := Some (inl Ropp);
      rngl_opt_inv_or_quot := Some (inl Rinv);
-     rngl_opt_eqb := None;
+     rngl_opt_eq_dec := None;
      rngl_opt_leb := None (*Some Rle*) |}.
 
 (*
@@ -2402,7 +2426,6 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA; (*Rle_dec;*)
      rngl_opt_integral := Rmult_integral;
      rngl_opt_alg_closed := NA;

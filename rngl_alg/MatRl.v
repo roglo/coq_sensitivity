@@ -109,14 +109,27 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
 Definition square_matrix_eqb eqb {n} (A B : square_matrix n T) :=
   mat_eqb eqb (sm_mat A) (sm_mat B).
 
-Definition mat_ring_like_op eqb {n} : ring_like_op (square_matrix n T) :=
+Theorem square_matrix_eq_dec (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
+  ∀ A B : square_matrix n T, {A = B} + {A ≠ B}.
+Proof.
+intros.
+specialize (mat_eq_dec eq_dec (sm_mat A) (sm_mat B)) as H1.
+destruct H1 as [H1| H1]; [ left | right ]. {
+  now apply square_matrix_eq.
+} {
+  now intros H; subst B.
+}
+Qed.
+
+Definition mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
+    ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
      rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
-     rngl_opt_eqb := Some (square_matrix_eqb eqb);
+     rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
 
 (*
@@ -133,8 +146,8 @@ end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it. [projec
 Existing Instance mat_ring_like_op.
 *)
 
-Theorem mat_ncols_of_nat eqb {n} : ∀ i,
-  let rom := mat_ring_like_op eqb in
+Theorem mat_ncols_of_nat eq_dec {n} : ∀ i,
+  let rom := mat_ring_like_op eq_dec in
   mat_ncols (@sm_mat n T (rngl_mul_nat 1 i)) = n.
 Proof.
 intros; cbn.
@@ -148,8 +161,8 @@ apply Nat.min_id.
 Qed.
 
 Theorem sm_mat_of_nat :
-  ∀ eqb n,
-  let rom := mat_ring_like_op eqb in
+  ∀ eq_dec n,
+  let rom := mat_ring_like_op eq_dec in
   ∀ m,
   sm_mat (rngl_mul_nat 1 m : square_matrix n T) = (rngl_mul_nat 1 m × mI n)%M.
 (*
@@ -177,11 +190,11 @@ rewrite mat_mul_scal_l_add_distr_r.
 now rewrite mat_mul_scal_1_l, IHm.
 Qed.
 
-Theorem mat_el_of_nat_diag {n} : ∀ eqb m i,
+Theorem mat_el_of_nat_diag {n} : ∀ eq_dec m i,
   1 ≤ i ≤ n
   → mat_el
       (sm_mat
-         (@rngl_mul_nat (square_matrix n T) (mat_ring_like_op eqb)
+         (@rngl_mul_nat (square_matrix n T) (mat_ring_like_op eq_dec)
             (smI _) m)) i i =
     rngl_mul_nat 1 m.
 (*
@@ -204,12 +217,12 @@ now rewrite Nat.eqb_refl, rngl_mul_1_r.
 Qed.
 
 Theorem rngl_of_nat_is_correct_matrix :
-  ∀ eqb n,
-  let rom := mat_ring_like_op eqb in
+  ∀ eq_dec n,
+  let rom := mat_ring_like_op eq_dec in
   rngl_characteristic T = 0
   → ∀ i, is_correct_matrix (@sm_mat n T (rngl_mul_nat 1 i)) = true.
 Proof.
-intros eqb n rom Hch *.
+intros eq_dec n rom Hch *.
 apply is_scm_mat_iff.
 split. {
   intros Hc.
@@ -249,7 +262,7 @@ split. {
   }
   rewrite mat_el_mI_diag in Hlla; [ | easy ].
   subst rom.
-  specialize (@mat_el_of_nat_diag n eqb) as H1.
+  specialize (@mat_el_of_nat_diag n eq_dec) as H1.
   progress unfold rngl_mul_nat in H1.
   progress unfold mul_nat in H1; cbn in H1.
   rewrite H1 in Hlla; [ clear H1 | easy ].
@@ -274,8 +287,8 @@ split. {
 Qed.
 
 Theorem squ_mat_add_comm :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (MA MB : square_matrix n T), (MA + MB)%L = (MB + MA)%L.
 Proof.
 intros.
@@ -284,8 +297,8 @@ apply mat_add_comm.
 Qed.
 
 Theorem squ_mat_add_assoc :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (MA MB MC : square_matrix n T), (MA + (MB + MC) = (MA + MB) + MC)%L.
 Proof.
 intros.
@@ -294,8 +307,8 @@ apply mat_add_assoc.
 Qed.
 
 Theorem squ_mat_add_0_l :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (M : square_matrix n T), (0 + M)%L = M.
 Proof.
 intros.
@@ -310,8 +323,8 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_assoc :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (MA MB MC : square_matrix n T), (MA * (MB * MC) = (MA * MB) * MC)%L.
 Proof.
 intros.
@@ -356,8 +369,8 @@ apply mat_mul_assoc; [ easy | | | ]. {
 Qed.
 
 Theorem squ_mat_mul_1_l :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (M : square_matrix n T), (1 * M)%L = M.
 Proof.
 intros.
@@ -367,8 +380,8 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (MA MB MC : square_matrix n T), (MA * (MB + MC) = MA * MB + MA * MC)%L.
 Proof.
 intros.
@@ -438,8 +451,8 @@ apply mat_mul_add_distr_l. {
 Qed.
 
 Theorem squ_mat_mul_1_r :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (M : square_matrix n T), (M * 1)%L = M.
 Proof.
 intros.
@@ -449,8 +462,8 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_r :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
   ∀ (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%L.
 Proof.
@@ -517,9 +530,9 @@ apply mat_mul_add_distr_r. {
 Qed.
 
 Theorem squ_mat_opt_add_opp_l :
-  ∀ {n} eqb,
-  let rom := mat_ring_like_op eqb in
-  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op eqb) then
+  ∀ {n} eq_dec,
+  let rom := mat_ring_like_op eq_dec in
+  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op eq_dec) then
     ∀ M : square_matrix n T, (- M + M)%L = 0%L
   else not_applicable.
 (*
@@ -528,7 +541,7 @@ Theorem squ_mat_opt_add_opp_l :
 *)
 Proof.
 intros.
-remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op eqb)) as b
+remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op eq_dec)) as b
   eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].
@@ -563,20 +576,24 @@ apply List_hd_in, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
 
-Theorem mat_opt_eqb_eq : ∀ eqb (Heq : equality eqb) n,
-  match @rngl_has_eqb (square_matrix n T) (@mat_ring_like_op eqb n) return Prop with
+(*
+Theorem mat_opt_eqb_eq : ∀ eq_dec n,
+  match @rngl_has_eq_dec (square_matrix n T) (@mat_ring_like_op eq_dec n) return Prop with
   | true =>
       forall a b : square_matrix n T,
-      iff (@eq bool (@rngl_eqb (square_matrix n T) (@mat_ring_like_op eqb n) a b) true)
+      iff (@eq bool (@rngl_eqb (square_matrix n T) (@mat_ring_like_op eq_dec n) a b) true)
         (@eq (square_matrix n T) a b)
   | false => not_applicable
   end.
 (*
-  if rngl_has_eqb
-  then ∀ a b : square_matrix n T, (a =? b)%L = true ↔ a = b
-  else not_applicable
+  (if square_matrix_eq_dec eq_dec a b then true else false) = true ↔ a = b
 *)
 Proof.
+cbn.
+cbn; intros.
+split; intros Hab. {
+  destruct (square_matrix_eq_dec eq_dec a b) as [H1| H1]; [ | easy ].
+...
 cbn; intros.
 split; intros Hab. {
   apply mat_eqb_eq in Hab; [ | easy ].
@@ -587,17 +604,18 @@ split; intros Hab. {
   now apply mat_eqb_eq.
 }
 Qed.
+*)
 
 Theorem squ_mat_characteristic_prop :
-  ∀ eqb n,
-  let rom := @mat_ring_like_op eqb n in
+  ∀ eq_dec n,
+  let rom := @mat_ring_like_op eq_dec n in
   let ch := if n =? 0 then 1 else rngl_characteristic T in
   if ch =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
   else
    (∀ i : nat, 0 < i < ch → rngl_mul_nat 1 i ≠ 0%L)
    ∧ rngl_mul_nat 1 ch = 0%L.
 Proof.
-intros eqb n rom *.
+intros eq_dec n rom *.
 specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
 move Hos before Hop.
 subst ch.
@@ -636,7 +654,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     subst rom.
-    specialize (@mat_ncols_of_nat eqb) as H2.
+    specialize (@mat_ncols_of_nat eq_dec) as H2.
     progress unfold rngl_mul_nat in H2.
     progress unfold mul_nat in H2; cbn in H2.
     now rewrite H2.
@@ -661,7 +679,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-      specialize (rngl_of_nat_is_correct_matrix eqb) as H2.
+      specialize (rngl_of_nat_is_correct_matrix eq_dec) as H2.
       progress unfold rngl_mul_nat in H2.
       progress unfold mul_nat in H2; cbn in H2.
       now apply H2.
@@ -722,35 +740,35 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
-Definition mat_ring_like_prop eqb (Heq : equality eqb) (n : nat) :
-  let rom := mat_ring_like_op eqb in
+Definition mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
+    (n : nat) :
+  let rom := mat_ring_like_op eq_dec in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
      rngl_is_integral_domain := false;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic T;
-     rngl_add_comm := squ_mat_add_comm eqb;
-     rngl_add_assoc := squ_mat_add_assoc eqb;
-     rngl_add_0_l := squ_mat_add_0_l eqb;
-     rngl_mul_assoc := squ_mat_mul_assoc eqb;
-     rngl_opt_mul_1_l := squ_mat_mul_1_l eqb;
-     rngl_mul_add_distr_l := squ_mat_mul_add_distr_l eqb;
+     rngl_add_comm := squ_mat_add_comm eq_dec;
+     rngl_add_assoc := squ_mat_add_assoc eq_dec;
+     rngl_add_0_l := squ_mat_add_0_l eq_dec;
+     rngl_mul_assoc := squ_mat_mul_assoc eq_dec;
+     rngl_opt_mul_1_l := squ_mat_mul_1_l eq_dec;
+     rngl_mul_add_distr_l := squ_mat_mul_add_distr_l eq_dec;
      rngl_opt_mul_comm := NA;
-     rngl_opt_mul_1_r := squ_mat_mul_1_r eqb;
-     rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r eqb;
-     rngl_opt_add_opp_l := squ_mat_opt_add_opp_l eqb;
+     rngl_opt_mul_1_r := squ_mat_mul_1_r eq_dec;
+     rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r eq_dec;
+     rngl_opt_add_opp_l := squ_mat_opt_add_opp_l eq_dec;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := @mat_opt_eqb_eq eqb Heq n;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := @squ_mat_characteristic_prop eqb n;
+     rngl_characteristic_prop := @squ_mat_characteristic_prop eq_dec n;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
