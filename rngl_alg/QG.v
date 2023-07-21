@@ -24,6 +24,14 @@ Definition Z_pos_gcd z p :=
 Record QG := mk_qg
   {qg_q : Q; qg_gcd : Z_pos_gcd (Qnum qg_q) (Qden qg_q) = 1%positive}.
 
+Theorem Z_pos_gcd_Z_gcd :
+  ∀ n d, Z_pos_gcd n d = Z.to_pos (Z.gcd n (Z.pos d)).
+Proof.
+intros.
+unfold Z_pos_gcd.
+now destruct n.
+Qed.
+
 Theorem Z_pos_gcd_opp_l : ∀ z p, Z_pos_gcd (- z) p = Z_pos_gcd z p.
 Proof. now intros; destruct z. Qed.
 
@@ -215,11 +223,42 @@ move qn2 before qn1.
 move qd2 before qd1.
 cbn in *.
 apply eq_QG_eq; cbn.
+rewrite Z_pos_gcd_Z_gcd in Hq1, Hq2.
+rewrite <- Z2Pos.inj_1 in Hq1, Hq2.
+apply Z2Pos.inj in Hq1; [ | | easy ]. 2: {
+  destruct (Z.eq_dec (Z.gcd qn1 (Z.pos qd1)) 0) as [H1| H1]. {
+    now apply Z.gcd_eq_0 in H1.
+  }
+  specialize (Z.gcd_nonneg qn1 (Z.pos qd1)) as H2.
+  apply Z.nle_gt.
+  intros H3; apply H1.
+  now apply Z.le_antisymm.
+}
+apply Z2Pos.inj in Hq2; [ | | easy ]. 2: {
+  destruct (Z.eq_dec (Z.gcd qn2 (Z.pos qd2)) 0) as [H1| H1]. {
+    now apply Z.gcd_eq_0 in H1.
+  }
+  specialize (Z.gcd_nonneg qn2 (Z.pos qd2)) as H2.
+  apply Z.nle_gt.
+  intros H3; apply H1.
+  now apply Z.le_antisymm.
+}
 progress unfold "==" in Hq.
 cbn in Hq.
-progress unfold Z_pos_gcd in Hq1.
-progress unfold Z_pos_gcd in Hq2.
-specialize (Z.gauss qn1 (Z.pos qd1) (Z.pos qd2)) as H1.
+specialize (Z.gauss qn1 (Z.pos qd1) qn2) as H1.
+rewrite Z.mul_comm, <- Hq in H1.
+specialize (H1 (Z.divide_factor_l _ _) Hq1).
+specialize (Z.gauss qn2 (Z.pos qd2) qn1) as H2.
+rewrite Z.mul_comm, Hq in H2.
+specialize (H2 (Z.divide_factor_l _ _) Hq2).
+...
+destruct H1 as (k1, H1).
+destruct H2 as (k2, H2).
+rewrite H2 in H1.
+...
+apply Z.divide_antisym_nonneg in H2.
+
+Search ((_ | _) → (_ | _) → _ = _)%Z.
 ...
 f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
