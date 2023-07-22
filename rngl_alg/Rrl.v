@@ -1405,9 +1405,7 @@ assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c ≠ 
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
-Print is_upper_bound.
 Check AnBn.
-
 ...
   (* some random "d" in S, and then "c" is going to be in the
      interval [d, b] *)
