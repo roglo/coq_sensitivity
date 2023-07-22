@@ -1268,22 +1268,22 @@ Qed.
 
 (**)
 
+Definition bool_of_sumbool {P Q} (s : {P} + {Q}) :=
+  match s with
+  | left _ => true
+  | right _ => false
+  end.
+
 Definition is_upper_bound {T} {ro : ring_like_op T} {rp : ring_like_prop T}
     {rl : real_like_prop T} Q c :=
-  rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
+  bool_of_sumbool (rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L)).
 
 Definition is_supremum {T} {ro : ring_like_op T} {rp : ring_like_prop T}
     {rl : real_like_prop T} Q c :=
-  match is_upper_bound Q c with
-  | left _ =>
-      rl_forall_or_exist_not
-        (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False)
-  | right _ => False
-  end.
-
-(* ah, fait chier, merde *)
-
-...
+  (is_upper_bound Q c &&
+   bool_of_sumbool
+     (rl_forall_or_exist_not
+        (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False)))%bool.
 
 (*
 Definition is_upper_bound {T} {ro : ring_like_op T} P c :=
@@ -1303,7 +1303,7 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* to be completed *)
+(* to be completed
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
@@ -1480,7 +1480,7 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c). {
+assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c = true). {
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
