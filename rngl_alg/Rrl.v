@@ -1268,6 +1268,21 @@ Qed.
 
 (**)
 
+Definition is_upper_bound {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+    {rl : real_like_prop T} (Q : T → Type) c :=
+  rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
+
+Definition is_supremum {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+    {rl : real_like_prop T} (Q : T → Type) c :=
+  match is_upper_bound Q c with
+  | left _ =>
+      Some
+         (rl_forall_or_exist_not
+            (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False))
+  | right _ => None
+  end.
+
+(*
 Definition bool_of_sumbool {P Q} (s : {P} + {Q}) :=
   match s with
   | left _ => true
@@ -1284,6 +1299,7 @@ Definition is_supremum {T} {ro : ring_like_op T} {rp : ring_like_prop T}
    bool_of_sumbool
      (rl_forall_or_exist_not
         (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False)))%bool.
+*)
 
 (*
 Definition is_upper_bound {T} {ro : ring_like_op T} P c :=
@@ -1480,7 +1496,7 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c = true). {
+assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c ≠ None). {
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
