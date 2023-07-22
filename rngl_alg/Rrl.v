@@ -18,7 +18,13 @@ Arguments rngl_opt_eq_dec T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
 Arguments rngl_opt_one T {ring_like_op}.
 
-Theorem eq_gc_eq {T} :
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+Theorem eq_gc_eq :
   ∀ a b : GComplex T, gre a = gre b ∧ gim a = gim b ↔ a = b.
 Proof.
 intros.
@@ -27,7 +33,7 @@ destruct a, b; cbn in Hab.
 now f_equal.
 Qed.
 
-Theorem neq_gc_neq {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem neq_gc_neq :
   ∀ a b : GComplex T, gre a ≠ gre b ∨ gim a ≠ gim b → a ≠ b.
 Proof.
 intros * Hab.
@@ -35,11 +41,11 @@ intros H; subst b.
 now destruct Hab.
 Qed.
 
-Theorem neq_neq_GComplex {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem neq_neq_GComplex :
   rngl_has_eq_dec T = true →
   ∀ a b : GComplex T, a ≠ b → gre a ≠ gre b ∨ gim a ≠ gim b.
 Proof.
-intros * Heb * Hab.
+intros Heb * Hab.
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
 destruct (rngl_eq_dec Heb ra rb) as [Hrab| Hrab]. {
@@ -50,26 +56,26 @@ destruct (rngl_eq_dec Heb ra rb) as [Hrab| Hrab]. {
 }
 Qed.
 
-Definition gc_zero {T} {ro : ring_like_op T} : GComplex T :=
+Definition gc_zero : GComplex T :=
   {| gre := rngl_zero; gim := rngl_zero |}.
 
-Definition gc_one {T} {ro : ring_like_op T} : GComplex T :=
+Definition gc_one : GComplex T :=
   {| gre := rngl_one; gim := rngl_zero |}.
 
-Definition gc_opt_one {T} {ro : ring_like_op T} : option (GComplex T) :=
+Definition gc_opt_one : option (GComplex T) :=
   match rngl_opt_one T with
   | Some one => Some (mk_gc one rngl_zero)
   | None => None
   end.
 
-Definition gc_add {T} {ro : ring_like_op T} (ca cb : GComplex T) :=
+Definition gc_add (ca cb : GComplex T) :=
   {| gre := gre ca + gre cb; gim := gim ca + gim cb |}.
 
-Definition gc_mul {T} {ro : ring_like_op T} (ca cb : GComplex T) :=
+Definition gc_mul (ca cb : GComplex T) :=
   {| gre := (gre ca * gre cb - gim ca * gim cb)%L;
      gim := (gre ca * gim cb + gim ca * gre cb)%L |}.
 
-Definition gc_opt_opp_or_subt {T} {ro : ring_like_op T} :
+Definition gc_opt_opp_or_subt :
   option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_opp_or_subt with
   | Some (inl opp) =>
@@ -80,37 +86,32 @@ Definition gc_opt_opp_or_subt {T} {ro : ring_like_op T} :
       None
   end.
 
-Definition gc_inv {T} {ro : ring_like_op T} a :=
+Definition gc_inv a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
-Definition is_Cauchy_sequence {T} {ro : ring_like_op T} (u : nat → T) :=
+Definition is_Cauchy_sequence (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
-(*
-  ∃ N : nat, ∀ n, N ≤ n → ∀ k, (rngl_abs (u (n + k)%nat - u n) ≤ ε)%L.
-*)
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
-(**)
 
-Definition is_limit_when_tending_to {T} {ro : ring_like_op T} f a l :=
+Definition is_limit_when_tending_to f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x, rngl_abs (x - a) ≤ η → rngl_abs (f x - l) ≤ ε)%L.
 
-Definition is_limit_when_tending_to_inf {T} {ro : ring_like_op T} f l :=
+Definition is_limit_when_tending_to_inf f l :=
   ∀ ε, (0 < ε)%L → ∃ N,
   ∀ n, N < n → (rngl_abs (f n - l) ≤ ε)%L.
 
-Definition is_complete T {ro : ring_like_op T} :=
+Definition is_complete :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
 
-Definition continuous_at {T} {ro : ring_like_op T} f a :=
-  is_limit_when_tending_to f a (f a).
+Definition continuous_at f a := is_limit_when_tending_to f a (f a).
+Definition continuous f := ∀ a, continuous_at f a.
 
-Definition continuous {T} {ro : ring_like_op T} f :=
-  ∀ a, continuous_at f a.
-
-Definition is_derivative {T} {ro : ring_like_op T} f f' :=
+Definition is_derivative f f' :=
   ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
+
+End a.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_forall_or_exist_not : ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x};
