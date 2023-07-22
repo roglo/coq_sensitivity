@@ -213,81 +213,6 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
 Qed.
 
-Require Import Psatz.
-
-Theorem qeq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 == qg_q q2.
-Proof.
-intros.
-split; intros Hq; [ now subst q2 | ].
-destruct q1 as (q1, Hq1).
-destruct q2 as (q2, Hq2).
-cbn in Hq.
-move q2 before q1.
-apply eq_QG_eq; cbn.
-rewrite Z_pos_gcd_Z_gcd in Hq1, Hq2.
-rewrite <- Z2Pos.inj_1 in Hq1, Hq2.
-apply Z2Pos.inj in Hq1; [ | | easy ]. 2: {
-  destruct (Z.eq_dec (Z.gcd (Qnum q1) (QDen q1)) 0) as [H1| H1]. {
-    now apply Z.gcd_eq_0 in H1.
-  }
-  specialize (Z.gcd_nonneg (Qnum q1) (QDen q1)) as H2.
-  apply Z.nle_gt.
-  intros H3; apply H1.
-  now apply Z.le_antisymm.
-}
-apply Z2Pos.inj in Hq2; [ | | easy ]. 2: {
-  destruct (Z.eq_dec (Z.gcd (Qnum q2) (QDen q2)) 0) as [H1| H1]. {
-    now apply Z.gcd_eq_0 in H1.
-  }
-  specialize (Z.gcd_nonneg (Qnum q2) (QDen q2)) as H2.
-  apply Z.nle_gt.
-  intros H3; apply H1.
-  now apply Z.le_antisymm.
-}
-...
-progress unfold "==" in Hq.
-destruct (Z.eq_dec (Qnum q1) 0) as [Hqz1| Hqz1]. {
-  rewrite Hqz1 in Hq1; cbn in Hq1.
-  rewrite Hqz1, Z.mul_0_l in Hq.
-  symmetry in Hq.
-  apply Z.mul_eq_0 in Hq.
-  destruct Hq as [Hqz2| Hqz2]; [ | easy ].
-  rewrite Hqz2 in Hq2; cbn in Hq2.
-  destruct q1 as (qn1, qd1).
-  destruct q2 as (qn2, qd2).
-  cbn in *.
-  subst qn1 qn2.
-  apply Pos2Z.inj in Hq1, Hq2.
-  now rewrite Hq1, Hq2.
-}
-Theorem Z_div_gcd_1 : ∀ a b c d,
-  (0 < a * c → a * d = b * c → Z.gcd a b = 1 → Z.gcd c d = 1 → a = c)%Z.
-...
-assert (H1 : (0 < Qnum q1 * Qnum q2)%Z). {
-  destruct (Z_dec' 0 (Qnum q1)) as [[H1| H1]| H1]. {
-    rewrite <- (Z.mul_0_l (Qnum q2)).
-    apply Z.mul_lt_mono_pos_r; [ | easy ].
-    lia.
-  } {
-    rewrite <- (Z.mul_0_l (Qnum q2)).
-    apply Z.mul_lt_mono_neg_r; [ | easy ].
-    lia.
-  } {
-    now symmetry in H1.
-  }
-}
-rewrite (Z.mul_comm (Qnum q2)) in Hq.
-apply Z_div_gcd_1 in Hq; [ | easy | easy | easy ].
-destruct q1 as (qn1, qd1).
-destruct q2 as (qn2, qd2).
-cbn in *.
-subst qn2.
-f_equal.
-...
-apply (Eqdep_dec.UIP_dec Pos.eq_dec).
-apply (Eqdep_dec.UIP_dec Pos.eq_dec).
-Qed.
-
 Theorem QG_of_Q_0 : ∀ d, QG_of_Q (0 # d) = QG_of_Q 0.
 Proof.
 intros.
@@ -847,6 +772,91 @@ rewrite Z.mul_comm, Hadbc.
 apply Z.mul_comm.
 Qed.
 
+Require Import Psatz.
+
+(* I don't understand why the proof of that is so complicated *)
+Theorem qeq_eq : ∀ q1 q2,
+  Z.gcd (Qnum q1) (QDen q1) = 1%Z
+  → Z.gcd (Qnum q2) (QDen q2) = 1%Z
+  → q1 == q2
+  → q1 = q2.
+Proof.
+intros * Hq1 Hq2 Hq.
+progress unfold "==" in Hq.
+destruct (Z.eq_dec (Qnum q1) 0) as [Hqz1| Hqz1]. {
+  rewrite Hqz1 in Hq1; cbn in Hq1.
+  rewrite Hqz1, Z.mul_0_l in Hq.
+  symmetry in Hq.
+  apply Z.mul_eq_0 in Hq.
+  destruct Hq as [Hqz2| Hqz2]; [ | easy ].
+  rewrite Hqz2 in Hq2; cbn in Hq2.
+  destruct q1 as (qn1, qd1).
+  destruct q2 as (qn2, qd2).
+  cbn in *.
+  subst qn1 qn2.
+  apply Pos2Z.inj in Hq1, Hq2.
+  now rewrite Hq1, Hq2.
+}
+assert (H1 : (0 < Qnum q1 * Qnum q2)%Z). {
+  destruct (Z_dec' 0 (Qnum q1)) as [[H1| H1]| H1]. {
+    rewrite <- (Z.mul_0_l (Qnum q2)).
+    apply Z.mul_lt_mono_pos_r; [ | easy ].
+    lia.
+  } {
+    rewrite <- (Z.mul_0_l (Qnum q2)).
+    apply Z.mul_lt_mono_neg_r; [ | easy ].
+    lia.
+  } {
+    now symmetry in H1.
+  }
+}
+rewrite (Z.mul_comm (Qnum q2)) in Hq.
+specialize (Z_div_gcd_1 (Qnum q1) (QDen q1) (Qnum q2) (QDen q2)) as H2.
+specialize (H2 H1 Hq Hq1 Hq2).
+destruct q1 as (qn1, qd1).
+destruct q2 as (qn2, qd2).
+cbn in Hq1, Hq2, Hqz1, H1, H2.
+subst qn2.
+f_equal.
+rewrite (Z.mul_comm (QDen _)) in Hq.
+cbn in Hq.
+apply Z.mul_reg_l in Hq; [ | easy ].
+now apply Pos2Z.inj in Hq.
+Qed.
+
+(* I don't understand why the proof of that too is so complicated *)
+Theorem qeq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 == qg_q q2.
+Proof.
+intros.
+split; intros Hq; [ now subst q2 | ].
+destruct q1 as (q1, Hq1).
+destruct q2 as (q2, Hq2).
+cbn in Hq.
+move q2 before q1.
+apply eq_QG_eq; cbn.
+rewrite Z_pos_gcd_Z_gcd in Hq1, Hq2.
+rewrite <- Z2Pos.inj_1 in Hq1, Hq2.
+apply Z2Pos.inj in Hq1; [ | | easy ]. 2: {
+  destruct (Z.eq_dec (Z.gcd (Qnum q1) (QDen q1)) 0) as [H1| H1]. {
+    now apply Z.gcd_eq_0 in H1.
+  }
+  specialize (Z.gcd_nonneg (Qnum q1) (QDen q1)) as H2.
+  apply Z.nle_gt.
+  intros H3; apply H1.
+  now apply Z.le_antisymm.
+}
+apply Z2Pos.inj in Hq2; [ | | easy ]. 2: {
+  destruct (Z.eq_dec (Z.gcd (Qnum q2) (QDen q2)) 0) as [H1| H1]. {
+    now apply Z.gcd_eq_0 in H1.
+  }
+  specialize (Z.gcd_nonneg (Qnum q2) (QDen q2)) as H2.
+  apply Z.nle_gt.
+  intros H3; apply H1.
+  now apply Z.le_antisymm.
+}
+now apply qeq_eq.
+Qed.
+
 Theorem Z_le_0_div_nonneg_r :
   ∀ x y, (0 < y → 0 ≤ x / y ↔ 0 ≤ x)%Z.
 Proof.
@@ -1010,20 +1020,35 @@ Qed.
 
 Theorem QG_eq_dec : ∀ q1 q2 : QG, {q1 = q2} + {q1 ≠ q2}.
 Proof.
-(*
-intros.
-specialize (Qeq_dec (qg_q q1) (qg_q q2)) as H1.
-destruct H1 as [H1| H1]; [ left | right ]. {
-  apply eq_QG_eq; cbn.
-...
-*)
 intros (q1, Hq1) (q2, Hq2).
+move q2 before q1.
 specialize (Qeq_dec q1 q2) as H1.
 destruct H1 as [H1| H1]; [ left | right ]. {
   apply eq_QG_eq; cbn.
-  progress unfold "==" in H1.
-Search QG.
-...
+  apply qeq_eq; [ | | easy ]. {
+    unfold Z_pos_gcd in Hq1.
+    destruct (Qnum q1) as [| n| n]. {
+      now rewrite Hq1.
+    } {
+      now apply (f_equal Z.pos) in Hq1.
+    } {
+      now apply (f_equal Z.pos) in Hq1.
+    }
+  } {
+    unfold Z_pos_gcd in Hq2.
+    destruct (Qnum q2) as [| n| n]. {
+      now rewrite Hq2.
+    } {
+      now apply (f_equal Z.pos) in Hq2.
+    } {
+      now apply (f_equal Z.pos) in Hq2.
+    }
+  }
+}
+intros H2.
+apply H1; clear H1.
+now injection H2; clear H2; intros; subst q2.
+Qed.
 
 Theorem QG_of_Q_opp : ∀ a, QG_of_Q (- a) = (- QG_of_Q a)%QG.
 Proof.
@@ -1878,11 +1903,7 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_one := Some 1%QG;
      rngl_opt_opp_or_subt := Some (inl QG_opp);
      rngl_opt_inv_or_quot := Some (inl QG_inv);
-(**)
-     rngl_opt_eq_dec := Some QG_eqb;
-(*
-     rngl_opt_eqb := Some QG_eqb;
-*)
+     rngl_opt_eq_dec := Some QG_eq_dec;
      rngl_opt_leb := Some QG_leb |}.
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
@@ -1907,7 +1928,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := QG_eqb_eq;
      rngl_opt_le_dec := QG_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
