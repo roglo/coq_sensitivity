@@ -113,7 +113,8 @@ Definition is_derivative {T} {ro : ring_like_op T} f f' :=
   ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_has_trigo : bool;
+  { rl_forall_or_exist_not : ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x};
+    rl_has_trigo : bool;
     rl_exp : T → T;
     rl_log : T → T;
     rl_cos : T → T;
@@ -1265,12 +1266,33 @@ apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
 }
 Qed.
 
+(**)
+
+Definition is_upper_bound {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+    {rl : real_like_prop T} Q c :=
+  rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
+
+Definition is_supremum {T} {ro : ring_like_op T} {rp : ring_like_prop T}
+    {rl : real_like_prop T} Q c :=
+  match is_upper_bound Q c with
+  | left _ =>
+      rl_forall_or_exist_not
+        (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False)
+  | right _ => False
+  end.
+
+(* ah, fait chier, merde *)
+
+...
+
+(*
 Definition is_upper_bound {T} {ro : ring_like_op T} P c :=
   (∀ x,  P x → (x ≤ c)%L).
 
 Definition is_supremum {T} {ro : ring_like_op T} P c :=
   is_upper_bound P c ∧
   (∀ c', is_upper_bound P c' → (c ≤ c')%L).
+*)
 
 Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
   match n with
@@ -1281,7 +1303,7 @@ Fixpoint bisection {T} {ro : ring_like_op T} (P : T → bool) lb ub n :=
       else bisection P lb x n'
   end.
 
-(* to be completed
+(* to be completed *)
 Theorem rl_sqrt_div_squ_squ {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →
