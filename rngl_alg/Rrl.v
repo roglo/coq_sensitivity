@@ -1800,15 +1800,16 @@ Theorem polyn_modl_tends_tow_inf_when_var_modl_tends_tow_inf {T}
 Proof.
 intros * Hop Hivc Honc * Hla Hl1 *.
 ...
+*)
 
-Theorem gc_opt_alg_closed {T}
-  {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
-  let roc := gc_ring_like_op T in
+(* to be completed
+Theorem gc_opt_alg_closed :
+  let ro := gc_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool
   then
-    ∀ l : list (GComplex T), 1 < length l → llast l 0%L ≠ 0%L →
-    ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
+     ∀ l : list (GComplex T), 1 < length l → List.last l 0%L ≠ 0%L →
+     ∃ x : GComplex T, rngl_eval_polyn l x = 0%L
   else not_applicable.
 Proof.
 intros; cbn.
@@ -1819,19 +1820,21 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
-...
 *)
+
+End a.
 
 (* to be completed
 Definition gc_ring_like_prop T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
+  {roc : ring_like_op (GComplex T)}
   (Hop : rngl_has_opp T = true) :
-  ring_like_prop (GComplex T) :=
+    @ring_like_prop (GComplex T) (gc_ring_like_op T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_has_dec_le := false;
      rngl_is_integral_domain := false;
+     rngl_is_archimedean := false;
      rngl_is_alg_closed :=
        (rngl_has_opp T && rngl_has_inv (GComplex T) &&
         rngl_has_1 (GComplex T))%bool;
@@ -1852,7 +1855,6 @@ Definition gc_ring_like_prop T
      rngl_opt_mul_inv_r := gc_opt_mul_inv_r;
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
-     rngl_opt_eqb_eq := gc_opt_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := gc_opt_alg_closed;
@@ -1864,10 +1866,9 @@ Definition gc_ring_like_prop T
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA |}.
+     rngl_opt_not_le := NA;
+     rngl_opt_archimedean := NA |}.
 *)
-
-End a.
 
 (* Coq reals as Cauchy sequences *)
 
