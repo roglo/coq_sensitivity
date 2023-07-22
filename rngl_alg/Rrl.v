@@ -1405,7 +1405,13 @@ assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c ≠ 
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
-Check AnBn.
+Print AnBn.
+(* en fait, je me demande si AnBn ne devrait pas répondre Bn, et non pas la paire (An,Bn) ;
+   car ce Bn pourrait bien être cette fameuse borne supérieure (supremum) ; car A₀, bien
+   choisi (en supposant que S contient au moins deux éléments et en prenant le plus petit),
+   ne peut pas être un majorant, tandis que B₀, qui vaut "b", en est un, lui, ainsi que
+   tous les Bn. Aucun An n'est un majorant, tous les Bn sont des majorants. Il faut prouver
+   que Bn-An tend vers 0. Truc comme ça. *)
 ...
   (* some random "d" in S, and then "c" is going to be in the
      interval [d, b] *)
