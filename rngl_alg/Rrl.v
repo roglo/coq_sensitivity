@@ -1399,6 +1399,10 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
   move Hufb at bottom.
   now apply (rngl_lt_asymm Hor) in Hx.
 }
+...
+It is "least upper bound property"; I should declare a "Theorem" for
+that, here, instead of being just an "assert"
+...
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
 assert (Hc : ∃ c, is_supremum P c ≠ None). {
