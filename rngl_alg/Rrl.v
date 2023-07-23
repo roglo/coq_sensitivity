@@ -1221,7 +1221,7 @@ Fixpoint bisection (P : T → bool) lb ub n :=
 (* to be defined with "bisection", perhaps? *)
 Fixpoint AnBn (P : T → Type) n (An Bn : T) :=
   match n with
-  | 0 => (An, Bn)
+  | 0 => Bn
   | S n' =>
       let A := ((An + Bn) / 2)%L in
       if is_upper_bound P A then AnBn P n' An A
@@ -1384,12 +1384,12 @@ assert (H : (a < b)%L). {
 }
 move H before Hab; clear Hab; rename H into Hab.
 set (s := { x | (a ≤ x ≤ b ∧ f x < u)%L }).
-assert (Hs : s). {
+assert (x1 : s). {
   exists a.
   split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
 }
-assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
+assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
   intros.
   destruct x as (x & (Hax & Hxb) & Hx); cbn.
   destruct Hfab as (Hfau & Hufb).
@@ -1400,18 +1400,18 @@ assert (Hs' : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-assert (Hc : ∃ c, is_supremum (λ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L) c ≠ None). {
+set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
+assert (Hc : ∃ c, is_supremum P c ≠ None). {
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
-Print AnBn.
-(* en fait, je me demande si AnBn ne devrait pas répondre Bn, et non pas la paire (An,Bn) ;
-   car ce Bn pourrait bien être cette fameuse borne supérieure (supremum) ; car A₀, bien
-   choisi (en supposant que S contient au moins deux éléments et en prenant le plus petit),
-   ne peut pas être un majorant, tandis que B₀, qui vaut "b", en est un, lui, ainsi que
-   tous les Bn. Aucun An n'est un majorant, tous les Bn sont des majorants. Il faut prouver
-   que Bn-An tend vers 0. Truc comme ça. *)
+  (* before applying "exist", we must treat the case when S has only one element *)
+  (* but how to do that? *)
+...
+  (* x, here must be a value in S that is not an upper bound because there
+     exists a value y in S greater than x *)
+  exists (AnBn P x b).
 ...
   (* some random "d" in S, and then "c" is going to be in the
      interval [d, b] *)
