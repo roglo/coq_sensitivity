@@ -1236,7 +1236,6 @@ Theorem least_upper_bound :
   → ∃ c, is_supremum P c ≠ None.
 Proof.
 intros * Ha Hs.
-...
 *)
 
 (* to be completed
@@ -1440,7 +1439,6 @@ assert (Hc : ∃ c, is_supremum P c ≠ None). {
 ...
 *)
   specialize (least_upper_bound (λ x, (x < u)%L)) as H1.
-...
   specialize (H1 (f a) u).
   cbn in H1.
   assert (H : (f a < u)%L) by now destruct Ha.
@@ -1451,6 +1449,8 @@ assert (Hc : ∃ c, is_supremum P c ≠ None). {
   exists c.
   progress unfold P.
   intros H; apply Hc; clear Hc; rename H into Hc.
+  progress unfold is_supremum in Hc.
+  progress unfold is_supremum.
 ...
   assert (H : ∀ x : T, P x ↔ (x < u)%L). {
     intros x.
