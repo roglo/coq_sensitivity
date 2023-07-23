@@ -1229,6 +1229,17 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
   end.
 
 (* to be completed
+Theorem least_upper_bound :
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x ↔ (x < b)%L)
+  → ∃ c, is_supremum P c ≠ None.
+Proof.
+intros * Ha Hs.
+...
+*)
+
+(* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1409,20 +1420,42 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
 assert (Hc : ∃ c, is_supremum P c ≠ None). {
-Theorem least_upper_bound :
-  ∀ (P : T → Prop) a b,
-  P a
-  → (∀ x, P x ↔ (x < b)%L)
-  → ∃ c, is_supremum P c ≠ None.
-Proof.
-intros * Ha Hs.
-Admitted.
-specialize (least_upper_bound P) as H1.
-specialize (H1 a u Ha).
-assert (H : ∀ x, P x ↔ (x < u)%L). {
-  intros x.
-  split; intros Hx. {
-    progress unfold P in Hx.
+(*
+  specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b)%L ∧ (x < u)%L)) as H1.
+  specialize (H1 (f a) u).
+  cbn in H1.
+  assert (H : (f a ≤ f a ≤ f b)%L ∧ (f a < u)%L). {
+    split; [ | easy ].
+    split; [ apply (rngl_le_refl Hor) | ].
+    now apply (rngl_le_trans Hor _ u); apply (rngl_lt_le_incl Hor).
+  }
+  specialize (H1 H); clear H.
+...
+  assert (H : ∀ x, (x < u)%L ↔ (x < u)%L) by easy.
+  specialize (H1 H); clear H.
+  destruct H1 as (c, Hc).
+  exists c.
+  progress unfold P.
+  intros H; apply Hc; clear Hc; rename H into Hc.
+...
+*)
+  specialize (least_upper_bound (λ x, (x < u)%L)) as H1.
+...
+  specialize (H1 (f a) u).
+  cbn in H1.
+  assert (H : (f a < u)%L) by now destruct Ha.
+  specialize (H1 H); clear H.
+  assert (H : ∀ x, (x < u)%L ↔ (x < u)%L) by easy.
+  specialize (H1 H); clear H.
+  destruct H1 as (c, Hc).
+  exists c.
+  progress unfold P.
+  intros H; apply Hc; clear Hc; rename H into Hc.
+...
+  assert (H : ∀ x : T, P x ↔ (x < u)%L). {
+    intros x.
+    split; intros Hx. {
+      progress unfold P in Hx.
 (* bon, c'est pas ça, faut réfléchir *)
 ...
   (* Proof in
