@@ -1399,13 +1399,17 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
   move Hufb at bottom.
   now apply (rngl_lt_asymm Hor) in Hx.
 }
-...
-It is "least upper bound property"; I should declare a "Theorem" for
-that, here, instead of being just an "assert"
-...
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
 assert (Hc : ∃ c, is_supremum P c ≠ None). {
+Theorem least_upper_bound :
+  ∀ (P : T → Prop) a b,
+  P a
+  → (∀ x, P x ↔ (x < b)%L)
+  → ∃ c, is_supremum P c ≠ None.
+Proof.
+intros * Ha Hs.
+...
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
