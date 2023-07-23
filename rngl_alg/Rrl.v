@@ -1419,25 +1419,6 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
 assert (Hc : ∃ c, is_supremum P c ≠ None). {
-(*
-  specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b)%L ∧ (x < u)%L)) as H1.
-  specialize (H1 (f a) u).
-  cbn in H1.
-  assert (H : (f a ≤ f a ≤ f b)%L ∧ (f a < u)%L). {
-    split; [ | easy ].
-    split; [ apply (rngl_le_refl Hor) | ].
-    now apply (rngl_le_trans Hor _ u); apply (rngl_lt_le_incl Hor).
-  }
-  specialize (H1 H); clear H.
-...
-  assert (H : ∀ x, (x < u)%L ↔ (x < u)%L) by easy.
-  specialize (H1 H); clear H.
-  destruct H1 as (c, Hc).
-  exists c.
-  progress unfold P.
-  intros H; apply Hc; clear Hc; rename H into Hc.
-...
-*)
   specialize (least_upper_bound (λ x, (x < u)%L)) as H1.
   specialize (H1 (f a) u).
   cbn in H1.
