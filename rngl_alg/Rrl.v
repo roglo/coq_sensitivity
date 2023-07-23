@@ -1410,8 +1410,6 @@ Theorem least_upper_bound :
 Proof.
 intros * Ha Hs.
 ...
-eapply least_upper_bound with (b := b).
-...
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
