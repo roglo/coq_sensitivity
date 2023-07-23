@@ -1219,13 +1219,13 @@ Fixpoint bisection (P : T → bool) lb ub n :=
   end.
 
 (* to be defined with "bisection", perhaps? *)
-Fixpoint AnBn (P : T → Type) n (An Bn : T) :=
+Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
   match n with
   | 0 => Bn
   | S n' =>
       let A := ((An + Bn) / 2)%L in
-      if is_upper_bound P A then AnBn P n' An A
-      else AnBn P n' A Bn
+      if is_upper_bound P A then AnBn P An A n'
+      else AnBn P A Bn n'
   end.
 
 (* to be completed
@@ -1385,7 +1385,7 @@ assert (H : (a < b)%L). {
 move H before Hab; clear Hab; rename H into Hab.
 set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
 set (s := { x | P x }).
-assert (x1 : s). {
+assert (xa : s). {
   exists a.
   split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
@@ -1406,23 +1406,7 @@ assert (Hc : ∃ c, is_supremum P c ≠ None). {
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
   unfold is_supremum.
   progress unfold is_complete in Hco.
-  (* before applying "exist", we must treat the case when S has only one element *)
-  (* but how to do that? *)
-...
-  (* x, here must be a value in S that is not an upper bound because there
-     exists a value y in S greater than x *)
-  exists (AnBn P x b).
-...
-  (* some random "d" in S, and then "c" is going to be in the
-     interval [d, b] *)
-  destruct Hs as (d & Hadb & Hd).
-  (* cannot do a bisection in the interval [d, b] since, picking a
-     point in the middle of the interval, while doing it (in the
-     middle of [d, b] in the first iteration), we can fall into a
-     point that is not in S *)
-Print bisection.
-...
-  set (v := bisection (λ x : T, (f x <? u)%L) d b).
+  set (v := AnBn P a b).
   assert (H : is_Cauchy_sequence v). {
     unfold is_Cauchy_sequence.
     intros ε Hε.
