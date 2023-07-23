@@ -1385,11 +1385,18 @@ assert (H : (a < b)%L). {
 move H before Hab; clear Hab; rename H into Hab.
 set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
 set (s := { x | P x }).
+assert (Ha : P a). {
+  unfold P; cbn.
+  split; [ | easy ].
+  split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
+}
+(*
 assert (xa : s). {
   exists a.
   split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | now apply (rngl_lt_le_incl Hor) ].
 }
+*)
 assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
   intros.
   destruct x as (x & (Hax & Hxb) & Hx); cbn.
@@ -1409,6 +1416,14 @@ Theorem least_upper_bound :
   → ∃ c, is_supremum P c ≠ None.
 Proof.
 intros * Ha Hs.
+Admitted.
+specialize (least_upper_bound P) as H1.
+specialize (H1 a u Ha).
+assert (H : ∀ x, P x ↔ (x < u)%L). {
+  intros x.
+  split; intros Hx. {
+    progress unfold P in Hx.
+(* bon, c'est pas ça, faut réfléchir *)
 ...
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
