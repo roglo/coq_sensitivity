@@ -1383,7 +1383,8 @@ assert (H : (a < b)%L). {
   now apply (rngl_lt_irrefl Hor) in Hfau.
 }
 move H before Hab; clear Hab; rename H into Hab.
-set (s := { x | (a ≤ x ≤ b ∧ f x < u)%L }).
+set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
+set (s := { x | P x }).
 assert (x1 : s). {
   exists a.
   split; [ | easy ].
@@ -1400,7 +1401,6 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
 assert (Hc : ∃ c, is_supremum P c ≠ None). {
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
