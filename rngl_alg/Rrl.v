@@ -1234,10 +1234,9 @@ Theorem least_upper_bound :
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
-  → ∃ c, is_supremum P c ≠ None.
+  → ∃ c, is_supremum P c ≠ None ∧ (c ≤ b)%L.
 Proof.
 intros * Ha Hs.
-...
 *)
 
 (* to be completed
@@ -1439,7 +1438,7 @@ destruct H1 as (c, Hc).
 unfold is_supremum in Hc.
 remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
-clear Hc.
+destruct Hc as (_, Hc).
 unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
