@@ -1418,47 +1418,28 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-assert (Hc : ∃ c, is_supremum P c ≠ None). {
-(**)
-  specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b ∧ x < u)%L)) as H1.
-  specialize (H1 (f a) u).
-  cbn in H1.
-  assert (H : (f a ≤ f a ≤ f b ∧ f a < u)%L). {
-    split; [ | easy ].
-    split; [ apply (rngl_le_refl Hor) | ].
-    now apply (rngl_le_trans Hor _ u); apply (rngl_lt_le_incl Hor).
-  }
-  specialize (H1 H); clear H.
-  assert (H : ∀ x, (f a ≤ x ≤ f b)%L ∧ (x < u)%L → (x < u)%L) by easy.
-  specialize (H1 H); clear H.
-  destruct H1 as (c, Hc).
+specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b ∧ x < u)%L)) as H1.
+specialize (H1 (f a) u).
+cbn in H1.
+assert (H : (f a ≤ f a ≤ f b ∧ f a < u)%L). {
+  split; [ | easy ].
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_le_trans Hor _ u); apply (rngl_lt_le_incl Hor).
+}
+specialize (H1 H); clear H.
+assert (H : ∀ x, (f a ≤ x ≤ f b)%L ∧ (x < u)%L → (x < u)%L) by easy.
+specialize (H1 H); clear H.
+destruct H1 as (c, Hc).
+unfold is_supremum in Hc.
+remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
+destruct Hub1 as [Hub1| ]; [ | easy ].
+(* ouais, y a un truc à voir dans la définition de is_supremum
+   ou alors, c'est least_upper_bound qui ne va pas ; parce qu'il
+   faut que ce soit "least", donc que ça ne tombe pas sur "Some False" *)
 ...
-  exists c.
-  progress unfold P.
-  intros H; apply Hc; clear Hc; rename H into Hc.
-  progress unfold is_supremum in Hc.
-  progress unfold is_supremum.
-...
-...
-  specialize (least_upper_bound (λ x, (x < u)%L)) as H1.
-  specialize (H1 (f a) u).
-  cbn in H1.
-  assert (H : (f a < u)%L) by now destruct Ha.
-  specialize (H1 H); clear H.
-  assert (H : ∀ x, (x < u)%L ↔ (x < u)%L) by easy.
-  specialize (H1 H); clear H.
-  destruct H1 as (c, Hc).
-  exists c.
-  progress unfold P.
-  intros H; apply Hc; clear Hc; rename H into Hc.
-  progress unfold is_supremum in Hc.
-  progress unfold is_supremum.
-...
-  assert (H : ∀ x : T, P x ↔ (x < u)%L). {
-    intros x.
-    split; intros Hx. {
-      progress unfold P in Hx.
-(* bon, c'est pas ça, faut réfléchir *)
+clear Hc.
+unfold is_upper_bound in Hub2.
+Check rl_forall_or_exist_not.
 ...
   (* Proof in
      https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
