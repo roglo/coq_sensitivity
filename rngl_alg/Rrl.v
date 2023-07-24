@@ -1200,6 +1200,7 @@ Qed.
 Definition is_upper_bound (Q : T → Type) c :=
   rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
 
+
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
   | left _ =>
@@ -1236,6 +1237,7 @@ Theorem least_upper_bound :
   → ∃ c, is_supremum P c ≠ None.
 Proof.
 intros * Ha Hs.
+...
 *)
 
 (* to be completed
@@ -1418,6 +1420,30 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
+set (Q := λ y, ∃ x, (y = f x ∧ a ≤ x ≤ b ∧ y < u)%L).
+specialize (least_upper_bound Q) as H1.
+specialize (H1 (f a) u).
+assert (H : Q (f a)). {
+  exists a.
+  split; [ easy | ].
+  split; [ | easy ].
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H1 H); clear H.
+assert (H : (∀ x, Q x → (x < u)%L)). {
+  now intros y (x & Hx & Hy).
+}
+specialize (H1 H); clear H.
+destruct H1 as (c, Hc).
+unfold is_supremum in Hc.
+remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
+destruct Hub1 as [Hub1| ]; [ | easy ].
+clear Hc.
+unfold is_upper_bound in Hub2.
+destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
+clear Hub2 Hub3.
+...
 specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b ∧ x < u)%L)) as H1.
 specialize (H1 (f a) u).
 cbn in H1.
