@@ -1205,7 +1205,7 @@ Definition is_supremum (Q : T → Type) c :=
   | left _ =>
       Some
          (rl_forall_or_exist_not
-            (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False))
+            (λ c', if is_upper_bound Q c' then (c ≤ c')%L else True))
   | right _ => None
   end.
 
@@ -1470,15 +1470,12 @@ assert (H : H1). {
 clear Hc.
 destruct H1 as [Hc| Hc]. 2: {
   destruct Hc as (c', Hc).
-  destruct (is_upper_bound Q c') as [H1| H1]. 2: {
-    clear Hc.
-    destruct H1 as (c'', Hc).
-...
-    apply (rngl_nle_gt Hor) in Hc.
-    specialize (Hub1 c') as H2.
-    specialize (H1 c) as H3.
-    assert (H : Q c). {
-      progress unfold Q.
+  destruct (is_upper_bound Q c') as [H1| H1]; [ | easy ].
+  apply (rngl_nle_gt Hor) in Hc.
+  specialize (Hub1 c') as H2.
+  specialize (H1 c) as H3.
+  assert (H : Q c). {
+    progress unfold Q.
 (* probably must use continuity of f to prove that c has an
    antecedent *)
 ...
