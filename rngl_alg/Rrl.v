@@ -1445,6 +1445,7 @@ assert (Hc' : H1); [ | subst H1 ]. {
   intros c'.
   destruct (is_upper_bound Q c') as [H1| H1]; [ | easy ].
   move c' before c.
+...
   apply H1.
   progress unfold Q.
   split. 2: {
