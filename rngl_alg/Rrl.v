@@ -1442,6 +1442,7 @@ destruct Hc as (_, Hc).
 unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
+enough (H : ∃ d, _) by apply H.
 ...
 specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b ∧ x < u)%L)) as H1.
 specialize (H1 (f a) u).
