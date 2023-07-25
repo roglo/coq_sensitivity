@@ -1200,13 +1200,6 @@ Qed.
 Definition is_upper_bound (Q : T → Type) c :=
   rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
 
-(**)
-Definition is_supremum (Q : T → Type) c :=
-  match is_upper_bound Q c with
-  | left _ => Some (∀ c', if is_upper_bound Q c' then (c ≤ c')%L else False)
-  | right _ => None
-  end.
-(*
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
   | left _ =>
@@ -1215,7 +1208,6 @@ Definition is_supremum (Q : T → Type) c :=
             (λ c', if is_upper_bound Q c' then (c ≤ c')%L else False))
   | right _ => None
   end.
-*)
 
 Fixpoint bisection (P : T → bool) lb ub n :=
   match n with
@@ -1451,7 +1443,7 @@ unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
-(**)
+(*
 assert (H : H1). {
   subst H1.
   intros c'.
@@ -1474,6 +1466,7 @@ assert (H : H1). {
     assert (H : Q c). {
       progress unfold Q.
 ...
+*)
 clear Hc.
 destruct H1 as [Hc| Hc]. 2: {
   destruct Hc as (c', Hc).
