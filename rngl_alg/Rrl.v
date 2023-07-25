@@ -1233,9 +1233,8 @@ Theorem least_upper_bound :
   → ∃ c Hc, is_supremum P c = Some Hc ∧ (c ≤ b)%L.
 Proof.
 intros * Ha Hs.
-*)
+Admitted.
 
-(* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1415,19 +1414,19 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-set (Q := λ y, ∃ x, (y = f x ∧ a ≤ x ≤ b ∧ y < u)%L).
+set (Q := λ y, (∃ x, y = f x ∧ a ≤ x ≤ b)%L ∧ (y < u)%L).
 specialize (least_upper_bound Q) as H1.
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
+  split; [ | easy ].
   exists a.
   split; [ easy | ].
-  split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | ].
   now apply (rngl_lt_le_incl Hor).
 }
 specialize (H1 H); clear H.
 assert (H : (∀ x, Q x → (x < u)%L)). {
-  now intros y (x & Hx & Hy).
+  now intros y (Hx & Hy).
 }
 specialize (H1 H); clear H.
 destruct H1 as (c & H1 & Hc).
@@ -1448,6 +1447,7 @@ assert (Hc' : H1); [ | subst H1 ]. {
   move c' before c.
   apply H1.
   progress unfold Q.
+  split. 2: {
 ...
 clear Hc.
 destruct H1 as [Hc| Hc]. 2: {
