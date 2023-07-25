@@ -1200,7 +1200,6 @@ Qed.
 Definition is_upper_bound (Q : T → Type) c :=
   rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
 
-
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
   | left _ =>
@@ -1228,6 +1227,17 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
       if is_upper_bound P A then AnBn P An A n'
       else AnBn P A Bn n'
   end.
+
+Theorem not_None_iff_Some : ∀ A (ao : option A),
+  ao ≠ None ↔ ∃ a, ao = Some a.
+Proof.
+intros.
+split; intros Ha. {
+  destruct ao as [a| ]; [ now exists a | easy ].
+} {
+  now destruct Ha as (a, Ha); subst ao.
+}
+Qed.
 
 (* to be completed
 Theorem least_upper_bound :
@@ -1438,11 +1448,23 @@ destruct H1 as (c, Hc).
 unfold is_supremum in Hc.
 remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
-destruct Hc as (_, Hc).
+destruct Hc as (Hc, Hcu).
 unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
+apply not_None_iff_Some in Hc.
+destruct Hc as (Hc, _).
+destruct Hc as [Hc| Hc]. 2: {
+  destruct Hc as (c', Hc).
+  destruct (is_upper_bound Q c') as [H1| H1]. {
+    apply (rngl_nle_gt Hor) in Hc.
+    specialize (Hub1 c') as H2.
+    specialize (H1 c) as H3.
+    assert (H : Q c). {
+      progress unfold Q.
+(* probably must use continuity of f to prove that c has an
+   antecessor *)
 ...
 specialize (least_upper_bound (λ x, (f a ≤ x ≤ f b ∧ x < u)%L)) as H1.
 specialize (H1 (f a) u).
