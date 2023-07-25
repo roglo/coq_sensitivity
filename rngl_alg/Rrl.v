@@ -1202,10 +1202,7 @@ Definition is_upper_bound (Q : T → Type) c :=
 
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
-  | left _ =>
-      Some
-         (rl_forall_or_exist_not
-            (λ c', if is_upper_bound Q c' then (c ≤ c')%L else True))
+  | left _ => Some (∀ c', if is_upper_bound Q c' then (c ≤ c')%L else True)
   | right _ => None
   end.
 
@@ -1443,30 +1440,15 @@ unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
-(*
-assert (H : H1). {
+(**)
+assert (Hc' : H1); [ | subst H1 ]. {
   subst H1.
   intros c'.
-  destruct (is_upper_bound Q c') as [H1| H1]. 2: {
-    destruct H1 as (c'', Hc'').
-    move c' before c; move c'' before c'.
-    apply Hc''; clear Hc''.
-    intros Hc.
-    progress unfold Q in Hc.
-    destruct Hc as (x & Hc & Hacb & Hxu).
-    subst c''.
-    move x before c'.
-(* quel bordel ! bon, chais pas *)
+  destruct (is_upper_bound Q c') as [H1| H1]; [ | easy ].
+  move c' before c.
+  apply H1.
+  progress unfold Q.
 ...
-(*
-    apply (rngl_nle_gt Hor) in Hc.
-*)
-    specialize (Hub1 c') as H2.
-    specialize (H1 c) as H3.
-    assert (H : Q c). {
-      progress unfold Q.
-...
-*)
 clear Hc.
 destruct H1 as [Hc| Hc]. 2: {
   destruct Hc as (c', Hc).
