@@ -1435,7 +1435,7 @@ remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
 destruct Hc as (Hc, Hcu).
 injection Hc; clear Hc; intros Hc.
-unfold is_upper_bound in Hub2.
+progress unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
@@ -1443,8 +1443,12 @@ enough (H : ∃ d, _) by apply H.
 assert (Hc' : H1); [ | subst H1 ]. {
   subst H1.
   intros c'.
-  destruct (is_upper_bound Q c') as [H1| H1]; [ | easy ].
+  remember (is_upper_bound Q c') as Hub2 eqn:Hub3; symmetry in Hub3.
+  destruct Hub2 as [Hub2| ]; [ | easy ].
   move c' before c.
+  progress unfold is_upper_bound in Hub3.
+  destruct (rl_forall_or_exist_not _) as [Hub4| ]; [ | easy ].
+  clear Hub3 Hub4.
 (* bizarre, parce que, ici, il n'y a rien qui indique que "c"
    serait le plus petit majorant et que donc c' serait forcément
    supérieur ou égal à c ; il doit y avoir un truc qui déconne
