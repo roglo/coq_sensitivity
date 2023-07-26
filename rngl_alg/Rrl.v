@@ -1241,13 +1241,24 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
 
 (* to be completed
 Theorem least_upper_bound :
+  is_complete T →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros * Ha Hs.
-Admitted.
+intros Hco * Ha Hs.
+(* Proof in
+   https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
+unfold is_supremum.
+progress unfold is_complete in Hco.
+set (v := AnBn P a b).
+assert (H : is_Cauchy_sequence v). {
+  unfold is_Cauchy_sequence.
+  intros ε Hε.
+  (* N = int ((b - a) / ε + 1), truc comme ça
+     mais pour que "int" existe, il faut que T soit archimédien *)
+...
 
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
@@ -1513,20 +1524,6 @@ clear Hc.
 unfold is_upper_bound in Hub2.
 Check rl_forall_or_exist_not.
 ...
-  (* Proof in
-     https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
-  unfold is_supremum.
-  progress unfold is_complete in Hco.
-  set (v := AnBn P a b).
-  assert (H : is_Cauchy_sequence v). {
-    unfold is_Cauchy_sequence.
-    intros ε Hε.
-(*
-    rename v into v'; rename u into v; rename v' into u.
-    rename b into b'; rename c into b; rename b' into c.
-*)
-    (* N = int ((b - c) / ε + 1)
-      mais pour que "int" existe, il faut que T soit archimédien *)
 ... ...
 (* "That is, c is the smallest number that is greater than or equal to
     every member of s" *)
