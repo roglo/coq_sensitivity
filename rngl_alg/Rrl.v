@@ -1445,6 +1445,10 @@ assert (Hc' : H1); [ | subst H1 ]. {
   intros c'.
   destruct (is_upper_bound Q c') as [H1| H1]; [ | easy ].
   move c' before c.
+(* bizarre, parce que, ici, il n'y a rien qui indique que "c"
+   serait le plus petit majorant et que donc c' serait forcément
+   supérieur ou égal à c ; il doit y avoir un truc qui déconne
+   dans mon modèle *)
 ...
   apply H1.
   progress unfold Q.
