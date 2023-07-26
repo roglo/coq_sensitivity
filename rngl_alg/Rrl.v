@@ -115,7 +115,7 @@ End a.
 Arguments is_complete T {ro}.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_forall_or_exist_not : ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x};
+  { rl_excl_midd : ∀ P, {P} + {¬ P};
     rl_has_trigo : bool;
     rl_exp : T → T;
     rl_log : T → T;
@@ -147,6 +147,20 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_log_exp :
       if rl_has_trigo then ∀ x : T, rl_log (rl_exp x) = x
       else not_applicable }.
+
+Theorem rl_forall_or_exist_not {T} {ro : ring_like_op T}
+    {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x}.
+Proof.
+intros.
+specialize (rl_excl_midd (∃ x, ¬ P x)) as H2.
+destruct H2 as [H2| H2]; [ now right | left ].
+intros.
+specialize (rl_excl_midd (P x)) as H3.
+destruct H3 as [H3| H3]; [ easy | ].
+exfalso; apply H2.
+now exists x.
+Qed.
 
 Definition rl_has_mod_intgl {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
@@ -1202,8 +1216,8 @@ Definition is_upper_bound (Q : T → Type) c :=
 
 Definition is_supremum (Q : T → Type) c :=
   match is_upper_bound Q c with
-  | left _ => Some (∀ c', if is_upper_bound Q c' then (c ≤ c')%L else True)
-  | right _ => None
+  | left _ => ∀ c', if is_upper_bound Q c' then (c ≤ c')%L else True
+  | right _ => False
   end.
 
 Fixpoint bisection (P : T → bool) lb ub n :=
@@ -1230,7 +1244,7 @@ Theorem least_upper_bound :
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
-  → ∃ c Hc, is_supremum P c = Some Hc ∧ (c ≤ b)%L.
+  → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
 intros * Ha Hs.
 Admitted.
@@ -1429,34 +1443,15 @@ assert (H : (∀ x, Q x → (x < u)%L)). {
   now intros y (Hx & Hy).
 }
 specialize (H1 H); clear H.
-destruct H1 as (c & H1 & Hc).
+destruct H1 as (c & Hc & H1).
 progress unfold is_supremum in Hc.
 remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
-destruct Hc as (Hc, Hcu).
-injection Hc; clear Hc; intros Hc.
 progress unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
 (**)
-assert (Hc' : H1); [ | subst H1 ]. {
-  subst H1.
-  intros c'.
-  remember (is_upper_bound Q c') as Hub2 eqn:Hub3; symmetry in Hub3.
-  destruct Hub2 as [Hub2| ]; [ | easy ].
-  move c' before c.
-  progress unfold is_upper_bound in Hub3.
-  destruct (rl_forall_or_exist_not _) as [Hub4| ]; [ | easy ].
-  clear Hub3 Hub4.
-(* bizarre, parce que, ici, il n'y a rien qui indique que "c"
-   serait le plus petit majorant et que donc c' serait forcément
-   supérieur ou égal à c ; il doit y avoir un truc qui déconne
-   dans mon modèle *)
-...
-  apply H1.
-  progress unfold Q.
-  split. 2: {
 ...
 clear Hc.
 destruct H1 as [Hc| Hc]. 2: {
