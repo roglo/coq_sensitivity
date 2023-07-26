@@ -1430,6 +1430,32 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
     supremum c = sup S exists" *)
 set (Q := λ y, (∃ x, y = f x ∧ a ≤ x ≤ b)%L ∧ (y < u)%L).
 specialize (least_upper_bound Q) as H1.
+(**)
+specialize (H1 (f a) (f b)).
+assert (H : Q (f a)). {
+  split; [ | easy ].
+  exists a.
+  split; [ easy | ].
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H1 H); clear H.
+assert (H : (∀ x, Q x → (x < f b)%L)). {
+  intros y (Hx & Hy).
+  now apply (rngl_lt_trans Hor _ u).
+}
+specialize (H1 H); clear H.
+destruct H1 as (c & Hc & H1).
+progress unfold is_supremum in Hc.
+remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
+destruct Hub1 as [Hub1| ]; [ | easy ].
+progress unfold is_upper_bound in Hub2.
+destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
+clear Hub2 Hub3.
+enough (H : ∃ d, _) by apply H.
+(* probably must use continuity of f to prove that c has an
+   antecedent *)
+...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
   split; [ | easy ].
