@@ -118,6 +118,43 @@ Theorem nat_archimedean :
   ∀ a b : nat, (0 < a < b)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L.
 Proof.
 intros * (Ha, Hab) *.
+exists (S b).
+apply Nat.leb_gt in Ha, Hab; cbn in Ha.
+apply Nat.leb_gt; cbn.
+apply Nat.neq_0_lt_0 in Ha.
+(**)
+...
+apply -> Nat.succ_lt_mono.
+destruct b; [ easy | ].
+apply -> Nat.lt_succ_r in Hab.
+apply Nat.succ_lt_mono in Hab.
+apply Nat.succ_lt_mono in Hab.
+apply -> Nat.succ_lt_mono.
+clear Ha.
+cbn.
+revert a Hab.
+induction b; intros; [ easy | cbn ].
+rewrite Nat.add_succ_r.
+apply -> Nat.succ_lt_mono.
+...
+induction b; intros; [ easy | cbn ].
+apply -> Nat.lt_succ_r in Hab.
+destruct (Nat.eq_dec a b) as [Heab| Heab]. {
+  subst b.
+  rewrite <- Nat.add_1_r.
+  apply Nat.add_lt_mono_l.
+  clear IHb Hab.
+  destruct a; [ easy | cbn ].
+  clear Ha.
+  apply -> Nat.succ_lt_mono.
+  now rewrite Nat.add_succ_r.
+}
+eapply Nat.le_lt_trans. 2: {
+  apply Nat.add_lt_mono_l.
+  apply IHb.
+  eapply Nat.le_lt_trans; [ apply Hab | ].
+...
+intros * (Ha, Hab) *.
 exists (S (b / a)); cbn.
 apply Nat.leb_gt in Ha, Hab; cbn in Ha.
 apply Nat.leb_gt.
