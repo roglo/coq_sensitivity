@@ -1843,29 +1843,28 @@ Theorem QG_archimedean :
   (b < List.fold_right QG_add 0 (List.repeat a n))%QG.
 Proof.
 intros * Hab *.
-...
-destruct ε as ((εn , εd), Hεp).
-cbn in Hεp.
-exists (n * (Pos.to_nat εd / Z.to_nat εn + 1) + 1)%nat.
-apply not_true_iff_false in Hε.
+destruct a as ((an, ad), Hap).
+destruct b as ((bn, bd), Hbp).
+cbn in Hap, Hbp.
+destruct Hab as (Ha, Hab).
+exists
+  ((Z.to_nat bn * Pos.to_nat ad) / (Z.to_nat an * Pos.to_nat bd + 1) + 1)%nat.
+apply not_true_iff_false in Hab.
 apply not_true_iff_false.
-intros H1; apply Hε; clear Hε.
+intros H1; apply Hab; clear Hab.
 apply Qle_bool_iff in H1.
 apply Qle_bool_iff.
 apply Qnot_lt_le.
 apply Qle_not_lt in H1.
-intros Hε; apply H1; clear H1.
-do 2 rewrite qg_q_mul_nat.
 cbn.
-do 2 rewrite Q_mul_nat.
-rewrite Qmult_1_l.
+intros Hε; apply H1; clear H1.
+rewrite qg_q_mul_nat; cbn.
+rewrite Q_mul_nat.
 progress unfold Qlt.
 cbn.
-rewrite Z.mul_1_r.
 rewrite Pos.mul_1_r.
-rewrite nat_of_inv_Q.
-progress unfold Qinv.
-cbn.
+destruct an as [| an| an]; [ easy | | easy ].
+...
 destruct εn as [| εn| εn]; [ easy | | easy ].
 cbn - [ Z.mul ].
 rewrite Nat2Z.inj_add.
