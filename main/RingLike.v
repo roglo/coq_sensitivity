@@ -2316,6 +2316,22 @@ specialize (H3 1 1 H2 H2)%L.
 now rewrite (rngl_mul_1_l Hon) in H3.
 Qed.
 
+Theorem rngl_0_lt_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  (0 < 1)%L.
+Proof.
+intros Hon Hop Hc1 Hor.
+apply (rngl_lt_iff Hor).
+split. 2: {
+  apply not_eq_sym.
+  now apply (rngl_1_neq_0_iff Hon).
+}
+apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+
 Theorem rngl_0_lt_inv_compat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2651,6 +2667,26 @@ split. {
   apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_trans Hor _ y)%L.
 }
+Qed.
+
+Theorem rngl_0_lt_abs :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ x, (x ≠ 0 → 0 < rngl_abs x)%L.
+Proof.
+intros Hop Hor * Hxz.
+apply (rngl_lt_iff Hor).
+split. 2: {
+  apply not_eq_sym.
+  intros H; apply Hxz; clear Hxz.
+  progress unfold rngl_abs in H.
+  remember (x ≤? 0)%L as xz eqn:Hxz; symmetry in Hxz.
+  destruct xz; [ | easy ].
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H.
+  now rewrite (rngl_opp_0 Hop) in H.
+}
+apply (rngl_0_le_abs Hop Hor).
 Qed.
 
 Theorem rngl_abs_div :
@@ -3232,6 +3268,7 @@ Qed.
 Arguments rngl_add {T ring_like_op} (a b)%L.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%L.
+Arguments rngl_eq_dec {T ro} Hed (a b)%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.

@@ -1241,13 +1241,33 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
 
 (* to be completed
 Theorem int_part :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ x, ∃ n, (rngl_mul_nat 1 n ≤ x < rngl_mul_nat 1 (n + 1))%L.
+  ∀ x, ∃ n, (rngl_mul_nat 1 n ≤ rngl_abs x < rngl_mul_nat 1 (n + 1))%L.
 Proof.
-intros Hor Har *.
+intros Hon Hop Hiv Hed Hc1 Hor Har *.
 specialize rngl_opt_archimedean as H1.
 rewrite Har, Hor in H1; cbn in H1.
+destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
+  subst x.
+  exists 0; cbn.
+  progress unfold rngl_abs.
+  rewrite (rngl_leb_refl Hor).
+  rewrite (rngl_opp_0 Hop), rngl_add_0_r.
+  split; [ apply (rngl_le_refl Hor) | ].
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+specialize (H1 (rngl_abs x)⁻¹%L).
+assert (H : (0 < (rngl_abs x)⁻¹)%L). {
+  apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+  now apply (rngl_0_lt_abs Hop Hor).
+}
+specialize (H1 H); clear H.
 ...
 
 Theorem least_upper_bound :
