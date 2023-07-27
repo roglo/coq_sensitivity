@@ -1241,13 +1241,15 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
 
 (* to be completed
 Theorem least_upper_bound :
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
   is_complete T →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hco * Ha Hs.
+intros Hor Har Hco * Ha Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1258,6 +1260,8 @@ assert (H : is_Cauchy_sequence v). {
   intros ε Hε.
   (* N = int ((b - a) / ε + 1), truc comme ça
      mais pour que "int" existe, il faut que T soit archimédien *)
+  specialize rngl_opt_archimedean as H1.
+  rewrite Har, Hor in H1; cbn in H1.
 ...
 
 Theorem rl_sqrt_div_squ_squ :

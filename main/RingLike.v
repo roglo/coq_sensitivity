@@ -381,6 +381,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
 
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
+Arguments rngl_is_archimedean T {ro ring_like_prop}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Definition rngl_abs {T} {ro : ring_like_op T} x :=
