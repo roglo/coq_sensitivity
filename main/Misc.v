@@ -287,6 +287,16 @@ rewrite Nat_sub_succ_1.
 apply Hij.
 Qed.
 
+Theorem Nat_div_small_iff : ∀ a b, b ≠ 0 → a < b ↔ a / b = 0.
+Proof.
+intros * Hbz.
+split; intros Hab; [ now apply Nat.div_small | ].
+specialize (Nat.div_mod_eq a b) as H1.
+rewrite Hab, Nat.mul_0_r, Nat.add_0_l in H1.
+rewrite H1.
+now apply Nat.mod_upper_bound.
+Qed.
+
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   b ≠ 0 → (c * b + a) mod b = a mod b.
 Proof.
