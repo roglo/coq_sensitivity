@@ -1240,6 +1240,16 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
   end.
 
 (* to be completed
+Theorem int_part :
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  ∀ x, ∃ n, (rngl_mul_nat 1 n ≤ x < rngl_mul_nat 1 (n + 1))%L.
+Proof.
+intros Hor Har *.
+specialize rngl_opt_archimedean as H1.
+rewrite Har, Hor in H1; cbn in H1.
+...
+
 Theorem least_upper_bound :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
