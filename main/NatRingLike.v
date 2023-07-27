@@ -123,13 +123,56 @@ apply Nat.leb_gt in Ha, Hab; cbn in Ha.
 apply Nat.leb_gt.
 apply Nat.neq_0_lt_0 in Ha.
 remember (b / a) as n eqn:Hn; symmetry in Hn.
-destruct n. {
+specialize (Nat.div_mod_eq b a) as H2.
+rewrite Hn in H2.
+clear Hn.
+revert b Hab H2.
+induction n; intros. {
+  rewrite Nat.mul_0_r, Nat.add_0_l in H2.
+  rewrite H2 in Hab.
+  apply Nat.nle_gt in Hab.
+  exfalso; apply Hab.
+  apply Nat.lt_le_incl.
+  now apply Nat.mod_upper_bound.
+}
+cbn.
+rewrite Nat.mul_succ_r in H2.
+rewrite H2.
+rewrite (Nat.add_comm _ a).
+rewrite <- Nat.add_assoc.
+apply Nat.add_lt_mono_l.
+apply IHn. 2: {
+  rewrite Nat.add_mod_idemp_r; [ | easy ].
+  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+  rewrite Nat.mul_comm, Nat.mod_mul; [ | easy ].
+  now rewrite Nat.add_0_l.
+}
+...
+destruct n. 2: {
+  rewrite Nat.mul_succ_r.
+  rewrite (Nat.add_comm _ a), <- Nat.add_assoc.
+  apply Nat.lt_add_pos_r.
+...
+  rewrite H2.
+  rewrite Nat.add_mod_idemp_r; [ | easy ].
+  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+  rewrite (Nat.mul_comm _ (S n)), Nat_mod_add_l_mul_r; [ | easy ].
+  rewrite Nat.mod_same; [ | easy ].
+  rewrite Nat.add_0_l.
+  now rewrite Nat.add_0_l.
+
+  apply Nat.add_pos_r.
+
+...
+etransitivity. 2: {
+  apply IHn.
   apply Nat_div_small_iff in Hn; [ | easy ].
   apply Nat.nle_gt in Hn.
   now exfalso; apply Hn; apply Nat.lt_le_incl.
 }
 cbn.
-destruct n. {
+clear Hn.
+induction n. {
   cbn.
   rewrite Nat.add_0_r.
 ...
