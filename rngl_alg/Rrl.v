@@ -1262,12 +1262,12 @@ destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
   split; [ apply (rngl_le_refl Hor) | ].
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
-specialize (H1 (rngl_abs x)⁻¹%L).
+specialize (H1 (rngl_abs x)⁻¹%L) as H2.
 assert (H : (0 < (rngl_abs x)⁻¹)%L). {
   apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
   now apply (rngl_0_lt_abs Hop Hor).
 }
-specialize (H1 H); clear H.
+specialize (H2 H); clear H.
 ...
 
 Theorem least_upper_bound :
