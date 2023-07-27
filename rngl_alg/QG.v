@@ -199,6 +199,8 @@ Notation "a ≤ b" := (QG_le a b) : QG_scope.
 Notation "a < b" := (QG_lt a b) : QG_scope.
 Notation "a ≤ b ≤ c" := (QG_le a b ∧ QG_le b c)
   (at level 70, b at next level) : QG_scope.
+Notation "a < b < c" := (QG_lt a b ∧ QG_lt b c)
+  (at level 70, b at next level) : QG_scope.
 
 Arguments qg_q q%QG.
 
@@ -1836,12 +1838,12 @@ apply Z.add_comm.
 Qed.
 
 Theorem QG_archimedean :
-  ∀ ε : QG, (0 < ε)%QG →
-  ∀ n, ∃ m : nat,
-  (List.fold_right QG_add 0 (List.repeat 1 n) <
-     List.fold_right QG_add 0 (List.repeat ε m))%QG.
+  ∀ a b : QG, (0 < a < b)%QG →
+  ∃ n : nat,
+  (b < List.fold_right QG_add 0 (List.repeat a n))%QG.
 Proof.
-intros * Hε *.
+intros * Hab *.
+...
 destruct ε as ((εn , εd), Hεp).
 cbn in Hεp.
 exists (n * (Pos.to_nat εd / Z.to_nat εn + 1) + 1)%nat.
@@ -1891,6 +1893,7 @@ apply Z.add_le_mono_l.
 apply Z.lt_le_incl.
 now apply Z.mod_pos_bound.
 Qed.
+*)
 
 (* *)
 

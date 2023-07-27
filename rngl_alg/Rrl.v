@@ -1269,6 +1269,8 @@ assert (H : (0 < (rngl_abs x)⁻¹)%L). {
 }
 specialize (H2 H); clear H.
 ...
+rngl_mul_nat x⁻¹ n = n / x
+...
 
 Theorem least_upper_bound :
   rngl_is_ordered T = true →
