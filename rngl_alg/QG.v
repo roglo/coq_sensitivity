@@ -1864,14 +1864,13 @@ progress unfold Qlt.
 cbn.
 rewrite Pos.mul_1_r.
 destruct an as [| an| an]; [ easy | | easy ].
-...
-destruct εn as [| εn| εn]; [ easy | | easy ].
+destruct bn as [| bn| bn]; [ easy | | easy ].
 cbn - [ Z.mul ].
 rewrite Nat2Z.inj_add.
 cbn - [ Z.mul ].
-rewrite Nat2Z.inj_mul.
 rewrite Z.mul_add_distr_l.
 rewrite Z.mul_1_r.
+...
 rewrite Z.mul_assoc.
 rewrite (Z.mul_comm (Z.pos εn)).
 rewrite <- Z.mul_assoc.
