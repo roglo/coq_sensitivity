@@ -1871,8 +1871,36 @@ rewrite List_map_repeat.
 rewrite Q_mul_nat.
 rewrite Nat2Z.inj_add; cbn.
 rewrite Z2Nat.id. 2: {
-  unfold Z_of_QG.
   apply Z.div_pos; [ | easy ].
+(**)
+  cbn.
+  remember (Z_pos_gcd (Qnum (/ qg_q a)) _) as ga eqn:Hga.
+  remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
+  apply Z.div_pos; [ | easy ].
+  apply Z.mul_nonneg_nonneg.
+...
+  remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
+  destruct c as (cn, cd); cbn.
+  destruct cn as [| cn| cn]; [ easy | easy | ].
+  exfalso.
+  cbn in Hc.
+  injection Hc; clear Hc; intros _ H2.
+  specialize (Pos2Z.neg_is_neg cn) as H3.
+  rewrite <- H2 in H3; clear H2.
+  progress unfold QG_div.
+
+Search (_ ≤ Qnum _)%Z.
+Search (qg_q (_ * _)).
+  cbn - [ QG_mul ].
+...
+  destruct a as ((an, ad), Hap).
+  destruct b as ((bn, bd), Hbp).
+  cbn.
+...
+  remember (Z_pos_gcd (Qnum (/ qg_q a)) _) as ga eqn:Hga.
+  remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
+  progress unfold QG_div.
+  cbn.
 ...
 intros * Hab *.
 destruct a as ((an, ad), Hap).
