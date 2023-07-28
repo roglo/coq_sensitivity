@@ -1921,17 +1921,19 @@ rewrite Q_mul_nat.
 rewrite Nat2Z.inj_add; cbn.
 rewrite Z2Nat.id. 2: {
   apply Z.div_pos; [ | easy ].
-(**)
   cbn.
   remember (Z_pos_gcd (Qnum (/ qg_q a)) _) as ga eqn:Hga.
   remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
   apply Z.div_pos; [ | easy ].
   apply Z.mul_nonneg_nonneg. {
     assert (Hb : (0 < b)%QG) by now apply (@QG_lt_trans _ a).
-...
     apply QG_lt_iff in Hb.
-    destruct b as ((bn, bd), Hbp).
-    cbn in Hb |-*.
+    destruct Hb as (Hb, Hbz).
+    apply Qle_bool_iff in Hb; cbn in Hb.
+    progress unfold Qle in Hb.
+    now rewrite Z.mul_1_r in Hb.
+  } {
+    apply Z.div_pos; [ | easy ].
 ...
   remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
   destruct c as (cn, cd); cbn.
