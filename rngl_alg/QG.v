@@ -1934,6 +1934,23 @@ rewrite Z2Nat.id. 2: {
     now rewrite Z.mul_1_r in Hb.
   } {
     apply Z.div_pos; [ | easy ].
+    progress unfold Qinv.
+    remember (Qnum (qg_q a)) as x eqn:Hx; symmetry in Hx.
+    destruct x as [| x| x]; [ easy | easy | ].
+    exfalso.
+    destruct Hab as (Ha, Hab).
+    destruct a as ((an, ap), Hap).
+    cbn in Ha, Hx.
+    subst an.
+    apply QG_lt_iff in Ha.
+    cbn in Ha.
+    destruct Ha as (Ha, Ha').
+    apply Qle_bool_iff in Ha.
+    cbn in Ha.
+    apply Qle_not_lt in Ha.
+    now apply Ha.
+  }
+}
 ...
   remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
   destruct c as (cn, cd); cbn.
