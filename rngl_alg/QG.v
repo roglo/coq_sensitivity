@@ -1304,6 +1304,55 @@ apply Qle_bool_iff.
 now apply (Qle_trans _ (qg_q y)).
 Qed.
 
+Theorem QG_lt_le_incl : ∀ a b, (a < b → a ≤ b)%QG.
+Proof.
+intros * Hab.
+apply Qle_bool_iff.
+apply Qnot_lt_le; intros H1.
+apply Bool.not_true_iff_false in Hab.
+apply Hab.
+apply Qle_bool_iff.
+now apply Qlt_le_weak.
+Qed.
+
+Theorem QG_lt_irrefl : ∀ a, ¬ (a < a)%QG.
+Proof.
+intros * Ha.
+apply Bool.not_true_iff_false in Ha.
+apply Ha.
+apply QG_le_refl.
+Qed.
+
+Theorem QG_lt_iff : ∀ a b, (a < b ↔ a ≤ b ∧ a ≠ b)%QG.
+Proof.
+intros.
+split. {
+  intros Hab.
+  split; [ now apply QG_lt_le_incl | ].
+  intros H; subst b; revert Hab.
+  apply QG_lt_irrefl.
+} {
+  intros (H1, H2).
+  apply Bool.not_true_iff_false.
+  intros H3; apply H2.
+  now apply QG_le_antisymm.
+}
+Qed.
+
+Theorem QG_lt_trans : ∀ x y z : QG, (x < y → y < z → x < z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply QG_lt_iff in Hxy, Hyz.
+apply QG_lt_iff.
+destruct Hxy as (Hxy, Hnxy).
+destruct Hyz as (Hyz, Hnyz).
+split. {
+  apply (QG_le_trans Hxy Hyz).
+}
+intros H; subst z.
+now apply QG_le_antisymm in Hyz.
+Qed.
+
 Theorem QG_le_0_sub : ∀ x y : QG, (0 ≤ y - x)%QG ↔ (x ≤ y)%QG.
 Proof.
 intros.
@@ -1877,7 +1926,12 @@ rewrite Z2Nat.id. 2: {
   remember (Z_pos_gcd (Qnum (/ qg_q a)) _) as ga eqn:Hga.
   remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
   apply Z.div_pos; [ | easy ].
-  apply Z.mul_nonneg_nonneg.
+  apply Z.mul_nonneg_nonneg. {
+    assert (Hb : (0 < b)%QG) by now apply (@QG_lt_trans _ a).
+...
+    apply QG_lt_iff in Hb.
+    destruct b as ((bn, bd), Hbp).
+    cbn in Hb |-*.
 ...
   remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
   destruct c as (cn, cd); cbn.
