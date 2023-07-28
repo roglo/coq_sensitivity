@@ -113,158 +113,31 @@ apply Nat.leb_le.
 now apply Nat.add_le_mono.
 Qed.
 
+Theorem nat_rngl_mul_nat :
+  let ro := nat_ring_like_op in
+  ∀ a b, rngl_mul_nat a b = a * b.
+Proof.
+intros.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat.
+cbn.
+rewrite Nat.mul_comm.
+induction b; [ easy | cbn ].
+now rewrite IHb.
+Qed.
+
 Theorem nat_archimedean :
   let ro := nat_ring_like_op in
   ∀ a b : nat, (0 < a < b)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L.
 Proof.
 intros * (Ha, Hab) *.
 exists (S b).
+rewrite nat_rngl_mul_nat.
 apply Nat.leb_gt in Ha, Hab; cbn in Ha.
 apply Nat.leb_gt; cbn.
-apply Nat.neq_0_lt_0 in Ha.
-(**)
-...
-apply -> Nat.succ_lt_mono.
-destruct b; [ easy | ].
-apply -> Nat.lt_succ_r in Hab.
-apply Nat.succ_lt_mono in Hab.
-apply Nat.succ_lt_mono in Hab.
-apply -> Nat.succ_lt_mono.
-clear Ha.
-cbn.
-revert a Hab.
-induction b; intros; [ easy | cbn ].
-rewrite Nat.add_succ_r.
-apply -> Nat.succ_lt_mono.
-...
-induction b; intros; [ easy | cbn ].
-apply -> Nat.lt_succ_r in Hab.
-destruct (Nat.eq_dec a b) as [Heab| Heab]. {
-  subst b.
-  rewrite <- Nat.add_1_r.
-  apply Nat.add_lt_mono_l.
-  clear IHb Hab.
-  destruct a; [ easy | cbn ].
-  clear Ha.
-  apply -> Nat.succ_lt_mono.
-  now rewrite Nat.add_succ_r.
-}
-eapply Nat.le_lt_trans. 2: {
-  apply Nat.add_lt_mono_l.
-  apply IHb.
-  eapply Nat.le_lt_trans; [ apply Hab | ].
-...
-intros * (Ha, Hab) *.
-exists (S (b / a)); cbn.
-apply Nat.leb_gt in Ha, Hab; cbn in Ha.
-apply Nat.leb_gt.
-apply Nat.neq_0_lt_0 in Ha.
-remember (b / a) as n eqn:Hn; symmetry in Hn.
-specialize (Nat.div_mod_eq b a) as H2.
-rewrite Hn in H2.
-clear Hn.
-revert b Hab H2.
-induction n; intros. {
-  rewrite Nat.mul_0_r, Nat.add_0_l in H2.
-  rewrite H2 in Hab.
-  apply Nat.nle_gt in Hab.
-  exfalso; apply Hab.
-  apply Nat.lt_le_incl.
-  now apply Nat.mod_upper_bound.
-}
-cbn.
-rewrite Nat.mul_succ_r in H2.
-rewrite H2.
-rewrite (Nat.add_comm _ a).
-rewrite <- Nat.add_assoc.
-apply Nat.add_lt_mono_l.
-apply IHn. 2: {
-  rewrite Nat.add_mod_idemp_r; [ | easy ].
-  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
-  rewrite Nat.mul_comm, Nat.mod_mul; [ | easy ].
-  now rewrite Nat.add_0_l.
-}
-...
-destruct n. 2: {
-  rewrite Nat.mul_succ_r.
-  rewrite (Nat.add_comm _ a), <- Nat.add_assoc.
-  apply Nat.lt_add_pos_r.
-...
-  rewrite H2.
-  rewrite Nat.add_mod_idemp_r; [ | easy ].
-  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
-  rewrite (Nat.mul_comm _ (S n)), Nat_mod_add_l_mul_r; [ | easy ].
-  rewrite Nat.mod_same; [ | easy ].
-  rewrite Nat.add_0_l.
-  now rewrite Nat.add_0_l.
-
-  apply Nat.add_pos_r.
-
-...
-etransitivity. 2: {
-  apply IHn.
-  apply Nat_div_small_iff in Hn; [ | easy ].
-  apply Nat.nle_gt in Hn.
-  now exfalso; apply Hn; apply Nat.lt_le_incl.
-}
-cbn.
-clear Hn.
-induction n. {
-  cbn.
-  rewrite Nat.add_0_r.
-...
-  apply Nat_div_small_iff in Hn; [ | easy ].
-  apply Nat.nle_gt in Hn.
-  now exfalso; apply Hn; apply Nat.lt_le_incl.
-}
-cbn.
-...
-specialize (Nat.div_mod_eq b a) as H1.
-...
-intros * (Ha, Hab) *.
-apply Nat.leb_gt in Ha, Hab; cbn in Ha.
-exists (S (b / a)).
-remember (b / a) as n eqn:Hn.
-symmetry in Hn.
-revert a b Ha Hab Hn.
-induction n; intros. {
-  apply Nat.neq_0_lt_0 in Ha.
-  apply Nat_div_small_iff in Hn; [ | easy ].
-  apply Nat.nle_gt in Hn.
-  now exfalso; apply Hn; apply Nat.lt_le_incl.
-}
-cbn.
-cbn in IHn.
-(* ah, fait chier, tiens *)
-...
-  apply (f_equal (λ b, a * b)) in Hn.
-  rewrite Nat.mul_0_r in Hn.
-  apply
-Search (_ * (_ / _)).
-  apply Nat.div_small in Hab.
-  cbn; rewrite Nat.add_0_r.
-Search (_ / _ = 0).
-apply
-cbn - [ "/" ].
-exists (S n).
-apply Nat.leb_gt; cbn.
-induction n; [ now rewrite Nat.add_0_r | ].
-cbn; rewrite <- Nat.add_1_l.
-now apply Nat.add_le_lt_mono.
-...
-
-Theorem glop :
-  let ro := nat_ring_like_op in
-   ∀ ε : nat, (0 < ε)%L →
-   ∀ n : nat, ∃ m : nat, (rngl_mul_nat 1 n < rngl_mul_nat ε m)%L.
-Proof.
-intros * Hε *.
-apply Nat.leb_gt in Hε.
-exists (S n).
-apply Nat.leb_gt; cbn.
-induction n; [ now rewrite Nat.add_0_r | ].
-cbn; rewrite <- Nat.add_1_l.
-now apply Nat.add_le_lt_mono.
+destruct a; [ easy | cbn ].
+apply Nat.lt_succ_r.
+apply Nat.le_add_r.
 Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
