@@ -1951,6 +1951,11 @@ rewrite Z2Nat.id. 2: {
     now apply Ha.
   }
 }
+rewrite <- QG_of_Q_mul_idemp_r.
+rewrite QG_of_Q_qg_q_mul.
+...
+Search (QG_of_Q (_ + _)).
+rewrite QG_of_Q_qg_q_add.
 ...
   remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
   destruct c as (cn, cd); cbn.
