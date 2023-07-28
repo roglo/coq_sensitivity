@@ -12,7 +12,9 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep $(FILESFORDEP) | LC_ALL=C sort > .depend
+	coqdep $(FILESFORDEP) | LC_ALL=C sort > .depend | \
+	sed -e 's/  *$$//' > .depend
+
 
 .SUFFIXES: .v .vo
 

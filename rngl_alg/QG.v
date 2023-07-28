@@ -14,6 +14,8 @@ Notation "x ≤ y" := (Qle x y) : Q_scope.
 Notation "x ≤ y" := (Nat.le x y) : nat_scope.
 Notation "x ≤ y" := (Pos.le x y) : positive_scope.
 
+Require Import Main.Misc.
+
 Definition Z_pos_gcd z p :=
   match z with
   | Z0 => p
@@ -174,6 +176,7 @@ Definition QG_mul (a b : QG) := QG_of_Q (qg_q a * qg_q b).
 Definition QG_opp (a : QG) := QG_of_Q (- qg_q a).
 Definition QG_inv (a : QG) := QG_of_Q (/ qg_q a).
 Definition QG_sub (a b : QG) := QG_add a (QG_opp b).
+Definition QG_div (a b : QG) := QG_mul a (QG_inv b).
 
 Definition QG_eqb (a b : QG) := Qeq_bool (qg_q a) (qg_q b).
 Definition QG_leb (a b : QG) := Qle_bool (qg_q a) (qg_q b).
@@ -189,6 +192,7 @@ Notation "- a" := (QG_opp a) : QG_scope.
 Notation "a + b" := (QG_add a b) : QG_scope.
 Notation "a - b" := (QG_sub a b) : QG_scope.
 Notation "a * b" := (QG_mul a b) : QG_scope.
+Notation "a / b" := (QG_div a b) : QG_scope.
 Notation "a '⁻¹'" := (QG_inv a) (at level 1, format "a ⁻¹") :
   QG_scope.
 
@@ -1837,11 +1841,39 @@ rewrite Zpos_P_of_succ_nat.
 apply Z.add_comm.
 Qed.
 
+Theorem List_fold_right_QG_add :
+  ∀ a lb,
+  List.fold_right QG_add a lb =
+  QG_of_Q (List.fold_right Qplus (qg_q a) (List.map qg_q lb)).
+Proof.
+intros.
+induction lb as [| b]; cbn. {
+  symmetry; apply QG_of_Q_qg_q.
+}
+rewrite <- QG_of_Q_add_idemp_r.
+rewrite <- IHlb.
+rewrite <- qg_q_add.
+now rewrite QG_of_Q_qg_q.
+Qed.
+
+Definition Z_of_QG x := (Qnum (qg_q x) / QDen (qg_q x))%Z.
+Arguments Z_of_QG x%QG.
+
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
   ∃ n : nat,
   (b < List.fold_right QG_add 0 (List.repeat a n))%QG.
 Proof.
+intros * Hab *.
+exists (Z.to_nat (Z_of_QG (b / a)) + 1)%nat.
+rewrite List_fold_right_QG_add.
+rewrite List_map_repeat.
+rewrite Q_mul_nat.
+rewrite Nat2Z.inj_add; cbn.
+rewrite Z2Nat.id. 2: {
+  unfold Z_of_QG.
+  apply Z.div_pos; [ | easy ].
+...
 intros * Hab *.
 destruct a as ((an, ad), Hap).
 destruct b as ((bn, bd), Hbp).

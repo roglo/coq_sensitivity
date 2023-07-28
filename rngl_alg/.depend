@@ -12,12 +12,12 @@ Misc.vio: Misc.v ../main/Misc.vio ../main/PermutationFun.vio
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../main/Misc.vo ../main/PermutationFun.vo
 Nat_ggcd.vio: Nat_ggcd.v ../main/Misc.vio Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../main/Misc.vo Misc.vo
-Nrl.vio: Nrl.v ../main/Misc.vio ../main/RingLike.vio Misc.vio FermatLittle.vio
-Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo ../main/RingLike.vo Misc.vo FermatLittle.vo
+Nrl.vio: Nrl.v ../main/Misc.vio Misc.vio FermatLittle.vio ../main/RingLike.vio
+Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo Misc.vo FermatLittle.vo ../main/RingLike.vo
 PQ.vio: PQ.v ../main/Misc.vio Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../main/Misc.vo Misc.vo Nat_ggcd.vo
-QG.vio: QG.v ../main/RingLike.vio
-QG.vo QG.glob QG.v.beautified QG.required_vo: QG.v ../main/RingLike.vo
+QG.vio: QG.v ../main/Misc.vio
+QG.vo QG.glob QG.v.beautified QG.required_vo: QG.v ../main/Misc.vo
 Qrl.vio: Qrl.v ../main/RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v ../main/RingLike.vo Rational.vo
 QuadIntRl.vio: QuadIntRl.v ../main/Misc.vio ../main/RingLike.vio Misc.vio
