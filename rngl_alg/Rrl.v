@@ -1267,6 +1267,7 @@ assert (H : (0 < (rngl_abs x)⁻¹)%L). {
   apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
   now apply (rngl_0_lt_abs Hop Hor).
 }
+...
 specialize (H2 H); clear H.
 ...
 rngl_mul_nat x⁻¹ n = n / x
