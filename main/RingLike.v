@@ -620,9 +620,9 @@ Theorem rngl_le_dec :
   rngl_is_ordered T = true →
   ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
 Proof.
-intros H1 *.
+intros Hor *.
 specialize rngl_opt_le_dec as H.
-rewrite H1 in H.
+rewrite Hor in H.
 apply H.
 Qed.
 
@@ -705,6 +705,29 @@ split. {
   intros H.
   destruct H as [H4| H4]; [ now apply H1; rewrite H4 | ].
   subst b; apply H3.
+}
+Qed.
+
+Theorem rngl_lt_dec :
+  rngl_is_ordered T = true →
+  ∀ a b : T, ({a < b} + {¬ a < b})%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_le_dec as H1.
+rewrite Hor in H1.
+destruct (H1 b a) as [H2| H2]; [ right | left ]. {
+  intros H3.
+  apply (rngl_lt_iff Hor) in H3.
+  destruct H3 as (H3, H4).
+  now apply (rngl_le_antisymm Hor) in H2.
+} {
+  specialize rngl_opt_not_le as H3.
+  rewrite Hor in H3.
+  apply H3 in H2.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  destruct H2 as (H2, _).
+  now apply not_eq_sym.
 }
 Qed.
 
@@ -3269,7 +3292,10 @@ Arguments rngl_add {T ring_like_op} (a b)%L.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%L.
 Arguments rngl_eq_dec {T ro} Hed (a b)%L.
+Arguments rngl_le_add_r {T ro rp} Hor (a b)%L Hb.
+Arguments rngl_le_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
+Arguments rngl_lt_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.

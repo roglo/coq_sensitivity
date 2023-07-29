@@ -115,7 +115,7 @@ End a.
 Arguments is_complete T {ro}.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_excl_midd : ∀ P, {P} + {¬ P};
+  { rl_excl_midd : ∀ P, P + notT P;
     rl_has_trigo : bool;
     rl_exp : T → T;
     rl_log : T → T;
@@ -1262,12 +1262,36 @@ destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
   split; [ apply (rngl_le_refl Hor) | ].
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
-specialize (H1 (rngl_abs x)⁻¹%L) as H2.
-assert (H : (0 < (rngl_abs x)⁻¹)%L). {
+(**)
+destruct (rngl_lt_dec Hor (rngl_abs x) 1) as [H1x| H1x]. {
+  exists 0; cbn.
+  rewrite rngl_add_0_r.
+  split; [ | easy ].
+  apply (rngl_0_le_abs Hop Hor).
+}
+destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
+  apply (rngl_nlt_ge Hor) in H1x, Hx1.
+  apply (rngl_le_antisymm Hor) in H1x; [ | easy ].
+  rewrite H1x.
+  exists 1; cbn.
+  rewrite rngl_add_0_r.
+  split; [ apply (rngl_le_refl Hor) | ].
+specialize (rngl_le_add_r Hor 1 1) as H2.
+Search (0 < 1)%L.
+(* must add that characteristic ≠ 2 *)
+}
+...
+apply (rngl_nlt_ge Hor) in H1x.
+apply (rngl_lt_eq_cases Hor) in H1x.
+destruct (rngl_lt_cases Hor 1 (rngl_abs x)) as [Hx1| Hx1]. {
+  exists 1; cbn.
+...
+  apply (rngl_nlt_ge Hor) in H1x.
+  specialize (H1 (rngl_abs x)⁻¹%L 1%L) as H2.
+  assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
   apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
   now apply (rngl_0_lt_abs Hop Hor).
 }
-...
 specialize (H2 H); clear H.
 ...
 rngl_mul_nat x⁻¹ n = n / x
