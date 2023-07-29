@@ -1953,8 +1953,18 @@ rewrite Z2Nat.id. 2: {
 }
 rewrite <- QG_of_Q_mul_idemp_r.
 rewrite QG_of_Q_qg_q_mul.
+Search (QG → Z).
+Search (Z → QG).
+Search (nat → QG).
 ...
-Search (QG_of_Q (_ + _)).
+Theorem QG_of_Q_den_1 :
+  QG_of_Q (a # 1) = ?
+...
+remember (_ # _) as x.
+Search (QG_of_Q (_ # 1)).
+
+cbn.
+rewrite <- QG_of_Q_add_idemp_l.
 rewrite QG_of_Q_qg_q_add.
 ...
   remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
