@@ -1974,7 +1974,7 @@ Theorem last_fold_left_lap_mul_cons_cons_add_const :
   last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la lc)
     0%L =
   last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la lc) 0%L.
-Admitted.
+... admitted.
 rewrite last_fold_left_lap_mul_cons_cons_add_const.
 rewrite List_last_cons_cons.
 clear b0 blen Hbl.

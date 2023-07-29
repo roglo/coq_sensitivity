@@ -169,6 +169,9 @@ Definition QG_of_Q (q : Q) :=
   mk_qg (Qmake (Qnum q / Zpos g) (Z.to_pos (Zpos (Qden q) / Zpos g)%Z))
     (QG_of_Q_prop q).
 
+Definition QG_of_Z a := QG_of_Q (a # 1).
+Definition Z_of_QG a := (Qnum (qg_q a) / QDen (qg_q a))%Z.
+
 Definition QG_0 := QG_of_Q 0.
 Definition QG_1 := QG_of_Q 1.
 Definition QG_add (a b : QG) := QG_of_Q (qg_q a + qg_q b).
@@ -207,6 +210,10 @@ Notation "a < b < c" := (QG_lt a b ∧ QG_lt b c)
   (at level 70, b at next level) : QG_scope.
 
 Arguments qg_q q%QG.
+Arguments Z_of_QG a%QG.
+
+Theorem fold_QG_of_Z : ∀ a, QG_of_Q (a # 1) = QG_of_Z a.
+Proof. easy. Qed.
 
 Theorem eq_QG_eq : ∀ q1 q2 : QG, q1 = q2 ↔ qg_q q1 = qg_q q2.
 Proof.
@@ -1905,8 +1912,17 @@ rewrite <- qg_q_add.
 now rewrite QG_of_Q_qg_q.
 Qed.
 
-Definition Z_of_QG x := (Qnum (qg_q x) / QDen (qg_q x))%Z.
-Arguments Z_of_QG x%QG.
+Theorem QG_of_Z_add :
+  ∀ a b, QG_of_Z (a + b) = (QG_of_Z a + QG_of_Z b)%QG.
+Proof.
+intros.
+progress unfold QG_of_Z.
+apply eq_QG_eq; cbn.
+do 4 rewrite Z_pos_pos_gcd.
+do 4 rewrite Z.gcd_1_r; cbn.
+do 4 rewrite Z.div_1_r.
+now do 2 rewrite Z.mul_1_r.
+Qed.
 
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
@@ -1953,12 +1969,27 @@ rewrite Z2Nat.id. 2: {
 }
 rewrite <- QG_of_Q_mul_idemp_r.
 rewrite QG_of_Q_qg_q_mul.
+rewrite fold_QG_of_Z.
+rewrite QG_of_Z_add.
+Search QG_of_Z.
+...
+intros.
+intros.
+apply eq_QG_eq; cbn.
+rewrite Z_pos_pos_gcd.
+rewrite Z.gcd_1_r; cbn.
+rewrite Z.div_1_r.
+...
+...
 Search (QG → Z).
 Search (Z → QG).
 Search (nat → QG).
+progress unfold Z_of_QG.
+remember (b / a)%QG as x.
+cbn.
 ...
-Theorem QG_of_Q_den_1 :
-  QG_of_Q (a # 1) = ?
+rewrite Z_pos_gcd_1_r.
+progress unfold QG_of_Q; cbn.
 ...
 remember (_ # _) as x.
 Search (QG_of_Q (_ # 1)).
