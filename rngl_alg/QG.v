@@ -1232,6 +1232,13 @@ rewrite Qmult_1_l.
 apply QG_of_Q_qg_q.
 Qed.
 
+Theorem QG_mul_1_r : ∀ a : QG, (a * 1)%QG = a.
+Proof.
+intros.
+rewrite QG_mul_comm.
+apply QG_mul_1_l.
+Qed.
+
 Theorem QG_mul_inv_l : ∀ a : QG, a ≠ 0%QG → (a⁻¹ * a)%QG = 1%QG.
 Proof.
 intros * Haz.
@@ -1924,6 +1931,9 @@ do 4 rewrite Z.div_1_r.
 now do 2 rewrite Z.mul_1_r.
 Qed.
 
+Theorem QG_of_Z_QG_of_Q : ∀ a, QG_of_Z a = QG_of_Q (a # 1).
+Proof. easy. Qed.
+
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
   ∃ n : nat,
@@ -1971,6 +1981,11 @@ rewrite <- QG_of_Q_mul_idemp_r.
 rewrite QG_of_Q_qg_q_mul.
 rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
+rewrite QG_mul_add_distr_l.
+rewrite QG_mul_1_r.
+...
+progress unfold QG_of_Z at 2.
+progress unfold QG_of_Q.
 Search QG_of_Z.
 ...
 intros.
