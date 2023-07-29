@@ -1983,7 +1983,15 @@ rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
-(* le "exists", au début de la preuve, faut y réfléchir... *)
+...
+apply QG_lt_iff.
+split. 2: {
+  destruct a as ((an, ad), Hap).
+  destruct b as ((bn, bd), Hbp).
+  cbn in Hap, Hbp.
+  intros H.
+  apply eq_QG_eq in H.
+  cbn - [ "+"%QG ] in H.
 ...
 progress unfold QG_of_Z at 2.
 progress unfold QG_of_Q.
