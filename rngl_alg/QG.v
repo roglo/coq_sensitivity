@@ -1983,6 +1983,7 @@ rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
+(* le "exists", au début de la preuve, faut y réfléchir... *)
 ...
 progress unfold QG_of_Z at 2.
 progress unfold QG_of_Q.
