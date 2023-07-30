@@ -208,6 +208,8 @@ Notation "a ≤ b ≤ c" := (QG_le a b ∧ QG_le b c)
   (at level 70, b at next level) : QG_scope.
 Notation "a ≤ b < c" := (QG_le a b ∧ QG_lt b c)
   (at level 70, b at next level) : QG_scope.
+Notation "a < b ≤ c" := (QG_lt a b ∧ QG_le b c)
+  (at level 70, b at next level) : QG_scope.
 Notation "a < b < c" := (QG_lt a b ∧ QG_lt b c)
   (at level 70, b at next level) : QG_scope.
 
@@ -226,6 +228,12 @@ destruct q2 as (q2, Hq2).
 cbn in Hq; subst q2.
 f_equal.
 apply (Eqdep_dec.UIP_dec Pos.eq_dec).
+Qed.
+
+Theorem neq_QG_neq : ∀ q1 q2 : QG, q1 ≠ q2 ↔ qg_q q1 ≠ qg_q q2.
+Proof.
+intros.
+now split; intros H Hq'; apply H; clear H; apply eq_QG_eq.
 Qed.
 
 Theorem QG_of_Q_0 : ∀ d, QG_of_Q (0 # d) = QG_of_Q 0.
@@ -2002,25 +2010,40 @@ split. {
   rewrite Z.mul_1_r.
   progress unfold Qle; cbn.
   rewrite Z.mul_1_r.
-...
   rewrite Z.mul_add_distr_r.
   rewrite Z.mul_1_l.
   rewrite Z.mul_comm.
-...
-  rewrite <- (Z.add_0_r an) at 1.
-  apply Z.add_le_mono; [ | easy ].
-  apply Z.mul_div_ge.
-  }
-  eapply Z.le_trans; [ | apply Z.add_le_mono_r ].
-Search (_ * (_ / _))%Z.
-  apply Z.mul_div_ge.
+  rewrite (Z.div_mod an (Z.pos ap)) at 1; [ | easy ].
+  apply Z.add_le_mono_l.
+  apply Z.lt_le_incl.
+  now apply Z.mod_pos_bound.
+}
+apply neq_QG_neq.
+progress unfold qg_q at 1.
+progress unfold Z_of_QG.
+cbn.
+do 2 rewrite Z_pos_pos_gcd.
+do 2 rewrite Z.gcd_1_r.
+do 4 rewrite Z.div_1_r.
+cbn.
+rewrite Z.mul_1_r.
+intros H1.
+injection H1; clear H1; intros H1 H2.
+rewrite H1, Z.div_1_r in H2.
+rewrite Z.add_1_r in H2.
+revert H2.
+apply Z.neq_succ_diag_r.
+Qed.
 
-...
-
-Theorem QG_of_Z_Z_of_QG_interv :
+Theorem QG_of_Z_Z_of_QG_interv' :
   ∀ a : QG, (a - 1 < QG_of_Z (Z_of_QG a) ≤ a)%QG.
 Proof.
 intros.
+specialize QG_of_Z_Z_of_QG_interv as H1.
+split; [ | apply H1 ].
+Search (_ - _ ≤ _)%QG.
+(* ah, ce que c'est fatigant ! *)
+...
 split. {
   destruct a as ((an, ap), Hap).
   cbn in Hap.
@@ -2104,6 +2127,9 @@ eapply QG_lt_le_trans. 2: {
     split; [ | apply QG_le_refl ].
     now apply QG_lt_le_incl.
   }
+  split. 2: {
+Check QG_of_Z_Z_of_QG_interv.
+...
   split; [ | apply QG_of_Z_Z_of_QG_interv ].
   apply QG_mul_nonneg_nonneg. {
     apply QG_lt_le_incl.
