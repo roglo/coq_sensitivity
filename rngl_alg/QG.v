@@ -1975,6 +1975,80 @@ Qed.
 Theorem QG_of_Z_QG_of_Q : ∀ a, QG_of_Z a = QG_of_Q (a # 1).
 Proof. easy. Qed.
 
+Theorem QG_of_Z_Z_of_QG_interv :
+  ∀ a : QG, (QG_of_Z (Z_of_QG a) ≤ a < QG_of_Z (Z_of_QG a) + 1)%QG.
+Proof.
+intros.
+destruct a as ((an, ap), Hap).
+cbn in Hap.
+split. {
+  apply Qle_bool_iff; cbn.
+  progress unfold Z_of_QG; cbn.
+  rewrite Z_pos_pos_gcd.
+  rewrite Z.gcd_1_r; cbn.
+  rewrite Z.div_1_r.
+  progress unfold Qle; cbn.
+  rewrite Z.mul_1_r.
+  rewrite Z.mul_comm.
+  now apply Z.mul_div_le.
+}
+apply QG_lt_iff.
+split. {
+  apply Qle_bool_iff; cbn.
+  progress unfold Z_of_QG; cbn.
+  do 2 rewrite Z_pos_pos_gcd.
+  do 2 rewrite Z.gcd_1_r; cbn.
+  do 2 rewrite Z.div_1_r.
+  rewrite Z.mul_1_r.
+  progress unfold Qle; cbn.
+  rewrite Z.mul_1_r.
+...
+  rewrite Z.mul_add_distr_r.
+  rewrite Z.mul_1_l.
+  rewrite Z.mul_comm.
+...
+  rewrite <- (Z.add_0_r an) at 1.
+  apply Z.add_le_mono; [ | easy ].
+  apply Z.mul_div_ge.
+  }
+  eapply Z.le_trans; [ | apply Z.add_le_mono_r ].
+Search (_ * (_ / _))%Z.
+  apply Z.mul_div_ge.
+
+...
+
+Theorem QG_of_Z_Z_of_QG_interv :
+  ∀ a : QG, (a - 1 < QG_of_Z (Z_of_QG a) ≤ a)%QG.
+Proof.
+intros.
+split. {
+  destruct a as ((an, ap), Hap).
+  cbn in Hap.
+  apply Qle_bool_iff; cbn.
+  progress unfold Z_of_QG; cbn.
+  rewrite Z_pos_pos_gcd.
+  rewrite Z.gcd_1_r; cbn.
+  rewrite Z.div_1_r.
+  progress unfold Qle; cbn.
+  rewrite Z.mul_1_r.
+...
+
+Theorem QG_of_Z_Z_of_QG_interv :
+  ∀ a : QG, (a ≤ QG_of_Z (Z_of_QG a) < a + 1)%QG.
+Proof.
+intros.
+split. {
+  destruct a as ((an, ap), Hap).
+  cbn in Hap.
+  apply Qle_bool_iff; cbn.
+  progress unfold Z_of_QG; cbn.
+  rewrite Z_pos_pos_gcd.
+  rewrite Z.gcd_1_r; cbn.
+  rewrite Z.div_1_r.
+  progress unfold Qle; cbn.
+  rewrite Z.mul_1_r.
+...
+
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
   ∃ n : nat,
@@ -2024,21 +2098,13 @@ rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
-Compute (
-let a := QG_of_Q 6 in
-let b := QG_of_Q 17 in
-((b / a)%QG, QG_of_Z (Z_of_QG (b / a)))).
-Theorem glop :
-  ∀ a b : QG, (a / b ≤ QG_of_Z (Z_of_QG (a / b)) < a / b + 1)%QG.
-Admitted.
 eapply QG_lt_le_trans. 2: {
   apply QG_add_le_mono_r.
   apply QG_mul_le_compat_nonneg. {
     split; [ | apply QG_le_refl ].
     now apply QG_lt_le_incl.
   }
-  split; [ | apply glop ].
-Search (_ ≤ _ * _)%QG.
+  split; [ | apply QG_of_Z_Z_of_QG_interv ].
   apply QG_mul_nonneg_nonneg. {
     apply QG_lt_le_incl.
     now apply (@QG_lt_trans _ a).
@@ -2048,12 +2114,14 @@ Search (_ ≤ _ * _)%QG.
     rewrite Z.mul_1_r.
     apply Z.div_pos; [ | easy ].
     progress unfold Qinv.
-    destruct a as ((an, ad), Hap).
-    cbn.
-    destruct an as [| an| an]; [ easy | easy | ].
+    destruct a as ((an, ad), Hap); cbn.
+    destruct an as [| an| an]; [ easy | easy | exfalso ].
     destruct Hab as (Ha, Hab).
     apply QG_nle_gt in Ha.
-    exfalso; apply Ha; clear Ha.
+    apply Ha; clear Ha.
+    now apply Qle_bool_iff.
+  }
+}
 ...
 Search (_ ≤ QG_of_Q _)%QG.
 Search (0 ≤ _⁻¹)%QG.
