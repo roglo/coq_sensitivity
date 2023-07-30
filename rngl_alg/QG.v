@@ -1882,6 +1882,15 @@ rewrite QG_add_opp_r.
 apply QG_add_0_l.
 Qed.
 
+Theorem QG_sub_add : ∀ a b, (a - b + b)%QG = a.
+Proof.
+intros.
+progress unfold QG_sub.
+rewrite <- QG_add_assoc.
+rewrite QG_add_opp_l.
+apply QG_add_0_r.
+Qed.
+
 Theorem QG_characteristic_prop :
   ∀ i, List.fold_right QG_add 0%QG (List.repeat 1%QG (S i)) ≠ 0%QG.
 Proof.
@@ -2039,38 +2048,23 @@ Theorem QG_of_Z_Z_of_QG_interv' :
   ∀ a : QG, (a - 1 < QG_of_Z (Z_of_QG a) ≤ a)%QG.
 Proof.
 intros.
-specialize QG_of_Z_Z_of_QG_interv as H1.
+specialize (QG_of_Z_Z_of_QG_interv a) as H1.
 split; [ | apply H1 ].
-Search (_ - _ ≤ _)%QG.
-(* ah, ce que c'est fatigant ! *)
-...
+apply QG_lt_iff.
 split. {
-  destruct a as ((an, ap), Hap).
-  cbn in Hap.
-  apply Qle_bool_iff; cbn.
-  progress unfold Z_of_QG; cbn.
-  rewrite Z_pos_pos_gcd.
-  rewrite Z.gcd_1_r; cbn.
-  rewrite Z.div_1_r.
-  progress unfold Qle; cbn.
-  rewrite Z.mul_1_r.
-...
-
-Theorem QG_of_Z_Z_of_QG_interv :
-  ∀ a : QG, (a ≤ QG_of_Z (Z_of_QG a) < a + 1)%QG.
-Proof.
-intros.
-split. {
-  destruct a as ((an, ap), Hap).
-  cbn in Hap.
-  apply Qle_bool_iff; cbn.
-  progress unfold Z_of_QG; cbn.
-  rewrite Z_pos_pos_gcd.
-  rewrite Z.gcd_1_r; cbn.
-  rewrite Z.div_1_r.
-  progress unfold Qle; cbn.
-  rewrite Z.mul_1_r.
-...
+  apply QG_add_le_mono_r with (c := 1%QG).
+  rewrite QG_sub_add.
+  now apply QG_lt_le_incl.
+}
+intros H2.
+apply (f_equal (QG_add 1%QG)) in H2.
+rewrite QG_add_comm, QG_sub_add in H2.
+rewrite QG_add_comm in H2.
+rewrite <- H2 in H1.
+destruct H1 as (_, H1).
+revert H1.
+apply QG_lt_irrefl.
+Qed.
 
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
@@ -2119,18 +2113,23 @@ rewrite <- QG_of_Q_mul_idemp_r.
 rewrite QG_of_Q_qg_q_mul.
 rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
+(**)
+progress unfold QG_of_Z at 2; fold QG_1.
+specialize (QG_of_Z_Z_of_QG_interv (b / a)%QG) as H1.
+destruct H1 as (H1, H2).
+...
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
+...
 eapply QG_lt_le_trans. 2: {
   apply QG_add_le_mono_r.
   apply QG_mul_le_compat_nonneg. {
     split; [ | apply QG_le_refl ].
     now apply QG_lt_le_incl.
   }
-  split. 2: {
-Check QG_of_Z_Z_of_QG_interv.
 ...
-  split; [ | apply QG_of_Z_Z_of_QG_interv ].
+  split; [ | apply QG_of_Z_Z_of_QG_interv' ].
+...
   apply QG_mul_nonneg_nonneg. {
     apply QG_lt_le_incl.
     now apply (@QG_lt_trans _ a).
