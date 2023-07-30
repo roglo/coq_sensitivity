@@ -206,6 +206,8 @@ Notation "a ≤ b" := (QG_le a b) : QG_scope.
 Notation "a < b" := (QG_lt a b) : QG_scope.
 Notation "a ≤ b ≤ c" := (QG_le a b ∧ QG_le b c)
   (at level 70, b at next level) : QG_scope.
+Notation "a ≤ b < c" := (QG_le a b ∧ QG_lt b c)
+  (at level 70, b at next level) : QG_scope.
 Notation "a < b < c" := (QG_lt a b ∧ QG_lt b c)
   (at level 70, b at next level) : QG_scope.
 
@@ -1360,9 +1362,30 @@ apply QG_lt_iff in Hxy, Hyz.
 apply QG_lt_iff.
 destruct Hxy as (Hxy, Hnxy).
 destruct Hyz as (Hyz, Hnyz).
-split. {
-  apply (QG_le_trans Hxy Hyz).
-}
+split; [ apply (QG_le_trans Hxy Hyz) | ].
+intros H; subst z.
+now apply QG_le_antisymm in Hyz.
+Qed.
+
+Theorem QG_le_lt_trans : ∀ x y z : QG, (x ≤ y → y < z → x < z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply QG_lt_iff in Hyz.
+apply QG_lt_iff.
+destruct Hyz as (Hyz, Hnyz).
+split; [ apply (QG_le_trans Hxy Hyz) | ].
+intros H; subst z.
+apply not_eq_sym in Hnyz.
+now apply QG_le_antisymm in Hyz.
+Qed.
+
+Theorem QG_lt_le_trans : ∀ x y z : QG, (x < y → y ≤ z → x < z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply QG_lt_iff in Hxy.
+apply QG_lt_iff.
+destruct Hxy as (Hxy, Hnxy).
+split; [ apply (QG_le_trans Hxy Hyz) | ].
 intros H; subst z.
 now apply QG_le_antisymm in Hyz.
 Qed.
@@ -1931,6 +1954,24 @@ do 4 rewrite Z.div_1_r.
 now do 2 rewrite Z.mul_1_r.
 Qed.
 
+Theorem QG_nle_gt : ∀ a b : QG, ¬ (a ≤ b)%QG ↔ (b < a)%QG.
+Proof.
+intros.
+split. {
+  intros Hab.
+  apply QG_lt_iff.
+  apply QG_not_le in Hab.
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  intros Hba Hab.
+  apply QG_lt_iff in Hba.
+  destruct Hba as (Hba, H).
+  apply H; clear H.
+  now apply QG_le_antisymm.
+}
+Qed.
+
 Theorem QG_of_Z_QG_of_Q : ∀ a, QG_of_Z a = QG_of_Q (a # 1).
 Proof. easy. Qed.
 
@@ -1983,6 +2024,40 @@ rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
+Compute (
+let a := QG_of_Q 6 in
+let b := QG_of_Q 17 in
+((b / a)%QG, QG_of_Z (Z_of_QG (b / a)))).
+Theorem glop :
+  ∀ a b : QG, (a / b ≤ QG_of_Z (Z_of_QG (a / b)) < a / b + 1)%QG.
+Admitted.
+eapply QG_lt_le_trans. 2: {
+  apply QG_add_le_mono_r.
+  apply QG_mul_le_compat_nonneg. {
+    split; [ | apply QG_le_refl ].
+    now apply QG_lt_le_incl.
+  }
+  split; [ | apply glop ].
+Search (_ ≤ _ * _)%QG.
+  apply QG_mul_nonneg_nonneg. {
+    apply QG_lt_le_incl.
+    now apply (@QG_lt_trans _ a).
+  } {
+    apply Qle_bool_iff; cbn.
+    progress unfold Qle; cbn.
+    rewrite Z.mul_1_r.
+    apply Z.div_pos; [ | easy ].
+    progress unfold Qinv.
+    destruct a as ((an, ad), Hap).
+    cbn.
+    destruct an as [| an| an]; [ easy | easy | ].
+    destruct Hab as (Ha, Hab).
+    apply QG_nle_gt in Ha.
+    exfalso; apply Ha; clear Ha.
+...
+Search (_ ≤ QG_of_Q _)%QG.
+Search (0 ≤ _⁻¹)%QG.
+Search (_ ≤ _⁻¹)%QG.
 ...
 apply QG_lt_iff.
 split. 2: {
