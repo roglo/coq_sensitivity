@@ -1264,6 +1264,13 @@ rewrite <- QG_of_Q_qg_q.
 now rewrite H1.
 Qed.
 
+Theorem QG_mul_inv_r : ∀ a : QG, a ≠ 0%QG → (a * a⁻¹)%QG = 1%QG.
+Proof.
+intros * Haz.
+rewrite QG_mul_comm.
+now apply QG_mul_inv_l.
+Qed.
+
 Theorem QG_mul_add_distr_l :  ∀ a b c, (a * (b + c))%QG = (a * b + a * c)%QG.
 Proof.
 intros.
@@ -2066,6 +2073,19 @@ revert H1.
 apply QG_lt_irrefl.
 Qed.
 
+Theorem QG_mul_cancel_l:
+  ∀ a b c : QG, a ≠ 0%QG → (a * b)%QG = (a * c)%QG ↔ b = c.
+Proof.
+intros * Haz.
+split; intros Hbc; [ | now subst c ].
+apply (f_equal (λ b, QG_div b a)) in Hbc.
+do 2 rewrite (QG_mul_comm a) in Hbc.
+progress unfold QG_div in Hbc.
+do 2 rewrite <- QG_mul_assoc in Hbc.
+rewrite QG_mul_inv_r in Hbc; [ | easy ].
+now do 2 rewrite QG_mul_1_r in Hbc.
+Qed.
+
 Theorem QG_mul_lt_mono_pos_l :
   ∀ a b c : QG, (0 < a)%QG → (b < c)%QG ↔ (a * b < a * c)%QG.
 Proof.
@@ -2095,6 +2115,13 @@ split; intros Hbc. {
     rewrite Z.gcd_0_l in Hap.
     now cbn in Hap; subst ad.
   } {
+    intros H1.
+    apply QG_mul_cancel_l in H1; [ | now intros H2; subst a ].
+    now subst c.
+  }
+}
+...
+Search (_ * _ == _ * _)%Q.
 ...
 Search (_ → _ < _)%Q.
 ...
