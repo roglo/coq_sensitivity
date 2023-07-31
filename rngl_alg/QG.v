@@ -2120,6 +2120,23 @@ split; intros Hbc. {
     now subst c.
   }
 }
+apply QG_nle_gt in Hbc.
+apply QG_nle_gt.
+intros Hcb; apply Hbc; clear Hbc.
+(*lemma?*)
+destruct (QG_le_dec 0%QG c) as [Hcz| Hcz]. {
+  apply QG_mul_le_compat_nonneg; [ | easy ].
+  split; [ now apply QG_lt_le_incl | apply QG_le_refl ].
+}
+...
+apply QG_mul_le_compat_nonneg.
+...
+apply (f_equal (λ b, QG_div b a)) in Hbc.
+do 2 rewrite (QG_mul_comm a) in Hbc.
+progress unfold QG_div in Hbc.
+do 2 rewrite <- QG_mul_assoc in Hbc.
+rewrite QG_mul_inv_r in Hbc; [ | easy ].
+now do 2 rewrite QG_mul_1_r in Hbc.
 ...
 Search (_ * _ == _ * _)%Q.
 ...
