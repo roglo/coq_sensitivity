@@ -2124,24 +2124,11 @@ apply QG_nle_gt in Hbc.
 apply QG_nle_gt.
 intros Hcb; apply Hbc; clear Hbc.
 (*lemma?*)
-destruct (QG_le_dec 0%QG c) as [Hcz| Hcz]. {
-  apply QG_mul_le_compat_nonneg; [ | easy ].
-  split; [ now apply QG_lt_le_incl | apply QG_le_refl ].
-}
-...
-apply QG_mul_le_compat_nonneg.
-...
-apply (f_equal (λ b, QG_div b a)) in Hbc.
-do 2 rewrite (QG_mul_comm a) in Hbc.
-progress unfold QG_div in Hbc.
-do 2 rewrite <- QG_mul_assoc in Hbc.
-rewrite QG_mul_inv_r in Hbc; [ | easy ].
-now do 2 rewrite QG_mul_1_r in Hbc.
-...
-Search (_ * _ == _ * _)%Q.
-...
-Search (_ → _ < _)%Q.
-...
+apply QG_le_0_sub.
+rewrite <- QG_mul_sub_distr_l.
+apply QG_mul_nonneg_nonneg; [ now apply QG_lt_le_incl | ].
+now apply QG_le_0_sub.
+Qed.
 
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
@@ -2190,178 +2177,19 @@ rewrite <- QG_of_Q_mul_idemp_r.
 rewrite QG_of_Q_qg_q_mul.
 rewrite fold_QG_of_Z.
 rewrite QG_of_Z_add.
-(**)
 progress unfold QG_of_Z at 2; fold QG_1.
 specialize (QG_of_Z_Z_of_QG_interv (b / a)%QG) as H1.
 destruct H1 as (H1, H2).
-... ...
 apply (@QG_mul_lt_mono_pos_l a) in H2; [ | easy ].
-Search (_ * (_ / _))%QG.
-Search (_ * (_ / _))%Q.
-...
-rewrite QG_mul_comm in H2.
-Search (_ / _ * _)%QG.
-...
-Search (_ * _ < _ * _)%QG.
-Search (_ * _ < _ * _)%Q.
-Search (_ * _ < _ * _)%Z.
-Search (_ * _ ≤ _ * _)%QG.
-Search (_ * _ ≤ _ * _)%Q.
-Search (_ * _ ≤ _ * _)%Z.
-Z.mul_lt_mono_pos_r: ∀ p n m : Z, (0 < p)%Z → (n < m)%Z ↔ (n * p < m * p)%Z
-Z.mul_lt_mono_pos_l: ∀ p n m : Z, (0 < p)%Z → (n < m)%Z ↔ (p * n < p * m)%Z
-Z.mul_lt_mono_neg_l: ∀ p n m : Z, (p < 0)%Z → (n < m)%Z ↔ (p * m < p * n)%Z
-Z.mul_lt_mono_neg_r: ∀ p n m : Z, (p < 0)%Z → (n < m)%Z ↔ (m * p < n * p)%Z
-Z.mul_le_mono_pos_l: ∀ n m p : Z, (0 < p)%Z → (n ≤ m)%Z ↔ (p * n ≤ p * m)%Z
-Z.mul_le_mono_neg_r: ∀ n m p : Z, (p < 0)%Z → (n ≤ m)%Z ↔ (m * p ≤ n * p)%Z
-Z.mul_le_mono_neg_l: ∀ n m p : Z, (p < 0)%Z → (n ≤ m)%Z ↔ (p * m ≤ p * n)%Z
-Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n ≤ m)%Z ↔ (n * p ≤ m * p)%Z
-...
-rewrite QG_mul_add_distr_l.
-rewrite QG_mul_1_r.
-...
-eapply QG_lt_le_trans. 2: {
-  apply QG_add_le_mono_r.
-  apply QG_mul_le_compat_nonneg. {
-    split; [ | apply QG_le_refl ].
-    now apply QG_lt_le_incl.
-  }
-...
-  split; [ | apply QG_of_Z_Z_of_QG_interv' ].
-...
-  apply QG_mul_nonneg_nonneg. {
-    apply QG_lt_le_incl.
-    now apply (@QG_lt_trans _ a).
-  } {
-    apply Qle_bool_iff; cbn.
-    progress unfold Qle; cbn.
-    rewrite Z.mul_1_r.
-    apply Z.div_pos; [ | easy ].
-    progress unfold Qinv.
-    destruct a as ((an, ad), Hap); cbn.
-    destruct an as [| an| an]; [ easy | easy | exfalso ].
-    destruct Hab as (Ha, Hab).
-    apply QG_nle_gt in Ha.
-    apply Ha; clear Ha.
-    now apply Qle_bool_iff.
-  }
+progress unfold QG_div in H2 at 1.
+rewrite (QG_mul_comm a) in H2.
+rewrite <- QG_mul_assoc in H2.
+rewrite QG_mul_inv_l in H2. 2: {
+  destruct Hab as (Haz, Hab).
+  now intros H; subst a.
 }
-...
-Search (_ ≤ QG_of_Q _)%QG.
-Search (0 ≤ _⁻¹)%QG.
-Search (_ ≤ _⁻¹)%QG.
-...
-apply QG_lt_iff.
-split. 2: {
-  destruct a as ((an, ad), Hap).
-  destruct b as ((bn, bd), Hbp).
-  cbn in Hap, Hbp.
-  intros H.
-  apply eq_QG_eq in H.
-  cbn - [ "+"%QG ] in H.
-...
-progress unfold QG_of_Z at 2.
-progress unfold QG_of_Q.
-Search QG_of_Z.
-...
-intros.
-intros.
-apply eq_QG_eq; cbn.
-rewrite Z_pos_pos_gcd.
-rewrite Z.gcd_1_r; cbn.
-rewrite Z.div_1_r.
-...
-...
-Search (QG → Z).
-Search (Z → QG).
-Search (nat → QG).
-progress unfold Z_of_QG.
-remember (b / a)%QG as x.
-cbn.
-...
-rewrite Z_pos_gcd_1_r.
-progress unfold QG_of_Q; cbn.
-...
-remember (_ # _) as x.
-Search (QG_of_Q (_ # 1)).
-
-cbn.
-rewrite <- QG_of_Q_add_idemp_l.
-rewrite QG_of_Q_qg_q_add.
-...
-  remember (qg_q (b / a)) as c eqn:Hc; symmetry in Hc.
-  destruct c as (cn, cd); cbn.
-  destruct cn as [| cn| cn]; [ easy | easy | ].
-  exfalso.
-  cbn in Hc.
-  injection Hc; clear Hc; intros _ H2.
-  specialize (Pos2Z.neg_is_neg cn) as H3.
-  rewrite <- H2 in H3; clear H2.
-  progress unfold QG_div.
-
-Search (_ ≤ Qnum _)%Z.
-Search (qg_q (_ * _)).
-  cbn - [ QG_mul ].
-...
-  destruct a as ((an, ad), Hap).
-  destruct b as ((bn, bd), Hbp).
-  cbn.
-...
-  remember (Z_pos_gcd (Qnum (/ qg_q a)) _) as ga eqn:Hga.
-  remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
-  progress unfold QG_div.
-  cbn.
-...
-intros * Hab *.
-destruct a as ((an, ad), Hap).
-destruct b as ((bn, bd), Hbp).
-cbn in Hap, Hbp.
-destruct Hab as (Ha, Hab).
-exists
-  ((Z.to_nat bn * Pos.to_nat ad) / (Z.to_nat an * Pos.to_nat bd + 1) + 1)%nat.
-apply not_true_iff_false in Hab.
-apply not_true_iff_false.
-intros H1; apply Hab; clear Hab.
-apply Qle_bool_iff in H1.
-apply Qle_bool_iff.
-apply Qnot_lt_le.
-apply Qle_not_lt in H1.
-cbn.
-intros Hε; apply H1; clear H1.
-rewrite qg_q_mul_nat; cbn.
-rewrite Q_mul_nat.
-progress unfold Qlt.
-cbn.
-rewrite Pos.mul_1_r.
-destruct an as [| an| an]; [ easy | | easy ].
-destruct bn as [| bn| bn]; [ easy | | easy ].
-cbn - [ Z.mul ].
-rewrite Nat2Z.inj_add.
-cbn - [ Z.mul ].
-rewrite Z.mul_add_distr_l.
-rewrite Z.mul_1_r.
-...
-rewrite Z.mul_assoc.
-rewrite (Z.mul_comm (Z.pos εn)).
-rewrite <- Z.mul_assoc.
-remember (Z.pos εn * _)%Z as x.
-apply Z.le_lt_trans with (m := (Z.of_nat n * x)%Z). 2: {
-  now apply Z.lt_add_pos_r.
-}
-apply Z.mul_le_mono_nonneg_l; [ apply Nat2Z.is_nonneg | ].
-subst x.
-rewrite Nat2Z.inj_add.
-cbn - [ Z.mul ].
-rewrite Z.mul_add_distr_l.
-rewrite Z.mul_1_r.
-rewrite Nat2Z.inj_div.
-do 2 rewrite positive_nat_Z.
-rewrite (Z.div_mod (Z.pos εd) (Z.pos εn)) at 1; [ | easy ].
-apply Z.add_le_mono_l.
-apply Z.lt_le_incl.
-now apply Z.mod_pos_bound.
+now rewrite QG_mul_1_r in H2.
 Qed.
-*)
 
 (* *)
 
