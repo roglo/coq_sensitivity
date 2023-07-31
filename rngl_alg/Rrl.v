@@ -1251,6 +1251,9 @@ Theorem int_part :
   ∀ x, ∃ n, (rngl_mul_nat 1 n ≤ rngl_abs x < rngl_mul_nat 1 (n + 1))%L.
 Proof.
 intros Hon Hop Hiv Hed Hc1 Hor Har *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 specialize rngl_opt_archimedean as H1.
 rewrite Har, Hor in H1; cbn in H1.
 destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
@@ -1276,9 +1279,17 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
   exists 1; cbn.
   rewrite rngl_add_0_r.
   split; [ apply (rngl_le_refl Hor) | ].
-specialize (rngl_le_add_r Hor 1 1) as H2.
-Search (0 < 1)%L.
-(* must add that characteristic ≠ 2 *)
+  apply (rngl_lt_iff Hor).
+  split. 2: {
+    intros H12.
+    apply (f_equal (λ b, rngl_sub b 1)) in H12.
+    rewrite (rngl_sub_diag Hos) in H12.
+    rewrite (rngl_add_sub Hos) in H12.
+    symmetry in H12; revert H12.
+    now apply (rngl_1_neq_0_iff Hon).
+  }
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
 }
 ...
 apply (rngl_nlt_ge Hor) in H1x.
