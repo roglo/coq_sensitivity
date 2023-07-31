@@ -2066,6 +2066,39 @@ revert H1.
 apply QG_lt_irrefl.
 Qed.
 
+Theorem QG_mul_lt_mono_pos_l :
+  ∀ a b c : QG, (0 < a)%QG → (b < c)%QG ↔ (a * b < a * c)%QG.
+Proof.
+intros * Ha.
+split; intros Hbc. {
+  apply QG_lt_iff in Ha, Hbc.
+  apply QG_lt_iff.
+  destruct Ha as (Ha, Haz); apply not_eq_sym in Haz.
+  destruct Hbc as (Hbc, Hbcz).
+  apply Qle_bool_iff in Ha, Hbc.
+  apply neq_QG_neq in Haz, Hbcz.
+  cbn in Ha, Haz.
+  split. {
+    apply Qle_bool_iff.
+    do 2 rewrite qg_q_mul.
+    apply Qmult_le_l; [ | easy ].
+    apply Qnot_le_lt.
+    intros H1; apply Haz; clear Haz.
+    apply Qle_antisym in Ha; [ | easy ].
+    destruct a as ((an, ad), Hap).
+    cbn in Hap, Ha, H1 |-*.
+    progress unfold "==" in Ha.
+    cbn in Ha.
+    rewrite Z.mul_1_r in Ha.
+    subst an.
+    rewrite Z_pos_gcd_Z_gcd in Hap.
+    rewrite Z.gcd_0_l in Hap.
+    now cbn in Hap; subst ad.
+  } {
+...
+Search (_ → _ < _)%Q.
+...
+
 Theorem QG_archimedean :
   ∀ a b : QG, (0 < a < b)%QG →
   ∃ n : nat,
@@ -2117,6 +2150,28 @@ rewrite QG_of_Z_add.
 progress unfold QG_of_Z at 2; fold QG_1.
 specialize (QG_of_Z_Z_of_QG_interv (b / a)%QG) as H1.
 destruct H1 as (H1, H2).
+... ...
+apply (@QG_mul_lt_mono_pos_l a) in H2; [ | easy ].
+Search (_ * (_ / _))%QG.
+Search (_ * (_ / _))%Q.
+...
+rewrite QG_mul_comm in H2.
+Search (_ / _ * _)%QG.
+...
+Search (_ * _ < _ * _)%QG.
+Search (_ * _ < _ * _)%Q.
+Search (_ * _ < _ * _)%Z.
+Search (_ * _ ≤ _ * _)%QG.
+Search (_ * _ ≤ _ * _)%Q.
+Search (_ * _ ≤ _ * _)%Z.
+Z.mul_lt_mono_pos_r: ∀ p n m : Z, (0 < p)%Z → (n < m)%Z ↔ (n * p < m * p)%Z
+Z.mul_lt_mono_pos_l: ∀ p n m : Z, (0 < p)%Z → (n < m)%Z ↔ (p * n < p * m)%Z
+Z.mul_lt_mono_neg_l: ∀ p n m : Z, (p < 0)%Z → (n < m)%Z ↔ (p * m < p * n)%Z
+Z.mul_lt_mono_neg_r: ∀ p n m : Z, (p < 0)%Z → (n < m)%Z ↔ (m * p < n * p)%Z
+Z.mul_le_mono_pos_l: ∀ n m p : Z, (0 < p)%Z → (n ≤ m)%Z ↔ (p * n ≤ p * m)%Z
+Z.mul_le_mono_neg_r: ∀ n m p : Z, (p < 0)%Z → (n ≤ m)%Z ↔ (m * p ≤ n * p)%Z
+Z.mul_le_mono_neg_l: ∀ n m p : Z, (p < 0)%Z → (n ≤ m)%Z ↔ (p * m ≤ p * n)%Z
+Z.mul_le_mono_pos_r: ∀ n m p : Z, (0 < p)%Z → (n ≤ m)%Z ↔ (n * p ≤ m * p)%Z
 ...
 rewrite QG_mul_add_distr_l.
 rewrite QG_mul_1_r.
