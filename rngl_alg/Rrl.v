@@ -1365,8 +1365,8 @@ destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
 apply (rngl_nlt_ge Hor) in Hxa.
 clear IHn.
 ...
-x=0.5
-a=0
+  ============================
+  (List.fold_right rngl_add 0 (List.repeat 1 (int_part_loop n x)) ≤ x)%L
 ...
   apply (rngl_nle_gt Hor).
   intros H; apply Hxy; clear Hxy.
