@@ -155,7 +155,7 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
 
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
-  | 0 => ([], [rngl_mul_nat 1 97]) (* algo err: not enough iterations *)
+  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
   | S it' =>
       let (q, rlr) := rlap_quot_rem_step rla rlb in
       match q with
@@ -1882,7 +1882,7 @@ Qed.
 
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
-  if rngl_has_1 (list T) then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+  if rngl_has_1 (list T) then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else not_applicable.
 Proof.
 intros.
@@ -1900,7 +1900,6 @@ remember (S i) as j eqn:Hj.
 rewrite Hon in H1.
 progress unfold rol.
 progress unfold lap_ring_like_op.
-progress unfold rngl_one; cbn - [ lap_add ].
 progress unfold lap_opt_one.
 progress unfold rngl_has_1 in Hon.
 progress unfold rngl_has_1 in Honl; cbn in Honl.
@@ -1911,7 +1910,6 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   intros.
   specialize (H1 i) as H2.
   rewrite <- Hj in H2.
-  progress unfold rngl_one in H2.
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   intros H3; apply H2; clear H2.
   destruct j; [ easy | ].

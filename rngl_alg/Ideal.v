@@ -444,10 +444,10 @@ Qed.
 
 Theorem I_characteristic_prop : let roi := I_ring_like_op in
   if rngl_has_1 (ideal P) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
     else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L) ∧
-      rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
+      rngl_of_nat (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
 intros; cbn.
@@ -484,11 +484,14 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   now destruct (Bool.bool_dec (P one) true).
 }
 destruct H1 as (Hbef, Hch).
+progress unfold rngl_of_nat.
+progress unfold rngl_of_nat in Hch.
 split. {
   intros i Hi.
   specialize (Hbef i Hi) as H1.
   apply neq_ideal_neq.
   rewrite i_val_rngl_mul_nat; cbn.
+  progress unfold rngl_of_nat in H1.
   progress unfold rngl_one in H1.
   destruct (rngl_opt_one T) as [one| ]; [ | easy ].
   now destruct (Bool.bool_dec (P one) true).

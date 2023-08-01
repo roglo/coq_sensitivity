@@ -686,14 +686,18 @@ Qed.
 Theorem gc_characteristic_prop :
   let roc := gc_ring_like_op T in
   if rngl_has_1 (GComplex T) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
     else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
-      ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L)
+      ∧ rngl_of_nat (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
+progress unfold rngl_of_nat.
 cbn - [ rngl_mul_nat ].
 specialize (rngl_characteristic_prop) as H1.
+progress unfold rngl_of_nat in H1.
+progress unfold "1"%L in H1.
+progress unfold "1"%L.
 progress unfold rngl_has_1 in H1.
 progress unfold rngl_has_1; cbn - [ rngl_mul_nat ].
 progress unfold gc_opt_one.
@@ -704,7 +708,7 @@ assert
   (Hr :
     ∀ n,
     @rngl_mul_nat _ (gc_ring_like_op T) (mk_gc 1 0) n =
-    mk_gc (rngl_mul_nat 1 n) 0). {
+    mk_gc (rngl_of_nat n) 0). {
   intros.
   progress unfold rngl_mul_nat.
   progress unfold mul_nat; cbn.
@@ -717,16 +721,19 @@ unfold "1"%L in Hr.
 rewrite Hon in Hr.
 remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
+cbn.
   cbn - [ rngl_mul_nat ] in H1 |-*; intros.
   apply neq_gc_neq.
   cbn - [ rngl_mul_nat ].
   left.
   specialize (H1 i).
   intros H2; apply H1; clear H1.
-  progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
-  progress unfold gc_opt_one in H2.
-  progress unfold "1"%L.
-  rewrite Hon in H2 |-*; cbn - [ rngl_mul_nat ] in H2 |-*.
+(**)
+  rewrite Hr in H2.
+  cbn - [ rngl_of_nat ] in H2.
+  progress unfold rngl_of_nat in H2.
+  cbn in H2 |-*.
+...
   now rewrite Hr in H2.
 } {
   cbn - [ rngl_mul_nat ] in H1 |-*.
@@ -737,6 +744,7 @@ destruct ch. {
     cbn; left.
     specialize (H1 i Hi).
     intros H3; apply H1; clear H1.
+    progress unfold rngl_of_nat.
     progress unfold "1"%L.
     rewrite Hon.
     progress unfold "1"%L in H3; cbn in H3.
@@ -1239,7 +1247,13 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
       else AnBn P A Bn n'
   end.
 
-(* to be completed
+Fixpoint int_part_loop n a :=
+  match n with
+  | 0%nat => 0%nat
+  | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
+  end.
+
+(* to be completed *)
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1248,7 +1262,7 @@ Theorem int_part :
   rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ x, ∃ n, (rngl_mul_nat 1 n ≤ rngl_abs x < rngl_mul_nat 1 (n + 1))%L.
+  ∀ x, ∃ n, (rngl_of_nat n ≤ rngl_abs x < rngl_of_nat (n + 1))%L.
 Proof.
 intros Hon Hop Hiv Hed Hc1 Hor Har *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -1329,28 +1343,27 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := rngl_abs x) in Hm. 2: {
 rewrite (rngl_mul_1_r Hon), rngl_mul_assoc in Hm.
 rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
 rewrite (rngl_mul_1_l Hon) in Hm.
-Abort.
-
-Fixpoint int_part_loop n a :=
-  match n with
-  | 0%nat => 0%nat
-  | S n' => if (a ≤? rngl_mul_nat 1 n)%L then int_part_loop n' a else n
-  end.
-
-End a.
-
-Require Import Rational.
-Require Import Qrl.
-Import Q.Notations.
-Compute (
-    (17 / 5)%Q).
+exists (int_part_loop m (rngl_abs x)).
+split. {
+Theorem int_part_loop_le :
+  ∀ x n,
+  (x < rngl_of_nat n)%L
+  → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
 ...
 
+(*
+End a.
+Require Import QArith.
+Require Import QG.
 Compute (
-  let ro := Q_ring_like_op in
-  let rp := Q_ring_like_prop in
-  int_part_loop 3 (17 / 5)%GQ).
-
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  int_part_loop 30%nat (QG_of_Q (19 # 5)%Q)).
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  int_part_loop 30%nat (QG_of_Q (20 # 5)%Q)).
+*)
 ...
 apply (rngl_nlt_ge Hor) in H1x.
 apply (rngl_lt_eq_cases Hor) in H1x.
@@ -1736,7 +1749,7 @@ Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
   rngl_is_ordered T = true →
   ∀ f a l,
   is_limit_when_tending_to f a l
-  → is_limit_when_tending_to_inf (λ n, f (a + 1 / rngl_mul_nat 1 n)%L) l.
+  → is_limit_when_tending_to_inf (λ n, f (a + 1 / rngl_of_nat n)%L) l.
 Proof.
 intros Hos Hor * Hlim.
 progress unfold is_limit_when_tending_to in Hlim.
@@ -1763,7 +1776,7 @@ exists (1 / η).
 assert
   (H :
     is_Cauchy_sequence
-      (λ n, (rngl_mul_nat 1 n * rl_exp (1 / rngl_mul_nat 1 n - 1)))%L). {
+      (λ n, (rngl_of_nat n * rl_exp (1 / rngl_of_nat n - 1)))%L). {
   intros ε Hε.
 ...
 exists 0.
@@ -2302,7 +2315,7 @@ Qed.
 *)
 
 Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
-  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
 Proof.
 intros * H1.
 apply eq_CReal_eq in H1; [ easy | clear H1 H ].
@@ -2513,7 +2526,7 @@ Proof. intros; now rewrite Rmult_assoc. Qed.
 
 Theorem Rcharacteristic_prop :
   let ror := reals_ring_like_op in
-  ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L.
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
 Proof.
 intros.
 cbn - [ rngl_mul_nat ].

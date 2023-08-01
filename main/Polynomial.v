@@ -2025,10 +2025,11 @@ Arguments rngl_opt_one T {ring_like_op}.
 Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op in
   rngl_has_1 (list T) = true →
-  ∀ n, rngl_mul_nat 1 n = if Nat.eq_dec n 0 then [] else [rngl_mul_nat 1 n].
+  ∀ n, rngl_of_nat n = if Nat.eq_dec n 0 then [] else [rngl_of_nat n].
 Proof.
 intros * Honl *; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+progress unfold rngl_of_nat.
 progress unfold rngl_mul_nat.
 progress unfold mul_nat; cbn.
 induction n; [ easy | clear Hnz; cbn ].
@@ -2683,10 +2684,11 @@ Qed.
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
   rngl_characteristic T = 0
-  → ∀ i, i ≠ 0 → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
+  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros rop Hch * Hiz; cbn.
 subst rop.
+progress unfold rngl_of_nat.
 progress unfold rngl_mul_nat.
 progress unfold mul_nat; cbn.
 induction i; [ easy | clear Hiz; cbn ].
@@ -2708,7 +2710,7 @@ Qed.
 Theorem lap_polyn_rngl_of_nat_2 :
   let rop := polyn_ring_like_op in
   ∀ i, 0 < i < rngl_characteristic T
-  → lap (rngl_mul_nat 1 i) = [rngl_mul_nat 1 i].
+  → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi; cbn.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -2724,6 +2726,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
 }
 clear Hchz.
 destruct Hch as (Hbef, Hch).
+progress unfold rngl_of_nat.
 progress unfold rngl_mul_nat.
 progress unfold mul_nat.
 induction i; [ easy | cbn ].
@@ -2790,9 +2793,10 @@ Qed.
 Theorem lap_polyn_rngl_of_nat :
   let lop := lap_ring_like_op in
   let rop := polyn_ring_like_op in
-  ∀ n, lap (rngl_mul_nat 1 n) = lap_norm (rngl_mul_nat 1 n).
+  ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
 Proof.
 intros; cbn.
+progress unfold rngl_of_nat.
 progress unfold rngl_mul_nat.
 progress unfold mul_nat; cbn.
 induction n; [ easy | ].
@@ -2850,10 +2854,10 @@ Qed.
 
 Theorem polyn_characteristic_prop : let rop := polyn_ring_like_op in
   if rngl_has_1 (polyn T) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
     else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
-       ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L)
+       ∧ rngl_of_nat (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
 intros rop; subst rop.

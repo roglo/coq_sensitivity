@@ -270,6 +270,8 @@ Definition mul_nat {T} (zero : T) (add : T → T → T) a n :=
 Definition rngl_mul_nat {T} {ro : ring_like_op T} :=
   mul_nat 0%L rngl_add.
 
+Definition rngl_of_nat {T} {ro : ring_like_op T} a := rngl_mul_nat 1%L a.
+
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_is_integral_domain : bool;
@@ -341,10 +343,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_characteristic_prop :
       if rngl_has_1 T then
         if Nat.eqb (rngl_characteristic) 0 then
-          ∀ i, rngl_mul_nat 1%L (S i) ≠ 0%L
+          ∀ i, rngl_of_nat (S i) ≠ 0%L
         else
-          (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat 1%L i ≠ 0%L) ∧
-          rngl_mul_nat 1%L rngl_characteristic = 0%L
+          (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
+          rngl_of_nat rngl_characteristic = 0%L
       else
         not_applicable;
     (* when ordered *)
@@ -2081,7 +2083,7 @@ Arguments rngl_mul_nat {T ro} a%L n%nat.
 Theorem rngl_mul_nat_mul_nat_1 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  ∀ a n, rngl_mul_nat a n = (a * rngl_mul_nat 1 n)%L.
+  ∀ a n, rngl_mul_nat a n = (a * rngl_of_nat n)%L.
 Proof.
 intros Hon Hos *.
 induction n; cbn. {
@@ -2095,7 +2097,7 @@ Qed.
 Theorem eq_rngl_of_nat_0 :
   rngl_has_1 T = true →
   rngl_characteristic T = 0 →
-  ∀ i, rngl_mul_nat 1 i = 0%L → i = 0.
+  ∀ i, rngl_of_nat i = 0%L → i = 0.
 Proof.
 intros Hon Hch * Hi.
 induction i; [ easy | exfalso ].
@@ -2110,7 +2112,7 @@ Theorem rngl_of_nat_inj :
   rngl_has_opp_or_subt T = true →
   rngl_characteristic T = 0 →
   ∀ i j,
-  rngl_mul_nat 1 i = rngl_mul_nat 1 j
+  rngl_of_nat i = rngl_of_nat j
   → i = j.
 Proof.
 intros Hon Hom Hch * Hij.
