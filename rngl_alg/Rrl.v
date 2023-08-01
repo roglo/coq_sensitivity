@@ -1291,6 +1291,15 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
+clear H1x.
+...
+specialize (H1 (rngl_abs x)⁻¹ 1)%L as H2.
+assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
+  split. {
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    now apply (rngl_0_lt_abs Hop Hor).
+  }
+}
 ...
 apply (rngl_nlt_ge Hor) in H1x.
 apply (rngl_lt_eq_cases Hor) in H1x.
