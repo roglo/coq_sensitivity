@@ -1354,22 +1354,19 @@ progress unfold rngl_mul_nat in Hxn |-*.
 progress unfold mul_nat in Hxn |-*.
 induction n; [ easy | ].
 cbn in Hxn |-*.
-remember (List.fold_right _ _ _) as y eqn:Hy.
-remember (1 + y ≤? x)%L as c eqn:Hc; symmetry in Hc.
+remember (List.fold_right _ _ _) as a eqn:Ha.
+remember (1 + a ≤? x)%L as c eqn:Hc; symmetry in Hc.
 destruct c. {
   apply rngl_leb_le in Hc.
   now apply (rngl_nlt_ge Hor) in Hc.
 }
 clear Hc.
-destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]; [ now apply IHn | ].
-apply (rngl_nlt_ge Hor) in Hxy.
-(* ouais, bof *)
-...
-destruct (rngl_eq_dec Hed x y) as [Hxy| Hxy]. 2: {
-  apply IHn.
+destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
+apply (rngl_nlt_ge Hor) in Hxa.
+clear IHn.
 ...
 x=0.5
-y=0
+a=0
 ...
   apply (rngl_nle_gt Hor).
   intros H; apply Hxy; clear Hxy.
