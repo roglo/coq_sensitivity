@@ -1339,11 +1339,11 @@ Fixpoint int_part_loop n a :=
 
 End a.
 
-Require Import GQ.
+Require Import Rational.
 Require Import Qrl.
-Import GQ_Notations.
+Import Q.Notations.
 Compute (
-    (17 // 5)%GQ).
+    (17 / 5)%Q).
 ...
 
 Compute (
