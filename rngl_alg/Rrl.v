@@ -686,18 +686,14 @@ Qed.
 Theorem gc_characteristic_prop :
   let roc := gc_ring_like_op T in
   if rngl_has_1 (GComplex T) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
     else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L)
-      ∧ rngl_of_nat (rngl_characteristic T) = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
+      ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
-progress unfold rngl_of_nat.
 cbn - [ rngl_mul_nat ].
 specialize (rngl_characteristic_prop) as H1.
-progress unfold rngl_of_nat in H1.
-progress unfold "1"%L in H1.
-progress unfold "1"%L.
 progress unfold rngl_has_1 in H1.
 progress unfold rngl_has_1; cbn - [ rngl_mul_nat ].
 progress unfold gc_opt_one.
@@ -708,7 +704,7 @@ assert
   (Hr :
     ∀ n,
     @rngl_mul_nat _ (gc_ring_like_op T) (mk_gc 1 0) n =
-    mk_gc (rngl_of_nat n) 0). {
+    mk_gc (rngl_mul_nat 1 n) 0). {
   intros.
   progress unfold rngl_mul_nat.
   progress unfold mul_nat; cbn.
@@ -721,19 +717,17 @@ unfold "1"%L in Hr.
 rewrite Hon in Hr.
 remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
-cbn.
   cbn - [ rngl_mul_nat ] in H1 |-*; intros.
   apply neq_gc_neq.
   cbn - [ rngl_mul_nat ].
   left.
   specialize (H1 i).
   intros H2; apply H1; clear H1.
-(**)
-  rewrite Hr in H2.
-  cbn - [ rngl_of_nat ] in H2.
-  progress unfold rngl_of_nat in H2.
-  cbn in H2 |-*.
-...
+  progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
+  progress unfold gc_opt_one in H2.
+  progress unfold rngl_of_nat.
+  progress unfold "1"%L.
+  rewrite Hon in H2 |-*; cbn - [ rngl_mul_nat ] in H2 |-*.
   now rewrite Hr in H2.
 } {
   cbn - [ rngl_mul_nat ] in H1 |-*.
@@ -756,6 +750,7 @@ cbn.
     cbn - [ rngl_mul_nat ].
     progress unfold "1"%L; cbn - [ rngl_mul_nat ].
     progress unfold gc_opt_one.
+    progress unfold rngl_of_nat in H2.
     progress unfold "1"%L in H2; cbn - [ rngl_mul_nat ] in H2.
     rewrite Hon in H2 |-*.
     now rewrite Hr.
@@ -1253,7 +1248,7 @@ Fixpoint int_part_loop n a :=
   | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
   end.
 
-(* to be completed *)
+(* to be completed
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1346,9 +1341,43 @@ rewrite (rngl_mul_1_l Hon) in Hm.
 exists (int_part_loop m (rngl_abs x)).
 split. {
 Theorem int_part_loop_le :
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
   ∀ x n,
-  (x < rngl_of_nat n)%L
+  (0 ≤ x)%L
+  → (x < rngl_of_nat n)%L
   → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
+Proof.
+intros Hed Hor * Hxz Hxn.
+progress unfold rngl_of_nat in Hxn |-*.
+progress unfold rngl_mul_nat in Hxn |-*.
+progress unfold mul_nat in Hxn |-*.
+induction n; [ easy | ].
+cbn in Hxn |-*.
+remember (List.fold_right _ _ _) as y eqn:Hy.
+remember (1 + y ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  now apply (rngl_nlt_ge Hor) in Hc.
+}
+clear Hc.
+destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]; [ now apply IHn | ].
+apply (rngl_nlt_ge Hor) in Hxy.
+(* ouais, bof *)
+...
+destruct (rngl_eq_dec Hed x y) as [Hxy| Hxy]. 2: {
+  apply IHn.
+...
+x=0.5
+y=0
+...
+  apply (rngl_nle_gt Hor).
+  intros H; apply Hxy; clear Hxy.
+  apply (rngl_le_antisymm Hor); [ | easy ].
+...
+Search (_ < _ )%L.
+  apply (rngl_lt_asymm Hor) in Hxn.
+  apply (rngl_lt_iff Hor) in Hxn.
 ...
 
 (*
@@ -2539,6 +2568,7 @@ assert (H : ∀ n, rngl_mul_nat R1 n = INR n). {
   rewrite IHn.
   apply Rplus_comm.
 }
+progress unfold rngl_of_nat.
 rewrite H.
 now apply not_0_INR.
 Qed.
