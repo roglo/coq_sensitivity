@@ -1298,6 +1298,14 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 clear H1x.
+assert (Hax : rngl_abs x ≠ 0%L) . {
+  unfold rngl_abs.
+  destruct (x ≤? 0)%L; [ | easy ].
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H.
+  now rewrite (rngl_opp_0 Hop) in H.
+}
 specialize (H1 (rngl_abs x)⁻¹ 1)%L as H2.
 assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
   split. {
@@ -1308,31 +1316,41 @@ assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
     apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
     apply (rngl_0_le_1 Hon Hop Hor).
   }
-  rewrite (rngl_mul_inv_l Hon Hiv). 2: {
-    (*lemma?*)
-    unfold rngl_abs.
-    destruct (x ≤? 0)%L; [ | easy ].
-    intros H.
-    apply (f_equal rngl_opp) in H.
-    rewrite (rngl_opp_involutive Hop) in H.
-    now rewrite (rngl_opp_0 Hop) in H.
-  }
+  rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
   now rewrite rngl_mul_1_l.
 }
 specialize (H2 H); clear H.
 destruct H2 as (m, Hm).
-... ...
 rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in Hm.
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := rngl_abs x) in Hm. 2: {
+  apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+rewrite (rngl_mul_1_r Hon), rngl_mul_assoc in Hm.
+rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
+rewrite (rngl_mul_1_l Hon) in Hm.
+Abort.
+
+Fixpoint int_part_loop n a :=
+  match n with
+  | 0%nat => 0%nat
+  | S n' => if (a ≤? rngl_mul_nat 1 n)%L then int_part_loop n' a else n
+  end.
+
+End a.
+
+Require Import GQ.
+Require Import Qrl.
+Import GQ_Notations.
+Compute (
+    (17 // 5)%GQ).
 ...
-rngl_mul_lt_mono_pos_r:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_opp T = true
-    → rngl_is_ordered T = true
-      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
-        → ∀ a b c : T, (0 < a)%L → (b < c)%L ↔ (b * a < c * a)%L
-...
-Search (rngl_mul_nat _⁻¹ _)%L.
-Search (_ < rngl_mul_nat _ _)%L.
+
+Compute (
+  let ro := Q_ring_like_op in
+  let rp := Q_ring_like_prop in
+  int_part_loop 3 (17 / 5)%GQ).
+
 ...
 apply (rngl_nlt_ge Hor) in H1x.
 apply (rngl_lt_eq_cases Hor) in H1x.
