@@ -1254,6 +1254,12 @@ intros Hon Hop Hiv Hed Hc1 Hor Har *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (Hii :
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now left.
+}
 specialize rngl_opt_archimedean as H1.
 rewrite Har, Hor in H1; cbn in H1.
 destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
@@ -1292,14 +1298,31 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 clear H1x.
-...
 specialize (H1 (rngl_abs x)⁻¹ 1)%L as H2.
 assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
   split. {
     apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
     now apply (rngl_0_lt_abs Hop Hor).
   }
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := rngl_abs x). {
+    apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  rewrite (rngl_mul_inv_l Hon Hiv). 2: {
+    (*lemma?*)
+    unfold rngl_abs.
+    destruct (x ≤? 0)%L; [ | easy ].
+    intros H.
+    apply (f_equal rngl_opp) in H.
+    rewrite (rngl_opp_involutive Hop) in H.
+    now rewrite (rngl_opp_0 Hop) in H.
+  }
+  now rewrite rngl_mul_1_l.
 }
+specialize (H2 H); clear H.
+destruct H2 as (n, Hn).
+Search (rngl_mul_nat _⁻¹ _)%L.
+Search (_ < rngl_mul_nat _ _)%L.
 ...
 apply (rngl_nlt_ge Hor) in H1x.
 apply (rngl_lt_eq_cases Hor) in H1x.
