@@ -2078,6 +2078,20 @@ Qed.
 
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
+Theorem rngl_mul_nat_mul_nat_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a n, rngl_mul_nat a n = (a * rngl_mul_nat 1 n)%L.
+Proof.
+intros Hon Hos *.
+induction n; cbn. {
+  symmetry; apply (rngl_mul_0_r Hos).
+}
+rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+f_equal.
+apply IHn.
+Qed.
+
 Theorem eq_rngl_of_nat_0 :
   rngl_has_1 T = true →
   rngl_characteristic T = 0 →

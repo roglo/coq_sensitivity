@@ -1240,12 +1240,6 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
   end.
 
 (* to be completed
-Theorem rngl_mul_nat_mul_nat_1 :
-  ∀ a n, rngl_mul_nat a n = (a * rngl_mul_nat 1 n)%L.
-Proof.
-intros.
-...
-
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1327,11 +1321,9 @@ assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
 }
 specialize (H2 H); clear H.
 destruct H2 as (m, Hm).
-rewrite rngl_mul_nat_mul_nat_1 in Hm.
 ... ...
-rewrite rngl_mul_nat_inv_l in Hn.
-Search (_ < _⁻¹)%L.
-Search (_ < _ * _)%L.
+rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in Hm.
+...
 rngl_mul_lt_mono_pos_r:
   ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
     rngl_has_opp T = true
