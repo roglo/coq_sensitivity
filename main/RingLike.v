@@ -23,8 +23,8 @@
    There are many other properties that are implemented here or could be
    implemented :
      - archimedean or not
-     - with calculable equality or not
-     - commutative or not
+     - with decidable equality or not
+     - with commutative multiplication or not
      - with some characteristic
      - finite or infinite
      - ordered or not
