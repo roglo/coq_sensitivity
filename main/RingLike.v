@@ -44,7 +44,7 @@
      and so on. *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8.
+Require Import Utf8 Arith.
 
 Definition bool_of_option {T} (x : option T) :=
   match x with
@@ -187,8 +187,6 @@ Proof.
 intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
-
-Require Import Arith.
 
 Definition rngl_has_eq_dec T {R : ring_like_op T} :=
   bool_of_option rngl_opt_eq_dec.
