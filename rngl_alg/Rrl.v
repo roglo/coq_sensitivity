@@ -1287,26 +1287,35 @@ Qed.
 
 (* to be completed
 Theorem lt_int_part_loop_add_1 :
+  rngl_has_opp_or_subt T = true →
   rngl_is_ordered T = true →
   ∀ x n,
   (0 ≤ x)%L
   → (x < rngl_of_nat n)%L
   → (x < rngl_of_nat (int_part_loop n x) + 1)%L.
 Proof.
-intros Hor * Hxz Hxn.
+intros Hos Hor * Hxz Hxn.
 induction n; [ now apply (rngl_nle_gt Hor) in Hxn | ].
-(*
+cbn - [ rngl_of_nat ].
+remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  exfalso.
+  apply rngl_leb_le in Hc.
+  now apply (rngl_nlt_ge Hor) in Hc.
+}
+clear Hc.
 rewrite <- Nat.add_1_r in Hxn.
 rewrite rngl_of_nat_add_r in Hxn.
 cbn in Hxn.
 rewrite rngl_add_0_r in Hxn.
-*)
-cbn - [ rngl_of_nat ].
-remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  eapply (rngl_lt_trans Hor); [ apply Hxn | ].
 ...
-  apply rngl_lt_add_r.
+apply IHn.
+...
+  eapply (rngl_lt_trans Hor); [ apply Hxn | ].
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+Sea
 ...
 remember (
 Theorem int_part_loop_add_succ :

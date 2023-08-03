@@ -2618,6 +2618,22 @@ rewrite rngl_add_comm.
 now apply (rngl_le_add_l Hor).
 Qed.
 
+Theorem rngl_lt_add_r :
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < b)%L → (a < a + b)%L.
+Proof.
+intros Hos Hor * Hbz.
+apply (rngl_lt_iff Hor).
+split; [ now apply (rngl_le_add_r Hor), (rngl_lt_le_incl Hor) | ].
+intros H.
+symmetry in H.
+apply (rngl_add_sub_eq_l Hos) in H.
+rewrite (rngl_sub_diag Hos) in H; subst b.
+revert Hbz.
+apply (rngl_lt_irrefl Hor).
+Qed.
+
 (* abs *)
 
 Theorem rngl_abs_0 :
