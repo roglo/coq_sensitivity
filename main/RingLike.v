@@ -2592,14 +2592,23 @@ apply (rngl_le_lt_trans Hor _ b); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Theorem rngl_le_add_l :
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a → b ≤ a + b)%L.
+Proof.
+intros Hor * Hbz.
+remember (a + b)%L as c.
+rewrite <- (rngl_add_0_l b); subst c.
+apply (rngl_add_le_compat Hor); [ easy | apply (rngl_le_refl Hor) ].
+Qed.
+
 Theorem rngl_le_add_r :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ b → a ≤ a + b)%L.
 Proof.
 intros Hor * Hbz.
-remember (a + b)%L as c.
-rewrite <- (rngl_add_0_r a); subst c.
-apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
+rewrite rngl_add_comm.
+now apply (rngl_le_add_l Hor).
 Qed.
 
 (* abs *)

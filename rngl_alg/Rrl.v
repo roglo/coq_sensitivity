@@ -1248,6 +1248,46 @@ Fixpoint int_part_loop n a :=
   | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
   end.
 
+Theorem int_part_loop_le :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  ∀ x n,
+  (0 ≤ x)%L
+  → (x < rngl_of_nat n)%L
+  → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
+Proof.
+intros Hon Hop Hed Hor * Hxz Hxn.
+progress unfold rngl_of_nat in Hxn |-*.
+progress unfold rngl_mul_nat in Hxn |-*.
+progress unfold mul_nat in Hxn |-*.
+induction n; [ easy | ].
+cbn in Hxn |-*.
+remember (List.fold_right _ _ _) as a eqn:Ha.
+remember (1 + a ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  now apply (rngl_nlt_ge Hor) in Hc.
+}
+clear Hc.
+destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
+apply (rngl_nlt_ge Hor) in Hxa.
+clear IHn.
+apply (rngl_le_trans Hor _ a); [ | easy ].
+rewrite Ha.
+clear Ha.
+induction n; [ apply (rngl_le_refl Hor) | ].
+cbn.
+remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. 2: {
+  eapply (rngl_le_trans Hor); [ apply IHn | ].
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+apply (rngl_le_refl Hor).
+Qed.
+
 (* to be completed
 Theorem int_part :
   rngl_has_1 T = true →
@@ -1340,33 +1380,10 @@ rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
 rewrite (rngl_mul_1_l Hon) in Hm.
 exists (int_part_loop m (rngl_abs x)).
 split. {
-Theorem int_part_loop_le :
-  rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
-  ∀ x n,
-  (0 ≤ x)%L
-  → (x < rngl_of_nat n)%L
-  → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
-Proof.
-intros Hed Hor * Hxz Hxn.
-progress unfold rngl_of_nat in Hxn |-*.
-progress unfold rngl_mul_nat in Hxn |-*.
-progress unfold mul_nat in Hxn |-*.
-induction n; [ easy | ].
-cbn in Hxn |-*.
-remember (List.fold_right _ _ _) as a eqn:Ha.
-remember (1 + a ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  now apply (rngl_nlt_ge Hor) in Hc.
+  apply (int_part_loop_le Hon Hop Hed Hor); [ | easy ].
+  apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
+  apply (rngl_0_le_1 Hon Hop Hor).
 }
-clear Hc.
-destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
-apply (rngl_nlt_ge Hor) in Hxa.
-clear IHn.
-...
-  ============================
-  (List.fold_right rngl_add 0 (List.repeat 1 (int_part_loop n x)) ≤ x)%L
 ...
   apply (rngl_nle_gt Hor).
   intros H; apply Hxy; clear Hxy.
