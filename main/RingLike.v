@@ -2140,6 +2140,13 @@ rewrite <- rngl_add_assoc; f_equal.
 apply IHm.
 Qed.
 
+Theorem rngl_of_nat_add_r : ∀ m n,
+  rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
+Proof.
+intros.
+apply rngl_mul_nat_add_r.
+Qed.
+
 Theorem rngl_opp_inv :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

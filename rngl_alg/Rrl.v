@@ -1251,14 +1251,13 @@ Fixpoint int_part_loop n a :=
 Theorem int_part_loop_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   ∀ x n,
   (0 ≤ x)%L
   → (x < rngl_of_nat n)%L
   → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
 Proof.
-intros Hon Hop Hed Hor * Hxz Hxn.
+intros Hon Hop Hor * Hxz Hxn.
 progress unfold rngl_of_nat in Hxn |-*.
 progress unfold rngl_mul_nat in Hxn |-*.
 progress unfold mul_nat in Hxn |-*.
@@ -1275,10 +1274,8 @@ destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
 apply (rngl_nlt_ge Hor) in Hxa.
 clear IHn.
 apply (rngl_le_trans Hor _ a); [ | easy ].
-rewrite Ha.
-clear Ha.
-induction n; [ apply (rngl_le_refl Hor) | ].
-cbn.
+rewrite Ha; clear Ha.
+induction n; [ apply (rngl_le_refl Hor) | cbn ].
 remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
 destruct c. 2: {
   eapply (rngl_le_trans Hor); [ apply IHn | ].
@@ -1289,6 +1286,47 @@ apply (rngl_le_refl Hor).
 Qed.
 
 (* to be completed
+Theorem lt_int_part_loop_add_1 :
+  rngl_is_ordered T = true →
+  ∀ x n,
+  (0 ≤ x)%L
+  → (x < rngl_of_nat n)%L
+  → (x < rngl_of_nat (int_part_loop n x) + 1)%L.
+Proof.
+intros Hor * Hxz Hxn.
+induction n; [ now apply (rngl_nle_gt Hor) in Hxn | ].
+(*
+rewrite <- Nat.add_1_r in Hxn.
+rewrite rngl_of_nat_add_r in Hxn.
+cbn in Hxn.
+rewrite rngl_add_0_r in Hxn.
+*)
+cbn - [ rngl_of_nat ].
+remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  eapply (rngl_lt_trans Hor); [ apply Hxn | ].
+...
+  apply rngl_lt_add_r.
+...
+remember (
+Theorem int_part_loop_add_succ :
+  ∀ n x, int_part_loop (S n) x = int_part_loop n x.
+Proof.
+intros.
+Print int_part_loop.
+  x < rngl_of_nat n.
+cbn.
+remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ | easy ].
+Search ((_ ≤? _) = true)%L.
+apply rngl_leb_le in Hc.
+
+apply (rngl_le_refl Hor).
+
+... ...
+cbn.
+...
+
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1380,10 +1418,14 @@ rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
 rewrite (rngl_mul_1_l Hon) in Hm.
 exists (int_part_loop m (rngl_abs x)).
 split. {
-  apply (int_part_loop_le Hon Hop Hed Hor); [ | easy ].
+  apply (int_part_loop_le Hon Hop Hor); [ | easy ].
   apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
   apply (rngl_0_le_1 Hon Hop Hor).
 }
+rewrite rngl_of_nat_add_r.
+cbn; rewrite rngl_add_0_r.
+... ...
+apply lt_int_part_loop_add_1.
 ...
   apply (rngl_nle_gt Hor).
   intros H; apply Hxy; clear Hxy.
