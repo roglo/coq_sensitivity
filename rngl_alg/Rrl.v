@@ -1287,15 +1287,17 @@ Qed.
 
 (* to be completed
 Theorem lt_int_part_loop_add_1 :
-  rngl_has_opp_or_subt T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x n,
   (0 ≤ x)%L
   → (x < rngl_of_nat n)%L
   → (x < rngl_of_nat (int_part_loop n x) + 1)%L.
 Proof.
-intros Hos Hor * Hxz Hxn.
-induction n; [ now apply (rngl_nle_gt Hor) in Hxn | ].
+intros Hon Hop Hor * Hxz Hxn.
+revert x Hxz Hxn.
+induction n; intros; [ now apply (rngl_nle_gt Hor) in Hxn | ].
 cbn - [ rngl_of_nat ].
 remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
 destruct c. {
@@ -1308,6 +1310,36 @@ rewrite <- Nat.add_1_r in Hxn.
 rewrite rngl_of_nat_add_r in Hxn.
 cbn in Hxn.
 rewrite rngl_add_0_r in Hxn.
+destruct (rngl_lt_dec Hor x 1) as [Hx1| Hx1]. {
+  apply (rngl_lt_le_trans Hor _ 1%L); [ easy | ].
+  apply (rngl_le_add_l Hor).
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+apply (rngl_nlt_ge Hor) in Hx1.
+specialize (IHn (x - 1)%L) as H1.
+assert (H : (0 ≤ x - 1)%L) by now apply (rngl_le_0_sub Hop Hor).
+specialize (H1 H); clear H.
+assert (H : (x - 1 < rngl_of_nat n)%L). {
+...
+specialize (H1 H); clear H.
+(* prouver que
+    int_part_loop n (x - 1) = int_part_loop n x - 1
+ *)
+Theorem int_part_loop_sub_1 :
+  ∀ n x,
+  int_part_loop n (x - 1)%L = int_part_loop n x - 1.
+_Admitted.
+rewrite int_part_loop_sub_1 in H1.
+Search (rngl_of_nat (_ - _)).
+Theorem rngl_of_nat_sub_r :
+  ∀ a b, rngl_of_nat (a - b) = (rngl_of_nat a - rngl_of_nat b)%L.
+_Admitted.
+rewrite rngl_of_nat_sub_r in H1.
+cbn in H1.
+rewrite rngl_add_0_r in H1.
+rewrite rngl_sub_add in H1; [ | _admit ].
+(* ouais *)
+...
 Print int_part_loop.
 Theorem int_part_loop_enough_iter :
   rngl_is_ordered T = true →
@@ -1344,9 +1376,6 @@ destruct c. {
 clear Hc.
 move Hxn before Hxm; cbn in Hxn.
 rewrite fold_rngl_of_nat in Hxm, Hxn.
-(* prouver que
-    int_part_loop n (x - 1) = int_part_loop n x - 1
- *)
 ...
 apply IHm.
 ...

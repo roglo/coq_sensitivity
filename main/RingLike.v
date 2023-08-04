@@ -2151,6 +2151,20 @@ Theorem fold_rngl_of_nat :
   ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
 Proof. easy. Qed.
 
+Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
+Proof. apply rngl_add_0_r. Qed.
+
+Theorem rngl_of_nat_succ :
+  ∀ n, rngl_of_nat (S n) = (rngl_of_nat n + 1)%L.
+Proof.
+intros.
+rewrite <- Nat.add_1_r.
+rewrite rngl_of_nat_add_r.
+now rewrite rngl_of_nat_1.
+Qed.
+
+(* *)
+
 Theorem rngl_opp_inv :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2636,6 +2650,20 @@ apply (rngl_add_sub_eq_l Hos) in H.
 rewrite (rngl_sub_diag Hos) in H; subst b.
 revert Hbz.
 apply (rngl_lt_irrefl Hor).
+Qed.
+
+Theorem rngl_of_nat_nonneg :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ n, (0 ≤ rngl_of_nat n)%L.
+Proof.
+intros Hon Hop Hor *.
+induction n; [ apply (rngl_le_refl Hor) | ].
+rewrite rngl_of_nat_succ.
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+apply (rngl_le_add_r Hor).
+apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
 (* abs *)
