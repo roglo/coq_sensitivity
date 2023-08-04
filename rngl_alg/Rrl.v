@@ -1326,14 +1326,35 @@ assert (H : (x - 1 < rngl_of_nat n)%L). {
   now rewrite (rngl_sub_add Hop).
 }
 specialize (H1 H); clear H.
-...
-(* prouver que
-    int_part_loop n (x - 1) = int_part_loop n x - 1
- *)
 Theorem int_part_loop_sub_1 :
+  rngl_is_ordered T = true →
   ∀ n x,
-  int_part_loop n (x - 1)%L = int_part_loop n x - 1.
-_Admitted.
+  (1 ≤ x)%L
+  → (x - 1 < rngl_of_nat n)%L
+  → int_part_loop n (x - 1)%L = int_part_loop n x - 1.
+Proof.
+intros Hor * H1x Hxn.
+revert x H1x Hxn.
+induction n; intros; [ easy | cbn ].
+rewrite rngl_of_nat_succ in Hxn.
+rewrite fold_rngl_of_nat.
+remember (_ ≤? x - 1)%L as c1 eqn:Hc1; symmetry in Hc1.
+rewrite rngl_add_comm in Hc1.
+remember (_ ≤? x)%L as c2 eqn:Hc2; symmetry in Hc2.
+rewrite rngl_add_comm in Hc2.
+move c2 before c1.
+destruct c1. {
+  apply rngl_leb_le in Hc1.
+  now apply (rngl_nlt_ge Hor) in Hc1.
+}
+clear Hc1.
+destruct c2. {
+  apply rngl_leb_le in Hc2.
+...
+  rewrite fold_rngl_of_nat in Hc1.
+  destruct c2. {
+    apply rngl_leb_le in Hc2.
+... ...
 rewrite int_part_loop_sub_1 in H1.
 Search (rngl_of_nat (_ - _)).
 Theorem rngl_of_nat_sub_r :
