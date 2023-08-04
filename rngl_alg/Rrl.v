@@ -1246,10 +1246,11 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
 
 Fixpoint int_part_loop n a :=
   match n with
-  | 0%nat => 0%nat
+  | 0%nat => 42%nat (* should not happen *)
   | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
   end.
 
+(* to be completed
 Theorem int_part_loop_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1260,23 +1261,36 @@ Theorem int_part_loop_le :
   → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
 Proof.
 intros Hon Hop Hor * Hxz Hxn.
+(*
 progress unfold rngl_of_nat in Hxn |-*.
 progress unfold rngl_mul_nat in Hxn |-*.
 progress unfold mul_nat in Hxn |-*.
-induction n; [ easy | ].
+*)
+induction n. {
+  cbn in Hxn.
+  now apply (rngl_nle_gt Hor) in Hxn.
+}
 cbn in Hxn |-*.
-remember (List.fold_right _ _ _) as a eqn:Ha.
-remember (1 + a ≤? x)%L as c eqn:Hc; symmetry in Hc.
+rewrite fold_rngl_of_nat in Hxn.
+do 2 rewrite fold_rngl_of_nat.
+remember (1 + rngl_of_nat n ≤? x)%L as c eqn:Hc; symmetry in Hc.
 destruct c. {
   apply rngl_leb_le in Hc.
   now apply (rngl_nlt_ge Hor) in Hc.
 }
 clear Hc.
-destruct (rngl_lt_dec Hor x a) as [Hxa| Hxa]; [ now apply IHn | ].
+destruct (rngl_lt_dec Hor x (rngl_of_nat n)) as [Hxa| Hxa]. {
+  now apply IHn.
+}
 apply (rngl_nlt_ge Hor) in Hxa.
+(*
 clear IHn.
-apply (rngl_le_trans Hor _ a); [ | easy ].
-rewrite Ha; clear Ha.
+*)
+apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
+(**)
+induction n. {
+  cbn in Hxn.
+...
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
 remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
 destruct c. 2: {
@@ -1287,7 +1301,6 @@ destruct c. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-(* to be completed
 Theorem lt_int_part_loop_add_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
