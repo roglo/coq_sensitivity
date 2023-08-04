@@ -1362,37 +1362,7 @@ destruct c1. {
 clear Hc1.
 destruct c2. {
   apply rngl_leb_le in Hc2.
-... ...
-}
-apply (rngl_leb_gt Hor) in Hc2.
-now apply IHn.
-...
-  rewrite IHn; [ | easy | ]. 2: {
-...
-  rewrite fold_rngl_of_nat in Hc1.
-  destruct c2. {
-    apply rngl_leb_le in Hc2.
-... ...
-... ...
-rewrite (int_part_loop_sub_1 Hor); [ | easy | easy ].
-Search (rngl_of_nat (_ - _)%nat).
-rewrite (rngl_of_nat_sub_r Hos).
-rewrite rngl_of_nat_1.
-rewrite (rngl_sub_add Hop).
-apply (rngl_le_refl Hor).
-... ...
-rewrite int_part_loop_sub_1 in H1.
-Search (rngl_of_nat (_ - _)).
-Theorem rngl_of_nat_sub_r :
-  ∀ a b, rngl_of_nat (a - b) = (rngl_of_nat a - rngl_of_nat b)%L.
-_Admitted.
-rewrite rngl_of_nat_sub_r in H1.
-cbn in H1.
-rewrite rngl_add_0_r in H1.
-rewrite rngl_sub_add in H1; [ | _admit ].
-(* ouais *)
-...
-Print int_part_loop.
+  rewrite Nat_sub_succ_1.
 Theorem int_part_loop_enough_iter :
   rngl_is_ordered T = true →
   ∀ x m n,
@@ -1429,6 +1399,47 @@ clear Hc.
 move Hxn before Hxm; cbn in Hxn.
 rewrite fold_rngl_of_nat in Hxm, Hxn.
 ...
+assert (H : int_part_loop (S n) (x - 1)%L = n). {
+  cbn.
+  rewrite fold_rngl_of_nat.
+...
+}
+  cbn in H.
+  rewrite fold_rngl_of_nat in H.
+...
+  apply rngl_leb_gt in Hxn.
+  rewrite rngl_add_comm in Hc2.
+... ...
+}
+apply (rngl_leb_gt Hor) in Hc2.
+now apply IHn.
+...
+  rewrite IHn; [ | easy | ]. 2: {
+...
+  rewrite fold_rngl_of_nat in Hc1.
+  destruct c2. {
+    apply rngl_leb_le in Hc2.
+... ...
+... ...
+rewrite (int_part_loop_sub_1 Hor); [ | easy | easy ].
+Search (rngl_of_nat (_ - _)%nat).
+rewrite (rngl_of_nat_sub_r Hos).
+rewrite rngl_of_nat_1.
+rewrite (rngl_sub_add Hop).
+apply (rngl_le_refl Hor).
+... ...
+rewrite int_part_loop_sub_1 in H1.
+Search (rngl_of_nat (_ - _)).
+Theorem rngl_of_nat_sub_r :
+  ∀ a b, rngl_of_nat (a - b) = (rngl_of_nat a - rngl_of_nat b)%L.
+_Admitted.
+rewrite rngl_of_nat_sub_r in H1.
+cbn in H1.
+rewrite rngl_add_0_r in H1.
+rewrite rngl_sub_add in H1; [ | _admit ].
+(* ouais *)
+...
+Print int_part_loop.
 apply IHm.
 ...
 apply IHm; [ | easy ].
