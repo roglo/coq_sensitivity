@@ -2147,6 +2147,22 @@ intros.
 apply rngl_mul_nat_add_r.
 Qed.
 
+Theorem rngl_of_nat_sub_r :
+  rngl_has_opp_or_subt T = true →
+  ∀ m n : nat, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
+Proof.
+intros Hos * Hnm.
+replace m with (n + (m - n)) at 2. 2: {
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm.
+  apply Nat.add_sub.
+}
+rewrite rngl_of_nat_add_r.
+symmetry.
+rewrite rngl_add_comm.
+apply (rngl_add_sub Hos).
+Qed.
+
 Theorem fold_rngl_of_nat :
   ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
 Proof. easy. Qed.

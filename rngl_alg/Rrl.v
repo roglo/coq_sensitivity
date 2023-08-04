@@ -1298,6 +1298,9 @@ Theorem lt_int_part_loop_add_1 :
   → (x < rngl_of_nat (int_part_loop n x) + 1)%L.
 Proof.
 intros Hon Hop Hor * Hxz Hxn.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 revert x Hxz Hxn.
 induction n; intros; [ now apply (rngl_nle_gt Hor) in Hxn | ].
 cbn - [ rngl_of_nat ].
@@ -1326,14 +1329,20 @@ assert (H : (x - 1 < rngl_of_nat n)%L). {
   now rewrite (rngl_sub_add Hop).
 }
 specialize (H1 H); clear H.
+apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L) in H1.
+rewrite (rngl_sub_add Hop) in H1.
+eapply (rngl_lt_le_trans Hor); [ apply H1 | ].
+apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
+clear IHn Hxz H1.
 Theorem int_part_loop_sub_1 :
+  rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ n x,
   (1 ≤ x)%L
-  → (x - 1 < rngl_of_nat n)%L
+  → (x < rngl_of_nat n + 1)%L
   → int_part_loop n (x - 1)%L = int_part_loop n x - 1.
 Proof.
-intros Hor * H1x Hxn.
+intros Hop Hor * H1x Hxn.
 revert x H1x Hxn.
 induction n; intros; [ easy | cbn ].
 rewrite rngl_of_nat_succ in Hxn.
@@ -1345,15 +1354,32 @@ rewrite rngl_add_comm in Hc2.
 move c2 before c1.
 destruct c1. {
   apply rngl_leb_le in Hc1.
-  now apply (rngl_nlt_ge Hor) in Hc1.
+  apply (rngl_nlt_ge Hor) in Hc1.
+  exfalso; apply Hc1; clear Hc1.
+  apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L).
+  now rewrite (rngl_sub_add Hop).
 }
 clear Hc1.
 destruct c2. {
   apply rngl_leb_le in Hc2.
+... ...
+}
+apply (rngl_leb_gt Hor) in Hc2.
+now apply IHn.
+...
+  rewrite IHn; [ | easy | ]. 2: {
 ...
   rewrite fold_rngl_of_nat in Hc1.
   destruct c2. {
     apply rngl_leb_le in Hc2.
+... ...
+... ...
+rewrite (int_part_loop_sub_1 Hor); [ | easy | easy ].
+Search (rngl_of_nat (_ - _)%nat).
+rewrite (rngl_of_nat_sub_r Hos).
+rewrite rngl_of_nat_1.
+rewrite (rngl_sub_add Hop).
+apply (rngl_le_refl Hor).
 ... ...
 rewrite int_part_loop_sub_1 in H1.
 Search (rngl_of_nat (_ - _)).
