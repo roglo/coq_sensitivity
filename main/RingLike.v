@@ -2163,6 +2163,38 @@ rewrite rngl_of_nat_add_r.
 now rewrite rngl_of_nat_1.
 Qed.
 
+Theorem rngl_add_lt_mono_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T,
+  (a < b ↔ c + a < c + b)%L.
+Proof.
+intros Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+split; intros Hab. {
+  apply (rngl_lt_0_sub Hop Hor).
+  rewrite (rngl_add_sub_simpl_l Hos).
+  now apply (rngl_lt_0_sub Hop Hor).
+} {
+  apply (rngl_lt_0_sub Hop Hor) in Hab.
+  rewrite (rngl_add_sub_simpl_l Hos) in Hab.
+  now apply (rngl_lt_0_sub Hop Hor).
+}
+Qed.
+
+Theorem rngl_add_lt_mono_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T,
+  (a < b ↔ a + c < b + c)%L.
+Proof.
+intros Hop Hor *.
+do 2 rewrite (rngl_add_comm _ c).
+now apply (rngl_add_lt_mono_l Hop Hor).
+Qed.
+
 (* *)
 
 Theorem rngl_opp_inv :

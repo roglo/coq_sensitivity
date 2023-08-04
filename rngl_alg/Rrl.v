@@ -1322,98 +1322,11 @@ specialize (IHn (x - 1)%L) as H1.
 assert (H : (0 ≤ x - 1)%L) by now apply (rngl_le_0_sub Hop Hor).
 specialize (H1 H); clear H.
 assert (H : (x - 1 < rngl_of_nat n)%L). {
-  Search (_ + _ < _ + _)%L.
-  Search (_ + _ ≤ _ + _)%L.
-  Search (_ + _ ≤ _ + _)%Z.
-  Search (_ + _ < _ + _)%Z.
-Theorem rngl_add_lt_mono_l :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a b c : T,
-  (a < b ↔ c + a < c + b)%L.
-Proof.
-intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+  apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L).
+  now rewrite (rngl_sub_add Hop).
 }
-split; intros Hab. {
-  apply (rngl_lt_0_sub Hop Hor).
-  rewrite (rngl_add_sub_simpl_l Hos).
-  now apply (rngl_lt_0_sub Hop Hor).
-} {
-...
-  rewrite rngl_sub_add_swap.
-...
-Theorem rngl_add_lt_le_compat :
-  rngl_is_ordered T = true →
-  ∀ a b c d : T,
-  (a < b → c ≤ d → a + c < b + d)%L.
-Proof.
-intros Hor * Hab Hcd.
-apply (rngl_lt_le_trans Hor _ (a + d))%L. {
-Check Z.add_lt_mono_l.
-...
-Check rngl_add_lt_mono_l.
-...
-Check rngl_add_le_compat.
-...
-Search (_ - _ < _)%L.
-Search (_ < _ + _)%L.
-Search (_ ≤ _ + _)%L.
-...
-Print Z.add_lt_mono_l.
-               (Z.succ_lt_mono (p0 + n) (p0 + m))
-...
-Theorem rngl_add_lt_mono_r :
-  rngl_is_ordered T = true →
-  ∀ a b c : T, (a < b)%L ↔ (a + c < b + c)%L.
-Proof.
-intros Hor *.
-Print Z.add_lt_mono_r.
-...
-split; intros Hab. {
-  Search (_ + _ < _ + _)%L.
-  Search (_ + _ < _ + _)%Z.
-Theorem rngl_add_lt_le_mono :
-  rngl_is_ordered T = true →
-  ∀ a b c d : T,
-  (a < b → c ≤ d → a + c < b + d)%L.
-Proof.
-intros Hor * Hab Hcd.
-apply (rngl_lt_le_trans Hor _ (a + d))%L. {
-Check Z.add_lt_mono_l.
-Check rngl_add_lt_mono_l.
-...
-apply (rngl_le_lt_trans Hor _ (a + d))%L. {
-  apply (rngl_add_le_compat Hor); [ | easy ].
-  apply (rngl_le_refl Hor).
-}
-Search (_ + _ < _ + _)%L.
-Search (_ + _ < _ + _)%Z.
-Print Z.add_lt_le_mono.
-  Z.lt_le_trans (n + p) (m + p) (m + q)
-         match Z.add_lt_mono_r n0 m0 p0 with
-         match Z.add_le_mono_l n0 m0 p0 with
-Check Z.add_le_mono_r.
-... ...
-apply rngl_add_lt_le_mono; [ easy | ].
-apply (rngl_le_refl Hor).
-....
-Z.add_lt_le_mono: ∀ n m p q : Z, (n < m)%Z → (p <= q)%Z → (n + p < m + q)%Z
-Z.add_le_lt_mono: ∀ n m p q : Z, (n <= m)%Z → (p < q)%Z → (n + p < m + q)%Z
-Z.le_lt_add_lt: ∀ n m p q : Z, (n <= m)%Z → (p + m < q + n)%Z → (p < q)%Z
-...
-apply (rngl_add_lt_mono_r _ _ 1)%L.
-now rewrite (rngl_sub_add Hop).
-...
-Theorem rngl_add_lt_compat :
-  ∀ a b c d : T, (a ≤ b)%L → (c ≤ d)%L → (a + c < b + d)%L
-...
-Search (_ - _ < _)%L.
-Search (_ - _ ≤ _)%L.
-Search (_ - _ < _)%Z.
-...
 specialize (H1 H); clear H.
+...
 (* prouver que
     int_part_loop n (x - 1) = int_part_loop n x - 1
  *)
