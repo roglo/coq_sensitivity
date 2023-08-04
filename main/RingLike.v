@@ -2147,6 +2147,10 @@ intros.
 apply rngl_mul_nat_add_r.
 Qed.
 
+Theorem fold_rngl_of_nat :
+  ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
+Proof. easy. Qed.
+
 Theorem rngl_opp_inv :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

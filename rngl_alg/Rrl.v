@@ -1308,6 +1308,49 @@ rewrite <- Nat.add_1_r in Hxn.
 rewrite rngl_of_nat_add_r in Hxn.
 cbn in Hxn.
 rewrite rngl_add_0_r in Hxn.
+Print int_part_loop.
+Theorem int_part_loop_enough_iter :
+  rngl_is_ordered T = true →
+  ∀ x m n,
+  (0 ≤ x)%L
+  → (x < rngl_of_nat m)%L
+  → (x < rngl_of_nat n)%L
+  → int_part_loop m x = int_part_loop n x.
+Proof.
+intros Hor * Hxz Hxm Hxn.
+revert x n Hxz Hxm Hxn.
+induction m; intros. {
+  cbn in Hxm.
+  now apply (rngl_nle_gt Hor) in Hxm.
+}
+move n before m.
+cbn in Hxm |-*.
+remember (1 + _ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  now apply (rngl_nlt_ge Hor) in Hc.
+}
+clear Hc.
+destruct n. {
+  cbn in Hxn.
+  now apply (rngl_nle_gt Hor) in Hxn.
+}
+cbn.
+remember (1 + _ ≤? x)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  now apply (rngl_nlt_ge Hor) in Hc.
+}
+clear Hc.
+move Hxn before Hxm; cbn in Hxn.
+rewrite fold_rngl_of_nat in Hxm, Hxn.
+(* prouver que
+    int_part_loop n (x - 1) = int_part_loop n x - 1
+ *)
+...
+apply IHm.
+...
+apply IHm; [ | easy ].
 ...
 apply IHn.
 ...
