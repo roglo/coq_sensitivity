@@ -1380,12 +1380,51 @@ eapply (rngl_lt_le_trans Hor); [ apply H1 | ].
 apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
 clear IHn Hxz H1.
 Theorem int_part_id :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   ∀ m n a,
   (a ≤ rngl_of_nat n)%L
   → int_part_loop n a = m
-  → int_part_loop m a = m.
+  → int_part_loop (S m) a = m.
 Proof.
+intros Hon Hop Hc1 Hor * Han Hna.
+revert n Han Hna.
+induction m; intros. {
+  cbn; rewrite rngl_add_0_r.
+  remember (1 ≤? a)%L as c eqn:Hc; symmetry in Hc.
+  destruct c; [ exfalso | easy ].
+  apply rngl_leb_le in Hc.
+  destruct n. {
+    cbn in Han.
+    apply (rngl_nlt_ge Hor) in Hc.
+    apply Hc; clear Hc.
+    apply (rngl_le_lt_trans Hor _ 0%L); [ easy | ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  cbn in Hna.
+  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ in Hna.
+  remember (_ ≤? a)%L as c eqn:Hd; symmetry in Hd.
+  destruct c; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hd.
+(* mouais... y a rien qui marche *)
+...
+induction m; intros; [ easy | cbn ].
+rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
+remember (_ ≤? a)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | ].
+apply (rngl_leb_gt Hor) in Hc.
+...
+  apply rngl_leb_le in Hc.
+  subst m.
+  apply (rngl_le_antisymm Hor) in Hc; [ | easy ].
+  rewrite Hc; cbn.
+  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
+  now rewrite (rngl_leb_refl Hor).
+}
+apply (rngl_leb_gt Hor) in Hc.
+...
 intros Hor * Han Hna.
 revert m Hna.
 induction n; intros; [ now cbn in Hna; subst m | ].
@@ -1402,6 +1441,7 @@ destruct c. {
   now rewrite (rngl_leb_refl Hor).
 }
 apply (rngl_leb_gt Hor) in Hc.
+...
 apply IHn; [ | easy ].
 (* ah putain ça marche pas, bordel *)
 ...
