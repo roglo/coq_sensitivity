@@ -1379,6 +1379,32 @@ rewrite (rngl_sub_add Hop) in H1.
 eapply (rngl_lt_le_trans Hor); [ apply H1 | ].
 apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
 clear IHn Hxz H1.
+Theorem int_part_id :
+  rngl_is_ordered T = true →
+  ∀ m n a,
+  (a ≤ rngl_of_nat n)%L
+  → int_part_loop n a = m
+  → int_part_loop m a = m.
+Proof.
+intros Hor * Han Hna.
+revert m Hna.
+induction n; intros; [ now cbn in Hna; subst m | ].
+cbn in Hna.
+rewrite fold_rngl_of_nat in Hna.
+rewrite <- rngl_of_nat_succ in Hna.
+remember (_ ≤? a)%L as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  subst m.
+  apply (rngl_le_antisymm Hor) in Hc; [ | easy ].
+  rewrite Hc; cbn.
+  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
+  now rewrite (rngl_leb_refl Hor).
+}
+apply (rngl_leb_gt Hor) in Hc.
+apply IHn; [ | easy ].
+(* ah putain ça marche pas, bordel *)
+...
 Theorem int_part_loop_sub_1 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
