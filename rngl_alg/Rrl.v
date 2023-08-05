@@ -1332,7 +1332,8 @@ destruct d. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-(* to be completed
+(* to be completed *)
+(*
 Theorem lt_int_part_loop_add_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1610,11 +1611,12 @@ Search ((_ ≤? _) = true)%L.
 apply rngl_leb_le in Hc.
 
 apply (rngl_le_refl Hor).
-
 ... ...
 cbn.
 ...
+*)
 
+(* to be completed
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1681,6 +1683,25 @@ assert (Hax : rngl_abs x ≠ 0%L) . {
   rewrite (rngl_opp_involutive Hop) in H.
   now rewrite (rngl_opp_0 Hop) in H.
 }
+(**)
+specialize (H1 1 (rngl_abs x))%L as H2.
+assert (H : (0 < 1 < (rngl_abs x))%L). {
+  split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
+}
+specialize (H2 H); clear H.
+destruct H2 as (m, Hm).
+progress unfold rngl_mul_nat in Hm.
+progress unfold mul_nat in Hm.
+rewrite fold_rngl_of_nat in Hm.
+exists (int_part_loop m (rngl_abs x)).
+split. {
+  apply (int_part_loop_le Hon Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+rewrite rngl_of_nat_add_r.
+cbn; rewrite rngl_add_0_r.
+...
 specialize (H1 (rngl_abs x)⁻¹ 1)%L as H2.
 assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
   split. {
@@ -1706,7 +1727,7 @@ rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
 rewrite (rngl_mul_1_l Hon) in Hm.
 exists (int_part_loop m (rngl_abs x)).
 split. {
-  apply (int_part_loop_le Hon Hop Hor); [ | easy ].
+  apply (int_part_loop_le Hon Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
   apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
   apply (rngl_0_le_1 Hon Hop Hor).
 }
