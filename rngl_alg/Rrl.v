@@ -1244,48 +1244,75 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
       else AnBn P A Bn n'
   end.
 
+(* should be called with "a ≤ rngl_of_nat n" *)
 Fixpoint int_part_loop n a :=
   match n with
-  | 0%nat => 42%nat (* should not happen *)
+  | 0%nat => 0%nat
   | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
   end.
+
+(*
+End a.
+Require Import QArith.
+Require Import QG.
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  let a := QG_of_Q (19 # 5) in
+  let n := 4%nat in
+  ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  let a := QG_of_Q (4 # 5) in
+  let n := 1%nat in
+  ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  let a := QG_of_Q (18 # 1) in
+  let n := 18%nat in
+  ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  let a := QG_of_Q (37 # 2) in
+  let n := 19%nat in
+  ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
+Compute (
+  let ro := QG_ring_like_op in
+  let rp := QG_ring_like_prop in
+  let a := QG_of_Q (35 # 2) in
+  let n := 18%nat in
+  ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
+*)
 
 (* to be completed
 Theorem int_part_loop_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ x n,
-  (0 ≤ x)%L
-  → (x < rngl_of_nat n)%L
-  → (rngl_of_nat (int_part_loop n x) ≤ x)%L.
+  ∀ n a,
+  (0 ≤ a)%L
+  → (a ≤ rngl_of_nat n)%L
+  → (rngl_of_nat (int_part_loop n a) ≤ a)%L.
 Proof.
 intros Hon Hop Hor * Hxz Hxn.
-(*
-progress unfold rngl_of_nat in Hxn |-*.
-progress unfold rngl_mul_nat in Hxn |-*.
-progress unfold mul_nat in Hxn |-*.
-*)
-induction n. {
-  cbn in Hxn.
-  now apply (rngl_nle_gt Hor) in Hxn.
-}
+induction n; [ easy | ].
 cbn in Hxn |-*.
 rewrite fold_rngl_of_nat in Hxn.
 do 2 rewrite fold_rngl_of_nat.
-remember (1 + rngl_of_nat n ≤? x)%L as c eqn:Hc; symmetry in Hc.
+remember (1 + rngl_of_nat n ≤? a)%L as c eqn:Hc; symmetry in Hc.
 destruct c. {
   apply rngl_leb_le in Hc.
-  now apply (rngl_nlt_ge Hor) in Hc.
+  now rewrite rngl_of_nat_succ.
 }
-clear Hc.
-destruct (rngl_lt_dec Hor x (rngl_of_nat n)) as [Hxa| Hxa]. {
+apply (rngl_leb_gt Hor) in Hc.
+destruct (rngl_le_dec Hor a (rngl_of_nat n)) as [Han| Han]. {
   now apply IHn.
 }
-apply (rngl_nlt_ge Hor) in Hxa.
-(*
-clear IHn.
-*)
+apply (rngl_nle_gt Hor) in Han.
+...
 apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
 (**)
 induction n. {

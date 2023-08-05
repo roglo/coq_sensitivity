@@ -2171,10 +2171,10 @@ Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
 Theorem rngl_of_nat_succ :
-  ∀ n, rngl_of_nat (S n) = (rngl_of_nat n + 1)%L.
+  ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
 Proof.
 intros.
-rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_1_l.
 rewrite rngl_of_nat_add_r.
 now rewrite rngl_of_nat_1.
 Qed.
@@ -2710,7 +2710,7 @@ intros Hon Hop Hor *.
 induction n; [ apply (rngl_le_refl Hor) | ].
 rewrite rngl_of_nat_succ.
 eapply (rngl_le_trans Hor); [ apply IHn | ].
-apply (rngl_le_add_r Hor).
+apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
