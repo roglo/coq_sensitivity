@@ -1388,6 +1388,20 @@ Theorem int_part_loop_sub_1 :
   → int_part_loop n (x - 1)%L = int_part_loop n x - 1.
 Proof.
 intros Hop Hor * H1x Hxn.
+Theorem int_part_loop_enough_iter :
+  rngl_is_ordered T = true →
+  ∀ a n,
+  (0 ≤ a)%L
+  → (a ≤ rngl_of_nat n)%L
+  → ∀ i, int_part_loop n a = int_part_loop (n + i) a.
+Proof.
+_Admitted.
+rewrite (int_part_loop_enough_iter Hor) with (i := 1).
+rewrite Nat.add_1_r; cbn.
+rewrite fold_rngl_of_nat.
+rewrite <- rngl_of_nat_succ.
+...
+intros Hop Hor * H1x Hxn.
 revert x H1x Hxn.
 induction n; intros; [ easy | cbn ].
 rewrite fold_rngl_of_nat.
@@ -1406,6 +1420,26 @@ clear Hc1.
 destruct c2. {
   apply rngl_leb_le in Hc2.
   rewrite Nat_sub_succ_1.
+...
+enough (H : int_part_loop (S n) (x - 1)%L = n). {
+  cbn in H.
+  rewrite fold_rngl_of_nat in H.
+  rewrite <- rngl_of_nat_succ in H.
+Search (_ - _ < _)%L.
+Search (_ - _ < _)%Z.
+Theorem rngl_sub_lt_add_r : ∀ n m p, (n - p < m ↔ n < m + p)%L.
+_Admitted.
+  apply rngl_sub_lt_add_r in Hxn.
+  apply (rngl_leb_gt Hor) in Hxn.
+  now rewrite Hxn in H.
+}
+...
+cbn.
+rewrite fold_rngl_of_nat.
+rewrite <- rngl_of_nat_succ.
+apply rngl_sub_lt_add_r in Hxn.
+apply (rngl_leb_gt Hor) in Hxn.
+rewrite Hxn.
 ...
 Theorem int_part_loop_enough_iter :
   rngl_is_ordered T = true →
