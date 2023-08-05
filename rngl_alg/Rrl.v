@@ -1332,7 +1332,6 @@ destruct d. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-(* to be completed *)
 (*
 Theorem lt_int_part_loop_add_1 :
   rngl_has_1 T = true →
