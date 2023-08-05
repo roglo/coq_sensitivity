@@ -1287,7 +1287,6 @@ Compute (
   ((a ≤? rngl_of_nat n)%L, int_part_loop n a)).
 *)
 
-(* to be completed
 Theorem int_part_loop_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1312,22 +1311,28 @@ destruct (rngl_le_dec Hor a (rngl_of_nat n)) as [Han| Han]. {
   now apply IHn.
 }
 apply (rngl_nle_gt Hor) in Han.
-...
-apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
-(**)
-induction n. {
-  cbn in Hxn.
-...
+apply (rngl_le_trans Hor _ (rngl_of_nat n)). 2: {
+  now apply (rngl_lt_le_incl Hor).
+}
+clear IHn Hxn Hc.
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
-remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. 2: {
-  eapply (rngl_le_trans Hor); [ apply IHn | ].
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
+do 2 rewrite fold_rngl_of_nat.
+rewrite <- rngl_of_nat_succ.
+remember (_ ≤? a)%L as d eqn:Hd; symmetry in Hd.
+destruct d. 2: {
+  assert (H : (rngl_of_nat n ≤ rngl_of_nat (S n))%L). {
+    cbn; rewrite fold_rngl_of_nat.
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  eapply (rngl_le_trans Hor); [ | apply H ].
+  apply IHn.
+  eapply (rngl_le_lt_trans Hor); [ apply H | apply Han ].
 }
 apply (rngl_le_refl Hor).
 Qed.
 
+(* to be completed
 Theorem lt_int_part_loop_add_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
