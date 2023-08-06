@@ -1430,10 +1430,7 @@ assert (H : is_Cauchy_sequence v). {
   destruct H1 as (N & HN1 & HN2).
   exists N.
   intros * Hp Hq.
-  specialize (Nat.log2_lt_lin N) as H1.
-  assert (H : 0 < N) by admit.
-  specialize (H1 H); clear H.
-Search (rngl_of_nat _ ≤ _)%L.
+  specialize (Nat.log2_le_lin N (Nat.le_0_l _)) as H1.
 ...
 Search Nat.log2.
 Check Nat.log2_lt_lin.
