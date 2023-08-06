@@ -2259,13 +2259,10 @@ rewrite Z2Nat.id. 2: {
     remember (Qnum (qg_q a)) as x eqn:Hx; symmetry in Hx.
     destruct x as [| x| x]; [ easy | easy | ].
     exfalso.
-...
-    destruct Hab as (Ha, Hab).
     destruct a as ((an, ap), Hap).
     cbn in Ha, Hx.
     subst an.
     apply QG_lt_iff in Ha.
-    cbn in Ha.
     destruct Ha as (Ha, Ha').
     apply Qle_bool_iff in Ha.
     cbn in Ha.
@@ -2285,7 +2282,6 @@ progress unfold QG_div in H2 at 1.
 rewrite (QG_mul_comm a) in H2.
 rewrite <- QG_mul_assoc in H2.
 rewrite QG_mul_inv_l in H2. 2: {
-  destruct Hab as (Haz, Hab).
   now intros H; subst a.
 }
 now rewrite QG_mul_1_r in H2.
