@@ -1431,6 +1431,42 @@ assert (H : is_Cauchy_sequence v). {
   exists N.
   intros * Hp Hq.
   specialize (Nat.log2_le_lin N (Nat.le_0_l _)) as H1.
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
+...
+Check Z.add_le_mono
+Check rngl_add_le_compat.
+  apply (rngl_add_le_compat Hor) in Hij.
+  now apply IHi.
+...
+  destruct i. {
+    cbn in IHi, H.
+    rewrite rngl_add_0_r in H.
+    now apply (rngl_nlt_ge Hor) in H.
+  }
+...
+  apply (rngl_nlt_ge Hor) in H; apply H; clear H.
+  split; intros H; [ easy | exfalso ].
+  cbn in H.
+...
+split; intros Hij. {
+  revert j Hij.
+  induction i; intros; cbn. {
+    clear Hij.
+    induction j; [ apply (rngl_le_refl Hor) | cbn ].
+    eapply (rngl_le_trans Hor); [ apply IHj | ].
+    now apply (rngl_le_add_l Hor).
+  }
+  destruct j; [ easy | cbn ].
+  apply Nat.succ_le_mono in Hij.
+  apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
+  now apply IHi.
+} {
+  revert j Hij.
+  induction i; intros; cbn.
+... ...
+apply rngl_mul_nat_inj_le.
+... ...
+apply rngl_of_nat_inj_le in H1.
 ...
 Search Nat.log2.
 Check Nat.log2_lt_lin.

@@ -2602,6 +2602,34 @@ do 2 rewrite (fold_rngl_sub Hop) in H1.
 now rewrite (rngl_add_sub Hos) in H1.
 Qed.
 
+Theorem rngl_sub_le_mono_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a ≤ b → a - c ≤ b - c)%L.
+Proof.
+intros Hop Hor * Hab.
+progress unfold rngl_sub.
+rewrite Hop.
+apply (rngl_add_le_compat Hor); [ easy | ].
+now apply (rngl_le_refl Hor).
+Qed.
+
+Theorem rngl_add_le_mono_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (b ≤ c ↔ a + b ≤ a + c)%L.
+Proof.
+intros Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+split; intros Hbc. {
+  apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
+}
+apply (rngl_sub_le_mono_r Hop Hor) with (c := a) in Hbc.
+now do 2 rewrite rngl_add_comm, (rngl_add_sub Hos) in Hbc.
+Qed.
+
 Theorem rngl_nle_gt :
   rngl_is_ordered T = true →
   ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.
@@ -2727,6 +2755,57 @@ rewrite rngl_of_nat_succ.
 eapply (rngl_le_trans Hor); [ apply IHn | ].
 apply (rngl_le_add_l Hor).
 apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+
+Theorem rngl_mul_nat_inj_le :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 < a)%L → ∀ i j, i ≤ j ↔ (rngl_mul_nat a i ≤ rngl_mul_nat a j)%L.
+Proof.
+intros Hop Hor * Haz *.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat.
+revert j.
+induction i; intros; cbn. {
+  split; [ | intros; apply Nat.le_0_l ].
+  intros H; clear H.
+  induction j; [ apply (rngl_le_refl Hor) | cbn ].
+  eapply (rngl_le_trans Hor); [ apply IHj | ].
+  now apply (rngl_le_add_l Hor), (rngl_lt_le_incl Hor).
+}
+destruct j. {
+  split; [ easy | cbn ].
+  intros H; exfalso.
+  apply (rngl_nlt_ge Hor) in H; apply H; clear H.
+  eapply (rngl_lt_le_trans Hor); [ apply Haz | ].
+  apply (rngl_le_add_r Hor).
+  clear IHi.
+  induction i; [ apply (rngl_le_refl Hor) | cbn ].
+  eapply (rngl_le_trans Hor); [ apply IHi | ].
+  now apply (rngl_le_add_l Hor), (rngl_lt_le_incl Hor).
+}
+cbn.
+split; intros Hij. {
+  apply Nat.succ_le_mono in Hij.
+  apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
+  now apply IHi.
+} {
+  apply -> Nat.succ_le_mono.
+  apply (rngl_add_le_mono_l Hop Hor) in Hij.
+  now apply IHi.
+}
+Qed.
+
+Theorem rngl_of_nat_inj_le :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  ∀ i j, i ≤ j ↔ (rngl_of_nat i ≤ rngl_of_nat j)%L.
+Proof.
+intros Hon Hop Hc1 Hor *.
+apply (rngl_mul_nat_inj_le Hop Hor).
+apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
 (* abs *)
@@ -2957,11 +3036,6 @@ destruct xz. {
   }
 }
 apply (rngl_leb_gt Hor) in Hx.
-(*
-apply rngl_leb_nle in Hx.
-apply (rngl_not_le Hor) in Hx.
-destruct Hx as (Hxz, Hx).
-*)
 destruct yz. {
   apply rngl_leb_le in Hy.
   destruct xyz. {
