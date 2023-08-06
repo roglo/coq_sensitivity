@@ -2131,16 +2131,45 @@ now apply QG_le_0_sub.
 Qed.
 
 Theorem QG_archimedean :
-  ∀ a b : QG, (0 < a < b)%QG →
+  ∀ a b : QG, (0 < a)%QG →
   ∃ n : nat,
   (b < List.fold_right QG_add 0 (List.repeat a n))%QG.
 Proof.
-intros * Hab *.
+intros * Ha *.
 exists (Z.to_nat (Z_of_QG (b / a)) + 1)%nat.
 rewrite List_fold_right_QG_add.
 rewrite List_map_repeat.
 rewrite Q_mul_nat.
 rewrite Nat2Z.inj_add; cbn.
+destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {
+  apply QG_le_lt_trans with (y := 0%QG). {
+    now apply Qle_bool_iff; cbn.
+  }
+  apply QG_lt_iff.
+  split. {
+    apply Qle_bool_iff; cbn.
+    progress unfold Qle; cbn.
+    rewrite Pos.mul_1_r, Z.mul_1_r.
+    apply Z.div_pos; [ | easy ].
+    apply Z.mul_nonneg_nonneg. {
+      apply QG_lt_iff in Ha.
+      destruct Ha as (Ha, Haz).
+      apply Qle_bool_iff in Ha; cbn in Ha.
+      progress unfold Qle in Ha.
+      cbn in Ha.
+      now rewrite Z.mul_1_r in Ha.
+    } {
+      apply Z.le_trans with (m := 1%Z); [ easy | ].
+      apply Z.le_sub_le_add_r.
+      rewrite Z.sub_diag.
+      apply Nat2Z.is_nonneg.
+    }
+  } {
+    intros H1; symmetry in H1.
+    apply eq_QG_eq in H1; cbn in H1.
+    injection H1; clear H1; intros H1 H2.
+(* pfffff.... *)
+...
 rewrite Z2Nat.id. 2: {
   apply Z.div_pos; [ | easy ].
   cbn.
@@ -2148,6 +2177,7 @@ rewrite Z2Nat.id. 2: {
   remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
   apply Z.div_pos; [ | easy ].
   apply Z.mul_nonneg_nonneg. {
+...
     assert (Hb : (0 < b)%QG) by now apply (@QG_lt_trans _ a).
     apply QG_lt_iff in Hb.
     destruct Hb as (Hb, Hbz).

@@ -1338,10 +1338,10 @@ Theorem rngl_archimedean_ub :
   ∀ a b : T, (0 < a < b)%L →
   ∃ n : nat, (rngl_mul_nat a n ≤ b < rngl_mul_nat a (n + 1))%L.
 Proof.
-intros Har Hor * Hab.
+intros Har Hor * (Ha, Hab).
 specialize rngl_opt_archimedean as H1.
 rewrite Har, Hor in H1; cbn in H1.
-specialize (H1 a b Hab).
+specialize (H1 a b Ha).
 destruct H1 as (m, Hm).
 induction m. {
   exfalso; cbn in Hm.

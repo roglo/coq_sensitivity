@@ -236,12 +236,11 @@ Qed.
 
 Theorem Z_archimedean :
   let ro := Z_ring_like_op in
-  ∀ a b : Z, (0 < a < b)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L.
+  ∀ a b : Z, (0 < a)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L.
 Proof.
-intros * Hab *.
-destruct Hab as (Ha, Hab).
-apply Z.leb_gt in Ha, Hab.
-cbn in Ha, Hab.
+intros * Ha *.
+apply Z.leb_gt in Ha.
+cbn in Ha.
 specialize (Z_archimedean' a b Ha) as H1.
 destruct H1 as (m & Hm).
 exists m; cbn.
