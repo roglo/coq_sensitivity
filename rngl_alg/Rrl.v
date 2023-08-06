@@ -1399,7 +1399,7 @@ apply (H1 1 (rngl_abs a))%L.
 split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1426,6 +1426,17 @@ assert (H : is_Cauchy_sequence v). {
      than log2((b-a)/ε) where log2 is the log in base 2. Taking
      N = log2 ((b-a)/ε) + 1 should work. *)
   specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+  specialize (H1 ((b - a) / ε + 1))%L.
+  destruct H1 as (N & HN1 & HN2).
+  exists N.
+  intros * Hp Hq.
+  specialize (Nat.log2_lt_lin N) as H1.
+  assert (H : 0 < N) by admit.
+  specialize (H1 H); clear H.
+Search (rngl_of_nat _ ≤ _)%L.
+...
+Search Nat.log2.
+Check Nat.log2_lt_lin.
 (* euh... *)
 ...
 Search Nat.log2.
