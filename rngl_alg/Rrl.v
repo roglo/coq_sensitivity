@@ -1399,7 +1399,7 @@ apply (H1 1 (rngl_abs a))%L.
 split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1421,13 +1421,25 @@ set (v := AnBn P a b).
 assert (H : is_Cauchy_sequence v). {
   unfold is_Cauchy_sequence.
   intros ε Hε.
-  (* N = int ((b - a) / ε + 1), truc comme ça
-     mais pour que "int" existe, il faut que T soit archimédien *)
+  (* The size of the interval after N iterations is (b-a)/2^N; it
+     must be less than ε; it implies that N must be greater
+     than log2((b-a)/ε) where log2 is the log in base 2. Taking
+     N = log2 ((b-a)/ε) + 1 should work. *)
   specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+(* euh... *)
+...
+Search Nat.log2.
+...
+  specialize (H1 (Nat.log2 (rngl_to_nat ((b - a) / ε)%L))).
+Search Nat.log2.
+Compute (Nat.log2 128).
+Print Nat.log2_iter.
+...
   specialize (H1 ((b - a) / ε + 1))%L.
   destruct H1 as (N, HN).
   exists N.
   intros * Hp Hq.
+Print AnBn.
 ...
 
 Theorem rl_sqrt_div_squ_squ :
