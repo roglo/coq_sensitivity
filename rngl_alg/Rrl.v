@@ -1332,329 +1332,50 @@ destruct d. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-(*
-Theorem lt_int_part_loop_add_1 :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
+Theorem rngl_archimedean_ub :
+  rngl_is_archimedean T = true →
   rngl_is_ordered T = true →
-  ∀ x n,
-  (0 ≤ x)%L
-  → (x < rngl_of_nat n)%L
-  → (x < rngl_of_nat (int_part_loop n x) + 1)%L.
+  ∀ a b : T, (0 < a < b)%L →
+  ∃ n : nat, (rngl_mul_nat a n ≤ b < rngl_mul_nat a (n + 1))%L.
 Proof.
-intros Hon Hop Hor * Hxz Hxn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
+intros Har Hor * Hab.
+specialize rngl_opt_archimedean as H1.
+rewrite Har, Hor in H1; cbn in H1.
+specialize (H1 a b Hab).
+destruct H1 as (m, Hm).
+induction m. {
+  exfalso; cbn in Hm.
+  apply (rngl_nle_gt Hor) in Hm.
+  apply Hm; clear Hm.
+  now apply (rngl_le_trans Hor _ a); apply (rngl_lt_le_incl Hor).
 }
-revert x Hxz Hxn.
-induction n; intros; [ now apply (rngl_nle_gt Hor) in Hxn | ].
-cbn - [ rngl_of_nat ].
-remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  exfalso.
-  apply rngl_leb_le in Hc.
-  now apply (rngl_nlt_ge Hor) in Hc.
+destruct (rngl_le_dec Hor (rngl_mul_nat a m) b) as [Hba| Hba]. {
+  now exists m; rewrite Nat.add_1_r.
 }
-clear Hc.
-rewrite <- Nat.add_1_r in Hxn.
-rewrite rngl_of_nat_add_r in Hxn.
-cbn in Hxn.
-rewrite rngl_add_0_r in Hxn.
-destruct (rngl_lt_dec Hor x 1) as [Hx1| Hx1]. {
-  apply (rngl_lt_le_trans Hor _ 1%L); [ easy | ].
-  apply (rngl_le_add_l Hor).
-  apply (rngl_of_nat_nonneg Hon Hop Hor).
-}
-apply (rngl_nlt_ge Hor) in Hx1.
-specialize (IHn (x - 1)%L) as H1.
-assert (H : (0 ≤ x - 1)%L) by now apply (rngl_le_0_sub Hop Hor).
-specialize (H1 H); clear H.
-assert (H : (x - 1 < rngl_of_nat n)%L). {
-  apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L).
-  now rewrite (rngl_sub_add Hop).
-}
-specialize (H1 H); clear H.
-apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L) in H1.
-rewrite (rngl_sub_add Hop) in H1.
-eapply (rngl_lt_le_trans Hor); [ apply H1 | ].
-apply (rngl_add_le_compat Hor); [ | apply (rngl_le_refl Hor) ].
-clear IHn Hxz H1.
-Theorem int_part_id :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_characteristic T ≠ 1 →
-  rngl_is_ordered T = true →
-  ∀ m n a,
-  (a ≤ rngl_of_nat n)%L
-  → int_part_loop n a = m
-  → int_part_loop (S m) a = m.
-Proof.
-intros Hon Hop Hc1 Hor * Han Hna.
-revert n Han Hna.
-induction m; intros. {
-  cbn; rewrite rngl_add_0_r.
-  remember (1 ≤? a)%L as c eqn:Hc; symmetry in Hc.
-  destruct c; [ exfalso | easy ].
-  apply rngl_leb_le in Hc.
-  destruct n. {
-    cbn in Han.
-    apply (rngl_nlt_ge Hor) in Hc.
-    apply Hc; clear Hc.
-    apply (rngl_le_lt_trans Hor _ 0%L); [ easy | ].
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  cbn in Hna.
-  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ in Hna.
-  remember (_ ≤? a)%L as c eqn:Hd; symmetry in Hd.
-  destruct c; [ easy | ].
-  apply (rngl_leb_gt Hor) in Hd.
-(* mouais... y a rien qui marche *)
-...
-induction m; intros; [ easy | cbn ].
-rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
-remember (_ ≤? a)%L as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | ].
-apply (rngl_leb_gt Hor) in Hc.
-...
-  apply rngl_leb_le in Hc.
-  subst m.
-  apply (rngl_le_antisymm Hor) in Hc; [ | easy ].
-  rewrite Hc; cbn.
-  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
-  now rewrite (rngl_leb_refl Hor).
-}
-apply (rngl_leb_gt Hor) in Hc.
-...
-intros Hor * Han Hna.
-revert m Hna.
-induction n; intros; [ now cbn in Hna; subst m | ].
-cbn in Hna.
-rewrite fold_rngl_of_nat in Hna.
-rewrite <- rngl_of_nat_succ in Hna.
-remember (_ ≤? a)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  subst m.
-  apply (rngl_le_antisymm Hor) in Hc; [ | easy ].
-  rewrite Hc; cbn.
-  rewrite fold_rngl_of_nat, <- rngl_of_nat_succ.
-  now rewrite (rngl_leb_refl Hor).
-}
-apply (rngl_leb_gt Hor) in Hc.
-...
-apply IHn; [ | easy ].
-(* ah putain ça marche pas, bordel *)
-...
-Theorem int_part_loop_sub_1 :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ n x,
-  (1 ≤ x)%L
-  → (x < rngl_of_nat n + 1)%L
-  → int_part_loop n (x - 1)%L = int_part_loop n x - 1.
-Proof.
-intros Hop Hor * H1x Hxn.
-Theorem int_part_loop_enough_iter :
-  rngl_is_ordered T = true →
-  ∀ a n,
-  (0 ≤ a)%L
-  → (a ≤ rngl_of_nat n)%L
-  → ∀ i, int_part_loop n a = int_part_loop (n + i) a.
-Proof.
-_Admitted.
-rewrite (int_part_loop_enough_iter Hor) with (i := 1).
-rewrite Nat.add_1_r; cbn.
-rewrite fold_rngl_of_nat.
-rewrite <- rngl_of_nat_succ.
-...
-intros Hop Hor * H1x Hxn.
-revert x H1x Hxn.
-induction n; intros; [ easy | cbn ].
-rewrite fold_rngl_of_nat.
-rewrite <- rngl_of_nat_succ.
-remember (_ ≤? x - 1)%L as c1 eqn:Hc1; symmetry in Hc1.
-remember (_ ≤? x)%L as c2 eqn:Hc2; symmetry in Hc2.
-move c2 before c1.
-destruct c1. {
-  apply rngl_leb_le in Hc1.
-  apply (rngl_nlt_ge Hor) in Hc1.
-  exfalso; apply Hc1; clear Hc1.
-  apply (rngl_add_lt_mono_r Hop Hor) with (c := 1%L).
-  now rewrite (rngl_sub_add Hop).
-}
-clear Hc1.
-destruct c2. {
-  apply rngl_leb_le in Hc2.
-  rewrite Nat_sub_succ_1.
-...
-enough (H : int_part_loop (S n) (x - 1)%L = n). {
-  cbn in H.
-  rewrite fold_rngl_of_nat in H.
-  rewrite <- rngl_of_nat_succ in H.
-Search (_ - _ < _)%L.
-Search (_ - _ < _)%Z.
-Theorem rngl_sub_lt_add_r : ∀ n m p, (n - p < m ↔ n < m + p)%L.
-_Admitted.
-  apply rngl_sub_lt_add_r in Hxn.
-  apply (rngl_leb_gt Hor) in Hxn.
-  now rewrite Hxn in H.
-}
-...
-cbn.
-rewrite fold_rngl_of_nat.
-rewrite <- rngl_of_nat_succ.
-apply rngl_sub_lt_add_r in Hxn.
-apply (rngl_leb_gt Hor) in Hxn.
-rewrite Hxn.
-...
-Theorem int_part_loop_enough_iter :
-  rngl_is_ordered T = true →
-  ∀ x m n,
-  (0 ≤ x)%L
-  → (x < rngl_of_nat m)%L
-  → (x < rngl_of_nat n)%L
-  → int_part_loop m x = int_part_loop n x.
-Proof.
-intros Hor * Hxz Hxm Hxn.
-revert x n Hxz Hxm Hxn.
-induction m; intros. {
-  cbn in Hxm.
-  now apply (rngl_nle_gt Hor) in Hxm.
-}
-move n before m.
-cbn in Hxm |-*.
-remember (1 + _ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  now apply (rngl_nlt_ge Hor) in Hc.
-}
-clear Hc.
-destruct n. {
-  cbn in Hxn.
-  now apply (rngl_nle_gt Hor) in Hxn.
-}
-cbn.
-remember (1 + _ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  now apply (rngl_nlt_ge Hor) in Hc.
-}
-clear Hc.
-move Hxn before Hxm; cbn in Hxn.
-rewrite fold_rngl_of_nat in Hxm, Hxn.
-...
-assert (H : int_part_loop (S n) (x - 1)%L = n). {
-  cbn.
-  rewrite fold_rngl_of_nat.
-...
-}
-  cbn in H.
-  rewrite fold_rngl_of_nat in H.
-...
-  apply rngl_leb_gt in Hxn.
-  rewrite rngl_add_comm in Hc2.
-... ...
-}
-apply (rngl_leb_gt Hor) in Hc2.
-now apply IHn.
-...
-  rewrite IHn; [ | easy | ]. 2: {
-...
-  rewrite fold_rngl_of_nat in Hc1.
-  destruct c2. {
-    apply rngl_leb_le in Hc2.
-... ...
-... ...
-rewrite (int_part_loop_sub_1 Hor); [ | easy | easy ].
-Search (rngl_of_nat (_ - _)%nat).
-rewrite (rngl_of_nat_sub_r Hos).
-rewrite rngl_of_nat_1.
-rewrite (rngl_sub_add Hop).
-apply (rngl_le_refl Hor).
-... ...
-rewrite int_part_loop_sub_1 in H1.
-Search (rngl_of_nat (_ - _)).
-Theorem rngl_of_nat_sub_r :
-  ∀ a b, rngl_of_nat (a - b) = (rngl_of_nat a - rngl_of_nat b)%L.
-_Admitted.
-rewrite rngl_of_nat_sub_r in H1.
-cbn in H1.
-rewrite rngl_add_0_r in H1.
-rewrite rngl_sub_add in H1; [ | _admit ].
-(* ouais *)
-...
-Print int_part_loop.
-apply IHm.
-...
-apply IHm; [ | easy ].
-...
-apply IHn.
-...
-  eapply (rngl_lt_trans Hor); [ apply Hxn | ].
-  apply (rngl_lt_add_r Hos Hor).
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
-Sea
-...
-remember (
-Theorem int_part_loop_add_succ :
-  ∀ n x, int_part_loop (S n) x = int_part_loop n x.
-Proof.
-intros.
-Print int_part_loop.
-  x < rngl_of_nat n.
-cbn.
-remember (_ ≤? x)%L as c eqn:Hc; symmetry in Hc.
-destruct c; [ | easy ].
-Search ((_ ≤? _) = true)%L.
-apply rngl_leb_le in Hc.
+apply (rngl_nle_gt Hor) in Hba.
+now apply IHm.
+Qed.
 
-apply (rngl_le_refl Hor).
-... ...
-cbn.
-...
-*)
-
-(* to be completed
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
   rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ x, ∃ n, (rngl_of_nat n ≤ rngl_abs x < rngl_of_nat (n + 1))%L.
+  ∀ a, ∃ n, (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L.
 Proof.
-intros Hon Hop Hiv Hed Hc1 Hor Har *.
+intros Hon Hop Hc1 Hor Har *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-assert (Hii :
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now left.
-}
-specialize rngl_opt_archimedean as H1.
-rewrite Har, Hor in H1; cbn in H1.
-destruct (rngl_eq_dec Hed x 0) as [Hxz| Hxz]. {
-  subst x.
-  exists 0; cbn.
-  progress unfold rngl_abs.
-  rewrite (rngl_leb_refl Hor).
-  rewrite (rngl_opp_0 Hop), rngl_add_0_r.
-  split; [ apply (rngl_le_refl Hor) | ].
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
-(**)
-destruct (rngl_lt_dec Hor (rngl_abs x) 1) as [H1x| H1x]. {
+specialize (rngl_archimedean_ub Har Hor) as H1.
+destruct (rngl_lt_dec Hor (rngl_abs a) 1) as [H1x| H1x]. {
   exists 0; cbn.
   rewrite rngl_add_0_r.
   split; [ | easy ].
   apply (rngl_0_le_abs Hop Hor).
 }
-destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
+destruct (rngl_lt_dec Hor 1 (rngl_abs a)) as [Hx1| Hx1]. 2: {
   apply (rngl_nlt_ge Hor) in H1x, Hx1.
   apply (rngl_le_antisymm Hor) in H1x; [ | easy ].
   rewrite H1x.
@@ -1668,113 +1389,21 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs x)) as [Hx1| Hx1]. 2: {
     rewrite (rngl_sub_diag Hos) in H12.
     rewrite (rngl_add_sub Hos) in H12.
     symmetry in H12; revert H12.
-    now apply (rngl_1_neq_0_iff Hon).
+    apply (rngl_1_neq_0_iff Hon), Hc1.
   }
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 clear H1x.
-assert (Hax : rngl_abs x ≠ 0%L) . {
-  unfold rngl_abs.
-  destruct (x ≤? 0)%L; [ | easy ].
-  intros H.
-  apply (f_equal rngl_opp) in H.
-  rewrite (rngl_opp_involutive Hop) in H.
-  now rewrite (rngl_opp_0 Hop) in H.
-}
-(**)
-specialize (H1 1 (rngl_abs x))%L as H2.
-assert (H : (0 < 1 < (rngl_abs x))%L). {
-  split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
-}
-specialize (H2 H); clear H.
-destruct H2 as (m, Hm).
-progress unfold rngl_mul_nat in Hm.
-progress unfold mul_nat in Hm.
-rewrite fold_rngl_of_nat in Hm.
-exists (int_part_loop m (rngl_abs x)).
-split. {
-  apply (int_part_loop_le Hon Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-  apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite rngl_of_nat_add_r.
-cbn; rewrite rngl_add_0_r.
-...
-specialize (H1 (rngl_abs x)⁻¹ 1)%L as H2.
-assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
-  split. {
-    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    now apply (rngl_0_lt_abs Hop Hor).
-  }
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := rngl_abs x). {
-    apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
-  now rewrite rngl_mul_1_l.
-}
-specialize (H2 H); clear H.
-destruct H2 as (m, Hm).
-rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in Hm.
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := rngl_abs x) in Hm. 2: {
-  apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite (rngl_mul_1_r Hon), rngl_mul_assoc in Hm.
-rewrite (rngl_mul_inv_r Hon Hiv) in Hm; [ | easy ].
-rewrite (rngl_mul_1_l Hon) in Hm.
-exists (int_part_loop m (rngl_abs x)).
-split. {
-  apply (int_part_loop_le Hon Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-  apply (rngl_le_trans Hor _ 1); [ | now apply (rngl_lt_le_incl Hor) ].
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite rngl_of_nat_add_r.
-cbn; rewrite rngl_add_0_r.
-... ...
-apply lt_int_part_loop_add_1.
-...
-  apply (rngl_nle_gt Hor).
-  intros H; apply Hxy; clear Hxy.
-  apply (rngl_le_antisymm Hor); [ | easy ].
-...
-Search (_ < _ )%L.
-  apply (rngl_lt_asymm Hor) in Hxn.
-  apply (rngl_lt_iff Hor) in Hxn.
-...
+apply (H1 1 (rngl_abs a))%L.
+split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
+Qed.
 
-(*
-End a.
-Require Import QArith.
-Require Import QG.
-Compute (
-  let ro := QG_ring_like_op in
-  let rp := QG_ring_like_prop in
-  int_part_loop 30%nat (QG_of_Q (19 # 5)%Q)).
-Compute (
-  let ro := QG_ring_like_op in
-  let rp := QG_ring_like_prop in
-  int_part_loop 30%nat (QG_of_Q (20 # 5)%Q)).
-*)
-...
-apply (rngl_nlt_ge Hor) in H1x.
-apply (rngl_lt_eq_cases Hor) in H1x.
-destruct (rngl_lt_cases Hor 1 (rngl_abs x)) as [Hx1| Hx1]. {
-  exists 1; cbn.
-...
-  apply (rngl_nlt_ge Hor) in H1x.
-  specialize (H1 (rngl_abs x)⁻¹%L 1%L) as H2.
-  assert (H : (0 < (rngl_abs x)⁻¹ < 1)%L). {
-  apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-  now apply (rngl_0_lt_abs Hop Hor).
-}
-specialize (H2 H); clear H.
-...
-rngl_mul_nat x⁻¹ n = n / x
-...
-
+(* to be completed
 Theorem least_upper_bound :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   is_complete T →
@@ -1783,7 +1412,7 @@ Theorem least_upper_bound :
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hor Har Hco * Ha Hs.
+intros Hon Hop Hc1 Hor Har Hco * Ha Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1794,8 +1423,11 @@ assert (H : is_Cauchy_sequence v). {
   intros ε Hε.
   (* N = int ((b - a) / ε + 1), truc comme ça
      mais pour que "int" existe, il faut que T soit archimédien *)
-  specialize rngl_opt_archimedean as H1.
-  rewrite Har, Hor in H1; cbn in H1.
+  specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+  specialize (H1 ((b - a) / ε + 1))%L.
+  destruct H1 as (N, HN).
+  exists N.
+  intros * Hp Hq.
 ...
 
 Theorem rl_sqrt_div_squ_squ :

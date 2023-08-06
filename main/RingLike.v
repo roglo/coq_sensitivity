@@ -2163,12 +2163,25 @@ rewrite rngl_add_comm.
 apply (rngl_add_sub Hos).
 Qed.
 
+Theorem fold_rngl_mul_nat :
+  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
+Proof. easy. Qed.
+
 Theorem fold_rngl_of_nat :
   ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
 Proof. easy. Qed.
 
 Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
+
+Theorem rngl_mul_nat_succ :
+  ∀ a n, rngl_mul_nat a (S n) = (a + rngl_mul_nat a n)%L.
+Proof.
+intros.
+rewrite <- Nat.add_1_l.
+rewrite rngl_mul_nat_add_r.
+now cbn; rewrite rngl_add_0_r.
+Qed.
 
 Theorem rngl_of_nat_succ :
   ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
@@ -2178,6 +2191,8 @@ rewrite <- Nat.add_1_l.
 rewrite rngl_of_nat_add_r.
 now rewrite rngl_of_nat_1.
 Qed.
+
+(* *)
 
 Theorem rngl_add_lt_mono_l :
   rngl_has_opp T = true →
