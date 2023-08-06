@@ -2184,28 +2184,63 @@ destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {
         destruct Ha as (Ha1, Ha2).
         apply Qle_bool_iff in Ha1.
         cbn in Ha1.
-        apply neq_QG_neq in Ha2.
+        assert (H : ¬ an # ad == 0). {
+          intros H.
+          apply Ha2.
+          now apply qeq_QG_eq.
+        }
+        move H before Ha2; clear Ha2; rename H into Ha2.
         cbn in Ha2.
-        apply not_eq_sym in Ha2.
         progress unfold Qle in Ha1.
         cbn in Ha1.
         rewrite Z.mul_1_r in Ha1.
         apply Z.nle_gt; intros Ha3.
         apply Z.le_antisymm in Ha3; [ | easy ].
         subst an.
-        apply Ha2; clear Ha2.
-(* ouais, bon, encore ce bordel de == *)
-...
-    rewrite Pos.mul_1_r in H1.
-    rewrite Pos.mul_1_r in H2.
-Search (Z.to_pos (_ / _)).
-...
-Search (_ = 1%positive).
-...
-    apply -> Z.div_small_iff in H2; [ | easy ].
-
-(* pfffff.... *)
-...
+        now apply Ha2; clear Ha2.
+      }
+      apply (Z.lt_le_trans _ 1%Z); [ easy | ].
+      apply Z.le_sub_le_add_r.
+      rewrite Z.sub_diag.
+      apply Nat2Z.is_nonneg.
+    }
+    destruct H2 as (H2, H3).
+    apply Z.nle_gt in H3; apply H3; clear H3.
+    apply Z.divide_pos_le. {
+      apply Z.nle_gt; intros H3.
+      apply Z.le_antisymm in H3; [ | easy ].
+      rewrite Heqy in H3.
+      symmetry in H3.
+      apply Z.eq_mul_0 in H3.
+      destruct H3 as [H3| H3]. {
+        apply QG_lt_iff in Ha.
+        destruct a as ((an, ad), Hap).
+        cbn in H3; subst an.
+        destruct Ha as (Ha1, Ha2).
+        apply Ha2; symmetry.
+        now apply qeq_QG_eq.
+      }
+      apply Z.add_move_0_r in H3.
+      specialize (Nat2Z.is_nonneg x) as H4.
+      now rewrite H3 in H4.
+    }
+    apply Z.gcd_divide_l.
+  }
+}
+assert (Hb : (0 < b)%QG). {
+  destruct b as ((bn, bd), Hb).
+  cbn in Hbz.
+  apply QG_lt_iff.
+  split. {
+    apply Qle_bool_iff; cbn.
+    now apply Qlt_le_weak.
+  }
+  intros H.
+  symmetry in H.
+  apply qeq_QG_eq in H; cbn in H.
+  now rewrite H in Hbz.
+}
+rename Hbz into Hzb.
 rewrite Z2Nat.id. 2: {
   apply Z.div_pos; [ | easy ].
   cbn.
@@ -2213,8 +2248,6 @@ rewrite Z2Nat.id. 2: {
   remember (Z_pos_gcd _ _) as gb eqn:Hgb in |-*.
   apply Z.div_pos; [ | easy ].
   apply Z.mul_nonneg_nonneg. {
-...
-    assert (Hb : (0 < b)%QG) by now apply (@QG_lt_trans _ a).
     apply QG_lt_iff in Hb.
     destruct Hb as (Hb, Hbz).
     apply Qle_bool_iff in Hb; cbn in Hb.
@@ -2226,6 +2259,7 @@ rewrite Z2Nat.id. 2: {
     remember (Qnum (qg_q a)) as x eqn:Hx; symmetry in Hx.
     destruct x as [| x| x]; [ easy | easy | ].
     exfalso.
+...
     destruct Hab as (Ha, Hab).
     destruct a as ((an, ap), Hap).
     cbn in Ha, Hx.
