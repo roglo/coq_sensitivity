@@ -1403,6 +1403,7 @@ Qed.
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
@@ -1412,7 +1413,7 @@ Theorem least_upper_bound :
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hon Hop Hc1 Hor Har Hco * Ha Hs.
+intros Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1427,11 +1428,20 @@ assert (H : is_Cauchy_sequence v). {
      N = log2 ((b-a)/ε) + 1 should work. *)
   specialize (int_part Hon Hop Hc1 Hor Har) as H1.
   specialize (H1 ((b - a) / ε + 1))%L.
+  rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+    apply (rngl_add_nonneg_nonneg Hor). 2: {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_le_0_sub Hop Hor).
+    now apply (rngl_lt_le_incl Hor), Hs.
+  }
   destruct H1 as (N & HN1 & HN2).
   exists N.
   intros * Hp Hq.
   specialize (Nat.log2_le_lin N (Nat.le_0_l _)) as H1.
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
+  eapply (rngl_le_trans Hor) with (b := rngl_of_nat N) in H1; [ | apply HN1 ].
 ...
 Check Z.add_le_mono
 Check rngl_add_le_compat.

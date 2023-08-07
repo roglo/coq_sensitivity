@@ -2743,6 +2743,15 @@ revert Hbz.
 apply (rngl_lt_irrefl Hor).
 Qed.
 
+Theorem rngl_add_nonneg_nonneg :
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a + b)%L.
+Proof.
+intros Hor * Ha Hb.
+apply (rngl_le_trans Hor _ a); [ easy | ].
+now apply (rngl_le_add_r Hor).
+Qed.
+
 Theorem rngl_of_nat_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3433,6 +3442,27 @@ split; intros Hab. {
   apply -> (rngl_le_0_sub Hop Hor) in H2.
   now apply (rngl_nlt_ge Hor) in H2.
 }
+Qed.
+
+Theorem rngl_div_pos :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a → 0 < b → 0 ≤ a / b)%L.
+Proof.
+intros Hon Hop Hiv Hor * Ha Hb.
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+apply (rngl_mul_le_mono_pos_l Hop Hor) with (c := b); [ | easy | ]. {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
+rewrite (rngl_mul_inv_r Hon Hiv); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+apply (rngl_lt_iff Hor) in Hb.
+now apply not_eq_sym.
 Qed.
 
 (* *)
