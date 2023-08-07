@@ -1436,10 +1436,11 @@ assert (H : is_Cauchy_sequence v). {
     apply (rngl_le_0_sub Hop Hor).
     now apply (rngl_lt_le_incl Hor), Hs.
   }
-  destruct H1 as (N & HN1 & HN2).
-  exists N.
+  destruct H1 as (M & HM1 & HM2).
+  exists (Nat.log2 M).
   intros * Hp Hq.
-  specialize (Nat.log2_le_lin N (Nat.le_0_l _)) as H1.
+  specialize (Nat.log2_le_lin M (Nat.le_0_l _)) as H1.
+...
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
   eapply (rngl_le_trans Hor) with (b := rngl_of_nat N) in H1; [ | apply HN1 ].
 ...
