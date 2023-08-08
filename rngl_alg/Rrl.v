@@ -1400,7 +1400,7 @@ apply (H1 1 (rngl_abs a))%L.
 split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
