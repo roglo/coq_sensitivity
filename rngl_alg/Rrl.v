@@ -1446,11 +1446,15 @@ assert (H : is_Cauchy_sequence v). {
     unfold v.
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
-Search rngl_abs.
 Theorem rngl_abs_nonpos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a : T, (a ≤ 0)%L → rngl_abs a = (- a)%L.
+Proof.
+intros Hop Hor * Haz.
+rewrite <- (rngl_opp_involutive Hop a) at 1.
+rewrite (rngl_abs_opp Hop Hor).
+apply (rngl_abs_nonneg Hop Hor).
 ... ...
       rewrite (rngl_abs_nonpos Hop Hor). 2: {
 Search (_ - _ ≤ 0)%L.

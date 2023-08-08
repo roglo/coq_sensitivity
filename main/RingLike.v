@@ -386,8 +386,8 @@ Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_archimedean T {ro ring_like_prop}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
-Definition rngl_abs {T} {ro : ring_like_op T} x :=
-  if (x ≤? 0)%L then (- x)%L else x.
+Definition rngl_abs {T} {ro : ring_like_op T} a :=
+  if (a ≤? 0)%L then (- a)%L else a.
 Definition rngl_min {T} {ro : ring_like_op T} (a b : T) :=
   if (a ≤? b)%L then a else b.
 Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
@@ -2921,6 +2921,35 @@ split. {
 }
 Qed.
 
+Theorem rngl_abs_opp :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, rngl_abs (- a)%L = rngl_abs a.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_abs.
+remember (- a ≤? 0)%L as c eqn:Hc; symmetry in Hc.
+remember (a ≤? 0)%L as d eqn:Hd; symmetry in Hd.
+destruct c. {
+  apply rngl_leb_le in Hc.
+  rewrite (rngl_opp_involutive Hop).
+  rewrite <- (rngl_opp_0 Hop) in Hc.
+  apply (rngl_opp_le_compat Hop Hor) in Hc.
+  destruct d; [ | easy ].
+  apply rngl_leb_le in Hd.
+  apply (rngl_le_antisymm Hor) in Hd; [ | easy ].
+  subst a.
+  symmetry; apply (rngl_opp_0 Hop).
+} {
+  apply (rngl_leb_gt Hor) in Hc.
+  rewrite <- (rngl_opp_0 Hop) in Hc.
+  apply (rngl_opp_lt_compat Hop Hor) in Hc.
+  destruct d; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hd.
+  now apply (rngl_lt_asymm Hor) in Hd.
+}
+Qed.
+
 Theorem rngl_0_lt_abs :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -3533,6 +3562,7 @@ easy.
 Qed.
 *)
 
+Arguments rngl_abs {T ro} a%L.
 Arguments rngl_add {T ring_like_op} (a b)%L.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%L.
