@@ -1440,9 +1440,8 @@ assert (H : is_Cauchy_sequence v). {
   exists (Nat.log2 M).
   intros * Hp Hq.
   specialize (Nat.log2_le_lin M (Nat.le_0_l _)) as H1.
-...
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
-  eapply (rngl_le_trans Hor) with (b := rngl_of_nat N) in H1; [ | apply HN1 ].
+  eapply (rngl_le_trans Hor) with (b := rngl_of_nat M) in H1; [ | apply HM1 ].
 ...
 Check Z.add_le_mono
 Check rngl_add_le_compat.
