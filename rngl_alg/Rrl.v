@@ -4,6 +4,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
 Require Import Main.Misc Main.RingLike.
+Require Import Init.Nat.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -1399,7 +1400,7 @@ apply (H1 1 (rngl_abs a))%L.
 split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1439,8 +1440,27 @@ assert (H : is_Cauchy_sequence v). {
   destruct H1 as (M & HM1 & HM2).
   exists (Nat.log2 M).
   intros * Hp Hq.
+  (* TODO: a lemma *)
+  assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
+    clear Hp Hq.
+    unfold v.
+    destruct (le_dec p q) as [Hpq| Hpq]. {
+      rewrite Nat.min_l; [ | easy ].
+Search rngl_abs.
+Theorem rngl_abs_nonpos :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a : T, (a ≤ 0)%L → rngl_abs a = (- a)%L.
+... ...
+      rewrite (rngl_abs_nonpos Hop Hor). 2: {
+Search (_ - _ ≤ 0)%L.
+Search (_ - _ ≤ 0)%Z.
+Theorem rngl_le_sub_0 : ∀ a b, (a - b ≤ 0 ↔ a ≤ b)%L.
+Proof.
+... ...
+        apply rngl_le_sub_0.
+...
 (**)
-About rngl_le_trans.
   apply (rngl_le_trans Hor _ ((b - a) / rngl_of_nat M)%L).
 Arguments rngl_le_trans {T}%type_scope {ro rp} Hor (a b c)%ring_like_scope _ _
 ...
