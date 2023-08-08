@@ -1439,9 +1439,23 @@ assert (H : is_Cauchy_sequence v). {
   destruct H1 as (M & HM1 & HM2).
   exists (Nat.log2 M).
   intros * Hp Hq.
+(**)
+About rngl_le_trans.
+  apply (rngl_le_trans Hor _ ((b - a) / rngl_of_nat M)%L).
+Arguments rngl_le_trans {T}%type_scope {ro rp} Hor (a b c)%ring_like_scope _ _
+...
   specialize (Nat.log2_le_lin M (Nat.le_0_l _)) as H1.
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
+...
   eapply (rngl_le_trans Hor) with (b := rngl_of_nat M) in H1; [ | apply HM1 ].
+  apply Nat.lt_succ_r in Hp, Hq.
+  apply Nat.log2_lt_pow2 in Hp.
+...
+Search (_ < S _).
+Search Nat.log2.
+Nat.log2_pow2: ∀ a : nat, 0 ≤ a → Nat.log2 (2 ^ a) = a
+Nat.log2_lt_pow2: ∀ a b : nat, 0 < a → a < 2 ^ b ↔ Nat.log2 a < b
+Nat.log2_le_pow2: ∀ a b : nat, 0 < a → 2 ^ b ≤ a ↔ b ≤ Nat.log2 a
 ...
 Check Z.add_le_mono
 Check rngl_add_le_compat.
