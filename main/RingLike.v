@@ -1387,7 +1387,9 @@ Theorem rngl_eq_mul_0_l :
 Proof.
 intros Hos Hii * Hab Hbz.
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
+destruct rngl_is_integral_domain. {
+  now apply rngl_integral in Hab; destruct Hab.
+}
 cbn in Hii; clear rngl_integral.
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
@@ -1426,7 +1428,9 @@ destruct ic. {
   now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
 }
 specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral_domain; [ now apply rngl_integral in Hab; destruct Hab | ].
+destruct rngl_is_integral_domain. {
+  now apply rngl_integral in Hab; destruct Hab.
+}
 cbn in Hii; clear rngl_integral.
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
@@ -1885,7 +1889,9 @@ assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
 specialize (rngl_div_diag Hon Hiq) as div_diag.
 specialize (rngl_eq_mul_0_l Hom) as integral.
 assert
-  (H : (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true). {
+  (H :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
   now rewrite Hid; destruct rngl_is_integral_domain.
 }
 specialize (integral H); clear H.
