@@ -1467,6 +1467,29 @@ destruct (is_upper_bound P _) as [H1| H1]. {
 }
 Qed.
 
+Theorem le_AnBn :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ P a b i, (a ≤ b → a ≤ AnBn P a b i)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab.
+revert a b Hab.
+induction i; intros; [ easy | cbn ].
+destruct (is_upper_bound P _) as [H1| H1]. {
+  apply IHi.
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+} {
+  eapply (rngl_le_trans Hor). 2: {
+    apply IHi.
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+Qed.
+
 (* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
@@ -1522,6 +1545,17 @@ assert (H : is_Cauchy_sequence v). {
           apply (AnBn_le Hic Hon Hop Hiv Hor).
           now apply (rngl_lt_le_incl Hor), Hs.
         }
+        destruct (is_upper_bound P ((a + b) / 2))%L as [H1| H1]. {
+          eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
+...
+          eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). {
+            apply H1.
+...
+          eapply (rngl_le_trans Hor). 2: {
+            apply (le_AnBn Hic Hon Hop Hiv Hor).
+            now apply H1.
+          }
+          apply (AnBn_le).
 ...
 (**)
   apply (rngl_le_trans Hor _ ((b - a) / rngl_of_nat M)%L).
