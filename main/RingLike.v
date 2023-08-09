@@ -1995,6 +1995,27 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_le_sub_0 :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a - b ≤ 0 ↔ a ≤ b)%L.
+Proof.
+intros Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_add_le_compat Hor) as H1.
+split; intros Hab. {
+  specialize (H1 (a - b) 0 b b Hab (rngl_le_refl Hor _))%L.
+  rewrite (rngl_sub_add Hop) in H1.
+  now rewrite rngl_add_0_l in H1.
+} {
+  specialize (H1 a b (- b) (- b) Hab (rngl_le_refl Hor _))%L.
+  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  now rewrite (rngl_sub_diag Hos) in H1.
+}
+Qed.
+
 Theorem rngl_lt_0_sub :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2865,21 +2886,6 @@ destruct az. {
 }
 Qed.
 
-Theorem rngl_abs_nonneg :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a, (0 ≤ a)%L → rngl_abs a = a.
-Proof.
-intros Hop Hor * Hza.
-progress unfold rngl_abs.
-remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
-destruct az; [ | easy ].
-apply rngl_leb_le in Haz.
-apply (rngl_le_antisymm Hor _ _ Hza) in Haz.
-subst a.
-apply (rngl_opp_0 Hop).
-Qed.
-
 Theorem rngl_abs_le :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2948,6 +2954,34 @@ destruct c. {
   apply (rngl_leb_gt Hor) in Hd.
   now apply (rngl_lt_asymm Hor) in Hd.
 }
+Qed.
+
+Theorem rngl_abs_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ a)%L → rngl_abs a = a.
+Proof.
+intros Hop Hor * Hza.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+destruct az; [ | easy ].
+apply rngl_leb_le in Haz.
+apply (rngl_le_antisymm Hor _ _ Hza) in Haz.
+subst a.
+apply (rngl_opp_0 Hop).
+Qed.
+
+Theorem rngl_abs_nonpos :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a : T, (a ≤ 0)%L → rngl_abs a = (- a)%L.
+Proof.
+intros Hop Hor * Haz.
+rewrite <- (rngl_opp_involutive Hop a) at 1.
+rewrite (rngl_abs_opp Hop Hor).
+apply (rngl_abs_nonneg Hop Hor).
+rewrite <- (rngl_opp_0 Hop).
+now apply -> (rngl_opp_le_compat Hop Hor).
 Qed.
 
 Theorem rngl_0_lt_abs :
