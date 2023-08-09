@@ -1515,6 +1515,7 @@ Theorem AnBn_le :
   ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor * Hab.
+(*
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1530,6 +1531,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (AnBn _ _ _ _)), H1.
   apply (rngl_le_refl Hor).
 }
+*)
 revert b Hab.
 induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
 remember (is_upper_bound P _) as c eqn:Hc; symmetry in Hc.
