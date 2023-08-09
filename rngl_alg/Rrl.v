@@ -1538,8 +1538,11 @@ assert (H : is_Cauchy_sequence v). {
           now apply (rngl_lt_le_incl Hor), Hs.
         }
         destruct (is_upper_bound P ((a + b) / 2))%L as [H1| H1]. {
-          eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
+...
           specialize (AnBn_interval Hic Hon Hop Hiv Hor P) as H2.
+          eapply (rngl_le_trans Hor); [ | apply (H2 a) ].
+...
+          eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
           eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). {
 (* putain, merde, j'y arrive pas *)
 ...
