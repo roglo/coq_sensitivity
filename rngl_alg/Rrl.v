@@ -1532,17 +1532,37 @@ assert (H : is_Cauchy_sequence v). {
       rewrite Nat.min_l; [ | easy ].
       rewrite (rngl_abs_nonneg Hop Hor). 2: {
         apply (rngl_le_0_sub Hop Hor).
-        revert q Hpq.
+clear v HM1 HM2.
+        revert a b q Ha Hs Hpq.
         induction p; intros; cbn. {
           apply (AnBn_interval Hic Hon Hop Hiv Hor).
           now apply (rngl_lt_le_incl Hor), Hs.
         }
+destruct q; [ easy | cbn ].
         destruct (is_upper_bound P ((a + b) / 2))%L as [H1| H1]. {
+apply Nat.succ_le_mono in Hpq.
+...
+  apply IHp; [ easy | | easy ].
+  intros x Hx.
+  specialize (H1 x Hx) as H3.
+...
+          eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
+...
+Theorem toto :
+  ∀ P a b c, (a ≤ c ≤ b)%L
+  → (∀ x : T, P x → (x ≤ c)%L)
+  → ∀ i, (AnBn P a b i = AnBn P a c i)%L.
+Proof.
+intros * Hacb Hc *.
+revert a c b Hacb Hc.
+induction i; intros; cbn.
+apply Hc.
+... ...
+apply toto.
 ...
           specialize (AnBn_interval Hic Hon Hop Hiv Hor P) as H2.
           eapply (rngl_le_trans Hor); [ | apply (H2 a) ].
 ...
-          eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
           eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). {
 (* putain, merde, j'y arrive pas *)
 ...
