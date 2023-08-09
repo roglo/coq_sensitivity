@@ -1428,8 +1428,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 (* marrant, quand il y a un 1, l'opposé, l'ordre et la caractéristique
    différente de 1 alors 0 < 2, ça veut donc dire que la caractéristique
    est différente de 2 et problablement de n, ∀ n
-clear Hic Hiv Hab Hii.
 *)
+(**)
+clear Hic Hiv Hab Hii Hos; exfalso.
+(**)
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert (Hz2 : (0 < 2)%L). {
   apply (rngl_le_lt_trans Hor _ 1)%L. {
     apply (rngl_0_le_1 Hon Hop Hor).
@@ -1441,6 +1446,8 @@ assert (H2z : 2%L ≠ 0%L). {
   intros H; rewrite H in Hz2; revert Hz2.
   apply (rngl_lt_irrefl Hor).
 }
+...
+(**)
 split. {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L); [ easy | ].
   rewrite (rngl_mul_div_r Hon Hic Hiv); [ | easy ].
