@@ -1446,8 +1446,43 @@ assert (H : is_Cauchy_sequence v). {
     unfold v.
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
-      rewrite (rngl_abs_nonpos Hop Hor). 2: {
-        apply (rngl_le_sub_0 Hop Hor).
+      rewrite (rngl_abs_nonneg Hop Hor). 2: {
+        apply (rngl_le_0_sub Hop Hor).
+        revert q Hpq.
+        induction p; intros; cbn. {
+          clear Hpq.
+Theorem AnBn_le :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
+Proof.
+intros Hon Hop Hc1 Hor Hii * Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+revert b Hab.
+induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
+remember (is_upper_bound P _) as c eqn:Hc; symmetry in Hc.
+destruct c as [H1| H1]. {
+  eapply (rngl_le_trans Hor). {
+    apply IHi.
+    apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L). {
+      apply (rngl_le_lt_trans Hor _ 1)%L. {
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    }
+Search (_ / _ * _).
+...
+apply rngl_add_lt_mono_r.
+...
+      apply rngl_0_lt_1. Hon Hop Hc1 Hor
+... ...
+          apply (AnBn_le Hor).
 ...
 (**)
   apply (rngl_le_trans Hor _ ((b - a) / rngl_of_nat M)%L).
