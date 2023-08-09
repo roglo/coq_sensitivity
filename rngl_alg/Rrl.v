@@ -1456,11 +1456,11 @@ Theorem AnBn_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
+  rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hc1 Hor * Hab.
+intros Hic Hon Hop Hiv Hc2 Hor * Hab.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1470,6 +1470,11 @@ assert
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 (AnBn _ _ _ _)), H1.
+  apply (rngl_le_refl Hor).
 }
 revert b Hab.
 induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
@@ -1484,7 +1489,31 @@ destruct c as [H1| H1]. {
       apply (rngl_lt_add_r Hos Hor).
       apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
     }
-    rewrite (rngl_mul_div_r Hon Hic Hiv).
+    rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+      specialize (rngl_characteristic_prop) as H2.
+      rewrite Hon in H2.
+      remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+      remember (ch =? 0) as chz eqn:Hchz; symmetry in Hchz.
+      destruct chz. {
+        specialize (H2 1); cbn in H2.
+        now rewrite rngl_add_0_r in H2.
+      } {
+        destruct H2 as (H2, H3).
+        destruct ch; [ easy | clear Hchz ].
+        destruct ch; [ easy | clear Hc1 ].
+        destruct ch; [ easy | clear Hc2 ].
+        specialize (H2 2); cbn in H2.
+        rewrite rngl_add_0_r in H2.
+        apply H2.
+        split; [ easy | ].
+        now do 2 apply -> Nat.succ_lt_mono.
+      }
+    }
+    rewrite rngl_mul_add_distr_r.
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
+  }
+(* ouais, bon, faisable, mais fait chier *)
 ...
     specialize (rngl_mod_div) as H2.
 Search (_ * (_ / _)).
