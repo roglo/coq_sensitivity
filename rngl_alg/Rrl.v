@@ -1444,49 +1444,42 @@ split. {
 }
 Qed.
 
-Theorem AnBn_le :
+Theorem AnBn_interval :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
+  ∀ P a b i, (a ≤ b → a ≤ AnBn P a b i ≤ b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor * Hab.
 revert a b Hab.
-induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
-destruct (is_upper_bound P _) as [H1| H1]. {
-  eapply (rngl_le_trans Hor). {
-    apply IHi.
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  }
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-} {
-  apply IHi.
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+induction i; intros. {
+  split; [ easy | apply (rngl_le_refl Hor) ].
 }
-Qed.
-
-Theorem le_AnBn :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ P a b i, (a ≤ b → a ≤ AnBn P a b i)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab.
-revert a b Hab.
-induction i; intros; [ easy | cbn ].
+cbn.
 destruct (is_upper_bound P _) as [H1| H1]. {
-  apply IHi.
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  split. {
+    apply (IHi a ((a + b) / 2))%L.
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  } {
+    eapply (rngl_le_trans Hor). {
+      apply IHi.
+      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+    }
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
 } {
-  eapply (rngl_le_trans Hor). 2: {
+  split. {
+    eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). 2: {
+      apply IHi.
+      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+    }
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  } {
     apply IHi.
     now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
   }
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
 }
 Qed.
 
@@ -1541,15 +1534,20 @@ assert (H : is_Cauchy_sequence v). {
         apply (rngl_le_0_sub Hop Hor).
         revert q Hpq.
         induction p; intros; cbn. {
-          clear Hpq.
-          apply (AnBn_le Hic Hon Hop Hiv Hor).
+          apply (AnBn_interval Hic Hon Hop Hiv Hor).
           now apply (rngl_lt_le_incl Hor), Hs.
         }
         destruct (is_upper_bound P ((a + b) / 2))%L as [H1| H1]. {
           eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
-...
+          specialize (AnBn_interval Hic Hon Hop Hiv Hor P) as H2.
           eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). {
+(* putain, merde, j'y arrive pas *)
+...
             apply H1.
+Check AnBn_le.
+Check le_AnBn.
+...
+          }
 ...
           eapply (rngl_le_trans Hor). 2: {
             apply (le_AnBn Hic Hon Hop Hiv Hor).
