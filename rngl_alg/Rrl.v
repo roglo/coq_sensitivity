@@ -1406,11 +1406,10 @@ Theorem rngl_middle_in_middle :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   ∀ a b, (a ≤ b → a ≤ (a + b) / 2 ≤ b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hc2 Hor * Hab.
+intros Hic Hon Hop Hiv Hor * Hab.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1426,39 +1425,36 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ((a + b) / 2)%L), (H1 a), (H1 b).
   split; apply (rngl_le_refl Hor).
 }
+(* marrant, quand il y a un 1, l'opposé, l'ordre et la caractéristique
+   différente de 1 alors 0 < 2, ça veut donc dire que la caractéristique
+   est différente de 2 et problablement de n, ∀ n
+clear Hic Hiv Hab Hii.
+*)
+assert (Hz2 : (0 < 2)%L). {
+  apply (rngl_le_lt_trans Hor _ 1)%L. {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+assert (H2z : 2%L ≠ 0%L). {
+  intros H; rewrite H in Hz2; revert Hz2.
+  apply (rngl_lt_irrefl Hor).
+}
 split. {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L). {
-    apply (rngl_le_lt_trans Hor _ 1)%L. {
-      apply (rngl_0_le_1 Hon Hop Hor).
-    }
-    apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
-    specialize (rngl_characteristic_prop) as H2.
-    rewrite Hon in H2.
-    remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
-    remember (ch =? 0) as chz eqn:Hchz; symmetry in Hchz.
-    destruct chz. {
-      specialize (H2 1); cbn in H2.
-      now rewrite rngl_add_0_r in H2.
-    } {
-      destruct H2 as (H2, H3).
-      destruct ch; [ easy | clear Hchz ].
-      destruct ch; [ easy | clear Hc1 ].
-      destruct ch; [ easy | clear Hc2 ].
-      specialize (H2 2); cbn in H2.
-      rewrite rngl_add_0_r in H2.
-      apply H2.
-      split; [ easy | ].
-      now do 2 apply -> Nat.succ_lt_mono.
-    }
-  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L); [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv); [ | easy ].
   rewrite rngl_mul_add_distr_r.
   rewrite (rngl_mul_1_l Hon).
   apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
+} {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L); [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv); [ | easy ].
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_add_le_compat Hor); [ easy | apply (rngl_le_refl Hor) ].
 }
-...
+Qed.
 
 Theorem least_upper_bound :
   rngl_has_1 T = true →
@@ -1515,11 +1511,10 @@ Theorem AnBn_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
   ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hc2 Hor * Hab.
+intros Hic Hon Hop Hiv Hor * Hab.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1541,10 +1536,9 @@ remember (is_upper_bound P _) as c eqn:Hc; symmetry in Hc.
 destruct c as [H1| H1]. {
   eapply (rngl_le_trans Hor). {
     apply IHi.
-... ...
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hc2 Hor).
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
   }
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hc2 Hor).
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
 }
 ...
     specialize (rngl_mod_div) as H2.
