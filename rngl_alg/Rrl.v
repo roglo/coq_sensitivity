@@ -1444,8 +1444,32 @@ split. {
 }
 Qed.
 
+Theorem AnBn_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab.
+revert a b Hab.
+induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
+destruct (is_upper_bound P _) as [H1| H1]. {
+  eapply (rngl_le_trans Hor). {
+    apply IHi.
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+} {
+  apply IHi.
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+Qed.
+
 (* to be completed
 Theorem least_upper_bound :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -1458,7 +1482,7 @@ Theorem least_upper_bound :
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
+intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1495,53 +1519,9 @@ assert (H : is_Cauchy_sequence v). {
         revert q Hpq.
         induction p; intros; cbn. {
           clear Hpq.
-Theorem AnBn_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ P a b i, (a ≤ b → AnBn P a b i ≤ b)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab.
-(*
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (H1 (AnBn _ _ _ _)), H1.
-  apply (rngl_le_refl Hor).
-}
-*)
-revert b Hab.
-induction i; intros; [ apply (rngl_le_refl Hor) | cbn ].
-remember (is_upper_bound P _) as c eqn:Hc; symmetry in Hc.
-destruct c as [H1| H1]. {
-  eapply (rngl_le_trans Hor). {
-    apply IHi.
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  }
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-}
-...
-    specialize (rngl_mod_div) as H2.
-Search (_ * (_ / _)).
-apply (rngl_le_trans Hor) with (b := (a + b)%L). 2: {
-Search (_ * (_ / _))%Z.
-...
-apply rngl_add_lt_mono_r.
-...
-      apply rngl_0_lt_1. Hon Hop Hc1 Hor
-... ...
-          apply (AnBn_le Hor).
+          apply (AnBn_le Hic Hon Hop Hiv Hor).
+          now apply (rngl_lt_le_incl Hor), Hs.
+        }
 ...
 (**)
   apply (rngl_le_trans Hor _ ((b - a) / rngl_of_nat M)%L).
