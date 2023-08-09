@@ -2468,22 +2468,6 @@ specialize (H3 1 1 H2 H2)%L.
 now rewrite (rngl_mul_1_l Hon) in H3.
 Qed.
 
-Theorem rngl_0_lt_1 :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_characteristic T ≠ 1 →
-  rngl_is_ordered T = true →
-  (0 < 1)%L.
-Proof.
-intros Hon Hop Hc1 Hor.
-apply (rngl_lt_iff Hor).
-split. 2: {
-  apply not_eq_sym.
-  now apply (rngl_1_neq_0_iff Hon).
-}
-apply (rngl_0_le_1 Hon Hop Hor).
-Qed.
-
 Theorem rngl_0_lt_inv_compat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2768,6 +2752,40 @@ apply (rngl_add_sub_eq_l Hos) in H.
 rewrite (rngl_sub_diag Hos) in H; subst b.
 revert Hbz.
 apply (rngl_lt_irrefl Hor).
+Qed.
+
+Theorem rngl_0_lt_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  (0 < 1)%L.
+Proof.
+intros Hon Hop Hc1 Hor.
+apply (rngl_lt_iff Hor).
+split. 2: {
+  apply not_eq_sym.
+  now apply (rngl_1_neq_0_iff Hon).
+}
+apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+
+Theorem rngl_0_lt_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  (0 < 2)%L.
+Proof.
+intros Hon Hop Hc1 Hor.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply (rngl_le_lt_trans Hor _ 1)%L. {
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+apply (rngl_lt_add_r Hos Hor).
+apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
 Theorem rngl_add_nonneg_nonneg :

@@ -1400,7 +1400,6 @@ apply (H1 1 (rngl_abs a))%L.
 split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 Qed.
 
-(* to be completed
 Theorem rngl_middle_in_middle :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1425,45 +1424,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 ((a + b) / 2)%L), (H1 a), (H1 b).
   split; apply (rngl_le_refl Hor).
 }
-(* marrant, quand il y a un 1, l'opposé, l'ordre et la caractéristique
-   différente de 1 alors 0 < 2, ça veut donc dire que la caractéristique
-   est différente de 2 et problablement de n, ∀ n
-*)
-(*
-Theorem rngl_characteristic_1_if :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  rngl_characteristic T ≠ 1 →
-  rngl_characteristic T = 0.
-Proof.
-intros Hon Hop Hor Hc1.
-specialize rngl_characteristic_prop as H1.
-rewrite Hon in H1.
-remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
-destruct ch; [ easy | exfalso ].
-cbn in H1.
-destruct H1 as (H1, H2).
-destruct ch; [ easy | clear Hc1 ].
-induction ch. {
-...
-clear Hic Hiv Hab Hii Hos; exfalso.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-*)
-assert (Hz2 : (0 < 2)%L). {
-  apply (rngl_le_lt_trans Hor _ 1)%L. {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  apply (rngl_lt_add_r Hos Hor).
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
+specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 assert (H2z : 2%L ≠ 0%L). {
   intros H; rewrite H in Hz2; revert Hz2.
   apply (rngl_lt_irrefl Hor).
 }
-(**)
 split. {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L); [ easy | ].
   rewrite (rngl_mul_div_r Hon Hic Hiv); [ | easy ].
@@ -1479,6 +1444,7 @@ split. {
 }
 Qed.
 
+(* to be completed
 Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
