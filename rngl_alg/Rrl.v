@@ -6,6 +6,10 @@ Require Import Utf8 Reals.
 Require Import Main.Misc Main.RingLike.
 Require Import Init.Nat.
 
+Notation "a ≤ b ≤ c ≤ d" :=
+  (a ≤ b ∧ b ≤ c ∧ c ≤ d)%L (at level 70, b at next level, c at next level) :
+  ring_like_scope.
+
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
 (* general complex whose real and imaginary parts are of type T
@@ -1238,7 +1242,7 @@ Fixpoint bisection (P : T → bool) lb ub n :=
 (* to be defined with "bisection", perhaps? *)
 Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
   match n with
-  | 0 => Bn
+  | 0 => (An, Bn)
   | S n' =>
       let A := ((An + Bn) / 2)%L in
       if is_upper_bound P A then AnBn P An A n'
@@ -1444,46 +1448,146 @@ split. {
 }
 Qed.
 
+(* to be completed
 Theorem AnBn_interval :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ P a b i, (a ≤ b → a ≤ AnBn P a b i ≤ b)%L.
+  ∀ a b, (a ≤ b)%L →
+  ∀ P n an bn,
+  AnBn P a b n = (an, bn)
+  → (a ≤ an ≤ bn ≤ b)%L ∧
+    bn = (an + (b - a) / 2 ^ n)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hab.
-revert a b Hab.
-induction i; intros. {
-  split; [ easy | apply (rngl_le_refl Hor) ].
+intros Hic Hon Hop Hiv Hor * Hab * Hanbn.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
 }
-cbn.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 a), (H1 b), (H1 an), (H1 bn).
+  split. {
+    split; [ apply (rngl_le_refl Hor) | ].
+    split; apply (rngl_le_refl Hor).
+  }
+  rewrite rngl_add_0_l, (rngl_sub_0_r Hos).
+  symmetry; apply H1.
+}
+assert (Hc2 : (2 ≠ 0)%L). {
+  specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as H2.
+  intros H; rewrite H in H2.
+  now apply (rngl_lt_irrefl Hor) in H2.
+}
+revert a b Hab Hanbn.
+induction n; intros. {
+  cbn in Hanbn.
+  injection Hanbn; intros; clear Hanbn; subst an bn.
+  split. {
+    split; [ apply (rngl_le_refl Hor) | ].
+    split; [ easy | apply (rngl_le_refl Hor) ].
+  }
+  cbn; rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite rngl_add_comm; symmetry.
+  apply (rngl_sub_add Hop).
+}
+cbn in Hanbn |-*.
 destruct (is_upper_bound P _) as [H1| H1]. {
-  split. {
-    apply (IHi a ((a + b) / 2))%L.
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  } {
-    eapply (rngl_le_trans Hor). {
-      apply IHi.
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    }
+  specialize (IHn a ((a + b) / 2))%L.
+  assert (H : (a ≤ (a + b) / 2)%L). {
     now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
   }
+  specialize (IHn H Hanbn); clear H.
+  destruct  IHn as (Haabb, Hbnan).
+  split. {
+    split; [ easy | ].
+    split; [ easy | ].
+    eapply (rngl_le_trans Hor); [ apply Haabb | ].
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  rewrite Hbnan at 1.
+  f_equal.
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
+    now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  }
+  rewrite (rngl_div_div_swap Hic Hiv).
+  f_equal.
+...
 } {
-  split. {
-    eapply (rngl_le_trans Hor) with (b := ((a + b) / 2)%L). 2: {
-      apply IHi.
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    }
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  } {
-    apply IHi.
+  specialize (IHn ((a + b) / 2) b)%L.
+  assert (H : ((a + b) / 2 ≤ b)%L). {
     now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
   }
+  specialize (IHn H Hanbn); clear H.
+  split; [ | easy ].
+  eapply (rngl_le_trans Hor); [ | apply IHn ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
 }
 Qed.
 
-(* to be completed
+(*
+Theorem AnBn_interval :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P n an bn,
+  AnBn P a b n = (an, bn)
+  → (a ≤ an ≤ bn ≤ b)%L ∧
+    bn = (an + (b - a) / 2 ^ n)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab * Hanbn.
+revert a b Hab Hanbn.
+induction n; intros. {
+  cbn in Hanbn.
+  injection Hanbn; intros; clear Hanbn; subst an bn.
+  split. {
+    split; [ apply (rngl_le_refl Hor) | ].
+    split; [ easy | apply (rngl_le_refl Hor) ].
+  }
+  cbn; rewrite (rngl_div_1_r Hon Hiq Hc1).
+}
+cbn in Hanbn |-*.
+destruct (is_upper_bound P _) as [H1| H1]. {
+  specialize (IHn a ((a + b) / 2))%L.
+  assert (H : (a ≤ (a + b) / 2)%L). {
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  specialize (IHn H Hanbn); clear H.
+  split; [ easy | ].
+  split; [ easy | ].
+  eapply (rngl_le_trans Hor); [ apply IHn | ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+} {
+  specialize (IHn ((a + b) / 2) b)%L.
+  assert (H : ((a + b) / 2 ≤ b)%L). {
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  specialize (IHn H Hanbn); clear H.
+  split; [ | easy ].
+  eapply (rngl_le_trans Hor); [ | apply IHn ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+Qed.
+*)
+
+(* to be completed *)
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1503,7 +1607,7 @@ intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
 progress unfold is_complete in Hco.
-set (v := AnBn P a b).
+set (v := λ n, snd (AnBn P a b n)).
 assert (H : is_Cauchy_sequence v). {
   unfold is_Cauchy_sequence.
   intros ε Hε.
@@ -1528,8 +1632,10 @@ assert (H : is_Cauchy_sequence v). {
   assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
     unfold v.
+    specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
+...
       rewrite (rngl_abs_nonneg Hop Hor). 2: {
         apply (rngl_le_0_sub Hop Hor).
 clear v HM1 HM2.

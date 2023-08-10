@@ -885,7 +885,7 @@ Theorem rngl_div_div_swap :
   (a / b / c = a / c / b)%L.
 Proof.
 intros Hic Hin *.
-unfold rngl_div.
+progress unfold rngl_div.
 now rewrite Hin, rngl_mul_mul_swap.
 Qed.
 
@@ -1910,6 +1910,19 @@ rewrite (rngl_mul_1_r Hon).
 now symmetry; apply div_diag.
 Qed.
 
+Theorem rngl_div_div :
+  rngl_has_opp_or_subt T = true →
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  ∀ a b c, (b ≠ 0 → c ≠ 0 → a / b / c = a / (c * b))%L.
+Proof.
+intros Hos Hon Hiv * Hbz Hzc.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- rngl_mul_assoc; f_equal; symmetry.
+now apply (rngl_inv_mul_distr Hon Hos Hiv).
+Qed.
+
 Theorem rngl_eq_add_0 :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%L.
@@ -2362,6 +2375,19 @@ Qed.
 
 Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
 Proof. easy. Qed.
+
+Theorem rngl_pow_nonzero :
+  rngl_has_1 T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a n, (a ≠ 0 → a ^ n ≠ 0)%L.
+Proof.
+intros Hon Hc1 Hos Hii * Haz.
+induction n; [ now apply (rngl_1_neq_0_iff Hon) | cbn ].
+intros H1; apply IHn.
+now apply (rngl_eq_mul_0_l Hos Hii) in H1.
+Qed.
 
 (* *)
 
