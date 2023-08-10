@@ -1596,6 +1596,9 @@ Theorem least_upper_bound :
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1625,6 +1628,31 @@ assert (H : is_Cauchy_sequence v). {
   assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
     unfold v.
+    destruct (le_dec p q) as [Hpq| Hpq]. {
+      rewrite Nat.min_l; [ | easy ].
+      subst v.
+      clear HM1 HM2.
+      revert a b q Ha Hs Hpq.
+      induction p; intros; cbn. {
+        specialize (AnBn_interval Hic Hon Hop Hiv Hor a b) as H2.
+        assert (H : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
+        specialize (H2 H P q); clear H.
+        remember (fst (AnBn P a b q)) as aq eqn:Haq.
+        remember (snd (AnBn P a b q)) as bq eqn:Hbq.
+        specialize (H2 aq bq).
+        rewrite Haq, Hbq in H2.
+        specialize (H2 (surjective_pairing _)).
+        rewrite <- Haq, <- Hbq in H2.
+        destruct H2 as (H2, H4).
+        rewrite (rngl_div_1_r Hon Hiq Hc1).
+        rewrite (rngl_abs_nonneg Hop Hor). {
+          apply (rngl_sub_le_mono_l Hop Hor).
+          now apply (rngl_le_trans Hor _ aq).
+        } {
+          now apply (rngl_le_0_sub Hop Hor).
+        }
+      }
+...
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H2.
     specialize (H1 a b).
@@ -1649,8 +1677,14 @@ assert (H : is_Cauchy_sequence v). {
     destruct H2 as (H2, H4).
     move H2 before H1.
 ...
-    destruct (le_dec p q) as [Hpq| Hpq]. {
-      rewrite Nat.min_l; [ | easy ].
+      revert a b q Ha Hs Hpq.
+        induction p; intros; cbn. {
+          apply (AnBn_interval Hic Hon Hop Hiv Hor).
+          now apply (rngl_lt_le_incl Hor), Hs.
+        }
+      eapply (rngl_le_trans Hor). {
+...
+      eapply (rngl_le_trans Hor); [ apply IHp; flia Hpq | ].
 ...
       rewrite (rngl_abs_nonneg Hop Hor). 2: {
         apply (rngl_le_0_sub Hop Hor).

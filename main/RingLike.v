@@ -2639,6 +2639,18 @@ do 2 rewrite (fold_rngl_sub Hop) in H1.
 now rewrite (rngl_add_sub Hos) in H1.
 Qed.
 
+Theorem rngl_sub_le_mono_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T, (a ≤ b)%L → (c - b ≤ c - a)%L.
+Proof.
+intros Hop Hor * Hab.
+progress unfold rngl_sub.
+rewrite Hop.
+apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
+now apply -> (rngl_opp_le_compat Hop Hor).
+Qed.
+
 Theorem rngl_sub_le_mono_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
