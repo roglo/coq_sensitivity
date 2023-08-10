@@ -1429,10 +1429,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   split; apply (rngl_le_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
-assert (H2z : 2%L ≠ 0%L). {
-  intros H; rewrite H in Hz2; revert Hz2.
-  apply (rngl_lt_irrefl Hor).
-}
+specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
 split. {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L); [ easy | ].
   rewrite (rngl_mul_div_r Hon Hic Hiv); [ | easy ].
@@ -1487,11 +1484,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite rngl_add_0_l, (rngl_sub_0_r Hos).
   symmetry; apply H1.
 }
-assert (Hc2 : (2 ≠ 0)%L). {
-  specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as H2.
-  intros H; rewrite H in H2.
-  now apply (rngl_lt_irrefl Hor) in H2.
-}
+specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
 revert a b Hab Hanbn.
 induction n; intros. {
   cbn in Hanbn.
@@ -1596,6 +1589,9 @@ Theorem least_upper_bound :
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -1653,7 +1649,10 @@ assert (H : is_Cauchy_sequence v). {
             apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
             apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
           }
-          rewrite (rngl_mul_div_r Hon Hic Hiv).
+          rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+            apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          }
 ...
 apply (rngl_lt_le_trans Hor _ (a ^ n))%L; [ easy | ].
 rewrite <- (rngl_mul_1_l Hon (a ^ n))%L at 1.
