@@ -785,11 +785,11 @@ apply H.
 Qed.
 
 Theorem rngl_mul_le_compat :
-  rngl_is_ordered T = true →
   rngl_has_opp T = false →
+  rngl_is_ordered T = true →
   ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
-intros Hor Hop * Hac Hbd.
+intros Hop Hor * Hac Hbd.
 specialize rngl_opt_mul_le_compat as H.
 rewrite Hor, Hop in H.
 now apply H.
@@ -3618,6 +3618,28 @@ rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
 rewrite (rngl_mul_inv_r Hon Hiv); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
+Qed.
+
+Theorem rngl_pow_pos_nonneg :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  ∀ a n, (0 < a → 0 < a ^ n)%L.
+Proof.
+intros Hon Hop Hiv Hc1 Hor * Hza.
+induction n; cbn. {
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
 (* *)

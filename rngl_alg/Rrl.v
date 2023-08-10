@@ -1599,6 +1599,13 @@ intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
 unfold is_supremum.
@@ -1628,12 +1635,49 @@ assert (H : is_Cauchy_sequence v). {
   assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
     unfold v.
+    specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
+    assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
+      rewrite (rngl_abs_nonneg Hop Hor). 2: {
+        apply (rngl_le_0_sub Hop Hor).
+        specialize (Habi a b Hab P p) as H1.
+        specialize (H1 _ _ (surjective_pairing _)).
+        destruct H1 as (H1, H2).
+        specialize (Habi a b Hab P q) as H3.
+        specialize (H3 _ _ (surjective_pairing _)).
+        destruct H3 as (H3, H4).
+        rewrite H2, H4.
+        apply (rngl_add_le_compat Hor). 2: {
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := (2 ^ p)%L). {
+            apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          }
+          rewrite (rngl_mul_div_r Hon Hic Hiv).
+...
+apply (rngl_lt_le_trans Hor _ (a ^ n))%L; [ easy | ].
+rewrite <- (rngl_mul_1_l Hon (a ^ n))%L at 1.
+apply (rngl_mul_le_compat_nonneg Hor Hop). {
+  split; [ apply (rngl_0_le_1 Hon Hop Hor)| ].
+...
+apply rngl_pow_pos_nonneg.
+
+rngl_mul_pos_pos:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    rngl_has_opp T = true
+    → rngl_is_ordered T = true
+      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
+        → ∀ a b : T, (0 < a)%L → (0 < b)%L → (0 < a * b)%L
+rngl_mul_div_r:
+...
+heck rngl_mul_le_reg_l.
+          eapply (rngl_mul_le_compat_nonneg Hor).
+...
       subst v.
       clear HM1 HM2.
       revert a b q Ha Hs Hpq.
       induction p; intros; cbn. {
+...
         specialize (AnBn_interval Hic Hon Hop Hiv Hor a b) as H2.
         assert (H : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
         specialize (H2 H P q); clear H.
@@ -1654,7 +1698,8 @@ assert (H : is_Cauchy_sequence v). {
       }
       destruct (is_upper_bound _ _) as [H1| H1]. {
         eapply (rngl_le_trans Hor). {
-          apply IHp.
+Search (_ - _ ≤ _ - _)%L.
+apply (rngl_sub_le_mono_r Hop Hor).
 ...
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H2.
