@@ -1448,7 +1448,6 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem AnBn_interval :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1521,10 +1520,6 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   }
   rewrite Hbnan at 1.
   f_equal.
-(*
-  ============================
-  (((a + b) / 2 - a) / 2 ^ n)%L = ((b - a) / (2 * 2 ^ n))%L
-*)
   rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
     now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
@@ -1545,11 +1540,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   rewrite <- (rngl_opp_involutive Hop (_ - _))%L.
   f_equal.
   rewrite (rngl_opp_sub_distr Hop).
-  apply (rngl_mul_cancel_r Hi1) with (c := 2%L); [ easy | ].
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_add_sub Hos).
+  apply (rngl_one_sub_half Hon Hop Hiv Hor).
 } {
   specialize (IHn ((a + b) / 2) b)%L.
   assert (H : ((a + b) / 2 ≤ b)%L). {
@@ -1564,61 +1555,32 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   }
   rewrite Hbnan at 1.
   f_equal.
-...
-  ============================
-  ((b - (a + b) / 2) / 2 ^ n)%L = ((b - a) / (2 * 2 ^ n))%L
-...
-Qed.
-
-(*
-Theorem AnBn_interval :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (a ≤ b)%L →
-  ∀ P n an bn,
-  AnBn P a b n = (an, bn)
-  → (a ≤ an ≤ bn ≤ b)%L ∧
-    bn = (an + (b - a) / 2 ^ n)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hanbn.
-revert a b Hab Hanbn.
-induction n; intros. {
-  cbn in Hanbn.
-  injection Hanbn; intros; clear Hanbn; subst an bn.
-  split. {
-    split; [ apply (rngl_le_refl Hor) | ].
-    split; [ easy | apply (rngl_le_refl Hor) ].
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
+    now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
-  cbn; rewrite (rngl_div_1_r Hon Hiq Hc1).
-}
-cbn in Hanbn |-*.
-destruct (is_upper_bound P _) as [H1| H1]. {
-  specialize (IHn a ((a + b) / 2))%L.
-  assert (H : (a ≤ (a + b) / 2)%L). {
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  }
-  specialize (IHn H Hanbn); clear H.
-  split; [ easy | ].
-  split; [ easy | ].
-  eapply (rngl_le_trans Hor); [ apply IHn | ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-} {
-  specialize (IHn ((a + b) / 2) b)%L.
-  assert (H : ((a + b) / 2 ≤ b)%L). {
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  }
-  specialize (IHn H Hanbn); clear H.
-  split; [ | easy ].
-  eapply (rngl_le_trans Hor); [ | apply IHn ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  rewrite (rngl_div_div_swap Hic Hiv).
+  f_equal.
+  progress unfold rngl_div.
+  rewrite Hiv.
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_add_comm.
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite (rngl_opp_add_distr Hop).
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite (rngl_add_comm (- (a * _))%L).
+  rewrite rngl_add_assoc; f_equal.
+  rewrite (fold_rngl_sub Hop).
+  rewrite <- (rngl_mul_1_r Hon b) at 1.
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  f_equal.
+  apply (rngl_one_sub_half Hon Hop Hiv Hor).
 }
 Qed.
-*)
 
-(* to be completed *)
+(* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →

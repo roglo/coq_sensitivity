@@ -2888,6 +2888,36 @@ apply (rngl_mul_nat_inj_le Hop Hor).
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rngl_one_sub_half :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (1 - 2⁻¹ = 2⁻¹)%L.
+Proof.
+intros Hon Hop Hiv Hor.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (_ - _))%L, H1.
+}
+assert (Hc2 : (2 ≠ 0)%L). {
+  specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as H2.
+  intros H; rewrite H in H2.
+  now apply (rngl_lt_irrefl Hor) in H2.
+}
+apply (rngl_mul_cancel_r Hi1) with (c := 2%L); [ easy | ].
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_add_sub Hos).
+Qed.
+
 (* abs *)
 
 Theorem rngl_abs_0 :
