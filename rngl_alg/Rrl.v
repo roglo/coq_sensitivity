@@ -1652,6 +1652,9 @@ assert (H : is_Cauchy_sequence v). {
           now apply (rngl_le_0_sub Hop Hor).
         }
       }
+      destruct (is_upper_bound _ _) as [H1| H1]. {
+        eapply (rngl_le_trans Hor). {
+          apply IHp.
 ...
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H2.
