@@ -1521,22 +1521,53 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   }
   rewrite Hbnan at 1.
   f_equal.
+(*
+  ============================
+  (((a + b) / 2 - a) / 2 ^ n)%L = ((b - a) / (2 * 2 ^ n))%L
+*)
   rewrite <- (rngl_div_div Hos Hon Hiv); [ | | easy ]. 2: {
     now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
   rewrite (rngl_div_div_swap Hic Hiv).
   f_equal.
-...
+  progress unfold rngl_div.
+  rewrite Hiv.
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_add_comm.
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite <- rngl_add_assoc; f_equal.
+  rewrite (fold_rngl_sub Hop).
+  rewrite <- (rngl_mul_1_r Hon a) at 2.
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite <- (rngl_mul_opp_r Hop); f_equal.
+  rewrite <- (rngl_opp_involutive Hop (_ - _))%L.
+  f_equal.
+  rewrite (rngl_opp_sub_distr Hop).
+  apply (rngl_mul_cancel_r Hi1) with (c := 2%L); [ easy | ].
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_add_sub Hos).
 } {
   specialize (IHn ((a + b) / 2) b)%L.
   assert (H : ((a + b) / 2 ≤ b)%L). {
     now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
   }
   specialize (IHn H Hanbn); clear H.
-  split; [ | easy ].
-  eapply (rngl_le_trans Hor); [ | apply IHn ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-}
+  destruct  IHn as (Haabb, Hbnan).
+  split. {
+    split; [ | easy ].
+    eapply (rngl_le_trans Hor); [ | apply Haabb ].
+    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+  }
+  rewrite Hbnan at 1.
+  f_equal.
+...
+  ============================
+  ((b - (a + b) / 2) / 2 ^ n)%L = ((b - a) / (2 * 2 ^ n))%L
+...
 Qed.
 
 (*
