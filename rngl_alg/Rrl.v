@@ -1626,6 +1626,29 @@ assert (H : is_Cauchy_sequence v). {
     clear Hp Hq.
     unfold v.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
+    specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H2.
+    specialize (H1 a b).
+    specialize (H2 a b).
+    assert (H : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
+    specialize (H1 H P p).
+    specialize (H2 H P q); clear H.
+    remember (fst (AnBn P a b p)) as ap eqn:Hap.
+    remember (snd (AnBn P a b p)) as bp eqn:Hbp.
+    remember (fst (AnBn P a b q)) as aq eqn:Haq.
+    remember (snd (AnBn P a b q)) as bq eqn:Hbq.
+    specialize (H1 ap bp).
+    specialize (H2 aq bq).
+    move aq before bp; move bq before aq.
+    rewrite Hap, Hbp in H1.
+    rewrite Haq, Hbq in H2.
+    specialize (H1 (surjective_pairing _)).
+    specialize (H2 (surjective_pairing _)).
+    rewrite <- Hap, <- Hbp in H1.
+    rewrite <- Haq, <- Hbq in H2.
+    destruct H1 as (H1, H3).
+    destruct H2 as (H2, H4).
+    move H2 before H1.
+...
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
 ...
