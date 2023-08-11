@@ -1685,8 +1685,8 @@ assert (H : is_Cauchy_sequence v). {
         apply (rngl_le_0_sub Hop Hor).
         now apply (Bn_le Hic Hon Hop Hiv Hor).
       }
-      clear Ha Hs.
-      revert a b q v HM1 HM2 Hab Hpq.
+      clear Ha Hs HM1 HM2 v.
+      revert a b q Hab Hpq.
       induction p; intros; cbn. {
         rewrite (rngl_div_1_r Hon Hiq Hc1).
         apply (rngl_sub_le_mono_l Hop Hor).
@@ -1698,7 +1698,39 @@ assert (H : is_Cauchy_sequence v). {
       destruct q; [ easy | cbn ].
       apply Nat.succ_le_mono in Hpq.
       destruct (is_upper_bound _ _) as [H1| H1]. {
-        apply (rngl_le_trans Hor _ (((a + b) / 2 - a) / 2 ^ p))%L. 2: {
+        eapply (rngl_le_trans Hor). {
+          apply IHp; [ | easy ].
+          now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+        }
+        rewrite (rngl_mul_comm Hic 2)%L.
+        rewrite <- (rngl_div_div Hos Hon Hiv); [ | | apply H2i ]. 2: {
+          apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+        }
+        rewrite (rngl_middle_sub_l Hon Hop Hiv Hor).
+        apply (rngl_le_refl Hor).
+      } {
+        eapply (rngl_le_trans Hor). {
+          apply IHp; [ | easy ].
+          now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+        }
+        rewrite (rngl_mul_comm Hic 2)%L.
+        rewrite <- (rngl_div_div Hos Hon Hiv); [ | | apply H2i ]. 2: {
+          apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+        }
+        rewrite (rngl_middle_sub_r Hon Hop Hiv Hor).
+        apply (rngl_le_refl Hor).
+      }
+    } {
+      apply Nat.nle_gt in Hpq.
+      rewrite Nat.min_r; [ | now apply Nat.lt_le_incl ].
+... ...
+rewrite rngl_middle_sub_r.
+About rngl_middle_sub_left.
+...
+        rewrite (rngl_middle_sub_left Hon Hop Hiv Hor).
+        apply (rngl_le_refl Hor).
+...
+        apply IHp; [ | easy ].
           rewrite (rngl_mul_comm Hic 2)%L.
           rewrite <- (rngl_div_div Hos Hon Hiv); [ | | apply H2i ]. 2: {
             apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
@@ -1706,7 +1738,8 @@ assert (H : is_Cauchy_sequence v). {
           rewrite (rngl_middle_sub_left Hon Hop Hiv Hor).
           apply (rngl_le_refl Hor).
         }
-        apply IHp; [ | | | easy ].
+        apply IHp; [ | easy ].
+        now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
 ...
         specialize (Habi a b Hab P p) as H1.
         specialize (H1 _ _ (surjective_pairing _)).

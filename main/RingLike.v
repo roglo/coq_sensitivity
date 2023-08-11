@@ -3683,7 +3683,7 @@ apply (rngl_mul_le_compat_nonneg Hop Hor). {
 }
 Qed.
 
-Theorem rngl_middle_sub_left :
+Theorem rngl_middle_sub_l :
    rngl_has_1 T = true →
    rngl_has_opp T = true →
    rngl_has_inv T = true →
@@ -3707,6 +3707,31 @@ f_equal.
 rewrite <- (rngl_opp_involutive Hop (_ - _))%L.
 f_equal.
 rewrite (rngl_opp_sub_distr Hop).
+apply (rngl_one_sub_half Hon Hop Hiv Hor).
+Qed.
+
+Theorem rngl_middle_sub_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (b - (a + b) / 2 = (b - a) / 2)%L.
+Proof.
+intros Hon Hop Hiv Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite rngl_add_comm.
+(**)
+rewrite (rngl_sub_add_distr Hos).
+f_equal.
+rewrite <- (rngl_mul_1_r Hon b) at 1.
+rewrite <- (rngl_mul_sub_distr_l Hop).
+f_equal.
 apply (rngl_one_sub_half Hon Hop Hiv Hor).
 Qed.
 
