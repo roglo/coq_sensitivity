@@ -1575,6 +1575,45 @@ destruct (is_upper_bound P _) as [H1| H1]. {
 }
 Qed.
 
+Theorem Bn_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P p q,
+  p ≤ q
+  → (snd (AnBn P a b q) ≤ snd (AnBn P a b p))%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab * Hpq.
+revert a b q Hab Hpq.
+induction p; intros; cbn. {
+  clear Hpq.
+  revert a b Hab.
+  induction q; intros; [ apply (rngl_le_refl Hor) | cbn ].
+  destruct (is_upper_bound _ _) as [H1| H1]. {
+    eapply (rngl_le_trans Hor). {
+      apply IHq.
+      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+    } {
+      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+    }
+  }
+  apply IHq.
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+destruct q; [ easy | cbn ].
+apply Nat.succ_le_mono in Hpq.
+destruct (is_upper_bound _ _) as [H1| H1]. {
+  apply IHp; [ | easy ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+} {
+  apply IHp; [ | easy ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+Qed.
+
 (* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
@@ -1644,6 +1683,9 @@ assert (H : is_Cauchy_sequence v). {
       rewrite Nat.min_l; [ | easy ].
       rewrite (rngl_abs_nonneg Hop Hor). 2: {
         apply (rngl_le_0_sub Hop Hor).
+        now apply (Bn_le Hic Hon Hop Hiv Hor).
+      }
+...
         specialize (Habi a b Hab P p) as H1.
         specialize (H1 _ _ (surjective_pairing _)).
         destruct H1 as (H1, H2).
