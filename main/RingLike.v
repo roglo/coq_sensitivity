@@ -2376,6 +2376,16 @@ Qed.
 Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
 Proof. easy. Qed.
 
+Theorem rngl_pow_add_r :
+  rngl_has_1 T = true →
+  ∀ a i j, (a ^ (i + j) = a ^ i * a ^ j)%L.
+Proof.
+intros Hon *.
+induction i; [ symmetry; apply (rngl_mul_1_l Hon) | cbn ].
+rewrite <- rngl_mul_assoc; f_equal.
+apply IHi.
+Qed.
+
 Theorem rngl_pow_nonzero :
   rngl_has_1 T = true →
   rngl_characteristic T ≠ 1 →

@@ -1627,6 +1627,11 @@ assert (H : is_Cauchy_sequence v). {
   destruct H1 as (M & HM1 & HM2).
   exists (Nat.log2 M).
   intros * Hp Hq.
+  assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
+    intros.
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
   (* TODO: a lemma *)
   assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
@@ -1649,18 +1654,23 @@ assert (H : is_Cauchy_sequence v). {
             apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
             apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
           }
-          rewrite (rngl_div_mul Hon Hiv). 2: {
-            apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-          }
+          rewrite (rngl_div_mul Hon Hiv); [ | apply H2i ].
           progress unfold rngl_div.
           rewrite Hiv.
-(**)
           replace q with (p + (q - p)) by flia Hpq.
-Search (_ ^ (_ + _)%nat)%L.
-Search (_ ^ (_ + _))%Z.
-...
-          rewrite rngl_pow_add_r.
+          rewrite (rngl_pow_add_r Hon).
+          rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | apply H2i | ]. 2: {
+            apply H2i.
+          }
+          do 2 rewrite <- rngl_mul_assoc.
+          rewrite (rngl_mul_inv_l Hon Hiv); [ | apply H2i ].
+          rewrite (rngl_mul_1_r Hon).
+          rewrite <- (rngl_mul_1_r Hon (b - a))%L at 2.
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+            apply (rngl_lt_0_sub Hop Hor).
+            now apply Hs.
+          }
+Search (_ ^ _ ≤ _)%L.
 ...
           rewrite <- (rngl_inv_involutive Hon Hos Hiv (2 ^ p))%L. 2: {
             apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
