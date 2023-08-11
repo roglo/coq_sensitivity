@@ -2,7 +2,7 @@
 (* see also Quaternions.v *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 Reals.
+Require Import Utf8 ZArith.
 Require Import Main.Misc Main.RingLike.
 Require Import Init.Nat.
 
