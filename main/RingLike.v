@@ -763,22 +763,22 @@ apply H.
 Qed.
 
 Theorem rngl_mul_le_compat_nonneg :
-  rngl_is_ordered T = true →
   rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
-intros Hor Hop *.
+intros Hop Hor *.
 specialize rngl_opt_mul_le_compat_nonneg as H.
 rewrite Hor, Hop in H.
 apply H.
 Qed.
 
 Theorem rngl_mul_le_compat_nonpos :
-  rngl_is_ordered T = true →
   rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
-intros Hor Hop *.
+intros Hop Hor *.
 specialize rngl_opt_mul_le_compat_nonpos as H.
 rewrite Hor, Hop in H.
 apply H.
@@ -2410,7 +2410,7 @@ intros * Hop Hor * Ha Hb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 a b)%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
 specialize (H1 H); clear H.
@@ -2428,7 +2428,7 @@ intros * Hop Hor * Ha Hb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
+specialize (rngl_mul_le_compat_nonpos Hop Hor) as H1.
 specialize (H1 0 0 a b)%L.
 assert (H : (a ≤ 0 ≤ 0)%L) by now split; [ | apply (rngl_le_refl Hor) ].
 specialize (H1 H); clear H.
@@ -2446,7 +2446,7 @@ intros * Hop Hor * Ha Hb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 a (- b))%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
 specialize (H1 H); clear H.
@@ -2472,7 +2472,7 @@ intros * Hop Hor * Ha Hb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 (- a) b)%L.
 assert (H : (0 ≤ 0 ≤ - a)%L). {
   split; [ apply (rngl_le_refl Hor) | ].
@@ -2578,7 +2578,7 @@ Proof.
 intros * Hon Hop Hiv Hor * Hbz (Hza, Hab).
 unfold rngl_div.
 rewrite Hiv.
-specialize (rngl_mul_le_compat_nonneg Hor Hop) as H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 a b⁻¹ b b⁻¹)%L.
 assert (H : (0 ≤ a ≤ b)%L) by easy.
 specialize (H1 H); clear H.
@@ -3146,7 +3146,7 @@ destruct xz. {
       apply rngl_leb_le in Hxy.
       progress unfold rngl_div in Hxy.
       rewrite Hiv in Hxy.
-      specialize (rngl_mul_le_compat_nonpos Hor Hop) as H1.
+      specialize (rngl_mul_le_compat_nonpos Hop Hor) as H1.
       specialize (H1 0 0 x y⁻¹)%L.
       assert (H : (x ≤ 0 ≤ 0)%L). {
         split; [ easy | apply (rngl_le_refl Hor) ].

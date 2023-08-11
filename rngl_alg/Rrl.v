@@ -1670,7 +1670,36 @@ assert (H : is_Cauchy_sequence v). {
             apply (rngl_lt_0_sub Hop Hor).
             now apply Hs.
           }
+          rewrite <- (rngl_div_1_l Hon Hiv).
+          apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
+            split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+Theorem rngl_pow_le_mono_r :
+  rngl_has_opp T = true →
+  rngl_has_1 T = true →
+  rngl_is_ordered T = true →
+  ∀ a i j, (0 < a)%L → i ≤ j → (a ^ i ≤ a ^ j)%L.
+Proof.
+intros Hop Hon Hor * Hza Hij.
+rewrite <- (rngl_mul_1_r Hon (a ^ i))%L.
+replace j with (i + (j - i)) by flia Hij.
+rewrite (rngl_pow_add_r Hon).
+apply (rngl_mul_le_compat_nonneg Hop Hor). 2: {
+  split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+Search (_ ≤ _ ^ _)%L.
+...
+Search (_ * _ ≤ _ * _)%L.
+apply rngl_mul_le_mono_pos_r with (c := (a ^ (- i)))%L.
+... ...
+            rewrite <- (rngl_pow_0_r 2)%L at 1.
+            apply rngl_pow_le_mono_r.
+Search (_ ≤ _ ^ _)%L.
+Search (_ ≤ _ ^ _)%Z.
+Search (_ ^ _ ≤ _ ^ _)%Z.
+Search (_ < _ ^ _)%Z.
 Search (_ ^ _ ≤ _)%L.
+Search (_⁻¹ ≤ _)%L.
+Search (1 / _)%L.
+Search (_ / _ ≤ _)%L.
 ...
           rewrite <- (rngl_inv_involutive Hon Hos Hiv (2 ^ p))%L. 2: {
             apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
