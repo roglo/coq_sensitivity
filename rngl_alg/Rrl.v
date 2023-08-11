@@ -1648,6 +1648,9 @@ assert (H : is_Cauchy_sequence v). {
         specialize (Habi a b Hab P q) as H3.
         specialize (H3 _ _ (surjective_pairing _)).
         destruct H3 as (H3, H4).
+...
+        (* crotte : j'ai démontré une première partie, mais la
+           seconde est fausse ! *)
         rewrite H2, H4.
         apply (rngl_add_le_compat Hor). 2: {
           apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := (2 ^ p)%L). {
@@ -1673,6 +1676,15 @@ assert (H : is_Cauchy_sequence v). {
           rewrite <- (rngl_div_1_l Hon Hiv).
           apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
             split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+            apply (rngl_pow_ge_1 Hop Hon Hor).
+            apply (rngl_le_add_l Hor).
+            apply (rngl_0_le_1 Hon Hop Hor).
+          }
+          apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+          apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+        }
+        (* aïe, c'est faux !!! *)
+...
 Theorem rngl_pow_le_mono_r :
   rngl_has_opp T = true →
   rngl_has_1 T = true →
@@ -1686,6 +1698,10 @@ rewrite (rngl_pow_add_r Hon).
 apply (rngl_mul_le_compat_nonneg Hop Hor). 2: {
   split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 Search (_ ≤ _ ^ _)%L.
+Search (_ ≤ _ ^ _)%Z.
+Require Import QArith.
+Search (_ ≤ _ ^ _)%Q.
+Theorem rngl_pow_ge_1 :
 ...
 Search (_ * _ ≤ _ * _)%L.
 apply rngl_mul_le_mono_pos_r with (c := (a ^ (- i)))%L.

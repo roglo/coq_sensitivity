@@ -3665,6 +3665,24 @@ assert
 now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
+Theorem rngl_pow_ge_1 :
+  rngl_has_opp T = true →
+  rngl_has_1 T = true →
+  rngl_is_ordered T = true →
+  ∀ a n, (1 ≤ a → 1 ≤ a ^ n)%L.
+Proof.
+intros Hop Hon Hor * Hza.
+induction n; [ apply (rngl_le_refl Hor) | cbn ].
+rewrite <- (rngl_mul_1_l Hon 1%L).
+apply (rngl_mul_le_compat_nonneg Hop Hor). {
+  split; [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+} {
+  split; [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=
