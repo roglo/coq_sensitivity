@@ -1685,6 +1685,16 @@ assert (H : is_Cauchy_sequence v). {
         apply (rngl_le_0_sub Hop Hor).
         now apply (Bn_le Hic Hon Hop Hiv Hor).
       }
+      clear Ha Hs.
+      revert a b q v HM1 HM2 Hab Hpq.
+      induction p; intros; cbn. {
+        rewrite (rngl_div_1_r Hon Hiq Hc1).
+        apply (rngl_sub_le_mono_l Hop Hor).
+        specialize (Habi a b Hab P q) as H1.
+        specialize (H1 _ _ (surjective_pairing _)).
+        destruct H1 as (H1, H2).
+        eapply (rngl_le_trans Hor); apply H1.
+      }
 ...
         specialize (Habi a b Hab P p) as H1.
         specialize (H1 _ _ (surjective_pairing _)).
