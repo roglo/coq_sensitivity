@@ -1645,14 +1645,39 @@ assert (H : is_Cauchy_sequence v). {
         destruct H3 as (H3, H4).
         rewrite H2, H4.
         apply (rngl_add_le_compat Hor). 2: {
-          apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := (2 ^ p)%L). {
+          apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := (2 ^ p)%L). {
             apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
             apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
           }
-          rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
+          rewrite (rngl_div_mul Hon Hiv). 2: {
             apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
             apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
           }
+          progress unfold rngl_div.
+          rewrite Hiv.
+(**)
+          replace q with (p + (q - p)) by flia Hpq.
+Search (_ ^ (_ + _)%nat)%L.
+Search (_ ^ (_ + _))%Z.
+...
+          rewrite rngl_pow_add_r.
+...
+          rewrite <- (rngl_inv_involutive Hon Hos Hiv (2 ^ p))%L. 2: {
+            apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          }
+          rewrite <- rngl_mul_assoc.
+          rewrite <- (rngl_inv_mul_distr Hon Hos Hiv); cycle 1. {
+            apply (rngl_inv_neq_0 Hon Hos Hiv).
+            apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          } {
+            apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          }
+          rewrite (rngl_mul_comm Hic _ (2 ^ q))%L.
+          replace q with (p + (q - p)) by flia Hpq.
+          do 2 rewrite (fold_rngl_div Hiv).
 ...
 apply (rngl_lt_le_trans Hor _ (a ^ n))%L; [ easy | ].
 rewrite <- (rngl_mul_1_l Hon (a ^ n))%L at 1.
