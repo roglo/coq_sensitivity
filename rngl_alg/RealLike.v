@@ -1703,15 +1703,10 @@ assert (H : is_Cauchy_sequence v). {
           rewrite <- (rngl_div_div Hos Hon Hiv); [ | | apply H2i ]. 2: {
             apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
           }
-...
-Theorem rngl_div_le_mono :
-  ∀ a b c, (0 < c → a ≤ b → a / c ≤ b / c)%L.
-...
-apply rngl_div_le_mono.
-
-Search (_ / _ ≤ _ / _)%L.
-Search (_ / _ ≤ _ / _)%Z.
-Z.div_le_mono: ∀ a b c : Z, (0 < c)%Z → (a ≤ b)%Z → (a / c ≤ b / c)%Z
+          rewrite (rngl_middle_sub_left Hon Hop Hiv Hor).
+          apply (rngl_le_refl Hor).
+        }
+        apply IHp; [ | | | easy ].
 ...
         specialize (Habi a b Hab P p) as H1.
         specialize (H1 _ _ (surjective_pairing _)).
