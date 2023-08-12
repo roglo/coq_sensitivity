@@ -1695,7 +1695,6 @@ Theorem least_upper_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_characteristic T ≠ 1 →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   is_complete T →
@@ -1704,7 +1703,7 @@ Theorem least_upper_bound :
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hc1 Hor Har Hco * Ha Hs.
+intros Hic Hon Hop Hiv Hor Har Hco * Ha Hs.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1717,6 +1716,24 @@ assert
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  exists 0%L.
+  rewrite (H b).
+  split; [ | apply (rngl_le_refl Hor) ].
+  progress unfold is_supremum.
+  destruct (is_upper_bound P 0%L) as [H1| H1]. {
+    intros.
+    rewrite (H c').
+    destruct (is_upper_bound P 0%L); [ | easy ].
+    apply (rngl_le_refl Hor).
+  } {
+    destruct H1 as (x, Hx); apply Hx.
+    intros Hpx.
+    rewrite (H x).
+    apply (rngl_le_refl Hor).
+  }
 }
 (* Proof in
    https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
@@ -1765,6 +1782,7 @@ assert (H : is_Cauchy_sequence v). {
       now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
     }
   }
+  eapply (rngl_le_trans Hor); [ apply H | ].
 ... ...
 rewrite rngl_middle_sub_r.
 About rngl_middle_sub_left.
