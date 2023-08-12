@@ -1849,13 +1849,20 @@ assert (Hcsv : is_Cauchy_sequence v). {
 }
 specialize (Hco _ Hcsv).
 destruct Hco as (lim, Hco).
+(**)
 progress unfold is_limit_when_tending_to_inf in Hco.
-cbn in Hco.
+(**)
 exists lim.
 destruct (is_upper_bound P lim)  as [H1| H1]. {
   split. {
     intros c.
+    move c before lim.
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
+    assert (H3 : ∀ ε, (0 < ε)%L → P (lim - ε)%L ∧ ¬ P (lim + ε)%L).
+...
+    apply (rngl_nlt_ge Hor).
+    intros H4.
+    specialize (H3 (lim - c)%L) as H5.
 ...
   eapply le_trans; [ apply Nat.le_log2_up_succ_log2 | ].
 ...
