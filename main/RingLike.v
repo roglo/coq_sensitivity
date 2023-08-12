@@ -2180,6 +2180,14 @@ rewrite <- rngl_add_assoc; f_equal.
 apply IHm.
 Qed.
 
+Theorem fold_rngl_mul_nat :
+  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
+Proof. easy. Qed.
+
+Theorem fold_rngl_of_nat :
+  ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
+Proof. easy. Qed.
+
 Theorem rngl_of_nat_add : ∀ m n,
   rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
 Proof.
@@ -2203,13 +2211,29 @@ rewrite rngl_add_comm.
 apply (rngl_add_sub Hos).
 Qed.
 
-Theorem fold_rngl_mul_nat :
-  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
-Proof. easy. Qed.
+Theorem rngl_of_nat_mul :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ m n : nat, rngl_of_nat (m * n) = (rngl_of_nat m * rngl_of_nat n)%L.
+Proof.
+intros Hon Hos *.
+induction m; cbn; [ symmetry; apply (rngl_mul_0_l Hos) | ].
+do 2 rewrite fold_rngl_of_nat.
+rewrite rngl_of_nat_add, rngl_mul_add_distr_r.
+now rewrite (rngl_mul_1_l Hon); f_equal.
+Qed.
 
-Theorem fold_rngl_of_nat :
-  ∀ n, List.fold_right rngl_add 0%L (List.repeat 1 n)%L = rngl_of_nat n.
-Proof. easy. Qed.
+Theorem rngl_of_nat_pow :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a n, rngl_of_nat (a ^ n) = (rngl_of_nat a ^ n)%L.
+Proof.
+intros Hon Hos *.
+induction n; cbn; [ apply rngl_add_0_r | ].
+rewrite fold_rngl_of_nat.
+rewrite (rngl_of_nat_mul Hon Hos).
+now f_equal.
+Qed.
 
 Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
 Proof. apply rngl_add_0_r. Qed.

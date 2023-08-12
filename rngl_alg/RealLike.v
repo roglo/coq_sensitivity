@@ -1740,7 +1740,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 unfold is_supremum.
 progress unfold is_complete in Hco.
 set (v := λ n, snd (AnBn P a b n)).
-assert (H : is_Cauchy_sequence v). {
+assert (Hcsv : is_Cauchy_sequence v). {
   unfold is_Cauchy_sequence.
   intros ε Hε.
   (* The size of the interval after N iterations is (b-a)/2^N; it
@@ -1762,7 +1762,7 @@ assert (H : is_Cauchy_sequence v). {
   cbn in HM2.
   rewrite rngl_add_0_r in HM2.
   apply (rngl_add_lt_mono_r Hop Hor) in HM2.
-  exists (Nat.log2 M).
+  exists (Nat.log2_up M).
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
@@ -1801,6 +1801,44 @@ assert (H : is_Cauchy_sequence v). {
     now apply (rngl_lt_le_incl Hor).
   }
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  apply Nat.log2_up_le_pow2. {
+    apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
+    cbn in HM2.
+    rewrite (rngl_mul_0_r Hos) in HM2.
+    apply (rngl_nle_gt Hor) in HM2.
+    apply HM2; clear HM2.
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_lt_le_incl Hor).
+    now apply Hs.
+  }
+  now apply Nat.min_glb with (n := p) in Hq.
+}
+specialize (Hco _ Hcsv).
+destruct Hco as (lim, Hco).
+progress unfold is_limit_when_tending_to_inf in Hco.
+cbn in Hco.
+exists lim.
+...
+  eapply le_trans; [ apply Nat.le_log2_up_succ_log2 | ].
+...
+Nat.le_log2_up_succ_log2: ∀ a : nat, Nat.log2_up a ≤ S (Nat.log2 a)
+...
+Search Nat.log2_up.
+Search (S (Nat.log2_up _)).
+Search (S (Nat.log2 _)).
+Search (Nat.log2 _ ≤ _).
+Search (_ ≤ _ ^ _)%nat.
+...
+eapply le_trans; [ | apply Hq ].
+......
+Nat.log2_up_le_pow2: ∀ a b : nat, 0 < a → a ≤ 2 ^ b ↔ Nat.log2_up a ≤ b
+Search (rngl_of_nat (_ ^ _))%nat.
+Search (rngl_of_nat _ ≤ _)%L.
+rngl_of_nat_inj_le:
+Search (Nat.log2 (_ ^ _)).
 ...
 Search (_ / _ ≤ _)%L.
 Search (_ / _ ≤ _)%Z.
