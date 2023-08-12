@@ -2180,14 +2180,14 @@ rewrite <- rngl_add_assoc; f_equal.
 apply IHm.
 Qed.
 
-Theorem rngl_of_nat_add_r : ∀ m n,
+Theorem rngl_of_nat_add : ∀ m n,
   rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
 Proof.
 intros.
 apply rngl_mul_nat_add_r.
 Qed.
 
-Theorem rngl_of_nat_sub_r :
+Theorem rngl_of_nat_sub :
   rngl_has_opp_or_subt T = true →
   ∀ m n : nat, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
 Proof.
@@ -2197,7 +2197,7 @@ replace m with (n + (m - n)) at 2. 2: {
   rewrite Nat.add_comm.
   apply Nat.add_sub.
 }
-rewrite rngl_of_nat_add_r.
+rewrite rngl_of_nat_add.
 symmetry.
 rewrite rngl_add_comm.
 apply (rngl_add_sub Hos).
@@ -2228,7 +2228,7 @@ Theorem rngl_of_nat_succ :
 Proof.
 intros.
 rewrite <- Nat.add_1_l.
-rewrite rngl_of_nat_add_r.
+rewrite rngl_of_nat_add.
 now rewrite rngl_of_nat_1.
 Qed.
 
@@ -3641,6 +3641,28 @@ rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
 rewrite (rngl_mul_inv_r Hon Hiv); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
+Qed.
+
+Theorem rngl_div_le_upper_bound :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b q, (0 < b → a ≤ b * q → a / b ≤ q)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hzb Habq.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := b); [ easy | ].
+rewrite (rngl_mul_div_r Hon Hic Hiv); [ easy | ].
+intros H; rewrite H in Hzb.
+now apply (rngl_lt_irrefl Hor) in Hzb.
 Qed.
 
 Theorem rngl_pow_pos_nonneg :

@@ -1758,6 +1758,10 @@ assert (H : is_Cauchy_sequence v). {
     now apply (rngl_lt_le_incl Hor), Hs.
   }
   destruct H1 as (M & HM1 & HM2).
+  rewrite rngl_of_nat_add in HM2.
+  cbn in HM2.
+  rewrite rngl_add_0_r in HM2.
+  apply (rngl_add_lt_mono_r Hop Hor) in HM2.
   exists (Nat.log2 M).
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
@@ -1766,7 +1770,7 @@ assert (H : is_Cauchy_sequence v). {
     apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
   }
   (* TODO: a lemma *)
-  assert (H : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
+  assert (H1 : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
     clear Hp Hq.
     unfold v.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
@@ -1782,7 +1786,26 @@ assert (H : is_Cauchy_sequence v). {
       now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
     }
   }
-  eapply (rngl_le_trans Hor); [ apply H | ].
+  eapply (rngl_le_trans Hor); [ apply H1 | ].
+  apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv) in HM2. 2: {
+    intros H; rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+...
+Search (_ / _ ≤ _)%L.
+Search (_ / _ ≤ _)%Z.
+Require Import QArith.
+Search (_ / _ <= _)%Q.
 ...
 Qle_shift_div_r: ∀ a b c : Q, 0 < b → a <= c * b → a / b <= c
 Z.div_le_upper_bound: ∀ a b q : Z, (0 < b)%Z → (a <= b * q)%Z → (a / b <= q)%Z
