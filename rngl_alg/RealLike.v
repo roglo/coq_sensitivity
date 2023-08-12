@@ -171,6 +171,20 @@ exfalso; apply H2.
 now exists x.
 Qed.
 
+Theorem rl_forall_not_or_exist {T} {ro : ring_like_op T}
+    {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ (P : T → Prop), {∀ x, ¬ P x} + {∃ x, P x}.
+Proof.
+intros.
+specialize (rl_excl_midd (∃ x, P x)) as H2.
+destruct H2 as [H2| H2]; [ now right | left ].
+intros.
+specialize (rl_excl_midd (P x)) as H3.
+destruct H3 as [H3| H3]; [ | easy ].
+exfalso; apply H2.
+now exists x.
+Qed.
+
 Definition rl_has_mod_intgl {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option rl_opt_mod_intgl_prop.
@@ -1858,11 +1872,41 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     intros c.
     move c before lim.
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
-    assert (H3 : ∀ ε, (0 < ε)%L → P (lim - ε)%L).
+    assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η < ε)%L ∧ P (lim - η)%L). {
+      intros * Hε.
+Search AnBn.
 ...
-    _admit.
+      specialize rl_forall_not_or_exist as H3.
+      specialize (H3 (λ η, ((0 < η < ε)%L ∧ P (lim - η)%L))).
+      cbn in H3.
+      destruct H3 as [H3| H3]; [ | easy ].
+      specialize (H3 (ε / 2)%L).
+      exists (ε / 2)%L.
+Search (¬ (_ ∧ _)).
+...
+      specialize rl_forall_or_exist_not as H3.
+      specialize (H3 (λ η, ¬ ((0 < η < ε)%L ∧ P (lim - η)%L))).
+      destruct H3 as [H3| H3]. {
+... ...
     apply (rngl_nlt_ge Hor).
     intros H4.
+    specialize (H3 (lim - c)%L) as H5.
+    assert (H : (0 < lim - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+    specialize (H5 H); clear H.
+    destruct H5 as (η & Hη & Hpη).
+    specialize (H2 _ Hpη) as H5.
+    apply (rngl_nlt_ge Hor) in H5.
+    apply H5; clear H5.
+    apply (rngl_lt_0_sub Hop Hor).
+    rewrite (rngl_sub_sub_swap Hop).
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+...
+    assert (H3 : ∀ ε, (0 < ε)%L → ¬ P (lim + ε)%L).
+...
+    apply (rngl_nlt_ge Hor).
+    intros H4.
+...
     specialize (H3 (lim - c)%L) as H5.
     rewrite (rngl_sub_sub_distr Hop) in H5.
     rewrite (rngl_sub_diag Hos) in H5.

@@ -868,6 +868,16 @@ assert (m + p = p + m)%L as H by apply rngl_add_comm.
 rewrite H; reflexivity.
 Qed.
 
+Theorem rngl_sub_sub_swap :
+  rngl_has_opp T = true →
+  ∀ n m p, (n - m - p = n - p - m)%L.
+Proof.
+intros Hop n m p.
+progress unfold rngl_sub.
+rewrite Hop.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem rngl_mul_mul_swap :
   rngl_mul_is_comm T = true →
   ∀ n m p, (n * m * p = n * p * m)%L.
