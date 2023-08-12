@@ -1783,6 +1783,10 @@ assert (H : is_Cauchy_sequence v). {
     }
   }
   eapply (rngl_le_trans Hor); [ apply H | ].
+...
+Qle_shift_div_r: ∀ a b c : Q, 0 < b → a <= c * b → a / b <= c
+Z.div_le_upper_bound: ∀ a b q : Z, (0 < b)%Z → (a <= b * q)%Z → (a / b <= q)%Z
+Nat.div_le_upper_bound: ∀ a b q : nat, b ≠ 0%nat → a ≤ b * q → a / b ≤ q
 ... ...
 rewrite rngl_middle_sub_r.
 About rngl_middle_sub_left.
