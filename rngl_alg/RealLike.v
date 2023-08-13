@@ -1874,15 +1874,14 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
     assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η < ε)%L ∧ P (lim - η)%L). {
       intros * Hε.
-Search AnBn.
-...
       specialize rl_forall_not_or_exist as H3.
       specialize (H3 (λ η, ((0 < η < ε)%L ∧ P (lim - η)%L))).
       cbn in H3.
-      destruct H3 as [H3| H3]; [ | easy ].
+      destruct H3 as [H3| H3]; [ exfalso | easy ].
+      (* it means that lim-ε, which is less than lim, is a lesser
+         upper bound of P, which is impossible *)
+...
       specialize (H3 (ε / 2)%L).
-      exists (ε / 2)%L.
-Search (¬ (_ ∧ _)).
 ...
       specialize rl_forall_or_exist_not as H3.
       specialize (H3 (λ η, ¬ ((0 < η < ε)%L ∧ P (lim - η)%L))).
