@@ -1806,6 +1806,61 @@ apply Nat.log2_up_le_pow2. {
 now apply Nat.min_glb with (n := p) in Hq.
 Qed.
 
+Theorem AnBn_exists_P :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (P : _ → Prop) a b x,
+  (∀ x : T, P x → (x ≤ b)%L)
+  → (a ≤ x ≤ b)%L
+  → P x
+  → ∀ n an bn,
+  AnBn P a b n = (an, bn)
+  → ∃ y, (an ≤ y ≤ bn ∧ P y)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hs Hab Hx * Habn.
+revert a b x Hs Hab Hx an bn Habn.
+induction n; intros; cbn in Habn. {
+  injection Habn; clear Habn; intros; subst an bn.
+  now exists x.
+}
+destruct (is_upper_bound _ _) as [H1| H1]. {
+  specialize (IHn a ((a + b) / 2)%L x H1) as H2.
+  assert (H : (a ≤ x ≤ (a + b) / 2)%L). {
+    split; [ easy | now apply H1 ].
+  }
+  now specialize (H2 H Hx _ _ Habn).
+} {
+  specialize (IHn ((a + b) / 2)%L b) as H2.
+  destruct (rngl_le_dec Hor ((a + b) / 2)%L x) as [Habx| Habx]. {
+    specialize (H2 x Hs).
+    assert (H : ((a + b) / 2 ≤ x ≤ b)%L) by easy.
+    now specialize (H2 H Hx _ _ Habn); clear H.
+  }
+  apply (rngl_nle_gt Hor) in Habx.
+  destruct H1 as (z & Hz).
+  specialize (H2 z Hs).
+  assert (Hpz : P z). {
+    specialize (rl_excl_midd (P z)) as H3.
+    destruct H3 as [H3| H3]; [ easy | ].
+    exfalso.
+    apply Hz.
+    now intros H.
+  }
+  assert (H : ((a + b) / 2 ≤ z ≤ b)%L). {
+    split; [ | now apply Hs ].
+    apply (rngl_nlt_ge Hor).
+    intros H3.
+    apply Hz; clear Hz.
+    intros H4.
+    now apply (rngl_lt_le_incl Hor).
+  }
+  now specialize (H2 H Hpz _ _ Habn); clear H.
+}
+Qed.
+
 (* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
@@ -1880,45 +1935,25 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       destruct H3 as [H3| H3]; [ exfalso | easy ].
       (* it means that lim-ε, which is less than lim, is a lesser
          upper bound of P, which is impossible *)
-Theorem AnBn_exists_P :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ (P : _ → Prop) a b x,
-  (∀ x : T, P x → (x ≤ b)%L)
-  → (a ≤ x ≤ b)%L
-  → P x
-  → ∀ n an bn,
-  AnBn P a b n = (an, bn)
-  → ∃ y, (an ≤ y ≤ bn ∧ P y)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hs Hab Hx * Habn.
-revert a b x Hs Hab Hx an bn Habn.
-induction n; intros; cbn in Habn. {
-  injection Habn; clear Habn; intros; subst an bn.
-  now exists x.
-}
-destruct (is_upper_bound _ _) as [H1| H1]. {
-  specialize (IHn a ((a + b) / 2)%L x H1) as H2.
-  assert (H : (a ≤ x ≤ (a + b) / 2)%L). {
-    split; [ easy | now apply H1 ].
-  }
-  now specialize (H2 H Hx _ _ Habn).
-} {
-  specialize (IHn ((a + b) / 2)%L b) as H2.
-  destruct (rngl_le_dec Hor ((a + b) / 2)%L x) as [Habx| Habx]. {
-    specialize (H2 x Hs).
-    assert (H : ((a + b) / 2 ≤ x ≤ b)%L) by easy.
-    now specialize (H2 H Hx _ _ Habn); clear H.
-  }
-  apply (rngl_nle_gt Hor) in Habx.
-  destruct H1 as (z & Hz).
+      specialize (AnBn_exists_P Hic Hon Hop Hiv Hor P) as H4.
+      specialize (H4 a b a).
+      assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+        now intros; apply (rngl_lt_le_incl Hor), Hs.
+      }
+      specialize (H4 H); clear H.
+      assert (H : (a ≤ a ≤ b)%L). {
+        split; [ apply (rngl_le_refl Hor) | ].
+        now apply (rngl_lt_le_incl Hor), Hs.
+      }
+      specialize (H4 H Ha); clear H.
+...
   assert (H : P z ∧ ((a + b) / 2 < z)%L). {
     specialize (rl_excl_midd (P z ∧ ((a + b) / 2 < z)%L)) as H3.
     destruct H3 as [H3| H3]; [ easy | ].
     exfalso; apply Hz; clear Hz.
+    intros Hpz.
+    destruct H3.
+    split; [ easy | ].
 ...
 destruct H as (Hz' & Habz).
 specialize (H2 z Hs).
