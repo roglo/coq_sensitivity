@@ -1861,6 +1861,33 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
+Theorem in_AnBn :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (P : _ → Prop) a b,
+  P a
+  → (∀ x : T, P x → (x < b)%L)
+  → ∀ n an bn,
+  AnBn P a b n = (an, bn)
+  → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
+Proof.
+intros Hic Hon Hop Hiv Hor * Ha Hs * Habn.
+specialize (AnBn_exists_P Hic Hon Hop Hiv Hor P) as H1.
+specialize (H1 a b a).
+assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+  now intros; apply (rngl_lt_le_incl Hor), Hs.
+}
+specialize (H1 H); clear H.
+assert (H : (a ≤ a ≤ b)%L). {
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor), Hs.
+}
+apply (H1 H Ha n an bn Habn).
+Qed.
+
 (* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
@@ -1935,17 +1962,7 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       destruct H3 as [H3| H3]; [ exfalso | easy ].
       (* it means that lim-ε, which is less than lim, is a lesser
          upper bound of P, which is impossible *)
-      specialize (AnBn_exists_P Hic Hon Hop Hiv Hor P) as H4.
-      specialize (H4 a b a).
-      assert (H : ∀ x : T, P x → (x ≤ b)%L). {
-        now intros; apply (rngl_lt_le_incl Hor), Hs.
-      }
-      specialize (H4 H); clear H.
-      assert (H : (a ≤ a ≤ b)%L). {
-        split; [ apply (rngl_le_refl Hor) | ].
-        now apply (rngl_lt_le_incl Hor), Hs.
-      }
-      specialize (H4 H Ha); clear H.
+      specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
 ...
   assert (H : P z ∧ ((a + b) / 2 < z)%L). {
     specialize (rl_excl_midd (P z ∧ ((a + b) / 2 < z)%L)) as H3.
