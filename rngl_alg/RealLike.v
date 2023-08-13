@@ -1954,8 +1954,13 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     intros c.
     move c before lim.
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
-    assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η < ε)%L ∧ P (lim - η)%L). {
+    assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η ≤ ε)%L ∧ P (lim - η)%L). {
       intros * Hε.
+(**)
+      specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
+      progress unfold is_limit_when_tending_to_inf in Hco.
+      destruct (Hco _ Hε) as (N, HN).
+...
       specialize rl_forall_not_or_exist as H3.
       specialize (H3 (λ η, ((0 < η < ε)%L ∧ P (lim - η)%L))).
       cbn in H3.
