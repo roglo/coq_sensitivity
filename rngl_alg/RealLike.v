@@ -1906,9 +1906,11 @@ intros Hic Hon Hop Hiv Hor Har Hco * Ha Hs.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+move Hos before Har.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
+move Hiq before Hos.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -1916,6 +1918,7 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+move Hii before Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
   exists 0%L.
@@ -1949,13 +1952,21 @@ destruct Hco as (lim, Hco).
 progress unfold is_limit_when_tending_to_inf in Hco.
 *)
 exists lim.
+move lim before b.
 destruct (is_upper_bound P lim)  as [H1| H1]. {
   split. {
     intros c.
-    move c before lim.
+    move c before b.
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
+    apply (rngl_nlt_ge Hor).
+    intros Hc.
 (**)
     specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
+    assert (Hcl : ∀ x, (c < x < lim)%L → ¬ P x). {
+      intros x Hx Hpx.
+      now apply H2, (rngl_nlt_ge Hor) in Hpx.
+    }
+    progress unfold is_limit_when_tending_to_inf in Hco.
 ...
     assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η ≤ ε)%L ∧ P (lim - η)%L). {
       intros * Hε.
