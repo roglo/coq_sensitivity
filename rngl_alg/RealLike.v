@@ -1962,11 +1962,34 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     intros Hc.
 (**)
     specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
-    assert (Hcl : ∀ x, (c < x < lim)%L → ¬ P x). {
+    assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
       intros x Hx Hpx.
       now apply H2, (rngl_nlt_ge Hor) in Hpx.
     }
     progress unfold is_limit_when_tending_to_inf in Hco.
+    (* il y a un moment où an > c *)
+    specialize (Hco (lim - c)%L) as H3.
+    assert (H : (0 < lim - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+    specialize (H3 H); clear H.
+    destruct H3 as (N, HN).
+    destruct (H4 (N + 1) _ _ (surjective_pairing _)) as (y & Haby & Hu).
+    specialize (Hcl y).
+    assert (H : (c < y)%L). {
+      specialize (HN (N + 1)).
+      assert (H : N < N + 1) by now apply Nat.lt_add_pos_r.
+      specialize (HN H); clear H.
+      destruct (rngl_le_dec Hor (v (N + 1)) lim) as [Hvl| Hvl]. {
+        rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
+          now apply (rngl_le_sub_0 Hop Hor).
+        }
+        rewrite (rngl_opp_sub_distr Hop) in HN.
+        apply (rngl_sub_le_mono_l Hop Hor) in HN.
+        progress fold (v (N + 1)) in Haby.
+(* bon, ras le bol ; je crois que je suis pas loin, mais pas sûr *)
+...
+Check Z.sub_le_mono_l.
+apply rngl_sub_le_mono_l in HN.
+        progress unfold v in Hvl.
 ...
     assert (H3 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η ≤ ε)%L ∧ P (lim - η)%L). {
       intros * Hε.

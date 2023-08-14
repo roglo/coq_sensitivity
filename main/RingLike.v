@@ -2688,25 +2688,41 @@ Qed.
 Theorem rngl_sub_le_mono_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ a b c : T, (a ≤ b)%L → (c - b ≤ c - a)%L.
+  ∀ a b c : T, (a ≤ b)%L ↔ (c - b ≤ c - a)%L.
 Proof.
-intros Hop Hor * Hab.
-progress unfold rngl_sub.
-rewrite Hop.
-apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
-now apply -> (rngl_opp_le_compat Hop Hor).
+intros Hop Hor *.
+split; intros Hab. {
+  progress unfold rngl_sub.
+  rewrite Hop.
+  apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | ].
+  now apply -> (rngl_opp_le_compat Hop Hor).
+} {
+  apply (rngl_opp_le_compat Hop Hor) in Hab.
+  do 2 rewrite (rngl_opp_sub_distr Hop) in Hab.
+  apply (rngl_add_le_compat Hor) with (c := c) (d := c) in Hab. 2: {
+    apply (rngl_le_refl Hor).
+  }
+  now do 2 rewrite (rngl_sub_add Hop) in Hab.
+}
 Qed.
 
 Theorem rngl_sub_le_mono_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ a b c, (a ≤ b → a - c ≤ b - c)%L.
+  ∀ a b c, (a ≤ b ↔ a - c ≤ b - c)%L.
 Proof.
-intros Hop Hor * Hab.
-progress unfold rngl_sub.
-rewrite Hop.
-apply (rngl_add_le_compat Hor); [ easy | ].
-now apply (rngl_le_refl Hor).
+intros Hop Hor *.
+split; intros Hab. {
+  rewrite <- (rngl_opp_sub_distr Hop c a).
+  rewrite <- (rngl_opp_sub_distr Hop c b).
+  apply -> (rngl_opp_le_compat Hop Hor).
+  now apply (rngl_sub_le_mono_l Hop Hor).
+} {
+  apply (rngl_add_le_compat Hor _ _ c c) in Hab. 2: {
+    apply (rngl_le_refl Hor).
+  }
+  now do 2 rewrite (rngl_sub_add Hop) in Hab.
+}
 Qed.
 
 Theorem rngl_add_le_mono_l :
