@@ -1986,6 +1986,10 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         apply (rngl_sub_le_mono_l Hop Hor) in HN.
         progress fold (v (N + 1)) in Haby.
 (* bon, ras le bol ; je crois que je suis pas loin, mais pas sûr *)
+assert (H3 : (c < y)%L). {
+eapply (rngl_le_lt_trans Hor).
+apply HN.
+progress unfold v.
 ...
 Check Z.sub_le_mono_l.
 apply rngl_sub_le_mono_l in HN.
