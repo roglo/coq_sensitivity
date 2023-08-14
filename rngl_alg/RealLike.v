@@ -1968,11 +1968,32 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     }
     progress unfold is_limit_when_tending_to_inf in Hco.
     (* il y a un moment où an > c *)
+(**)
+    (* si n > log2 ((b - a) / (lim - c)), alors
+         bn - an < lim - c *)
+...
+    specialize (H4 (Nat.log2 ((b - a) / (lim - c)))) as H5.
+...
     specialize (Hco (lim - c)%L) as H3.
     assert (H : (0 < lim - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
     specialize (H3 H); clear H.
     destruct H3 as (N, HN).
     destruct (H4 (N + 1) _ _ (surjective_pairing _)) as (y & Haby & Hu).
+    progress fold (v (N + 1)) in Haby.
+(**)
+    destruct (rngl_lt_dec Hor c y) as [Hcy| Hcy]. {
+      now specialize (Hcl y Hcy).
+    }
+    apply (rngl_nlt_ge Hor) in Hcy.
+...
+    specialize (HN (N + 1)).
+    assert (H : N < N + 1) by now apply Nat.lt_add_pos_r.
+    specialize (HN H); clear H.
+    destruct (rngl_le_dec Hor (v (N + 1)) lim) as [Hvl| Hvl]. {
+      rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
+        now apply (rngl_le_sub_0 Hop Hor).
+      }
+...
     specialize (Hcl y).
     assert (H : (c < y)%L). {
       specialize (HN (N + 1)).
