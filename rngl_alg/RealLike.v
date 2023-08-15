@@ -1693,7 +1693,6 @@ assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
 specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
-(**)
   now apply (An_le Hic Hon Hop Hiv Hor).
 }
 rewrite (rngl_opp_sub_distr Hop).
