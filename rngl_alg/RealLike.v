@@ -1589,6 +1589,39 @@ destruct (is_upper_bound P _) as [H1| H1]. {
 }
 Qed.
 
+Theorem AnBn_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P p q ap bp aq bq,
+  p ≤ q
+  → AnBn P a b p = (ap, bp)
+  → AnBn P a b q = (aq, bq)
+  → (ap ≤ aq ∧ bq ≤ bp)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab * Hpq Hp Hq.
+revert a b q Hab Hpq Hp Hq.
+induction p; intros; cbn. {
+  cbn in Hp.
+  injection Hp; clear Hp; intros; subst ap bp.
+  specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
+  now specialize (H1 a b Hab P q aq bq Hq).
+}
+cbn in Hp.
+destruct q; [ easy | cbn in Hq ].
+apply Nat.succ_le_mono in Hpq.
+destruct (is_upper_bound _ _) as [H1| H1]. {
+  eapply IHp; [ | apply Hpq | apply Hp | apply Hq ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+} {
+  eapply IHp; [ | apply Hpq | apply Hp | apply Hq ].
+  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
+}
+Qed.
+
 Theorem An_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1601,32 +1634,9 @@ Theorem An_le :
   → (fst (AnBn P a b p) ≤ fst (AnBn P a b q))%L.
 Proof.
 intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-revert a b q Hab Hpq.
-induction p; intros; cbn. {
-  clear Hpq.
-  revert a b Hab.
-  induction q; intros; [ apply (rngl_le_refl Hor) | cbn ].
-  destruct (is_upper_bound _ _) as [H1| H1]. {
-    apply IHq.
-    now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-  } {
-    eapply (rngl_le_trans Hor). 2: {
-      apply IHq.
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    } {
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    }
-  }
-}
-destruct q; [ easy | cbn ].
-apply Nat.succ_le_mono in Hpq.
-destruct (is_upper_bound _ _) as [H1| H1]. {
-  apply IHp; [ | easy ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-} {
-  apply IHp; [ | easy ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-}
+specialize (AnBn_le Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 a b Hab P p q).
+now specialize (H1 _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
 Qed.
 
 Theorem Bn_le :
@@ -1641,31 +1651,9 @@ Theorem Bn_le :
   → (snd (AnBn P a b q) ≤ snd (AnBn P a b p))%L.
 Proof.
 intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-revert a b q Hab Hpq.
-induction p; intros; cbn. {
-  clear Hpq.
-  revert a b Hab.
-  induction q; intros; [ apply (rngl_le_refl Hor) | cbn ].
-  destruct (is_upper_bound _ _) as [H1| H1]. {
-    eapply (rngl_le_trans Hor). {
-      apply IHq.
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    } {
-      now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-    }
-  }
-  apply IHq.
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-}
-destruct q; [ easy | cbn ].
-apply Nat.succ_le_mono in Hpq.
-destruct (is_upper_bound _ _) as [H1| H1]. {
-  apply IHp; [ | easy ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-} {
-  apply IHp; [ | easy ].
-  now apply (rngl_middle_in_middle Hic Hon Hop Hiv Hor).
-}
+specialize (AnBn_le Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 a b Hab P p q).
+now specialize (H1 _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
 Qed.
 
 Theorem rngl_abs_An_sub_An_le :
@@ -1703,9 +1691,9 @@ assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
 specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
-(**)
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
+(**)
   now apply (An_le Hic Hon Hop Hiv Hor).
 }
 rewrite (rngl_opp_sub_distr Hop).
