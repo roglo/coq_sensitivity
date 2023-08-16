@@ -2120,25 +2120,26 @@ assert (Hlab : lima = limb). {
     specialize (Hal (ε / 2)%L).
     specialize (Hbl (ε / 2)%L).
     assert (H : (0 < ε / 2)%L). {
-Search (_ < _ / _)%L.
-Search (_ ≤ _ / _)%L.
-Search (_ < _ / _)%Z.
-Search (_ < _ / _)%nat.
-...
-Theorem rngl_div_str_pos : ∀ a b, (0 < b ≤ a)%L → (0 < a / b)%L.
-...
-Check Z.div_pos.
-apply rngl_div_str_pos.
-Znumtheory.Zdivide_Zdiv_lt_pos:
-  ∀ a b : Z, (1 < a)%Z → (0 < b)%Z → (a | b)%Z → (0 < b / a < b)%Z
-
-Search (_ < _ / _)%nat.
-Search (_ ≤ _ / _)%Z.
-Check Z.div_pos.
-...
+      apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2⁻¹%L) in Hε. 2: {
+        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_mul_0_l Hos) in Hε.
+      now rewrite (fold_rngl_div Hiv) in Hε.
+    }
+    specialize (Hal H).
+    specialize (Hbl H).
     destruct Hal as (Na, Hal).
     destruct Hbl as (Nb, Hbl).
     move Nb before Na.
+    exists (max Na Nb).
+    intros n Hn.
+    rewrite (rngl_sub_0_r Hos).
+    apply Nat.max_lub_lt_iff in Hn.
+    destruct Hn as (Han, Hbn).
+    specialize (Hal _ Han).
+    specialize (Hbl _ Hbn).
+(* ah mais non chuis nul, c'est pas ça, con que je suis *)
 ...
 exists lim.
 move lim before b.
