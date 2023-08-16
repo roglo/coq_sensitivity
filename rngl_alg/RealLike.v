@@ -1963,36 +1963,6 @@ split. {
 }
 Qed.
 
-Theorem An_is_Cauchy_sequence :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  rngl_is_archimedean T = true →
-  ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)).
-Proof.
-intros Hic Hon Hop Hiv Hor Har * Hab.
-specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
-now specialize (H1 a b Hab).
-Qed.
-
-Theorem Bn_is_Cauchy_sequence :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  rngl_is_archimedean T = true →
-  ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
-Proof.
-intros Hic Hon Hop Hiv Hor Har * Hab.
-specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
-now specialize (H1 a b Hab).
-Qed.
-
 Theorem AnBn_exists_P :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2130,26 +2100,46 @@ unfold is_supremum.
 progress unfold is_complete in Hco.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).
-assert (Hcsu : is_Cauchy_sequence u). {
-  apply (An_is_Cauchy_sequence Hic Hon Hop Hiv Hor Har).
-  now apply (rngl_lt_le_incl Hor), Hs.
-}
-assert (Hcsv : is_Cauchy_sequence v). {
-  apply (Bn_is_Cauchy_sequence Hic Hon Hop Hiv Hor Har).
-  now apply (rngl_lt_le_incl Hor), Hs.
-}
+specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
+assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
+specialize (H1 a b Hab).
+progress fold u in H1.
+progress fold v in H1.
+destruct H1 as (Hcsu, Hcsv).
 specialize (Hco _ Hcsu) as Hac.
 specialize (Hco _ Hcsv) as Hbc.
 destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
 (**)
-assert (Hab : lima = limb). {
+assert (Hlab : lima = limb). {
   progress unfold is_limit_when_tending_to_inf in Hal, Hbl.
+  assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
+    progress unfold is_limit_when_tending_to_inf.
+    intros ε Hε.
+    specialize (Hal (ε / 2)%L).
+    specialize (Hbl (ε / 2)%L).
+    assert (H : (0 < ε / 2)%L). {
+Search (_ < _ / _)%L.
+Search (_ ≤ _ / _)%L.
+Search (_ < _ / _)%Z.
+Search (_ < _ / _)%nat.
 ...
-(*
-progress unfold is_limit_when_tending_to_inf in Hco.
-*)
+Theorem rngl_div_str_pos : ∀ a b, (0 < b ≤ a)%L → (0 < a / b)%L.
+...
+Check Z.div_pos.
+apply rngl_div_str_pos.
+Znumtheory.Zdivide_Zdiv_lt_pos:
+  ∀ a b : Z, (1 < a)%Z → (0 < b)%Z → (a | b)%Z → (0 < b / a < b)%Z
+
+Search (_ < _ / _)%nat.
+Search (_ ≤ _ / _)%Z.
+Check Z.div_pos.
+...
+    destruct Hal as (Na, Hal).
+    destruct Hbl as (Nb, Hbl).
+    move Nb before Na.
+...
 exists lim.
 move lim before b.
 destruct (is_upper_bound P lim)  as [H1| H1]. {
