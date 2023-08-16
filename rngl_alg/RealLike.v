@@ -1779,7 +1779,7 @@ specialize (H1 p q _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
 easy.
 Qed.
 
-Theorem An_is_Cauchy_sequence :
+Theorem An_Bn_are_Cauchy_sequence :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1787,109 +1787,7 @@ Theorem An_is_Cauchy_sequence :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)).
-Proof.
-intros Hic Hon Hop Hiv Hor Har * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  progress unfold is_Cauchy_sequence.
-  intros * Hε.
-  exists 0.
-  intros * Hp Hq.
-  rewrite (H1 (rngl_abs _)), (H1 ε).
-  apply (rngl_le_refl Hor).
-}
-set (u := λ n : nat, fst (AnBn P a b n)).
-unfold is_Cauchy_sequence.
-intros ε Hε.
-(* The size of the interval after N iterations is (b-a)/2^N; it
-   must be less than ε; it implies that N must be greater
-   than log2((b-a)/ε) where log2 is the log in base 2. Taking
-   N = log2 ((b-a)/ε) + 1 should work. *)
-specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-specialize (H1 ((b - a) / ε + 1))%L.
-rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
-  apply (rngl_add_nonneg_nonneg Hor). 2: {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-  now apply (rngl_le_0_sub Hop Hor).
-}
-destruct H1 as (M & HM1 & HM2).
-rewrite rngl_of_nat_add in HM2.
-cbn in HM2.
-rewrite rngl_add_0_r in HM2.
-apply (rngl_add_lt_mono_r Hop Hor) in HM2.
-exists (Nat.log2_up M).
-intros * Hp Hq.
-assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
-  intros.
-  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-(* TODO: a lemma *)
-assert (H1 : (rngl_abs (u p - u q) ≤ (b - a) / 2 ^ min p q)%L). {
-  clear Hp Hq.
-  progress unfold u.
-  specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
-  destruct (le_dec p q) as [Hpq| Hpq]. {
-    rewrite Nat.min_l; [ | easy ].
-    now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
-  } {
-    apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
-    rewrite Nat.min_r; [ | easy ].
-    rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_sub_distr Hop).
-    now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
-  }
-}
-eapply (rngl_le_trans Hor); [ apply H1 | ].
-apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
-  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_comm Hic).
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
-rewrite (rngl_mul_div_r Hon Hic Hiv) in HM2. 2: {
-  intros H; rewrite H in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
-rewrite <- (rngl_of_nat_pow Hon Hos).
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-apply Nat.log2_up_le_pow2. {
-  apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
-  cbn in HM2.
-  rewrite (rngl_mul_0_r Hos) in HM2.
-  apply (rngl_nle_gt Hor) in HM2.
-  apply HM2; clear HM2.
-  now apply (rngl_le_0_sub Hop Hor).
-}
-now apply Nat.min_glb with (n := p) in Hq.
-Qed.
-
-Theorem Bn_is_Cauchy_sequence :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  rngl_is_archimedean T = true →
-  ∀ P a b, (a ≤ b)%L →
+  is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)) ∧
   is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
 Proof.
 intros Hic Hon Hop Hiv Hor Har * Hab.
@@ -1906,83 +1804,193 @@ assert
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   progress unfold is_Cauchy_sequence.
-  intros * Hε.
-  exists 0.
-  intros * Hp Hq.
-  rewrite (H1 (rngl_abs _)), (H1 ε).
-  apply (rngl_le_refl Hor).
+  split. {
+    intros * Hε.
+    exists 0.
+    intros * Hp Hq.
+    rewrite (H1 (rngl_abs _)), (H1 ε).
+    apply (rngl_le_refl Hor).
+  } {
+    intros * Hε.
+    exists 0.
+    intros * Hp Hq.
+    rewrite (H1 (rngl_abs _)), (H1 ε).
+    apply (rngl_le_refl Hor).
+  }
 }
+set (u := λ n : nat, fst (AnBn P a b n)).
 set (v := λ n : nat, snd (AnBn P a b n)).
 unfold is_Cauchy_sequence.
-intros ε Hε.
-(* The size of the interval after N iterations is (b-a)/2^N; it
-   must be less than ε; it implies that N must be greater
-   than log2((b-a)/ε) where log2 is the log in base 2. Taking
-   N = log2 ((b-a)/ε) + 1 should work. *)
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-specialize (H1 ((b - a) / ε + 1))%L.
-rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
-  apply (rngl_add_nonneg_nonneg Hor). 2: {
-    apply (rngl_0_le_1 Hon Hop Hor).
+split. {
+  intros ε Hε.
+  (* The size of the interval after N iterations is (b-a)/2^N; it
+     must be less than ε; it implies that N must be greater
+     than log2((b-a)/ε) where log2 is the log in base 2. Taking
+     N = log2 ((b-a)/ε) + 1 should work. *)
+  specialize (H1 ((b - a) / ε + 1))%L.
+  rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+    apply (rngl_add_nonneg_nonneg Hor). 2: {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    now apply (rngl_le_0_sub Hop Hor).
   }
-  apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
-  now apply (rngl_le_0_sub Hop Hor).
-}
-destruct H1 as (M & HM1 & HM2).
-rewrite rngl_of_nat_add in HM2.
-cbn in HM2.
-rewrite rngl_add_0_r in HM2.
-apply (rngl_add_lt_mono_r Hop Hor) in HM2.
-exists (Nat.log2_up M).
-intros * Hp Hq.
-assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
-  intros.
-  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-(* TODO: a lemma *)
-assert (H1 : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
-  clear Hp Hq.
-  unfold v.
-  specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
-  destruct (le_dec p q) as [Hpq| Hpq]. {
-    rewrite Nat.min_l; [ | easy ].
-    now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
-  } {
-    apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
-    rewrite Nat.min_r; [ | easy ].
-    rewrite <- (rngl_abs_opp Hop Hor).
-    rewrite (rngl_opp_sub_distr Hop).
-    now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
-  }
-}
-eapply (rngl_le_trans Hor); [ apply H1 | ].
-apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
-  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_comm Hic).
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
-rewrite (rngl_mul_div_r Hon Hic Hiv) in HM2. 2: {
-  intros H; rewrite H in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
-rewrite <- (rngl_of_nat_pow Hon Hos).
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-apply Nat.log2_up_le_pow2. {
-  apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
+  destruct H1 as (M & HM1 & HM2).
+  rewrite rngl_of_nat_add in HM2.
   cbn in HM2.
-  rewrite (rngl_mul_0_r Hos) in HM2.
-  apply (rngl_nle_gt Hor) in HM2.
-  apply HM2; clear HM2.
-  now apply (rngl_le_0_sub Hop Hor).
+  rewrite rngl_add_0_r in HM2.
+  apply (rngl_add_lt_mono_r Hop Hor) in HM2.
+  exists (Nat.log2_up M).
+  intros * Hp Hq.
+  assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
+    intros.
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  (* TODO: a lemma *)
+  assert (H1 : (rngl_abs (u p - u q) ≤ (b - a) / 2 ^ min p q)%L). {
+    clear Hp Hq.
+    progress unfold u.
+    specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
+    destruct (le_dec p q) as [Hpq| Hpq]. {
+      rewrite Nat.min_l; [ | easy ].
+      now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
+    } {
+      apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
+      rewrite Nat.min_r; [ | easy ].
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_sub_distr Hop).
+      now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
+    }
+  }
+  eapply (rngl_le_trans Hor); [ apply H1 | ].
+  apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv) in HM2. 2: {
+    intros H; rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  apply Nat.log2_up_le_pow2. {
+    apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
+    cbn in HM2.
+    rewrite (rngl_mul_0_r Hos) in HM2.
+    apply (rngl_nle_gt Hor) in HM2.
+    apply HM2; clear HM2.
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  now apply Nat.min_glb with (n := p) in Hq.
+} {
+  intros ε Hε.
+  (* The size of the interval after N iterations is (b-a)/2^N; it
+     must be less than ε; it implies that N must be greater
+     than log2((b-a)/ε) where log2 is the log in base 2. Taking
+     N = log2 ((b-a)/ε) + 1 should work. *)
+  specialize (H1 ((b - a) / ε + 1))%L.
+  rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+    apply (rngl_add_nonneg_nonneg Hor). 2: {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  destruct H1 as (M & HM1 & HM2).
+  rewrite rngl_of_nat_add in HM2.
+  cbn in HM2.
+  rewrite rngl_add_0_r in HM2.
+  apply (rngl_add_lt_mono_r Hop Hor) in HM2.
+  exists (Nat.log2_up M).
+  intros * Hp Hq.
+  assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
+    intros.
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  (* TODO: a lemma *)
+  assert (H1 : (rngl_abs (v p - v q) ≤ (b - a) / 2 ^ min p q)%L). {
+    clear Hp Hq.
+    unfold v.
+    specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
+    destruct (le_dec p q) as [Hpq| Hpq]. {
+      rewrite Nat.min_l; [ | easy ].
+      now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
+    } {
+      apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
+      rewrite Nat.min_r; [ | easy ].
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_sub_distr Hop).
+      now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
+    }
+  }
+  eapply (rngl_le_trans Hor); [ apply H1 | ].
+  apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv) in HM2. 2: {
+    intros H; rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  apply Nat.log2_up_le_pow2. {
+    apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
+    cbn in HM2.
+    rewrite (rngl_mul_0_r Hos) in HM2.
+    apply (rngl_nle_gt Hor) in HM2.
+    apply HM2; clear HM2.
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  now apply Nat.min_glb with (n := p) in Hq.
 }
-now apply Nat.min_glb with (n := p) in Hq.
+Qed.
+
+Theorem An_is_Cauchy_sequence :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  ∀ P a b, (a ≤ b)%L →
+  is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)).
+Proof.
+intros Hic Hon Hop Hiv Hor Har * Hab.
+specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
+now specialize (H1 a b Hab).
+Qed.
+
+Theorem Bn_is_Cauchy_sequence :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  ∀ P a b, (a ≤ b)%L →
+  is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
+Proof.
+intros Hic Hon Hop Hiv Hor Har * Hab.
+specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
+now specialize (H1 a b Hab).
 Qed.
 
 Theorem AnBn_exists_P :
