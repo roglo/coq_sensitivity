@@ -2115,6 +2115,14 @@ move limb before lima.
 assert (Hlab : lima = limb). {
   progress unfold is_limit_when_tending_to_inf in Hal, Hbl.
   assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
+(**)
+    assert (Hc : is_Cauchy_sequence (λ n, (u n - v n)%L)).
+    _admit.
+    destruct (Hco _ Hc) as (lim, Hlim).
+    progress unfold is_limit_when_tending_to_inf in Hlim |-*.
+    intros ε Hε.
+    destruct (Hlim _ Hε) as (N, HN).
+...
     progress unfold is_limit_when_tending_to_inf.
     intros ε Hε.
     specialize (Hal (ε / 2)%L).
