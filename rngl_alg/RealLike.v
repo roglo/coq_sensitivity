@@ -2087,7 +2087,7 @@ assert (H : (a ≤ a ≤ b)%L). {
 apply (H1 H Ha n an bn Habn).
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
