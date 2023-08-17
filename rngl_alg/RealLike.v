@@ -1656,6 +1656,48 @@ specialize (H1 a b Hab P p q).
 now specialize (H1 _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
 Qed.
 
+Theorem rngl_abs_An_Bn_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ b)%L →
+  ∀ P n an bn,
+  AnBn P a b n = (an, bn)
+  → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hab * Habn.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
+  rewrite (H (rngl_abs _))%L.
+  rewrite H.
+  apply (rngl_le_refl Hor).
+}
+specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 a b Hab P n _ _ (surjective_pairing _)).
+rewrite Habn in H1; cbn in H1.
+destruct H1 as (H1, H2).
+rewrite H2.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite <- (rngl_abs_opp Hop Hor).
+rewrite (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_abs_nonneg Hop Hor). 2: {
+  apply (rngl_div_pos Hon Hop Hiv Hor). {
+    now apply (rngl_le_0_sub Hop Hor).
+  } {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+}
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_abs_AnBn_sub_AnBn_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2045,7 +2087,7 @@ assert (H : (a ≤ a ≤ b)%L). {
 apply (H1 H Ha n an bn Habn).
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem least_upper_bound :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2115,6 +2157,79 @@ move limb before lima.
 assert (Hlab : lima = limb). {
   assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
 (**)
+    progress unfold is_limit_when_tending_to_inf.
+    intros ε Hε.
+    progress unfold u.
+    progress unfold v.
+    specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+    specialize (H1 ((b - a) / ε)%L).
+    destruct H1 as (N, HN).
+    exists N.
+    intros n Hn.
+    rewrite (rngl_sub_0_r Hos).
+    eapply (rngl_le_trans Hor). {
+      apply (rngl_abs_An_Bn_le Hic Hon Hop Hiv Hor _ _ Hab P n).
+      apply surjective_pairing.
+    }
+Search (_ / _ ≤ _)%L.
+...
+    exists ((b - a) / ε)%L.
+...
+(b - a) / 2 ^ N ≤ ε
+(b - a) ≤ ε * 2 ^ N
+(b - a) / ε ≤ 2 ^ N
+(b - a) / ε ≤ N
+...
+    exists ((b - a) / 2 ^ N)%L.
+...
+rngl_abs_An_Bn_le:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_inv T = true
+        → rngl_is_ordered T = true
+          → ∀ a b : T,
+              (a ≤ b)%L
+              → ∀ (P : T → Type) (n : nat) (an bn : T),
+                  AnBn P a b n = (an, bn)
+                  → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L
+...
+rngl_abs_AnBn_sub_AnBn_le:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_inv T = true
+        → rngl_is_ordered T = true
+          → ∀ a b : T,
+              (a ≤ b)%L
+              → ∀ (P : T → Type) (p q : nat) (ap bp aq bq : T),
+                  p ≤ q
+                  → AnBn P a b p = (ap, bp)
+                    → AnBn P a b q = (aq, bq)
+                      → (rngl_abs (ap - aq) ≤ (b - a) / 2 ^ p)%L
+                        ∧ (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L
+...
+Search (_ ^ _)%L.
+    exists ((b - a) / 2 ^
+...
+Check AnBn_interval.
+Check Nat.log2_up_le_pow2.
+Search (_ ^ _)%L.
+...
+rngl_abs_Bn_sub_Bn_le:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_inv T = true
+        → rngl_is_ordered T = true
+          → ∀ a b : T,
+              (a ≤ b)%L
+              → ∀ (P : T → Type) (p q : nat),
+                  p ≤ q
+                  → (rngl_abs (snd (AnBn P a b p) - snd (AnBn P a b q))
+                     ≤ (b - a) / 2 ^ p)%L
+...
+...
     assert (Hc : is_Cauchy_sequence (λ n, (u n - v n)%L)). {
       intros ε Hε.
       specialize (Hcsu (ε / 2)%L).
