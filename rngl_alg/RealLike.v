@@ -286,6 +286,20 @@ rewrite (rngl_abs_opp Hop Hor).
 now apply HN.
 Qed.
 
+Theorem limit_ext_in :
+  ∀ u v lim,
+  (∀ n, u n = v n)
+  → is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf v lim.
+Proof.
+intros * Huv Hu ε Hε.
+destruct (Hu ε Hε) as (N, HN).
+exists N.
+intros n Hn.
+rewrite <- Huv.
+now apply HN.
+Qed.
+
 Definition gc_opt_inv_or_quot :
   option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_inv_or_quot T with
@@ -2275,22 +2289,106 @@ assert (Hlab : lima = limb). {
   specialize (limit_add Hic Hon Hop Hiv Hor) as H1.
   specialize (H1 _ _ _ _ Hal Hbl).
   rewrite (fold_rngl_sub Hop) in H1.
-...
-Theorem limit_ext_in :
-  ∀ u v lim,
-  (∀ n, u n = v n)
-  → is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf v lim.
-... ...
-eapply limit_ext_in in H1. 2: {
-  now intros; rewrite (fold_rngl_sub Hop).
-}
+  eapply limit_ext_in in H1. 2: {
+    now intros; rewrite (fold_rngl_sub Hop).
+  }
 Theorem limit_unique :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
   ∀ u lim1 lim2,
   is_limit_when_tending_to_inf u lim1
   → is_limit_when_tending_to_inf u lim2
   → lim1 = lim2.
+Proof.
+intros Hic Hon Hop Hiv Hed Hor * Hu1 Hu2.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 lim1), (H1 lim2).
+}
+apply (limit_opp Hop Hor) in Hu2.
+specialize (limit_add Hic Hon Hop Hiv Hor) as H1.
+specialize (H1 _ _ _ _ Hu1 Hu2).
+rewrite (fold_rngl_sub Hop) in H1.
+eapply limit_ext_in in H1. 2: {
+  intros n.
+  rewrite (fold_rngl_sub Hop).
+  now rewrite (rngl_sub_diag Hos).
+}
+progress unfold is_limit_when_tending_to_inf in H1.
+assert (H : ∀ ε, (0 < ε)%L → (rngl_abs (lim1 - lim2) ≤ ε)%L). {
+  intros ε Hε.
+  destruct (H1 ε Hε) as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  rewrite <- (rngl_abs_opp Hop Hor) in HN.
+  rewrite (rngl_opp_sub_distr Hop) in HN.
+  now rewrite (rngl_sub_0_r Hos) in HN.
+}
+clear H1; rename H into H1.
+destruct (rngl_lt_dec Hor lim1 lim2) as [H12| H12]. {
+  specialize (H1 ((lim2 - lim1) / 2))%L.
+  assert (H : (0 < (lim2 - lim1) / 2)%L). {
+    progress unfold rngl_div.
+    rewrite Hiv.
+    apply (rngl_mul_pos_pos Hop Hor Hii). {
+      now apply (rngl_lt_0_sub Hop Hor).
+    }
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  specialize (H1 H); clear H.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H1; apply H1.
+  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  rewrite (rngl_opp_sub_distr Hop).
+Check rngl_div_le_upper_bound.
 ...
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    remember (2 * _)%L as x.
+    rewrite <- (rngl_mul_1_l Hon (lim2 - lim1))%L.
+    subst x.
+    apply (rngl_mul_le_compat_nonneg Hop Hor). 2: {
+      split; [ | apply (rngl_le_refl Hor) ].
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+    }
+    split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  intros H.
+...
+apply rngl_mul_nonneg_nonneg.
+...
+apply rngl_mul
+
+    apply (rngl_lt_0_sub Hop Hor).
+  }
+  specialize (H1 H).
+...
+progress unfold is_limit_when_tending_to_inf in Hu1.
+progress unfold is_limit_when_tending_to_inf in Hu2.
+... ...
 apply (rngl_sub_move_0_r Hop).
 now apply (limit_unique _ 0)%L in H1.
 }
