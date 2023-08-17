@@ -870,6 +870,16 @@ assert (m + p = p + m)%L as H by apply rngl_add_comm.
 rewrite H; reflexivity.
 Qed.
 
+Theorem rngl_add_add_add_swap :
+  ∀ a b c d, ((a + b) + (c + d) = (a + c) + (b + d))%L.
+Proof.
+intros.
+do 2 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite rngl_add_comm, rngl_add_assoc.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem rngl_sub_sub_swap :
   rngl_has_opp T = true →
   ∀ n m p, (n - m - p = n - p - m)%L.
@@ -878,6 +888,15 @@ intros Hop n m p.
 progress unfold rngl_sub.
 rewrite Hop.
 apply rngl_add_add_swap.
+Qed.
+
+Theorem rngl_add_diag :
+  rngl_has_1 T = true →
+  ∀ a, (a + a = 2 * a)%L.
+Proof.
+intros Hon *.
+rewrite rngl_mul_add_distr_r.
+now rewrite (rngl_mul_1_l Hon).
 Qed.
 
 Theorem rngl_mul_mul_swap :

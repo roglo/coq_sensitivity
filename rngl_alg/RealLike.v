@@ -2147,27 +2147,48 @@ assert (Hlab : lima = limb). {
       progress unfold rngl_sub.
       rewrite Hop.
       rewrite (rngl_opp_involutive Hop).
-Theorem rngl_add_add_add_swap :
-  ∀ a b c d, ((a + b) + (c + d) = (a + c) + (b + d))%L.
-... ...
-rewrite (rngl_add_comm (v q)).
-rewrite rngl_add_add_add_swap.
-...
-Nat.add_shuffle2: ∀ n m p q : nat, n + m + (p + q) = n + q + (m + p)
-Z.add_shuffle2: ∀ n m p q : Z, (n + m + (p + q))%Z = (n + q + (m + p))%Z
-...
-      progress unfold rngl_sub at 1.
-      rewrite Hop.
+      rewrite (rngl_add_comm (v q)).
+      rewrite rngl_add_add_add_swap.
       eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
-...
-rngl_abs_triangle:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_has_opp T = true → rngl_is_ordered T = true → ∀ a b : T, (rngl_abs (a + b) ≤ rngl_abs a + rngl_abs b)%L
-...
+      rewrite (rngl_add_comm _ (v q)).
+      do 2 rewrite (fold_rngl_sub Hop).
+      rewrite <- (rngl_opp_sub_distr Hop (v p)).
+      rewrite (rngl_abs_opp Hop Hor).
+      eapply (rngl_le_trans Hor). {
+        apply (rngl_add_le_compat Hor); [ apply Hnu | apply Hnv ].
+      }
+      rewrite (rngl_add_diag Hon).
+      rewrite (rngl_mul_div_r Hon Hic Hiv).
+      apply (rngl_le_refl Hor).
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
     }
     destruct (Hco _ Hc) as (lim, Hlim).
-(* Prouver que limite d'une somme = somme des limites *)
+(**)
+Theorem limit_opp :
+  ∀ u lim,
+  is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
+... ...
+apply limit_opp in Hbl.
+Theorem limit_add :
+  ∀ u v limu limv,
+  is_limit_when_tending_to_inf u limu
+  → is_limit_when_tending_to_inf v limv
+  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
+... ...
+specialize (limit_add _ _ _ _ Hal Hbl) as H1; cbn in H1.
+rewrite (fold_rngl_sub Hop) in H1.
+Theorem limit_ext_in :
+  ∀ u v lim,
+  (∀ n, u n = v n)
+  → is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf v lim.
+... ...
+eapply limit_ext_in in H1. 2: {
+  now intros; rewrite (fold_rngl_sub Hop).
+}
+(* ah oui, mais ça suffit pas, faut montrer que lima-limb=0, ce qui
+   est justement ce que je veux prouver ! *)
 ...
 exists lim.
 move lim before b.
