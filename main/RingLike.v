@@ -3720,9 +3720,9 @@ Theorem rngl_div_le_upper_bound :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ a b q, (0 < b → a ≤ b * q → a / b ≤ q)%L.
+  ∀ a b q, (0 < b → a ≤ b * q ↔ a / b ≤ q)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hzb Habq.
+intros Hic Hon Hop Hiv Hor * Hzb.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -3730,10 +3730,17 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := b); [ easy | ].
-rewrite (rngl_mul_div_r Hon Hic Hiv); [ easy | ].
-intros H; rewrite H in Hzb.
-now apply (rngl_lt_irrefl Hor) in Hzb.
+split; intros Habq. {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := b); [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv); [ easy | ].
+  intros H; rewrite H in Hzb.
+  now apply (rngl_lt_irrefl Hor) in Hzb.
+} {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ b) in Habq; [ | easy ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv) in Habq; [ easy | ].
+  intros H; subst b.
+  now apply (rngl_lt_irrefl Hor) in Hzb.
+}
 Qed.
 
 Theorem rngl_pow_pos_nonneg :

@@ -2153,25 +2153,93 @@ specialize (Hco _ Hcsv) as Hbc.
 destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
-(**)
+assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
+  progress unfold is_limit_when_tending_to_inf.
+  intros ε Hε.
+  progress unfold u.
+  progress unfold v.
+  specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+  specialize (H1 ((b - a) / ε)%L).
+  destruct H1 as (N, HN).
+  rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  exists (N + 1).
+  intros n Hn.
+  rewrite (rngl_sub_0_r Hos).
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_abs_An_Bn_le Hic Hon Hop Hiv Hor _ _ Hab P n).
+    apply surjective_pairing.
+  }
+  apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_div_le_upper_bound Hic Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_lt_le_incl Hor).
+  eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+  replace (2 ^ n)%L with (rngl_of_nat (2 ^ n)). 2: {
+    rewrite (rngl_of_nat_pow Hon Hos); cbn.
+    now rewrite rngl_add_0_r.
+  }
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  eapply le_trans; [ apply Hn | ].
+  apply Nat.log2_up_le_pow2; [ flia Hn | ].
+  now apply Nat.log2_up_le_lin.
+}
 assert (Hlab : lima = limb). {
-  assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
-(**)
-    progress unfold is_limit_when_tending_to_inf.
-    intros ε Hε.
-    progress unfold u.
-    progress unfold v.
-    specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-    specialize (H1 ((b - a) / ε)%L).
-    destruct H1 as (N, HN).
-    exists N.
-    intros n Hn.
-    rewrite (rngl_sub_0_r Hos).
-    eapply (rngl_le_trans Hor). {
-      apply (rngl_abs_An_Bn_le Hic Hon Hop Hiv Hor _ _ Hab P n).
-      apply surjective_pairing.
-    }
-Search (_ / _ ≤ _)%L.
+Theorem limit_opp :
+  ∀ u lim,
+  is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
+Proof.
+intros * Hu.
+...
+apply limit_opp in Hbl.
+Theorem limit_add :
+  ∀ u v limu limv,
+  is_limit_when_tending_to_inf u limu
+  → is_limit_when_tending_to_inf v limv
+  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
+... ...
+specialize (limit_add _ _ _ _ Hal Hbl) as H1; cbn in H1.
+rewrite (fold_rngl_sub Hop) in H1.
+Theorem limit_ext_in :
+  ∀ u v lim,
+  (∀ n, u n = v n)
+  → is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf v lim.
+... ...
+eapply limit_ext_in in H1. 2: {
+  now intros; rewrite (fold_rngl_sub Hop).
+}
+Theorem limit_unique :
+  ∀ u lim1 lim2,
+  is_limit_when_tending_to_inf u lim1
+  → is_limit_when_tending_to_inf u lim2
+  → lim1 = lim2.
+...
+apply (rngl_sub_move_0_r Hop).
+now apply (limit_unique _ 0)%L in H1.
+}
+...
+Theorem rngl_le_power2 :
+  ∀ n : T, (0 ≤ n → n ≤ 2 ^ n)%L.
+...
+Search (_ ≤ _ ^ _)%L.
+Search (_ ≤ _ ^ _)%nat.
+Search (_ ≤ _ ^ _)%Z.
+Check Nat.log2_up_le_pow2.
+Check Zpow_facts.Zpower2_le_lin.
+...
+Search (rngl_of_nat (_ ^ _))%L.
+...
+      replace 2%L with (rngl_of_nat 2). 2: {
+        now cbn; rewrite rngl_add_0_r.
+      }
+Search (_ ≤ _ ^ _)%L.
 ...
     exists ((b - a) / ε)%L.
 ...
@@ -2279,31 +2347,6 @@ rngl_abs_Bn_sub_Bn_le:
     }
     destruct (Hco _ Hc) as (lim, Hlim).
 (**)
-Theorem limit_opp :
-  ∀ u lim,
-  is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
-... ...
-apply limit_opp in Hbl.
-Theorem limit_add :
-  ∀ u v limu limv,
-  is_limit_when_tending_to_inf u limu
-  → is_limit_when_tending_to_inf v limv
-  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
-... ...
-specialize (limit_add _ _ _ _ Hal Hbl) as H1; cbn in H1.
-rewrite (fold_rngl_sub Hop) in H1.
-Theorem limit_ext_in :
-  ∀ u v lim,
-  (∀ n, u n = v n)
-  → is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf v lim.
-... ...
-eapply limit_ext_in in H1. 2: {
-  now intros; rewrite (fold_rngl_sub Hop).
-}
-(* ah oui, mais ça suffit pas, faut montrer que lima-limb=0, ce qui
-   est justement ce que je veux prouver ! *)
 ...
 exists lim.
 move lim before b.
