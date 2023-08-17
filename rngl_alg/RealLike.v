@@ -205,6 +205,68 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
+Theorem limit_add :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ u v limu limv,
+  is_limit_when_tending_to_inf u limu
+  → is_limit_when_tending_to_inf v limv
+  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hu Hv ε Hε.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  exists 0.
+  intros n Hn.
+  rewrite (H1 (rngl_abs _)), (H1 ε).
+  apply (rngl_le_refl Hor).
+}
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos) in Hε.
+  now rewrite (fold_rngl_div Hiv) in Hε.
+}
+destruct (Hu (ε / 2) Hε2)%L as (Nu, Hun).
+destruct (Hv (ε / 2) Hε2)%L as (Nv, Hvn).
+move Nv before Nu.
+exists (max Nu Nv).
+intros n H.
+apply Nat.max_lub_iff in H.
+destruct H as (Hnun, Hnvn).
+specialize (Hun _ Hnun).
+specialize (Hvn _ Hnvn).
+rewrite (rngl_sub_add_distr Hos).
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite <- rngl_add_assoc.
+rewrite rngl_add_add_add_swap.
+do 2 rewrite (fold_rngl_sub Hop).
+eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_compat Hor); [ apply Hun | apply Hvn ].
+}
+rewrite (rngl_add_diag Hon).
+rewrite (rngl_mul_div_r Hon Hic Hiv).
+apply (rngl_le_refl Hor).
+apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+Qed.
+
 Theorem limit_opp :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2210,15 +2272,10 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
 }
 assert (Hlab : lima = limb). {
   apply limit_opp in Hbl.
-...<<
-Theorem limit_add :
-  ∀ u v limu limv,
-  is_limit_when_tending_to_inf u limu
-  → is_limit_when_tending_to_inf v limv
-  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
-... ...
-specialize (limit_add _ _ _ _ Hal Hbl) as H1; cbn in H1.
-rewrite (fold_rngl_sub Hop) in H1.
+  specialize (limit_add Hic Hon Hop Hiv Hor) as H1.
+  specialize (H1 _ _ _ _ Hal Hbl).
+  rewrite (fold_rngl_sub Hop) in H1.
+...
 Theorem limit_ext_in :
   ∀ u v lim,
   (∀ n, u n = v n)
