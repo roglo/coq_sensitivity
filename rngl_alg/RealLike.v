@@ -108,7 +108,7 @@ Definition is_limit_when_tending_to f a l :=
 
 Definition is_limit_when_tending_to_inf f l :=
   ∀ ε, (0 < ε)%L → ∃ N,
-  ∀ n, N < n → (rngl_abs (f n - l) ≤ ε)%L.
+  ∀ n, N ≤ n → (rngl_abs (f n - l) ≤ ε)%L.
 
 Definition is_complete :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
@@ -1779,7 +1779,7 @@ specialize (H1 p q _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
 easy.
 Qed.
 
-Theorem An_Bn_are_Cauchy_sequence :
+Theorem An_Bn_are_Cauchy_sequences :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2100,7 +2100,7 @@ unfold is_supremum.
 progress unfold is_complete in Hco.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).
-specialize (An_Bn_are_Cauchy_sequence Hic Hon Hop Hiv Hor Har P) as H1.
+specialize (An_Bn_are_Cauchy_sequences Hic Hon Hop Hiv Hor Har P) as H1.
 assert (Hab : (a ≤ b)%L) by now apply (rngl_lt_le_incl Hor), Hs.
 specialize (H1 a b Hab).
 progress fold u in H1.
@@ -2113,41 +2113,61 @@ destruct Hbc as (limb, Hbl).
 move limb before lima.
 (**)
 assert (Hlab : lima = limb). {
-  progress unfold is_limit_when_tending_to_inf in Hal, Hbl.
   assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
 (**)
-    assert (Hc : is_Cauchy_sequence (λ n, (u n - v n)%L)).
-    _admit.
-    destruct (Hco _ Hc) as (lim, Hlim).
-    progress unfold is_limit_when_tending_to_inf in Hlim |-*.
-    intros ε Hε.
-    destruct (Hlim _ Hε) as (N, HN).
-...
-    progress unfold is_limit_when_tending_to_inf.
-    intros ε Hε.
-    specialize (Hal (ε / 2)%L).
-    specialize (Hbl (ε / 2)%L).
-    assert (H : (0 < ε / 2)%L). {
-      apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2⁻¹%L) in Hε. 2: {
-        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    assert (Hc : is_Cauchy_sequence (λ n, (u n - v n)%L)). {
+      intros ε Hε.
+      specialize (Hcsu (ε / 2)%L).
+      specialize (Hcsv (ε / 2)%L).
+      assert (H : (0 < ε / 2)%L). {
+        apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
+          apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite (rngl_mul_0_l Hos) in Hε.
+        now rewrite (fold_rngl_div Hiv) in Hε.
       }
-      rewrite (rngl_mul_0_l Hos) in Hε.
-      now rewrite (fold_rngl_div Hiv) in Hε.
+      specialize (Hcsu H).
+      specialize (Hcsv H).
+      destruct Hcsu as (Nu, Hnu).
+      destruct Hcsv as (Nv, Hnv).
+      move Nv before Nu.
+      exists (max Nu Nv).
+      intros p q Huvp Huvq.
+      apply Nat.max_lub_iff in Huvp, Huvq.
+      destruct Huvp as (Hup, Hvp).
+      destruct Huvq as (Huq, Hvq).
+      specialize (Hnu _ _ Hup Huq).
+      specialize (Hnv _ _ Hvp Hvq).
+      move Hnu at bottom.
+      move Hnv at bottom.
+      progress unfold rngl_sub.
+      rewrite Hop.
+      rewrite (rngl_opp_add_distr Hop).
+      progress unfold rngl_sub.
+      rewrite Hop.
+      rewrite (rngl_opp_involutive Hop).
+Theorem rngl_add_add_add_swap :
+  ∀ a b c d, ((a + b) + (c + d) = (a + c) + (b + d))%L.
+... ...
+rewrite (rngl_add_comm (v q)).
+rewrite rngl_add_add_add_swap.
+...
+Nat.add_shuffle2: ∀ n m p q : nat, n + m + (p + q) = n + q + (m + p)
+Z.add_shuffle2: ∀ n m p q : Z, (n + m + (p + q))%Z = (n + q + (m + p))%Z
+...
+      progress unfold rngl_sub at 1.
+      rewrite Hop.
+      eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
+...
+rngl_abs_triangle:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_has_opp T = true → rngl_is_ordered T = true → ∀ a b : T, (rngl_abs (a + b) ≤ rngl_abs a + rngl_abs b)%L
+...
     }
-    specialize (Hal H).
-    specialize (Hbl H).
-    destruct Hal as (Na, Hal).
-    destruct Hbl as (Nb, Hbl).
-    move Nb before Na.
-    exists (max Na Nb).
-    intros n Hn.
-    rewrite (rngl_sub_0_r Hos).
-    apply Nat.max_lub_lt_iff in Hn.
-    destruct Hn as (Han, Hbn).
-    specialize (Hal _ Han).
-    specialize (Hbl _ Hbn).
-(* ah mais non chuis nul, c'est pas ça, con que je suis *)
+    destruct (Hco _ Hc) as (lim, Hlim).
+(* Prouver que limite d'une somme = somme des limites *)
 ...
 exists lim.
 move lim before b.
