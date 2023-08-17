@@ -205,6 +205,25 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
+Theorem limit_opp :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ u lim,
+  is_limit_when_tending_to_inf u lim
+  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
+Proof.
+intros Hop Hor * Hu.
+intros ε Hε.
+destruct (Hu ε Hε) as (N, HN).
+exists N.
+intros n Hn.
+rewrite <- (rngl_opp_add_distr Hop).
+rewrite rngl_add_comm.
+rewrite (fold_rngl_sub Hop).
+rewrite (rngl_abs_opp Hop Hor).
+now apply HN.
+Qed.
+
 Definition gc_opt_inv_or_quot :
   option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_inv_or_quot T with
@@ -2190,14 +2209,8 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   now apply Nat.log2_up_le_lin.
 }
 assert (Hlab : lima = limb). {
-Theorem limit_opp :
-  ∀ u lim,
-  is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
-Proof.
-intros * Hu.
-...
-apply limit_opp in Hbl.
+  apply limit_opp in Hbl.
+...<<
 Theorem limit_add :
   ∀ u v limu limv,
   is_limit_when_tending_to_inf u limu
