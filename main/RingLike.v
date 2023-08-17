@@ -3714,7 +3714,7 @@ apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
 Qed.
 
-Theorem rngl_div_le_upper_bound :
+Theorem rngl_le_div_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3737,6 +3737,35 @@ split; intros Habq. {
   now apply (rngl_lt_irrefl Hor) in Hzb.
 } {
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ b) in Habq; [ | easy ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv) in Habq; [ easy | ].
+  intros H; subst b.
+  now apply (rngl_lt_irrefl Hor) in Hzb.
+}
+Qed.
+
+Theorem rngl_lt_div_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b q, (0 < b → a < b * q ↔ a / b < q)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hzb.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+split; intros Habq. {
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) with (a := b); [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hic Hiv); [ easy | ].
+  intros H; rewrite H in Hzb.
+  now apply (rngl_lt_irrefl Hor) in Hzb.
+} {
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii b) in Habq; [ | easy ].
   rewrite (rngl_mul_div_r Hon Hic Hiv) in Habq; [ easy | ].
   intros H; subst b.
   now apply (rngl_lt_irrefl Hor) in Hzb.
