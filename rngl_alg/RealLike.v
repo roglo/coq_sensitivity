@@ -2413,6 +2413,7 @@ assert (Hlab : lima = limb). {
 subst limb; rename lima into lim.
 exists lim.
 move lim before b.
+clear Hl.
 destruct (is_upper_bound P lim)  as [H1| H1]. {
   split. {
     intros c.
@@ -2420,14 +2421,13 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge Hor).
     intros Hc.
-(**)
-    specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
     assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
       intros x Hx Hpx.
       now apply H2, (rngl_nlt_ge Hor) in Hpx.
     }
+    specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
+    progress unfold is_limit_when_tending_to_inf in Hal.
 ...
-    progress unfold is_limit_when_tending_to_inf in Hco.
     (* il y a un moment où an > c *)
 (**)
     (* si n > log2 ((b - a) / (lim - c)), alors
