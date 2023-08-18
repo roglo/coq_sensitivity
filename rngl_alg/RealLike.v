@@ -2427,6 +2427,27 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     }
     specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
     progress unfold is_limit_when_tending_to_inf in Hal.
+(*
+  trouver n tel que
+    c < an < lim < bn
+    c < u n < lim < v n
+(b - a) / 2 ^ n < lim - c
+il suffit que
+(b - a) < 2 ^ n * (lim - c)
+il suffit que
+2 ^ n > (b - a) / (lim - c)
+il suffit que
+n > (b - a) / (lim - c)
+*)
+Check int_part.
+    specialize (int_part Hon Hop Hc1 Hor Har) as H3.
+    specialize (H3 ((b - a) / (lim - c)))%L.
+    destruct H3 as (N, HN).
+(*
+    specialize (H4 (N + 1) _ _ (surjective_pairing _)).
+    destruct H4 as (y & Hy & Hpy).
+*)
+    assert (H : (c < fst (AnBn P a b N))%L).
 ...
     (* il y a un moment où an > c *)
 (**)
