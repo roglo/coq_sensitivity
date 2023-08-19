@@ -1832,40 +1832,6 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
-Theorem An_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (a ≤ b)%L →
-  ∀ P p q,
-  p ≤ q
-  → (fst (AnBn P a b p) ≤ fst (AnBn P a b q))%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-specialize (AnBn_le Hic Hon Hop Hiv Hor) as H1.
-specialize (H1 a b Hab P p q).
-now specialize (H1 _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
-Qed.
-
-Theorem Bn_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (a ≤ b)%L →
-  ∀ P p q,
-  p ≤ q
-  → (snd (AnBn P a b q) ≤ snd (AnBn P a b p))%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-specialize (AnBn_le Hic Hon Hop Hiv Hor) as H1.
-specialize (H1 a b Hab P p q).
-now specialize (H1 _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
-Qed.
-
 Theorem rngl_abs_An_Bn_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1915,13 +1881,14 @@ Theorem rngl_abs_AnBn_sub_AnBn_le :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ a b, (a ≤ b)%L →
-  ∀ P p q ap bp aq bq, p ≤ q
-  → AnBn P a b p = (ap, bp)
+  ∀ P p q, p ≤ q →
+  ∀ ap bp aq bq,
+  AnBn P a b p = (ap, bp)
   → AnBn P a b q = (aq, bq)
   → (rngl_abs (ap - aq) ≤ (b - a) / 2 ^ p)%L ∧
     (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hpq Ha Hb.
+intros Hic Hon Hop Hiv Hor * Hab * Hpq * Ha Hb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1999,38 +1966,6 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
-Theorem rngl_abs_An_sub_An_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (a ≤ b)%L →
-  ∀ P p q, p ≤ q →
-  (rngl_abs (fst (AnBn P a b p) - fst (AnBn P a b q)) ≤ (b - a) / 2 ^ p)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-specialize (rngl_abs_AnBn_sub_AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H1.
-specialize (H1 p q _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
-easy.
-Qed.
-
-Theorem rngl_abs_Bn_sub_Bn_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (a ≤ b)%L →
-  ∀ P p q, p ≤ q →
-  (rngl_abs (snd (AnBn P a b p) - snd (AnBn P a b q)) ≤ (b - a) / 2 ^ p)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor * Hab * Hpq.
-specialize (rngl_abs_AnBn_sub_AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H1.
-specialize (H1 p q _ _ _ _ Hpq (surjective_pairing _) (surjective_pairing _)).
-easy.
-Qed.
-
 Theorem An_Bn_are_Cauchy_sequences :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2105,15 +2040,19 @@ split. {
     clear Hp Hq.
     progress unfold u.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
+    specialize (rngl_abs_AnBn_sub_AnBn_le Hic Hon Hop Hiv Hor) as H1.
+    specialize (H1 a b Hab P).
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
-      now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
+      specialize (H1 p q Hpq).
+      apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     } {
       apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
       rewrite Nat.min_r; [ | easy ].
       rewrite <- (rngl_abs_opp Hop Hor).
       rewrite (rngl_opp_sub_distr Hop).
-      now apply (rngl_abs_An_sub_An_le Hic Hon Hop Hiv Hor).
+      specialize (H1 q p Hpq).
+      apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     }
   }
   eapply (rngl_le_trans Hor); [ apply H1 | ].
@@ -2174,15 +2113,19 @@ split. {
     clear Hp Hq.
     unfold v.
     specialize (AnBn_interval Hic Hon Hop Hiv Hor) as Habi.
+    specialize (rngl_abs_AnBn_sub_AnBn_le Hic Hon Hop Hiv Hor) as H1.
+    specialize (H1 a b Hab P).
     destruct (le_dec p q) as [Hpq| Hpq]. {
       rewrite Nat.min_l; [ | easy ].
-      now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
+      specialize (H1 p q Hpq).
+      apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     } {
       apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
       rewrite Nat.min_r; [ | easy ].
       rewrite <- (rngl_abs_opp Hop Hor).
       rewrite (rngl_opp_sub_distr Hop).
-      now apply (rngl_abs_Bn_sub_Bn_le Hic Hon Hop Hiv Hor).
+      specialize (H1 q p Hpq).
+      apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     }
   }
   eapply (rngl_le_trans Hor); [ apply H1 | ].
@@ -2441,14 +2384,16 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
           apply (rngl_le_sub_0 Hop Hor).
 ...
-An_le:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_inv T = true
-        → rngl_is_ordered T = true
-          → ∀ a b : T,
-              (a ≤ b)%L → ∀ (P : T → Type) (p q : nat), p ≤ q → (fst (AnBn P a b p) ≤ fst (AnBn P a b q))%L
+AnBn_le
+     : rngl_mul_is_comm T = true
+       → rngl_has_1 T = true
+         → rngl_has_opp T = true
+           → rngl_has_inv T = true
+             → rngl_is_ordered T = true
+               → ∀ a b : T,
+                   (a ≤ b)%L
+                   → ∀ (P : T → Type) (p q : nat) (ap bp aq bq : T),
+                       p ≤ q → AnBn P a b p = (ap, bp) → AnBn P a b q = (aq, bq) → (ap ≤ aq)%L ∧ (bq ≤ bp)%L
 ...
     progress unfold is_limit_when_tending_to_inf in Hal.
 (*
