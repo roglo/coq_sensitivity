@@ -2388,10 +2388,11 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
 ...
         assert (H5 :
           ∀ (q : nat) (aq bq : T),
-          n ≤ q
+          max n N ≤ q
           → AnBn P a b q = (aq, bq)
           → (an ≤ aq)%L). {
           intros * Hnq Hq.
+          specialize (H3 q _ _ _ _ Hnq Habn).
           now specialize (H3 q _ _ _ _ Hnq Habn Hq).
         }
         clear H3.
