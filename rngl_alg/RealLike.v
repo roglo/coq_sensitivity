@@ -2426,6 +2426,21 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       now apply H2, (rngl_nlt_ge Hor) in Hpx.
     }
     specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
+(**)
+    assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
+      intros * Habn.
+      split. {
+        apply (rngl_nlt_ge Hor).
+        intros Hla.
+        assert (H : (0 < an - lim)%L) by now apply (rngl_lt_0_sub Hop Hor).
+        destruct (Hal _ H) as (N, HN); clear H.
+        specialize (HN (max n N)).
+        assert (H : N ≤ max n N) by apply Nat.le_max_r.
+        specialize (HN H); clear H.
+        progress unfold u in HN.
+        rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
+          apply (rngl_le_sub_0 Hop Hor).
+...
     progress unfold is_limit_when_tending_to_inf in Hal.
 (*
   trouver n tel que
@@ -2447,7 +2462,7 @@ Check int_part.
     specialize (H4 (N + 1) _ _ (surjective_pairing _)).
     destruct H4 as (y & Hy & Hpy).
 *)
-    assert (H : (c < fst (AnBn P a b N))%L).
+    assert (H : (c < fst (AnBn P a b N))%L). {
 ...
     (* il y a un moment où an > c *)
 (**)
