@@ -2441,6 +2441,15 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
           apply (rngl_le_sub_0 Hop Hor).
 ...
+An_le:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_inv T = true
+        → rngl_is_ordered T = true
+          → ∀ a b : T,
+              (a ≤ b)%L → ∀ (P : T → Type) (p q : nat), p ≤ q → (fst (AnBn P a b p) ≤ fst (AnBn P a b q))%L
+...
     progress unfold is_limit_when_tending_to_inf in Hal.
 (*
   trouver n tel que
