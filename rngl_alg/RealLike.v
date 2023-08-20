@@ -2382,6 +2382,16 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hla | ].
         easy.
       } {
+        apply (rngl_nlt_ge Hor).
+        intros Hla.
+        destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
+...
+        revert Hpy.
+        apply Hcl.
+        eapply (rngl_lt_le_trans Hor); [ apply Hc | ].
+        eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor) | ].
+        eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hla | ].
+        easy.
 ...
           apply Nat.nle_gt, Nat.lt_le_incl in HnN.
           rewrite Nat.max_r in HN; [ | easy ].
