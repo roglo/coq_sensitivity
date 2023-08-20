@@ -2430,11 +2430,24 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       split; [ easy | ].
       specialize (after_AnBn Hic Hon Hop Hiv Hor) as H3.
       specialize (H3 P a b Ha Hs n an bn Habn).
+      apply (rngl_nlt_ge Hor).
+      intros H5.
+      progress unfold is_limit_when_tending_to_inf in Hbl.
+      progress unfold v in Hbl.
 ...
-        apply (rngl_nle_gt Hor).
-        intros H.
-        revert Hx.
-        apply Hcl.
+      specialize (Hbl (lim - bn)%L) as H6.
+      assert (H : (0 < lim - bn)%L) by now apply (rngl_lt_0_sub Hop Hor).
+      specialize (H6 H); clear H.
+      destruct H6 as (N, HN).
+...
+      specialize (HN (max n N)).
+...
+      specialize (H3 ((bn + lim) / 2)%L).
+...
+      destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
+...
+        eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), Hc ].
+        eapply (rngl_le_trans Hor); [ apply Hay | ].
 ...
 apply H1.
 apply H1.
