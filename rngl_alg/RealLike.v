@@ -2213,6 +2213,32 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 }
 Qed.
 
+Theorem AnBn_not_P :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (P : _ → Prop) a b n an bn,
+  (∀ x : T, P x → (x ≤ b)%L)
+  → AnBn P a b n = (an, bn)
+  → ∀ y, (bn < y → ¬ P y)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor * Hs Habn y Hby.
+revert a b Hs Habn.
+induction n; intros; cbn in Habn. {
+  injection Habn; clear Habn; intros; subst an bn.
+  intros H.
+  apply Hs in H.
+  now apply (rngl_nlt_ge Hor) in H.
+}
+destruct (is_upper_bound _ _) as [H1| H1]. {
+  apply (IHn a ((a + b) / 2)%L H1 Habn).
+} {
+  apply (IHn ((a + b) / 2)%L b Hs Habn).
+}
+Qed.
+
 Theorem in_AnBn :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2238,6 +2264,28 @@ assert (H : (a ≤ a ≤ b)%L). {
   now apply (rngl_lt_le_incl Hor), Hs.
 }
 apply (H1 H Ha n an bn Habn).
+Qed.
+
+Theorem after_AnBn :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ (P : _ → Prop) a b,
+  P a
+  → (∀ x : T, P x → (x < b)%L)
+  → ∀ n an bn,
+  AnBn P a b n = (an, bn)
+  → ∀ y, (bn < y)%L
+  → ¬ P y.
+Proof.
+intros Hic Hon Hop Hiv Hor * Ha Hs * Habn * Hby.
+assert (H : ∀ x : T, P x → (x ≤ b)%L). {
+  now intros; apply (rngl_lt_le_incl Hor), Hs.
+}
+specialize (AnBn_not_P Hic Hon Hop Hiv Hor P) as H1.
+now apply (H1 a b n an bn H Habn).
 Qed.
 
 (* to be completed
@@ -2372,16 +2420,60 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
 (**)
     assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
       intros * Habn.
-      split. {
-        apply (rngl_nlt_ge Hor).
-        intros Hla.
+      assert (Hanl : (an ≤ lim)%L). {
         destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
-        revert Hpy.
+        eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), Hc ].
+        eapply (rngl_le_trans Hor); [ apply Hay | ].
+        apply (rngl_nlt_ge Hor).
+        now intros H; apply Hcl in H.
+      }
+      split; [ easy | ].
+      specialize (after_AnBn Hic Hon Hop Hiv Hor) as H3.
+      specialize (H3 P a b Ha Hs n an bn Habn).
+...
+        apply (rngl_nle_gt Hor).
+        intros H.
+        revert Hx.
         apply Hcl.
-        eapply (rngl_lt_le_trans Hor); [ apply Hc | ].
-        eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hla | ].
-        easy.
-      } {
+...
+apply H1.
+apply H1.
+specialize (H1 H Habn); clear H.
+assert (H : (a ≤ a ≤ b)%L). {
+  split; [ apply (rngl_le_refl Hor) | ].
+  now apply (rngl_lt_le_incl Hor), Hs.
+}
+specialize (H1 H Ha n an bn Habn); clear H.
+...
+apply (H1 H Ha n an bn Habn).
+Qed.
+...
+specialize (after_AnBn P a b n an bn Habn) as H3.
+apply (rngl_nlt_ge Hor).
+intros H.
+specialize (H3 (
+...
+apply H3 in H.
+...
+...
+specialize (AnBn_interval Hic Hon Hop Hiv Hor) as H3.
+specialize (H3 a b Hab P n an bn Habn).
+destruct H3 as (H3, H5).
+...
+...
+apply (rngl_nlt_ge Hor).
+intros Hb.
+specialize (Hbl (lim - bn)%L).
+Check AnBn_interval.
+...
+progress unfold is_limit_when_tending_to_inf in Hbl.
+progress unfold v in Hbl.
+...
+        eapply (rngl_le_trans Hor); [ | apply Hay ].
+...
+        apply (rngl_nlt_ge Hor).
+        now intros H; apply Hcl in H.
+...
         apply (rngl_nlt_ge Hor).
         intros Hla.
         destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
