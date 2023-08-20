@@ -2373,18 +2373,22 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
       intros * Habn.
       split. {
-(**)
-        progress unfold is_limit_when_tending_to_inf in Hal.
-        progress unfold u in Hal.
         apply (rngl_nlt_ge Hor).
         intros Hla.
-        assert (H : (0 < an - lim)%L) by now apply (rngl_lt_0_sub Hop Hor).
-        destruct (Hal _ H) as (N, HN); clear H.
-        specialize (HN (max n N)).
-        assert (H : N ≤ max n N) by apply Nat.le_max_r.
-        specialize (HN H); clear H.
-        specialize (AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H3.
-        specialize (H3 (max n N)).
+        destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
+        revert Hpy.
+        apply Hcl.
+        eapply (rngl_lt_le_trans Hor); [ apply Hc | ].
+        eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hla | ].
+        easy.
+      } {
+...
+          apply Nat.nle_gt, Nat.lt_le_incl in HnN.
+          rewrite Nat.max_r in HN; [ | easy ].
+          rewrite Nat.max_r in H3; [ | easy ].
+...
+          rewrite Nat.max_l in HN; [ | easy ].
+          rewrite Habn in HN; cbn in HN.
 ...
         assert (H5 :
           ∀ (q : nat) (aq bq : T),
