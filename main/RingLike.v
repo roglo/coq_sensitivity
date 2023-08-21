@@ -3714,6 +3714,27 @@ apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
 Qed.
 
+Theorem rngl_div_lt_pos:
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < a)%L → (0 < b)%L → (0 < a / b)%L.
+Proof.
+intros Hon Hop Hiv Hor * Ha Hb.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+Qed.
+
 Theorem rngl_le_div_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
