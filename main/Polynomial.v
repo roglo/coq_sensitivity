@@ -1411,7 +1411,8 @@ rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
 replace (b * cq)%L with (b * (a / b))%L by now rewrite Hcq.
-rewrite (rngl_mul_div_r Hon Hic Hiv _ _ Hbz).
+rewrite (rngl_mul_comm Hic b).
+rewrite (rngl_mul_div_r Hon Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
