@@ -2464,9 +2464,8 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         now apply (rngl_lt_0_sub Hop Hor).
       } {
         apply Nat.nle_gt in HnN.
-(* comme bn < lim par H5, après n, les bn sont encore plus inférieurs à lim
-   (on peut utiliser H6 pour ça). Du coup, la limite des bn (Hbl) ne peut pas
-   être lim *)
+(* comme, par H5, bn < lim, par H6, après n, les bn sont encore plus inférieurs à
+   lim. Du coup, la limite des bn (Hbl) ne peut pas être lim *)
 ...
         assert (H : N ≤ n) by now apply Nat.lt_le_incl.
         specialize (H6 N n _ _ _ _ H (surjective_pairing _) Habn).
