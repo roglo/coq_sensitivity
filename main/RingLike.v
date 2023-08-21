@@ -2751,6 +2751,23 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_sub_lt_mono_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T, (a < b)%L ↔ (c - b < c - a)%L.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_sub.
+rewrite Hop.
+split; intros Hab. {
+  apply (rngl_add_lt_mono_l Hop Hor).
+  now apply -> (rngl_opp_lt_compat Hop Hor).
+} {
+  apply (rngl_add_lt_mono_l Hop Hor) in Hab.
+  now apply (rngl_opp_lt_compat Hop Hor).
+}
+Qed.
+
 Theorem rngl_add_le_mono_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

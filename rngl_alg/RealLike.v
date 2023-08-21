@@ -2476,6 +2476,13 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
           apply (rngl_le_div_r Hon Hop Hiv Hor) in HN. 2: {
             apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
           }
+          apply (rngl_nlt_ge Hor) in HN.
+          apply HN; clear HN.
+          rewrite rngl_mul_add_distr_l.
+          rewrite (rngl_mul_1_r Hon).
+          rewrite <- (rngl_sub_sub_distr Hop).
+          apply (rngl_sub_lt_mono_l Hop Hor).
+(* ah bin non ça marche pas *)
 ...
           eapply (rngl_le_trans Hor); [ apply H7 | ].
           now apply (rngl_lt_le_incl Hor).
