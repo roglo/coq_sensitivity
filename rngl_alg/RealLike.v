@@ -2420,55 +2420,58 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         apply (rngl_lt_le_incl Hor).
         now apply Hs.
       }
-      specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
+clear c H2 Hc Hcl.
       intros * Habn.
       split. {
+...
+        specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
         destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
         eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), Hc ].
         eapply (rngl_le_trans Hor); [ apply Hay | ].
         apply (rngl_nlt_ge Hor).
         now intros H; apply Hcl in H.
-      }
-      apply (rngl_nlt_ge Hor).
-      intros H5.
-      progress unfold is_limit_when_tending_to_inf in Hbl.
-      specialize (Hbl ((lim - bn) / 2)%L) as H7.
-      assert (H : (0 < (lim - bn) / 2)%L). {
-        apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+      } {
+        apply (rngl_nlt_ge Hor).
+        intros H5.
+        progress unfold is_limit_when_tending_to_inf in Hbl.
+        specialize (Hbl ((lim - bn) / 2)%L) as H7.
+        assert (H : (0 < (lim - bn) / 2)%L). {
+          apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          }
+          now apply (rngl_lt_0_sub Hop Hor).
+        }
+        specialize (H7 H); clear H.
+        destruct H7 as (M, HM).
+        specialize (HM (max M n)).
+        assert (H : M ≤ max M n) by apply Nat.le_max_l.
+        specialize (HM H); clear H.
+        assert (H : n ≤ max M n) by apply Nat.le_max_r.
+        specialize (AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H6.
+        specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
+        destruct H6 as (H6, H7).
+        rewrite (rngl_abs_nonpos Hop Hor) in HM. 2: {
+          apply (rngl_le_sub_0 Hop Hor).
+          eapply (rngl_le_trans Hor); [ apply H7 | ].
+          now apply (rngl_lt_le_incl Hor).
+        }
+        rewrite (rngl_opp_sub_distr Hop) in HM.
+        apply (rngl_nlt_ge Hor) in HM.
+        apply HM; clear HM.
+        apply (rngl_lt_div_l Hon Hop Hiv Hor). {
           apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
         }
-        now apply (rngl_lt_0_sub Hop Hor).
+        rewrite rngl_mul_add_distr_l.
+        rewrite (rngl_mul_1_r Hon).
+        rewrite <- (rngl_sub_sub_distr Hop).
+        apply (rngl_sub_lt_mono_l Hop Hor).
+        eapply (rngl_add_lt_mono_r Hop Hor).
+        rewrite (rngl_sub_add Hop).
+        eapply (rngl_le_lt_trans Hor); [ apply H7 | ].
+        apply (rngl_lt_add_r Hos Hor).
+        apply (rngl_lt_0_sub Hop Hor).
+        eapply (rngl_le_lt_trans Hor); [ apply H7 | easy ].
       }
-      specialize (H7 H); clear H.
-      destruct H7 as (M, HM).
-      specialize (HM (max M n)).
-      assert (H : M ≤ max M n) by apply Nat.le_max_l.
-      specialize (HM H); clear H.
-      assert (H : n ≤ max M n) by apply Nat.le_max_r.
-      specialize (AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H6.
-      specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
-      destruct H6 as (H6, H7).
-      rewrite (rngl_abs_nonpos Hop Hor) in HM. 2: {
-        apply (rngl_le_sub_0 Hop Hor).
-        eapply (rngl_le_trans Hor); [ apply H7 | ].
-        now apply (rngl_lt_le_incl Hor).
-      }
-      rewrite (rngl_opp_sub_distr Hop) in HM.
-      apply (rngl_nlt_ge Hor) in HM.
-      apply HM; clear HM.
-      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite rngl_mul_add_distr_l.
-      rewrite (rngl_mul_1_r Hon).
-      rewrite <- (rngl_sub_sub_distr Hop).
-      apply (rngl_sub_lt_mono_l Hop Hor).
-      eapply (rngl_add_lt_mono_r Hop Hor).
-      rewrite (rngl_sub_add Hop).
-      eapply (rngl_le_lt_trans Hor); [ apply H7 | ].
-      apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_lt_0_sub Hop Hor).
-      eapply (rngl_le_lt_trans Hor); [ apply H7 | easy ].
     }
 ...
           }
