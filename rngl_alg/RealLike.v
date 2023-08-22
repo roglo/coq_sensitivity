@@ -2408,13 +2408,19 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge Hor).
     intros Hc.
-    assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
-      intros x Hx Hpx.
-      now apply H2, (rngl_nlt_ge Hor) in Hpx.
-    }
-    specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
     assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
-      clear - H4 Hor Hc Hcl Hbl Hon Hop Hiv Hc1 Hic Hab Hos.
+      clear - Hor Hc H2 Hbl Hon Hop Hiv Hc1 Hic Hos Ha Hs.
+      subst v.
+      move H2 before Hs.
+      assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
+        intros x Hx Hpx.
+        now apply H2, (rngl_nlt_ge Hor) in Hpx.
+      }
+      assert (Hab : (a ≤ b)%L). {
+        apply (rngl_lt_le_incl Hor).
+        now apply Hs.
+      }
+      specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
       intros * Habn.
       split. {
         destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
@@ -2426,7 +2432,6 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       apply (rngl_nlt_ge Hor).
       intros H5.
       progress unfold is_limit_when_tending_to_inf in Hbl.
-      progress unfold v in Hbl.
       specialize (Hbl ((lim - bn) / 2)%L) as H7.
       assert (H : (0 < (lim - bn) / 2)%L). {
         apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
@@ -2470,26 +2475,6 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
           rewrite (rngl_opp_sub_distr Hop) in HN.
           apply (rngl_le_div_r Hon Hop Hiv Hor) in HN. 2: {
             apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-...
-        assert (H : N ≤ n) by now apply Nat.lt_le_incl.
-        specialize (H6 N n _ _ _ _ H (surjective_pairing _) Habn).
-        clear H.
-        destruct H6 as (H6, H7).
-        destruct (rngl_le_dec Hor (snd (AnBn P a b N)) lim) as [Hnl| Hnl]. {
-          rewrite (rngl_abs_nonpos Hop Hor) in HN. 2: {
-            now apply (rngl_le_sub_0 Hop Hor).
-          }
-          rewrite (rngl_opp_sub_distr Hop) in HN.
-          apply (rngl_le_div_r Hon Hop Hiv Hor) in HN. 2: {
-            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-          }
-          apply (rngl_nlt_ge Hor) in HN.
-          apply HN; clear HN.
-          rewrite rngl_mul_add_distr_l.
-          rewrite (rngl_mul_1_r Hon).
-          rewrite <- (rngl_sub_sub_distr Hop).
-          apply (rngl_sub_lt_mono_l Hop Hor).
-(* ah bin non ça marche pas *)
 ...
           eapply (rngl_le_trans Hor); [ apply H7 | ].
           now apply (rngl_lt_le_incl Hor).
