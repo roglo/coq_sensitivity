@@ -735,8 +735,10 @@ progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hic, Hrl.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
+rewrite Hrl.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq; [ | easy ].
+now rewrite Hic.
 Qed.
 
 Theorem gc_inv_im :
@@ -755,8 +757,10 @@ progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hic, Hrl.
-destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ now destruct iq | easy ].
+rewrite Hrl.
+destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
+destruct iq; [ | easy ].
+now rewrite Hic.
 Qed.
 
 Theorem gc_opt_mul_inv_l :
@@ -2153,7 +2157,6 @@ split. {
 Qed.
 
 Theorem AnBn_exists_P :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2166,7 +2169,7 @@ Theorem AnBn_exists_P :
   AnBn P a b n = (an, bn)
   → ∃ y, (an ≤ y ≤ bn ∧ P y)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hs Hab Hx * Habn.
+intros Hon Hop Hiv Hor * Hs Hab Hx * Habn.
 revert a b x Hs Hab Hx an bn Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -2208,7 +2211,6 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 Qed.
 
 Theorem AnBn_not_P :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2218,7 +2220,7 @@ Theorem AnBn_not_P :
   → AnBn P a b n = (an, bn)
   → ∀ y, (bn < y → ¬ P y)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor * Hs Habn y Hby.
+intros Hon Hop Hiv Hor * Hs Habn y Hby.
 revert a b Hs Habn.
 induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
@@ -2234,7 +2236,6 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
 Qed.
 
 Theorem in_AnBn :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2246,8 +2247,8 @@ Theorem in_AnBn :
   AnBn P a b n = (an, bn)
   → ∃ y : T, (an ≤ y ≤ bn)%L ∧ P y.
 Proof.
-intros Hic Hon Hop Hiv Hor * Ha Hs * Habn.
-specialize (AnBn_exists_P Hic Hon Hop Hiv Hor P) as H1.
+intros Hon Hop Hiv Hor * Ha Hs * Habn.
+specialize (AnBn_exists_P Hon Hop Hiv Hor P) as H1.
 specialize (H1 a b a).
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
@@ -2261,7 +2262,6 @@ apply (H1 H Ha n an bn Habn).
 Qed.
 
 Theorem after_AnBn :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2274,15 +2274,15 @@ Theorem after_AnBn :
   → ∀ y, (bn < y)%L
   → ¬ P y.
 Proof.
-intros Hic Hon Hop Hiv Hor * Ha Hs * Habn * Hby.
+intros Hon Hop Hiv Hor * Ha Hs * Habn * Hby.
 assert (H : ∀ x : T, P x → (x ≤ b)%L). {
   now intros; apply (rngl_lt_le_incl Hor), Hs.
 }
-specialize (AnBn_not_P Hic Hon Hop Hiv Hor P) as H1.
+specialize (AnBn_not_P Hon Hop Hiv Hor P) as H1.
 now apply (H1 a b n an bn H Habn).
 Qed.
 
-Theorem limit_between_AnBn :
+Theorem limit_between_An_and_Bn :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2393,7 +2393,6 @@ Qed.
 
 (* to be completed
 Theorem least_upper_bound :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2405,7 +2404,7 @@ Theorem least_upper_bound :
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor Har Hco * Ha Hs.
+intros Hon Hop Hiv Hor Har Hco * Ha Hs.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2480,15 +2479,12 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-(**)
-  rewrite (rngl_mul_comm Hic).
+  replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  rewrite <- (rngl_mul_nat_comm Hon Hos).
   apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_lt_le_incl Hor).
   eapply (rngl_lt_le_trans Hor); [ apply HN | ].
-  replace (2 ^ n)%L with (rngl_of_nat (2 ^ n)). 2: {
-    rewrite (rngl_of_nat_pow Hon Hos); cbn.
-    now rewrite rngl_add_0_r.
-  }
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
   eapply le_trans; [ apply Hn | ].
   apply Nat.log2_up_le_pow2; [ flia Hn | ].
@@ -2516,7 +2512,7 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
     apply (rngl_nlt_ge Hor).
     intros Hc.
-    specialize (limit_between_AnBn Hon Hop Hiv Hor a b lim P) as Hl.
+    specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
 ...
     }
