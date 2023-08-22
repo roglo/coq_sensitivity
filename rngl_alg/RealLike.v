@@ -2424,6 +2424,17 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         now intros H; apply Hcl in H.
       }
       split; [ easy | ].
+(**)
+apply (rngl_nlt_ge Hor).
+intros H5.
+specialize (AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H6.
+specialize (Hbl (lim - bn)%L) as H7.
+assert (H : (0 < lim - bn)%L) by now apply (rngl_lt_0_sub Hop Hor).
+specialize (H7 H); clear H.
+destruct H7 as (N, HN).
+progress unfold v in HN.
+specialize (HN N (le_refl _)).
+...
       specialize (after_AnBn Hic Hon Hop Hiv Hor) as H3.
       specialize (H3 P a b Ha Hs n an bn Habn).
       apply (rngl_nlt_ge Hor).
@@ -2436,7 +2447,7 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
           apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
         }
         now apply (rngl_lt_0_sub Hop Hor).
-     }
+      }
       specialize (H6 H); clear H.
       destruct H6 as (N, HN).
       specialize (HN N (le_refl _)).
@@ -2464,8 +2475,12 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
         now apply (rngl_lt_0_sub Hop Hor).
       } {
         apply Nat.nle_gt in HnN.
-(* comme, par H5, bn < lim, par H6, après n, les bn sont encore plus inférieurs à
-   lim. Du coup, la limite des bn (Hbl) ne peut pas être lim *)
+(* comme, par H5, bn < lim, par H6, après n, les bn sont encore plus inférieurs
+   à lim. Du coup, la limite des bn (Hbl) ne peut pas être lim *)
+        specialize (Hbl (lim - bn)%L) as H7.
+        assert (H : (0 < lim - bn)%L) by now apply (rngl_lt_0_sub Hop Hor).
+        specialize (H7 H); clear H.
+        destruct H7 as (M, HM).
 ...
         assert (H : N ≤ n) by now apply Nat.lt_le_incl.
         specialize (H6 N n _ _ _ _ H (surjective_pairing _) Habn).
