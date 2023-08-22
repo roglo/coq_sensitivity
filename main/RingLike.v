@@ -503,34 +503,6 @@ rewrite Hon in rngl_mul_inv_r.
 now apply rngl_mul_inv_r.
 Qed.
 
-(*
-Theorem rngl_opt_eqb_eq :
-  if rngl_has_eq_dec T then ∀ a b : T, (a =? b)%L = true ↔ a = b
-  else not_applicable.
-Proof.
-remember (rngl_has_eq_dec T) as ed eqn:Hed.
-symmetry in Hed.
-progress unfold rngl_has_eq_dec in Hed.
-destruct ed; [ | easy ].
-intros.
-remember (rngl_eqb a b) as eb eqn:Heb.
-symmetry in Heb.
-unfold rngl_eqb in Heb.
-destruct eb. {
-  split; [ | easy ].
-  intros _.
-  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
-  now destruct (rngl_eq_dec a b).
-} {
-  split; [ easy | ].
-  intros Hab; exfalso.
-  subst b.
-  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
-  now destruct (rngl_eq_dec a a).
-}
-Qed.
-*)
-
 Theorem rngl_eqb_eq :
   rngl_has_eq_dec T = true →
   ∀ a b : T, (a =? b)%L = true ↔ a = b.
@@ -2236,6 +2208,24 @@ unfold rngl_mul_nat, mul_nat.
 induction m; cbn; [ now rewrite rngl_add_0_l | ].
 rewrite <- rngl_add_assoc; f_equal.
 apply IHm.
+Qed.
+
+Theorem rngl_mul_nat_comm :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n a, (rngl_of_nat n * a = a * rngl_of_nat n)%L.
+Proof.
+intros Hon Hos *.
+induction n; cbn. {
+  rewrite (rngl_mul_0_r Hos).
+  apply (rngl_mul_0_l Hos).
+}
+rewrite rngl_mul_add_distr_l.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_r Hon).
+f_equal.
+apply IHn.
 Qed.
 
 Theorem fold_rngl_mul_nat :
