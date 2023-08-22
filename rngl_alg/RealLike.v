@@ -2409,8 +2409,7 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     apply (rngl_nlt_ge Hor).
     intros Hc.
     assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
-      clear - Hor Hc H2 Hbl Hon Hop Hiv Hc1 Hic Hos Ha Hs.
-      subst v.
+      clear - Hor Hc H2 Hbl Hon Hop Hiv Hc1 Hic Hos Ha Hs Hal.
       move H2 before Hs.
       assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
         intros x Hx Hpx.
@@ -2423,14 +2422,48 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
 clear c H2 Hc Hcl.
       intros * Habn.
       split. {
-...
-        specialize (in_AnBn Hic Hon Hop Hiv Hor P a b Ha Hs) as H4.
-        destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
-        eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), Hc ].
-        eapply (rngl_le_trans Hor); [ apply Hay | ].
+        subst u.
         apply (rngl_nlt_ge Hor).
-        now intros H; apply Hcl in H.
+        intros H5.
+        progress unfold is_limit_when_tending_to_inf in Hal.
+        specialize (Hal ((an - lim) / 2)%L) as H7.
+        assert (H : (0 < (an - lim) / 2)%L). {
+          apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          }
+          now apply (rngl_lt_0_sub Hop Hor).
+        }
+        specialize (H7 H); clear H.
+        destruct H7 as (M, HM).
+        specialize (HM (max M n)).
+        assert (H : M ≤ max M n) by apply Nat.le_max_l.
+        specialize (HM H); clear H.
+        assert (H : n ≤ max M n) by apply Nat.le_max_r.
+        specialize (AnBn_le Hic Hon Hop Hiv Hor a b Hab P) as H6.
+        specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
+        destruct H6 as (H6, H7).
+        rewrite (rngl_abs_nonneg Hop Hor) in HM. 2: {
+          apply (rngl_le_0_sub Hop Hor).
+          eapply (rngl_le_trans Hor); [ | apply H6 ].
+          now apply (rngl_lt_le_incl Hor).
+        }
+        apply (rngl_nlt_ge Hor) in HM.
+        apply HM; clear HM.
+        apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite rngl_mul_add_distr_l.
+        rewrite (rngl_mul_1_r Hon).
+        rewrite (rngl_add_sub_assoc Hop).
+        apply (rngl_sub_lt_mono_r Hop Hor).
+        rewrite <- (rngl_add_sub_swap Hop).
+        rewrite <- (rngl_add_sub_assoc Hop).
+        eapply (rngl_le_lt_trans Hor); [ apply H6 | ].
+        apply (rngl_lt_add_r Hos Hor).
+        apply (rngl_lt_0_sub Hop Hor).
+        eapply (rngl_lt_le_trans Hor); [ apply H5 | easy ].
       } {
+        subst v.
         apply (rngl_nlt_ge Hor).
         intros H5.
         progress unfold is_limit_when_tending_to_inf in Hbl.

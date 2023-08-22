@@ -1069,6 +1069,26 @@ apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
+Theorem rngl_add_sub_assoc :
+  rngl_has_opp T = true →
+  ∀ a b c, (a + (b - c) = a + b - c)%L.
+Proof.
+intros Hop *.
+progress unfold rngl_sub.
+rewrite Hop.
+apply rngl_add_assoc.
+Qed.
+
+Theorem rngl_add_sub_swap :
+  rngl_has_opp T = true →
+  ∀ a b c, (a + b - c = a - c + b)%L.
+Proof.
+intros Hop *.
+progress unfold rngl_sub.
+rewrite Hop.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem rngl_mul_div :
   rngl_has_inv_and_1_or_quot T = true →
   ∀ a b : T, b ≠ 0%L → (a * b / b)%L = a.
@@ -2766,6 +2786,17 @@ split; intros Hab. {
   apply (rngl_add_lt_mono_l Hop Hor) in Hab.
   now apply (rngl_opp_lt_compat Hop Hor).
 }
+Qed.
+
+Theorem rngl_sub_lt_mono_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T, (a < b)%L ↔ (a - c < b - c)%L.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_sub.
+rewrite Hop.
+apply (rngl_add_lt_mono_r Hop Hor).
 Qed.
 
 Theorem rngl_add_le_mono_l :
