@@ -2409,18 +2409,12 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     apply (rngl_nlt_ge Hor).
     intros Hc.
     assert (Hl : ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L). {
-      clear - Hor Hc H2 Hbl Hon Hop Hiv Hc1 Hic Hos Ha Hs Hal.
-      move H2 before Hs.
-      assert (Hcl : ∀ x, (c < x)%L → ¬ P x). {
-        intros x Hx Hpx.
-        now apply H2, (rngl_nlt_ge Hor) in Hpx.
-      }
+      clear - Hor Hbl Hon Hop Hiv Hc1 Hic Hos Ha Hs Hal.
+      intros * Habn.
       assert (Hab : (a ≤ b)%L). {
         apply (rngl_lt_le_incl Hor).
         now apply Hs.
       }
-clear c H2 Hc Hcl.
-      intros * Habn.
       split. {
         subst u.
         apply (rngl_nlt_ge Hor).
