@@ -2513,8 +2513,12 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
-...
-    }
+    specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
+    specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hn.
+    specialize (Hn Ha Hs).
+    (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
+       we have a y between an nad bn with P y, but
+       therefore greater than c, what contredicts H2 *)
 ...
           }
           rewrite (rngl_opp_sub_distr Hop) in HN.
