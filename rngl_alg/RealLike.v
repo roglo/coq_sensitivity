@@ -2530,6 +2530,32 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
       specialize (Hl n _ _ (surjective_pairing _)) as H3.
       destruct (Hi n _ _ (surjective_pairing _)) as (Hanb, H4).
+      set (an := fst (AnBn P a b n)) in *.
+      set (bn := snd (AnBn P a b n)) in *.
+      symmetry in H4.
+      apply (rngl_add_sub_eq_r Hos) in H4.
+      rewrite <- H4.
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      rewrite rngl_add_comm.
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      apply (rngl_lt_le_trans Hor _ (lim - c)%L). 2: {
+        now apply (rngl_sub_le_mono_r Hop Hor).
+      }
+      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+        apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
+      rewrite <- (rngl_mul_nat_pow_comm Hon Hos).
+      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+        now apply (rngl_lt_0_sub Hop Hor).
+      }
+      replace (rngl_of_nat 2) with 2%L by now cbn; rewrite rngl_add_0_r.
+... ...
+    }
+    apply H2 in Hy.
+    now apply (rngl_nlt_ge Hor) in Hy.
+  }
 ...
           }
           rewrite (rngl_opp_sub_distr Hop) in HN.

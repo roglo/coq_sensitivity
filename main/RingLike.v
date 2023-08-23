@@ -2283,6 +2283,17 @@ rewrite (rngl_of_nat_mul Hon Hos).
 now f_equal.
 Qed.
 
+
+Theorem rngl_mul_nat_pow_comm :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a b n, (rngl_of_nat a ^ n * b = b * rngl_of_nat a ^ n)%L.
+Proof.
+intros Hon Hos *.
+rewrite <- (rngl_of_nat_pow Hon Hos).
+apply (rngl_mul_nat_comm Hon Hos).
+Qed.
+
 Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
@@ -2916,6 +2927,25 @@ apply (rngl_add_sub_eq_l Hos) in H.
 rewrite (rngl_sub_diag Hos) in H; subst b.
 revert Hbz.
 apply (rngl_lt_irrefl Hor).
+Qed.
+
+Theorem rngl_lt_add_lt_sub_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a + b < c ↔ b < c - a)%L.
+Proof.
+intros Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+rewrite rngl_add_comm.
+split; intros Hab. {
+  apply (rngl_sub_lt_mono_r Hop Hor _ _ a) in Hab.
+  now rewrite (rngl_add_sub Hos) in Hab.
+} {
+  apply (rngl_sub_lt_mono_r Hop Hor _ _ a).
+  now rewrite (rngl_add_sub Hos).
+}
 Qed.
 
 Theorem rngl_0_lt_1 :
