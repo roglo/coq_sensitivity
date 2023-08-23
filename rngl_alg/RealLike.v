@@ -2575,21 +2575,23 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   }
 } {
   exfalso.
-  destruct H1 as (x, Hx).
-  apply Hx; clear Hx.
-  intros Hx.
+  destruct H1 as (c, Hc).
+  apply Hc; clear Hc.
+  intros Hc.
   apply (rngl_nlt_ge Hor).
-  intros Hlx.
+  intros Hlc.
   specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
   specialize (Hl Ha Hs Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
   specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
   specialize (Hin Ha Hs).
   specialize (after_AnBn Hon Hop Hiv Hor P a b Ha Hs) as H1.
-  (* faut que je trouve un n tel que bn < x,
-     c'est-à-dire an + (b - a) / 2 ^ n < x
-     qui marche si lim + (b - a) / 2 ^ n < x
-     c'est-à-dire (b - a) / 2 ^ n < x - lim *)
+  (* faut que je trouve un n tel que bn < c,
+     c'est-à-dire an + (b - a) / 2 ^ n < c
+     qui marche si lim + (b - a) / 2 ^ n < c
+     c'est-à-dire (b - a) / 2 ^ n < c - lim,
+     c'est-à-dire (b - a) / (c - lim) < 2 ^ n
+     ça marche si (b - a) / (c - lim) < n *)
 ...
 apply H1.
 apply H1.
