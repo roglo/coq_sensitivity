@@ -2514,11 +2514,21 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
     specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
-    specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hn.
-    specialize (Hn Ha Hs).
+    specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
+    specialize (Hin Ha Hs).
     (* if (b - a) / 2 ^ n < lim - c, then c < an < lim,
-       we have a y between an nad bn with P y, but
+       we have a y between an and bn with P y, but
        therefore greater than c, what contredicts H2 *)
+    (* (b - a) / 2 ^ n < lim - c, if
+       (b - a) < (lim - c) * 2 ^ n, if
+       (b - a) / (lim - c) < 2 ^ n, if
+       (b - a) / (lim - c) < n *)
+    set (x := ((b - a) / (lim - c))%L).
+    destruct (int_part Hon Hop Hc1 Hor Har x) as (n & Hnx & Hxn1).
+    destruct (Hin n _ _ (surjective_pairing _)) as (y & (Hny & Hyn) & Hy).
+    assert (Hcy : (c < y)%L). {
+      eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
+      specialize (Hl n _ _ (surjective_pairing _)) as H3.
 ...
           }
           rewrite (rngl_opp_sub_distr Hop) in HN.
