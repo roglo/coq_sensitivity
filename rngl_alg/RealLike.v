@@ -2504,7 +2504,7 @@ subst limb; rename lima into lim.
 exists lim.
 move lim before b.
 clear Hl.
-destruct (is_upper_bound P lim)  as [H1| H1]. {
+destruct (is_upper_bound P lim) as [H1| H1]. {
   split. {
     intros c.
     move c before b.
@@ -2568,7 +2568,23 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     }
     apply H2 in Hy.
     now apply (rngl_nlt_ge Hor) in Hy.
+  } {
+    specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
+    specialize (Hl Ha Hs Hal Hbl).
+    now specialize (Hl 0 _ _ (surjective_pairing _)).
   }
+} {
+  exfalso.
+  destruct H1 as (x, Hx).
+  apply Hx; clear Hx.
+  intros Hx.
+  specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
+  specialize (Hl Ha Hs Hal Hbl).
+  specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
+  specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
+  specialize (Hin Ha Hs).
+  specialize (AnBn_exists_P Hon Hop Hiv Hor P) as H1.
+  specialize (H1 a b x).
 ...
 apply H1.
 apply H1.
