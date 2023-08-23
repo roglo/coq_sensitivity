@@ -2578,6 +2578,8 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   destruct H1 as (x, Hx).
   apply Hx; clear Hx.
   intros Hx.
+  apply (rngl_nlt_ge Hor).
+  intros Hlx.
   specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
   specialize (Hl Ha Hs Hal Hbl).
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
