@@ -2553,36 +2553,22 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       progress fold x.
       rewrite <- (rngl_abs_nonneg Hop Hor x). 2: {
         progress unfold x.
-        apply (rngl_div_pos Hon Hop Hiv Hor).
-...
-      replace (rngl_of_nat 2) with 2%L by now cbn; rewrite rngl_add_0_r.
-... ...
+        apply (rngl_div_pos Hon Hop Hiv Hor). {
+          now apply (rngl_le_0_sub Hop Hor).
+        } {
+          now apply (rngl_lt_0_sub Hop Hor).
+        }
+      }
+      rewrite <- (rngl_of_nat_pow Hon Hos).
+      eapply (rngl_lt_le_trans Hor); [ apply Hxn1 | ].
+      apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+      rewrite Nat.add_1_r.
+      apply Nat.le_succ_l.
+      now apply Nat.pow_gt_lin_r.
     }
     apply H2 in Hy.
     now apply (rngl_nlt_ge Hor) in Hy.
   }
-...
-          }
-          rewrite (rngl_opp_sub_distr Hop) in HN.
-          apply (rngl_le_div_r Hon Hop Hiv Hor) in HN. 2: {
-            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-...
-          eapply (rngl_le_trans Hor); [ apply H7 | ].
-          now apply (rngl_lt_le_incl Hor).
-        }
-        rewrite (rngl_opp_sub_distr Hop) in HN.
-        apply (rngl_sub_le_mono_l Hop Hor) in HN.
-...
-        apply (rngl_sub_le_mono_l Hop Hor) in HN.
-        apply (rngl_le_antisymm Hor) in H8; [ | easy ].
-        clear HN.
-...
-      specialize (H3 ((bn + lim) / 2)%L).
-...
-      destruct (H4 n _ _ Habn) as (y & Hay & Hpy).
-...
-        eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), Hc ].
-        eapply (rngl_le_trans Hor); [ apply Hay | ].
 ...
 apply H1.
 apply H1.
