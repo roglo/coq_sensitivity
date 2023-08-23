@@ -2550,6 +2550,11 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
       apply (rngl_lt_div_l Hon Hop Hiv Hor). {
         now apply (rngl_lt_0_sub Hop Hor).
       }
+      progress fold x.
+      rewrite <- (rngl_abs_nonneg Hop Hor x). 2: {
+        progress unfold x.
+        apply (rngl_div_pos Hon Hop Hiv Hor).
+...
       replace (rngl_of_nat 2) with 2%L by now cbn; rewrite rngl_add_0_r.
 ... ...
     }
