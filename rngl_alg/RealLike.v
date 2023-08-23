@@ -2529,6 +2529,7 @@ destruct (is_upper_bound P lim)  as [H1| H1]. {
     assert (Hcy : (c < y)%L). {
       eapply (rngl_lt_le_trans Hor); [ | apply Hny ].
       specialize (Hl n _ _ (surjective_pairing _)) as H3.
+      destruct (Hi n _ _ (surjective_pairing _)) as (Hanb, H4).
 ...
           }
           rewrite (rngl_opp_sub_distr Hop) in HN.
