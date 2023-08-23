@@ -2585,8 +2585,11 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   specialize (AnBn_interval Hon Hop Hiv Hor a b Hab P) as Hi.
   specialize (in_AnBn Hon Hop Hiv Hor P a b) as Hin.
   specialize (Hin Ha Hs).
-  specialize (AnBn_exists_P Hon Hop Hiv Hor P) as H1.
-  specialize (H1 a b x).
+  specialize (after_AnBn Hon Hop Hiv Hor P a b Ha Hs) as H1.
+  (* faut que je trouve un n tel que bn < x,
+     c'est-à-dire an + (b - a) / 2 ^ n < x
+     qui marche si lim + (b - a) / 2 ^ n < x
+     c'est-à-dire (b - a) / 2 ^ n < x - lim *)
 ...
 apply H1.
 apply H1.
