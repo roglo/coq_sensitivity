@@ -2842,9 +2842,17 @@ clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
 exists c.
 split. {
-  split; [ | easy ].
-  now apply Hub1.
+  split; [ now apply Hub1 | easy ].
 }
+(* continuity of f to prove that *)
+specialize (Hfc c) as H2.
+progress unfold continuous_at in H2.
+progress unfold is_limit_when_tending_to in H2.
+destruct (rngl_lt_dec Hor (f c) u) as [Hfcu| Hfcu]. {
+  specialize (H2 (u - f c)%L).
+  assert (H : (0 < u - f c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (H2 H); clear H.
+  destruct H2 as (η & Hη & H2).
 ...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
