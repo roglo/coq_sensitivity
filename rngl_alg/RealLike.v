@@ -2391,7 +2391,7 @@ split. {
 }
 Qed.
 
-Theorem least_upper_bound :
+Theorem exists_supremum :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2756,15 +2756,19 @@ remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
 destruct ab. {
 (* https://en.wikipedia.org/wiki/Intermediate_value_theorem#Proof *)
 Theorem intermediate_value_le :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
   is_complete T →
   ∀ f, continuous f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros * Heb Hor Hco * Hfc * Hab Hfab.
+intros Hon Hop Hiv Heb Hor Har Hco * Hfc * Hab Hfab.
 destruct (rngl_eq_dec Heb (f a) u) as [Hau| Hau]. {
   exists a.
   split; [ | easy ].
@@ -2815,7 +2819,7 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
 set (Q := λ y, (∃ x, y = f x ∧ a ≤ x ≤ b)%L ∧ (y < u)%L).
-specialize (least_upper_bound Q) as H1.
+specialize (exists_supremum Hon Hop Hiv Hor Har Hco Q) as H1.
 (**)
 specialize (H1 (f a) (f b)).
 assert (H : Q (f a)). {
