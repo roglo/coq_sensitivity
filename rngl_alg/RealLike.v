@@ -2845,6 +2845,13 @@ clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
 (* probably must use continuity of f to prove that c has an
    antecedent *)
+(* euh... attends, c'est c ou c'est u ? *)
+(* chais plus ce que je fais... *)
+(* ou alors, justement, c = u ? mais faut le prouver *)
+...
+enough (H : ∃ e, f e = c).
+destruct H as (e, He).
+subst c.
 ...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
