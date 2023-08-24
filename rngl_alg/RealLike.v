@@ -2849,6 +2849,18 @@ enough (H : ∃ d, _) by apply H.
 (* chais plus ce que je fais... *)
 (* ou alors, justement, c = u ? mais faut le prouver *)
 ...
+assert (∀ x, P x ↔ Q (f x)). {
+  intros.
+  split. {
+    intros (Haxb, Hfxu).
+    progress unfold Q.
+    split; [ now exists x | easy ].
+  } {
+    intros (Hxab, Hfxu).
+    destruct Hxab as (x' & Hxx & Hx').
+    progress unfold P.
+    split; [ | easy ].
+...
 enough (H : ∃ e, f e = c).
 destruct H as (e, He).
 subst c.
