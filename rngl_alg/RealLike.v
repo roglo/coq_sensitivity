@@ -2848,10 +2848,10 @@ enough (H : ∃ d, _) by apply H.
 (* euh... attends, c'est c ou c'est u ? *)
 (* chais plus ce que je fais... *)
 (* ou alors, justement, c = u ? mais faut le prouver *)
-enough (H : ∃ d, f d = c).
-destruct H as (d, Hd).
+enough (H : ∃ d, (a ≤ d ≤ b)%L ∧ f d = c).
+destruct H as (d & Had & Hd).
 exists d.
-subst c.
+split; [ easy | ].
 ...
 assert (∀ x, P x ↔ Q (f x)). {
   intros.
