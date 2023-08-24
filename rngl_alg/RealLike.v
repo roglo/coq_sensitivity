@@ -98,6 +98,7 @@ Definition gc_inv a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
 
+(* should be added in RingLike, begin *)
 Definition is_Cauchy_sequence (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
@@ -112,6 +113,7 @@ Definition is_limit_when_tending_to_inf f l :=
 
 Definition is_complete :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
+(* should be added in RingLike, end *)
 
 Definition continuous_at f a := is_limit_when_tending_to f a (f a).
 Definition continuous f := ∀ a, continuous_at f a.
@@ -2818,21 +2820,16 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-set (Q := λ y, (∃ x, y = f x ∧ a ≤ x ≤ b)%L ∧ (y < u)%L).
-specialize (exists_supremum Hon Hop Hiv Hor Har Hco Q) as H1.
 (**)
-specialize (H1 (f a) (f b)).
-assert (H : Q (f a)). {
-  split; [ | easy ].
-  exists a.
-  split; [ easy | ].
-  split; [ apply (rngl_le_refl Hor) | ].
-  now apply (rngl_lt_le_incl Hor).
-}
-specialize (H1 H); clear H.
-assert (H : (∀ x, Q x → (x < f b)%L)). {
-  intros y (Hx & Hy).
-  now apply (rngl_lt_trans Hor _ u).
+specialize (exists_supremum Hon Hop Hiv Hor Har Hco P) as H1.
+specialize (H1 a b Ha).
+assert (H : (∀ x, P x → (x < b)%L)). {
+  intros y ((Hay & Hyb) & Hy).
+  destruct (rngl_eq_dec Heb y b) as [Hby| Hby]. {
+    subst y.
+    now apply (rngl_lt_asymm Hor) in Hy.
+  }
+  now apply (rngl_lt_iff Hor).
 }
 specialize (H1 H); clear H.
 destruct H1 as (c & Hc & H1).
@@ -2843,31 +2840,11 @@ progress unfold is_upper_bound in Hub2.
 destruct (rl_forall_or_exist_not _) as [Hub3| ]; [ | easy ].
 clear Hub2 Hub3.
 enough (H : ∃ d, _) by apply H.
-(* probably must use continuity of f to prove that c has an
-   antecedent *)
-(* euh... attends, c'est c ou c'est u ? *)
-(* chais plus ce que je fais... *)
-(* ou alors, justement, c = u ? mais faut le prouver *)
-enough (H : ∃ d, (a ≤ d ≤ b)%L ∧ f d = c).
-destruct H as (d & Had & Hd).
-exists d.
-split; [ easy | ].
-...
-assert (∀ x, P x ↔ Q (f x)). {
-  intros.
-  split. {
-    intros (Haxb, Hfxu).
-    progress unfold Q.
-    split; [ now exists x | easy ].
-  } {
-    intros (Hxab, Hfxu).
-    destruct Hxab as (x' & Hxx & Hx').
-    progress unfold P.
-    split; [ | easy ].
-...
-enough (H : ∃ e, f e = c).
-destruct H as (e, He).
-subst c.
+exists c.
+split. {
+  split; [ | easy ].
+  now apply Hub1.
+}
 ...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
