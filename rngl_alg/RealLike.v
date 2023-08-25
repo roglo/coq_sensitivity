@@ -2403,7 +2403,9 @@ Theorem exists_supremum :
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
-  → ∃ c, is_supremum P c ∧ (c ≤ b)%L.
+  → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
+    is_limit_when_tending_to_inf (λ n, fst (AnBn P a b n)) c ∧
+    is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hop Hiv Hor Har Hco * Ha Hs.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -2426,17 +2428,29 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
   exists 0%L.
   rewrite (H b).
-  split; [ | apply (rngl_le_refl Hor) ].
-  progress unfold is_supremum.
-  destruct (is_upper_bound P 0%L) as [H1| H1]. {
-    intros.
-    rewrite (H c').
-    destruct (is_upper_bound P 0%L); [ | easy ].
+  split. {
+    progress unfold is_supremum.
+    destruct (is_upper_bound P 0%L) as [H1| H1]. {
+      intros.
+      rewrite (H c').
+      destruct (is_upper_bound P 0%L); [ | easy ].
+      apply (rngl_le_refl Hor).
+    } {
+      destruct H1 as (x, Hx); apply Hx.
+      intros Hpx.
+      rewrite (H x).
+      apply (rngl_le_refl Hor).
+    }
+  }
+  split; [ apply (rngl_le_refl Hor) | ].
+  rewrite (H a).
+  split. {
+    intros ε Hε; exists 0.
+    intros n Hn; rewrite (H (rngl_abs _)), (H ε).
     apply (rngl_le_refl Hor).
   } {
-    destruct H1 as (x, Hx); apply Hx.
-    intros Hpx.
-    rewrite (H x).
+    intros ε Hε; exists 0.
+    intros n Hn; rewrite (H (rngl_abs _)), (H ε).
     apply (rngl_le_refl Hor).
   }
 }
@@ -2832,7 +2846,7 @@ assert (H : (∀ x, P x → (x < b)%L)). {
   now apply (rngl_lt_iff Hor).
 }
 specialize (H1 H); clear H.
-destruct H1 as (c & Hc & H1).
+destruct H1 as (c & Hc & H1 & Hlima & Hlimb).
 progress unfold is_supremum in Hc.
 remember (is_upper_bound _ _) as Hub1 eqn:Hub2; symmetry in Hub2.
 destruct Hub1 as [Hub1| ]; [ | easy ].
@@ -2853,6 +2867,7 @@ destruct (rngl_lt_dec Hor (f c) u) as [Hfcu| Hfcu]. {
   assert (H : (0 < u - f c)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
+Search is_limit_when_tending_to.
 ...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
