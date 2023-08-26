@@ -2867,7 +2867,10 @@ destruct (rngl_lt_dec Hor (f c) u) as [Hfcu| Hfcu]. {
   assert (H : (0 < u - f c)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
-Search is_limit_when_tending_to.
+(*
+  x < c → f x < f c
+  c < x → f c < f x
+*)
 ...
 specialize (H1 (f a) u).
 assert (H : Q (f a)). {
