@@ -2862,6 +2862,23 @@ split. {
 specialize (Hfc c) as H2.
 progress unfold continuous_at in H2.
 progress unfold is_limit_when_tending_to in H2.
+(**)
+assert (Hac : c ≠ a). {
+  specialize (H2 (u - f a)%L).
+  assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (H2 H); clear H.
+  destruct H2 as (η & Hη & H2).
+...
+set (δ₂ := rngl_min (c - a)%L (b - c)%L).
+assert ((0 < δ₂ ∧ a ≤ c - δ₂ ∧ c + δ₂ ≤ b)%L). {
+  split. {
+    subst δ₂.
+    progress unfold rngl_min.
+    destruct (c - a ≤? b - c)%L. {
+      apply (rngl_lt_0_sub Hop Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ now apply Hub1 | ].
+...
 destruct (rngl_lt_dec Hor (f c) u) as [Hfcu| Hfcu]. {
   specialize (H2 (u - f c)%L).
   assert (H : (0 < u - f c)%L) by now apply (rngl_lt_0_sub Hop Hor).
