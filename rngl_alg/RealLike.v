@@ -2859,16 +2859,25 @@ split. {
   split; [ now apply Hub1 | easy ].
 }
 (* continuity of f to prove that *)
-specialize (Hfc c) as H2.
-progress unfold continuous_at in H2.
-progress unfold is_limit_when_tending_to in H2.
 (**)
 assert (Hac : c ≠ a). {
-  specialize (H2 (u - f a)%L).
+  specialize (Hfc a (u - f a)%L) as H2.
   assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
+  assert (∀ x, (a ≤ x ≤ rngl_min (a + η) b → f x < u)%L). {
+    intros x Hx.
+    assert (H : (rngl_abs (x - a) ≤ η)%L). {
+      rewrite (rngl_abs_nonneg Hop Hor) by now apply (rngl_le_0_sub Hop Hor).
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      eapply (rngl_le_trans Hor); [ apply Hx | ].
+      apply (rngl_le_min_l Hor).
+    }
+    specialize (H2 _ H); clear H.
 ...
+specialize (Hfc c) as H2.
+progress unfold continuous_at in H2.
+progress unfold is_limit_when_tending_to in H2.
 set (δ₂ := rngl_min (c - a)%L (b - c)%L).
 assert ((0 < δ₂ ∧ a ≤ c - δ₂ ∧ c + δ₂ ≤ b)%L). {
   split. {

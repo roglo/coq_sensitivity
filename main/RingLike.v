@@ -2816,6 +2816,24 @@ apply (rngl_sub_le_mono_r Hop Hor) with (c := a) in Hbc.
 now do 2 rewrite rngl_add_comm, (rngl_add_sub Hos) in Hbc.
 Qed.
 
+Theorem rngl_le_sub_le_add_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a - b ≤ c ↔ a ≤ b + c)%L.
+Proof.
+intros Hop Hor *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+split; intros Habc. {
+  apply (rngl_sub_le_mono_r Hop Hor _ _ b).
+  now rewrite rngl_add_comm, (rngl_add_sub Hos).
+} {
+  apply (rngl_sub_le_mono_r Hop Hor _ _ b) in Habc.
+  now rewrite rngl_add_comm, (rngl_add_sub Hos) in Habc.
+}
+Qed.
+
 Theorem rngl_nle_gt :
   rngl_is_ordered T = true →
   ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.
@@ -3564,6 +3582,18 @@ specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Haz Hbz) as H1.
 now apply (rngl_nlt_ge Hor) in H1.
 Qed.
 
+Theorem rngl_le_min_l :
+  rngl_is_ordered T = true →
+  ∀ a b, (rngl_min a b ≤ a)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+remember (a ≤? b)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ apply (rngl_le_refl Hor) | ].
+apply (rngl_leb_gt Hor) in Hc.
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_mul_pos_pos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -3977,7 +4007,6 @@ rewrite Hiv.
 rewrite rngl_mul_add_distr_r.
 rewrite (rngl_mul_sub_distr_r Hop).
 rewrite rngl_add_comm.
-(**)
 rewrite (rngl_sub_add_distr Hos).
 f_equal.
 rewrite <- (rngl_mul_1_r Hon b) at 1.
