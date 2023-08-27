@@ -2378,25 +2378,13 @@ split. {
   rewrite (rngl_mul_1_r Hon).
   rewrite <- (rngl_sub_sub_distr Hop).
   apply (rngl_sub_le_mono_l Hop Hor).
+  set (bm := snd (AnBn P a b (max M n))) in *.
   apply (rngl_le_sub_le_add_l Hop Hor).
-...
   apply (rngl_le_trans Hor _ bn); [ easy | ].
-Search (_
-Search (_ - _ ≤ _)%L.
-apply (rngl_le_sub_le_add_l Hop Hor).
-  rewrite <- (rngl_sub_sub_distr Hop).
-
-(**)
-...
-Check rngl_add_lt_mono_r.
-Search (_ + _ ≤ _ + _)%L.
-...
-  eapply (rngl_add_le_mono_r Hop Hor).
-  rewrite (rngl_sub_add Hop).
-  eapply (rngl_le_lt_trans Hor); [ apply H7 | ].
-  apply (rngl_lt_add_r Hos Hor).
-  apply (rngl_lt_0_sub Hop Hor).
-  eapply (rngl_le_lt_trans Hor); [ apply H7 | easy ].
+  apply (rngl_le_add_l Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_trans Hor _ bn); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
 }
 Qed.
 
@@ -2452,13 +2440,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   split; [ apply (rngl_le_refl Hor) | ].
   rewrite (H a).
   split. {
-    intros ε Hε; exists 0.
-    intros n Hn; rewrite (H (rngl_abs _)), (H ε).
-    apply (rngl_le_refl Hor).
+    intros ε Hε.
+    rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
   } {
-    intros ε Hε; exists 0.
-    intros n Hn; rewrite (H (rngl_abs _)), (H ε).
-    apply (rngl_le_refl Hor).
+    intros ε Hε.
+    rewrite H in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
   }
 }
 (* Proof in
@@ -2492,19 +2480,18 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   exists (N + 1).
   intros n Hn.
   rewrite (rngl_sub_0_r Hos).
-  eapply (rngl_le_trans Hor). {
+  eapply (rngl_le_lt_trans Hor). {
     apply (rngl_abs_An_Bn_le Hon Hop Hiv Hor _ _ Hab P n).
     apply surjective_pairing.
   }
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
   rewrite <- (rngl_mul_nat_comm Hon Hos).
-  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
-  apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   eapply (rngl_lt_le_trans Hor); [ apply HN | ].
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
   eapply le_trans; [ apply Hn | ].
@@ -2657,7 +2644,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
