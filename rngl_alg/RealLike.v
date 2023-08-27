@@ -105,7 +105,7 @@ Definition is_Cauchy_sequence (u : nat → T) :=
 
 Definition is_limit_when_tending_to f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x, rngl_abs (x - a) ≤ η → rngl_abs (f x - l) ≤ ε)%L.
+   ∀ x, rngl_abs (x - a) < η → rngl_abs (f x - l) < ε)%L.
 
 Definition is_limit_when_tending_to_inf f l :=
   ∀ ε, (0 < ε)%L → ∃ N,
@@ -1438,7 +1438,7 @@ rewrite (rngl_abs_mul Hop Hi1 Hor) in H1.
 rewrite (rngl_abs_nonneg Hop Hor (rl_exp _)) in H1. 2: {
   apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
 }
-apply (rngl_mul_le_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
+apply (rngl_mul_lt_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
   rewrite Hi1.
   apply Bool.orb_true_r.
 } {
@@ -2857,12 +2857,12 @@ assert (Hac : c ≠ a). {
   assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
-  assert (∀ x, (a ≤ x ≤ rngl_min (a + η) b → f x < u)%L). {
+  assert (∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
     intros x Hx.
-    assert (H : (rngl_abs (x - a) ≤ η)%L). {
+    assert (H : (rngl_abs (x - a) < η)%L). {
       rewrite (rngl_abs_nonneg Hop Hor) by now apply (rngl_le_0_sub Hop Hor).
-      apply (rngl_le_sub_le_add_l Hop Hor).
-      eapply (rngl_le_trans Hor); [ apply Hx | ].
+      apply (rngl_lt_sub_lt_add_l Hop Hor).
+      eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
       apply (rngl_le_min_l Hor).
     }
     specialize (H2 _ H); clear H.
