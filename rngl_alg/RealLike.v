@@ -109,7 +109,7 @@ Definition is_limit_when_tending_to f a l :=
 
 Definition is_limit_when_tending_to_inf f l :=
   ∀ ε, (0 < ε)%L → ∃ N,
-  ∀ n, N ≤ n → (rngl_abs (f n - l) ≤ ε)%L.
+  ∀ n, N ≤ n → (rngl_abs (f n - l) < ε)%L.
 
 Definition is_complete :=
   ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
@@ -256,9 +256,17 @@ rewrite Hop.
 rewrite <- rngl_add_assoc.
 rewrite rngl_add_add_add_swap.
 do 2 rewrite (fold_rngl_sub Hop).
-eapply (rngl_le_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_compat Hor); [ apply Hun | apply Hvn ].
+eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
+...
+apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
+Search (_ + _ < _ + _)%L.
+Search (_ + _ < _ + _)%Z.
+...
+  apply (rngl_add_lt_compat Hor). {
+    apply (rngl_lt_le_incl Hor), Hun.
+  } {
+    apply (rngl_lt_le_incl Hor), Hvn.
+  }
 }
 rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_div_r Hon Hiv).
@@ -2642,7 +2650,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
