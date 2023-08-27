@@ -2168,12 +2168,55 @@ Theorem eq_rngl_of_nat_0 :
   ∀ i, rngl_of_nat i = 0%L → i = 0.
 Proof.
 intros Hon Hch * Hi.
-induction i; [ easy | exfalso ].
+destruct i; [ easy | exfalso ].
 cbn in Hi.
 specialize rngl_characteristic_prop as rngl_char_prop.
 rewrite Hon, Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
+
+(*
+Theorem eq_rngl_mul_nat_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T = 0 →
+  ∀ a i, a ≠ 0%L → rngl_mul_nat a i = 0%L → i = 0.
+Proof.
+intros Hon Hch * Haz Hi.
+progress unfold rngl_mul_nat in Hi.
+progress unfold mul_nat in Hi.
+destruct i; [ easy | exfalso ].
+cbn in Hi.
+...
+specialize rngl_characteristic_prop as rngl_char_prop.
+rewrite Hon, Hch in rngl_char_prop.
+cbn in rngl_char_prop.
+...
+specialize (rngl_char_prop i) as H.
+cbn in H.
+Qed.
+
+Theorem rngl_mul_nat_inj :
+  ∀ a i j, (a ≠ 0)%L → rngl_mul_nat a i = rngl_mul_nat a j → i = j.
+Proof.
+intros * Haz Hij.
+revert i Hij.
+induction j; intros. {
+  cbn in Hij.
+...
+  apply eq_rngl_mul_nat_0 in Hij.
+}
+destruct i. {
+  exfalso.
+  symmetry in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
+}
+f_equal.
+cbn in Hij.
+apply rngl_add_cancel_l in Hij; [ | easy ].
+now apply IHj.
+Qed.
+...
+*)
 
 Theorem rngl_of_nat_inj :
   rngl_has_1 T = true →
@@ -2317,6 +2360,25 @@ Qed.
 
 (* *)
 
+Theorem rngl_add_lt_mono :
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c : T,
+  (a < b → c + a < c + b)%L.
+Proof.
+intros Hos Hor * Hab.
+apply (rngl_lt_iff Hor) in Hab.
+destruct Hab as (Hab, Haeb).
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_add_le_compat Hor); [ | easy ].
+  apply (rngl_le_refl Hor).
+} {
+  intros H; apply Haeb; clear Haeb.
+  now apply (rngl_add_cancel_l Hos) in H.
+}
+Qed.
+
 Theorem rngl_add_lt_mono_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2328,9 +2390,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 split; intros Hab. {
-  apply (rngl_lt_0_sub Hop Hor).
-  rewrite (rngl_add_sub_simpl_l Hos).
-  now apply (rngl_lt_0_sub Hop Hor).
+  now apply (rngl_add_lt_mono Hos Hor).
 } {
   apply (rngl_lt_0_sub Hop Hor) in Hab.
   rewrite (rngl_add_sub_simpl_l Hos) in Hab.
@@ -2964,6 +3024,16 @@ split; intros Hab. {
   apply (rngl_sub_lt_mono_r Hop Hor _ _ a).
   now rewrite (rngl_add_sub Hos).
 }
+Qed.
+
+Theorem rngl_lt_add_lt_sub_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a + b < c ↔ a < c - b)%L.
+Proof.
+intros Hop Hor *.
+rewrite rngl_add_comm.
+apply (rngl_lt_add_lt_sub_l Hop Hor).
 Qed.
 
 Theorem rngl_0_lt_1 :
