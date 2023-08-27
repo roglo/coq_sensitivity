@@ -230,10 +230,8 @@ assert
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  exists 0.
-  intros n Hn.
-  rewrite (H1 (rngl_abs _)), (H1 ε).
-  apply (rngl_le_refl Hor).
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
 }
 assert (Hε2 : (0 < ε / 2)%L). {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
@@ -1993,16 +1991,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   progress unfold is_Cauchy_sequence.
   split. {
     intros * Hε.
-    exists 0.
-    intros * Hp Hq.
-    rewrite (H1 (rngl_abs _)), (H1 ε).
-    apply (rngl_le_refl Hor).
+    rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
   } {
     intros * Hε.
-    exists 0.
-    intros * Hp Hq.
-    rewrite (H1 (rngl_abs _)), (H1 ε).
-    apply (rngl_le_refl Hor).
+    rewrite H1 in Hε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
   }
 }
 set (u := λ n : nat, fst (AnBn P a b n)).
