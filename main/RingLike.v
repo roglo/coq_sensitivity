@@ -3145,6 +3145,51 @@ split; intros Hij. {
 }
 Qed.
 
+Theorem rngl_mul_nat_inj_lt :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 < a)%L → ∀ i j, i < j ↔ (rngl_mul_nat a i < rngl_mul_nat a j)%L.
+Proof.
+intros Hop Hor * Haz *.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat.
+revert j.
+induction i; intros; cbn. {
+  split; intros Hj. 2: {
+    destruct j; [ | apply Nat.lt_0_succ ].
+    now apply (rngl_lt_irrefl Hor) in Hj.
+  }
+  induction j; [ easy | clear Hj ].
+  cbn.
+  apply (rngl_lt_le_trans Hor _ a); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  destruct j; [ apply (rngl_le_refl Hor) | ].
+  apply (rngl_lt_le_incl Hor), IHj.
+  apply Nat.lt_0_succ.
+}
+destruct j. {
+  split; [ easy | cbn ].
+  intros H; exfalso.
+  apply (rngl_nle_gt Hor) in H; apply H; clear H.
+  eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Haz | ].
+  apply (rngl_le_add_r Hor).
+  clear IHi.
+  induction i; [ apply (rngl_le_refl Hor) | cbn ].
+  eapply (rngl_le_trans Hor); [ apply IHi | ].
+  now apply (rngl_le_add_l Hor), (rngl_lt_le_incl Hor).
+}
+cbn.
+split; intros Hij. {
+  apply Nat.succ_lt_mono in Hij.
+  apply (rngl_add_lt_mono_l Hop Hor).
+  now apply IHi.
+} {
+  apply -> Nat.succ_lt_mono.
+  apply (rngl_add_lt_mono_l Hop Hor) in Hij.
+  now apply IHi.
+}
+Qed.
+
 Theorem rngl_of_nat_inj_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3154,6 +3199,18 @@ Theorem rngl_of_nat_inj_le :
 Proof.
 intros Hon Hop Hc1 Hor *.
 apply (rngl_mul_nat_inj_le Hop Hor).
+apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+Qed.
+
+Theorem rngl_of_nat_inj_lt :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  ∀ i j, i < j ↔ (rngl_of_nat i < rngl_of_nat j)%L.
+Proof.
+intros Hon Hop Hc1 Hor *.
+apply (rngl_mul_nat_inj_lt Hop Hor).
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
@@ -4161,6 +4218,7 @@ Arguments rngl_eq_dec {T ro} Hed (a b)%L.
 Arguments rngl_le_add_r {T ro rp} Hor (a b)%L Hb.
 Arguments rngl_le_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
+Arguments rngl_le_lt_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_lt_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.

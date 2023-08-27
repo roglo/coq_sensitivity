@@ -101,7 +101,7 @@ Definition gc_inv a :=
 (* should be added in RingLike, begin *)
 Definition is_Cauchy_sequence (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
-  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) ≤ ε)%L.
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) < ε)%L.
 
 Definition is_limit_when_tending_to f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
@@ -2022,7 +2022,7 @@ split. {
   cbn in HM2.
   rewrite rngl_add_0_r in HM2.
   apply (rngl_add_lt_mono_r Hop Hor) in HM2.
-  exists (Nat.log2_up M).
+  exists (S (Nat.log2_up M)).
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
@@ -2049,8 +2049,8 @@ split. {
       apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     }
   }
-  eapply (rngl_le_trans Hor); [ apply H1 | ].
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
@@ -2060,22 +2060,21 @@ split. {
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
   rewrite (rngl_mul_nat_comm Hon Hos) in HM2.
-  apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
+  apply (rngl_le_lt_trans Hor _ (ε * rngl_of_nat M)). {
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
-  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-  apply Nat.log2_up_le_pow2. {
-    apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
-    cbn in HM2.
-    rewrite (rngl_mul_0_r Hos) in HM2.
-    apply (rngl_nle_gt Hor) in HM2.
-    apply HM2; clear HM2.
-    now apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.log2_up_le_pow2; [ easy | cbn ].
+  apply Nat.min_glb. {
+    eapply le_trans; [ | apply Hp ].
+    apply Nat.log2_up_succ_le.
+  } {
+    eapply le_trans; [ | apply Hq ].
+    apply Nat.log2_up_succ_le.
   }
-  now apply Nat.min_glb with (n := p) in Hq.
 } {
   intros ε Hε.
   (* The size of the interval after N iterations is (b-a)/2^N; it
@@ -2095,7 +2094,7 @@ split. {
   cbn in HM2.
   rewrite rngl_add_0_r in HM2.
   apply (rngl_add_lt_mono_r Hop Hor) in HM2.
-  exists (Nat.log2_up M).
+  exists (S (Nat.log2_up M)).
   intros * Hp Hq.
   assert (H2i : ∀ i, (2 ^ i)%L ≠ 0%L). {
     intros.
@@ -2122,8 +2121,8 @@ split. {
       apply (H1 _ _ _ _ (surjective_pairing _) (surjective_pairing _)).
     }
   }
-  eapply (rngl_le_trans Hor); [ apply H1 | ].
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
@@ -2133,22 +2132,21 @@ split. {
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
   rewrite (rngl_mul_nat_comm Hon Hos) in HM2.
-  apply (rngl_le_trans Hor _ (ε * rngl_of_nat M)). {
+  apply (rngl_le_lt_trans Hor _ (ε * rngl_of_nat M)). {
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
   replace 2%L with (rngl_of_nat 2) by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_of_nat_pow Hon Hos).
-  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-  apply Nat.log2_up_le_pow2. {
-    apply Nat.neq_0_lt_0; intros H; rewrite H in HM2.
-    cbn in HM2.
-    rewrite (rngl_mul_0_r Hos) in HM2.
-    apply (rngl_nle_gt Hor) in HM2.
-    apply HM2; clear HM2.
-    now apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.log2_up_le_pow2; [ easy | cbn ].
+  apply Nat.min_glb. {
+    eapply le_trans; [ | apply Hp ].
+    apply Nat.log2_up_succ_le.
+  } {
+    eapply le_trans; [ | apply Hq ].
+    apply Nat.log2_up_succ_le.
   }
-  now apply Nat.min_glb with (n := p) in Hq.
 }
 Qed.
 
