@@ -257,16 +257,8 @@ rewrite <- rngl_add_assoc.
 rewrite rngl_add_add_add_swap.
 do 2 rewrite (fold_rngl_sub Hop).
 eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
-...
 apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
-Search (_ + _ < _ + _)%L.
-Search (_ + _ < _ + _)%Z.
-...
-  apply (rngl_add_lt_compat Hor). {
-    apply (rngl_lt_le_incl Hor), Hun.
-  } {
-    apply (rngl_lt_le_incl Hor), Hvn.
-  }
+  now apply (rngl_add_lt_compat Hop Hor).
 }
 rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_div_r Hon Hiv).
@@ -417,7 +409,8 @@ destruct (H1 ε Hε) as (N, HN).
 specialize (HN N (Nat.le_refl _)).
 rewrite <- (rngl_abs_opp Hop Hor) in HN.
 rewrite (rngl_opp_sub_distr Hop) in HN.
-now rewrite (rngl_sub_0_r Hos) in HN.
+rewrite (rngl_sub_0_r Hos) in HN.
+now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Definition gc_opt_inv_or_quot :
@@ -2336,19 +2329,20 @@ split. {
   }
   apply (rngl_nlt_ge Hor) in HM.
   apply HM; clear HM.
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   rewrite rngl_mul_add_distr_l.
   rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_add_sub_assoc Hop).
-  apply (rngl_sub_lt_mono_r Hop Hor).
+  apply (rngl_sub_le_mono_r Hop Hor).
   rewrite <- (rngl_add_sub_swap Hop).
   rewrite <- (rngl_add_sub_assoc Hop).
-  eapply (rngl_le_lt_trans Hor); [ apply H6 | ].
-  apply (rngl_lt_add_r Hos Hor).
-  apply (rngl_lt_0_sub Hop Hor).
-  eapply (rngl_lt_le_trans Hor); [ apply H5 | easy ].
+  eapply (rngl_le_trans Hor); [ apply H6 | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  eapply (rngl_le_trans Hor); [ | apply H6 ].
+  now apply (rngl_lt_le_incl Hor).
 } {
   apply (rngl_nlt_ge Hor).
   intros H5.
@@ -2377,14 +2371,27 @@ split. {
   rewrite (rngl_opp_sub_distr Hop) in HM.
   apply (rngl_nlt_ge Hor) in HM.
   apply HM; clear HM.
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   rewrite rngl_mul_add_distr_l.
   rewrite (rngl_mul_1_r Hon).
   rewrite <- (rngl_sub_sub_distr Hop).
-  apply (rngl_sub_lt_mono_l Hop Hor).
-  eapply (rngl_add_lt_mono_r Hop Hor).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+...
+  apply (rngl_le_trans Hor _ bn); [ easy | ].
+Search (_
+Search (_ - _ ≤ _)%L.
+apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite <- (rngl_sub_sub_distr Hop).
+
+(**)
+...
+Check rngl_add_lt_mono_r.
+Search (_ + _ ≤ _ + _)%L.
+...
+  eapply (rngl_add_le_mono_r Hop Hor).
   rewrite (rngl_sub_add Hop).
   eapply (rngl_le_lt_trans Hor); [ apply H7 | ].
   apply (rngl_lt_add_r Hos Hor).

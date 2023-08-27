@@ -736,25 +736,6 @@ rewrite H1 in H.
 apply H.
 Qed.
 
-(*
-Theorem rngl_add_lt_compat :
-  rngl_is_ordered T = true →
-  ∀ a b c d, (a < b → c < d → a + c < b + d)%L.
-Proof.
-intros Hor * Hab Hcd.
-apply (rngl_lt_iff Hor).
-split. {
-  apply (rngl_lt_iff Hor) in Hab, Hcd.
-  now apply (rngl_add_le_compat Hor).
-}
-intros H1.
-...
-specialize rngl_opt_add_le_compat as H.
-rewrite H1 in H.
-apply H.
-Qed.
-*)
-
 Theorem rngl_mul_le_compat_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -3017,6 +2998,20 @@ split; intros Hab. {
 } {
   apply (rngl_sub_lt_mono_r Hop Hor _ _ a).
   now rewrite (rngl_add_sub Hos).
+}
+Qed.
+
+(**)
+Theorem rngl_add_lt_compat :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a < b → c < d → a + c < b + d)%L.
+Proof.
+intros Hop Hor * Hab Hcd.
+apply (rngl_lt_trans Hor _ (a + d)%L). {
+  now apply (rngl_add_lt_mono_l Hop Hor).
+} {
+  now apply (rngl_add_lt_mono_r Hop Hor).
 }
 Qed.
 
