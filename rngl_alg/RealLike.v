@@ -2982,8 +2982,12 @@ assert (Hbc : c ≠ b). {
     now apply (rngl_lt_trans Hor _ (f b)).
   }
   intros H; subst c.
-...
+assert (Haηb : (a < (rngl_max a (b - η) + b) / 2 ≤ b)%L). {
+(*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
+*)
+admit.
+(*
   split. {
     apply (rngl_lt_div_r Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -3002,14 +3006,18 @@ assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
     }
     apply (rngl_le_min_r Hor).
   }
+*)
 }
+(*
 set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
-assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
+*)
+assert (H : P ((rngl_max a (b - η) + b) / 2)%L). {
   progress unfold P.
   split. {
     split; [ | easy ].
     now apply (rngl_lt_le_incl Hor).
   }
+...
   apply Hfu.
   split; [ now apply (rngl_lt_le_incl Hor) | ].
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
