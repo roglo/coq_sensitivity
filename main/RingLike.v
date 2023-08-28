@@ -3710,6 +3710,17 @@ apply (rngl_leb_gt Hor) in Hc.
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Theorem rngl_le_min_r :
+  rngl_is_ordered T = true →
+  ∀ a b, (rngl_min a b ≤ b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+remember (a ≤? b)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ | apply (rngl_le_refl Hor) ].
+now apply rngl_leb_le in Hc.
+Qed.
+
 Theorem rngl_mul_pos_pos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

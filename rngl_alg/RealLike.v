@@ -2853,7 +2853,7 @@ split. {
   split; [ now apply Hub1 | easy ].
 }
 (* continuity of f to prove that *)
-(**)
+(*
 assert (Hac : c ≠ a). {
   specialize (Hfc a (u - f a)%L) as H2.
   assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
@@ -2866,6 +2866,42 @@ assert (Hac : c ≠ a). {
       apply (rngl_lt_sub_lt_add_l Hop Hor).
       eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
       apply (rngl_le_min_l Hor).
+    }
+    specialize (H2 _ H); clear H.
+    destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
+      rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+        now apply (rngl_le_sub_0 Hop Hor).
+      }
+      now apply (rngl_le_lt_trans Hor _ (f a)).
+    }
+    apply (rngl_nle_gt Hor) in Hfxa.
+    rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
+       apply (rngl_le_0_sub Hop Hor).
+       now apply (rngl_lt_le_incl Hor).
+    }
+    now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
+  }
+  (* I don't see why c is different from a *)
+*)
+assert (Hbc : c ≠ b). {
+  specialize (Hfc b (f b - u)%L) as H2.
+  assert (H : (0 < f b - u)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (H2 H); clear H.
+  destruct H2 as (η & Hη & H2).
+...
+  assert (Hfu : ∀ x, (rngl_min a (b - η) ≤ x < b → u < f x)%L). {
+    intros x Hx.
+    assert (H : (rngl_abs (b - x) ≤ η)%L). {
+      rewrite (rngl_abs_nonneg Hop Hor). 2: {
+        now apply (rngl_le_0_sub Hop Hor), (rngl_lt_le_incl Hor).
+      }
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      rewrite rngl_add_comm.
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      eapply (rngl_le_trans Hor); [ | apply Hx ].
+...
+Check rngl_le_min_r.
+      apply (rngl_le_min_r).
     }
     specialize (H2 _ H); clear H.
     destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
