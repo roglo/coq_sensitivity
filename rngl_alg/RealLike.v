@@ -2859,7 +2859,7 @@ assert (Hac : c ≠ a). {
   assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
-  assert (∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
+  assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
     intros x Hx.
     assert (H : (rngl_abs (x - a) < η)%L). {
       rewrite (rngl_abs_nonneg Hop Hor) by now apply (rngl_le_0_sub Hop Hor).
@@ -2868,6 +2868,19 @@ assert (Hac : c ≠ a). {
       apply (rngl_le_min_l Hor).
     }
     specialize (H2 _ H); clear H.
+    destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
+      rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+        now apply (rngl_le_sub_0 Hop Hor).
+      }
+      now apply (rngl_le_lt_trans Hor _ (f a)).
+    }
+    apply (rngl_nle_gt Hor) in Hfxa.
+    rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
+       apply (rngl_le_0_sub Hop Hor).
+       now apply (rngl_lt_le_incl Hor).
+    }
+    now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
+  }
 ...
 specialize (Hfc c) as H2.
 progress unfold continuous_at in H2.
