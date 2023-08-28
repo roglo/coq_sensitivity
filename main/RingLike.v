@@ -3721,6 +3721,29 @@ destruct c; [ | apply (rngl_le_refl Hor) ].
 now apply rngl_leb_le in Hc.
 Qed.
 
+Theorem rngl_le_max_l :
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ rngl_max a b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_max.
+remember (a ≤? b)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ | apply (rngl_le_refl Hor) ].
+now apply rngl_leb_le in Hc.
+Qed.
+
+Theorem rngl_le_max_r :
+  rngl_is_ordered T = true →
+  ∀ a b, (b ≤ rngl_max a b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_max.
+remember (a ≤? b)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ apply (rngl_le_refl Hor) | ].
+apply (rngl_leb_gt Hor) in Hc.
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_min_glb :
   ∀ a b c, (a ≤ b → a ≤ c → a ≤ rngl_min b c)%L.
 Proof.

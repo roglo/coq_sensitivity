@@ -2954,24 +2954,75 @@ split. {
 assert (Hac : c ≠ a). {
   now apply (intermediate_value_prop_1 Hon Hop Hiv Hor f Hfc a b c u).
 }
-...
-(**)
 assert (Hbc : c ≠ b). {
   specialize (Hfc b (f b - u)%L) as H2.
   assert (H : (0 < f b - u)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
   destruct H2 as (η & Hη & H2).
-...
-  assert (Hfu : ∀ x, (rngl_min a (b - η) ≤ x < b → u < f x)%L). {
+  assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
     intros x Hx.
-    assert (H : (rngl_abs (b - x) ≤ η)%L). {
-      rewrite (rngl_abs_nonneg Hop Hor). 2: {
-        now apply (rngl_le_0_sub Hop Hor), (rngl_lt_le_incl Hor).
-      }
-      apply (rngl_le_sub_le_add_l Hop Hor).
+    assert (H : (rngl_abs (x - b) < η)%L). {
+      rewrite (rngl_abs_nonpos Hop Hor) by now apply (rngl_le_sub_0 Hop Hor).
+      rewrite (rngl_opp_sub_distr Hop).
+      apply (rngl_lt_sub_lt_add_l Hop Hor).
       rewrite rngl_add_comm.
-      apply (rngl_le_sub_le_add_l Hop Hor).
-      eapply (rngl_le_trans Hor); [ | apply Hx ].
+      apply (rngl_lt_sub_lt_add_l Hop Hor).
+      eapply (rngl_le_lt_trans Hor); [ | apply Hx ].
+      apply (rngl_le_max_r Hor).
+    }
+    specialize (H2 _ H); clear H.
+    destruct (rngl_le_dec Hor (f x) (f b)) as [Hfxb| Hfxb]. {
+      rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+        now apply (rngl_le_sub_0 Hop Hor).
+      }
+      rewrite (rngl_opp_sub_distr Hop) in H2.
+      now apply (rngl_sub_lt_mono_l Hop Hor) in H2.
+    }
+    apply (rngl_nle_gt Hor) in Hfxb.
+    now apply (rngl_lt_trans Hor _ (f b)).
+  }
+  intros H; subst c.
+...
+assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
+  split. {
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_add_diag2 Hon).
+    apply (rngl_add_lt_mono_l Hop Hor).
+    apply (rngl_min_glb_lt); [ | easy ].
+    now apply (rngl_lt_add_r Hos Hor).
+  } {
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_add_diag2 Hon).
+    apply (rngl_add_le_compat Hor). {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_le_min_r Hor).
+  }
+}
+set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
+assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
+  progress unfold P.
+  split. {
+    split; [ | easy ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply Hfu.
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_add_diag2 Hon).
+  apply (rngl_add_lt_mono_r Hop Hor).
+  apply (rngl_min_glb_lt); [ | easy ].
+  now apply (rngl_lt_add_r Hos Hor).
+}
+apply Hub1 in H.
+now apply (rngl_nlt_ge Hor) in H.
+Qed.
 ...
 Check rngl_le_min_r.
       apply (rngl_le_min_r).
@@ -2990,7 +3041,6 @@ Check rngl_le_min_r.
     }
     now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
   }
-  (* I don't see why c is different from a *)
 ...
 specialize (Hfc c) as H2.
 progress unfold continuous_at in H2.
