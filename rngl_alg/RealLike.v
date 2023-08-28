@@ -2881,6 +2881,7 @@ assert (Hac : c ≠ a). {
     }
     now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
   }
+  (* I don't see why c is different from a *)
 ...
 specialize (Hfc c) as H2.
 progress unfold continuous_at in H2.
