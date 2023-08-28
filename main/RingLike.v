@@ -3721,6 +3721,22 @@ destruct c; [ | apply (rngl_le_refl Hor) ].
 now apply rngl_leb_le in Hc.
 Qed.
 
+Theorem rngl_min_glb :
+  ∀ a b c, (a ≤ b → a ≤ c → a ≤ rngl_min b c)%L.
+Proof.
+intros * Hab Hac.
+progress unfold rngl_min.
+now destruct (b ≤? c)%L.
+Qed.
+
+Theorem rngl_min_glb_lt :
+  ∀ a b c, (a < b → a < c → a < rngl_min b c)%L.
+Proof.
+intros * Hab Hac.
+progress unfold rngl_min.
+now destruct (b ≤? c)%L.
+Qed.
+
 Theorem rngl_mul_pos_pos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -4051,6 +4067,34 @@ split; intros Habq. {
 }
 Qed.
 
+Theorem rngl_lt_div_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (0 < c → a * c < b ↔ a < b / c)%L.
+Proof.
+intros Hon Hop Hiv Hor * Hzc.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+assert (Hcz : c ≠ 0%L). {
+  intros H; rewrite H in Hzc.
+  now apply (rngl_lt_irrefl Hor) in Hzc.
+}
+split; intros Habq. {
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := c); [ easy | ].
+  now rewrite (rngl_mul_div_r Hon Hiv).
+} {
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii c) in Habq; [ | easy ].
+  now rewrite (rngl_mul_div_r Hon Hiv) in Habq.
+}
+Qed.
+
 Theorem rngl_pow_pos_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -4219,6 +4263,7 @@ Arguments rngl_le_add_r {T ro rp} Hor (a b)%L Hb.
 Arguments rngl_le_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_le_lt_trans {T}%type {ro rp} Hor (a b c)%L.
+Arguments rngl_lt_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_lt_dec {T ro rp} Hor (a b)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.
