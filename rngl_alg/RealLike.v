@@ -2864,6 +2864,9 @@ split. {
 (* continuity of f to prove that *)
 (**)
 assert (Hac : c ≠ a). {
+  clear - Hfc u Hop Hor rp Hfab Hon Hiv Hc1 Hab Hos P Hub1.
+  move c before b.
+(**)
   specialize (Hfc a (u - f a)%L) as H2.
   assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
   specialize (H2 H); clear H.
@@ -2905,7 +2908,9 @@ assert (Hac : c ≠ a). {
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       rewrite <- (rngl_add_diag2 Hon).
-      apply (rngl_add_le_compat Hor); [ easy | ].
+      apply (rngl_add_le_compat Hor). {
+        now apply (rngl_lt_le_incl Hor).
+      }
       apply (rngl_le_min_r Hor).
     }
   }
