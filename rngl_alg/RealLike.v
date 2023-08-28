@@ -2644,6 +2644,95 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
 }
 Qed.
 
+Theorem intermediate_value_prop_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ f, continuous f →
+  ∀ a b c u,
+  (a < b)%L
+  → (f a < u)%L
+  → (∀ x, (a ≤ x ≤ b)%L ∧ (f x < u)%L → (x ≤ c)%L)
+  → c ≠ a.
+Proof.
+intros Hon Hop Hiv Hor * Hfc * Hab Hfab Hub1.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 a), (H1 b) in Hab.
+  now apply (rngl_lt_irrefl Hor) in Hab.
+}
+specialize (Hfc a (u - f a)%L) as H2.
+assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
+specialize (H2 H); clear H.
+destruct H2 as (η & Hη & H2).
+assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
+  intros x Hx.
+  assert (H : (rngl_abs (x - a) < η)%L). {
+    rewrite (rngl_abs_nonneg Hop Hor) by now apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
+    apply (rngl_le_min_l Hor).
+  }
+  specialize (H2 _ H); clear H.
+  destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
+    rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+      now apply (rngl_le_sub_0 Hop Hor).
+    }
+    now apply (rngl_le_lt_trans Hor _ (f a)).
+  }
+  apply (rngl_nle_gt Hor) in Hfxa.
+  rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
+     apply (rngl_le_0_sub Hop Hor).
+     now apply (rngl_lt_le_incl Hor).
+  }
+  now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
+}
+intros H; subst c.
+assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
+  split. {
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_add_diag2 Hon).
+    apply (rngl_add_lt_mono_l Hop Hor).
+    apply (rngl_min_glb_lt); [ | easy ].
+    now apply (rngl_lt_add_r Hos Hor).
+  } {
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_add_diag2 Hon).
+    apply (rngl_add_le_compat Hor). {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_le_min_r Hor).
+  }
+}
+set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
+assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
+  progress unfold P.
+  split. {
+    split; [ | easy ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply Hfu.
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_add_diag2 Hon).
+  apply (rngl_add_lt_mono_r Hop Hor).
+  apply (rngl_min_glb_lt); [ | easy ].
+  now apply (rngl_lt_add_r Hos Hor).
+}
+apply Hub1 in H.
+now apply (rngl_nlt_ge Hor) in H.
+Qed.
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
@@ -2862,76 +2951,8 @@ split. {
   split; [ now apply Hub1 | easy ].
 }
 (* continuity of f to prove that *)
-(**)
 assert (Hac : c ≠ a). {
-  clear - Hfc u Hop Hor rp Hfab Hon Hiv Hc1 Hab Hos P Hub1.
-  move c before b.
-(**)
-  specialize (Hfc a (u - f a)%L) as H2.
-  assert (H : (0 < u - f a)%L) by now apply (rngl_lt_0_sub Hop Hor).
-  specialize (H2 H); clear H.
-  destruct H2 as (η & Hη & H2).
-  assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
-    intros x Hx.
-    assert (H : (rngl_abs (x - a) < η)%L). {
-      rewrite (rngl_abs_nonneg Hop Hor) by now apply (rngl_le_0_sub Hop Hor).
-      apply (rngl_lt_sub_lt_add_l Hop Hor).
-      eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
-      apply (rngl_le_min_l Hor).
-    }
-    specialize (H2 _ H); clear H.
-    destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
-      rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
-        now apply (rngl_le_sub_0 Hop Hor).
-      }
-      now apply (rngl_le_lt_trans Hor _ (f a)).
-    }
-    apply (rngl_nle_gt Hor) in Hfxa.
-    rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
-       apply (rngl_le_0_sub Hop Hor).
-       now apply (rngl_lt_le_incl Hor).
-    }
-    now apply (rngl_sub_lt_mono_r Hop Hor) in H2.
-  }
-  intros H; subst c.
-  assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
-    split. {
-      apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite <- (rngl_add_diag2 Hon).
-      apply (rngl_add_lt_mono_l Hop Hor).
-      apply (rngl_min_glb_lt); [ | easy ].
-      now apply (rngl_lt_add_r Hos Hor).
-    } {
-      apply (rngl_le_div_l Hon Hop Hiv Hor). {
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite <- (rngl_add_diag2 Hon).
-      apply (rngl_add_le_compat Hor). {
-        now apply (rngl_lt_le_incl Hor).
-      }
-      apply (rngl_le_min_r Hor).
-    }
-  }
-  assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
-    progress unfold P.
-    split. {
-      split; [ | easy ].
-      now apply (rngl_lt_le_incl Hor).
-    }
-    apply Hfu.
-    split; [ now apply (rngl_lt_le_incl Hor) | ].
-    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    rewrite <- (rngl_add_diag2 Hon).
-    apply (rngl_add_lt_mono_r Hop Hor).
-    apply (rngl_min_glb_lt); [ | easy ].
-    now apply (rngl_lt_add_r Hos Hor).
-  }
-  apply Hub1 in H.
-  now apply (rngl_nlt_ge Hor) in H.
+  now apply (intermediate_value_prop_1 Hon Hop Hiv Hor f Hfc a b c u).
 }
 ...
 (**)
