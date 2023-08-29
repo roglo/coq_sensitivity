@@ -2987,8 +2987,13 @@ clear c Hub1 Hc H1 Hlima Hlimb Hac H.
 *)
 subst c.
 clear Hac H1.
-...
 assert (Haηb : (a < (rngl_max a (b - η) + b) / 2 ≤ b)%L). {
+  _admit.
+}
+  set (x := ((rngl_max a (b - η) + b) / 2)%L) in *.
+  specialize (Hc x) as H3.
+  destruct (is_upper_bound P x) as [Hux| Hux]. 2: {
+...
 (*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
 *)
