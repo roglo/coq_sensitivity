@@ -2981,12 +2981,18 @@ assert (Hbc : c ≠ b). {
     apply (rngl_nle_gt Hor) in Hfxb.
     now apply (rngl_lt_trans Hor _ (f b)).
   }
-  intros H; subst c.
+intros H.
+(*
+clear c Hub1 Hc H1 Hlima Hlimb Hac H.
+*)
+subst c.
+clear Hac H1.
+...
 assert (Haηb : (a < (rngl_max a (b - η) + b) / 2 ≤ b)%L). {
 (*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
 *)
-admit.
+_admit.
 (*
   split. {
     apply (rngl_lt_div_r Hon Hop Hiv Hor). {
@@ -3011,7 +3017,14 @@ admit.
 (*
 set (P := λ x : T, (a ≤ x ≤ b)%L ∧ (f x < u)%L).
 *)
-assert (H : P ((rngl_max a (b - η) + b) / 2)%L). {
+assert (H : ¬ P ((rngl_max a (b - η) + b) / 2)%L). {
+  progress unfold P.
+  intros (H3, H4).
+  set (x := ((rngl_max a (b - η) + b) / 2)%L) in *.
+  specialize (Hfu x) as H5.
+...
+}
+...
   progress unfold P.
   split. {
     split; [ | easy ].
