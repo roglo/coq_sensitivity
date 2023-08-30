@@ -4350,6 +4350,7 @@ Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_le_lt_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_lt_le_trans {T}%type {ro rp} Hor (a b c)%L.
 Arguments rngl_lt_dec {T ro rp} Hor (a b)%L.
+Arguments rngl_min {T ro} (a b)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.

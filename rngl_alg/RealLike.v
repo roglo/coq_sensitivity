@@ -3049,6 +3049,10 @@ assert (Hac : c ≠ a). {
 assert (Hbc : c ≠ b). {
   now apply (intermediate_value_prop_2 Hon Hop Hiv Hor f Hfc a b c u).
 }
+specialize (Hfc c) as Hcc.
+progress unfold continuous_at in Hcc.
+progress unfold is_limit_when_tending_to in Hcc.
+set (η2 := rngl_min (c - a) (c - b)).
 ...
 (*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
