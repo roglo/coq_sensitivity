@@ -2833,6 +2833,16 @@ apply (rngl_sub_le_mono_r Hop Hor) with (c := a) in Hbc.
 now do 2 rewrite rngl_add_comm, (rngl_add_sub Hos) in Hbc.
 Qed.
 
+Theorem rngl_add_le_mono_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a ≤ b ↔ a + c ≤ b + c)%L.
+Proof.
+intros Hop Hor *.
+do 2 rewrite (rngl_add_comm _ c).
+apply (rngl_add_le_mono_l Hop Hor).
+Qed.
+
 Theorem rngl_le_sub_le_add_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -2849,6 +2859,16 @@ split; intros Habc. {
   apply (rngl_sub_le_mono_r Hop Hor _ _ b) in Habc.
   now rewrite rngl_add_comm, (rngl_add_sub Hos) in Habc.
 }
+Qed.
+
+Theorem rngl_le_sub_le_add_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a - b ≤ c ↔ a ≤ c + b)%L.
+Proof.
+intros Hop Hor *.
+rewrite rngl_add_comm.
+apply (rngl_le_sub_le_add_l Hop Hor).
 Qed.
 
 Theorem rngl_lt_sub_lt_add_l :
@@ -2966,20 +2986,46 @@ rewrite rngl_add_comm.
 now apply (rngl_le_add_l Hor).
 Qed.
 
+Theorem rngl_lt_add_l :
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < a)%L → (b < a + b)%L.
+Proof.
+intros Hos Hor * Hbz.
+apply (rngl_lt_iff Hor).
+split; [ now apply (rngl_le_add_l Hor), (rngl_lt_le_incl Hor) | ].
+intros H.
+symmetry in H.
+apply (rngl_add_sub_eq_r Hos) in H.
+rewrite (rngl_sub_diag Hos) in H; subst a.
+revert Hbz.
+apply (rngl_lt_irrefl Hor).
+Qed.
+
 Theorem rngl_lt_add_r :
   rngl_has_opp_or_subt T = true →
   rngl_is_ordered T = true →
   ∀ a b : T, (0 < b)%L → (a < a + b)%L.
 Proof.
 intros Hos Hor * Hbz.
-apply (rngl_lt_iff Hor).
-split; [ now apply (rngl_le_add_r Hor), (rngl_lt_le_incl Hor) | ].
-intros H.
-symmetry in H.
-apply (rngl_add_sub_eq_l Hos) in H.
-rewrite (rngl_sub_diag Hos) in H; subst b.
-revert Hbz.
-apply (rngl_lt_irrefl Hor).
+rewrite rngl_add_comm.
+now apply (rngl_lt_add_l Hos Hor).
+Qed.
+
+Theorem rngl_le_sub_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ b ↔ a - b ≤ a)%L.
+Proof.
+intros Hop Hor *.
+split; intros Hb. {
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  now apply (rngl_le_add_r Hor).
+} {
+  apply (rngl_le_sub_le_add_l Hop Hor) in Hb.
+  apply (rngl_add_le_mono_r Hop Hor _ _ a).
+  now rewrite rngl_add_0_l.
+}
 Qed.
 
 Theorem rngl_lt_add_lt_sub_l :
@@ -3758,6 +3804,22 @@ Proof.
 intros * Hab Hac.
 progress unfold rngl_min.
 now destruct (b ≤? c)%L.
+Qed.
+
+Theorem rngl_max_lub :
+  ∀ a b c, (a ≤ c → b ≤ c → rngl_max a b ≤ c)%L.
+Proof.
+intros * Hac Hbc.
+progress unfold rngl_max.
+now destruct (a ≤? b)%L.
+Qed.
+
+Theorem rngl_max_lub_lt :
+  ∀ a b c, (a < c → b < c → rngl_max a b < c)%L.
+Proof.
+intros * Hac Hbc.
+progress unfold rngl_max.
+now destruct (a ≤? b)%L.
 Qed.
 
 Theorem rngl_mul_pos_pos :
