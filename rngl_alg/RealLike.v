@@ -187,6 +187,19 @@ exfalso; apply H2.
 now exists x.
 Qed.
 
+Theorem rl_not_forall_exist {T} {ro : ring_like_op T}
+    {rp : ring_like_prop T} {rl : real_like_prop T} :
+  ∀ (P : T → Prop),  ¬ (∀ x, ¬ P x) → ∃ x, P x.
+Proof.
+intros * Ha.
+specialize (rl_excl_midd (∃ x, P x)) as H2.
+destruct H2 as [H2| H2]; [ easy | ].
+exfalso; apply Ha; clear Ha.
+intros x Hx.
+apply H2.
+now exists x.
+Qed.
+
 Definition rl_has_mod_intgl {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option rl_opt_mod_intgl_prop.
@@ -3052,7 +3065,38 @@ assert (Hbc : c ≠ b). {
 specialize (Hfc c) as Hcc.
 progress unfold continuous_at in Hcc.
 progress unfold is_limit_when_tending_to in Hcc.
-set (η2 := rngl_min (c - a) (c - b)).
+set (η2 := rngl_min (c - a) (b - c)).
+assert (Hzη2 : (0 < η2)%L). {
+  progress unfold η2.
+  apply not_eq_sym in Hac.
+  apply rngl_min_glb_lt. {
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_lt_iff Hor); split; [ | easy ].
+    now apply Hub1.
+  } {
+    apply (rngl_lt_0_sub Hop Hor).
+    now apply (rngl_lt_iff Hor).
+  }
+}
+assert
+  (∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+    (∀ x, (rngl_abs (x - c) < η)%L → (rngl_abs (f x - f c) < ε)%L) ∧
+    (∃ a', (c - η < a' ≤ c)%L ∧ P a') ∧
+    (∃ a'', (c < a'' < c + η)%L ∧ P a'')). {
+  intros ε Hε.
+  destruct (Hcc ε Hε) as (η1 & Hzη1 & Hη1).
+  exists (rngl_min η1 η2).
+  assert (H12 : (0 < rngl_min η1 η2)%L) by now apply rngl_min_glb_lt.
+  split; [ easy | ].
+  split. {
+    intros x Hx.
+    apply Hη1.
+    eapply (rngl_lt_le_trans Hor); [ apply Hx | ].
+    apply (rngl_le_min_l Hor).
+  }
+  split. {
+    apply rl_not_forall_exist.
+    intros Hx.
 ...
 (*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
