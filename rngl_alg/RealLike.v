@@ -3125,6 +3125,15 @@ assert
         now apply Hyc, Hub1.
       }
     }
+    apply (rngl_nlt_ge Hor) in H2; apply H2; clear H2.
+    progress unfold x.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    now rewrite (rngl_mul_0_l Hos).
+  } {
 ...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
