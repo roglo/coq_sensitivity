@@ -3079,7 +3079,7 @@ assert (Hzη2 : (0 < η2)%L). {
   }
 }
 assert
-  (∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+  (H2 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
     (∀ x, (rngl_abs (x - c) < η)%L → (rngl_abs (f x - f c) < ε)%L) ∧
     (∃ a', (c - η < a' ≤ c)%L ∧ P a') ∧
     (∃ a'', (c ≤ a'' < c + η)%L ∧ ¬ P a'')). {
@@ -3183,6 +3183,11 @@ assert
     now rewrite (rngl_mul_0_l Hos).
   }
 }
+assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
+  intros ε Hε.
+  specialize (H2 ε Hε).
+  destruct H2 as (η & Hzη & Hη & (a' & Ha' & Hpa') & (a'' & Ha'' & Hpa'')).
+  progress unfold P in Hpa'; cbn in Hpa'.
 ...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
