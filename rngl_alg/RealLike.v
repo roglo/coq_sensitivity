@@ -3082,7 +3082,7 @@ assert
   (∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
     (∀ x, (rngl_abs (x - c) < η)%L → (rngl_abs (f x - f c) < ε)%L) ∧
     (∃ a', (c - η < a' ≤ c)%L ∧ P a') ∧
-    (∃ a'', (c < a'' < c + η)%L ∧ P a'')). {
+    (∃ a'', (c ≤ a'' < c + η)%L ∧ ¬ P a'')). {
   intros ε Hε.
   destruct (Hcc ε Hε) as (η1 & Hzη1 & Hη1).
   exists (rngl_min η1 η2).
@@ -3136,11 +3136,11 @@ assert
   } {
     apply rl_not_forall_exist.
     intros Hx.
-    assert (Hx' : ∀ x, (c < x < c + rngl_min η1 η2)%L → ¬ P x). {
+    assert (Hx' : ∀ x, (c ≤ x < c + rngl_min η1 η2)%L → P x). {
       intros y Hy.
       specialize (Hx y) as H2.
       specialize (rl_excl_midd (P y)) as H3.
-      destruct H3 as [H3| H3]; [ | easy ].
+      destruct H3 as [H3| H3]; [ easy | ].
       now exfalso; apply H2.
     }
     clear Hx; rename Hx' into Hx.
@@ -3149,31 +3149,40 @@ assert
     destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
       apply Hy; clear Hy; intros Hpy.
-      apply (rngl_nlt_ge Hor); intros Hxy.
-      destruct (rngl_le_dec Hor y c) as [Hyc| Hyc]. {
-        apply (rngl_nlt_ge Hor) in Hyc.
-        apply Hyc; clear Hyc.
-        apply (rngl_le_lt_trans Hor _ x); [ | easy ].
-        progress unfold x.
-        apply (rngl_le_add_r Hor).
-        apply (rngl_le_div_r Hon Hop Hiv Hor). {
-          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-        }
-        rewrite (rngl_mul_0_l Hos).
-        now apply (rngl_lt_le_incl Hor).
-      } {
-        now apply Hub1 in Hpy.
+      apply (rngl_le_trans Hor _ c); [ now apply Hub1 | ].
+      progress unfold x.
+      apply (rngl_le_add_r Hor).
+      apply (rngl_le_div_r Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
+      rewrite (rngl_mul_0_l Hos).
+      now apply (rngl_lt_le_incl Hor).
     }
-...
-    apply (rngl_nlt_ge Hor) in H2; apply H2; clear H2.
+    assert (H : ∀ y, _ → _) by apply Hpx.
+    move H before Hpx; clear Hpx; rename H into Hpx.
+    specialize (Hx x) as H3.
+    assert (H : (c ≤ x < c + rngl_min η1 η2)%L). {
+      split; [ easy | ].
+      progress unfold x.
+      apply (rngl_add_lt_mono_l Hop Hor).
+      apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite <- (rngl_add_diag2 Hon).
+      now apply (rngl_lt_add_l Hos Hor).
+    }
+    specialize (H3 H); clear H.
+    apply Hub1 in H3.
+    apply (rngl_nlt_ge Hor) in H3.
+    apply H3; clear H3.
     progress unfold x.
-    apply (rngl_lt_sub_lt_add_l Hop Hor).
-    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_lt_add_r Hos Hor).
     apply (rngl_lt_div_r Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
     now rewrite (rngl_mul_0_l Hos).
+  }
+}
 ...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
