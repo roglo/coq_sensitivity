@@ -3082,7 +3082,7 @@ assert
   (H2 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
     (∀ x, (rngl_abs (x - c) < η)%L → (rngl_abs (f x - f c) < ε)%L) ∧
     (∃ a', (c - η < a' ≤ c)%L ∧ P a') ∧
-    (∃ a'', (c ≤ a'' < c + η)%L ∧ ¬ P a'')). {
+    (∃ a'', (c ≤ a'' < c + η2)%L ∧ ¬ P a'')). {
   intros ε Hε.
   destruct (Hcc ε Hε) as (η1 & Hzη1 & Hη1).
   exists (rngl_min η1 η2).
@@ -3136,15 +3136,32 @@ assert
   } {
     apply rl_not_forall_exist.
     intros Hx.
-    assert (Hx' : ∀ x, (c ≤ x < c + rngl_min η1 η2)%L → P x). {
+(**)
+    assert (Hx' : ∀ x, (c ≤ x < c + η2)%L → P x). {
       intros y Hy.
       specialize (Hx y) as H2.
       specialize (rl_excl_midd (P y)) as H3.
       destruct H3 as [H3| H3]; [ easy | ].
       now exfalso; apply H2.
     }
+(*
+    assert (Hx' : ∀ x, (c ≤ x < c + rngl_min η1 η2)%L → P x). {
+      intros y Hy.
+      specialize (Hx y) as H2.
+      specialize (rl_excl_midd (P y)) as H3.
+      destruct H3 as [H3| H3]; [ easy | ].
+exfalso; apply H2.
+split; [ | easy ].
+...
+      now exfalso; apply H2.
+    }
+*)
     clear Hx; rename Hx' into Hx.
+(**)
+    set (x := ((c + η2 / 2)%L)).
+(*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
+*)
     specialize (Hc x) as H2.
     destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
@@ -3161,7 +3178,11 @@ assert
     assert (H : ∀ y, _ → _) by apply Hpx.
     move H before Hpx; clear Hpx; rename H into Hpx.
     specialize (Hx x) as H3.
+(**)
+    assert (H : (c ≤ x < c + η2)%L). {
+(*
     assert (H : (c ≤ x < c + rngl_min η1 η2)%L). {
+*)
       split; [ easy | ].
       progress unfold x.
       apply (rngl_add_lt_mono_l Hop Hor).
@@ -3188,6 +3209,80 @@ assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
   specialize (H2 ε Hε).
   destruct H2 as (η & Hzη & Hη & (a' & Ha' & Hpa') & (a'' & Ha'' & Hpa'')).
   progress unfold P in Hpa'; cbn in Hpa'.
+  split. 2: {
+    apply (rngl_le_lt_trans Hor _ (f a' + ε)). 2: {
+      now apply (rngl_add_lt_mono_r Hop Hor).
+    }
+    specialize (Hη a') as H2.
+    rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+      now apply (rngl_le_sub_0 Hop Hor).
+    }
+    rewrite (rngl_opp_sub_distr Hop) in H2.
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    apply (rngl_le_trans Hor _ (rngl_abs (f a' - f c))). {
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_sub_distr Hop).
+      apply (rngl_le_abs Hop Hor).
+    }
+    apply (rngl_lt_le_incl Hor), H2.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    rewrite rngl_add_comm.
+    now apply (rngl_lt_sub_lt_add_l Hop Hor).
+  } {
+    apply (rngl_le_lt_trans Hor _ (f a'' - ε)). {
+      apply (rngl_sub_le_mono_r Hop Hor).
+      apply (rngl_nlt_ge Hor).
+      intros H.
+      apply Hpa''.
+      progress unfold P.
+      split; [ | easy ].
+      split. {
+        apply (rngl_le_trans Hor _ c); [ | easy ].
+        now apply Hub1.
+      } {
+        apply (rngl_le_trans Hor _ (c + η2)). {
+          now apply (rngl_lt_le_incl Hor).
+        }
+        rewrite rngl_add_comm.
+        apply (rngl_le_add_le_sub_r Hop Hor).
+        progress unfold η2.
+        apply (rngl_le_min_r Hor).
+      }
+    }
+...
+    apply (rngl_nle_gt Hor).
+    intros H; apply Hpa''.
+    progress unfold P.
+...
+        progress unfold η.
+...
+      now apply (rngl_add_lt_mono_r Hop Hor).
+    }
+    specialize (Hη a') as H2.
+    rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+      now apply (rngl_le_sub_0 Hop Hor).
+    }
+    rewrite (rngl_opp_sub_distr Hop) in H2.
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    apply (rngl_le_trans Hor _ (rngl_abs (f a' - f c))). {
+      rewrite <- (rngl_abs_opp Hop Hor).
+      rewrite (rngl_opp_sub_distr Hop).
+      apply (rngl_le_abs Hop Hor).
+    }
+    apply (rngl_lt_le_incl Hor), H2.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    rewrite rngl_add_comm.
+    now apply (rngl_lt_sub_lt_add_l Hop Hor).
+... ...
+  } {
+...
+eapply (rngl_le_trans Hor). 2: {
+  apply rngl_abs_sub_triangle.
+}
+...
+    rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
+      now apply (rngl_le_sub_0 Hop Hor).
+    }
 ...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).

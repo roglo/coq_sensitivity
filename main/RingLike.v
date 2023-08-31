@@ -2736,17 +2736,24 @@ Qed.
 Theorem rngl_le_add_le_sub_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ a b c, (a + b ≤ c → a ≤ c - b)%L.
+  ∀ a b c, (a + b ≤ c ↔ a ≤ c - b)%L.
 Proof.
-intros Hop Hor * Habc.
+intros Hop Hor *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rngl_add_le_compat Hor) as H1.
-specialize (H1 (a + b) c (- b) (- b) Habc)%L.
-specialize (H1 (rngl_le_refl Hor _)).
-do 2 rewrite (fold_rngl_sub Hop) in H1.
-now rewrite (rngl_add_sub Hos) in H1.
+split; intros Habc. {
+  specialize (rngl_add_le_compat Hor) as H1.
+  specialize (H1 (a + b) c (- b) (- b) Habc)%L.
+  specialize (H1 (rngl_le_refl Hor _)).
+  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  now rewrite (rngl_add_sub Hos) in H1.
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_sub_swap Hop).
+  now apply (rngl_le_0_sub Hop Hor).
+}
 Qed.
 
 Theorem rngl_sub_le_mono_l :
@@ -3788,6 +3795,24 @@ remember (a ≤? b)%L as c eqn:Hc; symmetry in Hc.
 destruct c; [ apply (rngl_le_refl Hor) | ].
 apply (rngl_leb_gt Hor) in Hc.
 now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem rngl_le_abs :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (a ≤ rngl_abs a)%L.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ | apply (rngl_le_refl Hor) ].
+apply rngl_leb_le in Hc.
+apply (rngl_le_sub_0 Hop Hor).
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite (rngl_opp_involutive Hop).
+rewrite <- (rngl_add_0_l 0%L).
+now apply (rngl_add_le_compat Hor).
 Qed.
 
 Theorem rngl_min_glb :
