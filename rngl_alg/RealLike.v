@@ -3134,6 +3134,46 @@ assert
     }
     now rewrite (rngl_mul_0_l Hos).
   } {
+    apply rl_not_forall_exist.
+    intros Hx.
+    assert (Hx' : ∀ x, (c < x < c + rngl_min η1 η2)%L → ¬ P x). {
+      intros y Hy.
+      specialize (Hx y) as H2.
+      specialize (rl_excl_midd (P y)) as H3.
+      destruct H3 as [H3| H3]; [ | easy ].
+      now exfalso; apply H2.
+    }
+    clear Hx; rename Hx' into Hx.
+    set (x := ((c + rngl_min η1 η2 / 2)%L)).
+    specialize (Hc x) as H2.
+    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+      destruct Hpx as (y & Hy); clear H2.
+      apply Hy; clear Hy; intros Hpy.
+      apply (rngl_nlt_ge Hor); intros Hxy.
+      destruct (rngl_le_dec Hor y c) as [Hyc| Hyc]. {
+        apply (rngl_nlt_ge Hor) in Hyc.
+        apply Hyc; clear Hyc.
+        apply (rngl_le_lt_trans Hor _ x); [ | easy ].
+        progress unfold x.
+        apply (rngl_le_add_r Hor).
+        apply (rngl_le_div_r Hon Hop Hiv Hor). {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite (rngl_mul_0_l Hos).
+        now apply (rngl_lt_le_incl Hor).
+      } {
+        now apply Hub1 in Hpy.
+      }
+    }
+...
+    apply (rngl_nlt_ge Hor) in H2; apply H2; clear H2.
+    progress unfold x.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    now rewrite (rngl_mul_0_l Hos).
 ...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
