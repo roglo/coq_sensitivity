@@ -3103,6 +3103,29 @@ assert
       now intros Hpy; apply H2; clear H2.
     }
     clear Hx; rename Hx' into Hx.
+    set (x := ((c - rngl_min η1 η2 / 2)%L)).
+    specialize (Hc x) as H2.
+    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+      destruct Hpx as (y & Hy); clear H2.
+      apply Hy; clear Hy; intros Hpy.
+      apply (rngl_nlt_ge Hor); intros Hxy.
+      destruct (rngl_le_dec Hor y c) as [Hyc| Hyc]. {
+        specialize (Hx y) as H2; apply H2; [ | easy ]; clear H2.
+        split; [ | easy ].
+        eapply (rngl_le_lt_trans Hor _ x); [ | easy ].
+        progress unfold x.
+        apply (rngl_sub_le_mono_l Hop Hor).
+        apply (rngl_le_div_l Hon Hop Hiv Hor). {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite <- (rngl_add_diag2 Hon).
+        apply (rngl_le_add_l Hor).
+        now apply (rngl_lt_le_incl Hor).
+      } {
+        now apply Hyc, Hub1.
+      }
+    }
+...
 (*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
     specialize (Hc x) as H2.
