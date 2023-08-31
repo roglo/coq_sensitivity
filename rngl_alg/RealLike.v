@@ -3097,6 +3097,33 @@ assert
   split. {
     apply rl_not_forall_exist.
     intros Hx.
+    assert (Hx' : ∀ x, ((c - rngl_min η1 η2 < x ≤ c)%L) → ¬ P x). {
+      intros y Hy.
+      specialize (Hx y) as H2.
+      now intros Hpy; apply H2; clear H2.
+    }
+    clear Hx; rename Hx' into Hx.
+(*
+    set (x := ((c + rngl_min η1 η2 / 2)%L)).
+    specialize (Hc x) as H2.
+    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+      destruct Hpx as (y & Hy); clear H2.
+      apply Hy; clear Hy; intros Hpy.
+      apply (rngl_nlt_ge Hor); intros Hxy.
+      specialize (Hx y) as H2; apply H2; clear H2.
+      split; [ | easy ].
+...
+*)
+    set (x := ((c - rngl_min η1 η2 / 2)%L)).
+    specialize (Hc x) as H2.
+    destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
+      destruct Hpx as (y & Hy); clear H2.
+      apply Hy; clear Hy; intros Hpy.
+      apply (rngl_nlt_ge Hor); intros Hxy.
+      specialize (Hx y) as H2; apply H2; clear H2.
+(* ouais, non, ça marche pas *)
+...
+      split; [ | easy ].
 ...
 (*
 assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
