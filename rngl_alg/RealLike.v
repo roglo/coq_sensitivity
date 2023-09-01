@@ -3296,6 +3296,36 @@ Theorem rl_exp_increasing :
   (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr He1 * Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 (rl_exp a)), (H1 (rl_exp b)).
+  apply (rngl_le_refl Hor).
+}
+clear He1.
+assert (H : (1 < rl_exp 1)%L). {
+  assert (Hiq : rngl_has_inv_or_quot T = true). {
+    now apply rngl_has_inv_or_quot_iff; left.
+  }
+  apply (rngl_lt_iff Hor).
+  split. 2: {
+    rewrite <- (rl_exp_0 Hon Hiq Htr) at 1.
+    intros H.
+    apply (rl_exp_inj Htr) in H.
+    symmetry in H; revert H.
+    now apply (rngl_1_neq_0_iff Hon).
+  }
+Check rl_exp_inj.
+(* c'est bizarre que rl_exp soit injective sans condition et que
+   pourtant, on ne sache pas montrer que "1 ≤ rl_exp 1" ;
+   l'exponentielle est
+   - soit strictement croissante si 1<exp(1)
+   - soit strictement décroissante si exp(1)<1
+   - soit constante donc non injective si exp(1)=1
+*)
+...
 destruct (rngl_eq_dec Heb a b) as [Haeb| Haeb]. {
   subst b; apply (rngl_le_refl Hor).
 }
