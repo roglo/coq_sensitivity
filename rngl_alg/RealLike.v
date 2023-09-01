@@ -3079,15 +3079,18 @@ assert (Hzη2 : (0 < η2)%L). {
   }
 }
 assert
-  (H2 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η)%L ∧
+  (H2 : ∀ ε, (0 < ε)%L → ∃ η, (0 < η ≤ η2)%L ∧
     (∀ x, (rngl_abs (x - c) < η)%L → (rngl_abs (f x - f c) < ε)%L) ∧
     (∃ a', (c - η < a' ≤ c)%L ∧ P a') ∧
-    (∃ a'', (c ≤ a'' < c + η2)%L ∧ ¬ P a'')). {
+    (∃ a'', (c ≤ a'' < c + η)%L ∧ ¬ P a'')). {
   intros ε Hε.
   destruct (Hcc ε Hε) as (η1 & Hzη1 & Hη1).
   exists (rngl_min η1 η2).
   assert (H12 : (0 < rngl_min η1 η2)%L) by now apply rngl_min_glb_lt.
-  split; [ easy | ].
+  split. {
+    split; [ easy | ].
+    apply (rngl_le_min_r Hor).
+  }
   split. {
     intros x Hx.
     apply Hη1.
@@ -3136,32 +3139,17 @@ assert
   } {
     apply rl_not_forall_exist.
     intros Hx.
-(**)
-    assert (Hx' : ∀ x, (c ≤ x < c + η2)%L → P x). {
-      intros y Hy.
-      specialize (Hx y) as H2.
-      specialize (rl_excl_midd (P y)) as H3.
-      destruct H3 as [H3| H3]; [ easy | ].
-      now exfalso; apply H2.
-    }
-(*
     assert (Hx' : ∀ x, (c ≤ x < c + rngl_min η1 η2)%L → P x). {
       intros y Hy.
       specialize (Hx y) as H2.
       specialize (rl_excl_midd (P y)) as H3.
       destruct H3 as [H3| H3]; [ easy | ].
-exfalso; apply H2.
-split; [ | easy ].
-...
+      exfalso; apply H2.
+      split; [ | easy ].
       now exfalso; apply H2.
     }
-*)
     clear Hx; rename Hx' into Hx.
-(**)
-    set (x := ((c + η2 / 2)%L)).
-(*
     set (x := ((c + rngl_min η1 η2 / 2)%L)).
-*)
     specialize (Hc x) as H2.
     destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
@@ -3178,11 +3166,7 @@ split; [ | easy ].
     assert (H : ∀ y, _ → _) by apply Hpx.
     move H before Hpx; clear Hpx; rename H into Hpx.
     specialize (Hx x) as H3.
-(**)
-    assert (H : (c ≤ x < c + η2)%L). {
-(*
     assert (H : (c ≤ x < c + rngl_min η1 η2)%L). {
-*)
       split; [ easy | ].
       progress unfold x.
       apply (rngl_add_lt_mono_l Hop Hor).
@@ -3241,7 +3225,10 @@ assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
         now apply Hub1.
       } {
         apply (rngl_le_trans Hor _ (c + η2)). {
-          now apply (rngl_lt_le_incl Hor).
+          apply (rngl_le_trans Hor _ (c + η)). {
+            now apply (rngl_lt_le_incl Hor).
+          }
+          now apply (rngl_add_le_mono_l Hop Hor).
         }
         rewrite rngl_add_comm.
         apply (rngl_le_add_le_sub_r Hop Hor).
@@ -3249,32 +3236,20 @@ assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
         apply (rngl_le_min_r Hor).
       }
     }
-...
-    apply (rngl_nle_gt Hor).
-    intros H; apply Hpa''.
-    progress unfold P.
-...
-        progress unfold η.
-...
-      now apply (rngl_add_lt_mono_r Hop Hor).
+    specialize (Hη a'') as H2.
+    rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
+      now apply (rngl_le_0_sub Hop Hor).
     }
-    specialize (Hη a') as H2.
-    rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
-      now apply (rngl_le_sub_0 Hop Hor).
-    }
-    rewrite (rngl_opp_sub_distr Hop) in H2.
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    apply (rngl_le_trans Hor _ (rngl_abs (f a' - f c))). {
-      rewrite <- (rngl_abs_opp Hop Hor).
-      rewrite (rngl_opp_sub_distr Hop).
-      apply (rngl_le_abs Hop Hor).
-    }
-    apply (rngl_lt_le_incl Hor), H2.
     apply (rngl_lt_sub_lt_add_l Hop Hor).
     rewrite rngl_add_comm.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_le_lt_trans Hor _ (rngl_abs (f a'' - f c))). {
+      apply (rngl_le_abs Hop Hor).
+    }
+    apply H2.
     now apply (rngl_lt_sub_lt_add_l Hop Hor).
-... ...
-  } {
+  }
+}
 ...
 eapply (rngl_le_trans Hor). 2: {
   apply rngl_abs_sub_triangle.
