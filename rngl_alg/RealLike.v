@@ -1400,7 +1400,7 @@ Theorem rl_exp_continuous :
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_trigo T = true →
-  ∀ a, continuous_at rl_exp a.
+  continuous rl_exp.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr b.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -3293,14 +3293,15 @@ apply (rngl_lt_eq_cases Hor) in Hab.
 destruct Hab as [Hab| Hab]; [ clear Haeb | easy ].
 apply (rngl_lt_le_incl Hor).
 specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
-progress unfold continuous_at in H1.
-progress unfold is_limit_when_tending_to in H1.
-specialize (H1 a) as Ha.
-specialize (H1 b) as Hb.
 (*
 https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
 *)
 Inspect 1.
+...
+progress unfold continuous_at in H1.
+progress unfold is_limit_when_tending_to in H1.
+specialize (H1 a) as Ha.
+specialize (H1 b) as Hb.
 ...
 apply (rngl_leb_gt Hor) in Hlab.
 Check intermediate_value_le.
