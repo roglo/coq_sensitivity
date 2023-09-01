@@ -3144,6 +3144,53 @@ apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge Hor); intros Hu. {
 }
 Qed.
 
+Theorem intermediate_value :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  is_complete T →
+  ∀ f, continuous f
+  → ∀ a b u, (a ≤ b)%L
+  → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
+  → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
+Proof.
+intros Hon Hop Hiv Hed Hor Har Hco * Hfc * Hab Hfab.
+progress unfold rngl_min in Hfab.
+progress unfold rngl_max in Hfab.
+remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
+specialize (intermediate_value_le Hon Hop Hiv Hed Hor Har Hco) as H1.
+destruct ab; [ now apply (H1 _ Hfc) | ].
+specialize (H1 (λ x, (- f x))%L).
+cbn in H1.
+assert (H : continuous (λ x, (- f x))%L). {
+  intros x ε Hε.
+  destruct (Hfc x ε Hε) as (η & Hzη & Hη).
+  exists η.
+  split; [ easy | ].
+  intros y Hy.
+  specialize (Hη y Hy).
+  rewrite <- (rngl_abs_opp Hop Hor).
+  rewrite (rngl_opp_sub_distr Hop).
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_add_comm.
+  now rewrite (fold_rngl_sub Hop).
+}
+specialize (H1 H a b (- u)%L Hab); clear H.
+assert (H : (- f a ≤ - u ≤ - f b)%L). {
+  now split; apply -> (rngl_opp_le_compat Hop Hor).
+}
+specialize (H1 H); clear H.
+destruct H1 as (c & Hacb & Hc).
+exists c.
+split; [ easy | ].
+now apply (rngl_opp_inj Hop) in Hc.
+Qed.
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
@@ -3253,27 +3300,9 @@ specialize (H1 b) as Hb.
 (*
 https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
 *)
-Theorem intermediate_value :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
-  rngl_is_archimedean T = true →
-  is_complete T →
-  ∀ f, continuous f
-  → ∀ a b u, (a ≤ b)%L
-  → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
-  → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
-Proof.
-intros Hon Hop Hiv Hed Hor Har Hco * Hfc * Hab Hfab.
-progress unfold rngl_min in Hfab.
-progress unfold rngl_max in Hfab.
-remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
-destruct ab. {
-  now apply (intermediate_value_le Hon Hop Hiv Hed Hor Har Hco _ Hfc).
-} {
-  apply (rngl_leb_gt Hor) in Hlab.
+Inspect 1.
+...
+apply (rngl_leb_gt Hor) in Hlab.
 Check intermediate_value_le.
 ...
 intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
