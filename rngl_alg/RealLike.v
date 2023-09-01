@@ -1460,6 +1460,16 @@ apply (rngl_mul_lt_mono_pos_r Hop Hor) in H1; [ easy | | ]. {
 }
 Qed.
 
+Theorem rl_exp_inj :
+  rl_has_trigo T = true →
+  ∀ a b, rl_exp a = rl_exp b → a = b.
+Proof.
+intros Htr * Hab.
+rewrite <- (rl_log_exp Htr a).
+rewrite <- (rl_log_exp Htr b).
+now f_equal.
+Qed.
+
 (**)
 
 Definition is_upper_bound (Q : T → Type) c :=
@@ -3293,10 +3303,17 @@ apply (rngl_lt_eq_cases Hor) in Hab.
 destruct Hab as [Hab| Hab]; [ clear Haeb | easy ].
 apply (rngl_lt_le_incl Hor).
 specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
+specialize (rl_exp_inj Htr) as H2.
 (*
 https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
 *)
-Inspect 1.
+apply (rngl_nle_gt Hor).
+intros Hba.
+apply (rngl_lt_eq_cases Hor) in Hba.
+destruct Hba as [Hba| Hba]. 2: {
+  apply H2 in Hba; subst b.
+  revert Hab; apply (rngl_lt_irrefl Hor).
+}
 ...
 progress unfold continuous_at in H1.
 progress unfold is_limit_when_tending_to in H1.
