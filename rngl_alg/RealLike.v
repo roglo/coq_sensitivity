@@ -3324,6 +3324,11 @@ Check rl_exp_inj.
    - soit strictement croissante si 1<exp(1)
    - soit strictement décroissante si exp(1)<1
    - soit constante donc non injective si exp(1)=1
+   Question : de quelle exponentielle je parle, dans ma
+   définition de rl_exp ? Clairement pas l'exponentielle
+   de base 1, qui est constante. Et mon log, rl_log,
+   c'est quoi ?
+https://fr.wikipedia.org/wiki/Exponentielle_de_base_a#Par_la_propri%C3%A9t%C3%A9_alg%C3%A9brique
 *)
 ...
 destruct (rngl_eq_dec Heb a b) as [Haeb| Haeb]. {
