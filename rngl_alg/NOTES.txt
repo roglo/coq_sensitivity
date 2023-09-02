@@ -162,3 +162,21 @@ J'ai donc peur que pour les preuves de tout ce merdier, il faille
 passer en logique classique (tiers exclu), et même, pire, que ce soit
 décidable (∀ P, {P} + {¬P}), ce qui, bon, ne me surprend pas de la
 part des nombres réels, mais ça faiche, quand même. Berk !
+
+samedi 2 septembre 2023 09:35
+
+Bloqué, aujourd'hui, après avoir tout de même fini la preuve du
+théorème de la borne supérieure il y a quelques jours et celui des
+valeurs intermédiaires hier. Tout ça pour montrer que ma fonction
+exponentielle est monotonne mais ça chie parce que, puisque je l'ai
+définie comme ayant une réciproque log, elle l'est forcément
+monotonne, eh ! Tout ça pour manipuler la fonction racine carrée que
+j'ai définie comme exp(1/2 log(x)) et chais pas si c'est une bonne
+idée finalement. Peut-être qu'il faudrait que je la définisse comme
+une fonction dont le carré vaut la valeur initiale, mais du coup,
+chais pas démontrer qu'elle est positive. D'ailleurs dans ℂ, elle ne
+l'est pas. Du coup, chais pas quoi faire.
+
+Peut-être revenir à d'autres de mes recherches, mais chais plus où
+j'en étais, chuis fatigué et déprimé. Plus envie de bosser, mais j'ai
+pas d'idées de savoir quoi faire de ma vie.
