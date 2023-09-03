@@ -129,7 +129,7 @@ Arguments is_complete T {ro}.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_excl_midd : ∀ P, P + notT P;
-    rl_opt_mod_intgl_prop :
+    rl_opt_abs_val_integral_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L) }.
 
 Theorem rl_forall_or_exist_not {T} {ro : ring_like_op T}
@@ -2053,7 +2053,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
 
 Definition rl_has_mod_intgl {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
-  bool_of_option rl_opt_mod_intgl_prop.
+  bool_of_option rl_opt_abs_val_integral_prop.
 
 (*
 Arguments rl_acos {T ro rp real_like_prop} x%L.
@@ -2106,7 +2106,7 @@ Qed.
 End a.
 
 Arguments rl_has_mod_intgl T {ro rp rl}.
-Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
+Arguments rl_opt_abs_val_integral_prop T {ro rp real_like_prop}.
 
 Declare Scope gc_scope.
 Delimit Scope gc_scope with C.
@@ -2497,7 +2497,7 @@ split. {
   intros H2.
   generalize Hrl; intros H.
   unfold rl_has_mod_intgl in H.
-  destruct (rl_opt_mod_intgl_prop T) as [H3| ]; [ clear H | easy ].
+  destruct (rl_opt_abs_val_integral_prop T) as [H3| ]; [ clear H | easy ].
   apply H3 in H2.
   apply Haz.
   now apply eq_gc_eq; cbn.
@@ -3217,7 +3217,9 @@ Theorem rl_sqrt_div_squ_squ :
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_mod_intgl T = true →
+(*
   rl_has_trigo T = true →
+*)
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
