@@ -127,31 +127,26 @@ Arguments is_complete T {ro}.
 
 (* ....... *)
 
-Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_excl_midd : ∀ P, P + notT P;
-    rl_opt_integral_modulus_prop :
-      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L) }.
+Class excl_midd := { em_prop : ∀ P, P + notT P }.
 
-Theorem rl_forall_or_exist_not {T} {ro : ring_like_op T}
-    {rp : ring_like_prop T} {rl : real_like_prop T} :
+Theorem rl_forall_or_exist_not {em : excl_midd} {T} :
   ∀ (P : T → Prop), {∀ x, P x} + {∃ x, ¬ P x}.
 Proof.
 intros.
-specialize (rl_excl_midd (∃ x, ¬ P x)) as H2.
+specialize (em_prop (∃ x, ¬ P x)) as H2.
 destruct H2 as [H2| H2]; [ now right | left ].
 intros.
-specialize (rl_excl_midd (P x)) as H3.
+specialize (em_prop (P x)) as H3.
 destruct H3 as [H3| H3]; [ easy | ].
 exfalso; apply H2.
 now exists x.
 Qed.
 
-Theorem rl_not_forall_exist {T} {ro : ring_like_op T}
-    {rp : ring_like_prop T} {rl : real_like_prop T} :
+Theorem rl_not_forall_exist {em : excl_midd} {T} :
   ∀ (P : T → Prop),  ¬ (∀ x, ¬ P x) → ∃ x, P x.
 Proof.
 intros * Ha.
-specialize (rl_excl_midd (∃ x, P x)) as H2.
+specialize (em_prop (∃ x, P x)) as H2.
 destruct H2 as [H2| H2]; [ easy | ].
 exfalso; apply Ha; clear Ha.
 intros x Hx.
@@ -164,7 +159,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {rl : real_like_prop T}.
+Context {em : excl_midd}.
 
 Definition is_upper_bound (Q : T → Type) c :=
   rl_forall_or_exist_not (λ x : T, Q x → (x ≤ c)%L).
@@ -1133,7 +1128,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   destruct H1 as (z & Hz).
   specialize (H2 z Hs).
   assert (Hpz : P z). {
-    specialize (rl_excl_midd (P z)) as H3.
+    specialize (em_prop (P z)) as H3.
     destruct H3 as [H3| H3]; [ easy | ].
     exfalso.
     apply Hz.
@@ -1837,7 +1832,7 @@ assert
     assert (Hx' : ∀ x, (c ≤ x < c + rngl_min η1 η2)%L → P x). {
       intros y Hy.
       specialize (Hx y) as H2.
-      specialize (rl_excl_midd (P y)) as H3.
+      specialize (em_prop (P y)) as H3.
       destruct H3 as [H3| H3]; [ easy | ].
       exfalso; apply H2.
       split; [ | easy ].
@@ -2050,6 +2045,12 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_trigo then ∀ x : T, rl_log (rl_exp x) = x
       else not_applicable }.
 *)
+
+Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
+  { rl_opt_integral_modulus_prop :
+      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L) }.
+
+Context {rl : real_like_prop T}.
 
 Definition rl_has_integral_modulus {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
