@@ -100,6 +100,12 @@ Definition is_derivative f f' :=
 
 End a.
 
+Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
+  { rl_nth_sqrt : nat → T → T;
+    rl_opt_integral_modulus_prop :
+      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
+    rl_nth_sqrt_prop : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L }.
+
 (*
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_excl_midd : ∀ P, P + notT P;
@@ -136,9 +142,9 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       else not_applicable }.
 *)
 
-Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_opt_integral_modulus_prop :
-      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L) }.
+Definition rl_has_integral_modulus {T} {ro : ring_like_op T}
+    {rp : ring_like_prop T} {rl : real_like_prop T} :=
+  bool_of_option rl_opt_integral_modulus_prop.
 
 Section a.
 
@@ -147,9 +153,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Definition rl_has_integral_modulus {T} {ro : ring_like_op T}
-    {rp : ring_like_prop T} {rl : real_like_prop T} :=
-  bool_of_option rl_opt_integral_modulus_prop.
+Definition rl_sqrt := rl_nth_sqrt 2.
 
 (*
 Arguments rl_acos {T ro rp real_like_prop} x%L.
@@ -176,6 +180,9 @@ Definition gc_opt_inv_or_quot :
   | None =>
       None
   end.
+
+Theorem fold_rl_sqrt : rl_nth_sqrt 2 = rl_sqrt.
+Proof. easy. Qed.
 
 Theorem gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
 Proof.
@@ -1313,17 +1320,21 @@ Theorem rl_sqrt_div_squ_squ :
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rl_has_integral_modulus T = true →
-(*
-  rl_has_trigo T = true →
-*)
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros * Hon Hop Hiv Heb Hor Hmi Htr * Hxyz.
+intros * Hon Hop Hiv Heb Hor Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 unfold rl_sqrt.
+specialize (rl_nth_sqrt_prop 2) as H1.
+rewrite fold_rl_sqrt in H1 |-*.
+(**)
+split. {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+(* I need to prove that sqrt is always positive *)
+...
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
   apply (rngl_eqb_eq Heb) in Hxy.
