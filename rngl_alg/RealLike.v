@@ -1351,16 +1351,11 @@ split. {
       apply H1.
       rewrite <- Ha.
       rewrite <- (rngl_add_0_r 0%L).
-      apply (rngl_add_le_compat Hor). {
-        progress unfold rngl_squ.
-(* ah ouai, faut que je démontre que le carré d'un nombre réel
-   est positif ou nul *)
-...
-    destruct (rngl_eq_dec Heb a 0) as [Haz| Haz]. {
-      subst a.
-      apply H2 in Haz.
-      now destruct Hxyz.
-    }
+      apply (rngl_add_le_compat Hor); apply (rngl_square_ge_0 Hop Hor).
+    } {
+      intros H3; symmetry in H3.
+      apply (f_equal rngl_squ) in H3.
+      progress unfold rl_sqrt in H3.
 ...
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
