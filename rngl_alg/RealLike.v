@@ -1436,57 +1436,7 @@ assert
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs Hop Hor).
 }
-Theorem rngl_square_le_simpl_nonneg :
-  rngl_is_ordered T = true →
-  ∀ a b, (0 ≤ b → a * a ≤ b * b → a ≤ b)%L.
-Proof.
-intros Hor * Hzb Hab.
-destruct (rngl_le_dec Hor a 0) as [Haz| Haz]. {
-  now apply (rngl_le_trans Hor a 0 b).
-}
-apply (rngl_nle_gt Hor) in Haz.
-Check Z.square_le_simpl_nonneg.
-Print Z.square_le_simpl_nonneg.
-Check Z.square_lt_mono_nonneg.
-Theorem rngl_square_lt_mono_nonneg :
-  ∀ a b, (0 ≤ a → a < b → a * a < b * b)%L.
-Proof.
-intros * Ha Hab.
-Print Z.square_lt_mono_nonneg.
-Check Z.mul_lt_mono_nonneg.
-Theorem rngl_mul_lt_mono_nonneg :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-   rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ a b c d, (0 ≤ a → a < b → 0 ≤ c → c < d → a * c < b * d)%L.
-Proof.
-intros Hop Hor Hii * Haz Hab Hcz Hcd.
-Print Z.mul_lt_mono_nonneg.
-Check rngl_mul_le_mono_nonneg_r.
-...
-apply (rngl_lt_le_trans Hor _ (b * c)). {
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii).
-... ...
-now apply rngl_mul_lt_mono_nonneg.
-... ...
-apply (rngl_nlt_ge Hor).
-apply (rngl_nlt_ge Hor) in Hab.
-intros Hba.
-apply Hab; clear Hab.
-now apply rngl_square_lt_mono_nonneg.
-...
-Check Z.lt_ge_cases.
-Search (_ < _ ∨ _)%L.
-...
-Check rngl_lt_ge_cases.
-
-apply (rngl_le_trans Hor _ (a * a)). 2: {
-...
-apply rngl_square_le_simpl_nonneg.
-Search (_ * _ ≤ _ * _)%L.
-Search (_ * _ ≤ _ * _)%Z.
-Z.square_le_simpl_nonneg: ∀ n m : Z, (0 ≤ m)%Z → (n * n ≤ m * m)%Z → (n ≤ m)%Z
+apply (rngl_square_le_simpl_nonneg Hop Hor Hii).
 ...
 apply (rngl_mul_le_mono_pos_l Hop Hor) with (c := rngl_abs a).
 rngl_mul_le_mono_pos_l:
