@@ -2725,6 +2725,15 @@ destruct (rngl_le_dec Hor 0%L a) as [Hap| Han]. {
 }
 Qed.
 
+Theorem rngl_squ_opp :
+  rngl_has_opp T = true →
+  ∀ a, rngl_squ (- a)%L = rngl_squ a.
+Proof.
+intros Hop *.
+progress unfold rngl_squ.
+apply (rngl_mul_opp_opp Hop).
+Qed.
+
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -4400,5 +4409,6 @@ Arguments rngl_min {T ro} (a b)%L.
 Arguments rngl_mul {T ring_like_op} (a b)%L.
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
+Arguments rngl_squ {T ro} x%L.
 Arguments rngl_sub {T ro} (a b)%L.
 Arguments rngl_subt {T ro} (a b)%L.

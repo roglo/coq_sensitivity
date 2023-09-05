@@ -1384,7 +1384,7 @@ split. {
     apply (rngl_nle_gt Hor) in Hzx.
     apply (rngl_opp_lt_compat Hop Hor) in Hzx.
     rewrite (rngl_opp_0 Hop) in Hzx.
-Search (rngl_squ (- _)%L).
+    rewrite <- (rngl_squ_opp Hop).
 ...
 (*
 ...
