@@ -1385,7 +1385,6 @@ split. {
     apply (rngl_opp_lt_compat Hop Hor) in Hzx.
     rewrite (rngl_opp_0 Hop) in Hzx.
     rewrite <- (rngl_squ_opp Hop).
-...
 (*
 ...
   specialize rl_sqrt_prop as H3.
@@ -1410,14 +1409,14 @@ apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
 *)
 *)
-Theorem le_rngl_abs_rl_sqrt_add :
+Theorem le_rl_sqrt_add :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
-  ∀ a b, (0 ≤ b → a ≤ rngl_abs (rl_sqrt (rngl_squ a + b)))%L.
+  ∀ a b, (0 ≤ b → a ≤ rl_sqrt (rngl_squ a + b))%L.
 Proof.
 intros * Hon Hop Hiv Heb Hc2 Hor * Hzb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -1427,7 +1426,22 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
-specialize (rl_nth_sqrt_prop 2) as H1.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with
+  (c := rl_sqrt (rngl_squ a + b)%L). 2: {
+  specialize (rl_nth_sqrt_pow 2) as H1.
+  cbn in H1.
+  rewrite fold_rl_sqrt in H1.
+  rewrite H1.
+(* ah non, ça donne rien *)
+...
+specialize (rl_sqrt_prop 2) as H1.
 rewrite fold_rl_sqrt in H1.
 Search (_ ^ _ ≤ _)%L.
 ...
