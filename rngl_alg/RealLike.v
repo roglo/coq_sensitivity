@@ -1327,13 +1327,16 @@ intros * Hon Hop Hiv Heb Hor Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-unfold rl_sqrt.
 specialize (rl_nth_sqrt_prop 2) as H1.
-rewrite fold_rl_sqrt in H1 |-*.
+rewrite fold_rl_sqrt in H1.
 (**)
 split. {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-(* I need to prove that sqrt is always positive *)
+  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_opp_le_compat Hop Hor).
+    rewrite (rngl_opp_involutive Hop).
+(*
 ...
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
@@ -1350,6 +1353,7 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
+*)
 Theorem le_rngl_abs_rl_sqrt_add :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1357,10 +1361,9 @@ Theorem le_rngl_abs_rl_sqrt_add :
   rngl_has_eq_dec T = true →
   rngl_characteristic T ≠ 2 →
   rngl_is_ordered T = true →
-  rl_has_trigo T = true →
   ∀ a b, (0 ≤ b → a ≤ rngl_abs (rl_sqrt (rngl_squ a + b)))%L.
 Proof.
-intros * Hon Hop Hiv Heb Hc2 Hor Htr * Hzb.
+intros * Hon Hop Hiv Heb Hc2 Hor * Hzb.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1368,7 +1371,10 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
-progress unfold rl_sqrt.
+specialize (rl_nth_sqrt_prop 2) as H1.
+rewrite fold_rl_sqrt in H1.
+Search (_ ^ _ ≤ _)%L.
+...
 remember (rngl_squ _ + _ =? _)%L as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply (rngl_eqb_eq Heb) in Hab.
