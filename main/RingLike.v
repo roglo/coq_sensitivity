@@ -401,6 +401,7 @@ Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
   | O => 1%L
+  | 1 => a (* to make it accesible even if 1 ∉ T *)
   | S m => (a * rngl_power a m)%L
   end.
 
@@ -2282,10 +2283,13 @@ Proof.
 intros Hon Hos *.
 induction n; cbn; [ apply rngl_add_0_r | ].
 rewrite fold_rngl_of_nat.
+destruct n. {
+  cbn; f_equal.
+  apply Nat.mul_1_r.
+}
 rewrite (rngl_of_nat_mul Hon Hos).
 now f_equal.
 Qed.
-
 
 Theorem rngl_mul_nat_pow_comm :
   rngl_has_1 T = true →
@@ -2472,6 +2476,7 @@ Theorem rngl_pow_0_l :
   ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
 Proof.
 intros Hos *.
+destruct n; [ easy | ].
 destruct n; [ easy | cbn ].
 apply (rngl_mul_0_l Hos).
 Qed.
@@ -2484,9 +2489,17 @@ Theorem rngl_pow_add_r :
   ∀ a i j, (a ^ (i + j) = a ^ i * a ^ j)%L.
 Proof.
 intros Hon *.
-induction i; [ symmetry; apply (rngl_mul_1_l Hon) | cbn ].
+induction i; [ symmetry; apply (rngl_mul_1_l Hon) | ].
+destruct i. {
+  destruct j. {
+    symmetry; apply (rngl_mul_1_r Hon).
+  }
+  cbn in IHi |-*.
+  now rewrite IHi.
+}
+cbn in IHi |-*.
+rewrite IHi.
 rewrite <- rngl_mul_assoc; f_equal.
-apply IHi.
 Qed.
 
 Theorem rngl_pow_nonzero :
@@ -2499,6 +2512,7 @@ Proof.
 intros Hon Hc1 Hos Hii * Haz.
 induction n; [ now apply (rngl_1_neq_0_iff Hon) | cbn ].
 intros H1; apply IHn.
+destruct n; [ easy | ].
 now apply (rngl_eq_mul_0_l Hos Hii) in H1.
 Qed.
 
@@ -4227,6 +4241,7 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+destruct n; [ easy | ].
 now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
@@ -4239,6 +4254,9 @@ Proof.
 intros Hop Hon Hor * Hza.
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
 rewrite <- (rngl_mul_1_l Hon 1%L).
+destruct n. {
+  now rewrite (rngl_mul_1_l Hon).
+}
 apply (rngl_mul_le_compat_nonneg Hop Hor). {
   split; [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).

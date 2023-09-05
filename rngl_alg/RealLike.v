@@ -1318,6 +1318,12 @@ destruct d. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
+Theorem rngl_squ_sqrt : ∀ a, rngl_squ (rl_sqrt a) = a.
+Proof.
+intros.
+apply (rl_nth_sqrt_pow 2 a).
+Qed.
+
 (* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
@@ -1355,16 +1361,21 @@ split. {
     } {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
-      progress unfold rl_sqrt in H3.
       progress unfold rngl_squ in H3 at 2.
       rewrite (rngl_mul_0_l Hos) in H3.
-...
+      rewrite rngl_squ_sqrt in H3.
+      move H3 at top; subst a.
+      apply H2 in Ha.
+      now destruct Hxyz.
+    }
+  }
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
   apply (rngl_opp_le_compat Hop Hor).
   rewrite (rngl_opp_involutive Hop).
-  specialize rl_sqrt_prop as H1.
-  rewrite Hor in H1.
+...
+  specialize rl_sqrt_prop as H3.
+  rewrite Hor in H3.
 ...
 (*
 ...

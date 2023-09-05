@@ -260,7 +260,6 @@ induction n; intros. {
 rewrite <- Nat.add_1_r.
 rewrite (rngl_pow_add_r Hon).
 cbn in Hanbn |-*.
-rewrite (rngl_mul_1_r Hon).
 destruct (is_upper_bound P _) as [H1| H1]. {
   specialize (IHn a ((a + b) / 2))%L.
   assert (H : (a ≤ (a + b) / 2)%L). {
@@ -434,7 +433,6 @@ induction p; intros. {
 }
 rewrite <- Nat.add_1_r.
 rewrite (rngl_pow_add_r Hon); cbn.
-rewrite (rngl_mul_1_r Hon).
 destruct q; [ easy | cbn ].
 apply Nat.succ_le_mono in Hpq.
 cbn in Ha, Hb.
