@@ -1373,6 +1373,20 @@ split. {
   rewrite (rngl_mul_1_l Hon).
   apply (rngl_opp_le_compat Hop Hor).
   rewrite (rngl_opp_involutive Hop).
+  destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
+    apply (rngl_le_trans Hor _ 0). {
+      rewrite <- (rngl_opp_0 Hop).
+      now apply -> (rngl_opp_le_compat Hop Hor).
+    }
+    apply H1.
+    apply (rngl_add_nonneg_nonneg Hor); apply (rngl_square_ge_0 Hop Hor).
+  } {
+    apply (rngl_nle_gt Hor) in Hzx.
+    apply (rngl_opp_lt_compat Hop Hor) in Hzx.
+    rewrite (rngl_opp_0 Hop) in Hzx.
+Search (rngl_squ (- _)%L).
+...
+(*
 ...
   specialize rl_sqrt_prop as H3.
   rewrite Hor in H3.
@@ -1394,6 +1408,7 @@ rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
 }
 apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
   split; [ apply (rngl_0_le_abs Hop Hor) | ].
+*)
 *)
 Theorem le_rngl_abs_rl_sqrt_add :
   rngl_has_1 T = true →
