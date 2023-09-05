@@ -1356,6 +1356,8 @@ split. {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
       progress unfold rl_sqrt in H3.
+      progress unfold rngl_squ in H3 at 2.
+      rewrite (rngl_mul_0_l Hos) in H3.
 ...
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
