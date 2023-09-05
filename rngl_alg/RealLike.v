@@ -104,7 +104,13 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_nth_sqrt : nat → T → T;
     rl_opt_integral_modulus_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
-    rl_nth_sqrt_prop : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L }.
+    rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
+    rl_nth_sqrt_mul_l :
+      ∀ m n a, rl_nth_sqrt (m * n) a = rl_nth_sqrt m (rl_nth_sqrt n a);
+    rl_sqrt_prop :
+      if rngl_is_ordered T then ∀ a, (0 ≤ a → 0 ≤ rl_nth_sqrt 2 a)%L
+      else not_applicable }.
+
 
 (*
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
@@ -1327,15 +1333,42 @@ intros * Hon Hop Hiv Heb Hor Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize (rl_nth_sqrt_prop 2) as H1.
-rewrite fold_rl_sqrt in H1.
 (**)
+specialize rl_sqrt_prop as H1.
+rewrite Hor in H1.
+rewrite fold_rl_sqrt in H1.
+progress unfold rl_has_integral_modulus in Hmi.
+remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
+symmetry in Him.
+destruct im as [H2| ]; [ clear Hmi | easy ].
+clear Him.
 split. {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
-    rewrite (rngl_mul_opp_l Hop).
-    rewrite (rngl_mul_1_l Hon).
-    apply (rngl_opp_le_compat Hop Hor).
-    rewrite (rngl_opp_involutive Hop).
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
+    symmetry in Ha.
+    apply (rngl_lt_iff Hor).
+    split. {
+      apply H1.
+      rewrite <- Ha.
+      rewrite <- (rngl_add_0_r 0%L).
+      apply (rngl_add_le_compat Hor). {
+        progress unfold rngl_squ.
+(* ah ouai, faut que je démontre que le carré d'un nombre réel
+   est positif ou nul *)
+...
+    destruct (rngl_eq_dec Heb a 0) as [Haz| Haz]. {
+      subst a.
+      apply H2 in Haz.
+      now destruct Hxyz.
+    }
+...
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+  specialize rl_sqrt_prop as H1.
+  rewrite Hor in H1.
+...
 (*
 ...
 rewrite if_bool_if_dec.
