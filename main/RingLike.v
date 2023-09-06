@@ -417,6 +417,9 @@ Context {rp : ring_like_prop T}.
 
 (* theorems *)
 
+Theorem fold_rngl_squ : ∀ a, (a * a)%L = rngl_squ a.
+Proof. easy. Qed.
+
 Theorem rngl_mul_comm :
   rngl_mul_is_comm T = true →
   ∀ a b, (a * b = b * a)%L.
@@ -2732,6 +2735,16 @@ Proof.
 intros Hop *.
 progress unfold rngl_squ.
 apply (rngl_mul_opp_opp Hop).
+Qed.
+
+Theorem rngl_squ_abs :
+  rngl_has_opp T = true →
+  ∀ a, rngl_squ (rngl_abs a) = rngl_squ a.
+Proof.
+intros Hop *.
+progress unfold rngl_abs.
+destruct (a ≤? 0)%L; [ | easy ].
+apply (rngl_squ_opp Hop).
 Qed.
 
 Theorem eq_rngl_add_square_0 :
