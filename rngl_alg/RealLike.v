@@ -102,6 +102,9 @@ End a.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_nth_sqrt : nat → T → T;
+    rl_cos : T → T;
+    rl_sin : T → T;
+    rl_acos : T → T;
     rl_opt_integral_modulus_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
     rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
@@ -162,16 +165,18 @@ Context {rl : real_like_prop T}.
 
 Definition rl_sqrt := rl_nth_sqrt 2.
 
-(*
 Arguments rl_acos {T ro rp real_like_prop} x%L.
 Arguments rl_cos {T ro rp real_like_prop} x%L.
+(*
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 *)
 Arguments rl_has_integral_modulus T {ro rp rl}.
 (*
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
 Arguments rl_log {T ro rp real_like_prop} x%L.
+*)
 Arguments rl_sin {T ro rp real_like_prop} x%L.
+(*
 Arguments rl_has_trigo T {ro rp real_like_prop}.
 *)
 
@@ -224,6 +229,7 @@ Qed.
 
 End a.
 
+Arguments rl_acos {T ro rp real_like_prop} x%L.
 Arguments rl_has_integral_modulus T {ro rp rl}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
 
@@ -1473,8 +1479,8 @@ Theorem all_gc_has_nth_root :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
 intros * Hnz *.
-Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
-  {rl : real_like_prop T} :
+About rl_acos.
+Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1485,8 +1491,8 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   z ≠ gc_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
   → θ =
-      (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)
-       else (- rl_acos (gre z / ρ))%L)
+       (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)
+        else (- rl_acos (gre z / ρ))%L)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Hed Hmi * Hz Hρ Hθ.
