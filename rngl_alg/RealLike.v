@@ -114,6 +114,10 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
 *)
     rl_opt_sqrt_prop :
       if rngl_is_ordered T then ∀ a, (0 ≤ a → 0 ≤ rl_nth_sqrt 2 a)%L
+      else not_applicable;
+    rl_opt_cos_acos :
+      if rngl_is_ordered T then
+        ∀ x, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x
       else not_applicable }.
 
 (*
@@ -1486,6 +1490,7 @@ Theorem polar :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
   rl_has_integral_modulus T = true →
   ∀ (z : GComplex T) ρ θ,
   z ≠ gc_zero
@@ -1495,7 +1500,7 @@ Theorem polar :
         else (- rl_acos (gre z / ρ))%L)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Hed Hmi * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Hed Hor Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1506,6 +1511,16 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [H10| H10]. {
 }
 subst θ.
 (**)
+destruct z as (zr, zi).
+cbn in Hρ |-*.
+f_equal. {
+  remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    apply rngl_leb_le in Hc.
+    specialize rl_opt_cos_acos as H1.
+    rewrite Hor in H1.
+    rewrite H1.
+...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
 ... ...
