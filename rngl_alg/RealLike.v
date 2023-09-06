@@ -105,12 +105,13 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_integral_modulus_prop :
       option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
     rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
+(* can be added if required
     rl_nth_sqrt_mul_l :
       ∀ m n a, rl_nth_sqrt (m * n) a = rl_nth_sqrt m (rl_nth_sqrt n a);
-    rl_sqrt_prop :
+*)
+    rl_opt_sqrt_prop :
       if rngl_is_ordered T then ∀ a, (0 ≤ a → 0 ≤ rl_nth_sqrt 2 a)%L
       else not_applicable }.
-
 
 (*
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
@@ -189,6 +190,15 @@ Definition gc_opt_inv_or_quot :
 
 Theorem fold_rl_sqrt : rl_nth_sqrt 2 = rl_sqrt.
 Proof. easy. Qed.
+
+Theorem rl_sqrt_prop :
+  rngl_is_ordered T = true →
+  ∀ a : T, (0 ≤ a)%L → (0 ≤ rl_nth_sqrt 2 a)%L.
+Proof.
+intros Hor.
+specialize rl_opt_sqrt_prop as H1.
+now rewrite Hor in H1.
+Qed.
 
 Theorem gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
 Proof.
@@ -1352,9 +1362,7 @@ apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs Hop Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
-  specialize rl_sqrt_prop as H1.
-  rewrite Hor in H1.
-  apply H1.
+  apply (rl_sqrt_prop Hor).
   apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
   apply (rngl_square_ge_0 Hop Hor).
 }
@@ -1380,9 +1388,6 @@ intros * Hon Hop Hiv Hed Hor Hc2 Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-specialize rl_sqrt_prop as H1.
-rewrite Hor in H1.
-rewrite fold_rl_sqrt in H1.
 progress unfold rl_has_integral_modulus in Hmi.
 remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
 symmetry in Him.
@@ -1394,7 +1399,7 @@ split. {
     symmetry in Ha.
     apply (rngl_lt_iff Hor).
     split. {
-      apply H1.
+      apply (rl_sqrt_prop Hor).
       rewrite <- Ha.
       rewrite <- (rngl_add_0_r 0%L).
       apply (rngl_add_le_compat Hor); apply (rngl_square_ge_0 Hop Hor).
@@ -1418,7 +1423,7 @@ split. {
       rewrite <- (rngl_opp_0 Hop).
       now apply -> (rngl_opp_le_compat Hop Hor).
     }
-    apply H1.
+    apply (rl_sqrt_prop Hor).
     apply (rngl_add_nonneg_nonneg Hor); apply (rngl_square_ge_0 Hop Hor).
   } {
     apply (rngl_nle_gt Hor) in Hzx.
