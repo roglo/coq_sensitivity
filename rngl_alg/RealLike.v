@@ -1372,7 +1372,6 @@ rewrite (rngl_squ_abs Hop).
 now apply (rngl_le_add_r Hor).
 Qed.
 
-(* to be completed
 Theorem rl_sqrt_div_squ_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1434,373 +1433,43 @@ split. {
     apply (rngl_square_ge_0 Hop Hor).
   }
 } {
-...
-(*
-...
-  specialize rl_sqrt_prop as H3.
-  rewrite Hor in H3.
-...
-(*
-...
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Hxy| Hxy]. {
-  apply (rngl_eqb_eq Heb) in Hxy.
-  progress unfold rl_has_integral_modulus in Hmi.
-  destruct (rl_opt_mod_intgl_prop T) as [H1| ]; [ | easy ].
-  apply H1 in Hxy.
-  destruct Hxy; subst x y.
-  now destruct Hxyz.
-}
-apply (rngl_abs_le Hop Hor).
-rewrite (rngl_abs_div Hon Hop Hiv Heb Hor). 2: {
-  apply (rl_pow_neq_0 Hon Hop Hiv Htr).
-}
-apply (rngl_div_le_1 Hon Hop Hiv Hor). 2: {
-  split; [ apply (rngl_0_le_abs Hop Hor) | ].
-*)
-*)
-...
-Search (rngl_squ (rngl_abs _)).
-Search rngl_squ.
-rewrite rngl_squ_sqrt.
-...
-apply (rngl_mul_le_mono_pos_l Hop Hor) with (c := rngl_abs a).
-rngl_mul_le_mono_pos_l:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_opp T = true
-    → rngl_is_ordered T = true
-      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
-        → ∀ a b c : T, (0 < c)%L → (a ≤ b)%L ↔ (c * a ≤ c * b)%L
-...
-apply (rngl_mul_le_compat_nonneg Hop Hor)
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_has_opp T = true
-      → rngl_is_ordered T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-...
-apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with
-  (c := rl_sqrt (rngl_squ a + b)%L). 2: {
-  specialize (rl_nth_sqrt_pow 2) as H1.
-  cbn in H1.
-  rewrite fold_rl_sqrt in H1.
-  rewrite H1.
-(* ah non, ça donne rien *)
-...
-specialize (rl_sqrt_prop 2) as H1.
-rewrite fold_rl_sqrt in H1.
-Search (_ ^ _ ≤ _)%L.
-...
-remember (rngl_squ _ + _ =? _)%L as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply (rngl_eqb_eq Heb) in Hab.
-  rewrite (rngl_abs_0 Hop).
-  apply (rngl_add_sub_eq_l Hos) in Hab.
-  progress unfold rngl_sub in Hab.
-  rewrite Hop, rngl_add_0_l in Hab.
-  subst b.
-  apply (rngl_opp_le_compat Hop Hor) in Hzb.
-  rewrite (rngl_opp_involutive Hop) in Hzb.
-  rewrite (rngl_opp_0 Hop) in Hzb.
-  specialize (rngl_square_ge_0 Hop Hor a) as H1.
-  unfold rngl_squ in Hzb.
-  specialize (rngl_le_antisymm Hor _ _ Hzb H1) as H2.
-  specialize (rngl_integral Hos) as H3.
-  rewrite Hi1, Heb in H3; cbn in H3.
-  rewrite Bool.orb_true_r in H3.
-  specialize (H3 eq_refl).
-  apply H3 in H2.
-  destruct H2; subst a; apply (rngl_le_refl Hor).
-}
-rewrite (rngl_abs_nonneg Hop Hor). 2: {
-  apply (rl_pow_ge_0 Hon Hop Hiv Hc2 Hor Htr).
-}
-unfold rl_pow.
-destruct (rngl_le_dec Hor a 0)%L as [Haz| Haz]. {
-  apply (rngl_le_trans Hor _ 0%L); [ easy | ].
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
-}
-apply (rngl_nle_gt Hor) in Haz.
-specialize rl_opt_exp_log as H1.
-rewrite Htr in H1.
-rewrite <- (H1 a Haz) at 1.
-Theorem rl_exp_increasing :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_characteristic T ≠ 2 →
-  rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
-  rl_has_trigo T = true →
-  (1 < rl_exp 1 → ∀ a b, a ≤ b → rl_exp a ≤ rl_exp b)%L.
-Proof.
-intros * Hon Hop Hiv Hc2 Heb Hor Htr He1 * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (H1 (rl_exp a)), (H1 (rl_exp b)).
-  apply (rngl_le_refl Hor).
-}
-clear He1.
-assert (H : (1 < rl_exp 1)%L). {
-  assert (Hiq : rngl_has_inv_or_quot T = true). {
-    now apply rngl_has_inv_or_quot_iff; left.
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
+    symmetry in Ha.
+    apply (rngl_lt_iff Hor).
+    split. {
+      apply (rl_sqrt_prop Hor).
+      rewrite <- Ha.
+      rewrite <- (rngl_add_0_r 0%L).
+      apply (rngl_add_le_compat Hor); apply (rngl_square_ge_0 Hop Hor).
+    } {
+      intros H3; symmetry in H3.
+      apply (f_equal rngl_squ) in H3.
+      progress unfold rngl_squ in H3 at 2.
+      rewrite (rngl_mul_0_l Hos) in H3.
+      rewrite rngl_squ_sqrt in H3.
+      move H3 at top; subst a.
+      apply H2 in Ha.
+      now destruct Hxyz.
+    }
   }
-  apply (rngl_lt_iff Hor).
-  split. 2: {
-    rewrite <- (rl_exp_0 Hon Hiq Htr) at 1.
-    intros H.
-    apply (rl_exp_inj Htr) in H.
-    symmetry in H; revert H.
-    now apply (rngl_1_neq_0_iff Hon).
+  rewrite (rngl_mul_1_l Hon).
+  destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
+    apply (le_rl_sqrt_add Hon Hop Hiv Hed Hc2 Hor).
+    apply (rngl_square_ge_0 Hop Hor).
+  } {
+    apply (rngl_nle_gt Hor) in Hzx.
+    apply (rngl_le_trans Hor _ 0). {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rl_sqrt_prop Hor).
+    apply (rngl_add_nonneg_nonneg Hor); apply (rngl_square_ge_0 Hop Hor).
   }
-Check rl_exp_inj.
-(* c'est bizarre que rl_exp soit injective sans condition et que
-   pourtant, on ne sache pas montrer que "1 ≤ rl_exp 1" ;
-   l'exponentielle est
-   - soit strictement croissante si 1<exp(1)
-   - soit strictement décroissante si exp(1)<1
-   - soit constante donc non injective si exp(1)=1
-   Question : de quelle exponentielle je parle, dans ma
-   définition de rl_exp ? Clairement pas l'exponentielle
-   de base 1, qui est constante. Et mon log, rl_log,
-   c'est quoi ?
-https://fr.wikipedia.org/wiki/Exponentielle_de_base_a#Par_la_propri%C3%A9t%C3%A9_alg%C3%A9brique
-*)
-...
-destruct (rngl_eq_dec Heb a b) as [Haeb| Haeb]. {
-  subst b; apply (rngl_le_refl Hor).
 }
-apply (rngl_lt_eq_cases Hor) in Hab.
-destruct Hab as [Hab| Hab]; [ clear Haeb | easy ].
-apply (rngl_lt_le_incl Hor).
-specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
-specialize (rl_exp_inj Htr) as H2.
-(*
-https://uel.unisciel.fr/mathematiques/analyse3/analyse3_ch01/co/apprendre_ch01_02.html
-*)
-apply (rngl_nle_gt Hor).
-intros Hba.
-apply (rngl_lt_eq_cases Hor) in Hba.
-destruct Hba as [Hba| Hba]. 2: {
-  apply H2 in Hba; subst b.
-  revert Hab; apply (rngl_lt_irrefl Hor).
-}
-...
-progress unfold continuous_at in H1.
-progress unfold is_limit_when_tending_to in H1.
-specialize (H1 a) as Ha.
-specialize (H1 b) as Hb.
-...
-apply (rngl_leb_gt Hor) in Hlab.
-Check intermediate_value_le.
-...
-intros * Hon Hop Hiv Hc2 Hor Htr He1 * Hab.
-apply (rngl_le_0_sub Hop Hor) in Hab.
-rewrite <- (rngl_sub_add Hop b a).
-rewrite (rl_exp_add Htr).
-rewrite <- (rngl_mul_1_l Hon) at 1.
-apply (rngl_mul_le_compat_nonneg Hor Hop). 2: {
-  split; [ | apply (rngl_le_refl Hor) ].
-  apply (rl_exp_ge_0 Hon Hop Hiv Hc2 Hor Htr).
-}
-split; [ apply (rngl_0_le_1 Hon Hop Hor) | ].
-Theorem rl_exp_nonneg_ge_1 {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_characteristic T ≠ 2 →
-  rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
-  rl_has_trigo T = true →
-  (1 < rl_exp 1 → ∀ x, 0 ≤ x → 1 ≤ rl_exp x)%L.
-Proof.
-intros Hon Hop Hiv Hc2 Heb Hor Htr * He1 * Hzx.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-move x after He1.
-(* since rl_log is supposed to be the inverse of rl_exp,
-   rl_exp must be monotonic. No need to use derivative. *)
-...
-specialize (rl_exp_continuous Hon Hop Hiv Hc2 Heb Hor Htr) as H1.
-progress unfold continuous_at in H1.
-progress unfold is_limit_when_tending_to in H1.
-specialize (H1 0)%L as H2.
-specialize (H2 (rl_exp x - rl_exp 1))%L.
-assert (H : (0 < rl_exp 1 - 1)%L) by _admit.
-specialize (H2 H); clear H.
-destruct H2 as (η & Hzη & Hη).
-rewrite (rl_exp_0 Hon Hiq Htr) in Hη.
-...
-Print is_limit_when_tending_to.
-Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  ∀ f', is_derivative rl_exp f' →
-  ∀ x, f' x = (f' 0 * rl_exp x)%L.
-Proof.
-intros * Hff' *.
-progress unfold is_derivative in Hff'.
-Theorem rl_exp_derivative_exists {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  ∃ f', is_derivative rl_exp f'.
-Proof.
-intros.
-progress unfold is_derivative.
-Print is_derivative.
-Theorem glop {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  is_complete T →
-  ∃ c, (is_limit_when_tending_to (λ x, (rl_exp x - 1) / x) 0 c)%L.
-Proof.
-intros Hc.
-unfold is_complete in Hc.
-Print is_limit_when_tending_to.
-Theorem glop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_has_opp_or_subt T = true →
-  rngl_is_ordered T = true →
-  ∀ f a l,
-  is_limit_when_tending_to f a l
-  → is_limit_when_tending_to_inf (λ n, f (a + 1 / rngl_of_nat n)%L) l.
-Proof.
-intros Hos Hor * Hlim.
-progress unfold is_limit_when_tending_to in Hlim.
-progress unfold is_limit_when_tending_to_inf.
-intros ε Hε.
-specialize (Hlim ε Hε).
-destruct Hlim as (η & Hzη & Hη).
-specialize (Hη (a + η)%L).
-rewrite rngl_add_comm in Hη at 1.
-rewrite (rngl_add_sub Hos) in Hη.
-assert (H : (rngl_abs η ≤ η)%L). {
-  unfold rngl_abs.
-  remember (η ≤? 0)%L as ηz eqn:Hηz; symmetry in Hηz.
-  destruct ηz; [ | apply (rngl_le_refl Hor) ].
-  apply rngl_leb_le in Hηz.
-  now apply (rngl_nlt_ge Hor) in Hηz.
-}
-specialize (Hη H); clear H.
-...
-(* hou, là... j'ai peur qu'il faille ajouter que T est archimédien... *)
-(* pourquoi pas, mais bon... *)
-exists (1 / η).
-...
-assert
-  (H :
-    is_Cauchy_sequence
-      (λ n, (rngl_of_nat n * rl_exp (1 / rngl_of_nat n - 1)))%L). {
-  intros ε Hε.
-...
-exists 0.
-intros.
-rewrite rngl_mul_nat_add_r.
-rewrite rngl_mul_add_distr_r.
-Print rngl_mul_nat.
-...
-Theorem rl_exp_derivative_prop {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  ∃ c, is_derivative rl_exp (λ x, rl_exp x * c)%L.
-Proof.
-intros.
-unfold is_derivative.
-...
-Theorem glop {T} {ro : ring_like_op T}
-  {rp : ring_like_prop T} {rl : real_like_prop T} :
-  rngl_has_1 T = true →
-  ∀ x ε, (0 < ε → ε < rl_exp (x + ε) - rl_exp x)%L.
-Proof.
-intros * Hon * Hε.
-rewrite rl_exp_add.
-remember (_ * _)%L as z.
-rewrite <- (rngl_mul_1_r Hon (rl_exp x)).
-subst z.
-rewrite <- rngl_mul_sub_distr_l.
-... ...
-now apply rl_exp_nonneg_ge_1.
-... ...
-specialize rl_opt_exp_ln as H1.
-rewrite Htr in H1.
-rewrite <- (H1 a Haz) at 1.
-apply rl_exp_increasing.
-... ...
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
-specialize (le_rngl_abs_rl_sqrt_add Hop Hi1 Heb Hor) as H1.
-specialize (H1 (rngl_abs x) (rngl_squ y)) as H1.
-assert (H : (0 ≤ rngl_squ y)%L). {
-  progress unfold rngl_squ.
-  apply (rngl_square_ge_0 Hop Hor).
-}
-specialize (H1 H); clear H.
-unfold rl_sqrt in H1.
-...
-intros * Hon Hop Hiv Hor * Haz Hza.
-specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-rewrite <- (rngl_mul_inv_l Hon Hiv a Haz) in H1.
-destruct (rngl_le_dec Hor 0 a⁻¹)%L as [H2| H2]; [ easy | ].
-apply (rngl_not_le Hor) in H2.
-destruct H2 as (H2, H3).
-specialize (rngl_mul_nonneg_nonpos Hop Hor) as H4.
-specialize (H4 _ _ Hza H3).
-Check rngl_not_le.
-...
-About rngl_squ_opp_1.
-Search rngl_inv.
-Check rngl_mul_nonneg_nonneg.
-...
-Require Import ZArith.
-Search (0 <= _ * _)%Z.
-Z.mul_nonneg_nonneg: ∀ n m : Z, (0 <= n)%Z → (0 <= m)%Z → (0 <= n * m)%Z
-...
-Check rngl_mul_le_compat_nonneg.
-specialize (rngl_mul_le_compat_nonneg Hor Hop 0 (a⁻¹) 1 (a⁻¹))%L as H1.
-...
-About rngl_inv_neq_0.
-Check rngl_mul_move_1_r.
-(*
-Check rngl_inv_le_0_compat.
-*)
-Require Import Rational.
-Import Q.Notations.
-Search Q.inv.
-Require Import QArith.
-Search (_ <= / _)%Q.
-Print Qinv_le_0_compat.
-Qinv_le_0_compat
-     : ∀ a : Q, 0 <= a → 0 <= / a
-...
-Check Qopp_le_compat.
+Qed.
 
-Search (_ * _ == 1)%Q.
-Search (/ _)%Q.
-Search (_⁻¹ ≤ _)%L.
-Check rngl_not_le.
-...
-        exfalso.
-Check rngl_mul_le_compat_nonneg.
-...
-        rewrite (rngl_mul_opp_l Hop).
-...
-rngl_mul_le_compat_nonneg:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_is_ordered T = true
-      → rngl_has_opp T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-rngl_mul_le_compat_nonpos:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_is_ordered T = true
-      → rngl_has_opp T = true → ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-... ...
-rewrite rngl_abs_div.
-rngl_abs (x / y) ≤ 1 ↔ rngl_abs x ≤ rngl_abs y
-...
-
-Theorem all_gc_has_nth_root {T} {ro : ring_like_op T} :
+(* to be completed
+Theorem all_gc_has_nth_root :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
 intros * Hnz *.
@@ -1811,7 +1480,6 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
-  rl_has_trigo = true →
   rl_has_integral_modulus T = true →
   ∀ (z : GComplex T) ρ θ,
   z ≠ gc_zero
@@ -1821,7 +1489,7 @@ Theorem polar {T} {ro : ring_like_op T} {rp : ring_like_prop T}
        else (- rl_acos (gre z / ρ))%L)
   → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Heb Htr Hmi * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Hed Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
