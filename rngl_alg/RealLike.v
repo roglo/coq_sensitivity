@@ -221,6 +221,33 @@ specialize rl_opt_cos_acos as H1.
 now rewrite Hor in H1.
 Qed.
 
+Theorem rl_integral_modulus_prop :
+  rl_has_integral_modulus T = true →
+  ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
+Proof.
+intros Him * Hab.
+progress unfold rl_has_integral_modulus in Him.
+destruct rl_opt_integral_modulus_prop as [Hmi| ]; [ | easy ].
+now apply Hmi.
+Qed.
+
+Theorem rngl_squ_sqrt : ∀ a, rngl_squ (rl_sqrt a) = a.
+Proof.
+intros.
+apply (rl_nth_sqrt_pow 2 a).
+Qed.
+
+Theorem eq_rl_sqrt_0 :
+  rngl_has_opp_or_subt T = true →
+  ∀ a, rl_sqrt a = 0%L → a = 0%L.
+Proof.
+intros Hos * Ha.
+apply (f_equal rngl_squ) in Ha.
+rewrite rngl_squ_sqrt in Ha.
+progress unfold rngl_squ in Ha.
+now rewrite (rngl_mul_0_l Hos) in Ha.
+Qed.
+
 Theorem gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
 Proof.
 remember (rngl_opt_eq_dec T) as ed eqn:Hed; symmetry in Hed.
@@ -639,9 +666,7 @@ split. {
   rewrite H1; [ easy | ].
   intros H2.
   generalize Hrl; intros H.
-  unfold rl_has_integral_modulus in H.
-  destruct (rl_opt_integral_modulus_prop T) as [H3| ]; [ clear H | easy ].
-  apply H3 in H2.
+  apply (rl_integral_modulus_prop H) in H2.
   apply Haz.
   now apply eq_gc_eq; cbn.
 } {
@@ -1352,12 +1377,6 @@ destruct d. 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
-Theorem rngl_squ_sqrt : ∀ a, rngl_squ (rl_sqrt a) = a.
-Proof.
-intros.
-apply (rl_nth_sqrt_pow 2 a).
-Qed.
-
 Theorem le_rl_sqrt_add :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1411,11 +1430,13 @@ intros * Hon Hop Hiv Hed Hor Hc2 Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+(*
 progress unfold rl_has_integral_modulus in Hmi.
 remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
 symmetry in Him.
 destruct im as [H2| ]; [ clear Hmi | easy ].
 clear Him.
+*)
 split. {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
@@ -1433,7 +1454,7 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite rngl_squ_sqrt in H3.
       move H3 at top; subst a.
-      apply H2 in Ha.
+      apply (rl_integral_modulus_prop Hmi) in Ha.
       now destruct Hxyz.
     }
   }
@@ -1473,7 +1494,7 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite rngl_squ_sqrt in H3.
       move H3 at top; subst a.
-      apply H2 in Ha.
+      apply (rl_integral_modulus_prop Hmi) in Ha.
       now destruct Hxyz.
     }
   }
@@ -1518,6 +1539,10 @@ intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now left; rewrite Hiv, Hon.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   destruct z as (rz, iz).
@@ -1534,10 +1559,7 @@ f_equal. {
       rewrite (rngl_mul_comm Hic).
       symmetry; apply (rngl_div_mul Hon Hiv).
       rewrite Hρ; intros H2.
-      apply (f_equal rngl_squ) in H2.
-      rewrite rngl_squ_sqrt in H2.
-      progress unfold rngl_squ in H2 at 3.
-      rewrite (rngl_mul_0_l Hos) in H2.
+      apply (eq_rl_sqrt_0 Hos) in H2.
       progress unfold rl_has_integral_modulus in Hmi.
       remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
       symmetry in Him.
@@ -1553,17 +1575,43 @@ f_equal. {
   }
   destruct (0 ≤? zi)%L; [ easy | now rewrite rl_cos_opp ].
 } {
-  assert (∀ x, rngl_squ (rl_sin x) = (1 - rngl_squ (rl_cos x))%L). {
+  assert (Hsc : ∀ x, rngl_squ (rl_sin x) = (1 - rngl_squ (rl_cos x))%L). {
     intros x.
     symmetry; apply (rngl_add_sub_eq_l Hos).
     apply rl_cos2_sin2.
   }
+  assert (Hρz : ρ ≠ 0%L). {
+    rewrite Hρ.
+    intros H.
+    apply (eq_rl_sqrt_0 Hos) in H.
+    apply (rl_integral_modulus_prop Hmi) in H.
+    now destruct H; subst zr zi.
+  }
   remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
   destruct c. {
     apply rngl_leb_le in Hc.
+    apply (rngl_mul_cancel_l Hi1 ρ⁻¹)%L.
+...
+2: {
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_inv_l.
+...
+
+Search (_ / _ = _)%L.
+Search (_ / _ = _)%Z.
+Require Import QArith.
+Search (_ / _ == _)%Q.
+Search (_ == _ / _)%Q.
 Search (rngl_squ _ = rngl_squ _).
 Search (_ * _ = _ * _)%L.
 ...
+rngl_div_div_mul_mul:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    rngl_has_1 T = true
+    → rngl_mul_is_comm T = true
+      → rngl_has_inv T = true
+        → ∀ a b c d : T,
+            b ≠ 0%L → d ≠ 0%L → (a / b)%L = (c / d)%L ↔ (a * d)%L = (b * c)%L
     split. {
       apply (rngl_le_div_r Hon Hop Hiv Hor).
 ...
