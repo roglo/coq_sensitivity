@@ -1599,6 +1599,7 @@ f_equal. {
       now destruct H; subst zr zi.
     }
     rewrite <- (rngl_abs_nonneg Hop Hor (rl_sin _)). 2: {
+(* acos(-1)=π *)
 ...
 Search (_ * _ = _ * _)%L.
 Search (_ * _ = _ * _)%Z.
