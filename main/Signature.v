@@ -35,12 +35,6 @@ Fixpoint ε (l : list nat) :=
   | i :: q => (ε_aux i q * ε q)%L
   end.
 
-Definition minus_one_pow n :=
-  match n mod 2 with
-  | 0 => 1%L
-  | _ => (- 1%L)%L
-  end.
-
 (* for testing with a elementary ring-like *)
 
 Inductive test_rl := Minus_one | Zero | One.

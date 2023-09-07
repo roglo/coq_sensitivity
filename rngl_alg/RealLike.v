@@ -100,19 +100,12 @@ Definition is_derivative f f' :=
 
 End a.
 
-(*
-Require Import Main.Signature.
-Print minus_one_pow.
-*)
-
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
     rl_nth_sqrt : nat → T → T;
     rl_cos : T → T;
-(**)
     rl_sin : T → T;
     rl_acos : T → T;
-(**)
     rl_opt_integral_modulus_prop :
       if rl_has_integral_modulus then
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
@@ -125,13 +118,13 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_sqrt_nonneg :
       if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
       else not_applicable;
-(*
+(**)
     rl_cos_as_series :
       ∀ a b, rl_cos a = b ↔
       is_limit_when_tending_to_inf
         (λ n, ∑ (i = 0, n), minus_one_pow n / rngl_of_nat (2 * n)! * a ^ n)%L
         b;
-*)
+(**)
     rl_cos2_sin2 :
       ∀ x, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L;
     rl_cos_opp : ∀ x, rl_cos (- x)%L = rl_cos x;

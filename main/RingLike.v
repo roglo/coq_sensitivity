@@ -4380,6 +4380,14 @@ f_equal.
 apply (rngl_one_sub_half Hon Hop Hiv Hor).
 Qed.
 
+(* (-1) ^ n *)
+
+Definition minus_one_pow n :=
+  match n mod 2 with
+  | 0 => 1%L
+  | _ => (- 1%L)%L
+  end.
+
 (* *)
 
 Record in_charac_0_field :=
