@@ -101,19 +101,22 @@ Definition is_derivative f f' :=
 End a.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_nth_sqrt : nat → T → T;
+  { rl_has_integral_modulus : bool;
+    rl_nth_sqrt : nat → T → T;
     rl_cos : T → T;
     rl_sin : T → T;
     rl_acos : T → T;
     rl_opt_integral_modulus_prop :
-      option (∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L);
+      if rl_has_integral_modulus then
+        ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
+      else not_applicable;
     rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
 (* can be added if required
     rl_nth_sqrt_mul_l :
       ∀ m n a, rl_nth_sqrt (m * n) a = rl_nth_sqrt m (rl_nth_sqrt n a);
 *)
-    rl_opt_sqrt_prop :
-      if rngl_is_ordered T then ∀ a, (0 ≤ a → 0 ≤ rl_nth_sqrt 2 a)%L
+    rl_opt_sqrt_nonneg :
+      if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
       else not_applicable;
     rl_cos2_sin2 :
       ∀ x, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L;
@@ -157,11 +160,11 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_log_exp :
       if rl_has_trigo then ∀ x : T, rl_log (rl_exp x) = x
       else not_applicable }.
-*)
 
 Definition rl_has_integral_modulus {T} {ro : ring_like_op T}
     {rp : ring_like_prop T} {rl : real_like_prop T} :=
   bool_of_option rl_opt_integral_modulus_prop.
+*)
 
 Section a.
 
@@ -177,7 +180,7 @@ Arguments rl_cos {T ro rp real_like_prop} x%L.
 (*
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 *)
-Arguments rl_has_integral_modulus T {ro rp rl}.
+Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 (*
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
 Arguments rl_log {T ro rp real_like_prop} x%L.
@@ -203,12 +206,12 @@ Definition gc_opt_inv_or_quot :
 Theorem fold_rl_sqrt : rl_nth_sqrt 2 = rl_sqrt.
 Proof. easy. Qed.
 
-Theorem rl_sqrt_prop :
+Theorem rl_sqrt_nonneg :
   rngl_is_ordered T = true →
-  ∀ a : T, (0 ≤ a)%L → (0 ≤ rl_nth_sqrt 2 a)%L.
+  ∀ a : T, (0 ≤ rl_sqrt a)%L.
 Proof.
 intros Hor.
-specialize rl_opt_sqrt_prop as H1.
+specialize rl_opt_sqrt_nonneg as H1.
 now rewrite Hor in H1.
 Qed.
 
@@ -226,8 +229,8 @@ Theorem rl_integral_modulus_prop :
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
 intros Him * Hab.
-progress unfold rl_has_integral_modulus in Him.
-destruct rl_opt_integral_modulus_prop as [Hmi| ]; [ | easy ].
+specialize rl_opt_integral_modulus_prop as Hmi.
+rewrite Him in Hmi.
 now apply Hmi.
 Qed.
 
@@ -275,7 +278,7 @@ End a.
 Arguments rl_acos {T ro rp real_like_prop} x%L.
 Arguments rl_sqrt {T ro rp rl} x%L.
 
-Arguments rl_has_integral_modulus T {ro rp rl}.
+Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
 
 Declare Scope gc_scope.
@@ -1405,9 +1408,7 @@ apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs Hop Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
-  apply (rl_sqrt_prop Hor).
-  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rl_sqrt_nonneg Hor).
 }
 do 2 rewrite fold_rngl_squ.
 rewrite rngl_squ_sqrt.
@@ -1443,10 +1444,7 @@ split. {
     symmetry in Ha.
     apply (rngl_lt_iff Hor).
     split. {
-      apply (rl_sqrt_prop Hor).
-      rewrite <- Ha.
-      rewrite <- (rngl_add_0_r 0%L).
-      apply (rngl_add_le_compat Hor); apply (rngl_square_ge_0 Hop Hor).
+      apply (rl_sqrt_nonneg Hor).
     } {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
@@ -1467,8 +1465,7 @@ split. {
       rewrite <- (rngl_opp_0 Hop).
       now apply -> (rngl_opp_le_compat Hop Hor).
     }
-    apply (rl_sqrt_prop Hor).
-    apply (rngl_add_nonneg_nonneg Hor); apply (rngl_square_ge_0 Hop Hor).
+    apply (rl_sqrt_nonneg Hor).
   } {
     apply (rngl_nle_gt Hor) in Hzx.
     apply (rngl_opp_lt_compat Hop Hor) in Hzx.
@@ -1483,10 +1480,7 @@ split. {
     symmetry in Ha.
     apply (rngl_lt_iff Hor).
     split. {
-      apply (rl_sqrt_prop Hor).
-      rewrite <- Ha.
-      rewrite <- (rngl_add_0_r 0%L).
-      apply (rngl_add_le_compat Hor); apply (rngl_square_ge_0 Hop Hor).
+      apply (rl_sqrt_nonneg Hor).
     } {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
@@ -1507,8 +1501,7 @@ split. {
     apply (rngl_le_trans Hor _ 0). {
       now apply (rngl_lt_le_incl Hor).
     }
-    apply (rl_sqrt_prop Hor).
-    apply (rngl_add_nonneg_nonneg Hor); apply (rngl_square_ge_0 Hop Hor).
+    apply (rl_sqrt_nonneg Hor).
   }
 }
 Qed.
@@ -1560,11 +1553,7 @@ f_equal. {
       symmetry; apply (rngl_div_mul Hon Hiv).
       rewrite Hρ; intros H2.
       apply (eq_rl_sqrt_0 Hos) in H2.
-      progress unfold rl_has_integral_modulus in Hmi.
-      remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
-      symmetry in Him.
-      destruct im as [Hs| ]; [ clear Hmi | easy ].
-      apply Hs in H2.
+      apply (rl_integral_modulus_prop Hmi) in H2.
       now destruct H2; subst zr zi.
     }
     subst ρ.
@@ -1590,37 +1579,35 @@ f_equal. {
   remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
   destruct c. {
     apply rngl_leb_le in Hc.
-    apply (rngl_mul_cancel_l Hi1 ρ⁻¹)%L.
+    apply (rngl_mul_cancel_l Hi1 ρ⁻¹)%L. {
+      now apply (rngl_inv_neq_0 Hon Hos Hiv).
+    }
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_comm Hic).
+    rewrite (fold_rngl_div Hiv).
+    rewrite <- (rngl_abs_nonneg Hop Hor (zi / ρ)%L). 2: {
+      apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+      rewrite Hρ.
+      apply (rngl_lt_iff Hor).
+      split; [ apply (rl_sqrt_nonneg Hor) | ].
+      apply not_eq_sym.
+      intros H.
+      apply (eq_rl_sqrt_0 Hos) in H.
+      apply (rl_integral_modulus_prop Hmi) in H.
+      now destruct H; subst zr zi.
+    }
+    rewrite <- (rngl_abs_nonneg Hop Hor (rl_sin _)). 2: {
 ...
-2: {
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_inv_l.
-...
-
-Search (_ / _ = _)%L.
-Search (_ / _ = _)%Z.
-Require Import QArith.
-Search (_ / _ == _)%Q.
-Search (_ == _ / _)%Q.
-Search (rngl_squ _ = rngl_squ _).
 Search (_ * _ = _ * _)%L.
-...
-rngl_div_div_mul_mul:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_1 T = true
-    → rngl_mul_is_comm T = true
-      → rngl_has_inv T = true
-        → ∀ a b c d : T,
-            b ≠ 0%L → d ≠ 0%L → (a / b)%L = (c / d)%L ↔ (a * d)%L = (b * c)%L
-    split. {
-      apply (rngl_le_div_r Hon Hop Hiv Hor).
-...
-      apply Hz; clear Hz.
-      progress unfold gc_zero.
-      f_equal.
-Search (rl_sqrt _ = 0)%L.
-Search (rl_nth_sqrt_pow).
-Search ((_ / _) * _)%L.
+Search (_ * _ = _ * _)%Z.
+Print Z.square.
+Search Z.square.
+Theorem eq_rngl_squ_rngl_abs :
+  ∀ a b, rngl_squ a = rngl_squ b → rngl_abs a = rngl_abs b.
+... ...
+    apply eq_rngl_squ_rngl_abs.
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
