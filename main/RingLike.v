@@ -861,9 +861,9 @@ Qed.
 
 Theorem rngl_sub_sub_swap :
   rngl_has_opp T = true →
-  ∀ n m p, (n - m - p = n - p - m)%L.
+  ∀ a b c, (a - b - c = a - c - b)%L.
 Proof.
-intros Hop n m p.
+intros Hop *.
 progress unfold rngl_sub.
 rewrite Hop.
 apply rngl_add_add_swap.
@@ -889,12 +889,12 @@ Qed.
 
 Theorem rngl_mul_mul_swap :
   rngl_mul_is_comm T = true →
-  ∀ n m p, (n * m * p = n * p * m)%L.
+  ∀ a b c, (a * b * c = a * c * b)%L.
 Proof.
-intros Hic n m p; simpl.
+intros Hic *.
 do 2 rewrite <- rngl_mul_assoc.
-assert (m * p = p * m)%L as H by now apply rngl_mul_comm.
-rewrite H; reflexivity.
+f_equal.
+apply (rngl_mul_comm Hic).
 Qed.
 
 Theorem rngl_div_div_swap :
