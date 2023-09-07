@@ -1519,7 +1519,29 @@ f_equal. {
     apply rngl_leb_le in Hc.
     specialize rl_opt_cos_acos as H1.
     rewrite Hor in H1.
-    rewrite H1.
+    rewrite H1. {
+      rewrite (rngl_mul_comm Hic).
+      symmetry; apply (rngl_div_mul Hon Hiv).
+      rewrite Hρ; intros H2.
+      apply (f_equal rngl_squ) in H2.
+      rewrite rngl_squ_sqrt in H2.
+      progress unfold rngl_squ in H2 at 3.
+      rewrite (rngl_mul_0_l Hos) in H2.
+      progress unfold rl_has_integral_modulus in Hmi.
+      remember (rl_opt_integral_modulus_prop T) as im eqn:Him.
+      symmetry in Him.
+      destruct im as [Hs| ]; [ clear Hmi | easy ].
+      apply Hs in H2.
+      now destruct H2; subst zr zi.
+    }
+    subst ρ.
+...
+      apply Hz; clear Hz.
+      progress unfold gc_zero.
+      f_equal.
+Search (rl_sqrt _ = 0)%L.
+Search (rl_nth_sqrt_pow).
+Search ((_ / _) * _)%L.
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
