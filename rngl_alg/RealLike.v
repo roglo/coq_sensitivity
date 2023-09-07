@@ -209,6 +209,15 @@ specialize rl_opt_sqrt_prop as H1.
 now rewrite Hor in H1.
 Qed.
 
+Theorem rl_cos_acos :
+  rngl_is_ordered T = true →
+  ∀ x : T, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x.
+Proof.
+intros Hor.
+specialize rl_opt_cos_acos as H1.
+now rewrite Hor in H1.
+Qed.
+
 Theorem gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
 Proof.
 remember (rngl_opt_eq_dec T) as ed eqn:Hed; symmetry in Hed.
@@ -1517,9 +1526,7 @@ f_equal. {
   remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
   destruct c. {
     apply rngl_leb_le in Hc.
-    specialize rl_opt_cos_acos as H1.
-    rewrite Hor in H1.
-    rewrite H1. {
+    rewrite (rl_cos_acos Hor). {
       rewrite (rngl_mul_comm Hic).
       symmetry; apply (rngl_div_mul Hon Hiv).
       rewrite Hρ; intros H2.
