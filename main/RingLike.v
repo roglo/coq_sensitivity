@@ -2747,6 +2747,48 @@ destruct (a ≤? 0)%L; [ | easy ].
 apply (rngl_squ_opp Hop).
 Qed.
 
+Theorem rngl_squ_add :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a b, (rngl_squ (a + b) = rngl_squ a + 2 * a * b + rngl_squ b)%L.
+Proof.
+intros Hic Hon *.
+progress unfold rngl_squ.
+rewrite rngl_mul_add_distr_l.
+do 2 rewrite rngl_mul_add_distr_r.
+rewrite rngl_add_assoc; f_equal.
+rewrite <- rngl_add_assoc; f_equal.
+rewrite <- rngl_mul_assoc.
+rewrite <- (rngl_add_diag Hon); f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem rngl_squ_sub :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a b, (rngl_squ (a - b) = rngl_squ a - 2 * a * b + rngl_squ b)%L.
+Proof.
+intros Hop Hic Hon *.
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite (rngl_squ_add Hic Hon).
+rewrite (rngl_squ_opp Hop).
+f_equal; f_equal.
+apply (rngl_mul_opp_r Hop).
+Qed.
+
+Theorem rngl_squ_mul :
+  rngl_mul_is_comm T = true →
+  ∀ a b, rngl_squ (a * b)%L = (rngl_squ a * rngl_squ b)%L.
+Proof.
+intros Hic *.
+progress unfold rngl_squ.
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+apply (rngl_mul_mul_swap Hic).
+Qed.
+
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

@@ -100,6 +100,57 @@ Definition is_derivative f f' :=
 
 End a.
 
+(* angles; personal version *)
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hic : rngl_mul_is_comm T = true}.
+Context {Hon : rngl_has_1 T = true}.
+
+Record angle := mk_ang
+  { rngl_cos : T;
+    rngl_sin : T;
+    rngl_sin2_cos2 : (rngl_squ rngl_cos + rngl_squ rngl_sin = 1)%L }.
+
+Theorem rngl_sin2_cos2_add :
+  ∀ a b,
+  (rngl_squ (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b) +
+   rngl_squ (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b))%L = 1%L.
+Proof.
+intros.
+destruct a as (x, y, Hxy).
+destruct b as (x', y', Hxy'); cbn.
+move x' before y; move y' before x'.
+rewrite (rngl_squ_add Hic Hon).
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite rngl_add_add_swap.
+do 2 rewrite rngl_add_assoc.
+rewrite <- (rngl_add_sub_swap Hop).
+do 4 rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (2 * x * y')%L).
+rewrite (rngl_mul_mul_swap Hic (2 * x) y')%L.
+rewrite (rngl_mul_mul_swap Hic (2 * x * x') y' y)%L.
+rewrite (rngl_sub_add Hop).
+do 4 rewrite (rngl_squ_mul Hic).
+rewrite <- rngl_add_assoc.
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite Hxy'.
+now do 2 rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Definition angle_add a b :=
+  {| rngl_cos := (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L;
+     rngl_sin := (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)%L;
+     rngl_sin2_cos2 := rngl_sin2_cos2_add a b |}.
+
+End a.
+
+(* end angles *)
+
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
     rl_nth_sqrt : nat → T → T;
