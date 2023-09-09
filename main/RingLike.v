@@ -231,6 +231,8 @@ Definition rngl_one {T} {ro : ring_like_op T} :=
   | None => rngl_zero
   end.
 
+Definition rngl_squ {T} {ro : ring_like_op T} x := rngl_mul x x.
+
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
 Notation "2" := (rngl_add rngl_one rngl_one) : ring_like_scope.
@@ -242,6 +244,8 @@ Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "a < b" := (rngl_lt a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
+  ring_like_scope.
+Notation "a '²'" := (rngl_squ a) (at level 1, format "a ²") :
   ring_like_scope.
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%L (at level 70, b at next level) :
   ring_like_scope.
@@ -405,8 +409,6 @@ Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   | S m => (a * rngl_power a m)%L
   end.
 
-Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%L.
-
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
 Section a.
@@ -417,7 +419,7 @@ Context {rp : ring_like_prop T}.
 
 (* theorems *)
 
-Theorem fold_rngl_squ : ∀ a, (a * a)%L = rngl_squ a.
+Theorem fold_rngl_squ : ∀ a : T, (a * a)%L = rngl_squ a.
 Proof. easy. Qed.
 
 Theorem rngl_mul_comm :
@@ -3909,6 +3911,17 @@ rewrite (rngl_add_sub_assoc Hop).
 rewrite (rngl_mul_comm Hic b a).
 f_equal; symmetry.
 apply (rngl_sub_add Hop).
+Qed.
+
+Theorem rngl_squ_inv :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  ∀ a, (a ≠ 0 → (a⁻¹)² = (a²)⁻¹)%L.
+Proof.
+intros Hon Hos Hiv * Haz.
+progress unfold rngl_squ.
+now rewrite (rngl_inv_mul_distr Hon Hos Hiv).
 Qed.
 
 Theorem eq_rngl_squ_rngl_abs :

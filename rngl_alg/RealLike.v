@@ -351,7 +351,7 @@ End a.
 (*
 Arguments rl_acos {T ro rp real_like_prop} x%L.
 *)
-Arguments rl_sqrt {T ro rp rl} x%L.
+Arguments rl_sqrt {T ro rp rl} _%L.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
@@ -361,6 +361,7 @@ Delimit Scope gc_scope with C.
 
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
+Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 
 Definition gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -1688,6 +1689,18 @@ f_equal. {
     rewrite rngl_squ_sqrt.
     symmetry.
     apply (rngl_add_sub_eq_l Hos).
+    progress unfold rngl_div.
+    rewrite Hiv.
+    do 2 rewrite (rngl_squ_mul Hic).
+    rewrite <- rngl_mul_add_distr_r.
+    rewrite (rngl_squ_inv Hon Hos Hiv); [ | easy ].
+    rewrite Hρ.
+    rewrite rngl_squ_sqrt.
+    apply (rngl_mul_inv_r Hon Hiv).
+    intros H.
+    apply (rl_integral_modulus_prop Hmi) in H.
+    now destruct H; subst zr zi.
+  } {
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
