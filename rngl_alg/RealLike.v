@@ -122,7 +122,7 @@ Record angle := mk_ang
     rngl_sin : T;
     rngl_sin2_cos2 : (rngl_squ rngl_cos + rngl_squ rngl_sin = 1)%L }.
 
-Theorem rngl_sin2_cos2_add :
+Theorem angle_add_prop :
   ∀ a b,
   (rngl_squ (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b) +
    rngl_squ (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b))%L = 1%L.
@@ -148,21 +148,32 @@ rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
+Theorem angle_opp_prop : ∀ a,
+  (rngl_squ (rngl_cos a) + rngl_squ (- rngl_sin a))%L = 1%L.
+Proof.
+intros.
+rewrite (rngl_squ_opp Hop).
+now destruct a.
+Qed.
+
 Definition angle_add a b :=
   {| rngl_cos := (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L;
      rngl_sin := (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)%L;
-     rngl_sin2_cos2 := rngl_sin2_cos2_add a b |}.
+     rngl_sin2_cos2 := angle_add_prop a b |}.
+
+Definition angle_opp a :=
+  {| rngl_cos := rngl_cos a; rngl_sin := (- rngl_sin a)%L;
+     rngl_sin2_cos2 := angle_opp_prop a |}.
 
 End a.
+
+Arguments angle T {ro}.
 
 (* end angles *)
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
     rl_nth_sqrt : nat → T → T;
-    rl_cos : T → T;
-    rl_sin : T → T;
-    rl_acos : T → T;
     rl_opt_integral_modulus_prop :
       if rl_has_integral_modulus then
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
@@ -174,21 +185,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
 *)
     rl_opt_sqrt_nonneg :
       if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
-      else not_applicable;
-(**)
-    rl_cos_as_series :
-      ∀ a b, rl_cos a = b ↔
-      is_limit_when_tending_to_inf
-        (λ n, ∑ (i = 0, n), minus_one_pow n / rngl_of_nat (2 * n)! * a ^ n)%L
-        b;
-(**)
-    rl_cos2_sin2 :
-      ∀ x, (rngl_squ (rl_cos x) + rngl_squ (rl_sin x))%L = 1%L;
-    rl_cos_opp : ∀ x, rl_cos (- x)%L = rl_cos x;
-    rl_opt_cos_acos :
-      if rngl_is_ordered T then
-        ∀ x, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x
-      else not_applicable (**) }.
+      else not_applicable }.
 
 (*
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
@@ -239,18 +236,15 @@ Context {rl : real_like_prop T}.
 
 Definition rl_sqrt := rl_nth_sqrt 2.
 
-Arguments rl_acos {T ro rp real_like_prop} x%L.
-Arguments rl_cos {T ro rp real_like_prop} x%L.
 (*
+Arguments rl_cos {T ro rp real_like_prop} x%L.
 Arguments rl_exp {T ro rp real_like_prop} x%L.
 *)
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 (*
 Arguments rl_opt_mod_intgl_prop T {ro rp real_like_prop}.
 Arguments rl_log {T ro rp real_like_prop} x%L.
-*)
 Arguments rl_sin {T ro rp real_like_prop} x%L.
-(*
 Arguments rl_has_trigo T {ro rp real_like_prop}.
 *)
 
@@ -279,15 +273,6 @@ specialize rl_opt_sqrt_nonneg as H1.
 now rewrite Hor in H1.
 Qed.
 
-Theorem rl_cos_acos :
-  rngl_is_ordered T = true →
-  ∀ x : T, (-1 ≤ x ≤ 1)%L → rl_cos (rl_acos x) = x.
-Proof.
-intros Hor.
-specialize rl_opt_cos_acos as H1.
-now rewrite Hor in H1.
-Qed.
-
 Theorem rl_integral_modulus_prop :
   rl_has_integral_modulus T = true →
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
@@ -303,6 +288,30 @@ Proof.
 intros.
 apply (rl_nth_sqrt_pow 2 a).
 Qed.
+
+Context (Hop : rngl_has_opp T = true).
+
+Theorem rl_acos_sin2_cos2 :
+  ∀ x, (rngl_squ x + rngl_squ (rl_sqrt (1 - rngl_squ x)))%L = 1%L.
+Proof.
+intros.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+rewrite rngl_squ_sqrt.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+apply (rngl_add_sub Hos).
+Qed.
+
+Definition rl_acos (x : T) :=
+  {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
+     rngl_sin2_cos2 := rl_acos_sin2_cos2 x |}.
+
+Arguments rl_acos x%L.
+
+Theorem rl_cos_acos : ∀ x, rngl_cos (rl_acos x) = x.
+Proof. easy. Qed.
 
 Theorem eq_rl_sqrt_0 :
   rngl_has_opp_or_subt T = true →
@@ -339,7 +348,9 @@ Qed.
 
 End a.
 
+(*
 Arguments rl_acos {T ro rp real_like_prop} x%L.
+*)
 Arguments rl_sqrt {T ro rp rl} x%L.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
@@ -362,6 +373,8 @@ Definition gc_ring_like_op T
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot;
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
+
+Arguments rl_acos {T ro rp rl Hop} x%L.
 
 Section a.
 
@@ -1570,6 +1583,11 @@ split. {
 }
 Qed.
 
+Context (Hop : rngl_has_opp T = true).
+
+Definition rl_acos' := @rl_acos _ _ _ _ Hop.
+Definition angle_opp' := @angle_opp _ _ _ Hop.
+
 (* to be completed
 Theorem all_gc_has_nth_root :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
@@ -1578,7 +1596,6 @@ intros * Hnz *.
 Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
@@ -1588,11 +1605,11 @@ Theorem polar :
   z ≠ gc_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
   → θ =
-       (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)
-        else (- rl_acos (gre z / ρ))%L)
-  → z = mk_gc (ρ * rl_cos θ) (ρ * rl_sin θ).
+       (if rngl_leb 0%L (gim z) then rl_acos' (gre z / ρ)%L
+        else (angle_opp' (rl_acos' (gre z / ρ))%L))
+  → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
+intros * Hic Hon Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1611,23 +1628,17 @@ subst θ.
 destruct z as (zr, zi).
 cbn in Hρ |-*.
 f_equal. {
-  assert (Hzr : zr = (ρ * rl_cos (rl_acos (zr / ρ)))%L). {
-    rewrite (rl_cos_acos Hor). {
-      rewrite (rngl_mul_comm Hic).
-      symmetry; apply (rngl_div_mul Hon Hiv).
-      rewrite Hρ; intros H2.
-      apply (eq_rl_sqrt_0 Hos) in H2.
-      apply (rl_integral_modulus_prop Hmi) in H2.
-      now destruct H2; subst zr zi.
-    }
-    subst ρ.
-    apply (rl_sqrt_div_squ_squ Hon Hop Hiv Hed Hor Hc2 Hmi).
-    progress unfold gc_zero in Hz.
-    destruct (rngl_eq_dec Hed zr 0) as [Hrz| Hrz]; [ right | now left ].
-    now intros H; subst zr zi.
+  assert (Hzr : zr = (ρ * (zr / ρ))%L). {
+    rewrite (rngl_mul_comm Hic).
+    symmetry; apply (rngl_div_mul Hon Hiv).
+    rewrite Hρ; intros H2.
+    apply (eq_rl_sqrt_0 Hos) in H2.
+    apply (rl_integral_modulus_prop Hmi) in H2.
+    now destruct H2; subst zr zi.
   }
-  destruct (0 ≤? zi)%L; [ easy | now rewrite rl_cos_opp ].
+  now destruct (0 ≤? zi)%L.
 } {
+...
   assert (Hsc : ∀ x, rngl_squ (rl_sin x) = (1 - rngl_squ (rl_cos x))%L). {
     intros x.
     symmetry; apply (rngl_add_sub_eq_l Hos).
