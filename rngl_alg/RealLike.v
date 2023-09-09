@@ -100,7 +100,7 @@ Definition is_derivative f f' :=
 
 End a.
 
-(* angles; personal version *)
+(* angles; personal idea *)
 
 Section a.
 
@@ -110,6 +110,12 @@ Context {rp : ring_like_prop T}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
+
+(* in this vision, an angle is not a real but a pair of reals (x,y)
+   such that x²+y²=1; the cosinus is then x and the sinus is y.
+   The property sin²+cos²=1 is by definition. It is possible to
+   add angles (see below) and we inherit the properties of
+   cos(x+y) and sin(x+y) in an obvious way. *)
 
 Record angle := mk_ang
   { rngl_cos : T;
