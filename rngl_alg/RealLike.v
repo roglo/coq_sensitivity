@@ -1589,11 +1589,6 @@ Context (Hop : rngl_has_opp T = true).
 Definition rl_acos' := @rl_acos _ _ _ _ Hop.
 Definition angle_opp' := @angle_opp _ _ _ Hop.
 
-(* to be completed
-Theorem all_gc_has_nth_root :
-  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
-Proof.
-intros * Hnz *.
 Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1632,7 +1627,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 move Hc1 after Hc2.
 subst θ.
-(**)
 destruct z as (zr, zi).
 cbn in Hρ |-*.
 f_equal. {
@@ -1646,13 +1640,6 @@ f_equal. {
   }
   now destruct (0 ≤? zi)%L.
 } {
-(*
-  assert (Hsc : ∀ x, rngl_squ (rl_sin x) = (1 - rngl_squ (rl_cos x))%L). {
-    intros x.
-    symmetry; apply (rngl_add_sub_eq_l Hos).
-    apply rl_cos2_sin2.
-  }
-*)
   assert (Hρz : ρ ≠ 0%L). {
     rewrite Hρ.
     intros H.
@@ -1673,14 +1660,9 @@ f_equal. {
     rewrite (fold_rngl_div Hiv).
     rewrite <- (rngl_abs_nonneg Hop Hor (zi / ρ)%L). 2: {
       apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
-      rewrite Hρ.
       apply (rngl_lt_iff Hor).
-      split; [ apply (rl_sqrt_nonneg Hor) | ].
-      apply not_eq_sym.
-      intros H.
-      apply (eq_rl_sqrt_0 Hos) in H.
-      apply (rl_integral_modulus_prop Hmi) in H.
-      now destruct H; subst zr zi.
+      split; [ | now apply not_eq_sym ].
+      rewrite Hρ; apply (rl_sqrt_nonneg Hor).
     }
     rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
       apply (rl_sqrt_nonneg Hor).
@@ -1701,6 +1683,56 @@ f_equal. {
     apply (rl_integral_modulus_prop Hmi) in H.
     now destruct H; subst zr zi.
   } {
+    rewrite (rngl_mul_opp_r Hop).
+    apply (rngl_opp_inj Hop).
+    rewrite (rngl_opp_involutive Hop).
+    apply (rngl_leb_gt Hor) in Hc.
+    apply (rngl_lt_le_incl Hor) in Hc.
+    apply (rngl_opp_le_compat Hop Hor) in Hc.
+    rewrite (rngl_opp_0 Hop) in Hc.
+    apply (rngl_mul_cancel_l Hi1 ρ⁻¹)%L. {
+      now apply (rngl_inv_neq_0 Hon Hos Hiv).
+    }
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_comm Hic).
+    rewrite (fold_rngl_div Hiv).
+    rewrite <- (rngl_abs_nonneg Hop Hor (- zi / ρ)%L). 2: {
+      apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+      apply (rngl_lt_iff Hor).
+      split; [ | now apply not_eq_sym ].
+      rewrite Hρ; apply (rl_sqrt_nonneg Hor).
+    }
+    rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+      apply (rl_sqrt_nonneg Hor).
+    }
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii).
+    rewrite rngl_squ_sqrt.
+    symmetry.
+    apply (rngl_add_sub_eq_l Hos).
+    progress unfold rngl_div.
+    rewrite Hiv.
+    do 2 rewrite (rngl_squ_mul Hic).
+    rewrite <- rngl_mul_add_distr_r.
+    rewrite (rngl_squ_inv Hon Hos Hiv); [ | easy ].
+    rewrite Hρ.
+    rewrite rngl_squ_sqrt.
+    rewrite (rngl_squ_opp Hop).
+    apply (rngl_mul_inv_r Hon Hiv).
+    intros H.
+    apply (rl_integral_modulus_prop Hmi) in H.
+    now destruct H; subst zr zi.
+  }
+}
+Qed.
+
+(* to be completed
+Theorem all_gc_has_nth_root :
+  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
+Proof.
+intros * Hnz *.
+Inspect 1.
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
