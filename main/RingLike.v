@@ -3896,6 +3896,46 @@ rewrite <- (rngl_add_0_l 0%L).
 now apply (rngl_add_le_compat Hor).
 Qed.
 
+Theorem rngl_squ_sub_squ :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  ∀ a b, (rngl_squ a - rngl_squ b = (a + b) * (a - b))%L.
+Proof.
+intros Hop Hic *.
+progress unfold rngl_squ.
+rewrite rngl_mul_add_distr_r.
+do 2 rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_mul_comm Hic b a).
+f_equal; symmetry.
+apply (rngl_sub_add Hop).
+Qed.
+
+Theorem eq_rngl_squ_rngl_abs :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a b, rngl_squ a = rngl_squ b → rngl_abs a = rngl_abs b.
+Proof.
+intros Hop Hic Hor Hii * Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply (rngl_sub_move_0_r Hop) in Hab.
+rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
+apply (rngl_integral Hos Hii) in Hab.
+destruct Hab as [Hab| Hab]. {
+  apply (rngl_add_move_0_r Hop) in Hab.
+  subst a.
+  apply (rngl_abs_opp Hop Hor).
+} {
+  apply -> (rngl_sub_move_0_r Hop) in Hab.
+  now subst a.
+}
+Qed.
+
 Theorem rngl_min_glb :
   ∀ a b c, (a ≤ b → a ≤ c → a ≤ rngl_min b c)%L.
 Proof.

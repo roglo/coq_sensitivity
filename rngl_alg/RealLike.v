@@ -1617,6 +1617,13 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now left; rewrite Hiv, Hon.
 }
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   destruct z as (rz, iz).
@@ -1638,12 +1645,13 @@ f_equal. {
   }
   now destruct (0 ≤? zi)%L.
 } {
-...
+(*
   assert (Hsc : ∀ x, rngl_squ (rl_sin x) = (1 - rngl_squ (rl_cos x))%L). {
     intros x.
     symmetry; apply (rngl_add_sub_eq_l Hos).
     apply rl_cos2_sin2.
   }
+*)
   assert (Hρz : ρ ≠ 0%L). {
     rewrite Hρ.
     intros H.
@@ -1652,7 +1660,7 @@ f_equal. {
     now destruct H; subst zr zi.
   }
   remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
-  destruct c. {
+  destruct c; cbn. {
     apply rngl_leb_le in Hc.
     apply (rngl_mul_cancel_l Hi1 ρ⁻¹)%L. {
       now apply (rngl_inv_neq_0 Hon Hos Hiv).
@@ -1673,17 +1681,13 @@ f_equal. {
       apply (rl_integral_modulus_prop Hmi) in H.
       now destruct H; subst zr zi.
     }
-    rewrite <- (rngl_abs_nonneg Hop Hor (rl_sin _)). 2: {
-(* acos(-1)=π *)
-...
-Search (_ * _ = _ * _)%L.
-Search (_ * _ = _ * _)%Z.
-Print Z.square.
-Search Z.square.
-Theorem eq_rngl_squ_rngl_abs :
-  ∀ a b, rngl_squ a = rngl_squ b → rngl_abs a = rngl_abs b.
-... ...
-    apply eq_rngl_squ_rngl_abs.
+    rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+      apply (rl_sqrt_nonneg Hor).
+    }
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii).
+    rewrite rngl_squ_sqrt.
+    symmetry.
+    apply (rngl_add_sub_eq_l Hos).
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
