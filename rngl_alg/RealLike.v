@@ -118,36 +118,42 @@ Record angle := mk_ang
   { rngl_cos : T;
     rngl_sin : T;
     rngl_sin2_cos2 :
-      if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
-        (rngl_squ rngl_cos + rngl_squ rngl_sin = 1)%L
-      else not_applicable }.
+      (negb
+         (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
+          rngl_has_eq_dec T) ||
+       (rngl_cos² + rngl_sin² =? 1)%L)%bool = true }.
 
 Theorem angle_zero_prop :
-  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
-    (1² + 0²)%L = 1%L
-  else not_applicable.
+  (negb
+     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
+      rngl_has_eq_dec T)
+   || (1² + 0² =? 1)%L)%bool = true.
 Proof.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
 destruct on; [ | easy ].
 destruct op; [ | easy ].
-destruct ic; [ cbn | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ cbn | easy ].
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
-apply rngl_add_0_r.
+rewrite rngl_add_0_r.
+apply (rngl_eqb_refl Hed).
 Qed.
 
 Theorem angle_add_prop :
   ∀ a b,
-  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
-    ((rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)² +
-     (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)²)%L = 1%L
-  else not_applicable.
+  (negb
+     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T && rngl_has_eq_dec T)
+   || ((rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)² +
+       (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)² =? 1)%L)%bool =
+  true.
 Proof.
 intros.
 destruct a as (x, y, Hxy).
@@ -156,9 +162,11 @@ move x' before y; move y' before x'.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
 destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
+destruct ed; [ | easy ].
 cbn in Hxy, Hxy' |-*.
 rewrite (rngl_squ_add Hic Hon).
 rewrite (rngl_squ_sub Hop Hic Hon).
@@ -173,23 +181,27 @@ rewrite (rngl_sub_add Hop).
 do 4 rewrite (rngl_squ_mul Hic).
 rewrite <- rngl_add_assoc.
 do 2 rewrite <- rngl_mul_add_distr_l.
+apply (rngl_eqb_eq Hed) in Hxy'.
 rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
 Theorem angle_opp_prop : ∀ a,
-  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
-    ((rngl_cos a)² + (- rngl_sin a)²)%L = 1%L
-  else not_applicable.
+  (negb
+     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
+      rngl_has_eq_dec T)
+   || ((rngl_cos a)² + (- rngl_sin a)² =? 1)%L)%bool = true.
 Proof.
 intros.
 destruct a as (x, y, Hxy); cbn.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
 destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
+destruct ed; [ | easy ].
 cbn in Hxy |-*.
 now rewrite (rngl_squ_opp Hop).
 Qed.
@@ -205,6 +217,20 @@ Definition angle_add a b :=
 Definition angle_opp a :=
   {| rngl_cos := rngl_cos a; rngl_sin := (- rngl_sin a)%L;
      rngl_sin2_cos2 := angle_opp_prop a |}.
+
+Theorem eq_angle_eq : ∀ a b,
+  (rngl_cos a, rngl_sin a) = (rngl_cos b, rngl_sin b) ↔ a = b.
+Proof.
+intros.
+split; intros Hab; [ | now subst b ].
+injection Hab; clear Hab; intros Hs Hc.
+destruct a as (aco, asi, Hacs).
+destruct b as (bco, bsi, Hbcs).
+cbn in Hs, Hc.
+subst bsi bco.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
 
 End a.
 
@@ -278,23 +304,27 @@ Qed.
 
 Theorem rl_acos_prop :
   ∀ x,
-  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool
-    then (x² + (rl_sqrt (1 - x²))²)%L = 1%L
-  else not_applicable.
+  (negb
+     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
+      rngl_has_eq_dec T)
+   || (x² + (rl_sqrt (1 - x²))² =? 1)%L)%bool = true.
 Proof.
 intros.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
 destruct on; [ | easy ].
 destruct op; [ | easy ].
-destruct ic; [ cbn | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ cbn | easy ].
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 rewrite rngl_squ_sqrt.
 rewrite (rngl_add_sub_assoc Hop).
 rewrite rngl_add_comm.
+apply (rngl_eqb_eq Hed).
 apply (rngl_add_sub Hos).
 Qed.
 
@@ -738,7 +768,8 @@ split. {
   generalize Hrl; intros H.
   apply (rl_integral_modulus_prop H) in H2.
   apply Haz.
-  now apply eq_gc_eq; cbn.
+  apply eq_gc_eq; cbn.
+  now f_equal.
 } {
   progress unfold "1"%L; cbn.
   progress unfold gc_opt_one.
