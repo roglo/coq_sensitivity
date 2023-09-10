@@ -223,6 +223,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_opt_sqrt_nonneg :
       if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
       else not_applicable }.
+
 Section a.
 
 Context {T : Type}.
@@ -317,16 +318,15 @@ progress unfold rngl_squ in Ha.
 now rewrite (rngl_mul_0_l Hos) in Ha.
 Qed.
 
-Theorem gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}).
+Theorem gc_eq_dec :
+  rngl_has_eq_dec T = true →
+  ∀ a b : GComplex T, {a = b} + {a ≠ b}.
 Proof.
-remember (rngl_opt_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct ed as [rngl_eq_dec| ]; [ | apply None ].
-apply Some.
-intros.
+intros Hed *.
 destruct a as (ra, ia).
 destruct b as (rb, ib).
-specialize (rngl_eq_dec ra rb) as H1.
-specialize (rngl_eq_dec ia ib) as H2.
+specialize (rngl_eq_dec Hed ra rb) as H1.
+specialize (rngl_eq_dec Hed ia ib) as H2.
 destruct H1 as [H1| H1]. {
   subst rb.
   destruct H2 as [H2| H2]; [ now subst ib; left | right ].
@@ -338,6 +338,12 @@ destruct H1 as [H1| H1]. {
   now injection H.
 }
 Qed.
+
+Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
+  match Bool.bool_dec (rngl_has_eq_dec T) true with
+  | left Hed => Some (gc_eq_dec Hed)
+  | right _ => None
+  end.
 
 End a.
 
@@ -1077,14 +1083,13 @@ Theorem polar :
   rngl_characteristic T ≠ 2 →
   rl_has_integral_modulus T = true →
   ∀ (z : GComplex T) ρ θ,
-  z ≠ gc_zero
-  → ρ = √((gre z)² + (gim z)²)%L
+  ρ = √((gre z)² + (gim z)²)%L
   → θ =
        (if (0 ≤? gim z)%L then rl_acos (gre z / ρ)
         else angle_opp (rl_acos (gre z / ρ)))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1105,6 +1110,23 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   f_equal; rewrite H1; apply H1.
 }
 move Hc1 after Hc2.
+destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
+  destruct z as (zr, zi).
+  progress unfold gc_zero in Hz.
+  injection Hz; clear Hz; intros; subst zr zi.
+  cbn in Hρ.
+  progress unfold rngl_squ in Hρ.
+  rewrite (rngl_mul_0_l Hos) in Hρ.
+  rewrite rngl_add_0_l in Hρ.
+  (* TODO: lemma √0=0 *)
+  progress unfold rl_sqrt in Hρ.
+  specialize (rl_nth_sqrt_pow 2 0%L) as H1.
+  rewrite <- Hρ in H1.
+  apply (rngl_integral Hos Hii) in H1.
+  assert (H2 : ρ = 0%L) by now destruct H1.
+  rewrite H2.
+  now do 2 rewrite (rngl_mul_0_l Hos).
+}
 subst θ.
 destruct z as (zr, zi).
 cbn in Hρ |-*.
