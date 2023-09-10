@@ -114,21 +114,20 @@ Context {rp : ring_like_prop T}.
    add angles (see below) and we inherit the properties of
    cos(x+y) and sin(x+y) in an obvious way. *)
 
+Definition cos2_sin2_prop x y :=
+  (negb
+     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
+      rngl_has_eq_dec T) ||
+   (x² + y² =? 1)%L)%bool = true.
+
 Record angle := mk_ang
   { rngl_cos : T;
     rngl_sin : T;
-    rngl_sin2_cos2 :
-      (negb
-         (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-          rngl_has_eq_dec T) ||
-       (rngl_cos² + rngl_sin² =? 1)%L)%bool = true }.
+    rngl_cos2_sin2 : cos2_sin2_prop rngl_cos rngl_sin }.
 
-Theorem angle_zero_prop :
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-      rngl_has_eq_dec T)
-   || (1² + 0² =? 1)%L)%bool = true.
+Theorem angle_zero_prop : (cos2_sin2_prop 1 0)%L.
 Proof.
+progress unfold cos2_sin2_prop.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
@@ -149,16 +148,15 @@ Qed.
 
 Theorem angle_add_prop :
   ∀ a b,
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T && rngl_has_eq_dec T)
-   || ((rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)² +
-       (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)² =? 1)%L)%bool =
-  true.
+  cos2_sin2_prop
+    (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L
+    (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)%L.
 Proof.
 intros.
 destruct a as (x, y, Hxy).
 destruct b as (x', y', Hxy'); cbn.
 move x' before y; move y' before x'.
+progress unfold cos2_sin2_prop in Hxy, Hxy' |-*.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
@@ -186,14 +184,11 @@ rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
-Theorem angle_opp_prop : ∀ a,
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-      rngl_has_eq_dec T)
-   || ((rngl_cos a)² + (- rngl_sin a)² =? 1)%L)%bool = true.
+Theorem angle_opp_prop : ∀ a, cos2_sin2_prop (rngl_cos a) (- rngl_sin a)%L.
 Proof.
 intros.
 destruct a as (x, y, Hxy); cbn.
+progress unfold cos2_sin2_prop in Hxy |-*.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
@@ -207,16 +202,16 @@ now rewrite (rngl_squ_opp Hop).
 Qed.
 
 Definition angle_zero :=
-  {| rngl_cos := 1; rngl_sin := 0; rngl_sin2_cos2 := angle_zero_prop |}%L.
+  {| rngl_cos := 1; rngl_sin := 0; rngl_cos2_sin2 := angle_zero_prop |}%L.
 
 Definition angle_add a b :=
   {| rngl_cos := (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L;
      rngl_sin := (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)%L;
-     rngl_sin2_cos2 := angle_add_prop a b |}.
+     rngl_cos2_sin2 := angle_add_prop a b |}.
 
 Definition angle_opp a :=
   {| rngl_cos := rngl_cos a; rngl_sin := (- rngl_sin a)%L;
-     rngl_sin2_cos2 := angle_opp_prop a |}.
+     rngl_cos2_sin2 := angle_opp_prop a |}.
 
 Theorem eq_angle_eq : ∀ a b,
   (rngl_cos a, rngl_sin a) = (rngl_cos b, rngl_sin b) ↔ a = b.
@@ -330,7 +325,7 @@ Qed.
 
 Definition rl_acos (x : T) :=
   {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
-     rngl_sin2_cos2 := rl_acos_prop x |}.
+     rngl_cos2_sin2 := rl_acos_prop x |}.
 
 Arguments rl_acos x%L.
 
