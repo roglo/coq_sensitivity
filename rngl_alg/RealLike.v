@@ -125,6 +125,20 @@ Record angle := mk_ang
     rngl_sin : T;
     rngl_cos2_sin2 : cos2_sin2_prop rngl_cos rngl_sin }.
 
+Theorem eq_angle_eq : ∀ a b,
+  (rngl_cos a, rngl_sin a) = (rngl_cos b, rngl_sin b) ↔ a = b.
+Proof.
+intros.
+split; intros Hab; [ | now subst b ].
+injection Hab; clear Hab; intros Hs Hc.
+destruct a as (aco, asi, Hacs).
+destruct b as (bco, bsi, Hbcs).
+cbn in Hs, Hc.
+subst bsi bco.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 Theorem angle_zero_prop : (cos2_sin2_prop 1 0)%L.
 Proof.
 progress unfold cos2_sin2_prop.
@@ -213,19 +227,11 @@ Definition angle_opp a :=
   {| rngl_cos := rngl_cos a; rngl_sin := (- rngl_sin a)%L;
      rngl_cos2_sin2 := angle_opp_prop a |}.
 
-Theorem eq_angle_eq : ∀ a b,
-  (rngl_cos a, rngl_sin a) = (rngl_cos b, rngl_sin b) ↔ a = b.
-Proof.
-intros.
-split; intros Hab; [ | now subst b ].
-injection Hab; clear Hab; intros Hs Hc.
-destruct a as (aco, asi, Hacs).
-destruct b as (bco, bsi, Hbcs).
-cbn in Hs, Hc.
-subst bsi bco.
-f_equal.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-Qed.
+Fixpoint angle_mul_nat a n :=
+  match n with
+  | 0 => angle_zero
+  | S n' => angle_add a (angle_mul_nat a n')
+  end.
 
 End a.
 
