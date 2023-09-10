@@ -1256,10 +1256,26 @@ Qed.
 
 (* to be completed
 Theorem all_gc_has_nth_root :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 2 →
+  rl_has_integral_modulus T = true →
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
-intros * Hnz *.
-Inspect 1.
+intros Hic Hon Hop Hiv Hed Hor Hc2 Him * Hnz *.
+specialize (polar Hic Hon Hop Hiv Hed Hor Hc2 Him z) as H1.
+set (ρ := √((gre z)² + (gim z)²)%L).
+set
+  (θ :=
+     (if (0 ≤? gim z)%L then rl_acos (gre z / ρ)
+      else angle_opp (rl_acos (gre z / ρ)))).
+specialize (H1 ρ θ eq_refl eq_refl).
+...
+exists (mk_gc (rl_nth_sqrt n ρ) (angle_div_nat θ n)).
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
