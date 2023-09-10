@@ -107,9 +107,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hop : rngl_has_opp T = true}.
-Context {Hic : rngl_mul_is_comm T = true}.
-Context {Hon : rngl_has_1 T = true}.
 
 (* in this vision, an angle is not a real but a pair of reals (x,y)
    such that x²+y²=1; the cosinus is then x and the sinus is y.
@@ -120,17 +117,49 @@ Context {Hon : rngl_has_1 T = true}.
 Record angle := mk_ang
   { rngl_cos : T;
     rngl_sin : T;
-    rngl_sin2_cos2 : (rngl_squ rngl_cos + rngl_squ rngl_sin = 1)%L }.
+    rngl_sin2_cos2 :
+      if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
+        (rngl_squ rngl_cos + rngl_squ rngl_sin = 1)%L
+      else not_applicable }.
+
+Theorem angle_zero_prop :
+  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
+    (1² + 0²)%L = 1%L
+  else not_applicable.
+Proof.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ cbn | easy ].
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+progress unfold rngl_squ.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+apply rngl_add_0_r.
+Qed.
 
 Theorem angle_add_prop :
   ∀ a b,
-  (rngl_squ (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b) +
-   rngl_squ (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b))%L = 1%L.
+  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
+    ((rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)² +
+     (rngl_cos a * rngl_sin b + rngl_sin a * rngl_cos b)²)%L = 1%L
+  else not_applicable.
 Proof.
 intros.
 destruct a as (x, y, Hxy).
 destruct b as (x', y', Hxy'); cbn.
 move x' before y; move y' before x'.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+cbn in Hxy, Hxy' |-*.
 rewrite (rngl_squ_add Hic Hon).
 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite rngl_add_add_swap.
@@ -149,12 +178,24 @@ now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
 Theorem angle_opp_prop : ∀ a,
-  (rngl_squ (rngl_cos a) + rngl_squ (- rngl_sin a))%L = 1%L.
+  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool then
+    ((rngl_cos a)² + (- rngl_sin a)²)%L = 1%L
+  else not_applicable.
 Proof.
 intros.
-rewrite (rngl_squ_opp Hop).
-now destruct a.
+destruct a as (x, y, Hxy); cbn.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+cbn in Hxy |-*.
+now rewrite (rngl_squ_opp Hop).
 Qed.
+
+Definition angle_zero :=
+  {| rngl_cos := 1; rngl_sin := 0; rngl_sin2_cos2 := angle_zero_prop |}%L.
 
 Definition angle_add a b :=
   {| rngl_cos := (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L;
@@ -234,12 +275,19 @@ intros.
 apply (rl_nth_sqrt_pow 2 a).
 Qed.
 
-Context (Hop : rngl_has_opp T = true).
-
-Theorem rl_acos_sin2_cos2 :
-  ∀ x, (rngl_squ x + rngl_squ (rl_sqrt (1 - rngl_squ x)))%L = 1%L.
+Theorem rl_acos_prop :
+  ∀ x,
+  if (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T)%bool
+    then (x² + (rl_sqrt (1 - x²))²)%L = 1%L
+  else not_applicable.
 Proof.
 intros.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ cbn | easy ].
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -251,7 +299,7 @@ Qed.
 
 Definition rl_acos (x : T) :=
   {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
-     rngl_sin2_cos2 := rl_acos_sin2_cos2 x |}.
+     rngl_sin2_cos2 := rl_acos_prop x |}.
 
 Arguments rl_acos x%L.
 
@@ -317,7 +365,7 @@ Definition gc_ring_like_op T
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
-Arguments rl_acos {T ro rp rl Hop} x%L.
+Arguments rl_acos {T ro rp rl} x%L.
 
 Section a.
 
@@ -1019,14 +1067,10 @@ split. {
 }
 Qed.
 
-Context (Hop : rngl_has_opp T = true).
-
-Definition rl_acos' := @rl_acos _ _ _ _ Hop.
-Definition angle_opp' := @angle_opp _ _ _ Hop.
-
 Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
+  rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
@@ -1036,11 +1080,11 @@ Theorem polar :
   z ≠ gc_zero
   → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
   → θ =
-       (if rngl_leb 0%L (gim z) then rl_acos' (gre z / ρ)%L
-        else (angle_opp' (rl_acos' (gre z / ρ))%L))
+       (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)%L
+        else (angle_opp (rl_acos (gre z / ρ))%L))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
-intros * Hic Hon Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
+intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
