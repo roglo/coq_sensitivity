@@ -1078,10 +1078,10 @@ Theorem polar :
   rl_has_integral_modulus T = true →
   ∀ (z : GComplex T) ρ θ,
   z ≠ gc_zero
-  → ρ = rl_sqrt (rngl_squ (gre z) + rngl_squ (gim z))%L
+  → ρ = √((gre z)² + (gim z)²)%L
   → θ =
-       (if rngl_leb 0%L (gim z) then rl_acos (gre z / ρ)%L
-        else (angle_opp (rl_acos (gre z / ρ))%L))
+       (if (0 ≤? gim z)%L then rl_acos (gre z / ρ)
+        else angle_opp (rl_acos (gre z / ρ)))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hz Hρ Hθ.
