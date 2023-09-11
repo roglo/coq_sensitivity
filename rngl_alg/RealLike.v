@@ -427,6 +427,14 @@ rewrite (rngl_mul_inv_r Hon Hiv). 2: {
   easy.
 }
 rewrite (rngl_mul_1_r Hon); f_equal.
+Search (rl_sqrt _ * rl_sqrt _)%L.
+Theorem rl_sqrt_mul : ∀ a b, (√a * √b = √(a * b))%L.
+Proof.
+intros.
+progress unfold rl_sqrt.
+Search rl_nth_sqrt.
+... ...
+rewrite rl_sqrt_mul.
 ...
 *)
 
