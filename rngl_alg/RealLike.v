@@ -259,6 +259,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
 Definition rl_sqrt := rl_nth_sqrt 2.
+Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 
@@ -302,6 +303,68 @@ Proof.
 intros.
 apply (rl_nth_sqrt_pow 2 a).
 Qed.
+
+(* to be completed
+Theorem angle_div_2_prop :
+  rngl_has_inv T = true →
+  rngl_characteristic T ≠ 2 →
+  ∀ a,
+  cos2_sin2_prop
+    (√ ((1 + rngl_cos a) / 2)%L)
+    (√ ((1 - rngl_cos a) / 2)%L).
+Proof.
+intros Hiv Hc2 *.
+progress unfold cos2_sin2_prop.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ cbn | easy ].
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+do 2 rewrite rngl_squ_sqrt.
+apply (rngl_eqb_eq Hed).
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- rngl_mul_add_distr_r.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub Hos).
+apply (rngl_mul_inv_r Hon Hiv).
+specialize rngl_characteristic_prop as H1.
+rewrite Hon in H1.
+remember (rngl_characteristic T =? 0) as cz eqn:Hcz; symmetry in Hcz.
+destruct cz. {
+  specialize (H1 1); cbn in H1.
+  now rewrite rngl_add_0_r in H1.
+}
+destruct H1 as (H1, H2).
+apply Nat.eqb_neq in Hcz.
+intros H3; apply Hcz; clear Hcz.
+...
+replace 0%L with (rngl_of_nat 0) in H2 by easy.
+Check rngl_of_nat_inj.
+apply (rngl_of_nat_inj Hon Hos) in H2. 2: {
+
+specialize (H1 2).
+cbn in H1.
+rewrite rngl_add_0_r in H1.
+apply H1.
+split; [ easy | ].
+Search (rngl_of_nat _ = rngl_of_nat _).
+...
+
+Definition angle_div_2 a :=
+  {| rngl_cos := (rl_sqrt ((1 + rngl_cos a) / 2))%L;
+     rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
+     rngl_cos2_sin2 := angle_div_2_prop a |}.
+...
+*)
 
 Theorem rl_acos_prop :
   ∀ x,
