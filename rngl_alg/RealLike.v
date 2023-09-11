@@ -247,6 +247,8 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
       else not_applicable;
     rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
+    rl_nth_sqrt_mul :
+      ∀ n a b, (rl_nth_sqrt n a * rl_nth_sqrt n b = rl_nth_sqrt n (a * b))%L;
     rl_opt_sqrt_nonneg :
       if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
       else not_applicable }.
@@ -368,6 +370,7 @@ Definition angle_div_2 Hiv Hc2 a :=
 
 (* to be completed
 Theorem angle_div_2_mul_2 :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ (Hiv : rngl_has_inv T = true)
@@ -375,7 +378,7 @@ Theorem angle_div_2_mul_2 :
   ∀ a,
   angle_mul_nat (angle_div_2 Hiv Hc2 a) 2 = a.
 Proof.
-intros Hon Hop *.
+intros Hic Hon Hop *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -387,25 +390,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   easy.
 }
 move Hc1 after Hc2.
-progress unfold angle_mul_nat.
-progress unfold angle_div_2.
-progress unfold angle_add.
-cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-do 2 rewrite (rngl_mul_1_r Hon).
-rewrite rngl_add_0_l.
-do 2 rewrite fold_rngl_squ.
-do 2 rewrite rngl_squ_sqrt.
-progress unfold rngl_div.
-rewrite Hiv.
-rewrite <- (rngl_mul_sub_distr_r Hop).
-rewrite (rngl_sub_sub_distr Hop).
-rewrite (rngl_add_comm 1%L) at 1.
-rewrite (rngl_add_sub Hos).
-rewrite (rngl_add_diag2 Hon).
-rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_r Hon Hiv). 2: {
+assert (H20 : 2%L ≠ 0%L). {
   remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
   destruct ch. {
     specialize (rngl_characteristic_0 Hon Hch 1) as H1.
@@ -426,7 +411,46 @@ rewrite (rngl_mul_inv_r Hon Hiv). 2: {
   do 2 apply -> Nat.succ_lt_mono.
   easy.
 }
+progress unfold angle_mul_nat.
+progress unfold angle_div_2.
+progress unfold angle_add.
+cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite rngl_add_0_l.
+do 2 rewrite fold_rngl_squ.
+do 2 rewrite rngl_squ_sqrt.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_add_comm 1%L) at 1.
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_add_diag2 Hon).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_r Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon); f_equal.
+progress unfold rl_sqrt.
+rewrite rl_nth_sqrt_mul.
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (1 + _)%L).
+rewrite <- rngl_mul_assoc.
+rewrite <- rl_nth_sqrt_mul.
+rewrite <- (rngl_inv_mul_distr Hon Hos Hiv); [ | easy | easy ].
+Check rl_nth_sqrt_pow.
+...
+rewrite <- rngl_pow_add_r.
+rewrite fold_rngl_squ.
+rewrite <- rl_nth_sqrt_mul.
+...
+Search (rl_nth_sqrt).
+rewrite rl_nth_sqrt_pow.
+
+rewrite rngl_squ_inv.
+...
+rewrite (rngl_mul_comm Hic (1 + _)%L).
+...
 Search (rl_sqrt _ * rl_sqrt _)%L.
 Theorem rl_sqrt_mul : ∀ a b, (√a * √b = √(a * b))%L.
 Proof.
