@@ -383,7 +383,10 @@ progress unfold angle_add.
 cbn.
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
-rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite rngl_add_0_l.
+do 2 rewrite fold_rngl_squ.
+do 2 rewrite rngl_squ_sqrt.
 ...
 *)
 
