@@ -1894,7 +1894,7 @@ assert (Hon : rngl_has_1 T = true). {
   progress unfold lap_opt_one in Honl.
   now destruct (rngl_opt_one T).
 }
-specialize rngl_characteristic_prop as H1.
+specialize rngl_opt_characteristic_prop as H1.
 intros i.
 remember (S i) as j eqn:Hj.
 rewrite Hon in H1.
@@ -2930,7 +2930,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lap_opt_integral Hos;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := lap_characteristic_prop;
+     rngl_opt_characteristic_prop := lap_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;

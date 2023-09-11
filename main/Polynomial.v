@@ -2703,8 +2703,7 @@ rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
 clear IHi; exfalso.
 apply (rngl_eqb_eq Heb) in H11.
-specialize rngl_characteristic_prop as H2.
-rewrite Hon, Hch in H2; cbn in H2.
+specialize (rngl_characteristic_0 Hon Hch) as H2.
 now specialize (H2 (S i)).
 Qed.
 
@@ -2718,7 +2717,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   flia Hi Hc1.
 }
 specialize (proj1 (rngl_1_neq_0_iff Hon) Hc1) as H11.
-specialize rngl_characteristic_prop as Hch.
+specialize rngl_opt_characteristic_prop as Hch.
 rewrite Hon in Hch; cbn in Hch.
 rewrite if_bool_if_dec in Hch.
 destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
@@ -2870,7 +2869,7 @@ assert (Honl : rngl_has_1 (list T) = true). {
   now destruct rngl_opt_one.
 }
 cbn - [ rngl_mul_nat ].
-specialize rngl_characteristic_prop as H1.
+specialize rngl_opt_characteristic_prop as H1.
 rewrite Hon in H1; cbn in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hcz| Hcz]. {
@@ -3253,7 +3252,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_le_dec := NA;
      rngl_opt_integral := polyn_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := polyn_characteristic_prop;
+     rngl_opt_characteristic_prop := polyn_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;

@@ -2326,7 +2326,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_le_dec := QG_le_dec;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := QG_characteristic_prop;
+     rngl_opt_characteristic_prop := QG_characteristic_prop;
      rngl_opt_le_refl := QG_le_refl;
      rngl_opt_le_antisymm := QG_le_antisymm;
      rngl_opt_le_trans := QG_le_trans;

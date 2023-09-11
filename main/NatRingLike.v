@@ -24,7 +24,7 @@ Global Existing Instance nat_ring_like_op.
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
 
-Theorem nat_characteristic_prop :
+Theorem nat_opt_characteristic_prop :
   let ro := nat_ring_like_op in
   ∀ i, rngl_mul_nat 1 (S i) ≠ 0.
 Proof. easy. Qed.
@@ -165,7 +165,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_le_dec := Nat_opt_le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := nat_characteristic_prop;
+     rngl_opt_characteristic_prop := nat_opt_characteristic_prop;
      rngl_opt_le_refl := Nat.leb_refl;
      rngl_opt_le_antisymm := Nat_le_antisymm;
      rngl_opt_le_trans := Nat_le_trans;

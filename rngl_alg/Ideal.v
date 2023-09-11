@@ -459,7 +459,7 @@ assert (Hon : rngl_has_1 T = true). {
   progress unfold I_opt_one in Honi.
   now destruct (rngl_opt_one T).
 }
-specialize rngl_characteristic_prop as H1.
+specialize rngl_opt_characteristic_prop as H1.
 rewrite Hon in H1.
 rewrite if_bool_if_dec in H1 |-*.
 progress unfold roi.
@@ -707,7 +707,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_le_dec := I_opt_le_dec;
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := I_characteristic_prop;
+     rngl_opt_characteristic_prop := I_characteristic_prop;
      rngl_opt_le_refl := I_opt_le_refl;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;

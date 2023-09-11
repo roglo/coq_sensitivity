@@ -274,9 +274,7 @@ split. {
   progress unfold rngl_mul_nat in H1.
   progress unfold mul_nat in H1; cbn in H1.
   rewrite H1 in Hlla; [ clear H1 | easy ].
-  specialize rngl_characteristic_prop as H1.
-  rewrite Hon, Hch in H1; cbn in H1.
-  now apply (H1 i).
+  now apply (rngl_characteristic_0 Hon Hch i).
 } {
   intros l Hl.
   subst rom.
@@ -634,7 +632,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   intros i Hi; flia Hi.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-specialize @rngl_characteristic_prop as H1.
+specialize @rngl_opt_characteristic_prop as H1.
 specialize (H1 T ro rp).
 rewrite Hon in H1.
 rewrite if_eqb_eq_dec in H1 |-*.
@@ -781,7 +779,7 @@ Definition mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := @squ_mat_characteristic_prop eq_dec n;
+     rngl_opt_characteristic_prop := @squ_mat_characteristic_prop eq_dec n;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;

@@ -340,7 +340,7 @@ rewrite rngl_add_comm.
 rewrite rngl_add_assoc.
 rewrite (rngl_add_sub Hos).
 apply (rngl_mul_inv_r Hon Hiv).
-specialize rngl_characteristic_prop as H1.
+specialize rngl_opt_characteristic_prop as H1.
 rewrite Hon in H1.
 remember (rngl_characteristic T =? 0) as cz eqn:Hcz; symmetry in Hcz.
 destruct cz. {
@@ -369,13 +369,16 @@ Definition angle_div_2 Hiv Hc2 a :=
 (* to be completed
 Theorem angle_div_2_mul_2 :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp T = true →
   ∀ (Hiv : rngl_has_inv T = true)
     (Hc2 : rngl_characteristic T ≠ 2),
   ∀ a,
   angle_mul_nat (angle_div_2 Hiv Hc2 a) 2 = a.
 Proof.
-intros Hon Hos *.
+intros Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 apply eq_angle_eq.
 progress unfold angle_mul_nat.
 progress unfold angle_div_2.
@@ -387,6 +390,16 @@ do 2 rewrite (rngl_mul_1_r Hon).
 rewrite rngl_add_0_l.
 do 2 rewrite fold_rngl_squ.
 do 2 rewrite rngl_squ_sqrt.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_add_comm 1%L) at 1.
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_add_diag2 Hon).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_r Hon Hiv). 2: {
+Search rngl_characteristic.
 ...
 *)
 
@@ -945,7 +958,7 @@ Theorem gc_characteristic_prop :
   else not_applicable.
 Proof.
 cbn - [ rngl_mul_nat ].
-specialize (rngl_characteristic_prop) as H1.
+specialize (rngl_opt_characteristic_prop) as H1.
 progress unfold rngl_has_1 in H1.
 progress unfold rngl_has_1; cbn - [ rngl_mul_nat ].
 progress unfold gc_opt_one.

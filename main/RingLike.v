@@ -347,7 +347,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∃ x, rngl_eval_polyn l x = 0%L
       else not_applicable;
     (* characteristic *)
-    rngl_characteristic_prop :
+    rngl_opt_characteristic_prop :
       if rngl_has_1 T then
         if Nat.eqb (rngl_characteristic) 0 then
           ∀ i, rngl_of_nat (S i) ≠ 0%L
@@ -1251,6 +1251,28 @@ rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
+Theorem rngl_characteristic_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T = 0 →
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+Proof.
+intros Hon Hcz.
+specialize (rngl_opt_characteristic_prop) as H1.
+now rewrite Hon, Hcz in H1.
+Qed.
+
+Theorem rngl_characteristic_non_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T ≠ 0 →
+  (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
+  rngl_of_nat (rngl_characteristic T) = 0%L.
+Proof.
+intros Hon Hcz.
+specialize (rngl_opt_characteristic_prop) as H1.
+apply Nat.eqb_neq in Hcz.
+now rewrite Hon, Hcz in H1.
+Qed.
+
 Theorem rngl_characteristic_1 :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -1258,7 +1280,7 @@ Theorem rngl_characteristic_1 :
   ∀ x, x = 0%L.
 Proof.
 intros Hon Hos Hch *.
-specialize (rngl_characteristic_prop) as H1.
+specialize (rngl_opt_characteristic_prop) as H1.
 rewrite Hon, Hch in H1; cbn in H1.
 destruct H1 as (_, H1).
 rewrite rngl_add_0_r in H1.
@@ -1274,7 +1296,7 @@ Theorem rngl_1_neq_0_iff :
   rngl_has_1 T = true → rngl_characteristic T ≠ 1 ↔ (1 ≠ 0)%L.
 Proof.
 intros Hon.
-specialize rngl_characteristic_prop as H1.
+specialize rngl_opt_characteristic_prop as H1.
 rewrite Hon in H1.
 split. {
   intros Hc.
@@ -2179,9 +2201,8 @@ Proof.
 intros Hon Hch * Hi.
 destruct i; [ easy | exfalso ].
 cbn in Hi.
-specialize rngl_characteristic_prop as rngl_char_prop.
-rewrite Hon, Hch in rngl_char_prop.
-now specialize (rngl_char_prop i) as H.
+specialize (rngl_characteristic_0 Hon Hch) as H1.
+now specialize (H1 i) as H.
 Qed.
 
 Theorem rngl_of_nat_inj :
@@ -2462,9 +2483,8 @@ Proof.
 intros Hon Hos Hii Hch * Haa.
 rewrite <- (rngl_mul_1_l Hon a) in Haa.
 rewrite <- rngl_mul_add_distr_r in Haa.
-specialize rngl_characteristic_prop as char_prop.
-rewrite Hon, Hch in char_prop; cbn in char_prop.
-specialize (char_prop 1) as H1; cbn in H1.
+specialize (rngl_characteristic_0 Hon Hch 1) as H1.
+cbn in H1.
 rewrite rngl_add_0_r in H1.
 apply (rngl_eq_mul_0_r Hos) in Haa; [ easy | | easy ].
 destruct rngl_is_integral_domain; [ easy | ].
