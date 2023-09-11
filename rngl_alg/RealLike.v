@@ -304,7 +304,6 @@ intros.
 apply (rl_nth_sqrt_pow 2 a).
 Qed.
 
-(* to be completed
 Theorem angle_div_2_prop :
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
@@ -328,6 +327,11 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 }
 do 2 rewrite rngl_squ_sqrt.
 apply (rngl_eqb_eq Hed).
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (_ + _)%L), (H1 1%L).
+}
+move Hc1 after Hc2.
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite <- rngl_mul_add_distr_r.
@@ -345,24 +349,37 @@ destruct cz. {
 }
 destruct H1 as (H1, H2).
 apply Nat.eqb_neq in Hcz.
-intros H3; apply Hcz; clear Hcz.
-...
-replace 0%L with (rngl_of_nat 0) in H2 by easy.
-Check rngl_of_nat_inj.
-apply (rngl_of_nat_inj Hon Hos) in H2. 2: {
-
+remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+destruct ch; [ easy | clear Hcz ].
+destruct ch; [ easy | clear Hc1 ].
+destruct ch; [ easy | clear Hc2 ].
 specialize (H1 2).
 cbn in H1.
 rewrite rngl_add_0_r in H1.
 apply H1.
 split; [ easy | ].
-Search (rngl_of_nat _ = rngl_of_nat _).
-...
+now do 2 apply -> Nat.succ_lt_mono.
+Qed.
 
-Definition angle_div_2 a :=
+Definition angle_div_2 Hiv Hc2 a :=
   {| rngl_cos := (rl_sqrt ((1 + rngl_cos a) / 2))%L;
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
-     rngl_cos2_sin2 := angle_div_2_prop a |}.
+     rngl_cos2_sin2 := angle_div_2_prop Hiv Hc2 a |}.
+
+(* to be completed
+Theorem angle_div_2_mul_2 :
+  ∀ (Hiv : rngl_has_inv T = true)
+    (Hc2 : rngl_characteristic T ≠ 2),
+  ∀ a,
+  angle_mul_nat (angle_div_2 Hiv Hc2 a) 2 = a.
+Proof.
+intros.
+apply eq_angle_eq.
+progress unfold angle_mul_nat.
+progress unfold angle_div_2.
+progress unfold angle_add.
+cbn.
+rewrite rngl_mul_0_r.
 ...
 *)
 
