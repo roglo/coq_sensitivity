@@ -368,18 +368,22 @@ Definition angle_div_2 Hiv Hc2 a :=
 
 (* to be completed
 Theorem angle_div_2_mul_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
   ∀ (Hiv : rngl_has_inv T = true)
     (Hc2 : rngl_characteristic T ≠ 2),
   ∀ a,
   angle_mul_nat (angle_div_2 Hiv Hc2 a) 2 = a.
 Proof.
-intros.
+intros Hon Hos *.
 apply eq_angle_eq.
 progress unfold angle_mul_nat.
 progress unfold angle_div_2.
 progress unfold angle_add.
 cbn.
-rewrite rngl_mul_0_r.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite (rngl_mul_1_r Hon).
 ...
 *)
 
