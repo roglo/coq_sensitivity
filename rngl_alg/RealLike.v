@@ -380,6 +380,13 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 apply eq_angle_eq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  do 2 rewrite (H1 (rngl_cos _)).
+  do 2 rewrite (H1 (rngl_sin _)).
+  easy.
+}
+move Hc1 after Hc2.
 progress unfold angle_mul_nat.
 progress unfold angle_div_2.
 progress unfold angle_add.
@@ -399,7 +406,27 @@ rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_diag2 Hon).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_r Hon Hiv). 2: {
-Search rngl_characteristic.
+  remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+  destruct ch. {
+    specialize (rngl_characteristic_0 Hon Hch 1) as H1.
+    cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+  }
+  destruct ch; [ easy | ].
+  destruct ch; [ easy | ].
+  specialize rngl_opt_characteristic_prop as H1.
+  rewrite Hon in H1.
+  rewrite Hch in H1.
+  cbn - [ rngl_of_nat ] in H1.
+  destruct H1 as (H1, H2).
+  specialize (H1 2); cbn in H1.
+  rewrite rngl_add_0_r in H1.
+  apply H1.
+  split; [ easy | ].
+  do 2 apply -> Nat.succ_lt_mono.
+  easy.
+}
+rewrite (rngl_mul_1_r Hon); f_equal.
 ...
 *)
 
