@@ -497,7 +497,6 @@ assert (Hε : (ε² = 1)%L). {
 }
 rewrite (rngl_squ_mul Hic).
 rewrite Hε, (rngl_mul_1_l Hon).
-(**)
 assert (Hz1ac : (0 ≤ 1 + rngl_cos a)%L). {
   apply (rngl_le_sub_le_add_l Hop Hor).
   progress unfold rngl_sub.
@@ -611,19 +610,51 @@ Qed.
 
 (* to be completed
 Theorem angle_mul_2_div_2 :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ (Hiv : rngl_has_inv T = true)
     (Hc2 : rngl_characteristic T ≠ 2)
     (Hor : rngl_is_ordered T = true),
   ∀ a,
   angle_div_2 Hiv Hc2 Hor (angle_mul_nat a 2) = a.
 Proof.
-intros Hon Hop *.
+intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
 apply eq_angle_eq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now do 2 rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
+}
+move Hc1 after Hc2.
+assert (H20 : 2%L ≠ 0%L). {
+  remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+  destruct ch. {
+    specialize (rngl_characteristic_0 Hon Hch 1) as H1.
+    cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+  }
+  destruct ch; [ easy | ].
+  destruct ch; [ easy | ].
+  specialize rngl_opt_characteristic_prop as H1.
+  rewrite Hon in H1.
+  rewrite Hch in H1.
+  cbn - [ rngl_of_nat ] in H1.
+  destruct H1 as (H1, H2).
+  specialize (H1 2); cbn in H1.
+  rewrite rngl_add_0_r in H1.
+  apply H1.
+  split; [ easy | ].
+  do 2 apply -> Nat.succ_lt_mono.
+  easy.
+}
 progress unfold angle_mul_nat.
 progress unfold angle_div_2.
 progress unfold angle_add.
@@ -632,6 +663,37 @@ do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite (rngl_mul_1_r Hon).
 rewrite rngl_add_0_l.
+rewrite (rngl_mul_comm Hic (rngl_cos a)).
+rewrite (rngl_add_diag Hon).
+rewrite rngl_mul_assoc.
+set (ε := if (0 ≤? _)%L then 1%L else (-1)%L).
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
+  destruct (0 ≤? _)%L. {
+    apply (rngl_mul_1_l Hon).
+  } {
+    apply (rngl_squ_opp_1 Hon Hop).
+  }
+}
+do 2 rewrite fold_rngl_squ.
+destruct a as (ca, sa, Ha); cbn in ε |-*.
+progress unfold cos2_sin2_prop in Ha.
+rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
+apply (rngl_eqb_eq Hed) in Ha.
+apply (rngl_add_sub_eq_r Hos) in Ha.
+rewrite <- Ha.
+rewrite <- (rngl_sub_add_distr Hos).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_diag Hos), rngl_add_0_l.
+rewrite (rngl_add_diag Hon sa²%L).
+rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
+rewrite <- (rngl_mul_sub_distr_l Hop).
+do 2 rewrite (rngl_mul_comm Hic 2%L).
+rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite Ha.
+Search (√(_²))%L.
 ...
 
 Theorem rl_acos_prop :
