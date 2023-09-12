@@ -341,7 +341,6 @@ rewrite (rngl_abs_1 Hon Hop Hor) in H.
 now apply (rngl_abs_le Hop Hor) in H.
 Qed.
 
-(* to be completed *)
 Theorem angle_div_2_prop :
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
@@ -612,13 +611,27 @@ Qed.
 
 (* to be completed
 Theorem angle_mul_2_div_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   ∀ (Hiv : rngl_has_inv T = true)
     (Hc2 : rngl_characteristic T ≠ 2)
     (Hor : rngl_is_ordered T = true),
   ∀ a,
   angle_div_2 Hiv Hc2 Hor (angle_mul_nat a 2) = a.
 Proof.
-intros *.
+intros Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply eq_angle_eq.
+progress unfold angle_mul_nat.
+progress unfold angle_div_2.
+progress unfold angle_add.
+cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite rngl_add_0_l.
 ...
 
 Theorem rl_acos_prop :
