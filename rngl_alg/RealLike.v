@@ -247,6 +247,18 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
       else not_applicable;
     rl_nth_root_pow : ∀ n a, (rl_nth_root n a ^ n = a)%L;
+(*
+    rl_even_nth_root_mul :
+      if rngl_is_ordered T then
+        ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →
+        (rl_nth_root (2 * n) a * rl_nth_root (2 * n) b =
+           rl_nth_root (2 * n) (a * b))%L
+      else not_applicable;
+    rl_odd_nth_root_mul :
+      ∀ n a b,
+      (rl_nth_root (2 * n + 1) a * rl_nth_root (2 * n + 1) b =
+         rl_nth_root (2 * n + 1) (a * b))%L;
+*)
     rl_nth_root_mul :
       ∀ n a b, (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
     rl_opt_sqrt_nonneg :
@@ -486,7 +498,29 @@ rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
 apply (rngl_eqb_eq Hed) in Ha.
 rewrite <- Ha, rngl_add_comm, (rngl_add_sub Hos).
 progress unfold rngl_squ.
+(**)
+progress unfold ε.
+remember (0 ≤? sa)%L as saz eqn:Hsaz; symmetry in Hsaz.
+destruct saz. {
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rl_nth_root_pow 2).
+  now rewrite <- rl_nth_root_mul.
+} {
+  rewrite <- (rngl_mul_opp_opp Hop sa).
+Check rl_nth_root_pow.
+...
+  rewrite <- (rl_nth_root_pow 2).
+  rewrite <- rl_nth_root_mul.
+...
 rewrite <- rl_nth_root_mul.
+progress unfold ε.
+remember (0 ≤? sa)%L as saz eqn:Hsaz; symmetry in Hsaz.
+rewrite <- (rl_nth_root_pow 2).
+destruct saz. {
+  now rewrite (rngl_mul_1_l Hon).
+} {
+  cbn.
+(* ça déconne *)
 ...
 replace (sa²)%L with (sa ^ 2)%L by easy.
 rewrite fold_rl_sqrt.
