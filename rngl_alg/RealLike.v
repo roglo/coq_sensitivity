@@ -241,16 +241,16 @@ Arguments angle T {ro}.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
-    rl_nth_sqrt : nat → T → T;
+    rl_nth_root : nat → T → T;
     rl_opt_integral_modulus_prop :
       if rl_has_integral_modulus then
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
       else not_applicable;
-    rl_nth_sqrt_pow : ∀ n a, (rl_nth_sqrt n a ^ n = a)%L;
-    rl_nth_sqrt_mul :
-      ∀ n a b, (rl_nth_sqrt n a * rl_nth_sqrt n b = rl_nth_sqrt n (a * b))%L;
+    rl_nth_root_pow : ∀ n a, (rl_nth_root n a ^ n = a)%L;
+    rl_nth_root_mul :
+      ∀ n a b, (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
     rl_opt_sqrt_nonneg :
-      if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_sqrt 2 a)%L
+      if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_root 2 a)%L
       else not_applicable }.
 
 Section a.
@@ -260,7 +260,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Definition rl_sqrt := rl_nth_sqrt 2.
+Definition rl_sqrt := rl_nth_root 2.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
@@ -278,7 +278,7 @@ Definition gc_opt_inv_or_quot :
       None
   end.
 
-Theorem fold_rl_sqrt : rl_nth_sqrt 2 = rl_sqrt.
+Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
 Proof. easy. Qed.
 
 Theorem rl_sqrt_nonneg :
@@ -303,7 +303,7 @@ Qed.
 Theorem rngl_squ_sqrt : ∀ a, rngl_squ (rl_sqrt a) = a.
 Proof.
 intros.
-apply (rl_nth_sqrt_pow 2 a).
+apply (rl_nth_root_pow 2 a).
 Qed.
 
 Theorem angle_div_2_prop :
@@ -459,23 +459,23 @@ rewrite (rngl_mul_comm Hic).
 rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_comm Hic ε).
 rewrite rngl_mul_assoc.
-rewrite rl_nth_sqrt_mul.
+rewrite rl_nth_root_mul.
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 - _)%L).
 do 2 rewrite <- rngl_mul_assoc.
-do 3 rewrite <- rl_nth_sqrt_mul.
+do 3 rewrite <- rl_nth_root_mul.
 rewrite fold_rngl_squ.
 rewrite fold_rl_sqrt.
 replace (_)²%L with ((√(2⁻¹)) ^ 2)%L by easy.
 progress unfold rl_sqrt.
-rewrite rl_nth_sqrt_pow.
+rewrite rl_nth_root_pow.
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic).
 rewrite (rngl_mul_comm Hic).
 do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon).
-rewrite rl_nth_sqrt_mul.
+rewrite rl_nth_root_mul.
 rewrite (rngl_mul_comm Hic (1 - _)%L).
 rewrite <- (rngl_squ_sub_squ Hop Hic).
 progress unfold rngl_squ at 1.
@@ -485,12 +485,14 @@ progress unfold cos2_sin2_prop in Ha.
 rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
 apply (rngl_eqb_eq Hed) in Ha.
 rewrite <- Ha, rngl_add_comm, (rngl_add_sub Hos).
+progress unfold rngl_squ.
+rewrite <- rl_nth_root_mul.
 ...
 replace (sa²)%L with (sa ^ 2)%L by easy.
 rewrite fold_rl_sqrt.
 progress unfold rl_sqrt.
 progress unfold rngl_squ.
-rewrite <- rl_nth_sqrt_mul.
+rewrite <- rl_nth_root_mul.
 Search (rl_sqrt (_ ^ 2)%L).
 Search (rl_sqrt (_²)%L).
 ...
@@ -1345,7 +1347,7 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
   rewrite rngl_add_0_l in Hρ.
   (* TODO: lemma √0=0 *)
   progress unfold rl_sqrt in Hρ.
-  specialize (rl_nth_sqrt_pow 2 0%L) as H1.
+  specialize (rl_nth_root_pow 2 0%L) as H1.
   rewrite <- Hρ in H1.
   apply (rngl_integral Hos Hii) in H1.
   assert (H2 : ρ = 0%L) by now destruct H1.
@@ -1486,7 +1488,7 @@ Definition angle_div_nat a n :=
   let θ := rad_of_angle a in
   angle_of_rad (θ / rngl_of_nat n)%L.
 ...
-exists (mk_gc (rl_nth_sqrt n ρ) (angle_div_nat θ n)).
+exists (mk_gc (rl_nth_root n ρ) (angle_div_nat θ n)).
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
