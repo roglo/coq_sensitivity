@@ -341,7 +341,7 @@ rewrite (rngl_abs_1 Hon Hop Hor) in H.
 now apply (rngl_abs_le Hop Hor) in H.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_2_prop :
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
@@ -434,7 +434,7 @@ Definition angle_div_2 Hiv Hc2 Hor a :=
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
      rngl_cos2_sin2 := angle_div_2_prop Hiv Hc2 Hor a |}.
 
-(* to be completed *)
+(* to be completed
 Theorem angle_div_2_mul_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -499,8 +499,26 @@ assert (Hε : (ε² = 1)%L). {
 }
 rewrite (rngl_squ_mul Hic).
 rewrite Hε, (rngl_mul_1_l Hon).
-...
-do 2 rewrite rngl_squ_sqrt.
+(**)
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop, rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite <- (rngl_mul_sub_distr_r Hop).
@@ -517,6 +535,7 @@ rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_comm Hic ε).
 rewrite rngl_mul_assoc.
 rewrite rl_nth_root_mul.
+...
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 - _)%L).
 do 2 rewrite <- rngl_mul_assoc.
