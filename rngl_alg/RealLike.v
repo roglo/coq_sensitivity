@@ -309,10 +309,10 @@ Qed.
 Theorem angle_div_2_prop :
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
-  ∀ a,
+  ∀ a (ε := (if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L)),
   cos2_sin2_prop
-    (√ ((1 + rngl_cos a) / 2)%L)
-    (√ ((1 - rngl_cos a) / 2)%L).
+    (ε * √((1 + rngl_cos a) / 2))%L
+    (√((1 - rngl_cos a) / 2)%L).
 Proof.
 intros Hiv Hc2 *.
 progress unfold cos2_sin2_prop.
@@ -327,6 +327,16 @@ destruct ed; [ cbn | easy ].
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
+  destruct (0 ≤? _)%L. {
+    apply (rngl_mul_1_l Hon).
+  } {
+    apply (rngl_squ_opp_1 Hon Hop).
+  }
+}
+rewrite (rngl_squ_mul Hic).
+rewrite Hε, (rngl_mul_1_l Hon).
 do 2 rewrite rngl_squ_sqrt.
 apply (rngl_eqb_eq Hed).
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -364,7 +374,8 @@ now do 2 apply -> Nat.succ_lt_mono.
 Qed.
 
 Definition angle_div_2 Hiv Hc2 a :=
-  {| rngl_cos := (rl_sqrt ((1 + rngl_cos a) / 2))%L;
+  let ε := if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L in
+  {| rngl_cos := (ε * rl_sqrt ((1 + rngl_cos a) / 2))%L;
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
      rngl_cos2_sin2 := angle_div_2_prop Hiv Hc2 a |}.
 
@@ -421,6 +432,17 @@ rewrite (rngl_sub_0_r Hos).
 do 2 rewrite (rngl_mul_1_r Hon).
 rewrite rngl_add_0_l.
 do 2 rewrite fold_rngl_squ.
+set (ε := if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L).
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
+  destruct (0 ≤? _)%L. {
+    apply (rngl_mul_1_l Hon).
+  } {
+    apply (rngl_squ_opp_1 Hon Hop).
+  }
+}
+rewrite (rngl_squ_mul Hic).
+rewrite Hε, (rngl_mul_1_l Hon).
 do 2 rewrite rngl_squ_sqrt.
 progress unfold rngl_div.
 rewrite Hiv.
@@ -435,32 +457,42 @@ rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
 rewrite (rngl_mul_comm Hic).
 rewrite (rngl_add_diag2 Hon).
+rewrite (rngl_mul_comm Hic ε).
+rewrite rngl_mul_assoc.
 rewrite rl_nth_sqrt_mul.
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 - _)%L).
-rewrite <- rngl_mul_assoc.
+do 2 rewrite <- rngl_mul_assoc.
 do 3 rewrite <- rl_nth_sqrt_mul.
 rewrite fold_rngl_squ.
 rewrite fold_rl_sqrt.
 replace (_)²%L with ((√(2⁻¹)) ^ 2)%L by easy.
 progress unfold rl_sqrt.
 rewrite rl_nth_sqrt_pow.
-rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic).
+rewrite (rngl_mul_comm Hic).
+do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon).
 rewrite rl_nth_sqrt_mul.
-rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_comm Hic (1 - _)%L).
 rewrite <- (rngl_squ_sub_squ Hop Hic).
 progress unfold rngl_squ at 1.
 rewrite (rngl_mul_1_r Hon).
-Search (1 - (rngl_cos _)²)%L.
-Search (_ + _ = 1)%L.
-destruct a as (ca, sa, Ha); cbn.
+destruct a as (ca, sa, Ha); cbn in ε |-*.
 progress unfold cos2_sin2_prop in Ha.
 rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
 apply (rngl_eqb_eq Hed) in Ha.
 rewrite <- Ha, rngl_add_comm, (rngl_add_sub Hos).
+...
+replace (sa²)%L with (sa ^ 2)%L by easy.
 rewrite fold_rl_sqrt.
+progress unfold rl_sqrt.
+progress unfold rngl_squ.
+rewrite <- rl_nth_sqrt_mul.
+Search (rl_sqrt (_ ^ 2)%L).
+Search (rl_sqrt (_²)%L).
 ...
 *)
 
