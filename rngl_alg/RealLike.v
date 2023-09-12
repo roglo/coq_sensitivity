@@ -251,27 +251,11 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_integral_modulus then
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
       else not_applicable;
-(* is it a good idea?
-    rl_ord_even_nth_root_pow :
-      if rngl_is_ordered T then
-        ∀ n a, (0 ≤ a)%L → (rl_nth_root (2 * n) a ^ (2 * n) = a)%L
-      else not_applicable;
-    rl_ord_odd_nth_root_pow :
-      if rngl_is_ordered T then
-        ∀ n a, (rl_nth_root (2 * n + 1) a ^ (2 * n + 1) = a)%L
-      else not_applicable;
-    rl_not_ord_nth_root_pow :
-      if rngl_is_ordered T then not_applicable
-      else
-        ∀ n a, (rl_nth_root n a ^ n = a)%L;
-*)
-    rl_nth_root_pow : ∀ n a, (rl_nth_root n a ^ n = a)%L;
-(**)
+    rl_nth_root_pow : ∀ n a, (0 ≤ a → rl_nth_root n a ^ n = a)%L;
     rl_nth_root_mul :
-      ∀ n a b, (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
-    rl_opt_sqrt_nonneg :
-      if rngl_is_ordered T then ∀ a, (0 ≤ rl_nth_root 2 a)%L
-      else not_applicable }.
+      ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →
+      (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
+    rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ rl_nth_root 2 a)%L }.
 
 Section a.
 
@@ -301,15 +285,6 @@ Definition gc_opt_inv_or_quot :
 Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
 Proof. easy. Qed.
 
-Theorem rl_sqrt_nonneg :
-  rngl_is_ordered T = true →
-  ∀ a : T, (0 ≤ rl_sqrt a)%L.
-Proof.
-intros Hor.
-specialize rl_opt_sqrt_nonneg as H1.
-now rewrite Hor in H1.
-Qed.
-
 Theorem rl_integral_modulus_prop :
   rl_has_integral_modulus T = true →
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
@@ -320,12 +295,13 @@ rewrite Him in Hmi.
 now apply Hmi.
 Qed.
 
-Theorem rngl_squ_sqrt : ∀ a, rngl_squ (rl_sqrt a) = a.
+Theorem rngl_squ_sqrt : ∀ a, (0 ≤ a)%L → rngl_squ (rl_sqrt a) = a.
 Proof.
 intros.
-apply (rl_nth_root_pow 2 a).
+now apply (rl_nth_root_pow 2 a).
 Qed.
 
+(* to be completed
 Theorem angle_div_2_prop :
   rngl_has_inv T = true →
   rngl_characteristic T ≠ 2 →
@@ -357,6 +333,8 @@ assert (Hε : (ε² = 1)%L). {
 }
 rewrite (rngl_squ_mul Hic).
 rewrite Hε, (rngl_mul_1_l Hon).
+rewrite rngl_squ_sqrt. 2: {
+...
 do 2 rewrite rngl_squ_sqrt.
 apply (rngl_eqb_eq Hed).
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -399,7 +377,7 @@ Definition angle_div_2 Hiv Hc2 a :=
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
      rngl_cos2_sin2 := angle_div_2_prop Hiv Hc2 a |}.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_2_mul_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -538,7 +516,6 @@ rewrite <- rl_nth_root_mul.
 Search (rl_sqrt (_ ^ 2)%L).
 Search (rl_sqrt (_²)%L).
 ...
-*)
 
 Theorem rl_acos_prop :
   ∀ x,
@@ -574,14 +551,15 @@ Arguments rl_acos x%L.
 
 Theorem rl_cos_acos : ∀ x, rngl_cos (rl_acos x) = x.
 Proof. easy. Qed.
+*)
 
 Theorem eq_rl_sqrt_0 :
   rngl_has_opp_or_subt T = true →
-  ∀ a, rl_sqrt a = 0%L → a = 0%L.
+  ∀ a, (0 ≤ a)%L → rl_sqrt a = 0%L → a = 0%L.
 Proof.
-intros Hos * Ha.
+intros Hos * Hza Ha.
 apply (f_equal rngl_squ) in Ha.
-rewrite rngl_squ_sqrt in Ha.
+rewrite rngl_squ_sqrt in Ha; [ | easy ].
 progress unfold rngl_squ in Ha.
 now rewrite (rngl_mul_0_l Hos) in Ha.
 Qed.
@@ -639,7 +617,9 @@ Definition gc_ring_like_op T
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
+(*
 Arguments rl_acos {T ro rp rl} x%L.
+*)
 
 Section a.
 
@@ -1251,10 +1231,15 @@ apply (rngl_le_trans Hor _ (rngl_abs a)). {
   apply (rngl_le_abs Hop Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
-  apply (rl_sqrt_nonneg Hor).
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+  apply (rngl_square_ge_0 Hop Hor).
 }
 do 2 rewrite fold_rngl_squ.
-rewrite rngl_squ_sqrt.
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+  apply (rngl_square_ge_0 Hop Hor).
+}
 rewrite (rngl_squ_abs Hop).
 now apply (rngl_le_add_r Hor).
 Qed.
@@ -1274,19 +1259,23 @@ intros * Hon Hop Hiv Hed Hor Hc2 Hmi * Hxyz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert (Hxy : (0 ≤ x² + y²)%L). {
+  apply (rngl_add_nonneg_nonneg Hor);
+  apply (rngl_square_ge_0 Hop Hor).
+}
 split. {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     remember (rngl_squ x + rngl_squ y)%L as a eqn:Ha.
     symmetry in Ha.
     apply (rngl_lt_iff Hor).
     split. {
-      apply (rl_sqrt_nonneg Hor).
+      now apply rl_sqrt_nonneg.
     } {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
       progress unfold rngl_squ in H3 at 2.
       rewrite (rngl_mul_0_l Hos) in H3.
-      rewrite rngl_squ_sqrt in H3.
+      rewrite rngl_squ_sqrt in H3; [ | easy ].
       move H3 at top; subst a.
       apply (rl_integral_modulus_prop Hmi) in Ha.
       now destruct Hxyz.
@@ -1301,7 +1290,7 @@ split. {
       rewrite <- (rngl_opp_0 Hop).
       now apply -> (rngl_opp_le_compat Hop Hor).
     }
-    apply (rl_sqrt_nonneg Hor).
+    now apply rl_sqrt_nonneg.
   } {
     apply (rngl_nle_gt Hor) in Hzx.
     apply (rngl_opp_lt_compat Hop Hor) in Hzx.
@@ -1316,13 +1305,13 @@ split. {
     symmetry in Ha.
     apply (rngl_lt_iff Hor).
     split. {
-      apply (rl_sqrt_nonneg Hor).
+      now apply rl_sqrt_nonneg.
     } {
       intros H3; symmetry in H3.
       apply (f_equal rngl_squ) in H3.
       progress unfold rngl_squ in H3 at 2.
       rewrite (rngl_mul_0_l Hos) in H3.
-      rewrite rngl_squ_sqrt in H3.
+      rewrite rngl_squ_sqrt in H3; [ | easy ].
       move H3 at top; subst a.
       apply (rl_integral_modulus_prop Hmi) in Ha.
       now destruct Hxyz.
@@ -1337,11 +1326,12 @@ split. {
     apply (rngl_le_trans Hor _ 0). {
       now apply (rngl_lt_le_incl Hor).
     }
-    apply (rl_sqrt_nonneg Hor).
+    now apply rl_sqrt_nonneg.
   }
 }
 Qed.
 
+(* to be completed
 Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1497,7 +1487,6 @@ f_equal. {
 }
 Qed.
 
-(* to be completed
 Theorem all_gc_has_nth_root :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
