@@ -432,26 +432,21 @@ rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_r Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
-rewrite rl_nth_sqrt_mul.
-rewrite rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_add_diag2 Hon).
+rewrite <- rngl_mul_assoc.
+...
+do 2 rewrite rl_nth_sqrt_mul.
+do 2 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 + _)%L).
 rewrite <- rngl_mul_assoc.
-rewrite <- rl_nth_sqrt_mul.
-rewrite <- (rngl_inv_mul_distr Hon Hos Hiv); [ | easy | easy ].
-Check rl_nth_sqrt_pow.
-...
-rewrite <- rngl_pow_add_r.
+do 3 rewrite <- rl_nth_sqrt_mul.
 rewrite fold_rngl_squ.
-rewrite <- rl_nth_sqrt_mul.
-...
-Search (rl_nth_sqrt).
+rewrite fold_rl_sqrt.
+replace (_)²%L with ((√(2⁻¹)) ^ 2)%L by easy.
+progress unfold rl_sqrt.
 rewrite rl_nth_sqrt_pow.
-
-rewrite rngl_squ_inv.
 ...
-rewrite (rngl_mul_comm Hic (1 + _)%L).
-...
-Search (rl_sqrt _ * rl_sqrt _)%L.
 Theorem rl_sqrt_mul : ∀ a b, (√a * √b = √(a * b))%L.
 Proof.
 intros.
