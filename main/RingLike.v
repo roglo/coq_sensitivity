@@ -3424,6 +3424,14 @@ exfalso; apply Hc.
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rngl_squ_1 :
+  rngl_has_1 T = true →
+  (1² = 1)%L.
+Proof.
+intros Hon.
+apply (rngl_mul_1_l Hon).
+Qed.
+
 Theorem rngl_leb_gt :
   rngl_is_ordered T = true →
   ∀ a b, ((a ≤? b) = false ↔ b < a)%L.
