@@ -3401,6 +3401,29 @@ rewrite (rngl_opp_0 Hop).
 now destruct (0 ≤? 0)%L.
 Qed.
 
+Theorem rngl_abs_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_abs 1 = 1)%L.
+Proof.
+intros Hon Hop Hor.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (rngl_abs 1)%L), (H1 1%L).
+}
+progress unfold rngl_abs.
+remember (1 ≤? 0)%L as c eqn:Hc; symmetry in Hc.
+destruct c; [ | easy ].
+apply rngl_leb_le in Hc.
+apply (rngl_nlt_ge Hor) in Hc.
+exfalso; apply Hc.
+apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+Qed.
+
 Theorem rngl_leb_gt :
   rngl_is_ordered T = true →
   ∀ a b, ((a ≤? b) = false ↔ b < a)%L.
