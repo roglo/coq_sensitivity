@@ -373,12 +373,13 @@ Theorem angle_div_2_mul_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ (Hiv : rngl_has_inv T = true)
     (Hc2 : rngl_characteristic T ≠ 2),
   ∀ a,
   angle_mul_nat (angle_div_2 Hiv Hc2 a) 2 = a.
 Proof.
-intros Hic Hon Hop *.
+intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -434,11 +435,9 @@ rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
 rewrite (rngl_mul_comm Hic).
 rewrite (rngl_add_diag2 Hon).
-rewrite <- rngl_mul_assoc.
-...
-do 2 rewrite rl_nth_sqrt_mul.
-do 2 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_mul_swap Hic (1 + _)%L).
+rewrite rl_nth_sqrt_mul.
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (1 - _)%L).
 rewrite <- rngl_mul_assoc.
 do 3 rewrite <- rl_nth_sqrt_mul.
 rewrite fold_rngl_squ.
@@ -446,14 +445,22 @@ rewrite fold_rl_sqrt.
 replace (_)²%L with ((√(2⁻¹)) ^ 2)%L by easy.
 progress unfold rl_sqrt.
 rewrite rl_nth_sqrt_pow.
-...
-Theorem rl_sqrt_mul : ∀ a b, (√a * √b = √(a * b))%L.
-Proof.
-intros.
-progress unfold rl_sqrt.
-Search rl_nth_sqrt.
-... ...
-rewrite rl_sqrt_mul.
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+rewrite (rngl_mul_1_r Hon).
+rewrite rl_nth_sqrt_mul.
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_squ_sub_squ Hop Hic).
+progress unfold rngl_squ at 1.
+rewrite (rngl_mul_1_r Hon).
+Search (1 - (rngl_cos _)²)%L.
+Search (_ + _ = 1)%L.
+destruct a as (ca, sa, Ha); cbn.
+progress unfold cos2_sin2_prop in Ha.
+rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
+apply (rngl_eqb_eq Hed) in Ha.
+rewrite <- Ha, rngl_add_comm, (rngl_add_sub Hos).
+rewrite fold_rl_sqrt.
 ...
 *)
 
