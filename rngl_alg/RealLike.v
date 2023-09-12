@@ -239,6 +239,11 @@ Arguments angle T {ro}.
 
 (* end angles *)
 
+(*
+a^(1/n) = exp(1/n*ln a)
+∛(-8)=-2
+*)
+
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
     rl_nth_root : nat → T → T;
@@ -246,19 +251,22 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       if rl_has_integral_modulus then
         ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
       else not_applicable;
-    rl_nth_root_pow : ∀ n a, (rl_nth_root n a ^ n = a)%L;
-(*
-    rl_even_nth_root_mul :
+(* is it a good idea?
+    rl_ord_even_nth_root_pow :
       if rngl_is_ordered T then
-        ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →
-        (rl_nth_root (2 * n) a * rl_nth_root (2 * n) b =
-           rl_nth_root (2 * n) (a * b))%L
+        ∀ n a, (0 ≤ a)%L → (rl_nth_root (2 * n) a ^ (2 * n) = a)%L
       else not_applicable;
-    rl_odd_nth_root_mul :
-      ∀ n a b,
-      (rl_nth_root (2 * n + 1) a * rl_nth_root (2 * n + 1) b =
-         rl_nth_root (2 * n + 1) (a * b))%L;
+    rl_ord_odd_nth_root_pow :
+      if rngl_is_ordered T then
+        ∀ n a, (rl_nth_root (2 * n + 1) a ^ (2 * n + 1) = a)%L
+      else not_applicable;
+    rl_not_ord_nth_root_pow :
+      if rngl_is_ordered T then not_applicable
+      else
+        ∀ n a, (rl_nth_root n a ^ n = a)%L;
 *)
+    rl_nth_root_pow : ∀ n a, (rl_nth_root n a ^ n = a)%L;
+(**)
     rl_nth_root_mul :
       ∀ n a b, (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
     rl_opt_sqrt_nonneg :
@@ -507,10 +515,10 @@ destruct saz. {
   now rewrite <- rl_nth_root_mul.
 } {
   rewrite <- (rngl_mul_opp_opp Hop sa).
-Check rl_nth_root_pow.
-...
-  rewrite <- (rl_nth_root_pow 2).
   rewrite <- rl_nth_root_mul.
+...
+Check rl_nth_root_pow.
+  rewrite <- (rl_nth_root_pow 2).
 ...
 rewrite <- rl_nth_root_mul.
 progress unfold ε.
