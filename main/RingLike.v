@@ -4000,6 +4000,9 @@ destruct Hab as [Hab| Hab]. {
 }
 Qed.
 
+Theorem rngl_squ_pow_2 : ∀ a, (a² = a ^ 2)%L.
+Proof. easy. Qed.
+
 Theorem rngl_min_glb :
   ∀ a b c, (a ≤ b → a ≤ c → a ≤ rngl_min b c)%L.
 Proof.
