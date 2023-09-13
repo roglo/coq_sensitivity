@@ -693,7 +693,21 @@ do 2 rewrite (rngl_mul_comm Hic 2%L).
 rewrite (rngl_mul_div Hi1); [ | easy ].
 rewrite (rngl_mul_div Hi1); [ | easy ].
 rewrite Ha.
-Search (√(_²))%L.
+remember (0 ≤? 2 * sa * ca)%L as zsc eqn:Hzsc; symmetry in Hzsc.
+destruct zsc. {
+  apply rngl_leb_le in Hzsc.
+  subst ε.
+  rewrite (rngl_mul_1_l Hon).
+  (* s'ils sont tous les deux positifs, ça marche ;
+     mais s'ils sont négatifs, ça ne marche pas *)
+...
+progress unfold rngl_squ.
+progress unfold rl_sqrt.
+destruct (rngl_le_dec Hor 0 ca) as [Hzc| Hzc]. {
+  rewrite <- rl_nth_root_mul; [ | easy | easy ].
+  rewrite fold_rl_sqrt.
+  rewrite fold_rngl_squ.
+  rewrite rngl_squ_sqrt; [ | easy ].
 ...
 
 Theorem rl_acos_prop :
