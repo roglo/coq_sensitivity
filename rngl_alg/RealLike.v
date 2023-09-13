@@ -663,10 +663,21 @@ destruct az. {
 }
 Qed.
 
-(* to be completed
-Definition angle_leb a b :=
-...
+Definition angle_eqb a b :=
+  ((rngl_cos a =? rngl_cos b)%L && (rngl_sin a =? rngl_sin b)%L)%bool.
 
+Definition angle_leb a b :=
+  if (0 ≤? rngl_sin a)%L then
+    if (0 ≤? rngl_sin b)%L then (rngl_cos b ≤? rngl_cos a)%L
+    else true
+  else
+    if (0 ≤? rngl_sin b)%L then false
+    else (rngl_cos a ≤? rngl_cos b)%L.
+
+Definition angle_ltb a b :=
+  (angle_leb a b && negb (angle_eqb a b))%bool.
+
+(* to be completed
 Theorem angle_mul_2_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -698,6 +709,13 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -725,18 +743,17 @@ assert (H20 : 2%L ≠ 0%L). {
   do 2 apply -> Nat.succ_lt_mono.
   easy.
 }
-progress unfold angle_mul_nat.
-progress unfold angle_div_2.
-progress unfold angle_add.
-progress unfold angle_straight.
-cbn.
-do 2 rewrite (rngl_mul_1_r Hon).
-remember (0 ≤? rngl_sin a)%L as zs eqn:Hzs; symmetry in Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
+(**)
+remember (angle_ltb a angle_straight) as ap eqn:Hap; symmetry in Hap.
+destruct ap. {
+  progress unfold angle_mul_nat.
+  progress unfold angle_div_2.
+  progress unfold angle_add.
+  cbn.
   do 2 rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  do 2 rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_mul_comm Hic (rngl_cos a)).
   rewrite (rngl_add_diag Hon).
   rewrite rngl_mul_assoc.
@@ -750,7 +767,19 @@ destruct zs. {
     }
   }
   do 2 rewrite fold_rngl_squ.
-  destruct a as (ca, sa, Ha); cbn in ε, Hzs |-*.
+  progress unfold angle_ltb in Hap.
+  apply Bool.andb_true_iff in Hap.
+  destruct Hap as (Hal, Hae).
+  apply Bool.negb_true_iff in Hae.
+  progress unfold angle_leb in Hal.
+  progress unfold angle_eqb in Hae.
+  apply Bool.andb_false_iff in Hae.
+  cbn in Hal, Hae.
+  rewrite (rngl_leb_refl Hor) in Hal.
+  destruct a as (ca, sa, Ha); cbn in ε, Hal, Hae |-*.
+  remember (0 ≤? sa)%L as zs eqn:Hzs; symmetry in Hzs.
+  destruct zs; [ clear Hal | easy ].
+  apply rngl_leb_le in Hzs.
   progress unfold cos2_sin2_prop in Ha.
   rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
   apply (rngl_eqb_eq Hed) in Ha.
@@ -767,11 +796,69 @@ destruct zs. {
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite Ha.
+  do 2 rewrite (rl_sqrt_squ Hop Hor).
+  rewrite (rngl_abs_nonneg Hop Hor sa); [ | easy ].
+  f_equal.
+  subst ε.
   remember (0 ≤? 2 * sa * ca)%L as zsc eqn:Hzsc; symmetry in Hzsc.
   destruct zsc. {
     apply rngl_leb_le in Hzsc.
-    subst ε.
     rewrite (rngl_mul_1_l Hon).
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2⁻¹%L) in Hzsc. 2: {
+      apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_r Hos) in Hzsc.
+    do 2 rewrite rngl_mul_assoc in Hzsc.
+    rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
+    rewrite (rngl_mul_1_l Hon) in Hzsc.
+    destruct Hae as [Hae| Hae]. {
+      apply (rngl_eqb_neq Hed) in Hae.
+      destruct (rngl_eq_dec Hed sa 0) as [Hsz| Hsz]. {
+        subst sa.
+        rewrite (rngl_squ_0 Hos) in Ha.
+        rewrite (rngl_sub_0_r Hos) in Ha.
+        symmetry in Ha.
+        rewrite <- (rngl_squ_1 Hon) in Ha.
+        apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Ha.
+        rewrite (rngl_abs_1 Hon Hop Hor) in Ha.
+        progress unfold rngl_abs in Ha.
+        remember (ca ≤? 0)%L as cz eqn:Hcz; symmetry in Hcz.
+        destruct cz. {
+          apply (f_equal rngl_opp) in Ha.
+          now rewrite (rngl_opp_involutive Hop) in Ha.
+        } {
+          rewrite Ha.
+          apply (rngl_0_le_1 Hon Hop Hor).
+        }
+      }
+      rewrite (rngl_mul_comm Hic) in Hzsc.
+      apply (rngl_le_div_l Hon Hop Hiv Hor) in Hzsc. 2: {
+        apply not_eq_sym in Hsz.
+        now apply (rngl_lt_iff Hor).
+      }
+      now rewrite (rngl_div_0_l Hos Hi1) in Hzsc.
+    }
+    apply (rngl_eqb_neq Hed) in Hae.
+    rewrite (rngl_mul_comm Hic) in Hzsc.
+    apply (rngl_le_div_l Hon Hop Hiv Hor) in Hzsc. 2: {
+      apply not_eq_sym in Hae.
+      now apply (rngl_lt_iff Hor).
+    }
+    now rewrite (rngl_div_0_l Hos Hi1) in Hzsc.
+  }
+...
+Search (_ ≤ _ * _)%L.
+rngl_le_div_l:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_has_1 T = true
+      → rngl_has_opp T = true
+        → rngl_has_inv T = true
+          → rngl_is_ordered T = true
+            → ∀ a b c : T, (0 < c)%L → (a ≤ b * c)%L ↔ (a / c ≤ b)%L
+...
     do 2 rewrite (rl_sqrt_squ Hop Hor).
     rewrite (rngl_abs_nonneg Hop Hor). 2: {
       apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2⁻¹%L) in Hzsc. 2: {

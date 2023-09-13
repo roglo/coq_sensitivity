@@ -3424,6 +3424,14 @@ exfalso; apply Hc.
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rngl_squ_0 :
+  rngl_has_opp_or_subt T = true →
+  (0² = 0)%L.
+Proof.
+intros Hos.
+apply (rngl_mul_0_l Hos).
+Qed.
+
 Theorem rngl_squ_1 :
   rngl_has_1 T = true →
   (1² = 1)%L.
