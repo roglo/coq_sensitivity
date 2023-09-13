@@ -1036,15 +1036,12 @@ destruct ap. {
 }
 Qed.
 
-(* to be completed
 Theorem rl_acos_prop :
-  ∀ x,
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-      rngl_has_eq_dec T)
-   || (x² + (rl_sqrt (1 - x²))² =? 1)%L)%bool = true.
+  rngl_is_ordered T = true →
+  ∀ x, (x² ≤ 1)%L → cos2_sin2_prop x √(1 - x²)%L.
 Proof.
-intros.
+intros Hor * Hx1.
+progress unfold cos2_sin2_prop.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
@@ -1056,19 +1053,28 @@ destruct ed; [ cbn | easy ].
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
-rewrite rngl_squ_sqrt.
+apply (rngl_eqb_eq Hed).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  now rewrite rngl_add_0_l.
+}
 rewrite (rngl_add_sub_assoc Hop).
 rewrite rngl_add_comm.
-apply (rngl_eqb_eq Hed).
 apply (rngl_add_sub Hos).
 Qed.
 
-Definition rl_acos (x : T) :=
-  {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
-     rngl_cos2_sin2 := rl_acos_prop x |}.
+Definition rl_acos Hor (x : T) :=
+  match (rngl_le_dec Hor x² 1)%L with
+  | left Hx1 =>
+      {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
+         rngl_cos2_sin2 := rl_acos_prop Hor x Hx1 |}
+  | _ =>
+      angle_zero
+  end.
 
-Arguments rl_acos x%L.
+Arguments rl_acos Hor x%L.
 
+(* to be completed
 Theorem rl_cos_acos : ∀ x, rngl_cos (rl_acos x) = x.
 Proof. easy. Qed.
 *)
