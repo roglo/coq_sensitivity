@@ -847,40 +847,28 @@ destruct ap. {
       now apply (rngl_lt_iff Hor).
     }
     now rewrite (rngl_div_0_l Hos Hi1) in Hzsc.
+  } {
+    apply (rngl_opp_inj Hop).
+    rewrite <- (rngl_mul_opp_l Hop).
+    rewrite (rngl_opp_involutive Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_abs_nonpos Hop Hor).
+    apply (rngl_leb_gt Hor) in Hzsc.
+    apply (rngl_mul_lt_mono_pos_l Hop Hor Hii 2⁻¹%L) in Hzsc. 2: {
+      apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_r Hos) in Hzsc.
+    do 2 rewrite rngl_mul_assoc in Hzsc.
+    rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
+    rewrite (rngl_mul_1_l Hon) in Hzsc.
+    apply (rngl_nle_gt Hor) in Hzsc.
+    apply (rngl_nlt_ge Hor).
+    intros Hca; apply Hzsc; clear Hzsc.
+    apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+    now apply (rngl_lt_le_incl Hor).
   }
-...
-Search (_ ≤ _ * _)%L.
-rngl_le_div_l:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T
-    → rngl_has_1 T = true
-      → rngl_has_opp T = true
-        → rngl_has_inv T = true
-          → rngl_is_ordered T = true
-            → ∀ a b c : T, (0 < c)%L → (a ≤ b * c)%L ↔ (a / c ≤ b)%L
-...
-    do 2 rewrite (rl_sqrt_squ Hop Hor).
-    rewrite (rngl_abs_nonneg Hop Hor). 2: {
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2⁻¹%L) in Hzsc. 2: {
-        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite (rngl_mul_0_r Hos) in Hzsc.
-      do 2 rewrite rngl_mul_assoc in Hzsc.
-      rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
-      rewrite (rngl_mul_1_l Hon) in Hzsc.
-...
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2⁻¹%L) in Hzsc.
-     apply rngl_mul_le_compat_nonneg in Hzsc.
-      apply (f_equal (rngl_mul_le_compat_nonneg
-...
-progress unfold rngl_squ.
-progress unfold rl_sqrt.
-destruct (rngl_le_dec Hor 0 ca) as [Hzc| Hzc]. {
-  rewrite <- rl_nth_root_mul; [ | easy | easy ].
-  rewrite fold_rl_sqrt.
-  rewrite fold_rngl_squ.
-  rewrite rngl_squ_sqrt; [ | easy ].
+} {
 ...
 
 Theorem rl_acos_prop :
