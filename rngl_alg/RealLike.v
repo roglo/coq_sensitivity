@@ -1866,17 +1866,17 @@ Theorem polar :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
   rngl_characteristic T ≠ 2 →
   rl_has_integral_modulus T = true →
+  ∀ (Hor : rngl_is_ordered T = true),
   ∀ (z : GComplex T) ρ θ,
   ρ = √((gre z)² + (gim z)²)%L
   → θ =
-       (if (0 ≤? gim z)%L then rl_acos (gre z / ρ)
-        else angle_opp (rl_acos (gre z / ρ)))
+       (if (0 ≤? gim z)%L then rl_acos Hor (gre z / ρ)%L
+        else angle_opp (rl_acos Hor (gre z / ρ)%L))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
-intros * Hic Hon Hop Hiv Hed Hor Hc2 Hmi * Hρ Hθ.
+intros * Hic Hon Hop Hiv Hed Hc2 Hmi * Hρ Hθ.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -1909,7 +1909,9 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
   progress unfold rl_sqrt in Hρ.
   specialize (rl_nth_root_pow 2 0%L) as H1.
   rewrite <- Hρ in H1.
-  apply (rngl_integral Hos Hii) in H1.
+  apply (rngl_integral Hos Hii) in H1. 2: {
+    apply (rngl_le_refl Hor).
+  }
   assert (H2 : ρ = 0%L) by now destruct H1.
   rewrite H2.
   now do 2 rewrite (rngl_mul_0_l Hos).
@@ -1922,10 +1924,18 @@ f_equal. {
     rewrite (rngl_mul_comm Hic).
     symmetry; apply (rngl_div_mul Hon Hiv).
     rewrite Hρ; intros H2.
-    apply (eq_rl_sqrt_0 Hos) in H2.
+    apply (eq_rl_sqrt_0 Hos) in H2. 2: {
+      apply (rngl_add_nonneg_nonneg Hor). {
+        apply (rngl_square_ge_0 Hop Hor).
+      } {
+        apply (rngl_square_ge_0 Hop Hor).
+      }
+    }
     apply (rl_integral_modulus_prop Hmi) in H2.
     now destruct H2; subst zr zi.
   }
+...
+  destruct (0 ≤? zi)%L.
   now destruct (0 ≤? zi)%L.
 } {
   assert (Hρz : ρ ≠ 0%L). {
