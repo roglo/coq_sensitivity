@@ -664,6 +664,9 @@ destruct az. {
 Qed.
 
 (* to be completed
+Definition angle_leb a b :=
+...
+
 Theorem angle_mul_2_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -674,7 +677,11 @@ Theorem angle_mul_2_div_2 :
     (Hor : rngl_is_ordered T = true),
   ∀ a,
   angle_div_2 Hiv Hc2 Hor (angle_mul_nat a 2) =
+(**)
+    if angle_ltb a angle_straight then a else angle_add a angle_straight.
+(*
     if (0 ≤? rngl_sin a)%L then a else angle_add a angle_straight.
+*)
 Proof.
 intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
