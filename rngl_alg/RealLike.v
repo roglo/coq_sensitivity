@@ -265,11 +265,6 @@ Arguments angle T {ro}.
 
 (* end angles *)
 
-(*
-a^(1/n) = exp(1/n*ln a)
-∛(-8)=-2
-*)
-
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;
     rl_nth_root : nat → T → T;
@@ -677,6 +672,48 @@ Definition angle_leb a b :=
 Definition angle_ltb a b :=
   (angle_leb a b && negb (angle_eqb a b))%bool.
 
+Theorem rl_sqrt_0 :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  rl_sqrt 0%L = 0%L.
+Proof.
+intros Hop Hic Hor Hii.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rl_nth_root_pow 2 0%L (rngl_le_refl Hor _)) as H1.
+rewrite <- (rngl_squ_0 Hos) in H1 at 2.
+rewrite <- rngl_squ_pow_2 in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_0 Hop) in H1.
+rewrite (rngl_abs_nonneg Hop Hor) in H1; [ easy | ].
+apply rl_sqrt_nonneg, (rngl_le_refl Hor).
+Qed.
+
+Theorem rl_sqrt_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+ rl_sqrt 1%L = 1%L.
+Proof.
+intros Hic Hon Hop Hiv Hor Hii.
+specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
+progress unfold rl_sqrt.
+specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
+rewrite <- (rngl_squ_1 Hon) in H1 at 2.
+rewrite <- rngl_squ_pow_2 in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+  now apply rl_sqrt_nonneg.
+}
+now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
+Qed.
+
 (* to be completed
 Theorem angle_mul_2_div_2 :
   rngl_mul_is_comm T = true →
@@ -925,6 +962,22 @@ destruct ap. {
       rewrite fold_rngl_squ.
       rewrite (rngl_squ_opp Hop).
       rewrite (rngl_squ_1 Hon).
+      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      rewrite (rl_sqrt_1 Hic Hon Hop Hiv Hor Hid).
+      easy.
+    }
+  } {
+    clear Hap.
+...
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+  now apply rl_sqrt_nonneg.
+}
+now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
+...
+
+apply (rngl_mul_move_1_r Hon Hiv) in H1.
+...
       progress unfold rl_sqrt.
 Search rl_nth_root.
 ...
