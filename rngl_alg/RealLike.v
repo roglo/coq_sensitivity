@@ -1074,10 +1074,12 @@ Definition rl_acos Hor (x : T) :=
 
 Arguments rl_acos Hor x%L.
 
-(* to be completed
-Theorem rl_cos_acos : ∀ x, rngl_cos (rl_acos x) = x.
-Proof. easy. Qed.
-*)
+Theorem rl_cos_acos : ∀ Hor x, (x² ≤ 1)%L → rngl_cos (rl_acos Hor x) = x.
+Proof.
+intros * Hx1.
+progress unfold rl_acos.
+now destruct (rngl_le_dec Hor x² 1).
+Qed.
 
 Theorem eq_rl_sqrt_0 :
   rngl_has_opp_or_subt T = true →
