@@ -712,6 +712,9 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -901,6 +904,29 @@ destruct ap. {
       exfalso; apply Hap; clear Hap.
       apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
     } {
+      apply Bool.negb_false_iff in Hap.
+      apply Bool.andb_true_iff in Hap.
+      destruct Hap as (Hac, Has).
+      apply (rngl_eqb_eq Hed) in Hac, Has.
+      progress unfold ε.
+      rewrite Hac, Has.
+      rewrite (rngl_squ_0 Hos).
+      rewrite (rngl_mul_0_r Hos).
+      rewrite (rngl_mul_0_l Hos).
+      rewrite (rngl_leb_refl Hor).
+      rewrite (rngl_mul_1_l Hon).
+      do 2 rewrite (rngl_sub_0_r Hos).
+      rewrite rngl_add_0_l.
+      rewrite (rngl_squ_opp Hop).
+      rewrite (rngl_squ_1 Hon).
+      rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+      rewrite (rngl_sub_diag Hos).
+      rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+      rewrite fold_rngl_squ.
+      rewrite (rngl_squ_opp Hop).
+      rewrite (rngl_squ_1 Hon).
+      progress unfold rl_sqrt.
+Search rl_nth_root.
 ...
   destruct zs; [ clear Hal | easy ].
   apply rngl_leb_le in Hzs.
