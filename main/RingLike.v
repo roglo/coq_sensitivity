@@ -3574,47 +3574,6 @@ rewrite <- (rngl_opp_0 Hop).
 now apply -> (rngl_opp_le_compat Hop Hor).
 Qed.
 
-Theorem rngl_abs_le_squ_le :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (rngl_abs a ≤ rngl_abs b → a² ≤ b²)%L.
-Proof.
-intros Hop Hor * Hab.
-progress unfold rngl_squ.
-progress unfold rngl_abs in Hab.
-remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
-remember (b ≤? 0)%L as bz eqn:Hbz; symmetry in Hbz.
-destruct az. {
-  apply rngl_leb_le in Haz.
-  destruct bz. {
-    apply rngl_leb_le in Hbz.
-    apply (rngl_opp_le_compat Hop Hor) in Hab.
-    now apply (rngl_mul_le_compat_nonpos Hop Hor).
-  } {
-    apply (rngl_leb_gt Hor) in Hbz.
-    apply (rngl_opp_le_compat Hop Hor) in Haz.
-    rewrite (rngl_opp_0 Hop) in Haz.
-    rewrite <- (rngl_mul_opp_opp Hop).
-    apply (rngl_lt_le_incl Hor) in Hbz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
-  }
-} {
-  apply (rngl_leb_gt Hor) in Haz.
-  destruct bz. {
-    apply rngl_leb_le in Hbz.
-    apply (rngl_opp_le_compat Hop Hor) in Hbz.
-    rewrite (rngl_opp_0 Hop) in Hbz.
-    rewrite <- (rngl_mul_opp_opp Hop b).
-    apply (rngl_lt_le_incl Hor) in Haz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
-  } {
-    apply (rngl_leb_gt Hor) in Hbz.
-    apply (rngl_lt_le_incl Hor) in Haz, Hbz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
-  }
-}
-Qed.
-
 Theorem rngl_0_lt_abs :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -4022,6 +3981,20 @@ Proof.
 intros Hon Hos Hiv * Haz.
 progress unfold rngl_squ.
 now rewrite (rngl_inv_mul_distr Hon Hos Hiv).
+Qed.
+
+Theorem rngl_squ_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (b ≠ 0)%L → (a / b)²%L = (a² / b²)%L.
+Proof.
+intros Hic Hon Hos Hiv * Hbz.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- (rngl_squ_inv Hon Hos Hiv); [ | easy ].
+apply (rngl_squ_mul Hic).
 Qed.
 
 Theorem eq_rngl_squ_rngl_abs :
@@ -4576,6 +4549,47 @@ rewrite <- (rngl_mul_1_r Hon b) at 1.
 rewrite <- (rngl_mul_sub_distr_l Hop).
 f_equal.
 apply (rngl_one_sub_half Hon Hop Hiv Hor).
+Qed.
+
+Theorem rngl_abs_le_squ_le :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (rngl_abs a ≤ rngl_abs b → a² ≤ b²)%L.
+Proof.
+intros Hop Hor * Hab.
+progress unfold rngl_squ.
+progress unfold rngl_abs in Hab.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+remember (b ≤? 0)%L as bz eqn:Hbz; symmetry in Hbz.
+destruct az. {
+  apply rngl_leb_le in Haz.
+  destruct bz. {
+    apply rngl_leb_le in Hbz.
+    apply (rngl_opp_le_compat Hop Hor) in Hab.
+    now apply (rngl_mul_le_compat_nonpos Hop Hor).
+  } {
+    apply (rngl_leb_gt Hor) in Hbz.
+    apply (rngl_opp_le_compat Hop Hor) in Haz.
+    rewrite (rngl_opp_0 Hop) in Haz.
+    rewrite <- (rngl_mul_opp_opp Hop).
+    apply (rngl_lt_le_incl Hor) in Hbz.
+    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+  }
+} {
+  apply (rngl_leb_gt Hor) in Haz.
+  destruct bz. {
+    apply rngl_leb_le in Hbz.
+    apply (rngl_opp_le_compat Hop Hor) in Hbz.
+    rewrite (rngl_opp_0 Hop) in Hbz.
+    rewrite <- (rngl_mul_opp_opp Hop b).
+    apply (rngl_lt_le_incl Hor) in Haz.
+    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+  } {
+    apply (rngl_leb_gt Hor) in Hbz.
+    apply (rngl_lt_le_incl Hor) in Haz, Hbz.
+    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+  }
+}
 Qed.
 
 Theorem rngl_squ_le_abs_le :
