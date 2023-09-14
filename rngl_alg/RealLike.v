@@ -2072,13 +2072,14 @@ intros Hic Hon Hop Hiv Hed Hor Hc2 Him * Hnz *.
 specialize (polar Hic Hon Hop Hiv Hed Hc2 Him Hor z) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L).
 set
-  (a :=
+  (θ :=
      (if (0 ≤? gim z)%L then rl_acos Hor (gre z / ρ)%L
       else angle_opp (rl_acos Hor (gre z / ρ)%L))).
-specialize (H1 ρ a eq_refl eq_refl).
-Print mk_gc.
+specialize (H1 ρ θ eq_refl eq_refl).
+set (ρ' := rl_nth_root n ρ).
 ...
-exists (mk_gc (rl_nth_root n ρ) (angle_div_nat θ n)).
+set (θ' := angle_div_nat θ n).
+exists (mk_gc (ρ' * cos θ') (ρ' * sin θ')).
 ...
 assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
   subst ρ.
