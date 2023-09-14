@@ -2069,25 +2069,14 @@ Theorem all_gc_has_nth_root :
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
 intros Hic Hon Hop Hiv Hed Hor Hc2 Him * Hnz *.
-specialize (polar Hic Hon Hop Hiv Hed Hor Hc2 Him z) as H1.
+specialize (polar Hic Hon Hop Hiv Hed Hc2 Him Hor z) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L).
 set
   (a :=
-     (if (0 ≤? gim z)%L then rl_acos (gre z / ρ)
-      else angle_opp (rl_acos (gre z / ρ)))).
+     (if (0 ≤? gim z)%L then rl_acos Hor (gre z / ρ)%L
+      else angle_opp (rl_acos Hor (gre z / ρ)%L))).
 specialize (H1 ρ a eq_refl eq_refl).
-(*
-  j'ai besoin du sin et du cos d'un angle en radians
-  et aussi de acos et/ou asin rendant un angle en radians
-  Par contre, je peux faire a * n en itérant a + a + ... a
-  n fois ; mais c'est l'opération inverse qui m'intéresse.
- *)
-...
-Definition rad_of_angle a := acos (rngl_cos a).
-Definition angle_of_rad θ := mk_ang (cos θ) (sin θ) ...
-Definition angle_div_nat a n :=
-  let θ := rad_of_angle a in
-  angle_of_rad (θ / rngl_of_nat n)%L.
+Print mk_gc.
 ...
 exists (mk_gc (rl_nth_root n ρ) (angle_div_nat θ n)).
 ...
