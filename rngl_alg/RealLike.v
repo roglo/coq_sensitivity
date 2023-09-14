@@ -1956,6 +1956,14 @@ f_equal. {
     }
     apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
     rewrite (rngl_mul_1_l Hon).
+    rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+      rewrite Hρ.
+      apply rl_sqrt_nonneg.
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_square_ge_0 Hop Hor).
+      apply (rngl_square_ge_0 Hop Hor).
+    }
+Search (rngl_abs _ ≤ rngl_abs _)%L.
 ...
   now destruct (0 ≤? zi)%L.
 } {
