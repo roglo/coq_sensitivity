@@ -1885,11 +1885,18 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   now left; rewrite Hiv, Hon.
 }
 assert
-  (Hii :
+  (Hid :
     (rngl_is_integral_domain T ||
        rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1909,7 +1916,7 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
   progress unfold rl_sqrt in Hρ.
   specialize (rl_nth_root_pow 2 0%L) as H1.
   rewrite <- Hρ in H1.
-  apply (rngl_integral Hos Hii) in H1. 2: {
+  apply (rngl_integral Hos Hid) in H1. 2: {
     apply (rngl_le_refl Hor).
   }
   assert (H2 : ρ = 0%L) by now destruct H1.
@@ -1945,7 +1952,8 @@ f_equal. {
     rewrite (rngl_mul_comm Hic).
     now symmetry; apply (rngl_div_mul Hon Hiv).
   }
-  destruct (0 ≤? zi)%L. {
+  remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
+  destruct zzi. {
     rewrite rl_cos_acos; [ easy | ].
     rewrite <- (rngl_squ_1 Hon).
     apply (rngl_abs_le_squ_le Hop Hor).
@@ -1963,7 +1971,16 @@ f_equal. {
       apply (rngl_square_ge_0 Hop Hor).
       apply (rngl_square_ge_0 Hop Hor).
     }
-Search (rngl_abs _ ≤ rngl_abs _)%L.
+    apply (rngl_squ_le_abs_le Hop Hor Hii).
+    rewrite Hρ.
+    rewrite rngl_squ_sqrt. 2: {
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_square_ge_0 Hop Hor).
+      apply (rngl_square_ge_0 Hop Hor).
+    }
+    apply (rngl_le_add_r Hor).
+    apply (rngl_square_ge_0 Hop Hor).
+  } {
 ...
   now destruct (0 ≤? zi)%L.
 } {
