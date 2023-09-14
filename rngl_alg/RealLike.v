@@ -1919,32 +1919,46 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
 subst θ.
 destruct z as (zr, zi).
 cbn in Hρ |-*.
+assert (Hρz : ρ ≠ 0%L). {
+  rewrite Hρ.
+  intros H.
+  apply (eq_rl_sqrt_0 Hos) in H. 2: {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_square_ge_0 Hop Hor).
+    apply (rngl_square_ge_0 Hop Hor).
+  }
+  apply (rl_integral_modulus_prop Hmi) in H.
+  now destruct H; subst zr zi.
+}
+assert (Hzρ : (0 < ρ)%L). {
+  apply not_eq_sym in Hρz.
+  apply (rngl_lt_iff Hor).
+  split; [ | easy ].
+  rewrite Hρ.
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_square_ge_0 Hop Hor).
+}
 f_equal. {
   assert (Hzr : zr = (ρ * (zr / ρ))%L). {
     rewrite (rngl_mul_comm Hic).
-    symmetry; apply (rngl_div_mul Hon Hiv).
-    rewrite Hρ; intros H2.
-    apply (eq_rl_sqrt_0 Hos) in H2. 2: {
-      apply (rngl_add_nonneg_nonneg Hor). {
-        apply (rngl_square_ge_0 Hop Hor).
-      } {
-        apply (rngl_square_ge_0 Hop Hor).
-      }
-    }
-    apply (rl_integral_modulus_prop Hmi) in H2.
-    now destruct H2; subst zr zi.
+    now symmetry; apply (rngl_div_mul Hon Hiv).
   }
+  destruct (0 ≤? zi)%L. {
+    rewrite rl_cos_acos; [ easy | ].
+    rewrite <- (rngl_squ_1 Hon).
+    apply (rngl_abs_le_squ_le Hop Hor).
+    rewrite (rngl_abs_1 Hon Hop Hor).
+    rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
+    rewrite (rngl_abs_nonneg Hop Hor ρ). 2: {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_1_l Hon).
 ...
-  destruct (0 ≤? zi)%L.
   now destruct (0 ≤? zi)%L.
 } {
-  assert (Hρz : ρ ≠ 0%L). {
-    rewrite Hρ.
-    intros H.
-    apply (eq_rl_sqrt_0 Hos) in H.
-    apply (rl_integral_modulus_prop Hmi) in H.
-    now destruct H; subst zr zi.
-  }
   remember (0 ≤? zi)%L as c eqn:Hc; symmetry in Hc.
   destruct c; cbn. {
     apply rngl_leb_le in Hc.
