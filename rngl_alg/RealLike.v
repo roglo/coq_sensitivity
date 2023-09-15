@@ -2057,20 +2057,38 @@ destruct zzi. {
 Qed.
 
 (* to be completed
-Compute (Nat.log2 5).
-Compute (Nat.log2_up 5).
+Compute (Nat.log2_up 3).
+Require Import Rational.
+Import Q.Notations.
+Compute (1/3 - 1//2^2)%Q.
+Compute (Nat.log2_up 12).
+Compute (1/12 - 1//2^4)%Q.
+Compute (Nat.log2_up 48).
+Compute (1/48 - 1//2^6)%Q.
+Compute (Nat.log2_up 192).
+Compute (1/192 - 1//2^8)%Q.
+Compute (Nat.log2_up 768).
+Compute (1/768 - 1//2^10)%Q.
 
-Check Nat.log2_spec.
+Definition qsub_inv a b :=
+  (b - a, a * b).
+
+Compute (qsub_inv (2 ^ (Nat.log2_up 3)) 3).
+...
+Compute (qsub_inv (2 ^ (Nat.log2_up 12)) 12).
+Compute (qsub_inv (2 ^ (Nat.log2_up 192)) 192).
 
 (* n first bits of 1/a *)
 Fixpoint glop n two_pow_n a :=
   match n with
   | 0 => []
   | S n' =>
+      Nat.log2_up a *
       if a <? two_pow_n then ...
       if a =? two_pow_n then [1]
 ...
 
+Check Nat.log2_spec.
 Fixpoint first_bits_of_inv n a :=
   match n with
   | 0 => []
