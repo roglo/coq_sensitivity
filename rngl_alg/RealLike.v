@@ -2082,15 +2082,22 @@ Compute (qsub_inv 192 (2 ^ Nat.log2_up 192)).
 
 Compute (let n := 5 in Nat.log2_up n).
 Compute (let n := 5 in qsub_inv n (2 ^ Nat.log2_up n)).
+Compute (1//5 - 1//2^3)%Q.
+(* 1/5 = 1/5 *)
+Compute (let n := 5/1 in Nat.log2_up n).
+Compute (1//5 - (1//2^3))%Q.
 (* 1/5 = 1/2^3 + 3/40 *)
-(* n such that 3/40 < 1/2^n
-   i.e. 2^n * 3 < 40
-   i.e. 2^n < 40/3 *)
 Compute (let n := 40/3 in Nat.log2_up n).
-Compute (let n := 40/3 in qsub_inv n (2 ^ Nat.log2_up n)).
-(* 1/5 = 1/2^3 + 1/2^4 + 3/208 *)
-Compute (1//2^4 + 3//208)%Q.
-(* pffff... chuis nul, j'arrive pas à trouver l'algo *)
+Compute (1//5 - (1//2^3 + 1//2^4))%Q.
+(* 1/5 = 1/2^3 + 1/2^4 + 1/80 *)
+Compute (let n := 80/1 in Nat.log2_up n).
+Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7))%Q.
+(* 1/5 = 1/2^3 + 1/2^4 + 1/2^7 + 3/640 *)
+Compute (let n := 640/3 in Nat.log2_up n).
+Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7 + 1//2^8))%Q.
+(* 1/5 = 1/2^3 + 1/2^4 + 1/2^7 + 1/2^8 + 1/1280 *)
+Compute (let n := 1280/1 in Nat.log2_up n).
+Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7 + 1//2^8 + 1//2^11))%Q.
 ...
 
 (* n first bits of 1/a *)
