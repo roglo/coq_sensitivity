@@ -2057,6 +2057,36 @@ destruct zzi. {
 Qed.
 
 (* to be completed
+Compute (Nat.log2 5).
+Compute (Nat.log2_up 5).
+
+Check Nat.log2_spec.
+
+(* n first bits of 1/a *)
+Fixpoint glop n two_pow_n a :=
+  match n with
+  | 0 => []
+  | S n' =>
+      if a <? two_pow_n then ...
+      if a =? two_pow_n then [1]
+...
+
+Fixpoint first_bits_of_inv n a :=
+  match n with
+  | 0 => []
+  | S n' =>
+      if a =? Nat.log2
+...
+Fixpoint first_bits_of_rational n p q :=
+  match n with
+  | 0 => []
+  | S n' =>
+      if a =? Nat.log2
+...
+Check Nat.log2_log2_up_spec.
+
+Print Nat.log2_up.
+
 Definition angle_div_nat θ n :=
   {| rngl_cos := 1; rngl_sin := 0;
      rngl_cos2_sin2 := 42 |}%L.
