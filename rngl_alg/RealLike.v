@@ -2057,13 +2057,15 @@ destruct zzi. {
 }
 Qed.
 
-Fixpoint first_bits_of_rat n p q :=
+Fixpoint first_dec_of_rat rad n p q :=
   match n with
   | 0 => []
   | S n' =>
-      let d := 2 * p / q in
-      d :: first_bits_of_rat n' (2 * p - d * q) q
+      let d := rad * p / q in
+      d :: first_dec_of_rat rad n' (rad * p - d * q) q
   end.
+
+Definition first_bits_of_rat := first_dec_of_rat 2.
 
 (* to be completed
 (* first nth bits of p/q *)
