@@ -2071,12 +2071,27 @@ Compute (Nat.log2_up 768).
 Compute (1/768 - 1//2^10)%Q.
 
 Definition qsub_inv a b :=
-  (b - a, a * b).
+  let n := b - a in
+  let d := a * b in
+  (n / Nat.gcd n d, d / Nat.gcd n d).
 
-Compute (qsub_inv (2 ^ (Nat.log2_up 3)) 3).
+Compute (qsub_inv 3 (2 ^ Nat.log2_up 3)).
+Compute (qsub_inv 12 (2 ^ Nat.log2_up 12)).
+Compute (qsub_inv 48 (2 ^ Nat.log2_up 48)).
+Compute (qsub_inv 192 (2 ^ Nat.log2_up 192)).
+
+Compute (let n := 5 in Nat.log2_up n).
+Compute (let n := 5 in qsub_inv n (2 ^ Nat.log2_up n)).
+(* 1/5 = 1/2^3 + 3/40 *)
+(* n such that 3/40 < 1/2^n
+   i.e. 2^n * 3 < 40
+   i.e. 2^n < 40/3 *)
+Compute (let n := 40/3 in Nat.log2_up n).
+Compute (let n := 40/3 in qsub_inv n (2 ^ Nat.log2_up n)).
+(* 1/5 = 1/2^3 + 1/2^4 + 3/208 *)
+Compute (1//2^4 + 3//208)%Q.
+(* pffff... chuis nul, j'arrive pas à trouver l'algo *)
 ...
-Compute (qsub_inv (2 ^ (Nat.log2_up 12)) 12).
-Compute (qsub_inv (2 ^ (Nat.log2_up 192)) 192).
 
 (* n first bits of 1/a *)
 Fixpoint glop n two_pow_n a :=
