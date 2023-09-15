@@ -2057,6 +2057,11 @@ destruct zzi. {
 Qed.
 
 (* to be completed
+Definition angle_div_nat θ n :=
+  {| rngl_cos := 1; rngl_sin := 0;
+     rngl_cos2_sin2 := 42 |}%L.
+...
+
 Theorem all_gc_has_nth_root :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
