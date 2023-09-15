@@ -5,6 +5,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
+Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Init.Nat.
 Require Import IntermVal.
@@ -2056,76 +2057,19 @@ destruct zzi. {
 }
 Qed.
 
+Fixpoint first_bits_of_rat n p q :=
+  match n with
+  | 0 => []
+  | S n' =>
+      let d := 2 * p / q in
+      d :: first_bits_of_rat n' (2 * p - d * q) q
+  end.
+
 (* to be completed
-Compute (Nat.log2_up 3).
-Require Import Rational.
-Import Q.Notations.
-Compute (1/3 - 1//2^2)%Q.
-Compute (Nat.log2_up 12).
-Compute (1/12 - 1//2^4)%Q.
-Compute (Nat.log2_up 48).
-Compute (1/48 - 1//2^6)%Q.
-Compute (Nat.log2_up 192).
-Compute (1/192 - 1//2^8)%Q.
-Compute (Nat.log2_up 768).
-Compute (1/768 - 1//2^10)%Q.
-
-Definition qsub_inv a b :=
-  let n := b - a in
-  let d := a * b in
-  (n / Nat.gcd n d, d / Nat.gcd n d).
-
-Compute (qsub_inv 3 (2 ^ Nat.log2_up 3)).
-Compute (qsub_inv 12 (2 ^ Nat.log2_up 12)).
-Compute (qsub_inv 48 (2 ^ Nat.log2_up 48)).
-Compute (qsub_inv 192 (2 ^ Nat.log2_up 192)).
-
-Compute (let n := 5 in Nat.log2_up n).
-Compute (let n := 5 in qsub_inv n (2 ^ Nat.log2_up n)).
-Compute (1//5 - 1//2^3)%Q.
-(* 1/5 = 1/5 *)
-Compute (let n := 5/1 in Nat.log2_up n).
-Compute (1//5 - (1//2^3))%Q.
-(* 1/5 = 1/2^3 + 3/40 *)
-Compute (let n := 40/3 in Nat.log2_up n).
-Compute (1//5 - (1//2^3 + 1//2^4))%Q.
-(* 1/5 = 1/2^3 + 1/2^4 + 1/80 *)
-Compute (let n := 80/1 in Nat.log2_up n).
-Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7))%Q.
-(* 1/5 = 1/2^3 + 1/2^4 + 1/2^7 + 3/640 *)
-Compute (let n := 640/3 in Nat.log2_up n).
-Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7 + 1//2^8))%Q.
-(* 1/5 = 1/2^3 + 1/2^4 + 1/2^7 + 1/2^8 + 1/1280 *)
-Compute (let n := 1280/1 in Nat.log2_up n).
-Compute (1//5 - (1//2^3 + 1//2^4 + 1//2^7 + 1//2^8 + 1//2^11))%Q.
+(* first nth bits of p/q *)
+Compute (first_bits_of_rat 10 1 2).
+Compute (first_bits_of_rat 10 1 3).
 ...
-
-(* n first bits of 1/a *)
-Fixpoint glop n two_pow_n a :=
-  match n with
-  | 0 => []
-  | S n' =>
-      Nat.log2_up a *
-      if a <? two_pow_n then ...
-      if a =? two_pow_n then [1]
-...
-
-Check Nat.log2_spec.
-Fixpoint first_bits_of_inv n a :=
-  match n with
-  | 0 => []
-  | S n' =>
-      if a =? Nat.log2
-...
-Fixpoint first_bits_of_rational n p q :=
-  match n with
-  | 0 => []
-  | S n' =>
-      if a =? Nat.log2
-...
-Check Nat.log2_log2_up_spec.
-
-Print Nat.log2_up.
 
 Definition angle_div_nat θ n :=
   {| rngl_cos := 1; rngl_sin := 0;
