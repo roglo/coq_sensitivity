@@ -2057,12 +2057,12 @@ destruct zzi. {
 }
 Qed.
 
-Fixpoint first_dec_of_rat rad n p q :=
+Fixpoint first_dec_of_rat rad p q n :=
   match n with
   | 0 => []
   | S n' =>
       let d := rad * p / q in
-      d :: first_dec_of_rat rad n' (rad * p - d * q) q
+      d :: first_dec_of_rat rad (rad * p - d * q) q n'
   end.
 
 Definition first_bits_of_rat := first_dec_of_rat 2.
@@ -2074,23 +2074,49 @@ Fixpoint partial_sum_of_power d a l :=
       (rngl_of_nat b * a + partial_sum_of_power d (a * d) l')%L
   end.
 
+Definition partial_sum_of_inv_pow_2_of_inv n i :=
+  (partial_sum_of_power (1/2) (1/2) (first_bits_of_rat 1 n i))%L.
+
 (* to be completed
+(* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
+   corresponding to 1/5 written in binary, which is
+     [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
+*)
+Theorem inv_is_inf_sum_of_inv_pow_2 :
+  ∀ n,
+  is_limit_when_tending_to_inf (partial_sum_of_inv_pow_2_of_inv n)
+    (1 / rngl_of_nat n)%L.
+Proof.
+intros.
+intros ε Hε.
+progress unfold partial_sum_of_inv_pow_2_of_inv.
+progress unfold first_bits_of_rat.
+...
+
 (* first nth bits of p/q *)
 Compute (first_bits_of_rat 10 1 2).
 Compute (first_bits_of_rat 10 1 3).
 
 End a.
 
-(*
+(**)
 Require Import Rational.
 Import Q.Notations.
 Require Import Qrl.
 
 Compute (first_bits_of_rat 4 1 3).
+Compute (
+  let ro := Q_ring_like_op in
+  partial_sum_of_inv_pow_2_of_inv 5 11).
+Compute (first_bits_of_rat 1 5 10).
+Compute (1/8 + 1/16 + 1/128 + 1/256)%Q.
+...
+Compute (51 * 5).
+...
+Compute (@partial_sum_of_inv_pow_2_of_inv Q Q_ring_like_op 5 0).
+...
 Compute (@partial_sum_of_power Q Q_ring_like_op (1/2) (1/2) (first_bits_of_rat 12 1 3))%Q.
 Compute (1365 * 3).
-...
-*)
 ...
 
 Definition angle_div_nat θ n :=
