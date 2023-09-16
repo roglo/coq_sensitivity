@@ -2071,6 +2071,26 @@ Definition first_bits_of_rat := first_dec_of_rat 2.
 (* first nth bits of p/q *)
 Compute (first_bits_of_rat 10 1 2).
 Compute (first_bits_of_rat 10 1 3).
+
+Fixpoint partial_sum_of_power d a l :=
+  match l with
+  | [] => 0%L
+  | b :: l' =>
+      (rngl_of_nat b * a + partial_sum_of_power d (a * d) l')%L
+  end.
+
+End a.
+
+(*
+Require Import Rational.
+Import Q.Notations.
+Require Import Qrl.
+
+Compute (first_bits_of_rat 4 1 3).
+Compute (@partial_sum_of_power Q Q_ring_like_op (1/2) (1/2) (first_bits_of_rat 12 1 3))%Q.
+Compute (1365 * 3).
+...
+*)
 ...
 
 Definition angle_div_nat θ n :=
