@@ -2083,14 +2083,32 @@ Definition partial_sum_of_inv_pow_2_of_inv n i :=
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
 Theorem inv_is_inf_sum_of_inv_pow_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
   ∀ n,
   is_limit_when_tending_to_inf (partial_sum_of_inv_pow_2_of_inv n)
     (1 / rngl_of_nat n)%L.
 Proof.
-intros.
+intros Hon Hop Hor Har *.
 intros ε Hε.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 progress unfold partial_sum_of_inv_pow_2_of_inv.
 progress unfold first_bits_of_rat.
+specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+destruct (H1 (1 / ε)%L) as (N, HN).
+exists N.
+intros m Hm.
+...
+exists (Nat.log2 (1 / ε)).
 ...
 
 (* first nth bits of p/q *)
