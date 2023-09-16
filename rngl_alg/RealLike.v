@@ -2067,17 +2067,17 @@ Fixpoint first_dec_of_rat rad n p q :=
 
 Definition first_bits_of_rat := first_dec_of_rat 2.
 
-(* to be completed
-(* first nth bits of p/q *)
-Compute (first_bits_of_rat 10 1 2).
-Compute (first_bits_of_rat 10 1 3).
-
 Fixpoint partial_sum_of_power d a l :=
   match l with
   | [] => 0%L
   | b :: l' =>
       (rngl_of_nat b * a + partial_sum_of_power d (a * d) l')%L
   end.
+
+(* to be completed
+(* first nth bits of p/q *)
+Compute (first_bits_of_rat 10 1 2).
+Compute (first_bits_of_rat 10 1 3).
 
 End a.
 
