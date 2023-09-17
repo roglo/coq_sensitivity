@@ -2086,13 +2086,14 @@ Definition partial_sum_of_inv_pow_2_of_inv n i :=
 Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ n,
+  ∀ n, n ≠ 0 →
   is_limit_when_tending_to_inf (partial_sum_of_inv_pow_2_of_inv n)
     (1 / rngl_of_nat n)%L.
 Proof.
-intros Hon Hop Hor Har *.
+intros Hon Hop Hiv Hor Har * Hnz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2107,14 +2108,65 @@ destruct (H1 (1 / ε)%L) as (N, HN).
 exists N.
 intros m Hm.
 progress unfold partial_sum_of_inv_pow_2_of_inv.
-progress unfold first_bits_of_rat.
+(**)
+rewrite (rngl_abs_nonpos Hop Hor). 2: {
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_0 Hop).
+  rewrite (rngl_opp_sub_distr Hop).
+  apply (rngl_le_0_sub Hop Hor).
+...
+induction m. {
+  cbn.
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_add_0_l.
+  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+    apply (rngl_opp_le_compat Hop Hor).
+    rewrite (rngl_opp_0 Hop).
+    rewrite (rngl_opp_involutive Hop).
+    apply (rngl_div_pos Hon Hop Hiv Hor). {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    now apply Nat.neq_0_lt_0.
+  }
+  rewrite (rngl_opp_involutive Hop).
+  apply Nat.le_0_r in Hm; subst N.
+  cbn in HN.
+  rewrite rngl_add_0_r in HN.
+  destruct HN as (_, HN).
+  rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
+    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor) in HN; [ | easy ].
+  rewrite (rngl_mul_1_l Hon) in HN.
+  apply (rngl_le_lt_trans Hor _ 1)%L; [ | easy ].
+  apply (rngl_le_div_l Hon Hop Hiv Hor). 2: {
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- rngl_of_nat_1.
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    apply Nat.le_succ_l.
+    now apply Nat.neq_0_lt_0.
+  }
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+...
+Print first_bits_of_rat.
+Print first_dec_of_rat.
+Theorem first_bits_of_rat_succ :
+  ∀ p q n,
+  first_bits_of_rat p q (S n) =
+    first_bits_of_rat p q n ++ [2 * ah oui non chais pas].
 ...
 Theorem glop :
   ∀ d l,
   (∀ i, i ∈ l → i < d)
-  → (partial_sum_of_inv_power d 1 l ≤ 1)%L.
-Abort.
-Abort.
+  → (partial_sum_of_inv_power d 1 l - 1 / d ≤ 1)%L.
+...
 (*
 ...
 specialize (glop 2 (first_dec_of_rat 2 1

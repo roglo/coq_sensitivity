@@ -2193,6 +2193,9 @@ f_equal.
 apply IHn.
 Qed.
 
+Theorem rngl_of_nat_0 : rngl_of_nat 0 = 0%L.
+Proof. easy. Qed.
+
 Theorem eq_rngl_of_nat_0 :
   rngl_has_1 T = true →
   rngl_characteristic T = 0 →
