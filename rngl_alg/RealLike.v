@@ -2128,17 +2128,60 @@ Theorem glop :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ d p q n, q ≠ 0 →
-  (partial_sum_of_inv_power d 1 (first_bits_of_rat p q n) ≤
-     rngl_of_nat p / rngl_of_nat q)%L.
+  ∀ d p q n m,
+  rngl_of_nat d ≠ 0%L
+  → rngl_of_nat q ≠ 0%L
+  → (partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
+       rngl_of_nat p / rngl_of_nat q)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hqz.
+intros Hon Hop Hiv Hor * Hdz Hqz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1.
+  rewrite (H1 (partial_sum_of_inv_power _ _ _)).
+  apply (rngl_le_refl Hor).
+}
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p; cbn.
-  rewrite first_bits_of_rat_0_l; [ | easy ].
+  rewrite first_bits_of_rat_0_l. 2: {
+    now intros H; subst q.
+  }
+  rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+  revert m.
+  induction n; intros; [ apply (rngl_le_refl Hor) | ].
+  cbn.
+  rewrite (rngl_div_0_l Hos Hi1). 2: {
+    now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  }
+  rewrite rngl_add_0_l.
+  apply IHn.
+}
+revert m.
+induction n; intros. {
+  cbn.
+  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
+    now apply not_eq_sym.
+  }
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
 ...
-induction n; cbn. {
-  apply (rngl_div_pos Hon Hop Hiv Hor).
+rewrite Nat.add_0_r.
 ...
 induction m. {
   cbn.
