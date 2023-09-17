@@ -2078,6 +2078,15 @@ Fixpoint partial_sum_of_inv_power d n l :=
 Definition partial_sum_of_inv_pow_2_of_inv n i :=
   (partial_sum_of_inv_power 2 1 (first_bits_of_rat 1 n i))%L.
 
+Theorem first_bits_of_rat_0_l :
+  ∀ q n, q ≠ 0 → first_bits_of_rat 0 q n = repeat 0 n.
+Proof.
+intros * Hqz.
+induction n; [ easy | cbn ].
+rewrite IHn; f_equal.
+now apply Nat.div_0_l.
+Qed.
+
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
@@ -2114,6 +2123,22 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   rewrite (rngl_opp_0 Hop).
   rewrite (rngl_opp_sub_distr Hop).
   apply (rngl_le_0_sub Hop Hor).
+Theorem glop :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ d p q n, q ≠ 0 →
+  (partial_sum_of_inv_power d 1 (first_bits_of_rat p q n) ≤
+     rngl_of_nat p / rngl_of_nat q)%L.
+Proof.
+intros Hon Hop Hiv Hor * Hqz.
+destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+  subst p; cbn.
+  rewrite first_bits_of_rat_0_l; [ | easy ].
+...
+induction n; cbn. {
+  apply (rngl_div_pos Hon Hop Hiv Hor).
 ...
 induction m. {
   cbn.
