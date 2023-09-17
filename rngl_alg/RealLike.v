@@ -2078,18 +2078,6 @@ Fixpoint partial_sum_of_inv_power d n l :=
 Definition partial_sum_of_inv_pow_2_of_inv n i :=
   (partial_sum_of_inv_power 2 1 (first_bits_of_rat 1 n i))%L.
 
-(*
-Fixpoint partial_sum_of_power d a l :=
-  match l with
-  | [] => 0%L
-  | b :: l' =>
-      (rngl_of_nat b * a + partial_sum_of_power d (a * d) l')%L
-  end.
-
-Definition partial_sum_of_inv_pow_2_of_inv n i :=
-  (partial_sum_of_power (1/2) (1/2) (first_bits_of_rat 1 n i))%L.
-*)
-
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
@@ -2120,10 +2108,14 @@ exists N.
 intros m Hm.
 progress unfold partial_sum_of_inv_pow_2_of_inv.
 progress unfold first_bits_of_rat.
+...
 Theorem glop :
   ∀ d l,
   (∀ i, i ∈ l → i < d)
-  → (partial_sum_of_inv_power d 1 l ≤ rngl_of_nat d)%L.
+  → (partial_sum_of_inv_power d 1 l ≤ 1)%L.
+Abort.
+Abort.
+(*
 ...
 specialize (glop 2 (first_dec_of_rat 2 1
 ...
@@ -2133,6 +2125,7 @@ exists (Nat.log2 ...)
 (* first nth bits of p/q *)
 Compute (first_bits_of_rat 10 1 2).
 Compute (first_bits_of_rat 10 1 3).
+*)
 
 End a.
 
@@ -2147,6 +2140,12 @@ Compute (
   partial_sum_of_inv_pow_2_of_inv 5 6).
 Compute (first_bits_of_rat 1 5 10).
 Compute (1/8 + 1/16 + 1/128 + 1/256)%Q.
+Compute (
+  let ro := Q_ring_like_op in
+  let rp := Q_ring_like_prop in
+  let d := 2 in
+  let l := [1;1;1;1] in
+  (partial_sum_of_inv_power d 1 l, 1/rngl_of_nat d)%L).
 ...
 Compute (51 * 5).
 ...
