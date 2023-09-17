@@ -2067,6 +2067,18 @@ Fixpoint first_dec_of_rat rad p q n :=
 
 Definition first_bits_of_rat := first_dec_of_rat 2.
 
+Fixpoint partial_sum_of_inv_power d n l :=
+  match l with
+  | [] => 0%L
+  | b :: l' =>
+      (rngl_of_nat b / rngl_of_nat d ^ n +
+       partial_sum_of_inv_power d (S n) l')%L
+  end.
+
+Definition partial_sum_of_inv_pow_2_of_inv n i :=
+  (partial_sum_of_inv_power 2 1 (first_bits_of_rat 1 n i))%L.
+
+(*
 Fixpoint partial_sum_of_power d a l :=
   match l with
   | [] => 0%L
@@ -2076,6 +2088,7 @@ Fixpoint partial_sum_of_power d a l :=
 
 Definition partial_sum_of_inv_pow_2_of_inv n i :=
   (partial_sum_of_power (1/2) (1/2) (first_bits_of_rat 1 n i))%L.
+*)
 
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
@@ -2101,14 +2114,20 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1 in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-progress unfold partial_sum_of_inv_pow_2_of_inv.
-progress unfold first_bits_of_rat.
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 exists N.
 intros m Hm.
+progress unfold partial_sum_of_inv_pow_2_of_inv.
+progress unfold first_bits_of_rat.
+Theorem glop :
+  ∀ d l,
+  (∀ i, i ∈ l → i < d)
+  → (partial_sum_of_inv_power d 1 l ≤ rngl_of_nat d)%L.
 ...
-exists (Nat.log2 (1 / ε)).
+specialize (glop 2 (first_dec_of_rat 2 1
+...
+exists (Nat.log2 ...)
 ...
 
 (* first nth bits of p/q *)
@@ -2125,7 +2144,7 @@ Require Import Qrl.
 Compute (first_bits_of_rat 4 1 3).
 Compute (
   let ro := Q_ring_like_op in
-  partial_sum_of_inv_pow_2_of_inv 5 11).
+  partial_sum_of_inv_pow_2_of_inv 5 6).
 Compute (first_bits_of_rat 1 5 10).
 Compute (1/8 + 1/16 + 1/128 + 1/256)%Q.
 ...
