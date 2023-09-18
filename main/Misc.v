@@ -236,6 +236,12 @@ Qed.
 
 (* *)
 
+Theorem Nat_add_diag : ∀ n, n + n = 2 * n.
+Proof.
+intros; cbn.
+now rewrite Nat.add_0_r.
+Qed.
+
 Theorem Nat_leb_add_mono_l : ∀ a b c, (a + b <=? a + c) = (b <=? c).
 Proof.
 intros.

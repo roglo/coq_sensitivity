@@ -2209,6 +2209,40 @@ induction n. {
   rewrite (rngl_mul_1_l Hon).
   now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 }
+Theorem first_bits_of_rat_succ :
+  ∀ p q n, p < q →
+  ∃ a, a < 2 ∧
+  first_bits_of_rat p q (S n) =
+  first_bits_of_rat p q n ++ [a].
+Proof.
+(*
+intros * Hpq.
+cbn.
+rewrite Nat.add_0_r.
+rewrite Nat_add_diag.
+...
+*)
+intros * Hpq.
+induction n. {
+  cbn.
+  rewrite Nat.add_0_r.
+  rewrite Nat_add_diag.
+  exists (2 * p / q).
+  split; [ | easy ].
+  apply Nat.div_lt_upper_bound. {
+    now intros H; subst q.
+  }
+  rewrite Nat.mul_comm.
+  now apply Nat.mul_lt_mono_pos_r.
+}
+destruct IHn as (a & Ha2 & Ha).
+...
+remember (S n) as sn; cbn.
+rewrite Nat.add_0_r.
+rewrite Nat_add_diag.
+... ...
+destruct (first_bits_of_rat_succ p q n) as (a & Ha2 & Ha).
+rewrite Ha.
 ...
 partial_sum_of_inv_power d m (l ++ [a]) =
 partial_sum_of_inv_power d m l + a/d^length l
