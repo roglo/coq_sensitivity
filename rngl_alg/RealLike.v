@@ -2129,13 +2129,14 @@ Theorem glop :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ d p q n m,
-  rngl_of_nat d ≠ 0%L
+  p ≤ q
+  → rngl_of_nat d ≠ 0%L
   → rngl_of_nat q ≠ 0%L
   → (rngl_of_nat p / rngl_of_nat q -
       partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
         1 / rngl_of_nat (2 ^ n))%L.
 Proof.
-intros Hon Hop Hiv Hor * Hdz Hqz.
+intros Hon Hop Hiv Hor * Hpq Hdz Hqz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2150,12 +2151,17 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1.
   rewrite (H1 (_ - _)%L).
   apply (rngl_le_refl Hor).
 }
+apply (rngl_le_sub_le_add_l Hop Hor).
+(*
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p; cbn.
   rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
@@ -2190,16 +2196,21 @@ Search (rngl_of_nat _ = 0)%L.
   rewrite rngl_add_0_l.
   apply IHn.
 }
-revert m.
-induction n; intros. {
+*)
+induction n. {
   cbn.
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  rewrite rngl_add_0_l, rngl_add_0_r.
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_lt_iff Hor).
     split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
     now apply not_eq_sym.
   }
-  apply (rngl_of_nat_nonneg Hon Hop Hor).
+  rewrite (rngl_mul_1_l Hon).
+  now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 }
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+(* ouais, ça devrait le faire. Enfin, je crois. *)
 ...
 rewrite Nat.add_0_r.
 ...
