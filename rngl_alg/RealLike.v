@@ -262,7 +262,7 @@ Fixpoint angle_mul_nat a n :=
 
 End a.
 
-Arguments angle T {ro}.
+Arguments angle T {ro rp}.
 
 (* end angles *)
 
@@ -1122,6 +1122,12 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
 
 End a.
 
+Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
+  match n with
+  | 0 => gc_one
+  | S n' => gc_mul z (gc_power_nat z n')
+  end.
+
 Arguments rl_sqrt {T ro rp rl} _%L.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
@@ -1133,6 +1139,8 @@ Delimit Scope gc_scope with C.
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+Notation "x + 'ℹ' * y" := (mk_gc x y) (at level 50) : gc_scope.
+Notation "z ^ n" := (gc_power_nat z n) : gc_scope.
 
 Definition gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -1146,9 +1154,7 @@ Definition gc_ring_like_op T
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
-(*
-Arguments rl_acos {T ro rp rl} x%L.
-*)
+Arguments gc_power_nat {T ro} z%C n%nat.
 
 Section a.
 
@@ -1674,12 +1680,6 @@ Qed.
 Definition gc_modl (z : GComplex T) :=
   (gre z * gre z + gim z * gim z)%L.
 
-Fixpoint gc_power_nat (z : GComplex T) n :=
-  match n with
-  | 0 => gc_one
-  | S n' => (z * gc_power_nat z n')%C
-  end.
-
 (* should be called with "a ≤ rngl_of_nat n" *)
 Fixpoint int_part_loop n a :=
   match n with
@@ -2087,7 +2087,31 @@ rewrite IHn; f_equal.
 now apply Nat.div_0_l.
 Qed.
 
+Declare Scope angle_scope.
+Delimit Scope angle_scope with A.
+
+Notation "a + b" := (angle_add a b) : angle_scope.
+Notation "n * a" := (angle_mul_nat a n) : angle_scope.
+
+Arguments rngl_cos {T ro rp} a%A.
+Arguments rngl_sin {T ro rp} a%A.
+
+Theorem gc_cos_add_sin_add_is_mul :
+  ∀ a b,
+  (rngl_cos (a + b) + ℹ * rngl_sin (a + b))%C =
+  ((rngl_cos a + ℹ * rngl_sin a) * (rngl_cos b + ℹ * rngl_sin b))%C.
+Proof. easy. Qed.
+
 (* to be completed
+Theorem gc_cos_sin_pow :
+  ∀ a n,
+  (rngl_cos (n * a) + ℹ * rngl_sin (n * a))%C =
+  ((rngl_cos a + ℹ * rngl_sin a) ^ n)%C.
+Proof.
+intros.
+Inspect 1.
+...
+
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
