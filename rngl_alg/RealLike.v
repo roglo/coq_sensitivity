@@ -2209,10 +2209,10 @@ induction n. {
   rewrite (rngl_mul_1_l Hon).
   now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 }
-eapply (rngl_le_trans Hor); [ apply IHn | ].
-(* ouais, ça devrait le faire. Enfin, je crois. *)
 ...
-rewrite Nat.add_0_r.
+partial_sum_of_inv_power d m (l ++ [a]) =
+partial_sum_of_inv_power d m (l + u/d^length l)
+  where 0 ≤ u < d
 ...
 induction m. {
   cbn.
