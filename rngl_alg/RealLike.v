@@ -2131,8 +2131,9 @@ Theorem glop :
   ∀ d p q n m,
   rngl_of_nat d ≠ 0%L
   → rngl_of_nat q ≠ 0%L
-  → (partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
-       rngl_of_nat p / rngl_of_nat q)%L.
+  → (rngl_of_nat p / rngl_of_nat q -
+      partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
+        1 / rngl_of_nat (2 ^ n))%L.
 Proof.
 intros Hon Hop Hiv Hor * Hdz Hqz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -2152,15 +2153,34 @@ assert
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1.
-  rewrite (H1 (partial_sum_of_inv_power _ _ _)).
+  rewrite (H1 (_ - _)%L).
   apply (rngl_le_refl Hor).
 }
 destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
   subst p; cbn.
-  rewrite first_bits_of_rat_0_l. 2: {
-    now intros H; subst q.
-  }
   rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+  progress unfold rngl_sub.
+  rewrite Hop, rngl_add_0_l.
+...
+  apply (rngl_le_trans Hor _ 0). 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+      rewrite (rngl_mul_0_l Hos).
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
+    apply not_eq_sym.
+...
+Search (rngl_of_nat _ = 0)%L.
+    rewrite <- rngl_of_nat_0.
+    intros H.
+    apply (rngl_of_nat_inj Hon Hos) in H.
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  }
+    apply rngl_
+...
+  rewrite first_bits_of_rat_0_l; [ | now intros H; subst q ].
+...
   revert m.
   induction n; intros; [ apply (rngl_le_refl Hor) | ].
   cbn.
@@ -2223,6 +2243,38 @@ induction m. {
   now apply Nat.neq_0_lt_0.
 }
 ...
+...
+End a.
+
+(**)
+Require Import Rational.
+Import Q.Notations.
+Require Import Qrl.
+
+Compute (
+  let ro := Q_ring_like_op in
+  let rp := Q_ring_like_prop in
+  let d := 2 in
+  let p := 4 in
+  let q := 77 in
+  let m := 1 in
+  let n := 6 in
+  (first_bits_of_rat p q n,
+   rngl_of_nat p / rngl_of_nat q -
+    partial_sum_of_inv_power d m (first_bits_of_rat p q n),
+      1 / rngl_of_nat (2 ^ n))%L).
+...
+Theorem glop :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ d p q n m,
+  rngl_of_nat d ≠ 0%L
+  → rngl_of_nat q ≠ 0%L
+  → (partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
+       rngl_of_nat p / rngl_of_nat q)%L.
+Proof.
 Print first_bits_of_rat.
 Print first_dec_of_rat.
 Theorem first_bits_of_rat_succ :
