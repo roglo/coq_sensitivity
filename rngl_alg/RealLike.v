@@ -2133,8 +2133,8 @@ Theorem glop :
   → rngl_of_nat d ≠ 0%L
   → rngl_of_nat q ≠ 0%L
   → (rngl_of_nat p / rngl_of_nat q -
-      partial_sum_of_inv_power d m (first_bits_of_rat p q n) ≤
-        1 / rngl_of_nat (2 ^ n))%L.
+      partial_sum_of_inv_power d m (first_dec_of_rat d p q n) ≤
+        1 / rngl_of_nat (d ^ n))%L.
 Proof.
 intros Hon Hop Hiv Hor * Hpq Hdz Hqz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -2209,6 +2209,37 @@ induction n. {
   rewrite (rngl_mul_1_l Hon).
   now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 }
+Theorem glop :
+  ∀ d p q n, d ≠ 0 → p < q → ∃ a, a < d ∧
+  partial_sum_of_inv_power d 1 (first_dec_of_rat d p q (S n)) =
+  (partial_sum_of_inv_power d 1 (first_dec_of_rat d p q n) +
+     rngl_of_nat a / rngl_of_nat (d ^ S n))%L.
+Proof.
+intros * Hdz Hpq.
+induction n. {
+  cbn.
+  rewrite rngl_add_0_r.
+  rewrite Nat.mul_1_r.
+  destruct d; [ easy | clear Hdz ].
+  cbn.
+  exists ((p + d * p) / q).
+  split. 2: {
+    now rewrite rngl_add_0_l.
+  }
+  apply Nat.div_lt_upper_bound. {
+    now intros H; subst q.
+  }
+  rewrite Nat.mul_succ_r, Nat.add_comm.
+  apply Nat.add_le_lt_mono; [ | easy ].
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_nonneg_r; [ easy | ].
+  now apply Nat.lt_le_incl.
+}
+destruct IHn as (a & Had & Ha).
+... ...
+destruct (glop d p q n m) as (a & Had & Ha).
+rewrite Ha.
+...
 Theorem first_bits_of_rat_succ :
   ∀ p q n, p < q →
   ∃ a, a < 2 ∧
