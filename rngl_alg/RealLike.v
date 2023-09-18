@@ -2211,8 +2211,7 @@ induction n. {
 }
 ...
 partial_sum_of_inv_power d m (l ++ [a]) =
-partial_sum_of_inv_power d m (l + u/d^length l)
-  where 0 ≤ u < d
+partial_sum_of_inv_power d m l + a/d^length l
 ...
 induction m. {
   cbn.
