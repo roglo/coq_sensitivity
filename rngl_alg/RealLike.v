@@ -2102,16 +2102,17 @@ Theorem gc_cos_add_sin_add_is_mul :
   ((rngl_cos a + ℹ * rngl_sin a) * (rngl_cos b + ℹ * rngl_sin b))%C.
 Proof. easy. Qed.
 
-(* to be completed
 Theorem gc_cos_sin_pow :
   ∀ a n,
-  (rngl_cos (n * a) + ℹ * rngl_sin (n * a))%C =
-  ((rngl_cos a + ℹ * rngl_sin a) ^ n)%C.
+  ((rngl_cos a + ℹ * rngl_sin a) ^ n)%C =
+  (rngl_cos (n * a) + ℹ * rngl_sin (n * a))%C.
 Proof.
 intros.
-Inspect 1.
-...
+induction n; [ easy | cbn ].
+now rewrite IHn.
+Qed.
 
+(* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
