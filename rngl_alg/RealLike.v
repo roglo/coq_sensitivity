@@ -2123,7 +2123,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ n, n ≠ 0 →
+  ∀ n, rngl_of_nat n ≠ 0%L →
   is_limit_when_tending_to_inf (partial_sum_of_inv_pow_2_of_inv n)
     (1 / rngl_of_nat n)%L.
 Proof.
@@ -2148,6 +2148,12 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   rewrite (rngl_opp_0 Hop).
   rewrite (rngl_opp_sub_distr Hop).
   apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
+    now apply not_eq_sym.
+  }
+...
 Theorem glop :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
