@@ -180,3 +180,29 @@ l'est pas. Du coup, chais pas quoi faire.
 Peut-être revenir à d'autres de mes recherches, mais chais plus où
 j'en étais, chuis fatigué et déprimé. Plus envie de bosser, mais j'ai
 pas d'idées de savoir quoi faire de ma vie.
+
+mardi 19 septembre 2023 17:51
+
+Bon, entre temps, je me suis consacré à de la trigonométrie sans π, où
+les angles sont définis par des couples (x,y) tels que x²+y²=1.
+
+On fait des sommes (qui sont en fait des produits de nombres
+complexes, par exemple pour l'angle (x,y), on a le nombre complexe
+x+iy). Du coup, ce que j'appelle "cos", c'est x et "sin", c'est y.
+
+On arrive donc à prouver que (cos a + i sin a)^n = cos (na) + i sin
+(na), où na est un produit d'un entier avec un angle (c'est-à-dire une
+somme de n fois le même angle, c'est-à-dire une puissance n du nombre
+complexe associé.
+
+But final, en fait : montrer que x+iy a une racine n-ième. En prenant
+ρ=√(x²+y²), on peut l'écrire sous la forme ρ(cos a + i sin a) où
+l'angle a est (x/ρ, y/ρ) (qui vérifie bien (x/ρ)²+(y/ρ)²=1). Du coup,
+on prend la racine n-ième de ρ (fastoche, c'est un réel positif). Et
+il faut calculer la racine n-ième d'un nombre complexe sur le cercle
+unité, autrement dit diviser l'angle par n.
+
+Je ne sais diviser simplement que par 2. Pour n>2, mon idée est de
+représenter 1/n comme une somme infinie d'inverses de puissances de 2,
+ce qui peut se voir comme 1/n en base 2. Et, du coup, on ne fait que
+des divisions par 2 et des sommes.
