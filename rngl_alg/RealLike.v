@@ -2066,12 +2066,12 @@ Fixpoint first_dec_of_rat rad a b n :=
 
 Definition first_bits_of_rat := first_dec_of_rat 2.
 
-Fixpoint partial_sum_of_inv_power d n l :=
+Fixpoint partial_sum_of_inv_power rad n l :=
   match l with
   | [] => 0%L
   | b :: l' =>
-      (rngl_of_nat b / rngl_of_nat d ^ n +
-       partial_sum_of_inv_power d (S n) l')%L
+      (rngl_of_nat b / rngl_of_nat rad ^ n +
+       partial_sum_of_inv_power rad (S n) l')%L
   end.
 
 Definition partial_sum_of_inv_pow_2_of_inv n i :=
@@ -2156,6 +2156,26 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   progress unfold first_bits_of_rat.
 Print first_dec_of_rat.
 Print partial_sum_of_inv_power.
+Theorem glop :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ rad d a b n, d ≠ 0 → a < b →
+  (partial_sum_of_inv_power rad d (first_dec_of_rat rad a b n) *
+     rngl_of_nat b * rngl_of_nat rad ^ (d - 1) ≤ rngl_of_nat a)%L.
+Proof.
+intros Hon Hop Hor * Hdz Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+revert d a b Hdz Hab.
+induction n; intros. {
+  cbn.
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+cbn.
 ...
 Theorem glop :
   rngl_has_1 T = true →
