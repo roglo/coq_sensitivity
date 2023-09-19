@@ -2154,8 +2154,8 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     now apply not_eq_sym.
   }
   progress unfold first_bits_of_rat.
-Print partial_sum_of_inv_power.
 Print first_dec_of_rat.
+Print partial_sum_of_inv_power.
 ...
 Theorem glop :
   rngl_has_1 T = true →
