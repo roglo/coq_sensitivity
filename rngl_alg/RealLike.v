@@ -2057,12 +2057,11 @@ destruct zzi. {
 }
 Qed.
 
-Fixpoint first_dec_of_rat rad p q n :=
+Fixpoint first_dec_of_rat rad a b n :=
   match n with
   | 0 => []
   | S n' =>
-      let d := rad * p / q in
-      d :: first_dec_of_rat rad (rad * p - d * q) q n'
+      rad * a / b :: first_dec_of_rat rad ((rad * a) mod b) b n'
   end.
 
 Definition first_bits_of_rat := first_dec_of_rat 2.
@@ -2083,6 +2082,7 @@ Theorem first_bits_of_rat_0_l :
 Proof.
 intros * Hqz.
 induction n; [ easy | cbn ].
+rewrite Nat.mod_0_l; [ | easy ].
 rewrite IHn; f_equal.
 now apply Nat.div_0_l.
 Qed.
@@ -2153,6 +2153,9 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
     now apply not_eq_sym.
   }
+  progress unfold first_bits_of_rat.
+Print partial_sum_of_inv_power.
+Print first_dec_of_rat.
 ...
 Theorem glop :
   rngl_has_1 T = true →
@@ -2267,6 +2270,7 @@ induction n. {
   now apply Nat.lt_le_incl.
 }
 destruct IHn as (a & Had & Ha).
+rewrite Ha.
 ... ...
 destruct (glop d p q n m) as (a & Had & Ha).
 rewrite Ha.
@@ -2348,7 +2352,6 @@ induction m. {
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   now apply Nat.neq_0_lt_0.
 }
-...
 ...
 End a.
 
