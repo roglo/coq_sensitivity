@@ -2206,6 +2206,9 @@ Theorem glop :
     partial_sum_of_inv_pow rad a b (S i) n + x)%L.
 Proof.
 intros Hon Hop Hiv Hor Hc1 * Hrz Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 revert rad a b i Hrz Hab.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n. {
@@ -2229,6 +2232,22 @@ destruct n. {
     now intros H; subst rad.
   }
   eapply (rngl_lt_le_trans Hor); [ apply IHi | ].
+  rewrite <- (rngl_mul_1_l Hon (_ ^ S i)%L).
+  remember (S i) as si; cbn; subst si.
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor). 2: {
+    rewrite <- rngl_of_nat_1.
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    apply Nat.nlt_ge.
+    intros H.
+    now apply Nat.lt_1_r in H; subst rad.
+  }
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  apply Nat_pow_nonneg.
+}
+specialize (IHn n (Nat.lt_succ_diag_r _) rad a b i Hrz Hab).
+destruct IHn as (x & Hx1 & Hx).
 ... ...
   specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
   cbn in H2.

@@ -311,6 +311,14 @@ rewrite Nat.add_comm.
 now apply Nat.mod_add.
 Qed.
 
+Theorem Nat_pow_nonneg: ∀ a b, 0 ≤ a ^ b.
+Proof.
+intros.
+induction b; [ easy | cbn ].
+rewrite <- (Nat.mul_0_r a).
+now apply Nat.mul_le_mono_l.
+Qed.
+
 Theorem Nat_lt_lt_add_mul : ∀ a b c n, a < b → c < n → c + n * a < n * b.
 Proof.
 intros * Hab Hcn.
