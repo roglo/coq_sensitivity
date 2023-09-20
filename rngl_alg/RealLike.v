@@ -2194,9 +2194,19 @@ destruct n. {
   apply Hab.
   apply (rngl_of_nat_nonneg Hon Hop Hor).
 }
-...
-remember (S i) as si; cbn; subst si.
-Print partial_sum_of_inv_pow.
+Theorem glop :
+  ∀ rad a  b i n,
+  ∃ x, (x < 1 ∧
+  partial_sum_of_inv_pow rad a b (S i) (S n) =
+    partial_sum_of_inv_pow rad a b (S i) n + x)%L.
+Proof.
+intros.
+revert rad a b i.
+induction n as (n, IHn) using lt_wf_rec; intros.
+destruct n. {
+  remember (S i) as si; cbn; subst si.
+  exists 0%L.
+  split. 2: {
 ... ...
   specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
   cbn in H2.
