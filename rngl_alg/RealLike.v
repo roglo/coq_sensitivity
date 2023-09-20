@@ -2166,6 +2166,17 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
     now apply not_eq_sym.
   }
+Theorem partial_sum_of_inv_pow_le :
+  ∀ rad a b i n,
+  (partial_sum_of_inv_pow rad a b (S i) n * rngl_of_nat b *
+     rngl_of_nat rad ^ i ≤ rngl_of_nat a)%L.
+Proof.
+intros.
+... ...
+  specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
+  cbn in H2.
+  now rewrite (rngl_mul_1_r Hon), rngl_add_0_r in H2.
+}
 ...
 Print first_dec_of_rat.
 Print partial_sum_of_inv_power.
