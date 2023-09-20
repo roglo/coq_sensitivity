@@ -2205,8 +2205,8 @@ revert rad a b i.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n. {
   remember (S i) as si; cbn; subst si.
-  exists 0%L.
-  split. 2: {
+  exists (rngl_of_nat (rad * a / b) / rngl_of_nat rad ^ S i)%L.
+  split; [ | now rewrite rngl_add_0_r, rngl_add_0_l ].
 ... ...
   specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
   cbn in H2.
