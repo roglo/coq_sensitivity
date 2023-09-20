@@ -2167,11 +2167,36 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     now apply not_eq_sym.
   }
 Theorem partial_sum_of_inv_pow_le :
-  ∀ rad a b i n,
-  (partial_sum_of_inv_pow rad a b (S i) n * rngl_of_nat b *
-     rngl_of_nat rad ^ i ≤ rngl_of_nat a)%L.
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ rad a b i n, (rngl_of_nat a < rngl_of_nat b)%L →
+  (partial_sum_of_inv_pow rad a b (S i) n * rngl_of_nat rad ^ i ≤
+     rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-intros.
+intros Hon Hop Hiv Hor * Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+revert rad a b i Hab.
+induction n as (n, IHn) using lt_wf_rec; intros.
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_div_pos Hon Hop Hiv Hor).
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
+  apply not_eq_sym.
+  intros H; rewrite H in Hab.
+  apply (rngl_nle_gt Hor) in Hab.
+  apply Hab.
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+...
+remember (S i) as si; cbn; subst si.
+Print partial_sum_of_inv_pow.
 ... ...
   specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
   cbn in H2.
