@@ -2113,6 +2113,9 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
+
+see everything with "to_radix" in ../main/Misc.v
+
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
