@@ -2057,6 +2057,7 @@ destruct zzi. {
 }
 Qed.
 
+(*
 Fixpoint first_dec_of_rat rad a b n :=
   match n with
   | 0 => []
@@ -2076,7 +2077,20 @@ Fixpoint partial_sum_of_inv_power rad n l :=
 
 Definition partial_sum_of_inv_pow_2_of_inv n i :=
   (partial_sum_of_inv_power 2 1 (first_bits_of_rat 1 n i))%L.
+*)
 
+Fixpoint partial_sum_of_inv_pow rad a b i n :=
+  match n with
+  | 0 => 0%L
+  | S n' =>
+      let q := rad * a / b in
+      let r := (rad * a) mod b in
+      (rngl_of_nat q / rngl_of_nat rad ^ i +
+       partial_sum_of_inv_pow rad r b (S i) n')%L
+  end.
+(* = partial_sum_of_inv_power rad i (first_dec_of_rat rad a b n) *)
+
+(*
 Theorem first_bits_of_rat_0_l :
   ∀ q n, q ≠ 0 → first_bits_of_rat 0 q n = repeat 0 n.
 Proof.
@@ -2086,6 +2100,7 @@ rewrite Nat.mod_0_l; [ | easy ].
 rewrite IHn; f_equal.
 now apply Nat.div_0_l.
 Qed.
+*)
 
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
@@ -2113,13 +2128,11 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
-
-see everything with "to_radix" in ../main/Misc.v
-
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
+Print partial_sum_of_inv_pow.
 Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2127,7 +2140,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ n, rngl_of_nat n ≠ 0%L →
-  is_limit_when_tending_to_inf (partial_sum_of_inv_pow_2_of_inv n)
+  is_limit_when_tending_to_inf (partial_sum_of_inv_pow 2 1 n 1)
     (1 / rngl_of_nat n)%L.
 Proof.
 intros Hon Hop Hiv Hor Har * Hnz.
@@ -2144,6 +2157,7 @@ specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 exists N.
 intros m Hm.
+...
 progress unfold partial_sum_of_inv_pow_2_of_inv.
 (**)
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
@@ -2379,7 +2393,6 @@ induction m. {
 ...
 End a.
 
-(**)
 Require Import Rational.
 Import Q.Notations.
 Require Import Qrl.
@@ -2387,15 +2400,11 @@ Require Import Qrl.
 Compute (
   let ro := Q_ring_like_op in
   let rp := Q_ring_like_prop in
-  let d := 2 in
-  let p := 4 in
-  let q := 77 in
-  let m := 1 in
-  let n := 6 in
-  (first_bits_of_rat p q n,
-   rngl_of_nat p / rngl_of_nat q -
-    partial_sum_of_inv_power d m (first_bits_of_rat p q n),
-      1 / rngl_of_nat (2 ^ n))%L).
+  let rad := 2 in
+  let n := 7 in
+  let i := 7 in
+  (partial_sum_of_inv_pow rad 1 n 1 i,
+   (1 / rngl_of_nat n)%L)).
 ...
 Theorem glop :
   rngl_has_1 T = true →
