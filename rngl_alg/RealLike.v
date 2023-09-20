@@ -2132,7 +2132,6 @@ Qed.
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
-Print partial_sum_of_inv_pow.
 Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2157,9 +2156,6 @@ specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 exists N.
 intros m Hm.
-...
-progress unfold partial_sum_of_inv_pow_2_of_inv.
-(**)
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_opp_le_compat Hop Hor).
   rewrite (rngl_opp_0 Hop).
@@ -2170,7 +2166,6 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
     now apply not_eq_sym.
   }
-  progress unfold first_bits_of_rat.
 ...
 Print first_dec_of_rat.
 Print partial_sum_of_inv_power.
