@@ -2195,18 +2195,40 @@ destruct n. {
   apply (rngl_of_nat_nonneg Hon Hop Hor).
 }
 Theorem glop :
-  ∀ rad a  b i n,
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
+  ∀ rad a  b i n, rngl_of_nat rad ≠ 0%L → a < b →
   ∃ x, (x < 1 ∧
   partial_sum_of_inv_pow rad a b (S i) (S n) =
     partial_sum_of_inv_pow rad a b (S i) n + x)%L.
 Proof.
-intros.
-revert rad a b i.
+intros Hon Hop Hiv Hor Hc1 * Hrz Hab.
+revert rad a b i Hrz Hab.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n. {
   remember (S i) as si; cbn; subst si.
   exists (rngl_of_nat (rad * a / b) / rngl_of_nat rad ^ S i)%L.
   split; [ | now rewrite rngl_add_0_r, rngl_add_0_l ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_nle_gt Hor).
+    intros H; apply Hrz; clear Hrz.
+    apply (rngl_le_antisymm Hor); [ easy | ].
+    apply (rngl_of_nat_nonneg Hon Hop Hor).
+  }
+  rewrite (rngl_mul_1_l Hon).
+  induction i. {
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply Nat.div_lt_upper_bound; [ now intros H; subst b | ].
+    rewrite Nat.mul_comm.
+    apply Nat.mul_lt_mono_pos_r; [ | easy ].
+    apply Nat.neq_0_lt_0.
+    now intros H; subst rad.
+  }
+  eapply (rngl_lt_le_trans Hor); [ apply IHi | ].
 ... ...
   specialize (partial_sum_of_inv_pow_le 2 1 n 0 m) as H2.
   cbn in H2.
@@ -2442,10 +2464,13 @@ Compute (
   let ro := Q_ring_like_op in
   let rp := Q_ring_like_prop in
   let rad := 2 in
-  let n := 7 in
-  let i := 7 in
-  (partial_sum_of_inv_pow rad 1 n 1 i,
-   (1 / rngl_of_nat n)%L)).
+  let a := 6 in
+  let b := 7 in
+  let i := 0 in
+  let n := 8 in
+  (partial_sum_of_inv_pow rad a b (S i) n * rngl_of_nat rad ^ i,
+   rngl_of_nat a / rngl_of_nat b,
+   rngl_of_nat (rad * a / b) / rngl_of_nat rad ^ S i, 1)%L).
 ...
 Theorem glop :
   rngl_has_1 T = true →
