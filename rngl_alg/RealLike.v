@@ -2132,7 +2132,18 @@ Qed.
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
+Theorem partial_sum_of_inv_pow_lt :
+  ∀ rad a b i n,
+  a ≤ b →
+  (rngl_abs
+     (partial_sum_of_inv_pow rad a b i n - rngl_of_nat a / rngl_of_nat b) <
+        1 / rngl_of_nat rad ^ n)%L.
+Proof.
+intros * Hab.
+...
+
 Theorem inv_is_inf_sum_of_inv_pow_2 :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -2142,7 +2153,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   is_limit_when_tending_to_inf (partial_sum_of_inv_pow 2 1 n 1)
     (1 / rngl_of_nat n)%L.
 Proof.
-intros Hon Hop Hiv Hor Har * Hnz.
+intros Hic Hon Hop Hiv Hor Har * Hnz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2154,8 +2165,49 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
-exists N.
+exists (S (Nat.log2_up N)).
 intros m Hm.
+rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+(**)
+rewrite <- rngl_of_nat_1.
+eapply (rngl_lt_le_trans Hor). {
+...
+  apply partial_sum_of_inv_pow_lt.
+  apply Nat.le_succ_l.
+  apply Nat.neq_0_lt_0.
+  now intros H; subst n.
+}
+apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+  cbn; rewrite rngl_add_0_r.
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+eapply (rngl_le_trans Hor). {
+  apply (rngl_lt_le_incl Hor).
+  apply HN.
+}
+rewrite <- (rngl_of_nat_pow Hon Hos).
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+eapply le_trans; [ | apply Hm ].
+cbn; rewrite Nat.add_0_r.
+apply Nat.add_le_mono. {
+  destruct (Nat.eq_dec N 0) as [HNz| HNz]; [ now subst N | ].
+  destruct (Nat.eq_dec N 1) as [HN1| HN1]; [ now subst N | ].
+  apply Nat.log2_up_spec.
+  destruct N; [ easy | ].
+  destruct N; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
+}
+apply Nat.le_succ_l.
+apply Nat.neq_0_lt_0.
+now apply Nat.pow_nonzero.
+...
 apply -> (rngl_abs_lt Hop Hor).
 ...
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
@@ -2209,6 +2261,7 @@ Theorem glop :
     partial_sum_of_inv_pow rad a b (S i) n + x)%L.
 Proof.
 intros Hon Hop Hiv Hor Hc1 * Hrz Hab.
+...
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
