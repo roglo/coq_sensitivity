@@ -2128,10 +2128,6 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
-(* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
-   corresponding to 1/5 written in binary, which is
-     [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
-*)
 Theorem partial_sum_of_inv_pow_lt :
   ∀ rad a b i n,
   a ≤ b →
@@ -2140,8 +2136,16 @@ Theorem partial_sum_of_inv_pow_lt :
         1 / rngl_of_nat rad ^ n)%L.
 Proof.
 intros * Hab.
+(* faudrait que je démontre que si une suite a une limite, c'est
+   forcément une suite de Cauchy ! Alors je pourrais remplacer
+   rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
+   tel que m ≥ n *)
 ...
 
+(* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
+   corresponding to 1/5 written in binary, which is
+     [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
+*)
 Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
