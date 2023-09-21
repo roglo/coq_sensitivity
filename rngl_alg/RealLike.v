@@ -2140,6 +2140,7 @@ intros * Hab.
    forcément une suite de Cauchy ! Alors je pourrais remplacer
    rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
    tel que m ≥ n *)
+Check limit_unique.
 ...
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
