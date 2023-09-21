@@ -2156,6 +2156,8 @@ specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 exists N.
 intros m Hm.
+apply -> (rngl_abs_lt Hop Hor).
+...
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_opp_le_compat Hop Hor).
   rewrite (rngl_opp_0 Hop).
@@ -2166,6 +2168,7 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     split; [ apply (rngl_of_nat_nonneg Hon Hop Hor) | ].
     now apply not_eq_sym.
   }
+...
 Theorem partial_sum_of_inv_pow_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
