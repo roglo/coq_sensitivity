@@ -2141,6 +2141,10 @@ intros * Hab.
    rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
    tel que m ≥ n *)
 Check limit_unique.
+(* quand une suite a une limite, elle est unique, ok ; mais ça suppose
+   de dire que cette suite de Cauchy a une limite, donc qu'il faille
+   mettre en hypothèse que le type T est complet ; mais c'est con,
+   puisqu'on l'a, cette limite ! *)
 ...
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
