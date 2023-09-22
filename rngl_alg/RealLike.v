@@ -2182,7 +2182,8 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 }
 (**)
 progress unfold partial_sum_of_inv_power.
-induction m. {
+induction m; [ easy | ].
+...
   rewrite rngl_summation_empty; [ | easy ].
   progress unfold rngl_sub.
   rewrite Hop.
@@ -2190,6 +2191,21 @@ induction m. {
   rewrite (rngl_abs_nonpos Hop Hor). 2: {
     rewrite <- (rngl_opp_0 Hop).
     apply -> (rngl_opp_le_compat Hop Hor).
+    apply (rngl_div_pos Hon Hop Hiv Hor). {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply Nat.neq_0_lt_0.
+    now intros H; subst n.
+  }
+  rewrite (rngl_opp_involutive Hop).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply Nat.neq_0_lt_0.
+    now intros H; subst n.
+  }
 ...
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
