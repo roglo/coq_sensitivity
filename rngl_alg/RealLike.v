@@ -2057,6 +2057,22 @@ destruct zzi. {
 }
 Qed.
 
+(* first n decimals (in radix rad) of rational p/q
+   where 0 ≤ p/q ≤ 1 *)
+Fixpoint first_dec_of_rat rad a b n :=
+  match n with
+  | 0 => []
+  | S n' =>
+      let q := rad * a / b in
+      let r := (rad * a) mod b in
+      q :: first_dec_of_rat rad r b n'
+  end.
+
+Definition partial_sum_of_inv_power (rad a b n : nat) :=
+  let u := first_dec_of_rat rad a b n in
+  ∑ (i = 1, n), rngl_of_nat u.(i) / rngl_of_nat rad ^ i.
+
+(*
 Fixpoint partial_sum_of_inv_pow rad a b i n :=
   match n with
   | 0 => 0%L
@@ -2066,6 +2082,7 @@ Fixpoint partial_sum_of_inv_pow rad a b i n :=
       (rngl_of_nat q / rngl_of_nat rad ^ S i +
        partial_sum_of_inv_pow rad r b (S i) n')%L
   end.
+*)
 
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
