@@ -2110,12 +2110,12 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
-Theorem partial_sum_of_inv_pow_lt_any_i :
-  ∀ rad a b i n,
+(*
+Theorem partial_sum_of_inv_pow_lt :
+  ∀ rad a b n,
   a ≤ b
   → (rngl_abs
-       (partial_sum_of_inv_pow rad a b i n * rngl_of_nat rad ^ i -
-          rngl_of_nat a / rngl_of_nat b) <
+       (partial_sum_of_inv_power rad a b n - rngl_of_nat a / rngl_of_nat b) <
           1 / rngl_of_nat rad ^ n)%L.
 Proof.
 intros * Hab.
@@ -2128,14 +2128,13 @@ Check limit_unique.
    de dire que cette suite de Cauchy a une limite, donc qu'il faille
    mettre en hypothèse que le type T est complet ; mais c'est con,
    puisqu'on l'a, cette limite ! *)
-...
 
 Theorem partial_sum_of_inv_pow_lt :
   rngl_has_1 T = true →
   ∀ rad a b n,
   a ≤ b
   → (rngl_abs
-       (partial_sum_of_inv_pow rad a b 0 n - rngl_of_nat a / rngl_of_nat b) <
+       (partial_sum_of_inv_power rad a b n - rngl_of_nat a / rngl_of_nat b) <
           1 / rngl_of_nat rad ^ n)%L.
 Proof.
 intros Hon * Hab.
@@ -2143,6 +2142,7 @@ specialize (partial_sum_of_inv_pow_lt_any_i rad a b 0 n Hab) as H1.
 cbn in H1.
 now rewrite (rngl_mul_1_r Hon) in H1.
 Qed.
+*)
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
@@ -2156,7 +2156,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ n, rngl_of_nat n ≠ 0%L →
-  is_limit_when_tending_to_inf (partial_sum_of_inv_pow 2 1 n 0)
+  is_limit_when_tending_to_inf (partial_sum_of_inv_power 2 1 n)
     (1 / rngl_of_nat n)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor Har * Hnz.
@@ -2181,6 +2181,7 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 (**)
+...
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
   apply (partial_sum_of_inv_pow_lt Hon).
