@@ -2182,6 +2182,10 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 }
 (**)
 progress unfold partial_sum_of_inv_power.
+apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+Search Nat.log2_up.
+Search (_ ^ Nat.log2 _).
+...
 induction m; [ easy | ].
 ...
   rewrite rngl_summation_empty; [ | easy ].
