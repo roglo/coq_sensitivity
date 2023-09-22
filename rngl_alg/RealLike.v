@@ -2182,17 +2182,45 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 }
 (**)
 progress unfold partial_sum_of_inv_power.
+(* 1 / (N + 1) < ε *)
+assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 ...
-remember (first_dec_of_rat 2 1 n m) as u eqn:Hu.
-revert u Hu.
-induction m as (m, IHm) using lt_wf_rec; intros.
-destruct m; [ easy | ].
+}
+eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
+clear ε Hε HN Hnε.
+revert N Hm.
+induction m; intros; [ easy | ].
+apply Nat.succ_le_mono in Hm.
+destruct N. {
+  rewrite Nat.add_0_l.
+  rewrite rngl_of_nat_1.
+  rewrite (rngl_div_diag Hon Hiq). 2: {
+    now apply (rngl_1_neq_0_iff Hon).
+  }
+...
+}
+Search (Nat.log2_up (S _)).
+specialize (Nat.log2_up_succ_or N) as H2.
+destruct H2 as [H2| H2]. {
+  rewrite H2 in Hm.
+  specialize (IHm N Hm).
+...
 Theorem glop :
   ∀ rad a b n,
   ∃ d, 0 ≤ d < rad ∧
   first_dec_of_rat rad a b (S n) =
   first_dec_of_rat rad a b n ++ [d].
 Proof.
+...
+rewrite glop.
+...
+cbn in Hm.
+Search (Nat.log2_up (S _)).
+...
+remember (first_dec_of_rat 2 1 n m) as u eqn:Hu.
+revert u Hu.
+induction m as (m, IHm) using lt_wf_rec; intros.
+destruct m; [ easy | ].
 ...
 destruct (glop 2 1 n m) as (x & Hx2 & Hx).
 destruct Hx2 as (_, Hx2).
