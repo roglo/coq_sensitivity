@@ -2184,6 +2184,7 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 progress unfold partial_sum_of_inv_power.
 (* 1 / (N + 1) < ε *)
 assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
 ...
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
