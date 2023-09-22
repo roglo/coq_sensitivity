@@ -2182,6 +2182,22 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 }
 (**)
 progress unfold partial_sum_of_inv_power.
+...
+remember (first_dec_of_rat 2 1 n m) as u eqn:Hu.
+revert u Hu.
+induction m as (m, IHm) using lt_wf_rec; intros.
+destruct m; [ easy | ].
+Theorem glop :
+  ∀ rad a b n,
+  ∃ d, 0 ≤ d < rad ∧
+  first_dec_of_rat rad a b (S n) =
+  first_dec_of_rat rad a b n ++ [d].
+Proof.
+...
+destruct (glop 2 1 n m) as (x & Hx2 & Hx).
+destruct Hx2 as (_, Hx2).
+rewrite Hx in Hu.
+...
 apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
 Search Nat.log2_up.
 Search (_ ^ Nat.log2 _).
