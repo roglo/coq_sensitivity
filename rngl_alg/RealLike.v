@@ -2184,6 +2184,12 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 progress unfold partial_sum_of_inv_power.
 induction m. {
   rewrite rngl_summation_empty; [ | easy ].
+  progress unfold rngl_sub.
+  rewrite Hop.
+  rewrite rngl_add_0_l.
+  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
 ...
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
