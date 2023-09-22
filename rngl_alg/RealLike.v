@@ -2097,9 +2097,9 @@ Theorem partial_sum_of_inv_pow_lt_any_i :
   ∀ rad a b i n,
   a ≤ b
   → (rngl_abs
-       (partial_sum_of_inv_pow rad a b i n -
-          rngl_of_nat a / rngl_of_nat b / rngl_of_nat rad ^ i) <
-          1 / rngl_of_nat rad ^ (i + n))%L.
+       (partial_sum_of_inv_pow rad a b i n * rngl_of_nat rad ^ i -
+          rngl_of_nat a / rngl_of_nat b) <
+          1 / rngl_of_nat rad ^ n)%L.
 Proof.
 intros * Hab.
 (* faudrait que je démontre que si une suite a une limite, c'est
@@ -2111,22 +2111,20 @@ Check limit_unique.
    de dire que cette suite de Cauchy a une limite, donc qu'il faille
    mettre en hypothèse que le type T est complet ; mais c'est con,
    puisqu'on l'a, cette limite ! *)
-Print partial_sum_of_inv_pow.
 ...
 
 Theorem partial_sum_of_inv_pow_lt :
   rngl_has_1 T = true →
-  rngl_has_inv_or_quot T = true →
-  rngl_characteristic T ≠ 1 →
   ∀ rad a b n,
   a ≤ b
   → (rngl_abs
        (partial_sum_of_inv_pow rad a b 0 n - rngl_of_nat a / rngl_of_nat b) <
           1 / rngl_of_nat rad ^ n)%L.
 Proof.
-intros Hon Hiq Hc1 * Hab.
+intros Hon * Hab.
 specialize (partial_sum_of_inv_pow_lt_any_i rad a b 0 n Hab) as H1.
-now rewrite (rngl_div_1_r Hon Hiq Hc1) in H1.
+cbn in H1.
+now rewrite (rngl_mul_1_r Hon) in H1.
 Qed.
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
@@ -2168,7 +2166,7 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 (**)
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
-  apply (partial_sum_of_inv_pow_lt Hon Hiq Hc1).
+  apply (partial_sum_of_inv_pow_lt Hon).
   apply Nat.le_succ_l.
   apply Nat.neq_0_lt_0.
   now intros H; subst n.
