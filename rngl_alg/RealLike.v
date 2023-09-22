@@ -2195,6 +2195,48 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hm.
+rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  apply Nat.le_0_r in Hm.
+  apply Nat.log2_up_null in Hm.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_add_0_l.
+  cbn - [ first_dec_of_rat ].
+  rewrite rngl_add_0_r.
+...
+  destruct N. {
+    cbn; rewrite rngl_add_0_r.
+    rewrite (rngl_div_diag Hon Hiq). 2: {
+      now apply (rngl_1_neq_0_iff Hon).
+    }
+    destruct n; [ easy | ].
+    cbn.
+    destruct n; cbn. {
+      rewrite rngl_add_0_r.
+      rewrite (rngl_div_diag Hon Hiq). 2: {
+        now apply (rngl_2_neq_0 Hon).
+      }
+      rewrite (rngl_div_diag Hon Hiq). 2: {
+        now apply (rngl_1_neq_0_iff Hon).
+      }
+      rewrite (rngl_sub_diag Hos).
+      rewrite (rngl_abs_0 Hop).
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    destruct n; cbn.
+...
+  apply Nat.le_0_r in Hm.
+  apply Nat.log2_up_null in Hm.
+...
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ now apply -> Nat.succ_le_mono | ].
+  apply -> Nat.succ_le_mono.
+  destruct m; [ | now apply -> Nat.succ_le_mono ].
+  exfalso.
+Search (_ < Nat.log2_up _).
 ...
 revert N Hm.
 induction m; intros; [ easy | ].
