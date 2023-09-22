@@ -2130,12 +2130,13 @@ Qed.
 (* to be completed
 Theorem partial_sum_of_inv_pow_lt :
   ∀ rad a b i n,
-  a ≤ b →
-  (rngl_abs
-     (partial_sum_of_inv_pow rad a b i n - rngl_of_nat a / rngl_of_nat b) <
-        1 / rngl_of_nat rad ^ n)%L.
+  a ≤ b
+  → i ≠ 0
+  → (rngl_abs
+       (partial_sum_of_inv_pow rad a b i n - rngl_of_nat a / rngl_of_nat b) <
+          1 / rngl_of_nat rad ^ (i + n - 1))%L.
 Proof.
-intros * Hab.
+intros * Hab Hiz.
 (* faudrait que je démontre que si une suite a une limite, c'est
    forcément une suite de Cauchy ! Alors je pourrais remplacer
    rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
@@ -2145,6 +2146,7 @@ Check limit_unique.
    de dire que cette suite de Cauchy a une limite, donc qu'il faille
    mettre en hypothèse que le type T est complet ; mais c'est con,
    puisqu'on l'a, cette limite ! *)
+Print partial_sum_of_inv_pow.
 ...
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
@@ -2183,8 +2185,7 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 (**)
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
-...
-  apply partial_sum_of_inv_pow_lt.
+  apply partial_sum_of_inv_pow_lt; [ | easy ].
   apply Nat.le_succ_l.
   apply Nat.neq_0_lt_0.
   now intros H; subst n.
@@ -2203,6 +2204,7 @@ eapply (rngl_le_trans Hor). {
 rewrite <- (rngl_of_nat_pow Hon Hos).
 apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+rewrite (Nat.add_comm 1 m), Nat.add_sub.
 eapply le_trans; [ | apply Hm ].
 cbn; rewrite Nat.add_0_r.
 apply Nat.add_le_mono. {
@@ -2213,7 +2215,6 @@ apply Nat.add_le_mono. {
   destruct N; [ easy | ].
   now apply -> Nat.succ_lt_mono.
 }
-apply Nat.le_succ_l.
 apply Nat.neq_0_lt_0.
 now apply Nat.pow_nonzero.
 ...
