@@ -2057,50 +2057,15 @@ destruct zzi. {
 }
 Qed.
 
-(*
-Fixpoint first_dec_of_rat rad a b n :=
-  match n with
-  | 0 => []
-  | S n' =>
-      rad * a / b :: first_dec_of_rat rad ((rad * a) mod b) b n'
-  end.
-
-Definition first_bits_of_rat := first_dec_of_rat 2.
-
-Fixpoint partial_sum_of_inv_power rad n l :=
-  match l with
-  | [] => 0%L
-  | b :: l' =>
-      (rngl_of_nat b / rngl_of_nat rad ^ n +
-       partial_sum_of_inv_power rad (S n) l')%L
-  end.
-
-Definition partial_sum_of_inv_pow_2_of_inv n i :=
-  (partial_sum_of_inv_power 2 1 (first_bits_of_rat 1 n i))%L.
-*)
-
 Fixpoint partial_sum_of_inv_pow rad a b i n :=
   match n with
   | 0 => 0%L
   | S n' =>
       let q := rad * a / b in
       let r := (rad * a) mod b in
-      (rngl_of_nat q / rngl_of_nat rad ^ i +
+      (rngl_of_nat q / rngl_of_nat rad ^ S i +
        partial_sum_of_inv_pow rad r b (S i) n')%L
   end.
-(* = partial_sum_of_inv_power rad i (first_dec_of_rat rad a b n) *)
-
-(*
-Theorem first_bits_of_rat_0_l :
-  ∀ q n, q ≠ 0 → first_bits_of_rat 0 q n = repeat 0 n.
-Proof.
-intros * Hqz.
-induction n; [ easy | cbn ].
-rewrite Nat.mod_0_l; [ | easy ].
-rewrite IHn; f_equal.
-now apply Nat.div_0_l.
-Qed.
-*)
 
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
@@ -2128,15 +2093,15 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
-Theorem partial_sum_of_inv_pow_lt :
+Theorem partial_sum_of_inv_pow_lt_any_i :
   ∀ rad a b i n,
   a ≤ b
-  → i ≠ 0
   → (rngl_abs
-       (partial_sum_of_inv_pow rad a b i n - rngl_of_nat a / rngl_of_nat b) <
-          1 / rngl_of_nat rad ^ (i + n - 1))%L.
+       (partial_sum_of_inv_pow rad a b i n -
+          rngl_of_nat a / rngl_of_nat b / rngl_of_nat rad ^ i) <
+          1 / rngl_of_nat rad ^ (i + n))%L.
 Proof.
-intros * Hab Hiz.
+intros * Hab.
 (* faudrait que je démontre que si une suite a une limite, c'est
    forcément une suite de Cauchy ! Alors je pourrais remplacer
    rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
@@ -2148,6 +2113,21 @@ Check limit_unique.
    puisqu'on l'a, cette limite ! *)
 Print partial_sum_of_inv_pow.
 ...
+
+Theorem partial_sum_of_inv_pow_lt :
+  rngl_has_1 T = true →
+  rngl_has_inv_or_quot T = true →
+  rngl_characteristic T ≠ 1 →
+  ∀ rad a b n,
+  a ≤ b
+  → (rngl_abs
+       (partial_sum_of_inv_pow rad a b 0 n - rngl_of_nat a / rngl_of_nat b) <
+          1 / rngl_of_nat rad ^ n)%L.
+Proof.
+intros Hon Hiq Hc1 * Hab.
+specialize (partial_sum_of_inv_pow_lt_any_i rad a b 0 n Hab) as H1.
+now rewrite (rngl_div_1_r Hon Hiq Hc1) in H1.
+Qed.
 
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
@@ -2161,13 +2141,16 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ n, rngl_of_nat n ≠ 0%L →
-  is_limit_when_tending_to_inf (partial_sum_of_inv_pow 2 1 n 1)
+  is_limit_when_tending_to_inf (partial_sum_of_inv_pow 2 1 n 0)
     (1 / rngl_of_nat n)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor Har * Hnz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -2185,7 +2168,7 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
 (**)
 rewrite <- rngl_of_nat_1.
 eapply (rngl_lt_le_trans Hor). {
-  apply partial_sum_of_inv_pow_lt; [ | easy ].
+  apply (partial_sum_of_inv_pow_lt Hon Hiq Hc1).
   apply Nat.le_succ_l.
   apply Nat.neq_0_lt_0.
   now intros H; subst n.
@@ -2204,7 +2187,6 @@ eapply (rngl_le_trans Hor). {
 rewrite <- (rngl_of_nat_pow Hon Hos).
 apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
-rewrite (Nat.add_comm 1 m), Nat.add_sub.
 eapply le_trans; [ | apply Hm ].
 cbn; rewrite Nat.add_0_r.
 apply Nat.add_le_mono. {
