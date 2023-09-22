@@ -206,3 +206,13 @@ Je ne sais diviser simplement que par 2. Pour n>2, mon idée est de
 représenter 1/n comme une somme infinie d'inverses de puissances de 2,
 ce qui peut se voir comme 1/n en base 2. Et, du coup, on ne fait que
 des divisions par 2 et des sommes.
+
+vendredi 22 septembre 2023 09:35
+
+Pas d'idée, déprimé. Faut que je prouve que 1/3 = 1/4 + 1/16 + 1/64
++..., bref qu'un rationel inférieur à 1 est une somme infinie de
+puissances négatives de 2, ce qui est normalement évident, puisque ça
+découle de la représentation du nombre en base 2 (1/3 = 0,010101...).
+
+Mais je sais pas comment m'y prendre. Les preuves par récurrence
+marchent pas.
