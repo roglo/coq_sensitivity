@@ -2181,9 +2181,6 @@ rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
 }
-(**)
-progress unfold partial_sum_of_inv_power.
-(* 1 / (N + 1) < ε *)
 assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     rewrite <- rngl_of_nat_0.
@@ -2194,6 +2191,8 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
   now apply (rngl_lt_div_l Hon Hop Hiv Hor).
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
+...
+progress unfold partial_sum_of_inv_power.
 clear ε Hε HN Hnε.
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hm.
