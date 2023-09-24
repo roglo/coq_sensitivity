@@ -2182,6 +2182,7 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
+...
 progress unfold partial_sum_of_inv_power.
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hm.
