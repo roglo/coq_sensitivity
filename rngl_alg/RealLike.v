@@ -2057,8 +2057,21 @@ destruct zzi. {
 }
 Qed.
 
+(* nth decimal (in radix rad) of rational p/q *)
+Fixpoint nth_dec_of_rat rad a b n :=
+  match n with
+  | 0 => rad * a / b
+  | S n' =>
+      let r := (rad * a) mod b in
+      nth_dec_of_rat rad r b n'
+  end.
+
+Definition partial_sum_of_inv_power (rad a b n : nat) :=
+  let u := nth_dec_of_rat rad a b in
+  ∑ (i = 1, n), rngl_of_nat (u (i - 1)%nat) / rngl_of_nat rad ^ i.
+
 (* first n decimals (in radix rad) of rational p/q
-   where 0 ≤ p/q ≤ 1 *)
+   where 0 ≤ p/q ≤ 1
 Fixpoint first_dec_of_rat rad a b n :=
   match n with
   | 0 => []
@@ -2068,20 +2081,17 @@ Fixpoint first_dec_of_rat rad a b n :=
       q :: first_dec_of_rat rad r b n'
   end.
 
+Compute (
+  let rad := 10 in
+  let a := 6 in
+  let b := 7 in
+  let n := 7 in
+  (first_dec_of_rat rad a b (S n),
+   nth_dec_of_rat rad a b n)).
+
 Definition partial_sum_of_inv_power (rad a b n : nat) :=
   let u := first_dec_of_rat rad a b n in
   ∑ (i = 1, n), rngl_of_nat u.(i) / rngl_of_nat rad ^ i.
-
-(*
-Fixpoint partial_sum_of_inv_pow rad a b i n :=
-  match n with
-  | 0 => 0%L
-  | S n' =>
-      let q := rad * a / b in
-      let r := (rad * a) mod b in
-      (rngl_of_nat q / rngl_of_nat rad ^ S i +
-       partial_sum_of_inv_pow rad r b (S i) n')%L
-  end.
 *)
 
 Declare Scope angle_scope.
@@ -2191,9 +2201,8 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
   now apply (rngl_lt_div_l Hon Hop Hiv Hor).
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
-...
-progress unfold partial_sum_of_inv_power.
 clear ε Hε HN Hnε.
+progress unfold partial_sum_of_inv_power.
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hm.
 rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
@@ -2203,8 +2212,9 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   apply Nat.log2_up_null in Hm.
   rewrite rngl_summation_empty; [ | easy ].
   rewrite rngl_add_0_l.
-  cbn - [ first_dec_of_rat ].
-  rewrite rngl_add_0_r.
+  cbn - [ rngl_of_nat ].
+  rewrite (rngl_of_nat_add 1).
+  rewrite rngl_of_nat_1.
 ...
   destruct N. {
     cbn; rewrite rngl_add_0_r.
