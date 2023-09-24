@@ -2165,7 +2165,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
-exists (S (Nat.log2_up N)).
+exists (S (S (Nat.log2_up N))).
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
@@ -2186,6 +2186,17 @@ progress unfold partial_sum_of_inv_power.
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hm.
 rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hm.
+rewrite (rngl_summation_shift 2). 2: {
+  split; [ easy | ].
+  now do 2 apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag.
+rewrite Nat.sub_succ.
+rewrite Nat_sub_succ_1.
+cbn - [ rngl_of_nat Nat.modulo ].
+...
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   subst m.
   apply Nat.le_0_r in Hm.
