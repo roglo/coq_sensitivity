@@ -2153,6 +2153,10 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1 in Hε.
@@ -2193,6 +2197,42 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite rngl_of_nat_1.
   progress unfold nth_dec_of_rat.
   rewrite Nat.mul_1_l, Nat.pow_1_r.
+  destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+    subst n.
+    rewrite Nat.div_1_r.
+    rewrite Nat.mod_same; [ | easy ].
+    rewrite rngl_of_nat_0.
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    progress unfold rngl_sub.
+    rewrite Hop.
+    rewrite rngl_add_0_l.
+    rewrite rngl_of_nat_1.
+    rewrite (rngl_div_1_r Hon Hiq Hc1).
+    rewrite (rngl_abs_opp Hop Hor).
+    rewrite (rngl_abs_1 Hon Hop Hor).
+    apply (rngl_le_div_r Hon Hop Hiv Hor). {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      rewrite Nat.add_1_r.
+      apply Nat.lt_0_succ.
+    }
+    destruct N. {
+      cbn; rewrite rngl_add_0_r.
+      rewrite (rngl_mul_1_l Hon).
+      apply (rngl_le_refl Hor).
+    }
+    rewrite (rngl_mul_1_l Hon).
+    apply Nat.succ_le_mono in Hm.
+    destruct N; [ | easy ].
+(* et paf ! ça marche pas *)
+...
+  rewrite Nat.mod_small. 2: {
+    destruct n; [ easy | ].
+...
+    apply Nat.div_lt; [ easy | ].
+    apply Nat.div_lt_upper_bound; [ easy | ].
 ...
   ============================
   (rngl_abs (rngl_of_nat (2 / n) / 2 - 1 / rngl_of_nat n) ≤ 1 / rngl_of_nat (N + 1))%L
