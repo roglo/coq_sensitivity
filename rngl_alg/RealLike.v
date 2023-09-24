@@ -2165,6 +2165,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
+...
 exists (S (S (Nat.log2_up N))).
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
