@@ -2058,6 +2058,14 @@ destruct zzi. {
 Qed.
 
 (* nth decimal (in radix rad) of rational p/q *)
+Definition nth_dec_of_rat rad a b n :=
+  (a * rad ^ n / b) mod rad.
+
+Definition partial_sum_of_inv_power (rad a b n : nat) :=
+  let u := nth_dec_of_rat rad a b in
+  ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
+
+(*
 Fixpoint nth_dec_of_rat rad a b n :=
   match n with
   | 0 => rad * a / b
@@ -2065,10 +2073,7 @@ Fixpoint nth_dec_of_rat rad a b n :=
       let r := (rad * a) mod b in
       nth_dec_of_rat rad r b n'
   end.
-
-Definition partial_sum_of_inv_power (rad a b n : nat) :=
-  let u := nth_dec_of_rat rad a b in
-  ∑ (i = 1, n), rngl_of_nat (u (i - 1)%nat) / rngl_of_nat rad ^ i.
+*)
 
 (* first n decimals (in radix rad) of rational p/q
    where 0 ≤ p/q ≤ 1
@@ -2085,13 +2090,18 @@ Compute (
   let rad := 10 in
   let a := 6 in
   let b := 7 in
-  let n := 7 in
+  let n := 0 in
   (first_dec_of_rat rad a b (S n),
-   nth_dec_of_rat rad a b n)).
+   nth_dec_of_rat rad a b n,
+   nth_dec_of_rat' rad a b n)).
 
 Definition partial_sum_of_inv_power (rad a b n : nat) :=
   let u := first_dec_of_rat rad a b n in
   ∑ (i = 1, n), rngl_of_nat u.(i) / rngl_of_nat rad ^ i.
+
+Definition partial_sum_of_inv_power (rad a b n : nat) :=
+  let u := nth_dec_of_rat rad a b in
+  ∑ (i = 1, n), rngl_of_nat (u (i - 1)%nat) / rngl_of_nat rad ^ i.
 *)
 
 Declare Scope angle_scope.
@@ -2120,40 +2130,6 @@ now rewrite IHn.
 Qed.
 
 (* to be completed
-(*
-Theorem partial_sum_of_inv_pow_lt :
-  ∀ rad a b n,
-  a ≤ b
-  → (rngl_abs
-       (partial_sum_of_inv_power rad a b n - rngl_of_nat a / rngl_of_nat b) <
-          1 / rngl_of_nat rad ^ n)%L.
-Proof.
-intros * Hab.
-(* faudrait que je démontre que si une suite a une limite, c'est
-   forcément une suite de Cauchy ! Alors je pourrais remplacer
-   rngl_of_nat a / rngl_of_nat b par partial_sum blablabla avec m
-   tel que m ≥ n *)
-Check limit_unique.
-(* quand une suite a une limite, elle est unique, ok ; mais ça suppose
-   de dire que cette suite de Cauchy a une limite, donc qu'il faille
-   mettre en hypothèse que le type T est complet ; mais c'est con,
-   puisqu'on l'a, cette limite ! *)
-
-Theorem partial_sum_of_inv_pow_lt :
-  rngl_has_1 T = true →
-  ∀ rad a b n,
-  a ≤ b
-  → (rngl_abs
-       (partial_sum_of_inv_power rad a b n - rngl_of_nat a / rngl_of_nat b) <
-          1 / rngl_of_nat rad ^ n)%L.
-Proof.
-intros Hon * Hab.
-specialize (partial_sum_of_inv_pow_lt_any_i rad a b 0 n Hab) as H1.
-cbn in H1.
-now rewrite (rngl_mul_1_r Hon) in H1.
-Qed.
-*)
-
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
@@ -2212,10 +2188,16 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   apply Nat.log2_up_null in Hm.
   rewrite rngl_summation_empty; [ | easy ].
   rewrite rngl_add_0_l.
-  cbn - [ rngl_of_nat ].
+  cbn - [ rngl_of_nat Nat.modulo ].
   rewrite (rngl_of_nat_add 1).
   rewrite rngl_of_nat_1.
+  progress unfold nth_dec_of_rat.
+  rewrite Nat.mul_1_l, Nat.pow_1_r.
 ...
+  ============================
+  (rngl_abs (rngl_of_nat (2 / n) / 2 - 1 / rngl_of_nat n) ≤ 1 / rngl_of_nat (N + 1))%L
+  ============================
+  (rngl_abs (rngl_of_nat ((2 / n) mod 2) / 2 - 1 / rngl_of_nat n) ≤ 1 / rngl_of_nat (N + 1))%L
   destruct N. {
     cbn; rewrite rngl_add_0_r.
     rewrite (rngl_div_diag Hon Hiq). 2: {
