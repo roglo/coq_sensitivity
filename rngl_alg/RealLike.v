@@ -2181,6 +2181,13 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1 in Hε.
@@ -2213,7 +2220,38 @@ clear ε Hε HN Hnε.
 (**)
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
-  admit. (* a lemma to do *)
+  clear Hm.
+  (* lemma to do *)
+  progress unfold partial_sum_of_inv_power.
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_summation_le_compat Hor) with
+      (h := λ i, (1 / rngl_of_nat 2 ^ i)%L).
+    intros i Hi.
+    progress unfold rngl_div.
+    rewrite Hiv.
+    apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with
+        (c := (rngl_of_nat 2 ^ i)%L). {
+        apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+        cbn; rewrite rngl_add_0_r.
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_mul_0_r Hos).
+      rewrite (rngl_mul_inv_r Hon Hiv). 2: {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        cbn; rewrite rngl_add_0_r.
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    rewrite <- rngl_of_nat_1.
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    progress unfold nth_dec_of_rat.
+    apply Nat.lt_succ_r.
+    now apply Nat.mod_upper_bound.
+  }
+(* ah bin non, ça marche pas du tout, ça *)
+...
 }
 rewrite (rngl_opp_sub_distr Hop).
 (*
@@ -2225,7 +2263,7 @@ induction m; intros. {
   now apply Nat.pow_eq_0 in Hm.
 }
 rewrite partial_sum_of_inv_power_succ.
-rewrite (rngl_sub_add_distr Hos).
+prewrite (rngl_sub_add_distr Hos).
 apply (rngl_le_sub_le_add_r Hop Hor).
 destruct N. {
   admit. (* à voir *)
