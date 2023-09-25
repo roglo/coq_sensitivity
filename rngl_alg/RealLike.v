@@ -2129,6 +2129,30 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
+Theorem partial_sum_of_inv_power_succ :
+  ∀ rad a b n,
+  partial_sum_of_inv_power rad a b (S n) =
+  (partial_sum_of_inv_power rad a b n +
+     rngl_of_nat (nth_dec_of_rat rad a b (S n)) / rngl_of_nat rad ^ S n)%L.
+Proof.
+intros.
+progress unfold partial_sum_of_inv_power.
+rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
+destruct n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  now rewrite rngl_summation_empty.
+}
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ now apply -> Nat.succ_le_mono | ].
+  now do 2 apply -> Nat.succ_le_mono.
+}
+f_equal.
+rewrite (Nat_sub_succ_1 (S n)).
+apply rngl_summation_eq_compat.
+intros i Hi.
+now rewrite Nat.add_comm, Nat.add_sub.
+Qed.
+
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
