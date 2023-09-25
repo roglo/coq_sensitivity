@@ -2245,7 +2245,33 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     cbn - [ "mod" ].
     rewrite rngl_add_0_r.
     destruct n; [ easy | ].
-(* là, je dois dire que je suis sec *)
+    destruct n. {
+      cbn.
+      rewrite rngl_add_0_r.
+      rewrite (rngl_div_1_r Hon Hiq Hc1).
+      rewrite (rngl_div_0_l Hos Hi1). {
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    destruct n. {
+      cbn.
+      rewrite rngl_add_0_r.
+      apply (rngl_le_refl Hor).
+    }
+    rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_lt_mono ].
+    rewrite Nat.mod_0_l; [ | easy ].
+    rewrite rngl_of_nat_0.
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      rewrite <- rngl_of_nat_0.
+      now apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    }
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  destruct m. {
 ...
   eapply (rngl_le_trans Hor). {
     apply (rngl_summation_le_compat Hor) with
