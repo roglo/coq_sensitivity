@@ -2189,7 +2189,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
+(*
 exists (S (S (Nat.log2_up N))).
+*)
+exists (2 ^ S (Nat.log2_up N)).
+(**)
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
@@ -2216,11 +2220,13 @@ rewrite (rngl_opp_sub_distr Hop).
 apply (rngl_le_sub_le_add_r Hop Hor).
 *)
 revert N Hm.
-induction m; intros; [ easy | ].
+induction m; intros. {
+  apply Nat.le_0_r in Hm.
+  now apply Nat.pow_eq_0 in Hm.
+}
 rewrite partial_sum_of_inv_power_succ.
 rewrite (rngl_sub_add_distr Hos).
 apply (rngl_le_sub_le_add_r Hop Hor).
-apply Nat.succ_le_mono in Hm.
 destruct N. {
   admit. (* à voir *)
 }
@@ -2228,14 +2234,13 @@ eapply (rngl_le_trans Hor). {
   specialize (Nat.log2_up_succ_or N) as H1.
   destruct H1 as [H1| H1]. {
     apply (IHm N).
+    apply Nat.succ_le_mono.
     eapply Nat.le_trans; [ | apply Hm ].
-    now rewrite H1.
+    rewrite H1.
+    admit.
   }
-(* il faudrait choisir N tel que log2_up (S N) soit
-   égal à S (log2_up N), c'est-à-dire N = une puissance
-   de 2 moins 1 *)
+Search (Nat.log2_up (S _)).
 ...
-  admit.
 }
 apply (rngl_le_sub_le_add_l Hop Hor).
 progress unfold nth_dec_of_rat.
