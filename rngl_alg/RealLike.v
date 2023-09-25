@@ -2189,7 +2189,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
-...
 exists (S (S (Nat.log2_up N))).
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
@@ -2207,6 +2206,31 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 }
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
+(**)
+rewrite (rngl_abs_nonpos Hop Hor). 2: {
+  apply (rngl_le_sub_0 Hop Hor).
+  admit. (* a lemma to do *)
+}
+rewrite (rngl_opp_sub_distr Hop).
+(*
+apply (rngl_le_sub_le_add_r Hop Hor).
+*)
+revert N Hm.
+induction m; intros; [ easy | ].
+rewrite partial_sum_of_inv_power_succ.
+rewrite (rngl_sub_add_distr Hos).
+apply (rngl_le_sub_le_add_r Hop Hor).
+apply Nat.succ_le_mono in Hm.
+destruct N. {
+  admit. (* à voir *)
+}
+eapply (rngl_le_trans Hor). {
+  apply (IHm N).
+Search (Nat.log2_up (S _)).
+...
+  eapply Nat.le_trans; [ | apply Hm ].
+  apply -> Nat.succ_le_mono.
+Search (Nat.log2 (S _)).
 ...
 progress unfold partial_sum_of_inv_power.
 destruct m; [ easy | ].
