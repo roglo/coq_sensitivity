@@ -2225,12 +2225,22 @@ destruct N. {
   admit. (* à voir *)
 }
 eapply (rngl_le_trans Hor). {
-  apply (IHm N).
-Search (Nat.log2_up (S _)).
+  specialize (Nat.log2_up_succ_or N) as H1.
+  destruct H1 as [H1| H1]. {
+    apply (IHm N).
+    eapply Nat.le_trans; [ | apply Hm ].
+    now rewrite H1.
+  }
+(* il faudrait choisir N tel que log2_up (S N) soit
+   égal à S (log2_up N), c'est-à-dire N = une puissance
+   de 2 moins 1 *)
 ...
-  eapply Nat.le_trans; [ | apply Hm ].
-  apply -> Nat.succ_le_mono.
-Search (Nat.log2 (S _)).
+  admit.
+}
+apply (rngl_le_sub_le_add_l Hop Hor).
+progress unfold nth_dec_of_rat.
+rewrite Nat.mul_1_l.
+(* faut voir... *)
 ...
 progress unfold partial_sum_of_inv_power.
 destruct m; [ easy | ].
