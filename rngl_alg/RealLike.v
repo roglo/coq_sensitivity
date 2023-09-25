@@ -2230,7 +2230,6 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     now rewrite Nat.mul_1_l.
   }
   cbn - [ "mod" rngl_of_nat ].
-...
   induction m. {
     rewrite rngl_summation_empty; [ | easy ].
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
@@ -2241,6 +2240,12 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     }
     apply (rngl_0_le_1 Hon Hop Hor).
   }
+  destruct m. {
+    rewrite rngl_summation_only_one.
+    cbn - [ "mod" ].
+    rewrite rngl_add_0_r.
+    destruct n; [ easy | ].
+(* là, je dois dire que je suis sec *)
 ...
   eapply (rngl_le_trans Hor). {
     apply (rngl_summation_le_compat Hor) with
