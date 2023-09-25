@@ -2223,6 +2223,25 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   clear Hm.
   (* lemma to do *)
   progress unfold partial_sum_of_inv_power.
+(**)
+  progress unfold nth_dec_of_rat.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    now rewrite Nat.mul_1_l.
+  }
+  cbn - [ "mod" rngl_of_nat ].
+...
+  induction m. {
+    rewrite rngl_summation_empty; [ | easy ].
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      apply Nat.neq_0_lt_0.
+      now intros H; subst n.
+    }
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+...
   eapply (rngl_le_trans Hor). {
     apply (rngl_summation_le_compat Hor) with
       (h := λ i, (1 / rngl_of_nat 2 ^ i)%L).
