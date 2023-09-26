@@ -2200,18 +2200,17 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
 (**)
-...
-progress unfold partial_sum_of_inv_power.
-progress unfold nth_dec_of_rat.
-...
+progress unfold seq_conv_to_rat.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   clear Hm.
-  (* lemma to do *)
-  progress unfold partial_sum_of_inv_power.
-(**)
-  progress unfold nth_dec_of_rat.
   induction m. {
+    cbn.
+    rewrite Nat.mul_1_r.
+    rewrite (rngl_div_1_r Hon Hiq Hc1).
+Search (rngl_of_nat (_ / _))%L.
+Search (rngl_of_nat _ / _)%L.
+...
     rewrite rngl_summation_empty; [ | easy ].
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       rewrite <- rngl_of_nat_0.
