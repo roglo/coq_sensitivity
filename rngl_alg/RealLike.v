@@ -2031,13 +2031,17 @@ Definition partial_sum_of_inv_power (rad : nat) (x : T) (n : nat) :=
   ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
 *)
 
-(* nth decimal (in radix rad) of rational p/q *)
+(* nth decimal (in radix rad) of rational p/q
 Definition nth_dec_of_rat rad a b n :=
   (a * rad ^ n / b) mod rad.
 
 Definition partial_sum_of_inv_power (rad a b n : nat) :=
   let u := nth_dec_of_rat rad a b in
   ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
+*)
+
+Definition seq_conv_to_rat (rad a b n : nat) :=
+  (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat rad ^ n)%L.
 
 (*
 Fixpoint nth_dec_of_rat rad a b n :=
@@ -2103,6 +2107,7 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
+(*
 Theorem partial_sum_of_inv_power_succ :
   ∀ rad a b n,
   partial_sum_of_inv_power rad a b (S n) =
@@ -2126,6 +2131,7 @@ apply rngl_summation_eq_compat.
 intros i Hi.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
+*)
 
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
@@ -2142,7 +2148,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   ∀ rad a b,
   rngl_of_nat rad ≠ 0%L
   → rngl_of_nat b ≠ 0%L
-  → is_limit_when_tending_to_inf (partial_sum_of_inv_power rad a b)
+  → is_limit_when_tending_to_inf (seq_conv_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor Har * Hrz Hbz.
@@ -2194,6 +2200,7 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
 (**)
+...
 progress unfold partial_sum_of_inv_power.
 progress unfold nth_dec_of_rat.
 ...
