@@ -1680,58 +1680,6 @@ Qed.
 Definition gc_modl (z : GComplex T) :=
   (gre z * gre z + gim z * gim z)%L.
 
-(* should be called with "a ≤ rngl_of_nat n" *)
-Fixpoint int_part_loop n a :=
-  match n with
-  | 0%nat => 0%nat
-  | S n' => if (rngl_of_nat n ≤? a)%L then n else int_part_loop n' a
-  end.
-
-Theorem int_part_loop_le :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ n a,
-  (0 ≤ a)%L
-  → (a ≤ rngl_of_nat n)%L
-  → (rngl_of_nat (int_part_loop n a) ≤ a)%L.
-Proof.
-intros Hon Hop Hor * Hxz Hxn.
-induction n; [ easy | ].
-cbn in Hxn |-*.
-rewrite fold_rngl_of_nat in Hxn.
-do 2 rewrite fold_rngl_of_nat.
-remember (1 + rngl_of_nat n ≤? a)%L as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply rngl_leb_le in Hc.
-  now rewrite rngl_of_nat_succ.
-}
-apply (rngl_leb_gt Hor) in Hc.
-destruct (rngl_le_dec Hor a (rngl_of_nat n)) as [Han| Han]. {
-  now apply IHn.
-}
-apply (rngl_nle_gt Hor) in Han.
-apply (rngl_le_trans Hor _ (rngl_of_nat n)). 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
-clear IHn Hxn Hc.
-induction n; [ apply (rngl_le_refl Hor) | cbn ].
-do 2 rewrite fold_rngl_of_nat.
-rewrite <- rngl_of_nat_succ.
-remember (_ ≤? a)%L as d eqn:Hd; symmetry in Hd.
-destruct d. 2: {
-  assert (H : (rngl_of_nat n ≤ rngl_of_nat (S n))%L). {
-    cbn; rewrite fold_rngl_of_nat.
-    apply (rngl_le_add_l Hor).
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  eapply (rngl_le_trans Hor); [ | apply H ].
-  apply IHn.
-  eapply (rngl_le_lt_trans Hor); [ apply H | apply Han ].
-}
-apply (rngl_le_refl Hor).
-Qed.
-
 Theorem le_rl_sqrt_add :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2056,6 +2004,31 @@ destruct zzi. {
   now apply (rngl_abs_nonpos Hop Hor).
 }
 Qed.
+
+(* attempt to define the decimals of a number using rngl_int
+   (integer part of a positive number), which supposes that
+   T is ordered and archimedean, and that rngl_int is defined
+   in RingLike.v which is not at the time I write this comment
+     rngl_int : T → nat
+     rngl_opt_int_prop :
+       if (rngl_is_ordered T && rngl_is_archimedean T)%bool then
+         ∀ x, (rngl_of_nat (rngl_int x) ≤ x < rngl_of_nat (rngl_int x + 1))%L
+       else not_applicable;
+   Interesting but what do I do with the theorem int_part defined
+   in IntermVal.v ?
+     A generalization of nth_dec_of_rat ant partial_sum_of_inv_power
+   below where x is the rational a/b
+
+About int_part.
+...
+
+Definition nth_dec rngl_int rad x n :=
+  rngl_int (x * rngl_of_nat rad ^ n)%L mod rad.
+
+Definition partial_sum_of_inv_power (rad : nat) (x : T) (n : nat) :=
+  let u := nth_dec rad x in
+  ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
+*)
 
 (* nth decimal (in radix rad) of rational p/q *)
 Definition nth_dec_of_rat rad a b n :=
