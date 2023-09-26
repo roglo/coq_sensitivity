@@ -2204,22 +2204,24 @@ progress unfold seq_conv_to_rat.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   clear Hm.
+...
   induction m. {
     cbn.
     rewrite Nat.mul_1_r.
     rewrite (rngl_div_1_r Hon Hiq Hc1).
-Search (rngl_of_nat (_ / _))%L.
-Search (rngl_of_nat _ / _)%L.
-...
-    rewrite rngl_summation_empty; [ | easy ].
-    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor). {
       rewrite <- rngl_of_nat_0.
       apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
       apply Nat.neq_0_lt_0.
       now intros H; subst b.
     }
-    apply (rngl_of_nat_nonneg Hon Hop Hor).
+    rewrite <- (rngl_of_nat_mul Hon Hos).
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    rewrite Nat.mul_comm.
+    apply Nat.mul_div_le.
+    now intros H; subst b.
   }
+...
   destruct m. {
     rewrite rngl_summation_only_one.
     cbn.
