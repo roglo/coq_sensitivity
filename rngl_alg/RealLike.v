@@ -2165,11 +2165,13 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  ∀ n, rngl_of_nat n ≠ 0%L →
-  is_limit_when_tending_to_inf (partial_sum_of_inv_power 2 1 n)
-    (1 / rngl_of_nat n)%L.
+  ∀ rad a b,
+  rngl_of_nat rad ≠ 0%L
+  → rngl_of_nat b ≠ 0%L
+  → is_limit_when_tending_to_inf (partial_sum_of_inv_power rad a b)
+       (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor Har * Hnz.
+intros Hic Hon Hop Hiv Hor Har * Hrz Hbz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2225,38 +2227,33 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   progress unfold partial_sum_of_inv_power.
 (**)
   progress unfold nth_dec_of_rat.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    now rewrite Nat.mul_1_l.
-  }
-  cbn - [ "mod" rngl_of_nat ].
   induction m. {
     rewrite rngl_summation_empty; [ | easy ].
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       rewrite <- rngl_of_nat_0.
       apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
       apply Nat.neq_0_lt_0.
-      now intros H; subst n.
+      now intros H; subst b.
     }
-    apply (rngl_0_le_1 Hon Hop Hor).
+    apply (rngl_of_nat_nonneg Hon Hop Hor).
   }
   destruct m. {
     rewrite rngl_summation_only_one.
-    cbn - [ "mod" ].
-    rewrite rngl_add_0_r.
-    destruct n; [ easy | ].
-    destruct n. {
-      cbn.
-      rewrite rngl_add_0_r.
+    cbn.
+    rewrite Nat.mul_1_r.
+    destruct b; [ easy | ].
+    destruct b. {
+      rewrite Nat.div_1_r.
+      rewrite Nat.mod_mul; [ | now intros H; subst rad ].
+      rewrite rngl_of_nat_1.
       rewrite (rngl_div_1_r Hon Hiq Hc1).
-      rewrite (rngl_div_0_l Hos Hi1). {
-        apply (rngl_0_le_1 Hon Hop Hor).
-      }
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+      apply (rngl_of_nat_nonneg Hon Hop Hor).
     }
-    destruct n. {
-      cbn.
+    destruct b. {
+      cbn - [ "/" ].
       rewrite rngl_add_0_r.
+...
       apply (rngl_le_refl Hor).
     }
     rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_lt_mono ].
