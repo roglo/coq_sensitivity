@@ -2005,82 +2005,8 @@ destruct zzi. {
 }
 Qed.
 
-(* to be completed
-   attempt to define the decimals of a number using rngl_int
-   (integer part of a positive number), which supposes that
-   T is ordered and archimedean, and that rngl_int is defined
-   in RingLike.v which is not at the time I write this comment
-     rngl_int : T → nat
-     rngl_opt_int_prop :
-       if (rngl_is_ordered T && rngl_is_archimedean T)%bool then
-         ∀ x, (rngl_of_nat (rngl_int x) ≤ x < rngl_of_nat (rngl_int x + 1))%L
-       else not_applicable;
-   Interesting but what do I do with the theorem int_part defined
-   in IntermVal.v ?
-     A generalization of nth_dec_of_rat ant partial_sum_of_inv_power
-   below where x is the rational a/b
-
-About int_part.
-...
-
-Definition nth_dec rngl_int rad x n :=
-  rngl_int (x * rngl_of_nat rad ^ n)%L mod rad.
-
-Definition partial_sum_of_inv_power (rad : nat) (x : T) (n : nat) :=
-  let u := nth_dec rad x in
-  ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
-*)
-
-(* nth decimal (in radix rad) of rational p/q
-Definition nth_dec_of_rat rad a b n :=
-  (a * rad ^ n / b) mod rad.
-
-Definition partial_sum_of_inv_power (rad a b n : nat) :=
-  let u := nth_dec_of_rat rad a b in
-  ∑ (i = 1, n), rngl_of_nat (u i) / rngl_of_nat rad ^ i.
-*)
-
 Definition seq_conv_to_rat (rad a b n : nat) :=
   (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat rad ^ n)%L.
-
-(*
-Fixpoint nth_dec_of_rat rad a b n :=
-  match n with
-  | 0 => rad * a / b
-  | S n' =>
-      let r := (rad * a) mod b in
-      nth_dec_of_rat rad r b n'
-  end.
-*)
-
-(* first n decimals (in radix rad) of rational p/q
-   where 0 ≤ p/q ≤ 1
-Fixpoint first_dec_of_rat rad a b n :=
-  match n with
-  | 0 => []
-  | S n' =>
-      let q := rad * a / b in
-      let r := (rad * a) mod b in
-      q :: first_dec_of_rat rad r b n'
-  end.
-
-Compute (
-  let rad := 10 in
-  let a := 6 in
-  let b := 7 in
-  let n := 0 in
-  (first_dec_of_rat rad a b (S n),
-   nth_dec_of_rat rad a b n,
-   nth_dec_of_rat' rad a b n)).
-
-Definition partial_sum_of_inv_power (rad a b n : nat) :=
-  let u := first_dec_of_rat rad a b n in
-  ∑ (i = 1, n), rngl_of_nat u.(i) / rngl_of_nat rad ^ i.
-
-Definition partial_sum_of_inv_power (rad a b n : nat) :=
-  let u := nth_dec_of_rat rad a b in
-  ∑ (i = 1, n), rngl_of_nat (u (i - 1)%nat) / rngl_of_nat rad ^ i.
-*)
 
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
@@ -2106,32 +2032,6 @@ intros.
 induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
-
-(*
-Theorem partial_sum_of_inv_power_succ :
-  ∀ rad a b n,
-  partial_sum_of_inv_power rad a b (S n) =
-  (partial_sum_of_inv_power rad a b n +
-     rngl_of_nat (nth_dec_of_rat rad a b (S n)) / rngl_of_nat rad ^ S n)%L.
-Proof.
-intros.
-progress unfold partial_sum_of_inv_power.
-rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
-destruct n. {
-  rewrite rngl_summation_empty; [ | easy ].
-  now rewrite rngl_summation_empty.
-}
-rewrite (rngl_summation_shift 1). 2: {
-  split; [ now apply -> Nat.succ_le_mono | ].
-  now do 2 apply -> Nat.succ_le_mono.
-}
-f_equal.
-rewrite (Nat_sub_succ_1 (S n)).
-apply rngl_summation_eq_compat.
-intros i Hi.
-now rewrite Nat.add_comm, Nat.add_sub.
-Qed.
-*)
 
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
@@ -2204,23 +2104,36 @@ progress unfold seq_conv_to_rat.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   clear Hm.
-...
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply Nat.neq_0_lt_0.
+    now intros H; subst b.
+  }
+  progress unfold rngl_div.
+  rewrite Hiv.
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite <- (rngl_of_nat_pow Hon Hos).
+  rewrite (fold_rngl_div Hiv).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply Nat.neq_0_lt_0.
+    apply Nat.pow_nonzero.
+    now intros H; subst rad.
+  }
   induction m. {
     cbn.
     rewrite Nat.mul_1_r.
-    rewrite (rngl_div_1_r Hon Hiq Hc1).
-    apply (rngl_le_div_r Hon Hop Hiv Hor). {
-      rewrite <- rngl_of_nat_0.
-      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-      apply Nat.neq_0_lt_0.
-      now intros H; subst b.
-    }
+    rewrite rngl_add_0_r.
+    rewrite (rngl_mul_1_r Hon).
     rewrite <- (rngl_of_nat_mul Hon Hos).
     apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
     rewrite Nat.mul_comm.
     apply Nat.mul_div_le.
     now intros H; subst b.
   }
+  cbn - [ rngl_of_nat ].
 ...
   destruct m. {
     rewrite rngl_summation_only_one.
