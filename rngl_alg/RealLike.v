@@ -2005,7 +2005,8 @@ destruct zzi. {
 }
 Qed.
 
-(* attempt to define the decimals of a number using rngl_int
+(* to be completed
+   attempt to define the decimals of a number using rngl_int
    (integer part of a positive number), which supposes that
    T is ordered and archimedean, and that rngl_int is defined
    in RingLike.v which is not at the time I write this comment
