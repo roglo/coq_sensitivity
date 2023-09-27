@@ -1394,6 +1394,17 @@ rewrite (rngl_mul_inv_l Hon Hiv _ Hbz).
 apply (rngl_mul_1_r Hon).
 Qed.
 
+Theorem rngl_div_mul_mul_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  ∀ a b c, (a / b * c = a * c / b)%L.
+Proof.
+intros Hic Hiv *.
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_mul_swap Hic).
+Qed.
+
 Theorem rngl_div_0_l :
   rngl_has_opp_or_subt T = true →
   rngl_has_inv_and_1_or_quot T = true →

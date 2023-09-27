@@ -2109,6 +2109,7 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
+assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
@@ -2127,8 +2128,7 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     rewrite <- rngl_of_nat_0.
     apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
     apply Nat.neq_0_lt_0.
-    apply Nat.pow_nonzero.
-    now intros H; subst rad.
+    now apply Nat.pow_nonzero.
   }
   do 2 rewrite <- (rngl_of_nat_mul Hon Hos).
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
@@ -2137,21 +2137,61 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
   now rewrite Nat.mul_comm, Nat.div_mul.
 }
 rewrite (rngl_opp_sub_distr Hop).
+rewrite <- (rngl_of_nat_pow Hon Hos).
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with
+  (c := rngl_of_nat (rad ^ m)). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite <- (rngl_of_nat_mul Hon Hos).
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite <- (rngl_of_nat_mul Hon Hos).
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H.
 ...
-(*
+rewrite <- (rngl_of_nat_mul Hon Hos).
+rewrite <- (rngl_div_mul_mul_div Hic Hiv).
+...
+apply (rngl_le_div_r Hon Hop Hiv Hor). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now rewrite Nat.add_comm.
+}
+rewrite (rngl_mul_sub_distr_r Hop).
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite <- (rngl_of_nat_pow Hon Hos).
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite (rngl_mul_comm Hic).
 apply (rngl_le_sub_le_add_r Hop Hor).
-*)
+apply (rngl_le_div_r Hon Hop Hiv Hor). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_le_sub_le_add_r Hop Hor).
+...
 revert N Hm.
 induction m; intros. {
   apply Nat.le_0_r in Hm.
   now apply Nat.pow_eq_0 in Hm.
 }
-rewrite partial_sum_of_inv_power_succ.
-prewrite (rngl_sub_add_distr Hos).
-apply (rngl_le_sub_le_add_r Hop Hor).
 destruct N. {
-  admit. (* à voir *)
-}
+  cbn - [ "^" ].
+  rewrite rngl_add_0_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_1_r Hon).
+...
 eapply (rngl_le_trans Hor). {
   specialize (Nat.log2_up_succ_or N) as H1.
   destruct H1 as [H1| H1]. {
