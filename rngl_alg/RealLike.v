@@ -2157,6 +2157,14 @@ rewrite (rngl_mul_div Hi1). 2: {
   now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
 }
 remember (a * rad ^ m) as c.
+apply (rngl_le_trans Hor _ 1%L). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now rewrite Nat.add_comm.
+}
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 ...
 apply (rngl_le_sub_le_add_l Hop Hor).
 ...
