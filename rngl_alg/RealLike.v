@@ -2156,6 +2156,8 @@ rewrite (rngl_mul_div Hi1). 2: {
   rewrite (rngl_of_nat_pow Hon Hos).
   now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
 }
+remember (a * rad ^ m) as c.
+...
 apply (rngl_le_sub_le_add_l Hop Hor).
 ...
   apply (rngl_of_nat_inj Hon Hos) in H.
