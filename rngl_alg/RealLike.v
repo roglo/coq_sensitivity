@@ -2168,6 +2168,12 @@ rewrite (rngl_mul_1_l Hon).
 apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply Nat.log2_le_mono in Hm.
 rewrite Nat.log2_pow2 in Hm; [ | easy ].
+clear c Heqc.
+Search (Nat.log2_up (_ ^ _)).
+Search (Nat.log2 _ / _).
+Print Nat.log2.
+Print Nat.log2_iter.
+...
 Search (_ / _ ≤ _).
 (* chiasse de pute *)
 ...
