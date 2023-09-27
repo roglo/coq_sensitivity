@@ -2097,6 +2097,18 @@ assert (Hnε : (1 / rngl_of_nat (N + 1) < ε)%L). {
   rewrite <- (rngl_mul_comm Hic).
   now apply (rngl_lt_div_l Hon Hop Hiv Hor).
 }
+assert (Hzr : (0 < rngl_of_nat rad)%L). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.neq_0_lt_0.
+  now intros H; subst rad.
+}
+assert (Hzb : (0 < rngl_of_nat b)%L). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.neq_0_lt_0.
+  now intros H; subst b.
+}
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
 (**)
@@ -2104,12 +2116,7 @@ progress unfold seq_conv_to_rat.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
   clear Hm.
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    rewrite <- rngl_of_nat_0.
-    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-    apply Nat.neq_0_lt_0.
-    now intros H; subst b.
-  }
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
   progress unfold rngl_div.
   rewrite Hiv.
   rewrite (rngl_mul_mul_swap Hic).
@@ -2134,6 +2141,16 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     now intros H; subst b.
   }
   cbn - [ rngl_of_nat ].
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_mul_swap Hic).
+  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
+  eapply (rngl_le_trans Hor); [ | apply IHm ].
+  apply -> (rngl_le_div_l Hon Hop Hiv Hor); [ | easy ].
+  rewrite (rngl_mul_mul_swap Hic).
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii); [ easy | ].
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm a).
 ...
   destruct m. {
     rewrite rngl_summation_only_one.
