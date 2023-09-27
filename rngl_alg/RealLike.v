@@ -2080,8 +2080,9 @@ destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
 (*
 exists (S (S (Nat.log2_up N))).
-*)
 exists (2 ^ S (Nat.log2_up N)).
+*)
+exists (2 ^ (Nat.log2 (N + 1) / Nat.log2 rad)).
 (**)
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
@@ -2165,6 +2166,23 @@ apply (rngl_le_trans Hor _ 1%L). 2: {
 }
 rewrite (rngl_mul_1_l Hon).
 apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+apply Nat.log2_le_mono in Hm.
+rewrite Nat.log2_pow2 in Hm; [ | easy ].
+Search (_ / _ ≤ _).
+(* chiasse de pute *)
+...
+Search (_ * _ ≤ _ * _).
+apply (Nat.mul_le_mono_l _ _ (Nat.log2 rad)) in Hm.
+Search (_ * (_ / _)).
+...
+eapply Nat.le_trans in Hm. 2: {
+Search (_ ≤ _ * (_ / _)).
+
+Search (_ ≤ _ / _ * _).
+Check Nat.div_mul_le.
+apply Nat.div_mul_le.
+2: { apply Nat.div_mul_le. }
+Check Nat.mul_div_le.
 ...
 apply (rngl_le_sub_le_add_l Hop Hor).
 ...
