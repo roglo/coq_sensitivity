@@ -2113,7 +2113,6 @@ assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
-(**)
 progress unfold seq_conv_to_rat.
 rewrite (rngl_abs_nonpos Hop Hor). 2: {
   apply (rngl_le_sub_0 Hop Hor).
@@ -2154,7 +2153,12 @@ rewrite (rngl_div_mul_mul_div Hic Hiv).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
 rewrite (rngl_mul_div Hi1). 2: {
-  intros H.
+  rewrite (rngl_of_nat_pow Hon Hos).
+  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+}
+apply (rngl_le_sub_le_add_l Hop Hor).
+...
+  apply (rngl_of_nat_inj Hon Hos) in H.
 ...
 rewrite <- (rngl_of_nat_mul Hon Hos).
 rewrite <- (rngl_div_mul_mul_div Hic Hiv).
