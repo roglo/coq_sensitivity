@@ -2109,6 +2109,7 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
+assert (Hzb' : b ≠ 0) by now intros H; subst b.
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
 (**)
@@ -2129,93 +2130,14 @@ rewrite (rngl_abs_nonpos Hop Hor). 2: {
     apply Nat.pow_nonzero.
     now intros H; subst rad.
   }
-  induction m. {
-    cbn.
-    rewrite Nat.mul_1_r.
-    rewrite rngl_add_0_r.
-    rewrite (rngl_mul_1_r Hon).
-    rewrite <- (rngl_of_nat_mul Hon Hos).
-    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-    rewrite Nat.mul_comm.
-    apply Nat.mul_div_le.
-    now intros H; subst b.
-  }
-  cbn - [ rngl_of_nat ].
-  rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_mul_swap Hic).
-  apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
-  eapply (rngl_le_trans Hor); [ | apply IHm ].
-  apply -> (rngl_le_div_l Hon Hop Hiv Hor); [ | easy ].
-  rewrite (rngl_mul_mul_swap Hic).
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii); [ easy | ].
-  rewrite Nat.mul_assoc.
-  rewrite (Nat.mul_comm a).
-...
-  destruct m. {
-    rewrite rngl_summation_only_one.
-    cbn.
-    rewrite Nat.mul_1_r.
-    destruct b; [ easy | ].
-    destruct b. {
-      rewrite Nat.div_1_r.
-      rewrite Nat.mod_mul; [ | now intros H; subst rad ].
-      rewrite rngl_of_nat_1.
-      rewrite (rngl_div_1_r Hon Hiq Hc1).
-      rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-      apply (rngl_of_nat_nonneg Hon Hop Hor).
-    }
-    destruct b. {
-      cbn - [ "/" ].
-      rewrite rngl_add_0_r.
-...
-      apply (rngl_le_refl Hor).
-    }
-    rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_lt_mono ].
-    rewrite Nat.mod_0_l; [ | easy ].
-    rewrite rngl_of_nat_0.
-    rewrite (rngl_div_0_l Hos Hi1). 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-      rewrite <- rngl_of_nat_0.
-      now apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-    }
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  destruct m. {
-...
-  eapply (rngl_le_trans Hor). {
-    apply (rngl_summation_le_compat Hor) with
-      (h := λ i, (1 / rngl_of_nat 2 ^ i)%L).
-    intros i Hi.
-    progress unfold rngl_div.
-    rewrite Hiv.
-    apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with
-        (c := (rngl_of_nat 2 ^ i)%L). {
-        apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
-        cbn; rewrite rngl_add_0_r.
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite (rngl_mul_0_r Hos).
-      rewrite (rngl_mul_inv_r Hon Hiv). 2: {
-        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-        cbn; rewrite rngl_add_0_r.
-        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-      }
-      apply (rngl_0_le_1 Hon Hop Hor).
-    }
-    rewrite <- rngl_of_nat_1.
-    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-    progress unfold nth_dec_of_rat.
-    apply Nat.lt_succ_r.
-    now apply Nat.mod_upper_bound.
-  }
-(* ah bin non, ça marche pas du tout, ça *)
-...
+  do 2 rewrite <- (rngl_of_nat_mul Hon Hos).
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  rewrite Nat.mul_comm.
+  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+  now rewrite Nat.mul_comm, Nat.div_mul.
 }
 rewrite (rngl_opp_sub_distr Hop).
+...
 (*
 apply (rngl_le_sub_le_add_r Hop Hor).
 *)
