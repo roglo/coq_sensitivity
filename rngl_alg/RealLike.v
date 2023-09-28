@@ -2278,7 +2278,12 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ n, N ≤ n → angle_lt (angle_sub l (f n)) ε.
 
 (* to be completed
+(* ah oui non je sais pas *)
+Definition seq_angle_converging_to_rat θ (n : nat) :=
+  (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat 2 ^ n)%L.
+
 Theorem glop :
+  ∀ rad n θn θ,
   is_angle_upper_limit_when_tending_to_inf (seq_converging_to_rat rad 1 n) θn ∧
   angle_mul_nat θn n = θ.
 ...
