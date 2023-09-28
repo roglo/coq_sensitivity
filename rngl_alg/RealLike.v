@@ -2109,69 +2109,81 @@ assert (Hzb' : b ≠ 0) by now intros H; subst b.
 exists (S (S (Nat.log2_up N))).
 exists (2 ^ S (Nat.log2_up N)).
 *)
-exists (2 ^ Nat.log2 (N + 1)).
 (**)
+enough (H : ∃ M, ∀ m, Nat.log2 M ≤ Nat.log2 m → N + 1 ≤ rad ^ m). {
+  destruct H as (M, HM).
+  exists M.
+  intros m Hm.
+(*
+...
+exists (2 ^ Nat.log2 (N + 1)).
+exists M.
 intros m Hm.
-eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
-clear ε Hε HN Hnε.
-progress unfold seq_conv_to_rat.
-rewrite (rngl_abs_nonpos Hop Hor). 2: {
-  apply (rngl_le_sub_0 Hop Hor).
-  clear Hm.
-  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
-  progress unfold rngl_div.
-  rewrite Hiv.
-  rewrite (rngl_mul_mul_swap Hic).
+*)
+  eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
+  clear ε Hε HN Hnε.
+  progress unfold seq_conv_to_rat.
+  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    clear Hm.
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    progress unfold rngl_div.
+    rewrite Hiv.
+    rewrite (rngl_mul_mul_swap Hic).
+    rewrite <- (rngl_of_nat_pow Hon Hos).
+    rewrite (fold_rngl_div Hiv).
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      apply Nat.neq_0_lt_0.
+      now apply Nat.pow_nonzero.
+    }
+    do 2 rewrite <- (rngl_of_nat_mul Hon Hos).
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    rewrite Nat.mul_comm.
+    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+    now rewrite Nat.mul_comm, Nat.div_mul.
+  }
+  rewrite (rngl_opp_sub_distr Hop).
   rewrite <- (rngl_of_nat_pow Hon Hos).
-  rewrite (fold_rngl_div Hiv).
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with
+    (c := rngl_of_nat (rad ^ m)). {
     rewrite <- rngl_of_nat_0.
     apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
-  do 2 rewrite <- (rngl_of_nat_mul Hon Hos).
-  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-  rewrite Nat.mul_comm.
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  now rewrite Nat.mul_comm, Nat.div_mul.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_div_mul_mul_div Hic Hiv).
+  rewrite <- (rngl_of_nat_mul Hon Hos).
+  rewrite (rngl_div_mul_mul_div Hic Hiv).
+  rewrite <- (rngl_of_nat_mul Hon Hos).
+  rewrite (rngl_div_mul_mul_div Hic Hiv).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
+  rewrite (rngl_mul_div Hi1). 2: {
+    rewrite (rngl_of_nat_pow Hon Hos).
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    intros H.
+    rewrite H in Hzr.
+    now apply (rngl_lt_irrefl Hor) in Hzr.
+  }
+  remember (a * rad ^ m) as c.
+  apply (rngl_le_trans Hor _ 1%L). 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor). {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      now rewrite Nat.add_comm.
+    }
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+    apply Nat.log2_le_mono in Hm.
+    now apply HM.
+  }
+...
 }
-rewrite (rngl_opp_sub_distr Hop).
-rewrite <- (rngl_of_nat_pow Hon Hos).
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with
-  (c := rngl_of_nat (rad ^ m)). {
-  rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-rewrite (rngl_mul_sub_distr_r Hop).
-rewrite (rngl_div_mul_mul_div Hic Hiv).
-rewrite <- (rngl_of_nat_mul Hon Hos).
-rewrite (rngl_div_mul_mul_div Hic Hiv).
-rewrite <- (rngl_of_nat_mul Hon Hos).
-rewrite (rngl_div_mul_mul_div Hic Hiv).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
-rewrite (rngl_mul_div Hi1). 2: {
-  rewrite (rngl_of_nat_pow Hon Hos).
-  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
-  intros H.
-  rewrite H in Hzr.
-  now apply (rngl_lt_irrefl Hor) in Hzr.
-}
-remember (a * rad ^ m) as c.
-apply (rngl_le_trans Hor _ 1%L). 2: {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-  rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  now rewrite Nat.add_comm.
-}
-rewrite (rngl_mul_1_l Hon).
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-apply Nat.log2_le_mono in Hm.
+...
 rewrite Nat.log2_pow2 in Hm; [ | easy ].
-clear c Heqc.
 (* faudrait peut-être prendre une borne inf (le "exist" ci-dessus) plus
    large, plus grosse, mais faut qu'elle soit facile à prouver, aussi *)
 ...
