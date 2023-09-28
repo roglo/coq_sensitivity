@@ -2005,7 +2005,7 @@ destruct zzi. {
 }
 Qed.
 
-Definition seq_conv_to_rat (rad a b n : nat) :=
+Definition seq_converging_to_rat (rad a b n : nat) :=
   (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat rad ^ n)%L.
 
 Declare Scope angle_scope.
@@ -2048,7 +2048,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   ∀ rad a b,
   2 ≤ rad
   → rngl_of_nat b ≠ 0%L
-  → is_limit_when_tending_to_inf (seq_conv_to_rat rad a b)
+  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor Har * H2r Hbz.
@@ -2122,7 +2122,7 @@ intros m Hm.
 *)
   eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
   clear ε Hε HN Hnε.
-  progress unfold seq_conv_to_rat.
+  progress unfold seq_converging_to_rat.
   rewrite (rngl_abs_nonpos Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
     clear Hm.
