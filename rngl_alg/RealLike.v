@@ -2046,12 +2046,12 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a b,
-  rngl_of_nat rad ≠ 0%L
+  (2 ≤ rngl_of_nat rad)%L
   → rngl_of_nat b ≠ 0%L
   → is_limit_when_tending_to_inf (seq_conv_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor Har * Hrz Hbz.
+intros Hic Hon Hop Hiv Hor Har * H2r Hbz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2078,13 +2078,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 destruct (H1 (1 / ε)%L) as (N, HN).
 clear H1.
-(*
-exists (S (S (Nat.log2_up N))).
-exists (2 ^ S (Nat.log2_up N)).
-*)
-exists (2 ^ Nat.log2 (N + 1)).
-(**)
-intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
   apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
@@ -2102,7 +2095,11 @@ assert (Hzr : (0 < rngl_of_nat rad)%L). {
   rewrite <- rngl_of_nat_0.
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   apply Nat.neq_0_lt_0.
-  now intros H; subst rad.
+  intros H; subst rad.
+  cbn in H2r.
+  apply (rngl_nlt_ge Hor) in H2r.
+  apply H2r.
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 assert (Hzb : (0 < rngl_of_nat b)%L). {
   rewrite <- rngl_of_nat_0.
@@ -2110,8 +2107,18 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
-assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
+assert (Hzr' : rad ≠ 0). {
+  intros H; subst rad.
+  now apply (rngl_lt_irrefl Hor) in Hzr.
+}
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
+(*
+exists (S (S (Nat.log2_up N))).
+exists (2 ^ S (Nat.log2_up N)).
+*)
+exists (2 ^ Nat.log2 (N + 1)).
+(**)
+intros m Hm.
 eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
 clear ε Hε HN Hnε.
 progress unfold seq_conv_to_rat.
@@ -2155,7 +2162,10 @@ rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_of_nat_mul Hon Hos (a * rad ^ m / b)).
 rewrite (rngl_mul_div Hi1). 2: {
   rewrite (rngl_of_nat_pow Hon Hos).
-  now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+  intros H.
+  rewrite H in Hzr.
+  now apply (rngl_lt_irrefl Hor) in Hzr.
 }
 remember (a * rad ^ m) as c.
 apply (rngl_le_trans Hor _ 1%L). 2: {
@@ -2196,6 +2206,7 @@ destruct (Nat.eq_dec (Nat.log2 (N + 1)) (Nat.log2 m)) as [Hnm| Hnm]. {
   }
   eapply le_trans. {
     apply Nat.add_le_mul; [ easy | ].
+    destruct m. {
 ...
 Search (Nat.log2 _ = Nat.log2 _).
 ...
