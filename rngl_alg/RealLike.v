@@ -2180,6 +2180,8 @@ intros m Hm.
     apply Nat.log2_le_mono in Hm.
     now apply HM.
   }
+  clear a Heqc.
+  rename c into a.
 ...
 }
 ...
