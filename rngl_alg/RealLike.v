@@ -2156,21 +2156,10 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
 }
 assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
-(*
-exists (S (S (Nat.log2_up N))).
-exists (2 ^ S (Nat.log2_up N)).
-*)
-(**)
 enough (H : ∃ M, ∀ m, Nat.log2 M ≤ Nat.log2 m → N + 1 ≤ rad ^ m). {
   destruct H as (M, HM).
   exists M.
   intros m Hm.
-(*
-...
-exists (2 ^ Nat.log2 (N + 1)).
-exists M.
-intros m Hm.
-*)
   eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
   clear ε Hε HN Hnε.
   progress unfold seq_converging_to_rat.
