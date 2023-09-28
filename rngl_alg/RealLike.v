@@ -2253,26 +2253,33 @@ Require Import Qrl.
 Compute (
   let ro := Q_ring_like_op in
   let rp := Q_ring_like_prop in
-  let rad := 2 in
-  let a := 6 in
-  let b := 7 in
-  let i := 0 in
-  let n := 8 in
-  (partial_sum_of_inv_pow rad a b (S i) n * rngl_of_nat rad ^ i,
-   rngl_of_nat a / rngl_of_nat b,
-   rngl_of_nat (rad * a / b) / rngl_of_nat rad ^ S i, 1)%L).
+...
 *)
 
-(* to be completed
-(* angle_abs : ah oui, mais j'ai pas d'angles négatifs, moi ; tous mes
-   angles sont toujours positifs *)
-Definition is_angle_limit_when_tending_to_inf f (l : angle T) :=
-  ∀ ε, (0 < ε)%L → ∃ N,
-  ∀ n, N ≤ n → (angle_abs (f n - l) < ε)%L.
-...
+Definition rngl_compare a b :=
+  if (a =? b)%L then Eq
+  else if (a ≤? b)%L then Lt else Gt.
 
+Definition angle_compare θ1 θ2 :=
+  if (rngl_zero ≤? rngl_sin θ1)%L then
+    if (rngl_zero ≤? rngl_sin θ2)%L then
+      rngl_compare (rngl_cos θ2) (rngl_cos θ1)
+    else Lt
+  else
+    if (rngl_zero ≤? rngl_sin θ2)%L then Gt
+    else rngl_compare (rngl_cos θ1) (rngl_cos θ2).
+
+Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
+
+Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
+
+Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
+  ∀ ε, angle_lt angle_zero ε → ∃ N,
+  ∀ n, N ≤ n → angle_lt (angle_sub l (f n)) ε.
+
+(* to be completed
 Theorem glop :
-  is_angle_limit_when_tending_to_inf (seq_converging_to_rat rad 1 n) θn ∧
+  is_angle_upper_limit_when_tending_to_inf (seq_converging_to_rat rad 1 n) θn ∧
   angle_mul_nat θn n = θ.
 ...
 
