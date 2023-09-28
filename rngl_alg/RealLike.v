@@ -2156,9 +2156,9 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
 }
 assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
-enough (H : ∃ M, ∀ m, Nat.log2 M ≤ Nat.log2 m → N + 1 ≤ rad ^ m). {
+enough (H : ∃ M, ∀ m, Nat.log2 M < Nat.log2 m → N + 1 ≤ rad ^ m). {
   destruct H as (M, HM).
-  exists M.
+  exists (2 * S M + 1).
   intros m Hm.
   eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
   clear ε Hε HN Hnε.
@@ -2218,7 +2218,13 @@ enough (H : ∃ M, ∀ m, Nat.log2 M ≤ Nat.log2 m → N + 1 ≤ rad ^ m). {
     rewrite (rngl_mul_1_l Hon).
     apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
     apply Nat.log2_le_mono in Hm.
-    now apply HM.
+    rewrite Nat.log2_succ_double in Hm; [ | easy ].
+    apply -> Nat.le_succ_l in Hm.
+    apply HM.
+    eapply Nat.lt_le_trans; [ | apply Hm ].
+    apply Nat.lt_succ_r.
+    apply Nat.log2_le_mono.
+    apply Nat.le_succ_diag_r.
   }
   clear a Heqc.
   rename c into a.
