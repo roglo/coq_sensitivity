@@ -2082,7 +2082,7 @@ clear H1.
 exists (S (S (Nat.log2_up N))).
 exists (2 ^ S (Nat.log2_up N)).
 *)
-exists (2 ^ (Nat.log2 (N + 1) / Nat.log2 rad)).
+exists (2 ^ Nat.log2 (N + 1)).
 (**)
 intros m Hm.
 rewrite (rngl_abs_nonneg Hop Hor) in HN. 2: {
@@ -2169,6 +2169,36 @@ apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply Nat.log2_le_mono in Hm.
 rewrite Nat.log2_pow2 in Hm; [ | easy ].
 clear c Heqc.
+destruct (Nat.eq_dec (Nat.log2 (N + 1)) (Nat.log2 m)) as [Hnm| Hnm]. {
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    subst m; cbn in Hnm |-*.
+    rewrite Nat.add_1_r.
+    apply -> Nat.succ_le_mono.
+    apply Nat.le_0_r.
+    destruct N; [ easy | ].
+    rewrite Nat.add_1_r in Hnm.
+    apply Nat.log2_null in Hnm.
+    now apply Nat.succ_le_mono in Hnm.
+  }
+  apply Nat.log2_same in Hnm; [ | now rewrite Nat.add_comm | ]. 2: {
+    now apply Nat.neq_0_lt_0.
+  }
+...
+  apply Nat.lt_le_incl in Hnm.
+  apply (Nat.le_trans _ (2 * m)); [ easy | ].
+  destruct m; [ easy | ].
+  cbn.
+  rewrite Nat.add_0_r.
+  destruct m; cbn.
+...
+Search (Nat.log2 _ = Nat.log2 _).
+...
+Search (Nat.log2 _ < Nat.log2 _).
+...
+apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+Search (2 ^ Nat.log2 _).
+...
+Search (_ ^ _ ≤ _ ^ _).
 Search (Nat.log2_up (_ ^ _)).
 Search (Nat.log2 _ / _).
 Print Nat.log2.
