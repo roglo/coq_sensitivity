@@ -2183,13 +2183,18 @@ destruct (Nat.eq_dec (Nat.log2 (N + 1)) (Nat.log2 m)) as [Hnm| Hnm]. {
   apply Nat.log2_same in Hnm; [ | now rewrite Nat.add_comm | ]. 2: {
     now apply Nat.neq_0_lt_0.
   }
-...
   apply Nat.lt_le_incl in Hnm.
   apply (Nat.le_trans _ (2 * m)); [ easy | ].
-  destruct m; [ easy | ].
-  cbn.
-  rewrite Nat.add_0_r.
-  destruct m; cbn.
+  clear Hmz Hm Hnm.
+  induction m; [ easy | ].
+  remember 2 as two.
+  rewrite Nat.mul_comm; cbn; subst two.
+  rewrite Nat.mul_comm.
+  apply (le_trans _ (2 + rad ^ m)). {
+    now apply Nat.add_le_mono_l.
+  }
+  eapply le_trans. {
+    apply Nat.add_le_mul; [ easy | ].
 ...
 Search (Nat.log2 _ = Nat.log2 _).
 ...
