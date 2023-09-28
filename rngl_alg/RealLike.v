@@ -2264,6 +2264,18 @@ Compute (
 *)
 
 (* to be completed
+(* angle_abs : ah oui, mais j'ai pas d'angles négatifs, moi ; tous mes
+   angles sont toujours positifs *)
+Definition is_angle_limit_when_tending_to_inf f (l : angle T) :=
+  ∀ ε, (0 < ε)%L → ∃ N,
+  ∀ n, N ≤ n → (angle_abs (f n - l) < ε)%L.
+...
+
+Theorem glop :
+  is_angle_limit_when_tending_to_inf (seq_converging_to_rat rad 1 n) θn ∧
+  angle_mul_nat θn n = θ.
+...
+
 Definition angle_div_nat θ n :=
   {| rngl_cos := 1; rngl_sin := 0;
      rngl_cos2_sin2 := 42 |}%L.
