@@ -2033,6 +2033,57 @@ induction n; [ easy | cbn ].
 now rewrite IHn.
 Qed.
 
+Theorem rngl_rat_frac_part_lt_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b,
+  rngl_of_nat b ≠ 0%L
+  → (rngl_of_nat a / rngl_of_nat b - rngl_of_nat (a / b) < 1)%L.
+Proof.
+intros Hon Hop Hiv Hor * Hrbz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (rngl_of_nat b)) in Hrbz.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert (Hbz : b ≠ 0) by now intros H; subst b.
+assert (Hzb : (0 < rngl_of_nat b)%L). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  apply Nat.neq_0_lt_0.
+  now intros H; subst b.
+}
+specialize (Nat.div_mod a b Hbz) as H1.
+rewrite H1.
+rewrite rngl_of_nat_add.
+rewrite Nat.mul_comm.
+rewrite Nat.div_add_l; [ | easy ].
+rewrite (Nat.div_small (a mod b)). 2: {
+  now apply Nat.mod_upper_bound.
+}
+rewrite Nat.add_0_r.
+(* a lemma, perhaps, like Nat.div_add_l ? *)
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite rngl_mul_add_distr_r.
+do 2 rewrite (fold_rngl_div Hiv).
+rewrite (rngl_of_nat_mul Hon Hos).
+rewrite (rngl_mul_div Hi1); [ | easy ].
+rewrite rngl_add_comm, (rngl_add_sub Hos).
+apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+now apply Nat.mod_upper_bound.
+Qed.
+
 (* to be completed
 (* e.g. 1/5 = 1/8 + 1/16 + 1/128 + 1/256 + ...
    corresponding to 1/5 written in binary, which is
@@ -2182,12 +2233,11 @@ intros m Hm.
   }
   clear a Heqc.
   rename c into a.
-...
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_rat_frac_part_lt_1 Hon Hop Hiv Hor).
 }
 ...
 rewrite Nat.log2_pow2 in Hm; [ | easy ].
-(* faudrait peut-être prendre une borne inf (le "exist" ci-dessus) plus
-   large, plus grosse, mais faut qu'elle soit facile à prouver, aussi *)
 ...
 destruct (Nat.eq_dec (Nat.log2 (N + 1)) (Nat.log2 m)) as [Hnm| Hnm]. {
   destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
