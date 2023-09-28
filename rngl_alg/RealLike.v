@@ -2169,6 +2169,7 @@ apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply Nat.log2_le_mono in Hm.
 rewrite Nat.log2_pow2 in Hm; [ | easy ].
 clear c Heqc.
+...
 destruct (Nat.eq_dec (Nat.log2 (N + 1)) (Nat.log2 m)) as [Hnm| Hnm]. {
   destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
     subst m; cbn in Hnm |-*.
