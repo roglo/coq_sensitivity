@@ -2278,13 +2278,24 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ n, N ≤ n → angle_lt (angle_sub l (f n)) ε.
 
 (* to be completed
-(* ah oui non je sais pas *)
-Definition seq_angle_converging_to_rat θ (n : nat) :=
-  (rngl_of_nat (a * rad ^ n / b) / rngl_of_nat 2 ^ n)%L.
+(* ah oui, non, c'est pas ça, faut faire intervenir "n" quelque part, là *)
+
+Fixpoint angle_div_2_n Hiv Hc2 Hor θ i :=
+  match i with
+  | 0 => θ
+  | S i' => angle_div_2 Hiv Hc2 Hor (angle_div_2_n Hiv Hc2 Hor θ i')
+  end.
+
+Definition seq_angle_converging_to_angle_div_n Hiv Hc2 Hor θ (i : nat) :=
+  angle_div_2_n Hiv Hc2 Hor (angle_mul_nat θ (2 ^ i)) i.
 
 Theorem glop :
-  ∀ rad n θn θ,
-  is_angle_upper_limit_when_tending_to_inf (seq_converging_to_rat rad 1 n) θn ∧
+  ∀ (Hiv : rngl_has_inv T = true)
+    (Hor : rngl_is_ordered T = true)
+    (Hc2 : rngl_characteristic T ≠ 2),
+  ∀ n θn θ,
+  is_angle_upper_limit_when_tending_to_inf
+    (seq_angle_converging_to_angle_div_n Hiv Hc2 Hor θ) θn ∧
   angle_mul_nat θn n = θ.
 ...
 
