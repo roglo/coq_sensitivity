@@ -2046,7 +2046,7 @@ Theorem inv_is_inf_sum_of_inv_pow_2 :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a b,
-  (2 ≤ rngl_of_nat rad)%L
+  2 ≤ rad
   → rngl_of_nat b ≠ 0%L
   → is_limit_when_tending_to_inf (seq_conv_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
@@ -2095,11 +2095,7 @@ assert (Hzr : (0 < rngl_of_nat rad)%L). {
   rewrite <- rngl_of_nat_0.
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   apply Nat.neq_0_lt_0.
-  intros H; subst rad.
-  cbn in H2r.
-  apply (rngl_nlt_ge Hor) in H2r.
-  apply H2r.
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now intros H; subst rad.
 }
 assert (Hzb : (0 < rngl_of_nat b)%L). {
   rewrite <- rngl_of_nat_0.
@@ -2107,10 +2103,7 @@ assert (Hzb : (0 < rngl_of_nat b)%L). {
   apply Nat.neq_0_lt_0.
   now intros H; subst b.
 }
-assert (Hzr' : rad ≠ 0). {
-  intros H; subst rad.
-  now apply (rngl_lt_irrefl Hor) in Hzr.
-}
+assert (Hzr' : rad ≠ 0) by now intros H; subst rad.
 assert (Hzb' : b ≠ 0) by now intros H; subst b.
 (*
 exists (S (S (Nat.log2_up N))).
