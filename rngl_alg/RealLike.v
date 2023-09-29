@@ -2317,6 +2317,11 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 intros Hic Hon Hop Har Hed * Hnz α Hα.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Hed.
+move α before θ.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Hor Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
