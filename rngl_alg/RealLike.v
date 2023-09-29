@@ -2088,7 +2088,7 @@ Qed.
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
-Theorem inv_is_inf_sum_of_inv_pow_2 :
+Theorem rat_is_inf_sum_of_inv_pow_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2270,33 +2270,45 @@ Definition angle_compare θ1 θ2 :=
     else rngl_compare (rngl_cos θ1) (rngl_cos θ2).
 
 Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
+Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
 
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
+Notation "θ1 < θ2" := (angle_lt θ1 θ2) : angle_scope.
+Notation "θ1 ≤ θ2" := (angle_le θ1 θ2) : angle_scope.
+Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
+Notation "0" := (angle_zero) : angle_scope.
+Notation "a ≤ b < c" := (angle_le a b ∧ angle_lt b c)%L :
+  angle_scope.
+
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
-  ∀ ε, angle_lt angle_zero ε → ∃ N,
-  ∀ n, N ≤ n → angle_lt (angle_sub l (f n)) ε.
+  ∀ ε, (0 < ε)%A → ∃ N, ∀ n : nat, N ≤ n → (0%A ≤ (l - f n)%A < ε)%A.
 
-(* to be completed
-(* ah oui, non, c'est pas ça, faut faire intervenir "n" quelque part, là *)
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hc2 : rngl_characteristic T ≠ 2}.
+Context {Hor : rngl_is_ordered T = true}.
 
-Fixpoint angle_div_2_n Hiv Hc2 Hor θ i :=
+Fixpoint angle_div_2_pow_nat θ i :=
   match i with
   | 0 => θ
-  | S i' => angle_div_2 Hiv Hc2 Hor (angle_div_2_n Hiv Hc2 Hor θ i')
+  | S i' => angle_div_2 Hiv Hc2 Hor (angle_div_2_pow_nat θ i')
   end.
 
-Definition seq_angle_converging_to_angle_div_n Hiv Hc2 Hor θ (i : nat) :=
-  angle_div_2_n Hiv Hc2 Hor (angle_mul_nat θ (2 ^ i)) i.
+Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
+  angle_div_2_pow_nat (angle_mul_nat θ (2 ^ i / n)) i.
 
-Theorem glop :
-  ∀ (Hiv : rngl_has_inv T = true)
-    (Hor : rngl_is_ordered T = true)
-    (Hc2 : rngl_characteristic T ≠ 2),
-  ∀ n θn θ,
+Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
+
+(* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
+   e.g. angle_add *)
+
+(* to be completed
+Theorem angle_div_nat_is_inf_sum_of_angle_div_pow_2 :
+  ∀ n θ,
   is_angle_upper_limit_when_tending_to_inf
-    (seq_angle_converging_to_angle_div_n Hiv Hc2 Hor θ) θn ∧
-  angle_mul_nat θn n = θ.
+    (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+Proof.
+intros * ε Hε.
 ...
 
 Definition angle_div_nat θ n :=
