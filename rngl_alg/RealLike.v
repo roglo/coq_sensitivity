@@ -2419,6 +2419,10 @@ destruct zs. {
   split. {
 (* ah ouais, ce serait bien si les angles étaient des espèces d'anneaux.
    Mais faudrait une multiplication... *)
+(* (cos (atan2 x y * atan2 x' y'), sin (atan2 x y * atan2 x' y'), _)
+   supposes to define:
+   - atan2 and
+   - cos and sin on classical angles *)
 ...
 rewrite (rngl_squ_mul Hic) in H2.
 rewrite <- rngl_squ
