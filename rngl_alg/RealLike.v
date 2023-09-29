@@ -2294,8 +2294,10 @@ Fixpoint angle_div_2_pow_nat θ i :=
   | S i' => angle_div_2 Hiv Hc2 Hor (angle_div_2_pow_nat θ i')
   end.
 
+Arguments angle_div_2_pow_nat θ%A i%nat.
+
 Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
-  angle_div_2_pow_nat (angle_mul_nat θ (2 ^ i / n)) i.
+  angle_div_2_pow_nat (2 ^ i / n * θ) i.
 
 Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
 
