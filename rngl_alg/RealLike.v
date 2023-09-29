@@ -2310,17 +2310,32 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_archimedean T = true →
+  rngl_has_eq_dec T = true →
   ∀ n θ,
   rngl_of_nat n ≠ 0%L
   → is_angle_upper_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
-intros Hic Hon Hop Har * Hnz ε Hε.
+intros Hic Hon Hop Har Hed * Hnz α Hα.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Hor Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold seq_converging_to_rat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold angle_lt in Hα.
+progress unfold angle_compare in Hα.
+progress unfold rngl_compare in Hα.
+cbn in Hα.
+rewrite (rngl_leb_refl Hor) in Hα.
+remember (0 ≤? rngl_sin α)%L as zs eqn:Hzs; symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  remember (rngl_cos α =? 1)%L as ce1 eqn:Hce1; symmetry in Hce1.
+  destruct ce1; [ easy | ].
+  apply (rngl_eqb_neq Hed) in Hce1.
+  remember (rngl_cos α ≤? 1)%L as cl1 eqn:Hcl1; symmetry in Hcl1.
+  destruct cl1; [ clear Hα | easy ].
+  apply rngl_leb_le in Hcl1.
 ...
 
 Definition angle_div_nat θ n :=
