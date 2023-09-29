@@ -2414,6 +2414,9 @@ destruct zs. {
   }
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
+  exists N. (* au pif *)
+  intros m Hm.
+  split. {
 ...
 rewrite (rngl_squ_mul Hic) in H2.
 rewrite <- rngl_squ
