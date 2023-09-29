@@ -2355,27 +2355,6 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   → is_angle_upper_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
-(*
-intros Hic Hon Hop Har Hed * Hnz α Hα.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-move Hos before Hed.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  now rewrite (H1 _) in Hnz.
-}
-move Hc1 before Hos.
-progress unfold seq_angle_converging_to_angle_div_nat.
-specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-...
-destruct (H1 (1 / ε)%L) as (N, HN).
-...
-enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ 2 ^ m). {
-  destruct H as (M, HM).
-  exists M.
-...
-*)
 intros Hic Hon Hop Har Hed * Hnz α Hα.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2394,6 +2373,11 @@ assert
   now rewrite Hi1, Hed.
 }
 move Hid before Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 _) in Hnz.
+}
+move Hc1 before Hid.
 move α before θ.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
@@ -2422,6 +2406,14 @@ destruct zs. {
     apply (rl_sqrt_lt_rl_sqrt Hic Hop). {
       apply (rngl_le_refl Hor).
     }
+    apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_lt_0_sub Hop Hor).
+    now apply (rngl_lt_iff Hor).
+  }
+  specialize (H1 H); clear H.
+  destruct H1 as (N, HN).
 ...
 rewrite (rngl_squ_mul Hic) in H2.
 rewrite <- rngl_squ
