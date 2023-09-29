@@ -260,9 +260,11 @@ Fixpoint angle_mul_nat a n :=
   | S n' => angle_add a (angle_mul_nat a n')
   end.
 
+(*
 End a.
 
 Arguments angle T {ro rp}.
+*)
 
 (* end angles *)
 
@@ -279,11 +281,13 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
       (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
     rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ rl_nth_root 2 a)%L }.
 
+(*
 Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+*)
 Context {rl : real_like_prop T}.
 
 Definition rl_sqrt := rl_nth_root 2.
@@ -2282,6 +2286,8 @@ Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
 Notation "a ≤ b < c" := (angle_le a b ∧ angle_lt b c)%L :
   angle_scope.
+
+Arguments angle T {ro rp}.
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ ε, (0 < ε)%A → ∃ N, ∀ n : nat, N ≤ n → (0%A ≤ (l - f n)%A < ε)%A.
