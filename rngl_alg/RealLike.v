@@ -2309,6 +2309,36 @@ Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
   angle_div_2_pow_nat (2 ^ i / n * θ) i.
 
 Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
+Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
+
+Theorem rl_sqrt_lt_rl_sqrt :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ a b,
+  (0 ≤ a)%L
+  → (a < b)%L
+  → (√ a < √ b)%L.
+Proof.
+intros Hic Hop * Ha Hab.
+apply (rngl_nle_gt Hor).
+intros H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
+specialize (H2 √b √b √a √a)%L.
+assert (H : (0 ≤ √b ≤ √a)%L). {
+  split; [ | easy ].
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_trans Hor _ a); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H2 H H).
+do 2 rewrite fold_rngl_squ in H2.
+rewrite rngl_squ_sqrt in H2. 2: {
+  apply (rngl_le_trans Hor _ a); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite rngl_squ_sqrt in H2; [ | easy ].
+now apply (rngl_nle_gt Hor) in Hab.
+Qed.
 
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
@@ -2325,11 +2355,45 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   → is_angle_upper_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
+(*
 intros Hic Hon Hop Har Hed * Hnz α Hα.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 move Hos before Hed.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 _) in Hnz.
+}
+move Hc1 before Hos.
+progress unfold seq_angle_converging_to_angle_div_nat.
+specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+...
+destruct (H1 (1 / ε)%L) as (N, HN).
+...
+enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ 2 ^ m). {
+  destruct H as (M, HM).
+  exists M.
+...
+*)
+intros Hic Hon Hop Har Hed * Hnz α Hα.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+move Hos before Hed.
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+move Hi1 before Hos.
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+move Hid before Hi1.
 move α before θ.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
@@ -2351,6 +2415,33 @@ destruct zs. {
   destruct cl1; [ clear Hα | easy ].
   apply rngl_leb_le in Hcl1.
   specialize (H1 (rngl_sin (angle_div_2 Hiv Hc2 Hor α))).
+  assert (H : (0 < rngl_sin (angle_div_2 Hiv Hc2 Hor α))%L). {
+    progress unfold angle_div_2.
+    cbn.
+    rewrite <- (rl_sqrt_0 Hor Hop Hic Hid).
+    apply (rl_sqrt_lt_rl_sqrt Hic Hop). {
+      apply (rngl_le_refl Hor).
+    }
+...
+rewrite (rngl_squ_mul Hic) in H2.
+rewrite <- rngl_squ
+Search (√_ * √_)%L.
+Search (√_)%L.
+...
+apply (rngl_mul_le_compat Hop Hor) with (b := √b%L) (d := √a%L).
+apply (rngl_
+Search (_ * _ < _ * _)%Z.
+...
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hi1) with (a := √(
+...
+apply rl_sqrt_lt_rl_sqrt.
+Search (_ < √ _)%L.
+Search (rngl_squ _ < rngl_squ _)%L.
+Search (rngl_squ _ ≤ rngl_squ _)%L.
+Search (rngl_abs (√ _))%L.
+Search (√ 0)%L.
+...
+    apply (rngl_div_lt_pos).
 ...
 
 Definition angle_div_nat θ n :=
