@@ -2278,10 +2278,23 @@ Definition angle_compare θ1 θ2 :=
 Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
 Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
 
+(* alternative definition of angle_le *)
+Definition angle_le' θ1 θ2 :=
+  if (rngl_zero ≤? rngl_sin θ1)%L then
+    if (rngl_zero ≤? rngl_sin θ2)%L then
+      (rngl_cos θ2 ≤? rngl_cos θ1)%L
+    else
+      false
+  else
+    if (rngl_zero ≤? rngl_sin θ2)%L then
+      true
+    else
+      (rngl_cos θ1 ≤? rngl_cos θ2)%L.
+
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
 Notation "θ1 < θ2" := (angle_lt θ1 θ2) : angle_scope.
-Notation "θ1 ≤ θ2" := (angle_le θ1 θ2) : angle_scope.
+Notation "θ1 ≤ θ2" := (angle_le' θ1 θ2 = true) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
 Notation "a ≤ b < c" := (angle_le a b ∧ angle_lt b c)%L :
@@ -2417,6 +2430,73 @@ destruct zs. {
   exists N. (* au pif *)
   intros m Hm.
   split. {
+Search (0 ≤ _ - _)%L.
+Theorem angle_le_0_sub :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 : angle T, (0 ≤ θ1 - θ2)%A ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+progress unfold angle_le'.
+progress unfold angle_sub.
+progress unfold angle_opp.
+cbn.
+(*
+progress unfold angle_compare.
+progress unfold rngl_compare.
+cbn.
+*)
+rewrite (rngl_leb_refl Hor).
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+cbn.
+move c2 before c1; move s2 before s1.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
+cbn in Hcs1, Hcs2.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
+do 2 rewrite (rngl_mul_opp_r Hop).
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite (rngl_opp_involutive Hop).
+rewrite rngl_add_comm.
+rewrite (fold_rngl_sub Hop).
+remember (0 ≤? s1 * c2 - c1 * s2)%L as zcs eqn:Hzcs.
+remember (c1 * c2 + s1 * s2 =? 1)%L as cse1 eqn:Hcse1.
+remember (c1 * c2 + s1 * s2 ≤? 1)%L as csl1 eqn:Hcsl1.
+remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
+remember (c2 =? c1)%L as c21 eqn:Hc21.
+symmetry in Hzcs, Hcse1, Hcsl1, Hzs1, Hzs2, Hc21.
+destruct zcs. {
+  apply rngl_leb_le in Hzcs.
+  apply -> (rngl_le_0_sub Hop Hor) in Hzcs.
+  destruct csl1. {
+    apply rngl_leb_le in Hcsl1.
+    split; [ | easy ].
+    intros _.
+    destruct zs1. {
+      apply rngl_leb_le in Hzs1.
+      destruct zs2; [ | exfalso ]. {
+        apply rngl_leb_le in Hzs2.
+        apply rngl_leb_le.
+...
+specialize (rngl_add_le_compat Hor) as H1.
+split; intros Hab. {
+  specialize (H1 0%L (b - a)%L a a Hab (rngl_le_refl Hor _)).
+  rewrite <- (rngl_sub_sub_distr Hop) in H1.
+  rewrite (rngl_sub_diag Hos) in H1.
+  now rewrite rngl_add_0_l, (rngl_sub_0_r Hos) in H1.
+} {
+  specialize (H1 a b (- a)%L (- a)%L Hab (rngl_le_refl Hor _)).
+  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  now rewrite (rngl_sub_diag Hos) in H1.
+}
+
+...
 (* ah ouais, ce serait bien si les angles étaient des espèces d'anneaux.
    Mais faudrait une multiplication... *)
 (* (cos (atan2 x y * atan2 x' y'), sin (atan2 x y * atan2 x' y'), _)
