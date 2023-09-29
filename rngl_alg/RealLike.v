@@ -126,14 +126,14 @@ Record angle := mk_ang
     rngl_sin : T;
     rngl_cos2_sin2 : cos2_sin2_prop rngl_cos rngl_sin }.
 
-Theorem eq_angle_eq : ∀ a b,
-  (rngl_cos a, rngl_sin a) = (rngl_cos b, rngl_sin b) ↔ a = b.
+Theorem eq_angle_eq : ∀ θ1 θ2,
+  (rngl_cos θ1, rngl_sin θ1) = (rngl_cos θ2, rngl_sin θ2) ↔ θ1 = θ2.
 Proof.
 intros.
-split; intros Hab; [ | now subst b ].
+split; intros Hab; [ | now subst θ2 ].
 injection Hab; clear Hab; intros Hs Hc.
-destruct a as (aco, asi, Hacs).
-destruct b as (bco, bsi, Hbcs).
+destruct θ1 as (aco, asi, Hacs).
+destruct θ2 as (bco, bsi, Hbcs).
 cbn in Hs, Hc.
 subst bsi bco.
 f_equal.
@@ -449,7 +449,11 @@ split; [ easy | ].
 now do 2 apply -> Nat.succ_lt_mono.
 Qed.
 
-Definition angle_div_2 Hiv Hc2 Hor a :=
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hc2 : rngl_characteristic T ≠ 2}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition angle_div_2 a :=
   let ε := if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L in
   {| rngl_cos := (ε * rl_sqrt ((1 + rngl_cos a) / 2))%L;
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
@@ -460,11 +464,7 @@ Theorem angle_div_2_mul_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ (Hiv : rngl_has_inv T = true)
-    (Hc2 : rngl_characteristic T ≠ 2)
-    (Hor : rngl_is_ordered T = true),
-  ∀ a,
-  angle_mul_nat (angle_div_2 Hiv Hc2 Hor a) 2 = a.
+  ∀ a, angle_mul_nat (angle_div_2 a) 2 = a.
 Proof.
 intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
@@ -632,10 +632,9 @@ Qed.
 
 Theorem rl_sqrt_squ :
   rngl_has_opp T = true →
-  rngl_is_ordered T = true →
   ∀ a, (√(a²))%L = rngl_abs a.
 Proof.
-intros Hop Hor *.
+intros Hop *.
 progress unfold rngl_squ.
 progress unfold rngl_abs.
 progress unfold rl_sqrt.
@@ -676,11 +675,11 @@ Definition angle_ltb a b :=
 Theorem rl_sqrt_0 :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
   rl_sqrt 0%L = 0%L.
 Proof.
-intros Hop Hic Hor Hii.
+intros Hop Hic Hii.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -697,12 +696,11 @@ Theorem rl_sqrt_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
  rl_sqrt 1%L = 1%L.
 Proof.
-intros Hic Hon Hop Hiv Hor Hii.
+intros Hic Hon Hop Hii.
 specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
 progress unfold rl_sqrt.
 specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
@@ -720,11 +718,8 @@ Theorem angle_mul_2_div_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ (Hiv : rngl_has_inv T = true)
-    (Hc2 : rngl_characteristic T ≠ 2)
-    (Hor : rngl_is_ordered T = true),
   ∀ a,
-  angle_div_2 Hiv Hc2 Hor (angle_mul_nat a 2) =
+  angle_div_2 (angle_mul_nat a 2) =
     if angle_ltb a angle_straight then a else angle_add a angle_straight.
 Proof.
 intros Hic Hon Hop Hed *.
@@ -832,7 +827,7 @@ destruct ap. {
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite Ha.
-  do 2 rewrite (rl_sqrt_squ Hop Hor).
+  do 2 rewrite (rl_sqrt_squ Hop).
   rewrite (rngl_abs_nonneg Hop Hor sa); [ | easy ].
   f_equal.
   subst ε.
@@ -962,8 +957,8 @@ destruct ap. {
       rewrite fold_rngl_squ.
       rewrite (rngl_squ_opp Hop).
       rewrite (rngl_squ_1 Hon).
-      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-      rewrite (rl_sqrt_1 Hic Hon Hop Hiv Hor Hid).
+      rewrite (rl_sqrt_0 Hop Hic Hid).
+      rewrite (rl_sqrt_1 Hic Hon Hop Hid).
       easy.
     }
   } {
@@ -984,7 +979,7 @@ destruct ap. {
     rewrite (rngl_add_diag Hon).
     rewrite (rngl_mul_comm Hic 2)%L.
     rewrite (rngl_mul_div Hi1); [ | easy ].
-    rewrite (rl_sqrt_squ Hop Hor).
+    rewrite (rl_sqrt_squ Hop).
     rewrite <- Ha at 1.
     rewrite (rngl_sub_sub_distr Hop).
     rewrite (rngl_add_comm ca²%L).
@@ -992,7 +987,7 @@ destruct ap. {
     rewrite (rngl_add_diag Hon).
     rewrite (rngl_mul_comm Hic 2%L).
     rewrite (rngl_mul_div Hi1); [ | easy ].
-    rewrite (rl_sqrt_squ Hop Hor).
+    rewrite (rl_sqrt_squ Hop).
     rewrite (rngl_abs_nonpos Hop Hor sa). 2: {
       now apply (rngl_lt_le_incl Hor).
     }
@@ -1038,10 +1033,9 @@ destruct ap. {
 Qed.
 
 Theorem rl_acos_prop :
-  rngl_is_ordered T = true →
   ∀ x, (x² ≤ 1)%L → cos2_sin2_prop x √(1 - x²)%L.
 Proof.
-intros Hor * Hx1.
+intros * Hx1.
 progress unfold cos2_sin2_prop.
 remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
@@ -1064,18 +1058,18 @@ rewrite rngl_add_comm.
 apply (rngl_add_sub Hos).
 Qed.
 
-Definition rl_acos Hor (x : T) :=
+Definition rl_acos (x : T) :=
   match (rngl_le_dec Hor x² 1)%L with
   | left Hx1 =>
       {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
-         rngl_cos2_sin2 := rl_acos_prop Hor x Hx1 |}
+         rngl_cos2_sin2 := rl_acos_prop x Hx1 |}
   | _ =>
       angle_zero
   end.
 
-Arguments rl_acos Hor x%L.
+Arguments rl_acos x%L.
 
-Theorem rl_cos_acos : ∀ Hor x, (x² ≤ 1)%L → rngl_cos (rl_acos Hor x) = x.
+Theorem rl_cos_acos : ∀ x, (x² ≤ 1)%L → rngl_cos (rl_acos x) = x.
 Proof.
 intros * Hx1.
 progress unfold rl_acos.
@@ -1120,7 +1114,9 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   | right _ => None
   end.
 
+(*
 End a.
+*)
 
 Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   match n with
@@ -1128,7 +1124,11 @@ Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   | S n' => gc_mul z (gc_power_nat z n')
   end.
 
+(*
 Arguments rl_sqrt {T ro rp rl} _%L.
+*)
+
+End a.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
@@ -1808,6 +1808,11 @@ split. {
 }
 Qed.
 
+Context {Hor : rngl_is_ordered T = true}.
+
+Arguments rl_acos {T ro rp rl} Hor x%L.
+Arguments rl_sqrt_squ {T ro rp rl} Hor Hop a%L.
+
 Theorem polar :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1816,7 +1821,6 @@ Theorem polar :
   rngl_has_eq_dec T = true →
   rngl_characteristic T ≠ 2 →
   rl_has_integral_modulus T = true →
-  ∀ (Hor : rngl_is_ordered T = true),
   ∀ (z : GComplex T) ρ θ,
   ρ = √((gre z)² + (gim z)²)%L
   → θ =
@@ -1972,7 +1976,7 @@ destruct zzi. {
   cbn.
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
-  rewrite (rl_sqrt_squ Hop Hor).
+  rewrite (rl_sqrt_squ Hor Hop).
   rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
   rewrite (rngl_abs_nonneg Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
@@ -1993,7 +1997,7 @@ destruct zzi. {
   cbn.
   apply (rngl_add_sub_eq_l Hos) in Hri.
   rewrite Hri.
-  rewrite (rl_sqrt_squ Hop Hor).
+  rewrite (rl_sqrt_squ Hor Hop).
   rewrite (rngl_abs_div Hon Hop Hiv Hed Hor); [ | easy ].
   rewrite (rngl_abs_nonneg Hop Hor ρ). 2: {
     now apply (rngl_lt_le_incl Hor).
@@ -2037,12 +2041,11 @@ Theorem rngl_rat_frac_part_lt_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   ∀ a b,
   rngl_of_nat b ≠ 0%L
   → (rngl_of_nat a / rngl_of_nat b - rngl_of_nat (a / b) < 1)%L.
 Proof.
-intros Hon Hop Hiv Hor * Hrbz.
+intros Hon Hop Hiv * Hrbz.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2093,7 +2096,6 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a b,
   2 ≤ rad
@@ -2101,7 +2103,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   → is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-intros Hic Hon Hop Hiv Hor Har * H2r Hbz.
+intros Hic Hon Hop Hiv Har * H2r Hbz.
 intros ε Hε.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
@@ -2221,7 +2223,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   clear a Heqc.
   rename c into a.
   apply (rngl_lt_le_incl Hor).
-  now apply (rngl_rat_frac_part_lt_1 Hon Hop Hiv Hor).
+  now apply (rngl_rat_frac_part_lt_1 Hon Hop Hiv).
 }
 enough (H : ∃ M : nat, ∀ m : nat, M ≤ m → N + 1 ≤ 2 ^ m). {
   destruct H as (M, HM).
@@ -2286,7 +2288,8 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
 
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hc2 : rngl_characteristic T ≠ 2}.
-Context {Hor : rngl_is_ordered T = true}.
+
+Arguments angle_div_2 {T ro rp rl} Hiv Hc2 Hor a%A.
 
 Fixpoint angle_div_2_pow_nat θ i :=
   match i with
@@ -2322,7 +2325,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 }
 move Hos before Hed.
 move α before θ.
-specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Hor Har) as H1.
+specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold seq_converging_to_rat in H1.
@@ -2341,6 +2344,7 @@ destruct zs. {
   remember (rngl_cos α ≤? 1)%L as cl1 eqn:Hcl1; symmetry in Hcl1.
   destruct cl1; [ clear Hα | easy ].
   apply rngl_leb_le in Hcl1.
+  specialize (H1 (rngl_sin (angle_div_2 Hiv Hc2 Hor α))).
 ...
 
 Definition angle_div_nat θ n :=
