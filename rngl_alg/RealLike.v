@@ -2088,7 +2088,7 @@ Qed.
    corresponding to 1/5 written in binary, which is
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
-Theorem rat_is_inf_sum_of_inv_pow_2 :
+Theorem rat_is_inf_sum_of_inv_rad_pow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2305,12 +2305,20 @@ Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
    e.g. angle_add *)
 
 (* to be completed
-Theorem angle_div_nat_is_inf_sum_of_angle_div_pow_2 :
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_archimedean T = true →
   ∀ n θ,
-  is_angle_upper_limit_when_tending_to_inf
-    (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+  rngl_of_nat n ≠ 0%L
+  → is_angle_upper_limit_when_tending_to_inf
+       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
-intros * ε Hε.
+intros Hic Hon Hop Har * Hnz ε Hε.
+specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Hor Har) as H1.
+specialize (H1 2 1 n (le_refl _) Hnz).
+progress unfold is_limit_when_tending_to_inf in H1.
 ...
 
 Definition angle_div_nat θ n :=
