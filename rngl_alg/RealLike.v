@@ -2417,6 +2417,8 @@ destruct zs. {
   exists N. (* au pif *)
   intros m Hm.
   split. {
+(* ah ouais, ce serait bien si les angles étaient des espèces d'anneaux.
+   Mais faudrait une multiplication... *)
 ...
 rewrite (rngl_squ_mul Hic) in H2.
 rewrite <- rngl_squ
