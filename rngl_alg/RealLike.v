@@ -2319,6 +2319,8 @@ intros Hic Hon Hop Har * Hnz ε Hε.
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Hor Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold seq_converging_to_rat in H1.
+progress unfold seq_angle_converging_to_angle_div_nat.
 ...
 
 Definition angle_div_nat θ n :=
