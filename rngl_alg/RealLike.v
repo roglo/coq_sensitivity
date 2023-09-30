@@ -2284,10 +2284,10 @@ Definition angle_le' θ1 θ2 :=
     if (rngl_zero ≤? rngl_sin θ2)%L then
       (rngl_cos θ2 ≤? rngl_cos θ1)%L
     else
-      false
+      true
   else
     if (rngl_zero ≤? rngl_sin θ2)%L then
-      true
+      false
     else
       (rngl_cos θ1 ≤? rngl_cos θ2)%L.
 
@@ -2465,12 +2465,14 @@ rewrite (rngl_opp_involutive Hop).
 rewrite rngl_add_comm.
 rewrite (fold_rngl_sub Hop).
 remember (0 ≤? s1 * c2 - c1 * s2)%L as zcs eqn:Hzcs.
+(*
 remember (c1 * c2 + s1 * s2 =? 1)%L as cse1 eqn:Hcse1.
+*)
 remember (c1 * c2 + s1 * s2 ≤? 1)%L as csl1 eqn:Hcsl1.
 remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
-remember (c2 =? c1)%L as c21 eqn:Hc21.
-symmetry in Hzcs, Hcse1, Hcsl1, Hzs1, Hzs2, Hc21.
+remember (c2 ≤? c1)%L as c21 eqn:Hc21.
+symmetry in Hzcs, (*Hcse1,*) Hcsl1, Hzs1, Hzs2, Hc21.
 destruct zcs. {
   apply rngl_leb_le in Hzcs.
   apply -> (rngl_le_0_sub Hop Hor) in Hzcs.
@@ -2480,9 +2482,12 @@ destruct zcs. {
     intros _.
     destruct zs1. {
       apply rngl_leb_le in Hzs1.
-      destruct zs2; [ | exfalso ]. {
-        apply rngl_leb_le in Hzs2.
-        apply rngl_leb_le.
+      destruct zs2; [ | easy ].
+      apply rngl_leb_le in Hzs2.
+      destruct c21; [ easy | ].
+      apply (rngl_leb_gt Hor) in Hc21.
+(* bizarre, ça a pas l'air de marcher ; peut-être que la
+   définition de angle_le' est fausse *)
 ...
 specialize (rngl_add_le_compat Hor) as H1.
 split; intros Hab. {
