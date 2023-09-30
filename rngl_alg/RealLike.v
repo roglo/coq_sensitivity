@@ -2297,7 +2297,7 @@ Notation "θ1 < θ2" := (angle_lt θ1 θ2) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_le' θ1 θ2 = true) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
-Notation "a ≤ b < c" := (angle_le a b ∧ angle_lt b c)%L :
+Notation "a ≤ b < c" := (angle_le' a b = true ∧ angle_lt b c)%L :
   angle_scope.
 
 Arguments angle T {ro rp}.
@@ -2351,6 +2351,19 @@ rewrite rngl_squ_sqrt in H2. 2: {
 }
 rewrite rngl_squ_sqrt in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
+Qed.
+
+Theorem angle_add_0_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, (0 + θ = θ)%A.
+Proof.
+intros Hon Hos *.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+now rewrite rngl_add_0_r.
 Qed.
 
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
@@ -2430,7 +2443,40 @@ destruct zs. {
   exists N. (* au pif *)
   intros m Hm.
   split. {
-Search (0 ≤ _ - _)%L.
+Check Nat.mul_assoc.
+Theorem angle_mul_nat_assoc :
+  ∀ a b θ, (a * (b * θ) = (a * b) * θ)%A.
+Proof.
+intros.
+induction a; [ easy | cbn ].
+rewrite IHa.
+symmetry.
+Theorem angle_mul_add_distr_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
+Proof.
+intros Hon Hos *.
+induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
+rewrite IHa.
+Theorem angle_add_assoc :
+  ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%A.
+Proof.
+intros.
+apply eq_angle_eq; cbn.
+(* ouais, casse-couilles *)
+... ...
+apply angle_add_assoc.
+... ...
+apply angle_mul_add_distr_r.
+...
+rewrite angle_mul_nat_assoc.
+...
+Theorem glop :
+  (0 ≤ θ - angle_div_2_pow_nat...
+...
+(* theorem ci-dessous faux : with θ1+θ3 déborde mais pas θ2+θ3
+   alors l'ordre n'est plus respecté *)
 Theorem angle_add_le_mono_l:
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
