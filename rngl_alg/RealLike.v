@@ -2431,6 +2431,54 @@ destruct zs. {
   intros m Hm.
   split. {
 Search (0 ≤ _ - _)%L.
+Theorem angle_add_le_mono_l:
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (θ2 ≤ θ3 ↔ θ1 + θ2 ≤ θ1 + θ3)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+progress unfold angle_le'.
+progress unfold angle_add.
+cbn.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+cbn.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+progress unfold cos2_sin2_prop in Hcs3.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
+cbn in Hcs1, Hcs2, Hcs3.
+move c2 before c1; move c3 before c2.
+move s2 before s1; move s3 before s2.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
+remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? s3)%L as zs3 eqn:Hzs3.
+remember (0 ≤? c1 * s2 + s1 * c2)%L as zcs12 eqn:Hzcs12.
+remember (0 ≤? c1 * s3 + s1 * c3)%L as zcs13 eqn:Hzcs13.
+remember (c3 ≤? c2)%L as zc32 eqn:Hzc32.
+symmetry in Hzcs12, Hzcs13, Hzs2, Hzs3, Hzc32.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2.
+  destruct zs3. {
+    apply rngl_leb_le in Hzs3.
+    destruct zc32. {
+      split; [ intros _ | easy ].
+      apply rngl_leb_le in Hzc32.
+      destruct zcs12. {
+        apply rngl_leb_le in Hzcs12.
+        destruct zcs13; [ | easy ].
+        apply rngl_leb_le in Hzcs13.
+        apply rngl_leb_le.
+        apply (rngl_le_add_le_sub_l Hop Hor).
+        rewrite (rngl_add_sub_assoc Hop).
+        rewrite (rngl_add_sub_swap Hop).
+        rewrite <- (rngl_mul_sub_distr_l Hop).
+        apply (rngl_le_add_le_sub_r Hop Hor).
+        rewrite <- (rngl_mul_sub_distr_l Hop).
+...
 Theorem angle_add_le_compat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
