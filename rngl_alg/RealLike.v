@@ -2431,6 +2431,57 @@ destruct zs. {
   intros m Hm.
   split. {
 Search (0 ≤ _ - _)%L.
+Theorem angle_add_le_compat :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3 θ4 : angle T,
+  (θ1 ≤ θ2 → θ3 ≤ θ4 → θ1 + θ3 ≤ θ2 + θ4)%A.
+Proof.
+intros Hic Hon Hop Hed * H12 H34.
+progress unfold angle_le' in H12.
+progress unfold angle_le' in H34.
+progress unfold angle_le'.
+progress unfold angle_add.
+cbn.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+destruct θ4 as (c4, s4, Hcs4).
+cbn in H12, H34 |-*.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+progress unfold cos2_sin2_prop in Hcs3.
+progress unfold cos2_sin2_prop in Hcs4.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3, Hcs4.
+cbn in Hcs1, Hcs2, Hcs3, Hcs4.
+move c2 before c1; move c3 before c2; move c4 before c3.
+move s2 before s1; move s3 before s2; move s4 before s3.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3, Hcs4.
+remember (0 ≤? c1 * s3 + s1 * c3)%L as zcs13 eqn:Hzcs13.
+remember (0 ≤? c2 * s4 + s2 * c4)%L as zcs24 eqn:Hzcs24.
+remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? s3)%L as zs3 eqn:Hzs3.
+remember (0 ≤? s4)%L as zs4 eqn:Hzs4.
+symmetry in Hzcs13, Hzcs24, Hzs1, Hzs2, Hzs3, Hzs4.
+destruct zcs13. {
+  apply rngl_leb_le in Hzcs13.
+  destruct zcs24; [ | easy ].
+  apply rngl_leb_le in Hzcs24.
+  apply rngl_leb_le.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      apply rngl_leb_le in H12.
+      destruct zs3. {
+        apply rngl_leb_le in Hzs3.
+        destruct zs4. {
+          apply rngl_leb_le in Hzs4.
+          apply rngl_leb_le in H34.
+...
 Theorem angle_le_0_sub :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2438,6 +2489,8 @@ Theorem angle_le_0_sub :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 : angle T, (0 ≤ θ1 - θ2)%A ↔ (θ1 ≤ θ2)%A.
 Proof.
+intros Hic Hon Hop Hed *.
+...
 intros Hic Hon Hop Hed *.
 progress unfold angle_le'.
 progress unfold angle_sub.
@@ -2469,8 +2522,6 @@ remember (0 ≤? s1 * c2 - c1 * s2)%L as zcs eqn:Hzcs.
 remember (c1 * c2 + s1 * s2 =? 1)%L as cse1 eqn:Hcse1.
 *)
 remember (c1 * c2 + s1 * s2 ≤? 1)%L as csl1 eqn:Hcsl1.
-remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
 remember (c2 ≤? c1)%L as c21 eqn:Hc21.
 symmetry in Hzcs, (*Hcse1,*) Hcsl1, Hzs1, Hzs2, Hc21.
 destruct zcs. {
