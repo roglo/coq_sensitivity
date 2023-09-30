@@ -2366,6 +2366,70 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_r.
 Qed.
 
+Theorem angle_add_assoc :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%A.
+Proof.
+intros Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply eq_angle_eq; cbn.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+cbn.
+f_equal. {
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  do 4 rewrite rngl_mul_assoc.
+  do 2 rewrite <- (rngl_sub_add_distr Hos).
+  f_equal.
+  do 2 rewrite rngl_add_assoc.
+  rewrite rngl_add_add_swap; f_equal.
+  apply rngl_add_comm.
+} {
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  do 4 rewrite rngl_mul_assoc.
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite rngl_add_assoc.
+  rewrite (rngl_add_sub_swap Hop).
+  f_equal.
+  apply (rngl_add_sub_swap Hop).
+}
+Qed.
+
+Theorem angle_mul_add_distr_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
+Proof.
+intros Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
+rewrite IHa.
+apply (angle_add_assoc Hop).
+Qed.
+
+Theorem angle_mul_nat_assoc :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b θ, (a * (b * θ) = (a * b) * θ)%A.
+Proof.
+intros Hon Hop *.
+induction a; [ easy | cbn ].
+rewrite IHa.
+symmetry.
+apply (angle_mul_add_distr_r Hon Hop).
+Qed.
+
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
@@ -2443,34 +2507,9 @@ destruct zs. {
   exists N. (* au pif *)
   intros m Hm.
   split. {
-Check Nat.mul_assoc.
-Theorem angle_mul_nat_assoc :
-  ∀ a b θ, (a * (b * θ) = (a * b) * θ)%A.
-Proof.
-intros.
-induction a; [ easy | cbn ].
-rewrite IHa.
-symmetry.
-Theorem angle_mul_add_distr_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
-Proof.
-intros Hon Hos *.
-induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
-rewrite IHa.
-Theorem angle_add_assoc :
-  ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%A.
-Proof.
-intros.
-apply eq_angle_eq; cbn.
-(* ouais, casse-couilles *)
-... ...
-apply angle_add_assoc.
-... ...
-apply angle_mul_add_distr_r.
-...
-rewrite angle_mul_nat_assoc.
+    rewrite (angle_mul_nat_assoc Hon Hop).
+    remember (2 ^ m / n * n) as a eqn:Ha.
+(* oui mais a*θ, ça peut déborder *)
 ...
 Theorem glop :
   (0 ≤ θ - angle_div_2_pow_nat...
