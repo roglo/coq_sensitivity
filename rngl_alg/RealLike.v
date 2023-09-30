@@ -2446,6 +2446,8 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 intros Hic Hon Hop Har Hed * Hnz α Hα.
+(* il faut que nθ ne fasse pas le tour ! *)
+...
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
