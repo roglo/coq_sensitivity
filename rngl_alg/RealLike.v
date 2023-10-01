@@ -2490,10 +2490,6 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
 }
 Qed.
 
-(* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
-   e.g. angle_add *)
-
-(* to be completed
 Theorem angle_dist_separation :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2512,7 +2508,6 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
-(**)
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2524,7 +2519,6 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
-(**)
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -2533,19 +2527,18 @@ progress unfold angle_dist in H12.
 cbn in H12.
 remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
 symmetry in Hzs12.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
+cbn in Hcs1, Hcs2.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
 destruct zs12. {
   apply rngl_leb_le in Hzs12.
   apply (eq_rngl_abs_0 Hop) in H12.
   apply -> (rngl_sub_move_0_r Hop) in H12.
   subst c2.
-  progress unfold cos2_sin2_prop in Hcs1.
-  progress unfold cos2_sin2_prop in Hcs2.
-  rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
-  cbn in Hcs1, Hcs2.
-  apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
   rewrite <- Hcs2 in Hcs1.
   apply (rngl_add_cancel_l Hos) in Hcs1.
-(*
   apply (rngl_sub_move_0_r Hop) in Hcs1.
   rewrite (rngl_squ_sub_squ Hop Hic) in Hcs1.
   apply (rngl_le_0_mul Hon Hop) in Hzs12.
@@ -2578,29 +2571,21 @@ destruct zs12. {
       now subst s1.
     }
   }
+} {
+  apply (rngl_leb_gt Hor) in Hzs12.
+  apply (eq_rngl_abs_0 Hop) in H12.
+  apply -> (rngl_sub_move_0_r Hop) in H12.
+  subst s2.
+  apply (rngl_nle_gt Hor) in Hzs12.
+  exfalso; apply Hzs12.
+  apply (rngl_square_ge_0 Hop Hor).
 }
-...
-*)
-  apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Hcs1.
-  progress unfold rngl_abs in Hcs1.
-  remember (s1 ≤? 0)%L as s1z eqn:Hs1z.
-  remember (s2 ≤? 0)%L as s2z eqn:Hs2z.
-  symmetry in Hs1z, Hs2z.
-  destruct s1z. {
-    apply rngl_leb_le in Hs1z.
-    destruct s2z. {
-      apply rngl_leb_le in Hs2z.
-...
-Search (rngl_abs _ = rngl_abs _).
-...
-  apply (rngl_sub_compat_l _ _ 1)%L in Hcs2.
-  apply (rngl_sub_compat_l _ _ (c1² + s1²))%L in Hcs2.
-...
-  apply rngl_leb_le in Hzs12.
-  apply (rngl_le_0_mul Hon Hop) in Hzs12.
-  destruct Hzs12 as [(Hz1, Hz2)| (Hz1, Hz2)]. {
-...
+Qed.
 
+(* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
+   e.g. angle_add *)
+
+(* to be completed
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3,
   (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
