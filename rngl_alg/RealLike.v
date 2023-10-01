@@ -2636,6 +2636,10 @@ destruct zs13. {
         apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in Hcs1.
         destruct Hcs1 as [Hc1| Hc1]. {
           subst c1.
+rewrite (rngl_abs_nonpos Hop Hor).
+rewrite (rngl_abs_nonpos Hop Hor).
+do 2 rewrite (rngl_opp_sub_distr Hop).
+...
           specialize (rngl_abs_triangle Hop Hor) as H1.
           specialize (H1 (c2 - 1) (s3 - s2))%L as H2.
           specialize (H1 c3 (-1))%L as H3.
