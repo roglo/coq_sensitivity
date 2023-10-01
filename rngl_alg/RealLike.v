@@ -2303,7 +2303,7 @@ Notation "a ≤ b < c" := (angle_le' a b = true ∧ angle_lt b c)%L :
 Arguments angle T {ro rp}.
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
-  ∀ ε, (0 < ε)%A → ∃ N, ∀ n : nat, N ≤ n → (0%A ≤ (l - f n)%A < ε)%A.
+  ∀ ε, (0 < ε)%A → ∃ N, ∀ n : nat, N ≤ n → ((l - f n)%A < ε)%A.
 
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hc2 : rngl_characteristic T ≠ 2}.
@@ -2452,7 +2452,6 @@ intros Hic Hon Hop Har Hed * Hnz α Hα.
       (seq_angle_converging_to_angle_div_nat θ n) θ'
    → θ = (n * θ')%A.
  *)
-...
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2513,192 +2512,6 @@ destruct zs. {
   destruct H1 as (N, HN).
   exists N. (* au pif *)
   intros m Hm.
-  split. {
-    rewrite (angle_mul_nat_assoc Hon Hop).
-    remember (2 ^ m / n * n) as a eqn:Ha.
-(* oui mais a*θ, ça peut déborder *)
-...
-Theorem glop :
-  (0 ≤ θ - angle_div_2_pow_nat...
-...
-(* theorem ci-dessous faux : with θ1+θ3 déborde mais pas θ2+θ3
-   alors l'ordre n'est plus respecté *)
-Theorem angle_add_le_mono_l:
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3, (θ2 ≤ θ3 ↔ θ1 + θ2 ≤ θ1 + θ3)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-progress unfold angle_le'.
-progress unfold angle_add.
-cbn.
-destruct θ1 as (c1, s1, Hcs1).
-destruct θ2 as (c2, s2, Hcs2).
-destruct θ3 as (c3, s3, Hcs3).
-cbn.
-progress unfold cos2_sin2_prop in Hcs1.
-progress unfold cos2_sin2_prop in Hcs2.
-progress unfold cos2_sin2_prop in Hcs3.
-rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
-cbn in Hcs1, Hcs2, Hcs3.
-move c2 before c1; move c3 before c2.
-move s2 before s1; move s3 before s2.
-apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
-remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? s3)%L as zs3 eqn:Hzs3.
-remember (0 ≤? c1 * s2 + s1 * c2)%L as zcs12 eqn:Hzcs12.
-remember (0 ≤? c1 * s3 + s1 * c3)%L as zcs13 eqn:Hzcs13.
-remember (c3 ≤? c2)%L as zc32 eqn:Hzc32.
-symmetry in Hzcs12, Hzcs13, Hzs2, Hzs3, Hzc32.
-destruct zs2. {
-  apply rngl_leb_le in Hzs2.
-  destruct zs3. {
-    apply rngl_leb_le in Hzs3.
-    destruct zc32. {
-      split; [ intros _ | easy ].
-      apply rngl_leb_le in Hzc32.
-      destruct zcs12. {
-        apply rngl_leb_le in Hzcs12.
-        destruct zcs13; [ | easy ].
-        apply rngl_leb_le in Hzcs13.
-        apply rngl_leb_le.
-        apply (rngl_le_add_le_sub_l Hop Hor).
-        rewrite (rngl_add_sub_assoc Hop).
-        rewrite (rngl_add_sub_swap Hop).
-        rewrite <- (rngl_mul_sub_distr_l Hop).
-        apply (rngl_le_add_le_sub_r Hop Hor).
-        rewrite <- (rngl_mul_sub_distr_l Hop).
-...
-Theorem angle_add_le_compat :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3 θ4 : angle T,
-  (θ1 ≤ θ2 → θ3 ≤ θ4 → θ1 + θ3 ≤ θ2 + θ4)%A.
-Proof.
-intros Hic Hon Hop Hed * H12 H34.
-progress unfold angle_le' in H12.
-progress unfold angle_le' in H34.
-progress unfold angle_le'.
-progress unfold angle_add.
-cbn.
-destruct θ1 as (c1, s1, Hcs1).
-destruct θ2 as (c2, s2, Hcs2).
-destruct θ3 as (c3, s3, Hcs3).
-destruct θ4 as (c4, s4, Hcs4).
-cbn in H12, H34 |-*.
-progress unfold cos2_sin2_prop in Hcs1.
-progress unfold cos2_sin2_prop in Hcs2.
-progress unfold cos2_sin2_prop in Hcs3.
-progress unfold cos2_sin2_prop in Hcs4.
-rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3, Hcs4.
-cbn in Hcs1, Hcs2, Hcs3, Hcs4.
-move c2 before c1; move c3 before c2; move c4 before c3.
-move s2 before s1; move s3 before s2; move s4 before s3.
-apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3, Hcs4.
-remember (0 ≤? c1 * s3 + s1 * c3)%L as zcs13 eqn:Hzcs13.
-remember (0 ≤? c2 * s4 + s2 * c4)%L as zcs24 eqn:Hzcs24.
-remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? s3)%L as zs3 eqn:Hzs3.
-remember (0 ≤? s4)%L as zs4 eqn:Hzs4.
-symmetry in Hzcs13, Hzcs24, Hzs1, Hzs2, Hzs3, Hzs4.
-destruct zcs13. {
-  apply rngl_leb_le in Hzcs13.
-  destruct zcs24; [ | easy ].
-  apply rngl_leb_le in Hzcs24.
-  apply rngl_leb_le.
-  destruct zs1. {
-    apply rngl_leb_le in Hzs1.
-    destruct zs2. {
-      apply rngl_leb_le in Hzs2.
-      apply rngl_leb_le in H12.
-      destruct zs3. {
-        apply rngl_leb_le in Hzs3.
-        destruct zs4. {
-          apply rngl_leb_le in Hzs4.
-          apply rngl_leb_le in H34.
-...
-Theorem angle_le_0_sub :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 : angle T, (0 ≤ θ1 - θ2)%A ↔ (θ1 ≤ θ2)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-...
-intros Hic Hon Hop Hed *.
-progress unfold angle_le'.
-progress unfold angle_sub.
-progress unfold angle_opp.
-cbn.
-(*
-progress unfold angle_compare.
-progress unfold rngl_compare.
-cbn.
-*)
-rewrite (rngl_leb_refl Hor).
-destruct θ1 as (c1, s1, Hcs1).
-destruct θ2 as (c2, s2, Hcs2).
-cbn.
-move c2 before c1; move s2 before s1.
-progress unfold cos2_sin2_prop in Hcs1.
-progress unfold cos2_sin2_prop in Hcs2.
-rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
-cbn in Hcs1, Hcs2.
-apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
-do 2 rewrite (rngl_mul_opp_r Hop).
-progress unfold rngl_sub.
-rewrite Hop.
-rewrite (rngl_opp_involutive Hop).
-rewrite rngl_add_comm.
-rewrite (fold_rngl_sub Hop).
-remember (0 ≤? s1 * c2 - c1 * s2)%L as zcs eqn:Hzcs.
-(*
-remember (c1 * c2 + s1 * s2 =? 1)%L as cse1 eqn:Hcse1.
-*)
-remember (c1 * c2 + s1 * s2 ≤? 1)%L as csl1 eqn:Hcsl1.
-remember (c2 ≤? c1)%L as c21 eqn:Hc21.
-symmetry in Hzcs, (*Hcse1,*) Hcsl1, Hzs1, Hzs2, Hc21.
-destruct zcs. {
-  apply rngl_leb_le in Hzcs.
-  apply -> (rngl_le_0_sub Hop Hor) in Hzcs.
-  destruct csl1. {
-    apply rngl_leb_le in Hcsl1.
-    split; [ | easy ].
-    intros _.
-    destruct zs1. {
-      apply rngl_leb_le in Hzs1.
-      destruct zs2; [ | easy ].
-      apply rngl_leb_le in Hzs2.
-      destruct c21; [ easy | ].
-      apply (rngl_leb_gt Hor) in Hc21.
-(* bizarre, ça a pas l'air de marcher ; peut-être que la
-   définition de angle_le' est fausse *)
-...
-specialize (rngl_add_le_compat Hor) as H1.
-split; intros Hab. {
-  specialize (H1 0%L (b - a)%L a a Hab (rngl_le_refl Hor _)).
-  rewrite <- (rngl_sub_sub_distr Hop) in H1.
-  rewrite (rngl_sub_diag Hos) in H1.
-  now rewrite rngl_add_0_l, (rngl_sub_0_r Hos) in H1.
-} {
-  specialize (H1 a b (- a)%L (- a)%L Hab (rngl_le_refl Hor _)).
-  do 2 rewrite (fold_rngl_sub Hop) in H1.
-  now rewrite (rngl_sub_diag Hos) in H1.
-}
-
-...
-(* ah ouais, ce serait bien si les angles étaient des espèces d'anneaux.
-   Mais faudrait une multiplication... *)
-(* (cos (atan2 x y * atan2 x' y'), sin (atan2 x y * atan2 x' y'), _)
-   supposes to define:
-   - atan2 and
-   - cos and sin on classical angles *)
 ...
 rewrite (rngl_squ_mul Hic) in H2.
 rewrite <- rngl_squ
