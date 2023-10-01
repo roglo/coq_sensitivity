@@ -2302,9 +2302,6 @@ Notation "a ≤ b < c" := (angle_le' a b = true ∧ angle_lt b c)%L :
 
 Arguments angle T {ro rp}.
 
-Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
-  ∀ ε, (0 < ε)%A → ∃ N, ∀ n : nat, N ≤ n → ((l - f n)%A < ε)%A.
-
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hc2 : rngl_characteristic T ≠ 2}.
 
@@ -2434,6 +2431,11 @@ Qed.
    e.g. angle_add *)
 
 (* to be completed
+Definition angle_dist θ1 θ2 := ...
+
+Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
