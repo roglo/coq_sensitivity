@@ -2433,14 +2433,25 @@ Definition angle_dist θ1 θ2 :=
   else
     rngl_abs (rngl_sin θ2 - rngl_sin θ1).
 
+Theorem angle_dist_symmetric :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
+Proof.
+intros Hic Hop *.
+progress unfold angle_dist.
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_abs_opp Hop Hor).
+rewrite (rngl_opp_sub_distr Hop).
+rewrite <- (rngl_abs_opp Hop Hor (rngl_sin θ2 - rngl_sin θ1))%L.
+rewrite (rngl_opp_sub_distr Hop).
+easy.
+Qed.
+
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
 (* to be completed
-Theorem angle_dist_symmetric :
-  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
-...
-
 Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
 ...
