@@ -2454,6 +2454,55 @@ Qed.
 (* to be completed
 Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
+Proof.
+intros * H12.
+apply eq_angle_eq.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+cbn in H12 |-*.
+progress unfold angle_dist in H12.
+cbn in H12.
+remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
+symmetry in Hzs12.
+destruct zs12. {
+  apply rngl_leb_le in Hzs12.
+Theorem rngl_le_0_mul :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b, (0 ≤ a * b → 0 ≤ a ∧ 0 ≤ b ∨ a ≤ 0 ∧ b ≤ 0)%L.
+Proof.
+intros Hon Hop * Hab.
+Check Z.le_0_mul.
+...
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  now apply Bool.orb_true_iff; right.
+}
+destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]; [ left | right ]. {
+  split; [ easy | ].
+  rewrite <- (rngl_mul_0_r Hos a) in Hab.
+  destruct (rngl_lt_dec Hor 0 a) as [Hlza| Hlza]. 2: {
+    apply (rngl_nlt_ge Hor) in Hlza.
+    apply (rngl_le_antisymm Hor) in Hza; [ | easy ].
+    subst a.
+...
+  destruct (rngl_eq_dec Hed a 0).
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab; [ easy | ].
+Search (_ ↔ _ * _ ≤ _ * _)%L.
+... ...
+apply rngl_le_0_mul in Hzs12.
+...
+
+Search (rngl_abs _ = 0)%L.
 ...
 
 Theorem angle_dist_triangular :
