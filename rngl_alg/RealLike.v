@@ -2512,7 +2512,7 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
-(*
+(**)
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2524,7 +2524,7 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
-*)
+(**)
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -2545,21 +2545,52 @@ destruct zs12. {
   apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
   rewrite <- Hcs2 in Hcs1.
   apply (rngl_add_cancel_l Hos) in Hcs1.
-(**)
+(*
   apply (rngl_sub_move_0_r Hop) in Hcs1.
   rewrite (rngl_squ_sub_squ Hop Hic) in Hcs1.
   apply (rngl_le_0_mul Hon Hop) in Hzs12.
+  apply (rngl_integral Hos Hid) in Hcs1.
   destruct Hzs12 as [(Hz1, Hz2)| (Hz1, Hz2)]. {
-    apply (rngl_eq_mul_0_r Hos Hii) in Hcs1.
-(* ouais, bon, c'est pas ça *)
+    destruct Hcs1 as [Hss| Hss]. {
+      apply (rngl_eq_add_0 Hor) in Hss; [ | easy | easy ].
+      now destruct Hss; subst s1 s2.
+    } {
+      apply -> (rngl_sub_move_0_r Hop) in Hss.
+      now subst s1.
+    }
+  } {
+    destruct Hcs1 as [Hss| Hss]. {
+      apply (f_equal rngl_opp) in Hss.
+      rewrite (rngl_opp_add_distr Hop) in Hss.
+      progress unfold rngl_sub in Hss.
+      rewrite Hop in Hss.
+      rewrite (rngl_opp_0 Hop) in Hss.
+      apply (rngl_opp_le_compat Hop Hor) in Hz1, Hz2.
+      rewrite (rngl_opp_0 Hop) in Hz1, Hz2.
+      apply (rngl_eq_add_0 Hor) in Hss; [ | easy | easy ].
+      destruct Hss as (H1, H2).
+      apply (f_equal rngl_opp) in H1, H2.
+      rewrite (rngl_opp_involutive Hop) in H1, H2.
+      rewrite (rngl_opp_0 Hop) in H1, H2.
+      now subst s1 s2.
+    } {
+      apply -> (rngl_sub_move_0_r Hop) in Hss.
+      now subst s1.
+    }
+  }
+}
 ...
-rngl_eq_mul_0_l:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_opp_or_subt T = true
-    → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
-      → ∀ a b : T, (a * b)%L = 0%L → b ≠ 0%L → a = 0%L
-...
+*)
   apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Hcs1.
+  progress unfold rngl_abs in Hcs1.
+  remember (s1 ≤? 0)%L as s1z eqn:Hs1z.
+  remember (s2 ≤? 0)%L as s2z eqn:Hs2z.
+  symmetry in Hs1z, Hs2z.
+  destruct s1z. {
+    apply rngl_leb_le in Hs1z.
+    destruct s2z. {
+      apply rngl_leb_le in Hs2z.
+...
 Search (rngl_abs _ = rngl_abs _).
 ...
   apply (rngl_sub_compat_l _ _ 1)%L in Hcs2.
