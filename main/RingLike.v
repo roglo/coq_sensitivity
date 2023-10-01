@@ -3425,6 +3425,17 @@ rewrite (rngl_opp_0 Hop).
 now destruct (0 ≤? 0)%L.
 Qed.
 
+Theorem eq_rngl_abs_0 :
+  rngl_has_opp T = true →
+  ∀ a, rngl_abs a = 0%L → a = 0%L.
+Proof.
+intros Hop * Ha.
+progress unfold rngl_abs in Ha.
+destruct (a ≤? 0)%L; [ | easy ].
+rewrite <- (rngl_opp_0 Hop) in Ha.
+now apply (rngl_opp_inj Hop) in Ha.
+Qed.
+
 Theorem rngl_abs_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

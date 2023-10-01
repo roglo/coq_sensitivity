@@ -2495,11 +2495,27 @@ Qed.
 
 (* to be completed
 Theorem angle_dist_separation :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
 Proof.
-intros Hon Hop * H12.
+intros Hic Hon Hop Hed * H12.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -2509,7 +2525,22 @@ cbn in H12.
 remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
 symmetry in Hzs12.
 destruct zs12. {
-Search (rngl_abs _ = 0)%L.
+  apply rngl_leb_le in Hzs12.
+  apply (eq_rngl_abs_0 Hop) in H12.
+  apply -> (rngl_sub_move_0_r Hop) in H12.
+  subst c2.
+  progress unfold cos2_sin2_prop in Hcs1.
+  progress unfold cos2_sin2_prop in Hcs2.
+  rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
+  cbn in Hcs1, Hcs2.
+  apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
+  rewrite <- Hcs2 in Hcs1.
+  apply (rngl_add_cancel_l Hos) in Hcs1.
+  apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Hcs1.
+Search (rngl_abs _ = rngl_abs _).
+...
+  apply (rngl_sub_compat_l _ _ 1)%L in Hcs2.
+  apply (rngl_sub_compat_l _ _ (c1² + s1²))%L in Hcs2.
 ...
   apply rngl_leb_le in Hzs12.
   apply (rngl_le_0_mul Hon Hop) in Hzs12.
