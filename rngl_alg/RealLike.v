@@ -2589,6 +2589,18 @@ Qed.
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3,
   (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
+Proof.
+intros.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+progress unfold angle_dist.
+progress unfold rngl_abs.
+cbn.
+remember (0 ≤? s1 * s3)%L as zs13 eqn:Hzs13.
+symmetry in Hzs13.
+destruct zs13. {
+  apply rngl_leb_le in Hzs13.
 ...
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
