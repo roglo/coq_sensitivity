@@ -2448,24 +2448,6 @@ rewrite (rngl_opp_sub_distr Hop).
 easy.
 Qed.
 
-(* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
-   e.g. angle_add *)
-
-(* to be completed
-Theorem angle_dist_separation :
-  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
-Proof.
-intros * H12.
-apply eq_angle_eq.
-destruct θ1 as (c1, s1, Hcs1).
-destruct θ2 as (c2, s2, Hcs2).
-cbn in H12 |-*.
-progress unfold angle_dist in H12.
-cbn in H12.
-remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
-symmetry in Hzs12.
-destruct zs12. {
-  apply rngl_leb_le in Hzs12.
 Theorem rngl_le_0_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2499,6 +2481,39 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
 } {
   apply (rngl_nle_gt Hor) in Hza.
   right.
+  rewrite <- (rngl_mul_0_l Hos b) in Hab.
+  split; [ now apply (rngl_lt_le_incl Hor) | ].
+  apply (rngl_nle_gt Hor) in Hza.
+  apply (rngl_nlt_ge Hor).
+  intros Hzb; apply Hza.
+  now apply (rngl_mul_le_mono_pos_r Hop Hor Hii) in Hab.
+}
+Qed.
+
+(* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
+   e.g. angle_add *)
+
+(* to be completed
+Theorem angle_dist_separation :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
+Proof.
+intros Hon Hop * H12.
+apply eq_angle_eq.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+cbn in H12 |-*.
+progress unfold angle_dist in H12.
+cbn in H12.
+remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
+symmetry in Hzs12.
+destruct zs12. {
+Search (rngl_abs _ = 0)%L.
+...
+  apply rngl_leb_le in Hzs12.
+  apply (rngl_le_0_mul Hon Hop) in Hzs12.
+  destruct Hzs12 as [(Hz1, Hz2)| (Hz1, Hz2)]. {
 ...
 
 Theorem angle_dist_triangular :
