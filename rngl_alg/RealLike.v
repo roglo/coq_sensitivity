@@ -856,17 +856,10 @@ destruct ap. {
         rewrite (rngl_sub_0_r Hos) in Ha.
         symmetry in Ha.
         rewrite <- (rngl_squ_1 Hon) in Ha.
-        apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Ha.
-        rewrite (rngl_abs_1 Hon Hop Hor) in Ha.
-        progress unfold rngl_abs in Ha.
-        remember (ca ≤? 0)%L as cz eqn:Hcz; symmetry in Hcz.
-        destruct cz. {
-          apply (f_equal rngl_opp) in Ha.
-          now rewrite (rngl_opp_involutive Hop) in Ha.
-        } {
-          rewrite Ha.
-          apply (rngl_0_le_1 Hon Hop Hor).
-        }
+        apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in Ha.
+        destruct Ha as [Ha| Ha]; [ | easy ].
+        subst ca.
+        apply (rngl_0_le_1 Hon Hop Hor).
       }
       rewrite (rngl_mul_comm Hic) in Hzsc.
       apply (rngl_le_div_l Hon Hop Hiv Hor) in Hzsc. 2: {
@@ -2587,20 +2580,75 @@ Qed.
 
 (* to be completed
 Theorem angle_dist_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
   (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
 Proof.
-intros.
+intros Hic Hon Hop Hed *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 progress unfold angle_dist.
-progress unfold rngl_abs.
 cbn.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+progress unfold cos2_sin2_prop in Hcs3.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
+cbn in Hcs1, Hcs2, Hcs3.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
 remember (0 ≤? s1 * s3)%L as zs13 eqn:Hzs13.
 symmetry in Hzs13.
 destruct zs13. {
   apply rngl_leb_le in Hzs13.
+  remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
+  symmetry in Hzs12.
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    remember (0 ≤? s2 * s3)%L as zs23 eqn:Hzs23.
+    symmetry in Hzs23.
+    destruct zs23. {
+      apply rngl_leb_le in Hzs23.
+      specialize (rngl_abs_triangle Hop Hor) as H1.
+      specialize (H1 (c2 - c1) (c3 - c2))%L.
+      rewrite <- (rngl_add_sub_swap Hop) in H1.
+      rewrite (rngl_add_sub_assoc Hop) in H1.
+      rewrite rngl_add_comm in H1.
+      now rewrite (rngl_add_sub Hos) in H1.
+    } {
+      apply (rngl_leb_gt Hor) in Hzs23.
+      apply (rngl_le_0_mul Hon Hop) in Hzs12, Hzs13.
+      destruct Hzs13 as [(Hs1, Hs3)| (Hs1, Hs3)]. {
+        destruct Hzs12 as [(Hs1', Hs2)| (Hs1', Hs2)]. {
+          apply (rngl_nle_gt Hor) in Hzs23.
+          exfalso; apply Hzs23; clear Hzs23.
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        }
+        apply (rngl_le_antisymm Hor) in Hs1; [ | easy ].
+        subst s1; clear Hs1'.
+        rewrite (rngl_squ_0 Hos), rngl_add_0_r in Hcs1.
+        rewrite <- (rngl_squ_1 Hon) in Hcs1.
+        apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in Hcs1.
+        destruct Hcs1 as [Hc1| Hc1]. {
+          subst c1.
+          specialize (rngl_abs_triangle Hop Hor) as H1.
+          specialize (H1 (c2 - 1) (s3 - s2))%L.
+          eapply (rngl_le_trans Hor); [ | apply H1 ].
+...
+        apply (rngl_0_le_1 Hon Hop Hor).
+...
+Search (rngl_abs _ ≤ rngl_abs _ + rngl_abs _)%L.
+...
+  remember (c3 - c1 ≤? 0)%L as c31z eqn:Hc31z.
+  symmetry in Hc31z.
+  destruct c31z. {
+    apply rngl_leb_le in Hc31z.
+    apply -> (rngl_le_sub_0 Hop Hor) in Hc31z.
 ...
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=

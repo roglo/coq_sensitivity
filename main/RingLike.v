@@ -4100,6 +4100,39 @@ Qed.
 Theorem rngl_squ_pow_2 : ∀ a, (a² = a ^ 2)%L.
 Proof. easy. Qed.
 
+Theorem rngl_squ_eq_cases :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b, (a² = b² → a = b ∨ a = -b)%L.
+Proof.
+intros Hic Hon Hop Hiv Hed * Hab.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+apply (rngl_sub_move_0_r Hop) in Hab.
+rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
+apply (rngl_integral Hos Hid) in Hab.
+destruct Hab as [Hab| Hab]; [ right | left ]. {
+  now apply (rngl_add_move_0_r Hop) in Hab.
+} {
+  now apply -> (rngl_sub_move_0_r Hop) in Hab.
+}
+Qed.
+
 Theorem rngl_min_glb :
   ∀ a b c, (a ≤ b → a ≤ c → a ≤ rngl_min b c)%L.
 Proof.
