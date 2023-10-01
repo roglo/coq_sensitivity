@@ -2431,7 +2431,12 @@ Qed.
    e.g. angle_add *)
 
 (* to be completed
-Definition angle_dist θ1 θ2 := ...
+Definition angle_dist θ1 θ2 :=
+  if (0 ≤? rngl_sin θ1)%L then
+    if (0 ≤? rngl_sin θ2)%L then
+      rngl_abs (rngl_cos θ2 - rngl_cos θ1) (* between 0 and 2 *)
+    else
+  ...
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
