@@ -2472,8 +2472,6 @@ Theorem rngl_le_0_mul :
   ∀ a b, (0 ≤ a * b → 0 ≤ a ∧ 0 ≤ b ∨ a ≤ 0 ∧ b ≤ 0)%L.
 Proof.
 intros Hon Hop * Hab.
-Check Z.le_0_mul.
-...
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2487,22 +2485,20 @@ assert
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   now apply Bool.orb_true_iff; right.
 }
-destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]; [ left | right ]. {
-  split; [ easy | ].
-  rewrite <- (rngl_mul_0_r Hos a) in Hab.
+destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
   destruct (rngl_lt_dec Hor 0 a) as [Hlza| Hlza]. 2: {
     apply (rngl_nlt_ge Hor) in Hlza.
     apply (rngl_le_antisymm Hor) in Hza; [ | easy ].
     subst a.
-...
-  destruct (rngl_eq_dec Hed a 0).
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab; [ easy | ].
-Search (_ ↔ _ * _ ≤ _ * _)%L.
-... ...
-apply rngl_le_0_mul in Hzs12.
-...
-
-Search (rngl_abs _ = 0)%L.
+    destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]; [ now left | ].
+    apply (rngl_nle_gt Hor), (rngl_lt_le_incl Hor) in Hzb.
+    now right.
+  }
+  rewrite <- (rngl_mul_0_r Hos a) in Hab.
+  now left; apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab.
+} {
+  apply (rngl_nle_gt Hor) in Hza.
+  right.
 ...
 
 Theorem angle_dist_triangular :
