@@ -2447,6 +2447,11 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
 Proof.
 intros Hic Hon Hop Har Hed * Hnz α Hα.
 (* il faut que nθ ne fasse pas le tour ! *)
+(* et est-ce qu'il ne faut pas plutôt que j'écrive
+   is_angle_upper_limit_when_tending_to_inf
+      (seq_angle_converging_to_angle_div_nat θ n) θ'
+   → θ = (n * θ')%A.
+ *)
 ...
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
