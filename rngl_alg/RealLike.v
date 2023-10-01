@@ -2427,16 +2427,28 @@ symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
+Definition angle_dist θ1 θ2 :=
+  if (0 ≤? rngl_sin θ1 * rngl_sin θ2)%L then
+    rngl_abs (rngl_cos θ2 - rngl_cos θ1)
+  else
+    rngl_abs (rngl_sin θ2 - rngl_sin θ1).
+
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
 (* to be completed
-Definition angle_dist θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1)%L then
-    if (0 ≤? rngl_sin θ2)%L then
-      rngl_abs (rngl_cos θ2 - rngl_cos θ1) (* between 0 and 2 *)
-    else
-  ...
+Theorem angle_dist_symmetric :
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
+...
+
+Theorem angle_dist_separation :
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
+...
+
+Theorem angle_dist_triangular :
+  ∀ θ1 θ2 θ3,
+  (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
+...
 
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
