@@ -2585,7 +2585,7 @@ Qed.
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
-(* to be completed *)
+(* to be completed
 Theorem angle_dist_triangular :
   ∀ θ1 θ2 θ3,
   (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
