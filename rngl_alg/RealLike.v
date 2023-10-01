@@ -2505,6 +2505,14 @@ intros Hic Hon Hop Hed * H12.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+(*
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2516,6 +2524,7 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
+*)
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -2536,6 +2545,20 @@ destruct zs12. {
   apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
   rewrite <- Hcs2 in Hcs1.
   apply (rngl_add_cancel_l Hos) in Hcs1.
+(**)
+  apply (rngl_sub_move_0_r Hop) in Hcs1.
+  rewrite (rngl_squ_sub_squ Hop Hic) in Hcs1.
+  apply (rngl_le_0_mul Hon Hop) in Hzs12.
+  destruct Hzs12 as [(Hz1, Hz2)| (Hz1, Hz2)]. {
+    apply (rngl_eq_mul_0_r Hos Hii) in Hcs1.
+(* ouais, bon, c'est pas ça *)
+...
+rngl_eq_mul_0_l:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    rngl_has_opp_or_subt T = true
+    → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
+      → ∀ a b : T, (a * b)%L = 0%L → b ≠ 0%L → a = 0%L
+...
   apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in Hcs1.
 Search (rngl_abs _ = rngl_abs _).
 ...
