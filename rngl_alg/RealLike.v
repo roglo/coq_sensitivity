@@ -2612,6 +2612,16 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
+apply (rngl_le_add_le_sub_r Hop Hor).
+apply (rngl_le_add_le_sub_r Hop Hor _ (c3 * c2))%L.
+apply (rngl_le_add_le_sub_r Hop Hor _ (s2 * s1))%L.
+apply (rngl_le_add_le_sub_r Hop Hor _ (c2 * c1))%L.
+do 3 rewrite <- rngl_add_assoc.
+do 2 rewrite <- (rngl_add_sub_swap Hop).
+do 2 apply (rngl_le_sub_le_add_r Hop Hor).
+do 2 rewrite <- rngl_add_assoc.
+apply (rngl_add_le_mono_l Hop Hor).
+do 3 rewrite rngl_add_assoc.
 ...
 progress unfold rngl_max.
 remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.
