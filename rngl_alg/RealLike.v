@@ -2421,8 +2421,9 @@ apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
 Definition angle_dist θ1 θ2 :=
-  ((rngl_cos θ2 - rngl_cos θ1)² +
-   (rngl_sin θ2 - rngl_sin θ1)²)%L.
+  rl_sqrt
+    ((rngl_cos θ2 - rngl_cos θ1)² +
+     (rngl_sin θ2 - rngl_sin θ1)²)%L.
 
 (*
 Theorem angle_dist_symmetric :
@@ -2537,6 +2538,64 @@ Qed.
    e.g. angle_add *)
 
 (* to be completed
+Theorem euclidean_distance_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ x1 y1 x2 y2 x3 y3,
+  (√((x3 - x1)² + (y3 - y1)²)
+   ≤ √((x2 - x1)² + (y2 - y1)²) + √((x3 - x2)² + (y3 - y2)²))%L.
+Proof.
+intros Hic Hon Hop *.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+(**)
+replace (x3 - x1)%L with ((x3 - x2) + (x2 - x1))%L.
+replace (y3 - y1)%L with ((y3 - y2) + (y2 - y1))%L.
+remember (x3 - x2)%L as a eqn:Hx32.
+remember (x2 - x1)%L as b eqn:Hx21.
+remember (y3 - y2)%L as c eqn:Hy32.
+remember (y2 - y1)%L as d eqn:Hy21.
+rewrite (rngl_add_comm √(b² + d²))%L.
+...
+remember (x3 - x2)%L as x32 eqn:Hx32.
+remember (x2 - x1)%L as x21 eqn:Hx21.
+remember (y3 - y2)%L as y32 eqn:Hy32.
+remember (y2 - y1)%L as y21 eqn:Hy21.
+...
+rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply rl_sqrt_nonneg.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  } {
+    apply rl_sqrt_nonneg.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
+}
+rewrite <- (rngl_abs_nonneg Hop Hor (√_))%L. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite (rngl_squ_add Hic Hon).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_le_sub_le_add_r Hop Hor).
+apply -> (rngl_le_sub_le_add_l Hop Hor).
+...
+
 Theorem angle_dist_triangular :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2554,13 +2613,17 @@ destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 progress unfold angle_dist.
 cbn.
+(**)
+specialize (rngl_abs_triangle Hop Hor) as H1.
+... ...
+apply euclidean_distance_triangular.
+...
 progress unfold cos2_sin2_prop in Hcs1.
 progress unfold cos2_sin2_prop in Hcs2.
 progress unfold cos2_sin2_prop in Hcs3.
 rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
 cbn in Hcs1, Hcs2, Hcs3.
 apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
-(**)
 rewrite rngl_add_assoc.
 specialize (rngl_abs_triangle Hop Hor) as H1.
 do 6 rewrite (rngl_squ_sub Hop Hic Hon).

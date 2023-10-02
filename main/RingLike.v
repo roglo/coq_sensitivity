@@ -4047,6 +4047,16 @@ f_equal; symmetry.
 apply (rngl_sub_add Hop).
 Qed.
 
+Theorem rngl_add_squ_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a² + b²)%L.
+Proof.
+intros Hop Hor *.
+apply (rngl_add_nonneg_nonneg Hor);
+  apply (rngl_square_ge_0 Hop Hor).
+Qed.
+
 Theorem rngl_squ_inv :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
