@@ -2450,6 +2450,7 @@ Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
 Proof.
 intros Hic Hon Hop Hed * H12.
+(*
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2471,12 +2472,14 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
+*)
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn in H12 |-*.
 progress unfold angle_dist in H12.
 cbn in H12.
+...
 remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
 symmetry in Hzs12.
 progress unfold cos2_sin2_prop in Hcs1.
