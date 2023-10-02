@@ -2622,6 +2622,12 @@ do 2 apply (rngl_le_sub_le_add_r Hop Hor).
 do 2 rewrite <- rngl_add_assoc.
 apply (rngl_add_le_mono_l Hop Hor).
 do 3 rewrite rngl_add_assoc.
+rewrite (rngl_add_add_swap _ _ (s2 * s1))%L.
+rewrite (rngl_mul_comm Hic).
+rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_mul_comm Hic c3).
+rewrite <- rngl_add_assoc.
+rewrite <- rngl_mul_add_distr_l.
 ...
 progress unfold rngl_max.
 remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.
