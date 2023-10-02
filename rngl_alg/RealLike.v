@@ -2633,13 +2633,13 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
+Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
+
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
 (* to be completed
-Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
-  ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
-
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2686,6 +2686,7 @@ specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold seq_converging_to_rat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
+...
 progress unfold angle_lt in Hα.
 progress unfold angle_compare in Hα.
 progress unfold rngl_compare in Hα.
