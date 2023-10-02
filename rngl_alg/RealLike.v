@@ -2441,7 +2441,6 @@ rewrite (rngl_opp_sub_distr Hop).
 easy.
 Qed.
 
-(* to be completed
 Theorem angle_dist_separation :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2450,16 +2449,8 @@ Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
 Proof.
 intros Hic Hon Hop Hed * H12.
-(*
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
-}
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
@@ -2472,71 +2463,26 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
-*)
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn in H12 |-*.
 progress unfold angle_dist in H12.
 cbn in H12.
-...
-remember (0 ≤? s1 * s2)%L as zs12 eqn:Hzs12.
-symmetry in Hzs12.
-progress unfold cos2_sin2_prop in Hcs1.
-progress unfold cos2_sin2_prop in Hcs2.
-rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2.
-cbn in Hcs1, Hcs2.
-apply (rngl_eqb_eq Hed) in Hcs1, Hcs2.
-destruct zs12. {
-  apply rngl_leb_le in Hzs12.
-  apply (eq_rngl_abs_0 Hop) in H12.
-  apply -> (rngl_sub_move_0_r Hop) in H12.
-  subst c2.
-  rewrite <- Hcs2 in Hcs1.
-  apply (rngl_add_cancel_l Hos) in Hcs1.
-  apply (rngl_sub_move_0_r Hop) in Hcs1.
-  rewrite (rngl_squ_sub_squ Hop Hic) in Hcs1.
-  apply (rngl_le_0_mul Hon Hop) in Hzs12.
-  apply (rngl_integral Hos Hid) in Hcs1.
-  destruct Hzs12 as [(Hz1, Hz2)| (Hz1, Hz2)]. {
-    destruct Hcs1 as [Hss| Hss]. {
-      apply (rngl_eq_add_0 Hor) in Hss; [ | easy | easy ].
-      now destruct Hss; subst s1 s2.
-    } {
-      apply -> (rngl_sub_move_0_r Hop) in Hss.
-      now subst s1.
-    }
-  } {
-    destruct Hcs1 as [Hss| Hss]. {
-      apply (f_equal rngl_opp) in Hss.
-      rewrite (rngl_opp_add_distr Hop) in Hss.
-      progress unfold rngl_sub in Hss.
-      rewrite Hop in Hss.
-      rewrite (rngl_opp_0 Hop) in Hss.
-      apply (rngl_opp_le_compat Hop Hor) in Hz1, Hz2.
-      rewrite (rngl_opp_0 Hop) in Hz1, Hz2.
-      apply (rngl_eq_add_0 Hor) in Hss; [ | easy | easy ].
-      destruct Hss as (H1, H2).
-      apply (f_equal rngl_opp) in H1, H2.
-      rewrite (rngl_opp_involutive Hop) in H1, H2.
-      rewrite (rngl_opp_0 Hop) in H1, H2.
-      now subst s1 s2.
-    } {
-      apply -> (rngl_sub_move_0_r Hop) in Hss.
-      now subst s1.
-    }
-  }
+apply (eq_rl_sqrt_0 Hos) in H12. 2: {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
+  apply (rngl_square_ge_0 Hop Hor).
 } {
-  apply (rngl_leb_gt Hor) in Hzs12.
-  apply (eq_rngl_abs_0 Hop) in H12.
-  apply -> (rngl_sub_move_0_r Hop) in H12.
-  subst s2.
-  apply (rngl_nle_gt Hor) in Hzs12.
-  exfalso; apply Hzs12.
   apply (rngl_square_ge_0 Hop Hor).
 }
+destruct H12 as (Hc, Hs).
+apply (eq_rngl_squ_0 Hos Hid) in Hc, Hs.
+apply -> (rngl_sub_move_0_r Hop) in Hc.
+apply -> (rngl_sub_move_0_r Hop) in Hs.
+now subst c2 s2.
 Qed.
-*)
 
 Theorem rl_sqrt_sqr_le_sqrt_add_sqrt :
   rngl_mul_is_comm T = true →

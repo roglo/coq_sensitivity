@@ -4082,6 +4082,17 @@ rewrite <- (rngl_squ_inv Hon Hos Hiv); [ | easy ].
 apply (rngl_squ_mul Hic).
 Qed.
 
+Theorem eq_rngl_squ_0 :
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a, (a² = 0 → a = 0)%L.
+Proof.
+intros Hos Hii * Ha.
+apply (rngl_integral Hos Hii) in Ha.
+now destruct Ha.
+Qed.
+
 Theorem eq_rngl_squ_rngl_abs :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
