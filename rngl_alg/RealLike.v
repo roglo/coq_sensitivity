@@ -2561,6 +2561,28 @@ progress unfold cos2_sin2_prop in Hcs3.
 rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
 cbn in Hcs1, Hcs2, Hcs3.
 apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
+(**)
+progress unfold rngl_max.
+remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.
+remember (rngl_abs (c2 - c1) ≤? rngl_abs (s2 - s1))%L as a21 eqn:Ha21.
+remember (rngl_abs (c3 - c2) ≤? rngl_abs (s3 - s2))%L as a32 eqn:Ha32.
+symmetry in Ha31, Ha21, Ha32.
+specialize (rngl_abs_triangle Hop Hor) as H1.
+destruct a31. {
+  apply rngl_leb_le in Ha31.
+  destruct a21. {
+    apply rngl_leb_le in Ha21.
+    destruct a32. {
+      apply rngl_leb_le in Ha32.
+      specialize (H1 (s2 - s1) (s3 - s2))%L.
+      rewrite <- (rngl_add_sub_swap Hop) in H1.
+      rewrite (rngl_add_sub_assoc Hop) in H1.
+      rewrite rngl_add_comm in H1.
+      now rewrite (rngl_add_sub Hos) in H1.
+    } {
+      apply (rngl_leb_gt Hor) in Ha32.
+      specialize (H1 (s2 - s1) (c3 - c2))%L.
+...
 remember (0 ≤? s1 * s3)%L as zs13 eqn:Hzs13.
 symmetry in Hzs13.
 destruct zs13. {
