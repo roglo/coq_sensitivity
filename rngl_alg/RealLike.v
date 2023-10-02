@@ -2588,6 +2588,30 @@ rewrite <- (rngl_add_sub_swap Hop 1)%L.
 rewrite <- (rngl_mul_1_r Hon 2)%L at 2.
 do 2 rewrite <- rngl_mul_assoc.
 do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_add_add_swap _ c2² s3²)%L.
+rewrite <- (rngl_add_sub_swap Hop _ s3²)%L.
+rewrite <- rngl_add_assoc.
+rewrite Hcs3.
+rewrite <- (rngl_add_sub_swap Hop _ s2²)%L.
+rewrite <- rngl_add_assoc.
+rewrite Hcs2.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite <- (rngl_mul_1_r Hon 2)%L at 3.
+rewrite <- rngl_mul_add_distr_l.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_sub_add_distr Hos _ (2 * c3 * c2))%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_sub_add_distr Hos).
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_le_trans Hor _ 1)%L.
+  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
 ...
 progress unfold rngl_max.
 remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.

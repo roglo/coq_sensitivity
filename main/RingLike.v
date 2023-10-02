@@ -4334,6 +4334,21 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_mul_le_mono_nonneg_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (0 ≤ a)%L → (b ≤ c)%L → (a * b ≤ a * c)%L.
+Proof.
+intros Hop Hor * Ha Hbc.
+apply (rngl_lt_eq_cases Hor) in Hbc.
+destruct Hbc as [Hbc| Hbc]; [ | subst b; apply (rngl_le_refl Hor) ].
+apply (rngl_le_0_sub Hop Hor).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+apply (rngl_le_0_sub Hop Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_mul_le_mono_nonneg_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
