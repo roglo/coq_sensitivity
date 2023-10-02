@@ -2570,6 +2570,9 @@ Theorem rl_sqrt_sqr_le_sqrt_add_sqrt :
   (√((a + b)² + (c + d)²) ≤ √(a² + c²) + √(b² + d²))%L.
 Proof.
 intros Hic Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -2598,6 +2601,64 @@ rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 apply (rngl_le_sub_le_add_r Hop Hor).
 apply -> (rngl_le_sub_le_add_l Hop Hor).
 do 2 rewrite (rngl_squ_add Hic Hon)%L.
+rewrite rngl_add_assoc.
+rewrite (rngl_sub_add_distr Hos _ b²)%L.
+rewrite (rngl_sub_sub_swap Hop _ b²)%L.
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub Hos).
+rewrite rngl_add_assoc.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_sub Hos).
+rewrite <- rngl_add_assoc.
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+do 3 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_le_trans Hor _ 1)%L.
+  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+eapply (rngl_le_trans Hor); [ apply (rngl_le_abs Hop Hor) | ].
+rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply rl_sqrt_nonneg.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  } {
+    apply rl_sqrt_nonneg.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
+}
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+rewrite (rngl_squ_mul Hic).
+rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+(* c'est pas une formule connue, ça ? un truc chinois, chais plus *)
+rewrite (rngl_squ_add Hic Hon).
+do 2 rewrite (rngl_squ_mul Hic).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_add_distr_r _ _ b²)%L.
+rewrite (rngl_mul_add_distr_r _ _ d²)%L.
+rewrite rngl_add_assoc.
+apply (rngl_add_le_mono_r Hop Hor).
+rewrite <- rngl_add_assoc.
+apply (rngl_add_le_mono_l Hop Hor).
+rewrite (rngl_add_comm (_ * _))%L.
+rewrite (rngl_mul_comm Hic c²)%L.
+do 2 rewrite <- (rngl_squ_mul Hic).
+...
+Search (_² ≤ _²)%L.
+Search (_ ≤ rngl_abs _)%L.
+Check rngl_squ_le_abs_le.
+...
+apply rngl_mul_le_compat_nonneg.
+...
+rewrite rngl_add
 ... ...
 apply rl_sqrt_sqr_le_sqrt_add_sqrt.
 ...
