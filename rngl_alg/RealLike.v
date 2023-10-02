@@ -2421,8 +2421,8 @@ apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
 Definition angle_dist θ1 θ2 :=
-  (rngl_abs (rngl_cos θ2 - rngl_cos θ1) +
-     rngl_abs (rngl_sin θ2 - rngl_sin θ1))%L.
+  ((rngl_cos θ2 - rngl_cos θ1)² +
+   (rngl_sin θ2 - rngl_sin θ1)²)%L.
 
 (*
 Theorem angle_dist_symmetric :
@@ -2563,6 +2563,31 @@ apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
 (**)
 rewrite rngl_add_assoc.
 specialize (rngl_abs_triangle Hop Hor) as H1.
+do 6 rewrite (rngl_squ_sub Hop Hic Hon).
+do 4 rewrite rngl_add_assoc.
+do 4 rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_sub_swap Hop c3²)%L.
+rewrite Hcs3.
+rewrite (rngl_add_sub_swap Hop (1 - 2 * c3 * c1))%L.
+rewrite <- rngl_add_assoc.
+rewrite Hcs1.
+rewrite <- (rngl_add_sub_swap Hop (1 - 2 * c3 * c1))%L.
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+rewrite <- (rngl_mul_1_r Hon 2)%L at 1.
+do 2 rewrite <- rngl_mul_assoc.
+do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_add_add_swap (c2² - 2 * c2 * c1))%L.
+rewrite <- (rngl_add_sub_swap Hop c2²)%L.
+rewrite Hcs2.
+rewrite (rngl_add_sub_swap Hop (1 - 2 * c2 * c1))%L.
+rewrite <- (rngl_add_assoc _ c1² s1²)%L.
+rewrite Hcs1.
+rewrite <- (rngl_add_sub_swap Hop (1 - 2 * c2 * c1))%L.
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+rewrite <- (rngl_mul_1_r Hon 2)%L at 2.
+do 2 rewrite <- rngl_mul_assoc.
+do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
 ...
 progress unfold rngl_max.
 remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.
