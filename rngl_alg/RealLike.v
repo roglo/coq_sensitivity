@@ -2646,21 +2646,38 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_has_opp T = true →
   rngl_is_archimedean T = true →
   rngl_has_eq_dec T = true →
-  ∀ n θ,
+  ∀ n θ θ',
   rngl_of_nat n ≠ 0%L
   → is_angle_upper_limit_when_tending_to_inf
-       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+       (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → θ = (n * θ')%A.
 Proof.
-intros Hic Hon Hop Har Hed * Hnz.
-Check rat_is_inf_sum_of_inv_rad_pow.
+intros Hic Hon Hop Har Hed * Hnz Hlim.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply eq_angle_eq.
+induction n; [ easy | ].
+clear Hnz.
+destruct n. {
+  clear IHn; cbn.
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos).
+  rewrite rngl_add_0_l.
 ...
-(* il faut que nθ ne fasse pas le tour ! *)
-(* et est-ce qu'il ne faut pas plutôt que j'écrive
-   is_angle_upper_limit_when_tending_to_inf
-      (seq_angle_converging_to_angle_div_nat θ n) θ'
-   → θ = (n * θ')%A.
- *)
-intros ε Hε.
+  progress unfold angle_add.
+  progress unfold angle_
+  progress unfold angle_mul_nat.
+
+  rewrite angle_add_0_r.
+rewrite angle_mul_1_l.
+...
+intros Hic Hon Hop Har Hed * Hnz Hlim.
+(*
+progress unfold is_angle_upper_limit_when_tending_to_inf in Hlim.
+Check rat_is_inf_sum_of_inv_rad_pow.
+*)
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
