@@ -2421,9 +2421,8 @@ apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
 Definition angle_dist θ1 θ2 :=
-  rngl_max
-    (rngl_abs (rngl_cos θ2 - rngl_cos θ1))
-    (rngl_abs (rngl_sin θ2 - rngl_sin θ1)).
+  (rngl_abs (rngl_cos θ2 - rngl_cos θ1) +
+     rngl_abs (rngl_sin θ2 - rngl_sin θ1))%L.
 
 (*
 Theorem angle_dist_symmetric :
@@ -2562,6 +2561,9 @@ rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
 cbn in Hcs1, Hcs2, Hcs3.
 apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
 (**)
+rewrite rngl_add_assoc.
+specialize (rngl_abs_triangle Hop Hor) as H1.
+...
 progress unfold rngl_max.
 remember (rngl_abs (c3 - c1) ≤? rngl_abs (s3 - s1))%L as a31 eqn:Ha31.
 remember (rngl_abs (c2 - c1) ≤? rngl_abs (s2 - s1))%L as a21 eqn:Ha21.
