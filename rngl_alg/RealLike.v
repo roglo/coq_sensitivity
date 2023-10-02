@@ -2581,6 +2581,10 @@ destruct a31. {
       now rewrite (rngl_add_sub Hos) in H1.
     } {
       apply (rngl_leb_gt Hor) in Ha32.
+(* perhaps I should define angle_dist as the *sum* of the cos and sin
+   distances instead of their *max*? I don't know if it is better
+   and/or if the proofs are easier. *)
+...
       specialize (H1 (s2 - s1) (c3 - c2))%L.
 ...
 remember (0 ≤? s1 * s3)%L as zs13 eqn:Hzs13.
