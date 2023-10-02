@@ -2555,19 +2555,28 @@ assert
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 (**)
+rewrite (rngl_add_comm √((x2 - x1)² + (y2 - y1)²))%L.
 replace (x3 - x1)%L with ((x3 - x2) + (x2 - x1))%L.
 replace (y3 - y1)%L with ((y3 - y2) + (y2 - y1))%L.
 remember (x3 - x2)%L as a eqn:Hx32.
 remember (x2 - x1)%L as b eqn:Hx21.
 remember (y3 - y2)%L as c eqn:Hy32.
 remember (y2 - y1)%L as d eqn:Hy21.
-rewrite (rngl_add_comm √(b² + d²))%L.
-...
-remember (x3 - x2)%L as x32 eqn:Hx32.
-remember (x2 - x1)%L as x21 eqn:Hx21.
-remember (y3 - y2)%L as y32 eqn:Hy32.
-remember (y2 - y1)%L as y21 eqn:Hy21.
-...
+Theorem rl_sqrt_sqr_le_sqrt_add_sqrt :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b c d,
+  (√((a + b)² + (c + d)²) ≤ √(a² + c²) + √(b² + d²))%L.
+Proof.
+intros Hic Hon Hop *.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
 rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
   apply (rngl_add_nonneg_nonneg Hor). {
     apply rl_sqrt_nonneg.
@@ -2582,18 +2591,15 @@ rewrite <- (rngl_abs_nonneg Hop Hor (√_))%L. 2: {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
-rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_add_squ_nonneg Hop Hor).
-}
-rewrite (rngl_squ_add Hic Hon).
-rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_add_squ_nonneg Hop Hor).
-}
-rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_add_squ_nonneg Hop Hor).
-}
+rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_add Hic Hon √_)%L.
+rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 apply (rngl_le_sub_le_add_r Hop Hor).
 apply -> (rngl_le_sub_le_add_l Hop Hor).
+do 2 rewrite (rngl_squ_add Hic Hon)%L.
+... ...
+apply rl_sqrt_sqr_le_sqrt_add_sqrt.
 ...
 
 Theorem angle_dist_triangular :
