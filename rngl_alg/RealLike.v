@@ -2652,6 +2652,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
        (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 intros Hic Hon Hop Har Hed * Hnz α Hα.
+...
 (* il faut que nθ ne fasse pas le tour ! *)
 (* et est-ce qu'il ne faut pas plutôt que j'écrive
    is_angle_upper_limit_when_tending_to_inf
@@ -2686,6 +2687,7 @@ specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold seq_converging_to_rat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
+Search angle_dist.
 ...
 progress unfold angle_lt in Hα.
 progress unfold angle_compare in Hα.
