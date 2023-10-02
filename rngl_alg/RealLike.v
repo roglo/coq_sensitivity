@@ -2425,7 +2425,7 @@ Definition angle_dist θ1 θ2 :=
     ((rngl_cos θ2 - rngl_cos θ1)² +
      (rngl_sin θ2 - rngl_sin θ1)²)%L.
 
-(*
+(* to be completed
 Theorem angle_dist_symmetric :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
