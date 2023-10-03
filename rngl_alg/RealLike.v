@@ -2839,6 +2839,19 @@ f_equal. {
         rewrite (rngl_abs_nonneg Hop Hor). 2: {
           now apply (rngl_lt_le_incl Hor).
         }
+Theorem rngl_div_sub_distr_r:
+  ∀ x y z : T, ((x - y) / z)%L = (x / z - y / z)%L.
+Proof.
+Admitted.
+rewrite <- rngl_div_sub_distr_r.
+...
+remember (√_)%L as x.
+remember (√_)%L as y in |-*.
+remember (√_)%L as z in |-*.
+...
+Search (_ / _ - _ / _)%L.
+Search (_ / _ + _ / _)%L.
+Search (_ / _ * _ / _)%L.
 ...
           apply (rngl_le_sub_le_add_l Hop Hor).
           progress unfold rngl_sub at 1.
@@ -2857,9 +2870,6 @@ f_equal. {
 Search (_ / _ * _ / _)%L.
 Search (_ / _ * _)%L.
 ...
-Theorem rngl_div_add_distr_r:
-  ∀ x y z : T, ((x + y) / z)%L = (x / z + y / z)%L.
-Proof.
 ...
 rewrite <- rngl_div_add_distr_r.
 ...
