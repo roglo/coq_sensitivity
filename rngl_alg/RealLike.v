@@ -2706,8 +2706,10 @@ destruct n. {
     rewrite Nat.div_1_r in HN.
     assert (H : angle_div_2_pow_nat (2 ^ n * θ) n = θ). {
       clear Hn.
-      induction n; cbn.
-      apply (angle_add_0_r Hon Hos).
+      induction n; [ apply (angle_add_0_r Hon Hos) | ].
+      cbn - [ "^" ].
+...
+cbn.
       rewrite Nat.add_0_r.
       rewrite (angle_mul_add_distr_r Hon Hop).
 Search (angle_div_2_pow_nat).
