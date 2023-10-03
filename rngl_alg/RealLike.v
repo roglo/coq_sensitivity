@@ -2667,10 +2667,47 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
    e.g. angle_add *)
 
 (* to be completed
-Theorem angle_div_2_pow_nat_pow_nat_l :
-  ∀ n θ, angle_div_2_pow_nat (2 ^ n * θ) n = θ.
+Theorem angle_div_2_add :
+  ∀ θ1 θ2,
+  angle_div_2 (θ1 + θ2)  = (angle_div_2 θ1 + angle_div_2 θ2)%A.
 Proof.
 intros.
+apply eq_angle_eq.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+cbn.
+...
+
+Theorem angle_div_2_pow_nat_add :
+  ∀ n θ1 θ2,
+  angle_div_2_pow_nat (θ1 + θ2) n =
+  (angle_div_2_pow_nat θ1 n + angle_div_2_pow_nat θ2 n)%A.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn.
+... ...
+apply angle_div_2_add.
+...
+
+Theorem angle_div_2_pow_nat_pow_nat_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ n θ, angle_div_2_pow_nat (2 ^ n * θ) n = θ.
+Proof.
+intros Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+revert θ.
+induction n; intros; cbn. {
+  apply (angle_add_0_r Hon Hos).
+}
+rewrite Nat.add_0_r.
+rewrite (angle_mul_add_distr_r Hon Hop).
+... ...
+rewrite angle_div_2_pow_nat_add.
+rewrite IHn.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
