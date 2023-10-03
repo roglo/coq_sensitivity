@@ -2343,6 +2343,21 @@ rewrite rngl_squ_sqrt in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
+Theorem angle_add_comm :
+  rngl_mul_is_comm T = true →
+  ∀ θ1 θ2, (θ1 + θ2 = θ2 + θ1)%A.
+Proof.
+intros Hic *.
+apply eq_angle_eq; cbn.
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
+f_equal.
+rewrite rngl_add_comm.
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
+easy.
+Qed.
+
 Theorem angle_add_0_l :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -2354,6 +2369,19 @@ do 2 rewrite (rngl_mul_1_l Hon).
 do 2 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_r.
+Qed.
+
+Theorem angle_add_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, (θ + 0 = θ)%A.
+Proof.
+intros Hon Hos *.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+now rewrite rngl_add_0_l.
 Qed.
 
 Theorem angle_add_assoc :
@@ -2665,13 +2693,27 @@ destruct n. {
   do 2 rewrite (rngl_mul_0_r Hos).
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  assert
+    (H : is_angle_upper_limit_when_tending_to_inf
+           (λ i, angle_div_2_pow_nat (2 ^ i * θ) i) θ'). {
+    intros ε Hε.
+    specialize (Hlim ε Hε).
+    destruct Hlim as (N, HN).
+    exists N.
+    intros n Hn.
+    specialize (HN n Hn).
+    rewrite Nat.div_1_r in HN.
+    assert (H : angle_div_2_pow_nat (2 ^ n * θ) n = θ). {
+      clear Hn.
+      induction n; cbn.
+      apply (angle_add_0_r Hon Hos).
+      rewrite Nat.add_0_r.
+      rewrite (angle_mul_add_distr_r Hon Hop).
+Search (angle_div_2_pow_nat).
 ...
-  progress unfold angle_add.
-  progress unfold angle_
-  progress unfold angle_mul_nat.
-
-  rewrite angle_add_0_r.
-rewrite angle_mul_1_l.
+  }
+  clear Hlim; rename H into Hlim.
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 (*
