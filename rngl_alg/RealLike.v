@@ -826,6 +826,11 @@ rewrite fold_rngl_squ.
 rewrite fold_rl_sqrt.
 rewrite rngl_squ_pow_2.
 progress unfold rl_sqrt.
+(*
+  ============================
+  (rl_nth_root 2 (1 - rngl_cos a) * rl_nth_root 2 (1 + rngl_cos a) *
+   rl_nth_root 2 2⁻¹ ^ 2 * (ε * 2))%L = rngl_sin a
+*)
 rewrite rl_nth_root_pow; [ | easy ].
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic).
@@ -2759,17 +2764,24 @@ f_equal. {
 Check rl_nth_root_mul.
 Search (√ (_ / _))%L.
 Theorem rl_sqrt_div :
-  ∀ a b, (√(a / b) = √a / √b)%L.
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b, (0 ≤ a)%L → (0 < b)%L → (√(a / b) = √a / √b)%L.
 Proof.
-intros.
+intros Hon Hop * Ha Hb.
 progress unfold rngl_div.
 rewrite Hiv.
 progress unfold rl_sqrt.
-rewrite <- rl_nth_root_mul.
+rewrite <- rl_nth_root_mul; [ | easy | ]. 2: {
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+}
 f_equal.
 rewrite fold_rl_sqrt.
-Search rl_nth_root.
 Search (√ _⁻¹)%L.
+Search (√ _)⁻¹%L.
+...
+Search rl_nth_root.
 ...
 rewrite rl_sqrt_div.
 rewrite rl_sqrt_div.
