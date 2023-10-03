@@ -278,7 +278,7 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_nth_root_pow : ∀ n a, (0 ≤ a → rl_nth_root n a ^ n = a)%L;
     rl_nth_root_mul :
       ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →
-      (rl_nth_root n a * rl_nth_root n b = rl_nth_root n (a * b))%L;
+      (rl_nth_root n (a * b) = rl_nth_root n a * rl_nth_root n b)%L;
     rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ rl_nth_root 2 a)%L }.
 
 (*
@@ -481,14 +481,14 @@ destruct az. {
   apply (rngl_opp_le_compat Hop Hor) in Haz.
   rewrite (rngl_opp_0 Hop) in Haz.
   rewrite <- (rngl_mul_opp_opp Hop).
-  rewrite <- rl_nth_root_mul; [ | easy | easy ].
+  rewrite rl_nth_root_mul; [ | easy | easy ].
   rewrite fold_rngl_squ.
   rewrite rngl_squ_pow_2.
   now apply rl_nth_root_pow.
 } {
   apply (rngl_leb_gt Hor) in Haz.
   apply (rngl_lt_le_incl Hor) in Haz.
-  rewrite <- rl_nth_root_mul; [ | easy | easy ].
+  rewrite rl_nth_root_mul; [ | easy | easy ].
   rewrite fold_rngl_squ.
   rewrite rngl_squ_pow_2.
   now apply rl_nth_root_pow.
@@ -794,7 +794,7 @@ rewrite (rngl_mul_comm Hic).
 rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_comm Hic ε).
 rewrite rngl_mul_assoc.
-rewrite rl_nth_root_mul; cycle 1. {
+rewrite <- rl_nth_root_mul; cycle 1. {
   rewrite (fold_rngl_div Hiv).
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -810,27 +810,22 @@ rewrite rl_nth_root_mul; cycle 1. {
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 - _)%L).
 do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rl_nth_root_mul; cycle 1. {
+rewrite rl_nth_root_mul; cycle 1. {
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
   apply (rngl_square_ge_0 Hop Hor).
 }
-rewrite <- rl_nth_root_mul; [ | easy | easy ].
+rewrite rl_nth_root_mul; [ | easy | easy ].
 assert (Hz2 : (0 ≤ 2⁻¹)%L). {
   apply (rngl_lt_le_incl Hor).
   apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
-rewrite <- rl_nth_root_mul; [ | easy | easy ].
+rewrite rl_nth_root_mul; [ | easy | easy ].
 rewrite fold_rngl_squ.
 rewrite fold_rl_sqrt.
 rewrite rngl_squ_pow_2.
 progress unfold rl_sqrt.
-(*
-  ============================
-  (rl_nth_root 2 (1 - rngl_cos a) * rl_nth_root 2 (1 + rngl_cos a) *
-   rl_nth_root 2 2⁻¹ ^ 2 * (ε * 2))%L = rngl_sin a
-*)
 rewrite rl_nth_root_pow; [ | easy ].
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic).
@@ -838,7 +833,7 @@ rewrite (rngl_mul_comm Hic).
 do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon).
-rewrite rl_nth_root_mul; [ | easy | easy ].
+rewrite <- rl_nth_root_mul; [ | easy | easy ].
 rewrite (rngl_mul_comm Hic (1 - _)%L).
 rewrite <- (rngl_squ_sub_squ Hop Hic).
 progress unfold rngl_squ at 1.
@@ -855,14 +850,14 @@ destruct saz. {
   apply rngl_leb_le in Hsaz.
   rewrite (rngl_mul_1_l Hon).
   rewrite <- (rl_nth_root_pow 2); [ | easy ].
-  now rewrite <- rl_nth_root_mul.
+  now rewrite rl_nth_root_mul.
 } {
   apply (rngl_leb_gt Hor) in Hsaz.
   apply (rngl_opp_lt_compat Hop Hor) in Hsaz.
   rewrite (rngl_opp_0 Hop) in Hsaz.
   apply (rngl_lt_le_incl Hor) in Hsaz.
   rewrite <- (rngl_mul_opp_opp Hop sa).
-  rewrite <- rl_nth_root_mul; [ | easy | easy ].
+  rewrite rl_nth_root_mul; [ | easy | easy ].
   apply (rngl_opp_inj Hop).
   rewrite <- (rngl_mul_opp_l Hop).
   rewrite (rngl_opp_involutive Hop).
@@ -2727,7 +2722,7 @@ f_equal. {
       destruct zs2. {
         rewrite (rngl_mul_1_l Hon).
         progress unfold rl_sqrt.
-        rewrite rl_nth_root_mul; cycle 1. {
+        rewrite <- rl_nth_root_mul; cycle 1. {
           apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
           apply (rngl_le_sub_le_add_l Hop Hor).
           progress unfold rngl_sub.
@@ -2745,7 +2740,7 @@ f_equal. {
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
         progress unfold rl_sqrt.
-        rewrite rl_nth_root_mul; cycle 1. {
+        rewrite <- rl_nth_root_mul; cycle 1. {
           apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
           apply (rngl_le_add_le_sub_r Hop Hor).
           rewrite rngl_add_0_l.
@@ -2772,7 +2767,7 @@ intros Hon Hop * Ha Hb.
 progress unfold rngl_div.
 rewrite Hiv.
 progress unfold rl_sqrt.
-rewrite <- rl_nth_root_mul; [ | easy | ]. 2: {
+rewrite rl_nth_root_mul; [ | easy | ]. 2: {
   apply (rngl_lt_le_incl Hor).
   now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
 }
