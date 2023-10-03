@@ -2668,15 +2668,68 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
 
 (* to be completed
 Theorem angle_div_2_add :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   ∀ θ1 θ2,
   angle_div_2 (θ1 + θ2)  = (angle_div_2 θ1 + angle_div_2 θ2)%A.
 Proof.
-intros.
+intros Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  progress unfold angle_div_2.
+  apply eq_angle_eq; cbn.
+  f_equal. {
+    now rewrite H1; symmetry; rewrite H1.
+  } {
+    now rewrite H1; symmetry; rewrite H1.
+  }
+}
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn.
 f_equal. {
+  remember (0 ≤? c1 * s2 + s1 * c2)%L as cs eqn:Hcs.
+  symmetry in Hcs.
+  destruct cs. {
+    rewrite (rngl_mul_1_l Hon).
+    remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
+    symmetry in Hzs1.
+    destruct zs1. {
+      rewrite (rngl_mul_1_l Hon).
+      remember (0 ≤? s2)%L as zs2 eqn:Hzs2.
+      symmetry in Hzs2.
+      destruct zs2. {
+        rewrite (rngl_mul_1_l Hon).
+        progress unfold rl_sqrt.
+        rewrite rl_nth_root_mul; cycle 1. {
+          apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          }
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          progress unfold rngl_sub.
+          rewrite Hop, rngl_add_0_l.
+Search (-1 ≤ _)%L.
+Theorem rngl_cos_proj_bound:
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_eq_dec T = true →
+  ∀ c s, cos2_sin2_prop c s → (-1 ≤ c ≤ 1)%L.
+Proof.
+intros Hon Hop Hic Hed * Hcs.
+...
+rl_sqrt_div_squ_squ:
+  rngl_has_1 T = true
+  → rngl_has_opp T = true
+    → rngl_has_eq_dec T = true
+      → rl_has_integral_modulus T = true
+        → ∀ x y : T, x ≠ 0%L ∨ y ≠ 0%L → (-1 ≤ x / √(x² + y²) ≤ 1)%L
+...
+        }
 ...
 
 Theorem angle_div_2_pow_nat_add :
