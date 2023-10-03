@@ -2706,6 +2706,8 @@ apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn.
+specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
+specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 f_equal. {
   remember (0 ≤? c1 * s2 + s1 * c2)%L as cs eqn:Hcs.
   symmetry in Hcs.
@@ -2721,40 +2723,50 @@ f_equal. {
         rewrite (rngl_mul_1_l Hon).
         progress unfold rl_sqrt.
         rewrite rl_nth_root_mul; cycle 1. {
-          apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-          }
+          apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
           apply (rngl_le_sub_le_add_l Hop Hor).
           progress unfold rngl_sub.
           rewrite Hop, rngl_add_0_l.
           now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c1 s1).
         } {
-          apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-          }
+          apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
           apply (rngl_le_sub_le_add_l Hop Hor).
           progress unfold rngl_sub.
           rewrite Hop, rngl_add_0_l.
           now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c2 s2).
         }
         rewrite fold_rl_sqrt.
-Check rngl_mul_div.
-Check rngl_mul_div_r.
-Theorem rngl_mul_div_assoc :
-  ∀ a b c, (a * (b / c) = a * b / c)%L.
-... ...
-rewrite rngl_mul_div_assoc.
+        rewrite (rngl_mul_div_assoc Hiv).
+        rewrite (rngl_div_mul_mul_div Hic Hiv).
+        rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+Search (√ (_ / _))%L.
 ...
-Search (_ * (_ / _))%L.
-Require Import QArith.
-Search (_ * (_ / _))%Q.
+        progress unfold rl_sqrt.
+        rewrite rl_nth_root_mul; cycle 1. {
+          apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          rewrite rngl_add_0_l.
+          now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c1 s1).
+        } {
+          apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          rewrite rngl_add_0_l.
+          now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c2 s2).
+        }
+        rewrite fold_rl_sqrt.
+        rewrite (rngl_mul_div_assoc Hiv).
+        rewrite (rngl_div_mul_mul_div Hic Hiv).
+        rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
 ...
-Search (_ / _ + _ / _)%L.
-Search (_ * _ + _ * _)%L.
+        rewrite (rngl_div_mul_mul_div Hic Hiv).
+        rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+Search (_ / _ * _ / _)%L.
+Search (_ / _ * _)%L.
+...
 Theorem rngl_div_add_distr_r:
   ∀ x y z : T, ((x + y) / z)%L = (x / z + y / z)%L.
 Proof.
-Admitted.
+...
 rewrite <- rngl_div_add_distr_r.
 ...
 
