@@ -2739,8 +2739,6 @@ f_equal. {
         rewrite (rngl_mul_div_assoc Hiv).
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
-Search (√ (_ / _))%L.
-...
         progress unfold rl_sqrt.
         rewrite rl_nth_root_mul; cycle 1. {
           apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
@@ -2757,6 +2755,16 @@ Search (√ (_ / _))%L.
         rewrite (rngl_mul_div_assoc Hiv).
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+(**)
+Check rl_nth_root_mul.
+Search (√ (_ / _))%L.
+Theorem rl_sqrt_div :
+  ∀ a b, (√(a / b) = √a / √b)%L.
+Proof.
+...
+rewrite rl_sqrt_div.
+rewrite rl_sqrt_div.
+rewrite rl_sqrt_div.
 ...
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
