@@ -2761,6 +2761,15 @@ Search (√ (_ / _))%L.
 Theorem rl_sqrt_div :
   ∀ a b, (√(a / b) = √a / √b)%L.
 Proof.
+intros.
+progress unfold rngl_div.
+rewrite Hiv.
+progress unfold rl_sqrt.
+rewrite <- rl_nth_root_mul.
+f_equal.
+rewrite fold_rl_sqrt.
+Search rl_nth_root.
+Search (√ _⁻¹)%L.
 ...
 rewrite rl_sqrt_div.
 rewrite rl_sqrt_div.
