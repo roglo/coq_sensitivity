@@ -327,6 +327,45 @@ intros.
 now apply (rl_nth_root_pow 2 a).
 Qed.
 
+Theorem rngl_cos_proj_bound:
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  ∀ c s, cos2_sin2_prop c s → (-1 ≤ c ≤ 1)%L.
+Proof.
+intros Hic Hon Hop Hiv Hed Hor * Hcs.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+progress unfold cos2_sin2_prop in Hcs.
+cbn in Hcs.
+rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
+apply (rngl_eqb_eq Hed) in Hcs.
+assert (H : (c² ≤ 1)%L). {
+  rewrite <- Hcs.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_square_ge_0 Hop Hor).
+}
+replace 1%L with 1²%L in H. 2: {
+  apply (rngl_mul_1_l Hon).
+}
+rewrite <- (rngl_squ_abs Hop c) in H.
+rewrite <- (rngl_squ_abs Hop 1%L) in H.
+apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+rewrite (rngl_abs_1 Hon Hop Hor) in H.
+now apply (rngl_abs_le Hop Hor) in H.
+Qed.
+
 Theorem rngl_cos_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -337,34 +376,8 @@ Theorem rngl_cos_bound :
   ∀ a, (-1 ≤ rngl_cos a ≤ 1)%L.
 Proof.
 intros Hon Hop Hiv Hic Hed Hor *.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
 destruct a as (ca, sa, Ha); cbn.
-progress unfold cos2_sin2_prop in Ha.
-cbn in Ha.
-rewrite Hon, Hop, Hic, Hed in Ha; cbn in Ha.
-apply (rngl_eqb_eq Hed) in Ha.
-assert (H : (ca² ≤ 1)%L). {
-  rewrite <- Ha.
-  apply (rngl_le_add_r Hor).
-  apply (rngl_square_ge_0 Hop Hor).
-}
-replace 1%L with 1²%L in H. 2: {
-  apply (rngl_mul_1_l Hon).
-}
-rewrite <- (rngl_squ_abs Hop ca) in H.
-rewrite <- (rngl_squ_abs Hop 1%L) in H.
-apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
-  rewrite (rngl_abs_1 Hon Hop Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite (rngl_abs_1 Hon Hop Hor) in H.
-now apply (rngl_abs_le Hop Hor) in H.
+now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor ca sa).
 Qed.
 
 Theorem angle_div_2_prop :
@@ -2668,12 +2681,14 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
 
 (* to be completed
 Theorem angle_div_2_add :
+  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
   angle_div_2 (θ1 + θ2)  = (angle_div_2 θ1 + angle_div_2 θ2)%A.
 Proof.
-intros Hon Hop *.
+intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2712,24 +2727,35 @@ f_equal. {
           apply (rngl_le_sub_le_add_l Hop Hor).
           progress unfold rngl_sub.
           rewrite Hop, rngl_add_0_l.
-Search (-1 ≤ _)%L.
-Theorem rngl_cos_proj_bound:
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
-  rngl_has_eq_dec T = true →
-  ∀ c s, cos2_sin2_prop c s → (-1 ≤ c ≤ 1)%L.
-Proof.
-intros Hon Hop Hic Hed * Hcs.
-...
-rl_sqrt_div_squ_squ:
-  rngl_has_1 T = true
-  → rngl_has_opp T = true
-    → rngl_has_eq_dec T = true
-      → rl_has_integral_modulus T = true
-        → ∀ x y : T, x ≠ 0%L ∨ y ≠ 0%L → (-1 ≤ x / √(x² + y²) ≤ 1)%L
-...
+          now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c1 s1).
+        } {
+          apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          }
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          progress unfold rngl_sub.
+          rewrite Hop, rngl_add_0_l.
+          now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor c2 s2).
         }
+        rewrite fold_rl_sqrt.
+Check rngl_mul_div.
+Check rngl_mul_div_r.
+Theorem rngl_mul_div_assoc :
+  ∀ a b c, (a * (b / c) = a * b / c)%L.
+... ...
+rewrite rngl_mul_div_assoc.
+...
+Search (_ * (_ / _))%L.
+Require Import QArith.
+Search (_ * (_ / _))%Q.
+...
+Search (_ / _ + _ / _)%L.
+Search (_ * _ + _ * _)%L.
+Theorem rngl_div_add_distr_r:
+  ∀ x y z : T, ((x + y) / z)%L = (x / z + y / z)%L.
+Proof.
+Admitted.
+rewrite <- rngl_div_add_distr_r.
 ...
 
 Theorem angle_div_2_pow_nat_add :
