@@ -279,6 +279,8 @@ Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     rl_nth_root_mul :
       ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →
       (rl_nth_root n (a * b) = rl_nth_root n a * rl_nth_root n b)%L;
+    rl_nth_root_inv :
+      ∀ n a, (0 < a → rl_nth_root n a⁻¹ = (rl_nth_root n a)⁻¹)%L;
     rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ rl_nth_root 2 a)%L }.
 
 (*
@@ -2673,6 +2675,23 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
+Theorem rl_sqrt_div :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b, (0 ≤ a)%L → (0 < b)%L → (√(a / b) = √a / √b)%L.
+Proof.
+intros Hon Hop * Ha Hb.
+progress unfold rngl_div.
+rewrite Hiv.
+progress unfold rl_sqrt.
+rewrite rl_nth_root_mul; [ | easy | ]. 2: {
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+}
+f_equal.
+now apply rl_nth_root_inv.
+Qed.
+
 Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
 
@@ -2703,8 +2722,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   }
 }
 apply eq_angle_eq.
+remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+injection Hθ3; clear Hθ3; intros H1 H2.
+subst s3 c3.
 cbn.
 specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
@@ -2712,6 +2735,7 @@ f_equal. {
   remember (0 ≤? c1 * s2 + s1 * c2)%L as cs eqn:Hcs.
   symmetry in Hcs.
   destruct cs. {
+    apply rngl_leb_le in Hcs.
     rewrite (rngl_mul_1_l Hon).
     remember (0 ≤? s1)%L as zs1 eqn:Hzs1.
     symmetry in Hzs1.
@@ -2755,32 +2779,27 @@ f_equal. {
         rewrite (rngl_mul_div_assoc Hiv).
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
-(**)
-Check rl_nth_root_mul.
-Search (√ (_ / _))%L.
-Theorem rl_sqrt_div :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  ∀ a b, (0 ≤ a)%L → (0 < b)%L → (√(a / b) = √a / √b)%L.
-Proof.
-intros Hon Hop * Ha Hb.
-progress unfold rngl_div.
-rewrite Hiv.
-progress unfold rl_sqrt.
-rewrite rl_nth_root_mul; [ | easy | ]. 2: {
-  apply (rngl_lt_le_incl Hor).
-  now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-}
-f_equal.
-rewrite fold_rl_sqrt.
-Search (√ _⁻¹)%L.
-Search (√ _)⁻¹%L.
+        rewrite (rl_sqrt_div Hon Hop); [ | | easy ]. 2: {
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          progress unfold rngl_sub at 1.
+          rewrite Hop.
+          rewrite rngl_add_0_l.
+          specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+          apply (H1 _ _ Hcs3).
+        }
+        rewrite (rl_sqrt_div Hon Hop); cycle 1. {
 ...
-Search rl_nth_root.
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          progress unfold rngl_sub at 1.
+          rewrite Hop.
+          rewrite rngl_add_0_l.
+          specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+          apply (H1 _ _ Hcs3).
+        }
 ...
-rewrite rl_sqrt_div.
-rewrite rl_sqrt_div.
-rewrite rl_sqrt_div.
+          rewrite (rngl_add_sub_assoc Hop).
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          rewrite rngl_add_0_l.
 ...
         rewrite (rngl_div_mul_mul_div Hic Hiv).
         rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
