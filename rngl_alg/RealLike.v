@@ -2291,6 +2291,14 @@ Arguments angle T {ro rp}.
 
 Arguments angle_div_2 a%A.
 
+(*
+Fixpoint angle_div_2_pow_nat θ i :=
+  match i with
+  | 0 => θ
+  | S i' => angle_div_2_pow_nat (angle_div_2 θ) i'
+  end.
+*)
+
 Fixpoint angle_div_2_pow_nat θ i :=
   match i with
   | 0 => θ
@@ -2659,6 +2667,12 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
    e.g. angle_add *)
 
 (* to be completed
+Theorem angle_div_2_pow_nat_pow_nat_l :
+  ∀ n θ, angle_div_2_pow_nat (2 ^ n * θ) n = θ.
+Proof.
+intros.
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2691,16 +2705,21 @@ destruct n. {
     intros ε Hε.
     specialize (Hlim ε Hε).
     destruct Hlim as (N, HN).
-    exists N.
+    exists N. (* au pif *)
     intros n Hn.
     specialize (HN n Hn).
     rewrite Nat.div_1_r in HN.
+... ...
+rewrite angle_div_2_pow_nat_pow_nat_l.
+...
     assert (H : angle_div_2_pow_nat (2 ^ n * θ) n = θ). {
       clear HN Hn.
-      induction n; [ apply (angle_add_0_r Hon Hos) | ].
+      revert θ.
+      induction n; intros; [ apply (angle_add_0_r Hon Hos) | ].
       cbn.
       rewrite Nat.add_0_r.
       rewrite (angle_mul_add_distr_r Hon Hop).
+Search angle_div_2.
 ...
   }
   clear Hlim; rename H into Hlim.
