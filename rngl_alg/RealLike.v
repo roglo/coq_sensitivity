@@ -2676,6 +2676,7 @@ apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn.
+f_equal. {
 ...
 
 Theorem angle_div_2_pow_nat_add :
