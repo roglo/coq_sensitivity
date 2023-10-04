@@ -2722,6 +2722,17 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1; symmetry.
@@ -2768,41 +2779,62 @@ assert (Ha12 : (0 ≤ (1 + c1) * (1 + c2))%L). {
   }
 }
 (* if faut que 0 ≤ c1 + c2 *)
-rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
-  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
-  rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_0_sub Hop Hor).
-  rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
-  rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
-  apply (rngl_squ_le_abs_le Hop Hor Hii).
-  rewrite rngl_squ_sqrt; [ | easy ].
-  rewrite rngl_squ_sqrt; [ | easy ].
-  rewrite (rngl_mul_sub_distr_l Hop).
-  rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite <- (rngl_sub_add_distr Hos).
-  rewrite rngl_mul_add_distr_l.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_mul_1_l Hon).
-  rewrite <- rngl_add_assoc.
-  apply (rngl_le_sub_le_add_r Hop Hor).
-  rewrite <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
-  do 2 rewrite rngl_add_assoc.
-  rewrite (rngl_add_sub_assoc Hop).
-  rewrite (rngl_add_add_swap (c1 + c2))%L.
-  rewrite (rngl_add_add_swap (c1 + c2 + c1))%L.
-  rewrite (rngl_add_sub Hos).
-  rewrite (rngl_add_add_swap c1).
-  rewrite <- rngl_add_assoc.
-  rewrite (rngl_add_diag Hon).
-  rewrite (rngl_add_diag Hon c2).
-  rewrite <- rngl_mul_add_distr_l.
-  apply (rngl_mul_nonneg_nonneg Hop Hor). {
-    now apply (rngl_lt_le_incl Hor).
+destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
+  rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_le_0_sub Hop Hor).
+    rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
+    rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
+    apply (rngl_squ_le_abs_le Hop Hor Hii).
+    rewrite rngl_squ_sqrt; [ | easy ].
+    rewrite rngl_squ_sqrt; [ | easy ].
+    rewrite (rngl_mul_sub_distr_l Hop).
+    rewrite (rngl_mul_1_r Hon).
+    rewrite (rngl_mul_sub_distr_r Hop).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- (rngl_sub_add_distr Hos).
+    rewrite rngl_mul_add_distr_l.
+    rewrite (rngl_mul_1_r Hon).
+    rewrite rngl_mul_add_distr_r.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_le_add_r Hor).
+    do 2 rewrite rngl_add_assoc.
+    rewrite (rngl_add_sub_assoc Hop).
+    rewrite (rngl_add_add_swap (c1 + c2))%L.
+    rewrite (rngl_add_add_swap (c1 + c2 + c1))%L.
+    rewrite (rngl_add_sub Hos).
+    rewrite (rngl_add_add_swap c1).
+    rewrite <- rngl_add_assoc.
+    rewrite (rngl_add_diag Hon).
+    rewrite (rngl_add_diag Hon c2).
+    rewrite <- rngl_mul_add_distr_l.
+    apply (rngl_mul_nonneg_nonneg Hop Hor). {
+      now apply (rngl_lt_le_incl Hor).
+    }
+    easy.
   }
+  apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+  rewrite rngl_squ_sqrt. 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub at 1.
+    rewrite Hop, rngl_add_0_l.
+    specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+    apply (H1 _ _ Hcs3).
+  }
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  progress unfold rngl_squ at 2.
+  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
 ...
 
 Theorem angle_div_2_add :
