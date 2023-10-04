@@ -4423,6 +4423,36 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_mul_le_mono_nonpos_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (a ≤ 0)%L → (b ≤ c)%L → (a * c ≤ a * b)%L.
+Proof.
+intros Hop Hor * Ha Hbc.
+apply (rngl_lt_eq_cases Hor) in Hbc.
+destruct Hbc as [Hbc| Hbc]; [ | subst b; apply (rngl_le_refl Hor) ].
+apply (rngl_le_0_sub Hop Hor).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_mul_nonpos_nonpos Hop Hor); [ easy | ].
+apply (rngl_le_sub_0 Hop Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem rngl_mul_le_mono_nonpos_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (c ≤ 0 → a ≤ b → b * c ≤ a * c)%L.
+Proof.
+intros Hop Hor * Hc Hab.
+apply (rngl_lt_eq_cases Hor) in Hab.
+destruct Hab as [Hab| Hab]; [ | subst b; apply (rngl_le_refl Hor) ].
+apply (rngl_le_0_sub Hop Hor).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+apply (rngl_mul_nonpos_nonpos Hop Hor); [ | easy ].
+apply (rngl_le_sub_0 Hop Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_mul_lt_mono_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

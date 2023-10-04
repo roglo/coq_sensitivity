@@ -368,6 +368,45 @@ rewrite (rngl_abs_1 Hon Hop Hor) in H.
 now apply (rngl_abs_le Hop Hor) in H.
 Qed.
 
+Theorem rngl_sin_proj_bound:
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  ∀ c s, cos2_sin2_prop c s → (-1 ≤ s ≤ 1)%L.
+Proof.
+intros Hic Hon Hop Hiv Hed Hor * Hcs.
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+progress unfold cos2_sin2_prop in Hcs.
+cbn in Hcs.
+rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
+apply (rngl_eqb_eq Hed) in Hcs.
+assert (H : (s² ≤ 1)%L). {
+  rewrite <- Hcs.
+  apply (rngl_le_add_l Hor).
+  apply (rngl_square_ge_0 Hop Hor).
+}
+replace 1%L with 1²%L in H. 2: {
+  apply (rngl_mul_1_l Hon).
+}
+rewrite <- (rngl_squ_abs Hop s) in H.
+rewrite <- (rngl_squ_abs Hop 1%L) in H.
+apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+rewrite (rngl_abs_1 Hon Hop Hor) in H.
+now apply (rngl_abs_le Hop Hor) in H.
+Qed.
+
 Theorem rngl_cos_bound :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -380,6 +419,20 @@ Proof.
 intros Hon Hop Hiv Hic Hed Hor *.
 destruct a as (ca, sa, Ha); cbn.
 now apply (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor ca sa).
+Qed.
+
+Theorem rngl_sin_bound :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_eq_dec T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (-1 ≤ rngl_sin a ≤ 1)%L.
+Proof.
+intros Hon Hop Hiv Hic Hed Hor *.
+destruct a as (ca, sa, Ha); cbn.
+now apply (rngl_sin_proj_bound Hic Hon Hop Hiv Hed Hor ca sa).
 Qed.
 
 Theorem angle_div_2_prop :
@@ -2917,16 +2970,40 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
   easy.
 } {
-  apply (rngl_nle_gt Hor) in Hcc.
 (**)
+  exfalso; apply Hcc; clear Hcc.
+  clear Hc2.
+  specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as Hc.
+  specialize (rngl_sin_proj_bound Hic Hon Hop Hiv Hed Hor) as Hs.
+  specialize (Hc _ _ Hcs2) as Hc2.
+  specialize (Hs _ _ Hcs2) as Hs2.
+(*
+  specialize (Hs _ _ Hcs3) as Hs3.
+  clear - (* Hc1*) rp Hor Hon Hop Hcs Hc2 Hs2 (*Hs3*).
+*)
+...
+  eapply (rngl_le_trans Hor); [ apply Hcs | ].
+(**)
+  apply (rngl_add_le_compat Hor). {
+...
+  rewrite <- (rngl_mul_1_r Hon c1) at 2.
+  rewrite <- (rngl_mul_1_r Hon c2) at 2.
+  apply (rngl_add_le_compat Hor). {
+    destruct (rngl_le_dec Hor 0 c1) as [Hz1| Hz1]. {
+      now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    } {
+      apply (rngl_nle_gt Hor), (rngl_lt_le_incl Hor) in Hz1.
+      apply (rngl_mul_le_mono_nonpos_l Hop Hor); [ easy | ].
+...
   apply (rngl_nle_gt Hor) in Hcc.
-exfalso; apply Hcc.
 progress unfold cos2_sin2_prop in Hcs1.
 progress unfold cos2_sin2_prop in Hcs2.
 progress unfold cos2_sin2_prop in Hcs3.
 rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
 cbn in Hcs1, Hcs2, Hcs3.
 apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
+clear - Hcs1 Hcs2 Hcs3 Hcs.
+...
 clear - Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
 ...
   apply (rngl_lt_le_incl Hor) in Hcc.
