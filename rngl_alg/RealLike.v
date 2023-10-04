@@ -2919,10 +2919,9 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
 } {
   apply (rngl_nle_gt Hor) in Hcc.
 (**)
-apply (rngl_nle_gt Hor) in Hcc.
+  apply (rngl_nle_gt Hor) in Hcc.
 exfalso; apply Hcc.
-clear - Hzs1 Hzs2 Hcs.
-(* not sure these hypotheses are enough *)
+clear - Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
 ...
   apply (rngl_lt_le_incl Hor) in Hcc.
   apply (rngl_opp_le_compat Hop Hor) in Hcc.
