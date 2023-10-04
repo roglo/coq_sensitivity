@@ -2752,7 +2752,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
-rewrite <- (rngl_abs_nonneg Hop Hor √_)%L. 2: {
+apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+rewrite <- (rngl_abs_nonneg Hop Hor (√_ * 2))%L. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | now apply rngl_lt_le_incl ].
   apply rl_sqrt_nonneg.
   apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
   rewrite (rngl_mul_0_l Hos).
@@ -2792,8 +2795,6 @@ assert (Ha12 : (0 ≤ (1 + c1) * (1 + c2))%L). {
 }
 destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
-    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
-    rewrite (rngl_mul_0_l Hos).
     apply (rngl_le_0_sub Hop Hor).
     rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
     rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
@@ -2829,6 +2830,7 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
     easy.
   }
   apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+  rewrite (rngl_squ_mul Hic).
   rewrite rngl_squ_sqrt. 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
     rewrite (rngl_mul_0_l Hos).
@@ -2838,14 +2840,9 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
     specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
     apply (H1 _ _ Hcs3).
   }
-  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-  apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
-  progress unfold rngl_squ at 2.
-  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
-  apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  progress unfold rngl_squ at 1.
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
   rewrite (rngl_squ_sub Hop Hic Hon).
   rewrite rngl_squ_sqrt; [ | easy ].
   rewrite rngl_squ_sqrt; [ | easy ].
@@ -2918,8 +2915,38 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite (rngl_opp_add_distr Hop) in Hcc.
   progress unfold rngl_sub in Hcc.
   rewrite Hop, rngl_add_comm in Hcc.
+  apply (rngl_opp_inj Hop).
   rewrite <- (rngl_mul_opp_opp Hop).
-(**)
+  rewrite (rngl_opp_sub_distr Hop).
+  replace (1 - c1)%L with (1 + (- c1))%L. 2: {
+    progress unfold rngl_sub.
+    now rewrite Hop.
+  }
+  replace (1 - c2)%L with (1 + (- c2))%L. 2: {
+    progress unfold rngl_sub.
+    now rewrite Hop.
+  }
+  replace (1 + c1)%L with (1 - (- c1))%L. 2: {
+    progress unfold rngl_sub.
+    rewrite Hop.
+    now rewrite (rngl_opp_involutive Hop).
+  }
+  replace (1 + c2)%L with (1 - (- c2))%L. 2: {
+    progress unfold rngl_sub.
+    rewrite Hop.
+    now rewrite (rngl_opp_involutive Hop).
+  }
+  remember (- c1)%L as c'1 eqn:Hc'1.
+  remember (- c2)%L as c'2 eqn:Hc'2.
+(* et là, on devrait pouvoir appliquer le même truc que
+   là-haut en faisant, soit un lemme, soit un assert avec
+   ∀ c1 c2 *)
+(* d'un autre côté, vu tout le merdier qu'il faut pour
+   préparer ça, ça veut peut-être pas la peine et qu'il
+   vaut mieux re-prouver le truc en partant de
+     rewrite <- (rngl_abs_nonpos Hop Hor)%L
+   à la place de
+     rewrite <- (rngl_abs_nonneg Hop Hor)%L *)
 ...
 
 Theorem angle_div_2_add :
