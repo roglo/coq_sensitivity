@@ -2970,7 +2970,7 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
   easy.
 } {
-(**)
+(*
   exfalso; apply Hcc; clear Hcc.
   clear Hc2.
   specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as Hc.
@@ -3006,6 +3006,8 @@ clear - Hcs1 Hcs2 Hcs3 Hcs.
 ...
 clear - Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
 ...
+*)
+  apply (rngl_nle_gt Hor) in Hcc.
   apply (rngl_lt_le_incl Hor) in Hcc.
   apply (rngl_opp_le_compat Hop Hor) in Hcc.
   rewrite (rngl_opp_0 Hop) in Hcc.
@@ -3046,6 +3048,7 @@ clear - Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
   rewrite (rngl_opp_involutive Hop).
 remember (√ _ * _)%L as x eqn:Hx.
 remember (√ _ - √ _)%L as y eqn:Hy.
+(* ça veut dire qu'il faut que x=0 et y=0, mais est-ce le cas ? *)
 ...
 
 Theorem angle_div_2_add :
