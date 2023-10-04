@@ -2718,10 +2718,12 @@ Theorem strange_formula :
   cos2_sin2_prop c1 s1
   → cos2_sin2_prop c2 s2
   → cos2_sin2_prop (c1 * c2 - s1 * s2)%L (c1 * s2 + s1 * c2)%L
+  → (0 ≤ s1)%L
+  → (0 ≤ s2)%L
   → √((1 + (c1 * c2 - s1 * s2)) / 2)%L =
     ((√((1 + c1) * (1 + c2)) - √((1 - c1) * (1 - c2))) / 2)%L.
 Proof.
-intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3.
+intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3 Hzs1 Hzs2.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2788,14 +2790,10 @@ assert (Ha12 : (0 ≤ (1 + c1) * (1 + c2))%L). {
     apply (H1 _ _ Hcs2).
   }
 }
-(* if faut que 0 ≤ c1 + c2 *)
 destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
     rewrite (rngl_mul_0_l Hos).
-(*
-assert (Hsqsq :
-*)
     apply (rngl_le_0_sub Hop Hor).
     rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
     rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
@@ -2909,6 +2907,19 @@ assert (Hsqsq :
   rewrite <- (rngl_add_sub_assoc Hop).
   f_equal.
   f_equal.
+  rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+  easy.
+} {
+  apply (rngl_nle_gt Hor) in Hcc.
+  apply (rngl_lt_le_incl Hor) in Hcc.
+  apply (rngl_opp_le_compat Hop Hor) in Hcc.
+  rewrite (rngl_opp_0 Hop) in Hcc.
+  rewrite (rngl_opp_add_distr Hop) in Hcc.
+  progress unfold rngl_sub in Hcc.
+  rewrite Hop, rngl_add_comm in Hcc.
+  rewrite <- (rngl_mul_opp_opp Hop).
+(**)
 ...
 
 Theorem angle_div_2_add :
