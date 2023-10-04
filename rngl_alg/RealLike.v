@@ -2675,6 +2675,17 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
+Theorem rl_sqrt_mul :
+  ∀ a b,
+  (0 ≤ a)%L
+  → (0 ≤ b)%L
+  → rl_sqrt (a * b)%L = (rl_sqrt a * rl_sqrt b)%L.
+Proof.
+intros * Ha Hb.
+progress unfold rl_sqrt.
+now rewrite rl_nth_root_mul.
+Qed.
+
 Theorem rl_sqrt_div :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2683,8 +2694,7 @@ Proof.
 intros Hon Hop * Ha Hb.
 progress unfold rngl_div.
 rewrite Hiv.
-progress unfold rl_sqrt.
-rewrite rl_nth_root_mul; [ | easy | ]. 2: {
+rewrite rl_sqrt_mul; [ | easy | ]. 2: {
   apply (rngl_lt_le_incl Hor).
   now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
 }
@@ -2783,6 +2793,9 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
     rewrite (rngl_mul_0_l Hos).
+(*
+assert (Hsqsq :
+*)
     apply (rngl_le_0_sub Hop Hor).
     rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
     rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
@@ -2835,6 +2848,37 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
   apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
   rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  rewrite (rngl_squ_sub Hop Hic Hon).
+  rewrite rngl_squ_sqrt; [ | easy ].
+  rewrite rngl_squ_sqrt; [ | easy ].
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- rngl_mul_assoc.
+  rewrite <- rl_sqrt_mul; [ | easy | easy ].
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_mul_swap Hic (1 + c1))%L.
+  rewrite <- rngl_mul_assoc.
+  do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
+  rewrite (rngl_squ_1 Hon).
+  replace (1 - c1²)%L with s1²%L. 2: {
+    progress unfold cos2_sin2_prop in Hcs1.
+    rewrite Hon, Hop, Hic, Hed in Hcs1; cbn in Hcs1.
+    apply (rngl_eqb_eq Hed) in Hcs1.
+    rewrite <- Hcs1, rngl_add_comm; symmetry.
+    apply (rngl_add_sub Hos).
+  }
+  replace (1 - c2²)%L with s2²%L. 2: {
+    progress unfold cos2_sin2_prop in Hcs2.
+    rewrite Hon, Hop, Hic, Hed in Hcs2; cbn in Hcs2.
+    apply (rngl_eqb_eq Hed) in Hcs2.
+    rewrite <- Hcs2, rngl_add_comm; symmetry.
+    apply (rngl_add_sub Hos).
+  }
+  rewrite rl_sqrt_mul; cycle 1. {
+    apply (rngl_square_ge_0 Hop Hor).
+  } {
+    apply (rngl_square_ge_0 Hop Hor).
+  }
+  do 2 rewrite (rl_sqrt_squ Hop Hor).
 ...
 
 Theorem angle_div_2_add :
