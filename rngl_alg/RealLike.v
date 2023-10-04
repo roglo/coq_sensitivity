@@ -2699,6 +2699,112 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
    e.g. angle_add *)
 
 (* to be completed
+Theorem strange_formula :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ c1 c2 s1 s2,
+  cos2_sin2_prop c1 s1
+  → cos2_sin2_prop c2 s2
+  → cos2_sin2_prop (c1 * c2 - s1 * s2)%L (c1 * s2 + s1 * c2)%L
+  → √((1 + (c1 * c2 - s1 * s2)) / 2)%L =
+    ((√((1 + c1) * (1 + c2)) - √((1 - c1) * (1 - c2))) / 2)%L.
+Proof.
+intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1; symmetry.
+  now rewrite H1.
+}
+specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
+specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
+rewrite <- (rngl_abs_nonneg Hop Hor √_)%L. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  progress unfold rngl_sub at 1.
+  rewrite Hop, rngl_add_0_l.
+  specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+  apply (H1 _ _ Hcs3).
+}
+assert (Hs12 : (0 ≤ (1 - c1) * (1 - c2))%L). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite rngl_add_0_r.
+    specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+    apply (H1 _ _ Hcs1).
+  } {
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite rngl_add_0_r.
+    specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+    apply (H1 _ _ Hcs2).
+  }
+}
+assert (Ha12 : (0 ≤ (1 + c1) * (1 + c2))%L). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+    apply (H1 _ _ Hcs1).
+  } {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as H1.
+    apply (H1 _ _ Hcs2).
+  }
+}
+(* if faut que 0 ≤ c1 + c2 *)
+rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
+  rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  rewrite rngl_squ_sqrt; [ | easy ].
+  rewrite rngl_squ_sqrt; [ | easy ].
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rngl_sub_add_distr Hos).
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_add_r Hor).
+  do 2 rewrite rngl_add_assoc.
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_add_add_swap (c1 + c2))%L.
+  rewrite (rngl_add_add_swap (c1 + c2 + c1))%L.
+  rewrite (rngl_add_sub Hos).
+  rewrite (rngl_add_add_swap c1).
+  rewrite <- rngl_add_assoc.
+  rewrite (rngl_add_diag Hon).
+  rewrite (rngl_add_diag Hon c2).
+  rewrite <- rngl_mul_add_distr_l.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    now apply (rngl_lt_le_incl Hor).
+  }
+...
+
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2844,6 +2950,8 @@ Theorem rngl_div_sub_distr_r:
 Proof.
 Admitted.
 rewrite <- rngl_div_sub_distr_r.
+... ...
+apply strange_formula.
 ...
 remember (√_)%L as x.
 remember (√_)%L as y in |-*.
