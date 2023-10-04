@@ -2921,6 +2921,12 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
 (**)
   apply (rngl_nle_gt Hor) in Hcc.
 exfalso; apply Hcc.
+progress unfold cos2_sin2_prop in Hcs1.
+progress unfold cos2_sin2_prop in Hcs2.
+progress unfold cos2_sin2_prop in Hcs3.
+rewrite Hon, Hop, Hic, Hed in Hcs1, Hcs2, Hcs3.
+cbn in Hcs1, Hcs2, Hcs3.
+apply (rngl_eqb_eq Hed) in Hcs1, Hcs2, Hcs3.
 clear - Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
 ...
   apply (rngl_lt_le_incl Hor) in Hcc.
