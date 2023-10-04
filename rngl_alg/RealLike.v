@@ -2879,6 +2879,36 @@ assert (Hsqsq :
     apply (rngl_square_ge_0 Hop Hor).
   }
   do 2 rewrite (rl_sqrt_squ Hop Hor).
+  rewrite (rngl_mul_add_distr_l (1 + c1))%L.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_add_distr_r 1 c1)%L.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_sub_distr_l Hop (1 - c1))%L.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_sub_distr_r Hop 1 c1)%L.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_add_assoc.
+  rewrite (rngl_add_sub_assoc Hop (1 + c1 + c2 + c1 * c2))%L.
+  rewrite (rngl_add_sub_assoc Hop _ 1 c1)%L.
+  rewrite (rngl_sub_sub_distr Hop _ c2).
+  rewrite rngl_add_add_swap.
+  rewrite (rngl_add_add_swap _ c2 1)%L.
+  rewrite (rngl_add_add_swap _ c1 1)%L.
+  rewrite (rngl_add_sub_swap Hop _ _ c1).
+  rewrite (rngl_add_sub_swap Hop _ _ c1).
+  rewrite (rngl_add_sub Hos).
+  rewrite (rngl_add_sub_swap Hop _ _ c2).
+  rewrite (rngl_add_sub Hos).
+  rewrite <- rngl_add_assoc.
+  rewrite (rngl_add_diag Hon (c1 * c2)%L).
+  rewrite <- (rngl_mul_1_r Hon 2)%L at 2.
+  rewrite <- rngl_mul_add_distr_l.
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_comm Hic).
+  f_equal.
+  rewrite <- (rngl_add_sub_assoc Hop).
+  f_equal.
+  f_equal.
 ...
 
 Theorem angle_div_2_add :
