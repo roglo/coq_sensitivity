@@ -2720,10 +2720,11 @@ Theorem strange_formula :
   → cos2_sin2_prop (c1 * c2 - s1 * s2)%L (c1 * s2 + s1 * c2)%L
   → (0 ≤ s1)%L
   → (0 ≤ s2)%L
+  → (0 ≤ c1 * s2 + s1 * c2)%L
   → √((1 + (c1 * c2 - s1 * s2)) / 2)%L =
     ((√((1 + c1) * (1 + c2)) - √((1 - c1) * (1 - c2))) / 2)%L.
 Proof.
-intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3 Hzs1 Hzs2.
+intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2799,7 +2800,7 @@ assert
     → (0 ≤ (1 + c1) * (1 + c2))%L
     → (0 ≤ c1 + c2)%L
     → (√((1 - c1) * (1 - c2)) ≤ √((1 + c1) * (1 + c2)))%L). {
-  clear c1 c2 Hcs1 Hcs2 Hcs3 Hs12 Ha12.
+  clear c1 c2 Hcs1 Hcs2 Hcs3 Hs12 Ha12 Hcs.
   intros * Hs12 Ha12 Hcc.
   rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
   rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
@@ -2917,6 +2918,12 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   easy.
 } {
   apply (rngl_nle_gt Hor) in Hcc.
+(**)
+apply (rngl_nle_gt Hor) in Hcc.
+exfalso; apply Hcc.
+clear - Hzs1 Hzs2 Hcs.
+(* not sure these hypotheses are enough *)
+...
   apply (rngl_lt_le_incl Hor) in Hcc.
   apply (rngl_opp_le_compat Hop Hor) in Hcc.
   rewrite (rngl_opp_0 Hop) in Hcc.
@@ -2955,6 +2962,8 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite <- (rngl_mul_opp_l Hop).
   rewrite (rngl_opp_involutive Hop).
+remember (√ _ * _)%L as x eqn:Hx.
+remember (√ _ - √ _)%L as y eqn:Hy.
 ...
 
 Theorem angle_div_2_add :
