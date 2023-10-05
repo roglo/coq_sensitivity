@@ -3037,12 +3037,48 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
       now specialize (Hc _ _ Hcs2).
     }
   }
-...
   exfalso; apply Hcc; clear Hcc.
   destruct (rngl_le_dec Hor c2 c1) as [Hc21| Hc21]. {
     destruct (rngl_lt_dec Hor c1 0) as [Hc1z| Hc1z]. {
       apply (rngl_nlt_ge Hor) in Hcs.
       exfalso; apply Hcs; clear Hcs.
+      apply (rngl_lt_le_trans Hor _ (c1 * s2))%L. 2: {
+        apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
+        now apply (rngl_lt_le_incl Hor).
+      }
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      rewrite (rngl_sub_diag Hos).
+      apply (rngl_mul_pos_neg Hop Hor Hid). {
+        apply not_eq_sym in Hs1z.
+        now apply (rngl_lt_iff Hor).
+      } {
+        now apply (rngl_le_lt_trans Hor _ c1).
+      }
+    }
+    apply (rngl_nlt_ge Hor) in Hc1z.
+    destruct (rngl_lt_dec Hor c2 0) as [Hc2z| Hc2z]. {
+      apply (rngl_nlt_ge Hor) in Hcs.
+      exfalso; apply Hcs; clear Hcs.
+      apply (rngl_le_lt_trans Hor _ (s1 * c2))%L. 2: {
+        apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+        apply not_eq_sym in Hs1z.
+        now apply (rngl_lt_iff Hor).
+      }
+...
+      apply (rngl_le_add_le_sub_r Hop Hor).
+      rewrite (rngl_sub_diag Hos).
+...
+      apply (rngl_mul_nonneg_nonpos Hop Hor); [ | ].
+        now apply (rngl_lt_le_incl Hor).
+...
+      apply (rngl_mul_pos_neg Hop Hor Hid). {
+        apply not_eq_sym in Hs1z.
+        now apply (rngl_lt_iff Hor).
+      } {
+        now apply (rngl_le_lt_trans Hor _ c1).
+      }
+    }
+...
       destruct (rngl_eq_dec Hed s1 0) as [Hs1z| Hs1z]. {
         subst s1.
         rewrite (rngl_mul_0_l Hos).
@@ -3093,7 +3129,7 @@ Search (_ * _ < _ * _)%Q.
 Check Z.mul_lt_mono_neg_l.
 Theorem rngl_mul_lt_mono_neg_l :
   ∀ p n m, (p < 0 → n < m ↔ p * m < p * n)%L.
-Admitted.
+...
 apply rngl_mul_lt_mono_neg_l; [ easy | ].
 ...
       apply (rngl_add_nonneg_nonneg Hor); [ | easy ].

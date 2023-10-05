@@ -2762,6 +2762,36 @@ intros Hor * Hab.
 now apply (rngl_lt_iff Hor) in Hab.
 Qed.
 
+Theorem rngl_mul_pos_neg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a b, (0 < a → b < 0 → a * b < 0)%L.
+Proof.
+intros Hop Hor Hid * Hza Hbz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_mul_nonneg_nonpos Hop Hor). {
+    now apply (rngl_lt_le_incl Hor).
+  } {
+    now apply (rngl_lt_le_incl Hor).
+  }
+}
+intros H.
+apply (rngl_integral Hos Hid) in H.
+destruct H as [H| H]. {
+  subst a.
+  now apply (rngl_lt_irrefl Hor) in Hza.
+} {
+  subst b.
+  now apply (rngl_lt_irrefl Hor) in Hbz.
+}
+Qed.
+
 Theorem rngl_div_le_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
