@@ -588,6 +588,25 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_ltb_nlt :
+  ∀ a b, (a <? b)%L = false ↔ ¬ (a < b)%L.
+Proof.
+intros.
+progress unfold rngl_ltb.
+progress unfold rngl_lt.
+split; intros Hab. {
+  destruct rngl_opt_leb; [ | easy ].
+  apply Bool.negb_false_iff in Hab.
+  apply Bool.not_false_iff_true.
+  easy.
+} {
+  destruct rngl_opt_leb; [ | easy ].
+  apply Bool.negb_false_iff.
+  apply Bool.not_false_iff_true in Hab.
+  easy.
+}
+Qed.
+
 Theorem rngl_leb_refl :
   rngl_is_ordered T = true →
   ∀ a, (a ≤? a)%L = true.
@@ -3509,6 +3528,21 @@ split; intros Hab. {
   apply rngl_leb_nle.
   intros H1.
   now apply (rngl_nle_gt Hor) in Hab.
+}
+Qed.
+
+Theorem rngl_ltb_ge :
+  rngl_is_ordered T = true →
+  ∀ a b, ((a <? b) = false ↔ b ≤ a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply rngl_ltb_nlt in Hab.
+  now apply (rngl_nlt_ge Hor) in Hab.
+} {
+  apply rngl_ltb_nlt.
+  intros H1.
+  now apply (rngl_nlt_ge Hor) in Hab.
 }
 Qed.
 
