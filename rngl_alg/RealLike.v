@@ -3361,7 +3361,6 @@ Theorem angle_div_2_add :
     else
       (angle_div_2 θ1 + angle_div_2 θ2)%A.
 Proof.
-(* pb: (-1,0) (-1,0) *)
 intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
