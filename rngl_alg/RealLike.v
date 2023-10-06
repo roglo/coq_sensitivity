@@ -3344,11 +3344,13 @@ remember (√ _ * _)%L as x eqn:Hx.
 remember (√ _ - √ _)%L as y eqn:Hy.
 (* ça veut dire qu'il faut que x=0 et y=0, mais est-ce le cas ? *)
 ...
+completed*)
 
 Arguments angle_lt' (θ1 θ2)%A.
 
 Definition angle_add_overflow θ1 θ2 := angle_lt' (θ1 + θ2) θ1.
 
+(* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
