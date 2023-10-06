@@ -3045,14 +3045,16 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
       apply (rngl_nlt_ge Hor) in Hc2z.
       now apply (rngl_add_nonneg_nonneg Hor).
     }
-...
+    move Hcs at bottom.
     apply (rngl_le_sub_le_add_r Hop Hor).
     progress unfold rngl_sub.
     rewrite Hop, rngl_add_0_l.
+(*
     apply (rngl_nlt_ge Hor).
     intros Hcc.
     apply (rngl_nlt_ge Hor) in Hcs.
     apply Hcs; clear Hcs.
+*)
     remember (- c2)%L as c3 eqn:Hc3.
     apply (f_equal rngl_opp) in Hc3.
     rewrite (rngl_opp_involutive Hop) in Hc3.
@@ -3060,10 +3062,10 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
     apply (rngl_opp_lt_compat Hop Hor) in Hc2z.
     rewrite (rngl_opp_0 Hop) in Hc2z.
     rewrite (rngl_opp_involutive Hop) in Hc2z.
-    rewrite (rngl_mul_opp_r Hop).
-    rewrite (fold_rngl_sub Hop).
-    apply (rngl_lt_sub_lt_add_l Hop Hor).
-    rewrite rngl_add_0_r.
+    rewrite (rngl_mul_opp_r Hop) in Hcs.
+    rewrite (fold_rngl_sub Hop) in Hcs.
+    apply (rngl_le_add_le_sub_l Hop Hor) in Hcs.
+    rewrite rngl_add_0_r in Hcs.
 ...
       apply (rngl_nlt_ge Hor) in Hcs.
       exfalso; apply Hcs; clear Hcs.
