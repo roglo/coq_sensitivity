@@ -3393,15 +3393,25 @@ destruct aov. 2: {
   progress unfold angle_lt' in Haov.
 (**)
   f_equal. {
+    progress unfold angle_div_2.
+    cbn.
     remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
     symmetry in Hzs3.
     destruct zs3. {
       apply rngl_leb_le in Hzs3.
+      rewrite (rngl_mul_1_l Hon).
       remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
       symmetry in Hzs1.
       destruct zs1; [ | easy ].
       apply rngl_leb_le in Hzs1.
       apply (rngl_ltb_ge Hor) in Haov.
+      rewrite (rngl_mul_1_l Hon).
+      remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+      symmetry in Hzs2.
+      destruct zs2. {
+        apply rngl_leb_le in Hzs2.
+        move Hzs2 before Hzs1.
+        move Hzs3 after Hzs2.
 ...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).
