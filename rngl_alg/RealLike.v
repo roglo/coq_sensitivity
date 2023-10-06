@@ -3056,7 +3056,11 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
       }
     }
     apply (rngl_nlt_ge Hor) in Hc1z.
-    destruct (rngl_lt_dec Hor c2 0) as [Hc2z| Hc2z]. {
+    destruct (rngl_lt_dec Hor c2 0) as [Hc2z| Hc2z]. 2: {
+      apply (rngl_nlt_ge Hor) in Hc2z.
+      now apply (rngl_add_nonneg_nonneg Hor).
+    }
+...
       apply (rngl_nlt_ge Hor) in Hcs.
       exfalso; apply Hcs; clear Hcs.
       apply (rngl_le_lt_trans Hor _ (s1 * c2))%L. 2: {
@@ -3064,7 +3068,6 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
         apply not_eq_sym in Hs1z.
         now apply (rngl_lt_iff Hor).
       }
-...
       apply (rngl_le_add_le_sub_r Hop Hor).
       rewrite (rngl_sub_diag Hos).
 ...
