@@ -3344,7 +3344,7 @@ remember (√ _ * _)%L as x eqn:Hx.
 remember (√ _ - √ _)%L as y eqn:Hy.
 (* ça veut dire qu'il faut que x=0 et y=0, mais est-ce le cas ? *)
 ...
-completed*)
+*)
 
 Arguments angle_lt' (θ1 θ2)%A.
 
@@ -3374,6 +3374,10 @@ assert
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   progress unfold angle_div_2.
@@ -3394,24 +3398,15 @@ destruct aov. 2: {
 (**)
   specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
   specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
-  assert (Hz1ac1 :  (0 ≤ 1 + rngl_cos θ1)%L). {
+  assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cos θ)%L). {
+    intros.
     apply (rngl_le_sub_le_add_l Hop Hor).
     progress unfold rngl_sub.
     rewrite Hop, rngl_add_0_l.
     apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
-  assert (Hz1ac2 :  (0 ≤ 1 + rngl_cos θ2)%L). {
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    progress unfold rngl_sub.
-    rewrite Hop, rngl_add_0_l.
-    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-  }
-  assert (Hz1sc1 :  (0 ≤ 1 - rngl_cos θ1)%L). {
-    apply (rngl_le_add_le_sub_r Hop Hor).
-    rewrite rngl_add_0_l.
-    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-  }
-  assert (Hz1sc2 :  (0 ≤ 1 - rngl_cos θ2)%L). {
+  assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
+    intros.
     apply (rngl_le_add_le_sub_r Hop Hor).
     rewrite rngl_add_0_l.
     apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
@@ -3474,6 +3469,22 @@ destruct aov. 2: {
           now apply (rngl_lt_le_incl Hor).
         }
         rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+        apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+        rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+        rewrite <- (rngl_abs_nonneg Hop Hor (√_ * 2))%L. 2: {
+          apply (rngl_mul_nonneg_nonneg Hop Hor). 2: {
+            now apply rngl_lt_le_incl.
+          }
+          apply rl_sqrt_nonneg.
+          apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+          now rewrite (rngl_mul_0_l Hos).
+        }
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))
+          as [Hcc| Hcc]. {
+          rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
+            apply (rngl_le_0_sub Hop Hor).
+....
+            now apply Hsqsq.
 ...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).
