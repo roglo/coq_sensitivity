@@ -3392,6 +3392,30 @@ destruct aov. 2: {
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   progress unfold angle_lt' in Haov.
 (**)
+  specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
+  specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
+  assert (Hz1ac1 :  (0 ≤ 1 + rngl_cos θ1)%L). {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  assert (Hz1ac2 :  (0 ≤ 1 + rngl_cos θ2)%L). {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  assert (Hz1sc1 :  (0 ≤ 1 - rngl_cos θ1)%L). {
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  assert (Hz1sc2 :  (0 ≤ 1 - rngl_cos θ2)%L). {
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
   f_equal. {
     progress unfold angle_div_2.
     cbn.
@@ -3412,6 +3436,44 @@ destruct aov. 2: {
         apply rngl_leb_le in Hzs2.
         move Hzs2 before Hzs1.
         move Hzs3 after Hzs2.
+        rewrite (rngl_mul_1_l Hon).
+        rewrite <- rl_sqrt_mul; cycle 1. {
+          now apply (rngl_div_pos Hon Hop Hiv Hor).
+        } {
+          now apply (rngl_div_pos Hon Hop Hiv Hor).
+        }
+        rewrite <- rl_sqrt_mul; cycle 1. {
+          now apply (rngl_div_pos Hon Hop Hiv Hor).
+        } {
+          now apply (rngl_div_pos Hon Hop Hiv Hor).
+        }
+        rewrite (rngl_mul_div_assoc Hiv).
+        rewrite (rngl_div_mul_mul_div Hic Hiv).
+        rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+        rewrite (rl_sqrt_div Hon Hop _ (2 * 2))%L; cycle 1. {
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        } {
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+        rewrite fold_rngl_squ.
+        rewrite (rl_sqrt_squ Hop Hor).
+        rewrite (rngl_abs_nonneg Hop Hor). 2: {
+          now apply (rngl_lt_le_incl Hor).
+        }
+        rewrite (rngl_mul_div_assoc Hiv).
+        rewrite (rngl_div_mul_mul_div Hic Hiv).
+        rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+        rewrite (rl_sqrt_div Hon Hop _ (2 * 2))%L; cycle 1. {
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        } {
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+        rewrite fold_rngl_squ.
+        rewrite (rl_sqrt_squ Hop Hor).
+        rewrite (rngl_abs_nonneg Hop Hor). 2: {
+          now apply (rngl_lt_le_incl Hor).
+        }
+        rewrite <- (rngl_div_sub_distr_r Hop Hiv).
 ...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).
@@ -3515,12 +3577,6 @@ destruct aov. 2: {
           }
 Check Haov.
 ...
-Theorem rngl_div_sub_distr_r:
-  ∀ x y z : T, ((x - y) / z)%L = (x / z - y / z)%L.
-Proof.
-Admitted.
-rewrite <- rngl_div_sub_distr_r.
-... ...
 apply strange_formula.
 ...
 remember (√_)%L as x.
