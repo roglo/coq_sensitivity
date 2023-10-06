@@ -2780,11 +2780,11 @@ Theorem strange_formula :
   → (0 ≤ s1)%L
   → (0 ≤ s2)%L
   → (0 ≤ c1 * s2 + s1 * c2)%L
-  → (c1 * c2 - s1 * s2 ≤ c1)%L
+  → ¬ ((c1, s1) = (-1, 0) ∧ (c2, s2) = (-1, 0))%L
   → √((1 + (c1 * c2 - s1 * s2)) / 2)%L =
     ((√((1 + c1) * (1 + c2)) - √((1 - c1) * (1 - c2))) / 2)%L.
 Proof.
-intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs Haov.
+intros Hic Hon Hop Hed * Hcs1 Hcs2 Hcs3 Hzs1 Hzs2 Hcs Hnss.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -2863,7 +2863,7 @@ assert
     → (0 ≤ (1 + c1) * (1 + c2))%L
     → (0 ≤ c1 + c2)%L
     → (√((1 - c1) * (1 - c2)) ≤ √((1 + c1) * (1 + c2)))%L). {
-  clear c1 c2 Hcs1 Hcs2 Hcs3 Hs12 Ha12 Hcs Haov.
+  clear c1 c2 Hcs1 Hcs2 Hcs3 Hs12 Ha12 Hcs Hnss.
   intros * Hs12 Ha12 Hcc.
   rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
   rewrite <- (rngl_abs_nonneg Hop Hor)%L; [ | now apply rl_sqrt_nonneg ].
@@ -2979,8 +2979,7 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
 (*1*)
   destruct (rngl_eq_dec Hed s1 0) as [Hs1z| Hs1z]. {
     subst s1.
-    rewrite (rngl_mul_0_l Hos) in Haov, Hcs.
-    rewrite (rngl_sub_0_r Hos) in Haov.
+    rewrite (rngl_mul_0_l Hos) in Hcs.
     rewrite rngl_add_0_r in Hcs.
     rewrite (rngl_mul_0_l Hos).
     rewrite (rngl_sub_0_r Hos).
@@ -3002,32 +3001,18 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
       rewrite rngl_add_0_r in Hcs2.
       rewrite <- (rngl_squ_1 Hon) in Hcs2.
       apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in Hcs2.
-      destruct Hcs2 as [Hcs2| Hcs2]; subst c2. {
-        rewrite (rngl_mul_1_r Hon).
-        rewrite (fold_rngl_sub Hop).
-        rewrite (rngl_sub_diag Hos).
-        rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-        rewrite (rngl_mul_0_l Hos).
-        rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-        rewrite (rngl_mul_0_l Hos).
-        rewrite (rngl_mul_0_r Hos).
-        rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-        rewrite (rngl_sub_diag Hos).
-        apply (rngl_abs_0 Hop).
-      } {
-        rewrite (rngl_mul_opp_opp Hop) in Haov.
-        rewrite (rngl_mul_1_l Hon) in Haov.
-        apply (rngl_nlt_ge Hor) in Haov.
-        exfalso; apply Haov; clear Haov.
-        apply (rngl_lt_trans Hor _ 0)%L. 2: {
-          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-        } {
-          apply (rngl_opp_lt_compat Hop Hor).
-          rewrite (rngl_opp_0 Hop).
-          rewrite (rngl_opp_involutive Hop).
-          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-        }
-      }
+      destruct Hcs2 as [Hcs2| Hcs2]; subst c2; [ | now exfalso; apply Hnss ].
+      rewrite (rngl_mul_1_r Hon).
+      rewrite (fold_rngl_sub Hop).
+      rewrite (rngl_sub_diag Hos).
+      rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+      rewrite (rngl_mul_0_l Hos).
+      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      rewrite (rngl_mul_0_l Hos).
+      rewrite (rngl_mul_0_r Hos).
+      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      rewrite (rngl_sub_diag Hos).
+      apply (rngl_abs_0 Hop).
     } {
       exfalso; apply Hcc; clear Hcc.
       apply (rngl_le_sub_le_add_l Hop Hor).
