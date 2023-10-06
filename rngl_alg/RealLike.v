@@ -3024,6 +3024,111 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
   }
   exfalso; apply Hcc; clear Hcc.
   destruct (rngl_le_dec Hor c2 c1) as [Hc21| Hc21]. {
+Theorem rngl_le_cos_le_sin :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ s1 s2 c1 c2,
+  cos2_sin2_prop c1 s1
+  → cos2_sin2_prop c2 s2
+  → (0 ≤ s1)%L
+  → (0 ≤ s2)%L
+  → (c2 ≤ c1)%L
+  → (s1 ≤ s2)%L.
+Proof.
+intros Hic Hon Hop Hed * Hcs1 Hcs2 Hs1 Hs2 Hcc.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+assert
+  (Hii :
+    (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now apply rngl_has_inv_and_1_or_quot_iff; left.
+}
+specialize (rngl_cos_proj_bound Hic Hon Hop Hiv Hed Hor) as Hc.
+specialize (rngl_sin_proj_bound Hic Hon Hop Hiv Hed Hor) as Hs.
+specialize (Hc _ _ Hcs2) as Hc121.
+specialize (Hs _ _ Hcs2) as Hs121.
+specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs1) as H1.
+specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs2) as H2.
+apply (rngl_add_sub_eq_l Hos) in H1, H2.
+apply (f_equal rl_sqrt) in H1, H2.
+rewrite (rl_sqrt_squ Hop Hor) in H1, H2.
+rewrite (rngl_abs_nonneg Hop Hor) in H1; [ | easy ].
+rewrite (rngl_abs_nonneg Hop Hor) in H2; [ | easy ].
+rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+rewrite <- (rngl_abs_nonneg Hop Hor s1)%L; [ | easy ].
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+rewrite <- H1, <- H2.
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_squ_1 Hon).
+  apply (rngl_abs_le_squ_le Hop Hor).
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  apply -> (rngl_abs_le Hop Hor).
+  now apply (Hc c1 s1).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_squ_1 Hon).
+  apply (rngl_abs_le_squ_le Hop Hor).
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  now apply -> (rngl_abs_le Hop Hor).
+}
+apply (rngl_sub_le_mono_l Hop Hor).
+apply (rngl_abs_le_squ_le Hop Hor).
+Search (rngl_abs _ ≤ rngl_abs _)%L.
+(* faut p'tet ajouter comme hypothèse que c2 ≤ 0 et 0 ≤ c1
+   car, de toutes façons, c'est ça dont j'ai besoin *)
+...
+Search (_² ≤ _²)%L.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+...
+...
+  apply rl_sqrt_nonneg.
+...
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_squ_1 Hon).
+  apply (rngl_abs_le_squ_le Hop Hor).
+  rewrite (rngl_abs_1 Hon Hop Hor).
+...
+  specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs1) as H1.
+  now apply -> (rngl_abs_le Hop Hor).
+}
+Search (rngl_abs _ ≤ _)%L.
+Search (_² ≤ _²)%L.
+Search (_² = _²)%L.
+...
+eq_rngl_squ_rngl_abs:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    rngl_has_opp T = true
+    → rngl_mul_is_comm T = true
+      → rngl_is_ordered T = true
+        → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true
+          → ∀ a b : T, a²%L = b²%L → rngl_abs a = rngl_abs b
+...
+specialize (rngl_le_cos_le_sin _ _ _ _ Hcs1 Hcs2 Hzs1 Hzs2 Hc21) as Hs1s2.
+...
     destruct (rngl_lt_dec Hor c1 0) as [Hc1z| Hc1z]. {
       apply (rngl_nlt_ge Hor) in Hcs.
       exfalso; apply Hcs; clear Hcs.
