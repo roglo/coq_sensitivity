@@ -3051,6 +3051,11 @@ destruct (rngl_le_dec Hor 0 (c1 + c2)) as [Hcc| Hcc]. {
     rewrite Hop, rngl_add_0_l.
 (**)
 clear Hc21.
+(*
+    apply (rngl_le_sub_le_add_l Hop Hor) in Hcs.
+    progress unfold rngl_sub in Hcs.
+    rewrite Hop, rngl_add_0_l in Hcs.
+*)
     remember (- c2)%L as c3 eqn:Hc3.
     apply (f_equal rngl_opp) in Hc3.
     rewrite (rngl_opp_involutive Hop) in Hc3.
@@ -3063,6 +3068,11 @@ clear Hc21.
     apply (rngl_le_add_le_sub_l Hop Hor) in Hcs.
     rewrite rngl_add_0_r in Hcs.
     rename c3 into c2.
+    apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs1.
+    apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs2.
+    rewrite (rngl_squ_opp Hop) in Hcs2.
+    move Hcs1 at bottom.
+    move Hcs2 at bottom.
 ...
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ s1). {
       apply not_eq_sym in Hs1z.
@@ -3071,11 +3081,6 @@ clear Hc21.
     apply (rngl_le_trans Hor _ (c1 * s2)); [ easy | ].
     rewrite (rngl_mul_comm Hic).
     apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
-    apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs1.
-    apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs2.
-    rewrite (rngl_squ_opp Hop) in Hcs2.
-    move Hcs1 at bottom.
-    move Hcs2 at bottom.
 ...
       apply (rngl_nlt_ge Hor) in Hcs.
       exfalso; apply Hcs; clear Hcs.
