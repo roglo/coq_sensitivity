@@ -2767,7 +2767,7 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
-(* to be completed
+(* to be completed (à voir...)
 Theorem strange_formula :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3391,6 +3391,18 @@ destruct aov. 2: {
   apply eq_angle_eq.
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   progress unfold angle_lt' in Haov.
+(**)
+  f_equal. {
+    remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+    symmetry in Hzs3.
+    destruct zs3. {
+      apply rngl_leb_le in Hzs3.
+      remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+      symmetry in Hzs1.
+      destruct zs1; [ | easy ].
+      apply rngl_leb_le in Hzs1.
+      apply (rngl_ltb_ge Hor) in Haov.
+...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).
   destruct θ3 as (c3, s3, Hcs3).
