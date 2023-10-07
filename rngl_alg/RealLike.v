@@ -3388,6 +3388,45 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     now rewrite H1; symmetry; rewrite H1.
   }
 }
+assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cos θ)%L). {
+  intros.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop, rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
+  intros.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
+  intros.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  } {
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    progress unfold rngl_sub.
+    rewrite Hop, rngl_add_0_l.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+}
+assert (Hs12 : ∀ θ1 θ2, (0 ≤ (1 - rngl_cos θ1) * (1 - rngl_cos θ2))%L). {
+  intros.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite rngl_add_0_r.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  } {
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite rngl_add_0_r.
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+}
 remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
 destruct aov. 2: {
@@ -3398,19 +3437,6 @@ destruct aov. 2: {
 (**)
   specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
   specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
-  assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cos θ)%L). {
-    intros.
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    progress unfold rngl_sub.
-    rewrite Hop, rngl_add_0_l.
-    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-  }
-  assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
-    intros.
-    apply (rngl_le_add_le_sub_r Hop Hor).
-    rewrite rngl_add_0_l.
-    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-  }
   f_equal. {
     progress unfold angle_div_2.
     cbn.
@@ -3483,6 +3509,12 @@ destruct aov. 2: {
           as [Hcc| Hcc]. {
           rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
             apply (rngl_le_0_sub Hop Hor).
+            rewrite <- (rngl_abs_nonneg Hop Hor √_)%L. 2: {
+              now apply rl_sqrt_nonneg.
+            }
+            rewrite <- (rngl_abs_nonneg Hop Hor)%L. 2: {
+              now apply rl_sqrt_nonneg.
+            }
 ....
             now apply Hsqsq.
 ...
