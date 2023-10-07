@@ -1749,6 +1749,16 @@ rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
+Theorem rngl_sub_0_l :
+  rngl_has_opp T = true →
+  ∀ a, (0 - a = - a)%L.
+Proof.
+intros Hop *.
+progress unfold rngl_sub.
+rewrite Hop.
+apply rngl_add_0_l.
+Qed.
+
 Theorem rngl_sub_0_r :
   rngl_has_opp_or_subt T = true →
   ∀ a, (a - 0 = a)%L.

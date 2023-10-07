@@ -524,8 +524,7 @@ rewrite rngl_squ_sqrt. 2: {
   }
   rewrite (rngl_mul_0_l Hos).
   apply (rngl_le_sub_le_add_l Hop Hor).
-  progress unfold rngl_sub.
-  rewrite Hop, rngl_add_0_l.
+  rewrite (rngl_sub_0_l Hop).
   apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 }
 rewrite rngl_squ_sqrt. 2: {
@@ -859,8 +858,7 @@ rewrite (rngl_squ_mul Hic).
 rewrite Hε, (rngl_mul_1_l Hon).
 assert (Hz1ac : (0 ≤ 1 + rngl_cos a)%L). {
   apply (rngl_le_sub_le_add_l Hop Hor).
-  progress unfold rngl_sub.
-  rewrite Hop, rngl_add_0_l.
+  rewrite (rngl_sub_0_l Hop).
   apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 }
 assert (Hz1sc : (0 ≤ 1 - rngl_cos a)%L). {
@@ -2455,6 +2453,22 @@ rewrite rngl_squ_sqrt in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
+Theorem angle_right_add_angle_right :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  (angle_right + angle_right = angle_straight)%A.
+Proof.
+intros Hon Hop.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_0_l Hos).
+do 2 rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_0_l Hop).
+now rewrite rngl_add_0_l.
+Qed.
+
 Theorem angle_add_comm :
   rngl_mul_is_comm T = true →
   ∀ θ1 θ2, (θ1 + θ2 = θ2 + θ1)%A.
@@ -3745,8 +3759,19 @@ destruct aov. 2: {
             rewrite (angle_add_assoc Hop) in Hθ3.
             rewrite (angle_add_comm Hic) in Hθ3.
             do 2 rewrite (angle_add_assoc Hop) in Hθ3.
-Theorem angle_right_add_angle_right :
-  (angle_right + angle_right = angle_straight)%A.
+            rewrite (angle_right_add_angle_right Hon Hop) in Hθ3.
+            rewrite Hθ3 in Hzs3.
+            cbn in Hzs3.
+            do 2 rewrite (rngl_mul_0_l Hos) in Hzs3.
+            do 4 rewrite (rngl_mul_0_r Hos) in Hzs3.
+            rewrite (rngl_sub_0_r Hos) in Hzs3.
+            do 3 rewrite rngl_add_0_r in Hzs3.
+            do 2 rewrite (rngl_sub_0_l Hop) in Hzs3.
+            do 10 rewrite (rngl_mul_opp_r Hop) in Hzs3.
+            do 7 rewrite (rngl_mul_opp_l Hop) in Hzs3.
+            do 4 rewrite (rngl_mul_1_r Hon) in Hzs3.
+            do 2 rewrite (rngl_mul_1_l Hon) in Hzs3.
+            do 4 rewrite (rngl_opp_involutive Hop) in Hzs3.
 ...
 Search angle_opp.
 Search (_ + (_ - _))%A.
