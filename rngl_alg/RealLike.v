@@ -161,6 +161,26 @@ rewrite rngl_add_0_r.
 apply (rngl_eqb_refl Hed).
 Qed.
 
+Theorem angle_right_prop : cos2_sin2_prop 0%L 1%L.
+Proof.
+progress unfold cos2_sin2_prop.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ cbn | easy ].
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+rewrite (rngl_squ_0 Hos).
+rewrite (rngl_squ_1 Hon).
+rewrite rngl_add_0_l.
+apply (rngl_eqb_refl Hed).
+Qed.
+
 Theorem angle_straight_prop : (cos2_sin2_prop (-1) 0)%L.
 Proof.
 progress unfold cos2_sin2_prop.
@@ -240,6 +260,10 @@ Qed.
 
 Definition angle_zero :=
   {| rngl_cos := 1; rngl_sin := 0; rngl_cos2_sin2 := angle_zero_prop |}%L.
+
+Definition angle_right :=
+  {| rngl_cos := 0; rngl_sin := 1;
+     rngl_cos2_sin2 := angle_right_prop |}%L.
 
 Definition angle_straight :=
   {| rngl_cos := -1; rngl_sin := 0;
@@ -339,6 +363,20 @@ Proof.
 intros Hon Hop Hic Hed * Hcs.
 progress unfold cos2_sin2_prop in Hcs.
 cbn in Hcs.
+rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
+now apply (rngl_eqb_eq Hed) in Hcs.
+Qed.
+
+Theorem cos2_sin2_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, ((rngl_cos θ)² + (rngl_sin θ)² = 1)%L.
+Proof.
+intros Hon Hop Hic Hed *.
+destruct θ as (c, s, Hcs); cbn.
+progress unfold cos2_sin2_prop in Hcs.
 rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
@@ -2354,9 +2392,10 @@ Definition angle_lt' θ1 θ2 :=
 
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
-Notation "θ1 < θ2" := (angle_lt θ1 θ2) : angle_scope.
+Notation "θ1 < θ2" := (angle_lt' θ1 θ2 = true) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_le' θ1 θ2 = true) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
+Notation "- θ" := (angle_opp θ) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
 Notation "a ≤ b < c" := (angle_le' a b = true ∧ angle_lt b c)%L :
   angle_scope.
@@ -2493,6 +2532,30 @@ f_equal. {
   f_equal.
   apply (rngl_add_sub_swap Hop).
 }
+Qed.
+
+Theorem angle_add_opp_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, (- θ + θ = 0)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_opp_l Hop).
+progress unfold rngl_sub.
+rewrite Hop.
+rewrite (rngl_opp_involutive Hop).
+do 2 rewrite fold_rngl_squ.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+f_equal.
+rewrite (fold_rngl_sub Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_sub_diag Hos).
 Qed.
 
 Theorem angle_mul_add_distr_r :
@@ -3648,6 +3711,46 @@ destruct aov. 2: {
               rngl_sin θ3 < 0
               contradiction
              *)
+            assert (H1r : (angle_right < θ1)%A). {
+              progress unfold angle_lt'.
+              cbn.
+              specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+              apply rngl_leb_le in H1; rewrite H1.
+              apply rngl_ltb_lt in Hc1n; rewrite Hc1n.
+              apply Tauto.if_same.
+            }
+            assert (H2r : (angle_right ≤ θ2)%A). {
+              progress unfold angle_le'.
+              cbn.
+              specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+              apply rngl_leb_le in H1; rewrite H1.
+              apply rngl_leb_le in Hzc2; rewrite Hzc2.
+              apply Tauto.if_same.
+            }
+            replace θ1 with (angle_right + (θ1 - angle_right))%A in Hθ3. 2: {
+              rewrite (angle_add_comm Hic).
+              progress unfold angle_sub.
+              rewrite <- (angle_add_assoc Hop).
+              rewrite (angle_add_opp_l Hic Hon Hop Hed).
+              apply (angle_add_0_r Hon Hos).
+            }
+            replace θ2 with (angle_right + (θ2 - angle_right))%A in Hθ3. 2: {
+              rewrite (angle_add_comm Hic).
+              progress unfold angle_sub.
+              rewrite <- (angle_add_assoc Hop).
+              rewrite (angle_add_opp_l Hic Hon Hop Hed).
+              apply (angle_add_0_r Hon Hos).
+            }
+            rewrite (angle_add_comm Hic _ (θ2 - _))%A in Hθ3.
+            rewrite (angle_add_assoc Hop) in Hθ3.
+            rewrite (angle_add_comm Hic) in Hθ3.
+            do 2 rewrite (angle_add_assoc Hop) in Hθ3.
+Theorem angle_right_add_angle_right :
+  (angle_right + angle_right = angle_straight)%A.
+...
+Search angle_opp.
+Search (_ + (_ - _))%A.
+Search (_ - _ + _)%A.
 ...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).

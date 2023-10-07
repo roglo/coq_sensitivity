@@ -573,6 +573,21 @@ progress unfold rngl_le.
 now split; intros Hab; destruct rngl_opt_leb.
 Qed.
 
+Theorem rngl_ltb_lt :
+  ∀ a b, (a <? b)%L = true ↔ (a < b)%L.
+Proof.
+intros.
+progress unfold rngl_ltb.
+progress unfold rngl_lt.
+split; intros Hab. {
+  destruct rngl_opt_leb; [ | easy ].
+  now apply Bool.negb_true_iff.
+} {
+  destruct rngl_opt_leb; [ | easy ].
+  now apply Bool.negb_true_iff.
+}
+Qed.
+
 Theorem rngl_leb_nle :
   ∀ a b, (a ≤? b)%L = false ↔ ¬ (a ≤ b)%L.
 Proof.
