@@ -3795,7 +3795,11 @@ destruct aov. 2: {
             do 2 rewrite (rngl_opp_involutive Hop).
             rewrite <- (rngl_mul_opp_r Hop).
             rewrite <- (rngl_mul_opp_l Hop).
-(* ah chiasse *)
+(* oui, mais sin θ1 et sin θ2 peuvent être nuls tous les deux *)
+...
+Z.add_pos_nonneg: ∀ n m : Z, (0 < n)%Z → (0 ≤ m)%Z → (0 < n + m)%Z
+Z.add_nonneg_pos: ∀ n m : Z, (0 ≤ n)%Z → (0 < m)%Z → (0 < n + m)%Z
+...
             apply (rngl_le_lt_trans Hor _ (rngl_sin θ1 * - rngl_cos θ2))%L. {
               apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
               apply (rngl_opp_le_compat Hop Hor) in Hzc2.
