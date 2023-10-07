@@ -3423,6 +3423,22 @@ remember (√ _ - √ _)%L as y eqn:Hy.
 ...
 *)
 
+Theorem rngl_sin_add_angle_straight_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, (rngl_sin (θ + angle_straight) = - rngl_sin θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+rewrite (rngl_mul_0_r Hos).
+rewrite rngl_add_0_l.
+rewrite (rngl_mul_opp_r Hop).
+f_equal.
+apply (rngl_mul_1_r Hon).
+Qed.
+
 Arguments angle_lt' (θ1 θ2)%A.
 
 Definition angle_add_overflow θ1 θ2 := angle_lt' (θ1 + θ2) θ1.
@@ -3760,18 +3776,36 @@ destruct aov. 2: {
             rewrite (angle_add_comm Hic) in Hθ3.
             do 2 rewrite (angle_add_assoc Hop) in Hθ3.
             rewrite (angle_right_add_angle_right Hon Hop) in Hθ3.
+            rewrite <- (angle_add_assoc Hop) in Hθ3.
             rewrite Hθ3 in Hzs3.
-            cbn in Hzs3.
-            do 2 rewrite (rngl_mul_0_l Hos) in Hzs3.
-            do 4 rewrite (rngl_mul_0_r Hos) in Hzs3.
-            rewrite (rngl_sub_0_r Hos) in Hzs3.
-            do 3 rewrite rngl_add_0_r in Hzs3.
-            do 2 rewrite (rngl_sub_0_l Hop) in Hzs3.
-            do 10 rewrite (rngl_mul_opp_r Hop) in Hzs3.
-            do 7 rewrite (rngl_mul_opp_l Hop) in Hzs3.
-            do 4 rewrite (rngl_mul_1_r Hon) in Hzs3.
-            do 2 rewrite (rngl_mul_1_l Hon) in Hzs3.
-            do 4 rewrite (rngl_opp_involutive Hop) in Hzs3.
+            rewrite (angle_add_comm Hic) in Hzs3.
+            rewrite (rngl_sin_add_angle_straight_r Hon Hop) in Hzs3.
+            apply (rngl_opp_le_compat Hop Hor) in Hzs3.
+            rewrite (rngl_opp_involutive Hop) in Hzs3.
+            rewrite (rngl_opp_0 Hop) in Hzs3.
+            apply (rngl_nlt_ge Hor) in Hzs3.
+            apply Hzs3; clear Hzs3.
+            cbn.
+            do 4 rewrite (rngl_mul_0_r Hos).
+            do 2 rewrite rngl_add_0_r.
+            do 2 rewrite (rngl_sub_0_l Hop).
+            do 7 rewrite (rngl_mul_opp_r Hop).
+            do 3 rewrite (rngl_mul_opp_l Hop).
+            do 4 rewrite (rngl_mul_1_r Hon).
+            do 2 rewrite (rngl_opp_involutive Hop).
+            rewrite <- (rngl_mul_opp_r Hop).
+            rewrite <- (rngl_mul_opp_l Hop).
+(* ah chiasse *)
+            apply (rngl_le_lt_trans Hor _ (rngl_sin θ1 * - rngl_cos θ2))%L. {
+              apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+              apply (rngl_opp_le_compat Hop Hor) in Hzc2.
+              now rewrite (rngl_opp_0 Hop) in Hzc2.
+            }
+            apply (rngl_lt_sub_lt_add_l Hop Hor).
+            rewrite (rngl_sub_diag Hos).
+...
+Search (0 < _ * _)%L.
+            apply rngl_mul_pos_cancel_r.
 ...
 Search angle_opp.
 Search (_ + (_ - _))%A.
