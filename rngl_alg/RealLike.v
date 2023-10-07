@@ -3625,6 +3625,29 @@ destruct aov. 2: {
           easy.
         }
         apply (rngl_nle_gt Hor) in Hcc.
+        assert (H12n : (rngl_cos θ1 < 0 ∨ rngl_cos θ2 < 0)%L). {
+          destruct (rngl_lt_dec Hor (rngl_cos θ1) 0) as [H1| H1]. {
+            now left.
+          }
+          apply (rngl_nlt_ge Hor) in H1.
+          right.
+          eapply (rngl_le_lt_trans Hor); [ | apply Hcc ].
+          apply (rngl_le_sub_le_add_r Hop Hor).
+          now rewrite (rngl_sub_diag Hos).
+        }
+        (* I claim that θ3 overflows the straight angle, i.e. its
+           sinus is negative *)
+        exfalso.
+        destruct H12n as [Hc1n| Hc2n]. {
+          destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hzc2| Hzc2]. {
+            (*
+              θ1 = angle_right + θ'1 (* with 0 < θ'1 ≤ angle_right *)
+              θ2 = angle_right + θ'2 (* with 0 < θ'2 ≤ angle_right *)
+              θ3 = angle_right + angle_right + θ'1 + θ'2
+              θ3 = angle_straight + θ'1 + θ'2
+              rngl_sin θ3 < 0
+              contradiction
+             *)
 ...
   destruct θ1 as (c1, s1, Hcs1).
   destruct θ2 as (c2, s2, Hcs2).
