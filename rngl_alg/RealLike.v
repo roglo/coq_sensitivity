@@ -3611,10 +3611,11 @@ destruct zs12. {
         apply rngl_ltb_lt in Hc1c3.
         destruct c2c3; [ easy | exfalso ].
         apply (rngl_ltb_ge Hor) in Hc2c3.
-(* θ1, θ1+θ2 et θ2 sont, dans cet ordre, au dessus de l'axe des X *)
-(* donc θ1+θ2 a fait le tour, puisqu'il est plus petit que θ1 *)
-(* mais ça, c'est pas possible, parce que θ1 et θ2 ne sont pas assez
-   grands pour que θ1+θ2 fasse le tour *)
+        (* θ1, θ1+θ2 and θ2 are, in this order (Hc1c3 & Hc2c3), above
+           the X axis (Hzs1 & Hzs2 & Hzs12). Therefore θ1+θ2 went
+           around, since its cosinus is smaller than the one of θ2
+           (Hc2c3). But it is not possible, because θ1 et θ2 are not
+           big enough for θ1+θ2 to go around. *)
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
           apply (rngl_nle_gt Hor) in Hc1c3.
