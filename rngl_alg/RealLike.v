@@ -598,16 +598,26 @@ Qed.
 Definition angle_eqb a b :=
   ((rngl_cos a =? rngl_cos b)%L && (rngl_sin a =? rngl_sin b)%L)%bool.
 
-Definition angle_leb a b :=
-  if (0 ≤? rngl_sin a)%L then
-    if (0 ≤? rngl_sin b)%L then (rngl_cos b ≤? rngl_cos a)%L
+Definition angle_leb θ1 θ2 :=
+  if (0 ≤? rngl_sin θ1)%L then
+    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L
     else true
   else
-    if (0 ≤? rngl_sin b)%L then false
-    else (rngl_cos a ≤? rngl_cos b)%L.
+    if (0 ≤? rngl_sin θ2)%L then false
+    else (rngl_cos θ1 ≤? rngl_cos θ2)%L.
 
+(*
 Definition angle_ltb a b :=
   (angle_leb a b && negb (angle_eqb a b))%bool.
+*)
+
+Definition angle_ltb θ1 θ2 :=
+  if (0 ≤? rngl_sin θ1)%L then
+    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 <? rngl_cos θ1)%L
+    else true
+  else
+    if (0 ≤? rngl_sin θ2)%L then false
+    else (rngl_cos θ1 <? rngl_cos θ2)%L.
 
 Theorem rl_sqrt_0 :
   rngl_has_opp T = true →
@@ -964,6 +974,7 @@ destruct saz. {
 }
 Qed.
 
+(* to be completed
 Theorem angle_mul_2_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1050,6 +1061,8 @@ destruct ap. {
   }
   do 2 rewrite fold_rngl_squ.
   progress unfold angle_ltb in Hap.
+(**)
+...
   apply Bool.andb_true_iff in Hap.
   destruct Hap as (Hal, Hae).
   apply Bool.negb_true_iff in Hae.
@@ -1271,6 +1284,7 @@ destruct ap. {
   }
 }
 Qed.
+*)
 
 Theorem gc_add_comm :
   let roc := gc_ring_like_op T in
@@ -2355,50 +2369,16 @@ Compute (
 ...
 *)
 
-(*
-Definition rngl_compare a b :=
-  if (a =? b)%L then Eq
-  else if (a ≤? b)%L then Lt else Gt.
-
-Definition angle_compare θ1 θ2 :=
-  if (rngl_zero ≤? rngl_sin θ1)%L then
-    if (rngl_zero ≤? rngl_sin θ2)%L then
-      rngl_compare (rngl_cos θ2) (rngl_cos θ1)
-    else Lt
-  else
-    if (rngl_zero ≤? rngl_sin θ2)%L then Gt
-    else rngl_compare (rngl_cos θ1) (rngl_cos θ2).
-
-Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
-Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
-*)
-
-Definition angle_le θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1)%L then
-    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L
-    else true
-  else
-    if (0 ≤? rngl_sin θ2)%L then false
-    else (rngl_cos θ1 ≤? rngl_cos θ2)%L.
-
-Definition angle_lt θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1)%L then
-    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 <? rngl_cos θ1)%L
-    else true
-  else
-    if (0 ≤? rngl_sin θ2)%L then false
-    else (rngl_cos θ1 <? rngl_cos θ2)%L.
-
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
-Notation "θ1 <? θ2" := (angle_lt θ1 θ2) : angle_scope.
-Notation "θ1 ≤? θ2" := (angle_le θ1 θ2) : angle_scope.
-Notation "θ1 < θ2" := (angle_lt θ1 θ2 = true) : angle_scope.
-Notation "θ1 ≤ θ2" := (angle_le θ1 θ2 = true) : angle_scope.
+Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
+Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
+Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : angle_scope.
+Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "- θ" := (angle_opp θ) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
-Notation "a ≤ b < c" := (angle_le a b = true ∧ angle_lt b c)%L :
+Notation "a ≤ b < c" := (angle_leb a b = true ∧ angle_ltb b c = true)%L :
   angle_scope.
 
 Arguments angle T {ro rp}.
@@ -3488,9 +3468,9 @@ symmetry.
 apply rngl_add_0_r.
 Qed.
 
-Arguments angle_lt (θ1 θ2)%A.
+Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-Definition angle_add_overflow θ1 θ2 := angle_lt (θ1 + θ2) θ1.
+Definition angle_add_overflow θ1 θ2 := angle_ltb (θ1 + θ2) θ1.
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -3593,7 +3573,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 progress unfold angle_add_overflow.
-progress unfold angle_lt.
+progress unfold angle_ltb.
 rewrite (angle_add_comm Hic θ2).
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -3616,6 +3596,12 @@ destruct zs12. {
            around, since its cosinus is smaller than the one of θ2
            (Hc2c3). But it is not possible, because θ1 et θ2 are not
            big enough for θ1+θ2 to go around. *)
+Print angle_add_overflow.
+Print angle_ltb.
+...
+angle_add_overflow = λ θ1 θ2 : angle T, (θ1 + θ2 <? θ1)%A
+     : angle T → angle T → bool
+
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
           apply (rngl_nle_gt Hor) in Hc1c3.
