@@ -3537,7 +3537,6 @@ remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
 destruct aov. 2: {
   progress unfold angle_add_overflow in Haov.
-Print angle_add_overflow.
 Theorem angle_add_overflow_comm :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3573,6 +3572,7 @@ destruct zs12. {
            around, since its cosinus is smaller than the one of θ2
            (Hc2c3). But it is not possible, because θ1 et θ2 are not
            big enough for θ1+θ2 to go around. *)
+...
 Print angle_add_overflow.
 Print angle_ltb.
 ...
