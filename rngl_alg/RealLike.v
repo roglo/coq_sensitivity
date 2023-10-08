@@ -3441,13 +3441,41 @@ symmetry.
 apply rngl_add_0_r.
 Qed.
 
+Theorem angle_eqb_eq :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
+Proof.
+intros Hed *.
+split; intros H12. {
+  progress unfold angle_eqb in H12.
+  apply Bool.andb_true_iff in H12.
+  destruct H12 as (Hc12, Hs12).
+  apply (rngl_eqb_eq Hed) in Hc12, Hs12.
+  apply eq_angle_eq.
+  now rewrite Hc12, Hs12.
+} {
+  subst θ2.
+  progress unfold angle_eqb.
+  now do 2 rewrite (rngl_eqb_refl Hed).
+}
+Qed.
+
+Theorem angle_opp_0 :
+  rngl_has_opp T = true →
+  (- 0)%A = 0%A.
+Proof.
+intros Hop.
+apply eq_angle_eq; cbn.
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(**)
-Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 (*
-Definition angle_add_overflow (θ1 θ2 : angle T) := ((θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
+Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 *)
+Definition angle_add_overflow (θ1 θ2 : angle T) := ((θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
+(**)
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -3549,6 +3577,25 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 progress unfold angle_add_overflow.
+(* 1 *)
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1. {
+  apply (angle_eqb_eq Hed) in Hz1.
+  subst θ1; cbn.
+  rewrite (angle_opp_0 Hop).
+  remember (0 ≤? θ2)%A as zl2 eqn:Hzl2.
+  remember (θ2 =? 0)%A as z2 eqn:Hz2.
+  remember (- θ2 ≤? 0)%A as o2z eqn:Ho2z.
+  symmetry in Hzl2, Hz2, Ho2z.
+  destruct zl2. {
+    destruct z2. {
+      destruct o2z; [ easy | exfalso ].
+      apply (angle_eqb_eq Hed) in Hz2.
+      subst θ2.
+      rewrite (angle_opp_0 Hop) in Ho2z.
+Search ((_ ≤? _)%A).
+... 1
 progress unfold angle_ltb.
 rewrite (angle_add_comm Hic θ2).
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
