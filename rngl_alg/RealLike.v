@@ -3761,38 +3761,38 @@ destruct aov. 2: {
           apply (rngl_le_sub_le_add_r Hop Hor).
           now rewrite (rngl_sub_diag Hos).
         }
+        (* case when θ1=angle_straight *)
+        destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc11| Hc11]. {
+          rewrite Hc11 in Haov |-*.
+          specialize (eq_rngl_cos_opp_1 Hic Hon Hop Hed _ Hc11) as Hs1z.
+          specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) as H1.
+          specialize (H1 θ3).
+          apply (rngl_le_antisymm Hor) in Haov; [ | easy ].
+          rewrite <- Haov.
+          rewrite (rngl_sub_opp Hop).
+          rewrite (fold_rngl_sub Hop).
+          rewrite (rngl_sub_diag Hos).
+          rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+          rewrite (rngl_mul_0_l Hos).
+          rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+          rewrite (rngl_mul_0_l Hos).
+          rewrite (rngl_abs_0 Hop).
+          rewrite Hθ3 in Haov; cbn in Haov.
+          rewrite Hc11, Hs1z in Haov.
+          rewrite (rngl_mul_opp_l Hop) in Haov.
+          rewrite (rngl_mul_1_l Hon) in Haov.
+          rewrite (rngl_mul_0_l Hos) in Haov.
+          rewrite (rngl_sub_0_r Hos) in Haov.
+          apply (rngl_opp_inj Hop) in Haov.
+          rewrite <- Haov, (rngl_sub_diag Hos).
+          rewrite (rngl_mul_0_r Hos).
+          rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+          symmetry.
+          apply (rngl_sub_diag Hos).
+        }
         (* I claim that θ3 overflows the straight angle, i.e. its
            sinus is negative *)
         destruct H12n as [Hc1n| Hc2n]. {
-          (* but, before, there is the case when θ1=angle_straight *)
-          destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc11| Hc11]. {
-            rewrite Hc11 in Haov |-*.
-            specialize (eq_rngl_cos_opp_1 Hic Hon Hop Hed _ Hc11) as Hs1z.
-            specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) as H1.
-            specialize (H1 θ3).
-            apply (rngl_le_antisymm Hor) in Haov; [ | easy ].
-            rewrite <- Haov.
-            rewrite (rngl_sub_opp Hop).
-            rewrite (fold_rngl_sub Hop).
-            rewrite (rngl_sub_diag Hos).
-            rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-            rewrite (rngl_mul_0_l Hos).
-            rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-            rewrite (rngl_mul_0_l Hos).
-            rewrite (rngl_abs_0 Hop).
-            rewrite Hθ3 in Haov; cbn in Haov.
-            rewrite Hc11, Hs1z in Haov.
-            rewrite (rngl_mul_opp_l Hop) in Haov.
-            rewrite (rngl_mul_1_l Hon) in Haov.
-            rewrite (rngl_mul_0_l Hos) in Haov.
-            rewrite (rngl_sub_0_r Hos) in Haov.
-            apply (rngl_opp_inj Hop) in Haov.
-            rewrite <- Haov, (rngl_sub_diag Hos).
-            rewrite (rngl_mul_0_r Hos).
-            rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-            symmetry.
-            apply (rngl_sub_diag Hos).
-          }
           exfalso.
           destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hzc2| Hzc2]. {
             (*
@@ -3857,6 +3857,21 @@ destruct aov. 2: {
             do 2 rewrite (rngl_opp_involutive Hop).
             rewrite <- (rngl_mul_opp_r Hop).
             rewrite <- (rngl_mul_opp_l Hop).
+            (* case when θ2=angle_right *)
+            destruct (rngl_eq_dec Hed (rngl_sin θ2) 1) as [Hs21| Hs21]. {
+              rewrite Hs21, (rngl_mul_1_r Hon).
+              apply (rngl_add_nonneg_pos Hor Hos). 2: {
+                rewrite <- (rngl_opp_0 Hop).
+                now apply -> (rngl_opp_lt_compat Hop Hor).
+              }
+              apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+              rewrite <- (rngl_opp_0 Hop).
+              now apply -> (rngl_opp_le_compat Hop Hor).
+            }
+(* ah putain merde je crois que je me suis encore gouré *)
+...
+        }
+        assert (Hc2z : rngl_cos θ2 ≠ 0%L) by ...
 ...
 Theorem rngl_add_nonneg_pos : ∀ n m, (0 ≤ n)%L → (0 < m)%L → (0 < n + m)%L.
 Theorem rngl_add_pos_nonneg : ∀ n m, (0 < n → 0 ≤ m → 0 < n + m)%L.

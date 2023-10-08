@@ -3365,6 +3365,16 @@ apply (rngl_le_trans Hor _ a); [ easy | ].
 now apply (rngl_le_add_r Hor).
 Qed.
 
+Theorem rngl_add_nonneg_pos :
+  rngl_is_ordered T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a b, (0 ≤ a)%L → (0 < b)%L → (0 < a + b)%L.
+Proof.
+intros Hor Hos * Hza Hzb.
+apply (rngl_le_lt_trans Hor _ a); [ easy | ].
+now apply (rngl_lt_add_r Hos Hor).
+Qed.
+
 Theorem rngl_of_nat_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
