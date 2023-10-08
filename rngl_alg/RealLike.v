@@ -3439,6 +3439,40 @@ f_equal.
 apply (rngl_mul_1_r Hon).
 Qed.
 
+Theorem eq_rngl_cos_opp_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, (rngl_cos θ = -1 → rngl_sin θ = 0)%L.
+Proof.
+intros Hic Hon Hop Hed * Hθ.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+destruct θ as (c, s, Hcs).
+cbn in Hθ |-*.
+subst c.
+apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs.
+rewrite (rngl_squ_opp Hop) in Hcs.
+rewrite (rngl_squ_1 Hon) in Hcs.
+apply (rngl_add_sub_eq_l Hos) in Hcs.
+rewrite (rngl_sub_diag Hos) in Hcs.
+symmetry in Hcs.
+now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
+Qed.
+
 Arguments angle_lt' (θ1 θ2)%A.
 
 Definition angle_add_overflow θ1 θ2 := angle_lt' (θ1 + θ2) θ1.
@@ -3534,7 +3568,6 @@ destruct aov. 2: {
   apply eq_angle_eq.
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   progress unfold angle_lt' in Haov.
-(**)
   specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
   specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
   f_equal. {
@@ -3730,8 +3763,37 @@ destruct aov. 2: {
         }
         (* I claim that θ3 overflows the straight angle, i.e. its
            sinus is negative *)
-        exfalso.
         destruct H12n as [Hc1n| Hc2n]. {
+          (* but, before, there is the case when θ1=angle_straight *)
+          destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc11| Hc11]. {
+            rewrite Hc11 in Haov |-*.
+            specialize (eq_rngl_cos_opp_1 Hic Hon Hop Hed _ Hc11) as Hs1z.
+            specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) as H1.
+            specialize (H1 θ3).
+            apply (rngl_le_antisymm Hor) in Haov; [ | easy ].
+            rewrite <- Haov.
+            rewrite (rngl_sub_opp Hop).
+            rewrite (fold_rngl_sub Hop).
+            rewrite (rngl_sub_diag Hos).
+            rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+            rewrite (rngl_mul_0_l Hos).
+            rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+            rewrite (rngl_mul_0_l Hos).
+            rewrite (rngl_abs_0 Hop).
+            rewrite Hθ3 in Haov; cbn in Haov.
+            rewrite Hc11, Hs1z in Haov.
+            rewrite (rngl_mul_opp_l Hop) in Haov.
+            rewrite (rngl_mul_1_l Hon) in Haov.
+            rewrite (rngl_mul_0_l Hos) in Haov.
+            rewrite (rngl_sub_0_r Hos) in Haov.
+            apply (rngl_opp_inj Hop) in Haov.
+            rewrite <- Haov, (rngl_sub_diag Hos).
+            rewrite (rngl_mul_0_r Hos).
+            rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+            symmetry.
+            apply (rngl_sub_diag Hos).
+          }
+          exfalso.
           destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hzc2| Hzc2]. {
             (*
               θ1 = angle_right + θ'1 (* with 0 < θ'1 ≤ angle_right *)
@@ -3795,7 +3857,11 @@ destruct aov. 2: {
             do 2 rewrite (rngl_opp_involutive Hop).
             rewrite <- (rngl_mul_opp_r Hop).
             rewrite <- (rngl_mul_opp_l Hop).
-(* oui, mais sin θ1 et sin θ2 peuvent être nuls tous les deux *)
+...
+Theorem rngl_add_nonneg_pos : ∀ n m, (0 ≤ n)%L → (0 < m)%L → (0 < n + m)%L.
+Theorem rngl_add_pos_nonneg : ∀ n m, (0 < n → 0 ≤ m → 0 < n + m)%L.
+...
+apply rngl_add_nonneg_pos.
 ...
 Z.add_pos_nonneg: ∀ n m : Z, (0 < n)%Z → (0 ≤ m)%Z → (0 < n + m)%Z
 Z.add_nonneg_pos: ∀ n m : Z, (0 ≤ n)%Z → (0 < m)%Z → (0 < n + m)%Z
