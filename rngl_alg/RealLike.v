@@ -1062,7 +1062,13 @@ destruct ap. {
   do 2 rewrite fold_rngl_squ.
   progress unfold angle_ltb in Hap.
 (**)
-...
+  cbn in Hap.
+  rewrite (rngl_leb_refl Hor) in Hap.
+  destruct a as (ca, sa, Ha); cbn in ε, Hap |-*.
+  remember (0 ≤? sa)%L as zs eqn:Hzs; symmetry in Hzs.
+  destruct zs; [ | easy ].
+  apply rngl_ltb_lt in Hap.
+(*
   apply Bool.andb_true_iff in Hap.
   destruct Hap as (Hal, Hae).
   apply Bool.negb_true_iff in Hae.
@@ -1071,9 +1077,9 @@ destruct ap. {
   apply Bool.andb_false_iff in Hae.
   cbn in Hal, Hae.
   rewrite (rngl_leb_refl Hor) in Hal.
-  destruct a as (ca, sa, Ha); cbn in ε, Hal, Hae |-*.
+  destruct a as (ca, sa, Ha); cbn in ε(*, Hal, Hae*) |-*.
   remember (0 ≤? sa)%L as zs eqn:Hzs; symmetry in Hzs.
-  destruct zs; [ clear Hal | easy ].
+*)
   apply rngl_leb_le in Hzs.
   apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Ha.
   apply (rngl_add_sub_eq_r Hos) in Ha.
@@ -1106,8 +1112,10 @@ destruct ap. {
     do 2 rewrite rngl_mul_assoc in Hzsc.
     rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
     rewrite (rngl_mul_1_l Hon) in Hzsc.
+(*
     destruct Hae as [Hae| Hae]. {
       apply (rngl_eqb_neq Hed) in Hae.
+*)
       destruct (rngl_eq_dec Hed sa 0) as [Hsz| Hsz]. {
         subst sa.
         rewrite (rngl_squ_0 Hos) in Ha.
@@ -1115,8 +1123,9 @@ destruct ap. {
         symmetry in Ha.
         rewrite <- (rngl_squ_1 Hon) in Ha.
         apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in Ha.
-        destruct Ha as [Ha| Ha]; [ | easy ].
-        subst ca.
+        destruct Ha as [Ha| Ha]; subst ca. 2: {
+          now apply (rngl_lt_irrefl Hor) in Hap.
+        }
         apply (rngl_0_le_1 Hon Hop Hor).
       }
       rewrite (rngl_mul_comm Hic) in Hzsc.
@@ -1126,6 +1135,25 @@ destruct ap. {
       }
       now rewrite (rngl_div_0_l Hos Hi1) in Hzsc.
     }
+(**)
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_opp_inj Hop).
+    rewrite (rngl_opp_involutive Hop).
+    apply (rngl_abs_nonpos Hop Hor).
+    apply (rngl_leb_gt Hor) in Hzsc.
+    rewrite <- (rngl_mul_0_r Hos 2)%L in Hzsc.
+    rewrite <- rngl_mul_assoc in Hzsc.
+    apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hzsc. 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hzsc.
+    apply (rngl_lt_le_incl Hor).
+    apply (rngl_nle_gt Hor).
+    intros H; apply Hzsc.
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+(*
+...
     apply (rngl_eqb_neq Hed) in Hae.
     rewrite (rngl_mul_comm Hic) in Hzsc.
     apply (rngl_le_div_l Hon Hop Hiv Hor) in Hzsc. 2: {
@@ -1154,6 +1182,7 @@ destruct ap. {
     apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
     now apply (rngl_lt_le_incl Hor).
   }
+*)
 } {
   progress unfold angle_mul_nat.
   progress unfold angle_div_2.
@@ -1177,6 +1206,16 @@ destruct ap. {
   }
   do 2 rewrite fold_rngl_squ.
   progress unfold angle_ltb in Hap.
+(**)
+  cbn in Hap.
+  rewrite (rngl_leb_refl Hor) in Hap.
+  destruct a as (ca, sa, Ha); cbn in ε, Hap |-*.
+  remember (0 ≤? sa)%L as zs eqn:Hzs; symmetry in Hzs.
+  destruct zs. {
+    apply (rngl_ltb_ge Hor) in Hap.
+...
+  apply rngl_ltb_lt in Hap.
+...
   apply Bool.andb_false_iff in Hap.
 (**)
   progress unfold angle_leb in Hap.
