@@ -3608,6 +3608,10 @@ destruct zs12. {
       apply rngl_leb_le in Hzs2.
       destruct c1c3. {
         apply rngl_ltb_lt in Hc1c3.
+(* même ça, ça devrait être impossible *)
+exfalso; clear c2c3 Hc2c3.
+(* enfin, je crois *)
+...
         destruct c2c3; [ easy | exfalso ].
         apply (rngl_ltb_ge Hor) in Hc2c3.
 ...
