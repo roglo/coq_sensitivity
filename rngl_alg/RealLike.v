@@ -2355,6 +2355,7 @@ Compute (
 ...
 *)
 
+(*
 Definition rngl_compare a b :=
   if (a =? b)%L then Eq
   else if (a ≤? b)%L then Lt else Gt.
@@ -2370,9 +2371,9 @@ Definition angle_compare θ1 θ2 :=
 
 Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
 Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
+*)
 
-(* alternative definition of angle_le and angle_lt *)
-Definition angle_le' θ1 θ2 :=
+Definition angle_le θ1 θ2 :=
   if (0 ≤? rngl_sin θ1)%L then
     if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L
     else true
@@ -2380,7 +2381,7 @@ Definition angle_le' θ1 θ2 :=
     if (0 ≤? rngl_sin θ2)%L then false
     else (rngl_cos θ1 ≤? rngl_cos θ2)%L.
 
-Definition angle_lt' θ1 θ2 :=
+Definition angle_lt θ1 θ2 :=
   if (0 ≤? rngl_sin θ1)%L then
     if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 <? rngl_cos θ1)%L
     else true
@@ -2390,12 +2391,14 @@ Definition angle_lt' θ1 θ2 :=
 
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
-Notation "θ1 < θ2" := (angle_lt' θ1 θ2 = true) : angle_scope.
-Notation "θ1 ≤ θ2" := (angle_le' θ1 θ2 = true) : angle_scope.
+Notation "θ1 <? θ2" := (angle_lt θ1 θ2) : angle_scope.
+Notation "θ1 ≤? θ2" := (angle_le θ1 θ2) : angle_scope.
+Notation "θ1 < θ2" := (angle_lt θ1 θ2 = true) : angle_scope.
+Notation "θ1 ≤ θ2" := (angle_le θ1 θ2 = true) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "- θ" := (angle_opp θ) : angle_scope.
 Notation "0" := (angle_zero) : angle_scope.
-Notation "a ≤ b < c" := (angle_le' a b = true ∧ angle_lt b c)%L :
+Notation "a ≤ b < c" := (angle_le a b = true ∧ angle_lt b c)%L :
   angle_scope.
 
 Arguments angle T {ro rp}.
@@ -3473,9 +3476,9 @@ symmetry in Hcs.
 now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
 Qed.
 
-Arguments angle_lt' (θ1 θ2)%A.
+Arguments angle_lt (θ1 θ2)%A.
 
-Definition angle_add_overflow θ1 θ2 := angle_lt' (θ1 + θ2) θ1.
+Definition angle_add_overflow θ1 θ2 := angle_lt (θ1 + θ2) θ1.
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -3565,6 +3568,45 @@ remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
 destruct aov. 2: {
   progress unfold angle_add_overflow in Haov.
+Print angle_add_overflow.
+Theorem angle_add_overflow_comm :
+  rngl_mul_is_comm T = true →
+  ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
+Proof.
+intros Hic *.
+progress unfold angle_add_overflow.
+progress unfold angle_lt.
+rewrite (angle_add_comm Hic θ2).
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_cos θ1 <? rngl_cos (θ1 + θ2))%L as c1c3 eqn:Hc1c3.
+remember (rngl_cos θ2 <? rngl_cos (θ1 + θ2))%L as c2c3 eqn:Hc2c3.
+symmetry in Hzs12, Hzs1, Hzs2, Hc1c3, Hc2c3.
+destruct zs12. {
+  apply rngl_leb_le in Hzs12.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      destruct c1c3. {
+        apply rngl_ltb_lt in Hc1c3.
+        destruct c2c3; [ easy | exfalso ].
+        apply (rngl_ltb_ge Hor) in Hc2c3.
+        cbn in Hzs12, Hc1c3, Hc2c3.
+...
+cos θ = sin (θ + right).
+...
+Theorem angle_add_overflow_comm :
+  rngl_mul_is_comm T = true →
+  ∀ θ1 θ2, ((θ1 + θ2 <? θ1) = (θ1 + θ2 <? θ2))%A.
+Proof.
+intros Hic *.
+progress unfold angle_lt.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs12.
+destruct zs12. {
+...
   apply eq_angle_eq.
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   progress unfold angle_lt' in Haov.
@@ -3790,6 +3832,7 @@ destruct aov. 2: {
           symmetry.
           apply (rngl_sub_diag Hos).
         }
+...
         (* I claim that θ3 overflows the straight angle, i.e. its
            sinus is negative *)
         destruct H12n as [Hc1n| Hc2n]. {
