@@ -3573,7 +3573,6 @@ Print angle_ltb.
 ...
 angle_add_overflow = λ θ1 θ2 : angle T, (θ1 + θ2 <? θ1)%A
      : angle T → angle T → bool
-
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
           apply (rngl_nle_gt Hor) in Hc1c3.
