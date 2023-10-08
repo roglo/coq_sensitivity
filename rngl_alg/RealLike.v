@@ -2343,6 +2343,7 @@ Compute (
 
 Definition angle_sub θ1 θ2 := angle_add θ1 (angle_opp θ2).
 
+Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : angle_scope.
 Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
 Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : angle_scope.
@@ -3442,7 +3443,11 @@ Qed.
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
+(**)
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
+(*
+Definition angle_add_overflow (θ1 θ2 : angle T) := ((θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
+*)
 
 (* to be completed
 Theorem angle_div_2_add :
