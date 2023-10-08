@@ -3476,6 +3476,18 @@ symmetry in Hcs.
 now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
 Qed.
 
+Theorem rngl_cos_eq_sin_add_right :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_cos θ = rngl_sin (θ + angle_right).
+Proof.
+intros Hon Hos *; cbn.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_0_r Hos).
+symmetry.
+apply rngl_add_0_r.
+Qed.
+
 Arguments angle_lt (θ1 θ2)%A.
 
 Definition angle_add_overflow θ1 θ2 := angle_lt (θ1 + θ2) θ1.
@@ -3571,9 +3583,14 @@ destruct aov. 2: {
 Print angle_add_overflow.
 Theorem angle_add_overflow_comm :
   rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
 Proof.
-intros Hic *.
+intros Hic Hon Hop *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
 progress unfold angle_add_overflow.
 progress unfold angle_lt.
 rewrite (angle_add_comm Hic θ2).
@@ -3593,19 +3610,19 @@ destruct zs12. {
         apply rngl_ltb_lt in Hc1c3.
         destruct c2c3; [ easy | exfalso ].
         apply (rngl_ltb_ge Hor) in Hc2c3.
+...
+        cbn in Hc1c3.
+        do 2 rewrite (rngl_cos_eq_sin_add_right Hon Hos) in Hc1c3.
+...
+        rewrite <- (angle_add_assoc Hop) in Hc1c3.
+remember (θ2 + angle_right)%A as θ2r eqn:Hθ2r.
+        cbn in Hc1c3.
+...
+        do 2 rewrite (rngl_mul_1_r Hon) in Hc1c3.
+        do 2 rewrite (rngl_mul_0_r Hos) in Hc1c3.
+        do 2 rewrite rngl_add_0_r in Hc1c3.
+...
         cbn in Hzs12, Hc1c3, Hc2c3.
-...
-cos θ = sin (θ + right).
-...
-Theorem angle_add_overflow_comm :
-  rngl_mul_is_comm T = true →
-  ∀ θ1 θ2, ((θ1 + θ2 <? θ1) = (θ1 + θ2 <? θ2))%A.
-Proof.
-intros Hic *.
-progress unfold angle_lt.
-remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-symmetry in Hzs12.
-destruct zs12. {
 ...
   apply eq_angle_eq.
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
