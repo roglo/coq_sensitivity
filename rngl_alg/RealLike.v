@@ -3585,9 +3585,10 @@ Theorem angle_add_overflow_comm :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
 Proof.
-intros Hic Hon Hop *.
+intros Hic Hon Hop Hed *.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
@@ -3608,12 +3609,59 @@ destruct zs12. {
       apply rngl_leb_le in Hzs2.
       destruct c1c3. {
         apply rngl_ltb_lt in Hc1c3.
-(* même ça, ça devrait être impossible *)
-exfalso; clear c2c3 Hc2c3.
-(* enfin, je crois *)
-...
         destruct c2c3; [ easy | exfalso ].
         apply (rngl_ltb_ge Hor) in Hc2c3.
+(* θ1, θ1+θ2 et θ2 sont, dans cet ordre, au dessus de l'axe des X *)
+(* donc θ1+θ2 a fait le tour, puisqu'il est plus petit que θ1 *)
+(* mais ça, c'est pas possible, parce que θ1 et θ2 ne sont pas assez
+   grands pour que θ1+θ2 fasse le tour *)
+...
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
+          apply (rngl_nle_gt Hor) in Hc1c3.
+          apply Hc1c3; cbn.
+          eapply (rngl_le_trans Hor _ (rngl_cos θ1 * rngl_cos θ2)). {
+            apply (rngl_le_sub_nonneg Hop Hor).
+            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          }
+          rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 2.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        }
+        apply (rngl_nle_gt Hor) in Hz1.
+...
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hz2| Hz2]. {
+          apply (rngl_nlt_ge Hor) in Hc2c3.
+          apply Hc2c3; cbn.
+...
+          eapply (rngl_le_lt_trans Hor _ (rngl_cos θ1 * rngl_cos θ2)). {
+...
+            apply (rngl_le_sub_nonneg Hop Hor).
+            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          }
+          rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 2.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+
+          apply (rngl_nlt_ge Hor) in Hc2c3.
+          apply Hc2c3; cbn.
+...
+          eapply (rngl_le_lt_trans Hor _ (rngl_cos θ1 * rngl_cos θ2)). {
+            rewrite <- (rngl_mul_1_l Hon (rngl_cos θ2)) at 1.
+            apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+...
+            apply (rngl_le_sub_nonneg Hop Hor).
+            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          }
+          rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 2.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        }
+...
+ {
+          apply (rngl_nle_gt Hor) in Hz1.
+          apply (rngl_nlt_ge Hor) in Hc2c3.
+          apply Hc2c3; cbn.
 ...
         cbn in Hc1c3.
         do 2 rewrite (rngl_cos_eq_sin_add_right Hon Hos) in Hc1c3.
