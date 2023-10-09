@@ -3194,51 +3194,62 @@ destruct z1. {
   apply rngl_leb_le in Hz1.
   destruct z2. {
     apply rngl_leb_le in Hz2.
-    destruct zo1. {
-      apply rngl_leb_le in Hzo1.
-      apply (rngl_opp_le_compat Hop Hor) in Hzo1.
-      rewrite (rngl_opp_involutive Hop) in Hzo1.
-      rewrite (rngl_opp_0 Hop) in Hzo1.
-      apply (rngl_le_antisymm Hor) in Hz1; [ | easy ].
-      clear Hzo1.
-      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hz1.
-      destruct Hz1 as [Hz1| Hz1]; [ easy | ].
-      subst θ1; cbn in H12 |-*.
-      clear H1z.
-      apply rngl_leb_le in H12.
-      specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor θ2) as H1.
-      apply (rngl_le_antisymm Hor) in H12; [ | easy ].
-      symmetry in H12.
-      apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H12.
-      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H12.
-      destruct H12 as [H12| H12]; [ easy | ].
-      subst θ2; cbn in Hzo2 |-*.
-      clear H2z H1 Hz2.
-      rewrite (rngl_opp_0 Hop) in Hzo2.
-      rewrite (rngl_leb_refl Hor) in Hzo2; subst zo2.
-      apply (rngl_leb_refl Hor).
-    } {
-...
-Search (rngl_sin (- _))%A.
-Search (rngl_cos (- _))%A.
-...
-apply angle_opp_le_compat.
-Search (- - _)%L.
-...
-rewrite angle_opp_involutive.
-...
-Search ((- _ ≤ - _)%A).
-Search ((- _ ≤? - _)%A).
-Search ((- _ ≤ - _)%L).
-Search ((- _ ≤? - _)%L).
-...
-Search ((_ ≤? _)%A = false).
-Search ((_ ≤? _)%L = false).
-...
-destruct θ as (c, s, Hcs).
-cbn in Hθ.
-subst c; clear H1.
-apply eq_angle_eq; cbn.
+    destruct zo1; [ | now destruct zo2 ].
+    apply rngl_leb_le in Hzo1.
+    apply (rngl_opp_le_compat Hop Hor) in Hzo1.
+    rewrite (rngl_opp_involutive Hop) in Hzo1.
+    rewrite (rngl_opp_0 Hop) in Hzo1.
+    apply (rngl_le_antisymm Hor) in Hz1; [ | easy ].
+    clear Hzo1.
+    apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hz1.
+    destruct Hz1 as [Hz1| Hz1]; [ easy | ].
+    subst θ1; cbn in H12 |-*.
+    clear H1z.
+    apply rngl_leb_le in H12.
+    specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor θ2) as H1.
+    apply (rngl_le_antisymm Hor) in H12; [ | easy ].
+    symmetry in H12.
+    apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H12.
+    apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H12.
+    destruct H12 as [H12| H12]; [ easy | ].
+    subst θ2; cbn in Hzo2 |-*.
+    clear H2z H1 Hz2.
+    rewrite (rngl_opp_0 Hop) in Hzo2.
+    rewrite (rngl_leb_refl Hor) in Hzo2; subst zo2.
+    apply (rngl_leb_refl Hor).
+  }
+  clear H12.
+  apply (rngl_leb_gt Hor) in Hz2.
+  destruct zo1. {
+    apply rngl_leb_le in Hzo1.
+    apply (rngl_opp_le_compat Hop Hor) in Hzo1.
+    rewrite (rngl_opp_involutive Hop) in Hzo1.
+    rewrite (rngl_opp_0 Hop) in Hzo1.
+    apply (rngl_le_antisymm Hor) in Hzo1; [ | easy ].
+    symmetry in Hzo1.
+    apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzo1.
+    destruct Hzo1 as [Hzo1| Hzo1]; [ easy | ].
+    subst θ1; cbn.
+    destruct zo2. {
+      apply rngl_leb_le.
+      apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+    }
+    apply rngl_leb_nle in Hzo2.
+    exfalso; apply Hzo2.
+    apply (rngl_opp_le_compat Hop Hor).
+    rewrite (rngl_opp_involutive Hop).
+    rewrite (rngl_opp_0 Hop).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  destruct zo2; [ easy | ].
+  apply rngl_leb_nle in Hzo2.
+  exfalso; apply Hzo2.
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_opp_0 Hop).
+  now apply (rngl_lt_le_incl Hor).
+}
+destruct z2; [ easy | ].
 ... 1
 progress unfold angle_ltb.
 rewrite (angle_add_comm Hic θ2).
