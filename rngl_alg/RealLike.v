@@ -2982,6 +2982,51 @@ apply rngl_leb_le in Hzs, Hθ.
 now apply (le_1_rngl_cos Hic Hon Hop Hed) in Hθ.
 Qed.
 
+Theorem angle_opp_inj :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, (- θ1)%A = (- θ2)%A → θ1 = θ2.
+Proof.
+intros Hop * H12.
+progress unfold angle_opp in H12.
+injection H12; clear H12; intros H1 H2.
+apply (rngl_opp_inj Hop) in H1.
+apply eq_angle_eq.
+now rewrite H1, H2.
+Qed.
+
+Theorem angle_leb_nle :
+  ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ ¬ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+now split; intros; apply Bool.not_true_iff_false.
+Qed.
+
+Theorem angle_leb_le :
+  ∀ θ1 θ2, (θ1 ≤? θ2)%A = true ↔ (θ1 ≤ θ2)%A.
+Proof. easy. Qed.
+
+Theorem eq_rngl_sin_0 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, rngl_sin θ = 0%L → θ = 0%A ∨ θ = angle_straight.
+Proof.
+intros Hic Hon Hop Hed * Hθ.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct θ as (c, s, Hcs).
+cbn in Hθ |-*.
+subst s; cbn.
+specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs) as H1.
+rewrite (rngl_squ_0 Hos) in H1.
+rewrite rngl_add_0_r in H1.
+rewrite <- (rngl_squ_1 Hon) in H1.
+apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in H1.
+now destruct H1; subst c; [ left | right ]; apply eq_angle_eq.
+Qed.
+
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
 (*
@@ -3104,6 +3149,91 @@ destruct z1. {
   destruct o2z; [ exfalso | easy ].
   apply (angle_eqb_neq Hed) in Hz2.
   apply (angle_le_0_r Hic Hon Hop Hed) in Ho2z.
+  rewrite <- (angle_opp_0 Hop) in Ho2z.
+  now apply angle_opp_inj in Ho2z.
+}
+cbn.
+apply (angle_eqb_neq Hed) in Hz1.
+remember (θ2 =? 0)%A as z2 eqn:Hz2.
+symmetry in Hz2.
+destruct z2; cbn. {
+  apply (angle_eqb_eq Hed) in Hz2.
+  subst θ2.
+  apply Bool.not_true_iff_false.
+  intros H.
+  apply (angle_le_0_r Hic Hon Hop Hed) in H.
+  rewrite <- (angle_opp_0 Hop) in H.
+  now apply (angle_opp_inj Hop) in H.
+}
+apply (angle_eqb_neq Hed) in Hz2.
+remember (- θ1 ≤? θ2)%A as o12 eqn:Ho12.
+remember (- θ2 ≤? θ1)%A as o21 eqn:Ho21.
+symmetry in Ho12, Ho21.
+destruct o12. {
+  destruct o21; [ easy | exfalso ].
+  apply angle_leb_nle in Ho21.
+  apply Ho21; clear Ho21.
+Theorem angle_opp_le_compat :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A ↔ (- θ2 ≤ - θ1)%A.
+Proof.
+intros Hic Hon Hop Hed * H1z H2z.
+progress unfold angle_leb.
+split; intros H12. {
+progress unfold angle_opp.
+cbn.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? - rngl_sin θ1)%L as zo1 eqn:Hzo1.
+remember (0 ≤? - rngl_sin θ2)%L as zo2 eqn:Hzo2.
+symmetry in Hz1, Hz2, Hzo1, Hzo2.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  destruct z2. {
+    apply rngl_leb_le in Hz2.
+    destruct zo1. {
+      apply rngl_leb_le in Hzo1.
+      apply (rngl_opp_le_compat Hop Hor) in Hzo1.
+      rewrite (rngl_opp_involutive Hop) in Hzo1.
+      rewrite (rngl_opp_0 Hop) in Hzo1.
+      apply (rngl_le_antisymm Hor) in Hz1; [ | easy ].
+      clear Hzo1.
+      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hz1.
+      destruct Hz1 as [Hz1| Hz1]; [ easy | ].
+      subst θ1; cbn in H12 |-*.
+      clear H1z.
+      apply rngl_leb_le in H12.
+      specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor θ2) as H1.
+      apply (rngl_le_antisymm Hor) in H12; [ | easy ].
+      symmetry in H12.
+      apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H12.
+      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H12.
+      destruct H12 as [H12| H12]; [ easy | ].
+      subst θ2; cbn in Hzo2 |-*.
+      clear H2z H1 Hz2.
+      rewrite (rngl_opp_0 Hop) in Hzo2.
+      rewrite (rngl_leb_refl Hor) in Hzo2; subst zo2.
+      apply (rngl_leb_refl Hor).
+    } {
+...
+Search (rngl_sin (- _))%A.
+Search (rngl_cos (- _))%A.
+...
+apply angle_opp_le_compat.
+Search (- - _)%L.
+...
+rewrite angle_opp_involutive.
+...
+Search ((- _ ≤ - _)%A).
+Search ((- _ ≤? - _)%A).
+Search ((- _ ≤ - _)%L).
+Search ((- _ ≤? - _)%L).
+...
+Search ((_ ≤? _)%A = false).
+Search ((_ ≤? _)%L = false).
 ...
 destruct θ as (c, s, Hcs).
 cbn in Hθ.
