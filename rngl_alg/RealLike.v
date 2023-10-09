@@ -3381,6 +3381,10 @@ destruct aov. 2: {
         rewrite (rngl_mul_1_l Hon).
         destruct zs2. {
           apply rngl_leb_le in Hzs2.
+          (* I think that θ2 < -θ1 is not compatible with 0 ≤ sin θ1
+             and 0 ≤ sin θ2 *)
+          exfalso.
+...
           rewrite (rngl_mul_1_l Hon).
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
