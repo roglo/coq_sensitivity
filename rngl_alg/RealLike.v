@@ -3199,6 +3199,50 @@ destruct o12. {
 }
 Qed.
 
+Theorem angle_div_2_0 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  angle_div_2 0 = 0%A.
+Proof.
+intros Hic Hon Hop Hed.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+assert (Hiq : rngl_has_inv_or_quot T = true). {
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now rewrite Hiv, Hon; left.
+}
+move Hi1 before Hos.
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  apply eq_angle_eq; cbn.
+  rewrite (rngl_leb_refl Hor).
+  now rewrite (H1 (_ * _))%L, (H1 √_)%L, (H1 1)%L.
+}
+specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H20.
+apply eq_angle_eq; cbn.
+rewrite (rngl_leb_refl Hor).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+f_equal.
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+apply (rl_sqrt_0 Hop Hic Hor Hid).
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3389,18 +3433,9 @@ remember (θ2 + angle_right)%A as θ2r eqn:Hθ2r.
     apply (angle_eqb_eq Hed) in Haov.
     subst θ1.
     rewrite (angle_add_0_l Hon Hos).
-Theorem angle_div_2_0 :
-  rngl_has_1 T = true →
-  angle_div_2 0 = 0%A.
-Proof.
-intros Hon.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-apply eq_angle_eq; cbn.
-rewrite (rngl_leb_refl Hor).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_div_diag Hon Hiq).
+    rewrite (angle_div_2_0 Hic Hon Hop Hed).
+    now rewrite (angle_add_0_l Hon Hos).
+  }
 ...
 cbn - [ rngl_cos rngl_sin ].
 rewrite angle_add_0_l.
