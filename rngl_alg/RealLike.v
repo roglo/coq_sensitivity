@@ -2900,13 +2900,43 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
+Theorem angle_eqb_refl :
+  rngl_has_eq_dec T = true →
+  ∀ θ, (θ =? θ)%A = true.
+Proof.
+intros Hed *.
+progress unfold angle_eqb.
+now do 2 rewrite (rngl_eqb_refl Hed).
+Qed.
+
+Theorem angle_eqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.
+Proof.
+intros Hed *.
+progress unfold angle_eqb.
+split; intros H12. {
+  intros H; subst θ2.
+  now do 2 rewrite (rngl_eqb_refl Hed) in H12.
+} {
+  apply Bool.not_true_iff_false.
+  intros H; apply H12; clear H12.
+  apply eq_angle_eq; cbn.
+  apply Bool.andb_true_iff in H.
+  destruct H as (Hc, Hs).
+  apply (rngl_eqb_eq Hed) in Hc, Hs.
+  now rewrite Hc, Hs.
+}
+Qed.
+
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(**)
-Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 (*
-Definition angle_add_overflow (θ1 θ2 : angle T) := ((θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
+Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 *)
+Definition angle_add_overflow (θ1 θ2 : angle T) :=
+  (negb (θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
+(**)
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -3008,31 +3038,19 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; left.
 }
 progress unfold angle_add_overflow.
-(* for the other definition of angle_add_overflow;
-   doesn't seem to work, but should be investigated
+(**)
 remember (θ1 =? 0)%A as z1 eqn:Hz1.
 symmetry in Hz1.
 destruct z1. {
   apply (angle_eqb_eq Hed) in Hz1.
   subst θ1; cbn.
-  rewrite (angle_opp_0 Hop).
-  remember (0 ≤? θ2)%A as zl2 eqn:Hzl2.
   remember (θ2 =? 0)%A as z2 eqn:Hz2.
   remember (- θ2 ≤? 0)%A as o2z eqn:Ho2z.
-  symmetry in Hzl2, Hz2, Ho2z.
-  destruct zl2. {
-    destruct z2. {
-      destruct o2z; [ easy | exfalso ].
-      apply (angle_eqb_eq Hed) in Hz2.
-      subst θ2.
-      rewrite (angle_opp_0 Hop) in Ho2z.
-      now rewrite angle_leb_refl in Ho2z.
-    }
-    exfalso.
-    destruct o2z. 2: {
-Search (_ ≤ _)%A.
+  symmetry in Hz2, Ho2z.
+  destruct z2; [ easy | ].
+  destruct o2z; [ exfalso | easy ].
+  apply (angle_eqb_neq Hed) in Hz2.
 ... 1
-*)
 progress unfold angle_ltb.
 rewrite (angle_add_comm Hic θ2).
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
