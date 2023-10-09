@@ -3381,10 +3381,6 @@ destruct aov. 2: {
         rewrite (rngl_mul_1_l Hon).
         destruct zs2. {
           apply rngl_leb_le in Hzs2.
-          (* I think that θ2 < -θ1 is not compatible with 0 ≤ sin θ1
-             and 0 ≤ sin θ2 *)
-          exfalso.
-...
           rewrite (rngl_mul_1_l Hon).
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
@@ -3417,26 +3413,43 @@ destruct aov. 2: {
           remember (√(_ * _))%L as y eqn:Hy in |-*.
           destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
             exfalso.
-            apply (rngl_mul_lt_mono_nonneg Hop Hor Hii x y) in Hxy; cycle 1. {
-              rewrite Hx; apply rl_sqrt_nonneg.
-              now apply (rngl_mul_nonneg_nonneg Hop Hor).
-            } {
-              easy.
-            } {
+            apply (rngl_nle_gt Hor) in Hxy.
+            apply Hxy; clear Hxy.
+            apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
               rewrite Hx; apply rl_sqrt_nonneg.
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
             }
-            do 2 rewrite fold_rngl_squ in Hxy.
+            do 2 rewrite fold_rngl_squ.
             subst x y.
-            rewrite rngl_squ_sqrt in Hxy. 2: {
+            rewrite rngl_squ_sqrt. 2: {
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
             }
-            rewrite rngl_squ_sqrt in Hxy. 2: {
+            rewrite rngl_squ_sqrt. 2: {
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
             }
-            assert ((rngl_cos θ2 < rngl_cos θ1)%L).
-(* by Haov *)
-(* ah, fait chier, merde *)
+            rewrite (rngl_mul_sub_distr_l Hop).
+            rewrite (rngl_mul_1_r Hon).
+            rewrite (rngl_mul_sub_distr_r Hop).
+            rewrite (rngl_mul_1_l Hon).
+            rewrite (rngl_sub_sub_distr Hop).
+            rewrite rngl_mul_add_distr_l.
+            rewrite (rngl_mul_1_r Hon).
+            rewrite rngl_mul_add_distr_r.
+            rewrite (rngl_mul_1_l Hon).
+            rewrite rngl_add_assoc.
+            apply (rngl_add_le_mono_r Hop Hor).
+            rewrite <- (rngl_sub_add_distr Hos).
+            apply (rngl_le_sub_le_add_r Hop Hor).
+            do 2 rewrite <- rngl_add_assoc.
+            apply (rngl_le_add_r Hor).
+            rewrite rngl_add_assoc.
+            rewrite rngl_add_add_swap.
+            rewrite rngl_add_assoc.
+            rewrite <- rngl_add_assoc.
+            rewrite (rngl_add_diag Hon).
+            rewrite (rngl_add_diag Hon (rngl_cos θ2)).
+            rewrite <- rngl_mul_add_distr_l.
+            apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 ...
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
