@@ -3398,9 +3398,41 @@ destruct aov. 2: {
           rewrite (rl_sqrt_squ Hop Hor).
           rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
           rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-...
-cbn - [ rngl_cos rngl_sin ].
-rewrite angle_add_0_l.
+          apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+          rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+          rewrite <- (rngl_abs_nonneg Hop Hor (√_ / _ * _))%L. 2: {
+            apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+            apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+              apply (rngl_lt_iff Hor).
+              split; [ now apply rl_sqrt_nonneg | ].
+              now apply not_eq_sym.
+            }
+            now apply rl_sqrt_nonneg.
+          }
+          remember (√(_ * _))%L as x eqn:Hx.
+          remember (√(_ * _))%L as y eqn:Hy in |-*.
+          destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
+            exfalso.
+            apply (rngl_mul_lt_mono_nonneg Hop Hor Hii x y) in Hxy; cycle 1. {
+              rewrite Hx; apply rl_sqrt_nonneg.
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            } {
+              easy.
+            } {
+              rewrite Hx; apply rl_sqrt_nonneg.
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+            do 2 rewrite fold_rngl_squ in Hxy.
+            subst x y.
+            rewrite rngl_squ_sqrt in Hxy. 2: {
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+            rewrite rngl_squ_sqrt in Hxy. 2: {
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+            assert ((rngl_cos θ2 < rngl_cos θ1)%L).
+(* by Haov *)
+(* ah, fait chier, merde *)
 ...
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
   specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
