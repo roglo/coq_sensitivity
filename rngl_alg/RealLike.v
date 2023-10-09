@@ -3243,6 +3243,39 @@ rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
 apply (rl_sqrt_0 Hop Hic Hor Hid).
 Qed.
 
+Theorem angle_leb_gt :
+  ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
+Proof.
+intros.
+progress unfold angle_leb.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs2; [ | easy ].
+  apply rngl_leb_le in Hzs2.
+  split; intros H12. {
+    apply (rngl_leb_gt Hor) in H12.
+    now apply rngl_ltb_lt.
+  } {
+    apply (rngl_leb_gt Hor).
+    now apply rngl_ltb_lt in H12.
+  }
+} {
+  apply (rngl_leb_gt Hor) in Hzs1.
+  destruct zs2; [ easy | ].
+  split; intros H12. {
+    apply (rngl_leb_gt Hor) in H12.
+    now apply rngl_ltb_lt.
+  } {
+    apply (rngl_leb_gt Hor).
+    now apply rngl_ltb_lt in H12.
+  }
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3436,6 +3469,9 @@ remember (θ2 + angle_right)%A as θ2r eqn:Hθ2r.
     rewrite (angle_div_2_0 Hic Hon Hop Hed).
     now rewrite (angle_add_0_l Hon Hos).
   }
+  apply angle_leb_gt in Haov.
+  f_equal. {
+    cbn.
 ...
 cbn - [ rngl_cos rngl_sin ].
 rewrite angle_add_0_l.
