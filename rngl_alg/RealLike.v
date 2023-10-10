@@ -3676,25 +3676,64 @@ destruct aov. 2: {
             apply (rngl_nle_gt Hor) in Hzc1, Hzc2.
             exfalso.
             apply angle_ltb_ge in Haov.
-...
-Search ((_ <? _) = true ↔ _ < _)%A.
-Search ((_ <? _) = true ↔ _ < _)%L.
-Search ((_ <? _) = true ↔ _ < _)%Z.
-
-Search ((_ <? _) = false ↔ _ ≤ _)%A.
-Search ((_ <? _) = false ↔ _ ≤ _)%L.
-Search ((_ <? _) = false ↔ _ ≤ _)%Z.
-...
-angle_ltb_lt:
-rngl_ltb_lt: ∀ (T : Type) (ro : ring_like_op T) (a b : T), (a <? b)%L = true ↔ (a < b)%L
-Z.ltb_lt: ∀ n m : Z, (n <? m)%Z = true ↔ (n < m)%Z
-
-angle_ltb_ge: ∀ θ1 θ2 : angle T, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A
-rngl_ltb_ge:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → rngl_is_ordered T = true → ∀ a b : T, (a <? b)%L = false ↔ (b ≤ a)%L
-Z.ltb_ge: ∀ x y : Z, (x <? y)%Z = false ↔ (y ≤ x)%Z
-...
+            apply (rngl_nlt_ge Hor) in Hzs3.
+            apply Hzs3; clear Hzs3.
+            rewrite Hθ3; cbn.
+            (* special case for sin θ2 = 0 *)
+            destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [H2z| H2z]. {
+              rewrite H2z, (rngl_mul_0_r Hos), rngl_add_0_l.
+              destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [H1z| H1z]. {
+                apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H2z, H1z.
+                destruct H2z as [H2z| H2z]. {
+                  subst θ2.
+                  apply (rngl_nle_gt Hor) in Hzc2.
+                  exfalso; apply Hzc2; clear Hzc2; cbn.
+                  apply (rngl_0_le_1 Hon Hop Hor).
+                }
+                subst θ2.
+                clear Hzs2 Hzc2.
+                exfalso.
+                destruct H1z as [H1z| H1z]. {
+                  subst θ1.
+                  apply (rngl_nle_gt Hor) in Hzc1.
+                  apply Hzc1; clear Hzc1; cbn.
+                  apply (rngl_0_le_1 Hon Hop Hor).
+                } {
+                  subst θ1.
+                  clear Hzc1 Hzs1.
+                  progress unfold angle_leb in Haov.
+                  cbn in Haov.
+                  rewrite (rngl_leb_refl Hor) in Haov.
+                  subst θ3.
+                  cbn in Haov.
+                  rewrite (rngl_mul_0_r Hos) in Haov.
+                  rewrite rngl_add_0_l in Haov.
+                  do 2 rewrite (rngl_mul_0_l Hos) in Haov.
+                  rewrite (rngl_leb_refl Hor) in Haov.
+                  apply rngl_leb_le in Haov.
+                  apply (rngl_nlt_ge Hor) in Haov.
+                  apply Haov; clear Haov.
+                  rewrite (rngl_squ_opp_1 Hon Hop).
+                  rewrite (rngl_sub_0_r Hos).
+                  apply (rngl_add_lt_mono_l Hop Hor _ _ 1)%L.
+                  rewrite (fold_rngl_sub Hop).
+                  now rewrite (rngl_sub_diag Hos).
+                }
+              }
+              apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+              apply (rngl_lt_iff Hor).
+              split; [ easy | ].
+              now apply not_eq_sym.
+            }
+            apply (rngl_add_neg_nonpos Hop Hor). {
+              rewrite (rngl_mul_comm Hic).
+              apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+              apply (rngl_lt_iff Hor).
+              split; [ easy | ].
+              now apply not_eq_sym.
+            }
+            apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
+            now apply (rngl_lt_le_incl Hor).
           }
           apply (rngl_nlt_ge Hor) in Hxy.
           rewrite <- (rngl_abs_nonneg Hop Hor). 2: {

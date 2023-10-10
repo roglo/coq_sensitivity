@@ -5020,6 +5020,20 @@ rewrite H in Hab.
 now apply (rngl_lt_irrefl Hor) in Hab.
 Qed.
 
+Theorem rngl_add_neg_nonpos :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a < 0)%L → (b ≤ 0)%L → (a + b < 0)%L.
+Proof.
+intros Hop Hor * Haz Hbz.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+eapply (rngl_lt_le_trans Hor); [ | apply Hbz ].
+apply (rngl_lt_add_lt_sub_r Hop Hor).
+now rewrite (rngl_sub_diag Hos).
+Qed.
+
 (* (-1) ^ n *)
 
 Definition minus_one_pow n :=
