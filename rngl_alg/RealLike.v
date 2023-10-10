@@ -3817,6 +3817,19 @@ destruct aov. 2: {
         (* parce que si on garde le but, on obtient qu'une racine
            carrée doit être égale à un négatif *)
         apply angle_ltb_ge in Haov.
+progress unfold angle_leb in Haov.
+cbn in Haov.
+apply (rngl_leb_le) in Hzs1.
+rewrite Hzs1 in Haov.
+apply (rngl_leb_le) in Hzs1.
+apply (rngl_leb_le) in Hzs3.
+rewrite Hzs3 in Haov.
+apply (rngl_leb_le) in Hzs3.
+apply rngl_leb_le in Haov.
+apply (rngl_nlt_ge Hor) in Haov.
+apply Haov; clear Haov.
+rewrite Hθ3; cbn.
+rewrite Hθ3 in Hzs3; cbn in Hzs3.
 ...
         rewrite rngl_mul_assoc.
         rewrite (rngl_mul_opp_r Hop).
