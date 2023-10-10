@@ -3525,27 +3525,37 @@ destruct aov. 2: {
                   rewrite <- (H1 θ1) at 1.
                   rewrite <- (H1 θ2) at 1.
                   do 2 rewrite (rngl_add_sub Hos).
-Search (_ ² < _ ²)%L.
-Search (_ ² ≤ _ ²)%L.
+                  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+                  rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+                  rewrite (rngl_abs_nonpos Hop Hor); [ easy | ].
+                  now apply (rngl_lt_le_incl Hor).
+                }
+                apply
+                  (rngl_le_lt_trans Hor _
+                     ((- rngl_cos θ2) * rngl_sin θ2 +
+                        rngl_sin θ1 * rngl_cos θ2))%L. {
+                  apply (rngl_add_le_mono_r Hop Hor).
+                  apply (rngl_mul_le_mono_pos_r Hop Hor Hii); [ easy | ].
+                  now apply (rngl_lt_le_incl Hor).
+                } {
+                  rewrite rngl_add_comm.
+                  rewrite (rngl_mul_comm Hic).
+                  rewrite (rngl_mul_opp_l Hop).
+                  rewrite (fold_rngl_sub Hop).
+                  rewrite <- (rngl_mul_sub_distr_l Hop).
+                  rewrite (rngl_mul_comm Hic).
+                  apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+                  now apply (rngl_lt_0_sub Hop Hor).
+                }
+              }
+            }
+            (* it's symmetric between θ1 and θ2 : therefore a lemma
+               or an assert should resolve this case too *)
 ...
-(* 1st option : sin θ2 < sin θ1 *)
-enough (Hs21 : (rngl_sin θ2 < rngl_sin θ1)%L).
-apply (rngl_le_lt_trans Hor _ ((- rngl_cos θ2) * rngl_sin θ2 + rngl_sin θ1 * rngl_cos θ2))%L. {
-  apply (rngl_add_le_mono_r Hop Hor).
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii).
-easy.
-now apply (rngl_lt_le_incl Hor).
-} {
-  rewrite rngl_add_comm.
-  rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (fold_rngl_sub Hop).
-  rewrite <- (rngl_mul_sub_distr_l Hop).
-rewrite (rngl_mul_comm Hic).
-  apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
-  now apply (rngl_lt_0_sub Hop Hor).
-}
+          }
+          apply (rngl_nlt_ge Hor) in Hxy.
 ...
+(* to be removed *)
 (* 2nd option : sin θ2 ≤ sin θ1 *)
 enough (Hs21 : (rngl_sin θ2 ≤ rngl_sin θ1)%L).
 apply (rngl_lt_le_trans Hor _ ((- rngl_cos θ2) * rngl_sin θ2 + rngl_sin θ1 * rngl_cos θ2))%L. {

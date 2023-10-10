@@ -4937,6 +4937,26 @@ destruct az. {
 }
 Qed.
 
+Theorem rngl_abs_lt_squ_lt :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a b : T, (rngl_abs a < rngl_abs b)%L → (a² < b²)%L.
+Proof.
+intros Hic Hop Hor Hii * Hab.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_abs_le_squ_le Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H.
+rewrite H in Hab.
+now apply (rngl_lt_irrefl Hor) in Hab.
+Qed.
+
 Theorem rngl_squ_le_abs_le :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
