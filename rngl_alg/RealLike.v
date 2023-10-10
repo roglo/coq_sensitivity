@@ -3590,12 +3590,32 @@ destruct aov. 2: {
             exfalso.
             apply (rngl_nle_gt Hor) in Hxy.
             apply Hxy; clear Hxy.
+subst x y.
+Theorem rngl_add_cos_nonneg_sqrt_mul_le :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (∀ θ : angle T, (0 ≤ 1 + rngl_cos θ)%L) →
+  (∀ θ : angle T, (0 ≤ 1 - rngl_cos θ)%L) →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
+  → (√((1 - rngl_cos θ1) * (1 - rngl_cos θ2)) ≤
+      √((1 + rngl_cos θ1) * (1 + rngl_cos θ2)))%L.
+Proof.
+intros Hon Hop Hii Hz1ac Hz1sc * H12.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1, (H1 √_)%L.
+  apply (rngl_le_refl Hor).
+}
             apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
-              rewrite Hx; apply rl_sqrt_nonneg.
+              apply rl_sqrt_nonneg.
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
             }
             do 2 rewrite fold_rngl_squ.
-            subst x y.
             rewrite rngl_squ_sqrt. 2: {
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
             }
@@ -3624,7 +3644,15 @@ destruct aov. 2: {
             rewrite (rngl_add_diag Hon).
             rewrite (rngl_add_diag Hon (rngl_cos θ2)).
             rewrite <- rngl_mul_add_distr_l.
-            apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+            apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+            apply (rngl_lt_le_incl Hor).
+            apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+Qed.
+apply (rngl_add_cos_nonneg_sqrt_mul_le Hon Hop Hii).
+...
+  ============================
+  (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
+...
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
               subst θ3.
               now apply rngl_add_cos_nonneg_when_sin_nonneg.
