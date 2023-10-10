@@ -4981,6 +4981,25 @@ destruct az. {
 }
 Qed.
 
+Theorem rngl_squ_lt_abs_lt :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b : T, (a² < b²)%L → (rngl_abs a < rngl_abs b)%L.
+Proof.
+intros Hop Hor Hii * Hab.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H.
+apply (f_equal rngl_squ) in H.
+do 2 rewrite (rngl_squ_abs Hop) in H.
+rewrite H in Hab.
+now apply (rngl_lt_irrefl Hor) in Hab.
+Qed.
+
 (* (-1) ^ n *)
 
 Definition minus_one_pow n :=

@@ -3516,6 +3516,17 @@ destruct aov. 2: {
                   now apply not_eq_sym.
                 }
                 clear H2z.
+                assert (Hs21 : (rngl_sin θ2 < rngl_sin θ1)%L). {
+                  rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+                  rewrite <- (rngl_abs_nonneg Hop Hor (_ θ2)); [ | easy ].
+                  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+                  apply (rngl_sub_lt_mono_l Hop Hor _ _ 1)%L.
+                  specialize (cos2_sin2_1 Hon Hop Hic Hed) as H1.
+                  rewrite <- (H1 θ1) at 1.
+                  rewrite <- (H1 θ2) at 1.
+                  do 2 rewrite (rngl_add_sub Hos).
+Search (_ ² < _ ²)%L.
+Search (_ ² ≤ _ ²)%L.
 ...
 (* 1st option : sin θ2 < sin θ1 *)
 enough (Hs21 : (rngl_sin θ2 < rngl_sin θ1)%L).
