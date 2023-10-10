@@ -3813,9 +3813,10 @@ destruct aov. 2: {
           easy.
         }
         apply (rngl_leb_gt Hor) in Hzs2.
-exfalso.
-(* parce que si on garde le but, on obtient qu'une racine
-   carrée doit être égale à un négatif *)
+        exfalso.
+        (* parce que si on garde le but, on obtient qu'une racine
+           carrée doit être égale à un négatif *)
+        apply angle_ltb_ge in Haov.
 ...
         rewrite rngl_mul_assoc.
         rewrite (rngl_mul_opp_r Hop).
