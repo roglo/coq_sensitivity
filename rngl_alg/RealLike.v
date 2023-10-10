@@ -3103,13 +3103,14 @@ Qed.
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(*
+(**)
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
-*)
+(*
 Definition angle_add_overflow (θ1 θ2 : angle T) :=
   (negb (θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
-(**)
+*)
 
+(*
 Theorem angle_add_overflow_comm :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3178,6 +3179,7 @@ destruct o12. {
   now rewrite (angle_opp_involutive Hop).
 }
 Qed.
+*)
 
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
@@ -3223,8 +3225,7 @@ rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
 apply (rl_sqrt_0 Hop Hic Hor Hid).
 Qed.
 
-Theorem angle_leb_gt :
-  ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
+Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
 Proof.
 intros.
 progress unfold angle_leb.
@@ -3252,6 +3253,37 @@ destruct zs1. {
   } {
     apply (rngl_leb_gt Hor).
     now apply rngl_ltb_lt in H12.
+  }
+}
+Qed.
+
+Theorem angle_ltb_ge : ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+split; intros H12. {
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    apply (rngl_ltb_ge Hor) in H12.
+    now apply rngl_leb_le.
+  } {
+    destruct zs2; [ easy | ].
+    apply (rngl_ltb_ge Hor) in H12.
+    now apply rngl_leb_le.
+  }
+} {
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in H12.
+    now apply (rngl_ltb_ge Hor).
+  } {
+    destruct zs2; [ easy | ].
+    apply rngl_leb_le in H12.
+    now apply (rngl_ltb_ge Hor).
   }
 }
 Qed.
@@ -3497,6 +3529,7 @@ assert (Hs2z : (√2 ≠ 0)%L). {
 destruct aov. 2: {
   apply eq_angle_eq.
   progress unfold angle_add_overflow in Haov.
+(*
   apply Bool.andb_false_iff in Haov.
   destruct Haov as [Haov| Haov]. {
     apply Bool.negb_false_iff in Haov.
@@ -3507,6 +3540,7 @@ destruct aov. 2: {
     now rewrite (angle_add_0_l Hon Hos).
   }
   apply angle_leb_gt in Haov.
+*)
   f_equal. {
     remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
     cbn.
@@ -3603,6 +3637,25 @@ destruct aov. 2: {
             }
             apply (rngl_nle_gt Hor) in Hzc1, Hzc2.
             exfalso.
+            apply angle_ltb_ge in Haov.
+...
+Search ((_ <? _) = true ↔ _ < _)%A.
+Search ((_ <? _) = true ↔ _ < _)%L.
+Search ((_ <? _) = true ↔ _ < _)%Z.
+
+Search ((_ <? _) = false ↔ _ ≤ _)%A.
+Search ((_ <? _) = false ↔ _ ≤ _)%L.
+Search ((_ <? _) = false ↔ _ ≤ _)%Z.
+...
+angle_ltb_lt:
+rngl_ltb_lt: ∀ (T : Type) (ro : ring_like_op T) (a b : T), (a <? b)%L = true ↔ (a < b)%L
+Z.ltb_lt: ∀ n m : Z, (n <? m)%Z = true ↔ (n < m)%Z
+
+angle_ltb_ge: ∀ θ1 θ2 : angle T, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A
+rngl_ltb_ge:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_is_ordered T = true → ∀ a b : T, (a <? b)%L = false ↔ (b ≤ a)%L
+Z.ltb_ge: ∀ x y : Z, (x <? y)%Z = false ↔ (y ≤ x)%Z
 ...
           }
           apply (rngl_nlt_ge Hor) in Hxy.
