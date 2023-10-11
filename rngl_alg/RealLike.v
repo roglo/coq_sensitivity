@@ -3934,26 +3934,29 @@ destruct aov. 2: {
         (* parce que si on garde le but, on obtient qu'une racine
            carrée doit être égale à un négatif *)
         apply angle_ltb_ge in Haov.
-progress unfold angle_leb in Haov.
-cbn in Haov.
-apply (rngl_leb_le) in Hzs1.
-rewrite Hzs1 in Haov.
-apply (rngl_leb_le) in Hzs1.
-apply (rngl_leb_le) in Hzs3.
-rewrite Hzs3 in Haov.
-apply (rngl_leb_le) in Hzs3.
-apply rngl_leb_le in Haov.
-apply (rngl_nlt_ge Hor) in Haov.
-apply Haov; clear Haov.
-(**)
-apply (rngl_nle_gt Hor).
-intros Hc31.
-apply (rngl_nle_gt Hor) in Hzs2.
-apply Hzs2; clear Hzs2.
-symmetry in Hθ3.
-apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
-subst θ2.
-Check rngl_sin_nonneg_cos_le_sin_sub_nonneg.
+        progress unfold angle_leb in Haov.
+        cbn in Haov.
+        apply (rngl_leb_le) in Hzs1.
+        rewrite Hzs1 in Haov.
+        apply (rngl_leb_le) in Hzs1.
+        apply (rngl_leb_le) in Hzs3.
+        rewrite Hzs3 in Haov.
+        apply (rngl_leb_le) in Hzs3.
+        apply rngl_leb_le in Haov.
+        apply (rngl_nlt_ge Hor) in Haov.
+        apply Haov; clear Haov.
+        apply (rngl_nle_gt Hor).
+        intros Hc31.
+        apply (rngl_nle_gt Hor) in Hzs2.
+        apply Hzs2; clear Hzs2.
+        symmetry in Hθ3.
+        apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
+        subst θ2.
+        now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
+      }
+      apply (rngl_leb_gt Hor) in Hzs1.
+      destruct zs2. {
+        apply rngl_leb_le in Hzs2.
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
