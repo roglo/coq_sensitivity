@@ -3617,6 +3617,12 @@ split. {
 }
 Qed.
 
+Theorem rngl_cos_opp : ∀ θ, rngl_cos (- θ) = rngl_cos θ.
+Proof. easy. Qed.
+
+Theorem rngl_sin_opp : ∀ θ, rngl_sin (- θ) = (- rngl_sin θ)%L.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3745,6 +3751,7 @@ destruct aov. 2: {
         destruct zs2. {
           apply rngl_leb_le in Hzs2.
           rewrite (rngl_mul_1_l Hon).
+(**)
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
@@ -3967,6 +3974,45 @@ destruct aov. 2: {
         now rewrite Hzs3 in Haov.
       }
       apply (rngl_leb_gt Hor) in Hzs2.
+      rewrite rngl_mul_assoc.
+      rewrite (rngl_mul_mul_swap Hic (-1))%L.
+      rewrite (rngl_squ_opp_1 Hon Hop).
+      rewrite (rngl_mul_1_l Hon).
+      apply (rngl_opp_lt_compat Hop Hor) in Hzs1, Hzs2.
+      rewrite (rngl_opp_0 Hop) in Hzs1, Hzs2.
+      rewrite <- rngl_sin_opp in Hzs1, Hzs2.
+      apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+      rewrite <- (rngl_cos_opp θ1).
+      rewrite <- (rngl_cos_opp θ2).
+      remember (- θ1)%A as θ.
+      apply (f_equal angle_opp) in Heqθ.
+      rewrite (angle_opp_involutive Hop) in Heqθ.
+      subst θ1; rename θ into θ1.
+      remember (- θ2)%A as θ.
+      apply (f_equal angle_opp) in Heqθ.
+      rewrite (angle_opp_involutive Hop) in Heqθ.
+      subst θ2; rename θ into θ2.
+      apply (f_equal angle_opp) in Hθ3.
+...
+      rewrite angle_opp_add_distr in Hθ3.
+(**)
+...
+  Haov : (θ3 <? θ1)%A = false
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 ≤ rngl_sin θ2)%L
+  Hzs3 : (0 ≤ rngl_sin θ3)%L
+  ============================
+  √((1 + rngl_cos θ3) / 2)%L =
+  (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) - √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+...
+  Haov : (θ3 <? θ1)%A = false
+  Hzs1 : (rngl_sin θ1 < 0)%L
+  Hzs2 : (rngl_sin θ2 < 0)%L
+  Hzs3 : (0 ≤ rngl_sin θ3)%L
+  ============================
+  √((1 + rngl_cos θ3) / 2)%L =
+  (-1 * √((1 + rngl_cos θ1) / 2) * (-1 * √((1 + rngl_cos θ2) / 2)) -
+   √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
