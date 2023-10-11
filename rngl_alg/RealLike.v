@@ -3704,6 +3704,19 @@ apply eq_angle_eq; cbn.
 now rewrite (rngl_opp_involutive Hop).
 Qed.
 
+Theorem rngl_cos_add_straight :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (θ + angle_straight) = (- rngl_cos θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_0_r Hos).
+apply (rngl_sub_0_r Hos).
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -4090,8 +4103,15 @@ destruct aov. 2: {
           apply (rngl_nle_gt Hor) in Hxy.
           apply Hxy; clear Hxy.
           subst x y.
+          progress unfold rngl_sub.
+          rewrite Hop.
+          do 2 rewrite <- (rngl_sub_opp_r Hop).
+          do 2 rewrite <- (rngl_cos_add_straight Hon Hop).
+          apply (rngl_add_cos_nonneg_sqrt_mul_le Hic Hon Hop Hed Hii). {
 ...
-          apply (rngl_add_cos_nonneg_sqrt_mul_le Hic Hon Hop Hed Hii).
+            do 2 rewrite (rngl_cos_add_straight Hon Hop).
+Check rngl_add_cos_nonneg_when_sin_nonneg.
+...
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
               subst θ3.
               now apply rngl_add_cos_nonneg_when_sin_nonneg.
