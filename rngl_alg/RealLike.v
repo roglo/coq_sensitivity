@@ -3543,15 +3543,29 @@ Qed.
 
 Theorem rngl_sin_nonneg_cos_le_angle_le :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ2)%L
-  → (rngl_cos θ1 ≤ rngl_cos θ2)%L
-  → (θ2 ≤ θ1)%A.
+  (0 ≤ rngl_sin θ1)%L
+  → (rngl_cos θ2 ≤ rngl_cos θ1)%L
+  → (θ1 ≤ θ2)%A.
 Proof.
 intros * Hzs2 Hc12.
 progress unfold angle_leb.
 apply (rngl_leb_le) in Hzs2, Hc12.
 rewrite Hzs2.
-now destruct (0 ≤? rngl_sin θ1)%L.
+now destruct (0 ≤? rngl_sin θ2)%L.
+Qed.
+
+Theorem rngl_sin_nonneg_sin_neg_angle_lt :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (rngl_sin θ2 < 0)%L
+  → (θ1 < θ2)%A.
+Proof.
+intros * Hzs1 Hs2z.
+progress unfold angle_ltb.
+apply rngl_leb_le in Hzs1.
+rewrite Hzs1.
+apply (rngl_leb_gt Hor) in Hs2z.
+now rewrite Hs2z.
 Qed.
 
 Theorem rngl_sin_nonneg_cos_le_sin_le :
@@ -3818,7 +3832,6 @@ destruct aov. 2: {
         destruct zs2. {
           apply rngl_leb_le in Hzs2.
           rewrite (rngl_mul_1_l Hon).
-(**)
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
           rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
@@ -4041,91 +4054,13 @@ destruct aov. 2: {
         now rewrite Hzs3 in Haov.
       }
       apply (rngl_leb_gt Hor) in Hzs2.
-exfalso.
-apply angle_ltb_ge in Haov.
-...
-      rewrite rngl_mul_assoc.
-      rewrite (rngl_mul_mul_swap Hic (-1))%L.
-      rewrite (rngl_squ_opp_1 Hon Hop).
-      rewrite (rngl_mul_1_l Hon).
-(*
-      apply (rngl_opp_lt_compat Hop Hor) in Hzs1, Hzs2.
-      rewrite (rngl_opp_0 Hop) in Hzs1, Hzs2.
-      rewrite <- rngl_sin_opp in Hzs1, Hzs2.
-      rewrite <- (rngl_cos_opp θ1).
-      rewrite <- (rngl_cos_opp θ2).
-      remember (- θ1)%A as θ.
-      apply (f_equal angle_opp) in Heqθ.
-      rewrite (angle_opp_involutive Hop) in Heqθ.
-      subst θ1; rename θ into θ1.
-      remember (- θ2)%A as θ.
-      apply (f_equal angle_opp) in Heqθ.
-      rewrite (angle_opp_involutive Hop) in Heqθ.
-      subst θ2; rename θ into θ2.
-      apply (f_equal angle_opp) in Hθ3.
-      rewrite (angle_opp_add_distr Hic Hop) in Hθ3.
-      rewrite (angle_opp_involutive Hop) in Hθ3.
-      rewrite (angle_sub_opp_r Hop) in Hθ3.
-      rewrite <- (rngl_cos_opp θ3).
-      remember (- θ3)%A as θ.
-      apply (f_equal angle_opp) in Heqθ.
-      rewrite (angle_opp_involutive Hop) in Heqθ.
-      subst θ3; rename θ into θ3.
-      rewrite (angle_add_comm Hic) in Hθ3.
-      rewrite rngl_sin_opp in Hzs3.
-      apply (rngl_opp_le_compat Hop Hor) in Hzs3.
-      rewrite (rngl_opp_involutive Hop) in Hzs3.
-      rewrite (rngl_opp_0 Hop) in Hzs3.
-*)
-      (**)
-      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
-      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
-      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
-      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
-      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
-      do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
-      do 2 rewrite (rngl_mul_div_assoc Hiv).
-      rewrite <- rl_sqrt_mul; [ | easy | easy ].
-      rewrite <- rl_sqrt_mul; [ | easy | easy ].
-      rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
-      rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
-      rewrite <- rl_sqrt_mul; [ | easy | easy ].
-      rewrite fold_rngl_squ.
-      rewrite (rl_sqrt_squ Hop Hor).
-      rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
-      rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-      apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
-      rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
-      rewrite <- (rngl_abs_nonneg Hop Hor (√_ / _ * _))%L. 2: {
-        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-        apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-          apply (rngl_lt_iff Hor).
-          split; [ now apply rl_sqrt_nonneg | ].
-          now apply not_eq_sym.
-        }
-        now apply rl_sqrt_nonneg.
-      }
-      remember (√(_ * _))%L as x eqn:Hx.
-      remember (√(_ * _))%L as y eqn:Hy in |-*.
-      destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
-        exfalso.
-        apply (rngl_nle_gt Hor) in Hxy.
-        apply Hxy; clear Hxy.
-        subst x y.
-        apply (rngl_add_cos_nonneg_sqrt_mul_le Hic Hon Hop Hed Hii).
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-          subst θ3.
-          apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
-          apply rngl_add_cos_nonneg_when_sin_nonpos; try easy.
-(* ah bin non *)
-...
-  Haov : (θ3 <? θ1)%A = false
-  Hzs1 : (0 ≤ rngl_sin θ1)%L
-  Hzs2 : (0 ≤ rngl_sin θ2)%L
-  Hzs3 : (0 ≤ rngl_sin θ3)%L
-  ============================
-  √((1 + rngl_cos θ3) / 2)%L =
-  (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) - √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+      exfalso.
+      apply angle_ltb_ge in Haov.
+      specialize (rngl_sin_nonneg_sin_neg_angle_lt _ _ Hzs3 Hzs1) as H1.
+      apply angle_leb_gt in H1.
+      now apply angle_leb_nle in H1.
+    }
+    apply (rngl_leb_gt Hor) in Hzs3.
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
