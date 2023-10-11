@@ -3477,6 +3477,19 @@ rewrite (angle_sub_diag Hic Hon Hop Hed).
 apply (angle_add_0_r Hon Hos).
 Qed.
 
+Theorem rngl_sin_nonneg_cos_le_angle_le :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L
+  → (θ2 ≤ θ1)%A.
+Proof.
+intros * Hzs2 Hc12.
+progress unfold angle_leb.
+apply (rngl_leb_le) in Hzs2, Hc12.
+rewrite Hzs2.
+now destruct (0 ≤? rngl_sin θ1)%L.
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3823,6 +3836,7 @@ rewrite (rngl_mul_comm Hic (rngl_sin _)).
 *)
 Theorem glop :
   rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -3830,17 +3844,16 @@ Theorem glop :
   → (rngl_cos θ1 ≤ rngl_cos θ2)%L
   → (0 ≤ rngl_sin (θ1 - θ2))%L.
 Proof.
-intros Hic Hop * Hs1 Hs2 Hc12.
+intros Hic Hon Hop * Hs1 Hs2 Hc12.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite rngl_add_comm.
 rewrite (fold_rngl_sub Hop).
 apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_mul_comm Hic (rngl_sin _)).
-replace (rngl_cos θ2) with (rngl_cos θ1 + (rngl_cos θ2 - rngl_cos θ1))%L.
-rewrite rngl_mul_add_distr_r.
-remember (rngl_cos θ2 - rngl_cos θ1)%L as Δ eqn:HΔ.
-...
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+  assert (Hss : (rngl_sin θ2 ≤ rngl_sin θ1)%L).
 Theorem glop :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -3849,6 +3862,13 @@ Theorem glop :
   → if (0 ≤? rngl_cos θ1)%L then (rngl_sin θ2 ≤ rngl_sin θ1)%L
     else if (0 ≤? rngl_cos θ2)%L then (0 ≤ rngl_sin (θ1 - θ2))%L
     else (rngl_sin θ1 ≤ rngl_sin θ2)%L.
+Proof.
+intros * Hzs1 Hzs2 Hc12.
+remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+symmetry in Hzc1.
+destruct zc1. {
+  apply rngl_leb_le in Hzc1.
+  specialize (rngl_sin_nonneg_cos_le_angle_le _ _ Hzs2 Hc12) as H1.
 ...
 specialize (glop _ _ Hzs3 Hzs1 Hc31) as H1.
 ...
