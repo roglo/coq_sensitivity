@@ -3811,7 +3811,46 @@ intros Hc31.
 apply (rngl_nle_gt Hor) in Hzs2.
 apply Hzs2; clear Hzs2.
 symmetry in Hθ3.
-apply angle_add_sub_eq_l in Hθ3.
+apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
+subst θ2.
+(*
+subst θ2; cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite rngl_add_comm.
+rewrite (fold_rngl_sub Hop).
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_mul_comm Hic (rngl_sin _)).
+*)
+Theorem glop :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 - θ2))%L.
+Proof.
+intros Hic Hop * Hs1 Hs2 Hc12.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite rngl_add_comm.
+rewrite (fold_rngl_sub Hop).
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_mul_comm Hic (rngl_sin _)).
+replace (rngl_cos θ2) with (rngl_cos θ1 + (rngl_cos θ2 - rngl_cos θ1))%L.
+rewrite rngl_mul_add_distr_r.
+remember (rngl_cos θ2 - rngl_cos θ1)%L as Δ eqn:HΔ.
+...
+Theorem glop :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L
+  → if (0 ≤? rngl_cos θ1)%L then (rngl_sin θ2 ≤ rngl_sin θ1)%L
+    else if (0 ≤? rngl_cos θ2)%L then (0 ≤ rngl_sin (θ1 - θ2))%L
+    else (rngl_sin θ1 ≤ rngl_sin θ2)%L.
+...
+specialize (glop _ _ Hzs3 Hzs1 Hc31) as H1.
 ...
         rewrite rngl_mul_assoc.
         rewrite (rngl_mul_opp_r Hop).
