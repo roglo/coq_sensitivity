@@ -1920,7 +1920,7 @@ apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
-Theorem rngl_sub_opp :
+Theorem rngl_sub_opp_r :
   rngl_has_opp T = true →
   ∀ a b, (a - - b = a + b)%L.
 Proof.
@@ -2219,7 +2219,7 @@ Proof.
 intros * Hop Hor *.
 split; intros Hxy. {
   apply (rngl_le_0_sub Hop Hor).
-  rewrite (rngl_sub_opp Hop).
+  rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_comm, (fold_rngl_sub Hop).
   now apply (rngl_le_0_sub Hop Hor).
 } {
@@ -4154,7 +4154,7 @@ remember (a ≤? 0)%L as c eqn:Hc; symmetry in Hc.
 destruct c; [ | apply (rngl_le_refl Hor) ].
 apply rngl_leb_le in Hc.
 apply (rngl_le_sub_0 Hop Hor).
-rewrite (rngl_sub_opp Hop).
+rewrite (rngl_sub_opp_r Hop).
 rewrite <- (rngl_add_0_l 0%L).
 now apply (rngl_add_le_compat Hor).
 Qed.

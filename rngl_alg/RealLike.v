@@ -3450,7 +3450,7 @@ Proof.
 intros Hic Hon Hop Hed *.
 apply eq_angle_eq; cbn.
 rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp Hop).
+rewrite (rngl_sub_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
 rewrite (cos2_sin2_1 Hon Hop Hic Hed).
 f_equal.
@@ -3622,6 +3622,35 @@ Proof. easy. Qed.
 
 Theorem rngl_sin_opp : ∀ θ, rngl_sin (- θ) = (- rngl_sin θ)%L.
 Proof. easy. Qed.
+
+Theorem angle_opp_add_distr :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, (- (θ1 + θ2))%A = (- θ2 - θ1)%A.
+Proof.
+intros Hic Hop *.
+apply eq_angle_eq; cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (fold_rngl_sub Hop).
+do 2 rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
+do 2 rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
+f_equal.
+rewrite (rngl_opp_add_distr Hop).
+rewrite <- (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+now rewrite (fold_rngl_sub Hop).
+Qed.
+
+Theorem angle_sub_opp_r :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, (θ1 - - θ2)%A = (θ1 + θ2)%A.
+Proof.
+intros Hop *.
+apply eq_angle_eq; cbn.
+now rewrite (rngl_opp_involutive Hop).
+Qed.
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -3981,7 +4010,6 @@ destruct aov. 2: {
       apply (rngl_opp_lt_compat Hop Hor) in Hzs1, Hzs2.
       rewrite (rngl_opp_0 Hop) in Hzs1, Hzs2.
       rewrite <- rngl_sin_opp in Hzs1, Hzs2.
-      apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
       rewrite <- (rngl_cos_opp θ1).
       rewrite <- (rngl_cos_opp θ2).
       remember (- θ1)%A as θ.
@@ -3993,9 +4021,20 @@ destruct aov. 2: {
       rewrite (angle_opp_involutive Hop) in Heqθ.
       subst θ2; rename θ into θ2.
       apply (f_equal angle_opp) in Hθ3.
-...
-      rewrite angle_opp_add_distr in Hθ3.
-(**)
+      rewrite (angle_opp_add_distr Hic Hop) in Hθ3.
+      rewrite (angle_opp_involutive Hop) in Hθ3.
+      rewrite (angle_sub_opp_r Hop) in Hθ3.
+      rewrite <- (rngl_cos_opp θ3).
+      remember (- θ3)%A as θ.
+      apply (f_equal angle_opp) in Heqθ.
+      rewrite (angle_opp_involutive Hop) in Heqθ.
+      subst θ3; rename θ into θ3.
+      rewrite (angle_add_comm Hic) in Hθ3.
+      rewrite rngl_sin_opp in Hzs3.
+      apply (rngl_opp_le_compat Hop Hor) in Hzs3.
+      rewrite (rngl_opp_involutive Hop) in Hzs3.
+      rewrite (rngl_opp_0 Hop) in Hzs3.
+      (**)
 ...
   Haov : (θ3 <? θ1)%A = false
   Hzs1 : (0 ≤ rngl_sin θ1)%L
@@ -4004,15 +4043,6 @@ destruct aov. 2: {
   ============================
   √((1 + rngl_cos θ3) / 2)%L =
   (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) - √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
-...
-  Haov : (θ3 <? θ1)%A = false
-  Hzs1 : (rngl_sin θ1 < 0)%L
-  Hzs2 : (rngl_sin θ2 < 0)%L
-  Hzs3 : (0 ≤ rngl_sin θ3)%L
-  ============================
-  √((1 + rngl_cos θ3) / 2)%L =
-  (-1 * √((1 + rngl_cos θ1) / 2) * (-1 * √((1 + rngl_cos θ2) / 2)) -
-   √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
