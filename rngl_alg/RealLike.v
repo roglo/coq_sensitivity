@@ -3957,6 +3957,16 @@ destruct aov. 2: {
       apply (rngl_leb_gt Hor) in Hzs1.
       destruct zs2. {
         apply rngl_leb_le in Hzs2.
+        exfalso.
+        apply angle_ltb_ge in Haov.
+        progress unfold angle_leb in Haov.
+        cbn in Haov.
+        apply (rngl_leb_gt Hor) in Hzs1.
+        rewrite Hzs1 in Haov.
+        apply (rngl_leb_le) in Hzs3.
+        now rewrite Hzs3 in Haov.
+      }
+      apply (rngl_leb_gt Hor) in Hzs2.
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
