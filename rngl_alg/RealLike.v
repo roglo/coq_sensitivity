@@ -151,9 +151,7 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
@@ -172,9 +170,7 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_squ_0 Hos).
 rewrite (rngl_squ_1 Hon).
 rewrite rngl_add_0_l.
@@ -192,9 +188,7 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_squ_opp Hop).
 progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
@@ -500,9 +494,7 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hε : (ε² = 1)%L). {
   progress unfold ε.
   destruct (0 ≤? _)%L. {
@@ -628,9 +620,7 @@ Theorem rl_sqrt_0 :
   rl_sqrt 0%L = 0%L.
 Proof.
 intros Hop Hic Hor Hii.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rl_nth_root_pow 2 0%L (rngl_le_refl Hor _)) as H1.
 rewrite <- (rngl_squ_0 Hos) in H1 at 2.
 rewrite <- rngl_squ_pow_2 in H1.
@@ -676,9 +666,7 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_eqb_eq Hed).
 rewrite rngl_squ_sqrt. 2: {
   apply (rngl_le_add_le_sub_r Hop Hor).
@@ -814,9 +802,7 @@ Theorem angle_div_2_mul_2 :
   ∀ a, angle_mul_nat (angle_div_2 a) 2 = a.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -964,9 +950,7 @@ Theorem angle_mul_2_div_2 :
     if angle_ltb a angle_straight then a else angle_add a angle_straight.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -1252,9 +1236,7 @@ Theorem gc_mul_assoc :
   ∀ a b c : GComplex T, (a * (b * c))%L = (a * b * c)%L.
 Proof.
 intros * Hop *; cbn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold gc_mul; cbn.
 do 2 rewrite (rngl_mul_sub_distr_l Hop).
 do 2 rewrite (rngl_mul_sub_distr_r Hop).
@@ -1412,9 +1394,7 @@ Theorem gc_opt_add_opp_l :
   else not_applicable.
 Proof.
 intros * Hop.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 remember (rngl_has_opp (GComplex T)) as opc eqn:Hopc; symmetry in Hopc.
 destruct opc; [ | easy ].
 intros.
@@ -1539,9 +1519,7 @@ assert (Hiv : rngl_has_inv T = true). {
   now destruct iq.
 }
 *)
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hic : rngl_mul_is_comm T = true). {
   progress unfold rngl_has_inv in Hivc; cbn in Hivc.
   progress unfold gc_opt_inv_or_quot in Hivc.
@@ -1742,9 +1720,7 @@ Theorem le_rl_sqrt_add :
   ∀ a b, (0 ≤ b → a ≤ rl_sqrt (rngl_squ a + b))%L.
 Proof.
 intros * Hon Hop Heb * Hzb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -1782,9 +1758,7 @@ Theorem rl_sqrt_div_squ_squ :
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
 intros * Hon Hop Hed Hmi * Hxyz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hxy : (0 ≤ x² + y²)%L). {
   apply (rngl_add_nonneg_nonneg Hor);
   apply (rngl_square_ge_0 Hop Hor).
@@ -1874,9 +1848,7 @@ Theorem polar :
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 intros * Hic Hon Hop Hed Hmi * Hρ Hθ.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -2090,9 +2062,7 @@ Theorem rngl_rat_frac_part_lt_1 :
   → (rngl_of_nat a / rngl_of_nat b - rngl_of_nat (a / b) < 1)%L.
 Proof.
 intros Hon Hop * Hrbz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   now rewrite (H1 (rngl_of_nat b)) in Hrbz.
@@ -2148,9 +2118,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
 Proof.
 intros Hic Hon Hop Har * H2r Hbz.
 intros ε Hε.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -2375,9 +2343,7 @@ Theorem angle_right_add_angle_right :
   (angle_right + angle_right = angle_straight)%A.
 Proof.
 intros Hon Hop.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_0_l Hos).
 do 2 rewrite (rngl_mul_1_l Hon).
@@ -2431,9 +2397,7 @@ Theorem angle_add_assoc :
   ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%A.
 Proof.
 intros Hop *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq; cbn.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -2472,9 +2436,7 @@ Theorem angle_add_opp_l :
   ∀ θ, (- θ + θ = 0)%A.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_opp_l Hop).
 progress unfold rngl_sub.
@@ -2494,9 +2456,7 @@ Theorem angle_mul_add_distr_r :
   ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
 Proof.
 intros Hon Hop *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
 rewrite IHa.
 apply (angle_add_assoc Hop).
@@ -2543,9 +2503,7 @@ Theorem angle_dist_separation :
   ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
 Proof.
 intros Hic Hon Hop Hed * H12.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2586,9 +2544,7 @@ Theorem rl_sqrt_sqr_le_sqrt_add_sqrt :
   (√((a + b)² + (c + d)²) ≤ √(a² + c²) + √(b² + d²))%L.
 Proof.
 intros Hic Hon Hop *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -2715,9 +2671,7 @@ Theorem angle_dist_triangular :
   (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
@@ -2766,9 +2720,7 @@ Theorem rngl_sin_add_angle_straight_r :
   ∀ θ, (rngl_sin (θ + angle_straight) = - rngl_sin θ)%L.
 Proof.
 intros Hon Hop *; cbn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_l.
 rewrite (rngl_mul_opp_r Hop).
@@ -2784,9 +2736,7 @@ Theorem eq_rngl_cos_opp_1 :
   ∀ θ, (rngl_cos θ = -1 → rngl_sin θ = 0)%L.
 Proof.
 intros Hic Hon Hop Hed * Hθ.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2897,9 +2847,7 @@ Theorem le_1_rngl_cos :
   ∀ θ, (1 ≤ rngl_cos θ)%L → θ = 0%A.
 Proof.
 intros Hic Hon Hop Hed * Hθ.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -2973,9 +2921,7 @@ Theorem eq_rngl_sin_0 :
   ∀ θ, rngl_sin θ = 0%L → θ = 0%A ∨ θ = angle_straight.
 Proof.
 intros Hic Hon Hop Hed * Hθ.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct θ as (c, s, Hcs).
 cbn in Hθ |-*.
 subst s; cbn.
@@ -3119,9 +3065,7 @@ Theorem angle_add_overflow_comm :
   ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_add_overflow.
 remember (θ1 =? 0)%A as z1 eqn:Hz1.
 symmetry in Hz1.
@@ -3189,9 +3133,7 @@ Theorem angle_div_2_0 :
   angle_div_2 0 = 0%A.
 Proof.
 intros Hic Hon Hop Hed.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -3302,9 +3244,7 @@ Theorem rngl_add_cos_nonneg_when_sin_nonneg :
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzs3 Hzc1.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -3452,9 +3392,7 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
   rewrite rngl_add_0_l.
   apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 }
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1, (H1 √_)%L.
@@ -3498,6 +3436,47 @@ apply (rngl_lt_le_incl Hor).
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem fold_angle_sub :
+  ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%A.
+Proof. easy. Qed.
+
+Theorem angle_sub_diag :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, (θ - θ = 0)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+apply eq_angle_eq; cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp Hop).
+do 2 rewrite fold_rngl_squ.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+f_equal.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_add_opp_l Hop).
+Qed.
+
+Theorem angle_add_sub_eq_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b c, (a + b)%A = c → (c - a)%A = b.
+Proof.
+intros Hic Hon Hop Hed * Hab.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite <- Hab.
+rewrite (angle_add_comm Hic).
+progress unfold angle_sub.
+rewrite <- (angle_add_assoc Hop).
+rewrite fold_angle_sub.
+rewrite (angle_sub_diag Hic Hon Hop Hed).
+apply (angle_add_0_r Hon Hos).
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3512,9 +3491,7 @@ Theorem angle_div_2_add :
       (angle_div_2 θ1 + angle_div_2 θ2)%A.
 Proof.
 intros Hic Hon Hop Hed *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -3828,8 +3805,13 @@ apply (rngl_leb_le) in Hzs3.
 apply rngl_leb_le in Haov.
 apply (rngl_nlt_ge Hor) in Haov.
 apply Haov; clear Haov.
-rewrite Hθ3; cbn.
-rewrite Hθ3 in Hzs3; cbn in Hzs3.
+(**)
+apply (rngl_nle_gt Hor).
+intros Hc31.
+apply (rngl_nle_gt Hor) in Hzs2.
+apply Hzs2; clear Hzs2.
+symmetry in Hθ3.
+apply angle_add_sub_eq_l in Hθ3.
 ...
         rewrite rngl_mul_assoc.
         rewrite (rngl_mul_opp_r Hop).
@@ -4533,9 +4515,7 @@ Theorem angle_div_2_pow_nat_pow_nat_l :
   ∀ n θ, angle_div_2_pow_nat (2 ^ n * θ) n = θ.
 Proof.
 intros Hon Hop *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 revert θ.
 induction n; intros; cbn. {
   apply (angle_add_0_r Hon Hos).
@@ -4560,9 +4540,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   → θ = (n * θ')%A.
 Proof.
 intros Hic Hon Hop Har Hed * Hnz Hlim.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq.
 induction n; [ easy | ].
 clear Hnz.
@@ -4603,9 +4581,7 @@ intros Hic Hon Hop Har Hed * Hnz Hlim.
 progress unfold is_angle_upper_limit_when_tending_to_inf in Hlim.
 Check rat_is_inf_sum_of_inv_rad_pow.
 *)
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 move Hos before Hed.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
@@ -4760,9 +4736,7 @@ Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr * Hx1.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
 rewrite (rl_cos_acos Htr _ Hx1) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
@@ -4811,9 +4785,7 @@ Theorem rl_sin_atan2 {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   ∀ x y, rl_sin (rl_atan2 y x) = (y / rl_sqrt (rngl_squ x + rngl_squ y))%L.
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rl_cos2_sin2 Htr (rl_atan2 y x)) as H1.
 rewrite (rl_cos_atan2 Htr) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
