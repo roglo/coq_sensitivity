@@ -950,10 +950,8 @@ Theorem angle_mul_2_div_2 :
 Proof.
 intros Hic Hon Hop Hed *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -968,7 +966,6 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1714,10 +1711,7 @@ Theorem le_rl_sqrt_add :
 Proof.
 intros * Hon Hop Heb * Hzb.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -1843,10 +1837,7 @@ Proof.
 intros * Hic Hon Hop Hed Hmi * Hρ Hθ.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now left; rewrite Hiv, Hon.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hid :
     (rngl_is_integral_domain T ||
@@ -2054,13 +2045,10 @@ Theorem rngl_rat_frac_part_lt_1 :
 Proof.
 intros Hon Hop * Hrbz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   now rewrite (H1 (rngl_of_nat b)) in Hrbz.
-}
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
 }
 assert (Hbz : b ≠ 0) by now intros H; subst b.
 assert (Hzb : (0 < rngl_of_nat b)%L). {
@@ -2111,10 +2099,7 @@ intros Hic Hon Hop Har * H2r Hbz.
 intros ε Hε.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
@@ -2493,10 +2478,7 @@ Theorem angle_dist_separation :
 Proof.
 intros Hic Hon Hop Hed * H12.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hid :
     (rngl_is_integral_domain T ||
@@ -2739,10 +2721,7 @@ Theorem eq_rngl_cos_opp_1 :
 Proof.
 intros Hic Hon Hop Hed * Hθ.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hid :
     (rngl_is_integral_domain T ||
@@ -2850,10 +2829,7 @@ Theorem le_1_rngl_cos :
 Proof.
 intros Hic Hon Hop Hed * Hθ.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hid :
     (rngl_is_integral_domain T ||
@@ -3127,10 +3103,7 @@ Proof.
 intros Hic Hon Hop Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 move Hi1 before Hos.
 assert
   (Hid :
@@ -3263,16 +3236,13 @@ Theorem rngl_add_cos_nonneg_when_sin_nonneg :
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzs3 Hzc1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
 }
 assert
   (Hid :
@@ -3433,16 +3403,13 @@ Theorem rngl_add_cos_nonneg_when_sin_nonneg_neg :
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hs3z Hzc1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
 }
 assert
   (Hid :
@@ -3873,16 +3840,13 @@ Theorem angle_div_2_add :
 Proof.
 intros Hic Hon Hop Hed *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
   (Hii :
     (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff; right.
   now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
 }
 assert
   (Hid :
@@ -5289,10 +5253,7 @@ Check rat_is_inf_sum_of_inv_rad_pow.
 *)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 move Hos before Hed.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 move Hi1 before Hos.
 assert
   (Hid :

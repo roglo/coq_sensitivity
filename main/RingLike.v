@@ -195,6 +195,17 @@ intros * Hop.
 now apply rngl_has_inv_or_quot_iff; left.
 Qed.
 
+Theorem rngl_has_inv_and_1_has_inv_and_1_or_quot :
+  ∀ {T} {ro : ring_like_op T},
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_has_inv_and_1_or_quot T = true.
+Proof.
+intros * Hon Hiv.
+apply rngl_has_inv_and_1_or_quot_iff.
+now rewrite Hiv, Hon; left.
+Qed.
+
 Definition rngl_has_eq_dec T {R : ring_like_op T} :=
   bool_of_option rngl_opt_eq_dec.
 
@@ -1489,10 +1500,7 @@ split. {
 } {
   intros Habcd.
   apply (f_equal (λ x, rngl_div x d)) in Habcd.
-  assert (Hiq : rngl_has_inv_and_1_or_quot T = true). {
-    apply rngl_has_inv_and_1_or_quot_iff.
-    now left; rewrite Hiv, Hon.
-  }
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
   rewrite rngl_mul_div in Habcd; [ | easy | easy ].
   apply (f_equal (λ x, rngl_div x b)) in Habcd.
   rewrite rngl_div_div_swap in Habcd; [ | easy | easy ].
@@ -1878,12 +1886,12 @@ Theorem rngl_div_1_r :
   ∀ a, (a / 1 = a)%L.
 Proof.
 intros Hon Hiq H10 *.
-assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
+assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_or_quot_iff in Hiq.
   apply rngl_has_inv_and_1_or_quot_iff.
   now destruct Hiq; [ left | right ].
 }
-specialize (rngl_mul_div Hid a 1%L) as H1.
+specialize (rngl_mul_div Hi1 a 1%L) as H1.
 rewrite (rngl_mul_1_r Hon) in H1.
 now apply H1, rngl_1_neq_0_iff.
 Qed.
