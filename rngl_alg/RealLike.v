@@ -3466,8 +3466,13 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   } {
     now apply (rngl_mul_nonneg_nonneg Hop Hor).
   }
-} {
-  apply (rngl_nle_gt Hor) in Hzc2.
+}
+apply (rngl_nle_gt Hor) in Hzc2.
+apply (rngl_nlt_ge Hor).
+intros Hcc.
+apply (rngl_nle_gt Hor) in Hs3z.
+apply Hs3z; clear Hs3z.
+rewrite Hθ3; cbn.
 ...
   rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)).
   rewrite <- (rngl_mul_1_l Hon (rngl_cos θ2)).
