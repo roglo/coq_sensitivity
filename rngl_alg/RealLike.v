@@ -2713,7 +2713,20 @@ Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
 (* TODO : rename parameters a and b into θ1 and θ2 in initial definitions
    e.g. angle_add *)
 
-Theorem rngl_sin_add_angle_straight_r :
+Theorem rngl_cos_add_straight_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (θ + angle_straight) = (- rngl_cos θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_0_r Hos).
+apply (rngl_sub_0_r Hos).
+Qed.
+
+Theorem rngl_sin_add_straight_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ θ, (rngl_sin (θ + angle_straight) = - rngl_sin θ)%L.
@@ -3385,7 +3398,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
 }
 Qed.
 
-(**)
 Theorem rngl_add_cos_nonneg_when_sin_nonpos :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3417,6 +3429,23 @@ apply (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed). {
   now rewrite rngl_cos_opp.
 }
 Qed.
+
+(* to be completed
+Theorem rngl_add_cos_nonneg_when_sin_nonneg_neg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_sin (θ1 + θ2) < 0)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (rngl_cos θ2 + rngl_cos θ1 ≤ 0)%L.
+Proof.
+intros Hic Hon Hop Hed * Hzs1 Hzs2 Hs3z Hzc1.
+... ...
+*)
 
 Theorem rngl_add_cos_nonneg_sqrt_mul_le :
   rngl_mul_is_comm T = true →
@@ -3685,17 +3714,22 @@ apply eq_angle_eq; cbn.
 now rewrite (rngl_opp_involutive Hop).
 Qed.
 
-Theorem rngl_cos_add_straight :
+Theorem angle_straight_add_straight :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  ∀ θ, rngl_cos (θ + angle_straight) = (- rngl_cos θ)%L.
+  (angle_straight + angle_straight = 0)%A.
 Proof.
-intros Hon Hop *; cbn.
+intros Hon Hop.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_mul_1_r Hon).
+apply eq_angle_eq; cbn.
+rewrite (rngl_mul_opp_opp Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+f_equal.
 rewrite (rngl_mul_0_r Hos).
-apply (rngl_sub_0_r Hos).
+rewrite (rngl_mul_0_l Hos).
+apply rngl_add_0_l.
 Qed.
 
 (* to be completed
@@ -4087,14 +4121,70 @@ destruct aov. 2: {
           progress unfold rngl_sub.
           rewrite Hop.
           do 2 rewrite <- (rngl_sub_opp_r Hop).
-          do 2 rewrite <- (rngl_cos_add_straight Hon Hop).
+          do 2 rewrite <- (rngl_cos_add_straight_r Hon Hop).
           apply (rngl_add_cos_nonneg_sqrt_mul_le Hic Hon Hop Hed Hii). {
+            do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+            rewrite (fold_rngl_sub Hop).
+            rewrite <- (rngl_opp_add_distr Hop).
+            apply (rngl_opp_nonneg_nonpos Hop Hor).
+... ...
+rewrite Hθ3 in Hzs3.
+apply rngl_add_cos_nonneg_when_sin_nonneg_neg; try easy.
+...
+
+Check rngl_add_cos_nonneg_when_sin_nonpos.
+Check rngl_add_cos_nonneg_when_sin_nonneg.
+rngl_add_cos_nonneg_when_sin_nonpos
+             → ∀ θ1 θ2 : angle T,
+                 (rngl_sin θ1 ≤ 0)%L
+                 → (rngl_sin θ2 ≤ 0)%L
+                   → (rngl_sin (θ1 + θ2) ≤ 0)%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
+rngl_add_cos_nonneg_when_sin_nonneg
+             → ∀ θ1 θ2 : angle T,
+                 (0 ≤ rngl_sin θ1)%L
+                 → (0 ≤ rngl_sin θ2)%L
+                   → (0 ≤ rngl_sin (θ1 + θ2))%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
+...
+(* case rngl_cos θ1 ≤ 0 *)
+apply rngl_add_cos_nonneg_when_sin_nonpos; try easy. {
+  rewrite (rngl_sin_add_straight_r Hon Hop).
+  now apply (rngl_opp_nonpos_nonneg Hop Hor).
+} {
+  rewrite (rngl_sin_add_straight_r Hon Hop).
+  now apply (rngl_opp_nonpos_nonneg Hop Hor).
+} {
+  rewrite (angle_add_assoc Hop).
+  rewrite (angle_add_comm Hic θ1).
+  rewrite (angle_add_comm Hic).
+  do 2 rewrite (angle_add_assoc Hop).
+  rewrite (angle_straight_add_straight Hon Hop).
+  rewrite (angle_add_0_l Hon Hos).
+  rewrite Hθ3 in Hzs3.
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite (rngl_cos_add_straight_r Hon Hop).
+apply (rngl_opp_nonneg_nonpos Hop Hor).
+(* rngl_cos θ1 ≤ 0 *)
+...
             do 2 rewrite (rngl_cos_add_straight Hon Hop).
             rewrite (fold_rngl_sub Hop).
             rewrite <- (rngl_opp_add_distr Hop).
             rewrite rngl_add_comm.
             apply (rngl_opp_nonneg_nonpos Hop Hor).
+...
 Check rngl_add_cos_nonneg_when_sin_nonneg.
+Check rngl_add_cos_nonneg_when_sin_nonpos.
+Theorem rngl_add_cos_nonneg_when_sin_nonpos :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_sin (θ1 + θ2) ≤ 0)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (rngl_cos θ1 + rngl_cos θ2 ≤ 0)%L.
 (* ouais, chais pas *)
 ...
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
