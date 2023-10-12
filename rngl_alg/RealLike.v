@@ -4492,8 +4492,18 @@ destruct aov. 2: {
       now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
     }
     apply (rngl_leb_gt Hor) in Hzs2.
+    progress unfold angle_leb in Haov.
+    apply (rngl_leb_gt Hor) in Hzs1.
+    rewrite Hzs1 in Haov.
+    apply (rngl_leb_gt Hor) in Hzs3.
+    rewrite Hzs3 in Haov.
+    apply rngl_leb_le in Haov.
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs3.
+    apply (rngl_nlt_ge Hor) in Haov.
+    exfalso; apply Haov; clear Haov.
+    rewrite Hθ3; cbn.
+(* ppp... chais pas *)
 ...
-    exfalso.
 Check rngl_sin_nonneg_sin_neg_angle_lt.
 ...
     specialize (rngl_sin_nonneg_sin_neg_angle_lt _ _ Hzs3 Hzs1) as H1.
