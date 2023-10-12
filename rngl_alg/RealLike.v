@@ -4492,6 +4492,7 @@ destruct aov. 2: {
       now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
     }
     apply (rngl_leb_gt Hor) in Hzs2.
+...
     exfalso.
 Check rngl_sin_nonneg_sin_neg_angle_lt.
 ...
