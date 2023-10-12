@@ -4250,17 +4250,18 @@ destruct aov. 2: {
         rewrite (rngl_opp_sub_distr Hop).
         now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
       }
+      apply (rngl_leb_gt Hor) in Hzs2.
 ...
-        apply (rngl_leb_gt Hor) in Hzs2.
-        exfalso.
-        (* parce que si on garde le but, on obtient qu'une racine
-           carrée doit être égale à un négatif *)
-        progress unfold angle_leb in Haov.
-        cbn in Haov.
-        apply (rngl_leb_le) in Hzs1.
-        rewrite Hzs1 in Haov.
-        apply (rngl_leb_le) in Hzs1.
-        apply (rngl_leb_le) in Hzs3.
+      exfalso.
+      (* parce que si on garde le but, on obtient qu'une racine
+         carrée doit être égale à un négatif *)
+      progress unfold angle_leb in Haov.
+      cbn in Haov.
+      apply (rngl_leb_le) in Hzs1.
+      rewrite Hzs1 in Haov.
+      apply (rngl_leb_le) in Hzs1.
+...
+      apply (rngl_leb_le) in Hzs3.
         rewrite Hzs3 in Haov.
         apply (rngl_leb_le) in Hzs3.
         apply rngl_leb_le in Haov.
