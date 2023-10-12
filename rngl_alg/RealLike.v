@@ -3458,6 +3458,16 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+  apply (rngl_nle_gt Hor) in Hs3z.
+  exfalso; apply Hs3z; clear Hs3z.
+  rewrite Hθ3; cbn.
+  apply (rngl_add_nonneg_nonneg Hor). {
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  } {
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+} {
+  apply (rngl_nle_gt Hor) in Hzc2.
 ...
   rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)).
   rewrite <- (rngl_mul_1_l Hon (rngl_cos θ2)).
