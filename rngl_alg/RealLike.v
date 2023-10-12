@@ -4011,6 +4011,8 @@ destruct aov. 2: {
           rewrite rngl_mul_assoc.
           rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
           rewrite <- rngl_mul_assoc.
+(**)
+clear  Hzs3 Hxy.
           do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
           rewrite (rngl_squ_1 Hon).
           replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
@@ -4157,218 +4159,120 @@ destruct aov. 2: {
           do 2 rewrite <- (rngl_sub_opp_r Hop).
           do 2 rewrite <- (rngl_cos_add_straight_r Hon Hop).
           apply (rngl_add_cos_nonneg_sqrt_mul_le Hic Hon Hop Hed Hii). {
-            do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
-            rewrite (fold_rngl_sub Hop).
-            rewrite <- (rngl_opp_add_distr Hop).
-            apply (rngl_opp_nonneg_nonpos Hop Hor).
-            rewrite Hθ3 in Hzs3.
-            rewrite rngl_add_comm.
-            apply rngl_add_cos_nonneg_when_sin_nonneg_neg; try easy.
-...
-
-Check rngl_add_cos_nonneg_when_sin_nonpos.
-Check rngl_add_cos_nonneg_when_sin_nonneg.
-rngl_add_cos_nonneg_when_sin_nonpos
-             → ∀ θ1 θ2 : angle T,
-                 (rngl_sin θ1 ≤ 0)%L
-                 → (rngl_sin θ2 ≤ 0)%L
-                   → (rngl_sin (θ1 + θ2) ≤ 0)%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
-rngl_add_cos_nonneg_when_sin_nonneg
-             → ∀ θ1 θ2 : angle T,
-                 (0 ≤ rngl_sin θ1)%L
-                 → (0 ≤ rngl_sin θ2)%L
-                   → (0 ≤ rngl_sin (θ1 + θ2))%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
-...
-(* case rngl_cos θ1 ≤ 0 *)
-apply rngl_add_cos_nonneg_when_sin_nonpos; try easy. {
-  rewrite (rngl_sin_add_straight_r Hon Hop).
-  now apply (rngl_opp_nonpos_nonneg Hop Hor).
-} {
-  rewrite (rngl_sin_add_straight_r Hon Hop).
-  now apply (rngl_opp_nonpos_nonneg Hop Hor).
-} {
-  rewrite (angle_add_assoc Hop).
-  rewrite (angle_add_comm Hic θ1).
-  rewrite (angle_add_comm Hic).
-  do 2 rewrite (angle_add_assoc Hop).
-  rewrite (angle_straight_add_straight Hon Hop).
-  rewrite (angle_add_0_l Hon Hos).
-  rewrite Hθ3 in Hzs3.
-  now apply (rngl_lt_le_incl Hor).
-}
-rewrite (rngl_cos_add_straight_r Hon Hop).
-apply (rngl_opp_nonneg_nonpos Hop Hor).
-(* rngl_cos θ1 ≤ 0 *)
-...
-            do 2 rewrite (rngl_cos_add_straight Hon Hop).
-            rewrite (fold_rngl_sub Hop).
-            rewrite <- (rngl_opp_add_distr Hop).
-            rewrite rngl_add_comm.
-            apply (rngl_opp_nonneg_nonpos Hop Hor).
-...
-Check rngl_add_cos_nonneg_when_sin_nonneg.
-Check rngl_add_cos_nonneg_when_sin_nonpos.
-Theorem rngl_add_cos_nonneg_when_sin_nonpos :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (rngl_sin (θ1 + θ2) ≤ 0)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (rngl_cos θ1 + rngl_cos θ2 ≤ 0)%L.
-(* ouais, chais pas *)
-...
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-              subst θ3.
-              now apply rngl_add_cos_nonneg_when_sin_nonneg.
-            }
-            destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
-              subst θ3.
-              rewrite (angle_add_comm Hic) in Hzs3.
+              do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+              rewrite (fold_rngl_sub Hop).
+              rewrite <- (rngl_opp_add_distr Hop).
+              apply (rngl_opp_nonneg_nonpos Hop Hor).
+              rewrite Hθ3 in Hzs3.
               rewrite rngl_add_comm.
-              now apply rngl_add_cos_nonneg_when_sin_nonneg.
+              now apply rngl_add_cos_nonneg_when_sin_nonneg_neg.
             }
-            apply (rngl_nle_gt Hor) in Hzc1, Hzc2.
-            exfalso.
-            apply (rngl_nlt_ge Hor) in Hzs3.
-            apply Hzs3; clear Hzs3.
-            rewrite Hθ3; cbn.
-            (* special case for sin θ2 = 0 *)
-            destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [H2z| H2z]. {
-              rewrite H2z, (rngl_mul_0_r Hos), rngl_add_0_l.
-              destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [H1z| H1z]. {
-                apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H2z, H1z.
-                destruct H2z as [H2z| H2z]. {
-                  subst θ2.
-                  apply (rngl_nle_gt Hor) in Hzc2.
-                  exfalso; apply Hzc2; clear Hzc2; cbn.
-                  apply (rngl_0_le_1 Hon Hop Hor).
-                }
-                subst θ2.
-                clear Hzs2 Hzc2.
-                exfalso.
-                destruct H1z as [H1z| H1z]. {
-                  subst θ1.
-                  apply (rngl_nle_gt Hor) in Hzc1.
-                  apply Hzc1; clear Hzc1; cbn.
-                  apply (rngl_0_le_1 Hon Hop Hor).
-                } {
-                  subst θ1.
-                  clear Hzc1 Hzs1.
-                  progress unfold angle_leb in Haov.
-                  cbn in Haov.
-                  rewrite (rngl_leb_refl Hor) in Haov.
-                  subst θ3.
-                  cbn in Haov.
-                  rewrite (rngl_mul_0_r Hos) in Haov.
-                  rewrite rngl_add_0_l in Haov.
-                  do 2 rewrite (rngl_mul_0_l Hos) in Haov.
-                  rewrite (rngl_leb_refl Hor) in Haov.
-                  apply rngl_leb_le in Haov.
-                  apply (rngl_nlt_ge Hor) in Haov.
-                  apply Haov; clear Haov.
-                  rewrite (rngl_squ_opp_1 Hon Hop).
-                  rewrite (rngl_sub_0_r Hos).
-                  apply (rngl_add_lt_mono_l Hop Hor _ _ 1)%L.
-                  rewrite (fold_rngl_sub Hop).
-                  now rewrite (rngl_sub_diag Hos).
-                }
-              }
-              apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
-              apply (rngl_lt_iff Hor).
-              split; [ easy | ].
-              now apply not_eq_sym.
+            apply (rngl_nle_gt Hor) in Hzc1.
+            (* case rngl_cos θ1 ≤ 0 *)
+            apply rngl_add_cos_nonneg_when_sin_nonpos; try easy. {
+              rewrite (rngl_sin_add_straight_r Hon Hop).
+              now apply (rngl_opp_nonpos_nonneg Hop Hor).
+            } {
+              rewrite (rngl_sin_add_straight_r Hon Hop).
+              now apply (rngl_opp_nonpos_nonneg Hop Hor).
+            } {
+              rewrite (angle_add_assoc Hop).
+              rewrite (angle_add_comm Hic θ1).
+              rewrite (angle_add_comm Hic).
+              do 2 rewrite (angle_add_assoc Hop).
+              rewrite (angle_straight_add_straight Hon Hop).
+              rewrite (angle_add_0_l Hon Hos).
+              rewrite Hθ3 in Hzs3.
+              now apply (rngl_lt_le_incl Hor).
             }
-            apply (rngl_add_neg_nonpos Hop Hor). {
-              rewrite (rngl_mul_comm Hic).
-              apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
-              apply (rngl_lt_iff Hor).
-              split; [ easy | ].
-              now apply not_eq_sym.
-            }
-            apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
+            rewrite (rngl_cos_add_straight_r Hon Hop).
+            apply (rngl_opp_nonneg_nonpos Hop Hor).
             now apply (rngl_lt_le_incl Hor).
           }
-          apply (rngl_nlt_ge Hor) in Hxy.
-          rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
-            now apply (rngl_le_0_sub Hop Hor).
-          }
-          apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
-          rewrite (rngl_squ_mul Hic).
-          rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-          rewrite rngl_squ_sqrt; [ | easy ].
-          rewrite rngl_squ_sqrt; [ | easy ].
-          progress unfold rngl_squ at 1.
-          rewrite rngl_mul_assoc.
-          rewrite (rngl_div_mul Hon Hiv); [ | easy ].
-          rewrite (rngl_squ_sub Hop Hic Hon).
-          subst x y.
-          rewrite rngl_squ_sqrt; [ | easy ].
-          rewrite rngl_squ_sqrt; [ | easy ].
-          rewrite <- (rngl_add_sub_swap Hop).
-          rewrite <- rngl_mul_assoc.
-          rewrite <- rl_sqrt_mul; [ | easy | easy ].
-          rewrite rngl_mul_assoc.
-          rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
-          rewrite <- rngl_mul_assoc.
-          do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
-          rewrite (rngl_squ_1 Hon).
-          replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
-            symmetry.
-            apply (rngl_add_sub_eq_l Hos).
-            apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed).
-            apply rngl_cos2_sin2.
-          }
-          replace (1 - (rngl_cos θ2)²)%L with (rngl_sin θ2)²%L. 2: {
-            symmetry.
-            apply (rngl_add_sub_eq_l Hos).
-            apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed).
-            apply rngl_cos2_sin2.
-          }
-          rewrite rl_sqrt_mul; cycle 1. {
-            apply (rngl_square_ge_0 Hop Hor).
-          } {
-            apply (rngl_square_ge_0 Hop Hor).
-          }
-          do 2 rewrite (rl_sqrt_squ Hop Hor).
-          rewrite (rngl_mul_add_distr_l (1 + rngl_cos θ1))%L.
-          rewrite (rngl_mul_1_r Hon).
-          rewrite (rngl_mul_add_distr_r 1 (rngl_cos θ1))%L.
-          rewrite (rngl_mul_1_l Hon).
-          rewrite (rngl_mul_sub_distr_l Hop (1 - rngl_cos θ1))%L.
-          rewrite (rngl_mul_1_r Hon).
-          rewrite (rngl_mul_sub_distr_r Hop 1 (rngl_cos θ1))%L.
-          rewrite (rngl_mul_1_l Hon).
-          rewrite rngl_add_assoc.
-          rewrite (rngl_add_sub_assoc Hop (1 + _ + _ + _ * _))%L.
-          rewrite (rngl_add_sub_assoc Hop _ 1 (rngl_cos θ1))%L.
-          rewrite (rngl_sub_sub_distr Hop _ (rngl_cos θ2)).
-          rewrite rngl_add_add_swap.
-          rewrite (rngl_add_add_swap _ (rngl_cos θ2) 1)%L.
-          rewrite (rngl_add_add_swap _ (rngl_cos θ1) 1)%L.
-          rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ1)).
-          rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ1)).
-          rewrite (rngl_add_sub Hos).
-          rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
-          rewrite (rngl_add_sub Hos).
-          rewrite <- rngl_add_assoc.
-          rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
-          rewrite <- (rngl_mul_1_r Hon 2)%L at 2.
-          rewrite <- rngl_mul_add_distr_l.
-          rewrite <- (rngl_mul_sub_distr_l Hop).
-          rewrite (rngl_mul_comm Hic).
-          f_equal.
-          rewrite <- (rngl_add_sub_assoc Hop).
-          f_equal.
-          rewrite Hθ3; cbn.
-          f_equal.
-          rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
-          rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
-          easy.
         }
+        apply (rngl_nlt_ge Hor) in Hxy.
+        rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+          now apply (rngl_le_0_sub Hop Hor).
+        }
+        apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+        rewrite (rngl_squ_mul Hic).
+        rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+        rewrite rngl_squ_sqrt; [ | easy ].
+        rewrite rngl_squ_sqrt; [ | easy ].
+        progress unfold rngl_squ at 1.
+        rewrite rngl_mul_assoc.
+        rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+        rewrite (rngl_squ_sub Hop Hic Hon).
+        subst x y.
+        rewrite rngl_squ_sqrt; [ | easy ].
+        rewrite rngl_squ_sqrt; [ | easy ].
+        rewrite <- (rngl_add_sub_swap Hop).
+        rewrite <- rngl_mul_assoc.
+        rewrite <- rl_sqrt_mul; [ | easy | easy ].
+        rewrite rngl_mul_assoc.
+        rewrite (rngl_mul_mul_swap Hic (1 - rngl_cos θ1))%L.
+        rewrite <- rngl_mul_assoc.
+        rewrite (rngl_add_comm ((1 - rngl_cos θ1) * _))%L.
+        do 2 rewrite (rngl_mul_comm Hic (1 - _) (1 + _))%L.
+(**)
+clear Hzs3 Hxy.
+        do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
+        rewrite (rngl_squ_1 Hon).
+        replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
+          symmetry.
+          apply (rngl_add_sub_eq_l Hos).
+          apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed).
+          apply rngl_cos2_sin2.
+        }
+        replace (1 - (rngl_cos θ2)²)%L with (rngl_sin θ2)²%L. 2: {
+          symmetry.
+          apply (rngl_add_sub_eq_l Hos).
+          apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed).
+          apply rngl_cos2_sin2.
+        }
+        rewrite rl_sqrt_mul; cycle 1. {
+          apply (rngl_square_ge_0 Hop Hor).
+        } {
+          apply (rngl_square_ge_0 Hop Hor).
+        }
+        do 2 rewrite (rl_sqrt_squ Hop Hor).
+        rewrite (rngl_mul_add_distr_l (1 + rngl_cos θ1))%L.
+        rewrite (rngl_mul_1_r Hon).
+        rewrite (rngl_mul_add_distr_r 1 (rngl_cos θ1))%L.
+        rewrite (rngl_mul_1_l Hon).
+        rewrite (rngl_mul_sub_distr_l Hop (1 - rngl_cos θ1))%L.
+        rewrite (rngl_mul_1_r Hon).
+        rewrite (rngl_mul_sub_distr_r Hop 1 (rngl_cos θ1))%L.
+        rewrite (rngl_mul_1_l Hon).
+        rewrite rngl_add_assoc.
+        rewrite (rngl_add_sub_assoc Hop (1 + _ + _ + _ * _))%L.
+        rewrite (rngl_add_sub_assoc Hop _ 1 (rngl_cos θ1))%L.
+        rewrite (rngl_sub_sub_distr Hop _ (rngl_cos θ2)).
+        rewrite rngl_add_add_swap.
+        rewrite (rngl_add_add_swap _ (rngl_cos θ2) 1)%L.
+        rewrite (rngl_add_add_swap _ (rngl_cos θ1) 1)%L.
+        rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ1)).
+        rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ1)).
+        rewrite (rngl_add_sub Hos).
+        rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
+        rewrite (rngl_add_sub Hos).
+        rewrite <- rngl_add_assoc.
+        rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
+        rewrite <- (rngl_mul_1_r Hon 2)%L at 2.
+        rewrite <- rngl_mul_add_distr_l.
+        rewrite <- (rngl_mul_sub_distr_l Hop).
+        rewrite (rngl_mul_comm Hic).
+        f_equal.
+        rewrite <- (rngl_add_sub_assoc Hop).
+        f_equal.
+        rewrite Hθ3; cbn.
+        f_equal.
+        rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+        rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+        easy.
+      }
+...
         apply (rngl_leb_gt Hor) in Hzs2.
         exfalso.
         (* parce que si on garde le but, on obtient qu'une racine
