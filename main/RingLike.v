@@ -1738,6 +1738,16 @@ rewrite rngl_mul_add_distr_r.
 now rewrite rngl_mul_opp_l.
 Qed.
 
+Theorem rngl_div_add_distr_r:
+  rngl_has_inv T = true →
+  ∀ a b c, ((a + b) / c)%L = (a / c + b / c)%L.
+Proof.
+intros Hiv *.
+progress unfold rngl_div.
+rewrite Hiv.
+apply rngl_mul_add_distr_r.
+Qed.
+
 Theorem rngl_div_sub_distr_r:
   rngl_has_opp T = true →
   rngl_has_inv T = true →

@@ -4251,6 +4251,57 @@ destruct aov. 2: {
         now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
       }
       apply (rngl_leb_gt Hor) in Hzs2.
+(**)
+      (* essayons de voir si on peut montrer la conclusion *)
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_mul_1_l Hon).
+      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
+      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
+      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
+      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
+      rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
+      do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
+      do 2 rewrite (rngl_mul_div_assoc Hiv).
+      rewrite <- rl_sqrt_mul; [ | easy | easy ].
+      rewrite <- rl_sqrt_mul; [ | easy | easy ].
+      rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+      rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+      rewrite <- rl_sqrt_mul; [ | easy | easy ].
+      rewrite fold_rngl_squ.
+      rewrite (rl_sqrt_squ Hop Hor).
+      rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+      rewrite <- (rngl_div_add_distr_r Hiv).
+      apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
+      rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+      rewrite <- (rngl_abs_nonneg Hop Hor (√_ / _ * _))%L. 2: {
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+          apply (rngl_lt_iff Hor).
+          split; [ now apply rl_sqrt_nonneg | ].
+          now apply not_eq_sym.
+        }
+        now apply rl_sqrt_nonneg.
+      }
+      rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+        now apply (rngl_add_nonneg_nonneg Hor); apply rl_sqrt_nonneg.
+      }
+      apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+      rewrite (rngl_squ_mul Hic).
+      rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+      rewrite rngl_squ_sqrt; [ | easy ].
+      rewrite rngl_squ_sqrt; [ | easy ].
+      progress unfold rngl_squ at 1.
+      rewrite rngl_mul_assoc.
+      rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+      subst θ3.
+      rewrite <- (rngl_squ_opp Hop).
+      rewrite (rngl_squ_opp Hop).
+      rewrite (rngl_add_comm √_)%L.
+Check rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
+...
+        now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
 ...
       exfalso.
       (* parce que si on garde le but, on obtient qu'une racine
