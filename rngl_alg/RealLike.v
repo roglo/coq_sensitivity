@@ -3769,7 +3769,7 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add :
+Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -4107,7 +4107,7 @@ destruct aov. 2: {
           rewrite (rngl_div_mul Hon Hiv); [ | easy ].
           subst x y.
           subst θ3.
-          now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
+          now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
         }
         apply (rngl_leb_gt Hor) in Hzs2.
         exfalso.
@@ -4248,7 +4248,7 @@ destruct aov. 2: {
         subst θ3.
         rewrite <- (rngl_squ_opp Hop).
         rewrite (rngl_opp_sub_distr Hop).
-        now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
+        now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
       }
       apply (rngl_leb_gt Hor) in Hzs2.
 (**)
@@ -4299,9 +4299,9 @@ destruct aov. 2: {
       rewrite <- (rngl_squ_opp Hop).
       rewrite (rngl_squ_opp Hop).
       rewrite (rngl_add_comm √_)%L.
-Check rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
+Check rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
 ...
-        now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add.
+        now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
 ...
       exfalso.
       (* parce que si on garde le but, on obtient qu'une racine
