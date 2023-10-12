@@ -188,6 +188,13 @@ intros * Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
+Theorem rngl_has_inv_has_inv_or_quot : ∀ {T} {ro : ring_like_op T},
+  rngl_has_inv T = true → rngl_has_inv_or_quot T = true.
+Proof.
+intros * Hop.
+now apply rngl_has_inv_or_quot_iff; left.
+Qed.
+
 Definition rngl_has_eq_dec T {R : ring_like_op T} :=
   bool_of_option rngl_opt_eq_dec.
 
@@ -1111,9 +1118,7 @@ Proof.
 intros Hii a b Hbz.
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
-  assert (Hiq : rngl_has_inv_or_quot T = true). {
-    now apply rngl_has_inv_or_quot_iff; left.
-  }
+  specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
   assert (Hon : rngl_has_1 T = true). {
     apply rngl_has_inv_and_1_or_quot_iff in Hii.
     destruct Hii as [Hii| Hii]; [ easy | ].
@@ -1843,9 +1848,7 @@ Theorem rngl_inv_1 :
   (1⁻¹ = 1)%L.
 Proof.
 intros Hon Hiv H10.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_div_diag Hon) as H.
 unfold rngl_div in H.
 rewrite Hiv in H.
@@ -2028,9 +2031,7 @@ Theorem rngl_inv_mul_distr :
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
 intros Hon Hom Hiv * Haz Hbz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }

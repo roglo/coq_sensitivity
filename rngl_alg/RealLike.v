@@ -968,9 +968,7 @@ assert
   apply Bool.orb_true_iff; right.
   now rewrite Hi1, Hed.
 }
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1445,9 +1443,7 @@ Theorem gc_inv_re :
   gre a⁻¹ = (gre a / (gre a * gre a + gim a * gim a))%L.
 Proof.
 intros * Hic Hrl * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
@@ -1466,9 +1462,7 @@ Theorem gc_inv_im :
   gim a⁻¹ = (- gim a / (gre a * gre a + gim a * gim a))%L.
 Proof.
 intros * Hic Hrl * Haz.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
@@ -1848,9 +1842,7 @@ Theorem polar :
 Proof.
 intros * Hic Hon Hop Hed Hmi * Hρ Hθ.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now left; rewrite Hiv, Hon.
@@ -2118,9 +2110,7 @@ Proof.
 intros Hic Hon Hop Har * H2r Hbz.
 intros ε Hε.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -3136,9 +3126,7 @@ Theorem angle_div_2_0 :
 Proof.
 intros Hic Hon Hop Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_or_quot T = true). {
-  now apply rngl_has_inv_or_quot_iff; left.
-}
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
