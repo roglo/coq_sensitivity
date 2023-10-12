@@ -4012,7 +4012,8 @@ destruct aov. 2: {
           rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
           rewrite <- rngl_mul_assoc.
 (**)
-clear  Hzs3 Hxy.
+clear  Hzs3 Hxy Haov.
+subst θ3.
           do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
           rewrite (rngl_squ_1 Hon).
           replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
@@ -4061,8 +4062,7 @@ clear  Hzs3 Hxy.
           rewrite (rngl_mul_comm Hic).
           f_equal.
           rewrite <- (rngl_add_sub_assoc Hop).
-          f_equal.
-          rewrite Hθ3; cbn.
+          f_equal; cbn.
           f_equal.
           rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
           rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
@@ -4216,7 +4216,8 @@ clear  Hzs3 Hxy.
         rewrite (rngl_add_comm ((1 - rngl_cos θ1) * _))%L.
         do 2 rewrite (rngl_mul_comm Hic (1 - _) (1 + _))%L.
 (**)
-clear Hzs3 Hxy.
+clear Hzs3 Hxy Haov.
+subst θ3.
         do 2 rewrite <- (rngl_squ_sub_squ Hop Hic).
         rewrite (rngl_squ_1 Hon).
         replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
@@ -4265,8 +4266,7 @@ clear Hzs3 Hxy.
         rewrite (rngl_mul_comm Hic).
         f_equal.
         rewrite <- (rngl_add_sub_assoc Hop).
-        f_equal.
-        rewrite Hθ3; cbn.
+        f_equal; cbn.
         f_equal.
         rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
         rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
