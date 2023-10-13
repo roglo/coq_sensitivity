@@ -1256,6 +1256,32 @@ apply rngl_has_inv_and_1_or_quot_iff in Hii.
 destruct Hii as [(H1, H2)| ]; congruence.
 Qed.
 
+Theorem rngl_add_move_l :
+  rngl_has_opp T = true →
+  ∀ a b c, (a + b)%L = c ↔ b = (c - a)%L.
+Proof.
+intros Hop *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+split; intros Hb. {
+  subst c; symmetry.
+  rewrite rngl_add_comm.
+  apply (rngl_add_sub Hos).
+} {
+  subst b.
+  rewrite rngl_add_comm.
+  apply (rngl_sub_add Hop).
+}
+Qed.
+
+Theorem rngl_add_move_r :
+  rngl_has_opp T = true →
+  ∀ a b c, (a + b)%L = c ↔ a = (c - b)%L.
+Proof.
+intros Hop *.
+rewrite rngl_add_comm.
+apply (rngl_add_move_l Hop).
+Qed.
+
 Theorem rngl_add_sub_eq_l :
   rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + b = c → c - a = b)%L.
