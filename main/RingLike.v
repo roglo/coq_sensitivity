@@ -1282,6 +1282,35 @@ rewrite rngl_add_comm.
 apply (rngl_add_move_l Hop).
 Qed.
 
+Theorem rngl_sub_move_l :
+  rngl_has_opp T = true →
+  ∀ a b c, (a - b)%L = c ↔ (- b)%L = (c - a)%L.
+Proof.
+intros Hop *.
+split; intros Hb. {
+  apply (rngl_add_move_l Hop).
+  now rewrite (fold_rngl_sub Hop).
+} {
+  apply (rngl_add_move_l Hop) in Hb.
+  now rewrite (fold_rngl_sub Hop) in Hb.
+}
+Qed.
+
+Theorem rngl_sub_move_r :
+  rngl_has_opp T = true →
+  ∀ a b c, (a - b)%L = c ↔ a = (c + b)%L.
+Proof.
+intros Hop *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+split; intros Ha. {
+  subst c; symmetry.
+  apply (rngl_sub_add Hop).
+} {
+  subst a.
+  apply (rngl_add_sub Hos).
+}
+Qed.
+
 Theorem rngl_add_sub_eq_l :
   rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + b = c → c - a = b)%L.

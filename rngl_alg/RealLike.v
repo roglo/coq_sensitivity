@@ -4230,6 +4230,46 @@ rewrite (angle_add_comm Hic).
 apply (angle_add_move_l Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_sub_move_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (θ1 - θ2)%A = θ3 ↔ θ1 = (θ3 + θ2)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+split; intros Ha. {
+  subst θ3; symmetry.
+  apply (angle_sub_add Hic Hon Hop Hed).
+} {
+  subst θ1.
+  apply (angle_add_sub Hic Hon Hop Hed).
+}
+Qed.
+
+Theorem angle_cos_add_right :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (θ + angle_right) = (- rngl_sin θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_0_r Hos).
+apply (rngl_sub_0_l Hop).
+Qed.
+
+Theorem angle_sin_add_right :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_sin (θ + angle_right) = rngl_cos θ.
+Proof.
+intros Hon Hos *; cbn.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_0_r Hos).
+apply rngl_add_0_r.
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -4687,23 +4727,31 @@ destruct aov. 2: {
     (*
       rename Hc12z into Hc12.
     *)
-      remember (θ2 - angle_right)%A as θ'2 eqn:H2.
+      remember (θ2 - angle_right)%A as θ eqn:H2.
       symmetry in H2.
-Check Z.sub_move_r.
-(* bon, faut que je me tape rngl_sub_move_r *)
-(* pis rngl_sub_move_l pendant que j'y suis *)
-...
-      apply angle_sub_move_r in H2.
-      subst θ2.
-Theorem angle_sin_sub_right :
-  ∀ θ, rngl_sin (θ - angle_right) = (- rngl_cos θ)%L.
-Proof.
-intros.
-cbn.
-...
-rewrite angle_sin_sub_right in Hzs2.
-rewrite <- rngl_opp_0 in Hzs2.
-apply rngl_opp_lt_compat in Hzs2.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in H2.
+      subst θ2; rename θ into θ2.
+      rewrite (angle_sin_add_right Hon Hos) in Hzs2.
+      rewrite (angle_add_assoc Hop) in Hzs3.
+      rewrite (angle_sin_add_right Hon Hos) in Hzs3.
+      rewrite (angle_cos_add_right Hon Hop) in Hc12z.
+      rewrite (fold_rngl_sub Hop) in Hc12z.
+      apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc12z.
+      rewrite rngl_add_0_r in Hc12z.
+      rewrite (angle_sin_add_right Hon Hos) in Hs21.
+      rewrite (angle_cos_add_right Hon Hop) in Hc2z.
+      rewrite <- (rngl_opp_0 Hop) in Hc2z.
+      apply (rngl_opp_lt_compat Hop Hor) in Hc2z.
+      rewrite (angle_add_assoc Hop).
+      rewrite (angle_cos_add_right Hon Hop).
+      rewrite (fold_rngl_sub Hop).
+      apply (rngl_lt_sub_lt_add_l Hop Hor).
+      rewrite rngl_add_0_r.
+      move θ2 before θ1.
+      move Hc2z before Hzs1.
+      move Hzc1 after Hzs2.
+      cbn.
+(* pfff... fait chier ; ça marche peut-être mais fait chier *)
 ...
   rewrite <- (rngl_cos_add_straight_r Hon Hop) in Hc12.
   rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hs21.
