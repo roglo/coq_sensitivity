@@ -3388,10 +3388,7 @@ apply (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed). {
 }
 Qed.
 
-(* perhaps the conclusion could be "<" instead of "≤"
-   because I made many (perhaps too many) calls to
-   rngl_lt_le_incl *)
-Theorem rngl_add_cos_nonpos_when_sin_nonneg_neg :
+Theorem rngl_add_cos_neg_when_sin_nonneg_neg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3401,7 +3398,7 @@ Theorem rngl_add_cos_nonpos_when_sin_nonneg_neg :
   → (0 ≤ rngl_sin θ2)%L
   → (rngl_sin (θ1 + θ2) < 0)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (rngl_cos θ1 + rngl_cos θ2 ≤ 0)%L.
+  → (rngl_cos θ1 + rngl_cos θ2 < 0)%L.
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hs3z Hzc1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -3422,8 +3419,8 @@ assert
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (H1 (_ + _))%L.
-  apply (rngl_le_refl Hor).
+  rewrite (H1 (rngl_sin _)) in Hs3z.
+  now apply (rngl_lt_irrefl Hor) in Hs3z.
 }
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
@@ -3437,21 +3434,21 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   }
 }
 apply (rngl_nle_gt Hor) in Hzc2.
-apply (rngl_nlt_ge Hor).
+apply (rngl_nle_gt Hor).
 intros Hcc.
-assert (Hs21 : (rngl_sin θ1 < rngl_sin θ2)%L). {
+assert (Hs21 : (rngl_sin θ1 ≤ rngl_sin θ2)%L). {
   rewrite rngl_add_comm in Hcc.
-  apply (rngl_lt_sub_lt_add_l Hop Hor) in Hcc.
+  apply (rngl_le_sub_le_add_l Hop Hor) in Hcc.
   rewrite (rngl_sub_0_l Hop) in Hcc.
   rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
   rewrite <- (rngl_abs_nonneg Hop Hor (_ θ2)); [ | easy ].
-  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
-  apply (rngl_sub_lt_mono_l Hop Hor _ _ 1)%L.
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  apply (rngl_sub_le_mono_l Hop Hor _ _ 1)%L.
   specialize (cos2_sin2_1 Hon Hop Hic Hed) as H1.
   rewrite <- (H1 θ2) at 1.
   rewrite <- (H1 θ1) at 1.
   do 2 rewrite (rngl_add_sub Hos).
-  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+  apply (rngl_abs_le_squ_le Hop Hor).
   apply (rngl_lt_le_incl Hor) in Hzc2.
   rewrite (rngl_abs_nonpos Hop Hor); [ | easy ].
   rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
@@ -3472,12 +3469,10 @@ rewrite Hop.
 rewrite <- (rngl_mul_opp_r Hop).
 (* ok, all terms are non negative *)
 apply (rngl_add_nonneg_nonneg Hor). {
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
 apply (rngl_mul_nonneg_nonneg Hop Hor). {
-  apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_le_0_sub Hop Hor).
 } {
   apply (rngl_opp_nonneg_nonpos Hop Hor).
   now apply (rngl_lt_le_incl Hor).
@@ -4439,7 +4434,8 @@ destruct aov. 2: {
               apply (rngl_opp_nonneg_nonpos Hop Hor).
               rewrite Hθ3 in Hzs3.
               rewrite rngl_add_comm.
-              now apply rngl_add_cos_nonpos_when_sin_nonneg_neg.
+              apply (rngl_lt_le_incl Hor).
+              now apply rngl_add_cos_neg_when_sin_nonneg_neg.
             }
             apply (rngl_nle_gt Hor) in Hzc1.
             (* case rngl_cos θ1 ≤ 0 *)
@@ -4538,16 +4534,12 @@ rewrite <- (rngl_sub_0_l Hop).
 apply (rngl_lt_add_lt_sub_l Hop Hor).
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
-...
-rngl_add_cos_nonpos_when_sin_nonneg_neg:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ θ1 θ2 : angle T,
-            (0 ≤ rngl_sin θ1)%L
-            → (0 ≤ rngl_sin θ2)%L
-              → (rngl_sin (θ1 + θ2) < 0)%L → (0 ≤ rngl_cos θ1)%L → (rngl_cos θ1 + rngl_cos θ2 ≤ 0)%L
+  apply rngl_add_cos_neg_when_sin_nonneg_neg; try easy. {
+    now apply (rngl_lt_le_incl Hor).
+  } {
+    now apply (rngl_lt_le_incl Hor).
+  }
+}
 ...
 Check rngl_sin_nonneg_sin_neg_angle_lt.
 ...
