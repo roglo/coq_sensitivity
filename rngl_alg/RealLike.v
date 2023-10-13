@@ -3391,7 +3391,7 @@ Qed.
 (* perhaps the conclusion could be "<" instead of "≤"
    because I made many (perhaps too many) calls to
    rngl_lt_le_incl *)
-Theorem rngl_add_cos_nonneg_when_sin_nonneg_neg :
+Theorem rngl_add_cos_nonpos_when_sin_nonneg_neg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -4098,6 +4098,17 @@ rewrite (rngl_add_comm √_)%L.
 now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
 Qed.
 
+Theorem angle_add_add_swap :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 + θ2 + θ3)%A = (θ1 + θ3 + θ2)%A.
+Proof.
+intros Hic Hop *.
+do 2 rewrite <- (angle_add_assoc Hop).
+f_equal.
+apply (angle_add_comm Hic).
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -4428,7 +4439,7 @@ destruct aov. 2: {
               apply (rngl_opp_nonneg_nonpos Hop Hor).
               rewrite Hθ3 in Hzs3.
               rewrite rngl_add_comm.
-              now apply rngl_add_cos_nonneg_when_sin_nonneg_neg.
+              now apply rngl_add_cos_nonpos_when_sin_nonneg_neg.
             }
             apply (rngl_nle_gt Hor) in Hzc1.
             (* case rngl_cos θ1 ≤ 0 *)
@@ -4501,8 +4512,43 @@ destruct aov. 2: {
     apply (rngl_leb_gt Hor) in Hzs1, Hzs3.
     apply (rngl_nlt_ge Hor) in Haov.
     exfalso; apply Haov; clear Haov.
-    rewrite Hθ3; cbn.
-(* ppp... chais pas *)
+    subst θ3.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs1, Hzs2, Hzs3.
+rewrite (rngl_opp_0 Hop) in Hzs1, Hzs2, Hzs3.
+rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs1, Hzs2, Hzs3.
+rewrite (angle_add_add_swap Hic Hop) in Hzs3.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs3.
+rewrite (rngl_opp_0 Hop) in Hzs3.
+rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs3.
+rewrite <- (angle_add_assoc Hop) in Hzs3.
+apply (rngl_opp_lt_compat Hop Hor).
+do 2 rewrite <- (rngl_cos_add_straight_r Hon Hop).
+rewrite (angle_add_add_swap Hic Hop).
+apply (rngl_opp_lt_compat Hop Hor).
+rewrite <- (rngl_cos_add_straight_r Hon Hop).
+rewrite <- (angle_add_assoc Hop).
+remember (θ1 + angle_straight)%A as θ.
+clear θ1 Heqθ.
+rename θ into θ1.
+remember (θ2 + angle_straight)%A as θ.
+clear θ2 Heqθ.
+rename θ into θ2.
+move θ2 before θ1.
+rewrite <- (rngl_sub_0_l Hop).
+apply (rngl_lt_add_lt_sub_l Hop Hor).
+apply (rngl_nle_gt Hor) in Hzs3.
+apply (rngl_nle_gt Hor).
+intros Hzc3; apply Hzs3; clear Hzs3.
+...
+rngl_add_cos_nonpos_when_sin_nonneg_neg:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            (0 ≤ rngl_sin θ1)%L
+            → (0 ≤ rngl_sin θ2)%L
+              → (rngl_sin (θ1 + θ2) < 0)%L → (0 ≤ rngl_cos θ1)%L → (rngl_cos θ1 + rngl_cos θ2 ≤ 0)%L
 ...
 Check rngl_sin_nonneg_sin_neg_angle_lt.
 ...
