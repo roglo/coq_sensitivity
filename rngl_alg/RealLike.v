@@ -4536,9 +4536,8 @@ rename θ into θ2.
 move θ2 before θ1.
 rewrite <- (rngl_sub_0_l Hop).
 apply (rngl_lt_add_lt_sub_l Hop Hor).
-apply (rngl_nle_gt Hor) in Hzs3.
-apply (rngl_nle_gt Hor).
-intros Hzc3; apply Hzs3; clear Hzs3.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+  assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
 ...
 rngl_add_cos_nonpos_when_sin_nonneg_neg:
   rngl_mul_is_comm T = true
