@@ -4534,12 +4534,12 @@ rewrite <- (rngl_sub_0_l Hop).
 apply (rngl_lt_add_lt_sub_l Hop Hor).
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
-  apply rngl_add_cos_neg_when_sin_nonneg_neg; try easy. {
-    now apply (rngl_lt_le_incl Hor).
-  } {
-    now apply (rngl_lt_le_incl Hor).
+    apply rngl_add_cos_neg_when_sin_nonneg_neg; try easy. {
+      now apply (rngl_lt_le_incl Hor).
+    } {
+      now apply (rngl_lt_le_incl Hor).
+    }
   }
-}
 ...
 Check rngl_sin_nonneg_sin_neg_angle_lt.
 ...
