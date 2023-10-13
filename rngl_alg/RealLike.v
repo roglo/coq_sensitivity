@@ -4617,10 +4617,14 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   move  Hzc1 before Hzs2.
   move Hc2z before Hzc1.
   move Hs21 before Hc2z.
+(*
   apply (rngl_lt_add_lt_sub_r Hop Hor) in Hc12z.
   rewrite (rngl_sub_0_l Hop) in Hc12z.
+*)
   move Hc12z before Hs21.
+(*
   rename Hc12z into Hc12.
+*)
 ...
   rewrite <- (rngl_cos_add_straight_r Hon Hop) in Hc12.
   rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hs21.
