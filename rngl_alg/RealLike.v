@@ -4911,8 +4911,8 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
     }
     (* case perhaps to be treated before, at first *)
     apply (rngl_nle_gt Hor) in Hc12z.
-    apply (rngl_nlt_ge Hor) in Hc13.
 ...
+    apply (rngl_nlt_ge Hor) in Hc13.
     exfalso; apply Hc13; clear Hc13; cbn.
     rewrite (rngl_add_sub_assoc Hop).
     progress unfold rngl_sub.
