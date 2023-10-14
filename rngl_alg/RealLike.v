@@ -4672,7 +4672,9 @@ destruct aov. 2: {
     rewrite Hzs3 in Haov.
     apply rngl_leb_le in Haov.
     apply (rngl_leb_gt Hor) in Hzs1, Hzs3.
+(*
     exfalso.
+*)
 (**)
     rename Haov into Hc13.
     move Hc13 at bottom.
@@ -4696,6 +4698,7 @@ destruct aov. 2: {
     rewrite <- (rngl_cos_add_straight_r Hon Hop (_ + θ2)%A) in Hc13.
     rewrite <- (angle_add_assoc Hop) in Hzs3, Hc13.
     remember (θ1 + angle_straight)%A as θ.
+exfalso.
     clear θ1 Heqθ.
     rename θ into θ1.
     remember (θ2 + angle_straight)%A as θ.
@@ -4704,6 +4707,9 @@ destruct aov. 2: {
     move θ2 before θ1.
     rewrite <- (rngl_sub_0_l Hop) in Hc13.
     apply (rngl_le_sub_le_add_l Hop Hor) in Hc13.
+    destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hzc3]. {
+      apply (rngl_nlt_ge Hor) in Hzc3.
+      apply Hzc3; clear Hzc3.
 ...
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
       assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
