@@ -4676,6 +4676,13 @@ destruct aov. 2: {
 (**)
     rename Haov into Hc13.
     move Hc13 at bottom.
+    subst θ3.
+(*
+  Hzs1 : (rngl_sin θ1 < 0)%L
+  Hzs2 : (rngl_sin θ2 < 0)%L
+  Hc13 : (rngl_cos θ1 ≤ rngl_cos (θ1 + θ2))%L
+  Hzs3 : (rngl_sin (θ1 + θ2) < 0)%L
+*)
 ...
     apply (rngl_nlt_ge Hor) in Haov.
     apply Haov; clear Haov.
@@ -4755,10 +4762,14 @@ destruct aov. 2: {
       move θ2 before θ1.
       move Hc2z before Hzs1.
       move Hzc1 after Hzs2.
-Search (rngl_cos _ < rngl_sin _)%L.
-Search (0 ≤ rngl_cos (_ + _))%L.
-Search (rngl_sin _ ≤ rngl_cos _)%L.
-(* pfff... fait chier ; ça marche peut-être mais fait chier *)
+      apply (rngl_nle_gt Hor).
+      rename Hzs2 into Hzc2.
+      rename Hc2z into Hzs2.
+      rename Hzs3 into Hc3z.
+      rename Hc12z into Hc1s2.
+      rename Hs21 into Hc2s1.
+      intros Hs3c.
+      move Hs3c after Hc3z.
 ...
   rewrite <- (rngl_cos_add_straight_r Hon Hop) in Hc12.
   rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hs21.
