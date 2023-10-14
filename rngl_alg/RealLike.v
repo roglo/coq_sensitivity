@@ -4910,7 +4910,22 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
       easy.
     }
     (* case perhaps to be treated before, at first *)
-    apply rngl_nle_gt in Hc12z.
+    apply (rngl_nle_gt Hor) in Hc12z.
+    apply (rngl_nlt_ge Hor) in Hc13.
+...
+    exfalso; apply Hc13; clear Hc13; cbn.
+    rewrite (rngl_add_sub_assoc Hop).
+    progress unfold rngl_sub.
+    rewrite Hop.
+    apply (rngl_add_nonpos_neg Hop Hor). {
+...
+      eapply (rngl_le_trans Hor). 2: {
+        apply (rngl_lt_le_incl Hor), Hc12z.
+      }
+      apply (rngl_add_le_mono_l Hop Hor).
+      rewrite <- (rngl_mul_1_l Hon).
+      apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+3: {
 ...
 Check rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
 Search rl_sqrt.
