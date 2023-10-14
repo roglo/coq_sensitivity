@@ -4698,7 +4698,7 @@ destruct aov. 2: {
     rewrite <- (rngl_cos_add_straight_r Hon Hop (_ + θ2)%A) in Hc13.
     rewrite <- (angle_add_assoc Hop) in Hzs3, Hc13.
     remember (θ1 + angle_straight)%A as θ.
-exfalso.
+    exfalso.
     clear θ1 Heqθ.
     rename θ into θ1.
     remember (θ2 + angle_straight)%A as θ.
@@ -4707,13 +4707,79 @@ exfalso.
     move θ2 before θ1.
     rewrite <- (rngl_sub_0_l Hop) in Hc13.
     apply (rngl_le_sub_le_add_l Hop Hor) in Hc13.
-    destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hzc3]. {
+    destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hc3z]. {
       apply (rngl_nlt_ge Hor) in Hzc3.
       apply Hzc3; clear Hzc3.
-(* si le cos de θ1 est négatif alors, par Hc13, le cos de θ1+θ2 est
-   positif, et la conclusion ne tient pas, mais on doit avoir |cos θ1|
-   ≤ cos (θ1+θ2), ce qui impose à θ2 d'être assez grand, plus que π/2,
-   donc son cos à lui est négatif aussi, et même que θ1+θ2>3π/2 *)
+      destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+        apply (rngl_nlt_ge Hor) in Hc13.
+        exfalso; apply Hc13; clear Hc13; cbn.
+        rewrite (rngl_add_sub_assoc Hop).
+        rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
+        rewrite <- rngl_mul_add_distr_l.
+        progress unfold rngl_sub.
+        rewrite Hop.
+        apply (rngl_add_nonpos_neg Hop Hor). {
+          apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          rewrite (rngl_sub_0_l Hop).
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        } {
+          rewrite <- (rngl_opp_0 Hop).
+          apply -> (rngl_opp_lt_compat Hop Hor).
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+      }
+      apply (rngl_nle_gt Hor) in Hzc1.
+      move Hzc1 before Hzs2.
+      destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
+        cbn.
+        progress unfold rngl_sub.
+        rewrite Hop.
+        apply (rngl_add_nonpos_neg Hop Hor). {
+          apply (rngl_mul_nonneg_nonpos Hop Hor); [ | easy ].
+          now apply (rngl_lt_le_incl Hor).
+        } {
+          rewrite <- (rngl_opp_0 Hop).
+          apply -> (rngl_opp_lt_compat Hop Hor).
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+      }
+      apply (rngl_nle_gt Hor) in Hzc2.
+      move Hzc2 before Hzc1.
+      apply (rngl_nle_gt Hor) in Hzs3.
+      exfalso; apply Hzs3; clear Hzs3; cbn.
+      apply (rngl_add_nonneg_nonneg Hor). {
+        apply (rngl_mul_nonneg_nonneg Hop Hor);
+          now apply (rngl_lt_le_incl Hor).
+      } {
+        apply (rngl_mul_nonneg_nonneg Hop Hor);
+          now apply (rngl_lt_le_incl Hor).
+      }
+    } {
+      apply (rngl_nle_gt Hor) in Hc3z.
+      destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hz1c]. {
+        (* same as above : perhaps an assert, a lemma or a
+           reorganization of the order of the comparisons *)
+        apply (rngl_nlt_ge Hor) in Hc13.
+        apply Hc13; clear Hc13; cbn.
+        rewrite (rngl_add_sub_assoc Hop).
+        rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
+        rewrite <- rngl_mul_add_distr_l.
+        progress unfold rngl_sub.
+        rewrite Hop.
+        apply (rngl_add_nonpos_neg Hop Hor). {
+          apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          rewrite (rngl_sub_0_l Hop).
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        } {
+          rewrite <- (rngl_opp_0 Hop).
+          apply -> (rngl_opp_lt_compat Hop Hor).
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+      } {
+        apply (rngl_nle_gt Hor) in Hz1c.
+        move Hz1c before Hzs2.
 ...
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
       assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {

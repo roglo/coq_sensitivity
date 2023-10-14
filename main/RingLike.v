@@ -5138,6 +5138,16 @@ apply (rngl_lt_add_lt_sub_r Hop Hor).
 now rewrite (rngl_sub_diag Hos).
 Qed.
 
+Theorem rngl_add_nonpos_neg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ 0)%L → (b < 0)%L → (a + b < 0)%L.
+Proof.
+intros Hop Hor * Haz Hbz.
+rewrite rngl_add_comm.
+now apply (rngl_add_neg_nonpos Hop Hor).
+Qed.
+
 (* (-1) ^ n *)
 
 Definition minus_one_pow n :=
