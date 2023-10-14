@@ -4911,8 +4911,23 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
     }
     (* case perhaps to be treated before, at first *)
     apply (rngl_nle_gt Hor) in Hc12z.
+exfalso.
+replace θ1 with (angle_right - (angle_right - θ1))%A in *.
+replace θ2 with (angle_straight - (angle_straight - θ2))%A in *.
+remember (angle_right - θ1)%A as Δ1.
+remember (angle_straight - θ2)%A as Δ2.
+assert ((Δ1 < Δ2)%A).
 ...
     apply (rngl_nlt_ge Hor) in Hc13.
+    exfalso; apply Hc13; clear Hc13.
+cbn in Hzs3.
+...
+cbn.
+    rewrite (rngl_add_sub_assoc Hop).
+    progress unfold rngl_sub.
+    rewrite Hop.
+    apply (rngl_add_nonpos_neg Hop Hor). {
+...
     exfalso; apply Hc13; clear Hc13; cbn.
     rewrite (rngl_add_sub_assoc Hop).
     progress unfold rngl_sub.
