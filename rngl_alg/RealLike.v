@@ -4710,6 +4710,10 @@ exfalso.
     destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hzc3]. {
       apply (rngl_nlt_ge Hor) in Hzc3.
       apply Hzc3; clear Hzc3.
+(* si le cos de θ1 est négatif alors, par Hc13, le cos de θ1+θ2 est
+   positif, et la conclusion ne tient pas, mais on doit avoir |cos θ1|
+   ≤ cos (θ1+θ2), ce qui impose à θ2 d'être assez grand, plus que π/2,
+   donc son cos à lui est négatif aussi, et même que θ1+θ2>3π/2 *)
 ...
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
       assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
