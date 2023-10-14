@@ -4707,30 +4707,30 @@ destruct aov. 2: {
     move θ2 before θ1.
     rewrite <- (rngl_sub_0_l Hop) in Hc13.
     apply (rngl_le_sub_le_add_l Hop Hor) in Hc13.
+    destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+      apply (rngl_nlt_ge Hor) in Hc13.
+      apply Hc13; clear Hc13; cbn.
+      rewrite (rngl_add_sub_assoc Hop).
+      rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
+      rewrite <- rngl_mul_add_distr_l.
+      progress unfold rngl_sub.
+      rewrite Hop.
+      apply (rngl_add_nonpos_neg Hop Hor). {
+        apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
+        apply (rngl_le_sub_le_add_l Hop Hor).
+        rewrite (rngl_sub_0_l Hop).
+        apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+      } {
+        rewrite <- (rngl_opp_0 Hop).
+        apply -> (rngl_opp_lt_compat Hop Hor).
+        now apply (rngl_mul_pos_pos Hop Hor Hii).
+      }
+    }
+    apply (rngl_nle_gt Hor) in Hzc1.
+    move Hzc1 before Hzs2.
     destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hc3z]. {
       apply (rngl_nlt_ge Hor) in Hzc3.
       apply Hzc3; clear Hzc3.
-      destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
-        apply (rngl_nlt_ge Hor) in Hc13.
-        exfalso; apply Hc13; clear Hc13; cbn.
-        rewrite (rngl_add_sub_assoc Hop).
-        rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
-        rewrite <- rngl_mul_add_distr_l.
-        progress unfold rngl_sub.
-        rewrite Hop.
-        apply (rngl_add_nonpos_neg Hop Hor). {
-          apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
-          apply (rngl_le_sub_le_add_l Hop Hor).
-          rewrite (rngl_sub_0_l Hop).
-          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-        } {
-          rewrite <- (rngl_opp_0 Hop).
-          apply -> (rngl_opp_lt_compat Hop Hor).
-          now apply (rngl_mul_pos_pos Hop Hor Hii).
-        }
-      }
-      apply (rngl_nle_gt Hor) in Hzc1.
-      move Hzc1 before Hzs2.
       destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
         cbn.
         progress unfold rngl_sub.
@@ -4757,29 +4757,6 @@ destruct aov. 2: {
       }
     } {
       apply (rngl_nle_gt Hor) in Hc3z.
-      destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hz1c]. {
-        (* same as above : perhaps an assert, a lemma or a
-           reorganization of the order of the comparisons *)
-        apply (rngl_nlt_ge Hor) in Hc13.
-        apply Hc13; clear Hc13; cbn.
-        rewrite (rngl_add_sub_assoc Hop).
-        rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
-        rewrite <- rngl_mul_add_distr_l.
-        progress unfold rngl_sub.
-        rewrite Hop.
-        apply (rngl_add_nonpos_neg Hop Hor). {
-          apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
-          apply (rngl_le_sub_le_add_l Hop Hor).
-          rewrite (rngl_sub_0_l Hop).
-          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-        } {
-          rewrite <- (rngl_opp_0 Hop).
-          apply -> (rngl_opp_lt_compat Hop Hor).
-          now apply (rngl_mul_pos_pos Hop Hor Hii).
-        }
-      } {
-        apply (rngl_nle_gt Hor) in Hz1c.
-        move Hz1c before Hzs2.
 ...
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
       assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
