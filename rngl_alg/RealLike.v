@@ -4755,8 +4755,21 @@ destruct aov. 2: {
         apply (rngl_mul_nonneg_nonneg Hop Hor);
           now apply (rngl_lt_le_incl Hor).
       }
-    } {
-      apply (rngl_nle_gt Hor) in Hc3z.
+    }
+    apply (rngl_nle_gt Hor) in Hc3z.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2z| Hc2z]. {
+      apply (rngl_nle_gt Hor) in Hzs3.
+      apply Hzs3; clear Hzs3; cbn.
+      apply (rngl_add_nonneg_nonneg Hor). {
+        apply (rngl_mul_nonneg_nonneg Hop Hor);
+          now apply (rngl_lt_le_incl Hor).
+      } {
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        now apply (rngl_lt_le_incl Hor).
+      }
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
+    move Hc2z before Hzc1.
 ...
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
       assert (Hc12z : (rngl_cos θ1 + rngl_cos θ2 < 0)%L). {
