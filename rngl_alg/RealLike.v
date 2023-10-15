@@ -2741,6 +2741,7 @@ symmetry in Hcs.
 now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
 Qed.
 
+(*
 Theorem rngl_cos_eq_sin_add_right :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -2752,6 +2753,7 @@ rewrite (rngl_mul_0_r Hos).
 symmetry.
 apply rngl_add_0_r.
 Qed.
+*)
 
 Theorem angle_eqb_eq :
   rngl_has_eq_dec T = true →
@@ -4645,7 +4647,7 @@ split; intros Ha. {
 }
 Qed.
 
-Theorem angle_cos_add_right :
+Theorem rngl_cos_add_right :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ + angle_right) = (- rngl_sin θ)%L.
@@ -4657,7 +4659,7 @@ rewrite (rngl_mul_0_r Hos).
 apply (rngl_sub_0_l Hop).
 Qed.
 
-Theorem angle_sin_add_right :
+Theorem rngl_sin_add_right :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_sin (θ + angle_right) = rngl_cos θ.
@@ -5082,6 +5084,22 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
     (* case perhaps to be treated before, at first *)
     apply (rngl_nle_gt Hor) in Hc12z.
 exfalso.
+remember (θ2 - angle_right)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite (angle_add_assoc Hop) in Hzs3, Hc3z, Hc13.
+rewrite (rngl_sin_add_right Hon Hos) in Hzs2, Hzs3.
+rewrite (rngl_cos_add_right Hon Hop) in Hc12z, Hc3z, Hc13, Hc2z.
+rewrite (fold_rngl_sub Hop) in Hc12z, Hc13.
+rewrite <- (rngl_opp_0 Hop) in Hc2z, Hc3z.
+apply (rngl_opp_lt_compat Hop Hor) in Hc2z, Hc3z.
+move Hc2z before Hzs1.
+move Hzc1 after Hzs2.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc12z.
+apply (rngl_le_add_le_sub_l Hop Hor) in Hc13.
+rewrite rngl_add_0_r in Hc12z, Hc13.
+...
 apply (rngl_nlt_ge Hor) in Hc13.
 apply Hc13; clear Hc13; cbn.
 rewrite (rngl_add_sub_assoc Hop).
