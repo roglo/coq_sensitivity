@@ -4812,6 +4812,20 @@ destruct z1. {
 }
 Qed.
 
+Theorem rngl_cos_le_anticompat_when_sin_nonneg :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros * Hs1 Hs2.
+progress unfold angle_leb.
+apply rngl_leb_le in Hs1, Hs2.
+rewrite Hs1, Hs2.
+apply iff_sym.
+apply rngl_leb_le.
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -5269,25 +5283,26 @@ rewrite (rngl_cos_sub_comm Hic Hop) in Hc3z, Hc13.
 rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs3.
 rewrite <- (rngl_opp_0 Hop) in Hzs3.
 apply (rngl_opp_lt_compat Hop Hor) in Hzs3.
-Theorem rngl_cos_le_anticompat_when_sin_nonneg :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (rngl_cos θ1 ≤ rngl_cos θ2)%L ↔ (θ2 ≤ θ1)%A.
-Proof.
-intros * Hs1 Hs2.
-progress unfold angle_leb.
-apply rngl_leb_le in Hs1, Hs2.
-rewrite Hs1, Hs2.
-apply iff_sym.
-apply rngl_leb_le.
-Qed.
+...
 apply (rngl_cos_le_anticompat_when_sin_nonneg) in Hc13.
 2: now apply (rngl_lt_le_incl Hor).
 2: now apply (rngl_lt_le_incl Hor).
 Check rngl_nle_gt.
 apply angle_nlt_ge in Hc13.
 apply Hc13; clear Hc13.
+apply (rngl_lt_le_incl Hor) in Hc12z.
+apply (rngl_cos_le_anticompat_when_sin_nonneg) in Hc12z.
+2: now apply (rngl_lt_le_incl Hor).
+2: now apply (rngl_lt_le_incl Hor).
+progress unfold angle_leb in Hc12z.
+progress unfold angle_ltb.
+apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2, Hzs3.
+apply rngl_leb_le in Hzs1, Hzs3, Hzs2.
+rewrite Hzs2, Hzs1 in Hc12z.
+rewrite Hzs1, Hzs3.
+apply (rngl_leb_le) in Hc12z.
+apply (rngl_ltb_lt).
+Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
 rewrite (angle_add_assoc Hop) in Hzs3, Hc3z, Hc13.
 rewrite (rngl_sin_add_right Hon Hos) in Hzs2, Hzs3.
