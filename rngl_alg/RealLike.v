@@ -4744,6 +4744,74 @@ rewrite (angle_opp_involutive Hop).
 apply (angle_add_comm Hic).
 Qed.
 
+Theorem angle_nle_gt :
+  ∀ θ1 θ2, ¬ (θ1 ≤ θ2)%A ↔ (θ2 < θ1)%A.
+Proof.
+intros.
+progress unfold angle_leb.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+symmetry in Hz1, Hz2.
+destruct z1. {
+  destruct z2; [ | easy ].
+  split; intros H12. {
+    apply Bool.not_true_iff_false in H12.
+    apply (rngl_leb_gt Hor) in H12.
+    now apply rngl_ltb_lt.
+  } {
+    apply Bool.not_true_iff_false.
+    apply (rngl_leb_gt Hor).
+    now apply rngl_ltb_lt.
+  }
+} {
+  destruct z2; [ easy | ].
+  split; intros H12. {
+    apply Bool.not_true_iff_false in H12.
+    apply (rngl_leb_gt Hor) in H12.
+    now apply rngl_ltb_lt.
+  } {
+    apply Bool.not_true_iff_false.
+    apply (rngl_leb_gt Hor).
+    now apply rngl_ltb_lt.
+  }
+}
+Qed.
+
+Theorem angle_nlt_ge :
+  ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros.
+progress unfold angle_leb.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+symmetry in Hz1, Hz2.
+destruct z1. {
+  destruct z2; [ | easy ].
+  split; intros H12. {
+    apply Bool.not_true_iff_false in H12.
+    apply (rngl_ltb_ge Hor) in H12.
+    now apply rngl_leb_le.
+  } {
+    apply Bool.not_true_iff_false.
+    apply (rngl_ltb_ge Hor).
+    now apply rngl_leb_le.
+  }
+} {
+  destruct z2; [ easy | ].
+  split; intros H12. {
+    apply Bool.not_true_iff_false in H12.
+    apply (rngl_ltb_ge Hor) in H12.
+    now apply rngl_leb_le.
+  } {
+    apply Bool.not_true_iff_false.
+    apply (rngl_ltb_ge Hor).
+    now apply rngl_leb_le.
+  }
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -5201,6 +5269,25 @@ rewrite (rngl_cos_sub_comm Hic Hop) in Hc3z, Hc13.
 rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs3.
 rewrite <- (rngl_opp_0 Hop) in Hzs3.
 apply (rngl_opp_lt_compat Hop Hor) in Hzs3.
+Theorem rngl_cos_le_anticompat_when_sin_nonneg :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ rngl_cos θ2)%L ↔ (θ2 ≤ θ1)%A.
+Proof.
+intros * Hs1 Hs2.
+progress unfold angle_leb.
+apply rngl_leb_le in Hs1, Hs2.
+rewrite Hs1, Hs2.
+apply iff_sym.
+apply rngl_leb_le.
+Qed.
+apply (rngl_cos_le_anticompat_when_sin_nonneg) in Hc13.
+2: now apply (rngl_lt_le_incl Hor).
+2: now apply (rngl_lt_le_incl Hor).
+Check rngl_nle_gt.
+apply angle_nlt_ge in Hc13.
+apply Hc13; clear Hc13.
 ...
 rewrite (angle_add_assoc Hop) in Hzs3, Hc3z, Hc13.
 rewrite (rngl_sin_add_right Hon Hos) in Hzs2, Hzs3.
