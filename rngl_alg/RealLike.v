@@ -5082,6 +5082,24 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
     (* case perhaps to be treated before, at first *)
     apply (rngl_nle_gt Hor) in Hc12z.
 exfalso.
+apply (rngl_nlt_ge Hor) in Hc13.
+apply Hc13; clear Hc13; cbn.
+rewrite (rngl_add_sub_assoc Hop).
+assert ((rngl_sin θ2 < rngl_cos θ1)%L). {
+cbn in Hzs3, Hc3z.
+(* nom d'un chien, il doit bien exister une formule
+   magique permettant de manipuer ces trucs avec
+   aisance, non ? mais je trouve pas *)
+...
+  apply (rngl_add_lt_mono_r Hop Hor _ _ (rngl_cos θ2)).
+  eapply (rngl_le_lt_trans Hor). 2: {
+; [ | apply Hc12z ].
+...
+Search (_ + _ < _ + _)%L.
+  apply (rngl_lt_le_trans Hor _ (rn
+...
+assert ((0 < rngl_sin θ1 + rngl_cos θ2)%L). {
+...
 replace θ1 with (angle_right - (angle_right - θ1))%A in *.
 replace θ2 with (angle_straight - (angle_straight - θ2))%A in *.
 remember (angle_right - θ1)%A as Δ1.
