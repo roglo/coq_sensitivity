@@ -4670,6 +4670,80 @@ rewrite (rngl_mul_0_r Hos).
 apply rngl_add_0_r.
 Qed.
 
+Theorem rngl_cos_sub_right_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (angle_right - θ) = rngl_sin θ.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_opp_r Hop).
+apply rngl_add_0_l.
+Qed.
+
+Theorem rngl_sin_sub_right_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_sin (angle_right - θ) = rngl_cos θ.
+Proof.
+intros Hon Hos *; cbn.
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_add_0_l.
+apply (rngl_mul_1_l Hon).
+Qed.
+
+Theorem angle_add_sub_assoc :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 + (θ2 - θ3))%A = (θ1 + θ2 - θ3)%A.
+Proof.
+intros Hop *.
+progress unfold angle_sub.
+apply (angle_add_assoc Hop).
+Qed.
+
+Theorem rngl_cos_sub_comm :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, rngl_cos (θ1 - θ2) = rngl_cos (θ2 - θ1).
+Proof.
+intros Hic Hop *; cbn.
+rewrite (rngl_mul_comm Hic).
+f_equal.
+do 2 rewrite (rngl_mul_opp_r Hop).
+f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem rngl_sin_sub_anticomm :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, rngl_sin (θ1 - θ2) = (- rngl_sin (θ2 - θ1))%L.
+Proof.
+intros Hic Hop *; cbn.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_mul_comm Hic).
+f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem angle_sub_sub_distr :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 - (θ2 - θ3))%A = (θ1 - θ2 + θ3)%A.
+Proof.
+intros Hic Hop *.
+progress unfold angle_sub.
+rewrite <- (angle_add_assoc Hop).
+f_equal.
+rewrite (angle_opp_add_distr Hic Hop).
+rewrite (angle_opp_involutive Hop).
+apply (angle_add_comm Hic).
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -5106,48 +5180,15 @@ rewrite (angle_add_comm Hic) in Heqθ.
 apply (angle_add_move_l Hic Hon Hop Hed) in Heqθ.
 subst θ2; rename θ into θ2.
 move θ2 before θ1.
-Theorem rngl_cos_sub_right_l :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  ∀ θ, rngl_cos (angle_right - θ) = rngl_sin θ.
-Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_sub_opp_r Hop).
-apply rngl_add_0_l.
-Qed.
-Theorem rngl_sin_sub_right_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, rngl_sin (angle_right - θ) = rngl_cos θ.
-Proof.
-intros Hon Hos *; cbn.
-rewrite (rngl_mul_0_l Hos).
-rewrite rngl_add_0_l.
-apply (rngl_mul_1_l Hon).
-Qed.
 rewrite (rngl_sin_sub_right_l Hon Hos) in Hc2z.
-Theorem angle_add_sub_assoc :
-  rngl_has_opp T = true →
-  ∀ θ1 θ2 θ3, (θ1 + (θ2 - θ3))%A = (θ1 + θ2 - θ3)%A.
-Proof.
-intros Hop *.
-progress unfold angle_sub.
-apply (angle_add_assoc Hop).
-Qed.
-Theorem angle_sub_sub_distr :
-  ∀ a b c, (a - (b - c))%A = (a - b + c)%A.
-Admitted.
 rewrite (angle_add_comm Hic) in Hc13.
-rewrite <- angle_sub_sub_distr in Hc13.
+rewrite <- (angle_sub_sub_distr Hic Hop) in Hc13.
 rewrite (rngl_sin_sub_right_l Hon Hos) in Hc13.
 rewrite (angle_add_comm Hic) in Hzs3.
-rewrite <- angle_sub_sub_distr in Hzs3.
+rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs3.
 rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs3.
 rewrite (angle_add_comm Hic) in Hc3z.
-rewrite <- angle_sub_sub_distr in Hc3z.
+rewrite <- (angle_sub_sub_distr Hic Hop) in Hc3z.
 rewrite (rngl_sin_sub_right_l Hon Hos) in Hc3z.
 rewrite (rngl_sin_sub_right_l Hon Hos) in Hc12z.
 rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs2.
@@ -5156,7 +5197,10 @@ move Hzc1 after Hc2z.
 move Hzs3 before Hc2z.
 move Hc3z before Hzs3.
 move Hc12z after Hc13.
-(* il faudrait que je fasse θ1-θ2 au lieu de θ2-θ1 *)
+rewrite (rngl_cos_sub_comm Hic Hop) in Hc3z, Hc13.
+rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs3.
+rewrite <- (rngl_opp_0 Hop) in Hzs3.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs3.
 ...
 rewrite (angle_add_assoc Hop) in Hzs3, Hc3z, Hc13.
 rewrite (rngl_sin_add_right Hon Hos) in Hzs2, Hzs3.
