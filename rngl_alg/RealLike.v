@@ -5099,15 +5099,31 @@ move Hzc1 after Hzs2.
 apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc12z.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hc13.
 rewrite rngl_add_0_r in Hc12z, Hc13.
+(* si ça se trouve, c'est faux *)
+...
+specialize (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed) as H1.
+apply (rngl_lt_le_incl Hor) in Hzs1, Hc2z, Hzc1, Hc3z.
+specialize (H1 _ _ Hzs1 Hc2z Hc3z Hzc1).
+...
+apply (rngl_nlt_ge Hor) in Hc13.
+apply Hc13; clear Hc13; cbn.
+...
+rngl_add_cos_nonneg_when_sin_nonneg:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            (0 ≤ rngl_sin θ1)%L
+            → (0 ≤ rngl_sin θ2)%L
+              → (0 ≤ rngl_sin (θ1 + θ2))%L
+                → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
 ...
 apply (rngl_nlt_ge Hor) in Hc13.
 apply Hc13; clear Hc13; cbn.
 rewrite (rngl_add_sub_assoc Hop).
 assert ((rngl_sin θ2 < rngl_cos θ1)%L). {
 cbn in Hzs3, Hc3z.
-(* nom d'un chien, il doit bien exister une formule
-   magique permettant de manipuer ces trucs avec
-   aisance, non ? mais je trouve pas *)
 ...
   apply (rngl_add_lt_mono_r Hop Hor _ _ (rngl_cos θ2)).
   eapply (rngl_le_lt_trans Hor). 2: {
