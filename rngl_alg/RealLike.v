@@ -4012,9 +4012,8 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
        √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
-(* borrowed from rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub
-   and it works: perhaps there is a way to unify these two
-   theorems *)
+(* proof borrowed from rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub
+   and it works: perhaps there is a way to unify these two theorems *)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
   intros.
