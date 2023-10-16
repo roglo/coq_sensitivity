@@ -4614,15 +4614,11 @@ Theorem rngl_sin_nonneg_sin_nonneg_sin_nonneg :
       (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) -
        √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L.
 Proof.
-intros Hic Hon Hop Hed * Haov Hzs1 Hzs2 Hzs3.
 (*
+intros Hic Hon Hop Hed * Haov Hzs1 Hzs2 Hzs3.
 apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
-Inspect 1.
-              → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
-                (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) -
-                 √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
-...
 *)
+intros Hic Hon Hop Hed * Haov Hzs1 Hzs2 Hzs3.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
