@@ -5376,11 +5376,11 @@ assert (Hss : (rngl_sin θ2 < rngl_sin θ1)%L). {
   now rewrite Hzc1 in H1.
 }
 move Hss after Hc12z.
-rename Hc12z into Hcc.
-...
 apply (rngl_nlt_ge Hor) in Hc13.
-apply Hc13; clear Hc13.
-cbn.
+apply Hc13; clear Hc13; cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+...
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_sub_opp_r Hop).
 eapply (rngl_le_lt_trans Hor). 2: {
