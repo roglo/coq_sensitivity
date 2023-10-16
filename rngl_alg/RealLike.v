@@ -4006,60 +4006,15 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → ((1 + rngl_cos (θ1 + θ2)) * 2)%L =
-     (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
-      √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
+  → (0 ≤ rngl_sin θ2)%L
+  → ((1 + rngl_cos (θ1 - θ2)) * 2)%L =
+      (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
+       √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
 Proof.
-(*
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
-remember (- θ2)%A as θ eqn:Hθ.
-symmetry in Hθ.
-rewrite <- (angle_opp_involutive Hop) in Hθ.
-apply (angle_opp_inj Hop) in Hθ.
-subst θ2; rename θ into θ2.
-move θ2 before θ1.
-rewrite rngl_sin_opp in Hzs2.
-rewrite <- (rngl_opp_0 Hop) in Hzs2.
-apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
-rewrite fold_angle_sub.
-rewrite rngl_cos_opp.
-(* possible new statement of this theorem, with all sin pos:
-  Hzs1 : (0 ≤ rngl_sin θ1)%L
-  Hzs2 : (0 < rngl_sin θ2)%L
-  ============================
-  ((1 + rngl_cos (θ1 - θ2)) * 2)%L =
-  (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
-   √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L
-*)
-...
-*)
-(*
-intros Hic Hon Hop Hed * Hzs1 Hzs2.
-remember (θ2 - angle_straight)%A as θ eqn:Hθ.
-symmetry in Hθ.
-apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
-subst θ2; rename θ into θ2.
-move θ2 before θ1.
-rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
-rewrite <- (rngl_opp_0 Hop) in Hzs2.
-apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
-rewrite (angle_add_assoc Hop).
-do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
-do 2 rewrite (fold_rngl_sub Hop).
-rewrite (rngl_sub_opp_r Hop).
-(* possible new statement of this theorem, with all sin pos:
-  θ1, θ2 : angle T
-  Hzs1 : (0 ≤ rngl_sin θ1)%L
-  Hzs2 : (0 < rngl_sin θ2)%L
-  ============================
-  ((1 - rngl_cos (θ1 + θ2)) * 2)%L =
-  (√((1 + rngl_cos θ1) * (1 - rngl_cos θ2)) +
-   √((1 - rngl_cos θ1) * (1 + rngl_cos θ2)))²%L
-*)
-...
-*)
-intros Hic Hon Hop Hed * Hzs1 Hzs2.
+(* borrowed from rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub
+   and it works: perhaps there is a way to unify these two
+   theorems *)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
   intros.
@@ -4145,13 +4100,12 @@ rewrite (rngl_mul_comm Hic).
 f_equal.
 rewrite <- rngl_add_assoc.
 f_equal; cbn.
-progress unfold rngl_sub.
-rewrite Hop.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
 f_equal.
 rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
-rewrite (rngl_abs_nonpos Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-symmetry.
-apply (rngl_mul_opp_r Hop).
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+easy.
 Qed.
 
 Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub :
@@ -4398,6 +4352,19 @@ rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 rewrite <- (rngl_squ_opp Hop).
 rewrite (rngl_squ_opp Hop).
 rewrite (rngl_add_comm √_)%L.
+(**)
+remember (- θ2)%A as θ eqn:Hθ.
+symmetry in Hθ.
+rewrite <- (angle_opp_involutive Hop) in Hθ.
+apply (angle_opp_inj Hop) in Hθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite rngl_sin_opp in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite fold_angle_sub.
+rewrite rngl_cos_opp.
+apply (rngl_lt_le_incl Hor) in Hzs2.
 now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
 Qed.
 
