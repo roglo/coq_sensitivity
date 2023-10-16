@@ -4211,6 +4211,23 @@ rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
 easy.
 Qed.
 
+(*
+Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → √((1 + rngl_cos (θ1 - θ2)) / 2)%L =
+       (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) +
+        √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L.
+Proof.
+intros Hic Hon Hop Hed * Hzs1 Hzs2.
+...
+*)
+
 Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4223,6 +4240,31 @@ Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
      (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) +
       √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L.
 Proof.
+(*
+intros Hic Hon Hop Hed * Hzs1 Hzs2.
+remember (- θ2)%A as θ eqn:Hθ.
+symmetry in Hθ.
+rewrite <- (angle_opp_involutive Hop) in Hθ.
+apply (angle_opp_inj Hop) in Hθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite rngl_sin_opp in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite fold_angle_sub.
+rewrite rngl_cos_opp.
+apply (rngl_lt_le_incl Hor) in Hzs2.
+rewrite (rngl_add_comm (_ * _))%L.
+(* possible new statement of this theorem, with all sin pos:
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 ≤ rngl_sin θ2)%L
+  ============================
+  √((1 + rngl_cos (θ1 - θ2)) / 2)%L =
+  (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) +
+   √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+*)
+...
+*)
 (*
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
 remember (θ2 - angle_straight)%A as θ eqn:Hθ.
@@ -4373,8 +4415,8 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_cos_nonneg :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (0 < rngl_sin θ2)%L
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1 + rngl_cos θ2)%L
   → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
     (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) -
@@ -4553,12 +4595,8 @@ progress unfold rngl_sub.
 rewrite Hop.
 f_equal.
 f_equal.
-rewrite (rngl_abs_nonneg Hop Hor). 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
-rewrite (rngl_abs_nonneg Hop Hor). 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
 easy.
 Qed.
 
@@ -4577,6 +4615,14 @@ Theorem rngl_sin_nonneg_sin_nonneg_sin_nonneg :
        √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L.
 Proof.
 intros Hic Hon Hop Hed * Haov Hzs1 Hzs2 Hzs3.
+(*
+apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+Inspect 1.
+              → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
+                (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) -
+                 √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+...
+*)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert
@@ -5120,6 +5166,34 @@ destruct aov. 2: {
       destruct zs2. {
         apply rngl_leb_le in Hzs2.
         rewrite (rngl_mul_1_l Hon).
+(*
+Search (√ ((1 + rngl_cos _) / 2) = _)%L.
+rngl_sin_nonneg_sin_neg_sin_add_neg:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            (0 ≤ rngl_sin θ1)%L
+            → (rngl_sin θ2 < 0)%L
+              → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
+                (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) +
+                 √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L
+rngl_sin_nonneg_sin_nonneg_sin_nonneg:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            (θ1 ≤ θ1 + θ2)%A
+            → (0 ≤ rngl_sin θ1)%L
+              → (0 ≤ rngl_sin θ2)%L
+                → (0 ≤ rngl_sin (θ1 + θ2))%L
+                  → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
+                    (√((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) -
+                     √((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+...
+*)
         rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
         rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
         rewrite (rl_sqrt_div Hon Hop); [ | easy | easy ].
@@ -5364,7 +5438,9 @@ rewrite <- (rngl_cos_add_straight_r Hon Hop).
     rewrite (rngl_mul_1_l Hon).
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
       as [Hzc12| Hc12z]. {
-      now apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
+      apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
     }
     (* case perhaps to be treated before, at first *)
     apply (rngl_nle_gt Hor) in Hc12z.
