@@ -4013,6 +4013,29 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
 Proof.
 (*
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
+remember (- θ2)%A as θ eqn:Hθ.
+symmetry in Hθ.
+rewrite <- (angle_opp_involutive Hop) in Hθ.
+apply (angle_opp_inj Hop) in Hθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite rngl_sin_opp in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite fold_angle_sub.
+rewrite rngl_cos_opp.
+(* possible new statement of this theorem, with all sin pos:
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 < rngl_sin θ2)%L
+  ============================
+  ((1 + rngl_cos (θ1 - θ2)) * 2)%L =
+  (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
+   √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L
+*)
+...
+*)
+(*
+intros Hic Hon Hop Hed * Hzs1 Hzs2.
 remember (θ2 - angle_straight)%A as θ eqn:Hθ.
 symmetry in Hθ.
 apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
