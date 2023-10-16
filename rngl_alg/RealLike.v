@@ -1866,15 +1866,8 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
   progress unfold rngl_squ in Hρ.
   rewrite (rngl_mul_0_l Hos) in Hρ.
   rewrite rngl_add_0_l in Hρ.
-  (* TODO: lemma √0=0 *)
-  progress unfold rl_sqrt in Hρ.
-  specialize (rl_nth_root_pow 2 0%L) as H1.
-  rewrite <- Hρ in H1.
-  apply (rngl_integral Hos Hid) in H1. 2: {
-    apply (rngl_le_refl Hor).
-  }
-  assert (H2 : ρ = 0%L) by now destruct H1.
-  rewrite H2.
+  rewrite (rl_sqrt_0 Hop Hic Hor Hid) in Hρ.
+  rewrite Hρ.
   now do 2 rewrite (rngl_mul_0_l Hos).
 }
 subst θ.
@@ -3651,6 +3644,18 @@ rewrite (angle_sub_diag Hic Hon Hop Hed).
 apply (angle_add_0_r Hon Hos).
 Qed.
 
+Theorem angle_add_sub_eq_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b c, (a + b)%A = c → (c - b)%A = a.
+Proof.
+intros Hic Hon Hop Hed * Hab.
+rewrite (angle_add_comm Hic) in Hab.
+now apply angle_add_sub_eq_l.
+Qed.
+
 Theorem rngl_sin_nonneg_cos_le_angle_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -3915,6 +3920,85 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_l.
 Qed.
 
+Theorem angle_add_sub :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 + θ2 - θ2)%A = θ1.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold angle_sub.
+rewrite <- (angle_add_assoc Hop).
+rewrite fold_angle_sub.
+rewrite (angle_sub_diag Hic Hon Hop Hed).
+apply (angle_add_0_r Hon Hos).
+Qed.
+
+Theorem angle_sub_add :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold angle_sub.
+rewrite <- (angle_add_assoc Hop).
+rewrite (angle_add_opp_l Hic Hon Hop Hed).
+apply (angle_add_0_r Hon Hos).
+Qed.
+
+Theorem angle_add_move_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (θ1 + θ2)%A = θ3 ↔ θ2 = (θ3 - θ1)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+split; intros H2. {
+  subst θ3; symmetry.
+  rewrite (angle_add_comm Hic).
+  apply (angle_add_sub Hic Hon Hop Hed).
+} {
+  subst θ2.
+  rewrite (angle_add_comm Hic).
+  apply (angle_sub_add Hic Hon Hop Hed).
+}
+Qed.
+
+Theorem angle_add_move_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (θ1 + θ2)%A = θ3 ↔ θ1 = (θ3 - θ2)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+rewrite (angle_add_comm Hic).
+apply (angle_add_move_l Hic Hon Hop Hed).
+Qed.
+
+Theorem angle_sub_move_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (θ1 - θ2)%A = θ3 ↔ θ1 = (θ3 + θ2)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+split; intros Ha. {
+  subst θ3; symmetry.
+  apply (angle_sub_add Hic Hon Hop Hed).
+} {
+  subst θ1.
+  apply (angle_add_sub Hic Hon Hop Hed).
+}
+Qed.
+
 Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3927,6 +4011,31 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add :
      (√((1 + rngl_cos θ1) * (1 + rngl_cos θ2)) +
       √((1 - rngl_cos θ1) * (1 - rngl_cos θ2)))²%L.
 Proof.
+(*
+intros Hic Hon Hop Hed * Hzs1 Hzs2.
+remember (θ2 - angle_straight)%A as θ eqn:Hθ.
+symmetry in Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite (angle_add_assoc Hop).
+do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+do 2 rewrite (fold_rngl_sub Hop).
+rewrite (rngl_sub_opp_r Hop).
+(* possible new statement of this theorem, with all sin pos:
+  θ1, θ2 : angle T
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 < rngl_sin θ2)%L
+  ============================
+  ((1 - rngl_cos (θ1 + θ2)) * 2)%L =
+  (√((1 + rngl_cos θ1) * (1 - rngl_cos θ2)) +
+   √((1 - rngl_cos θ1) * (1 + rngl_cos θ2)))²%L
+*)
+...
+*)
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
@@ -4138,6 +4247,31 @@ Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
      (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) +
       √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L.
 Proof.
+(*
+intros Hic Hon Hop Hed * Hzs1 Hzs2.
+remember (θ2 - angle_straight)%A as θ eqn:Hθ.
+symmetry in Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite (angle_add_assoc Hop).
+do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+do 2 rewrite (fold_rngl_sub Hop).
+rewrite (rngl_sub_opp_r Hop).
+(* possible new statement of this theorem, with all sin pos:
+  θ1, θ2 : angle T
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 < rngl_sin θ2)%L
+  ============================
+  √((1 - rngl_cos (θ1 + θ2)) / 2)%L =
+  (√((1 - rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2) +
+   √((1 + rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2))%L
+*)
+...
+*)
 intros Hic Hon Hop Hed * Hzs1 Hzs2.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -4651,85 +4785,6 @@ intros Hic Hop *.
 do 2 rewrite <- (angle_add_assoc Hop).
 f_equal.
 apply (angle_add_comm Hic).
-Qed.
-
-Theorem angle_add_sub :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, (θ1 + θ2 - θ2)%A = θ1.
-Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
-rewrite fold_angle_sub.
-rewrite (angle_sub_diag Hic Hon Hop Hed).
-apply (angle_add_0_r Hon Hos).
-Qed.
-
-Theorem angle_sub_add :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
-Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
-rewrite (angle_add_opp_l Hic Hon Hop Hed).
-apply (angle_add_0_r Hon Hos).
-Qed.
-
-Theorem angle_add_move_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3, (θ1 + θ2)%A = θ3 ↔ θ2 = (θ3 - θ1)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-split; intros H2. {
-  subst θ3; symmetry.
-  rewrite (angle_add_comm Hic).
-  apply (angle_add_sub Hic Hon Hop Hed).
-} {
-  subst θ2.
-  rewrite (angle_add_comm Hic).
-  apply (angle_sub_add Hic Hon Hop Hed).
-}
-Qed.
-
-Theorem angle_add_move_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3, (θ1 + θ2)%A = θ3 ↔ θ1 = (θ3 - θ2)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-rewrite (angle_add_comm Hic).
-apply (angle_add_move_l Hic Hon Hop Hed).
-Qed.
-
-Theorem angle_sub_move_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3, (θ1 - θ2)%A = θ3 ↔ θ1 = (θ3 + θ2)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-split; intros Ha. {
-  subst θ3; symmetry.
-  apply (angle_sub_add Hic Hon Hop Hed).
-} {
-  subst θ1.
-  apply (angle_add_sub Hic Hon Hop Hed).
-}
 Qed.
 
 Theorem rngl_cos_add_right :
