@@ -5042,6 +5042,42 @@ apply eq_angle_eq.
 now rewrite Hθ, H1.
 Qed.
 
+Theorem rngl_sin_nonneg_add_nonneg_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (θ1 ≤ θ1 + θ2)%A
+  → (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (0 ≤ rngl_sin θ2)%L.
+Proof.
+intros Hic Hon Hop Hed * Haov Hzs1 Hzs3.
+remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
+apply (rngl_nlt_ge Hor).
+intros Hzs2.
+progress unfold angle_leb in Haov.
+cbn in Haov.
+apply (rngl_leb_le) in Hzs1.
+rewrite Hzs1 in Haov.
+apply (rngl_leb_le) in Hzs1.
+apply (rngl_leb_le) in Hzs3.
+rewrite Hzs3 in Haov.
+apply (rngl_leb_le) in Hzs3.
+apply rngl_leb_le in Haov.
+apply (rngl_nlt_ge Hor) in Haov.
+apply Haov; clear Haov.
+apply (rngl_nle_gt Hor).
+intros Hc31.
+apply (rngl_nle_gt Hor) in Hzs2.
+apply Hzs2; clear Hzs2.
+symmetry in Hθ3.
+apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
+subst θ2.
+now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
+Qed.
+
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -5115,44 +5151,31 @@ destruct zs3. {
       subst θ3.
       now apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
     }
-    apply (rngl_leb_gt Hor) in Hzs2.
     exfalso.
-    progress unfold angle_leb in Haov.
-    cbn in Haov.
-    apply (rngl_leb_le) in Hzs1.
-    rewrite Hzs1 in Haov.
-    apply (rngl_leb_le) in Hzs1.
-    apply (rngl_leb_le) in Hzs3.
-    rewrite Hzs3 in Haov.
-    apply (rngl_leb_le) in Hzs3.
-    apply rngl_leb_le in Haov.
-    apply (rngl_nlt_ge Hor) in Haov.
-    apply Haov; clear Haov.
-    apply (rngl_nle_gt Hor).
-    intros Hc31.
+    apply (rngl_leb_gt Hor) in Hzs2.
     apply (rngl_nle_gt Hor) in Hzs2.
     apply Hzs2; clear Hzs2.
-    symmetry in Hθ3.
-    apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
-    subst θ2.
-    now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
-  }
-  apply (rngl_leb_gt Hor) in Hzs1.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    exfalso.
-    progress unfold angle_leb in Haov.
+    subst θ3.
+    now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
+  } {
     apply (rngl_leb_gt Hor) in Hzs1.
-    rewrite Hzs1 in Haov.
-    apply (rngl_leb_le) in Hzs3.
-    now rewrite Hzs3 in Haov.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      exfalso.
+      progress unfold angle_leb in Haov.
+      apply (rngl_leb_gt Hor) in Hzs1.
+      rewrite Hzs1 in Haov.
+      apply (rngl_leb_le) in Hzs3.
+      now rewrite Hzs3 in Haov.
+    }
+    apply (rngl_leb_gt Hor) in Hzs2.
+    exfalso.
+    specialize (rngl_sin_nonneg_sin_neg_angle_lt _ _ Hzs3 Hzs1) as H1.
+    apply angle_leb_gt in H1.
+    now apply angle_leb_nle in H1.
   }
-  apply (rngl_leb_gt Hor) in Hzs2.
-  exfalso.
-  specialize (rngl_sin_nonneg_sin_neg_angle_lt _ _ Hzs3 Hzs1) as H1.
-  apply angle_leb_gt in H1.
-  now apply angle_leb_nle in H1.
 }
+(*to be cleaned from here*)
 apply (rngl_leb_gt Hor) in Hzs3.
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_mul_1_l Hon).
