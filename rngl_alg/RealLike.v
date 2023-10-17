@@ -3669,13 +3669,18 @@ rewrite Hzs2.
 now destruct (0 ≤? rngl_sin θ2)%L.
 Qed.
 
-Theorem rngl_sin_nonneg_sin_neg_angle_lt :
+Theorem angle_le_rngl_sin_nonneg_sin_nonneg :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → (θ1 < θ2)%A.
+  (θ2 ≤ θ1)%A
+  → (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L.
 Proof.
-intros * Hzs1 Hs2z.
+intros * H21 Hzs1.
+apply Bool.not_false_iff_true in H21.
+apply (rngl_nlt_ge Hor).
+intros Hs2z.
+apply H21; clear H21.
+apply angle_leb_gt.
 progress unfold angle_ltb.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
@@ -3857,7 +3862,6 @@ Theorem rngl_sin_nonneg_cos_le_sin_sub_nonneg :
 Proof.
 intros Hic Hon Hop Hed * Hs1 Hs2 Hc12.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-(**)
 specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
 specialize (H1 _ _ Hs1 Hs2 Hc12).
 remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
@@ -4393,7 +4397,6 @@ rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 rewrite <- (rngl_squ_opp Hop).
 rewrite (rngl_squ_opp Hop).
 rewrite (rngl_add_comm √_)%L.
-(**)
 remember (- θ2)%A as θ eqn:Hθ.
 symmetry in Hθ.
 rewrite <- (angle_opp_involutive Hop) in Hθ.
@@ -5169,10 +5172,8 @@ destruct zs3. {
       now rewrite Hzs3 in Haov.
     }
     apply (rngl_leb_gt Hor) in Hzs2.
-    exfalso.
-    specialize (rngl_sin_nonneg_sin_neg_angle_lt _ _ Hzs3 Hzs1) as H1.
-    apply angle_leb_gt in H1.
-    now apply angle_leb_nle in H1.
+    apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
+    now apply (rngl_nlt_ge Hor) in Hzs3.
   }
 }
 (*to be cleaned from here*)
