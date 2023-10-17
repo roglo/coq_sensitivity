@@ -5014,6 +5014,34 @@ rewrite (angle_add_assoc Hop).
 apply (angle_add_add_swap Hic Hop).
 Qed.
 
+Theorem eq_rngl_cos_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, rngl_cos θ = 1%L ↔ θ = 0%A.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+split; intros Hθ; [ | now subst θ ].
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ) as H1.
+rewrite Hθ in H1.
+rewrite (rngl_squ_1 Hon) in H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite (rngl_sub_diag Hos) in H1.
+apply (eq_rngl_squ_0 Hos Hid) in H1.
+apply eq_angle_eq.
+now rewrite Hθ, H1.
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -5559,6 +5587,41 @@ rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_squ_mul Hic).
 apply (rngl_lt_add_lt_sub_l Hop Hor).
 rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_add Hop).
+rewrite <- (rngl_mul_1_r Hon 2)%L at 1.
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic _ 2)%L.
+rewrite <- (rngl_squ_1 Hon) at 4.
+rewrite (rngl_squ_sub_squ Hop Hic).
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii). {
+  apply (rngl_lt_0_sub Hop Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ now apply rngl_cos_bound | ].
+  intros H.
+  apply (eq_rngl_cos_1 Hic Hon Hop Hed) in H.
+  subst θ2.
+  now apply (rngl_lt_irrefl Hor) in Hzs2.
+}
+apply (rngl_lt_le_trans Hor _ (2 * (rngl_cos θ2)²))%L. {
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+  rewrite (rngl_abs_nonneg Hop Hor); [ | now apply rngl_lt_le_incl ].
+  rewrite (rngl_abs_nonneg Hop Hor); [ | now apply rngl_lt_le_incl ].
+  easy.
+}
+apply (rngl_le_trans Hor _ (2 * rngl_cos θ2))%L. {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+Search (_² < _)%L.
+...
+remember (1 - (rngl_cos θ2)²)%L as x.
 ...
 rewrite (rngl_mul_sub_distr_l Hop (1 - _))%L.
 rewrite (rngl_mul_1_r Hon).
