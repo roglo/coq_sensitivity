@@ -5528,10 +5528,42 @@ move Hss after Hc12z.
 rename Hc12z into Hcc.
 apply (rngl_nlt_ge Hor) in Hc13.
 apply Hc13; clear Hc13.
-(*
+(**)
 cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_sub_opp_r Hop).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1))%L at 1.
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite <- (rngl_abs_nonneg Hop Hor (rngl_cos θ1 * _))%L. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite (rngl_squ_mul Hic (rngl_sin _)).
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_squ_mul Hic).
+apply (rngl_lt_add_lt_sub_l Hop Hor).
+rewrite <- rngl_mul_add_distr_l.
+...
+rewrite (rngl_mul_sub_distr_l Hop (1 - _))%L.
+rewrite (rngl_mul_1_r Hon).
+...
+(*
   Hzs1 : (0 < rngl_sin θ1)%L
   Hzs2 : (0 < rngl_sin θ2)%L
   Hzc1 : (0 < rngl_cos θ1)%L
