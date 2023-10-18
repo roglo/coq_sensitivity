@@ -363,11 +363,91 @@ Context {Hiv : rngl_has_inv T = true}.
 Context {Hc2 : rngl_characteristic T ≠ 2}.
 Context {Hor : rngl_is_ordered T = true}.
 
+Theorem angle_div_2_prop :
+  ∀ a (ε := (if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L)),
+  cos2_sin2_prop
+    (ε * √((1 + rngl_cos a) / 2))%L
+    (√((1 - rngl_cos a) / 2)%L).
+Proof.
+intros.
+progress unfold cos2_sin2_prop.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ cbn | easy ].
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
+  destruct (0 ≤? _)%L. {
+    apply (rngl_mul_1_l Hon).
+  } {
+    apply (rngl_squ_opp_1 Hon Hop).
+  }
+}
+rewrite (rngl_squ_mul Hic).
+rewrite Hε, (rngl_mul_1_l Hon).
+apply (rngl_eqb_eq Hed).
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (_ + _)%L), (H1 1%L).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite (rngl_sub_0_l Hop).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+move Hc1 after Hc2.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- rngl_mul_add_distr_r.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub Hos).
+apply (rngl_mul_inv_r Hon Hiv).
+specialize rngl_opt_characteristic_prop as H1.
+rewrite Hon in H1.
+remember (rngl_characteristic T =? 0) as cz eqn:Hcz; symmetry in Hcz.
+destruct cz. {
+  specialize (H1 1); cbn in H1.
+  now rewrite rngl_add_0_r in H1.
+}
+destruct H1 as (H1, H2).
+apply Nat.eqb_neq in Hcz.
+remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
+destruct ch; [ easy | clear Hcz ].
+destruct ch; [ easy | clear Hc1 ].
+destruct ch; [ easy | clear Hc2 ].
+specialize (H1 2).
+cbn in H1.
+rewrite rngl_add_0_r in H1.
+apply H1.
+split; [ easy | ].
+now do 2 apply -> Nat.succ_lt_mono.
+Qed.
+
 Definition angle_div_2 a :=
   let ε := if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L in
   {| rngl_cos := (ε * rl_sqrt ((1 + rngl_cos a) / 2))%L;
      rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
-     rngl_cos2_sin2 := angle_div_2_prop Hiv Hc2 Hor a |}.
+     rngl_cos2_sin2 := angle_div_2_prop a |}.
 
 Theorem angle_div_2_mul_2 :
   rngl_mul_is_comm T = true →
