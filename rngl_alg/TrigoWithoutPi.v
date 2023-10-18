@@ -6,9 +6,7 @@
    to add angles (see below) and we inherit the properties of cos(x+y)
    and sin(x+y) in an obvous way. *)
 
-(*
 Set Nested Proofs Allowed.
-*)
 Require Import Utf8 Arith.
 (*
 Import List List.ListNotations.
@@ -319,10 +317,6 @@ Qed.
 
 (* *)
 
-Definition rngl_compare a b :=
-  if (a =? b)%L then Eq
-  else if (a ≤? b)%L then Lt else Gt.
-
 Definition angle_compare θ1 θ2 :=
   if (rngl_zero ≤? rngl_sin θ1)%L then
     if (rngl_zero ≤? rngl_sin θ2)%L then
@@ -335,6 +329,18 @@ Definition angle_compare θ1 θ2 :=
 Definition angle_eq θ1 θ2 := angle_compare θ1 θ2 = Eq.
 Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
 Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
+
+(*
+Definition bool_of_angle_compare cmp θ1 θ2 :=
+  match (cmp, angle_compare θ1 θ2) with
+  | (Eq, Eq) | (Lt, Lt) | (Gt, Gt) => true
+  | _ => false
+  end.
+
+Definition angle_eqb := bool_of_angle_compare Eq.
+Definition angle_ltb := bool_of_angle_compare Lt.
+Definition angle_leb θ1 θ2 := negb (bool_of_angle_compare Gt θ1 θ2).
+*)
 
 Definition angle_eqb θ1 θ2 :=
   match angle_compare θ1 θ2 with
@@ -477,18 +483,37 @@ Arguments angle_div_2 θ%A.
 
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 
-Theorem angle_ltb_ge : ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
+Theorem angle_ltb_ge :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
 Proof.
-intros.
+intros Hed *.
 progress unfold angle_ltb.
-...
-progress unfold angle_leb.
+progress unfold angle_le.
+progress unfold angle_compare.
+(*
+progress unfold rngl_compare.
+*)
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
+remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
+remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
+symmetry in Hzs1, Hzs2, Hc21, Hc12.
 split; intros H12. {
   destruct zs1. {
     destruct zs2; [ | easy ].
+    destruct c21; [ | easy | ]. {
+      destruct c12; [ easy | easy | ].
+      apply (rngl_compare_eq_iff Hed) in Hc21.
+      apply (rngl_compare_gt_iff Hor Hed) in Hc12.
+      rewrite Hc21 in Hc12.
+      now apply (rngl_lt_irrefl Hor) in Hc12.
+    }
+...
+    destruct c21. {
+      destruct c12. {
+        apply (rngl_eqb_eq) in Hc21.
+...
     apply (rngl_ltb_ge Hor) in H12.
     now apply rngl_leb_le.
   } {

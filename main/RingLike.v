@@ -5248,6 +5248,93 @@ Definition minus_one_pow n :=
   | _ => (- 1%L)%L
   end.
 
+(* comparison *)
+
+Definition rngl_compare a b :=
+  if (a =? b)%L then Eq
+  else if (a ≤? b)%L then Lt else Gt.
+
+Theorem rngl_compare_eq_iff :
+  rngl_has_eq_dec T = true →
+  ∀ a b, rngl_compare a b = Eq ↔ a = b.
+Proof.
+intros Hed *.
+progress unfold rngl_compare.
+remember (a =? b)%L as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  split; [ | easy ].
+  now apply (rngl_eqb_eq Hed) in Hab.
+} {
+  destruct (a ≤? b)%L. {
+    split; [ easy | ].
+    now apply (rngl_eqb_neq Hed) in Hab.
+  } {
+    split; [ easy | ].
+    now apply (rngl_eqb_neq Hed) in Hab.
+  }
+}
+Qed.
+
+Theorem rngl_compare_lt_iff :
+  rngl_is_ordered T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b, rngl_compare a b = Lt ↔ (a < b)%L.
+Proof.
+intros Hor Hed *.
+progress unfold rngl_compare.
+remember (a =? b)%L as ab eqn:Hab.
+remember (a ≤? b)%L as alb eqn:Halb.
+symmetry in Hab, Halb.
+destruct ab. {
+  split; [ easy | intros H ].
+  apply (rngl_eqb_eq Hed) in Hab.
+  subst b.
+  now apply (rngl_lt_irrefl Hor) in H.
+} {
+  apply (rngl_eqb_neq Hed) in Hab.
+  destruct alb. {
+    apply rngl_leb_le in Halb.
+    split; [ | easy ].
+    intros _.
+    now apply (rngl_lt_iff Hor).
+  } {
+    split; [ easy | ].
+    apply (rngl_leb_gt Hor) in Halb.
+    intros H.
+    now apply (rngl_lt_asymm Hor) in H.
+  }
+}
+Qed.
+
+Theorem rngl_compare_gt_iff :
+  rngl_is_ordered T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b, rngl_compare a b = Gt ↔ (b < a)%L.
+Proof.
+intros Hor Hed *.
+progress unfold rngl_compare.
+remember (a =? b)%L as ab eqn:Hab.
+remember (a ≤? b)%L as alb eqn:Halb.
+symmetry in Hab, Halb.
+destruct ab. {
+  split; [ easy | intros H ].
+  apply (rngl_eqb_eq Hed) in Hab.
+  subst b.
+  now apply (rngl_lt_irrefl Hor) in H.
+} {
+  apply (rngl_eqb_neq Hed) in Hab.
+  destruct alb. {
+    apply rngl_leb_le in Halb.
+    split; [ easy | ].
+    intros H.
+    now apply (rngl_nle_gt Hor) in H.
+  } {
+    now apply (rngl_leb_gt Hor) in Halb.
+  }
+}
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=
@@ -5259,6 +5346,8 @@ Record in_charac_0_field :=
     cf_characteristic : rngl_characteristic T = 0 }.
 
 End a.
+
+Notation "x ?= y" := (rngl_compare x y) : ring_like_scope.
 
 (* to be able to use tactic "ring" *)
 
