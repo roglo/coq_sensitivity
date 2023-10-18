@@ -1,5 +1,5 @@
-Complex.vio: Complex.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio RealLike.vio
-Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo RealLike.vo
+Complex.vio: Complex.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio RealLike.vio TrigoWithoutPi.vio
+Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo RealLike.vo TrigoWithoutPi.vo
 FermatLittle.vio: FermatLittle.v ../main/Misc.vio ../main/PermutationFun.vio Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
