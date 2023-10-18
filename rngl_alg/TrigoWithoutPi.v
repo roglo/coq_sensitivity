@@ -400,4 +400,59 @@ split; [ easy | ].
 now do 2 apply -> Nat.succ_lt_mono.
 Qed.
 
+(* *)
+
+Definition rngl_compare a b :=
+  if (a =? b)%L then Eq
+  else if (a ≤? b)%L then Lt else Gt.
+
+Definition angle_compare θ1 θ2 :=
+  if (rngl_zero ≤? rngl_sin θ1)%L then
+    if (rngl_zero ≤? rngl_sin θ2)%L then
+      rngl_compare (rngl_cos θ2) (rngl_cos θ1)
+    else Lt
+  else
+    if (rngl_zero ≤? rngl_sin θ2)%L then Gt
+    else rngl_compare (rngl_cos θ1) (rngl_cos θ2).
+
+Definition angle_eq θ1 θ2 := angle_compare θ1 θ2 = Eq.
+Definition angle_lt θ1 θ2 := angle_compare θ1 θ2 = Lt.
+Definition angle_le θ1 θ2 := angle_compare θ1 θ2 ≠ Gt.
+
+Definition angle_eqb θ1 θ2 :=
+  match angle_compare θ1 θ2 with
+  | Eq => true
+  | _ => false
+  end.
+
+Definition angle_ltb θ1 θ2 :=
+  match angle_compare θ1 θ2 with
+  | Lt => true
+  | _ => false
+  end.
+
+Definition angle_leb θ1 θ2 :=
+  match angle_compare θ1 θ2 with
+  | Gt => false
+  | _ => true
+  end.
+
 End a.
+
+(*
+Declare Scope angle_scope.
+Delimit Scope angle_scope with A.
+
+Notation "a + b" := (angle_add a b) : angle_scope.
+Notation "n * a" := (angle_mul_nat a n) : angle_scope.
+
+Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : angle_scope.
+Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
+Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
+Notation "θ1 < θ2" := (angle_lt θ1 θ2) : angle_scope.
+Notation "θ1 ≤ θ2" := (angle_le θ1 θ2) : angle_scope.
+Notation "- θ" := (angle_opp θ) : angle_scope.
+Notation "0" := (angle_zero) : angle_scope.
+Notation "a ≤ b < c" := (angle_leb a b = true ∧ angle_ltb b c = true)%L :
+  angle_scope.
+*)
