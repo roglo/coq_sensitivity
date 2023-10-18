@@ -1445,6 +1445,24 @@ subst θ2.
 now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_le_rngl_sin_nonneg_sin_nonneg :
+  ∀ θ1 θ2,
+  (θ2 ≤ θ1)%A
+  → (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L.
+Proof.
+intros * H21 Hzs1.
+progress unfold angle_le in H21.
+apply (rngl_nlt_ge Hor).
+intros Hs2z.
+apply H21; clear H21.
+progress unfold angle_compare.
+apply rngl_leb_le in Hzs1.
+rewrite Hzs1.
+apply (rngl_leb_gt Hor) in Hs2z.
+now rewrite Hs2z.
+Qed.
+
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1529,8 +1547,8 @@ destruct zs3. {
     destruct zs2. {
       apply rngl_leb_le in Hzs2.
       exfalso.
-...
-      progress unfold angle_leb in Haov.
+      progress unfold angle_le in Haov.
+      progress unfold angle_compare in Haov.
       apply (rngl_leb_gt Hor) in Hzs1.
       rewrite Hzs1 in Haov.
       apply (rngl_leb_le) in Hzs3.
@@ -1554,6 +1572,7 @@ destruct zs1. {
     apply rngl_leb_le in Hzs2.
     rewrite (rngl_mul_1_l Hon).
     subst θ3.
+...
     now apply rngl_sin_nonneg_sin_nonneg_sin_neg.
   } {
     apply (rngl_leb_gt Hor) in Hzs2.
