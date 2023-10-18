@@ -34,5 +34,7 @@ RealLike.vio: RealLike.v ../main/RingLike.vio
 RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v ../main/RingLike.vo
 Rrl.vio: Rrl.v ../main/RingLike.vio
 Rrl.vo Rrl.glob Rrl.v.beautified Rrl.required_vo: Rrl.v ../main/RingLike.vo
+TrigoWithoutPi.vio: TrigoWithoutPi.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio
+TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo
 Zrl.vio: Zrl.v ../main/RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v ../main/RingLike.vo

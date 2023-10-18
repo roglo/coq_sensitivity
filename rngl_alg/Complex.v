@@ -292,9 +292,6 @@ Context {rp : ring_like_prop T}.
 *)
 Context {rl : real_like_prop T}.
 
-Definition rl_sqrt := rl_nth_root 2.
-Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
-
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 
 Definition gc_opt_inv_or_quot :
@@ -321,12 +318,6 @@ intros Him * Hab.
 specialize rl_opt_integral_modulus_prop as Hmi.
 rewrite Him in Hmi.
 now apply Hmi.
-Qed.
-
-Theorem rngl_squ_sqrt : ∀ a, (0 ≤ a)%L → rngl_squ (rl_sqrt a) = a.
-Proof.
-intros.
-now apply (rl_nth_root_pow 2 a).
 Qed.
 
 Theorem cos2_sin2_prop_add_squ :
