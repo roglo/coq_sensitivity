@@ -1,3 +1,5 @@
+Complex.vio: Complex.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio
+Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo
 FermatLittle.vio: FermatLittle.v ../main/Misc.vio ../main/PermutationFun.vio Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
@@ -28,8 +30,6 @@ Quaternion.vio: Quaternion.v ../main/Misc.vio ../main/RingLike.vio ../main/IterA
 Quaternion.vo Quaternion.glob Quaternion.v.beautified Quaternion.required_vo: Quaternion.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/MyVector.vo Zrl.vo
 Rational.vio: Rational.v ../main/Misc.vio Misc.vio GQ.vio
 Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v ../main/Misc.vo Misc.vo GQ.vo
-RealLike.vio: RealLike.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio
-RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo
 Rrl.vio: Rrl.v ../main/RingLike.vio
 Rrl.vo Rrl.glob Rrl.v.beautified Rrl.required_vo: Rrl.v ../main/RingLike.vo
 Zrl.vio: Zrl.v ../main/RingLike.vio
