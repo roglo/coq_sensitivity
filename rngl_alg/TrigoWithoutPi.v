@@ -1194,6 +1194,44 @@ subst x y.
 now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
 Qed.
 
+Theorem rngl_sin_nonneg_add_nonneg_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (θ1 ≤ θ1 + θ2)%A
+  → (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (0 ≤ rngl_sin θ2)%L.
+Proof.
+intros Hic Hon Hop Hed * Haov Hzs1 Hzs3.
+remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
+apply (rngl_nlt_ge Hor).
+intros Hzs2.
+progress unfold angle_le in Haov.
+...
+progress unfold angle_leb in Haov.
+cbn in Haov.
+apply (rngl_leb_le) in Hzs1.
+rewrite Hzs1 in Haov.
+apply (rngl_leb_le) in Hzs1.
+apply (rngl_leb_le) in Hzs3.
+rewrite Hzs3 in Haov.
+apply (rngl_leb_le) in Hzs3.
+apply rngl_leb_le in Haov.
+apply (rngl_nlt_ge Hor) in Haov.
+apply Haov; clear Haov.
+apply (rngl_nle_gt Hor).
+intros Hc31.
+apply (rngl_nle_gt Hor) in Hzs2.
+apply Hzs2; clear Hzs2.
+symmetry in Hθ3.
+apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
+subst θ2.
+now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
+Qed.
+
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
