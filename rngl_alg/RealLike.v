@@ -8,7 +8,6 @@ Require Import Utf8 ZArith.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Init.Nat.
-Require Import IntermVal.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -95,9 +94,6 @@ Definition gc_opt_opp_or_subt :
 Definition gc_inv a :=
   let d := (gre a * gre a + gim a * gim a)%L in
   mk_gc (gre a / d) (- gim a / d)%L.
-
-Definition is_derivative f f' :=
-  ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
 
 End a.
 

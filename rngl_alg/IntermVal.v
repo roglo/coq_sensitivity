@@ -8,35 +8,6 @@ Require Import Main.Misc Main.RingLike.
 Require Import Init.Nat.
 *)
 
-Section a.
-
-Context {T : Type}.
-Context {ro : ring_like_op T}.
-
-(* should be added in RingLike, begin *)
-Definition is_Cauchy_sequence (u : nat → T) :=
-  ∀ ε : T, (0 < ε)%L →
-  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) < ε)%L.
-
-Definition is_limit_when_tending_to f a l :=
-  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x, rngl_abs (x - a) < η → rngl_abs (f x - l) < ε)%L.
-
-Definition is_limit_when_tending_to_inf f l :=
-  ∀ ε, (0 < ε)%L → ∃ N,
-  ∀ n, N ≤ n → (rngl_abs (f n - l) < ε)%L.
-
-Definition is_complete :=
-  ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
-(* should be added in RingLike, end *)
-
-Definition continuous_at f a := is_limit_when_tending_to f a (f a).
-Definition continuous f := ∀ a, continuous_at f a.
-
-End a.
-
-Arguments is_complete T {ro}.
-
 Class excl_midd := { em_prop : ∀ P, P + notT P }.
 
 Theorem rl_forall_or_exist_not {em : excl_midd} {T} :
@@ -98,73 +69,6 @@ Fixpoint AnBn (P : T → Type) (An Bn : T) n :=
       if is_upper_bound P A then AnBn P An A n'
       else AnBn P A Bn n'
   end.
-
-Theorem rngl_archimedean_ub :
-  rngl_is_archimedean T = true →
-  rngl_is_ordered T = true →
-  ∀ a b : T, (0 < a < b)%L →
-  ∃ n : nat, (rngl_mul_nat a n ≤ b < rngl_mul_nat a (n + 1))%L.
-Proof.
-intros Har Hor * (Ha, Hab).
-specialize rngl_opt_archimedean as H1.
-rewrite Har, Hor in H1; cbn in H1.
-specialize (H1 a b Ha).
-destruct H1 as (m, Hm).
-induction m. {
-  exfalso; cbn in Hm.
-  apply (rngl_nle_gt Hor) in Hm.
-  apply Hm; clear Hm.
-  now apply (rngl_le_trans Hor _ a); apply (rngl_lt_le_incl Hor).
-}
-destruct (rngl_le_dec Hor (rngl_mul_nat a m) b) as [Hba| Hba]. {
-  now exists m; rewrite Nat.add_1_r.
-}
-apply (rngl_nle_gt Hor) in Hba.
-now apply IHm.
-Qed.
-
-Theorem int_part :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_characteristic T ≠ 1 →
-  rngl_is_ordered T = true →
-  rngl_is_archimedean T = true →
-  ∀ a, ∃ n, (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L.
-Proof.
-intros Hon Hop Hc1 Hor Har *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-specialize (rngl_archimedean_ub Har Hor) as H1.
-destruct (rngl_lt_dec Hor (rngl_abs a) 1) as [H1x| H1x]. {
-  exists 0; cbn.
-  rewrite rngl_add_0_r.
-  split; [ | easy ].
-  apply (rngl_0_le_abs Hop Hor).
-}
-destruct (rngl_lt_dec Hor 1 (rngl_abs a)) as [Hx1| Hx1]. 2: {
-  apply (rngl_nlt_ge Hor) in H1x, Hx1.
-  apply (rngl_le_antisymm Hor) in H1x; [ | easy ].
-  rewrite H1x.
-  exists 1; cbn.
-  rewrite rngl_add_0_r.
-  split; [ apply (rngl_le_refl Hor) | ].
-  apply (rngl_lt_iff Hor).
-  split. 2: {
-    intros H12.
-    apply (f_equal (λ b, rngl_sub b 1)) in H12.
-    rewrite (rngl_sub_diag Hos) in H12.
-    rewrite (rngl_add_sub Hos) in H12.
-    symmetry in H12; revert H12.
-    apply (rngl_1_neq_0_iff Hon), Hc1.
-  }
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-clear H1x.
-apply (H1 1 (rngl_abs a))%L.
-split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
-Qed.
 
 Theorem rngl_middle_in_middle :
   rngl_has_1 T = true →

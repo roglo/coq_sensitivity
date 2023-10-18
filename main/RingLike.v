@@ -5148,6 +5148,98 @@ rewrite rngl_add_comm.
 now apply (rngl_add_neg_nonpos Hop Hor).
 Qed.
 
+(* completeness *)
+
+Definition is_Cauchy_sequence (u : nat → T) :=
+  ∀ ε : T, (0 < ε)%L →
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) < ε)%L.
+
+Definition is_limit_when_tending_to f a l :=
+  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
+   ∀ x, rngl_abs (x - a) < η → rngl_abs (f x - l) < ε)%L.
+
+Definition is_limit_when_tending_to_inf f l :=
+  ∀ ε, (0 < ε)%L → ∃ N,
+  ∀ n, N ≤ n → (rngl_abs (f n - l) < ε)%L.
+
+Definition is_derivative f f' :=
+  ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
+
+Definition is_complete :=
+  ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
+
+Definition continuous_at f a := is_limit_when_tending_to f a (f a).
+Definition continuous f := ∀ a, continuous_at f a.
+
+(* archimedianity *)
+
+Theorem rngl_archimedean_ub :
+  rngl_is_archimedean T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < a < b)%L →
+  ∃ n : nat, (rngl_mul_nat a n ≤ b < rngl_mul_nat a (n + 1))%L.
+Proof.
+intros Har Hor * (Ha, Hab).
+specialize rngl_opt_archimedean as H1.
+rewrite Har, Hor in H1; cbn in H1.
+specialize (H1 a b Ha).
+destruct H1 as (m, Hm).
+induction m. {
+  exfalso; cbn in Hm.
+  apply (rngl_nle_gt Hor) in Hm.
+  apply Hm; clear Hm.
+  now apply (rngl_le_trans Hor _ a); apply (rngl_lt_le_incl Hor).
+}
+destruct (rngl_le_dec Hor (rngl_mul_nat a m) b) as [Hba| Hba]. {
+  now exists m; rewrite Nat.add_1_r.
+}
+apply (rngl_nle_gt Hor) in Hba.
+now apply IHm.
+Qed.
+
+Theorem int_part :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  ∀ a, ∃ n, (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L.
+Proof.
+intros Hon Hop Hc1 Hor Har *.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+specialize (rngl_archimedean_ub Har Hor) as H1.
+destruct (rngl_lt_dec Hor (rngl_abs a) 1)%L as [H1x| H1x]. {
+  exists 0; cbn.
+  rewrite rngl_add_0_r.
+  split; [ | easy ].
+  apply (rngl_0_le_abs Hop Hor).
+}
+destruct (rngl_lt_dec Hor 1 (rngl_abs a))%L as [Hx1| Hx1]. 2: {
+  apply (rngl_nlt_ge Hor) in H1x, Hx1.
+  apply (rngl_le_antisymm Hor) in H1x; [ | easy ].
+  rewrite H1x.
+  exists 1; cbn.
+  rewrite rngl_add_0_r.
+  split; [ apply (rngl_le_refl Hor) | ].
+  apply (rngl_lt_iff Hor).
+  split. 2: {
+    intros H12.
+    apply (f_equal (λ b, rngl_sub b 1))%L in H12.
+    rewrite (rngl_sub_diag Hos) in H12.
+    rewrite (rngl_add_sub Hos) in H12.
+    symmetry in H12; revert H12.
+    apply (rngl_1_neq_0_iff Hon), Hc1.
+  }
+  apply (rngl_le_add_r Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+clear H1x.
+apply (H1 1 (rngl_abs a))%L.
+split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
+Qed.
+
 (* (-1) ^ n *)
 
 Definition minus_one_pow n :=
@@ -5242,3 +5334,5 @@ Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
 Arguments rngl_squ {T ro} x%L.
 Arguments rngl_sub {T ro} (a b)%L.
 Arguments rngl_subt {T ro} (a b)%L.
+
+Arguments is_complete T {ro}.
