@@ -491,9 +491,6 @@ intros Hed *.
 progress unfold angle_ltb.
 progress unfold angle_le.
 progress unfold angle_compare.
-(*
-progress unfold rngl_compare.
-*)
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
@@ -502,36 +499,31 @@ symmetry in Hzs1, Hzs2, Hc21, Hc12.
 split; intros H12. {
   destruct zs1. {
     destruct zs2; [ | easy ].
+    destruct c12; [ easy | easy | exfalso ].
     destruct c21; [ | easy | ]. {
-      destruct c12; [ easy | easy | ].
       apply (rngl_compare_eq_iff Hed) in Hc21.
       apply (rngl_compare_gt_iff Hor Hed) in Hc12.
       rewrite Hc21 in Hc12.
       now apply (rngl_lt_irrefl Hor) in Hc12.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc21, Hc12.
+      now apply (rngl_lt_asymm Hor) in Hc12.
     }
-...
-    destruct c21. {
-      destruct c12. {
-        apply (rngl_eqb_eq) in Hc21.
-...
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
   } {
     destruct zs2; [ easy | ].
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
-  }
-} {
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
-  } {
-    destruct zs2; [ easy | ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
+    destruct c21; [ easy | easy | exfalso ].
+    apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+    destruct c12; [ | easy | ]. {
+      apply (rngl_compare_eq_iff Hed) in Hc12.
+      rewrite Hc12 in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc12.
+      now apply (rngl_lt_asymm Hor) in Hc12.
+    }
   }
 }
+...
 Qed.
 
 Theorem rngl_cos_angle_div_2_add_not_overflow :
