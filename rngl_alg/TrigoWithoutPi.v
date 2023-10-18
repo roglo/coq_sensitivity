@@ -1,9 +1,10 @@
 (* angles without π *)
 (* in this vision, an angle is not a real but a pair of reals (x,y)
    such that x²+y²=1; the cosinus is then x and the sinus is y.
-   The property sin²+cos²=1 is by definition. It is possible to
-   add angles (see below) and we inherit the properties of
-   cos(x+y) and sin(x+y) in an obvous way. *)
+
+   The property sin²+cos²=1 is therefore by definition. It is possible
+   to add angles (see below) and we inherit the properties of cos(x+y)
+   and sin(x+y) in an obvous way. *)
 
 (*
 Set Nested Proofs Allowed.
@@ -15,7 +16,6 @@ Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
 (*
 Require Import Init.Nat.
-Require Import IntermVal.
 *)
 Require Import RealLike.
 
