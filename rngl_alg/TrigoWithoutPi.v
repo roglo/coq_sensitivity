@@ -374,6 +374,7 @@ Notation "θ1 + θ2" := (angle_add θ1 θ2) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "n * a" := (angle_mul_nat a n) : angle_scope.
 
+Notation "θ1 ?= θ2" := (angle_compare θ1 θ2) : angle_scope.
 Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : angle_scope.
 Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
@@ -488,6 +489,318 @@ Arguments angle_div_2 θ%A.
 
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 
+Theorem angle_eqb_refl :
+  rngl_has_eq_dec T = true →
+  ∀ θ, (θ =? θ)%A = true.
+Proof.
+intros Hed *.
+progress unfold angle_eqb.
+progress unfold angle_compare.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  progress unfold rngl_compare.
+  now rewrite (rngl_eqb_refl Hed).
+} {
+  progress unfold rngl_compare.
+  now rewrite (rngl_eqb_refl Hed).
+}
+Qed.
+
+Theorem angle_compare_eq_iff :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 ?= θ2)%A = Eq ↔ θ1 = θ2.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+progress unfold angle_compare.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
+remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
+symmetry in Hzs1, Hzs2, Hc21, Hc12.
+split; intros H12. {
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    destruct c21; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc21.
+    rewrite Hc21 in Hc12.
+    apply eq_angle_eq.
+    rewrite Hc21; f_equal.
+    apply (rngl_leb_le) in Hzs1, Hzs2.
+    rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonneg Hop Hor (rngl_sin θ1)); [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  } {
+    destruct zs2; [ easy | ].
+    destruct c12; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc12.
+    apply eq_angle_eq.
+    rewrite Hc12; f_equal.
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+    apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+    apply (rngl_opp_inj Hop).
+    rewrite <- (rngl_abs_nonpos Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonpos Hop Hor (rngl_sin θ2))%L; [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  }
+} {
+  subst θ2.
+  rewrite Hzs1 in Hzs2; subst zs2.
+  rewrite Hc21 in Hc12; subst c12.
+  destruct zs1. {
+    destruct c21; [ easy | | ]. {
+      apply (rngl_compare_lt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    }
+  } {
+    destruct c21; [ easy | | ]. {
+      apply (rngl_compare_lt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    }
+  }
+}
+Qed.
+
+Theorem angle_compare_lt_iff : ∀ θ1 θ2, (θ1 ?= θ2)%A = Lt ↔ (θ1 < θ2)%A.
+Proof. easy. Qed.
+
+Theorem angle_compare_gt_iff :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 ?= θ2)%A = Gt ↔ (θ2 < θ1)%A.
+Proof.
+intros Hed *.
+progress unfold angle_lt.
+progress unfold angle_compare.
+destruct (0 ≤? rngl_sin θ1)%L. {
+  destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
+  remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
+  remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
+  symmetry in Hc21, Hc12.
+  destruct c21. {
+    split; [ easy | ].
+    intros H; move H at top; subst c12.
+    apply (rngl_compare_eq_iff Hed) in Hc21.
+    apply (rngl_compare_lt_iff Hor Hed) in Hc12.
+    rewrite Hc21 in Hc12.
+    now apply (rngl_lt_irrefl Hor) in Hc12.
+  } {
+    split; [ easy | ].
+    intros H; move H at top; subst c12.
+    apply (rngl_compare_lt_iff Hor Hed) in Hc21.
+    apply (rngl_compare_lt_iff Hor Hed) in Hc12.
+    now apply (rngl_lt_asymm Hor) in Hc21.
+  } {
+    split; [ | easy ].
+    intros _.
+    apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+    destruct c12; [ | easy | ]. {
+      apply (rngl_compare_eq_iff Hed) in Hc12.
+      rewrite Hc12 in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc12.
+      now apply (rngl_lt_asymm Hor) in Hc21.
+    }
+  }
+}
+...
+      rewrite Hc21 in Hc12.
+      now apply (rngl_lt_irrefl Hor) in Hc12.
+...
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
+remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
+symmetry in Hzs1, Hzs2, Hc21, Hc12.
+split; intros H12. {
+  destruct zs1. {
+    destruct zs2. {
+      move H12 at top; subst c21.
+...
+    destruct c21; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc21.
+    rewrite Hc21 in Hc12.
+    apply eq_angle_eq.
+    rewrite Hc21; f_equal.
+    apply (rngl_leb_le) in Hzs1, Hzs2.
+    rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonneg Hop Hor (rngl_sin θ1)); [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  } {
+    destruct zs2; [ easy | ].
+    destruct c12; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc12.
+    apply eq_angle_eq.
+    rewrite Hc12; f_equal.
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+    apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+    apply (rngl_opp_inj Hop).
+    rewrite <- (rngl_abs_nonpos Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonpos Hop Hor (rngl_sin θ2))%L; [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  }
+} {
+  subst θ2.
+  rewrite Hzs1 in Hzs2; subst zs2.
+  rewrite Hc21 in Hc12; subst c12.
+  destruct zs1. {
+    destruct c21; [ easy | | ]. {
+      apply (rngl_compare_lt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    }
+  } {
+    destruct c21; [ easy | | ]. {
+      apply (rngl_compare_lt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    } {
+      apply (rngl_compare_gt_iff Hor Hed) in Hc21.
+      now apply (rngl_lt_irrefl Hor) in Hc21.
+    }
+  }
+}
+...progress
+...
+
+rngl_compare_lt_iff:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true → rngl_has_eq_dec T = true → ∀ a b : T, (a ?= b)%L = Lt ↔ (a < b)%L
+
+...
+
+rngl_compare_gt_iff:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → rngl_is_ordered T = true → rngl_has_eq_dec T = true → ∀ a b : T, (a ?= b)%L = Gt ↔ (b < a)%L
+
+Theorem angle_eqb_eq :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
+Proof.
+intros Hic Hon Hop Hed *.
+progress unfold angle_eqb.
+remember (θ1 ?= θ2)%A as c12 eqn:Hc12.
+symmetry in Hc12.
+destruct c12. {
+  now apply (angle_compare_eq_iff Hic Hon Hop Hed) in Hc12.
+} {
+...
+  apply (angle_compare_lt_iff Hic Hon Hop Hed) in Hc12.
+  split; [ easy | ].
+...
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert
+  (Hid :
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1, Hed.
+}
+split; intros H12. {
+  progress unfold angle_eqb in H12.
+  progress unfold angle_compare in H12.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
+    symmetry in Hc21.
+    destruct c21; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc21.
+    apply eq_angle_eq.
+    rewrite Hc21; f_equal.
+    apply (rngl_leb_le) in Hzs1, Hzs2.
+    rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonneg Hop Hor (rngl_sin θ1)); [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  } {
+    destruct zs2; [ easy | ].
+    remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
+    symmetry in Hc12.
+    destruct c12; [ | easy | easy ].
+    apply (rngl_compare_eq_iff Hed) in Hc12.
+    apply eq_angle_eq.
+    rewrite Hc12; f_equal.
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+    apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+    apply (rngl_opp_inj Hop).
+    rewrite <- (rngl_abs_nonpos Hop Hor); [ | easy ].
+    rewrite <- (rngl_abs_nonpos Hop Hor (rngl_sin θ2))%L; [ | easy ].
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    now f_equal; f_equal.
+  }
+} {
+  subst θ2.
+  apply (angle_eqb_refl Hed).
+}
+Qed.
+
 Theorem angle_ltb_ge :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
@@ -495,6 +808,7 @@ Proof.
 intros Hed *.
 progress unfold angle_ltb.
 progress unfold angle_le.
+...
 progress unfold angle_compare.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
@@ -1152,6 +1466,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
         subst θ1.
         clear Hzc1 Hzs1.
         progress unfold angle_le in Haov.
+...
         progress unfold angle_compare in Haov.
         cbn in Haov.
         rewrite (rngl_leb_refl Hor) in Haov.
@@ -1441,6 +1756,7 @@ remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge Hor).
 intros Hzs2.
 progress unfold angle_le in Haov.
+...
 progress unfold angle_compare in Haov.
 apply (rngl_leb_le) in Hzs1.
 rewrite Hzs1 in Haov.
@@ -1471,6 +1787,7 @@ progress unfold angle_le in H21.
 apply (rngl_nlt_ge Hor).
 intros Hs2z.
 apply H21; clear H21.
+...
 progress unfold angle_compare.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
@@ -2157,30 +2474,13 @@ apply rngl_add_0_r.
 Qed.
 *)
 
-Theorem angle_eqb_refl :
-  rngl_has_eq_dec T = true →
-  ∀ θ, (θ =? θ)%A = true.
-Proof.
-intros Hed *.
-progress unfold angle_eqb.
-progress unfold angle_compare.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  progress unfold rngl_compare.
-  now rewrite (rngl_eqb_refl Hed).
-} {
-  progress unfold rngl_compare.
-  now rewrite (rngl_eqb_refl Hed).
-}
-Qed.
-
 Theorem angle_leb_refl :
   rngl_has_eq_dec T = true →
   ∀ θ, (θ ≤? θ)%A = true.
 Proof.
 intros Hed *.
 progress unfold angle_leb.
+...
 progress unfold angle_compare.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -2190,75 +2490,6 @@ destruct zs. {
 } {
   progress unfold rngl_compare.
   now rewrite (rngl_eqb_refl Hed).
-}
-Qed.
-
-Theorem angle_eqb_eq :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
-Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-assert
-  (Hid :
-    (rngl_is_integral_domain T ||
-       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now rewrite Hi1, Hed.
-}
-split; intros H12. {
-  progress unfold angle_eqb in H12.
-  progress unfold angle_compare in H12.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hzs1, Hzs2.
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    remember (rngl_cos θ2 ?= rngl_cos θ1)%L as c21 eqn:Hc21.
-    symmetry in Hc21.
-    destruct c21; [ | easy | easy ].
-    apply (rngl_compare_eq_iff Hed) in Hc21.
-    apply eq_angle_eq.
-    rewrite Hc21; f_equal.
-    apply (rngl_leb_le) in Hzs1, Hzs2.
-    rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
-    rewrite <- (rngl_abs_nonneg Hop Hor (rngl_sin θ1)); [ | easy ].
-    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
-    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
-    apply (rngl_add_move_l Hop) in H1.
-    rewrite H1; clear H1.
-    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
-    apply (rngl_add_move_l Hop) in H1.
-    rewrite H1; clear H1.
-    now f_equal; f_equal.
-  } {
-    destruct zs2; [ easy | ].
-    remember (rngl_cos θ1 ?= rngl_cos θ2)%L as c12 eqn:Hc12.
-    symmetry in Hc12.
-    destruct c12; [ | easy | easy ].
-    apply (rngl_compare_eq_iff Hed) in Hc12.
-    apply eq_angle_eq.
-    rewrite Hc12; f_equal.
-    apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
-    apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
-    apply (rngl_opp_inj Hop).
-    rewrite <- (rngl_abs_nonpos Hop Hor); [ | easy ].
-    rewrite <- (rngl_abs_nonpos Hop Hor (rngl_sin θ2))%L; [ | easy ].
-    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid).
-    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
-    apply (rngl_add_move_l Hop) in H1.
-    rewrite H1; clear H1.
-    specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
-    apply (rngl_add_move_l Hop) in H1.
-    rewrite H1; clear H1.
-    now f_equal; f_equal.
-  }
-} {
-  subst θ2.
-  apply (angle_eqb_refl Hed).
 }
 Qed.
 
@@ -2330,7 +2561,11 @@ Theorem angle_le_0_r :
   ∀ θ, (θ ≤ 0)%A → θ = 0%A.
 Proof.
 intros Hic Hon Hop Hed * Hθ.
+progress unfold angle_le in Hθ.
+Search rngl_compare.
+Search angle_compare.
 ...
+intros Hic Hon Hop Hed * Hθ.
 progress unfold angle_leb in Hθ.
 cbn in Hθ.
 rewrite (rngl_leb_refl Hor) in Hθ.
