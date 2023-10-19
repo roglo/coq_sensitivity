@@ -2527,10 +2527,15 @@ intros Hic Hon Hop Hed * H1z H2z.
 assert (H : ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A → (- θ2 ≤ - θ1)%A). {
   clear θ1 θ2 H1z H2z.
   intros θ1 θ2 H1z H2z H12.
-...
-  progress unfold angle_leb in H12 |-*.
-  progress unfold angle_opp.
-  cbn.
+  progress unfold angle_le in H12 |-*.
+  intros H; apply H12; clear H12; rename H into H12.
+  apply (angle_compare_gt_iff Hed) in H12.
+  apply (angle_compare_gt_iff Hed).
+  progress unfold angle_lt in H12.
+  progress unfold angle_lt.
+  progress unfold angle_compare in H12.
+  progress unfold angle_compare.
+  cbn in H12.
   remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
   remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
   remember (0 ≤? - rngl_sin θ1)%L as zo1 eqn:Hzo1.
@@ -2549,19 +2554,19 @@ assert (H : ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A → (- 
       destruct Hz1 as [Hz1| Hz1]; [ easy | ].
       subst θ1; cbn in H12 |-*.
       clear H1z.
-      apply rngl_leb_le in H12.
-      specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor θ2) as H1.
-      apply (rngl_le_antisymm Hor) in H12; [ | easy ].
-      symmetry in H12.
-      apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H12.
-      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H12.
-      destruct H12 as [H12| H12]; [ easy | ].
-      subst θ2; cbn in Hzo2 |-*.
-      clear H2z H1 Hz2.
+      apply (rngl_compare_lt_iff Hor Hed).
+      apply (rngl_lt_iff Hor).
+      split; [ apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) | ].
+      intros H; symmetry in H.
+      rewrite H in H12.
+      rewrite (rngl_compare_refl Hed) in H12.
+      destruct zo2; [ easy | ].
+      apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H.
+      rewrite H in Hzo2.
       rewrite (rngl_opp_0 Hop) in Hzo2.
-      rewrite (rngl_leb_refl Hor) in Hzo2; subst zo2.
-      apply (rngl_leb_refl Hor).
+      now rewrite (rngl_leb_refl Hor) in Hzo2.
     }
+...
     clear H12.
     apply (rngl_leb_gt Hor) in Hz2.
     destruct zo1. {
@@ -2610,6 +2615,8 @@ apply H in H12. {
   now rewrite (angle_opp_0 Hop) in H1.
 }
 Qed.
+
+...
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 

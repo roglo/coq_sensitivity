@@ -5351,6 +5351,14 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_compare_refl :
+  rngl_has_eq_dec T = true →
+  ∀ a, rngl_compare a a = Eq.
+Proof.
+intros Hed *.
+now apply (rngl_compare_eq_iff Hed).
+Qed.
+
 (* *)
 
 Record in_charac_0_field :=
