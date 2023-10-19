@@ -5274,7 +5274,7 @@ now apply rngl_cos_bound.
 Qed.
 *)
 
-(* to be completed *)
+(* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
