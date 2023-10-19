@@ -34,12 +34,78 @@ Context {rl : real_like_prop T}.
 
 Definition rl_sqrt := rl_nth_root 2.
 
-Theorem rngl_squ_sqrt : ∀ a, (0 ≤ a)%L → rngl_squ (rl_sqrt a) = a.
+End a.
+
+Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+
+Theorem rngl_squ_sqrt : ∀ a, (0 ≤ a)%L → rngl_squ √a = a.
 Proof.
 intros.
 now apply (rl_nth_root_pow 2 a).
 Qed.
 
-End a.
+Theorem rl_sqrt_mul :
+  ∀ a b,
+  (0 ≤ a)%L
+  → (0 ≤ b)%L
+  → rl_sqrt (a * b)%L = (rl_sqrt a * rl_sqrt b)%L.
+Proof.
+intros * Ha Hb.
+progress unfold rl_sqrt.
+now rewrite rl_nth_root_mul.
+Qed.
 
-Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+Theorem rl_sqrt_div :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a)%L → (0 < b)%L → (√(a / b) = √a / √b)%L.
+Proof.
+intros Hon Hop Hiv Hor * Ha Hb.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite rl_sqrt_mul; [ | easy | ]. 2: {
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+}
+f_equal.
+now apply rl_nth_root_inv.
+Qed.
+
+Theorem rl_sqrt_squ :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (√(a²))%L = rngl_abs a.
+Proof.
+intros Hop Hor *.
+progress unfold rngl_squ.
+progress unfold rngl_abs.
+progress unfold rl_sqrt.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+destruct az. {
+  apply rngl_leb_le in Haz.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Haz.
+  rewrite <- (rngl_mul_opp_opp Hop).
+  rewrite rl_nth_root_mul; [ | easy | easy ].
+  rewrite fold_rngl_squ.
+  rewrite rngl_squ_pow_2.
+  now apply rl_nth_root_pow.
+} {
+  apply (rngl_leb_gt Hor) in Haz.
+  apply (rngl_lt_le_incl Hor) in Haz.
+  rewrite rl_nth_root_mul; [ | easy | easy ].
+  rewrite fold_rngl_squ.
+  rewrite rngl_squ_pow_2.
+  now apply rl_nth_root_pow.
+}
+Qed.
+
+End a.
