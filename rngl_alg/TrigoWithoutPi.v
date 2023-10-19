@@ -1646,7 +1646,6 @@ remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge Hor).
 intros Hzs2.
 progress unfold angle_le in Haov.
-...
 progress unfold angle_compare in Haov.
 apply (rngl_leb_le) in Hzs1.
 rewrite Hzs1 in Haov.
@@ -1677,7 +1676,6 @@ progress unfold angle_le in H21.
 apply (rngl_nlt_ge Hor).
 intros Hs2z.
 apply H21; clear H21.
-...
 progress unfold angle_compare.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
@@ -2370,7 +2368,6 @@ Theorem angle_leb_refl :
 Proof.
 intros Hed *.
 progress unfold angle_leb.
-...
 progress unfold angle_compare.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -2452,18 +2449,26 @@ Theorem angle_le_0_r :
 Proof.
 intros Hic Hon Hop Hed * Hθ.
 progress unfold angle_le in Hθ.
-Search rngl_compare.
-Search angle_compare.
-...
-intros Hic Hon Hop Hed * Hθ.
-progress unfold angle_leb in Hθ.
+progress unfold angle_compare in Hθ.
 cbn in Hθ.
 rewrite (rngl_leb_refl Hor) in Hθ.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
 destruct zs; [ | easy ].
-apply rngl_leb_le in Hzs, Hθ.
-now apply (le_1_rngl_cos Hic Hon Hop Hed) in Hθ.
+remember (1 ?= rngl_cos θ)%L as oc eqn:Hoc.
+symmetry in Hoc.
+destruct oc; [ | | easy ]. {
+  apply (rngl_compare_eq_iff Hed) in Hoc.
+  symmetry in Hoc.
+  apply (le_1_rngl_cos Hic Hon Hop Hed).
+  rewrite Hoc.
+  apply (rngl_le_refl Hor).
+} {
+  apply (rngl_compare_lt_iff Hor Hed) in Hoc.
+  apply (rngl_nle_gt Hor) in Hoc.
+  exfalso; apply Hoc; clear Hoc.
+  now apply rngl_cos_bound.
+}
 Qed.
 
 Theorem angle_opp_inj :
@@ -2482,6 +2487,7 @@ Theorem angle_leb_nle :
   ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ ¬ (θ1 ≤ θ2)%A.
 Proof.
 intros.
+...
 now split; intros; apply Bool.not_true_iff_false.
 Qed.
 
