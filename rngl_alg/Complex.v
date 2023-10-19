@@ -4886,6 +4886,7 @@ subst θ2.
 now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
 Qed.
 
+(*
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -5271,8 +5272,9 @@ rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_le_mono_r Hop Hor).
 now apply rngl_cos_bound.
 Qed.
+*)
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -5291,7 +5293,7 @@ symmetry in Haov.
 destruct aov. 2: {
   apply eq_angle_eq.
   f_equal. {
-    now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
+    now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
   }
 ...
 
