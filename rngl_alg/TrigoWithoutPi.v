@@ -2566,8 +2566,6 @@ assert (H : ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A → (- 
       rewrite (rngl_opp_0 Hop) in Hzo2.
       now rewrite (rngl_leb_refl Hor) in Hzo2.
     }
-...
-    clear H12.
     apply (rngl_leb_gt Hor) in Hz2.
     destruct zo1. {
       apply rngl_leb_le in Hzo1.
@@ -2576,9 +2574,11 @@ assert (H : ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A → (- 
       symmetry in Hzo1.
       apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzo1.
       destruct Hzo1 as [Hzo1| Hzo1]; [ easy | ].
-      subst θ1; cbn.
+      subst θ1; cbn in H12.
       destruct zo2. {
-        apply rngl_leb_le.
+        apply (rngl_compare_lt_iff Hor Hed) in H12.
+        apply (rngl_nle_gt Hor) in H12.
+        exfalso; apply H12.
         apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
       }
       apply rngl_leb_nle in Hzo2.
@@ -2616,85 +2616,46 @@ apply H in H12. {
 }
 Qed.
 
-...
-
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(**)
-Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
-(*
-Definition angle_add_overflow (θ1 θ2 : angle T) :=
-  (negb (θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
-*)
-
-(*
-Theorem angle_add_overflow_comm :
+Theorem rl_sqrt_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+ rl_sqrt 1%L = 1%L.
 Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-progress unfold angle_add_overflow.
-remember (θ1 =? 0)%A as z1 eqn:Hz1.
-symmetry in Hz1.
-destruct z1. {
-  apply (angle_eqb_eq Hed) in Hz1.
-  subst θ1; cbn.
-  remember (θ2 =? 0)%A as z2 eqn:Hz2.
-  remember (- θ2 ≤? 0)%A as o2z eqn:Ho2z.
-  symmetry in Hz2, Ho2z.
-  destruct z2; [ easy | ].
-  destruct o2z; [ exfalso | easy ].
-  apply (angle_eqb_neq Hed) in Hz2.
-  apply (angle_le_0_r Hic Hon Hop Hed) in Ho2z.
-  rewrite <- (angle_opp_0 Hop) in Ho2z.
-  now apply angle_opp_inj in Ho2z.
+intros Hic Hon Hop Hii.
+specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
+progress unfold rl_sqrt.
+specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
+rewrite <- (rngl_squ_1 Hon) in H1 at 2.
+rewrite <- rngl_squ_pow_2 in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_nonneg Hop Hor) in H1. 2: {
+  now apply rl_sqrt_nonneg.
 }
-cbn.
-apply (angle_eqb_neq Hed) in Hz1.
-remember (θ2 =? 0)%A as z2 eqn:Hz2.
-symmetry in Hz2.
-destruct z2; cbn. {
-  apply (angle_eqb_eq Hed) in Hz2.
-  subst θ2.
-  apply Bool.not_true_iff_false.
-  intros H.
-  apply (angle_le_0_r Hic Hon Hop Hed) in H.
-  rewrite <- (angle_opp_0 Hop) in H.
-  now apply (angle_opp_inj Hop) in H.
-}
-apply (angle_eqb_neq Hed) in Hz2.
-remember (- θ1 ≤? θ2)%A as o12 eqn:Ho12.
-remember (- θ2 ≤? θ1)%A as o21 eqn:Ho21.
-symmetry in Ho12, Ho21.
-destruct o12. {
-  destruct o21; [ easy | exfalso ].
-  apply angle_leb_nle in Ho21.
-  apply Ho21; clear Ho21.
-  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
-    intros H.
-    apply (f_equal angle_opp) in H.
-    rewrite (angle_opp_involutive Hop) in H.
-    now rewrite (angle_opp_0 Hop) in H.
-  }
-  now rewrite (angle_opp_involutive Hop).
-} {
-  destruct o21; [ exfalso | easy ].
-  apply angle_leb_nle in Ho12.
-  apply Ho12; clear Ho12.
-  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
-    intros H.
-    apply (f_equal angle_opp) in H.
-    rewrite (angle_opp_involutive Hop) in H.
-    now rewrite (angle_opp_0 Hop) in H.
-  }
-  now rewrite (angle_opp_involutive Hop).
-}
+now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
 Qed.
-*)
+
+Theorem rl_sqrt_0 :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  rl_sqrt 0%L = 0%L.
+Proof.
+intros Hop Hic Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rl_nth_root_pow 2 0%L (rngl_le_refl Hor _)) as H1.
+rewrite <- (rngl_squ_0 Hos) in H1 at 2.
+rewrite <- rngl_squ_pow_2 in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_0 Hop) in H1.
+rewrite (rngl_abs_nonneg Hop Hor) in H1; [ easy | ].
+apply rl_sqrt_nonneg, (rngl_le_refl Hor).
+Qed.
 
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
@@ -2726,17 +2687,18 @@ apply eq_angle_eq; cbn.
 rewrite (rngl_leb_refl Hor).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+rewrite (rl_sqrt_1 Hic Hon Hop Hid).
 f_equal.
 rewrite (rngl_sub_diag Hos).
 rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-apply (rl_sqrt_0 Hop Hic Hor Hid).
+apply (rl_sqrt_0 Hop Hic Hid).
 Qed.
 
 Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
 Proof.
 intros.
 progress unfold angle_leb.
+...
 progress unfold angle_ltb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
