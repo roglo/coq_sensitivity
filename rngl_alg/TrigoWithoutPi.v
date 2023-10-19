@@ -2694,9 +2694,11 @@ rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
 apply (rl_sqrt_0 Hop Hic Hid).
 Qed.
 
-Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
+Theorem angle_leb_gt :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
 Proof.
-intros.
+intros Hed *.
 progress unfold angle_leb.
 progress unfold angle_lt.
 progress unfold angle_compare.
@@ -2707,16 +2709,27 @@ destruct zs1. {
   apply rngl_leb_le in Hzs1.
   destruct zs2; [ | easy ].
   apply rngl_leb_le in Hzs2.
+  remember (rngl_cos θ2 ?= rngl_cos θ1)%L as cc eqn:Hcc.
+  symmetry in Hcc.
   split; intros H12. {
-...
-    apply (rngl_leb_gt Hor) in H12.
-    now apply rngl_ltb_lt.
+    destruct cc; [ easy | easy | ].
+    apply (rngl_compare_lt_iff Hor Hed).
+    now apply (rngl_compare_gt_iff Hor Hed) in Hcc.
   } {
-    apply (rngl_leb_gt Hor).
-    now apply rngl_ltb_lt in H12.
+    destruct cc; [ | | easy ]. {
+      apply (rngl_compare_eq_iff Hed) in Hcc.
+      apply (rngl_compare_lt_iff Hor Hed) in H12.
+      rewrite Hcc in H12.
+      now apply (rngl_lt_irrefl Hor) in H12.
+    } {
+      apply (rngl_compare_lt_iff Hor Hed) in Hcc.
+      apply (rngl_compare_lt_iff Hor Hed) in H12.
+      now apply (rngl_lt_asymm Hor) in Hcc.
+    }
   }
 } {
   apply (rngl_leb_gt Hor) in Hzs1.
+...
   destruct zs2; [ easy | ].
   split; intros H12. {
     apply (rngl_leb_gt Hor) in H12.
