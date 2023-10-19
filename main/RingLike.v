@@ -582,6 +582,22 @@ destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 apply rngl_eq_dec.
 Qed.
 
+Theorem rngl_eqb_sym :
+  rngl_has_eq_dec T = true →
+  ∀ a b, ((a =? b) = (b =? a))%L.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+destruct (rngl_eq_dec a b). {
+  subst b.
+  now destruct (rngl_eq_dec a a).
+} {
+  destruct (rngl_eq_dec b a); [ now subst b | easy ].
+}
+Qed.
+
 Theorem rngl_leb_le :
   ∀ a b, (a ≤? b)%L = true ↔ (a ≤ b)%L.
 Proof.
