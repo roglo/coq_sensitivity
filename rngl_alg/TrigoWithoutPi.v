@@ -2272,23 +2272,23 @@ now rewrite (rngl_opp_0 Hop).
 Qed.
 
 Theorem angle_eqb_neq :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.
 Proof.
-intros Hed *.
-progress unfold angle_eqb.
-split; intros H12. {
-  intros H; subst θ2.
-...
-  now do 2 rewrite (rngl_eqb_refl Hed) in H12.
+intros Hic Hon Hop Hed *.
+split. {
+  intros H12 H.
+  apply Bool.not_true_iff_false in H12.
+  apply H12; clear H12.
+  now apply (angle_eqb_eq Hic Hon Hop Hed).
 } {
+  intros H.
   apply Bool.not_true_iff_false.
-  intros H; apply H12; clear H12.
-  apply eq_angle_eq; cbn.
-  apply Bool.andb_true_iff in H.
-  destruct H as (Hc, Hs).
-  apply (rngl_eqb_eq Hed) in Hc, Hs.
-  now rewrite Hc, Hs.
+  intros H12; apply H; clear H.
+  now apply (angle_eqb_eq Hic Hon Hop Hed).
 }
 Qed.
 
@@ -2330,6 +2330,7 @@ Theorem angle_le_0_r :
   ∀ θ, (θ ≤ 0)%A → θ = 0%A.
 Proof.
 intros Hic Hon Hop Hed * Hθ.
+...
 progress unfold angle_leb in Hθ.
 cbn in Hθ.
 rewrite (rngl_leb_refl Hor) in Hθ.
