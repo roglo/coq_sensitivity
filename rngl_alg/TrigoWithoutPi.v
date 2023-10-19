@@ -2698,8 +2698,8 @@ Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
 Proof.
 intros.
 progress unfold angle_leb.
-...
-progress unfold angle_ltb.
+progress unfold angle_lt.
+progress unfold angle_compare.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 symmetry in Hzs1, Hzs2.
@@ -2708,6 +2708,7 @@ destruct zs1. {
   destruct zs2; [ | easy ].
   apply rngl_leb_le in Hzs2.
   split; intros H12. {
+...
     apply (rngl_leb_gt Hor) in H12.
     now apply rngl_ltb_lt.
   } {
