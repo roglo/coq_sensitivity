@@ -2483,36 +2483,27 @@ apply eq_angle_eq.
 now rewrite H1, H2.
 Qed.
 
+Theorem angle_leb_le :
+  ∀ θ1 θ2, (θ1 ≤? θ2)%A = true ↔ (θ1 ≤ θ2)%A.
+Proof.
+intros.
+progress unfold angle_leb.
+progress unfold angle_le.
+now destruct (θ1 ?= θ2)%A.
+Qed.
+
 Theorem angle_leb_nle :
   ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ ¬ (θ1 ≤ θ2)%A.
 Proof.
 intros.
-...
-now split; intros; apply Bool.not_true_iff_false.
-Qed.
-
-Theorem angle_leb_le :
-  ∀ θ1 θ2, (θ1 ≤? θ2)%A = true ↔ (θ1 ≤ θ2)%A.
-Proof. easy. Qed.
-
-Theorem eq_rngl_sin_0 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ, rngl_sin θ = 0%L → θ = 0%A ∨ θ = angle_straight.
-Proof.
-intros Hic Hon Hop Hed * Hθ.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct θ as (c, s, Hcs).
-cbn in Hθ |-*.
-subst s; cbn.
-specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs) as H1.
-rewrite (rngl_squ_0 Hos) in H1.
-rewrite rngl_add_0_r in H1.
-rewrite <- (rngl_squ_1 Hon) in H1.
-apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in H1.
-now destruct H1; subst c; [ left | right ]; apply eq_angle_eq.
+split; intros H12. {
+  intros H; apply angle_leb_le in H.
+  now rewrite H in H12.
+} {
+  apply Bool.not_true_iff_false.
+  intros H; apply H12.
+  now apply angle_leb_le.
+}
 Qed.
 
 Theorem angle_opp_involutive :
@@ -2536,6 +2527,7 @@ intros Hic Hon Hop Hed * H1z H2z.
 assert (H : ∀ θ1 θ2, θ1 ≠ 0%A → θ2 ≠ 0%A → (θ1 ≤ θ2)%A → (- θ2 ≤ - θ1)%A). {
   clear θ1 θ2 H1z H2z.
   intros θ1 θ2 H1z H2z H12.
+...
   progress unfold angle_leb in H12 |-*.
   progress unfold angle_opp.
   cbn.
