@@ -5267,10 +5267,37 @@ symmetry in Haov.
 destruct aov. 2: {
   apply eq_angle_eq.
   f_equal. {
-(* c'est bizarre qu'il accepte que j'applique rngl_cos_angle_div_2_add_not_overflow
-   de TrigoWithoutPi.v alors qu'il s'agit de deux définitions de angle_div_2 *)
+(* c'est bizarre qu'il accepte que j'applique indifféremment
+   rngl_cos_angle_div_2_add_not_overflow de TrigoWithoutPi.v ou celui
+   ce Complex.v alors qu'il s'agit de deux définitions de angle_div_2
+   *)
+(*
 Check @rngl_cos_angle_div_2_add_not_overflow.
 Check @rngl_cos_angle_div_2_add_not_overflow'.
+@rngl_cos_angle_div_2_add_not_overflow
+     : ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) 
+         (rl : real_like_prop T) (Hiv : rngl_has_inv T = true) 
+         (Hc2 : rngl_characteristic T ≠ 2) (Hor : rngl_is_ordered T = true),
+         rngl_mul_is_comm T = true
+         → rngl_has_1 T = true
+           → rngl_has_opp T = true
+             → rngl_has_eq_dec T = true
+               → ∀ θ1 θ2 : angle T,
+                   TrigoWithoutPi.angle_add_overflow θ1 θ2 = false
+                   → rngl_cos (TrigoWithoutPi.angle_div_2 (θ1 + θ2)%A) =
+                     rngl_cos
+                       (TrigoWithoutPi.angle_div_2 θ1 +
+                        TrigoWithoutPi.angle_div_2 θ2)
+rngl_cos_angle_div_2_add_not_overflow'
+     : rngl_mul_is_comm T = true
+       → rngl_has_1 T = true
+         → rngl_has_opp T = true
+           → rngl_has_eq_dec T = true
+             → ∀ θ1 θ2 : angle T,
+                 angle_add_overflow θ1 θ2 = false
+                 → rngl_cos (angle_div_2 (θ1 + θ2)) =
+                   rngl_cos (angle_div_2 θ1 + angle_div_2 θ2)
+*)
     now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
     now apply (@rngl_cos_angle_div_2_add_not_overflow' Hic Hon Hop Hed).
   }
