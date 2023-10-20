@@ -1831,60 +1831,7 @@ rewrite rngl_squ_sqrt in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
-Theorem angle_right_add_angle_right :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  (angle_right + angle_right = angle_straight)%A.
-Proof.
-intros Hon Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-apply eq_angle_eq; cbn.
-do 2 rewrite (rngl_mul_0_l Hos).
-do 2 rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_sub_0_l Hop).
-now rewrite rngl_add_0_l.
-Qed.
-
-Theorem angle_add_comm :
-  rngl_mul_is_comm T = true →
-  ∀ θ1 θ2, (θ1 + θ2 = θ2 + θ1)%A.
-Proof.
-intros Hic *.
-apply eq_angle_eq; cbn.
-rewrite (rngl_mul_comm Hic).
-rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
-f_equal.
-rewrite rngl_add_comm.
-rewrite (rngl_mul_comm Hic).
-rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
-easy.
-Qed.
-
-Theorem angle_add_0_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, (0 + θ = θ)%A.
-Proof.
-intros Hon Hos *.
-apply eq_angle_eq; cbn.
-do 2 rewrite (rngl_mul_1_l Hon).
-do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_r.
-Qed.
-
-Theorem angle_add_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, (θ + 0 = θ)%A.
-Proof.
-intros Hon Hos *.
-apply eq_angle_eq; cbn.
-do 2 rewrite (rngl_mul_1_r Hon).
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_l.
-Qed.
+(*ici*)
 
 Theorem angle_add_assoc :
   rngl_has_opp T = true →
