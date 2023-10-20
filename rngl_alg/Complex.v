@@ -2225,39 +2225,6 @@ Theorem angle_leb_le :
   ∀ θ1 θ2, (θ1 ≤? θ2)%A = true ↔ (θ1 ≤ θ2)%A.
 Proof. easy. Qed.
 
-(*check from here if not still existing in TrigoWithoutPi *)
-
-Theorem eq_rngl_sin_0 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ, rngl_sin θ = 0%L → θ = 0%A ∨ θ = angle_straight.
-Proof.
-intros Hic Hon Hop Hed * Hθ.
-destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct θ as (c, s, Hcs).
-cbn in Hθ |-*.
-subst s; cbn.
-specialize (cos2_sin2_prop_add_squ Hon Hop Hic Hed _ _ Hcs) as H1.
-rewrite (rngl_squ_0 Hos) in H1.
-rewrite rngl_add_0_r in H1.
-rewrite <- (rngl_squ_1 Hon) in H1.
-apply (rngl_squ_eq_cases Hic Hon Hop Hiv Hed) in H1.
-now destruct H1; subst c; [ left | right ]; apply eq_angle_eq.
-Qed.
-
-Theorem angle_opp_involutive :
-  rngl_has_opp T = true →
-  ∀ θ, (- - θ)%A = θ.
-Proof.
-intros Hop *.
-apply eq_angle_eq; cbn.
-f_equal.
-apply (rngl_opp_involutive Hop).
-Qed.
-
 Theorem angle_opp_le_compat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2355,81 +2322,7 @@ Qed.
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(**)
-Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
-(*
-Definition angle_add_overflow (θ1 θ2 : angle T) :=
-  (negb (θ1 =? 0)%A && (- θ1 ≤? θ2)%A)%bool.
-*)
-
-(*
-Theorem angle_add_overflow_comm :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
-Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-progress unfold angle_add_overflow.
-remember (θ1 =? 0)%A as z1 eqn:Hz1.
-symmetry in Hz1.
-destruct z1. {
-  apply (angle_eqb_eq Hed) in Hz1.
-  subst θ1; cbn.
-  remember (θ2 =? 0)%A as z2 eqn:Hz2.
-  remember (- θ2 ≤? 0)%A as o2z eqn:Ho2z.
-  symmetry in Hz2, Ho2z.
-  destruct z2; [ easy | ].
-  destruct o2z; [ exfalso | easy ].
-  apply (angle_eqb_neq Hed) in Hz2.
-  apply (angle_le_0_r Hic Hon Hop Hed) in Ho2z.
-  rewrite <- (angle_opp_0 Hop) in Ho2z.
-  now apply angle_opp_inj in Ho2z.
-}
-cbn.
-apply (angle_eqb_neq Hed) in Hz1.
-remember (θ2 =? 0)%A as z2 eqn:Hz2.
-symmetry in Hz2.
-destruct z2; cbn. {
-  apply (angle_eqb_eq Hed) in Hz2.
-  subst θ2.
-  apply Bool.not_true_iff_false.
-  intros H.
-  apply (angle_le_0_r Hic Hon Hop Hed) in H.
-  rewrite <- (angle_opp_0 Hop) in H.
-  now apply (angle_opp_inj Hop) in H.
-}
-apply (angle_eqb_neq Hed) in Hz2.
-remember (- θ1 ≤? θ2)%A as o12 eqn:Ho12.
-remember (- θ2 ≤? θ1)%A as o21 eqn:Ho21.
-symmetry in Ho12, Ho21.
-destruct o12. {
-  destruct o21; [ easy | exfalso ].
-  apply angle_leb_nle in Ho21.
-  apply Ho21; clear Ho21.
-  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
-    intros H.
-    apply (f_equal angle_opp) in H.
-    rewrite (angle_opp_involutive Hop) in H.
-    now rewrite (angle_opp_0 Hop) in H.
-  }
-  now rewrite (angle_opp_involutive Hop).
-} {
-  destruct o21; [ exfalso | easy ].
-  apply angle_leb_nle in Ho12.
-  apply Ho12; clear Ho12.
-  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
-    intros H.
-    apply (f_equal angle_opp) in H.
-    rewrite (angle_opp_involutive Hop) in H.
-    now rewrite (angle_opp_0 Hop) in H.
-  }
-  now rewrite (angle_opp_involutive Hop).
-}
-Qed.
-*)
+(*here*)
 
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
