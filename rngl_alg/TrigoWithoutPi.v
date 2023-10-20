@@ -443,6 +443,8 @@ Definition angle_ltb θ1 θ2 :=
     if (0 ≤? rngl_sin θ2)%L then false
     else (rngl_cos θ1 <? rngl_cos θ2)%L.
 
+End a.
+
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
 
@@ -450,14 +452,26 @@ Notation "0" := (angle_zero) : angle_scope.
 Notation "θ1 + θ2" := (angle_add θ1 θ2) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "- θ" := (angle_opp θ) : angle_scope.
+Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : angle_scope.
 Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
 Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : angle_scope.
 Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : angle_scope.
+Notation "n * θ" := (angle_mul_nat θ n) : angle_scope.
+Notation "θ1 ≤ θ2 < θ3" :=
+  (angle_leb θ1 θ2 = true ∧ angle_ltb θ2 θ3 = true)%L : angle_scope.
 
-Arguments angle_div_2 a%A.
+Arguments angle_div_2 {T ro rp rl ac} a%A.
 Arguments rngl_cos {T ro rp} a%A.
 Arguments rngl_sin {T ro rp} a%A.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
 
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 
