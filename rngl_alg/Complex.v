@@ -2322,8 +2322,6 @@ Qed.
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
-(*here*)
-
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2362,79 +2360,7 @@ rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
 apply (rl_sqrt_0 Hop Hic Hor Hid).
 Qed.
 
-Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
-Proof.
-intros.
-destruct ac as (Hiv, Hc2, Hor).
-progress unfold angle_leb.
-progress unfold angle_ltb.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  destruct zs2; [ | easy ].
-  apply rngl_leb_le in Hzs2.
-  split; intros H12. {
-    apply (rngl_leb_gt Hor) in H12.
-    now apply rngl_ltb_lt.
-  } {
-    apply (rngl_leb_gt Hor).
-    now apply rngl_ltb_lt in H12.
-  }
-} {
-  apply (rngl_leb_gt Hor) in Hzs1.
-  destruct zs2; [ easy | ].
-  split; intros H12. {
-    apply (rngl_leb_gt Hor) in H12.
-    now apply rngl_ltb_lt.
-  } {
-    apply (rngl_leb_gt Hor).
-    now apply rngl_ltb_lt in H12.
-  }
-}
-Qed.
-
-Theorem angle_ltb_ge : ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
-Proof.
-intros.
-destruct ac as (Hiv, Hc2, Hor).
-progress unfold angle_ltb.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-split; intros H12. {
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
-  } {
-    destruct zs2; [ easy | ].
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
-  }
-} {
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
-  } {
-    destruct zs2; [ easy | ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
-  }
-}
-Qed.
-
-Theorem fold_angle_sub : ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%A.
-Proof. easy. Qed.
-
-Theorem rngl_cos_opp : ∀ θ, rngl_cos (- θ) = rngl_cos θ.
-Proof. easy. Qed.
-
-Theorem rngl_sin_opp : ∀ θ, rngl_sin (- θ) = (- rngl_sin θ)%L.
-Proof. easy. Qed.
+(*here*)
 
 Theorem angle_opp_add_distr :
   rngl_mul_is_comm T = true →
