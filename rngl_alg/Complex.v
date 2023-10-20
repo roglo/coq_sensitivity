@@ -4862,8 +4862,7 @@ subst θ2.
 now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
 Qed.
 
-(*
-Theorem rngl_cos_angle_div_2_add_not_overflow :
+Theorem rngl_cos_angle_div_2_add_not_overflow' :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -5248,7 +5247,6 @@ rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_le_mono_r Hop Hor).
 now apply rngl_cos_bound.
 Qed.
-*)
 
 (* to be completed
 Theorem angle_div_2_add :
@@ -5270,8 +5268,11 @@ destruct aov. 2: {
   apply eq_angle_eq.
   f_equal. {
 (* c'est bizarre qu'il accepte que j'applique rngl_cos_angle_div_2_add_not_overflow
-   alors qu'il s'agit de deux définitions de angle_div_2 *)
+   de TrigoWithoutPi.v alors qu'il s'agit de deux définitions de angle_div_2 *)
+Check @rngl_cos_angle_div_2_add_not_overflow.
+Check @rngl_cos_angle_div_2_add_not_overflow'.
     now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
+    now apply (@rngl_cos_angle_div_2_add_not_overflow' Hic Hon Hop Hed).
   }
 About angle_div_2.
 About TrigoWithoutPi.angle_div_2.
