@@ -2073,9 +2073,11 @@ Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 assert (Hon : rngl_has_1 T = true) by now destruct Hif.
 assert (Hop : rngl_has_opp T = true) by now destruct Hif.
+assert (Hiv : rngl_has_inv T = true) by now destruct Hif.
 assert (Hic : rngl_mul_is_comm T = true) by now destruct Hif.
 assert (Hch : rngl_characteristic T = 0) by now destruct Hif.
 assert (H10 : rngl_characteristic T ≠ 1) by now rewrite Hch.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hi1.
 assert
   (Hii : (rngl_is_integral_domain T || rngl_has_inv_or_quot T)%bool = true). {
   destruct Hif.

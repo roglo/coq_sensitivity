@@ -234,29 +234,6 @@ rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
-Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
-  rngl_has_inv_and_1_or_quot T = true →
-  rngl_has_eq_dec T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
-Proof.
-intros Hi1 Hed.
-apply Bool.orb_true_iff; right.
-now rewrite Hi1, Hed.
-Qed.
-
-Theorem rngl_int_dom_or_inv_1_quo :
-  rngl_has_inv T = true →
-  rngl_has_1 T = true →
-  (rngl_is_integral_domain T ||
-   rngl_has_inv_and_1_or_quot T)%bool = true.
-Proof.
-intros Hiv Hon.
-apply Bool.orb_true_iff; right.
-apply rngl_has_inv_and_1_or_quot_iff; left.
-now rewrite Hiv, Hon.
-Qed.
-
 Theorem rngl_cos_proj_bound:
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →

@@ -437,6 +437,29 @@ Context {rp : ring_like_prop T}.
 
 (* theorems *)
 
+Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_has_eq_dec T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
+Proof.
+intros Hi1 Hed.
+apply Bool.orb_true_iff; right.
+now rewrite Hi1, Hed.
+Qed.
+
+Theorem rngl_int_dom_or_inv_1_quo :
+  rngl_has_inv T = true →
+  rngl_has_1 T = true →
+  (rngl_is_integral_domain T ||
+   rngl_has_inv_and_1_or_quot T)%bool = true.
+Proof.
+intros Hiv Hon.
+apply Bool.orb_true_iff; right.
+apply rngl_has_inv_and_1_or_quot_iff; left.
+now rewrite Hiv, Hon.
+Qed.
+
 Theorem fold_rngl_squ : ∀ a : T, (a * a)%L = rngl_squ a.
 Proof. easy. Qed.
 
@@ -4384,13 +4407,7 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
-assert
-  (Hid :
-    (rngl_is_integral_domain T ||
-       rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now rewrite Hi1, Hed.
-}
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 apply (rngl_sub_move_0_r Hop) in Hab.
 rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
 apply (rngl_integral Hos Hid) in Hab.
@@ -4752,13 +4769,7 @@ Theorem rngl_div_lt_pos:
   ∀ a b : T, (0 < a)%L → (0 < b)%L → (0 < a / b)%L.
 Proof.
 intros Hon Hop Hiv Hor * Ha Hb.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 progress unfold rngl_div.
 rewrite Hiv.
 apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
@@ -4773,13 +4784,7 @@ Theorem rngl_le_div_l :
   ∀ a b c, (0 < c → a ≤ b * c ↔ a / c ≤ b)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hzc.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 split; intros Habq. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := c); [ easy | ].
   rewrite (rngl_mul_div_r Hon Hiv); [ easy | ].
@@ -4805,13 +4810,7 @@ assert (Hcz : c ≠ 0%L). {
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
 }
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 split; intros Habq. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := c); [ easy | ].
   now rewrite (rngl_mul_div_r Hon Hiv).
@@ -4829,13 +4828,7 @@ Theorem rngl_lt_div_l :
   ∀ a b c, (0 < c → a < b * c ↔ a / c < b)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hzc.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 assert (Hcz : c ≠ 0%L). {
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
@@ -4857,13 +4850,7 @@ Theorem rngl_lt_div_r :
   ∀ a b c, (0 < c → a * c < b ↔ a < b / c)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hzc.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 assert (Hcz : c ≠ 0%L). {
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
@@ -4889,13 +4876,7 @@ intros Hon Hop Hiv Hc1 Hor * Hza.
 induction n; cbn. {
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct n; [ easy | ].
 now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
@@ -4936,12 +4917,7 @@ assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
 }
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  now apply Bool.orb_true_iff; right.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
   destruct (rngl_lt_dec Hor 0 a)%L as [Hlza| Hlza]. 2: {
     apply (rngl_nlt_ge Hor) in Hlza.
