@@ -234,6 +234,29 @@ rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
+Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_has_eq_dec T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
+Proof.
+intros Hi1 Hed.
+apply Bool.orb_true_iff; right.
+now rewrite Hi1, Hed.
+Qed.
+
+Theorem rngl_int_dom_or_inv_1_quo :
+  rngl_has_inv T = true →
+  rngl_has_1 T = true →
+  (rngl_is_integral_domain T ||
+   rngl_has_inv_and_1_or_quot T)%bool = true.
+Proof.
+intros Hiv Hon.
+apply Bool.orb_true_iff; right.
+apply rngl_has_inv_and_1_or_quot_iff; left.
+now rewrite Hiv, Hon.
+Qed.
+
 Theorem rngl_cos_proj_bound:
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -244,13 +267,7 @@ Theorem rngl_cos_proj_bound:
   ∀ c s, cos2_sin2_prop c s → (-1 ≤ c ≤ 1)%L.
 Proof.
 intros Hic Hon Hop Hiv Hed Hor * Hcs.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs.
 assert (H : (c² ≤ 1)%L). {
   rewrite <- Hcs.
@@ -280,13 +297,7 @@ Theorem rngl_sin_proj_bound:
   ∀ c s, cos2_sin2_prop c s → (-1 ≤ s ≤ 1)%L.
 Proof.
 intros Hic Hon Hop Hiv Hed Hor * Hcs.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs.
 assert (H : (s² ≤ 1)%L). {
   rewrite <- Hcs.
@@ -595,17 +606,6 @@ apply (rngl_squ_eq_cases Hic Hon Hop ac_iv Hed) in H1.
 now destruct H1; subst c; [ left | right ]; apply eq_angle_eq.
 Qed.
 
-Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
-  rngl_has_inv_and_1_or_quot T = true →
-  rngl_has_eq_dec T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
-Proof.
-intros Hi1 Hed.
-apply Bool.orb_true_iff; right.
-now rewrite Hi1, Hed.
-Qed.
-
 Theorem rngl_sin_nonneg_nonneg_cos_nonneg_neg2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -623,13 +623,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzc1 Hzc2 Hcc.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 apply (rngl_lt_add_lt_sub_r Hop ac_or) in Hcc.
 rewrite (rngl_sub_0_l Hop) in Hcc.
@@ -663,13 +657,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzs3 Hzc1.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -913,13 +901,7 @@ intros Hic Hon Hop Hed * Haov Hzs1 Hzs2 Hzs3.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1198,13 +1180,7 @@ Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hc12.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
 destruct zc1. {
@@ -1424,13 +1400,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzc1 Hzc2 Hcc.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 rewrite rngl_add_comm in Hcc.
 apply (rngl_le_sub_le_add_l Hop ac_or) in Hcc.
 rewrite (rngl_sub_0_l Hop) in Hcc.
@@ -1465,13 +1435,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hs3z Hzc1.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1642,13 +1606,7 @@ destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1; apply H1.
@@ -2099,13 +2057,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzc12.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -2457,13 +2409,7 @@ intros Hic Hon Hop Hed * Hzs1 Hzs2 Hc12.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 remember (0 <? rngl_cos θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
@@ -2559,13 +2505,7 @@ apply angle_ltb_ge in Haov.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon ac_iv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-assert
-  (Hii :
-    (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1; apply H1.
