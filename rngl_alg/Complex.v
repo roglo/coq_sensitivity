@@ -2518,57 +2518,6 @@ apply (angle_add_add_swap Hic Hop).
 Qed.
 
 (* to be completed
-Theorem angle_div_2_add :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2,
-  angle_div_2 (θ1 + θ2) =
-    if angle_add_overflow θ1 θ2 then
-      (angle_div_2 θ1 + angle_div_2 θ2 + angle_straight)%A
-    else
-      (angle_div_2 θ1 + angle_div_2 θ2)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. 2: {
-  apply eq_angle_eq.
-  f_equal. {
-(* c'est bizarre qu'il accepte que j'applique indifféremment
-   rngl_cos_angle_div_2_add_not_overflow de TrigoWithoutPi.v ou celui
-   ce Complex.v alors qu'il s'agit de deux définitions de angle_div_2
-*)
-    now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
-...
-    now apply (rngl_cos_angle_div_2_add_not_overflow' Hic Hon Hop Hed).
-(*
-Check rngl_cos_angle_div_2_add_not_overflow.
-Check rngl_cos_angle_div_2_add_not_overflow'.
-rngl_cos_angle_div_2_add_not_overflow
-     : rngl_mul_is_comm T = true
-       → rngl_has_1 T = true
-         → rngl_has_opp T = true
-           → rngl_has_eq_dec T = true
-             → ∀ θ1 θ2 : angle T,
-                 TrigoWithoutPi.angle_add_overflow θ1 θ2 = false
-                 → rngl_cos (TrigoWithoutPi.angle_div_2 (θ1 + θ2)%A) =
-                   rngl_cos (TrigoWithoutPi.angle_div_2 θ1 + TrigoWithoutPi.angle_div_2 θ2)
-rngl_cos_angle_div_2_add_not_overflow'
-     : rngl_mul_is_comm T = true
-       → rngl_has_1 T = true
-         → rngl_has_opp T = true
-           → rngl_has_eq_dec T = true
-             → ∀ θ1 θ2 : angle T,
-                 angle_add_overflow θ1 θ2 = false
-                 → rngl_cos (angle_div_2 (θ1 + θ2)) = rngl_cos (angle_div_2 θ1 + angle_div_2 θ2)
-*)
-  }
-About angle_div_2.
-About TrigoWithoutPi.angle_div_2.
-...
-
 Theorem angle_div_2_pow_nat_add :
   ∀ n θ1 θ2,
   angle_div_2_pow_nat (θ1 + θ2) n =
