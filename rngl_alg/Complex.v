@@ -5271,6 +5271,9 @@ destruct aov. 2: {
    rngl_cos_angle_div_2_add_not_overflow de TrigoWithoutPi.v ou celui
    ce Complex.v alors qu'il s'agit de deux définitions de angle_div_2
    *)
+    now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
+...
+    now apply (@rngl_cos_angle_div_2_add_not_overflow' Hic Hon Hop Hed).
 (*
 Check @rngl_cos_angle_div_2_add_not_overflow.
 Check @rngl_cos_angle_div_2_add_not_overflow'.
@@ -5298,8 +5301,6 @@ rngl_cos_angle_div_2_add_not_overflow'
                  → rngl_cos (angle_div_2 (θ1 + θ2)) =
                    rngl_cos (angle_div_2 θ1 + angle_div_2 θ2)
 *)
-    now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
-    now apply (@rngl_cos_angle_div_2_add_not_overflow' Hic Hon Hop Hed).
   }
 About angle_div_2.
 About TrigoWithoutPi.angle_div_2.

@@ -330,8 +330,6 @@ Qed.
 
 (* *)
 
-(* to be completed *)
-
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hc2 : rngl_characteristic T ≠ 2}.
 Context {Hor : rngl_is_ordered T = true}.
@@ -2946,7 +2944,7 @@ apply (rngl_add_le_mono_r Hop Hor).
 now apply rngl_cos_bound.
 Qed.
 
-(*
+(* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
