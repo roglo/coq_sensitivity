@@ -2841,6 +2841,14 @@ now apply rngl_cos_bound.
 Qed.
 
 (* to be completed
+Theorem rngl_sin_angle_div_2_add_not_overflow :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → rngl_sin (angle_div_2 (θ1 + θ2)) =
+     rngl_sin (angle_div_2 θ1 + angle_div_2 θ2).
+Proof.
+...
+
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2860,6 +2868,8 @@ destruct aov. 2: {
   apply eq_angle_eq.
   f_equal. {
     now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
+  } {
+    now apply rngl_sin_angle_div_2_add_not_overflow.
   }
 ...
 *)
