@@ -2598,6 +2598,7 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 rewrite (rngl_mul_1_l Hon).
 (*to be cleaned from here*)
 (*
+subst θ3.
 remember (θ1 - angle_straight)%A as θ.
 apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
 subst θ1; rename θ into θ1.
@@ -2608,6 +2609,37 @@ apply (rngl_opp_lt_compat Hop Hor) in Hzs1.
 rewrite (rngl_cos_add_straight_r Hon Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (fold_rngl_sub Hop).
+rewrite (angle_add_add_swap Hic Hop) in Haov, Hzs3 |-*.
+remember (θ2 - angle_straight)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+move Hzs3 after Hzs3.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite (rngl_cos_add_straight_r Hon Hop θ2).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (fold_rngl_sub Hop).
+rewrite (angle_add_assoc Hop) in Haov, Hzs3 |-*.
+rewrite <- (angle_add_assoc Hop) in Haov, Hzs3 |-*.
+rewrite (angle_straight_add_straight Hon Hop) in Haov, Hzs3 |-*.
+rewrite (angle_add_0_r Hon Hos) in Haov, Hzs3 |-*.
+...
+rngl_sin_nonneg_sin_nonneg_sin_neg:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            (θ1 ≤ θ1 + θ2)%A
+            → (0 ≤ rngl_sin θ1)%L
+              → (0 ≤ rngl_sin θ2)%L
+                → (rngl_sin (θ1 + θ2) < 0)%L
+                  → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
+                    (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) -
+                     √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L
+Search (√((1 + rngl_cos _) / 2))%L.
 ...
 *)
 progress unfold angle_leb in Haov.
