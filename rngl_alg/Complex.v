@@ -162,30 +162,6 @@ destruct az. {
 }
 Qed.
 
-Definition angle_eqb a b :=
-  ((rngl_cos a =? rngl_cos b)%L && (rngl_sin a =? rngl_sin b)%L)%bool.
-
-Definition angle_leb θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1)%L then
-    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L
-    else true
-  else
-    if (0 ≤? rngl_sin θ2)%L then false
-    else (rngl_cos θ1 ≤? rngl_cos θ2)%L.
-
-(*
-Definition angle_ltb a b :=
-  (angle_leb a b && negb (angle_eqb a b))%bool.
-*)
-
-Definition angle_ltb θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1)%L then
-    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 <? rngl_cos θ1)%L
-    else true
-  else
-    if (0 ≤? rngl_sin θ2)%L then false
-    else (rngl_cos θ1 <? rngl_cos θ2)%L.
-
 Theorem rl_sqrt_0 :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
@@ -5293,8 +5269,12 @@ symmetry in Haov.
 destruct aov. 2: {
   apply eq_angle_eq.
   f_equal. {
+(* c'est bizarre qu'il accepte que j'applique rngl_cos_angle_div_2_add_not_overflow
+   alors qu'il s'agit de deux définitions de angle_div_2 *)
     now apply (@rngl_cos_angle_div_2_add_not_overflow T ro rp rl Hiv Hc2 Hor Hic Hon Hop Hed).
   }
+About angle_div_2.
+About TrigoWithoutPi.angle_div_2.
 ...
 
 Theorem angle_div_2_pow_nat_add :
