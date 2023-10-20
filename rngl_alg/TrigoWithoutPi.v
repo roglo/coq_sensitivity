@@ -2567,12 +2567,6 @@ rewrite (rngl_mul_1_l Hon).
 apply (rngl_opp_inj Hop).
 rewrite (rngl_opp_involutive Hop).
 rewrite (rngl_opp_sub_distr Hop).
-(*
-subst θ3.
-Search √((1 + rngl_cos (_ + _)) / 2)%L.
-Search √((1 - rngl_cos (_ + _)) / 2)%L.
-...
-*)
 destruct zs1. {
   apply rngl_leb_le in Hzs1.
   rewrite (rngl_mul_1_l Hon).
@@ -2637,6 +2631,10 @@ rewrite (angle_add_assoc Hop) in Haov, Hzs3 |-*.
 rewrite <- (angle_add_assoc Hop) in Haov, Hzs3 |-*.
 rewrite (angle_straight_add_straight Hon Hop) in Haov, Hzs3 |-*.
 rewrite (angle_add_0_r Hon Hos) in Haov, Hzs3 |-*.
+...
+differences:
+    Haov : (θ1 + angle_straight ≤ θ1 + θ2)%A
+    goal : opposite subtraction
 ...
 rngl_sin_nonneg_sin_nonneg_sin_neg:
   rngl_mul_is_comm T = true
