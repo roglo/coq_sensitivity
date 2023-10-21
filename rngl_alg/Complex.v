@@ -2313,41 +2313,6 @@ rewrite Hzs2.
 now destruct (0 ≤? rngl_sin θ2)%L.
 Qed.
 
-Theorem angle_sub_opp_r :
-  rngl_has_opp T = true →
-  ∀ θ1 θ2, (θ1 - - θ2)%A = (θ1 + θ2)%A.
-Proof.
-intros Hop *.
-apply eq_angle_eq; cbn.
-now rewrite (rngl_opp_involutive Hop).
-Qed.
-
-Theorem angle_sub_move_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3, (θ1 - θ2)%A = θ3 ↔ θ1 = (θ3 + θ2)%A.
-Proof.
-intros Hic Hon Hop Hed *.
-split; intros Ha. {
-  subst θ3; symmetry.
-  apply (angle_sub_add Hic Hon Hop Hed).
-} {
-  subst θ1.
-  apply (angle_add_sub Hic Hon Hop Hed).
-}
-Qed.
-
-Theorem angle_add_sub_assoc :
-  rngl_has_opp T = true →
-  ∀ θ1 θ2 θ3, (θ1 + (θ2 - θ3))%A = (θ1 + θ2 - θ3)%A.
-Proof.
-intros Hop *.
-progress unfold angle_sub.
-apply (angle_add_assoc Hop).
-Qed.
-
 Theorem angle_nle_gt :
   ∀ θ1 θ2, ¬ (θ1 ≤ θ2)%A ↔ (θ2 < θ1)%A.
 Proof.
