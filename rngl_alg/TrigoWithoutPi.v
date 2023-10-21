@@ -2910,7 +2910,40 @@ apply (rngl_nle_gt Hor) in Hzc1.
 move Hzc1 before Hzs2.
 rewrite <- (rngl_sub_0_l Hop).
 apply (rngl_lt_add_lt_sub_l Hop Hor).
-cbn.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2z| Hc2z]. {
+  apply (rngl_nle_gt Hor) in Hzs3.
+  exfalso.
+  apply Hzs3; clear Hzs3; cbn.
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_mul_nonneg_nonneg Hop Hor);
+      now apply (rngl_lt_le_incl Hor).
+  } {
+    apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+}
+apply (rngl_nle_gt Hor) in Hc2z.
+remember (angle_straight - θ2)%A as θ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
+rewrite (angle_sub_opp_r Hop) in Heqθ.
+apply (angle_add_move_l Hic Hon Hop Hed) in Heqθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+rewrite (angle_add_comm Hic) in Hzs3 |-*.
+rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs3 |-*.
+rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2, Hzs3.
+rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z, Hc12z |-*.
+rewrite <- (rngl_opp_0 Hop) in Hc2z.
+apply (rngl_opp_lt_compat Hop Hor) in Hc2z.
+rewrite (fold_rngl_sub Hop) in Hc12z |-*.
+Check rngl_sub_opp_r.
+Require Import ZArith.
+Check Z.sub_opp_r.
+Check Z.add_opp_r.
+...
+Check rngl_add_opp_r.
+rngl_sub_opp_r
+     : rngl_has_opp T = true → ∀ a b : T, (a - - b)%L = (a + b)%L
 ...
 (*
 ...
