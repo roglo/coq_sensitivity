@@ -879,7 +879,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_r.
-    now apply rngl_add_opp_l.
+    now apply rngl_add_opp_diag_l.
   } {
     apply Nat.nlt_ge in Hkn.
     erewrite rngl_summation_eq_compat. 2: {

@@ -189,7 +189,7 @@ apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.mul_comm.
 Qed.
 
-Theorem Zn_add_opp_l :
+Theorem Zn_add_opp_diag_l :
   ∀ n (a : Zn n), Zn_add n (Zn_opp n a) a = Zn_of_nat n 0.
 Proof.
 intros n (a, Ha).
@@ -431,7 +431,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_mul_comm := Zn_mul_comm n;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := Zn_add_opp_l n;
+     rngl_opt_add_opp_diag_l := Zn_add_opp_diag_l n;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l NA n;
@@ -522,7 +522,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := NA;
+     rngl_opt_add_opp_diag_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := NA;

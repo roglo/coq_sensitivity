@@ -1202,7 +1202,7 @@ rewrite QG_add_comm.
 apply QG_add_0_l.
 Qed.
 
-Theorem QG_add_opp_l : ∀ a : QG, (- a + a)%QG = 0%QG.
+Theorem QG_add_opp_diag_l : ∀ a : QG, (- a + a)%QG = 0%QG.
 Proof.
 intros.
 progress unfold QG_add, QG_opp.
@@ -1211,11 +1211,11 @@ rewrite QG_of_Q_add_idemp_r.
 now rewrite Qplus_opp_r.
 Qed.
 
-Theorem QG_add_opp_r : ∀ a : QG, (a + - a)%QG = 0%QG.
+Theorem QG_add_opp_diag_r : ∀ a : QG, (a + - a)%QG = 0%QG.
 Proof.
 intros.
 rewrite QG_add_comm.
-apply QG_add_opp_l.
+apply QG_add_opp_diag_l.
 Qed.
 
 Theorem QG_mul_comm : ∀ a b : QG, (a * b)%QG = (b * a)%QG.
@@ -1504,7 +1504,7 @@ split; intros Hbc. {
   rewrite QG_add_assoc.
   rewrite QG_add_comm.
   rewrite <- QG_add_assoc.
-  rewrite QG_add_opp_r.
+  rewrite QG_add_opp_diag_r.
   rewrite QG_add_0_r.
   rewrite QG_add_comm.
   now apply QG_le_0_sub.
@@ -1517,7 +1517,7 @@ split; intros Hbc. {
   rewrite QG_add_assoc in Hbc.
   rewrite QG_add_comm in Hbc.
   rewrite <- QG_add_assoc in Hbc.
-  rewrite QG_add_opp_r in Hbc.
+  rewrite QG_add_opp_diag_r in Hbc.
   rewrite QG_add_0_r in Hbc.
   rewrite QG_add_comm in Hbc.
   now apply -> QG_le_0_sub in Hbc.
@@ -1885,7 +1885,7 @@ Proof.
 intros.
 progress unfold QG_sub.
 rewrite <- QG_add_assoc, QG_add_comm.
-rewrite QG_add_opp_r.
+rewrite QG_add_opp_diag_r.
 apply QG_add_0_l.
 Qed.
 
@@ -1894,7 +1894,7 @@ Proof.
 intros.
 progress unfold QG_sub.
 rewrite <- QG_add_assoc.
-rewrite QG_add_opp_l.
+rewrite QG_add_opp_diag_l.
 apply QG_add_0_r.
 Qed.
 
@@ -2316,7 +2316,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_comm := QG_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := QG_add_opp_l;
+     rngl_opt_add_opp_diag_l := QG_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := QG_mul_inv_l;

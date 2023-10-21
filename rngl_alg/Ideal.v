@@ -278,7 +278,7 @@ intros; apply eq_ideal_eq; cbn.
 apply rngl_mul_add_distr_r.
 Qed.
 
-Theorem I_opt_add_opp_l : let roi := I_ring_like_op in
+Theorem I_opt_add_opp_diag_l : let roi := I_ring_like_op in
   if rngl_has_opp (ideal P) then ∀ a : ideal P, (- a + a)%L = 0%L
   else not_applicable.
 Proof.
@@ -288,7 +288,7 @@ unfold rngl_has_opp in Hop at 2.
 unfold rngl_has_opp, rngl_opp; cbn.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 destruct os as [opp| subt]; [ | easy ].
-intros; apply eq_ideal_eq, (rngl_add_opp_l Hop).
+intros; apply eq_ideal_eq, (rngl_add_opp_diag_l Hop).
 Qed.
 
 Theorem I_opt_add_sub : let roi := I_ring_like_op in
@@ -697,7 +697,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_mul_comm := I_opt_mul_comm;
      rngl_opt_mul_1_r := I_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := I_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := I_opt_add_opp_l;
+     rngl_opt_add_opp_diag_l := I_opt_add_opp_diag_l;
      rngl_opt_add_sub := I_opt_add_sub;
      rngl_opt_sub_add_distr := I_opt_sub_add_distr;
      rngl_opt_mul_inv_l := NA;

@@ -323,7 +323,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_mul_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%L;
     (* when has opposite *)
-    rngl_opt_add_opp_l :
+    rngl_opt_add_opp_diag_l :
       if rngl_has_opp T then ∀ a : T, (- a + a = 0)%L else not_applicable;
     (* when has subtraction (subt) *)
     rngl_opt_add_sub :
@@ -513,12 +513,12 @@ destruct ic. {
 }
 Qed.
 
-Theorem rngl_add_opp_l :
+Theorem rngl_add_opp_diag_l :
   rngl_has_opp T = true →
   ∀ x, (- x + x = 0)%L.
 Proof.
 intros H1 *.
-specialize rngl_opt_add_opp_l as H.
+specialize rngl_opt_add_opp_diag_l as H.
 rewrite H1 in H.
 apply H.
 Qed.
@@ -1042,7 +1042,7 @@ destruct op. {
   unfold rngl_sub.
   rewrite Hop.
   rewrite rngl_add_comm.
-  now apply rngl_add_opp_l.
+  now apply rngl_add_opp_diag_l.
 }
 remember (rngl_has_subt T) as mo eqn:Hmo.
 symmetry in Hmo.
@@ -1083,7 +1083,7 @@ Proof.
 intros Hop *.
 unfold rngl_sub; rewrite Hop.
 rewrite <- rngl_add_assoc.
-rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_add_opp_diag_l Hop).
 apply rngl_add_0_r.
 Qed.
 
@@ -1128,7 +1128,7 @@ destruct op. {
   rewrite Hop.
   rewrite <- rngl_add_assoc.
   rewrite (rngl_add_comm b).
-  now rewrite rngl_add_opp_l, rngl_add_0_r.
+  now rewrite rngl_add_opp_diag_l, rngl_add_0_r.
 }
 remember (rngl_has_subt T) as mo eqn:Hmo.
 symmetry in Hmo.
@@ -1507,7 +1507,7 @@ split; intros H. {
   now rewrite rngl_add_0_l in H.
 } {
   rewrite H.
-  now rewrite rngl_add_opp_l.
+  now rewrite rngl_add_opp_diag_l.
 }
 Qed.
 
@@ -1740,7 +1740,7 @@ split. {
   unfold rngl_sub in Hab.
   rewrite Hop in Hab.
   rewrite <- rngl_add_assoc in Hab.
-  rewrite rngl_add_opp_l in Hab; [ | easy ].
+  rewrite rngl_add_opp_diag_l in Hab; [ | easy ].
   now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 } {
   intros Hab.
@@ -1814,7 +1814,7 @@ Theorem rngl_mul_opp_l :
 Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_r (- a)%L a b) as H.
-rewrite rngl_add_opp_l in H; [ | easy ].
+rewrite rngl_add_opp_diag_l in H; [ | easy ].
 rewrite rngl_mul_0_l in H. 2: {
   now apply rngl_has_opp_or_subt_iff; left.
 }

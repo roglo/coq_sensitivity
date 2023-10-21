@@ -264,7 +264,7 @@ progress unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_add_opp_l :
+Theorem quad_int_add_opp_diag_l :
   let ro := quad_int_ring_like_op d in
   ∀ a : quad_int d, (- a + a)%L = 0%L.
 Proof.
@@ -1192,7 +1192,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_comm := @quad_int_mul_comm d;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := @quad_int_add_opp_l d;
+     rngl_opt_add_opp_diag_l := @quad_int_add_opp_diag_l d;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := NA;

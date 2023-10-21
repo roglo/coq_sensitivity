@@ -913,7 +913,7 @@ split; f_equal. {
 }
 Qed.
 
-Theorem gc_opt_add_opp_l :
+Theorem gc_opt_add_opp_diag_l :
   let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
   if rngl_has_opp (GComplex T) then ∀ a : GComplex T, (- a + a)%L = 0%L
@@ -925,7 +925,7 @@ remember (rngl_has_opp (GComplex T)) as opc eqn:Hopc; symmetry in Hopc.
 destruct opc; [ | easy ].
 intros.
 apply eq_gc_eq; cbn.
-specialize (rngl_add_opp_l Hop) as H1.
+specialize (rngl_add_opp_diag_l Hop) as H1.
 progress unfold rngl_opp; cbn.
 progress unfold gc_opt_opp_or_subt; cbn.
 progress unfold rngl_has_opp in Hop.

@@ -154,7 +154,7 @@ rewrite CReal_mult_comm in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
-Theorem CReal_add_opp_l : let ro := CReal_ring_like_op in
+Theorem CReal_add_opp_diag_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, (- a + a)%L = 0%L.
 Proof.
 cbn; intros.
@@ -294,7 +294,7 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_comm := CReal_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := CReal_add_opp_l;
+     rngl_opt_add_opp_diag_l := CReal_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := CReal_mul_inv_l;
@@ -486,7 +486,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_comm := Rmult_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := Rplus_opp_l;
+     rngl_opt_add_opp_diag_l := Rplus_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := Rinv_l;

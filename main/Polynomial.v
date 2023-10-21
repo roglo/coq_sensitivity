@@ -954,17 +954,17 @@ Qed.
 (* optional left addition of opposite; not existing if there is
    no opposite *)
 
-Theorem lap_add_opp_l :
+Theorem lap_add_opp_diag_l :
   rngl_has_opp T = true
   → ∀ la, (- la + la)%lap = repeat 0%L (length la).
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_add_opp_diag_l Hop).
 now f_equal.
 Qed.
 
-Theorem lap_add_opp_r :
+Theorem lap_add_opp_diag_r :
   rngl_has_opp T = true
   → ∀ la, (la + - la)%lap = repeat 0%L (length la).
 Proof.
@@ -991,7 +991,7 @@ Theorem lap_norm_add_opp_l :
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros Hop *.
-rewrite (lap_add_opp_l Hop).
+rewrite (lap_add_opp_diag_l Hop).
 apply lap_norm_repeat_0.
 Qed.
 
@@ -1361,7 +1361,7 @@ intros Hop * Hba.
 unfold lap_sub.
 rewrite Hop.
 rewrite <- lap_add_assoc.
-rewrite (lap_add_opp_l Hop).
+rewrite (lap_add_opp_diag_l Hop).
 revert lb Hba.
 induction la as [| a]; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
@@ -1847,7 +1847,7 @@ unfold lap_sub.
 remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
 destruct op. {
 rewrite <- lap_add_assoc.
-rewrite (lap_add_opp_r Hop).
+rewrite (lap_add_opp_diag_r Hop).
 destruct (le_dec (length lb) (length la)) as [Hlba| Hlba]. {
   rewrite lap_add_repeat_0_r; [ | easy ].
   rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
@@ -2459,7 +2459,7 @@ rewrite (lap_add_norm_idemp_l Heb).
 now apply lap_norm_add_opp_l.
 Qed.
 
-Theorem polyn_opt_add_opp_l :
+Theorem polyn_opt_add_opp_diag_l :
   let rop := polyn_ring_like_op in
   if rngl_has_opp (polyn T) then ∀ a : polyn T, (- a + a)%L = 0%L
   else not_applicable.
@@ -3242,7 +3242,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := polyn_opt_add_opp_l;
+     rngl_opt_add_opp_diag_l := polyn_opt_add_opp_diag_l;
      rngl_opt_add_sub := polyn_opt_add_sub;
      rngl_opt_sub_add_distr := polyn_opt_sub_add_distr;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;

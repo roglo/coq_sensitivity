@@ -784,7 +784,7 @@ Qed.
 
 (* addition left and right with opposite *)
 
-Theorem mat_add_opp_l {m n} : ∀ (M : matrix T),
+Theorem mat_add_opp_diag_l {m n} : ∀ (M : matrix T),
   is_correct_matrix M = true
   → m = mat_nrows M
   → n = mat_ncols M
@@ -808,7 +808,7 @@ clear IHll.
 specialize (HM la (or_introl eq_refl)).
 revert ncols HM.
 induction la as [| a]; intros; cbn; [ now rewrite <- HM | ].
-rewrite rngl_add_opp_l; [ | easy ].
+rewrite rngl_add_opp_diag_l; [ | easy ].
 destruct ncols; [ easy | ].
 cbn; f_equal.
 cbn in HM.
@@ -816,14 +816,14 @@ apply Nat.succ_inj in HM.
 now apply IHla.
 Qed.
 
-Theorem mat_add_opp_r : ∀ (M : matrix T),
+Theorem mat_add_opp_diag_r : ∀ (M : matrix T),
   is_correct_matrix M = true
   → (M - M = mZ (mat_nrows M) (mat_ncols M))%M.
 Proof.
 intros * HM.
 unfold mat_sub.
 rewrite mat_add_comm.
-now apply mat_add_opp_l.
+now apply mat_add_opp_diag_l.
 Qed.
 
 Theorem mat_add_sub :
@@ -838,7 +838,7 @@ intros * Ha Hb Hrab Hcab.
 unfold mat_sub.
 rewrite <- mat_add_assoc.
 rewrite fold_mat_sub.
-rewrite mat_add_opp_r; [ | easy ].
+rewrite mat_add_opp_diag_r; [ | easy ].
 now rewrite mat_add_0_r.
 Qed.
 

@@ -535,7 +535,7 @@ apply mat_mul_add_distr_r. {
 }
 Qed.
 
-Theorem squ_mat_opt_add_opp_l :
+Theorem squ_mat_opt_add_opp_diag_l :
   ∀ {n} eq_dec,
   let rom := mat_ring_like_op eq_dec in
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op eq_dec) then
@@ -565,7 +565,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in Hr.
   now rewrite Hr.
 }
-apply mat_add_opp_l; [ easy | | easy | ]. 2: {
+apply mat_add_opp_diag_l; [ easy | | easy | ]. 2: {
   unfold mat_ncols.
   rewrite Hr in Hc.
   symmetry; apply Hc.
@@ -769,7 +769,7 @@ Definition mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := squ_mat_mul_1_r eq_dec;
      rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r eq_dec;
-     rngl_opt_add_opp_l := squ_mat_opt_add_opp_l eq_dec;
+     rngl_opt_add_opp_diag_l := squ_mat_opt_add_opp_diag_l eq_dec;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := NA;

@@ -1111,7 +1111,7 @@ rewrite (cos2_sin2_1 Hon Hop Hic Hed).
 f_equal.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_comm Hic).
-apply (rngl_add_opp_l Hop).
+apply (rngl_add_opp_diag_l Hop).
 Qed.
 
 Theorem angle_add_0_r :
