@@ -2798,6 +2798,11 @@ rewrite Hzs3 in Haov.
 apply (rngl_leb_gt Hor) in Hzs3.
 apply rngl_leb_le in Haov.
 move Haov at bottom.
+exfalso.
+apply rngl_nlt_ge in Haov.
+apply Haov; clear Haov.
+(* changer θ1 en (straight - θ1) et
+   changer θ2 en (straight - θ2), peut-être ? *)
 ...
 exfalso.
 (*
@@ -2876,6 +2881,7 @@ rewrite <- (rngl_sub_0_l Hop) in Hc13.
 apply (rngl_le_sub_le_add_l Hop Hor) in Hc13.
 destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   apply (rngl_nlt_ge Hor) in Hc13.
+  progress exfalso.
   exfalso.
   apply Hc13; clear Hc13; cbn.
   rewrite (rngl_add_sub_assoc Hop).
