@@ -2367,7 +2367,7 @@ rewrite (angle_sub_diag Hic Hon Hop Hed).
 apply (angle_add_0_r Hon Hos).
 Qed.
 
-Theorem angle_add_opp_l :
+Theorem angle_add_opp_diag_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2400,7 +2400,7 @@ intros Hic Hon Hop Hed *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
-rewrite (angle_add_opp_l Hic Hon Hop Hed).
+rewrite (angle_add_opp_diag_l Hic Hon Hop Hed).
 apply (angle_add_0_r Hon Hos).
 Qed.
 

@@ -986,7 +986,7 @@ induction n; [ easy | cbn ].
 now rewrite (rngl_eqb_refl Heb).
 Qed.
 
-Theorem lap_norm_add_opp_l :
+Theorem lap_norm_add_opp_diag_l :
   rngl_has_opp T = true
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
@@ -2446,7 +2446,7 @@ destruct rngl_mul_is_comm; [ easy | ].
 apply polyn_mul_add_distr_r.
 Qed.
 
-Theorem polyn_add_opp_l :
+Theorem polyn_add_opp_diag_l :
   rngl_has_opp T = true
   → ∀ a : polyn T, (- a + a)%pol = 0%pol.
 Proof.
@@ -2456,7 +2456,7 @@ destruct a as (la, Ha); cbn.
 rewrite fold_lap_add.
 do 2 rewrite fold_lap_norm.
 rewrite (lap_add_norm_idemp_l Heb).
-now apply lap_norm_add_opp_l.
+now apply lap_norm_add_opp_diag_l.
 Qed.
 
 Theorem polyn_opt_add_opp_diag_l :
@@ -2471,13 +2471,13 @@ destruct op; [ | easy ].
 intros a.
 unfold rngl_opp; cbn.
 unfold polyn_opt_opp_or_subt.
-specialize polyn_add_opp_l as add_opp_l.
-unfold rngl_has_opp in Hop, add_opp_l.
-cbn in Hop, add_opp_l.
-unfold polyn_opt_opp_or_subt in Hop, add_opp_l.
+specialize polyn_add_opp_diag_l as add_opp_diag_l.
+unfold rngl_has_opp in Hop, add_opp_diag_l.
+cbn in Hop, add_opp_diag_l.
+unfold polyn_opt_opp_or_subt in Hop, add_opp_diag_l.
 destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 destruct opp as [opp| ]; [ | easy ].
-now apply add_opp_l.
+now apply add_opp_diag_l.
 Qed.
 
 Theorem polyn_opt_has_no_inv : ∀ P,

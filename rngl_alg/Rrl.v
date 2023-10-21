@@ -671,7 +671,7 @@ do 2 rewrite (Rmult_comm (im b)).
 now rewrite Rplus_comm.
 Qed.
 
-Theorem complex_add_opp_l : let roc := complex_ring_like_op in
+Theorem complex_add_opp_diag_l : let roc := complex_ring_like_op in
   ∀ a : complex, (- a + a)%L = 0%L.
 Proof.
 intros; cbn.
@@ -909,7 +909,7 @@ Definition complex_ring_like_prop : ring_like_prop complex :=
      rngl_opt_mul_comm := complex_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
-     rngl_opt_add_opp_l := complex_add_opp_l;
+     rngl_opt_add_opp_diag_l := complex_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
      rngl_opt_mul_inv_l := complex_opt_mul_inv_l Hop;

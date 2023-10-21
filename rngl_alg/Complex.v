@@ -2764,7 +2764,7 @@ Definition gc_ring_like_prop T
      rngl_opt_mul_comm := gc_opt_mul_comm;
      rngl_opt_mul_1_r := gc_opt_mul_1_r Hos;
      rngl_opt_mul_add_distr_r := gc_opt_mul_add_distr_r Hop;
-     rngl_opt_add_opp_l := gc_opt_add_opp_l Hop;
+     rngl_opt_add_opp_diag_l := gc_opt_add_opp_diag_l Hop;
      rngl_opt_add_sub := gc_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := gc_opt_sub_add_distr Hsu;
      rngl_opt_mul_inv_l := gc_opt_mul_inv_l Hop;
