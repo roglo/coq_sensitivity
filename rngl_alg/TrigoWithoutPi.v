@@ -2879,10 +2879,17 @@ rename θ into θ2.
 move θ2 before θ1.
 rewrite <- (rngl_sub_0_l Hop) in Hc13.
 apply (rngl_le_sub_le_add_l Hop Hor) in Hc13.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
+  as [Hzc12| Hc12z]. {
+  apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_nle_gt Hor) in Hc12z.
+progress exfalso.
+(* see from here if there is a smaller proof *)
 destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   apply (rngl_nlt_ge Hor) in Hc13.
-  progress exfalso.
-  exfalso.
   apply Hc13; clear Hc13; cbn.
   rewrite (rngl_add_sub_assoc Hop).
   rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)) at 1.
@@ -2904,7 +2911,6 @@ apply (rngl_nle_gt Hor) in Hzc1.
 move Hzc1 before Hzs2.
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hc3z]. {
   apply (rngl_nlt_ge Hor) in Hzc3.
-  exfalso.
   apply Hzc3; clear Hzc3.
   destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
     cbn.
@@ -2922,7 +2928,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hc3z]. {
   apply (rngl_nle_gt Hor) in Hzc2.
   move Hzc2 before Hzc1.
   apply (rngl_nle_gt Hor) in Hzs3.
-  exfalso; apply Hzs3; clear Hzs3; cbn.
+  progress exfalso; apply Hzs3; clear Hzs3; cbn.
   apply (rngl_add_nonneg_nonneg Hor). {
     apply (rngl_mul_nonneg_nonneg Hop Hor);
       now apply (rngl_lt_le_incl Hor).
@@ -2934,7 +2940,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc3| Hc3z]. {
 apply (rngl_nle_gt Hor) in Hc3z.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2z| Hc2z]. {
   apply (rngl_nle_gt Hor) in Hzs3.
-  exfalso.
   apply Hzs3; clear Hzs3; cbn.
   apply (rngl_add_nonneg_nonneg Hor). {
     apply (rngl_mul_nonneg_nonneg Hop Hor);
@@ -2946,14 +2951,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2z| Hc2z]. {
 }
 apply (rngl_nle_gt Hor) in Hc2z.
 move Hc2z before Hzc1.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
-  as [Hzc12| Hc12z]. {
-  apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_nle_gt Hor) in Hc12z.
-exfalso.
 remember (θ2 - angle_right)%A as θ.
 apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
 subst θ2; rename θ into θ2.
@@ -3082,59 +3079,6 @@ now apply rngl_cos_bound.
 Qed.
 
 (* to be completed
-Theorem rngl_sin_angle_div_2_add_not_overflow :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = false
-  → rngl_sin (angle_div_2 (θ1 + θ2)) =
-     rngl_sin (angle_div_2 θ1 + angle_div_2 θ2).
-Proof.
-intros Hic Hon Hop Hed * Haov.
-destruct ac as (Hiv, Hc2, Hor).
-progress unfold angle_add_overflow in Haov.
-apply angle_ltb_ge in Haov.
-remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
-cbn.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  rewrite (rngl_mul_1_l Hon).
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    rewrite (rngl_mul_1_l Hon).
-    subst θ3.
-Check rngl_sin_nonneg_sin_nonneg_sin_nonneg.
-...
-    now apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
-  }
-  exfalso.
-  apply (rngl_leb_gt Hor) in Hzs2.
-  apply (rngl_nle_gt Hor) in Hzs2.
-  apply Hzs2; clear Hzs2.
-  subst θ3.
-  now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
-} {
-  apply (rngl_leb_gt Hor) in Hzs1.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    exfalso.
-    progress unfold angle_leb in Haov.
-    apply (rngl_leb_gt Hor) in Hzs1.
-    rewrite Hzs1 in Haov.
-    apply (rngl_leb_le) in Hzs3.
-    now rewrite Hzs3 in Haov.
-  }
-  apply (rngl_leb_gt Hor) in Hzs2.
-  apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
-  now apply (rngl_nlt_ge Hor) in Hzs3.
-}
-...
-
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3155,6 +3099,7 @@ destruct aov. 2: {
   f_equal. {
     now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
   } {
+...
     now apply rngl_sin_angle_div_2_add_not_overflow.
   }
 ...
