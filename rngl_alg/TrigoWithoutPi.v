@@ -2795,7 +2795,7 @@ apply rngl_leb_nle in Hzs1, Hzs3.
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
 apply rngl_leb_le in Haov.
 move Haov at bottom.
-(* to be completed
+(* could work if new lemma to be written...
 (* changing θ1 into -θ1 *)
 remember (-  θ1)%A as θ.
 rewrite <- (angle_opp_involutive Hop θ) in Heqθ.
