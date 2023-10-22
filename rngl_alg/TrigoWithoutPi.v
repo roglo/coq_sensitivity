@@ -2788,6 +2788,25 @@ apply rngl_leb_nle in Hzs1, Hzs3.
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
 apply rngl_leb_le in Haov.
 move Haov at bottom.
+(* to be completed
+(* changing θ1 into -θ1 *)
+remember (-  θ1)%A as θ.
+rewrite <- (angle_opp_involutive Hop θ) in Heqθ.
+apply (angle_opp_inj Hop) in Heqθ.
+subst θ1; rename θ into θ1.
+move θ1 after θ2.
+rewrite rngl_sin_opp in Hzs1.
+rewrite <- (rngl_opp_0 Hop) in Hzs1.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs1.
+rewrite rngl_cos_opp in Haov.
+Search (- _ + _ = _ - _)%L.
+Search (- _ + _ = _ - _)%A.
+Require Import ZArith.
+Search (- _ + _ = _ - _)%Z.
+Check rngl_add_opp_r.
+Check rngl_add_opp_l.
+...
+*)
 (* changing θ1 into θ1 - angle_straight *)
 remember (θ1 - angle_straight)%A as θ.
 apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.

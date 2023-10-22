@@ -1015,12 +1015,23 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
+Theorem rngl_add_opp_l :
+  rngl_has_opp T = true →
+  ∀ a b, (- a + b)%L = (b - a)%L.
+Proof.
+intros Hop *.
+rewrite rngl_add_comm.
+progress unfold rngl_sub.
+now rewrite Hop.
+Qed.
+
 Theorem rngl_add_opp_r :
   rngl_has_opp T = true →
   ∀ a b, (a + - b)%L = (a - b)%L.
 Proof.
-intros Hro *.
-now unfold rngl_sub; rewrite Hro.
+intros Hop *.
+progress unfold rngl_sub.
+now rewrite Hop.
 Qed.
 
 Theorem rngl_mul_inv_r :
