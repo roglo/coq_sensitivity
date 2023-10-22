@@ -3021,23 +3021,24 @@ destruct zs3. {
       rewrite (rngl_add_comm (_ * _))%L.
       now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
     }
-    exfalso.
     apply (rngl_leb_gt Hor) in Hzs2.
-    apply (rngl_nle_gt Hor) in Hzs2.
-    apply Hzs2; clear Hzs2.
     subst θ3.
     remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
     symmetry in Hzs12.
     destruct zs12. {
+    exfalso.
+      apply (rngl_nle_gt Hor) in Hzs2.
+      apply Hzs2; clear Hzs2.
       apply (rngl_leb_le) in Hzs12.
       now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
     }
     clear Haov.
     apply (rngl_leb_gt Hor) in Hzs12.
+Search (√((1 + rngl_cos _) / 2) = _)%L.
+(* rngl_sin_nonneg_sin_nonneg_sin_nonneg,
+   je dirais, après changement de variable *)
 ...
-Check rngl_sin_nonneg_add_nonneg_nonneg.
-...
-apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2); try easy.
+Check rngl_sin_nonneg_sin_neg_sin_add_neg.
 ...
     now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
   } {
