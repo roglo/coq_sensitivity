@@ -1850,7 +1850,7 @@ Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
+  → (rngl_sin θ2 ≤ 0)%L
   → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
      (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) +
       √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L.
@@ -2011,10 +2011,9 @@ subst θ2; rename θ into θ2.
 move θ2 before θ1.
 rewrite rngl_sin_opp in Hzs2.
 rewrite <- (rngl_opp_0 Hop) in Hzs2.
-apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+apply (rngl_opp_le_compat Hop Hor) in Hzs2.
 rewrite angle_add_opp_r.
 rewrite rngl_cos_opp.
-apply (rngl_lt_le_incl Hor) in Hzs2.
 now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_add.
 Qed.
 
@@ -2756,6 +2755,7 @@ destruct zs1. {
     rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_mul_1_l Hon).
     subst θ3.
+    apply (rngl_lt_le_incl Hor) in Hzs2.
     now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
   }
 }
@@ -2769,6 +2769,7 @@ destruct zs2. {
   subst θ3.
   rewrite (rngl_mul_comm Hic).
   rewrite (rngl_mul_comm Hic √((1 + rngl_cos θ1) / _))%L.
+  apply (rngl_lt_le_incl Hor) in Hzs1.
   now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
 }
 apply (rngl_leb_gt Hor) in Hzs2.
@@ -2987,6 +2988,9 @@ progress unfold angle_add_overflow in Haov.
 apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 cbn.
+move Haov at bottom.
+generalize Haov; intros Haov'.
+progress unfold angle_leb in Haov.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 symmetry in Hzs1, Hzs2.
@@ -3015,14 +3019,26 @@ destruct zs3. {
       do 2 rewrite (rngl_sub_opp_r Hop).
       rewrite (rngl_add_opp_r Hop).
       rewrite (rngl_add_comm (_ * _))%L.
-apply rngl_sin_nonneg_sin_neg_sin_add_neg; try easy.
-...
+      now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
     }
     exfalso.
     apply (rngl_leb_gt Hor) in Hzs2.
     apply (rngl_nle_gt Hor) in Hzs2.
     apply Hzs2; clear Hzs2.
     subst θ3.
+    remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs12.
+    destruct zs12. {
+      apply (rngl_leb_le) in Hzs12.
+      now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
+    }
+    clear Haov.
+    apply (rngl_leb_gt Hor) in Hzs12.
+...
+Check rngl_sin_nonneg_add_nonneg_nonneg.
+...
+apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2); try easy.
+...
     now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
   } {
     apply (rngl_leb_gt Hor) in Hzs1.
