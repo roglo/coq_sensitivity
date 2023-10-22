@@ -3529,6 +3529,17 @@ apply (rngl_le_lt_trans Hor _ a); [ easy | ].
 now apply (rngl_lt_add_r Hos Hor).
 Qed.
 
+Theorem rngl_add_nonpos_nonpos :
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ 0 → b ≤ 0 → a + b ≤ 0)%L.
+Proof.
+intros Hor * Ha Hb.
+apply (rngl_le_trans Hor _ a); [ | easy ].
+rewrite <- rngl_add_0_r.
+apply (rngl_add_le_compat Hor); [ | easy ].
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_of_nat_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

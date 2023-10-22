@@ -11,13 +11,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-(*
-Import List List.ListNotations.
-*)
-Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
-(*
-Require Import Init.Nat.
-*)
+Require Import Main.Misc Main.RingLike.
 Require Import RealLike.
 
 Section a.
@@ -3062,36 +3056,34 @@ destruct zs3. {
     apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy. {
       now apply (rngl_lt_le_incl Hor).
     }
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hzc1]. {
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
       apply rngl_add_cos_nonneg_when_sin_nonneg; try easy.
       now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
     }
-    apply (rngl_nle_gt Hor) in Hzc1.
-Search (_ → 0 ≤ _ + _)%L.
-...
-eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
-cbn.
-apply (rngl_add_le_compat Hor). {
-  rewrite <- (rngl_mul_1_r Hon).
-...
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-  apply (rngl_mul_le_compat Hop Hor).
-...
-    apply rngl_sin_nonneg_sin_nonneg_sin_nonneg; try easy.
-    progress unfold angle_leb.
-Check rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
-(* mouais... pas gagné *)
-...
-    apply (angle_le_trans).
-...
-Check rngl_sin_nonneg_sin_neg_sin_add_neg.
-...
-    now apply (rngl_sin_nonneg_add_nonneg_nonneg Hic Hon Hop Hed θ1 θ2).
+    apply (rngl_nle_gt Hor) in Hc1z.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
+      rewrite rngl_add_comm.
+      rewrite (angle_add_comm Hic) in Hzs12.
+      apply rngl_add_cos_nonneg_when_sin_nonneg; try easy.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
+    apply (rngl_nle_gt Hor) in Hzs12.
+    exfalso; apply Hzs12; clear Hzs12; cbn.
+    apply (rngl_add_nonpos_nonpos Hor). {
+      apply (rngl_lt_le_incl Hor) in Hzs2, Hc1z.
+      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+    } {
+      apply (rngl_lt_le_incl Hor) in Hc2z.
+      now apply (rngl_mul_nonneg_nonpos Hop Hor).
+    }
   } {
     apply (rngl_leb_gt Hor) in Hzs1.
     destruct zs2. {
       apply rngl_leb_le in Hzs2.
+...
       exfalso.
       progress unfold angle_leb in Haov.
       apply (rngl_leb_gt Hor) in Hzs1.
