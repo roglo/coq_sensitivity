@@ -649,17 +649,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
-  rewrite <- (rngl_mul_1_r Hon (rngl_cos θ1)).
-  rewrite <- (rngl_mul_1_l Hon (rngl_cos θ2)).
-  eapply (rngl_le_trans Hor); [ apply Hzs3 | ].
-  rewrite Hθ3; cbn.
-  apply (rngl_add_le_compat Hor). {
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
-    apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
-  } {
-    apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
-    apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
-  }
+  now apply (rngl_add_nonneg_nonneg Hor).
 } {
   apply (rngl_nle_gt Hor) in Hzc2.
   (* here, for sin θ3 to be non negative, then the negativity
