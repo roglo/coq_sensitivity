@@ -3060,8 +3060,11 @@ destruct zs3. {
     do 2 rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_r Hop).
     apply (rngl_lt_le_incl Hor) in Hzs2, Hzs12.
-apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
-(* faut voir, peut-être qu'il marche, celui-là *)
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L as [Hzcc| Hzcc]. {
+  now apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
+} {
+  exfalso; apply Hzcc; clear Hzcc.
+  cbn in Hzs12.
 ...
 eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
 cbn.
