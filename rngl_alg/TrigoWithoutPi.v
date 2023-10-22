@@ -3003,23 +3003,20 @@ destruct zs3. {
       apply rngl_leb_le in Hzs2.
       rewrite (rngl_mul_1_l Hon).
       subst θ3.
-Search (√((1 + _)/2) = _)%L.
-(* je crois que si j'ajoute pi à θ2, est-ce que je pourrai appliquer
-   celui-ci :
-rngl_sin_nonneg_sin_neg_sin_add_neg:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ θ1 θ2 : angle T,
-            (0 ≤ rngl_sin θ1)%L
-            → (rngl_sin θ2 < 0)%L
-              → √((1 + rngl_cos (θ1 + θ2)) / 2)%L =
-                (√((1 - rngl_cos θ1) / 2) * √((1 - rngl_cos θ2) / 2) +
-                 √((1 + rngl_cos θ1) / 2) * √((1 + rngl_cos θ2) / 2))%L
-*)
+      remember (θ2 - angle_straight)%A as θ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
+      rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+      rewrite <- (rngl_opp_0 Hop) in Hzs2.
+      apply (rngl_opp_le_compat Hop Hor) in Hzs2.
+      rewrite (angle_add_assoc Hop).
+      do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+      do 2 rewrite (rngl_sub_opp_r Hop).
+      rewrite (rngl_add_opp_r Hop).
+      rewrite (rngl_add_comm (_ * _))%L.
+apply rngl_sin_nonneg_sin_neg_sin_add_neg; try easy.
 ...
-      now apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
     }
     exfalso.
     apply (rngl_leb_gt Hor) in Hzs2.
