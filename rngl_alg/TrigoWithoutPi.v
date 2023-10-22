@@ -990,6 +990,14 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
         apply (rngl_0_le_1 Hon Hop Hor).
       }
       subst θ2.
+(*
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite <- (rngl_opp_0 Hop).
+apply -> (rngl_opp_lt_compat Hop Hor).
+...
+*)
       clear Hzs2 Hzc2.
       exfalso.
       destruct H1z as [H1z| H1z]. {
@@ -3052,8 +3060,20 @@ destruct zs3. {
     do 2 rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_r Hop).
     apply (rngl_lt_le_incl Hor) in Hzs2, Hzs12.
+apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+(* faut voir, peut-être qu'il marche, celui-là *)
+...
+eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
+cbn.
+apply (rngl_add_le_compat Hor). {
+  rewrite <- (rngl_mul_1_r Hon).
+...
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_mul_le_compat Hop Hor).
+...
     apply rngl_sin_nonneg_sin_nonneg_sin_nonneg; try easy.
     progress unfold angle_leb.
+Check rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
 (* mouais... pas gagné *)
 ...
     apply (angle_le_trans).
