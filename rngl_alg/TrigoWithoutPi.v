@@ -1095,6 +1095,14 @@ f_equal. {
 }
 Qed.
 
+Theorem angle_add_opp_l :
+  rngl_mul_is_comm T = true →
+  ∀ θ1 θ2, (- θ1 + θ2 = θ2 - θ1)%A.
+Proof.
+intros Hic *.
+apply (angle_add_comm Hic).
+Qed.
+
 Theorem angle_add_opp_r : ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%A.
 Proof. easy. Qed.
 
@@ -2780,7 +2788,6 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 rewrite (rngl_mul_1_l Hon).
 subst θ3.
 progress unfold angle_leb in Haov.
-(**)
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
 apply rngl_leb_nle in Hzs1, Hzs3.
 rewrite Hzs1, Hzs3 in Haov.
@@ -2799,12 +2806,35 @@ rewrite rngl_sin_opp in Hzs1.
 rewrite <- (rngl_opp_0 Hop) in Hzs1.
 apply (rngl_opp_lt_compat Hop Hor) in Hzs1.
 rewrite rngl_cos_opp in Haov.
-Search (- _ + _ = _ - _)%L.
-Search (- _ + _ = _ - _)%A.
-Require Import ZArith.
-Search (- _ + _ = _ - _)%Z.
-Check rngl_add_opp_r.
-Check rngl_add_opp_l.
+rewrite (angle_add_opp_l Hic) in Haov, Hzs3.
+(* changing θ2 into θ2 - angle_straight *)
+remember (θ2 - angle_straight)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ2; rename θ into θ2.
+move θ2 before θ1.
+move Hzs3 after Hzs3.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite (rngl_cos_add_straight_r Hon Hop θ2).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite (angle_add_sub_swap Hic Hop) in Haov, Hzs3.
+rewrite (angle_add_assoc Hop).
+rewrite (rngl_cos_add_straight_r Hon Hop) in Haov |-*.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3.
+rewrite (rngl_add_opp_r Hop).
+rewrite rngl_cos_opp.
+rewrite (angle_add_opp_l Hic).
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
+  as [Hzc12| Hc12z]. {
+(* ouais, ça se présente mal, j'ai pas de lemme pour ça *)
+  apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_nle_gt Hor) in Hc12z.
+exfalso.
 ...
 *)
 (* changing θ1 into θ1 - angle_straight *)
