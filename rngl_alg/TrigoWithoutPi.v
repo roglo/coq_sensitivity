@@ -2936,14 +2936,9 @@ rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z, Hc12z |-*.
 rewrite <- (rngl_opp_0 Hop) in Hc2z.
 apply (rngl_opp_lt_compat Hop Hor) in Hc2z.
 rewrite (rngl_add_opp_r Hop) in Hc12z |-*.
-Check rngl_sub_opp_r.
-Require Import ZArith.
-Check Z.sub_opp_r.
-Check Z.add_opp_r.
-...
-Check rngl_add_opp_r.
-rngl_sub_opp_r
-     : rngl_has_opp T = true → ∀ a b : T, (a - - b)%L = (a + b)%L
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc12z.
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+rewrite rngl_add_0_r in Hc12z |-*.
 ...
 (*
 ...
