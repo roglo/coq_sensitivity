@@ -2550,6 +2550,7 @@ intros Hop *.
 progress unfold angle_sub.
 apply (angle_add_assoc Hop).
 Qed.
+
 Theorem rngl_cos_lt_rngl_cos_sub :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
