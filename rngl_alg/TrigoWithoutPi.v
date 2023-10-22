@@ -4,7 +4,10 @@
 
    The property sin²+cos²=1 is therefore by definition. It is possible
    to add angles (see below) and we inherit the properties of cos(x+y)
-   and sin(x+y) in an obvous way. *)
+   and sin(x+y) in an obvous way.
+
+   There is no need of the number π here; the angle π is just (-1,0)
+ *)
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
