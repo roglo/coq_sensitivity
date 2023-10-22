@@ -2780,27 +2780,26 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 rewrite (rngl_mul_1_l Hon).
 subst θ3.
 progress unfold angle_leb in Haov.
+(**)
+apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
+apply rngl_leb_nle in Hzs1, Hzs3.
+rewrite Hzs1, Hzs3 in Haov.
+apply rngl_leb_nle in Hzs1, Hzs3.
+apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
+apply rngl_leb_le in Haov.
+move Haov at bottom.
 (* changing θ1 into θ1 - angle_straight *)
 remember (θ1 - angle_straight)%A as θ.
 apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
 subst θ1; rename θ into θ1.
 move θ1 after θ2.
-rewrite (rngl_sin_add_straight_r Hon Hop) in Haov, Hzs1.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1.
 rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
 rewrite <- (rngl_opp_0 Hop) in Hzs1.
 apply (rngl_opp_lt_compat Hop Hor) in Hzs1.
 rewrite (rngl_cos_add_straight_r Hon Hop).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
-remember (0 ≤? - rngl_sin θ1)%L as x eqn:Hx.
-symmetry in Hx.
-destruct x. {
-  apply (rngl_leb_le) in Hx.
-  rewrite <- (rngl_opp_0 Hop) in Hx.
-  apply (rngl_opp_le_compat Hop Hor) in Hx.
-  now apply (rngl_nlt_ge Hor) in Hx.
-}
-clear Hx.
 rewrite (angle_add_add_swap Hic Hop) in Haov, Hzs3 |-*.
 (* changing θ2 into θ2 - angle_straight *)
 remember (θ2 - angle_straight)%A as θ.
@@ -2825,11 +2824,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
   now apply (rngl_lt_le_incl Hor).
 }
 apply (rngl_nle_gt Hor) in Hc12z.
-apply (rngl_nle_gt Hor) in Hzs3.
-apply rngl_leb_nle in Hzs3.
-rewrite Hzs3 in Haov.
-apply (rngl_leb_gt Hor) in Hzs3.
-apply rngl_leb_le in Haov.
 exfalso.
 apply (rngl_nlt_ge Hor) in Haov.
 apply Haov; clear Haov.
