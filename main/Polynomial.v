@@ -948,7 +948,7 @@ unfold lap_sub.
 rewrite Hop.
 rewrite list_nth_lap_add.
 rewrite (list_nth_lap_opp Hop).
-now rewrite (fold_rngl_sub Hop).
+now rewrite (rngl_add_opp_r Hop).
 Qed.
 
 (* optional left addition of opposite; not existing if there is
@@ -972,7 +972,7 @@ intros Hop *.
 clear Hos.
 induction la as [| a]; [ easy | cbn ].
 rewrite fold_lap_opp.
-rewrite fold_rngl_sub; [ | easy ].
+rewrite rngl_add_opp_r; [ | easy ].
 rewrite rngl_sub_diag; [ | now apply rngl_has_opp_has_opp_or_subt ].
 now f_equal.
 Qed.
@@ -3245,8 +3245,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_add_opp_diag_l := polyn_opt_add_opp_diag_l;
      rngl_opt_add_sub := polyn_opt_add_sub;
      rngl_opt_sub_add_distr := polyn_opt_sub_add_distr;
-     rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
-     rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
+     rngl_opt_mul_inv_diag_l := polyn_opt_has_no_inv _;
+     rngl_opt_mul_inv_diag_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
      rngl_opt_le_dec := NA;

@@ -275,7 +275,7 @@ rewrite (rngl_inv_mul_distr Hon Hos Hin); cycle 1. {
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_inv_l Hon Hin); [ now rewrite rngl_mul_1_l | ].
+rewrite (rngl_mul_inv_diag_l Hon Hin); [ now rewrite rngl_mul_1_l | ].
 intros H; apply Hcz.
 apply (rngl_eq_mul_0_l Hos) in H; [ easy | | easy ].
 apply Bool.orb_true_iff; right.
@@ -1017,7 +1017,7 @@ assert (Hdu : det U ≠ 0%L). {
   symmetry in Huu; revert Huu.
   now apply rngl_1_neq_0_iff.
 }
-rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
+rewrite mat_mul_inv_diag_r in H1; [ | easy | | apply Hdu ]. {
   rewrite <- H1v.
   rewrite <- mat_mul_assoc; [ | now destruct Hif | | | ]; cycle 1. {
     now rewrite Ho, mat_with_vect_nrows.
@@ -1027,7 +1027,7 @@ rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
     rewrite Ho, mat_with_vect_nrows, squ_mat_ncols; [ easy | ].
     now unfold is_symm_mat in Hsy.
   }
-  rewrite mat_mul_inv_r; [ | easy | | apply Hdu ]. 2: {
+  rewrite mat_mul_inv_diag_r; [ | easy | | apply Hdu ]. 2: {
     rewrite Ho.
     apply mat_with_vect_is_square.
   }

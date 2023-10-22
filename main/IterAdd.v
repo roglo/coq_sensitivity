@@ -224,7 +224,7 @@ Proof.
 intros Hop *.
 rewrite iter_list_inv. 2: {
   intros.
-  rewrite (fold_rngl_sub Hop).
+  rewrite (rngl_add_opp_r Hop).
   rewrite rngl_add_comm.
   apply (rngl_opp_add_distr Hop).
 }
@@ -270,7 +270,7 @@ Proof.
 intros Hop *.
 rewrite iter_seq_inv. 2: {
   intros.
-  rewrite (fold_rngl_sub Hop).
+  rewrite (rngl_add_opp_r Hop).
   rewrite rngl_add_comm.
   apply (rngl_opp_add_distr Hop).
 }

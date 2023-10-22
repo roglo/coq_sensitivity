@@ -164,7 +164,7 @@ rewrite CReal_plus_opp_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
-Theorem CReal_mul_inv_l : let ro := CReal_ring_like_op in
+Theorem CReal_mul_inv_diag_l : let ro := CReal_ring_like_op in
   ∀ a : CReal, a ≠ 0%L → (a⁻¹ * a)%L = 1%L.
 Proof.
 cbn; intros * Haz.
@@ -297,8 +297,8 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_add_opp_diag_l := CReal_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := CReal_mul_inv_l;
-     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_inv_diag_l := CReal_mul_inv_diag_l;
+     rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA; (*CReal_le_dec;*)
@@ -489,8 +489,8 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_add_opp_diag_l := Rplus_opp_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := Rinv_l;
-     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_inv_diag_l := Rinv_l;
+     rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA; (*Rle_dec;*)

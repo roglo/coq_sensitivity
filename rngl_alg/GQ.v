@@ -1512,7 +1512,7 @@ setoid_rewrite GQmul_comm.
 apply GQmul_cancel_l.
 Qed.
 
-Theorem GQmul_inv_r : ∀ x, (x * ¹/ x = 1)%GQ.
+Theorem GQmul_inv_diag_r : ∀ x, (x * ¹/ x = 1)%GQ.
 Proof.
 intros.
 apply GQeq_eq; cbn.
@@ -1524,10 +1524,10 @@ rewrite Nat.mul_comm.
 apply PQred_diag.
 Qed.
 
-Theorem GQmul_inv_l : ∀ x, (¹/ x * x = 1)%GQ.
+Theorem GQmul_inv_diag_l : ∀ x, (¹/ x * x = 1)%GQ.
 Proof.
 intros; rewrite GQmul_comm.
-apply GQmul_inv_r.
+apply GQmul_inv_diag_r.
 Qed.
 
 Theorem GQpair_lt_nat_l : ∀ a b c, a ≠ 0 → b ≠ 0 → c ≠ 0 →

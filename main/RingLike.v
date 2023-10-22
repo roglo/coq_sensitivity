@@ -333,11 +333,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_subt T then ∀ a b c, (a - (b + c) = a - b - c)%L
       else not_applicable;
     (* when has inverse *)
-    rngl_opt_mul_inv_l :
+    rngl_opt_mul_inv_diag_l :
       if (rngl_has_inv T && rngl_has_1 T)%bool then
         ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L
       else not_applicable;
-    rngl_opt_mul_inv_r :
+    rngl_opt_mul_inv_diag_r :
       if (rngl_has_inv T && rngl_has_1 T && negb rngl_mul_is_comm)%bool then
         ∀ a : T, a ≠ 0%L → (a / a = 1)%L
       else not_applicable;
@@ -523,34 +523,34 @@ rewrite H1 in H.
 apply H.
 Qed.
 
-Theorem rngl_mul_inv_l :
+Theorem rngl_mul_inv_diag_l :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L.
 Proof.
 intros Hon Hiv *.
-specialize rngl_opt_mul_inv_l as H.
+specialize rngl_opt_mul_inv_diag_l as H.
 rewrite Hiv, Hon in H.
 apply H.
 Qed.
 
-Theorem rngl_mul_inv_r :
+Theorem rngl_mul_inv_diag_r :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   ∀ a : T, a ≠ 0%L → (a * a⁻¹ = 1)%L.
 Proof.
 intros Hon Hiv * Haz.
-specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-unfold rngl_div in rngl_mul_inv_r.
-rewrite Hiv in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
+specialize rngl_opt_mul_inv_diag_r as rngl_mul_inv_diag_r.
+unfold rngl_div in rngl_mul_inv_diag_r.
+rewrite Hiv in rngl_mul_inv_diag_r; cbn in rngl_mul_inv_diag_r.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic. {
   rewrite (rngl_mul_comm Hic).
-  now apply (rngl_mul_inv_l Hon Hiv).
+  now apply (rngl_mul_inv_diag_l Hon Hiv).
 }
-cbn in rngl_mul_inv_r.
-rewrite Hon in rngl_mul_inv_r.
-now apply rngl_mul_inv_r.
+cbn in rngl_mul_inv_diag_r.
+rewrite Hon in rngl_mul_inv_diag_r.
+now apply rngl_mul_inv_diag_r.
 Qed.
 
 Theorem rngl_eqb_eq :
@@ -1015,7 +1015,7 @@ intros a b c Hab.
 now rewrite Hab.
 Qed.
 
-Theorem fold_rngl_sub :
+Theorem rngl_add_opp_r :
   rngl_has_opp T = true →
   ∀ a b, (a + - b)%L = (a - b)%L.
 Proof.
@@ -1023,7 +1023,7 @@ intros Hro *.
 now unfold rngl_sub; rewrite Hro.
 Qed.
 
-Theorem fold_rngl_div :
+Theorem rngl_mul_inv_r :
   rngl_has_inv T = true →
   ∀ a b, (a * b⁻¹)%L = (a / b)%L.
 Proof.
@@ -1099,11 +1099,11 @@ destruct ai. {
   destruct ic. {
     unfold rngl_div; rewrite Hai.
     rewrite rngl_mul_comm; [ | easy ].
-    now apply rngl_mul_inv_l.
+    now apply rngl_mul_inv_diag_l.
   }
-  specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
-  rewrite Hai, Hon, Hic in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
-  now apply rngl_mul_inv_r.
+  specialize rngl_opt_mul_inv_diag_r as rngl_mul_inv_diag_r.
+  rewrite Hai, Hon, Hic in rngl_mul_inv_diag_r; cbn in rngl_mul_inv_diag_r.
+  now apply rngl_mul_inv_diag_r.
 }
 remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
@@ -1178,7 +1178,7 @@ destruct iv. {
   progress unfold rngl_div.
   rewrite Hiv.
   rewrite <- rngl_mul_assoc.
-  rewrite fold_rngl_div; [ | easy ].
+  rewrite rngl_mul_inv_r; [ | easy ].
   rewrite rngl_div_diag; [ | easy | easy | easy ].
   now apply rngl_mul_1_r.
 }
@@ -1203,7 +1203,7 @@ intros Hon Hiv * Hbz.
 progress unfold "/"%L.
 rewrite Hiv.
 rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_l Hon Hiv _ Hbz).
+rewrite (rngl_mul_inv_diag_l Hon Hiv _ Hbz).
 apply (rngl_mul_1_r Hon).
 Qed.
 
@@ -1230,7 +1230,7 @@ destruct op. {
   unfold rngl_sub in Habc.
   rewrite Hop in Habc.
   do 2 rewrite <- rngl_add_assoc in Habc.
-  rewrite fold_rngl_sub in Habc; [ | easy ].
+  rewrite rngl_add_opp_r in Habc; [ | easy ].
   rewrite rngl_sub_diag in Habc; [ | easy ].
   now do 2 rewrite rngl_add_0_r in Habc.
 }
@@ -1266,7 +1266,7 @@ destruct iv. {
   }
   apply (f_equal (λ x, rngl_mul (a⁻¹)%L x)) in Habc.
   do 2 rewrite rngl_mul_assoc in Habc.
-  rewrite rngl_mul_inv_l in Habc; [ | easy | easy | easy ].
+  rewrite rngl_mul_inv_diag_l in Habc; [ | easy | easy | easy ].
   now do 2 rewrite (rngl_mul_1_l Hon) in Habc.
 }
 remember (rngl_has_quot T) as qu eqn:Hqu.
@@ -1328,10 +1328,10 @@ Proof.
 intros Hop *.
 split; intros Hb. {
   apply (rngl_add_move_l Hop).
-  now rewrite (fold_rngl_sub Hop).
+  now rewrite rngl_add_opp_r.
 } {
   apply (rngl_add_move_l Hop) in Hb.
-  now rewrite (fold_rngl_sub Hop) in Hb.
+  now rewrite (rngl_add_opp_r Hop) in Hb.
 }
 Qed.
 
@@ -1517,7 +1517,7 @@ Theorem rngl_mul_opp_r :
 Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_l a b (- b)%L) as H.
-rewrite fold_rngl_sub in H; [ | easy ].
+rewrite rngl_add_opp_r in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_subt_iff; left ].
 rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_subt_iff; left ].
 symmetry in H.
@@ -1544,7 +1544,7 @@ intros Hon Hiv * Hbz.
 unfold rngl_div.
 rewrite Hiv.
 rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_l Hon Hiv _ Hbz).
+rewrite (rngl_mul_inv_diag_l Hon Hiv _ Hbz).
 apply (rngl_mul_1_r Hon).
 Qed.
 
@@ -1624,7 +1624,7 @@ destruct iv. {
   }
   apply (f_equal (λ x, (x * b⁻¹)%L)) in Hab.
   rewrite <- rngl_mul_assoc in Hab.
-  rewrite rngl_mul_inv_r in Hab; [ | easy | easy | easy ].
+  rewrite rngl_mul_inv_diag_r in Hab; [ | easy | easy | easy ].
   rewrite (rngl_mul_1_r Hon) in Hab; rewrite Hab.
   apply (rngl_mul_0_l Hos).
 }
@@ -1665,7 +1665,7 @@ destruct iv. {
   }
   apply (f_equal (rngl_mul a⁻¹%L)) in Hab.
   rewrite rngl_mul_assoc, (rngl_mul_0_r Hos) in Hab.
-  rewrite (rngl_mul_inv_l Hon Hiv) in Hab; [ | easy ].
+  rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hab; [ | easy ].
   now rewrite rngl_mul_1_l in Hab.
 }
 remember (rngl_has_quot T) as qu eqn:Hqu; symmetry in Hqu.
@@ -1710,7 +1710,7 @@ destruct iv. {
   remember (rngl_eqb a 0%L) as az eqn:Haz; symmetry in Haz.
   destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
   apply (rngl_eqb_neq Hde) in Haz; right.
-  rewrite rngl_mul_inv_l in H; [ | easy | easy | easy ].
+  rewrite rngl_mul_inv_diag_l in H; [ | easy | easy | easy ].
   rewrite (rngl_mul_1_l Hon) in H; rewrite H.
   apply (rngl_mul_0_r Hmo).
 } {
@@ -1786,7 +1786,7 @@ transitivity (0 + - 0)%L. {
   symmetry.
   apply rngl_add_0_l.
 }
-rewrite fold_rngl_sub; [ | easy ].
+rewrite rngl_add_opp_r; [ | easy ].
 apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
@@ -1909,12 +1909,12 @@ intros Hop *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hop'.
 rewrite Hop in Hop'.
 apply rngl_add_cancel_l with (a := (a + b)%L); [ now apply Hop'; left | ].
-rewrite (fold_rngl_sub Hop).
+rewrite (rngl_add_opp_r Hop).
 rewrite rngl_sub_diag; [ | now apply Hop'; left ].
 unfold rngl_sub.
 rewrite Hop.
 rewrite rngl_add_assoc.
-do 2 rewrite (fold_rngl_sub Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
 rewrite rngl_add_sub; [ | now apply Hop'; left ].
 symmetry.
 apply rngl_sub_diag.
@@ -1935,9 +1935,9 @@ destruct op. {
   rewrite rngl_add_assoc.
   rewrite rngl_add_add_swap.
   rewrite (rngl_add_add_swap a).
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_add_opp_r; [ | easy ].
+  rewrite rngl_add_opp_r; [ | easy ].
+  rewrite rngl_add_opp_r; [ | easy ].
   rewrite rngl_sub_diag, rngl_add_0_l; [ easy | easy ].
 }
 remember (rngl_has_subt T) as mo eqn:Hmo.
@@ -2011,14 +2011,14 @@ split; intros H. {
   unfold rngl_div in H.
   rewrite Hiv in H.
   rewrite <- rngl_mul_assoc in H.
-  rewrite (fold_rngl_div Hiv) in H.
+  rewrite (rngl_mul_inv_r Hiv) in H.
   rewrite (rngl_div_diag Hon) in H; [ | | easy ]. 2: {
     now apply rngl_has_inv_or_quot_iff; left.
   }
   now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
 } {
   rewrite H.
-  specialize (rngl_mul_inv_l Hon Hiv) as H1.
+  specialize (rngl_mul_inv_diag_l Hon Hiv) as H1.
   now apply H1.
 }
 Qed.
@@ -2030,7 +2030,7 @@ Proof.
 intros Hro *.
 symmetry.
 apply (rngl_add_move_0_r Hro).
-rewrite (fold_rngl_sub Hro).
+rewrite (rngl_add_opp_r Hro).
 apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
@@ -2086,7 +2086,7 @@ unfold rngl_div in div_diag.
 rewrite Hiv in div_diag.
 specialize (rngl_mul_move_1_r Hon Hiv) as H1.
 apply H1. 2: {
-  rewrite fold_rngl_div; [ | easy ].
+  rewrite rngl_mul_inv_r; [ | easy ].
   unfold rngl_div; rewrite Hiv.
   apply div_diag; [ | easy ].
   now apply rngl_has_inv_or_quot_iff; left.
@@ -2270,7 +2270,7 @@ split; intros Hab. {
   now rewrite rngl_add_0_l, (rngl_sub_0_r Hos) in H1.
 } {
   specialize (H1 a b (- a)%L (- a)%L Hab (rngl_le_refl Hor _)).
-  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  do 2 rewrite (rngl_add_opp_r Hop) in H1.
   now rewrite (rngl_sub_diag Hos) in H1.
 }
 Qed.
@@ -2291,7 +2291,7 @@ split; intros Hab. {
   now rewrite rngl_add_0_l in H1.
 } {
   specialize (H1 a b (- b) (- b) Hab (rngl_le_refl Hor _))%L.
-  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  do 2 rewrite (rngl_add_opp_r Hop) in H1.
   now rewrite (rngl_sub_diag Hos) in H1.
 }
 Qed.
@@ -2333,7 +2333,7 @@ intros * Hop Hor *.
 split; intros Hxy. {
   apply (rngl_le_0_sub Hop Hor).
   rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_add_comm, (fold_rngl_sub Hop).
+  rewrite rngl_add_comm, (rngl_add_opp_r Hop).
   now apply (rngl_le_0_sub Hop Hor).
 } {
   apply (rngl_le_0_sub Hop Hor).
@@ -2341,7 +2341,7 @@ split; intros Hxy. {
   rewrite Hop.
   rewrite rngl_add_comm.
   rewrite <- (rngl_opp_involutive Hop y).
-  rewrite (fold_rngl_sub Hop).
+  rewrite (rngl_add_opp_r Hop).
   now apply (rngl_le_0_sub Hop Hor).
 }
 Qed.
@@ -2659,21 +2659,21 @@ assert (Hoaz : (- a)%L ≠ 0%L). {
   now rewrite rngl_opp_0 in H.
 }
 apply (rngl_mul_cancel_l Hid (- a)%L); [ easy | ].
-specialize (rngl_opt_mul_inv_r) as H2.
+specialize (rngl_opt_mul_inv_diag_r) as H2.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 rewrite Hon, Hiv in H2; cbn in H2.
 rewrite rngl_mul_opp_opp; [ | easy ].
 destruct ic. {
   symmetry.
   rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
+  rewrite rngl_mul_inv_diag_l; [ | easy | easy | easy ].
   rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
+  rewrite rngl_mul_inv_diag_l; [ | easy | easy | easy ].
   easy.
 } {
   cbn in H2.
-  rewrite fold_rngl_div; [ | easy ].
-  rewrite fold_rngl_div; [ | easy ].
+  rewrite rngl_mul_inv_r; [ | easy ].
+  rewrite rngl_mul_inv_r; [ | easy ].
   rewrite H2; [ | easy ].
   now rewrite H2.
 }
@@ -2688,7 +2688,7 @@ intros Hon Hiv * Hs.
 unfold rngl_div; rewrite Hiv.
 rewrite rngl_mul_assoc; f_equal.
 rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_inv_l; [ | easy| easy | easy ].
+rewrite rngl_mul_inv_diag_l; [ | easy| easy | easy ].
 apply (rngl_mul_1_r Hon).
 Qed.
 
@@ -2905,7 +2905,7 @@ destruct H2 as (H2, H3).
 specialize (rngl_mul_nonneg_nonpos Hop Hor) as H4.
 assert (H : (0 ≤ a)%L) by now apply (rngl_lt_iff Hor) in Hza.
 specialize (H4 _ _ H H3); clear H.
-rewrite (rngl_mul_inv_r Hon Hiv a Haz) in H4.
+rewrite (rngl_mul_inv_diag_r Hon Hiv a Haz) in H4.
 specialize (rngl_0_le_1 Hon Hop Hor) as H5.
 specialize (rngl_le_antisymm Hor _ _ H4 H5) as H6.
 clear H4 H5.
@@ -2994,7 +2994,7 @@ assert (H : (0 ≤ b⁻¹ ≤ b⁻¹)%L). {
   now apply (rngl_le_trans Hor _ a).
 }
 specialize (H1 H); clear H.
-now rewrite (rngl_mul_inv_r Hon Hiv) in H1.
+now rewrite (rngl_mul_inv_diag_r Hon Hiv) in H1.
 Qed.
 
 Theorem rngl_square_ge_0 :
@@ -3110,7 +3110,7 @@ split; intros Habc. {
   specialize (rngl_add_le_compat Hor) as H1.
   specialize (H1 (a + b) c (- a) (- a) Habc)%L.
   specialize (H1 (rngl_le_refl Hor _)).
-  do 2 rewrite (fold_rngl_sub Hop) in H1.
+  do 2 rewrite (rngl_add_opp_r Hop) in H1.
   rewrite rngl_add_comm in H1.
   now rewrite (rngl_add_sub Hos) in H1.
 } {
@@ -3665,7 +3665,7 @@ assert (Hc2 : (2 ≠ 0)%L). {
 }
 apply (rngl_mul_cancel_r Hi1) with (c := 2%L); [ easy | ].
 rewrite (rngl_mul_sub_distr_r Hop).
-rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_l Hon).
 apply (rngl_add_sub Hos).
 Qed.
@@ -4756,7 +4756,7 @@ apply (rngl_mul_le_mono_pos_l Hop Hor) with (c := b); [ | easy | ]. {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
 rewrite rngl_mul_0_r; [ | now apply rngl_has_opp_or_subt_iff; left ].
-rewrite (rngl_mul_inv_r Hon Hiv); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+rewrite (rngl_mul_inv_diag_r Hon Hiv); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
 apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
 Qed.
@@ -4957,7 +4957,7 @@ rewrite rngl_add_comm.
 progress unfold rngl_sub.
 rewrite Hop.
 rewrite <- rngl_add_assoc; f_equal.
-rewrite (fold_rngl_sub Hop).
+rewrite (rngl_add_opp_r Hop).
 rewrite <- (rngl_mul_1_r Hon a) at 2.
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- (rngl_mul_opp_r Hop).
@@ -5365,7 +5365,7 @@ Context (Hon : @rngl_has_1 T ro = true).
 Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%L = 0%L.
 Proof.
 intros.
-rewrite (fold_rngl_sub Hop).
+rewrite (rngl_add_opp_r Hop).
 apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
@@ -5379,7 +5379,7 @@ Definition rngl_ring_theory
      Rmul_comm := rngl_mul_comm Hic;
      Rmul_assoc := rngl_mul_assoc;
      Rdistr_l := rngl_mul_add_distr_r;
-     Rsub_def x y := eq_sym (fold_rngl_sub Hop x y);
+     Rsub_def x y := eq_sym (rngl_add_opp_r Hop x y);
      Ropp_def := rngl_Ropp_def |}.
 
 End a.

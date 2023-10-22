@@ -1635,7 +1635,7 @@ Qed.
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
-Theorem mat_mul_inv_r : in_charac_0_field →
+Theorem mat_mul_inv_diag_r : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
@@ -1667,11 +1667,11 @@ rewrite (matrix_comatrix_transp_mul Hon Hop Hic Hch); [ | | easy ]. 2: {
   now apply rngl_has_inv_or_quot_iff; left.
 }
 rewrite mat_mul_scal_l_mul_assoc.
-rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
+rewrite rngl_mul_inv_diag_l; [ | easy | easy | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
-Theorem mat_mul_inv_l : in_charac_0_field →
+Theorem mat_mul_inv_diag_l : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
@@ -1690,7 +1690,7 @@ rewrite (comatrix_transp_matrix_mul Hon Hop Hic Hch); [ | | easy ]. 2: {
   now apply rngl_has_inv_or_quot_iff; left.
 }
 rewrite mat_mul_scal_l_mul_assoc.
-rewrite rngl_mul_inv_l; [ | easy | easy | easy ].
+rewrite rngl_mul_inv_diag_l; [ | easy | easy | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
@@ -1732,7 +1732,7 @@ assert (Hiq : rngl_has_inv_or_quot T = true). {
 }
 specialize (H1 (proj2 (Bool.orb_true_iff _ _) (or_intror Hiq))).
 specialize (H1 M Hsm).
-specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
+specialize (mat_mul_inv_diag_l Hif M Hsm Hmz) as H3.
 apply (f_equal (mat_mul M⁻¹)) in H1.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   destruct M as (ll).
@@ -1790,7 +1790,7 @@ rewrite (mat_mul_1_r Hon Hop) in H1; cycle 1. {
 rewrite H1.
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite (rngl_div_1_l Hon); [ | easy ].
-rewrite (rngl_mul_inv_l Hon); [ | easy | easy ].
+rewrite (rngl_mul_inv_diag_l Hon); [ | easy | easy ].
 symmetry; apply (mat_mul_scal_1_l Hon).
 Qed.
 

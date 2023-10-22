@@ -1249,7 +1249,7 @@ rewrite QG_mul_comm.
 apply QG_mul_1_l.
 Qed.
 
-Theorem QG_mul_inv_l : ∀ a : QG, a ≠ 0%QG → (a⁻¹ * a)%QG = 1%QG.
+Theorem QG_mul_inv_diag_l : ∀ a : QG, a ≠ 0%QG → (a⁻¹ * a)%QG = 1%QG.
 Proof.
 intros * Haz.
 progress unfold QG_mul.
@@ -1264,11 +1264,11 @@ rewrite <- QG_of_Q_qg_q.
 now rewrite H1.
 Qed.
 
-Theorem QG_mul_inv_r : ∀ a : QG, a ≠ 0%QG → (a * a⁻¹)%QG = 1%QG.
+Theorem QG_mul_inv_diag_r : ∀ a : QG, a ≠ 0%QG → (a * a⁻¹)%QG = 1%QG.
 Proof.
 intros * Haz.
 rewrite QG_mul_comm.
-now apply QG_mul_inv_l.
+now apply QG_mul_inv_diag_l.
 Qed.
 
 Theorem QG_mul_add_distr_l :  ∀ a b c, (a * (b + c))%QG = (a * b + a * c)%QG.
@@ -2082,7 +2082,7 @@ apply (f_equal (λ b, QG_div b a)) in Hbc.
 do 2 rewrite (QG_mul_comm a) in Hbc.
 progress unfold QG_div in Hbc.
 do 2 rewrite <- QG_mul_assoc in Hbc.
-rewrite QG_mul_inv_r in Hbc; [ | easy ].
+rewrite QG_mul_inv_diag_r in Hbc; [ | easy ].
 now do 2 rewrite QG_mul_1_r in Hbc.
 Qed.
 
@@ -2281,7 +2281,7 @@ apply (@QG_mul_lt_mono_pos_l a) in H2; [ | easy ].
 progress unfold QG_div in H2 at 1.
 rewrite (QG_mul_comm a) in H2.
 rewrite <- QG_mul_assoc in H2.
-rewrite QG_mul_inv_l in H2. 2: {
+rewrite QG_mul_inv_diag_l in H2. 2: {
   now intros H; subst a.
 }
 now rewrite QG_mul_1_r in H2.
@@ -2319,8 +2319,8 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_add_opp_diag_l := QG_add_opp_diag_l;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := QG_mul_inv_l;
-     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_inv_diag_l := QG_mul_inv_diag_l;
+     rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := QG_le_dec;

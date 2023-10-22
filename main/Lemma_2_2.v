@@ -657,7 +657,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now cbn.
     }
     cbn.
-    rewrite fold_rngl_sub; [ | easy ].
+    rewrite rngl_add_opp_r; [ | easy ].
     rewrite (rngl_summation_split3 (k - 2 ^ n + 1)). 2: {
       split; [ flia Hk | ].
       apply (Nat.add_le_mono_r _ _ (2 ^ n)).
@@ -1606,7 +1606,7 @@ destruct n. {
     apply (f_equal (rngl_mul (μ⁻¹)%L)) in Hμ.
     rewrite rngl_mul_0_r in Hμ; [ | easy ].
     rewrite rngl_mul_assoc in Hμ.
-    rewrite (rngl_mul_inv_l Hon) in Hμ; [ | easy | easy ].
+    rewrite (rngl_mul_inv_diag_l Hon) in Hμ; [ | easy | easy ].
     now rewrite (rngl_mul_1_l Hon) in Hμ.
   }
   subst μ.

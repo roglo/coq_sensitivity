@@ -404,7 +404,7 @@ rewrite (rngl_add_comm 1%L) at 1.
 rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_diag2 Hon).
 rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_r Hon Hiv); [ | easy ].
+rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
 rewrite (rngl_mul_comm Hic).
@@ -412,13 +412,13 @@ rewrite (rngl_add_diag2 Hon).
 rewrite (rngl_mul_comm Hic ε).
 rewrite rngl_mul_assoc.
 rewrite <- rl_nth_root_mul; cycle 1. {
-  rewrite (fold_rngl_div Hiv).
+  rewrite (rngl_mul_inv_r Hiv).
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   now rewrite (rngl_mul_0_l Hos).
 } {
-  rewrite (fold_rngl_div Hiv).
+  rewrite (rngl_mul_inv_r Hiv).
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
@@ -448,7 +448,7 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic).
 rewrite (rngl_mul_comm Hic).
 do 2 rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_l Hon Hiv); [ | easy ].
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon).
 rewrite <- rl_nth_root_mul; [ | easy | easy ].
 rewrite (rngl_mul_comm Hic (1 - _)%L).
@@ -565,7 +565,7 @@ destruct ap. {
     }
     rewrite (rngl_mul_0_r Hos) in Hzsc.
     do 2 rewrite rngl_mul_assoc in Hzsc.
-    rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
+    rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hzsc; [ | easy ].
     rewrite (rngl_mul_1_l Hon) in Hzsc.
     destruct (rngl_eq_dec Hed sa 0) as [Hsz| Hsz]. {
       subst sa.
@@ -700,7 +700,7 @@ destruct ap. {
       }
       rewrite (rngl_mul_0_r Hos) in Hzsc.
       do 2 rewrite rngl_mul_assoc in Hzsc.
-      rewrite (rngl_mul_inv_l Hon Hiv) in Hzsc; [ | easy ].
+      rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hzsc; [ | easy ].
       rewrite (rngl_mul_1_l Hon) in Hzsc.
       apply (rngl_nle_gt Hor) in Hzs.
       apply (rngl_nlt_ge Hor).
@@ -1004,7 +1004,7 @@ destruct iq; [ | easy ].
 now rewrite Hic.
 Qed.
 
-Theorem gc_opt_mul_inv_l :
+Theorem gc_opt_mul_inv_diag_l :
   let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
   if (rngl_has_inv (GComplex T) && rngl_has_1 (GComplex T))%bool then
@@ -1055,7 +1055,7 @@ assert (Hic : rngl_mul_is_comm T = true). {
 }
 intros * Haz.
 apply eq_gc_eq; cbn.
-specialize (rngl_mul_inv_l Hon Hiv) as H1.
+specialize (rngl_mul_inv_diag_l Hon Hiv) as H1.
 rewrite (gc_inv_re Hic Hrl); [ | now intros H; subst a ].
 rewrite (gc_inv_im Hic Hrl); [ | now intros H; subst a ].
 progress unfold rngl_sub.
@@ -1090,14 +1090,14 @@ split. {
   destruct x as [one| ]; [ cbn | easy ].
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_comm Hic).
-  rewrite (fold_rngl_sub Hop).
+  rewrite (rngl_add_opp_r Hop).
   rewrite rngl_mul_assoc.
   rewrite (rngl_mul_mul_swap Hic).
   apply (rngl_sub_diag Hos).
 }
 Qed.
 
-Theorem gc_opt_mul_inv_r :
+Theorem gc_opt_mul_inv_diag_r :
   let roc := gc_ring_like_op T in
   if (rngl_has_inv (GComplex T) && rngl_has_1 (GComplex T) &&
       negb (rngl_mul_is_comm T))%bool then
@@ -1453,7 +1453,7 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
   progress unfold rngl_div.
   rewrite Hiv.
   rewrite <- rngl_mul_add_distr_r.
-  rewrite (fold_rngl_div Hiv).
+  rewrite (rngl_mul_inv_r Hiv).
   rewrite Hρ.
   rewrite rngl_squ_sqrt. 2: {
     apply (rngl_add_nonneg_nonneg Hor).
@@ -1575,7 +1575,7 @@ rewrite Nat.add_0_r.
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite rngl_mul_add_distr_r.
-do 2 rewrite (fold_rngl_div Hiv).
+do 2 rewrite (rngl_mul_inv_r Hiv).
 rewrite (rngl_of_nat_mul Hon Hos).
 rewrite (rngl_mul_div Hi1); [ | easy ].
 rewrite rngl_add_comm, (rngl_add_sub Hos).
@@ -1657,7 +1657,7 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
     rewrite Hiv.
     rewrite (rngl_mul_mul_swap Hic).
     rewrite <- (rngl_of_nat_pow Hon Hos).
-    rewrite (fold_rngl_div Hiv).
+    rewrite (rngl_mul_inv_r Hiv).
     apply (rngl_le_div_l Hon Hop Hiv Hor). {
       rewrite <- rngl_of_nat_0.
       apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
@@ -2767,8 +2767,8 @@ Definition gc_ring_like_prop T
      rngl_opt_add_opp_diag_l := gc_opt_add_opp_diag_l Hop;
      rngl_opt_add_sub := gc_opt_add_sub Hsu;
      rngl_opt_sub_add_distr := gc_opt_sub_add_distr Hsu;
-     rngl_opt_mul_inv_l := gc_opt_mul_inv_l Hop;
-     rngl_opt_mul_inv_r := gc_opt_mul_inv_r;
+     rngl_opt_mul_inv_diag_l := gc_opt_mul_inv_diag_l Hop;
+     rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
      rngl_opt_le_dec := NA;

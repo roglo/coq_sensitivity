@@ -254,7 +254,7 @@ Definition Zn_inv' n a :=
 
 Definition Zn_has_1 (n : nat) := true.
 
-Theorem Zn_opt_mul_inv_l :
+Theorem Zn_opt_mul_inv_diag_l :
   ∀ {not_applicable : Prop} (NA : not_applicable) n,
   if (Zn_has_inv n && Zn_has_1 n)%bool then
     ∀ a : Zn n,
@@ -309,7 +309,7 @@ apply Nat.nle_gt in Ha; apply Ha.
 destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
-Theorem Zn_opt_mul_inv_r :
+Theorem Zn_opt_mul_inv_diag_r :
   ∀ {not_applicable : Prop} (NA : not_applicable) n {P},
   if (Zn_has_inv n && true && false)%bool then P
   else not_applicable.
@@ -434,8 +434,8 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_add_opp_diag_l := Zn_add_opp_diag_l n;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := Zn_opt_mul_inv_l NA n;
-     rngl_opt_mul_inv_r := Zn_opt_mul_inv_r NA n;
+     rngl_opt_mul_inv_diag_l := Zn_opt_mul_inv_diag_l NA n;
+     rngl_opt_mul_inv_diag_r := Zn_opt_mul_inv_diag_r NA n;
      rngl_opt_mul_div := Zn_opt_mul_div NA n;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_le_dec := NA;
@@ -525,8 +525,8 @@ Definition lcm_ring_like_prop :=
      rngl_opt_add_opp_diag_l := NA;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_add_distr := NA;
-     rngl_opt_mul_inv_l := NA;
-     rngl_opt_mul_inv_r := NA;
+     rngl_opt_mul_inv_diag_l := NA;
+     rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA;
