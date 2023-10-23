@@ -3191,6 +3191,22 @@ destruct zs3. {
     exfalso. (* because goal is nonneg=nonpos *)
     clear Haov'.
     apply (rngl_leb_gt Hor) in Hzs2.
+    destruct (rngl_eq_dec Hed (rngl_cos θ1) 0) as [Hc1ez| Hc1ez]. {
+      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hc1ez.
+      destruct Hc1ez; subst θ1. {
+        cbn in Haov.
+        rewrite (rngl_mul_0_l Hos) in Haov.
+        rewrite (rngl_sub_0_l Hop) in Haov.
+        rewrite (rngl_mul_1_l Hon) in Haov.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Haov.
+        now apply (rngl_nlt_ge Hor) in Haov.
+      } {
+        apply (rngl_nle_gt Hor) in Hzs1.
+        exfalso; apply Hzs1; clear Hzs1.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+    }
 (*
 Search (rngl_cos _ < rngl_cos _)%L.
 ...
@@ -3301,12 +3317,8 @@ Search (rngl_cos _ < rngl_cos _)%L.
       apply (rngl_lt_iff Hor).
       split; [ easy | ].
       intros H.
-      symmetry in H.
-      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
-      destruct H; subst θ1. {
-        rewrite rngl_sin_sub_right_r in Hzs12.
-        cbn in *.
-(* mouais, peut-être que c'est un cas où le goal du début marchait *)
+      now symmetry in H.
+    }
 ...
 Search (rngl_sin (_ - angle_right)).
 Search (rngl_sin (angle_right - _)).
