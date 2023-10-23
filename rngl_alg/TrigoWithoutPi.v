@@ -3122,7 +3122,22 @@ destruct zs3. {
       }
     }
     exfalso. (* because goal is nonneg=nonpos *)
+    clear Haov'.
     apply (rngl_leb_gt Hor) in Hzs2.
+    remember (θ2 - angle_straight)%A as θ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+    subst θ2; rename θ into θ2.
+    move θ2 before θ1.
+    rewrite (angle_add_assoc Hop) in Haov.
+    rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Haov, Hzs2.
+    do 2 rewrite (rngl_opp_involutive Hop) in Haov.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
+    remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs12.
+    destruct zs12; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs12.
+    apply rngl_leb_le in Haov.
 ...
     apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
     now apply (rngl_nlt_ge Hor) in Hzs3.
