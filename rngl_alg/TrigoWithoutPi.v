@@ -3138,6 +3138,22 @@ destruct zs3. {
     destruct zs12; [ easy | ].
     apply (rngl_leb_gt Hor) in Hzs12.
     apply rngl_leb_le in Haov.
+    remember (angle_straight - θ1)%A as θ.
+    apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
+    rewrite (angle_sub_opp_r Hop) in Heqθ.
+    apply (angle_add_move_l Hic Hon Hop Hed) in Heqθ.
+    subst θ1; rename θ into θ1.
+    move θ1 after θ2.
+    rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs12.
+    rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs1, Hzs12.
+    do 2 rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov.
+    rewrite (rngl_opp_involutive Hop) in Haov.
+    rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+    move Hzs2 before Hzs1.
+    move Hzs12 before Hzs2.
+(* chais pas si chuis tellement plus avancé avec ça,
+   avec ce dernier changement de variable θ1 -> plat - θ1 *)
 ...
     apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
     now apply (rngl_nlt_ge Hor) in Hzs3.
