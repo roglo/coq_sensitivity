@@ -2284,7 +2284,7 @@ rewrite (angle_add_comm Hic).
 apply (angle_add_move_l Hic Hon Hop Hed).
 Qed.
 
-Theorem rngl_sin_add_right :
+Theorem rngl_sin_add_right_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_sin (θ + angle_right) = rngl_cos θ.
@@ -2295,7 +2295,7 @@ rewrite (rngl_mul_0_r Hos).
 apply rngl_add_0_r.
 Qed.
 
-Theorem rngl_cos_add_right :
+Theorem rngl_cos_add_right_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ + angle_right) = (- rngl_sin θ)%L.
@@ -3083,17 +3083,18 @@ destruct zs3. {
     do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
     do 2 rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_r Hop).
+    remember (0 ≤? - rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs12.
+    destruct zs12; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs12.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+    move Hzs12 at bottom.
+    apply rngl_leb_le in Haov.
+    apply (rngl_opp_le_compat Hop Hor) in Haov.
+    move Haov at bottom.
     destruct zs2. {
       apply rngl_leb_le in Hzs2.
       rewrite (rngl_mul_1_l Hon).
-      remember (0 ≤? - rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-      symmetry in Hzs12.
-      destruct zs12; [ easy | ].
-      apply (rngl_leb_gt Hor) in Hzs12.
-      apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
-      move Hzs12 at bottom.
-      apply rngl_leb_le in Haov.
-      apply (rngl_opp_le_compat Hop Hor) in Haov.
       apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy. {
         now apply (rngl_lt_le_incl Hor).
       }
@@ -3124,6 +3125,41 @@ destruct zs3. {
     exfalso. (* because goal is nonneg=nonpos *)
     clear Haov'.
     apply (rngl_leb_gt Hor) in Hzs2.
+(**)
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+    remember (0 ≤? - rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs12.
+    destruct zs12; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs12.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+    move Hzs12 at bottom.
+    apply rngl_leb_le in Haov.
+    apply (rngl_opp_le_compat Hop Hor) in Haov.
+...
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+      remember (θ2 - angle_straight - angle_right)%A as θ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      subst θ2; rename θ into θ2.
+      do 2 rewrite (angle_add_assoc Hop) in Haov.
+      rewrite (rngl_sin_add_straight_r Hon Hop) in Haov, Hzs2.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Haov, Hzs2.
+      rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
+      rewrite (rngl_cos_add_right_r Hon Hop) in Haov.
+      do 2 rewrite (rngl_opp_involutive Hop) in Haov.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
+(* ah ouais mais du coup j'ai rien sur sin θ2 *)
+...
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Haov, Hzs2.
+    do 2 rewrite (rngl_opp_involutive Hop) in Haov.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
+    remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs12.
+    destruct zs12; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs12.
+    apply rngl_leb_le in Haov.
+...
     remember (θ2 - angle_straight)%A as θ.
     apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
     subst θ2; rename θ into θ2.
@@ -3138,6 +3174,7 @@ destruct zs3. {
     destruct zs12; [ easy | ].
     apply (rngl_leb_gt Hor) in Hzs12.
     apply rngl_leb_le in Haov.
+...
     remember (angle_straight - θ1)%A as θ.
     apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
     rewrite (angle_sub_opp_r Hop) in Heqθ.
@@ -3152,6 +3189,7 @@ destruct zs3. {
     apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
     move Hzs2 before Hzs1.
     move Hzs12 before Hzs2.
+...
 (* chais pas si chuis tellement plus avancé avec ça,
    avec ce dernier changement de variable θ1 -> plat - θ1 *)
 ...
