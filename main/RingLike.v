@@ -5199,31 +5199,45 @@ Definition is_gen_limit_when_tending_to {A} (dist : A → A → T) f a l :=
 Definition is_gen_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
 
+Definition is_gen_complete {A} (dist : A → A → T) :=
+  ∀ u, is_gen_Cauchy_sequence dist u
+  → ∃ c, is_gen_limit_when_tending_to_inf dist u c.
+
+Definition is_gen_derivative (dist : T → T → T) f f' :=
+  ∀ a,
+  is_gen_limit_when_tending_to dist (λ x, dist (f x) (f a) / dist x a)%L
+    a (f' a).
+
+Definition gen_continuous_at {A} (dist : A → A → T) f a :=
+  is_gen_limit_when_tending_to dist f a (f a).
+
+Definition gen_continuous {A} (dist : A → A → T) f :=
+  ∀ a, gen_continuous_at dist f a.
+
 (* completeness *)
 
 Definition rngl_dist a b := rngl_abs (a - b)%L.
 
-Definition is_Cauchy_sequence := is_gen_Cauchy_sequence rngl_dist.
+Definition is_Cauchy_sequence :=
+  is_gen_Cauchy_sequence rngl_dist.
 
-Definition is_limit_when_tending_to := is_gen_limit_when_tending_to rngl_dist.
-
-(*
-Definition is_limit_when_tending_to f a l :=
-  (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x, rngl_abs (x - a) < η → rngl_abs (f x - l) < ε)%L.
-*)
+Definition is_limit_when_tending_to :=
+  is_gen_limit_when_tending_to rngl_dist.
 
 Definition is_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf rngl_dist.
 
-Definition is_derivative f f' :=
-  ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).
+Definition is_derivative :=
+  is_gen_derivative rngl_dist.
 
 Definition is_complete :=
-  ∀ u, is_Cauchy_sequence u → ∃ c, is_limit_when_tending_to_inf u c.
+  is_gen_complete rngl_dist.
 
-Definition continuous_at f a := is_limit_when_tending_to f a (f a).
-Definition continuous f := ∀ a, continuous_at f a.
+Definition continuous_at :=
+  gen_continuous_at rngl_dist.
+
+Definition continuous :=
+  gen_continuous rngl_dist.
 
 (* archimedianity *)
 

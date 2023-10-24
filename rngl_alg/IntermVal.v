@@ -1532,8 +1532,9 @@ assert (Hbc : c ≠ b). {
   now apply (intermediate_value_prop_2 Hon Hop Hiv Hor f Hfc a b c u).
 }
 specialize (Hfc c) as Hcc.
-progress unfold continuous_at in Hcc.
-progress unfold is_limit_when_tending_to in Hcc.
+progress unfold rngl_dist in Hcc.
+progress unfold gen_continuous_at in Hcc.
+progress unfold is_gen_limit_when_tending_to in Hcc.
 set (η2 := rngl_min (c - a) (b - c)).
 assert (Hzη2 : (0 < η2)%L). {
   progress unfold η2.
