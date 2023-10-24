@@ -32,7 +32,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Definition rl_sqrt := rl_nth_root 2.
+Definition rl_sqrt a := rl_nth_root 2 a.
 
 End a.
 
