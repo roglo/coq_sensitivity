@@ -3344,7 +3344,6 @@ Search (rngl_cos _ < rngl_cos _)%L.
     }
     apply (rngl_nle_gt Hor) in Hc1z.
     clear Hc1ez.
-(* faire la même chose avec θ2 *)
 ...
 Search (rngl_sin (_ - angle_right)).
 Search (rngl_sin (angle_right - _)).
