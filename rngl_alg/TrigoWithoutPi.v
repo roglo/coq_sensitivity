@@ -3342,6 +3342,24 @@ destruct zs1. {
 }
 Qed.
 
+Theorem angle_div_2_add_not_overflow :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → angle_div_2 (θ1 + θ2) = (angle_div_2 θ1 + angle_div_2 θ2)%A.
+Proof.
+intros Hic Hon Hop Hed * Haov.
+apply eq_angle_eq.
+f_equal. {
+  now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
+} {
+  now apply rngl_sin_angle_div_2_add_not_overflow.
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_2_add :
   rngl_mul_is_comm T = true →
@@ -3359,12 +3377,7 @@ intros Hic Hon Hop Hed *.
 remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
 destruct aov. 2: {
-  apply eq_angle_eq.
-  f_equal. {
-    now apply (rngl_cos_angle_div_2_add_not_overflow Hic Hon Hop Hed).
-  } {
-    now apply rngl_sin_angle_div_2_add_not_overflow.
-  }
+  now apply (angle_div_2_add_not_overflow Hic Hon Hop Hed).
 } {
   progress unfold angle_add_overflow in Haov.
 ...
