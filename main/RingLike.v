@@ -5176,11 +5176,24 @@ rewrite rngl_add_comm.
 now apply (rngl_add_neg_nonpos Hop Hor).
 Qed.
 
+(* general limit using a parametrized distance *)
+
+Definition is_gen_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
+  ∀ ε : T, (0 < ε)%L →
+  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
+
+Definition is_gen_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
+  ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist l (f n) < ε)%L.
+
 (* completeness *)
 
+Definition is_Cauchy_sequence := is_gen_Cauchy_sequence (λ a b, rngl_abs (a - b)%L).
+
+(*
 Definition is_Cauchy_sequence (u : nat → T) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) < ε)%L.
+*)
 
 Definition is_limit_when_tending_to f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧

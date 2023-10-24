@@ -1993,8 +1993,13 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
-Definition is_angle_upper_limit_when_tending_to_inf f (l : angle T) :=
+Definition is_angle_upper_limit_when_tending_to_inf :=
+  is_gen_limit_when_tending_to_inf angle_dist.
+
+(*
+Definition is_angle_upper_limit_when_tending_to_inf' f (l : angle T) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
+*)
 
 Theorem eq_rngl_cos_opp_1 :
   rngl_mul_is_comm T = true →
@@ -2604,6 +2609,9 @@ destruct n. {
     now rewrite angle_mul_2_pow_div_2_pow in HN.
   }
   clear Hlim; rename H into Hlim.
+  progress unfold is_angle_upper_limit_when_tending_to_inf in Hlim.
+  progress unfold is_gen_limit_when_tending_to_inf in Hlim.
+(* generalize limits in RingLike.v *)
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 (*

@@ -361,6 +361,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   progress unfold is_Cauchy_sequence.
+  progress unfold is_gen_Cauchy_sequence.
   split. {
     intros * Hε.
     rewrite H1 in Hε.
