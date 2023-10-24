@@ -2711,10 +2711,10 @@ Theorem rngl_sin_sub_nonneg :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (0 < rngl_sin θ2)%L
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (0 < rngl_cos θ2)%L
+  → (0 ≤ rngl_cos θ2)%L
   → (rngl_cos θ2 ≤ rngl_cos θ1)%L
   → (0 ≤ rngl_sin (θ2 - θ1))%L.
 Proof.
@@ -2733,13 +2733,10 @@ rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
 apply (rngl_le_0_sub Hop Hor).
 rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
 rewrite <- (rngl_abs_nonneg Hop Hor (rngl_cos θ2 * _))%L. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
 rewrite (rngl_squ_mul Hic).
@@ -2759,7 +2756,7 @@ rewrite rngl_add_comm.
 rewrite (rngl_add_sub Hos).
 rewrite (rngl_mul_1_r Hon).
 apply (rngl_abs_le_squ_le Hop Hor).
-rewrite (rngl_abs_nonneg Hop Hor); [ | now apply rngl_lt_le_incl ].
+rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg Hop Hor); [ | easy ].
 easy.
 Qed.
@@ -3336,7 +3333,10 @@ Search (rngl_cos _ < rngl_cos _)%L.
         apply (rngl_nle_gt Hor) in Hzs12.
         intros H.
         apply Hzs12; clear Hzs12.
-        now apply rngl_sin_sub_nonneg.
+        apply rngl_sin_sub_nonneg; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
       }
       apply rngl_cos_lt_rngl_cos_sub; try easy.
       now apply (rngl_lt_le_incl Hor).
