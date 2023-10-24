@@ -1633,7 +1633,6 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   clear ε Hε HN Hnε.
   progress unfold seq_converging_to_rat.
   progress unfold rngl_dist.
-  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_abs_nonpos Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
     clear Hm.

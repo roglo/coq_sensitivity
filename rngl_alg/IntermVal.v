@@ -755,6 +755,7 @@ intros ε Hε.
 destruct (H1 ε Hε) as (N, HN).
 specialize (HN N (Nat.le_refl _)).
 progress unfold rngl_dist in HN.
+rewrite (rngl_abs_sub_comm Hop Hor) in HN.
 rewrite (rngl_sub_0_r Hos) in HN.
 now apply (rngl_lt_le_incl Hor).
 Qed.
@@ -805,7 +806,6 @@ split. {
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
   progress unfold rngl_dist in HM.
-  rewrite (rngl_abs_sub_comm Hop Hor) in HM.
   rewrite (rngl_abs_nonneg Hop Hor) in HM. 2: {
     apply (rngl_le_0_sub Hop Hor).
     eapply (rngl_le_trans Hor); [ | apply H6 ].
@@ -848,7 +848,6 @@ split. {
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
   progress unfold rngl_dist in HM.
-  rewrite (rngl_abs_sub_comm Hop Hor) in HM.
   rewrite (rngl_abs_nonpos Hop Hor) in HM. 2: {
     apply (rngl_le_sub_0 Hop Hor).
     eapply (rngl_le_trans Hor); [ apply H7 | ].
@@ -1086,7 +1085,6 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   exists (N + 1).
   intros n Hn.
   progress unfold rngl_dist.
-  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
     apply (rngl_abs_An_Bn_le Hon Hop Hiv Hor _ _ Hab P n).
@@ -1287,12 +1285,14 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
   }
   specialize (H2 _ H); clear H.
   destruct (rngl_le_dec Hor (f x) (f a)) as [Hfxa| Hfxa]. {
+    progress unfold rngl_dist in H2.
     rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
       now apply (rngl_le_sub_0 Hop Hor).
     }
     now apply (rngl_le_lt_trans Hor _ (f a)).
   }
   apply (rngl_nle_gt Hor) in Hfxa.
+  progress unfold rngl_dist in H2.
   rewrite (rngl_abs_nonneg Hop Hor) in H2. 2: {
      apply (rngl_le_0_sub Hop Hor).
      now apply (rngl_lt_le_incl Hor).
@@ -1382,6 +1382,7 @@ assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
   }
   specialize (H2 _ H); clear H.
   destruct (rngl_le_dec Hor (f x) (f b)) as [Hfxb| Hfxb]. {
+    progress unfold rngl_dist in H2.
     rewrite (rngl_abs_nonpos Hop Hor) in H2. 2: {
       now apply (rngl_le_sub_0 Hop Hor).
     }
@@ -1767,6 +1768,7 @@ assert (H : continuous (λ x, (- f x))%L). {
   split; [ easy | ].
   intros y Hy.
   specialize (Hη y Hy).
+  progress unfold rngl_dist.
   rewrite <- (rngl_abs_opp Hop Hor).
   rewrite (rngl_opp_sub_distr Hop).
   progress unfold rngl_sub.
