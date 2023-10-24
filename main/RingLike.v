@@ -3929,6 +3929,16 @@ destruct c. {
 }
 Qed.
 
+Theorem rngl_abs_sub_comm :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, rngl_abs (a - b)%L = rngl_abs (b - a)%L.
+Proof.
+intros Hop Hor *.
+rewrite <- (rngl_abs_opp Hop Hor).
+now rewrite (rngl_opp_sub_distr Hop).
+Qed.
+
 Theorem rngl_abs_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -5187,21 +5197,22 @@ Definition is_gen_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
 
 (* completeness *)
 
-Definition is_Cauchy_sequence := is_gen_Cauchy_sequence (λ a b, rngl_abs (a - b)%L).
+Definition rngl_dist a b := rngl_abs (a - b)%L.
 
-(*
-Definition is_Cauchy_sequence (u : nat → T) :=
-  ∀ ε : T, (0 < ε)%L →
-  ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (rngl_abs (u p - u q) < ε)%L.
-*)
+Definition is_Cauchy_sequence := is_gen_Cauchy_sequence rngl_dist.
 
 Definition is_limit_when_tending_to f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x, rngl_abs (x - a) < η → rngl_abs (f x - l) < ε)%L.
 
+Definition is_limit_when_tending_to_inf :=
+  is_gen_limit_when_tending_to_inf rngl_dist.
+
+(*
 Definition is_limit_when_tending_to_inf f l :=
   ∀ ε, (0 < ε)%L → ∃ N,
   ∀ n, N ≤ n → (rngl_abs (f n - l) < ε)%L.
+*)
 
 Definition is_derivative f f' :=
   ∀ a, is_limit_when_tending_to (λ x, (f x - f a) / (x - a))%L a (f' a).

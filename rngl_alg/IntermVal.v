@@ -576,6 +576,7 @@ intros ε Hε.
 destruct (Hu ε Hε) as (N, HN).
 exists N.
 intros n Hn.
+progress unfold rngl_dist.
 rewrite <- (rngl_opp_add_distr Hop).
 rewrite rngl_add_comm.
 rewrite (rngl_add_opp_r Hop).
@@ -620,6 +621,7 @@ apply Nat.max_lub_iff in H.
 destruct H as (Hnun, Hnvn).
 specialize (Hun _ Hnun).
 specialize (Hvn _ Hnvn).
+progress unfold rngl_dist.
 rewrite (rngl_sub_add_distr Hos).
 progress unfold rngl_sub.
 rewrite Hop.
@@ -752,8 +754,7 @@ apply (rngl_abs_le_ε Hon Hop Hiv Hor).
 intros ε Hε.
 destruct (H1 ε Hε) as (N, HN).
 specialize (HN N (Nat.le_refl _)).
-rewrite <- (rngl_abs_opp Hop Hor) in HN.
-rewrite (rngl_opp_sub_distr Hop) in HN.
+progress unfold rngl_dist in HN.
 rewrite (rngl_sub_0_r Hos) in HN.
 now apply (rngl_lt_le_incl Hor).
 Qed.
@@ -803,6 +804,8 @@ split. {
   specialize (AnBn_le Hon Hop Hiv Hor a b Hab P) as H6.
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
+  progress unfold rngl_dist in HM.
+  rewrite (rngl_abs_sub_comm Hop Hor) in HM.
   rewrite (rngl_abs_nonneg Hop Hor) in HM. 2: {
     apply (rngl_le_0_sub Hop Hor).
     eapply (rngl_le_trans Hor); [ | apply H6 ].
@@ -844,6 +847,8 @@ split. {
   specialize (AnBn_le Hon Hop Hiv Hor a b Hab P) as H6.
   specialize (H6 n (max M n) _ _ _ _ H Habn (surjective_pairing _)).
   destruct H6 as (H6, H7).
+  progress unfold rngl_dist in HM.
+  rewrite (rngl_abs_sub_comm Hop Hor) in HM.
   rewrite (rngl_abs_nonpos Hop Hor) in HM. 2: {
     apply (rngl_le_sub_0 Hop Hor).
     eapply (rngl_le_trans Hor); [ apply H7 | ].
@@ -1080,6 +1085,8 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   }
   exists (N + 1).
   intros n Hn.
+  progress unfold rngl_dist.
+  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_sub_0_r Hos).
   eapply (rngl_le_lt_trans Hor). {
     apply (rngl_abs_An_Bn_le Hon Hop Hiv Hor _ _ Hab P n).

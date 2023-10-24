@@ -1632,6 +1632,8 @@ enough (H : ∃ M, ∀ m, M ≤ m → N + 1 ≤ rad ^ m). {
   eapply (rngl_le_lt_trans Hor); [ | apply Hnε ].
   clear ε Hε HN Hnε.
   progress unfold seq_converging_to_rat.
+  progress unfold rngl_dist.
+  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_abs_nonpos Hop Hor). 2: {
     apply (rngl_le_sub_0 Hop Hor).
     clear Hm.
@@ -1993,13 +1995,9 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
-Definition is_angle_upper_limit_when_tending_to_inf :=
-  is_gen_limit_when_tending_to_inf angle_dist.
 
-(*
-Definition is_angle_upper_limit_when_tending_to_inf' f (l : angle T) :=
-  ∀ ε, (0 < ε)%L → ∃ N, ∀ n : nat, N ≤ n → (angle_dist l (f n) < ε)%L.
-*)
+Definition is_angle_limit_when_tending_to_inf :=
+  is_gen_limit_when_tending_to_inf angle_dist.
 
 Theorem eq_rngl_cos_opp_1 :
   rngl_mul_is_comm T = true →
@@ -2582,7 +2580,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_has_eq_dec T = true →
   ∀ n θ θ',
   rngl_of_nat n ≠ 0%L
-  → is_angle_upper_limit_when_tending_to_inf
+  → is_angle_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat θ n) θ'
   → θ = (n * θ')%A.
 Proof.
@@ -2598,7 +2596,7 @@ destruct n. {
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  assert (H : is_angle_upper_limit_when_tending_to_inf (λ _, θ) θ'). {
+  assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) θ'). {
     intros ε Hε.
     specialize (Hlim ε Hε).
     destruct Hlim as (N, HN).
@@ -2609,9 +2607,8 @@ destruct n. {
     now rewrite angle_mul_2_pow_div_2_pow in HN.
   }
   clear Hlim; rename H into Hlim.
-  progress unfold is_angle_upper_limit_when_tending_to_inf in Hlim.
+  progress unfold is_angle_limit_when_tending_to_inf in Hlim.
   progress unfold is_gen_limit_when_tending_to_inf in Hlim.
-(* generalize limits in RingLike.v *)
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 (*
