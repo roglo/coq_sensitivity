@@ -286,19 +286,11 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   | right _ => None
   end.
 
-(*
-End a.
-*)
-
 Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   match n with
   | 0 => gc_one
   | S n' => gc_mul z (gc_power_nat z n')
   end.
-
-(*
-Arguments rl_sqrt {T ro rp rl} _%L.
-*)
 
 End a.
 
@@ -1035,15 +1027,6 @@ assert (Hon : rngl_has_1 T = true). {
   unfold rngl_has_1 in Honc; cbn in Honc.
   now destruct rngl_opt_one.
 }
-(*
-assert (Hiv : rngl_has_inv T = true). {
-  progress unfold rngl_has_inv in Hivc; cbn in Hivc.
-  progress unfold gc_opt_inv_or_quot in Hivc.
-  progress unfold rngl_has_inv.
-  destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
-  now destruct iq.
-}
-*)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hic : rngl_mul_is_comm T = true). {
   progress unfold rngl_has_inv in Hivc; cbn in Hivc.
@@ -1759,8 +1742,9 @@ Fixpoint angle_div_2_pow_nat θ i :=
 
 Arguments angle_div_2_pow_nat θ%A i%nat.
 
+(* θ / 2^i * (2^i / n) *)
 Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
-  angle_div_2_pow_nat (2 ^ i / n * θ) i.
+  ((2 ^ i / n) * angle_div_2_pow_nat θ i)%A.
 
 Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
@@ -2563,13 +2547,12 @@ apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
 
-(* to be completed
-Theorem angle_div_2_pow_nat_pow_nat_l :
+Theorem angle_mul_2_pow_div_2_pow :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ n θ, angle_div_2_pow_nat (2 ^ n * θ) n = θ.
+  ∀ n θ, (2 ^ n * angle_div_2_pow_nat θ n)%A = θ.
 Proof.
 intros Hic Hon Hop Hed *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -2579,15 +2562,13 @@ induction n; intros; cbn. {
 }
 rewrite Nat.add_0_r.
 rewrite (angle_mul_add_distr_r Hon Hop).
-rewrite (angle_div_2_add_not_overflow Hic Hon Hop Hed). 2: {
-  progress unfold angle_add_overflow.
-  apply angle_ltb_ge.
-(* hou la la, c'est pas gagné, ça *)
-...
-rewrite angle_div_2_pow_nat_add.
 rewrite IHn.
-...
+specialize (angle_div_2_mul_2 Hic Hon Hop Hed θ) as H1.
+cbn in H1.
+now rewrite (angle_add_0_r Hon Hos) in H1.
+Qed.
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2612,28 +2593,15 @@ destruct n. {
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  assert
-    (H : is_angle_upper_limit_when_tending_to_inf
-           (λ i, angle_div_2_pow_nat (2 ^ i * θ) i) θ'). {
+  assert (H : is_angle_upper_limit_when_tending_to_inf (λ _, θ) θ'). {
     intros ε Hε.
     specialize (Hlim ε Hε).
     destruct Hlim as (N, HN).
-    exists N. (* au pif *)
+    exists N.
     intros n Hn.
     specialize (HN n Hn).
     rewrite Nat.div_1_r in HN.
-... ...
-rewrite angle_div_2_pow_nat_pow_nat_l.
-...
-    assert (H : angle_div_2_pow_nat (2 ^ n * θ) n = θ). {
-      clear HN Hn.
-      revert θ.
-      induction n; intros; [ apply (angle_add_0_r Hon Hos) | ].
-      cbn.
-      rewrite Nat.add_0_r.
-      rewrite (angle_mul_add_distr_r Hon Hop).
-Search angle_div_2.
-...
+    now rewrite angle_mul_2_pow_div_2_pow in HN.
   }
   clear Hlim; rename H into Hlim.
 ...
