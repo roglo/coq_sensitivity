@@ -78,9 +78,7 @@ Theorem rngl_middle_in_middle :
   ∀ a b, (a ≤ b → a ≤ (a + b) / 2 ≤ b)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -116,9 +114,7 @@ Theorem AnBn_interval :
     bn = (an + (b - a) / 2 ^ n)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab * Hanbn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -271,9 +267,7 @@ Theorem rngl_abs_AnBn_sub_AnBn_le :
     (rngl_abs (bp - bq) ≤ (b - a) / 2 ^ p)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab * Hpq * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
 }
@@ -354,9 +348,7 @@ Theorem An_Bn_are_Cauchy_sequences :
   is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
 Proof.
 intros Hon Hop Hiv Hor Har * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -534,9 +526,7 @@ Theorem rngl_abs_An_Bn_le :
   → (rngl_abs (an - bn) ≤ (b - a) / 2 ^ n)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab * Habn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H.
   rewrite (H (rngl_abs _))%L.
@@ -595,9 +585,7 @@ Theorem limit_add :
   → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hu Hv ε Hε.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -638,11 +626,11 @@ apply (rngl_le_refl Hor).
 apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.
 
-Theorem limit_ext_in :
-  ∀ u v lim,
+Theorem gen_limit_ext_in :
+  ∀ {A} (dist : A → A → _) u v lim,
   (∀ n, u n = v n)
-  → is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf v lim.
+  → is_gen_limit_when_tending_to_inf dist u lim
+  → is_gen_limit_when_tending_to_inf dist v lim.
 Proof.
 intros * Huv Hu ε Hε.
 destruct (Hu ε Hε) as (N, HN).
@@ -650,80 +638,6 @@ exists N.
 intros n Hn.
 rewrite <- Huv.
 now apply HN.
-Qed.
-
-Theorem rngl_abs_le_ε :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a,
-  (∀ ε, (0 < ε)%L → (rngl_abs a ≤ ε)%L)
-  → a = 0%L.
-Proof.
-intros Hon Hop Hiv Hor * H1.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  apply (rngl_characteristic_1 Hon Hos Hc1).
-}
-destruct (rngl_lt_dec Hor a 0%L) as [H12| H12]. {
-  specialize (H1 (- a / 2))%L.
-  assert (H : (0 < - a / 2)%L). {
-    progress unfold rngl_div.
-    rewrite Hiv.
-    apply (rngl_mul_pos_pos Hop Hor Hii). {
-      rewrite <- (rngl_opp_0 Hop).
-      now apply -> (rngl_opp_lt_compat Hop Hor).
-    }
-    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  specialize (H1 H); clear H.
-  exfalso.
-  apply (rngl_nlt_ge Hor) in H1; apply H1; clear H1.
-  rewrite (rngl_abs_nonpos Hop Hor). 2: {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  remember (_ * _)%L as x.
-  rewrite <- (rngl_mul_1_r Hon (- a))%L.
-  subst x.
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). 2: {
-    apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  rewrite <- (rngl_opp_0 Hop).
-  now apply -> (rngl_opp_lt_compat Hop Hor).
-}
-destruct (rngl_lt_dec Hor 0%L a) as [H21| H21]. {
-  specialize (H1 (a / 2))%L.
-  assert (H : (0 < a / 2)%L). {
-    progress unfold rngl_div.
-    rewrite Hiv.
-    apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
-    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  specialize (H1 H); clear H.
-  exfalso.
-  apply (rngl_nlt_ge Hor) in H1; apply H1.
-  rewrite (rngl_abs_nonneg Hop Hor). 2: {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite rngl_mul_add_distr_l.
-  rewrite (rngl_mul_1_r Hon).
-  now apply (rngl_lt_add_r Hos Hor).
-}
-apply (rngl_nlt_ge Hor) in H12, H21.
-now apply (rngl_le_antisymm Hor).
 Qed.
 
 Theorem limit_unique :
@@ -737,14 +651,12 @@ Theorem limit_unique :
   → lim1 = lim2.
 Proof.
 intros Hon Hop Hiv Hor * Hu1 Hu2.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (limit_opp Hop Hor) in Hu2.
 specialize (limit_add Hon Hop Hiv Hor) as H1.
 specialize (H1 _ _ _ _ Hu1 Hu2).
 rewrite (rngl_add_opp_r Hop) in H1.
-eapply limit_ext_in in H1. 2: {
+eapply gen_limit_ext_in in H1. 2: {
   intros n.
   rewrite (rngl_add_opp_r Hop).
   now rewrite (rngl_sub_diag Hos).
@@ -773,9 +685,7 @@ Theorem limit_between_An_and_Bn :
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
 intros Hon Hop Hiv Hor * Ha Hs Hal Hbl * Habn.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hab : (a ≤ b)%L). {
   apply (rngl_lt_le_incl Hor).
   now apply Hs.
@@ -1014,9 +924,7 @@ Theorem exists_supremum :
     is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hop Hiv Hor Har Hco * Ha Hs.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 move Hos before Har.
 assert (Hiq : rngl_has_inv_or_quot T = true). {
   now apply rngl_has_inv_or_quot_iff; left.
@@ -1109,7 +1017,7 @@ assert (Hlab : lima = limb). {
   specialize (limit_add Hon Hop Hiv Hor) as H1.
   specialize (H1 _ _ _ _ Hal Hbl).
   rewrite (rngl_add_opp_r Hop) in H1.
-  eapply limit_ext_in in H1. 2: {
+  eapply gen_limit_ext_in in H1. 2: {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
@@ -1263,9 +1171,7 @@ Theorem intermediate_value_prop_1 :
   → c ≠ a.
 Proof.
 intros Hon Hop Hiv Hor * Hfc * Hab Hfab Hub1.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -1357,9 +1263,7 @@ Theorem intermediate_value_prop_2 :
   → c ≠ b.
 Proof.
 intros Hon Hop Hiv Hor * Hfc * Hab Hub Hc.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 a), (H1 b) in Hab.
@@ -1449,9 +1353,7 @@ Theorem intermediate_value_le :
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
 intros Hon Hop Hiv Heb Hor Har Hco * Hfc * Hab Hfab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   exists a.

@@ -5162,6 +5162,80 @@ rewrite H in Hab.
 now apply (rngl_lt_irrefl Hor) in Hab.
 Qed.
 
+Theorem rngl_abs_le_ε :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a,
+  (∀ ε, (0 < ε)%L → (rngl_abs a ≤ ε)%L)
+  → a = 0%L.
+Proof.
+intros Hon Hop Hiv Hor * H1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+assert (Hos : rngl_has_opp_or_subt T = true). {
+  now apply rngl_has_opp_or_subt_iff; left.
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  apply (rngl_characteristic_1 Hon Hos Hc1).
+}
+destruct (rngl_lt_dec Hor a 0%L) as [H12| H12]. {
+  specialize (H1 (- a / 2))%L.
+  assert (H : (0 < - a / 2)%L). {
+    progress unfold rngl_div.
+    rewrite Hiv.
+    apply (rngl_mul_pos_pos Hop Hor Hii). {
+      rewrite <- (rngl_opp_0 Hop).
+      now apply -> (rngl_opp_lt_compat Hop Hor).
+    }
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  specialize (H1 H); clear H.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H1; apply H1; clear H1.
+  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  remember (_ * _)%L as x.
+  rewrite <- (rngl_mul_1_r Hon (- a))%L.
+  subst x.
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). 2: {
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_opp_0 Hop).
+  now apply -> (rngl_opp_lt_compat Hop Hor).
+}
+destruct (rngl_lt_dec Hor 0%L a) as [H21| H21]. {
+  specialize (H1 (a / 2))%L.
+  assert (H : (0 < a / 2)%L). {
+    progress unfold rngl_div.
+    rewrite Hiv.
+    apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  specialize (H1 H); clear H.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H1; apply H1.
+  rewrite (rngl_abs_nonneg Hop Hor). 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_mul_1_r Hon).
+  now apply (rngl_lt_add_r Hos Hor).
+}
+apply (rngl_nlt_ge Hor) in H12, H21.
+now apply (rngl_le_antisymm Hor).
+Qed.
+
 Theorem rngl_add_neg_nonpos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
