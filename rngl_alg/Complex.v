@@ -1994,7 +1994,6 @@ specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
 Qed.
 
-
 Definition is_angle_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf angle_dist.
 

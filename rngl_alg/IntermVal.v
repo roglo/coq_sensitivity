@@ -3,10 +3,8 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Main.Misc Main.RingLike.
-(*
 Require Import Init.Nat.
-*)
+Require Import Main.Misc Main.RingLike.
 
 Class excl_midd := { em_prop : ∀ P, P + notT P }.
 
@@ -639,6 +637,59 @@ intros n Hn.
 rewrite <- Huv.
 now apply HN.
 Qed.
+
+Record is_dist {A} (dist : A → A → T) :=
+  { is_dist_symmetric : ∀ a b, dist a b = dist b a;
+    is_dist_separated : ∀ a b, dist a b = 0%L → a = b;
+    is_dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
+
+(* to be completed
+(* but is it true? *)
+Theorem gen_limit_unique :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ A (dist : A → A → T) (id : is_dist dist) u lim1 lim2,
+  is_gen_limit_when_tending_to_inf dist u lim1
+  → is_gen_limit_when_tending_to_inf dist u lim2
+  → lim1 = lim2.
+Proof.
+intros Hon Hop Hiv Hor * Hid * Hu1 Hu2.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  destruct Hid as (Hdsym, Hdsep, Hdtri).
+  assert (H : ∀ a b : A, a = b) by now intros; apply Hdsep, H1.
+  apply H.
+}
+destruct Hid as (Hdsym, Hdsep, Hdtri).
+assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
+  intros ε Hε.
+  assert (Hε2 : (0 < ε / 2)%L). {
+    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2%L). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_l Hos).
+    rewrite (rngl_div_mul Hon Hiv); [ easy | ].
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  specialize (Hu1 (ε / 2) Hε2)%L.
+  specialize (Hu2 (ε / 2) Hε2)%L.
+  destruct Hu1 as (N1, Hu1).
+  destruct Hu2 as (N2, Hu2).
+  exists (max N1 N2).
+  intros n HN.
+  eapply (rngl_le_lt_trans Hor); [ apply (Hdtri _ (u n)) | ].
+  rewrite Hdsym.
+...
+progress unfold is_gen_limit_when_tending_to_inf in Hu1.
+progress unfold is_gen_limit_when_tending_to_inf in Hu2.
+...
+dist lim1 lim2 ≤ dist (u n) lim1 + dist (u n) lim2
+...
+*)
 
 Theorem limit_unique :
   rngl_has_1 T = true →
