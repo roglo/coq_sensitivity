@@ -3600,6 +3600,105 @@ cbn in H1.
 now rewrite (angle_add_0_r Hon Hos) in H1.
 Qed.
 
+Definition angle_dist θ1 θ2 :=
+  rl_sqrt
+    ((rngl_cos θ2 - rngl_cos θ1)² +
+     (rngl_sin θ2 - rngl_sin θ1)²)%L.
+
+Theorem angle_dist_symmetry :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
+Proof.
+intros Hic Hop *.
+progress unfold angle_dist.
+f_equal.
+rewrite <- (rngl_squ_opp Hop).
+rewrite (rngl_opp_sub_distr Hop).
+f_equal.
+rewrite <- (rngl_squ_opp Hop).
+rewrite (rngl_opp_sub_distr Hop).
+easy.
+Qed.
+
+Theorem angle_dist_separation :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
+Proof.
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+split; intros H12. 2: {
+  subst θ2.
+  progress unfold angle_dist.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_r.
+  apply (rl_sqrt_0 Hop Hic Hor Hid).
+}
+apply eq_angle_eq.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+cbn in H12 |-*.
+progress unfold angle_dist in H12.
+cbn in H12.
+apply (eq_rl_sqrt_0 Hos) in H12. 2: {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
+  apply (rngl_square_ge_0 Hop Hor).
+} {
+  apply (rngl_square_ge_0 Hop Hor).
+}
+destruct H12 as (Hc, Hs).
+apply (eq_rngl_squ_0 Hos Hid) in Hc, Hs.
+apply -> (rngl_sub_move_0_r Hop) in Hc.
+apply -> (rngl_sub_move_0_r Hop) in Hs.
+now subst c2 s2.
+Qed.
+
+Theorem angle_dist_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
+Proof.
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+progress unfold angle_dist.
+cbn.
+specialize (rngl_abs_triangle Hop Hor) as H1.
+apply (euclidean_distance_triangular Hic Hon Hop Hiv Hor).
+Qed.
+
+Theorem angle_dist_is_dist :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  is_dist angle_dist.
+Proof.
+intros Hic Hon Hop Hed.
+split. {
+  apply (angle_dist_symmetry Hic Hop).
+} {
+  apply (angle_dist_separation Hic Hon Hop Hed).
+} {
+  apply (angle_dist_triangular Hic Hon Hop Hed).
+}
+Qed.
+
 End a.
 
 Arguments angle_div_2_pow_nat {T ro rp rl ac} θ%A i%nat.
