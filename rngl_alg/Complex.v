@@ -1680,6 +1680,7 @@ progress unfold angle_eqb.
 now do 2 rewrite (rngl_eqb_refl Hed).
 Qed.
 
+(*
 Theorem angle_eqb_neq :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.
@@ -1849,9 +1850,11 @@ apply H in H12. {
   now rewrite (angle_opp_0 Hop) in H1.
 }
 Qed.
+*)
 
 Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
 
+(*
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2158,6 +2161,7 @@ rewrite <- (angle_div_2_add_not_overflow Hic Hon Hop Hed); [ | easy ].
 apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
+*)
 
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
