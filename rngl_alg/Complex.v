@@ -2640,6 +2640,8 @@ destruct n. {
   now rewrite dist_refl.
 }
 assert (H : rngl_of_nat (S n) ≠ 0%L). {
+(* perhaps the characteristic must absolutely be 0;
+   I must think of it. *)
 ...
 Search (rngl_of_nat _ = 0%L).
   rewrite rngl_of_nat_succ.
