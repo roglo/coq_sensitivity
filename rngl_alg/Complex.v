@@ -1563,36 +1563,7 @@ Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
 Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
-Theorem rl_sqrt_lt_rl_sqrt :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
-  ∀ a b,
-  (0 ≤ a)%L
-  → (a < b)%L
-  → (√ a < √ b)%L.
-Proof.
-intros Hic Hop * Ha Hab.
-destruct ac as (Hiv, Hc2, Hor).
-apply (rngl_nle_gt Hor).
-intros H1.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
-specialize (H2 √b √b √a √a)%L.
-assert (H : (0 ≤ √b ≤ √a)%L). {
-  split; [ | easy ].
-  apply rl_sqrt_nonneg.
-  apply (rngl_le_trans Hor _ a); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-}
-specialize (H2 H H).
-do 2 rewrite fold_rngl_squ in H2.
-rewrite rngl_squ_sqrt in H2. 2: {
-  apply (rngl_le_trans Hor _ a); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-}
-rewrite rngl_squ_sqrt in H2; [ | easy ].
-now apply (rngl_nle_gt Hor) in Hab.
-Qed.
-
+(*
 Theorem angle_mul_nat_assoc :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1604,10 +1575,12 @@ rewrite IHa.
 symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
+*)
 
 Definition is_angle_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf angle_dist.
 
+(*
 Theorem eq_rngl_cos_opp_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1680,7 +1653,6 @@ progress unfold angle_eqb.
 now do 2 rewrite (rngl_eqb_refl Hed).
 Qed.
 
-(*
 Theorem angle_eqb_neq :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.

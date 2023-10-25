@@ -248,4 +248,34 @@ replace (y3 - y1)%L with ((y3 - y2) + (y2 - y1))%L. 2: {
 apply (rl_sqrt_sqr_le_sqrt_add_sqrt Hic Hon Hop Hiv Hor).
 Qed.
 
+Theorem rl_sqrt_lt_rl_sqrt :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b,
+  (0 ≤ a)%L
+  → (a < b)%L
+  → (√ a < √ b)%L.
+Proof.
+intros Hic Hop Hor * Ha Hab.
+apply (rngl_nle_gt Hor).
+intros H1.
+specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
+specialize (H2 √b √b √a √a)%L.
+assert (H : (0 ≤ √b ≤ √a)%L). {
+  split; [ | easy ].
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_trans Hor _ a); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+specialize (H2 H H).
+do 2 rewrite fold_rngl_squ in H2.
+rewrite rngl_squ_sqrt in H2. 2: {
+  apply (rngl_le_trans Hor _ a); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite rngl_squ_sqrt in H2; [ | easy ].
+now apply (rngl_nle_gt Hor) in Hab.
+Qed.
+
 End a.
