@@ -658,6 +658,7 @@ Proof.
 intros Hon Hop Hiv Hor * Hid * Hu1 Hu2.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   destruct Hid as (Hdsym, Hdsep, Hdtri).
@@ -683,6 +684,26 @@ assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros n HN.
   eapply (rngl_le_lt_trans Hor); [ apply (Hdtri _ (u n)) | ].
   rewrite Hdsym.
+  replace ε with (ε / 2 + ε / 2)%L. 2: {
+    apply (rngl_mul_cancel_r Hi1 _ _ 2%L). {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    rewrite rngl_mul_add_distr_r.
+    rewrite (rngl_div_mul Hon Hiv). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_add_diag2 Hon).
+  }
+  apply (rngl_add_lt_compat Hop Hor). {
+    apply Hu1.
+    eapply le_trans; [ | apply HN ].
+    apply Nat.le_max_l.
+  } {
+    apply Hu2.
+    eapply le_trans; [ | apply HN ].
+    apply Nat.le_max_r.
+  }
+}
 ...
 progress unfold is_gen_limit_when_tending_to_inf in Hu1.
 progress unfold is_gen_limit_when_tending_to_inf in Hu2.
