@@ -2610,7 +2610,8 @@ Proof.
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-induction n; [ easy | ].
+revert θ θ' Hlim.
+induction n; intros; [ easy | ].
 clear Hnz.
 destruct n. {
   clear IHn; cbn.
@@ -2638,6 +2639,10 @@ destruct n. {
   intros n Hn.
   now rewrite dist_refl.
 }
+assert (H : rngl_of_nat (S n) ≠ 0%L). {
+...
+Search (rngl_of_nat _ = 0%L).
+  rewrite rngl_of_nat_succ.
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 (*
