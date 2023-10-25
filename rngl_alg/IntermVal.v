@@ -639,12 +639,76 @@ now apply HN.
 Qed.
 
 Record is_dist {A} (dist : A → A → T) :=
-  { is_dist_symmetric : ∀ a b, dist a b = dist b a;
-    is_dist_separated : ∀ a b, dist a b = 0%L → a = b;
+  { is_dist_symmetry : ∀ a b, dist a b = dist b a;
+    is_dist_separation : ∀ a b, dist a b = 0%L ↔ a = b;
     is_dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
 
-(* to be completed
-(* but is it true? *)
+Theorem rngl_dist_is_dist :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  is_dist rngl_dist.
+Proof.
+intros Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold rngl_dist.
+split. {
+  intros.
+  apply (rngl_abs_sub_comm Hop Hor).
+} {
+  intros.
+  split; intros Hab. {
+    apply (eq_rngl_abs_0 Hop) in Hab.
+    now apply -> (rngl_sub_move_0_r Hop) in Hab.
+  }
+  subst b.
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_abs_0 Hop).
+} {
+  intros.
+  specialize (rngl_abs_triangle Hop Hor) as H1.
+  specialize (H1 (a - b) (b - c))%L.
+  rewrite (rngl_add_sub_assoc Hop) in H1.
+  now rewrite (rngl_sub_add Hop) in H1.
+}
+Qed.
+
+Theorem dist_nonneg :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ A (dist : A → A → T) (Hid : is_dist dist) a b, (0 ≤ dist a b)%L.
+Proof.
+intros Hon Hop Hiv Hor * Hid *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1.
+  apply (rngl_le_refl Hor).
+}
+destruct Hid as (Hdsym, Hdsep, Hdtri).
+specialize (proj2 (Hdsep a a) eq_refl) as H1.
+specialize (Hdtri a b a) as H2.
+rewrite H1, (Hdsym b a) in H2.
+rewrite (rngl_add_diag Hon) in H2.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor) with (a := 2⁻¹%L) in H2. 2: {
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_mul_inv_diag_r Hon Hiv).
+  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_0_r Hos) in H2.
+rewrite rngl_mul_assoc in H2.
+rewrite (rngl_mul_inv_diag_l Hon Hiv) in H2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+now rewrite (rngl_mul_1_l Hon) in H2.
+Qed.
+
 Theorem gen_limit_unique :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -665,13 +729,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   assert (H : ∀ a b : A, a = b) by now intros; apply Hdsep, H1.
   apply H.
 }
-Theorem dist_nonneg :
-  ∀ A (dist : A → A → T) (Hid : is_dist dist) a b, (0 ≤ dist a b)%L.
-Proof.
-intros.
-destruct Hid as (Hdsym, Hdsep, Hdtri).
-...
-specialize (dist_nonneg _ dist Hid) as Hdpos.
+specialize (dist_nonneg Hon Hop Hiv Hor _ dist Hid) as Hdpos.
 destruct Hid as (Hdsym, Hdsep, Hdtri).
 assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
@@ -722,114 +780,10 @@ apply Hdsep.
 apply (rngl_abs_le_ε Hon Hop Hiv Hor).
 intros ε Hε.
 specialize (Hu ε Hε).
-rewrite (rngl_abs_nonneg Hop Hor). 2: {
-...
+rewrite (rngl_abs_nonneg Hop Hor); [ | apply Hdpos ].
 apply (rngl_lt_le_incl Hor).
 eapply (rngl_le_lt_trans Hor); [ | apply Hu ].
-rewrite (rngl_abs_sub_comm Hop Hor).
-rewrite (rngl_sub_0_r Hos) in HN.
-now apply (rngl_lt_le_incl Hor).
-...
-apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge Hor); intros Hll. {
-  generalize Hll; intros Hvll.
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2⁻¹%L) in Hll. 2: {
-    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_0_l Hos) in Hll.
-  specialize (Hu _ Hll).
-  apply (rngl_nle_gt Hor) in Hu.
-  apply Hu; clear Hu.
-  rewrite <- (rngl_mul_1_r Hon).
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_inv_diag_l Hon Hiv). 2: {
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-Search ((∀ _, (0 < _)%L → _) → _).
-...
-assert (Hε2 : (0 < ε / 2)%L). {
-  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
-    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_0_l Hos) in Hε.
-  now rewrite (rngl_mul_inv_r Hiv) in Hε.
-}
-destruct (Hu (ε / 2) Hε2)%L as (Nu, Hun).
-destruct (Hv (ε / 2) Hε2)%L as (Nv, Hvn).
-...
-  specialize (H3 (f c - u)%L).
-  assert (H : (0 < f c - u)%L). {
-    now apply (rngl_lt_0_sub Hop Hor).
-  }
-  destruct (H3 H) as (H4, H5); clear H.
-  rewrite (rngl_add_sub_assoc Hop) in H5.
-  rewrite rngl_add_comm, (rngl_add_sub Hos) in H5.
-  revert H5; apply (rngl_lt_irrefl Hor).
-} {
-  specialize (H3 (u - f c)%L).
-  assert (H : (0 < u - f c)%L). {
-    now apply (rngl_lt_0_sub Hop Hor).
-  }
-  destruct (H3 H) as (H4, H5); clear H.
-  rewrite (rngl_sub_sub_distr Hop) in H4.
-  rewrite (rngl_sub_diag Hos), rngl_add_0_l in H4.
-  revert H4; apply (rngl_lt_irrefl Hor).
-}
-...
-Check rngl_abs_le_ε.
-...
-Check rngl_abs_le_ε Hon Hop Hiv Hor).
-eapply gen_limit_ext_in in Hu. 2: {
-  intros n.
-  rewrite (rngl_add_opp_r Hop).
-  now rewrite (rngl_sub_diag Hos).
-}
-...
-progress unfold is_gen_limit_when_tending_to_inf in Hu1.
-progress unfold is_gen_limit_when_tending_to_inf in Hu2.
-...
-dist lim1 lim2 ≤ dist (u n) lim1 + dist (u n) lim2
-...
-*)
-
-Theorem limit_unique :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ u lim1 lim2,
-  is_limit_when_tending_to_inf u lim1
-  → is_limit_when_tending_to_inf u lim2
-  → lim1 = lim2.
-Proof.
-intros Hon Hop Hiv Hor * Hu1 Hu2.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-apply (limit_opp Hop Hor) in Hu2.
-specialize (limit_add Hon Hop Hiv Hor) as H1.
-specialize (H1 _ _ _ _ Hu1 Hu2).
-rewrite (rngl_add_opp_r Hop) in H1.
-eapply gen_limit_ext_in in H1. 2: {
-  intros n.
-  rewrite (rngl_add_opp_r Hop).
-  now rewrite (rngl_sub_diag Hos).
-}
-apply (rngl_sub_move_0_r Hop).
-apply (rngl_abs_le_ε Hon Hop Hiv Hor).
-intros ε Hε.
-destruct (H1 ε Hε) as (N, HN).
-specialize (HN N (Nat.le_refl _)).
-progress unfold rngl_dist in HN.
-rewrite (rngl_abs_sub_comm Hop Hor) in HN.
-rewrite (rngl_sub_0_r Hos) in HN.
-now apply (rngl_lt_le_incl Hor).
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem limit_between_An_and_Bn :
@@ -1173,6 +1127,7 @@ assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   now apply Nat.log2_up_le_lin.
 }
 assert (Hlab : lima = limb). {
+  generalize Hbl; intros Hblv.
   apply (limit_opp Hop Hor) in Hbl.
   specialize (limit_add Hon Hop Hiv Hor) as H1.
   specialize (H1 _ _ _ _ Hal Hbl).
@@ -1181,7 +1136,10 @@ assert (Hlab : lima = limb). {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
-  apply (limit_unique Hon Hop Hiv Hor _ _ _ H1 Hl).
+  eapply (gen_limit_unique Hon Hop Hiv Hor _ rngl_dist).
+  apply (rngl_dist_is_dist Hop Hor).
+  apply H1.
+  apply Hl.
 }
 subst limb; rename lima into lim.
 exists lim.
