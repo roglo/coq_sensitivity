@@ -2628,16 +2628,16 @@ destruct n. {
   }
   clear Hlim; rename H into Hlim.
   progress unfold is_angle_limit_when_tending_to_inf in Hlim.
-(*
-...
-Require Import IntermVal.
-Search is_gen_limit_when_tending_to_inf.
-...
-*)
   specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
-...
   specialize (gen_limit_unique Hon Hop Hiv Hor _ _ H1) as H2.
-  progress unfold is_gen_limit_when_tending_to_inf in Hlim.
+  specialize (H2 (λ _, θ) θ' θ Hlim).
+  symmetry.
+  apply H2.
+  intros ε Hε.
+  exists 0.
+  intros n Hn.
+  now rewrite dist_refl.
+}
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
 (*
