@@ -5260,6 +5260,44 @@ rewrite rngl_add_comm.
 now apply (rngl_add_neg_nonpos Hop Hor).
 Qed.
 
+(* distances *)
+
+Record is_dist {A} (dist : A → A → T) :=
+  { is_dist_symmetry : ∀ a b, dist a b = dist b a;
+    is_dist_separation : ∀ a b, dist a b = 0%L ↔ a = b;
+    is_dist_triangular : ∀ a b c, (dist a c ≤ dist a b + dist b c)%L }.
+
+Definition rngl_dist a b := rngl_abs (a - b)%L.
+
+Theorem rngl_dist_is_dist :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  is_dist rngl_dist.
+Proof.
+intros Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold rngl_dist.
+split. {
+  intros.
+  apply (rngl_abs_sub_comm Hop Hor).
+} {
+  intros.
+  split; intros Hab. {
+    apply (eq_rngl_abs_0 Hop) in Hab.
+    now apply -> (rngl_sub_move_0_r Hop) in Hab.
+  }
+  subst b.
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_abs_0 Hop).
+} {
+  intros.
+  specialize (rngl_abs_triangle Hop Hor) as H1.
+  specialize (H1 (a - b) (b - c))%L.
+  rewrite (rngl_add_sub_assoc Hop) in H1.
+  now rewrite (rngl_sub_add Hop) in H1.
+}
+Qed.
+
 (* general limit using a parametrized distance *)
 
 Definition is_gen_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
@@ -5289,8 +5327,6 @@ Definition gen_continuous {A} (dist : A → A → T) f :=
   ∀ a, gen_continuous_at dist f a.
 
 (* completeness *)
-
-Definition rngl_dist a b := rngl_abs (a - b)%L.
 
 Definition is_Cauchy_sequence :=
   is_gen_Cauchy_sequence rngl_dist.
