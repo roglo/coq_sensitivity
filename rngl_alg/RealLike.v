@@ -1,14 +1,6 @@
-(*
 Set Nested Proofs Allowed.
-*)
-Require Import Utf8 (*ZArith*).
-(*
-Import List List.ListNotations.
-*)
-Require Import (*Main.Misc*) Main.RingLike (*Main.IterAdd*).
-(*
-Require Import Init.Nat.
-*)
+Require Import Utf8.
+Require Import Main.RingLike.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
   { rl_has_integral_modulus : bool;

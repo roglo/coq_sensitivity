@@ -2583,16 +2583,13 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   → θ = (n * θ')%A.
 Proof.
 intros Hic Hon Hop Har Hed * Hnz Hlim.
+destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-apply eq_angle_eq.
 induction n; [ easy | ].
 clear Hnz.
 destruct n. {
   clear IHn; cbn.
-  do 2 rewrite (rngl_mul_1_r Hon).
-  do 2 rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_sub_0_r Hos).
-  rewrite rngl_add_0_l.
+  rewrite (angle_add_0_r Hon Hos).
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) θ'). {
     intros ε Hε.
@@ -2606,6 +2603,12 @@ destruct n. {
   }
   clear Hlim; rename H into Hlim.
   progress unfold is_angle_limit_when_tending_to_inf in Hlim.
+...
+Require Import IntermVal.
+Search is_gen_limit_when_tending_to_inf.
+...
+  specialize (angle_dist_is_dist Hop Hor) as H1.
+  specialize (gen_limit_unique Hon Hop Hiv Hor _ _ H1) as H2.
   progress unfold is_gen_limit_when_tending_to_inf in Hlim.
 ...
 intros Hic Hon Hop Har Hed * Hnz Hlim.
