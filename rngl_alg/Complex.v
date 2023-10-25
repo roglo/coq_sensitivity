@@ -1563,7 +1563,6 @@ Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
 Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
-(*
 Theorem angle_mul_nat_assoc :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1575,7 +1574,6 @@ rewrite IHa.
 symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
-*)
 
 Definition is_angle_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf angle_dist.
@@ -2151,9 +2149,43 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
 Proof.
 (*
 intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
+(*
+Theorem rat_is_inf_sum_of_inv_rad_pow' :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_archimedean T = true →
+  ∀ rad a i c,
+  2 ≤ rad
+  → rngl_of_nat i ≠ 0%L
+  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a i) c
+  → rngl_of_nat a = (rngl_of_nat i * c)%L.
+Proof.
+intros Hic Hon Hop Har * H2r Hbz Hlim.
+*)
 progress unfold is_angle_limit_when_tending_to_inf in Hlim.
 progress unfold is_gen_limit_when_tending_to_inf in Hlim.
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+assert
+  (H :
+    ∀ ε : T, (0 < ε)%L →
+      ∃ N : nat, ∀ n : nat, N ≤ n →
+      (angle_dist θ θ' < ε)%L). {
+  intros ε Hε.
+  specialize (Hlim ε Hε).
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  specialize (Nat.div_mod_eq (2 ^ n) i) as H1.
+  symmetry in H1.
+  apply Nat.add_sub_eq_r in H1.
+Search ((_ * _) * _)%A.
+progress unfold angle_dist in HN.
+Search (rngl_cos (_ * _)%A).
+Inspect 8.
+...
+rat_is_inf_sum_of_inv_rad_pow.
 ...
 *)
 intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
