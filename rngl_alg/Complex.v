@@ -2631,20 +2631,27 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
   rngl_has_eq_dec T = true →
   rngl_characteristic T = 0 →
-  ∀ n θ θ',
-  n ≠ 0
+  ∀ i θ θ',
+  i ≠ 0
   → is_angle_limit_when_tending_to_inf
-       (seq_angle_converging_to_angle_div_nat θ n) θ'
-  → θ = (n * θ')%A.
+       (seq_angle_converging_to_angle_div_nat θ i) θ'
+  → θ = (i * θ')%A.
 Proof.
-intros Hic Hon Hop Har Hed Hch * Hnz Hlim.
+(*
+intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
+progress unfold is_angle_limit_when_tending_to_inf in Hlim.
+progress unfold is_gen_limit_when_tending_to_inf in Hlim.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+...
+*)
+intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 revert θ θ' Hlim.
-induction n; intros; [ easy | ].
-clear Hnz.
-destruct n. {
-  clear IHn; cbn.
+induction i; intros; [ easy | ].
+clear Hiz.
+destruct i. {
+  clear IHi; cbn.
   rewrite (angle_add_0_r Hon Hos).
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) θ'). {
@@ -2669,10 +2676,10 @@ destruct n. {
   intros n Hn.
   now rewrite dist_refl.
 }
-specialize (IHn (Nat.neq_succ_0 _)).
+specialize (IHi (Nat.neq_succ_0 _)).
 (**)
-destruct n. {
-  clear IHn; cbn.
+destruct i. {
+  clear IHi; cbn.
   rewrite (angle_add_0_r Hon Hos).
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) (2 * θ')%A). {
