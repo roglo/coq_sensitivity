@@ -1830,13 +1830,21 @@ Theorem angle_dist_separation :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L → θ1 = θ2.
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
-intros Hic Hon Hop Hed * H12.
+intros Hic Hon Hop Hed *.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+split; intros H12. 2: {
+  subst θ2.
+  progress unfold angle_dist.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_r.
+  apply (rl_sqrt_0 Hop Hic Hor Hid).
+}
 apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -1992,6 +2000,23 @@ progress unfold angle_dist.
 cbn.
 specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop).
+Qed.
+
+Theorem angle_dist_is_dist :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  is_dist angle_dist.
+Proof.
+intros Hic Hon Hop Hed.
+split. {
+  apply (angle_dist_symmetry Hic Hop).
+} {
+  apply (angle_dist_separation Hic Hon Hop Hed).
+} {
+  apply (angle_dist_triangular Hic Hon Hop Hed).
+}
 Qed.
 
 Definition is_angle_limit_when_tending_to_inf :=
@@ -2603,11 +2628,14 @@ destruct n. {
   }
   clear Hlim; rename H into Hlim.
   progress unfold is_angle_limit_when_tending_to_inf in Hlim.
+(*
 ...
 Require Import IntermVal.
 Search is_gen_limit_when_tending_to_inf.
 ...
-  specialize (angle_dist_is_dist Hop Hor) as H1.
+*)
+  specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
+...
   specialize (gen_limit_unique Hon Hop Hiv Hor _ _ H1) as H2.
   progress unfold is_gen_limit_when_tending_to_inf in Hlim.
 ...
