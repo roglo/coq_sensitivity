@@ -665,6 +665,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   assert (H : ∀ a b : A, a = b) by now intros; apply Hdsep, H1.
   apply H.
 }
+Theorem dist_nonneg :
+  ∀ A (dist : A → A → T) (Hid : is_dist dist) a b, (0 ≤ dist a b)%L.
+Proof.
+intros.
+destruct Hid as (Hdsym, Hdsep, Hdtri).
+...
+specialize (dist_nonneg _ dist Hid) as Hdpos.
 destruct Hid as (Hdsym, Hdsep, Hdtri).
 assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
@@ -703,6 +710,87 @@ assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
     eapply le_trans; [ | apply HN ].
     apply Nat.le_max_r.
   }
+}
+assert (H : ∀ ε : T, (0 < ε)%L → (dist lim1 lim2 < ε)%L). {
+  intros ε Hε.
+  specialize (Hu ε Hε).
+  destruct Hu as (N, HN).
+  now apply (HN N).
+}
+clear Hu; rename H into Hu.
+apply Hdsep.
+apply (rngl_abs_le_ε Hon Hop Hiv Hor).
+intros ε Hε.
+specialize (Hu ε Hε).
+rewrite (rngl_abs_nonneg Hop Hor). 2: {
+...
+apply (rngl_lt_le_incl Hor).
+eapply (rngl_le_lt_trans Hor); [ | apply Hu ].
+rewrite (rngl_abs_sub_comm Hop Hor).
+rewrite (rngl_sub_0_r Hos) in HN.
+now apply (rngl_lt_le_incl Hor).
+...
+apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge Hor); intros Hll. {
+  generalize Hll; intros Hvll.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2⁻¹%L) in Hll. 2: {
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos) in Hll.
+  specialize (Hu _ Hll).
+  apply (rngl_nle_gt Hor) in Hu.
+  apply Hu; clear Hu.
+  rewrite <- (rngl_mul_1_r Hon).
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_inv_diag_l Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+Search ((∀ _, (0 < _)%L → _) → _).
+...
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
+    apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos) in Hε.
+  now rewrite (rngl_mul_inv_r Hiv) in Hε.
+}
+destruct (Hu (ε / 2) Hε2)%L as (Nu, Hun).
+destruct (Hv (ε / 2) Hε2)%L as (Nv, Hvn).
+...
+  specialize (H3 (f c - u)%L).
+  assert (H : (0 < f c - u)%L). {
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  destruct (H3 H) as (H4, H5); clear H.
+  rewrite (rngl_add_sub_assoc Hop) in H5.
+  rewrite rngl_add_comm, (rngl_add_sub Hos) in H5.
+  revert H5; apply (rngl_lt_irrefl Hor).
+} {
+  specialize (H3 (u - f c)%L).
+  assert (H : (0 < u - f c)%L). {
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  destruct (H3 H) as (H4, H5); clear H.
+  rewrite (rngl_sub_sub_distr Hop) in H4.
+  rewrite (rngl_sub_diag Hos), rngl_add_0_l in H4.
+  revert H4; apply (rngl_lt_irrefl Hor).
+}
+...
+Check rngl_abs_le_ε.
+...
+Check rngl_abs_le_ε Hon Hop Hiv Hor).
+eapply gen_limit_ext_in in Hu. 2: {
+  intros n.
+  rewrite (rngl_add_opp_r Hop).
+  now rewrite (rngl_sub_diag Hos).
 }
 ...
 progress unfold is_gen_limit_when_tending_to_inf in Hu1.
@@ -1474,7 +1562,6 @@ assert (Hs : ∀ x : s, (proj1_sig x < b)%L). {
 }
 (* "Since S is non-empty and bounded above by b, by completeness, the
     supremum c = sup S exists" *)
-(**)
 specialize (exists_supremum Hon Hop Hiv Hor Har Hco P) as H1.
 specialize (H1 a b Ha).
 assert (H : (∀ x, P x → (x < b)%L)). {
