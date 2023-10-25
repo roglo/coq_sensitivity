@@ -1534,6 +1534,32 @@ apply Nat.add_le_mono_l.
 now apply -> Nat.succ_le_mono.
 Qed.
 
+Theorem rat_is_inf_sum_of_inv_rad_pow' :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_archimedean T = true →
+  ∀ rad a i c,
+  2 ≤ rad
+  → rngl_of_nat i ≠ 0%L
+  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a i) c
+  → rngl_of_nat a = (rngl_of_nat i * c)%L.
+Proof.
+intros Hic Hon Hop Har * H2r Hbz Hlim.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Har _ a i H2r) as H1.
+specialize (H1 Hbz).
+progress unfold is_limit_when_tending_to_inf in Hlim.
+progress unfold is_limit_when_tending_to_inf in H1.
+specialize (gen_limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
+specialize (H2 (rngl_dist_is_dist Hop Hor)).
+specialize (H2 _ _ _ Hlim H1).
+subst c.
+rewrite (rngl_mul_comm Hic).
+symmetry.
+now apply (rngl_div_mul Hon Hiv).
+Qed.
+
 (*
 End a.
 
