@@ -2594,6 +2594,35 @@ cbn in H1.
 now rewrite (angle_add_0_r Hon Hos) in H1.
 Qed.
 
+Theorem rngl_cos_mul_2_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_cos (2 * θ) = ((rngl_cos θ)² - (rngl_sin θ)²)%L.
+Proof.
+intros Hon Hos *; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+now do 2 rewrite fold_rngl_squ.
+Qed.
+
+Theorem rngl_sin_mul_2_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_sin (2 * θ) = (2 * rngl_sin θ * rngl_cos θ)%L.
+Proof.
+intros Hic Hon Hos *; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+rewrite (rngl_mul_comm Hic).
+rewrite <- rngl_mul_assoc.
+apply (rngl_add_diag Hon).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2601,13 +2630,14 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_has_opp T = true →
   rngl_is_archimedean T = true →
   rngl_has_eq_dec T = true →
+  rngl_characteristic T = 0 →
   ∀ n θ θ',
-  rngl_of_nat n ≠ 0%L
+  n ≠ 0
   → is_angle_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat θ n) θ'
   → θ = (n * θ')%A.
 Proof.
-intros Hic Hon Hop Har Hed * Hnz Hlim.
+intros Hic Hon Hop Har Hed Hch * Hnz Hlim.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 revert θ θ' Hlim.
@@ -2639,9 +2669,47 @@ destruct n. {
   intros n Hn.
   now rewrite dist_refl.
 }
-assert (H : rngl_of_nat (S n) ≠ 0%L). {
-(* perhaps the characteristic must absolutely be 0;
-   I must think of it. *)
+specialize (IHn (Nat.neq_succ_0 _)).
+(**)
+destruct n. {
+  clear IHn; cbn.
+  rewrite (angle_add_0_r Hon Hos).
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) (2 * θ')%A). {
+    intros ε Hε.
+enough (H2ε : (0 < 2 * ε)%L).
+    specialize (Hlim (2 * ε)%L H2ε).
+    destruct Hlim as (N, HN).
+    exists (N - 1). (* au pif *)
+    intros n Hn.
+    apply Nat.le_sub_le_add_r in Hn.
+    specialize (HN (n + 1) Hn).
+    rewrite Nat.add_1_r in HN.
+    rewrite Nat.pow_succ_r in HN; [ | easy ].
+    rewrite Nat.mul_comm in HN.
+    rewrite Nat.div_mul in HN; [ | easy ].
+    cbn in HN.
+    rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed) in HN.
+    progress unfold angle_dist in HN.
+    progress unfold angle_dist.
+    rewrite (rngl_cos_mul_2_l Hon Hos).
+    rewrite (rngl_sin_mul_2_l Hic Hon Hos).
+...
+    rewrite Nat.mul_div in HN.
+    rewrite Nat.pow_add_r in HN.
+    rewrite
+Search (_ ^ (_ + _)).
+    rewrite Nat.add_
+    destruct n. {
+...
+    rewrite angle_mul_2_pow_div_2_pow in HN.
+...
+remember (S n) as sn; cbn; subst sn.
+rewrite (angle_add_comm Hic).
+apply (angle_sub_move_r Hic Hon Hop Hed).
+apply IHn.
+progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 ...
 Search (rngl_of_nat _ = 0%L).
   rewrite rngl_of_nat_succ.
