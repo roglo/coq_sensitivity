@@ -8,8 +8,7 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
-Require Import RealLike.
-Require Import TrigoWithoutPi.
+Require Import RealLike TrigoWithoutPi.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -2147,22 +2146,11 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
        (seq_angle_converging_to_angle_div_nat θ i) θ'
   → θ = (i * θ')%A.
 Proof.
-(*
+(**)
 intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
-(*
-Theorem rat_is_inf_sum_of_inv_rad_pow' :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_archimedean T = true →
-  ∀ rad a i c,
-  2 ≤ rad
-  → rngl_of_nat i ≠ 0%L
-  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a i) c
-  → rngl_of_nat a = (rngl_of_nat i * c)%L.
-Proof.
-intros Hic Hon Hop Har * H2r Hbz Hlim.
-*)
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 progress unfold is_angle_limit_when_tending_to_inf in Hlim.
 progress unfold is_gen_limit_when_tending_to_inf in Hlim.
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
@@ -2180,6 +2168,19 @@ assert
   specialize (Nat.div_mod_eq (2 ^ n) i) as H1.
   symmetry in H1.
   apply Nat.add_sub_eq_r in H1.
+  apply (f_equal rngl_of_nat) in H1.
+  rewrite (rngl_of_nat_mul Hon Hos) in H1.
+  symmetry in H1.
+  apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
+   intros Hi.
+...
+Check rngl_mul_move_l.
+Check rngl_mul_move_r.
+...
+Search (_ * _ = _)%L.
+...
+Search (_ = _ * _)%L.
+...
 Search ((_ * _) * _)%A.
 progress unfold angle_dist in HN.
 Search (rngl_cos (_ * _)%A).
@@ -2187,7 +2188,7 @@ Inspect 8.
 ...
 rat_is_inf_sum_of_inv_rad_pow.
 ...
-*)
+(**)
 intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.

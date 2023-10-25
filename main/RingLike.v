@@ -2034,6 +2034,26 @@ split; intros H. {
 }
 Qed.
 
+Theorem rngl_mul_move_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv_and_1_or_quot T = true →
+  ∀ a b c, a ≠ 0%L → (a * b)%L = c → b = (c / a)%L.
+Proof.
+intros Hic Hi1 * Haz Hab.
+subst c; symmetry.
+rewrite (rngl_mul_comm Hic).
+now apply (rngl_mul_div Hi1).
+Qed.
+
+Theorem rngl_mul_move_r :
+  rngl_has_inv_and_1_or_quot T = true →
+  ∀ a b c, b ≠ 0%L → (a * b)%L = c → a = (c / b)%L.
+Proof.
+intros Hi1 * Hcz Ha.
+subst c; symmetry.
+now apply (rngl_mul_div Hi1).
+Qed.
+
 Theorem rngl_opp_involutive :
   rngl_has_opp T = true →
   ∀ x, (- - x)%L = x.
