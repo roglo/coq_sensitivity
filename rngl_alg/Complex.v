@@ -2172,7 +2172,12 @@ assert
   rewrite (rngl_of_nat_mul Hon Hos) in H1.
   symmetry in H1.
   apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
-   intros Hi.
+    intros Hi.
+    now apply (eq_rngl_of_nat_0 Hon Hch) in Hi.
+  }
+...
+Fixpoint rngl_to_nat :
+  ∀ a,
 ...
 Check rngl_mul_move_l.
 Check rngl_mul_move_r.
