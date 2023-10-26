@@ -1990,19 +1990,6 @@ rewrite Hs1, Hs2.
 apply iff_sym.
 apply rngl_leb_le.
 Qed.
-
-Theorem angle_sub_add_distr :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
-  ∀ θ1 θ2 θ3, (θ1 - (θ2 + θ3))%A = (θ1 - θ2 - θ3)%A.
-Proof.
-intros Hic Hop *.
-progress unfold angle_sub.
-rewrite (angle_opp_add_distr Hic Hop).
-progress unfold angle_sub.
-rewrite (angle_add_assoc Hop).
-apply (angle_add_add_swap Hic Hop).
-Qed.
 *)
 
 Theorem angle_div_2_le_compat :
@@ -2205,7 +2192,9 @@ intros Hic Hon Hop Har Hed Hch * Hnz Haov.
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
   is_angle_limit_when_tending_to_inf
-    (λ i, (2 ^ i - 2 ^ i mod n) * angle_div_2_pow_nat θ i)%A θ). {
+    (λ i,
+      (2 ^ i * angle_div_2_pow_nat θ i -
+       2 ^ i mod n * angle_div_2_pow_nat θ i)%A) θ). {
   progress unfold is_angle_limit_when_tending_to_inf.
   progress unfold is_gen_limit_when_tending_to_inf.
   intros ε Hε.
@@ -2221,10 +2210,17 @@ enough (H :
   symmetry in H1.
   rewrite Nat.mul_comm in H1.
   rewrite H1.
+  rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed). 2: {
+    now apply Nat.mod_le.
+  }
   now apply HN.
 }
-Search ((_ + _) * _)%A.
-Search ((_ - _) * _)%A.
+...
+  ============================
+  is_angle_limit_when_tending_to_inf
+    (λ i : nat,
+       (2 ^ i * angle_div_2_pow_nat θ i - 2 ^ i mod n * angle_div_2_pow_nat θ i)%A)
+    θ
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :

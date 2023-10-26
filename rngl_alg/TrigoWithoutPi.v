@@ -1120,6 +1120,21 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_l.
 Qed.
 
+Theorem angle_sub_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, (θ - 0 = θ)%A.
+Proof.
+intros Hon Hop *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_opp_0 Hop).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+now rewrite rngl_add_0_l.
+Qed.
+
 Theorem angle_add_sub_eq_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3422,6 +3437,45 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
 rewrite IHa.
 apply (angle_add_assoc Hop).
+Qed.
+
+Theorem angle_sub_add_distr :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 - (θ2 + θ3))%A = (θ1 - θ2 - θ3)%A.
+Proof.
+intros Hic Hop *.
+progress unfold angle_sub.
+rewrite (angle_opp_add_distr Hic Hop).
+progress unfold angle_sub.
+rewrite (angle_add_assoc Hop).
+apply (angle_add_add_swap Hic Hop).
+Qed.
+
+Theorem angle_mul_sub_distr_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b θ, b ≤ a → ((a - b) * θ = a * θ - b * θ)%A.
+Proof.
+intros Hic Hon Hop Hed * Hba.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+revert b Hba.
+induction a; intros. {
+  apply Nat.le_0_r in Hba; subst b; cbn.
+  symmetry.
+  apply (angle_sub_diag Hic Hon Hop Hed).
+}
+destruct b. {
+  now rewrite (angle_sub_0_r Hon Hop).
+}
+apply Nat.succ_le_mono in Hba.
+rewrite Nat.sub_succ.
+rewrite IHa; [ cbn | easy ].
+rewrite (angle_sub_add_distr Hic Hop).
+rewrite (angle_add_comm Hic).
+now rewrite (angle_add_sub Hic Hon Hop Hed).
 Qed.
 
 Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
