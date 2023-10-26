@@ -2003,6 +2003,7 @@ progress unfold angle_sub.
 rewrite (angle_add_assoc Hop).
 apply (angle_add_add_swap Hic Hop).
 Qed.
+*)
 
 Theorem angle_div_2_le_compat :
   rngl_has_1 T = true →
@@ -2156,9 +2157,73 @@ rewrite <- (angle_div_2_add_not_overflow Hic Hon Hop Hed); [ | easy ].
 apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
-*)
+
+Theorem angle_div_2_pow_nat_mul :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n m θ,
+  m ≠ 0
+  → (∀ i, i < m → angle_add_overflow θ (i * θ)%A = false)
+  → angle_div_2_pow_nat (m * θ) n =
+      (m * angle_div_2_pow_nat θ n)%A.
+Proof.
+intros Hic Hon Hop Hed * Hmz Haov.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+induction m; [ easy | clear Hmz; cbn ].
+destruct m. {
+  cbn.
+  rewrite (angle_add_0_r Hon Hos).
+  symmetry; apply (angle_add_0_r Hon Hos).
+}
+specialize (IHm (Nat.neq_succ_0 _)).
+rewrite (angle_div_2_pow_nat_add Hic Hon Hop Hed); [ | now apply Haov ].
+f_equal.
+apply IHm.
+intros i Hi.
+apply Haov.
+apply (Nat.lt_le_trans _ (S m)); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
 
 (* to be completed
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_archimedean T = true →
+  rngl_has_eq_dec T = true →
+  rngl_characteristic T = 0 →
+  ∀ n θ,
+  n ≠ 0
+  → (∀ i, i < n → angle_add_overflow θ (i * θ)%A = false)
+  → is_angle_limit_when_tending_to_inf
+      (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+Proof.
+intros Hic Hon Hop Har Hed Hch * Hnz Haov.
+progress unfold seq_angle_converging_to_angle_div_nat.
+enough (H :
+  is_angle_limit_when_tending_to_inf
+    (λ i : nat, (2 ^ i / n * n * angle_div_2_pow_nat θ i)%A) θ). {
+  progress unfold is_angle_limit_when_tending_to_inf.
+  progress unfold is_gen_limit_when_tending_to_inf.
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros m Hm.
+  rewrite (angle_div_2_pow_nat_mul Hic Hon Hop Hed); [ | easy | easy ].
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  now apply HN.
+}
+...
+specialize (Nat.div_mod_eq (2 ^ n) i) as H1.
+symmetry in H1.
+apply Nat.add_sub_eq_r in H1.
+apply (f_equal rngl_of_nat) in H1.
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
