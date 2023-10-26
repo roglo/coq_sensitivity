@@ -2212,8 +2212,47 @@ enough (H :
     now apply Nat.mod_le.
   }
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+Theorem angle_dist_sub_l_diag_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (angle_dist (θ1 - θ2) θ1 ≤ angle_dist θ2 0)%L.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
+destruct H1 as (Hdsym, Hdsep, Hdtri).
+specialize (Hdtri θ2 θ1 0)%A as H1.
+(* pas simple *)
+...
+specialize (Hdtri (θ1 - θ2) (θ1 - θ2) θ1)%A as H1.
+cbn.
+...
+rewrite angle_dist_sub_l_diag.
+...
+Search (angle_dist (_ - _))%L.
+Search (angle_dist (_ + _))%L.
+(* faut faire un angle_dist (x - y) (x - z) = angle_dist y z *)
+...
+  rewrite <- (angle_sub_0_r Hon Hop θ) at 3.
+Theorem angle_dist_sub_cancel_r_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3, (angle_dist (θ1 - θ3) (θ2 - θ3) ≤ angle_dist θ1 θ2)%L.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
+destruct H1 as (Hdsym, Hdsep, Hdtri).
+specialize (Hdtri (θ1 - θ3) θ2 (θ2 - θ3))%A as H1.
+...
   now apply HN.
 }
+progress unfold is_angle_limit_when_tending_to_inf.
+Search is_gen_limit_when_tending_to_inf.
+Require Import IntermVal.
+Check limit_add.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :

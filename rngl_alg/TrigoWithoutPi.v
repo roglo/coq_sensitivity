@@ -3755,4 +3755,5 @@ Qed.
 
 End a.
 
+Arguments angle_dist {T ro rp rl} (θ1 θ2)%A.
 Arguments angle_div_2_pow_nat {T ro rp rl ac} θ%A i%nat.
