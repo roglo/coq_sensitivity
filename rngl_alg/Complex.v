@@ -2192,9 +2192,7 @@ intros Hic Hon Hop Har Hed Hch * Hnz Haov.
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
   is_angle_limit_when_tending_to_inf
-    (λ i,
-      (2 ^ i * angle_div_2_pow_nat θ i -
-       2 ^ i mod n * angle_div_2_pow_nat θ i)%A) θ). {
+    (λ i, (θ - 2 ^ i mod n * angle_div_2_pow_nat θ i)%A) θ). {
   progress unfold is_angle_limit_when_tending_to_inf.
   progress unfold is_gen_limit_when_tending_to_inf.
   intros ε Hε.
@@ -2213,14 +2211,9 @@ enough (H :
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed). 2: {
     now apply Nat.mod_le.
   }
+  rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
   now apply HN.
 }
-...
-  ============================
-  is_angle_limit_when_tending_to_inf
-    (λ i : nat,
-       (2 ^ i * angle_div_2_pow_nat θ i - 2 ^ i mod n * angle_div_2_pow_nat θ i)%A)
-    θ
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
