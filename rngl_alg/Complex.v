@@ -2231,6 +2231,24 @@ apply (rngl_add_le_compat Hor).
 *)
   now apply HN.
 }
+Theorem glop :
+  rngl_has_opp T = true →
+  ∀ θ Δθ,
+  is_angle_limit_when_tending_to_inf Δθ 0%A
+  → is_angle_limit_when_tending_to_inf (λ i : nat, (θ - Δθ i)%A) θ.
+Proof.
+intros Hop * Hθ ε Hε.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (Hθ ε Hε).
+destruct Hθ as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+specialize (angle_dist_is_dist Hop) as H1.
+destruct H1 as (Hdsym, Hdsep, Hdtri).
+...
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+...
 (*
 ...
 intros ε Hε.
@@ -2294,7 +2312,6 @@ rewrite <- rngl_mul_add_distr_r.
 *)
       split. {
         apply (rngl_le_0_sub Hop Hor).
-        cbn; rewrite (rngl_mul_1_r Hon).
         apply (rngl_le_trans Hor _ 1). 2: {
           apply (rngl_le_add_l Hor).
           apply (rngl_0_le_1 Hon Hop Hor).
