@@ -2206,11 +2206,10 @@ enough (H :
   apply Nat.add_sub_eq_r in H1.
   symmetry in H1.
   rewrite Nat.mul_comm in H1.
-  rewrite H1.
-  rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed). 2: {
-    now apply Nat.mod_le.
-  }
+  rewrite H1; clear H1.
+  rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+...
 (*
   specialize (angle_dist_is_dist Hop) as H2.
   destruct H2 as (Hdsym, Hdsep, Hdtri).
