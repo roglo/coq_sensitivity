@@ -2209,6 +2209,10 @@ enough (H :
   rewrite H1; clear H1.
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+  now apply HN.
+}
+intros ε Hε.
+rename n into m.
 ...
 (*
   specialize (angle_dist_is_dist Hop) as H2.
