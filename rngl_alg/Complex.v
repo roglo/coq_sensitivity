@@ -2212,6 +2212,11 @@ enough (H :
     now apply Nat.mod_le.
   }
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+(*
+  specialize (angle_dist_is_dist Hop) as H2.
+  destruct H2 as (Hdsym, Hdsep, Hdtri).
+...
+*)
 Theorem angle_dist_sub_l_diag_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2220,8 +2225,16 @@ Theorem angle_dist_sub_l_diag_le :
   ∀ θ1 θ2, (angle_dist (θ1 - θ2) θ1 ≤ angle_dist θ2 0)%L.
 Proof.
 intros Hic Hon Hop Hed *.
-specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
+progress unfold angle_dist.
+cbn.
+...
+intros Hic Hon Hop Hed *.
+specialize (angle_dist_is_dist Hop) as H1.
 destruct H1 as (Hdsym, Hdsep, Hdtri).
+specialize (Hdtri θ1 θ2 (θ1 - θ2))%A as H1.
+...
+specialize (Hdtri (θ2 - θ1) 0 θ1)%A as H1.
+...
 specialize (Hdtri θ2 θ1 0)%A as H1.
 (* pas simple *)
 ...

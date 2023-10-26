@@ -3654,6 +3654,7 @@ cbn in H1.
 now rewrite (angle_add_0_r Hon Hos) in H1.
 Qed.
 
+(*
 Definition angle_dist θ1 θ2 :=
   rl_sqrt
     ((rngl_cos θ2 - rngl_cos θ1)² +
@@ -3752,8 +3753,102 @@ split. {
   apply (angle_dist_triangular Hic Hon Hop Hed).
 }
 Qed.
+*)
+
+Definition angle_dist θ1 θ2 :=
+  (rngl_abs (rngl_cos θ2 - rngl_cos θ1) +
+   rngl_abs (rngl_sin θ2 - rngl_sin θ1))%L.
+
+Theorem angle_dist_symmetry :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = angle_dist θ2 θ1.
+Proof.
+intros Hop *.
+destruct ac as (Hiv, Hc2, Hor).
+progress unfold angle_dist.
+rewrite (rngl_abs_sub_comm Hop Hor).
+f_equal.
+apply (rngl_abs_sub_comm Hop Hor).
+Qed.
+
+Theorem angle_dist_separation :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
+Proof.
+intros Hop *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold angle_dist.
+split; intros H12. {
+  apply (rngl_eq_add_0 Hor) in H12; cycle 1.
+  apply (rngl_0_le_abs Hop Hor).
+  apply (rngl_0_le_abs Hop Hor).
+  destruct H12 as (Hcc, Hss).
+  apply (eq_rngl_abs_0 Hop) in Hcc, Hss.
+  apply -> (rngl_sub_move_0_r Hop) in Hcc.
+  apply -> (rngl_sub_move_0_r Hop) in Hss.
+  apply eq_angle_eq.
+  now rewrite Hcc, Hss.
+} {
+  subst θ2.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_abs_0 Hop).
+  apply rngl_add_0_l.
+}
+Qed.
+
+Theorem angle_dist_triangular :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3,
+  (angle_dist θ1 θ3 ≤ angle_dist θ1 θ2 + angle_dist θ2 θ3)%L.
+Proof.
+intros Hop *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+progress unfold angle_dist.
+cbn.
+specialize (rngl_abs_triangle Hop Hor) as H1.
+Search (rngl_abs _ - rngl_abs _)%L.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_add_swap (rngl_abs (c2 - c1))).
+rewrite <- rngl_add_assoc.
+apply (rngl_add_le_compat Hor). {
+  eapply (rngl_le_trans Hor); [ | apply H1 ].
+  rewrite rngl_add_comm.
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_add Hop).
+  apply (rngl_le_refl Hor).
+} {
+  eapply (rngl_le_trans Hor); [ | apply H1 ].
+  rewrite rngl_add_comm.
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_add Hop).
+  apply (rngl_le_refl Hor).
+}
+Qed.
+
+Theorem angle_dist_is_dist :
+  rngl_has_opp T = true →
+  is_dist angle_dist.
+Proof.
+intros Hop.
+split. {
+  apply (angle_dist_symmetry Hop).
+} {
+  apply (angle_dist_separation Hop).
+} {
+  apply (angle_dist_triangular Hop).
+}
+Qed.
 
 End a.
 
+(*
 Arguments angle_dist {T ro rp rl} (θ1 θ2)%A.
+*)
+
+Arguments angle_dist {T ro rp} (θ1 θ2)%A.
 Arguments angle_div_2_pow_nat {T ro rp rl ac} θ%A i%nat.
