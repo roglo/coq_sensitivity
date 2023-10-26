@@ -2275,8 +2275,23 @@ apply (rngl_add_le_compat Hor). {
     do 2 rewrite (rngl_opp_sub_distr Hop).
     remember (θ - Δθ)%A as θ'; cbn; subst θ'.
     rewrite (rngl_mul_1_r Hon).
-...
+(*
+rewrite (rngl_mul_comm Hic).
+*)
     apply (rngl_mul_le_compat_nonneg Hop Hor). {
+(*
+split; [ ... | ].
+...
+} {
+split; [ ... | ].
+apply (rngl_le_sub_le_add_r Hop Hor).
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_mul_1_l Hon (rngl_cos Δθ)) at 2.
+rewrite <- rngl_mul_add_distr_r.
+*)
       split. {
         apply (rngl_le_0_sub Hop Hor).
         cbn; rewrite (rngl_mul_1_r Hon).
@@ -2297,7 +2312,7 @@ apply (rngl_add_le_compat Hor). {
           apply (rngl_mul_le_mono_nonneg_r Hop Hor). 2: {
             apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
           }
-          admit.
+          ...
         }
 ...
   rewrite <- (rngl_add_sub_swap Hop).
