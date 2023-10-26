@@ -3333,6 +3333,18 @@ split; intros Habc. {
 }
 Qed.
 
+Theorem rngl_sub_le_compat :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a ≤ b → c ≤ d → a - d ≤ b - c)%L.
+Proof.
+intros Hop Hor * Hab Hcd.
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_add_sub_assoc Hop).
+apply (rngl_le_add_le_sub_l Hop Hor).
+now apply (rngl_add_le_compat Hor).
+Qed.
+
 Theorem rngl_nle_gt :
   rngl_is_ordered T = true →
   ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.

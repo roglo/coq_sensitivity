@@ -2209,6 +2209,7 @@ enough (H :
   rewrite H1; clear H1.
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+(*
 remember (2 ^ i mod n * _)%A as Δθ.
 progress unfold angle_dist.
 cbn.
@@ -2227,12 +2228,15 @@ apply (rngl_le_lt_trans Hor) with
 apply (rngl_add_le_compat Hor).
 (* ouais, mais si sin(θ) est négatif, ça marche pô *)
 ...
+*)
   now apply HN.
 }
+(*
 ...
 intros ε Hε.
 rename n into m.
 ...
+*)
 (*
   specialize (angle_dist_is_dist Hop) as H2.
   destruct H2 as (Hdsym, Hdsep, Hdtri).
@@ -2243,9 +2247,77 @@ Theorem angle_dist_sub_l_diag_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, (angle_dist (θ1 - θ2) θ1 ≤ angle_dist θ2 0)%L.
+  ∀ θ  Δθ, (angle_dist (θ - Δθ) θ ≤ angle_dist (Δθ) 0)%L.
 Proof.
 intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (angle_dist_is_dist Hop) as H1.
+destruct H1 as (Hdsym, Hdsep, Hdtri).
+progress unfold angle_dist.
+apply (rngl_add_le_compat Hor). {
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+  do 2 rewrite <- (rngl_add_sub_swap Hop).
+  do 2 rewrite <- (rngl_add_sub_assoc Hop).
+  apply (rngl_add_le_compat Hor). {
+    cbn.
+    apply (rngl_abs_le_squ_le Hop Hor).
+    rewrite (rngl_abs_1 Hon Hop Hor).
+    apply -> (rngl_abs_le Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  } {
+    progress unfold rngl_squ.
+    do 2 rewrite <- (rngl_mul_sub_distr_r Hop).
+    apply (rngl_opp_le_compat Hop Hor).
+    do 2 rewrite <- (rngl_mul_opp_l Hop).
+    do 2 rewrite (rngl_opp_sub_distr Hop).
+    remember (θ - Δθ)%A as θ'; cbn; subst θ'.
+    rewrite (rngl_mul_1_r Hon).
+...
+    apply (rngl_mul_le_compat_nonneg Hop Hor). {
+      split. {
+        apply (rngl_le_0_sub Hop Hor).
+        cbn; rewrite (rngl_mul_1_r Hon).
+        apply (rngl_le_trans Hor _ 1). 2: {
+          apply (rngl_le_add_l Hor).
+          apply (rngl_0_le_1 Hon Hop Hor).
+        }
+        apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+      } {
+        cbn.
+        rewrite (rngl_mul_1_r Hon).
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
+        rewrite (rngl_add_comm (_ * _))%L.
+        rewrite (rngl_sub_add_distr Hos).
+        apply (rngl_sub_le_compat Hop Hor). 2: {
+          rewrite <- (rngl_mul_1_l Hon).
+          apply (rngl_mul_le_mono_nonneg_r Hop Hor). 2: {
+            apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+          }
+          admit.
+        }
+...
+  rewrite <- (rngl_add_sub_swap Hop).
+  do 2 rewrite <- (rngl_sub_sub_distr Hop).
+  specialize (rngl_sub_le_mono_l Hop Hor) as H1.
+  remember(2 * rngl_cos 0 * rngl_cos Δθ - (rngl_cos Δθ)²)%L as x eqn:Hx.
+  remember (2 * rngl_cos θ * rngl_cos (θ - Δθ) - (rngl_cos (θ - Δθ))²)%L as y eqn:Hy.
+  specialize (H1 (2 * rngl_cos 0 * rngl_cos Δθ - (rngl_cos Δθ)²))%L.
+  specialize (H1 ((2 * rngl_cos θ * rngl_cos (θ - Δθ) - (rngl_cos (θ - Δθ))²)))%L.
+  specialize (H1 (rngl_cos θ)²)%L.
+
+Search (_ - _ ≤ _ - _)%L.
+apply (rngl_sub_le_mono_l Hop Hor).
+...
+eapply (rngl_le_trans Hor). {
+  apply Hdtri.
+}
+...
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_dist.
 cbn.
@@ -2256,6 +2328,15 @@ rewrite (rngl_sub_sub_distr Hop).
 rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_sub_mul_diag_l Hon Hop).
 (* ouais, bof, j'y crois pas trop *)
+...
+apply (rngl_add_le_compat Hor). {
+  eapply (rngl_le_trans Hor). {
+    specialize (angle_dist_is_dist Hop) as H1.
+    destruct H1 as (Hdsym, Hdsep, Hdtri).
+    progress unfold angle_dist in Hdtri.
+Search (rngl_abs _ ≤ _ + _)%L.
+Check rngl_abs_triangle.
+    apply (rngl_abs_triangle Hop Hor).
 ...
 intros Hic Hon Hop Hed *.
 specialize (angle_dist_is_dist Hop) as H1.
