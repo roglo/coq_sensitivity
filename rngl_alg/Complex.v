@@ -356,8 +356,7 @@ destruct ap. {
   rewrite (rngl_sub_sub_distr Hop).
   rewrite (rngl_sub_diag Hos), rngl_add_0_l.
   rewrite (rngl_add_diag Hon sa²%L).
-  rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
-  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_sub_mul_diag_l Hon Hop).
   do 2 rewrite (rngl_mul_comm Hic 2%L).
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite (rngl_mul_div Hi1); [ | easy ].
@@ -2225,8 +2224,16 @@ Theorem angle_dist_sub_l_diag_le :
   ∀ θ1 θ2, (angle_dist (θ1 - θ2) θ1 ≤ angle_dist θ2 0)%L.
 Proof.
 intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_dist.
 cbn.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_mul_diag_l Hon Hop).
+(* ouais, bof, j'y crois pas trop *)
 ...
 intros Hic Hon Hop Hed *.
 specialize (angle_dist_is_dist Hop) as H1.

@@ -1546,6 +1546,25 @@ rewrite rngl_mul_add_distr_l.
 now rewrite rngl_mul_opp_r.
 Qed.
 
+Theorem rngl_add_mul_diag_l :
+  rngl_has_1 T = true →
+  ∀ a b, (a + a * b = a * (1 + b))%L.
+Proof.
+intros Hon *.
+rewrite rngl_mul_add_distr_l.
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Theorem rngl_sub_mul_diag_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b, (a - a * b = a * (1 - b))%L.
+Proof.
+intros Hon Hop *.
+rewrite (rngl_mul_sub_distr_l Hop).
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
 Theorem rngl_div_mul :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
@@ -2757,8 +2776,7 @@ Theorem eq_rngl_add_same_0 :
   → a = 0%L.
 Proof.
 intros Hon Hos Hii Hch * Haa.
-rewrite <- (rngl_mul_1_l Hon a) in Haa.
-rewrite <- rngl_mul_add_distr_r in Haa.
+rewrite (rngl_add_diag Hon) in Haa.
 specialize (rngl_characteristic_0 Hon Hch 1) as H1.
 cbn in H1.
 rewrite rngl_add_0_r in H1.
@@ -4956,9 +4974,7 @@ Proof.
 intros Hop Hon Hor * Hza.
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
 rewrite <- (rngl_mul_1_l Hon 1%L).
-destruct n. {
-  now rewrite (rngl_mul_1_l Hon).
-}
+destruct n; [ now rewrite (rngl_mul_1_l Hon) | ].
 apply (rngl_mul_le_compat_nonneg Hop Hor). {
   split; [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
@@ -5052,8 +5068,7 @@ rewrite (rngl_mul_sub_distr_r Hop).
 rewrite rngl_add_comm.
 rewrite (rngl_sub_add_distr Hos).
 f_equal.
-rewrite <- (rngl_mul_1_r Hon b) at 1.
-rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_sub_mul_diag_l Hon Hop).
 f_equal.
 apply (rngl_one_sub_half Hon Hop Hiv Hor).
 Qed.
