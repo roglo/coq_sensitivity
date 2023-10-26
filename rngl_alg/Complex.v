@@ -2209,8 +2209,27 @@ enough (H :
   rewrite H1; clear H1.
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+remember (2 ^ i mod n * _)%A as Δθ.
+progress unfold angle_dist.
+cbn.
+rewrite rngl_mul_opp_r.
+rewrite rngl_sub_opp_r.
+rewrite rngl_mul_opp_r.
+rewrite rngl_add_opp_l.
+rewrite rngl_sub_add_distr.
+rewrite rngl_sub_mul_diag_l.
+rewrite rngl_sub_sub_distr.
+rewrite rngl_sub_mul_diag_l.
+destruct ac as (Hiv, Hc2, Hor).
+remember (1 - rngl_cos Δθ)%L as x.
+apply (rngl_le_lt_trans Hor) with
+  (b := (rngl_abs (rngl_cos θ * x) + rngl_abs (rngl_sin θ * x))%L).
+apply (rngl_add_le_compat Hor).
+(* ouais, mais si sin(θ) est négatif, ça marche pô *)
+...
   now apply HN.
 }
+...
 intros ε Hε.
 rename n into m.
 ...
