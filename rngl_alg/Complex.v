@@ -2222,6 +2222,23 @@ rewrite <- (rngl_add_sub_swap Hop).
 now rewrite (rngl_sub_mul_diag_l Hon Hop).
 Qed.
 
+Theorem one_sub_squ_cos_add_squ_sin :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, ((1 - rngl_cos θ)² + (rngl_sin θ)² = 2 * (1 - rngl_cos θ))%L.
+Proof.
+intros Hic Hon Hop Hed *.
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+apply (rngl_sub_mul_diag_l Hon Hop).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2237,6 +2254,21 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 intros Hic Hon Hop Har Hed Hch * Hnz Haov.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
+  intros.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
+assert (H02 : (0 ≤ 2)%L). {
+  apply (rngl_lt_le_incl Hor), (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
   is_angle_eucl_limit_when_tending_to_inf
@@ -2261,6 +2293,29 @@ enough (H :
   rewrite (angle_eucl_dist_sub_l_diag Hic Hon Hop Hed).
   now apply HN.
 }
+enough (H :
+  is_angle_eucl_limit_when_tending_to_inf
+    (λ i, (n * angle_div_2_pow_nat θ i))%A 0%A). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros i Hi.
+  eapply (rngl_le_lt_trans Hor); [ | now apply (HN i) ].
+  progress unfold angle_eucl_dist.
+  cbn.
+  do 2 rewrite (rngl_sub_0_l Hop).
+  do 2 rewrite (rngl_squ_opp Hop).
+  remember (angle_div_2_pow_nat θ i) as Δθ.
+  do 2 rewrite (one_sub_squ_cos_add_squ_sin Hic Hon Hop Hed).
+  rewrite rl_sqrt_mul; [ | easy | easy ].
+  rewrite rl_sqrt_mul; [ | easy | easy ].
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ now apply rl_sqrt_nonneg | ].
+  rewrite <- (rngl_abs_nonneg Hop Hor); [ | now apply rl_sqrt_nonneg ].
+  rewrite <- (rngl_abs_nonneg Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  rewrite rngl_squ_sqrt; [ | easy ].
+  rewrite rngl_squ_sqrt; [ | easy ].
 ...
 Theorem glop :
   rngl_mul_is_comm T = true →
