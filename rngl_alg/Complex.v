@@ -2173,6 +2173,55 @@ apply (Nat.lt_le_trans _ (S m)); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
+Theorem angle_dist_sub_l_diag :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ Δθ, angle_dist (θ - Δθ) θ = angle_dist Δθ 0.
+Proof.
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold angle_dist.
+remember (θ - Δθ)%A as x; cbn; subst x.
+do 4 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_squ_0 Hos).
+rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_add_swap).
+rewrite <- (rngl_add_sub_swap Hop (rngl_cos θ)²)%L.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+remember (θ - Δθ)%A as x.
+replace (_ * _ + _ * _)%L with (rngl_cos (θ - x))%A. 2: {
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  now rewrite rngl_sub_opp_r.
+}
+subst x.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite (angle_sub_diag Hic Hon Hop Hed).
+rewrite (angle_add_0_l Hon Hos).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+now rewrite (rngl_sub_mul_diag_l Hon Hop).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2191,7 +2240,7 @@ intros Hic Hon Hop Har Hed Hch * Hnz Haov.
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
   is_angle_limit_when_tending_to_inf
-    (λ i, (θ - 2 ^ i mod n * angle_div_2_pow_nat θ i)%A) θ). {
+    (λ i, (2 ^ i mod n * angle_div_2_pow_nat θ i))%A 0%A). {
   progress unfold is_angle_limit_when_tending_to_inf.
   progress unfold is_gen_limit_when_tending_to_inf.
   intros ε Hε.
@@ -2209,45 +2258,68 @@ enough (H :
   rewrite H1; clear H1.
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
-(*
-remember (2 ^ i mod n * _)%A as Δθ.
-progress unfold angle_dist.
-cbn.
-rewrite rngl_mul_opp_r.
-rewrite rngl_sub_opp_r.
-rewrite rngl_mul_opp_r.
-rewrite rngl_add_opp_l.
-rewrite rngl_sub_add_distr.
-rewrite rngl_sub_mul_diag_l.
-rewrite rngl_sub_sub_distr.
-rewrite rngl_sub_mul_diag_l.
-destruct ac as (Hiv, Hc2, Hor).
-remember (1 - rngl_cos Δθ)%L as x.
-apply (rngl_le_lt_trans Hor) with
-  (b := (rngl_abs (rngl_cos θ * x) + rngl_abs (rngl_sin θ * x))%L).
-apply (rngl_add_le_compat Hor).
-(* ouais, mais si sin(θ) est négatif, ça marche pô *)
-...
-*)
+  rewrite (angle_dist_sub_l_diag Hic Hon Hop Hed).
   now apply HN.
 }
+...
 Theorem glop :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ Δθ,
   is_angle_limit_when_tending_to_inf Δθ 0%A
   → is_angle_limit_when_tending_to_inf (λ i : nat, (θ - Δθ i)%A) θ.
 Proof.
-intros Hop * Hθ ε Hε.
+intros Hic Hon Hop Hed * Hθ ε Hε.
 destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (Hθ ε Hε).
 destruct Hθ as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
-specialize (angle_dist_is_dist Hop) as H1.
+specialize (angle_dist_is_dist Hic Hon Hop Hed) as H1.
 destruct H1 as (Hdsym, Hdsep, Hdtri).
-...
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+progress unfold angle_dist.
+remember (θ - Δθ n)%A as x; cbn; subst x.
+do 4 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_squ_0 Hos).
+rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_add_swap).
+rewrite <- (rngl_add_sub_swap Hop (rngl_cos θ)²)%L.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+remember (θ - Δθ n)%A as x.
+replace (_ * _ + _ * _)%L with (rngl_cos (θ - x))%A. 2: {
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  now rewrite rngl_sub_opp_r.
+}
+subst x.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite (angle_sub_diag Hic Hon Hop Hed).
+rewrite (angle_add_0_l Hon Hos).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_mul_diag_l Hon Hop).
+apply (rngl_le_refl Hor).
 ...
 (*
 ...

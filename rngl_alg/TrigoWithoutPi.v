@@ -3648,7 +3648,7 @@ cbn in H1.
 now rewrite (angle_add_0_r Hon Hos) in H1.
 Qed.
 
-(*
+(**)
 Definition angle_dist θ1 θ2 :=
   rl_sqrt
     ((rngl_cos θ2 - rngl_cos θ1)² +
@@ -3747,7 +3747,7 @@ split. {
   apply (angle_dist_triangular Hic Hon Hop Hed).
 }
 Qed.
-*)
+(*
 
 Definition angle_dist θ1 θ2 :=
   (rngl_abs (rngl_cos θ2 - rngl_cos θ1) +
@@ -3837,12 +3837,14 @@ split. {
   apply (angle_dist_triangular Hop).
 }
 Qed.
+*)
 
 End a.
 
-(*
+(**)
 Arguments angle_dist {T ro rp rl} (θ1 θ2)%A.
-*)
+(*
 
 Arguments angle_dist {T ro rp} (θ1 θ2)%A.
+*)
 Arguments angle_div_2_pow_nat {T ro rp rl ac} θ%A i%nat.
