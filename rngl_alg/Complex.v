@@ -2359,6 +2359,7 @@ Theorem angle_mul_nat_le_mono_nonneg_r :
   ∀ a b θ, angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A.
 Proof.
 intros Hic Hon Hop Hed * Hb Hab.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 revert a Hab.
 induction b; intros. {
   apply Nat.le_0_r in Hab; subst a.
@@ -2368,6 +2369,61 @@ destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
 apply Nat.succ_le_mono in Hab.
 cbn.
 Search (_ + _ ≤ _ + _)%A.
+Search (_ + _ ≤ _ + _)%L.
+Theorem angle_add_le_mono_l :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
+Proof.
+intros * Haov.
+destruct ac as (Hiv, Hc2, Hor).
+move Haov at bottom.
+split; intros H23. {
+  progress unfold angle_add_overflow in Haov.
+  progress unfold angle_ltb in Haov.
+  progress unfold angle_leb in H23.
+  progress unfold angle_leb.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
+  symmetry in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+  move Hzs2 before Hzs1.
+  move Hzs3 before Hzs2.
+  move Hzs12 before Hzs3.
+(*
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+...
+*)
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    destruct zs13; [ | easy ].
+    apply rngl_leb_le in Hzs13.
+    apply rngl_leb_le.
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Hzs1.
+    apply (rngl_ltb_ge Hor) in Haov.
+    eapply (rngl_le_trans Hor); [ apply Haov | ].
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      destruct zs3. {
+        apply rngl_leb_le in Hzs3.
+        apply rngl_leb_le in H23.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos _ < rngl_cos _)%L.
+... ...
+apply angle_add_le_mono_l. {
+  cbn in Hb.
+  destruct b; [ cbn | now apply Bool.orb_false_iff in Hb ].
+  progress unfold angle_add_overflow.
+  rewrite (angle_add_0_r Hon Hos).
+  apply angle_ltb_ge.
+  apply angle_leb_refl.
+}
 ... ...
   apply angle_mul_nat_le_mono_nonneg_r.
 ...
