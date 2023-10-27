@@ -5375,25 +5375,25 @@ Definition gen_continuous {A} (dist : A → A → T) f :=
 
 (* limit with ring-like distance *)
 
-Definition is_Cauchy_sequence :=
+Definition rngl_is_Cauchy_sequence :=
   is_gen_Cauchy_sequence rngl_dist.
 
-Definition is_limit_when_tending_to :=
+Definition rngl_is_limit_when_tending_to :=
   is_gen_limit_when_tending_to rngl_dist.
 
-Definition is_limit_when_tending_to_inf :=
+Definition rngl_is_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf rngl_dist.
 
-Definition is_derivative :=
+Definition rngl_is_derivative :=
   is_gen_derivative rngl_dist.
 
-Definition is_complete :=
+Definition rngl_is_complete :=
   is_gen_complete rngl_dist.
 
-Definition continuous_at :=
+Definition rngl_continuous_at :=
   gen_continuous_at rngl_dist.
 
-Definition continuous :=
+Definition rngl_continuous :=
   gen_continuous rngl_dist.
 
 (* properties of distances and limits *)
@@ -5781,4 +5781,4 @@ Arguments rngl_squ {T ro} x%L.
 Arguments rngl_sub {T ro} (a b)%L.
 Arguments rngl_subt {T ro} (a b)%L.
 
-Arguments is_complete T {ro}.
+Arguments rngl_is_complete T {ro}.

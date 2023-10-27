@@ -342,15 +342,15 @@ Theorem An_Bn_are_Cauchy_sequences :
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ P a b, (a ≤ b)%L →
-  is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)) ∧
-  is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
+  rngl_is_Cauchy_sequence (λ n : nat, fst (AnBn P a b n)) ∧
+  rngl_is_Cauchy_sequence (λ n : nat, snd (AnBn P a b n)).
 Proof.
 intros Hon Hop Hiv Hor Har * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  progress unfold is_Cauchy_sequence.
+  progress unfold rngl_is_Cauchy_sequence.
   progress unfold is_gen_Cauchy_sequence.
   split. {
     intros * Hε.
@@ -364,7 +364,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 set (u := λ n : nat, fst (AnBn P a b n)).
 set (v := λ n : nat, snd (AnBn P a b n)).
-unfold is_Cauchy_sequence.
+unfold rngl_is_Cauchy_sequence.
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 split. {
   intros ε Hε.
@@ -556,8 +556,8 @@ Theorem limit_opp :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ u lim,
-  is_limit_when_tending_to_inf u lim
-  → is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
+  rngl_is_limit_when_tending_to_inf u lim
+  → rngl_is_limit_when_tending_to_inf (λ n, (- u n)%L) (- lim)%L.
 Proof.
 intros Hop Hor * Hu.
 intros ε Hε.
@@ -578,9 +578,9 @@ Theorem limit_add :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u v limu limv,
-  is_limit_when_tending_to_inf u limu
-  → is_limit_when_tending_to_inf v limv
-  → is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
+  rngl_is_limit_when_tending_to_inf u limu
+  → rngl_is_limit_when_tending_to_inf v limv
+  → rngl_is_limit_when_tending_to_inf (λ n, (u n + v n))%L (limu + limv)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hu Hv ε Hε.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -646,8 +646,8 @@ Theorem limit_between_An_and_Bn :
   ∀ a b lim P,
   P a
   → (∀ x : T, P x → (x < b)%L)
-  → is_limit_when_tending_to_inf (λ n, fst (AnBn P a b n)) lim
-  → is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) lim
+  → rngl_is_limit_when_tending_to_inf (λ n, fst (AnBn P a b n)) lim
+  → rngl_is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) lim
   → ∀ n an bn, AnBn P a b n = (an, bn) → (an ≤ lim ≤ bn)%L.
 Proof.
 intros Hon Hop Hiv Hor * Ha Hs Hal Hbl * Habn.
@@ -664,7 +664,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 split. {
   apply (rngl_nlt_ge Hor).
   intros H5.
-  progress unfold is_limit_when_tending_to_inf in Hal.
+  progress unfold rngl_is_limit_when_tending_to_inf in Hal.
   specialize (Hal ((an - lim) / 2)%L) as H7.
   assert (H : (0 < (an - lim) / 2)%L). {
     apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
@@ -706,7 +706,7 @@ split. {
 } {
   apply (rngl_nlt_ge Hor).
   intros H5.
-  progress unfold is_limit_when_tending_to_inf in Hbl.
+  progress unfold rngl_is_limit_when_tending_to_inf in Hbl.
   specialize (Hbl ((lim - bn) / 2)%L) as H7.
   assert (H : (0 < (lim - bn) / 2)%L). {
     apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
@@ -881,13 +881,13 @@ Theorem exists_supremum :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  is_complete T →
+  rngl_is_complete T →
   ∀ (P : T → Prop) a b,
   P a
   → (∀ x, P x → (x < b)%L)
   → ∃ c, is_supremum P c ∧ (c ≤ b)%L ∧
-    is_limit_when_tending_to_inf (λ n, fst (AnBn P a b n)) c ∧
-    is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) c.
+    rngl_is_limit_when_tending_to_inf (λ n, fst (AnBn P a b n)) c ∧
+    rngl_is_limit_when_tending_to_inf (λ n, snd (AnBn P a b n)) c.
 Proof.
 intros Hon Hop Hiv Hor Har Hco * Ha Hs.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -944,8 +944,8 @@ specialize (Hco _ Hcsv) as Hbc.
 destruct Hac as (lima, Hal).
 destruct Hbc as (limb, Hbl).
 move limb before lima.
-assert (Hl : (is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
-  progress unfold is_limit_when_tending_to_inf.
+assert (Hl : (rngl_is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
+  progress unfold rngl_is_limit_when_tending_to_inf.
   intros ε Hε.
   progress unfold u.
   progress unfold v.
@@ -1133,7 +1133,7 @@ Theorem intermediate_value_prop_1 :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ f, continuous f →
+  ∀ f, rngl_continuous f →
   ∀ a b c u,
   (a < b)%L
   → (f a < u)%L
@@ -1222,7 +1222,7 @@ Theorem intermediate_value_prop_2 :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ f, continuous f →
+  ∀ f, rngl_continuous f →
   ∀ a b c u,
   (a < b)%L
   → (u < f b)%L
@@ -1316,8 +1316,8 @@ Theorem intermediate_value_le :
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  is_complete T →
-  ∀ f, continuous f
+  rngl_is_complete T →
+  ∀ f, rngl_continuous f
   → ∀ a b u, (a ≤ b)%L
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
@@ -1619,8 +1619,8 @@ Theorem intermediate_value :
   rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
-  is_complete T →
-  ∀ f, continuous f
+  rngl_is_complete T →
+  ∀ f, rngl_continuous f
   → ∀ a b u, (a ≤ b)%L
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
   → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
@@ -1633,7 +1633,7 @@ specialize (intermediate_value_le Hon Hop Hiv Hed Hor Har Hco) as H1.
 destruct ab; [ now apply (H1 _ Hfc) | ].
 specialize (H1 (λ x, (- f x))%L).
 cbn in H1.
-assert (H : continuous (λ x, (- f x))%L). {
+assert (H : rngl_continuous (λ x, (- f x))%L). {
   intros x ε Hε.
   destruct (Hfc x ε Hε) as (η & Hzη & Hη).
   exists η.

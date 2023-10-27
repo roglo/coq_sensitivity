@@ -1399,7 +1399,7 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   ∀ rad a b,
   2 ≤ rad
   → rngl_of_nat b ≠ 0%L
-  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
+  → rngl_is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
 intros Hic Hon Hop Har * H2r Hbz.
@@ -1541,15 +1541,15 @@ Theorem rat_is_inf_sum_of_inv_rad_pow' :
   ∀ rad a i c,
   2 ≤ rad
   → rngl_of_nat i ≠ 0%L
-  → is_limit_when_tending_to_inf (seq_converging_to_rat rad a i) c
+  → rngl_is_limit_when_tending_to_inf (seq_converging_to_rat rad a i) c
   → rngl_of_nat a = (rngl_of_nat i * c)%L.
 Proof.
 intros Hic Hon Hop Har * H2r Hbz Hlim.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Har _ a i H2r) as H1.
 specialize (H1 Hbz).
-progress unfold is_limit_when_tending_to_inf in Hlim.
-progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold rngl_is_limit_when_tending_to_inf in Hlim.
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
 specialize (gen_limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
 specialize (H2 (rngl_dist_is_dist Hop Hor)).
 specialize (H2 _ _ _ Hlim H1).
@@ -1599,7 +1599,7 @@ symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
-Definition is_angle_limit_when_tending_to_inf :=
+Definition is_angle_eucl_limit_when_tending_to_inf :=
   is_gen_limit_when_tending_to_inf angle_eucl_dist.
 
 (*
@@ -2233,15 +2233,15 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   ∀ n θ,
   n ≠ 0
   → (∀ i, i < n → angle_add_overflow θ (i * θ)%A = false)
-  → is_angle_limit_when_tending_to_inf
+  → is_angle_eucl_limit_when_tending_to_inf
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 intros Hic Hon Hop Har Hed Hch * Hnz Haov.
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
-  is_angle_limit_when_tending_to_inf
+  is_angle_eucl_limit_when_tending_to_inf
     (λ i, (2 ^ i mod n * angle_div_2_pow_nat θ i))%A 0%A). {
-  progress unfold is_angle_limit_when_tending_to_inf.
+  progress unfold is_angle_eucl_limit_when_tending_to_inf.
   progress unfold is_gen_limit_when_tending_to_inf.
   intros ε Hε.
   specialize (H ε Hε).
