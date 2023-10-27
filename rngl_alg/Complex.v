@@ -2397,13 +2397,6 @@ split; intros H23. {
   move Hzs2 before Hzs1.
   move Hzs3 before Hzs2.
   move Hzs12 before Hzs3.
-(*
-  destruct zs1. {
-    apply rngl_leb_le in Hzs1.
-    destruct zs2. {
-      apply rngl_leb_le in Hzs2.
-...
-*)
   destruct zs12. {
     apply rngl_leb_le in Hzs12.
     destruct zs13; [ | easy ].
@@ -2412,17 +2405,20 @@ split; intros H23. {
     destruct zs1; [ | easy ].
     apply rngl_leb_le in Hzs1.
     apply (rngl_ltb_ge Hor) in Haov.
+(*
     eapply (rngl_le_trans Hor); [ apply Haov | ].
+*)
     destruct zs2. {
       apply rngl_leb_le in Hzs2.
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
-...
-(**)
-        exfalso.
-        apply (rngl_nlt_ge Hor) in Haov.
-        apply Haov; clear Haov.
+cbn.
+apply (rngl_le_sub_le_add_r Hop Hor).
+rewrite <- (rngl_sub_sub_distr Hop).
+apply (rngl_le_add_le_sub_l Hop Hor).
+apply (rngl_le_add_le_sub_r Hop Hor).
+do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
 ...
         remember (θ1 - angle_right)%A as θ eqn:Hθ.
         symmetry in Hθ.
