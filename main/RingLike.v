@@ -5345,56 +5345,56 @@ split. {
 }
 Qed.
 
-(* general limit using a parametrized distance *)
+(* limits *)
 
-Definition is_gen_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
+Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
-Definition is_gen_limit_when_tending_to {A} (dist : A → A → T) f a l :=
+Definition is_limit_when_tending_to {A} (dist : A → A → T) f a l :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
    ∀ x, rngl_abs (x - a) < η → dist (f x) l < ε)%L.
 
-Definition is_gen_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
+Definition is_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
 
-Definition is_gen_complete {A} (dist : A → A → T) :=
-  ∀ u, is_gen_Cauchy_sequence dist u
-  → ∃ c, is_gen_limit_when_tending_to_inf dist u c.
+Definition is_complete {A} (dist : A → A → T) :=
+  ∀ u, is_Cauchy_sequence dist u
+  → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_gen_derivative (dist : T → T → T) f f' :=
+Definition is_derivative (dist : T → T → T) f f' :=
   ∀ a,
-  is_gen_limit_when_tending_to dist (λ x, dist (f x) (f a) / dist x a)%L
+  is_limit_when_tending_to dist (λ x, dist (f x) (f a) / dist x a)%L
     a (f' a).
 
-Definition gen_continuous_at {A} (dist : A → A → T) f a :=
-  is_gen_limit_when_tending_to dist f a (f a).
+Definition continuous_at {A} (dist : A → A → T) f a :=
+  is_limit_when_tending_to dist f a (f a).
 
-Definition gen_continuous {A} (dist : A → A → T) f :=
-  ∀ a, gen_continuous_at dist f a.
+Definition continuous {A} (dist : A → A → T) f :=
+  ∀ a, continuous_at dist f a.
 
 (* limit with ring-like distance *)
 
 Definition rngl_is_Cauchy_sequence :=
-  is_gen_Cauchy_sequence rngl_dist.
+  is_Cauchy_sequence rngl_dist.
 
 Definition rngl_is_limit_when_tending_to :=
-  is_gen_limit_when_tending_to rngl_dist.
+  is_limit_when_tending_to rngl_dist.
 
 Definition rngl_is_limit_when_tending_to_inf :=
-  is_gen_limit_when_tending_to_inf rngl_dist.
+  is_limit_when_tending_to_inf rngl_dist.
 
 Definition rngl_is_derivative :=
-  is_gen_derivative rngl_dist.
+  is_derivative rngl_dist.
 
 Definition rngl_is_complete :=
-  is_gen_complete rngl_dist.
+  is_complete rngl_dist.
 
 Definition rngl_continuous_at :=
-  gen_continuous_at rngl_dist.
+  continuous_at rngl_dist.
 
 Definition rngl_continuous :=
-  gen_continuous rngl_dist.
+  continuous rngl_dist.
 
 (* properties of distances and limits *)
 
@@ -5443,14 +5443,14 @@ rewrite (rngl_mul_inv_diag_l Hon Hiv) in H2. 2: {
 now rewrite (rngl_mul_1_l Hon) in H2.
 Qed.
 
-Theorem gen_limit_unique :
+Theorem limit_unique :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ A (dist : A → A → T) (id : is_dist dist) u lim1 lim2,
-  is_gen_limit_when_tending_to_inf dist u lim1
-  → is_gen_limit_when_tending_to_inf dist u lim2
+  is_limit_when_tending_to_inf dist u lim1
+  → is_limit_when_tending_to_inf dist u lim2
   → lim1 = lim2.
 Proof.
 intros Hon Hop Hiv Hor * Hid * Hu1 Hu2.
@@ -5465,7 +5465,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (dist_nonneg Hon Hop Hiv Hor _ dist Hid) as Hdpos.
 destruct Hid as (Hdsym, Hdsep, Hdtri).
-assert (Hu : is_gen_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
+assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {
     apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2%L). {

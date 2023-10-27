@@ -1550,7 +1550,7 @@ specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Har _ a i H2r) as H1.
 specialize (H1 Hbz).
 progress unfold rngl_is_limit_when_tending_to_inf in Hlim.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.
-specialize (gen_limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
+specialize (limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
 specialize (H2 (rngl_dist_is_dist Hop Hor)).
 specialize (H2 _ _ _ Hlim H1).
 subst c.
@@ -1600,7 +1600,7 @@ apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
 Definition is_angle_eucl_limit_when_tending_to_inf :=
-  is_gen_limit_when_tending_to_inf angle_eucl_dist.
+  is_limit_when_tending_to_inf angle_eucl_dist.
 
 (*
 Theorem eq_rngl_cos_opp_1 :
@@ -2242,7 +2242,7 @@ enough (H :
   is_angle_eucl_limit_when_tending_to_inf
     (λ i, (2 ^ i mod n * angle_div_2_pow_nat θ i))%A 0%A). {
   progress unfold is_angle_eucl_limit_when_tending_to_inf.
-  progress unfold is_gen_limit_when_tending_to_inf.
+  progress unfold is_limit_when_tending_to_inf.
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).

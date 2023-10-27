@@ -351,7 +351,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   progress unfold rngl_is_Cauchy_sequence.
-  progress unfold is_gen_Cauchy_sequence.
+  progress unfold is_Cauchy_sequence.
   split. {
     intros * Hε.
     rewrite H1 in Hε.
@@ -627,8 +627,8 @@ Qed.
 Theorem gen_limit_ext_in :
   ∀ {A} (dist : A → A → _) u v lim,
   (∀ n, u n = v n)
-  → is_gen_limit_when_tending_to_inf dist u lim
-  → is_gen_limit_when_tending_to_inf dist v lim.
+  → is_limit_when_tending_to_inf dist u lim
+  → is_limit_when_tending_to_inf dist v lim.
 Proof.
 intros * Huv Hu ε Hε.
 destruct (Hu ε Hε) as (N, HN).
@@ -988,7 +988,7 @@ assert (Hlab : lima = limb). {
     now intros; rewrite (rngl_add_opp_r Hop).
   }
   apply (rngl_sub_move_0_r Hop).
-  eapply (gen_limit_unique Hon Hop Hiv Hor _ rngl_dist).
+  eapply (limit_unique Hon Hop Hiv Hor _ rngl_dist).
   apply (rngl_dist_is_dist Hop Hor).
   apply H1.
   apply Hl.
@@ -1404,8 +1404,8 @@ assert (Hbc : c ≠ b). {
 }
 specialize (Hfc c) as Hcc.
 progress unfold rngl_dist in Hcc.
-progress unfold gen_continuous_at in Hcc.
-progress unfold is_gen_limit_when_tending_to in Hcc.
+progress unfold continuous_at in Hcc.
+progress unfold is_limit_when_tending_to in Hcc.
 set (η2 := rngl_min (c - a) (b - c)).
 assert (Hzη2 : (0 < η2)%L). {
   progress unfold η2.
