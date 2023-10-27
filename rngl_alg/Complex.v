@@ -2413,6 +2413,20 @@ split; intros H23. {
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
+(*
+        specialize (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed) as H1.
+        specialize (rngl_add_cos_nonneg_when_sin_nonpos Hic Hon Hop Hed) as H2.
+        specialize (rngl_add_cos_neg_when_sin_nonneg_neg Hic Hon Hop Hed) as H3.
+        specialize (rngl_cos_lt_rngl_cos_sub Hic Hon Hop Hed) as H4.
+        specialize (rngl_sin_nonneg_nonneg_cos_nonneg_neg Hic Hon Hop Hed) as H5.
+        specialize (rngl_sin_nonneg_nonneg_cos_nonneg_neg2 Hic Hon Hop Hed) as H6.
+*)
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+          specialize (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed) as H1.
+          specialize (H1 θ1 _ Hzs1 Hzs2 Hzs12 Hzc1) as H11.
+          specialize (H1 θ1 _ Hzs1 Hzs3 Hzs13 Hzc1) as H12.
+          clear H1.
+...
 cbn.
 apply (rngl_le_sub_le_add_r Hop Hor).
 rewrite <- (rngl_sub_sub_distr Hop).
