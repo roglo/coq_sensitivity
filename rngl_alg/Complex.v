@@ -2316,6 +2316,9 @@ enough (H :
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   rewrite rngl_squ_sqrt; [ | easy ].
   rewrite rngl_squ_sqrt; [ | easy ].
+  apply (rngl_sub_le_mono_l Hop Hor).
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
 Theorem glop :
   rngl_mul_is_comm T = true →
