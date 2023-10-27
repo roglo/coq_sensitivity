@@ -2151,26 +2151,24 @@ Theorem angle_div_2_pow_nat_mul :
   rngl_has_eq_dec T = true →
   ∀ n m θ,
   m ≠ 0
-  → (∀ i, i < m → angle_add_overflow θ (i * θ)%A = false)
+  → angle_mul_nat_overflow m θ = false
   → angle_div_2_pow_nat (m * θ) n =
       (m * angle_div_2_pow_nat θ n)%A.
 Proof.
 intros Hic Hon Hop Hed * Hmz Haov.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 induction m; [ easy | clear Hmz; cbn ].
+cbn in Haov.
 destruct m. {
   cbn.
   rewrite (angle_add_0_r Hon Hos).
   symmetry; apply (angle_add_0_r Hon Hos).
 }
 specialize (IHm (Nat.neq_succ_0 _)).
-rewrite (angle_div_2_pow_nat_add Hic Hon Hop Hed); [ | now apply Haov ].
+apply Bool.orb_false_iff in Haov.
+rewrite (angle_div_2_pow_nat_add Hic Hon Hop Hed); [ | easy ].
 f_equal.
-apply IHm.
-intros i Hi.
-apply Haov.
-apply (Nat.lt_le_trans _ (S m)); [ easy | ].
-apply Nat.le_succ_diag_r.
+now apply IHm.
 Qed.
 
 Theorem angle_eucl_dist_sub_l_diag :
@@ -2264,7 +2262,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_characteristic T = 0 →
   ∀ n θ,
   n ≠ 0
-  → (∀ i, i < n → angle_add_overflow θ (i * θ)%A = false)
+  → angle_mul_nat_overflow n θ = false
   → is_angle_eucl_limit_when_tending_to_inf
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
@@ -2334,7 +2332,12 @@ enough (H :
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
   split. {
-Search (_ * _ ≤ _ * _)%A.
+Theorem angle_mul_nat_le_mono_nonneg_r :
+  ∀ a b θ, a ≤ b → angle_mul_nat_overflow b θ = false → (a * θ ≤ b * θ)%A.
+Proof.
+intros * Hab Hb.
+... ...
+  apply angle_mul_nat_le_mono_nonneg_r.
 ...
   subst Δθ.
 ...

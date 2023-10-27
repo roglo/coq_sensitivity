@@ -11,6 +11,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
+Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike.
 Require Import RealLike.
 
@@ -461,6 +462,13 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
+Fixpoint angle_mul_nat_overflow n θ :=
+  match n with
+  | 0 | 1 => false
+  | S n' =>
+      (angle_add_overflow θ (n' * θ)%A ||
+       angle_mul_nat_overflow n' θ)%bool
+  end.
 
 Theorem angle_ltb_ge : ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
 Proof.
