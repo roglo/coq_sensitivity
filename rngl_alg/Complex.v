@@ -2239,6 +2239,21 @@ rewrite <- (rngl_add_sub_swap Hop).
 apply (rngl_sub_mul_diag_l Hon Hop).
 Qed.
 
+Theorem rngl_cos_decr :
+  ∀ θ1 θ2, (θ1 ≤ θ2 ≤ angle_straight)%A → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
+Proof.
+intros * (H12, H2s).
+destruct ac as (Hiv, Hc2, Hor).
+progress unfold angle_leb in H12, H2s.
+cbn in H2s.
+rewrite (rngl_leb_refl Hor) in H2s.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+destruct (0 ≤? rngl_sin θ1)%L; [ | easy ].
+now apply rngl_leb_le in H12.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2317,8 +2332,11 @@ enough (H :
   rewrite rngl_squ_sqrt; [ | easy ].
   rewrite rngl_squ_sqrt; [ | easy ].
   apply (rngl_sub_le_mono_l Hop Hor).
+  apply rngl_cos_decr.
+  split. {
+Search (_ * _ ≤ _ * _)%A.
 ...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
+  subst Δθ.
 ...
 Theorem glop :
   rngl_mul_is_comm T = true →
