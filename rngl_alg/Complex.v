@@ -1600,7 +1600,7 @@ apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
 Definition is_angle_limit_when_tending_to_inf :=
-  is_gen_limit_when_tending_to_inf angle_dist.
+  is_gen_limit_when_tending_to_inf angle_eucl_dist.
 
 (*
 Theorem eq_rngl_cos_opp_1 :
@@ -2173,17 +2173,17 @@ apply (Nat.lt_le_trans _ (S m)); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
-Theorem angle_dist_sub_l_diag :
+Theorem angle_eucl_dist_sub_l_diag :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ θ Δθ, angle_dist (θ - Δθ) θ = angle_dist Δθ 0.
+  ∀ θ Δθ, angle_eucl_dist (θ - Δθ) θ = angle_eucl_dist Δθ 0.
 Proof.
 intros Hic Hon Hop Hed *.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-progress unfold angle_dist.
+progress unfold angle_eucl_dist.
 remember (θ - Δθ)%A as x; cbn; subst x.
 do 4 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite (rngl_squ_1 Hon).
@@ -2258,7 +2258,7 @@ enough (H :
   rewrite H1; clear H1.
   rewrite (angle_mul_sub_distr_r Hic Hon Hop Hed); [ | now apply Nat.mod_le ].
   rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
-  rewrite (angle_dist_sub_l_diag Hic Hon Hop Hed).
+  rewrite (angle_eucl_dist_sub_l_diag Hic Hon Hop Hed).
   now apply HN.
 }
 ...
