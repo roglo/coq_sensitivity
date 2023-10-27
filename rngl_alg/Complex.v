@@ -2371,12 +2371,17 @@ cbn.
 Search (_ + _ ≤ _ + _)%A.
 Search (_ + _ ≤ _ + _)%L.
 Theorem angle_add_le_mono_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
-intros * Haov.
+intros Hic Hon Hop Hed * Haov.
 destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 move Haov at bottom.
 split; intros H23. {
   progress unfold angle_add_overflow in Haov.
@@ -2413,6 +2418,29 @@ split; intros H23. {
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
+...
+(**)
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Haov.
+        apply Haov; clear Haov.
+...
+        remember (θ1 - angle_right)%A as θ eqn:Hθ.
+        symmetry in Hθ.
+        apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ1; rename θ into θ1.
+        move θ1 after θ2.
+        rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12 |-*.
+        do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+        rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs13, Hzs12.
+        apply -> (rngl_opp_lt_compat Hop Hor).
+...
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite <- (rngl_opp_0 Hop) in Hzs2.
+apply (rngl_opp_lt_compat Hop Hor) in Hzs2.
+rewrite (angle_add_assoc Hop).
+do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Search (rngl_cos _ < rngl_cos _)%L.
 ... ...
