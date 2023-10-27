@@ -1654,6 +1654,7 @@ intros Hop.
 apply eq_angle_eq; cbn.
 now rewrite (rngl_opp_0 Hop).
 Qed.
+*)
 
 Theorem angle_leb_refl :
   ∀ θ, (θ ≤? θ)%A = true.
@@ -1666,6 +1667,7 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
+(*
 Theorem angle_eqb_refl :
   rngl_has_eq_dec T = true →
   ∀ θ, (θ =? θ)%A = true.
@@ -2252,6 +2254,23 @@ destruct (0 ≤? rngl_sin θ1)%L; [ | easy ].
 now apply rngl_leb_le in H12.
 Qed.
 
+Theorem angle_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, (0 ≤ θ)%A.
+Proof.
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
+apply rngl_leb_le.
+apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2333,9 +2352,22 @@ enough (H :
   apply rngl_cos_decr.
   split. {
 Theorem angle_mul_nat_le_mono_nonneg_r :
-  ∀ a b θ, a ≤ b → angle_mul_nat_overflow b θ = false → (a * θ ≤ b * θ)%A.
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b θ, angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A.
 Proof.
-intros * Hab Hb.
+intros Hic Hon Hop Hed * Hb Hab.
+revert a Hab.
+induction b; intros. {
+  apply Nat.le_0_r in Hab; subst a.
+  apply (angle_leb_refl).
+}
+destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
+apply Nat.succ_le_mono in Hab.
+cbn.
+Search (_ + _ ≤ _ + _)%A.
 ... ...
   apply angle_mul_nat_le_mono_nonneg_r.
 ...
