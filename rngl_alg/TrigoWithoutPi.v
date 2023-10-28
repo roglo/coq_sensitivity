@@ -444,6 +444,7 @@ Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : angle_scope.
 Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : angle_scope.
 Notation "n * θ" := (angle_mul_nat θ n) : angle_scope.
+Notation "θ / ₂" := (angle_div_2 θ) (at level 40) : angle_scope.
 Notation "θ1 ≤ θ2 < θ3" :=
   (angle_leb θ1 θ2 = true ∧ angle_ltb θ2 θ3 = true)%L : angle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
