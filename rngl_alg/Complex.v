@@ -2368,8 +2368,6 @@ induction b; intros. {
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
 apply Nat.succ_le_mono in Hab.
 cbn.
-Search (_ + _ ≤ _ + _)%A.
-Search (_ + _ ≤ _ + _)%L.
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2460,6 +2458,89 @@ split; intros H23. {
           }
           apply (rngl_squ_le_abs_le Hop Hor Hii).
           do 2 rewrite (rngl_squ_mul Hic).
+Theorem rngl_cos_add_rngl_cos :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ p q,
+  (rngl_cos p + rngl_cos q =
+   2 * rngl_cos (angle_div_2 (p + q)) * rngl_cos (angle_div_2 (p - q)))%L.
+Proof.
+intros Hic Hon Hop Hed *.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1; apply H1.
+}
+assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cos θ)%L). {
+  intros.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  progress unfold rngl_sub.
+  rewrite Hop, rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
+  intros.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite rngl_add_0_l.
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+remember (p + q)%A as paq eqn:Hpaq.
+remember (p - q)%A as psq eqn:Hpsq.
+cbn.
+remember (0 ≤? rngl_sin paq)%L as sa eqn:Hsa.
+remember (0 ≤? rngl_sin psq)%L as ss eqn:Hss.
+symmetry in Hsa, Hss.
+destruct sa. {
+  rewrite (rngl_mul_1_l Hon).
+  destruct ss. {
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- rngl_mul_assoc.
+    rewrite <- rl_sqrt_mul; cycle 1. {
+      apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    } {
+      apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_div_mul_mul_div Hic Hiv).
+    rewrite (rngl_mul_div_assoc Hiv).
+    rewrite (rngl_div_div Hos Hon Hiv); cycle 1.
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+      now apply (rngl_mul_nonneg_nonneg Hop Hor).
+    } {
+      rewrite rngl_mul_add_distr_l.
+      rewrite (rngl_mul_1_r Hon).
+      apply (rngl_add_nonneg_pos Hor Hos).
+      apply (rngl_lt_le_incl Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite fold_rngl_squ.
+    rewrite (rl_sqrt_squ Hop Hor).
+    rewrite (rngl_abs_2 Hon Hop Hor).
+    rewrite (rngl_mul_comm Hic).
+    rewrite (rngl_div_mul Hon Hiv). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    subst paq psq; cbn.
+    rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_sub_opp_r Hop).
+    rewrite (rngl_add_sub_assoc Hop).
+    rewrite rngl_add_assoc.
+    rewrite (rngl_mul_comm Hic).
+    rewrite <- (rngl_squ_sub_squ Hop Hic).
+    rewrite (rngl_squ_add Hic Hon).
+    rewrite (rngl_squ_1 Hon).
+    rewrite (rngl_mul_1_r Hon).
+    rewrite <- (rngl_add_sub_assoc Hop).
+    rewrite (rngl_squ_sub_squ Hop Hic).
+...
+rngl_cos (p - q) * rngl_cos (p + q)
 ...
           specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
           apply (rngl_add_move_r Hop) in H1.

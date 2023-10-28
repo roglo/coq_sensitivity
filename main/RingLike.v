@@ -2309,9 +2309,7 @@ Theorem rngl_le_0_sub :
   ∀ a b : T, (0 ≤ b - a ↔ a ≤ b)%L.
 Proof.
 intros * Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_add_le_compat Hor) as H1.
 split; intros Hab. {
   specialize (H1 0%L (b - a)%L a a Hab (rngl_le_refl Hor _)).
@@ -2331,9 +2329,7 @@ Theorem rngl_le_sub_0 :
   ∀ a b, (a - b ≤ 0 ↔ a ≤ b)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_add_le_compat Hor) as H1.
 split; intros Hab. {
   specialize (H1 (a - b) 0 b b Hab (rngl_le_refl Hor _))%L.
@@ -2352,9 +2348,7 @@ Theorem rngl_lt_0_sub :
   ∀ a b : T, (0 < b - a ↔ a < b)%L.
 Proof.
 intros * Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hab. {
   apply (rngl_lt_iff Hor) in Hab.
   apply (rngl_lt_iff Hor).
@@ -2671,9 +2665,7 @@ Theorem rngl_add_lt_mono_l :
   (a < b ↔ c + a < c + b)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hab. {
   now apply (rngl_add_lt_mono Hos Hor).
 } {
@@ -2703,9 +2695,7 @@ Theorem rngl_opp_inv :
   ∀ a, a ≠ 0%L → (- a⁻¹ = (- a)⁻¹)%L.
 Proof.
 intros Hon Hop Hiv * Haz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
@@ -2843,9 +2833,7 @@ Theorem rngl_mul_nonneg_nonneg :
   ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a * b)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 a b)%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
@@ -2861,9 +2849,7 @@ Theorem rngl_mul_nonpos_nonpos :
   ∀ a b, (a ≤ 0 → b ≤ 0 → 0 ≤ a * b)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_mul_le_compat_nonpos Hop Hor) as H1.
 specialize (H1 0 0 a b)%L.
 assert (H : (a ≤ 0 ≤ 0)%L) by now split; [ | apply (rngl_le_refl Hor) ].
@@ -2879,9 +2865,7 @@ Theorem rngl_mul_nonneg_nonpos :
   ∀ a b, (0 ≤ a → b ≤ 0 → a * b ≤ 0)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 a (- b))%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
@@ -2905,9 +2889,7 @@ Theorem rngl_mul_nonpos_nonneg :
   ∀ a b, (a ≤ 0 → 0 ≤ b → a * b ≤ 0)%L.
 Proof.
 intros * Hop Hor * Ha Hb.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
 specialize (H1 0 0 (- a) b)%L.
 assert (H : (0 ≤ 0 ≤ - a)%L). {
@@ -2949,9 +2931,7 @@ Theorem rngl_0_lt_inv_compat :
 Proof.
 intros * Hon Hop Hiv Hor.
 intros * Hza.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Haz : a ≠ 0%L). {
   intros H; subst a.
   now apply (rngl_lt_irrefl Hor) in Hza.
@@ -3012,9 +2992,7 @@ Theorem rngl_mul_pos_neg :
   ∀ a b, (0 < a → b < 0 → a * b < 0)%L.
 Proof.
 intros Hop Hor Hid * Hza Hbz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_lt_iff Hor).
 split. {
   apply (rngl_mul_nonneg_nonpos Hop Hor). {
@@ -3144,9 +3122,7 @@ Theorem eq_rngl_add_square_0 :
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
 intros * Hop Hor Hii * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
   apply (rngl_square_ge_0 Hop Hor).
 } {
@@ -3166,9 +3142,7 @@ Theorem rngl_le_add_le_sub_l :
   ∀ a b c, (a + b ≤ c ↔ b ≤ c - a)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Habc. {
   specialize (rngl_add_le_compat Hor) as H1.
   specialize (H1 (a + b) c (- a) (- a) Habc)%L.
@@ -3267,9 +3241,7 @@ Theorem rngl_add_le_mono_l :
   ∀ a b c, (b ≤ c ↔ a + b ≤ a + c)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hbc. {
   apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
 }
@@ -3293,9 +3265,7 @@ Theorem rngl_le_sub_le_add_l :
   ∀ a b c, (a - b ≤ c ↔ a ≤ b + c)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Habc. {
   apply (rngl_sub_le_mono_r Hop Hor _ _ b).
   now rewrite rngl_add_comm, (rngl_add_sub Hos).
@@ -3321,9 +3291,7 @@ Theorem rngl_lt_sub_lt_add_l :
   ∀ a b c, (a - b < c ↔ a < b + c)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Habc. {
   apply (rngl_sub_lt_mono_r Hop Hor _ _ b).
   now rewrite rngl_add_comm, (rngl_add_sub Hos).
@@ -3490,9 +3458,7 @@ Theorem rngl_lt_add_lt_sub_l :
   ∀ a b c, (a + b < c ↔ b < c - a)%L.
 Proof.
 intros Hop Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite rngl_add_comm.
 split; intros Hab. {
   apply (rngl_sub_lt_mono_r Hop Hor _ _ a) in Hab.
@@ -3551,9 +3517,7 @@ Theorem rngl_0_lt_2 :
   (0 < 2)%L.
 Proof.
 intros Hon Hop Hc1 Hor.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_le_lt_trans Hor _ 1)%L. {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
@@ -3734,9 +3698,7 @@ Theorem rngl_one_sub_half :
   (1 - 2⁻¹ = 2⁻¹)%L.
 Proof.
 intros Hon Hop Hiv Hor.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
@@ -3786,9 +3748,7 @@ Theorem rngl_abs_1 :
   (rngl_abs 1 = 1)%L.
 Proof.
 intros Hon Hop Hor.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   now rewrite (H1 (rngl_abs 1)%L), (H1 1%L).
@@ -3800,6 +3760,28 @@ apply rngl_leb_le in Hc.
 apply (rngl_nlt_ge Hor) in Hc.
 exfalso; apply Hc.
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+Qed.
+
+Theorem rngl_abs_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_abs 2 = 2)%L.
+Proof.
+intros Hon Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite H1; apply H1.
+}
+progress unfold rngl_abs.
+remember (2 ≤? 0)%L as tz eqn:Htz.
+symmetry in Htz.
+destruct tz; [ | easy ].
+apply rngl_leb_le in Htz.
+apply (rngl_nlt_ge Hor) in Htz.
+exfalso; apply Htz.
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
 
 Theorem rngl_squ_0 :
@@ -4046,9 +4028,7 @@ Theorem rngl_abs_div :
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
 intros * Hon Hop Hiv Heb Hor * Hyz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hiq : rngl_has_inv_and_1_or_quot T = true). {
   now apply rngl_has_inv_and_1_or_quot_iff; left.
 }
@@ -4271,9 +4251,7 @@ Theorem rngl_abs_mul :
   ∀ a b, (rngl_abs (a * b) = rngl_abs a * rngl_abs b)%L.
 Proof.
 intros Hop Hi1 Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 unfold rngl_abs.
 remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
 remember (b ≤? 0)%L as bz eqn:Hbz; symmetry in Hbz.
@@ -4468,9 +4446,7 @@ Theorem eq_rngl_squ_rngl_abs :
   ∀ a b, rngl_squ a = rngl_squ b → rngl_abs a = rngl_abs b.
 Proof.
 intros Hop Hic Hor Hii * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_sub_move_0_r Hop) in Hab.
 rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
 apply (rngl_integral Hos Hii) in Hab.
@@ -4496,9 +4472,7 @@ Theorem rngl_squ_eq_cases :
   ∀ a b, (a² = b² → a = b ∨ a = -b)%L.
 Proof.
 intros Hic Hon Hop Hiv Hed * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -4553,9 +4527,7 @@ Theorem rngl_mul_pos_pos :
   ∀ a b : T, (0 < a)%L → (0 < b)%L → (0 < a * b)%L.
 Proof.
 intros Hop Hor Hii * Haz Hbz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_lt_iff Hor) in Haz.
 apply (rngl_lt_iff Hor) in Hbz.
 apply (rngl_lt_iff Hor).
@@ -4577,9 +4549,7 @@ Theorem rngl_mul_pos_cancel_l :
   ∀ a b : T, (0 < a → 0 < a * b ↔ 0 < b)%L.
 Proof.
 intros Hop Hor Hii * Ha.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hb. {
   apply (rngl_lt_iff Hor) in Ha.
   apply (rngl_lt_iff Hor) in Hb.
@@ -4612,9 +4582,7 @@ Theorem rngl_mul_pos_cancel_r :
   ∀ a b : T, (0 < b → 0 < a * b ↔ 0 < a)%L.
 Proof.
 intros Hop Hor Hii * Ha.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hb. {
   apply (rngl_lt_iff Hor) in Ha.
   apply (rngl_lt_iff Hor) in Hb.
@@ -4687,9 +4655,7 @@ Theorem rngl_mul_le_mono_pos_l :
   ∀ a b c : T, (0 < c)%L → (a ≤ b)%L ↔ (c * a ≤ c * b)%L.
 Proof.
 intros Hop Hor Hii * Hc.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hab. {
   apply (rngl_lt_eq_cases Hor) in Hab.
   destruct Hab as [Hab| Hab]; [ | subst b; apply (rngl_le_refl Hor) ].
@@ -4752,9 +4718,7 @@ Theorem rngl_mul_le_mono_pos_r :
   ∀ a b c : T, (0 < c)%L → (a ≤ b)%L ↔ (a * c ≤ b * c)%L.
 Proof.
 intros Hop Hor Hii * Hc.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hab. {
   apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ | easy ].
   now apply (rngl_lt_le_incl Hor).
@@ -5004,9 +4968,7 @@ Theorem rngl_le_0_mul :
   ∀ a b, (0 ≤ a * b → 0 ≤ a ∧ 0 ≤ b ∨ a ≤ 0 ∧ b ≤ 0)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
   apply rngl_has_inv_and_1_or_quot_iff.
   now rewrite Hiv, Hon; left.
@@ -5070,9 +5032,7 @@ Theorem rngl_middle_sub_r :
   ∀ a b, (b - (a + b) / 2 = (b - a) / 2)%L.
 Proof.
 intros Hon Hop Hiv Hor *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite rngl_mul_add_distr_r.
@@ -5220,9 +5180,7 @@ Theorem rngl_abs_le_ε :
 Proof.
 intros Hon Hop Hiv Hor * H1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_characteristic_1 Hon Hos Hc1).
 }
@@ -5289,9 +5247,7 @@ Theorem rngl_add_neg_nonpos :
   ∀ a b, (a < 0)%L → (b ≤ 0)%L → (a + b < 0)%L.
 Proof.
 intros Hop Hor * Haz Hbz.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 eapply (rngl_lt_le_trans Hor); [ | apply Hbz ].
 apply (rngl_lt_add_lt_sub_r Hop Hor).
 now rewrite (rngl_sub_diag Hos).
@@ -5555,9 +5511,7 @@ Theorem int_part :
   ∀ a, ∃ n, (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L.
 Proof.
 intros Hon Hop Hc1 Hor Har *.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_archimedean_ub Har Hor) as H1.
 destruct (rngl_lt_dec Hor (rngl_abs a) 1)%L as [H1x| H1x]. {
   exists 0; cbn.
