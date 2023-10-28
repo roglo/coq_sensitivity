@@ -2458,6 +2458,7 @@ split; intros H23. {
           }
           apply (rngl_squ_le_abs_le Hop Hor Hii).
           do 2 rewrite (rngl_squ_mul Hic).
+(* for the sport *)
 Theorem rngl_cos_add_rngl_cos :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
