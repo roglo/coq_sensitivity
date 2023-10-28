@@ -838,7 +838,7 @@ rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- rngl_add_assoc.
 rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
-rewrite (rngl_add_mul_diag_l Hon).
+rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite (rngl_mul_comm Hic).
 f_equal.
@@ -1844,7 +1844,7 @@ rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- (rngl_add_assoc 2)%L.
 rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
-rewrite (rngl_add_mul_diag_l Hon).
+rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- rngl_mul_add_distr_l.
 rewrite (rngl_mul_comm Hic).
 f_equal.
@@ -2207,7 +2207,7 @@ rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- (rngl_add_assoc 2)%L.
 rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
-rewrite (rngl_add_mul_diag_l Hon).
+rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite (rngl_mul_comm Hic).
 f_equal.
@@ -2661,7 +2661,7 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_mul_comm Hic (rngl_cos θ2)).
 rewrite (rngl_mul_comm Hic (rngl_sin θ2)).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
-rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
   apply (rngl_lt_le_incl Hor) in Hzs2.
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
@@ -2692,7 +2692,7 @@ rewrite (rngl_add_sub_assoc Hop).
 rewrite <- (rngl_add_sub_swap Hop 1)%L.
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_add Hop).
-rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic _ 2)%L.
 rewrite <- (rngl_squ_1 Hon) at 4.
@@ -3022,7 +3022,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_assoc.
   apply (rngl_add_nonneg_pos Hor Hos). {
-    rewrite (rngl_add_mul_diag_l Hon).
+    rewrite (rngl_add_mul_r_diag_l Hon).
     apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
     apply (rngl_le_sub_le_add_l Hop Hor).
     rewrite (rngl_sub_0_l Hop).

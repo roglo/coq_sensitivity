@@ -356,7 +356,7 @@ destruct ap. {
   rewrite (rngl_sub_sub_distr Hop).
   rewrite (rngl_sub_diag Hos), rngl_add_0_l.
   rewrite (rngl_add_diag Hon sa²%L).
-  rewrite (rngl_sub_mul_diag_l Hon Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
   do 2 rewrite (rngl_mul_comm Hic 2%L).
   rewrite (rngl_mul_div Hi1); [ | easy ].
   rewrite (rngl_mul_div Hi1); [ | easy ].
@@ -2203,7 +2203,7 @@ rewrite <- rngl_add_assoc.
 rewrite (cos2_sin2_1 Hon Hop Hic Hed).
 rewrite <- (rngl_add_sub_swap Hop 1)%L.
 do 2 rewrite <- rngl_mul_assoc.
-rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- (rngl_sub_add_distr Hos).
 remember (θ - Δθ)%A as x.
@@ -2219,7 +2219,7 @@ rewrite (angle_add_0_l Hon Hos).
 rewrite <- rngl_add_assoc.
 rewrite (cos2_sin2_1 Hon Hop Hic Hed).
 rewrite <- (rngl_add_sub_swap Hop).
-now rewrite (rngl_sub_mul_diag_l Hon Hop).
+now rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 Qed.
 
 Theorem one_sub_squ_cos_add_squ_sin :
@@ -2236,7 +2236,7 @@ rewrite (rngl_mul_1_r Hon).
 rewrite <- rngl_add_assoc.
 rewrite (cos2_sin2_1 Hon Hop Hic Hed).
 rewrite <- (rngl_add_sub_swap Hop).
-apply (rngl_sub_mul_diag_l Hon Hop).
+apply (rngl_sub_mul_r_diag_l Hon Hop).
 Qed.
 
 Theorem rngl_cos_decr :
@@ -2269,6 +2269,68 @@ rewrite (rngl_leb_refl Hor).
 destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
 apply rngl_leb_le.
 apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+Qed.
+
+Theorem rngl_cos_add_rngl_cos :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ p q,
+  (rngl_cos p + rngl_cos q =
+   2 * rngl_cos (angle_div_2 p + angle_div_2 q) *
+   rngl_cos (angle_div_2 p - angle_div_2 q))%L.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed p) at 1.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed q) at 1.
+remember (angle_div_2 p) as p2.
+remember (angle_div_2 q) as q2.
+cbn.
+do 4 rewrite (rngl_mul_1_r Hon).
+do 4 rewrite (rngl_mul_0_r Hos).
+do 2 rewrite (rngl_sub_0_r Hos).
+do 2 rewrite rngl_add_0_l.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic (_ - _))%L.
+rewrite <- (rngl_squ_sub_squ Hop Hic).
+do 4 rewrite fold_rngl_squ.
+do 2 rewrite (rngl_squ_mul Hic).
+specialize (cos2_sin2_1 Hon Hop Hic Hed p2) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+specialize (cos2_sin2_1 Hon Hop Hic Hed q2) as H1.
+apply (rngl_add_move_l Hop) in H1.
+rewrite H1; clear H1.
+rewrite (rngl_sub_sub_distr Hop _²)%L.
+rewrite <- (rngl_add_sub_swap Hop _²)%L.
+rewrite (rngl_add_diag Hon).
+rewrite <- (rngl_add_sub_swap Hop (_ * _²))%L.
+rewrite (rngl_sub_sub_distr Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite (rngl_add_diag Hon _²)%L.
+rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+f_equal.
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_sub_swap Hop _ _ (_ * _))%L.
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite (rngl_sub_sub_distr Hop).
+rewrite rngl_add_comm.
+apply (rngl_add_sub_swap Hop).
 Qed.
 
 (* to be completed
@@ -2458,53 +2520,17 @@ split; intros H23. {
           }
           apply (rngl_squ_le_abs_le Hop Hor Hii).
           do 2 rewrite (rngl_squ_mul Hic).
-(* for the sport *)
-Theorem rngl_cos_add_rngl_cos :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ p q,
-  (rngl_cos p + rngl_cos q =
-   2 * rngl_cos (angle_div_2 p + angle_div_2 q) *
-   rngl_cos (angle_div_2 p - angle_div_2 q))%L.
-Proof.
-intros Hic Hon Hop Hed *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed p) at 1.
-rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed q) at 1.
-remember (angle_div_2 p) as p2.
-remember (angle_div_2 q) as q2.
-cbn.
-do 4 rewrite (rngl_mul_1_r Hon).
-do 4 rewrite (rngl_mul_0_r Hos).
-do 2 rewrite (rngl_sub_0_r Hos).
-do 2 rewrite rngl_add_0_l.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
+Check rngl_cos_add_rngl_cos.
+rewrite (rngl_cos_add_rngl_cos Hic Hon Hop Hed) in H11.
+(* bof, c'était juste pour voir si ça marchait *)
+...
 rewrite (rngl_add_sub_assoc Hop).
-rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_comm Hic (_ - _))%L.
-rewrite <- (rngl_squ_sub_squ Hop Hic).
-do 4 rewrite fold_rngl_squ.
-do 2 rewrite (rngl_squ_mul Hic).
-specialize (cos2_sin2_1 Hon Hop Hic Hed p2) as H1.
-apply (rngl_add_move_l Hop) in H1.
-rewrite H1; clear H1.
-specialize (cos2_sin2_1 Hon Hop Hic Hed q2) as H1.
-apply (rngl_add_move_l Hop) in H1.
-rewrite H1; clear H1.
-rewrite (rngl_sub_sub_distr Hop _²)%L.
-rewrite <- (rngl_add_sub_swap Hop _²)%L.
-rewrite (rngl_add_diag Hon).
-rewrite <- (rngl_add_sub_swap Hop (_ * _²))%L.
 rewrite (rngl_sub_sub_distr Hop).
-rewrite <- (rngl_sub_add_distr Hos).
 rewrite <- (rngl_add_sub_swap Hop).
-rewrite <- rngl_add_assoc.
-rewrite (rngl_add_diag Hon _²)%L.
-rewrite <- rngl_mul_add_distr_l.
-Search (_ * _ - _)%L.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+...
+rewrite <- (rngl_sub_sub_distr Hop).
 ...
 rewrite (rngl_add_sub_swap Hop).
 ...

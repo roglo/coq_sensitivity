@@ -1546,7 +1546,7 @@ rewrite rngl_mul_add_distr_l.
 now rewrite rngl_mul_opp_r.
 Qed.
 
-Theorem rngl_add_mul_diag_l :
+Theorem rngl_add_mul_r_diag_l :
   rngl_has_1 T = true →
   ∀ a b, (a + a * b = a * (1 + b))%L.
 Proof.
@@ -1555,10 +1555,29 @@ rewrite rngl_mul_add_distr_l.
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
-Theorem rngl_sub_mul_diag_l :
+Theorem rngl_add_mul_l_diag_l :
+  rngl_has_1 T = true →
+  ∀ a b, (a * b + a = a * (b + 1))%L.
+Proof.
+intros Hon *.
+rewrite rngl_mul_add_distr_l.
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Theorem rngl_sub_mul_r_diag_l :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ a b, (a - a * b = a * (1 - b))%L.
+Proof.
+intros Hon Hop *.
+rewrite (rngl_mul_sub_distr_l Hop).
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Theorem rngl_sub_mul_l_diag_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b : T, (a * b - a)%L = (a * (b - 1))%L.
 Proof.
 intros Hon Hop *.
 rewrite (rngl_mul_sub_distr_l Hop).
@@ -5040,7 +5059,7 @@ rewrite (rngl_mul_sub_distr_r Hop).
 rewrite rngl_add_comm.
 rewrite (rngl_sub_add_distr Hos).
 f_equal.
-rewrite (rngl_sub_mul_diag_l Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 f_equal.
 apply (rngl_one_sub_half Hon Hop Hiv Hor).
 Qed.
