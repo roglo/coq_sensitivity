@@ -2468,6 +2468,22 @@ Theorem rngl_cos_add_rngl_cos :
    2 * rngl_cos (angle_div_2 (p + q)) * rngl_cos (angle_div_2 (p - q)))%L.
 Proof.
 intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed p) at 1.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed q) at 1.
+rewrite (angle_div_2_add_not_overflow Hic Hon Hop Hed).
+progress unfold angle_sub.
+rewrite (angle_div_2_add_not_overflow Hic Hon Hop Hed).
+...
+remember (angle_div_2 p) as p2.
+remember (angle_div_2 q) as q2.
+cbn.
+do 4 rewrite (rngl_mul_1_r Hon).
+do 4 rewrite (rngl_mul_0_r Hos).
+do 2 rewrite (rngl_sub_0_r Hos).
+do 2 rewrite rngl_add_0_l.
+...
+intros Hic Hon Hop Hed *.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -2487,6 +2503,24 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
   rewrite rngl_add_0_l.
   apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 }
+Search (angle_div_2 (_ + _))%L.
+(**)
+rewrite (angle_div_2_add_not_overflow Hic Hon Hop Hed).
+progress unfold angle_sub.
+rewrite (angle_div_2_add_not_overflow Hic Hon Hop Hed).
+Search angle_div_2.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed p) at 1.
+rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed q) at 1.
+remember (angle_div_2 p) as p2.
+remember (@angle_div_2 T ro rp rl (@Build_angle_ctx T ro rp Hiv Hc2 Hor) p) as x.
+move x before p2.
+...
+Set Printing All.
+...
+remember rngl_cos as rc.
+cbn - [ angle_mul_nat ].
+remember (angle_div_2 q) as q2.
+...
 remember (p + q)%A as paq eqn:Hpaq.
 remember (p - q)%A as psq eqn:Hpsq.
 cbn.
@@ -2539,7 +2573,6 @@ destruct sa. {
     rewrite (rngl_mul_1_r Hon).
     rewrite <- (rngl_add_sub_assoc Hop).
     rewrite (rngl_squ_sub_squ Hop Hic).
-...
 ...
 rngl_cos (p - q) * rngl_cos (p + q)
 ...
