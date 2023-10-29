@@ -2676,6 +2676,7 @@ rewrite <- (angle_opp_involutive Hop) in Hθ.
 apply (angle_opp_inj Hop) in Hθ.
 subst θ1; rename θ into θ1.
 move θ1 after θ2.
+Search (rngl_sin _ ≤ rngl_cos _)%L.
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
           specialize (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop) as H1.
