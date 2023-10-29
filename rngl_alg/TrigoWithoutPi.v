@@ -1038,6 +1038,47 @@ specialize (H1 _ _ Hzs2 Hzs1 Hcc).
 apply rngl_leb_le in Hzc2.
 now rewrite Hzc2 in H1.
 Qed.
+
+Theorem rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (rngl_sin θ1 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hzs1 Hzs2 Hzc1 Hzc2 Hss.
+apply (rngl_nlt_ge Hor) in Hss.
+apply (rngl_nlt_ge Hor).
+intros Hcc; apply Hss; clear Hss.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_lt_le_incl Hor) in Hcc.
+  now apply rngl_cos_cos_sin_sin_nonneg_cos_le_sin_le.
+}
+intros Hss.
+apply (rngl_nle_gt Hor) in Hcc.
+apply Hcc; clear Hcc.
+rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
+rewrite <- (rngl_abs_nonneg Hop Hor (rngl_cos θ2)); [ | easy ].
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1; clear H1.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1, Hss; clear H1.
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
