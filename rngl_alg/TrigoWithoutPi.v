@@ -1069,7 +1069,7 @@ split. {
 }
 Qed.
 
-Theorem rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt :
+Theorem rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1079,36 +1079,25 @@ Theorem rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt :
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
   → (0 ≤ rngl_cos θ2)%L
-  → (rngl_cos θ2 < rngl_cos θ1)%L
-  → (rngl_sin θ1 < rngl_sin θ2)%L.
+  → (rngl_sin θ1 < rngl_sin θ2)%L
+  ↔ (rngl_cos θ2 < rngl_cos θ1)%L.
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hzs1 Hzs2 Hzc1 Hzc2 Hcc.
-specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-specialize (H1 Hic Hon Hop Hed).
-specialize (H1 _ _ Hzs1 Hzs2).
-apply (rngl_lt_iff Hor).
-split. {
-  apply H1; [ easy | easy | ].
-  now apply (rngl_lt_le_incl Hor).
+intros * Hzs1 Hzs2 Hzc1 Hzc2.
+split. 2: {
+  intros Hcc.
+  apply (rngl_nle_gt Hor) in Hcc.
+  apply (rngl_nle_gt Hor).
+  intros Hss; apply Hcc; clear Hcc.
+  now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+} {
+  intros Hss.
+  apply (rngl_nle_gt Hor) in Hss.
+  apply (rngl_nle_gt Hor).
+  intros Hcc; apply Hss; clear Hss.
+  now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 }
-intros Hs21.
-apply (rngl_nle_gt Hor) in Hcc.
-apply Hcc; clear Hcc.
-rewrite <- (rngl_abs_nonneg Hop Hor); [ | easy ].
-rewrite <- (rngl_abs_nonneg Hop Hor (rngl_cos θ1)); [ | easy ].
-apply (rngl_squ_le_abs_le Hop Hor Hii).
-specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H2.
-apply (rngl_add_move_r Hop) in H2.
-rewrite H2; clear H2.
-specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H2.
-apply (rngl_add_move_r Hop) in H2.
-rewrite H2; clear H2.
-apply (rngl_sub_le_mono_l Hop Hor).
-rewrite Hs21.
-apply (rngl_le_refl Hor).
 Qed.
 
 Theorem rngl_add_cos_nonneg_when_sin_nonneg :
@@ -1202,7 +1191,8 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     apply -> (rngl_lt_sub_0 Hop Hor) in Hcc.
     apply (rngl_opp_neg_pos Hop Hor) in Hzc2.
     apply (rngl_lt_le_incl Hor) in Hzc2.
-    now apply rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt.
+    now apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
+
   }
   apply
     (rngl_le_lt_trans Hor _
