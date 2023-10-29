@@ -2771,8 +2771,43 @@ clear H23 Hzs12 Haov H11.
             rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs13 |-*.
             rewrite <- (angle_sub_add_distr Hic Hop).
             rewrite (rngl_cos_sub_right_l Hon Hop) in Hzc1, Hzs13, H12.
-            rewrite (rngl_sin_sub_right_l Hon Hos) in Hs21.
+            rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs1, Hs21.
             do 2 rewrite (rngl_sin_sub_right_l Hon Hos).
+            specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le as H1.
+            specialize (H1 Hic Hon Hop Hed).
+            generalize Hzs3; intros H.
+            apply (rngl_lt_le_incl Hor) in H.
+            specialize (H1 θ3 θ1 H Hzc1 Hzc3 Hzs1 H12); clear H.
+clear Hzs13.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite rngl_add_comm.
+apply
+  (rngl_le_trans Hor _
+     (rngl_cos θ1 * rngl_cos θ1 + rngl_sin θ1 * rngl_sin θ3 +
+        rngl_sin θ1 * rngl_sin θ2)%L). 2: {
+  do 2 rewrite <- rngl_add_assoc.
+  apply (rngl_add_le_mono_r Hop Hor).
+  now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+}
+rewrite fold_rngl_squ.
+apply
+  (rngl_le_trans Hor _
+     ((rngl_cos θ1)² + rngl_sin θ3 * rngl_sin θ3 +
+       rngl_sin θ1 * rngl_sin θ2)%L). 2: {
+  do 2 rewrite <- rngl_add_assoc.
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite fold_rngl_squ.
+...
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H2.
+apply (rngl_add_move_r Hop) in H2.
+rewrite H2.
 ...
 (**)
 cbn in Hzs13.
