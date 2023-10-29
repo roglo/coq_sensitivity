@@ -2666,8 +2666,6 @@ split; intros H23. {
         specialize (rngl_add_cos_nonneg_when_sin_nonpos Hic Hon Hop Hed) as H2.
         specialize (rngl_add_cos_neg_when_sin_nonneg_neg Hic Hon Hop Hed) as H3.
         specialize (rngl_cos_lt_rngl_cos_sub Hic Hon Hop Hed) as H4.
-        specialize (rngl_sin_nonneg_nonneg_cos_nonneg_neg Hic Hon Hop Hed) as H5.
-        specialize (rngl_sin_nonneg_nonneg_cos_nonneg_neg2 Hic Hon Hop Hed) as H6.
 *)
 (**)
 remember (- θ1)%A as θ eqn:Hθ.
@@ -2676,7 +2674,7 @@ rewrite <- (angle_opp_involutive Hop) in Hθ.
 apply (angle_opp_inj Hop) in Hθ.
 subst θ1; rename θ into θ1.
 move θ1 after θ2.
-Search (rngl_sin _ ≤ rngl_cos _)%L.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
           specialize (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop) as H1.
