@@ -2668,13 +2668,13 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     rewrite <- (rngl_add_sub_swap Hop).
     rewrite <- (rngl_add_sub_assoc Hop).
     rewrite <- (rngl_mul_sub_distr_l Hop).
-    specialize rngl_cos_cos_sin_sin_nonneg_cos_le_sin_le as H1.
+    specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
     specialize (H1 Hic Hon Hop Hed).
     specialize (H1 θ2 θ3 Hzs2 Hzs3).
     assert (Hzc2 : (0 ≤ rngl_cos θ2)%L). {
       eapply (rngl_le_trans Hor); [ apply Hzc3 | easy ].
     }
-    specialize (H1 Hzc2 Hzc3 H23).
+    specialize (H1 Hzc2 Hzc3).
     apply (rngl_le_0_sub Hop Hor).
     rewrite (rngl_add_sub_swap Hop).
     rewrite <- (rngl_mul_sub_distr_l Hop).
@@ -2683,22 +2683,23 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
       now apply (rngl_le_0_sub Hop Hor).
     } {
       apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-      now apply (rngl_le_0_sub Hop Hor).
+      apply (rngl_le_0_sub Hop Hor).
+      now apply H1.
     }
   }
   apply (rngl_nle_gt Hor) in Hc3z.
+  remember (angle_straight - θ3)%A as θ.
+  apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+  subst θ3; rename θ into θ3.
+  move θ3 before θ2.
+  rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
+  rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
+  rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, H23, Hc3z |-*.
+  rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hzs13.
+  apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+  apply (rngl_le_0_sub Hop Hor) in H23.
+  rewrite (rngl_sub_opp_r Hop) in H23.
   destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs32]. {
-    remember (angle_straight - θ3)%A as θ.
-    apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
-    subst θ3; rename θ into θ3.
-    move θ3 before θ2.
-    rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
-    rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, H23, Hc3z |-*.
-    rewrite (rngl_sin_sub_straight_l Hon Hop) in Hs23, Hzs3, Hzs13.
-    apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
-    apply (rngl_le_0_sub Hop Hor) in H23.
-    rewrite (rngl_sub_opp_r Hop) in H23.
     cbn.
     rewrite (rngl_mul_opp_r Hop).
     rewrite (rngl_sub_opp_r Hop).
@@ -2722,6 +2723,10 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     }
   }
   apply (rngl_nle_gt Hor) in Hs32.
+Search (rngl_sin _ < rngl_sin _)%L.
+...
+Check rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt.
+Check rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt.
 ...
 Search (0 ≤ _ + _)%L.
   apply (rngl_le_add_le_sub_r).
