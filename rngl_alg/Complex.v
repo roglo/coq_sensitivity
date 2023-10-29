@@ -2745,6 +2745,16 @@ Search (rngl_cos _ ≤ rngl_cos _)%L.
             rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs12, Hzs2, Hs32.
             apply -> (rngl_opp_le_compat Hop Hor).
             rewrite (rngl_cos_sub_comm Hic Hop) in Hzs12.
+            apply -> (rngl_le_0_sub Hop Hor) in H12.
+clear H23 Hzs12 Haov H11.
+(**)
+...
+cbn.
+cbn in Hzs13.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+apply (rngl_le_sub_le_add_r Hop Hor).
+(**)
 ...
 Search (rngl_sin _ ≤ rngl_sin _)%L.
 apply rngl_cos_cos_sin_sin_nonneg_cos_le_sin_le; try easy.
