@@ -2697,6 +2697,16 @@ split; intros H23. {
               now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
             }
             move Hzc2 before Hzc1.
+            exfalso.
+            apply (rngl_nle_gt Hor) in Hs32.
+            apply Hs32; clear Hs32.
+            specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
+            specialize (H1 θ3 θ2 Hzs3 Hzs2 H23).
+            apply rngl_leb_le in Hzc3.
+            now rewrite Hzc3 in H1.
+          }
+          apply (rngl_nle_gt Hor) in Hc3z.
+          move Hc3z before Hzc1.
 ...
           move Hs32 before Hzs13.
           move H23 before Hs32.
