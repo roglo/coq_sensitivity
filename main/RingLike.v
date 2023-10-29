@@ -3410,6 +3410,60 @@ apply (rngl_le_lt_trans Hor _ b); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Theorem rngl_add_lt_compat :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a < b → c < d → a + c < b + d)%L.
+Proof.
+intros Hop Hor * Hab Hcd.
+apply (rngl_lt_trans Hor _ (a + d)%L). {
+  now apply (rngl_add_lt_mono_l Hop Hor).
+} {
+  now apply (rngl_add_lt_mono_r Hop Hor).
+}
+Qed.
+
+Theorem rngl_add_le_lt_mono :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a ≤ b)%L → (c < d)%L → (a + c < b + d)%L.
+Proof.
+intros Hop Hor * Hab Hcd.
+apply (rngl_lt_le_trans Hor _ (a + d))%L.
+now apply (rngl_add_lt_mono_l Hop Hor).
+now apply (rngl_add_le_mono_r Hop Hor).
+Qed.
+
+Theorem rngl_add_lt_le_mono :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a < b)%L → (c ≤ d)%L → (a + c < b + d)%L.
+Proof.
+intros Hop Hor * Hab Hcd.
+apply (rngl_lt_le_trans Hor _ (b + c))%L.
+now apply (rngl_add_lt_mono_r Hop Hor).
+now apply (rngl_add_le_mono_l Hop Hor).
+Qed.
+
+Theorem rngl_lt_sub_0 :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a - b < 0 ↔ a < b)%L.
+Proof.
+intros Hop Hor *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_add_lt_le_mono Hop Hor) as H1.
+split; intros Hab. {
+  specialize (H1 (a - b) 0 b b Hab (rngl_le_refl Hor _))%L.
+  rewrite (rngl_sub_add Hop) in H1.
+  now rewrite rngl_add_0_l in H1.
+} {
+  specialize (H1 a b (- b) (- b) Hab (rngl_le_refl Hor _))%L.
+  do 2 rewrite (rngl_add_opp_r Hop) in H1.
+  now rewrite (rngl_sub_diag Hos) in H1.
+}
+Qed.
+
 Theorem rngl_le_add_l :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ a → b ≤ a + b)%L.
@@ -3485,20 +3539,6 @@ split; intros Hab. {
 } {
   apply (rngl_sub_lt_mono_r Hop Hor _ _ a).
   now rewrite (rngl_add_sub Hos).
-}
-Qed.
-
-(**)
-Theorem rngl_add_lt_compat :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a b c d, (a < b → c < d → a + c < b + d)%L.
-Proof.
-intros Hop Hor * Hab Hcd.
-apply (rngl_lt_trans Hor _ (a + d)%L). {
-  now apply (rngl_add_lt_mono_l Hop Hor).
-} {
-  now apply (rngl_add_lt_mono_r Hop Hor).
 }
 Qed.
 
