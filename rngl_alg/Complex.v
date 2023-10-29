@@ -2675,6 +2675,7 @@ split; intros H23. {
           specialize (H1 θ1 _ Hzs1 Hzs2 Hzs12 Hzc1) as H11.
           specialize (H1 θ1 _ Hzs1 Hzs3 Hzs13 Hzc1) as H12.
           clear H1.
+          move Hzc1 before Hzs3.
           destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs32]. {
             cbn.
             apply (rngl_le_sub_le_add_r Hop Hor).
@@ -2690,6 +2691,16 @@ split; intros H23. {
             now apply (rngl_le_0_sub Hop Hor).
           }
           apply (rngl_nle_gt Hor) in Hs32.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+            move Hzc3 before Hzc1.
+            assert (Hzc2 : (0 ≤ rngl_cos θ2)%L). {
+              now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
+            }
+            move Hzc2 before Hzc1.
+...
+          move Hs32 before Hzs13.
+          move H23 before Hs32.
+...
           cbn.
           apply (rngl_le_sub_le_add_r Hop Hor).
           rewrite <- (rngl_sub_sub_distr Hop).
@@ -2707,6 +2718,12 @@ split; intros H23. {
           }
           apply (rngl_squ_le_abs_le Hop Hor Hii).
           do 2 rewrite (rngl_squ_mul Hic).
+...
+rewrite (rngl_sin_sub_rngl_sin Hic Hon Hop Hed).
+rewrite (rngl_cos_sub_rngl_cos Hic Hon Hop Hed).
+Search (angle_div_2 _ + angle_div_2 _)%A.
+rewrite <- angle_div_2_add_not_overflow.
+...
           rewrite (rngl_cos_add_rngl_cos Hic Hon Hop Hed) in H11.
 (* bof, c'était juste pour voir si ça marchait *)
 ...
