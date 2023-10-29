@@ -1039,6 +1039,30 @@ apply rngl_leb_le in Hzc2.
 now rewrite Hzc2 in H1.
 Qed.
 
+(* to be completed
+Theorem rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (rngl_cos θ2 < rngl_cos θ1)%L
+  → (rngl_sin θ1 < rngl_sin θ2)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hzc1 Hzc2 Hcc.
+specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
+specialize (H1 _ _ Hzs2 Hzs1).
+apply rngl_leb_le in Hzc2.
+now rewrite Hzc2 in H1.
+Qed.
+*)
+
 Theorem rngl_sin_nonneg_nonneg_cos_nonneg_neg2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
