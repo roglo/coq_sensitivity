@@ -2721,6 +2721,19 @@ split; intros H23. {
             }
           }
           apply (rngl_nle_gt Hor) in Hs32.
+          remember (θ3 - angle_right)%A as θ.
+          apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+          subst θ3; rename θ into θ3.
+          move θ3 before θ2.
+          rewrite (angle_add_assoc Hop) in Haov, Hzs13 |-*.
+          rewrite (rngl_cos_add_right_r Hon Hop) in H23, Haov, Hc3z |-*.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3, Hzs13, Hs32.
+          apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+          move Hc3z before Hzs2.
+          move Hzc1 before Hc3z.
+          rewrite <- (rngl_sub_0_l Hop).
+          apply (rngl_le_sub_le_add_r Hop Hor).
+          cbn.
 ...
 cbn.
 apply (rngl_le_add_le_sub_l Hop Hor).
