@@ -3892,7 +3892,7 @@ split; intros Hab. {
 }
 Qed.
 
-Theorem rngl_0_le_abs :
+Theorem rngl_abs_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ rngl_abs a)%L.
@@ -4075,7 +4075,7 @@ split. 2: {
   rewrite (rngl_opp_involutive Hop) in H.
   now rewrite (rngl_opp_0 Hop) in H.
 }
-apply (rngl_0_le_abs Hop Hor).
+apply (rngl_abs_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_abs_div :
@@ -5576,7 +5576,7 @@ destruct (rngl_lt_dec Hor (rngl_abs a) 1)%L as [H1x| H1x]. {
   exists 0; cbn.
   rewrite rngl_add_0_r.
   split; [ | easy ].
-  apply (rngl_0_le_abs Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
 }
 destruct (rngl_lt_dec Hor 1 (rngl_abs a))%L as [Hx1| Hx1]. 2: {
   apply (rngl_nlt_ge Hor) in H1x, Hx1.

@@ -3845,8 +3845,8 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_taxi_dist.
 split; intros H12. {
   apply (rngl_eq_add_0 Hor) in H12; cycle 1.
-  apply (rngl_0_le_abs Hop Hor).
-  apply (rngl_0_le_abs Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
   destruct H12 as (Hcc, Hss).
   apply (eq_rngl_abs_0 Hop) in Hcc, Hss.
   apply -> (rngl_sub_move_0_r Hop) in Hcc.
