@@ -2722,6 +2722,93 @@ split; intros H23. {
           }
           apply (rngl_nle_gt Hor) in Hs32.
 ...
+cbn.
+apply (rngl_le_add_le_sub_l Hop Hor).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_le_add_le_sub_r Hop Hor).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  now apply (rngl_le_0_sub Hop Hor).
+}
+rewrite <- (rngl_abs_nonneg Hop Hor (_ * _))%L. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+do 2 rewrite (rngl_squ_mul Hic).
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H2.
+apply (rngl_add_move_l Hop) in H2.
+rewrite H2; clear H2.
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_le_sub_le_add_r Hop Hor).
+rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_squ_sub Hop Hic Hon (rngl_cos θ2)).
+rewrite (rngl_squ_sub Hop Hic Hon (rngl_sin θ2)) at 2.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_sub_swap Hop _²)%L.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+rewrite <- (rngl_add_sub_swap Hop).
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+(*
+rewrite <- (rngl_sub_add_distr Hos).
+replace (_ * _ + _)%L with (rngl_cos (θ3 - θ2)). 2: {
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_mul_comm Hic (rngl_cos θ3)); f_equal.
+  apply (rngl_mul_comm Hic).
+}
+*)
+rewrite (rngl_squ_sub Hop Hic Hon (rngl_sin θ2)).
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H2.
+apply (rngl_add_move_l Hop) in H2.
+rewrite H2; clear H2.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ3) as H2.
+apply (rngl_add_move_l Hop) in H2.
+rewrite H2; clear H2.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop 2)%L.
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic _ 2)%L.
+rewrite (rngl_sub_sub_swap Hop 1)%L.
+rewrite (rngl_mul_sub_distr_l Hop (_ * _²))%L.
+apply (rngl_le_add_le_sub_l Hop Hor).
+do 2 rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+do 2 rewrite <- (rngl_add_sub_assoc Hop).
+apply (rngl_le_add_le_sub_r Hop Hor).
+do 2 rewrite (rngl_sub_sub_distr Hop).
+do 2 rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- rngl_add_assoc.
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_mul_mul_swap Hic).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite (rngl_add_sub_assoc Hop).
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H2.
+apply (rngl_add_move_l Hop) in H2.
+rewrite <- H2.
+....
+rewrite (rngl_add_sub_swap Hop).
+apply (rngl_le_sub_le_add_r Hop Hor).
+...
           destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z ]. {
             assert (Hc23 : (rngl_cos θ2 < rngl_cos θ3)%L). {
               apply (rngl_lt_le_incl Hor) in Hc3z.
