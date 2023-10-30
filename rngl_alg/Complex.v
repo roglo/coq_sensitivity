@@ -2721,6 +2721,8 @@ split; intros H23. {
             }
           }
           apply (rngl_nle_gt Hor) in Hs32.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+...
           remember (θ3 - angle_right)%A as θ.
           apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
           subst θ3; rename θ into θ3.
@@ -2733,7 +2735,6 @@ split; intros H23. {
           move Hzc1 before Hc3z.
           rewrite <- (rngl_sub_0_l Hop).
           apply (rngl_le_sub_le_add_r Hop Hor).
-          cbn.
 ...
 cbn.
 apply (rngl_le_add_le_sub_l Hop Hor).
