@@ -4030,7 +4030,7 @@ rewrite <- (rngl_abs_opp Hop Hor).
 now rewrite (rngl_opp_sub_distr Hop).
 Qed.
 
-Theorem rngl_abs_nonneg :
+Theorem rngl_abs_nonneg_eq :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ a)%L → rngl_abs a = a.
@@ -4045,7 +4045,7 @@ subst a.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem rngl_abs_nonpos :
+Theorem rngl_abs_nonpos_eq :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a : T, (a ≤ 0)%L → rngl_abs a = (- a)%L.
@@ -4053,7 +4053,7 @@ Proof.
 intros Hop Hor * Haz.
 rewrite <- (rngl_opp_involutive Hop a) at 1.
 rewrite (rngl_abs_opp Hop Hor).
-apply (rngl_abs_nonneg Hop Hor).
+apply (rngl_abs_nonneg_eq Hop Hor).
 rewrite <- (rngl_opp_0 Hop).
 now apply -> (rngl_opp_le_compat Hop Hor).
 Qed.
@@ -5258,7 +5258,7 @@ destruct (rngl_lt_dec Hor a 0%L) as [H12| H12]. {
   specialize (H1 H); clear H.
   exfalso.
   apply (rngl_nlt_ge Hor) in H1; apply H1; clear H1.
-  rewrite (rngl_abs_nonpos Hop Hor). 2: {
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
@@ -5286,7 +5286,7 @@ destruct (rngl_lt_dec Hor 0%L a) as [H21| H21]. {
   specialize (H1 H); clear H.
   exfalso.
   apply (rngl_nlt_ge Hor) in H1; apply H1.
-  rewrite (rngl_abs_nonneg Hop Hor). 2: {
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
@@ -5529,7 +5529,7 @@ apply Hdsep.
 apply (rngl_abs_le_ε Hon Hop Hiv Hor).
 intros ε Hε.
 specialize (Hu ε Hε).
-rewrite (rngl_abs_nonneg Hop Hor); [ | apply Hdpos ].
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ | apply Hdpos ].
 apply (rngl_lt_le_incl Hor).
 eapply (rngl_le_lt_trans Hor); [ | apply Hu ].
 apply (rngl_le_refl Hor).

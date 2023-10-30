@@ -115,7 +115,7 @@ rewrite <- (rngl_squ_0 Hos) in H1 at 2.
 rewrite <- rngl_squ_pow_2 in H1.
 apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
 rewrite (rngl_abs_0 Hop) in H1.
-rewrite (rngl_abs_nonneg Hop Hor) in H1; [ easy | ].
+rewrite (rngl_abs_nonneg_eq Hop Hor) in H1; [ easy | ].
 apply rl_sqrt_nonneg, (rngl_le_refl Hor).
 Qed.
 
@@ -142,7 +142,7 @@ Proof.
 intros Hic Hon Hop Hiv Hor *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_add_nonneg_nonneg Hor). {
     apply rl_sqrt_nonneg.
     apply (rngl_add_squ_nonneg Hop Hor).
@@ -151,7 +151,7 @@ rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
     apply (rngl_add_squ_nonneg Hop Hor).
   }
 }
-rewrite <- (rngl_abs_nonneg Hop Hor (√_))%L. 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
   apply rl_sqrt_nonneg.
   apply (rngl_add_squ_nonneg Hop Hor).
 }
@@ -187,7 +187,7 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 eapply (rngl_le_trans Hor); [ apply (rngl_le_abs Hop Hor) | ].
-rewrite <- (rngl_abs_nonneg Hop Hor). 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply rl_sqrt_nonneg.
     apply (rngl_add_squ_nonneg Hop Hor).
