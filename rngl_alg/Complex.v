@@ -2756,6 +2756,36 @@ rewrite (rngl_sub_sub_swap Hop).
 rewrite (rngl_sub_diag Hos).
 rewrite (rngl_sub_0_l Hop).
 rewrite (rngl_add_opp_l Hop).
+(**)
+remember (rngl_abs (rngl_sin θ'))%L as x eqn:Hx.
+remember (rngl_abs (rngl_sin θ))%L as y eqn:Hy.
+destruct (rngl_le_dec Hor x y) as [Hxy| Hxy]. {
+  apply (rngl_le_trans Hor _ 0). {
+    now apply (rngl_le_sub_0 Hop Hor).
+  }
+  now apply (rngl_le_0_sub Hop Hor).
+}
+apply (rngl_nle_gt Hor) in Hxy.
+(*
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (x - y))%L. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+*)
+subst x y.
+...
+rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+  now apply (rngl_le_0_sub Hop Hor).
+}
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+...
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+do 2 rewrite (rngl_squ_abs Hop).
+do 2 rewrite <- (rngl_sub_sub_distr Hop).
+...
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_sub_sub_distr Hop).
+...
 specialize (cos2_sin2_1 Hon Hop Hic Hed θ) as H1.
 apply (rngl_add_move_l Hop) in H1.
 apply (f_equal rl_sqrt) in H1.
@@ -2766,17 +2796,41 @@ apply (rngl_add_move_l Hop) in H1.
 apply (f_equal rl_sqrt) in H1.
 rewrite (rl_sqrt_squ Hop Hor) in H1.
 rewrite H1; clear H1.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-  now apply (rngl_le_0_sub Hop Hor).
-}
 remember (√_)%L as x eqn:Hx.
 remember (√_)%L as y eqn:Hy in |-*.
 destruct (rngl_le_dec Hor x y) as [Hxy| Hxy]. {
   apply (rngl_le_trans Hor _ 0). {
     now apply (rngl_le_sub_0 Hop Hor).
   }
-Search (0 ≤ rngl_abs _)%L.
-Check rngl_abs_nonneg.
+  now apply (rngl_le_0_sub Hop Hor).
+}
+apply (rngl_nle_gt Hor) in Hxy.
+(*
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (x - y))%L. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+*)
+subst x y.
+...
+apply (rngl_squ_le_abs_le Hop Hor Hii).
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_squ_1 Hon).
+  apply (rngl_abs_le_squ_le Hop Hor).
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  apply -> (rngl_abs_le Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_squ_1 Hon).
+  apply (rngl_abs_le_squ_le Hop Hor).
+  rewrite (rngl_abs_1 Hon Hop Hor).
+  apply -> (rngl_abs_le Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
 ...
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ - _))%L. 2: {
   apply (rngl_le_0_sub Hop Hor).
