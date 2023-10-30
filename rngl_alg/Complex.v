@@ -2685,18 +2685,19 @@ split; intros H23. {
             }
           }
           apply (rngl_nle_gt Hor) in Hc3z.
-          remember (angle_straight - θ3)%A as θ.
-          apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
-          subst θ3; rename θ into θ3.
-          move θ3 before θ2.
-          rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
-          rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
-          rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, H23, Hc3z |-*.
-          rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hzs13.
-          apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
-          apply (rngl_le_0_sub Hop Hor) in H23.
-          rewrite (rngl_sub_opp_r Hop) in H23.
-          destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3)) as [Hs23| Hs32]. {
+          destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
+              as [Hs23| Hs32]. {
+            remember (angle_straight - θ3)%A as θ.
+            apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
+            rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
+            rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, H23, Hc3z |-*.
+            rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hzs13, Hs23.
+            apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+            apply (rngl_le_0_sub Hop Hor) in H23.
+            rewrite (rngl_sub_opp_r Hop) in H23.
             cbn.
             rewrite (rngl_mul_opp_r Hop).
             rewrite (rngl_sub_opp_r Hop).
@@ -2721,9 +2722,11 @@ split; intros H23. {
           }
           apply (rngl_nle_gt Hor) in Hs32.
 ...
-  assert (Hc23 : (rngl_cos θ2 < rngl_cos θ3)%L). {
-    apply (rngl_lt_le_incl Hor) in Hc3z.
-    apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z ]. {
+            assert (Hc23 : (rngl_cos θ2 < rngl_cos θ3)%L). {
+              apply (rngl_lt_le_incl Hor) in Hc3z.
+              apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+            }
 ...
 Check rngl_cos_cos_sin_sin_nonneg_cos_lt_sin_lt.
 Check rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt.
