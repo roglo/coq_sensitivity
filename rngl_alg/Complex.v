@@ -2836,6 +2836,7 @@ split; intros H23. {
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
+...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
 specialize (angle_eucl_dist_is_dist Hic Hon Hop Hed) as H1.
