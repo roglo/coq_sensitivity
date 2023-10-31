@@ -2795,7 +2795,6 @@ induction b; intros. {
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
 apply Nat.succ_le_mono in Hab.
 cbn.
-...
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2837,6 +2836,8 @@ split; intros H23. {
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
+        rename H23 into Hc32.
+(*
 ...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
@@ -2857,6 +2858,7 @@ rewrite (rngl_sub_0_r Hos) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
 rewrite (rngl_squ_opp Hop) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
 rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
 ...
+*)
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
             cbn.
@@ -2892,11 +2894,11 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
             move θ3 before θ2.
             rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
             rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
-            rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, H23, Hc3z |-*.
+            rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, Hc32, Hc3z |-*.
             rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hzs13, Hs23.
             apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
-            apply (rngl_le_0_sub Hop Hor) in H23.
-            rewrite (rngl_sub_opp_r Hop) in H23.
+            apply (rngl_le_0_sub Hop Hor) in Hc32.
+            rewrite (rngl_sub_opp_r Hop) in Hc32.
             cbn.
             rewrite (rngl_mul_opp_r Hop).
             rewrite (rngl_sub_opp_r Hop).
@@ -2921,6 +2923,12 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
           }
           apply (rngl_nle_gt Hor) in Hs32.
           destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+            move Hs32 after Hc32.
+            move Haov at bottom.
+            move Hzc1 before Hzs3.
+            move Hzc2 before Hzc1.
+            move Hc3z before Hzc2.
+...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
 specialize (angle_eucl_dist_is_dist Hic Hon Hop Hed) as H1.
