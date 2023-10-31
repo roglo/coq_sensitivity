@@ -3031,6 +3031,20 @@ rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 apply (rngl_le_add_le_sub_r Hop Hor).
 rewrite <- (rngl_mul_sub_distr_l Hop).
+            remember (angle_straight - θ3)%A as θ.
+            apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_comm Hic) in Haov, Hzs13.
+            rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13.
+            rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc3z, Haov, Hc32 |-*.
+            rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hs32, Hzs13 |-*.
+            apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+            rewrite (rngl_sub_opp_r Hop).
+            rewrite <- (rngl_sub_0_l Hop) in Hc32, Haov.
+            apply (rngl_le_sub_le_add_r Hop Hor) in Hc32, Haov.
+cbn in Haov.
+clear Haov Hc32 Hzs12.
 ...
 rewrite (rngl_cos_sub_rngl_cos Hic Hon Hop Hed).
 rewrite (rngl_sin_sub_rngl_sin Hic Hon Hop Hed).
