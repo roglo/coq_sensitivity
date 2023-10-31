@@ -2795,6 +2795,7 @@ induction b; intros. {
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
 apply Nat.succ_le_mono in Hab.
 cbn.
+...
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
