@@ -2842,13 +2842,18 @@ specialize (angle_eucl_dist_is_dist Hic Hon Hop Hed) as H1.
 destruct H1 as (Hdsym, Hdsep, Hdtri).
 specialize (Hdtri (θ1 + θ2) θ1 0)%A as H1.
 replace 0%L with (rngl_sin 0) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13 by easy.
-apply (rngl_sin_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hzs1.
+apply (rngl_sin_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hzs1, Hzs2, Hzs3.
+apply (rngl_sin_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hzs12, Hzs13.
 progress unfold angle_eucl_dist in Hzs1 at 2.
-cbn in Hzs1.
-rewrite (rngl_sub_0_l Hop) in Hzs1.
-rewrite (rngl_sub_0_r Hos) in Hzs1.
-rewrite (rngl_squ_opp Hop) in Hzs1.
-rewrite (rngl_squ_1 Hon) in Hzs1.
+progress unfold angle_eucl_dist in Hzs2 at 2.
+progress unfold angle_eucl_dist in Hzs3 at 2.
+progress unfold angle_eucl_dist in Hzs12 at 2.
+progress unfold angle_eucl_dist in Hzs13 at 2.
+cbn in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+rewrite (rngl_sub_0_l Hop) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+rewrite (rngl_sub_0_r Hos) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+rewrite (rngl_squ_opp Hop) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
 ...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
