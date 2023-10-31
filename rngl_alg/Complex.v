@@ -2746,6 +2746,12 @@ split; intros H23. {
       destruct zs3. {
         apply rngl_leb_le in Hzs3.
         apply rngl_leb_le in H23.
+apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
+apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
+specialize (angle_eucl_dist_is_dist Hic Hon Hop Hed) as H1.
+destruct H1 as (Hdsym, Hdsep, Hdtri).
+specialize (Hdtri (θ1 + θ2) θ1 0)%A as H1.
+...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
             cbn.
