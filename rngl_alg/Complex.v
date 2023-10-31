@@ -2888,34 +2888,17 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
           apply (rngl_nle_gt Hor) in Hc3z.
           destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
               as [Hs23| Hs32]. {
-            remember (angle_straight - θ3)%A as θ.
-            apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
-            subst θ3; rename θ into θ3.
-            move θ3 before θ2.
-            rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
-            rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
-            rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, Hc32, Hc3z |-*.
-            rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hzs13, Hs23.
-            apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
-            apply (rngl_le_0_sub Hop Hor) in Hc32.
-            rewrite (rngl_sub_opp_r Hop) in Hc32.
             cbn.
-            rewrite (rngl_mul_opp_r Hop).
-            rewrite (rngl_sub_opp_r Hop).
-            rewrite (rngl_opp_add_distr Hop).
-            apply (rngl_le_sub_le_add_l Hop Hor).
-            rewrite (rngl_add_sub_assoc Hop).
-            rewrite (rngl_mul_comm Hic (rngl_cos θ3)).
-            rewrite <- rngl_mul_add_distr_l.
-            rewrite (rngl_add_comm (rngl_cos θ3)).
-            apply (rngl_le_0_sub Hop Hor).
-            rewrite (rngl_sub_opp_r Hop).
+            apply (rngl_le_sub_le_add_r Hop Hor).
             rewrite <- (rngl_add_sub_swap Hop).
             rewrite <- (rngl_add_sub_assoc Hop).
-            rewrite (rngl_mul_comm Hic (rngl_sin θ3)).
+            rewrite <- (rngl_mul_sub_distr_l Hop).
+            apply (rngl_le_0_sub Hop Hor).
+            rewrite (rngl_add_sub_swap Hop).
             rewrite <- (rngl_mul_sub_distr_l Hop).
             apply (rngl_add_nonneg_nonneg Hor). {
-              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+              apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+              now apply (rngl_le_0_sub Hop Hor).
             } {
               apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
               now apply (rngl_le_0_sub Hop Hor).
