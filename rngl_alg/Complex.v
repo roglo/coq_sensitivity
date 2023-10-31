@@ -2928,6 +2928,7 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
             move Hzc1 before Hzs3.
             move Hzc2 before Hzc1.
             move Hc3z before Hzc2.
+(*
 ...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
@@ -3039,6 +3040,7 @@ progress unfold cos2_sin2_prop in Hxy, Hxy'.
           rewrite <- (rngl_sub_0_l Hop).
           apply (rngl_le_sub_le_add_r Hop Hor).
 ...
+*)
 cbn.
 apply (rngl_le_add_le_sub_l Hop Hor).
 rewrite (rngl_add_sub_assoc Hop).
@@ -3046,6 +3048,21 @@ rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 apply (rngl_le_add_le_sub_r Hop Hor).
 rewrite <- (rngl_mul_sub_distr_l Hop).
+...
+rewrite (rngl_cos_sub_rngl_cos Hic Hon Hop Hed).
+rewrite (rngl_sin_sub_rngl_sin Hic Hon Hop Hed).
+do 3 rewrite rngl_mul_assoc.
+...
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii). {
+  cbn.
+  apply rngl_leb_le in Hzs2, Hzs3.
+  rewrite Hzs2, Hzs3.
+  do 2 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_add_opp_l Hop).
+  rewrite <- rl_sqrt_mul.
+  rewrite <- rl_sqrt_mul.
+...
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
   now apply (rngl_le_0_sub Hop Hor).
