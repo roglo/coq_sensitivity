@@ -2795,6 +2795,13 @@ induction b; intros. {
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
 apply Nat.succ_le_mono in Hab.
 cbn.
+assert (H : angle_mul_nat_overflow b θ = false). {
+  cbn in Hb.
+  destruct b; [ easy | ].
+  now apply Bool.orb_false_iff in Hb.
+}
+specialize (IHb H _ Hab); clear H.
+...
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
