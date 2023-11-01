@@ -2926,11 +2926,11 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
             }
           }
           apply (rngl_nle_gt Hor) in Hs32.
+          move Hs32 after Hc32.
+          move Haov at bottom.
+          move Hzc1 before Hzs3.
 ...
           destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-            move Hs32 after Hc32.
-            move Haov at bottom.
-            move Hzc1 before Hzs3.
             move Hzc2 before Hzc1.
             move Hc3z before Hzc2.
 (*
