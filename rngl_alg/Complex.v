@@ -2698,6 +2698,26 @@ split; intros Hθθ. {
 }
 Qed.
 
+Theorem angle_mul_nat_overflow_succ_l_false :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ n,
+  angle_mul_nat_overflow (S n) θ = false
+  → angle_mul_nat_overflow n θ = false ∧
+    angle_add_overflow θ (n * θ)%A = false.
+Proof.
+intros Hon Hos * Hn.
+destruct n. {
+  split; [ easy | cbn ].
+  progress unfold angle_add_overflow.
+  rewrite (angle_add_0_r Hon Hos).
+  apply angle_ltb_ge.
+  apply angle_leb_refl.
+}
+remember (S n) as sn; cbn in Hn; subst sn.
+now apply Bool.orb_false_iff in Hn.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2792,15 +2812,10 @@ induction b; intros. {
   apply Nat.le_0_r in Hab; subst a.
   apply (angle_leb_refl).
 }
-destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | ].
+destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | cbn ].
 apply Nat.succ_le_mono in Hab.
-cbn.
-assert (H : angle_mul_nat_overflow b θ = false). {
-  cbn in Hb.
-  destruct b; [ easy | ].
-  now apply Bool.orb_false_iff in Hb.
-}
-specialize (IHb H _ Hab); clear H.
+destruct (angle_mul_nat_overflow_succ_l_false Hon Hos θ b Hb) as (H1, H2).
+specialize (IHb H1 _ Hab).
 ...
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
