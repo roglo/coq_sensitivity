@@ -2828,12 +2828,19 @@ Theorem angle_add_le_mono_l :
 Proof.
 intros Hic Hon Hop Hed * Haov.
 Theorem glop :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
   (θ1 - θ2 ≤ θ3 → θ1 ≤ θ2 + θ3)%A.
 Proof.
-intros Hop.
+intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * Hc123.
 progress unfold angle_leb in Hc123.
 progress unfold angle_leb.
@@ -2879,6 +2886,50 @@ destruct zs1. {
             }
             apply (rngl_nle_gt Hor) in Hzc3.
             move Hzc3 before Hzc2.
+(**)
+...
+            exfalso.
+            apply (rngl_nlt_ge Hor) in Hzs12.
+            apply Hzs12; clear Hzs12.
+            cbn.
+            rewrite (rngl_mul_opp_r Hop).
+            rewrite (rngl_add_opp_l Hop).
+            apply (rngl_lt_sub_0 Hop Hor).
+            rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+              now apply (rngl_mul_nonneg_nonneg Hop).
+            }
+            rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_sin θ1 * _))%L. 2: {
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+            apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+            do 2 rewrite (rngl_squ_mul Hic).
+            specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+            apply (rngl_add_move_l Hop) in H1.
+            rewrite H1; clear H1.
+            specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+            apply (rngl_add_move_l Hop) in H1.
+            rewrite H1; clear H1.
+            rewrite (rngl_mul_sub_distr_r Hop).
+            rewrite (rngl_mul_1_l Hon).
+            apply (rngl_lt_sub_lt_add_l Hop Hor).
+            rewrite <- rngl_mul_add_distr_l.
+            rewrite (rngl_add_sub_assoc Hop).
+            rewrite rngl_add_comm.
+            rewrite (rngl_add_sub Hos).
+            rewrite (rngl_mul_1_r Hon).
+            apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+            rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+            rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+...
+            apply (rngl_nlt_ge Hor) in Hc123.
+            apply Hc123; clear Hc123.
+            cbn.
+            rewrite (rngl_mul_opp_r Hop).
+            rewrite (rngl_sub_opp_r Hop).
+            cbn in Hzs12.
+            rewrite (rngl_mul_opp_r Hop) in Hzs12.
+            rewrite (rngl_add_opp_l Hop) in Hzs12.
+            apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
 ...
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
