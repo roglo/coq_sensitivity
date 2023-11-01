@@ -2929,6 +2929,30 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
           move Hs32 after Hc32.
           move Haov at bottom.
           move Hzc1 before Hzs3.
+(**)
+          remember (angle_straight - θ3)%A as θ.
+          apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+          subst θ3; rename θ into θ3.
+          move θ3 before θ2.
+          rewrite (angle_add_comm Hic) in Haov, Hzs13 |-*.
+          rewrite <- (angle_sub_sub_distr Hic Hop) in Haov, Hzs13 |-*.
+          rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, Hc3z, Hc32 |-*.
+          rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3, Hs32, Hzs13.
+          apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+          apply (rngl_le_0_sub Hop Hor).
+          rewrite (rngl_sub_opp_r Hop).
+...
+          cbn.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_sub_opp_r Hop).
+...
+apply rngl_opp_nonpos_nonneg.
+...
+          apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+          move Hc3z before Hzs2.
+          move Hzc1 before Hc3z.
+          rewrite <- (rngl_sub_0_l Hop).
+          apply (rngl_le_sub_le_add_r Hop Hor).
 ...
           destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
             move Hzc2 before Hzc1.
