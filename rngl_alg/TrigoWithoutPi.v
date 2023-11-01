@@ -2836,6 +2836,7 @@ rewrite (rngl_squ_mul Hic (rngl_sin _)).
 specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
 apply (rngl_add_move_l Hop) in H1.
 rewrite H1; clear H1.
+(* thanks to Geoffroy *)
 specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
 apply (rngl_add_move_l Hop) in H1.
 rewrite H1; clear H1.
