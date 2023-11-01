@@ -2827,6 +2827,46 @@ Theorem angle_add_le_mono_l :
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
 intros Hic Hon Hop Hed * Haov.
+Theorem glop :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3,
+  (θ1 - θ2 ≤ θ3 → θ1 ≤ θ2 + θ3)%A.
+Proof.
+intros Hop.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hc123.
+progress unfold angle_leb in Hc123.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+remember (0 ≤? rngl_sin (θ1 - θ2))%L as zs12 eqn:Hzs12.
+remember (0 ≤? rngl_sin (θ2 + θ3))%L as zs23 eqn:Hzs23.
+symmetry in Hzs1, Hzs3, Hzs12, Hzs23.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs23; [ | easy ].
+  apply rngl_leb_le in Hzs23.
+  apply rngl_leb_le.
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    destruct zs3. {
+      apply rngl_leb_le in Hzs3.
+      apply rngl_leb_le in Hc123.
+      move Hzs12 before Hzs23.
+      cbn in Hc123, Hzs12, Hzs23 |-*.
+      rewrite (rngl_mul_opp_r Hop) in Hc123, Hzs12.
+      rewrite (rngl_sub_opp_r Hop) in Hc123.
+      rewrite (rngl_add_opp_l Hop) in Hzs12.
+      apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+      apply (rngl_le_sub_le_add_r Hop Hor).
+      move Hzs1 after Hzs3.
+... ...
+split; intros H13. {
+  apply glop.
+  rewrite (angle_add_comm Hic).
+  now rewrite (angle_add_sub Hic Hon Hop Hed).
+...
+intros Hic Hon Hop Hed * Haov.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -2929,7 +2969,7 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
           move Hs32 after Hc32.
           move Haov at bottom.
           move Hzc1 before Hzs3.
-cbn.
+...
 cbn.
 apply (rngl_le_add_le_sub_l Hop Hor).
 rewrite (rngl_add_sub_assoc Hop).
