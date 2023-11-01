@@ -2814,9 +2814,9 @@ induction b; intros. {
 }
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | cbn ].
 apply Nat.succ_le_mono in Hab.
-destruct (angle_mul_nat_overflow_succ_l_false Hon Hos θ b Hb) as (H1, H2).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
+destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
-...
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2926,6 +2926,7 @@ rewrite (rngl_squ_1 Hon) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
             }
           }
           apply (rngl_nle_gt Hor) in Hs32.
+...
           destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
             move Hs32 after Hc32.
             move Haov at bottom.
