@@ -2853,13 +2853,37 @@ destruct zs1. {
       apply rngl_leb_le in Hzs3.
       apply rngl_leb_le in Hc123.
       move Hzs12 before Hzs23.
+(*
       cbn in Hc123, Hzs12, Hzs23 |-*.
       rewrite (rngl_mul_opp_r Hop) in Hc123, Hzs12.
       rewrite (rngl_sub_opp_r Hop) in Hc123.
       rewrite (rngl_add_opp_l Hop) in Hzs12.
       apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
       apply (rngl_le_sub_le_add_r Hop Hor).
+*)
       move Hzs1 after Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_sin θ2))%L as [Hzs2| Hs2z]. {
+        move Hzs2 after Hzs3.
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+          move Hzc1 before Hzs3.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
+            move Hzc2 before Hzc1.
+            destruct (rngl_le_dec Hor (rngl_cos θ3) 0)%L as [Hc3z| Hzc3]. {
+              cbn.
+              apply (rngl_le_sub_le_add_r Hop Hor).
+              apply (rngl_le_trans Hor _ 0). {
+                now apply (rngl_mul_nonneg_nonpos Hop Hor).
+              }
+              apply (rngl_add_nonneg_nonneg Hor); [ easy | ].
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+            apply (rngl_nle_gt Hor) in Hzc3.
+            move Hzc3 before Hzc2.
+...
+destruct θ1 as (c1, s1, Hcs1).
+destruct θ2 as (c2, s2, Hcs2).
+destruct θ3 as (c3, s3, Hcs3).
+cbn in *.
 ... ...
 split; intros H13. {
   apply glop.
