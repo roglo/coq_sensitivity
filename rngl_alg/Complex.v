@@ -2838,12 +2838,11 @@ split; intros H23. {
         apply rngl_leb_le in H23.
         rename H23 into Hc32.
 (*
-...
-apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, H23.
+apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Haov, Hc32.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
 specialize (angle_eucl_dist_is_dist Hic Hon Hop Hed) as H1.
 destruct H1 as (Hdsym, Hdsep, Hdtri).
-specialize (Hdtri (θ1 + θ2) θ1 0)%A as H1.
+specialize (Hdtri (θ1 + θ2) 0 (θ1 + θ3))%A as H1.
 replace 0%L with (rngl_sin 0) in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13 by easy.
 apply (rngl_sin_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hzs1, Hzs2, Hzs3.
 apply (rngl_sin_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hzs12, Hzs13.
