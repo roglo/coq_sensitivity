@@ -2774,6 +2774,15 @@ Theorem fold_cos_add :
   rngl_cos (θ1 + θ2).
 Proof. easy. Qed.
 
+Theorem fold_sin_add :
+  ∀ θ1 θ2,
+  (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L =
+  rngl_sin (θ1 + θ2).
+Proof.
+intros.
+apply rngl_add_comm.
+Qed.
+
 Theorem fold_sin_sub :
   rngl_has_opp T = true →
   ∀ θ1 θ2,
@@ -2903,7 +2912,9 @@ Theorem angle_le_sub_le_add_l :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ2 θ3 = false
-  → (θ1 - θ2 ≤ θ3 → θ1 ≤ θ2 + θ3)%A.
+  → (θ2 ≤ θ1)%A
+  → (θ1 - θ2 ≤ θ3)%A
+  → (θ1 ≤ θ2 + θ3)%A.
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
@@ -2913,7 +2924,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Haov H123.
+  intros * Haov H21 H123.
   progress unfold angle_leb.
   rewrite (H1 (rngl_sin θ1)).
   rewrite (rngl_leb_refl Hor).
@@ -2924,7 +2935,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_leb_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
-intros * Haov Hc123.
+intros * Haov H21 Hc123.
 progress unfold angle_leb in Hc123.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -3084,10 +3095,59 @@ destruct zs1. {
           rewrite Hzs2, Hzs23 in Haov.
           apply rngl_leb_le in Hzs2, Hzs23.
           apply rngl_leb_le in Haov.
-...
+          progress unfold angle_leb in H21.
+          rewrite (rngl_cos_add_right_r Hon Hop) in H21.
+          rewrite (rngl_sin_add_right_r Hon Hos) in H21.
+          apply rngl_leb_le in Hzs1, Hzs2.
+          rewrite Hzs2, Hzs1 in H21.
+          apply rngl_leb_le in Hzs1, Hzs2.
+          apply rngl_leb_le in H21.
+          (* H21: aucun intérêt *)
           specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
           specialize (H1 Hic Hon Hop Hed).
-          apply H1; try easy.
+          apply H1; try easy. {
+            apply (rngl_add_nonneg_nonneg Hor). {
+              apply (rngl_lt_le_incl Hor) in Hc3z.
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            } {
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            }
+          } {
+            now apply (rngl_lt_le_incl Hor) in Hc1z.
+          }
+          clear H1.
+          cbn.
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_sin θ1) Hc1z).
+          apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ3) Hc3z)
+            in Hc123.
+          rewrite rngl_mul_assoc.
+          eapply (rngl_le_trans Hor); [ apply Hc123 | ].
+          rewrite (rngl_mul_add_distr_r).
+          rewrite (rngl_mul_sub_distr_l Hop).
+          do 2 rewrite fold_rngl_squ.
+...
+          specialize (cos2_sin2_1 Hon Hop Hic Hed θ3) as H1.
+          apply (rngl_add_move_l Hop) in H1.
+          rewrite H1; clear H1.
+          rewrite <- (rngl_add_sub_swap Hop).
+          apply (rngl_le_sub_le_add_r Hop Hor).
+          rewrite <- (rngl_add_sub_swap Hop).
+          progress unfold rngl_squ at 2.
+          rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
+          rewrite (rngl_mul_comm Hic (rngl_sin θ2)).
+          rewrite <- (rngl_mul_assoc (rngl_cos θ3)).
+          rewrite <- (rngl_add_sub_assoc Hop).
+          rewrite <- (rngl_mul_sub_distr_l Hop).
+...
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
+          rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
+          rewrite <- (rngl_sub_add_distr Hos).
+          do 2 rewrite <- rngl_mul_assoc.
+          rewrite <- rngl_mul_add_distr_l.
+          rewrite (rngl_mul_comm Hic (rngl_cos θ3)).
+          rewrite fold_sin_add.
 ...
             assert (H : (0 ≤ rngl_cos (θ1 - θ2))%L). {
               now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
