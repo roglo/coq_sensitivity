@@ -2946,12 +2946,12 @@ destruct zs1. {
 *)
       move Hzs1 after Hzs3.
       (* thanks Geoffroy *)
-      destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
-        move Hzs2 before Hzs1.
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
-          move Hzc2 before Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
+        move Hzc2 before Hzs3.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+          move Hzs2 before Hzs1.
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
-            move Hzc3 before Hzc2.
+            move Hzc3 before Hzs3.
             generalize Hc123; intros Hc123v.
             cbn in Hc123 |-*.
             rewrite (rngl_mul_opp_r Hop) in Hc123.
@@ -2987,7 +2987,6 @@ destruct zs1. {
             now apply (H1 _ _ Hzs12 Hzs3 H Hzc3).
           }
           apply (rngl_nle_gt Hor) in Hc3z.
-cbn.
 ...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hc123.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
