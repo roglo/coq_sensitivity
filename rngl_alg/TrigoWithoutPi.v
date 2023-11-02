@@ -247,7 +247,7 @@ apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs.
 assert (H : (c² ≤ 1)%L). {
   rewrite <- Hcs.
   apply (rngl_le_add_r Hor).
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 replace 1%L with 1²%L in H. 2: {
   apply (rngl_mul_1_l Hon).
@@ -277,7 +277,7 @@ apply (cos2_sin2_prop_add_squ Hon Hop Hic Hed) in Hcs.
 assert (H : (s² ≤ 1)%L). {
   rewrite <- Hcs.
   apply (rngl_le_add_l Hor).
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 replace 1%L with 1²%L in H. 2: {
   apply (rngl_mul_1_l Hon).
@@ -1279,9 +1279,9 @@ replace (1 - (rngl_cos θ2)²)%L with (rngl_sin θ2)²%L. 2: {
   apply rngl_cos2_sin2.
 }
 rewrite rl_sqrt_mul; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 do 2 rewrite (rl_sqrt_squ Hop Hor).
 rewrite (rngl_mul_add_distr_l (1 + rngl_cos θ1))%L.
@@ -2040,9 +2040,9 @@ replace (1 - (rngl_cos θ2)²)%L with (rngl_sin θ2)²%L. 2: {
   apply rngl_cos2_sin2.
 }
 rewrite rl_sqrt_mul; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 do 2 rewrite (rl_sqrt_squ Hop Hor).
 rewrite (rngl_mul_add_distr_l (1 + rngl_cos θ1))%L.
@@ -2403,9 +2403,9 @@ replace (1 - (rngl_cos θ2)²)%L with (rngl_sin θ2)²%L. 2: {
   apply rngl_cos2_sin2.
 }
 rewrite rl_sqrt_mul; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 do 2 rewrite (rl_sqrt_squ Hop Hor).
 rewrite (rngl_mul_add_distr_l (1 + rngl_cos θ1))%L.
@@ -3652,7 +3652,7 @@ do 2 rewrite <- rngl_mul_assoc.
 rewrite rl_nth_root_mul; cycle 1. {
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 rewrite rl_nth_root_mul; [ | easy | easy ].
 assert (Hz2 : (0 ≤ 2⁻¹)%L). {
@@ -3784,9 +3784,9 @@ apply (eq_rl_sqrt_0 Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
 apply (rngl_eq_add_0 Hor) in H12; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 destruct H12 as (Hc, Hs).
 apply (eq_rngl_squ_0 Hos Hid) in Hc, Hs.

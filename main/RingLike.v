@@ -3067,7 +3067,7 @@ specialize (H1 H); clear H.
 now rewrite (rngl_mul_inv_diag_r Hon Hiv) in H1.
 Qed.
 
-Theorem rngl_square_ge_0 :
+Theorem rngl_mul_diag_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ a * a)%L.
@@ -3153,9 +3153,9 @@ Proof.
 intros * Hop Hor Hii * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_eq_add_0 Hor) in Hab; cycle 1. {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 } {
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 }
 destruct Hab as (Ha, Hb).
 split. {
@@ -4467,7 +4467,7 @@ Theorem rngl_add_squ_nonneg :
 Proof.
 intros Hop Hor *.
 apply (rngl_add_nonneg_nonneg Hor);
-  apply (rngl_square_ge_0 Hop Hor).
+  apply (rngl_mul_diag_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_squ_inv :
