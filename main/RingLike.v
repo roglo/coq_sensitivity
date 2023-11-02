@@ -1334,15 +1334,18 @@ Qed.
 
 Theorem rngl_sub_move_l :
   rngl_has_opp T = true →
-  ∀ a b c, (a - b)%L = c ↔ (- b)%L = (c - a)%L.
+  ∀ a b c, (a - b)%L = c ↔ b = (a - c)%L.
 Proof.
 intros Hop *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Hb. {
   apply (rngl_add_move_l Hop).
-  now rewrite rngl_add_opp_r.
+  subst c.
+  apply (rngl_sub_add Hop).
 } {
   apply (rngl_add_move_l Hop) in Hb.
-  now rewrite (rngl_add_opp_r Hop) in Hb.
+  subst a.
+  apply (rngl_add_sub Hos).
 }
 Qed.
 
