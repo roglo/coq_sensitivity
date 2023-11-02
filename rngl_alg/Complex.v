@@ -2887,6 +2887,8 @@ destruct zs1. {
             apply (rngl_nle_gt Hor) in Hzc3.
             move Hzc3 before Hzc2.
 (**)
+cbn.
+apply (rngl_le_sub_le_add_r Hop Hor).
 ...
             exfalso.
             apply (rngl_nlt_ge Hor) in Hzs12.
