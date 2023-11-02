@@ -2226,16 +2226,14 @@ Theorem rngl_inv_mul_distr :
 Proof.
 intros Hon Hom Hiv * Haz Hbz.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_div_diag Hon Hiq) as div_diag.
 specialize (rngl_eq_mul_0_l Hom) as integral.
 assert
   (H :
     (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T)%bool = true). {
-  now rewrite Hid; destruct rngl_is_integral_domain.
+  now rewrite Hi1; destruct rngl_is_integral_domain.
 }
 specialize (integral H); clear H.
 unfold rngl_div in div_diag.
@@ -2244,7 +2242,7 @@ assert (Habz : (a * b)%L ≠ 0%L). {
   intros H.
   now specialize (integral a b H Hbz).
 }
-apply (rngl_mul_cancel_l Hid (a * b)%L _ _ Habz).
+apply (rngl_mul_cancel_l Hi1 (a * b)%L _ _ Habz).
 rewrite (div_diag _ Habz).
 rewrite rngl_mul_assoc.
 rewrite <- (rngl_mul_assoc a).
@@ -2728,9 +2726,7 @@ Theorem rngl_opp_inv :
 Proof.
 intros Hon Hop Hiv * Haz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hid : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 remember (Nat.eqb (rngl_characteristic T) 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   apply Nat.eqb_eq in Hch.
@@ -2744,7 +2740,7 @@ assert (Hoaz : (- a)%L ≠ 0%L). {
   rewrite rngl_opp_involutive in H; [ | easy ].
   now rewrite rngl_opp_0 in H.
 }
-apply (rngl_mul_cancel_l Hid (- a)%L); [ easy | ].
+apply (rngl_mul_cancel_l Hi1 (- a)%L); [ easy | ].
 specialize (rngl_opt_mul_inv_diag_r) as H2.
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 rewrite Hon, Hiv in H2; cbn in H2.
@@ -3780,9 +3776,7 @@ Theorem rngl_one_sub_half :
 Proof.
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   now rewrite (H1 (_ - _))%L, H1.
@@ -4110,9 +4104,7 @@ Theorem rngl_abs_div :
 Proof.
 intros * Hon Hop Hiv Heb Hor * Hyz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hiq : rngl_has_inv_and_1_or_quot T = true). {
-  now apply rngl_has_inv_and_1_or_quot_iff; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 progress unfold rngl_abs.
 remember (x ≤? _)%L as xz eqn:Hx; symmetry in Hx.
 remember (y ≤? _)%L as yz eqn:Hy; symmetry in Hy.
@@ -4152,15 +4144,15 @@ destruct xz. {
       rewrite (rngl_mul_0_l Hos) in H1.
       specialize (rngl_le_antisymm Hor _ _ Hxy H1) as H2.
       apply (rngl_integral Hos) in H2. 2: {
-        rewrite Hiq, Heb; cbn.
+        rewrite Hi1, Heb; cbn.
         now destruct rngl_is_integral_domain.
       }
       destruct H2 as [H2| H2]. {
         subst x.
-        rewrite (rngl_div_0_l Hos Hiq _ Hyz).
+        rewrite (rngl_div_0_l Hos Hi1 _ Hyz).
         rewrite (rngl_opp_0 Hop).
         symmetry.
-        apply (rngl_div_0_l Hos Hiq).
+        apply (rngl_div_0_l Hos Hi1).
         intros H.
         apply (f_equal rngl_opp) in H.
         rewrite (rngl_opp_0 Hop) in H.
@@ -4243,7 +4235,7 @@ apply (rngl_lt_le_incl Hor) in Hx'.
 specialize (rngl_mul_nonneg_nonneg Hop Hor _ _ Hx' Hy') as H1.
 specialize (rngl_le_antisymm Hor _ _ Hxy H1) as H2.
 apply (rngl_integral Hos) in H2. 2: {
-  rewrite Hiq, Heb.
+  rewrite Hi1, Heb.
   now destruct rngl_is_integral_domain.
 }
 destruct H2 as [H2| H2]. {
@@ -4554,10 +4546,7 @@ Theorem rngl_squ_eq_cases :
 Proof.
 intros Hic Hon Hop Hiv Hed * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 apply (rngl_sub_move_0_r Hop) in Hab.
 rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
@@ -5066,10 +5055,7 @@ Theorem rngl_le_0_mul :
 Proof.
 intros Hon Hop Hiv Hor * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-assert (Hi1 : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now rewrite Hiv, Hon; left.
-}
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
   destruct (rngl_lt_dec Hor 0 a)%L as [Hlza| Hlza]. 2: {
