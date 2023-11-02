@@ -1881,6 +1881,16 @@ rewrite rngl_mul_add_distr_r.
 now rewrite rngl_mul_opp_l.
 Qed.
 
+Theorem rngl_sub_mul_l_diag_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b : T, (a * b - b)%L = ((a - 1) * b)%L.
+Proof.
+intros Hon Hop *.
+rewrite (rngl_mul_sub_distr_r Hop).
+now rewrite (rngl_mul_1_l Hon).
+Qed.
+
 Theorem rngl_div_add_distr_r:
   rngl_has_inv T = true →
   ∀ a b c, ((a + b) / c)%L = (a / c + b / c)%L.

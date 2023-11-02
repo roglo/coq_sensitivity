@@ -2886,9 +2886,26 @@ destruct zs1. {
             }
             apply (rngl_nle_gt Hor) in Hzc3.
             move Hzc3 before Hzc2.
-(**)
-cbn.
-apply (rngl_le_sub_le_add_r Hop Hor).
+            cbn.
+            apply (rngl_le_sub_le_add_r Hop Hor).
+            assert (Hc31 : (rngl_cos θ3 ≤ rngl_cos θ1)%L). {
+              eapply (rngl_le_trans Hor); [ apply Hc123 | ].
+              cbn.
+              rewrite (rngl_mul_opp_r Hop).
+              rewrite (rngl_sub_opp_r Hop).
+...
+eapply (rngl_le_trans Hor). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+  apply Hc31.
+}
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+apply (rngl_le_trans Hor _ 0). {
+  apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
+  apply (rngl_le_sub_0 Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
 ...
             exfalso.
             apply (rngl_nlt_ge Hor) in Hzs12.
