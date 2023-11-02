@@ -2560,7 +2560,6 @@ apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
 now apply (rngl_sub_move_l Hop) in H1.
 Qed.
 
-(* to be completed
 Theorem rngl_cos_le_iff_angle_eucl_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2571,16 +2570,8 @@ Theorem rngl_cos_le_iff_angle_eucl_le :
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
-intros.
-do 2 rewrite (rngl_cos_angle_eucl_dist Hic Hon Hop Hed).
-split; intros H1. {
-  apply (rngl_sub_le_mono_l Hop Hor) in H1.
-Search (_ / _ = _ / _)%L.
-  apply (rngl_div_le_mono_r Hop Hor) in H1.
-...
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -2592,72 +2583,30 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
     apply (rngl_le_refl Hor).
   }
 }
-assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
-  intros.
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  rewrite rngl_add_0_l.
-  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-}
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 intros.
-progress unfold angle_eucl_dist.
-cbn.
-do 2 rewrite (rngl_sub_0_l Hop).
-do 2 rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite (rngl_squ_1 Hon).
-rewrite (rngl_mul_1_r Hon).
-do 2 rewrite (rngl_squ_opp Hop).
-do 2 rewrite <- rngl_add_assoc.
-do 2 rewrite (cos2_sin2_1 Hon Hop Hic Hed).
-do 2 rewrite <- (rngl_add_sub_swap Hop).
-do 2 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-rewrite rl_sqrt_mul; [ | | easy ]. 2: {
-  now apply (rngl_lt_le_incl Hor).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+  apply (angle_eucl_dist_is_dist Hic Hon Hop Hed).
 }
-rewrite rl_sqrt_mul; [ | | easy ]. 2: {
-  now apply (rngl_lt_le_incl Hor).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ _)). 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+  apply (angle_eucl_dist_is_dist Hic Hon Hop Hed).
 }
-split; intros Hθθ. {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-    apply rl_sqrt_nonneg.
-    now apply (rngl_lt_le_incl Hor).
+do 2 rewrite (rngl_cos_angle_eucl_dist Hic Hon Hop Hed).
+split; intros H1. {
+  apply (rngl_sub_le_mono_l Hop Hor) in H1.
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii) in H1. 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-    now apply rl_sqrt_nonneg.
-  }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
-    now apply rl_sqrt_nonneg.
-  }
-  apply (rngl_squ_le_abs_le Hop Hor Hii).
-  rewrite rngl_squ_sqrt; [ | easy ].
-  rewrite rngl_squ_sqrt; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hor).
+  now apply (rngl_squ_le_abs_le Hop Hor Hii) in H1.
 } {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hθθ. 2: {
-    rewrite <- (rngl_abs_0 Hop).
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-      apply rl_sqrt_nonneg.
-      now apply (rngl_lt_le_incl Hor).
-    }
-    apply (rngl_squ_lt_abs_lt Hop Hor Hii).
-    rewrite (rngl_squ_0 Hos).
-    rewrite rngl_squ_sqrt; [ easy | ].
-    now apply (rngl_lt_le_incl Hor).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hθθ. 2: {
-    now apply rl_sqrt_nonneg.
-  }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hθθ. 2: {
-    now apply rl_sqrt_nonneg.
-  }
-  apply (rngl_abs_le_squ_le Hop Hor) in Hθθ.
-  rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
-  rewrite rngl_squ_sqrt in Hθθ; [ | easy ].
-  now apply (rngl_sub_le_mono_l Hop Hor) in Hθθ.
+  now apply (rngl_abs_le_squ_le Hop Hor).
 }
 Qed.
-*)
 
 Theorem rngl_sin_le_iff_angle_eucl_le :
   rngl_mul_is_comm T = true →
@@ -2920,8 +2869,7 @@ destruct zs1. {
       apply (rngl_le_sub_le_add_r Hop Hor).
 *)
       move Hzs1 after Hzs3.
-...
-do 2 rewrite (rngl_cos_angle_eucl_dist Hic Hon Hop Hed).
+apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
 ...
       destruct (rngl_le_dec Hor 0 (rngl_sin θ2))%L as [Hzs2| Hs2z]. {
         move Hzs2 after Hzs3.

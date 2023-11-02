@@ -4881,6 +4881,22 @@ intros Hba; apply Hab; clear Hab.
 now apply (rngl_mul_lt_mono_nonneg Hop Hor Hii).
 Qed.
 
+Theorem rngl_div_le_mono_pos_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b c, (0 < c)%L → (a ≤ b ↔ a / c ≤ b / c)%L.
+Proof.
+intros Hon Hop Hiv Hor Hi1.
+intros * Hcz.
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_le_mono_pos_r Hop Hor Hi1).
+now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+Qed.
+
 Theorem rngl_div_pos :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
