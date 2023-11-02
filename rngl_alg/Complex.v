@@ -1057,12 +1057,12 @@ apply (rngl_le_trans Hor _ (rngl_abs a)). {
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
   apply rl_sqrt_nonneg.
   apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
 }
 do 2 rewrite fold_rngl_squ.
 rewrite rngl_squ_sqrt. 2: {
   apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
 }
 rewrite (rngl_squ_abs Hop).
 now apply (rngl_le_add_r Hor).
@@ -1081,7 +1081,7 @@ destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Hxy : (0 ≤ x² + y²)%L). {
   apply (rngl_add_nonneg_nonneg Hor);
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
 }
 split. {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
@@ -1117,7 +1117,7 @@ split. {
     rewrite (rngl_opp_0 Hop) in Hzx.
     rewrite <- (rngl_squ_opp Hop).
     apply (le_rl_sqrt_add Hon Hop Hed).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_squ_nonneg Hop Hor).
   }
 } {
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
@@ -1140,7 +1140,7 @@ split. {
   rewrite (rngl_mul_1_l Hon).
   destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
     apply (le_rl_sqrt_add Hon Hop Hed).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_squ_nonneg Hop Hor).
   } {
     apply (rngl_nle_gt Hor) in Hzx.
     apply (rngl_le_trans Hor _ 0). {
@@ -1199,9 +1199,8 @@ assert (Hρz : ρ ≠ 0%L). {
   rewrite Hρ.
   intros H.
   apply (eq_rl_sqrt_0 Hos) in H. 2: {
-    apply (rngl_add_nonneg_nonneg Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_add_nonneg_nonneg Hor);
+    apply (rngl_squ_nonneg Hop Hor).
   }
   apply (rl_integral_modulus_prop Hmi) in H.
   now destruct H; subst zr zi.
@@ -1212,9 +1211,8 @@ assert (Hzρ : (0 < ρ)%L). {
   split; [ | easy ].
   rewrite Hρ.
   apply rl_sqrt_nonneg.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_diag_nonneg Hop Hor).
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_add_nonneg_nonneg Hor);
+  apply (rngl_squ_nonneg Hop Hor).
 }
 assert (Hzr : zr = (ρ * (zr / ρ))%L). {
   rewrite (rngl_mul_comm Hic).
@@ -1234,19 +1232,17 @@ assert (Hr : zr = (ρ * rngl_cos (rl_acos Hor (zr / ρ)))%L). {
   rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
     rewrite Hρ.
     apply rl_sqrt_nonneg.
-    apply (rngl_add_nonneg_nonneg Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_add_nonneg_nonneg Hor);
+    apply (rngl_squ_nonneg Hop Hor).
   }
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   rewrite Hρ.
   rewrite rngl_squ_sqrt. 2: {
-    apply (rngl_add_nonneg_nonneg Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_add_nonneg_nonneg Hor);
+    apply (rngl_squ_nonneg Hop Hor).
   }
   apply (rngl_le_add_r Hor).
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
 }
 f_equal; [ now destruct (0 ≤? zi)%L | ].
 assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
@@ -1258,9 +1254,8 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
   rewrite (rngl_mul_inv_r Hiv).
   rewrite Hρ.
   rewrite rngl_squ_sqrt. 2: {
-    apply (rngl_add_nonneg_nonneg Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_add_nonneg_nonneg Hor);
+    apply (rngl_squ_nonneg Hop Hor).
   }
   apply (rngl_div_diag Hon Hiq).
   intros H.
@@ -1275,12 +1270,11 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
   rewrite (rngl_mul_1_l Hon).
   rewrite Hρ.
   rewrite rngl_squ_sqrt. 2: {
-    apply (rngl_add_nonneg_nonneg Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
+    apply (rngl_add_nonneg_nonneg Hor);
+    apply (rngl_squ_nonneg Hop Hor).
   }
   apply (rngl_le_add_r Hor).
-  apply (rngl_mul_diag_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
 }
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
 destruct zzi. {

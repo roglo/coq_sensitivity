@@ -3072,13 +3072,22 @@ Theorem rngl_mul_diag_nonneg :
   rngl_is_ordered T = true →
   ∀ a, (0 ≤ a * a)%L.
 Proof.
-intros * Hop Hor *.
+intros Hop Hor *.
 destruct (rngl_le_dec Hor 0%L a) as [Hap| Han]. {
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
   apply (rngl_not_le Hor) in Han.
   now apply (rngl_mul_nonpos_nonpos Hop Hor).
 }
+Qed.
+
+Theorem rngl_squ_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ a²)%L.
+Proof.
+intros Hop Hor *.
+now apply rngl_mul_diag_nonneg.
 Qed.
 
 Theorem rngl_squ_opp :
@@ -4467,7 +4476,7 @@ Theorem rngl_add_squ_nonneg :
 Proof.
 intros Hop Hor *.
 apply (rngl_add_nonneg_nonneg Hor);
-  apply (rngl_mul_diag_nonneg Hop Hor).
+apply (rngl_squ_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_squ_inv :

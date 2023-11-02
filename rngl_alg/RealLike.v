@@ -221,7 +221,7 @@ rewrite <- (rngl_mul_assoc 2)%L.
 apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_squ_sub Hop Hic Hon).
-apply (rngl_mul_diag_nonneg Hop Hor).
+apply (rngl_squ_nonneg Hop Hor).
 Qed.
 
 Theorem euclidean_distance_triangular :
