@@ -2768,6 +2768,19 @@ remember (S n) as sn; cbn in Hn; subst sn.
 now apply Bool.orb_false_iff in Hn.
 Qed.
 
+Theorem fold_sin_sub :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2,
+  (rngl_sin θ1 * rngl_cos θ2 - rngl_cos θ1 * rngl_sin θ2)%L =
+  rngl_sin (θ1 - θ2).
+Proof.
+intros Hop *.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+symmetry.
+apply (rngl_add_opp_l Hop).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2932,6 +2945,37 @@ destruct zs1. {
       apply (rngl_le_sub_le_add_r Hop Hor).
 *)
       move Hzs1 after Hzs3.
+      (* thanks Geoffroy *)
+      destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+        move Hzs2 before Hzs1.
+        cbn in Hc123 |-*.
+        rewrite (rngl_mul_opp_r Hop) in Hc123.
+        rewrite (rngl_sub_opp_r Hop) in Hc123.
+        apply (rngl_le_sub_le_add_r Hop Hor).
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
+          move Hzc2 before Hzs3.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cos θ2)) in Hc123; [ | easy ].
+          rewrite rngl_mul_add_distr_l in Hc123.
+          rewrite (rngl_mul_comm Hic _ (_ * _))%L in Hc123.
+          rewrite <- rngl_mul_assoc in Hc123.
+          rewrite fold_rngl_squ in Hc123.
+          specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+          apply (rngl_add_move_r Hop) in H1.
+          rewrite H1 in Hc123; clear H1.
+          rewrite (rngl_mul_sub_distr_l Hop) in Hc123.
+          rewrite (rngl_mul_1_r Hon) in Hc123.
+          eapply (rngl_le_trans Hor); [ apply Hc123 | ].
+          rewrite <- (rngl_add_sub_swap Hop).
+          rewrite <- (rngl_add_sub_assoc Hop).
+          apply (rngl_add_le_mono_l Hop Hor).
+          progress unfold rngl_squ.
+          do 2 rewrite rngl_mul_assoc.
+          rewrite <- (rngl_mul_sub_distr_r Hop).
+          rewrite (rngl_mul_comm Hic _ (rngl_sin θ2)).
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+          rewrite (rngl_mul_comm Hic (rngl_cos θ2)).
+          rewrite (fold_sin_sub Hop).
+...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hc123.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
 rewrite (rngl_sin_angle_eucl_dist Hic Hon Hop Hed) in Hzs1, Hzs3.
