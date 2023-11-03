@@ -3143,11 +3143,43 @@ destruct zs1. {
   ============================
   (rngl_cos (θ3 - θ2) ≤ rngl_cos θ1)%L
 *)
-        cbn in Hc123 |-*.
-        rewrite (rngl_mul_opp_r Hop).
-        rewrite (rngl_sub_opp_r Hop).
+        destruct (rngl_le_dec Hor (rngl_sin θ3) (rngl_sin (θ1 + θ2)))%L
+          as [Hs321| Hs213]. {
+          cbn in Hc123 |-*.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_sub_opp_r Hop).
+          apply (rngl_le_add_le_sub_r Hop Hor).
+          apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_cos θ2)) in Hc123;
+            [ | easy ].
+          rewrite (rngl_mul_sub_distr_r Hop) in Hc123.
+          rewrite <- rngl_mul_assoc in Hc123.
+          rewrite fold_rngl_squ in Hc123.
+          specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+          apply (rngl_add_move_r Hop) in H1.
+          rewrite H1 in Hc123; clear H1.
+          rewrite (rngl_mul_sub_distr_l Hop) in Hc123.
+          rewrite (rngl_mul_1_r Hon) in Hc123.
+          rewrite <- (rngl_sub_add_distr Hos) in Hc123.
+          progress unfold rngl_sub in Hc123 |-*.
+          rewrite Hop in Hc123 |-*.
+          apply (rngl_le_sub_le_add_l Hop Hor) in Hc123.
+          apply (rngl_le_sub_le_add_l Hop Hor).
+          progress unfold rngl_squ in Hc123.
+          rewrite (rngl_mul_mul_swap Hic) in Hc123.
+          rewrite rngl_mul_assoc in Hc123.
+          rewrite <- rngl_mul_add_distr_r in Hc123.
+          rewrite (rngl_mul_comm Hic (rngl_cos θ1)) in Hc123.
+          rewrite (rngl_mul_comm Hic (rngl_sin θ1)) in Hc123.
+          rewrite (fold_sin_add) in Hc123.
+          eapply (rngl_le_trans Hor); [ apply Hc123 | ].
+          apply -> (rngl_opp_le_compat Hop Hor).
+          rewrite (angle_add_comm Hic).
+          apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ | easy ].
+          now apply (rngl_lt_le_incl Hor) in Hs2z.
+        }
+        apply (rngl_nle_gt Hor) in Hs213.
 ...
-        apply (rngl_le_add_le_sub_r).
+  (rngl_sin θ3 ≤ rngl_sin (θ2 + θ1))%L
 ...
         remember (θ2 + angle_right)%A as θ.
         apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
