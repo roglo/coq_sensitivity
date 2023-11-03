@@ -3180,6 +3180,7 @@ destruct zs1. {
           now apply (rngl_lt_le_incl Hor) in Hs2z.
         }
         apply (rngl_nle_gt Hor) in Hs213.
+...
         destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
           move Hzc3 before Hzc2.
           destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
