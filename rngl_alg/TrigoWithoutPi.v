@@ -946,6 +946,34 @@ rewrite rngl_add_0_r.
 apply (rngl_opp_involutive Hop).
 Qed.
 
+Theorem rngl_cos_sub_straight_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (θ - angle_straight) = (- rngl_cos θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_mul_0_r Hos).
+now rewrite (rngl_sub_0_r Hos).
+Qed.
+
+Theorem rngl_sin_sub_straight_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_sin (θ - angle_straight) = (- rngl_sin θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_mul_0_r Hos).
+rewrite rngl_add_0_l.
+now rewrite (rngl_mul_1_r Hon).
+Qed.
+
 Theorem rngl_sin_nonneg_cos_le_sin_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1178,8 +1206,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   }
   clear H2z.
   assert (Hs21 : (rngl_sin θ2 < rngl_sin θ1)%L). {
-    rewrite <- (rngl_sub_0_l Hop) in Hcc.
-    apply (rngl_lt_add_lt_sub_r Hop Hor) in Hcc.
+    apply (rngl_lt_opp_r Hop Hor) in Hcc.
     remember (angle_straight - θ2)%A as θ eqn:Hθ.
     symmetry in Hθ.
     apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
@@ -3415,8 +3442,7 @@ destruct zs1. {
   rename Hzs1 into Hzc1; rename Hc1z into Hzs1.
   move Hzs1 after Hzs2.
   move Hzc1 after Hzs2.
-  rewrite <- (rngl_sub_0_l Hop) in Haov.
-  apply (rngl_le_add_le_sub_r Hop Hor) in Haov.
+  apply (rngl_le_opp_r Hop Hor) in Haov.
   apply (rngl_nlt_ge Hor) in Haov.
   apply Haov; clear Haov; cbn.
   rewrite <- rngl_add_assoc.

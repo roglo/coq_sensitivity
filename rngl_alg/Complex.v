@@ -3118,6 +3118,28 @@ destruct zs1. {
         }
       }
       apply (rngl_nle_gt Hor) in Hc2z.
+      remember (angle_straight - θ2)%A as θ.
+      apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
+      rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs23 |-*.
+      rewrite (angle_sub_sub_distr Hic Hop) in Hzs12, Hc123.
+      rewrite (angle_add_comm Hic) in Hzs12, Hc123.
+      rewrite (angle_add_sub_assoc Hop) in Hzs12, Hc123.
+      rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z |-*.
+      rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2, Hzs23.
+      rewrite (rngl_cos_sub_straight_r Hon Hop) in Hc123.
+      rewrite (rngl_sin_sub_straight_r Hon Hop) in Hzs12.
+      apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+      apply (rngl_le_opp_r Hop Hor) in Hc123.
+      rewrite <- (rngl_sub_0_l Hop).
+      apply (rngl_le_sub_le_add_r Hop Hor).
+...
+      remember (θ2 - angle_right)%A as θ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
 ...
 (*
 ...
