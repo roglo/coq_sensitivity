@@ -3118,6 +3118,61 @@ destruct zs1. {
           now apply (rngl_lt_le_incl Hor).
         }
         apply (rngl_nle_gt Hor) in Hs2z.
+(**)
+        remember (- θ2)%A as θ eqn:Hθ.
+        symmetry in Hθ.
+        rewrite <- (angle_opp_involutive Hop) in Hθ.
+        apply (angle_opp_inj Hop) in Hθ.
+        subst θ2; rename θ into θ2.
+        move θ2 before θ1.
+        rewrite (rngl_sin_opp) in Hs2z.
+        rewrite (rngl_cos_opp) in Hzc2.
+        apply (rngl_opp_neg_pos Hop Hor) in Hs2z.
+        rewrite (angle_add_opp_l Hic) in Hzs23 |-*.
+        rewrite (angle_sub_opp_r Hop) in Hzs12, Hc123.
+        move Hs2z after Hzs3.
+        move Hzc2 before Hzs3.
+(*
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hs2z : (0 < rngl_sin θ2)%L
+  Hzs3 : (0 ≤ rngl_sin θ3)%L
+  Hzc2 : (0 ≤ rngl_cos θ2)%L
+  Hzs23 : (0 ≤ rngl_sin (θ3 - θ2))%L
+  Hzs12 : (0 ≤ rngl_sin (θ1 + θ2))%L
+  Hc123 : (rngl_cos θ3 ≤ rngl_cos (θ1 + θ2))%L
+  ============================
+  (rngl_cos (θ3 - θ2) ≤ rngl_cos θ1)%L
+*)
+        cbn in Hc123 |-*.
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
+...
+        apply (rngl_le_add_le_sub_r).
+...
+        remember (θ2 + angle_right)%A as θ.
+        apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
+        subst θ2; rename θ into θ2.
+        move θ2 before θ1.
+        rewrite <- (angle_add_sub_swap Hic Hop) in Hzs23 |-*.
+        rewrite (angle_sub_sub_distr Hic Hop) in Hzs12, Hc123.
+        rewrite (rngl_cos_add_right_r Hon Hop) in Hc123.
+        rewrite (rngl_sin_add_right_r Hon Hos) in Hzs12.
+        rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc2 |-*.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in Hs2z, Hzs23.
+        apply (rngl_opp_neg_pos Hop Hor) in Hs2z.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
+        rewrite <- (rngl_sin_sub_anticomm Hic Hop) in Hc123.
+        move Hzc2 before Hzs1.
+...
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzc2 : (0 ≤ rngl_sin θ2)%L
+  Hzs3 : (0 ≤ rngl_sin θ3)%L
+  Hs2z : (0 < rngl_cos θ2)%L
+  Hzs23 : (rngl_cos (θ2 + θ3) ≤ 0)%L
+  Hzs12 : (0 ≤ rngl_cos (θ1 - θ2))%L
+  Hc123 : (rngl_cos θ3 ≤ rngl_sin (θ2 - θ1))%L
+  ============================
+  (rngl_sin (θ2 + θ3) ≤ rngl_cos θ1)%L
 ...
           cbn.
           apply (rngl_le_add_le_sub_r Hop Hor).
@@ -3156,7 +3211,6 @@ destruct zs1. {
               now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
             }
             now apply (H1 _ _ Hzs12 Hzs3 H Hzc3).
-
 ...
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed) in Hc123.
 apply (rngl_cos_le_iff_angle_eucl_le Hic Hon Hop Hed).
