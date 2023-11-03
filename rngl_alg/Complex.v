@@ -2924,7 +2924,8 @@ Theorem angle_le_sub_le_add_l :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
-  (θ1 - θ2 ≤ θ3)%A
+  (θ2 ≤ θ1)%A
+  → (θ1 - θ2 ≤ θ3)%A
   → (θ1 ≤ θ2 + θ3)%A.
 Proof.
 intros Hic Hon Hop Hed.
@@ -2935,7 +2936,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * H123.
+  intros * H21 H123.
   progress unfold angle_leb.
   rewrite (H1 (rngl_sin θ1)).
   rewrite (rngl_leb_refl Hor).
@@ -2946,7 +2947,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_leb_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
-intros * Hc123.
+intros * H21 Hc123.
 progress unfold angle_leb in Hc123.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -3120,6 +3121,14 @@ destruct zs1. {
           now apply (rngl_lt_le_incl Hor).
         }
         apply (rngl_nle_gt Hor) in Hs2z.
+        progress unfold angle_leb in H21.
+        apply (rngl_nle_gt Hor) in Hs2z.
+        apply rngl_leb_nle in Hs2z.
+        rewrite Hs2z in H21.
+        apply rngl_leb_le in Hzs1.
+        now rewrite Hzs1 in H21.
+      }
+...
 (**)
         remember (- θ2)%A as θ eqn:Hθ.
         symmetry in Hθ.
@@ -3134,6 +3143,18 @@ destruct zs1. {
         rewrite (angle_sub_opp_r Hop) in Hzs12, Hc123.
         move Hs2z after Hzs3.
         move Hzc2 before Hzs3.
+progress unfold angle_leb in H21.
+rewrite rngl_sin_opp in H21.
+remember (0 ≤? - rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
+  now apply (rngl_nlt_ge Hor) in Hzs2.
+}
+apply rngl_leb_le in Hzs1.
+now rewrite Hzs1 in H21.
+}
 (*
   Hzs1 : (0 ≤ rngl_sin θ1)%L
   Hs2z : (0 < rngl_sin θ2)%L
@@ -3203,6 +3224,18 @@ destruct zs1. {
             now apply (rngl_mul_nonneg_nonneg Hop Hor).
           }
           apply (rngl_nle_gt Hor) in Hc1s2s3.
+progress unfold angle_leb in H21.
+rewrite rngl_sin_opp in H21.
+remember (0 ≤? - rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
+  now apply (rngl_nlt_ge Hor) in Hzs2.
+}
+apply rngl_leb_le in Hzs1.
+now rewrite Hzs1 in H21.
+}
 ...
           cbn in Hs213 |-*.
           rewrite (rngl_mul_opp_r Hop).
