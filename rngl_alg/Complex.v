@@ -3192,41 +3192,17 @@ destruct zs1. {
             apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
             now apply (rngl_nlt_ge Hor) in Hzs12.
           }
-cbn in Hzs23 |-*.
-          rewrite (rngl_mul_opp_r Hop).
-          rewrite (rngl_sub_opp_r Hop).
-          apply (rngl_le_add_le_sub_r Hop Hor).
-          rewrite (rngl_mul_opp_r Hop) in Hzs23.
-          rewrite (rngl_add_opp_l Hop) in Hzs23.
-          apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
-          apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cos θ2)) in Hzs23;
-            [ | easy ].
-          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_sin θ2));
-            [ easy | ].
-          rewrite (rngl_mul_comm Hic) in Hzs23.
-          rewrite (rngl_mul_comm Hic).
-          rewrite (rngl_mul_mul_swap Hic).
-          rewrite (rngl_mul_comm Hic (rngl_cos θ2)) in Hzs23.
-          rewrite <- (rngl_mul_assoc (rngl_sin θ3)) in Hzs23.
-          rewrite fold_rngl_squ in Hzs23.
-          specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
-          apply (rngl_add_move_r Hop) in H1.
-          rewrite H1 in Hzs23; clear H1.
-          rewrite (rngl_mul_sub_distr_l Hop) in Hzs23.
-          rewrite (rngl_mul_1_r Hon) in Hzs23.
-          apply (rngl_le_add_le_sub_r Hop Hor) in Hzs23.
-          rewrite (rngl_mul_sub_distr_l Hop).
-          rewrite (rngl_mul_comm Hic _ (_ * _))%L.
-          rewrite <- (rngl_mul_assoc (rngl_sin θ3)).
-          rewrite fold_rngl_squ.
-          apply (rngl_le_add_le_sub_r Hop Hor).
-          eapply (rngl_le_trans Hor); [ apply Hzs23 | ].
-...
-  Hzs12 : (0 ≤ rngl_sin (θ1 + θ2))%L
-  Hc123 : (rngl_cos θ3 ≤ rngl_cos (θ1 + θ2))%L
-  Hs213 : (rngl_sin (θ1 + θ2) < rngl_sin θ3)%L
-  ============================
-  (rngl_sin θ3 ≤ rngl_sin θ2 * rngl_cos θ1)%L
+          destruct (rngl_le_dec Hor (rngl_sin θ3) (rngl_cos θ1 * rngl_sin θ2))
+              as [Hs3c1s2| Hc1s2s3]. {
+            cbn in Hs213.
+            exfalso.
+            apply (rngl_nlt_ge Hor) in Hs3c1s2.
+            apply Hs3c1s2; clear Hs3c1s2.
+            eapply (rngl_le_lt_trans Hor); [ | apply Hs213 ].
+            apply (rngl_le_add_r Hor).
+            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          }
+          apply (rngl_nle_gt Hor) in Hc1s2s3.
 ...
           cbn in Hs213 |-*.
           rewrite (rngl_mul_opp_r Hop).
