@@ -3165,8 +3165,10 @@ destruct zs1. {
       move Hc1z after Hc2z.
       apply (rngl_nlt_ge Hor).
       intros H23.
-      assert (H2z : (rngl_sin θ2 ≠ 0)%L). {
-        intros H.
+      assert (H : (0 < rngl_sin θ2)%L). {
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H; symmetry in H.
         apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
         destruct H; subst θ2. {
           cbn in Hzs12, Hzs23.
@@ -3216,15 +3218,18 @@ destruct zs1. {
         apply (rngl_opp_nonpos_nonneg Hop Hor).
         apply (rngl_0_le_1 Hon Hop Hor).
       }
+      move H before Hzs2; clear Hzs2; rename H into Hzs2.
 (**)
       progress unfold angle_add_overflow in Haov.
       progress unfold angle_ltb in Haov.
       rewrite <- (angle_sub_sub_distr Hic Hop) in Haov.
       do 2 rewrite (rngl_sin_sub_straight_l Hon Hop) in Haov.
       do 2 rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov.
-      apply (rngl_leb_le) in Hzs23, Hzs2.
-      rewrite Hzs23, Hzs2 in Haov.
-      apply rngl_leb_le in Hzs23, Hzs2.
+      generalize Hzs2; intros H.
+      apply (rngl_lt_le_incl Hor) in H.
+      apply rngl_leb_le in Hzs23, H.
+      rewrite Hzs23, H in Haov; clear H.
+      apply rngl_leb_le in Hzs23.
       apply (rngl_ltb_ge Hor) in Haov.
       apply (rngl_opp_le_compat Hop Hor) in Haov.
 (**)
