@@ -2924,6 +2924,7 @@ Theorem angle_le_sub_le_add_l :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
+angle_add_overflow θ2 θ3 = false →
   (θ2 ≤ θ1)%A
   → (θ1 - θ2 ≤ θ3)%A
   → (θ1 ≤ θ2 + θ3)%A.
@@ -2936,7 +2937,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * H21 H123.
+  intros * Haov H21 H123.
   progress unfold angle_leb.
   rewrite (H1 (rngl_sin θ1)).
   rewrite (rngl_leb_refl Hor).
@@ -2947,7 +2948,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_leb_refl Hor).
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
-intros * H21 Hc123.
+intros * Haov H21 Hc123.
 progress unfold angle_leb in Hc123.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -3162,11 +3163,17 @@ destruct zs1. {
       rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z, Hzs12.
       move Hc1z after Hc2z.
-...
-      remember (θ2 - angle_right)%A as θ.
-      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
-      subst θ2; rename θ into θ2.
-      move θ2 before θ1.
+(**)
+      progress unfold angle_add_overflow in Haov.
+      progress unfold angle_ltb in Haov.
+      rewrite <- (angle_sub_sub_distr Hic Hop) in Haov.
+      do 2 rewrite (rngl_sin_sub_straight_l Hon Hop) in Haov.
+      do 2 rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov.
+      apply (rngl_leb_le) in Hzs23, Hzs2.
+      rewrite Hzs23, Hzs2 in Haov.
+      apply rngl_leb_le in Hzs23, Hzs2.
+      apply (rngl_ltb_ge Hor) in Haov.
+      apply (rngl_opp_le_compat Hop Hor) in Haov.
 ...
 (*
 ...
