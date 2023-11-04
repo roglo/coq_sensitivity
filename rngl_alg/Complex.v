@@ -3246,6 +3246,67 @@ destruct zs1. {
           apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
           now apply (rngl_lt_le_incl Hor).
         }
+        assert (Hc2c3 : (rngl_cos θ2 ≤ rngl_cos θ3)%L). {
+          specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+          apply (H1 Hic Hon Hop Hed _ _ Hzs3).
+          now apply (rngl_lt_le_incl Hor).
+          easy.
+          now apply (rngl_lt_le_incl Hor).
+          clear H1.
+Theorem rngl_sin_sub_nonneg :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 - θ2))%L
+  → (rngl_sin θ2 ≤ rngl_sin θ1)%L.
+Proof.
+intros Hop.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hcs1 Hcs2 Hzs12.
+cbn in Hzs12.
+rewrite (rngl_mul_opp_r Hop) in Hzs12.
+rewrite (rngl_add_opp_l Hop) in Hzs12.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+...
+apply rngl_sin_sub_nonneg; try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+...
+          cbn in Hzs23.
+          rewrite (rngl_mul_opp_r Hop) in Hzs23.
+          rewrite (rngl_add_opp_l Hop) in Hzs23.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+...
+          apply (rngl_le_trans Hor _ (rngl_sin θ2 * rngl_cos θ3))%L. 2: {
+            apply (rngl_le_0_sub Hop Hor).
+            rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+            apply (rngl_mul_nonneg_nonneg Hop Hor). {
+              now apply (rngl_lt_le_incl Hor).
+            }
+            apply (rngl_le_0_sub Hop Hor).
+            apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+          }
+          eapply (rngl_le_trans Hor); [ | apply Hzs23 ].
+...
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2)) in
+            Hzs23; [ | easy ].
+          rewrite rngl_mul_assoc in Hzs23.
+          rewrite fold_rngl_squ in Hzs23.
+          specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+          apply (rngl_add_move_r Hop) in H1.
+          rewrite H1 in Hzs23; clear H1.
+          rewrite (rngl_mul_sub_distr_r Hop) in Hzs23.
+          rewrite (rngl_mul_1_l Hon) in Hzs23.
+          apply (rngl_le_sub_le_add_r Hop Hor) in Hzs23.
+          eapply (rngl_le_trans Hor); [ apply Hzs23 | ].
+
+2: {
+...
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2)).
+          easy.
 ...
       assert (Hc3z : (0 ≤ rngl_cos θ3)%L). {
         cbn in Hzs23.
