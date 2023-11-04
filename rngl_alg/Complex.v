@@ -3163,6 +3163,59 @@ destruct zs1. {
       rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z, Hzs12.
       move Hc1z after Hc2z.
+      apply (rngl_nlt_ge Hor).
+      intros H23.
+      assert (H2z : (rngl_sin θ2 ≠ 0)%L). {
+        intros H.
+        apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+        destruct H; subst θ2. {
+          cbn in Hzs12, Hzs23.
+          rewrite (rngl_mul_1_l Hon) in Hzs12, Hzs23.
+          rewrite (rngl_mul_0_l Hos) in Hzs12, Hzs23.
+          rewrite rngl_add_0_r in Hzs12, Hzs23.
+          apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12, Hzs23.
+          apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+          apply (rngl_le_antisymm Hor) in Hzs3; [ | easy ].
+          apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzs1, Hzs3.
+          destruct Hzs1; subst θ1. {
+            destruct Hzs3; subst θ3. {
+              cbn in H23.
+              apply (rngl_nle_gt Hor) in H23.
+              apply H23.
+              rewrite (rngl_mul_1_l Hon).
+              rewrite (rngl_mul_0_l Hos).
+              rewrite (rngl_sub_0_r Hos).
+              apply (rngl_le_refl Hor).
+            }
+            rewrite (angle_sub_0_r Hon Hop) in Haov.
+            progress unfold angle_add_overflow in Haov.
+            progress unfold angle_ltb in Haov.
+            rewrite (rngl_sin_add_straight_r Hon Hop) in Haov.
+            rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
+            cbn in Haov.
+            rewrite (rngl_opp_0 Hop) in Haov.
+            rewrite (rngl_leb_refl Hor) in Haov.
+            rewrite (rngl_opp_involutive Hop) in Haov.
+            apply rngl_ltb_nlt in Haov.
+            apply Haov.
+            apply (rngl_le_lt_trans Hor _ 0%L). {
+              apply (rngl_opp_nonpos_nonneg Hop Hor).
+              apply (rngl_0_le_1 Hon Hop Hor).
+            }
+            apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+          }
+          apply (rngl_nle_gt Hor) in H23.
+          apply H23; cbn.
+          rewrite (rngl_mul_1_l Hon).
+          rewrite (rngl_mul_0_l Hos).
+          rewrite (rngl_sub_0_r Hos).
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        }
+        apply (rngl_nle_gt Hor) in Hc2z.
+        apply Hc2z; cbn.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
 (**)
       progress unfold angle_add_overflow in Haov.
       progress unfold angle_ltb in Haov.
@@ -3174,6 +3227,33 @@ destruct zs1. {
       apply rngl_leb_le in Hzs23, Hzs2.
       apply (rngl_ltb_ge Hor) in Haov.
       apply (rngl_opp_le_compat Hop Hor) in Haov.
+(**)
+...
+      assert (Hc3z : (0 ≤ rngl_cos θ3)%L). {
+        cbn in Hzs23.
+        rewrite (rngl_mul_opp_r Hop) in Hzs23.
+        rewrite (rngl_add_opp_l Hop) in Hzs23.
+        apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+        apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_sin θ2)). {
+          apply not_eq_sym in H2z.
+          now apply (rngl_lt_iff Hor).
+        }
+        rewrite (rngl_mul_0_r Hos).
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+...
+2: {
+eapply (rngl_le_trans Hor).
+2: {
+apply Hzs23.
+}
+(* c'est bon *)
+...
+cbn in *.
+rewrite (rngl_mul_opp_r Hop) in Haov, Hzs23, Hc123, Hzs12 |-*.
+rewrite (rngl_sub_opp_r Hop) in Haov, Hc123 |-*.
+rewrite (rngl_add_opp_l Hop) in Hzs23, Hzs12.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
 ...
 (*
 ...
