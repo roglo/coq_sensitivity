@@ -3299,8 +3299,23 @@ destruct zs1. {
           now apply rngl_sin_sub_nonneg.
         }
         assert (Hc3c1 : (rngl_cos θ3 ≤ rngl_cos θ1)%L). {
+(*
+          eapply (rngl_le_trans Hor). 2: {
+            apply (rngl_lt_le_incl Hor), H23.
+          }
+cbn.
+specialize (rngl_sin_sub_nonneg) as H1.
+specialize (H1 Hic Hon Hop Hed).
+specialize (H1 θ2 θ1).
 ...
-          cbn in Hzs23.
+*)
+          specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+          apply (H1 Hic Hon Hop Hed _ _ Hzs1); [ easy | easy | easy | ].
+          clear H1.
+          apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z.
+          apply rngl_sin_sub_nonneg; try easy.
+...
+          cbn in Hzs1.
           rewrite (rngl_mul_opp_r Hop) in Hzs23.
           rewrite (rngl_add_opp_l Hop) in Hzs23.
           apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
