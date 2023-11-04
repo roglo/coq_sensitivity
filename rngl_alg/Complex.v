@@ -3119,50 +3119,14 @@ destruct zs1. {
       }
       apply (rngl_nle_gt Hor) in Hc2z.
       assert (Hc1z : (rngl_cos θ1 ≤ 0)%L). {
-        cbn in Hzs12.
-        rewrite (rngl_mul_opp_r Hop) in Hzs12.
-        rewrite (rngl_add_opp_l Hop) in Hzs12.
-        apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
-        destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [H2z| H2z]. {
-          rewrite H2z, (rngl_mul_0_r Hos) in Hzs12.
-          apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H2z.
-          destruct H2z; subst θ2. {
-            exfalso; apply (rngl_nle_gt Hor) in Hc2z.
-            apply Hc2z; cbn.
-            apply (rngl_0_le_1 Hon Hop Hor).
-          }
-          cbn in Hzs12.
-          rewrite (rngl_mul_opp_r Hop) in Hzs12.
-          rewrite (rngl_mul_1_r Hon) in Hzs12.
-          apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
-          apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
-          apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzs1.
-          destruct Hzs1; subst θ1. {
-            progress unfold angle_leb in H21.
-            cbn in H21.
-            rewrite (rngl_leb_refl Hor) in H21.
-            apply rngl_leb_le in H21.
-            apply (rngl_nlt_ge Hor) in H21.
-            exfalso; apply H21.
-            apply (rngl_le_lt_trans Hor _ 0). {
-              apply (rngl_opp_nonneg_nonpos Hop Hor).
-              rewrite (rngl_opp_involutive Hop).
-              apply (rngl_0_le_1 Hon Hop Hor).
-            }
-            apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-          }
-          cbn.
-          apply (rngl_opp_nonneg_nonpos Hop Hor).
-          rewrite (rngl_opp_involutive Hop).
-          apply (rngl_0_le_1 Hon Hop Hor).
-        }
-        apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ2)). {
-          apply not_eq_sym in H2z.
-          now apply (rngl_lt_iff Hor).
-        }
-        rewrite (rngl_mul_0_l Hos).
-        eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
-        apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
+        clear - H21 Hzs1 Hzs2 Hor Hc2z.
+        progress unfold angle_leb in H21.
+        cbn in H21.
+        apply rngl_leb_le in Hzs1, Hzs2.
+        rewrite Hzs1, Hzs2 in H21.
+        apply rngl_leb_le in Hzs1, Hzs2.
+        apply rngl_leb_le in H21.
+        eapply (rngl_le_trans Hor); [ apply H21 | ].
         now apply (rngl_lt_le_incl Hor).
       }
       remember (angle_straight - θ2)%A as θ.
