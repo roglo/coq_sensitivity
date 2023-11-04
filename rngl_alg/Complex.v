@@ -3233,6 +3233,39 @@ destruct zs1. {
       apply (rngl_ltb_ge Hor) in Haov.
       apply (rngl_opp_le_compat Hop Hor) in Haov.
 (**)
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
+        move Hzc3 before Hc2z.
+        apply (rngl_nlt_ge Hor) in Haov.
+        apply Haov; clear Haov.
+        assert (Hc23 : (rngl_cos θ2 * rngl_cos θ3 ≤ rngl_cos θ1)%L). {
+          cbn in Hc123.
+          rewrite (rngl_mul_opp_r Hop) in Hc123.
+          rewrite (rngl_sub_opp_r Hop) in Hc123.
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2))
+            in Hc123; [ | easy ].
+          eapply (rngl_le_trans Hor); [ apply Hc123 | ].
+          rewrite rngl_mul_add_distr_l.
+          rewrite rngl_mul_assoc.
+          rewrite (rngl_mul_mul_swap Hic).
+          rewrite fold_rngl_squ.
+          cbn in Hzs12.
+          rewrite (rngl_mul_opp_r Hop) in Hzs12.
+          rewrite (rngl_add_opp_l Hop) in Hzs12.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+          apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_sin θ2)) in
+            Hzs12; [ | easy ].
+          rewrite (rngl_mul_comm Hic) in Hzs12.
+          rewrite <- rngl_mul_assoc in Hzs12.
+          apply (rngl_add_le_mono_l Hop Hor ((rngl_cos θ2)² * rngl_cos θ1))%L
+            in Hzs12.
+          eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
+          rewrite rngl_mul_assoc.
+          rewrite fold_rngl_squ.
+          rewrite <- rngl_mul_add_distr_r.
+          rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+          rewrite (rngl_mul_1_l Hon).
+          apply (rngl_le_refl Hor).
+        }
 ...
       assert (Hc3z : (0 ≤ rngl_cos θ3)%L). {
         cbn in Hzs23.
