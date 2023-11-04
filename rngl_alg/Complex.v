@@ -3287,17 +3287,24 @@ destruct zs1. {
           apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
           now apply (rngl_lt_le_incl Hor).
         }
+        assert (Hs2s3 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
+          apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ | | easy ].
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+        }
         assert (Hc2c3 : (rngl_cos θ2 ≤ rngl_cos θ3)%L). {
           specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-          apply (H1 Hic Hon Hop Hed _ _ Hzs3); [ | easy | | ]. {
-            now apply (rngl_lt_le_incl Hor).
-          } {
-            now apply (rngl_lt_le_incl Hor).
-          }
-          clear H1.
-          apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z.
-          now apply rngl_sin_sub_nonneg.
+          apply (H1 Hic Hon Hop Hed _ _ Hzs3); [ | easy | | easy ].
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
         }
+        assert (Hs3s1 : (rngl_sin θ3 ≤ rngl_sin θ1)%L). {
+          apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ easy | easy | ].
+          cbn.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_add_opp_l Hop).
+          apply (rngl_le_0_sub Hop Hor).
+...
         assert (Hc3c1 : (rngl_cos θ3 ≤ rngl_cos θ1)%L). {
 (*
           eapply (rngl_le_trans Hor). 2: {
@@ -3309,11 +3316,17 @@ specialize (H1 Hic Hon Hop Hed).
 specialize (H1 θ2 θ1).
 ...
 *)
+...z
           specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
           apply (H1 Hic Hon Hop Hed _ _ Hzs1); [ easy | easy | easy | ].
           clear H1.
+...
           apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z.
           apply rngl_sin_sub_nonneg; try easy.
+cbn in H23 |-*.
+...
+cbn in Hzs23 |-*.
+cbn in Hc123.
 ...
           cbn in Hzs1.
           rewrite (rngl_mul_opp_r Hop) in Hzs23.
