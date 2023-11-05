@@ -3333,6 +3333,15 @@ assert (H1 : (rngl_cos (θ3 - θ1) ≤ rngl_cos (θ1 - θ2))%L). {
   do 2 rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_sub_opp_r Hop) in Hc123.
   do 2 rewrite (rngl_sub_opp_r Hop).
+(**)
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_r Hop Hor). {
+    apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply Hc123.
+  }
+}
+...
   apply (rngl_le_sub_le_add_l Hop Hor).
   rewrite (rngl_add_sub_swap Hop).
   rewrite (rngl_mul_comm Hic (rngl_cos θ3)).
