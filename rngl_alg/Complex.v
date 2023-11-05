@@ -3346,6 +3346,31 @@ destruct zs1. {
         now apply (rngl_lt_le_incl Hor).
         now apply (rngl_lt_le_incl Hor).
       }
+      assert (H : (rngl_cos θ3 ≤ rngl_cos θ1 * rngl_cos θ2)%L). {
+(*
+...
+        apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_cos θ2));
+          [ easy | ].
+        rewrite <- rngl_mul_assoc.
+        rewrite fold_rngl_squ.
+        specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+        apply (rngl_add_move_r Hop) in H1.
+        rewrite H1; clear H1.
+        rewrite (rngl_mul_sub_distr_l Hop).
+        rewrite (rngl_mul_1_r Hon).
+        apply (rngl_le_add_le_sub_r Hop Hor).
+        specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+        apply (rngl_add_move_l Hop) in H1.
+        rewrite H1; clear H1.
+        rewrite (rngl_mul_sub_distr_l Hop).
+        rewrite (rngl_mul_1_r Hon).
+        rewrite (rngl_add_sub_assoc Hop).
+        rewrite (rngl_add_sub_swap Hop).
+...
+(* c2 c3 ≤ c1 * c2² *)
+(* c3 ≤ c1 c2 *)
+...
+*)
       assert (Hs3s1 : (rngl_sin θ3 ≤ rngl_sin θ1)%L). {
         apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ easy | | ]. {
           now apply (rngl_lt_le_incl Hor).
@@ -3363,6 +3388,41 @@ apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
 apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
 (* s3 / c3 ≤ s2 / c2 *)
 (* s1 / c1 ≤ s2 / c2 *)
+assert (H : ((rngl_cos θ2)² * rngl_cos (θ2 - θ3) < rngl_cos θ1)%L). {
+  eapply (rngl_le_lt_trans Hor); [ | apply H23 ].
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite (rngl_sub_mul_r_diag_r Hon Hop).
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_le_0_sub Hop Hor).
+    rewrite <- (rngl_mul_1_r Hon).
+    progress unfold rngl_squ.
+    apply (rngl_mul_le_compat_nonneg Hop Hor). {
+      split; [ now apply (rngl_lt_le_incl Hor) | ].
+      apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+    }
+    split; [ now apply (rngl_lt_le_incl Hor) | ].
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  admit.
+}
+cbn in H.
+rewrite (rngl_mul_opp_r Hop) in H.
+rewrite (rngl_sub_opp_r Hop) in H.
+rewrite rngl_mul_add_distr_l in H.
+progress unfold rngl_squ in H.
+rewrite (rngl_mul_mul_swap Hic _ _ (rngl_sin _ * _))%L in H.
+do 2 rewrite rngl_mul_assoc in H.
+rewrite <- (rngl_mul_assoc (rngl_cos _ * rngl_sin _))%L in H.
+rewrite (rngl_mul_comm Hic (rngl_sin θ3)) in H.
+assert (H1 :
+   (rngl_cos θ2 * rngl_cos θ2 * rngl_cos θ2 * rngl_cos θ3 +
+       rngl_cos θ2 * rngl_sin θ2 * (rngl_sin θ2 * rngl_cos θ3) <
+       rngl_cos θ1)%L). {
+  eapply (rngl_le_lt_trans Hor); [ | apply H ].
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). 2: {
+(* bin non c'est à l'envers *)
+...
 cbn in H23.
 rewrite (rngl_mul_opp_r Hop) in H23.
 rewrite (rngl_sub_opp_r Hop) in H23.
