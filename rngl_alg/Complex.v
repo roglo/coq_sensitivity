@@ -3374,6 +3374,25 @@ destruct zs1. {
         now apply (rngl_lt_le_incl Hor).
         now apply (rngl_lt_le_incl Hor).
       }
+specialize (rngl_cos_add_le_cos_if) as H1.
+generalize Hzs2; intros Hzs2'.
+apply (rngl_lt_le_incl Hor) in Hzs2'.
+generalize Hc2z; intros Hzc2'.
+apply (rngl_lt_le_incl Hor) in Hzc2'.
+generalize Hzc1; intros Hzc1'.
+apply (rngl_lt_le_incl Hor) in Hzc1'.
+rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
+specialize (H1 Hic Hon Hop Hed θ2 θ1 θ3 Hzs2' Hzs1 Hzs3 Hzc1' Hc123 Hzs12).
+assert (H : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+  cbn.
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
+specialize (H1 H); clear H.
+clear Hzs2' Hzc2' Hzc1'.
+(* ouais, bon, ça sert pas à grand chose, mais j'aurai utilisé
+   une autre fois le lemme de Geoffroy *)
 ...
       assert (H : (rngl_cos θ3 ≤ rngl_cos θ1 * rngl_cos θ2)%L). {
 (*
