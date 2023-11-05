@@ -3300,11 +3300,11 @@ destruct zs1. {
         }
         assert (Hs3s1 : (rngl_sin θ3 ≤ rngl_sin θ1)%L). {
           apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ easy | easy | ].
-          cbn in Hzs23, Hzs12 |-*.
-          rewrite (rngl_mul_opp_r Hop) in Hzs23, Hzs12 |-*.
-          rewrite (rngl_add_opp_l Hop) in Hzs23, Hzs12 |-*.
-          apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
-          apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+          move Hc123 at bottom; move H23 at bottom.
+          cbn in Hc123, H23 |-*.
+          rewrite (rngl_mul_opp_r Hop) in Hc123, H23 |-*.
+          rewrite (rngl_sub_opp_r Hop) in Hc123, H23.
+          rewrite (rngl_add_opp_l Hop).
           apply (rngl_le_0_sub Hop Hor).
 ...
         assert (Hc3c1 : (rngl_cos θ3 ≤ rngl_cos θ1)%L). {
