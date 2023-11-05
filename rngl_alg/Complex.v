@@ -3310,8 +3310,10 @@ destruct zs1. {
       }
       move H before Hc1z; clear Hc1z.
       rename H into Hzc1.
+(*
       apply (rngl_nlt_ge Hor) in Haov.
       apply Haov; clear Haov.
+*)
       assert (Hc23 : (rngl_cos θ2 * rngl_cos θ3 < rngl_cos θ1)%L). {
         cbn in H23.
         rewrite (rngl_mul_opp_r Hop) in H23.
@@ -3319,6 +3321,18 @@ destruct zs1. {
         eapply (rngl_le_lt_trans Hor); [ | apply H23 ].
         apply (rngl_le_add_r Hor).
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        now apply (rngl_lt_le_incl Hor).
+      }
+      assert (Hs1s2 : (rngl_sin θ1 ≤ rngl_sin θ2)%L). {
+        apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ | | easy ].
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+      }
+      assert (Hc2c1 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
+        specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+        apply (H1 Hic Hon Hop Hed _ _ Hzs1); [ | | | easy ].
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
         now apply (rngl_lt_le_incl Hor).
       }
       assert (Hs2s3 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
@@ -3332,12 +3346,47 @@ destruct zs1. {
         now apply (rngl_lt_le_incl Hor).
         now apply (rngl_lt_le_incl Hor).
       }
-...
       assert (Hs3s1 : (rngl_sin θ3 ≤ rngl_sin θ1)%L). {
         apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ easy | | ]. {
           now apply (rngl_lt_le_incl Hor).
         }
         move Hc123 at bottom; move H23 at bottom.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+apply (rngl_le_0_sub Hop Hor).
+(* s3 / c3 ≤ s1 / c1 ? *)
+cbn in Hzs23, Hzs12.
+rewrite (rngl_mul_opp_r Hop) in Hzs23, Hzs12.
+rewrite (rngl_add_opp_l Hop) in Hzs23, Hzs12.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+(* s3 / c3 ≤ s2 / c2 *)
+(* s1 / c1 ≤ s2 / c2 *)
+cbn in H23.
+rewrite (rngl_mul_opp_r Hop) in H23.
+rewrite (rngl_sub_opp_r Hop) in H23.
+(* 1 + (s2 / c2) (s3 / c3) ≤ c1 / (c2 c3) *)
+(* 1 + (s2 / c2) (s2 / c2) ≤ c1 / (c2 c3) *)
+(* 1 + (s2 / c2)² ≤ c1 / (c2 c3) *)
+(* 1 / c2² ≤ c1 / (c2 c3) *)
+(* 1 ≤ c1 c2 / c3 *)
+(* c3 ≤ c1 c2 *)
+...
+apply (rngl_le_trans Hor _ (rngl_cos θ1 * rngl_sin θ2)). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_le_trans Hor _ (rngl_sin θ1 * rngl_cos θ2)). 2: {
+  now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+}
+cbn in Hzs12.
+...
+cbn in Hzs12.
+rewrite (rngl_mul_opp_r Hop) in Hzs12.
+rewrite (rngl_add_opp_l Hop) in Hzs12.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+...
 assert (H1 : (rngl_cos (θ3 - θ1) ≤ rngl_cos (θ1 - θ2))%L). {
   cbn in Hc123 |-*.
   rewrite (rngl_mul_opp_r Hop) in Hc123.
