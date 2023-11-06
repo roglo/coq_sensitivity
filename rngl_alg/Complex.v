@@ -3136,6 +3136,9 @@ Theorem angle_le_sub_le_add_l :
   → (θ1 - θ2 ≤ θ3)%A
   → (θ1 ≤ θ2 + θ3)%A.
 Proof.
+(* perhaps the hypothesis (θ2 ≤ θ1) is not necessary
+   because of "angle_add_overflow θ1 (- θ2)"
+   but not sure *)
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -3302,7 +3305,6 @@ destruct zs1. {
         apply (rngl_0_le_1 Hon Hop Hor).
       }
       move H before Hzs2; clear Hzs2; rename H into Hzs2.
-(**)
       progress unfold angle_add_overflow in Haov.
       progress unfold angle_ltb in Haov.
       rewrite <- (angle_sub_sub_distr Hic Hop) in Haov.
@@ -3352,69 +3354,38 @@ destruct zs1. {
       }
       move H before Hc1z; clear Hc1z.
       rename H into Hzc1.
-      assert (Hc23 : (rngl_cos θ2 * rngl_cos θ3 < rngl_cos θ1)%L). {
-        cbn in H23.
-        rewrite (rngl_mul_opp_r Hop) in H23.
-        rewrite (rngl_sub_opp_r Hop) in H23.
-        eapply (rngl_le_lt_trans Hor); [ | apply H23 ].
-        apply (rngl_le_add_r Hor).
-        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-        now apply (rngl_lt_le_incl Hor).
-      }
-      assert (Hs1s2 : (rngl_sin θ1 ≤ rngl_sin θ2)%L). {
-        apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ | | easy ].
-        now apply (rngl_lt_le_incl Hor).
-        now apply (rngl_lt_le_incl Hor).
-      }
-      assert (Hc2c1 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
-        specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-        apply (H1 Hic Hon Hop Hed _ _ Hzs1); [ | | | easy ].
-        now apply (rngl_lt_le_incl Hor).
-        now apply (rngl_lt_le_incl Hor).
-        now apply (rngl_lt_le_incl Hor).
-      }
-      assert (Hs2s3 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
-        apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); [ | | easy ].
-        now apply (rngl_lt_le_incl Hor).
-        now apply (rngl_lt_le_incl Hor).
-      }
-      assert (Hc2c3 : (rngl_cos θ2 ≤ rngl_cos θ3)%L). {
-        specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-        apply (H1 Hic Hon Hop Hed _ _ Hzs3); [ | easy | | easy ].
-        now apply (rngl_lt_le_incl Hor).
-        now apply (rngl_lt_le_incl Hor).
-      }
-rewrite (angle_opp_sub_distr Hic Hop) in Haov'.
-progress unfold angle_add_overflow in Haov'.
-rewrite (angle_add_sub_assoc Hop) in Haov'.
-rewrite (angle_add_sub_swap Hic Hop) in Haov'.
-rewrite (angle_sub_sub_swap Hic Hop) in Haov'.
-rewrite (angle_sub_diag Hic Hon Hop Hed) in Haov'.
-rewrite <- (angle_add_sub_swap Hic Hop) in Haov'.
-rewrite (angle_add_0_l Hon Hos) in Haov'.
-progress unfold angle_ltb in Haov'.
-apply (rngl_leb_le) in Hzs12, Hzs1.
-rewrite Hzs12 in Haov'.
-rewrite (rngl_sin_sub_straight_l Hon Hop) in Haov'.
-rewrite Hzs1 in Haov'.
-apply (rngl_leb_le) in Hzs12, Hzs1.
-rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov'.
-apply (rngl_ltb_ge Hor) in Haov'.
-apply (rngl_le_opp_r Hop Hor) in Haov'.
-apply (rngl_nlt_ge Hor) in Haov'.
-apply Haov'; clear Haov'.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-apply (rngl_add_nonneg_pos Hor Hos); [ | easy ].
-apply (rngl_add_nonneg_nonneg Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-now apply (rngl_lt_le_incl Hor).
-}
-(* ouais, bon d'accord. C'est dingue, hein. *)
+      rewrite (angle_opp_sub_distr Hic Hop) in Haov'.
+      progress unfold angle_add_overflow in Haov'.
+      rewrite (angle_add_sub_assoc Hop) in Haov'.
+      rewrite (angle_add_sub_swap Hic Hop) in Haov'.
+      rewrite (angle_sub_sub_swap Hic Hop) in Haov'.
+      rewrite (angle_sub_diag Hic Hon Hop Hed) in Haov'.
+      rewrite <- (angle_add_sub_swap Hic Hop) in Haov'.
+      rewrite (angle_add_0_l Hon Hos) in Haov'.
+      progress unfold angle_ltb in Haov'.
+      apply (rngl_leb_le) in Hzs12, Hzs1.
+      rewrite Hzs12 in Haov'.
+      rewrite (rngl_sin_sub_straight_l Hon Hop) in Haov'.
+      rewrite Hzs1 in Haov'.
+      apply (rngl_leb_le) in Hzs12, Hzs1.
+      rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov'.
+      apply (rngl_ltb_ge Hor) in Haov'.
+      apply (rngl_le_opp_r Hop Hor) in Haov'.
+      apply (rngl_nlt_ge Hor) in Haov'.
+      apply Haov'; clear Haov'.
+      cbn.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      apply (rngl_add_nonneg_pos Hor Hos); [ | easy ].
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_mul_nonneg_nonneg Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+      now apply (rngl_lt_le_incl Hor).
+    }
+    clear Hc123.
+    apply (rngl_leb_gt Hor) in Hzs3.
 ...
   apply (rngl_le_sub_le_add_l Hop Hor).
   rewrite (rngl_add_sub_swap Hop).
