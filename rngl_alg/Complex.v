@@ -3386,6 +3386,36 @@ destruct zs1. {
     }
     clear Hc123.
     apply (rngl_leb_gt Hor) in Hzs3.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
+        remember (θ3 - angle_straight)%A as θ.
+        apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+        subst θ3; rename θ into θ3.
+        move θ3 before θ2.
+        rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+        rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3, Hzs23.
+        rewrite (rngl_cos_add_straight_r Hon Hop) in Hc3z |-*.
+        apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
+        apply (rngl_le_0_sub Hop Hor).
+        rewrite (rngl_sub_opp_r Hop).
+        apply (rngl_nlt_ge Hor).
+        intros Hcc.
+...
+        apply (rngl_nlt_ge Hor) in Hzs23.
+        apply Hzs23; clear Hzs23; cbn.
+...
+      do 2 rewrite <- (angle_add_assoc Hop) in Hs23z.
+      rewrite (angle_straight_add_straight Hon Hop) in Hs23z.
+      rewrite (angle_add_0_r Hon Hos) in Hs23z.
+      now apply (rngl_nlt_ge Hor) in Hzs23.
+    }
+...
+      apply (rngl_nlt_ge Hor) in Hzs23.
+...
+...
+      apply Hzs23; clear Hzs23; cbn.
+...
     remember (- θ3)%A as θ eqn:Hθ.
     symmetry in Hθ.
     rewrite <- (angle_opp_involutive Hop) in Hθ.
@@ -3396,6 +3426,8 @@ destruct zs1. {
     apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
     move Hzs2 after Hzs3; move Hzs1 after Hzs2.
     rewrite angle_add_opp_r in Hzs23 |-*.
+Inspect 1.
+...
     cbn in Hzs23 |-*.
     rewrite (rngl_mul_opp_r Hop) in Hzs23 |-*.
     rewrite (rngl_add_opp_l Hop) in Hzs23.
