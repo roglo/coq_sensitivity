@@ -3150,7 +3150,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_assoc.
-  apply (rngl_add_nonneg_pos Hor Hos). {
+  apply (rngl_add_nonneg_pos Hor). {
     rewrite (rngl_add_mul_r_diag_l Hon).
     apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
     apply (rngl_le_sub_le_add_l Hop Hor).
@@ -3476,7 +3476,7 @@ destruct zs1. {
   apply Haov; clear Haov; cbn.
   rewrite <- rngl_add_assoc.
   rewrite rngl_add_comm.
-  apply (rngl_add_nonneg_pos Hor Hos). {
+  apply (rngl_add_nonneg_pos Hor). {
     rewrite <- (rngl_mul_1_r Hon (rngl_sin θ1)) at 2.
     rewrite <- rngl_mul_add_distr_l.
     apply (rngl_mul_nonneg_nonneg Hop Hor).

@@ -3376,7 +3376,7 @@ destruct zs1. {
       cbn.
       rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_sub_opp_r Hop).
-      apply (rngl_add_nonneg_pos Hor Hos); [ | easy ].
+      apply (rngl_add_nonneg_pos Hor); [ | easy ].
       apply (rngl_add_nonneg_nonneg Hor).
       apply (rngl_mul_nonneg_nonneg Hop Hor).
       now apply (rngl_lt_le_incl Hor).
@@ -3386,7 +3386,7 @@ destruct zs1. {
     }
     clear Hc123.
     apply (rngl_leb_gt Hor) in Hzs3.
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
         remember (θ3 - angle_straight)%A as θ.
         apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
@@ -3401,9 +3401,16 @@ destruct zs1. {
         rewrite (rngl_sub_opp_r Hop).
         apply (rngl_nlt_ge Hor).
         intros Hcc.
-...
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
         apply (rngl_nlt_ge Hor) in Hzs23.
-        apply Hzs23; clear Hzs23; cbn.
+        apply Hzs23; clear Hzs23.
+        cbn.
+        apply (rngl_add_pos_nonneg Hor).
+        now apply (rngl_mul_pos_pos Hop Hor Hii).
+        now apply (rngl_mul_nonneg_nonneg).
+      }
+      apply (rngl_nle_gt Hor) in Hzc3.
+      move Hzc2 before Hzs2; move Hzc3 before Hzc2.
 ...
       do 2 rewrite <- (angle_add_assoc Hop) in Hs23z.
       rewrite (angle_straight_add_straight Hon Hop) in Hs23z.
