@@ -3413,12 +3413,16 @@ destruct zs1. {
       move Hzc2 before Hzs2; move Hzc3 before Hzc2.
 (**)
       progress unfold angle_add_overflow in Haov.
-      apply angle_ltb_ge in Haov.
+      progress unfold angle_add_overflow in Haov'.
+      apply angle_ltb_ge in Haov, Haov'.
       progress unfold angle_leb in Haov.
-      apply rngl_leb_le in Hzs2, Hzs23.
+      progress unfold angle_leb in Haov'.
+      rewrite angle_add_opp_r in Haov'.
+      apply rngl_leb_le in Hzs1, Hzs2, Hzs23, Hzs12.
       rewrite Hzs2, Hzs23 in Haov.
-      apply rngl_leb_le in Haov.
-      apply rngl_leb_le in Hzs2, Hzs23.
+      rewrite Hzs1, Hzs12 in Haov'.
+      apply rngl_leb_le in Haov, Haov'.
+      apply rngl_leb_le in Hzs1, Hzs2, Hzs23, Hzs12.
       remember (θ3 + angle_right)%A as θ.
       apply (angle_sub_move_r Hic Hon Hop Hed) in Heqθ.
       subst θ3; rename θ into θ3.
@@ -3429,6 +3433,11 @@ destruct zs1. {
       apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
       apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
       move Hzc3 before Hzs2; move Hzs3 after Hzc2.
+apply (rngl_nlt_ge Hor).
+intros Hc123.
+apply (rngl_nlt_ge Hor) in Haov'.
+apply Haov'; clear Haov'; cbn.
+eapply (rngl_lt_le_trans Hor); [ apply Hc123 | ].
 ...
 apply rngl_leb_le in Hzs2.
 rewrite Hzs2 in Haov.
