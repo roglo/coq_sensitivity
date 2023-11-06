@@ -3130,8 +3130,8 @@ Theorem angle_le_sub_le_add_l :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
-angle_add_overflow θ2 θ3 = false →
-  (θ2 ≤ θ1)%A
+  angle_add_overflow θ2 θ3 = false
+  → (θ2 ≤ θ1)%A
   → (θ1 - θ2 ≤ θ3)%A
   → (θ1 ≤ θ2 + θ3)%A.
 Proof.
@@ -3188,6 +3188,19 @@ destruct zs1. {
         now apply rngl_cos_add_le_cos_if.
       }
       apply (rngl_nle_gt Hor) in Hc2z.
+(*
+  Haov : angle_add_overflow θ2 θ3 = false
+  H21 : (θ2 ≤ θ1)%A
+  Hzs1 : (0 ≤ rngl_sin θ1)%L
+  Hzs2 : (0 ≤ rngl_sin θ2)%L
+  Hzs3 : (0 ≤ rngl_sin θ3)%L
+  Hc123 : (rngl_cos θ3 ≤ rngl_cos (θ1 - θ2))%L
+  Hzs12 : (0 ≤ rngl_sin (θ1 - θ2))%L
+  Hzs23 : (0 ≤ rngl_sin (θ2 + θ3))%L
+  Hc2z : (rngl_cos θ2 < 0)%L
+  ============================
+  (rngl_cos (θ2 + θ3) ≤ rngl_cos θ1)%L
+*)
       assert (Hc1z : (rngl_cos θ1 ≤ 0)%L). {
         clear - H21 Hzs1 Hzs2 Hor Hc2z.
         progress unfold angle_leb in H21.
@@ -3338,10 +3351,6 @@ destruct zs1. {
       }
       move H before Hc1z; clear Hc1z.
       rename H into Hzc1.
-(*
-      apply (rngl_nlt_ge Hor) in Haov.
-      apply Haov; clear Haov.
-*)
       assert (Hc23 : (rngl_cos θ2 * rngl_cos θ3 < rngl_cos θ1)%L). {
         cbn in H23.
         rewrite (rngl_mul_opp_r Hop) in H23.
@@ -3374,6 +3383,13 @@ destruct zs1. {
         now apply (rngl_lt_le_incl Hor).
         now apply (rngl_lt_le_incl Hor).
       }
+(* des tests en ocaml (toto.ml) donnent un contre exemple *)
+...
+      destruct (rngl_le_dec Hor (rngl_cos θ3) (rngl_cos θ1))
+          as [Hc31| Hc13]. {
+        apply (rngl_nlt_ge Hor) in Hc31.
+        apply Hc31; clear Hc31.
+...
 specialize (rngl_cos_add_le_cos_if) as H1.
 generalize Hzs2; intros Hzs2'.
 apply (rngl_lt_le_incl Hor) in Hzs2'.
