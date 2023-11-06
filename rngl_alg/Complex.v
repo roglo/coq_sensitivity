@@ -3396,6 +3396,39 @@ destruct zs1. {
     apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
     move Hzs2 after Hzs3; move Hzs1 after Hzs2.
     rewrite angle_add_opp_r in Hzs23 |-*.
+    cbn in Hzs23 |-*.
+    rewrite (rngl_mul_opp_r Hop) in Hzs23 |-*.
+    rewrite (rngl_add_opp_l Hop) in Hzs23.
+    rewrite (rngl_sub_opp_r Hop).
+    apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+    apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ3)); [ easy | ].
+    rewrite rngl_mul_add_distr_r.
+    apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_cos θ3)) in Hzs23.
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite (rngl_mul_mul_swap Hic).
+    eapply (rngl_le_trans Hor); [ apply Hzs23 | ].
+    rewrite <- (rngl_mul_assoc _ (rngl_cos θ3)).
+    rewrite <- (rngl_mul_assoc _ (rngl_sin θ3)).
+    do 2 rewrite fold_rngl_squ.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ3) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1; clear H1.
+    rewrite (rngl_mul_sub_distr_l Hop).
+    rewrite (rngl_mul_1_r Hon).
+    rewrite (rngl_sub_sub_distr Hop).
+    apply (rngl_le_add_l Hor).
+    cbn in Hzs12.
+    rewrite (rngl_mul_opp_r Hop) in Hzs12.
+    rewrite (rngl_add_opp_l Hop) in Hzs12.
+    apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ1)); [ admit | ].
+    rewrite rngl_mul_assoc.
+    rewrite fold_rngl_squ.
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+    apply (rngl_add_move_r Hop) in H1.
+    rewrite H1; clear H1.
+(* ouais, bof *)
 ...
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
       subst θ2; rename θ into θ2.
