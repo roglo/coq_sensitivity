@@ -789,6 +789,25 @@ rewrite (rngl_mul_opp_l Hop).
 now rewrite (rngl_add_opp_r Hop).
 Qed.
 
+Theorem angle_opp_sub_distr :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, (- (θ1 - θ2))%A = (θ2 - θ1)%A.
+Proof.
+intros Hic Hop *.
+apply eq_angle_eq; cbn.
+do 3 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_opp_sub_distr Hop).
+do 2 rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
+do 2 rewrite (rngl_mul_comm Hic (rngl_sin θ1)).
+f_equal.
+rewrite (rngl_mul_opp_r Hop).
+symmetry.
+apply (rngl_add_opp_l Hop).
+Qed.
+
 Theorem angle_opp_involutive :
   rngl_has_opp T = true →
   ∀ θ, (- - θ)%A = θ.
@@ -2291,6 +2310,16 @@ intros Hic Hop *.
 do 2 rewrite <- (angle_add_assoc Hop).
 f_equal.
 apply (angle_add_comm Hic).
+Qed.
+
+Theorem angle_sub_sub_swap :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2 θ3, (θ1 - θ2 - θ3 = θ1 - θ3 - θ2)%A.
+Proof.
+intros Hic Hop *.
+progress unfold angle_sub.
+apply (angle_add_add_swap Hic Hop).
 Qed.
 
 Theorem rngl_sin_nonneg_sin_nonneg_add_cos_nonneg :
