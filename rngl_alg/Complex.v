@@ -3694,6 +3694,38 @@ destruct zs1. {
     apply (rngl_nle_gt Hor) in H.
     move H before Hzs1; clear Hzs1.
     rename Hc1z into Hzs1; rename H into Hzc1.
+    progress unfold angle_add_overflow in Haov'.
+    apply angle_ltb_ge in Haov'.
+    progress unfold angle_leb in Haov'.
+    rewrite (rngl_sin_add_right_r Hon Hos) in Haov'.
+    generalize Hzc1; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply rngl_leb_le in H.
+    rewrite H in Haov'; clear H.
+    rewrite (angle_opp_add_distr Hic Hop) in Haov'.
+    rewrite (angle_add_sub_assoc Hop) in Haov'.
+    rewrite angle_add_opp_r in Haov'.
+    rewrite (angle_add_sub Hic Hon Hop Hed) in Haov'.
+    apply rngl_leb_le in Hzs12.
+    rewrite Hzs12 in Haov'.
+    apply rngl_leb_le in Hzs12.
+    rewrite (rngl_cos_add_right_r Hon Hop) in Haov'.
+    apply rngl_leb_le in Haov'.
+    apply (rngl_nlt_ge Hor) in Haov'.
+    exfalso; apply Haov'; clear Haov'; cbn.
+    rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_sub_opp_r Hop).
+    apply (rngl_le_lt_trans Hor _ 0). {
+      now apply (rngl_opp_nonpos_nonneg Hop Hor).
+    }
+    apply (rngl_add_pos_nonneg Hor). {
+      now apply (rngl_mul_pos_pos Hop Hor Hii).
+    }
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+  destruct zs3; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
+  apply rngl_leb_le in Hc123.
 ...
     progress unfold angle_add_overflow in Haov'.
     apply angle_ltb_ge in Haov'.
