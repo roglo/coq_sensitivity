@@ -3484,8 +3484,48 @@ destruct zs1. {
       apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
       move Hc1z after Hzs2.
       move Hzs1 after Hzc3.
+      assert (H : (0 < rngl_cos θ1)%L). {
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H; symmetry in H.
+        apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+        destruct H; subst θ1. {
+          rewrite (rngl_sin_sub_right_l Hon Hos) in Haov'.
+          rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs12.
+          cbn in Haov'.
+          apply (rngl_le_antisymm Hor) in Haov'. 2: {
+            apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+          }
+          apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Haov'.
+          subst θ2.
+          rewrite (angle_add_0_l Hon Hos) in Hzs23.
+          now apply (rngl_nlt_ge Hor) in Hzs23.
+        }
+        apply (rngl_nle_gt Hor) in Hc1z.
+        apply Hc1z; cbn.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      move H before Hzs1; clear Hzs1; rename H into Hzc1.
+      apply (rngl_nlt_ge Hor) in Haov'.
+      apply Haov'; clear Haov'; cbn.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_add_opp_l Hop).
+      apply (rngl_lt_sub_lt_add_r Hop Hor).
+      eapply (rngl_le_lt_trans Hor _ (rngl_sin θ1)). {
+        apply (rngl_le_0_sub Hop Hor).
+        rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+        apply (rngl_mul_nonneg_nonneg Hop Hor).
+        now apply (rngl_lt_le_incl Hor).
+        apply (rngl_le_0_sub Hop Hor).
+        apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+      }
+      apply (rngl_lt_add_r Hos Hor).
+      now apply (rngl_mul_pos_pos Hop Hor Hii).
+    }
 ...
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
+Search (rngl_sin _ < rngl_sin (_ - _))%L.
 Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
 ...
         rewrite (rngl_mul_opp_r Hop).
