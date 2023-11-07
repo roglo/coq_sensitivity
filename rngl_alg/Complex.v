@@ -3433,11 +3433,39 @@ destruct zs1. {
       apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
       apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
       move Hzc3 before Hzs2; move Hzs3 after Hzc2.
-apply (rngl_nlt_ge Hor).
-intros Hc123.
-apply (rngl_nlt_ge Hor) in Haov'.
-apply Haov'; clear Haov'; cbn.
+      apply (rngl_nlt_ge Hor).
+      intros Hc123.
+      assert (H : (0 < rngl_sin θ2)%L). {
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H; symmetry in H.
+        apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+        destruct H; subst θ2. {
+          rewrite (angle_add_0_l Hon Hos) in Hzs23.
+          now apply (rngl_nlt_ge Hor) in Hzs23.
+        }
+        apply (rngl_nle_gt Hor) in Hzc2.
+        apply Hzc2; cbn.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      move H before Hzs2; clear Hzs2; rename H into Hzs2.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+        move Hzc1 after Hzc2.
+        apply (rngl_nlt_ge Hor) in Haov'.
+        apply Haov'; clear Haov'.
+        rewrite (rngl_cos_sub_comm Hic Hop).
+apply rngl_cos_lt_rngl_cos_sub; try easy.
+now apply (rngl_lt_le_incl Hor).
+...
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
+...
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
+...
 eapply (rngl_lt_le_trans Hor); [ apply Hc123 | ].
+cbn.
 ...
 apply rngl_leb_le in Hzs2.
 rewrite Hzs2 in Haov.
