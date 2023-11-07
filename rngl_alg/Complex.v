@@ -3532,6 +3532,19 @@ destruct zs1. {
     rewrite (rngl_cos_add_straight_r Hon Hop).
     apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
     move Hzs3 after Hzs2.
+    remember (θ2 - angle_right)%A as θ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+    subst θ2; rename θ into θ2.
+    move θ2 before θ1.
+    rewrite (angle_sub_add_distr Hic Hop) in Hzs12.
+    rewrite (angle_add_add_swap Hic Hop) in Hzs23 |-*.
+    rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12.
+    rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hzs23.
+    rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z |-*.
+    apply (rngl_nlt_ge Hor) in Hc2z.
+    apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12, Hzs23.
+    rewrite (rngl_opp_involutive Hop).
 ...
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
 Search (rngl_sin _ < rngl_sin (_ - _))%L.
