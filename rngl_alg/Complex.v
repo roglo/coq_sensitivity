@@ -2837,7 +2837,7 @@ symmetry.
 apply (rngl_add_opp_l Hop).
 Qed.
 
-Theorem rngl_sin_sub_nonneg :
+Theorem rngl_sin_sub_nonneg_sin_le_sin :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3604,8 +3604,6 @@ destruct zs1. {
   destruct zs3; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
   apply rngl_leb_le in Hc123.
-...
-
 ...
 
 Check angle_le_sub_le_add_l.
