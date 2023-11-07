@@ -3603,7 +3603,11 @@ destruct zs1. {
   }
   destruct zs3; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
-  apply rngl_leb_le in Hc123.
+progress unfold angle_leb in H21.
+apply rngl_leb_le in Hzs1, Hzs2.
+rewrite Hzs2, Hzs1 in H21.
+apply rngl_leb_le in Hzs1, Hzs2.
+apply rngl_leb_le in H21.
 ...
 
 Check angle_le_sub_le_add_l.
