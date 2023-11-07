@@ -3523,6 +3523,15 @@ destruct zs1. {
       apply (rngl_lt_add_r Hos Hor).
       now apply (rngl_mul_pos_pos Hop Hor Hii).
     }
+    remember (θ3 - angle_straight)%A as θ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+    subst θ3; rename θ into θ3.
+    move θ3 before θ2.
+    rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3, Hzs23.
+    rewrite (rngl_cos_add_straight_r Hon Hop).
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+    move Hzs3 after Hzs2.
 ...
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
 Search (rngl_sin _ < rngl_sin (_ - _))%L.
