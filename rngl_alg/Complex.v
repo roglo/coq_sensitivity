@@ -3455,8 +3455,35 @@ destruct zs1. {
         apply (rngl_nlt_ge Hor) in Haov'.
         apply Haov'; clear Haov'.
         rewrite (rngl_cos_sub_comm Hic Hop).
-apply rngl_cos_lt_rngl_cos_sub; try easy.
-now apply (rngl_lt_le_incl Hor).
+        apply rngl_cos_lt_rngl_cos_sub; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        progress unfold angle_leb in H21.
+        generalize Hzs2; intros H.
+        apply (rngl_lt_le_incl Hor) in H.
+        apply rngl_leb_le in H.
+        rewrite H in H21; clear H.
+        apply rngl_leb_le in Hzs1.
+        rewrite Hzs1 in H21.
+        apply rngl_leb_le in Hzs1.
+        apply rngl_leb_le in H21.
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H.
+        rewrite H in Hc123.
+        now apply (rngl_nle_gt Hor) in Hc123.
+      }
+      apply (rngl_nle_gt Hor) in Hc1z.
+      remember (θ1 - angle_right)%A as θ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      subst θ1; rename θ into θ1.
+      move θ1 after θ2.
+      rewrite (angle_add_sub_swap Hic Hop) in Haov', Hzs12.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs12.
+      rewrite (rngl_cos_add_right_r Hon Hop) in Haov', Haov', Hc1z, Hc123.
+      apply (rngl_opp_le_compat Hop Hor) in Haov'.
+      apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
+      move Hc1z after Hzs2.
+      move Hzs1 after Hzc3.
 ...
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
 Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
