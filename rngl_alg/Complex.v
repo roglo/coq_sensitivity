@@ -3603,11 +3603,23 @@ destruct zs1. {
   }
   destruct zs3; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
-progress unfold angle_leb in H21.
-apply rngl_leb_le in Hzs1, Hzs2.
-rewrite Hzs2, Hzs1 in H21.
-apply rngl_leb_le in Hzs1, Hzs2.
-apply rngl_leb_le in H21.
+  progress unfold angle_leb in H21.
+  apply rngl_leb_le in Hzs1, Hzs2.
+  rewrite Hzs2, Hzs1 in H21.
+  apply rngl_leb_le in Hzs1, Hzs2.
+  apply rngl_leb_le in H21, Hc123.
+  remember (θ3 - angle_straight)%A as θ.
+  apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+  subst θ3; rename θ into θ3.
+  move θ3 before θ2.
+  rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3, Hzs23.
+  rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123 |-*.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+  rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
+  move Hzs3 after Hzs2.
 ...
 
 Check angle_le_sub_le_add_l.
