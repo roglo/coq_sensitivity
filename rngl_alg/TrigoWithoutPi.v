@@ -915,6 +915,18 @@ rewrite (rngl_mul_0_r Hos).
 apply (rngl_sub_0_r Hos).
 Qed.
 
+Theorem rngl_cos_add_right_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (angle_right + θ) = (- rngl_sin θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+apply (rngl_sub_0_l Hop).
+Qed.
+
 Theorem rngl_cos_add_right_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -925,6 +937,17 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_0_r Hos).
 apply (rngl_sub_0_l Hop).
+Qed.
+
+Theorem rngl_sin_add_right_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, rngl_sin (angle_right + θ) = rngl_cos θ.
+Proof.
+intros Hon Hos *; cbn.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_sin_add_right_r :

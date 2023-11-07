@@ -3545,6 +3545,36 @@ destruct zs1. {
     apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12, Hzs23.
     rewrite (rngl_opp_involutive Hop).
+    move Hc2z before Hzs1; move Hzs3 before Hc2z.
+    rename Hzs2 into Hzc2; rename Hc2z into Hsz2.
+    destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [H| H]. {
+      apply (rngl_le_antisymm Hor) in H.
+      symmetry in H.
+      apply eq_rngl_cos_0 in H.
+      destruct H; subst θ2. {
+        progress unfold angle_leb in H21.
+        rewrite (rngl_sin_add_right_l Hon Hos) in H21.
+        rewrite (rngl_cos_add_right_l Hon Hop) in H21.
+        cbn in H21.
+        rewrite (rngl_leb_refl Hor) in H21.
+        apply rngl_leb_le in Hzs1.
+        rewrite Hzs1 in H21.
+        apply rngl_leb_le in H21.
+...
+        progress unfold angle_add_overflow in Haov.
+        apply angle_ltb_ge in Haov.
+...
+        rewrite (rngl_sin_add_right_l Hon Hos).
+...
+        rewrite (rngl_cos_add_right_l Hon Hop) in Hzs23.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs23.
+...
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      move Hzc1 after Hzc2.
+      apply (rngl_nlt_ge Hor) in Hzs12.
+      exfalso; apply Hzs12; clear Hzs12; cbn.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_sub_opp_r Hop).
 ...
 Search (rngl_cos _ < rngl_cos (_ - _))%L.
 Search (rngl_sin _ < rngl_sin (_ - _))%L.
