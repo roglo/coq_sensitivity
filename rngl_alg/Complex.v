@@ -3796,6 +3796,7 @@ destruct zs1. {
   apply (rngl_le_opp_r Hop Hor) in Hc123.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
   apply -> (rngl_opp_le_compat Hop Hor).
+  apply (rngl_le_opp_l Hop Hor) in H21.
   move Hc1z after Hzs2; move Hzs1 after Hzs3.
 ...
 

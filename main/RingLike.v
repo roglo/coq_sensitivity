@@ -3605,6 +3605,16 @@ rewrite rngl_add_comm.
 apply (rngl_lt_add_lt_sub_l Hop Hor).
 Qed.
 
+Theorem rngl_le_opp_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (- a ≤ b → 0 ≤ a + b)%L.
+Proof.
+intros Hop Hor * Hab.
+rewrite <- (rngl_sub_0_l Hop) in Hab.
+now apply (rngl_le_sub_le_add_l Hop Hor) in Hab.
+Qed.
+
 Theorem rngl_le_opp_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
