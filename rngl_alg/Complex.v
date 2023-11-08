@@ -3712,6 +3712,19 @@ destruct zs1. {
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
   rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
   move Hzs3 after Hzs2.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+    generalize Hzs12; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply (rngl_sin_sub_nonneg_sin_le_sin Hic Hon Hop Hed _ _ Hzs2) in H. 2: {
+      eapply (rngl_le_trans Hor); [ apply Hzc1 | apply H21 ].
+    }
+    cbn in Hzs12.
+    rewrite (rngl_mul_opp_r Hop) in Hzs12.
+    rewrite (rngl_add_opp_l Hop) in Hzs12.
+    apply -> (rngl_lt_0_sub Hop Hor) in Hzs12.
+    exfalso.
+    apply (rngl_nle_gt Hor) in Hzs12.
+    apply Hzs12; clear Hzs12.
 ...
 
 Check angle_le_sub_le_add_l.
