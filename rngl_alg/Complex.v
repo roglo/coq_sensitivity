@@ -3611,6 +3611,43 @@ apply (rngl_add_pos_nonneg Hor). {
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
+Theorem rngl_cos_eq :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, rngl_cos θ1 = rngl_cos θ2 → θ1 = θ2 ∨ θ1 = (- θ2)%A.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * Hcc.
+destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hss| Hss]. {
+  left.
+  apply eq_angle_eq.
+  now rewrite Hcc, Hss.
+}
+right.
+apply eq_angle_eq.
+rewrite Hcc; f_equal.
+cbn.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H2.
+apply (rngl_add_move_l Hop) in H1, H2.
+rewrite Hcc in H1.
+rewrite <- H2 in H1; clear H2.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hid) in H1.
+progress unfold rngl_abs in H1.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+symmetry in Hs1z, Hs2z.
+destruct s1z; [ | now destruct s2z ].
+destruct s2z; [ now apply (rngl_opp_inj Hop) in H1 | ].
+rewrite <- H1; symmetry.
+apply (rngl_opp_involutive Hop).
+Qed.
+
 (* to be completed
 Theorem angle_le_sub_le_add_l :
   rngl_mul_is_comm T = true →
@@ -3729,9 +3766,23 @@ destruct zs1. {
       eapply (rngl_le_trans Hor); [ apply Hzc1 | apply H21 ].
     }
     apply (rngl_le_antisymm Hor) in H; [ | easy ].
+    apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+    rewrite (rngl_mul_comm Hic).
+    destruct H; subst θ1. {
+      apply (rngl_le_refl Hor).
+    }
+    cbn in Hzs1.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs1.
+    apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+    rewrite rngl_cos_opp.
+    rewrite <- Hzs1; cbn.
+    symmetry in Hzs1.
+    apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzs1.
+    destruct Hzs1; subst θ2; cbn; rewrite (rngl_opp_0 Hop);
+      apply (rngl_le_refl Hor).
+  }
+  apply (rngl_nle_gt Hor) in Hc1z.
 ...
-
-Check angle_le_sub_le_add_l.
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
