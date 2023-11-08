@@ -2503,6 +2503,21 @@ split; intros Ha. {
 }
 Qed.
 
+Theorem rngl_opp_pos_neg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 < - a)%L ↔ (a < 0)%L.
+Proof.
+intros Hop Hor *.
+split; intros Ha. {
+  apply (rngl_opp_lt_compat Hop Hor).
+  now rewrite (rngl_opp_0 Hop).
+} {
+  apply (rngl_opp_lt_compat Hop Hor) in Ha.
+  now rewrite (rngl_opp_0 Hop) in Ha.
+}
+Qed.
+
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem rngl_mul_nat_mul_nat_1 :

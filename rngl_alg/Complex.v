@@ -3791,9 +3791,12 @@ destruct zs1. {
   rewrite (rngl_cos_add_right_r Hon Hop) in H21, Hc1z |-*.
   rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12.
   rewrite (rngl_cos_sub_right_r Hon Hop) in Hc123.
+  apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
-  move Hc1z after Hzs2.
-  move Hzs1 after Hzs3.
+  apply (rngl_le_opp_r Hop Hor) in Hc123.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
+  apply -> (rngl_opp_le_compat Hop Hor).
+  move Hc1z after Hzs2; move Hzs1 after Hzs3.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
