@@ -3725,6 +3725,10 @@ destruct zs1. {
     exfalso.
     apply (rngl_nle_gt Hor) in Hzs12.
     apply Hzs12; clear Hzs12.
+    apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H; try easy. 2: {
+      eapply (rngl_le_trans Hor); [ apply Hzc1 | apply H21 ].
+    }
+    apply (rngl_le_antisymm Hor) in H; [ | easy ].
 ...
 
 Check angle_le_sub_le_add_l.
