@@ -3970,7 +3970,15 @@ destruct zs1. {
     now apply angle_le_sub_le_add_l_lemma_5.
   }
 }
+apply (rngl_leb_gt Hor) in Hzs1.
 destruct zs23. {
+  exfalso.
+  apply rngl_leb_le in Hzs23.
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    destruct zs3. {
+      apply rngl_leb_le in Hzs3.
+      apply rngl_leb_le in Hc123.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
