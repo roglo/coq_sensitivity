@@ -3991,6 +3991,7 @@ destruct zs23. {
       rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
       rewrite (rngl_opp_involutive Hop) in Hzs12.
       rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
+      move Hzs3 after Hzs1.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
