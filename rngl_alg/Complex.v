@@ -3979,6 +3979,18 @@ destruct zs23. {
     destruct zs3. {
       apply rngl_leb_le in Hzs3.
       apply rngl_leb_le in Hc123.
+      remember (θ1 - angle_straight)%A as θ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+      subst θ1; rename θ into θ1.
+      move θ1 after θ2.
+      rewrite (angle_add_sub_swap Hic Hop) in Hc123, Hzs12.
+      rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1, Hzs12.
+      rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
+      apply (rngl_le_opp_r Hop Hor) in Hc123.
+      rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+      rewrite (rngl_opp_involutive Hop) in Hzs12.
+      rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
