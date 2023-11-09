@@ -3871,6 +3871,22 @@ destruct zs1. {
   apply rngl_leb_le in Haov.
   apply (rngl_le_opp_r Hop Hor) in Haov.
   rewrite rngl_add_comm in Haov.
+  apply (rngl_nlt_ge Hor) in H21.
+  exfalso.
+  apply H21; clear H21.
+Search (0 < rngl_sin (_ - _))%L.
+Search (0 ≤ rngl_sin (_ - _))%L.
+apply (rngl_lt_iff Hor).
+split.
+apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+intros H.
+Search (rngl_sin _ = rngl_sin _).
+Search (rngl_cos _ = rngl_cos _).
+...
+cbn in Hc123.
+cbn.
 ...
   eapply (rngl_le_trans Hor); [ | apply Haov ].
   apply (rngl_add_le_mono_r Hop Hor).
