@@ -3848,6 +3848,33 @@ destruct zs1. {
   apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
   apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs23.
   move Hc3z before Hc2z; move Hzs3 after Hzs2.
+  progress unfold angle_add_overflow in Haov.
+  apply angle_ltb_ge in Haov.
+  progress unfold angle_leb in Haov.
+  rewrite (rngl_sin_add_right_r Hon Hos) in Haov.
+  apply rngl_leb_le in Hzs2.
+  rewrite Hzs2 in Haov.
+  apply rngl_leb_le in Hzs2.
+  do 2 rewrite (angle_add_assoc Hop) in Haov.
+  rewrite (rngl_sin_add_straight_r Hon Hop) in Haov.
+  rewrite (rngl_sin_add_right_r Hon Hos) in Haov.
+  rewrite (angle_add_add_swap Hic Hop) in Haov.
+  rewrite (rngl_cos_add_right_r Hon Hop) in Haov.
+  rewrite (rngl_opp_involutive Hop) in Haov.
+  apply rngl_leb_le in Hzs23.
+  rewrite Hzs23 in Haov.
+  apply rngl_leb_le in Hzs23.
+  rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
+  do 2 rewrite (rngl_cos_add_right_r Hon Hop) in Haov.
+  rewrite (rngl_sin_add_right_r Hon Hos) in Haov.
+  rewrite (rngl_opp_involutive Hop) in Haov.
+  apply rngl_leb_le in Haov.
+  apply (rngl_le_opp_r Hop Hor) in Haov.
+  rewrite rngl_add_comm in Haov.
+...
+  eapply (rngl_le_trans Hor); [ | apply Haov ].
+  apply (rngl_add_le_mono_r Hop Hor).
+(* fuck *)
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
