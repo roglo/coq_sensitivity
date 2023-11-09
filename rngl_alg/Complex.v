@@ -3732,11 +3732,12 @@ destruct zs1. {
   }
   destruct zs3; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
+  apply rngl_leb_le in Hc123.
   progress unfold angle_leb in H21.
   apply rngl_leb_le in Hzs1, Hzs2.
   rewrite Hzs2, Hzs1 in H21.
   apply rngl_leb_le in Hzs1, Hzs2.
-  apply rngl_leb_le in H21, Hc123.
+  apply rngl_leb_le in H21.
   remember (θ3 - angle_straight)%A as θ.
   apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
   subst θ3; rename θ into θ3.
@@ -3798,6 +3799,14 @@ destruct zs1. {
   apply -> (rngl_opp_le_compat Hop Hor).
   apply (rngl_le_opp_l Hop Hor) in H21.
   move Hc1z after Hzs2; move Hzs1 after Hzs3.
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    remember (θ3 - angle_right)%A as θ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+    subst θ3; rename θ into θ3.
+    move θ3 before θ2.
+    rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+    rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3, Hzs23.
+    rewrite (rngl_cos_add_right_r Hon Hop) in Hc123 |-*.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
