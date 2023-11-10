@@ -4181,22 +4181,71 @@ destruct zs23. {
           rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
           rewrite (rngl_sin_add_right_r Hon Hos) in Hsov.
           generalize Hzs1; intros H.
-          apply (rngl_lt_le_incl Hor) in H.
-          apply (rngl_opp_le_compat Hop Hor) in H.
-...
-          rewrite (rngl_opp_0 Hop) in H.
-Search (- _ ≤ 0)%L.
-apply rngl_
-          apply rngl_leb_le in H.
-          apply rngl__le in H.
-...
-          rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
-          generalize Hzs1; intros H.
           apply (rngl_opp_lt_compat Hop Hor) in H.
           rewrite (rngl_opp_0 Hop) in H.
           apply (rngl_nle_gt Hor) in H.
           apply rngl_leb_nle in H.
           rewrite H in Hsov; clear H.
+          apply rngl_leb_le in Hzs12.
+          now rewrite Hzs12 in Hsov.
+        }
+        apply (rngl_nle_gt Hor) in Hc2z.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+          cbn.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite <- (rngl_mul_opp_l Hop).
+          apply (rngl_add_nonneg_pos Hor); [ easy | ].
+          apply (rngl_opp_pos_neg Hop Hor) in Hc2z.
+          apply (rngl_lt_le_incl Hor) in Hzs1.
+          apply (rngl_add_pos_nonneg Hor).
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        }
+        apply (rngl_nle_gt Hor) in Hs2z.
+        remember (θ2 - angle_straight)%A as θ.
+        apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+        subst θ2; rename θ into θ2.
+        move θ2 before θ1.
+        rewrite (angle_add_add_swap Hic Hop) in Hzs23.
+        rewrite (angle_add_sub_swap Hic Hop) in Hzs12 |-*.
+        rewrite (rngl_sin_add_straight_r Hon Hop) in Hs2z, Hzs23 |-*.
+        rewrite (rngl_cos_add_straight_r Hon Hop) in Hc2z, Hzs12.
+        rewrite (rngl_add_opp_r Hop).
+        apply (rngl_opp_neg_pos Hop Hor) in Hs2z, Hc2z.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs12.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs23.
+        apply (rngl_lt_0_sub Hop Hor).
+        move Hs2z before Hc1z; move Hc2z before Hzs1.
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzs23.
+        apply Hzs23; clear Hzs23.
+        apply (rngl_lt_iff Hor).
+        split. {
+          cbn.
+          apply (rngl_lt_le_incl Hor) in Hc2z, Hs2z.
+          apply (rngl_add_nonneg_nonneg Hor).
+          now apply (rngl_mul_nonneg_nonneg).
+          now apply (rngl_mul_nonneg_nonneg).
+        }
+        intros H.
+        symmetry in H.
+        apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+        destruct H as [H| H]. {
+          apply (angle_add_sub_eq_l Hic Hon Hop Hed) in H.
+          progress unfold angle_sub in H.
+          rewrite (angle_add_0_l Hon Hos) in H.
+          subst θ3.
+          cbn in Hzs3.
+          apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs3.
+          now apply (rngl_nlt_ge Hor) in Hzs3.
+        }
+        apply (angle_add_sub_eq_l Hic Hon Hop Hed) in H.
+        subst θ3.
+        rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc3.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc3.
+        now apply (rngl_nlt_ge Hor) in Hzc3.
+      }
+      apply (rngl_nle_gt Hor) in Hc3z.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
