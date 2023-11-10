@@ -4291,10 +4291,36 @@ destruct zs23. {
           rewrite <- (angle_sub_sub_swap Hic Hop) in Hzs12 |-*.
           rewrite (rngl_sin_sub_right_r Hon Hop) in Hs2z |-*.
           rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc2, Hzs23, Hzs12.
-          apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs2z.
+          rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+          apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs2z, Hzs12.
           apply (rngl_lt_opp_r Hop Hor).
           move Hzc2 before Hc1z; move Hzs1 after Hc3z.
           move Hs2z after Hzs3.
+          progress unfold angle_add_overflow in Hsov.
+          apply angle_ltb_ge in Hsov.
+          rewrite angle_add_opp_r in Hsov.
+          rewrite (angle_sub_sub_distr Hic Hop) in Hsov.
+          do 2 rewrite (angle_add_sub_swap Hic Hop) in Hsov.
+          rewrite (angle_add_add_swap Hic Hop (_ + _))%A in Hsov.
+          do 3 rewrite <- (angle_add_assoc Hop) in Hsov.
+          rewrite (angle_add_assoc Hop angle_right) in Hsov.
+          rewrite (angle_right_add_right Hon Hop) in Hsov.
+          rewrite (angle_straight_add_straight Hon Hop) in Hsov.
+          rewrite (angle_add_0_r Hon Hos) in Hsov.
+          progress unfold angle_leb in Hsov.
+          rewrite (angle_add_assoc Hop) in Hsov.
+          rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hsov.
+          generalize Hzs1; intros H.
+          apply (rngl_opp_lt_compat Hop Hor) in H.
+          rewrite (rngl_opp_0 Hop) in H.
+          apply (rngl_nle_gt Hor) in H.
+          apply rngl_leb_nle in H.
+          rewrite H in Hsov; clear H.
+          apply rngl_leb_le in Hzs12.
+          now rewrite Hzs12 in Hsov.
+        }
+        apply (rngl_nle_gt Hor) in Hc2z.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
