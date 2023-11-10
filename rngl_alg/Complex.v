@@ -4122,6 +4122,19 @@ destruct zs23. {
           now rewrite H in Hsov.
         }
         apply (rngl_nle_gt Hor) in Hc1z.
+        remember (θ1 - angle_right)%A as θ eqn:Hθ.
+        apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ1; rename θ into θ1.
+        move θ1 after θ2.
+        rewrite (angle_sub_add_distr Hic Hop) in Hzs12 |-*.
+        rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1.
+        rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12.
+        rewrite (rngl_cos_sub_right_r Hon Hop).
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+        apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
+        move Hc1z after Hzs3; move Hzs1 after Hzs3.
+        move Hzc3 before Hzs1.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
