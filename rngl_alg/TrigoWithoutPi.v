@@ -1874,6 +1874,22 @@ f_equal.
 apply (rngl_mul_1_r Hon).
 Qed.
 
+Theorem angle_right_add_right :
+  rngl_has_1 T = true
+  → rngl_has_opp T = true
+  → (angle_right + angle_right)%A = angle_straight.
+Proof.
+intros Hon Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_0_l Hos).
+do 2 rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_0_l Hop).
+f_equal.
+apply rngl_add_0_l.
+Qed.
+
 Theorem angle_straight_add_straight :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
