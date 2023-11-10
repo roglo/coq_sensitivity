@@ -4357,6 +4357,13 @@ destruct zs23. {
       }
       apply (rngl_nlt_ge Hor) in Hzc1.
       move Hzc1 after Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+          move Hzs2 before Hzs1; move Hzc2 before Hzc1.
+          cbn in Hzs23 |-*.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_sub_opp_r Hop).
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
