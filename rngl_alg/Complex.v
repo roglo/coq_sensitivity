@@ -4360,6 +4360,17 @@ destruct zs23. {
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
         destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
           move Hzs2 before Hzs1; move Hzc2 before Hzc1.
+          remember (angle_right - θ3)%A as θ eqn:Hθ.
+          apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+          subst θ3; rename θ into θ3.
+          move θ3 before θ2.
+          rewrite (angle_add_comm Hic) in Hzs23.
+          rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs23.
+          rewrite (rngl_sin_sub_right_l Hon Hos) in Hc3z |-*.
+          rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs3, Hzs23.
+          move Hzs3 before Hzs2; move Hc3z after Hzc2.
+Search (rngl_cos _ < rngl_cos _)%L.
+eapply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 ...
           cbn in Hzs12, Hzs23 |-*.
           rewrite (rngl_mul_opp_r Hop) in Hzs12.
