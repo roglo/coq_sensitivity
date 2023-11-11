@@ -4369,6 +4369,19 @@ destruct zs23. {
           rewrite (rngl_sin_sub_right_l Hon Hos) in Hc3z |-*.
           rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs3, Hzs23.
           move Hzs3 before Hzs2; move Hc3z after Hzc2.
+          enough (H : (rngl_sin θ3 * rngl_cos θ2 < rngl_sin θ1)%L). {
+            cbn in Hzs12, Hzs23.
+            rewrite (rngl_mul_opp_r Hop) in Hzs12, Hzs23.
+            rewrite (rngl_add_opp_l Hop) in Hzs12, Hzs23.
+            apply -> (rngl_le_0_sub Hop) in Hzs12.
+            apply -> (rngl_le_0_sub Hop) in Hzs23.
+            remember (rngl_cos θ2 * rngl_cos θ1 * rngl_sin θ2)%L as x.
+            apply (rngl_add_lt_mono_r Hop Hor _ _ x) in H.
+            subst x.
+            apply
+              (rngl_lt_trans Hor _
+                 (rngl_sin θ3 * rngl_sin θ2 + ...
+...
 Search (rngl_cos _ < rngl_cos _)%L.
 eapply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 ...
