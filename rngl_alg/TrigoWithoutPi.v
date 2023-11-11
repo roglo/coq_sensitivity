@@ -701,6 +701,19 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_l.
 Qed.
 
+Theorem angle_sub_0_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, (0 - θ = - θ)%A.
+Proof.
+intros Hon Hos *.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+now rewrite rngl_add_0_r.
+Qed.
+
 Theorem angle_sub_0_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1858,6 +1871,20 @@ apply (rngl_add_cos_nonneg_when_sin_nonneg Hic Hon Hop Hed). {
 } {
   now rewrite rngl_cos_opp.
 }
+Qed.
+
+Theorem rngl_sin_add_straight_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, (rngl_sin (angle_straight + θ) = - rngl_sin θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_mul_opp_l Hop).
+f_equal.
+apply (rngl_mul_1_l Hon).
 Qed.
 
 Theorem rngl_sin_add_straight_r :

@@ -4464,6 +4464,90 @@ destruct zs23. {
           now apply (rngl_lt_le_incl).
         }
         apply (rngl_nlt_ge Hor) in Hs2z.
+        remember (θ2 + angle_right)%A as θ eqn:Hθ.
+        apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ2; rename θ into θ2.
+        move θ2 before θ1.
+        rewrite <- (angle_add_sub_swap Hic Hop) in Hzs23.
+        rewrite (angle_sub_sub_swap Hic Hop) in Hzs12 |-*.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in Hs2z, Hzs12.
+        rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc2, Hzs23 |-*.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs2z.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+        move Hzc2 before Hzs1; move Hs2z before Hzc1.
+        destruct (rngl_le_dec Hor (rngl_sin θ2) 0) as [H| H]. {
+          apply (rngl_le_antisymm Hor) in H; [ | easy ].
+          symmetry in H.
+          apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+          destruct H; subst θ2. {
+            rewrite (angle_sub_0_l Hon Hos) in Hzs12.
+            rewrite rngl_cos_opp in Hzs12.
+            apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
+            symmetry in Hzs12.
+            apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hzs12.
+            destruct Hzs12; subst θ1. {
+              progress unfold angle_add_overflow in Hsov.
+              apply angle_ltb_ge in Hsov.
+              rewrite angle_add_opp_r in Hsov.
+              rewrite (angle_sub_sub_distr Hic Hop) in Hsov.
+              rewrite (angle_sub_0_r Hon Hop) in Hsov.
+              rewrite (angle_add_add_swap Hic Hop) in Hsov.
+              rewrite (angle_right_add_right Hon Hop) in Hsov.
+              rewrite (angle_straight_add_straight Hon Hop) in Hsov.
+              progress unfold angle_leb in Hsov.
+              rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
+              rewrite (rngl_leb_refl Hor) in Hsov.
+              cbn in Hsov.
+              remember (0 ≤? -1)%L as x eqn:Hx.
+              symmetry in Hx.
+              destruct x; [ | easy ].
+              apply rngl_leb_le in Hx.
+              apply (rngl_nlt_ge Hor) in Hx.
+              exfalso; apply Hx; clear Hx.
+              apply (rngl_opp_neg_pos Hop Hor).
+              apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+            }
+            cbn in Hzs1.
+            apply (rngl_nle_gt Hor) in Hzs1.
+            exfalso; apply Hzs1; clear Hzs1.
+            apply (rngl_opp_nonpos_nonneg Hop Hor).
+            apply (rngl_0_le_1 Hon Hop Hor).
+          }
+          apply (rngl_nlt_ge Hor) in Hs2z.
+          exfalso; apply Hs2z; clear Hs2z; cbn.
+          apply (rngl_opp_neg_pos Hop Hor).
+          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+        }
+        apply (rngl_nle_gt Hor) in H.
+        move H before Hzc2; clear Hzc2; rename H into Hzs2.
+        apply (rngl_nlt_ge Hor) in Hzs12.
+        exfalso; apply Hzs12; clear Hzs12; cbn.
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
+        apply (rngl_add_nonneg_pos Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        now apply (rngl_mul_pos_pos Hop Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc2z.
+...
+          rewrite (angle_add_add_swap Hic Hop (_ + _))%A in Hsov.
+          do 3 rewrite <- (angle_add_assoc Hop) in Hsov.
+          rewrite (angle_add_assoc Hop angle_right) in Hsov.
+          rewrite (angle_right_add_right Hon Hop) in Hsov.
+          rewrite (angle_straight_add_straight Hon Hop) in Hsov.
+          rewrite (angle_add_0_r Hon Hos) in Hsov.
+          progress unfold angle_leb in Hsov.
+          rewrite (angle_add_assoc Hop) in Hsov.
+          rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hsov.
+          generalize Hzs1; intros H.
+
+...
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzs12.
+        apply Hzs12; clear Hzs12; cbn.
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
 ...
           enough (H : (rngl_sin θ3 * rngl_cos θ2 < rngl_sin θ1)%L). {
             cbn in Hzs12, Hzs23.
