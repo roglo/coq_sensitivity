@@ -4360,10 +4360,35 @@ destruct zs23. {
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
         destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
           move Hzs2 before Hzs1; move Hzc2 before Hzc1.
-          cbn in Hzs23 |-*.
+...
+          cbn in Hzs12, Hzs23 |-*.
+          rewrite (rngl_mul_opp_r Hop) in Hzs12.
+          rewrite (rngl_add_opp_l Hop) in Hzs12.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
           apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
           rewrite (rngl_mul_opp_r Hop).
           rewrite (rngl_sub_opp_r Hop).
+          apply (rngl_mul_lt_mono_pos_l Hop Hor Hii (rngl_sin θ2) _ _ Hzs2).
+          eapply (rngl_le_lt_trans Hor); [ apply Hzs23 | ].
+          rewrite rngl_mul_add_distr_l.
+          do 2 rewrite rngl_mul_assoc.
+          rewrite fold_rngl_squ.
+          specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+          apply (rngl_add_move_l Hop) in H1.
+          rewrite H1; clear H1.
+          rewrite (rngl_mul_sub_distr_r Hop).
+          rewrite (rngl_mul_1_l Hon).
+          rewrite (rngl_add_sub_assoc Hop).
+          apply (rngl_lt_add_lt_sub_r Hop Hor).
+          apply (rngl_lt_add_lt_sub_l Hop Hor).
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cos θ2) _ _ Hzc2) in Hzs12.
+          rewrite rngl_mul_assoc in Hzs12.
+          rewrite fold_rngl_squ in Hzs12.
+          eapply (rngl_le_lt_trans Hor); [ apply Hzs12 | ].
+...
+          progress unfold rngl_squ.
+          rewrite <- rngl_mul_assoc.
+          rewrite <- rngl_mul_add_distr_l.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
