@@ -4529,66 +4529,8 @@ destruct zs23. {
         now apply (rngl_mul_pos_pos Hop Hor).
       }
       apply (rngl_nle_gt Hor) in Hc2z.
-...
-          rewrite (angle_add_add_swap Hic Hop (_ + _))%A in Hsov.
-          do 3 rewrite <- (angle_add_assoc Hop) in Hsov.
-          rewrite (angle_add_assoc Hop angle_right) in Hsov.
-          rewrite (angle_right_add_right Hon Hop) in Hsov.
-          rewrite (angle_straight_add_straight Hon Hop) in Hsov.
-          rewrite (angle_add_0_r Hon Hos) in Hsov.
-          progress unfold angle_leb in Hsov.
-          rewrite (angle_add_assoc Hop) in Hsov.
-          rewrite (rngl_sin_add_straight_r Hon Hop) in Hsov.
-          rewrite (rngl_sin_add_right_r Hon Hos) in Hsov.
-          generalize Hzs1; intros H.
-
-...
-        exfalso.
-        apply (rngl_nlt_ge Hor) in Hzs12.
-        apply Hzs12; clear Hzs12; cbn.
-        rewrite (rngl_mul_opp_r Hop).
-        rewrite (rngl_sub_opp_r Hop).
-...
-          enough (H : (rngl_sin θ3 * rngl_cos θ2 < rngl_sin θ1)%L). {
-            cbn in Hzs12, Hzs23.
-            rewrite (rngl_mul_opp_r Hop) in Hzs12, Hzs23.
-            rewrite (rngl_add_opp_l Hop) in Hzs12, Hzs23.
-            apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
-            apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
-            remember (rngl_cos θ2 * rngl_cos θ1 * rngl_sin θ2)%L as x.
-            apply (rngl_add_lt_mono_r Hop Hor _ _ x) in H.
-            subst x.
-            apply (rngl_le_lt_trans Hor) with
-              (a :=
-                 (rngl_sin θ3 * rngl_cos θ2 +
-                  rngl_cos θ2 * rngl_cos θ2 * rngl_sin θ1)%L)
-                in H. 2: {
-              apply (rngl_add_le_mono_l Hop Hor).
-              do 2 rewrite <- rngl_mul_assoc.
-              apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-              now rewrite (rngl_mul_comm Hic (rngl_cos θ1)).
-            }
-            rewrite fold_rngl_squ in H.
-            apply (rngl_lt_add_lt_sub_r Hop Hor) in H.
-            rewrite (rngl_add_comm (rngl_sin θ1)) in H.
-            rewrite <- (rngl_add_sub_assoc Hop) in H.
-            rewrite (rngl_sub_mul_r_diag_r Hon Hop) in H.
-            specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
-            apply (rngl_add_move_l Hop) in H1.
-            rewrite <- H1 in H; clear H1.
-            rewrite (rngl_mul_comm Hic _²)%L in H.
-            eapply (rngl_le_lt_trans Hor) in H; [ | apply Hzs23 ].
-            progress unfold rngl_squ in H.
-            rewrite rngl_mul_assoc in H.
-            rewrite <- rngl_mul_add_distr_r in H.
-            apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) in H; [ | easy ].
-            rewrite (rngl_mul_comm Hic (rngl_sin θ1)) in H.
-            cbn.
-            rewrite (rngl_mul_opp_r Hop).
-            now rewrite (rngl_sub_opp_r Hop).
-          }
-(* bon, ça serait en effet suffisant de prouver ça, mais c'est pas sûr que
-   ça soit vrai ; me voilà Gros-Jean comme devant *)
+      destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+        move Hzs2 before Hzs1.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
