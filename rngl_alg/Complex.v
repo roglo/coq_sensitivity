@@ -4404,11 +4404,10 @@ destruct zs23. {
           apply (rngl_nle_gt Hor) in H.
           move H before Hzc1; clear Hzc1; rename H into Hzc1.
           enough (H : (rngl_cos θ3 * rngl_cos θ1 < rngl_cos θ2)%L). {
-            cbn in Hzs12, Hzs23.
-            rewrite (rngl_mul_opp_r Hop) in Hzs12, Hzs23.
-            rewrite (rngl_add_opp_l Hop) in Hzs12, Hzs23.
+            cbn in Hzs12.
+            rewrite (rngl_mul_opp_r Hop) in Hzs12.
+            rewrite (rngl_add_opp_l Hop) in Hzs12.
             apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
-            apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
             rewrite <- (rngl_mul_1_r Hon (rngl_cos θ2)) in H.
             specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
             rewrite <- H1 in H; clear H1.
@@ -4422,7 +4421,7 @@ destruct zs23. {
               apply (rngl_add_le_mono_l Hop Hor).
               progress unfold rngl_squ.
               rewrite rngl_mul_assoc.
-              apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ | easy ].
+              apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ | apply Hzs12 ].
               now apply (rngl_lt_le_incl Hor).
             }
             clear H; rename H1 into H.
@@ -4435,6 +4434,16 @@ destruct zs23. {
             rewrite (rngl_mul_opp_r Hop).
             now rewrite (rngl_sub_opp_r Hop).
           }
+          enough (H : (rngl_cos θ3 < rngl_cos θ2)%L). {
+            eapply (rngl_le_lt_trans Hor); [ | apply H ].
+            rewrite <- (rngl_mul_1_r Hon).
+            apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+            apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+          }
+          cbn in Hzs23.
+          rewrite (rngl_mul_opp_r Hop) in Hzs23.
+          rewrite (rngl_add_opp_l Hop) in Hzs23.
+          apply -> (rngl_le_0_sub Hop Hor) in Hzs23.
 ...
           enough (H : (rngl_sin θ3 * rngl_cos θ2 < rngl_sin θ1)%L). {
             cbn in Hzs12, Hzs23.
