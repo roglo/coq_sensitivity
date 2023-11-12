@@ -4808,6 +4808,52 @@ destruct zs23. {
           now apply (rngl_mul_pos_pos Hop Hor).
         }
         apply (rngl_nle_gt Hor) in Hc2z.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hzs2]. {
+          remember (θ2 - angle_right)%A as θ eqn:Hθ.
+          apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+          subst θ2; rename θ into θ2.
+          move θ2 before θ1.
+          rewrite (angle_add_add_swap Hic Hop) in Hzs23.
+          rewrite (angle_add_sub_swap Hic Hop) in Hzs12.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs12, Hzs2.
+          rewrite (rngl_cos_add_right_r Hon Hop) in Hzs23, Hc2z.
+          apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs23.
+          apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+          move Hc2z before Hzs1.
+          move Hzc1 after Hzs3; move Hzs2 after Hzs3.
+          progress unfold angle_add_overflow in Haov.
+          apply angle_ltb_ge in Haov.
+          rewrite (angle_add_sub_assoc Hop) in Haov.
+          rewrite (angle_add_add_swap Hic Hop) in Haov.
+          rewrite (angle_add_sub Hic Hon Hop Hed) in Haov.
+          apply angle_nlt_ge in Haov.
+          apply Haov; clear Haov.
+          progress unfold angle_ltb.
+          apply rngl_leb_le in Hzs23, Hzs2.
+          rewrite Hzs23.
+          rewrite (rngl_sin_add_right_r Hon Hos).
+          rewrite Hzs2.
+          apply rngl_leb_le in Hzs23, Hzs2.
+          apply rngl_ltb_lt.
+          rewrite (rngl_cos_add_right_r Hon Hop).
+(* fuck. fuck. *)
+...
+          progress unfold angle_leb in Haov.
+            generalize Hzs2; intros H.
+            apply (rngl_lt_le_incl Hor) in H.
+            apply rngl_leb_le in H.
+            rewrite H in Haov; clear H.
+            rewrite (angle_add_sub_assoc Hop) in Haov.
+            rewrite (rngl_sin_sub_right_r Hon Hop) in Haov.
+            generalize Hzs23; intros H.
+            apply (rngl_opp_le_compat Hop Hor) in H.
+            rewrite (rngl_opp_0 Hop) in H.
+            apply rngl_leb_le in H.
+            rewrite H in Haov; clear H.
+            rewrite (rngl_cos_sub_right_r Hon Hop) in Haov.
+            apply rngl_leb_le in Haov.
+            move Haov at bottom.
+            remember (angle_right - θ3)%A as θ eqn:Hθ.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
