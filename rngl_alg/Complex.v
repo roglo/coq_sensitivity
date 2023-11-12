@@ -4655,6 +4655,49 @@ destruct zs23. {
             rewrite (rngl_cos_sub_right_r Hon Hop) in Haov.
             apply rngl_leb_le in Haov.
             move Haov at bottom.
+            remember (angle_right - θ3)%A as θ eqn:Hθ.
+            apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_comm Hic) in Hzs23, Haov.
+            rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs23, Haov.
+            rewrite (rngl_sin_sub_right_l Hon Hos) in Hzc3, Haov.
+            rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs3, Hzs23.
+            rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs23.
+            apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs23.
+            move Haov at bottom.
+            apply (rngl_nlt_ge Hor) in Haov.
+            apply Haov; clear Haov.
+            destruct (rngl_eq_dec Hed (rngl_sin θ2) (rngl_sin θ3))
+                as [Hss| Hss]. {
+              apply (rngl_sin_eq Hic Hon Hop Hed) in Hss.
+              destruct Hss; subst θ2. {
+                rewrite (angle_sub_diag Hic Hon Hop Hed).
+                apply (rngl_lt_iff Hor).
+                split. {
+                  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+                }
+                intros H.
+                apply (eq_rngl_cos_1 Hic Hon Hop Hed) in H.
+                subst θ3.
+                now apply (rngl_lt_irrefl Hor) in Hzs3.
+              }
+..
+            apply rngl_cos_lt_rngl_cos_sub; try easy.
+            now apply (rngl_lt_le_incl Hor).
+            apply (rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff); try easy.
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            apply (rngl_lt_iff Hor).
+            split. {
+              apply (rngl_sin_sub_nonneg_sin_le_sin Hic Hon Hop Hed).
+              now apply (rngl_lt_le_incl Hor).
+              easy.
+              easy.
+            }
+            intros H.
+            apply (rngl_sin_eq Hic Hon Hop Hed) in H.
+            destruct H; subst θ3. {
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
