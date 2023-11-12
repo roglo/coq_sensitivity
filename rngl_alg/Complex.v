@@ -4638,6 +4638,23 @@ destruct zs23. {
           destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
             move Hzs2 before Hzs1.
             move Hzc1 after Hzs3; move Hzc2 after Hzs3.
+            progress unfold angle_add_overflow in Haov.
+            apply angle_ltb_ge in Haov.
+            progress unfold angle_leb in Haov.
+            generalize Hzs2; intros H.
+            apply (rngl_lt_le_incl Hor) in H.
+            apply rngl_leb_le in H.
+            rewrite H in Haov; clear H.
+            rewrite (angle_add_sub_assoc Hop) in Haov.
+            rewrite (rngl_sin_sub_right_r Hon Hop) in Haov.
+            generalize Hzs23; intros H.
+            apply (rngl_opp_le_compat Hop Hor) in H.
+            rewrite (rngl_opp_0 Hop) in H.
+            apply rngl_leb_le in H.
+            rewrite H in Haov; clear H.
+            rewrite (rngl_cos_sub_right_r Hon Hop) in Haov.
+            apply rngl_leb_le in Haov.
+            move Haov at bottom.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
