@@ -4682,22 +4682,38 @@ destruct zs23. {
                 subst θ3.
                 now apply (rngl_lt_irrefl Hor) in Hzs3.
               }
-..
+              rewrite <- (angle_sub_add_distr Hic Hop) in Hzs23, Hzs12.
+              rewrite (angle_sub_sub_distr Hic Hop).
+              rewrite (angle_add_comm Hic).
+              rewrite (angle_add_sub_assoc Hop).
+              rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2, Hzs23, Hzs12.
+              rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc2 |-*.
+              rewrite (rngl_cos_sub_straight_r Hon Hop).
+              apply -> (rngl_opp_lt_compat Hop Hor).
+              cbn.
+              apply (rngl_lt_sub_lt_add_r Hop Hor).
+              eapply (rngl_le_lt_trans Hor). 2: {
+                apply (rngl_lt_add_r Hos Hor).
+                now apply (rngl_mul_pos_pos Hop Hor Hii).
+              }
+              rewrite <- (rngl_mul_1_r Hon).
+              apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+              apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+            }
             apply rngl_cos_lt_rngl_cos_sub; try easy.
             now apply (rngl_lt_le_incl Hor).
             apply (rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff); try easy.
             now apply (rngl_lt_le_incl Hor).
             now apply (rngl_lt_le_incl Hor).
             apply (rngl_lt_iff Hor).
-            split. {
-              apply (rngl_sin_sub_nonneg_sin_le_sin Hic Hon Hop Hed).
-              now apply (rngl_lt_le_incl Hor).
-              easy.
-              easy.
-            }
-            intros H.
-            apply (rngl_sin_eq Hic Hon Hop Hed) in H.
-            destruct H; subst θ3. {
+            apply not_eq_sym in Hss.
+            split; [ | easy ].
+            apply (rngl_sin_sub_nonneg_sin_le_sin Hic Hon Hop Hed).
+            now apply (rngl_lt_le_incl Hor).
+            easy.
+            easy.
+          }
+          apply (rngl_nlt_ge Hor) in Hs2z.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
