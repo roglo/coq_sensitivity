@@ -5275,7 +5275,9 @@ destruct zs23. {
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
   move Hzs1 after Hzs3.
 ...
+*)
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
