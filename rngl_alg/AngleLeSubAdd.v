@@ -290,6 +290,58 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 apply rngl_add_0_r.
 Qed.
 
+Theorem rngl_cos_nonneg :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, (0 ≤ rngl_cos θ)%L ↔ (θ ≤ angle_right ∨ - angle_right ≤ θ)%A.
+Proof.
+intros Hon Hop.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  progress unfold angle_leb.
+  cbn.
+  rewrite (H1 1)%L.
+  rewrite (rngl_leb_refl Hor).
+  rewrite (H1 (rngl_sin _)).
+  rewrite (rngl_leb_refl Hor).
+  rewrite (H1 (rngl_cos _)).
+  rewrite (rngl_leb_refl Hor).
+  split; intros H; [ now left | ].
+  apply (rngl_le_refl Hor).
+}
+intros.
+progress unfold angle_leb.
+cbn.
+specialize (rngl_0_le_1 Hon Hop Hor) as H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+assert (H : (-1 < 0)%L). {
+  apply (rngl_opp_neg_pos Hop Hor).
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  split; intros H. {
+    left.
+    now apply rngl_leb_le.
+  }
+  destruct H as [H| H]; [ | easy ].
+  now apply rngl_leb_le.
+}
+split; intros H. {
+  right.
+  now apply rngl_leb_le.
+}
+destruct H as [H| H]; [ easy | ].
+now apply rngl_leb_le.
+Qed.
+
 Theorem rngl_cos_nonpos :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2717,6 +2769,11 @@ apply rngl_leb_le in H4.
 rewrite H4; clear H4.
 apply rngl_ltb_lt.
 replace (rngl_cos angle_right)%L with 0%L by easy.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_cos_nonneg Hon Hop).
+  left.
+  progress unfold angle_leb.
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
