@@ -293,7 +293,7 @@ Qed.
 Theorem rngl_cos_nonpos :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  ∀ θ, (rngl_cos θ ≤ 0)%L → (angle_right ≤ θ ≤ (- angle_right)%A)%A.
+  ∀ θ, (rngl_cos θ ≤ 0)%L ↔ (angle_right ≤ θ ≤ (- angle_right)%A)%A.
 Proof.
 intros Hon Hop.
 destruct ac as (Hiv, Hc2, Hor).
@@ -309,11 +309,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (rngl_leb_refl Hor).
   rewrite (H1 (rngl_cos _)).
   rewrite (rngl_leb_refl Hor).
-  split; [ easy | ].
-  rewrite (rngl_opp_0 Hop).
-  now rewrite (rngl_leb_refl Hor).
+  split; intros H. {
+    rewrite (rngl_opp_0 Hop).
+    now rewrite (rngl_leb_refl Hor).
+  }
+  apply (rngl_le_refl Hor).
 }
-intros * Hcz.
+intros.
 progress unfold angle_leb.
 cbn.
 specialize (rngl_0_le_1 Hon Hop Hor) as H.
@@ -327,8 +329,19 @@ apply (rngl_leb_gt Hor) in H.
 rewrite H; clear H.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
-apply rngl_leb_le in Hcz.
-now destruct zs.
+destruct zs. {
+  split; intros H. {
+    split; [ now apply rngl_leb_le | easy ].
+  }
+  destruct H as (H, _).
+  now apply rngl_leb_le.
+}
+split; intros H. {
+  split; [ easy | ].
+  now apply rngl_leb_le.
+}
+destruct H as (_, H).
+now apply rngl_leb_le.
 Qed.
 
 Theorem angle_le_sub_le_add_l_lemma_1 :
