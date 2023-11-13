@@ -5105,6 +5105,40 @@ destruct zs23. {
       rewrite (angle_straight_sub_right Hon Hop).
       progress unfold angle_ltb.
       rewrite (rngl_sin_add_right_r Hon Hos).
+      apply rngl_leb_le in Hzs23.
+      rewrite Hzs23.
+      apply rngl_leb_le in Hzs23.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      rewrite (rngl_cos_sub_right_r Hon Hop).
+      rewrite (rngl_cos_add_right_r Hon Hop).
+      generalize Hs2z; intros H.
+      apply (rngl_lt_eq_cases Hor) in H.
+      destruct H as [H| H]. {
+        apply (rngl_opp_lt_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply (rngl_leb_gt Hor) in H.
+        now rewrite H.
+      }
+      symmetry in H.
+      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+      destruct H; subst θ2. {
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzs12.
+        apply Hzs12; clear Hzs12.
+        now rewrite (rngl_cos_sub_right_l Hon Hop).
+      }
+      rewrite (angle_add_opp_l Hic).
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      rewrite (rngl_opp_involutive Hop).
+      cbn.
+      rewrite (rngl_opp_0 Hop).
+      rewrite (rngl_leb_refl Hor).
+      apply rngl_ltb_lt.
+      apply (rngl_lt_trans Hor _ 0)%L; [ | easy ].
+      apply (rngl_opp_neg_pos Hop Hor).
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
