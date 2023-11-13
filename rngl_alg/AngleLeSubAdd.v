@@ -290,6 +290,47 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 apply rngl_add_0_r.
 Qed.
 
+Theorem rngl_cos_nonpos :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, (rngl_cos θ ≤ 0)%L → (angle_right ≤ θ ≤ (- angle_right)%A)%A.
+Proof.
+intros Hon Hop.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  progress unfold angle_leb.
+  cbn.
+  rewrite (H1 1)%L.
+  rewrite (rngl_leb_refl Hor).
+  rewrite (H1 (rngl_sin _)).
+  rewrite (rngl_leb_refl Hor).
+  rewrite (H1 (rngl_cos _)).
+  rewrite (rngl_leb_refl Hor).
+  split; [ easy | ].
+  rewrite (rngl_opp_0 Hop).
+  now rewrite (rngl_leb_refl Hor).
+}
+intros * Hcz.
+progress unfold angle_leb.
+cbn.
+specialize (rngl_0_le_1 Hon Hop Hor) as H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+assert (H : (-1 < 0)%L). {
+  apply (rngl_opp_neg_pos Hop Hor).
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+apply rngl_leb_le in Hcz.
+now destruct zs.
+Qed.
+
 Theorem angle_le_sub_le_add_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2638,17 +2679,35 @@ destruct zs23. {
         }
         intros H; symmetry in H.
         rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
-(**)
+(*
 apply (rngl_nlt_ge Hor) in Hc123.
 apply Hc123; clear Hc123.
 ...
+*)
         rewrite rngl_add_comm in H.
         apply (rngl_add_move_0_r Hop) in H.
-        rewrite H in Hzc1.
-        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc1.
+        generalize Hzc1; intros H1.
+        rewrite H in H1.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in H1.
+apply (rngl_cos_nonpos Hon Hop) in H1.
+destruct H1 as (H1, H2).
+apply angle_nlt_ge in H1.
+apply H1; clear H1.
+progress unfold angle_ltb.
+generalize Hzs12; intros H3.
+apply (rngl_lt_le_incl Hor) in H3.
+apply rngl_leb_le in H3.
+rewrite H3; clear H3.
+cbn - [ rngl_cos ].
+specialize (rngl_0_le_1 Hon Hop Hor) as H4.
+apply rngl_leb_le in H4.
+rewrite H4; clear H4.
+apply rngl_ltb_lt.
+replace (rngl_cos angle_right)%L with 0%L by easy.
 ...
-Theorem rngl_cos_nonpos :
-  ∀ θ, (rngl_cos θ ≤ 0)%L → (angle_right ≤ θ ≤ (- angle_right)%A)%A.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
 ...
 (*
         apply (rngl_add_move_0_r Hop) in H.
