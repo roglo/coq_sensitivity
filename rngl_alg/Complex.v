@@ -2691,6 +2691,26 @@ now apply Bool.orb_false_iff in Hn.
 Qed.
 
 (* to be completed
+Theorem angle_add_le_mono_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
+Proof.
+intros Hic Hon Hop Hed * Haov.
+Require Import AngleLeSubAdd.
+Check angle_le_sub_le_add_l.
+split; intros H13. {
+  apply angle_le_sub_le_add_l; try easy.
+3 : {
+  rewrite (angle_add_comm Hic).
+  now rewrite (angle_add_sub Hic Hon Hop Hed).
+}
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2789,25 +2809,7 @@ apply Nat.succ_le_mono in Hab.
 apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
-Theorem angle_add_le_mono_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
-  → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
-Proof.
-intros Hic Hon Hop Hed * Haov.
 ... ...
-Check angle_le_sub_le_add_l.
-split; intros H13. {
-  apply angle_le_sub_le_add_l; try easy.
-3 : {
-  rewrite (angle_add_comm Hic).
-  now rewrite (angle_add_sub Hic Hon Hop Hed).
-}
-...
 Check angle_add_le_mono_l.
 ... ...
 apply angle_add_le_mono_l; try easy.
