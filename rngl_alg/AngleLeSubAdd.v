@@ -2903,6 +2903,23 @@ destruct zs23. {
     rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
     apply (rngl_le_opp_l Hop Hor) in Hc123.
     move Hzs1 before Hzc3; move Hc1z before Hzc3.
+    destruct (rngl_lt_dec Hor (rngl_sin θ2) 0) as [Hs2z| Hzs2]. {
+...
+        progress unfold angle_add_overflow in Haov.
+        apply angle_ltb_ge in Haov.
+        apply angle_nlt_ge in Haov.
+        apply Haov; clear Haov.
+        rewrite (angle_add_sub_assoc Hop).
+        progress unfold angle_ltb.
+        rewrite (rngl_sin_sub_right_r Hon Hop).
+        generalize Hzs23; intros H.
+        apply (rngl_opp_le_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply rngl_leb_le in H.
+        rewrite H; clear H.
+        apply (rngl_leb_gt Hor) in Hs2z.
+        now rewrite Hs2z.
+      }
 ...
     progress unfold angle_add_overflow in Hsov.
     apply angle_ltb_ge in Hsov.
