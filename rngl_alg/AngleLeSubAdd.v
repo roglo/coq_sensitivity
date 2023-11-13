@@ -2637,8 +2637,35 @@ destruct zs23. {
           now apply (rngl_lt_le_incl Hor).
         }
         intros H; symmetry in H.
-(* bof *)
+        rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
+(**)
+apply (rngl_nlt_ge Hor) in Hc123.
+apply Hc123; clear Hc123.
 ...
+        rewrite rngl_add_comm in H.
+        apply (rngl_add_move_0_r Hop) in H.
+        rewrite H in Hzc1.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc1.
+...
+Theorem rngl_cos_nonpos :
+  ∀ θ, (rngl_cos θ ≤ 0)%L → (angle_right ≤ θ ≤ (- angle_right)%A)%A.
+...
+(*
+        apply (rngl_add_move_0_r Hop) in H.
+        rewrite H in Hc123; clear H.
+        rewrite (rngl_add_opp_l Hop) in Hc123.
+        apply -> (rngl_le_0_sub Hop Hor) in Hc123.
+*)
+(*
+cbn in H.
+rewrite (rngl_mul_opp_r Hop) in H.
+rewrite (rngl_sub_opp_r Hop) in H.
+rewrite <- rngl_add_assoc in H.
+rewrite rngl_add_mul_l_diag_l in H.
+*)
+        rename H into Hc12s1.
+...
+(**)
         progress unfold angle_add_overflow in Haov.
         apply angle_ltb_ge in Haov.
         apply angle_nlt_ge in Haov.
@@ -2654,6 +2681,24 @@ destruct zs23. {
         rewrite (rngl_cos_add_right_r Hon Hop).
         apply rngl_ltb_lt.
         apply (rngl_lt_opp_l Hop Hor).
+        apply (rngl_nle_gt Hor).
+        intros Hs2c23.
+clear H21.
+(*
+clear - H21 Hon Hos Hop Hzs2 Hzs1 Hor.
+        progress unfold angle_leb in H21.
+        rewrite (rngl_sin_add_right_r Hon Hos) in H21.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in H21.
+        apply rngl_leb_le in Hzs2.
+        rewrite Hzs2 in H21.
+        apply rngl_leb_le in Hzs2.
+        generalize Hzs1; intros H.
+        apply (rngl_opp_lt_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply (rngl_nle_gt Hor) in H.
+        apply rngl_leb_nle in H.
+        rewrite H in H21; clear H.
+*)
 ...
 *)
 
