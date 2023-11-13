@@ -2744,90 +2744,106 @@ destruct zs23. {
         }
         intros H; symmetry in H.
         rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
-(*
-apply (rngl_nlt_ge Hor) in Hc123.
-apply Hc123; clear Hc123.
-...
-*)
         rewrite rngl_add_comm in H.
         apply (rngl_add_move_0_r Hop) in H.
         generalize Hzc1; intros H1.
         rewrite H in H1.
         apply (rngl_opp_nonneg_nonpos Hop Hor) in H1.
-apply (rngl_cos_nonpos Hon Hop) in H1.
-destruct H1 as (H1, H2).
-apply angle_nlt_ge in H1.
-apply H1; clear H1.
-progress unfold angle_ltb.
-generalize Hzs12; intros H3.
-apply (rngl_lt_le_incl Hor) in H3.
-apply rngl_leb_le in H3.
-rewrite H3; clear H3.
-cbn - [ rngl_cos ].
-specialize (rngl_0_le_1 Hon Hop Hor) as H4.
-apply rngl_leb_le in H4.
-rewrite H4; clear H4.
-apply rngl_ltb_lt.
-replace (rngl_cos angle_right)%L with 0%L by easy.
-apply (rngl_lt_iff Hor).
-split. {
-  apply (rngl_cos_nonneg Hon Hop).
-  left.
-  progress unfold angle_leb.
-...
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-...
-(*
-        apply (rngl_add_move_0_r Hop) in H.
-        rewrite H in Hc123; clear H.
-        rewrite (rngl_add_opp_l Hop) in Hc123.
-        apply -> (rngl_le_0_sub Hop Hor) in Hc123.
-*)
-(*
-cbn in H.
-rewrite (rngl_mul_opp_r Hop) in H.
-rewrite (rngl_sub_opp_r Hop) in H.
-rewrite <- rngl_add_assoc in H.
-rewrite rngl_add_mul_l_diag_l in H.
-*)
-        rename H into Hc12s1.
-...
-(**)
-        progress unfold angle_add_overflow in Haov.
-        apply angle_ltb_ge in Haov.
-        apply angle_nlt_ge in Haov.
-        apply Haov; clear Haov.
-        rewrite (angle_add_sub_assoc Hop).
-        rewrite (angle_add_sub_swap Hic Hop).
-        rewrite (angle_add_sub Hic Hon Hop Hed).
+        apply (rngl_cos_nonpos Hon Hop) in H1.
+        destruct H1 as (H1, H2).
+        apply angle_nlt_ge in H1.
+        apply H1; clear H1.
         progress unfold angle_ltb.
-        rewrite (rngl_sin_add_right_r Hon Hos).
-        apply rngl_leb_le in Hzs23, Hzs2.
-        rewrite Hzs23, Hzs2.
-        apply rngl_leb_le in Hzs23, Hzs2.
-        rewrite (rngl_cos_add_right_r Hon Hop).
+        generalize Hzs12; intros H3.
+        apply (rngl_lt_le_incl Hor) in H3.
+        apply rngl_leb_le in H3.
+        rewrite H3; clear H3.
+        cbn - [ rngl_cos ].
+        specialize (rngl_0_le_1 Hon Hop Hor) as H4.
+        apply rngl_leb_le in H4.
+        rewrite H4; clear H4.
         apply rngl_ltb_lt.
-        apply (rngl_lt_opp_l Hop Hor).
-        apply (rngl_nle_gt Hor).
-        intros Hs2c23.
-clear H21.
-(*
-clear - H21 Hon Hos Hop Hzs2 Hzs1 Hor.
-        progress unfold angle_leb in H21.
-        rewrite (rngl_sin_add_right_r Hon Hos) in H21.
-        rewrite (rngl_sin_sub_right_r Hon Hop) in H21.
-        apply rngl_leb_le in Hzs2.
-        rewrite Hzs2 in H21.
-        apply rngl_leb_le in Hzs2.
-        generalize Hzs1; intros H.
-        apply (rngl_opp_lt_compat Hop Hor) in H.
-        rewrite (rngl_opp_0 Hop) in H.
-        apply (rngl_nle_gt Hor) in H.
-        apply rngl_leb_nle in H.
-        rewrite H in H21; clear H.
-*)
+        replace (rngl_cos angle_right)%L with 0%L by easy.
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply (rngl_cos_nonneg Hon Hop).
+          left.
+          progress unfold angle_leb.
+          generalize Hzs12; intros H3.
+          apply (rngl_lt_le_incl Hor) in H3.
+          apply rngl_leb_le in H3.
+          rewrite H3; clear H3.
+          cbn.
+          specialize (rngl_0_le_1 Hon Hop Hor) as H4.
+          apply rngl_leb_le in H4.
+          rewrite H4; clear H4.
+          apply rngl_leb_le.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_sub_opp_r Hop).
+          apply (rngl_add_nonneg_nonneg Hor).
+          apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+          now apply (rngl_lt_le_incl Hor).
+          apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+          now apply (rngl_lt_le_incl Hor).
+        }
+        intros H3.
+        symmetry in H3.
+        apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H3.
+        destruct H3 as [H3| H3]. {
+          rewrite H3 in H.
+          cbn in H.
+          rewrite (rngl_opp_0 Hop) in H.
+          apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+          destruct H; subst θ1. {
+            rewrite (angle_sub_0_l Hon Hos) in H3.
+            apply (f_equal angle_opp) in H3.
+            rewrite (angle_opp_involutive Hop) in H3.
+            subst θ2.
+            cbn in Hc2z.
+            apply (rngl_nle_gt Hor) in Hc2z.
+            apply Hc2z.
+            apply (rngl_opp_nonpos_nonneg Hop Hor).
+            apply (rngl_0_le_1 Hon Hop Hor).
+          }
+          cbn in Hzs1.
+          apply (rngl_nle_gt Hor) in Hzs1.
+          apply Hzs1.
+          apply (rngl_opp_nonpos_nonneg Hop Hor).
+          apply (rngl_0_le_1 Hon Hop Hor).
+        }
+        rewrite H3 in Hzs12; cbn in Hzs12.
+        apply (rngl_nle_gt Hor) in Hzs12.
+        apply Hzs12.
+        apply (rngl_opp_nonpos_nonneg Hop Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      apply (rngl_nlt_ge Hor) in Hzc2.
+      move Hzc2 before Hzs1.
+      progress unfold angle_add_overflow in Hsov.
+      apply angle_ltb_ge in Hsov.
+      apply angle_nlt_ge in Hsov.
+      apply Hsov; clear Hsov.
+      rewrite angle_add_opp_r.
+      rewrite (angle_sub_sub_swap Hic Hop θ1).
+      progress unfold angle_ltb.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      generalize Hzs12; intros H.
+      rewrite (rngl_cos_sub_comm Hic Hop) in H.
+      apply (rngl_opp_lt_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply (rngl_nle_gt Hor) in H.
+      apply rngl_leb_nle in H.
+      rewrite H; clear H.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      generalize Hzs1; intros H.
+      apply (rngl_opp_lt_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply (rngl_nle_gt Hor) in H.
+      apply rngl_leb_nle in H.
+      rewrite H; clear H.
+      apply rngl_ltb_lt.
+      rewrite (rngl_cos_sub_right_r Hon Hop).
+      rewrite (rngl_cos_sub_right_r Hon Hop).
 ...
 *)
 
