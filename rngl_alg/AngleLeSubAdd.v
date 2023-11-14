@@ -2903,55 +2903,62 @@ destruct zs23. {
     rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
     apply (rngl_le_opp_l Hop Hor) in Hc123.
     move Hzs1 before Hzc3; move Hc1z before Hzc3.
-    destruct (rngl_lt_dec Hor (rngl_sin θ2) 0) as [Hs2z| Hzs2]. {
-...
-        progress unfold angle_add_overflow in Haov.
-        apply angle_ltb_ge in Haov.
-        apply angle_nlt_ge in Haov.
-        apply Haov; clear Haov.
-        rewrite (angle_add_sub_assoc Hop).
+    destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
+      destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        move Hzs2 before Hzs1; move Hzc2 before Hc1z.
+        progress unfold angle_add_overflow in Hsov.
+        apply angle_ltb_ge in Hsov.
+        apply angle_nlt_ge in Hsov.
+        apply Hsov; clear Hsov.
+        rewrite angle_add_opp_r.
+        rewrite (angle_add_sub_swap Hic Hop θ1).
         progress unfold angle_ltb.
-        rewrite (rngl_sin_sub_right_r Hon Hop).
-        generalize Hzs23; intros H.
-        apply (rngl_opp_le_compat Hop Hor) in H.
+        rewrite (rngl_sin_add_straight_r Hon Hop).
+        generalize Hzs12; intros H.
+        apply (rngl_opp_lt_compat Hop Hor) in H.
         rewrite (rngl_opp_0 Hop) in H.
-        apply rngl_leb_le in H.
+        apply (rngl_nle_gt Hor) in H.
+        apply rngl_leb_nle in H.
         rewrite H; clear H.
-        apply (rngl_leb_gt Hor) in Hs2z.
-        now rewrite Hs2z.
+        rewrite (rngl_sin_add_straight_r Hon Hop).
+        generalize Hzs1; intros H.
+        apply (rngl_opp_lt_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply (rngl_nle_gt Hor) in H.
+        apply rngl_leb_nle in H.
+        rewrite H; clear H.
+        do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+        apply rngl_ltb_lt.
+        apply -> (rngl_opp_lt_compat Hop Hor).
+        rewrite (rngl_cos_sub_comm Hic Hop).
+        apply rngl_cos_lt_rngl_cos_sub; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+          apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_lt_le_incl Hor).
+        }
+        intros H.
+        apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+        destruct H; subst θ1. {
+          rewrite (angle_sub_diag Hic Hon Hop Hed) in Hzs12.
+          now apply (rngl_lt_irrefl Hor) in Hzs12.
+        }
+        cbn in Hzs1.
+        apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
+        apply (rngl_lt_le_incl Hor) in Hzs1.
+        now apply (rngl_nlt_ge Hor) in Hzs1.
       }
-...
-    progress unfold angle_add_overflow in Hsov.
-    apply angle_ltb_ge in Hsov.
-    apply angle_nlt_ge in Hsov.
-    apply Hsov; clear Hsov.
-    rewrite angle_add_opp_r.
-    rewrite (angle_add_sub_swap Hic Hop θ1).
-    progress unfold angle_ltb.
-    rewrite (rngl_sin_add_straight_r Hon Hop).
-    generalize Hzs12; intros H.
-    apply (rngl_opp_lt_compat Hop Hor) in H.
-    rewrite (rngl_opp_0 Hop) in H.
-    apply (rngl_nle_gt Hor) in H.
-    apply rngl_leb_nle in H.
-    rewrite H; clear H.
-    rewrite (rngl_sin_add_straight_r Hon Hop).
-    generalize Hzs1; intros H.
-    apply (rngl_opp_lt_compat Hop Hor) in H.
-    rewrite (rngl_opp_0 Hop) in H.
-    apply (rngl_nle_gt Hor) in H.
-    apply rngl_leb_nle in H.
-    rewrite H; clear H.
-    do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
-    apply rngl_ltb_lt.
-    apply -> (rngl_opp_lt_compat Hop Hor).
-rewrite (rngl_cos_sub_comm Hic Hop).
-apply rngl_cos_lt_rngl_cos_sub; try easy.
-(* au minimum, il faut considérer le signe de sin θ2 et cos θ2, mec *)
-...
-    cbn.
-    rewrite (rngl_mul_opp_r Hop).
-    rewrite (rngl_sub_opp_r Hop).
+      apply (rngl_nlt_ge Hor) in Hc2z.
 ...
 *)
 
