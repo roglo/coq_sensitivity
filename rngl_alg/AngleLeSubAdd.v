@@ -3121,6 +3121,53 @@ destruct zs23. {
         eapply (rngl_lt_le_trans Hor); [ apply Hc3z | apply Hc123 ].
       }
       apply (rngl_nle_gt Hor) in Hc2z.
+      remember (θ2 - angle_right)%A as θ eqn:Hθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
+      rewrite (angle_add_sub_swap Hic Hop) in Hc123.
+      rewrite (angle_add_add_swap Hic Hop) in Hzs23.
+      rewrite (angle_sub_add_distr Hic Hop) in Hzs12.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hc123, Hzs23.
+      rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z.
+      rewrite (rngl_cos_sub_right_r Hon Hop) in Hzs12.
+      apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+      move Hc2z before Hzc1; move Hzs2 before Hzs1.
+      progress unfold angle_add_overflow in Hsov.
+      apply angle_ltb_ge in Hsov.
+      apply angle_nlt_ge in Hsov.
+      apply Hsov; clear Hsov.
+      rewrite angle_add_opp_r.
+      rewrite (angle_sub_add_distr Hic Hop).
+      rewrite (angle_sub_sub_swap Hic Hop).
+      rewrite <- (angle_sub_add_distr Hic Hop θ1).
+      rewrite (angle_right_add_right Hon Hop).
+      rewrite (angle_sub_sub_swap Hic Hop).
+      progress unfold angle_ltb.
+      rewrite (rngl_sin_sub_straight_r Hon Hop).
+      generalize Hzs12; intros H.
+      apply (rngl_opp_lt_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply (rngl_nle_gt Hor) in H.
+      apply rngl_leb_nle in H.
+      rewrite H; clear H.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      generalize Hzs1; intros H.
+      apply (rngl_opp_lt_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply (rngl_nle_gt Hor) in H.
+      apply rngl_leb_nle in H.
+      rewrite H; clear H.
+      rewrite (rngl_cos_sub_straight_r Hon Hop).
+      rewrite (rngl_cos_sub_right_r Hon Hop).
+      apply rngl_ltb_lt.
+      apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
+      apply (rngl_opp_neg_pos Hop Hor).
+      rewrite (rngl_cos_sub_comm Hic Hop).
+      eapply (rngl_lt_le_trans Hor); [ apply Hc3z | apply Hc123 ].
+    }
+    apply (rngl_nle_gt Hor) in Hs2z.
+(* Haov ? *)
 ...
 *)
 
