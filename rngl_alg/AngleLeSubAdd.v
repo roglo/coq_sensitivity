@@ -3373,6 +3373,26 @@ destruct zs23. {
     }
   }
 }
+apply (rngl_leb_gt Hor) in Hzs23.
+apply rngl_leb_le.
+destruct zs12. {
+  apply rngl_leb_le in Hzs12.
+  destruct zs3. {
+    apply rngl_leb_le in Hzs3.
+    apply rngl_leb_le in Hc123.
+    move Hzs1 after Hzs3.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      remember (θ1 + angle_right)%A as θ eqn:Hθ.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ1; rename θ into θ1.
+      move θ1 after θ2.
+      rewrite (angle_sub_sub_swap Hic Hop) in Hzs12, Hc123.
+      rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs1, Hzs12.
+      rewrite (rngl_cos_sub_right_r Hon Hop) in Hc123, Hzc1 |-*.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+      move Hzc1 after Hzs3; move Hzs1 after Hzs3.
+      move Hc123 at bottom.
 ...
 *)
 
