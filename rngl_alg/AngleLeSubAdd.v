@@ -2959,6 +2959,31 @@ destruct zs23. {
         now apply (rngl_nlt_ge Hor) in Hzs1.
       }
       apply (rngl_nlt_ge Hor) in Hc2z.
+      remember (θ2 - angle_right)%A as θ eqn:Hθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
+      rewrite (angle_add_add_swap Hic Hop) in Hzs23.
+      rewrite (angle_sub_add_distr Hic Hop) in Hc123, Hzs12.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2.
+      rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, Hzs23.
+      rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12.
+      rewrite (rngl_cos_sub_right_r Hon Hop) in Hc123.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z, Hzs23.
+      apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
+      move Hc2z before Hzs1; move Hzs2 before Hc1z.
+      apply (rngl_nle_gt Hor) in Hzs12.
+      apply Hzs12; clear Hzs12; cbn.
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_mul_nonneg_nonneg Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+      now apply (rngl_lt_le_incl Hor).
+    }
+    apply (rngl_nlt_ge Hor) in Hs2z.
 ...
 *)
 
