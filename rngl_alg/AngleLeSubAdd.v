@@ -3354,8 +3354,7 @@ destruct zs23. {
       now apply angle_le_sub_le_add_l_lemma_6.
     } {
       apply (rngl_leb_gt Hor) in Hzs3.
-      now apply angle_le_sub_le_add_l_lemma_7 with
-        (θ1 := θ1) (θ2 := θ2) (θ3 := θ3).
+      now apply (angle_le_sub_le_add_l_lemma_7 Hic Hon Hop Hed θ1 θ2 θ3).
     }
   } {
     apply (rngl_leb_gt Hor) in Hzs12.
@@ -3367,12 +3366,10 @@ destruct zs23. {
     apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
     move Hzs1 after Hzs3.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
-      now apply angle_le_sub_le_add_l_lemma_8 with
-        (θ1 := θ1) (θ2 := θ2) (θ3 := θ3).
+      now apply (angle_le_sub_le_add_l_lemma_8 Hic Hon Hop Hed θ1 θ2 θ3).
     } {
       apply (rngl_nle_gt Hor) in Hc3z.
-      now apply angle_le_sub_le_add_l_lemma_9 with
-        (θ1 := θ1) (θ2 := θ2) (θ3 := θ3).
+      now apply (angle_le_sub_le_add_l_lemma_9 Hic Hon Hop Hed θ1 θ2 θ3).
     }
   }
 }
