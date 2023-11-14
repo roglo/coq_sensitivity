@@ -3459,6 +3459,61 @@ destruct zs12. {
           now rewrite H; clear H.
         }
         apply (rngl_nle_gt Hor) in Hc3z.
+        remember (θ3 - angle_right)%A as θ eqn:Hθ.
+        apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ3; rename θ into θ3.
+        move θ3 before θ2.
+        rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+        rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3 |-*.
+        rewrite (rngl_cos_add_right_r Hon Hop) in Hzs23, Hc123, Hc3z.
+        apply (rngl_opp_pos_neg Hop Hor) in Hzs23.
+        apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+        exfalso.
+        apply (rngl_nle_gt Hor) in Hzs23.
+        apply Hzs23; clear Hzs23; cbn.
+        apply (rngl_add_nonneg_nonneg Hor).
+        apply (rngl_mul_nonneg_nonneg Hop Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc2z.
+      apply (rngl_nlt_ge Hor).
+      intros Hc231.
+      progress unfold angle_add_overflow in Hsov.
+      apply angle_ltb_ge in Hsov.
+      apply angle_nlt_ge in Hsov.
+      apply Hsov; clear Hsov.
+      rewrite angle_add_opp_r.
+      rewrite (angle_sub_sub_swap Hic Hop).
+      progress unfold angle_ltb.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      generalize Hzs12; intros H.
+      apply (rngl_opp_le_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply rngl_leb_le in H.
+      rewrite H; clear H.
+      rewrite (rngl_sin_sub_right_r Hon Hop).
+      generalize Hzs1; intros H.
+      apply (rngl_opp_lt_compat Hop Hor) in H.
+      rewrite (rngl_opp_0 Hop) in H.
+      apply (rngl_nle_gt Hor) in H.
+      apply rngl_leb_nle in H.
+      now rewrite H; clear H.
+    }
+    apply (rngl_nle_gt Hor) in Hc1z.
+    remember (θ1 - angle_straight)%A as θ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+    subst θ1; rename θ into θ1.
+    move θ1 after θ2.
+    rewrite (angle_add_sub_swap Hic Hop) in Hc123, Hzs12.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1, Hzs12.
+    rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123, Hc1z |-*.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hc1z.
+    apply (rngl_le_opp_r Hop Hor) in Hc123.
+    rewrite <- (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+    apply (rngl_le_opp_l Hop Hor).
+    move Hzs1 before Hzs3; move Hc1z before Hzs3.
 ...
 *)
 
