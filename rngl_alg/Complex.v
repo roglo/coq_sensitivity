@@ -8,7 +8,7 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
-Require Import RealLike TrigoWithoutPi.
+Require Import RealLike TrigoWithoutPi AngleLeSubAdd.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -2701,8 +2701,6 @@ Theorem angle_add_le_mono_l :
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
 intros Hic Hon Hop Hed * Haov.
-Require Import AngleLeSubAdd.
-Check angle_le_sub_le_add_l.
 split; intros H13. {
   apply angle_le_sub_le_add_l; try easy.
 3 : {
