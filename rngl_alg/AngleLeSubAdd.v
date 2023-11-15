@@ -3547,6 +3547,28 @@ destruct zs12. {
         rewrite (rngl_add_opp_r Hop).
         apply (rngl_le_0_sub Hop Hor).
         move Hc3z before Hzs2; move Hzs3 after Hzc2.
+        exfalso.
+        progress unfold angle_add_overflow in Hsov.
+        apply angle_ltb_ge in Hsov.
+        apply angle_nlt_ge in Hsov.
+        apply Hsov; clear Hsov.
+        rewrite angle_add_opp_r.
+        rewrite (angle_add_sub_swap Hic Hop).
+        progress unfold angle_ltb.
+        do 2 rewrite (rngl_sin_add_straight_r Hon Hop).
+        do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+        generalize Hzs12; intros H.
+        rewrite (rngl_sin_sub_anticomm Hic Hop) in H.
+        apply rngl_leb_le in H.
+        rewrite H; clear H.
+        generalize Hzs1; intros H.
+        apply (rngl_opp_lt_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply (rngl_nle_gt Hor) in H.
+        apply rngl_leb_nle in H.
+        now rewrite H.
+      }
+      apply (rngl_nle_gt Hor) in Hc2z.
 ...
 *)
 
