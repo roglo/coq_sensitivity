@@ -2395,7 +2395,6 @@ do 2 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite rngl_add_0_l.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_add_comm (_ * _)%L).
-(**)
 rewrite (rngl_add_opp_l Hop).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_sub_distr_l Hop).
@@ -2697,12 +2696,41 @@ Theorem angle_add_le_mono_l :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
+  angle_add_overflow θ1 θ2 = false
+  → angle_add_overflow θ1 θ3 = false
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
-intros Hic Hon Hop Hed * Haov.
+intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H13. {
-  apply angle_le_sub_le_add_l; try easy.
+rewrite (angle_add_comm Hic _ θ3).
+  apply angle_le_sub_le_add_l; try easy. {
+Theorem angle_add_overflow_comm :
+  rngl_mul_is_comm T = true →
+  ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
+Proof.
+intros Hic *.
+remember (angle_add_
+...
+progress unfold angle_add_overflow.
+rewrite (angle_add_comm Hic).
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin (θ2 + θ1))%L as zs21 eqn:Hzs21.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs21, Hzs1, Hzs2.
+destruct zs21. {
+  apply rngl_leb_le in Hzs21.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+...
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    rewrite angle_add_opp_r.
+    rewrite (angle_add_comm Hic).
+    rewrite (angle_add_sub Hic Hon Hop Hed).
+...
 3 : {
   rewrite (angle_add_comm Hic).
   now rewrite (angle_add_sub Hic Hon Hop Hed).
