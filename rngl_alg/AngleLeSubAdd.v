@@ -1405,7 +1405,7 @@ apply (rngl_opp_nonpos_nonneg Hop Hor).
 apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
-Theorem angle_le_sub_le_add_l_lemma_8 :
+Theorem angle_le_sub_le_add_l_lemma_6 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1834,7 +1834,7 @@ apply (rngl_opp_neg_pos Hop Hor).
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
-Theorem angle_le_sub_le_add_l_lemma_9 :
+Theorem angle_le_sub_le_add_l_lemma_7 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -2218,10 +2218,10 @@ destruct zs23. {
     apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
     move Hzs1 after Hzs3.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
-      now apply (angle_le_sub_le_add_l_lemma_8 Hic Hon Hop Hed θ1 θ2 θ3).
+      now apply (angle_le_sub_le_add_l_lemma_6 Hic Hon Hop Hed θ1 θ2 θ3).
     } {
       apply (rngl_nle_gt Hor) in Hc3z.
-      now apply (angle_le_sub_le_add_l_lemma_9 Hic Hon Hop Hed θ1 θ2 θ3).
+      now apply (angle_le_sub_le_add_l_lemma_7 Hic Hon Hop Hed θ1 θ2 θ3).
     }
   }
 }
@@ -2232,6 +2232,33 @@ destruct zs12. {
   apply rngl_leb_le in Hzs12.
   now apply angle_sub_not_overflow_sin_neg_sin_sub_nonneg in Hzs12.
 }
+destruct zs3; [ easy | ].
+apply (rngl_leb_gt Hor) in Hzs3, Hzs12.
+apply rngl_leb_le in Hc123.
+rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+move Hzs1 after Hzs3.
+remember (θ1 - angle_straight)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ1; rename θ into θ1.
+move θ1 after θ2.
+rewrite (angle_sub_add_distr Hic Hop) in Hzs12.
+rewrite (angle_add_sub_swap Hic Hop) in Hc123.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1.
+rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123 |-*.
+rewrite (rngl_sin_sub_straight_r Hon Hop) in Hzs12.
+remember (θ3 - angle_straight)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ3; rename θ into θ3.
+rewrite (angle_add_assoc Hop) in Hzs23 |-*.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3, Hzs23.
+rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123 |-*.
+apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hzs3, Hzs23.
+rewrite <- (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+move Hzs1 before Hzs3.
+apply (rngl_opp_le_compat Hop Hor) in Hc123.
+apply -> (rngl_opp_le_compat Hop Hor).
+move Hc123 at bottom.
 ...
 *)
 
