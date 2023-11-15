@@ -2488,8 +2488,17 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   rewrite (rngl_cos_sub_right_r Hon Hop).
   apply rngl_ltb_lt.
   apply (rngl_lt_opp_l Hop Hor).
-  eapply (rngl_lt_le_trans Hor); [ apply H231 | ].
-  apply (rngl_add_le_mono_l Hop Hor).
+  cbn.
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_add_pos_nonneg Hor).
+  now apply (rngl_mul_pos_pos Hop Hor Hii).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
+}
+apply (rngl_nle_gt Hor) in Hc2z.
 ...
 *)
 
