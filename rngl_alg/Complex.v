@@ -1596,7 +1596,6 @@ Qed.
 Definition is_angle_eucl_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf angle_eucl_dist.
 
-(*
 Theorem angle_eqb_eq :
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
@@ -1616,6 +1615,7 @@ split; intros H12. {
 }
 Qed.
 
+(*
 Theorem angle_opp_0 :
   rngl_has_opp T = true →
   (- 0)%A = 0%A.
@@ -2702,14 +2702,155 @@ Theorem angle_add_le_mono_l :
 Proof.
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H13. {
+(*
 rewrite (angle_add_comm Hic _ θ3).
-  apply angle_le_sub_le_add_l; try easy. {
+*)
+  apply angle_le_sub_le_add_l; try easy.
+3 : {
+  rewrite (angle_add_comm Hic).
+  now rewrite (angle_add_sub Hic Hon Hop Hed).
+}
+2: {
+  progress unfold angle_leb.
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  symmetry in Hzs12, Hzs1.
+  destruct zs1. {
+    destruct zs12; [ | easy ].
+    apply rngl_leb_le in Hzs12, Hzs1.
+    apply rngl_leb_le.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+...
+(*
 Theorem angle_add_overflow_comm :
   rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
 Proof.
-intros Hic *.
-remember (angle_add_
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold angle_add_overflow.
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1. {
+  apply (angle_eqb_eq Hed) in Hz1.
+  subst θ1; cbn.
+  rewrite (angle_add_0_l Hon Hos).
+  rewrite (angle_add_0_r Hon Hos).
+  remember (θ2 =? 0)%A as z2 eqn:Hz2.
+  remember (- θ2 ≤? 0)%A as o2z eqn:Ho2z.
+  symmetry in Hz2, Ho2z.
+  destruct z2.
+...
+  destruct z2; [ easy | ].
+  destruct o2z; [ exfalso | easy ].
+  apply (angle_eqb_neq Hed) in Hz2.
+  apply (angle_le_0_r Hic Hon Hop Hed) in Ho2z.
+  rewrite <- (angle_opp_0 Hop) in Ho2z.
+  now apply angle_opp_inj in Ho2z.
+}
+cbn.
+apply (angle_eqb_neq Hed) in Hz1.
+remember (θ2 =? 0)%A as z2 eqn:Hz2.
+symmetry in Hz2.
+destruct z2; cbn. {
+  apply (angle_eqb_eq Hed) in Hz2.
+  subst θ2.
+  apply Bool.not_true_iff_false.
+  intros H.
+  apply (angle_le_0_r Hic Hon Hop Hed) in H.
+  rewrite <- (angle_opp_0 Hop) in H.
+  now apply (angle_opp_inj Hop) in H.
+}
+apply (angle_eqb_neq Hed) in Hz2.
+remember (- θ1 ≤? θ2)%A as o12 eqn:Ho12.
+remember (- θ2 ≤? θ1)%A as o21 eqn:Ho21.
+symmetry in Ho12, Ho21.
+destruct o12. {
+  destruct o21; [ easy | exfalso ].
+  apply angle_leb_nle in Ho21.
+  apply Ho21; clear Ho21.
+  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
+    intros H.
+    apply (f_equal angle_opp) in H.
+    rewrite (angle_opp_involutive Hop) in H.
+    now rewrite (angle_opp_0 Hop) in H.
+  }
+  now rewrite (angle_opp_involutive Hop).
+} {
+  destruct o21; [ exfalso | easy ].
+  apply angle_leb_nle in Ho12.
+  apply Ho12; clear Ho12.
+  apply (angle_opp_le_compat Hic Hon Hop Hed); [ | easy | ]. {
+    intros H.
+    apply (f_equal angle_opp) in H.
+    rewrite (angle_opp_involutive Hop) in H.
+    now rewrite (angle_opp_0 Hop) in H.
+  }
+  now rewrite (angle_opp_involutive Hop).
+}
+Qed.
+...
+*)
+Theorem angle_add_overflow_comm :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ1 θ2, angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
+Proof.
+intros Hic Hon Hop.
+destruct ac as (Hiv, Hc2, Hor).
+intros.
+remember (angle_add_overflow _ _) as o12 eqn:Ho12.
+remember (angle_add_overflow _ _) as o21 eqn:Ho21 in |-*.
+symmetry in Ho12, Ho21.
+destruct o12. {
+  destruct o21; [ easy | exfalso ].
+  progress unfold angle_add_overflow in Ho12.
+  progress unfold angle_add_overflow in Ho21.
+  apply (angle_ltb_ge) in Ho21.
+  apply angle_nlt_ge in Ho21.
+  apply Ho21; clear Ho21.
+  progress unfold angle_ltb in Ho12.
+  progress unfold angle_ltb.
+  rewrite (angle_add_comm Hic).
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs12, Hzs1, Hzs2.
+  move Hzs2 before Hzs1.
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in Hzs2.
+    apply rngl_ltb_lt.
+    destruct zs1. {
+      apply rngl_leb_le in Hzs1.
+      apply rngl_ltb_lt in Ho12.
+      destruct (rngl_le_dec Hor (rngl_cos θ2) (rngl_cos θ1)) as [H21| H12]. {
+        now apply (rngl_le_lt_trans Hor _ (rngl_cos θ1)).
+      }
+      apply (rngl_nle_gt Hor) in H12.
+      apply (rngl_nle_gt Hor).
+      intros Hc12.
+...
+      apply (rngl_nle_gt Hor) in Ho12.
+      apply Ho12; clear Ho12; cbn.
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      apply (rngl_le_sub_le_add_r Hop Hor).
+      rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+      apply (rngl_nlt_ge Hor).
+      intros Hss.
+      apply (rngl_nlt_ge Hor) in Hc12.
+      apply Hc12; clear Hc12; cbn.
+      apply (rngl_lt_add_lt_sub_r Hop Hor).
+      apply (rngl_lt_add_lt_sub_l Hop Hor).
+      rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+      apply (rngl_nle_gt Hor).
+      intros Hc12.
 ...
 progress unfold angle_add_overflow.
 rewrite (angle_add_comm Hic).
@@ -2730,11 +2871,6 @@ destruct zs21. {
     rewrite angle_add_opp_r.
     rewrite (angle_add_comm Hic).
     rewrite (angle_add_sub Hic Hon Hop Hed).
-...
-3 : {
-  rewrite (angle_add_comm Hic).
-  now rewrite (angle_add_sub Hic Hon Hop Hed).
-}
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
