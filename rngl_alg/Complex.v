@@ -2702,25 +2702,21 @@ Theorem angle_add_le_mono_l :
 Proof.
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H13. {
-(*
-rewrite (angle_add_comm Hic _ θ3).
-*)
-  apply angle_le_sub_le_add_l; try easy.
-3 : {
+  apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
+    progress unfold angle_add_overflow in Haov12.
+    now apply angle_ltb_ge in Haov12.
+  } {
+    rewrite (angle_add_comm Hic).
+    now rewrite (angle_add_sub Hic Hon Hop Hed).
+  }
+  progress unfold angle_add_overflow in Haov12.
+  apply angle_ltb_ge in Haov12.
+  progress unfold angle_add_overflow.
+  rewrite angle_add_opp_r.
   rewrite (angle_add_comm Hic).
-  now rewrite (angle_add_sub Hic Hon Hop Hed).
-}
-2: {
-  progress unfold angle_leb.
-  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  symmetry in Hzs12, Hzs1.
-  destruct zs1. {
-    destruct zs12; [ | easy ].
-    apply rngl_leb_le in Hzs12, Hzs1.
-    apply rngl_leb_le.
-...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
+  rewrite (angle_add_sub Hic Hon Hop Hed).
+  apply angle_ltb_ge.
+(* bobo ! *)
 ...
 (*
 Theorem angle_add_overflow_comm :
