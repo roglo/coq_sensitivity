@@ -2787,97 +2787,17 @@ split; intros H23. {
             }
             apply (rngl_nle_gt Hor) in Hzc2.
             move Hzc2 before Hs1z.
+...
 Check rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
-Theorem rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (rngl_cos θ1 ≤ 0)%L
-  → (rngl_cos θ2 ≤ 0)%L
-  → (rngl_sin θ1 ≤ rngl_sin θ2)%L ↔ (rngl_cos θ1 ≤ rngl_cos θ2)%L.
-Proof.
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzs1 Hzs2 Hzc1 Hzc2.
-  rewrite (H1 (rngl_sin θ1)), (H1 (rngl_sin θ2)).
-  rewrite (H1 (rngl_cos θ1)), (H1 (rngl_cos θ2)).
-  easy.
-}
-intros * Hzs1 Hzs2 Hzc1 Hzc2.
-split. {
-  intros Hss.
-  apply (rngl_nlt_ge Hor) in Hss.
-  apply (rngl_nlt_ge Hor).
-  intros Hcc; apply Hss; clear Hss.
-  apply (rngl_lt_iff Hor).
-  split. {
-    apply (rngl_lt_le_incl Hor) in Hcc.
-    specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
-    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [H| H]. {
-      apply (rngl_le_antisymm Hor) in H; [ | easy ].
-      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
-      destruct H; subst θ1. {
-        apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
-      }
-      exfalso.
-      apply (rngl_nlt_ge Hor) in Hzs1.
-      apply Hzs1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-    }
-    apply (rngl_nle_gt Hor) in H.
-    move H before Hzc1; clear Hzc1; rename H into Hzc1.
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [H| H]. {
-      apply (rngl_le_antisymm Hor) in H; [ | easy ].
-      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
-      destruct H; subst θ2. {
-        apply (rngl_lt_le_incl Hor) in Hzc1.
-        apply (rngl_le_antisymm Hor) in Hcc; [ | easy ].
-        cbn in Hcc.
-        apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hcc.
-        destruct Hcc; subst θ1; [ apply (rngl_le_refl Hor) | ].
-        exfalso.
-        apply (rngl_nlt_ge Hor) in Hzs1.
-        apply Hzs1; clear Hzs1; cbn.
-        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-      }
-      apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
-    }
-    apply (rngl_nle_gt Hor) in H.
-    move H before Hzc2; clear Hzc2; rename H into Hzc2.
-    generalize Hzc2; intros H.
-    apply (rngl_leb_gt Hor) in H.
-    rewrite H in H1; clear H.
+Check rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
+...
     generalize Hzc1; intros H.
     apply (rngl_leb_gt Hor) in H.
     now rewrite H in H1; clear H.
-  }
-  intros H.
-  apply (rngl_sin_eq Hic Hon Hop Hed) in H.
-  destruct H; subst θ2; [ now apply (rngl_lt_irrefl Hor) in Hcc | ].
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hcc, Hzc2.
-  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc2.
-  apply (rngl_le_antisymm Hor) in Hzc2; [ | easy ].
-  rewrite Hzc2 in Hcc.
-  rewrite (rngl_opp_0 Hop) in Hcc.
-  now apply (rngl_lt_irrefl Hor) in Hcc.
-} {
-  intros Hcc.
-  apply (rngl_nlt_ge Hor) in Hcc.
-  apply (rngl_nlt_ge Hor).
-  intros Hss; apply Hcc; clear Hcc.
-  apply (rngl_lt_iff Hor).
+...
   split. {
     apply (rngl_lt_le_incl Hor) in Hss.
 ...
-    specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
     specialize (H1 _ _ Hzs2 Hzs1 Hcc).
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [H| H]. {
       apply (rngl_le_antisymm Hor) in H; [ | easy ].
