@@ -2700,9 +2700,10 @@ Theorem angle_add_le_mono_l :
   → angle_add_overflow θ1 θ3 = false
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
-intros Hic Hon Hop Hed * Haov12 Haov13.
-split; intros H23. {
 (**)
+intros Hic Hon Hop Hed * Haov12 Haov13.
+destruct ac as (Hiv, Hc2, Hor).
+split; intros H23. {
   progress unfold angle_leb in H23.
   progress unfold angle_leb.
   remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
@@ -2719,7 +2720,24 @@ split; intros H23. {
       apply rngl_leb_le in Hzs2.
       destruct zs3. {
         apply rngl_leb_le in Hzs3, H23.
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+          destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+            apply angle_le_sub_le_add_l_lemma_1; try easy. {
+              rewrite (angle_add_comm Hic).
+              now rewrite (angle_add_sub Hic Hon Hop Hed).
+            } {
+              rewrite (angle_add_comm Hic).
+              now rewrite (angle_add_sub Hic Hon Hop Hed).
+            }
+          } {
+            apply (rngl_nle_gt Hor) in Hs1z.
 ...
+            rewrite (angle_add_comm Hic θ1 θ3).
+            rewrite (angle_add_comm Hic θ1 θ2).
+            apply angle_le_sub_le_add_l_lemma_4; try easy; cycle 2. {
+...
+intros Hic Hon Hop Hed * Haov12 Haov13.
+split; intros H23. {
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
     progress unfold angle_add_overflow in Haov12.
     now apply angle_ltb_ge in Haov12.
@@ -2736,6 +2754,8 @@ split; intros H23. {
   apply angle_ltb_ge.
 (* bobo ! *)
 ...
+intros Hic Hon Hop Hed * Haov12 Haov13.
+split; intros H23. {
   do 2 rewrite (angle_add_comm Hic θ1).
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); cycle 1. {
     progress unfold angle_add_overflow in Haov12.
@@ -2746,6 +2766,18 @@ split; intros H23. {
     apply angle_ltb_ge.
     progress unfold angle_leb.
     (* faut voir mais bof *)
+...
+intros Hic Hon Hop Hed * Haov12 Haov13.
+split; intros H23. {
+  rewrite (angle_add_comm Hic θ1 θ2).
+  apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]. {
+    progress unfold angle_add_overflow in Haov12.
+    apply angle_ltb_ge in Haov12.
+    progress unfold angle_add_overflow.
+    rewrite angle_add_opp_r.
+    rewrite (angle_add_sub Hic Hon Hop Hed).
+    apply angle_ltb_ge.
+    progress unfold angle_leb.
 ...
 (*
 Theorem angle_add_overflow_comm :

@@ -2479,7 +2479,6 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-(* to be completed *)
 Theorem angle_le_sub_le_add_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
