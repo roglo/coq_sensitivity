@@ -2788,6 +2788,17 @@ split; intros H23. {
             apply (rngl_nle_gt Hor) in Hzc2.
             move Hzc2 before Hs1z.
 ...
+            cbn.
+            eapply (rngl_le_trans Hor). {
+              apply (rngl_add_le_mono_l Hop Hor).
+              apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+              apply H23.
+            }
+            apply (rngl_add_le_mono_r Hop Hor).
+            apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+            specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+            apply (H1 Hic Hon Hop Hed _ _ Hzs3 Hzs2).
+...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
