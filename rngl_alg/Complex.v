@@ -2787,8 +2787,43 @@ split; intros H23. {
             }
             apply (rngl_nle_gt Hor) in Hzc2.
             move Hzc2 before Hs1z.
+            destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+              move Hzc3 before Hzc2.
+              specialize rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff as H1.
+              apply (H1 Hic Hon Hop Hed (θ1 + θ3) (θ1 + θ2))%A;
+                  [ | | easy | easy | ]. {
+                cbn.
+                apply (rngl_add_nonneg_nonneg Hor).
+                apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+                now apply (rngl_lt_le_incl Hor).
+                now apply (rngl_mul_nonneg_nonneg Hop Hor).
+              } {
+                cbn.
+                apply (rngl_add_nonneg_nonneg Hor).
+                apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+                now apply (rngl_lt_le_incl Hor).
+                apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+                now apply (rngl_lt_le_incl Hor).
+              }
+              clear H1.
+              specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+              generalize Hzc2; intros H.
+              apply (rngl_lt_le_incl Hor) in H.
+              specialize (H1 Hic Hon Hop Hed _ _ Hzs2 Hzs3 H Hzc3).
+              clear H.
+              generalize H23; intros Hs12.
+              apply H1 in Hs12; clear H1.
+              cbn.
+              eapply (rngl_le_trans Hor). {
+                apply (rngl_sub_le_mono_l Hop Hor).
+                apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+                apply Hs12.
+              }
+              apply (rngl_sub_le_mono_r Hop Hor).
+              now apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+            }
+            apply (rngl_nle_gt Hor) in Hc3z.
 ...
-Check rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 Check rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
 ...
     generalize Hzc1; intros H.
