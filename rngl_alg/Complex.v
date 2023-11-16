@@ -2787,17 +2787,68 @@ split; intros H23. {
             }
             apply (rngl_nle_gt Hor) in Hzc2.
             move Hzc2 before Hs1z.
+Check rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+Theorem rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 ≤ 0)%L
+  → (rngl_cos θ2 ≤ 0)%L
+  → (rngl_sin θ1 ≤ rngl_sin θ2)%L ↔ (rngl_cos θ1 ≤ rngl_cos θ2)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hzs1 Hzs2 Hzc1 Hzc2.
+split. {
+  intros Hss.
+  apply (rngl_nlt_ge Hor) in Hss.
+  apply (rngl_nlt_ge Hor).
+  intros Hcc; apply Hss; clear Hss.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_lt_le_incl Hor) in Hcc.
+    specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
+    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
 ...
-            cbn.
-            eapply (rngl_le_trans Hor). {
-              apply (rngl_add_le_mono_l Hop Hor).
-              apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
-              apply H23.
-            }
-            apply (rngl_add_le_mono_r Hop Hor).
-            apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
-            specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-            apply (H1 Hic Hon Hop Hed _ _ Hzs3 Hzs2).
+    apply rngl_leb_le in Hzc2.
+    now rewrite Hzc2 in H1.
+  }
+  intros Hss.
+  apply (rngl_nle_gt Hor) in Hcc.
+  apply Hcc; clear Hcc.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ2)); [ | easy ].
+  apply (rngl_squ_le_abs_le Hop Hor Hii).
+  specialize (cos2_sin2_1 Hon Hop Hic Hed θ1) as H1.
+  apply (rngl_add_move_r Hop) in H1.
+  rewrite H1; clear H1.
+  specialize (cos2_sin2_1 Hon Hop Hic Hed θ2) as H1.
+  apply (rngl_add_move_r Hop) in H1.
+  rewrite H1, Hss; clear H1.
+  apply (rngl_le_refl Hor).
+} {
+  intros Hcc.
+  specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
+  specialize (H1 _ _ Hzs2 Hzs1 Hcc).
+  apply rngl_leb_le in Hzc2.
+  now rewrite Hzc2 in H1.
+}
+Qed.
+...
+            apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy. {
+cbn.
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+(* cos θ3 to be considered *)
+...
+  now apply (rngl_lt_le_incl Hor).
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
