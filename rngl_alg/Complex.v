@@ -2823,12 +2823,17 @@ split; intros H23. {
               now apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
             }
             apply (rngl_nle_gt Hor) in Hc3z.
-...
-Check rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
-...
-    generalize Hzc1; intros H.
-    apply (rngl_leb_gt Hor) in H.
-    now rewrite H in H1; clear H.
+            remember (θ3 - angle_right)%A as θ.
+            apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_assoc Hop) in Hzs13 |-*.
+            rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3 |-*.
+            rewrite (rngl_cos_add_right_r Hon Hop) in Hzs13, Hc3z, H23.
+            apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+            apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
+            apply (rngl_le_opp_l Hop Hor) in H23.
+            move Hc3z before Hzs2; move Hzs3 after Hzc2.
 ...
   split. {
     apply (rngl_lt_le_incl Hor) in Hss.
