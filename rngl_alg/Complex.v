@@ -2752,14 +2752,11 @@ split; intros H23. {
               move θ2 before θ1.
               rewrite (angle_add_assoc Hop) in Hzs12 |-*.
               rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2 |-*.
+              rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H23, Hzs12.
+              apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z, Hzs12.
+              apply (rngl_le_opp_r Hop Hor) in H23.
+              move Hc2z before Hzc1; move Hzs2 after Hs1z.
 ...
-            rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc1.
-            do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
-            apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13, Hzs12.
-            apply (rngl_opp_neg_pos Hop Hor) in Hs1z.
-            move Hzc1 after Hzs2; move Hs1z before Hzs3.
-            destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
-`...
   dorewrite (rngl_cos_sub_right_r Hon Hop).
   rewrite (rngl_sin_add_right_r Hon Hos) in Hzs12.
   rewrite (rngl_cos_add_right_r Hon Hop) in Hc123.
