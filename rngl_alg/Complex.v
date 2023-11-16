@@ -2701,8 +2701,25 @@ Theorem angle_add_le_mono_l :
   → (θ2 ≤ θ3)%A ↔ (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
 intros Hic Hon Hop Hed * Haov12 Haov13.
-split; intros H13. {
-(*
+split; intros H23. {
+(**)
+  progress unfold angle_leb in H23.
+  progress unfold angle_leb.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
+  symmetry in Hzs2, Hzs3, Hzs12, Hzs13.
+  move H23 at bottom.
+  destruct zs12. {
+    destruct zs13; [ | easy ].
+    apply rngl_leb_le in Hzs12, Hzs13.
+    apply rngl_leb_le.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      destruct zs3. {
+        apply rngl_leb_le in Hzs3, H23.
+...
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
     progress unfold angle_add_overflow in Haov12.
     now apply angle_ltb_ge in Haov12.
@@ -2718,7 +2735,7 @@ split; intros H13. {
   rewrite (angle_add_sub Hic Hon Hop Hed).
   apply angle_ltb_ge.
 (* bobo ! *)
-*)
+...
   do 2 rewrite (angle_add_comm Hic θ1).
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); cycle 1. {
     progress unfold angle_add_overflow in Haov12.
