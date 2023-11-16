@@ -2496,23 +2496,6 @@ Proof.
    but not sure *)
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Haov Hsov H21 H123.
-  progress unfold angle_leb.
-  rewrite (H1 (rngl_sin θ1)).
-  rewrite (rngl_leb_refl Hor).
-  rewrite (H1 (rngl_sin (θ2 + θ3))).
-  rewrite (rngl_leb_refl Hor).
-  rewrite (H1 (rngl_cos _)).
-  rewrite (H1 (rngl_cos _)).
-  apply (rngl_leb_refl Hor).
-}
-specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 intros * Haov Hsov H21 Hc123.
 progress unfold angle_leb in Hc123.
 progress unfold angle_leb.
