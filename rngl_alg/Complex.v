@@ -2837,8 +2837,14 @@ split; intros H23. {
             apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
             apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
             apply (rngl_le_opp_l Hop Hor) in H23.
-            apply (rngl_le_opp_l Hop Hor).
+            rewrite <- (rngl_sin_sub_anticomm Hic Hop).
             move Hc3z before Hzc2.
+...
+  Hzs13 : (0 ≤ rngl_cos (θ1 - θ3))%L
+  Hzs12 : (rngl_cos (θ1 + θ2) ≤ 0)%L
+  H23 : (0 ≤ rngl_cos θ3 + rngl_cos θ2)%L
+  ============================
+  (rngl_sin (θ3 - θ1) ≤ rngl_sin (θ1 + θ2))%L
 ...
             remember (θ3 - angle_right)%A as θ.
             apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
@@ -2851,7 +2857,12 @@ split; intros H23. {
             apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
             apply (rngl_le_opp_l Hop Hor) in H23.
             move Hc3z before Hzs2; move Hzs3 after Hzc2.
-Search (rngl_cos _ ≤ rngl_sin _)%L.
+...
+  Hzs13 : (0 ≤ rngl_sin (θ1 + θ3))%L
+  Hzs12 : (rngl_cos (θ1 + θ2) ≤ 0)%L
+  H23 : (0 ≤ rngl_sin θ3 + rngl_cos θ2)%L
+  ============================
+  (rngl_cos (θ1 + θ3) ≤ rngl_sin (θ1 + θ2))%L
 ...
   split. {
     apply (rngl_lt_le_incl Hor) in Hss.
