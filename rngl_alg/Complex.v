@@ -2803,6 +2803,14 @@ Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hzc1 Hzc2.
+  rewrite (H1 (rngl_sin θ1)), (H1 (rngl_sin θ2)).
+  rewrite (H1 (rngl_cos θ1)), (H1 (rngl_cos θ2)).
+  easy.
+}
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
 split. {
   intros Hss.
@@ -2814,6 +2822,49 @@ split. {
     apply (rngl_lt_le_incl Hor) in Hcc.
     specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
     specialize (H1 _ _ Hzs2 Hzs1 Hcc).
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [H| H]. {
+      apply (rngl_le_antisymm Hor) in H; [ | easy ].
+      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+      destruct H; subst θ1. {
+        apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
+      }
+      exfalso.
+      apply (rngl_nlt_ge Hor) in Hzs1.
+      apply Hzs1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    }
+    apply (rngl_nle_gt Hor) in H.
+    move H before Hzc1; clear Hzc1; rename H into Hzc1.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [H| H]. {
+      apply (rngl_le_antisymm Hor) in H; [ | easy ].
+      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+      destruct H; subst θ2. {
+        apply (rngl_lt_le_incl Hor) in Hzc1.
+        apply (rngl_le_antisymm Hor) in Hcc; [ | easy ].
+        cbn in Hcc.
+        apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hcc.
+        destruct Hcc; subst θ1; [ apply (rngl_le_refl Hor) | ].
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzs1.
+        apply Hzs1; clear Hzs1; cbn.
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+      }
+      apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
+    }
+    apply (rngl_nle_gt Hor) in H.
+    move H before Hzc2; clear Hzc2; rename H into Hzc2.
+    generalize Hzc2; intros H.
+    apply (rngl_leb_gt Hor) in H.
+    rewrite H in H1; clear H.
+    generalize Hzc1; intros H.
+    apply (rngl_leb_gt Hor) in H.
+    now rewrite H in H1; clear H.
+  }
+...
+apply (rngl_
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply rngl_leb_nle in H.
+rewrite H; clear H.
 ...
     apply rngl_leb_le in Hzc2.
     now rewrite Hzc2 in H1.

@@ -3698,6 +3698,18 @@ intros H; rewrite H in H5.
 now apply (rngl_lt_irrefl Hor) in H5.
 Qed.
 
+Theorem rngl_opp_1_lt_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
+  (-1 < 0)%L.
+Proof.
+intros Hon Hop Hor Hc1.
+apply (rngl_opp_neg_pos Hop Hor).
+apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+Qed.
+
 Theorem rngl_add_nonneg_nonneg :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a + b)%L.
