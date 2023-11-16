@@ -2859,6 +2859,43 @@ split. {
     apply (rngl_leb_gt Hor) in H.
     now rewrite H in H1; clear H.
   }
+  intros H.
+  apply (rngl_sin_eq Hic Hon Hop Hed) in H.
+  destruct H; subst θ2; [ now apply (rngl_lt_irrefl Hor) in Hcc | ].
+  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hcc, Hzc2.
+  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc2.
+  apply (rngl_le_antisymm Hor) in Hzc2; [ | easy ].
+  rewrite Hzc2 in Hcc.
+  rewrite (rngl_opp_0 Hop) in Hcc.
+  now apply (rngl_lt_irrefl Hor) in Hcc.
+} {
+  intros Hcc.
+  apply (rngl_nlt_ge Hor) in Hcc.
+  apply (rngl_nlt_ge Hor).
+  intros Hss; apply Hcc; clear Hcc.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_lt_le_incl Hor) in Hss.
+...
+    specialize (rngl_sin_nonneg_cos_le_sin_le Hic Hon Hop Hed) as H1.
+    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [H| H]. {
+      apply (rngl_le_antisymm Hor) in H; [ | easy ].
+      apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+      destruct H; subst θ1. {
+        apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
+      }
+      exfalso.
+      apply (rngl_nlt_ge Hor) in Hzs1.
+      apply Hzs1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    }
+    apply (rngl_nle_gt Hor) in H.
+    move H before Hzc1; clear Hzc1; rename H into Hzc1.
+...
+  specialize (H1 _ _ Hzs2 Hzs1).
+  specialize (H1 _ _ Hzs2 Hzs1 Hcc).
+  apply rngl_leb_le in Hzc2.
+  now rewrite Hzc2 in H1.
 ...
 apply (rngl_
 apply (rngl_opp_lt_compat Hop Hor) in H.
