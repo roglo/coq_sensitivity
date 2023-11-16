@@ -2823,6 +2823,23 @@ split; intros H23. {
               now apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
             }
             apply (rngl_nle_gt Hor) in Hc3z.
+(**)
+            remember (angle_straight - θ3)%A as θ.
+            apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_sub_assoc Hop) in Hzs13 |-*.
+            rewrite (angle_add_sub_swap Hic Hop) in Hzs13 |-*.
+            rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs3.
+            rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc3z, H23.
+            rewrite (rngl_sin_add_straight_r Hon Hop).
+            rewrite (rngl_cos_add_straight_r Hon Hop) in Hzs13.
+            apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
+            apply (rngl_opp_neg_pos Hop Hor) in Hc3z.
+            apply (rngl_le_opp_l Hop Hor) in H23.
+            apply (rngl_le_opp_l Hop Hor).
+            move Hc3z before Hzc2.
+...
             remember (θ3 - angle_right)%A as θ.
             apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
             subst θ3; rename θ into θ3.
@@ -2834,6 +2851,7 @@ split; intros H23. {
             apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
             apply (rngl_le_opp_l Hop Hor) in H23.
             move Hc3z before Hzs2; move Hzs3 after Hzc2.
+Search (rngl_cos _ ≤ rngl_sin _)%L.
 ...
   split. {
     apply (rngl_lt_le_incl Hor) in Hss.
