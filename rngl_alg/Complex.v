@@ -2918,14 +2918,14 @@ split; intros H23. {
             apply (rngl_nlt_ge Hor) in Hzc2.
             move Hzc2 before Hzs1.
             rename Hzs12 into Hzc12; rename Hzs13 into Hzc13.
-            assert (Hsz12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
+            assert (Hzs12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
               cbn.
               apply (rngl_add_nonneg_nonneg Hor).
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
               apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
               now apply (rngl_lt_le_incl Hor).
             }
-            assert (Hsz13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+            assert (Hzs13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
               cbn.
               apply (rngl_add_nonneg_nonneg Hor).
               now apply (rngl_mul_nonneg_nonneg Hop Hor).
@@ -2936,6 +2936,25 @@ split; intros H23. {
             apply H1; try easy.
             clear H1.
             apply angle_add_le_mono_l_lemma_1; try easy.
+            progress unfold angle_add_overflow.
+            apply angle_ltb_ge.
+            progress unfold angle_leb.
+            generalize Hc1z; intros H.
+            apply (rngl_lt_le_incl Hor) in H.
+            apply rngl_leb_le in H.
+            rewrite H; clear H.
+            apply rngl_leb_le in Hzs13.
+            rewrite Hzs13.
+            apply rngl_leb_le in Hzs13.
+            apply rngl_leb_le.
+            apply angle_le_sub_le_add_l_lemma_1; try easy.
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            rewrite (angle_sub_diag Hic Hon Hop Hed).
+            apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+            rewrite (angle_sub_diag Hic Hon Hop Hed).
+            apply (rngl_le_refl Hor).
+          }
 ...
 (*
 intros Hic Hon Hop Hed * Haov12 Haov13.
