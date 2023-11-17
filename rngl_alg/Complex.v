@@ -2689,6 +2689,200 @@ remember (S n) as sn; cbn in Hn; subst sn.
 now apply Bool.orb_false_iff in Hn.
 Qed.
 
+Theorem angle_add_overflow_le_lemma_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin θ3)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (0 ≤ rngl_sin (θ1 + θ3))%L
+  → (rngl_cos θ2 ≤ rngl_cos θ3)%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L
+  → (rngl_cos (θ1 + θ3) ≤ rngl_cos θ1)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32 H12.
+  do 2 rewrite (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32 H12.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  cbn.
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_le_add_r Hor).
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+apply (rngl_nle_gt Hor) in Hc1z.
+remember (θ1 - angle_right)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ1; rename θ into θ1.
+move θ1 after θ2.
+rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12, H12 |-*.
+rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs13, Hzs12.
+rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z, H12, H12.
+do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
+apply (rngl_opp_le_compat Hop Hor) in H12.
+apply -> (rngl_opp_le_compat Hop Hor).
+move Hc1z after Hzs2; move Hzs1 after Hzs3.
+destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
+  remember (θ2 - angle_right)%A as θ.
+  apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+  subst θ2; rename θ into θ2.
+  move θ2 before θ1.
+  rewrite (angle_add_assoc Hop) in H12, Hzs12.
+  rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, H12.
+  rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H32, Hzs12.
+  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
+  apply (rngl_le_opp_l Hop Hor) in H32.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+  move Hc2z before Hc1z; move Hzs2 after Hzs1.
+  apply (rngl_nlt_ge Hor).
+  intros Hs13.
+  apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Hzs12; clear Hzs12.
+  apply (rngl_lt_iff Hor).
+  split. {
+    cbn.
+    apply (rngl_add_nonneg_nonneg Hor).
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  intros Hs12.
+  symmetry in Hs12.
+  apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hs12.
+  destruct Hs12 as [Hs12| Hs12]. {
+    apply (angle_add_move_l Hic Hon Hop Hed) in Hs12.
+    rewrite (angle_sub_0_l Hon Hos) in Hs12.
+    subst θ2.
+    cbn in Hc2z.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
+    now apply (rngl_nlt_ge Hor) in Hc2z.
+  }
+  apply (angle_add_move_l Hic Hon Hop Hed) in Hs12.
+  subst θ2.
+  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
+  apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+  symmetry in Hzs2.
+  apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hzs2.
+  destruct Hzs2; subst θ1. {
+    rewrite (angle_straight_sub_right Hon Hop) in H12.
+    rewrite (angle_right_add_right Hon Hop) in H12.
+    apply (rngl_nlt_ge Hor) in H12.
+    apply H12; cbn.
+    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+  }
+  apply (rngl_nle_gt Hor) in Hc1z.
+  apply Hc1z; cbn.
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+}
+apply (rngl_nle_gt Hor) in Hzc2.
+move Hzc2 before Hzs1.
+apply (rngl_sin_sub_nonneg_sin_le_sin); try easy. {
+  cbn.
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+} {
+  rewrite (angle_add_sub_swap Hic Hop).
+  rewrite (angle_sub_diag Hic Hon Hop Hed).
+  now rewrite (angle_add_0_l Hon Hos).
+}
+Qed.
+
+(* to be completed
+Theorem angle_add_overflow_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (θ3 ≤ θ2)%A
+  → angle_add_overflow θ1 θ2 = false
+  → angle_add_overflow θ1 θ3 = false.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H32 H12.
+  progress unfold angle_add_overflow.
+  apply angle_ltb_ge.
+  progress unfold angle_leb.
+  rewrite (H1 (rngl_sin θ1)).
+  rewrite (rngl_leb_refl Hor).
+  rewrite (H1 (rngl_sin (θ1 + θ3))).
+  rewrite (rngl_leb_refl Hor).
+  apply rngl_leb_le.
+  rewrite H1.
+  rewrite (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+intros * H32 H12.
+progress unfold angle_add_overflow in H12.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge in H12.
+apply angle_ltb_ge.
+(*
+...
+Theorem angle_le_trans :
+  ∀ θ1 θ2 θ3, (θ1 ≤ θ2 → θ2 ≤ θ3 → θ1 ≤ θ3)%A.
+...
+eapply angle_le_trans; [ apply H12 | ].
+...
+*)
+progress unfold angle_leb in H32.
+progress unfold angle_leb in H12.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
+symmetry in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
+move Hzs1 after Hzs2.
+move Hzs12 before Hzs3; move Hzs13 before Hzs12.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs13; [ | easy ].
+  apply rngl_leb_le in Hzs13.
+  apply rngl_leb_le.
+  destruct zs3. {
+    apply rngl_leb_le in Hzs3.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      apply rngl_leb_le in H32.
+      destruct zs12. {
+        apply rngl_leb_le in Hzs12.
+        apply rngl_leb_le in H12.
+        now apply angle_add_overflow_le_lemma_1 with (θ2 := θ2).
+      }
+      clear H12.
+      apply (rngl_leb_gt Hor) in Hzs12.
+...
+*)
+
 Theorem angle_add_le_mono_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2984,199 +3178,7 @@ apply (rngl_add_pos_nonneg Hor); [ easy | ].
 apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
-Theorem angle_add_overflow_le_lemma_1 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (0 ≤ rngl_sin (θ1 + θ3))%L
-  → (rngl_cos θ2 ≤ rngl_cos θ3)%L
-  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L
-  → (rngl_cos (θ1 + θ3) ≤ rngl_cos θ1)%L.
-Proof.
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32 H12.
-  do 2 rewrite (H1 (rngl_cos _)).
-  apply (rngl_le_refl Hor).
-}
-intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32 H12.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-  cbn.
-  apply (rngl_le_sub_le_add_r Hop Hor).
-  eapply (rngl_le_trans Hor). 2: {
-    apply (rngl_le_add_r Hor).
-    now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  }
-  apply (rngl_le_0_sub Hop Hor).
-  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  apply (rngl_le_0_sub Hop Hor).
-  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-}
-apply (rngl_nle_gt Hor) in Hc1z.
-remember (θ1 - angle_right)%A as θ.
-apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
-subst θ1; rename θ into θ1.
-move θ1 after θ2.
-rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12, H12 |-*.
-rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs13, Hzs12.
-rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z, H12, H12.
-do 2 rewrite (rngl_cos_add_right_r Hon Hop).
-apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
-apply (rngl_opp_le_compat Hop Hor) in H12.
-apply -> (rngl_opp_le_compat Hop Hor).
-move Hc1z after Hzs2; move Hzs1 after Hzs3.
-destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
-  remember (θ2 - angle_right)%A as θ.
-  apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
-  subst θ2; rename θ into θ2.
-  move θ2 before θ1.
-  rewrite (angle_add_assoc Hop) in H12, Hzs12.
-  rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, H12.
-  rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H32, Hzs12.
-  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
-  apply (rngl_le_opp_l Hop Hor) in H32.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
-  move Hc2z before Hc1z; move Hzs2 after Hzs1.
-  apply (rngl_nlt_ge Hor).
-  intros Hs13.
-  apply (rngl_nlt_ge Hor) in Hzs12.
-  apply Hzs12; clear Hzs12.
-  apply (rngl_lt_iff Hor).
-  split. {
-    cbn.
-    apply (rngl_add_nonneg_nonneg Hor).
-    now apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-    now apply (rngl_lt_le_incl Hor).
-  }
-  intros Hs12.
-  symmetry in Hs12.
-  apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hs12.
-  destruct Hs12 as [Hs12| Hs12]. {
-    apply (angle_add_move_l Hic Hon Hop Hed) in Hs12.
-    rewrite (angle_sub_0_l Hon Hos) in Hs12.
-    subst θ2.
-    cbn in Hc2z.
-    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
-    now apply (rngl_nlt_ge Hor) in Hc2z.
-  }
-  apply (angle_add_move_l Hic Hon Hop Hed) in Hs12.
-  subst θ2.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
-  apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-  symmetry in Hzs2.
-  apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hzs2.
-  destruct Hzs2; subst θ1. {
-    rewrite (angle_straight_sub_right Hon Hop) in H12.
-    rewrite (angle_right_add_right Hon Hop) in H12.
-    apply (rngl_nlt_ge Hor) in H12.
-    apply H12; cbn.
-    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-  }
-  apply (rngl_nle_gt Hor) in Hc1z.
-  apply Hc1z; cbn.
-  apply (rngl_opp_1_le_0 Hon Hop Hor).
-}
-apply (rngl_nle_gt Hor) in Hzc2.
-move Hzc2 before Hzs1.
-apply (rngl_sin_sub_nonneg_sin_le_sin); try easy. {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
-} {
-  rewrite (angle_add_sub_swap Hic Hop).
-  rewrite (angle_sub_diag Hic Hon Hop Hed).
-  now rewrite (angle_add_0_l Hon Hos).
-}
-Qed.
-
 (* to be completed
-Theorem angle_add_overflow_le :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  (θ3 ≤ θ2)%A
-  → angle_add_overflow θ1 θ2 = false
-  → angle_add_overflow θ1 θ3 = false.
-Proof.
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * H32 H12.
-  progress unfold angle_add_overflow.
-  apply angle_ltb_ge.
-  progress unfold angle_leb.
-  rewrite (H1 (rngl_sin θ1)).
-  rewrite (rngl_leb_refl Hor).
-  rewrite (H1 (rngl_sin (θ1 + θ3))).
-  rewrite (rngl_leb_refl Hor).
-  apply rngl_leb_le.
-  rewrite H1.
-  rewrite (H1 (rngl_cos _)).
-  apply (rngl_le_refl Hor).
-}
-intros * H32 H12.
-progress unfold angle_add_overflow in H12.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge in H12.
-apply angle_ltb_ge.
-(*
-...
-Theorem angle_le_trans :
-  ∀ θ1 θ2 θ3, (θ1 ≤ θ2 → θ2 ≤ θ3 → θ1 ≤ θ3)%A.
-...
-eapply angle_le_trans; [ apply H12 | ].
-...
-*)
-progress unfold angle_leb in H32.
-progress unfold angle_leb in H12.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
-remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
-symmetry in Hzs1, Hzs2, Hzs3, Hzs12, Hzs13.
-move Hzs1 after Hzs2.
-move Hzs12 before Hzs3; move Hzs13 before Hzs12.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  destruct zs13; [ | easy ].
-  apply rngl_leb_le in Hzs13.
-  apply rngl_leb_le.
-  destruct zs3. {
-    apply rngl_leb_le in Hzs3.
-    destruct zs2. {
-      apply rngl_leb_le in Hzs2.
-      apply rngl_leb_le in H32.
-      destruct zs12. {
-        apply rngl_leb_le in Hzs12.
-        apply rngl_leb_le in H12.
-        now apply angle_add_overflow_le_lemma_1 with (θ2 := θ2).
-      }
-      clear H12.
-      apply (rngl_leb_gt Hor) in Hzs12.
-...
-
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
