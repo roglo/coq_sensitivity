@@ -2888,7 +2888,46 @@ split; intros H23. {
           now apply angle_add_le_mono_l_lemma_1.
         }
         apply (rngl_nle_gt Hor) in Hc1z.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+          remember (θ1 - angle_right)%A as θ.
+          apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+          subst θ1; rename θ into θ1.
+          move θ1 after θ2.
+          rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12.
+          rewrite (angle_add_add_swap Hic Hop).
+          rewrite (angle_add_add_swap Hic Hop _ _ θ2).
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs13, Hzs12, Hzs1.
+          rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z.
+          do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+          apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
+          apply -> (rngl_opp_le_compat Hop Hor).
+          move Hc1z after Hzs2; move Hzs1 before Hzs3.
+          specialize rngl_sin_nonneg_cos_le_sin_le as H1.
+          specialize (H1 Hic Hon Hop Hed θ3 θ2 Hzs3 Hzs2 H23).
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
+            move Hzc3 before Hzs1.
+            apply rngl_leb_le in Hzc3.
+            rewrite Hzc3 in H1.
+            apply rngl_leb_le in Hzc3.
+            destruct (rngl_lt_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
+              apply (rngl_nle_gt Hor) in Hc2z.
+              exfalso; apply Hc2z; clear Hc2z.
+              eapply (rngl_le_trans Hor); [ apply Hzc3 | easy ].
+            }
+            apply (rngl_nlt_ge Hor) in Hzc2.
+            move Hzc2 before Hzs1.
 ...
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+...
+          specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+          apply H1; try easy.
+...
+apply rngl_sin_sub_nonneg_sin_le_sin in H23; try easy.
+...
+          apply angle_add_le_mono_l_lemma_1.
+...
+(*
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
@@ -3082,6 +3121,7 @@ destruct zs21. {
     rewrite (angle_add_comm Hic).
     rewrite (angle_add_sub Hic Hon Hop Hed).
 ...
+*)
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3181,8 +3221,6 @@ apply Nat.succ_le_mono in Hab.
 apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
-... ...
-Check angle_add_le_mono_l.
 ... ...
 apply angle_add_le_mono_l; try easy.
 ...

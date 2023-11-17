@@ -2388,8 +2388,7 @@ apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
 apply -> (rngl_le_sub_0 Hop Hor) in Hc123.
 apply -> (rngl_lt_sub_0 Hop Hor) in H231.
 apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
-move Hc1z after Hs2z.
-move Hzs1 after Hzs3.
+move Hc1z after Hs2z; move Hzs1 after Hzs3.
 apply (rngl_nle_gt Hor) in Hzs12.
 exfalso.
 apply Hzs12; clear Hzs12; cbn.
