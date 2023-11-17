@@ -3042,7 +3042,7 @@ split; intros H23. {
         apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13, Hzs12.
         apply -> (rngl_opp_le_compat Hop Hor).
         move Hs1z before Hzs2; move Hc1z before Hzs3.
-...
+Admitted.
 (*
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
@@ -3325,20 +3325,73 @@ Theorem angle_mul_nat_le_mono_nonneg_r :
   rngl_has_eq_dec T = true →
   ∀ a b θ, angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A.
 Proof.
-intros Hic Hon Hop Hed * Hb Hab.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hb Hab.
 revert a Hab.
 induction b; intros. {
   apply Nat.le_0_r in Hab; subst a.
   apply (angle_leb_refl).
 }
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | cbn ].
+move a after b.
 apply Nat.succ_le_mono in Hab.
 apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
-... ...
 apply angle_add_le_mono_l; try easy.
+Theorem glop :
+  ∀ θ1 θ2 θ3,
+  (θ3 ≤ θ2)%A
+  → angle_add_overflow θ1 θ2 = false
+  → angle_add_overflow θ1 θ3 = false.
+Proof.
+intros * H32 H12.
+progress unfold angle_add_overflow in H12.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge in H12.
+apply angle_ltb_ge.
+progress unfold angle_leb in H32.
+progress unfold angle_leb in H12.
+progress unfold angle_leb.
+... ...
+now apply (glop _ (b * θ))%A.
+...
+progress unfold angle_add_overflow in H2.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge in H2.
+apply angle_ltb_ge.
+progress unfold angle_leb in H2.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst. {
+  apply rngl_leb_le in Hzst.
+  remember (0 ≤? rngl_sin (θ + (a * θ)%A))%L as zsta eqn:Hzsta.
+  remember (0 ≤? rngl_sin (θ + (b * θ)%A))%L as zstb eqn:Hzstb.
+  symmetry in Hzsta, Hzstb.
+  destruct zsta; [ | easy ].
+  apply rngl_leb_le.
+  apply rngl_leb_le in Hzsta.
+  destruct zstb. {
+    apply rngl_leb_le in Hzstb.
+    apply rngl_leb_le in H2.
+    move Hzsta after Hzstb.
+    eapply (rngl_le_trans Hor); [ | apply H2 ].
+(*
+Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+*)
+specialize rngl_sin_nonneg_cos_le_sin_le as H3.
+specialize (H3 Hic Hon Hop Hed).
+specialize (H3 _ _ Hzstb Hzst H2).
+Search angle_mul_nat_overflow.
+...
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+    cbn.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
