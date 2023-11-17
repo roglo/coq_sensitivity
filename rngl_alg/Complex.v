@@ -2908,6 +2908,7 @@ split; intros H23. {
             move Hzc3 before Hzs1.
             apply rngl_leb_le in Hzc3.
             rewrite Hzc3 in H1.
+            rename H1 into Hs23.
             apply rngl_leb_le in Hzc3.
             destruct (rngl_lt_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
               apply (rngl_nle_gt Hor) in Hc2z.
@@ -2916,16 +2917,25 @@ split; intros H23. {
             }
             apply (rngl_nlt_ge Hor) in Hzc2.
             move Hzc2 before Hzs1.
-...
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
-...
-          specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
-          apply H1; try easy.
-...
-apply rngl_sin_sub_nonneg_sin_le_sin in H23; try easy.
-...
-          apply angle_add_le_mono_l_lemma_1.
+            rename Hzs12 into Hzc12; rename Hzs13 into Hzc13.
+            assert (Hsz12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
+              cbn.
+              apply (rngl_add_nonneg_nonneg Hor).
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+              apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+              now apply (rngl_lt_le_incl Hor).
+            }
+            assert (Hsz13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+              cbn.
+              apply (rngl_add_nonneg_nonneg Hor).
+              now apply (rngl_mul_nonneg_nonneg Hop Hor).
+              apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+              now apply (rngl_lt_le_incl Hor).
+            }
+            specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
+            apply H1; try easy.
+            clear H1.
+            apply angle_add_le_mono_l_lemma_1; try easy.
 ...
 (*
 intros Hic Hon Hop Hed * Haov12 Haov13.
