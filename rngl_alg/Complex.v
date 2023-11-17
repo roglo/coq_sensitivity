@@ -1893,6 +1893,7 @@ destruct z1. {
   }
 }
 Qed.
+*)
 
 Theorem rngl_cos_le_anticompat_when_sin_nonneg :
   ∀ θ1 θ2,
@@ -1907,7 +1908,6 @@ rewrite Hs1, Hs2.
 apply iff_sym.
 apply rngl_leb_le.
 Qed.
-*)
 
 Theorem angle_div_2_le_compat :
   rngl_has_1 T = true →
