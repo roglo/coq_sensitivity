@@ -3254,6 +3254,23 @@ split; intros H23. {
   rewrite (angle_add_comm Hic).
   rewrite (angle_add_sub Hic Hon Hop Hed).
   apply angle_ltb_ge.
+(**)
+  progress unfold angle_leb in Haov12.
+  progress unfold angle_leb.
+  rewrite (angle_add_comm Hic).
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  symmetry in Hzs1, Hzs2, Hzs12.
+  destruct zs12. {
+    apply rngl_leb_le in Hzs12.
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in Hzs2.
+    apply rngl_leb_le.
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Haov12.
+    apply rngl_leb_le in Hzs1.
+    move Hzs2 before Hzs1.
 (* bobo ! *)
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
