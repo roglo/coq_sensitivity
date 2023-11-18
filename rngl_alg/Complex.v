@@ -3052,9 +3052,11 @@ destruct zs1. {
       apply (rngl_lt_le_incl Hor) in Hzs12.
       now apply (rngl_nlt_ge Hor) in Hzs12.
     }
+...
     apply angle_add_overflow_le_lemma_2; try easy.
     apply (rngl_nlt_ge Hor).
     intros Hzc1.
+    move Hzc1 before Hzs3.
 ...
     clear θ2 Hzs2 Hzs12.
 ...
