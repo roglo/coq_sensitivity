@@ -3103,6 +3103,7 @@ destruct zs1. {
     rewrite (rngl_cos_sub_straight_r Hon Hop) in Hzc2, Hzs12.
     apply (rngl_opp_neg_pos Hop Hor) in Hzs2, Hzc2, Hzs12.
     move Hzc2 before Hzs1.
+    destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
 ...
 Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
     apply angle_add_overflow_le_lemma_2; try easy.
