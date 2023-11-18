@@ -3052,7 +3052,30 @@ destruct zs1. {
       apply (rngl_lt_le_incl Hor) in Hzs12.
       now apply (rngl_nlt_ge Hor) in Hzs12.
     }
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+      apply angle_le_sub_le_add_l_lemma_1; try easy. {
+        rewrite (angle_sub_diag Hic Hon Hop Hed).
+        apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+      } {
+        rewrite (angle_sub_diag Hic Hon Hop Hed).
+        apply (rngl_le_refl Hor).
+      }
+    }
+    apply (rngl_nle_gt Hor) in Hzc1.
+    remember (θ1 - angle_right)%A as θ eqn:Hθ.
+    apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+    subst θ1; rename θ into θ1.
+    rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12 |-*.
+    rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs13, Hzs12.
+    rewrite (rngl_cos_add_right_r Hon Hop) in Hzc1, Hc1o.
+    do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+    apply (rngl_opp_neg_pos Hop Hor) in Hzc1.
+    apply -> (rngl_opp_le_compat Hop Hor).
+    move Hzc1 after Hzs2; move Hzs1 after Hzs3.
+    assert (H : (rngl_sin θ1 ≠ 1)%L) by now intros H; apply Hc1o; f_equal.
+    move H before Hc1o; clear Hc1o; rename H into Hs11.
 ...
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
     apply angle_add_overflow_le_lemma_2; try easy.
     apply (rngl_nlt_ge Hor).
     intros Hzc1.
