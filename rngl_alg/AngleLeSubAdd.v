@@ -416,6 +416,40 @@ Theorem angle_le_sub_le_add_l_lemma_1 :
   → (0 ≤ rngl_sin (θ2 + θ3))%L
   → (rngl_cos (θ2 + θ3) ≤ rngl_cos θ1)%L.
 Proof.
+(*
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1, (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+intros * Hzs1 Hzs2 Hzs3 Hzc2 Hc123 Hzs12 Hzs23.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+  move Hzc1 after Hzc2.
+...
+  remember (angle_right - θ2)%A as θ eqn:Hθ.
+  apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+  subst θ2; rename θ into θ2.
+  move θ2 before θ1.
+  rewrite (angle_add_comm Hic) in Hzs23 |-*.
+  rewrite (angle_add_sub_assoc Hop) in Hzs23 |-*.
+  rewrite (angle_add_sub_swap Hic Hop) in Hzs23 |-*.
+  rewrite (angle_sub_sub_distr Hic Hop) in Hzs12, Hc123.
+  rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12, Hc123.
+  rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs2.
+  rewrite (rngl_cos_sub_right_l Hon Hop) in Hzc2.
+  rewrite (rngl_sin_add_right_r Hon Hos) in Hzs23.
+  rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12.
+  rewrite (rngl_cos_sub_right_r Hon Hop) in Hc123.
+  rewrite (rngl_cos_add_right_r Hon Hop).
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+  apply (rngl_le_opp_l Hop Hor).
+...
+*)
 (* thanks Geoffroy *)
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
