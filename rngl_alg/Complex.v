@@ -2993,6 +2993,27 @@ destruct zs1. {
         now apply angle_add_overflow_le_lemma_2 with (θ2 := θ2).
       }
       apply (rngl_nle_gt Hor) in Hzc1.
+      move Hzc1 before Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        apply (rngl_nle_gt Hor) in Hzs12.
+        exfalso.
+        apply Hzs12; clear Hzs12; cbn.
+        apply (rngl_add_nonneg_nonneg Hor).
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc2z.
+      remember (θ2 - angle_right)%A as θ eqn:Hθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ2; rename θ into θ2.
+      move θ2 before θ1.
+      rewrite (angle_add_assoc Hop) in Hzs12.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hzs12.
+      rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H32.
+      apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+      apply (rngl_le_opp_l Hop Hor) in H32.
+      move Hc2z before Hzs1; move Hzs2 after Hzc1.
 ...
 *)
 
