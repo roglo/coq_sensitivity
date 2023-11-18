@@ -2876,16 +2876,18 @@ destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
   }
   apply (angle_add_move_l Hic Hon Hop Hed) in H.
   subst θ3.
+  clear Hc13.
   rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs3.
+  rewrite (rngl_sin_sub_straight_l Hon Hop) in H32.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs3.
   apply (rngl_le_antisymm Hor) in Hzs3; [ | easy ].
   symmetry in Hzs3.
   apply (eq_rngl_cos_0 Hic Hon Hop Hed) in Hzs3.
   destruct Hzs3; subst θ1. {
-    rewrite (angle_straight_sub_right Hon Hop) in H32.
+    rewrite rngl_add_comm in H32.
+    cbn in H32.
     apply (rngl_nlt_ge Hor) in H32.
     apply H32; clear H32; cbn.
-    rewrite rngl_add_comm.
     apply (rngl_lt_opp_l Hop Hor).
     apply (rngl_lt_iff Hor).
     split; [ apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) | ].
