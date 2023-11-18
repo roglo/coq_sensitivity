@@ -3018,8 +3018,26 @@ destruct zs1. {
     }
     clear H32.
     destruct zs12. {
-      apply rngl_leb_le in Hzs12.
+      exfalso.
+      apply rngl_leb_le in Hzs12, H12.
       apply (rngl_leb_gt Hor) in Hzs2.
+clear - Hzs12 H12 Hzs2 Hor ac Hic Hon Hop Hed Hzs1.
+      apply (rngl_nle_gt Hor) in Hzs2.
+      apply Hzs2; clear Hzs2.
+      apply rngl_sin_nonneg_add_nonneg_nonneg with (θ1 := θ1); try easy.
+      progress unfold angle_leb.
+      apply rngl_leb_le in Hzs1, Hzs12.
+      rewrite Hzs1, Hzs12.
+      apply rngl_leb_le in Hzs1, Hzs12.
+      now apply rngl_leb_le.
+    }
+    clear H12.
+    apply (rngl_leb_gt Hor) in Hzs2, Hzs12.
+    clear θ2 Hzs2 Hzs12.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_2 with (θ2 := θ3); try easy.
+...
+apply angle_le_sub_le_add_l_lemma_1; try easy.
 ...
 *)
 
