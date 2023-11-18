@@ -2941,9 +2941,7 @@ destruct ac as (Hiv, Hc2, Hor).
             rewrite rngl_add_comm.
             apply (rngl_lt_opp_l Hop Hor).
             apply (rngl_lt_iff Hor).
-            split. {
-              apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-            }
+            split; [ apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) | ].
             intros H.
             symmetry in H.
             apply (eq_rngl_cos_opp_1 Hic Hon Hop Hed) in H.
@@ -2961,24 +2959,27 @@ destruct ac as (Hiv, Hc2, Hor).
         }
         apply (rngl_nle_gt Hor) in Hzc3.
         move Hzc3 before Hzs1.
-        destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
-          remember (θ2 - angle_right)%A as θ eqn:Hθ.
-          apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
-          subst θ2; rename θ into θ2.
-          move θ2 before θ1.
-          rewrite (angle_add_assoc Hop) in Hzs12.
-          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2.
-          rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H32, Hzs12.
-          apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
-          apply (rngl_le_opp_l Hop Hor) in H32.
-          apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
-          move Hc2z before Hzs2.
-          move Hzs2 after Hzs1.
-...
-        specialize rngl_sin_nonneg_cos_le_sin_le as H1.
-        specialize (H1 Hic Hon Hop Hed θ2 θ3 Hzs2 Hzs3 H32).
-...
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+        apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. {
+          cbn.
+          apply (rngl_add_nonneg_nonneg Hor).
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+          now apply (rngl_lt_le_incl Hor).
+        }
+        apply angle_le_sub_le_add_l_lemma_1; try easy. {
+          rewrite (angle_sub_diag Hic Hon Hop Hed).
+          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        } {
+          rewrite (angle_sub_diag Hic Hon Hop Hed).
+          apply (rngl_le_refl Hor).
+        }
+        cbn.
+        apply (rngl_add_nonneg_nonneg Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+        now apply (rngl_lt_le_incl Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hzc1.
 ...
 *)
 
