@@ -915,6 +915,19 @@ split; intros Ha. {
 }
 Qed.
 
+Theorem rngl_cos_add_straight_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (angle_straight + θ) = (- rngl_cos θ)%L.
+Proof.
+intros Hon Hop *; cbn.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+apply (rngl_sub_0_r Hos).
+Qed.
+
 Theorem rngl_cos_add_straight_r :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
