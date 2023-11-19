@@ -2689,6 +2689,25 @@ remember (S n) as sn; cbn in Hn; subst sn.
 now apply Bool.orb_false_iff in Hn.
 Qed.
 
+Theorem angle_sub_move_0_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 - θ2)%A = 0%A ↔ θ1 = θ2.
+Proof.
+intros Hic Hon Hop Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+split; intros H12. {
+  apply (angle_sub_move_r Hic Hon Hop Hed) in H12.
+  now rewrite (angle_add_0_l Hon Hos) in H12.
+} {
+  apply (angle_sub_move_r Hic Hon Hop Hed).
+  now rewrite (angle_add_0_l Hon Hos).
+}
+Qed.
+
 Theorem angle_add_overflow_le_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3248,6 +3267,42 @@ destruct zs12. {
         destruct Hc12; subst θ1. {
           clear Hzs1 Hzc1 Hzs12.
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
+            remember (- θ3)%A as θ eqn:Hθ.
+            rewrite <- (angle_opp_involutive Hop θ) in Hθ.
+            apply (angle_opp_inj Hop) in Hθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            cbn in Hzs3, H32, Hzc3.
+            apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+            rewrite angle_add_opp_r in Hc11, Hzs13.
+Search (0 < rngl_sin (_ - _))%L.
+specialize (rngl_sin_nonneg_cos_lt_sin_lt Hic Hon Hop Hed) as H1.
+specialize (H1 θ2 (θ2 - θ3) Hzs2)%A.
+destruct (rngl_lt_dec Hor 0 (rngl_sin (θ2 - θ3))) as [Hzs23| Hs23z]. 2: {
+  apply Hs23z; clear Hs23z.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+  destruct H as [H| H]. {
+    apply -> (angle_sub_move_0_r Hic Hon Hop Hed) in H.
+    subst θ3.
+    clear H1 Hzs3 Hzs2 Hzs13 Hzc3 H32.
+(* bizarre... *)
+...
+  specialize (H1 Hzs23 Hc11).
+  apply rngl_ltb_lt in Hzc2.
+  rewrite Hzc2 in H1.
+  apply rngl_ltb_lt in Hzc2.
+...
+Search (rngl_sin _ < rngl_sin (_ - _))%L.
+...
+            apply (rngl_nlt_ge Hor) in Hzs13.
+            apply Hzs13; clear Hzs13.
+            rewrite (rngl_sin_sub_anticomm Hic Hop).
+            apply (rngl_opp_neg_pos Hop Hor).
+Search (0 < rngl_sin (_ - _))%L.
+...
             remember (θ3 + angle_right)%A as θ eqn:Hθ.
             apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
             subst θ3; rename θ into θ3.
