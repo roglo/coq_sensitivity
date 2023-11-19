@@ -3416,6 +3416,8 @@ destruct zs12. {
   apply (rngl_opp_le_compat Hop Hor) in H12.
   apply -> (rngl_opp_le_compat Hop Hor).
   move Hzc1 after Hzs2; move Hzs1 after Hzs3.
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+    move Hzc1 before Hzs3.
 ...
 *)
 
