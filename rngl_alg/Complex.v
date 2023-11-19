@@ -3294,6 +3294,7 @@ destruct zs12. {
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Check rngl_sin_nonneg_cos_le_sin_sub_nonneg.
 Theorem rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -3303,13 +3304,20 @@ Theorem rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le :
   → (0 ≤ rngl_sin (θ1 - θ2))%L
   → (rngl_cos θ1 ≤ rngl_cos θ2)%L.
 Proof.
-intros Hop.
+intros Hon Hop.
 destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hsz1 Hzs2 Hzc1 Hzc2 Hzs12.
+Search (rngl_sin (_ - _) < 0)%L.
+...
 cbn in Hzs12.
 rewrite (rngl_mul_opp_r Hop) in Hzs12.
 rewrite (rngl_add_opp_l Hop) in Hzs12.
 apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+Search (_ * _ ≤ _ * _)%L.
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ2)).
+2: {
+eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
 ...
 apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
 now apply (rngl_lt_le_incl Hor).
