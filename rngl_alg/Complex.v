@@ -3247,6 +3247,17 @@ destruct zs12. {
         apply (rngl_cos_eq Hic Hon Hop Hed) in Hc12.
         destruct Hc12; subst θ1. {
           clear Hzs1 Hzc1 Hzs12.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
+            remember (θ3 + angle_right)%A as θ eqn:Hθ.
+            apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+            subst θ3; rename θ into θ3.
+            move θ3 before θ2.
+            rewrite (angle_add_sub_assoc Hop) in Hc11, Hzs13.
+            rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs3, Hzs13.
+            rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc3, Hc11, H32.
+            apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+            apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+            move Hzc3 before Hzs2; move Hzc2 before Hzs3.
 ...
 Search (rngl_cos _ = rngl_cos _).
 ...
