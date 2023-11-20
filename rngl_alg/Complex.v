@@ -3427,6 +3427,23 @@ destruct zs12. {
     rewrite (rngl_opp_neg_pos Hop Hor) in Hzs2.
     rewrite angle_add_opp_r in H12, Hzs12.
     move Hzc2 before Hzs1.
+Theorem rngl_sin_incr :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2 ≤ angle_right)%A
+  → (rngl_sin θ1 ≤ rngl_sin θ2)%L.
+...
+exfalso.
+apply (rngl_nlt_ge Hor) in H12.
+apply H12; clear H12.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rngl_sin_incr.
+  split. {
+    progress unfold angle_leb.
+    apply rngl_leb_le in Hzc1.
+    rewrite Hzc1.
+    apply rngl_leb_le in Hzc1.
+...
 (*
     remember (θ2 + angle_right)%A as θ eqn:Hθ.
     apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
@@ -3450,6 +3467,12 @@ destruct zs12. {
       rewrite (rngl_opp_neg_pos Hop Hor) in Hzs3.
       rewrite angle_add_opp_r in Hzs13 |-*.
       move Hzc3 before Hzc2.
+(*
+Check rngl_cos_decr.
+apply rngl_sin_incr.
+...
+*)
+...
 specialize rngl_sin_nonneg_cos_le_sin_le as H1.
 specialize (H1 Hic Hon Hop Hed θ3 θ2).
 ...
