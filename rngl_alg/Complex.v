@@ -3677,6 +3677,20 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     rewrite (rngl_opp_neg_pos Hop Hor) in Hzs3.
     move Hzs3 before Hzc2; move Hzc3 before Hzs2.
     move Hzc1 after Hzs2.
+    remember (angle_right - θ2)%A as θ eqn:Hθ.
+    apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+    subst θ2; rename θ into θ2.
+    move θ2 before θ1.
+    rewrite (angle_add_sub_assoc Hop) in Hzs12.
+    rewrite (angle_add_sub_swap Hic Hop) in Hzs12.
+    rewrite (rngl_sin_sub_right_l Hon Hos) in Hzc2, H32.
+    rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs2.
+    rewrite (rngl_cos_add_right_r Hon Hop) in Hzs12.
+    rewrite <- (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+    move Hzs2 before Hzs1; move Hzc2 after Hzc1.
+    exfalso.
+    apply (rngl_nlt_ge Hor) in H32.
+    apply H32; clear H32.
 ... ...
   apply angle_le_sub_le_add_l_lemma_3; try easy. {
     progress unfold angle_add_overflow.
