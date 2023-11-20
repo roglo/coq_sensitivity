@@ -3487,12 +3487,28 @@ destruct zs12. {
     exfalso.
     apply (rngl_nlt_ge Hor) in H12.
     apply H12; clear H12.
+    rename Hzs12 into Hzc12.
+    destruct (rngl_lt_dec Hor (rngl_sin (θ1 - θ2)) 0) as [Hs12z| Hzs12]. {
+      eapply (rngl_lt_le_trans Hor); [ apply Hs12z | easy ].
+    }
+    apply (rngl_nlt_ge Hor) in Hzs12.
     apply (rngl_sin_incr_lt Hic Hon Hop Hed).
     split. {
       progress unfold angle_ltb.
-      apply rngl_leb_le in Hzc1.
-      rewrite Hzc1.
-      apply rngl_leb_le in Hzc1.
+      apply rngl_leb_le in Hzc1, Hzs12.
+      rewrite Hzc1, Hzs12.
+      apply rngl_leb_le in Hzc1, Hzs12.
+      apply rngl_ltb_lt.
+      apply (rngl_lt_iff Hor).
+      split. {
+...
+        apply (rngl_cos_decr).
+        split. {
+          progress unfold angle_leb.
+          apply rngl_leb_le in Hzc1, Hzs12.
+          rewrite Hzs12, Hzc1.
+          apply rngl_leb_le in Hzc1, Hzs12.
+          apply rngl_leb_le.
 ...
       rename Hzs13 into Hzc13.
       remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
