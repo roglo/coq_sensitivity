@@ -4061,7 +4061,9 @@ destruct zs21. {
     rewrite (angle_add_sub Hic Hon Hop Hed).
 ...
 *)
+*)
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4140,7 +4142,6 @@ enough (H :
   rewrite rngl_squ_sqrt; [ | easy ].
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
-  split. {
 Theorem angle_mul_nat_le_mono_nonneg_r :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4163,6 +4164,19 @@ apply Nat.succ_le_mono in Hab.
 apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
+(*
+apply angle_le_sub_le_add_l; try easy; cycle 2. {
+  rewrite (angle_add_sub_swap Hic Hop).
+  rewrite (angle_sub_diag Hic Hon Hop Hed).
+  now rewrite (angle_add_0_l Hon Hos).
+} {
+  progress unfold angle_add_overflow.
+  rewrite angle_add_opp_r.
+  rewrite (angle_add_sub_swap Hic Hop).
+  rewrite (angle_sub_diag Hic Hon Hop Hed).
+  apply angle_ltb_ge.
+  apply angle_leb_refl.
+*)
 apply angle_add_le_mono_l; try easy.
 ... ...
 now apply (angle_add_overflow_le Hop _ (b * θ))%A.
