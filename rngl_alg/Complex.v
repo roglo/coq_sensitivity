@@ -3492,23 +3492,52 @@ destruct zs12. {
       eapply (rngl_lt_le_trans Hor); [ apply Hs12z | easy ].
     }
     apply (rngl_nlt_ge Hor) in Hzs12.
-    apply (rngl_sin_incr_lt Hic Hon Hop Hed).
-    split. {
-      progress unfold angle_ltb.
-      apply rngl_leb_le in Hzc1, Hzs12.
-      rewrite Hzc1, Hzs12.
-      apply rngl_leb_le in Hzc1, Hzs12.
-      apply rngl_ltb_lt.
-      apply (rngl_lt_iff Hor).
-      split. {
 ...
-        apply (rngl_cos_decr).
-        split. {
-          progress unfold angle_leb.
-          apply rngl_leb_le in Hzc1, Hzs12.
-          rewrite Hzs12, Hzc1.
-          apply rngl_leb_le in Hzc1, Hzs12.
-          apply rngl_leb_le.
+    apply (rngl_sin_incr_lt Hic Hon Hop Hed).
+    split. 2: {
+      progress unfold angle_leb.
+      cbn.
+      apply rngl_leb_le in Hzc1.
+      rewrite Hzc1.
+      apply rngl_leb_le in Hzc1.
+      specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+      apply rngl_leb_le in H1.
+      rewrite H1.
+      now apply rngl_leb_le.
+    }
+    progress unfold angle_ltb.
+    apply rngl_leb_le in Hzc1, Hzs12.
+    rewrite Hzc1, Hzs12.
+    apply rngl_leb_le in Hzc1, Hzs12.
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split. 2: {
+      intros H.
+      apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+      destruct H as [H| H]. {
+        apply (angle_sub_move_l Hic Hon Hop Hed) in H.
+        rewrite (angle_sub_diag Hic Hon Hop Hed) in H.
+        subst θ2.
+        now apply (rngl_lt_irrefl Hor) in Hzs2.
+      }
+      rewrite (angle_opp_sub_distr Hic Hop) in H.
+      rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+      rewrite <- H in Hzs12.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+      apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
+      symmetry in Hzs12.
+      apply (eq_rngl_sin_0 Hic Hon Hop Hed) in Hzs12.
+      destruct Hzs12; subst θ1. {
+        rewrite (angle_sub_0_r Hon Hop) in H.
+        subst θ2.
+        now apply (rngl_lt_irrefl Hor) in Hzs2.
+      }
+      apply (angle_sub_move_r Hic Hon Hop Hed) in H.
+      rewrite (angle_sub_opp_r Hop) in H.
+      rewrite (angle_straight_add_straight Hon Hop) in H.
+      subst θ2.
+      now apply (rngl_lt_irrefl Hor) in Hzs2.
+    }
 ...
       rename Hzs13 into Hzc13.
       remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
