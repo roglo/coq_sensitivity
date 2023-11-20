@@ -401,6 +401,37 @@ apply rngl_leb_nle in H.
 now rewrite H.
 Qed.
 
+Theorem rngl_sin_sub_lt_sin_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (0 < rngl_cos θ1)%L
+  → (rngl_sin (θ1 - θ2) < rngl_sin θ1)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hc1z Hzs2 Hzc1.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+eapply (rngl_le_lt_trans Hor _ (rngl_sin θ1)). {
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+apply (rngl_lt_add_r Hos Hor).
+now apply (rngl_mul_pos_pos Hop Hor Hii).
+Qed.
+
 Theorem angle_le_sub_le_add_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -953,20 +984,9 @@ assert (H : (0 < rngl_cos θ1)%L). {
 }
 move H before Hzs1; clear Hzs1; rename H into Hzc1.
 apply (rngl_nlt_ge Hor) in Hsov.
-apply Hsov; clear Hsov; cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_l Hop).
-apply (rngl_lt_sub_lt_add_r Hop Hor).
-eapply (rngl_le_lt_trans Hor _ (rngl_sin θ1)). {
-  apply (rngl_le_0_sub Hop Hor).
-  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-}
-apply (rngl_lt_add_r Hos Hor).
-now apply (rngl_mul_pos_pos Hop Hor Hii).
+apply Hsov; clear Hsov.
+apply (rngl_sin_sub_lt_sin_l Hic Hon Hop Hed); try easy.
+now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Theorem angle_le_sub_le_add_l_lemma_4 :
@@ -1202,10 +1222,6 @@ rewrite (angle_add_assoc Hop) in Hzs23 |-*.
 rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs3, Hzs23.
 rewrite (rngl_cos_add_straight_r Hon Hop) in Hc123 |-*.
 apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
-(*
-rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
-apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
-*)
 rewrite (rngl_cos_sub_comm Hic Hop) in Hc123.
 move Hzs3 after Hzs2.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
@@ -1590,38 +1606,20 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   rewrite (rngl_cos_sub_right_r Hon Hop).
   rewrite (rngl_cos_sub_right_r Hon Hop).
   rewrite (rngl_cos_sub_comm Hic Hop) in Hzs12.
+  apply rngl_sin_sub_lt_sin_l; try easy.
   apply (rngl_lt_iff Hor).
-  split. {
-    cbn.
-    rewrite (rngl_mul_opp_r Hop).
-    rewrite (rngl_add_opp_l Hop).
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    apply (rngl_le_trans Hor _ (rngl_sin θ1)). 2: {
-      apply (rngl_le_add_l Hor).
-      apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-      now apply (rngl_lt_le_incl Hor).
-    }
-    rewrite <- (rngl_mul_1_r Hon).
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
-    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-  }
+  split; [ easy | ].
   intros H.
-  apply (rngl_sin_eq Hic Hon Hop Hed) in H.
-  destruct H as [H| H]. {
-    apply (angle_add_sub_eq_l Hic Hon Hop Hed) in H.
-    rewrite (angle_sub_diag Hic Hon Hop Hed) in H.
-    apply (f_equal angle_opp) in H.
-    rewrite (angle_opp_involutive Hop) in H.
-    rewrite (angle_opp_0 Hop) in H.
-    subst θ2.
+  symmetry in H.
+  apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+  destruct H; subst θ2. {
     rewrite (angle_add_0_l Hon Hos) in Hzs23.
     now apply (rngl_nlt_ge Hor) in Hzs23.
   }
-  rewrite H in Hzs12.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs12.
-  apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
-  apply (rngl_lt_le_incl Hor) in Hzs12.
-  now apply (rngl_nlt_ge Hor) in Hzs12.
+  rewrite (rngl_cos_add_straight_l Hon Hop) in Hzs23.
+  apply (rngl_nlt_ge Hor) in Hzc2.
+  apply Hzc2; cbn.
+  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 }
 apply (rngl_nle_gt Hor) in Hc1z.
 remember (θ1 - angle_straight)%A as θ.
