@@ -3666,6 +3666,18 @@ rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc2, H32.
 apply (rngl_opp_neg_pos Hop Hor) in Hzs2, Hzs12.
 move Hzc2 before Hzs1.
 destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+    remember (- θ3)%A as θ eqn:Hθ.
+    rewrite <- (angle_opp_involutive Hop θ) in Hθ.
+    apply (angle_opp_inj Hop) in Hθ.
+    subst θ3; rename θ into θ3.
+    move θ3 before θ2.
+    cbn in Hzs3, Hzc3, H32.
+    rewrite angle_add_opp_r in Hzs13 |-*.
+    rewrite (rngl_opp_neg_pos Hop Hor) in Hzs3.
+    move Hzs3 before Hzc2; move Hzc3 before Hzs2.
+    move Hzc1 after Hzs2.
+... ...
   apply angle_le_sub_le_add_l_lemma_3; try easy. {
     progress unfold angle_add_overflow.
     apply angle_ltb_ge.
@@ -3675,6 +3687,41 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     apply rngl_leb_le in Hzs1, Hzs13.
     apply rngl_leb_le.
     move Hzc1 after Hzs2.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+(**)
+      remember (- θ3)%A as θ eqn:Hθ.
+      rewrite <- (angle_opp_involutive Hop θ) in Hθ.
+      apply (angle_opp_inj Hop) in Hθ.
+      subst θ3; rename θ into θ3.
+      move θ3 before θ2.
+      cbn in Hzs3, Hzc3, H32.
+      rewrite angle_add_opp_r in Hzs13 |-*.
+      rewrite (rngl_opp_neg_pos Hop Hor) in Hzs3.
+      move Hzs3 before Hzc2; move Hzc3 before Hzs2.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+...
+  cbn in Hzs2, Hzc2.
+  rewrite (rngl_opp_neg_pos Hop Hor) in Hzs2.
+  rewrite angle_add_opp_r in H12, Hzs12.
+  move Hzc2 before Hzs1.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H12.
+...
+      remember (θ3 + angle_right)%A as θ eqn:Hθ.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ3; rename θ into θ3.
+      move θ3 before θ2.
+      rewrite (angle_add_sub_assoc Hop) in Hzs13 |-*.
+      rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs3, Hzs13.
+      rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc3, H32 |-*.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+      move Hzc3 before Hzc2.
+      cbn.
+...
+  apply angle_le_sub_le_add_l_lemma_3; try easy. {
+    progress unfold angle_add_overflow.
 ...
     apply angle_le_sub_le_add_l_lemma_7; try easy.
     apply angle_add_overflow_le_lemma_1; try easy.
