@@ -3492,6 +3492,10 @@ destruct zs12. {
       eapply (rngl_lt_le_trans Hor); [ apply Hs12z | easy ].
     }
     apply (rngl_nlt_ge Hor) in Hzs12.
+    apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+    rewrite (rngl_cos_sub_comm Hic Hop).
+    apply rngl_cos_lt_rngl_cos_sub; try easy.
+    now apply (rngl_lt_le_incl Hor).
 ...
     apply (rngl_sin_incr_lt Hic Hon Hop Hed).
     split. 2: {
