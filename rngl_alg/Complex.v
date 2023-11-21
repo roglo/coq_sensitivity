@@ -3831,6 +3831,16 @@ destruct zs13. {
         }
         apply (rngl_nle_gt Hor) in Hzc2.
         move Hzc2 before Hzs1.
+        destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
+          apply (rngl_nlt_ge Hor) in Hc3z.
+          apply Hc3z.
+          now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+        }
+        apply (rngl_nle_gt Hor) in Hzc3.
+        move Hzc3 before Hzc2.
+...
+Search (0 < rngl_cos (_ + _))%L.
+Search (0 ≤ rngl_cos (_ + _))%L.
 ...
 Search (0 < - _)%L.
 rewrite (rngl_add_opp_r Hop).
