@@ -3838,6 +3838,50 @@ destruct zs13. {
         }
         apply (rngl_nle_gt Hor) in Hzc3.
         move Hzc3 before Hzc2.
+        apply (rngl_nlt_ge Hor) in Hzs13.
+        apply Hzs13; clear Hzs13.
+        eapply (rngl_lt_le_trans Hor); [ apply Hzs12 | ].
+        specialize rngl_sin_nonneg_cos_le_sin_le as H1.
+        specialize (H1 Hic Hon Hop Hed θ2 θ3 Hzs2 Hzs3 H32).
+        generalize Hzc2; intros H.
+        apply (rngl_lt_le_incl Hor) in H.
+        apply rngl_leb_le in H.
+        rewrite H in H1; clear H.
+        cbn.
+        apply (rngl_sub_le_compat Hop Hor).
+        apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc1z.
+      remember (θ1 + angle_straight)%A as θ eqn:Hθ.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ1; rename θ into θ1; move θ1 after θ2.
+      rewrite <- (angle_add_sub_swap Hic Hop) in Hzs13, Hzs12, H12.
+      rewrite (rngl_sin_sub_straight_r Hon Hop) in Hzs1, Hzs13, Hzs12.
+      rewrite (rngl_cos_sub_straight_r Hon Hop) in Hc1z.
+      do 2 rewrite (rngl_cos_sub_straight_r Hon Hop) in H12.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hzs12, Hc1z.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+      apply (rngl_opp_le_compat Hop Hor) in H12.
+      move Hc1z before Hzs3.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+...
+Search (rngl_cos _ < rngl_cos (_ + _))%L.
+Search (rngl_cos _ ≤ rngl_cos (_ + _))%L.
+...
+        remember (angle_right - θ3)%A as θ eqn:Hθ.
+        apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+        subst θ3; rename θ into θ3; move θ3 before θ2.
+        rewrite (angle_add_sub_assoc Hop) in Hzs13.
+        rewrite (angle_add_sub_swap Hic Hop) in Hzs13.
+        rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs3.
+        rewrite (rngl_cos_sub_right_l Hon Hop) in Hzc3, H32.
+        rewrite (rngl_cos_add_right_r Hon Hop) in Hzs13.
+        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
 ...
 Search (0 < rngl_cos (_ + _))%L.
 Search (0 ≤ rngl_cos (_ + _))%L.
