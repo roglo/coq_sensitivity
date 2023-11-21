@@ -3793,6 +3793,36 @@ destruct zs1. {
 destruct zs12; [ easy | ].
 apply (rngl_leb_gt Hor) in Hzs1, Hzs12.
 apply rngl_leb_le in H12.
+destruct zs13. {
+  exfalso.
+  apply rngl_leb_le in Hzs13.
+  destruct zs3. {
+    apply rngl_leb_le in Hzs3.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2, H32.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+        remember (θ1 + angle_right)%A as θ eqn:Hθ.
+        apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ1; rename θ into θ1.
+        move θ1 after θ2.
+        rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12, Hzs13, H12.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs1, Hzs13, Hzs12.
+        rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc1, H12, H12.
+        apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hzs12.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+        move Hzc1 after Hzs2; move Hzs1 after Hzs3.
+...
+        do 2 rewrite (rngl_cos_add_right_r Hon Hop) in
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z.
+apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
+apply (rngl_nle_gt Hor) in Hzs12.
+apply Hzs12; clear Hzs12; cbn.
+apply (rngl_add_nonneg_nonneg Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+
 ...
 Search (0 < - _)%L.
 rewrite (rngl_add_opp_r Hop).
