@@ -4067,6 +4067,30 @@ destruct zs3. {
   apply rngl_leb_le in Hzs3.
   destruct zs2. {
     apply rngl_leb_le in Hzs2, H32.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      remember (θ1 + angle_right)%A as θ eqn:Hθ.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ1; rename θ into θ1; move θ1 after θ2.
+      rewrite <- (angle_add_sub_swap Hic Hop) in Hzs13, Hzs12, H12 |-*.
+      rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs1, Hzs13, Hzs12.
+      rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc1, H12, H12.
+      do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hzs13, Hzs12.
+      move Hzc1 after Hzs2; move Hzs1 after Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        move Hzc2 before Hzs1.
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+          move Hzc3 before Hzc2.
+...
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+eapply (rngl_le_trans Hor); [ apply H12 | ].
+...
+cbn.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+Search (rngl_sin _ ≤ rngl_sin (_ + _))%L.
+Search (rngl_sin _ < rngl_sin (_ + _))%L.
+Search (rngl_sin _ < rngl_sin (_ + _))%L.
 ...
 *)
 
