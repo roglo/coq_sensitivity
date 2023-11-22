@@ -4641,6 +4641,21 @@ split; intros H23. {
       }
       clear H23.
       apply (rngl_leb_gt Hor) in Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+        move Hzc1 before Hzs3.
+cbn.
+...
+Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
+        apply angle_add_le_mono_l_lemma_1; try easy.
+}
+apply (rngl_nle_gt Hor) in Hc1z.
+move Hc1z before Hzs3.
+destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+  move Hzs1 after Hzs2.
+  now apply angle_add_le_mono_l_lemma_2.
+}
+apply (rngl_nle_gt Hor) in Hs1z.
+move Hs1z after Hzs2.
 ...
 (*
 *)
