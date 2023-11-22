@@ -4641,6 +4641,51 @@ split; intros H23. {
       }
       clear H23.
       apply (rngl_leb_gt Hor) in Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
+        remember (θ3 + angle_right)%A as θ eqn:Hθ.
+        apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ3; rename θ into θ3; move θ3 before θ2.
+        rewrite (angle_add_sub_assoc Hop) in Hzs13 |-*.
+        rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs3, Hzs13.
+        rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc3 |-*.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+        apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
+        move Hzc3 before Hzs2.
+        destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
+          remember (θ2 - angle_right)%A as θ eqn:Hθ.
+          apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+          subst θ2; rename θ into θ2; move θ2 before θ1.
+          rewrite (angle_add_assoc Hop) in Hzs12 |-*.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hzs12.
+          rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z |-*.
+          apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
+          apply (rngl_le_opp_r Hop Hor).
+          move Hc2z after Hzc3; move Hzs2 before Hzs3.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+            destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+              exfalso.
+              progress unfold angle_add_overflow in Haov13.
+              apply angle_ltb_ge in Haov13.
+              apply angle_nlt_ge in Haov13.
+              apply Haov13; clear Haov13.
+              rewrite (angle_add_sub_assoc Hop).
+              progress unfold angle_ltb.
+              rewrite (rngl_sin_sub_right_r Hon Hop).
+              generalize Hzs13; intros H.
+              apply (rngl_opp_le_compat Hop Hor) in H.
+              rewrite (rngl_opp_0 Hop) in H.
+              apply rngl_leb_le in H.
+              rewrite H; clear H.
+              apply rngl_leb_le in Hzs1.
+              rewrite Hzs1.
+              apply rngl_leb_le in Hzs1.
+              apply rngl_ltb_lt.
+              rewrite (rngl_cos_sub_right_r Hon Hop).
+...
+cbn.
+...
+          move Hzc2 after Hzs3.
+...
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
         move Hzc1 before Hzs3.
 cbn.
