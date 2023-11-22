@@ -2944,6 +2944,40 @@ apply (rngl_sin_sub_nonneg_sin_le_sin); try easy. {
 }
 Qed.
 
+Theorem angle_add_overflow_le_lemma_111 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 < rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 < rngl_cos θ1)%L
+  → (0 < rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hc1z Hzs12.
+apply angle_add_overflow_le_lemma_1 with (θ2 := θ2); try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+apply (rngl_le_refl Hor).
+cbn.
+apply (rngl_le_sub_le_add_l Hop Hor).
+apply (rngl_le_0_sub Hop Hor).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+apply (rngl_add_nonneg_nonneg Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+now apply (rngl_lt_le_incl Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_lt_le_incl Hor).
+apply (rngl_le_0_sub Hop Hor).
+apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+Qed.
+
 Theorem angle_add_overflow_le_lemma_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4013,23 +4047,7 @@ do 2 rewrite (rngl_cos_sub_straight_r Hon Hop).
 apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hc1z, Hzs12.
 apply -> (rngl_opp_le_compat Hop Hor).
 move Hc1z before Hzs2.
-apply angle_add_overflow_le_lemma_1 with (θ2 := θ2); try easy.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-apply (rngl_le_refl Hor).
-cbn.
-apply (rngl_le_sub_le_add_l Hop Hor).
-apply (rngl_le_0_sub Hop Hor).
-rewrite <- (rngl_add_sub_assoc Hop).
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-apply (rngl_add_nonneg_nonneg Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-now apply (rngl_lt_le_incl Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_lt_le_incl Hor).
-apply (rngl_le_0_sub Hop Hor).
-apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+now apply angle_add_overflow_le_lemma_111.
 Qed.
 
 (* to be completed
@@ -4091,6 +4109,9 @@ destruct zs1. {
       destruct zs12. {
         apply rngl_leb_le in Hzs12.
         apply rngl_leb_le in H12.
+Check angle_add_overflow_le_lemma_111.
+apply angle_add_overflow_le_lemma_111; try easy.
+...
         now apply angle_add_overflow_le_lemma_1 with (θ2 := θ2).
       } {
         clear H12.
