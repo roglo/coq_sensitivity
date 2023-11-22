@@ -4077,20 +4077,26 @@ destruct zs3. {
       do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
       apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hzs13, Hzs12.
       move Hzc1 after Hzs2; move Hzs1 after Hzs3.
-      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-        move Hzc2 before Hzs1.
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
-          move Hzc3 before Hzc2.
-...
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-eapply (rngl_le_trans Hor); [ apply H12 | ].
-...
-cbn.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-Search (rngl_sin _ ≤ rngl_sin _)%L.
-Search (rngl_sin _ ≤ rngl_sin (_ + _))%L.
-Search (rngl_sin _ < rngl_sin (_ + _))%L.
-Search (rngl_sin _ < rngl_sin (_ + _))%L.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+        move Hzc3 before Hzc1.
+        assert (Hzc13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+          cbn.
+          apply (rngl_add_nonneg_nonneg Hor).
+          apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_mul_nonneg_nonneg Hop Hor).
+        }
+        apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        apply angle_le_sub_le_add_l_lemma_1; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        rewrite (angle_sub_diag Hic Hon Hop Hed).
+        apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+        rewrite (angle_sub_diag Hic Hon Hop Hed).
+        apply (rngl_le_refl Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc3z.
 ...
 *)
 
