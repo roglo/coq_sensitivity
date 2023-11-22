@@ -2953,15 +2953,13 @@ Theorem angle_add_overflow_le_lemma_111 :
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (0 < rngl_sin (θ1 + θ2))%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 intros * Hzs1 Hzs2 Hc1z Hzs12.
 apply angle_add_overflow_le_lemma_1 with (θ2 := θ2); try easy.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
 apply (rngl_le_refl Hor).
 cbn.
 apply (rngl_le_sub_le_add_l Hop Hor).
@@ -4044,11 +4042,10 @@ do 2 rewrite (rngl_cos_sub_straight_r Hon Hop).
 apply (rngl_opp_neg_pos Hop Hor) in Hzs1, Hc1z, Hzs12.
 apply -> (rngl_opp_le_compat Hop Hor).
 move Hc1z before Hzs2.
-apply (rngl_lt_le_incl Hor) in Hzs1, Hc1z.
+apply (rngl_lt_le_incl Hor) in Hzs1, Hc1z, Hzs12.
 now apply angle_add_overflow_le_lemma_111.
 Qed.
 
-(* to be completed
 Theorem angle_add_overflow_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4107,9 +4104,10 @@ destruct zs1. {
       destruct zs12. {
         apply rngl_leb_le in Hzs12.
         apply rngl_leb_le in H12.
+(*
 Check angle_add_overflow_le_lemma_111.
 apply angle_add_overflow_le_lemma_111; try easy.
-...
+*)
         now apply angle_add_overflow_le_lemma_1 with (θ2 := θ2).
       } {
         clear H12.
@@ -4118,6 +4116,9 @@ apply angle_add_overflow_le_lemma_111; try easy.
       }
     } {
       clear H32.
+(*
+apply angle_add_overflow_le_lemma_111; try easy.
+*)
       destruct zs12. {
         exfalso.
         apply rngl_leb_le in Hzs12, H12.
@@ -4178,8 +4179,8 @@ destruct zs3. {
 destruct zs2; [ easy | ].
 apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
 apply rngl_leb_le in H32.
-...
-*)
+apply angle_add_overflow_le_lemma_10 in H12; try easy.
+Qed.
 
 Theorem angle_add_le_mono_l_lemma_1 :
   rngl_mul_is_comm T = true →
@@ -4535,7 +4536,6 @@ split; intros H23. {
         apply -> (rngl_opp_le_compat Hop Hor).
         move Hs1z before Hzs2; move Hc1z before Hzs3.
 ...
-(*
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
   apply (angle_le_sub_le_add_l Hic Hon Hop Hed); [ easy | | | ]; cycle 1. {
@@ -4747,7 +4747,6 @@ destruct zs21. {
     rewrite (angle_add_sub Hic Hon Hop Hed).
 ...
 *)
-*)
 
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
@@ -4863,9 +4862,10 @@ apply angle_le_sub_le_add_l; try easy; cycle 2. {
   apply angle_ltb_ge.
   apply angle_leb_refl.
 *)
+... ...
 apply angle_add_le_mono_l; try easy.
 ... ...
-now apply (angle_add_overflow_le Hop _ (b * θ))%A.
+now apply (angle_add_overflow_le Hic Hon Hop Hed _ (b * θ))%A.
 ...
 progress unfold angle_add_overflow in H2.
 progress unfold angle_add_overflow.
