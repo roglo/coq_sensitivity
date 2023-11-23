@@ -5026,6 +5026,27 @@ split; intros H23. {
         now apply angle_add_le_mono_l_lemma_7.
       }
       apply (rngl_nle_gt Hor) in Hc3z.
+      remember (θ3 + angle_straight)%A as θ eqn:Hθ.
+      apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ3; rename θ into θ3; move θ3 before θ2.
+      rewrite (angle_add_sub_assoc Hop) in Hzs13 |-*.
+      rewrite (rngl_sin_sub_straight_r Hon Hop) in Hzs3, Hzs13.
+      rewrite (rngl_cos_sub_straight_r Hon Hop) in Hc3z |-*.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs3, Hc3z.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+      apply (rngl_le_opp_l Hop Hor).
+      move Hc3z before Hzs3.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+        destruct (rngl_lt_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+          exfalso.
+          apply (rngl_nlt_ge Hor) in Hzs13.
+          apply Hzs13; clear Hzs13; cbn.
+          apply (rngl_add_nonneg_pos Hor).
+          apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_mul_pos_pos Hop Hor Hii).
+        }
+        apply (rngl_nlt_ge Hor) in Hs1z.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
