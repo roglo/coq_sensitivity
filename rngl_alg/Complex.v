@@ -5194,6 +5194,42 @@ split; intros H23. {
       rewrite <- (rngl_opp_add_distr Hop).
       apply (rngl_opp_nonneg_nonpos Hop Hor).
       move Hc1z after Hzs2; move Hc3z after Hzs1.
+      apply (rngl_nlt_ge Hor).
+      intros H123.
+      apply angle_add_le_mono_l_lemma_4 in Hzs13; try easy. {
+        progress unfold angle_add_overflow.
+        rewrite (angle_add_sub_assoc Hop).
+        apply angle_ltb_ge.
+        progress unfold angle_leb.
+        generalize Hc1z; intros H.
+        apply (rngl_lt_le_incl Hor) in H.
+        apply rngl_leb_le in H.
+        rewrite H; clear H.
+        rewrite (rngl_sin_sub_right_r Hon Hop).
+        generalize Hzs13; intros H.
+        apply (rngl_opp_le_compat Hop Hor) in H.
+        rewrite (rngl_opp_0 Hop) in H.
+        apply rngl_leb_le in H.
+        rewrite H; clear H.
+        rewrite (rngl_cos_sub_right_r Hon Hop).
+        apply rngl_leb_le.
+...
+      apply (rngl_nlt_ge Hor) in Hzs13.
+      apply Hzs13; clear Hzs13.
+Search (0 ≤ rngl_cos (_ + _))%L.
+Search (0 < rngl_cos (_ + _))%L.
+Search (0 ≤ rngl_cos _)%L.
+Search (0 < rngl_cos _)%L.
+angle_add_le_mono_l_lemma_4:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 : angle T,
+            angle_add_overflow θ1 (θ2 - angle_right)%A = false
+            → (0 ≤ rngl_sin θ1)%L
+              → (0 ≤ rngl_sin θ2)%L
+                → (0 ≤ rngl_cos θ1)%L → (0 < rngl_cos θ2)%L → (rngl_cos (θ1 + θ2) ≤ 0)%L → False
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
