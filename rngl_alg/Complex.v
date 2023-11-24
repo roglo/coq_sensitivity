@@ -5485,6 +5485,51 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Theorem angle_add_le_mono_l_lemma_15 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 (θ2 - angle_right)%A = false
+  → (rngl_cos (θ1 + θ2) ≤ 0)%L
+  → (rngl_sin θ1 < 0)%L
+  → False.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Haov12 Hzs12 Hs1z.
+remember (θ1 + angle_right)%A as θ eqn:Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ1; rename θ into θ1.
+rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12.
+rewrite (rngl_sin_sub_right_r Hon Hop) in Hs1z.
+rewrite (rngl_cos_sub_right_r Hon Hop) in Hzs12.
+apply (rngl_opp_neg_pos Hop Hor) in Hs1z.
+progress unfold angle_add_overflow in Haov12.
+apply angle_ltb_ge in Haov12.
+apply angle_nlt_ge in Haov12.
+apply Haov12; clear Haov12.
+rewrite (angle_add_sub_assoc Hop).
+rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_sub_add_distr Hic Hop).
+rewrite (angle_right_add_right Hon Hop).
+progress unfold angle_ltb.
+rewrite (rngl_sin_sub_straight_r Hon Hop).
+generalize Hzs12; intros H.
+apply (rngl_opp_le_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_sin_sub_right_r Hon Hop).
+generalize Hs1z; intros H.
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply (rngl_nle_gt Hor) in H.
+apply rngl_leb_nle in H.
+now rewrite H.
+Qed.
+
 (* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
@@ -5619,21 +5664,13 @@ split; intros H23. {
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
         destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
           now apply angle_add_le_mono_l_lemma_14.
+        } {
+          exfalso.
+          apply (rngl_nle_gt Hor) in Hs1z.
+          now apply angle_add_le_mono_l_lemma_15 in Hzs13.
         }
-        apply (rngl_nle_gt Hor) in Hs1z.
-...
-apply angle_add_le_mono_l_lemma_2; try easy.
-apply angle_add_le_mono_l_lemma_1; try easy.
-Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
-...
-apply angle_add_le_mono_l_lemma_1; try easy.
-apply angle_add_le_mono_l_lemma_7; try easy.
-...
-Search (rngl_sin (_ + _) ≤ rngl_sin (_ + _))%L.
-Search (rngl_sin (_ + _) < rngl_sin (_ + _))%L.
-Search (rngl_sin _ ≤ rngl_sin _)%L.
-apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+      }
+      apply (rngl_nle_gt Hor) in Hc1z.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
