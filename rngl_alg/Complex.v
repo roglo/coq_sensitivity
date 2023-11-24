@@ -5308,17 +5308,26 @@ split; intros H23. {
       }
       clear H23.
       apply (rngl_leb_gt Hor) in Hzs3.
-      destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
-        now apply angle_add_le_mono_l_lemma_7.
-      } {
+      destruct (rngl_lt_dec Hor (rngl_cos θ3) 0)%L as [Hc3z| Hzc3]. {
         exfalso.
-        apply (rngl_nle_gt Hor) in Hc3z.
         now apply angle_add_le_mono_l_lemma_11 in Hzs13.
+      } {
+        apply (rngl_nlt_ge Hor) in Hzc3.
+        now apply angle_add_le_mono_l_lemma_7.
       }
     }
     destruct zs3; [ easy | ].
     apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
     apply rngl_leb_le in H23.
+    destruct (rngl_lt_dec Hor (rngl_cos θ3) 0)%L as [Hc3z| Hzc3]. {
+      exfalso.
+      now apply angle_add_le_mono_l_lemma_11 in Hzs13.
+    } {
+      apply (rngl_nlt_ge Hor) in Hzc3.
+      move Hzc3 before Hzs3.
+About angle_add_le_mono_l_lemma_7.
+...
+    apply angle_add_le_mono_l_lemma_7; try easy.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
