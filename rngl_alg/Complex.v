@@ -4331,6 +4331,17 @@ split; intros H23. {
     }
   }
   apply (rngl_leb_gt Hor) in Hzs12.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    destruct zs3. {
+      apply rngl_leb_le in Hzs3, H23.
+      destruct zs13. {
+        exfalso.
+        apply rngl_leb_le in Hzs13.
+...
+Search (rngl_sin (_ + _) < 0)%L.
+apply angle_add_overflow_le_lemma_8 with (θ3 := θ3) in Hzs12; try easy.
+apply angle_add_overflow_le_lemma_9 with (θ3 := θ3) in Hzs12; try easy.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
