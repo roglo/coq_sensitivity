@@ -5300,6 +5300,47 @@ split; intros H23. {
       rewrite H; clear H.
       rewrite (rngl_cos_sub_right_r Hon Hop).
       apply rngl_leb_le.
+(**)
+      remember (angle_right - θ3)%A as θ eqn:Hθ.
+      apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+      subst θ3; rename θ into θ3; move θ3 before θ2.
+      rewrite (angle_add_comm Hic) in Hzs13 |-*.
+      rewrite (angle_add_comm Hic _ (_ - _))%A in H123.
+      rewrite <- (angle_sub_sub_distr Hic Hop) in H123, Hzs13 |-*.
+      rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs3, H123 |-*.
+      rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs13, Hc3z.
+      rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs13.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
+specialize rngl_sin_nonneg_cos_le_sin_le as H1.
+specialize (H1 Hic Hon Hop Hed θ1 (θ1 - θ3))%A.
+generalize Hc1z; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+specialize (H1 H Hzs13); clear H.
+apply (rngl_nlt_ge Hor).
+intros Hc131.
+rewrite (rngl_cos_sub_comm Hic Hop) in Hc131.
+generalize Hc131; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+specialize (H1 H); clear H.
+apply rngl_leb_le in Hzs1.
+rewrite Hzs1 in H1.
+apply rngl_leb_le in Hzs1.
+rename H1 into Hs131.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+..
+...
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
+Search (rngl_cos (_ - _) < rngl_cos _)%L.
+...
+      rewrite (rngl_sin_sub_right_l Hon Hos) in Hzc3, H123 |-*.
+rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs3, Hzs13.
+rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs13.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
 ...
       apply (rngl_nlt_ge Hor) in Hzs13.
       apply Hzs13; clear Hzs13.
