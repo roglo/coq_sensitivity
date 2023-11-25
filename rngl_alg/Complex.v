@@ -4380,30 +4380,15 @@ split; intros H23. {
       destruct zs13. {
         exfalso.
         apply rngl_leb_le in Hzs13.
+        generalize Hzs13; intros Hzs1.
+        apply rngl_sin_add_nonneg_sin_nonneg in Hzs1; try easy.
         destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
           move Hzc2 after Hzs3.
-          destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
-            apply (rngl_nle_gt Hor) in Hzs12.
-            apply Hzs12; clear Hzs12.
-            now apply angle_add_le_mono_l_lemma_18 with (θ2 := θ3).
-          }
-          apply (rngl_nle_gt Hor) in Hs1z.
-          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-            apply (rngl_nle_gt Hor) in Hs1z.
-            apply Hs1z; clear Hs1z.
-            now apply rngl_sin_add_nonneg_sin_nonneg in Hzs13.
-          }
-...
-apply rngl_leb_le in H.
-rewrite H; clear H.
-rewrite (rngl_sin_sub_right_r Hon Hop).
-generalize Hs1z; intros H.
-apply (rngl_opp_lt_compat Hop Hor) in H.
-rewrite (rngl_opp_0 Hop) in H.
-apply (rngl_nle_gt Hor) in H.
-apply rngl_leb_nle in H.
-now rewrite H.
-Qed.
+          apply (rngl_nle_gt Hor) in Hzs12.
+          apply Hzs12; clear Hzs12.
+          now apply angle_add_le_mono_l_lemma_18 with (θ2 := θ3).
+        }
+        apply (rngl_nle_gt Hor) in Hc2z.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
