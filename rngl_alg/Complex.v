@@ -4518,6 +4518,50 @@ split; intros H23. {
             now apply angle_add_le_mono_l_lemma_18 with (θ2 := θ3).
           }
           apply (rngl_nle_gt Hor) in Hs1z.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            remember (θ1 + angle_right)%A as θ eqn:Hθ.
+            apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+            subst θ1; rename θ into θ1.
+            rewrite <- (angle_add_sub_swap Hic Hop) in Hzs13, Hzs12.
+            rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs13, Hzs12, Hs1z.
+            rewrite (rngl_cos_sub_right_r Hon Hop) in Hzc1.
+            apply (rngl_opp_neg_pos Hop Hor) in Hzs12, Hs1z.
+            apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+            move Hzc1 after Hzs2; move Hzs3 before Hzs2.
+            move Hs1z after Hzc2.
+            progress unfold angle_add_overflow in Haov12.
+            apply angle_ltb_ge in Haov12.
+            apply angle_nlt_ge in Haov12.
+            apply Haov12; clear Haov12.
+            rewrite <- (angle_add_sub_swap Hic Hop).
+            progress unfold angle_ltb.
+            rewrite (rngl_sin_sub_right_r Hon Hop).
+            generalize Hzs12; intros H.
+            apply (rngl_opp_lt_compat Hop Hor) in H.
+            rewrite (rngl_opp_0 Hop) in H.
+            apply (rngl_nle_gt Hor) in H.
+            apply rngl_leb_nle in H.
+            rewrite H; clear H.
+            rewrite (rngl_sin_sub_right_r Hon Hop).
+            generalize Hs1z; intros H.
+            apply (rngl_opp_lt_compat Hop Hor) in H.
+            rewrite (rngl_opp_0 Hop) in H.
+            apply (rngl_nle_gt Hor) in H.
+            apply rngl_leb_nle in H.
+            rewrite H; clear H.
+            do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
+            apply rngl_ltb_lt.
+...
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_sin_sub_right_r Hon Hop).
+generalize Hs1z; intros H.
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply (rngl_nle_gt Hor) in H.
+apply rngl_leb_nle in H.
+now rewrite H.
+Qed.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
