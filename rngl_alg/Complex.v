@@ -3122,6 +3122,23 @@ destruct zs2. {
 }
 Qed.
 
+(*
+Theorem angle_add_overflow_comm :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = angle_add_overflow θ2 θ1.
+Proof.
+intros Hic Hon Hop Hed *.
+remember (angle_add_overflow θ1 θ2) as o12 eqn:Ho12.
+remember (angle_add_overflow θ2 θ1) as o21 eqn:Ho21.
+symmetry in Ho12, Ho21.
+destruct o12, o21; [ easy | | | easy ]. {
+...
+*)
+
 Theorem angle_add_le_mono_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -4664,6 +4681,8 @@ split; intros H23. {
       }
       apply (rngl_leb_gt Hor) in Hzs13.
       apply rngl_leb_le.
+      destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
