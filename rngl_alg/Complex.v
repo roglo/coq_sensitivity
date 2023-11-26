@@ -4869,6 +4869,25 @@ split; intros H23. {
           remember (θ1 - angle_right)%A as θ.
           apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
           subst θ1; rename θ into θ1; move θ1 after θ2.
+          rewrite (angle_add_add_swap Hic Hop) in Hzs12 |-*.
+          rewrite (angle_add_sub_swap Hic Hop) in Hzs13 |-*.
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs12, Hzs13, Hzs1.
+          rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z.
+          do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+          apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
+          rewrite (rngl_opp_involutive Hop).
+          apply (rngl_le_opp_l Hop Hor).
+clear H23.
+          cbn.
+          rewrite rngl_add_assoc.
+          rewrite (rngl_add_add_swap (_ * _))%L.
+          rewrite <- rngl_add_assoc.
+          do 2 rewrite <- rngl_mul_add_distr_l.
+          rewrite (rngl_add_opp_r Hop).
+...
+          rewrite (rngl_add_comm (rngl_cos θ2)).
+          apply (rngl_add_nonneg_nonneg Hor). {
+            apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 ...
           rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12.
           do 2 rewrite (angle_add_add_swap Hic Hop _ angle_right).
