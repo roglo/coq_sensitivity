@@ -4836,6 +4836,17 @@ split; intros H23. {
         apply rngl_leb_le in H.
         rewrite H; clear H.
         apply rngl_leb_le.
+        apply angle_add_overflow_le_lemma_111; try easy.
+        now apply (rngl_lt_le_incl Hor).
+      }
+      apply (rngl_nlt_ge Hor) in Hc3z.
+      remember (θ3 - angle_right)%A as θ eqn:Hθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ3; rename θ into θ3; move θ3 before θ2.
+      rewrite (angle_add_assoc Hop) in Hzs13 |-*.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3, Hzs13.
+      rewrite (rngl_cos_add_right_r Hon Hop) in H23, Hc3z |-*.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
