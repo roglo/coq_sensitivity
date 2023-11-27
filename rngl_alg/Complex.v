@@ -4879,6 +4879,10 @@ split; intros H23. {
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
       apply (rngl_le_opp_l Hop Hor) in H23.
       apply (rngl_opp_neg_pos Hop Hor) in Hzs13.
+(*
+assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
+...
+*)
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
         destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
           destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
@@ -4901,6 +4905,7 @@ split; intros H23. {
           apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
           rewrite (rngl_opp_involutive Hop).
           apply (rngl_le_opp_l Hop Hor).
+...
 clear H23.
           cbn.
           rewrite rngl_add_assoc.
