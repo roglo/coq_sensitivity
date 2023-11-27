@@ -4866,6 +4866,7 @@ split; intros H23. {
           }
           apply (rngl_nle_gt Hor) in Hzc13.
           move Hzc13 before Hzs13.
+eapply (rngl_le_trans Hor _ (rngl_cos θ1)). 2: {
 ...
       remember (angle_straight - θ3)%A as θ.
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
