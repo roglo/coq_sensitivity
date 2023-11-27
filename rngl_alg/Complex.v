@@ -4829,17 +4829,37 @@ split; intros H23. {
       }
       apply (rngl_nlt_ge Hor) in Hc3z.
 (**)
-(*
-enough (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
-*)
-(*
-      destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
-          as [Hs23| Hs23]. {
+      remember (θ3 - angle_right)%A as θ eqn:Hθ.
+      apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+      subst θ3; rename θ into θ3; move θ3 before θ2.
+      rewrite (angle_add_assoc Hop) in Hzs13 |-*.
+      rewrite (rngl_sin_add_right_r Hon Hos) in Hzs3, Hzs13.
+      rewrite (rngl_cos_add_right_r Hon Hop) in H23, Hc3z |-*.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
+      move Hc3z before Hzs2.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        move Hzc2 after Hzs3.
+        clear H23.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
+          move Hzs1 after Hzs2.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            exfalso.
+            apply (rngl_nle_gt Hor) in Hzs12.
+            apply Hzs12; clear Hzs12.
+            now apply (rngl_sin_add_nonneg Hop).
+          }
+          apply (rngl_nle_gt Hor) in Hc1z.
+          remember (θ1 - angle_right)%A as θ.
+          apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+          subst θ1; rename θ into θ1; move θ1 after θ2.
+          rewrite (angle_add_add_swap Hic Hop) in Hzs12, Hzs13.
+          do 2 rewrite (angle_add_add_swap Hic Hop _ angle_right).
+          rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs12 |-*.
+          rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z, Hzs13 |-*.
+          apply (rngl_opp_neg_pos Hop Hor) in Hc1z, Hzs13.
+          apply -> (rngl_opp_le_compat Hop Hor).
+          move Hc1z after Hzs2; move Hzs1 before Hzc2.
 ...
-cbn.
-apply (rngl_sub_le_compat Hop Hor).
-...
-*)
       remember (angle_straight - θ3)%A as θ.
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
       subst θ3; rename θ into θ3; move θ3 before θ2.
@@ -4854,6 +4874,7 @@ apply (rngl_sub_le_compat Hop Hor).
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
       apply (rngl_le_opp_l Hop Hor) in H23.
       apply (rngl_opp_neg_pos Hop Hor) in Hzs13.
+...
 (*
 assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 ...
