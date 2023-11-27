@@ -4866,7 +4866,51 @@ split; intros H23. {
           }
           apply (rngl_nle_gt Hor) in Hzc13.
           move Hzc13 before Hzs13.
-eapply (rngl_le_trans Hor _ (rngl_cos θ1)). 2: {
+remember (angle_right - θ2)%A as θ eqn:Hθ.
+apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+subst θ2; rename θ into θ2; move θ2 before θ1.
+rewrite (angle_add_comm Hic _ (_ - _)%A) in Hzs12 |-*.
+rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12 |-*.
+rewrite <- (angle_add_sub_assoc Hop) in Hzs12 |-*.
+rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs2.
+rewrite (rngl_cos_sub_right_l Hon Hop) in Hzc2.
+rewrite (rngl_sin_add_right_l Hon Hos).
+rewrite (rngl_cos_add_right_l Hon Hop) in Hzs12.
+apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
+move Hzc2 before Hc1z; move Hzs2 after Hzs1.
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+...
+apply angle_add_le_mono_l_lemma_1; try easy. (* non *)
+apply angle_add_le_mono_l_lemma_7; try easy. (* non *)
+apply angle_add_le_mono_l_lemma_20; try easy. (* non *)
+apply angle_add_le_mono_l_lemma_3; try easy. (* non *)
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+Search (rngl_sin _ ≤ rngl_cos _)%L.
+Search (rngl_cos _ < rngl_sin _)%L.
+Search (rngl_sin _ < rngl_cos _)%L.
+...
+apply angle_add_le_mono_l_lemma_6.
+...
+angle_add_le_mono_l_lemma_6:
+  rngl_mul_is_comm T = true
+  → rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_has_eq_dec T = true
+        → ∀ θ1 θ2 θ3 : angle T,
+            angle_add_overflow θ1 (θ3 - angle_right)%A = false
+            → (0 ≤ rngl_sin θ2)%L
+              → (0 ≤ rngl_sin θ3)%L
+                → (rngl_cos θ2 ≤ 0)%L
+                  → (0 < rngl_cos θ3)%L
+                    → (0 ≤ rngl_sin (θ1 + θ2))%L
+                      → (rngl_cos (θ1 + θ3) ≤ 0)%L → (rngl_sin (θ1 + θ3) ≤ rngl_cos (θ1 + θ2))%L
+...
+eapply (rngl_le_trans Hor _ (rngl_cos θ3)). 2: {
 ...
       remember (angle_straight - θ3)%A as θ.
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
