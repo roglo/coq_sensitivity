@@ -4923,13 +4923,13 @@ split; intros H23. {
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc3z.
       move Hc3z before Hzs2.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-        move Hzc2 after Hzs3.
-        clear H23.
         apply (rngl_le_opp_r Hop Hor).
         destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
           now apply angle_add_le_mono_l_lemma_21.
         }
         apply (rngl_nle_gt Hor) in Hs1z.
+        move Hzc2 after Hzs3.
+        clear H23.
 ...
 (*
 assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
