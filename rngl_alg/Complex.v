@@ -4902,11 +4902,33 @@ assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 (*
 enough (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 *)
-          destruct (rngl_le_dec Hor (rngl_sin θ3) (rngl_sin θ1)) as [Hs31| Hs13]. {
+          destruct (rngl_le_dec Hor (rngl_sin θ3) (rngl_sin θ1))
+              as [Hs31| Hs13]. {
             apply (rngl_add_nonneg_nonneg Hor). {
               apply (rngl_lt_le_incl Hor) in Hc1z.
               now apply (rngl_sin_add_nonneg Hop).
             } {
+              apply (rngl_lt_le_incl Hor) in Hc1z.
+              apply rngl_sin_nonneg_cos_le_sin_sub_nonneg; try easy.
+              now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+            }
+          }
+          apply (rngl_nle_gt Hor) in Hs13.
+          rewrite (rngl_sin_sub_anticomm Hic Hop).
+          rewrite (rngl_cos_sub_comm Hic Hop) in Hzs13.
+          rewrite (rngl_add_opp_r Hop).
+          apply (rngl_le_0_sub Hop Hor).
+          generalize Hs13; intros Hc31.
+          apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff in Hc31;
+              try easy.
+          2: now apply (rngl_lt_le_incl Hor) in Hc1z.
+...
+Check rngl_sin_nonneg_cos_le_sin_le.
+...
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
+apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+apply rngl_sin_incr; try easy.
 ... ...
 apply (rngl_sin_add_nonneg Hop); [ | easy | easy | easy ].
 now apply (rngl_lt_le_incl Hor).
