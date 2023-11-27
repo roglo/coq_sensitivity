@@ -4859,6 +4859,13 @@ split; intros H23. {
           apply (rngl_opp_neg_pos Hop Hor) in Hc1z, Hzs13.
           apply -> (rngl_opp_le_compat Hop Hor).
           move Hc1z after Hzs2; move Hzs1 before Hzc2.
+          destruct (rngl_le_dec Hor (rngl_cos (θ1 + θ3)) 0) as [H| Hzc13]. {
+            eapply (rngl_le_trans Hor); [ apply H | ].
+            apply (rngl_lt_le_incl Hor) in Hc1z.
+            now apply (rngl_sin_add_nonneg Hop).
+          }
+          apply (rngl_nle_gt Hor) in Hzc13.
+          move Hzc13 before Hzs13.
 ...
       remember (angle_straight - θ3)%A as θ.
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
