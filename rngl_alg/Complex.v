@@ -4865,6 +4865,17 @@ split; intros H23. {
       }
       apply (rngl_nlt_ge Hor) in Hc3z.
 (**)
+(*
+enough (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
+*)
+(*
+      destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
+          as [Hs23| Hs23]. {
+...
+cbn.
+apply (rngl_sub_le_compat Hop Hor).
+...
+*)
       remember (angle_straight - θ3)%A as θ.
       apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
       subst θ3; rename θ into θ3; move θ3 before θ2.
@@ -4880,7 +4891,7 @@ split; intros H23. {
       apply (rngl_le_opp_l Hop Hor) in H23.
       apply (rngl_opp_neg_pos Hop Hor) in Hzs13.
 (*
-assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
+assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 ...
 *)
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
@@ -4894,6 +4905,27 @@ assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
             now apply (rngl_mul_nonneg_nonneg Hop Hor).
           }
           apply (rngl_nle_gt Hor) in Hc1z.
+(*
+          remember (angle_straight - θ1)%A as θ.
+          apply (angle_sub_move_l Hic Hon Hop Hed) in Heqθ.
+          subst θ1; rename θ into θ1; move θ1 after θ2.
+          rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12 |-*.
+          rewrite <- (angle_add_sub_assoc Hop) in Hzs12 |-*.
+          rewrite <- (angle_sub_add_distr Hic Hop) in Hzs13 |-*.
+          rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
+          rewrite (rngl_cos_add_straight_l Hon Hop).
+          rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs13, Hzs1.
+          rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc1z |-*.
+          apply (rngl_opp_neg_pos Hop Hor) in Hzs12, Hc1z.
+          apply -> (rngl_opp_le_compat Hop Hor).
+          apply (rngl_le_opp_l Hop Hor).
+          cbn.
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_sub_opp_r Hop).
+          rewrite rngl_add_assoc.
+          rewrite <- (rngl_add_sub_swap Hop).
+...
+*)
           remember (θ1 - angle_right)%A as θ.
           apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
           subst θ1; rename θ into θ1; move θ1 after θ2.
@@ -4905,6 +4937,11 @@ assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L). {
           apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
           rewrite (rngl_opp_involutive Hop).
           apply (rngl_le_opp_l Hop Hor).
+(*
+enough (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
+*)
+      destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
+          as [Hs23| Hs23]. {
 ...
 clear H23.
           cbn.
