@@ -2772,6 +2772,24 @@ apply rngl_ltb_lt.
 apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 Qed.
 
+Theorem rngl_sin_add_nonneg :
+  rngl_has_opp T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L.
+Proof.
+intros Hop.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hcs1 Hcs2.
+cbn.
+apply (rngl_add_nonneg_nonneg Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
 Theorem rngl_sin_add_is_pos_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3217,18 +3235,12 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   move Hzc2 before Hzs1.
   rename Hzs12 into Hzc12; rename Hzs13 into Hzc13.
   assert (Hzs12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
-    cbn.
-    apply (rngl_add_nonneg_nonneg Hor).
-    now apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_lt_le_incl Hor) in Hc1z.
+    now apply (rngl_sin_add_nonneg Hop).
   }
   assert (Hzs13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
-    cbn.
-    apply (rngl_add_nonneg_nonneg Hor).
-    now apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_lt_le_incl Hor) in Hc1z.
+    now apply (rngl_sin_add_nonneg Hop).
   }
   specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
   apply H1; try easy.
@@ -3389,20 +3401,12 @@ generalize H23; intros H32.
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32; try easy.
 move H32 before H23.
 assert (Hs12z : (0 ≤ rngl_sin (θ1 + θ2))%L). {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 assert (Hs13z : (0 ≤ rngl_sin (θ1 + θ3))%L). {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
 apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
@@ -3613,12 +3617,8 @@ apply (rngl_nlt_ge Hor) in Hzs12.
 apply Hzs12; clear Hzs12.
 apply (rngl_lt_iff Hor).
 split. {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hc1z.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 intros H; symmetry in H.
 apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
@@ -3951,11 +3951,8 @@ apply (rngl_nlt_ge Hor) in Hzs12.
 apply Hzs12; clear Hzs12.
 apply (rngl_lt_iff Hor).
 split. {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hc1z.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 intros H; symmetry in H.
 apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
@@ -4061,13 +4058,8 @@ rewrite (rngl_cos_add_right_r Hon Hop).
 rewrite (rngl_cos_sub_right_r Hon Hop).
 apply rngl_ltb_lt.
 apply (rngl_lt_le_trans Hor _ 0); [ now apply (rngl_opp_neg_pos Hop Hor) | ].
-cbn.
-apply (rngl_add_nonneg_nonneg Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-now apply (rngl_lt_le_incl Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
+apply (rngl_lt_le_incl Hor) in Hc1z, Hzs2, Hc2z.
+now apply (rngl_sin_add_nonneg Hop).
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_12 :
@@ -4192,11 +4184,8 @@ apply (rngl_nlt_ge Hor) in H1.
 apply H1; clear H1.
 apply (rngl_lt_iff Hor).
 split. {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_lt_le_incl Hor) in Hzs2.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 intros H1; symmetry in H1.
 apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H1.
@@ -4250,18 +4239,11 @@ intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 intros * Haov13 Hzs1 Hzc2 Hzc3 Hzc1 Hzs2 Hzs3 H23 Hzs12 Hzs13.
 apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy. {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hzs3.
+  now apply (rngl_sin_add_nonneg Hop).
 } {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hzc2, Hzs2.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 apply angle_add_le_mono_l_lemma_3; try easy. {
   apply (angle_add_overflow_le) with (θ2 := (θ3 - angle_right)%A);
@@ -4280,18 +4262,11 @@ apply angle_add_le_mono_l_lemma_3; try easy. {
 } {
   now apply (rngl_lt_le_incl Hor).
 } {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hzc2, Hzs2.
+  now apply (rngl_sin_add_nonneg Hop).
 } {
-  cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hzs3.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 now apply (rngl_lt_le_incl Hor).
@@ -4485,10 +4460,8 @@ apply (rngl_nlt_ge Hor).
 intros Hzs13.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   apply (rngl_nle_gt Hor) in Hzs13.
-  apply Hzs13; clear Hzs13; cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply Hzs13; clear Hzs13.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 apply (rngl_nle_gt Hor) in Hc1z.
 move Hc1z after Hzc3.
@@ -4643,12 +4616,9 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     exfalso.
     apply (rngl_nle_gt Hor) in Hzs12.
-    apply Hzs12; clear Hzs12; cbn.
-    apply (rngl_add_nonneg_nonneg Hor).
-    now apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-    now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
+    apply Hzs12; clear Hzs12.
+    apply (rngl_lt_le_incl Hor) in Hzc2, Hzs1.
+    now apply (rngl_sin_add_nonneg Hop).
   }
   apply (rngl_nle_gt Hor) in Hc1z.
   remember (angle_straight - θ1)%A as θ.
@@ -4737,18 +4707,12 @@ do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
 apply (rngl_opp_neg_pos Hop Hor) in Hzs13, Hzs12.
 apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs1z.
 assert (Hs12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hc1z, Hzc2.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 assert (Hs13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hor) in Hc1z, Hzc3.
+  now apply (rngl_sin_add_nonneg Hop).
 }
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 now apply (rngl_lt_le_incl Hor).
@@ -4899,10 +4863,8 @@ assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
           destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
             exfalso.
             apply (rngl_nle_gt Hor) in Hzs12.
-            apply Hzs12; clear Hzs12; cbn.
-            apply (rngl_add_nonneg_nonneg Hor).
-            now apply (rngl_mul_nonneg_nonneg Hop Hor).
-            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+            apply Hzs12; clear Hzs12.
+            now apply (rngl_sin_add_nonneg Hop).
           }
           apply (rngl_nle_gt Hor) in Hc1z.
 (*
@@ -4940,6 +4902,16 @@ assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 (*
 enough (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
 *)
+          destruct (rngl_le_dec Hor (rngl_sin θ3) (rngl_sin θ1)) as [Hs31| Hs13]. {
+            apply (rngl_add_nonneg_nonneg Hor). {
+              apply (rngl_lt_le_incl Hor) in Hc1z.
+              now apply (rngl_sin_add_nonneg Hop).
+            } {
+... ...
+apply (rngl_sin_add_nonneg Hop); [ | easy | easy | easy ].
+now apply (rngl_lt_le_incl Hor).
+...
+
       destruct (rngl_le_dec Hor (rngl_sin θ2) (rngl_sin θ3))
           as [Hs23| Hs23]. {
 ...
