@@ -4935,6 +4935,45 @@ rewrite (angle_sub_diag Hic Hon Hop Hed).
 now rewrite (angle_add_0_l Hon Hos).
 Qed.
 
+Theorem angle_add_le_mono_l_lemma_24 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (rngl_cos θ1 ≤ 0)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (rngl_cos θ1 ≤ rngl_sin (θ1 + θ2))%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hzs1 Hc1z Hzs2.
+remember (θ1 - angle_right)%A as θ.
+apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
+subst θ1; rename θ into θ1; move θ1 after θ2.
+rewrite (angle_add_add_swap Hic Hop).
+rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1 |-*.
+rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z |-*.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z.
+apply (rngl_le_opp_l Hop Hor).
+remember (angle_right - θ2)%A as θ eqn:Hθ.
+apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ.
+subst θ2; rename θ into θ2; move θ2 before θ1.
+rewrite (angle_add_comm Hic _ (_ - _)%A).
+rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_add_sub_assoc Hop).
+rewrite (rngl_cos_sub_right_l Hon Hop) in Hzs2.
+rewrite (rngl_cos_add_right_l Hon Hop).
+rewrite (rngl_add_opp_r Hop).
+apply (rngl_le_0_sub Hop Hor).
+apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite (angle_sub_diag Hic Hon Hop Hed).
+now rewrite (angle_add_0_l Hon Hos).
+Qed.
+
 (* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
@@ -5094,7 +5133,12 @@ split; intros H23. {
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
               apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hzs13, Hzs12.
               apply angle_add_le_mono_l_lemma_23; try easy.
+            } {
+              apply (rngl_nle_gt Hor) in Hc1z.
+              apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hzs13, Hc1z.
+              apply angle_add_le_mono_l_lemma_24; try easy.
             }
+          }
 ...
             cbn in H23.
             specialize (rngl_sin_bound Hon Hop Hiv Hic Hed Hor θ3) as H.
