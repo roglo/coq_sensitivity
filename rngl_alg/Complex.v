@@ -4274,7 +4274,7 @@ Theorem angle_add_le_mono_l_lemma_14 :
   → (0 < rngl_sin θ2)%L
   → (0 ≤ rngl_sin θ3)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (0 < rngl_cos θ2)%L
+  → (0 ≤ rngl_cos θ2)%L
   → (0 < rngl_cos θ3)%L
   → (rngl_sin θ2 ≤ rngl_sin θ3)%L
   → (rngl_cos (θ1 + θ2) ≤ 0)%L
@@ -4288,7 +4288,7 @@ apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy. {
   apply (rngl_lt_le_incl Hor) in Hzs3.
   now apply (rngl_sin_add_nonneg Hop).
 } {
-  apply (rngl_lt_le_incl Hor) in Hzc2, Hzs2.
+  apply (rngl_lt_le_incl Hor) in Hzc2.
   now apply (rngl_sin_add_nonneg Hop).
 }
 apply angle_add_le_mono_l_lemma_3; try easy. {
@@ -4308,14 +4308,13 @@ apply angle_add_le_mono_l_lemma_3; try easy. {
 } {
   now apply (rngl_lt_le_incl Hor).
 } {
-  apply (rngl_lt_le_incl Hor) in Hzc2, Hzs2.
+  apply (rngl_lt_le_incl Hor) in Hzc2.
   now apply (rngl_sin_add_nonneg Hop).
 } {
   apply (rngl_lt_le_incl Hor) in Hzs3.
   now apply (rngl_sin_add_nonneg Hop).
 }
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
@@ -4427,6 +4426,7 @@ apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
 move Hzc2 after Hzc3; move Hzs2 before Hzs3.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  apply (rngl_lt_le_incl Hor) in Hzs2.
   now apply angle_add_le_mono_l_lemma_14.
 }
 apply (rngl_nle_gt Hor) in Hc1z.
@@ -5027,6 +5027,29 @@ split; intros H23. {
         rewrite (rngl_add_opp_l Hop).
         apply (rngl_le_sub_0 Hop Hor).
         move H23 after Hzs12.
+        destruct (rngl_eq_dec Hed (rngl_cos θ2) 0) as [H| Hc2ez]. {
+          apply (eq_rngl_cos_0 Hic Hon Hop Hed) in H.
+          destruct H; subst θ2. {
+            cbn in H23.
+            specialize (rngl_sin_bound Hon Hop Hiv Hic Hed Hor θ3) as H.
+            apply (rngl_le_antisymm Hor) in H23; [ clear H | easy ].
+            apply (eq_rngl_sin_1 Hic Hon Hop Hed) in H23.
+            subst θ3.
+            apply (rngl_le_refl Hor).
+          }
+          exfalso.
+          apply (rngl_nle_gt Hor) in Hc2z.
+          apply Hc2z; cbn.
+          apply (rngl_opp_1_le_0 Hon Hop Hor).
+        }
+        assert (H : (0 < rngl_cos θ2)%L). {
+          apply not_eq_sym in Hc2ez.
+          now apply (rngl_lt_iff Hor).
+        }
+        move H before Hzs2; clear Hzs2.
+        rename H into Hzs2; clear Hc2ez.
+apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
+...
 Search (rngl_sin _ ≤ rngl_sin _)%L.
 apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
 ...
