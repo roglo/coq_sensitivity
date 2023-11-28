@@ -5152,31 +5152,36 @@ split; intros H23. {
         rename H into Hzs3; clear Hc3ez.
         destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
           destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            assert (Hzc12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
+              apply (rngl_sin_add_nonneg Hop); try easy.
+              now apply (rngl_lt_le_incl Hor).
+              now apply (rngl_lt_le_incl Hor).
+            }
+            assert (Hzc13 : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+              apply (rngl_sin_add_nonneg Hop); try easy.
+              now apply (rngl_lt_le_incl Hor).
+            }
             apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
-            apply (rngl_sin_add_nonneg Hop); try easy.
-            now apply (rngl_lt_le_incl Hor).
-            apply (rngl_sin_add_nonneg Hop); try easy.
             now apply (rngl_lt_le_incl Hor).
             now apply (rngl_lt_le_incl Hor).
+            apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
+            now apply (rngl_lt_le_incl Hor).
+            apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
             now apply (rngl_lt_le_incl Hor).
             now apply (rngl_lt_le_incl Hor).
-Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
-...
-apply angle_add_le_mono_l_lemma_3; try easy. (* bof *)
-...
-5: {
-Search (rngl_sin _ ≤ rngl_sin _)%L.
-...
-            apply angle_add_le_mono_l_lemma_14; try easy.
-...
-            apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
-...
-            exfalso.
-            apply (rngl_nle_gt Hor) in Hzs12.
-            apply Hzs12; clear Hzs12.
-            now apply (rngl_sin_add_nonneg Hop).
+            now apply (rngl_lt_le_incl Hor).
+            progress unfold angle_add_overflow.
+            progress unfold angle_ltb.
+            generalize Hzc13; intros H.
+            apply rngl_leb_le in H.
+            rewrite H; clear H.
+            generalize Hzs1; intros H.
+            apply rngl_leb_le in H.
+            rewrite H; clear H.
+            apply (rngl_ltb_ge Hor).
+            apply (rngl_le_trans Hor _ 0); [ | easy ].
+            now apply (rngl_lt_le_incl Hor).
           }
-          apply (rngl_nle_gt Hor) in Hc1z.
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. (* mouais *)
 ...
