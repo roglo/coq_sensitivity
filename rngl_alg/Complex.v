@@ -5010,12 +5010,25 @@ split; intros H23. {
           apply (rngl_nle_gt Hor) in Hs1z.
           now apply angle_add_le_mono_l_lemma_22.
         }
-      }
-      apply (rngl_nle_gt Hor) in Hc2z.
-      apply (rngl_le_opp_l Hop Hor) in H23.
-      apply (rngl_le_opp_r Hop Hor).
-      move Hc2z after Hzs3.
-      move H23 after Hzs12.
+      } {
+        apply (rngl_nle_gt Hor) in Hc2z.
+        apply (rngl_le_opp_l Hop Hor) in H23.
+        apply (rngl_le_opp_r Hop Hor).
+        move Hc2z after Hzs3; move H23 after Hzs12.
+        remember (θ2 - angle_right)%A as θ eqn:Hθ.
+        apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
+        subst θ2; rename θ into θ2; move θ2 before θ3.
+        rewrite (angle_add_assoc Hop) in Hzs12 |-*.
+        rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hzs12.
+        rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H23 |-*.
+        apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+        rewrite (rngl_add_opp_r Hop) in H23.
+        apply -> (rngl_le_0_sub Hop Hor) in H23.
+        rewrite (rngl_add_opp_l Hop).
+        apply (rngl_le_sub_0 Hop Hor).
+        move H23 after Hzs12.
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
 ...
 (*
 assert (Hs32 : (rngl_sin θ3 ≤ rngl_sin θ2)%L).
