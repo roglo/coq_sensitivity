@@ -5139,19 +5139,52 @@ split; intros H23. {
               apply angle_add_le_mono_l_lemma_24; try easy.
             }
           }
-...
-            cbn in H23.
-            specialize (rngl_sin_bound Hon Hop Hiv Hic Hed Hor θ3) as H.
-            apply (rngl_le_antisymm Hor) in H23; [ clear H | easy ].
-            apply (eq_rngl_sin_1 Hic Hon Hop Hed) in H23.
-            subst θ3.
-            apply (rngl_le_refl Hor).
-          }
           exfalso.
-          apply (rngl_nle_gt Hor) in Hc2z.
-          apply Hc2z; cbn.
-          apply (rngl_opp_1_le_0 Hon Hop Hor).
+          apply (rngl_nlt_ge Hor) in Hc3z.
+          apply Hc3z; cbn.
+          apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
         }
+        assert (H : (0 < rngl_cos θ3)%L). {
+          apply not_eq_sym in Hc3ez.
+          now apply (rngl_lt_iff Hor).
+        }
+        move H before Hzs3; clear Hzs3.
+        rename H into Hzs3; clear Hc3ez.
+        destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
+            apply (rngl_sin_add_nonneg Hop); try easy.
+            now apply (rngl_lt_le_incl Hor).
+            apply (rngl_sin_add_nonneg Hop); try easy.
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
+...
+apply angle_add_le_mono_l_lemma_3; try easy. (* bof *)
+...
+5: {
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+...
+            apply angle_add_le_mono_l_lemma_14; try easy.
+...
+            apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
+...
+            exfalso.
+            apply (rngl_nle_gt Hor) in Hzs12.
+            apply Hzs12; clear Hzs12.
+            now apply (rngl_sin_add_nonneg Hop).
+          }
+          apply (rngl_nle_gt Hor) in Hc1z.
+...
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. (* mouais *)
+...
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+apply rngl_sin_sub_nonneg_sin_le_sin; try easy. (* non *)
+...
+Search (rngl_sin (_ + _) ≤ rngl_sin (_ + _))%L.
+...
 apply angle_add_le_mono_l_lemma_14; (try easy); (try now apply rngl_lt_le_incl).
 ...
 Search (rngl_sin _ ≤ rngl_sin _)%L.
