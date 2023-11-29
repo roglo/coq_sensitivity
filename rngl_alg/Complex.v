@@ -5486,8 +5486,18 @@ split; intros H23. {
             apply (rngl_nle_gt Hor) in Hs1z.
             destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
               now apply (angle_add_le_mono_l_lemma_32 Hic Hon Hop Hed _ _ θ3).
+            } {
+              apply (rngl_nle_gt Hor) in Hc1z.
+              apply angle_add_overflow_false_comm in Haov13; try easy.
+              exfalso.
+              apply Bool.not_true_iff_false in Haov13.
+              apply Haov13; clear Haov13.
+              apply angle_add_le_mono_l_lemma_11; try easy.
+              now rewrite (angle_add_comm Hic).
             }
-            apply (rngl_nle_gt Hor) in Hc1z.
+          }
+        }
+        apply (rngl_nle_gt Hor) in Hc2z.
 ...
 Search (rngl_sin _ ≤ rngl_sin _)%L.
 ...
