@@ -3961,16 +3961,16 @@ rewrite <- (angle_sub_add_distr Hic Hop).
 rewrite (angle_straight_add_straight Hon Hop).
 rewrite (angle_sub_0_r Hon Hop).
 progress unfold angle_ltb.
-apply rngl_leb_le in Hzs12.
-rewrite Hzs12.
-apply rngl_leb_le in Hzs12.
 rewrite (rngl_sin_sub_straight_r Hon Hop).
 generalize Hs1z; intros H.
 apply (rngl_opp_lt_compat Hop Hor) in H.
 rewrite (rngl_opp_0 Hop) in H.
 apply (rngl_nle_gt Hor) in H.
 apply (rngl_leb_nle) in H.
-now rewrite H.
+rewrite H; clear H.
+rewrite (rngl_cos_sub_straight_r Hon Hop).
+apply rngl_leb_le in Hzs12.
+now rewrite Hzs12.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_10 :
