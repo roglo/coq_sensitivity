@@ -5059,6 +5059,61 @@ apply (rngl_ltb_ge Hor).
 apply angle_add_overflow_le_lemma_111; try easy.
 Qed.
 
+Theorem angle_add_le_mono_l_lemma_27 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (rngl_sin θ1 < 0)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin θ3)%L
+  → (rngl_cos θ1 < 0)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_cos θ3)%L
+  → (rngl_sin θ2 ≤ rngl_sin θ3)%L
+  → (rngl_cos (θ1 + θ2) < 0)%L
+  → (rngl_cos (θ1 + θ3) ≤ 0)%L
+  → (rngl_sin (θ1 + θ3) ≤ rngl_sin (θ1 + θ2))%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hs1z Hc2z Hc3z Hc1z Hzs2 Hzs3 h23 Hzs12 Hzs13.
+remember (θ1 + angle_straight)%A as θ eqn:Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ1; rename θ into θ1.
+rewrite <- (angle_add_sub_swap Hic Hop) in Hzs13, Hzs12.
+do 2 rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite (rngl_sin_sub_straight_r Hon Hop) in Hs1z.
+do 2 rewrite (rngl_sin_sub_straight_r Hon Hop).
+rewrite (rngl_cos_sub_straight_r Hon Hop) in Hc1z, Hzs13, Hzs12.
+apply (rngl_opp_neg_pos Hop Hor) in Hc1z, Hs1z, Hzs12.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs13.
+apply -> (rngl_opp_le_compat Hop Hor).
+apply (rngl_lt_le_incl Hor) in Hc1z, Hs1z.
+apply (rngl_lt_le_incl Hor) in Hzs12.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply (rngl_sin_add_nonneg Hop); try easy.
+apply (rngl_sin_add_nonneg Hop); try easy.
+apply angle_add_le_mono_l_lemma_3; try easy; cycle 1.
+apply (rngl_sin_add_nonneg Hop); try easy.
+apply (rngl_sin_add_nonneg Hop); try easy.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+generalize Hs1z; intros H.
+apply (rngl_sin_add_nonneg Hop θ3) in H; try easy.
+rewrite (angle_add_comm Hic) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+apply rngl_leb_le in Hs1z.
+rewrite Hs1z.
+apply rngl_leb_le in Hs1z.
+apply (rngl_ltb_ge Hor).
+apply angle_add_overflow_le_lemma_111; try easy.
+apply (rngl_sin_add_nonneg Hop); try easy.
+Qed.
+
 (* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
@@ -5247,25 +5302,30 @@ split; intros H23. {
           }
         } {
           apply (rngl_nle_gt Hor) in Hs1z.
+          apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z.
           destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
             exfalso.
             apply (rngl_nle_gt Hor) in Hzs12.
             apply Hzs12; clear Hzs12.
-            apply (rngl_lt_le_incl Hor) in Hc2z, Hzs2.
             now apply (rngl_cos_add_nonneg Hic Hon Hop Hed).
           } {
             apply (rngl_nle_gt Hor) in Hc1z.
+            apply (rngl_lt_le_incl Hor) in Hzs3, Hzs13.
+            now apply angle_add_le_mono_l_lemma_27.
+          }
+        }
+      }
+    }
+    clear H23.
 ...
-            rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs13, Hzs12, Hs1z.
-rewrite (rngl_cos_sub_right_r Hon Hop) in Hc1z.
-do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
-apply (rngl_opp_neg_pos Hop Hor) in Hzs13, Hzs12.
-apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs1z.
-assert (Hs12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+...
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+apply angle_add_le_mono_l_lemma_26; try easy.
+apply angle_add_le_mono_l_lemma_14; try easy.
 ...
 Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
 apply angle_add_le_mono_l_lemma_7; try easy. (* non *)
-Search (rngl_sin _ ≤ rngl_sin _)%L.
 apply rngl_sin_sub_nonneg_sin_le_sin; try easy. (* non *)
 ...
 Search (rngl_sin (_ + _) ≤ rngl_sin (_ + _))%L.
