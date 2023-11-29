@@ -5245,8 +5245,23 @@ split; intros H23. {
             apply (rngl_lt_le_incl Hor) in Hc1z.
             now apply angle_add_le_mono_l_lemma_26.
           }
-        }
-        apply (rngl_nle_gt Hor) in Hs1z.
+        } {
+          apply (rngl_nle_gt Hor) in Hs1z.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            exfalso.
+            apply (rngl_nle_gt Hor) in Hzs12.
+            apply Hzs12; clear Hzs12.
+            apply (rngl_lt_le_incl Hor) in Hc2z, Hzs2.
+            now apply (rngl_cos_add_nonneg Hic Hon Hop Hed).
+          } {
+            apply (rngl_nle_gt Hor) in Hc1z.
+...
+            rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs13, Hzs12, Hs1z.
+rewrite (rngl_cos_sub_right_r Hon Hop) in Hc1z.
+do 2 rewrite (rngl_cos_sub_right_r Hon Hop).
+apply (rngl_opp_neg_pos Hop Hor) in Hzs13, Hzs12.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hs1z.
+assert (Hs12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
 ...
 Search (rngl_cos (_ + _) ≤ rngl_cos (_ + _))%L.
 apply angle_add_le_mono_l_lemma_7; try easy. (* non *)
