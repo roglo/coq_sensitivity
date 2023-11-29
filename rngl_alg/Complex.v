@@ -4043,16 +4043,15 @@ Theorem angle_add_le_mono_l_lemma_11 :
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = false
-  → (rngl_sin θ2 < 0)%L
+  (rngl_sin θ2 < 0)%L
   → (rngl_cos θ2 < 0)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → False.
+  → angle_add_overflow θ1 θ2 = true.
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Haov12 Hzs2 Hc2z Hzs12.
+intros * Hzs2 Hc2z Hzs12.
 remember (θ2 + angle_straight)%A as θ eqn:Hθ.
 apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
 subst θ2; rename θ into θ2.
@@ -4063,12 +4062,16 @@ apply (rngl_opp_neg_pos Hop Hor) in Hzs2, Hc2z.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Bool.not_false_iff_true.
+  intros H.
   apply Hzs12; clear Hzs12.
   now apply angle_add_le_mono_l_lemma_8.
 }
 apply (rngl_nle_gt Hor) in Hc1z.
 destruct (rngl_lt_dec Hor (rngl_sin θ1) 0)%L as [Hs1z| Hzs1]. {
   apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Bool.not_false_iff_true.
+  intros H.
   apply Hzs12; clear Hzs12.
   now apply angle_add_le_mono_l_lemma_9.
 }
@@ -4080,10 +4083,7 @@ rewrite (angle_add_add_swap Hic Hop) in Hzs12.
 rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs12.
 rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z.
 apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
-progress unfold angle_add_overflow in Haov12.
-apply angle_ltb_ge in Haov12.
-apply angle_nlt_ge in Haov12.
-apply Haov12; clear Haov12.
+progress unfold angle_add_overflow.
 rewrite (angle_add_sub_assoc Hop).
 rewrite (angle_add_add_swap Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
@@ -5329,7 +5329,9 @@ split; intros H23. {
       apply (rngl_leb_gt Hor) in Hzs3.
       destruct (rngl_lt_dec Hor (rngl_cos θ3) 0)%L as [Hc3z| Hzc3]. {
         exfalso.
-        now apply angle_add_le_mono_l_lemma_11 in Hzs13.
+        apply Bool.not_true_iff_false in Haov13.
+        apply Haov13.
+        now apply angle_add_le_mono_l_lemma_11.
       } {
         apply (rngl_nlt_ge Hor) in Hzc3.
         now apply angle_add_le_mono_l_lemma_7.
@@ -5340,7 +5342,9 @@ split; intros H23. {
     apply rngl_leb_le in H23.
     destruct (rngl_lt_dec Hor (rngl_cos θ3) 0)%L as [Hc3z| Hzc3]. {
       exfalso.
-      now apply angle_add_le_mono_l_lemma_11 in Hzs13.
+      apply Bool.not_true_iff_false in Haov13.
+      apply Haov13.
+      now apply angle_add_le_mono_l_lemma_11.
     } {
       apply (rngl_nlt_ge Hor) in Hzc3.
       now apply angle_add_le_mono_l_lemma_16.
