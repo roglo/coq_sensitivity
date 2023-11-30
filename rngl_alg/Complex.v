@@ -6018,6 +6018,17 @@ split; intros H23. {
             sin_cos_add_sub_right_hyp Hon Hop Hzs13.
             sin_cos_add_sub_right_hyp Hon Hop Hzc3.
             sin_cos_add_sub_right Hon Hop.
+rewrite (rngl_cos_sub_comm Hic Hop).
+apply rngl_cos_lt_rngl_cos_sub; try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+...
+Search (0 < rngl_sin (_ - _))%L.
+Search
+...
+Search (0 < rngl_sin (_ - _))%L.
+Search (rngl_cos _ < rngl_cos _)%L.
+Search (rngl_sin _ < rngl_sin _)%L.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
