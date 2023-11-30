@@ -5612,7 +5612,8 @@ Ltac change_angle_sub Hic Hon Hop Hed θ a :=
   remember (θ - a)%A as θ' eqn:Hθ';
   apply (angle_add_move_r Hic Hon Hop Hed) in Hθ';
   subst θ; rename θ' into θ;
-  (try rewrite (angle_add_add_swap Hic Hop) in *).
+  (try rewrite (angle_add_assoc Hop) in *);
+  (try rewrite (angle_add_add_swap Hic Hop _ a) in *).
 
 Ltac sin_cos_add_sub_right_hyp Hon Hop H :=
   destruct ac as (_, _, Hor');
@@ -5635,8 +5636,8 @@ Ltac sin_cos_add_sub_right Hon Hop :=
   try rewrite (rngl_cos_add_right_r Hon Hop);
   try rewrite (rngl_sin_sub_right_r Hon Hos');
   try rewrite (rngl_cos_sub_right_r Hon Hop);
-  try apply (rngl_opp_nonpos_nonneg Hop Hor');
-  try apply (rngl_opp_neg_pos Hop Hor');
+  try apply <- (rngl_opp_nonpos_nonneg Hop Hor');
+  try apply <- (rngl_opp_neg_pos Hop Hor');
   repeat rewrite (rngl_opp_involutive Hop);
   clear Hos' Hor'.
 
@@ -5843,6 +5844,11 @@ split; intros H23. {
           }
         } {
           apply (rngl_nle_gt Hor) in Hc2z.
+          change_angle_sub Hic Hon Hop Hed θ2 angle_right.
+          sin_cos_add_sub_right_hyp Hon Hop Hzs2.
+          sin_cos_add_sub_right_hyp Hon Hop Hc2z.
+          sin_cos_add_sub_right Hon Hop.
+(*
           remember (θ2 - angle_right)%A as θ eqn:Hθ.
           apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
           subst θ2; rename θ into θ2; move θ2 before θ3.
@@ -5850,6 +5856,7 @@ split; intros H23. {
           rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2 |-*.
           rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z.
           apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
+*)
           destruct (rngl_le_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
             now apply (angle_add_le_mono_l_lemma_34 Hic Hon Hop Hed _ _ θ3).
           } {
@@ -5898,7 +5905,7 @@ split; intros H23. {
               apply Hzs13; clear Hzs13.
               apply (rngl_nle_gt Hor) in Hc1z.
 (**)
-              change_angle_sub_right Hic Hon Hop Hed θ1.
+              change_angle_sub Hic Hon Hop Hed θ1 angle_right.
               sin_cos_add_sub_right_hyp Hon Hop Hzs12.
               sin_cos_add_sub_right_hyp Hon Hop Hc1z.
               sin_cos_add_sub_right_hyp Hon Hop Hzs1.
