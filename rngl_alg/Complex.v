@@ -5608,6 +5608,36 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
 }
 Qed.
 
+Ltac change_angle_sub_right Hic Hon Hop Hed Hor θ :=
+  remember (θ - angle_right)%A as θ' eqn:Hθ';
+  apply (angle_add_move_r Hic Hon Hop Hed) in Hθ';
+  subst θ; rename θ' into θ;
+  (try rewrite (angle_add_add_swap Hic Hop) in *).
+
+Ltac sin_cos_add_sub_right_hyp Hon Hop Hor H :=
+  assert (Hos' : rngl_has_opp_or_subt T = true) by
+    apply (rngl_has_opp_has_opp_or_subt Hop);
+  try rewrite (rngl_sin_add_right_r Hon Hos') in H;
+  try rewrite (rngl_cos_add_right_r Hon Hop) in H;
+  try rewrite (rngl_sin_sub_right_r Hon Hos') in H;
+  try rewrite (rngl_cos_sub_right_r Hon Hop) in H;
+  try apply -> (rngl_opp_nonpos_nonneg Hop Hor) in H;
+  try apply -> (rngl_opp_neg_pos Hop Hor) in H;
+  repeat rewrite (rngl_opp_involutive Hop) in H;
+  clear Hos'.
+
+Ltac sin_cos_add_sub_right Hon Hop Hor :=
+  assert (Hos' : rngl_has_opp_or_subt T = true) by
+    apply (rngl_has_opp_has_opp_or_subt Hop);
+  try rewrite (rngl_sin_add_right_r Hon Hos');
+  try rewrite (rngl_cos_add_right_r Hon Hop);
+  try rewrite (rngl_sin_sub_right_r Hon Hos');
+  try rewrite (rngl_cos_sub_right_r Hon Hop);
+  try apply (rngl_opp_nonpos_nonneg Hop Hor);
+  try apply (rngl_opp_neg_pos Hop Hor);
+  repeat rewrite (rngl_opp_involutive Hop);
+  clear Hos'.
+
 Theorem angle_add_le_mono_l_lemma_38 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -5642,6 +5672,13 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   now apply (rngl_lt_le_incl Hor).
 }
 apply (rngl_nlt_ge Hor) in Hc1z.
+(**)
+change_angle_sub_right Hic Hon Hop Hed Hor θ1.
+sin_cos_add_sub_right_hyp Hon Hop Hor Hzs13.
+sin_cos_add_sub_right_hyp Hon Hop Hor Hzs1.
+sin_cos_add_sub_right_hyp Hon Hop Hor Hc1z.
+sin_cos_add_sub_right Hon Hop Hor.
+(*
 remember (θ1 - angle_right)%A as θ.
 apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
 subst θ1; rename θ into θ1.
@@ -5650,6 +5687,7 @@ rewrite (rngl_sin_add_right_r Hon Hos) in Hzs13, Hzs1.
 rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z |-*.
 apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z.
 apply (rngl_opp_nonneg_nonpos Hop Hor).
+*)
 exfalso.
 apply Bool.not_true_iff_false in Haov13.
 apply Haov13; clear Haov13.
@@ -5857,6 +5895,13 @@ split; intros H23. {
               apply (rngl_nle_gt Hor) in Hzs13.
               apply Hzs13; clear Hzs13.
               apply (rngl_nle_gt Hor) in Hc1z.
+(**)
+              change_angle_sub_right Hic Hon Hop Hed Hor θ1.
+              sin_cos_add_sub_right_hyp Hon Hop Hor Hzs12.
+              sin_cos_add_sub_right_hyp Hon Hop Hor Hc1z.
+              sin_cos_add_sub_right_hyp Hon Hop Hor Hzs1.
+              sin_cos_add_sub_right Hon Hop Hor.
+(*
               remember (θ1 - angle_right)%A as θ.
               apply (angle_add_move_r Hic Hon Hop Hed) in Heqθ.
               subst θ1; rename θ into θ1.
@@ -5865,6 +5910,7 @@ split; intros H23. {
               rewrite (rngl_cos_add_right_r Hon Hop) in Hzs12, Hc1z |-*.
               apply (rngl_opp_neg_pos Hop Hor) in Hzs12, Hc1z.
               apply (rngl_opp_nonpos_nonneg Hop Hor).
+*)
               apply rngl_sin_add_nonneg; try easy.
               now apply (rngl_lt_le_incl Hor).
               now apply (rngl_lt_le_incl Hor).
