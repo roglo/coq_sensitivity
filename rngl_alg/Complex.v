@@ -5608,8 +5608,8 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
 }
 Qed.
 
-Ltac change_angle_sub_right Hic Hon Hop Hed θ :=
-  remember (θ - angle_right)%A as θ' eqn:Hθ';
+Ltac change_angle_sub Hic Hon Hop Hed θ a :=
+  remember (θ - a)%A as θ' eqn:Hθ';
   apply (angle_add_move_r Hic Hon Hop Hed) in Hθ';
   subst θ; rename θ' into θ;
   (try rewrite (angle_add_add_swap Hic Hop) in *).
@@ -5675,7 +5675,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
 }
 apply (rngl_nlt_ge Hor) in Hc1z.
 (**)
-change_angle_sub_right Hic Hon Hop Hed θ1.
+change_angle_sub Hic Hon Hop Hed θ1 angle_right.
 sin_cos_add_sub_right_hyp Hon Hop Hzs13.
 sin_cos_add_sub_right_hyp Hon Hop Hzs1.
 sin_cos_add_sub_right_hyp Hon Hop Hc1z.
