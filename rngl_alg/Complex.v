@@ -5646,6 +5646,7 @@ Ltac sin_cos_add_sub_right Hon Hop :=
   try apply <- (rngl_opp_nonneg_nonpos Hop Hor');
   try apply <- (rngl_opp_neg_pos Hop Hor');
   repeat rewrite (rngl_opp_involutive Hop);
+  try apply <- (rngl_le_opp_l Hop Hor');
   clear Hos' Hor'.
 
 Theorem angle_add_le_mono_l_lemma_38 :
@@ -5869,14 +5870,11 @@ split; intros H23. {
           sin_cos_add_sub_right_hyp Hon Hop Hzs13.
           sin_cos_add_sub_right Hon Hop.
           destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
-            remember (θ2 - angle_right)%A as θ eqn:Hθ.
-            apply (angle_add_move_r Hic Hon Hop Hed) in Hθ.
-            subst θ2; rename θ into θ2; move θ2 before θ3.
-            rewrite (angle_add_assoc Hop) in Hzs12 |-*.
-            rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, Hzs12.
-            rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z |-*.
-            apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
-            apply (rngl_le_opp_l Hop Hor).
+            change_angle_sub Hic Hon Hop Hed θ2 angle_right.
+            sin_cos_add_sub_right_hyp Hon Hop Hzs2.
+            sin_cos_add_sub_right_hyp Hon Hop Hzs12.
+            sin_cos_add_sub_right_hyp Hon Hop Hc2z.
+            sin_cos_add_sub_right Hon Hop.
             destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
               destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
                 apply (rngl_add_nonneg_nonneg Hor).
