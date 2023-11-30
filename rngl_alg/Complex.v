@@ -5574,6 +5574,40 @@ apply not_eq_sym in Hs12.
 now apply (rngl_lt_iff Hor).
 Qed.
 
+Theorem angle_add_le_mono_l_lemma_37 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 < rngl_sin θ1)%L
+  → (rngl_sin θ2 < 0)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → angle_add_overflow θ1 θ2 = true.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hzc2 Hzs12.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+generalize Hzs12; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+generalize Hzs1; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+apply rngl_ltb_lt.
+destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+  now apply angle_add_le_mono_l_lemma_35.
+} {
+  apply (rngl_nle_gt Hor) in Hzc1.
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
+  now apply angle_add_le_mono_l_lemma_36.
+}
+Qed.
+
 (* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
@@ -5726,28 +5760,9 @@ split; intros H23. {
               intros Hc12z.
               apply Bool.not_true_iff_false in Haov13.
               apply Haov13; clear Haov13.
-clear - ac.
-...
-              progress unfold angle_add_overflow.
-              progress unfold angle_ltb.
-              generalize Hzs13; intros H.
-              apply rngl_leb_le in H.
-              rewrite H; clear H.
-              generalize Hzs1; intros H.
-              apply (rngl_lt_le_incl Hor) in H.
-              apply rngl_leb_le in H.
-              rewrite H; clear H.
-              apply rngl_ltb_lt.
-              destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
-                now apply angle_add_le_mono_l_lemma_35.
-              } {
-                apply (rngl_nle_gt Hor) in Hzc1.
-                apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
-                now apply angle_add_le_mono_l_lemma_36.
-              }
-...
-            }
-            apply (rngl_nle_gt Hor) in Hc3z.
+              now apply angle_add_le_mono_l_lemma_37.
+            } {
+              apply (rngl_nle_gt Hor) in Hc3z.
 ...
 Search (0 ≤ rngl_sin (_ - _))%L.
 ...
