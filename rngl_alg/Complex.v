@@ -5622,6 +5622,17 @@ Ltac change_angle_sub Hic Hon Hop Hed θ a :=
   (repeat rewrite (angle_add_assoc Hop) in * );
   (repeat rewrite (angle_add_add_swap Hic Hop _ a) in * ).
 
+Ltac change_angle_sub_l Hic Hon Hop Hed θ a :=
+  remember (a - θ)%A as θ' eqn:Hθ';
+  apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ';
+  subst θ; rename θ' into θ;
+(*
+  (repeat rewrite (angle_add_assoc Hop) in * );
+  (repeat rewrite (angle_add_add_swap Hic Hop _ a) in * ).
+*)
+  (repeat rewrite (angle_add_sub_assoc Hop) in * );
+  (repeat rewrite (angle_add_sub_swap Hic Hop _ a) in * ).
+
 Ltac sin_cos_add_sub_right_hyp Hon Hop H :=
   destruct ac as (_, _, Hor');
   assert (Hos' : rngl_has_opp_or_subt T = true) by
@@ -5630,6 +5641,10 @@ Ltac sin_cos_add_sub_right_hyp Hon Hop H :=
   repeat rewrite (rngl_cos_add_right_r Hon Hop) in H;
   repeat rewrite (rngl_sin_sub_right_r Hon Hop) in H;
   repeat rewrite (rngl_cos_sub_right_r Hon Hop) in H;
+  repeat rewrite (rngl_sin_add_right_l Hon Hos') in H;
+  repeat rewrite (rngl_cos_add_right_l Hon Hop) in H;
+  repeat rewrite (rngl_sin_sub_right_l Hon Hos') in H;
+  repeat rewrite (rngl_cos_sub_right_l Hon Hop) in H;
   try apply -> (rngl_opp_nonpos_nonneg Hop Hor') in H;
   try apply -> (rngl_opp_neg_pos Hop Hor') in H;
   repeat rewrite (rngl_opp_involutive Hop) in H;
@@ -5661,6 +5676,19 @@ Ltac sin_cos_add_sub_right Hon Hop :=
   repeat rewrite (rngl_opp_involutive Hop);
   try apply <- (rngl_le_opp_l Hop Hor');
   clear Hos' Hor'.
+
+Ltac sin_cos_add_sub_straight Hon Hop :=
+  destruct ac as (_, _, Hor');
+  repeat rewrite (rngl_sin_add_straight_r Hon Hop);
+  repeat rewrite (rngl_cos_add_straight_r Hon Hop);
+  repeat rewrite (rngl_sin_sub_straight_r Hon Hop);
+  repeat rewrite (rngl_cos_sub_straight_r Hon Hop);
+  repeat apply <- (rngl_opp_nonpos_nonneg Hop Hor');
+  repeat apply <- (rngl_opp_nonneg_nonpos Hop Hor');
+  repeat apply <- (rngl_opp_neg_pos Hop Hor');
+  repeat rewrite (rngl_opp_involutive Hop);
+  try apply <- (rngl_le_opp_l Hop Hor');
+  clear Hor'.
 
 Theorem angle_add_le_mono_l_lemma_38 :
   rngl_mul_is_comm T = true →
@@ -5959,6 +5987,7 @@ split; intros H23. {
             sin_cos_add_sub_straight_hyp Hon Hop Hzs13.
             sin_cos_add_sub_straight_hyp Hon Hop Hc1z.
             sin_cos_add_sub_straight_hyp Hon Hop Hs1z.
+            sin_cos_add_sub_straight Hon Hop.
             exfalso.
             apply Bool.not_true_iff_false in Haov13.
             apply Haov13; clear Haov13.
@@ -5984,6 +6013,11 @@ split; intros H23. {
             rewrite (rngl_cos_sub_right_r Hon Hop).
             apply rngl_ltb_lt.
             apply -> (rngl_opp_lt_compat Hop Hor).
+            change_angle_sub_l Hic Hon Hop Hed θ3 angle_right.
+            sin_cos_add_sub_right_hyp Hon Hop Hzs3.
+            sin_cos_add_sub_right_hyp Hon Hop Hzs13.
+            sin_cos_add_sub_right_hyp Hon Hop Hzc3.
+            sin_cos_add_sub_right Hon Hop.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
