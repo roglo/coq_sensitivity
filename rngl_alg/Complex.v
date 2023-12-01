@@ -6018,10 +6018,22 @@ split; intros H23. {
             sin_cos_add_sub_right_hyp Hon Hop Hzs13.
             sin_cos_add_sub_right_hyp Hon Hop Hzc3.
             sin_cos_add_sub_right Hon Hop.
+...
 rewrite (rngl_cos_sub_comm Hic Hop).
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
+move Hzs12 at bottom.
+move Hzs13 at bottom.
+  cbn in Hzs13.
+  rewrite (rngl_mul_opp_r Hop) in Hzs13.
+  rewrite (rngl_add_opp_l Hop) in Hzs13.
+  apply -> (rngl_lt_0_sub Hop Hor) in Hzs13.
+...
+  rewrite (rngl_mul_comm Hic) in H12.
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
 About rngl_sin_sub_nonneg.
