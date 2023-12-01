@@ -6005,42 +6005,33 @@ split; intros H23. {
             sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
             sin_cos_add_sub_right_hyp Hic Hon Hop Hzc3.
             sin_cos_add_sub_right_goal Hic Hon Hop.
-...
-rewrite (rngl_cos_sub_comm Hic Hop).
-apply rngl_cos_lt_rngl_cos_sub; try easy.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-move Hzs12 at bottom.
-move Hzs13 at bottom.
-  cbn in Hzs13.
-  rewrite (rngl_mul_opp_r Hop) in Hzs13.
-  rewrite (rngl_add_opp_l Hop) in Hzs13.
-  apply -> (rngl_lt_0_sub Hop Hor) in Hzs13.
-...
-  rewrite (rngl_mul_comm Hic) in H12.
-...
-Search (rngl_cos _ < rngl_cos _)%L.
-...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-...
-About rngl_sin_sub_nonneg.
-rngl_sin_sub_nonneg :
-∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-  angle_ctx T
-  → rngl_mul_is_comm T = true
-    → rngl_has_1 T = true
-      → rngl_has_opp T = true
-        → rngl_has_eq_dec T = true
-          → ∀ θ1 θ2 : angle T,
-              (0 ≤ rngl_sin θ1)%L
-              → (0 ≤ rngl_sin θ2)%L → (rngl_cos θ1 ≤ rngl_cos θ2)%L → (0 ≤ rngl_sin (θ1 - θ2))%L
-..
-Search (0 < rngl_sin (_ - _))%L.
-Search
-...
-Search (0 < rngl_sin (_ - _))%L.
-Search (rngl_cos _ < rngl_cos _)%L.
-Search (rngl_sin _ < rngl_sin _)%L.
+            rewrite (rngl_cos_sub_comm Hic Hop).
+            apply rngl_cos_lt_rngl_cos_sub; try easy.
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            move Hzs12 at bottom.
+            move Hzs13 at bottom.
+            Search (0 ≤ rngl_sin (_ - _))%L.
+            Check rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le.
+            apply (rngl_lt_iff Hor).
+            split.
+            apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            now apply (rngl_lt_le_incl Hor).
+            intros H.
+            apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+            destruct H; subst θ1. {
+              rewrite (angle_sub_diag Hic Hon Hop Hed) in Hzs13.
+              now apply (rngl_lt_irrefl Hor) in Hzs13.
+            }
+            cbn in Hs1z.
+            apply (rngl_opp_pos_neg Hop Hor) in Hs1z.
+            apply (rngl_lt_le_incl Hor) in Hs1z.
+            now apply (rngl_nlt_ge Hor) in Hs1z.
+          }
+          apply (rngl_nle_gt Hor) in Hzc2.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
