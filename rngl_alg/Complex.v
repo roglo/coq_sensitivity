@@ -5438,6 +5438,7 @@ Ltac sin_cos_add_sub_right_hyp Hic Hon Hop H :=
   repeat rewrite (angle_add_add_swap Hic Hop _ angle_right) in H;
   repeat rewrite (angle_add_sub_swap Hic Hop _ angle_right) in H;
   repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_right) in H;
+  repeat rewrite <- (angle_sub_sub_distr Hic Hop angle_right) in H;
   destruct ac as (_, _, Hor');
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop);
@@ -5479,9 +5480,12 @@ Ltac sin_cos_add_sub_right_goal Hic Hon Hop :=
   repeat rewrite (angle_add_add_swap Hic Hop _ angle_right);
   repeat rewrite (angle_add_sub_swap Hic Hop _ angle_right);
   repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_right);
+  repeat rewrite <- (angle_sub_sub_distr Hic Hop angle_right);
   destruct ac as (_, _, Hor');
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop);
+  repeat rewrite -> (rngl_sin_sub_right_l Hon Hos');
+  repeat rewrite -> (rngl_cos_sub_right_l Hon Hop);
   repeat rewrite (rngl_sin_add_right_r Hon Hos');
   repeat rewrite (rngl_cos_add_right_r Hon Hop);
   repeat rewrite (rngl_sin_sub_right_r Hon Hop);
@@ -6321,6 +6325,58 @@ Check angle_add_le_mono_l_lemma_19.
             apply (rngl_le_sub_0 Hop Hor).
             destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
               destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+(*
+                change_angle_sub_l Hic Hon Hop Hed θ3 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs3.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc3z.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+...
+                change_angle_sub_l Hic Hon Hop Hed θ2 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs2.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc2z.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+*)
+                change_angle_sub_l Hic Hon Hop Hed θ1 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzc1.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs1.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                apply (rngl_nlt_ge Hor).
+                intros Hc12s13.
+                apply Bool.not_true_iff_false in Haov13.
+                apply Haov13; clear Haov13.
+                progress unfold angle_add_overflow.
+                rewrite (angle_add_sub_assoc Hop).
+                rewrite <- (angle_add_sub_swap Hic Hop).
+                rewrite (angle_add_comm Hic).
+                rewrite (angle_add_sub_swap Hic Hop).
+                rewrite (angle_add_sub_swap Hic Hop).
+                rewrite <- (angle_sub_sub_distr Hic Hop).
+                rewrite (angle_straight_sub_right Hon Hop).
+                progress unfold angle_ltb.
+                rewrite (rngl_sin_sub_right_r Hon Hop).
+                rewrite (rngl_cos_sub_comm Hic Hop).
+                generalize Hzs13; intros H.
+                apply (rngl_opp_lt_compat Hop Hor) in H.
+                rewrite (rngl_opp_0 Hop) in H.
+                apply (rngl_nle_gt Hor) in H.
+                apply rngl_leb_nle in H.
+                rewrite H; clear H.
+                rewrite (rngl_sin_sub_right_l Hon Hos).
+                generalize Hzs1; intros H.
+                apply rngl_leb_le in H.
+                rewrite H; clear H.
+(* ah merde *)
+...
+                apply rngl_ltb_lt.
+                sin_cos_add_sub_straight_goal Hic Hon Hop.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                apply (rngl_add_pos_nonneg Hor); [ | easy ].
+                apply (rngl_sin_add_pos_1 Hic Hon Hop Hed); try easy.
+                now apply (rngl_lt_le_incl Hor).
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
