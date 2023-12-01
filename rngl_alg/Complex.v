@@ -5626,10 +5626,6 @@ Ltac change_angle_sub_l Hic Hon Hop Hed θ a :=
   remember (a - θ)%A as θ' eqn:Hθ';
   apply (angle_sub_move_l Hic Hon Hop Hed) in Hθ';
   subst θ; rename θ' into θ;
-(*
-  (repeat rewrite (angle_add_assoc Hop) in * );
-  (repeat rewrite (angle_add_add_swap Hic Hop _ a) in * ).
-*)
   (repeat rewrite (angle_add_sub_assoc Hop) in * );
   (repeat rewrite (angle_add_sub_swap Hic Hop _ a) in * ).
 
@@ -5707,6 +5703,25 @@ intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Haov13 Hzs1 Hzs3 Hc3z Hzs13.
+(*
+set (a := angle_straight).
+  remember (θ1 + a)%A as θ' eqn:Hθ'.
+  apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ'.
+  subst θ1; rename θ' into θ1.
+  (try rewrite (angle_add_sub_assoc Hop) in * ).
+  repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ a ) in *.
+  repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ a ) in *.
+...
+  (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ a ) in * ).
+  (try rewrite <- (angle_add_sub_swap Hic Hop _ a ) in * ).
+  (try rewrite <- (angle_add_sub_swap Hic Hop _ _ a) in * ).
+...
+change_angle_add Hic Hon Hop Hed θ1 angle_straight.
+...
+sin_cos_add_sub_straight_hyp Hon Hop Hzs1.
+sin_cos_add_sub_straight_hyp Hon Hop Hzs13.
+...
+*)
 remember (θ3 + angle_straight)%A as θ eqn:Hθ.
 apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
 subst θ3; rename θ into θ3.
