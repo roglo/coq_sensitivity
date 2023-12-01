@@ -5705,6 +5705,17 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Haov13 Hzs1 Hzs3 Hc3z Hzs13.
 (*
 change_angle_add Hic Hon Hop Hed θ1 angle_straight.
+  (repeat rewrite (angle_add_sub_assoc Hop) in Hzs13 );
+  (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ _) in Hzs13 ).
+(* mettre ces deux repeat pour chaque hypothèses et but, donc dans
+     sin_cos_add_sub_straight_hyp
+   et
+     sin_cos_add_sub_straight
+*)
+...
+  (repeat rewrite (angle_add_sub_assoc Hop) in * );
+  (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ _) in * ).
+...
   (repeat rewrite (angle_add_sub_assoc Hop) in * );
   (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_straight) in * ).
 ...
