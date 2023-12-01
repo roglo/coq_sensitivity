@@ -1903,7 +1903,7 @@ rewrite (angle_sub_diag Hic Hon Hop Hed).
 apply (angle_add_0_r Hon Hos).
 Qed.
 
-Theorem rngl_sin_nonneg_cos_le_sin_sub_nonneg :
+Theorem rngl_sin_sub_nonneg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1929,26 +1929,19 @@ destruct zc1. {
   apply (rngl_le_0_sub Hop Hor).
   rewrite (rngl_mul_comm Hic).
   now apply (rngl_mul_le_compat_nonneg Hop Hor).
-}
-apply (rngl_leb_gt Hor) in Hzc1.
-remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
-symmetry in Hzc2.
-destruct zc2; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzc2; cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite rngl_add_comm.
-rewrite (rngl_add_opp_r Hop).
-apply (rngl_le_0_sub Hop Hor).
-rewrite (rngl_mul_comm Hic).
-(* a lemma, perhaps? *)
-apply (rngl_opp_le_compat Hop Hor).
-do 2 rewrite <- (rngl_mul_opp_r Hop).
-apply (rngl_mul_le_compat_nonneg Hop Hor); [ easy | ].
-split. {
-  apply (rngl_opp_nonneg_nonpos Hop Hor).
-  now apply (rngl_lt_le_incl Hor).
 } {
-  now apply -> (rngl_opp_le_compat Hop Hor).
+  apply (rngl_leb_gt Hor) in Hzc1.
+  remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
+  symmetry in Hzc2.
+  destruct zc2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzc2; cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite rngl_add_comm.
+  rewrite (rngl_add_opp_r Hop).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_le_incl Hor) in Hzc2.
+  now apply (rngl_mul_le_compat_nonpos_nonneg Hop Hor).
 }
 Qed.
 
@@ -1986,7 +1979,7 @@ apply Hzs2; clear Hzs2.
 symmetry in Hθ3.
 apply (angle_add_sub_eq_l Hic Hon Hop Hed) in Hθ3.
 subst θ2.
-now apply (rngl_sin_nonneg_cos_le_sin_sub_nonneg Hic Hon Hop Hed).
+now apply (rngl_sin_sub_nonneg Hic Hon Hop Hed).
 Qed.
 
 Theorem angle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A = false ↔ (θ2 < θ1)%A.
@@ -3129,6 +3122,7 @@ apply (rngl_add_le_mono_r Hop Hor).
 now apply rngl_cos_bound.
 Qed.
 
+(*
 Theorem rngl_sin_sub_nonneg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3143,6 +3137,12 @@ Theorem rngl_sin_sub_nonneg :
   → (0 ≤ rngl_sin (θ2 - θ1))%L.
 Proof.
 intros Hic Hon Hop Hed * Hzs1 Hzs2 Hzc1 Hzc2 Hc21.
+...
+Theorem rngl_sin_sub_nonneg :
+Check rngl_sin_nonneg_cos_le_sin_sub_nonneg.
+...
+apply rngl_sin_nonneg_cos_le_sin_sub_nonneg; try easy.
+...
 destruct ac as (Hiv, Hc2, Hor).
 apply (rngl_nlt_ge Hor) in Hc21.
 apply (rngl_nlt_ge Hor).
@@ -3185,6 +3185,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 easy.
 Qed.
+*)
 
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   rngl_mul_is_comm T = true →
@@ -3723,7 +3724,6 @@ destruct zs1. {
       intros H.
       apply Hzs12; clear Hzs12.
       apply rngl_sin_sub_nonneg; try easy.
-      now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
     }

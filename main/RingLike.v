@@ -2518,6 +2518,23 @@ split; intros Ha. {
 }
 Qed.
 
+Theorem rngl_mul_le_compat_nonpos_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c d,
+  (0 ≤ c ≤ a)%L
+  → (b ≤ d ≤ 0)%L
+  → (a * b ≤ c * d)%L.
+Proof.
+intros Hop Hor * Had Hcd.
+apply (rngl_opp_le_compat Hop Hor).
+do 2 rewrite <- (rngl_mul_opp_r Hop).
+apply (rngl_mul_le_compat_nonneg Hop Hor); [ easy | ].
+split.
+now apply (rngl_opp_nonneg_nonpos Hop Hor).
+now apply -> (rngl_opp_le_compat Hop Hor).
+Qed.
+
 Arguments rngl_mul_nat {T ro} a%L n%nat.
 
 Theorem rngl_mul_nat_mul_nat_1 :

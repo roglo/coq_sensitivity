@@ -4662,7 +4662,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   apply (rngl_nlt_ge Hor).
   intros H.
   apply (rngl_lt_le_incl Hor) in H.
-  apply rngl_sin_nonneg_cos_le_sin_sub_nonneg in H; try easy. {
+  apply rngl_sin_sub_nonneg in H; try easy. {
     rewrite (angle_sub_sub_distr Hic Hop) in H.
     rewrite (angle_sub_sub_swap Hic Hop) in H.
     rewrite (angle_sub_add Hic Hon Hop Hed) in H.
@@ -6022,7 +6022,20 @@ rewrite (rngl_cos_sub_comm Hic Hop).
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
+Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
+About rngl_sin_sub_nonneg.
+rngl_sin_sub_nonneg :
+∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+  angle_ctx T
+  → rngl_mul_is_comm T = true
+    → rngl_has_1 T = true
+      → rngl_has_opp T = true
+        → rngl_has_eq_dec T = true
+          → ∀ θ1 θ2 : angle T,
+              (0 ≤ rngl_sin θ1)%L
+              → (0 ≤ rngl_sin θ2)%L → (rngl_cos θ1 ≤ rngl_cos θ2)%L → (0 ≤ rngl_sin (θ1 - θ2))%L
+..
 Search (0 < rngl_sin (_ - _))%L.
 Search
 ...
