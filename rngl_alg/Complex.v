@@ -5492,6 +5492,7 @@ Ltac sin_cos_add_sub_right_goal Hic Hon Hop :=
   clear Hos' Hor'.
 
 Ltac sin_cos_add_sub_straight_goal Hic Hon Hop :=
+  repeat rewrite -> (angle_add_sub_assoc Hop);
   repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_straight);
   destruct ac as (_, _, Hor');
   repeat rewrite (rngl_sin_add_straight_r Hon Hop);
@@ -6075,12 +6076,37 @@ split; intros H23. {
               apply (rngl_nle_gt Hor) in Hs1z.
 (**)
               destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+                exfalso.
                 change_angle_add_r Hic Hon Hop Hed θ1 angle_straight.
                 sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs12.
                 sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs13.
                 sin_cos_add_sub_straight_hyp Hic Hon Hop Hc1z.
                 sin_cos_add_sub_straight_hyp Hic Hon Hop Hs1z.
+                apply Bool.not_true_iff_false in Haov13.
+                apply Haov13; clear Haov13.
+                progress unfold angle_add_overflow.
+                rewrite (angle_add_sub_assoc Hop).
+                rewrite <- (angle_add_sub_swap Hic Hop).
+                rewrite (angle_sub_sub_swap Hic Hop).
+                progress unfold angle_ltb.
+                do 2 rewrite (rngl_sin_sub_straight_r Hon Hop).
+                rewrite (rngl_sin_sub_right_r Hon Hop).
+                rewrite (rngl_opp_involutive Hop).
+                generalize Hzs13; intros H.
+                apply (rngl_nle_gt Hor) in H.
+                apply rngl_leb_nle in H.
+                rewrite H; clear H.
+                generalize Hs1z; intros H.
+                apply (rngl_opp_lt_compat Hop Hor) in H.
+                rewrite (rngl_opp_0 Hop) in H.
+                apply (rngl_nle_gt Hor) in H.
+                apply rngl_leb_nle in H.
+                rewrite H; clear H.
+                apply rngl_ltb_lt.
                 sin_cos_add_sub_straight_goal Hic Hon Hop.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                apply (rngl_lt_0_sub Hop Hor).
+Search (rngl_cos _ < rngl_sin (_ + _))%L.
 ...
                 apply rngl_sin_add_nonneg; try easy.
                 now apply (rngl_lt_le_incl Hor).
