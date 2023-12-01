@@ -5704,6 +5704,14 @@ destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Haov13 Hzs1 Hzs3 Hc3z Hzs13.
 (*
+change_angle_add Hic Hon Hop Hed θ1 angle_straight.
+  (repeat rewrite (angle_add_sub_assoc Hop) in * );
+  (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_straight) in * ).
+...
+  (repeat rewrite (angle_add_sub_assoc Hop) in Hzs13 );
+  (repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_straight) in Hzs13 ).
+...
+...
 set (a := angle_straight).
   remember (θ1 + a)%A as θ' eqn:Hθ'.
   apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ'.
