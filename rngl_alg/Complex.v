@@ -5487,6 +5487,7 @@ Ltac sin_cos_add_sub_right_goal Hic Hon Hop :=
   repeat apply <- (rngl_opp_neg_pos Hop Hor');
   repeat rewrite (rngl_opp_involutive Hop);
   try apply <- (rngl_le_opp_l Hop Hor');
+  try apply <- (rngl_le_opp_r Hop Hor');
   try apply <- (rngl_lt_opp_l Hop Hor');
   clear Hos' Hor'.
 
@@ -5503,6 +5504,8 @@ Ltac sin_cos_add_sub_straight_goal Hic Hon Hop :=
   repeat rewrite (rngl_opp_involutive Hop);
   try apply <- (rngl_le_opp_l Hop Hor');
   try apply <- (rngl_lt_opp_l Hop Hor');
+  try rewrite (rngl_add_opp_r Hop);
+  try apply <- (rngl_le_0_sub Hop Hor');
   clear Hor'.
 
 Theorem angle_add_le_mono_l_lemma_34 :
@@ -6048,6 +6051,53 @@ split; intros H23. {
             now apply angle_add_le_mono_l_lemma_39.
           } {
             apply (rngl_nle_gt Hor) in Hzc2.
+            destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
+              exfalso.
+              destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+                apply (rngl_nle_gt Hor) in Hzs13.
+                apply Hzs13; clear Hzs13.
+                change_angle_sub_r Hic Hon Hop Hed θ1 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc1z.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs1.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                apply rngl_sin_add_nonneg; try easy.
+                now apply (rngl_lt_le_incl Hor).
+              } {
+                apply (rngl_nle_gt Hor) in Hzc1.
+                apply (rngl_nle_gt Hor) in Hzs12.
+                apply Hzs12; clear Hzs12.
+                apply rngl_sin_add_nonneg; try easy.
+                now apply (rngl_lt_le_incl Hor).
+                now apply (rngl_lt_le_incl Hor).
+              }
+            } {
+              apply (rngl_nle_gt Hor) in Hs1z.
+(**)
+              destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+                change_angle_add_r Hic Hon Hop Hed θ1 angle_straight.
+                sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs13.
+                sin_cos_add_sub_straight_hyp Hic Hon Hop Hc1z.
+                sin_cos_add_sub_straight_hyp Hic Hon Hop Hs1z.
+                sin_cos_add_sub_straight_goal Hic Hon Hop.
+...
+                apply rngl_sin_add_nonneg; try easy.
+                now apply (rngl_lt_le_incl Hor).
+              } {
+                apply (rngl_nle_gt Hor) in Hzc1.
+                apply (rngl_nle_gt Hor) in Hzs12.
+                apply Hzs12; clear Hzs12.
+                apply rngl_sin_add_nonneg; try easy.
+                now apply (rngl_lt_le_incl Hor).
+                now apply (rngl_lt_le_incl Hor).
+              }
+...
+              exfalso.
+              change_angle_add_r Hic Hon Hop Hed θ1 angle_right.
+              sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+              sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+              sin_cos_add_sub_right_hyp Hic Hon Hop Hs1z.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
