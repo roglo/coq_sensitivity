@@ -6344,8 +6344,18 @@ Check angle_add_le_mono_l_lemma_19.
                 sin_cos_add_sub_right_hyp Hic Hon Hop Hzc1.
                 sin_cos_add_sub_right_hyp Hic Hon Hop Hzs1.
                 sin_cos_add_sub_right_goal Hic Hon Hop.
+                rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+                apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
                 apply (rngl_nlt_ge Hor).
                 intros Hc12s13.
+                rename Hzs13 into Hzc13.
+                assert (Hzs13 : (0 < rngl_sin (θ1 - θ3))%L). {
+                  eapply (rngl_le_lt_trans Hor); [ | apply Hc12s13 ].
+                  apply (rngl_lt_le_incl Hor) in Hc2z.
+                  now apply (rngl_cos_sub_nonneg Hop).
+                }
+                move Hzs12 before Hzs13.
+...
                 apply Bool.not_true_iff_false in Haov13.
                 apply Haov13; clear Haov13.
                 progress unfold angle_add_overflow.
