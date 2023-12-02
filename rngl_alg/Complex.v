@@ -6492,6 +6492,11 @@ split; intros H23. {
     }
   }
   destruct zs3; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
+  apply rngl_leb_le in H23.
+  destruct zs13. {
+    exfalso.
+    apply rngl_leb_le in Hzs13.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
