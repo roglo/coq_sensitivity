@@ -6569,6 +6569,7 @@ split; intros H23. {
           now apply (rngl_lt_le_incl Hor) in Hzc1.
           apply (rngl_le_trans Hor _ (rngl_sin θ2)); [ | easy ].
           now apply (rngl_lt_le_incl Hor) in Hzc2.
+...
           apply angle_add_le_mono_l_lemma_39; try easy.
           apply not_eq_sym in Hs1z.
           now apply (rngl_lt_iff Hor).
@@ -6580,6 +6581,14 @@ split; intros H23. {
           intros H; symmetry in H.
           apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
           destruct H as [H| H]. {
+            apply (angle_sub_move_l Hic Hon Hop Hed) in H.
+            rewrite (angle_sub_0_r Hon Hop) in H.
+            subst θ3.
+...
+            rewrite (angle_sub_diag Hic Hon Hop Hed) in Hzs13.
+  cbn in Hc2z.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
+  now apply (rngl_nlt_ge Hor) in Hc2z.
 ...
           now apply (rngl_lt_le_incl Hor).
 Search (rngl_cos _ < rngl_cos _)%L.
