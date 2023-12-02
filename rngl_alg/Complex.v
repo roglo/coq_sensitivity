@@ -6497,6 +6497,23 @@ split; intros H23. {
   destruct zs13. {
     exfalso.
     apply rngl_leb_le in Hzs13.
+    apply Bool.not_true_iff_false in Haov13.
+    apply Haov13; clear Haov13.
+    progress unfold angle_add_overflow.
+    progress unfold angle_ltb.
+    generalize Hzs13; intros H.
+    apply rngl_leb_le in H.
+    rewrite H; clear H.
+    destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
+      apply (rngl_nle_gt Hor) in Hs1z.
+      apply rngl_leb_nle in Hs1z.
+      now rewrite Hs1z.
+    } {
+      apply (rngl_nlt_ge Hor) in Hzs1.
+      generalize Hzs1; intros H.
+      apply rngl_leb_le in H.
+      rewrite H; clear H.
+      apply rngl_ltb_lt.
 ...
 intros Hic Hon Hop Hed * Haov12 Haov13.
 split; intros H23. {
