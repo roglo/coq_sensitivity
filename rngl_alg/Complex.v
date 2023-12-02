@@ -6522,19 +6522,49 @@ split; intros H23. {
         rewrite (angle_add_opp_l Hic).
         rewrite (angle_sub_diag Hic Hon Hop Hed).
         apply (rngl_lt_iff Hor).
-        split. {
-          apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
-        }
+        split; [ apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor) | ].
         intros H.
         cbn in H.
         apply (eq_rngl_cos_1 Hic Hon Hop Hed) in H.
         subst θ3.
         now apply (rngl_lt_irrefl Hor) in Hzs3.
       }
+(**)
+      rewrite (angle_sub_opp_r Hop) in Hzs13, Hzs12 |-*.
+      rewrite <- (angle_add_assoc Hop) in Hzs13, Hzs12 |-*.
+      rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs13, Hzs12.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+      do 2 rewrite (rngl_cos_add_straight_l Hon Hop).
+      apply -> (rngl_opp_lt_compat Hop Hor).
+...
+      rewrite (angle_sub_opp_r Hop) in Hzs12.
+      rewrite <- (angle_add_assoc Hop) in Hzs12.
+      rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
+
+      exfalso.
+      apply (rngl_nlt_ge Hor) in Hzs13.
+      apply Hzs13; clear Hzs13.
+cbn.
+(*
+  0 < 2 . sin θ3 . cos θ3
+*)
+...
+cbn.
+...
+      apply (rngl_opp_lt_compat Hop Hor).
+      rewrite (rngl_opp_0 Hop).
+      rewrite <- rngl_sin_opp.
+      rewrite (angle_opp_add_distr Hic Hop).
+...
       rewrite (angle_sub_opp_r Hop).
       rewrite <- (angle_add_assoc Hop).
       do 2 rewrite (rngl_cos_add_straight_l Hon Hop).
       apply -> (rngl_opp_lt_compat Hop Hor).
+      rewrite (angle_sub_opp_r Hop) in Haov12, Hzs13, Hzs12.
+      rewrite <- (angle_add_assoc Hop) in Hzs13, Hzs12.
+      rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs13, Hzs12.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+      apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
 ...
       cbn.
       do 2 rewrite fold_rngl_squ.
@@ -6549,12 +6579,20 @@ split; intros H23. {
       progress unfold rngl_squ.
       rewrite rngl_mul_assoc.
       rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+      apply (rngl_lt_le_trans Hor _ (rngl_cos θ3)
+        rewrite (rngl_mul_1_l Hon).
+        apply (rngl_le_refl Hor).
+      }
+...
       apply (rngl_lt_le_trans Hor _ (1 * 1)%L). 2: {
         rewrite (rngl_mul_1_l Hon).
         apply (rngl_le_refl Hor).
       }
       rewrite (rngl_mul_comm Hic).
+Search (_ * _ < _ * _)%L.
+...
       apply (rngl_mul_lt_mono_nonneg Hop Hor Hii).
+...
 Search (_ * _ < _ * _)%L.
 ...
 Search (_ * _ = _ * 2)%L.
