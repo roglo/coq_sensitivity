@@ -6098,8 +6098,7 @@ sin_cos_add_sub_right_hyp Hic Hon Hop Hc12s13.
 rewrite (angle_add_comm Hic) in Hc12s13.
 apply (rngl_nle_gt Hor) in Hc12s13.
 apply Hc12s13; clear Hc12s13.
-destruct (rngl_le_dec Hor (rngl_cos θ3) (rngl_cos θ2))
-    as [Hc32| Hc23]. {
+destruct (rngl_le_dec Hor (rngl_cos θ3) (rngl_cos θ2)) as [Hc32| Hc23]. {
   cbn.
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_add_opp_l Hop).
@@ -6382,6 +6381,48 @@ split; intros H23. {
                 now apply angle_add_le_mono_l_lemma_42.
               } {
                 apply (rngl_nle_gt Hor) in Hc1z.
+                change_angle_sub_r Hic Hon Hop Hed θ1 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc1z.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs1.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                change_angle_sub_l Hic Hon Hop Hed θ2 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs2.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc2z.
+                sin_cos_add_sub_right_goal Hic Hon Hop.
+                destruct (rngl_le_dec Hor (rngl_cos θ2) (rngl_cos θ3))
+                    as [Hc23| Hc32]. {
+                  cbn.
+                  rewrite (rngl_mul_opp_r Hop).
+                  rewrite (rngl_sub_add_distr Hos).
+                  rewrite (rngl_sub_opp_r Hop).
+                  rewrite rngl_add_add_swap.
+                  rewrite <- (rngl_add_sub_assoc Hop).
+                  rewrite <- (rngl_mul_sub_distr_l Hop).
+                  apply (rngl_add_nonneg_nonneg Hor).
+                  apply (rngl_add_nonneg_nonneg Hor).
+                  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+                  now apply (rngl_lt_le_incl Hor).
+                  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+                  apply (rngl_mul_nonneg_nonneg Hop Hor).
+                  now apply (rngl_lt_le_incl Hor).
+                  now apply (rngl_le_0_sub Hop Hor).
+                }
+                apply (rngl_nle_gt Hor) in Hc32.
+                apply (rngl_le_0_sub Hop Hor).
+...
+                apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
+                apply (rngl_sin_add_nonneg Hop); try easy.
+                now apply (rngl_lt_le_incl Hor).
+...
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+apply (rngl_sin_add_nonneg Hop); try easy.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite (angle_add_comm Hic θ1).
+rewrite (angle_add_sub Hic Hon Hop Hed).
+now apply (rngl_sin_add_nonneg Hop).
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Search (rngl_sin _ ≤ rngl_sin _)%L.
