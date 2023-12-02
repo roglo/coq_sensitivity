@@ -5433,19 +5433,25 @@ Ltac change_angle_sub_l Hic Hon Hop Hed θ a :=
   subst θ; rename θ' into θ.
 
 Ltac sin_cos_add_sub_right_hyp Hic Hon Hop H :=
-  repeat rewrite (angle_add_assoc Hop) in H;
-  repeat rewrite (angle_add_sub_assoc Hop) in H;
+  repeat rewrite -> (angle_add_assoc Hop _ _ angle_right) in H;
+  repeat rewrite -> (angle_add_sub_assoc Hop _ angle_right) in H;
+  repeat rewrite -> (angle_add_sub_assoc Hop _ _ angle_right) in H;
   repeat rewrite (angle_add_add_swap Hic Hop _ angle_right) in H;
   repeat rewrite (angle_add_sub_swap Hic Hop _ angle_right) in H;
   repeat rewrite <- (angle_add_sub_swap Hic Hop _ _ angle_right) in H;
   repeat rewrite <- (angle_sub_sub_distr Hic Hop angle_right) in H;
+  repeat rewrite -> (angle_sub_sub_distr Hic Hop _ angle_right) in H;
+  repeat rewrite <- (angle_sub_add_distr Hic Hop angle_right) in H;
+  repeat rewrite -> (angle_sub_add_distr Hic Hop _ _ angle_right) in H;
+  repeat rewrite -> (angle_add_comm Hic (_ - angle_right))%A in H;
+  repeat rewrite -> (angle_add_sub_assoc Hop _ _ angle_right)%A in H;
   destruct ac as (_, _, Hor');
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop);
   repeat rewrite (rngl_sin_add_right_r Hon Hos') in H;
   repeat rewrite (rngl_cos_add_right_r Hon Hop) in H;
   repeat rewrite (rngl_sin_sub_right_r Hon Hop) in H;
-  repeat rewrite (rngl_cos_sub_right_r Hon Hop) in H;
+  repeat rewrite -> (rngl_cos_sub_right_r Hon Hop) in H;
   repeat rewrite (rngl_sin_add_right_l Hon Hos') in H;
   repeat rewrite (rngl_cos_add_right_l Hon Hop) in H;
   repeat rewrite (rngl_sin_sub_right_l Hon Hos') in H;
@@ -6355,6 +6361,12 @@ Check angle_add_le_mono_l_lemma_19.
                   now apply (rngl_cos_sub_nonneg Hop).
                 }
                 move Hzs12 before Hzs13.
+                change_angle_sub_l Hic Hon Hop Hed θ2 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs2.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc2z.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc12s13.
+                rewrite (angle_add_comm Hic) in Hc12s13.
 ...
                 apply Bool.not_true_iff_false in Haov13.
                 apply Haov13; clear Haov13.
