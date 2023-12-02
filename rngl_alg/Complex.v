@@ -6367,7 +6367,42 @@ Check angle_add_le_mono_l_lemma_19.
                 sin_cos_add_sub_right_hyp Hic Hon Hop Hc2z.
                 sin_cos_add_sub_right_hyp Hic Hon Hop Hc12s13.
                 rewrite (angle_add_comm Hic) in Hc12s13.
+(**)
+                apply (rngl_nle_gt Hor) in Hc12s13.
+                apply Hc12s13; clear Hc12s13.
+                destruct (rngl_le_dec Hor (rngl_cos θ3) (rngl_cos θ2))
+                    as [Hc32| Hc23]. {
+                  cbn.
+                  rewrite (rngl_mul_opp_r Hop).
+                  rewrite (rngl_add_opp_l Hop).
+                  apply (rngl_le_sub_le_add_l Hop Hor).
+                  rewrite rngl_add_assoc.
+                  apply (rngl_le_0_sub Hop Hor).
+                  rewrite <- (rngl_add_sub_assoc Hop).
+                  rewrite <- (rngl_mul_sub_distr_l Hop).
+                  rewrite <- rngl_mul_add_distr_l.
+                  apply (rngl_add_nonneg_nonneg Hor).
+                  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+                  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+                  now apply (rngl_lt_le_incl Hor).
+                  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+                  now apply (rngl_le_0_sub Hop Hor).
+                }
+                apply (rngl_nle_gt Hor) in Hc23.
 ...
+                change_angle_sub_l Hic Hon Hop Hed θ3 angle_right.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzc13.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs3.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc3z.
+                sin_cos_add_sub_right_hyp Hic Hon Hop Hc12s13.
+                apply (rngl_lt_opp_r Hop Hor) in Hc12s13.
+                apply (rngl_nle_gt Hor) in Hc12s13.
+                apply Hc12s13; clear Hc12s13.
+...
+  ============================
+  (0 ≤ rngl_sin (θ1 + θ2) + rngl_cos (θ3 + θ1))%L
+......
                 apply Bool.not_true_iff_false in Haov13.
                 apply Haov13; clear Haov13.
                 progress unfold angle_add_overflow.
