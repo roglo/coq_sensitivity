@@ -6664,6 +6664,33 @@ cbn in Hs13.
             apply (rngl_le_trans Hor _ (rngl_sin θ2)); [ | easy ].
             now apply (rngl_lt_le_incl Hor) in Hzc2.
           }
+          apply angle_add_le_mono_l_lemma_39; try easy. {
+            apply not_eq_sym in Hs1z.
+            now apply (rngl_lt_iff Hor).
+          } {
+            now apply (rngl_lt_le_incl Hor) in Hzs3.
+          } {
+            now apply (rngl_lt_le_incl Hor) in Hzc1.
+          } {
+            now apply (rngl_lt_le_incl Hor) in Hzc3.
+          } {
+            apply (rngl_lt_iff Hor).
+            split; [ easy | ].
+            intros H; symmetry in H.
+            apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+            destruct H as [H| H]. {
+              apply (angle_sub_move_l Hic Hon Hop Hed) in H.
+              rewrite (angle_sub_0_r Hon Hop) in H.
+              now subst θ3.
+            }
+            apply (angle_sub_move_l Hic Hon Hop Hed) in H.
+            subst θ3.
+            sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs3.
+            now apply (rngl_nle_gt Hor) in Hzs3.
+          }
+        }
+      }
+      apply (rngl_nlt_ge Hor) in Hc2z.
 ...
 (*
       apply (rngl_opp_lt_compat Hop Hor).
@@ -6917,75 +6944,6 @@ rewrite (rngl_cos_sub_right_r Hon Hop).
           now apply (rngl_lt_le_incl Hor).
 Search (rngl_cos _ < rngl_cos _)%L.
 ...
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ θ1 θ2 : angle T,
-            (0 < rngl_sin θ1)%L
-            → (0 ≤ rngl_sin θ2)%L
-              → (0 ≤ rngl_cos θ1)%L
-                → (0 ≤ rngl_cos θ2)%L
-                  → (0 < rngl_sin (θ1 - θ2))%L → (rngl_cos θ1 < rngl_cos θ2)%L
-angle_add_le_mono_l_lemma_36:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ θ1 θ2 : angle T,
-            (0 ≤ rngl_sin θ1)%L
-            → (rngl_sin θ2 < 0)%L
-              → (0 ≤ rngl_cos θ1)%L
-                → (0 ≤ rngl_cos θ2)%L
-                  → (0 ≤ rngl_sin (θ1 + θ2))%L
-                    → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L
-rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T
-    → rngl_mul_is_comm T = true
-      → rngl_has_1 T = true
-        → rngl_has_opp T = true
-          → rngl_has_eq_dec T = true
-            → ∀ θ1 θ2 : angle T,
-                (0 ≤ rngl_sin θ1)%L
-                → (0 ≤ rngl_sin θ2)%L
-                  → (0 ≤ rngl_cos θ1)%L
-                    → (0 ≤ rngl_cos θ2)%L
-                      → (rngl_sin θ1 < rngl_sin θ2)%L
-                        ↔ (rngl_cos θ2 < rngl_cos θ1)%L
-rngl_cos_lt_rngl_cos_sub:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T
-    → rngl_mul_is_comm T = true
-      → rngl_has_1 T = true
-        → rngl_has_opp T = true
-          → rngl_has_eq_dec T = true
-            → ∀ θ1 θ2 : angle T,
-                (0 ≤ rngl_sin θ1)%L
-                → (0 < rngl_sin θ2)%L
-                  → (0 ≤ rngl_cos θ1)%L
-                    → (0 ≤ rngl_cos θ2)%L
-                      → (rngl_cos θ1 < rngl_cos θ2)%L
-                        → (rngl_cos θ1 < rngl_cos (θ2 - θ1))%L
-rngl_sin_nonneg_cos_lt_sin_lt:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T
-    → rngl_mul_is_comm T = true
-      → rngl_has_1 T = true
-        → rngl_has_opp T = true
-          → rngl_has_eq_dec T = true
-            → ∀ θ1 θ2 : angle T,
-                (0 < rngl_sin θ1)%L
-                → (0 < rngl_sin θ2)%L
-                  → (rngl_cos θ1 < rngl_cos θ2)%L
-                    → if (0 <? rngl_cos θ1)%L
-                      then (rngl_sin θ2 < rngl_sin θ1)%L
-                      else
-                       if (0 <? rngl_cos θ2)%L
-                       then (0 < rngl_sin (θ1 - θ2))%L
-                       else (rngl_sin θ1 < rngl_sin θ2)%L
-...
-Search (rngl_cos _ < rngl_cos (_ - _))%L.
           apply (rngl_nle_gt Hor).
           intros Hs13.
           apply Bool.not_true_iff_false in Haov12.
