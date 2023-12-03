@@ -6587,7 +6587,6 @@ split; intros H23. {
       rewrite <- rngl_sin_opp in Hs13.
       now apply angle_add_le_mono_l_lemma_45.
     }
-(**)
     apply Bool.not_true_iff_false in Haov13.
     apply Haov13; clear Haov13.
     progress unfold angle_add_overflow.
@@ -6716,6 +6715,32 @@ split; intros H23. {
             sin_cos_add_sub_right_hyp Hic Hon Hop Hc1z.
             sin_cos_add_sub_right_goal Hic Hon Hop.
             move Hc1z after Hzs2; move Hzs1 after Hzc3.
+            cbn.
+            rewrite (rngl_add_sub_assoc Hop).
+            rewrite (rngl_add_sub_swap Hop).
+            rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+            apply (rngl_add_pos_nonneg Hor). {
+              apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+              apply (rngl_lt_0_sub Hop Hor).
+              apply (rngl_lt_iff Hor).
+              split; [ apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor) | ].
+              intros H.
+              apply (eq_rngl_sin_1 Hic Hon Hop Hed) in H.
+              subst θ3.
+              now apply (rngl_lt_irrefl Hor) in Hzs3.
+            }
+            apply (rngl_lt_le_incl Hor) in Hzs3.
+            now apply (rngl_mul_nonneg_nonneg Hop Hor).
+          }
+          apply (rngl_nlt_ge Hor) in Hzc1.
+          move Hzc1 after Hc2z.
+...
+
+    now apply (rngl_mul_pos_pos Hop Hor Hii).
+  }
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
 ...
             apply (rngl_nle_gt Hor).
             intros Hs1c13.
