@@ -6735,26 +6735,23 @@ split; intros H23. {
           apply (rngl_nlt_ge Hor) in Hzc1.
           move Hzc1 after Hc2z.
 ...
-
+(*
+...
     now apply (rngl_mul_pos_pos Hop Hor Hii).
   }
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
   apply (rngl_le_0_sub Hop Hor).
   apply (rngl_sin_bound Hon Hop Hiv Hic Hed Hor).
 ...
+*)
             apply (rngl_nle_gt Hor).
             intros Hs1c13.
             apply Bool.not_true_iff_false in Haov12.
             apply Haov12; clear Haov12.
             progress unfold angle_add_overflow.
             rewrite (angle_add_sub_assoc Hop).
-            rewrite (angle_add_add_swap Hic Hop).
-            rewrite (angle_add_sub_swap Hic Hop).
-            rewrite <- (angle_sub_sub_distr Hic Hop).
-            rewrite (angle_straight_sub_right Hon Hop).
             progress unfold angle_ltb.
-            rewrite (rngl_sin_sub_right_r Hon Hop).
-            rewrite (rngl_sin_add_right_r Hon Hos).
+            rewrite (rngl_sin_sub_straight_r Hon Hop).
             generalize Hzs12; intros H.
             apply (rngl_opp_lt_compat Hop Hor) in H.
             rewrite (rngl_opp_0 Hop) in H.
