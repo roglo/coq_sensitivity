@@ -6790,6 +6790,25 @@ split; intros H23. {
           now apply angle_add_le_mono_l_lemma_46.
         } {
           apply (rngl_nle_gt Hor) in Hc3z.
+          cbn in Hs13.
+          change_angle_add_r Hic Hon Hop Hed θ3 angle_straight.
+          sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs3.
+          sin_cos_add_sub_straight_hyp Hic Hon Hop Hs13.
+          sin_cos_add_sub_straight_hyp Hic Hon Hop H23.
+          sin_cos_add_sub_straight_hyp Hic Hon Hop Hzs13.
+          sin_cos_add_sub_straight_hyp Hic Hon Hop Hc3z.
+          sin_cos_add_sub_straight_goal Hic Hon Hop.
+          rewrite (rngl_add_opp_l Hop) in H23.
+          apply -> (rngl_le_sub_0 Hop Hor) in H23.
+          move Hzs2 after Hzs1; move Hzs3 after Hzs2.
+          destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+            exfalso.
+            apply (rngl_nlt_ge Hor) in Hzs13.
+            apply Hzs13; clear Hzs13.
+            apply (rngl_lt_le_incl Hor) in Hc3z.
+            now apply (rngl_sin_add_pos_1).
+          }
+          apply (rngl_nlt_ge Hor) in Hc1z.
 ...
 rewrite rngl_cos_add_straight_l in Hzc3.
 ...
