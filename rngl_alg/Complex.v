@@ -6747,7 +6747,52 @@ split; intros H23. {
             now apply rngl_cos_lt_rngl_cos_sub.
           } {
             apply (rngl_nlt_ge Hor) in Hc13.
+            exfalso.
+            apply (rngl_nlt_ge Hor) in Hzs13.
+            apply Hzs13; clear Hzs13.
+            rewrite (rngl_sin_sub_anticomm Hic Hop).
+            apply (rngl_lt_opp_l Hop Hor).
+            rewrite rngl_add_0_r.
+            apply (rngl_lt_iff Hor).
+            split. {
+              apply (rngl_sin_sub_nonneg Hic Hon Hop Hed); try easy.
+              now apply (rngl_lt_le_incl Hor) in Hzs3.
+            }
+            intros H; symmetry in H.
+            apply (eq_rngl_sin_0 Hic Hon Hop Hed) in H.
+            destruct H as [H| H]. {
+              apply (angle_sub_move_r Hic Hon Hop Hed) in H.
+              rewrite (angle_add_0_l Hon Hos) in H.
+              now subst θ3.
+            }
+            apply (angle_sub_move_r Hic Hon Hop Hed) in H.
+            subst θ3.
+            rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs3.
+            apply (rngl_opp_pos_neg Hop Hor) in Hzs3.
+            now apply (rngl_nle_gt Hor) in Hzs3.
+          }
+        }
+        apply (rngl_nle_gt Hor) in Hc3z.
+...
+rewrite rngl_cos_add_straight_l in Hzc3.
+...
 cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+eapply (rngl_lt_le_trans Hor). 2: {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+  apply Hc13.
+}
+rewrite fold_rngl_squ.
+specialize (cos2_sin2_1 Hon Hop Hic Hed θ3) as H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1; clear H1.
+(* euh... non *)
+...
+rewrite (rngl_sub_sub_distr Hop _²)%L.
+rewrite <- (rngl_add_sub_swap Hop _²)%L.
+rcos
 ...
             apply (rngl_nle_gt Hor).
             intros Hs13c1.
