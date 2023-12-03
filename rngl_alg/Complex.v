@@ -6734,7 +6734,32 @@ split; intros H23. {
           }
           apply (rngl_nlt_ge Hor) in Hzc1.
           move Hzc1 after Hc2z.
+          change_angle_sub_l Hic Hon Hop Hed θ3 angle_right.
+          sin_cos_add_sub_right_hyp Hic Hon Hop Hzs3.
+          sin_cos_add_sub_right_hyp Hic Hon Hop Hs13.
+          sin_cos_add_sub_right_hyp Hic Hon Hop Hzs13.
+          sin_cos_add_sub_right_hyp Hic Hon Hop H23.
+          sin_cos_add_sub_right_hyp Hic Hon Hop Hzc3.
+          sin_cos_add_sub_right_goal Hic Hon Hop.
+          destruct (rngl_lt_dec Hor (rngl_cos θ1) (rngl_cos θ3))
+              as [Hc13| Hc13]. {
+            rewrite (rngl_cos_sub_comm Hic Hop).
+            now apply rngl_cos_lt_rngl_cos_sub.
+          } {
+            apply (rngl_nlt_ge Hor) in Hc13.
+cbn.
 ...
+            apply (rngl_nle_gt Hor).
+            intros Hs13c1.
+            apply (rngl_nlt_ge Hor) in Hzs13.
+            apply Hzs13; clear Hzs13.
+...
+cbn.
+apply (rngl_cos_add_nonneg).
+...
+(*
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+*)
 (*
 ...
     now apply (rngl_mul_pos_pos Hop Hor Hii).
