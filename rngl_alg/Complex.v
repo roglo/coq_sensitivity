@@ -3120,39 +3120,7 @@ remember (angle_add_overflow θ2 θ1) as o21 eqn:Ho21.
 symmetry in Ho12, Ho21.
 destruct o12, o21; [ easy | | | easy ]. {
 ...
-*)
 
-Theorem angle_add_le_mono_l_lemma_5 :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 (θ2 - angle_right)%A = false
-  → (rngl_cos (θ1 + θ2) ≤ 0)%L
-  → (rngl_sin θ1 < 0)%L
-  → False.
-Proof.
-intros Hon Hop.
-destruct ac as (Hiv, Hc2, Hor).
-intros * Haov12 Hzs12 Hs1z.
-progress unfold angle_add_overflow in Haov12.
-apply angle_ltb_ge in Haov12.
-apply angle_nlt_ge in Haov12.
-apply Haov12; clear Haov12.
-rewrite (angle_add_sub_assoc Hop).
-progress unfold angle_ltb.
-rewrite (rngl_sin_sub_right_r Hon Hop).
-generalize Hzs12; intros H.
-apply (rngl_opp_le_compat Hop Hor) in H.
-rewrite (rngl_opp_0 Hop) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hs1z; intros H.
-apply (rngl_nle_gt Hor) in H.
-apply rngl_leb_nle in H.
-now rewrite H.
-Qed.
-
-(*
 Theorem angle_add_le_mono_l_lemma_10 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
