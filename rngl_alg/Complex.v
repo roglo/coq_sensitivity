@@ -3156,62 +3156,6 @@ apply Hc2z; clear Hc2z; cbn.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_14 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 (θ3 - angle_right)%A = false
-  → (0 ≤ rngl_sin θ1)%L
-  → (0 < rngl_sin θ2)%L
-  → (0 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 < rngl_cos θ3)%L
-  → (rngl_sin θ2 ≤ rngl_sin θ3)%L
-  → (rngl_cos (θ1 + θ2) ≤ 0)%L
-  → (rngl_cos (θ1 + θ3) ≤ 0)%L
-  → (rngl_sin (θ1 + θ3) ≤ rngl_sin (θ1 + θ2))%L.
-Proof.
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
-intros * Haov13 Hzs1 Hzc2 Hzc3 Hzc1 Hzs2 Hzs3 H23 Hzs12 Hzs13.
-apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy. {
-  apply (rngl_lt_le_incl Hor) in Hzs3.
-  now apply (rngl_sin_add_nonneg Hop).
-} {
-  apply (rngl_lt_le_incl Hor) in Hzc2.
-  now apply (rngl_sin_add_nonneg Hop).
-}
-apply angle_add_le_mono_l_lemma_3; try easy. {
-  apply (angle_add_overflow_le) with (θ2 := (θ3 - angle_right)%A);
-    try easy.
-  progress unfold angle_leb.
-  apply rngl_leb_le in Hzc3.
-  rewrite Hzc3.
-  apply rngl_leb_le in Hzc3.
-  rewrite (rngl_sin_sub_right_r Hon Hop).
-  generalize Hzs3; intros H.
-  apply (rngl_opp_lt_compat Hop Hor) in H.
-  rewrite (rngl_opp_0 Hop) in H.
-  apply (rngl_nle_gt Hor) in H.
-  apply rngl_leb_nle in H.
-  now rewrite H.
-} {
-  now apply (rngl_lt_le_incl Hor).
-} {
-  apply (rngl_lt_le_incl Hor) in Hzc2.
-  now apply (rngl_sin_add_nonneg Hop).
-} {
-  apply (rngl_lt_le_incl Hor) in Hzs3.
-  now apply (rngl_sin_add_nonneg Hop).
-}
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_18 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
