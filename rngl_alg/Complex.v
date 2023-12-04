@@ -2736,25 +2736,6 @@ remember (S n) as sn; cbn in Hn; subst sn.
 now apply Bool.orb_false_iff in Hn.
 Qed.
 
-Theorem angle_sub_move_0_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, (θ1 - θ2)%A = 0%A ↔ θ1 = θ2.
-Proof.
-intros Hic Hon Hop Hed.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-split; intros H12. {
-  apply (angle_sub_move_r Hic Hon Hop Hed) in H12.
-  now rewrite (angle_add_0_l Hon Hos) in H12.
-} {
-  apply (angle_sub_move_r Hic Hon Hop Hed).
-  now rewrite (angle_add_0_l Hon Hos).
-}
-Qed.
-
 Theorem angle_add_overflow_straight_straight :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

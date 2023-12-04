@@ -19,6 +19,25 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem angle_sub_move_0_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 - θ2)%A = 0%A ↔ θ1 = θ2.
+Proof.
+intros Hic Hon Hop Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+split; intros H12. {
+  apply (angle_sub_move_r Hic Hon Hop Hed) in H12.
+  now rewrite (angle_add_0_l Hon Hos) in H12.
+} {
+  apply (angle_sub_move_r Hic Hon Hop Hed).
+  now rewrite (angle_add_0_l Hon Hos).
+}
+Qed.
+
 Theorem rngl_sin_add_nonneg :
   rngl_has_opp T = true →
   ∀ θ1 θ2,
@@ -795,7 +814,6 @@ apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
 now apply (rngl_nlt_ge Hor) in Hzs2.
 Qed.
 
-(* to be completed
 Theorem angle_add_le_mono_l_lemma_7 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -833,7 +851,6 @@ apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
 apply (rngl_opp_neg_pos Hop Hor) in Hzs3.
 destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
   now apply angle_add_le_mono_l_lemma_6.
-...
 }
 apply (rngl_nle_gt Hor) in Hzc2.
 move Hzc2 after Hzs3.
@@ -946,6 +963,7 @@ apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+(* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1002,7 +1020,6 @@ destruct zs12. {
     } {
       apply (rngl_nlt_ge Hor) in Hzc3.
       now apply angle_add_le_mono_l_lemma_7.
-...
     }
   }
   destruct zs3; [ easy | ].
@@ -1016,6 +1033,7 @@ destruct zs12. {
   } {
     apply (rngl_nlt_ge Hor) in Hzc3.
     now apply angle_add_le_mono_l_lemma_16.
+...
   }
 }
 apply (rngl_leb_gt Hor) in Hzs12.
