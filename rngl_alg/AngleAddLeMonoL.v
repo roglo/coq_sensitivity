@@ -468,7 +468,52 @@ apply Hzc1.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
-(* to be completed
+Theorem angle_add_le_mono_l_lemma_9 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 (θ2 - angle_straight)%A = false
+  → (rngl_cos θ1 < 0)%L
+  → (rngl_sin θ1 < 0)%L
+  → (0 < rngl_sin (θ1 + θ2))%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Haov12 Hc1z Hs1z.
+apply (rngl_nle_gt Hor).
+intros Hzs12.
+remember (θ1 + angle_straight)%A as θ eqn:Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ1; rename θ into θ1.
+rewrite <- (angle_add_sub_swap Hic Hop) in Hzs12.
+rewrite (rngl_sin_sub_straight_r Hon Hop) in Hs1z, Hzs12.
+rewrite (rngl_cos_sub_straight_r Hon Hop) in Hc1z.
+apply (rngl_opp_neg_pos Hop Hor) in Hs1z, Hc1z.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs12.
+progress unfold angle_add_overflow in Haov12.
+apply angle_ltb_ge in Haov12.
+apply angle_nlt_ge in Haov12.
+apply Haov12; clear Haov12.
+rewrite (angle_add_sub_assoc Hop).
+rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_sub_add_distr Hic Hop).
+rewrite (angle_straight_add_straight Hon Hop).
+rewrite (angle_sub_0_r Hon Hop).
+progress unfold angle_ltb.
+rewrite (rngl_sin_sub_straight_r Hon Hop).
+generalize Hs1z; intros H.
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply (rngl_nle_gt Hor) in H.
+apply (rngl_leb_nle) in H.
+rewrite H; clear H.
+rewrite (rngl_cos_sub_straight_r Hon Hop).
+apply rngl_leb_le in Hzs12.
+now rewrite Hzs12.
+Qed.
+
 Theorem angle_add_le_mono_l_lemma_11 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -506,7 +551,6 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0)%L as [Hs1z| Hzs1]. {
   intros H.
   apply Hzs12; clear Hzs12.
   now apply angle_add_le_mono_l_lemma_9.
-...
 }
 apply (rngl_nlt_ge Hor) in Hzs1.
 remember (θ1 - angle_right)%A as θ.
@@ -541,6 +585,7 @@ apply (rngl_lt_le_incl Hor) in Hc1z, Hzs2, Hc2z.
 now apply (rngl_sin_add_nonneg Hop).
 Qed.
 
+(* to be completed
 Theorem angle_add_le_mono_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -594,10 +639,10 @@ destruct zs12. {
       apply Bool.not_true_iff_false in Haov13.
       apply Haov13.
       now apply angle_add_le_mono_l_lemma_11.
-...
     } {
       apply (rngl_nlt_ge Hor) in Hzc3.
       now apply angle_add_le_mono_l_lemma_7.
+...
     }
   }
   destruct zs3; [ easy | ].
