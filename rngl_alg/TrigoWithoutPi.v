@@ -505,6 +505,36 @@ split; intros H12. {
 }
 Qed.
 
+Theorem angle_nlt_ge :
+  ∀ θ1 θ2,
+  ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
+Proof.
+destruct ac as (Hiv, Hc2, Hor).
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+destruct (0 ≤? rngl_sin θ1)%L. {
+  destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
+  split; intros H. {
+    apply Bool.not_true_iff_false in H.
+    apply (rngl_ltb_ge Hor) in H.
+    now apply rngl_leb_le.
+  }
+  apply Bool.not_true_iff_false.
+  apply (rngl_ltb_ge Hor).
+  now apply rngl_leb_le.
+}
+destruct (0 ≤? rngl_sin θ2)%L; [ easy | ].
+split; intros H. {
+  apply Bool.not_true_iff_false in H.
+  apply (rngl_ltb_ge Hor) in H.
+  now apply rngl_leb_le.
+}
+apply Bool.not_true_iff_false.
+apply (rngl_ltb_ge Hor).
+now apply rngl_leb_le.
+Qed.
+
 Theorem rngl_add_cos_nonneg_sqrt_mul_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →

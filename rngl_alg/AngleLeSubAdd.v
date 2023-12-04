@@ -169,36 +169,6 @@ apply (rngl_le_antisymm Hor) in Hθ; [ | easy ].
 now apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Hθ.
 Qed.
 
-Theorem angle_nlt_ge :
-  ∀ θ1 θ2,
-  ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
-Proof.
-destruct ac as (Hiv, Hc2, Hor).
-intros.
-progress unfold angle_ltb.
-progress unfold angle_leb.
-destruct (0 ≤? rngl_sin θ1)%L. {
-  destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
-  split; intros H. {
-    apply Bool.not_true_iff_false in H.
-    apply (rngl_ltb_ge Hor) in H.
-    now apply rngl_leb_le.
-  }
-  apply Bool.not_true_iff_false.
-  apply (rngl_ltb_ge Hor).
-  now apply rngl_leb_le.
-}
-destruct (0 ≤? rngl_sin θ2)%L; [ easy | ].
-split; intros H. {
-  apply Bool.not_true_iff_false in H.
-  apply (rngl_ltb_ge Hor) in H.
-  now apply rngl_leb_le.
-}
-apply Bool.not_true_iff_false.
-apply (rngl_ltb_ge Hor).
-now apply rngl_leb_le.
-Qed.
-
 Theorem angle_straight_sub_right :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

@@ -21,7 +21,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
-(* to be completed
 Theorem rngl_sin_add_nonneg_sin_nonneg :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -46,7 +45,6 @@ apply (rngl_opp_neg_pos Hop Hor) in Hs1z.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
 progress unfold angle_add_overflow in Haov12.
 apply angle_ltb_ge in Haov12.
-...
 apply angle_nlt_ge in Haov12.
 apply Haov12; clear Haov12.
 rewrite <- (angle_add_sub_swap Hic Hop).
@@ -66,6 +64,7 @@ apply rngl_leb_nle in H.
 now rewrite H; clear H.
 Qed.
 
+(* to be completed
 Theorem angle_add_le_mono_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
