@@ -56,6 +56,28 @@ now apply (rngl_mul_nonneg_nonneg Hop Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
+Theorem rngl_sin_add_pos_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (0 < rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 < rngl_sin (θ1 + θ2))%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros  * Hs1z Hs2z Hc1z Hc2z.
+cbn.
+apply (rngl_add_pos_nonneg Hor).
+now apply (rngl_mul_pos_pos Hop Hor Hii).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
 Theorem rngl_sin_add_pos_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -964,6 +986,46 @@ now apply (rngl_lt_le_incl Hor).
 Qed.
 
 (* to be completed
+Theorem angle_add_le_mono_l_lemma_12 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (0 < rngl_cos θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin θ3)%L
+  → (0 < rngl_cos θ3)%L
+  → (rngl_sin (θ1 + θ2) ≤ 0)%L
+  → (rngl_cos (θ1 + θ3) ≤ 0)%L
+  → False.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hzc1 Hzs2 Hc2z Hzc3 Hzs3 Hzs12 Hzs13.
+destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
+  apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Hzs12; clear Hzs12.
+  now apply rngl_sin_add_pos_1.
+...
+}
+apply (rngl_nle_gt Hor) in Hs1z.
+remember (θ1 + angle_right)%A as θ eqn:Hθ.
+apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
+subst θ1; rename θ into θ1.
+rewrite <- (angle_add_sub_swap Hic Hop) in Hzs13, Hzs12.
+rewrite (rngl_sin_sub_right_r Hon Hop) in Hzs12, Hs1z.
+rewrite (rngl_cos_sub_right_r Hon Hop) in Hzs13, Hzc1.
+apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzs12.
+apply (rngl_opp_neg_pos Hop Hor) in Hs1z.
+apply (rngl_nlt_ge Hor) in Hzs13.
+apply Hzs13; clear Hzs13.
+apply (rngl_lt_le_incl Hor) in Hs1z.
+now apply rngl_sin_add_pos_2.
+Qed.
+
 Theorem angle_add_le_mono_l_lemma_16 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
