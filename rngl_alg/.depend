@@ -1,3 +1,5 @@
+AngleAddLeMonoL.vio: AngleAddLeMonoL.v ../main/RingLike.vio TrigoWithoutPi.vio
+AngleAddLeMonoL.vo AngleAddLeMonoL.glob AngleAddLeMonoL.v.beautified AngleAddLeMonoL.required_vo: AngleAddLeMonoL.v ../main/RingLike.vo TrigoWithoutPi.vo
 AngleAddOverflowLe.vio: AngleAddOverflowLe.v ../main/RingLike.vio TrigoWithoutPi.vio AngleLeSubAdd.vio
 AngleAddOverflowLe.vo AngleAddOverflowLe.glob AngleAddOverflowLe.v.beautified AngleAddOverflowLe.required_vo: AngleAddOverflowLe.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo
 AngleLeSubAdd.vio: AngleLeSubAdd.v ../main/RingLike.vio TrigoWithoutPi.vio
