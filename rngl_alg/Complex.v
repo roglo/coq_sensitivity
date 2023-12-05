@@ -2873,6 +2873,15 @@ eapply (angle_add_overflow_le Hic Hon Hop Hed); [ | apply H2n2 ].
 now apply (angle_mul_le_mono_l Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_mul_nat_1_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, (1 * θ)%A = θ.
+Proof.
+intros Hon Hos *; cbn.
+apply (angle_add_0_r Hon Hos).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2960,6 +2969,29 @@ enough (H :
     subst Δθ.
     move Haov at bottom.
     apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
+    rewrite <- (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed i θ) at 2.
+    rewrite <- (angle_mul_nat_1_l Hon Hos) at 1.
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed). 2: {
+      apply Nat.lt_succ_r.
+      apply -> Nat.succ_lt_mono.
+      clear Hi.
+      (* strange that this theorem does not exist; I should add it *)
+      induction i; cbn; [ easy | ].
+      rewrite Nat.add_0_r.
+      apply (Nat.lt_le_trans _ (2 ^ i)); [ easy | ].
+      apply Nat.le_add_r.
+    }
+Check angle_mul_nat_overflow_le_r.
+specialize (angle_mul_nat_overflow_le_r Hic Hon Hop Hed) as H1.
+specialize (H1 (angle_div_2_pow_nat θ i) θ).
+Search (angle_div_2_pow_nat).
+...
+eapply angle_mul_nat_overflow_le_r; try easy.
+Search (angle_mul_nat_overflow).
+...
+Search (_ * _ ≤ _ * _)%A.
+Search (angle_div_2_pow_nat _ _ ≤ _)%A.
+Search angle_div_2_pow_nat.
 ...
 Search angle_add_overflow.
 ...
