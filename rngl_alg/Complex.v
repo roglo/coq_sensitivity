@@ -2854,12 +2854,35 @@ induction i; [ easy | ].
 Search (angle_div_2_pow_nat _ (S _)).
 Search angle_mul_nat_overflow.
 Theorem angle_mul_nat_overflow_le_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2,
   (θ1 ≤ θ2)%A
   → ∀ n,
   angle_mul_nat_overflow n θ2 = false
   → angle_mul_nat_overflow n θ1 = false.
+Proof.
+intros Hic Hon Hop Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H12 * H2.
+revert θ1 θ2 H12 H2.
+induction n; intros; [ easy | ].
+Search (angle_mul_nat_overflow (S _)).
+generalize H2; intros H.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in H.
+destruct H as (Hn2, H2n2).
+cbn.
+destruct n; [ easy | ].
+apply Bool.orb_false_iff.
+split; [ | now apply (IHn _ θ2) ].
 ...
+  eapply (angle_add_overflow_le Hic Hon Hop Hed _ (S n * θ2))%A. 2: {
+...
+split. {
+  eapply (angle_add_overflow_le Hic Hon Hop Hed _ (S n * θ2))%A.
+... ...
 apply (angle_mul_nat_overflow_le_r _ (angle_div_2_pow_nat θ i)); [ | easy ].
 cbn.
 ...
