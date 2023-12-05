@@ -2981,9 +2981,18 @@ enough (H :
       apply (Nat.lt_le_trans _ (2 ^ i)); [ easy | ].
       apply Nat.le_add_r.
     }
+    clear Hi HN Haov.
+    (* TODO: lemma *)
+    revert θ.
+    induction i; intros; [ easy | cbn ].
+    rewrite Nat.add_0_r.
+Search (angle_mul_nat_overflow (_ + _)).
+...
+    specialize (angle_mul_nat_overflow_le_r Hic Hon Hop Hed) as H1.
+    specialize (H1 (angle_div_2_pow_nat θ i) (θ))%A.
+    apply H1.
+...
 Check angle_mul_nat_overflow_le_r.
-specialize (angle_mul_nat_overflow_le_r Hic Hon Hop Hed) as H1.
-specialize (H1 (angle_div_2_pow_nat θ i) θ).
 Search (angle_div_2_pow_nat).
 ...
 eapply angle_mul_nat_overflow_le_r; try easy.
