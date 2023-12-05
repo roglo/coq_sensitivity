@@ -1,5 +1,10 @@
 (* just a file for this theorem:
      (θ1 - θ2 ≤ θ3)%A → (θ1 ≤ θ2 + θ3)%A
+   actually not used, should be removed one day,
+   its lemmas being tranfered where necessary.
+     It is a shame, it was a big effort, and its statement is simple and
+   perhaps could be used one day, but if I keep all this kind of theorem,
+   my software is going to be unnecessarily huge.
  *)
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
