@@ -2911,21 +2911,37 @@ apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ apply H12 | ].
 apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ | apply H2n2 ].
+(**)
 remember (S n) as m eqn:Hm.
 clear n Hm; rename m into n.
+(**)
+clear H2 H2n2 IHn.
+revert θ1 θ2 H12 Hn2.
+induction n; intros; [ apply angle_le_refl | ].
+cbn.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn2.
+apply (angle_le_trans _ (θ1 + n * θ2))%A. {
+  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | now apply IHn ]. {
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ2))%A. {
+      now apply IHn.
+    }
+...
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ1))%A.
+...
 clear H2 Hn2 IHn.
 induction n; [ apply angle_le_refl | ].
 cbn.
 apply (angle_le_trans _ (θ1 + n * θ2))%A. {
   apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | ].
-...
-  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ].
+3: {
 ...
   ============================
   angle_add_overflow θ1 (n * θ1)%A = false
 
-goal 2 (ID 2303) is:
+goal 2 (ID 2341) is:
  angle_add_overflow θ1 (n * θ2)%A = false
+goal 3 (ID 2342) is:
+ (n * θ1 ≤ n * θ2)%A
 ... ...
   rewrite (angle_add_comm Hic θ1).
   rewrite (angle_add_comm Hic θ2).
