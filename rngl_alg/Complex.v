@@ -2797,6 +2797,49 @@ destruct z1. {
 }
 Qed.
 
+Theorem angle_mul_le_mono_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2)%A
+  → ∀ n,
+  angle_mul_nat_overflow n θ2 = false
+  → (n * θ1 ≤ n * θ2)%A.
+Proof.
+intros Hic Hon Hop Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H12 * Hn2.
+revert θ1 θ2 H12 Hn2.
+induction n; intros; [ apply angle_le_refl | cbn ].
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn2.
+destruct Hn2 as (Hn2, H2n2).
+generalize Hn2; intros Hn12.
+apply (IHn θ1) in Hn12; [ | easy ].
+apply (angle_le_trans _ (θ1 + n * θ2))%A. {
+  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ2))%A; [ easy | ].
+    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2); [ easy | ].
+    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+  } {
+    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
+    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+  }
+} {
+  rewrite (angle_add_comm Hic θ1).
+  rewrite (angle_add_comm Hic θ2).
+  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
+    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
+    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+  } {
+    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+  }
+}
+Qed.
+
 Theorem angle_mul_nat_overflow_le_r :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2827,35 +2870,7 @@ apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ apply H12 | ].
 apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ | apply H2n2 ].
-clear H2n2.
-revert θ1 θ2 H12 Hn2.
-induction n; intros; [ apply angle_le_refl | ].
-cbn.
-apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn2.
-destruct Hn2 as (Hn2, H2n2).
-generalize Hn2; intros Hn12.
-apply (IHn θ1) in Hn12; [ | easy ].
-apply (angle_le_trans _ (θ1 + n * θ2))%A. {
-  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
-    apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ2))%A; [ easy | ].
-    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2); [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-  } {
-    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-  }
-} {
-  rewrite (angle_add_comm Hic θ1).
-  rewrite (angle_add_comm Hic θ2).
-  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
-    apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-  } {
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
-  }
-}
+now apply (angle_mul_le_mono_l Hic Hon Hop Hed).
 Qed.
 
 (* to be completed
@@ -2944,7 +2959,6 @@ enough (H :
     }
     subst Δθ.
     move Haov at bottom.
-... ...
     apply angle_mul_nat_overflow_le_r with (θ2 := θ); try easy.
 ...
 Search angle_add_overflow.
