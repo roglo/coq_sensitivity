@@ -1616,7 +1616,7 @@ split; intros H12. {
 }
 Qed.
 
-Theorem angle_leb_refl :
+Theorem angle_le_refl :
   ∀ θ, (θ ≤? θ)%A = true.
 Proof.
 intros.
@@ -2730,7 +2730,7 @@ destruct n. {
   progress unfold angle_add_overflow.
   rewrite (angle_add_0_r Hon Hos).
   apply angle_ltb_ge.
-  apply angle_leb_refl.
+  apply angle_le_refl.
 }
 remember (S n) as sn; cbn in Hn; subst sn.
 now apply Bool.orb_false_iff in Hn.
@@ -2750,7 +2750,7 @@ intros * Hb Hab.
 revert a Hab.
 induction b; intros. {
   apply Nat.le_0_r in Hab; subst a.
-  apply (angle_leb_refl).
+  apply angle_le_refl.
 }
 destruct a; [ apply (angle_nonneg Hic Hon Hop Hed) | cbn ].
 move a after b.
@@ -2760,6 +2760,41 @@ destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
 apply angle_add_le_mono_l; try easy.
 now apply (angle_add_overflow_le Hic Hon Hop Hed _ (b * θ))%A.
+Qed.
+
+Theorem angle_le_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2 → θ2 ≤ θ3 → θ1 ≤ θ3)%A.
+Proof.
+destruct ac as (Hiv, Hc2, Hor).
+intros * H12 H23.
+progress unfold angle_leb in H12.
+progress unfold angle_leb in H23.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  (* c'est bizarre, quand même : si j'avais utilisé rngl_eq_dec,
+     il m'aurait fallu que "rngl_has_eq_dec T = true" soit en
+     hypothèse. Tandis que là, non *)
+  destruct z3; [ | easy ].
+  apply rngl_leb_le.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H12, H23.
+  apply rngl_leb_le in Hz2.
+  apply rngl_leb_le in Hz2.
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_leb_le in H12, H23.
+  apply rngl_leb_le.
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+}
 Qed.
 
 (* to be completed
@@ -2876,6 +2911,25 @@ apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ apply H12 | ].
 apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ | apply H2n2 ].
+remember (S n) as m eqn:Hm.
+clear n Hm; rename m into n.
+clear H2 Hn2 IHn.
+induction n; [ apply angle_le_refl | ].
+cbn.
+apply (angle_le_trans _ (θ1 + n * θ2))%A. {
+  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | ].
+...
+  apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ].
+...
+  ============================
+  angle_add_overflow θ1 (n * θ1)%A = false
+
+goal 2 (ID 2303) is:
+ angle_add_overflow θ1 (n * θ2)%A = false
+... ...
+  rewrite (angle_add_comm Hic θ1).
+  rewrite (angle_add_comm Hic θ2).
+  apply angle_add_le_mono_l; try easy.
 ...
 apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
 Search (angle_div_2_pow_nat _ _ ≤ _)%L.
