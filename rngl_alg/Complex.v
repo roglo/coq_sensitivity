@@ -2959,7 +2959,7 @@ enough (H :
     }
     subst Δθ.
     move Haov at bottom.
-    apply angle_mul_nat_overflow_le_r with (θ2 := θ); try easy.
+    apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
 ...
 Search angle_add_overflow.
 ...
