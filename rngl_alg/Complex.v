@@ -2841,6 +2841,8 @@ enough (H :
   rewrite rngl_squ_sqrt; [ | easy ].
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
+Inspect 1.
+About angle_mul_nat_le_mono_nonneg_r.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
