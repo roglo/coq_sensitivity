@@ -2801,34 +2801,6 @@ now apply (rngl_mul_nonneg_nonneg Hop Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
-Theorem rngl_cos_add_nonneg_cos_add_nonneg :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_cos θ3)%L
-  → (rngl_sin θ2 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_cos (θ1 + θ3))%L
-  → (0 ≤ rngl_cos (θ1 + θ2))%L.
-Proof.
-intros Hic Hon Hop Hed.
-destruct ac as (Hiv, Hc2, Hor).
-intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 H23 Hzc13.
-eapply (rngl_le_trans Hor); [ apply Hzc13 | cbn ].
-apply (rngl_sub_le_compat Hop Hor). {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
-  generalize H23; intros H32.
-  now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32.
-}
-now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-Qed.
-
 (* pas très satisfait de cette preuve. Elle a marché, certes,
    mais me paraît bien compliquée. Il y aurait sûrement un
    moyen de la rendre plus simple, mais j'ai pas le temps

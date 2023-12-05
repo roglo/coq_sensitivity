@@ -143,6 +143,34 @@ apply rngl_leb_nle in H.
 now rewrite H; clear H.
 Qed.
 
+Theorem rngl_cos_add_nonneg_cos_add_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin θ3)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_cos θ3)%L
+  → (rngl_sin θ2 ≤ rngl_sin θ3)%L
+  → (0 ≤ rngl_cos (θ1 + θ3))%L
+  → (0 ≤ rngl_cos (θ1 + θ2))%L.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 H23 Hzc13.
+eapply (rngl_le_trans Hor); [ apply Hzc13 | cbn ].
+apply (rngl_sub_le_compat Hop Hor). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+  generalize H23; intros H32.
+  now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32.
+}
+now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+Qed.
+
 Theorem angle_add_le_mono_l_lemma_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -1349,7 +1377,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   apply (rngl_nle_gt Hor) in Hzs13.
   apply Hzs13; clear Hzs13.
   apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := θ2); try easy.
-...
   now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 }
 apply (rngl_nle_gt Hor) in Hc2z.
@@ -1381,6 +1408,7 @@ destruct H; subst θ1. {
   destruct Hzs12; subst θ2. {
     rewrite (angle_right_add_right Hon Hop) in Haov12.
     now rewrite angle_add_overflow_straight_straight in Haov12.
+...
   }
   apply (rngl_nle_gt Hor) in Hc2z.
   apply Hc2z; cbn.
