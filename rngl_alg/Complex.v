@@ -2841,8 +2841,27 @@ enough (H :
   rewrite rngl_squ_sqrt; [ | easy ].
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
-Inspect 1.
-About angle_mul_nat_le_mono_nonneg_r.
+  split. {
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed). 2: {
+      apply Nat.lt_le_incl.
+      now apply Nat.mod_upper_bound.
+    }
+    subst Δθ.
+    move Haov at bottom.
+    clear HN.
+    induction n; [ easy | ].
+    apply angle_mul_nat_overflow_succ_l_false in Haov.
+    destruct Haov as (Haov, Hanov).
+    destruct n; [ easy | ].
+    specialize (IHn (Nat.neq_succ_0 _) Haov).
+(* mouais, bon... *)
+...
+Search angle_div_2_pow_nat.
+    generalize Haov; intros H.
+    specialize (angle_div_2_mul_2 Hic Hon Hop Hed (θ / ₂))%A as H1.
+    rewrite <- H1 in H; clear H1.
+...
+    apply (angle_div_2_pow_nat_mul Hic Hon Hop Hed 1) in H.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
