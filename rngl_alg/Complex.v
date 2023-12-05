@@ -2849,12 +2849,29 @@ enough (H :
     subst Δθ.
     move Haov at bottom.
     clear HN.
-    induction n; [ easy | ].
-    apply angle_mul_nat_overflow_succ_l_false in Haov.
-    destruct Haov as (Haov, Hanov).
+    revert θ Haov.
+    induction n; intros; [ easy | ].
+    generalize Haov; intros H.
+    apply angle_mul_nat_overflow_succ_l_false in H.
+    destruct H as (Haov', Hanov).
     destruct n; [ easy | ].
-    specialize (IHn (Nat.neq_succ_0 _) Haov).
-(* mouais, bon... *)
+    specialize (IHn (Nat.neq_succ_0 _)).
+    specialize (IHn (2 * θ))%A.
+    assert (H : angle_mul_nat_overflow (S n) (2 * θ)%A = false). {
+remember (2 * θ)%A as θ'.
+cbn.
+destruct n; [ easy | ].
+apply Bool.orb_false_iff.
+split. {
+  subst θ'.
+...
+      Check angle_mul_nat_overflow_succ_l_false.
+...
+    specialize (angle_div_2_mul_2 Hic Hon Hop Hed (2 * θ))%A as H1.
+    rewrite <- H1 in IHn at 1.
+Check angle_div_2_pow_nat_mul.
+...
+    specialize (IHn (Nat.neq_succ_0 _) Haov').
 ...
 Search angle_div_2_pow_nat.
     generalize Haov; intros H.
