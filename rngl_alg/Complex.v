@@ -2052,6 +2052,8 @@ apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
 
+Arguments angle_add_overflow {T ro rp} (θ1 θ2)%A.
+
 Fixpoint angle_mul_nat_overflow n θ :=
   match n with
   | 0 | 1 => false
@@ -2729,19 +2731,25 @@ Theorem angle_mul_nat_overflow_succ_l_false :
   rngl_has_opp_or_subt T = true →
   ∀ θ n,
   angle_mul_nat_overflow (S n) θ = false
-  → angle_mul_nat_overflow n θ = false ∧
+  ↔ angle_mul_nat_overflow n θ = false ∧
     angle_add_overflow θ (n * θ)%A = false.
 Proof.
-intros Hon Hos * Hn.
-destruct n. {
-  split; [ easy | cbn ].
-  progress unfold angle_add_overflow.
-  rewrite (angle_add_0_r Hon Hos).
-  apply angle_ltb_ge.
-  apply angle_le_refl.
+intros Hon Hos *.
+split; intros Hn. {
+  destruct n. {
+    split; [ easy | cbn ].
+    progress unfold angle_add_overflow.
+    rewrite (angle_add_0_r Hon Hos).
+    apply angle_ltb_ge.
+    apply angle_le_refl.
+  }
+  remember (S n) as sn; cbn in Hn; subst sn.
+  now apply Bool.orb_false_iff in Hn.
+} {
+  destruct n; [ easy | ].
+  remember (S n) as sn; cbn; subst sn.
+  now apply Bool.orb_false_iff.
 }
-remember (S n) as sn; cbn in Hn; subst sn.
-now apply Bool.orb_false_iff in Hn.
 Qed.
 
 Theorem angle_mul_nat_le_mono_nonneg_r :
@@ -3255,6 +3263,17 @@ revert θ Hn.
 induction n; intros; [ easy | ].
 apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
 destruct Hn as (Hmn, Han).
+(**)
+cbn - [ angle_mul_nat_overflow ].
+rewrite Nat.add_0_r.
+rewrite Nat.add_succ_r.
+rewrite Nat_add_diag.
+apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
+split. {
+  apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
+  split; [ now apply IHn | ].
+Search (_ → angle_add_overflow _ _ = false).
+...
 cbn - [ angle_mul_nat_overflow ].
 rewrite Nat.add_0_r.
 rewrite Nat.add_succ_r.
@@ -3262,7 +3281,6 @@ remember (S (n + n)) as m.
 cbn; subst m.
 apply Bool.orb_false_iff.
 split. {
-Print angle_mul_nat_overflow.
 ...
   apply angle_add_overflow_le with (θ2 := (S (n * n) * θ / ₂)%A); try easy.
 ...
