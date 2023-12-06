@@ -3052,7 +3052,11 @@ Theorem angle_mul_nat_overflow_pow_div :
   angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow_nat θ n) = false.
 Proof.
 intros Hic Hon Hop Hed.
+remember ac_iv as Hiv.
+remember ac_or as Hor.
+(*
 destruct ac as (Hiv, Hc2, Hor).
+*)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3064,7 +3068,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 intros.
-destruct n; [ easy | cbn ].
+revert θ.
+induction n; intros; [ easy | cbn ].
 destruct n. {
   cbn.
   apply Bool.orb_false_iff.
@@ -3211,11 +3216,76 @@ destruct n. {
     now apply (rngl_lt_irrefl Hor) in Hzs.
   }
 }
+cbn.
+do 2 rewrite Nat.add_0_r.
+rewrite Nat.add_assoc.
+cbn in IHn.
+rewrite Nat.add_0_r in IHn.
+specialize (IHn θ) as H1.
+Search angle_mul_nat_overflow.
+Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
+  ∀ m n θ,
+  angle_mul_nat_overflow n (angle_div_2_pow_nat θ m) = false
+  → angle_mul_nat_overflow (2 * n) (angle_div_2_pow_nat (θ / ₂) m) = false.
+Proof.
+intros * Hnm.
+revert n Hnm.
+induction m; intros; cbn. {
+  cbn in Hnm.
+  rewrite Nat.add_0_r.
+  rewrite Nat_add_diag.
+Search (angle_mul_nat_overflow).
+Theorem angle_mul_nat_overflow_mul_2_div_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → angle_mul_nat_overflow (2 * n) (θ / ₂)%A = false.
+Proof.
+intros Hon Hos * Hn.
+revert θ Hn.
+induction n; intros; [ easy | ].
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
+destruct Hn as (Hmn, Han).
+cbn - [ angle_mul_nat_overflow ].
 rewrite Nat.add_0_r.
-Search (angle_div_2_pow_nat).
+rewrite Nat.add_succ_r.
+remember (S (n + n)) as m.
+cbn; subst m.
+apply Bool.orb_false_iff.
+split. {
+(* ah, pute vierge *)
+...
+rewrite Nat.add_0_r, Nat.add_comm; cbn.
+Search (angle_mul_nat_overflow (S _)).
+... ...
+now apply angle_mul_nat_overflow_mul_2_div_2.
+}
+...
+intros * Hnm.
+revert m Hnm.
+induction n; intros; [ easy | cbn ].
+rewrite Nat.add_0_r, Nat.add_comm.
+cbn.
+apply Bool.orb_false_iff.
+split. 2: {
+cbn in Hnm.
+... ...
+apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2 in H1.
+cbn in H1.
+rewrite Nat.add_0_r in H1.
+rewrite Nat.add_assoc in H1.
+apply H1.
+...
+specialize (glop n (2 ^ n + 2 ^ n) (θ / ₂)%A) as H2.
+cbn in H2.
+specialize (H2 H1).
+...
 rewrite <- (Nat.add_1_r n) at 3.
+Search (angle_div_2_pow_nat _ (_ + _)).
 About angle_div_2_pow_nat_add.
 ...
+Search (angle_div_2_pow_nat).
   ============================
   angle_mul_nat_overflow (2 ^ S n + 2 ^ S n)
     (angle_div_2_pow_nat (θ / ₂) (S n)) = false
