@@ -2986,6 +2986,7 @@ enough (H :
     revert θ.
     induction i; intros; [ easy | cbn ].
     rewrite Nat.add_0_r.
+...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.
 Search (angle_mul_nat_overflow (_ + _)).
