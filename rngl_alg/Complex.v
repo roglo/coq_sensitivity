@@ -3064,12 +3064,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (characteristic_0_angle_0 Hon Hos Hc1 (angle_div_2_pow_nat _ _)).
-Search (angle_mul_nat_overflow _ 0%A).
-... ...
-  apply angle_mul_nat_overflow_0_r.
-...
-  destruct n; [ easy | cbn ].
-...
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
 intros.
 destruct n; [ easy | cbn ].
 destruct n. {
@@ -3093,6 +3089,19 @@ destruct n. {
     apply rl_sqrt_nonneg.
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  apply rngl_leb_le in Hx.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    rewrite (rngl_mul_1_l Hon).
+    remember (0 ≤? _)%L as zss eqn:Hzss in |-*.
+    symmetry in Hzss.
+    destruct zss; [ | easy ].
+    apply rngl_leb_le.
 ...
 Search (0 ≤? √ _)%L.
 Search rl_sqrt.
