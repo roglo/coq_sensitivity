@@ -2882,6 +2882,69 @@ intros Hon Hos *; cbn.
 apply (angle_add_0_r Hon Hos).
 Qed.
 
+Theorem angle_add_overflow_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, angle_add_overflow θ 0%A = false.
+Proof.
+intros Hon Hos.
+intros.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite (angle_add_0_r Hon Hos).
+apply (angle_le_refl).
+Qed.
+
+Theorem rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ √ a)%L.
+Proof.
+intros * Ha.
+now apply rl_sqrt_nonneg.
+Qed.
+
+Theorem characteristic_0_angle_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_characteristic T = 1 →
+  ∀ θ, (θ = 0)%A.
+Proof.
+intros Hon Hos Hc1 *.
+specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+apply eq_angle_eq.
+do 2 rewrite (H1 (rngl_cos _)).
+now do 2 rewrite (H1 (rngl_sin _)).
+Qed.
+
+Theorem angle_mul_nat_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n, (n * 0 = 0)%A.
+Proof.
+intros Hon Hos *.
+apply eq_angle_eq; cbn.
+induction n; [ easy | cbn ].
+do 2 rewrite (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+now rewrite rngl_add_0_r.
+Qed.
+
+Theorem angle_mul_nat_overflow_0_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n, angle_mul_nat_overflow n 0%A = false.
+Proof.
+intros Hon Hos *.
+induction n; [ easy | cbn ].
+destruct n; [ easy | ].
+rewrite (angle_mul_nat_0_r Hon Hos).
+apply Bool.orb_false_iff.
+split; [ | easy ].
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite (angle_add_0_l Hon Hos).
+apply angle_le_refl.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -2982,16 +3045,77 @@ enough (H :
       apply Nat.le_add_r.
     }
     clear Hi HN.
-    (* TODO: lemma *)
-    revert n θ Haov Hnz.
-    induction i; intros; [ easy | cbn ].
-    rewrite Nat.add_0_r.
-    rewrite Nat_add_diag.
-    destruct i. {
-      cbn.
-      apply Bool.orb_false_iff.
-      split; [ | easy ].
-      rewrite (angle_add_0_r Hon Hos).
+Theorem angle_mul_nat_overflow_pow_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow_nat θ n) = false.
+Proof.
+intros Hic Hon Hop Hed.
+destruct ac as (Hiv, Hc2, Hor).
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+(*
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+*)
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (characteristic_0_angle_0 Hon Hos Hc1 (angle_div_2_pow_nat _ _)).
+Search (angle_mul_nat_overflow _ 0%A).
+... ...
+  apply angle_mul_nat_overflow_0_r.
+...
+  destruct n; [ easy | cbn ].
+...
+intros.
+destruct n; [ easy | cbn ].
+destruct n. {
+  cbn.
+  apply Bool.orb_false_iff.
+  split; [ | easy ].
+  rewrite (angle_add_0_r Hon Hos).
+  progress unfold angle_add_overflow.
+  apply angle_ltb_ge.
+(**)
+  progress unfold angle_div_2.
+  progress unfold angle_leb.
+  cbn.
+  remember (0 ≤? √ _)%L as x eqn:Hx.
+  symmetry in Hx.
+  destruct x. 2: {
+    exfalso.
+    apply Bool.not_true_iff_false in Hx.
+    apply Hx; clear Hx.
+    apply rngl_leb_le.
+    apply rl_sqrt_nonneg.
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+...
+Search (0 ≤? √ _)%L.
+Search rl_sqrt.
+...
+  rewrite <- (angle_add_0_r Hon Hos) at 1.
+  apply (angle_add_le_mono_l Hic Hon Hop Hed). {
+    apply (angle_add_overflow_0_r Hon Hos).
+  } {
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    rewrite <- (angle_add_0_r Hon Hos) at 1.
+    apply (angle_add_le_mono_l Hic Hon Hop Hed).
+...
+  progress unfold angle_leb.
+  rewrite <- (angle_div_2_add_not_overflow Hic Hon Hop Hed). 2: {
+...
+Search (_ / ₂ + _ / ₂)%A.
+  remember (0 ≤? rngl_sin (θ / ₂))%L as zs2 eqn:Hzs2.
+  symmetry in Hzs2.
+  destruct zs2. {
+... ...
+apply (angle_mul_nat_overflow_pow_div Hon Hos).
+...
 (* oh, fait chier, tiens *)
 Search (angle_mul_nat_overflow (2 * _)).
 Search (angle_mul_nat_overflow (_ + _)).
