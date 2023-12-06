@@ -2052,6 +2052,14 @@ apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
 
+Fixpoint angle_mul_nat_overflow n θ :=
+  match n with
+  | 0 | 1 => false
+  | S n' =>
+      (angle_add_overflow θ (n' * θ)%A ||
+       angle_mul_nat_overflow n' θ)%bool
+  end.
+
 Theorem angle_div_2_pow_nat_mul :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3254,7 +3262,9 @@ remember (S (n + n)) as m.
 cbn; subst m.
 apply Bool.orb_false_iff.
 split. {
-(* ah, pute vierge *)
+Print angle_mul_nat_overflow.
+...
+  apply angle_add_overflow_le with (θ2 := (S (n * n) * θ / ₂)%A); try easy.
 ...
 rewrite Nat.add_0_r, Nat.add_comm; cbn.
 Search (angle_mul_nat_overflow (S _)).
