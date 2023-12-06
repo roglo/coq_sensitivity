@@ -3143,6 +3143,9 @@ destruct n. {
     }
     apply (rngl_squ_le_abs_le Hop Hor Hii).
     rewrite rngl_squ_sqrt; [ | easy ].
+    apply -> (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
 ...
 Search (0 ≤? √ _)%L.
 Search rl_sqrt.
