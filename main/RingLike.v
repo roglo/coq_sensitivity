@@ -3702,6 +3702,20 @@ apply (rngl_lt_add_r Hos Hor).
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rngl_0_le_2 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (0 ≤ 2)%L.
+Proof.
+intros Hon Hop Hor.
+apply (rngl_le_trans Hor _ 1)%L. {
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+apply (rngl_le_add_r Hor).
+apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+
 Theorem rngl_2_neq_0 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
