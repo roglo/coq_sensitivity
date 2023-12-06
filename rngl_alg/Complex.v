@@ -3148,6 +3148,29 @@ destruct n. {
     apply -> (rngl_le_div_r Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
+(**)
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    progress unfold rngl_squ.
+    rewrite <- rngl_mul_assoc.
+    rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+...
+    rewrite <- (rngl_mul_1_l Hon 1)%L at 4.
+Search (_ * _ ≤ _ * _)%L.
+...
+    apply (rngl_mul_le_compat_nonneg Hop Hor). {
+      split; [ now apply (rngl_lt_le_incl Hor) | ].
+      apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+    }
+...
+    specialize (cos2_sin2_1 Hon Hop Hic Hed θ) as H1.
+    apply (rngl_add_move_r Hop) in H1.
+    rewrite H1.
+    rewrite (rngl_mul_sub_distr_r Hop).
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_add_sub Hos).
 ...
 Search (0 ≤? √ _)%L.
 Search rl_sqrt.
