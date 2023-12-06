@@ -3128,16 +3128,18 @@ destruct n. {
     rewrite (rngl_mul_div Hi1). 2: {
       apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
     }
-    remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+    remember (0 <? rngl_cos θ)%L as zc eqn:Hzc.
     symmetry in Hzc.
     rewrite rngl_add_comm.
     destruct zc. 2: {
-      apply (rngl_leb_gt Hor) in Hzc.
-      apply (rngl_le_trans Hor _ 0); [ now apply (rngl_lt_le_incl Hor) | ].
+      apply (rngl_ltb_ge Hor) in Hzc.
+      apply (rngl_le_trans Hor _ 0); [ easy | ].
       now apply rl_sqrt_nonneg.
     }
-    apply rngl_leb_le in Hzc.
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1; [ | easy ].
+    apply rngl_ltb_lt in Hzc.
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1. 2: {
+      now apply (rngl_lt_le_incl Hor).
+    }
     rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
       now apply rl_sqrt_nonneg.
     }
