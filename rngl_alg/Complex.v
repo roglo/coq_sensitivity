@@ -3056,10 +3056,8 @@ Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-(*
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-*)
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -3081,19 +3079,30 @@ destruct n. {
   cbn.
   remember (0 ≤? √ _)%L as x eqn:Hx.
   symmetry in Hx.
-  destruct x. 2: {
-    exfalso.
-    apply Bool.not_true_iff_false in Hx.
-    apply Hx; clear Hx.
-    apply rngl_leb_le.
-    apply rl_sqrt_nonneg.
+  assert (Hz1ac : (0 ≤ (1 + rngl_cos θ) / 2)%L). {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_opp_l Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  assert (Hz1sc : (0 ≤ (1 - rngl_cos θ) / 2)%L). {
     apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
     apply (rngl_le_0_sub Hop Hor).
     apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
+  destruct x. 2: {
+    exfalso.
+    apply Bool.not_true_iff_false in Hx.
+    apply Hx; clear Hx.
+    apply rngl_leb_le.
+    now apply rl_sqrt_nonneg.
+  }
   apply rngl_leb_le in Hx.
+  do 2 rewrite fold_rngl_squ.
+  rewrite rngl_squ_sqrt; [ | easy ].
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   destruct zs. {
@@ -3101,7 +3110,39 @@ destruct n. {
     remember (0 ≤? _)%L as zss eqn:Hzss in |-*.
     symmetry in Hzss.
     destruct zss; [ | easy ].
+    apply rngl_leb_le in Hzs, Hzss.
+(*
+    rewrite (rngl_mul_comm Hic) in Hzss.
+    rewrite <- (rl_sqrt_mul) in Hzss; [ | easy | easy ].
+    rewrite (rngl_add_diag Hon) in Hzss.
+...
+*)
+    rewrite rngl_squ_sqrt; [ | easy ].
     apply rngl_leb_le.
+    rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+    rewrite (rngl_sub_sub_distr Hop).
+    rewrite (rngl_add_comm 1)%L.
+    rewrite (rngl_add_sub Hos).
+    rewrite (rngl_add_diag Hon).
+    rewrite (rngl_mul_comm Hic).
+    rewrite (rngl_mul_div Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+    symmetry in Hzc.
+    rewrite rngl_add_comm.
+    destruct zc. 2: {
+      apply (rngl_leb_gt Hor) in Hzc.
+      apply (rngl_le_trans Hor _ 0); [ now apply (rngl_lt_le_incl Hor) | ].
+      now apply rl_sqrt_nonneg.
+    }
+    apply rngl_leb_le in Hzc.
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1; [ | easy ].
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+      now apply rl_sqrt_nonneg.
+    }
+    apply (rngl_squ_le_abs_le Hop Hor Hii).
+    rewrite rngl_squ_sqrt; [ | easy ].
 ...
 Search (0 ≤? √ _)%L.
 Search rl_sqrt.
