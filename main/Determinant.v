@@ -55,7 +55,6 @@ Fixpoint determinant_loop n (M : matrix T) :=
   end.
 
 Definition det M := determinant_loop (mat_nrows M) M.
-Arguments det M%M.
 
 (* definition 2
    determinant by sum of products involving all permutations of columns,
@@ -78,10 +77,6 @@ Definition det' (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε (canon_sym_gr_list n k) *
     ∏ (i = 1, n), mat_el M i ((canon_sym_gr_list n k).(i) + 1).
-
-(*
-Arguments det' M%M.
-*)
 
 (* definition 3
    determinant by sum of products like in definition 2, but running with all
@@ -2427,5 +2422,4 @@ Qed.
 
 End a.
 
-Arguments det {T ro} M%M.
 Arguments determinant_alternating {T ro rp} Hon Hic Hop M%M [p q]%nat.
