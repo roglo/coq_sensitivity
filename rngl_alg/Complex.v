@@ -3259,6 +3259,50 @@ rewrite Nat_add_diag.
 now apply IHm.
 Qed.
 
+Theorem angle_mul_nat_overflow_pow_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow_nat θ n) = false.
+Proof.
+intros Hic Hon Hop Hed.
+specialize ac_iv as Hiv.
+specialize ac_or as Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (characteristic_0_angle_0 Hon Hos Hc1 (angle_div_2_pow_nat _ _)).
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
+assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+intros.
+revert θ.
+induction n; intros; [ easy | cbn ].
+destruct n. {
+  cbn.
+  apply Bool.orb_false_iff.
+  split; [ | easy ].
+  rewrite (angle_add_0_r Hon Hos).
+  apply (angle_add_overflow_div_2_div_2 Hic Hon Hop Hed).
+}
+cbn.
+do 2 rewrite Nat.add_0_r.
+rewrite Nat.add_assoc.
+cbn in IHn.
+rewrite Nat.add_0_r in IHn.
+specialize (IHn θ) as H1.
+apply (angle_mul_nat_overflow_angle_div_2_mul_2_div_2 Hic Hon Hop Hed) in H1.
+cbn in H1.
+rewrite Nat.add_0_r in H1.
+rewrite Nat.add_assoc in H1.
+apply H1.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3357,46 +3401,6 @@ enough (H :
       apply Nat.le_add_r.
     }
     clear Hi HN.
-Theorem angle_mul_nat_overflow_pow_div :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ n θ,
-  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow_nat θ n) = false.
-Proof.
-intros Hic Hon Hop Hed.
-specialize ac_iv as Hiv.
-specialize ac_or as Hor.
-(*
-destruct ac as (Hiv, Hc2, Hor).
-*)
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros.
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (characteristic_0_angle_0 Hon Hos Hc1 (angle_div_2_pow_nat _ _)).
-  apply (angle_mul_nat_overflow_0_r Hon Hos).
-}
-assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-intros.
-revert θ.
-induction n; intros; [ easy | cbn ].
-destruct n. {
-  cbn.
-  apply Bool.orb_false_iff.
-  split; [ | easy ].
-  rewrite (angle_add_0_r Hon Hos).
-  apply (angle_add_overflow_div_2_div_2 Hic Hon Hop Hed).
-}
-cbn.
-do 2 rewrite Nat.add_0_r.
-rewrite Nat.add_assoc.
-cbn in IHn.
-rewrite Nat.add_0_r in IHn.
-specialize (IHn θ) as H1.
 (*
 About angle_add.
 About angle_add_overflow.
@@ -3407,11 +3411,8 @@ Check (angle_add_overflow θ (angle_add θ (angle_add θ θ))).
 Check (angle_add_overflow θ (θ + θ + θ)%A).
 Check (angle_add_overflow θ (θ + θ + θ)).
 *)
-apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2 in H1.
-cbn in H1.
-rewrite Nat.add_0_r in H1.
-rewrite Nat.add_assoc in H1.
-apply H1.
+Inspect 1.
+Check angle_mul_nat_overflow_pow_div.
 ...
 specialize (glop n (2 ^ n + 2 ^ n) (θ / ₂)%A) as H2.
 cbn in H2.
