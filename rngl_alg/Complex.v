@@ -3157,6 +3157,29 @@ rewrite (angle_add_0_r Hon Hos).
 apply (angle_add_overflow_div_2_div_2 Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_add_not_overflow_move_add :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → angle_add_overflow (θ1 + θ3) θ2 = false
+  → angle_add_overflow θ1 (θ2 + θ3) = false.
+Proof.
+intros Hic Hon Hop Hed.
+intros * H13 H132.
+progress unfold angle_add_overflow in H132.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge in H132.
+apply angle_ltb_ge.
+rewrite (angle_add_add_swap Hic Hop) in H132.
+rewrite <- (angle_add_assoc Hop) in H132.
+apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
+progress unfold angle_add_overflow in H13.
+now apply angle_ltb_ge in H13.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3264,8 +3287,8 @@ Theorem angle_mul_nat_overflow_pow_div :
   angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow_nat θ n) = false.
 Proof.
 intros Hic Hon Hop Hed.
-remember ac_iv as Hiv eqn:H; clear H.
-remember ac_or as Hor eqn:H; clear H.
+specialize ac_iv as Hiv.
+specialize ac_or as Hor.
 (*
 destruct ac as (Hiv, Hc2, Hor).
 *)
@@ -3340,6 +3363,17 @@ split. {
   apply (angle_add_overflow_le Hic Hon Hop Hed _ θ); [ | easy ].
   apply (angle_div_2_le Hic Hon Hop Hed).
 }
+rewrite <- Nat.add_1_r.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite (angle_mul_nat_1_l Hon Hos).
+apply angle_add_not_overflow_move_add; try easy.
+...
+apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ + θ / ₂))%A.
+...
+eapply (angle_add_overflow_le Hic Hon Hop Hed).
+(n * θ + θ / ₂)
+...
+Search (angle_add_overflow _ _ = false).
 ...
 Check angle_mul_nat_le_mono_nonneg_r.
 ...
