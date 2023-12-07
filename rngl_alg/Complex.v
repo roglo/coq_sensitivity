@@ -18,6 +18,10 @@ Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
 Class GComplex T := mk_gc {gre : T; gim : T}.
 
+Declare Scope gc_scope.
+Delimit Scope gc_scope with C.
+Bind Scope gc_scope with GComplex.
+
 Arguments mk_gc {T} gre%L gim%L.
 Arguments gre {T} GComplex%L.
 Arguments gim {T} GComplex%L.
@@ -264,9 +268,6 @@ End a.
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
 
-Declare Scope gc_scope.
-Delimit Scope gc_scope with C.
-
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
@@ -284,8 +285,6 @@ Definition gc_ring_like_op T
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot;
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
-
-Arguments gc_power_nat {T ro} z%C n%nat.
 
 Section a.
 
@@ -1579,7 +1578,6 @@ Fixpoint angle_div_2_pow_nat θ i :=
 Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
   ((2 ^ i / n) * angle_div_2_pow_nat θ i)%A.
 
-Arguments seq_angle_converging_to_angle_div_nat θ%A (n i)%nat.
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
 Theorem angle_mul_nat_assoc :
