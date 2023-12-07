@@ -3917,7 +3917,7 @@ Theorem angle_div_2_mul_2 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ a, angle_mul_nat (angle_div_2 a) 2 = a.
+  ∀ a, (2 * (a / ₂))%A = a.
 Proof.
 intros Hic Hon Hop Hed *.
 destruct ac as (Hiv, Hc2, Hor).

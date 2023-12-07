@@ -3180,6 +3180,60 @@ progress unfold angle_add_overflow in H13.
 now apply angle_ltb_ge in H13.
 Qed.
 
+Theorem angle_add_diag :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ, (θ + θ = 2 * θ)%A.
+Proof.
+intros Hon Hos *; cbn.
+now rewrite (angle_add_0_r Hon Hos).
+Qed.
+
+Theorem angle_mul_nat_overflow_mul_2_div_2 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → angle_mul_nat_overflow (2 * n) (θ / ₂)%A = false.
+Proof.
+intros Hic Hon Hop Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn.
+revert θ Hn.
+induction n; intros; [ easy | ].
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
+destruct Hn as (Hmn, Han).
+cbn - [ angle_mul_nat_overflow ].
+rewrite Nat.add_0_r.
+rewrite Nat.add_succ_r.
+rewrite Nat_add_diag.
+apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
+split. {
+  apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
+  split; [ now apply IHn | ].
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
+  apply (angle_add_not_overflow_comm Hic Hon Hop Hed) in Han.
+  apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
+  apply (angle_add_overflow_le Hic Hon Hop Hed _ θ); [ | easy ].
+  apply (angle_div_2_le Hic Hon Hop Hed).
+}
+rewrite <- Nat.add_1_r.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite (angle_mul_nat_1_l Hon Hos).
+apply (angle_add_not_overflow_move_add Hic Hon Hop Hed). {
+  apply (angle_add_overflow_div_2_div_2 Hic Hon Hop Hed).
+}
+rewrite (angle_add_diag Hon Hos).
+rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
+rewrite Nat.mul_comm.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+now rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3319,177 +3373,25 @@ cbn in IHn.
 rewrite Nat.add_0_r in IHn.
 specialize (IHn θ) as H1.
 Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ m n θ,
   angle_mul_nat_overflow n (angle_div_2_pow_nat θ m) = false
   → angle_mul_nat_overflow (2 * n) (angle_div_2_pow_nat (θ / ₂) m) = false.
 Proof.
+intros Hic Hon Hop Hed.
 intros * Hnm.
 revert n Hnm.
 induction m; intros; cbn. {
   cbn in Hnm.
   rewrite Nat.add_0_r.
   rewrite Nat_add_diag.
-Theorem angle_mul_nat_overflow_mul_2_div_2 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = false
-  → angle_mul_nat_overflow (2 * n) (θ / ₂)%A = false.
-Proof.
-intros Hic Hon Hop Hed.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hn.
-revert θ Hn.
-induction n; intros; [ easy | ].
-apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
-destruct Hn as (Hmn, Han).
-cbn - [ angle_mul_nat_overflow ].
+  now apply (angle_mul_nat_overflow_mul_2_div_2 Hic Hon Hop Hed).
+}
 rewrite Nat.add_0_r.
-rewrite Nat.add_succ_r.
 rewrite Nat_add_diag.
-apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
-split. {
-  apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
-  split; [ now apply IHn | ].
-  rewrite Nat.mul_comm.
-  rewrite <- (angle_mul_nat_assoc Hon Hop).
-  rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
-  apply (angle_add_not_overflow_comm Hic Hon Hop Hed) in Han.
-  apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
-  apply (angle_add_overflow_le Hic Hon Hop Hed _ θ); [ | easy ].
-  apply (angle_div_2_le Hic Hon Hop Hed).
-}
-rewrite <- Nat.add_1_r.
-rewrite (angle_mul_add_distr_r Hon Hop).
-rewrite (angle_mul_nat_1_l Hon Hos).
-apply angle_add_not_overflow_move_add; try easy.
-...
-apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ + θ / ₂))%A.
-...
-eapply (angle_add_overflow_le Hic Hon Hop Hed).
-(n * θ + θ / ₂)
-...
-Search (angle_add_overflow _ _ = false).
-...
-Check angle_mul_nat_le_mono_nonneg_r.
-...
-Search (_ / ₂)%A.
-(*
-angle_add_overflow_div_2_div_2:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true → rngl_has_eq_dec T = true → ∀ θ : angle T, angle_add_overflow (θ / ₂) (θ / ₂) = false
-*)
-...
-intros Hon.
-remember ac_or as Hor eqn:H; clear H.
-intros.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin (θ / ₂))%L as zs2 eqn:Hzs2.
-cbn.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs, Hzs2.
-destruct zs2. {
-  apply rngl_leb_le in Hzs2.
-  destruct zs; [ | easy ].
-  apply rngl_leb_le in Hzs.
-  apply rngl_leb_le.
-  rewrite (rngl_mul_1_l Hon).
-...
-  ============================
-  (rngl_cos θ ≤ √((1 + rngl_cos θ) / 2))%L
-...
-} {
-  apply (rngl_leb_gt Hor) in Hzs2.
-  destruct zs. {
-    exfalso.
-    apply rngl_leb_le in Hzs.
-    apply (rngl_nle_gt Hor) in Hzs2.
-    apply Hzs2; clear Hzs2.
-    cbn.
-...
-  Hzs : (0 ≤ rngl_sin θ)%L
-  ============================
-  (0 ≤ √((1 - rngl_cos θ) / 2))%L
-...
-  remember (θ / ₂)%A as x.
-  rewrite <- (angle_div_2_mul_2 Hic Hon Hop Hed θ).
-(**)
-  rewrite <- (angle_mul_nat_1_l Hon Hos) in Heqx.
-  subst x.
-  apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed). 2: {
-    now apply -> Nat.succ_le_mono.
-  }
-  cbn.
-...
-angle_mul_nat_le_mono_nonneg_r:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ (a b : nat) (θ : angle T), angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A
-angle_mul_le_mono_l:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ θ1 θ2 : angle T, (θ1 ≤ θ2)%A → ∀ n : nat, angle_mul_nat_overflow n θ2 = false → (n * θ1 ≤ n * θ2)%A
-  subst x.
-  cbn; rewrite (angle_add_0_r Hon Hos).
-...
-  rewrite <- (angle_add_0_r Hon Hos x); subst x.
-  cbn; rewrite (angle_add_0_r Hon Hos) at 2.
-  apply (angle_add_le_mono_l Hic Hon Hop Hed). {
-    apply (angle_add_overflow_0_r Hon Hos).
-  } {
-    progress unfold angle_add_overflow.
-    apply angle_ltb_ge.
-...
-  ============================
-  (θ / ₂ ≤ θ / ₂ + θ / ₂)%A
-Search (angle_add_overflow (_ / ₂))%A.
-...
-Search (_ ≤ _ + _)%A.
-Check angle_add_0_r.
-...
-Search (2 * _)%A.
-Search (_ ≤ _ * _)%A.
-angle_mul_nat_le_mono_nonneg_r:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ (a b : nat) (θ : angle T), angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A
-angle_mul_2_div_2:
-  rngl_mul_is_comm T = true
-  → rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_has_eq_dec T = true
-        → ∀ a : angle T, ((2 * a) / ₂)%A = (if (a <? angle_straight)%A then a else (a + angle_straight)%A)
-
-Search (_ + _ ≤ _ + _)%A.
-Search (_ / ₂)%A.
-...
-Search (_ * _ * _)%A.
-Search (_ → angle_add_overflow _ _ = false).
-...
-cbn - [ angle_mul_nat_overflow ].
-rewrite Nat.add_0_r.
-rewrite Nat.add_succ_r.
-remember (S (n + n)) as m.
-cbn; subst m.
-apply Bool.orb_false_iff.
-split. {
-...
-  apply angle_add_overflow_le with (θ2 := (S (n * n) * θ / ₂)%A); try easy.
-...
-rewrite Nat.add_0_r, Nat.add_comm; cbn.
-Search (angle_mul_nat_overflow (S _)).
-... ...
-now apply angle_mul_nat_overflow_mul_2_div_2.
-}
 ...
 intros * Hnm.
 revert m Hnm.
