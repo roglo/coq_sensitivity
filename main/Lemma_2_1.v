@@ -86,8 +86,6 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
 Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
   (≺ v, M • v ≻ / ≺ v, v ≻)%L.
 
-Arguments Rayleigh_quotient M%M v%V.
-
 Theorem rngl_0_le_squ :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
