@@ -3351,7 +3351,7 @@ enough (H :
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
-  exists (max N (Nat.log2 (S n))).
+  exists (max N (Nat.log2 n)).
   intros i Hi.
   eapply (rngl_le_lt_trans Hor). 2: {
     apply (HN i).
@@ -3398,41 +3398,37 @@ enough (H :
   }
   subst Δθ.
   apply Nat.max_lub_r in Hi.
-...
-  apply (Nat.le_trans (Nat.log2 n)) in Hi. 2: {
-...
-Search (Nat.log2 (S _)).
-Nat.log2_succ_le: ∀ a : nat, Nat.log2 (S a) ≤ S (Nat.log2 a)
-
-  rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
-Search (Nat.log2 (S _)).
-...
-
-  apply (Nat.le_trans (Nat.log2 n)) in Hi. 2: {
-Search (Nat.log2_up (S _)).
-...
-Search (Nat.log2 (S _)).
-Search (Nat.log2 _ ≤ Nat.log2 (S _)).
-...
-  apply (Nat.lt_le_trans (Nat.log2 n)) in Hi. 2: {
-Search (Nat.log2 (S _)).
-eapply Nat.lt_le_trans. 2: {
-
-...
-  apply Nat.log2_succ_le.
-Nat.log2_succ_le: ∀ a : nat, Nat.log2 (S a) ≤ S (Nat.log2 a)
-...
-
+  apply Nat.succ_le_mono in Hi.
+  rewrite <- (Nat.log2_pow2 (S i)) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
-
-Search (Nat.log2 _ ≤ _).
-Search (Nat.log2_up _ ≤ _).
-Search (Nat.log2 _ < _).
+Search (angle_div_2_pow_nat (_ / ₂)).
 ...
-Nat.log2_lt_cancel: ∀ a b : nat, Nat.log2 a < Nat.log2 b → a < b
-Search (Nat.log2_up _ < _).
-Search Nat.log2.
-Nat.log2_pow2: ∀ a : nat, 0 ≤ a → Nat.log2 (2 ^ a) = a
+angle_mul_nat_overflow_angle_div_2_mul_2_div_2:
+...
+  apply (angle_le_trans _ (2 ^ i * angle_div_2_pow_nat (2 * θ) (S i))); cbn.
+rewrite (angle_add_0_r Hon Hos).
+rewrite (angle_add_diag Hon Hos).
+Search (2 * _ / ₂)%A.
+rewrite (angle_mul_2_div_2 Hic Hon Hop Hed).
+...
+  apply (angle_le_trans _ (2 ^ i * angle_div_2_pow_nat θ (S i))); cbn. 2: {
+    rewrite (angle_mul_2_pow_div_2_pow Hic Hon Hop Hed).
+    (* lemma *)
+    progress unfold angle_leb.
+...
+Search (_ * _ ≤ _ * _)%A.
+...
+Search (_ ≤ angle_straight)%A.
+Search (_ / ₂ ≤ _)%A.
+    rewrite angle_mul_2_pow_div_2_pow; try easy.
+
+Search (angle_div_2_pow_nat _ (S _)).
+cbn.
+rewrite angle_div_2_pow_nat_succ_r.
+
+Search (2 ^ _ * angle_div_2_pow_nat _ _)%A.
+2: {
+rewrite angle_mul_2_pow_div_2_pow; try easy.
 ...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.
