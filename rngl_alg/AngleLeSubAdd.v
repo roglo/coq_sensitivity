@@ -6,7 +6,9 @@
    perhaps could be used one day, but if I keep all this kind of theorem,
    my software is going to be unnecessarily huge.
  *)
+(*
 Set Nested Proofs Allowed.
+*)
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi.
@@ -37,6 +39,7 @@ symmetry.
 apply (rngl_sub_opp_r Hop).
 Qed.
 
+(*
 Theorem fold_sin_add :
   ∀ θ1 θ2,
   (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L =
@@ -45,6 +48,7 @@ Proof.
 intros.
 apply rngl_add_comm.
 Qed.
+*)
 
 Theorem fold_sin_sub :
   rngl_has_opp T = true →
@@ -85,6 +89,7 @@ symmetry in Hcs.
 now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
 Qed.
 
+(*
 Theorem eq_rngl_sin_opp_1 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -110,6 +115,7 @@ rewrite (rngl_sub_diag Hos) in Hcs.
 symmetry in Hcs.
 now apply (eq_rngl_squ_0 Hos Hid) in Hcs.
 Qed.
+*)
 
 Theorem rngl_sin_sub_nonneg_sin_le_sin :
   rngl_mul_is_comm T = true →
@@ -152,6 +158,7 @@ apply (rngl_le_0_sub Hop Hor).
 apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 Qed.
 
+(*
 Theorem angle_le_0_r :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -173,6 +180,7 @@ specialize (rngl_cos_bound Hon Hop Hiv Hic Hed Hor θ) as H1.
 apply (rngl_le_antisymm Hor) in Hθ; [ | easy ].
 now apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Hθ.
 Qed.
+*)
 
 Theorem angle_straight_sub_right :
   rngl_has_1 T = true →
@@ -190,6 +198,7 @@ rewrite (rngl_squ_opp_1 Hon Hop).
 apply rngl_add_0_r.
 Qed.
 
+(*
 Theorem rngl_cos_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -375,6 +384,7 @@ apply (rngl_nle_gt Hor) in H.
 apply rngl_leb_nle in H.
 now rewrite H.
 Qed.
+*)
 
 Theorem rngl_sin_sub_lt_sin_l :
   rngl_mul_is_comm T = true →
@@ -606,6 +616,7 @@ apply (rngl_add_nonneg_nonneg Hor). {
 }
 Qed.
 
+(*
 Theorem angle_le_sub_le_add_l_lemma_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2526,5 +2537,6 @@ destruct zs12. {
   now apply angle_le_sub_le_add_l_lemma_8.
 }
 Qed.
+*)
 
 End a.
