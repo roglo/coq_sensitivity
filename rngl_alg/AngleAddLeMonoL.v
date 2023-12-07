@@ -3,13 +3,9 @@
  *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 ZArith.
-(*
-Require Import Init.Nat.
-Import List List.ListNotations.
-*)
-Require Import (*Main.Misc*) Main.RingLike (*Main.IterAdd*).
-Require Import (*RealLike*) TrigoWithoutPi AngleLeSubAdd.
+Require Import Utf8 Arith.
+Require Import Main.RingLike.
+Require Import TrigoWithoutPi AngleLeSubAdd.
 Require Import AngleAddOverflowLe.
 
 Section a.
@@ -355,7 +351,7 @@ Ltac sin_cos_add_sub_straight_goal Hic Hon Hop :=
    moyen de la rendre plus simple, mais j'ai pas le temps
    de regarder. Tant pis, c'est prouvé, c'est déjà ça. Et
    puis ce théorème est important. *)
-Theorem angle_add_overflow_false_comm :
+Theorem angle_add_not_overflow_comm :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -1970,7 +1966,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     rewrite (angle_add_comm Hic) in Hzs13.
     apply angle_add_le_mono_l_lemma_10 in Hzs13; try easy.
     2: now apply (rngl_lt_le_incl Hor).
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    now apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   }
 }
 Qed.
@@ -4072,7 +4068,7 @@ destruct zs2. {
             now apply (angle_add_le_mono_l_lemma_32 Hic Hon Hop Hed _ _ θ3).
           } {
             apply (rngl_nle_gt Hor) in Hc1z.
-            apply angle_add_overflow_false_comm in Haov13; try easy.
+            apply angle_add_not_overflow_comm in Haov13; try easy.
             exfalso.
             apply Bool.not_true_iff_false in Haov13.
             apply Haov13; clear Haov13.

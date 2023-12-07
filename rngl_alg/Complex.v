@@ -2836,22 +2836,22 @@ apply (IHn θ1) in Hn12; [ | easy ].
 apply (angle_le_trans _ (θ1 + n * θ2))%A. {
   apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
     apply (angle_add_overflow_le Hic Hon Hop Hed _ (n * θ2))%A; [ easy | ].
-    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
     apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2); [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    now apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   } {
-    apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
     apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    now apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   }
 } {
   rewrite (angle_add_comm Hic θ1).
   rewrite (angle_add_comm Hic θ2).
   apply (angle_add_le_mono_l Hic Hon Hop Hed); [ | | easy ]. {
     apply (angle_add_overflow_le Hic Hon Hop Hed _ θ2)%A; [ easy | ].
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    now apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   } {
-    now apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+    now apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   }
 }
 Qed.
@@ -2882,9 +2882,9 @@ split; [ | now apply (IHn _ θ2) ].
 remember (S n) as m eqn:Hm.
 clear n Hm; rename m into n.
 clear H2 IHn.
-apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ apply H12 | ].
-apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
 eapply (angle_add_overflow_le Hic Hon Hop Hed); [ | apply H2n2 ].
 now apply (angle_mul_le_mono_l Hic Hon Hop Hed).
 Qed.
@@ -3318,7 +3318,6 @@ rewrite Nat.add_assoc.
 cbn in IHn.
 rewrite Nat.add_0_r in IHn.
 specialize (IHn θ) as H1.
-Search angle_mul_nat_overflow.
 Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
   ∀ m n θ,
   angle_mul_nat_overflow n (angle_div_2_pow_nat θ m) = false
@@ -3330,7 +3329,6 @@ induction m; intros; cbn. {
   cbn in Hnm.
   rewrite Nat.add_0_r.
   rewrite Nat_add_diag.
-Search (angle_mul_nat_overflow).
 Theorem angle_mul_nat_overflow_mul_2_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3358,8 +3356,8 @@ split. {
   rewrite Nat.mul_comm.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
-  apply (angle_add_overflow_false_comm Hic Hon Hop Hed) in Han.
-  apply (angle_add_overflow_false_comm Hic Hon Hop Hed).
+  apply (angle_add_not_overflow_comm Hic Hon Hop Hed) in Han.
+  apply (angle_add_not_overflow_comm Hic Hon Hop Hed).
   apply (angle_add_overflow_le Hic Hon Hop Hed _ θ); [ | easy ].
   apply (angle_div_2_le Hic Hon Hop Hed).
 }
