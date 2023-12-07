@@ -29,10 +29,8 @@ Definition transparentify {A} (D : {A} + {¬A}) (H : A) : A :=
   end.
 
 Definition GQmake x p := GQmake0 x (transparentify (Nat.eq_dec _ _) p).
-Arguments GQmake x%PQ.
 
 Definition GQ_of_PQ x := GQmake (PQred x) (PQred_gcd x).
-Arguments GQ_of_PQ x%PQ.
 
 Definition GQ_of_pair n d := GQ_of_PQ (PQ_of_pair n d).
 

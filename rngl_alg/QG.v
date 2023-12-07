@@ -188,6 +188,7 @@ Definition QG_lt a b := QG_leb b a = false.
 
 Declare Scope QG_scope.
 Delimit Scope QG_scope with QG.
+Bind Scope QG_scope with QG.
 
 Notation "0" := QG_0 : QG_scope.
 Notation "1" := QG_1 : QG_scope.
@@ -212,9 +213,6 @@ Notation "a < b ≤ c" := (QG_lt a b ∧ QG_le b c)
   (at level 70, b at next level) : QG_scope.
 Notation "a < b < c" := (QG_lt a b ∧ QG_lt b c)
   (at level 70, b at next level) : QG_scope.
-
-Arguments qg_q q%QG.
-Arguments Z_of_QG a%QG.
 
 Theorem fold_QG_of_Z : ∀ a, QG_of_Q (a # 1) = QG_of_Z a.
 Proof. easy. Qed.
