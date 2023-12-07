@@ -23,6 +23,10 @@ Open Scope Z_scope.
 
 Record quad_int (d : Z) := mk_qi { qi_re : Z; qi_im : Z }.
 
+Declare Scope QI_scope.
+Delimit Scope QI_scope with QI.
+Bind Scope QI_scope  with quad_int.
+
 Definition qi_zero {d} := mk_qi d 0 0.
 Definition qi_one {d} := mk_qi d 1 0.
 
@@ -47,12 +51,6 @@ Definition qi_div d (α β : quad_int d) :=
   let ab := qi_mul α (qi_conj β) in
   let bb := qi_mul β (qi_conj β) in
   mk_qi d (qi_re ab / qi_re bb) (qi_im ab / qi_re bb).
-
-Declare Scope QI_scope.
-Delimit Scope QI_scope with QI.
-
-Arguments qi_re [d]%Z q%QI.
-Arguments qi_im [d]%Z q%QI.
 
 Notation "0" := qi_zero : QI_scope.
 Notation "1" := qi_one : QI_scope.
