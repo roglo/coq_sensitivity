@@ -3394,11 +3394,21 @@ induction m; intros; cbn. {
 }
 rewrite Nat.add_0_r.
 rewrite Nat_add_diag.
+...
 About angle_mul_nat_overflow.
 About angle_add_overflow.
 Check (angle_add_overflow θ (θ + θ)).
 About angle_add.
+Check (θ + θ)%A.
+Check (θ + θ + θ)%A.
+About angle_add.
+About angle_add_overflow.
+Check (angle_add_overflow (angle_add (angle_add θ θ) θ) θ).
+Check (angle_add_overflow θ (angle_add (angle_add θ θ) θ)).
+Locate "+".
+Print Grammar constr.
 ...
+Check (angle_add_overflow θ (θ + θ + θ)%A).
 Check (angle_add_overflow θ (θ + θ + θ)).
 ...
 intros * Hnm.
