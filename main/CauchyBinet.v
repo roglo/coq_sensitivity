@@ -389,9 +389,6 @@ Definition mat_select_cols (jl : list nat) (M : matrix T) :=
 
 End a.
 
-Arguments mat_select_rows {T ro} jl%list M%M.
-Arguments mat_select_cols {T ro} jl%list M%M.
-
 Section a.
 
 Context {T : Type}.
@@ -2166,8 +2163,6 @@ easy.
 Qed.
 
 End a.
-
-Arguments Cauchy_Binet_formula {T ro rp} _ [m n]%nat.
 
 Section a.
 
