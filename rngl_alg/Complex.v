@@ -3236,6 +3236,29 @@ rewrite <- (angle_mul_nat_assoc Hon Hop).
 now rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ m n θ,
+  angle_mul_nat_overflow n (angle_div_2_pow_nat θ m) = false
+  → angle_mul_nat_overflow (2 * n) (angle_div_2_pow_nat (θ / ₂) m) = false.
+Proof.
+intros Hic Hon Hop Hed.
+intros * Hnm.
+revert θ n Hnm.
+induction m; intros; cbn. {
+  cbn in Hnm.
+  rewrite Nat.add_0_r.
+  rewrite Nat_add_diag.
+  now apply (angle_mul_nat_overflow_mul_2_div_2 Hic Hon Hop Hed).
+}
+rewrite Nat.add_0_r.
+rewrite Nat_add_diag.
+now apply IHm.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3374,26 +3397,6 @@ rewrite Nat.add_assoc.
 cbn in IHn.
 rewrite Nat.add_0_r in IHn.
 specialize (IHn θ) as H1.
-Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ m n θ,
-  angle_mul_nat_overflow n (angle_div_2_pow_nat θ m) = false
-  → angle_mul_nat_overflow (2 * n) (angle_div_2_pow_nat (θ / ₂) m) = false.
-Proof.
-intros Hic Hon Hop Hed.
-intros * Hnm.
-revert θ n Hnm.
-induction m; intros; cbn. {
-  cbn in Hnm.
-  rewrite Nat.add_0_r.
-  rewrite Nat_add_diag.
-  now apply (angle_mul_nat_overflow_mul_2_div_2 Hic Hon Hop Hed).
-}
-rewrite Nat.add_0_r.
-rewrite Nat_add_diag.
 (*
 About angle_add.
 About angle_add_overflow.
@@ -3404,17 +3407,6 @@ Check (angle_add_overflow θ (angle_add θ (angle_add θ θ))).
 Check (angle_add_overflow θ (θ + θ + θ)%A).
 Check (angle_add_overflow θ (θ + θ + θ)).
 *)
-apply IHm.
-...
-intros * Hnm.
-revert m Hnm.
-induction n; intros; [ easy | cbn ].
-rewrite Nat.add_0_r, Nat.add_comm.
-cbn.
-apply Bool.orb_false_iff.
-split. 2: {
-cbn in Hnm.
-... ...
 apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2 in H1.
 cbn in H1.
 rewrite Nat.add_0_r in H1.
