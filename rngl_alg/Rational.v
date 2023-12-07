@@ -19,15 +19,14 @@ Tactic Notation "pauto" := progress auto.
    << (a, b) >> representing << (a+1)/(b+1) >> and a proof that
    << a+1 >> and << b+1 >> are coprimes. *)
 
-Delimit Scope Q_scope with Q.
-
 Inductive Q :=
   | Zero : Q
   | Pos : GQ → Q
   | Neg : GQ → Q.
 
-Arguments Pos p%GQ.
-Arguments Neg p%GQ.
+Declare Scope Q_scope.
+Delimit Scope Q_scope with Q.
+Bind Scope Q_scope with Q.
 
 (** Module Q is meant to be used as a whole module,
    without importing it, leading to qualified definitions
@@ -62,8 +61,6 @@ Definition den x :=
   | Pos a => GQden a
   | Neg a => GQden a
   end.
-Arguments num x%Q.
-Arguments den x%Q.
 
 (** * Addition and Multiplication *)
 
@@ -161,7 +158,6 @@ Definition lt x y :=
   | Pos px => match y with Pos py => GQlt px py | _ => False end
   | Neg px => match y with Neg py => GQlt py px | _ => True end
   end.
-Arguments lt x%Q y%Q.
 
 Definition le x y :=
   match x with
@@ -169,7 +165,6 @@ Definition le x y :=
   | Pos px => match y with Pos py => GQle px py | _ => False end
   | Neg px => match y with Neg py => GQle py px | _ => True end
   end.
-Arguments le x%Q y%Q.
 
 Definition gt x y := lt y x.
 Definition ge x y := le y x.
@@ -751,7 +746,6 @@ destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQle_trans; [ apply Hxy | apply Hyz ].
 -eapply GQle_trans; [ apply Hyz | apply Hxy ].
 Qed.
-Arguments le_trans x%Q y%Q z%Q.
 
 Theorem lt_irrefl : ∀ x, ¬ (x < x)%Q.
 Proof.
@@ -769,7 +763,6 @@ destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQlt_trans; [ apply Hxy | apply Hyz ].
 -eapply GQlt_trans; [ apply Hyz | apply Hxy ].
 Qed.
-Arguments lt_trans x%Q y%Q z%Q.
 
 Theorem le_lt_trans: ∀ x y z, (x ≤ y)%Q → (y < z)%Q → (x < z)%Q.
 Proof.
@@ -779,7 +772,6 @@ destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQle_lt_trans; [ apply Hxy | apply Hyz ].
 -eapply GQlt_le_trans; [ apply Hyz | apply Hxy ].
 Qed.
-Arguments le_lt_trans x%Q y%Q z%Q.
 
 Theorem lt_le_trans : ∀ x y z, (x < y)%Q → (y ≤ z)%Q → (x < z)%Q.
 Proof.
@@ -789,7 +781,6 @@ destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 -eapply GQlt_le_trans; [ apply Hxy | apply Hyz ].
 -eapply GQle_lt_trans; [ apply Hyz | apply Hxy ].
 Qed.
-Arguments lt_le_trans x%Q y%Q z%Q.
 
 Theorem nle_gt : ∀ x y, ¬ (x ≤ y)%Q ↔ (y < x)%Q.
 Proof.
@@ -830,7 +821,6 @@ destruct x as [| px| px], y as [| py| py]; try now right.
  +now intros H; apply H1; injection H; intros.
 (**)
 Defined.
-Arguments eq_dec x%Q y%Q.
 
 Theorem lt_le_dec : ∀ x y : Q, {(x < y)%Q} + {(y ≤ x)%Q}.
 Proof.
@@ -842,7 +832,6 @@ destruct x as [| px| px].
 -destruct y as [| py| py]; [ now left | now left | ].
  apply GQlt_le_dec.
 Qed.
-Arguments lt_le_dec x%Q y%Q.
 
 Theorem le_lt_dec : ∀ x y : Q, {(x ≤ y)%Q} + {(y < x)%Q}.
 Proof.
@@ -853,7 +842,6 @@ destruct x as [| px| px].
 -destruct y as [| py| py]; [ now left | now left | ].
  apply GQle_lt_dec.
 Qed.
-Arguments le_lt_dec x%Q y%Q.
 
 Theorem le_dec : ∀ x y : Q, {(x ≤ y)%Q} + {¬ (x ≤ y)%Q}.
 Proof.
@@ -864,7 +852,6 @@ destruct x as [| px| px].
 -destruct y as [| py| py]; [ now left | now left | ].
  apply GQle_dec.
 Qed.
-Arguments le_dec x%Q y%Q.
 
 (** * Miscellaneous Properties *)
 
@@ -1080,7 +1067,6 @@ split; intros Hxy.
   apply GQnle_gt in Hxy; apply GQnle_gt; intros H; apply Hxy.
   now apply GQadd_le_mono_l.
 Qed.
-Arguments add_lt_mono_l x%Q y%Q z%Q.
 
 Theorem add_lt_mono_r : ∀ x y z, (x < y)%Q ↔ (x + z < y + z)%Q.
 Proof.
@@ -1088,7 +1074,6 @@ intros *.
 setoid_rewrite add_comm.
 apply add_lt_mono_l.
 Qed.
-Arguments add_lt_mono_r x%Q y%Q z%Q.
 
 Theorem add_le_mono : ∀ x y z t, (x ≤ y)%Q → (z ≤ t)%Q → (x + z ≤ y + t)%Q.
 Proof.
@@ -1109,7 +1094,6 @@ destruct (eq_dec x y) as [H1| H1].
   *apply lt_le_incl, add_lt_mono_r, nle_gt.
    now intros H; apply H1, le_antisymm.
 Qed.
-Arguments add_le_mono x%Q y%Q z%Q t%Q.
 
 Theorem add_le_mono_l : ∀ x y z, (x ≤ y)%Q ↔ (z + x ≤ z + y)%Q.
 Proof.
@@ -1121,7 +1105,6 @@ split; intros Hxy.
  replace (z + y)%Q with (y + z)%Q in Hxy by apply add_comm.
  now do 2 rewrite add_opp_r, add_sub in Hxy.
 Qed.
-Arguments add_le_mono_l x%Q y%Q z%Q.
 
 Theorem add_le_mono_r : ∀ x y z, (x ≤ y)%Q ↔ (x + z ≤ y + z)%Q.
 Proof.
@@ -1129,7 +1112,6 @@ intros.
 setoid_rewrite add_comm.
 apply add_le_mono_l.
 Qed.
-Arguments add_le_mono_r x%Q y%Q z%Q.
 
 Theorem add_le_lt_mono : ∀ x y z t, (x ≤ y → z < t → x + z < y + t)%Q.
 Proof.
@@ -1149,7 +1131,6 @@ destruct (eq_dec x y) as [H1| H1].
   *apply add_lt_mono_r, nle_gt.
    now intros H; apply H1, le_antisymm.
 Qed.
-Arguments add_le_lt_mono x%Q y%Q z%Q t%Q.
 
 Theorem add_lt_le_mono : ∀ x y z t, (x < y → z ≤ t → x + z < y + t)%Q.
 Proof.
@@ -1157,7 +1138,6 @@ intros * Hxy Hzt.
 setoid_rewrite add_comm.
 now apply add_le_lt_mono.
 Qed.
-Arguments add_lt_le_mono x%Q y%Q z%Q t%Q.
 
 Theorem add_lt_mono : ∀ x y z t, (x < y → z < t → x + z < y + t)%Q.
 Proof.
@@ -1238,7 +1218,6 @@ split; intros H.
  now do 2 rewrite add_opp_r, add_sub in H.
 -apply add_le_mono; [ easy | apply le_refl ].
 Qed.
-Arguments add_le_r x%Q y%Q z%Q.
 
 Theorem opp_lt_mono : ∀ x y, (x < y)%Q ↔ (- y < - x)%Q.
 Proof. intros; now destruct x, y. Qed.
@@ -1268,7 +1247,6 @@ destruct (eq_dec x y) as [H1| H1].
    intros H; apply H2, le_antisymm; [ easy | ].
    now apply opp_le_mono.
 Qed.
-Arguments sub_le_mono x%Q y%Q z%Q t%Q.
 
 Theorem sub_lt_mono : ∀ x y z t, (x < y)%Q → (z < t)%Q → (x - t < y - z)%Q.
 Proof.
@@ -1278,7 +1256,6 @@ apply (lt_trans _ (y - t)).
 -apply add_lt_mono_l.
  now apply -> opp_lt_mono.
 Qed.
-Arguments sub_lt_mono x%Q y%Q z%Q t%Q.
 
 Theorem sub_le_lt_mono : ∀ x y z t, (x ≤ y)%Q → (z < t)%Q → (x - t < y - z)%Q.
 Proof.
@@ -1291,7 +1268,6 @@ destruct (eq_dec x y) as [H1| H1].
  apply nle_gt; intros H2; apply H1; clear H1.
  now apply le_antisymm.
 Qed.
-Arguments sub_le_lt_mono x%Q y%Q z%Q t%Q.
 
 Theorem sub_lt_le_mono : ∀ x y z t, (x < y)%Q → (z ≤ t)%Q → (x - t < y - z)%Q.
 Proof.
@@ -1303,7 +1279,6 @@ destruct (eq_dec z t) as [H1| H1].
  apply nle_gt; intros H2; apply H1; clear H1.
  now apply le_antisymm.
 Qed.
-Arguments sub_lt_le_mono x%Q y%Q z%Q t%Q.
 
 Theorem lt_0_sub : ∀ x y, (0 < y - x)%Q ↔ (x < y)%Q.
 Proof.
@@ -1579,7 +1554,6 @@ split; intros Hxy.
  do 2 rewrite sub_sub_distr in Hxy.
  now rewrite sub_diag in Hxy.
 Qed.
-Arguments sub_le_mono_l x%Q y%Q z%Q.
 
 Theorem sub_le_mono_r : ∀ x y z, (x ≤ y)%Q ↔ (x - z ≤ y - z)%Q.
 Proof.
@@ -1589,7 +1563,6 @@ split; intros Hxy.
 -apply (add_le_mono_r _ _ z) in Hxy.
  now do 2 rewrite sub_add in Hxy.
 Qed.
-Arguments sub_le_mono_r x%Q y%Q z%Q.
 
 Theorem sub_lt_mono_l : ∀ x y z, (x < y)%Q ↔ (z - y < z - x)%Q.
 Proof.
@@ -1600,7 +1573,6 @@ split; intros Hxy.
  do 2 rewrite sub_sub_distr in Hxy.
  now rewrite sub_diag in Hxy.
 Qed.
-Arguments sub_lt_mono_l x%Q y%Q z%Q.
 
 Theorem sub_lt_mono_r : ∀ x y z, (x < y)%Q ↔ (x - z < y - z)%Q.
 Proof.
@@ -1610,7 +1582,6 @@ split; intros Hxy.
 -apply (add_lt_mono_r (x - z) (y - z) z) in Hxy.
  now do 2 rewrite sub_add in Hxy.
 Qed.
-Arguments sub_lt_mono_r x%Q y%Q z%Q.
 
 Theorem mul_pair : ∀ x y z t,
   y ≠ 0 → t ≠ 0 → ((x // y) * (z // t) = (x * z) // (y * t))%Q.
@@ -1717,7 +1688,6 @@ destruct y as [| yp| yp]; [ now destruct z | | ].
 -destruct z as [| zp| zp]; [ easy | easy | cbn ].
  apply GQmul_lt_mono_l.
 Qed.
-Arguments mul_lt_mono_pos_l x%Q y%Q z%Q.
 
 Theorem mul_lt_mono_pos_r : ∀ x y z,
   (0 < x)%Q → (y < z)%Q ↔ (y * x < z * x)%Q.
@@ -1725,7 +1695,6 @@ Proof.
 setoid_rewrite mul_comm.
 apply mul_lt_mono_pos_l.
 Qed.
-Arguments mul_lt_mono_pos_r x%Q y%Q z%Q.
 
 Theorem mul_le_mono_pos_l : ∀ x y z,
   (0 < x)%Q → (y ≤ z)%Q ↔ (x * y ≤ x * z)%Q.
@@ -1738,7 +1707,6 @@ destruct y as [| yp| yp]; [ now destruct z | | ].
 -destruct z as [| zp| zp]; [ easy | easy | cbn ].
  apply GQmul_le_mono_l.
 Qed.
-Arguments mul_le_mono_pos_l x%Q y%Q z%Q.
 
 Theorem mul_le_mono_pos_r : ∀ x y z,
   (0 < x)%Q → (y ≤ z)%Q ↔ (y * x ≤ z * x)%Q.
@@ -1746,7 +1714,6 @@ Proof.
 setoid_rewrite mul_comm.
 apply mul_le_mono_pos_l.
 Qed.
-Arguments mul_le_mono_pos_r x%Q y%Q z%Q.
 
 Theorem mul_cancel_l : ∀ x y z, x ≠ 0%Q → (x * y)%Q = (x * z)%Q ↔ y = z.
 Proof.
@@ -2382,9 +2349,6 @@ Qed.
 
 Definition frac x := ((num x mod den x) // den x)%Q.
 Definition intg x := num x / den x.
-
-Arguments frac x%Q.
-Arguments intg x%Q.
 
 Theorem frac_pair : ∀ a b, b ≠ 0 → frac (a // b) = ((a mod b) // b)%Q.
 Proof.

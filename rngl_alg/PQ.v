@@ -12,18 +12,19 @@ Reserved Notation "a // b" (at level 32, format "a // b").
    Natural numbers excluding 0.
    Represented by a nat "n" meaning "n+1" *)
 
+Record nnn := mknn { nn : nat }.
+
 Declare Scope nnn_scope.
 Delimit Scope nnn_scope with n.
-Record nnn := mknn { nn : nat }.
+Bind Scope nnn_scope with nnn.
 
 (* A PQ number {PQnum1:=a; PQden1:=b} represents the rational (a+1)/(b+1) *)
 
+Record PQ := PQmake { PQnum1 : nnn; PQden1 : nnn }.
+
 Declare Scope PQ_scope.
 Delimit Scope PQ_scope with PQ.
-Record PQ := PQmake { PQnum1 : nnn; PQden1 : nnn }.
-Arguments PQmake _%n _%n.
-Arguments PQnum1 x%PQ : rename.
-Arguments PQden1 x%PQ : rename.
+Bind Scope PQ_scope with PQ.
 
 Definition PQ_of_pair n d := PQmake (mknn (n - 1)) (mknn (d - 1)).
 Definition nd x y := (nn (PQnum1 x) + 1) * (nn (PQden1 y) + 1).
@@ -31,10 +32,8 @@ Definition PQeq x y := nd x y = nd y x.
 
 Theorem PQeq_dec : ∀ x y : PQ, {PQeq x y} + {¬ PQeq x y}.
 Proof. intros; apply Nat.eq_dec. Qed.
-Arguments PQeq_dec x%PQ y%PQ.
 
 Definition if_PQeq {A} (P Q : A) x y := if PQeq_dec x y then P else Q.
-Arguments if_PQeq _ _ _ x%PQ y%PQ.
 
 Definition PQlt x y := nd x y < nd y x.
 Definition PQle x y := nd x y ≤ nd y x.
@@ -54,9 +53,6 @@ Definition PQadd x y :=
 Definition PQsub x y :=
   PQmake (mknn (PQsub_num1 x y)) (mknn (PQadd_den1 x y)).
 
-Arguments PQadd x%PQ y%PQ.
-Arguments PQsub x%PQ y%PQ.
-
 (* multiplication, inversion, division *)
 (* unlike opp, inv exists in PQ *)
 
@@ -69,9 +65,6 @@ Definition PQmul x y :=
   PQmake (mknn (PQmul_num1 x y)) (mknn (PQmul_den1 x y)).
 Definition PQdiv x y :=
   PQmul x (PQinv y).
-
-Arguments PQmul x%PQ y%PQ.
-Arguments PQdiv x%PQ y%PQ.
 
 Module PQ_Notations.
 
@@ -244,7 +237,6 @@ Qed.
 (* inequality *)
 
 Definition PQcompare x y := Nat.compare (nd x y) (nd y x).
-Arguments PQcompare x%PQ y%PQ.
 
 Theorem PQcompare_eq_iff : ∀ x y, PQcompare x y = Eq ↔ (x == y)%PQ.
 Proof. intros; apply Nat.compare_eq_iff. Qed.
@@ -281,7 +273,6 @@ destruct (lt_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
 -now left.
 -now right; apply Nat.nlt_ge.
 Qed.
-Arguments PQlt_le_dec x%PQ y%PQ.
 
 Theorem PQle_lt_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {(y < x)%PQ}.
 Proof.
@@ -292,7 +283,6 @@ destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
 -now left.
 -now right; apply Nat.nle_gt.
 Qed.
-Arguments PQle_lt_dec x%PQ y%PQ.
 
 Theorem PQle_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {¬ (x ≤ y)%PQ}.
 Proof.
@@ -303,7 +293,6 @@ destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
 -now left.
 -now right.
 Qed.
-Arguments PQle_dec x%PQ y%PQ.
 
 Ltac split_var x :=
   let xn := fresh x in
@@ -467,7 +456,6 @@ f_equal.
 -replace (x1n * y1d * (y2d * x2d)) with (x1n * x2d * y1d * y2d) by flia.
  rewrite Hx; flia.
 Qed.
-Arguments PQsub_morph x1%PQ x2%PQ y1%PQ y2%PQ.
 
 (* allows to use rewrite inside a multiplication
    e.g.
@@ -599,7 +587,6 @@ apply
 -setoid_rewrite Nat.mul_shuffle0.
  apply Nat.mul_le_mono_pos_r; [ flia | easy ].
 Qed.
-Arguments PQle_trans x%PQ y%PQ z%PQ.
 
 Theorem PQlt_trans : ∀ x y z, (x < y)%PQ → (y < z)%PQ → (x < z)%PQ.
 Proof.
@@ -614,7 +601,6 @@ apply
 -setoid_rewrite Nat.mul_shuffle0.
  apply Nat.mul_lt_mono_pos_r; [ flia | easy ].
 Qed.
-Arguments PQlt_trans x%PQ y%PQ z%PQ.
 
 Theorem PQle_lt_trans : ∀ x y z, (x ≤ y)%PQ → (y < z)%PQ → (x < z)%PQ.
 Proof.
@@ -681,7 +667,6 @@ destruct c1.
   apply PQnle_gt in Hc2.
   now exfalso; apply Hc2, PQlt_le_incl.
 Qed.
-Arguments PQcompare_morph x1%PQ x2%PQ Hx%PQ y1%PQ y2%PQ Hy%PQ : rename.
 
 Theorem PQadd_lt_mono_r : ∀ x y z, (x < y)%PQ ↔ (x + z < y + z)%PQ.
 Proof.
@@ -1079,7 +1064,6 @@ intros.
 setoid_rewrite PQadd_comm.
 apply PQadd_cancel_l.
 Qed.
-Arguments PQadd_cancel_r x%PQ y%PQ z%PQ.
 
 Theorem PQsub_cancel_l : ∀ x y z,
   (y < x)%PQ → (z < x)%PQ → (x - y == x - z)%PQ ↔ (y == z)%PQ.
@@ -1322,7 +1306,6 @@ Require Import Nat_ggcd.
 Definition PQred x :=
   let '(_, (aa, bb)) := ggcd (nn (PQnum1 x) + 1) (nn (PQden1 x) + 1) in
   PQmake (mknn (aa - 1)) (mknn (bb - 1)).
-Arguments PQred x%PQ.
 
 Global Instance PQred_morph : Proper (PQeq ==> PQeq) PQred.
 Proof.
