@@ -3401,6 +3401,8 @@ enough (H :
       apply Nat.le_add_r.
     }
     clear Hi HN.
+    apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
+  }
 (*
 About angle_add.
 About angle_add_overflow.
@@ -3411,91 +3413,6 @@ Check (angle_add_overflow θ (angle_add θ (angle_add θ θ))).
 Check (angle_add_overflow θ (θ + θ + θ)%A).
 Check (angle_add_overflow θ (θ + θ + θ)).
 *)
-Inspect 1.
-Check angle_mul_nat_overflow_pow_div.
-...
-specialize (glop n (2 ^ n + 2 ^ n) (θ / ₂)%A) as H2.
-cbn in H2.
-specialize (H2 H1).
-...
-rewrite <- (Nat.add_1_r n) at 3.
-Search (angle_div_2_pow_nat _ (_ + _)).
-About angle_div_2_pow_nat_add.
-...
-Search (angle_div_2_pow_nat).
-  ============================
-  angle_mul_nat_overflow (2 ^ S n + 2 ^ S n)
-    (angle_div_2_pow_nat (θ / ₂) (S n)) = false
-...
-Search (0 < rngl_abs _)%L.
-...
-    specialize (cos2_sin2_1 Hon Hop Hic Hed q2) as H1.
-    rewrite rngl_mul_add_sub.
-Search ((_ * _) / _)%L.
-...
-Search (_ / _ / _)%L.
-rewrite
-...
-    apply (rngl_mul_pos_pos Hop Hor Hii). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-Search (0 < √ _)%L.
-...
-    apply rngl_leb_le in Hzss.
-    apply rngl_leb_le.
-    rewrite (rngl_squ_opp Hop).
-    rewrite rngl_squ_sqrt; [ | easy ].
-    rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-    rewrite (rngl_sub_sub_distr Hop).
-    rewrite (rngl_add_comm 1)%L.
-    rewrite (rngl_add_sub Hos).
-    rewrite (rngl_add_diag Hon).
-    rewrite (rngl_mul_comm Hic).
-    rewrite (rngl_mul_div Hi1). 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-    }
-    remember (0 <? rngl_cos θ)%L as zc eqn:Hzc.
-...
-    remember (0 ≤? _)%L as zss eqn:Hzss in |-*.
-    symmetry in Hzss.
-    destruct zss; [ | easy ].
-...
-    specialize (cos2_sin2_1 Hon Hop Hic Hed θ) as H1.
-    apply (rngl_add_move_r Hop) in H1.
-    rewrite H1.
-    rewrite (rngl_mul_sub_distr_r Hop).
-    apply (rngl_le_sub_le_add_r Hop Hor).
-    rewrite <- rngl_add_assoc.
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    rewrite (rngl_mul_1_l Hon).
-    rewrite (rngl_add_sub Hos).
-...
-Search (0 ≤? √ _)%L.
-Search rl_sqrt.
-...
-  rewrite <- (angle_add_0_r Hon Hos) at 1.
-  apply (angle_add_le_mono_l Hic Hon Hop Hed). {
-    apply (angle_add_overflow_0_r Hon Hos).
-  } {
-    progress unfold angle_add_overflow.
-    apply angle_ltb_ge.
-    rewrite <- (angle_add_0_r Hon Hos) at 1.
-    apply (angle_add_le_mono_l Hic Hon Hop Hed).
-...
-  progress unfold angle_leb.
-  rewrite <- (angle_div_2_add_not_overflow Hic Hon Hop Hed). 2: {
-...
-Search (_ / ₂ + _ / ₂)%A.
-  remember (0 ≤? rngl_sin (θ / ₂))%L as zs2 eqn:Hzs2.
-  symmetry in Hzs2.
-  destruct zs2. {
-... ...
-apply (angle_mul_nat_overflow_pow_div Hon Hos).
-...
-(* oh, fait chier, tiens *)
-Search (angle_mul_nat_overflow (2 * _)).
-Search (angle_mul_nat_overflow (_ + _)).
-Search (_ → angle_mul_nat_overflow _ _ = false).
 ...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.
