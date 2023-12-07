@@ -3351,9 +3351,12 @@ enough (H :
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
-  exists N.
+  exists (max N (Nat.log2 (S n))).
   intros i Hi.
-  eapply (rngl_le_lt_trans Hor); [ | now apply (HN i) ].
+  eapply (rngl_le_lt_trans Hor). 2: {
+    apply (HN i).
+    now apply Nat.max_lub_l in Hi.
+  }
   progress unfold angle_eucl_dist.
   cbn.
   do 2 rewrite (rngl_sub_0_l Hop).
@@ -3394,6 +3397,42 @@ enough (H :
     apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
   }
   subst Δθ.
+  apply Nat.max_lub_r in Hi.
+...
+  apply (Nat.le_trans (Nat.log2 n)) in Hi. 2: {
+...
+Search (Nat.log2 (S _)).
+Nat.log2_succ_le: ∀ a : nat, Nat.log2 (S a) ≤ S (Nat.log2 a)
+
+  rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
+Search (Nat.log2 (S _)).
+...
+
+  apply (Nat.le_trans (Nat.log2 n)) in Hi. 2: {
+Search (Nat.log2_up (S _)).
+...
+Search (Nat.log2 (S _)).
+Search (Nat.log2 _ ≤ Nat.log2 (S _)).
+...
+  apply (Nat.lt_le_trans (Nat.log2 n)) in Hi. 2: {
+Search (Nat.log2 (S _)).
+eapply Nat.lt_le_trans. 2: {
+
+...
+  apply Nat.log2_succ_le.
+Nat.log2_succ_le: ∀ a : nat, Nat.log2 (S a) ≤ S (Nat.log2 a)
+...
+
+  apply Nat.log2_lt_cancel in Hi.
+
+Search (Nat.log2 _ ≤ _).
+Search (Nat.log2_up _ ≤ _).
+Search (Nat.log2 _ < _).
+...
+Nat.log2_lt_cancel: ∀ a b : nat, Nat.log2 a < Nat.log2 b → a < b
+Search (Nat.log2_up _ < _).
+Search Nat.log2.
+Nat.log2_pow2: ∀ a : nat, 0 ≤ a → Nat.log2 (2 ^ a) = a
 ...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.
