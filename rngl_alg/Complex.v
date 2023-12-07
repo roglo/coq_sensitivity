@@ -2058,7 +2058,7 @@ Fixpoint angle_mul_nat_overflow n θ :=
   match n with
   | 0 | 1 => false
   | S n' =>
-      (angle_add_overflow θ (n' * θ)%A ||
+      (angle_add_overflow θ (n' * θ) ||
        angle_mul_nat_overflow n' θ)%bool
   end.
 
@@ -2732,7 +2732,7 @@ Theorem angle_mul_nat_overflow_succ_l_false :
   ∀ θ n,
   angle_mul_nat_overflow (S n) θ = false
   ↔ angle_mul_nat_overflow n θ = false ∧
-    angle_add_overflow θ (n * θ)%A = false.
+    angle_add_overflow θ (n * θ) = false.
 Proof.
 intros Hon Hos *.
 split; intros Hn. {
@@ -2901,7 +2901,7 @@ Qed.
 Theorem angle_add_overflow_0_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  ∀ θ, angle_add_overflow θ 0%A = false.
+  ∀ θ, angle_add_overflow θ 0 = false.
 Proof.
 intros Hon Hos.
 intros.
@@ -2956,10 +2956,12 @@ rewrite (angle_add_0_l Hon Hos).
 apply angle_le_refl.
 Qed.
 
+Arguments angle_mul_nat_overflow n%nat θ%A.
+
 Theorem angle_mul_nat_overflow_0_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
-  ∀ n, angle_mul_nat_overflow n 0%A = false.
+  ∀ n, angle_mul_nat_overflow n 0 = false.
 Proof.
 intros Hon Hos *.
 induction n; [ easy | cbn ].
@@ -3196,7 +3198,7 @@ Theorem angle_mul_nat_overflow_mul_2_div_2 :
   rngl_has_eq_dec T = true →
   ∀ n θ,
   angle_mul_nat_overflow n θ = false
-  → angle_mul_nat_overflow (2 * n) (θ / ₂)%A = false.
+  → angle_mul_nat_overflow (2 * n) (θ / ₂) = false.
 Proof.
 intros Hic Hon Hop Hed.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -3392,6 +3394,12 @@ induction m; intros; cbn. {
 }
 rewrite Nat.add_0_r.
 rewrite Nat_add_diag.
+About angle_mul_nat_overflow.
+About angle_add_overflow.
+Check (angle_add_overflow θ (θ + θ)).
+About angle_add.
+...
+Check (angle_add_overflow θ (θ + θ + θ)).
 ...
 intros * Hnm.
 revert m Hnm.
