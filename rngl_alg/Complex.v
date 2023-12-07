@@ -1787,11 +1787,7 @@ apply H in H12. {
   now rewrite (angle_opp_0 Hop) in H1.
 }
 Qed.
-*)
 
-Arguments angle_ltb {T ro rp} (θ1 θ2)%A.
-
-(*
 Theorem angle_div_2_0 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -2051,8 +2047,6 @@ rewrite <- (angle_div_2_add_not_overflow Hic Hon Hop Hed); [ | easy ].
 apply angle_ltb_ge in Haov.
 now apply (angle_div_2_le_compat).
 Qed.
-
-Arguments angle_add_overflow {T ro rp} (θ1 θ2)%A.
 
 Fixpoint angle_mul_nat_overflow n θ :=
   match n with
@@ -2956,8 +2950,6 @@ rewrite (angle_add_0_l Hon Hos).
 apply angle_le_refl.
 Qed.
 
-Arguments angle_mul_nat_overflow n%nat θ%A.
-
 Theorem angle_mul_nat_overflow_0_r :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -3403,17 +3395,7 @@ enough (H :
     clear Hi HN.
     apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
   }
-(*
-About angle_add.
-About angle_add_overflow.
-Check (angle_add_overflow (angle_add (angle_add θ θ) θ) θ).
-Check (angle_add_overflow θ (angle_add (angle_add θ θ) θ)).
-Check (angle_add_overflow (angle_add θ (angle_add θ θ)) θ).
-Check (angle_add_overflow θ (angle_add θ (angle_add θ θ))).
-Check (angle_add_overflow θ (θ + θ + θ)%A).
-Check (angle_add_overflow θ (θ + θ + θ)).
-*)
-subst Δθ.
+  subst Δθ.
 ...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.

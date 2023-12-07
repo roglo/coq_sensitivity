@@ -433,6 +433,7 @@ End a.
 
 Declare Scope angle_scope.
 Delimit Scope angle_scope with A.
+Bind Scope angle_scope with angle.
 
 Notation "0" := (angle_zero) : angle_scope.
 Notation "θ1 + θ2" := (angle_add θ1 θ2) : angle_scope.
@@ -451,11 +452,6 @@ Notation "θ1 ≤ θ2 ≤ θ3" :=
   (angle_leb θ1 θ2 = true ∧ angle_leb θ2 θ3 = true)%L : angle_scope.
 Notation "θ1 < θ2 ≤ θ3" :=
   (angle_ltb θ1 θ2 = true ∧ angle_leb θ2 θ3 = true)%L : angle_scope.
-
-Arguments angle_add {T ro rp} (a b)%A.
-Arguments angle_div_2 {T ro rp rl ac} a%A.
-Arguments rngl_cos {T ro rp} a%A.
-Arguments rngl_sin {T ro rp} a%A.
 
 Section a.
 
@@ -4346,8 +4342,3 @@ split. {
 Qed.
 
 End a.
-
-Arguments angle_eucl_dist {T ro rp rl} (θ1 θ2)%A.
-Arguments angle_taxi_dist {T ro rp} (θ1 θ2)%A.
-
-Arguments angle_div_2_pow_nat {T ro rp rl ac} θ%A i%nat.
