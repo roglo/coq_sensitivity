@@ -3413,6 +3413,7 @@ Check (angle_add_overflow θ (angle_add θ (angle_add θ θ))).
 Check (angle_add_overflow θ (θ + θ + θ)%A).
 Check (angle_add_overflow θ (θ + θ + θ)).
 *)
+subst Δθ.
 ...
 specialize (IHi (θ / ₂))%A as H1.
 Search angle_div_2_pow_nat.
