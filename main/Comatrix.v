@@ -25,8 +25,6 @@ Definition com (M : matrix T) : matrix T :=
          (seq 1 (mat_ncols M)))
       (seq 1 (mat_nrows M))).
 
-Arguments com M%M.
-
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
 Proof.

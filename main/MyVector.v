@@ -136,8 +136,7 @@ Definition vect_squ_norm (V : vector T) := vect_dot_mul V V.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
-
-Arguments vect_dot_mul (U V)%V.
+Bind Scope V_scope with vector.
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
@@ -145,8 +144,6 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
 Notation "- V" := (vect_opp V) : V_scope.
-
-Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_assoc : ∀ (a b : T) (V : vector T),
   (a × (b × V))%V = ((a * b)%L × V)%V.
@@ -518,10 +515,7 @@ End a.
 
 Declare Scope V_scope.
 Delimit Scope V_scope with V.
-
-Arguments vect_dot_mul {T}%type {ro} (U V)%V.
-Arguments vect_el {T}%type {ro} V%V i%nat.
-Arguments vect_size {T}%type v%V.
+Bind Scope V_scope with vector.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.

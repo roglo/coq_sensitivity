@@ -662,14 +662,9 @@ Context (Hop : @rngl_has_opp T ro = true).
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
+Bind Scope M_scope with matrix.
 
-Arguments matrix_eq {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} s%L M%M.
-Arguments mat_nrows {T}%type M%M.
-Arguments mat_ncols {T}%type M%M.
-Arguments mat_el {T}%type {ro} M%M (i j)%nat.
-Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -3061,16 +3056,9 @@ Module matrix_Notations.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
+Bind Scope M_scope with matrix.
 
-Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
-Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type M%M.
 Arguments mat_mul_scal_l {T ro} s%L M%M.
-Arguments mat_mul {T}%type {ro} (MA MB)%M.
-Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_ncols {T}%type M%M.
-Arguments mat_nrows {T}%type M%M.
-Arguments subm {T} i%nat j%nat M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
