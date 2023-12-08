@@ -3538,7 +3538,7 @@ enough (H :
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
-  exists (max N (S (Nat.log2 n))).
+  exists (max N (S (S (Nat.log2 n)))).
   intros i Hi.
   eapply (rngl_le_lt_trans Hor). 2: {
     apply (HN i).
@@ -3587,13 +3587,17 @@ enough (H :
   apply Nat.max_lub_r in Hi.
 (**)
   move Haov at bottom.
+  destruct i; [ easy | ].
+  apply Nat.succ_le_mono in Hi.
   rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
+(*
   destruct i. {
     cbn in Hi.
     destruct n; [ easy | ].
     now apply Nat.succ_lt_mono in Hi.
   }
+*)
   rewrite <- angle_div_2_pow_nat_div_2.
   rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed); [ | easy | ]. {
     apply (angle_le_trans _ (angle_div_2_pow_nat (n * θ) i)). {
@@ -3601,21 +3605,15 @@ enough (H :
       apply (angle_mul_le_mono_l Hic Hon Hop Hed); [ | easy ].
       apply (angle_div_2_le Hic Hon Hop Hed).
     }
-destruct i. {
-cbn.
-cbn in Hi.
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hi.
-apply Nat.lt_1_r in Hi; subst n.
-cbn in Haov.
-cbn.
-(* ah bin non c'est faux *)
-...
-  ============================
-  (angle_div_2_pow_nat (n * θ) i ≤ angle_straight)%A
-...
-Search (angle_div_2_pow_nat (_ * _)).
-Search (angle_div_2_pow_nat _ _ ≤ angle_div_2_pow_nat _ _)%A.
+    destruct i; [ now apply Nat.lt_1_r in Hi; subst n | ].
+    clear Hi.
+    induction i; [ apply (angle_div_2_le_straight Hic Hon Hop Hed) | ].
+    remember (S i) as x; cbn; subst x.
+    eapply angle_le_trans; [ | apply IHi ].
+    apply (angle_div_2_pow_nat_le Hic Hon Hop Hed).
+    apply (angle_div_2_le Hic Hon Hop Hed).
+  }
+Search (angle_mul_nat_overflow _ (_ / ₂)).
 ...
 Search (angle_div_2_pow_nat _ (S _)).
 Search (_ * angle_div_2_pow_nat _ _)%A.
