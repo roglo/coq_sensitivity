@@ -3601,6 +3601,15 @@ enough (H :
       apply (angle_mul_le_mono_l Hic Hon Hop Hed); [ | easy ].
       apply (angle_div_2_le Hic Hon Hop Hed).
     }
+destruct i. {
+cbn.
+cbn in Hi.
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hi.
+apply Nat.lt_1_r in Hi; subst n.
+cbn in Haov.
+cbn.
+(* ah bin non c'est faux *)
 ...
   ============================
   (angle_div_2_pow_nat (n * θ) i ≤ angle_straight)%A
