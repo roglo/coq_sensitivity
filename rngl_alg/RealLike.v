@@ -268,8 +268,7 @@ assert (H : (0 ≤ √b < √a)%L). {
   apply rl_sqrt_nonneg.
   now apply (rngl_le_trans Hor _ a).
 }
-destruct H as (H, H').
-specialize (H2 H H' H H').
+specialize (H2 H H).
 do 2 rewrite fold_rngl_squ in H2.
 rewrite rngl_squ_sqrt in H2. 2: {
   now apply (rngl_le_trans Hor _ a).

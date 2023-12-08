@@ -4767,7 +4767,7 @@ split. {
 apply not_eq_sym in Hza, Hzb.
 apply not_eq_sym.
 intros Hab.
-now apply (rngl_eq_mul_0_l Hos) in Hab.
+now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
 Qed.
 
 Theorem rngl_mul_pos_cancel_l :
@@ -5000,9 +5000,9 @@ Theorem rngl_mul_lt_mono_nonneg :
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T ||
    rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ a b c d, (0 ≤ a → a < b → 0 ≤ c → c < d → a * c < b * d)%L.
+  ∀ a b c d, (0 ≤ a < b → 0 ≤ c < d → a * c < b * d)%L.
 Proof.
-intros Hop Hor Hii * Haz Hab Hcz Hcd.
+intros Hop Hor Hii * (Haz, Hab) (Hcz, Hcd).
 apply (rngl_le_lt_trans Hor _ (b * c)%L). {
   apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
