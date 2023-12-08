@@ -3582,14 +3582,33 @@ enough (H :
     rewrite (angle_mul_nat_1_l Hon Hos).
     apply (angle_div_2_le_straight Hic Hon Hop Hed).
   }
+(**)
+  eapply angle_le_trans. {
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed).
+    apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
+...
+  }
+... ...
+  rewrite angle_mul_2_pow_div_2_pow.
+...
+  rewrite angle_div_2_pow_nat_div_2.
+(*
+  remember (S (S i)) as j; clear i Heqj.
+  rename j into i.
+*)
+  eapply angle_le_trans. {
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed).
+    apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
+    now apply Nat.lt_le_incl.
+  }
+  remember (S i) as j.
+  rewrite angle_mul_2_pow_div_2_pow.
+...
+  apply (angle_le_trans _ (2 ^ i * angle_div_2_po
 ...
 Search (- _ < - _)%L.
 Print angle_ltb.
 About angle_ltb.
-... ...
-apply angle_lt_le_incl.
-apply angle_div_2_lt_straight.
-...
     progress unfold angle_leb.
     remember (0 ≤? rngl_sin
 ...
