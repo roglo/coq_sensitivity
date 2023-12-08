@@ -3568,16 +3568,34 @@ enough (H :
   }
   subst Δθ.
   apply Nat.max_lub_r in Hi.
+(**)
+  destruct n; [ easy | ].
   rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
   destruct i. {
-...
+    cbn in Hi.
+    now apply Nat.succ_lt_mono in Hi.
   }
-... ...
   rewrite <- angle_div_2_pow_nat_div_2.
+  eapply angle_le_trans. {
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed).
+    apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
 ...
-
-  rewrite angle_mul_2_pow_div_2_pow.
+(*
+  destruct i. {
+    cbn in Hi.
+    apply Nat.lt_1_r in Hi; subst n; cbn.
+    apply (angle_nonneg Hic Hon Hop Hed).
+  }
+*)
+  destruct i; [ easy | ].
+  rewrite <- (Nat.log2_pow2 (S i)) in Hi; [ | easy ].
+  apply Nat.log2_lt_cancel in Hi.
+  rewrite <- angle_div_2_pow_nat_div_2.
+  eapply angle_le_trans. {
+    apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed).
+    apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
+(* chiasse *)
 ...
   assert (H : Nat.log2 (S n) ≤ Nat.log2 (2 ^ i)). {
     eapply le_trans; [ apply Nat.log2_succ_le | easy ].
