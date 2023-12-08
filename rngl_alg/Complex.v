@@ -3568,7 +3568,25 @@ enough (H :
   }
   subst Δθ.
   apply Nat.max_lub_r in Hi.
+  rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
+  apply Nat.log2_lt_cancel in Hi.
+  destruct i. {
+...
+  }
+... ...
+  rewrite <- angle_div_2_pow_nat_div_2.
+...
+
+  rewrite angle_mul_2_pow_div_2_pow.
+...
+  assert (H : Nat.log2 (S n) ≤ Nat.log2 (2 ^ i)). {
+    eapply le_trans; [ apply Nat.log2_succ_le | easy ].
+  }
+  clear Hi; rename H into Hi.
+  apply Nat.log2_lt_cancel in Hi.
+...
   destruct i; [ easy | ].
+  apply N
   rewrite <- (Nat.log2_pow2 (S i)) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
   cbn.
