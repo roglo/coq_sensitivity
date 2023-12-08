@@ -248,8 +248,37 @@ replace (y3 - y1)%L with ((y3 - y2) + (y2 - y1))%L. 2: {
 apply (rl_sqrt_sqr_le_sqrt_add_sqrt Hic Hon Hop Hiv Hor).
 Qed.
 
+Theorem rl_sqrt_le_rl_sqrt :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b,
+  (0 ≤ a)%L
+  → (a ≤ b)%L
+  → (√ a ≤ √ b)%L.
+Proof.
+intros Hop Hor Hii.
+intros * Ha Hab.
+apply (rngl_nlt_ge Hor).
+intros H1.
+specialize (rngl_mul_lt_mono_nonneg Hop Hor Hii) as H2.
+specialize (H2 √b √a √b √a)%L.
+assert (H : (0 ≤ √b < √a)%L). {
+  split; [ | easy ].
+  apply rl_sqrt_nonneg.
+  now apply (rngl_le_trans Hor _ a).
+}
+destruct H as (H, H').
+specialize (H2 H H' H H').
+do 2 rewrite fold_rngl_squ in H2.
+rewrite rngl_squ_sqrt in H2. 2: {
+  now apply (rngl_le_trans Hor _ a).
+}
+rewrite rngl_squ_sqrt in H2; [ | easy ].
+now apply (rngl_nle_gt Hor) in Hab.
+Qed.
+
 Theorem rl_sqrt_lt_rl_sqrt :
-  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a b,
@@ -257,7 +286,7 @@ Theorem rl_sqrt_lt_rl_sqrt :
   → (a < b)%L
   → (√ a < √ b)%L.
 Proof.
-intros Hic Hop Hor * Ha Hab.
+intros Hop Hor * Ha Hab.
 apply (rngl_nle_gt Hor).
 intros H1.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
