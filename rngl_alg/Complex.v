@@ -3463,6 +3463,23 @@ destruct zs. {
 }
 Qed.
 
+Theorem angle_div_2_pow_nat_le :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ1 θ2,
+  (θ1 ≤ θ2)%A
+  → (angle_div_2_pow_nat θ1 n ≤ angle_div_2_pow_nat θ2 n)%A.
+Proof.
+intros Hic Hon Hop Hed.
+intros * H12.
+revert θ1 θ2 H12.
+induction n; intros; [ easy | cbn ].
+apply IHn.
+now apply (angle_div_2_le_compat Hon Hop Hic Hed).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3569,7 +3586,34 @@ enough (H :
   subst Δθ.
   apply Nat.max_lub_r in Hi.
 (**)
+  move Haov at bottom.
+  rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
+  apply Nat.log2_lt_cancel in Hi.
+  destruct i. {
+    cbn in Hi.
+    destruct n; [ easy | ].
+    now apply Nat.succ_lt_mono in Hi.
+  }
+  rewrite <- angle_div_2_pow_nat_div_2.
+  rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed); [ | easy | ]. {
+    apply (angle_le_trans _ (angle_div_2_pow_nat (n * θ) i)). {
+      apply (angle_div_2_pow_nat_le Hic Hon Hop Hed).
+      apply (angle_mul_le_mono_l Hic Hon Hop Hed); [ | easy ].
+      apply (angle_div_2_le Hic Hon Hop Hed).
+    }
+...
+  ============================
+  (angle_div_2_pow_nat (n * θ) i ≤ angle_straight)%A
+...
+Search (angle_div_2_pow_nat (_ * _)).
+Search (angle_div_2_pow_nat _ _ ≤ angle_div_2_pow_nat _ _)%A.
+...
+Search (angle_div_2_pow_nat _ (S _)).
+Search (_ * angle_div_2_pow_nat _ _)%A.
   destruct n; [ easy | ].
+  apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Haov.
+  destruct Haov as (Hnov, Hnov1).
+...
   rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
   destruct i. {
@@ -3577,6 +3621,24 @@ enough (H :
     now apply Nat.succ_lt_mono in Hi.
   }
   rewrite <- angle_div_2_pow_nat_div_2.
+  rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed); [ | easy | ]. {
+    rewrite <- Nat.add_1_r.
+    rewrite (angle_mul_add_distr_r Hon Hop).
+    rewrite (angle_mul_nat_1_l Hon Hos).
+    rewrite (angle_div_2_pow_nat_add Hic Hon Hop Hed). {
+Search (angle_div_2_pow_nat).
+rewrite angle_div_2_pow_nat_mul.
+...
+2: {
+Check angle_div_2_pow_nat_add.
+Search (angle_div_2_pow_nat).
+...
+...
+Search (angle_div_2_pow_nat (_ * _) _).
+Search (_ * (_ / ₂))%A.
+...
+Search (_ * angle_div_2_pow_nat _ _)%A.
+Search (angle_div_2_pow_nat (_ / ₂)).
   eapply angle_le_trans. {
     apply (angle_mul_nat_le_mono_nonneg_r Hic Hon Hop Hed).
     apply (angle_mul_nat_overflow_pow_div Hic Hon Hop Hed).
