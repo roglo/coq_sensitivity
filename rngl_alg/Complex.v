@@ -3542,6 +3542,19 @@ destruct zs. {
 }
 Qed.
 
+Theorem rngl_sin_div_2_pow_nat_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ, n ≠ 0 → (0 ≤ rngl_sin (angle_div_2_pow_nat θ n))%L.
+Proof.
+intros Hic Hon Hop Hed * Hnz.
+destruct n; [ easy | ].
+rewrite angle_div_2_pow_nat_succ_r.
+apply (rngl_sin_div_2_nonneg Hic Hon Hop Hed).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3772,8 +3785,34 @@ enough (H :
   now apply (rngl_lt_sub_lt_add_r Hop Hor).
 }
 intros ε Hε.
-Print angle_div_2_pow_nat.
-Search (angle_div_2_pow_nat _ (S _)).
+Theorem glop :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  (0 < θ ≤ angle_straight)%A
+  → (rngl_cos (angle_div_2_pow_nat θ n) <
+     rngl_cos (angle_div_2_pow_nat θ (S n)))%L.
+Proof.
+intros Hic Hon Hop Hed.
+specialize ac_or as Hor.
+intros * Hs.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rngl_cos_decr.
+  split; [ apply (angle_div_2_le Hic Hon Hop Hed) | ].
+  apply (angle_le_trans _ θ); [ | easy ].
+  apply (angle_div_2_pow_nat_le_diag Hic Hon Hop Hed).
+}
+intros H.
+apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+destruct H as [H| H]. {
+  rewrite angle_div_2_pow_nat_succ_r in H.
+Search (_ = _ / ₂)%A.
+(* pffff... fatigué *)
+...
+Qed.
 ... ...
 specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.
