@@ -3905,11 +3905,80 @@ Theorem angle_div_2_lt :
   ∀ θ, (θ ≠ 0 → θ / ₂ < θ)%A.
 Proof.
 intros Hic Hon Hop Hed.
+specialize ac_or as Hor.
+specialize ac_iv as Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  exfalso; apply H, H1.
+}
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
+intros * Htz.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin (θ / ₂))%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs2, Hzs.
+destruct zs2. {
+  destruct zs; [ | easy ].
+  apply rngl_ltb_lt.
+  cbn.
+  rewrite Hzs.
+  rewrite (rngl_mul_1_l Hon).
+  apply rngl_leb_le in Hzs2, Hzs.
+  remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+  symmetry in Hzc.
+  destruct zc. 2: {
+    apply (rngl_leb_gt Hor) in Hzc.
+    apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+    apply rl_sqrt_nonneg.
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_opp_l Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  apply rngl_leb_le in Hzc.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+    apply rl_sqrt_nonneg.
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_le_opp_l Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1; [ | easy ].
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  rewrite rngl_squ_sqrt. 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_le_opp_l Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+intros Hic Hon Hop Hed.
 intros * Htz.
 apply (angle_lt_iff Hic Hon Hop Hed).
 split; [ apply (angle_div_2_le Hic Hon Hop Hed) | ].
 intros H; apply Htz; clear Htz.
-Search (_ / ₂ = _)%A.
+(**)
+progress unfold angle_div_2 in H.
+Inspect 1.
+...
+apply eq_angle_eq in H.
+apply eq_angle_eq; cbn.
+injection H; clear H; intros Hs Hc.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  rewrite (rngl_mul_1_l Hon) in Hc.
+...
+remember (θ / ₂)%A as x.
+injection H; clear H; intros H1 H2; subst x.
+Search (rngl_cos (_ / ₂)).
 ...
 Search (_ < _)%A.
 Check rngl_lt_iff.
