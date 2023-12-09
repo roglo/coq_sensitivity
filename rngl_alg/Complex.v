@@ -3585,8 +3585,6 @@ enough (H :
   }
   subst Δθ.
   apply Nat.max_lub_r in Hi.
-(**)
-  move Haov at bottom.
   destruct i; [ easy | ].
   apply Nat.succ_le_mono in Hi.
   rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
@@ -3609,6 +3607,34 @@ enough (H :
   apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
   apply (angle_div_2_le Hic Hon Hop Hed).
 }
+enough (H :
+  ∀ ε, (0 < ε)%L →
+  ∃ N : nat, ∀ m : nat, N ≤ m →
+  (√(2 * (1 - rngl_cos (angle_div_2_pow_nat (n * θ) m))) < ε)%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N & HN).
+  exists N.
+  intros m Hm.
+  specialize (HN m Hm).
+  progress unfold angle_eucl_dist.
+  cbn.
+  rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_squ_opp Hop).
+  remember (n * angle_div_2_pow_nat θ m)%A as θ1 eqn:Hθ1.
+  rewrite (rngl_squ_sub Hop Hic Hon).
+  rewrite (rngl_squ_1 Hon).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- rngl_add_assoc.
+  rewrite (cos2_sin2_1 Hon Hop Hic Hed).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  subst θ1.
+  rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed _ _ _ Hnz Haov).
+  easy.
+}
+intros ε Hε.
+remember (n * θ)%A as θ1.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
