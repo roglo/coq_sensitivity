@@ -3607,10 +3607,24 @@ enough (H :
   apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
   apply (angle_div_2_le Hic Hon Hop Hed).
 }
+assert (Hzs2 : (0 < √2)%L). {
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply rl_sqrt_nonneg.
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  intros H; symmetry in H.
+  apply (eq_rl_sqrt_0 Hos) in H. {
+    revert H.
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  } {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+}
 enough (H :
   ∀ ε, (0 < ε)%L →
   ∃ N : nat, ∀ m : nat, N ≤ m →
-  (√(1 - rngl_cos (angle_div_2_pow_nat (n * θ) m)) < ε / √2)%L). {
+  (1 - ε²/2 < rngl_cos (angle_div_2_pow_nat (n * θ) m))%L). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N & HN).
@@ -3636,24 +3650,34 @@ enough (H :
     apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
   rewrite (rngl_mul_comm Hic).
-  apply (rngl_lt_div_r Hon Hop Hiv Hor); [ | easy ].
-  apply (rngl_lt_iff Hor).
-  split. {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+    rewrite (rngl_mul_0_l Hos).
+    now apply (rngl_lt_le_incl Hor).
+  }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
     apply rl_sqrt_nonneg.
-    apply (rngl_0_le_2 Hon Hop Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
-  intros H; symmetry in H.
-  apply (eq_rl_sqrt_0 Hos) in H. {
-    revert H.
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  } {
-    apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  rewrite rngl_squ_sqrt. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
+  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+    intros H; rewrite H in Hzs2.
+    now apply (rngl_lt_irrefl Hor) in Hzs2.
+  }
+  rewrite rngl_squ_sqrt; [ | easy ].
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  easy.
 }
 intros ε Hε.
-remember (n * θ)%A as θ1.
-(* suite: 1 - cos _ < ε² / 2 *)
-(* suite: 1 - ε²/2 < cos _ *)
+remember (n * θ)%A as θ1 eqn:Hθ1.
+(* ouais, bon *)
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
