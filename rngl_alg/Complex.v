@@ -3278,13 +3278,24 @@ rewrite <- (angle_mul_nat_assoc Hon Hop).
 now rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
 Qed.
 
+Theorem angle_div_2_pow_nat_succ_r :
+  ∀ n θ, angle_div_2_pow_nat θ (S n) = (angle_div_2_pow_nat θ n / ₂)%A.
+Proof. easy. Qed.
+
 Theorem angle_div_2_pow_nat_div_2 :
-  ∀ θ n, angle_div_2_pow_nat (θ / ₂) n = angle_div_2_pow_nat θ (S n).
+  ∀ n θ, angle_div_2_pow_nat (θ / ₂) n = angle_div_2_pow_nat θ (S n).
 Proof.
 intros.
 induction n; intros; [ easy | ].
 remember (S n) as sn; cbn; subst sn.
 now rewrite <- IHn.
+Qed.
+
+Theorem angle_div_2_pow_nat_div_2_distr :
+  ∀ n θ, angle_div_2_pow_nat (θ / ₂) n = (angle_div_2_pow_nat θ n / ₂)%A.
+Proof.
+intros.
+now rewrite angle_div_2_pow_nat_div_2.
 Qed.
 
 Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
@@ -3762,7 +3773,7 @@ enough (H :
 }
 intros ε Hε.
 Print angle_div_2_pow_nat.
-About angle_div_2_pow_nat.
+Search (angle_div_2_pow_nat _ (S _)).
 ... ...
 specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.
