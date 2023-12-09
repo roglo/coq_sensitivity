@@ -3652,7 +3652,6 @@ enough (H :
     induction i; [ apply (angle_div_2_le_straight Hic Hon Hop Hed) | ].
     remember (S i) as x; cbn; subst x.
     eapply angle_le_trans; [ | apply IHi ].
-    apply (angle_div_2_pow_nat_le Hic Hon Hop Hed).
     apply (angle_div_2_le Hic Hon Hop Hed).
   }
   apply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed _ θ); [ | easy ].
