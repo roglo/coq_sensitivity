@@ -294,6 +294,33 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Fixpoint angle_div_2_pow_nat θ i :=
+  match i with
+  | 0 => θ
+  | S i' => angle_div_2_pow_nat (angle_div_2 θ) i'
+  end.
+
+Theorem angle_mul_2_pow_div_2_pow :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ, (2 ^ n * angle_div_2_pow_nat θ n)%A = θ.
+Proof.
+intros Hic Hon Hop Hed *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+revert θ.
+induction n; intros; cbn. {
+  apply (angle_add_0_r Hon Hos).
+}
+rewrite Nat.add_0_r.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite IHn.
+specialize (angle_div_2_mul_2 Hic Hon Hop Hed θ) as H1.
+cbn in H1.
+now rewrite (angle_add_0_r Hon Hos) in H1.
+Qed.
+
 Theorem angle_mul_2_div_2 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3711,6 +3738,8 @@ enough (H :
   now apply (rngl_lt_sub_lt_add_r Hop Hor).
 }
 intros ε Hε.
+Print angle_div_2_pow_nat.
+About angle_div_2_pow_nat.
 ... ...
 specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.
