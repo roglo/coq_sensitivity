@@ -3105,7 +3105,7 @@ destruct zs. {
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  apply (rngl_0_lt_abs Hop Hor).
+  apply (rngl_abs_pos Hop Hor).
   intros H.
   apply (f_equal (λ a, (a * 2)%L)) in H.
   rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
@@ -3676,8 +3676,70 @@ enough (H :
   easy.
 }
 intros ε Hε.
+(*
 remember (n * θ)%A as θ1 eqn:Hθ1.
-(* ouais, bon *)
+*)
+Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
+  ∀ θ,
+  rngl_is_limit_when_tending_to_inf
+    (λ i, rngl_cos (angle_div_2_pow_nat θ i)) 1%L.
+Proof.
+intros.
+progress unfold rngl_is_limit_when_tending_to_inf.
+progress unfold is_limit_when_tending_to_inf.
+intros ε Hε.
+... ...
+specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+specialize (H1 (ε² / 2))%L.
+progress unfold rngl_dist in H1.
+assert (H : (0 < ε² / 2)%L). {
+Search (0 < _ / _)%L.
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor).
+  rewrite <- (rngl_squ_0 Hos). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+Search (_² < _²)%L.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+rewrite (rngl_abs_0 Hop).
+apply (rngl_abs_pos Hop Hor).
+intros H; rewrite H in Hε.
+now apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (H1 H); clear H.
+destruct H1 as (N, HN).
+exists N.
+intros m Hm.
+specialize (HN m Hm).
+rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
+  apply (rngl_le_sub_0 Hop Hor).
+  apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+}
+rewrite (rngl_opp_sub_distr Hop) in HN.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+Qed.
+...
+rewrite rngl_abs_neg in HN.
+...
+Search (0 < rngl_abs _)%L.
+About rngl_abs_pos.
+...
+rewrite rngl_0_lt_abs
+...
+Theorem glop :
+  ∀ n θ,
+  is_angle_eucl_limit_when_tending_to_inf
+    (λ i, angle_div_2_pow_nat (n * θ) i) angle_right.
+...
+
+Print seq_converging_to_rat.
+...
+  → rngl_is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
+       (rngl_of_nat a / rngl_of_nat b)%L.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :

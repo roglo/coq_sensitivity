@@ -4232,7 +4232,7 @@ rewrite <- (rngl_opp_0 Hop).
 now apply -> (rngl_opp_le_compat Hop Hor).
 Qed.
 
-Theorem rngl_0_lt_abs :
+Theorem rngl_abs_pos :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ x, (x ≠ 0 → 0 < rngl_abs x)%L.
