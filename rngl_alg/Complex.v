@@ -3610,7 +3610,7 @@ enough (H :
 enough (H :
   ∀ ε, (0 < ε)%L →
   ∃ N : nat, ∀ m : nat, N ≤ m →
-  (√(2 * (1 - rngl_cos (angle_div_2_pow_nat (n * θ) m))) < ε)%L). {
+  (√(1 - rngl_cos (angle_div_2_pow_nat (n * θ) m)) < ε / √2)%L). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N & HN).
@@ -3631,10 +3631,29 @@ enough (H :
   rewrite (rngl_sub_mul_r_diag_l Hon Hop).
   subst θ1.
   rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed _ _ _ Hnz Haov).
-  easy.
+  rewrite rl_sqrt_mul; [ | easy | ]. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply rl_sqrt_nonneg.
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  intros H; symmetry in H.
+  apply (eq_rl_sqrt_0 Hos) in H. {
+    revert H.
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  } {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
 }
 intros ε Hε.
 remember (n * θ)%A as θ1.
+(* suite: 1 - cos _ < ε² / 2 *)
+(* suite: 1 - ε²/2 < cos _ *)
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
