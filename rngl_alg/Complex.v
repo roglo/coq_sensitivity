@@ -3680,13 +3680,36 @@ intros ε Hε.
 remember (n * θ)%A as θ1 eqn:Hθ1.
 *)
 Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
   ∀ θ,
   rngl_is_limit_when_tending_to_inf
     (λ i, rngl_cos (angle_div_2_pow_nat θ i)) 1%L.
 Proof.
+intros Hic Hon Hop Hed.
+specialize ac_or as Hor.
+specialize ac_iv as Hiv.
 intros.
-progress unfold rngl_is_limit_when_tending_to_inf.
-progress unfold is_limit_when_tending_to_inf.
+enough (H :
+    ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
+    (1 - ε < rngl_cos (angle_div_2_pow_nat θ n))%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  progress unfold rngl_dist.
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+  }
+  rewrite (rngl_opp_sub_distr Hop).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now apply (rngl_lt_sub_lt_add_r Hop Hor).
+}
 intros ε Hε.
 ... ...
 specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
@@ -3695,12 +3718,10 @@ progress unfold is_limit_when_tending_to_inf in H1.
 specialize (H1 (ε² / 2))%L.
 progress unfold rngl_dist in H1.
 assert (H : (0 < ε² / 2)%L). {
-Search (0 < _ / _)%L.
   apply (rngl_div_lt_pos Hon Hop Hiv Hor).
   rewrite <- (rngl_squ_0 Hos). 2: {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-Search (_² < _²)%L.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
