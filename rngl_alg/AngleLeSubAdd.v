@@ -80,7 +80,7 @@ apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 apply (rngl_le_0_sub Hop Hor).
-apply (rngl_cos_bound).
+apply rngl_cos_bound.
 Qed.
 
 (*
@@ -331,7 +331,7 @@ eapply (rngl_le_lt_trans Hor _ (rngl_sin θ1)). {
   rewrite (rngl_sub_mul_r_diag_l Hon Hop).
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
   apply (rngl_le_0_sub Hop Hor).
-  apply (rngl_cos_bound).
+  apply rngl_cos_bound.
 }
 apply (rngl_lt_add_r Hos Hor).
 now apply (rngl_mul_pos_pos Hop Hor Hii).
@@ -685,11 +685,11 @@ rewrite (angle_sub_diag Hic Hon Hop Hed) in Hsov.
 rewrite <- (angle_add_sub_swap Hic Hop) in Hsov.
 rewrite (angle_add_0_l Hon Hos) in Hsov.
 progress unfold angle_ltb in Hsov.
-apply (rngl_leb_le) in Hzs12, Hzs1.
+apply rngl_leb_le in Hzs12, Hzs1.
 rewrite Hzs12 in Hsov.
 rewrite (rngl_sin_sub_straight_l Hon Hop) in Hsov.
 rewrite Hzs1 in Hsov.
-apply (rngl_leb_le) in Hzs12, Hzs1.
+apply rngl_leb_le in Hzs12, Hzs1.
 rewrite (rngl_cos_sub_straight_l Hon Hop) in Hsov.
 apply (rngl_ltb_ge Hor) in Hsov.
 apply (rngl_le_opp_r Hop Hor) in Hsov.
@@ -749,7 +749,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
   cbn.
   apply (rngl_add_pos_nonneg Hor).
   now apply (rngl_mul_pos_pos Hop Hor Hii).
-  now apply (rngl_mul_nonneg_nonneg).
+  now apply rngl_mul_nonneg_nonneg.
 }
 apply (rngl_nle_gt Hor) in Hzc3.
 move Hzc2 before Hzs2; move Hzc3 before Hzc2.
@@ -2264,7 +2264,7 @@ apply (rngl_lt_opp_r Hop Hor).
 eapply (rngl_le_lt_trans Hor); [ | apply H231 ].
 apply (rngl_add_le_mono_l Hop Hor).
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-  apply (rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff); try easy.
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
