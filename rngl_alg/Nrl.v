@@ -448,7 +448,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :
      rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := NA;
      rngl_opt_archimedean := NA |}.
 
@@ -539,7 +539,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := NA;
      rngl_opt_archimedean := NA |}.
 

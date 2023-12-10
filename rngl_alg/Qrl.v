@@ -200,6 +200,6 @@ Definition Q_ring_like_prop :=
      rngl_opt_add_le_compat := Q_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := Q_not_le;
      rngl_opt_archimedean := NA |}.

@@ -641,7 +641,7 @@ Theorem I_opt_mul_le_compat : let roi := I_ring_like_op in
   else not_applicable.
 Proof.
 intros.
-specialize rngl_opt_mul_le_compat as H1.
+specialize rngl_opt_mul_le_compat_non_opp as H1.
 progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
 progress unfold roi; cbn.
@@ -714,7 +714,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_add_le_compat := I_opt_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := I_opt_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := I_opt_mul_le_compat;
+     rngl_opt_mul_le_compat_non_opp := I_opt_mul_le_compat;
      rngl_opt_not_le := I_opt_not_le;
      rngl_opt_archimedean := NA |}.
 

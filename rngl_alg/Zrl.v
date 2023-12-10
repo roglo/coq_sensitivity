@@ -281,6 +281,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_add_le_compat := Z_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := Z_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Z_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := Z_not_le;
      rngl_opt_archimedean := Z_archimedean |}.

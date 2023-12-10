@@ -3639,6 +3639,24 @@ destruct zs1. {
 }
 Qed.
 
+Theorem rl_sqrt_pos :
+  rngl_has_opp_or_subt T = true →
+  ∀ a, (0 < a)%L → (0 < √a)%L.
+Proof.
+intros Hos.
+specialize ac_or as Hor.
+intros a Ha.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rl_sqrt_nonneg.
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H; symmetry in H.
+apply (eq_rl_sqrt_0 Hos) in H; [ | now apply (rngl_lt_le_incl Hor) ].
+subst a.
+now apply (rngl_lt_irrefl Hor) in Ha.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -3893,10 +3911,6 @@ intros H.
 apply (rngl_cos_eq Hic Hon Hop Hed) in H.
 destruct H as [H| H]. {
   rewrite angle_div_2_pow_nat_succ_r in H.
-Search (_ / ₂ < _)%A.
-Search (_ = _ / ₂)%A.
-Search (_ / ₂ < _)%A.
-Search (_ / ₂ ≤ _)%A.
 Theorem angle_div_2_lt :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3955,6 +3969,54 @@ destruct zs2. {
     apply (rngl_le_opp_l Hop Hor).
     apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
   }
+  apply -> (rngl_lt_div_r Hon Hop Hiv Hor); [ | easy ].
+(**)
+  apply (rngl_lt_le_trans Hor _ (rngl_cos θ * 2))%L. 2: {
+    rewrite rngl_mul_add_distr_l.
+    rewrite (rngl_mul_1_r Hon).
+    apply (rngl_add_le_compat Hor).
+    apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
+    apply (rngl_le_refl Hor).
+  }
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii); [ easy | ].
+  apply (rngl_lt_iff Hor).
+  split. {
+    rewrite <- (rngl_mul_1_r Hon).
+    progress unfold rngl_squ.
+...
+Search (_ * _ ≤ _ * _)%L.
+...
+apply rngl_mul_
+    apply (rngl_mul_nonneg).
+...
+  specialize (cos2_sin2_1 Hon Hop Hic Hed θ) as H1.
+  apply (rngl_add_move_r Hop) in H1.
+  rewrite H1.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  rewrite <- rngl_add_assoc.
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+  rewrite (rngl_add_sub Hos).
+  rewrite rngl_mul_
+...
+  apply (rngl_lt_0_sub Hop Hor).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  progress unfold rngl_squ.
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+...
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_le_opp_l Hop Hor).
+...
+    rewrite <- (rngl_mul_1_r Hon (-1))%L.
+...
+    apply rngl_mul_le_compat_nonneg.
+Search (_ * _ ≤ _ * _)%L.
+Check rngl_mul_pos_
+Check rngl_mul_nonneg_nonneg.
+    apply rngl_mul_nonneg_nonneg.
 ...
 Search (rngl_cos _ < rngl_cos _)%L.
 ...
@@ -4475,7 +4537,7 @@ Definition gc_ring_like_prop T
      rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := NA;
      rngl_opt_archimedean := NA |}.
 *)

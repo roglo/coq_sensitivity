@@ -37,7 +37,7 @@ intros * Hbz.
 now apply Nat.div_mul.
 Qed.
 
-Theorem Nat_mul_le_compat :
+Theorem Nat_mul_le_compat_non_opp :
   ∀ a b c d : nat,
   (a <=? c) = true → (b <=? d) = true → (a * b <=? c * d) = true.
 Proof.
@@ -172,7 +172,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_add_le_compat := Nat_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat := Nat_mul_le_compat;
+     rngl_opt_mul_le_compat_non_opp := Nat_mul_le_compat_non_opp;
      rngl_opt_not_le := Nat_not_le;
      rngl_opt_archimedean := nat_archimedean |}.
 

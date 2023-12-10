@@ -2331,6 +2331,6 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_add_le_compat := QG_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := QG_not_le;
      rngl_opt_archimedean := QG_archimedean |}.

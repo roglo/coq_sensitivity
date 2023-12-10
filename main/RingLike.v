@@ -394,7 +394,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_is_ordered T && rngl_has_opp T)%bool then
         ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
       else not_applicable;
-    rngl_opt_mul_le_compat :
+    rngl_opt_mul_le_compat_non_opp :
       if (rngl_is_ordered T && negb (rngl_has_opp T))%bool then
         ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
       else not_applicable;
@@ -858,13 +858,13 @@ rewrite Hor, Hop in H.
 apply H.
 Qed.
 
-Theorem rngl_mul_le_compat :
+Theorem rngl_mul_le_compat_non_opp :
   rngl_has_opp T = false →
   rngl_is_ordered T = true →
   ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hop Hor * Hac Hbd.
-specialize rngl_opt_mul_le_compat as H.
+specialize rngl_opt_mul_le_compat_non_opp as H.
 rewrite Hor, Hop in H.
 now apply H.
 Qed.
