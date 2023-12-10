@@ -3788,7 +3788,7 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 Qed.
 
-Theorem angle_div_2_neq :
+Theorem angle_div_2_neq_0 :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -3832,6 +3832,74 @@ destruct zs. {
   now apply (rngl_lt_irrefl Hor) in H.
 }
 Qed.
+
+(*
+Theorem rngl_cos_angle_div_2_pow_nat_lt_succ :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  (0 < θ ≤ angle_straight)%A
+  → (rngl_cos (angle_div_2_pow_nat θ n) <
+     rngl_cos (angle_div_2_pow_nat θ (S n)))%L.
+Proof.
+intros Hic Hon Hop Hed.
+specialize ac_or as Hor.
+intros * Hzs.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rngl_cos_decr.
+  split; [ apply (angle_div_2_le Hic Hon Hop Hed) | ].
+  apply (angle_le_trans _ θ); [ | easy ].
+  apply (angle_div_2_pow_nat_le_diag Hic Hon Hop Hed).
+}
+intros H.
+apply (rngl_cos_eq Hic Hon Hop Hed) in H.
+destruct H as [H| H]. {
+  rewrite angle_div_2_pow_nat_succ_r_1 in H.
+  remember (angle_div_2_pow_nat θ n) as θ' eqn:Hθ'.
+  specialize (angle_div_2_lt Hic Hon Hop Hed θ') as H1.
+  rewrite <- H in H1.
+  assert (H2 : θ' ≠ 0%A). {
+    intros H2.
+    move H2 at top; subst θ'.
+    symmetry in Hθ'.
+    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in Hθ'.
+    subst θ.
+    destruct Hzs as (Hs, _).
+    now apply angle_lt_irrefl in Hs.
+  }
+  specialize (H1 H2).
+  now apply angle_lt_irrefl in H1.
+} {
+  rewrite angle_div_2_pow_nat_succ_r_2 in H.
+  rewrite angle_div_2_pow_nat_div_2_distr in H.
+  apply eq_angle_eq in H.
+  remember rngl_cos as c; remember rngl_sin as s.
+  injection H; clear H; intros Hs Hc; subst c s.
+  rewrite rngl_sin_opp in Hs.
+  rewrite rngl_cos_opp in Hc.
+  apply (rngl_cos_eq Hic Hon Hop Hed) in Hc.
+  destruct Hc as [Hc| Hc]. {
+    symmetry in Hc.
+    apply (angle_div_2_neq_0 Hic Hon Hop Hed) in Hc; [ easy | ].
+    intros H.
+    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in H.
+    subst θ.
+    destruct Hzs as (Hzs, _).
+    now apply angle_lt_irrefl in Hzs.
+  }
+  apply (angle_sub_move_0_r Hic Hon Hop Hed) in Hc.
+  rewrite (angle_sub_opp_r Hop) in Hc.
+  rewrite <- angle_div_2_pow_nat_div_2_distr in Hc.
+  rewrite <- (angle_div_2_pow_nat_add Hic Hon Hop Hed) in Hc. 2: {
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    progress unfold angle_leb.
+    (* putain, c'est compliqué *)
+...
+*)
 
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
@@ -4063,72 +4131,6 @@ enough (H :
   now apply (rngl_lt_sub_lt_add_r Hop Hor).
 }
 intros ε Hε.
-Theorem rngl_cos_angle_div_2_pow_nat_lt_succ :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ n θ,
-  (0 < θ ≤ angle_straight)%A
-  → (rngl_cos (angle_div_2_pow_nat θ n) <
-     rngl_cos (angle_div_2_pow_nat θ (S n)))%L.
-Proof.
-intros Hic Hon Hop Hed.
-specialize ac_or as Hor.
-intros * Hzs.
-apply (rngl_lt_iff Hor).
-split. {
-  apply rngl_cos_decr.
-  split; [ apply (angle_div_2_le Hic Hon Hop Hed) | ].
-  apply (angle_le_trans _ θ); [ | easy ].
-  apply (angle_div_2_pow_nat_le_diag Hic Hon Hop Hed).
-}
-intros H.
-apply (rngl_cos_eq Hic Hon Hop Hed) in H.
-destruct H as [H| H]. {
-  rewrite angle_div_2_pow_nat_succ_r_1 in H.
-  remember (angle_div_2_pow_nat θ n) as θ' eqn:Hθ'.
-  specialize (angle_div_2_lt Hic Hon Hop Hed θ') as H1.
-  rewrite <- H in H1.
-  assert (H2 : θ' ≠ 0%A). {
-    intros H2.
-    move H2 at top; subst θ'.
-    symmetry in Hθ'.
-    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in Hθ'.
-    subst θ.
-    destruct Hzs as (Hs, _).
-    now apply angle_lt_irrefl in Hs.
-  }
-  specialize (H1 H2).
-  now apply angle_lt_irrefl in H1.
-} {
-  rewrite angle_div_2_pow_nat_succ_r_2 in H.
-  rewrite angle_div_2_pow_nat_div_2_distr in H.
-  apply eq_angle_eq in H.
-  remember rngl_cos as c; remember rngl_sin as s.
-  injection H; clear H; intros Hs Hc; subst c s.
-  rewrite rngl_sin_opp in Hs.
-  rewrite rngl_cos_opp in Hc.
-  apply (rngl_cos_eq Hic Hon Hop Hed) in Hc.
-  destruct Hc as [Hc| Hc]. {
-    symmetry in Hc.
-    apply (angle_div_2_neq Hic Hon Hop Hed) in Hc; [ easy | ].
-    intros H.
-    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in H.
-    subst θ.
-    destruct Hzs as (Hzs, _).
-    now apply angle_lt_irrefl in Hzs.
-  }
-...
-rngl_cos_angle_div_2_pow_nat_lt_succ is declared
-...
-Search (_ / ₂ = _)%A.
-Theorem angle_div_2_neq :
-Search (_ = _ / ₂)%A.
-Search (_ / ₂ < _)%A.
-...
-Search (_ / _ = 0)%L.
-apply rngl_div_0_l
 ...
 apply rngl_mul_
     apply (rngl_mul_nonneg).
