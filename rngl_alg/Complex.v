@@ -3678,6 +3678,40 @@ subst a.
 now apply (rngl_lt_irrefl Hor) in Ha.
 Qed.
 
+Theorem eq_angle_div_2_0 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ, (θ / ₂ = 0 → θ = 0)%A.
+Proof.
+intros Hic Hon Hop Hed.
+specialize ac_or as Hor.
+specialize ac_iv as Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  apply H1.
+}
+intros * Htz.
+apply eq_angle_eq in Htz.
+apply eq_angle_eq; cbn.
+injection Htz; clear Htz; intros Hc Hs.
+apply (eq_rl_sqrt_0 Hos) in Hc. 2: {
+  apply (rngl_1_sub_cos_div_2_nonneg Hic Hon Hop Hed).
+}
+apply (f_equal (λ x, rngl_mul x 2)) in Hc.
+rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_0_l Hos) in Hc.
+apply -> (rngl_sub_move_0_r Hop) in Hc.
+symmetry in Hc.
+apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Hc.
+now subst θ.
+Qed.
+
 Theorem angle_div_2_lt :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3754,38 +3788,17 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply (rngl_cos_bound Hon Hop Hiv Hic Hed Hor).
 Qed.
 
-Theorem eq_angle_div_2_0 :
+Theorem angle_div_2_neq :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_eq_dec T = true →
-  ∀ θ, (θ / ₂ = 0 → θ = 0)%A.
+  ∀ θ, (θ ≠ 0 → θ / ₂ ≠ θ)%A.
 Proof.
 intros Hic Hon Hop Hed.
-specialize ac_or as Hor.
-specialize ac_iv as Hiv.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros.
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  apply H1.
-}
-intros * Htz.
-apply eq_angle_eq in Htz.
-apply eq_angle_eq; cbn.
-injection Htz; clear Htz; intros Hc Hs.
-apply (eq_rl_sqrt_0 Hos) in Hc. 2: {
-  apply (rngl_1_sub_cos_div_2_nonneg Hic Hon Hop Hed).
-}
-apply (f_equal (λ x, rngl_mul x 2)) in Hc.
-rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_0_l Hos) in Hc.
-apply -> (rngl_sub_move_0_r Hop) in Hc.
-symmetry in Hc.
-apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Hc.
-now subst θ.
+intros * H2.
+specialize (angle_div_2_lt Hic Hon Hop Hed _ H2) as H1.
+now apply (angle_lt_iff Hic Hon Hop Hed) in H1.
 Qed.
 
 Theorem eq_angle_div_2_pow_nat_0 :
@@ -4050,7 +4063,7 @@ enough (H :
   now apply (rngl_lt_sub_lt_add_r Hop Hor).
 }
 intros ε Hε.
-Theorem glop :
+Theorem rngl_cos_angle_div_2_pow_nat_lt_succ :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -4062,7 +4075,7 @@ Theorem glop :
 Proof.
 intros Hic Hon Hop Hed.
 specialize ac_or as Hor.
-intros * Hs.
+intros * Hzs.
 apply (rngl_lt_iff Hor).
 split. {
   apply rngl_cos_decr.
@@ -4083,15 +4096,36 @@ destruct H as [H| H]. {
     symmetry in Hθ'.
     apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in Hθ'.
     subst θ.
-    destruct Hs as (Hs, _).
+    destruct Hzs as (Hs, _).
     now apply angle_lt_irrefl in Hs.
   }
   specialize (H1 H2).
   now apply angle_lt_irrefl in H1.
-}
-rewrite angle_div_2_pow_nat_succ_r_2 in H.
-Search (- angle_div_2_pow_nat _ _)%L.
-Search (angle_div_2_pow_nat _ (S _)).
+} {
+  rewrite angle_div_2_pow_nat_succ_r_2 in H.
+  rewrite angle_div_2_pow_nat_div_2_distr in H.
+  apply eq_angle_eq in H.
+  remember rngl_cos as c; remember rngl_sin as s.
+  injection H; clear H; intros Hs Hc; subst c s.
+  rewrite rngl_sin_opp in Hs.
+  rewrite rngl_cos_opp in Hc.
+  apply (rngl_cos_eq Hic Hon Hop Hed) in Hc.
+  destruct Hc as [Hc| Hc]. {
+    symmetry in Hc.
+    apply (angle_div_2_neq Hic Hon Hop Hed) in Hc; [ easy | ].
+    intros H.
+    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in H.
+    subst θ.
+    destruct Hzs as (Hzs, _).
+    now apply angle_lt_irrefl in Hzs.
+  }
+...
+rngl_cos_angle_div_2_pow_nat_lt_succ is declared
+...
+Search (_ / ₂ = _)%A.
+Theorem angle_div_2_neq :
+Search (_ = _ / ₂)%A.
+Search (_ / ₂ < _)%A.
 ...
 Search (_ / _ = 0)%L.
 apply rngl_div_0_l
