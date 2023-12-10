@@ -759,14 +759,9 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_l.
 Qed.
 
-Theorem angle_add_opp_diag_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ, (- θ + θ = 0)%A.
+Theorem angle_add_opp_diag_l : ∀ θ, (- θ + θ = 0)%A.
 Proof.
-intros Hic Hon Hop Hed *.
+destruct_ac; intros.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_opp_l Hop).
@@ -798,7 +793,7 @@ destruct_ac; intros.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
-rewrite (angle_add_opp_diag_l Hic Hon Hop Hed).
+rewrite (angle_add_opp_diag_l).
 apply (angle_add_0_r).
 Qed.
 
