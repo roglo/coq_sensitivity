@@ -8,7 +8,7 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
-Require Import RealLike TrigoWithoutPi (*AngleLeSubAdd*).
+Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
@@ -863,7 +863,7 @@ destruct hrl. 2: {
   rewrite Hrl.
   destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
   destruct iq as [inv| quot]; [ | easy ].
-  now destruct (rngl_mul_is_comm T).
+  now rewrite Hic.
 }
 intros.
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.

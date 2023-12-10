@@ -48,13 +48,13 @@ Arguments angle T {ro rp}.
 Arguments angle_ctx T {ro rp}.
 
 Ltac destruct_ac :=
-  specialize ac_ic as Hic;
+  set (Hic := ac_ic);
+  set (Hop := ac_op);
+  set (Hed := ac_ed);
+  set (Hor := ac_or);
   specialize ac_on as Hon;
-  specialize ac_op as Hop;
-  specialize ac_ed as Hed;
   specialize ac_iv as Hiv;
-  specialize ac_c2 as Hc2;
-  set (Hor := ac_or).
+  specialize ac_c2 as Hc2.
 
 Section a.
 
