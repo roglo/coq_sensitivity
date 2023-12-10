@@ -3788,6 +3788,22 @@ apply (eq_rngl_cos_1 Hic Hon Hop Hed) in Hc.
 now subst θ.
 Qed.
 
+Theorem eq_angle_div_2_pow_nat_0 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ n θ,
+  (angle_div_2_pow_nat θ n = 0 → θ = 0)%A.
+Proof.
+intros Hic Hon Hop Hed.
+intros * Htn.
+induction n; [ easy | ].
+cbn in Htn.
+apply (eq_angle_div_2_0 Hic Hon Hop Hed) in Htn.
+now apply IHn.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -4049,17 +4065,12 @@ destruct H as [H| H]. {
     intros H2.
     move H2 at top; subst θ'.
     symmetry in Hθ'.
-Search (angle_div_2_pow_nat _ _ = 0)%A.
-Theorem eq_angle_div_2_pow_nat_0 :
-  ∀ n θ,
-  (angle_div_2_pow_nat θ n = 0 → θ = 0)%A.
-Proof.
-intros * Htn.
-induction n; [ easy | ].
-cbn in Htn.
-Search (_ / ₂ = 0)%A.
-... ...
-Theorem eq_angle_div_2_0 :
+    apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in Hθ'.
+    subst θ.
+    destruct Hs as (Hs, _).
+Search (0 < 0)%A.
+...
+    apply angle_lt_irrefl in Hs.
 ...
 Search (_ / _ = 0)%L.
 apply rngl_div_0_l
