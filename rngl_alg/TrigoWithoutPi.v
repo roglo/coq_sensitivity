@@ -54,7 +54,7 @@ Ltac destruct_ac :=
   specialize ac_ed as Hed;
   specialize ac_iv as Hiv;
   specialize ac_c2 as Hc2;
-  specialize ac_or as Hor.
+  set (Hor := ac_or).
 
 Section a.
 
@@ -719,12 +719,11 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_r.
 Qed.
 
-Theorem angle_add_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, (θ + 0 = θ)%A.
+Theorem angle_add_0_r : ∀ θ, (θ + 0 = θ)%A.
 Proof.
-intros Hon Hos *.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 do 2 rewrite (rngl_mul_0_r Hos).
@@ -790,7 +789,7 @@ progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 rewrite angle_add_opp_r.
 rewrite angle_sub_diag.
-apply (angle_add_0_r Hon Hos).
+apply (angle_add_0_r).
 Qed.
 
 Theorem angle_sub_add : ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
@@ -800,7 +799,7 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 rewrite (angle_add_opp_diag_l Hic Hon Hop Hed).
-apply (angle_add_0_r Hon Hos).
+apply (angle_add_0_r).
 Qed.
 
 Theorem angle_opp_add_distr :
@@ -1868,7 +1867,7 @@ progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 rewrite angle_add_opp_r.
 rewrite (angle_sub_diag).
-apply (angle_add_0_r Hon Hos).
+apply (angle_add_0_r).
 Qed.
 
 Theorem rngl_sin_sub_nonneg :
@@ -3315,7 +3314,7 @@ rewrite (rngl_add_opp_r Hop).
 rewrite (angle_add_assoc Hop) in Haov, Hzs3 |-*.
 rewrite <- (angle_add_assoc Hop) in Haov, Hzs3 |-*.
 rewrite (angle_straight_add_straight Hon Hop) in Haov, Hzs3 |-*.
-rewrite (angle_add_0_r Hon Hos) in Haov, Hzs3 |-*.
+rewrite (angle_add_0_r) in Haov, Hzs3 |-*.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
   as [Hzc12| Hc12z]. {
   apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
