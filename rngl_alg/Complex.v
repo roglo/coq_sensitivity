@@ -3804,6 +3804,22 @@ apply (eq_angle_div_2_0 Hic Hon Hop Hed) in Htn.
 now apply IHn.
 Qed.
 
+Theorem angle_lt_irrefl : ∀ θ, ¬ (θ < θ)%A.
+Proof.
+specialize ac_or as Hor.
+intros * H.
+progress unfold angle_ltb in H.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_ltb_lt in H.
+  now apply (rngl_lt_irrefl Hor) in H.
+} {
+  apply rngl_ltb_lt in H.
+  now apply (rngl_lt_irrefl Hor) in H.
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_mul_is_comm T = true →
@@ -4068,9 +4084,11 @@ destruct H as [H| H]. {
     apply (eq_angle_div_2_pow_nat_0 Hic Hon Hop Hed) in Hθ'.
     subst θ.
     destruct Hs as (Hs, _).
-Search (0 < 0)%A.
-...
-    apply angle_lt_irrefl in Hs.
+    now apply angle_lt_irrefl in Hs.
+  }
+  specialize (H1 H2).
+  now apply angle_lt_irrefl in H1.
+}
 ...
 Search (_ / _ = 0)%L.
 apply rngl_div_0_l
