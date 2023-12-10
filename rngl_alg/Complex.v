@@ -3299,24 +3299,24 @@ rewrite <- (angle_mul_nat_assoc Hon Hop).
 now rewrite (angle_div_2_mul_2 Hic Hon Hop Hed).
 Qed.
 
-Theorem angle_div_2_pow_nat_succ_r :
+Theorem angle_div_2_pow_nat_succ_r_1 :
   ∀ n θ, angle_div_2_pow_nat θ (S n) = (angle_div_2_pow_nat θ n / ₂)%A.
 Proof. easy. Qed.
 
-Theorem angle_div_2_pow_nat_div_2 :
-  ∀ n θ, angle_div_2_pow_nat (θ / ₂) n = angle_div_2_pow_nat θ (S n).
+Theorem angle_div_2_pow_nat_succ_r_2 :
+  ∀ n θ, angle_div_2_pow_nat θ (S n) = angle_div_2_pow_nat (θ / ₂) n.
 Proof.
 intros.
 induction n; intros; [ easy | ].
 remember (S n) as sn; cbn; subst sn.
-now rewrite <- IHn.
+now rewrite IHn.
 Qed.
 
 Theorem angle_div_2_pow_nat_div_2_distr :
   ∀ n θ, angle_div_2_pow_nat (θ / ₂) n = (angle_div_2_pow_nat θ n / ₂)%A.
 Proof.
 intros.
-now rewrite angle_div_2_pow_nat_div_2.
+now rewrite <- angle_div_2_pow_nat_succ_r_2.
 Qed.
 
 Theorem angle_mul_nat_overflow_angle_div_2_mul_2_div_2 :
@@ -3337,11 +3337,11 @@ induction m; intros. {
   rewrite Nat_add_diag.
   now apply (angle_mul_nat_overflow_mul_2_div_2 Hic Hon Hop Hed).
 }
-rewrite <- angle_div_2_pow_nat_div_2.
+rewrite angle_div_2_pow_nat_succ_r_2.
 apply IHm.
 cbn in Hnm.
 eapply (angle_mul_nat_overflow_le_r Hic Hon Hop Hed); [ | apply Hnm ].
-rewrite angle_div_2_pow_nat_div_2.
+rewrite <- angle_div_2_pow_nat_succ_r_2.
 apply (angle_le_refl).
 Qed.
 
@@ -3572,7 +3572,7 @@ Theorem rngl_sin_div_2_pow_nat_nonneg :
 Proof.
 intros Hic Hon Hop Hed * Hnz.
 destruct n; [ easy | ].
-rewrite angle_div_2_pow_nat_succ_r.
+rewrite angle_div_2_pow_nat_succ_r_1.
 apply (rngl_sin_div_2_nonneg Hic Hon Hop Hed).
 Qed.
 
@@ -3929,7 +3929,7 @@ enough (H :
   apply Nat.succ_le_mono in Hi.
   rewrite <- (Nat.log2_pow2 i) in Hi; [ | easy ].
   apply Nat.log2_lt_cancel in Hi.
-  rewrite <- angle_div_2_pow_nat_div_2.
+  rewrite angle_div_2_pow_nat_succ_r_2.
   rewrite <- (angle_div_2_pow_nat_mul Hic Hon Hop Hed); [ | easy | ]. {
     apply (angle_le_trans _ (angle_div_2_pow_nat (n * θ) i)). {
       apply (angle_div_2_pow_nat_le Hic Hon Hop Hed).
@@ -4073,7 +4073,7 @@ split. {
 intros H.
 apply (rngl_cos_eq Hic Hon Hop Hed) in H.
 destruct H as [H| H]. {
-  rewrite angle_div_2_pow_nat_succ_r in H.
+  rewrite angle_div_2_pow_nat_succ_r_1 in H.
   remember (angle_div_2_pow_nat θ n) as θ' eqn:Hθ'.
   specialize (angle_div_2_lt Hic Hon Hop Hed θ') as H1.
   rewrite <- H in H1.
@@ -4089,6 +4089,9 @@ destruct H as [H| H]. {
   specialize (H1 H2).
   now apply angle_lt_irrefl in H1.
 }
+rewrite angle_div_2_pow_nat_succ_r_2 in H.
+Search (- angle_div_2_pow_nat _ _)%L.
+Search (angle_div_2_pow_nat _ (S _)).
 ...
 Search (_ / _ = 0)%L.
 apply rngl_div_0_l
