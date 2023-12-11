@@ -3732,6 +3732,47 @@ apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
 apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
+Theorem rngl_cos_div_pow_2_eq :
+  ∀ θ n,
+  (0 ≤ rngl_cos θ)%L
+  → (0 ≤ rngl_sin θ)%L
+  → rngl_cos (angle_div_2_pow_nat θ n) = rngl_cos_div_pow_2 θ n.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  intros.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 (rngl_cos _)); symmetry.
+  apply H1.
+}
+intros * Hzc Hzs.
+induction n; [ easy | cbn ].
+destruct n. {
+  cbn.
+  generalize Hzs; intros H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  rewrite rl_sqrt_div_2. 2: {
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_1_l Hon).
+}
+rewrite IHn.
+rewrite rl_sqrt_div_2. 2: {
+  apply (rngl_add_nonneg_nonneg Hor); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+  now apply rngl_cos_div_pow_2_nonneg.
+}
+remember (0 ≤? _)%L as zsa eqn:Hzsa.
+symmetry in Hzsa.
+destruct zsa; [ apply (rngl_mul_1_l Hon) | ].
+exfalso.
+apply rngl_leb_nle in Hzsa.
+apply Hzsa; clear Hzsa.
+now apply rngl_sin_div_2_pow_nat_nonneg.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
@@ -3949,53 +3990,25 @@ enough (H :
   }
   rewrite (rngl_opp_sub_distr Hop).
   easy.
-(*
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  now apply (rngl_lt_sub_lt_add_r Hop Hor).
-*)
 }
-intros ε Hε.
-Theorem rngl_cos_div_pow_2_eq :
-  ∀ θ n,
-  (0 ≤ rngl_cos θ)%L
-  → (0 ≤ rngl_sin θ)%L
-  → rngl_cos (angle_div_2_pow_nat θ n) = rngl_cos_div_pow_2 θ n.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-  intros.
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite (H1 (rngl_cos _)); symmetry.
-  apply H1.
-}
-intros * Hzc Hzs.
-induction n; [ easy | cbn ].
-destruct n. {
-  cbn.
-  generalize Hzs; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  rewrite rl_sqrt_div_2. 2: {
-    apply (rngl_le_opp_l Hop Hor).
-    apply rngl_cos_bound.
-  }
-  apply (rngl_mul_1_l Hon).
-}
-rewrite IHn.
-rewrite rl_sqrt_div_2. 2: {
-  apply (rngl_add_nonneg_nonneg Hor); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
-  now apply rngl_cos_div_pow_2_nonneg.
-}
-remember (0 ≤? _)%L as zsa eqn:Hzsa.
-symmetry in Hzsa.
-destruct zsa; [ apply (rngl_mul_1_l Hon) | ].
-exfalso.
-apply rngl_leb_nle in Hzsa.
-apply Hzsa; clear Hzsa.
-now apply rngl_sin_div_2_pow_nat_nonneg.
-Qed.
-Check rngl_cos_div_pow_2_eq.
+enough (H :
+    ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
+    (1 - rngl_cos_div_pow_2 θ n < ε)%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists (S (S N)).
+  intros n Hn.
+  assert (H : N ≤ n) by flia Hn.
+  specialize (HN n H); clear H.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hn.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hn.
+  rewrite rngl_cos_div_pow_2_eq; cycle 1. {
+...
+    cbn in HN.
+(* non, c'est pas bon *)
 ...
 destruct n. {
   cbn.
