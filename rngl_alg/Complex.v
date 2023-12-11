@@ -3930,51 +3930,40 @@ Fixpoint rngl_cos_div_pow_2 θ n :=
   end.
 
 Theorem rngl_cos_div_pow_2_eq :
-  ∀ θ n, rngl_cos (angle_div_2_pow_nat θ n) = rngl_cos_div_pow_2 θ n.
+  ∀ θ n,
+  (0 ≤ rngl_sin θ)%L
+  → rngl_cos (angle_div_2_pow_nat θ n) = rngl_cos_div_pow_2 θ n.
 Proof.
-destruct_ac; intros.
+destruct_ac; intros * Hzs.
 induction n; [ easy | cbn ].
 destruct n. {
   cbn.
+  generalize Hzs; intros H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
   rewrite rl_sqrt_div_2. 2: {
     apply (rngl_le_opp_l Hop Hor).
     apply rngl_cos_bound.
   }
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs; [ apply (rngl_mul_1_l Hon) | ].
-  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_mul_1_l Hon).
+}
+destruct n. {
+  cbn.
+  generalize Hzs; intros H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  rewrite (rngl_mul_1_l Hon).
+  remember (0 ≤? √((1 - rngl_cos θ) / 2))%L as zs2 eqn:Hzs2.
+  symmetry in Hzs2.
+  rewrite rl_sqrt_div_2. 2: {
 ...
-  specialize (cos2_sin2_1 θ) as H1.
-  apply (rngl_add_move_r Hop) in H1.
-  rewrite H1.
-  rewrite (rngl_mul_sub_distr_r Hop).
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
-  rewrite <- rngl_add_assoc.
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  rewrite (rngl_sub_mul_l_diag_l Hon Hop).
-  rewrite (rngl_add_sub Hos).
-  rewrite rngl_mul_
+    apply (rngl_add_non
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+
+  destruct Hzs2; [ apply (rngl_mul_1_
 ...
-  apply (rngl_lt_0_sub Hop Hor).
-  rewrite <- (rngl_add_sub_assoc Hop).
-  progress unfold rngl_squ.
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-...
-  apply (rngl_lt_iff Hor).
-  split. {
-    apply (rngl_le_opp_l Hop Hor).
-...
-    rewrite <- (rngl_mul_1_r Hon (-1))%L.
-...
-    apply rngl_mul_le_compat_nonneg.
-Search (_ * _ ≤ _ * _)%L.
-Check rngl_mul_pos_
-Check rngl_mul_nonneg_nonneg.
-    apply rngl_mul_nonneg_nonneg.
-...
-Search (rngl_cos _ < rngl_cos _)%L.
 ...
 destruct_ac.
 intros * Htz.
