@@ -3944,6 +3944,16 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hzs.
 induction n; [ easy | cbn ].
+(**)
+rewrite IHn.
+rewrite rl_sqrt_div_2. 2: {
+  apply (rngl_add_nonneg_nonneg Hor); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+Search (0 ≤ rngl_cos_div_pow_2 _ _)%L.
+...
+}
+... ...
+remember √_%L.
+...
 destruct n. {
   cbn.
   generalize Hzs; intros H.
@@ -3984,35 +3994,8 @@ destruct n. {
   apply rngl_1_sub_cos_div_2_nonneg.
 }
 destruct n. {
-(* etc. *)
-...
-apply eq_angle_eq in H.
-apply eq_angle_eq; cbn.
-injection H; clear H; intros Hs Hc.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  rewrite (rngl_mul_1_l Hon) in Hc.
-...
-remember (θ / ₂)%A as x.
-injection H; clear H; intros H1 H2; subst x.
-Search (rngl_cos (_ / ₂)).
-...
-Search (_ < _)%A.
-Check rngl_lt_iff.
-Check angle_lt_iff.
-...
-      cbn in H12.
-        apply H12; apply angle_opp_0.
-      apply (rngl_le_opp_r Hop Hor) in Hzs1.
-...
-progress unfold angle_ltb.
 ... ...
-specialize (angle_div_2_lt Hic) as H1.
-specialize (H1 (angle_div_2_pow_nat θ n)).
-...
-Qed.
+Check rngl_cos_div_pow_2_eq.
 ... ...
 specialize (rngl_cos_angle_div_2_pow_nat_tending_to_1 (n * θ)) as H1.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.

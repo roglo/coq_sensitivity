@@ -194,6 +194,10 @@ apply (rngl_sub_le_compat Hop Hor). {
 now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 Qed.
 
+(* TODO: use these Ltac tactics each time there is a change of variable,
+   i.e. codes starting with "remember (θ2 + angle_straight)" for example;
+   these tactics are used further, but not (yet) at the beginning *)
+
 Ltac change_angle_add_r θ a :=
   remember (θ + a)%A as θ' eqn:Hθ';
   apply angle_sub_move_r in Hθ';
