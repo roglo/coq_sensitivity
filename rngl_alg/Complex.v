@@ -3952,6 +3952,31 @@ enough (H :
   exists N.
   intros n Hn.
   specialize (HN n Hn).
+  destruct n; [ easy | ].
+  rewrite angle_div_2_pow_nat_succ_r_1.
+  cbn in HN.
+  cbn.
+  remember (0 ≤? rngl_sin _)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite rngl_cos_div_pow_2_eq. 2: {
+      destruct n; [ easy | ].
+Search (0 ≤ rngl_sin (angle_div_2_pow_nat _ _))%L.
+cbn - [ rngl_sin ] in Hzs.
+destruct n. 2: {
+cbn - [ rngl_sin ] in Hzs.
+(* ouais, donc, ça va pas *)
+...
+apply rngl_sin
+...
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. 2: {
+    apply (rngl_leb_gt Hor) in Hzs.
+Search angle_div_2_pow_nat.
+...
   rewrite rngl_cos_div_pow_2_eq. 2: {
 ...
 Print rngl_cos_div_pow_2.
