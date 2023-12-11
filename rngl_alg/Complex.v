@@ -3700,6 +3700,11 @@ rewrite (rngl_mul_comm Hic).
 now rewrite (rngl_mul_div Hi1).
 Qed.
 
+(*
+Search (-1)%L.
+...
+*)
+
 Fixpoint rngl_cos_div_pow_2 θ n :=
   match n with
   | 0 => rngl_cos θ
@@ -3961,12 +3966,12 @@ enough (H :
   destruct zs. {
     apply rngl_leb_le in Hzs.
     rewrite (rngl_mul_1_l Hon).
+Check rngl_cos_div_pow_2_eq.
+...
     rewrite rngl_cos_div_pow_2_eq. 2: {
       destruct n; [ easy | ].
-Search (0 ≤ rngl_sin (angle_div_2_pow_nat _ _))%L.
-cbn - [ rngl_sin ] in Hzs.
-destruct n. 2: {
-cbn - [ rngl_sin ] in Hzs.
+      cbn - [ rngl_sin ] in Hzs.
+...
 (* ouais, donc, ça va pas *)
 ...
 apply rngl_sin
