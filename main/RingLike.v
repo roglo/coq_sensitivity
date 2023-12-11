@@ -5044,7 +5044,7 @@ apply (rngl_mul_le_mono_pos_r Hop Hor Hi1).
 now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
 Qed.
 
-Theorem rngl_div_pos :
+Theorem rngl_div_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →

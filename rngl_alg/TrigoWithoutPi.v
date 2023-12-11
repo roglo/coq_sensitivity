@@ -1751,7 +1751,7 @@ apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
 rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ / _ * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
     apply (rngl_lt_iff Hor).
     split; [ now apply rl_sqrt_nonneg | ].
     now apply not_eq_sym.
@@ -2222,7 +2222,7 @@ apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
 rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ / _ * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
     apply (rngl_lt_iff Hor).
     split; [ now apply rl_sqrt_nonneg | ].
     now apply not_eq_sym.
@@ -2544,7 +2544,7 @@ apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
 rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ / _ * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
     apply (rngl_lt_iff Hor).
     split; [ now apply rl_sqrt_nonneg | ].
     now apply not_eq_sym.
@@ -2688,7 +2688,7 @@ apply (rngl_mul_cancel_r Hi1 _ _ 2)%L; [ easy | ].
 rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ / _ * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
     apply (rngl_lt_iff Hor).
     split; [ now apply rl_sqrt_nonneg | ].
     now apply not_eq_sym.

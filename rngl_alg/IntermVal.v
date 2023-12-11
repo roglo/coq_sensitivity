@@ -377,7 +377,7 @@ split. {
     apply (rngl_add_nonneg_nonneg Hor). 2: {
       apply (rngl_0_le_1 Hon Hop Hor).
     }
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
     now apply (rngl_le_0_sub Hop Hor).
   }
   destruct H1 as (M & HM1 & HM2).
@@ -449,7 +449,7 @@ split. {
     apply (rngl_add_nonneg_nonneg Hor). 2: {
       apply (rngl_0_le_1 Hon Hop Hor).
     }
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
     now apply (rngl_le_0_sub Hop Hor).
   }
   destruct H1 as (M & HM1 & HM2).
@@ -542,7 +542,7 @@ rewrite <- (rngl_abs_opp Hop Hor).
 rewrite (rngl_opp_sub_distr Hop).
 rewrite (rngl_sub_0_r Hos).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-  apply (rngl_div_pos Hon Hop Hiv Hor). {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
     now apply (rngl_le_0_sub Hop Hor).
   } {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
@@ -953,7 +953,7 @@ assert (Hl : (rngl_is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   specialize (H1 ((b - a) / ε)%L).
   destruct H1 as (N, HN).
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
-    apply (rngl_div_pos Hon Hop Hiv Hor); [ | easy ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
     now apply (rngl_le_0_sub Hop Hor).
   }
   exists (N + 1).
@@ -1046,7 +1046,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
       progress fold x.
       rewrite <- (rngl_abs_nonneg_eq Hop Hor x). 2: {
         progress unfold x.
-        apply (rngl_div_pos Hon Hop Hiv Hor). {
+        apply (rngl_div_nonneg Hon Hop Hiv Hor). {
           now apply (rngl_le_0_sub Hop Hor).
         } {
           now apply (rngl_lt_0_sub Hop Hor).
@@ -1112,7 +1112,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   replace (rngl_of_nat 2) with 2%L by now cbn; rewrite rngl_add_0_r.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor x). 2: {
     progress unfold x.
-    apply (rngl_div_pos Hon Hop Hiv Hor). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). {
       now apply (rngl_le_0_sub Hop Hor).
     } {
       now apply (rngl_lt_0_sub Hop Hor).
