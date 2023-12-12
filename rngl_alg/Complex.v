@@ -3732,6 +3732,23 @@ destruct n; cbn. {
 }
 Qed.
 
+Theorem rngl_cos_div_pow_2_succ_r :
+  ∀ n θ,
+  (0 ≤ rngl_sin θ)%L
+  → rngl_cos_div_pow_2 θ (S n) = rngl_cos_div_pow_2 (θ / ₂) n.
+Proof.
+destruct_ac; intros * Hzs.
+cbn.
+induction n. {
+  cbn.
+  apply rngl_leb_le in Hzs.
+  rewrite Hzs; symmetry.
+  apply (rngl_mul_1_l Hon).
+}
+cbn.
+now rewrite IHn.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
@@ -3962,6 +3979,20 @@ enough (H :
   destruct n; [ easy | ].
 (**)
   rewrite rngl_cos_div_pow_2_eq.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    now rewrite <- rngl_cos_div_pow_2_succ_r.
+  }
+  apply (rngl_leb_gt Hor) in Hzs.
+  cbn in HN.
+  destruct n. {
+    cbn.
+    cbn in HN.
+...
+cbn in HN.
+Print rngl_cos_div_pow_2.
 ...
   rewrite angle_div_2_pow_nat_succ_r_2.
 Print rngl_cos_div_pow_2.
