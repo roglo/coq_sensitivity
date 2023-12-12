@@ -3949,6 +3949,17 @@ Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
     (λ i, rngl_cos (angle_div_2_pow_nat θ i)) 1%L.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * ε Hε.
+  exists 1.
+  intros n Hn.
+  destruct n; [ easy | cbn ].
+(* ah chiasse, ça fait chier... bon, faut du courage, mais là, j'en
+   ai un peu marre, je verrai plus tard *)
+...
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 √_)%L, (H1 (_ / _))%L.
+...
 intros.
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
@@ -3980,7 +3991,31 @@ enough (H :
   specialize (HN n Hn).
   now rewrite <- rngl_cos_div_pow_2_eq in HN.
 }
-intros ε Hε.
+enough (H :
+    ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
+    (1 - rngl_cos_div_pow_2 (θ / ₂) n < ε)%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists (S N).
+  intros n Hn.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hn.
+  specialize (HN n Hn).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  remember (1 - ε <? 0)%L as z1e eqn:Hz1e.
+  symmetry in Hz1e.
+  destruct z1e.  {
+    apply rngl_ltb_lt in Hz1e.
+    apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+    cbn.
+    apply rl_sqrt_nonneg.
+Search (0 ≤ _ / _)%L.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+Search (rngl_cos_div_pow_2).
+...
 Check rngl_cos_div_pow_2_eq.
 ... ...
 Check rngl_cos_div_pow_2_eq.
