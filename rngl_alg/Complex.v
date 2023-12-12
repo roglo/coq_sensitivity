@@ -3969,116 +3969,19 @@ enough (H :
 }
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
-    (1 - rngl_cos_div_pow_2 θ n < ε)%L). {
+    (1 - rngl_cos_div_pow_2 (θ / ₂) n < ε)%L). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
-  exists N.
+  exists (S N).
   intros n Hn.
-  specialize (HN n Hn).
   destruct n; [ easy | ].
-(**)
-  rewrite rngl_cos_div_pow_2_eq.
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs. {
-    apply rngl_leb_le in Hzs.
-    now rewrite <- rngl_cos_div_pow_2_succ_r.
-  }
-  apply (rngl_leb_gt Hor) in Hzs.
-  cbn in HN.
-  destruct n. {
-    cbn.
-    cbn in HN.
-...
-cbn in HN.
-Print rngl_cos_div_pow_2.
-...
-  rewrite angle_div_2_pow_nat_succ_r_2.
-Print rngl_cos_div_pow_2.
-Theorem rngl_cos_div_pow_2_succ_r :
-  ∀ n θ,
-  rngl_cos_div_pow_2 θ (S n) =
-  rngl_cos_div_pow_2 (θ / ₂) n.
-Proof.
-intros.
-cbn.
-destruct n. {
-  cbn.
-...
-rewrite <- rngl_cos_div_pow_2_eq in HN.
-...
-  rewrite angle_div_2_pow_nat_succ_r_1.
-  cbn in HN.
-  cbn.
-  remember (0 ≤? rngl_sin _)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs. {
-    apply rngl_leb_le in Hzs.
-    rewrite (rngl_mul_1_l Hon).
+  apply Nat.succ_le_mono in Hn.
+  specialize (HN n Hn).
+  now rewrite <- rngl_cos_div_pow_2_eq in HN.
+}
+intros ε Hε.
 Check rngl_cos_div_pow_2_eq.
-...
-    rewrite rngl_cos_div_pow_2_eq. 2: {
-      destruct n; [ easy | ].
-      cbn - [ rngl_sin ] in Hzs.
-...
-(* ouais, donc, ça va pas *)
-...
-apply rngl_sin
-...
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs. 2: {
-    apply (rngl_leb_gt Hor) in Hzs.
-Search angle_div_2_pow_nat.
-...
-  rewrite rngl_cos_div_pow_2_eq. 2: {
-...
-Print rngl_cos_div_pow_2.
-...
-    cbn in HN.
-(* non, c'est pas bon *)
-...
-destruct n. {
-  cbn.
-  generalize Hzs; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  rewrite rl_sqrt_div_2. 2: {
-    apply (rngl_le_opp_l Hop Hor).
-    apply rngl_cos_bound.
-  }
-  apply (rngl_mul_1_l Hon).
-}
-destruct n. {
-  cbn.
-  generalize Hzs; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  rewrite (rngl_mul_1_l Hon).
-  remember (0 ≤? √((1 - rngl_cos θ) / 2))%L as zs2 eqn:Hzs2.
-  symmetry in Hzs2.
-  rewrite rl_sqrt_div_2. 2: {
-    apply (rngl_add_nonneg_nonneg Hor); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
-    apply rl_sqrt_nonneg.
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_le_opp_l Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite rl_sqrt_div_2. 2: {
-    apply (rngl_le_opp_l Hop Hor).
-    apply rngl_cos_bound.
-  }
-  destruct zs2; [ apply (rngl_mul_1_l Hon) | ].
-  exfalso.
-  apply rngl_leb_nle in Hzs2.
-  apply Hzs2; clear Hzs2.
-  apply rl_sqrt_nonneg.
-  apply rngl_1_sub_cos_div_2_nonneg.
-}
-destruct n. {
 ... ...
 Check rngl_cos_div_pow_2_eq.
 ... ...
