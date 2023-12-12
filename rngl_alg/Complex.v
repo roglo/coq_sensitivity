@@ -3710,21 +3710,26 @@ Fixpoint rngl_cos_div_pow_2 θ n :=
 
 Theorem rngl_cos_div_pow_2_eq :
   ∀ θ n,
-  (0 ≤ rngl_sin θ)%L
-  → rngl_cos (angle_div_2_pow_nat θ n) = rngl_cos_div_pow_2 θ n.
+  rngl_cos (angle_div_2_pow_nat θ (S n)) = rngl_cos_div_pow_2 (θ / ₂) n.
 Proof.
 destruct_ac.
-intros * Hzs.
+intros.
+rewrite angle_div_2_pow_nat_succ_r_2.
 induction n; intros; [ easy | cbn ].
 rewrite IHn.
 remember (0 ≤? _)%L as zsa eqn:Hzsa.
 symmetry in Hzsa.
-destruct zsa; [ now apply (rngl_mul_1_l Hon) | ].
+destruct zsa; [ apply (rngl_mul_1_l Hon) | ].
 exfalso.
 apply rngl_leb_nle in Hzsa.
 apply Hzsa; clear Hzsa.
-destruct n; [ easy | ].
-now apply rngl_sin_div_2_pow_nat_nonneg.
+destruct n; cbn. {
+  apply rl_sqrt_nonneg.
+  apply rngl_1_sub_cos_div_2_nonneg.
+} {
+  apply rl_sqrt_nonneg.
+  apply rngl_1_sub_cos_div_2_nonneg.
+}
 Qed.
 
 (* to be completed
@@ -3955,6 +3960,23 @@ enough (H :
   intros n Hn.
   specialize (HN n Hn).
   destruct n; [ easy | ].
+(**)
+  rewrite rngl_cos_div_pow_2_eq.
+...
+  rewrite angle_div_2_pow_nat_succ_r_2.
+Print rngl_cos_div_pow_2.
+Theorem rngl_cos_div_pow_2_succ_r :
+  ∀ n θ,
+  rngl_cos_div_pow_2 θ (S n) =
+  rngl_cos_div_pow_2 (θ / ₂) n.
+Proof.
+intros.
+cbn.
+destruct n. {
+  cbn.
+...
+rewrite <- rngl_cos_div_pow_2_eq in HN.
+...
   rewrite angle_div_2_pow_nat_succ_r_1.
   cbn in HN.
   cbn.
