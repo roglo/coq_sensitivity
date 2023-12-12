@@ -3944,22 +3944,13 @@ intros ε Hε.
 remember (n * θ)%A as θ1 eqn:Hθ1.
 *)
 Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
+  rngl_characteristic T ≠ 1 →
   ∀ θ,
   rngl_is_limit_when_tending_to_inf
     (λ i, rngl_cos (angle_div_2_pow_nat θ i)) 1%L.
 Proof.
+intros Hc1.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros * ε Hε.
-  exists 1.
-  intros n Hn.
-  destruct n; [ easy | cbn ].
-(* ah chiasse, ça fait chier... bon, faut du courage, mais là, j'en
-   ai un peu marre, je verrai plus tard *)
-...
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  now rewrite (H1 √_)%L, (H1 (_ / _))%L.
-...
 intros.
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
@@ -4011,9 +4002,39 @@ enough (H :
     apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
     cbn.
     apply rl_sqrt_nonneg.
-Search (0 ≤ _ / _)%L.
     apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_opp_l Hop Hor).
+    clear HN Hn.
+    induction n; cbn - [ angle_div_2 ]; [ apply rngl_cos_bound | ].
+    apply (rngl_le_trans Hor _ 0). {
+      apply (rngl_opp_1_le_0 Hon Hop Hor).
+    }
+    apply rl_sqrt_nonneg.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    now apply (rngl_le_opp_l Hop Hor).
+  }
+  apply (rngl_ltb_ge Hor) in Hz1e.
+...
+    apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_lt_le_incl Hor), HN.
+}
+...
+    apply rngl_cos_bound.
+
+    apply (rngl_add_nonneg_nonneg Hor). {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+Search rngl_cos_div_pow_2.
+Check rngl_cos_div_pow_2_eq.
+...
+    apply rngl_cos_div_pow_2_nonneg.
+Search (0 ≤ _ / _)%L.
 Search (rngl_cos_div_pow_2).
 ...
 Check rngl_cos_div_pow_2_eq.
