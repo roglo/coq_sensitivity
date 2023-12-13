@@ -3636,8 +3636,6 @@ rewrite (rngl_mul_comm Hic).
 now rewrite (rngl_mul_div Hi1).
 Qed.
 
-Definition rngl_sign a := if (0 ≤? a)%L then 1%L else (-1)%L.
-
 Fixpoint rngl_cos_div_pow_2 θ n :=
   match n with
   | 0 => rngl_cos θ
