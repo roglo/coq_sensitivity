@@ -1764,38 +1764,6 @@ apply H in H12. {
 }
 Qed.
 
-Theorem angle_div_2_0 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  angle_div_2 0 = 0%A.
-Proof.
-intros Hic Hon Hop Hed.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-move Hi1 before Hos.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  apply eq_angle_eq; cbn.
-  rewrite (rngl_leb_refl Hor).
-  now rewrite (H1 (_ * _))%L, (H1 √_)%L, (H1 1)%L.
-}
-specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H20.
-apply eq_angle_eq; cbn.
-rewrite (rngl_leb_refl Hor).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
-f_equal.
-rewrite (rngl_sub_diag Hos).
-rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-apply (rl_sqrt_0 Hop Hic Hor Hid).
-Qed.
-
 Theorem angle_add_sub_eq_r :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3727,6 +3695,36 @@ apply (rngl_le_opp_l Hop Hor).
 apply rngl_cos_div_pow_2_div_2_bound.
 Qed.
 
+Theorem angle_straight_div_2 : (angle_straight / ₂ = angle_right)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite (H1 angle_right).
+  apply H1.
+}
+apply eq_angle_eq; cbn.
+rewrite (rngl_leb_refl Hor).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_div_0_l Hos Hi1). 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+f_equal.
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+apply (rl_sqrt_1 Hic Hon Hop Hor Hid).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
@@ -3967,8 +3965,26 @@ Theorem rngl_cos_div_pow_2_incr :
   (rngl_cos_div_pow_2 (θ / ₂) n < rngl_cos_div_pow_2 (θ / ₂) (S n))%L.
 Proof.
 destruct_ac; intros Hc1.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
+destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
+  apply (eq_rngl_cos_opp_1) in Ht1.
+  subst θ; cbn.
+  rewrite angle_straight_div_2.
+  remember (rngl_cos_div_pow_2 angle_right n) as a eqn:Ha.
+  revert a Ha.
+  induction n; intros. {
+    cbn in Ha; subst a.
+    rewrite rngl_add_0_r.
+    apply (rl_sqrt_pos Hos).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  cbn in Ha.
+...
 destruct n. {
   cbn.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
@@ -3985,6 +4001,19 @@ destruct n. {
       apply (rngl_le_opp_l Hop Hor).
       apply rngl_cos_bound.
     }
+    assert (Ha1 : (a ≤ 1)%L). {
+      subst a.
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_mul_1_l Hon).
+      apply (rngl_add_le_mono_l Hop Hor).
+      apply rngl_cos_bound.
+    }
+    assert (Haz : (a ≠ 0)%L). {
+      intros H; move H at top; subst a.
+      symmetry in Ha.
+...
     assert (Hzsa : (0 ≤ √a)%L) by now apply rl_sqrt_nonneg.
     rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
       apply rl_sqrt_nonneg.
@@ -4009,7 +4038,8 @@ destruct n. {
     }
     rewrite rngl_mul_add_distr_l.
     rewrite (rngl_mul_1_r Hon).
-    apply (rngl_add_lt_compat Hop Hor).
+    apply (rngl_add_le_lt_mono Hop Hor); [ easy | ].
+Search (_ < √ _)%L.
 ...
 Search (_ + _ < _ + _)%L.
     apply rngl_l
