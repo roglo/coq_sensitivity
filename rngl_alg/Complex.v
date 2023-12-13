@@ -3972,7 +3972,27 @@ destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
   apply (eq_rngl_cos_opp_1) in Ht1.
   subst θ; cbn.
   rewrite angle_straight_div_2.
+...
   remember (rngl_cos_div_pow_2 angle_right n) as a eqn:Ha.
+(**)
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply rl_sqrt_nonneg.
+      apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_add_nonneg_nonneg Hor). 2: {
+        subst a.
+        destruct n; [ apply (rngl_le_refl Hor) | cbn ].
+        apply rl_sqrt_nonneg.
+        apply (rngl_le_div_r Hon Hop Hiv Hor).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        rewrite (rngl_mul_0_l Hos).
+...
+      apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor √a)%L at 1; [ | easy ].
+...
   revert a Ha.
   induction n; intros. {
     cbn in Ha; subst a.
