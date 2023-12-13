@@ -3749,6 +3749,35 @@ cbn.
 now rewrite IHn.
 Qed.
 
+Theorem rngl_cos_dov_pow_2_div_2_succ_nonneg :
+  ∀ n θ, (0 ≤ rngl_cos_div_pow_2 (θ / ₂) (S n))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1.
+  apply (rngl_le_refl Hor).
+}
+intros.
+cbn.
+apply rl_sqrt_nonneg.
+apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_le_opp_l Hop Hor).
+induction n; cbn - [ angle_div_2 ]; [ apply rngl_cos_bound | ].
+apply (rngl_le_trans Hor _ 0). {
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+}
+apply rl_sqrt_nonneg.
+apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+now apply (rngl_le_opp_l Hop Hor).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
@@ -3951,6 +3980,7 @@ Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
 Proof.
 intros Hc1.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
@@ -3984,7 +4014,7 @@ enough (H :
 }
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
-    (1 - rngl_cos_div_pow_2 (θ / ₂) n < ε)%L). {
+    ((1 - ε)² < (rngl_cos_div_pow_2 (θ / ₂) (S n))²)%L). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
@@ -4000,28 +4030,33 @@ enough (H :
   destruct z1e.  {
     apply rngl_ltb_lt in Hz1e.
     apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
-    cbn.
-    apply rl_sqrt_nonneg.
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_le_opp_l Hop Hor).
-    clear HN Hn.
-    induction n; cbn - [ angle_div_2 ]; [ apply rngl_cos_bound | ].
-    apply (rngl_le_trans Hor _ 0). {
-      apply (rngl_opp_1_le_0 Hon Hop Hor).
-    }
-    apply rl_sqrt_nonneg.
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    now apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_dov_pow_2_div_2_succ_nonneg.
   }
-  apply (rngl_ltb_ge Hor) in Hz1e.
+Search (rngl_cos_div_pow_2).
 ...
-    apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-    apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-eapply (rngl_le_trans Hor). 2: {
+cbn in HN.
+Search (√_²)%L.
+rewrite rngl_squ_sqrt in HN.
+...
+  apply (rngl_ltb_ge Hor) in Hz1e.
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii) in HN.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN; [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+    apply rngl_cos_dov_pow_2_div_2_succ_nonneg.
+  }
+  easy.
+}
+intros ε Hε.
+...
+Search (angle_div_2_pow_nat _ _ ≤ _)%A.
+Search (angle_div_2_pow_nat).
+...
+rewrite <- rngl_cos_div_pow_2_eq.
+Print rngl_cos_div_pow_2.
+Search (rngl_cos_div_pow_2 (_ / ₂)).
+Search (rngl_cos_div_pow_2 _ _ ≤ _)%L.
+cbn.
+...
   apply (rngl_lt_le_incl Hor), HN.
 }
 ...
