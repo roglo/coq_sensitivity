@@ -4226,9 +4226,63 @@ destruct tz. {
   now apply (rngl_lt_add_r Hos Hor).
 }
 apply (angle_eqb_neq Hed) in Htz.
-exists 0. (* bidon, mais c'est pour avancer *)
+(**)
+remember (1 - ε ≤? 0)%L as z1e eqn:Hz1e.
+symmetry in Hz1e.
+destruct z1e.  {
+  apply rngl_leb_le in Hz1e.
+  exists 2.
+  intros n Hn.
+  destruct n; [ easy | ].
+  destruct n; [ flia Hn | ].
+  apply (rngl_le_lt_trans Hor _ 0); [ easy | ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_pow_2_div_2_succ_nonneg | ].
+  intros H; symmetry in H.
+...
+  destruct n; [ easy | ].
+  apply rngl_cos_pow_2_div_2_succ_nonneg.
+}
+...
+remember (1 - ε <? 0)%L as z1e eqn:Hz1e.
+symmetry in Hz1e.
+destruct z1e.  {
+  apply rngl_ltb_lt in Hz1e.
+  exists 1.
+  intros n Hn.
+  apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+  destruct n; [ easy | ].
+  apply rngl_cos_pow_2_div_2_succ_nonneg.
+}
+apply (rngl_ltb_ge Hor) in Hz1e.
+destruct (rngl_eq_dec Hed ε 1) as [He1| He1]. {
+  subst ε.
+  rewrite (rngl_sub_diag Hos).
+  exists 2.
+  intros n Hn.
+  destruct n; [ easy | ].
+  destruct n; [ flia Hn | ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_pow_2_div_2_succ_nonneg | ].
+  intros H; symmetry in H.
+...
+  remember (S n) as sn; cbn in H; subst sn.
+Search (rngl_cos_div_pow_2 _ _ = 0)%L.
+...
+  apply
+Search (rngl_cos_div_pow_2 _ (S _)).
+...
+  apply (rl_sqrt_pos Hos).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+...
+exists 2. (* bidon, mais c'est pour avancer *)
 intros n Hn.
 induction n. 2: {
+  apply Nat.succ_le_mono in Hn.
+...
+  cbn.
   eapply (rngl_le_lt_trans Hor). 2: {
     now apply (rngl_cos_div_pow_2_incr Hc1).
   }
@@ -4241,6 +4295,47 @@ symmetry in Hzs.
 destruct zs. {
   rewrite (rngl_mul_1_l Hon).
   apply rngl_leb_le in Hzs.
+  remember (1 - ε <? 0)%L as z1e eqn:Hz1e.
+  symmetry in Hz1e.
+  destruct z1e.  {
+    apply rngl_ltb_lt in Hz1e.
+    apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+    apply rl_sqrt_nonneg.
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  apply (rngl_ltb_ge Hor) in Hz1e.
+  destruct (rngl_eq_dec Hed ε 1) as [He1| He1]. {
+    subst ε.
+    rewrite (rngl_sub_diag Hos).
+    apply (rl_sqrt_pos Hos).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_lt_opp_l Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H; symmetry in H.
+    apply (eq_rngl_cos_opp_1) in H.
+    subst θ.
+...
+Search (0 < _ / 2)%L.
+...
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply rl_sqrt_nonneg.
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (1 - ε))%L; [ | easy ].
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  rewrite rngl_squ_sqrt. 2: {
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  destruct (rngl_eq_dec Hed ε 1) as [He1| He1]. {
+    subst ε.
+    rewrite (rngl_sub_diag Hos).
+    rewrite rngl_squ_0.
+...
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
 ...
 Search (rngl_cos_div_pow_2 _ 0)%L.
 ...
