@@ -1612,6 +1612,7 @@ intros Hed *.
 progress unfold angle_eqb.
 now do 2 rewrite (rngl_eqb_refl Hed).
 Qed.
+*)
 
 Theorem angle_eqb_neq :
   rngl_has_eq_dec T = true →
@@ -1633,6 +1634,7 @@ split; intros H12. {
 }
 Qed.
 
+(*
 Theorem le_1_rngl_cos :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
@@ -3953,6 +3955,28 @@ apply (rngl_add_cancel_l Hos) in H.
 now apply (eq_rngl_cos_1) in H.
 Qed.
 
+Theorem rngl_cos_div_pow_2_0 : ∀ n, rngl_cos_div_pow_2 0 n = 1%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  intros.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 1%L).
+  apply H1.
+}
+intros n.
+induction n; [ easy | cbn ].
+rewrite IHn.
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+apply (rl_sqrt_1 Hic Hon Hop Hor Hid).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
@@ -4152,6 +4176,7 @@ Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
 Proof.
 intros Hc1.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 enough (H :
@@ -4187,14 +4212,37 @@ enough (H :
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   easy.
 }
-Check rngl_cos_div_pow_2_incr.
+intros ε Hε.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz.
+  subst θ.
+  exists 0.
+  intros n Hn.
+  rewrite angle_0_div_2.
+  rewrite rngl_cos_div_pow_2_0.
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  now apply (rngl_lt_add_r Hos Hor).
+}
+apply (angle_eqb_neq Hed) in Htz.
+exists 0. (* bidon, mais c'est pour avancer *)
+intros n Hn.
+induction n. 2: {
+  eapply (rngl_le_lt_trans Hor). 2: {
+    now apply (rngl_cos_div_pow_2_incr Hc1).
+  }
+  apply (rngl_lt_le_incl Hor).
+  now apply IHn.
+}
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon).
+  apply rngl_leb_le in Hzs.
 ...
-Search (_ / _ = _)%L.
-rngl_div_div_mul_mul:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_1 T = true
-    → rngl_mul_is_comm T = true
-      → rngl_has_inv T = true → ∀ a b c d : T, b ≠ 0%L → d ≠ 0%L → (a / b)%L = (c / d)%L ↔ (a * d)%L = (b * c)%L
+Search (rngl_cos_div_pow_2 _ 0)%L.
 ...
 apply eq_rngl_cos_opp_1 in H.
 apply eq_angle_eq in H.
