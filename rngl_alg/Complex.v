@@ -3961,21 +3961,45 @@ apply (rngl_add_cancel_l Hos) in H.
 now apply (eq_rngl_cos_1) in H.
 Qed.
 
-(* to be completed
-Theorem squ_rngl_cos_div_pow_2_incr :
+Theorem squ_rngl_cos_non_0_div_pow_2_bound :
+  rngl_characteristic T ≠ 1 →
   ∀ n θ,
-  (squ_rngl_cos_div_pow_2 (θ / ₂) n < squ_rngl_cos_div_pow_2 (θ / ₂) (S n))%L.
+  θ ≠ 0%A
+  → (squ_rngl_cos_div_pow_2 θ n < 1)%L.
 Proof.
 destruct_ac.
-intros; cbn.
-remember (squ_rngl_cos_div_pow_2 (θ / ₂) n) as a eqn:Ha.
+intros Hc1.
+intros * Htz.
+induction n; cbn. {
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros H.
+  now apply (eq_rngl_cos_1) in H.
+}
+apply (rngl_lt_div_l Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+rewrite (rngl_mul_1_l Hon).
+now apply (rngl_add_lt_mono_l Hop Hor).
+Qed.
+
+Theorem squ_rngl_cos_div_pow_2_incr :
+  rngl_characteristic T ≠ 1 →
+  ∀ n θ,
+  θ ≠ 0%A
+  → (squ_rngl_cos_div_pow_2 θ n < squ_rngl_cos_div_pow_2 θ (S n))%L.
+Proof.
+destruct_ac.
+intros Hc1.
+intros * Htz; cbn.
+remember (squ_rngl_cos_div_pow_2 θ n) as a eqn:Ha.
 apply (rngl_lt_div_r Hon Hop Hiv Hor).
-apply (rngl_0_lt_2 Hon Hop).
-3: {
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 rewrite (rngl_mul_comm Hic).
 rewrite <- (rngl_add_diag Hon).
-...
-*)
+apply (rngl_add_lt_mono_r Hop Hor).
+subst a.
+now apply (squ_rngl_cos_non_0_div_pow_2_bound Hc1).
+Qed.
 
 Theorem rngl_cos_div_pow_2_0 : ∀ n, rngl_cos_div_pow_2 0 n = 1%L.
 Proof.
@@ -4278,11 +4302,21 @@ destruct tz. {
   apply (rngl_le_refl Hor).
 }
 apply (angle_eqb_neq Hed) in Htz.
-induction n; [ apply (rngl_le_refl Hor) | ].
+revert θ Htz.
+induction n; intros; [ apply (rngl_le_refl Hor) | ].
+cbn.
+remember (1 + squ_rngl_cos_div_pow_2 _ _)%L as a eqn:Ha.
+remember (1 + rngl_cos_div_pow_2 _ _)%L as b eqn:Hb.
+move b before a.
+...
 eapply (rngl_le_trans Hor). 2: {
   apply (rngl_lt_le_incl Hor).
   now apply (rngl_cos_div_pow_2_incr Hc1).
 }
+...
+eapply (rngl_le_trans Hor); [ | apply IHn ].
+Search squ_rngl_cos_div_pow_2.
+apply squ_rngl_cos_div_pow_2.
 ...
 remember (θ =? 0)%A as tz eqn:Htz.
 symmetry in Htz.
