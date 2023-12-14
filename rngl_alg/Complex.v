@@ -4231,14 +4231,38 @@ remember (1 - ε ≤? 0)%L as z1e eqn:Hz1e.
 symmetry in Hz1e.
 destruct z1e.  {
   apply rngl_leb_le in Hz1e.
-  exists 2.
+  exists 1.
   intros n Hn.
   destruct n; [ easy | ].
-  destruct n; [ flia Hn | ].
   apply (rngl_le_lt_trans Hor _ 0); [ easy | ].
   apply (rngl_lt_iff Hor).
   split; [ apply rngl_cos_pow_2_div_2_succ_nonneg | ].
   intros H; symmetry in H.
+...
+  rewrite rngl_cos_div_pow_2_succ_r in H. 2: {
+    apply rngl_sin_div_2_nonneg.
+  }
+...
+Theorem eq_rngl_cos_div_pow_2_0 :
+  ∀ n θ,
+  (0 ≤ rngl_sin θ)%L
+  → rngl_cos_div_pow_2 θ n = 0%L
+  → θ = angle_right ∨ θ = (- angle_right)%A.
+Proof.
+intros * Hzs Hcz.
+revert θ Hzs Hcz.
+induction n; intros. {
+  cbn in Hcz.
+  now apply eq_rngl_cos_0 in Hcz.
+}
+...
+rewrite rngl_cos_div_pow_2_succ_r in Hcz; [ | easy ].
+apply IHn in Hcz.
+...
+rewrite rngl_cos_div_pow_2_succ_r in Hcz.
+...
+Search (rngl_cos_div_pow_2 _ (S _)).
+Search (rngl_cos_div_pow_2 _ _ = 0)%L.
 ...
   destruct n; [ easy | ].
   apply rngl_cos_pow_2_div_2_succ_nonneg.
