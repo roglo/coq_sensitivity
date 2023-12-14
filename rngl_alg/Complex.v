@@ -3628,6 +3628,12 @@ Fixpoint rngl_cos_div_pow_2 θ n :=
   | S n' => (√((1 + rngl_cos_div_pow_2 θ n') / 2))%L
   end.
 
+Fixpoint squ_rngl_cos_div_pow_2 θ n :=
+  match n with
+  | 0 => rngl_cos θ
+  | S n' => ((1 + squ_rngl_cos_div_pow_2 θ n') / 2)%L
+  end.
+
 Theorem rngl_cos_div_pow_2_eq :
   ∀ θ n,
   rngl_cos (angle_div_2_pow_nat θ (S n)) = rngl_cos_div_pow_2 (θ / ₂) n.
@@ -3955,6 +3961,22 @@ apply (rngl_add_cancel_l Hos) in H.
 now apply (eq_rngl_cos_1) in H.
 Qed.
 
+(* to be completed
+Theorem squ_rngl_cos_div_pow_2_incr :
+  ∀ n θ,
+  (squ_rngl_cos_div_pow_2 (θ / ₂) n < squ_rngl_cos_div_pow_2 (θ / ₂) (S n))%L.
+Proof.
+destruct_ac.
+intros; cbn.
+remember (squ_rngl_cos_div_pow_2 (θ / ₂) n) as a eqn:Ha.
+apply (rngl_lt_div_r Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hop).
+3: {
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_add_diag Hon).
+...
+*)
+
 Theorem rngl_cos_div_pow_2_0 : ∀ n, rngl_cos_div_pow_2 0 n = 1%L.
 Proof.
 destruct_ac.
@@ -3975,6 +3997,24 @@ rewrite (rngl_div_diag Hon Hiq). 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
 apply (rl_sqrt_1 Hic Hon Hop Hor Hid).
+Qed.
+
+Theorem squ_rngl_cos_div_pow_2_0 : ∀ n, squ_rngl_cos_div_pow_2 0 n = 1%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  intros.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 1%L).
+  apply H1.
+}
+intros n.
+induction n; [ easy | cbn ].
+rewrite IHn.
+apply (rngl_div_diag Hon Hiq).
+apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.
 
 (* to be completed
@@ -4213,6 +4253,37 @@ enough (H :
   easy.
 }
 intros ε Hε.
+Theorem rngl_cos_div_pow_2_lower_bound :
+  ∀ n θ,
+  (squ_rngl_cos_div_pow_2 (θ / ₂) n ≤ rngl_cos_div_pow_2 (θ / ₂) n)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 (squ_rngl_cos_div_pow_2 _ _)).
+  rewrite (H1 (rngl_cos_div_pow_2 _ _)).
+  apply (rngl_le_refl Hor).
+}
+intros.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz.
+  subst θ.
+  rewrite angle_0_div_2.
+  rewrite rngl_cos_div_pow_2_0.
+  rewrite squ_rngl_cos_div_pow_2_0.
+  apply (rngl_le_refl Hor).
+}
+apply (angle_eqb_neq Hed) in Htz.
+induction n; [ apply (rngl_le_refl Hor) | ].
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_cos_div_pow_2_incr Hc1).
+}
+...
 remember (θ =? 0)%A as tz eqn:Htz.
 symmetry in Htz.
 destruct tz. {
