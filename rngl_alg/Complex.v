@@ -4282,9 +4282,9 @@ Theorem rngl_cos_div_pow_2_lower_bound :
   (squ_rngl_cos_div_pow_2 (θ / ₂) n ≤ rngl_cos_div_pow_2 (θ / ₂) n)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 (squ_rngl_cos_div_pow_2 _ _)).
   rewrite (H1 (rngl_cos_div_pow_2 _ _)).
@@ -4308,11 +4308,24 @@ cbn.
 remember (1 + squ_rngl_cos_div_pow_2 _ _)%L as a eqn:Ha.
 remember (1 + rngl_cos_div_pow_2 _ _)%L as b eqn:Hb.
 move b before a.
-...
-eapply (rngl_le_trans Hor). 2: {
-  apply (rngl_lt_le_incl Hor).
-  now apply (rngl_cos_div_pow_2_incr Hc1).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply rl_sqrt_nonneg; subst b.
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_div_pow_2_div_2_bound.
 }
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (a / 2))%L. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  subst a.
+  apply (rngl_le_opp_l Hop Hor).
+...
+  apply squ_rngl_cos_div_pow_2_div_2_bound.
 ...
 eapply (rngl_le_trans Hor); [ | apply IHn ].
 Search squ_rngl_cos_div_pow_2.
