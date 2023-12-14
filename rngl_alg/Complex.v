@@ -4414,8 +4414,20 @@ enough (H :
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   easy.
 }
+enough (H :
+    ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
+    (1 - ε < squ_rngl_cos_div_pow_2 (θ / ₂) n)%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros n Hn.
+  eapply (rngl_lt_le_trans Hor). 2: {
+    apply rngl_cos_div_pow_2_lower_bound.
+  }
+  now apply HN.
+}
 intros ε Hε.
-Check rngl_cos_div_pow_2_lower_bound.
 ...
 eapply (rngl_le_trans Hor); [ | apply IHn ].
 Search squ_rngl_cos_div_pow_2.
