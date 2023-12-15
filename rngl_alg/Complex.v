@@ -4485,7 +4485,7 @@ remember ((1 - rngl_cos (θ / ₂)))%L as a eqn:Ha.
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
 specialize (H1 (a / ε))%L.
 destruct H1 as (N, HN).
-exists (Nat.log2 N).
+exists (Nat.log2 N + 1).
 intros n Hn.
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
@@ -4518,10 +4518,15 @@ rewrite Nat.add_1_r.
 apply Nat.le_succ_l.
 clear HN Hn.
 induction N; [ now cbn | ].
-destruct N. {
-cbn.
-cbn in IHN.
-(* ah bin non, ça va pas, ça *)
+rewrite <- Nat.add_1_r.
+Search (S (Nat.log2 _)).
+...
+destruct N; [ cbn; easy | ].
+destruct N; [ cbn; flia | ].
+destruct N; [ cbn; flia | ].
+destruct N; [ cbn; flia | ].
+destruct N; [ cbn; flia | ].
+destruct N; [ cbn; flia | ].
 ...
 apply Nat.succ_lt_mono in IHN.
 eapply Nat.lt_le_trans; [ apply IHN | ].
