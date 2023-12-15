@@ -4427,8 +4427,47 @@ enough (H :
   }
   now apply HN.
 }
+enough (H :
+    ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
+    (1 - rngl_cos (θ / ₂) < ε * (2 ^ n))%L). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros n Hn.
+  remember (θ / ₂)%A as θ' eqn:Hθ.
+  specialize (HN n Hn).
+  clear N Hn.
+  revert ε Hε HN.
+  induction n; intros. {
+    cbn in HN |-*.
+    rewrite (rngl_mul_1_r Hon) in HN.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_sub_lt_add_r Hop Hor).
+    easy.
+  }
+  cbn.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  apply (rngl_add_lt_mono_l Hop Hor).
+  apply IHn. {
+    rewrite rngl_mul_add_distr_l.
+    rewrite (rngl_mul_1_r Hon).
+    apply (rngl_lt_trans Hor _ ε); [ easy | ].
+    now apply (rngl_lt_add_l Hos Hor).
+  }
+  rewrite <- rngl_mul_assoc.
+  cbn in HN.
+  destruct n; [ | easy ].
+  cbn.
+  now rewrite (rngl_mul_1_r Hon).
+}
 intros ε Hε.
-Print squ_rngl_cos_div_pow_2.
+...
 exists 0.
 intros n Hn.
 remember (θ / ₂)%A as θ' eqn:Hθ.
