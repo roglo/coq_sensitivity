@@ -4518,6 +4518,11 @@ rewrite Nat.add_1_r.
 apply Nat.le_succ_l.
 clear HN Hn.
 induction N; [ now cbn | ].
+destruct N. {
+cbn.
+cbn in IHN.
+(* ah bin non, ça va pas, ça *)
+...
 apply Nat.succ_lt_mono in IHN.
 eapply Nat.lt_le_trans; [ apply IHN | ].
 Search (Nat.log2 (S _)).
