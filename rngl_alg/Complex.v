@@ -4428,6 +4428,22 @@ enough (H :
   now apply HN.
 }
 intros ε Hε.
+Print squ_rngl_cos_div_pow_2.
+exists 1.
+intros n Hn.
+remember (θ / ₂)%A as θ' eqn:Hθ.
+destruct n; [ easy | ].
+destruct n. {
+  cbn.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  apply (rngl_add_lt_mono_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
 ...
 eapply (rngl_le_trans Hor); [ | apply IHn ].
 Search squ_rngl_cos_div_pow_2.
