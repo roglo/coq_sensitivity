@@ -4493,12 +4493,34 @@ apply (rngl_lt_div_l Hon Hop Hiv Hor). {
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
-...
-remember (θ / ₂)%A as θ' eqn:Hθ.
-destruct n. {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ / _))%L. 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  rewrite (rngl_mul_0_l Hos).
+  rewrite Ha.
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+apply (Nat.pow_le_mono_r 2) in Hn; [ | easy ].
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hn.
+Search (rngl_of_nat (_ ^ _)).
+do 2 rewrite (rngl_of_nat_pow Hon Hos) in Hn.
+cbn in Hn.
+rewrite rngl_add_0_r in Hn.
+eapply (rngl_le_trans Hor); [ | apply Hn ].
+replace 2%L with (rngl_of_nat 2). 2: {
   cbn.
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  now rewrite rngl_add_0_r.
+}
+rewrite <- (rngl_of_nat_pow Hon Hos).
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+rewrite Nat.add_1_r.
+apply Nat.le_succ_l.
+...
+Search (rngl_of_nat (_ ^ _)).
+Search (rngl_of_nat _ ≤ rngl_of_nat _)%L.
+rewrite Nat.add_1_r.
+rewrite rngl_of_nat_succ.
 ...
 }
 destruct n. {
