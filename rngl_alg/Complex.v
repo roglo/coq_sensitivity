@@ -4517,16 +4517,97 @@ apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 rewrite Nat.add_1_r.
 apply Nat.le_succ_l.
 clear HN Hn.
-induction N; [ now cbn | ].
-rewrite <- Nat.add_1_r.
-Search (S (Nat.log2 _)).
+rewrite Nat.add_1_r.
+cbn.
+rewrite Nat.add_0_r.
+induction N; [ easy | ].
+specialize (Nat.log2_succ_or N) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  cbn.
+  rewrite Nat.add_0_r.
+  apply Nat.succ_lt_mono in IHN.
+  eapply Nat.lt_le_trans; [ apply IHN | ].
+  rewrite <- Nat.add_1_r.
+  apply Nat.add_le_mono_l.
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.eq_add_0 in H.
+  destruct H as (H, _).
+  revert H.
+  now apply Nat.pow_nonzero.
+}
+rewrite H1.
+Search (Nat.log2 (S _)).
 ...
+destruct N; cbn in H1 |-*.
+flia.
+destruct N; cbn in H1 |-*.
+easy.
+destruct N; cbn in H1 |-*.
+easy.
+destruct N; cbn in H1 |-*.
+easy.
+...
+apply Nat.succ_lt_mono in IHN.
+rewrite <- H1 in IHN.
+eapply Nat.lt_le_trans; [ apply IHN | ].
+...
+Search (Nat.log2 (S _)).
+SNat.log2_succ_or: ∀ a : nat, Nat.log2 (S a) = S (Nat.log2 a) ∨ Nat.log2 (S a) = Nat.log2 a
+earch (S (Nat.log2 _)).
+...
+Search Nat.log2.
+
+destruct N; cbn.
+easy.
+destruct N; cbn.
+easy.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+destruct N; cbn.
+flia.
+...
+  ============================
+  0 < 2
+  ============================
+  1 < 2
+  ============================
+  2 < 4
+  ============================
+  3 < 4
+  ============================
+  4 < 8
+  ============================
+  5 < 8
+  ============================
+  6 < 8
+  ============================
+  7 < 8
+  ============================
+  8 < 16
+
+...
+induction N; [ now cbn | ].
+...
+rewrite <- Nat.add_1_r.
 destruct N; [ cbn; easy | ].
 destruct N; [ cbn; flia | ].
 destruct N; [ cbn; flia | ].
 destruct N; [ cbn; flia | ].
 destruct N; [ cbn; flia | ].
 destruct N; [ cbn; flia | ].
+destruct N; cbn.
 ...
 apply Nat.succ_lt_mono in IHN.
 eapply Nat.lt_le_trans; [ apply IHN | ].
