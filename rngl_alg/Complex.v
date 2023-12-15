@@ -4429,10 +4429,15 @@ enough (H :
 }
 intros ε Hε.
 Print squ_rngl_cos_div_pow_2.
-exists 1.
+exists 0.
 intros n Hn.
 remember (θ / ₂)%A as θ' eqn:Hθ.
-destruct n; [ easy | ].
+destruct n. {
+  cbn.
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+...
+}
 destruct n. {
   cbn.
   apply (rngl_lt_div_r Hon Hop Hiv Hor). {
@@ -4444,6 +4449,37 @@ destruct n. {
   apply (rngl_add_lt_mono_l Hop Hor).
   apply (rngl_lt_sub_lt_add_l Hop Hor).
   apply (rngl_lt_sub_lt_add_r Hop Hor).
+...
+}
+destruct n. {
+  cbn.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_sub_sub_swap Hop).
+  rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+  rewrite (rngl_add_sub Hos).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  apply (rngl_add_lt_mono_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+...
+  ============================
+  (1 - rngl_cos θ' < ε)%L
+  ============================
+  (1 - rngl_cos θ' < ε * 2)%L
+  ============================
+  (1 - rngl_cos θ' < ε * (2 * 2))%L
 ...
 eapply (rngl_le_trans Hor); [ | apply IHn ].
 Search squ_rngl_cos_div_pow_2.
