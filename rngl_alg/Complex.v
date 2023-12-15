@@ -4467,6 +4467,10 @@ enough (H :
   now rewrite (rngl_mul_1_r Hon).
 }
 intros ε Hε.
+(*
+2 ^ n > (1 - cos (θ/2)) / ε
+n > ln₂ ((1 - cos (θ/2)) / ε)
+*)
 ...
 exists 0.
 intros n Hn.
