@@ -4516,6 +4516,11 @@ rewrite <- (rngl_of_nat_pow Hon Hos).
 apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 rewrite Nat.add_1_r.
 apply Nat.le_succ_l.
+clear HN Hn.
+induction N; [ now cbn | ].
+apply Nat.succ_lt_mono in IHN.
+eapply Nat.lt_le_trans; [ apply IHN | ].
+Search (Nat.log2 (S _)).
 ...
 Search (rngl_of_nat (_ ^ _)).
 Search (rngl_of_nat _ ≤ rngl_of_nat _)%L.
