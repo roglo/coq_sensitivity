@@ -4372,13 +4372,15 @@ enough (H :
 intros ε Hε.
 Theorem rngl_cos_angle_div_2_pow_nat_tending_to_1 :
   rngl_characteristic T ≠ 1 →
+  rngl_is_archimedean T = true →
   ∀ θ,
   rngl_is_limit_when_tending_to_inf
     (λ i, rngl_cos (angle_div_2_pow_nat θ i)) 1%L.
 Proof.
-intros Hc1.
+intros Hc1 Har.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 enough (H :
@@ -4429,7 +4431,7 @@ enough (H :
 }
 enough (H :
     ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n →
-    (1 - rngl_cos (θ / ₂) < ε * (2 ^ n))%L). {
+    ((1 - rngl_cos (θ / ₂)) / 2 ^ n < ε)%L). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
@@ -4441,7 +4443,7 @@ enough (H :
   revert ε Hε HN.
   induction n; intros. {
     cbn in HN |-*.
-    rewrite (rngl_mul_1_r Hon) in HN.
+    rewrite (rngl_div_1_r Hon Hiq Hc1) in HN.
     apply (rngl_lt_sub_lt_add_l Hop Hor).
     apply (rngl_lt_sub_lt_add_r Hop Hor).
     easy.
@@ -4460,7 +4462,15 @@ enough (H :
     apply (rngl_lt_trans Hor _ ε); [ easy | ].
     now apply (rngl_lt_add_l Hos Hor).
   }
-  rewrite <- rngl_mul_assoc.
+  apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_div_div Hos Hon Hiv); cycle 1. {
+    apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  } {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
   cbn in HN.
   destruct n; [ | easy ].
   cbn.
@@ -4471,9 +4481,19 @@ intros ε Hε.
 2 ^ n > (1 - cos (θ/2)) / ε
 n > ln₂ ((1 - cos (θ/2)) / ε)
 *)
-...
-exists 0.
+remember ((1 - rngl_cos (θ / ₂)))%L as a eqn:Ha.
+specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+specialize (H1 (a / ε))%L.
+destruct H1 as (N, HN).
+exists (Nat.log2 N).
 intros n Hn.
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
+...
 remember (θ / ₂)%A as θ' eqn:Hθ.
 destruct n. {
   cbn.
