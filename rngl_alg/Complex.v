@@ -4807,11 +4807,13 @@ Definition angle_div_nat θ n :=
 
 (* to be completed
 Theorem all_gc_has_nth_root :
+  rngl_is_archimedean T = true →
+  rngl_characteristic T = 0 →
   rl_has_integral_modulus T = true →
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
 destruct_ac.
-intros Him * Hnz *.
+intros Har Hch Him * Hnz *.
 specialize (polar Him z) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L).
 set
@@ -4820,6 +4822,21 @@ set
       else angle_opp (rl_acos Hor (gre z / ρ)%L))).
 specialize (H1 ρ θ eq_refl eq_refl).
 set (ρ' := rl_nth_root n ρ).
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H2.
+specialize (H2 Har Hch).
+remember (seq_angle_converging_to_angle_div_nat θ n) as θi eqn:Hθi.
+progress unfold seq_angle_converging_to_angle_div_nat in Hθi.
+Theorem glop :
+  ∀ n θ, ∃ θ', (θ = n * θ').
+Proof.
+intros.
+Theorem glop :
+  ∀ n θ, ∃ θ',
+  is_angle_eucl_limit_when_tending_to_inf
+    (seq_angle_converging_to_angle_div_nat θ n) θ'.
+Proof.
+intros.
+Print is_limit_when_tending_to_inf.
 ...
 set (θ' := angle_div_nat θ n).
 exists (mk_gc (ρ' * cos θ') (ρ' * sin θ')).
