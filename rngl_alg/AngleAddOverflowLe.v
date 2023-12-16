@@ -62,7 +62,7 @@ rewrite (rngl_mul_mul_swap Hic).
 progress unfold rngl_squ.
 rewrite rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_r.
-rewrite (fold_cos_sub Hop).
+rewrite <- (rngl_cos_sub Hop).
 rewrite <- (rngl_mul_1_l Hon).
 apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
 apply rngl_cos_bound.

@@ -74,7 +74,7 @@ progress unfold rngl_squ in Hzs12.
 do 2 rewrite <- rngl_mul_assoc in Hzs12.
 rewrite <- rngl_mul_add_distr_l in Hzs12.
 rewrite (rngl_mul_comm Hic (rngl_cos θ2)) in Hzs12.
-rewrite (fold_cos_sub Hop) in Hzs12.
+rewrite <- (rngl_cos_sub Hop) in Hzs12.
 eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
 apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
@@ -387,7 +387,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   rewrite (rngl_mul_comm Hic _ (rngl_sin θ2)).
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
   rewrite (rngl_mul_comm Hic (rngl_cos θ2)).
-  rewrite (fold_sin_sub Hop).
+  rewrite <- (rngl_sin_sub Hop).
   specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
   assert (H : (0 ≤ rngl_cos (θ1 - θ2))%L). {
     now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
@@ -477,7 +477,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos (θ2 + θ3)))
   do 2 rewrite <- rngl_mul_assoc.
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_mul_comm Hic (rngl_cos θ3)).
-  rewrite fold_cos_add.
+  rewrite <- rngl_cos_add.
   rewrite (rngl_mul_comm Hic).
   now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 }

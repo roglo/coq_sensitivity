@@ -2524,9 +2524,9 @@ Qed.
 Theorem rngl_cos_sub_rngl_cos :
   ∀ p q,
   (rngl_cos p - rngl_cos q =
-   - 2%L *
-   rngl_sin (angle_div_2 p + angle_div_2 q) *
-   rngl_sin (angle_div_2 p - angle_div_2 q))%L.
+   - (2%L *
+      rngl_sin (angle_div_2 p + angle_div_2 q) *
+      rngl_sin (angle_div_2 p - angle_div_2 q)))%L.
 Proof.
 destruct_ac; intros *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -2562,7 +2562,6 @@ rewrite (rngl_sub_add Hop).
 rewrite <- (rngl_sub_add_distr Hos).
 rewrite (rngl_add_diag Hon _²)%L.
 rewrite <- (rngl_mul_sub_distr_l Hop).
-rewrite (rngl_mul_opp_l Hop).
 rewrite <- (rngl_mul_opp_r Hop).
 f_equal.
 rewrite (rngl_mul_sub_distr_l Hop).
@@ -4894,9 +4893,33 @@ Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_converging_to_angle_div_nat θ n).
 Proof.
+destruct_ac.
 intros.
 apply Cauchy_sin_cos_Cauchy_angle. {
   progress unfold seq_angle_converging_to_angle_div_nat.
+  intros ε Hε.
+  progress unfold rngl_dist.
+  enough (H :
+  ∃ N : nat,
+    ∀ p q : nat,
+      N ≤ p
+      → N ≤ q
+        → (rngl_abs
+             (rngl_cos (2 ^ p / n * angle_div_2_pow_nat θ p) - rngl_cos (2 ^ q / n * angle_div_2_pow_nat θ q)) < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  rewrite rngl_cos_sub_rngl_cos.
+  rewrite (rngl_abs_opp Hop Hor).
+  remember (2 ^ p / n * angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
+  remember (2 ^ q / n * angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
+  rewrite rngl_sin_add.
+  rewrite (rngl_sin_sub Hop).
+  rewrite <- rngl_mul_assoc.
+  rewrite <- (rngl_squ_sub_squ Hop Hic).
+...
+Search (rngl_sin (_ + _) = _)%L.
+Search (rngl_sin _ * rngl_sin _)%L.
 ...
 rogress unfold angle_eucl_dist.
 intros ε Hε.

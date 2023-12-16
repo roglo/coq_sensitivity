@@ -505,44 +505,42 @@ apply (rngl_ltb_ge Hor).
 now apply rngl_leb_le.
 Qed.
 
-Theorem fold_cos_add :
+Theorem rngl_cos_add :
   ∀ θ1 θ2,
-  (rngl_cos θ1 * rngl_cos θ2 - rngl_sin θ1 * rngl_sin θ2)%L =
-  rngl_cos (θ1 + θ2).
+  rngl_cos (θ1 + θ2) =
+    (rngl_cos θ1 * rngl_cos θ2 - rngl_sin θ1 * rngl_sin θ2)%L.
 Proof. easy. Qed.
 
-Theorem fold_cos_sub :
+Theorem rngl_cos_sub :
   rngl_has_opp T = true →
   ∀ θ1 θ2,
-  (rngl_cos θ1 * rngl_cos θ2 + rngl_sin θ1 * rngl_sin θ2)%L =
-  rngl_cos (θ1 - θ2).
+  (rngl_cos (θ1 - θ2) =
+     rngl_cos θ1 * rngl_cos θ2 + rngl_sin θ1 * rngl_sin θ2)%L.
 Proof.
 intros Hop *.
 cbn.
 rewrite (rngl_mul_opp_r Hop).
-symmetry.
 apply (rngl_sub_opp_r Hop).
 Qed.
 
-Theorem fold_sin_add :
+Theorem rngl_sin_add :
   ∀ θ1 θ2,
-  (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L =
-  rngl_sin (θ1 + θ2).
+  rngl_sin (θ1 + θ2) =
+    (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L.
 Proof.
 intros.
 apply rngl_add_comm.
 Qed.
 
-Theorem fold_sin_sub :
+Theorem rngl_sin_sub :
   rngl_has_opp T = true →
   ∀ θ1 θ2,
-  (rngl_sin θ1 * rngl_cos θ2 - rngl_cos θ1 * rngl_sin θ2)%L =
-  rngl_sin (θ1 - θ2).
+  rngl_sin (θ1 - θ2) =
+    (rngl_sin θ1 * rngl_cos θ2 - rngl_cos θ1 * rngl_sin θ2)%L.
 Proof.
 intros Hop *.
 cbn.
 rewrite (rngl_mul_opp_r Hop).
-symmetry.
 apply (rngl_add_opp_l Hop).
 Qed.
 
