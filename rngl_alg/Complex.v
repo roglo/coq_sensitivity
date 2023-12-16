@@ -4806,6 +4806,16 @@ Definition angle_div_nat θ n :=
 *)
 
 (* to be completed
+Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
+  ∀ n θ,
+  is_Cauchy_sequence angle_eucl_dist
+    (seq_angle_converging_to_angle_div_nat θ n).
+Proof.
+intros.
+intros ε Hε.
+set (u := seq_angle_converging_to_angle_div_nat θ n).
+...
+
 Theorem all_gc_has_nth_root :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -4826,17 +4836,6 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H2.
 specialize (H2 Har Hch).
 remember (seq_angle_converging_to_angle_div_nat θ n) as θi eqn:Hθi.
 progress unfold seq_angle_converging_to_angle_div_nat in Hθi.
-Theorem glop :
-  ∀ n θ, ∃ θ', (θ = n * θ').
-Proof.
-intros.
-Theorem glop :
-  ∀ n θ, ∃ θ',
-  is_angle_eucl_limit_when_tending_to_inf
-    (seq_angle_converging_to_angle_div_nat θ n) θ'.
-Proof.
-intros.
-Print is_limit_when_tending_to_inf.
 ...
 set (θ' := angle_div_nat θ n).
 exists (mk_gc (ρ' * cos θ') (ρ' * sin θ')).
