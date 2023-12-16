@@ -3181,6 +3181,16 @@ f_equal; f_equal.
 apply (rngl_mul_opp_r Hop).
 Qed.
 
+Theorem rngl_squ_sub_comm :
+  rngl_has_opp T = true →
+  ∀ a b, ((a - b)² = (b - a)²)%L.
+Proof.
+intros Hop.
+intros.
+rewrite <- (rngl_squ_opp Hop).
+now rewrite (rngl_opp_sub_distr Hop).
+Qed.
+
 Theorem rngl_squ_mul :
   rngl_mul_is_comm T = true →
   ∀ a b, rngl_squ (a * b)%L = (rngl_squ a * rngl_squ b)%L.

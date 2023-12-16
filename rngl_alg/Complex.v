@@ -4805,6 +4805,89 @@ Definition angle_div_nat θ n :=
 ...
 *)
 
+Theorem Cauchy_sin_cos_Cauchy_angle :
+  ∀ u,
+  rngl_is_Cauchy_sequence (λ i, rngl_cos (u i))
+  → rngl_is_Cauchy_sequence (λ i, rngl_sin (u i))
+  → is_Cauchy_sequence angle_eucl_dist u.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hcc Hcs.
+  intros ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hcc Hcs.
+intros ε Hε.
+assert (Hε2 : (0 < √(ε² / 2))%L). {
+  apply (rl_sqrt_pos Hos).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  rewrite (rngl_mul_0_l Hos).
+  progress unfold rngl_squ.
+  now apply (rngl_mul_pos_pos Hop Hor Hii).
+}
+specialize (Hcc _ Hε2).
+specialize (Hcs _ Hε2).
+destruct Hcc as (cn, Hcc).
+destruct Hcs as (sn, Hcs).
+move sn before cn.
+exists (max cn sn).
+intros p q Hp Hq.
+progress unfold angle_eucl_dist.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε)%L. 2: {
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+}
+specialize (Hcc p q).
+specialize (Hcs p q).
+assert (H : cn ≤ p) by now apply Nat.max_lub_l in Hp.
+specialize (Hcc H); clear H.
+assert (H : cn ≤ q) by now apply Nat.max_lub_l in Hq.
+specialize (Hcc H); clear H.
+assert (H : sn ≤ p) by now apply Nat.max_lub_r in Hp.
+specialize (Hcs H); clear H.
+assert (H : sn ≤ q) by now apply Nat.max_lub_r in Hq.
+specialize (Hcs H); clear H.
+progress unfold rngl_dist in Hcc.
+progress unfold rngl_dist in Hcs.
+apply (rngl_lt_le_incl Hor) in Hε2.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hcc, Hcs; [ | easy | easy ].
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hcc, Hcs.
+assert (Hzε2 : (0 ≤ ε² / 2)%L). {
+  apply (rngl_le_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_squ_nonneg Hop Hor).
+}
+rewrite rngl_squ_sqrt in Hcc, Hcs; [ | easy | easy ].
+specialize (rngl_div_add_distr_r Hiv ε² ε² 2)%L as H1.
+rewrite (rngl_add_diag2 Hon) in H1.
+rewrite (rngl_mul_div Hi1) in H1. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite H1.
+rewrite (rngl_squ_sub_comm Hop) in Hcc, Hcs.
+now apply (rngl_add_lt_compat Hop Hor).
+Qed.
+
 (* to be completed
 Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
   ∀ n θ,
@@ -4812,6 +4895,10 @@ Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
     (seq_angle_converging_to_angle_div_nat θ n).
 Proof.
 intros.
+apply Cauchy_sin_cos_Cauchy_angle. {
+  progress unfold seq_angle_converging_to_angle_div_nat.
+...
+rogress unfold angle_eucl_dist.
 intros ε Hε.
 set (u := seq_angle_converging_to_angle_div_nat θ n).
 ...
