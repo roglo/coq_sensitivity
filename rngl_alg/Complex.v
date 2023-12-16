@@ -4581,39 +4581,24 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
-(* to be completed
-...
-rewrite rngl_abs_neg in HN.
-...
-Search (0 < rngl_abs _)%L.
-About rngl_abs_pos.
-...
-rewrite rngl_0_lt_abs
-...
-Theorem glop :
-  ∀ n θ,
-  is_angle_eucl_limit_when_tending_to_inf
-    (λ i, angle_div_2_pow_nat (n * θ) i) angle_right.
-...
-
-Print seq_converging_to_rat.
-...
-  → rngl_is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
-       (rngl_of_nat a / rngl_of_nat b)%L.
-...
-
-Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
+(*
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
   ∀ i θ θ',
   i ≠ 0
-  → is_angle_limit_when_tending_to_inf
+  → is_angle_eucl_limit_when_tending_to_inf
        (seq_angle_converging_to_angle_div_nat θ i) θ'
   → θ = (i * θ')%A.
 Proof.
-(**)
-intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
 destruct_ac.
+intros Har Hch.
+intros * Hiz Hlim.
+Inspect 1.
+(**)
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
+specialize (H1 Har Hch i θ' Hiz).
+...
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 progress unfold is_angle_limit_when_tending_to_inf in Hlim.
@@ -4818,20 +4803,16 @@ Definition angle_div_nat θ n :=
   {| rngl_cos := 1; rngl_sin := 0;
      rngl_cos2_sin2 := 42 |}%L.
 ...
+*)
 
+(* to be completed
 Theorem all_gc_has_nth_root :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
-  rngl_is_ordered T = true →
-  rngl_characteristic T ≠ 2 →
   rl_has_integral_modulus T = true →
   ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
 Proof.
-intros Hic Hon Hop Hiv Hed Hor Hc2 Him * Hnz *.
-specialize (polar Hic Hon Hop Hiv Hed Hc2 Him Hor z) as H1.
+destruct_ac.
+intros Him * Hnz *.
+specialize (polar Him z) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L).
 set
   (θ :=
