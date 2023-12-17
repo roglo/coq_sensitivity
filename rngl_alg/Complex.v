@@ -4580,15 +4580,19 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
-(*
+Notation "⌊ a / b ⌋" := (div a b).
+Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
+  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
-  ∀ i θ θ',
-  i ≠ 0
+  ∀ n θ θ',
+  n ≠ 0
   → is_angle_eucl_limit_when_tending_to_inf
-       (seq_angle_converging_to_angle_div_nat θ i) θ'
-  → θ = (i * θ')%A.
+       (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → θ = (n * θ')%A.
 Proof.
 destruct_ac.
 intros Har Hch.
@@ -4886,10 +4890,6 @@ rewrite H1.
 rewrite (rngl_squ_sub_comm Hop) in Hcc, Hcs.
 now apply (rngl_add_lt_compat Hop Hor).
 Qed.
-
-Notation "⌊ a / b ⌋" := (div a b).
-Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
-  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
 (* to be completed
 Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
