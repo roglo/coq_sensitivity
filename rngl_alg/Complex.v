@@ -4887,6 +4887,10 @@ rewrite (rngl_squ_sub_comm Hop) in Hcc, Hcs.
 now apply (rngl_add_lt_compat Hop Hor).
 Qed.
 
+Notation "⌊ a / b ⌋" := (div a b).
+Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
+  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+
 (* to be completed
 Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
   ∀ n θ,
