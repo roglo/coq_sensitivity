@@ -4906,29 +4906,26 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 apply Cauchy_sin_cos_Cauchy_angle. {
   progress unfold seq_angle_converging_to_angle_div_nat.
-  intros ε Hε.
-  progress unfold rngl_dist.
   enough (H :
-  ∃ N : nat,
-    ∀ p q : nat,
+    ∀ ε, (0 < ε)%L →
+    ∃ N : nat,
+      ∀ p q : nat,
       N ≤ p
       → N ≤ q
-        → (rngl_abs
-             (rngl_cos (2 ^ p / n * angle_div_2_pow_nat θ p) - rngl_cos (2 ^ q / n * angle_div_2_pow_nat θ q)) < ε)%L). {
+      → (rngl_abs
+          (rngl_sin
+             ((2 ^ p / n * angle_div_2_pow_nat θ p) / ₂ +
+              (2 ^ q / n * angle_div_2_pow_nat θ q) / ₂)) <  ε / 2)%L). {
+  intros ε Hε.
+  progress unfold rngl_dist.
+  specialize (H ε Hε).
   destruct H as (N, HN).
   exists N.
   intros p q Hp Hq.
   specialize (HN p q Hp Hq).
-(*
-  remember (angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
-  remember (angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
-  move aq before ap.
-...
-*)
   remember (2 ^ p / n * angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
   remember (2 ^ q / n * angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
   move aq before ap.
-(**)
   rewrite rngl_cos_sub_rngl_cos.
   rewrite (rngl_abs_opp Hop Hor).
   rewrite <- rngl_mul_assoc.
@@ -4941,20 +4938,29 @@ apply Cauchy_sin_cos_Cauchy_angle. {
   apply (rngl_lt_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-...
-  rewrite (rngl_mul_0_l Hos).
-  apply (rngl_squ_nonneg Hop Hor).
-...
-  rewrite rngl_sin_add.
-  rewrite (rngl_sin_sub Hop).
-  rewrite <- rngl_mul_assoc.
-  rewrite <- (rngl_squ_sub_squ Hop Hic).
-...
-Search (rngl_sin (_ + _) = _)%L.
-Search (rngl_sin _ * rngl_sin _)%L.
-...
-rogress unfold angle_eucl_dist.
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  remember (rngl_sin _)%L as s eqn:Hs.
+  eapply (rngl_le_lt_trans Hor _ (rngl_abs s * 1))%L. {
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+    clear s Hs HN.
+    remember (rngl_sin _) as s eqn:Hs.
+    progress unfold rngl_abs.
+    remember (s ≤? 0)%L as sz eqn:Hsz.
+    symmetry in Hsz; subst s.
+    destruct sz. {
+      apply (rngl_opp_le_compat Hop Hor).
+      rewrite (rngl_opp_involutive Hop).
+      apply rngl_sin_bound.
+    }
+    apply rngl_sin_bound.
+  }
+  rewrite (rngl_mul_1_r Hon).
+  easy.
+}
 intros ε Hε.
+...
 set (u := seq_angle_converging_to_angle_div_nat θ n).
 ...
 
