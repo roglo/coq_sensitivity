@@ -4904,6 +4904,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros.
+set (u := λ p, (2 ^ p / n * angle_div_2_pow_nat θ p)%A).
 apply Cauchy_sin_cos_Cauchy_angle. {
   progress unfold seq_angle_converging_to_angle_div_nat.
   enough (H :
@@ -4912,10 +4913,7 @@ apply Cauchy_sin_cos_Cauchy_angle. {
       ∀ p q : nat,
       N ≤ p
       → N ≤ q
-      → (rngl_abs
-          (rngl_sin
-             ((2 ^ p / n * angle_div_2_pow_nat θ p) / ₂ +
-              (2 ^ q / n * angle_div_2_pow_nat θ q) / ₂)) <  ε / 2)%L). {
+      → (rngl_abs (rngl_sin (u p / ₂ + u q / ₂)) < ε / 2)%L). {
   intros ε Hε.
   progress unfold rngl_dist.
   specialize (H ε Hε).
@@ -4923,9 +4921,8 @@ apply Cauchy_sin_cos_Cauchy_angle. {
   exists N.
   intros p q Hp Hq.
   specialize (HN p q Hp Hq).
-  remember (2 ^ p / n * angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
-  remember (2 ^ q / n * angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
-  move aq before ap.
+  progress fold (u p).
+  progress fold (u q).
   rewrite rngl_cos_sub_rngl_cos.
   rewrite (rngl_abs_opp Hop Hor).
   rewrite <- rngl_mul_assoc.
