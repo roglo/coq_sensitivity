@@ -4894,6 +4894,15 @@ Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
     (seq_angle_converging_to_angle_div_nat θ n).
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  intros ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros.
 apply Cauchy_sin_cos_Cauchy_angle. {
   progress unfold seq_angle_converging_to_angle_div_nat.
@@ -4909,10 +4918,33 @@ apply Cauchy_sin_cos_Cauchy_angle. {
   destruct H as (N, HN).
   exists N.
   intros p q Hp Hq.
-  rewrite rngl_cos_sub_rngl_cos.
-  rewrite (rngl_abs_opp Hop Hor).
+  specialize (HN p q Hp Hq).
+(*
+  remember (angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
+  remember (angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
+  move aq before ap.
+...
+*)
   remember (2 ^ p / n * angle_div_2_pow_nat θ p)%A as ap eqn:Hap.
   remember (2 ^ q / n * angle_div_2_pow_nat θ q)%A as aq eqn:Haq.
+  move aq before ap.
+(**)
+  rewrite rngl_cos_sub_rngl_cos.
+  rewrite (rngl_abs_opp Hop Hor).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  replace (rngl_abs 2) with 2%L. 2: {
+    symmetry; apply (rngl_abs_nonneg_eq Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+...
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_squ_nonneg Hop Hor).
+...
   rewrite rngl_sin_add.
   rewrite (rngl_sin_sub Hop).
   rewrite <- rngl_mul_assoc.
