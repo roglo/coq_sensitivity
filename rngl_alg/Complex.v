@@ -4908,7 +4908,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros.
-set (u := λ p, (2 ^ p / n * angle_div_2_pow_nat θ p)%A).
+set (u := λ i, (2 ^ i / n * angle_div_2_pow_nat θ i)%A).
 apply Cauchy_sin_cos_Cauchy_angle. {
   progress unfold seq_angle_converging_to_angle_div_nat.
   enough (H :
