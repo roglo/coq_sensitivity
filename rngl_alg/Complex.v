@@ -4596,11 +4596,36 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
 Proof.
 destruct_ac.
 intros Har Hch.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
 intros * Hiz Hlim.
-Inspect 1.
-(**)
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
-specialize (H1 Har Hch i θ' Hiz).
+specialize (H1 Har Hch n θ' Hiz).
+remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
+symmetry in Hao.
+destruct ao. 2: {
+  specialize (H1 eq_refl).
+  move Hao before Hiz.
+  progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+  progress unfold is_angle_eucl_limit_when_tending_to_inf in H1.
+  progress unfold is_limit_when_tending_to_inf in Hlim.
+  progress unfold is_limit_when_tending_to_inf in H1.
+  specialize (Hlim 1%L).
+  specialize (H1 1%L).
+  assert (H : (0 < 1)%L) by apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  specialize (Hlim H).
+  specialize (H1 H); clear H.
+  destruct Hlim as (N, HN).
+  destruct H1 as (N', HN').
+  specialize (HN (max N N')).
+  specialize (HN' (max N N')).
+  specialize (HN (Nat.le_max_l _ _)).
+  specialize (HN' (Nat.le_max_r _ _)).
+  progress unfold angle_eucl_dist in HN.
+  progress unfold angle_eucl_dist in HN'.
+  set (u := seq_angle_converging_to_angle_div_nat) in HN, HN'.
+  set (m := max N N') in HN, HN'.
 ...
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
