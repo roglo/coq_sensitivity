@@ -4596,21 +4596,59 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
 Proof.
 destruct_ac.
 intros Har Hch.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
-specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
-specialize (H1 Har Hch n θ' Hiz).
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
+specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
 destruct ao. 2: {
-  specialize (H1 eq_refl).
+  specialize (Hlim' eq_refl).
   move Hao before Hiz.
-  progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
-  progress unfold is_angle_eucl_limit_when_tending_to_inf in H1.
-  progress unfold is_limit_when_tending_to_inf in Hlim.
-  progress unfold is_limit_when_tending_to_inf in H1.
+  set (u := seq_angle_converging_to_angle_div_nat) in Hlim, Hlim'.
+  assert (H :
+    ∀ ε, (0 < ε)%L →
+    ∃ N, ∀ p, N ≤ p → (angle_eucl_dist (u θ n p) (u (n * θ')%A n p) < ε)%L). {
+    intros ε Hε.
+    assert (Hε2 : (0 < ε / 2)%L). {
+      apply (rngl_lt_div_r Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      now rewrite (rngl_mul_0_l Hos).
+    }
+    specialize (Hlim (ε / 2) Hε2)%L.
+    specialize (Hlim' (ε / 2) Hε2)%L.
+    destruct Hlim as (N, HN).
+    destruct Hlim' as (N', HN').
+    exists (max N N').
+    intros p Hp.
+    assert (H : N ≤ p) by flia Hp.
+    specialize (HN _ H); clear H.
+    assert (H : N' ≤ p) by flia Hp.
+    specialize (HN' _ H); clear H.
+    specialize (angle_eucl_dist_triangular) as H1.
+    specialize (H1 (u θ n p) θ' (u (n * θ')%A n p)).
+    rewrite (angle_eucl_dist_symmetry Hic Hop θ') in H1.
+    eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
+    specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as H2.
+    rewrite (rngl_add_diag2 Hon) in H2.
+    rewrite (rngl_mul_div Hi1) in H2. 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    rewrite H2.
+    now apply (rngl_add_lt_compat Hop Hor).
+  }
+...
+    specialize (HN' _ H).
+    specialize (HN (Nat.le_max_l _ _)).
+  specialize (HN' (Nat.le_max_r _ _)).
+  progress unfold angle_eucl_dist in HN.
+  progress unfold angle_eucl_dist in HN'.
+  set (m := max N N') in HN, HN'.
+...
   specialize (Hlim 1%L).
   specialize (H1 1%L).
   assert (H : (0 < 1)%L) by apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
@@ -4624,7 +4662,6 @@ destruct ao. 2: {
   specialize (HN' (Nat.le_max_r _ _)).
   progress unfold angle_eucl_dist in HN.
   progress unfold angle_eucl_dist in HN'.
-  set (u := seq_angle_converging_to_angle_div_nat) in HN, HN'.
   set (m := max N N') in HN, HN'.
 ...
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
