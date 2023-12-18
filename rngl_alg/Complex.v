@@ -4641,6 +4641,26 @@ destruct ao. 2: {
     rewrite H2.
     now apply (rngl_add_lt_compat Hop Hor).
   }
+  remember (θ <? n * θ')%A as tt' eqn:Htt'.
+  symmetry in Htt'.
+  destruct tt'. {
+    exfalso.
+    remember (n * θ' - θ)%A as Δθ eqn:Hdt.
+    apply angle_add_move_l in Hdt.
+    specialize (H 1%L).
+    assert (H1 : (0 < 1)%L) by apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    specialize (H H1); clear H1.
+    destruct H as (N, HN).
+    specialize (HN N (Nat.le_refl _)).
+    rewrite <- Hdt in HN.
+    progress unfold u in HN.
+    progress unfold seq_angle_converging_to_angle_div_nat in HN.
+...
+  remember (θ =? n * θ')%A as tt eqn:Htt.
+  symmetry in Htt.
+  destruct tt; [ now apply angle_eqb_eq in Htt | ].
+  apply (angle_eqb_neq Hed) in Htt; exfalso.
+Search (_ <? _)%A.
 ...
     specialize (HN' _ H).
     specialize (HN (Nat.le_max_l _ _)).
