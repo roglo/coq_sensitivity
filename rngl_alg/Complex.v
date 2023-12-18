@@ -4609,6 +4609,29 @@ symmetry in Hao.
 destruct ao. 2: {
   specialize (Hlim' eq_refl).
   move Hao before Hiz.
+(**)
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+assert (H : is_angle_eucl_limit_when_tending_to_inf (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'). {
+  progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim'.
+  progress unfold is_angle_eucl_limit_when_tending_to_inf.
+  progress unfold is_limit_when_tending_to_inf in Hlim'.
+  progress unfold is_limit_when_tending_to_inf.
+  intros ε Hε.
+  specialize (Hlim' ε Hε).
+  destruct Hlim' as (N, HN).
+  exists N.
+  intros m Hm.
+  specialize (HN m Hm).
+  rewrite angle_div_2_pow_nat_mul; [ | easy | easy ].
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  set (θi := λ i : nat, (2 ^ i / n * (θ / ₂^i))%A) in Hlim.
+  set (θ'i := λ i : nat, (n * (2 ^ i / n * (θ' / ₂^i)))%A).
+  move θ'i before θi.
+  progress fold (θ'i m).
+...
   set (u := seq_angle_converging_to_angle_div_nat) in Hlim, Hlim'.
   assert (H :
     ∀ ε, (0 < ε)%L →
