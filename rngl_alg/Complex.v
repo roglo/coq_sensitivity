@@ -4764,7 +4764,19 @@ Theorem glop :
   is_angle_eucl_limit_when_tending_to_inf u θ
   → (∀ i, angle_mul_nat_overflow n (u i) = false)
   → angle_mul_nat_overflow n θ = false.
-Admitted.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hlim Hov.
+induction n; [ easy | ].
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
+split. {
+  apply IHn.
+  intros i.
+  specialize (Hov i).
+  now apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hov.
+}
+... ...
 apply (glop n) in Hlim; [ easy | ].
 intros i.
 clear Hlim Hiz.
