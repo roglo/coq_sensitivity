@@ -4580,7 +4580,9 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
+(*
 Notation "⌊ a / b ⌋" := (div a b).
+*)
 Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
   (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
@@ -4606,7 +4608,126 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
 specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
-destruct ao. 2: {
+destruct ao. {
+  apply Bool.not_false_iff_true in Hao.
+  exfalso; apply Hao; clear Hao Hlim'.
+Theorem glop :
+  ∀ n θ u,
+  is_angle_eucl_limit_when_tending_to_inf u θ
+  → (∀ i, angle_mul_nat_overflow n (u i) = false)
+  → angle_mul_nat_overflow n θ = false.
+Admitted.
+apply (glop n) in Hlim; [ easy | ].
+intros i.
+clear Hlim Hiz.
+induction n; [ easy | ].
+cbn - [ div ].
+destruct n; [ easy | ].
+remember (seq_angle_converging_to_angle_div_nat θ) as u eqn:Hu.
+cbn in IHn.
+destruct n. {
+  clear IHn.
+  cbn.
+  rewrite Bool.orb_false_iff.
+  rewrite angle_add_0_r.
+  split; [ | easy ].
+  subst u; cbn - [ div ].
+Theorem glip :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ,
+  (θ < angle_straight)%A
+  ↔ angle_add_overflow θ θ = false.
+Proof.
+intros Hc1.
+destruct_ac.
+cbn.
+...
+intros.
+split; intros Hθ. {
+  progress unfold angle_ltb in Hθ.
+  progress unfold angle_add_overflow.
+  progress unfold angle_ltb.
+  cbn in Hθ.
+  rewrite (rngl_leb_refl Hor) in Hθ.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs; [ | easy ].
+  apply rngl_leb_le in Hzs.
+  apply rngl_ltb_lt in Hθ.
+  remember (0 ≤? rngl_sin (θ + θ))%L as zst eqn:Hzst.
+  symmetry in Hzst.
+  destruct zst; [ | easy ].
+  apply (rngl_ltb_ge Hor).
+  apply rngl_leb_le in Hzst.
+  cbn.
+  apply (rngl_le_trans Hor _ (rngl_cos θ * rngl_cos θ)). {
+    apply (rngl_le_sub_nonneg Hop Hor).
+    apply (rngl_mul_diag_nonneg Hop Hor).
+  }
+  remember (_ * _)%L as x.
+  rewrite <- (rngl_mul_1_r Hon (rngl_cos _)).
+  subst x.
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply rngl_cos_bound ].
+  cbn in Hzst.
+  rewrite (rngl_mul_comm Hic) in Hzst.
+  rewrite (rngl_add_diag Hon) in Hzst.
+  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
+  destruct Hzst as [Hzst| (H, _)]. 2: {
+    apply (rngl_nlt_ge Hor) in H.
+    exfalso; apply H; clear H.
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+...
+apply rngl_mul_non
+...
+  apply (rngl_mul_nonneg_r).
+...
+  apply (rngl_le_sub_le_add_r Hop Hor).
+Search (_ ≤ _ + _)%L.
+...
+Search (_ → angle_add_overflow _ _ = false).
+Theorem glip :
+  ∀ θ i,
+  angle_add_overflow (seq_angle_converging_to_angle_div_nat θ 2 i)
+    (seq_angle_converging_to_angle_div_nat θ 2 i) = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+induction i. {
+  cbn.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+cbn - [ div ].
+Theorem seq_angle_converging_to_angle_div_nat_succ_r :
+  ∀ θ n i,
+  seq_angle_converging_to_angle_div_nat θ n (S i) = 0%A.
+Proof.
+intros.
+progress unfold seq_angle_converging_to_angle_div_nat.
+cbn.
+rewrite Nat.add_0_r.
+Search ((_ + _) / _).
+(* ah la la la la... ça a pas l'air simple, c't'histoire *)
+...
+  revert θ' Hlim.
+  induction n; intros; [ easy | clear Hiz ].
+  destruct n; [ easy | ].
+  specialize (IHn (Nat.neq_succ_0 _)).
+  destruct n. {
+    cbn.
+    rewrite angle_add_0_r.
+    rewrite Bool.orb_false_r.
+    clear IHn.
+    progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+    progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+    progress unfold is_limit_when_tending_to_inf in Hlim.
+...
+  rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos).
+...
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+  progress unfold is_limit_when_tending_to_inf in Hlim.
+... ...
   specialize (Hlim' eq_refl).
   move Hao before Hiz.
 (**)
