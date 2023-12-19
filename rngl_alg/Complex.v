@@ -4640,8 +4640,6 @@ Theorem glip :
 Proof.
 intros Hc1.
 destruct_ac.
-cbn.
-...
 intros.
 split; intros Hθ. {
   progress unfold angle_ltb in Hθ.
@@ -4664,6 +4662,7 @@ split; intros Hθ. {
     apply (rngl_le_sub_nonneg Hop Hor).
     apply (rngl_mul_diag_nonneg Hop Hor).
   }
+  (* TODO: lemma *)
   remember (_ * _)%L as x.
   rewrite <- (rngl_mul_1_r Hon (rngl_cos _)).
   subst x.
@@ -4672,10 +4671,60 @@ split; intros Hθ. {
   rewrite (rngl_mul_comm Hic) in Hzst.
   rewrite (rngl_add_diag Hon) in Hzst.
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
-  destruct Hzst as [Hzst| (H, _)]. 2: {
+  destruct Hzst as [(_, Hzst)| (H, _)]. 2: {
     apply (rngl_nlt_ge Hor) in H.
     exfalso; apply H; clear H.
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
+  destruct Hzst as [Hzst| (Hs, Hc)]; [ easy | ].
+  apply (rngl_le_antisymm Hor) in Hs; [ | easy ].
+  symmetry in Hs.
+  apply eq_rngl_sin_0 in Hs.
+  destruct Hs; subst θ. {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  now apply (rngl_lt_irrefl Hor) in Hθ.
+} {
+  progress unfold angle_add_overflow in Hθ.
+  progress unfold angle_ltb in Hθ.
+  progress unfold angle_ltb.
+  cbn.
+  rewrite (rngl_leb_refl Hor).
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H; symmetry in H.
+    apply eq_rngl_cos_opp_1 in H.
+    subst θ.
+    rewrite (angle_straight_add_straight Hon Hop) in Hθ.
+    cbn in Hθ.
+    rewrite (rngl_leb_refl Hor) in Hθ.
+    apply Bool.not_true_iff_false in Hθ.
+    apply Hθ.
+    apply rngl_ltb_lt.
+    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+  }
+  exfalso.
+  apply (rngl_leb_gt Hor) in Hzs.
+  remember (0 ≤? rngl_sin (θ + θ))%L as zst eqn:Hzst.
+  symmetry in Hzst.
+  destruct zst; [ easy | ].
+  apply (rngl_ltb_ge Hor) in Hθ.
+  apply (rngl_leb_gt Hor) in Hzst.
+...
+  apply rngl_leb_nle in Hzst.
+  apply Hzst; clear Hzst; cbn.
+...
+  cbn.
+  apply (rngl_le_trans Hor _ (rngl_cos θ * rngl_cos θ)). {
+    apply (rngl_le_sub_nonneg Hop Hor).
+    apply (rngl_mul_diag_nonneg Hop Hor).
+  }
 ...
 apply rngl_mul_non
 ...
