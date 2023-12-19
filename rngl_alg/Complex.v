@@ -4586,53 +4586,7 @@ Notation "⌊ a / b ⌋" := (div a b).
 Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
   (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
-(* to be completed
-Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
-  rngl_is_archimedean T = true →
-  rngl_characteristic T = 0 →
-  ∀ n θ θ',
-  n ≠ 0
-  → is_angle_eucl_limit_when_tending_to_inf
-       (seq_angle_converging_to_angle_div_nat θ n) θ'
-  → θ = (n * θ')%A.
-Proof.
-destruct_ac.
-intros Har Hch.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  now rewrite Hc1 in Hch.
-}
-intros * Hiz Hlim.
-specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
-specialize (Hlim' Har Hch n θ' Hiz).
-remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
-symmetry in Hao.
-destruct ao. {
-  apply Bool.not_false_iff_true in Hao.
-  exfalso; apply Hao; clear Hao Hlim'.
-Theorem glop :
-  ∀ n θ u,
-  is_angle_eucl_limit_when_tending_to_inf u θ
-  → (∀ i, angle_mul_nat_overflow n (u i) = false)
-  → angle_mul_nat_overflow n θ = false.
-Admitted.
-apply (glop n) in Hlim; [ easy | ].
-intros i.
-clear Hlim Hiz.
-induction n; [ easy | ].
-cbn - [ div ].
-destruct n; [ easy | ].
-remember (seq_angle_converging_to_angle_div_nat θ) as u eqn:Hu.
-cbn in IHn.
-destruct n. {
-  clear IHn.
-  cbn.
-  rewrite Bool.orb_false_iff.
-  rewrite angle_add_0_r.
-  split; [ | easy ].
-  subst u; cbn - [ div ].
-Theorem glip :
+Theorem angle_add_diag_not_overflow :
   rngl_characteristic T ≠ 1 →
   ∀ θ,
   (θ < angle_straight)%A
@@ -4640,6 +4594,8 @@ Theorem glip :
 Proof.
 intros Hc1.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 split; intros Hθ. {
   progress unfold angle_ltb in Hθ.
@@ -4716,6 +4672,88 @@ split; intros Hθ. {
   destruct zst; [ easy | ].
   apply (rngl_ltb_ge Hor) in Hθ.
   apply (rngl_leb_gt Hor) in Hzst.
+  rewrite (angle_add_diag Hon Hos) in Hzst.
+  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzst.
+  rewrite <- rngl_mul_assoc in Hzst.
+  apply (rngl_nle_gt Hor) in Hzst.
+  apply Hzst; clear Hzst.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_mul_nonpos_nonpos Hop Hor). {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_nlt_ge Hor).
+  intros Hzc.
+  apply (rngl_nlt_ge Hor) in Hθ.
+  apply Hθ; clear Hθ.
+  rewrite (angle_add_diag Hon Hos).
+  rewrite (rngl_cos_mul_2_l Hon Hos).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_le_lt_trans Hor _ (rngl_cos θ)). {
+    progress unfold rngl_squ.
+    remember (_ * _)%L as x.
+    rewrite <- (rngl_mul_1_r Hon (rngl_cos _)).
+    subst x.
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply rngl_cos_bound ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  apply (rngl_lt_add_r Hos Hor).
+  progress unfold rngl_squ.
+  now apply (rngl_mul_neg_neg Hop Hor Hii).
+}
+Qed.
+
+(* to be completed
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
+  rngl_is_archimedean T = true →
+  rngl_characteristic T = 0 →
+  ∀ n θ θ',
+  n ≠ 0
+  → is_angle_eucl_limit_when_tending_to_inf
+       (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → θ = (n * θ')%A.
+Proof.
+destruct_ac.
+intros Har Hch.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
+intros * Hiz Hlim.
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
+specialize (Hlim' Har Hch n θ' Hiz).
+remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
+symmetry in Hao.
+destruct ao. {
+  apply Bool.not_false_iff_true in Hao.
+  exfalso; apply Hao; clear Hao Hlim'.
+Theorem glop :
+  ∀ n θ u,
+  is_angle_eucl_limit_when_tending_to_inf u θ
+  → (∀ i, angle_mul_nat_overflow n (u i) = false)
+  → angle_mul_nat_overflow n θ = false.
+Admitted.
+apply (glop n) in Hlim; [ easy | ].
+intros i.
+clear Hlim Hiz.
+induction n; [ easy | ].
+cbn - [ div ].
+destruct n; [ easy | ].
+set (u := seq_angle_converging_to_angle_div_nat θ).
+cbn in IHn.
+destruct n. {
+  clear IHn.
+  cbn - [ u ].
+  rewrite Bool.orb_false_iff.
+  rewrite angle_add_0_r.
+  split; [ | easy ].
+  apply angle_add_diag_not_overflow; [ easy | ].
+  progress unfold u; cbn - [ div ].
+Search seq_angle_converging_to_angle_div_nat.
+...
+apply rngl_mul_neg_neg.
 ...
   apply rngl_leb_nle in Hzst.
   apply Hzst; clear Hzst; cbn.

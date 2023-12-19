@@ -4780,6 +4780,19 @@ intros Hab.
 now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
 Qed.
 
+Theorem rngl_mul_neg_neg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b : T, (a < 0)%L → (b < 0)%L → (0 < a * b)%L.
+Proof.
+intros Hop Hor Hii * Haz Hbz.
+rewrite <- (rngl_mul_opp_opp Hop).
+apply (rngl_mul_pos_pos Hop Hor Hii).
+now apply (rngl_opp_pos_neg Hop Hor).
+now apply (rngl_opp_pos_neg Hop Hor).
+Qed.
+
 Theorem rngl_mul_pos_cancel_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
