@@ -4613,6 +4613,7 @@ destruct ao. 2: {
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
   set (θi := λ θ i, (2 ^ i / n * (θ / ₂^i))%A).
+  fold (θi θ) in Hlim.
   assert
       (H :
        is_angle_eucl_limit_when_tending_to_inf (λ i, (n * (θi θ' i))%A) θ'). {
@@ -4632,6 +4633,7 @@ destruct ao. 2: {
     rewrite <- (angle_mul_nat_assoc Hon Hop) in HN.
     easy.
   }
+  clear Hlim'; rename H into Hlim'.
 ...
   set (u := seq_angle_converging_to_angle_div_nat) in Hlim, Hlim'.
   assert (H :
