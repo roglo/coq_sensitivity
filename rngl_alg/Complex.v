@@ -4704,6 +4704,36 @@ split; intros Hθ. {
 }
 Qed.
 
+Theorem angle_straight_pos :
+  rngl_characteristic T ≠ 1 →
+  (0 < angle_straight)%A.
+Proof.
+intros Hc1.
+destruct_ac.
+progress unfold angle_ltb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+apply rngl_ltb_lt.
+apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+Qed.
+
+Theorem angle_mul_nat_div_2 :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → (n * (θ / ₂) = (n * θ) / ₂)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Haov.
+induction n; cbn. {
+  symmetry; apply angle_0_div_2.
+}
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Haov.
+rewrite IHn; [ | easy ].
+symmetry.
+now apply angle_div_2_add_not_overflow.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4751,7 +4781,44 @@ destruct n. {
   split; [ | easy ].
   apply angle_add_diag_not_overflow; [ easy | ].
   progress unfold u; cbn - [ div ].
-Search seq_angle_converging_to_angle_div_nat.
+  progress unfold seq_angle_converging_to_angle_div_nat.
+  induction i. {
+    cbn.
+    apply (angle_straight_pos Hc1).
+  }
+  cbn - [ div ].
+  rewrite Nat.add_0_r.
+  rewrite Nat_add_diag.
+  rewrite Nat.mul_comm.
+  rewrite Nat.div_mul; [ | easy ].
+  rewrite angle_mul_nat_div_2. 2: {
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  apply (angle_div_2_lt_straight Hc1).
+}
+...
+  apply angle_div_2_add_not_overflow.
+  cbn in Haov.
+Print angle_add_overflow.
+Print angle_mul_nat_overflow.
+...
+Check angle_mul_overflow.
+...
+2: {
+Search (angle_add_overflow _ (S _ * _)).
+Search (angle_add_overflow (S _ * _) _).
+cbn in Haov.
+Search (angle_add_overflow _ (_ + _)).
+...
+symmetry.
+apply angle_div_2_add_not_overflow.
+... ...
+rewrite angle_mul_nat_div_2.
+Search (_ / ₂ < angle_straight)%A.
+...
+Search (0 ≤ angle_straight)%A.
+Search (0 < angle_straight)%A.
+    apply angle_straight_nonneg.
 ...
 apply rngl_mul_neg_neg.
 ...
