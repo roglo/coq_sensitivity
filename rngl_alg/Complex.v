@@ -4782,11 +4782,15 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hiz Hlim.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
+(* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
+Search (_ * (_ / ₂^_))%A.
 specialize (Hlim' Har Hch n θ' Hiz).
+...
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
 destruct ao. {
-(**)
+(*
+...
   clear Hlim'.
   destruct n; [ easy | ].
   apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hao.
@@ -4932,17 +4936,22 @@ Search ((_ + _) / _).
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
   progress unfold is_limit_when_tending_to_inf in Hlim.
-... ...
+*)
+  admit.
+} {
   specialize (Hlim' eq_refl).
   move Hao before Hiz.
 (**)
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
-  set (θi := λ θ i, (2 ^ i / n * (θ / ₂^i))%A).
-  fold (θi θ) in Hlim.
+  set (θi := λ i, (2 ^ i / n * (θ / ₂^i))%A).
+  set (θ'i := λ i, (2 ^ i / n * (n * θ / ₂^i))%A).
+  progress fold θi in Hlim.
+  progress fold θ'i in Hlim'.
+...
   assert
       (H :
-       is_angle_eucl_limit_when_tending_to_inf (λ i, (n * (θi θ' i))%A) θ'). {
+       is_angle_eucl_limit_when_tending_to_inf (λ i, (n * (θi i))%A) θ'). {
     progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim'.
     progress unfold is_angle_eucl_limit_when_tending_to_inf.
     progress unfold is_limit_when_tending_to_inf in Hlim'.
@@ -5080,7 +5089,6 @@ Inspect 8.
 ...
 rat_is_inf_sum_of_inv_rad_pow.
 ...
-(**)
 intros Hic Hon Hop Har Hed Hch * Hiz Hlim.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
