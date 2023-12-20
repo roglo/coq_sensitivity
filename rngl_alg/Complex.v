@@ -4642,9 +4642,7 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
     destruct H1 as [H1| H1]. {
       rewrite H1.
       rewrite angle_div_2_pow_nat_succ_r_1.
-Search (angle_mul_nat_overflow _ (_ / ₂)).
 apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
-Search (angle_mul_nat_overflow (_ * _)).
 Theorem angle_mul_nat_overflow_mul_cancel_l :
   ∀ a b θ,
   a ≠ 0
@@ -4670,7 +4668,6 @@ apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
 destruct Hab as (Hab, Hab2).
 split; [ apply (IHa b), Hab | ].
 rewrite (angle_mul_add_distr_r Hon Hop) in Hab2.
-Search (angle_add_overflow _ (_ + _)).
 Theorem angle_add_overflow_add_r_cancel_r :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 (θ2 + θ3) = false
@@ -4705,8 +4702,15 @@ destruct zs1. {
         now apply angle_add_overflow_le_lemma_111.
       }
       apply (rngl_leb_gt Hor) in Hzc1.
-      change_angle_add_r θ1 angle_right.
+      change_angle_sub_r θ1 angle_right.
       sin_cos_add_sub_right_hyp T Hzs12.
+      sin_cos_add_sub_right_hyp T H123.
+      rewrite -> (rngl_add_opp_r Hop) in H123.
+      apply -> (rngl_le_0_sub Hop Hor) in H123.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_hyp T Hzs1.
+      sin_cos_add_sub_right_hyp T Hzc1.
+      sin_cos_add_sub_right_goal T.
 ...
     assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
       rewrite (angle_add_comm Hic) in Hzs12.

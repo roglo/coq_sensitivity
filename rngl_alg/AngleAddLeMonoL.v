@@ -114,6 +114,7 @@ Ltac sin_cos_add_sub_right_goal T :=
   try apply <- (rngl_le_opp_r Hop' Hor');
   try apply <- (rngl_lt_opp_l Hop' Hor');
   try rewrite -> (rngl_add_opp_r Hop');
+  try apply <- (rngl_le_0_sub Hop' Hor');
   clear Hic' Hon' Hop' Hor' Hos'.
 
 Ltac sin_cos_add_sub_straight_goal T :=
@@ -3197,6 +3198,7 @@ sin_cos_add_sub_right_hyp T Hzs2.
 sin_cos_add_sub_right_hyp T Hzs12.
 sin_cos_add_sub_right_hyp T Hc2z.
 sin_cos_add_sub_right_goal T.
+apply (rngl_le_0_sub Hop Hor).
 destruct (rngl_le_dec Hor (rngl_cos θ2) (rngl_cos θ3)) as [Hc23| Hc32]. {
   cbn.
   rewrite (rngl_mul_opp_r Hop).
@@ -3831,8 +3833,9 @@ destruct zs2. {
         sin_cos_add_sub_right_hyp T Hzs2.
         sin_cos_add_sub_right_hyp T Hc2z.
         sin_cos_add_sub_right_goal T.
+        apply (rngl_le_0_sub Hop Hor).
         destruct (rngl_le_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
-         now apply (angle_add_le_mono_l_lemma_34 _ _ θ3).
+          now apply (angle_add_le_mono_l_lemma_34 _ _ θ3).
         } {
           apply (rngl_nle_gt Hor) in Hzs1.
           destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
@@ -3921,7 +3924,6 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   sin_cos_add_sub_right_hyp T Hzs1.
   sin_cos_add_sub_right_hyp T Hzs13.
   sin_cos_add_sub_right_goal T.
-  apply (rngl_le_0_sub Hop Hor).
   destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
     exfalso.
     change_angle_sub_r θ2 angle_right.
