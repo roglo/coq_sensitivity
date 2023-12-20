@@ -3691,29 +3691,6 @@ f_equal. {
 }
 Qed.
 
-(* to be completed
-Theorem angle_div_2_add :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2,
-  angle_div_2 (θ1 + θ2) =
-    if angle_add_overflow θ1 θ2 then
-      (angle_div_2 θ1 + angle_div_2 θ2 + angle_straight)%A
-    else
-      (angle_div_2 θ1 + angle_div_2 θ2)%A.
-Proof.
-intros *.
-remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. 2: {
-  now apply (angle_div_2_add_not_overflow).
-} {
-  progress unfold angle_add_overflow in Haov.
-...
-*)
-
 Theorem rngl_cos_mul_2_l :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →

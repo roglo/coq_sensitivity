@@ -4705,10 +4705,8 @@ destruct zs1. {
         now apply angle_add_overflow_le_lemma_111.
       }
       apply (rngl_leb_gt Hor) in Hzc1.
-...
-(* ah, m... les Ltac disparaissent parce qu'ils sont dans une section *)
       change_angle_add_r θ1 angle_right.
-      sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+      sin_cos_add_sub_right_hyp T Hzs12.
 ...
     assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
       rewrite (angle_add_comm Hic) in Hzs12.
