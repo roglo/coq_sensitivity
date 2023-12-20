@@ -4776,6 +4776,8 @@ split. {
   specialize (Hov i).
   now apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hov.
 }
+progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
 ... ...
 apply (glop n) in Hlim; [ easy | ].
 intros i.
