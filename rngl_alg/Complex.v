@@ -4694,9 +4694,30 @@ destruct zs1. {
   destruct zs123. {
     apply rngl_leb_le in Hzs123.
     apply (rngl_ltb_ge Hor) in H123.
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+    symmetry in Hzs2.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+      symmetry in Hzc1.
+      destruct zc1. {
+        apply rngl_leb_le in Hzc1.
+        now apply angle_add_overflow_le_lemma_111.
+      }
+      apply (rngl_leb_gt Hor) in Hzc1.
+...
+(* ah, m... les Ltac disparaissent parce qu'ils sont dans une section *)
+      change_angle_add_r θ1 angle_right.
+      sin_cos_add_sub_right_hyp Hic Hon Hop Hzs12.
+...
     assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
       rewrite (angle_add_comm Hic) in Hzs12.
       apply rngl_sin_add_nonneg_sin_nonneg in Hzs12; [ easy | ].
+      progress unfold angle_add_overflow.
+      progress unfold angle_ltb.
+      generalize Hzs12; intros H.
+      apply rngl_leb_le in H.
+      rewrite H; clear H.
 ...
 Check rngl_sin_add_nonneg_sin_nonneg.
 Search (0 ≤ rngl_sin (_ + _))%L.
