@@ -4694,6 +4694,13 @@ destruct zs1. {
   destruct zs123. {
     apply rngl_leb_le in Hzs123.
     apply (rngl_ltb_ge Hor) in H123.
+    assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
+      rewrite (angle_add_comm Hic) in Hzs12.
+      apply rngl_sin_add_nonneg_sin_nonneg in Hzs12; [ easy | ].
+...
+Check rngl_sin_add_nonneg_sin_nonneg.
+Search (0 ≤ rngl_sin (_ + _))%L.
+...
 apply angle_add_overflow_le_lemma_1 with (θ2 := (θ2 + θ3)%A); try easy.
 ...
 Search (angle_add_overflow _ (_ + _)).
