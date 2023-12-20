@@ -4387,7 +4387,13 @@ destruct H3 as (H3, H4).
 now apply Nat.lt_irrefl in H4.
 Qed.
 
-Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
+(*
+Notation "⌊ a / b ⌋" := (div a b).
+*)
+Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
+  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
   ∀ n θ,
@@ -4609,11 +4615,46 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
-(*
-Notation "⌊ a / b ⌋" := (div a b).
+(* to be completed
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
+  rngl_is_archimedean T = true →
+  rngl_characteristic T = 0 →
+  ∀ n θ,
+  n ≠ 0
+  → is_angle_eucl_limit_when_tending_to_inf
+      (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros Har Hch * Hnz.
+intros ε Hε.
+set (j := Nat.log2 n).
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp as H1.
+specialize (H1 Har Hch n (θ / ₂^j) Hnz)%A.
+assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
+  clear ε Hε H1.
+  subst j.
+  clear Hnz.
+  induction n; [ easy | ].
+  rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  split. {
+    specialize (Nat.log2_succ_or n) as H1.
+    destruct H1 as [H1| H1]. {
+      rewrite H1.
+      rewrite angle_div_2_pow_nat_succ_r_1.
+Search (angle_mul_nat_overflow _ (_ / ₂)).
+apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
+...
+Search (2 ^ Nat.log2 _).
+specialize (Nat.log2_spec_alt n) as H2.
+apply angle_mul_nat_overflow_mul_2_div_2.
+...
+progress unfold is_angle_eucl_limit_when_tending_to_inf.
+progress unfold is_limit_when_tending_to_inf.
+int
+progress unfold seq_angle_converging_to_angle_div_nat.
+...
 *)
-Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
-  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
 Theorem angle_add_diag_not_overflow :
   rngl_characteristic T ≠ 1 →
