@@ -4645,6 +4645,79 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
 Search (angle_mul_nat_overflow _ (_ / ₂)).
 apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
 Search (angle_mul_nat_overflow (_ * _)).
+Theorem angle_mul_nat_overflow_mul_cancel_l :
+  ∀ a b θ,
+  a ≠ 0
+  → angle_mul_nat_overflow (a * b) θ = false
+  → angle_mul_nat_overflow b θ = false.
+Proof.
+intros * Haz Hab.
+destruct a; [ easy | clear Haz ].
+cbn in Hab.
+Theorem angle_mul_nat_overflow_add_cancel_r :
+  ∀ a b θ,
+  angle_mul_nat_overflow (a + b) θ = false
+  → angle_mul_nat_overflow a θ = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hab.
+revert b Hab.
+induction a; intros; [ easy | ].
+rewrite Nat.add_succ_l in Hab.
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hab.
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+destruct Hab as (Hab, Hab2).
+split; [ apply (IHa b), Hab | ].
+rewrite (angle_mul_add_distr_r Hon Hop) in Hab2.
+Search (angle_add_overflow _ (_ + _)).
+Theorem angle_add_overflow_add_r_cancel_r :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 (θ2 + θ3) = false
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+destruct_ac.
+intros * H123.
+progress unfold angle_add_overflow in H123.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb in H123.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+remember (0 ≤? rngl_sin (θ1 + (θ2 + θ3)))%L as zs123 eqn:Hzs123.
+symmetry in Hzs1, Hzs12, Hzs123.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs12; [ | easy ].
+  apply rngl_leb_le in Hzs12.
+  apply (rngl_ltb_ge Hor).
+  destruct zs123. {
+    apply rngl_leb_le in Hzs123.
+    apply (rngl_ltb_ge Hor) in H123.
+apply angle_add_overflow_le_lemma_1 with (θ2 := (θ2 + θ3)%A); try easy.
+...
+Search (angle_add_overflow _ (_ + _)).
+Search (angle_add_overflow (_ + _)).
+...
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_1 with (θ2 := θ2); try easy.
+apply angle_add_overflow_le_lemma_1 with (θ2 := (θ2 + θ3)%A); try easy.
+apply angle_add_overflow_le_lemma_111; try easy.
+... ...
+now apply angle_add_overflow_add_r_cancel_r in Hab2.
+... ...
+now apply angle_mul_nat_overflow_add_cancel_r in Hab.
+...
+intros * Haz Hab.
+revert b Hab.
+induction a; intros; [ easy | clear Haz ].
+destruct a; [ now rewrite Nat.mul_1_l in Hab | ].
+specialize (IHa (Nat.neq_succ_0 _)).
+remember (S a) as sa; cbn in Hab; subst sa.
+cbn in IHa.
+apply IHa.
+... ...
+now apply angle_mul_nat_overflow_mul_cancel_l in IHn.
 ...
 Search (2 ^ Nat.log2 _).
 specialize (Nat.log2_spec_alt n) as H2.
