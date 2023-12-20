@@ -4393,7 +4393,7 @@ Notation "⌊ a / b ⌋" := (div a b).
 Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
   (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
-Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp :
+Lemma angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
   ∀ n θ,
@@ -4644,6 +4644,7 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
       rewrite angle_div_2_pow_nat_succ_r_1.
 Search (angle_mul_nat_overflow _ (_ / ₂)).
 apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
+Search (angle_mul_nat_overflow (_ * _)).
 ...
 Search (2 ^ Nat.log2 _).
 specialize (Nat.log2_spec_alt n) as H2.
