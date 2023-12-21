@@ -4624,6 +4624,8 @@ Theorem angle_add_not_overflow_add_r_cancel_r :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros * H123 H23.
@@ -4836,11 +4838,37 @@ destruct zs1. {
       sin_cos_add_sub_straight_hyp Hzc1.
       sin_cos_add_sub_straight_hyp Hzs12.
       sin_cos_add_sub_straight_goal T.
+(**)
+      rewrite rngl_add_comm.
+      apply (rngl_le_opp_r Hop Hor).
+      rewrite <- (rngl_sin_sub_anticomm Hic Hop).
+      rewrite rngl_add_comm in H123.
+      apply (rngl_le_opp_r Hop Hor) in H123.
+      rewrite <- (rngl_sin_sub_anticomm Hic Hop) in H123.
+      rewrite <- (rngl_cos_sub_comm Hic Hop) in Hzs12, Hzs123.
+      assert (Hzs3 : (0 ≤ rngl_sin θ3)%L). {
+        apply (rngl_nlt_ge Hor).
+        intros Hs3z.
+        apply (rngl_nlt_ge Hor) in H23.
+        apply H23; clear H23.
+        cbn.
+        apply (rngl_lt_add_lt_sub_r Hop Hor).
+        rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+        apply (rngl_lt_le_trans Hor _ 0).
+        now apply (rngl_mul_pos_neg Hop Hor Hid).
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+        apply (rngl_le_0_sub Hop Hor).
+        apply rngl_cos_bound.
+      }
+...
+        apply (rngl_lt_add_lt_sub_l Hop Hor).
+...
+        apply angle_add_le_mono_l_lemma_29; try easy.
+...
       apply (rngl_le_opp_r Hop Hor) in H123.
       apply (rngl_le_opp_r Hop Hor).
       eapply (rngl_le_trans Hor); [ | apply H123 ].
       rewrite (angle_sub_add_distr Hic Hop).
-...
       change_angle_sub_r θ1 angle_right.
       sin_cos_add_sub_right_hyp T Hzs1.
       sin_cos_add_sub_right_hyp T Hzs123.
