@@ -4622,6 +4622,7 @@ Theorem angle_add_overflow_add_r_cancel_r :
   → angle_add_overflow θ1 θ2 = false.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * H123.
 progress unfold angle_add_overflow in H123.
 progress unfold angle_add_overflow.
@@ -4695,6 +4696,35 @@ destruct zs1. {
         apply Hc12s1; clear Hc12s1.
         apply rngl_sin_bound.
       }
+      apply angle_add_sub_eq_l in H.
+      subst θ2.
+      sin_cos_add_sub_straight_hyp Hzs2.
+      apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+      symmetry in Hzs2.
+      apply eq_rngl_cos_0 in Hzs2.
+      destruct Hzs2; subst θ1. {
+        clear Hzs1 Hzc1.
+        sin_cos_add_sub_right_hyp T H123.
+        cbn in H123.
+        rewrite (rngl_mul_0_l Hos) in H123.
+        rewrite (rngl_sub_0_r Hos) in H123.
+        rewrite (rngl_mul_opp_l Hop) in H123.
+        rewrite (rngl_mul_1_l Hon) in H123.
+        apply (rngl_le_opp_r Hop Hor) in H123.
+        apply (rngl_nlt_ge Hor) in H123.
+        apply H123; clear H123.
+        apply (rngl_lt_opp_l Hop Hor).
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_cos_bound | ].
+        intros H; symmetry in H.
+        apply eq_rngl_cos_opp_1 in H.
+        subst θ3.
+(* ah bin ça marche pas *)
+...
+        sin_cos_add_sub_straight_hyp H123.
+        sin_cos_add_sub_right_hyp T H123.
+        cbn in  H123.
+
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
