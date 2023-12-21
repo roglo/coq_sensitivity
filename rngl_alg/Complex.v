@@ -4705,12 +4705,37 @@ destruct zs1. {
       change_angle_sub_r θ1 angle_right.
       sin_cos_add_sub_right_hyp T Hzs12.
       sin_cos_add_sub_right_hyp T H123.
-      rewrite -> (rngl_add_opp_r Hop) in H123.
-      apply -> (rngl_le_0_sub Hop Hor) in H123.
+      sin_cos_add_sub_right_hyp T H123.
       sin_cos_add_sub_right_hyp T Hzs123.
       sin_cos_add_sub_right_hyp T Hzs1.
       sin_cos_add_sub_right_hyp T Hzc1.
       sin_cos_add_sub_right_goal T.
+      remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
+      symmetry in Hzc2.
+      destruct zc2. {
+        apply rngl_leb_le in Hzc2.
+        apply (rngl_lt_le_incl Hor) in Hzc1.
+        apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+        now apply rngl_sin_add_nonneg.
+        now apply quadrant_1_rngl_cos_add_le_cos_l.
+      }
+      apply (rngl_leb_gt Hor) in Hzc2.
+      change_angle_sub_r θ2 angle_right.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T Hzs12.
+      sin_cos_add_sub_right_hyp T Hzs2.
+      sin_cos_add_sub_right_hyp T Hzc2.
+      sin_cos_add_sub_right_goal T.
+...
+apply angle_add_overflow_le_lemma_111; try easy.
+angle_add_overflow_le_lemma_111
+     : ∀ θ1 θ2 : angle T,
+         (0 ≤ rngl_sin θ1)%L
+         → (0 ≤ rngl_sin θ2)%L
+           → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_sin (θ1 + θ2))%L → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L
 ...
     assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
       rewrite (angle_add_comm Hic) in Hzs12.

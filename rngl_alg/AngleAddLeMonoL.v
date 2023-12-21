@@ -808,7 +808,7 @@ generalize Hs13z; intros H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
 apply rngl_leb_le.
-apply angle_add_overflow_le_lemma_111; try easy.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
@@ -2000,7 +2000,8 @@ generalize Hs13; intros H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
 apply rngl_leb_le.
-apply angle_add_overflow_le_lemma_111; try easy.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
@@ -2251,7 +2252,7 @@ generalize Hc1z; intros H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
 apply (rngl_ltb_ge Hor).
-apply angle_add_overflow_le_lemma_111; try easy.
+now apply quadrant_1_rngl_cos_add_le_cos_l.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_27 :
@@ -2300,8 +2301,7 @@ apply rngl_leb_le in Hs1z.
 rewrite Hs1z.
 apply rngl_leb_le in Hs1z.
 apply (rngl_ltb_ge Hor).
-apply angle_add_overflow_le_lemma_111; try easy.
-apply rngl_sin_add_nonneg; try easy.
+now apply quadrant_1_rngl_cos_add_le_cos_l.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_28 :

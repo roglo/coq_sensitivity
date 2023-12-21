@@ -1154,6 +1154,23 @@ apply (rngl_le_0_sub Hop Hor).
 apply rngl_cos_bound.
 Qed.
 
+Theorem quadrant_1_rngl_cos_add_le_cos_l :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+intros * Hzs1 Hzs2 Hzc1 Hzc2.
+apply angle_add_overflow_le_lemma_111; try easy.
+cbn.
+apply (rngl_add_nonneg_nonneg Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
 Theorem angle_add_overflow_le_lemma_11 :
   ∀ θ1 θ2,
   (rngl_sin θ1 ≤ 0)%L
