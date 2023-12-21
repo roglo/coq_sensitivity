@@ -4619,11 +4619,12 @@ Qed.
 Theorem angle_add_overflow_add_r_cancel_r :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 (θ2 + θ3) = false
+  → angle_add_overflow θ2 θ3 = false
   → angle_add_overflow θ1 θ2 = false.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * H123.
+intros * H123 H23.
 progress unfold angle_add_overflow in H123.
 progress unfold angle_add_overflow.
 progress unfold angle_ltb in H123.
@@ -4719,12 +4720,6 @@ destruct zs1. {
         intros H; symmetry in H.
         apply eq_rngl_cos_opp_1 in H.
         subst θ3.
-(* ah bin ça marche pas *)
-...
-        sin_cos_add_sub_straight_hyp H123.
-        sin_cos_add_sub_right_hyp T H123.
-        cbn in  H123.
-
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
@@ -4780,6 +4775,10 @@ destruct Hab as (Hab, Hab2).
 split; [ apply (IHa b), Hab | ].
 rewrite (angle_mul_add_distr_r Hon Hop) in Hab2.
 ... ...
+apply (angle_add_overflow_add_r_cancel_r θ (a * θ)) in Hab2; [ easy | ].
+(* bon, je pense que c'est bon *)
+...
+apply angle_add_overflow_add_r_cancel_r in Hab2.
 now apply angle_add_overflow_add_r_cancel_r in Hab2.
 ... ...
 now apply angle_mul_nat_overflow_add_cancel_r in Hab.
