@@ -125,6 +125,8 @@ Ltac sin_cos_add_sub_straight_goal T :=
   repeat rewrite <- (angle_add_sub_swap Hic' Hop' _ _ angle_straight);
   repeat rewrite -> (angle_add_sub_swap Hic' Hop' _ angle_straight);
   set (Hor' := ac_or);
+  repeat rewrite -> (rngl_sin_sub_straight_l Hon' Hop');
+  repeat rewrite -> (rngl_cos_sub_straight_l Hon' Hop');
   repeat rewrite (rngl_sin_add_straight_r Hon' Hop');
   repeat rewrite (rngl_cos_add_straight_r Hon' Hop');
   repeat rewrite (rngl_sin_sub_straight_r Hon' Hop');

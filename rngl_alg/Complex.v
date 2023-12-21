@@ -4827,6 +4827,20 @@ destruct zs1. {
         now apply (rngl_nle_gt Hor) in Hzs23.
       }
       apply (rngl_leb_gt Hor) in Hzc1.
+(**)
+      change_angle_sub_l θ1 angle_straight.
+      rewrite <- (angle_sub_sub_distr Hic Hop) in Hzs123, H123, Hzs12 |-*.
+      sin_cos_add_sub_straight_hyp Hzs1.
+      sin_cos_add_sub_straight_hyp Hzs123.
+      sin_cos_add_sub_straight_hyp H123.
+      sin_cos_add_sub_straight_hyp Hzc1.
+      sin_cos_add_sub_straight_hyp Hzs12.
+      sin_cos_add_sub_straight_goal T.
+      apply (rngl_le_opp_r Hop Hor) in H123.
+      apply (rngl_le_opp_r Hop Hor).
+      eapply (rngl_le_trans Hor); [ | apply H123 ].
+      rewrite (angle_sub_add_distr Hic Hop).
+...
       change_angle_sub_r θ1 angle_right.
       sin_cos_add_sub_right_hyp T Hzs1.
       sin_cos_add_sub_right_hyp T Hzs123.
