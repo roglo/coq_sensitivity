@@ -4782,8 +4782,67 @@ destruct zs1. {
         rewrite (rngl_cos_sub_comm Hic Hop).
         apply rngl_cos_lt_rngl_cos_sub; try easy.
         now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-Search (rngl_cos _ < rngl_cos (_ - _))%L.
+(**)
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+          now apply (rngl_lt_le_incl Hor).
+          now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+        }
+        intros H.
+        apply (rngl_cos_eq) in H.
+        destruct H as [H| H]. {
+          rewrite <- H in H23.
 ...
+          apply (rngl_nlt_ge Hor) in H23.
+          apply H23; clear H23.
+          apply angle_add_le_mono_l_lemma_39; try easy; cycle 1.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+(**)
+        apply angle_add_le_mono_l_lemma_39; try easy; cycle 1.
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H; symmetry in H.
+        apply eq_rngl_sin_0 in H.
+        destruct H as [H| H]. {
+          apply -> angle_sub_move_0_r in H.
+          rewrite <- H in H23.
+          apply (rngl_nlt_ge Hor) in H23.
+          apply H23; clear H23.
+          apply angle_add_le_mono_l_lemma_39; try easy; cycle 1.
+          now apply (rngl_lt_le_incl Hor).
+          apply (rngl_lt_iff Hor).
+          split; [ easy | ].
+          intros H'; symmetry in H'.
+          apply eq_rngl_sin_0 in H'.
+          destruct H' as [H'| H']. {
+            apply -> angle_sub_move_0_r in H'.
+            subst θ2.
+            apply angle_sub_move_l in H.
+            rewrite angle_sub_diag in H.
+            subst θ3.
+(* ouais, bin non *)
+...
+            apply angle_sub_move_0_r in H.
+...
+          rewrite <- H in H23.
+          apply (rngl_nlt_ge Hor) in H23.
+          apply H23; clear H23.
+          apply angle_add_le_mono_l_lemma_39; try easy; cycle 1.
+          now apply (rngl_lt_le_incl Hor).
+
+...
+        apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+        apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+Search (rngl_sin _ < rngl_sin _)%L.
+...
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+Search (rngl_cos _ < rngl_cos _)%L.
 ...
 apply angle_add_overflow_le_lemma_111; try easy.
 ...
