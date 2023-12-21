@@ -4860,6 +4860,24 @@ destruct zs1. {
         apply (rngl_le_0_sub Hop Hor).
         apply rngl_cos_bound.
       }
+      assert (Hzc3 : (0 ≤ rngl_cos θ3)%L). {
+        apply (rngl_nlt_ge Hor).
+        intros Hc3z.
+        apply (rngl_nle_gt Hor) in Hzs23.
+        apply Hzs23; clear Hzs23.
+        cbn.
+        apply (rngl_le_sub_0 Hop Hor).
+        apply (rngl_le_trans Hor _ 0).
+        apply (rngl_mul_nonneg_nonpos Hop Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_lt_le_incl Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      }
+...
+        now apply (rngl_mul_pos_neg Hop Hor Hid).
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+        apply (rngl_le_0_sub Hop Hor).
+        apply rngl_cos_bound.
 ...
         apply (rngl_lt_add_lt_sub_l Hop Hor).
 ...
