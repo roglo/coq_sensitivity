@@ -4624,10 +4624,18 @@ Theorem angle_add_overflow_add_r_cancel_r :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros * H123 H23.
+  rewrite (H1 θ2).
+  apply (angle_add_overflow_0_r Hon Hos).
+}
 intros * H123 H23.
 progress unfold angle_add_overflow in H123.
+progress unfold angle_add_overflow in H23.
 progress unfold angle_add_overflow.
 progress unfold angle_ltb in H123.
+progress unfold angle_ltb in H23.
 progress unfold angle_ltb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
@@ -4675,6 +4683,7 @@ destruct zs1. {
       sin_cos_add_sub_right_hyp T Hzs123.
       sin_cos_add_sub_right_hyp T H123.
       sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T H23.
       sin_cos_add_sub_right_hyp T Hzs12.
       sin_cos_add_sub_right_hyp T Hzs2.
       sin_cos_add_sub_right_hyp T Hzc2.
@@ -4706,6 +4715,7 @@ destruct zs1. {
       destruct Hzs2; subst θ1. {
         clear Hzs1 Hzc1.
         sin_cos_add_sub_right_hyp T H123.
+        sin_cos_add_sub_right_hyp T H23.
         cbn in H123.
         rewrite (rngl_mul_0_l Hos) in H123.
         rewrite (rngl_sub_0_r Hos) in H123.
@@ -4720,6 +4730,80 @@ destruct zs1. {
         intros H; symmetry in H.
         apply eq_rngl_cos_opp_1 in H.
         subst θ3.
+        rewrite (angle_straight_add_straight Hon Hop) in H23.
+        cbn in H23.
+        rewrite (rngl_leb_refl Hor) in H23.
+        apply Bool.not_true_iff_false in H23.
+        apply H23.
+        apply rngl_ltb_lt.
+        apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+      }
+      apply (rngl_nle_gt Hor) in Hzc1.
+      apply Hzc1.
+      apply (rngl_opp_1_le_0 Hon Hop Hor).
+    }
+    apply (rngl_leb_gt Hor) in Hzs2.
+    remember (0 ≤? rngl_sin (θ2 + θ3))%L as zs23 eqn:Hzs23.
+    symmetry in Hzs23.
+    destruct zs23; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs23.
+    apply (rngl_ltb_ge Hor) in H23.
+    remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
+    symmetry in Hzc2.
+    destruct zc2. {
+      apply rngl_leb_le in Hzc2.
+      change_angle_add_r θ2 angle_right.
+      sin_cos_add_sub_right_hyp T Hzc2.
+      sin_cos_add_sub_right_hyp T Hzs12.
+      sin_cos_add_sub_right_hyp T H23.
+      sin_cos_add_sub_right_hyp T Hzs23.
+      sin_cos_add_sub_right_hyp T Hzs2.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_goal T.
+      remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+      symmetry in Hzc1.
+      destruct zc1. {
+        apply rngl_leb_le in Hzc1.
+        change_angle_sub_l θ2 angle_right.
+        sin_cos_add_sub_right_hyp T Hzc2.
+        sin_cos_add_sub_right_hyp T Hzs12.
+        sin_cos_add_sub_right_hyp T H23.
+        sin_cos_add_sub_right_hyp T Hzs23.
+        sin_cos_add_sub_right_hyp T Hzs2.
+        sin_cos_add_sub_right_hyp T H123.
+        sin_cos_add_sub_right_hyp T H123.
+        sin_cos_add_sub_right_hyp T Hzs123.
+        sin_cos_add_sub_right_hyp T Hzs123.
+        sin_cos_add_sub_right_goal T.
+        exfalso.
+        apply (rngl_nlt_ge Hor) in H123.
+        apply H123; clear H123.
+        rewrite (rngl_cos_sub_comm Hic Hop).
+        apply rngl_cos_lt_rngl_cos_sub; try easy.
+        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+...
+...
+apply angle_add_overflow_le_lemma_111; try easy.
+...
+    remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+    symmetry in Hzc1.
+    destruct zc1. {
+      apply rngl_leb_le in Hzc1.
+apply angle_add_overflow_le_lemma_111; try easy.
+...
+        now apply angle_add_overflow_le_lemma_111.
+      }
+      apply (rngl_leb_gt Hor) in Hzc1.
+      change_angle_sub_r θ1 angle_right.
+      sin_cos_add_sub_right_hyp T Hzs12.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_hyp T Hzs1.
+      sin_cos_add_sub_right_hyp T Hzc1.
+      sin_cos_add_sub_right_goal T.
 ...
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
