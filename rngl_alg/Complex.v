@@ -4827,6 +4827,13 @@ destruct zs1. {
         now apply (rngl_nle_gt Hor) in Hzs23.
       }
       apply (rngl_leb_gt Hor) in Hzc1.
+      change_angle_sub_r θ1 angle_right.
+      sin_cos_add_sub_right_hyp T Hzs1.
+      sin_cos_add_sub_right_hyp T Hzs123.
+      sin_cos_add_sub_right_hyp T H123.
+      sin_cos_add_sub_right_hyp T Hzc1.
+      sin_cos_add_sub_right_hyp T Hzs12.
+      sin_cos_add_sub_right_goal T.
 ...
             apply -> angle_sub_move_0_r in H.
             subst θ2.
