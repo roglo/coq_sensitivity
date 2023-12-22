@@ -5011,6 +5011,40 @@ apply angle_add_overflow_le_lemma_111; try easy.
 *)
 
 (* to be completed
+Theorem angle_add_not_overflow_double_r :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 (2 * θ2) = false
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+intros * H12.
+cbn in H12.
+rewrite angle_add_0_r in H12.
+...
+
+Theorem angle_mul_nat_not_overflow_double_l :
+  ∀ n θ,
+  angle_mul_nat_overflow (2 * n) θ = false
+  → angle_mul_nat_overflow n θ = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn.
+rewrite <- Nat_add_diag in Hn.
+induction n; [ easy | ].
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+rewrite Nat.add_succ_r in Hn.
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hn.
+destruct Hn as (Hn, Ha).
+rewrite Nat.add_succ_l in Hn.
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hn.
+destruct Hn as (Hn, Hb).
+split; [ apply IHn, Hn | ].
+... ...
+apply angle_add_not_overflow_double_r.
+rewrite (angle_mul_nat_assoc Hon Hop).
+now rewrite <- Nat_add_diag.
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -5037,7 +5071,9 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
     destruct H1 as [H1| H1]. {
       rewrite H1.
       rewrite angle_div_2_pow_nat_succ_r_1.
-apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
+      apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
+... ...
+now apply angle_mul_nat_not_overflow_double.
 ...
 Theorem angle_mul_nat_overflow_mul_cancel_l :
   ∀ a b θ,
