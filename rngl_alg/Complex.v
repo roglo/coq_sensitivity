@@ -5010,12 +5010,34 @@ apply angle_add_overflow_le_lemma_111; try easy.
 ...
 *)
 
+(* to be moved to AngleAddLeMonoL.v *)
+Ltac change_angle_opp θ :=
+  remember (- θ)%A as θ' eqn:Hθ';
+  apply (f_equal angle_opp) in Hθ';
+  rewrite (angle_opp_involutive ac_op) in Hθ';
+  subst θ; rename θ' into θ.
+
+Ltac sin_cos_opp_hyp T H :=
+  set (Hop' := ac_op);
+  set (Hor' := ac_or);
+  repeat rewrite -> rngl_sin_opp in H;
+  repeat rewrite -> rngl_cos_opp in H;
+  repeat rewrite -> (angle_add_assoc Hop') in H;
+  repeat rewrite -> angle_add_opp_r in H;
+  try apply -> (rngl_opp_neg_pos Hop' Hor') in H;
+  clear Hop' Hor'.
+
+Ltac sin_cos_opp_goal T :=
+  repeat rewrite -> angle_add_opp_r.
+(* end to be moved *)
+
 (* to be completed
 Theorem angle_add_not_overflow_double_r :
   ∀ θ1 θ2,
   angle_add_overflow θ1 (2 * θ2) = false
   → angle_add_overflow θ1 θ2 = false.
 Proof.
+destruct_ac.
 intros * H12.
 cbn in H12.
 rewrite angle_add_0_r in H12.
@@ -5026,14 +5048,40 @@ apply angle_ltb_ge.
 progress unfold angle_leb in H12.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-symmetry in Hzs1, Hzs12.
+symmetry in Hzs1, Hzs2, Hzc1, Hzc2, Hzs12.
 destruct zs1. {
   apply rngl_leb_le in Hzs1.
   destruct zs12; [ | easy ].
   apply rngl_leb_le in Hzs12.
   apply rngl_leb_le.
-  apply angle_add_overflow_le_lemma_111; try easy.
+  destruct zc1. {
+    apply rngl_leb_le in Hzc1.
+    destruct zs2. {
+      apply rngl_leb_le in Hzs2.
+      now apply angle_add_overflow_le_lemma_111.
+    }
+    apply (rngl_leb_gt Hor) in Hzs2.
+    destruct zc2. {
+      apply rngl_leb_le in Hzc2.
+(**)
+      change_angle_opp θ2.
+      progress sin_cos_opp_hyp T Hzs2.
+      progress sin_cos_opp_hyp T H12.
+      progress sin_cos_opp_hyp T Hzs12.
+      progress sin_cos_opp_hyp T Hzc2.
+      progress sin_cos_opp_goal T.
+...
+      change_angle_add_r θ2 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs2.
+      progress sin_cos_add_sub_right_hyp T H12.
+      progress sin_cos_add_sub_right_hyp T H12.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T Hzc2.
+      progress sin_cos_add_sub_right_goal T.
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
