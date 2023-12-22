@@ -4393,8 +4393,7 @@ Notation "⌊ a / b ⌋" := (div a b).
 Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
   (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
-(* to be completed
-Lemma angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp :
+Lemma angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
   ∀ n θ,
@@ -4404,7 +4403,7 @@ Lemma angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat_hyp :
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
-intros Har Hch * Hnz Haov.
+intros Har Hch.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
@@ -4417,6 +4416,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 assert (H02 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
+intros * Hnz Haov.
 progress unfold seq_angle_converging_to_angle_div_nat.
 enough (H :
   is_angle_eucl_limit_when_tending_to_inf
@@ -4615,7 +4615,6 @@ rewrite (rngl_opp_sub_distr Hop) in HN.
 apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
-*)
 
 (* to be moved to AngleAddLeMonoL.v *)
 Ltac change_angle_opp θ :=
