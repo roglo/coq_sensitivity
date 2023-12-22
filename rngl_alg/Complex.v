@@ -5019,6 +5019,10 @@ Proof.
 intros * H12.
 cbn in H12.
 rewrite angle_add_0_r in H12.
+progress unfold angle_add_overflow in H12.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge in H12.
+apply angle_ltb_ge.
 ...
 
 Theorem angle_mul_nat_not_overflow_double_l :
