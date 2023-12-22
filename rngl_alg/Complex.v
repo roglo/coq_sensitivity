@@ -5031,7 +5031,7 @@ Ltac sin_cos_opp_goal T :=
   repeat rewrite -> angle_add_opp_r.
 (* end to be moved *)
 
-(* to be completed
+(* wrong, I guess
 Theorem angle_add_not_overflow_double_r :
   ∀ θ1 θ2,
   angle_add_overflow θ1 (2 * θ2) = false
@@ -5111,7 +5111,9 @@ apply angle_add_not_overflow_double_r.
 rewrite (angle_mul_nat_assoc Hon Hop).
 now rewrite <- Nat_add_diag.
 ...
+*)
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -5138,6 +5140,10 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
     destruct H1 as [H1| H1]. {
       rewrite H1.
       rewrite angle_div_2_pow_nat_succ_r_1.
+Search (angle_mul_nat_overflow _ (_ / ₂)).
+...
+      apply angle_mul_nat_overflow_mul_2_div_2.
+...
       apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
 ... ...
 now apply angle_mul_nat_not_overflow_double.
