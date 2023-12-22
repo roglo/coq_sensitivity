@@ -2407,8 +2407,7 @@ Theorem angle_div_2_pow_nat_add :
 Proof.
 intros * Haov.
 revert θ1 θ2 Haov.
-induction n; intros; [ easy | ].
-cbn.
+induction n; intros; [ easy | cbn ].
 rewrite IHn; [ | easy ].
 (*
 clear Haov.
@@ -4586,8 +4585,6 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
-Search (_ / ₂^S _)%A.
-...
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros Har Hch * Hnz.
 intros ε Hε.
