@@ -2387,6 +2387,19 @@ Notation "⌊ a / b ⌋" := (div a b).
 Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
   (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
+Theorem angle_div_2_pow_nat_succ_r_1 :
+  ∀ n θ, angle_div_2_pow_nat θ (S n) = (angle_div_2_pow_nat θ n / ₂)%A.
+Proof. easy. Qed.
+
+Theorem angle_div_2_pow_nat_succ_r_2 :
+  ∀ n θ, angle_div_2_pow_nat θ (S n) = angle_div_2_pow_nat (θ / ₂) n.
+Proof.
+intros.
+induction n; intros; [ easy | ].
+remember (S n) as sn; cbn; subst sn.
+now rewrite IHn.
+Qed.
+
 Theorem angle_div_2_pow_nat_add :
   ∀ n θ1 θ2,
   angle_add_overflow θ1 θ2 = false
@@ -2394,13 +2407,16 @@ Theorem angle_div_2_pow_nat_add :
 Proof.
 intros * Haov.
 revert θ1 θ2 Haov.
-induction n; intros; [ easy | cbn ].
+induction n; intros; [ easy | ].
+cbn.
 rewrite IHn; [ | easy ].
 (*
 clear Haov.
 enough (n ≠ 0).
 rewrite angle_div_2_add_not_overflow; [ easy | ].
 destruct n; [ easy | ].
+
+...
 Theorem glop :
   ∀ n θ, (θ / ₂^S n = θ / ₂^n / ₂)%A.
 Admitted.
@@ -3194,19 +3210,6 @@ rewrite angle_div_2_mul_2.
 rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 now rewrite angle_div_2_mul_2.
-Qed.
-
-Theorem angle_div_2_pow_nat_succ_r_1 :
-  ∀ n θ, angle_div_2_pow_nat θ (S n) = (angle_div_2_pow_nat θ n / ₂)%A.
-Proof. easy. Qed.
-
-Theorem angle_div_2_pow_nat_succ_r_2 :
-  ∀ n θ, angle_div_2_pow_nat θ (S n) = angle_div_2_pow_nat (θ / ₂) n.
-Proof.
-intros.
-induction n; intros; [ easy | ].
-remember (S n) as sn; cbn; subst sn.
-now rewrite IHn.
 Qed.
 
 Theorem angle_div_2_pow_nat_div_2_distr :
@@ -4583,6 +4586,8 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
       (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
+Search (_ / ₂^S _)%A.
+...
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros Har Hch * Hnz.
 intros ε Hε.
