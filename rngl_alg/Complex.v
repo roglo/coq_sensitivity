@@ -4615,7 +4615,7 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
-(* to be completed
+(* wrong
 Theorem angle_add_not_overflow_add_r_cancel_r :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 (θ2 + θ3) = false
@@ -5008,7 +5008,9 @@ apply angle_add_overflow_le_lemma_111; try easy.
       progress sin_cos_add_sub_right_hyp T Hzc1.
       progress sin_cos_add_sub_right_goal T.
 ...
+*)
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
