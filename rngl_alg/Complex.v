@@ -5023,6 +5023,21 @@ progress unfold angle_add_overflow in H12.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge in H12.
 apply angle_ltb_ge.
+progress unfold angle_leb in H12.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs1, Hzs12.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs12; [ | easy ].
+  apply rngl_leb_le in Hzs12.
+  apply rngl_leb_le.
+  apply angle_add_overflow_le_lemma_111; try easy.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+  apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 
 Theorem angle_mul_nat_not_overflow_double_l :
