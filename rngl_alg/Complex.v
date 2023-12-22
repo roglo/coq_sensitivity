@@ -4644,11 +4644,10 @@ apply (angle_eqb_neq Hed) in Hz3.
 progress unfold angle_add_overflow in H123.
 progress unfold angle_add_overflow in H23.
 progress unfold angle_add_overflow.
-(**)
+(*
 apply angle_ltb_ge in H123, H23.
 apply angle_ltb_ge.
-(* ouais, chais pas *)
-...
+*)
 progress unfold angle_ltb in H123.
 progress unfold angle_ltb in H23.
 progress unfold angle_ltb.
@@ -4767,7 +4766,7 @@ destruct zs1. {
     symmetry in Hzc2.
     destruct zc2. {
       apply rngl_leb_le in Hzc2.
-(*
+(**)
       change_angle_add_r θ2 angle_right.
       progress sin_cos_add_sub_right_hyp T Hzc2.
       progress sin_cos_add_sub_right_hyp T Hzs12.
@@ -4777,12 +4776,11 @@ destruct zs1. {
       progress sin_cos_add_sub_right_hyp T H123.
       progress sin_cos_add_sub_right_hyp T Hzs123.
       progress sin_cos_add_sub_right_goal T.
-*)
+(**)
       remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
       symmetry in Hzc1.
       destruct zc1. {
         apply rngl_leb_le in Hzc1.
-...
         change_angle_sub_l θ2 angle_right.
         progress sin_cos_add_sub_right_hyp T Hzc2.
         progress sin_cos_add_sub_right_hyp T Hzs12.
@@ -4891,6 +4889,9 @@ destruct zs1. {
       progress sin_cos_add_sub_right_goal T.
       rewrite (angle_sub_sub_distr Hic Hop).
       progress sin_cos_add_sub_right_goal T.
+      move Hzs1 after Hzc1.
+      move Hzc2 after Hzs1.
+      move Hzs2 after Hzc2.
 ...
       rewrite rngl_add_comm in H123 |-*.
       apply (rngl_le_opp_r Hop Hor) in H123.
