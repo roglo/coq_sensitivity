@@ -5038,6 +5038,7 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
       rewrite H1.
       rewrite angle_div_2_pow_nat_succ_r_1.
 apply angle_mul_nat_overflow_mul_2_div_2 in IHn.
+...
 Theorem angle_mul_nat_overflow_mul_cancel_l :
   ∀ a b θ,
   a ≠ 0
