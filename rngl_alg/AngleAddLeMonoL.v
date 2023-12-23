@@ -1983,8 +1983,6 @@ apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
 now apply rngl_cos_sub_nonneg.
 Qed.
 
-(* ***** *)
-
 Theorem angle_add_le_mono_l_lemma_23 :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -1997,17 +1995,11 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hzs1 Hzs2 Hzc1 Hzc2 Hc12z.
-remember (angle_right - θ2)%A as θ eqn:Hθ.
-apply angle_sub_move_l in Hθ.
-subst θ2; rename θ into θ2; move θ2 before θ1.
-rewrite (angle_add_comm Hic _ (_ - _)%A) in Hc12z |-*.
-rewrite <- (angle_add_sub_swap Hic Hop) in Hc12z |-*.
-rewrite <- (angle_add_sub_assoc Hop) in Hc12z |-*.
-rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs2.
-rewrite (rngl_cos_sub_right_l Hon Hop) in Hzc2.
-rewrite (rngl_sin_add_right_l Hon Hos).
-rewrite (rngl_cos_add_right_l Hon Hop) in Hc12z.
-apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc12z.
+change_angle_sub_l θ2 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs2.
+progress sin_cos_add_sub_right_hyp T Hc12z.
+progress sin_cos_add_sub_right_hyp T Hzc2.
+progress sin_cos_add_sub_right_goal T.
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 apply rngl_cos_sub_nonneg; try easy.
 apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
@@ -2026,6 +2018,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hzs1 Hc1z Hzs2.
+(* ***** *)
 remember (θ1 - angle_right)%A as θ.
 apply angle_add_move_r in Heqθ.
 subst θ1; rename θ into θ1; move θ1 after θ2.
