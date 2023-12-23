@@ -4648,6 +4648,24 @@ destruct H1 as (N, HN).
 exists (2 ^ N).
 intros m Hm.
 specialize (HN m).
+Print seq_angle_converging_to_angle_div_nat.
+Theorem glop :
+  ∀ n i j θ,
+  n ≤ 2 ^ i
+  → i < j
+  → (seq_angle_converging_to_angle_div_nat θ n j <
+     seq_angle_converging_to_angle_div_nat θ n i)%A.
+Proof.
+intros * Hn Hij.
+progress unfold seq_angle_converging_to_angle_div_nat.
+revert n j θ Hn Hij.
+induction i; intros. {
+  cbn in Hn.
+  destruct j; [ easy | ].
+  cbn.
+  rewrite Nat.add_0_r.
+...
+progress unfold seq_angle_converging_to_angle_div_nat in HN.
 ...
 assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
   clear ε Hε H1.
