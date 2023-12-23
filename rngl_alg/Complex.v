@@ -4643,6 +4643,11 @@ Search (_ < angle_straight)%A.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 (**)
 specialize (H1 Har Hch n (θ / ₂^n) Hnz Hov)%A.
+specialize (H1 ε Hε).
+destruct H1 as (N, HN).
+exists (2 ^ N).
+intros m Hm.
+specialize (HN m).
 ...
 assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
   clear ε Hε H1.
