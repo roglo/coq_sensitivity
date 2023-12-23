@@ -4597,6 +4597,33 @@ intros ε Hε.
 assert (H : angle_mul_nat_overflow n (θ / ₂^n) = false). {
   clear ε Hε.
   clear Hnz.
+(**)
+  revert θ.
+  induction n; intros; [ easy | ].
+  apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  split. {
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    apply IHn.
+  }
+  rewrite angle_div_2_pow_nat_succ_r_1 at 1.
+...
+  destruct n. {
+    cbn.
+    apply (angle_add_overflow_0_r Hon Hos).
+  }
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
+    specialize (IHn (2 ^ S n * θ))%A as H1.
+...
+    rewrite angle_div_2_pow_nat_mul in H1. {
+      now rewrite angle_mul_2_pow_div_2_pow in H1.
+    } {
+      now apply Nat.pow_nonzero.
+    }
+...
+    rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+
+Search (_ * (_ / ₂^_))%A.
+...
   destruct n; [ easy | ].
   destruct n; [ easy | ].
   destruct n. {
