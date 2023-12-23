@@ -1963,14 +1963,14 @@ progress sin_cos_add_sub_straight_hyp Hs12z.
 progress sin_cos_add_sub_straight_goal T.
 rewrite <- (rngl_opp_add_distr Hop).
 apply (rngl_opp_nonpos_nonneg Hop Hor).
-(* ***** *)
-remember (angle_right - θ3)%A as θ eqn:Hθ.
-apply angle_sub_move_l in Hθ.
-subst θ3; rename θ into θ3; move θ3 before θ2.
-rewrite (angle_add_comm Hic) in Hs13z |-*.
-rewrite <- (angle_sub_sub_distr Hic Hop) in Hs13z |-*.
-rewrite (rngl_sin_sub_right_l Hon Hos) in Hzs3 |-*.
-rewrite (rngl_cos_sub_right_l Hon Hop) in Hs13z, Hzc3.
+change_angle_sub_l θ3 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs3.
+progress sin_cos_add_sub_right_hyp T Hzc3.
+progress sin_cos_add_sub_right_hyp T Hs13z.
+progress sin_cos_add_sub_right_goal T.
+rewrite (rngl_sin_sub_anticomm Hic Hop) in Hs13z.
+rewrite (rngl_cos_sub_comm Hic Hop).
+progress sin_cos_add_sub_right_hyp T Hs13z.
 apply rngl_add_cos_nonneg_when_sin_nonneg; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
@@ -1980,6 +1980,8 @@ now apply rngl_sin_add_nonneg.
 apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
 now apply rngl_cos_sub_nonneg.
 Qed.
+
+(* ***** *)
 
 Theorem angle_add_le_mono_l_lemma_23 :
   ∀ θ1 θ2,
