@@ -4586,8 +4586,53 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros Har Hch * Hnz ε Hε.
+  rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros Har Hch * Hnz.
 intros ε Hε.
+(**)
+assert (H : angle_mul_nat_overflow n (θ / ₂^n) = false). {
+  clear ε Hε.
+  clear Hnz.
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n. {
+    cbn.
+    rewrite Bool.orb_false_r.
+    rewrite angle_add_0_r.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n. {
+    cbn.
+    rewrite Bool.orb_false_r.
+    rewrite angle_add_0_r.
+    apply Bool.orb_false_iff.
+    split. {
+      apply angle_add_overflow_lt_straight_le_straight.
+      apply (angle_div_2_lt_straight Hc1).
+      rewrite <- (angle_right_add_right Hon Hop).
+      eapply angle_le_trans. {
+        apply angle_add_le_mono_l.
+        apply angle_add_overflow_div_2_div_2.
+        apply angle_add_overflow_div_2_div_2.
+        apply (angle_div_2_le_compat _ angle_straight).
+        apply angle_div_2_le_straight.
+      }
+      rewrite angle_straight_div_2.
+      rewrite (angle_add_comm Hic).
+      rewrite <- angle_straight_div_2.
+      apply angle_add_le_mono_l.
+      apply angle_add_overflow_div_2_div_2.
+      apply angle_add_overflow_div_2_div_2.
+      apply angle_div_2_le_compat.
+      apply angle_div_2_le_straight.
+    }
+    apply angle_add_overflow_div_2_div_2.
+  }
+...
 set (j := Nat.log2 n).
 (*
 Search (_ / ₂^S n)%A.
@@ -4601,14 +4646,15 @@ Search (_ < angle_straight)%A.
 ...
 *)
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
+(**)
 specialize (H1 Har Hch n (θ / ₂^j) Hnz)%A.
 Check angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat.
-(* bon, faut remonter plus haut, doit y avoir un theorème à modifier *)
 ...
 assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
   clear ε Hε H1.
   subst j.
   clear Hnz.
+...
   induction n; [ easy | ].
   rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
   split. {
