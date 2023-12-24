@@ -111,17 +111,12 @@ progress sin_cos_add_sub_right_hyp T Hc1z.
 progress sin_cos_add_sub_right_hyp T H12.
 progress sin_cos_add_sub_right_goal T.
 destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
-(* ***** *)
-  remember (θ2 - angle_right)%A as θ.
-  apply angle_add_move_r in Heqθ.
-  subst θ2; rename θ into θ2.
-  move θ2 before θ1.
-  rewrite (angle_add_assoc Hop) in H12, Hzs12.
-  rewrite (rngl_sin_add_right_r Hon Hos) in Hzs2, H12.
-  rewrite (rngl_cos_add_right_r Hon Hop) in Hc2z, H32, Hzs12.
-  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc2z.
-  apply (rngl_le_opp_l Hop Hor) in H32.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+  change_angle_sub_r θ2 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs2.
+  progress sin_cos_add_sub_right_hyp T H32.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  progress sin_cos_add_sub_right_hyp T Hc2z.
+  progress sin_cos_add_sub_right_hyp T H12.
   apply (rngl_nlt_ge Hor).
   intros Hs13.
   apply (rngl_nlt_ge Hor) in Hzs12.
@@ -178,6 +173,8 @@ apply rngl_sin_sub_nonneg_sin_le_sin; try easy. {
   now rewrite (angle_add_0_l Hon Hos).
 }
 Qed.
+
+(* ***** *)
 
 Theorem angle_add_overflow_le_lemma_2 :
   ∀ θ1 θ2,
