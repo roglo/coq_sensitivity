@@ -3,6 +3,7 @@ Require Import Utf8 Arith.
 Require Import Init.Nat.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi AngleLeSubAdd.
+Require Import TacChangeAngle.
 
 Section a.
 
@@ -102,17 +103,15 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   apply rngl_cos_bound.
 }
 apply (rngl_nle_gt Hor) in Hc1z.
-remember (θ1 - angle_right)%A as θ.
-apply angle_add_move_r in Heqθ.
-subst θ1; rename θ into θ1.
-rewrite (angle_add_add_swap Hic Hop) in Hzs13, Hzs12, H12 |-*.
-rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs13, Hzs12.
-rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z, H12, H12.
-do 2 rewrite (rngl_cos_add_right_r Hon Hop).
-apply (rngl_opp_neg_pos Hop Hor) in Hc1z.
-apply (rngl_opp_le_compat Hop Hor) in H12.
-apply -> (rngl_opp_le_compat Hop Hor).
+change_angle_sub_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T Hzs13.
+progress sin_cos_add_sub_right_hyp T Hzs12.
+progress sin_cos_add_sub_right_hyp T Hc1z.
+progress sin_cos_add_sub_right_hyp T H12.
+progress sin_cos_add_sub_right_goal T.
 destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
+(* ***** *)
   remember (θ2 - angle_right)%A as θ.
   apply angle_add_move_r in Heqθ.
   subst θ2; rename θ into θ2.
