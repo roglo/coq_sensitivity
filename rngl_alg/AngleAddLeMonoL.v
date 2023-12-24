@@ -2592,8 +2592,6 @@ apply not_eq_sym in Hs12.
 now apply (rngl_lt_iff Hor).
 Qed.
 
-(* ***** *)
-
 Theorem angle_add_le_mono_l_lemma_37 :
   ∀ θ1 θ2,
   (0 < rngl_sin θ1)%L
