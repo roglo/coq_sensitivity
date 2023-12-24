@@ -4554,27 +4554,6 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 Qed.
 
-(* to be moved to AngleAddLeMonoL.v *)
-Ltac change_angle_opp θ :=
-  remember (- θ)%A as θ' eqn:Hθ';
-  apply (f_equal angle_opp) in Hθ';
-  rewrite (angle_opp_involutive ac_op) in Hθ';
-  subst θ; rename θ' into θ.
-
-Ltac sin_cos_opp_hyp T H :=
-  set (Hop' := ac_op);
-  set (Hor' := ac_or);
-  repeat rewrite -> rngl_sin_opp in H;
-  repeat rewrite -> rngl_cos_opp in H;
-  repeat rewrite -> (angle_add_assoc Hop') in H;
-  repeat rewrite -> angle_add_opp_r in H;
-  try apply -> (rngl_opp_neg_pos Hop' Hor') in H;
-  clear Hop' Hor'.
-
-Ltac sin_cos_opp_goal T :=
-  repeat rewrite -> angle_add_opp_r.
-(* end to be moved *)
-
 Theorem angle_mul_nat_div_2 :
   ∀ n θ,
   angle_mul_nat_overflow n θ = false
