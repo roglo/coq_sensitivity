@@ -1,5 +1,5 @@
-AngleAddLeMonoL.vio: AngleAddLeMonoL.v ../main/RingLike.vio TrigoWithoutPi.vio AngleLeSubAdd.vio AngleAddOverflowLe.vio
-AngleAddLeMonoL.vo AngleAddLeMonoL.glob AngleAddLeMonoL.v.beautified AngleAddLeMonoL.required_vo: AngleAddLeMonoL.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo AngleAddOverflowLe.vo
+AngleAddLeMonoL.vio: AngleAddLeMonoL.v ../main/RingLike.vio TrigoWithoutPi.vio AngleLeSubAdd.vio AngleAddOverflowLe.vio TacChangeAngle.vio
+AngleAddLeMonoL.vo AngleAddLeMonoL.glob AngleAddLeMonoL.v.beautified AngleAddLeMonoL.required_vo: AngleAddLeMonoL.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo AngleAddOverflowLe.vo TacChangeAngle.vo
 AngleAddOverflowLe.vio: AngleAddOverflowLe.v ../main/RingLike.vio TrigoWithoutPi.vio AngleLeSubAdd.vio
 AngleAddOverflowLe.vo AngleAddOverflowLe.glob AngleAddOverflowLe.v.beautified AngleAddOverflowLe.required_vo: AngleAddOverflowLe.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo
 AngleLeSubAdd.vio: AngleLeSubAdd.v ../main/RingLike.vio TrigoWithoutPi.vio
@@ -40,6 +40,8 @@ RealLike.vio: RealLike.v ../main/RingLike.vio
 RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v ../main/RingLike.vo
 Rrl.vio: Rrl.v ../main/RingLike.vio
 Rrl.vo Rrl.glob Rrl.v.beautified Rrl.required_vo: Rrl.v ../main/RingLike.vo
+TacChangeAngle.vio: TacChangeAngle.v ../main/RingLike.vio TrigoWithoutPi.vio
+TacChangeAngle.vo TacChangeAngle.glob TacChangeAngle.v.beautified TacChangeAngle.required_vo: TacChangeAngle.v ../main/RingLike.vo TrigoWithoutPi.vo
 TrigoWithoutPi.vio: TrigoWithoutPi.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio
 TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo
 Zrl.vio: Zrl.v ../main/RingLike.vio

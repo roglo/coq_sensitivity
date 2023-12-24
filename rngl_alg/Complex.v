@@ -4571,7 +4571,7 @@ symmetry.
 now apply angle_div_2_add_not_overflow.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
