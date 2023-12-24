@@ -1086,8 +1086,6 @@ apply (rngl_lt_le_incl Hor) in Hc1z, Hzs12.
 now apply angle_add_overflow_le_lemma_111.
 Qed.
 
-(* ***** *)
-
 Theorem angle_add_overflow_le :
   ∀ θ1 θ2 θ3,
   (θ3 ≤ θ2)%A
