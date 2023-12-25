@@ -1573,25 +1573,6 @@ Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 Definition is_angle_eucl_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf angle_eucl_dist.
 
-Theorem angle_eqb_eq :
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
-Proof.
-intros Hed *.
-split; intros H12. {
-  progress unfold angle_eqb in H12.
-  apply Bool.andb_true_iff in H12.
-  destruct H12 as (Hc12, Hs12).
-  apply (rngl_eqb_eq Hed) in Hc12, Hs12.
-  apply eq_angle_eq.
-  now rewrite Hc12, Hs12.
-} {
-  subst θ2.
-  progress unfold angle_eqb.
-  now do 2 rewrite (rngl_eqb_refl Hed).
-}
-Qed.
-
 Theorem angle_le_refl :
   ∀ θ, (θ ≤? θ)%A = true.
 Proof.
@@ -1613,26 +1594,6 @@ progress unfold angle_eqb.
 now do 2 rewrite (rngl_eqb_refl Hed).
 Qed.
 *)
-
-Theorem angle_eqb_neq :
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.
-Proof.
-intros Hed *.
-progress unfold angle_eqb.
-split; intros H12. {
-  intros H; subst θ2.
-  now do 2 rewrite (rngl_eqb_refl Hed) in H12.
-} {
-  apply Bool.not_true_iff_false.
-  intros H; apply H12; clear H12.
-  apply eq_angle_eq; cbn.
-  apply Bool.andb_true_iff in H.
-  destruct H as (Hc, Hs).
-  apply (rngl_eqb_eq Hed) in Hc, Hs.
-  now rewrite Hc, Hs.
-}
-Qed.
 
 (*
 Theorem le_1_rngl_cos :

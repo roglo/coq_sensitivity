@@ -1701,7 +1701,7 @@ Qed.
 
 Theorem rngl_sin_nonneg_sin_nonneg_sin_nonneg :
   ∀ θ1 θ2,
-  (θ1 ≤ θ1 + θ2)%A
+  θ1 ≠ angle_straight ∨ θ2 ≠ angle_straight
   → (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
@@ -1718,8 +1718,7 @@ apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
 ...
 *)
 destruct_ac.
-intros * Haov Hzs1 Hzs2 Hzs3.
-(* essayer avec θ2 ≠ 0 à la place de θ1 ≤ θ1 + θ2 *)
+intros * H12ns Hzs1 Hzs2 Hzs3.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1836,21 +1835,13 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
         exfalso; apply Hzc2; clear Hzc2; cbn.
         apply (rngl_0_le_1 Hon Hop Hor).
       }
-      subst θ2.
-      clear Hzs2 Hzc2.
+      destruct H12ns as [H12ns| H12ns]; [ | easy ].
+      destruct H1z as [H1z| H1z]; [ | easy ].
+      subst θ1 θ2.
       exfalso.
-      destruct H1z as [H1z| H1z]. {
-        subst θ1.
-        apply (rngl_nle_gt Hor) in Hzc1.
-        apply Hzc1; clear Hzc1; cbn.
-        apply (rngl_0_le_1 Hon Hop Hor).
-      } {
-        subst θ1.
-        rewrite (angle_straight_add_straight Hon Hop) in Haov.
-        apply angle_nlt_ge in Haov.
-        apply Haov.
-        apply (angle_straight_pos Hc1).
-      }
+      apply (rngl_nle_gt Hor) in Hzc1.
+      apply Hzc1; clear Hzc1; cbn.
+      apply (rngl_0_le_1 Hon Hop Hor).
     }
     apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
     apply (rngl_lt_iff Hor).
@@ -2993,6 +2984,45 @@ apply (rngl_add_le_mono_r Hop Hor).
 now apply rngl_cos_bound.
 Qed.
 
+Theorem angle_eqb_eq :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 : angle T, (θ1 =? θ2)%A = true ↔ θ1 = θ2.
+Proof.
+intros Hed *.
+split; intros H12. {
+  progress unfold angle_eqb in H12.
+  apply Bool.andb_true_iff in H12.
+  destruct H12 as (Hc12, Hs12).
+  apply (rngl_eqb_eq Hed) in Hc12, Hs12.
+  apply eq_angle_eq.
+  now rewrite Hc12, Hs12.
+} {
+  subst θ2.
+  progress unfold angle_eqb.
+  now do 2 rewrite (rngl_eqb_refl Hed).
+}
+Qed.
+
+Theorem angle_eqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2, (θ1 =? θ2)%A = false ↔ θ1 ≠ θ2.
+Proof.
+intros Hed *.
+progress unfold angle_eqb.
+split; intros H12. {
+  intros H; subst θ2.
+  now do 2 rewrite (rngl_eqb_refl Hed) in H12.
+} {
+  apply Bool.not_true_iff_false.
+  intros H; apply H12; clear H12.
+  apply eq_angle_eq; cbn.
+  apply Bool.andb_true_iff in H.
+  destruct H as (Hc, Hs).
+  apply (rngl_eqb_eq Hed) in Hc, Hs.
+  now rewrite Hc, Hs.
+}
+Qed.
+
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
@@ -3048,7 +3078,20 @@ destruct zs3. {
       apply rngl_leb_le in Hzs2.
       rewrite (rngl_mul_1_l Hon).
       subst θ3.
-      now apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
+      apply rngl_sin_nonneg_sin_nonneg_sin_nonneg; try easy.
+      remember (θ1 =? angle_straight)%A as s1 eqn:Hs1.
+      symmetry in Hs1.
+      destruct s1. {
+        apply (angle_eqb_eq Hed) in Hs1; right.
+        subst θ1.
+        intros H; subst θ2.
+        apply angle_nlt_ge in Haov.
+        apply Haov; clear Haov.
+        rewrite (angle_straight_add_straight Hon Hop).
+        apply (angle_straight_pos Hc1).
+      }
+      apply (angle_eqb_neq Hed) in Hs1.
+      now left.
     }
     exfalso.
     apply (rngl_leb_gt Hor) in Hzs2.
