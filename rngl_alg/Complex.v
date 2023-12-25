@@ -4727,14 +4727,33 @@ induction i; intros. {
   apply (rngl_le_refl Hor).
 }
 rewrite (Nat.pow_succ_r' _ (S i)).
+...
 eapply angle_le_trans. 2: {
   apply (angle_mul_nat_le_mono_nonneg_r (2 * (2 ^ S i / n))). 2: {
     now apply Nat.div_mul_le.
   }
+Check (angle_mul_nat_le_mono_nonneg_r).
+...
 (*
   rewrite <- Nat.pow_succ_r'.
 *)
-  rewrite angle_div_2_pow_nat_succ_r_2.
+  rewrite angle_div_2_pow_nat_succ_r_1.
+Theorem glop :
+  ∀ m n θ,
+  m ≤ n
+  → angle_mul_nat_overflow n θ = false
+  → angle_mul_nat_overflow m θ = false.
+...
+eapply glop with (n := 2 * (2 *
+...
+apply
+Search (_ * _ / _)%nat.
+Search angle_mul_nat_overflow.
+...
+eapply angle_mul_nat_overflow_le_r.
+...
+Search (angle_mul_nat_overflow _ (_ / ₂)).
+Check angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
 ...
   apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
 Search (angle_mul_nat_overflow _ (_ / ₂^_)).
