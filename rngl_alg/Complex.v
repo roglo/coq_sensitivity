@@ -4532,6 +4532,51 @@ symmetry.
 now apply angle_div_2_add_not_overflow.
 Qed.
 
+Theorem angle_add_overflow_diag :
+  ∀ θ,
+  (0 ≤ rngl_sin θ)%L
+  → θ ≠ angle_straight
+  → angle_add_overflow θ θ = false.
+Proof.
+destruct_ac.
+intros * Hzs Hts.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+apply rngl_leb_le in Hzs.
+rewrite Hzs.
+apply rngl_leb_le in Hzs.
+remember (0 ≤? rngl_sin (θ + θ))%L as zsd eqn:Hzsd.
+symmetry in Hzsd.
+destruct zsd; [ | easy ].
+apply rngl_leb_le in Hzsd.
+apply (rngl_ltb_ge Hor).
+destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+  now apply quadrant_1_rngl_cos_add_le_cos_l.
+}
+apply (rngl_nle_gt Hor) in Hzc.
+apply angle_add_overflow_le_lemma_2; try easy. {
+  intros H.
+  now apply (eq_rngl_cos_opp_1) in H.
+}
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem angle_add_div_2_diag : ∀ θ, (θ / ₂ + θ / ₂)%A = θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+apply eq_angle_eq.
+cbn - [ angle_div_2 ].
+do 2 rewrite fold_rngl_squ.
+rewrite <- (rngl_cos_mul_2_l Hon Hos).
+rewrite (rngl_mul_comm Hic (rngl_cos (_ / ₂))).
+rewrite (rngl_add_diag Hon).
+rewrite rngl_mul_assoc.
+rewrite <- (rngl_sin_mul_2_l Hic Hon Hos).
+now rewrite angle_div_2_mul_2.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4604,13 +4649,14 @@ induction i; intros. {
   destruct j; [ easy | ].
   cbn.
   rewrite Nat.add_0_r.
-Theorem glop :
+Theorem seq_angle_converging_to_angle_div_nat_succ_r_le :
   ∀ n i θ,
   n ≤ 2 ^ i
   → (seq_angle_converging_to_angle_div_nat θ n (S i) ≤
      seq_angle_converging_to_angle_div_nat θ n i)%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hn.
 progress unfold seq_angle_converging_to_angle_div_nat.
 revert n θ Hn.
@@ -4618,7 +4664,7 @@ induction i; intros. {
   cbn in Hn |-*.
   destruct n; [ apply angle_le_refl | cbn ].
   destruct n; [ | flia Hn ].
-  cbn.
+  clear Hn; cbn.
   do 2 rewrite angle_add_0_r.
   progress unfold angle_leb.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
@@ -4638,25 +4684,69 @@ induction i; intros. {
     } {
       apply (angle_eqb_neq Hed) in Hts.
       rewrite <- rngl_sin_angle_div_2_add. 2: {
-Theorem angle_add_overflow_diag :
-  ∀ θ,
-  (0 ≤ rngl_sin θ)%L
-  → θ ≠ angle_straight
-  → angle_add_overflow θ θ = false.
-Proof.
-destruct_ac.
-intros * Hzs Hts.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-apply rngl_leb_le in Hzs.
-rewrite Hzs.
-apply rngl_leb_le in Hzs.
-remember (0 ≤? rngl_sin (θ + θ))%L as zsd eqn:Hzsd.
+        now apply angle_add_overflow_diag.
+      }
+      rewrite <- rngl_cos_angle_div_2_add. 2: {
+        now apply angle_add_overflow_diag.
+      }
+      rewrite (angle_add_diag Hon Hos).
+      rewrite angle_mul_2_div_2.
+      remember (θ <? angle_straight)%A as tst eqn:Htst.
+      symmetry in Htst.
+      destruct tst. {
+        apply rngl_leb_le in Hzs.
+        rewrite Hzs.
+        apply (rngl_leb_refl Hor).
+      }
+      exfalso.
+      apply angle_ltb_ge in Htst.
+      apply angle_nlt_ge in Htst.
+      apply Htst; clear Htst.
+      progress unfold angle_ltb.
+      apply rngl_leb_le in Hzs.
+      rewrite Hzs.
+      cbn.
+      rewrite (rngl_leb_refl Hor).
+      apply rngl_ltb_lt.
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H; symmetry in H.
+      now apply eq_rngl_cos_opp_1 in H.
+    }
+  }
+  apply (rngl_leb_gt Hor) in Hzs.
+  rewrite angle_add_div_2_diag.
+  generalize Hzs; intros H.
+  apply (rngl_leb_gt Hor) in H.
+  rewrite H.
+  apply rngl_leb_le.
+  apply (rngl_le_refl Hor).
+}
+...
+intros.
+apply eq_angle_eq.
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite rngl_mul_1_l
+...
+Search (_ / ₂ + _ / ₂)%A.
+...
+  rewrite <- rngl_sin_angle_div_2_add. 2: {
+...
+    apply angle_add_overflow_diag.
+...
+...
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+...
+apply angle_add_overflow_le_lemma_111; try easy.
+...
 symmetry in Hzsd.
-destruct zsd; [ | easy ].
-apply rngl_leb_le in Hzsd.
-apply (rngl_ltb_ge Hor).
+...
 Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+(* peut-être qu'il faut affaiblir l'hypothèse angle_add_overflow
+   dans rngl_sin_angle_div_2_add, pareil pour cos *)
 ...
 apply angle_add_overflow_le_lemma_111; try easy.
 ...
