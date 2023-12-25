@@ -4652,14 +4652,18 @@ induction i; intros. {
 Theorem seq_angle_converging_to_angle_div_nat_succ_r_le :
   ∀ n i θ,
   n ≤ 2 ^ i
-  → (seq_angle_converging_to_angle_div_nat θ n (S i) ≤
-     seq_angle_converging_to_angle_div_nat θ n i)%A.
+  → (seq_angle_converging_to_angle_div_nat θ n i ≤
+     seq_angle_converging_to_angle_div_nat θ n (S i))%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hn.
 progress unfold seq_angle_converging_to_angle_div_nat.
-revert n θ Hn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply angle_le_refl.
+}
+revert n θ Hn Hnz.
 induction i; intros. {
   cbn in Hn |-*.
   destruct n; [ apply angle_le_refl | cbn ].
@@ -4722,6 +4726,24 @@ induction i; intros. {
   apply rngl_leb_le.
   apply (rngl_le_refl Hor).
 }
+rewrite (Nat.pow_succ_r' _ (S i)).
+eapply angle_le_trans. 2: {
+  apply (angle_mul_nat_le_mono_nonneg_r (2 * (2 ^ S i / n))). 2: {
+    now apply Nat.div_mul_le.
+  }
+(*
+  rewrite <- Nat.pow_succ_r'.
+*)
+  rewrite angle_div_2_pow_nat_succ_r_2.
+...
+  apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+Search (_ / _ * (_ / ₂^_))%A.
+Search (_ * _ / _).
+...
+rewrite angle_div_2_pow_nat_succ_r_1.
+...
+Search (_ / ₂^(S _))%A.
 ...
 intros.
 apply eq_angle_eq.
