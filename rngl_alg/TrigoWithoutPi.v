@@ -3023,7 +3023,7 @@ split; intros H12. {
 }
 Qed.
 
-Theorem rngl_cos_angle_div_2_add_not_overflow :
+Theorem rngl_cos_angle_div_2_add :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
   → rngl_cos ((θ1 + θ2) / ₂) = rngl_cos (θ1 / ₂ + θ2 / ₂).
@@ -3279,7 +3279,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
 }
 Qed.
 
-Theorem rngl_sin_angle_div_2_add_not_overflow :
+Theorem rngl_sin_angle_div_2_add :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
   → rngl_sin (angle_div_2 (θ1 + θ2)) =
@@ -3571,9 +3571,9 @@ Proof.
 intros * Haov.
 apply eq_angle_eq.
 f_equal. {
-  now apply (rngl_cos_angle_div_2_add_not_overflow).
+  now apply rngl_cos_angle_div_2_add.
 } {
-  now apply rngl_sin_angle_div_2_add_not_overflow.
+  now apply rngl_sin_angle_div_2_add.
 }
 Qed.
 
