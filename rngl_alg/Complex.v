@@ -4643,6 +4643,31 @@ induction i; intros. {
   destruct j; [ easy | ].
   cbn.
   rewrite Nat.add_0_r.
+Theorem glop :
+  ∀ n i θ,
+  n ≤ 2 ^ i
+  → (seq_angle_converging_to_angle_div_nat θ n (S i) ≤
+     seq_angle_converging_to_angle_div_nat θ n i)%A.
+Proof.
+intros * Hn.
+progress unfold seq_angle_converging_to_angle_div_nat.
+revert n θ Hn.
+induction i; intros. {
+  cbn in Hn |-*.
+  destruct n; [ apply angle_le_refl | cbn ].
+  destruct n; [ | flia Hn ].
+  cbn.
+  do 2 rewrite angle_add_0_r.
+  progress unfold angle_leb.
+Search (_ / ₂ + _ / ₂)%A.
+About rngl_cos_angle_div_2_add_not_overflow.
+...
+  cbn.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+Search (_ / ₂ + _ / ₂)%A.
+  rewrite <- angle_div_2_add_not_overflow.
 ...
 progress unfold seq_angle_converging_to_angle_div_nat in HN.
 ...
@@ -4839,19 +4864,6 @@ split; intros Hθ. {
   progress unfold rngl_squ.
   now apply (rngl_mul_neg_neg Hop Hor Hii).
 }
-Qed.
-
-Theorem angle_straight_pos :
-  rngl_characteristic T ≠ 1 →
-  (0 < angle_straight)%A.
-Proof.
-intros Hc1.
-destruct_ac.
-progress unfold angle_ltb.
-cbn.
-rewrite (rngl_leb_refl Hor).
-apply rngl_ltb_lt.
-apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 Qed.
 
 (* to be completed
