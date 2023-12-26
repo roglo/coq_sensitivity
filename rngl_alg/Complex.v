@@ -4658,6 +4658,13 @@ Theorem seq_angle_converging_to_angle_div_nat_succ_r_le :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * Hn.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite (H1 (seq_angle_converging_to_angle_div_nat θ n i)).
+  rewrite (H1 (seq_angle_converging_to_angle_div_nat θ n (S i))).
+  apply angle_le_refl.
+}
 intros * Hn.
 progress unfold seq_angle_converging_to_angle_div_nat.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -4706,20 +4713,43 @@ rewrite (Nat_mod_less_small (2 ^ i / n)). 2: {
 rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_assoc.
 rewrite (Nat_div_sub _ _ _ Hnz).
-...
-Check Nat_div_less_small.
-...
-rewrite (Nat_div_less_small 1). 2: {
-  rewrite Nat.mul_1_l.
-  split; [ easy | ].
-  cbn - [ "*" ].
-...
-  rewrite <- Nat_add_diag.
-  eapply le_lt_trans.
-  rewrite H1.
-...
-Search (_ * _ / _).
-Check Nat_div_less_small.
+destruct (lt_dec (2 ^ i) (2 * n)) as [Hin| Hin]. {
+  rewrite (Nat_div_less_small 1); [ | now rewrite Nat.mul_1_l ].
+  rewrite (angle_mul_nat_1_l Hon Hos).
+  rewrite Nat.mul_1_r.
+  apply angle_add_overflow_lt_straight_le_straight. {
+    destruct i. {
+      cbn in Hn.
+      destruct n; [ easy | ].
+      destruct n; [ | flia Hn ].
+      cbn in H2.
+      easy.
+    }
+    rewrite angle_div_2_pow_nat_succ_r_1.
+    apply (angle_div_2_lt_straight Hc1).
+  }
+  apply (angle_le_trans _ (2 ^ i * ((θ / ₂^i) / ₂))). 2: {
+    rewrite <- angle_div_2_pow_nat_succ_r_1.
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite angle_mul_2_pow_div_2_pow.
+    apply angle_div_2_le_straight.
+  }
+  apply angle_mul_nat_le_mono_nonneg_r. 2: {
+    cbn.
+    rewrite Nat.add_0_r.
+    apply Nat.le_sub_le_add_r.
+    apply (Nat.div_le_upper_bound _ _ _ Hnz).
+    rewrite Nat.mul_add_distr_l.
+    rewrite (Nat.mul_comm _ 2).
+    apply Nat.add_le_mono; [ | now apply Nat.lt_le_incl ].
+    destruct n; [ easy | cbn ].
+    apply Nat.le_add_r.
+  }
+  rewrite <- angle_div_2_pow_nat_succ_r_1.
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  apply angle_mul_nat_overflow_pow_div.
+}
+apply Nat.nlt_ge in Hin.
 ...
 specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
