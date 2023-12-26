@@ -8,6 +8,7 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
+Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 
@@ -4690,12 +4691,11 @@ destruct (lt_dec (2 * (2 ^ i mod n)) n) as [H2| H2]. {
   apply (angle_add_overflow_0_r Hon Hos).
 }
 apply Nat.nlt_ge in H2.
-Require Import Misc.
-Check Nat_mod_less_small.
 rewrite (Nat_mod_less_small (2 ^ i / n)).
 rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_assoc.
 Search ((_ - _ * _) / _).
+Search ((_ + _ * _) / _).
 ...
 specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
