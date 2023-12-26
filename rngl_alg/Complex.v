@@ -4691,14 +4691,32 @@ destruct (lt_dec (2 * (2 ^ i mod n)) n) as [H2| H2]. {
   apply (angle_add_overflow_0_r Hon Hos).
 }
 apply Nat.nlt_ge in H2.
-rewrite (Nat_mod_less_small (2 ^ i / n)).
+rewrite (Nat_mod_less_small (2 ^ i / n)). 2: {
+  split. {
+    rewrite H1 at 2.
+    rewrite Nat.mul_comm.
+    apply Nat.le_add_r.
+  }
+  rewrite H1 at 1.
+  rewrite Nat.mul_add_distr_r.
+  rewrite Nat.mul_comm, Nat.mul_1_l.
+  apply Nat.add_lt_mono_l.
+  apply (Nat.mod_upper_bound _ _ Hnz).
+}
 rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_assoc.
 rewrite (Nat_div_sub _ _ _ Hnz).
+...
+Check Nat_div_less_small.
+...
 rewrite (Nat_div_less_small 1). 2: {
   rewrite Nat.mul_1_l.
   split; [ easy | ].
   cbn - [ "*" ].
+...
+  rewrite <- Nat_add_diag.
+  eapply le_lt_trans.
+  rewrite H1.
 ...
 Search (_ * _ / _).
 Check Nat_div_less_small.
