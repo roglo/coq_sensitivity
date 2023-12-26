@@ -4696,6 +4696,55 @@ rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_assoc.
 Search ((_ - _ * _) / _).
 Search ((_ + _ * _) / _).
+About Nat.div_add.
+Theorem Nat_div_sub : ∀ a b c, c ≠ 0 → (a - b * c) / c = a / c - b.
+Proof.
+intros * Hcz.
+destruct (le_dec a (b * c)) as [Hbca| Hbca]. {
+  rewrite (proj2 (Nat.sub_0_le a (b * c))); [ | easy ].
+  rewrite Nat.div_small; [ | now apply Nat.neq_0_lt_0 ].
+  symmetry.
+  apply Nat.sub_0_le.
+  rewrite Nat.mul_comm in Hbca.
+  now apply Nat.div_le_upper_bound.
+}
+apply Nat.nle_gt in Hbca.
+...
+specialize (Nat.div_mod (a - b * c) c Hcz) as H1.
+rewrite H1.
+rewrite Nat.mul_comm.
+rewrite Nat.add_comm.
+Search (_ / _ * _).
+...
+rewrite (Nat.div_add _ _ _ Hcz).
+...
+intros * Hcz.
+revert b.
+induction a; intros. {
+  now cbn; rewrite (Nat.div_0_l _ Hcz).
+}
+destruct (le_dec (b * c) a) as [Hbca| Hbca]. {
+  rewrite Nat.sub_succ_l; [ | easy ].
+...
+  rewrite <- Nat.add_1_r.
+Search ((_ + _) / _).
+...
+intros * Hcz.
+specialize (Nat.div_mod (a - b * c) c Hcz) as H1.
+rewrite H1.
+rewrite Nat.mul_comm.
+rewrite Nat.add_comm.
+rewrite (Nat.div_add _ _ _ Hcz).
+rewrite Nat.div_small. 2: {
+  apply (Nat.mod_upper_bound _ _ Hcz).
+}
+rewrite Nat.add_0_l.
+...
+Nat.div_add is not universe polymorphic
+Arguments Nat.div_add (a b c)%nat_scope _
+Nat.div_add is opaque
+Expands to: Constant Coq.Arith.PeanoNat.Nat.div_add
+
 ...
 specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
