@@ -4664,13 +4664,40 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply angle_le_refl.
 }
 specialize (Nat.div_mod (2 ^ i) n Hnz) as H1.
-specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ i / n) as q eqn:Hq.
 remember (2 ^ i mod n) as r eqn:Hr.
+rewrite Nat.pow_succ_r'.
+rewrite H1.
+rewrite Nat.mul_add_distr_l.
+rewrite Nat.mul_assoc, Nat.mul_shuffle0.
+rewrite (Nat.div_add_l _ _ _ Hnz).
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_div_2_pow_nat_succ_r_1 at 1.
+rewrite (Nat.mul_comm 2).
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite angle_div_2_mul_2.
+remember (q * (θ / ₂^i))%A as θ' eqn:Hθ'.
+rewrite <- (angle_add_0_r θ') at 1.
+apply angle_add_le_mono_l; cycle 2. {
+  apply angle_nonneg.
+} {
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+subst θ' q r.
+rewrite angle_div_2_pow_nat_succ_r_1.
+destruct (lt_dec (2 * (2 ^ i mod n)) n) as [H2| H2]. {
+  rewrite (Nat.div_small (2 * (2 ^ i mod n))); [ | easy ].
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+apply Nat.nlt_ge in H2.
+...
+specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
 remember (2 ^ S i mod n) as r' eqn:Hr'.
 rewrite Nat.pow_succ_r' in H2 at 1.
 rewrite H1 in H2.
+move q' before q; move r before q'; move r' before r.
+Search (_ + _ mod _).
 ...
 revert n θ Hn Hnz.
 induction i; intros. {
