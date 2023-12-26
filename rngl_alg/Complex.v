@@ -4695,6 +4695,13 @@ rewrite (Nat_mod_less_small (2 ^ i / n)).
 rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_assoc.
 rewrite (Nat_div_sub _ _ _ Hnz).
+rewrite (Nat_div_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+  cbn - [ "*" ].
+...
+Search (_ * _ / _).
+Check Nat_div_less_small.
 ...
 specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
