@@ -4663,6 +4663,15 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   apply angle_le_refl.
 }
+specialize (Nat.div_mod (2 ^ i) n Hnz) as H1.
+specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
+remember (2 ^ i / n) as q eqn:Hq.
+remember (2 ^ i mod n) as r eqn:Hr.
+remember (2 ^ S i / n) as q' eqn:Hq'.
+remember (2 ^ S i mod n) as r' eqn:Hr'.
+rewrite Nat.pow_succ_r' in H2 at 1.
+rewrite H1 in H2.
+...
 revert n θ Hn Hnz.
 induction i; intros. {
   cbn in Hn |-*.
