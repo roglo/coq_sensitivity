@@ -323,6 +323,26 @@ induction b; intros.
  now rewrite Nat.sub_succ.
 Qed.
 
+Theorem Nat_div_sub : ∀ a b c, c ≠ 0 → (a - b * c) / c = a / c - b.
+Proof.
+intros * Hcz.
+destruct (le_dec a (b * c)) as [Hbca| Hbca]. {
+  rewrite (proj2 (Nat.sub_0_le a (b * c))); [ | easy ].
+  rewrite Nat.div_small; [ | now apply Nat.neq_0_lt_0 ].
+  symmetry.
+  apply Nat.sub_0_le.
+  rewrite Nat.mul_comm in Hbca.
+  now apply Nat.div_le_upper_bound.
+}
+apply Nat.nle_gt in Hbca.
+symmetry.
+apply Nat.add_sub_eq_r.
+rewrite <- (Nat.div_add _ _ _ Hcz).
+f_equal.
+apply Nat.lt_le_incl in Hbca.
+apply (Nat.sub_add _ _ Hbca).
+Qed.
+
 Theorem permutation_fold_mul : ∀ la lb d,
   permutation Nat.eqb la lb → fold_left Nat.mul la d = fold_left Nat.mul lb d.
 Proof.
