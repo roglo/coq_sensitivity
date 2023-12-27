@@ -4750,6 +4750,57 @@ destruct (lt_dec (2 ^ i) (2 * n)) as [Hin| Hin]. {
   apply angle_mul_nat_overflow_pow_div.
 }
 apply Nat.nlt_ge in Hin.
+(*
+remember (2 ^ i / n) as q eqn:Hq.
+remember (2 ^ i mod n) as r eqn:Hr.
+move r before q.
+*)
+clear Hnz H1 H2 Hn.
+destruct i. {
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  cbn in Hin; flia Hin.
+}
+destruct i. {
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  cbn in Hin; flia Hin.
+}
+destruct i. {
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  cbn in Hin; flia Hin.
+}
+destruct i. {
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    rewrite angle_add_div_2_diag.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  cbn in Hin; flia Hin.
+}
+destruct i. {
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    rewrite angle_add_div_2_diag.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  cbn in Hin; flia Hin.
+}
 ...
 specialize (Nat.div_mod (2 ^ S i) n Hnz) as H2.
 remember (2 ^ S i / n) as q' eqn:Hq'.
