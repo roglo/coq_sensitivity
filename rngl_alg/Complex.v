@@ -4652,14 +4652,21 @@ Search (_ < angle_straight)%A.
 ...
 *)
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
-(**)
+specialize (H1 Har Hch n θ Hnz)%A.
+remember (angle_mul_nat_overflow n θ) as ont eqn:Hont.
+symmetry in Hont.
+destruct ont; [ | now apply H1 ].
+clear H1.
+...
 specialize (H1 Har Hch n (θ / ₂^n) Hnz Hov)%A.
 specialize (H1 ε Hε).
 destruct H1 as (N, HN).
+...
 exists (2 ^ N).
 intros m Hm.
 specialize (HN m).
 Print seq_angle_converging_to_angle_div_nat.
+...
 Theorem glop :
   ∀ n i j θ,
   n ≤ 2 ^ i
@@ -4675,6 +4682,7 @@ induction i; intros. {
   destruct j; [ easy | ].
   cbn.
   rewrite Nat.add_0_r.
+...
 Theorem seq_angle_converging_to_angle_div_nat_succ_r_le :
   ∀ n i θ,
   n ≤ 2 ^ i
