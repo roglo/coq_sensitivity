@@ -4656,6 +4656,11 @@ assert (Htj : angle_mul_nat_overflow n θ'' = false). {
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 specialize (H1 ε Hε).
+destruct H1 as (N, HN).
+exists (N / 2 ^ j).
+intros m Hm.
+specialize (HN (m * 2 ^ j)).
+(* chais po *)
 ...
   revert θ.
   induction n; intros; [ easy | ].
