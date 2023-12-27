@@ -4767,6 +4767,46 @@ rewrite Nat.pow_succ_r' in Hin.
 apply Nat.mul_le_mono_pos_l in Hin; [ | easy ].
 ...
 *)
+(**)
+destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+rewrite <- Nat_div_sub; [ | easy ].
+rewrite <- Nat.mul_assoc.
+rewrite <- Nat.mul_sub_distr_l.
+(*
+remember (2 ^ i - 2 ^ i / S n * S n) as m eqn:Hm.
+Search (_ / _ * _).
+*)
+rewrite angle_mul_nat_div_2. {
+  destruct i; [ cbn in Hin; flia Hin | ].
+  rewrite angle_div_2_pow_nat_succ_r_1.
+  rewrite angle_mul_nat_div_2. {
+    apply angle_add_overflow_div_2_div_2.
+  }
+Search (angle_mul_nat_overflow _ (_ / ₂^_)%A).
+Search (_ → angle_mul_nat_overflow _ _ = false).
+Theorem angle_mul_nat_overflow_le_l :
+  ∀ m n,
+  m ≤ n → ∀ θ, angle_mul_nat_overflow n θ = false → angle_mul_nat_overflow m θ = false.
+Proof.
+intros * Hmn * Hn.
+...
+apply angle_mul_nat_overflow_le_l with (n := 2 * (2 ^ i / n)).
+Search (_ / _ ≤ _).
+apply Nat.div_le_upper_bound; [ easy | ].
+rewrite Nat.mul_comm.
+rewrite Nat.pow_succ_r'.
+rewrite <- Nat.mul_assoc.
+...
+replace 2 with (1 + 1) at 4 by easy.
+rewrite Nat.mul_add_distr_r.
+rewrite Nat.mul_1_l.
+rewrite Nat.sub_add_distr.
+Search ((_ - _) / _).
+Search ((_ + _) / _).
+...
+Search (_ / _ + _ / _)%nat.
+Search (_ / _ - _ / _)%nat.
+...
 destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
 destruct i; [ cbn in Hin; flia Hin | ].
 (**)
