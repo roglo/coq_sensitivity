@@ -4621,7 +4621,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros Har Hch * Hnz.
 intros ε Hε.
-(**)
+(*
 assert (Hov : angle_mul_nat_overflow n (θ / ₂^n) = false). {
   clear ε Hε.
   clear Hnz.
@@ -4637,9 +4637,32 @@ assert (Hov : angle_mul_nat_overflow n (θ / ₂^n) = false). {
   rewrite angle_mul_nat_div_2; [ | apply IHn ].
   apply angle_add_overflow_div_2_div_2.
 }
-(*
-set (j := Nat.log2 n).
 *)
+set (j := S (Nat.log2 n)).
+assert (Hjn : n < 2 ^ j). {
+  subst j.
+  apply Nat.log2_spec.
+  now apply Nat.neq_0_lt_0.
+}
+remember (θ / ₂^j)%A as θ'' eqn:Hθ''.
+assert (Htj : angle_mul_nat_overflow n θ'' = false). {
+  subst θ''.
+  subst j.
+  apply (angle_mul_nat_overflow_le_l _ (2 ^ S (Nat.log2 n))). {
+    now apply Nat.lt_le_incl.
+  }
+  apply angle_mul_nat_overflow_pow_div.
+}
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
+specialize (H1 Har Hch _ _ Hnz Htj)%A.
+specialize (H1 ε Hε).
+...
+  revert θ.
+  induction n; intros; [ easy | ].
+Check angle_mul_nat_overflow_succ_l.
+...
+  apply (angle_mul_nat_overflow_succ_l Hon Hos).
+...
 (*
 Search (_ / ₂^S n)%A.
 Search (angle_add_overflow (_ / ₂)).
@@ -4649,8 +4672,8 @@ Search (_ ≤ angle_straight)%A.
 Search (_ < angle_straight)%A.
 ...
   angle_add_overflow (θ1 / ₂^S n) (θ2 / ₂^S n) = false
-...
 *)
+...
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch n θ Hnz)%A.
 remember (angle_mul_nat_overflow n θ) as ont eqn:Hont.
