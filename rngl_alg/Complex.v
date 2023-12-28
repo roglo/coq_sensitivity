@@ -4603,6 +4603,35 @@ Qed.
 Theorem angle_mul_0_l : ∀ θ, (0 * θ = 0)%A.
 Proof. easy. Qed.
 
+Theorem angle_mul_2_pow_add_distr_l :
+  ∀ n θ1 θ2, (2 ^ n * (θ1 + θ2) = 2 ^ n * θ1 + 2 ^ n * θ2)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+apply eq_angle_eq.
+cbn.
+revert θ1 θ2.
+induction n; intros. {
+  cbn.
+  do 6 rewrite (rngl_mul_1_r Hon).
+  do 6 rewrite (rngl_mul_0_r Hos).
+  do 3 rewrite (rngl_sub_0_r Hos).
+  do 3 rewrite rngl_add_0_l.
+  easy.
+}
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite <- (angle_add_diag Hon Hos).
+rewrite (angle_add_add_swap Hic Hop).
+rewrite (angle_add_assoc Hop).
+rewrite <- (angle_add_assoc Hop).
+do 2 rewrite (angle_add_diag Hon Hos).
+rewrite IHn.
+now do 2 rewrite (angle_mul_nat_assoc Hon Hop).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4684,8 +4713,8 @@ Theorem angle_eucl_dist_mul_nat_le :
    2 ^ n * angle_eucl_dist θ1 θ2)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
   intros.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite (H1 (angle_eucl_dist _ _)).
@@ -4712,15 +4741,11 @@ eapply (rngl_le_trans Hor). 2: {
 cbn.
 rewrite Nat.add_0_r.
 do 2 rewrite (angle_mul_add_distr_r Hon Hop).
-Search (_ * (_ + _))%A.
-Theorem angle_mul_add_distr_l :
-  ∀ a θ1 θ2, (a * (θ1 + θ2) = a * θ1 + a * θ2)%A.
-Proof.
-intros.
-apply eq_angle_eq.
-cbn.
-f_equal. {
-Search (rngl_cos (_ * _)).
+do 2 rewrite <- angle_mul_2_pow_add_distr_l.
+do 2 rewrite (angle_add_diag Hon Hos).
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+...
+  rewrite Nat.add_0_r.
 ... ...
 rewrite <- angle_mul_add_distr_l.
 ...
