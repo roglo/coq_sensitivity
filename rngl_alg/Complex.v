@@ -4681,17 +4681,32 @@ replace 2%L with (rngl_of_nat 2) in HN. 2: {
   now cbn; rewrite rngl_add_0_r.
 }
 rewrite <- (rngl_of_nat_pow Hon Hos) in HN.
-Theorem angle_eucl_dist_mul_nat_l :
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+Theorem angle_eucl_dist_mul_nat_le :
   ∀ (a : nat) (θ1 θ2 : angle T),
-  (rngl_of_nat a * angle_eucl_dist θ1 θ2)%L =
-   angle_eucl_dist (a * θ1) (a * θ2).
+  (angle_eucl_dist (a * θ1) (a * θ2) ≤
+   rngl_of_nat a * angle_eucl_dist θ1 θ2)%L.
 Proof.
+destruct_ac.
 intros.
 progress unfold angle_eucl_dist.
-Search (rngl_cos (_ * _)).
-Search (rngl_cos _ - rngl_cos _)%L.
-... ...
-rewrite angle_eucl_dist_mul_nat_l in HN.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_of_nat a)). 2: {
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+rewrite <- (rl_sqrt_squ Hop Hor).
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply (rngl_squ_nonneg Hop Hor).
+} {
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+}
+...
+eapply (rngl_le_trans Hor). 2: {
+  apply angle_eucl_dist_mul_nat_le.
+}
+rewrite Hθ'' at 2.
+rewrite angle_mul_2_pow_div_2_pow.
 ...
 progress unfold seq_angle_converging_to_angle_div_nat in HN.
 ...
