@@ -4694,7 +4694,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 (**)
 intros.
-induction n. {
+revert θ1 θ2.
+induction n; intros. {
   cbn.
   do 2 rewrite angle_add_0_r.
   rewrite (rngl_mul_1_l Hon).
@@ -4710,7 +4711,21 @@ eapply (rngl_le_trans Hor). 2: {
 }
 cbn.
 rewrite Nat.add_0_r.
+do 2 rewrite (angle_mul_add_distr_r Hon Hop).
+Search (_ * (_ + _))%A.
+Theorem angle_mul_add_distr_l :
+  ∀ a θ1 θ2, (a * (θ1 + θ2) = a * θ1 + a * θ2)%A.
+Proof.
+intros.
+apply eq_angle_eq.
+cbn.
+f_equal. {
+Search (rngl_cos (_ * _)).
+... ...
+rewrite <- angle_mul_add_distr_l.
+...
 Check angle_eucl_dist_triangular.
+...
 Search (angle_eucl_dist (_ + _)).
 Search (angle_eucl_dist _ (_ + _)).
 ...
