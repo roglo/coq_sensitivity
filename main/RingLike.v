@@ -3202,6 +3202,16 @@ f_equal.
 apply (rngl_mul_mul_swap Hic).
 Qed.
 
+Theorem rngl_pow_succ_r :
+  rngl_has_1 T = true →
+  ∀ n a, (a ^ S n = a * a ^ n)%L.
+Proof.
+intros Hon *.
+destruct n; [ | easy ].
+cbn; symmetry.
+apply (rngl_mul_1_r Hon).
+Qed.
+
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

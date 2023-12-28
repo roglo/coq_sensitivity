@@ -4692,6 +4692,31 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ * _))%L.
   apply (rngl_le_refl Hor).
 }
+(**)
+intros.
+induction n. {
+  cbn.
+  do 2 rewrite angle_add_0_r.
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_le_refl Hor).
+}
+rewrite (rngl_pow_succ_r Hon).
+rewrite <- rngl_mul_assoc.
+rewrite <- (rngl_add_diag Hon).
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_add_le_compat Hor).
+  apply IHn.
+  apply IHn.
+}
+cbn.
+rewrite Nat.add_0_r.
+Check angle_eucl_dist_triangular.
+Search (angle_eucl_dist (_ + _)).
+Search (angle_eucl_dist _ (_ + _)).
+...
+rewrite rngl_squ_pow_2.
+rewrite Nat.pow_succ_r'.
+...
 intros.
 progress unfold angle_eucl_dist.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (2 ^ n)%L). 2: {
@@ -4708,24 +4733,6 @@ rewrite <- rl_sqrt_mul; cycle 1. {
   apply (rngl_squ_nonneg Hop Hor).
 }
 Search (rngl_cos (_ * _)).
-Theorem rngl_cos_mul_2_pow_l :
-  ∀ n θ, rngl_cos (2 ^ n * θ) = (2 ^ n * rngl_cos θ - 2 ^ n + 1)%L.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-induction n. {
-  cbn.
-  rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_sub_add Hop).
-  apply (rngl_sub_0_r Hos).
-}
-rewrite Nat.pow_succ_r'.
-rewrite <- (angle_mul_nat_assoc Hon Hop).
-rewrite (rngl_cos_mul_2_l' Hon Hop).
-rewrite IHn.
 ... ...
 eapply (rngl_le_trans Hor). 2: {
   apply angle_eucl_dist_mul_nat_le.
