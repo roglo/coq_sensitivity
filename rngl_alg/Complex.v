@@ -4708,6 +4708,24 @@ rewrite <- rl_sqrt_mul; cycle 1. {
   apply (rngl_squ_nonneg Hop Hor).
 }
 Search (rngl_cos (_ * _)).
+Theorem rngl_cos_mul_2_pow_l :
+  ∀ n θ, rngl_cos (2 ^ n * θ) = (2 ^ n * rngl_cos θ - 2 ^ n + 1)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+induction n. {
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_add Hop).
+  apply (rngl_sub_0_r Hos).
+}
+rewrite Nat.pow_succ_r'.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite (rngl_cos_mul_2_l' Hon Hop).
+rewrite IHn.
 ... ...
 eapply (rngl_le_trans Hor). 2: {
   apply angle_eucl_dist_mul_nat_le.

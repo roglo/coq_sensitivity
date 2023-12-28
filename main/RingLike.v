@@ -2336,8 +2336,8 @@ Proof.
 intros Hop *.
 unfold rngl_sub.
 rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
-rewrite rngl_opp_involutive; [ | easy ].
+rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_opp_involutive Hop).
 unfold rngl_sub; rewrite Hop.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.

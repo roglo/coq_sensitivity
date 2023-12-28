@@ -3590,6 +3590,24 @@ rewrite rngl_add_0_l.
 now do 2 rewrite fold_rngl_squ.
 Qed.
 
+Theorem rngl_cos_mul_2_l' :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ θ, rngl_cos (2 * θ) = (2 * (rngl_cos θ)² - 1)%L.
+Proof.
+intros Hon Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+rewrite (rngl_cos_mul_2_l Hon Hos).
+specialize (cos2_sin2_1 θ) as H1.
+apply (rngl_add_sub_eq_l Hos) in H1.
+rewrite <- H1.
+rewrite (rngl_sub_sub_distr Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+f_equal.
+apply (rngl_add_diag Hon).
+Qed.
+
 Theorem rngl_sin_mul_2_l :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
