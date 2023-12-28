@@ -4730,6 +4730,43 @@ induction n; intros. {
   rewrite (rngl_mul_1_l Hon).
   apply (rngl_le_refl Hor).
 }
+(**)
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+do 2 rewrite <- (angle_mul_nat_assoc Hon Hop).
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+rewrite (rngl_pow_succ_r Hon).
+rewrite (rngl_mul_comm Hic 2)%L.
+rewrite <- rngl_mul_assoc.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+Theorem angle_eucl_dist_twice_twice_le :
+  ∀ θ1 θ2, (angle_eucl_dist (2 * θ1) (2 * θ2) ≤ 2 * angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+...
+progress unfold angle_eucl_dist.
+cbn.
+do 4 rewrite (rngl_mul_1_r Hon).
+do 4 rewrite (rngl_mul_0_r Hos).
+do 2 rewrite (rngl_sub_0_r Hos).
+do 2 rewrite rngl_add_0_l.
+do 4 rewrite fold_rngl_squ.
+... ...
+apply angle_eucl_dist_twice_twice_le.
+...
+rewrite (angle_add_diag Hon Hos).
+...
+do 2 rewrite (angle_mul_add_distr_r Hon Hop).
+do 2 rewrite <- angle_mul_2_pow_add_distr_l.
+do 2 rewrite (angle_add_diag Hon Hos).
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+...
 rewrite (rngl_pow_succ_r Hon).
 rewrite <- rngl_mul_assoc.
 rewrite <- (rngl_add_diag Hon).
@@ -4744,6 +4781,8 @@ do 2 rewrite (angle_mul_add_distr_r Hon Hop).
 do 2 rewrite <- angle_mul_2_pow_add_distr_l.
 do 2 rewrite (angle_add_diag Hon Hos).
 eapply (rngl_le_trans Hor); [ apply IHn | ].
+...
+do 2 rewrite <- (angle_add_diag Hon Hos).
 ...
   rewrite Nat.add_0_r.
 ... ...
