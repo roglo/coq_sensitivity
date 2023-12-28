@@ -4655,10 +4655,51 @@ assert (Htj : angle_mul_nat_overflow n θ'' = false). {
 }
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
+(*
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
 progress unfold is_angle_eucl_limit_when_tending_to_inf in H1.
 progress unfold is_limit_when_tending_to_inf in H1.
+...
+*)
+specialize (H1 (ε / 2 ^ j))%L.
+assert (Hz2j : (0 < 2 ^ j)%L). {
+  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+assert (H : (0 < ε / 2 ^ j)%L). {
+  now apply (rngl_div_lt_pos Hon Hop Hiv Hor).
+}
+specialize (H1 H); clear H.
+destruct H1 as (N, HN).
+exists N.
+intros m Hm.
+specialize (HN m Hm).
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN; [ | easy ].
+rewrite (rngl_mul_comm Hic) in HN.
+replace 2%L with (rngl_of_nat 2) in HN. 2: {
+  now cbn; rewrite rngl_add_0_r.
+}
+rewrite <- (rngl_of_nat_pow Hon Hos) in HN.
+Theorem angle_eucl_dist_mul_nat_l :
+  ∀ (a : nat) (θ1 θ2 : angle T),
+  (rngl_of_nat a * angle_eucl_dist θ1 θ2)%L =
+   angle_eucl_dist (a * θ1) (a * θ2).
+Proof.
+intros.
+progress unfold angle_eucl_dist.
+Search (rngl_cos (_ * _)).
+Search (rngl_cos _ - rngl_cos _)%L.
+... ...
+rewrite angle_eucl_dist_mul_nat_l in HN.
+...
+progress unfold seq_angle_converging_to_angle_div_nat in HN.
+...
+progress unfold angle_eucl_dist in HN.
+progress unfold angle_eucl_dist.
+progress unfold seq_angle_converging_to_angle_div_nat.
+Search (rngl_cos (_ / ₂^_)).
+Search rngl_cos_div_pow_2.
 ...
 specialize (H1 ε Hε).
 destruct H1 as (N, HN).
