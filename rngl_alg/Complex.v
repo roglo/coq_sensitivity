@@ -4740,11 +4740,19 @@ assert (H : (0 < ε / 2 ^ j)%L). {
 specialize (H1 H); clear H.
 destruct H1 as (N, HN).
 exists N.
-intros m Hm.
-specialize (HN m Hm).
+intros i Hi.
+...
+specialize (HN i Hi).
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN; [ | easy ].
 rewrite (rngl_mul_comm Hic) in HN.
 rename θ into θ'.
+progress unfold seq_angle_converging_to_angle_div_nat in HN.
+Search (_ * (_ / ₂^_))%A.
+rewrite <- angle_div_2_pow_nat_mul in HN; cycle 1. {
+  intros H.
+  apply Nat.div_small_iff in H.
+  apply Nat.nle_gt in H.
+  apply H; clear H.
 ...
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 Theorem angle_eucl_dist_mul_nat_le :
