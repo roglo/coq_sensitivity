@@ -4703,7 +4703,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros Har Hch * Hnz.
+(*
 intros ε Hε.
+*)
 (*
 assert (Hov : angle_mul_nat_overflow n (θ / ₂^n) = false). {
   clear ε Hε.
@@ -4755,6 +4757,27 @@ apply is_angle_eucl_limit_eq_compat with
   rewrite Nat.mul_comm.
   now rewrite <- (angle_mul_nat_assoc Hon Hop).
 }
+Print seq_angle_converging_to_angle_div_nat.
+Theorem is_angle_eucl_limit_glop :
+  ∀ f θ j,
+  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
+Proof.
+intros * Hf.
+intros ε Hε.
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold angle_eucl_dist in HN.
+progress unfold angle_eucl_dist.
+Search (rngl_cos (_ / ₂^_)).
+(* ah fait chier *)
+...
+rewrite Hθ'' in H1.
+apply is_angle_eucl_limit_glop in H1.
+rewrite <- Hθ'' in H1.
 ...
 specialize (H1 (ε / 2 ^ j))%L.
 assert (Hz2j : (0 < 2 ^ j)%L). {
