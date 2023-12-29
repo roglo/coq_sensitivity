@@ -4707,6 +4707,7 @@ specialize (HN m Hm).
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN; [ | easy ].
 rewrite (rngl_mul_comm Hic) in HN.
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+...
 Theorem angle_eucl_dist_mul_nat_le :
   ∀ (n : nat) (θ1 θ2 : angle T),
   (angle_eucl_dist (2 ^ n * θ1) (2 ^ n * θ2) ≤
@@ -4743,12 +4744,16 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
   apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
+...
 Theorem angle_eucl_dist_twice_twice_le :
   ∀ θ1 θ2, (angle_eucl_dist (2 * θ1) (2 * θ2) ≤ 2 * angle_eucl_dist θ1 θ2)%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
+eapply (rngl_le_trans Hor). {
+  apply angle_eucl_dist_triangular with (θ2 := θ1).
+}
 ...
 progress unfold angle_eucl_dist.
 cbn.
