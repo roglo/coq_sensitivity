@@ -4670,6 +4670,22 @@ rewrite IHn.
 now do 2 rewrite (angle_mul_nat_assoc Hon Hop).
 Qed.
 
+Theorem is_angle_eucl_limit_eq_compat :
+  ∀ f g θ,
+  (∀ i, f i = g i)
+  → is_angle_eucl_limit_when_tending_to_inf f θ
+  → is_angle_eucl_limit_when_tending_to_inf g θ.
+Proof.
+intros * Hfg Hf.
+intros ε Hε.
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+now rewrite Hfg in HN.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4729,6 +4745,17 @@ progress unfold is_angle_eucl_limit_when_tending_to_inf in H1.
 progress unfold is_limit_when_tending_to_inf in H1.
 ...
 *)
+(**)
+progress unfold seq_angle_converging_to_angle_div_nat in H1.
+apply is_angle_eucl_limit_eq_compat with
+    (g := λ i, (n * (2 ^ i / n * (θ'' / ₂^i)))%A) in H1. 2: {
+  intros i.
+  rewrite (angle_div_2_pow_nat_mul _ _ _ Hnz Htj).
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  now rewrite <- (angle_mul_nat_assoc Hon Hop).
+}
+...
 specialize (H1 (ε / 2 ^ j))%L.
 assert (Hz2j : (0 < 2 ^ j)%L). {
   apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
