@@ -4706,8 +4706,9 @@ intros m Hm.
 specialize (HN m Hm).
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN; [ | easy ].
 rewrite (rngl_mul_comm Hic) in HN.
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+rename θ into θ'.
 ...
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 Theorem angle_eucl_dist_mul_nat_le :
   ∀ (n : nat) (θ1 θ2 : angle T),
   (angle_eucl_dist (2 ^ n * θ1) (2 ^ n * θ2) ≤
