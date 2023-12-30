@@ -4714,26 +4714,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros Har Hch * Hnz.
-(*
-intros ε Hε.
-*)
-(*
-assert (Hov : angle_mul_nat_overflow n (θ / ₂^n) = false). {
-  clear ε Hε.
-  clear Hnz.
-  revert θ.
-  induction n; intros; [ easy | ].
-  apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
-  split. {
-    rewrite angle_div_2_pow_nat_succ_r_2.
-    apply IHn.
-  }
-  rewrite angle_div_2_pow_nat_succ_r_1 at 1.
-  cbn.
-  rewrite angle_mul_nat_div_2; [ | apply IHn ].
-  apply angle_add_overflow_div_2_div_2.
-}
-*)
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
@@ -4751,14 +4731,6 @@ assert (Htj : angle_mul_nat_overflow n θ'' = false). {
 }
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
-(*
-progress unfold seq_angle_converging_to_angle_div_nat in H1.
-progress unfold seq_angle_converging_to_angle_div_nat.
-progress unfold is_angle_eucl_limit_when_tending_to_inf in H1.
-progress unfold is_limit_when_tending_to_inf in H1.
-...
-*)
-(**)
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 apply is_angle_eucl_limit_eq_compat with
     (g := λ i, (n * (2 ^ i / n * (θ'' / ₂^i)))%A) in H1. 2: {
@@ -4921,6 +4893,14 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
 apply (rngl_lt_sub_lt_add_r Hop Hor).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+...
+cbn - [ angle_mul_nat ].
+generalize Hs; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_sub_opp_r Hop).
 ...
 Theorem is_angle_eucl_limit_glop :
   ∀ f θ j,
