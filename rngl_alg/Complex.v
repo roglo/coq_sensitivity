@@ -4778,6 +4778,9 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * Hθ Hf ε Hε.
   rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
@@ -4856,6 +4859,29 @@ rewrite <- H1 in HN; clear H1.
 specialize (rngl_sin_div_2 θ) as H1.
 rewrite <- H1 in HN; clear H1.
 rewrite <- (rngl_cos_sub Hop) in HN.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in HN. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε) in HN. 2: {
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in HN.
+rewrite rngl_squ_sqrt in HN. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic) in HN.
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+apply <- (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
@@ -4871,6 +4897,30 @@ do 2 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 rewrite <- (rngl_cos_sub Hop).
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+  now apply (rngl_lt_le_incl Hor).
+}
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+eapply (rngl_lt_le_trans Hor); [ apply HN | ].
 ...
 Theorem is_angle_eucl_limit_glop :
   ∀ f θ j,
