@@ -4697,6 +4697,20 @@ Theorem rngl_sin_div_2 :
   ∀ θ, rngl_sin (θ / ₂) = √((1 - rngl_cos θ) / 2)%L.
 Proof. easy. Qed.
 
+Theorem angle_mul_sub_distr_l :
+  ∀ n θ1 θ2, (n * θ1 - n * θ2 = n * (θ1 - θ2))%A.
+Proof.
+destruct_ac.
+intros.
+revert θ1 θ2.
+induction n; intros; cbn; [ apply angle_sub_diag | ].
+rewrite (angle_sub_add_distr Hic Hop).
+rewrite (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_add_sub_assoc Hop).
+f_equal.
+apply IHn.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4893,6 +4907,9 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
 apply (rngl_lt_sub_lt_add_r Hop Hor).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+rewrite <- (angle_add_div_2_diag θ) at 2.
+rewrite (angle_add_diag Hon Hos (θ / ₂)).
+rewrite angle_mul_sub_distr_l.
 ...
 cbn - [ angle_mul_nat ].
 generalize Hs; intros H.
