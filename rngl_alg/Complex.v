@@ -4686,6 +4686,17 @@ specialize (HN n Hn).
 now rewrite Hfg in HN.
 Qed.
 
+Theorem rngl_cos_div_2 :
+  ∀ θ,
+  rngl_cos (θ / ₂) =
+  ((if (0 ≤? rngl_sin θ)%L then 1%L else (-1)%L) *
+   √((1 + rngl_cos θ) / 2))%L.
+Proof. easy. Qed.
+
+Theorem rngl_sin_div_2 :
+  ∀ θ, rngl_sin (θ / ₂) = √((1 - rngl_cos θ) / 2)%L.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4766,6 +4777,12 @@ Theorem is_angle_eucl_limit_glop :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * Hθ Hf ε Hε.
+  rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hθ Hf.
 intros ε Hε.
 assert (Hs : (0 ≤ rngl_sin θ)%L). {
@@ -4816,6 +4833,29 @@ rewrite <- (rngl_add_assoc _ _² _²)%L in HN.
 rewrite cos2_sin2_1 in HN.
 rewrite rngl_add_add_swap in HN.
 rewrite (rngl_add_sub_assoc Hop) in HN.
+rewrite <- (rngl_add_sub_swap Hop (_ / _))%L in HN.
+rewrite <- (rngl_sub_add_distr Hos) in HN.
+do 2 rewrite <- rngl_mul_assoc in HN.
+rewrite <- rngl_mul_add_distr_l in HN.
+rewrite rngl_add_comm in HN.
+rewrite (rngl_add_sub_assoc Hop) in HN.
+rewrite <- (rngl_div_add_distr_r Hiv) in HN.
+rewrite (rngl_add_sub_assoc Hop) in HN.
+rewrite (rngl_add_add_swap) in HN.
+rewrite (rngl_add_sub Hos) in HN.
+rewrite (rngl_div_diag Hon Hiq) in HN. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_sub_mul_r_diag_l Hon Hop) in HN.
+specialize (rngl_cos_div_2 θ) as H1.
+generalize Hs; intros H.
+apply rngl_leb_le in H.
+rewrite H in H1; clear H.
+rewrite (rngl_mul_1_l Hon) in H1.
+rewrite <- H1 in HN; clear H1.
+specialize (rngl_sin_div_2 θ) as H1.
+rewrite <- H1 in HN; clear H1.
+rewrite <- (rngl_cos_sub Hop) in HN.
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
