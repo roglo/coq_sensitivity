@@ -4759,6 +4759,57 @@ apply is_angle_eucl_limit_eq_compat with
 }
 Print seq_angle_converging_to_angle_div_nat.
 Theorem is_angle_eucl_limit_glop :
+  ∀ f θ,
+  (θ ≤ angle_right)%A
+  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂)
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 * f i)%A) θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hθ Hf.
+intros ε Hε.
+assert (Hs : (0 ≤ rngl_sin θ)%L). {
+  progress unfold angle_leb in Hθ.
+  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+  apply rngl_leb_le in H1.
+  cbn in Hθ; rewrite H1 in Hθ.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs; [ now apply rngl_leb_le | easy ].
+}
+assert (Hc : (0 ≤ rngl_cos θ)%L). {
+  progress unfold angle_leb in Hθ.
+  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+  apply rngl_leb_le in H1.
+  cbn in Hθ; rewrite H1 in Hθ.
+  apply rngl_leb_le in Hs.
+  rewrite Hs in Hθ.
+  now apply rngl_leb_le.
+}
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold angle_eucl_dist in HN.
+progress unfold angle_eucl_dist.
+cbn in HN |-*.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+rewrite <- rngl_cos_add.
+rewrite (rngl_add_comm (_ * _))%L.
+rewrite <- rngl_sin_add.
+rewrite (angle_add_diag Hon Hos).
+generalize Hs; intros H.
+apply rngl_leb_le in H.
+rewrite H in HN; clear H.
+rewrite (rngl_mul_1_l Hon) in HN.
+...
+Search ((1 + rngl_cos _) / 2)%L.
+...
+Theorem is_angle_eucl_limit_glop :
   ∀ f θ j,
   is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
   → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
