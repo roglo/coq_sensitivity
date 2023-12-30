@@ -4806,8 +4806,31 @@ generalize Hs; intros H.
 apply rngl_leb_le in H.
 rewrite H in HN; clear H.
 rewrite (rngl_mul_1_l Hon) in HN.
-...
-Search ((1 + rngl_cos _) / 2)%L.
+rewrite (rngl_squ_sub Hop Hic Hon) in HN.
+rewrite rngl_squ_sqrt in HN; [ | apply rngl_1_add_cos_div_2_nonneg ].
+rewrite (rngl_squ_sub Hop Hic Hon) in HN.
+rewrite rngl_squ_sqrt in HN; [ | apply rngl_1_sub_cos_div_2_nonneg ].
+rewrite rngl_add_assoc in HN.
+rewrite rngl_add_add_swap in HN.
+rewrite <- (rngl_add_assoc _ _² _²)%L in HN.
+rewrite cos2_sin2_1 in HN.
+rewrite rngl_add_add_swap in HN.
+rewrite (rngl_add_sub_assoc Hop) in HN.
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_assoc _ _² _²)%L.
+rewrite cos2_sin2_1.
+rewrite rngl_add_add_swap.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop _²)%L.
+rewrite cos2_sin2_1.
+rewrite <- (rngl_sub_add_distr Hos).
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+rewrite <- (rngl_cos_sub Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 ...
 Theorem is_angle_eucl_limit_glop :
   ∀ f θ j,
