@@ -4859,179 +4859,28 @@ apply is_angle_eucl_limit_eq_compat with
   rewrite Nat.mul_comm.
   now rewrite <- (angle_mul_nat_assoc Hon Hop).
 }
-Check is_angle_eucl_limit_div_2.
-...
-progress unfold angle_eucl_dist in HN.
-progress unfold angle_eucl_dist.
-cbn in HN |-*.
-do 2 rewrite (rngl_mul_1_r Hon).
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-rewrite rngl_add_0_l.
-rewrite <- rngl_cos_add.
-rewrite (rngl_add_comm (_ * _))%L.
-rewrite <- rngl_sin_add.
-rewrite (angle_add_diag Hon Hos).
-generalize Hs; intros H.
-apply rngl_leb_le in H.
-rewrite H in HN; clear H.
-rewrite (rngl_mul_1_l Hon) in HN.
-rewrite (rngl_squ_sub Hop Hic Hon) in HN.
-rewrite rngl_squ_sqrt in HN; [ | apply rngl_1_add_cos_div_2_nonneg ].
-rewrite (rngl_squ_sub Hop Hic Hon) in HN.
-rewrite rngl_squ_sqrt in HN; [ | apply rngl_1_sub_cos_div_2_nonneg ].
-rewrite rngl_add_assoc in HN.
-rewrite rngl_add_add_swap in HN.
-rewrite <- (rngl_add_assoc _ _² _²)%L in HN.
-rewrite cos2_sin2_1 in HN.
-rewrite rngl_add_add_swap in HN.
-rewrite (rngl_add_sub_assoc Hop) in HN.
-rewrite <- (rngl_add_sub_swap Hop (_ / _))%L in HN.
-rewrite <- (rngl_sub_add_distr Hos) in HN.
-do 2 rewrite <- rngl_mul_assoc in HN.
-rewrite <- rngl_mul_add_distr_l in HN.
-rewrite rngl_add_comm in HN.
-rewrite (rngl_add_sub_assoc Hop) in HN.
-rewrite <- (rngl_div_add_distr_r Hiv) in HN.
-rewrite (rngl_add_sub_assoc Hop) in HN.
-rewrite (rngl_add_add_swap) in HN.
-rewrite (rngl_add_sub Hos) in HN.
-rewrite (rngl_div_diag Hon Hiq) in HN. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_sub_mul_r_diag_l Hon Hop) in HN.
-specialize (rngl_cos_div_2 θ) as H1.
-generalize Hs; intros H.
-apply rngl_leb_le in H.
-rewrite H in H1; clear H.
-rewrite (rngl_mul_1_l Hon) in H1.
-rewrite <- H1 in HN; clear H1.
-specialize (rngl_sin_div_2 θ) as H1.
-rewrite <- H1 in HN; clear H1.
-rewrite <- (rngl_cos_sub Hop) in HN.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in HN. 2: {
-  apply rl_sqrt_nonneg.
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite <- (rngl_abs_nonneg_eq Hop Hor ε)%L in HN. 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in HN.
-rewrite rngl_squ_sqrt in HN. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_mul_comm Hic) in HN.
-apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-apply <- (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-do 2 rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite rngl_add_assoc.
-rewrite rngl_add_add_swap.
-rewrite <- (rngl_add_assoc _ _² _²)%L.
-rewrite cos2_sin2_1.
-rewrite rngl_add_add_swap.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite <- (rngl_add_sub_swap Hop _²)%L.
-rewrite cos2_sin2_1.
-rewrite <- (rngl_sub_add_distr Hos).
-rewrite <- (rngl_add_sub_swap Hop 1)%L.
-do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-rewrite <- (rngl_cos_sub Hop).
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
-  apply rl_sqrt_nonneg.
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_squ_lt_abs_lt Hop Hor Hii).
-rewrite rngl_squ_sqrt. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_mul_comm Hic).
-apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-apply (rngl_lt_sub_lt_add_r Hop Hor).
-apply (rngl_lt_sub_lt_add_l Hop Hor).
-rewrite <- (angle_add_div_2_diag θ).
-rewrite (angle_add_diag Hon Hos (θ / ₂)).
-rewrite angle_mul_sub_distr_l.
-(*
-rewrite (rngl_squ_div Hic Hon Hos Hiv) in HN. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite <- (rngl_add_sub Hos (ε² / 2) (ε² / 2² / 2))%L.
-rewrite (rngl_sub_sub_distr Hop).
-rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_sub_sub_swap Hop).
-rewrite <- (rngl_sub_sub_distr Hop).
-apply (rngl_lt_sub_lt_add_r Hop Hor).
-eapply (rngl_lt_le_trans Hor); [ apply HN | ].
-...
-eapply (rngl_le_lt_trans Hor _ (1 - (ε / 2)² / 2))%L. {
-  apply (rngl_sub_le_mono_l Hop Hor).
-  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  apply (rngl_abs_le_squ_le Hop Hor).
-  apply (rngl_lt_le_incl Hor).
-  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-  apply (rngl_lt_div_l Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  rewrite rngl_mul_add_distr_l.
-  rewrite (rngl_mul_1_r Hon).
-  now apply (rngl_lt_add_r Hos Hor).
-}
-*)
-eapply (rngl_lt_le_trans Hor); [ apply HN | ].
-...
-rewrite <- angle_mul_sub_distr_l.
-...
-rewrite <- (angle_add_div_2_diag θ) at 2.
-rewrite (angle_add_diag Hon Hos (θ / ₂)).
-rewrite angle_mul_sub_distr_l.
-...
-cbn - [ angle_mul_nat ].
-generalize Hs; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-rewrite (rngl_mul_1_l Hon).
-do 2 rewrite (rngl_mul_opp_r Hop).
-do 2 rewrite (rngl_sub_opp_r Hop).
-...
-Theorem is_angle_eucl_limit_glop :
+rewrite Hθ'' in H1 at 1.
+Theorem is_angle_eucl_limit_div_2_pow :
   ∀ f θ j,
-  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
+  (θ ≤ angle_right)%A
+  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
   → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
 Proof.
-intros * Hf.
-intros ε Hε.
-specialize (Hf ε Hε).
-destruct Hf as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-progress unfold angle_eucl_dist in HN.
-progress unfold angle_eucl_dist.
-Search (rngl_cos (_ / ₂^_)).
-(* ah fait chier *)
+intros * Hθ Hf.
+revert θ Hθ Hf.
+induction j; intros. {
+  cbn in Hf |-*.
+  eapply is_angle_eucl_limit_eq_compat. {
+    intros i; symmetry.
+    now apply angle_add_0_r.
+  }
+  easy.
+}
+rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
+apply IHj in Hf.
+apply is_angle_eucl_limit_div_2 in Hf; [ | easy ].
+... ...
+apply is_angle_eucl_limit_div_2_pow in H1.
 ...
 rewrite Hθ'' in H1.
 apply is_angle_eucl_limit_glop in H1.
