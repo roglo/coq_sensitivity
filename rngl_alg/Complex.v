@@ -4773,7 +4773,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hθ Hf.
-intros ε Hε.
 assert (Hs : (0 ≤ rngl_sin θ)%L). {
   progress unfold angle_leb in Hθ.
   specialize (rngl_0_le_1 Hon Hop Hor) as H1.
@@ -4792,6 +4791,7 @@ assert (Hc : (0 ≤ rngl_cos θ)%L). {
   rewrite Hs in Hθ.
   now apply rngl_leb_le.
 }
+intros ε Hε.
 (*
 enough (H2ε : (0 < ε / 2)%L).
 *)
@@ -4799,9 +4799,11 @@ specialize (Hf _ Hε)%L.
 destruct Hf as (N, HN).
 exists N.
 intros n Hn.
-specialize (HN n Hn).
+specialize (HN (n + 42)).
+assert (H : N ≤ n + 42) by flia Hn.
+specialize (HN H); clear H.
 (**)
-rewrite <- (angle_add_sub (f n) (θ / ₂))%A in HN.
+rewrite <- (angle_add_sub (f _) (θ / ₂))%A in HN.
 rewrite (angle_add_comm Hic) in HN.
 rewrite (angle_add_sub_swap Hic Hop) in HN.
 rewrite <- (angle_sub_sub_distr Hic Hop) in HN.
@@ -4812,7 +4814,7 @@ rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- (angle_sub_sub_distr Hic Hop).
 rewrite angle_eucl_dist_sub_l_diag.
 specialize (angle_eucl_dist_triangular) as H1.
-specialize (H1 (2 * (θ / ₂ - f n)) (θ / ₂ - f n) 0)%A.
+specialize (H1 (2 * (θ / ₂ - f n)) (θ / ₂ - f (n + 42)%nat) 0)%A.
 rewrite angle_mul_sub_distr_l in H1.
 rewrite angle_div_2_mul_2 in H1.
 eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
