@@ -4737,8 +4737,7 @@ Qed.
 
 Theorem is_angle_eucl_limit_div_2 :
   ∀ f θ,
-  (θ ≤ angle_right)%A
-  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂)
+  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂)
   → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 * f i)%A) θ.
 Proof.
 destruct_ac.
@@ -4748,29 +4747,11 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros * Hθ Hf ε Hε.
+  intros * Hf ε Hε.
   rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros * Hθ Hf.
-assert (Hs : (0 ≤ rngl_sin θ)%L). {
-  progress unfold angle_leb in Hθ.
-  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-  apply rngl_leb_le in H1.
-  cbn in Hθ; rewrite H1 in Hθ.
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs; [ now apply rngl_leb_le | easy ].
-}
-assert (Hc : (0 ≤ rngl_cos θ)%L). {
-  progress unfold angle_leb in Hθ.
-  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-  apply rngl_leb_le in H1.
-  cbn in Hθ; rewrite H1 in Hθ.
-  apply rngl_leb_le in Hs.
-  rewrite Hs in Hθ.
-  now apply rngl_leb_le.
-}
+intros * Hf.
 intros ε Hε.
 assert (H2ε : (0 < ε / 2)%L). {
   apply (rngl_lt_div_r Hon Hop Hiv Hor).
@@ -4818,13 +4799,12 @@ Qed.
 
 Theorem is_angle_eucl_limit_div_2_pow :
   ∀ f θ j,
-  (θ ≤ angle_right)%A
-  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
+  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
   → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
 Proof.
 destruct_ac.
-intros * Hθ Hf.
-revert θ Hθ Hf.
+intros * Hf.
+revert θ Hf.
 induction j; intros. {
   cbn in Hf |-*.
   eapply is_angle_eucl_limit_eq_compat. {
@@ -4834,11 +4814,8 @@ induction j; intros. {
   easy.
 }
 rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
-apply IHj in Hf. 2: {
-  eapply (angle_le_trans); [ | apply Hθ ].
-  apply angle_div_2_le.
-}
-apply is_angle_eucl_limit_div_2 in Hf; [ | easy ].
+apply IHj in Hf.
+apply is_angle_eucl_limit_div_2 in Hf.
 eapply is_angle_eucl_limit_eq_compat; [ | apply Hf ].
 intros i; cbn.
 rewrite angle_add_0_r.
@@ -4927,16 +4904,16 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
 }
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
-apply is_angle_eucl_limit_div_2_pow in H1. 2: {
-  rewrite <- angle_straight_div_2.
-  apply angle_div_2_le_compat.
-  apply angle_div_2_le_straight.
-}
+apply is_angle_eucl_limit_div_2_pow in H1.
 rewrite Hθ'' in H1.
 destruct j; [ easy | clear Hjz ].
 destruct j; [ easy | clear Hj1 ].
 do 2 rewrite Nat.sub_succ in H1.
 rewrite Nat.sub_0_r in H1.
+Inspect 2.
+...
+apply is_angle_eucl_limit_div_pow_2 in H1.
+(*
 eapply is_angle_eucl_limit_eq_compat in H1. 2: {
   intros i.
   rewrite (angle_mul_nat_assoc Hon Hop).
@@ -4950,9 +4927,57 @@ eapply is_angle_eucl_limit_eq_compat in H1. 2: {
   rewrite angle_div_pow_2_add_distr.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_nat_succ_r_1.
+  rewrite angle_div_2_pow_nat_succ_r_1.
+  reflexivity.
+}
+*)
+apply is_angle_eucl_limit_div_2 in H1.
+apply is_angle_eucl_limit_div_2 in H1.
+eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+  intros i.
+  do 3 rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite <- (Nat.mul_assoc 2).
+  do 2 rewrite <- Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+(*
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_shuffle0.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+*)
+  rewrite <- angle_div_pow_2_add_distr.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+(*
+  rewrite angle_mul_2_pow_div_2_pow.
+*)
+  reflexivity.
+}
+Inspect 2.
+...
+  rewrite <- Nat.pow_succ_r'.
+  rewrite (Nat.mul_shuffle0 2).
+  rewrite (Nat.mul_shuffle0 (2 * 2 ^ j)).
+  do 3 rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite angle_div_2_mul_2.
+  do 2 rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm, Nat.mul_assoc.
+  rewrite (Nat.mul_shuffle0 _ 2).
+  do 2 rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite angle_div_2_mul_2.
+(*
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+*)
   reflexivity.
 }
 ...
+  H1 : is_angle_eucl_limit_when_tending_to_inf (λ i : nat, (2 ^ i / n * (n * (θ / ₂^i)))%A) θ
+  ============================
+  is_angle_eucl_limit_when_tending_to_inf (λ i : nat, (2 ^ i / n * ((n * θ) / ₂^i))%A) θ
+...
+Search (is_angle_eucl_limit_when_tending_to_inf _ (_ / ₂)).
 Search (_ / ₂^(_ + _))%A.
 Search (_ / ₂^_ / ₂^_)%A.
 Check angle_div_pow_2_add_distr.
