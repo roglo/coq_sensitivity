@@ -4800,6 +4800,22 @@ destruct Hf as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
+(**)
+rewrite <- (angle_add_sub (2 * f n) θ)%A.
+rewrite (angle_add_comm Hic).
+rewrite (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_sub_sub_distr Hic Hop).
+rewrite angle_eucl_dist_sub_l_diag.
+specialize (angle_eucl_dist_triangular) as H1.
+specialize (H1 (θ - 2 * f n) θ 0)%A.
+(* ouais non c'est pas ça, faut que je regarde *)
+...
+rewrite <- (angle_sub_add (2 * f n) θ)%A.
+rewrite (angle_add_comm Hic).
+Search (angle_eucl_dist _ 0%A).
+rewrite angle_eucl_dist_sub_l_diag.
+replace (2 * f n)%A with ((2 * fn + θ
+...
 progress unfold angle_eucl_dist in HN.
 progress unfold angle_eucl_dist.
 cbn in HN |-*.
