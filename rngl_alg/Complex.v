@@ -4847,6 +4847,17 @@ symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
 
+Theorem angle_div_pow_2_add_distr :
+  ∀ i j θ, (θ / ₂^(i + j) = θ / ₂^i / ₂^j)%A.
+Proof.
+intros.
+revert j θ.
+induction i; intros; [ easy | ].
+rewrite Nat.add_succ_l.
+do 2 rewrite angle_div_2_pow_nat_succ_r_2.
+apply IHi.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4917,6 +4928,34 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
 apply is_angle_eucl_limit_div_2_pow in H1. 2: {
+  rewrite <- angle_straight_div_2.
+  apply angle_div_2_le_compat.
+  apply angle_div_2_le_straight.
+}
+rewrite Hθ'' in H1.
+destruct j; [ easy | clear Hjz ].
+destruct j; [ easy | clear Hj1 ].
+do 2 rewrite Nat.sub_succ in H1.
+rewrite Nat.sub_0_r in H1.
+eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+  intros i.
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite (angle_mul_nat_assoc Hon Hop (2 ^ j)).
+  rewrite Nat.mul_comm.
+  rewrite <- angle_div_pow_2_add_distr.
+  do 2 rewrite Nat.add_succ_comm.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite angle_mul_2_pow_div_2_pow.
+  reflexivity.
+}
+...
+Search (_ / ₂^(_ + _))%A.
+Search (_ / ₂^_ / ₂^_)%A.
+Check angle_div_pow_2_add_distr.
 ...
 rewrite Hθ'' in H1.
 apply is_angle_eucl_limit_glop in H1.
