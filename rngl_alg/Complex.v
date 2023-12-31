@@ -4698,12 +4698,12 @@ Theorem rngl_sin_div_2 :
 Proof. easy. Qed.
 
 Theorem angle_mul_sub_distr_l :
-  ∀ n θ1 θ2, (n * θ1 - n * θ2 = n * (θ1 - θ2))%A.
+  ∀ n θ1 θ2, (n * (θ1 - θ2) = n * θ1 - n * θ2)%A.
 Proof.
 destruct_ac.
 intros.
 revert θ1 θ2.
-induction n; intros; cbn; [ apply angle_sub_diag | ].
+induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
 rewrite (angle_sub_add_distr Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- (angle_add_sub_assoc Hop).
@@ -4801,20 +4801,21 @@ exists N.
 intros n Hn.
 specialize (HN n Hn).
 (**)
+rewrite <- (angle_add_sub (f n) (θ / ₂))%A in HN.
+rewrite (angle_add_comm Hic) in HN.
+rewrite (angle_add_sub_swap Hic Hop) in HN.
+rewrite <- (angle_sub_sub_distr Hic Hop) in HN.
+rewrite angle_eucl_dist_sub_l_diag in HN.
 rewrite <- (angle_add_sub (2 * f n) θ)%A.
 rewrite (angle_add_comm Hic).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- (angle_sub_sub_distr Hic Hop).
 rewrite angle_eucl_dist_sub_l_diag.
 specialize (angle_eucl_dist_triangular) as H1.
-specialize (H1 (θ - 2 * f n) θ 0)%A.
-(* ouais non c'est pas ça, faut que je regarde *)
-...
-rewrite <- (angle_sub_add (2 * f n) θ)%A.
-rewrite (angle_add_comm Hic).
-Search (angle_eucl_dist _ 0%A).
-rewrite angle_eucl_dist_sub_l_diag.
-replace (2 * f n)%A with ((2 * fn + θ
+specialize (H1 (2 * (θ / ₂ - f n)) (θ / ₂ - f n) 0)%A.
+rewrite angle_mul_sub_distr_l in H1.
+rewrite angle_div_2_mul_2 in H1.
+eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
 ...
 progress unfold angle_eucl_dist in HN.
 progress unfold angle_eucl_dist.
