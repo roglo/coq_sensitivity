@@ -4792,8 +4792,10 @@ assert (Hc : (0 ≤ rngl_cos θ)%L). {
   rewrite Hs in Hθ.
   now apply rngl_leb_le.
 }
+(*
 enough (H2ε : (0 < ε / 2)%L).
-specialize (Hf _ H2ε)%L.
+*)
+specialize (Hf _ Hε)%L.
 destruct Hf as (N, HN).
 exists N.
 intros n Hn.
@@ -4853,7 +4855,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in HN. 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (ε / 2))%L in HN. 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε)%L in HN. 2: {
   now apply (rngl_lt_le_incl Hor).
 }
 apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in HN.
@@ -4910,6 +4912,18 @@ apply (rngl_lt_sub_lt_add_l Hop Hor).
 rewrite <- (angle_add_div_2_diag θ).
 rewrite (angle_add_diag Hon Hos (θ / ₂)).
 rewrite angle_mul_sub_distr_l.
+(*
+rewrite (rngl_squ_div Hic Hon Hos Hiv) in HN. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_add_sub Hos (ε² / 2) (ε² / 2² / 2))%L.
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite <- (rngl_sub_sub_distr Hop).
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+...
 eapply (rngl_le_lt_trans Hor _ (1 - (ε / 2)² / 2))%L. {
   apply (rngl_sub_le_mono_l Hop Hor).
   apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii).
@@ -4924,7 +4938,7 @@ eapply (rngl_le_lt_trans Hor _ (1 - (ε / 2)² / 2))%L. {
   rewrite (rngl_mul_1_r Hon).
   now apply (rngl_lt_add_r Hos Hor).
 }
-...
+*)
 eapply (rngl_lt_le_trans Hor); [ apply HN | ].
 ...
 rewrite <- angle_mul_sub_distr_l.
