@@ -4816,6 +4816,37 @@ rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_lt_compat Hop Hor _ _ _ _ HN HN).
 Qed.
 
+Theorem is_angle_eucl_limit_div_2_pow :
+  ∀ f θ j,
+  (θ ≤ angle_right)%A
+  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
+Proof.
+destruct_ac.
+intros * Hθ Hf.
+revert θ Hθ Hf.
+induction j; intros. {
+  cbn in Hf |-*.
+  eapply is_angle_eucl_limit_eq_compat. {
+    intros i; symmetry.
+    now apply angle_add_0_r.
+  }
+  easy.
+}
+rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
+apply IHj in Hf. 2: {
+  eapply (angle_le_trans); [ | apply Hθ ].
+  apply angle_div_2_le.
+}
+apply is_angle_eucl_limit_div_2 in Hf; [ | easy ].
+eapply is_angle_eucl_limit_eq_compat; [ | apply Hf ].
+intros i; cbn.
+rewrite angle_add_0_r.
+rewrite Nat.add_0_r.
+symmetry.
+apply (angle_mul_add_distr_r Hon Hop).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4860,27 +4891,32 @@ apply is_angle_eucl_limit_eq_compat with
   now rewrite <- (angle_mul_nat_assoc Hon Hop).
 }
 rewrite Hθ'' in H1 at 1.
-Theorem is_angle_eucl_limit_div_2_pow :
-  ∀ f θ j,
-  (θ ≤ angle_right)%A
-  → is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
-Proof.
-intros * Hθ Hf.
-revert θ Hθ Hf.
-induction j; intros. {
-  cbn in Hf |-*.
-  eapply is_angle_eucl_limit_eq_compat. {
-    intros i; symmetry.
-    now apply angle_add_0_r.
-  }
-  easy.
+destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
+  rewrite Hjz in Hjn.
+  now apply Nat.lt_1_r in Hjn.
 }
-rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
-apply IHj in Hf.
-apply is_angle_eucl_limit_div_2 in Hf; [ | easy ].
-... ...
-apply is_angle_eucl_limit_div_2_pow in H1.
+destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
+  rewrite Hj1 in Hjn.
+  cbn in Hjn.
+  destruct n; [ easy | ].
+  destruct n; [ | flia Hjn ].
+  cbn.
+  rewrite angle_add_0_r.
+  progress unfold seq_angle_converging_to_angle_div_nat.
+  eapply is_angle_eucl_limit_eq_compat. {
+    intros i.
+    rewrite Nat.div_1_r.
+    rewrite (angle_mul_2_pow_div_2_pow i θ).
+    reflexivity.
+  }
+  intros ε Hε.
+  exists 0.
+  intros n Hn.
+  now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
+}
+replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
+do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
+apply is_angle_eucl_limit_div_2_pow in H1. 2: {
 ...
 rewrite Hθ'' in H1.
 apply is_angle_eucl_limit_glop in H1.
