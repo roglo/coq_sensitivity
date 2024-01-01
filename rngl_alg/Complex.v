@@ -4902,6 +4902,37 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   intros n Hn.
   now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
 }
+(**)
+apply is_angle_eucl_limit_div_2_pow in H1.
+eapply is_angle_eucl_limit_eq_compat in H1; [ apply H1 | ].
+intros i.
+progress unfold seq_angle_converging_to_angle_div_nat.
+do 2 rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_comm.
+rewrite Nat.mul_assoc.
+rewrite (Nat.mul_comm _ n).
+rewrite Nat.mul_assoc.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite (Nat.mul_comm n).
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
+  now apply Nat.pow_nonzero.
+} {
+  rewrite Hθ''.
+  apply angle_mul_nat_overflow_pow_div.
+}
+...
+Search (_ * (_ / ₂^_))%A.
+rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
+....
+
+rewrite Hθ''.
+rewrite <- angle_div_pow_2_add_distr.
+rewrite Nat.add_comm.
+rewrite angle_div_pow_2_add_distr.
+...
+rewrite angle_mul_2_pow_div_2_pow.
+...
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
 apply is_angle_eucl_limit_div_2_pow in H1.
