@@ -4926,9 +4926,61 @@ Search (_ * _ = _ * _)%L.
 Check rngl_mul_cancel_l.
 Theorem angle_mul_cancel_l :
   ∀ a b c, a ≠ 0 → (a * b)%A = (a * c)%A → b = c.
-... ...
+Admitted.
 apply (angle_mul_cancel_l (2 ^ i)).
 now apply Nat.pow_nonzero.
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_comm.
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_shuffle0.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+Search ((_ * _) / ₂^_)%A.
+rewrite angle_div_2_pow_nat_mul.
+rewrite Hθ''.
+Search ((_ / ₂^_) / ₂^_)%A.
+(*
+rewrite <- angle_div_pow_2_add_distr.
+*)
+(**)
+rewrite (angle_mul_nat_assoc Hon Hop (2 ^ i)).
+rewrite <- Nat.pow_add_r.
+(*
+rewrite (Nat.add_comm j).
+*)
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_shuffle0.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+Search (_ * (_ / ₂^_))%A.
+rewrite <- angle_div_2_pow_nat_mul.
+Search (_ * (_ / ₂^_))%A.
+Search (_ / ₂^_)%A.
+...
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+...
+rewrite (Nat.add_comm j).
+rewrite angle_div_pow_2_add_distr.
+...
+Search (_ * (_ * _))%A.
+rewrite (angle_mul_nat_assoc Hon Hop (2 ^ i)).
+Search (_ ^ (_ + _)).
+...
+rewrite <- Nat.pow_add_r.
+rewrite (Nat.add_comm j).
+Search (2 ^ _ * _)%A.
+rewrite angle_mul_2_pow_div_2_pow.
+...
+rewrite <- angle_div_2_pow_nat_mul.
+...
+rewrite angle_mul_2_pow_div_2_pow.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+Search (_ * (_ * _))%A.
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_shuffle0.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite Hθ''.
+...
+rewrite <- angle_div_2_pow_nat_mul; [ | | ]. 2: {
 ...
 Search (_ * (_ / ₂^_))%A.
 rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
