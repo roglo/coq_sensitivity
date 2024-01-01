@@ -4921,6 +4921,14 @@ rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
   rewrite Hθ''.
   apply angle_mul_nat_overflow_pow_div.
 }
+Search (_ * _ = _ * _)%A.
+Search (_ * _ = _ * _)%L.
+Check rngl_mul_cancel_l.
+Theorem angle_mul_cancel_l :
+  ∀ a b c, a ≠ 0 → (a * b)%A = (a * c)%A → b = c.
+... ...
+apply (angle_mul_cancel_l (2 ^ i)).
+now apply Nat.pow_nonzero.
 ...
 Search (_ * (_ / ₂^_))%A.
 rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
