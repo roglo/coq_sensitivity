@@ -4921,12 +4921,52 @@ rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
   rewrite Hθ''.
   apply angle_mul_nat_overflow_pow_div.
 }
-Search (_ * _ = _ * _)%A.
-Search (_ * _ = _ * _)%L.
-Check rngl_mul_cancel_l.
+...
 Theorem angle_mul_cancel_l :
-  ∀ a b c, a ≠ 0 → (a * b)%A = (a * c)%A → b = c.
-Admitted.
+  ∀ a θ1 θ2, a ≠ 0 → (a * θ1)%A = (a * θ2)%A → θ1 = θ2.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Haz H12.
+(**)
+apply angle_sub_move_0_r in H12.
+rewrite <- angle_mul_sub_distr_l in H12.
+(* faux : θ1=π/2 θ2=π a=4 *)
+...
+Search (_ * _ = 0)%A.
+Search (_ * _ = 0)%L.
+Theorem angle_eq_mul_0_r :
+  ∀ a θ, (a * θ)%A = 0%A → a ≠ 0 → θ = 0%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hatz Haz.
+revert θ Hatz.
+induction a; intros; [ easy | clear Haz ].
+destruct a. {
+  now rewrite (angle_mul_nat_1_l Hon Hos) in Hatz.
+}
+specialize (IHa (Nat.neq_succ_0 _)).
+remember (S a) as sa; cbn in Hatz; subst sa.
+(* non, c'est faux *)
+...
+apply eq_angle_eq in Hatz.
+injection Hatz; clear Hatz; intros Hs Hc.
+apply eq_rngl_cos_1 in Hc.
+...
+apply eq_angle_eq in H12.
+injection H12; clear H12; intros Hs Hc.
+apply eq_angle_eq.
+revert θ1 θ2 Hc Hs.
+induction a; intros; [ easy | clear Haz ].
+destruct a. {
+  do 2 rewrite (angle_mul_nat_1_l Hon Hos) in Hc, Hs.
+  now rewrite Hc, Hs.
+}
+specialize (IHa (Nat.neq_succ_0 _)).
+remember (S a) as sa; cbn in Hc, Hs; subst sa.
+specialize (IHa θ1 θ2).
+...
 apply (angle_mul_cancel_l (2 ^ i)).
 now apply Nat.pow_nonzero.
 rewrite (angle_mul_nat_assoc Hon Hop).
