@@ -4935,8 +4935,8 @@ intros ε Hε.
 specialize (H1 ε Hε).
 destruct H1 as (N, HN).
 exists N.
-intros m Hm.
-specialize (HN m Hm).
+intros i Hi.
+specialize (HN i Hi).
 ...
 (*
 progress unfold seq_angle_converging_to_angle_div_nat.
