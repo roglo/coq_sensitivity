@@ -4857,6 +4857,95 @@ do 2 rewrite angle_div_2_pow_nat_succ_r_2.
 apply IHi.
 Qed.
 
+Theorem is_angle_eucl_limit_add_add :
+  ∀ u v θ1 θ2,
+  is_angle_eucl_limit_when_tending_to_inf u θ1
+  → is_angle_eucl_limit_when_tending_to_inf v θ2
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (u i + v i))%A (θ1 + θ2).
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * Hu Hv ε Hε.
+  rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hu Hv.
+intros ε Hε.
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (Hu _ Hε2).
+specialize (Hv _ Hε2).
+destruct Hu as (M, HM).
+destruct Hv as (N, HN).
+exists (max M N).
+intros n Hn.
+specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
+specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
+replace (u n) with (θ1 - (θ1 - u n))%A in HM |-*. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+replace (v n) with (θ2 - (θ2 - v n))%A in HN |-*. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+rewrite angle_eucl_dist_sub_l_diag in HM, HN.
+rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite (angle_add_sub_assoc Hop).
+rewrite <- (angle_sub_add_distr Hic Hop).
+rewrite angle_eucl_dist_sub_l_diag.
+specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
+rewrite (rngl_add_diag2 Hon) in Hεε2.
+rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε2.
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (θ1 - u n)).
+}
+apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+rewrite (angle_add_comm Hic).
+rewrite (angle_add_sub_assoc Hop).
+rewrite (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_sub_sub_distr Hic Hop).
+rewrite angle_eucl_dist_sub_l_diag.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite (angle_opp_sub_distr Hic Hop).
+now rewrite angle_opp_0.
+Qed.
+
+Theorem is_angle_eucl_limit_mul :
+  ∀ k u θ,
+  is_angle_eucl_limit_when_tending_to_inf u θ
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (k * u i)%A) (k * θ).
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * Hu.
+induction k. {
+  intros ε Hε.
+  exists 0.
+  intros n _.
+  progress unfold angle_eucl_dist.
+  cbn.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_l.
+  now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+}
+cbn.
+now apply is_angle_eucl_limit_add_add.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4929,6 +5018,8 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
 }
 *)
+Check is_angle_eucl_limit_mul.
+...
 apply is_angle_eucl_limit_div_2_pow in H1.
 (**)
 intros ε Hε.
@@ -4937,31 +5028,6 @@ destruct H1 as (N, HN).
 exists N.
 intros i Hi.
 specialize (HN i Hi).
-Inspect 4.
-Theorem toto :
-  ∀ k u θ,
-  is_angle_eucl_limit_when_tending_to_inf u θ
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (k * u i)%A) (k * θ).
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-intros * Hu.
-induction k. {
-  intros ε Hε.
-  exists 0.
-  intros n _.
-  progress unfold angle_eucl_dist.
-  cbn.
-  do 2 rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_squ_0 Hos).
-  rewrite rngl_add_0_l.
-  now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-}
-cbn.
-Search (is_angle_eucl_limit_when_tending_to_inf (λ _, (_ + _)%A)).
-Search (is_angle_eucl_limit_when_tending_to_inf _ (_ + _))%A.
 ...
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
