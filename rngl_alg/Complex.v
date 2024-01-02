@@ -4671,6 +4671,26 @@ now do 2 rewrite (angle_mul_nat_assoc Hon Hop).
 Qed.
 
 Theorem is_angle_eucl_limit_eq_compat :
+  ∀ a b f g θ,
+  (∀ i, f (i + a) = g (i + b))
+  → is_angle_eucl_limit_when_tending_to_inf f θ
+  → is_angle_eucl_limit_when_tending_to_inf g θ.
+Proof.
+intros * Hfg Hf.
+intros ε Hε.
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists (N + max a b).
+intros n Hn.
+specialize (HN (n - b + a)).
+assert (H : N ≤ n - b + a) by flia Hn.
+specialize (HN H).
+rewrite Hfg in HN.
+rewrite Nat.sub_add in HN; [ easy | flia Hn ].
+Qed.
+
+(*
+Theorem is_angle_eucl_limit_eq_compat :
   ∀ f g θ,
   (∀ i, f i = g i)
   → is_angle_eucl_limit_when_tending_to_inf f θ
@@ -4685,6 +4705,7 @@ intros n Hn.
 specialize (HN n Hn).
 now rewrite Hfg in HN.
 Qed.
+*)
 
 Theorem rngl_cos_div_2 :
   ∀ θ,
@@ -4807,8 +4828,9 @@ intros * Hf.
 revert θ Hf.
 induction j; intros. {
   cbn in Hf |-*.
-  eapply is_angle_eucl_limit_eq_compat. {
+  eapply (is_angle_eucl_limit_eq_compat 0 0). {
     intros i; symmetry.
+    rewrite Nat.add_0_r.
     now apply angle_add_0_r.
   }
   easy.
@@ -4816,10 +4838,10 @@ induction j; intros. {
 rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
 apply IHj in Hf.
 apply is_angle_eucl_limit_div_2 in Hf.
-eapply is_angle_eucl_limit_eq_compat; [ | apply Hf ].
+eapply (is_angle_eucl_limit_eq_compat 0 0); [ | apply Hf ].
 intros i; cbn.
 rewrite angle_add_0_r.
-rewrite Nat.add_0_r.
+do 2 rewrite Nat.add_0_r.
 symmetry.
 apply (angle_mul_add_distr_r Hon Hop).
 Qed.
@@ -4870,9 +4892,10 @@ assert (Htj : angle_mul_nat_overflow n θ'' = false). {
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
-apply is_angle_eucl_limit_eq_compat with
-    (g := λ i, (n * (2 ^ i / n * (θ'' / ₂^i)))%A) in H1. 2: {
+apply (is_angle_eucl_limit_eq_compat j 0) with
+    (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
   intros i.
+  rewrite Nat.add_0_r.
   rewrite (angle_div_2_pow_nat_mul _ _ _ Hnz Htj).
   rewrite (angle_mul_nat_assoc Hon Hop).
   rewrite Nat.mul_comm.
@@ -4891,9 +4914,10 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   cbn.
   rewrite angle_add_0_r.
   progress unfold seq_angle_converging_to_angle_div_nat.
-  eapply is_angle_eucl_limit_eq_compat. {
+  eapply (is_angle_eucl_limit_eq_compat 0 0). {
     intros i.
     rewrite Nat.div_1_r.
+    rewrite Nat.add_0_r.
     rewrite (angle_mul_2_pow_div_2_pow i θ).
     reflexivity.
   }
@@ -4902,11 +4926,41 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   intros n Hn.
   now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
 }
-(**)
 apply is_angle_eucl_limit_div_2_pow in H1.
+(*
+progress unfold seq_angle_converging_to_angle_div_nat.
+rewrite Hθ'' in H1.
+eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+  intros i.
+(*
+  rewrite <- angle_div_pow_2_add_distr.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+*)
+  do 2 rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite Nat.mul_assoc.
+(*
+  rewrite (Nat.mul_comm _ n).
+  rewrite Nat.mul_assoc.
+*)
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | now rewrite <- Hθ'' ].
+(*
+Search ((_ * _) / ₂^_)%A.
 ...
-eapply is_angle_eucl_limit_eq_compat in H1; [ apply H1 | ].
+  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite (Nat.mul_comm n).
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+*)
+  reflexivity.
+}
+...
+*)
+(**)
+eapply (is_angle_eucl_limit_eq_compat 0 0) in H1; [ apply H1 | ].
 intros i.
+rewrite Nat.add_0_r.
 progress unfold seq_angle_converging_to_angle_div_nat.
 do 2 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
