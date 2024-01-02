@@ -4904,6 +4904,7 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
 }
 (**)
 apply is_angle_eucl_limit_div_2_pow in H1.
+...
 eapply is_angle_eucl_limit_eq_compat in H1; [ apply H1 | ].
 intros i.
 progress unfold seq_angle_converging_to_angle_div_nat.
