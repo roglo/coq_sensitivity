@@ -4893,7 +4893,6 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
-...
 apply (is_angle_eucl_limit_eq_compat j 0) with
     (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
   intros i.
@@ -4931,6 +4930,14 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
 }
 *)
 apply is_angle_eucl_limit_div_2_pow in H1.
+(**)
+intros ε Hε.
+specialize (H1 ε Hε).
+destruct H1 as (N, HN).
+exists N.
+intros m Hm.
+specialize (HN m Hm).
+...
 (*
 progress unfold seq_angle_converging_to_angle_div_nat.
 rewrite Hθ'' in H1.
@@ -4962,7 +4969,7 @@ Search ((_ * _) / ₂^_)%A.
 ...
 *)
 (**)
-progress unfold seq_angle_converging_to_angle_div_nat.
+...
 eapply (is_angle_eucl_limit_eq_compat 0 0) in H1; [ apply H1 | ].
 intros i.
 rewrite Nat.add_0_r.
