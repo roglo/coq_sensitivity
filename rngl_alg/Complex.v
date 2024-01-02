@@ -4922,6 +4922,7 @@ rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
   apply angle_mul_nat_overflow_pow_div.
 }
 ...
+(* faux : θ1=π/2 θ2=π a=4 *)
 Theorem angle_mul_cancel_l :
   ∀ a θ1 θ2, a ≠ 0 → (a * θ1)%A = (a * θ2)%A → θ1 = θ2.
 Proof.
@@ -4931,7 +4932,6 @@ intros * Haz H12.
 (**)
 apply angle_sub_move_0_r in H12.
 rewrite <- angle_mul_sub_distr_l in H12.
-(* faux : θ1=π/2 θ2=π a=4 *)
 ...
 Search (_ * _ = 0)%A.
 Search (_ * _ = 0)%L.
