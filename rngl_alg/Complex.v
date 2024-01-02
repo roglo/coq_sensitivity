@@ -4945,6 +4945,26 @@ Theorem toto :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * Hu.
+induction k. {
+  intros ε Hε.
+  exists 0.
+  intros n _.
+  progress unfold angle_eucl_dist.
+  cbn.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_l.
+  now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+}
+cbn.
+Search (is_angle_eucl_limit_when_tending_to_inf (λ _, (_ + _)%A)).
+Search (is_angle_eucl_limit_when_tending_to_inf _ (_ + _))%A.
+...
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hu.
 intros ε Hε.
 specialize (Hu ε Hε).
