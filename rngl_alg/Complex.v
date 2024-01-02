@@ -4937,6 +4937,34 @@ destruct H1 as (N, HN).
 exists N.
 intros i Hi.
 specialize (HN i Hi).
+Inspect 4.
+Theorem toto :
+  ∀ k u θ,
+  is_angle_eucl_limit_when_tending_to_inf u θ
+  → is_angle_eucl_limit_when_tending_to_inf (λ i, (k * u i)%A) (k * θ).
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hu.
+intros ε Hε.
+specialize (Hu ε Hε).
+destruct Hu as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+replace (u n) with (θ - (θ - u n))%A in HN |-*. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+rewrite angle_eucl_dist_sub_l_diag in HN.
+rewrite angle_mul_sub_distr_l.
+rewrite angle_eucl_dist_sub_l_diag.
+specialize angle_eucl_dist_triangular as H1.
+specialize (H1 (k * (θ - u n)))%A.
+specialize (H1 (θ - u n))%A.
+specialize (H1 0)%A.
+eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
 ...
 (*
 progress unfold seq_angle_converging_to_angle_div_nat.
