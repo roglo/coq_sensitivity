@@ -4896,6 +4896,133 @@ now apply angle_lim_add_add.
 Qed.
 
 (* to be completed
+Theorem angle_lim_mul_if :
+  ∀ k u θ,
+  k ≠ 0
+  → angle_lim (λ i, (k * u i)%A) (k * θ)
+  → angle_lim u θ.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * Hkz Hu.
+revert u θ Hu.
+induction k; intros; [ easy | clear Hkz ].
+destruct k. {
+  cbn in Hu.
+  rewrite angle_add_0_r in Hu.
+  eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
+    intros i; rewrite Nat.add_0_r.
+    apply angle_add_0_r.
+  }
+  easy.
+}
+specialize (IHk (Nat.neq_succ_0 _)).
+remember (S k) as sk; cbn in Hu; subst sk.
+eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
+  intros i; rewrite Nat.add_0_r.
+  reflexivity.
+}
+Search (angle_lim (λ _, (_ + _))%A).
+Theorem angle_lim_add_add_if :
+  ∀ u v θ1 θ2,
+  angle_lim u θ1
+  → angle_lim (λ i : nat, (u i + v i)%A) (θ1 + θ2)
+  → angle_lim v θ2.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * Hu Huv ε Hε.
+  rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hu Huv.
+intros ε Hε.
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (Hu _ Hε2).
+specialize (Huv _ Hε2).
+destruct Hu as (M, HM).
+destruct Huv as (N, HN).
+exists (max M N).
+intros n Hn.
+specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
+specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
+replace (u n) with (θ1 - (θ1 - u n))%A in HM. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+replace (u n + v n)%A with ((θ1 + θ2) - (θ1 + θ2 - (u n + v n)))%A in HN. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+replace (v n) with (θ2 - (θ2 - v n))%A. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+rewrite angle_eucl_dist_sub_l_diag in HM, HN |-*.
+specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
+rewrite (rngl_add_diag2 Hon) in Hεε2.
+rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε2.
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (θ1 - u n)).
+}
+apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+replace (θ2 - v n)%A with (θ1 - u n - (θ1 - u n - (θ2 - v n)))%A. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+rewrite angle_eucl_dist_sub_l_diag.
+(* ah chiasse *)
+...
+rewrite (angle_add_comm Hic).
+rewrite (angle_add_sub_assoc Hop).
+rewrite (angle_add_sub_swap Hic Hop).
+rewrite <- (angle_sub_sub_distr Hic Hop).
+rewrite angle_eucl_dist_sub_l_diag.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite (angle_opp_sub_distr Hic Hop).
+now rewrite angle_opp_0.
+...
+rewrite (angle_add_comm Hic) in Hu.
+eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
+  intros i; rewrite Nat.add_0_r.
+  apply (angle_add_comm Hic).
+}
+apply angle_lim_add_add_if in Hu; [ easy | ].
+...
+apply IHk.
+...
+induction k. {
+  intros ε Hε.
+  exists 0.
+  intros n _.
+  progress unfold angle_eucl_dist.
+  cbn.
+  do 2 rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_squ_0 Hos).
+  rewrite rngl_add_0_l.
+  now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+}
+cbn.
+now apply angle_lim_add_add.
+Qed.
+*)
+
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -4950,8 +5077,25 @@ assert (angle_mul_nat_overflow n θ = false). {
     rewrite Nat.add_comm.
     rewrite angle_div_pow_2_add_distr.
     rewrite angle_mul_2_pow_div_2_pow.
+    rewrite Nat.mul_comm.
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
     reflexivity.
   }
+Theorem glop :
+  ∀ n u θ,
+  angle_lim (λ i, (n * u i))%A θ
+  → angle_mul_nat_overflow n θ = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hu.
+revert u θ Hu.
+induction n; intros; [ easy | ].
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+Search (angle_lim (λ _, (_ * _))%A).
+Search (angle_lim (λ _, (_ + _))%A).
+... ...
+apply glop in H1.
 ...
 apply (angle_lim_eq_compat j 0) with
     (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
