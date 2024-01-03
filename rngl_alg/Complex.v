@@ -4935,6 +4935,23 @@ assert (angle_mul_nat_overflow n θ = false). {
   rewrite Hθ'' in H1 at 1.
   apply (angle_lim_mul (2 ^ j)) in H1.
   rewrite angle_mul_2_pow_div_2_pow in H1.
+  rewrite Hθ'' in H1.
+  eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite (angle_mul_nat_assoc Hon Hop).
+    rewrite Nat.mul_comm.
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
+    rewrite angle_div_2_pow_nat_mul; [ | easy | now rewrite <- Hθ'' ].
+    do 2 rewrite (angle_mul_nat_assoc Hon Hop).
+    rewrite Nat.mul_shuffle0.
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
+    rewrite <- angle_div_pow_2_add_distr.
+    rewrite Nat.add_comm.
+    rewrite angle_div_pow_2_add_distr.
+    rewrite angle_mul_2_pow_div_2_pow.
+    reflexivity.
+  }
 ...
 apply (angle_lim_eq_compat j 0) with
     (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
