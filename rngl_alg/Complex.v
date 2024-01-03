@@ -4795,34 +4795,6 @@ rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_lt_compat Hop Hor _ _ _ _ HN HN).
 Qed.
 
-Theorem angle_lim_div_2_pow :
-  ∀ f θ j,
-  angle_lim f (θ / ₂^j)
-  → angle_lim (λ i, (2 ^ j * f i)%A) θ.
-Proof.
-destruct_ac.
-intros * Hf.
-revert θ Hf.
-induction j; intros. {
-  cbn in Hf |-*.
-  eapply (angle_lim_eq_compat 0 0). {
-    intros i; symmetry.
-    rewrite Nat.add_0_r.
-    now apply angle_add_0_r.
-  }
-  easy.
-}
-rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
-apply IHj in Hf.
-apply angle_lim_div_2 in Hf.
-eapply (angle_lim_eq_compat 0 0); [ | apply Hf ].
-intros i; cbn.
-rewrite angle_add_0_r.
-do 2 rewrite Nat.add_0_r.
-symmetry.
-apply (angle_mul_add_distr_r Hon Hop).
-Qed.
-
 Theorem angle_div_pow_2_add_distr :
   ∀ i j θ, (θ / ₂^(i + j) = θ / ₂^i / ₂^j)%A.
 Proof.
@@ -4994,10 +4966,9 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
 }
 *)
-Check angle_lim_mul.
-About angle_lim.
+apply (angle_lim_mul (2 ^ j)) in H1.
+rewrite angle_mul_2_pow_div_2_pow in H1.
 ...
-apply angle_lim_div_2_pow in H1.
 (**)
 intros ε Hε.
 specialize (H1 ε Hε).
@@ -5199,7 +5170,8 @@ rewrite angle_mul_2_pow_div_2_pow.
 ...
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
-apply angle_lim_div_2_pow in H1.
+apply (angle_lim_mul (2 ^ j)) in H1.
+...
 rewrite Hθ'' in H1.
 destruct j; [ easy | clear Hjz ].
 destruct j; [ easy | clear Hj1 ].
