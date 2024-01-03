@@ -1571,7 +1571,7 @@ Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
 
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
-Definition is_angle_eucl_limit_when_tending_to_inf :=
+Definition angle_lim :=
   is_limit_when_tending_to_inf angle_eucl_dist.
 
 Theorem angle_le_refl :
@@ -4321,8 +4321,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
   ∀ n θ,
   n ≠ 0
   → angle_mul_nat_overflow n θ = false
-  → is_angle_eucl_limit_when_tending_to_inf
-      (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+  → angle_lim (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
 intros Har Hch.
@@ -4343,10 +4342,8 @@ intros * Hnz Haov.
 clear Haov.
 *)
 progress unfold seq_angle_converging_to_angle_div_nat.
-enough (H :
-  is_angle_eucl_limit_when_tending_to_inf
-    (λ i, (2 ^ i mod n * angle_div_2_pow_nat θ i))%A 0%A). {
-  progress unfold is_angle_eucl_limit_when_tending_to_inf.
+enough (H : angle_lim (λ i, (2 ^ i mod n * angle_div_2_pow_nat θ i))%A 0%A). {
+  progress unfold angle_lim.
   progress unfold is_limit_when_tending_to_inf.
   intros ε Hε.
 (*
@@ -4401,9 +4398,7 @@ rename θ into θ'.
   rewrite angle_eucl_dist_sub_l_diag.
   now apply HN.
 }
-enough (H :
-  is_angle_eucl_limit_when_tending_to_inf
-    (λ i, (n * angle_div_2_pow_nat θ i))%A 0%A). {
+enough (H : angle_lim (λ i, (n * angle_div_2_pow_nat θ i))%A 0%A). {
   intros ε Hε.
   specialize (H ε Hε).
   destruct H as (N, HN).
@@ -4670,11 +4665,11 @@ rewrite IHn.
 now do 2 rewrite (angle_mul_nat_assoc Hon Hop).
 Qed.
 
-Theorem is_angle_eucl_limit_eq_compat :
+Theorem angle_lim_eq_compat :
   ∀ a b f g θ,
   (∀ i, f (i + a) = g (i + b))
-  → is_angle_eucl_limit_when_tending_to_inf f θ
-  → is_angle_eucl_limit_when_tending_to_inf g θ.
+  → angle_lim f θ
+  → angle_lim g θ.
 Proof.
 intros * Hfg Hf.
 intros ε Hε.
@@ -4688,24 +4683,6 @@ specialize (HN H).
 rewrite Hfg in HN.
 rewrite Nat.sub_add in HN; [ easy | flia Hn ].
 Qed.
-
-(*
-Theorem is_angle_eucl_limit_eq_compat :
-  ∀ f g θ,
-  (∀ i, f i = g i)
-  → is_angle_eucl_limit_when_tending_to_inf f θ
-  → is_angle_eucl_limit_when_tending_to_inf g θ.
-Proof.
-intros * Hfg Hf.
-intros ε Hε.
-specialize (Hf ε Hε).
-destruct Hf as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-now rewrite Hfg in HN.
-Qed.
-*)
 
 Theorem rngl_cos_div_2 :
   ∀ θ,
@@ -4756,10 +4733,10 @@ cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem is_angle_eucl_limit_div_2 :
+Theorem angle_lim_div_2 :
   ∀ f θ,
-  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂)
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 * f i)%A) θ.
+  angle_lim f (θ / ₂)
+  → angle_lim (λ i, (2 * f i)%A) θ.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -4818,17 +4795,17 @@ rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_lt_compat Hop Hor _ _ _ _ HN HN).
 Qed.
 
-Theorem is_angle_eucl_limit_div_2_pow :
+Theorem angle_lim_div_2_pow :
   ∀ f θ j,
-  is_angle_eucl_limit_when_tending_to_inf f (θ / ₂^j)
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (2 ^ j * f i)%A) θ.
+  angle_lim f (θ / ₂^j)
+  → angle_lim (λ i, (2 ^ j * f i)%A) θ.
 Proof.
 destruct_ac.
 intros * Hf.
 revert θ Hf.
 induction j; intros. {
   cbn in Hf |-*.
-  eapply (is_angle_eucl_limit_eq_compat 0 0). {
+  eapply (angle_lim_eq_compat 0 0). {
     intros i; symmetry.
     rewrite Nat.add_0_r.
     now apply angle_add_0_r.
@@ -4837,8 +4814,8 @@ induction j; intros. {
 }
 rewrite angle_div_2_pow_nat_succ_r_2 in Hf.
 apply IHj in Hf.
-apply is_angle_eucl_limit_div_2 in Hf.
-eapply (is_angle_eucl_limit_eq_compat 0 0); [ | apply Hf ].
+apply angle_lim_div_2 in Hf.
+eapply (angle_lim_eq_compat 0 0); [ | apply Hf ].
 intros i; cbn.
 rewrite angle_add_0_r.
 do 2 rewrite Nat.add_0_r.
@@ -4857,11 +4834,11 @@ do 2 rewrite angle_div_2_pow_nat_succ_r_2.
 apply IHi.
 Qed.
 
-Theorem is_angle_eucl_limit_add_add :
+Theorem angle_lim_add_add :
   ∀ u v θ1 θ2,
-  is_angle_eucl_limit_when_tending_to_inf u θ1
-  → is_angle_eucl_limit_when_tending_to_inf v θ2
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (u i + v i))%A (θ1 + θ2).
+  angle_lim u θ1
+  → angle_lim v θ2
+  → angle_lim (λ i, (u i + v i))%A (θ1 + θ2).
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -4921,10 +4898,10 @@ rewrite (angle_opp_sub_distr Hic Hop).
 now rewrite angle_opp_0.
 Qed.
 
-Theorem is_angle_eucl_limit_mul :
+Theorem angle_lim_mul :
   ∀ k u θ,
-  is_angle_eucl_limit_when_tending_to_inf u θ
-  → is_angle_eucl_limit_when_tending_to_inf (λ i, (k * u i)%A) (k * θ).
+  angle_lim u θ
+  → angle_lim (λ i, (k * u i)%A) (k * θ).
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -4943,7 +4920,7 @@ induction k. {
   now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
 }
 cbn.
-now apply is_angle_eucl_limit_add_add.
+now apply angle_lim_add_add.
 Qed.
 
 (* to be completed
@@ -4952,8 +4929,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_characteristic T = 0 →
   ∀ n θ,
   n ≠ 0
-  → is_angle_eucl_limit_when_tending_to_inf
-      (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+  → angle_lim (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -4982,7 +4958,7 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
-apply (is_angle_eucl_limit_eq_compat j 0) with
+apply (angle_lim_eq_compat j 0) with
     (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
   intros i.
   rewrite Nat.add_0_r.
@@ -5005,7 +4981,7 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   cbn.
   rewrite angle_add_0_r.
   progress unfold seq_angle_converging_to_angle_div_nat.
-  eapply (is_angle_eucl_limit_eq_compat 0 0). {
+  eapply (angle_lim_eq_compat 0 0). {
     intros i.
     rewrite Nat.div_1_r.
     rewrite Nat.add_0_r.
@@ -5018,9 +4994,10 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
   now rewrite (proj2 (angle_eucl_dist_separation θ θ) eq_refl).
 }
 *)
-Check is_angle_eucl_limit_mul.
+Check angle_lim_mul.
+About angle_lim.
 ...
-apply is_angle_eucl_limit_div_2_pow in H1.
+apply angle_lim_div_2_pow in H1.
 (**)
 intros ε Hε.
 specialize (H1 ε Hε).
@@ -5055,7 +5032,7 @@ eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
 (*
 progress unfold seq_angle_converging_to_angle_div_nat.
 rewrite Hθ'' in H1.
-eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+eapply angle_lim_eq_compat in H1. 2: {
   intros i.
 (*
   rewrite <- angle_div_pow_2_add_distr.
@@ -5084,7 +5061,7 @@ Search ((_ * _) / ₂^_)%A.
 *)
 (**)
 ...
-eapply (is_angle_eucl_limit_eq_compat 0 0) in H1; [ apply H1 | ].
+eapply (angle_lim_eq_compat 0 0) in H1; [ apply H1 | ].
 intros i.
 rewrite Nat.add_0_r.
 do 2 rewrite (angle_mul_nat_assoc Hon Hop).
@@ -5222,7 +5199,7 @@ rewrite angle_mul_2_pow_div_2_pow.
 ...
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2 in H1.
-apply is_angle_eucl_limit_div_2_pow in H1.
+apply angle_lim_div_2_pow in H1.
 rewrite Hθ'' in H1.
 destruct j; [ easy | clear Hjz ].
 destruct j; [ easy | clear Hj1 ].
@@ -5230,9 +5207,9 @@ do 2 rewrite Nat.sub_succ in H1.
 rewrite Nat.sub_0_r in H1.
 Inspect 2.
 ...
-apply is_angle_eucl_limit_div_pow_2 in H1.
+apply angle_lim_div_pow_2 in H1.
 (*
-eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+eapply angle_lim_eq_compat in H1. 2: {
   intros i.
   rewrite (angle_mul_nat_assoc Hon Hop).
   rewrite Nat.mul_comm.
@@ -5250,9 +5227,9 @@ eapply is_angle_eucl_limit_eq_compat in H1. 2: {
   reflexivity.
 }
 *)
-apply is_angle_eucl_limit_div_2 in H1.
-apply is_angle_eucl_limit_div_2 in H1.
-eapply is_angle_eucl_limit_eq_compat in H1. 2: {
+apply angle_lim_div_2 in H1.
+apply angle_lim_div_2 in H1.
+eapply angle_lim_eq_compat in H1. 2: {
   intros i.
   do 3 rewrite (angle_mul_nat_assoc Hon Hop).
   rewrite <- (Nat.mul_assoc 2).
@@ -5291,17 +5268,17 @@ Inspect 2.
   reflexivity.
 }
 ...
-  H1 : is_angle_eucl_limit_when_tending_to_inf (λ i : nat, (2 ^ i / n * (n * (θ / ₂^i)))%A) θ
+  H1 : angle_lim (λ i : nat, (2 ^ i / n * (n * (θ / ₂^i)))%A) θ
   ============================
-  is_angle_eucl_limit_when_tending_to_inf (λ i : nat, (2 ^ i / n * ((n * θ) / ₂^i))%A) θ
+  angle_lim (λ i : nat, (2 ^ i / n * ((n * θ) / ₂^i))%A) θ
 ...
-Search (is_angle_eucl_limit_when_tending_to_inf _ (_ / ₂)).
+Search (angle_lim _ (_ / ₂)).
 Search (_ / ₂^(_ + _))%A.
 Search (_ / ₂^_ / ₂^_)%A.
 Check angle_div_pow_2_add_distr.
 ...
 rewrite Hθ'' in H1.
-apply is_angle_eucl_limit_glop in H1.
+apply angle_lim_glop in H1.
 rewrite <- Hθ'' in H1.
 ...
 specialize (H1 (ε / 2 ^ j))%L.
@@ -6033,7 +6010,7 @@ Search (2 ^ Nat.log2 _).
 specialize (Nat.log2_spec_alt n) as H2.
 apply angle_mul_nat_overflow_mul_2_div_2.
 ...
-progress unfold is_angle_eucl_limit_when_tending_to_inf.
+progress unfold angle_lim.
 progress unfold is_limit_when_tending_to_inf.
 int
 progress unfold seq_angle_converging_to_angle_div_nat.
@@ -6164,7 +6141,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_characteristic T = 0 →
   ∀ n θ θ',
   n ≠ 0
-  → is_angle_eucl_limit_when_tending_to_inf
+  → angle_lim
        (seq_angle_converging_to_angle_div_nat θ n) θ'
   → θ = (n * θ')%A.
 Proof.
@@ -6197,7 +6174,7 @@ destruct ao. {
 ...
 Theorem glop :
   ∀ n θ u,
-  is_angle_eucl_limit_when_tending_to_inf u θ
+  angle_lim u θ
   → (∀ i, angle_mul_nat_overflow n (u i) = false)
   → angle_mul_nat_overflow n θ = false.
 Proof.
@@ -6212,7 +6189,7 @@ split. {
   specialize (Hov i).
   now apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hov.
 }
-progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 ... ...
 apply (glop n) in Hlim; [ easy | ].
@@ -6323,13 +6300,13 @@ Search ((_ + _) / _).
     rewrite Bool.orb_false_r.
     clear IHn.
     progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-    progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+    progress unfold angle_lim in Hlim.
     progress unfold is_limit_when_tending_to_inf in Hlim.
 ...
   rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
 ...
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim.
+  progress unfold angle_lim in Hlim.
   progress unfold is_limit_when_tending_to_inf in Hlim.
 *)
   admit.
@@ -6346,9 +6323,9 @@ Search ((_ + _) / _).
 ...
   assert
       (H :
-       is_angle_eucl_limit_when_tending_to_inf (λ i, (n * (θi i))%A) θ'). {
-    progress unfold is_angle_eucl_limit_when_tending_to_inf in Hlim'.
-    progress unfold is_angle_eucl_limit_when_tending_to_inf.
+       angle_lim (λ i, (n * (θi i))%A) θ'). {
+    progress unfold angle_lim in Hlim'.
+    progress unfold angle_lim.
     progress unfold is_limit_when_tending_to_inf in Hlim'.
     progress unfold is_limit_when_tending_to_inf.
     intros ε Hε.
