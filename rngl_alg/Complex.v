@@ -4930,6 +4930,12 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
+(**)
+assert (angle_mul_nat_overflow n θ = false). {
+  rewrite Hθ'' in H1 at 1.
+  apply (angle_lim_mul (2 ^ j)) in H1.
+  rewrite angle_mul_2_pow_div_2_pow in H1.
+...
 apply (angle_lim_eq_compat j 0) with
     (g := λ i, (n * (2 ^ (i + j) / n * (θ'' / ₂^(i + j))))%A) in H1. 2: {
   intros i.
