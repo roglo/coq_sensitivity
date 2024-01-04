@@ -5025,6 +5025,12 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   reflexivity.
 }
+(*
+  Htj : angle_mul_nat_overflow n θ'' = false
+  H1 : angle_lim (λ i : nat, (2 ^ i / n * (n * (θ' / ₂^i)))%A) θ'
+  ============================
+  angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
+*)
 ...
 (**)
 assert (angle_mul_nat_overflow n θ = false). {
