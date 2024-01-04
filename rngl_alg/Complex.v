@@ -4969,7 +4969,7 @@ cbn.
 now apply angle_lim_add_add.
 Qed.
 
-(* to be completed
+(* suspect
 Theorem angle_lim_mul_if :
   ∀ k u θ,
   k ≠ 0
