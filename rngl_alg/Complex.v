@@ -4969,123 +4969,6 @@ cbn.
 now apply angle_lim_add_add.
 Qed.
 
-(* suspect
-Theorem angle_lim_mul_if :
-  ∀ k u θ,
-  k ≠ 0
-  → angle_lim (λ i, (k * u i)%A) (k * θ)
-  → angle_lim u θ.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-intros * Hkz Hu.
-revert u θ Hu.
-induction k; intros; [ easy | clear Hkz ].
-destruct k. {
-  cbn in Hu.
-  rewrite angle_add_0_r in Hu.
-  eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
-    intros i; rewrite Nat.add_0_r.
-    apply angle_add_0_r.
-  }
-  easy.
-}
-specialize (IHk (Nat.neq_succ_0 _)).
-remember (S k) as sk; cbn in Hu; subst sk.
-eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
-  intros i; rewrite Nat.add_0_r.
-  reflexivity.
-}
-(**)
-destruct k. {
-  rewrite (angle_mul_nat_1_l Hon Hos) in Hu.
-  eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
-    intros i.
-    rewrite Nat.add_0_r.
-    rewrite (angle_mul_nat_1_l Hon Hos).
-    reflexivity.
-  }
-Theorem angle_lim_add_diag :
-  ∀ u θ,
-  angle_lim (λ i, (u i + u i)%A) (θ + θ)
-  → angle_lim u θ.
-Proof.
-intros * Hu.
-(* faux : θ=π u=0 *)
-...
-  apply angle_lim_add_add_if in Hu. {
-    eapply (angle_lim_eq_compat 0 0) in Hu; [ apply Hu | ].
-    intros i.
-    rewrite Nat.add_0_r.
-    apply (angle_mul_nat_1_l Hon Hos).
-  }
-  apply angle_lim_add_add_if in Hu. {
-    eapply (angle_lim_eq_compat 0 0) in Hu; [ apply Hu | ].
-    intros i.
-    rewrite Nat.add_0_r.
-    apply (angle_mul_nat_1_l Hon Hos).
-  }
-...
-(*
-specialize angle_lim_add_add_if as H1.
-specialize (H1 u (λ i, S k * u i))%A.
-remember (S k) as sk; cbn in H1; subst sk.
-specialize (H1 θ (S k * θ))%A.
-apply H1 in Hu.
-...
-*)
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  now apply IHk.
-}
-...
-apply IHk.
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  easy.
-}
-apply IHk.
-apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
-  easy.
-}
-(* ouais bin non hein *)
-...
-2: {
-apply angle_lim_add_add_if in Hu; [ easy | ].
-...
-apply IHk.
-...
-induction k. {
-  intros ε Hε.
-  exists 0.
-  intros n _.
-  progress unfold angle_eucl_dist.
-  cbn.
-  do 2 rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_squ_0 Hos).
-  rewrite rngl_add_0_l.
-  now rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-}
-cbn.
-now apply angle_lim_add_add.
-Qed.
-*)
-
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5139,7 +5022,6 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
   rewrite angle_mul_2_pow_div_2_pow.
-  rewrite Nat.mul_comm.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   reflexivity.
 }
