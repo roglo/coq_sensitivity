@@ -5032,6 +5032,46 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
 *)
 ...
+eapply (angle_lim_eq_compat j 0) in H1. 2: {
+  intros i; rewrite Nat.add_0_r.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
+    now rewrite <- Hθ''.
+  }
+  rewrite Nat.add_comm.
+  rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
+    intros H.
+    apply Nat.div_small_iff in H; [ | easy ].
+...
+  rewrite <- angle_div_2_pow_nat_mul; [ | admit | admit ].
+  rewrite <- angle_div_2_pow_nat_mul; [ | admit | admit ].
+  easy.
+}
+apply (angle_lim_eq_compat 0 j (λ i, 2 ^ (i + j) / n * ((n * θ') / ₂^j) / ₂^i)%A). {
+  intros i; rewrite Nat.add_0_r.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+  rewrite angle_div_2_pow_nat_mul; [ | admit | ]. 2: {
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+...
+  rewrite angle_div_2_pow_nat_mul; [ | admit | admit ].
+  easy.
+}
+...
+eapply (angle_lim_eq_compat 0 j). {
+  intros i; rewrite Nat.add_0_r.
+  symmetry.
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+remember ((n * θ') / ₂^j)%A as θ.
+Search (_ * (_ / ₂^_))%A.
+  rewrite <- angle_div_2_pow_nat_mul; [ | admit | admit ].
+  rewrite Nat.add_comm.
+
+  rewrite angle_div_2_pow_nat_mul; [ | admit | admit ].
+}
+...
 (**)
 assert (angle_mul_nat_overflow n θ = false). {
   rewrite Hθ'' in H1 at 1.
