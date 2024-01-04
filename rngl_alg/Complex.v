@@ -5043,17 +5043,31 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
   rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
     intros H.
     apply Nat.div_small_iff in H; [ | easy ].
+    apply Nat.nle_gt in H.
+    apply H; clear H.
+    eapply le_trans; [ apply Nat.lt_le_incl, Hjn | ].
+    rewrite Nat.pow_add_r.
+    rewrite Nat.mul_comm.
+    apply Nat_mul_le_pos_r.
+    apply Nat.le_succ_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  } {
+    rewrite <- Hθ''.
 ...
-  rewrite <- angle_div_2_pow_nat_mul; [ | admit | admit ].
-  rewrite <- angle_div_2_pow_nat_mul; [ | admit | admit ].
+  rewrite (angle_mul_nat_assoc Hon Hop).
   easy.
 }
-apply (angle_lim_eq_compat 0 j (λ i, 2 ^ (i + j) / n * ((n * θ') / ₂^j) / ₂^i)%A). {
+...
+apply (angle_lim_eq_compat 0 j (λ i, 2 ^ (i + j) / n * n * (θ' / ₂^j) / ₂^i)%A). {
   intros i; rewrite Nat.add_0_r.
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
+(*
   rewrite angle_div_2_pow_nat_mul; [ | admit | ]. 2: {
 Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+...
+*)
 ...
   rewrite angle_div_2_pow_nat_mul; [ | admit | admit ].
   easy.
