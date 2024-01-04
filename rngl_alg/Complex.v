@@ -4998,6 +4998,36 @@ eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
   intros i; rewrite Nat.add_0_r.
   reflexivity.
 }
+(**)
+destruct k. {
+  rewrite (angle_mul_nat_1_l Hon Hos) in Hu.
+  eapply (angle_lim_eq_compat 0 0) in Hu. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite (angle_mul_nat_1_l Hon Hos).
+    reflexivity.
+  }
+Theorem angle_lim_add_diag :
+  ∀ u θ,
+  angle_lim (λ i, (u i + u i)%A) (θ + θ)
+  → angle_lim u θ.
+Proof.
+intros * Hu.
+(* faux : θ=π u=0 *)
+...
+  apply angle_lim_add_add_if in Hu. {
+    eapply (angle_lim_eq_compat 0 0) in Hu; [ apply Hu | ].
+    intros i.
+    rewrite Nat.add_0_r.
+    apply (angle_mul_nat_1_l Hon Hos).
+  }
+  apply angle_lim_add_add_if in Hu. {
+    eapply (angle_lim_eq_compat 0 0) in Hu; [ apply Hu | ].
+    intros i.
+    rewrite Nat.add_0_r.
+    apply (angle_mul_nat_1_l Hon Hos).
+  }
+...
 (*
 specialize angle_lim_add_add_if as H1.
 specialize (H1 u (λ i, S k * u i))%A.
@@ -5009,11 +5039,30 @@ apply H1 in Hu.
 apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
   now apply IHk.
 }
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  now apply IHk.
+}
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  now apply IHk.
+}
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  now apply IHk.
+}
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  now apply IHk.
+}
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  now apply IHk.
+}
+...
 apply IHk.
 apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
   easy.
 }
 apply IHk.
+apply (angle_lim_add_add_if _ _ θ (S k * θ))%A in Hu. {
+  easy.
+}
 (* ouais bin non hein *)
 ...
 2: {
@@ -5072,6 +5121,7 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H1.
 specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
+...
 (**)
 assert (angle_mul_nat_overflow n θ = false). {
   rewrite Hθ'' in H1 at 1.
@@ -5096,6 +5146,8 @@ assert (angle_mul_nat_overflow n θ = false). {
     rewrite <- (angle_mul_nat_assoc Hon Hop).
     reflexivity.
   }
+...
+(* suspect *)
 Theorem glop :
   ∀ n u θ,
   angle_lim (λ i, (n * u i))%A θ
