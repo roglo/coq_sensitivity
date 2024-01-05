@@ -5093,6 +5093,7 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
     admit.
   }
 Search (_ * (_ / ₂^_))%A.
+(* contre-exemple : m=2 n=2 θ=π *)
 Theorem angle_div_2_pow_nat_mul' :
   ∀ n m θ,
   m < 2 ^ n
