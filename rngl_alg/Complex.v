@@ -5068,6 +5068,39 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   ============================
   angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
 *)
+(**)
+eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+  intros i; rewrite Nat.add_0_r.
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  easy.
+}
+Search (angle_lim (λ _, (_ * _))%A).
+Theorem glop :
+  ∀ n u θ,
+  angle_lim (λ i, (n * u i)%A) θ
+  → ∃ θ', angle_lim u θ' ∧ (n * θ' = θ)%A.
+Proof.
+intros * Hθ.
+revert u θ Hθ.
+induction n; intros; cbn. {
+  cbn in Hθ.
+Theorem glop :
+  ∀ θ1 θ2, angle_lim (λ _, θ1) θ2 → θ2 = θ1.
+... ...
+  apply glop in Hθ.
+  subst θ.
+...
+Search (angle_lim (λ _, _)).
+progress unfold angle_lim in Hθ.
+Search (is_limit_when_tending_to_inf _ (λ _, _)).
+...
+specialize (glop n (λ i, (2 ^ i / n * (θ' / ₂^i))))%A as H2.
+cbn in H2.
+specialize (H2 θ' H1).
+destruct H2 as (θ & Hθ & Hθθ).
+...
 eapply (angle_lim_eq_compat j 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r.
   rewrite Nat.add_comm.
@@ -5090,7 +5123,7 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
     now apply Nat.pow_nonzero.
   } {
     rewrite <- Hθ''.
-    admit.
+...
   }
 Search (_ * (_ / ₂^_))%A.
 (* contre-exemple : m=2 n=2 θ=π *)
