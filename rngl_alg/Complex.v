@@ -5123,12 +5123,15 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   easy.
 }
+...
 Search (angle_lim (λ _, (_ * _))%A).
 Theorem glop :
   ∀ n u θ,
   angle_lim (λ i, (n * u i)%A) θ
   → ∃ θ', (n * θ' = θ)%A.
 Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hθ.
 revert u θ Hθ.
 induction n; intros; cbn. {
@@ -5137,6 +5140,31 @@ induction n; intros; cbn. {
   now exists 0%A.
 }
 cbn in Hθ.
+destruct n. {
+  exists θ.
+  rewrite angle_mul_0_l.
+  apply angle_add_0_r.
+}
+destruct n. {
+  exists (θ / ₂)%A.
+  rewrite (angle_mul_nat_1_l Hon Hos).
+  apply angle_add_div_2_diag.
+}
+destruct n. {
+...
+eapply angle_lim_add_add_if with (v := λ i, (- u i)%A) in Hθ. 2: {
+  eapply (angle_lim_eq_compat 0 0). {
+    intros i; rewrite Nat.add_0_r; symmetry.
+    rewrite (angle_add_add_swap Hic Hop).
+    rewrite angle_add_opp_r.
+    rewrite angle_sub_diag.
+    rewrite (angle_add_0_l Hon Hos).
+    reflexivity.
+  }
+...
+Search (angle_lim (λ _, (_ + _)))%A.
+Search (angle_lim (λ _, (_ * _)))%A.
+...
 ... ...
 Check angle_lim_const.
 Show.
