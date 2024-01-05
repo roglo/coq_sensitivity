@@ -4969,6 +4969,14 @@ cbn.
 now apply angle_lim_add_add.
 Qed.
 
+Theorem angle_0_div_2_pow : ∀ n, (0 / ₂^n = 0)%A.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn.
+apply angle_0_div_2.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5005,7 +5013,7 @@ specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
 rename θ into θ'.
-(**)
+(*
 eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   intros i.
   rewrite Nat.add_0_r.
@@ -5033,6 +5041,7 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
 rewrite Hθ'' in H1.
 rewrite angle_mul_2_pow_div_2_pow in H1.
 ...
+*)
 apply (angle_lim_mul (2 ^ j)) in H1.
 rewrite Hθ'' in H1.
 rewrite angle_mul_2_pow_div_2_pow in H1.
@@ -5059,7 +5068,6 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   ============================
   angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
 *)
-...
 eapply (angle_lim_eq_compat j 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r.
   rewrite Nat.add_comm.
@@ -5082,6 +5090,44 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
     now apply Nat.pow_nonzero.
   } {
     rewrite <- Hθ''.
+    admit.
+  }
+Search (_ * (_ / ₂^_))%A.
+Theorem angle_div_2_pow_nat_mul' :
+  ∀ n m θ,
+  m < 2 ^ n
+  → ((m * θ) / ₂^n = m * (θ / ₂^n))%A.
+Proof.
+intros * Hmn.
+revert n Hmn.
+induction m; intros. {
+  cbn.
+  apply angle_0_div_2_pow.
+}
+cbn.
+rewrite <- IHm; [ | flia Hmn ].
+...
+Search ((_ + _) / ₂^_)%A.
+apply angle_div_2_pow_nat_add.
+Check angle_div_2_pow_nat_mul.
+...
+cbn in Haov.
+destruct m. {
+  cbn.
+  rewrite angle_add_0_r.
+  symmetry; apply angle_add_0_r.
+}
+specialize (IHm (Nat.neq_succ_0 _)).
+apply Bool.orb_false_iff in Haov.
+rewrite angle_div_2_pow_nat_add; [ | easy ].
+f_equal.
+now apply IHm.
+Qed.
+...
+rewrite <- angle_div_2_pow_nat_mul'; [ | easy ].
+...
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | ].
+}
 ...
   rewrite (angle_mul_nat_assoc Hon Hop).
   easy.
