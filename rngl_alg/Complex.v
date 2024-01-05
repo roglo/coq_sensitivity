@@ -4977,6 +4977,53 @@ rewrite IHn.
 apply angle_0_div_2.
 Qed.
 
+Theorem angle_eucl_dist_nonneg : ∀ θ1 θ2, (0 ≤ angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+apply rl_sqrt_nonneg.
+apply (rngl_add_squ_nonneg Hop Hor).
+Qed.
+
+Theorem angle_lim_const :
+  ∀ θ1 θ2, angle_lim (λ _, θ1) θ2 → θ2 = θ1.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite (H1 θ1); apply H1.
+}
+intros * H1.
+progress unfold angle_lim in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+apply angle_eucl_dist_separation.
+rewrite (angle_eucl_dist_symmetry Hic Hop).
+specialize (angle_eucl_dist_nonneg θ1 θ2) as Hzx.
+remember (angle_eucl_dist θ1 θ2) as x eqn:Hx.
+clear θ1 θ2 Hx.
+specialize (proj1 (rngl_lt_eq_cases Hor _ x) Hzx) as H3.
+destruct H3 as [H3| H3]; [ | easy ].
+clear Hzx; exfalso.
+specialize (H1 (x / 2)%L).
+assert (H : (0 < x / 2)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+specialize (H1 H); clear H.
+destruct H1 as (N, HN).
+specialize (HN N (Nat.le_refl _)).
+apply (rngl_nle_gt Hor) in HN.
+apply HN; clear HN.
+apply (rngl_le_div_l Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+rewrite <- (rngl_add_diag2 Hon).
+apply (rngl_le_add_l Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5080,14 +5127,83 @@ Search (angle_lim (λ _, (_ * _))%A).
 Theorem glop :
   ∀ n u θ,
   angle_lim (λ i, (n * u i)%A) θ
+  → ∃ θ', (n * θ' = θ)%A.
+Proof.
+intros * Hθ.
+revert u θ Hθ.
+induction n; intros; cbn. {
+  cbn in Hθ.
+  apply angle_lim_const in Hθ.
+  now exists 0%A.
+}
+cbn in Hθ.
+... ...
+Check angle_lim_const.
+Show.
+Search (_ * 2)%L.
+...
+Search (_ / _ ≤ _)%L.
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_is_ordered T = true → ∀ a b : T, (a ≤ b)%L ↔ (a < b)%L ∨ a = b
+
+destruct (rngl_lt_dec Hor x 0) as [H2| H2]. {
+  subst x.
+  exfalso.
+  apply (rngl_nle_gt Hor) in H2.
+  apply H2; clear H2.
+Check angle_eucl_dist_nonneg.
+...
+  progress unfold angle_eucl_dist.
+  app
+...
+clear θ1 θ2 Hx.
+...
+destruct_ac.
+intros * H1.
+apply eq_angle_eq.
+f_equal. {
+  progress unfold angle_lim in H1.
+  progress unfold is_limit_when_tending_to_inf in H1.
+  destruct (rngl_lt_dec Hor (angle_eucl_dist θ1 θ2) 0) as [H2| H2]. {
+Search angle_eucl_dist.
+...
+  symmetry in Hd.
+Search (_ < _)%L.
+...
+rngl_lt_eq_cases:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_is_ordered T = true → ∀ a b : T, (a ≤ b)%L ↔ (a < b)%L ∨ a = b
+rngl_lt_iff:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_is_ordered T = true → ∀ a b : T, (a < b)%L ↔ (a ≤ b)%L ∧ a ≠ b
+...
+  progress unfold angle_eucl_dist in H1.
+...
+intros * H1.
+remember (θ2 <? θ1)%A as tt eqn:Htt.
+symmetry in Htt.
+destruct tt. {
+  apply angle_lt_iff in Htt.
+  destruct Htt as (Hte, Htn).
+...
+remember (θ2 =? θ1)%A as tt eqn:Htt.
+symmetry in Htt.
+destruct tt. {
+...
+progress unfold angle_lim in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+
+angle_lt_iff: ∀ θ1 θ2 : angle T, (θ1 < θ2)%A ↔ (θ1 ≤ θ2)%A ∧ θ1 ≠ θ2
+...
+Theorem glop :
+  ∀ n u θ,
+  angle_lim (λ i, (n * u i)%A) θ
   → ∃ θ', angle_lim u θ' ∧ (n * θ' = θ)%A.
 Proof.
 intros * Hθ.
 revert u θ Hθ.
 induction n; intros; cbn. {
   cbn in Hθ.
-Theorem glop :
-  ∀ θ1 θ2, angle_lim (λ _, θ1) θ2 → θ2 = θ1.
 ... ...
   apply glop in Hθ.
   subst θ.
