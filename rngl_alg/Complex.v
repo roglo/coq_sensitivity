@@ -5005,6 +5005,34 @@ specialize (H1 Har Hch _ _ Hnz Htj)%A.
 progress unfold seq_angle_converging_to_angle_div_nat in H1.
 progress unfold seq_angle_converging_to_angle_div_nat.
 rename θ into θ'.
+(**)
+eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+  intros i.
+  rewrite Nat.add_0_r.
+  rewrite angle_div_2_pow_nat_mul; [ | easy | easy ].
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  easy.
+}
+apply (angle_lim_mul (2 ^ j)) in H1.
+rewrite Hθ'' in H1 at 1.
+rewrite angle_mul_2_pow_div_2_pow in H1.
+eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+  intros i.
+  rewrite Nat.add_0_r.
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite <- angle_div_2_pow_nat_mul; cycle 1. {
+    now apply Nat.pow_nonzero.
+  } {
+    rewrite Hθ''.
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  reflexivity.
+}
+rewrite Hθ'' in H1.
+rewrite angle_mul_2_pow_div_2_pow in H1.
+...
 apply (angle_lim_mul (2 ^ j)) in H1.
 rewrite Hθ'' in H1.
 rewrite angle_mul_2_pow_div_2_pow in H1.
