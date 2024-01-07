@@ -5116,7 +5116,6 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
 *)
 (*
-...
 eapply (angle_lim_eq_compat j 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r.
   rewrite Nat.add_comm.
@@ -5125,13 +5124,20 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
   rewrite Nat.add_comm.
   easy.
 }
-...
 *)
+eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+  intros i; rewrite Nat.add_0_r.
+  rewrite (angle_mul_nat_assoc Hon Hop).
+  rewrite Nat.mul_comm.
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  easy.
+}
 eapply (angle_lim_eq_compat 0 j). {
   intros i; rewrite Nat.add_0_r; symmetry.
   easy.
 }
 ...
+(*
 eapply (angle_lim_eq_compat j 0). {
   intros i; rewrite Nat.add_0_r.
   symmetry.
@@ -5160,14 +5166,6 @@ eapply (angle_lim_eq_compat 0 j). {
 }
 ...
 *)
-eapply (angle_lim_eq_compat 0 0) in H1. 2: {
-  intros i; rewrite Nat.add_0_r.
-  rewrite (angle_mul_nat_assoc Hon Hop).
-  rewrite Nat.mul_comm.
-  rewrite <- (angle_mul_nat_assoc Hon Hop).
-  easy.
-}
-...
 Theorem glop :
   ∀ n u θ,
   angle_lim (λ i, (n * u i)%A) θ
