@@ -5038,6 +5038,12 @@ apply (rngl_le_add_l Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
+Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
+Proof.
+intros.
+now apply angle_eucl_dist_separation.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5140,6 +5146,7 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
   easy.
 }
 *)
+(*
 eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r.
   rewrite (angle_mul_nat_assoc Hon Hop).
@@ -5147,6 +5154,7 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   easy.
 }
+*)
 intros ε Hε.
 assert (Hε2 : (0 < ε / 2)%L). {
   apply (rngl_lt_div_r Hon Hop Hiv Hor).
@@ -5158,7 +5166,7 @@ destruct H1 as (N, HN).
 exists N. (* pour voir *)
 intros m Hm.
 specialize (HN m Hm).
-remember (n * (2 ^ m / n * (θ' / ₂^m)))%A as θ.
+remember (2 ^ m / n * (n * (θ' / ₂^m)))%A as θ.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
 }
@@ -5170,6 +5178,27 @@ rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
 rewrite Hεε2; clear Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
+eapply (rngl_le_lt_trans Hor).
+Theorem angle_eucl_list_mul_le_mono_l :
+  ∀ n θ1 θ2,
+  (angle_eucl_dist (n * θ1) (n * θ2) ≤
+     rngl_of_nat n * angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+revert θ1 θ2.
+induction n; intros. {
+  cbn.
+  rewrite angle_eucl_dist_diag.
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_refl Hor).
+}
+rewrite rngl_of_nat_succ; cbn.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+... ...
+rewrite angle_eucl_list_mul_mono_l.
 ...
 eapply (angle_lim_eq_compat 0 j). {
   intros i; rewrite Nat.add_0_r; symmetry.
