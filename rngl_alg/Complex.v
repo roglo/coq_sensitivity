@@ -5115,14 +5115,30 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   ============================
   angle_lim (λ i : nat, (2 ^ i / n * ((n * θ') / ₂^i))%A) θ'
 *)
-...
 (*
+...
 eapply (angle_lim_eq_compat j 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r.
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
   rewrite <- angle_div_2_pow_nat_mul; [ | easy | now rewrite <- Hθ'' ].
   rewrite Nat.add_comm.
+  easy.
+}
+...
+*)
+eapply (angle_lim_eq_compat 0 j). {
+  intros i; rewrite Nat.add_0_r; symmetry.
+  easy.
+}
+...
+eapply (angle_lim_eq_compat j 0). {
+  intros i; rewrite Nat.add_0_r.
+  symmetry.
+  replace i with ((i + j) - j) at 1 2 by flia.
+  remember (i + j) as k.
+  rename i into l.
+  rename k into i.
   easy.
 }
 ...
