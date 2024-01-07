@@ -1372,7 +1372,6 @@ rewrite (Nat.div_small (a mod b)). 2: {
   now apply Nat.mod_upper_bound.
 }
 rewrite Nat.add_0_r.
-(* a lemma, perhaps, like Nat.div_add_l ? *)
 progress unfold rngl_div.
 rewrite Hiv.
 rewrite rngl_mul_add_distr_r.
@@ -3741,6 +3740,52 @@ rewrite (rngl_div_diag Hon Hiq). 2: {
 apply (rl_sqrt_1 Hic Hon Hop Hor Hid).
 Qed.
 
+Theorem angle_div_2_not_straight :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ, (θ / ₂)%A ≠ angle_straight.
+Proof.
+destruct_ac.
+intros Hc1.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H.
+apply eq_angle_eq in H.
+injection H; clear H; intros Hs Hc.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon) in Hc.
+  remember √((1 + rngl_cos θ) / 2)%L as a eqn:Ha.
+  assert (H1 : (a < 0)%L). {
+    rewrite Hc.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  apply (rngl_nle_gt Hor) in H1.
+  apply H1; clear H1.
+  rewrite Ha.
+  apply rl_sqrt_nonneg.
+  apply rngl_1_add_cos_div_2_nonneg.
+}
+apply (rngl_leb_gt Hor) in Hzs.
+rewrite (rngl_mul_opp_l Hop) in Hc.
+rewrite (rngl_mul_1_l Hon) in Hc.
+apply (rngl_opp_inj Hop) in Hc.
+apply (f_equal rngl_squ) in Hc.
+rewrite rngl_squ_sqrt in Hc. 2: {
+  apply rngl_1_add_cos_div_2_nonneg.
+}
+rewrite (rngl_squ_1 Hon) in Hc.
+apply (f_equal (λ x, (x * 2)%L)) in Hc.
+rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_1_l Hon) in Hc.
+apply (rngl_add_cancel_l Hos) in Hc.
+apply (eq_rngl_cos_1) in Hc.
+rewrite Hc in Hzs.
+cbn in Hzs.
+now apply (rngl_lt_irrefl Hor) in Hzs.
+Qed.
+
 Theorem rngl_cos_div_pow_2_incr :
   rngl_characteristic T ≠ 1 →
   ∀ n θ,
@@ -3891,39 +3936,8 @@ apply IHn. {
   now apply eq_angle_div_2_0 in H.
 }
 intros H.
-(* lemma? *)
-cbn in H.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  rewrite (rngl_mul_1_l Hon) in H.
-  remember √((1 + rngl_cos θ) / 2)%L as a eqn:Ha.
-  assert (H1 : (a < 0)%L). {
-    rewrite H.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  apply (rngl_nle_gt Hor) in H1.
-  apply H1; clear H1.
-  rewrite Ha.
-  apply rl_sqrt_nonneg.
-  apply rngl_1_add_cos_div_2_nonneg.
-}
-apply (rngl_leb_gt Hor) in Hzs.
-rewrite (rngl_mul_opp_l Hop) in H.
-rewrite (rngl_mul_1_l Hon) in H.
-apply (rngl_opp_inj Hop) in H.
-apply (f_equal rngl_squ) in H.
-rewrite rngl_squ_sqrt in H. 2: {
-  apply rngl_1_add_cos_div_2_nonneg.
-}
-rewrite (rngl_squ_1 Hon) in H.
-apply (f_equal (λ x, (x * 2)%L)) in H.
-rewrite (rngl_div_mul Hon Hiv) in H. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_1_l Hon) in H.
-apply (rngl_add_cancel_l Hos) in H.
-now apply (eq_rngl_cos_1) in H.
+apply (eq_rngl_cos_opp_1) in H.
+now apply (angle_div_2_not_straight Hc1) in H.
 Qed.
 
 Theorem squ_rngl_cos_non_0_div_pow_2_bound :
