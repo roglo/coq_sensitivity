@@ -5048,6 +5048,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros Har Hch * Hnz ε Hε.
   rewrite (rngl_characteristic_1 Hon Hos Hc1 ε) in Hε.
@@ -5146,6 +5147,30 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   easy.
 }
+intros ε Hε.
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (H1 _ Hε2).
+destruct H1 as (N, HN).
+exists N. (* pour voir *)
+intros m Hm.
+specialize (HN m Hm).
+remember (n * (2 ^ m / n * (θ' / ₂^m)))%A as θ.
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ θ).
+}
+specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
+rewrite (rngl_add_diag2 Hon) in Hεε2.
+rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε2; clear Hεε2.
+apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+subst θ.
+...
 eapply (angle_lim_eq_compat 0 j). {
   intros i; rewrite Nat.add_0_r; symmetry.
   easy.
