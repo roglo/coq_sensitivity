@@ -4829,6 +4829,13 @@ intros.
 now apply angle_eucl_dist_separation.
 Qed.
 
+Theorem angle_add_div_2_pow_diag :
+  ∀ n θ, (θ / ₂^S n + θ / ₂^S n = θ / ₂^n)%A.
+Proof.
+intros; cbn.
+now rewrite angle_add_div_2_diag.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4940,6 +4947,14 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   easy.
 }
 *)
+eapply (angle_lim_eq_compat 0 j). {
+  intros i; rewrite Nat.add_0_r; symmetry.
+  reflexivity.
+}
+eapply (angle_lim_eq_compat j 0) in H1. 2: {
+  intros i; rewrite Nat.add_0_r; symmetry.
+  reflexivity.
+}
 intros ε Hε.
 assert (Hε2 : (0 < ε / 2)%L). {
   apply (rngl_lt_div_r Hon Hop Hiv Hor).
@@ -4951,7 +4966,7 @@ destruct H1 as (N, HN).
 exists N. (* pour voir *)
 intros i Hi.
 specialize (HN i Hi).
-remember (2 ^ i / n * (n * (θ' / ₂^i)))%A as θ.
+remember (2 ^ (i + j) / n * (n * (θ' / ₂^(i + j))))%A as θ.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
 }
@@ -4965,6 +4980,89 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
+replace θ' with (2 ^ (i + j) * (θ' / ₂^(i + j)))%A at 1. 2: {
+  apply angle_mul_2_pow_div_2_pow.
+}
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_comm.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+(*
+remember (n * (θ' / ₂^i))%A as θ.
+Search ((_ * _) / ₂^_)%A.
+*)
+rewrite angle_div_2_pow_nat_mul; cycle 1. {
+  now apply Nat.pow_nonzero.
+} {
+  remember (i + j) as k eqn:Hk.
+  assert (Hnk : n < 2 ^ k). {
+    rewrite Hk.
+    rewrite Nat.pow_add_r.
+    apply (Nat.lt_le_trans _ (2 ^ j)); [ easy | ].
+    rewrite Nat.mul_comm.
+    apply Nat_mul_le_pos_r.
+    apply Nat.le_succ_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  clear i j θ'' N Hjn Hθ'' Hk Hi Htj HN Hε2.
+...
+  eapply angle_mul_nat_overflow_le_r. 2: {
+    apply angle_mul_nat_overflow_pow_div with (θ := (n * θ')%A).
+  }
+  destruct n; [ easy | ].
+  destruct n. {
+    rewrite (angle_mul_nat_1_l Hon Hos).
+    rewrite (angle_mul_nat_1_l Hon Hos).
+    apply angle_le_refl.
+  }
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    destruct k. {
+      cbn in Hnk; flia Hnk.
+    }
+    rewrite angle_add_div_2_pow_diag.
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite (angle_add_diag Hon Hos).
+    rewrite angle_mul_2_div_2.
+...
+Search ((_ + _) / ₂)%A.
+Search ((_ + _) / ₂^_)%A.
+rewrite <- angle_div_2_pow_nat_add.
+...
+}
+(*
+...
+  rewrite Nat.add_comm.
+  rewrite angle_div_pow_2_add_distr.
+  rewrite <- Hθ''.
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | easy ].
+...
+  rewrite Hθ''.
+  rewrite angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
+    now rewrite <- Hθ''.
+  }
+  rewrite <- angle_div_pow_2_add_distr.
+Search (angle_mul_nat_overflow (2 ^ _)).
+...
+(*
+Search (_ * (_ / ₂^_))%A.
+*)
+  rewrite <- angle_div_2_pow_nat_mul; [ | easy | ]. 2: {
+... ...
+}
+*)
+rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_sub_diag.
+rewrite (angle_mul_nat_0_r Hon Hos).
+now rewrite angle_eucl_dist_diag.
+...
+remember (n * (θ' / ₂^i))%A as θ.
+Search ((_ * _) / ₂^_)%A.
+Check angle_mul_2_pow_div_2_pow.
+rewrite angle_mul_2_pow_div_2_pow.
+rewrite (angle_mul_2_pow_div_2_pow i (n * (θ' / ₂^i))).
+...
 remember (2 ^ i / n * _)%A as θ eqn:Hθ in |-*.
 progress unfold angle_eucl_dist.
 cbn.
