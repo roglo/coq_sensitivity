@@ -4949,9 +4949,9 @@ assert (Hε2 : (0 < ε / 2)%L). {
 specialize (H1 _ Hε2).
 destruct H1 as (N, HN).
 exists N. (* pour voir *)
-intros m Hm.
-specialize (HN m Hm).
-remember (2 ^ m / n * (n * (θ' / ₂^m)))%A as θ.
+intros i Hi.
+specialize (HN i Hi).
+remember (2 ^ i / n * (n * (θ' / ₂^i)))%A as θ.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
 }
