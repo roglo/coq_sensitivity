@@ -4986,10 +4986,27 @@ replace θ' with (2 ^ (i + j) * (θ' / ₂^(i + j)))%A at 1. 2: {
 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
-(*
-remember (n * (θ' / ₂^i))%A as θ.
-Search ((_ * _) / ₂^_)%A.
-*)
+(**)
+remember (n * (θ' / ₂^(i + j)))%A as θ.
+Theorem glop :
+  ∀ i θ,
+  angle_mul_nat_overflow (2 ^ i) θ = false
+  → ((2 ^ i * θ) / ₂^i)%A = θ.
+Proof.
+destruct_ac.
+intros * Haov.
+induction i; cbn; [ apply angle_add_0_r | ].
+...
+rewrite glop. 2: {
+  subst θ.
+...
+rewrite Nat.add_0_r.
+rewrite (angle_mul_add_distr_r Hon Hop).
+Search ((_ + _) / ₂^_)%A.
+rewrite angle_div_2_pow_nat_add.
+...
+rewrite glop.
+...
 rewrite angle_div_2_pow_nat_mul; cycle 1. {
   now apply Nat.pow_nonzero.
 } {
