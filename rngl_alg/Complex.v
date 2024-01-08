@@ -2468,6 +2468,60 @@ rewrite <- (rngl_add_sub_swap Hop).
 now rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 Qed.
 
+Theorem angle_eucl_dist_opp_opp :
+  ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+cbn.
+f_equal.
+f_equal.
+rewrite (rngl_sub_opp_r Hop).
+rewrite rngl_add_comm.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_opp_sub_distr Hop).
+apply (rngl_squ_opp Hop).
+Qed.
+
+Theorem angle_opp_0 : (- 0)%A = 0%A.
+Proof.
+destruct_ac.
+apply eq_angle_eq.
+cbn; f_equal.
+apply (rngl_opp_0 Hop).
+Qed.
+
+Theorem angle_eucl_dist_move_0_l :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ2 - θ1) 0.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+replace θ1 with (θ2 - (θ2 - θ1))%A. 2: {
+  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_diag.
+  apply (angle_add_0_l Hon Hos).
+}
+rewrite angle_eucl_dist_sub_l_diag.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_sub_diag.
+f_equal; symmetry.
+apply (angle_add_0_l Hon Hos).
+Qed.
+
+Theorem angle_eucl_dist_move_0_r :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ1 - θ2) 0.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_eucl_dist_move_0_l.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite angle_opp_0.
+f_equal.
+apply (angle_opp_sub_distr Hic Hop).
+Qed.
+
 Theorem one_sub_squ_cos_add_squ_sin :
   ∀ θ, ((1 - rngl_cos θ)² + (rngl_sin θ)² = 2 * (1 - rngl_cos θ))%L.
 Proof.
@@ -4723,30 +4777,6 @@ f_equal.
 apply IHn.
 Qed.
 
-Theorem angle_eucl_dist_opp_opp :
-  ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
-Proof.
-destruct_ac.
-intros.
-progress unfold angle_eucl_dist.
-cbn.
-f_equal.
-f_equal.
-rewrite (rngl_sub_opp_r Hop).
-rewrite rngl_add_comm.
-rewrite (rngl_add_opp_r Hop).
-rewrite <- (rngl_opp_sub_distr Hop).
-apply (rngl_squ_opp Hop).
-Qed.
-
-Theorem angle_opp_0 : (- 0)%A = 0%A.
-Proof.
-destruct_ac.
-apply eq_angle_eq.
-cbn; f_equal.
-apply (rngl_opp_0 Hop).
-Qed.
-
 Theorem angle_lim_div_2 :
   ∀ f θ,
   angle_lim f (θ / ₂)
@@ -4775,16 +4805,8 @@ destruct Hf as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
-rewrite <- (angle_add_sub (f _) (θ / ₂))%A in HN.
-rewrite (angle_add_comm Hic) in HN.
-rewrite (angle_add_sub_swap Hic Hop) in HN.
-rewrite <- (angle_sub_sub_distr Hic Hop) in HN.
-rewrite angle_eucl_dist_sub_l_diag in HN.
-rewrite <- (angle_add_sub (2 * f n) θ)%A.
-rewrite (angle_add_comm Hic).
-rewrite (angle_add_sub_swap Hic Hop).
-rewrite <- (angle_sub_sub_distr Hic Hop).
-rewrite angle_eucl_dist_sub_l_diag.
+rewrite angle_eucl_dist_move_0_l in HN.
+rewrite angle_eucl_dist_move_0_l.
 specialize (angle_eucl_dist_triangular) as H1.
 specialize (H1 (2 * (θ / ₂ - f n)) (θ / ₂ - f n) 0)%A.
 rewrite angle_mul_sub_distr_l in H1.
@@ -4849,21 +4871,8 @@ exists (max M N).
 intros n Hn.
 specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
 specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
-replace (u n) with (θ1 - (θ1 - u n))%A in HM |-*. 2: {
-  rewrite (angle_sub_sub_distr Hic Hop).
-  rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
-}
-replace (v n) with (θ2 - (θ2 - v n))%A in HN |-*. 2: {
-  rewrite (angle_sub_sub_distr Hic Hop).
-  rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
-}
-rewrite angle_eucl_dist_sub_l_diag in HM, HN.
-rewrite <- (angle_add_sub_swap Hic Hop).
-rewrite (angle_add_sub_assoc Hop).
-rewrite <- (angle_sub_add_distr Hic Hop).
-rewrite angle_eucl_dist_sub_l_diag.
+rewrite angle_eucl_dist_move_0_l in HM, HN.
+rewrite angle_eucl_dist_move_0_l.
 specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
 rewrite (rngl_add_diag2 Hon) in Hεε2.
 rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
@@ -4875,13 +4884,12 @@ eapply (rngl_le_lt_trans Hor). {
 }
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 rewrite (angle_add_comm Hic).
-rewrite (angle_add_sub_assoc Hop).
-rewrite (angle_add_sub_swap Hic Hop).
-rewrite <- (angle_sub_sub_distr Hic Hop).
-rewrite angle_eucl_dist_sub_l_diag.
-rewrite <- angle_eucl_dist_opp_opp.
-rewrite (angle_opp_sub_distr Hic Hop).
-now rewrite angle_opp_0.
+rewrite angle_eucl_dist_move_0_r.
+rewrite (angle_sub_sub_swap Hic Hop).
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_add_sub.
+rewrite (angle_sub_add_distr Hic Hop).
+now rewrite angle_add_sub.
 Qed.
 
 Theorem angle_lim_add_add_if :
@@ -4913,6 +4921,7 @@ exists (max M N).
 intros n Hn.
 specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
 specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
+(* à simplifier en utiliser angle_eucl_dist_move_0_l et _r *)
 replace (u n) with (θ1 - (θ1 - u n))%A in HM. 2: {
   rewrite (angle_sub_sub_distr Hic Hop).
   rewrite angle_sub_diag.
@@ -5178,6 +5187,9 @@ rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
 rewrite Hεε2; clear Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
+rewrite angle_eucl_dist_move_0_r.
+rewrite <- angle_mul_sub_distr_l.
+...
 eapply (rngl_le_lt_trans Hor).
 Theorem angle_eucl_list_mul_le_mono_l :
   ∀ n θ1 θ2,
