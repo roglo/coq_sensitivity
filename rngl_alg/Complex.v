@@ -4732,12 +4732,7 @@ rewrite <- (angle_eucl_dist_opp_opp (u n - θ1)).
 rewrite (angle_opp_sub_distr Hic Hop).
 rewrite angle_opp_0.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
-replace (θ2 - v n)%A with (u n - θ1 - (u n - θ1 - (θ2 - v n)))%A. 2: {
-  rewrite (angle_sub_sub_distr Hic Hop).
-  rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
-}
-rewrite angle_eucl_dist_sub_l_diag.
+rewrite angle_eucl_dist_move_0_l.
 rewrite <- angle_eucl_dist_opp_opp.
 rewrite (angle_opp_sub_distr Hic Hop).
 rewrite (angle_sub_sub_distr Hic Hop).
