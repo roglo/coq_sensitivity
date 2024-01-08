@@ -4988,6 +4988,7 @@ rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 (**)
 remember (n * (θ' / ₂^(i + j)))%A as θ.
+...
 Theorem glop :
   ∀ i θ,
   angle_mul_nat_overflow (2 ^ i) θ = false
