@@ -4718,18 +4718,13 @@ intros n Hn.
 specialize (HM n (Nat.max_lub_l _ _ _ Hn)).
 specialize (HN n (Nat.max_lub_r _ _ _ Hn)).
 (* à simplifier en utiliser angle_eucl_dist_move_0_l et _r *)
-rewrite angle_eucl_dist_move_0_l in HM.
-replace (u n + v n)%A with ((θ1 + θ2) - (θ1 + θ2 - (u n + v n)))%A in HN. 2: {
-  rewrite (angle_sub_sub_distr Hic Hop).
-  rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
-}
+rewrite angle_eucl_dist_move_0_l in HM, HN.
 replace (v n) with (θ2 - (θ2 - v n))%A. 2: {
   rewrite (angle_sub_sub_distr Hic Hop).
   rewrite angle_sub_diag.
   apply (angle_add_0_l Hon Hos).
 }
-rewrite angle_eucl_dist_sub_l_diag in HN |-*.
+rewrite angle_eucl_dist_sub_l_diag.
 specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
 rewrite (rngl_add_diag2 Hon) in Hεε2.
 rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
