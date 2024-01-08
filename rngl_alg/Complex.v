@@ -5197,6 +5197,18 @@ induction n; intros. {
 rewrite rngl_of_nat_succ; cbn.
 rewrite rngl_mul_add_distr_r.
 rewrite (rngl_mul_1_l Hon).
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite angle_add_0_r.
+  rewrite rngl_add_0_r.
+  apply (rngl_le_refl Hor).
+}
+destruct n. {
+  cbn.
+  do 2 rewrite angle_add_0_r.
+  rewrite rngl_add_0_r.
+  rewrite (rngl_mul_1_l Hon).
 ... ...
 rewrite angle_eucl_list_mul_mono_l.
 ...
