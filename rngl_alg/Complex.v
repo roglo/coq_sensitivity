@@ -4853,6 +4853,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros Har Hch * Hnz.
+remember (angle_mul_nat_overflow n θ) as nt eqn:Hnt.
+symmetry in Hnt.
+destruct nt. 2: {
+  now apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat Har Hch).
+}
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
@@ -4982,15 +4987,6 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
-remember (angle_mul_nat_overflow n θ') as nt eqn:Hnt.
-symmetry in Hnt.
-destruct nt. 2: {
-  rewrite angle_div_2_pow_nat_mul; [ | easy | easy ].
-  rewrite angle_sub_diag.
-  rewrite (angle_mul_nat_0_r Hon Hos).
-  now rewrite angle_eucl_dist_diag.
-}
-move Hnt before Htj.
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
