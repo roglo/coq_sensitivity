@@ -4836,6 +4836,20 @@ intros; cbn.
 now rewrite angle_add_div_2_diag.
 Qed.
 
+Theorem angle_mul_nat_overflow_exist :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = true
+  → ∃ m, angle_add_overflow θ (m * θ) = true.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn.
+induction n; [ easy | cbn ].
+apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+destruct Hn as [Hn| Hn]; [ now apply IHn | ].
+now exists n.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -4858,6 +4872,8 @@ symmetry in Hnt.
 destruct nt. 2: {
   now apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat Har Hch).
 }
+apply angle_mul_nat_overflow_exist in Hnt.
+destruct Hnt as (m, Hm).
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
