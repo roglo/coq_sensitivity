@@ -4983,6 +4983,7 @@ subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
 ...
+(*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
   apply angle_mul_2_pow_div_2_pow.
 }
@@ -5085,6 +5086,7 @@ Check angle_mul_2_pow_div_2_pow.
 rewrite angle_mul_2_pow_div_2_pow.
 rewrite (angle_mul_2_pow_div_2_pow i (n * (θ' / ₂^i))).
 ...
+*)
 remember (2 ^ i / n * _)%A as θ eqn:Hθ in |-*.
 progress unfold angle_eucl_dist.
 cbn.
@@ -5097,6 +5099,7 @@ rewrite <- rngl_add_assoc.
 rewrite cos2_sin2_1.
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+subst θ.
 ...
 eapply (rngl_le_lt_trans Hor).
 Theorem angle_eucl_list_mul_le_mono_l :
