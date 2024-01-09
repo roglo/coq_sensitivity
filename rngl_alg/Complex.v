@@ -4947,6 +4947,7 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   easy.
 }
 *)
+(*
 eapply (angle_lim_eq_compat 0 j). {
   intros i; rewrite Nat.add_0_r; symmetry.
   reflexivity.
@@ -4955,6 +4956,7 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
   intros i; rewrite Nat.add_0_r; symmetry.
   reflexivity.
 }
+*)
 intros ε Hε.
 assert (Hε2 : (0 < ε / 2)%L). {
   apply (rngl_lt_div_r Hon Hop Hiv Hor).
@@ -4966,7 +4968,7 @@ destruct H1 as (N, HN).
 exists N. (* pour voir *)
 intros i Hi.
 specialize (HN i Hi).
-remember (2 ^ (i + j) / n * (n * (θ' / ₂^(i + j))))%A as θ.
+remember (2 ^ i / n * (n * (θ' / ₂^i)))%A as θ.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
 }
@@ -4980,13 +4982,15 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
-replace θ' with (2 ^ (i + j) * (θ' / ₂^(i + j)))%A at 1. 2: {
+...
+replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
   apply angle_mul_2_pow_div_2_pow.
 }
 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 (**)
+...
 remember (n * (θ' / ₂^(i + j)))%A as θ.
 ...
 Theorem glop :
