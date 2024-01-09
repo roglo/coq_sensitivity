@@ -4982,6 +4982,15 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
+remember (angle_mul_nat_overflow n θ') as nt eqn:Hnt.
+symmetry in Hnt.
+destruct nt. 2: {
+  rewrite angle_div_2_pow_nat_mul; [ | easy | easy ].
+  rewrite angle_sub_diag.
+  rewrite (angle_mul_nat_0_r Hon Hos).
+  now rewrite angle_eucl_dist_diag.
+}
+move Hnt before Htj.
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
