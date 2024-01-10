@@ -4847,6 +4847,8 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Htz.
+apply neq_angle_neq in Htz.
+Search ((_, _) ≠ _).
 ...
 
 Theorem angle_mul_nat_overflow_exist :
