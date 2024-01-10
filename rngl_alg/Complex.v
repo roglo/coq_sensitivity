@@ -4852,23 +4852,6 @@ destruct un; [ | now exists n ].
 now apply IHn.
 Qed.
 
-(*
-Theorem angle_mul_nat_overflow_exist :
-  ∀ θ,
-  (θ ≠ 0)%A
-  → ∃ n,
-  (∀ m, m < n → angle_mul_nat_overflow m θ = false) ∧
-  angle_mul_nat_overflow n θ = true.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Htz.
-apply neq_angle_neq in Htz.
-Search ((_, _) ≠ _).
-...
-*)
-
-(* to be completed
 Theorem angle_mul_nat_overflow_exist :
   ∀ n θ,
   angle_mul_nat_overflow n θ = true
@@ -4879,121 +4862,19 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hn.
-apply (sequence_false_min n). {
-  rewrite angle_mul_0_l.
-  now rewrite (angle_add_overflow_0_r Hon Hos).
-}
-destruct n. {
-  rewrite angle_mul_0_l.
-  now rewrite (angle_add_overflow_0_r Hon Hos).
-}
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-cbn.
-...
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hn.
-destruct n; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-revert θ Hn.
-induction n; intros. {
-  destruct Hn as [Hn| Hn]; [ easy | ].
-  rewrite angle_mul_0_l in Hn.
-  now rewrite (angle_add_overflow_0_r Hon Hos) in Hn.
-}
-destruct Hn as [Hn| Hn]. {
-  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-  now apply IHn.
-}
-cbn in Hn.
-Search (angle_add_overflow _ (_ + _)).
-...
-  rewrite angle_mul_0_l in Hn.
-...
-destruct Hn as [Hn| Hn]. {
-  destruct n; [ easy | ].
-  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-  destruct Hn as [Hn| Hn]. {
-  destruct n; [ easy | ].
-  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-  destruct Hn as [Hn| Hn]. {
-  destruct n; [ easy | ].
-  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-  destruct Hn as [Hn| Hn]. {
-  destruct n; [ easy | ].
-  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-  destruct Hn as [Hn| Hn]. {
-...
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hn.
-revert θ Hn.
-induction n as (n, IHn) using lt_wf_rec; intros.
-destruct n; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-destruct Hn as [Hn| Hn]; [ now apply (IHn n) | ].
-destruct n. {
-  rewrite angle_mul_0_l in Hn.
-  now rewrite (angle_add_overflow_0_r Hon Hos) in Hn.
-}
-exists n.
-split; [ | easy ].
-destruct n. {
-  rewrite angle_mul_0_l.
-  now rewrite (angle_add_overflow_0_r Hon Hos).
-}
-destruct n. {
-  rewrite (angle_mul_nat_1_l Hon Hos).
-...
-  now rewrite (angle_add_overflow_0_r Hon Hos).
-}
-...
-specialize (IHn (S n)) as H1.
-specialize (H1 (Nat.lt_succ_diag_r _)).
-specialize (H1 θ).
-...
-progress unfold angle_add_overflow in Hn.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-progress unfold angle_ltb in Hn.
-progress unfold angle_leb.
-...
-specialize (IHn (S n)).
-apply IHn.
-...
-cbn in Hn.
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-destruct Hn as [Hn| Hn]; [ now apply (IHn n) | ].
-...
-induction n as (n, IHn) using lt_wf_rec; intros.
-destruct n; [ easy | ].
-Search (angle_mul_nat_overflow (S _)).
-; intros; [ easy | cbn ].
-apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-destruct Hn as [Hn| Hn]; [ now apply IHn | ].
-destruct n. {
-  rewrite angle_mul_0_l in Hn.
-  now rewrite (angle_add_overflow_0_r Hon Hos) in Hn.
-}
-exists n.
-rewrite <- Nat.add_1_r in Hn.
-rewrite (angle_mul_add_distr_r Hon Hop) in Hn.
-rewrite (angle_mul_nat_1_l Hon Hos) in Hn.
-Qed.
-*)
-
-Theorem angle_mul_nat_overflow_exist :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = true
-  → ∃ m, angle_add_overflow θ (m * θ) = true.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hn.
-induction n; [ easy | cbn ].
-apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
-destruct Hn as [Hn| Hn]; [ now apply IHn | ].
-now exists n.
+specialize (sequence_false_min n (λ i, angle_mul_nat_overflow i θ)) as H1.
+specialize (H1 eq_refl Hn).
+destruct H1 as (i & Hi & Hsi).
+destruct i; [ easy | ].
+rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hi.
+destruct Hi as (Hi, Hit).
+exists i.
+split; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
+destruct Hsi as [Hsi| Hsi]; [ | easy ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
+destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
+now rewrite Hit in Hsi.
 Qed.
 
 (* to be completed
@@ -5019,7 +4900,8 @@ destruct nt. 2: {
   now apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat Har Hch).
 }
 apply angle_mul_nat_overflow_exist in Hnt.
-destruct Hnt as (m, Hm).
+destruct Hnt as (m & Hm & Hsm).
+...
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
