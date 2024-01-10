@@ -5015,41 +5015,6 @@ rewrite <- (angle_mul_nat_assoc Hon Hop).
 ...
 remember (n * (θ' / ₂^(i + j)))%A as θ.
 ...
-Theorem glop :
-  ∀ i θ,
-  angle_mul_nat_overflow (2 ^ i) θ = false
-  → ((2 ^ i * θ) / ₂^i)%A = θ.
-Proof.
-destruct_ac.
-intros * Haov.
-induction i; cbn; [ apply angle_add_0_r | ].
-...
-rewrite glop. 2: {
-  subst θ.
-...
-rewrite Nat.add_0_r.
-rewrite (angle_mul_add_distr_r Hon Hop).
-Search ((_ + _) / ₂^_)%A.
-rewrite angle_div_2_pow_nat_add.
-...
-rewrite glop.
-...
-rewrite angle_div_2_pow_nat_mul; cycle 1. {
-  now apply Nat.pow_nonzero.
-} {
-  remember (i + j) as k eqn:Hk.
-  assert (Hnk : n < 2 ^ k). {
-    rewrite Hk.
-    rewrite Nat.pow_add_r.
-    apply (Nat.lt_le_trans _ (2 ^ j)); [ easy | ].
-    rewrite Nat.mul_comm.
-    apply Nat_mul_le_pos_r.
-    apply Nat.le_succ_l.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  clear i j θ'' N Hjn Hθ'' Hk Hi Htj HN Hε2.
-...
   eapply angle_mul_nat_overflow_le_r. 2: {
     apply angle_mul_nat_overflow_pow_div with (θ := (n * θ')%A).
   }
