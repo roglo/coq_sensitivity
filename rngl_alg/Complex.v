@@ -4836,7 +4836,23 @@ intros; cbn.
 now rewrite angle_add_div_2_diag.
 Qed.
 
-(* to be completed
+Theorem sequence_false_min :
+  ∀ n u,
+  u 0 = false
+  → u n = true
+  → ∃ i, u i = false ∧ u (S i) = true.
+Proof.
+intros * Huz Hun.
+revert u Huz Hun.
+induction n; intros; [ now rewrite Huz in Hun | ].
+rename Hun into Husn.
+remember (u n) as un eqn:Hun.
+symmetry in Hun.
+destruct un; [ | now exists n ].
+now apply IHn.
+Qed.
+
+(*
 Theorem angle_mul_nat_overflow_exist :
   ∀ θ,
   (θ ≠ 0)%A
@@ -4850,7 +4866,9 @@ intros * Htz.
 apply neq_angle_neq in Htz.
 Search ((_, _) ≠ _).
 ...
+*)
 
+(* to be completed
 Theorem angle_mul_nat_overflow_exist :
   ∀ n θ,
   angle_mul_nat_overflow n θ = true
@@ -4858,6 +4876,20 @@ Theorem angle_mul_nat_overflow_exist :
   angle_add_overflow θ (m * θ) = false ∧
   angle_add_overflow θ (S m * θ) = true.
 Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn.
+apply (sequence_false_min n). {
+  rewrite angle_mul_0_l.
+  now rewrite (angle_add_overflow_0_r Hon Hos).
+}
+destruct n. {
+  rewrite angle_mul_0_l.
+  now rewrite (angle_add_overflow_0_r Hon Hos).
+}
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+cbn.
+...
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hn.
