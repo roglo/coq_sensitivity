@@ -78,25 +78,6 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-(* to be completed
-Theorem neq_angle_neq : ∀ θ1 θ2,
-  rngl_cos θ1 ≠ rngl_cos θ2 ∨ rngl_sin θ1 ≠ rngl_sin θ2 ↔ θ1 ≠ θ2.
-Proof.
-intros.
-split; intros H. {
-  intros Hab; subst θ2.
-  now destruct H.
-} {
-  destruct θ1 as (c1, s1, Hcs1).
-  destruct θ2 as (c2, s2, Hcs2).
-  cbn.
-...
-  intros Hab; apply H.
-  now apply eq_angle_eq.
-}
-Qed.
-*)
-
 Theorem angle_zero_prop : (cos2_sin2_prop 1 0)%L.
 Proof.
 progress unfold cos2_sin2_prop.
