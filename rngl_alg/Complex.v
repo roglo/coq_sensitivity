@@ -4838,12 +4838,58 @@ Qed.
 
 (* to be completed
 Theorem angle_mul_nat_overflow_exist :
+  ∀ θ,
+  (θ ≠ 0)%A
+  → ∃ n,
+  (∀ m, m < n → angle_mul_nat_overflow m θ = false) ∧
+  angle_mul_nat_overflow n θ = true.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Htz.
+...
+
+Theorem angle_mul_nat_overflow_exist :
   ∀ n θ,
   angle_mul_nat_overflow n θ = true
   → ∃ m,
   angle_add_overflow θ (m * θ) = false ∧
   angle_add_overflow θ (S m * θ) = true.
 Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn.
+destruct n; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+revert θ Hn.
+induction n; intros. {
+  destruct Hn as [Hn| Hn]; [ easy | ].
+  rewrite angle_mul_0_l in Hn.
+  now rewrite (angle_add_overflow_0_r Hon Hos) in Hn.
+}
+destruct Hn as [Hn| Hn]. {
+  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+  now apply IHn.
+}
+cbn in Hn.
+Search (angle_add_overflow _ (_ + _)).
+...
+  rewrite angle_mul_0_l in Hn.
+...
+destruct Hn as [Hn| Hn]. {
+  destruct n; [ easy | ].
+  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+  destruct Hn as [Hn| Hn]. {
+  destruct n; [ easy | ].
+  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+  destruct Hn as [Hn| Hn]. {
+  destruct n; [ easy | ].
+  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+  destruct Hn as [Hn| Hn]. {
+  destruct n; [ easy | ].
+  rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hn.
+  destruct Hn as [Hn| Hn]. {
+...
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hn.
@@ -4858,6 +4904,16 @@ destruct n. {
 }
 exists n.
 split; [ | easy ].
+destruct n. {
+  rewrite angle_mul_0_l.
+  now rewrite (angle_add_overflow_0_r Hon Hos).
+}
+destruct n. {
+  rewrite (angle_mul_nat_1_l Hon Hos).
+...
+  now rewrite (angle_add_overflow_0_r Hon Hos).
+}
+...
 specialize (IHn (S n)) as H1.
 specialize (H1 (Nat.lt_succ_diag_r _)).
 specialize (H1 θ).
