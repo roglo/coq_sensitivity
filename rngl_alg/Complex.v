@@ -4941,7 +4941,6 @@ destruct nt. 2: {
 }
 apply angle_mul_nat_overflow_exist in Hnt.
 destruct Hnt as (m & Hmn & Hm & Hsm).
-...
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
