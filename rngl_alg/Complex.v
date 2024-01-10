@@ -4852,10 +4852,44 @@ destruct un; [ | now exists n ].
 now apply IHn.
 Qed.
 
+Theorem angle_mul_nat_overflow_true_after :
+  ∀ m n θ,
+  m ≤ n
+  → angle_mul_nat_overflow m θ = true
+  → angle_mul_nat_overflow n θ = true.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hmn Hm.
+destruct (Nat.eq_dec m n) as [H1| H1]; [ now subst m | ].
+assert (H : m < n) by flia Hmn H1.
+clear Hmn H1; rename H into Hmn.
+revert m Hmn Hm.
+induction n; intros; [ easy | ].
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hmn.
+apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hm.
+apply (angle_mul_nat_overflow_succ_l Hon Hos).
+destruct Hm as [Hm| Hm]. {
+  left.
+  now apply (IHn m).
+}
+left.
+destruct (Nat.eq_dec (S m) n) as [Hsmn| Hsmn]. 2: {
+  apply (IHn (S m)); [ flia Hmn Hsmn | ].
+  apply (angle_mul_nat_overflow_succ_l Hon Hos).
+  now right.
+}
+subst n.
+apply (angle_mul_nat_overflow_succ_l Hon Hos).
+now right.
+Qed.
+
 Theorem angle_mul_nat_overflow_exist :
   ∀ n θ,
   angle_mul_nat_overflow n θ = true
   → ∃ m,
+  m < n ∧
   angle_add_overflow θ (m * θ) = false ∧
   angle_add_overflow θ (S m * θ) = true.
 Proof.
@@ -4869,6 +4903,12 @@ destruct i; [ easy | ].
 rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hi.
 destruct Hi as (Hi, Hit).
 exists i.
+split. {
+  apply Nat.nle_gt.
+  intros Hni.
+  apply (angle_mul_nat_overflow_true_after _ i) in Hn; [ | easy ].
+  now rewrite Hn in Hi.
+}
 split; [ easy | ].
 rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
 destruct Hsi as [Hsi| Hsi]; [ | easy ].
@@ -4900,7 +4940,7 @@ destruct nt. 2: {
   now apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat Har Hch).
 }
 apply angle_mul_nat_overflow_exist in Hnt.
-destruct Hnt as (m & Hm & Hsm).
+destruct Hnt as (m & Hmn & Hm & Hsm).
 ...
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
