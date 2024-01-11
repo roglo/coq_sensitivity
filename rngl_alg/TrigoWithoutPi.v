@@ -1929,7 +1929,10 @@ Qed.
 
 Theorem rngl_sin_nonneg_add_nonneg_nonneg :
   ∀ θ1 θ2,
+(*
   (θ1 ≤ θ1 + θ2)%A
+*)
+  angle_add_overflow θ1 θ2 = false
   → (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   → (0 ≤ rngl_sin θ2)%L.
@@ -1937,6 +1940,8 @@ Proof.
 (*****)
 destruct_ac.
 intros * Haov Hzs1 Hzs3.
+progress unfold angle_add_overflow in Haov.
+apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge Hor).
 intros Hzs2.
@@ -3062,6 +3067,7 @@ assert (Hs2z : (√2 ≠ 0)%L). {
   now rewrite (rngl_squ_0 Hos) in H.
 }
 intros * Haov.
+generalize Haov; intros Haov_v.
 progress unfold angle_add_overflow in Haov.
 apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
@@ -3319,6 +3325,7 @@ assert (Hs2z : (√2 ≠ 0)%L). {
   rewrite rngl_squ_sqrt in H; [ | now apply (rngl_lt_le_incl Hor) ].
   now rewrite (rngl_squ_0 Hos) in H.
 }
+generalize Haov; intros Haov_v.
 progress unfold angle_add_overflow in Haov.
 apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.

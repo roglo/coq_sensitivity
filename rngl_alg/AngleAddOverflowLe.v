@@ -1111,6 +1111,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 intros * H32 H12.
+generalize H12; intros Haov.
 progress unfold angle_add_overflow in H12.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge in H12.
@@ -1151,15 +1152,10 @@ destruct zs1. {
         exfalso.
         apply rngl_leb_le in Hzs12, H12.
         apply (rngl_leb_gt Hor) in Hzs2.
-        clear - Hzs12 H12 Hzs2 Hor ac Hzs1.
+        clear - Hzs12 H12 Hzs2 Hor ac Hzs1 Haov.
         apply (rngl_nle_gt Hor) in Hzs2.
         apply Hzs2; clear Hzs2.
         apply rngl_sin_nonneg_add_nonneg_nonneg with (θ1 := θ1); try easy.
-        progress unfold angle_leb.
-        apply rngl_leb_le in Hzs1, Hzs12.
-        rewrite Hzs1, Hzs12.
-        apply rngl_leb_le in Hzs1, Hzs12.
-        now apply rngl_leb_le.
       }
       clear H12.
       apply (rngl_leb_gt Hor) in Hzs2, Hzs12.
