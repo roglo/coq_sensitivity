@@ -5019,6 +5019,35 @@ replace n with (m + (n - m)) at 1 by flia Hmn.
 rewrite (angle_mul_add_distr_r Hon Hop).
 Search ((_ + _) / ₂^_)%A.
 About angle_div_2_pow_nat_add.
+Search ((_ + _) / ₂)%A.
+Check angle_div_2_add_not_overflow.
+Check rngl_cos_angle_div_2_add.
+
+Theorem angle_div_2_add_not_overflow' :
+  ∀ θ1 θ2,
+  ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
+Proof.
+destruct_ac.
+intros.
+remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. 2: {
+  apply eq_angle_eq.
+  f_equal. {
+    now apply rngl_cos_angle_div_2_add.
+  } {
+    now apply rngl_sin_angle_div_2_add.
+  }
+} {
+  remember (θ1 - angle_straight)%A as θ.
+  apply angle_add_move_r in Heqθ.
+  subst θ1; rename θ into θ1.
+...
+  rewrite (angle_add_comm Hic) in Haov.
+Search (angle_add_overflow (_ + _)).
+...
+Qed.
+...
 ...
 rewrite angle_div_2_pow_nat_add.
 2: {
