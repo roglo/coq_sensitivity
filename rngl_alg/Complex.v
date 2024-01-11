@@ -1573,17 +1573,6 @@ Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 Definition angle_lim :=
   is_limit_when_tending_to_inf angle_eucl_dist.
 
-Theorem angle_le_refl :
-  ∀ θ, (θ ≤? θ)%A = true.
-Proof.
-intros.
-destruct_ac.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs; apply (rngl_leb_refl Hor).
-Qed.
-
 Theorem rngl_cos_le_anticompat_when_sin_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -1596,19 +1585,6 @@ apply rngl_leb_le in Hs1, Hs2.
 rewrite Hs1, Hs2.
 apply iff_sym.
 apply rngl_leb_le.
-Qed.
-
-Theorem rngl_characteristic_1_angle_0 :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  rngl_characteristic T = 1 →
-  ∀ θ, (θ = 0)%A.
-Proof.
-intros Hon Hos Hc1 *.
-specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-apply eq_angle_eq.
-do 2 rewrite (H1 (rngl_cos _)).
-now do 2 rewrite (H1 (rngl_sin _)).
 Qed.
 
 Theorem rngl_1_add_cos_div_2_nonneg :
@@ -1898,18 +1874,6 @@ destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
 apply angle_add_le_mono_l; try easy.
 now apply (angle_add_overflow_le _ (b * θ))%A.
-Qed.
-
-Theorem angle_add_overflow_0_0 :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  angle_add_overflow 0 0 = false.
-Proof.
-intros Hon Hos.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-rewrite (angle_add_0_l Hon Hos).
-apply angle_le_refl.
 Qed.
 
 (**)
@@ -3325,22 +3289,6 @@ induction n; [ easy | ].
 cbn in Htn.
 apply eq_angle_div_2_0 in Htn.
 now apply IHn.
-Qed.
-
-Theorem angle_lt_irrefl : ∀ θ, ¬ (θ < θ)%A.
-Proof.
-specialize ac_or as Hor.
-intros * H.
-progress unfold angle_ltb in H.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  apply rngl_ltb_lt in H.
-  now apply (rngl_lt_irrefl Hor) in H.
-} {
-  apply rngl_ltb_lt in H.
-  now apply (rngl_lt_irrefl Hor) in H.
-}
 Qed.
 
 Theorem rl_sqrt_div_2 : ∀ a, (0 ≤ a → √(a / 2) = √(2 * a) / 2)%L.

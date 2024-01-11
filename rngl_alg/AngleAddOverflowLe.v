@@ -1155,7 +1155,8 @@ destruct zs1. {
         clear - Hzs12 H12 Hzs2 Hor ac Hzs1 Haov.
         apply (rngl_nle_gt Hor) in Hzs2.
         apply Hzs2; clear Hzs2.
-        apply rngl_sin_nonneg_add_nonneg_nonneg with (θ1 := θ1); try easy.
+        specialize (rngl_sin_nonneg_add_nonneg θ1 θ2 Hzs1 Hzs12) as H1.
+        now rewrite Haov in H1.
       }
       clear H12.
       apply (rngl_leb_gt Hor) in Hzs2, Hzs12.

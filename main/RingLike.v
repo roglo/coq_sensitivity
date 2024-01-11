@@ -3785,6 +3785,18 @@ apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 
+Theorem rngl_opp_1_le_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
+  (-1 ≤ 1)%L.
+Proof.
+intros Hon Hop Hor Hc1.
+apply (rngl_lt_le_incl Hor).
+apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+Qed.
+
 Theorem rngl_add_nonneg_nonneg :
   rngl_is_ordered T = true →
   ∀ a b, (0 ≤ a → 0 ≤ b → 0 ≤ a + b)%L.
