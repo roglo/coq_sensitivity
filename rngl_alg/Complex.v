@@ -5026,7 +5026,10 @@ Check rngl_cos_angle_div_2_add.
 
 Theorem angle_div_2_add_not_overflow' :
   ∀ θ1 θ2,
-  ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
+  if angle_add_overflow θ1 θ2 then
+    ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
+  else
+    ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
 Proof.
 destruct_ac.
 intros.
@@ -5040,6 +5043,20 @@ destruct aov. 2: {
     now apply rngl_sin_angle_div_2_add.
   }
 } {
+Search (_ / ₂ = _ / ₂)%A.
+Search (_ * _ = _ * _)%A.
+Theorem glop :
+  ∀ θ1 θ2,
+  (2 * θ1 = 2 * θ2 → θ1 = θ2 ∨ θ1 = θ2 + angle_straight)%A.
+Admitted.
+specialize (glop ((θ1 + θ2) / ₂) (θ1 / ₂ + θ2 / ₂)) as H1.
+enough (H : (2 * ((θ1 + θ2) / ₂))%A = (2 * (θ1 / ₂ + θ2 / ₂))%A). {
+  specialize (H1 H).
+  destruct H1 as [H1| H1]; [ | easy ].
+  rewrite H1.
+(* mon cul, oui *)
+  rewrite <- H1 in H.
+...
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
   symmetry in Hzs1.
   destruct zs1. {
@@ -5058,7 +5075,6 @@ destruct aov. 2: {
       apply rngl_sin_nonneg_add_nonneg in Hzs12; [ | easy ].
       now rewrite Haov_v in Hzs12.
     }
-...
     change_angle_sub_r θ2 angle_straight.
     progress sin_cos_add_sub_straight_hyp T Hzs2.
 Search ((_ + angle_straight) / ₂)%A.
