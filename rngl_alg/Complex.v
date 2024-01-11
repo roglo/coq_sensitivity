@@ -4157,7 +4157,7 @@ destruct H3 as (H3, H4).
 now apply Nat.lt_irrefl in H4.
 Qed.
 
-Theorem angle_mul_nat_overflow_le_l :
+Theorem angle_mul_nat_not_overflow_le_l :
   ∀ m n,
   m ≤ n
   → ∀ θ, angle_mul_nat_overflow n θ = false
@@ -4177,6 +4177,20 @@ apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
 split; [ now apply IHn | ].
 apply (angle_add_overflow_le _ (n * θ)); [ | easy ].
 now apply angle_mul_nat_le_mono_nonneg_r.
+Qed.
+
+Theorem angle_mul_nat_overflow_le_l :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = true
+  → ∀ m, n ≤ m → angle_mul_nat_overflow m θ = true.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hn * Hnm.
+apply Bool.not_false_iff_true in Hn.
+apply Bool.not_false_iff_true.
+intros H; apply Hn.
+now apply (angle_mul_nat_not_overflow_le_l _ m).
 Qed.
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat :
@@ -4939,6 +4953,7 @@ symmetry in Hnt.
 destruct nt. 2: {
   now apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat Har Hch).
 }
+specialize (angle_mul_nat_overflow_le_l _ _ Hnt) as Hmt.
 apply angle_mul_nat_overflow_exist in Hnt.
 destruct Hnt as (m & Hmn & Hm & Hsm).
 set (j := S (Nat.log2 n)).
@@ -4951,7 +4966,7 @@ remember (θ / ₂^j)%A as θ'' eqn:Hθ''.
 assert (Htj : angle_mul_nat_overflow n θ'' = false). {
   subst θ''.
   subst j.
-  apply (angle_mul_nat_overflow_le_l _ (2 ^ S (Nat.log2 n))). {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ S (Nat.log2 n))). {
     now apply Nat.lt_le_incl.
   }
   apply angle_mul_nat_overflow_pow_div.
@@ -5070,6 +5085,7 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
