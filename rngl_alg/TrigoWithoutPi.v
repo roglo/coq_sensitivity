@@ -1934,6 +1934,7 @@ Theorem rngl_sin_nonneg_add_nonneg_nonneg :
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   → (0 ≤ rngl_sin θ2)%L.
 Proof.
+(*****)
 destruct_ac.
 intros * Haov Hzs1 Hzs3.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
@@ -3028,7 +3029,6 @@ Theorem rngl_cos_angle_div_2_add :
   angle_add_overflow θ1 θ2 = false
   → rngl_cos ((θ1 + θ2) / ₂) = rngl_cos (θ1 / ₂ + θ2 / ₂).
 Proof.
-intros * Haov.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3036,6 +3036,7 @@ specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Haov.
   rewrite H1; apply H1.
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
@@ -3060,6 +3061,7 @@ assert (Hs2z : (√2 ≠ 0)%L). {
   rewrite rngl_squ_sqrt in H; [ | now apply (rngl_lt_le_incl Hor) ].
   now rewrite (rngl_squ_0 Hos) in H.
 }
+intros * Haov.
 progress unfold angle_add_overflow in Haov.
 apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
@@ -3566,7 +3568,7 @@ Qed.
 Theorem angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  → angle_div_2 (θ1 + θ2) = (angle_div_2 θ1 + angle_div_2 θ2)%A.
+  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
 Proof.
 intros * Haov.
 apply eq_angle_eq.

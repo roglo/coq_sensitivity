@@ -2166,25 +2166,6 @@ intros * Haov.
 revert θ1 θ2 Haov.
 induction n; intros; [ easy | cbn ].
 rewrite IHn; [ | easy ].
-(*
-clear Haov.
-enough (n ≠ 0).
-rewrite angle_div_2_add_not_overflow; [ easy | ].
-destruct n; [ easy | ].
-
-...
-Theorem glop :
-  ∀ n θ, (θ / ₂^S n = θ / ₂^n / ₂)%A.
-Admitted.
-do 2 rewrite glop.
-Search (angle_add_overflow (_ / ₂)).
-...
-apply angle_add_overflow_div_2_div_2.
-  ============================
-  angle_add_overflow (θ1 / ₂^S n) (θ2 / ₂^S n) = false
-Search (_ / ₂^S _)%A.
-...
-*)
 apply angle_div_2_add_not_overflow.
 apply angle_add_overflow_le with (θ2 := θ2). {
   apply angle_div_2_pow_nat_le_diag.
@@ -5086,6 +5067,14 @@ subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
 specialize (Hmt n (le_refl _)) as Hnt.
+replace n with (m + (n - m)) at 1 by flia Hmn.
+rewrite (angle_mul_add_distr_r Hon Hop).
+Search ((_ + _) / ₂^_)%A.
+About angle_div_2_pow_nat_add.
+...
+rewrite angle_div_2_pow_nat_add.
+2: {
+Search (angle_mul_nat_overflow _ _ = true).
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
