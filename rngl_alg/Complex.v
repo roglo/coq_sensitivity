@@ -11,6 +11,7 @@ Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
+Require Import TacChangeAngle.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -5039,6 +5040,31 @@ destruct aov. 2: {
     now apply rngl_sin_angle_div_2_add.
   }
 } {
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  symmetry in Hzs1.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    assert (Hzs2 : (rngl_sin θ2 ≤ 0)%L). {
+      generalize Haov; intros Haov_v.
+      progress unfold angle_add_overflow in Haov.
+      progress unfold angle_ltb in Haov.
+      generalize Hzs1; intros H.
+      apply rngl_leb_le in H.
+      rewrite H in Haov; clear H.
+      remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+      symmetry in Hzs12.
+      destruct zs12; [ | easy ].
+      apply rngl_leb_le in Hzs12.
+      apply rngl_sin_nonneg_add_nonneg in Hzs12; [ | easy ].
+      now rewrite Haov_v in Hzs12.
+    }
+...
+    change_angle_sub_r θ2 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs2.
+Search ((_ + angle_straight) / ₂)%A.
+...
+    progress sin_cos_add_sub_straight_goal T.
+...
   remember (θ1 - angle_straight)%A as θ.
   apply angle_add_move_r in Heqθ.
   subst θ1; rename θ into θ1.
