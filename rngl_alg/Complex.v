@@ -5085,7 +5085,7 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+specialize (Hmt n (le_refl _)) as Hnt.
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
