@@ -5033,6 +5033,18 @@ Theorem angle_div_2_add_not_overflow' :
     ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite (H1 (_ / ₂)%A).
+  rewrite (H1 (_ + _)%A).
+  rewrite (H1 (_ + _)%A).
+  now destruct (angle_add_overflow θ1 θ2).
+}
 intros.
 remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
@@ -5072,16 +5084,49 @@ destruct aov. 2: {
           apply rngl_leb_le in Hzs2.
           rewrite (rngl_mul_1_l Hon).
           rewrite (rngl_opp_sub_distr Hop).
-          exfalso.
-          apply (rngl_nle_gt Hor) in Haov.
-          apply Haov; clear Haov.
-          apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
-          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [| H1].
-          now right; right; left.
-          destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [| H2].
-          now right; right; right.
-          apply (rngl_nle_gt Hor) in H1.
-          apply (rngl_nle_gt Hor) in H2.
+          remember (θ1 =? angle_straight)%A as t1s eqn:Ht1s.
+          symmetry in Ht1s.
+          destruct t1s. 2: {
+            apply (angle_eqb_neq Hed) in Ht1s.
+            exfalso.
+            apply (rngl_nle_gt Hor) in Haov.
+            apply Haov; clear Haov.
+            apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+            now left.
+          }
+          apply (angle_eqb_eq Hed) in Ht1s.
+          subst θ1.
+          remember (θ2 =? angle_straight)%A as t2s eqn:Ht2s.
+          symmetry in Ht2s.
+          destruct t2s. 2: {
+            apply (angle_eqb_neq Hed) in Ht2s.
+            exfalso.
+            apply (rngl_nle_gt Hor) in Haov.
+            apply Haov; clear Haov.
+            apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+            now right; left.
+          }
+          apply (angle_eqb_eq Hed) in Ht2s.
+          subst θ2.
+          rewrite (angle_straight_add_straight Hon Hop).
+          cbn.
+          rewrite (rngl_sub_opp_r Hop).
+          rewrite (rngl_add_opp_r Hop).
+          rewrite (rngl_sub_diag Hos).
+          rewrite (rngl_div_diag Hon Hiq). 2: {
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          }
+          rewrite (rngl_div_0_l Hos Hi1). 2: {
+            apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          }
+          rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+          rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+          rewrite (rngl_mul_0_l Hos).
+          rewrite (rngl_sub_0_r Hos).
+          symmetry.
+          apply (rngl_mul_1_l Hon).
+        }
+        apply (rngl_leb_gt Hor) in Hzs2.
 ...
           destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [He1| He1]. {
             apply eq_rngl_sin_0 in He1.
