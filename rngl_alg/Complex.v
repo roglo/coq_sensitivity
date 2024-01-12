@@ -5136,12 +5136,33 @@ destruct aov. 2: {
       }
       clear Haov.
       apply (rngl_leb_gt Hor) in Hzs1.
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_mul_1_l Hon).
+      rewrite (rngl_opp_sub_distr Hop).
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_sub_opp_r Hop).
       rewrite rngl_add_comm.
       rewrite <- rngl_sin_add.
       rewrite <- rngl_cos_add.
       generalize Hzs12; intros H.
       apply rngl_leb_le in H.
       rewrite H; clear H.
+      rewrite (rngl_mul_1_l Hon).
+      destruct zs2. {
+        apply rngl_leb_le in Hzs2.
+        rewrite (rngl_mul_1_l Hon).
+        rewrite (angle_add_comm Hic).
+        rewrite (rngl_mul_comm Hic).
+        rewrite (rngl_mul_comm Hic √((1 + _)/2))%L.
+        apply (rngl_lt_le_incl Hor) in Hzs1.
+        now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
+      }
+      apply (rngl_leb_gt Hor) in Hzs2.
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_mul_1_l Hon).
+      rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_add_opp_r Hop).
+Search (√ ((1 + rngl_cos _) / 2))%L.
 ...
 Search (√ ((1 + rngl_cos _) / 2))%L.
 apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
