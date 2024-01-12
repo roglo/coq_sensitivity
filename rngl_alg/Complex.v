@@ -5163,7 +5163,95 @@ destruct aov. 2: {
       rewrite (rngl_mul_1_l Hon).
       rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_add_opp_r Hop).
-Search (√ ((1 + rngl_cos _) / 2))%L.
+      change_angle_sub_r θ1 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hzs1.
+      progress sin_cos_add_sub_straight_goal T.
+      change_angle_sub_r θ2 angle_straight.
+      rewrite (angle_add_assoc Hop) in Hzs12 |-*.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      progress sin_cos_add_sub_straight_goal T.
+      do 3 rewrite (rngl_sub_opp_r Hop).
+      apply rngl_sin_nonneg_sin_nonneg_sin_nonneg; try easy; cycle 1.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      left; intros H; subst θ1.
+      cbn in Hzs1.
+      now apply (rngl_lt_irrefl Hor) in Hzs1.
+    }
+    destruct zs1; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs12.
+    apply rngl_ltb_lt in Haov.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_opp_sub_distr Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_sub_opp_r Hop).
+    rewrite rngl_add_comm.
+    rewrite <- rngl_sin_add.
+    rewrite <- rngl_cos_add.
+    generalize Hzs12; intros H.
+    apply (rngl_leb_gt Hor) in H.
+    rewrite H; clear H.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    destruct zs2. {
+      rewrite (rngl_mul_1_l Hon).
+      apply rngl_leb_le in Hzs2.
+      change_angle_sub_r θ1 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Haov.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hzs1.
+      exfalso.
+      apply (rngl_nle_gt Hor) in Haov.
+      apply Haov; clear Haov.
+      apply angle_add_overflow_le_lemma_111; try easy; cycle 1.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      left; intros H; subst θ1.
+      now apply (rngl_lt_irrefl Hor) in Hzs1.
+    }
+    apply (rngl_leb_gt Hor) in Hzs2.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_add_opp_r Hop).
+    apply (rngl_opp_inj Hop).
+    rewrite (rngl_opp_involutive Hop).
+    rewrite (rngl_opp_sub_distr Hop).
+    change_angle_sub_r θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Haov.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_goal T.
+    change_angle_sub_r θ2 angle_straight.
+    rewrite (angle_add_assoc Hop) in Hzs12, Haov |-*.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_hyp T Haov.
+    progress sin_cos_add_sub_straight_hyp T Hzs2.
+    progress sin_cos_add_sub_straight_goal T.
+    do 3 rewrite (rngl_sub_opp_r Hop).
+    apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1.
+    now apply (rngl_lt_le_incl Hor).
+    now apply (rngl_lt_le_incl Hor).
+    progress unfold angle_leb.
+    generalize Hzs1; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply rngl_leb_le in H.
+    rewrite H; clear H.
+    generalize Hzs12; intros H.
+    apply (rngl_leb_gt Hor) in H.
+    now rewrite H.
+  }
+...
+    progress unfold angle_add_overflow in Haov_v.
+Search (angle_add_overflow (_ + _)).
+apply angle_add_not_overflow_move_add in Haov_v.
+...
+Search (√ ((1 + rngl_cos _) / 2) = _)%L.
+...
+Search (√ ((1 - rngl_cos _) / 2) = _)%L.
 ...
 Search (√ ((1 + rngl_cos _) / 2))%L.
 apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
