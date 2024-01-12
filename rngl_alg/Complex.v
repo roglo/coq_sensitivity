@@ -4861,7 +4861,7 @@ destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
 now rewrite Hit in Hsi.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -5049,12 +5049,34 @@ destruct aov. 2: {
     cbn - [ angle_add ].
     progress unfold angle_add_overflow in Haov.
     progress unfold angle_ltb in Haov.
+    cbn.
     remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
     remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-    symmetry in Hzs1, Hzs12.
+    symmetry in Hzs1, Hzs2, Hzs12.
     destruct zs12. {
       apply rngl_leb_le in Hzs12.
-      rewrite (rngl_mul_1_l Hon).
+      destruct zs1. {
+        apply rngl_leb_le in Hzs1.
+        rewrite (rngl_mul_1_l Hon).
+        rewrite rngl_add_comm.
+        rewrite <- rngl_sin_add.
+        rewrite <- rngl_cos_add.
+        generalize Hzs12; intros H.
+        apply rngl_leb_le in H.
+        rewrite H; clear H.
+        rewrite (rngl_mul_1_l Hon).
+        destruct zs2. {
+          apply rngl_leb_le in Hzs2.
+          rewrite (rngl_mul_1_l Hon).
+          rewrite (rngl_opp_sub_distr Hop).
+...
+Search (√ ((1 + rngl_cos _) / 2))%L.
+...
+          apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
+apply rngl_sin_nonneg_sin_neg_sin_add_neg.
+apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
+apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
 ...
 Search (_ / ₂ = _ / ₂)%A.
 Search (_ * _ = _ * _)%A.
