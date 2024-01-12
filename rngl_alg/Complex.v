@@ -5080,10 +5080,10 @@ destruct aov. 2: {
         apply rngl_leb_le in H.
         rewrite H; clear H.
         rewrite (rngl_mul_1_l Hon).
+        rewrite (rngl_opp_sub_distr Hop).
         destruct zs2. {
           apply rngl_leb_le in Hzs2.
           rewrite (rngl_mul_1_l Hon).
-          rewrite (rngl_opp_sub_distr Hop).
           remember (θ1 =? angle_straight)%A as t1s eqn:Ht1s.
           symmetry in Ht1s.
           destruct t1s. 2: {
@@ -5127,34 +5127,29 @@ destruct aov. 2: {
           apply (rngl_mul_1_l Hon).
         }
         apply (rngl_leb_gt Hor) in Hzs2.
-...
-          destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [He1| He1]. {
-            apply eq_rngl_sin_0 in He1.
-            destruct He1; subst θ1. {
-              right; right; left; apply (rngl_0_le_1 Hon Hop Hor).
-            }
-            right.
-            rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
-            apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
-            apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
-            symmetry in Hzs12.
-            apply eq_rngl_sin_0 in Hzs12.
-            destruct Hzs12; subst θ2.
-            right; right; apply (rngl_0_le_1 Hon Hop Hor).
-            right.
-            cbn in H1.
-            cbn in Hzs1.
-            cbn in *.
-...
-          exfalso.
-          apply (rngl_nlt_ge Hor) in Hzs12.
-          apply Hzs12; clear Hzs12; cbn.
-
-...
-Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
-About angle_add_overflow_le_lemma_111.
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite (rngl_mul_1_l Hon).
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_sub_opp_r Hop).
+        apply (rngl_lt_le_incl Hor) in Hzs2.
+        now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
+      }
+      clear Haov.
+      apply (rngl_leb_gt Hor) in Hzs1.
+      rewrite rngl_add_comm.
+      rewrite <- rngl_sin_add.
+      rewrite <- rngl_cos_add.
+      generalize Hzs12; intros H.
+      apply rngl_leb_le in H.
+      rewrite H; clear H.
 ...
 Search (√ ((1 + rngl_cos _) / 2))%L.
+apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
+apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
+apply rngl_sin_nonneg_sin_neg_sin_add_neg; try easy.
+...
+About angle_add_overflow_le_lemma_111.
+...
 ...
           apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
 apply rngl_sin_nonneg_sin_neg_sin_add_neg.
