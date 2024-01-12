@@ -218,7 +218,7 @@ destruct zs2. {
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     rewrite (angle_add_comm Hic).
     apply angle_add_overflow_le_lemma_111; try easy.
-    now right; right.
+    now right; right; left.
     now rewrite (angle_add_comm Hic).
   }
   apply (rngl_nle_gt Hor) in Hc2z.
@@ -3558,7 +3558,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   apply (rngl_ltb_ge Hor).
   destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     apply angle_add_overflow_le_lemma_111; try easy.
-    now right; right.
+    now right; right; left.
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
   }

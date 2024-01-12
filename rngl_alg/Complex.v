@@ -2046,7 +2046,7 @@ symmetry in Hzc1.
 destruct zc1. {
   apply rngl_leb_le in Hzc1.
   apply angle_add_overflow_le_lemma_111; try easy.
-  now right; right.
+  now right; right; left.
 }
 apply (rngl_leb_gt Hor) in Hzc1.
 apply angle_add_overflow_le_lemma_2; try easy. 2: {
@@ -5076,6 +5076,35 @@ destruct aov. 2: {
           apply (rngl_nle_gt Hor) in Haov.
           apply Haov; clear Haov.
           apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [| H1].
+          now right; right; left.
+          destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [| H2].
+          now right; right; right.
+          apply (rngl_nle_gt Hor) in H1.
+          apply (rngl_nle_gt Hor) in H2.
+...
+          destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [He1| He1]. {
+            apply eq_rngl_sin_0 in He1.
+            destruct He1; subst θ1. {
+              right; right; left; apply (rngl_0_le_1 Hon Hop Hor).
+            }
+            right.
+            rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
+            apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+            apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
+            symmetry in Hzs12.
+            apply eq_rngl_sin_0 in Hzs12.
+            destruct Hzs12; subst θ2.
+            right; right; apply (rngl_0_le_1 Hon Hop Hor).
+            right.
+            cbn in H1.
+            cbn in Hzs1.
+            cbn in *.
+...
+          exfalso.
+          apply (rngl_nlt_ge Hor) in Hzs12.
+          apply Hzs12; clear Hzs12; cbn.
+
 ...
 Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
 About angle_add_overflow_le_lemma_111.
