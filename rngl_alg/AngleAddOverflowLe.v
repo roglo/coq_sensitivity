@@ -992,6 +992,83 @@ Qed.
 
 Theorem angle_add_overflow_le_lemma_111 :
   ∀ θ1 θ2,
+  (θ1 ≠ angle_straight ∨ θ2 ≠ angle_straight)
+  → (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * H12 Hzs1 Hzs2 Hzs12.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  cbn.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_nle_gt Hor) in Hc1z.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+  change_angle_sub_r θ1 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs1.
+  progress sin_cos_add_sub_right_hyp T Hc1z.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  progress sin_cos_add_sub_right_goal T.
+  apply (rngl_lt_le_incl Hor) in Hc1z.
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+  now apply rngl_sin_add_nonneg.
+  cbn.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_nle_gt Hor) in Hc2z.
+destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
+  apply eq_rngl_sin_0 in Hs1z.
+  destruct Hs1z; subst θ1. {
+    rewrite (angle_add_0_l Hon Hos).
+    apply rngl_cos_bound.
+  }
+  destruct H12 as [H12| H12]; [ easy | ].
+  rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+  apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
+  symmetry in Hzs12.
+  apply eq_rngl_sin_0 in Hzs12.
+  destruct Hzs12; subst θ2; [ | easy ].
+  rewrite angle_add_0_r.
+  apply (rngl_le_refl Hor).
+}
+exfalso.
+apply (rngl_nlt_ge Hor) in Hzs12.
+apply Hzs12; clear Hzs12.
+cbn.
+apply (rngl_add_nonpos_neg Hop Hor). {
+  apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+  apply not_eq_sym in Hs1z.
+  now apply (rngl_lt_iff Hor).
+}
+Qed.
+
+Theorem angle_add_overflow_le_lemma_112 :
+  ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
@@ -1024,7 +1101,7 @@ Theorem quadrant_1_rngl_cos_add_le_cos_l :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
-apply angle_add_overflow_le_lemma_111; try easy.
+apply angle_add_overflow_le_lemma_112; try easy.
 cbn.
 apply (rngl_add_nonneg_nonneg Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
@@ -1083,7 +1160,7 @@ progress sin_cos_add_sub_straight_hyp T Hc1z.
 progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_goal T.
 apply (rngl_lt_le_incl Hor) in Hc1z, Hzs12.
-now apply angle_add_overflow_le_lemma_111.
+now apply angle_add_overflow_le_lemma_112.
 Qed.
 
 Theorem angle_add_overflow_le :

@@ -2045,7 +2045,7 @@ remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
 destruct zc1. {
   apply rngl_leb_le in Hzc1.
-  now apply angle_add_overflow_le_lemma_111.
+  now apply angle_add_overflow_le_lemma_112.
 }
 apply (rngl_leb_gt Hor) in Hzc1.
 apply angle_add_overflow_le_lemma_2; try easy. 2: {
@@ -5058,6 +5058,7 @@ destruct aov. 2: {
       apply rngl_leb_le in Hzs12.
       destruct zs1. {
         apply rngl_leb_le in Hzs1.
+        apply rngl_ltb_lt in Haov.
         rewrite (rngl_mul_1_l Hon).
         rewrite rngl_add_comm.
         rewrite <- rngl_sin_add.
@@ -5070,6 +5071,14 @@ destruct aov. 2: {
           apply rngl_leb_le in Hzs2.
           rewrite (rngl_mul_1_l Hon).
           rewrite (rngl_opp_sub_distr Hop).
+...
+          exfalso.
+          apply (rngl_nle_gt Hor) in Haov.
+          apply Haov; clear Haov.
+          apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+...
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+About angle_add_overflow_le_lemma_111.
 ...
 Search (√ ((1 + rngl_cos _) / 2))%L.
 ...
