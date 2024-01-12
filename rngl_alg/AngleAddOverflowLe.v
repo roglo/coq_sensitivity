@@ -992,7 +992,7 @@ Qed.
 
 Theorem angle_add_overflow_le_lemma_111 :
   ∀ θ1 θ2,
-  (θ1 ≠ angle_straight ∨ θ2 ≠ angle_straight)
+  (θ1 ≠ angle_straight ∨ θ2 ≠ angle_straight ∨ 0 ≤ rngl_cos θ1)%L
   → (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
@@ -1003,6 +1003,19 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * H12 Hzs1 Hzs2 Hzs12.
+rewrite <- or_assoc in H12.
+destruct H12 as [H12| H12]. 2: {
+  cbn.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   cbn.
   apply (rngl_le_sub_le_add_l Hop Hor).
@@ -1067,30 +1080,6 @@ apply (rngl_add_nonpos_neg Hop Hor). {
 }
 Qed.
 
-Theorem angle_add_overflow_le_lemma_112 :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hc1z Hzs12.
-apply angle_add_overflow_le_lemma_1 with (θ2 := θ2); try easy.
-apply (rngl_le_refl Hor).
-cbn.
-apply (rngl_le_sub_le_add_l Hop Hor).
-apply (rngl_le_0_sub Hop Hor).
-rewrite <- (rngl_add_sub_assoc Hop).
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-apply (rngl_add_nonneg_nonneg Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-apply (rngl_le_0_sub Hop Hor).
-apply rngl_cos_bound.
-Qed.
-
 Theorem quadrant_1_rngl_cos_add_le_cos_l :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -1101,7 +1090,8 @@ Theorem quadrant_1_rngl_cos_add_le_cos_l :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
-apply angle_add_overflow_le_lemma_112; try easy.
+apply angle_add_overflow_le_lemma_111; try easy.
+now right; right.
 cbn.
 apply (rngl_add_nonneg_nonneg Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
@@ -1160,7 +1150,8 @@ progress sin_cos_add_sub_straight_hyp T Hc1z.
 progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_goal T.
 apply (rngl_lt_le_incl Hor) in Hc1z, Hzs12.
-now apply angle_add_overflow_le_lemma_112.
+apply angle_add_overflow_le_lemma_111; try easy.
+now right; right.
 Qed.
 
 Theorem angle_add_overflow_le :
