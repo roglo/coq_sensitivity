@@ -5027,10 +5027,11 @@ Check rngl_cos_angle_div_2_add.
 
 Theorem angle_div_2_add_not_overflow' :
   ∀ θ1 θ2,
-  if angle_add_overflow θ1 θ2 then
-    ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
-  else
-    ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
+  ((θ1 + θ2) / ₂)%A =
+    if angle_add_overflow θ1 θ2 then
+      (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
+    else
+      (θ1 / ₂ + θ2 / ₂)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
