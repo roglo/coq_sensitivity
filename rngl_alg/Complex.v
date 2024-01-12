@@ -4861,7 +4861,7 @@ destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
 now rewrite Hit in Hsi.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -5043,12 +5043,25 @@ destruct aov. 2: {
     now apply rngl_sin_angle_div_2_add.
   }
 } {
+  apply eq_angle_eq.
+  f_equal. {
+    rewrite (rngl_cos_add_straight_r Hon Hop).
+    cbn - [ angle_add ].
+    progress unfold angle_add_overflow in Haov.
+    progress unfold angle_ltb in Haov.
+    remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+    remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+    symmetry in Hzs1, Hzs12.
+    destruct zs12. {
+      apply rngl_leb_le in Hzs12.
+      rewrite (rngl_mul_1_l Hon).
+...
 Search (_ / ₂ = _ / ₂)%A.
 Search (_ * _ = _ * _)%A.
 Theorem glop :
   ∀ θ1 θ2,
   (2 * θ1 = 2 * θ2 → θ1 = θ2 ∨ θ1 = θ2 + angle_straight)%A.
-Admitted.
+...
 specialize (glop ((θ1 + θ2) / ₂) (θ1 / ₂ + θ2 / ₂)) as H1.
 enough (H : (2 * ((θ1 + θ2) / ₂))%A = (2 * (θ1 / ₂ + θ2 / ₂))%A). {
   specialize (H1 H).
