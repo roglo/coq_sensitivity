@@ -2112,15 +2112,24 @@ rewrite angle_div_2_add.
 now rewrite Haov.
 Qed.
 
+Theorem angle_div_2_add_overflow :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = true
+  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂ + angle_straight)%A.
+Proof.
+intros * Haov.
+rewrite angle_div_2_add.
+now rewrite Haov.
+Qed.
+
 Theorem angle_div_2_pow_nat_add :
   ∀ n θ1 θ2,
   angle_add_overflow θ1 θ2 = false
   → ((θ1 + θ2) / ₂^n = θ1 / ₂^n + θ2 / ₂^n)%A.
 Proof.
 intros * Haov.
-revert θ1 θ2 Haov.
-induction n; intros; [ easy | cbn ].
-rewrite IHn; [ | easy ].
+induction n; [ easy | cbn ].
+rewrite IHn.
 apply angle_div_2_add_not_overflow.
 apply angle_add_overflow_le with (θ2 := θ2). {
   apply angle_div_2_pow_nat_le_diag.
@@ -2131,6 +2140,50 @@ apply angle_add_overflow_le with (θ2 := θ1). {
 }
 now apply angle_add_not_overflow_comm.
 Qed.
+
+(* to be completed
+Theorem angle_div_2_pow_nat_add' :
+  ∀ n θ1 θ2,
+  ((θ1 + θ2) / ₂^n)%A =
+     if angle_add_overflow θ1 θ2 then
+       (θ1 / ₂^n + θ2 / ₂^n + angle_straight)%A
+     else
+       (θ1 / ₂^n + θ2 / ₂^n)%A.
+Proof.
+intros.
+remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. 2: {
+  induction n; [ easy | cbn ].
+  rewrite IHn.
+  apply angle_div_2_add_not_overflow.
+  apply angle_add_overflow_le with (θ2 := θ2). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  apply angle_add_not_overflow_comm.
+  apply angle_add_overflow_le with (θ2 := θ1). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  now apply angle_add_not_overflow_comm.
+} {
+  induction n. {
+    cbn.
+...
+  induction n; [ easy | cbn ].
+  rewrite IHn.
+...
+  apply angle_div_2_add_overflow.
+  apply angle_add_overflow_le with (θ2 := θ2). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  apply angle_add_not_overflow_comm.
+  apply angle_add_overflow_le with (θ2 := θ1). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  apply angle_add_overflow_comm.
+...
+Qed.
+*)
 
 Theorem angle_div_2_pow_nat_mul :
   ∀ n m θ,
@@ -5009,81 +5062,8 @@ specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
 rewrite (angle_mul_add_distr_r Hon Hop).
 Check angle_div_2_add.
-...
 Search ((_ + _) / ₂^_)%A.
 About angle_div_2_pow_nat_add.
-Search ((_ + _) / ₂)%A.
-Check angle_div_2_add_not_overflow.
-Check rngl_cos_angle_div_2_add.
-...
-    progress unfold angle_add_overflow in Haov_v.
-Search (angle_add_overflow (_ + _)).
-apply angle_add_not_overflow_move_add in Haov_v.
-...
-Search (√ ((1 + rngl_cos _) / 2) = _)%L.
-...
-Search (√ ((1 - rngl_cos _) / 2) = _)%L.
-...
-Search (√ ((1 + rngl_cos _) / 2))%L.
-apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
-apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
-apply rngl_sin_nonneg_sin_neg_sin_add_neg; try easy.
-...
-About angle_add_overflow_le_lemma_111.
-...
-...
-          apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
-apply rngl_sin_nonneg_sin_neg_sin_add_neg.
-apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg.
-apply rngl_sin_nonneg_sin_nonneg_sin_nonneg.
-...
-Search (_ / ₂ = _ / ₂)%A.
-Search (_ * _ = _ * _)%A.
-Theorem glop :
-  ∀ θ1 θ2,
-  (2 * θ1 = 2 * θ2 → θ1 = θ2 ∨ θ1 = θ2 + angle_straight)%A.
-...
-specialize (glop ((θ1 + θ2) / ₂) (θ1 / ₂ + θ2 / ₂)) as H1.
-enough (H : (2 * ((θ1 + θ2) / ₂))%A = (2 * (θ1 / ₂ + θ2 / ₂))%A). {
-  specialize (H1 H).
-  destruct H1 as [H1| H1]; [ | easy ].
-  rewrite H1.
-(* mon cul, oui *)
-  rewrite <- H1 in H.
-...
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  symmetry in Hzs1.
-  destruct zs1. {
-    apply rngl_leb_le in Hzs1.
-    assert (Hzs2 : (rngl_sin θ2 ≤ 0)%L). {
-      generalize Haov; intros Haov_v.
-      progress unfold angle_add_overflow in Haov.
-      progress unfold angle_ltb in Haov.
-      generalize Hzs1; intros H.
-      apply rngl_leb_le in H.
-      rewrite H in Haov; clear H.
-      remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-      symmetry in Hzs12.
-      destruct zs12; [ | easy ].
-      apply rngl_leb_le in Hzs12.
-      apply rngl_sin_nonneg_add_nonneg in Hzs12; [ | easy ].
-      now rewrite Haov_v in Hzs12.
-    }
-    change_angle_sub_r θ2 angle_straight.
-    progress sin_cos_add_sub_straight_hyp T Hzs2.
-Search ((_ + angle_straight) / ₂)%A.
-...
-    progress sin_cos_add_sub_straight_goal T.
-...
-  remember (θ1 - angle_straight)%A as θ.
-  apply angle_add_move_r in Heqθ.
-  subst θ1; rename θ into θ1.
-...
-  rewrite (angle_add_comm Hic) in Haov.
-Search (angle_add_overflow (_ + _)).
-...
-Qed.
-...
 ...
 rewrite angle_div_2_pow_nat_add.
 2: {
