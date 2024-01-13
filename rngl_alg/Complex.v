@@ -2141,14 +2141,14 @@ apply angle_add_overflow_le with (θ2 := θ1). {
 now apply angle_add_not_overflow_comm.
 Qed.
 
-(* to be completed
 Theorem angle_div_2_pow_nat_add' :
   ∀ n θ1 θ2,
   ((θ1 + θ2) / ₂^n)%A =
      if angle_add_overflow θ1 θ2 then
-       if n =? 0 then (θ1 + θ2)%A
-       else if n =? 1 then (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
-       else 0%A
+       match n with
+       | 0 => (θ1 + θ2)%A
+       | S n' => ((θ1 / ₂ + θ2 / ₂ + angle_straight) / ₂^n')%A
+       end
      else
        (θ1 / ₂^n + θ2 / ₂^n)%A.
 Proof.
@@ -2170,79 +2170,11 @@ destruct aov. 2: {
   now apply angle_add_not_overflow_comm.
 } {
   destruct n; [ easy | ].
-  cbn - [ angle_div_2_pow_nat ].
   rewrite angle_div_2_pow_nat_succ_r_2.
   rewrite angle_div_2_add_overflow; [ | easy ].
-  destruct n; [ easy | ].
-  cbn - [ angle_div_2_pow_nat ].
-...
-  remember (angle_add_overflow (θ1 / ₂ + θ2 / ₂) angle_straight) as aov1
-    eqn:Haov1.
-  symmetry in Haov1.
-  destruct aov1. 2: {
-    destruct n; [ easy | ].
-    do 3 rewrite angle_div_2_pow_nat_succ_r_2.
-    rewrite angle_div_2_add_overflow; [ | easy ].
-...
-  destruct n; intros. {
-    cbn; symmetry.
-    rewrite angle_add_0_r.
-    apply angle_add_0_r.
-  }
-  cbn.
-destruct n. {
-  cbn.
-  rewrite angle_add_0_r.
-  now apply angle_div_2_add_overflow.
+  now destruct n.
 }
-destruct n. {
-  cbn.
-  rewrite angle_add_0_r.
-  rewrite angle_div_2_add_overflow; [ | easy ].
-  rewrite (angle_straight_add_straight Hon Hop).
-  rewrite angle_add_0_r.
-  remember (angle_add_overflow (θ1 / ₂ + θ2 / ₂) angle_straight) as aov1
-    eqn:Haov1.
-  symmetry in Haov1.
-  destruct aov1. {
-    rewrite angle_div_2_add_overflow; [ | easy ].
-    rewrite angle_div_2_add_not_overflow. 2: {
-      apply angle_add_overflow_div_2_div_2.
-    }
-...
-  } {
-    rewrite angle_div_2_add_not_overflow; [ | easy ].
-    rewrite angle_div_2_add_not_overflow. 2: {
-      apply angle_add_overflow_div_2_div_2.
-    }
-...
-  rewrite angle_div_2_add_not_overflow; [ | ].
-...
-  rewrite IHn.
-  rewrite angle_div_2_add_not_overflow.
-  rewrite angle_div_2_add_not_overflow.
-...
-Search ((_ + _) / ₂)%A.
-...
-  rewrite (angle_add_assoc Hop).
-Search ((_ + _) / ₂)%A.
-...
-  rewrite (angle_add_assoc Hop).
-...
-  rewrite angle_div_2_add_overflow.
-  rewrite angle_div_2_add_not_overflow.
-...
-  apply angle_add_overflow_le with (θ2 := θ2). {
-    apply angle_div_2_pow_nat_le_diag.
-  }
-  apply angle_add_not_overflow_comm.
-  apply angle_add_overflow_le with (θ2 := θ1). {
-    apply angle_div_2_pow_nat_le_diag.
-  }
-  apply angle_add_overflow_comm.
-...
 Qed.
-*)
 
 Theorem angle_div_2_pow_nat_mul :
   ∀ n m θ,
@@ -5120,13 +5052,7 @@ rewrite <- angle_mul_sub_distr_l.
 specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
 rewrite (angle_mul_add_distr_r Hon Hop).
-Check angle_div_2_add.
-Search ((_ + _) / ₂^_)%A.
-About angle_div_2_pow_nat_add.
-...
-rewrite angle_div_2_pow_nat_add.
-2: {
-Search (angle_mul_nat_overflow _ _ = true).
+rewrite angle_div_2_pow_nat_add'.
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
