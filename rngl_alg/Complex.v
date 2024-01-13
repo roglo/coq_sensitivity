@@ -5156,6 +5156,46 @@ destruct zs12. {
     progress sin_cos_add_sub_straight_hyp T Hzs12.
     progress sin_cos_add_sub_straight_goal T.
     do 2 rewrite (rngl_sub_opp_r Hop).
+    destruct (rngl_eq_dec Hed (rngl_sin (θ1 + θ2)) 0) as [Hs12| Hs12]. {
+      apply eq_rngl_sin_0 in Hs12.
+      destruct Hs12 as [Hs12| Hs12]. {
+        exfalso.
+        rewrite Hs12 in Haov; cbn in Haov.
+        apply (rngl_nle_gt Hor) in Haov.
+        apply Haov, rngl_cos_bound.
+      }
+      rewrite Hs12 in Hzs12; cbn in Hzs12.
+      rewrite Hs12 in Haov; cbn in Haov.
+      rewrite Hs12.
+      cbn.
+      apply angle_add_sub_eq_l in Hs12.
+      subst θ2.
+      rewrite (rngl_cos_sub_straight_l Hon Hop).
+      rewrite (rngl_sub_opp_r Hop).
+      do 2 rewrite (rngl_add_opp_r Hop).
+      rewrite (rngl_mul_comm Hic).
+      do 2 rewrite (rngl_sub_diag Hos).
+      rewrite (rngl_div_0_l Hos Hi1). 2: {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      apply (rl_sqrt_0 Hop Hic Hor Hid).
+    }
+    apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
+      now apply (rngl_lt_le_incl Hor).
+    } {
+      now apply (rngl_lt_iff Hor).
+    }
+    progress unfold angle_leb.
+    generalize Hzs1; intros H.
+    apply rngl_leb_le in H.
+    rewrite H; clear H.
+    remember (0 ≤? rngl_sin (θ1 + θ2))%L as z12 eqn:Hz12.
+    symmetry in Hz12.
+    destruct z12; [ | easy ].
+    apply rngl_leb_le in Hz12.
+    now apply (rngl_le_antisymm Hor) in Hz12.
+  }
+  clear Haov.
 ...
 Search (√((1 + rngl_cos _) / 2)%L = _).
 ...
