@@ -5064,7 +5064,6 @@ apply (rngl_leb_gt Hor) in H.
 now rewrite H.
 Qed.
 
-(* to be completed
 Theorem rngl_sin_angle_div_2_add' :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = true
@@ -5302,140 +5301,47 @@ destruct zs2. {
   now apply (rngl_lt_irrefl Hor) in Hzs1.
 }
 apply (rngl_leb_gt Hor) in Hzs2.
-...
-Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
-Search (√((1 + rngl_cos _) / 2)%L = _).
-  apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
-...
-  apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
-...
-Search (√((1 - rngl_cos _) / 2)%L = _).
-...
-apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy.
-progress unfold angle_leb.
-generalize Hzs1; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hzs12; intros H.
-Search ((_ ≤? _)%L = false).
-apply rngl_
-apply rngl_leb_le in H.
-rewrite H; clear H.
-...
-apply rngl_sin_nonneg_sin_neg_sin_add_neg.
-    rewrite (rngl_sub_opp_r Hop).
-    apply (rngl_lt_le_incl Hor) in Hzs2.
-  }
-  clear Haov.
-  apply (rngl_leb_gt Hor) in Hzs1.
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_opp_sub_distr Hop).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_add_comm.
-  rewrite <- rngl_sin_add.
-  rewrite <- rngl_cos_add.
-  generalize Hzs12; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  rewrite (rngl_mul_1_l Hon).
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    rewrite (rngl_mul_1_l Hon).
-    rewrite (angle_add_comm Hic).
-    rewrite (rngl_mul_comm Hic).
-    rewrite (rngl_mul_comm Hic √((1 + _)/2))%L.
-    apply (rngl_lt_le_incl Hor) in Hzs1.
-    now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
-  }
-  apply (rngl_leb_gt Hor) in Hzs2.
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_opp_r Hop).
-  rewrite (rngl_add_opp_r Hop).
-  change_angle_sub_r θ1 angle_straight.
-  progress sin_cos_add_sub_straight_hyp T Hzs12.
-  progress sin_cos_add_sub_straight_hyp T Hzs1.
-  progress sin_cos_add_sub_straight_goal T.
-  change_angle_sub_r θ2 angle_straight.
-  rewrite (angle_add_assoc Hop) in Hzs12 |-*.
-  progress sin_cos_add_sub_straight_hyp T Hzs12.
-  progress sin_cos_add_sub_straight_hyp T Hzs2.
-  progress sin_cos_add_sub_straight_goal T.
-  do 3 rewrite (rngl_sub_opp_r Hop).
-  apply rngl_sin_nonneg_sin_nonneg_sin_nonneg; try easy; cycle 1.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  left; intros H; subst θ1.
-  cbn in Hzs1.
-  now apply (rngl_lt_irrefl Hor) in Hzs1.
-}
-destruct zs1; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzs1, Hzs12.
-apply rngl_ltb_lt in Haov.
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_opp_sub_distr Hop).
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_sub_opp_r Hop).
-rewrite rngl_add_comm.
-rewrite <- rngl_sin_add.
-rewrite <- rngl_cos_add.
-generalize Hzs12; intros H.
-apply (rngl_leb_gt Hor) in H.
-rewrite H; clear H.
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_1_l Hon).
-destruct zs2. {
-  rewrite (rngl_mul_1_l Hon).
-  apply rngl_leb_le in Hzs2.
-  change_angle_sub_r θ1 angle_straight.
-  progress sin_cos_add_sub_straight_hyp T Haov.
-  progress sin_cos_add_sub_straight_hyp T Hzs12.
-  progress sin_cos_add_sub_straight_hyp T Hzs1.
-  exfalso.
-  apply (rngl_nle_gt Hor) in Haov.
-  apply Haov; clear Haov.
-  apply angle_add_overflow_le_lemma_111; try easy; cycle 1.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  left; intros H; subst θ1.
-  now apply (rngl_lt_irrefl Hor) in Hzs1.
-}
-apply (rngl_leb_gt Hor) in Hzs2.
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
-apply (rngl_opp_inj Hop).
-rewrite (rngl_opp_involutive Hop).
-rewrite (rngl_opp_sub_distr Hop).
 change_angle_sub_r θ1 angle_straight.
 progress sin_cos_add_sub_straight_hyp T Haov.
 progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_hyp T Hzs1.
 progress sin_cos_add_sub_straight_goal T.
-change_angle_sub_r θ2 angle_straight.
-rewrite (angle_add_assoc Hop) in Hzs12, Haov |-*.
-progress sin_cos_add_sub_straight_hyp T Hzs12.
-progress sin_cos_add_sub_straight_hyp T Haov.
-progress sin_cos_add_sub_straight_hyp T Hzs2.
-progress sin_cos_add_sub_straight_goal T.
-do 3 rewrite (rngl_sub_opp_r Hop).
-apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
-progress unfold angle_leb.
-generalize Hzs1; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hzs12; intros H.
-apply (rngl_leb_gt Hor) in H.
-now rewrite H.
+do 2 rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+now apply rngl_sin_nonneg_sin_neg_sin_add_neg.
 Qed.
-*)
+
+Theorem angle_div_2_add :
+  ∀ θ1 θ2,
+  ((θ1 + θ2) / ₂)%A =
+    if angle_add_overflow θ1 θ2 then
+      (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
+    else
+      (θ1 / ₂ + θ2 / ₂)%A.
+Proof.
+intros.
+remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. 2: {
+  apply eq_angle_eq.
+  f_equal. {
+    now apply rngl_cos_angle_div_2_add.
+  } {
+    now apply rngl_sin_angle_div_2_add.
+  }
+} {
+  apply eq_angle_eq.
+  f_equal. {
+    now apply rngl_cos_angle_div_2_add'.
+  } {
+    now apply rngl_sin_angle_div_2_add'.
+  }
+}
+Qed.
 
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
@@ -5594,35 +5500,13 @@ rewrite <- angle_mul_sub_distr_l.
 specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
 rewrite (angle_mul_add_distr_r Hon Hop).
+Check angle_div_2_add.
+...
 Search ((_ + _) / ₂^_)%A.
 About angle_div_2_pow_nat_add.
 Search ((_ + _) / ₂)%A.
 Check angle_div_2_add_not_overflow.
 Check rngl_cos_angle_div_2_add.
-
-Theorem angle_div_2_add_not_overflow' :
-  ∀ θ1 θ2,
-  ((θ1 + θ2) / ₂)%A =
-    if angle_add_overflow θ1 θ2 then
-      (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
-    else
-      (θ1 / ₂ + θ2 / ₂)%A.
-Proof.
-intros.
-remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. 2: {
-  apply eq_angle_eq.
-  f_equal. {
-    now apply rngl_cos_angle_div_2_add.
-  } {
-    now apply rngl_sin_angle_div_2_add.
-  }
-} {
-  apply eq_angle_eq.
-  f_equal. {
-    now apply rngl_cos_angle_div_2_add'.
-  } {
 ...
     progress unfold angle_add_overflow in Haov_v.
 Search (angle_add_overflow (_ + _)).
