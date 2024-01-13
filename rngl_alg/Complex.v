@@ -2142,6 +2142,38 @@ now apply angle_add_not_overflow_comm.
 Qed.
 
 (* to be completed
+Theorem angle_div_2_pow_succ_nat_add :
+  ∀ n θ1 θ2,
+  ((θ1 + θ2) / ₂^S n)%A =
+     if angle_add_overflow (θ1 / ₂^n) (θ2 / ₂^n) then
+       (θ1 / ₂^S n + θ2 / ₂^S n + angle_straight)%A
+     else
+       (θ1 / ₂^S n + θ2 / ₂^S n)%A.
+Proof.
+destruct_ac.
+intros.
+remember (angle_add_overflow (θ1 / ₂^n) (θ2 / ₂^n)) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. 2: {
+  induction n. {
+    cbn in Haov; cbn.
+    now apply angle_div_2_add_not_overflow.
+  }
+  remember (S n) as sn; cbn; subst sn.
+  rewrite IHn.
+...
+  apply angle_div_2_add_not_overflow.
+  apply angle_add_overflow_le with (θ2 := θ2). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  apply angle_add_not_overflow_comm.
+  apply angle_add_overflow_le with (θ2 := θ1). {
+    apply angle_div_2_pow_nat_le_diag.
+  }
+  now apply angle_add_not_overflow_comm.
+} {
+...
+
 Theorem angle_div_2_pow_nat_add' :
   ∀ n θ1 θ2,
   ((θ1 + θ2) / ₂^n)%A =
@@ -2167,7 +2199,7 @@ destruct aov. 2: {
   }
   now apply angle_add_not_overflow_comm.
 } {
-  induction n. {
+  destruct n; intros. {
     cbn; symmetry.
     apply angle_add_0_r.
   }
@@ -2183,9 +2215,22 @@ destruct n. {
   rewrite angle_div_2_add_overflow; [ | easy ].
   rewrite (angle_straight_add_straight Hon Hop).
   rewrite angle_add_0_r.
+  remember (angle_add_overflow (θ1 / ₂ + θ2 / ₂) angle_straight) as aov1
+    eqn:Haov1.
+  symmetry in Haov1.
+  destruct aov1. {
+    rewrite angle_div_2_add_overflow; [ | easy ].
+    rewrite angle_div_2_add_not_overflow. 2: {
+      apply angle_add_overflow_div_2_div_2.
+    }
+...
+  } {
+    rewrite angle_div_2_add_not_overflow; [ | easy ].
+    rewrite angle_div_2_add_not_overflow. 2: {
+      apply angle_add_overflow_div_2_div_2.
+    }
 ...
   rewrite angle_div_2_add_not_overflow; [ | ].
-  rewrite angle_div_2_add_overflow; [ | ].
 ...
   rewrite IHn.
   rewrite angle_div_2_add_not_overflow.
