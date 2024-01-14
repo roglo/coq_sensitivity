@@ -5078,7 +5078,7 @@ rewrite Hεε2; clear Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
-(**)
+(*
 destruct i. {
   cbn.
   rewrite angle_sub_diag.
@@ -5089,8 +5089,13 @@ apply (rngl_le_lt_trans Hor) with
      angle_eucl_dist
        (2 ^ S i / n *
           (angle_straight / ₂^i + n * (angle_straight / ₂^i)))%A 0). {
-...
   apply rngl_cos_le_iff_angle_eucl_le.
+  rewrite <- angle_mul_sub_distr_l.
+  apply rngl_cos_le_anticompat_when_sin_nonneg; cycle 1. {
+...
+Search (_ → 0 ≤ rngl_sin _)%L.
+Search (rngl_sin (_ * _)).
+...
 Search (rngl_cos (_ * _) ≤ rngl_cos (_ * _))%L.
 ...
 eapply (rngl_le_lt_trans Hor). {
@@ -5118,6 +5123,7 @@ a / ₂^S i ≤ angle_straight / ₂^i
      (2 ^ i / n * ((n * θ') / ₂^i) - 2 ^ i / n * (n * (θ' / ₂^i))) 0 +
    angle_eucl_dist 0 0 < ε / 2)%L
 ...
+*)
 rewrite <- angle_mul_sub_distr_l.
 specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
@@ -5137,7 +5143,12 @@ destruct aov. 2: {
 clear Hm.
 rewrite Nat.sub_0_r in Haov.
 cbn in Haov.
-(* ouais, chais pas. Bizarre *)
+...
+destruct n; [ easy | ].
+apply angle_mul_nat_overflow_succ_l in Hnt.
+destruct Hnt as [Hnt| Hnt]. {
+  destruct n; [ easy | ].
+  apply angle_mul_nat_overflow_succ_l in Hnt.
 ...
   rewrite angle_div_2_pow_nat_mul; cycle 2. {
     apply angle_all_add_not_overflow.
