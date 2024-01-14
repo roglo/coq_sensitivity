@@ -4941,6 +4941,14 @@ destruct nt. 2: {
 specialize (angle_mul_nat_overflow_le_l _ _ Hnt) as Hmt.
 apply angle_mul_nat_overflow_exist in Hnt.
 destruct Hnt as (m & Hmn & Hm & Hsm).
+(**)
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  cbn in Hsm.
+  rewrite angle_add_0_r in Hsm.
+  clear Hm.
+  progress unfold seq_angle_converging_to_angle_div_nat.
+...
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
@@ -5085,6 +5093,9 @@ destruct aov. 2: {
     rewrite Nat.sub_0_r.
     rewrite angle_0_div_2_pow.
     rewrite (angle_add_0_l Hon Hos).
+clear Hm.
+rewrite Nat.sub_0_r in Haov.
+cbn in Haov.
 (* ouais, chais pas. Bizarre *)
 ...
   rewrite angle_div_2_pow_nat_mul; cycle 2. {
