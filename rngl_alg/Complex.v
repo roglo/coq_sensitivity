@@ -5089,6 +5089,7 @@ apply (rngl_le_lt_trans Hor) with
      angle_eucl_dist
        (2 ^ S i / n *
           (angle_straight / ₂^i + n * (angle_straight / ₂^i)))%A 0). {
+...
   apply rngl_cos_le_iff_angle_eucl_le.
 Search (rngl_cos (_ * _) ≤ rngl_cos (_ * _))%L.
 ...
