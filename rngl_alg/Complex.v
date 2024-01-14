@@ -5084,6 +5084,14 @@ destruct i. {
   rewrite angle_sub_diag.
   now rewrite angle_eucl_dist_diag.
 }
+apply (rngl_le_lt_trans Hor) with
+  (b :=
+     angle_eucl_dist
+       (2 ^ S i / n *
+          (angle_straight / ₂^i + n * (angle_straight / ₂^i)))%A 0). {
+  apply rngl_cos_le_iff_angle_eucl_le.
+Search (rngl_cos (_ * _) ≤ rngl_cos (_ * _))%L.
+...
 eapply (rngl_le_lt_trans Hor). {
 Check angle_eucl_dist_triangular.
   apply angle_eucl_dist_triangular with
@@ -5091,6 +5099,16 @@ Check angle_eucl_dist_triangular.
        (2 ^ S i / n *
           (angle_straight / ₂^i + n * (angle_straight / ₂^i)))%A).
 }
+specialize (rngl_div_add_distr_r Hiv (ε / 2) (ε / 2) 2)%L as Hεε4.
+rewrite (rngl_add_diag2 Hon) in Hεε4.
+rewrite (rngl_mul_div Hi1) in Hεε4. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε4; clear Hεε4.
+apply (rngl_add_lt_compat Hop Hor). {
+...
+Therorem glop :
+  angle_eucl_dist θ1 θ2 < ε
 ...
 a / ₂^S i ≤ angle_straight / ₂^i
 ...
