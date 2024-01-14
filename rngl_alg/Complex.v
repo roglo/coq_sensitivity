@@ -4941,7 +4941,7 @@ destruct nt. 2: {
 specialize (angle_mul_nat_overflow_le_l _ _ Hnt) as Hmt.
 apply angle_mul_nat_overflow_exist in Hnt.
 destruct Hnt as (m & Hmn & Hm & Hsm).
-(**)
+(*
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   subst m.
   cbn in Hsm.
@@ -4949,6 +4949,7 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   clear Hm.
   progress unfold seq_angle_converging_to_angle_div_nat.
 ...
+*)
 set (j := S (Nat.log2 n)).
 assert (Hjn : n < 2 ^ j). {
   subst j.
@@ -5077,6 +5078,27 @@ rewrite Hεε2; clear Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 subst θ.
 rewrite angle_eucl_dist_move_0_r.
+(**)
+destruct i. {
+  cbn.
+  rewrite angle_sub_diag.
+  now rewrite angle_eucl_dist_diag.
+}
+eapply (rngl_le_lt_trans Hor). {
+Check angle_eucl_dist_triangular.
+  apply angle_eucl_dist_triangular with
+    (θ2 :=
+       (2 ^ S i / n *
+          (angle_straight / ₂^i + n * (angle_straight / ₂^i)))%A).
+}
+...
+a / ₂^S i ≤ angle_straight / ₂^i
+...
+  ============================
+  (angle_eucl_dist
+     (2 ^ i / n * ((n * θ') / ₂^i) - 2 ^ i / n * (n * (θ' / ₂^i))) 0 +
+   angle_eucl_dist 0 0 < ε / 2)%L
+...
 rewrite <- angle_mul_sub_distr_l.
 specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
