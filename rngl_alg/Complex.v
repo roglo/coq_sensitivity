@@ -2171,8 +2171,8 @@ destruct aov. 2: {
 } {
   destruct n; [ easy | ].
   rewrite angle_div_2_pow_nat_succ_r_2.
-  rewrite angle_div_2_add_overflow; [ | easy ].
-  now destruct n.
+  f_equal.
+  now apply angle_div_2_add_overflow.
 }
 Qed.
 
@@ -4868,7 +4868,7 @@ Theorem angle_mul_nat_overflow_exist :
   angle_mul_nat_overflow n θ = true
   → ∃ m,
   m < n ∧
-  angle_add_overflow θ (m * θ) = false ∧
+  (∀ p, p ≤ m → angle_add_overflow θ (p * θ) = false) ∧
   angle_add_overflow θ (S m * θ) = true.
 Proof.
 destruct_ac.
@@ -4887,12 +4887,33 @@ split. {
   apply (angle_mul_nat_overflow_true_after _ i) in Hn; [ | easy ].
   now rewrite Hn in Hi.
 }
-split; [ easy | ].
+split. {
+  intros p Hpi.
+  apply angle_add_overflow_le with (θ2 := (i * θ)%A); [ | easy ].
+  now apply angle_mul_nat_le_mono_nonneg_r.
+}
 rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
 destruct Hsi as [Hsi| Hsi]; [ | easy ].
 rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
 destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
 now rewrite Hit in Hsi.
+Qed.
+
+Theorem angle_all_add_not_overflow :
+  ∀ n θ,
+  (∀ m, m < n → angle_add_overflow θ (m * θ) = false)
+  → angle_mul_nat_overflow n θ = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Ha.
+induction n; [ easy | ].
+rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+split; [ | now apply Ha ].
+apply IHn.
+intros m Hm.
+apply Ha.
+now apply Nat.lt_lt_succ_r.
 Qed.
 
 (* to be completed
@@ -5053,6 +5074,24 @@ specialize (Hmt n (le_refl _)) as Hnt.
 replace n with (m + (n - m)) at 1 by flia Hmn.
 rewrite (angle_mul_add_distr_r Hon Hop).
 rewrite angle_div_2_pow_nat_add'.
+remember (angle_add_overflow (m * θ') ((n - m) * θ')) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. 2: {
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    subst m.
+    cbn in Hsm.
+    rewrite angle_add_0_r in Hsm.
+    cbn.
+    rewrite Nat.sub_0_r.
+    rewrite angle_0_div_2_pow.
+    rewrite (angle_add_0_l Hon Hos).
+(* ouais, chais pas. Bizarre *)
+...
+  rewrite angle_div_2_pow_nat_mul; cycle 2. {
+    apply angle_all_add_not_overflow.
+    intros p Hp.
+    now apply Hm, Nat.lt_le_incl.
+  }
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
