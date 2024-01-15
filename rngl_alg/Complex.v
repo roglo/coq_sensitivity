@@ -5062,6 +5062,19 @@ assert (Hε2 : (0 < ε / 2)%L). {
 }
 specialize (H1 _ Hε2).
 destruct H1 as (N, HN).
+(**)
+exists (max N j).
+intros i Hi.
+specialize (HN i).
+assert (H : N ≤ i). {
+  apply (Nat.le_trans _ (max N j)); [ | easy ].
+  now apply Nat.le_max_l.
+}
+specialize (HN H); clear H.
+(* ouais, ça change rien *)
+...
+rewrite <- angle_div_2_pow_nat_mul in HN.
+...
 exists N. (* pour voir *)
 intros i Hi.
 specialize (HN i Hi).
