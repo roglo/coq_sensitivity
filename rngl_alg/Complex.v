@@ -5055,14 +5055,9 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
 }
 *)
 intros ε Hε.
-assert (Hε2 : (0 < ε / 2)%L). {
-  apply (rngl_lt_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  now rewrite (rngl_mul_0_l Hos).
-}
-specialize (H1 _ Hε2).
-destruct H1 as (N, HN).
 (**)
+specialize (H1 _ Hε).
+destruct H1 as (N, HN).
 exists (max N j).
 intros i Hi.
 specialize (HN i).
@@ -5071,10 +5066,27 @@ assert (H : N ≤ i). {
   now apply Nat.le_max_l.
 }
 specialize (HN H); clear H.
-(* ouais, ça change rien *)
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_comm.
+rewrite <- (angle_mul_nat_assoc Hon Hop).
+rewrite <- (angle_div_2_pow_nat_mul _ _ θ').
+3: {
+(* ouais, bon, n'importe quoi *)
+...
+Search (_ * (_ / ₂^_))%A.
+rewrite <- (angle_div_2_pow_nat_mul i (2 ^ i / n) θ').
+3: {
 ...
 rewrite <- angle_div_2_pow_nat_mul in HN.
 ...
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (H1 _ Hε2).
+destruct H1 as (N, HN).
 exists N. (* pour voir *)
 intros i Hi.
 specialize (HN i Hi).
