@@ -5065,6 +5065,7 @@ destruct H1 as (N, HN).
 exists N. (* pour voir *)
 intros i Hi.
 specialize (HN i Hi).
+...
 remember (2 ^ i / n * (n * (θ' / ₂^i)))%A as θ.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
