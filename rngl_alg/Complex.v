@@ -4916,6 +4916,23 @@ apply Ha.
 now apply Nat.lt_lt_succ_r.
 Qed.
 
+Theorem angle_mul_add_distr_l :
+  ∀ n θ1 θ2, (n * (θ1 + θ2) = n * θ1 + n * θ2)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+induction n. {
+  do 3 rewrite angle_mul_0_l.
+  symmetry.
+  apply (angle_add_0_l Hon Hos).
+}
+cbn.
+rewrite IHn.
+do 2 rewrite (angle_add_assoc Hop).
+now rewrite (angle_add_add_swap Hic Hop θ1 _ θ2).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5072,6 +5089,57 @@ rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 Check angle_div_2_pow_nat_mul.
 (* et si ça débordait ? à quoi serait égal (n * θ) / ₂^n ? *)
+Definition two_straight_div_2_pow i :=
+  match i with
+  | 0 => 0%A
+  | S i' => (angle_straight / ₂^i')%A
+  end.
+Theorem glop :
+  ∀ n i θ,
+  angle_mul_nat_overflow n θ = true
+  → ((n * θ) / ₂^i = n * (θ / ₂^i - n * two_straight_div_2_pow i))%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hmov.
+destruct n. {
+  cbn.
+  apply angle_0_div_2_pow.
+} {
+  cbn.
+  apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
+  destruct Hmov as [Hmov| Haov]. 2: {
+    rewrite angle_div_2_pow_nat_add'.
+    rewrite Haov.
+    destruct i. {
+      cbn.
+      rewrite (angle_add_0_l Hon Hos).
+      rewrite (angle_mul_nat_0_r Hon Hos).
+      now rewrite (angle_sub_0_r Hon Hop).
+    }
+    destruct i. {
+      cbn.
+      rewrite <- (angle_add_sub_swap Hic Hop).
+      rewrite angle_mul_sub_distr_l.
+      rewrite <- (angle_add_sub_assoc Hop).
+      rewrite <- (angle_add_assoc Hop).
+      f_equal.
+      apply angle_add_move_r.
+      rewrite <- (angle_sub_add_distr Hic Hop).
+      rewrite (angle_add_add_swap Hic Hop).
+      rewrite (angle_straight_add_straight Hon Hop).
+      rewrite (angle_add_0_l Hon Hos).
+      rewrite angle_mul_add_distr_l.
+      rewrite (angle_add_comm Hic).
+      rewrite (angle_sub_add_distr Hic Hop).
+(* mouais, bon faut que je revoie ma copie *)
+...
+      rewrite (angle_sub_0_r Hon Hop).
+Search ((_ * _) / ₂)%A.
+...
+rewrite angle_mul_nat_div_2.
+Search ((_ + _) / ₂^_)%A.
+rewrite angle_div_2_pow_nat_add.
 ...
 rewrite <- (angle_div_2_pow_nat_mul _ _ θ').
 3: {
