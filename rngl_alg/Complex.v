@@ -5140,9 +5140,8 @@ destruct aov. 2: {
     rewrite Nat.sub_0_r.
     rewrite angle_0_div_2_pow.
     rewrite (angle_add_0_l Hon Hos).
-clear Hm.
-rewrite Nat.sub_0_r in Haov.
-cbn in Haov.
+    clear Hm Haov.
+Search ((_ * _) / ₂^_)%A.
 ...
 destruct n; [ easy | ].
 apply angle_mul_nat_overflow_succ_l in Hnt.
