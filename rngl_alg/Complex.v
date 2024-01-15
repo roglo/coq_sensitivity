@@ -5070,6 +5070,9 @@ eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
+Check angle_div_2_pow_nat_mul.
+(* et si ça débordait ? à quoi serait égal (n * θ) / ₂^n ? *)
+...
 rewrite <- (angle_div_2_pow_nat_mul _ _ θ').
 3: {
 (* ouais, bon, n'importe quoi *)
