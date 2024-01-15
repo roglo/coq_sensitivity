@@ -5097,7 +5097,7 @@ Definition two_straight_div_2_pow i :=
 Theorem glop :
   ∀ n i θ,
   angle_mul_nat_overflow n θ = true
-  → ((n * θ) / ₂^i = n * (θ / ₂^i - n * two_straight_div_2_pow i))%A.
+  → ((n * θ) / ₂^i = n * (θ / ₂^i - two_straight_div_2_pow i))%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -5113,8 +5113,6 @@ destruct n. {
     rewrite Haov.
     destruct i. {
       cbn.
-      rewrite (angle_add_0_l Hon Hos).
-      rewrite (angle_mul_nat_0_r Hon Hos).
       now rewrite (angle_sub_0_r Hon Hop).
     }
     destruct i. {
@@ -5126,12 +5124,8 @@ destruct n. {
       f_equal.
       apply angle_add_move_r.
       rewrite <- (angle_sub_add_distr Hic Hop).
-      rewrite (angle_add_add_swap Hic Hop).
       rewrite (angle_straight_add_straight Hon Hop).
-      rewrite (angle_add_0_l Hon Hos).
-      rewrite angle_mul_add_distr_l.
-      rewrite (angle_add_comm Hic).
-      rewrite (angle_sub_add_distr Hic Hop).
+      rewrite (angle_sub_0_r Hon Hop).
 (* mouais, bon faut que je revoie ma copie *)
 ...
       rewrite (angle_sub_0_r Hon Hop).
