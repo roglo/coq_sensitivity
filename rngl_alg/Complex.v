@@ -5163,6 +5163,11 @@ Theorem glop :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite H1; apply H1.
+}
 intros * Hmov.
 cbn.
 apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
@@ -5188,32 +5193,62 @@ destruct aov2. 2: {
   apply angle_ltb_ge in Haov2.
   apply angle_nlt_ge in Haov2.
   apply Haov2; clear Haov2.
-  eapply (angle_le_lt_trans _ (θ + θ)); [ | easy ].
-Search (_ + _ ≤ _ + _)%A.
-...
   progress unfold angle_ltb.
   rewrite (rngl_sin_add_straight_r Hon Hop).
   rewrite (rngl_cos_add_straight_r Hon Hop).
   progress unfold angle_ltb in Haov.
   cbn in Haov |-*.
+  rewrite <- rngl_cos_add in Haov.
+  rewrite rngl_add_comm in Haov.
+  rewrite <- rngl_sin_add in Haov.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
   symmetry in Hzs, Hzc.
   destruct zs. {
     apply rngl_leb_le in Hzs.
-...
-    destruct zc. {
-      apply rngl_leb_le in Hzc.
-...
-  destruct i; [ easy | ].
-  cbn.
-  rewrite angle_div_2_pow_nat_add'.
-...
-destruct i; [ easy | ].
-destruct i; [ easy | ].
-destruct i; [ easy | ].
-destruct i; [ easy | ].
-destruct i; [ easy | ].
+    remember (0 ≤? - rngl_sin θ)%L as zns eqn:Hzns.
+    symmetry in Hzns.
+    destruct zns. {
+      apply rngl_leb_le in Hzns.
+      apply rngl_ltb_lt.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzns.
+      apply (rngl_le_antisymm Hor) in Hzns; [ | easy ].
+      symmetry in Hzns.
+      apply eq_rngl_sin_0 in Hzns.
+      destruct Hzns; subst θ. {
+        rewrite (angle_add_0_l Hon Hos) in Haov.
+        cbn in Haov.
+        rewrite (rngl_leb_refl Hor) in Haov.
+        apply rngl_ltb_lt in Haov.
+        now apply (rngl_lt_irrefl Hor) in Haov.
+      }
+      cbn.
+      rewrite (rngl_opp_involutive Hop).
+      apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+    }
+    exfalso.
+    apply (rngl_leb_gt Hor) in Hzns.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzns.
+    remember (0 ≤? rngl_sin (θ + θ))%L as zsa eqn:Hzsa.
+    symmetry in Hzsa.
+    destruct zsa; [ | easy ].
+    apply rngl_leb_le in Hzsa.
+    apply rngl_ltb_lt in Haov.
+    apply (rngl_nle_gt Hor) in Haov.
+    apply Haov; clear Haov.
+    apply angle_add_overflow_le_lemma_111; try easy.
+    left.
+    intros H; subst θ.
+    cbn in Hzns.
+    now apply (rngl_lt_irrefl Hor) in Hzns.
+  }
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_opp_lt_compat Hop Hor) in Hzs.
+  rewrite (rngl_opp_0 Hop) in Hzs.
+  apply (rngl_lt_le_incl Hor) in Hzs.
+  apply rngl_leb_le in Hzs.
+  now rewrite Hzs.
+}
 ...
       rewrite (angle_sub_0_r Hon Hop).
 Search ((_ * _) / ₂)%A.
