@@ -1748,8 +1748,6 @@ destruct z1. {
   apply rngl_leb_le in Hz3.
   destruct z2; [ | easy ].
   apply rngl_leb_le in Hz2, H12, H23.
-  apply rngl_leb_le in Hz2.
-  apply rngl_leb_le in Hz2.
   now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
 } {
   destruct z2; [ easy | ].
@@ -1757,6 +1755,70 @@ destruct z1. {
   apply rngl_leb_le in H12, H23.
   apply rngl_leb_le.
   now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+}
+Qed.
+
+Theorem angle_lt_le_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 < θ2 → θ2 ≤ θ3 → θ1 < θ3)%A.
+Proof.
+destruct_ac.
+intros * H12 H23.
+progress unfold angle_ltb in H12.
+progress unfold angle_leb in H23.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  destruct z3; [ | easy ].
+  apply rngl_ltb_lt.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H23.
+  apply rngl_ltb_lt in H12.
+  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_ltb_lt in H12.
+  apply rngl_leb_le in H23.
+  apply rngl_ltb_lt.
+  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+}
+Qed.
+
+Theorem angle_le_lt_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2 → θ2 < θ3 → θ1 < θ3)%A.
+Proof.
+destruct_ac.
+intros * H12 H23.
+progress unfold angle_leb in H12.
+progress unfold angle_ltb in H23.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  destruct z3; [ | easy ].
+  apply rngl_ltb_lt.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H12.
+  apply rngl_ltb_lt in H23.
+  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_leb_le in H12.
+  apply rngl_ltb_lt in H23.
+  apply rngl_ltb_lt.
+  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
 }
 Qed.
 
@@ -5097,7 +5159,7 @@ Definition two_straight_div_2_pow i :=
 Theorem glop :
   ∀ i θ,
   angle_mul_nat_overflow 2 θ = true
-  → ((2 * θ) / ₂^i = 2 * θ / ₂^i (* - two_straight_div_2_pow i*))%A.
+  → ((2 * θ) / ₂^i = 2 * (θ / ₂^i) + two_straight_div_2_pow i)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -5107,10 +5169,46 @@ apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
 cbn in Hmov.
 destruct Hmov as [Hmov| Haov]; [ easy | ].
 rewrite angle_add_0_r in Haov.
-rewrite angle_add_0_r.
+do 2 rewrite angle_add_0_r.
 rewrite angle_div_2_pow_nat_add'.
 rewrite Haov.
-destruct i; [ easy | ].
+destruct i. {
+  cbn; symmetry.
+  apply angle_add_0_r.
+}
+cbn.
+rewrite angle_add_div_2_diag.
+rewrite angle_div_2_pow_nat_add'.
+remember (angle_add_overflow θ angle_straight) as aov2 eqn:Haov2.
+symmetry in Haov2.
+destruct aov2. 2: {
+  exfalso.
+  progress unfold angle_add_overflow in Haov.
+  progress unfold angle_add_overflow in Haov2.
+  apply angle_ltb_ge in Haov2.
+  apply angle_nlt_ge in Haov2.
+  apply Haov2; clear Haov2.
+  eapply (angle_le_lt_trans _ (θ + θ)); [ | easy ].
+Search (_ + _ ≤ _ + _)%A.
+...
+  progress unfold angle_ltb.
+  rewrite (rngl_sin_add_straight_r Hon Hop).
+  rewrite (rngl_cos_add_straight_r Hon Hop).
+  progress unfold angle_ltb in Haov.
+  cbn in Haov |-*.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+  symmetry in Hzs, Hzc.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+...
+    destruct zc. {
+      apply rngl_leb_le in Hzc.
+...
+  destruct i; [ easy | ].
+  cbn.
+  rewrite angle_div_2_pow_nat_add'.
+...
 destruct i; [ easy | ].
 destruct i; [ easy | ].
 destruct i; [ easy | ].
