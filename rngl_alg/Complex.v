@@ -4995,6 +4995,22 @@ do 2 rewrite (angle_add_assoc Hop).
 now rewrite (angle_add_add_swap Hic Hop θ1 _ θ2).
 Qed.
 
+Theorem angle_add_move_0_r : ∀ θ1 θ2, (θ1 + θ2 = 0 ↔ θ1 = (- θ2))%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+split; intros H12. {
+  rewrite <- (angle_sub_0_l Hon Hos).
+  rewrite <- H12; symmetry.
+  apply angle_add_sub.
+} {
+  subst θ1.
+  rewrite (angle_add_opp_l Hic).
+  apply angle_sub_diag.
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5156,10 +5172,10 @@ Definition two_straight_div_2_pow i :=
   | 0 => 0%A
   | S i' => (angle_straight / ₂^i')%A
   end.
-Theorem glop :
+Theorem angle_mul_2_div_2_pow :
   ∀ i θ,
   angle_mul_nat_overflow 2 θ = true
-  → ((2 * θ) / ₂^i = 2 * (θ / ₂^i) + two_straight_div_2_pow i)%A.
+  → ((2 * θ) / ₂^i = 2 * (θ / ₂^i) - two_straight_div_2_pow i)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -5179,7 +5195,7 @@ rewrite angle_div_2_pow_nat_add'.
 rewrite Haov.
 destruct i. {
   cbn; symmetry.
-  apply angle_add_0_r.
+  apply (angle_sub_0_r Hon Hop).
 }
 cbn.
 rewrite angle_add_div_2_diag.
@@ -5251,15 +5267,39 @@ destruct aov2. 2: {
 }
 destruct i. {
   cbn.
-  f_equal; symmetry.
-  apply angle_add_div_2_diag.
+  rewrite angle_add_div_2_diag.
+  progress unfold angle_sub.
+  f_equal.
+  apply eq_angle_eq; cbn; f_equal; symmetry.
+  apply (rngl_opp_0 Hop).
 }
 rewrite angle_add_div_2_diag.
-rewrite <- angle_div_2_add_overflow; [ | easy ].
-do 2 rewrite angle_div_2_pow_nat_succ_r_2.
+destruct i. {
+  cbn.
+  rewrite <- (angle_add_assoc Hop).
+  progress unfold angle_sub.
+  f_equal.
+  apply angle_add_move_0_r.
+  rewrite (angle_add_add_swap Hic Hop).
+  rewrite angle_add_div_2_diag.
+  apply (angle_straight_add_straight Hon Hop).
+}
+destruct i. {
+  cbn.
+  rewrite <- (angle_add_assoc Hop).
+  rewrite angle_div_2_add_overflow. 2: {
+... ...
+  progress unfold angle_sub.
+  rewrite <- (angle_add_assoc Hop).
+  f_equal.
+...
 rewrite <- angle_div_2_pow_nat_add. 2: {
   apply angle_add_overflow_div_2_div_2.
 }
+destruct i. {
+  cbn.
+  rewrite angle_div_2_add_overflow; [ | easy ].
+...
 f_equal.
 rewrite angle_div_2_add_overflow; [ | easy ].
 rewrite (angle_add_add_swap Hic Hop).
