@@ -5095,38 +5095,27 @@ Definition two_straight_div_2_pow i :=
   | S i' => (angle_straight / ₂^i')%A
   end.
 Theorem glop :
-  ∀ n i θ,
-  angle_mul_nat_overflow n θ = true
-  → ((n * θ) / ₂^i = n * (θ / ₂^i - two_straight_div_2_pow i))%A.
+  ∀ i θ,
+  angle_mul_nat_overflow 2 θ = true
+  → ((2 * θ) / ₂^i = 2 * θ / ₂^i (* - two_straight_div_2_pow i*))%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hmov.
-destruct n. {
-  cbn.
-  apply angle_0_div_2_pow.
-} {
-  cbn.
-  apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
-  destruct Hmov as [Hmov| Haov]. 2: {
-    rewrite angle_div_2_pow_nat_add'.
-    rewrite Haov.
-    destruct i. {
-      cbn.
-      now rewrite (angle_sub_0_r Hon Hop).
-    }
-    destruct i. {
-      cbn.
-      rewrite <- (angle_add_sub_swap Hic Hop).
-      rewrite angle_mul_sub_distr_l.
-      rewrite <- (angle_add_sub_assoc Hop).
-      rewrite <- (angle_add_assoc Hop).
-      f_equal.
-      apply angle_add_move_r.
-      rewrite <- (angle_sub_add_distr Hic Hop).
-      rewrite (angle_straight_add_straight Hon Hop).
-      rewrite (angle_sub_0_r Hon Hop).
-(* mouais, bon faut que je revoie ma copie *)
+cbn.
+apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
+cbn in Hmov.
+destruct Hmov as [Hmov| Haov]; [ easy | ].
+rewrite angle_add_0_r in Haov.
+rewrite angle_add_0_r.
+rewrite angle_div_2_pow_nat_add'.
+rewrite Haov.
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
 ...
       rewrite (angle_sub_0_r Hon Hop).
 Search ((_ * _) / ₂)%A.
