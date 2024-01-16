@@ -5249,6 +5249,19 @@ destruct aov2. 2: {
   apply rngl_leb_le in Hzs.
   now rewrite Hzs.
 }
+destruct i. {
+  cbn.
+  f_equal; symmetry.
+  apply angle_add_div_2_diag.
+}
+rewrite angle_add_div_2_diag.
+rewrite <- angle_div_2_add_overflow; [ | easy ].
+Search (_ / ₂^_ + _ / ₂^_)%A.
+...
+rewrite angle_div_2_pow_nat_add'.
+rewrite angle_add_div_2_pow_diag.
+do 2 rewrite angle_div_2_pow_nat_succ_r_2.
+Search (_ / ₂^
 ...
       rewrite (angle_sub_0_r Hon Hop).
 Search ((_ * _) / ₂)%A.
