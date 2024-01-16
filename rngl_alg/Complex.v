@@ -5256,8 +5256,18 @@ destruct i. {
 }
 rewrite angle_add_div_2_diag.
 rewrite <- angle_div_2_add_overflow; [ | easy ].
-Search (_ / ₂^_ + _ / ₂^_)%A.
+do 2 rewrite angle_div_2_pow_nat_succ_r_2.
+rewrite <- angle_div_2_pow_nat_add. 2: {
+  apply angle_add_overflow_div_2_div_2.
+}
+f_equal.
+rewrite angle_div_2_add_overflow; [ | easy ].
+rewrite (angle_add_add_swap Hic Hop).
+f_equal.
+(* eh non *)
 ...
+Search (_ / ₂^S _)%A.
+Search (_ / ₂^_ + _ / ₂^_)%A.
 rewrite angle_div_2_pow_nat_add'.
 rewrite angle_add_div_2_pow_diag.
 do 2 rewrite angle_div_2_pow_nat_succ_r_2.
