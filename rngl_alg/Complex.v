@@ -5011,7 +5011,7 @@ split; intros H12. {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -5265,6 +5265,7 @@ destruct aov2. 2: {
   apply rngl_leb_le in Hzs.
   now rewrite Hzs.
 }
+rewrite angle_straight_div_2.
 destruct i. {
   cbn.
   rewrite angle_add_div_2_diag.
@@ -5276,14 +5277,43 @@ destruct i. {
 rewrite angle_add_div_2_diag.
 destruct i. {
   cbn.
+  rewrite angle_straight_div_2.
   rewrite <- (angle_add_assoc Hop).
   progress unfold angle_sub.
   f_equal.
   apply angle_add_move_0_r.
   rewrite (angle_add_add_swap Hic Hop).
-  rewrite angle_add_div_2_diag.
+  rewrite (angle_right_add_right Hon Hop).
   apply (angle_straight_add_straight Hon Hop).
 }
+remember (angle_add_overflow (θ / ₂) (angle_right + angle_straight))
+    as aov3 eqn:Haov3. {
+symmetry in Haov3.
+destruct aov3. 2: {
+  exfalso.
+  progress unfold angle_add_overflow in Haov.
+  progress unfold angle_add_overflow in Haov2.
+  progress unfold angle_add_overflow in Haov3.
+  apply angle_ltb_ge in Haov3.
+  apply angle_nlt_ge in Haov3.
+  apply Haov3; clear Haov3.
+  rewrite (angle_add_assoc Hop).
+  progress unfold angle_ltb.
+  rewrite (rngl_sin_add_straight_r Hon Hop).
+  rewrite (rngl_cos_add_straight_r Hon Hop).
+  rewrite (rngl_sin_add_right_r Hon Hos).
+  rewrite (rngl_cos_add_right_r Hon Hop).
+  rewrite (rngl_opp_involutive Hop).
+  progress unfold angle_ltb in Haov.
+  cbn in Haov |-*.
+  rewrite <- rngl_cos_add in Haov.
+  rewrite rngl_add_comm in Haov.
+  rewrite <- rngl_sin_add in Haov.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+  symmetry in Hzs, Hzc.
+  destruct zs. {
+... ...
 destruct i. {
   cbn.
   rewrite <- (angle_add_assoc Hop).
