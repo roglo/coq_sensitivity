@@ -5221,12 +5221,31 @@ do 2 rewrite angle_add_0_r.
 rewrite angle_div_2_pow_nat_add'.
 rewrite Haov.
 rewrite angle_add_div_2_diag.
-induction i. {
+destruct i. {
   cbn; symmetry.
   apply (angle_sub_0_r Hon Hop).
 }
 cbn.
 rewrite angle_add_div_2_diag.
+(**)
+induction i. {
+  cbn.
+  progress unfold angle_sub.
+  f_equal.
+  apply eq_angle_eq; cbn; f_equal; symmetry.
+  apply (rngl_opp_0 Hop).
+}
+cbn.
+rewrite IHi.
+progress unfold angle_sub.
+Search ((_ - _) / ₂)%A.
+Search ((_ + _) / ₂)%A.
+rewrite angle_div_2_add_not_overflow.
+f_equal.
+Search (- (_ / ₂))%A.
+...
+rewrite angle_div_2_pow_nat_succ_r_1.
+...
 rewrite angle_div_2_pow_nat_add'.
 remember (angle_add_overflow θ angle_straight) as aov2 eqn:Haov2.
 symmetry in Haov2.
@@ -5302,20 +5321,6 @@ destruct i. {
   apply (rngl_opp_0 Hop).
 }
 rewrite angle_add_div_2_pow_diag in IHi.
-(*
-...
-destruct i. {
-  cbn.
-  rewrite angle_straight_div_2.
-  rewrite <- (angle_add_assoc Hop).
-  progress unfold angle_sub.
-  f_equal.
-  apply angle_add_move_0_r.
-  rewrite (angle_add_add_swap Hic Hop).
-  rewrite (angle_right_add_right Hon Hop).
-  apply (angle_straight_add_straight Hon Hop).
-}
-*)
 remember (angle_add_overflow (θ / ₂) (angle_right + angle_straight))
     as aov3 eqn:Haov3. {
 symmetry in Haov3.
@@ -5335,7 +5340,6 @@ destruct aov3. 2: {
   rewrite (rngl_cos_add_right_r Hon Hop).
   rewrite (rngl_opp_involutive Hop).
   progress unfold angle_ltb in Haov.
-(**)
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
   specialize (rngl_sin_div_2_nonneg θ) as H1.
@@ -5483,6 +5487,7 @@ destruct i. {
 }
 destruct i. {
   cbn.
+cbn in IHi.
 ...
 rewrite <- angle_div_2_pow_nat_add. 2: {
   apply angle_add_overflow_div_2_div_2.
