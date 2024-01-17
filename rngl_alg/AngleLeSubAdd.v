@@ -338,22 +338,6 @@ apply (rngl_lt_add_r Hos Hor).
 now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
-Theorem rngl_sin_add_nonneg :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hcs1 Hcs2.
-cbn.
-apply (rngl_add_nonneg_nonneg Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-Qed.
-
 Theorem angle_le_sub_le_add_l_lemma_1 :
   ∀ θ1 θ2 θ3,
   (0 ≤ rngl_sin θ1)%L

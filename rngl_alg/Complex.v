@@ -5433,15 +5433,12 @@ destruct aov3. 2: {
   }
   exfalso.
   apply (rngl_leb_gt Hor) in Hc2z.
-...
-  cbn in Haov |-*.
-  rewrite <- rngl_cos_add in Haov.
-  rewrite rngl_add_comm in Haov.
-  rewrite <- rngl_sin_add in Haov.
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
-  symmetry in Hzs, Hzc.
-  destruct zs. {
+  apply (rngl_nle_gt Hor) in Hzs.
+  apply Hzs; clear Hzs.
+  rewrite <- (angle_add_div_2_diag θ).
+  apply (rngl_lt_le_incl Hor) in Hc2z.
+  now apply rngl_sin_add_nonneg.
+}
 ... ...
 destruct i. {
   cbn.
