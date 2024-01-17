@@ -5439,15 +5439,50 @@ destruct aov3. 2: {
   apply (rngl_lt_le_incl Hor) in Hc2z.
   now apply rngl_sin_add_nonneg.
 }
-... ...
+rewrite <- (angle_add_assoc Hop).
+rewrite angle_div_2_pow_nat_add'.
+rewrite Haov3.
 destruct i. {
   cbn.
-  rewrite <- (angle_add_assoc Hop).
-  rewrite angle_div_2_add_overflow. 2: {
-... ...
   progress unfold angle_sub.
-  rewrite <- (angle_add_assoc Hop).
   f_equal.
+  rewrite angle_straight_div_2.
+  apply angle_add_move_0_r.
+  rewrite (angle_add_add_swap Hic Hop).
+  rewrite (angle_right_add_right Hon Hop).
+  apply (angle_straight_add_straight Hon Hop).
+}
+rewrite <- (angle_add_assoc Hop).
+destruct i. {
+  cbn.
+  cbn in IHi.
+  progress unfold angle_sub.
+  f_equal.
+  rewrite angle_straight_div_2.
+  rewrite angle_div_2_add_not_overflow. 2: {
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    progress unfold angle_leb.
+    rewrite (rngl_sin_add_straight_r Hon Hop).
+    rewrite (rngl_cos_add_straight_r Hon Hop).
+    cbn.
+    specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+    apply rngl_leb_le in H1.
+    rewrite H1; clear H1.
+    rewrite (rngl_opp_0 Hop).
+    rewrite (rngl_leb_refl Hor).
+    now destruct (0 ≤? - 1)%L.
+  }
+  rewrite angle_straight_div_2.
+  apply angle_add_move_0_r.
+  rewrite (angle_add_add_swap Hic Hop).
+  rewrite (angle_add_add_swap Hic Hop _ angle_right).
+  rewrite angle_add_div_2_diag.
+  rewrite (angle_right_add_right Hon Hop).
+  apply (angle_straight_add_straight Hon Hop).
+}
+destruct i. {
+  cbn.
 ...
 rewrite <- angle_div_2_pow_nat_add. 2: {
   apply angle_add_overflow_div_2_div_2.
