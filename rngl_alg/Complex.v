@@ -5011,6 +5011,29 @@ split; intros H12. {
 }
 Qed.
 
+Theorem rngl_leb_opp_r :
+  ∀ a b, (a ≤? -b)%L = (b ≤? -a)%L.
+Proof.
+destruct_ac.
+intros.
+remember (a ≤? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  apply rngl_leb_le.
+  apply (rngl_le_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_le_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_leb_gt Hor).
+  apply (rngl_lt_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_lt_opp_l Hop Hor).
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5181,6 +5204,7 @@ destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
@@ -5313,8 +5337,7 @@ destruct aov3. 2: {
   progress unfold angle_ltb in Haov.
 (**)
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
-  symmetry in Hzs, Hzc.
+  symmetry in Hzs.
   specialize (rngl_sin_div_2_nonneg θ) as H1.
   apply rngl_leb_le in H1.
   rewrite H1.
@@ -5374,6 +5397,42 @@ destruct aov3. 2: {
     apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
   }
   apply (rngl_leb_gt Hor) in Hzs.
+  rewrite rngl_leb_opp_r.
+  rewrite (rngl_opp_0 Hop).
+  remember (rngl_cos (θ / ₂) ≤? 0)%L as c2z eqn:Hc2z.
+  symmetry in Hc2z.
+  destruct c2z. {
+    apply rngl_leb_le in Hc2z.
+    apply rngl_ltb_lt.
+    cbn.
+    apply (rngl_leb_gt Hor) in Hzs.
+    rewrite Hzs.
+    apply (rngl_leb_gt Hor) in Hzs.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_le_lt_trans Hor _ 0). {
+      apply (rngl_opp_nonpos_nonneg Hop Hor).
+      apply rl_sqrt_nonneg.
+      apply rngl_1_add_cos_div_2_nonneg.
+    }
+    apply (rl_sqrt_pos Hos).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_1_sub_cos_div_2_nonneg | ].
+    intros H.
+    symmetry in H.
+    progress unfold rngl_div in H.
+    rewrite Hiv in H.
+    apply (rngl_eq_mul_0_l Hos Hii) in H. 2: {
+      apply (rngl_inv_neq_0 Hon Hos Hiv).
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    apply -> (rngl_sub_move_0_r Hop) in H.
+    symmetry in H.
+    apply eq_rngl_cos_1 in H; subst θ.
+    now apply (rngl_lt_irrefl Hor) in Hzs.
+  }
+  exfalso.
+  apply (rngl_leb_gt Hor) in Hc2z.
 ...
   cbn in Haov |-*.
   rewrite <- rngl_cos_add in Haov.
