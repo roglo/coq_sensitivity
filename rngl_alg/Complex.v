@@ -5373,6 +5373,7 @@ destruct aov3. 2: {
     apply rngl_leb_le.
     apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
   }
+  apply (rngl_leb_gt Hor) in Hzs.
 ...
   cbn in Haov |-*.
   rewrite <- rngl_cos_add in Haov.
