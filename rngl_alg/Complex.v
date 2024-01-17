@@ -5238,8 +5238,58 @@ induction i. {
 cbn.
 rewrite IHi.
 progress unfold angle_sub.
-Search ((_ - _) / ₂)%A.
-Search ((_ + _) / ₂)%A.
+rewrite angle_div_2_add.
+rewrite angle_add_opp_r.
+Search (- (_ / ₂))%A.
+Theorem angle_opp_div_2 : ∀ θ, (- (θ / ₂) = (- θ) / ₂)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite H1; apply H1.
+}
+intros.
+apply eq_angle_eq.
+cbn.
+rewrite rngl_leb_opp_r.
+rewrite (rngl_opp_0 Hop).
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hzs, Hsz.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  rewrite (rngl_mul_1_l Hon).
+  destruct sz. {
+    apply rngl_leb_le in Hsz.
+    rewrite (rngl_mul_1_l Hon).
+    f_equal.
+    apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
+    symmetry in Hsz.
+    apply eq_rngl_sin_0 in Hsz.
+    destruct Hsz; subst θ. {
+      cbn.
+      rewrite (rngl_sub_diag Hos).
+      rewrite (rngl_div_0_l Hos Hi1). 2: {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      apply (rngl_opp_0 Hop).
+    } {
+      cbn.
+(* donc c'est faux *)
+... ...
+rewrite <- angle_opp_div_2.
+...
+remember (angle_add_overflow (θ / ₂^i) (- (angle_straight / ₂^i))) as aov2
+  eqn:Haov2.
+symmetry in Haov2.
+destruct aov2. {
+  rewrite angle_add_opp_r.
+...
 rewrite angle_div_2_add_not_overflow.
 f_equal.
 Search (- (_ / ₂))%A.
