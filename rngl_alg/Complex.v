@@ -5034,6 +5034,80 @@ destruct ab. {
 }
 Qed.
 
+Theorem angle_opp_div_2 :
+  ∀ θ, (- (θ / ₂) = - θ / ₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  rewrite H1; apply H1.
+}
+intros.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  rewrite angle_add_0_r.
+  apply (angle_eqb_eq Hed) in Htz.
+  subst θ.
+  rewrite angle_0_div_2.
+  rewrite angle_opp_0.
+  now rewrite angle_0_div_2.
+}
+apply (angle_eqb_neq Hed) in Htz.
+apply eq_angle_eq.
+cbn.
+rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+do 2 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite rngl_leb_opp_r.
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_mul_0_r Hos).
+rewrite rngl_add_0_l.
+f_equal.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hzs, Hsz.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  rewrite (rngl_mul_1_l Hon).
+  destruct sz. {
+    apply rngl_leb_le in Hsz.
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
+    symmetry in Hsz.
+    apply eq_rngl_sin_0 in Hsz.
+    destruct Hsz; subst θ; [ easy | cbn ].
+    rewrite (rngl_add_opp_r Hop).
+    rewrite (rngl_sub_diag Hos).
+    rewrite (rngl_div_0_l Hos Hi1). 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    symmetry.
+    rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+    apply (rngl_opp_0 Hop).
+  }
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  symmetry.
+  apply (rngl_opp_involutive Hop).
+} {
+  apply (rngl_leb_gt Hor) in Hzs.
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_1_l Hon).
+  destruct sz; [ now rewrite (rngl_mul_1_l Hon) | ].
+  apply (rngl_leb_gt Hor) in Hsz.
+  apply (rngl_nle_gt Hor) in Hsz.
+  exfalso.
+  apply Hsz.
+  now apply (rngl_lt_le_incl Hor).
+}
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5240,47 +5314,9 @@ rewrite IHi.
 progress unfold angle_sub.
 rewrite angle_div_2_add.
 rewrite angle_add_opp_r.
-Search (- (_ / ₂))%A.
-Theorem angle_opp_div_2 : ∀ θ, (- (θ / ₂) = (- θ) / ₂)%A.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros.
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  rewrite H1; apply H1.
-}
-intros.
-apply eq_angle_eq.
-cbn.
-rewrite rngl_leb_opp_r.
-rewrite (rngl_opp_0 Hop).
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
-symmetry in Hzs, Hsz.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  rewrite (rngl_mul_1_l Hon).
-  destruct sz. {
-    apply rngl_leb_le in Hsz.
-    rewrite (rngl_mul_1_l Hon).
-    f_equal.
-    apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
-    symmetry in Hsz.
-    apply eq_rngl_sin_0 in Hsz.
-    destruct Hsz; subst θ. {
-      cbn.
-      rewrite (rngl_sub_diag Hos).
-      rewrite (rngl_div_0_l Hos Hi1). 2: {
-        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-      }
-      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
-      apply (rngl_opp_0 Hop).
-    } {
-      cbn.
-(* donc c'est faux *)
+specialize (angle_opp_div_2 (angle_straight / ₂^i)) as H1.
+(* ouais, bon, ça serait plus pratique si angle_opp_div_2 marchait
+   dans l'autre sens : on pourrait faire rewrite directement *)
 ... ...
 rewrite <- angle_opp_div_2.
 ...
