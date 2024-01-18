@@ -5273,10 +5273,15 @@ assert (H : N ≤ i). {
   now apply Nat.le_max_l.
 }
 specialize (HN H); clear H.
+(**)
+rewrite angle_eucl_dist_move_0_l in HN.
+rewrite angle_eucl_dist_move_0_l.
+...
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
+...
 Check angle_div_2_pow_nat_mul.
 (* et si ça débordait ? à quoi serait égal (n * θ) / ₂^n ? *)
 Definition two_straight_div_2_pow i :=
@@ -5398,7 +5403,7 @@ progress unfold angle_leb.
 rewrite (rngl_sin_add_straight_r Hon Hop).
 rewrite rngl_leb_opp_r.
 rewrite (rngl_opp_0 Hop).
-admit.
+...
 }
 Search (_ / ₂ ≤ angle_straight)%A.
 apply angle_div_2_le_straight.
