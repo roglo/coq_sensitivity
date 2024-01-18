@@ -5412,6 +5412,9 @@ destruct zs. {
       apply (rngl_lt_iff Hor).
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
+Check rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
+Search (rngl_cos _ < rngl_cos _)%L.
+...
     apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy. {
       rewrite angle_div_2_pow_nat_succ_r_1.
       apply rngl_sin_div_2_nonneg.
@@ -5425,7 +5428,11 @@ destruct zs. {
 ...
       apply rngl_cos_div_2_nonneg.
       destruct i. {
-        cbn.
+cbn.
+        cbn in IHi.
+
+cbn in *.
+
 cbn - [ rngl_sin ] in Hzs.
 cbn in IHi.
 ...
