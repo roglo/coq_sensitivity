@@ -2980,11 +2980,10 @@ Theorem rngl_cos_lt_rngl_cos_sub :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 < rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
   → (rngl_cos θ1 < rngl_cos θ2)%L
   → (rngl_cos θ1 < rngl_cos (θ2 - θ1))%L.
 Proof.
-intros * Hzs1 Hzs2 Hzc1 Hc12z.
+intros * Hzs1 Hzs2 Hc12z.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3009,6 +3008,27 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_lt_le_incl Hor) in Hzs2.
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
+(**)
+destruct (rngl_lt_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+  destruct (rngl_eq_dec Hed (rngl_cos θ2) 1) as [Hc21| Hc21]. {
+    apply eq_rngl_cos_1 in Hc21.
+    subst θ2.
+    now apply (rngl_lt_irrefl Hor) in Hzs2.
+  }
+  apply (rngl_lt_le_trans Hor _ 0). {
+(*
+    apply (rngl_mul_neg_pos Hop Hor Hid).
+*)
+    rewrite (rngl_mul_comm Hic).
+    apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | easy ].
+(**)
+  }
+  apply (rngl_abs_nonneg Hop Hor).
+}
+apply (rngl_nlt_ge Hor) in Hzc1.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ1 * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
   apply (rngl_le_0_sub Hop Hor).

@@ -287,7 +287,6 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
     rewrite rngl_add_0_r in Hc12z |-*.
     apply rngl_cos_lt_rngl_cos_sub; try easy.
     now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
   }
 }
 Qed.
