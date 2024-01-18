@@ -5035,7 +5035,7 @@ destruct ab. {
 Qed.
 
 Theorem angle_opp_div_2 :
-  ∀ θ, (- (θ / ₂) = - θ / ₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
+  ∀ θ, ((- θ) / ₂ = - (θ / ₂) + if (θ =? 0)%A then 0 else angle_straight)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -5068,6 +5068,7 @@ rewrite rngl_leb_opp_r.
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_l.
+rewrite (rngl_opp_involutive Hop).
 f_equal.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
@@ -5092,13 +5093,12 @@ destruct zs. {
     apply (rngl_opp_0 Hop).
   }
   rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  symmetry.
-  apply (rngl_opp_involutive Hop).
+  now rewrite (rngl_mul_1_l Hon).
 } {
   apply (rngl_leb_gt Hor) in Hzs.
   rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_opp_involutive Hop).
   destruct sz; [ now rewrite (rngl_mul_1_l Hon) | ].
   apply (rngl_leb_gt Hor) in Hsz.
   apply (rngl_nle_gt Hor) in Hsz.
@@ -5314,17 +5314,91 @@ rewrite IHi.
 progress unfold angle_sub.
 rewrite angle_div_2_add.
 rewrite angle_add_opp_r.
-specialize (angle_opp_div_2 (angle_straight / ₂^i)) as H1.
-(* ouais, bon, ça serait plus pratique si angle_opp_div_2 marchait
-   dans l'autre sens : on pourrait faire rewrite directement *)
-... ...
-rewrite <- angle_opp_div_2.
-...
+rewrite angle_opp_div_2.
+remember (angle_straight / ₂^i =? 0)%A as s2z eqn:Hs2z.
+symmetry in Hs2z.
+destruct s2z. {
+  apply (angle_eqb_eq Hed) in Hs2z.
+  apply eq_angle_div_2_pow_nat_0 in Hs2z.
+  apply eq_angle_eq in Hs2z.
+  cbn in Hs2z.
+  injection Hs2z; clear Hs2z; intros H1.
+  exfalso; revert H1.
+  apply (rngl_lt_iff Hor).
+  apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+}
+rewrite (angle_add_assoc Hop).
+rewrite <- (angle_add_assoc Hop).
+rewrite (angle_straight_add_straight Hon Hop).
+rewrite angle_add_0_r.
+rewrite angle_add_opp_r.
 remember (angle_add_overflow (θ / ₂^i) (- (angle_straight / ₂^i))) as aov2
   eqn:Haov2.
 symmetry in Haov2.
-destruct aov2. {
-  rewrite angle_add_opp_r.
+destruct aov2; [ easy | ].
+exfalso.
+apply Bool.not_true_iff_false in Haov2.
+apply Haov2; clear Haov2.
+progress unfold angle_add_overflow.
+rewrite angle_add_opp_r.
+progress unfold angle_ltb.
+rewrite <- IHi.
+remember (0 ≤? rngl_sin ((θ + angle_straight) / ₂^i))%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (θ / ₂^i))%L as zs2 eqn:Hzs2.
+symmetry in Hzs, Hzs2.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    apply rngl_ltb_lt.
+    rewrite IHi.
+    rewrite (rngl_cos_sub_comm Hic Hop).
+(**)
+    destruct i. {
+      cbn - [ rngl_sin ] in Hzs, Hzs2.
+      rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs.
+      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs.
+      apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
+      symmetry in Hzs.
+      apply eq_rngl_sin_0 in Hzs.
+      destruct Hzs; subst θ. {
+        now rewrite (angle_add_overflow_0_0 Hon Hos) in Haov.
+      }
+      cbn - [ rngl_cos ].
+      rewrite angle_sub_diag; cbn.
+      apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+    }
+    apply rngl_cos_lt_rngl_cos_sub; try easy. {
+      apply (rngl_lt_iff Hor).
+      split; [ now apply rngl_sin_div_2_pow_nat_nonneg | ].
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      apply (angle_eqb_neq Hed) in Hs2z.
+      destruct H as [H| H]; [ easy | ].
+      apply eq_angle_eq in H.
+      injection H; clear H; intros H1 H2.
+      apply (eq_rl_sqrt_0 Hos) in H1. 2: {
+        apply rngl_1_sub_cos_div_2_nonneg.
+      }
+      progress unfold rngl_div in H1.
+      rewrite Hiv in H1.
+      apply (rngl_eq_mul_0_l Hos Hii) in H1. 2: {
+        apply (rngl_inv_neq_0 Hon Hos Hiv).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      apply -> (rngl_sub_move_0_r Hop) in H1.
+      symmetry in H1.
+      apply eq_rngl_cos_1 in H1.
+      apply eq_angle_div_2_pow_nat_0 in H1.
+      apply eq_angle_eq in H1.
+      cbn in H1.
+      injection H1; clear H1; intros H1.
+      exfalso; revert H1.
+      apply (rngl_lt_iff Hor).
+      apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+    }
+...
+rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ / ₂^S n) = rngl_cos_div_pow_2 (θ / ₂) n
 ...
 rewrite angle_div_2_add_not_overflow.
 f_equal.
