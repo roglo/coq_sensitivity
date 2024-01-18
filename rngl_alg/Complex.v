@@ -5108,6 +5108,21 @@ destruct zs. {
 }
 Qed.
 
+Theorem rngl_cos_div_2_nonneg :
+  ∀ θ,
+  (0 ≤ rngl_sin θ)%L
+  → (0 ≤ rngl_cos (θ / ₂))%L.
+Proof.
+destruct_ac.
+intros * Hzs.
+cbn.
+apply rngl_leb_le in Hzs.
+rewrite Hzs.
+rewrite (rngl_mul_1_l Hon).
+apply rl_sqrt_nonneg.
+apply rngl_1_add_cos_div_2_nonneg.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5397,6 +5412,49 @@ destruct zs. {
       apply (rngl_lt_iff Hor).
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
+    apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy. {
+      rewrite angle_div_2_pow_nat_succ_r_1.
+      apply rngl_sin_div_2_nonneg.
+    } {
+      rewrite angle_div_2_pow_nat_succ_r_1.
+      apply rngl_cos_div_2_nonneg.
+      destruct i; [ apply (rngl_le_refl Hor) | ].
+      now apply rngl_sin_div_2_pow_nat_nonneg.
+    } {
+      rewrite angle_div_2_pow_nat_succ_r_1.
+...
+      apply rngl_cos_div_2_nonneg.
+      destruct i. {
+        cbn.
+cbn - [ rngl_sin ] in Hzs.
+cbn in IHi.
+...
+      now apply rngl_sin_div_2_pow_nat_nonneg.
+...
+Search (0 ≤ rngl_sin (angle_straight / ₂))%L.
+Search (0 ≤ rngl_sin (angle_straight / ₂^_))%L.
+Search (0 < rngl_sin (angle_straight / ₂))%L.
+Search (0 < rngl_sin (angle_straight / ₂^_))%L.
+
+...
+      cbn.
+      remember (0 ≤? rngl_sin _)%L as zss eqn:Hzss.
+      symmetry in Hzss.
+      destruct zss. {
+        rewrite (rngl_mul_1_l Hon).
+        apply rl_sqrt_nonneg.
+...
+Search (0 ≤ rngl_cos (_ / ₂))%L.
+      apply rngl_cos_div_2_nonneg.
+    } {
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+    apply angle_add_le_mono_l_lemma_39; try easy; cycle 1. {
+      now apply rngl_sin_div_2_pow_nat_nonneg.
+    } {
+Search (rngl_sin (angle_straight / ₂^_)).
+...
+    cbn.
 ...
 rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ / ₂^S n) = rngl_cos_div_pow_2 (θ / ₂) n
 ...
