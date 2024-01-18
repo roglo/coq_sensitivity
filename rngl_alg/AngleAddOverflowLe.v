@@ -500,7 +500,6 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   }
   apply rngl_cos_lt_rngl_cos_sub; try easy.
   now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
   apply (rngl_lt_iff Hor).
   split; [ | easy ].
   apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
@@ -966,7 +965,6 @@ apply (rngl_nlt_ge Hor) in H12.
 apply H12; clear H12.
 rewrite (rngl_cos_sub_comm Hic Hop).
 apply rngl_cos_lt_rngl_cos_sub; try easy.
-now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_iff Hor).

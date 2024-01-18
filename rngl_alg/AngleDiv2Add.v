@@ -288,7 +288,6 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
     apply rngl_cos_lt_rngl_cos_sub; try easy.
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
   }
 }
 Qed.
@@ -542,7 +541,6 @@ destruct zs1. {
       now apply (rngl_lt_le_incl Hor).
     }
     apply rngl_cos_lt_rngl_cos_sub; try easy.
-    now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
   }
   apply (rngl_nle_gt Hor) in Hc1z.

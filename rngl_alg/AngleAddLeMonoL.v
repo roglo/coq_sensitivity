@@ -3261,9 +3261,6 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
       rewrite (rngl_cos_sub_comm Hic Hop).
       apply rngl_cos_lt_rngl_cos_sub; try easy. {
         now apply (rngl_lt_le_incl Hor) in Hzc1.
-      } {
-        apply (rngl_le_trans Hor _ (rngl_sin θ2)); [ | easy ].
-        now apply (rngl_lt_le_incl Hor) in Hzc2.
       }
       apply angle_add_le_mono_l_lemma_39; try easy. {
         apply not_eq_sym in Hs1z.
@@ -3789,7 +3786,6 @@ progress sin_cos_add_sub_right_hyp T Hc2z.
 progress sin_cos_add_sub_right_goal T.
 rewrite (rngl_cos_sub_comm Hic Hop).
 apply rngl_cos_lt_rngl_cos_sub; try easy.
-now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 apply angle_add_le_mono_l_lemma_39; try easy.

@@ -2981,11 +2981,10 @@ Theorem rngl_cos_lt_rngl_cos_sub :
   (0 ≤ rngl_sin θ1)%L
   → (0 < rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
   → (rngl_cos θ1 < rngl_cos θ2)%L
   → (rngl_cos θ1 < rngl_cos (θ2 - θ1))%L.
 Proof.
-intros * Hzs1 Hzs2 Hzc1 Hzc2 Hc12z.
+intros * Hzs1 Hzs2 Hzc1 Hc12z.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3054,14 +3053,20 @@ apply (rngl_lt_le_trans Hor _ (2 * (rngl_cos θ2)²))%L. {
   apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
   apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
   rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    apply (rngl_le_trans Hor _ (rngl_cos θ1)); [ easy | ].
+    now apply (rngl_lt_le_incl Hor).
+  }
   easy.
 }
 apply (rngl_le_trans Hor _ (2 * rngl_cos θ2))%L. {
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
   rewrite <- (rngl_mul_1_l Hon (rngl_cos θ2)) at 2.
   progress unfold rngl_squ.
-  apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
+    apply (rngl_le_trans Hor _ (rngl_cos θ1)); [ easy | ].
+    now apply (rngl_lt_le_incl Hor).
+  }
   now apply rngl_cos_bound.
 }
 rewrite <- (rngl_add_diag Hon).

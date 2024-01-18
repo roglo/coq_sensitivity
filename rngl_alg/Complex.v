@@ -5368,6 +5368,9 @@ destruct zs. {
       rewrite angle_sub_diag; cbn.
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+About rngl_cos_lt_rngl_cos_sub.
+...
     apply rngl_cos_lt_rngl_cos_sub; try easy. {
       apply (rngl_lt_iff Hor).
       split; [ now apply rngl_sin_div_2_pow_nat_nonneg | ].
