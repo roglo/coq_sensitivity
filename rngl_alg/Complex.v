@@ -5123,6 +5123,20 @@ apply rl_sqrt_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
 Qed.
 
+Theorem angle_straight_neq_0 :
+  rngl_characteristic T ≠ 1
+  → angle_straight ≠ 0%A.
+Proof.
+destruct_ac.
+intros Hc1 Hs2z.
+apply eq_angle_eq in Hs2z.
+cbn in Hs2z.
+injection Hs2z; clear Hs2z; intros H1.
+exfalso; revert H1.
+apply (rngl_lt_iff Hor).
+apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5341,12 +5355,7 @@ symmetry in Hs2z.
 destruct s2z. {
   apply (angle_eqb_eq Hed) in Hs2z.
   apply eq_angle_div_2_pow_nat_0 in Hs2z.
-  apply eq_angle_eq in Hs2z.
-  cbn in Hs2z.
-  injection Hs2z; clear Hs2z; intros H1.
-  exfalso; revert H1.
-  apply (rngl_lt_iff Hor).
-  apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+  now apply (angle_straight_neq_0 Hc1) in Hs2z.
 }
 rewrite (angle_add_assoc Hop).
 rewrite <- (angle_add_assoc Hop).
@@ -5449,6 +5458,20 @@ destruct zs. {
         apply (rngl_lt_le_incl Hor) in Hsz.
         now apply (rngl_nlt_ge Hor) in Hsz.
       }
+      rewrite angle_div_2_pow_nat_succ_r_1.
+      apply angle_div_2_le_straight.
+    }
+    intros H.
+    rewrite (rngl_cos_sub_comm Hic Hop) in H.
+    apply rngl_cos_eq in H.
+    destruct H as [H| H]. {
+      symmetry in H.
+      apply angle_sub_move_l in H.
+      rewrite angle_sub_diag in H.
+      apply eq_angle_div_2_pow_nat_0 in H.
+      now apply (angle_straight_neq_0 Hc1) in H.
+    }
+    rewrite <- IHi in H.
 ...
 apply angle_add_overflow_le_lemma_4 with (θ2 := θ); try easy.
 apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
