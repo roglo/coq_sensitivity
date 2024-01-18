@@ -5276,6 +5276,7 @@ specialize (HN H); clear H.
 (**)
 rewrite angle_eucl_dist_move_0_l in HN.
 rewrite angle_eucl_dist_move_0_l.
+(*
 ...
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 rewrite (angle_mul_nat_assoc Hon Hop).
@@ -5283,7 +5284,7 @@ rewrite Nat.mul_comm.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 ...
 Check angle_div_2_pow_nat_mul.
-(* et si ça débordait ? à quoi serait égal (n * θ) / ₂^n ? *)
+*)
 Definition two_straight_div_2_pow i :=
   match i with
   | 0 => 0%A
@@ -5388,21 +5389,69 @@ destruct zs. {
       rewrite angle_sub_diag; cbn.
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
-Check rngl_cos_lt_rngl_cos_sub.
-apply (rngl_lt_iff Hor).
-split. {
-rewrite (rngl_cos_sub_comm Hic Hop).
-apply rngl_cos_decr.
-split. {
-rewrite <- IHi.
-Search (_ / ₂^_ ≤ _ / ₂^_)%A.
-apply angle_div_2_pow_nat_le.
-progress unfold angle_add_overflow in Haov.
-progress unfold angle_ltb in Haov.
-progress unfold angle_leb.
-rewrite (rngl_sin_add_straight_r Hon Hop).
-rewrite rngl_leb_opp_r.
-rewrite (rngl_opp_0 Hop).
+    apply (rngl_lt_iff Hor).
+    split. {
+      rewrite (rngl_cos_sub_comm Hic Hop).
+      apply rngl_cos_decr.
+      split. {
+        rewrite <- IHi.
+        apply angle_div_2_pow_nat_le.
+        progress unfold angle_add_overflow in Haov.
+        progress unfold angle_ltb in Haov.
+        progress unfold angle_leb.
+        rewrite (rngl_sin_add_straight_r Hon Hop).
+        rewrite rngl_leb_opp_r.
+        rewrite (rngl_opp_0 Hop).
+        remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+        symmetry in Hzst.
+        destruct zst. {
+          apply rngl_leb_le in Hzst.
+          remember (0 ≤? rngl_sin (θ + θ))%L as zstt eqn:Hzstt.
+          symmetry in Hzstt.
+          destruct zstt; [ | easy ].
+          apply rngl_leb_le in Hzstt.
+          apply rngl_ltb_lt in Haov.
+          rewrite (rngl_cos_add_straight_r Hon Hop).
+          remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+          symmetry in Hsz.
+          destruct sz. {
+            apply rngl_leb_le.
+            apply rngl_leb_le in Hsz.
+            apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
+            symmetry in Hsz.
+            apply eq_rngl_sin_0 in Hsz.
+            destruct Hsz; subst θ. {
+              cbn in Haov.
+              rewrite (rngl_mul_1_l Hon) in Haov.
+              rewrite (rngl_mul_0_l Hos) in Haov.
+              rewrite (rngl_sub_0_r Hos) in Haov.
+              now apply (rngl_lt_irrefl Hor) in Haov.
+            }
+            cbn.
+            rewrite (rngl_opp_involutive Hop).
+            apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
+          }
+          exfalso.
+          apply (rngl_leb_gt Hor) in Hsz.
+          apply (rngl_nle_gt Hor) in Haov.
+          apply Haov; clear Haov.
+          apply angle_add_overflow_le_lemma_111; try easy.
+          left.
+          intros H; subst θ.
+          cbn in Hsz.
+          now apply (rngl_lt_irrefl Hor) in Hsz.
+        }
+        remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+        symmetry in Hsz.
+        destruct sz; [ easy | ].
+        apply (rngl_leb_gt Hor) in Hzst.
+        apply (rngl_leb_gt Hor) in Hsz.
+        apply (rngl_lt_le_incl Hor) in Hsz.
+        now apply (rngl_nlt_ge Hor) in Hsz.
+      }
+...
+apply angle_add_overflow_le_lemma_4 with (θ2 := θ); try easy.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 }
 Search (_ / ₂ ≤ angle_straight)%A.
