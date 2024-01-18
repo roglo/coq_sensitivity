@@ -5384,6 +5384,36 @@ destruct zs. {
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
 Check rngl_cos_lt_rngl_cos_sub.
+apply (rngl_lt_iff Hor).
+split. {
+rewrite (rngl_cos_sub_comm Hic Hop).
+apply rngl_cos_decr.
+split. {
+rewrite <- IHi.
+Search (_ / ₂^_ ≤ _ / ₂^_)%A.
+apply angle_div_2_pow_nat_le.
+progress unfold angle_add_overflow in Haov.
+progress unfold angle_ltb in Haov.
+progress unfold angle_leb.
+rewrite (rngl_sin_add_straight_r Hon Hop).
+rewrite rngl_leb_opp_r.
+rewrite (rngl_opp_0 Hop).
+admit.
+}
+Search (_ / ₂ ≤ angle_straight)%A.
+apply angle_div_2_le_straight.
+}
+intros H.
+Search (rngl_cos _ = rngl_cos _)%L.
+rewrite (rngl_cos_sub_comm Hic Hop) in H.
+apply rngl_cos_eq in H.
+destruct H as [H| H]. {
+rewrite <- IHi in H.
+Search (_ / ₂^_ = _ / ₂^_)%A.
+Search (_ / ₂ = _ / ₂)%A.
+...
+Search (_ / ₂^_ - _ / ₂^_)%A.
+Search (_ - _ ≤ _)%A.
 ...
     apply rngl_cos_lt_rngl_cos_sub; try easy. {
       apply (rngl_lt_iff Hor).
