@@ -5383,6 +5383,8 @@ destruct zs. {
       rewrite angle_sub_diag; cbn.
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
+Check rngl_cos_lt_rngl_cos_sub.
+...
     apply rngl_cos_lt_rngl_cos_sub; try easy. {
       apply (rngl_lt_iff Hor).
       split; [ now apply rngl_sin_div_2_pow_nat_nonneg | ].
@@ -5412,9 +5414,25 @@ destruct zs. {
       apply (rngl_lt_iff Hor).
       apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
     }
+(* mais ça, c'est faux, en fait, maintenant que j'y réfléchis *)
+...
+Check rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
+Check rngl_cos_decr.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
+  apply rngl_
+...
+Theorem glop :
+  ∀ θ1 θ2,
+  (θ2 < θ1)
+  (rngl_cos (θ1 / ₂) < rngl_cos (θ2 / ₂))%L.
+...
+do 2 rewrite angle_div_2_pow_nat_succ_r_1.
+apply glop.
+...
 Check rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
 Search (rngl_cos _ < rngl_cos _)%L.
-...
     apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy. {
       rewrite angle_div_2_pow_nat_succ_r_1.
       apply rngl_sin_div_2_nonneg.
