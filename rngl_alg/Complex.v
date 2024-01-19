@@ -7725,10 +7725,28 @@ specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
 (* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
 Search (_ * (_ / ₂^_))%A.
 specialize (Hlim' Har Hch n θ' Hiz).
-...
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
+(**)
 destruct ao. {
+  clear Hlim'.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  apply Bool.not_false_iff_true in Hao.
+  exfalso; apply Hao; clear Hao.
+...
+}
+... ...
+destruct ao. 2: {
+  specialize (Hlim' eq_refl).
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  set (θi := λ i, (2 ^ i / n * (θ / ₂^i))%A).
+  set (θ'i := λ i, (2 ^ i / n * (n * θ' / ₂^i))%A).
+  progress fold θi in Hlim.
+  progress fold θ'i in Hlim'.
+  move Hlim before Hlim'.
+  move θ'i before θi.
+...
 (*
 ...
   clear Hlim'.
@@ -7877,7 +7895,7 @@ Search ((_ + _) / _).
   progress unfold angle_lim in Hlim.
   progress unfold is_limit_when_tending_to_inf in Hlim.
 *)
-  admit.
+...
 } {
   specialize (Hlim' eq_refl).
   move Hao before Hiz.
