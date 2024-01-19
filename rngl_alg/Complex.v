@@ -7703,6 +7703,30 @@ split; intros Hθ. {
 }
 Qed.
 
+Theorem angle_mul_succ_l : ∀ n θ, (S n * θ = θ + n * θ)%A.
+Proof. easy. Qed.
+
+Theorem rngl_sin_nonneg_angle_le_straight :
+  ∀ θ, (0 ≤ rngl_sin θ)%L ↔ (θ ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  split; [ | easy ].
+  intros _; cbn.
+  apply rngl_leb_le.
+  apply rngl_cos_bound.
+}
+apply (rngl_leb_gt Hor) in Hzs.
+now apply (rngl_nle_gt Hor) in Hzs.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -7729,49 +7753,105 @@ symmetry in Hao.
 (**)
 destruct ao. {
   clear Hlim'.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   apply Bool.not_false_iff_true in Hao.
   exfalso; apply Hao; clear Hao.
-  revert θ θ' Hlim.
-  induction n; intros; [ easy | clear Hiz ].
-  destruct n; [ easy | ].
-  specialize (IHn (Nat.neq_succ_0 _)).
-  destruct n. {
-    cbn.
-    rewrite Bool.orb_false_r.
-    rewrite angle_add_0_r.
-    progress unfold angle_lim in Hlim.
-    progress unfold is_limit_when_tending_to_inf in Hlim.
-    progress unfold angle_add_overflow.
-    progress unfold angle_ltb.
-    remember (0 ≤? rngl_sin (θ' + θ'))%L as zsa eqn:Hzsa.
-    remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
-    symmetry in Hzsa, Hzs.
-    destruct zsa. {
-      apply rngl_leb_le in Hzsa.
-      destruct zs. {
-        apply rngl_leb_le in Hzs.
-        apply (rngl_ltb_ge Hor).
-        destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
-          apply angle_add_overflow_le_lemma_111; try easy.
-          now right; right; left.
-        }
-        apply (rngl_nle_gt Hor) in Hzc.
-        remember (θ' =? angle_straight)%A as ts eqn:Hts.
-        symmetry in Hts.
-        destruct ts. {
-          apply (angle_eqb_eq Hed) in Hts.
-          subst θ'.
-          clear Hzc Hzs Hzsa.
+Theorem angle_lim_seq_angle_not_mul_overflow :
+  ∀ n θ θ',
+  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → angle_mul_nat_overflow n θ' = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hlim.
+apply (angle_all_add_not_overflow n θ').
+intros m Hm.
+progress unfold angle_lim in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+rewrite <- angle_mul_succ_l.
+remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
+symmetry in Hzs, Hzsm.
+destruct zsm. {
+  apply rngl_leb_le in Hzsm.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    apply (rngl_ltb_ge Hor).
+    cbn - [ rngl_cos ].
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+      cbn - [ rngl_sin ] in Hzsm.
+...
+Theorem glop :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+intros * Hzs1 Hzc1 Hzs12.
+cbn.
+(* non, c'est faux, ça, suffit que θ2 = 2π-ε *)
+... ...
+now apply glop.
+Search (0 ≤ rngl_sin (_ + _))%L.
+specialize (rngl_sin_nonneg_add_nonneg θ' (m * θ') Hzs Hzsm) as H1.
+      apply angle_add_overflow_le_lemma_111; try easy. {
+        now right; right; left.
+      }
+      rewrite (angle_add_comm Hic) in Hzsm.
+      apply rngl_sin_add_nonneg_sin_nonneg with (θ2 := θ'); [ | easy ].
+      progress unfold angle_add_overflow.
+      apply angle_ltb_ge.
+      progress unfold angle_leb.
+      apply rngl_leb_le in Hzsm.
+      rewrite Hzsm.
+...
+Search (0 ≤ rngl_sin (_ + _))%L.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+...
+    apply rngl_cos_decr.
+    split; [ | now apply rngl_sin_nonneg_angle_le_straight ].
+    progress unfold angle_leb.
+    rewrite Hzs.
+    apply rngl_leb_le in Hzsm.
+    rewrite Hzsm.
+    apply rngl_leb_le.
+...
+destruct n; [ easy | ].
+destruct n. {
+  cbn.
+  rewrite Bool.orb_false_r.
+  rewrite angle_add_0_r.
+  progress unfold angle_lim in Hlim.
+  progress unfold is_limit_when_tending_to_inf in Hlim.
+  progress unfold angle_add_overflow.
+  progress unfold angle_ltb.
+  remember (0 ≤? rngl_sin (θ' + θ'))%L as zsa eqn:Hzsa.
+  remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+  symmetry in Hzsa, Hzs.
+  destruct zsa. {
+    apply rngl_leb_le in Hzsa.
+    destruct zs. {
+      apply rngl_leb_le in Hzs.
+      apply (rngl_ltb_ge Hor).
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+        apply angle_add_overflow_le_lemma_111; try easy.
+        now right; right; left.
+      }
+      apply (rngl_nle_gt Hor) in Hzc.
+      remember (θ' =? angle_straight)%A as ts eqn:Hts.
+      symmetry in Hts.
+      destruct ts. {
+        apply (angle_eqb_eq Hed) in Hts.
+        subst θ'.
+        clear Hzc Hzs Hzsa.
 ...
         apply angle_add_overflow_le_lemma_2; try easy. {
           intros H.
           apply eq_rngl_cos_opp_1 in H.
           subst θ'.
 cbn in *.
-cbn.
-
-          cbn.
 Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
 ...
 apply angle_add_overflow_le_lemma_111; try easy.
@@ -7779,6 +7859,8 @@ apply angle_add_overflow_le_lemma_1 with (θ2 := θ'); try easy.
 apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 }
+... ...
+now apply angle_lim_seq_angle_not_mul_overflow in Hlim.
 ... ...
 destruct ao. 2: {
   specialize (Hlim' eq_refl).
