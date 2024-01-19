@@ -5357,6 +5357,7 @@ destruct s2z. {
   apply eq_angle_div_2_pow_nat_0 in Hs2z.
   now apply (angle_straight_neq_0 Hc1) in Hs2z.
 }
+clear Hs2z.
 rewrite (angle_add_assoc Hop).
 rewrite <- (angle_add_assoc Hop).
 rewrite (angle_straight_add_straight Hon Hop).
@@ -5482,6 +5483,40 @@ destruct zs. {
   apply Haov.
   apply angle_add_overflow_div_2_div_2.
 }
+apply (rngl_leb_gt Hor) in Hzs.
+destruct zs2. {
+  exfalso.
+  apply rngl_leb_le in Hzs2.
+  rewrite IHi in Hzs.
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply Bool.not_true_iff_false in Hzs.
+  apply Hzs; clear Hzs.
+  apply rngl_leb_le.
+  apply rngl_sin_sub_nonneg; [ easy | | ]. {
+    destruct i; [ cbn; apply (rngl_le_refl Hor) | ].
+    now apply rngl_sin_div_2_pow_nat_nonneg.
+  }
+  destruct i. {
+    cbn in Hzs2 |-*.
+    destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)) as [Hco1| Hco1]. {
+      apply eq_rngl_cos_opp_1 in Hco1.
+      subst θ.
+      apply (rngl_le_refl Hor).
+    }
+    exfalso.
+    apply Bool.not_false_iff_true in Haov.
+    apply Haov.
+    apply angle_add_overflow_diag; [ easy | ].
+    now intros H; subst θ.
+  }
+  do 2 rewrite rngl_cos_div_pow_2_eq.
+Search rngl_cos_div_pow_2.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+...
+Search (_ → angle_add_overflow _ _ = false).
+angle_add_overflow_diag: ∀ θ : angle T, (0 ≤ rngl_sin θ)%L → θ ≠ angle_straight → angle_add_overflow θ θ = false
+rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ / ₂^S n) = rngl_cos_div_pow_2 (θ / ₂) n
 ...
     rewrite <- IHi in H.
 ...
