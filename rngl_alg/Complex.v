@@ -5378,110 +5378,110 @@ remember (0 ≤? rngl_sin (θ / ₂^i))%L as zs2 eqn:Hzs2.
 symmetry in Hzs, Hzs2.
 destruct zs. {
   apply rngl_leb_le in Hzs.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    apply rngl_ltb_lt.
-    rewrite IHi.
-    rewrite (rngl_cos_sub_comm Hic Hop).
-(**)
-    destruct i. {
-      cbn - [ rngl_sin ] in Hzs, Hzs2.
-      rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs.
-      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs.
-      apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
-      symmetry in Hzs.
-      apply eq_rngl_sin_0 in Hzs.
-      destruct Hzs; subst θ. {
-        now rewrite (angle_add_overflow_0_0 Hon Hos) in Haov.
-      }
-      cbn - [ rngl_cos ].
-      rewrite angle_sub_diag; cbn.
-      apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+  destruct zs2; [ | easy ].
+  apply rngl_leb_le in Hzs2.
+  apply rngl_ltb_lt.
+  rewrite IHi.
+  rewrite (rngl_cos_sub_comm Hic Hop).
+  destruct i. {
+    cbn - [ rngl_sin ] in Hzs, Hzs2.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs.
+    apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
+    symmetry in Hzs.
+    apply eq_rngl_sin_0 in Hzs.
+    destruct Hzs; subst θ. {
+      now rewrite (angle_add_overflow_0_0 Hon Hos) in Haov.
     }
-    apply (rngl_lt_iff Hor).
+    cbn - [ rngl_cos ].
+    rewrite angle_sub_diag; cbn.
+    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+  }
+  apply (rngl_lt_iff Hor).
+  split. {
+    rewrite (rngl_cos_sub_comm Hic Hop).
+    apply rngl_cos_decr.
     split. {
-      rewrite (rngl_cos_sub_comm Hic Hop).
-      apply rngl_cos_decr.
-      split. {
-        rewrite <- IHi.
-        apply angle_div_2_pow_nat_le.
-        progress unfold angle_add_overflow in Haov.
-        progress unfold angle_ltb in Haov.
-        progress unfold angle_leb.
-        rewrite (rngl_sin_add_straight_r Hon Hop).
-        rewrite rngl_leb_opp_r.
-        rewrite (rngl_opp_0 Hop).
-        remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
-        symmetry in Hzst.
-        destruct zst. {
-          apply rngl_leb_le in Hzst.
-          remember (0 ≤? rngl_sin (θ + θ))%L as zstt eqn:Hzstt.
-          symmetry in Hzstt.
-          destruct zstt; [ | easy ].
-          apply rngl_leb_le in Hzstt.
-          apply rngl_ltb_lt in Haov.
-          rewrite (rngl_cos_add_straight_r Hon Hop).
-          remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
-          symmetry in Hsz.
-          destruct sz. {
-            apply rngl_leb_le.
-            apply rngl_leb_le in Hsz.
-            apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
-            symmetry in Hsz.
-            apply eq_rngl_sin_0 in Hsz.
-            destruct Hsz; subst θ. {
-              cbn in Haov.
-              rewrite (rngl_mul_1_l Hon) in Haov.
-              rewrite (rngl_mul_0_l Hos) in Haov.
-              rewrite (rngl_sub_0_r Hos) in Haov.
-              now apply (rngl_lt_irrefl Hor) in Haov.
-            }
-            cbn.
-            rewrite (rngl_opp_involutive Hop).
-            apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
-          }
-          exfalso.
-          apply (rngl_leb_gt Hor) in Hsz.
-          apply (rngl_nle_gt Hor) in Haov.
-          apply Haov; clear Haov.
-          apply angle_add_overflow_le_lemma_111; try easy.
-          left.
-          intros H; subst θ.
-          cbn in Hsz.
-          now apply (rngl_lt_irrefl Hor) in Hsz.
-        }
+      rewrite <- IHi.
+      apply angle_div_2_pow_nat_le.
+      progress unfold angle_add_overflow in Haov.
+      progress unfold angle_ltb in Haov.
+      progress unfold angle_leb.
+      rewrite (rngl_sin_add_straight_r Hon Hop).
+      rewrite rngl_leb_opp_r.
+      rewrite (rngl_opp_0 Hop).
+      remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+      symmetry in Hzst.
+      destruct zst. {
+        apply rngl_leb_le in Hzst.
+        remember (0 ≤? rngl_sin (θ + θ))%L as zstt eqn:Hzstt.
+        symmetry in Hzstt.
+        destruct zstt; [ | easy ].
+        apply rngl_leb_le in Hzstt.
+        apply rngl_ltb_lt in Haov.
+        rewrite (rngl_cos_add_straight_r Hon Hop).
         remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
         symmetry in Hsz.
-        destruct sz; [ easy | ].
-        apply (rngl_leb_gt Hor) in Hzst.
+        destruct sz. {
+          apply rngl_leb_le.
+          apply rngl_leb_le in Hsz.
+          apply (rngl_le_antisymm Hor) in Hsz; [ | easy ].
+          symmetry in Hsz.
+          apply eq_rngl_sin_0 in Hsz.
+          destruct Hsz; subst θ. {
+            cbn in Haov.
+            rewrite (rngl_mul_1_l Hon) in Haov.
+            rewrite (rngl_mul_0_l Hos) in Haov.
+            rewrite (rngl_sub_0_r Hos) in Haov.
+            now apply (rngl_lt_irrefl Hor) in Haov.
+          }
+          cbn.
+          rewrite (rngl_opp_involutive Hop).
+          apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
+        }
+        exfalso.
         apply (rngl_leb_gt Hor) in Hsz.
-        apply (rngl_lt_le_incl Hor) in Hsz.
-        now apply (rngl_nlt_ge Hor) in Hsz.
+        apply (rngl_nle_gt Hor) in Haov.
+        apply Haov; clear Haov.
+        apply angle_add_overflow_le_lemma_111; try easy.
+        left.
+        intros H; subst θ.
+        cbn in Hsz.
+        now apply (rngl_lt_irrefl Hor) in Hsz.
       }
-      rewrite angle_div_2_pow_nat_succ_r_1.
-      apply angle_div_2_le_straight.
+      remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+      symmetry in Hsz.
+      destruct sz; [ easy | ].
+      apply (rngl_leb_gt Hor) in Hzst.
+      apply (rngl_leb_gt Hor) in Hsz.
+      apply (rngl_lt_le_incl Hor) in Hsz.
+      now apply (rngl_nlt_ge Hor) in Hsz.
     }
-    intros H.
-    rewrite (rngl_cos_sub_comm Hic Hop) in H.
-    apply rngl_cos_eq in H.
-    destruct H as [H| H]. {
-      symmetry in H.
-      apply angle_sub_move_l in H.
-      rewrite angle_sub_diag in H.
-      apply eq_angle_div_2_pow_nat_0 in H.
-      now apply (angle_straight_neq_0 Hc1) in H.
-    }
-    rewrite (angle_opp_sub_distr Hic Hop) in H.
-symmetry in H.
-Search (- (_ - _))%A.
-Search (_ - _ = _)%A.
-About angle_sub_move_l.
-...
-angle_sub_move_l:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T → ∀ θ1 θ2 θ3 : angle T, (θ1 - θ2)%A = θ3 ↔ θ2 = (θ1 - θ3)%A
-apply angle_sub_move_r in H.
-angle_add_sub_eq_r in H.
+    rewrite angle_div_2_pow_nat_succ_r_1.
+    apply angle_div_2_le_straight.
+  }
+  intros H.
+  rewrite (rngl_cos_sub_comm Hic Hop) in H.
+  apply rngl_cos_eq in H.
+  destruct H as [H| H]. {
+    symmetry in H.
+    apply angle_sub_move_l in H.
+    rewrite angle_sub_diag in H.
+    apply eq_angle_div_2_pow_nat_0 in H.
+    now apply (angle_straight_neq_0 Hc1) in H.
+  }
+  rewrite (angle_opp_sub_distr Hic Hop) in H.
+  symmetry in H.
+  apply angle_sub_move_r in H.
+  rewrite angle_add_div_2_pow_diag in H.
+  rewrite angle_div_2_pow_nat_succ_r_2 in H.
+  apply (f_equal (λ a, (2 ^ i * a)%A)) in H.
+  do 2 rewrite angle_mul_2_pow_div_2_pow in H.
+  subst θ.
+  apply Bool.not_false_iff_true in Haov.
+  apply Haov.
+  apply angle_add_overflow_div_2_div_2.
+}
 ...
     rewrite <- IHi in H.
 ...
