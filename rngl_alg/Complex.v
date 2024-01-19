@@ -7763,6 +7763,22 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hlim.
+(**)
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+Theorem glop :
+  ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
+Proof.
+intros.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin (2 ^ i / n * (θ / ₂^i)))%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs2, Hzs.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2.
+  destruct zs; [ | easy ].
+  apply rngl_leb_le in Hzs.
+  apply rngl_leb_le.
+...
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
 progress unfold angle_lim in Hlim.
