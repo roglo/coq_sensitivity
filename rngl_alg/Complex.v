@@ -5564,7 +5564,12 @@ eapply (angle_lim_eq_compat j 0) in H1. 2: {
 *)
 intros ε Hε.
 (**)
-specialize (H1 _ Hε).
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (H1 _ Hε2).
 destruct H1 as (N, HN).
 exists (max N j).
 intros i Hi.
@@ -5574,9 +5579,35 @@ assert (H : N ≤ i). {
   now apply Nat.le_max_l.
 }
 specialize (HN H); clear H.
+remember (2 ^ i / n * (n * (θ' / ₂^i)))%A as θ.
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ θ).
+}
+specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
+rewrite (rngl_add_diag2 Hon) in Hεε2.
+rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε2; clear Hεε2.
+apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+subst θ.
+rewrite angle_eucl_dist_move_0_r.
+destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+  subst n.
+  rewrite angle_mul_2_div_2_pow; [ | now apply Hmt ].
+  rewrite angle_mul_sub_distr_l.
+  rewrite (angle_sub_sub_swap Hic Hop).
+  rewrite angle_sub_diag.
+  rewrite (angle_sub_0_l Hon Hos).
+  rewrite <- angle_eucl_dist_opp_opp.
+  rewrite (angle_opp_involutive Hop).
+  rewrite angle_opp_0.
+Check angle_mul_2_div_2_pow.
+...
+2: {
+...
 rewrite angle_eucl_dist_move_0_l in HN.
 rewrite angle_eucl_dist_move_0_l.
-Check angle_mul_2_div_2_pow.
 ...
 Search (_ → angle_add_overflow _ _ = false).
 angle_add_overflow_diag: ∀ θ : angle T, (0 ≤ rngl_sin θ)%L → θ ≠ angle_straight → angle_add_overflow θ θ = false
