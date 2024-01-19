@@ -5137,6 +5137,40 @@ apply (rngl_lt_iff Hor).
 apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 Qed.
 
+Theorem rngl_cos_div_pow_2_decr :
+  ∀ n θ1 θ2,
+  (θ2 ≤ θ1 ≤ angle_straight)%A
+  → (rngl_cos_div_pow_2 θ1 n ≤ rngl_cos_div_pow_2 θ2 n)%L.
+Proof.
+destruct_ac.
+intros * H21.
+revert θ1 θ2 H21.
+induction n; intros; [ now apply rngl_cos_decr | ].
+rewrite rngl_cos_div_pow_2_succ_r. 2: {
+  destruct H21 as (_, H1).
+  progress unfold angle_leb in H1.
+  cbn in H1.
+  rewrite (rngl_leb_refl Hor) in H1.
+  remember (0 ≤? rngl_sin θ1)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs; [ | easy ].
+  now apply rngl_leb_le in Hzs.
+}
+rewrite rngl_cos_div_pow_2_succ_r. 2: {
+  assert (H2 : (θ2 ≤ angle_straight)%A) by now apply (angle_le_trans _ θ1).
+  progress unfold angle_leb in H2.
+  cbn in H2.
+  rewrite (rngl_leb_refl Hor) in H2.
+  remember (0 ≤? rngl_sin θ2)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs; [ | easy ].
+  now apply rngl_leb_le in Hzs.
+}
+apply IHn.
+split; [ | apply angle_div_2_le_straight ].
+now apply angle_div_2_le_compat.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -5510,9 +5544,13 @@ destruct zs2. {
     now intros H; subst θ.
   }
   do 2 rewrite rngl_cos_div_pow_2_eq.
-Search rngl_cos_div_pow_2.
+  apply rngl_cos_div_pow_2_decr.
+  split; [ | apply angle_div_2_le_straight ].
+  apply angle_div_2_le_compat.
+Search (angle_add_overflow _ _ = true → _).
 ...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
+  progress unfold angle_add_overflow in Haov.
+  progress unfold angle_ltb in Haov.
 ...
 Search (_ → angle_add_overflow _ _ = false).
 angle_add_overflow_diag: ∀ θ : angle T, (0 ≤ rngl_sin θ)%L → θ ≠ angle_straight → angle_add_overflow θ θ = false
