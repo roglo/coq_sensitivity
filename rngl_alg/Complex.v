@@ -7733,6 +7733,14 @@ destruct ao. {
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   apply Bool.not_false_iff_true in Hao.
   exfalso; apply Hao; clear Hao.
+  revert θ θ' Hlim.
+  induction n; intros; [ easy | clear Hiz ].
+  destruct n; [ easy | ].
+  specialize (IHn (Nat.neq_succ_0 _)).
+  destruct n. {
+    cbn.
+    rewrite Bool.orb_false_r.
+    rewrite angle_add_0_r.
 ...
 }
 ... ...
