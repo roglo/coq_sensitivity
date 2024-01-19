@@ -7780,7 +7780,13 @@ destruct zsm. {
     apply (rngl_ltb_ge Hor).
     cbn - [ rngl_cos ].
     destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+      destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
+        apply angle_add_overflow_le_lemma_111; try easy.
+        now right; right; left.
+      }
+      apply (rngl_nle_gt Hor) in Hzm.
       cbn - [ rngl_sin ] in Hzsm.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 ...
 Theorem glop :
   ∀ θ1 θ2,
