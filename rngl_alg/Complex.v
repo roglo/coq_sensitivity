@@ -5424,7 +5424,8 @@ apply rl_sqrt_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.
 Qed.
 
-(* to be completed
+(* seems false, the hypothesis angle_mul_nat_overflow n θ = false
+   seems required
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
