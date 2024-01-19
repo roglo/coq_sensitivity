@@ -881,7 +881,7 @@ destruct zs12. {
       rewrite Hs12 in Haov; cbn in Haov.
       rewrite Hs12.
       cbn.
-      apply angle_add_sub_eq_l in Hs12.
+      apply angle_add_move_l in Hs12.
       subst θ2.
       rewrite (rngl_cos_sub_straight_l Hon Hop).
       rewrite (rngl_sub_opp_r Hop).
@@ -928,7 +928,7 @@ destruct zs12. {
       apply eq_rngl_sin_0 in Hs12.
       destruct Hs12 as [Hs12| Hs12]. {
         rewrite Hs12.
-        apply angle_add_sub_eq_l in Hs12.
+        apply angle_add_move_l in Hs12.
         rewrite (angle_sub_0_l Hon Hos) in Hs12.
         subst θ2.
         cbn in Hzs2.
@@ -937,7 +937,7 @@ destruct zs12. {
       }
       rewrite Hs12.
       cbn.
-      apply angle_add_sub_eq_l in Hs12.
+      apply angle_add_move_l in Hs12.
       subst θ2.
       rewrite (rngl_cos_sub_straight_l Hon Hop).
       rewrite (rngl_sub_opp_r Hop).

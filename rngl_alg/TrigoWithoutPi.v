@@ -1874,21 +1874,6 @@ subst x y.
 now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
 Qed.
 
-Theorem angle_add_sub_eq_l :
-  ∀ a b c, (a + b)%A = c → (c - a)%A = b.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hab.
-rewrite <- Hab.
-rewrite (angle_add_comm Hic).
-progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
-rewrite angle_add_opp_r.
-rewrite angle_sub_diag.
-apply (angle_add_0_r).
-Qed.
-
 Theorem rngl_sin_sub_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -2075,7 +2060,7 @@ destruct aov. {
   apply (rngl_nle_gt Hor) in Hzs2.
   apply Hzs2; clear Hzs2.
   symmetry in Hθ3.
-  apply angle_add_sub_eq_l in Hθ3.
+  apply angle_add_move_l in Hθ3.
   subst θ2.
   rewrite (rngl_sin_sub_anticomm Hic Hop).
   apply (rngl_opp_nonpos_nonneg Hop Hor).
@@ -2099,7 +2084,7 @@ apply rngl_leb_le in Haov.
 apply (rngl_nle_gt Hor) in Hzs2.
 apply Hzs2; clear Hzs2.
 symmetry in Hθ3.
-apply angle_add_sub_eq_l in Hθ3.
+apply angle_add_move_l in Hθ3.
 subst θ2.
 now apply rngl_sin_sub_nonneg.
 Qed.

@@ -5471,6 +5471,18 @@ destruct zs. {
       apply eq_angle_div_2_pow_nat_0 in H.
       now apply (angle_straight_neq_0 Hc1) in H.
     }
+    rewrite (angle_opp_sub_distr Hic Hop) in H.
+symmetry in H.
+Search (- (_ - _))%A.
+Search (_ - _ = _)%A.
+About angle_sub_move_l.
+...
+angle_sub_move_l:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T → ∀ θ1 θ2 θ3 : angle T, (θ1 - θ2)%A = θ3 ↔ θ2 = (θ1 - θ3)%A
+apply angle_sub_move_r in H.
+angle_add_sub_eq_r in H.
+...
     rewrite <- IHi in H.
 ...
 apply angle_add_overflow_le_lemma_4 with (θ2 := θ); try easy.
