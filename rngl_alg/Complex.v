@@ -7709,8 +7709,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_characteristic T = 0 →
   ∀ n θ θ',
   n ≠ 0
-  → angle_lim
-       (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
   → θ = (n * θ')%A.
 Proof.
 destruct_ac.
@@ -7741,6 +7740,43 @@ destruct ao. {
     cbn.
     rewrite Bool.orb_false_r.
     rewrite angle_add_0_r.
+    progress unfold angle_lim in Hlim.
+    progress unfold is_limit_when_tending_to_inf in Hlim.
+    progress unfold angle_add_overflow.
+    progress unfold angle_ltb.
+    remember (0 ≤? rngl_sin (θ' + θ'))%L as zsa eqn:Hzsa.
+    remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+    symmetry in Hzsa, Hzs.
+    destruct zsa. {
+      apply rngl_leb_le in Hzsa.
+      destruct zs. {
+        apply rngl_leb_le in Hzs.
+        apply (rngl_ltb_ge Hor).
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+          apply angle_add_overflow_le_lemma_111; try easy.
+          now right; right; left.
+        }
+        apply (rngl_nle_gt Hor) in Hzc.
+        remember (θ' =? angle_straight)%A as ts eqn:Hts.
+        symmetry in Hts.
+        destruct ts. {
+          apply (angle_eqb_eq Hed) in Hts.
+          subst θ'.
+          clear Hzc Hzs Hzsa.
+...
+        apply angle_add_overflow_le_lemma_2; try easy. {
+          intros H.
+          apply eq_rngl_cos_opp_1 in H.
+          subst θ'.
+cbn in *.
+cbn.
+
+          cbn.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+...
+apply angle_add_overflow_le_lemma_111; try easy.
+apply angle_add_overflow_le_lemma_1 with (θ2 := θ'); try easy.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 }
 ... ...
