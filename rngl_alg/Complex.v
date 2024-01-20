@@ -7825,7 +7825,8 @@ clear Hzs2.
   }
   apply (angle_eqb_neq Hed) in Htz.
 (**)
-  induction i. {
+  revert θ Hzs Htz.
+  induction i; intros. {
     cbn.
     destruct n; [ apply rngl_cos_bound | ].
     destruct n. {
@@ -7837,13 +7838,9 @@ clear Hzs2.
     rewrite angle_mul_0_l.
     apply rngl_cos_bound.
   }
-(**)
-  eapply (rngl_le_trans Hor); [ apply IHi | ].
-(*
-  rewrite Nat.add_0_r.
-*)
   destruct n; [ apply rngl_cos_bound | ].
   destruct n. {
+    eapply (rngl_le_trans Hor); [ now apply IHi | ].
     do 2 rewrite Nat.div_1_r.
     do 2 rewrite angle_mul_2_pow_div_2_pow.
     apply (rngl_le_refl Hor).
@@ -7854,9 +7851,50 @@ clear Hzs2.
     rewrite Nat.div_mul; [ | easy ].
     rewrite angle_div_2_pow_nat_succ_r_2.
     rewrite angle_mul_2_pow_div_2_pow.
+    now apply rngl_cos_le_cos_div_2.
+  }
+  destruct n. {
+    apply (rngl_le_trans Hor _ (rngl_cos (2 ^ S i / 2 * (θ / ₂^S i)))). {
+      rewrite Nat.pow_succ_r'.
+      rewrite Nat.mul_comm.
+      rewrite Nat.div_mul; [ | easy ].
+      rewrite angle_div_2_pow_nat_succ_r_2.
+      rewrite angle_mul_2_pow_div_2_pow.
+      now apply rngl_cos_le_cos_div_2.
+    }
+    apply rngl_cos_decr.
+    split. {
+      apply angle_mul_nat_le_mono_nonneg_r. {
+...
+        progress unfold angle_leb.
+apply rngl_leb_le in Hzs2, Hzs.
+rewrite Hzs2, Hzs.
     destruct i. {
       cbn.
-cbn in IHi.
+      rewrite <- (angle_mul_1_l Hon Hos θ) at 2.
+      apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
+      destruct n; [ easy | ].
+      apply Nat.div_le_upper_bound; [ easy | ].
+      cbn.
+      now apply -> Nat.succ_le_mono.
+    }
+    cbn.
+    rewrite Nat.add_0_r.
+    destruct i. {
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos (_ * _) ≤ _)%L.
+Search (_ * _ ≤ _ * _)%A.
+Check rngl_cos_le_cos_div_2.
+Check rngl_cos_le_cos_div_2.
+...
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite angle_mul_2_pow_div_2_pow.
+    apply IHi.
+...
+    now apply rngl_cos_le_cos_div_2.
 ...
     rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_lt_mono ].
     apply rngl_cos_bound.
