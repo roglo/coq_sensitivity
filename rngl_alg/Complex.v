@@ -7768,6 +7768,8 @@ progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 Theorem glop :
   ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
 Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin (2 ^ i / n * (θ / ₂^i)))%L as zs2 eqn:Hzs2.
@@ -7778,6 +7780,70 @@ destruct zs2. {
   destruct zs; [ | easy ].
   apply rngl_leb_le in Hzs.
   apply rngl_leb_le.
+  destruct i. {
+    cbn.
+    destruct n; [ apply rngl_cos_bound | ].
+    destruct n. {
+      rewrite Nat.div_same; [ | easy ].
+      rewrite (angle_mul_nat_1_l Hon Hos).
+      apply (rngl_le_refl Hor).
+    }
+    rewrite Nat.div_small; [ | now apply -> Nat.succ_lt_mono ].
+    rewrite angle_mul_0_l.
+    apply rngl_cos_bound.
+  }
+Search (rngl_cos (_ * _)).
+(* faire un Fixpoint, comme pour rngl_cos_div_pow_2 *)
+...
+Search rngl_cos_div_pow_2.
+rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ / ₂^S n) = rngl_cos_div_pow_2 (θ / ₂) n
+...
+Search (_ * _)%A.
+rewrite rngl
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Check angle_add_overflow_le_lemma_111.
+remember ((2 ^ i / n * (θ / ₂^i)))%A as θ' eqn:Hθ'.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hsc| Hsc].
+specialize (angle_add_overflow_le_lemma_111 θ' (θ - θ')) as H1.
+Search (_ + (_ - _))%A.
+Search (_ - _ + _)%A.
+rewrite (angle_add_comm Hic) in H1.
+rewrite angle_sub_add in H1.
+apply H1; try easy; [ now right; right; left | ].
+(* θ' ≤ θ ? *)
+...
+Search (0 ≤ rngl_sin (_ - _))%L.
+apply rngl_sin_sub_nonneg; try easy.
+...
+rewrite angle
+rewrite angle_add_0_r in H1.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
+...
+  apply rngl_cos_decr.
+  split. {
+progress unfold angle_leb.
+apply rngl_leb_le in Hzs2, Hzs.
+rewrite Hzs2, Hzs.
+    destruct i. {
+      cbn.
+      rewrite <- (angle_mul_nat_1_l Hon Hos θ) at 2.
+      apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
+      destruct n; [ easy | ].
+      apply Nat.div_le_upper_bound; [ easy | ].
+      cbn.
+      now apply -> Nat.succ_le_mono.
+    }
+    cbn.
+    rewrite Nat.add_0_r.
+    destruct i. {
+      cbn.
+Search (_ * (_ / ₂))%A.
+rewrite angle_mul_nat_div_2.
+...
+  destruct i. {
+    destruct n; [ apply rngl_cos_bound | ].
+    remember (S n) as sn; cbn; subst sn.
 ...
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
