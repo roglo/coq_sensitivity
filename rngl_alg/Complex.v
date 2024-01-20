@@ -7824,7 +7824,8 @@ clear Hzs2.
     apply (rngl_le_refl Hor).
   }
   apply (angle_eqb_neq Hed) in Htz.
-  destruct i. {
+(**)
+  induction i. {
     cbn.
     destruct n; [ apply rngl_cos_bound | ].
     destruct n. {
@@ -7836,6 +7837,30 @@ clear Hzs2.
     rewrite angle_mul_0_l.
     apply rngl_cos_bound.
   }
+(**)
+  eapply (rngl_le_trans Hor); [ apply IHi | ].
+(*
+  rewrite Nat.add_0_r.
+*)
+  destruct n; [ apply rngl_cos_bound | ].
+  destruct n. {
+    do 2 rewrite Nat.div_1_r.
+    do 2 rewrite angle_mul_2_pow_div_2_pow.
+    apply (rngl_le_refl Hor).
+  }
+  destruct n. {
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite angle_mul_2_pow_div_2_pow.
+    destruct i. {
+      cbn.
+cbn in IHi.
+...
+    rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_lt_mono ].
+    apply rngl_cos_bound.
+...
   destruct i. {
     cbn.
     destruct n; [ apply rngl_cos_bound | ].
