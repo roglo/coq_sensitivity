@@ -7825,7 +7825,7 @@ clear Hzs2.
   }
   apply (angle_eqb_neq Hed) in Htz.
 (**)
-  revert θ Hzs Htz.
+  revert n θ Hzs Htz.
   induction i; intros. {
     cbn.
     destruct n; [ apply rngl_cos_bound | ].
@@ -7865,6 +7865,29 @@ clear Hzs2.
     apply rngl_cos_decr.
     split. {
       apply angle_mul_nat_le_mono_nonneg_r. {
+        rewrite Nat.pow_succ_r'.
+        rewrite Nat.mul_comm.
+        rewrite Nat.div_mul; [ | easy ].
+        rewrite angle_div_2_pow_nat_succ_r_2.
+        apply angle_mul_nat_overflow_pow_div.
+      }
+      apply Nat.div_le_compat_l.
+      split; [ easy | ].
+      now do 2 apply -> Nat.succ_le_mono.
+    }
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite angle_mul_2_pow_div_2_pow.
+    apply angle_div_2_le_straight.
+  }
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  eapply (rngl_le_trans Hor). {
+    now apply rngl_cos_le_cos_div_2.
+  }
+...
+  apply IHi.
 ...
         progress unfold angle_leb.
 apply rngl_leb_le in Hzs2, Hzs.
