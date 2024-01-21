@@ -7816,8 +7816,45 @@ clear Hzs2.
 (**)
   apply rngl_leb_le.
 (*
-  revert i.
+  revert i θ Hzs.
   induction n; intros; [ apply rngl_cos_bound | ].
+  destruct i. {
+    cbn - [ "/" ].
+    destruct n. {
+      rewrite Nat.div_1_r.
+      rewrite (angle_mul_1_l Hon Hos).
+      apply (rngl_le_refl Hor).
+    }
+    rewrite Nat.div_small; [ | now apply -> Nat.succ_lt_mono ].
+    rewrite angle_mul_0_l.
+    apply rngl_cos_bound.
+  }
+  apply (rngl_le_trans Hor _ (rngl_cos (2 ^ i / 2 * (θ / ₂^i)))). {
+  }
+  apply rngl_cos_decr.
+  split. {
+    destruct n. {
+      rewrite Nat.div_1_r.
+      apply angle_mul_nat_le_mono_nonneg_r. {
+        destruct i; [ easy | ].
+        rewrite Nat.pow_succ_r'.
+        rewrite Nat.mul_comm.
+        rewrite Nat.div_mul; [ | easy ].
+        rewrite angle_div_2_pow_nat_succ_r_2.
+        apply angle_mul_nat_overflow_pow_div.
+      }
+...
+      apply Nat.div_le_compat_l.
+    split; [ easy | ].
+    apply -> Nat.succ_le_mono.
+    }
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite angle_div_2_pow_nat_succ_r_2.
+    rewrite angle_mul_2_pow_div_2_pow.
+    apply angle_div_2_le_straight.
+...
   destruct i. {
     cbn - [ "/" ].
     destruct n. {
@@ -7853,8 +7890,8 @@ clear Hzs2.
   ============================
   (rngl_cos θ ≤ rngl_cos (2 ^ i / n * (θ / ₂^i)))%L
 ...
-*)
 clear Htz.
+*)
 *)
   destruct i. {
     cbn.
@@ -7896,7 +7933,8 @@ clear Htz.
   (rngl_cos θ ≤ rngl_cos (2 ^ S i / S (S (S n)) * (θ / ₂^S i)))%L
 ...
 *)
-  destruct n. {
+  revert i θ Hzs.
+  induction n; intros. {
     apply (rngl_le_trans Hor _ (rngl_cos (2 ^ S i / 2 * (θ / ₂^S i)))). {
       rewrite Nat.pow_succ_r'.
       rewrite Nat.mul_comm.
