@@ -7813,7 +7813,23 @@ clear Hzs2.
 *)
   destruct zs; [ | easy ].
   apply rngl_leb_le in Hzs.
+(**)
   apply rngl_leb_le.
+(*
+  revert i.
+  induction n; intros; [ apply rngl_cos_bound | ].
+  destruct i. {
+    cbn - [ "/" ].
+    destruct n. {
+      rewrite Nat.div_1_r.
+      rewrite (angle_mul_1_l Hon Hos).
+      apply (rngl_le_refl Hor).
+    }
+    rewrite Nat.div_small; [ | now apply -> Nat.succ_lt_mono ].
+    rewrite angle_mul_0_l.
+    apply rngl_cos_bound.
+  }
+...
   remember (θ =? 0)%A as tz eqn:Htz.
   symmetry in Htz.
   destruct tz. {
@@ -7825,8 +7841,22 @@ clear Hzs2.
   }
   apply (angle_eqb_neq Hed) in Htz.
 (**)
-  revert n θ Hzs Htz.
-  induction i; intros. {
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  ============================
+  (rngl_cos θ ≤ rngl_cos (2 ^ S i / S (S (S (S n))) * (θ / ₂^S i)))%L
+...
+(*
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  Htz : θ ≠ 0%A
+  ============================
+  (rngl_cos θ ≤ rngl_cos (2 ^ i / n * (θ / ₂^i)))%L
+...
+*)
+clear Htz.
+*)
+  destruct i. {
     cbn.
     destruct n; [ apply rngl_cos_bound | ].
     destruct n. {
@@ -7838,11 +7868,17 @@ clear Hzs2.
     rewrite angle_mul_0_l.
     apply rngl_cos_bound.
   }
+(*
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  ============================
+  (rngl_cos θ ≤ rngl_cos (2 ^ S i / n * (θ / ₂^S i)))%L
+...
+*)
   destruct n; [ apply rngl_cos_bound | ].
   destruct n. {
-    eapply (rngl_le_trans Hor); [ now apply IHi | ].
-    do 2 rewrite Nat.div_1_r.
-    do 2 rewrite angle_mul_2_pow_div_2_pow.
+    rewrite Nat.div_1_r.
+    rewrite angle_mul_2_pow_div_2_pow.
     apply (rngl_le_refl Hor).
   }
   destruct n. {
@@ -7853,6 +7889,13 @@ clear Hzs2.
     rewrite angle_mul_2_pow_div_2_pow.
     now apply rngl_cos_le_cos_div_2.
   }
+(*
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  ============================
+  (rngl_cos θ ≤ rngl_cos (2 ^ S i / S (S (S n)) * (θ / ₂^S i)))%L
+...
+*)
   destruct n. {
     apply (rngl_le_trans Hor _ (rngl_cos (2 ^ S i / 2 * (θ / ₂^S i)))). {
       rewrite Nat.pow_succ_r'.
@@ -7882,10 +7925,19 @@ clear Hzs2.
     rewrite angle_mul_2_pow_div_2_pow.
     apply angle_div_2_le_straight.
   }
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  ============================
+  (rngl_cos θ ≤ rngl_cos (2 ^ S i / S (S (S (S n))) * (θ / ₂^S i)))%L
+...
   rewrite angle_div_2_pow_nat_succ_r_2.
   eapply (rngl_le_trans Hor). {
     now apply rngl_cos_le_cos_div_2.
   }
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  ============================
+  (rngl_cos (θ / ₂) ≤ rngl_cos (2 ^ S i / S (S (S (S n))) * ((θ / ₂) / ₂^i)))%L
 ...
   apply IHi.
 ...
