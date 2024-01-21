@@ -7889,6 +7889,20 @@ destruct zs. {
     apply (IHi n (θ / ₂)%A).
     apply rngl_sin_div_2_nonneg.
   }
+(*
+destruct n; [ apply (rngl_le_refl Hor) | ].
+destruct n. {
+  do 2 rewrite Nat.div_1_r.
+  rewrite <- angle_div_2_pow_nat_succ_r_2.
+  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite -> angle_div_2_pow_nat_succ_r_2.
+  rewrite angle_mul_2_pow_div_2_pow.
+}
+*)
+  remember (0 ≤? angle_right)%A as tr eqn:Htr.
+  symmetry in Htr.
+  destruct tr. {
+... à voir
   apply rngl_sin_incr.
   split. {
     apply angle_mul_nat_le_mono_nonneg_r. {
@@ -7909,6 +7923,12 @@ destruct zs. {
     apply Nat.le_succ_diag_r.
   }
   destruct n; [ apply angle_right_nonneg | ].
+destruct n. {
+  rewrite Nat.div_1_r.
+  rewrite <- angle_div_2_pow_nat_succ_r_2.
+  rewrite angle_mul_2_pow_div_2_pow.
+(* ah bin non *)
+...
 (*
   rewrite <- (angle_mul_1_l Hon Hos angle_right).
   rewrite <- angle_straight_div_2.
