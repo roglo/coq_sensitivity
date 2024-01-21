@@ -7797,8 +7797,13 @@ Theorem angle_lim_seq_angle_not_mul_overflow :
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 θ').
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
 intros * Hlim.
-(**)
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
@@ -7825,6 +7830,18 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
+      specialize (Hlim (angle_eucl_dist θ' 0)).
+      assert (H : (0 < angle_eucl_dist θ' 0)%L). {
+        apply (rngl_lt_iff Hor).
+Search angle_eucl_dist.
+Check angle_eucl_dist_separation.
+        progress unfold angle_eucl_dist.
+        cbn.
+...
+      destruct Hlim as (N, HN).
+      specialize (HN N (le_refl _)).
+specialize (angle_eucl_dist_triangular) as H1.
+specialize (H1 θ' (2 ^ N / n * (θ / ₂^N)) θ')%A.
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply angle_add_overflow_le_lemma_4 with (θ2 := (m * θ')%A); try easy.
