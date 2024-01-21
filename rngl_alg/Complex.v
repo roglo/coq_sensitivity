@@ -7800,6 +7800,37 @@ specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hlim.
 (**)
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+apply (angle_all_add_not_overflow n θ').
+intros m Hm.
+progress unfold angle_lim in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+rewrite <- angle_mul_succ_l.
+remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
+symmetry in Hzs, Hzsm.
+destruct zsm. {
+  apply rngl_leb_le in Hzsm.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    apply (rngl_ltb_ge Hor).
+    cbn - [ rngl_cos ].
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+      destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
+        apply angle_add_overflow_le_lemma_111; try easy.
+        now right; right; left.
+      }
+      apply (rngl_nle_gt Hor) in Hzm.
+      cbn - [ rngl_sin ] in Hzsm.
+(* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
+   mais comment ? *)
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_4 with (θ2 := (m * θ')%A); try easy.
+apply quadrant_1_rngl_cos_add_le_cos_l.
+Check seq_angle_converging_to_angle_div_nat_le.
+... ...
 Theorem seq_angle_converging_to_angle_div_nat_le :
   ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
 Proof.
@@ -7899,35 +7930,34 @@ destruct n. {
   rewrite angle_mul_2_pow_div_2_pow.
 }
 *)
-  remember (0 ≤? angle_right)%A as tr eqn:Htr.
+  remember (θ ≤? angle_right)%A as tr eqn:Htr.
   symmetry in Htr.
   destruct tr. {
-... à voir
-  apply rngl_sin_incr.
-  split. {
-    apply angle_mul_nat_le_mono_nonneg_r. {
-      destruct n; [ easy | ].
-      apply angle_mul_nat_not_overflow_le_l with (n := 2 ^ S i). {
-        rewrite <- Nat.div_1_r.
-        apply Nat.div_le_compat_l.
-        split; [ easy | ].
-        now apply -> Nat.succ_le_mono.
+    apply rngl_sin_incr.
+    split. {
+      apply angle_mul_nat_le_mono_nonneg_r. {
+        destruct n; [ easy | ].
+        apply angle_mul_nat_not_overflow_le_l with (n := 2 ^ S i). {
+          rewrite <- Nat.div_1_r.
+          apply Nat.div_le_compat_l.
+          split; [ easy | ].
+          now apply -> Nat.succ_le_mono.
+        }
+        rewrite Nat.pow_succ_r'.
+        apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
+        apply angle_mul_nat_overflow_pow_div.
       }
-      rewrite Nat.pow_succ_r'.
-      apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
-      apply angle_mul_nat_overflow_pow_div.
+      destruct n; [ easy | ].
+      apply Nat.div_le_mono; [ easy | ].
+      apply Nat.pow_le_mono_r; [ easy | ].
+      apply Nat.le_succ_diag_r.
     }
-    destruct n; [ easy | ].
-    apply Nat.div_le_mono; [ easy | ].
-    apply Nat.pow_le_mono_r; [ easy | ].
-    apply Nat.le_succ_diag_r.
-  }
-  destruct n; [ apply angle_right_nonneg | ].
-destruct n. {
-  rewrite Nat.div_1_r.
-  rewrite <- angle_div_2_pow_nat_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
-(* ah bin non *)
+    destruct n; [ apply angle_right_nonneg | ].
+    destruct n. {
+      rewrite Nat.div_1_r.
+      rewrite <- angle_div_2_pow_nat_succ_r_2.
+      now rewrite angle_mul_2_pow_div_2_pow.
+    }
 ...
 (*
   rewrite <- (angle_mul_1_l Hon Hos angle_right).
@@ -8015,32 +8045,6 @@ rewrite angle_mul_nat_div_2.
     destruct n; [ apply rngl_cos_bound | ].
     remember (S n) as sn; cbn; subst sn.
 *)
-... ...
-apply (angle_all_add_not_overflow n θ').
-intros m Hm.
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-rewrite <- angle_mul_succ_l.
-remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
-remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
-symmetry in Hzs, Hzsm.
-destruct zsm. {
-  apply rngl_leb_le in Hzsm.
-  destruct zs. {
-    apply rngl_leb_le in Hzs.
-    apply (rngl_ltb_ge Hor).
-    cbn - [ rngl_cos ].
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
-      destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
-        apply angle_add_overflow_le_lemma_111; try easy.
-        now right; right; left.
-      }
-      apply (rngl_nle_gt Hor) in Hzm.
-      cbn - [ rngl_sin ] in Hzsm.
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-Check seq_angle_converging_to_angle_div_nat_le.
 ...
 Theorem glop :
   ∀ θ1 θ2,
