@@ -7831,17 +7831,26 @@ destruct zsm. {
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
       specialize (Hlim (angle_eucl_dist θ' 0)).
-      assert (H : (0 < angle_eucl_dist θ' 0)%L). {
+      assert (Htz : (0 < angle_eucl_dist θ' 0)%L). {
         apply (rngl_lt_iff Hor).
-Search angle_eucl_dist.
-Check angle_eucl_dist_separation.
-        progress unfold angle_eucl_dist.
-        cbn.
-...
+        split; [ apply angle_eucl_dist_nonneg | ].
+        intros H; symmetry in H.
+        apply angle_eucl_dist_separation in H.
+        subst θ'.
+        rewrite (angle_mul_0_r Hon Hos) in Hzm.
+        now apply (rngl_lt_irrefl Hor) in Hzm.
+      }
+      specialize (Hlim Htz).
       destruct Hlim as (N, HN).
       specialize (HN N (le_refl _)).
 specialize (angle_eucl_dist_triangular) as H1.
-specialize (H1 θ' (2 ^ N / n * (θ / ₂^N)) θ')%A.
+specialize (H1 θ' (2 ^ N / n * (θ / ₂^N)) 0)%A.
+exfalso.
+apply (rngl_nlt_ge Hor) in H1.
+apply H1; clear H1.
+rewrite (angle_eucl_dist_symmetry Hic Hop).
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+(* ah bin non *)
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply angle_add_overflow_le_lemma_4 with (θ2 := (m * θ')%A); try easy.
