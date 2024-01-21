@@ -7752,6 +7752,16 @@ rewrite (rngl_mul_1_l Hon).
 now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
 Qed.
 
+Theorem angle_right_nonneg : (0 ≤ angle_right)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+now destruct (0 ≤? 1)%L.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -7861,10 +7871,74 @@ destruct zs. {
   exfalso.
   apply (rngl_leb_gt Hor) in Hzs2.
   apply rngl_leb_le in Hzs.
-Admitted.
+  apply (rngl_nle_gt Hor) in Hzs2.
+  apply Hzs2; clear Hzs2.
+  revert n θ Hzs.
+  induction i; intros. {
+    cbn.
+    destruct n; [ apply (rngl_le_refl Hor) | ].
+    destruct n. {
+      rewrite Nat.div_1_r.
+      now rewrite (angle_mul_1_l Hon Hos).
+    }
+    rewrite Nat.div_small; [ | now do 2 apply -> Nat.succ_le_mono ].
+    apply (rngl_le_refl Hor).
+  }
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  eapply (rngl_le_trans Hor). {
+    apply (IHi n (θ / ₂)%A).
+    apply rngl_sin_div_2_nonneg.
+  }
+  apply rngl_sin_incr.
+  split. {
+    apply angle_mul_nat_le_mono_nonneg_r. {
+      destruct n; [ easy | ].
+      apply angle_mul_nat_not_overflow_le_l with (n := 2 ^ S i). {
+        rewrite <- Nat.div_1_r.
+        apply Nat.div_le_compat_l.
+        split; [ easy | ].
+        now apply -> Nat.succ_le_mono.
+      }
+      rewrite Nat.pow_succ_r'.
+      apply angle_mul_nat_overflow_angle_div_2_mul_2_div_2.
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    destruct n; [ easy | ].
+    apply Nat.div_le_mono; [ easy | ].
+    apply Nat.pow_le_mono_r; [ easy | ].
+    apply Nat.le_succ_diag_r.
+  }
+  destruct n; [ apply angle_right_nonneg | ].
+(*
+  rewrite <- (angle_mul_1_l Hon Hos angle_right).
+  rewrite <- angle_straight_div_2.
+*)
+  rewrite <- angle_div_2_pow_nat_succ_r_2.
+(*
+  rewrite angle_div_2_pow_nat_succ_r_1.
+*)
+  apply angle_le_trans with (θ2 := (2 ^ S i * (θ / ₂^S i))%A). {
+(*
+    rewrite <- (angle_mul_1_l Hon Hos (2 ^ S i * _)).
+*)
+    apply angle_mul_nat_le_mono_nonneg_r. {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    rewrite <- (Nat.div_1_r (2 ^ S i)) at 2.
+    apply Nat.div_le_compat_l.
+    split; [ easy | ].
+    now apply -> Nat.succ_le_mono.
+  }
+  rewrite angle_mul_2_pow_div_2_pow.
+(* rahhhh... fait chier *)
+...
+  apply angle_le_trans with (θ2 := 0%A).
+Search (_ * _ ≤ _ * _)%A.
+...
 Show.
 Check seq_angle_converging_to_angle_div_nat_le.
 Search (_ → angle_mul_nat_overflow _ _ = false).
+...
 (*
 ...
 Search (_ * (_ / ₂^_))%A.
