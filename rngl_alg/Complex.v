@@ -7833,6 +7833,38 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
+Theorem angle_lim_le :
+  ∀ f g θ θ',
+  (∀ i, (f i ≤ g i)%A)
+  → angle_lim f θ
+  → angle_lim g θ'
+  → (θ ≤ θ')%A.
+Proof.
+intros * Hfg Hf Hg.
+Search angle_lim.
+progress unfold angle_lim in Hf.
+progress unfold angle_lim in Hg.
+progress unfold is_limit_when_tending_to_inf in Hf.
+progress unfold is_limit_when_tending_to_inf in Hg.
+Check angle_eucl_dist_separation.
+Check angle_eucl_dist_symmetry.
+... ...
+specialize (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
+specialize (H1 θ' θ)%A.
+assert (Htt : (θ' ≤ θ)%A). {
+  apply H1; [ | easy | ]. 2: {
+    intros ε Hε.
+    exists 0.
+    intros p _.
+    now rewrite angle_eucl_dist_diag.
+  }
+  intros.
+Theorem seq_angle_converging_to_angle_div_nat_le :
+  ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
+Proof.
+... ...
+  apply seq_angle_converging_to_angle_div_nat_le.
+}
 ...
       specialize (Hlim (angle_eucl_dist θ' 0)).
       assert (Htz : (0 < angle_eucl_dist θ' 0)%L). {
