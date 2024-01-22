@@ -503,6 +503,34 @@ apply (rngl_ltb_ge Hor).
 now apply rngl_leb_le.
 Qed.
 
+Theorem angle_nle_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A ≠ true ↔ (θ2 < θ1)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+destruct (0 ≤? rngl_sin θ1)%L. {
+  destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
+  split; intros H. {
+    apply Bool.not_true_iff_false in H.
+    apply (rngl_leb_gt Hor) in H.
+    now apply rngl_ltb_lt.
+  }
+  apply Bool.not_true_iff_false.
+  apply (rngl_leb_gt Hor).
+  now apply rngl_ltb_lt.
+}
+destruct (0 ≤? rngl_sin θ2)%L; [ easy | ].
+split; intros H. {
+  apply Bool.not_true_iff_false in H.
+  apply (rngl_leb_gt Hor) in H.
+  now apply rngl_ltb_lt.
+}
+apply Bool.not_true_iff_false.
+apply (rngl_leb_gt Hor).
+now apply rngl_ltb_lt.
+Qed.
+
 Theorem rngl_cos_add :
   ∀ θ1 θ2,
   rngl_cos (θ1 + θ2) =
