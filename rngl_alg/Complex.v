@@ -7886,8 +7886,10 @@ destruct Hg as (N2, Hg).
 set (N := max N1 N2) in Hf, Hg.
 specialize (Hf N (Nat.le_max_l _ _)).
 specialize (Hg N (Nat.le_max_r _ _)).
-specialize (angle_eucl_dist_triangular (f N) θ θ') as H1.
-fold ε in H1.
+apply (rngl_nle_gt Hor) in Hg.
+apply Hg; clear Hg.
+specialize (angle_eucl_dist_triangular θ (f N) θ') as H1.
+progress fold ε in H1.
 ...
 progress unfold angle_ltb in Htt.
 ...
