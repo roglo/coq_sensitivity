@@ -7878,6 +7878,15 @@ assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
   subst θ'.
   now apply angle_lt_irrefl in Htt.
 }
+About angle_nlt_ge.
+...
+angle_nlt_ge is not universe polymorphic
+Arguments angle_nlt_ge {T}%type_scope {ro rp ac} (θ1 θ2)%angle_scope
+angle_nlt_ge is opaque
+Expands to: Constant RnglAlg.TrigoWithoutPi.angle_nlt_ge
+
+Check angle_nle_gt.
+...
 set (ε := angle_eucl_dist θ θ') in Hd.
 specialize (Hf _ Hd).
 specialize (Hg _ Hd).
@@ -7886,10 +7895,13 @@ destruct Hg as (N2, Hg).
 set (N := max N1 N2) in Hf, Hg.
 specialize (Hf N (Nat.le_max_l _ _)).
 specialize (Hg N (Nat.le_max_r _ _)).
-apply (rngl_nle_gt Hor) in Hg.
-apply Hg; clear Hg.
-specialize (angle_eucl_dist_triangular θ (f N) θ') as H1.
+rewrite angle_eucl_dist_move_0_r in Hf, Hg.
+...
+specialize (angle_eucl_dist_triangular θ' (f N) θ) as H1.
+rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
 progress fold ε in H1.
+specialize (angle_eucl_dist_triangular θ (g N) θ') as H2.
+progress fold ε in H2.
 ...
 progress unfold angle_ltb in Htt.
 ...

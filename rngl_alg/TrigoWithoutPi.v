@@ -475,9 +475,7 @@ split; intros H12. {
 }
 Qed.
 
-Theorem angle_nlt_ge :
-  ∀ θ1 θ2,
-  ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
+Theorem angle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
 Proof.
 destruct_ac.
 intros.
