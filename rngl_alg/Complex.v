@@ -7807,8 +7807,10 @@ intros * Hlim.
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
+(*
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
+*)
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 progress unfold angle_leb.
