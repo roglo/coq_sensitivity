@@ -7762,6 +7762,27 @@ rewrite (rngl_leb_refl Hor).
 now destruct (0 ≤? 1)%L.
 Qed.
 
+Theorem angle_lt_eq_cases :
+  ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (θ1 < θ2)%A ∨ θ1 = θ2.
+Proof.
+destruct_ac.
+intros.
+split; intros H12. {
+  remember (θ1 =? θ2)%A as e12 eqn:He12.
+  symmetry in He12.
+  destruct e12. {
+    apply (angle_eqb_eq Hed) in He12.
+    now right.
+  }
+  left.
+  apply (angle_eqb_neq Hed) in He12.
+  now apply angle_lt_iff.
+}
+destruct H12 as [H12| H12]; [ now apply angle_lt_le_incl | ].
+subst θ2.
+apply angle_le_refl.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -7840,12 +7861,47 @@ Theorem angle_lim_le :
   → angle_lim g θ'
   → (θ ≤ θ')%A.
 Proof.
+destruct_ac.
 intros * Hfg Hf Hg.
-Search angle_lim.
 progress unfold angle_lim in Hf.
 progress unfold angle_lim in Hg.
 progress unfold is_limit_when_tending_to_inf in Hf.
 progress unfold is_limit_when_tending_to_inf in Hg.
+(**)
+apply angle_nlt_ge.
+intros Htt.
+assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ'.
+  now apply angle_lt_irrefl in Htt.
+}
+set (ε := angle_eucl_dist θ θ') in Hd.
+specialize (Hf _ Hd).
+specialize (Hg _ Hd).
+destruct Hf as (N1, Hf).
+destruct Hg as (N2, Hg).
+set (N := max N1 N2) in Hf, Hg.
+specialize (Hf N (Nat.le_max_l _ _)).
+specialize (Hg N (Nat.le_max_r _ _)).
+specialize (angle_eucl_dist_triangular (f N) θ θ') as H1.
+fold ε in H1.
+...
+progress unfold angle_ltb in Htt.
+...
+apply angle_lt_eq_cases.
+remember (θ =? θ')%A as ett eqn:Hett.
+symmetry in Hett.
+destruct ett. {
+  apply (angle_eqb_eq Hed) in Hett.
+  now right.
+}
+apply (angle_eqb_neq Hed) in Hett.
+left.
+
+...
 Check angle_eucl_dist_separation.
 Check angle_eucl_dist_symmetry.
 ... ...
