@@ -7810,7 +7810,8 @@ intros m Hm.
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 progress unfold angle_add_overflow.
-progress unfold angle_ltb.
+apply angle_ltb_ge.
+progress unfold angle_leb.
 rewrite <- angle_mul_succ_l.
 remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
 remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
@@ -7819,7 +7820,7 @@ destruct zsm. {
   apply rngl_leb_le in Hzsm.
   destruct zs. {
     apply rngl_leb_le in Hzs.
-    apply (rngl_ltb_ge Hor).
+    apply rngl_leb_le.
     cbn - [ rngl_cos ].
     destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
       destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
@@ -7830,6 +7831,7 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
+...
       specialize (Hlim (angle_eucl_dist θ' 0)).
       assert (Htz : (0 < angle_eucl_dist θ' 0)%L). {
         apply (rngl_lt_iff Hor).
@@ -7843,6 +7845,7 @@ destruct zsm. {
       specialize (Hlim Htz).
       destruct Hlim as (N, HN).
       specialize (HN N (le_refl _)).
+...
 specialize (angle_eucl_dist_triangular) as H1.
 specialize (H1 θ' (2 ^ N / n * (θ / ₂^N)) 0)%A.
 exfalso.
