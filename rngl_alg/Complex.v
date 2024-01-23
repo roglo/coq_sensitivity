@@ -7855,18 +7855,18 @@ destruct zsm. {
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
 Theorem angle_lim_le :
-  ∀ f g θ θ',
-  (∀ i, (f i ≤ g i)%A)
-  → angle_lim f θ
-  → angle_lim g θ'
+  ∀ u v θ θ',
+  (∀ i, (u i ≤ v i)%A)
+  → angle_lim u θ
+  → angle_lim v θ'
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
-intros * Hfg Hf Hg.
-progress unfold angle_lim in Hf.
-progress unfold angle_lim in Hg.
-progress unfold is_limit_when_tending_to_inf in Hf.
-progress unfold is_limit_when_tending_to_inf in Hg.
+intros * Hfg Hu Hv.
+progress unfold angle_lim in Hu.
+progress unfold angle_lim in Hv.
+progress unfold is_limit_when_tending_to_inf in Hu.
+progress unfold is_limit_when_tending_to_inf in Hv.
 (**)
 apply angle_nlt_ge.
 intros Htt.
@@ -7880,16 +7880,20 @@ assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
 }
 apply angle_nle_gt in Htt.
 apply Htt; clear Htt.
-...
 set (ε := angle_eucl_dist θ θ') in Hd.
-specialize (Hf _ Hd).
-specialize (Hg _ Hd).
-destruct Hf as (N1, Hf).
-destruct Hg as (N2, Hg).
-set (N := max N1 N2) in Hf, Hg.
-specialize (Hf N (Nat.le_max_l _ _)).
-specialize (Hg N (Nat.le_max_r _ _)).
-rewrite angle_eucl_dist_move_0_r in Hf, Hg.
+specialize (Hu _ Hd).
+specialize (Hv _ Hd).
+destruct Hu as (N1, Hu).
+destruct Hv as (N2, Hv).
+set (N := max N1 N2) in Hu, Hv.
+specialize (Hu N (Nat.le_max_l _ _)).
+specialize (Hv N (Nat.le_max_r _ _)).
+progress unfold angle_eucl_dist in Hu.
+progress unfold angle_eucl_dist in Hv.
+progress unfold angle_leb.
+(* ouais, chais pas *)
+...
+rewrite angle_eucl_dist_move_0_r in Hu, Hv.
 ...
 specialize (angle_eucl_dist_triangular θ' (f N) θ) as H1.
 rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
