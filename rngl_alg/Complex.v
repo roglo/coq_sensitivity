@@ -7907,13 +7907,42 @@ assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
   subst θ'.
   now apply angle_lt_irrefl in Htt.
 }
+(*
 apply angle_nle_gt in Htt.
 apply Htt; clear Htt.
+*)
 set (ε := angle_eucl_dist θ θ') in Hd.
 specialize (Hu _ Hd) as H1.
 destruct H1 as (N, H1).
 specialize (H1 N (Nat.le_refl _)).
+specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
+rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
+specialize (Hut N) as H3.
 progress unfold ε in H1.
+...
+apply angle_nlt_ge in H3.
+apply H3; clear H3.
+eapply angle_lt_le_trans; [ apply Htt | ].
+...
+progress unfold ε in H1.
+(*
+specialize (angle_eucl_dist_triangular θ' (u N) θ) as H2.
+*)
+(*
+apply (rngl_nle_gt Hor) in H1.
+apply H1; clear H1.
+*)
+specialize (Hu (angle_eucl_dist (u N) θ)) as H2.
+destruct (rngl_lt_dec Hor 0 (angle_eucl_dist (u N) θ)) as [Hzut| Hzut]. {
+  specialize (H2 Hzut).
+  destruct H2 as (M, HM).
+...
+specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
+rewrite (angle_eucl_dist_symmetry Hic Hop) in H2.
+...
+eapply (rngl_le_trans Hor).
+apply H2.
+...
 apply angle_nlt_ge.
 intros Htt.
 apply (rngl_nle_gt Hor) in H1.
