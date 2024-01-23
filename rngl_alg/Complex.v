@@ -7854,7 +7854,7 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
-Theorem angle_lim_le :
+Theorem angles_lim_le :
   ∀ u v θ θ',
   (∀ i, (u i ≤ v i)%A)
   → angle_lim u θ
@@ -7862,12 +7862,11 @@ Theorem angle_lim_le :
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
-intros * Hfg Hu Hv.
+intros * Huv Hu Hv.
 progress unfold angle_lim in Hu.
 progress unfold angle_lim in Hv.
 progress unfold is_limit_when_tending_to_inf in Hu.
 progress unfold is_limit_when_tending_to_inf in Hv.
-(**)
 apply angle_nlt_ge.
 intros Htt.
 assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
@@ -7888,6 +7887,40 @@ destruct Hv as (N2, Hv).
 set (N := max N1 N2) in Hu, Hv.
 specialize (Hu N (Nat.le_max_l _ _)).
 specialize (Hv N (Nat.le_max_r _ _)).
+Theorem angle_lim_le :
+  ∀ u θ θ',
+  (∀ i, (u i ≤ θ')%A)
+  → angle_lim u θ
+  → (θ ≤ θ')%A.
+Proof.
+destruct_ac.
+intros * Hut Hu.
+progress unfold angle_lim in Hu.
+progress unfold is_limit_when_tending_to_inf in Hu.
+apply angle_nlt_ge.
+intros Htt.
+assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ'.
+  now apply angle_lt_irrefl in Htt.
+}
+apply angle_nle_gt in Htt.
+apply Htt; clear Htt.
+set (ε := angle_eucl_dist θ θ') in Hd.
+specialize (Hu _ Hd) as H1.
+destruct H1 as (N, H1).
+specialize (H1 N (Nat.le_refl _)).
+progress unfold ε in H1.
+apply angle_nlt_ge.
+intros Htt.
+apply (rngl_nle_gt Hor) in H1.
+apply H1; clear H1.
+specialize (angle_eucl_dist_triangular θ' (u N) θ) as H1.
+rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
+...
 progress unfold angle_eucl_dist in Hu.
 progress unfold angle_eucl_dist in Hv.
 progress unfold angle_leb.
@@ -7917,7 +7950,7 @@ left.
 Check angle_eucl_dist_separation.
 Check angle_eucl_dist_symmetry.
 ... ...
-specialize (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
+specialize (angles_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
 specialize (H1 θ' θ)%A.
 assert (Htt : (θ' ≤ θ)%A). {
   apply H1; [ | easy | ]. 2: {
