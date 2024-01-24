@@ -7783,6 +7783,38 @@ subst θ2.
 apply angle_le_refl.
 Qed.
 
+(* very interesting (and surprising) property;
+   perhaps "angle_eucl_dist" could be defined with that,
+   or, even, defined without this square root *)
+Theorem angle_eucl_dist_is_sqrt :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √ (2 * (1 - rngl_cos (θ2 - θ1)))%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+progress unfold angle_eucl_dist.
+f_equal.
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_add_add_swap).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite cos2_sin2_1.
+rewrite rngl_add_comm.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_assoc.
+rewrite <- rngl_add_add_swap.
+rewrite cos2_sin2_1.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_cos_sub Hop).
+easy.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -7926,15 +7958,27 @@ Theorem angle_dist_le :
   → (angle_eucl_dist θ2 θ3 ≤ angle_eucl_dist θ1 θ3)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * (H12, H23).
+do 2 rewrite angle_eucl_dist_is_sqrt.
 apply (rl_sqrt_le_rl_sqrt Hop Hor Hii). {
-  apply (rngl_add_squ_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
 }
-... ...
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_0_le_2 Hon Hop Hor).
+}
+apply (rngl_sub_le_mono_l Hop Hor).
+...
 progress unfold angle_leb in H12.
 progress unfold angle_leb in H23.
-progress unfold angle_eucl_dist.
+(*
+do 2 rewrite (rngl_cos_sub Hop).
+*)
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
@@ -7944,6 +7988,7 @@ destruct zs1. {
   destruct zs3. {
     apply rngl_leb_le in Hzs3.
     destruct zs2; [ | easy ].
+    apply rngl_leb_le in Hzs2.
     apply rngl_leb_le in H12.
     apply rngl_leb_le in H23.
 ... ...
