@@ -7915,6 +7915,22 @@ set (ε := angle_eucl_dist θ θ') in Hd.
 specialize (Hu _ Hd) as H1.
 destruct H1 as (N, H1).
 specialize (H1 N (Nat.le_refl _)).
+progress unfold ε in H1.
+specialize (Hut N) as H2.
+apply angle_nlt_ge in H2.
+apply H2; clear H2.
+move Htt before H1.
+Theorem angle_dist_lt :
+  ∀ θ1 θ2 θ3,
+  (θ1 < θ3)%A
+  → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
+  → (θ1 < θ2)%A.
+Proof.
+intros * H13 H23.
+... ...
+apply (angle_dist_lt _ _ θ); [ easy | ].
+now rewrite (angle_eucl_dist_symmetry Hic Hop θ').
+...
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
 rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
 specialize (Hut N) as H3.
