@@ -3406,20 +3406,43 @@ Definition angle_eucl_dist θ1 θ2 :=
     ((rngl_cos θ2 - rngl_cos θ1)² +
      (rngl_sin θ2 - rngl_sin θ1)²)%L.
 
+Theorem angle_eucl_dist_is_sqrt :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cos (θ2 - θ1)))%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+progress unfold angle_eucl_dist.
+f_equal.
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_add_add_swap).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite cos2_sin2_1.
+rewrite rngl_add_comm.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_assoc.
+rewrite <- rngl_add_add_swap.
+rewrite cos2_sin2_1.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+do 2 rewrite <- rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_cos_sub Hop).
+easy.
+Qed.
+
 Theorem angle_eucl_dist_symmetry :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist θ2 θ1.
 Proof.
 intros Hic Hop *.
-progress unfold angle_eucl_dist.
-f_equal.
-rewrite <- (rngl_squ_opp Hop).
-rewrite (rngl_opp_sub_distr Hop).
-f_equal.
-rewrite <- (rngl_squ_opp Hop).
-rewrite (rngl_opp_sub_distr Hop).
-easy.
+do 2 rewrite angle_eucl_dist_is_sqrt.
+now rewrite (rngl_cos_sub_comm Hic Hop).
 Qed.
 
 Theorem angle_eucl_dist_separation :

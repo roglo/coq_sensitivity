@@ -7783,38 +7783,6 @@ subst θ2.
 apply angle_le_refl.
 Qed.
 
-(* very interesting (and surprising) property;
-   perhaps "angle_eucl_dist" could be defined with that,
-   or, even, defined without this square root *)
-Theorem angle_eucl_dist_is_sqrt :
-  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √ (2 * (1 - rngl_cos (θ2 - θ1)))%L.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-progress unfold angle_eucl_dist.
-f_equal.
-do 2 rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite (rngl_add_add_swap).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite rngl_add_assoc.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite cos2_sin2_1.
-rewrite rngl_add_comm.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite rngl_add_assoc.
-rewrite <- rngl_add_add_swap.
-rewrite cos2_sin2_1.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite (rngl_sub_sub_swap Hop).
-rewrite <- (rngl_sub_add_distr Hos).
-do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-rewrite <- (rngl_cos_sub Hop).
-easy.
-Qed.
-
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
