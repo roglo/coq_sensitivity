@@ -7929,18 +7929,8 @@ destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * (H12, H23).
-do 2 rewrite angle_eucl_dist_is_sqrt.
-apply (rl_sqrt_le_rl_sqrt Hop Hor Hii). {
-  apply (rngl_mul_nonneg_nonneg Hop Hor). {
-    apply (rngl_0_le_2 Hon Hop Hor).
-  }
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-  apply (rngl_0_le_2 Hon Hop Hor).
-}
-apply (rngl_sub_le_mono_l Hop Hor).
+do 2 rewrite (angle_eucl_dist_move_0_l _ θ3).
+apply rngl_cos_le_iff_angle_eucl_le.
 ...
 progress unfold angle_leb in H12.
 progress unfold angle_leb in H23.
