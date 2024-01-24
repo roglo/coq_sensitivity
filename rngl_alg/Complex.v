@@ -7920,17 +7920,43 @@ specialize (Hut N) as H2.
 apply angle_nlt_ge in H2.
 apply H2; clear H2.
 move Htt before H1.
-Theorem angle_dist_lt :
+Theorem angle_dist_le :
   ∀ θ1 θ2 θ3,
-  (θ1 < θ3)%A
-  → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
-  → (θ1 < θ2)%A.
+  (θ1 ≤ θ2 ≤ θ3)%A
+  → (angle_eucl_dist θ2 θ3 ≤ angle_eucl_dist θ1 θ3)%L.
 Proof.
-intros * H13 H23.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * (H12, H23).
+apply (rl_sqrt_le_rl_sqrt Hop Hor Hii). {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
 ... ...
-apply (angle_dist_lt _ _ θ); [ easy | ].
-now rewrite (angle_eucl_dist_symmetry Hic Hop θ').
+progress unfold angle_leb in H12.
+progress unfold angle_leb in H23.
+progress unfold angle_eucl_dist.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+symmetry in Hzs1, Hzs2, Hzs3.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs3. {
+    apply rngl_leb_le in Hzs3.
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in H12.
+    apply rngl_leb_le in H23.
+... ...
+apply angle_nle_gt.
+intros Hnt.
+apply (rngl_nle_gt Hor) in H1.
+apply H1; clear H1.
+rewrite (angle_eucl_dist_symmetry Hic Hop θ).
+apply angle_dist_le.
+split; [ easy | ].
+now apply angle_lt_le_incl.
 ...
+(* poub *)
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
 rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
 specialize (Hut N) as H3.
