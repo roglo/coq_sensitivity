@@ -7889,12 +7889,13 @@ specialize (Hu N (Nat.le_max_l _ _)).
 specialize (Hv N (Nat.le_max_r _ _)).
 Theorem angle_lim_le :
   ∀ u θ θ',
-  (∀ i, (u i ≤ θ')%A)
+  (θ ≤ angle_straight)%A
+  → (∀ i, (u i ≤ θ')%A)
   → angle_lim u θ
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
-intros * Hut Hu.
+intros * Hts Hut Hu.
 progress unfold angle_lim in Hu.
 progress unfold is_limit_when_tending_to_inf in Hu.
 apply angle_nlt_ge.
@@ -7922,13 +7923,14 @@ apply H2; clear H2.
 move Htt before H1.
 Theorem angle_dist_le :
   ∀ θ1 θ2 θ3,
-  (θ1 ≤ θ2 ≤ θ3)%A
+  (θ3 ≤ angle_straight)%A
+  → (θ1 ≤ θ2 ≤ θ3)%A
   → (angle_eucl_dist θ2 θ3 ≤ angle_eucl_dist θ1 θ3)%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * (H12, H23).
+intros * Hts (H12, H23).
 do 2 rewrite (angle_eucl_dist_move_0_l _ θ3).
 apply rngl_cos_le_iff_angle_eucl_le.
 ...
@@ -7955,7 +7957,7 @@ intros Hnt.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
 rewrite (angle_eucl_dist_symmetry Hic Hop θ).
-apply angle_dist_le.
+apply angle_dist_le; [ easy | ].
 split; [ easy | ].
 now apply angle_lt_le_incl.
 ...
