@@ -7946,29 +7946,69 @@ assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
 assert (Hzs3 : (0 ≤ rngl_sin θ3)%L). {
   now apply rngl_sin_nonneg_angle_le_straight.
 }
-(**)
+assert (Hzc32 : (rngl_cos θ3 ≤ rngl_cos θ2)%L) by now apply rngl_cos_decr.
+assert (Hzc21 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
+  apply rngl_cos_decr.
+  split; [ easy | ].
+  now apply (angle_le_trans _ θ3).
+}
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
-  destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hzc32| Hc32z]. {
+  destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hz32| H32z]. {
     apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
       apply rngl_sin_sub_nonneg; [ easy | easy | ].
       apply rngl_cos_decr.
       split; [ | easy ].
       now apply (angle_le_trans _ θ2).
     } {
-      apply rngl_sin_sub_nonneg; [ easy | easy | ].
-      now apply rngl_cos_decr.
+      now apply rngl_sin_sub_nonneg.
     }
     rewrite (angle_sub_sub_distr Hic Hop).
     rewrite (angle_sub_sub_swap Hic Hop).
     rewrite angle_sub_diag.
     rewrite (angle_sub_0_l Hon Hos).
     rewrite (angle_add_opp_l Hic).
-    apply rngl_sin_sub_nonneg; [ easy | easy | ].
-    apply rngl_cos_decr.
-    split; [ easy | ].
-    now apply (angle_le_trans _ θ3).
+    now apply rngl_sin_sub_nonneg.
   }
-  apply (rngl_nle_gt Hor) in Hc32z.
+  apply (rngl_nle_gt Hor) in H32z.
+  exfalso.
+  apply (rngl_nle_gt Hor) in H32z.
+  apply H32z; clear H32z.
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+     destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+       apply (rngl_add_nonneg_nonneg Hor).
+       now apply (rngl_mul_nonneg_nonneg Hop Hor).
+       now apply (rngl_mul_nonneg_nonneg Hop Hor).
+     }
+     apply (rngl_nle_gt Hor) in Hc3z.
+     rewrite <- (rngl_cos_sub Hop).
+     change_angle_sub_r θ3 angle_right.
+     progress sin_cos_add_sub_right_hyp T Hzc32.
+     progress sin_cos_add_sub_right_hyp T Hzs3.
+     progress sin_cos_add_sub_right_hyp T Hzc31.
+     progress sin_cos_add_sub_right_hyp T Hc3z.
+     progress sin_cos_add_sub_right_goal T.
+(* ouais bin chais pas *)
+...
+Search (0 ≤ rngl_cos (_ + _))%L.
+apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := (- θ1)%A); cbn; try easy.
+...
+rewrite (rngl_cos_sub_comm Hic Hop).
+apply rngl_cos_add_nonneg; [ | | | ].
+2: cbn.
+...
+...
+apply rngl_cos_add_nonneg; [ | | | ].
+Search (0 ≤ rngl_cos (_ - _))%L.
+...
+     apply (rngl_add_nonneg_nonneg Hor).
+       now apply (rngl_mul_nonneg_nonneg Hop Hor).
+       now apply (rngl_mul_nonneg_nonneg Hop Hor).
+
+Search (0 ≤ rngl_cos (_ - _))%L.
+About rngl_cos_sub_nonneg.
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
