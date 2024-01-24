@@ -7943,11 +7943,34 @@ assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
   apply rngl_sin_nonneg_angle_le_straight.
   now apply (angle_le_trans _ θ3).
 }
+assert (Hzs3 : (0 ≤ rngl_sin θ3)%L). {
+  now apply rngl_sin_nonneg_angle_le_straight.
+}
 (**)
-cbn.
+destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
+  destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hzc32| Hc32z]. {
+    apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
+      apply rngl_sin_sub_nonneg; [ easy | easy | ].
+      apply rngl_cos_decr.
+      split; [ | easy ].
+      now apply (angle_le_trans _ θ2).
+    } {
+      apply rngl_sin_sub_nonneg; [ easy | easy | ].
+      now apply rngl_cos_decr.
+    }
+    rewrite (angle_sub_sub_distr Hic Hop).
+    rewrite (angle_sub_sub_swap Hic Hop).
+    rewrite angle_sub_diag.
+    rewrite (angle_sub_0_l Hon Hos).
+    rewrite (angle_add_opp_l Hic).
+    apply rngl_sin_sub_nonneg; [ easy | easy | ].
+    apply rngl_cos_decr.
+    split; [ easy | ].
+    now apply (angle_le_trans _ θ3).
+  }
+  apply (rngl_nle_gt Hor) in Hc32z.
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
-apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le.
 apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 ...
