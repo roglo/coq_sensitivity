@@ -7857,12 +7857,13 @@ destruct zsm. {
 Theorem angles_lim_le :
   ∀ u v θ θ',
   (∀ i, (u i ≤ v i)%A)
+  → (θ ≤ angle_straight)%A
   → angle_lim u θ
   → angle_lim v θ'
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
-intros * Huv Hu Hv.
+intros * Huv Hts Hu Hv.
 progress unfold angle_lim in Hu.
 progress unfold angle_lim in Hv.
 progress unfold is_limit_when_tending_to_inf in Hu.
@@ -7944,6 +7945,11 @@ assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
 }
 (**)
 cbn.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le.
+apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 ...
 apply rngl_cos_le_anticompat_when_sin_nonneg. {
   apply rngl_sin_sub_nonneg; [ | easy | ].
