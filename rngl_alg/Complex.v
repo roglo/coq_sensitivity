@@ -7933,6 +7933,46 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hts (H12, H23).
 do 2 rewrite (angle_eucl_dist_move_0_l _ θ3).
 apply rngl_cos_le_iff_angle_eucl_le.
+assert (Hzs1 : (0 ≤ rngl_sin θ1)%L). {
+  apply rngl_sin_nonneg_angle_le_straight.
+  apply (angle_le_trans _ θ2); [ easy | ].
+  now apply (angle_le_trans _ θ3).
+}
+assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
+  apply rngl_sin_nonneg_angle_le_straight.
+  now apply (angle_le_trans _ θ3).
+}
+(**)
+cbn.
+...
+apply rngl_cos_le_anticompat_when_sin_nonneg. {
+  apply rngl_sin_sub_nonneg; [ | easy | ].
+  now apply rngl_sin_nonneg_angle_le_straight.
+  apply rngl_cos_decr.
+  split; [ | easy ].
+  now apply (angle_le_trans _ θ2).
+} {
+  apply rngl_sin_sub_nonneg; [ | easy | ].
+  now apply rngl_sin_nonneg_angle_le_straight.
+  now apply rngl_cos_decr.
+}
+apply angle_add_le_mono_l. {
+...
+  apply angle_add_overflow_le with (θ2 := θ2). {
+    progress unfold angle_leb.
+    cbn.
+    rewrite rngl_leb_opp_r.
+    rewrite (rngl_opp_0 Hop).
+    apply rngl_leb_le in Hzs2.
+    rewrite Hzs2.
+...
+Search (_ - _ ≤ _)%A.
+Search (_ → angle_add_overflow _ _ = false).
+...
+  apply angle_add_overflow_le_straight_lt_straight.
+...
+...
+Search (0 ≤ rngl_sin (_ - _))%L.
 ...
 progress unfold angle_leb in H12.
 progress unfold angle_leb in H23.
