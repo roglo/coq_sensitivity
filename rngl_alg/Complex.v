@@ -8109,6 +8109,7 @@ Theorem angles_lim_le :
 Proof.
 destruct_ac.
 intros * Huv Hts Hu Hv.
+generalize Hu; intros Hu_v.
 progress unfold angle_lim in Hu.
 progress unfold angle_lim in Hv.
 progress unfold is_limit_when_tending_to_inf in Hu.
@@ -8137,8 +8138,15 @@ Check angle_lim_le.
 (* ouais, bon, pour prouver le truc, j'ai pensé qu'en essayant de prouver
    un truc similaire mais avec une seule suite, ça pourrait aider... mais
    chais pas, faut voir *)
-...
-apply angle_lim_le with (u := u); [ easy | | ].
+apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
+  apply (angle_lim_eq_compat N 0 u); [ | easy ].
+  intros i.
+  f_equal.
+  rewrite Nat.add_0_r.
+  apply Nat.add_comm.
+}
+intros i.
+(* truc genre *)
 ...
 (* poub *)
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
