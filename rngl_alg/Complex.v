@@ -7984,6 +7984,32 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
      }
      apply (rngl_nle_gt Hor) in Hc3z.
      rewrite <- (rngl_cos_sub Hop).
+eapply (rngl_le_trans Hor).
+apply Hzc31.
+...
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+cbn in Hzc31.
+rewrite (rngl_mul_opp_r Hop) in Hzc31.
+rewrite (rngl_sub_opp_r Hop) in Hzc31.
+...
+apply (rngl_add_nonneg_nonneg Hor). {
+  apply (rngl_le_trans Hor) with (b := (rngl_cos θ2 * rngl_cos θ2)%L). {
+    rewrite fold_rngl_squ.
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+Search
+...
+     change_angle_sub_l θ3 angle_straight.
+     progress sin_cos_add_sub_straight_hyp T Hzc32.
+     progress sin_cos_add_sub_straight_hyp T Hzs3.
+     rewrite <- (angle_sub_add_distr Hic Hop) in Hzc31 |-*.
+     progress sin_cos_add_sub_straight_hyp T Hzc31.
+     progress sin_cos_add_sub_straight_hyp T Hc3z.
+     progress sin_cos_add_sub_straight_goal T.
+cbn.
+...
      change_angle_sub_r θ3 angle_right.
      progress sin_cos_add_sub_right_hyp T Hzc32.
      progress sin_cos_add_sub_right_hyp T Hzs3.
