@@ -8065,9 +8065,45 @@ apply (rngl_nle_gt Hor) in Hc31z.
 apply (rngl_le_trans Hor _ 0). {
   now apply (rngl_lt_le_incl Hor).
 }
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
+destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
+apply (rngl_nle_gt Hor) in Hc3z.
+change_angle_sub_r θ3 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzc32.
+progress sin_cos_add_sub_right_hyp T Hzs3.
+progress sin_cos_add_sub_right_hyp T Hc3z.
+progress sin_cos_add_sub_right_hyp T Hc31z.
+progress sin_cos_add_sub_right_goal T.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  apply (rngl_opp_nonpos_nonneg Hop Hor).
+  cbn.
+  cbn in Hc31z.
+  rewrite (rngl_mul_opp_r Hop) in Hc31z |-*.
+  rewrite (rngl_add_opp_l Hop) in Hc31z |-*.
+  apply -> (rngl_lt_0_sub Hop Hor) in Hc31z.
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_trans Hor) with (b := (rngl_cos θ1 * rngl_sin θ3)%L). {
+    apply (rngl_lt_le_incl Hor) in Hc3z.
+    now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
+  }
+(* ouais chais pas *)
+...
+  apply (rngl_le_trans Hor) with (b := (rngl_sin θ1 * rngl_cos θ3)%L). {
+    apply Hc31z.
+     }
+     apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
+     apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+     now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+...
+  cbn in Hc31z.
 ...
      rewrite <- (rngl_cos_sub Hop).
 (*
