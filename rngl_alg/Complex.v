@@ -7783,145 +7783,6 @@ subst θ2.
 apply angle_le_refl.
 Qed.
 
-(* to be completed *)
-Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
-  rngl_is_archimedean T = true →
-  rngl_characteristic T = 0 →
-  ∀ n θ θ',
-  n ≠ 0
-  → angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
-  → θ = (n * θ')%A.
-Proof.
-destruct_ac.
-intros Har Hch.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  now rewrite Hc1 in Hch.
-}
-intros * Hiz Hlim.
-specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
-(* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
-Search (_ * (_ / ₂^_))%A.
-specialize (Hlim' Har Hch n θ' Hiz).
-remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
-symmetry in Hao.
-(**)
-destruct ao. {
-  clear Hlim'.
-  apply Bool.not_false_iff_true in Hao.
-  exfalso; apply Hao; clear Hao.
-Theorem angle_lim_seq_angle_not_mul_overflow :
-  ∀ n θ θ',
-  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
-  → angle_mul_nat_overflow n θ' = false.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 θ').
-  apply (angle_mul_nat_overflow_0_r Hon Hos).
-}
-intros * Hlim.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-apply (angle_all_add_not_overflow n θ').
-intros m Hm.
-(*
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
-*)
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-progress unfold angle_leb.
-rewrite <- angle_mul_succ_l.
-remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
-remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
-symmetry in Hzs, Hzsm.
-destruct zsm. {
-  apply rngl_leb_le in Hzsm.
-  destruct zs. {
-    apply rngl_leb_le in Hzs.
-    apply rngl_leb_le.
-    cbn - [ rngl_cos ].
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
-      destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
-        apply angle_add_overflow_le_lemma_111; try easy.
-        now right; right; left.
-      }
-      apply (rngl_nle_gt Hor) in Hzm.
-      cbn - [ rngl_sin ] in Hzsm.
-(* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
-   mais comment ? *)
-Theorem angles_lim_le :
-  ∀ u v θ θ',
-  (∀ i, (u i ≤ v i)%A)
-  → (θ ≤ angle_straight)%A
-  → angle_lim u θ
-  → angle_lim v θ'
-  → (θ ≤ θ')%A.
-Proof.
-destruct_ac.
-intros * Huv Hts Hu Hv.
-progress unfold angle_lim in Hu.
-progress unfold angle_lim in Hv.
-progress unfold is_limit_when_tending_to_inf in Hu.
-progress unfold is_limit_when_tending_to_inf in Hv.
-apply angle_nlt_ge.
-intros Htt.
-assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
-  apply (rngl_lt_iff Hor).
-  split; [ apply angle_eucl_dist_nonneg | ].
-  intros H; symmetry in H.
-  apply angle_eucl_dist_separation in H.
-  subst θ'.
-  now apply angle_lt_irrefl in Htt.
-}
-apply angle_nle_gt in Htt.
-apply Htt; clear Htt.
-set (ε := angle_eucl_dist θ θ') in Hd.
-specialize (Hu _ Hd).
-specialize (Hv _ Hd).
-destruct Hu as (N1, Hu).
-destruct Hv as (N2, Hv).
-set (N := max N1 N2) in Hu, Hv.
-specialize (Hu N (Nat.le_max_l _ _)).
-specialize (Hv N (Nat.le_max_r _ _)).
-Theorem angle_lim_le :
-  ∀ u θ θ',
-  (θ ≤ angle_straight)%A
-  → (∀ i, (u i ≤ θ')%A)
-  → angle_lim u θ
-  → (θ ≤ θ')%A.
-Proof.
-destruct_ac.
-intros * Hts Hut Hu.
-progress unfold angle_lim in Hu.
-progress unfold is_limit_when_tending_to_inf in Hu.
-apply angle_nlt_ge.
-intros Htt.
-assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
-  apply (rngl_lt_iff Hor).
-  split; [ apply angle_eucl_dist_nonneg | ].
-  intros H; symmetry in H.
-  apply angle_eucl_dist_separation in H.
-  subst θ'.
-  now apply angle_lt_irrefl in Htt.
-}
-(*
-apply angle_nle_gt in Htt.
-apply Htt; clear Htt.
-*)
-set (ε := angle_eucl_dist θ θ') in Hd.
-specialize (Hu _ Hd) as H1.
-destruct H1 as (N, H1).
-specialize (H1 N (Nat.le_refl _)).
-progress unfold ε in H1.
-specialize (Hut N) as H2.
-apply angle_nlt_ge in H2.
-apply H2; clear H2.
-move Htt before H1.
 Theorem angle_dist_le :
   ∀ θ1 θ2 θ3,
   (θ3 ≤ angle_straight)%A
@@ -7952,29 +7813,6 @@ assert (Hzc21 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
   split; [ easy | ].
   now apply (angle_le_trans _ θ3).
 }
-(*
-...
-apply rngl_cos_decr.
-split. {
-Search (_ ≤ _ + _ ↔ _ - _ ≤ _)%L.
-Search (_ - _ ≤ _ ↔ _)%L.
-Theorem angle_le_add_r_le_sub_l :
-  ∀ θ1 θ2 θ3, (θ1 ≤ θ2 + θ3 → θ1 - θ2 ≤ θ3)%A.
-Proof.
-intros * H123.
-... ...
-Theorem angle_le_add_l_le_sub_r :
-  ∀ θ1 θ2 θ3, (θ1 + θ2 ≤ θ3 → θ1 ≤ θ3 - θ2)%A.
-... ...
-apply angle_le_add_r_le_sub_l.
-rewrite (angle_add_sub_assoc Hop).
-apply angle_le_add_l_le_sub_r.
-rewrite (angle_add_comm Hic θ2).
-apply angle_add_le_mono_l.
-...
-Search (_ - _ ≤ _ - _)%A.
-...
-*)
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hz32| H32z]. {
     apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
@@ -8104,43 +7942,12 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   }
 }
 apply (rngl_nle_gt Hor) in Hc2z.
-(*
-change_angle_sub_l θ2 angle_straight.
-progress sin_cos_add_sub_straight_hyp T Hzc32.
-progress sin_cos_add_sub_straight_hyp T Hzs2.
-progress sin_cos_add_sub_straight_hyp T Hzc21.
-progress sin_cos_add_sub_straight_hyp T Hc2z.
-rewrite (angle_sub_sub_distr Hic Hop).
-progress sin_cos_add_sub_straight_goal T.
-rewrite (rngl_add_opp_r Hop) in Hzc32.
-cbn.
-cbn in Hc31z.
-...
-*)
 change_angle_sub_r θ2 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzc32.
 progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_hyp T Hzc21.
 progress sin_cos_add_sub_right_hyp T Hc2z.
 progress sin_cos_add_sub_right_goal T.
-(*
-change_angle_sub_l θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs1.
-progress sin_cos_add_sub_right_hyp T Hzc21.
-progress sin_cos_add_sub_right_hyp T Hc31z.
-rewrite (angle_sub_sub_distr Hic Hop).
-progress sin_cos_add_sub_right_goal T.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-rewrite rngl_add_assoc.
-rewrite (rngl_add_opp_r Hop).
-rewrite (rngl_add_sub_swap Hop).
-rewrite <- (rngl_mul_sub_distr_l Hop).
-rewrite <- rngl_add_assoc.
-rewrite <- rngl_mul_add_distr_l.
-...
-*)
 destruct (rngl_le_dec Hor (rngl_sin θ1) (rngl_cos θ2)) as [Hs1c2| Hc2s1]. {
   cbn.
   do 2 rewrite (rngl_mul_opp_r Hop).
@@ -8160,169 +7967,57 @@ destruct (rngl_le_dec Hor (rngl_sin θ1) (rngl_cos θ2)) as [Hs1c2| Hc2s1]. {
   }
 }
 apply (rngl_nle_gt Hor) in Hc2s1.
-...
-change_angle_sub_l θ1 angle_right.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  clear Hzc21.
+  apply (rngl_lt_le_incl Hor) in Hc31z, Hc2z, Hc3z.
+  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+  now apply rngl_cos_sub_nonneg.
+}
+apply (rngl_nle_gt Hor) in Hc1z.
+change_angle_sub_r θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
 progress sin_cos_add_sub_right_hyp T Hzc21.
 progress sin_cos_add_sub_right_hyp T Hc31z.
 progress sin_cos_add_sub_right_hyp T Hc2s1.
-rewrite (angle_sub_sub_distr Hic Hop).
+progress sin_cos_add_sub_right_hyp T Hc1z.
 progress sin_cos_add_sub_right_goal T.
-...
-Search (rngl_sin _ ≤ rngl_sin _)%L.
-...
-apply (rngl_lt_le_incl Hor) in Hc31z.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. (* chais pas *)
-apply angle_add_le_mono_l_lemma_25; try easy. (* non *)
-...
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
-  apply (rngl_opp_nonpos_nonneg Hop Hor).
-...
-  cbn.
-  cbn in Hc31z.
-  rewrite (rngl_mul_opp_r Hop) in Hc31z |-*.
-  rewrite (rngl_add_opp_l Hop) in Hc31z |-*.
-  apply -> (rngl_lt_0_sub Hop Hor) in Hc31z.
-  apply (rngl_le_0_sub Hop Hor).
-...
-  apply (rngl_le_trans Hor) with (b := (rngl_cos θ1 * rngl_sin θ3)%L). {
-    apply (rngl_lt_le_incl Hor) in Hc3z.
-    now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
-  }
-(* ouais chais pas *)
-...
-  apply (rngl_le_trans Hor) with (b := (rngl_sin θ1 * rngl_cos θ3)%L). {
-    apply Hc31z.
-     }
-     apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
-     apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-     now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-...
-  cbn in Hc31z.
-...
-     rewrite <- (rngl_cos_sub Hop).
-(*
-...
-     remember (θ3 - θ2)%A as θ eqn:Hθ.
-     apply angle_sub_move_r in Hθ.
-     rewrite (angle_sub_opp_r Hop) in Hθ.
-     subst θ3.
-     rename θ into θ3.
-     rewrite <- (angle_add_sub_assoc Hop) in Hzc31.
-     remember (θ2 - θ1)%A as θ eqn:Hθ.
-     apply angle_sub_move_r in Hθ.
-     rewrite (angle_sub_opp_r Hop) in Hθ.
-     subst θ2.
-     rename θ into θ2.
-...
-*)
-Search (_ → 0 ≤ rngl_cos _)%L.
-apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := θ1); try easy. (* non *)
-apply angle_add_le_mono_l_lemma_34 with (θ3 := (- θ3)%A); try easy. (* non *)
-apply angle_add_le_mono_l_lemma_38 with (θ3 := (- θ3)%A); try easy. (* non *)
-apply rngl_cos_add_nonneg; try easy. (* non *)
-apply rngl_cos_sub_nonneg; try easy. (* non *)
-...
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-cbn in Hzc31.
-rewrite (rngl_mul_opp_r Hop) in Hzc31.
-rewrite (rngl_sub_opp_r Hop) in Hzc31.
-...
-apply (rngl_add_nonneg_nonneg Hor). {
-  apply (rngl_le_trans Hor) with (b := (rngl_cos θ2 * rngl_cos θ2)%L). {
-    rewrite fold_rngl_squ.
-    apply (rngl_squ_nonneg Hop Hor).
-  }
-Search
-...
-     change_angle_sub_l θ3 angle_straight.
-     progress sin_cos_add_sub_straight_hyp T Hzc32.
-     progress sin_cos_add_sub_straight_hyp T Hzs3.
-     rewrite <- (angle_sub_add_distr Hic Hop) in Hzc31 |-*.
-     progress sin_cos_add_sub_straight_hyp T Hzc31.
-     progress sin_cos_add_sub_straight_hyp T Hc3z.
-     progress sin_cos_add_sub_straight_goal T.
-cbn.
-...
-     change_angle_sub_r θ3 angle_right.
-     progress sin_cos_add_sub_right_hyp T Hzc32.
-     progress sin_cos_add_sub_right_hyp T Hzs3.
-     progress sin_cos_add_sub_right_hyp T Hzc31.
-     progress sin_cos_add_sub_right_hyp T Hc3z.
-     progress sin_cos_add_sub_right_goal T.
-(* ouais bin chais pas *)
-...
-Search (0 ≤ rngl_cos (_ + _))%L.
-apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := (- θ1)%A); cbn; try easy.
-...
-rewrite (rngl_cos_sub_comm Hic Hop).
-apply rngl_cos_add_nonneg; [ | | | ].
-2: cbn.
-...
-...
-apply rngl_cos_add_nonneg; [ | | | ].
-Search (0 ≤ rngl_cos (_ - _))%L.
-...
-     apply (rngl_add_nonneg_nonneg Hor).
-       now apply (rngl_mul_nonneg_nonneg Hop Hor).
-       now apply (rngl_mul_nonneg_nonneg Hop Hor).
+exfalso.
+apply (rngl_nle_gt Hor) in Hc31z.
+apply Hc31z; clear Hc31z.
+apply (rngl_lt_le_incl Hor) in Hc1z, Hc3z.
+now apply rngl_cos_sub_nonneg.
+Qed.
 
-Search (0 ≤ rngl_cos (_ - _))%L.
-About rngl_cos_sub_nonneg.
-...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
-...
-apply rngl_cos_le_anticompat_when_sin_nonneg. {
-  apply rngl_sin_sub_nonneg; [ | easy | ].
-  now apply rngl_sin_nonneg_angle_le_straight.
-  apply rngl_cos_decr.
-  split; [ | easy ].
-  now apply (angle_le_trans _ θ2).
-} {
-  apply rngl_sin_sub_nonneg; [ | easy | ].
-  now apply rngl_sin_nonneg_angle_le_straight.
-  now apply rngl_cos_decr.
+Theorem angle_lim_le :
+  ∀ u θ θ',
+  (θ ≤ angle_straight)%A
+  → (∀ i, (u i ≤ θ')%A)
+  → angle_lim u θ
+  → (θ ≤ θ')%A.
+Proof.
+destruct_ac.
+intros * Hts Hut Hu.
+progress unfold angle_lim in Hu.
+progress unfold is_limit_when_tending_to_inf in Hu.
+apply angle_nlt_ge.
+intros Htt.
+assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ'.
+  now apply angle_lt_irrefl in Htt.
 }
-apply angle_add_le_mono_l. {
-...
-  apply angle_add_overflow_le with (θ2 := θ2). {
-    progress unfold angle_leb.
-    cbn.
-    rewrite rngl_leb_opp_r.
-    rewrite (rngl_opp_0 Hop).
-    apply rngl_leb_le in Hzs2.
-    rewrite Hzs2.
-...
-Search (_ - _ ≤ _)%A.
-Search (_ → angle_add_overflow _ _ = false).
-...
-  apply angle_add_overflow_le_straight_lt_straight.
-...
-...
-Search (0 ≤ rngl_sin (_ - _))%L.
-...
-progress unfold angle_leb in H12.
-progress unfold angle_leb in H23.
-(*
-do 2 rewrite (rngl_cos_sub Hop).
-*)
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
-symmetry in Hzs1, Hzs2, Hzs3.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  destruct zs3. {
-    apply rngl_leb_le in Hzs3.
-    destruct zs2; [ | easy ].
-    apply rngl_leb_le in Hzs2.
-    apply rngl_leb_le in H12.
-    apply rngl_leb_le in H23.
-... ...
+set (ε := angle_eucl_dist θ θ') in Hd.
+specialize (Hu _ Hd) as H1.
+destruct H1 as (N, H1).
+specialize (H1 N (Nat.le_refl _)).
+progress unfold ε in H1.
+specialize (Hut N) as H2.
+apply angle_nlt_ge in H2.
+apply H2; clear H2.
+move Htt before H1.
 apply angle_nle_gt.
 intros Hnt.
 apply (rngl_nle_gt Hor) in H1.
@@ -8331,6 +8026,119 @@ rewrite (angle_eucl_dist_symmetry Hic Hop θ).
 apply angle_dist_le; [ easy | ].
 split; [ easy | ].
 now apply angle_lt_le_incl.
+Qed.
+
+(* to be completed
+Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
+  rngl_is_archimedean T = true →
+  rngl_characteristic T = 0 →
+  ∀ n θ θ',
+  n ≠ 0
+  → angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → θ = (n * θ')%A.
+Proof.
+destruct_ac.
+intros Har Hch.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
+intros * Hiz Hlim.
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
+(* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
+Search (_ * (_ / ₂^_))%A.
+specialize (Hlim' Har Hch n θ' Hiz).
+remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
+symmetry in Hao.
+(**)
+destruct ao. {
+  clear Hlim'.
+  apply Bool.not_false_iff_true in Hao.
+  exfalso; apply Hao; clear Hao.
+Theorem angle_lim_seq_angle_not_mul_overflow :
+  ∀ n θ θ',
+  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → angle_mul_nat_overflow n θ' = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 θ').
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
+intros * Hlim.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+apply (angle_all_add_not_overflow n θ').
+intros m Hm.
+(*
+progress unfold angle_lim in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+*)
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+rewrite <- angle_mul_succ_l.
+remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
+symmetry in Hzs, Hzsm.
+destruct zsm. {
+  apply rngl_leb_le in Hzsm.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    apply rngl_leb_le.
+    cbn - [ rngl_cos ].
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
+      destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
+        apply angle_add_overflow_le_lemma_111; try easy.
+        now right; right; left.
+      }
+      apply (rngl_nle_gt Hor) in Hzm.
+      cbn - [ rngl_sin ] in Hzsm.
+(* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
+   mais comment ? *)
+Theorem angles_lim_le :
+  ∀ u v θ θ',
+  (∀ i, (u i ≤ v i)%A)
+  → (θ ≤ angle_straight)%A
+  → angle_lim u θ
+  → angle_lim v θ'
+  → (θ ≤ θ')%A.
+Proof.
+destruct_ac.
+intros * Huv Hts Hu Hv.
+progress unfold angle_lim in Hu.
+progress unfold angle_lim in Hv.
+progress unfold is_limit_when_tending_to_inf in Hu.
+progress unfold is_limit_when_tending_to_inf in Hv.
+apply angle_nlt_ge.
+intros Htt.
+assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ'.
+  now apply angle_lt_irrefl in Htt.
+}
+apply angle_nle_gt in Htt.
+apply Htt; clear Htt.
+set (ε := angle_eucl_dist θ θ') in Hd.
+specialize (Hu _ Hd).
+specialize (Hv _ Hd).
+destruct Hu as (N1, Hu).
+destruct Hv as (N2, Hv).
+set (N := max N1 N2) in Hu, Hv.
+specialize (Hu N (Nat.le_max_l _ _)).
+specialize (Hv N (Nat.le_max_r _ _)).
+Check angle_lim_le.
+(* ouais, bon, pour prouver le truc, j'ai pensé qu'en essayant de prouver
+   un truc similaire mais avec une seule suite, ça pourrait aider... mais
+   chais pas, faut voir *)
+...
+apply angle_lim_le with (u := u); [ easy | | ].
 ...
 (* poub *)
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
