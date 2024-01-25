@@ -7952,6 +7952,27 @@ assert (Hzc21 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
   split; [ easy | ].
   now apply (angle_le_trans _ θ3).
 }
+(**)
+apply rngl_cos_decr.
+split. {
+Search (_ ≤ _ + _ ↔ _ - _ ≤ _)%L.
+Search (_ - _ ≤ _ ↔ _)%L.
+Theorem angle_le_add_r_le_sub_l :
+  ∀ θ1 θ2 θ3, (θ1 ≤ θ2 + θ3 → θ1 - θ2 ≤ θ3)%A.
+Proof.
+intros * H123.
+... ...
+Theorem angle_le_add_l_le_sub_r :
+  ∀ θ1 θ2 θ3, (θ1 + θ2 ≤ θ3 → θ1 ≤ θ3 - θ2)%A.
+... ...
+apply angle_le_add_r_le_sub_l.
+rewrite (angle_add_sub_assoc Hop).
+apply angle_le_add_l_le_sub_r.
+rewrite (angle_add_comm Hic θ2).
+apply angle_add_le_mono_l.
+...
+Search (_ - _ ≤ _ - _)%A.
+...
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hz32| H32z]. {
     apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
@@ -7970,6 +7991,8 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
     now apply rngl_sin_sub_nonneg.
   }
   apply (rngl_nle_gt Hor) in H32z.
+Search (_ → 0 ≤ rngl_cos _)%L.
+...
   exfalso.
   apply (rngl_nle_gt Hor) in H32z.
   apply H32z; clear H32z.
@@ -7984,8 +8007,27 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
      }
      apply (rngl_nle_gt Hor) in Hc3z.
      rewrite <- (rngl_cos_sub Hop).
-eapply (rngl_le_trans Hor).
-apply Hzc31.
+(*
+...
+     remember (θ3 - θ2)%A as θ eqn:Hθ.
+     apply angle_sub_move_r in Hθ.
+     rewrite (angle_sub_opp_r Hop) in Hθ.
+     subst θ3.
+     rename θ into θ3.
+     rewrite <- (angle_add_sub_assoc Hop) in Hzc31.
+     remember (θ2 - θ1)%A as θ eqn:Hθ.
+     apply angle_sub_move_r in Hθ.
+     rewrite (angle_sub_opp_r Hop) in Hθ.
+     subst θ2.
+     rename θ into θ2.
+...
+*)
+Search (_ → 0 ≤ rngl_cos _)%L.
+apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := θ1); try easy. (* non *)
+apply angle_add_le_mono_l_lemma_34 with (θ3 := (- θ3)%A); try easy. (* non *)
+apply angle_add_le_mono_l_lemma_38 with (θ3 := (- θ3)%A); try easy. (* non *)
+apply rngl_cos_add_nonneg; try easy. (* non *)
+apply rngl_cos_sub_nonneg; try easy. (* non *)
 ...
 cbn.
 rewrite (rngl_mul_opp_r Hop).
