@@ -7783,7 +7783,7 @@ subst θ2.
 apply angle_le_refl.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -8104,6 +8104,70 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
   }
 }
 apply (rngl_nle_gt Hor) in Hc2z.
+(*
+change_angle_sub_l θ2 angle_straight.
+progress sin_cos_add_sub_straight_hyp T Hzc32.
+progress sin_cos_add_sub_straight_hyp T Hzs2.
+progress sin_cos_add_sub_straight_hyp T Hzc21.
+progress sin_cos_add_sub_straight_hyp T Hc2z.
+rewrite (angle_sub_sub_distr Hic Hop).
+progress sin_cos_add_sub_straight_goal T.
+rewrite (rngl_add_opp_r Hop) in Hzc32.
+cbn.
+cbn in Hc31z.
+...
+*)
+change_angle_sub_r θ2 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzc32.
+progress sin_cos_add_sub_right_hyp T Hzs2.
+progress sin_cos_add_sub_right_hyp T Hzc21.
+progress sin_cos_add_sub_right_hyp T Hc2z.
+progress sin_cos_add_sub_right_goal T.
+(*
+change_angle_sub_l θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T Hzc21.
+progress sin_cos_add_sub_right_hyp T Hc31z.
+rewrite (angle_sub_sub_distr Hic Hop).
+progress sin_cos_add_sub_right_goal T.
+cbn.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- rngl_add_assoc.
+rewrite <- rngl_mul_add_distr_l.
+...
+*)
+destruct (rngl_le_dec Hor (rngl_sin θ1) (rngl_cos θ2)) as [Hs1c2| Hc2s1]. {
+  cbn.
+  do 2 rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite rngl_add_assoc.
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite <- rngl_add_assoc.
+  rewrite <- rngl_mul_add_distr_l.
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+    now apply (rngl_le_0_sub Hop Hor).
+  } {
+    apply (rngl_lt_le_incl Hor) in Hc3z.
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+}
+apply (rngl_nle_gt Hor) in Hc2s1.
+...
+change_angle_sub_l θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T Hzc21.
+progress sin_cos_add_sub_right_hyp T Hc31z.
+progress sin_cos_add_sub_right_hyp T Hc2s1.
+rewrite (angle_sub_sub_distr Hic Hop).
+progress sin_cos_add_sub_right_goal T.
 ...
 Search (rngl_sin _ ≤ rngl_sin _)%L.
 ...
