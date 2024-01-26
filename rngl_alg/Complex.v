@@ -8108,6 +8108,14 @@ Theorem angles_lim_le :
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 θ), (H1 θ').
+  apply angle_le_refl.
+}
 intros * Huv Hts Hu Hv.
 generalize Hu; intros Hu_v.
 progress unfold angle_lim in Hu.
@@ -8116,17 +8124,29 @@ progress unfold is_limit_when_tending_to_inf in Hu.
 progress unfold is_limit_when_tending_to_inf in Hv.
 apply angle_nlt_ge.
 intros Htt.
-assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+set (ε := (angle_eucl_dist θ θ')%L).
+assert (Hd : (0 < ε / 2)%L). {
+  progress unfold ε.
   apply (rngl_lt_iff Hor).
-  split; [ apply angle_eucl_dist_nonneg | ].
+  split. {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply angle_eucl_dist_nonneg.
+  }
   intros H; symmetry in H.
+  progress unfold rngl_div in H.
+  rewrite Hiv in H.
+  apply (rngl_eq_mul_0_l Hos Hii) in H. 2: {
+    apply (rngl_inv_neq_0 Hon Hos Hiv).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
   apply angle_eucl_dist_separation in H.
   subst θ'.
   now apply angle_lt_irrefl in Htt.
 }
 apply angle_nle_gt in Htt.
 apply Htt; clear Htt.
-set (ε := angle_eucl_dist θ θ') in Hd.
 specialize (Hu _ Hd).
 specialize (Hv _ Hd).
 destruct Hu as (N1, Hu).
@@ -8148,6 +8168,10 @@ assert (H : N2 ≤ N + i) by flia.
 specialize (Hv H); clear H.
 apply angle_nlt_ge.
 intros Htu.
+Search (angle_eucl_dist _ _ < _)%L.
+specialize (angle_eucl_dist_triangular (u (N + i)) θ' θ) as H1.
+...
+Search angle_eucl_dist.
 ...
 (* poub *)
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
