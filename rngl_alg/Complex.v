@@ -8015,11 +8015,6 @@ destruct H1 as (N, H1).
 specialize (H1 N (Nat.le_refl _)).
 progress unfold ε in H1.
 specialize (Hut N) as H2.
-apply angle_nlt_ge in H2.
-apply H2; clear H2.
-move Htt before H1.
-apply angle_nle_gt.
-intros Hnt.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
 rewrite (angle_eucl_dist_symmetry Hic Hop θ).
@@ -8029,6 +8024,50 @@ now apply angle_lt_le_incl.
 Qed.
 
 (* to be completed
+Theorem angles_lim_le :
+  ∀ u v θ θ',
+  (∀ i, (u i ≤ v i)%A)
+  → (θ ≤ angle_straight)%A
+  → angle_lim u θ
+  → angle_lim v θ'
+  → (θ ≤ θ')%A.
+Proof.
+destruct_ac.
+intros * Huv Hts Hu Hv.
+progress unfold angle_lim in Hu.
+progress unfold angle_lim in Hv.
+progress unfold is_limit_when_tending_to_inf in Hu.
+progress unfold is_limit_when_tending_to_inf in Hv.
+apply angle_nlt_ge.
+intros Htt.
+assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst θ'.
+  now apply angle_lt_irrefl in Htt.
+}
+set (ε := angle_eucl_dist θ θ') in Hd.
+specialize (Hu _ Hd) as H1.
+specialize (Hv _ Hd) as H2.
+destruct H1 as (N1, H1).
+destruct H2 as (N2, H2).
+set (N := max N1 N2).
+specialize (H1 N (Nat.le_max_l _ _)).
+specialize (H2 N (Nat.le_max_r _ _)).
+progress unfold ε in H1.
+progress unfold ε in H2.
+specialize (Huv N) as H3.
+apply (rngl_nle_gt Hor) in H1.
+apply H1; clear H1.
+rewrite angle_eucl_dist_symmetry.
+apply angle_dist_le; [ easy | ].
+split; [ | now apply angle_lt_le_incl ].
+apply angle_nlt_ge.
+intros H4.
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -8155,6 +8194,7 @@ set (N := max N1 N2) in Hu, Hv.
 (**)
 specialize (Hu N (Nat.le_max_l _ _)).
 specialize (Hv N (Nat.le_max_r _ _)).
+rewrite angle_eucl_dist_is_sqrt in Hu.
 ...
 apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
   apply (angle_lim_eq_compat N 0 u); [ | easy ].
