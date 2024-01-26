@@ -8132,12 +8132,6 @@ specialize (Hv _ Hd).
 destruct Hu as (N1, Hu).
 destruct Hv as (N2, Hv).
 set (N := max N1 N2) in Hu, Hv.
-specialize (Hu N (Nat.le_max_l _ _)).
-specialize (Hv N (Nat.le_max_r _ _)).
-Check angle_lim_le.
-(* ouais, bon, pour prouver le truc, j'ai pensé qu'en essayant de prouver
-   un truc similaire mais avec une seule suite, ça pourrait aider... mais
-   chais pas, faut voir *)
 apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
   apply (angle_lim_eq_compat N 0 u); [ | easy ].
   intros i.
@@ -8146,7 +8140,14 @@ apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
   apply Nat.add_comm.
 }
 intros i.
-(* truc genre *)
+specialize (Hu (N + i)).
+assert (H : N1 ≤ N + i) by flia.
+specialize (Hu H); clear H.
+specialize (Hv (N + i)).
+assert (H : N2 ≤ N + i) by flia.
+specialize (Hv H); clear H.
+apply angle_nlt_ge.
+intros Htu.
 ...
 (* poub *)
 specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
