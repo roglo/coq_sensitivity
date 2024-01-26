@@ -8152,6 +8152,10 @@ specialize (Hv _ Hd).
 destruct Hu as (N1, Hu).
 destruct Hv as (N2, Hv).
 set (N := max N1 N2) in Hu, Hv.
+(**)
+specialize (Hu N (Nat.le_max_l _ _)).
+specialize (Hv N (Nat.le_max_r _ _)).
+...
 apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
   apply (angle_lim_eq_compat N 0 u); [ | easy ].
   intros i.
