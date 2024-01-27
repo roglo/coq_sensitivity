@@ -8067,7 +8067,16 @@ split; [ | now apply angle_lt_le_incl ].
 apply angle_nlt_ge.
 intros H4.
 ...
+apply (rngl_nle_gt Hor) in H2.
+apply H2; clear H2.
+apply angle_dist_le; [ | ].
+split; [ | now apply angle_lt_le_incl ].
+apply angle_nlt_ge.
+intros H4.
+...
+*)
 
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -8138,152 +8147,10 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
-Theorem angles_lim_le :
-  ∀ u v θ θ',
-  (∀ i, (u i ≤ v i)%A)
-  → (θ ≤ angle_straight)%A
-  → angle_lim u θ
-  → angle_lim v θ'
-  → (θ ≤ θ')%A.
-Proof.
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 θ), (H1 θ').
-  apply angle_le_refl.
-}
-intros * Huv Hts Hu Hv.
-generalize Hu; intros Hu_v.
-progress unfold angle_lim in Hu.
-progress unfold angle_lim in Hv.
-progress unfold is_limit_when_tending_to_inf in Hu.
-progress unfold is_limit_when_tending_to_inf in Hv.
-apply angle_nlt_ge.
-intros Htt.
-set (ε := (angle_eucl_dist θ θ')%L).
-assert (Hd : (0 < ε / 2)%L). {
-  progress unfold ε.
-  apply (rngl_lt_iff Hor).
-  split. {
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply angle_eucl_dist_nonneg.
-  }
-  intros H; symmetry in H.
-  progress unfold rngl_div in H.
-  rewrite Hiv in H.
-  apply (rngl_eq_mul_0_l Hos Hii) in H. 2: {
-    apply (rngl_inv_neq_0 Hon Hos Hiv).
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  }
-  apply angle_eucl_dist_separation in H.
-  subst θ'.
-  now apply angle_lt_irrefl in Htt.
-}
-apply angle_nle_gt in Htt.
-apply Htt; clear Htt.
-specialize (Hu _ Hd).
-specialize (Hv _ Hd).
-destruct Hu as (N1, Hu).
-destruct Hv as (N2, Hv).
-set (N := max N1 N2) in Hu, Hv.
-(**)
-specialize (Hu N (Nat.le_max_l _ _)).
-specialize (Hv N (Nat.le_max_r _ _)).
-rewrite angle_eucl_dist_is_sqrt in Hu.
 ...
-apply (angle_lim_le (λ i, (u (N + i)))); [ easy | | ]. 2: {
-  apply (angle_lim_eq_compat N 0 u); [ | easy ].
-  intros i.
-  f_equal.
-  rewrite Nat.add_0_r.
-  apply Nat.add_comm.
-}
-intros i.
-specialize (Hu (N + i)).
-assert (H : N1 ≤ N + i) by flia.
-specialize (Hu H); clear H.
-specialize (Hv (N + i)).
-assert (H : N2 ≤ N + i) by flia.
-specialize (Hv H); clear H.
-apply angle_nlt_ge.
-intros Htu.
-Search (angle_eucl_dist _ _ < _)%L.
-specialize (angle_eucl_dist_triangular (u (N + i)) θ' θ) as H1.
-...
-Search angle_eucl_dist.
-...
-(* poub *)
-specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
-rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
-specialize (Hut N) as H3.
-progress unfold ε in H1.
-...
-apply angle_nlt_ge in H3.
-apply H3; clear H3.
-eapply angle_lt_le_trans; [ apply Htt | ].
-...
-progress unfold ε in H1.
-(*
-specialize (angle_eucl_dist_triangular θ' (u N) θ) as H2.
-*)
-(*
-apply (rngl_nle_gt Hor) in H1.
-apply H1; clear H1.
-*)
-specialize (Hu (angle_eucl_dist (u N) θ)) as H2.
-destruct (rngl_lt_dec Hor 0 (angle_eucl_dist (u N) θ)) as [Hzut| Hzut]. {
-  specialize (H2 Hzut).
-  destruct H2 as (M, HM).
-...
-specialize (angle_eucl_dist_triangular θ θ' (u N)) as H2.
-rewrite (angle_eucl_dist_symmetry Hic Hop) in H2.
-...
-eapply (rngl_le_trans Hor).
-apply H2.
-...
-apply angle_nlt_ge.
-intros Htt.
-apply (rngl_nle_gt Hor) in H1.
-apply H1; clear H1.
-specialize (angle_eucl_dist_triangular θ' (u N) θ) as H1.
-rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
-...
-progress unfold angle_eucl_dist in Hu.
-progress unfold angle_eucl_dist in Hv.
-progress unfold angle_leb.
-(* ouais, chais pas *)
-...
-rewrite angle_eucl_dist_move_0_r in Hu, Hv.
-...
-specialize (angle_eucl_dist_triangular θ' (f N) θ) as H1.
-rewrite (angle_eucl_dist_symmetry Hic Hop) in H1.
-progress fold ε in H1.
-specialize (angle_eucl_dist_triangular θ (g N) θ') as H2.
-progress fold ε in H2.
-...
-progress unfold angle_ltb in Htt.
-...
-apply angle_lt_eq_cases.
-remember (θ =? θ')%A as ett eqn:Hett.
-symmetry in Hett.
-destruct ett. {
-  apply (angle_eqb_eq Hed) in Hett.
-  now right.
-}
-apply (angle_eqb_neq Hed) in Hett.
-left.
-
-...
-Check angle_eucl_dist_separation.
-Check angle_eucl_dist_symmetry.
-... ...
 specialize (angles_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
 specialize (H1 θ' θ)%A.
+cbn in H1.
 assert (Htt : (θ' ≤ θ)%A). {
   apply H1; [ | easy | ]. 2: {
     intros ε Hε.
