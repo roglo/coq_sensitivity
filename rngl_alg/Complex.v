@@ -8132,6 +8132,69 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   now apply (rngl_nle_gt Hor) in Hc3z.
 }
 apply (rngl_nle_gt Hor) in Hc31z.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+  exfalso.
+  apply (rngl_nle_gt Hor) in Hc31z.
+  apply Hc31z; clear Hc31z.
+  apply rngl_cos_sub_nonneg; [ easy | easy | easy | ].
+  apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ | easy ].
+  now apply (rngl_le_trans Hor _ (rngl_cos θ3)).
+}
+apply (rngl_nle_gt Hor) in Hc3z.
+change_angle_sub_r θ3 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzc32.
+progress sin_cos_add_sub_right_hyp T Hzs3.
+progress sin_cos_add_sub_right_hyp T Hc3z.
+progress sin_cos_add_sub_right_hyp T Hc31z.
+progress sin_cos_add_sub_right_goal T.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+  apply (rngl_add_nonneg_nonneg Hor).
+  now apply (rngl_lt_le_incl Hor).
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
+apply (rngl_nle_gt Hor) in Hc2z.
+change_angle_sub_r θ2 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzc32.
+progress sin_cos_add_sub_right_hyp T Hzs2.
+progress sin_cos_add_sub_right_hyp T Hzc21.
+progress sin_cos_add_sub_right_hyp T Hc2z.
+progress sin_cos_add_sub_right_goal T.
+...
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  cbn.
+  do 2 rewrite (rngl_mul_opp_r Hop).
+  do 2 rewrite (rngl_sub_opp_r Hop).
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+  now apply (rngl_le_0_sub Hop Hor).
+...
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+  apply (rngl_le_0_sub Hop Hor).
+
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+...
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+Search (_ ≤ _ - _)%L.
+Search (_ - _ ≤ _)%L.
+...
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite (rngl_add_sub_swap Hop).
 ...
   rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzc31.
   apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc31.
