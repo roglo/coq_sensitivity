@@ -8087,9 +8087,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   progress sin_cos_add_sub_right_goal T.
   rewrite (rngl_sin_sub_anticomm Hic Hop).
   apply (rngl_opp_nonpos_nonneg Hop Hor).
-...
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-...
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
     exfalso.
     apply (rngl_nlt_ge Hor) in Hzc32.
     apply Hzc32; clear Hzc32.
@@ -8101,7 +8099,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   progress sin_cos_add_sub_right_hyp T Hzc31.
   progress sin_cos_add_sub_right_hyp T Hzc32.
   progress sin_cos_add_sub_right_hyp T Hc3z.
-  progress sin_cos_add_sub_right_goal T.
+  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzc31.
+  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc31.
+...
   cbn.
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_sub_opp_r Hop).
