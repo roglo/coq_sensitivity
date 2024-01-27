@@ -7993,32 +7993,6 @@ Theorem angle_dist_le_l :
   → (θ1 ≤ θ2 ≤ θ3)%A
   → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ1 θ3)%L.
 Proof.
-(*
-destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  do 2 rewrite (H1 (angle_eucl_dist _ _)).
-  apply (rngl_le_refl Hor).
-}
-intros * Hts H123.
-change_angle_sub_l θ1 angle_straight.
-change_angle_sub_l θ3 angle_straight.
-rewrite angle_eucl_dist_move_0_l.
-rewrite (angle_sub_sub_distr Hic Hop).
-rewrite <- (angle_add_sub_swap Hic Hop).
-rewrite (angle_eucl_dist_move_0_l (angle_straight - θ1)).
-rewrite (angle_sub_sub_distr Hic Hop).
-rewrite (angle_sub_sub_swap Hic Hop).
-rewrite angle_sub_diag.
-rewrite (angle_sub_0_l Hon Hos).
-rewrite (angle_add_opp_l Hic).
-apply angle_dist_le.
-apply (angle_straight_nonneg Hc1).
-(* hou la la, c'est la merde *)
-...
-*)
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -8125,8 +8099,47 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   progress sin_cos_add_sub_right_hyp T Hzc31.
   progress sin_cos_add_sub_right_hyp T Hzc32.
   progress sin_cos_add_sub_right_hyp T Hc3z.
+  apply (rngl_lt_le_incl Hor) in Hc2z.
+  destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos θ2)) as [Hc12| Hc21]. {
+    now apply rngl_sin_sub_nonneg.
+  }
+  apply (rngl_nle_gt Hor) in Hc21.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in Hzc31.
+  apply Hzc31; clear Hzc31.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply (rngl_lt_le_incl Hor) in Hc3z.
+    apply (rngl_lt_le_incl Hor) in Hc21.
+    apply rngl_sin_sub_nonneg; [ easy | easy | ].
+    apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ | easy ].
+    apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+  }
+  intros H.
+  symmetry in H.
+  apply eq_rngl_sin_0 in H.
+  destruct H as [H| H]. {
+    apply -> angle_sub_move_0_r in H.
+    subst θ3.
+    apply (rngl_nle_gt Hor) in Hc21.
+    apply Hc21; clear Hc21.
+    apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+  }
+  apply angle_sub_move_r in H.
+  subst θ3.
+  rewrite (rngl_sin_add_straight_l Hon Hop) in Hc3z.
+  apply (rngl_opp_pos_neg Hop Hor) in Hc3z.
+  now apply (rngl_nle_gt Hor) in Hc3z.
+}
+apply (rngl_nle_gt Hor) in Hc31z.
+...
   rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzc31.
   apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc31.
+...
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T
+    → ∀ θ1 θ2 : angle T,
+        (0 ≤ rngl_sin θ1)%L → (0 ≤ rngl_sin θ2)%L → (rngl_cos θ1 ≤ rngl_cos θ2)%L → (0 ≤ rngl_sin (θ1 - θ2))%L
 ...
   cbn.
   rewrite (rngl_mul_opp_r Hop).
