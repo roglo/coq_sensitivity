@@ -7993,6 +7993,32 @@ Theorem angle_dist_le_l :
   → (θ1 ≤ θ2 ≤ θ3)%A
   → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ1 θ3)%L.
 Proof.
+(*
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  do 2 rewrite (H1 (angle_eucl_dist _ _)).
+  apply (rngl_le_refl Hor).
+}
+intros * Hts H123.
+change_angle_sub_l θ1 angle_straight.
+change_angle_sub_l θ3 angle_straight.
+rewrite angle_eucl_dist_move_0_l.
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite <- (angle_add_sub_swap Hic Hop).
+rewrite (angle_eucl_dist_move_0_l (angle_straight - θ1)).
+rewrite (angle_sub_sub_distr Hic Hop).
+rewrite (angle_sub_sub_swap Hic Hop).
+rewrite angle_sub_diag.
+rewrite (angle_sub_0_l Hon Hos).
+rewrite (angle_add_opp_l Hic).
+apply angle_dist_le.
+apply (angle_straight_nonneg Hc1).
+(* hou la la, c'est la merde *)
+...
+*)
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.

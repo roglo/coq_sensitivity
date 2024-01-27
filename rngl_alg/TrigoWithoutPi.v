@@ -1712,12 +1712,25 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_l.
 Qed.
 
+Theorem angle_straight_nonneg :
+  rngl_characteristic T ≠ 1 →
+  (0 ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+intros Hc1.
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+apply rngl_leb_le.
+apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
+Qed.
+
 Theorem angle_straight_pos :
   rngl_characteristic T ≠ 1 →
   (0 < angle_straight)%A.
 Proof.
-intros Hc1.
 destruct_ac.
+intros Hc1.
 progress unfold angle_ltb.
 cbn.
 rewrite (rngl_leb_refl Hor).
