@@ -28,7 +28,7 @@ Definition cos2_sin2_prop x y :=
       rngl_has_eq_dec T) ||
    (x² + y² =? 1)%L)%bool = true.
 
-Record angle := mk_ang
+Record angle := mk_angle
   { rngl_cos : T;
     rngl_sin : T;
     rngl_cos2_sin2 : cos2_sin2_prop rngl_cos rngl_sin }.
@@ -45,6 +45,7 @@ Class angle_ctx :=
 End a.
 
 Arguments angle T {ro rp}.
+Arguments mk_angle {T ro rp} (rngl_cos rngl_sin)%L.
 Arguments angle_ctx T {ro rp}.
 
 Ltac destruct_ac :=

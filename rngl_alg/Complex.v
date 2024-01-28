@@ -166,7 +166,7 @@ destruct az. {
 }
 Qed.
 
-Theorem rl_acos_prop :
+Theorem rngl_acos_prop :
   rngl_is_ordered T = true →
   ∀ x, (x² ≤ 1)%L → cos2_sin2_prop x √(1 - x²)%L.
 Proof.
@@ -191,21 +191,21 @@ rewrite rngl_add_comm.
 apply (rngl_add_sub Hos).
 Qed.
 
-Definition rl_acos Hor (x : T) :=
+Definition rngl_acos Hor (x : T) :=
   match (rngl_le_dec Hor x² 1)%L with
   | left Hx1 =>
-      {| rngl_cos := x; rngl_sin := rl_sqrt (1 - rngl_squ x)%L;
-         rngl_cos2_sin2 := rl_acos_prop Hor x Hx1 |}
+      {| rngl_cos := x; rngl_sin := √(1 - x²)%L;
+         rngl_cos2_sin2 := rngl_acos_prop Hor x Hx1 |}
   | _ =>
       angle_zero
   end.
 
-Theorem rl_cos_acos :
+Theorem rngl_cos_acos :
   ∀ Hor : rngl_is_ordered T = true,
-  ∀ x, (x² ≤ 1)%L → rngl_cos (rl_acos Hor x) = x.
+  ∀ x, (x² ≤ 1)%L → rngl_cos (rngl_acos Hor x) = x.
 Proof.
 intros * Hx1.
-progress unfold rl_acos.
+progress unfold rngl_acos.
 now destruct (rngl_le_dec Hor x² 1).
 Qed.
 
@@ -1142,7 +1142,7 @@ split. {
 }
 Qed.
 
-Arguments rl_acos {T ro rp rl} Hor x%L.
+Arguments rngl_acos {T ro rp rl} Hor x%L.
 Arguments rl_sqrt_squ {T ro rp rl} Hor Hop a%L.
 
 Theorem polar :
@@ -1150,8 +1150,8 @@ Theorem polar :
   ∀ (z : GComplex T) ρ θ,
   ρ = √((gre z)² + (gim z)²)%L
   → θ =
-       (if (0 ≤? gim z)%L then rl_acos ac_or (gre z / ρ)%L
-        else angle_opp (rl_acos ac_or (gre z / ρ)%L))
+       (if (0 ≤? gim z)%L then rngl_acos ac_or (gre z / ρ)%L
+        else angle_opp (rngl_acos ac_or (gre z / ρ)%L))
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 destruct_ac.
@@ -1205,8 +1205,8 @@ assert (Hzr : zr = (ρ * (zr / ρ))%L). {
   rewrite (rngl_mul_comm Hic).
   now symmetry; apply (rngl_div_mul Hon Hiv).
 }
-assert (Hr : zr = (ρ * rngl_cos (rl_acos Hor (zr / ρ)))%L). {
-  rewrite rl_cos_acos; [ easy | ].
+assert (Hr : zr = (ρ * rngl_cos (rngl_acos Hor (zr / ρ)))%L). {
+  rewrite rngl_cos_acos; [ easy | ].
   rewrite <- (rngl_squ_1 Hon).
   apply (rngl_abs_le_squ_le Hop Hor).
   rewrite (rngl_abs_1 Hon Hop Hor).
@@ -1265,7 +1265,7 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
 }
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
 destruct zzi. {
-  progress unfold rl_acos.
+  progress unfold rngl_acos.
   destruct (rngl_le_dec Hor (zr / ρ)² 1)%L as [Hzρ1| Hzρ1]; [ | easy ].
   apply rngl_leb_le in Hzzi.
   cbn.
@@ -1287,7 +1287,7 @@ destruct zzi. {
   rewrite (rngl_opp_involutive Hop).
   apply (rngl_leb_gt Hor) in Hzzi.
   apply (rngl_lt_le_incl Hor) in Hzzi.
-  progress unfold rl_acos.
+  progress unfold rngl_acos.
   destruct (rngl_le_dec Hor (zr / ρ)² 1)%L as [Hzρ1| Hzρ1]; [ | easy ].
   cbn.
   apply (rngl_add_sub_eq_l Hos) in Hri.
@@ -9418,8 +9418,8 @@ specialize (polar Him z) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L).
 set
   (θ :=
-     (if (0 ≤? gim z)%L then rl_acos Hor (gre z / ρ)%L
-      else angle_opp (rl_acos Hor (gre z / ρ)%L))).
+     (if (0 ≤? gim z)%L then rngl_acos Hor (gre z / ρ)%L
+      else angle_opp (rngl_acos Hor (gre z / ρ)%L))).
 specialize (H1 ρ θ eq_refl eq_refl).
 set (ρ' := rl_nth_root n ρ).
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as H2.
@@ -9438,7 +9438,7 @@ apply rl_sqrt_div_squ_squ.
 ...
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
-  rewrite (rl_cos_acos Htr).
+  rewrite (rngl_cos_acos Htr).
 ...
   rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
     subst ρ.
@@ -9471,12 +9471,12 @@ Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   rngl_is_ordered = true →
   rl_has_trigo = true →
   ∀ x, (-1 ≤ x ≤ 1)%L →
-  rl_sin (rl_acos x) = rl_sqrt (1%L - rngl_squ x).
+  rl_sin (rngl_acos x) = rl_sqrt (1%L - rngl_squ x).
 Proof.
 intros * Hon Hop Hiv Hc2 Heb Hor Htr * Hx1.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
-rewrite (rl_cos_acos Htr _ Hx1) in H1.
+specialize (rl_cos2_sin2 Htr (rngl_acos x)) as H1.
+rewrite (rngl_cos_acos Htr _ Hx1) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
 rewrite H1.
 rewrite (rl_sqrt_squ Hon Hop Hiv Hc2 Heb Hor Htr).
@@ -9484,7 +9484,7 @@ rewrite (rl_sqrt_squ Hon Hop Hiv Hc2 Heb Hor Htr).
 ...
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
-  ∀ x, rl_sin (rl_acos x) = rl_sqrt (1 - rngl_squ x)%L.
+  ∀ x, rl_sin (rngl_acos x) = rl_sqrt (1 - rngl_squ x)%L.
 ... ...
 rewrite rl_sin_acos.
 ...
@@ -9529,8 +9529,8 @@ rewrite (rl_cos_atan2 Htr) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
 remember (rl_sqrt _) as ρ eqn:Hρ.
 ...
-specialize (rl_cos2_sin2 Htr (rl_acos x)) as H1.
-rewrite (rl_cos_acos Htr) in H1.
+specialize (rl_cos2_sin2 Htr (rngl_acos x)) as H1.
+rewrite (rngl_cos_acos Htr) in H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
 rewrite H1.
 rewrite (rl_sqrt_squ Hon Hop Hiv Hc2 Heb Hor Hle Htr).
