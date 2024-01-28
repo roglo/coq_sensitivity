@@ -8250,13 +8250,14 @@ Qed.
 Theorem angles_lim_le :
   ∀ u v θ θ',
   (∀ i, (u i ≤ v i)%A)
+  → (∀ i, (v i ≤ angle_straight)%A)
   → (θ ≤ angle_straight)%A
   → angle_lim u θ
   → angle_lim v θ'
   → (θ ≤ θ')%A.
 Proof.
 destruct_ac.
-intros * Huv Hts Hu Hv.
+intros * Huv Hvs Hts Hu Hv.
 progress unfold angle_lim in Hu.
 progress unfold angle_lim in Hv.
 progress unfold is_limit_when_tending_to_inf in Hu.
@@ -8292,12 +8293,8 @@ intros H4.
 apply (rngl_nle_gt Hor) in H2.
 apply H2; clear H2.
 do 2 rewrite (angle_eucl_dist_symmetry Hic Hop _ θ').
-apply angle_dist_le_l. 2: {
-  split; [ now apply angle_lt_le_incl | ].
-...
-split; [ | now apply angle_lt_le_incl ].
-apply angle_nlt_ge.
-intros H4.
+apply angle_dist_le_l; [ apply Hvs | ].
+split; [ now apply angle_lt_le_incl | ].
 ...
 *)
 
