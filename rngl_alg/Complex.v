@@ -8209,10 +8209,9 @@ split; [ easy | ].
 now apply angle_lt_le_incl.
 Qed.
 
-(* to be completed
 Theorem angle_lim_ge :
   ∀ u θ θ',
-  (θ' ≤ angle_straight)%A
+  (∀ i, (u i ≤ angle_straight)%A)
   → (∀ i, (θ ≤ u i)%A)
   → angle_lim u θ'
   → (θ ≤ θ')%A.
@@ -8223,7 +8222,6 @@ progress unfold angle_lim in Hu.
 progress unfold is_limit_when_tending_to_inf in Hu.
 apply angle_nlt_ge.
 intros Htt.
-clear Hts.
 assert (Hd : (0 < angle_eucl_dist θ θ')%L). {
   apply (rngl_lt_iff Hor).
   split; [ apply angle_eucl_dist_nonneg | ].
@@ -8240,20 +8238,13 @@ progress unfold ε in H1.
 specialize (Hut N) as H2.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
-... ...
-Check angle_dist_le_l.
 do 2 rewrite (angle_eucl_dist_symmetry Hic Hop _ θ').
 apply angle_dist_le_l. 2: {
   split; [ | easy ].
   now apply angle_lt_le_incl.
 }
-...
-apply angle_dist_le; [ easy | ].
-split; [ easy | ].
-now apply angle_lt_le_incl.
+apply Hts.
 Qed.
-...
-*)
 
 (* to be completed
 Theorem angles_lim_le :
@@ -8293,15 +8284,17 @@ progress unfold ε in H2.
 specialize (Huv N) as H3.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
-rewrite angle_eucl_dist_symmetry.
-apply angle_dist_le; [ easy | ].
+rewrite (angle_eucl_dist_symmetry Hic Hop).
+apply angle_dist_le_r; [ easy | ].
 split; [ | now apply angle_lt_le_incl ].
 apply angle_nlt_ge.
 intros H4.
-...
 apply (rngl_nle_gt Hor) in H2.
 apply H2; clear H2.
-apply angle_dist_le; [ | ].
+do 2 rewrite (angle_eucl_dist_symmetry Hic Hop _ θ').
+apply angle_dist_le_l. 2: {
+  split; [ now apply angle_lt_le_incl | ].
+...
 split; [ | now apply angle_lt_le_incl ].
 apply angle_nlt_ge.
 intros H4.
