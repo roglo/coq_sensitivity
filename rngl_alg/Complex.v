@@ -8359,6 +8359,7 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in H2.
 2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 progress unfold ε in H1.
 progress unfold ε in H2.
+...
 specialize (angle_eucl_dist_triangular θ' (v N) θ) as H6.
 rewrite (angle_eucl_dist_symmetry Hic Hop) in H6.
 progress fold ε in H6.
