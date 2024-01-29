@@ -8259,6 +8259,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
@@ -8352,18 +8353,17 @@ apply angle_dist_le_r; [ apply Hvs | ].
 split; [ now apply angle_lt_le_incl | ].
 apply angle_nlt_ge.
 intros H5.
-(*
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in H1.
 2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in H2.
 2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-*)
 progress unfold ε in H1.
 progress unfold ε in H2.
+...
 do 2 rewrite angle_eucl_dist_is_sqrt in H1, H2.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ / _))%L in H1. 2: {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor).
-  2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ * _))%L in H1. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  2 : apply (rngl_0_le_2 Hon Hop Hor).
   apply rl_sqrt_nonneg.
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply (rngl_0_le_2 Hon Hop Hor).
@@ -8382,6 +8382,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_%L) in H1. 2: {
 }
 subst x.
 apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in H1.
+rewrite (rngl_squ_mul Hic) in H1.
 rewrite rngl_squ_sqrt in H1. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply (rngl_0_le_2 Hon Hop Hor).
@@ -8389,15 +8390,23 @@ rewrite rngl_squ_sqrt in H1. 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
-rewrite (rngl_squ_div Hic Hon Hos Hiv) in H1. 2: {
+rewrite rngl_squ_sqrt in H1. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- rngl_mul_assoc in H1.
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1.
+2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 ...
-rewrite rngl_squ_sqrt in H1. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor). {
-    apply (rngl_0_le_2 Hon Hop Hor).
-  }
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
+do 2 rewrite (rngl_mul_comm Hic 2)%L in H1.
+progress unfold rngl_squ in H1.
+rewrite <- (rngl_div_div Hos Hon Hiv) in H1.
+2, 3: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+rewrite (rngl_mul_div Hi1) in H1.
+2: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 ...
 rewrite (angle_eucl_dist_symmetry Hic Hop).
 apply angle_dist_le_r; [ easy | ].
