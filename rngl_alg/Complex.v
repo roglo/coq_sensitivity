@@ -8293,7 +8293,7 @@ set (N := max N1 N2).
 specialize (H1 N (Nat.le_max_l _ _)).
 specialize (H2 N (Nat.le_max_r _ _)).
 specialize (Huv N) as H3.
-(**)
+(*
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
 apply (rngl_le_div_l Hon Hop Hiv Hor).
@@ -8317,9 +8317,10 @@ specialize (angle_eucl_dist_triangular θ' (v N) (u N)) as H5.
 progress unfold ε in H1.
 progress unfold ε in H2.
 ...
+*)
 apply (rngl_nle_gt Hor) in H1.
-apply H1; clear H1.
-(**)
+apply H1.
+apply (rngl_nle_gt Hor) in H1.
 apply (rngl_le_div_l Hon Hop Hiv Hor).
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 rewrite (rngl_mul_comm Hic).
@@ -8334,7 +8335,8 @@ split; [ | now apply angle_lt_le_incl ].
 apply angle_nlt_ge.
 intros H4.
 apply (rngl_nle_gt Hor) in H2.
-apply H2; clear H2.
+apply H2.
+apply (rngl_nle_gt Hor) in H2.
 apply (rngl_le_div_l Hon Hop Hiv Hor).
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 rewrite (rngl_mul_comm Hic).
