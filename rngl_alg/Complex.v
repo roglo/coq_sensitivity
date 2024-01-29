@@ -8246,7 +8246,7 @@ apply angle_dist_le_l. 2: {
 apply Hts.
 Qed.
 
-(* to be completed
+(*
 Theorem angles_lim_le :
   ∀ u v θ θ',
   (∀ i, (u i ≤ v i)%A)
@@ -8525,6 +8525,18 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
+Inspect 4.
+specialize (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)))%A as H1.
+specialize (H1 θ' θ).
+assert (H : (θ' ≤ angle_straight)%A). {
+  now apply rngl_sin_nonneg_angle_le_straight.
+}
+specialize (H1 H); clear H.
+cbn in H1.
+assert (H : (∀ i : nat, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A)). {
+  intros.
+...
+specialize (H1 H Hlim); clear H.
 ...
 specialize (angles_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
 specialize (H1 θ' θ)%A.
