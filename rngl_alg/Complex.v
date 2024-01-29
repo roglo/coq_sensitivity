@@ -8359,6 +8359,36 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in H2.
 2 : apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 progress unfold ε in H1.
 progress unfold ε in H2.
+specialize (angle_eucl_dist_triangular θ' (v N) θ) as H6.
+rewrite (angle_eucl_dist_symmetry Hic Hop) in H6.
+progress fold ε in H6.
+progress fold ε in H1.
+progress fold ε in H2.
+apply (rngl_nlt_ge Hor) in H6.
+apply H6; clear H6.
+eapply (rngl_le_lt_trans Hor); [ | apply H2 ].
+rewrite (rngl_mul_comm Hic).
+rewrite <- (rngl_add_diag Hon).
+rewrite (angle_eucl_dist_symmetry Hic Hop).
+apply (rngl_add_le_mono_l Hop Hor).
+do 2 rewrite (angle_eucl_dist_symmetry Hic Hop (v N)).
+...
+apply angle_dist_le_r; [ apply Hvs | ].
+split; [ now apply angle_lt_le_incl | ].
+(* fuck *)
+...
+assert (Hεvt : (ε / 2 < angle_eucl_dist (v N) θ)%L). {
+  specialize (angle_eucl_dist_triangular θ' (v N) θ) as H6.
+  rewrite (angle_eucl_dist_symmetry Hic Hop) in H6.
+  progress fold ε in H6.
+  progress fold ε in H1.
+  progress fold ε in H2.
+  apply (rngl_lt_div_l Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+...
+  rewrite (rngl_mul_comm Hic).
+  rewrite <- (rngl_add_diag Hon).
+  eapply (rngl_le_lt_trans Hor); [ apply H6 | ].
 ...
 do 2 rewrite angle_eucl_dist_is_sqrt in H1, H2.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_ * _))%L in H1. 2: {
