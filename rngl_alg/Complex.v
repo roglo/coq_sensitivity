@@ -8507,7 +8507,7 @@ apply angle_mul_div_succ_succ_le.
 apply IHn.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
@@ -8646,8 +8646,11 @@ Theorem glop :
 Proof.
 intros Hc1 *.
 apply not_eq_sym.
-destruct n; [ apply (angle_right_neq_0 Hc1) | ].
-cbn.
+intros H.
+revert θ H.
+induction n; intros; [ now apply (angle_right_neq_0 Hc1) in H | ].
+Search (S _ * _)%A.
+cbn in H.
 ... ...
 apply glop in Hzc.
           destruct i. {
