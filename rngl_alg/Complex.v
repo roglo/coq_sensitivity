@@ -8472,6 +8472,28 @@ apply Nat_mul_le_pos_r.
 now apply -> Nat.succ_le_mono.
 Qed.
 
+Theorem angle_lim_seq_angle_le :
+  ∀ n θ θ',
+  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → (θ' ≤ angle_straight)%A
+  → (θ' ≤ θ)%A.
+Proof.
+intros * Hlim Hts.
+apply (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)))%A; [ easy | | easy ].
+intros.
+revert i.
+clear Hlim.
+induction n; intros; [ apply angle_nonneg | ].
+destruct n. {
+  rewrite Nat.div_1_r.
+  rewrite angle_mul_2_pow_div_2_pow.
+  apply angle_le_refl.
+}
+eapply angle_le_trans.
+apply angle_mul_div_succ_succ_le.
+apply IHn.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8517,10 +8539,6 @@ intros * Hlim.
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
-(*
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
-*)
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 progress unfold angle_leb.
@@ -8533,6 +8551,11 @@ destruct zsm. {
   destruct zs. {
     apply rngl_leb_le in Hzs.
     apply rngl_leb_le.
+    specialize (angle_lim_seq_angle_le n θ θ' Hlim) as Htt.
+    assert (Hts : (θ' ≤ angle_straight)%A). {
+      now apply rngl_sin_nonneg_angle_le_straight.
+    }
+    specialize (Htt Hts).
     cbn - [ rngl_cos ].
     destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
       destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
@@ -8541,30 +8564,11 @@ destruct zsm. {
       }
       apply (rngl_nle_gt Hor) in Hzm.
       cbn - [ rngl_sin ] in Hzsm.
-(* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
-   mais comment ? *)
-specialize (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)))%A as H1.
-specialize (H1 θ' θ).
-assert (H : (θ' ≤ angle_straight)%A). {
-  now apply rngl_sin_nonneg_angle_le_straight.
+(* c'est faux : m*θ'=-ε ; mais peut-être qu'avec Htt et Hts je peux
+   m'en sortir ; aucune idée si j'ai une chance *)
+...
 }
-specialize (H1 H); clear H.
-cbn in H1.
-assert (H : (∀ i : nat, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A)). {
-  intros.
-  clear Hlim Hm H1.
-  revert i.
-  induction n; intros; [ apply angle_nonneg | ].
-  destruct n. {
-    rewrite Nat.div_1_r.
-    rewrite angle_mul_2_pow_div_2_pow.
-    apply angle_le_refl.
-  }
-  eapply angle_le_trans.
-  apply angle_mul_div_succ_succ_le.
-  apply IHn.
-}
-specialize (H1 H Hlim); clear H.
+now apply H1.
 ...
 specialize (angles_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
 specialize (H1 θ' θ)%A.
