@@ -8454,6 +8454,24 @@ intros H5.
 ...
 *)
 
+Theorem angle_mul_div_succ_succ_le :
+  ∀ i n θ, (2 ^ i / S (S n) * (θ / ₂^i) ≤ 2 ^ i / S n * (θ / ₂^i))%A.
+Proof.
+intros.
+apply angle_mul_nat_le_mono_nonneg_r. 2: {
+  apply Nat.div_le_compat_l.
+  split; [ easy | ].
+  apply Nat.le_succ_diag_r.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+  apply angle_mul_nat_overflow_pow_div.
+}
+apply Nat.div_le_upper_bound; [ easy | ].
+rewrite Nat.mul_comm.
+apply Nat_mul_le_pos_r.
+now apply -> Nat.succ_le_mono.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8525,7 +8543,6 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; il faut donc essayer d'utiliser l'hypothèse Hlim,
    mais comment ? *)
-Inspect 4.
 specialize (angle_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)))%A as H1.
 specialize (H1 θ' θ).
 assert (H : (θ' ≤ angle_straight)%A). {
@@ -8535,7 +8552,18 @@ specialize (H1 H); clear H.
 cbn in H1.
 assert (H : (∀ i : nat, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A)). {
   intros.
-...
+  clear Hlim Hm H1.
+  revert i.
+  induction n; intros; [ apply angle_nonneg | ].
+  destruct n. {
+    rewrite Nat.div_1_r.
+    rewrite angle_mul_2_pow_div_2_pow.
+    apply angle_le_refl.
+  }
+  eapply angle_le_trans.
+  apply angle_mul_div_succ_succ_le.
+  apply IHn.
+}
 specialize (H1 H Hlim); clear H.
 ...
 specialize (angles_lim_le (λ i, 2 ^ i / n * (θ / ₂^i)) (λ _, θ))%A as H1.
