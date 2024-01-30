@@ -8495,6 +8495,46 @@ apply IHn.
 Qed.
 
 (* to be completed
+Theorem angle_lim_seq_angle_le' :
+  ∀ n θ θ',
+  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → (θ' ≤ angle_straight)%A
+  → (n * θ' ≤ θ)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hlim Hts.
+revert θ θ' Hlim Hts.
+induction n; intros; [ apply angle_nonneg | ].
+cbn.
+(* aucune idée si ça peut marcher *)
+...
+destruct n. {
+  rewrite (angle_mul_1_l Hon Hos).
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  eapply (angle_lim_eq_compat 0 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.div_1_r.
+    rewrite Nat.add_0_r.
+    rewrite angle_mul_2_pow_div_2_pow.
+    easy.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'.
+  apply angle_le_refl.
+}
+...
+  rewrite Nat.div_1_r in Hlim.
+  rewrite angle_mul_2_pow_div_2_pow.
+  apply angle_le_refl.
+}
+eapply angle_le_trans.
+apply angle_mul_div_succ_succ_le.
+apply IHn.
+Qed.
+*)
+
+(* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →
