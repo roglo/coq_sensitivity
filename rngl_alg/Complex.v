@@ -5119,6 +5119,19 @@ apply rl_sqrt_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
 Qed.
 
+Theorem angle_right_neq_0 :
+  rngl_characteristic T ≠ 1
+  → angle_right ≠ 0%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros Hc1 Hrz.
+apply eq_angle_eq in Hrz.
+cbn in Hrz.
+injection Hrz; clear Hrz; intros H1 H2.
+now apply (rngl_1_eq_0_iff Hon Hos) in H1.
+Qed.
+
 Theorem angle_straight_neq_0 :
   rngl_characteristic T ≠ 1
   → angle_straight ≠ 0%A.
@@ -8532,6 +8545,12 @@ destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros * Hu Hlim i.
+  rewrite (H1 (u i)).
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
 intros * Hu Hlim i.
 apply angle_all_add_not_overflow.
 intros m Hmi.
@@ -8599,6 +8618,56 @@ destruct zs. {
           apply (rngl_le_refl Hor).
         }
         destruct m. {
+          rewrite Hu in Hzc.
+          progress unfold seq_angle_converging_to_angle_div_nat in Hzc.
+          destruct i. {
+            cbn in Hzc.
+            destruct n; [ easy | ].
+            destruct n; [ flia Hmi | ].
+            rewrite Nat.div_small in Hzc; [ | flia ].
+            rewrite angle_mul_0_l in Hzc.
+            symmetry in Hzc.
+            now apply (angle_right_neq_0 Hc1) in Hzc.
+          }
+          destruct i. {
+            cbn in Hzc.
+            destruct n; [ easy | ].
+            destruct n; [ flia Hmi | ].
+            destruct n; [ flia Hmi | ].
+            rewrite Nat.div_small in Hzc; [ | flia ].
+            rewrite angle_mul_0_l in Hzc.
+            symmetry in Hzc.
+            now apply (angle_right_neq_0 Hc1) in Hzc.
+          }
+cbn in Hzc.
+Theorem glop :
+  rngl_characteristic T ≠ 1
+  → ∀ n θ, (n * (θ / ₂ / ₂) ≠ angle_right)%A.
+Proof.
+intros Hc1 *.
+apply not_eq_sym.
+destruct n; [ apply (angle_right_neq_0 Hc1) | ].
+cbn.
+... ...
+apply glop in Hzc.
+          destruct i. {
+            cbn in Hzc.
+            destruct n; [ easy | ].
+            destruct n; [ flia Hmi | ].
+            destruct n; [ flia Hmi | ].
+            destruct n; [ flia Hmi | ].
+...
+            rewrite Nat.div_small in Hzc; [ | flia ].
+            rewrite angle_mul_0_l in Hzc.
+            symmetry in Hzc.
+            now apply (angle_right_neq_0 Hc1) in Hzc.
+          }
+...
+Search (angle_right = 0)%A.
+Search (angle_straight = 0)%A.
+destruct n; [ flia Hmi | ].
+destruct n; [ flia Hmi | ].
+...
           rewrite Hzc in *.
           clear Hzs.
           replace 4 with (2 + 2) by easy.
