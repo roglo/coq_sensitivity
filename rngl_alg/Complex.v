@@ -8522,6 +8522,108 @@ destruct ao. {
   clear Hlim'.
   apply Bool.not_false_iff_true in Hao.
   exfalso; apply Hao; clear Hao.
+Theorem seq_angle_not_mul_overflow :
+  ∀ n u θ θ',
+  u = seq_angle_converging_to_angle_div_nat θ n
+  → angle_lim u θ'
+  → ∀ i, angle_mul_nat_overflow i (u i) = false.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hu Hlim i.
+apply angle_all_add_not_overflow.
+intros m Hmi.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+rewrite <- angle_mul_succ_l.
+remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
+symmetry in Hzs, Hzsm.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  destruct zsm; [ | easy ].
+  apply rngl_leb_le in Hzsm.
+  apply rngl_leb_le.
+  destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
+    destruct (rngl_le_dec Hor 0 (rngl_sin (m * u i)%A)) as [Hsmu| Hsmu]. {
+      destruct (rngl_le_dec Hor 0 (rngl_cos (m * u i)%A)) as [Hcmu| Hcmu]. {
+        cbn - [ rngl_cos ].
+        now apply quadrant_1_rngl_cos_add_le_cos_l.
+      }
+      apply (rngl_nle_gt Hor) in Hcmu.
+      cbn.
+      eapply (rngl_le_trans Hor). {
+        apply (rngl_le_sub_nonneg Hop Hor).
+        now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      }
+      apply (rngl_le_0_sub Hop Hor).
+      rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+      apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    }
+    apply (rngl_nle_gt Hor) in Hsmu.
+    destruct (rngl_le_dec Hor (rngl_cos (m * u i)) 0) as [Hcmu| Hcmu]. {
+      apply (rngl_lt_eq_cases Hor) in Hzc.
+      destruct Hzc as [Hzc| Hzc]. {
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzsm.
+        apply Hzsm; clear Hzsm.
+        cbn.
+        apply (rngl_add_neg_nonpos Hop Hor). {
+          now apply (rngl_mul_pos_neg Hop Hor Hid).
+        }
+        now apply (rngl_mul_nonneg_nonpos Hop Hor).
+      }
+      symmetry in Hzc.
+      apply eq_rngl_cos_0 in Hzc.
+      destruct Hzc as [Hzc| Hzc]. {
+        rewrite Hzc in Hsmu, Hcmu.
+        destruct m; [ now apply (rngl_lt_irrefl Hor) in Hsmu | ].
+        destruct m. {
+          exfalso.
+          apply (rngl_nle_gt Hor) in Hsmu.
+          apply Hsmu; clear Hsmu.
+          rewrite (angle_mul_1_l Hon Hos).
+          apply (rngl_0_le_1 Hon Hop Hor).
+        }
+        destruct m. {
+          exfalso.
+          apply (rngl_nle_gt Hor) in Hsmu.
+          apply Hsmu; clear Hsmu.
+          rewrite <- (angle_add_diag Hon Hos).
+          rewrite (angle_right_add_right Hon Hop).
+          apply (rngl_le_refl Hor).
+        }
+        destruct m. {
+          rewrite Hzc in *.
+          clear Hzs.
+...
+        cbn in Hzsm |-*.
+        rewrite Hzc in Hzsm |-*.
+        cbn in Hzsm |-*.
+...
+Search (_ * _ ≤ _)%L.
+apply rngl_le_div_r; try easy.
+...
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      remember (rngl_cos (u i) * rngl_cos (m * u i))%L as x eqn:Hx.
+apply rngl_le_sub_nonneg.
+      apply (rngl_le_trans Hor _ (rngl_cos (u i) * rngl_cos (m * u i))
+...
+(*
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+cbn - [ rngl_cos ].
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy. (* faut voir les cas cos *)
+*)
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. (* ça dépend *)
+...
+  apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | easy | ].
+  rewrite Hu.
+...
 Theorem angle_lim_seq_angle_not_mul_overflow :
   ∀ n θ θ',
   angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
@@ -8546,6 +8648,13 @@ rewrite <- angle_mul_succ_l.
 remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
 remember (0 ≤? rngl_sin (S m * θ'))%L as zsm eqn:Hzsm.
 symmetry in Hzs, Hzsm.
+(**)
+destruct zsm. 2: {
+  destruct zs; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_leb_gt Hor) in Hzsm.
+  apply rngl_leb_le.
+...
 destruct zsm. {
   apply rngl_leb_le in Hzsm.
   destruct zs. {
@@ -8566,9 +8675,19 @@ destruct zsm. {
       cbn - [ rngl_sin ] in Hzsm.
 (* c'est faux : m*θ'=-ε ; mais peut-être qu'avec Htt et Hts je peux
    m'en sortir ; aucune idée si j'ai une chance *)
-      clear Hlim.
+(**)
+      exfalso.
+      revert n Hlim Hm.
+      revert θ' Hzs Hzsm Htt Hts Hzc Hzm.
+      induction m; intros. {
+        rewrite angle_mul_0_l in Hzm.
+        now apply (rngl_lt_irrefl Hor) in Hzm.
+      }
+      destruct n; [ easy | ].
+      apply Nat.succ_lt_mono in Hm.
+...
       revert m Hm Hzsm Hzm.
-      revert θ' Hzs Htt Hzc Hts.
+      revert θ' Hzs Htt Hzc Hts Hlim.
       induction n; intros; [ easy | ].
       destruct m. {
         rewrite angle_mul_0_l, angle_add_0_r.
