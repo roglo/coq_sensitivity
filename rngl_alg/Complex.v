@@ -8526,7 +8526,7 @@ Theorem seq_angle_not_mul_overflow :
   ∀ n u θ θ',
   u = seq_angle_converging_to_angle_div_nat θ n
   → angle_lim u θ'
-  → ∀ i, angle_mul_nat_overflow i (u i) = false.
+  → ∀ i, angle_mul_nat_overflow n (u i) = false.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -8601,6 +8601,19 @@ destruct zs. {
         destruct m. {
           rewrite Hzc in *.
           clear Hzs.
+          replace 4 with (2 + 2) by easy.
+          rewrite (angle_mul_add_distr_r Hon Hop).
+          rewrite <- (angle_add_diag Hon Hos).
+          rewrite (angle_right_add_right Hon Hop).
+          rewrite (angle_straight_add_straight Hon Hop).
+          cbn.
+          exfalso.
+          replace 3 with (1 + 2) in Hsmu, Hcmu by easy.
+          rewrite (angle_mul_add_distr_r Hon Hop) in Hsmu, Hcmu.
+          rewrite <- (angle_add_diag Hon Hos) in Hsmu, Hcmu.
+          rewrite (angle_right_add_right Hon Hop) in Hsmu, Hcmu.
+          rewrite (angle_mul_1_l Hon Hos) in Hsmu, Hcmu.
+          clear Hsmu Hcmu.
 ...
         cbn in Hzsm |-*.
         rewrite Hzc in Hzsm |-*.
