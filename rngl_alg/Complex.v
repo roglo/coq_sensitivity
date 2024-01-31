@@ -8507,6 +8507,32 @@ apply angle_mul_div_succ_succ_le.
 apply IHn.
 Qed.
 
+Theorem angle_div_4_not_right :
+  rngl_characteristic T ≠ 1
+  → ∀ n θ, (n * θ ≠ 0 → n * (θ / ₂ / ₂) ≠ angle_right)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros Hc1 * Hnt.
+apply not_eq_sym.
+intros H.
+apply (f_equal (λ θ, (2 * θ)%A)) in H.
+rewrite <- (angle_add_diag Hon Hos) in H.
+rewrite (angle_right_add_right Hon Hop) in H.
+rewrite (angle_mul_nat_assoc Hon Hop) in H.
+rewrite Nat.mul_comm in H.
+rewrite <- (angle_mul_nat_assoc Hon Hop) in H.
+rewrite angle_div_2_mul_2 in H.
+apply (f_equal (λ θ, (2 * θ)%A)) in H.
+rewrite <- (angle_add_diag Hon Hos) in H.
+rewrite (angle_straight_add_straight Hon Hop) in H.
+rewrite (angle_mul_nat_assoc Hon Hop) in H.
+rewrite Nat.mul_comm in H.
+rewrite <- (angle_mul_nat_assoc Hon Hop) in H.
+rewrite angle_div_2_mul_2 in H.
+now symmetry in H.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8609,6 +8635,7 @@ destruct zs. {
           rewrite (angle_mul_1_l Hon Hos).
           apply (rngl_0_le_1 Hon Hop Hor).
         }
+(*
         destruct m. {
           exfalso.
           apply (rngl_nle_gt Hor) in Hsmu.
@@ -8617,42 +8644,42 @@ destruct zs. {
           rewrite (angle_right_add_right Hon Hop).
           apply (rngl_le_refl Hor).
         }
-        destruct m. {
-          rewrite Hu in Hzc.
-          progress unfold seq_angle_converging_to_angle_div_nat in Hzc.
-          destruct i. {
-            cbn in Hzc.
-            destruct n; [ easy | ].
-            destruct n; [ flia Hmi | ].
-            rewrite Nat.div_small in Hzc; [ | flia ].
-            rewrite angle_mul_0_l in Hzc.
-            symmetry in Hzc.
-            now apply (angle_right_neq_0 Hc1) in Hzc.
-          }
-          destruct i. {
-            cbn in Hzc.
-            destruct n; [ easy | ].
-            destruct n; [ flia Hmi | ].
-            destruct n; [ flia Hmi | ].
-            rewrite Nat.div_small in Hzc; [ | flia ].
-            rewrite angle_mul_0_l in Hzc.
-            symmetry in Hzc.
-            now apply (angle_right_neq_0 Hc1) in Hzc.
-          }
-cbn in Hzc.
-Theorem glop :
-  rngl_characteristic T ≠ 1
-  → ∀ n θ, (n * (θ / ₂ / ₂) ≠ angle_right)%A.
+*)
+        rewrite Hu in Hzc.
+        progress unfold seq_angle_converging_to_angle_div_nat in Hzc.
+        destruct i. {
+          cbn in Hzc.
+          destruct n; [ easy | ].
+          destruct n; [ flia Hmi | ].
+          rewrite Nat.div_small in Hzc; [ | flia ].
+          rewrite angle_mul_0_l in Hzc.
+          symmetry in Hzc.
+          now apply (angle_right_neq_0 Hc1) in Hzc.
+        }
+        destruct i. {
+          cbn in Hzc.
+          destruct n; [ easy | ].
+          destruct n; [ flia Hmi | ].
+          destruct n; [ flia Hmi | ].
+          rewrite Nat.div_small in Hzc; [ | flia ].
+          rewrite angle_mul_0_l in Hzc.
+          symmetry in Hzc.
+          now apply (angle_right_neq_0 Hc1) in Hzc.
+        }
+        cbn - [ div Nat.pow ] in Hzc.
+        apply angle_div_4_not_right in Hzc; [ easy | easy | ].
+        intros H.
+Search (_ * _ = 0)%A.
+Search (_ * _ = 0)%L.
+Theorem angle_eq_mul_0_r :
+  ∀ n θ, (n * θ)%A = 0%A → n ≠ 0 → θ = 0%A.
 Proof.
-intros Hc1 *.
-apply not_eq_sym.
-intros H.
-revert θ H.
-induction n; intros; [ now apply (angle_right_neq_0 Hc1) in H | ].
-Search (S _ * _)%A.
-cbn in H.
-... ...
-apply glop in Hzc.
+intros * Hnt Hnz.
+(* mmmm... mais ça, c'est faux, ça *)
+...
+Search (_ * (_ / ₂))%A.
+rewrite angle_mul_nat_div_2 in Hzc. 2: {
+...
           destruct i. {
             cbn in Hzc.
             destruct n; [ easy | ].
