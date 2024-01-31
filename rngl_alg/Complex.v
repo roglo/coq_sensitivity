@@ -8582,6 +8582,26 @@ apply angle_all_add_not_overflow.
 intros m Hmi.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz.
+  subst θ.
+  rewrite Hu.
+  progress unfold seq_angle_converging_to_angle_div_nat.
+  rewrite angle_0_div_2_pow.
+  rewrite (angle_mul_0_r Hon Hos).
+  apply angle_nonneg.
+}
+apply (angle_eqb_neq Hed) in Htz.
+destruct (lt_dec (2 ^ i) n) as [Hni| Hni]. {
+  rewrite Hu.
+  progress unfold seq_angle_converging_to_angle_div_nat.
+  rewrite Nat.div_small; [ | easy ].
+  rewrite angle_mul_0_l.
+  apply angle_nonneg.
+}
+apply Nat.nlt_ge in Hni.
 progress unfold angle_leb.
 rewrite <- angle_mul_succ_l.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
@@ -8669,20 +8689,47 @@ destruct zs. {
         cbn - [ div Nat.pow ] in Hzc.
         apply angle_div_4_not_right in Hzc; [ easy | easy | ].
         intros H.
-        destruct (lt_dec (2 ^ S (S i)) n) as [Hin| Hni]. {
-          rewrite Nat.div_small in Hzc; [ | easy ].
-          rewrite angle_mul_0_l in Hzc.
-          symmetry in Hzc.
-          now apply (angle_right_neq_0 Hc1) in Hzc.
-        }
-        apply Nat.nlt_ge in Hni.
+clear Hzs.
+rewrite Hu in Hzsm.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+cbn - [ Nat.pow "*"%A ] in Hzsm.
+rewrite Hzc in Hzsm.
+destruct m. {
+  apply (rngl_nlt_ge Hor) in Hzsm.
+  apply Hzsm; clear Hzsm.
+  replace 3 with (2 + 1) by easy.
+  rewrite (angle_mul_add_distr_r Hon Hop).
+  rewrite <- (angle_add_diag Hon Hos).
+  rewrite (angle_right_add_right Hon Hop).
+  rewrite (rngl_sin_add_straight_l Hon Hop).
+  rewrite (angle_mul_1_l Hon Hos).
+  cbn.
+  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+}
+destruct m. {
+  clear Hzsm Hsmu Hcmu.
+  destruct i. {
+    cbn in Hni.
+    replace n with 4 in H by flia Hmi Hni.
+    cbn in H.
+    now rewrite angle_add_0_r in H.
+  }
+  destruct i. {
+    cbn in H.
 Theorem angle_eq_mul_0_r :
   ∀ n θ, (n * θ)%A = 0%A → n ≠ 0 → ((n - 1) * θ = angle_straight)%A.
 Proof.
-intros * Hnt.
+destruct_ac.
+intros * Hnt Hnz.
+rewrite angle_mul_sub_distr_r; [ | flia Hnz ].
+rewrite (angle_mul_1_l Hon Hos).
 ... ...
 apply angle_eq_mul_0_r in H. 2: {
   intros H'.
+  apply Nat.div_small_iff in H'; [ | flia Hmi ].
+  now apply Nat.nlt_ge in Hni.
+}
+...
   rewrite H' in Hzc.
   rewrite angle_mul_0_l in Hzc.
   symmetry in Hzc.
