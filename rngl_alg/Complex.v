@@ -8669,12 +8669,38 @@ destruct zs. {
         cbn - [ div Nat.pow ] in Hzc.
         apply angle_div_4_not_right in Hzc; [ easy | easy | ].
         intros H.
-Search (_ * _ = 0)%A.
-Search (_ * _ = 0)%L.
+        destruct (lt_dec (2 ^ S (S i)) n) as [Hin| Hni]. {
+          rewrite Nat.div_small in Hzc; [ | easy ].
+          rewrite angle_mul_0_l in Hzc.
+          symmetry in Hzc.
+          now apply (angle_right_neq_0 Hc1) in Hzc.
+        }
+        apply Nat.nlt_ge in Hni.
 Theorem angle_eq_mul_0_r :
-  ∀ n θ, (n * θ)%A = 0%A → n ≠ 0 → θ = 0%A.
+  ∀ n θ, (n * θ)%A = 0%A → n ≠ 0 → ((n - 1) * θ = angle_straight)%A.
 Proof.
-intros * Hnt Hnz.
+intros * Hnt.
+... ...
+apply angle_eq_mul_0_r in H. 2: {
+  intros H'.
+  rewrite H' in Hzc.
+  rewrite angle_mul_0_l in Hzc.
+  symmetry in Hzc.
+  now apply (angle_right_neq_0 Hc1) in Hzc.
+}
+...
+apply (f_equal (λ θ, (2 * θ)%A)) in H.
+symmetry in H.
+rewrite <- (angle_add_diag Hon Hos) in H.
+rewrite (angle_straight_add_straight Hon Hop) in H.
+symmetry in H.
+apply angle_eq_mul_0_r in H; [ | easy ].
+cbn - [ div Nat.pow ] in H.
+rewrite angle_add_0_r in H.
+Search (_ * _ = angle_straight)%A.
+...
+
+destruct n; [ easy | ].
 (* mmmm... mais ça, c'est faux, ça *)
 ...
 Search (_ * (_ / ₂))%A.
