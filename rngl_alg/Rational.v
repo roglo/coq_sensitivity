@@ -2714,7 +2714,7 @@ split; intros Hx.
  apply lt_pair in Hxn; [ | easy | easy ].
  rewrite Nat.mul_1_l in Hnx.
  rewrite Nat.mul_1_r, Nat.mul_comm in Hxn.
- now apply Nat_div_interv.
+ now apply Nat_div_less_small.
 -subst n.
  rewrite intg_to_frac; [ | easy ].
  split; [ apply le_sub_l, frac_ge_0 | ].

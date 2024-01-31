@@ -8518,7 +8518,6 @@ destruct (lt_dec (2 ^ i) n) as [Hni| Hni]. {
 apply Nat.nlt_ge in Hni.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
-...
 progress unfold angle_leb.
 rewrite <- angle_mul_succ_l.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
@@ -8632,7 +8631,33 @@ destruct m. {
     now rewrite angle_add_0_r in H.
   }
   destruct i. {
-    cbn in H.
+    cbn in H, Hzc, Hni.
+    remember (8 / n) as m eqn:Hm.
+    symmetry in Hm.
+    destruct m. {
+      apply Nat.div_small_iff in Hm; [ | flia Hmi ].
+      now apply Nat.nle_gt in Hm.
+    }
+    destruct m. {
+      rewrite (angle_mul_1_l Hon Hos) in H.
+      now apply (eq_angle_div_2_0) in H.
+    }
+    destruct m. {
+      now rewrite angle_div_2_mul_2 in H.
+    }
+    destruct m. {
+Search (_ / _ = _).
+About Nat_div_interv.
+About Nat_div_less_small.
+...
+Nat_div_interv :     ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
+Nat_div_less_small : ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
+...
+    apply Nat.div_str_pos_iff in Hni; [ | flia Hmi ].
+Search (_ < _ ↔ _ ≤ _).
+Search (_ ≤ _ ↔ _ < _).
+Search (_ ≤ _ → _ < _).
+apply Nat.div_small_iff in Hni.
 ...
 Theorem angle_eq_mul_0_r :
   ∀ n θ, (n * θ)%A = 0%A → n mod 2 = 1 → ((n - 1) * θ = angle_straight)%A.
