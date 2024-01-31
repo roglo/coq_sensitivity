@@ -8631,12 +8631,28 @@ destruct m. {
   destruct i. {
     cbn in H.
 Theorem angle_eq_mul_0_r :
-  ∀ n θ, (n * θ)%A = 0%A → n ≠ 0 → ((n - 1) * θ = angle_straight)%A.
+  ∀ n θ, (n * θ)%A = 0%A → n mod 2 = 1 → ((n - 1) * θ = angle_straight)%A.
 Proof.
 destruct_ac.
 intros * Hnt Hnz.
-rewrite angle_mul_sub_distr_r; [ | flia Hnz ].
+rewrite angle_mul_sub_distr_r. 2: {
+  rewrite <- Hnz.
+  now apply Nat.mod_le.
+}
 rewrite (angle_mul_1_l Hon Hos).
+rewrite Hnt.
+rewrite (angle_sub_0_l Hon Hos).
+specialize (Nat.div_mod n 2 (Nat.neq_succ_0 _)) as H1.
+rewrite Hnz in H1.
+rewrite H1 in Hnt.
+(* ah, fait chier *)
+...
+apply (angle_opp_inj Hop).
+rewrite (angle_opp_involutive Hop).
+Search (- angle_straight)%A.
+Search (n mod _ ≠ 0).
+rewrite
+rewrite angle_opp_straight.
 ... ...
 apply angle_eq_mul_0_r in H. 2: {
   intros H'.
