@@ -8494,8 +8494,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hu Hlim i.
 apply angle_all_add_not_overflow.
 intros m Hmi.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
 remember (θ =? 0)%A as tz eqn:Htz.
 symmetry in Htz.
 destruct tz. {
@@ -8505,7 +8503,8 @@ destruct tz. {
   progress unfold seq_angle_converging_to_angle_div_nat.
   rewrite angle_0_div_2_pow.
   rewrite (angle_mul_0_r Hon Hos).
-  apply angle_nonneg.
+  apply angle_add_not_overflow_comm.
+  apply (angle_add_overflow_0_r Hon Hos).
 }
 apply (angle_eqb_neq Hed) in Htz.
 destruct (lt_dec (2 ^ i) n) as [Hni| Hni]. {
@@ -8513,9 +8512,13 @@ destruct (lt_dec (2 ^ i) n) as [Hni| Hni]. {
   progress unfold seq_angle_converging_to_angle_div_nat.
   rewrite Nat.div_small; [ | easy ].
   rewrite angle_mul_0_l.
-  apply angle_nonneg.
+  apply angle_add_not_overflow_comm.
+  apply (angle_add_overflow_0_r Hon Hos).
 }
 apply Nat.nlt_ge in Hni.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+...
 progress unfold angle_leb.
 rewrite <- angle_mul_succ_l.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
@@ -8630,6 +8633,7 @@ destruct m. {
   }
   destruct i. {
     cbn in H.
+...
 Theorem angle_eq_mul_0_r :
   ∀ n θ, (n * θ)%A = 0%A → n mod 2 = 1 → ((n - 1) * θ = angle_straight)%A.
 Proof.
