@@ -46,6 +46,31 @@ rewrite Nat.add_comm in Hab; cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
+Theorem Nat_div_less_small_iff : ∀ n a b,
+  b ≠ 0
+  → n * b ≤ a < (n + 1) * b
+  ↔ a / b = n.
+Proof.
+intros * Hbz.
+split; intros Hab. {
+  replace a with (a - n * b + n * b) at 1 by now apply Nat.sub_add.
+  rewrite Nat.div_add; [ | easy ].
+  replace n with (0 + n) at 3 by easy; f_equal.
+  apply Nat.div_small.
+  apply Nat.add_lt_mono_r with (p := n * b).
+  rewrite Nat.add_comm in Hab; cbn in Hab.
+  now rewrite Nat.sub_add.
+} {
+  specialize (Nat.div_mod a b Hbz) as H1.
+  rewrite Hab, Nat.mul_comm in H1.
+  rewrite H1.
+  split; [ apply Nat.le_add_r | ].
+  rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
+  apply Nat.add_lt_mono_l.
+  now apply Nat.mod_upper_bound.
+}
+Qed.
+
 Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
 Proof.
 intros * Ha.

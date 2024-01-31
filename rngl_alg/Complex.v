@@ -8648,7 +8648,7 @@ destruct m. {
     destruct m. {
 Search (_ / _ = _).
 About Nat_div_interv.
-About Nat_div_less_small.
+About Nat_div_less_small_iff.
 ...
 Nat_div_interv :     ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
 Nat_div_less_small : ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
