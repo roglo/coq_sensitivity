@@ -23,7 +23,6 @@ Theorem rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -81,7 +80,6 @@ Theorem angle_add_overflow_le_lemma_1 :
   → (rngl_cos (θ1 + θ3) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32 H12.
@@ -184,7 +182,6 @@ Theorem angle_add_overflow_le_lemma_2 :
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hco1 Hzs1 Hzs2 Hc1z Hzs12.
@@ -329,7 +326,6 @@ Theorem angle_add_overflow_le_lemma_4 :
   → (rngl_cos (θ1 + θ3) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13.
 destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc1o| Hc1o]. {
   apply eq_rngl_cos_opp_1 in Hc1o.
@@ -529,7 +525,6 @@ Theorem angle_add_overflow_le_lemma_6 :
   → False.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzs12 H12.
@@ -632,7 +627,6 @@ Theorem angle_add_overflow_le_lemma_7 :
   → False.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hzs1 Hzc2 Hzs3 Hzc1 Hzs2 Hzc3 Hzs12 Hzs13 H32.
 change_angle_opp θ3.
 sin_cos_opp_hyp T Hzs3.
@@ -686,7 +680,6 @@ Theorem angle_add_overflow_le_lemma_8 :
   → False.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32.
 destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
@@ -798,7 +791,6 @@ Theorem angle_add_overflow_le_lemma_9 :
   → False.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13 H32.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
@@ -996,7 +988,6 @@ Theorem angle_add_overflow_le_lemma_111 :
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * H12 Hzs1 Hzs2 Hzs12.
@@ -1106,7 +1097,6 @@ Theorem angle_add_overflow_le_lemma_11 :
   → (rngl_cos θ1 ≤ rngl_cos (θ1 + θ2))%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hzs1 Hzs2 Hzs12.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   change_angle_add_r θ1 angle_right.
@@ -1161,7 +1151,6 @@ Theorem angle_add_overflow_le :
   → angle_add_overflow θ1 θ3 = false.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.

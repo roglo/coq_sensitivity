@@ -53,6 +53,7 @@ Ltac destruct_ac :=
   set (Hop := ac_op);
   set (Hed := ac_ed);
   set (Hor := ac_or);
+  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos;
   specialize ac_on as Hon;
   specialize ac_iv as Hiv;
   specialize ac_c2 as Hc2.
@@ -127,9 +128,9 @@ destruct on; [ | easy ].
 destruct op; [ | easy ].
 destruct ic; [ | easy ].
 destruct ed; [ cbn | easy ].
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_squ_opp Hop).
 progress unfold rngl_squ.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 rewrite rngl_add_0_r.
@@ -320,7 +321,6 @@ Proof.
 intros.
 destruct_ac.
 progress unfold cos2_sin2_prop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite Hon, Hop, Hic, Hed.
 apply Bool.orb_true_iff; right.
 assert (Hε : (ε² = 1)%L). {
@@ -593,7 +593,6 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
   rewrite rngl_add_0_l.
   apply rngl_cos_bound.
 }
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1, (H1 √_)%L.
@@ -642,7 +641,6 @@ Theorem eq_rngl_sin_0 :
 Proof.
 destruct_ac.
 intros * Hθ.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct θ as (c, s, Hcs).
 cbn in Hθ |-*.
 subst s; cbn.
@@ -747,7 +745,6 @@ Qed.
 Theorem angle_add_0_r : ∀ θ, (θ + 0 = θ)%A.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
@@ -787,7 +784,6 @@ Qed.
 Theorem angle_add_opp_diag_l : ∀ θ, (- θ + θ = 0)%A.
 Proof.
 destruct_ac; intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_opp_l Hop).
 progress unfold rngl_sub.
@@ -804,7 +800,6 @@ Qed.
 Theorem angle_add_sub : ∀ θ1 θ2, (θ1 + θ2 - θ2)%A = θ1.
 Proof.
 destruct_ac; intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 rewrite angle_add_opp_r.
@@ -815,7 +810,6 @@ Qed.
 Theorem angle_sub_add : ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
 Proof.
 destruct_ac; intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 rewrite angle_add_opp_diag_l.
@@ -914,7 +908,6 @@ Theorem angle_sub_move_l :
 Proof.
 destruct_ac.
 intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 split; intros Ha. {
   subst θ3; symmetry.
   rewrite (angle_sub_sub_distr Hic Hop).
@@ -1080,7 +1073,6 @@ Theorem rngl_sin_nonneg_cos_le_sin_le :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hc12.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
@@ -1188,7 +1180,6 @@ Theorem eq_rngl_cos_0 :
 Proof.
 destruct_ac.
 intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 split; intros Hθ; [ | now destruct Hθ; subst θ ].
@@ -1212,7 +1203,6 @@ Theorem eq_rngl_cos_1 : ∀ θ, rngl_cos θ = 1%L ↔ θ = 0%A.
 Proof.
 destruct_ac.
 intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 split; intros Hθ; [ | now subst θ ].
@@ -1231,7 +1221,6 @@ Theorem eq_rngl_cos_opp_1 :
 Proof.
 destruct_ac.
 intros * Hθ.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct θ as (c, s, Hcs).
@@ -1253,7 +1242,6 @@ Theorem eq_rngl_sin_1 :
 Proof.
 destruct_ac.
 intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 split; intros Hθ; [ | now subst θ ].
@@ -1342,7 +1330,6 @@ Theorem rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzc1 Hzc2.
@@ -1481,7 +1468,6 @@ Theorem rngl_add_cos_nonneg_when_sin_nonneg :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hzs3 Hzc1.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -1589,7 +1575,6 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
   intros.
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
@@ -1759,7 +1744,6 @@ apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
 *)
 destruct_ac.
 intros * H12ns Hzs1 Hzs2 Hzs3.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -1923,7 +1907,6 @@ Theorem rngl_sin_sub_nonneg :
 Proof.
 destruct_ac.
 intros * Hs1 Hs2 Hc12.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize rngl_sin_nonneg_cos_le_sin_le as H1.
 specialize (H1 _ _ Hs1 Hs2 Hc12).
 remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
@@ -2072,7 +2055,6 @@ Theorem rngl_sin_nonneg_add_nonneg :
 Proof.
 (*****)
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs3.
@@ -2159,7 +2141,6 @@ Theorem rngl_add_cos_neg_when_sin_nonneg_neg :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hs3z Hzc1.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -2297,7 +2278,6 @@ Theorem rngl_sin_nonneg_sin_nonneg_sin_neg :
 Proof.
 destruct_ac.
 intros * Haov Hzs1 Hzs2 Hzs3.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -2431,7 +2411,6 @@ intros * Hzs1 Hzs2.
 (* proof borrowed from rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub
    and it works: perhaps there is a way to unify these two theorems *)
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cos θ1) * (1 + rngl_cos θ2))%L). {
   intros.
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
@@ -2533,7 +2512,6 @@ Theorem rngl_sin_nonneg_sin_neg_sin_add_neg :
 Proof.
 intros * Hzs1 Hzs2.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -2675,7 +2653,6 @@ Theorem rngl_sin_nonneg_sin_nonneg_add_cos_nonneg :
 Proof.
 intros * Hzs1 Hzs2 Hzc12.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -2915,7 +2892,6 @@ Theorem rngl_sin_nonneg_cos_lt_sin_lt :
 Proof.
 intros * Hzs1 Hzs2 Hc12.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -3014,7 +2990,6 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1 in Hc12z.
   rewrite (H1 (rngl_cos _)) in Hc12z.
@@ -3234,7 +3209,6 @@ Theorem angle_mul_sub_distr_r :
   ∀ a b θ, b ≤ a → ((a - b) * θ = a * θ - b * θ)%A.
 Proof.
 destruct_ac; intros * Hba.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 revert b Hba.
 induction a; intros. {
   apply Nat.le_0_r in Hba; subst b; cbn.
@@ -3260,7 +3234,6 @@ Theorem angle_div_2_mul_2 :
 Proof.
 intros *.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply eq_angle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -3424,7 +3397,6 @@ Theorem angle_eucl_dist_is_sqrt :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cos (θ2 - θ1)))%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 progress unfold angle_eucl_dist.
 f_equal.
@@ -3463,7 +3435,6 @@ Theorem angle_eucl_dist_separation :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
 destruct_ac; intros *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 split; intros H12. 2: {
@@ -3501,7 +3472,6 @@ Theorem angle_eucl_dist_triangular :
 Proof.
 intros *.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
@@ -3543,7 +3513,6 @@ Theorem angle_taxi_dist_separation :
   ∀ θ1 θ2, angle_taxi_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
 destruct_ac; intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold angle_taxi_dist.
 split; intros H12. {
   apply (rngl_eq_add_0 Hor) in H12; cycle 1.
@@ -3568,7 +3537,6 @@ Theorem angle_taxi_dist_triangular :
   (angle_taxi_dist θ1 θ3 ≤ angle_taxi_dist θ1 θ2 + angle_taxi_dist θ2 θ3)%L.
 Proof.
 destruct_ac; intros.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).

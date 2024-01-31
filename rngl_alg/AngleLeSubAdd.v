@@ -31,7 +31,6 @@ Theorem eq_rngl_sin_opp_1 :
 Proof.
 intros Hic Hon Hop Hed * Hθ.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct θ as (c, s, Hcs).
@@ -132,7 +131,6 @@ Theorem rngl_cos_nonneg :
 Proof.
 intros Hon Hop.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -184,7 +182,6 @@ Theorem rngl_cos_nonpos :
 Proof.
 intros Hon Hop.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -254,7 +251,6 @@ Theorem angle_sub_not_overflow_sin_neg_sin_sub_nonneg :
 Proof.
 intros Hic Hon Hop Hed.
 destruct ac as (Hiv, Hc2, Hor).
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hsov Hzs1 Hzs12.
 destruct (rngl_lt_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hs2z]. {
   progress unfold angle_add_overflow in Hsov.
@@ -320,7 +316,6 @@ Theorem rngl_sin_sub_lt_sin_l :
   → (rngl_sin (θ1 - θ2) < rngl_sin θ1)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hc1z Hzs2 Hzc1.
 cbn.
@@ -351,7 +346,6 @@ Theorem angle_le_sub_le_add_l_lemma_1 :
 Proof.
 (* thanks Geoffroy *)
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -504,7 +498,6 @@ Theorem angle_le_sub_le_add_l_lemma_2 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * Haov Hsov H21 Hzs1 Hzs2 Hzs3 Hc2z Hc123 Hzs12 Hzs23.
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -714,7 +707,6 @@ Theorem angle_le_sub_le_add_l_lemma_3 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros θ1 θ2 θ3 Haov Hsov H21 Hzs1 Hzs2 Hzs3 Hzc2 Hzs12 Hzs23.
 destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
@@ -861,7 +853,6 @@ Theorem angle_le_sub_le_add_l_lemma_4 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1059,7 +1050,6 @@ Theorem angle_le_sub_le_add_l_lemma_5 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Haov H21 Hzs1 Hzs2 Hzs3 Hzs12 Hc123 Hzs23.
 progress unfold angle_leb in H21.
@@ -1254,7 +1244,6 @@ Theorem angle_le_sub_le_add_l_lemma_6 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1665,7 +1654,6 @@ Theorem angle_le_sub_le_add_l_lemma_7 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Haov Hsov Hzs1 Hzs3 Hc3z Hzs12 Hzs23 Hc123.
 remember (θ3 + angle_straight)%A as θ eqn:Hθ.
 apply (angle_sub_move_r Hic Hon Hop Hed) in Hθ.
@@ -1943,7 +1931,6 @@ Theorem angle_le_sub_le_add_l_lemma_8 :
 Proof.
 intros Hic Hon Hop Hed.
 destruct_ac.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Haov Hsov Hzs1 Hzs3 Hzs12 Hc123 Hzs23.
 remember (θ1 - angle_straight)%A as θ.
