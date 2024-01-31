@@ -8605,59 +8605,49 @@ destruct zs. {
         cbn - [ div Nat.pow ] in Hzc.
         apply angle_div_4_not_right in Hzc; [ easy | easy | ].
         intros H.
-clear Hzs.
-rewrite Hu in Hzsm.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
-cbn - [ Nat.pow "*"%A ] in Hzsm.
-rewrite Hzc in Hzsm.
-destruct m. {
-  apply (rngl_nlt_ge Hor) in Hzsm.
-  apply Hzsm; clear Hzsm.
-  replace 3 with (2 + 1) by easy.
-  rewrite (angle_mul_add_distr_r Hon Hop).
-  rewrite <- (angle_add_diag Hon Hos).
-  rewrite (angle_right_add_right Hon Hop).
-  rewrite (rngl_sin_add_straight_l Hon Hop).
-  rewrite (angle_mul_1_l Hon Hos).
-  cbn.
-  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-}
-destruct m. {
-  clear Hzsm Hsmu Hcmu.
-  destruct i. {
-    cbn in Hni.
-    replace n with 4 in H by flia Hmi Hni.
-    cbn in H.
-    now rewrite angle_add_0_r in H.
-  }
-  destruct i. {
-    cbn in H, Hzc, Hni.
-    remember (8 / n) as m eqn:Hm.
-    symmetry in Hm.
-    destruct m. {
-      apply Nat.div_small_iff in Hm; [ | flia Hmi ].
-      now apply Nat.nle_gt in Hm.
-    }
-    destruct m. {
-      rewrite (angle_mul_1_l Hon Hos) in H.
-      now apply (eq_angle_div_2_0) in H.
-    }
-    destruct m. {
-      now rewrite angle_div_2_mul_2 in H.
-    }
-    destruct m. {
-Search (_ / _ = _).
-About Nat_div_interv.
-About Nat_div_less_small_iff.
-...
-Nat_div_interv :     ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
-Nat_div_less_small : ∀ n a b : nat, n * b ≤ a < (n + 1) * b → a / b = n
-...
-    apply Nat.div_str_pos_iff in Hni; [ | flia Hmi ].
-Search (_ < _ ↔ _ ≤ _).
-Search (_ ≤ _ ↔ _ < _).
-Search (_ ≤ _ → _ < _).
-apply Nat.div_small_iff in Hni.
+        clear Hzs.
+        rewrite Hu in Hzsm.
+        progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+        cbn - [ Nat.pow "*"%A ] in Hzsm.
+        rewrite Hzc in Hzsm.
+        destruct m. {
+          apply (rngl_nlt_ge Hor) in Hzsm.
+          apply Hzsm; clear Hzsm.
+          replace 3 with (2 + 1) by easy.
+          rewrite (angle_mul_add_distr_r Hon Hop).
+          rewrite <- (angle_add_diag Hon Hos).
+          rewrite (angle_right_add_right Hon Hop).
+          rewrite (rngl_sin_add_straight_l Hon Hop).
+          rewrite (angle_mul_1_l Hon Hos).
+          cbn.
+          apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+        }
+        destruct m. {
+          clear Hzsm Hsmu Hcmu.
+          destruct i. {
+            cbn in Hni.
+            replace n with 4 in H by flia Hmi Hni.
+            cbn in H.
+            now rewrite angle_add_0_r in H.
+          }
+          destruct i. {
+            cbn in H, Hzc, Hni.
+            remember (8 / n) as m eqn:Hm.
+            symmetry in Hm.
+            destruct m. {
+              apply Nat.div_small_iff in Hm; [ | flia Hmi ].
+              now apply Nat.nle_gt in Hm.
+            }
+            destruct m. {
+              rewrite (angle_mul_1_l Hon Hos) in H.
+              now apply (eq_angle_div_2_0) in H.
+            }
+            destruct m. {
+              now rewrite angle_div_2_mul_2 in H.
+            }
+            apply Nat_div_less_small_iff in Hm; [ | flia Hmi ].
+            flia Hm Hmi.
+          }
 ...
 Theorem angle_eq_mul_0_r :
   ∀ n θ, (n * θ)%A = 0%A → n mod 2 = 1 → ((n - 1) * θ = angle_straight)%A.
