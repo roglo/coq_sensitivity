@@ -2584,7 +2584,7 @@ rewrite cos2_sin2_1.
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem rngl_sin_sub_rngl_sin :
   ∀ p q,
   (rngl_sin p - rngl_sin q =
@@ -2602,12 +2602,19 @@ do 4 rewrite (rngl_mul_1_r Hon).
 do 4 rewrite (rngl_mul_0_r Hos).
 do 2 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite rngl_add_0_r.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_comm (_ * _)%L).
-rewrite (rngl_add_opp_l Hop).
+(**)
+rewrite (rngl_mul_comm Hic (rngl_cos p2)).
+rewrite (rngl_add_diag Hon).
+rewrite (rngl_mul_comm Hic (rngl_cos q2)).
+rewrite (rngl_add_diag Hon (_ * _))%L.
+rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_mul_sub_distr_l Hop).
 do 2 rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_sub_sub_distr Hop).
 do 4 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (rngl_cos p2)).
 rewrite <- rngl_mul_assoc.
@@ -2617,33 +2624,22 @@ rewrite fold_rngl_squ.
 rewrite (rngl_mul_mul_swap Hic _ (rngl_cos q2)).
 rewrite fold_rngl_squ.
 rewrite (rngl_mul_mul_swap Hic (rngl_sin p2)).
-rewrite <- (rngl_mul_assoc (rngl_sin p2 * _))%L.
+rewrite <- (rngl_mul_assoc (_ * _))%L.
 rewrite fold_rngl_squ.
-rewrite (rngl_sub_sub_distr Hop).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite (rngl_mul_comm Hic (rngl_sin p2)).
-rewrite <- rngl_mul_add_distr_l.
+do 2 rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_mul_comm Hic (rngl_cos p2)).
 rewrite <- rngl_mul_add_distr_l.
 rewrite cos2_sin2_1.
 rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_mul_mul_swap Hic _ (rngl_sin q2)).
 rewrite <- (rngl_sub_add_distr Hos).
+rewrite (rngl_mul_mul_swap Hic _ (rngl_cos q2)).
 do 2 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_r.
-rewrite (rngl_add_comm _²)%L.
+rewrite rngl_add_comm.
 rewrite cos2_sin2_1.
 rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_comm Hic (rngl_sin q2)).
-rewrite <- rngl_mul_add_distr_l.
-rewrite (rngl_add_diag Hon).
-rewrite (rngl_add_diag Hon (rngl_sin q2)).
-do 2 rewrite rngl_mul_assoc.
-do 2 rewrite (rngl_mul_comm Hic _ 2)%L.
-do 2 rewrite <- rngl_mul_assoc.
-now rewrite <- (rngl_mul_sub_distr_l Hop).
+easy.
 Qed.
-*)
 
 Theorem angle_eucl_dist_cos_sin :
   rngl_has_opp T = true →
