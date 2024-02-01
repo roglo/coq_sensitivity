@@ -8736,12 +8736,27 @@ destruct zs. {
           destruct Hc as (Hc, _).
           now apply (rngl_1_neq_0_iff Hon) in Hc.
         }
+        destruct m. {
+          rewrite <- (angle_add_diag Hon Hos) in Hsmu.
+          rewrite (angle_right_add_right Hon Hop) in Hsmu.
+          cbn in Hsmu.
+          now apply (rngl_lt_irrefl Hor) in Hsmu.
+        }
         destruct s. {
+          apply Nat_div_less_small_iff in Hsn; [ | easy ].
+          cbn - [ "*" "^" ] in Hsn.
+          destruct i; [ cbn in Hsn; flia Hsn | ].
+          destruct i; [ cbn in Hsn; flia Hsn | ].
           destruct i. {
-            cbn in Hsn, Hni.
-            apply Nat_div_less_small_iff in Hsn; [ | easy ].
-            flia Hsn.
-          }
+            destruct n; [ easy | clear Hnz ].
+            destruct n; [ flia Hmi | ].
+            do 2 apply Nat.succ_lt_mono in Hmi.
+            destruct n; [ flia Hmi | ].
+            destruct n; [ cbn in Hsn; flia Hsn | ].
+            destruct n; [ cbn in Hsn; flia Hsn | ].
+            destruct n. {
+              cbn in Hsn.
+              destruct m. {
 ...
 do 2 rewrite Nat.add_0_r in H.
 apply eq_angle_mul_0 in H.
