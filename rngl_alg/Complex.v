@@ -8672,51 +8672,70 @@ destruct zs. {
         cbn - [ div Nat.pow ] in Hzc.
         apply angle_div_4_not_right in Hzc; [ easy | easy | ].
         intros H.
-(**)
-apply eq_angle_eq in H.
-remember (_ * _)%A as x eqn:Hx in H.
-injection H; clear H; intros Hs Hc; subst x.
-(*
-rewrite rngl_cos_cos_mul in Hc.
-rewrite rngl_sin_sin_mul in Hs.
-*)
-remember (2 ^ S (S i) / n) as s eqn:Hsn.
-symmetry in Hsn.
-destruct s. {
-  apply Nat.div_small_iff in Hsn; [ | flia Hmi ].
-  now apply Nat.nle_gt in Hsn.
-}
-destruct s. {
-  cbn in Hc, Hs.
-  rewrite (rngl_mul_1_r Hon) in Hc, Hs.
-  rewrite (rngl_mul_0_r Hos) in Hc, Hs.
-  rewrite (rngl_sub_0_r Hos) in Hc.
-  rewrite rngl_add_0_r in Hs.
-  apply eq_rngl_cos_1 in Hc.
-  now apply eq_angle_div_2_pow_nat_0 in Hc.
-}
-destruct s. {
-  rewrite (rngl_cos_mul_2_l Hon Hos) in Hc.
-  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hs.
-  rewrite <- rngl_mul_assoc in Hs.
-  apply (rngl_eq_mul_0_r Hos Hii) in Hs.
-  2: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  apply (rngl_integral Hos Hid) in Hs.
-  destruct Hs as [Hs| Hs]. {
-    rewrite Hs in Hc.
-    apply eq_rngl_sin_0 in Hs.
-    destruct Hs as [Hs| Hs]. {
-      rewrite Hs in Hzc.
-      do 2 rewrite angle_0_div_2 in Hzc.
-      rewrite (angle_mul_0_r Hon Hos) in Hzc.
-      symmetry in Hzc.
-      now apply (angle_right_neq_0 Hc1) in Hzc.
-    }
-    clear Hzc Hc.
-Search (_ / ₂^_ = angle_straight)%A.
-...
-Search (2 * (_ / ₂^_))%A.
-Search (rngl_cos (2 * _)).
+        apply eq_angle_eq in H.
+        remember (_ * _)%A as x eqn:Hx in H.
+        injection H; clear H; intros Hs Hc; subst x.
+        (*
+        rewrite rngl_cos_cos_mul in Hc.
+        rewrite rngl_sin_sin_mul in Hs.
+        *)
+        remember (2 ^ S (S i) / n) as s eqn:Hsn.
+        symmetry in Hsn.
+        destruct s. {
+          apply Nat.div_small_iff in Hsn; [ | flia Hmi ].
+          now apply Nat.nle_gt in Hsn.
+        }
+        destruct s. {
+          cbn in Hc, Hs.
+          rewrite (rngl_mul_1_r Hon) in Hc, Hs.
+          rewrite (rngl_mul_0_r Hos) in Hc, Hs.
+          rewrite (rngl_sub_0_r Hos) in Hc.
+          rewrite rngl_add_0_r in Hs.
+          apply eq_rngl_cos_1 in Hc.
+          now apply eq_angle_div_2_pow_nat_0 in Hc.
+        }
+        destruct s. {
+          rewrite (rngl_cos_mul_2_l Hon Hos) in Hc.
+          rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hs.
+          rewrite <- rngl_mul_assoc in Hs.
+          apply (rngl_eq_mul_0_r Hos Hii) in Hs.
+          2: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+          apply (rngl_integral Hos Hid) in Hs.
+          destruct Hs as [Hs| Hs]. {
+            rewrite Hs in Hc.
+            apply eq_rngl_sin_0 in Hs.
+            destruct Hs as [Hs| Hs]. {
+              rewrite Hs in Hzc.
+              do 2 rewrite angle_0_div_2 in Hzc.
+              rewrite (angle_mul_0_r Hon Hos) in Hzc.
+              symmetry in Hzc.
+              now apply (angle_right_neq_0 Hc1) in Hzc.
+            }
+            clear Hzc Hc.
+            destruct i. {
+              cbn in Hni, Hsn.
+              apply Nat_div_less_small_iff in Hsn; [ | flia Hmi ].
+              cbn in Hsn.
+              rewrite Nat.add_0_r in Hsn.
+              flia Hmi Hni Hsn.
+            }
+            cbn in Hs.
+            now apply (angle_div_2_not_straight Hc1) in Hs.
+          }
+          rewrite Hs in Hc.
+          rewrite (rngl_squ_0 Hos) in Hc.
+          rewrite (rngl_sub_0_l Hop) in Hc.
+          symmetry in Hc.
+          apply (rngl_add_move_0_r Hop) in Hc.
+          apply (rngl_eq_add_0 Hor) in Hc; cycle 1. {
+            apply (rngl_0_le_1 Hon Hop Hor).
+          } {
+            apply (rngl_squ_nonneg Hop Hor).
+          }
+          destruct Hc as (Hc, _).
+          now apply (rngl_1_neq_0_iff Hon) in Hc.
+        }
+        destruct s. {
 ...
 do 2 rewrite Nat.add_0_r in H.
 apply eq_angle_mul_0 in H.
