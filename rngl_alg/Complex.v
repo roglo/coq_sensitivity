@@ -8627,6 +8627,7 @@ destruct zs. {
         now apply (rngl_mul_pos_neg Hop Hor Hid).
       }
       symmetry in Hzc.
+      assert (Hnz : n ≠ 0) by flia Hmi.
       apply eq_rngl_cos_0 in Hzc.
       destruct Hzc as [Hzc| Hzc]. {
         rewrite Hzc in Hsmu, Hcmu.
@@ -8682,7 +8683,7 @@ destruct zs. {
         remember (2 ^ S (S i) / n) as s eqn:Hsn.
         symmetry in Hsn.
         destruct s. {
-          apply Nat.div_small_iff in Hsn; [ | flia Hmi ].
+          apply Nat.div_small_iff in Hsn; [ | easy ].
           now apply Nat.nle_gt in Hsn.
         }
         destruct s. {
@@ -8714,7 +8715,7 @@ destruct zs. {
             clear Hzc Hc.
             destruct i. {
               cbn in Hni, Hsn.
-              apply Nat_div_less_small_iff in Hsn; [ | flia Hmi ].
+              apply Nat_div_less_small_iff in Hsn; [ | easy ].
               cbn in Hsn.
               rewrite Nat.add_0_r in Hsn.
               flia Hmi Hni Hsn.
@@ -8736,6 +8737,11 @@ destruct zs. {
           now apply (rngl_1_neq_0_iff Hon) in Hc.
         }
         destruct s. {
+          destruct i. {
+            cbn in Hsn, Hni.
+            apply Nat_div_less_small_iff in Hsn; [ | easy ].
+            flia Hsn.
+          }
 ...
 do 2 rewrite Nat.add_0_r in H.
 apply eq_angle_mul_0 in H.
