@@ -55,9 +55,9 @@ destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros  * Hs1z Hs2z Hc1z Hc2z.
 cbn.
-apply (rngl_add_pos_nonneg Hor).
-now apply (rngl_mul_pos_pos Hop Hor Hii).
+apply (rngl_add_nonneg_pos Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
 Theorem rngl_sin_add_pos_2 :
@@ -72,9 +72,9 @@ destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros  * Hs1z Hs2z Hc1z Hc2z.
 cbn.
-apply (rngl_add_nonneg_pos Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
+apply (rngl_add_pos_nonneg Hor).
 now apply (rngl_mul_pos_pos Hop Hor Hii).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_cos_add_nonneg :
@@ -314,10 +314,10 @@ destruct zs2. {
   destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
     cbn.
     apply (rngl_add_nonpos_nonpos Hor).
+    apply (rngl_mul_nonneg_nonpos Hop Hor); [ | easy ].
+    now apply (rngl_lt_le_incl Hor).
     apply (rngl_mul_nonneg_nonpos Hop Hor).
     now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
-    apply (rngl_mul_nonneg_nonpos Hop Hor); [ | easy ].
     now apply (rngl_lt_le_incl Hor).
   }
   apply (rngl_nle_gt Hor) in Hzc2.
@@ -928,14 +928,14 @@ apply (rngl_nle_gt Hor) in Hc1z.
 destruct (rngl_le_dec Hor (rngl_sin θ1) 0)%L as [Hs1z| Hzs1]. {
   apply (rngl_add_nonpos_nonpos Hor); cbn.
   apply (rngl_add_nonpos_nonpos Hor); cbn.
-  apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
-  now apply (rngl_lt_le_incl Hor).
   apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
-  apply (rngl_add_nonpos_nonpos Hor); cbn.
   apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
   now apply (rngl_lt_le_incl Hor).
+  apply (rngl_add_nonpos_nonpos Hor); cbn.
   now apply (rngl_mul_nonpos_nonneg Hop Hor).
+  apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
 }
 exfalso.
 apply (rngl_nle_gt Hor) in Hzs1.
@@ -1089,6 +1089,7 @@ cbn.
 rewrite rngl_add_assoc.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_sub_mul_r_diag_r Hon Hop).
 apply (rngl_add_pos_nonneg Hor).
 apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
@@ -1178,7 +1179,6 @@ apply (rngl_lt_iff Hor).
 split. {
   cbn.
   rewrite rngl_add_assoc.
-  rewrite rngl_add_add_swap.
   rewrite (rngl_add_mul_r_diag_l Hon).
   apply (rngl_add_nonneg_nonneg Hor).
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
@@ -1636,6 +1636,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
     apply (rngl_nlt_ge Hor) in H.
     apply H; clear H.
     cbn.
+    rewrite rngl_add_comm.
     eapply (rngl_le_lt_trans Hor). {
       apply (rngl_add_le_mono_l Hop Hor).
       apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
@@ -2773,10 +2774,11 @@ apply Hc12s13; clear Hc12s13.
 destruct (rngl_le_dec Hor (rngl_cos θ3) (rngl_cos θ2)) as [Hc32| Hc23]. {
   cbn.
   rewrite (rngl_mul_opp_r Hop).
-  rewrite (rngl_add_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
   apply (rngl_le_sub_le_add_l Hop Hor).
   rewrite rngl_add_assoc.
   apply (rngl_le_0_sub Hop Hor).
+  rewrite rngl_add_add_swap.
   rewrite <- (rngl_add_sub_assoc Hop).
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite <- rngl_mul_add_distr_l.
@@ -2826,15 +2828,16 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) (rngl_cos θ3)) as [Hc23| Hc32]. {
   rewrite (rngl_mul_opp_r Hop).
   rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_sub_opp_r Hop).
-  rewrite rngl_add_add_swap.
-  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_add_sub_swap Hop).
   rewrite <- (rngl_mul_sub_distr_l Hop).
-  apply (rngl_add_nonneg_nonneg Hor).
-  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_add_nonneg_nonneg Hor). {
+      apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+      now apply (rngl_le_0_sub Hop Hor).
+    }
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_le_0_sub Hop Hor).
 }
 apply (rngl_nle_gt Hor) in Hc32.
 apply (rngl_le_0_sub Hop Hor).

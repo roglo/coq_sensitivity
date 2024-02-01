@@ -57,6 +57,7 @@ Theorem rngl_sin_sub_nonneg_sin_le_sin :
 Proof.
 destruct_ac; intros * Hzs1 Hcs1 Hzs12.
 cbn in Hzs12.
+rewrite rngl_add_comm in Hzs12.
 rewrite (rngl_mul_opp_r Hop) in Hzs12.
 rewrite (rngl_add_opp_l Hop) in Hzs12.
 apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
@@ -120,7 +121,7 @@ rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_sub_diag Hos).
 f_equal.
 rewrite (rngl_squ_opp_1 Hon Hop).
-apply rngl_add_0_r.
+apply rngl_add_0_l.
 Qed.
 
 (*
@@ -320,7 +321,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hc1z Hzs2 Hzc1.
 cbn.
 rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_add_opp_r Hop).
 apply (rngl_lt_sub_lt_add_r Hop Hor).
 eapply (rngl_le_lt_trans Hor _ (rngl_sin θ1)). {
   apply (rngl_le_0_sub Hop Hor).
@@ -413,7 +414,7 @@ destruct (rngl_eq_dec Hed (rngl_cos θ2) 0) as [Hc2z| Hc2z]. {
   exfalso.
   cbn in Hc123.
   rewrite (rngl_mul_opp_r Hop) in Hc123.
-  rewrite (rngl_add_opp_l Hop) in Hc123.
+  rewrite (rngl_add_opp_r Hop) in Hc123.
   apply (rngl_le_sub_le_add_r Hop Hor) in Hc123.
   apply (rngl_nlt_ge Hor) in Hzs23.
   apply Hzs23; clear Hzs23; cbn.
@@ -440,9 +441,10 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos (θ2 + θ3)))
   }
   cbn in Hs123 |-*.
   rewrite (rngl_mul_opp_r Hop) in Hs123.
-  rewrite (rngl_add_opp_l Hop) in Hs123.
+  rewrite (rngl_add_opp_r Hop) in Hs123.
   apply (rngl_le_sub_le_add_l Hop Hor) in Hs123.
   rewrite rngl_mul_add_distr_r.
+  rewrite rngl_add_comm.
   rewrite (rngl_mul_mul_swap Hic).
   rewrite fold_rngl_squ.
   specialize (cos2_sin2_1 θ2) as H1.
@@ -470,9 +472,9 @@ apply (rngl_lt_le_incl Hor) in Hc1z, Hc231.
 apply H1; try easy.
 cbn.
 apply (rngl_add_nonneg_nonneg Hor). {
-  apply (rngl_lt_le_incl Hor) in Hc3z.
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
+  apply (rngl_lt_le_incl Hor) in Hc3z.
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
 Qed.
