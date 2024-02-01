@@ -7714,7 +7714,6 @@ subst θ2.
 apply angle_le_refl.
 Qed.
 
-(* to be completed
 Theorem angle_dist_le_r :
   ∀ θ1 θ2 θ3,
   (θ3 ≤ angle_straight)%A
@@ -7884,6 +7883,7 @@ destruct (rngl_le_dec Hor (rngl_sin θ1) (rngl_cos θ2)) as [Hs1c2| Hc2s1]. {
   rewrite rngl_add_assoc.
   rewrite (rngl_add_opp_r Hop).
   rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_add_sub_swap Hop).
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite <- rngl_add_assoc.
   rewrite <- rngl_mul_add_distr_l.
@@ -7916,7 +7916,6 @@ apply Hc31z; clear Hc31z.
 apply (rngl_lt_le_incl Hor) in Hc1z, Hc3z.
 now apply rngl_cos_sub_nonneg.
 Qed.
-*)
 
 Theorem angle_dist_le_l :
   ∀ θ1 θ2 θ3,
