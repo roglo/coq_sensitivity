@@ -8104,7 +8104,6 @@ apply (rngl_lt_le_incl Hor) in Hc3z, Hc1z.
 now apply rngl_cos_sub_nonneg.
 Qed.
 
-(* to be completed
 Theorem angle_lim_le :
   ∀ u θ θ',
   (θ ≤ angle_straight)%A
@@ -8139,7 +8138,6 @@ apply angle_dist_le_r; [ easy | ].
 split; [ easy | ].
 now apply angle_lt_le_incl.
 Qed.
-*)
 
 Theorem angle_lim_ge :
   ∀ u θ θ',
@@ -8403,7 +8401,6 @@ apply Nat_mul_le_pos_r.
 now apply -> Nat.succ_le_mono.
 Qed.
 
-(* to be completed
 Theorem angle_lim_seq_angle_le :
   ∀ n θ θ',
   angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
@@ -8425,7 +8422,6 @@ eapply angle_le_trans.
 apply angle_mul_div_succ_succ_le.
 apply IHn.
 Qed.
-*)
 
 Theorem angle_div_4_not_right :
   rngl_characteristic T ≠ 1
@@ -8586,10 +8582,10 @@ destruct zs. {
         apply (rngl_nlt_ge Hor) in Hzsm.
         apply Hzsm; clear Hzsm.
         cbn.
-        apply (rngl_add_neg_nonpos Hop Hor). {
-          now apply (rngl_mul_pos_neg Hop Hor Hid).
+        apply (rngl_add_nonpos_neg Hop Hor). {
+          now apply (rngl_mul_nonneg_nonpos Hop Hor).
         }
-        now apply (rngl_mul_nonneg_nonpos Hop Hor).
+        now apply (rngl_mul_pos_neg Hop Hor Hid).
       }
       symmetry in Hzc.
       apply eq_rngl_cos_0 in Hzc.
