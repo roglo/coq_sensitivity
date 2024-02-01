@@ -8477,6 +8477,44 @@ split; [ now rewrite <- rngl_cos_add | ].
 now rewrite <- rngl_sin_add.
 Qed.
 
+Fixpoint rngl_cos_mul n θ :=
+  match n with
+  | 0 => 1%L
+  | S n' =>
+      (rngl_cos θ * rngl_cos_mul n' θ - rngl_sin θ * rngl_sin_mul n' θ)%L
+  end
+with rngl_sin_mul n θ :=
+  match n with
+  | 0 => 0%L
+  | S n' =>
+      (rngl_sin θ * rngl_cos_mul n' θ + rngl_cos θ * rngl_sin_mul n' θ)%L
+  end.
+
+Theorem rngl_cos_mul_sin_mul :
+  ∀ n θ,
+  rngl_cos (n * θ) = rngl_cos_mul n θ ∧
+  rngl_sin (n * θ) = rngl_sin_mul n θ.
+Proof.
+intros.
+induction n; intros; [ easy | cbn ].
+destruct IHn as (Hc, Hs).
+now rewrite Hc, Hs.
+Qed.
+
+Theorem rngl_cos_cos_mul :
+  ∀ n θ, rngl_cos (n * θ) = rngl_cos_mul n θ.
+Proof.
+intros.
+apply rngl_cos_mul_sin_mul.
+Qed.
+
+Theorem rngl_sin_sin_mul :
+  ∀ n θ, rngl_sin (n * θ) = rngl_sin_mul n θ.
+Proof.
+intros.
+apply rngl_cos_mul_sin_mul.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8513,6 +8551,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros * Hu Hlim i.
@@ -8637,46 +8676,47 @@ destruct zs. {
 apply eq_angle_eq in H.
 remember (_ * _)%A as x eqn:Hx in H.
 injection H; clear H; intros Hs Hc; subst x.
-Search (rngl_cos (_ / ₂^_)).
-
-Fixpoint rngl_cos_mul n θ :=
-  match n with
-  | 0 => 1%L
-  | S n' =>
-      (rngl_cos θ * rngl_cos_mul n' θ - rngl_sin θ * rngl_sin_mul n' θ)%L
-  end
-with rngl_sin_mul n θ :=
-  match n with
-  | 0 => 0%L
-  | S n' =>
-      (rngl_sin θ * rngl_cos_mul n' θ + rngl_cos θ * rngl_sin_mul n' θ)%L
-  end.
-
-About angle_add.
+(*
+rewrite rngl_cos_cos_mul in Hc.
+rewrite rngl_sin_sin_mul in Hs.
+*)
+remember (2 ^ S (S i) / n) as s eqn:Hsn.
+symmetry in Hsn.
+destruct s. {
+  apply Nat.div_small_iff in Hsn; [ | flia Hmi ].
+  now apply Nat.nle_gt in Hsn.
+}
+destruct s. {
+  cbn in Hc, Hs.
+  rewrite (rngl_mul_1_r Hon) in Hc, Hs.
+  rewrite (rngl_mul_0_r Hos) in Hc, Hs.
+  rewrite (rngl_sub_0_r Hos) in Hc.
+  rewrite rngl_add_0_r in Hs.
+  apply eq_rngl_cos_1 in Hc.
+  now apply eq_angle_div_2_pow_nat_0 in Hc.
+}
+destruct s. {
+  rewrite (rngl_cos_mul_2_l Hon Hos) in Hc.
+  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hs.
+  rewrite <- rngl_mul_assoc in Hs.
+  apply (rngl_eq_mul_0_r Hos Hii) in Hs.
+  2: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  apply (rngl_integral Hos Hid) in Hs.
+  destruct Hs as [Hs| Hs]. {
+    rewrite Hs in Hc.
+    apply eq_rngl_sin_0 in Hs.
+    destruct Hs as [Hs| Hs]. {
+      rewrite Hs in Hzc.
+      do 2 rewrite angle_0_div_2 in Hzc.
+      rewrite (angle_mul_0_r Hon Hos) in Hzc.
+      symmetry in Hzc.
+      now apply (angle_right_neq_0 Hc1) in Hzc.
+    }
+    clear Hzc Hc.
+Search (_ / ₂^_ = angle_straight)%A.
 ...
-
-Theorem glop :
-  ∀ n θ,
-  rngl_cos (n * θ) = rngl_cos_mul n θ ∧
-  rngl_sin (n * θ) = rngl_sin_mul n θ.
-Proof.
-intros.
-induction n; intros; [ easy | cbn ].
-destruct IHn as (Hc, Hs).
-rewrite Hc, Hs.
-split; [ easy | ].
-...
-  rewrite angle_mul_succ_l.
-  cbn.
-Check rngl_cos_sub_right_r.
-rewrite <- (rngl_cos_sub_right_r Hon Hop (n * θ))%A.
-
-Check rngl_sin_add.
-
-...
-  cbn.
-...
-
+Search (2 * (_ / ₂^_))%A.
+Search (rngl_cos (2 * _)).
 ...
 do 2 rewrite Nat.add_0_r in H.
 apply eq_angle_mul_0 in H.
