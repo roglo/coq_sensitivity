@@ -8449,6 +8449,37 @@ rewrite angle_div_2_mul_2 in H.
 now symmetry in H.
 Qed.
 
+Theorem eq_angle_mul_0 :
+  ∀ n θ,
+  (n * θ)%A = 0%A
+  ↔ n = 0 ∨ rngl_cos (n * θ) = 1%L ∧ rngl_sin (n * θ) = 0%L.
+Proof.
+intros.
+split; intros Hnt. {
+  induction n; [ now left | right ].
+  cbn in Hnt.
+  progress unfold angle_add in Hnt.
+  injection Hnt; clear Hnt; intros Hs Hc.
+  rewrite <- rngl_cos_add in Hc.
+  rewrite rngl_add_comm in Hs.
+  rewrite <- rngl_sin_add in Hs.
+  rewrite <- angle_mul_succ_l in Hs, Hc.
+  easy.
+}
+destruct Hnt as [Hnt| Hnt]. {
+  subst n.
+  apply angle_mul_0_l.
+}
+destruct Hnt as (Hc, Hs).
+induction n; [ easy | cbn ].
+progress unfold angle_add.
+apply eq_angle_eq; cbn.
+apply pair_equal_spec.
+split; [ now rewrite <- rngl_cos_add | ].
+rewrite rngl_add_comm.
+now rewrite <- rngl_sin_add.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8605,6 +8636,19 @@ destruct zs. {
         cbn - [ div Nat.pow ] in Hzc.
         apply angle_div_4_not_right in Hzc; [ easy | easy | ].
         intros H.
+(**)
+apply eq_angle_eq in H.
+cbn in H.
+...
+do 2 rewrite Nat.add_0_r in H.
+apply eq_angle_mul_0 in H.
+destruct H as [H| H]. {
+  apply Nat.div_small_iff in H; [ | flia Hmi ].
+  now apply Nat.nle_gt in H.
+}
+destruct H as (Hc, Hs).
+cbn in Hc.
+...
         clear Hzs.
         rewrite Hu in Hzsm.
         progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
@@ -8644,6 +8688,52 @@ destruct zs. {
             }
             destruct m. {
               now rewrite angle_div_2_mul_2 in H.
+            }
+            apply Nat_div_less_small_iff in Hm; [ | flia Hmi ].
+            flia Hm Hmi.
+          }
+          destruct i. {
+            cbn in H, Hzc, Hni.
+            remember (16 / n) as m eqn:Hm.
+            symmetry in Hm.
+            destruct m. {
+              apply Nat.div_small_iff in Hm; [ | flia Hmi ].
+              now apply Nat.nle_gt in Hm.
+            }
+            destruct m. {
+              rewrite (angle_mul_1_l Hon Hos) in H.
+              apply (eq_angle_div_2_0) in H.
+              now apply (eq_angle_div_2_0) in H.
+            }
+            destruct m. {
+              rewrite angle_div_2_mul_2 in H.
+              now apply (eq_angle_div_2_0) in H.
+            }
+            destruct m. {
+              apply Nat_div_less_small_iff in Hm; [ | flia Hmi ].
+              cbn - [ "*" ] in Hm.
+              destruct n; [ flia Hm | ].
+              destruct n; [ flia Hm | ].
+              destruct n; [ flia Hm | ].
+              destruct n; [ flia Hm | ].
+              destruct n; [ flia Hm | ].
+              destruct n. {
+                cbn in Hm.
+apply eq_angle_mul_0 in H.
+...
+(*
+θ = 8π/3 = (6π+2π)/3 = 2π/3
+θ/2 = π/3
+θ/2/2 = π/6
+3*(θ/2/2) = π/2
+*)
+...
+              rewrite Nat.mul_add_distr_l in Hm.
+cbn in Hm.
+flia Hni Hm.
+...
+              rewrite angle_div_2_mul_2 in H.
+              now apply (eq_angle_div_2_0) in H.
             }
             apply Nat_div_less_small_iff in Hm; [ | flia Hmi ].
             flia Hm Hmi.
