@@ -2584,7 +2584,6 @@ rewrite cos2_sin2_1.
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
-(* to be completed *)
 Theorem rngl_sin_sub_rngl_sin :
   ∀ p q,
   (rngl_sin p - rngl_sin q =
@@ -2602,7 +2601,6 @@ do 4 rewrite (rngl_mul_1_r Hon).
 do 4 rewrite (rngl_mul_0_r Hos).
 do 2 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite rngl_add_0_r.
-(**)
 rewrite (rngl_mul_comm Hic (rngl_cos p2)).
 rewrite (rngl_add_diag Hon).
 rewrite (rngl_mul_comm Hic (rngl_cos q2)).
@@ -7516,7 +7514,6 @@ progress unfold seq_angle_converging_to_angle_div_nat.
 ...
 *)
 
-(* to be completed
 Theorem angle_add_diag_not_overflow :
   rngl_characteristic T ≠ 1 →
   ∀ θ,
@@ -7554,7 +7551,7 @@ split; intros Hθ. {
   subst x.
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply rngl_cos_bound ].
   cbn in Hzst.
-  rewrite (rngl_mul_comm Hic) in Hzst.
+  rewrite (rngl_mul_comm Hic (rngl_cos θ)) in Hzst.
   rewrite (rngl_add_diag Hon) in Hzst.
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
   destruct Hzst as [(_, Hzst)| (H, _)]. 2: {
@@ -7633,7 +7630,6 @@ split; intros Hθ. {
   now apply (rngl_mul_neg_neg Hop Hor Hii).
 }
 Qed.
-*)
 
 Theorem angle_mul_succ_l : ∀ n θ, (S n * θ = θ + n * θ)%A.
 Proof. easy. Qed.
