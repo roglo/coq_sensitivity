@@ -8615,11 +8615,30 @@ destruct zs. {
     progress unfold rngl_squ.
     rewrite rngl_mul_assoc.
     rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-    rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
-    destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
-      apply (rngl_mul_le_compat_nonneg Hop Hor). {
-        split. {
-          apply (rngl_le_0_sub Hop Hor).
+    remember (rngl_cos (u i)) as x eqn:Hx.
+    destruct (rngl_le_dec Hor 0 x) as [Hzc| Hcz]. {
+      destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
+        rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
+        apply (rngl_mul_le_compat_nonneg Hop Hor). {
+          split; [ easy | ].
+          apply (rngl_le_sub_le_add_r Hop Hor).
+          rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+            apply (rngl_0_le_2 Hon Hop Hor).
+          }
+          subst x; apply rngl_cos_bound.
+        }
+        split; [ easy | ].
+        subst x; apply rngl_cos_bound.
+      }
+      apply (rngl_nle_gt Hor) in H2cz.
+      apply (rngl_le_trans Hor _ 0)%L. 2: {
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      apply (rngl_lt_le_incl Hor) in H2cz.
+      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hcz.
 ...
   destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
     destruct (rngl_le_dec Hor 0 (rngl_sin (m * u i)%A)) as [Hsmu| Hsmu]. {
