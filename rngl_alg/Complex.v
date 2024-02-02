@@ -8675,6 +8675,72 @@ destruct zs. {
       apply (rngl_le_refl Hor).
     }
     destruct m. {
+      rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+      apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+      remember (rngl_cos (u i)) as x eqn:Hx.
+      destruct Hzsm as [(H1, Hzsm)| (H1, H2)]. 2: {
+        destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+          apply eq_rngl_sin_0 in Hxz.
+          destruct Hxz as [Hxz| Hxz]. {
+            rewrite Hxz in Hx; cbn in Hx; subst x.
+            exfalso; apply (rngl_nlt_ge Hor) in H2.
+            apply H2.
+            apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+          } {
+            rewrite Hxz in Hx; cbn in Hx; subst x.
+            exfalso; clear H1 H2 Hzs.
+            rewrite Hu in Hxz.
+            progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+            destruct i; [ cbn in Hni; flia Hni | ].
+            rewrite angle_div_2_pow_nat_succ_r_1 in Hxz.
+            rewrite angle_mul_nat_div_2 in Hxz.
+            now apply (angle_div_2_not_straight Hc1) in Hxz.
+            rewrite Nat.pow_succ_r'.
+            rewrite Nat.mul_comm.
+            apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i * 2 / 2)). 2: {
+              rewrite Nat.div_mul; [ | easy ].
+              apply angle_mul_nat_overflow_pow_div.
+            }
+            now apply Nat.div_le_compat_l.
+          }
+        }
+        exfalso.
+        apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
+        apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        now rewrite rngl_mul_0_r.
+      }
+      (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
+      rewrite (rngl_cos_mul_2_l' Hon Hop).
+clear - Hop Hor Hon Hx Hzsm.
+subst x.
+      remember (rngl_cos (u i)) as x eqn:Hx.
+      apply (rngl_le_sub_le_add_l Hop Hor).
+      apply (rngl_le_sub_le_add_r Hop Hor).
+      progress unfold rngl_squ.
+      rewrite rngl_mul_assoc.
+      rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+      destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
+        rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
+        apply (rngl_mul_le_compat_nonneg Hop Hor). {
+          split; [ easy | ].
+          apply (rngl_le_sub_le_add_r Hop Hor).
+          rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
+          apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+            apply (rngl_0_le_2 Hon Hop Hor).
+          }
+          subst x; apply rngl_cos_bound.
+        }
+        split; [ easy | subst x; apply rngl_cos_bound ].
+      }
+      apply (rngl_nle_gt Hor) in H2cz.
+      apply (rngl_le_trans Hor _ 0)%L. 2: {
+        apply (rngl_0_le_1 Hon Hop Hor).
+      }
+      apply (rngl_lt_le_incl Hor) in H2cz.
+      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+    }
 ...
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
