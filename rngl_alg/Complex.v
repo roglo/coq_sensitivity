@@ -8611,14 +8611,35 @@ destruct zs. {
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
-    rewrite <- rngl_mul_assoc in Hzsm.
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
-    destruct Hzsm as [(_, Hzsm)| (H, H1)]. 2: {
+    remember (rngl_cos (u i)) as x eqn:Hx.
+    destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
+      destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+        apply eq_rngl_sin_0 in Hxz.
+        destruct Hxz as [Hxz| Hxz]. {
+          rewrite Hxz in Hx; cbn in Hx; subst x.
+          exfalso; apply (rngl_nlt_ge Hor) in H2.
+          apply H2.
+          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+        } {
+          rewrite Hxz in Hx; cbn in Hx; subst x.
+....
+          destruct i; [ cbn in Hni; flia Hni | ].
+          progress unfold seq_angle_converging_to_angle_div_nat in Hu.
+          rewrite Hu in Hzs.
+          cbn in Hzs.
+...
+        move Hxz at top; subst x.
+        rewrite (rngl_squ_0 Hos).
+        rewrite (rngl_mul_0_r Hos).
+        rewrite (rngl_sub_0_l Hop).
+        apply (rngl_opp_1_le_0 Hon Hop Hor).
+      }
       exfalso; apply (rngl_nlt_ge Hor) in H.
-      apply H.
+      apply H; clear H.
+      apply rngl_
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    remember (rngl_cos (u i)) as x eqn:Hx.
     (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
     apply (rngl_le_sub_le_add_l Hop Hor).
     apply (rngl_le_sub_le_add_r Hop Hor).
@@ -8637,8 +8658,7 @@ destruct zs. {
           }
           subst x; apply rngl_cos_bound.
         }
-        split; [ easy | ].
-        subst x; apply rngl_cos_bound.
+        split; [ easy | subst x; apply rngl_cos_bound ].
       }
       apply (rngl_nle_gt Hor) in H2cz.
       apply (rngl_le_trans Hor _ 0)%L. 2: {
