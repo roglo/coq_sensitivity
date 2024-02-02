@@ -8724,6 +8724,24 @@ destruct zs. {
       split; [ easy | apply rngl_cos_bound ].
     }
     destruct m; [ clear Hmi | flia Hmi ].
+(* ui = 2π/3 + ε & 3ui = 3ε ⇒ marche pas *)
+progress unfold seq_angle_converging_to_angle_div_nat in Hu.
+(* oui, mais est-ce que ui peut être égal à 2π/3+ε ? Si ça se
+   trouve, non ! *)
+...
+destruct i; [ cbn in Hni; flia Hni | ].
+destruct i; [ cbn in Hni; flia Hni | ].
+destruct i. {
+  clear Hni.
+  rewrite Hu in Hzs, Hzsm |-*.
+  cbn - [ angle_mul_nat ] in Hzsm, Hzs |-*.
+  rewrite (angle_mul_1_l Hon Hos) in Hzsm, Hzs |-*.
+...
+}
+destruct i. {
+  clear Hni.
+  rewrite Hu in Hzs, Hzsm |-*.
+  cbn - [ angle_mul_nat ] in Hzsm, Hzs |-*.
 ...
 (*
     replace 3 with (1 + 2) in Hzsm |-* by easy.
