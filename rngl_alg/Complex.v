@@ -8615,7 +8615,11 @@ destruct zs. {
     progress unfold rngl_squ.
     rewrite rngl_mul_assoc.
     rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-Search (_ * _ ≤ 1)%L.
+    rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
+    destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
+      apply (rngl_mul_le_compat_nonneg Hop Hor). {
+        split. {
+          apply (rngl_le_0_sub Hop Hor).
 ...
   destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
     destruct (rngl_le_dec Hor 0 (rngl_sin (m * u i)%A)) as [Hsmu| Hsmu]. {
