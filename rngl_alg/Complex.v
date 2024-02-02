@@ -8671,32 +8671,9 @@ destruct zs. {
       now rewrite rngl_mul_0_r.
     }
     (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
-apply rngl_2_x2_sub_1_le_x.
-...
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    apply (rngl_le_sub_le_add_r Hop Hor).
-    progress unfold rngl_squ.
-    rewrite rngl_mul_assoc.
-    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-    destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
-      rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
-      apply (rngl_mul_le_compat_nonneg Hop Hor). {
-        split; [ easy | ].
-        apply (rngl_le_sub_le_add_r Hop Hor).
-        rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
-        apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-          apply (rngl_0_le_2 Hon Hop Hor).
-        }
-        subst x; apply rngl_cos_bound.
-      }
-      split; [ easy | subst x; apply rngl_cos_bound ].
-    }
-    apply (rngl_nle_gt Hor) in H2cz.
-    apply (rngl_le_trans Hor _ 0)%L. 2: {
-      apply (rngl_0_le_1 Hon Hop Hor).
-    }
-    apply (rngl_lt_le_incl Hor) in H2cz.
-    now apply (rngl_mul_nonpos_nonneg Hop Hor).
+    apply rngl_2_x2_sub_1_le_x.
+    split; [ easy | ].
+    subst x; apply rngl_cos_bound.
   }
   destruct n. {
     destruct m. {
@@ -8742,17 +8719,11 @@ apply rngl_2_x2_sub_1_le_x.
       }
       (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
       rewrite (rngl_cos_mul_2_l' Hon Hop).
-clear - Hop Hor Hon Hx Hzsm.
-subst x.
-      remember (rngl_cos (u i)) as x eqn:Hx.
-assert (H : (0 ≤ x ≤ 1)%L). {
-  split; [ easy | ].
-  subst x; apply rngl_cos_bound.
-}
-clear Hzsm Hx; rename H into Hx.
-now apply rngl_2_x2_sub_1_le_x.
-...
+      subst x.
+      apply rngl_2_x2_sub_1_le_x.
+      split; [ easy | apply rngl_cos_bound ].
     }
+    destruct m; [ clear Hmi | flia Hmi ].
 ...
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
