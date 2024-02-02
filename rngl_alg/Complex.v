@@ -8725,6 +8725,23 @@ destruct zs. {
     }
     destruct m; [ clear Hmi | flia Hmi ].
 ...
+(*
+    replace 3 with (1 + 2) in Hzsm |-* by easy.
+    rewrite (angle_mul_add_distr_r Hon Hop) in Hzsm |-*.
+    rewrite (angle_mul_1_l Hon Hos) in Hzsm |-*.
+    remember (2 * u i)%A as x.
+    cbn in Hzsm |-*; subst x.
+...
+*)
+cbn.
+cbn in Hzsm.
+remember (rngl_sin (u i)) as s eqn:Hs.
+remember (rngl_cos (u i)) as c eqn:Hc.
+do 2 rewrite (rngl_mul_0_r Hos) in Hzsm |-*.
+rewrite (rngl_sub_0_r Hos) in Hzsm |-*.
+rewrite rngl_add_0_r in Hzsm |-*.
+do 2 rewrite (rngl_mul_1_r Hon) in Hzsm |-*.
+...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 Check quadrant_1_rngl_cos_add_le_cos_l.
 replace 3 with (1 + 2) by easy.
