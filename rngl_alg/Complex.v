@@ -8515,6 +8515,33 @@ intros.
 apply rngl_cos_mul_sin_mul.
 Qed.
 
+Theorem rngl_2_x2_sub_1_le_x :
+  ∀ x, (0 ≤ x ≤ 1)%L → (2 * x² - 1 ≤ x)%L.
+Proof.
+destruct_ac.
+intros * Hx.
+apply (rngl_le_sub_le_add_l Hop Hor).
+apply (rngl_le_sub_le_add_r Hop Hor).
+progress unfold rngl_squ.
+rewrite rngl_mul_assoc.
+rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
+  rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
+  apply (rngl_mul_le_compat_nonneg Hop Hor); [ | easy ].
+  split; [ easy | ].
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
+  apply (rngl_0_le_2 Hon Hop Hor).
+}
+apply (rngl_nle_gt Hor) in H2cz.
+apply (rngl_le_trans Hor _ 0)%L. 2: {
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+apply (rngl_lt_le_incl Hor) in H2cz.
+now apply (rngl_mul_nonpos_nonneg Hop Hor).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8644,6 +8671,8 @@ destruct zs. {
       now rewrite rngl_mul_0_r.
     }
     (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
+apply rngl_2_x2_sub_1_le_x.
+...
     apply (rngl_le_sub_le_add_l Hop Hor).
     apply (rngl_le_sub_le_add_r Hop Hor).
     progress unfold rngl_squ.
@@ -8716,30 +8745,13 @@ destruct zs. {
 clear - Hop Hor Hon Hx Hzsm.
 subst x.
       remember (rngl_cos (u i)) as x eqn:Hx.
-      apply (rngl_le_sub_le_add_l Hop Hor).
-      apply (rngl_le_sub_le_add_r Hop Hor).
-      progress unfold rngl_squ.
-      rewrite rngl_mul_assoc.
-      rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-      destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
-        rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
-        apply (rngl_mul_le_compat_nonneg Hop Hor). {
-          split; [ easy | ].
-          apply (rngl_le_sub_le_add_r Hop Hor).
-          rewrite <- (rngl_mul_1_r Hon 2%L) at 2.
-          apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-            apply (rngl_0_le_2 Hon Hop Hor).
-          }
-          subst x; apply rngl_cos_bound.
-        }
-        split; [ easy | subst x; apply rngl_cos_bound ].
-      }
-      apply (rngl_nle_gt Hor) in H2cz.
-      apply (rngl_le_trans Hor _ 0)%L. 2: {
-        apply (rngl_0_le_1 Hon Hop Hor).
-      }
-      apply (rngl_lt_le_incl Hor) in H2cz.
-      now apply (rngl_mul_nonpos_nonneg Hop Hor).
+assert (H : (0 ≤ x ≤ 1)%L). {
+  split; [ easy | ].
+  subst x; apply rngl_cos_bound.
+}
+clear Hzsm Hx; rename H into Hx.
+now apply rngl_2_x2_sub_1_le_x.
+...
     }
 ...
     destruct m; [ clear Hmi | flia Hmi ].
