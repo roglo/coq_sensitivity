@@ -8561,6 +8561,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hu Hlim i.
 apply angle_all_add_not_overflow.
 intros m Hmi.
+assert (Hnz : n ≠ 0) by flia Hmi.
 remember (θ =? 0)%A as tz eqn:Htz.
 symmetry in Htz.
 destruct tz. {
@@ -8595,6 +8596,27 @@ destruct zs. {
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
+(**)
+  destruct n; [ easy | clear Hnz ].
+  destruct n. {
+    apply Nat.lt_1_r in Hmi; subst m.
+    rewrite (angle_mul_1_l Hon Hos).
+    apply (rngl_le_refl Hor).
+  }
+  destruct n. {
+    destruct m. {
+      rewrite (angle_mul_1_l Hon Hos).
+      apply (rngl_le_refl Hor).
+    }
+    destruct m; [ clear Hmi | flia Hmi ].
+    rewrite (rngl_cos_mul_2_l' Hon Hop).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    progress unfold rngl_squ.
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+Search (_ * _ ≤ 1)%L.
+...
   destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzc| Hcz]. {
     destruct (rngl_le_dec Hor 0 (rngl_sin (m * u i)%A)) as [Hsmu| Hsmu]. {
       destruct (rngl_le_dec Hor 0 (rngl_cos (m * u i)%A)) as [Hcmu| Hcmu]. {
@@ -8627,7 +8649,6 @@ destruct zs. {
         now apply (rngl_mul_pos_neg Hop Hor Hid).
       }
       symmetry in Hzc.
-      assert (Hnz : n ≠ 0) by flia Hmi.
       apply eq_rngl_cos_0 in Hzc.
       destruct Hzc as [Hzc| Hzc]. {
         rewrite Hzc in Hsmu, Hcmu.
