@@ -8725,6 +8725,17 @@ destruct zs. {
     }
     destruct m; [ clear Hmi | flia Hmi ].
 ...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Check quadrant_1_rngl_cos_add_le_cos_l.
+replace 3 with (1 + 2) by easy.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite (angle_mul_1_l Hon Hos).
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+(* aïe aïe aïe *)
+...
+Search (0 ≤ rngl_sin _ → _)%L.
+apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
+...
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
