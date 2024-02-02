@@ -8609,13 +8609,22 @@ destruct zs. {
       apply (rngl_le_refl Hor).
     }
     destruct m; [ clear Hmi | flia Hmi ].
+    rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
+    rewrite <- rngl_mul_assoc in Hzsm.
+    apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+    destruct Hzsm as [(_, Hzsm)| (H, H1)]. 2: {
+      exfalso; apply (rngl_nlt_ge Hor) in H.
+      apply H.
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    remember (rngl_cos (u i)) as x eqn:Hx.
+    (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
     apply (rngl_le_sub_le_add_l Hop Hor).
     apply (rngl_le_sub_le_add_r Hop Hor).
     progress unfold rngl_squ.
     rewrite rngl_mul_assoc.
     rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-    remember (rngl_cos (u i)) as x eqn:Hx.
     destruct (rngl_le_dec Hor 0 x) as [Hzc| Hcz]. {
       destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
         rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
