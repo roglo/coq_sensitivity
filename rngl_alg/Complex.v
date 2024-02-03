@@ -8820,10 +8820,16 @@ destruct n. {
         }
         destruct i. {
           cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
+apply eq_angle_eq in Hzcu.
+remember (5 * (θ / ₂^4))%A as x.
+injection Hzcu; clear Hzcu; intros Hc Hs; subst x.
+...
 (* 5θ/16 = 3π/2 *)
 (* θ = 16.3π/(2.5) = 24π/5 = (20π+4π)/5 = 4π/5 *)
 (* 5θ/16 = 20π/16/5 = 4π/16 = π/4 *)
 (* bin non, ch'comprends rien *)
+(* en fait, on ne peut pas raisonner comme ça *)
+(* car 2π/2=π, mais 0/2=0 *)
 ...
           rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
 ...
