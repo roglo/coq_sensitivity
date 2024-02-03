@@ -8797,9 +8797,10 @@ destruct n. {
         destruct i; [ cbn in Hni; flia Hni | ].
         destruct i; [ cbn in Hni; flia Hni | ].
         destruct i. {
-          cbn in Hzcu.
-          rewrite angle_add_0_r in Hzcu.
+          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
+          rewrite (angle_mul_1_l Hon Hos) in Hzcu.
           specialize (angle_div_2_le_straight (θ / ₂)) as H1.
+          cbn in Hzcu.
           rewrite Hzcu in H1.
           apply angle_nlt_ge in H1.
           apply H1; clear H1.
