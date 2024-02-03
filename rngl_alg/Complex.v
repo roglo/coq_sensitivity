@@ -8753,13 +8753,37 @@ destruct n. {
     }
     apply (rngl_leb_gt Hor) in Hzs.
     apply (rngl_nle_gt Hor) in Hzs.
-    exfalso.
-    apply Hzs; clear Hzs.
-    rewrite Hu.
-    progress unfold seq_angle_converging_to_angle_div_nat.
-    destruct i; [ cbn in Hni; flia Hni | ].
-    rewrite Nat.pow_succ_r'.
-    rewrite Nat.mul_comm.
+    destruct zsm. {
+      exfalso.
+      apply rngl_leb_le in Hzsm.
+      apply Hzs; clear Hzs.
+      rewrite (angle_add_diag Hon Hos) in Hzsm.
+      rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+      destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzcu| Hzcu]. {
+        apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+        destruct Hzsm as [(H1, H2)| (H1, H2)]. {
+          apply (rngl_le_0_mul Hon Hop Hiv Hor) in H1.
+          destruct H1 as [| (H1, H3)]; [ easy | ].
+          exfalso; apply (rngl_nlt_ge Hor) in H1.
+          apply H1; clear H1.
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        apply (rngl_le_antisymm Hor) in Hzcu; [ | easy ].
+        apply eq_rngl_cos_0 in Hzcu.
+        destruct Hzcu as [Hzcu| Hzcu]. {
+          rewrite Hzcu; cbn.
+          apply (rngl_0_le_1 Hon Hop Hor).
+        }
+        exfalso.
+        clear H1 H2 Hmi.
+        rewrite Hu in Hzcu.
+        progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
+...
+      rewrite Hu.
+      progress unfold seq_angle_converging_to_angle_div_nat.
+      destruct i; [ cbn in Hni; flia Hni | ].
+      rewrite Nat.pow_succ_r'.
+      rewrite Nat.mul_comm.
 ...
     rewrite Nat.div_mul; [ | easy ].
     rewrite angle_div_2_pow_nat_succ_r_2.
