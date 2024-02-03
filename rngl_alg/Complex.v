@@ -8824,9 +8824,6 @@ Search (_ * (_ / ₂^_))%A.
 angle_div_2_pow_nat_mul:
   ∀ (n m : nat) (θ : angle T), angle_mul_nat_overflow m θ = false → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A
 *)
-Theorem glop :
-  ∀ n m θ, angle_mul_nat_overflow m θ = false → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A.
-(* non *)
 ...
 rewrite <- angle_div_2_pow_nat_mul in Hzcu; cycle 1. {
   apply Nat.neq_succ_0.
@@ -8837,11 +8834,12 @@ remember (5 * (θ / ₂^4))%A as x.
 injection Hzcu; clear Hzcu; intros Hc Hs; subst x.
 ...
 (* 5θ/16 = 3π/2 *)
-(* θ = 16.3π/(2.5) = 24π/5 = (20π+4π)/5 = 4π/5 *)
-(* 5θ/16 = 20π/16/5 = 4π/16 = π/4 *)
-(* bin non, ch'comprends rien *)
-(* en fait, on ne peut pas raisonner comme ça *)
-(* car 2π/2=π, mais 0/2=0 *)
+(* θ = 16.3π/(2.5) = 24π/5 *)
+(* θ = 24π/5 = (20π+4π)/5 = 4π/5 *)
+(* oui, mais 24π/5 et 4π/5 ne sont pas égaux, ils sont équivalents ;
+   cf les nombres rationels où c'est pareil pour 1/2 et 2/4 *)
+(* 5θ/16 = 24π/16 = 3π/2 ⇒ 24π/5 est racine *)
+(* 5θ/16 = 20π/16/5 = 4π/16 = π/4 ⇒ 4π/5 n'est pas racine *)
 ...
           rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
 ...
