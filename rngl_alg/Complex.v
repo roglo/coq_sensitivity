@@ -8542,6 +8542,24 @@ apply (rngl_lt_le_incl Hor) in H2cz.
 now apply (rngl_mul_nonpos_nonneg Hop Hor).
 Qed.
 
+Theorem angle_straight_lt_opp_right :
+  rngl_characteristic T ≠ 1
+  → (angle_straight < - angle_right)%A.
+Proof.
+destruct_ac.
+intros Hc1.
+progress unfold angle_ltb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+remember (0 ≤? -1)%L as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ exfalso | easy ].
+apply rngl_leb_le in Hx.
+apply (rngl_nlt_ge Hor) in Hx.
+apply Hx; clear Hx.
+apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8778,17 +8796,31 @@ destruct n. {
         clear H1 H2 Hmi.
         rewrite Hu in Hzcu.
         progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
-...
-      rewrite Hu.
-      progress unfold seq_angle_converging_to_angle_div_nat.
-      destruct i; [ cbn in Hni; flia Hni | ].
-      rewrite Nat.pow_succ_r'.
-      rewrite Nat.mul_comm.
-...
-    rewrite Nat.div_mul; [ | easy ].
-    rewrite angle_div_2_pow_nat_succ_r_2.
-    rewrite angle_mul_2_pow_div_2_pow.
-    apply rngl_sin_div_2_nonneg.
+        destruct i; [ cbn in Hni; flia Hni | ].
+        destruct i; [ cbn in Hni; flia Hni | ].
+        destruct i. {
+          cbn in Hzcu.
+          rewrite angle_add_0_r in Hzcu.
+          specialize (angle_div_2_le_straight (θ / ₂)) as H1.
+          rewrite Hzcu in H1.
+          apply angle_nlt_ge in H1.
+          apply H1; clear H1.
+          apply (angle_straight_lt_opp_right Hc1).
+        }
+        destruct i. {
+          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
+          rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
+          rewrite angle_div_2_mul_2 in Hzcu.
+          cbn in Hzcu.
+          specialize (angle_div_2_le_straight (θ / ₂)) as H1.
+          rewrite Hzcu in H1.
+          apply angle_nlt_ge in H1.
+          apply H1; clear H1.
+          apply (angle_straight_lt_opp_right Hc1).
+        }
+        destruct i. {
+          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
+          rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
 ...
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
