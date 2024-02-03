@@ -8820,6 +8820,11 @@ destruct n. {
         }
         destruct i. {
           cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
+(* 5θ/16 = 3π/2 *)
+(* θ = 16.3π/(2.5) = 24π/5 = (20π+4π)/5 = 4π/5 *)
+(* 5θ/16 = 20π/16/5 = 4π/16 = π/4 *)
+(* bin non, ch'comprends rien *)
+...
           rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
 ...
 progress unfold angle_add_overflow.
