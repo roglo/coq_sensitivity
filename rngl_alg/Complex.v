@@ -8819,11 +8819,41 @@ destruct n. {
         }
         destruct i. {
           cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
-Search (_ * (_ / ₂^_))%A.
-(*
-angle_div_2_pow_nat_mul:
-  ∀ (n m : nat) (θ : angle T), angle_mul_nat_overflow m θ = false → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A
-*)
+Theorem glop :
+  ∀ n i θ θ1,
+  (n * (θ / ₂^i) = θ1)%A
+  → angle_mul_nat_overflow (2 ^ (i - Nat.log2 n)) θ1 = false.
+Proof.
+destruct_ac.
+intros * Hnti.
+remember (i - Nat.log2 n) as m eqn:Hm.
+symmetry in Hm.
+revert n i θ θ1 Hnti Hm.
+induction m; intros; [ easy | ].
+Search (angle_mul_nat_overflow (_ * _)).
+...
+cbn.
+rewrite Nat.add_0_r.
+rewrite Nat.pow_succ_r'.
+cbn.
+rewrite <- Nat_add_diag.
+Search (angle_mul_nat_overflow (_ + _)).
+...
+apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+split. {
+  apply IHm.
+Search (angle_mul_nat_overflow (S _)).
+... ...
+apply glop in Hzcu.
+apply Bool.not_true_iff_false in Hzcu.
+apply Hzcu; clear Hzcu; cbn.
+apply Bool.orb_true_intro.
+left.
+rewrite angle_add_0_r.
+rewrite angle_add_opp_r.
+rewrite <- (angle_opp_add_distr Hic Hop).
+rewrite angle_add_opp_r.
+rewrite (angle_right_add_right Hon Hop).
 ...
 rewrite <- angle_div_2_pow_nat_mul in Hzcu; cycle 1. {
   apply Nat.neq_succ_0.
