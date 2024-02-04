@@ -1821,17 +1821,6 @@ intros Hon Hos *; cbn.
 apply angle_add_0_r.
 Qed.
 
-Theorem angle_nonneg : ∀ θ, (0 ≤ θ)%A.
-Proof.
-destruct_ac; intros.
-progress unfold angle_leb.
-cbn.
-rewrite (rngl_leb_refl Hor).
-destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
-apply rngl_leb_le.
-apply rngl_cos_bound.
-Qed.
-
 Theorem angle_mul_nat_overflow_succ_l_false :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -2112,7 +2101,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   rewrite (rngl_characteristic_1_angle_0 Hon Hos Hc1 (θ1 / ₂)%A).
   rewrite (rngl_characteristic_1_angle_0 Hon Hos Hc1 (θ2 / ₂)%A).
-  apply (angle_add_overflow_0_0 Hon Hos).
+  apply angle_add_overflow_0_l.
 }
 intros.
 apply angle_add_overflow_lt_straight_le_straight.
@@ -3000,17 +2989,13 @@ now rewrite rngl_add_0_l.
 Qed.
 
 Theorem angle_mul_nat_overflow_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ n, angle_mul_nat_overflow n 0 = false.
 Proof.
-intros Hon Hos *.
+intros.
 induction n; [ easy | cbn ].
 destruct n; [ easy | ].
-rewrite (angle_mul_0_r Hon Hos).
-apply Bool.orb_false_iff.
-split; [ | easy ].
-apply (angle_add_overflow_0_0 Hon Hos).
+rewrite angle_add_overflow_0_l.
+now apply Bool.orb_false_iff.
 Qed.
 
 Theorem angle_add_not_overflow_move_add :
@@ -3120,7 +3105,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   rewrite (rngl_characteristic_1_angle_0 Hon Hos Hc1 (angle_div_2_pow_nat _ _)).
-  apply (angle_mul_nat_overflow_0_r Hon Hos).
+  apply angle_mul_nat_overflow_0_r.
 }
 assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 intros.
@@ -5222,7 +5207,7 @@ destruct zs. {
     symmetry in Hzs.
     apply eq_rngl_sin_0 in Hzs.
     destruct Hzs; subst θ. {
-      now rewrite (angle_add_overflow_0_0 Hon Hos) in Haov.
+      now rewrite angle_add_overflow_0_l in Haov.
     }
     cbn - [ rngl_cos ].
     rewrite angle_sub_diag; cbn.
@@ -8618,7 +8603,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros * Hu Hlim i.
   rewrite (H1 (u i)).
-  apply (angle_mul_nat_overflow_0_r Hon Hos).
+  apply angle_mul_nat_overflow_0_r.
 }
 intros * Hu Hlim i.
 apply angle_all_add_not_overflow.
@@ -8851,6 +8836,28 @@ destruct (le_dec i (Nat.log2 n)) as [Hin| Hin]. {
 }
 apply Nat.nle_gt in Hin.
 Search (angle_mul_nat_overflow _ (_ * _)).
+Theorem glop :
+  ∀ m n θ,
+  angle_mul_nat_overflow m (n * θ) = true
+  → angle_mul_nat_overflow (m * n) θ = true.
+Proof.
+destruct_ac.
+intros * Hmn.
+revert n θ Hmn.
+induction m; intros; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hmn.
+apply Bool.orb_true_iff in Hmn.
+destruct Hmn as [Hmn| Hmn]. {
+  apply (angle_mul_nat_overflow_le_l (m * n)); [ now apply IHm | ].
+  apply Nat_le_add_l.
+}
+destruct n. {
+  cbn in Hmn.
+  now rewrite angle_add_overflow_0_l in Hmn.
+}
+cbn - [ angle_mul_nat_overflow ].
+apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
+...
 Theorem glop :
   ∀ m n θ,
   angle_mul_nat_overflow m (n * θ) = angle_mul_nat_overflow (m * n) θ.

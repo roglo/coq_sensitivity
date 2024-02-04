@@ -2035,16 +2035,24 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
-Theorem angle_add_overflow_0_0 :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  angle_add_overflow 0 0 = false.
+Theorem angle_nonneg : ∀ θ, (0 ≤ θ)%A.
 Proof.
-intros Hon Hos.
+destruct_ac; intros.
+progress unfold angle_leb.
+cbn.
+rewrite (rngl_leb_refl Hor).
+destruct (0 ≤? rngl_sin θ)%L; [ | easy ].
+apply rngl_leb_le.
+apply rngl_cos_bound.
+Qed.
+
+Theorem angle_add_overflow_0_l :
+  ∀ θ, angle_add_overflow 0 θ = false.
+Proof.
+intros.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
-rewrite (angle_add_0_l Hon Hos).
-apply angle_le_refl.
+apply angle_nonneg.
 Qed.
 
 Theorem rngl_sin_nonneg_add_nonneg :
@@ -2060,7 +2068,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs3.
   rewrite (H1 θ1), (H1 θ2).
-  rewrite (angle_add_overflow_0_0 Hon Hos).
+  rewrite angle_add_overflow_0_l.
   apply (rngl_le_refl Hor).
 }
 intros * Hzs1 Hzs3.
