@@ -8826,9 +8826,10 @@ Theorem glop :
 Proof.
 destruct_ac.
 intros * Hnti.
+subst θ1.
 remember (i - Nat.log2 n) as m eqn:Hm.
 symmetry in Hm.
-revert n i θ θ1 Hnti Hm.
+revert n i θ Hm.
 induction m; intros; [ easy | ].
 Search (angle_mul_nat_overflow (_ * _)).
 ...
