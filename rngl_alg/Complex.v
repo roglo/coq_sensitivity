@@ -8858,9 +8858,31 @@ destruct n. {
 apply Bool.not_false_iff_true in Hmn.
 apply Bool.not_false_iff_true.
 intros H1; apply Hmn; clear Hmn.
-cbn - [ angle_mul_nat_overflow ] in H1.
-...
+remember (S n) as sn; clear n Heqsn.
+rename sn into n.
 rewrite (angle_mul_nat_assoc Hon Hop).
+cbn - [ angle_mul_nat_overflow ] in H1.
+remember (m * n) as m' eqn:Hm.
+clear m IHm Hm.
+rename m' into m.
+revert m H1.
+induction n; intros; [ apply angle_add_overflow_0_l | ].
+rewrite Nat.add_succ_comm in H1.
+apply IHn in H1.
+cbn.
+cbn in H1.
+apply angle_add_not_overflow_comm in H1.
+apply angle_add_not_overflow_move_add in H1. {
+  apply angle_add_not_overflow_comm in H1.
+  rewrite (angle_add_comm Hic) in H1.
+  apply angle_add_not_overflow_move_add in H1. {
+    now apply angle_add_not_overflow_comm in H1.
+  }
+  rewrite (angle_add_comm Hic) in H1.
+  apply angle_add_not_overflow_move_add in H1. {
+    rewrite (angle_add_comm Hic) in H1.
+    apply angle_add_not_overflow_comm in H1.
+...
 rewrite Nat.mul_comm.
 Search (angle_add_overflow (_ * _)).
 ...
