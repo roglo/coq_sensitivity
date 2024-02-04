@@ -8848,19 +8848,18 @@ destruct n; [ easy | clear Hnz ].
 apply -> Nat.succ_inj_wd_neg in Hn1.
 specialize (Nat.log2_succ_or n) as H2.
 destruct H2 as [H2| H2]. {
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / n)). {
+  rewrite H2.
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / S n)). {
     apply Nat.div_le_compat_l.
-    split; [ now apply Nat.neq_0_lt_0 | ].
-    apply Nat.lt_le_incl.
-    rewrite H2.
+    split; [ flia | ].
     apply Nat.log2_spec.
     now apply Nat.neq_0_lt_0.
   }
-Search (Nat.log2_up (S _)).
-...
 Search (angle_mul_nat_overflow (2 ^ _)).
 Search (angle_mul_nat_overflow (_ / _)).
 Search (angle_mul_nat_overflow _ (_ * _)).
+...
+Search (Nat.log2_up (S _)).
 ...
 remember (i - Nat.log2 n) as m eqn:Hm.
 symmetry in Hm.
