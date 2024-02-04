@@ -1832,7 +1832,7 @@ apply rngl_leb_le.
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_mul_nat_not_overflow_succ_l :
+Theorem angle_mul_nat_overflow_succ_l_false :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   ∀ θ n,
@@ -1858,7 +1858,7 @@ split; intros Hn. {
 }
 Qed.
 
-Theorem angle_mul_nat_overflow_succ_l :
+Theorem angle_mul_nat_overflow_succ_l_true :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   ∀ θ n,
@@ -1875,15 +1875,34 @@ split; intros Hn. {
   apply Bool.not_false_iff_true.
   intros Hy.
   apply Hn.
-  now apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  now apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 } {
   apply Bool.not_false_iff_true.
   intros Hx.
-  apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hx.
+  apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hx.
   destruct Hx as (Hx, Hy).
   rewrite Hx in Hn.
   rewrite Hy in Hn.
   now destruct Hn.
+}
+Qed.
+
+Theorem angle_mul_nat_overflow_succ_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ θ n,
+  angle_mul_nat_overflow (S n) θ =
+    (angle_mul_nat_overflow n θ || angle_add_overflow θ (n * θ))%bool.
+Proof.
+intros Hon Hos *.
+remember (_ || _)%bool as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Bool.orb_true_iff in Hb.
+  now apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
+} {
+  apply Bool.orb_false_iff in Hb.
+  now apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 }
 Qed.
 
@@ -1900,7 +1919,7 @@ induction b; intros. {
 destruct a; [ apply angle_nonneg | cbn ].
 move a after b.
 apply Nat.succ_le_mono in Hab.
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos θ b) in Hb.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
 apply angle_add_le_mono_l; try easy.
@@ -2892,7 +2911,7 @@ destruct_ac.
 intros * H12 * Hn2.
 revert θ1 θ2 H12 Hn2.
 induction n; intros; [ apply angle_le_refl | cbn ].
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hn2.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn2.
 destruct Hn2 as (Hn2, H2n2).
 generalize Hn2; intros Hn12.
 apply (IHn θ1) in Hn12; [ | easy ].
@@ -2931,7 +2950,7 @@ intros * H12 * H2.
 revert θ1 θ2 H12 H2.
 induction n; intros; [ easy | ].
 generalize H2; intros H.
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in H.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in H.
 destruct H as (Hn2, H2n2).
 cbn.
 destruct n; [ easy | ].
@@ -3031,15 +3050,15 @@ destruct_ac.
 intros * Hn.
 revert θ Hn.
 induction n; intros; [ easy | ].
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hn.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
 destruct Hn as (Hmn, Han).
 cbn - [ angle_mul_nat_overflow ].
 rewrite Nat.add_0_r.
 rewrite Nat.add_succ_r.
 rewrite Nat_add_diag.
-apply <- (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split. {
-  apply <- (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  apply <- (angle_mul_nat_overflow_succ_l_false Hon Hos).
   split; [ now apply IHn | ].
   rewrite Nat.mul_comm.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
@@ -4147,10 +4166,10 @@ revert θ m Hmn Hn.
 induction n; intros. {
   now apply Nat.le_0_r in Hmn; subst m.
 }
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hn.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hn.
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hmn.
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split; [ now apply IHn | ].
 apply (angle_add_overflow_le _ (n * θ)); [ | easy ].
 now apply angle_mul_nat_le_mono_nonneg_r.
@@ -4434,7 +4453,7 @@ intros * Haov.
 induction n; cbn. {
   symmetry; apply angle_0_div_2.
 }
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Haov.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Haov.
 rewrite IHn; [ | easy ].
 symmetry.
 now apply angle_div_2_add_not_overflow.
@@ -4840,8 +4859,8 @@ revert m Hmn Hm.
 induction n; intros; [ easy | ].
 destruct m; [ easy | ].
 apply Nat.succ_le_mono in Hmn.
-apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hm.
-apply (angle_mul_nat_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_true Hon Hos) in Hm.
+apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
 destruct Hm as [Hm| Hm]. {
   left.
   now apply (IHn m).
@@ -4849,11 +4868,11 @@ destruct Hm as [Hm| Hm]. {
 left.
 destruct (Nat.eq_dec (S m) n) as [Hsmn| Hsmn]. 2: {
   apply (IHn (S m)); [ flia Hmn Hsmn | ].
-  apply (angle_mul_nat_overflow_succ_l Hon Hos).
+  apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
   now right.
 }
 subst n.
-apply (angle_mul_nat_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
 now right.
 Qed.
 
@@ -4871,7 +4890,7 @@ specialize (sequence_false_min n (λ i, angle_mul_nat_overflow i θ)) as H1.
 specialize (H1 eq_refl Hn).
 destruct H1 as (i & Hi & Hsi).
 destruct i; [ easy | ].
-rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hi.
+rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hi.
 destruct Hi as (Hi, Hit).
 exists i.
 split. {
@@ -4885,9 +4904,9 @@ split. {
   apply angle_add_overflow_le with (θ2 := (i * θ)%A); [ | easy ].
   now apply angle_mul_nat_le_mono_nonneg_r.
 }
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
+rewrite (angle_mul_nat_overflow_succ_l_true Hon Hos) in Hsi.
 destruct Hsi as [Hsi| Hsi]; [ | easy ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hsi.
+rewrite (angle_mul_nat_overflow_succ_l_true Hon Hos) in Hsi.
 destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
 now rewrite Hit in Hsi.
 Qed.
@@ -4900,7 +4919,7 @@ Proof.
 destruct_ac.
 intros * Ha.
 induction n; [ easy | ].
-rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split; [ | now apply Ha ].
 apply IHn.
 intros m Hm.
@@ -5133,7 +5152,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hmov.
 cbn.
-apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
+apply (angle_mul_nat_overflow_succ_l_true Hon Hos) in Hmov.
 cbn in Hmov.
 destruct Hmov as [Hmov| Haov]; [ easy | ].
 rewrite angle_add_0_r in Haov.
@@ -6046,10 +6065,10 @@ destruct aov. 2: {
 Search ((_ * _) / ₂^_)%A.
 ...
 destruct n; [ easy | ].
-apply angle_mul_nat_overflow_succ_l in Hnt.
+apply angle_mul_nat_overflow_succ_l_true in Hnt.
 destruct Hnt as [Hnt| Hnt]. {
   destruct n; [ easy | ].
-  apply angle_mul_nat_overflow_succ_l in Hnt.
+  apply angle_mul_nat_overflow_succ_l_true in Hnt.
 ...
   rewrite angle_div_2_pow_nat_mul; cycle 2. {
     apply angle_all_add_not_overflow.
@@ -6454,7 +6473,7 @@ destruct_ac.
 intros * Hu.
 revert u θ Hu.
 induction n; intros; [ easy | ].
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 Search (angle_lim (λ _, (_ * _))%A).
 Search (angle_lim (λ _, (_ + _))%A).
 ... ...
@@ -6967,9 +6986,9 @@ specialize (HN (m * 2 ^ j)).
 ...
   revert θ.
   induction n; intros; [ easy | ].
-Check angle_mul_nat_overflow_succ_l.
+Check angle_mul_nat_overflow_succ_l_true.
 ...
-  apply (angle_mul_nat_overflow_succ_l Hon Hos).
+  apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
 ...
 (*
 Search (_ / ₂^S n)%A.
@@ -7442,7 +7461,7 @@ assert (H : angle_mul_nat_overflow n (θ / ₂^j) = false). {
   clear Hnz.
 ...
   induction n; [ easy | ].
-  rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos).
   split. {
     specialize (Nat.log2_succ_or n) as H1.
     destruct H1 as [H1| H1]. {
@@ -7476,8 +7495,8 @@ intros * Hab.
 revert b Hab.
 induction a; intros; [ easy | ].
 rewrite Nat.add_succ_l in Hab.
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hab.
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hab.
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 destruct Hab as (Hab, Hab2).
 split; [ apply (IHa b), Hab | ].
 rewrite (angle_mul_add_distr_r Hon Hop) in Hab2.
@@ -8831,6 +8850,53 @@ destruct (le_dec i (Nat.log2 n)) as [Hin| Hin]. {
   now rewrite (proj2 (Nat.sub_0_le _ _) Hin).
 }
 apply Nat.nle_gt in Hin.
+Search (angle_mul_nat_overflow _ (_ * _)).
+Theorem glop :
+  ∀ m n θ,
+  angle_mul_nat_overflow m (n * θ) = angle_mul_nat_overflow (m * n) θ.
+Proof.
+(*
+destruct_ac.
+intros.
+remember (angle_mul_nat_overflow (_ * _) _) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  revert n θ Hb.
+  induction m; intros; [ easy | ].
+  apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
+cbn in Hb.
+...
+*)
+destruct_ac.
+intros.
+revert n θ.
+induction m; intros; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
+rewrite IHm.
+remember (angle_mul_nat_overflow (m * n) θ) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  rewrite Bool.orb_true_l.
+  symmetry.
+  apply (angle_mul_nat_overflow_le_l (m * n)); [ easy | ].
+  apply Nat.mul_le_mono_r.
+  apply Nat.le_succ_diag_r.
+}
+rewrite Bool.orb_false_l.
+symmetry.
+remember (angle_mul_nat_overflow (S m * n) θ) as c eqn:Hc.
+symmetry in Hc |-*.
+destruct c. {
+...
+Search (angle_add_overflow _ (_ * _)).
+...
+Search (angle_mul_nat_overflow (_ + _)).
+Search (_ || _ = _)%bool.
+...
+remember (angle_mul_nat_overflow (S _ * _) _) as x eqn:Hx.
+symmetry
+rewrite angle_mul_
+...
 rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
@@ -8858,6 +8924,7 @@ destruct H2 as [H2| H2]. {
 Search (angle_mul_nat_overflow (2 ^ _)).
 Search (angle_mul_nat_overflow (_ / _)).
 Search (angle_mul_nat_overflow _ (_ * _)).
+
 ...
 Search (Nat.log2_up (S _)).
 ...
@@ -8874,7 +8941,7 @@ cbn.
 rewrite <- Nat_add_diag.
 Search (angle_mul_nat_overflow (_ + _)).
 ...
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split. {
   apply IHm.
 Search (angle_mul_nat_overflow (S _)).
@@ -9884,7 +9951,7 @@ destruct ao. 2: {
 ...
   clear Hlim'.
   destruct n; [ easy | ].
-  apply (angle_mul_nat_overflow_succ_l Hon Hos) in Hao.
+  apply (angle_mul_nat_overflow_succ_l_true Hon Hos) in Hao.
 ...
   apply Bool.not_false_iff_true in Hao.
   exfalso; apply Hao; clear Hao Hlim'.
@@ -9900,12 +9967,12 @@ Proof.
 destruct_ac.
 intros * Hlim Hov.
 induction n; [ easy | ].
-apply (angle_mul_nat_not_overflow_succ_l Hon Hos).
+apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split. {
   apply IHn.
   intros i.
   specialize (Hov i).
-  now apply (angle_mul_nat_not_overflow_succ_l Hon Hos) in Hov.
+  now apply (angle_mul_nat_overflow_succ_l_false Hon Hos) in Hov.
 }
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
@@ -10020,7 +10087,7 @@ Search ((_ + _) / _).
     progress unfold angle_lim in Hlim.
     progress unfold is_limit_when_tending_to_inf in Hlim.
 ...
-  rewrite (angle_mul_nat_not_overflow_succ_l Hon Hos).
+  rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos).
 ...
   progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   progress unfold angle_lim in Hlim.
