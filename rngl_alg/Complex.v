@@ -8855,8 +8855,31 @@ destruct n. {
   cbn in Hmn.
   now rewrite angle_add_overflow_0_l in Hmn.
 }
-cbn - [ angle_mul_nat_overflow ].
+apply Bool.not_false_iff_true in Hmn.
+apply Bool.not_false_iff_true.
+intros H1; apply Hmn; clear Hmn.
+cbn - [ angle_mul_nat_overflow ] in H1.
+...
+rewrite (angle_mul_nat_assoc Hon Hop).
+rewrite Nat.mul_comm.
+Search (angle_add_overflow (_ * _)).
+...
+cbn - [ angle_mul_nat_overflow ] in H1.
 apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
+right.
+...
+rewrite Nat.add_comm.
+rewrite Nat.mul_comm.
+cbn.
+rewrite <- Nat.mul_succ_l.
+right.
+...
+rewrite (angle_mul_add_distr_r Hon Hop).
+apply angle_add_not_overflow_comm in H1.
+rewrite Nat.mul_comm in H1.
+cbn in H1.
+apply angle_add_not_overflow_move_add in H1.
+cbn.
 ...
 Theorem glop :
   ∀ m n θ,
