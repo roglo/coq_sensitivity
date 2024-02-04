@@ -8827,6 +8827,41 @@ Proof.
 destruct_ac.
 intros * Hnti.
 subst θ1.
+destruct (le_dec i (Nat.log2 n)) as [Hin| Hin]. {
+  now rewrite (proj2 (Nat.sub_0_le _ _) Hin).
+}
+apply Nat.nle_gt in Hin.
+rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite angle_mul_0_l.
+  apply (angle_mul_nat_overflow_0_r Hon Hos).
+}
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n.
+  cbn - [ "/" ].
+  rewrite Nat.div_1_r.
+  rewrite angle_add_0_r.
+  apply angle_mul_nat_overflow_pow_div.
+}
+destruct n; [ easy | clear Hnz ].
+apply -> Nat.succ_inj_wd_neg in Hn1.
+specialize (Nat.log2_succ_or n) as H2.
+destruct H2 as [H2| H2]. {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / n)). {
+    apply Nat.div_le_compat_l.
+    split; [ now apply Nat.neq_0_lt_0 | ].
+    apply Nat.lt_le_incl.
+    rewrite H2.
+    apply Nat.log2_spec.
+    now apply Nat.neq_0_lt_0.
+  }
+Search (Nat.log2_up (S _)).
+...
+Search (angle_mul_nat_overflow (2 ^ _)).
+Search (angle_mul_nat_overflow (_ / _)).
+Search (angle_mul_nat_overflow _ (_ * _)).
+...
 remember (i - Nat.log2 n) as m eqn:Hm.
 symmetry in Hm.
 revert n i θ Hm.
