@@ -8881,8 +8881,11 @@ destruct n. {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       apply (rngl_nlt_ge Hor) in Hzcu.
-rewrite Hu in Hzcu.
+apply (rngl_nlt_ge Hor).
+intros Hsz.
+rewrite Hu in Hzcu, Hsz.
 progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
+progress unfold seq_angle_converging_to_angle_div_nat in Hsz.
 destruct i; [ cbn in Hni; flia Hni | ].
 destruct i; [ cbn in Hni; flia Hni | ].
 remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
@@ -8898,7 +8901,6 @@ apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
   now apply Nat.nle_gt in H.
 }
 apply Bool.not_true_iff_false in H1.
-exfalso.
 apply H1; clear H1.
 progress unfold angle_mul_nat_overflow.
 apply Bool.orb_true_iff.
@@ -8906,7 +8908,6 @@ left; cbn.
 rewrite angle_add_0_r.
 progress unfold angle_add_overflow.
 progress unfold angle_ltb.
-(* chais pas *)
 ...
 rewrite (angle_add_opp_l Hic).
         rewrite <- (angle_opp_add_distr Hic Hop).
