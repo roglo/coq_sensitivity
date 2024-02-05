@@ -8873,53 +8873,41 @@ destruct n. {
         progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
         destruct i; [ cbn in Hni; flia Hni | ].
         destruct i; [ cbn in Hni; flia Hni | ].
-        destruct i. {
-          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
-          rewrite (angle_mul_1_l Hon Hos) in Hzcu.
-          specialize (angle_div_2_le_straight (θ / ₂)) as H1.
-          cbn in Hzcu.
-          rewrite Hzcu in H1.
-          apply angle_nlt_ge in H1.
-          apply H1; clear H1.
-          apply (angle_straight_lt_opp_right Hc1).
+        apply angle_div_2_pow_mul_nat_if in Hzcu.
+        apply (angle_mul_nat_not_overflow_le_l 3) in Hzcu. 2: {
+          apply Nat.div_le_lower_bound. 2: {
+            rewrite Nat.mul_comm.
+            now apply Nat.mul_div_le.
+          }
+          intros H.
+          apply Nat.div_small_iff in H; [ | easy ].
+          now apply Nat.nle_gt in H.
         }
-        destruct i. {
-          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
-          rewrite angle_div_2_pow_nat_succ_r_1 in Hzcu.
-          rewrite angle_div_2_mul_2 in Hzcu.
-          cbn in Hzcu.
-          specialize (angle_div_2_le_straight (θ / ₂)) as H1.
-          rewrite Hzcu in H1.
-          apply angle_nlt_ge in H1.
-          apply H1; clear H1.
-          apply (angle_straight_lt_opp_right Hc1).
-        }
-        destruct i. {
-          cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
-          apply angle_div_2_pow_mul_nat_if in Hzcu.
-          apply Bool.not_true_iff_false in Hzcu.
-          apply Hzcu; clear Hzcu; cbn.
-          apply Bool.orb_true_intro.
-          left.
-          rewrite angle_add_0_r.
-          progress unfold angle_add_overflow.
-          rewrite angle_add_opp_r.
-          rewrite <- (angle_opp_add_distr Hic Hop).
-          rewrite (angle_right_add_right Hon Hop).
-          rewrite angle_add_opp_r.
-          rewrite <- (angle_opp_add_distr Hic Hop).
-          progress unfold angle_ltb.
-          rewrite rngl_sin_opp.
-          rewrite (rngl_sin_add_straight_l Hon Hop).
-          rewrite (rngl_opp_involutive Hop).
-          cbn.
-          specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-          apply rngl_leb_le in H1.
-          rewrite H1; clear H1.
-          specialize (rngl_opp_1_lt_0 Hon Hop Hor Hc1) as H1.
-          apply (rngl_leb_gt Hor) in H1.
-          now rewrite H1.
-        }
+        apply Bool.not_true_iff_false in Hzcu.
+        apply Hzcu; clear Hzcu.
+        progress unfold angle_mul_nat_overflow.
+        apply Bool.orb_true_iff.
+        left; cbn.
+        rewrite angle_add_0_r.
+        rewrite (angle_add_opp_l Hic).
+        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite (angle_right_add_right Hon Hop).
+        progress unfold angle_add_overflow.
+        rewrite angle_add_opp_r.
+        rewrite <- (angle_opp_add_distr Hic Hop).
+        progress unfold angle_ltb.
+        rewrite rngl_sin_opp.
+        rewrite (rngl_sin_add_straight_l Hon Hop).
+        rewrite (rngl_opp_involutive Hop).
+        cbn.
+        specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+        apply rngl_leb_le in H1.
+        rewrite H1; clear H1.
+        specialize (rngl_opp_1_lt_0 Hon Hop Hor Hc1) as H1.
+        apply (rngl_leb_gt Hor) in H1.
+        now rewrite H1.
+      }
+      apply (rngl_nle_gt Hor) in Hzcu.
 ...
 remember (0 ≤? 1)%L as b eqn:Hb.
 symmetry in Hb.
