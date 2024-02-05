@@ -8612,6 +8612,29 @@ rewrite (angle_mul_nat_assoc Hon Hop).
 now apply angle_mul_nat_overflow_distr_add_overflow.
 Qed.
 
+Theorem angle_div_2_pow_mul_nat_if :
+  ∀ n i θ θ1,
+  (n * (θ / ₂^i) = θ1)%A
+  → angle_mul_nat_overflow (2 ^ i / n) θ1 = false.
+Proof.
+destruct_ac.
+intros * Hnti.
+subst θ1.
+(* lemma to do *)
+apply Bool.not_true_iff_false.
+intros H1.
+apply angle_mul_nat_overflow_true_assoc in H1.
+apply Bool.not_false_iff_true in H1.
+apply H1; clear H1.
+(**)
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+  rewrite Nat.mul_comm.
+  now apply Nat.mul_div_le.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -8873,179 +8896,34 @@ destruct n. {
         }
         destruct i. {
           cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu.
-Theorem glop :
-  ∀ n i θ θ1,
-  (n * (θ / ₂^i) = θ1)%A
-  → angle_mul_nat_overflow (2 ^ (i - Nat.log2_up n)) θ1 = false.
-Proof.
-destruct_ac.
-intros * Hnti.
-subst θ1.
-destruct (le_dec i (Nat.log2_up n)) as [Hin| Hin]. {
-  now rewrite (proj2 (Nat.sub_0_le _ _) Hin).
-}
-apply Nat.nle_gt in Hin.
-(* lemma to do *)
-apply Bool.not_true_iff_false.
-intros H1.
-apply angle_mul_nat_overflow_true_assoc in H1.
-apply Bool.not_false_iff_true in H1.
-apply H1; clear H1.
-(**)
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  now rewrite Nat.mul_0_r.
-}
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / n * n)). {
-  apply Nat.mul_le_mono_r.
-  rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
-  apply Nat.div_le_compat_l.
-  split; [ now apply Nat.neq_0_lt_0 | ].
-  apply Nat.log2_log2_up_spec.
-  now apply Nat.neq_0_lt_0.
-}
+          apply angle_div_2_pow_mul_nat_if in Hzcu.
+          apply Bool.not_true_iff_false in Hzcu.
+          apply Hzcu; clear Hzcu; cbn.
+          apply Bool.orb_true_intro.
+          left.
+          rewrite angle_add_0_r.
+          progress unfold angle_add_overflow.
+          rewrite angle_add_opp_r.
+          rewrite <- (angle_opp_add_distr Hic Hop).
+          rewrite (angle_right_add_right Hon Hop).
+          rewrite angle_add_opp_r.
+          rewrite <- (angle_opp_add_distr Hic Hop).
+          progress unfold angle_ltb.
+          rewrite rngl_sin_opp.
+          rewrite (rngl_sin_add_straight_l Hon Hop).
+          rewrite (rngl_opp_involutive Hop).
+          cbn.
+          specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+          apply rngl_leb_le in H1.
+          rewrite H1; clear H1.
+          specialize (rngl_opp_1_lt_0 Hon Hop Hor Hc1) as H1.
+          apply (rngl_leb_gt Hor) in H1.
+          now rewrite H1.
+        }
 ...
-(*
-apply angle_add_not_overflow_comm in H1.
-apply angle_add_not_overflow_move_add in H1. {
-  apply angle_add_not_overflow_comm in H1.
-  rewrite (angle_add_comm Hic) in H1.
-  apply angle_add_not_overflow_move_add in H1. {
-    now apply angle_add_not_overflow_comm in H1.
-  }
-  rewrite (angle_add_comm Hic) in H1.
-  apply angle_add_not_overflow_move_add in H1. {
-    rewrite (angle_add_comm Hic) in H1.
-    apply angle_add_not_overflow_comm in H1.
-...
-rewrite Nat.mul_comm.
-Search (angle_add_overflow (_ * _)).
-...
-cbn - [ angle_mul_nat_overflow ] in H1.
-apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
-right.
-...
-rewrite Nat.add_comm.
-rewrite Nat.mul_comm.
-cbn.
-rewrite <- Nat.mul_succ_l.
-right.
-...
-rewrite (angle_mul_add_distr_r Hon Hop).
-apply angle_add_not_overflow_comm in H1.
-rewrite Nat.mul_comm in H1.
-cbn in H1.
-apply angle_add_not_overflow_move_add in H1.
-cbn.
-...
-Theorem glop :
-  ∀ m n θ,
-  angle_mul_nat_overflow m (n * θ) = angle_mul_nat_overflow (m * n) θ.
-Proof.
-(*
-destruct_ac.
-intros.
-remember (angle_mul_nat_overflow (_ * _) _) as b eqn:Hb.
+remember (0 ≤? 1)%L as b eqn:Hb.
 symmetry in Hb.
-destruct b. {
-  revert n θ Hb.
-  induction m; intros; [ easy | ].
-  apply (angle_mul_nat_overflow_succ_l_true Hon Hos).
-cbn in Hb.
-...
-*)
-destruct_ac.
-intros.
-revert n θ.
-induction m; intros; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
-rewrite IHm.
-remember (angle_mul_nat_overflow (m * n) θ) as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  rewrite Bool.orb_true_l.
-  symmetry.
-  apply (angle_mul_nat_overflow_le_l (m * n)); [ easy | ].
-  apply Nat.mul_le_mono_r.
-  apply Nat.le_succ_diag_r.
-}
-rewrite Bool.orb_false_l.
-symmetry.
-remember (angle_mul_nat_overflow (S m * n) θ) as c eqn:Hc.
-symmetry in Hc |-*.
-destruct c. {
-...
-Search (angle_add_overflow _ (_ * _)).
-...
-Search (angle_mul_nat_overflow (_ + _)).
-Search (_ || _ = _)%bool.
-...
-remember (angle_mul_nat_overflow (S _ * _) _) as x eqn:Hx.
-symmetry
-rewrite angle_mul_
-...
-rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  rewrite angle_mul_0_l.
-  apply (angle_mul_nat_overflow_0_r Hon Hos).
-}
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-  subst n.
-  cbn - [ "/" ].
-  rewrite Nat.div_1_r.
-  rewrite angle_add_0_r.
-  apply angle_mul_nat_overflow_pow_div.
-}
-destruct n; [ easy | clear Hnz ].
-apply -> Nat.succ_inj_wd_neg in Hn1.
-specialize (Nat.log2_succ_or n) as H2.
-destruct H2 as [H2| H2]. {
-  rewrite H2.
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / S n)). {
-    apply Nat.div_le_compat_l.
-    split; [ flia | ].
-    apply Nat.log2_spec.
-    now apply Nat.neq_0_lt_0.
-  }
-Search (angle_mul_nat_overflow (2 ^ _)).
-Search (angle_mul_nat_overflow (_ / _)).
-Search (angle_mul_nat_overflow _ (_ * _)).
-
-...
-Search (Nat.log2_up (S _)).
-...
-remember (i - Nat.log2 n) as m eqn:Hm.
-symmetry in Hm.
-revert n i θ Hm.
-induction m; intros; [ easy | ].
-Search (angle_mul_nat_overflow (_ * _)).
-...
-cbn.
-rewrite Nat.add_0_r.
-rewrite Nat.pow_succ_r'.
-cbn.
-rewrite <- Nat_add_diag.
-Search (angle_mul_nat_overflow (_ + _)).
-...
-apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
-split. {
-  apply IHm.
-Search (angle_mul_nat_overflow (S _)).
-*)
-... ...
-apply glop in Hzcu.
-apply Bool.not_true_iff_false in Hzcu.
-apply Hzcu; clear Hzcu; cbn.
-apply Bool.orb_true_intro.
-left.
-rewrite angle_add_0_r.
-progress unfold angle_add_overflow.
-rewrite angle_add_opp_r.
-rewrite <- (angle_opp_add_distr Hic Hop).
-rewrite (angle_right_add_right Hon Hop).
-progress unfold angle_ltb.
-cbn.
+destruct b. 2: {
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_leb_refl Hor).
 remember (0 ≤? - 1)%L as b eqn:Hb.
