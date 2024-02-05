@@ -8852,6 +8852,38 @@ destruct n. {
       apply Hzs; clear Hzs.
       rewrite (angle_add_diag Hon Hos) in Hzsm.
       rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+(**)
+      destruct (rngl_lt_dec Hor 0 (rngl_cos (u i))) as [Hzcu| Hzcu]. {
+        rewrite <- rngl_mul_assoc in Hzsm.
+        apply (rngl_lt_eq_cases Hor) in Hzsm.
+        destruct Hzsm as [Hzsm| Hzsm]. {
+          apply (rngl_nlt_ge Hor).
+          intros H.
+          apply (rngl_nle_gt Hor) in Hzsm.
+          apply Hzsm; clear Hzsm.
+          apply (rngl_mul_nonneg_nonpos Hop Hor). {
+            apply (rngl_0_le_2 Hon Hop Hor).
+          }
+          apply (rngl_lt_le_incl Hor) in H.
+          apply (rngl_lt_le_incl Hor) in Hzcu.
+          now apply (rngl_mul_nonpos_nonneg Hop Hor).
+        }
+        symmetry in Hzsm.
+        apply (rngl_eq_mul_0_r Hos Hii) in Hzsm. {
+          apply (rngl_eq_mul_0_l Hos Hii) in Hzsm. {
+            rewrite Hzsm.
+            apply (rngl_le_refl Hor).
+          }
+          intros H.
+          rewrite H in Hzcu.
+          now apply (rngl_lt_irrefl Hor) in Hzcu.
+        }
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_nlt_ge Hor) in Hzcu.
+...
+apply (rngl_mul_pos_neg Hop Hor Hid).
+...
       destruct (rngl_le_dec Hor 0 (rngl_cos (u i))) as [Hzcu| Hzcu]. {
         apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
         destruct Hzsm as [(H1, H2)| (H1, H2)]. {
@@ -8908,6 +8940,8 @@ destruct n. {
         now rewrite H1.
       }
       apply (rngl_nle_gt Hor) in Hzcu.
+rewrite Hu.
+progress unfold seq_angle_converging_to_angle_div_nat.
 ...
 remember (0 ≤? 1)%L as b eqn:Hb.
 symmetry in Hb.
