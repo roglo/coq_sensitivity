@@ -8876,12 +8876,12 @@ destruct n. {
 Theorem glop :
   ∀ n i θ θ1,
   (n * (θ / ₂^i) = θ1)%A
-  → angle_mul_nat_overflow (2 ^ (i - Nat.log2 n)) θ1 = false.
+  → angle_mul_nat_overflow (2 ^ (i - Nat.log2_up n)) θ1 = false.
 Proof.
 destruct_ac.
 intros * Hnti.
 subst θ1.
-destruct (le_dec i (Nat.log2 n)) as [Hin| Hin]. {
+destruct (le_dec i (Nat.log2_up n)) as [Hin| Hin]. {
   now rewrite (proj2 (Nat.sub_0_le _ _) Hin).
 }
 apply Nat.nle_gt in Hin.
@@ -8891,7 +8891,21 @@ intros H1.
 apply angle_mul_nat_overflow_true_assoc in H1.
 apply Bool.not_false_iff_true in H1.
 apply H1; clear H1.
+(**)
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  now rewrite Nat.mul_0_r.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / n * n)). {
+  apply Nat.mul_le_mono_r.
+  rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
+  apply Nat.div_le_compat_l.
+  split; [ now apply Nat.neq_0_lt_0 | ].
+  apply Nat.log2_log2_up_spec.
+  now apply Nat.neq_0_lt_0.
+}
 ...
+(*
 apply angle_add_not_overflow_comm in H1.
 apply angle_add_not_overflow_move_add in H1. {
   apply angle_add_not_overflow_comm in H1.
@@ -9018,6 +9032,7 @@ apply (angle_mul_nat_overflow_succ_l_false Hon Hos).
 split. {
   apply IHm.
 Search (angle_mul_nat_overflow (S _)).
+*)
 ... ...
 apply glop in Hzcu.
 apply Bool.not_true_iff_false in Hzcu.
@@ -9025,6 +9040,23 @@ apply Hzcu; clear Hzcu; cbn.
 apply Bool.orb_true_intro.
 left.
 rewrite angle_add_0_r.
+progress unfold angle_add_overflow.
+rewrite angle_add_opp_r.
+rewrite <- (angle_opp_add_distr Hic Hop).
+rewrite (angle_right_add_right Hon Hop).
+progress unfold angle_ltb.
+cbn.
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_leb_refl Hor).
+remember (0 ≤? - 1)%L as b eqn:Hb.
+symmetry in Hb.
+destruct b; [ exfalso | easy ].
+apply rngl_leb_le in Hb.
+apply (rngl_nlt_ge Hor) in Hb.
+apply Hb; clear Hb.
+apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+}
+...
 rewrite angle_add_opp_r.
 rewrite <- (angle_opp_add_distr Hic Hop).
 rewrite angle_add_opp_r.
