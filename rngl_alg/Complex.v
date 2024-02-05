@@ -8789,7 +8789,7 @@ destruct n. {
     apply (angle_add_overflow_0_r Hon Hos).
   }
   destruct m. {
-  rewrite (angle_mul_1_l Hon Hos).
+    rewrite (angle_mul_1_l Hon Hos).
     progress unfold angle_add_overflow.
     apply angle_ltb_ge.
     progress unfold angle_leb.
@@ -8881,6 +8881,51 @@ destruct n. {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       apply (rngl_nlt_ge Hor) in Hzcu.
+rewrite Hu in Hzcu.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
+destruct i; [ cbn in Hni; flia Hni | ].
+destruct i; [ cbn in Hni; flia Hni | ].
+remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
+symmetry in H1.
+apply angle_div_2_pow_mul_nat_if in H1.
+apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
+  apply Nat.div_le_lower_bound. 2: {
+    rewrite Nat.mul_comm.
+    now apply Nat.mul_div_le.
+  }
+  intros H.
+  apply Nat.div_small_iff in H; [ | easy ].
+  now apply Nat.nle_gt in H.
+}
+apply Bool.not_true_iff_false in H1.
+exfalso.
+apply H1; clear H1.
+progress unfold angle_mul_nat_overflow.
+apply Bool.orb_true_iff.
+left; cbn.
+rewrite angle_add_0_r.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+(* chais pas *)
+...
+rewrite (angle_add_opp_l Hic).
+        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite (angle_right_add_right Hon Hop).
+        progress unfold angle_add_overflow.
+        rewrite angle_add_opp_r.
+        rewrite <- (angle_opp_add_distr Hic Hop).
+        progress unfold angle_ltb.
+        rewrite rngl_sin_opp.
+        rewrite (rngl_sin_add_straight_l Hon Hop).
+        rewrite (rngl_opp_involutive Hop).
+        cbn.
+        specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+        apply rngl_leb_le in H1.
+        rewrite H1; clear H1.
+        specialize (rngl_opp_1_lt_0 Hon Hop Hor Hc1) as H1.
+        apply (rngl_leb_gt Hor) in H1.
+        now rewrite H1.
+      }
 ...
 apply (rngl_mul_pos_neg Hop Hor Hid).
 ...
