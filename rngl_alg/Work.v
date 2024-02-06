@@ -313,6 +313,7 @@ apply angle_mul_nat_overflow_symm_true.
       destruct i; [ cbn in Hni; flia Hni | ].
       remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
       symmetry in H1.
+      generalize H1; intros H2.
       apply angle_div_2_pow_mul_nat_if in H1.
       apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
         apply Nat.div_le_lower_bound. 2: {
@@ -331,6 +332,30 @@ apply angle_mul_nat_overflow_symm_true.
       rewrite angle_add_0_r.
       progress unfold angle_add_overflow.
       progress unfold angle_ltb.
+      rewrite (angle_add_assoc Hop).
+      generalize Hzs; intros H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      remember (0 ≤? rngl_sin _)%L as zs3 eqn:Hzs3.
+      symmetry in Hzs3.
+      destruct zs3; [ easy | ].
+      apply (rngl_leb_gt Hor) in Hzs3.
+      apply rngl_ltb_lt.
+      rename θ' into θ''.
+      change_angle_sub_r θ1 angle_straight.
+      remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ2 eqn:H2.
+      move Hθ' at top; subst θ2.
+      do 2 rewrite (angle_add_assoc Hop) in Hzs3.
+      do 2 rewrite (angle_add_assoc Hop).
+      progress sin_cos_add_sub_straight_hyp T Hzs.
+      progress sin_cos_add_sub_straight_hyp T Hzs3.
+      progress sin_cos_add_sub_straight_hyp T Hzs3.
+      progress sin_cos_add_sub_straight_hyp T Hzcu.
+      progress sin_cos_add_sub_straight_goal T.
+      progress sin_cos_add_sub_straight_goal T.
+      rewrite (rngl_add_opp_l Hop).
+      apply (rngl_lt_sub_0 Hop Hor).
+(* c'est faux, ça ; c'est fou, ça *)
 ...
 rewrite (angle_add_opp_l Hic).
         rewrite <- (angle_opp_add_distr Hic Hop).
