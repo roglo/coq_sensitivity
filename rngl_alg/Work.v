@@ -358,6 +358,17 @@ rewrite (proj2 (Nat_div_less_small _ _ _ (Nat.neq_succ_0 _))).
         cbn - [ rngl_sin angle_mul_nat angle_div_2_pow_nat ].
         rewrite rngl_sin_sin_mul.
 ...
+cbn - [ rngl_sin rngl_cos angle_div_2_pow_nat ].
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+do 2 rewrite (rngl_mul_1_r Hon).
+apply (rngl_add_nonneg_nonneg Hor). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    now apply rngl_sin_div_2_pow_nat_nonneg.
+  }
+(* pfff... chais pas *)
+...
 remember (u i) as θ1 eqn:Hθ1.
       rename θ' into θ''.
       change_angle_sub_r θ1 angle_straight.
