@@ -356,6 +356,7 @@ rewrite (proj2 (Nat_div_less_small _ _ _ (Nat.neq_succ_0 _))).
       }
       destruct i. {
         cbn - [ rngl_sin angle_mul_nat angle_div_2_pow_nat ].
+        rewrite rngl_sin_sin_mul.
 ...
 remember (u i) as θ1 eqn:Hθ1.
       rename θ' into θ''.
