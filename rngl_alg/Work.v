@@ -241,7 +241,8 @@ destruct n. {
     destruct zsm. {
       exfalso.
       apply rngl_leb_le in Hzsm.
-apply (rngl_nle_gt Hor) in Hzs.
+      apply (rngl_nle_gt Hor) in Hzs.
+...
 specialize (angle_div_2_pow_mul_nat_if 3 i θ _ eq_refl) as H1.
 apply Bool.not_true_iff_false in H1.
 apply H1; clear H1.
