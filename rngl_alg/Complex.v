@@ -8848,21 +8848,19 @@ destruct n. {
     apply (rngl_nle_gt Hor) in Hzs.
     destruct zsm. {
       exfalso.
-(**)
+      apply rngl_leb_le in Hzsm.
 apply (rngl_nle_gt Hor) in Hzs.
 specialize (angle_div_2_pow_mul_nat_if 3 i θ _ eq_refl) as H1.
 apply Bool.not_true_iff_false in H1.
 apply H1; clear H1.
-Search (angle_mul_nat_overflow _ _ = true).
-...
-Search (angle_mul_nat_overflow _ (_ * _)).
 destruct i; [ cbn in Hni; flia Hni | ].
 destruct i; [ cbn in Hni; flia Hni | ].
+destruct i. {
+  cbn.
 ...
 Search (angle_mul_nat_overflow _ _ = angle_mul_nat_overflow _ _).
 apply angle_mul_nat_overflow_symm_true.
 ...
-      apply rngl_leb_le in Hzsm.
       apply Hzs; clear Hzs.
       rewrite (angle_add_diag Hon Hos) in Hzsm.
       rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
@@ -8895,33 +8893,33 @@ apply angle_mul_nat_overflow_symm_true.
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       apply (rngl_nlt_ge Hor) in Hzcu.
-apply (rngl_nlt_ge Hor).
-intros Hsz.
-rewrite Hu in Hzcu, Hsz.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
-progress unfold seq_angle_converging_to_angle_div_nat in Hsz.
-destruct i; [ cbn in Hni; flia Hni | ].
-destruct i; [ cbn in Hni; flia Hni | ].
-remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
-symmetry in H1.
-apply angle_div_2_pow_mul_nat_if in H1.
-apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
-  apply Nat.div_le_lower_bound. 2: {
-    rewrite Nat.mul_comm.
-    now apply Nat.mul_div_le.
-  }
-  intros H.
-  apply Nat.div_small_iff in H; [ | easy ].
-  now apply Nat.nle_gt in H.
-}
-apply Bool.not_true_iff_false in H1.
-apply H1; clear H1.
-progress unfold angle_mul_nat_overflow.
-apply Bool.orb_true_iff.
-left; cbn.
-rewrite angle_add_0_r.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
+      apply (rngl_nlt_ge Hor).
+      intros Hsz.
+      rewrite Hu in Hzcu, Hsz.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hsz.
+      destruct i; [ cbn in Hni; flia Hni | ].
+      destruct i; [ cbn in Hni; flia Hni | ].
+      remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
+      symmetry in H1.
+      apply angle_div_2_pow_mul_nat_if in H1.
+      apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
+        apply Nat.div_le_lower_bound. 2: {
+          rewrite Nat.mul_comm.
+          now apply Nat.mul_div_le.
+        }
+        intros H.
+        apply Nat.div_small_iff in H; [ | easy ].
+        now apply Nat.nle_gt in H.
+      }
+      apply Bool.not_true_iff_false in H1.
+      apply H1; clear H1.
+      progress unfold angle_mul_nat_overflow.
+      apply Bool.orb_true_iff.
+      left; cbn.
+      rewrite angle_add_0_r.
+      progress unfold angle_add_overflow.
+      progress unfold angle_ltb.
 ...
 rewrite (angle_add_opp_l Hic).
         rewrite <- (angle_opp_add_distr Hic Hop).
