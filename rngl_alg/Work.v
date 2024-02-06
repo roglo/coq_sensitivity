@@ -27,6 +27,27 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem angle_mul_nat_overflow_2_pow_div_angle_mul :
+  ∀ n i θ,
+  angle_mul_nat_overflow (2 ^ i / n) (n * (θ / ₂^i)) = false.
+Proof.
+destruct_ac.
+intros.
+(* lemma to do *)
+apply Bool.not_true_iff_false.
+intros H1.
+apply angle_mul_nat_overflow_true_assoc in H1.
+apply Bool.not_false_iff_true in H1.
+apply H1; clear H1.
+(**)
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+  rewrite Nat.mul_comm.
+  now apply Nat.mul_div_le.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -306,6 +327,24 @@ apply angle_mul_nat_overflow_symm_true.
       apply (rngl_nlt_ge Hor).
       intros Hsz.
 *)
+(**)
+      clear Hzsm.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hu.
+      specialize angle_mul_nat_overflow_2_pow_div_angle_mul as H1.
+      specialize (H1 3 i θ).
+      rewrite Hu in Hzs, Hzcu.
+      apply Bool.not_true_iff_false in H1.
+      apply H1; clear H1.
+...
+remember (u i) as θ1 eqn:Hθ1.
+      rename θ' into θ''.
+      change_angle_sub_r θ1 angle_straight.
+      rename θ'' into θ'.
+      rename Hθ' into Hui; symmetry in Hui.
+      rewrite Hui in Hzcu, Hzs.
+      progress sin_cos_add_sub_straight_hyp T Hzs.
+      progress sin_cos_add_sub_straight_hyp T Hzcu.
+...
       rewrite Hu in Hzcu, Hzs.
       progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
       progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
@@ -341,8 +380,10 @@ apply angle_mul_nat_overflow_symm_true.
       destruct zs3; [ easy | ].
       apply (rngl_leb_gt Hor) in Hzs3.
       apply rngl_ltb_lt.
+...
       rename θ' into θ''.
       change_angle_sub_r θ1 angle_straight.
+      rename θ'' into θ'.
       remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ2 eqn:H2.
       move Hθ' at top; subst θ2.
       do 2 rewrite (angle_add_assoc Hop) in Hzs3.

@@ -8623,27 +8623,4 @@ rewrite (angle_mul_nat_assoc Hon Hop).
 now apply angle_mul_nat_overflow_distr_add_overflow.
 Qed.
 
-Theorem angle_div_2_pow_mul_nat_if :
-  ∀ n i θ θ1,
-  (n * (θ / ₂^i) = θ1)%A
-  → angle_mul_nat_overflow (2 ^ i / n) θ1 = false.
-Proof.
-destruct_ac.
-intros * Hnti.
-subst θ1.
-(* lemma to do *)
-apply Bool.not_true_iff_false.
-intros H1.
-apply angle_mul_nat_overflow_true_assoc in H1.
-apply Bool.not_false_iff_true in H1.
-apply H1; clear H1.
-(**)
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
-  rewrite Nat.mul_comm.
-  now apply Nat.mul_div_le.
-}
-apply angle_mul_nat_overflow_pow_div.
-Qed.
-
 End a.
