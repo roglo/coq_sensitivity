@@ -46,5 +46,7 @@ TacChangeAngle.vio: TacChangeAngle.v ../main/RingLike.vio TrigoWithoutPi.vio
 TacChangeAngle.vo TacChangeAngle.glob TacChangeAngle.v.beautified TacChangeAngle.required_vo: TacChangeAngle.v ../main/RingLike.vo TrigoWithoutPi.vo
 TrigoWithoutPi.vio: TrigoWithoutPi.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio
 TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo
+Work.vio: Work.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio TrigoWithoutPi.vio AngleAddLeMonoL.vio Complex.vio
+Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo AngleAddLeMonoL.vo Complex.vo
 Zrl.vio: Zrl.v ../main/RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v ../main/RingLike.vo
