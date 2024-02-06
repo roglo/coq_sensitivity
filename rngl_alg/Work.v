@@ -15,8 +15,8 @@ Require Import RealLike TrigoWithoutPi.
 Require Import (*AngleAddOverflowLe*) AngleAddLeMonoL.
 (*
 Require Import AngleDiv2Add.
-Require Import TacChangeAngle.
 *)
+Require Import TacChangeAngle.
 Require Import Complex.
 
 Section a.
@@ -241,6 +241,18 @@ destruct n. {
       exfalso.
       apply rngl_leb_le in Hzsm.
       apply (rngl_nle_gt Hor) in Hzs.
+(*
+...
+remember (u i) as θu.
+rename θ' into θ''.
+change_angle_add_r θu angle_straight.
+rewrite <- Hθ' in Hzsm, Hzs.
+progress sin_cos_add_sub_straight_hyp T Hzsm.
+progress sin_cos_add_sub_straight_hyp T Hzsm.
+progress sin_cos_add_sub_straight_hyp T Hzs.
+...
+*)
+(*
 rewrite Hu in Hzs, Hzsm.
 progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
 progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
@@ -257,29 +269,31 @@ Search (angle_mul_nat_overflow _ _ = angle_mul_nat_overflow _ _).
 apply angle_mul_nat_overflow_symm_true.
 ...
       apply Hzs; clear Hzs.
+*)
       rewrite (angle_add_diag Hon Hos) in Hzsm.
       rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
-(**)
       destruct (rngl_lt_dec Hor 0 (rngl_cos (u i))) as [Hzcu| Hzcu]. {
         rewrite <- rngl_mul_assoc in Hzsm.
         apply (rngl_lt_eq_cases Hor) in Hzsm.
         destruct Hzsm as [Hzsm| Hzsm]. {
+(*
           apply (rngl_nlt_ge Hor).
           intros H.
+*)
           apply (rngl_nle_gt Hor) in Hzsm.
           apply Hzsm; clear Hzsm.
           apply (rngl_mul_nonneg_nonpos Hop Hor). {
             apply (rngl_0_le_2 Hon Hop Hor).
           }
-          apply (rngl_lt_le_incl Hor) in H.
+          apply (rngl_lt_le_incl Hor) in Hzs.
           apply (rngl_lt_le_incl Hor) in Hzcu.
           now apply (rngl_mul_nonpos_nonneg Hop Hor).
         }
         symmetry in Hzsm.
         apply (rngl_eq_mul_0_r Hos Hii) in Hzsm. {
           apply (rngl_eq_mul_0_l Hos Hii) in Hzsm. {
-            rewrite Hzsm.
-            apply (rngl_le_refl Hor).
+            rewrite Hzsm in Hzs.
+            now apply (rngl_lt_irrefl Hor) in Hzs.
           }
           intros H.
           rewrite H in Hzcu.
@@ -288,11 +302,13 @@ apply angle_mul_nat_overflow_symm_true.
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       apply (rngl_nlt_ge Hor) in Hzcu.
+(*
       apply (rngl_nlt_ge Hor).
       intros Hsz.
-      rewrite Hu in Hzcu, Hsz.
+*)
+      rewrite Hu in Hzcu, Hzs.
       progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hsz.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
       destruct i; [ cbn in Hni; flia Hni | ].
       destruct i; [ cbn in Hni; flia Hni | ].
       remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
