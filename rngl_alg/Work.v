@@ -45,7 +45,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hiz Hlim.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat as Hlim'.
 (* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
-Search (_ * (_ / ₂^_))%A.
 specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
@@ -242,6 +241,9 @@ destruct n. {
       exfalso.
       apply rngl_leb_le in Hzsm.
       apply (rngl_nle_gt Hor) in Hzs.
+rewrite Hu in Hzs, Hzsm.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
 ...
 specialize (angle_div_2_pow_mul_nat_if 3 i θ _ eq_refl) as H1.
 apply Bool.not_true_iff_false in H1.

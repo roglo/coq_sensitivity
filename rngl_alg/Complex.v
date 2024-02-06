@@ -299,6 +299,19 @@ Fixpoint angle_mul_nat_overflow n θ :=
        angle_mul_nat_overflow n' θ)%bool
   end.
 
+End a.
+
+Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
+  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
+
 Theorem angle_mul_2_pow_div_2_pow :
   ∀ n θ, (2 ^ n * angle_div_2_pow_nat θ n)%A = θ.
 Proof.
@@ -2140,8 +2153,6 @@ Qed.
 (*
 Notation "⌊ a / b ⌋" := (div a b).
 *)
-Notation "θ / ₂ ^ n" := (angle_div_2_pow_nat θ n)
-  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
 Theorem angle_div_2_pow_nat_succ_r_1 :
   ∀ n θ, angle_div_2_pow_nat θ (S n) = (angle_div_2_pow_nat θ n / ₂)%A.
