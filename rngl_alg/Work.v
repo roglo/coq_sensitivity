@@ -8,9 +8,7 @@ Require Import Init.Nat.
 Import List List.ListNotations.
 *)
 Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
-(*
 Require Import Misc.
-*)
 Require Import RealLike TrigoWithoutPi.
 Require Import (*AngleAddOverflowLe*) AngleAddLeMonoL.
 (*
@@ -335,6 +333,29 @@ apply angle_mul_nat_overflow_symm_true.
       rewrite Hu in Hzs, Hzcu.
       apply Bool.not_true_iff_false in H1.
       apply H1; clear H1.
+      destruct i; [ cbn in Hni; flia Hni | ].
+      destruct i; [ cbn in Hni; flia Hni | ].
+      exfalso.
+      apply (rngl_nle_gt Hor) in Hzs.
+      apply Hzs; clear Hzs.
+(*
+Check Nat_div_less_small_iff.
+specialize (Nat_div_less_small_iff (2 ^ S (S i) / 3) (2 ^ S (S i)) 3) as H1.
+rewrite (proj2 (H1 _ _ _ (Nat.neq_succ_0 _))).
+rewrite (proj2 (Nat_div_less_small _ _ _ (Nat.neq_succ_0 _))).
+*)
+      destruct i. {
+        cbn - [ rngl_sin ].
+        rewrite angle_add_0_r.
+        apply rngl_sin_div_2_nonneg.
+      }
+      destruct i. {
+        cbn - [ rngl_sin angle_mul_nat ].
+        rewrite angle_div_2_mul_2.
+        apply rngl_sin_div_2_nonneg.
+      }
+      destruct i. {
+        cbn - [ rngl_sin angle_mul_nat angle_div_2_pow_nat ].
 ...
 remember (u i) as θ1 eqn:Hθ1.
       rename θ' into θ''.
