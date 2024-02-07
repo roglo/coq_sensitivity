@@ -416,6 +416,30 @@ destruct i. {
 }
 destruct i. {
   cbn in Hni |-*.
+  apply Nat.succ_le_mono in Hni.
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+  apply Nat.succ_le_mono in Hni.
+  destruct n. {
+    rewrite (angle_mul_1_l Hon Hos).
+    apply angle_add_overflow_div_2_div_2.
+  }
+  apply Nat.succ_le_mono in Hni.
+  destruct n. {
+    rewrite angle_div_2_mul_2.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  apply Nat.succ_le_mono in Hni.
+  cbn.
+...
+  rewrite angle_add_0_r.
+  rewrite (angle_add_assoc Hop).
+  apply angle_add_not_overflow_move_add. {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  rewrite <- angle_div_2_add_not_overflow. 2: {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  apply angle_add_overflow_div_2_div_2.
 ...
 Search (_ * (_ / ₂))%A.
 rewrite angle_mul_nat_div_2.
