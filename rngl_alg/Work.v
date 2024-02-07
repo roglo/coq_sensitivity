@@ -449,16 +449,52 @@ destruct i. {
   }
   apply Nat.succ_le_mono in Hni.
   destruct n. {
-...
-  rewrite angle_add_0_r.
-  rewrite (angle_add_assoc Hop).
-  apply angle_add_not_overflow_move_add. {
+    replace 5 with (2 * 2 + 1) by easy.
+    rewrite (angle_mul_add_distr_r Hon Hop).
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
+    do 2 rewrite angle_div_2_mul_2.
+    rewrite (angle_mul_1_l Hon Hos).
+    apply angle_add_not_overflow_move_add.
+    apply angle_add_overflow_div_2_div_2.
+    rewrite angle_add_div_2_diag.
     apply angle_add_overflow_div_2_div_2.
   }
-  rewrite <- angle_div_2_add_not_overflow. 2: {
+  apply Nat.succ_le_mono in Hni.
+  destruct n. {
+    replace 6 with ((2 + 1) * 2) by easy.
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
+    rewrite (angle_mul_add_distr_r Hon Hop).
+    do 2 rewrite angle_div_2_mul_2.
+    rewrite (angle_mul_1_l Hon Hos).
+    apply angle_add_not_overflow_move_add.
+    apply angle_add_overflow_div_2_div_2.
+    rewrite <- angle_div_2_add_not_overflow.
+    apply angle_add_overflow_div_2_div_2.
     apply angle_add_overflow_div_2_div_2.
   }
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  replace 7 with ((2 + 1) * 2 + 1) by easy.
+  rewrite (angle_mul_add_distr_r Hon Hop).
+  rewrite <- (angle_mul_nat_assoc Hon Hop).
+  rewrite angle_div_2_mul_2.
+  rewrite (angle_mul_add_distr_r Hon Hop).
+  rewrite angle_div_2_mul_2.
+  do 2 rewrite (angle_mul_1_l Hon Hos).
+  remember ((θ / ₂) / ₂)%A as x.
+  apply angle_add_not_overflow_move_add.
   apply angle_add_overflow_div_2_div_2.
+  rewrite angle_add_div_2_diag.
+  subst x.
+  apply angle_add_not_overflow_move_add.
+  apply angle_add_overflow_div_2_div_2.
+  rewrite angle_add_div_2_diag.
+  apply angle_add_overflow_div_2_div_2.
+}
+destruct i. {
+  cbn in Hni |-*.
+  apply Nat.succ_le_mono in Hni.
+  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
 ...
 Search (_ * (_ / ₂))%A.
 rewrite angle_mul_nat_div_2.
