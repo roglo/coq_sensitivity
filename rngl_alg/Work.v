@@ -368,6 +368,25 @@ split. {
   apply Nat.le_succ_diag_r.
 }
 clear IHn.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin (θ / ₂^i))%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  remember (0 ≤? rngl_sin (θ / ₂^i + n * (θ / ₂^i)))%L as zsn eqn:Hzsn.
+  symmetry in Hzsn.
+  destruct zsn; [ | easy ].
+  apply rngl_leb_le in Hzsn.
+  apply rngl_leb_le.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply AngleAddOverflowLe.angle_add_overflow_le_lemma_111; try easy. 2: {
+Search (rngl_sin (_ * _)).
+  destruct n. {
+    apply (rngl_le_refl Hor).
+  }
+apply AngleAddOverflowLe.quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 revert i θ Hni.
 induction n; intros; [ apply (angle_add_overflow_0_r Hon Hos) | ].
