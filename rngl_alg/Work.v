@@ -315,6 +315,125 @@ destruct n. {
       destruct i. {
         cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
         apply rngl_sin_nonneg_angle_le_straight.
+Theorem glop :
+  ∀ n i θ,
+  2 * n ≤ 2 ^ i
+  → (n * (θ / ₂^i) ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%A).
+  apply angle_nonneg.
+}
+intros * Hni.
+revert θ.
+induction i; intros. {
+  cbn in Hni.
+  rewrite Nat.add_0_r in Hni.
+  destruct n; [ apply (angle_straight_nonneg Hc1) | ].
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  rewrite <- Nat.add_succ_comm in Hni; cbn in Hni.
+  easy.
+}
+destruct (le_dec (2 * n) (2 ^ i)) as [Hni1| Hni1]. {
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hni1.
+rewrite Nat.pow_succ_r' in Hni.
+apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+apply (angle_le_trans _ (n * (θ / ₂^i))). {
+  rewrite angle_div_2_pow_nat_succ_r_1.
+  apply angle_mul_le_mono_l. {
+    apply angle_div_2_le.
+  }
+Search (_ → angle_mul_nat_overflow _ _ = false).
+Theorem glop :
+  ∀ n i θ,
+  n ≤ 2 ^ i
+  → angle_mul_nat_overflow n (θ / ₂^i) = false.
+Proof.
+destruct_ac.
+intros * Hni.
+revert i θ Hni.
+induction n; intros; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
+apply Bool.orb_false_iff.
+split. {
+  apply IHn.
+  apply (Nat.le_trans _ (S n)); [ | easy ].
+  apply Nat.le_succ_diag_r.
+}
+clear IHn.
+...
+revert i θ Hni.
+induction n; intros; [ apply (angle_add_overflow_0_r Hon Hos) | ].
+cbn.
+Search (angle_add_overflow _ (_ + _)).
+rewrite (angle_add_comm Hic).
+apply angle_add_not_overflow_move_add.
+...
+revert n θ Hni.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+rewrite angle_div_2_pow_nat_succ_r_2.
+apply IHi.
+...
+Search (angle_add_overflow (_ / ₂^_)).
+Search (angle_add_overflow _ (_ * _)).
+rewrite <- (angle_mul_1_l Hon Hos (θ / ₂^i)%A) at 1.
+Search (angle_add_overflow _ (_ * _)).
+apply angle_mul_nat_overflow_distr_add_overflow.
+...
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+Search (_ ≤ _ + _)%A.
+...
+intros * Hni.
+revert n θ Hni.
+induction i; intros. {
+  cbn in Hni.
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply Nat.succ_le_mono in Hni.
+}
+destruct (le_dec n (2 ^ i)) as [Hni1| Hni1]. {
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hni1.
+...
+apply (angle_mul_nat_overflow_le_r _ (θ / ₂^i)). 2: {
+  apply IHi.
+Search (angle_mul_nat_overflow _ _ = false).
+
+apply (angle_mul_nat_not_overflow_le_r).
+...
+apply (angle_mul_nat_not_overflow_le_l _ 2).
+Search (angle_mul_nat_overflow _ (_ / ₂^S _)).
+rewrite angle_div_2_pow_nat_succ_r_2.
+
+apply IHi.
+... ...
+now apply glop.
+...
+apply angle_all_add_not_overflow.
+intros m Hmn.
+Search (angle_add_overflow (_ / ₂^_)).
+...
+Search (_ * (_ / ₂ ≤ _))%A.
+...
+... ...
+apply glop; cbn.
+do 10 apply -> Nat.succ_le_mono.
+easy.
 ...
 Search (_ * _ ≤ _)%A.
 Search (_ * _ ≤ angle_straight)%A.
