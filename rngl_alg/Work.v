@@ -429,7 +429,26 @@ destruct i. {
     apply angle_add_overflow_div_2_div_2.
   }
   apply Nat.succ_le_mono in Hni.
-  cbn.
+  destruct n. {
+    remember ((θ / ₂) / ₂)%A as x.
+    replace 3 with (2 + 1) by easy.
+    rewrite (angle_mul_add_distr_r Hon Hop).
+    rewrite angle_div_2_mul_2.
+    rewrite (angle_mul_1_l Hon Hos).
+    apply angle_add_not_overflow_move_add.
+    apply angle_add_overflow_div_2_div_2.
+    rewrite angle_add_div_2_diag; subst x.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  apply Nat.succ_le_mono in Hni.
+  destruct n. {
+    replace 4 with (2 * 2) by easy.
+    rewrite <- (angle_mul_nat_assoc Hon Hop).
+    do 2 rewrite angle_div_2_mul_2.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  apply Nat.succ_le_mono in Hni.
+  destruct n. {
 ...
   rewrite angle_add_0_r.
   rewrite (angle_add_assoc Hop).
