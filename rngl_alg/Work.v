@@ -367,6 +367,40 @@ split. {
   apply (Nat.le_trans _ (S n)); [ | easy ].
   apply Nat.le_succ_diag_r.
 }
+destruct i. {
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+rewrite angle_div_2_pow_nat_succ_r_1.
+rewrite angle_mul_nat_div_2.
+apply angle_add_overflow_div_2_div_2.
+apply IHn.
+clear IHn θ.
+revert n Hni.
+induction i; intros. {
+  cbn in Hni |-*.
+  now apply Nat.succ_le_mono in Hni.
+}
+destruct i. {
+  cbn in Hni |-*.
+  apply Nat.succ_le_mono in Hni.
+(* merde *)
+...
+rewrite <- (angle_mul_1_l Hon Hos (θ / ₂^i)%A) at 1.
+apply angle_mul_nat_overflow_distr_add_overflow.
+rewrite Nat.add_1_l.
+Search (angle_mul_nat_overflow (S _)).
+...
+destruct n. {
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+cbn.
+apply angle_add_not_overflow_move_add. 2: {
+...
+Search (angle_add_overflow _ (_ + _)).
+...
 clear IHn.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
@@ -386,6 +420,11 @@ Search (rngl_sin (_ * _)).
   destruct n. {
     apply (rngl_le_refl Hor).
   }
+  destruct n. {
+    now rewrite angle_mul_1_l.
+  }
+  destruct n. {
+...
 apply AngleAddOverflowLe.quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...
 revert i θ Hni.
