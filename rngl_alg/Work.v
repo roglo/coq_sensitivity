@@ -384,6 +384,12 @@ destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
   now apply IHi.
 }
 apply Nat.nle_gt in Hsni.
+cbn in Hni.
+rewrite Nat.add_0_r in Hni.
+...
+rewrite angle_div_2_pow_nat_succ_r_1.
+rewrite angle_mul_nat_div_2.
+apply angle_add_overflow_div_2_div_2.
 ...
 destruct i. {
   cbn in Hni.
