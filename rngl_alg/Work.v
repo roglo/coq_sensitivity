@@ -118,6 +118,44 @@ split. {
 now apply angle_mul_add_overflow_mul_div_2_pow.
 Qed.
 
+Theorem angle_mul_div_2_pow_le_straight :
+  ∀ n i θ,
+  2 * n ≤ 2 ^ i
+  → (n * (θ / ₂^i) ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%A).
+  apply angle_nonneg.
+}
+intros * Hni.
+revert θ.
+induction i; intros. {
+  cbn in Hni.
+  rewrite Nat.add_0_r in Hni.
+  destruct n; [ apply (angle_straight_nonneg Hc1) | ].
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  rewrite <- Nat.add_succ_comm in Hni; cbn in Hni.
+  easy.
+}
+destruct (le_dec (2 * n) (2 ^ i)) as [Hni1| Hni1]. {
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hni1.
+clear IHi.
+rewrite Nat.pow_succ_r' in Hni.
+apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+rewrite angle_div_2_pow_nat_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  now apply angle_mul_nat_overflow_div_2_pow.
+}
+apply angle_div_2_le_straight.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -387,334 +425,9 @@ destruct n. {
       destruct i. {
         cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
         apply rngl_sin_nonneg_angle_le_straight.
-Theorem glop :
-  ∀ n i θ,
-  2 * n ≤ 2 ^ i
-  → (n * (θ / ₂^i) ≤ angle_straight)%A.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 (_ * _)%A).
-  apply angle_nonneg.
-}
-intros * Hni.
-revert θ.
-induction i; intros. {
-  cbn in Hni.
-  rewrite Nat.add_0_r in Hni.
-  destruct n; [ apply (angle_straight_nonneg Hc1) | ].
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  rewrite <- Nat.add_succ_comm in Hni; cbn in Hni.
-  easy.
-}
-destruct (le_dec (2 * n) (2 ^ i)) as [Hni1| Hni1]. {
-  rewrite angle_div_2_pow_nat_succ_r_2.
-  now apply IHi.
-}
-apply Nat.nle_gt in Hni1.
-clear IHi.
-rewrite Nat.pow_succ_r' in Hni.
-apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
-(**)
-specialize (angle_mul_nat_overflow_div_2_pow n i) as H1.
-specialize (H1 (θ / ₂ / ₂)%A Hni).
-...
-apply (angle_le_trans _ (n * (θ / ₂^i))). {
-  rewrite angle_div_2_pow_nat_succ_r_1.
-  apply angle_mul_le_mono_l. {
-    apply angle_div_2_le.
-  }
-  now apply angle_mul_nat_overflow_div_2_pow.
-}
-Search (_ * _ ≤ _)%A.
-Search (_ * _ ≤ angle_straight)%A.
-Search (_ ≤ angle_straight)%A.
-...
-cbn in Hni.
-rewrite Nat.add_0_r in Hni.
-...
-rewrite angle_div_2_pow_nat_succ_r_1.
-rewrite angle_mul_nat_div_2.
-apply angle_add_overflow_div_2_div_2.
-...
-destruct i. {
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  apply (angle_add_overflow_0_r Hon Hos).
-}
-rewrite angle_div_2_pow_nat_succ_r_1.
-(**)
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  rewrite (angle_mul_1_l Hon Hos).
-  apply angle_add_overflow_div_2_div_2.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    rewrite (angle_mul_1_l Hon Hos).
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    rewrite angle_div_2_mul_2.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  cbn.
-  rewrite angle_add_0_r.
-  rewrite (angle_add_assoc Hop).
-  apply angle_add_not_overflow_move_add. {
-    apply angle_add_overflow_div_2_div_2.
-  }
-  rewrite <- angle_div_2_add_not_overflow. 2: {
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply angle_add_overflow_div_2_div_2.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    rewrite (angle_mul_1_l Hon Hos).
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    rewrite angle_div_2_mul_2.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    remember ((θ / ₂) / ₂)%A as x.
-    replace 3 with (2 + 1) by easy.
-    rewrite (angle_mul_add_distr_r Hon Hop).
-    rewrite angle_div_2_mul_2.
-    rewrite (angle_mul_1_l Hon Hos).
-    apply angle_add_not_overflow_move_add.
-    apply angle_add_overflow_div_2_div_2.
-    rewrite angle_add_div_2_diag; subst x.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    replace 4 with (2 * 2) by easy.
-    rewrite <- (angle_mul_nat_assoc Hon Hop).
-    do 2 rewrite angle_div_2_mul_2.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    replace 5 with (2 * 2 + 1) by easy.
-    rewrite (angle_mul_add_distr_r Hon Hop).
-    rewrite <- (angle_mul_nat_assoc Hon Hop).
-    do 2 rewrite angle_div_2_mul_2.
-    rewrite (angle_mul_1_l Hon Hos).
-    apply angle_add_not_overflow_move_add.
-    apply angle_add_overflow_div_2_div_2.
-    rewrite angle_add_div_2_diag.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    replace 6 with ((2 + 1) * 2) by easy.
-    rewrite <- (angle_mul_nat_assoc Hon Hop).
-    rewrite (angle_mul_add_distr_r Hon Hop).
-    do 2 rewrite angle_div_2_mul_2.
-    rewrite (angle_mul_1_l Hon Hos).
-    apply angle_add_not_overflow_move_add.
-    apply angle_add_overflow_div_2_div_2.
-    rewrite <- angle_div_2_add_not_overflow.
-    apply angle_add_overflow_div_2_div_2.
-    apply angle_add_overflow_div_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  replace 7 with ((2 + 1) * 2 + 1) by easy.
-  rewrite (angle_mul_add_distr_r Hon Hop).
-  rewrite <- (angle_mul_nat_assoc Hon Hop).
-  rewrite angle_div_2_mul_2.
-  rewrite (angle_mul_add_distr_r Hon Hop).
-  rewrite angle_div_2_mul_2.
-  do 2 rewrite (angle_mul_1_l Hon Hos).
-  remember ((θ / ₂) / ₂)%A as x.
-  apply angle_add_not_overflow_move_add.
-  apply angle_add_overflow_div_2_div_2.
-  rewrite angle_add_div_2_diag.
-  subst x.
-  apply angle_add_not_overflow_move_add.
-  apply angle_add_overflow_div_2_div_2.
-  rewrite angle_add_div_2_diag.
-  apply angle_add_overflow_div_2_div_2.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ apply (angle_add_overflow_0_r Hon Hos) | ].
-...
-Search (_ * (_ / ₂))%A.
-rewrite angle_mul_nat_div_2.
-Search (angle_add_overflow (_ / ₂)).
-...
-rewrite angle_mul_nat_div_2. {
-  apply angle_add_overflow_div_2_div_2.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ easy | ].
-  apply Nat.succ_le_mono in Hni.
-  now apply Nat.le_0_r in Hni; subst n.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ easy | ].
-  apply Nat.succ_le_mono in Hni.
-  destruct n; [ easy | ].
-  apply Nat.succ_le_mono in Hni.
-  destruct n. {
-    replace 2 with (2 * 1) by easy.
-    now apply angle_mul_nat_overflow_mul_2_div_2.
-  }
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  rewrite <- angle_div_2_pow_1.
-  apply IHn.
-  cbn.
-(* ah putain, c'est faux *)
-...
-apply IHn.
-clear IHn θ.
-revert n Hni.
-induction i; intros. {
-  cbn in Hni |-*.
-  now apply Nat.succ_le_mono in Hni.
-}
-destruct i. {
-  cbn in Hni |-*.
-  apply Nat.succ_le_mono in Hni.
-(* merde *)
-...
-rewrite <- (angle_mul_1_l Hon Hos (θ / ₂^i)%A) at 1.
-apply angle_mul_nat_overflow_distr_add_overflow.
-rewrite Nat.add_1_l.
-Search (angle_mul_nat_overflow (S _)).
-...
-destruct n. {
-  apply (angle_add_overflow_0_r Hon Hos).
-}
-cbn.
-apply angle_add_not_overflow_move_add. 2: {
-...
-Search (angle_add_overflow _ (_ + _)).
-...
-clear IHn.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin (θ / ₂^i))%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  remember (0 ≤? rngl_sin (θ / ₂^i + n * (θ / ₂^i)))%L as zsn eqn:Hzsn.
-  symmetry in Hzsn.
-  destruct zsn; [ | easy ].
-  apply rngl_leb_le in Hzsn.
-  apply rngl_leb_le.
-Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
-apply AngleAddOverflowLe.angle_add_overflow_le_lemma_111; try easy. 2: {
-Search (rngl_sin (_ * _)).
-  destruct n. {
-    apply (rngl_le_refl Hor).
-  }
-  destruct n. {
-    now rewrite angle_mul_1_l.
-  }
-  destruct n. {
-...
-apply AngleAddOverflowLe.quadrant_1_rngl_cos_add_le_cos_l; try easy.
-...
-revert i θ Hni.
-induction n; intros; [ apply (angle_add_overflow_0_r Hon Hos) | ].
-cbn.
-Search (angle_add_overflow _ (_ + _)).
-rewrite (angle_add_comm Hic).
-apply angle_add_not_overflow_move_add.
-...
-revert n θ Hni.
-induction i; intros. {
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  apply (angle_add_overflow_0_r Hon Hos).
-}
-rewrite angle_div_2_pow_nat_succ_r_2.
-apply IHi.
-...
-Search (angle_add_overflow (_ / ₂^_)).
-Search (angle_add_overflow _ (_ * _)).
-rewrite <- (angle_mul_1_l Hon Hos (θ / ₂^i)%A) at 1.
-Search (angle_add_overflow _ (_ * _)).
-apply angle_mul_nat_overflow_distr_add_overflow.
-...
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-Search (_ ≤ _ + _)%A.
-...
-intros * Hni.
-revert n θ Hni.
-induction i; intros. {
-  cbn in Hni.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  now apply Nat.succ_le_mono in Hni.
-}
-destruct (le_dec n (2 ^ i)) as [Hni1| Hni1]. {
-  rewrite angle_div_2_pow_nat_succ_r_2.
-  now apply IHi.
-}
-apply Nat.nle_gt in Hni1.
-...
-apply (angle_mul_nat_overflow_le_r _ (θ / ₂^i)). 2: {
-  apply IHi.
-Search (angle_mul_nat_overflow _ _ = false).
-
-apply (angle_mul_nat_not_overflow_le_r).
-...
-apply (angle_mul_nat_not_overflow_le_l _ 2).
-Search (angle_mul_nat_overflow _ (_ / ₂^S _)).
-rewrite angle_div_2_pow_nat_succ_r_2.
-
-apply IHi.
-... ...
-...
-now apply glop.
-...
-apply angle_all_add_not_overflow.
-intros m Hmn.
-Search (angle_add_overflow (_ / ₂^_)).
-...
-Search (_ * (_ / ₂ ≤ _))%A.
-...
-... ...
-apply glop; cbn.
-do 10 apply -> Nat.succ_le_mono.
-easy.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 10 apply -> Nat.succ_le_mono.
+      }
 ...
 Search (_ * _ ≤ _)%A.
 Search (_ * _ ≤ angle_straight)%A.
