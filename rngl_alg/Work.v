@@ -397,6 +397,14 @@ rewrite H1.
 rewrite (angle_mul_add_distr_r Hon Hop).
 rewrite angle_div_2_pow_nat_succ_r_2 at 2.
 rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_nat_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)).
+  apply Nat.lt_le_incl, Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+  apply angle_mul_nat_overflow_pow_div.
+}
+rewrite <- angle_div_2_add_not_overflow. 2: {
 ...
 cbn in Hni.
 rewrite Nat.add_0_r in Hni.
