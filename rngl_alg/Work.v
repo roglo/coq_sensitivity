@@ -370,6 +370,21 @@ split. {
   apply (Nat.le_trans _ (S n)); [ | easy ].
   apply Nat.le_succ_diag_r.
 }
+clear IHn.
+(**)
+revert θ n Hni.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hsni.
+...
 destruct i. {
   cbn in Hni.
   apply Nat.succ_le_mono in Hni.
