@@ -49,6 +49,75 @@ Qed.
 Theorem angle_div_2_pow_1 : ∀ θ, (θ / ₂^1 = θ / ₂)%A.
 Proof. easy. Qed.
 
+Theorem angle_mul_add_overflow_mul_div_2_pow :
+  ∀ n i θ,
+  S n ≤ 2 ^ i
+  → angle_add_overflow (θ / ₂^i) (n * (θ / ₂^i)) = false.
+Proof.
+destruct_ac.
+intros * Hni.
+revert θ n Hni.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
+  rewrite angle_div_2_pow_nat_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hsni.
+apply -> Nat.le_succ_l in Hni.
+apply -> Nat.lt_succ_r in Hsni.
+assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
+  specialize (Nat.div_mod n (2 ^ i)) as H1.
+  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
+  specialize (H1 H); clear H.
+  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
+  now rewrite Nat.mul_1_l.
+}
+rewrite H1.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_div_2_pow_nat_succ_r_2 at 2.
+rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_nat_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)).
+  apply Nat.lt_le_incl, Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+  apply angle_mul_nat_overflow_pow_div.
+}
+apply angle_add_not_overflow_move_add. 2: {
+  rewrite <- angle_div_2_add_not_overflow. 2: {
+    apply IHi.
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
+  }
+  apply angle_add_overflow_div_2_div_2.
+}
+apply angle_add_overflow_div_2_div_2.
+Qed.
+
+Theorem angle_mul_nat_overflow_div_2_pow :
+  ∀ n i θ,
+  n ≤ 2 ^ i
+  → angle_mul_nat_overflow n (θ / ₂^i) = false.
+Proof.
+destruct_ac.
+intros * Hni.
+revert i θ Hni.
+induction n; intros; [ easy | ].
+rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
+apply Bool.orb_false_iff.
+split. {
+  apply IHn.
+  apply (Nat.le_trans _ (S n)); [ | easy ].
+  apply Nat.le_succ_diag_r.
+}
+now apply angle_mul_add_overflow_mul_div_2_pow.
+Qed.
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow_nat' :
   rngl_is_archimedean T = true →
@@ -353,58 +422,9 @@ apply (angle_le_trans _ (n * (θ / ₂^i))). {
   apply angle_mul_le_mono_l. {
     apply angle_div_2_le.
   }
-Search (_ → angle_mul_nat_overflow _ _ = false).
-Theorem glop :
-  ∀ n i θ,
-  n ≤ 2 ^ i
-  → angle_mul_nat_overflow n (θ / ₂^i) = false.
-Proof.
-destruct_ac.
-intros * Hni.
-revert i θ Hni.
-induction n; intros; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
-apply Bool.orb_false_iff.
-split. {
-  apply IHn.
-  apply (Nat.le_trans _ (S n)); [ | easy ].
-  apply Nat.le_succ_diag_r.
+  now apply angle_mul_nat_overflow_div_2_pow.
 }
-clear IHn.
-(**)
-revert θ n Hni.
-induction i; intros. {
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  apply (angle_add_overflow_0_r Hon Hos).
-}
-destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
-  rewrite angle_div_2_pow_nat_succ_r_2.
-  now apply IHi.
-}
-apply Nat.nle_gt in Hsni.
-apply -> Nat.le_succ_l in Hni.
-apply -> Nat.lt_succ_r in Hsni.
-assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
-  specialize (Nat.div_mod n (2 ^ i)) as H1.
-  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
-  specialize (H1 H); clear H.
-  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
-  now rewrite Nat.mul_1_l.
-}
-rewrite H1.
-rewrite (angle_mul_add_distr_r Hon Hop).
-rewrite angle_div_2_pow_nat_succ_r_2 at 2.
-rewrite angle_mul_2_pow_div_2_pow.
-rewrite angle_div_2_pow_nat_succ_r_1.
-rewrite angle_mul_nat_div_2. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)).
-  apply Nat.lt_le_incl, Nat.mod_upper_bound.
-  now apply Nat.pow_nonzero.
-  apply angle_mul_nat_overflow_pow_div.
-}
-rewrite <- angle_div_2_add_not_overflow. 2: {
+Search (_ * _ ≤ angle_straight)%A.
 ...
 cbn in Hni.
 rewrite Nat.add_0_r in Hni.
@@ -675,6 +695,7 @@ rewrite angle_div_2_pow_nat_succ_r_2.
 
 apply IHi.
 ... ...
+...
 now apply glop.
 ...
 apply angle_all_add_not_overflow.
