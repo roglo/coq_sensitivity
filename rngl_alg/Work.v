@@ -368,10 +368,18 @@ destruct n. {
     }
     apply (rngl_leb_gt Hor) in Hzs.
     apply (rngl_nle_gt Hor) in Hzs.
+(**)
+    exfalso.
+    apply Hzs; clear Hzs.
+    rewrite Hu.
+    unfold seq_angle_converging_to_angle_div_nat.
+    apply rngl_sin_nonneg_angle_le_straight.
+    apply angle_mul_div_2_pow_le_straight.
+...
     destruct zsm. {
       exfalso.
-      apply rngl_leb_le in Hzsm.
       apply (rngl_nle_gt Hor) in Hzs.
+      apply rngl_leb_le in Hzsm.
       rewrite (angle_add_diag Hon Hos) in Hzsm.
       rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
       destruct (rngl_lt_dec Hor 0 (rngl_cos (u i))) as [Hzcu| Hzcu]. {
@@ -399,6 +407,14 @@ destruct n. {
         }
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
+(**)
+      apply (rngl_nle_gt Hor) in Hzs.
+      apply Hzs; clear Hzs.
+rewrite Hu.
+unfold seq_angle_converging_to_angle_div_nat.
+apply rngl_sin_nonneg_angle_le_straight.
+apply angle_mul_div_2_pow_le_straight.
+...
       apply (rngl_nlt_ge Hor) in Hzcu.
       clear Hzsm.
       progress unfold seq_angle_converging_to_angle_div_nat in Hu.
@@ -406,7 +422,6 @@ destruct n. {
       specialize (H1 3 i θ).
       rewrite Hu in Hzs, Hzcu.
       apply Bool.not_true_iff_false in H1.
-      apply H1; clear H1.
       destruct i; [ cbn in Hni; flia Hni | ].
       destruct i; [ cbn in Hni; flia Hni | ].
       exfalso; clear Hni.
@@ -422,6 +437,12 @@ destruct n. {
         rewrite angle_div_2_mul_2.
         apply rngl_sin_div_2_nonneg.
       }
+(**)
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight.
+
+        now do 340 apply -> Nat.succ_le_mono.
+...
       destruct i. {
         cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
         apply rngl_sin_nonneg_angle_le_straight.
