@@ -384,6 +384,20 @@ destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
   now apply IHi.
 }
 apply Nat.nle_gt in Hsni.
+apply -> Nat.le_succ_l in Hni.
+apply -> Nat.lt_succ_r in Hsni.
+assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
+  specialize (Nat.div_mod n (2 ^ i)) as H1.
+  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
+  specialize (H1 H); clear H.
+  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
+  now rewrite Nat.mul_1_l.
+}
+rewrite H1.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_div_2_pow_nat_succ_r_2 at 2.
+rewrite angle_mul_2_pow_div_2_pow.
+...
 cbn in Hni.
 rewrite Nat.add_0_r in Hni.
 ...
