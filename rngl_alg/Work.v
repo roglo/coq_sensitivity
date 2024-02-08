@@ -428,6 +428,36 @@ destruct n. {
         apply angle_mul_div_2_pow_le_straight; cbn.
         now do 10 apply -> Nat.succ_le_mono.
       }
+      destruct i. {
+        cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 20 apply -> Nat.succ_le_mono.
+      }
+      destruct i. {
+        cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 42 apply -> Nat.succ_le_mono.
+      }
+      destruct i. {
+        cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 84 apply -> Nat.succ_le_mono.
+      }
+      destruct i. {
+        cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 170 apply -> Nat.succ_le_mono.
+      }
+      destruct i. {
+        cbn - [ angle_mul_nat angle_div_2_pow_nat ] in Hzcu |-*.
+        apply rngl_sin_nonneg_angle_le_straight.
+        apply angle_mul_div_2_pow_le_straight; cbn.
+        now do 340 apply -> Nat.succ_le_mono.
+      }
 ...
 Search (_ * _ ≤ _)%A.
 Search (_ * _ ≤ angle_straight)%A.
