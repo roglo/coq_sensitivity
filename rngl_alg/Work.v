@@ -415,8 +415,13 @@ destruct (le_dec (2 * n) (2 ^ i)) as [Hni1| Hni1]. {
   now apply IHi.
 }
 apply Nat.nle_gt in Hni1.
+clear IHi.
 rewrite Nat.pow_succ_r' in Hni.
 apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+(**)
+specialize (angle_mul_nat_overflow_div_2_pow n i) as H1.
+specialize (H1 (θ / ₂ / ₂)%A Hni).
+...
 apply (angle_le_trans _ (n * (θ / ₂^i))). {
   rewrite angle_div_2_pow_nat_succ_r_1.
   apply angle_mul_le_mono_l. {
@@ -424,7 +429,9 @@ apply (angle_le_trans _ (n * (θ / ₂^i))). {
   }
   now apply angle_mul_nat_overflow_div_2_pow.
 }
+Search (_ * _ ≤ _)%A.
 Search (_ * _ ≤ angle_straight)%A.
+Search (_ ≤ angle_straight)%A.
 ...
 cbn in Hni.
 rewrite Nat.add_0_r in Hni.
