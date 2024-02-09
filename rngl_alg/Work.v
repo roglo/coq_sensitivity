@@ -388,6 +388,7 @@ destruct n. {
   destruct i; [ cbn in Hni; flia Hni | ].
   destruct i; [ cbn in Hni; flia Hni | ].
   rewrite angle_div_2_pow_succ_r_1.
+...
   rewrite angle_mul_nat_div_2. {
     rewrite angle_mul_nat_div_2. {
       apply angle_add_overflow_div_2_div_2.
