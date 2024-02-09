@@ -49,7 +49,7 @@ Qed.
 Theorem angle_div_2_pow_1 : ∀ θ, (θ / ₂^1 = θ / ₂)%A.
 Proof. easy. Qed.
 
-Theorem angle_mul_add_overflow_mul_div_2_pow :
+Theorem angle_add_overflow_mul_div_2_pow :
   ∀ n i θ,
   n < 2 ^ i
   → angle_add_overflow (θ / ₂^i) (n * (θ / ₂^i)) = false.
@@ -115,7 +115,7 @@ split. {
   apply (Nat.le_trans _ (S n)); [ | easy ].
   apply Nat.le_succ_diag_r.
 }
-now apply angle_mul_add_overflow_mul_div_2_pow.
+now apply angle_add_overflow_mul_div_2_pow.
 Qed.
 
 Theorem angle_mul_div_2_pow_le_straight :
@@ -227,6 +227,109 @@ destruct tz. {
   apply (angle_add_overflow_0_r Hon Hos).
 }
 apply (angle_eqb_neq Hed) in Htz.
+(**)
+destruct m. {
+  rewrite angle_mul_0_l.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+destruct m. {
+  rewrite (angle_mul_1_l Hon Hos).
+(*****)
+  progress unfold angle_add_overflow.
+  apply angle_ltb_ge.
+  progress unfold angle_leb.
+  remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
+  remember (0 ≤? rngl_sin (u i + u i))%L as zsm eqn:Hzsm.
+  symmetry in Hzs, Hzsm.
+  rewrite Hu in Hzs, Hzsm.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  rewrite Hzs, Hzsm.
+  destruct zs. {
+    apply rngl_leb_le in Hzs.
+    destruct zsm; [ | easy ].
+    apply rngl_leb_le in Hzsm.
+    apply rngl_leb_le.
+    rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
+    rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+    rewrite (rngl_cos_mul_2_l' Hon Hop).
+    apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+    remember (rngl_cos (u i)) as x eqn:Hx.
+    rewrite Hu in Hx.
+    progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+    rewrite <- Hx.
+    destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
+      destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+        rewrite Hu in Hxz.
+        progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+        apply eq_rngl_sin_0 in Hxz.
+        destruct Hxz as [Hxz| Hxz]. {
+          rewrite Hxz in Hx; cbn in Hx; subst x.
+          exfalso; apply (rngl_nlt_ge Hor) in H2.
+          apply H2; clear H2.
+          rewrite Hxz.
+          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+        } {
+          rewrite Hxz in Hx; cbn in Hx; subst x.
+          exfalso; clear H1 H2 Hzs.
+          destruct i; [ cbn in Hni; flia Hmi Hni | ].
+...
+          rewrite angle_div_2_pow_succ_r_1 in Hxz.
+          rewrite angle_mul_nat_div_2 in Hxz.
+          now apply (angle_div_2_not_straight Hc1) in Hxz.
+...
+          rewrite Nat.pow_succ_r'.
+...
+          rewrite Nat.mul_comm.
+          rewrite Nat.div_mul; [ | easy ].
+          apply angle_mul_nat_overflow_pow_div.
+        }
+      }
+      exfalso.
+      rewrite Hu in Hxz.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+      apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      now rewrite rngl_mul_0_r.
+    }
+    (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
+    apply rngl_2_x2_sub_1_le_x.
+    rewrite <- Hx in Hzsm.
+    split; [ easy | ].
+    subst x; apply rngl_cos_bound.
+  }
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_nle_gt Hor) in Hzs.
+  exfalso.
+  apply Hzs; clear Hzs.
+  destruct i; [ cbn in Hni; flia Hni | ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+  rewrite Nat.div_mul; [ | easy ].
+  rewrite angle_div_2_pow_succ_r_2.
+  rewrite angle_mul_2_pow_div_2_pow.
+  apply rngl_sin_div_2_nonneg.
+}
+........
+...
+Search (angle_add_overflow _ _ = false).
+...
+(*
+  specialize (angle_mul_add_overflow_mul_div_2_pow n (S i) θ) as H1.
+  assert (H : n < 2 ^ S i). {
+    apply (Nat.le_lt_trans _ (2 ^ i)); [ easy | ].
+    cbn; rewrite Nat.add_0_r.
+    remember (2 ^ i) as x.
+    destruct x; [ | cbn; flia ].
+    symmetry in Heqx.
+    now apply Nat.pow_nonzero in Heqx.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+*)
+...
 destruct n; [ easy | clear Hnz ].
 destruct n. {
   apply Nat.lt_1_r in Hmi; subst m.
@@ -404,6 +507,7 @@ destruct n. {
   destruct i; [ cbn in Hni; flia Hni | ].
   destruct i; [ cbn in Hni; flia Hni | ].
   rewrite angle_div_2_pow_succ_r_1.
+  remember (2 ^ S (S i) / 3) as n eqn:Hn.
 ...
   rewrite angle_mul_nat_div_2. {
     rewrite angle_mul_nat_div_2. {
