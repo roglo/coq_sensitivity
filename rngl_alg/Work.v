@@ -309,23 +309,6 @@ destruct m. {
           }
           destruct i. {
             cbn in Hxz.
-Example toto : ∀ a b k, b * b * k = a * a → Nat.gcd a b = 1 → b = 1.
-Proof.
-intros * Hk Hab.
-enough (H : Nat.divide b 1). {
-  destruct H as (c, Hc).
-  symmetry in Hc.
-  now apply Nat.eq_mul_1 in Hc.
-}
-apply Nat.gauss with (m := b * b * k). {
-  rewrite Nat.mul_1_r.
-  rewrite <- Nat.mul_assoc.
-  now apply Nat.divide_mul_l.
-}
-rewrite Hk.
-rewrite Nat.gcd_comm.
-now apply Nat_gcd_1_mul_l.
-...
 ...
           rewrite angle_div_2_pow_succ_r_1 in Hxz.
           rewrite angle_mul_nat_div_2 in Hxz.
