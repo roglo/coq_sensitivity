@@ -363,6 +363,69 @@ destruct m. {
             easy.
           }
           destruct i. {
+            cbn - [ angle_mul_nat_overflow ] in Hb.
+            cbn in Hni.
+            destruct n; [ easy | clear Hnz ].
+            apply Nat.succ_lt_mono in Hmi.
+            apply Nat.succ_le_mono in Hni.
+            destruct n; [ flia Hmi | clear Hmi ].
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              replace 8 with (2 ^ 3) in Hxz by easy.
+              rewrite angle_div_2_pow_succ_r_2 in Hxz.
+              rewrite angle_div_2_pow_mul_2_pow in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+Theorem angle_div_2_pow_mul' :
+  ∀ m n θ, m ≤ 2 ^ n → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A.
+...
+Search (_ * (_ / ₂^_))%A.
+angle_div_2_pow_mul:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) (rl : real_like_prop T) (ac : angle_ctx T) 
+    (n m : nat) (θ : angle T), angle_mul_nat_overflow m θ = false → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A
+...
+rewrite <- angle_div_2_pow_mul in Hxz.
+              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+...
+              rewrite angle_div_2_mul_2 in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_div_2_mul_2 in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            easy.
 ...
           rewrite angle_div_2_pow_succ_r_1 in Hxz.
           rewrite angle_mul_nat_div_2 in Hxz.
