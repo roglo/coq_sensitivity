@@ -78,7 +78,7 @@ assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
   now rewrite Nat.mul_1_l.
 }
 rewrite H1.
-rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_2 at 2.
 rewrite angle_div_2_pow_mul_2_pow.
 rewrite angle_div_2_pow_succ_r_1.
@@ -406,7 +406,7 @@ assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
   now rewrite Nat.mul_1_l.
 }
 rewrite H1.
-rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_1 at 1.
 rewrite angle_mul_nat_div_2. 2: {
   apply angle_mul_nat_overflow_pow_div.
@@ -450,14 +450,10 @@ assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
   now rewrite Nat.mul_1_l.
 }
 rewrite H1.
-...
-rewrite (angle_mul_add_distr_r Hon Hop).
-rewrite angle_div_2_pow_succ_r_1 at 1.
-rewrite angle_mul_nat_div_2. 2: {
-  apply angle_mul_nat_overflow_pow_div.
-}
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_pow_succ_r_2 at 1.
 rewrite angle_div_2_pow_mul_2_pow.
-apply angle_le_lt_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
   apply angle_add_le_mono_l; cycle 1. {
     apply angle_add_overflow_div_2_div_2.
   } {

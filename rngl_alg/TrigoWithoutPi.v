@@ -3191,12 +3191,10 @@ apply (rngl_add_diag Hon).
 Qed.
 
 Theorem angle_mul_add_distr_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
 Proof.
-intros Hon Hop *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros.
 induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
 rewrite IHa.
 apply (angle_add_assoc Hop).
