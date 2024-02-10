@@ -10,7 +10,7 @@ Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
-Require Import (*AngleAddOverflowLe*) AngleAddLeMonoL.
+Require Import AngleAddOverflowLe AngleAddLeMonoL.
 (*
 Require Import AngleDiv2Add.
 *)
@@ -154,6 +154,62 @@ rewrite angle_mul_nat_div_2. 2: {
   now apply angle_mul_nat_overflow_div_2_pow.
 }
 apply angle_div_2_le_straight.
+Qed.
+
+Theorem angle_div_2_pow_mul_le_angle :
+  ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ θ)%A.
+Proof.
+intros * Hni.
+destruct (le_dec (2 ^ i) n) as [Hin| Hin]. {
+  apply Nat.le_antisymm in Hin; [ | easy ].
+  subst n.
+  rewrite angle_div_2_pow_mul_2_pow.
+  apply angle_le_refl.
+}
+apply Nat.nle_gt in Hin.
+clear Hni; rename Hin into Hni.
+revert n θ Hni.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.lt_1_r in Hni; subst n; cbn.
+  apply angle_nonneg.
+}
+destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
+  rewrite angle_div_2_pow_succ_r_2.
+  apply (angle_le_trans _ (θ / ₂)); [ now apply IHi | ].
+  apply angle_div_2_le.
+}
+apply Nat.nlt_ge in Hin.
+assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
+  specialize (Nat.div_mod n (2 ^ i)) as H1.
+  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
+  specialize (H1 H); clear H.
+  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
+  now rewrite Nat.mul_1_l.
+}
+rewrite H1.
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_pow_succ_r_2 at 1.
+rewrite angle_div_2_pow_mul_2_pow.
+apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+  apply angle_add_le_mono_l; cycle 1. {
+    apply angle_add_overflow_div_2_div_2.
+  } {
+    rewrite angle_div_2_pow_succ_r_2.
+    apply IHi.
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
+  }
+  apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  rewrite angle_div_2_pow_succ_r_2.
+  apply IHi.
+  apply Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+}
+rewrite angle_add_div_2_diag.
+apply angle_le_refl.
 Qed.
 
 (* to be completed
@@ -417,58 +473,21 @@ apply angle_le_lt_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
     apply angle_add_overflow_div_2_div_2.
   } {
     rewrite angle_div_2_pow_succ_r_2.
-Search (_ * (_ / ₂))%A.
-Theorem glop :
-  ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ θ)%A.
-Proof.
-intros * Hni.
-destruct (le_dec (2 ^ i) n) as [Hin| Hin]. {
-  apply Nat.le_antisymm in Hin; [ | easy ].
-  subst n.
-  rewrite angle_div_2_pow_mul_2_pow.
-  apply angle_le_refl.
-}
-apply Nat.nle_gt in Hin.
-clear Hni; rename Hin into Hni.
-revert n θ Hni.
-induction i; intros. {
-  cbn in Hni.
-  apply Nat.lt_1_r in Hni; subst n; cbn.
-  apply angle_nonneg.
-}
-destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
-  rewrite angle_div_2_pow_succ_r_2.
-  apply (angle_le_trans _ (θ / ₂)); [ now apply IHi | ].
-  apply angle_div_2_le.
-}
-apply Nat.nlt_ge in Hin.
-assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
-  specialize (Nat.div_mod n (2 ^ i)) as H1.
-  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
-  specialize (H1 H); clear H.
-  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
-  now rewrite Nat.mul_1_l.
-}
-rewrite H1.
-rewrite angle_mul_add_distr_r.
-rewrite angle_div_2_pow_succ_r_2 at 1.
-rewrite angle_div_2_pow_mul_2_pow.
-apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
-  apply angle_add_le_mono_l; cycle 1. {
-    apply angle_add_overflow_div_2_div_2.
-  } {
-...
-intros * Hni.
-progress unfold angle_leb.
-Search (rngl_sin (_ * _)).
-... ...
-apply glop.
-apply Nat.lt_le_incl.
-apply Nat.mod_upper_bound.
-...
+    apply angle_div_2_pow_mul_le_angle.
+    apply Nat.lt_le_incl.
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
   }
-  Search angle_add_overflow.
-  apply AngleAddOverflowLe.angle_add_overflow_le with (θ2 := (θ / ₂)%A).
+  apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  rewrite angle_div_2_pow_succ_r_2.
+  apply angle_div_2_pow_mul_le_angle.
+  apply Nat.lt_le_incl.
+  apply Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+}
+rewrite angle_add_div_2_diag.
 ...
 Search (_ * _ ≤ _)%A.
 angle_mul_nat_le_mono_nonneg_r:
