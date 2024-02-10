@@ -436,6 +436,9 @@ destruct m. {
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+Inspect 1.
+specialize (angle_div_2_pow_mul_le_angle 5 4 θ) as H1.
+...
 Theorem angle_div_2_pow_mul_lt_straight :
   rngl_characteristic T ≠ 1
   → ∀ n i θ, n < 2 ^ i → (n * (θ / ₂^i) < angle_straight)%A.
