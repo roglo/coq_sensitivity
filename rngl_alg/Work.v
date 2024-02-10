@@ -412,8 +412,35 @@ rewrite angle_mul_nat_div_2. 2: {
   apply angle_mul_nat_overflow_pow_div.
 }
 rewrite angle_div_2_pow_mul_2_pow.
+apply angle_le_lt_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+  apply angle_add_le_mono_l; cycle 1. {
+    apply angle_add_overflow_div_2_div_2.
+  } {
+    rewrite angle_div_2_pow_succ_r_2.
+Search (_ * (_ / ₂))%A.
+Theorem glop :
+  ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ θ)%A.
+Proof.
+intros * Hni.
+progress unfold angle_leb.
+Search (rngl_sin (_ * _)).
+... ...
+apply glop.
+apply Nat.lt_le_incl.
+apply Nat.mod_upper_bound.
 ...
-rewrite angle_div_2_pow_succ_r_2.
+  }
+  Search angle_add_overflow.
+  apply AngleAddOverflowLe.angle_add_overflow_le with (θ2 := (θ / ₂)%A).
+...
+Search (_ * _ ≤ _)%A.
+angle_mul_nat_le_mono_nonneg_r:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T → ∀ (a b : nat) (θ : angle T), angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A
+...
+  rewrite angle_add_div_2_diag.
+...
+rewrite angle_div_2_pow_succ_r_1.
 ...
 rewrite angle_div_2_pow_succ_r_2 at 2.
 rewrite angle_div_2_pow_mul_2_pow.
