@@ -380,8 +380,73 @@ destruct m. {
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-Theorem angle_div_2_pow_mul' :
-  ∀ m n θ, m ≤ 2 ^ n → ((m * θ) / ₂^n)%A = (m * (θ / ₂^n))%A.
+Theorem angle_div_2_pow_mul_lt_straight :
+  rngl_characteristic T ≠ 1
+  → ∀ n i θ, n < 2 ^ i → (n * (θ / ₂^i) < angle_straight)%A.
+Proof.
+destruct_ac.
+intros Hc1.
+intros * Hni.
+revert n θ Hni.
+induction i; intros. {
+  apply Nat.lt_1_r in Hni; subst n.
+  rewrite angle_mul_0_l.
+  apply (angle_straight_pos Hc1).
+}
+destruct (lt_dec n (2 ^ i)) as [Hni'| Hni']. {
+  rewrite angle_div_2_pow_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nlt_ge in Hni'.
+assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
+  specialize (Nat.div_mod n (2 ^ i)) as H1.
+  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
+  specialize (H1 H); clear H.
+  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
+  now rewrite Nat.mul_1_l.
+}
+rewrite H1.
+rewrite (angle_mul_add_distr_r Hon Hop).
+rewrite angle_div_2_pow_succ_r_1 at 1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply angle_mul_nat_overflow_pow_div.
+}
+rewrite angle_div_2_pow_mul_2_pow.
+...
+rewrite angle_div_2_pow_succ_r_2.
+...
+rewrite angle_div_2_pow_succ_r_2 at 2.
+rewrite angle_div_2_pow_mul_2_pow.
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)).
+  apply Nat.lt_le_incl, Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+  apply angle_mul_nat_overflow_pow_div.
+}
+apply angle_add_not_overflow_move_add. 2: {
+  rewrite <- angle_div_2_add_not_overflow. 2: {
+    apply IHi.
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
+  }
+  apply angle_add_overflow_div_2_div_2.
+}
+apply angle_add_overflow_div_2_div_2.
+...
+remember (angle_mul_nat_overflow n θ) as b eqn:Hb.
+symmetry in Hb.
+destruct b. 2: {
+  rewrite <- angle_div_2_pow_mul; [ | easy ].
+  rewrite angle_div_2_pow_succ_r_1.
+  apply (angle_div_2_not_straight Hc1).
+}
+...
+rewrite angle_div_2_pow_succ_r_1.
+Search (_ * (_ / ₂))%A.
+rewrite angle_mul_nat_div_2.
+... ...
+apply angle_div_2_pow_mul_non_straight in Hxz.
 ...
 Search (_ * (_ / ₂^_))%A.
 angle_div_2_pow_mul:
