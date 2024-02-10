@@ -393,30 +393,9 @@ destruct m. {
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            easy.
+            rewrite (Nat_div_less_small 1) in Hxz; [ | cbn; flia Hni ].
+            rewrite angle_mul_1_l in Hxz.
+            now apply (angle_div_2_not_straight Hc1) in Hxz.
           }
           destruct i. {
             cbn - [ angle_mul_nat_overflow ] in Hb.
@@ -491,54 +470,9 @@ destruct m. {
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            apply Nat.succ_le_mono in Hni.
-            destruct n. {
-              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_mul_1_l in Hxz.
-              now apply (angle_div_2_not_straight Hc1) in Hxz.
-            }
-            easy.
+            rewrite (Nat_div_less_small 1) in Hxz; [ | cbn; flia Hni ].
+            rewrite angle_mul_1_l in Hxz.
+            now apply (angle_div_2_not_straight Hc1) in Hxz.
           }
           destruct i. {
             cbn - [ angle_mul_nat_overflow ] in Hb.
