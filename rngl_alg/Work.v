@@ -80,7 +80,7 @@ assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
 rewrite H1.
 rewrite (angle_mul_add_distr_r Hon Hop).
 rewrite angle_div_2_pow_succ_r_2 at 2.
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 rewrite angle_div_2_pow_succ_r_1.
 rewrite angle_mul_nat_div_2. 2: {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)).
@@ -308,7 +308,61 @@ destruct m. {
             now apply (angle_div_2_not_straight Hc1) in Hxz.
           }
           destruct i. {
-            cbn in Hxz.
+            cbn in Hni.
+            cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+            destruct n; [ easy | clear Hnz ].
+            apply Nat.succ_lt_mono in Hmi.
+            apply Nat.succ_le_mono in Hni.
+            destruct n; [ flia Hmi | clear Hmi ].
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              replace 4 with (2 ^ 2) in Hxz by easy.
+              rewrite angle_div_2_pow_succ_r_2 in Hxz.
+              rewrite angle_div_2_pow_mul_2_pow in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_div_2_mul_2 in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_div_2_mul_2 in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite (angle_mul_1_l Hon Hos) in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            easy.
+          }
+          destruct i. {
 ...
           rewrite angle_div_2_pow_succ_r_1 in Hxz.
           rewrite angle_mul_nat_div_2 in Hxz.
@@ -345,7 +399,7 @@ destruct m. {
   rewrite Nat.mul_comm.
   rewrite Nat.div_mul; [ | easy ].
   rewrite angle_div_2_pow_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   apply rngl_sin_div_2_nonneg.
 }
 ........
@@ -450,7 +504,7 @@ destruct n. {
   rewrite Nat.mul_comm.
   rewrite Nat.div_mul; [ | easy ].
   rewrite angle_div_2_pow_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   apply rngl_sin_div_2_nonneg.
 }
 destruct n. {
@@ -1478,7 +1532,7 @@ destruct zs2. {
   destruct n; [ apply rngl_cos_bound | ].
   destruct n. {
     rewrite Nat.div_1_r.
-    rewrite angle_mul_2_pow_div_2_pow.
+    rewrite angle_div_2_pow_mul_2_pow.
     apply (rngl_le_refl Hor).
   }
   apply (rngl_le_trans Hor _ (rngl_cos (2 ^ S i / 2 * (θ / ₂^S i)))). {
@@ -1486,7 +1540,7 @@ destruct zs2. {
     rewrite Nat.mul_comm.
     rewrite Nat.div_mul; [ | easy ].
     rewrite angle_div_2_pow_succ_r_2.
-    rewrite angle_mul_2_pow_div_2_pow.
+    rewrite angle_div_2_pow_mul_2_pow.
     now apply rngl_cos_le_cos_div_2.
   }
   apply rngl_cos_decr.
@@ -1506,7 +1560,7 @@ destruct zs2. {
   rewrite Nat.mul_comm.
   rewrite Nat.div_mul; [ | easy ].
   rewrite angle_div_2_pow_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   apply angle_div_2_le_straight.
 }
 destruct zs. {
@@ -1536,9 +1590,9 @@ destruct n; [ apply (rngl_le_refl Hor) | ].
 destruct n. {
   do 2 rewrite Nat.div_1_r.
   rewrite <- angle_div_2_pow_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   rewrite -> angle_div_2_pow_succ_r_2.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
 }
 *)
   remember (θ ≤? angle_right)%A as tr eqn:Htr.
@@ -1567,7 +1621,7 @@ destruct n. {
     destruct n. {
       rewrite Nat.div_1_r.
       rewrite <- angle_div_2_pow_succ_r_2.
-      now rewrite angle_mul_2_pow_div_2_pow.
+      now rewrite angle_div_2_pow_mul_2_pow.
     }
 ...
 (*
@@ -1590,7 +1644,7 @@ destruct n. {
     split; [ easy | ].
     now apply -> Nat.succ_le_mono.
   }
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
 (* rahhhh... fait chier *)
 ...
   apply angle_le_trans with (θ2 := 0%A).
@@ -2062,7 +2116,7 @@ destruct i. {
     intros n Hn.
     specialize (HN n Hn).
     rewrite Nat.div_1_r in HN.
-    now rewrite angle_mul_2_pow_div_2_pow in HN.
+    now rewrite angle_div_2_pow_mul_2_pow in HN.
   }
   clear Hlim; rename H into Hlim.
   progress unfold is_angle_limit_when_tending_to_inf in Hlim.
@@ -2096,7 +2150,7 @@ enough (H2ε : (0 < 2 * ε)%L).
     rewrite Nat.mul_comm in HN.
     rewrite Nat.div_mul in HN; [ | easy ].
     cbn in HN.
-    rewrite (angle_mul_2_pow_div_2_pow Hic) in HN.
+    rewrite (angle_div_2_pow_mul_2_pow Hic) in HN.
     progress unfold angle_dist in HN.
     progress unfold angle_dist.
     rewrite (rngl_cos_mul_2_l Hon Hos).
@@ -2109,7 +2163,7 @@ Search (_ ^ (_ + _)).
     rewrite Nat.add_
     destruct n. {
 ...
-    rewrite angle_mul_2_pow_div_2_pow in HN.
+    rewrite angle_div_2_pow_mul_2_pow in HN.
 ...
 remember (S n) as sn; cbn; subst sn.
 rewrite (angle_add_comm Hic).

@@ -312,7 +312,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem angle_mul_2_pow_div_2_pow :
+Theorem angle_div_2_pow_mul_2_pow :
   ∀ n θ, (2 ^ n * angle_div_2_pow θ n)%A = θ.
 Proof.
 destruct_ac; intros.
@@ -4262,7 +4262,7 @@ rename θ into θ'.
   rewrite Nat.mul_comm in H1.
   rewrite H1; clear H1.
   rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   rewrite angle_eucl_dist_sub_l_diag.
   now apply HN.
 }
@@ -4300,7 +4300,7 @@ enough (H : angle_lim (λ i, (n * angle_div_2_pow θ i))%A 0%A). {
     subst Δθ.
     move Haov at bottom.
     apply (angle_mul_nat_overflow_le_r _ θ); [ | easy ].
-    rewrite <- (angle_mul_2_pow_div_2_pow i θ) at 2.
+    rewrite <- (angle_div_2_pow_mul_2_pow i θ) at 2.
     rewrite <- (angle_mul_1_l Hon Hos) at 1.
     apply angle_mul_nat_le_mono_nonneg_r. 2: {
       apply Nat.lt_succ_r.
@@ -5303,7 +5303,7 @@ destruct zs. {
   rewrite angle_add_div_2_pow_diag in H.
   rewrite angle_div_2_pow_succ_r_2 in H.
   apply (f_equal (λ a, (2 ^ i * a)%A)) in H.
-  do 2 rewrite angle_mul_2_pow_div_2_pow in H.
+  do 2 rewrite angle_div_2_pow_mul_2_pow in H.
   subst θ.
   apply Bool.not_false_iff_true in Haov.
   apply Haov.
@@ -5441,7 +5441,7 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
 }
 apply (angle_lim_mul (2 ^ j)) in H1.
 rewrite Hθ'' in H1 at 1.
-rewrite angle_mul_2_pow_div_2_pow in H1.
+rewrite angle_div_2_pow_mul_2_pow in H1.
 eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   intros i.
   rewrite Nat.add_0_r.
@@ -5457,12 +5457,12 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   reflexivity.
 }
 rewrite Hθ'' in H1.
-rewrite angle_mul_2_pow_div_2_pow in H1.
+rewrite angle_div_2_pow_mul_2_pow in H1.
 ...
 *)
 apply (angle_lim_mul (2 ^ j)) in H1.
 rewrite Hθ'' in H1.
-rewrite angle_mul_2_pow_div_2_pow in H1.
+rewrite angle_div_2_pow_mul_2_pow in H1.
 eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   intros i.
   rewrite Nat.add_0_r.
@@ -5476,7 +5476,7 @@ eapply (angle_lim_eq_compat 0 0) in H1. 2: {
   rewrite <- angle_div_pow_2_add_distr.
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
   reflexivity.
 }
@@ -6074,7 +6074,7 @@ destruct Hnt as [Hnt| Hnt]. {
 ...
 (*
 replace θ' with (2 ^ i * (θ' / ₂^i))%A at 1. 2: {
-  apply angle_mul_2_pow_div_2_pow.
+  apply angle_div_2_pow_mul_2_pow.
 }
 rewrite (angle_mul_nat_assoc Hon Hop).
 rewrite Nat.mul_comm.
@@ -6129,16 +6129,16 @@ Search (_ * (_ / ₂^_))%A.
 ... ...
 }
 *)
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 rewrite angle_sub_diag.
 rewrite (angle_mul_0_r Hon Hos).
 now rewrite angle_eucl_dist_diag.
 ...
 remember (n * (θ' / ₂^i))%A as θ.
 Search ((_ * _) / ₂^_)%A.
-Check angle_mul_2_pow_div_2_pow.
-rewrite angle_mul_2_pow_div_2_pow.
-rewrite (angle_mul_2_pow_div_2_pow i (n * (θ' / ₂^i))).
+Check angle_div_2_pow_mul_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
+rewrite (angle_div_2_pow_mul_2_pow i (n * (θ' / ₂^i))).
 ...
 *)
 remember (2 ^ i / n * _)%A as θ eqn:Hθ in |-*.
@@ -6438,7 +6438,7 @@ Search (_ * (_ / ₂^_))%A.
 assert (angle_mul_nat_overflow n θ = false). {
   rewrite Hθ'' in H1 at 1.
   apply (angle_lim_mul (2 ^ j)) in H1.
-  rewrite angle_mul_2_pow_div_2_pow in H1.
+  rewrite angle_div_2_pow_mul_2_pow in H1.
   rewrite Hθ'' in H1.
   eapply (angle_lim_eq_compat 0 0) in H1. 2: {
     intros i.
@@ -6453,7 +6453,7 @@ assert (angle_mul_nat_overflow n θ = false). {
     rewrite <- angle_div_pow_2_add_distr.
     rewrite Nat.add_comm.
     rewrite angle_div_pow_2_add_distr.
-    rewrite angle_mul_2_pow_div_2_pow.
+    rewrite angle_div_2_pow_mul_2_pow.
     rewrite Nat.mul_comm.
     rewrite <- (angle_mul_nat_assoc Hon Hop).
     reflexivity.
@@ -6502,7 +6502,7 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
     intros i.
     rewrite Nat.div_1_r.
     rewrite Nat.add_0_r.
-    rewrite (angle_mul_2_pow_div_2_pow i θ).
+    rewrite (angle_div_2_pow_mul_2_pow i θ).
     reflexivity.
   }
   intros ε Hε.
@@ -6512,7 +6512,7 @@ destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
 }
 *)
 apply (angle_lim_mul (2 ^ j)) in H1.
-rewrite angle_mul_2_pow_div_2_pow in H1.
+rewrite angle_div_2_pow_mul_2_pow in H1.
 ...
 (**)
 intros ε Hε.
@@ -6566,7 +6566,7 @@ eapply angle_lim_eq_compat in H1. 2: {
 (*
 Search ((_ * _) / ₂^_)%A.
 ...
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   rewrite (Nat.mul_comm n).
   rewrite <- (angle_mul_nat_assoc Hon Hop).
 *)
@@ -6598,7 +6598,7 @@ rewrite Nat.add_comm.
 rewrite angle_div_pow_2_add_distr.
 Search ((_ * _) / ₂^_)%A.
 rewrite angle_div_2_pow_mul.
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 rewrite Nat.add_comm.
 ...
 (* faux : θ1=π/2 θ2=π a=4 *)
@@ -6684,11 +6684,11 @@ Search (_ ^ (_ + _)).
 rewrite <- Nat.pow_add_r.
 rewrite (Nat.add_comm j).
 Search (2 ^ _ * _)%A.
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 ...
 rewrite <- angle_div_2_pow_mul.
 ...
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 rewrite <- (angle_mul_nat_assoc Hon Hop).
 Search (_ * (_ * _))%A.
 rewrite (angle_mul_nat_assoc Hon Hop).
@@ -6708,7 +6708,7 @@ rewrite <- angle_div_pow_2_add_distr.
 rewrite Nat.add_comm.
 rewrite angle_div_pow_2_add_distr.
 ...
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 ...
 replace j with (S (S (j - 2))) in H1 by flia Hjz Hj1.
 do 2 rewrite angle_div_2_pow_succ_r_2 in H1.
@@ -6735,7 +6735,7 @@ eapply angle_lim_eq_compat in H1. 2: {
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
   rewrite <- (angle_mul_nat_assoc Hon Hop).
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   rewrite angle_div_2_pow_succ_r_1.
   rewrite angle_div_2_pow_succ_r_1.
   reflexivity.
@@ -6758,7 +6758,7 @@ eapply angle_lim_eq_compat in H1. 2: {
   rewrite Nat.add_comm.
   rewrite angle_div_pow_2_add_distr.
 (*
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
 *)
   reflexivity.
 }
@@ -6933,7 +6933,7 @@ eapply (rngl_le_trans Hor). 2: {
   apply angle_eucl_dist_mul_nat_le.
 }
 rewrite Hθ'' at 2.
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 ...
 replace 2%L with (rngl_of_nat 2) in HN. 2: {
   now cbn; rewrite rngl_add_0_r.
@@ -6964,7 +6964,7 @@ eapply (rngl_le_trans Hor). 2: {
   apply angle_eucl_dist_mul_nat_le.
 }
 rewrite Hθ'' at 2.
-rewrite angle_mul_2_pow_div_2_pow.
+rewrite angle_div_2_pow_mul_2_pow.
 ...
 progress unfold seq_angle_converging_to_angle_div_nat in HN.
 ...
@@ -7109,7 +7109,7 @@ destruct (lt_dec (2 ^ i) (2 * n)) as [Hin| Hin]. {
   apply (angle_le_trans _ (2 ^ i * ((θ / ₂^i) / ₂))). 2: {
     rewrite <- angle_div_2_pow_succ_r_1.
     rewrite angle_div_2_pow_succ_r_2.
-    rewrite angle_mul_2_pow_div_2_pow.
+    rewrite angle_div_2_pow_mul_2_pow.
     apply angle_div_2_le_straight.
   }
   apply angle_mul_nat_le_mono_nonneg_r. 2: {
@@ -8428,7 +8428,7 @@ clear Hlim.
 induction n; intros; [ apply angle_nonneg | ].
 destruct n. {
   rewrite Nat.div_1_r.
-  rewrite angle_mul_2_pow_div_2_pow.
+  rewrite angle_div_2_pow_mul_2_pow.
   apply angle_le_refl.
 }
 eapply angle_le_trans.
