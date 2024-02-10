@@ -494,72 +494,55 @@ destruct m. {
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
               rewrite angle_mul_1_l in Hxz.
-...
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             apply Nat.succ_le_mono in Hni.
             destruct n. {
               cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
-              rewrite angle_div_2_mul_2 in Hxz.
-              rewrite angle_div_2_pow_succ_r_1 in Hxz.
+              rewrite angle_mul_1_l in Hxz.
+              now apply (angle_div_2_not_straight Hc1) in Hxz.
+            }
+            apply Nat.succ_le_mono in Hni.
+            destruct n. {
+              cbn - [ angle_mul_nat angle_div_2_pow ] in Hxz.
+              rewrite angle_mul_1_l in Hxz.
               now apply (angle_div_2_not_straight Hc1) in Hxz.
             }
             easy.
+          }
+          destruct i. {
+            cbn - [ angle_mul_nat_overflow ] in Hb.
 ...
-          rewrite angle_div_2_pow_succ_r_1 in Hxz.
-          rewrite angle_mul_nat_div_2 in Hxz.
-          now apply (angle_div_2_not_straight Hc1) in Hxz.
-...
-          rewrite Nat.pow_succ_r'.
-...
-          rewrite Nat.mul_comm.
-          rewrite Nat.div_mul; [ | easy ].
-          apply angle_mul_nat_overflow_pow_div.
-        }
       }
       exfalso.
       rewrite Hu in Hxz.
