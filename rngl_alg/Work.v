@@ -290,6 +290,20 @@ destruct m. {
 }
 destruct m. {
   rewrite angle_mul_1_l.
+clear Htz.
+clear Hb.
+clear Hnz.
+clear Hlim.
+(*
+clear Hmi.
+destruct (le_dec n 1) as [Hn1| Hn1]. {
+  destruct n; [ apply angle_add_overflow_0_l | ].
+  destruct n; [ | flia Hn1 ].
+  rewrite Nat.div_1_r.
+  rewrite angle_div_2_pow_mul_2_pow.
+...
+*)
+assert (Hnz : n ≠ 0) by flia Hmi.
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   progress unfold angle_leb.
