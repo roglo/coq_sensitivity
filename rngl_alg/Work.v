@@ -328,6 +328,126 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
+(* to be completed, if I can
+Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
+  ∀ m n i θ,
+  m < n ≤ 2 ^ i
+  → angle_add_overflow
+      (2 ^ i / n * (θ / ₂^i))
+      (m * (2 ^ i / n * (θ / ₂^i))) =
+      false.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%A).
+  apply angle_add_overflow_0_l.
+}
+intros * (Hmi, Hni).
+assert (Hnz : n ≠ 0) by flia Hmi.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
+remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
+symmetry in Hzs.
+rewrite Hu in Hzs.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+rewrite Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  remember (0 ≤? rngl_sin (u i + m * u i))%L as zsm eqn:Hzsm.
+  symmetry in Hzsm.
+  rewrite Hu in Hzsm.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  rewrite Hzsm.
+  destruct zsm; [ | easy ].
+  apply rngl_leb_le in Hzsm.
+  apply rngl_leb_le.
+  rewrite angle_add_diag in Hzsm |-*.
+  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+  rewrite (rngl_cos_mul_2_l' Hon Hop).
+  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+  remember (rngl_cos (u i)) as x eqn:Hx.
+  rewrite Hu in Hx.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+  rewrite <- Hx.
+  destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
+    destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
+      rewrite Hu in Hxz.
+      progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+      apply eq_rngl_sin_0 in Hxz.
+      destruct Hxz as [Hxz| Hxz]. {
+        rewrite Hxz in Hx; cbn in Hx; subst x.
+        exfalso; apply (rngl_nlt_ge Hor) in H2.
+        apply H2; clear H2.
+        rewrite Hxz.
+        apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+      } {
+        rewrite Hxz in Hx; cbn in Hx; subst x.
+        exfalso; clear H1 H2 Hzs.
+        revert Hxz.
+        apply fold_not.
+        destruct n; [ easy | clear Hnz ].
+        apply Nat.succ_lt_mono in Hmi.
+        destruct n; [ flia Hmi | clear Hmi ].
+        destruct n. {
+          destruct i; [ cbn in Hni; flia Hni | ].
+          rewrite Nat.pow_succ_r'.
+          rewrite Nat.mul_comm.
+          rewrite Nat.div_mul; [ | easy ].
+          rewrite angle_div_2_pow_succ_r_2.
+          rewrite angle_div_2_pow_mul_2_pow.
+          now apply (angle_div_2_not_straight Hc1).
+        }
+        destruct i; [ cbn in Hni; flia Hni | ].
+        rewrite angle_div_2_pow_succ_r_2.
+        specialize angle_div_2_pow_mul_le_angle as H1.
+        specialize (H1 (2 ^ S i / S (S (S n))) i (θ / ₂)%A).
+        assert (H : 2 ^ S i / S (S (S n)) ≤ 2 ^ i). {
+          rewrite Nat.pow_succ_r'.
+          apply Nat.div_le_upper_bound; [ easy | ].
+          apply Nat.mul_le_mono_r.
+          now do 2 apply -> Nat.succ_le_mono.
+        }
+        specialize (H1 H); clear H.
+        intros Hxz.
+        rewrite Hxz in H1.
+        apply angle_nlt_ge in H1.
+        apply H1.
+        apply (angle_div_2_lt_straight Hc1).
+      }
+    }
+    exfalso.
+    rewrite Hu in Hxz.
+    progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+    apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    now rewrite rngl_mul_0_r.
+  }
+  (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
+  apply rngl_2_x2_sub_1_le_x.
+  rewrite <- Hx in Hzsm.
+  split; [ easy | ].
+  subst x; apply rngl_cos_bound.
+}
+apply (rngl_leb_gt Hor) in Hzs.
+apply (rngl_nle_gt Hor) in Hzs.
+exfalso.
+apply Hzs; clear Hzs.
+destruct i; [ cbn in Hni; flia Hni Hmi | ].
+apply rngl_sin_nonneg_angle_le_straight.
+apply angle_mul_div_2_pow_le_straight.
+eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+apply Nat.div_le_upper_bound; [ easy | ].
+now apply Nat.mul_le_mono_r.
+Qed.
+*)
+
 (* to be completed
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow' :
   rngl_is_archimedean T = true →
@@ -408,6 +528,8 @@ destruct m. {
   rewrite angle_mul_1_l.
   now apply angle_add_overflow_2_pow_div_mul_2_pow_diag.
 }
+... ...
+now apply angle_add_overflow_2_pow_div_mul_2_pow_mul.
 destruct m. {
 ...
 Search (angle_add_overflow _ _ = false).
