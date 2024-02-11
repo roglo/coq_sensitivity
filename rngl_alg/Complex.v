@@ -3022,12 +3022,9 @@ progress unfold angle_add_overflow in H13.
 now apply angle_ltb_ge in H13.
 Qed.
 
-Theorem angle_add_diag :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, (θ + θ = 2 * θ)%A.
+Theorem angle_add_diag : ∀ θ, (θ + θ = 2 * θ)%A.
 Proof.
-intros Hon Hos *; cbn.
+intros; cbn.
 now rewrite angle_add_0_r.
 Qed.
 
@@ -3064,7 +3061,7 @@ rewrite angle_mul_1_l.
 apply angle_add_not_overflow_move_add. {
   apply angle_add_overflow_div_2_div_2.
 }
-rewrite (angle_add_diag Hon Hos).
+rewrite angle_add_diag.
 rewrite angle_div_2_mul_2.
 rewrite Nat.mul_comm.
 rewrite <- angle_mul_nat_assoc.
@@ -4473,11 +4470,11 @@ induction n; intros. {
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_comm.
 rewrite <- angle_mul_nat_assoc.
-rewrite <- (angle_add_diag Hon Hos).
+rewrite <- angle_add_diag.
 rewrite (angle_add_add_swap Hic Hop).
 rewrite (angle_add_assoc Hop).
 rewrite <- (angle_add_assoc Hop).
-do 2 rewrite (angle_add_diag Hon Hos).
+do 2 rewrite angle_add_diag.
 rewrite IHn.
 now do 2 rewrite angle_mul_nat_assoc.
 Qed.
@@ -5413,7 +5410,7 @@ split; intros Hθ. {
   destruct zst; [ easy | ].
   apply (rngl_ltb_ge Hor) in Hθ.
   apply (rngl_leb_gt Hor) in Hzst.
-  rewrite (angle_add_diag Hon Hos) in Hzst.
+  rewrite angle_add_diag in Hzst.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzst.
   rewrite <- rngl_mul_assoc in Hzst.
   apply (rngl_nle_gt Hor) in Hzst.
@@ -5428,7 +5425,7 @@ split; intros Hθ. {
   intros Hzc.
   apply (rngl_nlt_ge Hor) in Hθ.
   apply Hθ; clear Hθ.
-  rewrite (angle_add_diag Hon Hos).
+  rewrite angle_add_diag.
   rewrite (rngl_cos_mul_2_l Hon Hos).
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   apply (rngl_le_lt_trans Hor _ (rngl_cos θ)). {
@@ -6039,14 +6036,14 @@ intros Hc1 * Hnt.
 apply not_eq_sym.
 intros H.
 apply (f_equal (λ θ, (2 * θ)%A)) in H.
-rewrite <- (angle_add_diag Hon Hos) in H.
+rewrite <- angle_add_diag in H.
 rewrite (angle_right_add_right Hon Hop) in H.
 rewrite angle_mul_nat_assoc in H.
 rewrite Nat.mul_comm in H.
 rewrite <- angle_mul_nat_assoc in H.
 rewrite angle_div_2_mul_2 in H.
 apply (f_equal (λ θ, (2 * θ)%A)) in H.
-rewrite <- (angle_add_diag Hon Hos) in H.
+rewrite <- angle_add_diag in H.
 rewrite (angle_straight_add_straight Hon Hop) in H.
 rewrite angle_mul_nat_assoc in H.
 rewrite Nat.mul_comm in H.

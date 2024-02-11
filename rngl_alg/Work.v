@@ -294,6 +294,7 @@ clear Htz.
 clear Hb.
 clear Hnz.
 clear Hlim.
+clear θ'.
 (*
 clear Hmi.
 destruct (le_dec n 1) as [Hn1| Hn1]. {
@@ -303,6 +304,13 @@ destruct (le_dec n 1) as [Hn1| Hn1]. {
   rewrite angle_div_2_pow_mul_2_pow.
 ...
 *)
+Theorem angle_add_overflow_2_pow_div_mul_2_pow_diag :
+  ∀ n i u θ,
+  u = seq_angle_converging_to_angle_div_nat θ n
+  → 1 < n ≤ 2 ^ i
+  → angle_add_overflow (2 ^ i / n * (θ / ₂^i)) (2 ^ i / n * (θ / ₂^i)) = false.
+Proof.
+intros * Hu (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
@@ -319,6 +327,8 @@ assert (Hnz : n ≠ 0) by flia Hmi.
     destruct zsm; [ | easy ].
     apply rngl_leb_le in Hzsm.
     apply rngl_leb_le.
+About angle_add_diag.
+...
     rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
     rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
@@ -399,6 +409,7 @@ assert (Hnz : n ≠ 0) by flia Hmi.
   apply Nat.div_le_upper_bound; [ easy | ].
   now apply Nat.mul_le_mono_r.
 }
+destruct m. {
 ...
 Search (angle_add_overflow _ _ = false).
 ...
