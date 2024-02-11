@@ -330,7 +330,6 @@ destruct m. {
           exfalso; clear H1 H2 Hzs.
           revert Hxz.
           apply fold_not.
-(**)
           destruct n; [ easy | clear Hnz ].
           apply Nat.succ_lt_mono in Hmi.
           destruct n; [ flia Hmi | clear Hmi ].
@@ -343,60 +342,24 @@ destruct m. {
             rewrite angle_div_2_pow_mul_2_pow.
             now apply (angle_div_2_not_straight Hc1).
           }
-          destruct n. {
-            destruct i; [ cbn in Hni; flia Hni | ].
-            rewrite angle_div_2_pow_succ_r_2.
-            specialize angle_div_2_pow_mul_le_angle as H1.
-            specialize (H1 (2 ^ S i / 3) i (θ / ₂)%A).
-            assert (H : 2 ^ S i / 3 ≤ 2 ^ i). {
-              rewrite Nat.pow_succ_r'.
-              apply Nat.div_le_upper_bound; [ easy | ].
-              apply Nat.mul_le_mono_r.
-              now do 2 apply -> Nat.succ_le_mono.
-            }
-            specialize (H1 H); clear H.
-            intros Hxz.
-            rewrite Hxz in H1.
-            apply angle_nlt_ge in H1.
-            apply H1.
-            apply (angle_div_2_lt_straight Hc1).
+          destruct i; [ cbn in Hni; flia Hni | ].
+          rewrite angle_div_2_pow_succ_r_2.
+          specialize angle_div_2_pow_mul_le_angle as H1.
+          specialize (H1 (2 ^ S i / S (S (S n))) i (θ / ₂)%A).
+          assert (H : 2 ^ S i / S (S (S n)) ≤ 2 ^ i). {
+            rewrite Nat.pow_succ_r'.
+            apply Nat.div_le_upper_bound; [ easy | ].
+            apply Nat.mul_le_mono_r.
+            now do 2 apply -> Nat.succ_le_mono.
           }
-          destruct n. {
-            destruct i; [ cbn in Hni; flia Hni | ].
-            rewrite angle_div_2_pow_succ_r_2.
-            specialize angle_div_2_pow_mul_le_angle as H1.
-            specialize (H1 (2 ^ S i / 4) i (θ / ₂)%A).
-            assert (H : 2 ^ S i / 4 ≤ 2 ^ i). {
-              rewrite Nat.pow_succ_r'.
-              apply Nat.div_le_upper_bound; [ easy | ].
-              apply Nat.mul_le_mono_r.
-              now do 2 apply -> Nat.succ_le_mono.
-            }
-            specialize (H1 H); clear H.
-            intros Hxz.
-            rewrite Hxz in H1.
-            apply angle_nlt_ge in H1.
-            apply H1.
-            apply (angle_div_2_lt_straight Hc1).
-          }
-          destruct n. {
-            destruct i; [ cbn in Hni; flia Hni | ].
-            rewrite angle_div_2_pow_succ_r_2.
-            specialize angle_div_2_pow_mul_le_angle as H1.
-            specialize (H1 (2 ^ S i / 5) i (θ / ₂)%A).
-            assert (H : 2 ^ S i / 5 ≤ 2 ^ i). {
-              rewrite Nat.pow_succ_r'.
-              apply Nat.div_le_upper_bound; [ easy | ].
-              apply Nat.mul_le_mono_r.
-              now do 2 apply -> Nat.succ_le_mono.
-            }
-            specialize (H1 H); clear H.
-            intros Hxz.
-            rewrite Hxz in H1.
-            apply angle_nlt_ge in H1.
-            apply H1.
-            apply (angle_div_2_lt_straight Hc1).
-          }
+          specialize (H1 H); clear H.
+          intros Hxz.
+          rewrite Hxz in H1.
+          apply angle_nlt_ge in H1.
+          apply H1.
+          apply (angle_div_2_lt_straight Hc1).
+        }
+      }
 ...
           destruct i; [ cbn in Hni; flia Hmi Hni | ].
           destruct i. {
