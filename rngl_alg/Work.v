@@ -348,6 +348,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
+...
+rewrite angle_add_mul_r_diag_r.
+...
 apply angle_ltb_ge.
 progress unfold angle_leb.
 remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
@@ -376,7 +379,6 @@ destruct zs. {
   rewrite Hu in Hx.
   progress unfold seq_angle_converging_to_angle_div_nat in Hx.
   rewrite <- Hx.
-rewrite angle_add_mul_r_diag_r.
 ...
   destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
     destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
