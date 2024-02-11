@@ -1558,6 +1558,15 @@ rewrite rngl_mul_add_distr_l.
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
+Theorem rngl_add_mul_r_diag_r :
+  rngl_has_1 T = true →
+  ∀ a b, (a + b * a = (1 + b) * a)%L.
+Proof.
+intros Hon *.
+rewrite rngl_mul_add_distr_r.
+now rewrite (rngl_mul_1_l Hon).
+Qed.
+
 Theorem rngl_add_mul_l_diag_l :
   rngl_has_1 T = true →
   ∀ a b, (a * b + a = a * (b + 1))%L.

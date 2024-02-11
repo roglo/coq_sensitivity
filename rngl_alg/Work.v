@@ -366,14 +366,18 @@ destruct zs. {
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
+(*
   rewrite angle_add_diag in Hzsm |-*.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
   rewrite (rngl_cos_mul_2_l' Hon Hop).
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
+*)
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
   progress unfold seq_angle_converging_to_angle_div_nat in Hx.
   rewrite <- Hx.
+rewrite angle_add_mul_r_diag_r.
+...
   destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
     destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
       rewrite Hu in Hxz.
