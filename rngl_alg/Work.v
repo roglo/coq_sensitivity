@@ -290,7 +290,6 @@ destruct m. {
 }
 destruct m. {
   rewrite angle_mul_1_l.
-(*****)
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   progress unfold angle_leb.
@@ -380,15 +379,12 @@ destruct m. {
   exfalso.
   apply Hzs; clear Hzs.
   destruct i; [ cbn in Hni; flia Hni Hmi | ].
-...
-  rewrite Nat.pow_succ_r'.
-  rewrite Nat.mul_comm.
-  rewrite Nat.div_mul; [ | easy ].
-  rewrite angle_div_2_pow_succ_r_2.
-  rewrite angle_div_2_pow_mul_2_pow.
-  apply rngl_sin_div_2_nonneg.
+  apply rngl_sin_nonneg_angle_le_straight.
+  apply angle_mul_div_2_pow_le_straight.
+  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  now apply Nat.mul_le_mono_r.
 }
-........
 ...
 Search (angle_add_overflow _ _ = false).
 ...
