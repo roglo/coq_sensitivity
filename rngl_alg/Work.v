@@ -328,6 +328,9 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
+Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
+Proof. easy. Qed.
+
 (* to be completed, if I can
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -348,9 +351,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
-...
 rewrite angle_add_mul_r_diag_r.
-...
 apply angle_ltb_ge.
 progress unfold angle_leb.
 remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
@@ -361,7 +362,7 @@ progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
 rewrite Hzs.
 destruct zs. {
   apply rngl_leb_le in Hzs.
-  remember (0 ≤? rngl_sin (u i + m * u i))%L as zsm eqn:Hzsm.
+  remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
   symmetry in Hzsm.
   rewrite Hu in Hzsm.
   progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
