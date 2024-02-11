@@ -366,12 +366,12 @@ destruct zs. {
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
-(*
+(* we need cos(nx) in function of cos(x) and sin(x) *)
+...
   rewrite angle_add_diag in Hzsm |-*.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
   rewrite (rngl_cos_mul_2_l' Hon Hop).
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
-*)
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
   progress unfold seq_angle_converging_to_angle_div_nat in Hx.
