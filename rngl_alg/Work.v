@@ -509,6 +509,9 @@ erewrite rngl_summation_eq_compat. 2: {
   intros * Hin.
   rewrite mini_mul_add_distr_r.
   do 2 rewrite mini_mul_assoc.
+  rewrite (mini_mul_comm (a * _))%L.
+  rewrite mini_mul_assoc.
+Search (_ ^ _ * _)%L.
 ...
 rewrite mul_add_distr_r_in_summation.
 rewrite summation_add.
