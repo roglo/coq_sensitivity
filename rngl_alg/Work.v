@@ -608,6 +608,38 @@ erewrite rngl_summation_eq_compat. 2: {
   do 2 rewrite mini_mul_add_distr_r.
   easy.
 }
+remember (∑ (i = _, _), _) as x; subst x.
+rewrite iter_seq_distr; cycle 1.
+apply mini_add_0_l.
+apply mini_add_comm.
+apply mini_add_assoc.
+rewrite mini_add_comm.
+rewrite <- mini_add_assoc.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite Nat.add_1_r.
+  rewrite mini_mul_add_distr_l.
+  rewrite mini_mul_assoc.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+rewrite iter_seq_distr; cycle 1.
+apply mini_add_0_l.
+apply mini_add_comm.
+apply mini_add_assoc.
+f_equal.
+symmetry.
+rewrite rngl_summation_rshift.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite Nat_sub_succ_1.
+  rewrite Nat_sub_sub_assoc; [ | flia Hin ].
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+remember (∑ (i = 1, S n), rngl_of_nat (binomial n i) * a ^ (n + 1 - i) * b ^ i)%L as x.
 ...
 rngl_of_nat_succ is not universe polymorphic
 Arguments rngl_of_nat_succ {T}%type_scope {ro rp} n%nat_scope
