@@ -409,11 +409,13 @@ rewrite Nat.sub_0_r.
 Class mini_rngl_prop T {ro : ring_like_op T} :=
   { mini_add_comm : ∀ a b, (a + b = b + a)%L;
     mini_add_assoc: ∀ a b c, (a + (b + c))%L = (a + b + c)%L;
+    mini_mul_assoc: ∀ a b c, (a * (b * c))%L = (a * b * c)%L;
     mini_add_0_l : ∀ a, (0 + a = a)%L;
     mini_mul_1_l : ∀ a, (1 * a = a)%L;
     mini_mul_1_r : ∀ a, (a * 1 = a)%L;
     mini_mul_0_r : ∀ a, (a * 0 = 0)%L;
-    mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L }.
+    mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L;
+    mini_mul_add_distr_r : ∀ a b c, ((a + b) * c)%L = (a * c + b * c)%L }.
 
 Theorem mini_pow_succ_r :
   ∀ {m : mini_rngl_prop T} n a, (a ^ S n = a * a ^ n)%L.
@@ -472,6 +474,10 @@ induction n. {
 rewrite mini_pow_succ_r.
 rewrite IHn.
 rewrite mini_mul_summation_distr_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite mini_mul_add_distr_r.
+  rewrite mini_mul_assoc.
 ...
 rewrite mul_add_distr_r_in_summation.
 rewrite summation_add.
