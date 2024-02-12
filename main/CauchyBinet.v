@@ -19,21 +19,6 @@ Require Import PermutationFun SortingFun SortRank.
 Require Import PermutSeq Signature Matrix Determinant.
 Import matrix_Notations.
 
-(* binomial *)
-(* code borrowed from my work "coq_euler_prod_form" *)
-
-Fixpoint binomial n k :=
-  match k with
-  | 0 => 1
-  | S k' =>
-      match n with
-      | 0 => 0
-      | S n' => binomial n' k' + binomial n' k
-     end
-  end.
-
-(* end borrowed code *)
-
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
 Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
@@ -42,7 +27,8 @@ Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
   | S k' =>
       match n with
       | 0 => []
-      | S n' => map (λ l : list nat, i :: l) (sls1n (S i) n' k') ++ sls1n (S i) n' k
+      | S n' =>
+          map (λ l : list nat, i :: l) (sls1n (S i) n' k') ++ sls1n (S i) n' k
       end
   end.
 

@@ -2772,6 +2772,21 @@ Qed.
 
 (* end cart_prod *)
 
+(* binomial *)
+(* code borrowed from my work "coq_euler_prod_form" *)
+
+Fixpoint binomial n k :=
+  match k with
+  | 0 => 1
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' => binomial n' k' + binomial n' k
+     end
+  end.
+
+(* end binomial *)
+
 Theorem NoDup_filter {A} : ∀ (f : A → _) {l}, NoDup l → NoDup (filter f l).
 Proof.
 intros * Hnd.
