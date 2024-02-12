@@ -1319,6 +1319,7 @@ Theorem gc_cos_add_sin_add_is_mul :
   ((rngl_cos a + ℹ * rngl_sin a) * (rngl_cos b + ℹ * rngl_sin b))%C.
 Proof. easy. Qed.
 
+(* Moivre formula *)
 Theorem gc_cos_sin_pow :
   ∀ a n,
   ((rngl_cos a + ℹ * rngl_sin a) ^ n)%C =

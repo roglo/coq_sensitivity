@@ -386,6 +386,13 @@ cbn - [ binomial "-" "*" "/" ].
 rewrite IHn.
 (* faut faire le calcul parallèlement avec rngl_sin (n * θ) *)
 (* pis faut voir le S n / 2 en fonction de n / 2 *)
+
+(* peut-être qu'il faut que je prouve (a+b)^n = somme de aibj
+   et leurs coefficients binomiaux d'abord ? sauf que faut
+   l'appliquer sur des espèces d'anneaux et que les complexes
+   ne sont pas encore des espèces d'anneaux ; j'ai bien la
+   formule de Moivre, mais c'est tout *)
+Check gc_cos_sin_pow.
 ...
 destruct_ac.
 intros.
