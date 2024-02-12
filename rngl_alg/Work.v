@@ -408,6 +408,7 @@ rewrite Nat.sub_0_r.
 (**)
 Class mini_rngl_prop T {ro : ring_like_op T} :=
   { mini_add_comm : ∀ a b, (a + b = b + a)%L;
+    mini_add_assoc: ∀ a b c, (a + (b + c))%L = (a + b + c)%L;
     mini_add_0_l : ∀ a, (0 + a = a)%L;
     mini_mul_1_l : ∀ a, (1 * a = a)%L;
     mini_mul_1_r : ∀ a, (a * 1 = a)%L;
@@ -415,17 +416,17 @@ Class mini_rngl_prop T {ro : ring_like_op T} :=
     mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L }.
 
 Theorem mini_pow_succ_r :
-  ∀ (m : mini_rngl_prop T) n a, (a ^ S n = a * a ^ n)%L.
+  ∀ {m : mini_rngl_prop T} n a, (a ^ S n = a * a ^ n)%L.
 Proof.
-intros.
 clear rp rl ac.
+intros.
 destruct n; [ | easy ].
 cbn; symmetry.
 apply mini_mul_1_r.
 Qed.
 
 Theorem mini_mul_summation_distr_l :
-  ∀ (m : mini_rngl_prop T),
+  ∀ {m : mini_rngl_prop T},
   ∀ (a : T) (b e : nat) (f : nat → T),
   (a * (∑ (i = b, e), f i))%L = ∑ (i = b, e), a * f i.
 Proof.
@@ -437,17 +438,23 @@ remember (S e - b) as len eqn:Hlen.
 clear Hlen.
 revert b.
 induction len; intros; cbn; [ apply mini_mul_0_r | ].
-...
-rewrite (fold_left_op_fun_from_d 0%L).
-...
-rewrite fold_left_rngl_add_fun_from_0.
-...
- fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
+do 2 rewrite mini_add_0_l.
+rewrite (fold_left_op_fun_from_d 0%L); cycle 1.
+apply mini_add_0_l.
+intros; rewrite mini_add_comm; apply mini_add_0_l.
+apply mini_add_assoc.
+rewrite mini_mul_add_distr_l.
 rewrite IHlen.
-...
+symmetry.
+apply (fold_left_op_fun_from_d 0%L).
+apply mini_add_0_l.
+intros; rewrite mini_add_comm; apply mini_add_0_l.
+apply mini_add_assoc.
+Qed.
 
 Theorem newton_binomial :
-  ∀ (m : mini_rngl_prop T) n a b,
+  ∀ {m : mini_rngl_prop T},
+  ∀ n a b,
   ((a + b) ^ n)%L =
     (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.
 Proof.
@@ -462,11 +469,10 @@ induction n. {
   do 2 rewrite mini_add_0_l.
   now do 2 rewrite mini_mul_1_l.
 }
-rewrite (mini_pow_succ_r m).
+rewrite mini_pow_succ_r.
 rewrite IHn.
-Check @rngl_mul_summation_distr_l.
-... ...
 rewrite mini_mul_summation_distr_l.
+...
 rewrite mul_add_distr_r_in_summation.
 rewrite summation_add.
 do 2 rewrite <- double_mul_assoc_in_summation.
