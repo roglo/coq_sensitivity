@@ -425,10 +425,66 @@ destruct n. {
   rewrite rngl_add_0_r.
   do 3 rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_add_opp_r Hop).
-...
-  do 4 rewrite (rngl_mul_1_l Hon).
-  now rewrite (rngl_mul_1_r Hon).
+  do 3 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_1_r Hon).
+  do 3 rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  f_equal.
+  rewrite (rngl_add_diag Hon).
+  rewrite (rngl_mul_comm Hic _ (rngl_cos θ)).
+  rewrite (rngl_add_diag Hon).
+  rewrite (rngl_mul_comm Hic).
+  now do 2 rewrite rngl_mul_assoc.
 }
+destruct n. {
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  progress unfold minus_one_pow.
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  rewrite Nat.sub_diag, Nat.sub_0_r, Nat.sub_0_r; cbn.
+  rewrite rngl_add_0_l.
+  rewrite rngl_add_0_r.
+  do 3 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  do 3 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_1_r Hon).
+  do 3 rewrite rngl_mul_add_distr_r.
+  do 3 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_sub_add_distr Hos).
+  do 7 rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  do 5 rewrite rngl_mul_assoc.
+  do 4 rewrite (rngl_mul_sub_distr_l Hop).
+  do 7 rewrite rngl_mul_assoc.
+  do 4 rewrite rngl_mul_add_distr_l.
+  do 6 rewrite rngl_mul_assoc.
+  do 7 rewrite (rngl_sub_add_distr Hos).
+  remember (rngl_cos θ) as c.
+  remember (rngl_sin θ) as s.
+  rewrite (rngl_mul_sub_distr_l Hop).
+  do 4 rewrite rngl_mul_assoc.
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_mul_mul_swap Hic _ s c).
+  rewrite (rngl_mul_mul_swap Hic _ s c).
+  rewrite (rngl_mul_comm Hic (s * s)%L).
+  rewrite (rngl_mul_mul_swap Hic _ (s * s)%L).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_mul_comm Hic s c).
+  rewrite (rngl_mul_mul_swap Hic _ s c).
+  rewrite (rngl_mul_mul_swap Hic _ s c).
+  rewrite (rngl_add_sub_swap Hop).
+  easy.
+}
+(* bon, ça veut dire que c'est bon ; j'ai plus qu'à le prouver
+   par récurrence sur n *)
 ... ...
   rewrite angle_add_diag in Hzsm |-*.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
