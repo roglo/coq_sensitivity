@@ -393,6 +393,56 @@ rewrite IHn.
    ne sont pas encore des espèces d'anneaux ; j'ai bien la
    formule de Moivre, mais c'est tout *)
 Check gc_cos_sin_pow.
+specialize (gc_cos_sin_pow θ n) as H1.
+Theorem rngl_sum_pow :
+  ∀ a b n,
+  ((a + b) ^ n =
+     ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
+Proof.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+rewrite Nat.sub_0_r.
+
+Theorem glop :
+  ∀ a b n,
+  ((a + b) ^ n =
+     ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
+Proof.
+intros.
+clear ac.
+clear rl.
+clear rp.
+Search GComplex.
+Check gc_ring_like_op.
+...
+
+Fixpoint a_of_nat {A} a_zero a_one (a_add : A → _ → A) n :=
+  match n with
+  | 0 => a_zero
+  | S n' => a_add a_one (a_of_nat a_zero a_one a_add n')
+  end.
+
+Fixpoint a_pow {A} a_one (a_mul : A → A → A) a n :=
+  match n with
+  | 0 => a_one
+  | S n' => a_mul a (a_pow a_one a_mul a n')
+  end.
+
+Theorem glop :
+  ∀ A (a b : A) n a_zero a_one a_add a_mul,
+  a_pow a_one a_mul (a_add a b) n =
+  List.fold_left
+    (λ c i,
+       (a_add c
+          (a_mul
+             (a_mul
+                (a_of_nat a_zero a_one a_add (binomial n i))
+                (a_pow a_one a_mul a (n - i)))
+             (a_pow a_one a_mul b i))))
+    (List.seq 0 (S n)) a_zero.
+Proof.
+intros.
 ...
 destruct_ac.
 intros.

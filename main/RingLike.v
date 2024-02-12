@@ -423,7 +423,7 @@ Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
   | O => 1%L
-  | 1 => a (* to make it accesible even if 1 ∉ T *)
+  | 1 => a (* to make it accessible even if 1 ∉ T *)
   | S m => (a * rngl_power a m)%L
   end.
 
