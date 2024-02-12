@@ -442,6 +442,23 @@ f_equal.
 apply mini_mul_comm.
 Qed.
 
+Theorem mini_of_nat_add :
+  ∀ {mr : mini_rngl_prop T},
+  ∀ m n, rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
+Proof.
+clear rp rl ac.
+intros.
+revert m.
+induction n; intros. {
+  now rewrite Nat.add_0_r, mini_add_0_r.
+}
+rewrite <- Nat.add_succ_comm.
+rewrite IHn.
+do 2 rewrite rngl_of_nat_succ.
+rewrite (mini_add_comm 1)%L.
+now rewrite mini_add_assoc.
+Qed.
+
 (* end mini ring like *)
 
 (* to be completed, if I can
@@ -587,28 +604,10 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite (Nat.add_1_l i).
   rewrite binomial_succ_succ.
   rewrite Nat.sub_succ.
-Search (rngl_of_nat (_ + _)).
-About rngl_of_nat_add.
-Theorem mini_of_nat_add :
-  ∀ {mr : mini_rngl_prop T},
-  ∀ m n, rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
-Proof.
-clear rp rl ac.
-intros.
-revert m.
-induction n; intros. {
-  now rewrite Nat.add_0_r, mini_add_0_r.
+  rewrite mini_of_nat_add.
+  do 2 rewrite mini_mul_add_distr_r.
+  easy.
 }
-rewrite <- Nat.add_succ_comm.
-rewrite IHn.
-do 2 rewrite rngl_of_nat_succ.
-...
-Theorem mini_of_nat_succ :
-  ∀ {mr : mini_rngl_prop T},
-  ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
-Proof.
-clear rp rl ac.
-intros. easy. Qed.
 ...
 rngl_of_nat_succ is not universe polymorphic
 Arguments rngl_of_nat_succ {T}%type_scope {ro rp} n%nat_scope
