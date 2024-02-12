@@ -394,6 +394,7 @@ rewrite IHn.
    formule de Moivre, mais c'est tout *)
 Check gc_cos_sin_pow.
 specialize (gc_cos_sin_pow θ n) as H1.
+(*
 Theorem rngl_sum_pow :
   ∀ a b n,
   ((a + b) ^ n =
@@ -403,20 +404,64 @@ intros.
 progress unfold iter_seq.
 progress unfold iter_list.
 rewrite Nat.sub_0_r.
+*)
+(**)
+Class mini_rngl_prop T {ro : ring_like_op T} :=
+  { mini_add_comm : ∀ a b, (a + b = b + a)%L;
+    mini_add_0_l : ∀ a, (0 + a = a)%L;
+    mini_mul_1_l : ∀ a, (1 * a = a)%L;
+    mini_mul_1_r : ∀ a, (a * 1 = a)%L }.
 
-Theorem glop :
-  ∀ a b n,
+Theorem mini_pow_succ_r :
+  ∀ (m : mini_rngl_prop T) n a, (a ^ S n = a * a ^ n)%L.
+Proof.
+intros.
+clear rp rl ac.
+destruct n; [ | easy ].
+cbn; symmetry.
+apply mini_mul_1_r.
+Qed.
+
+Theorem mini_sum_pow :
+  ∀ (m : mini_rngl_prop T) a b n,
   ((a + b) ^ n =
      ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
 Proof.
 intros.
-clear ac.
-clear rl.
-clear rp.
-Search GComplex.
-Check gc_ring_like_op.
+clear ac rl rp.
+induction n. {
+  cbn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite (mini_add_comm 1)%L.
+  do 2 rewrite mini_add_0_l.
+  now do 2 rewrite mini_mul_1_l.
+}
+rewrite (mini_pow_succ_r m).
+rewrite IHn.
+rewrite rngl_mul_summation_distr_l.
 ...
-
+(*
+cbn - [ rngl_of_nat binomial "-" rngl_power ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite (mini_add_comm 1)%L.
+  do 2 rewrite mini_add_0_l.
+  rewrite mini_mul_1_r.
+  now do 3 rewrite mini_mul_1_l.
+}
+destruct n; [ easy | clear Hnz ].
+*)
+rewrite IHn.
+Search (binomial (S _)).
+...
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite rngl_summation_succ_succ.
+...
 Fixpoint a_of_nat {A} a_zero a_one (a_add : A → _ → A) n :=
   match n with
   | 0 => a_zero
@@ -429,6 +474,21 @@ Fixpoint a_pow {A} a_one (a_mul : A → A → A) a n :=
   | S n' => a_mul a (a_pow a_one a_mul a n')
   end.
 
+Theorem glop :
+  ∀ A (a b : A) n a_zero a_one a_add a_mul,
+  a_pow a_one a_mul (a_add a b) n =
+  List.fold_left
+    (λ c i,
+       (a_add c
+          (a_mul
+             (a_mul
+                (a_of_nat a_zero a_one a_add (binomial n i))
+                (a_pow a_one a_mul a (n - i)))
+             (a_pow a_one a_mul b i))))
+    (List.seq 0 (S n)) a_zero.
+Proof.
+intros.
+...
 Theorem glop :
   ∀ A (a b : A) n a_zero a_one a_add a_mul,
   a_pow a_one a_mul (a_add a b) n =
