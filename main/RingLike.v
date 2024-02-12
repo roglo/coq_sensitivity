@@ -2711,12 +2711,7 @@ Qed.
 
 Theorem rngl_of_nat_succ :
   ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
-Proof.
-intros.
-rewrite <- Nat.add_1_l.
-rewrite rngl_of_nat_add.
-now rewrite rngl_of_nat_1.
-Qed.
+Proof. easy. Qed.
 
 (* *)
 

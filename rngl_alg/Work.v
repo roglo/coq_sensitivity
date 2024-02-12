@@ -328,6 +328,10 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
+Theorem binomial_succ_succ : ∀ n k,
+  binomial (S n) (S k) = binomial n k + binomial n (S k).
+Proof. easy. Qed.
+
 (* mini ring like *)
 
 Class mini_rngl_prop T {ro : ring_like_op T} :=
@@ -339,6 +343,16 @@ Class mini_rngl_prop T {ro : ring_like_op T} :=
     mini_mul_0_l : ∀ a, (0 * a = 0)%L;
     mini_mul_1_l : ∀ a, (1 * a = a)%L;
     mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L }.
+
+Theorem mini_add_0_r :
+  ∀ {m : mini_rngl_prop T},
+  ∀ a, (a + 0 = a)%L.
+Proof.
+clear rp rl ac.
+intros.
+rewrite mini_add_comm.
+apply mini_add_0_l.
+Qed.
 
 Theorem mini_mul_1_r :
   ∀ {m : mini_rngl_prop T},
@@ -398,7 +412,7 @@ induction len; intros; cbn; [ apply mini_mul_0_r | ].
 do 2 rewrite mini_add_0_l.
 rewrite (fold_left_op_fun_from_d 0%L); cycle 1.
 apply mini_add_0_l.
-intros; rewrite mini_add_comm; apply mini_add_0_l.
+apply mini_add_0_r.
 apply mini_add_assoc.
 rewrite mini_mul_add_distr_l.
 rewrite IHlen.
@@ -522,8 +536,7 @@ induction n. {
   progress unfold iter_seq.
   progress unfold iter_list.
   cbn.
-  rewrite (mini_add_comm 1)%L.
-  do 2 rewrite mini_add_0_l.
+  rewrite mini_add_0_l, mini_add_0_r.
   now do 2 rewrite mini_mul_1_l.
 }
 rewrite mini_pow_succ_r.
@@ -558,7 +571,61 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 remember (∑ (i = _, _), _) as x; subst x.
 symmetry.
-rewrite iter_seq_split_first.
+rewrite iter_seq_split_first; cycle 1.
+apply mini_add_0_l.
+apply mini_add_0_r.
+apply mini_add_assoc.
+easy.
+progress unfold binomial at 1.
+rewrite Nat.sub_0_r, rngl_pow_0_r, mini_mul_1_r.
+rewrite (rngl_summation_shift 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+remember (rngl_of_nat 1) as x; cbn in Heqx; subst x.
+rewrite mini_add_0_r, mini_mul_1_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite (Nat.add_1_l i).
+  rewrite binomial_succ_succ.
+  rewrite Nat.sub_succ.
+Search (rngl_of_nat (_ + _)).
+About rngl_of_nat_add.
+Theorem mini_of_nat_add :
+  ∀ {mr : mini_rngl_prop T},
+  ∀ m n, rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
+Proof.
+clear rp rl ac.
+intros.
+revert m.
+induction n; intros. {
+  now rewrite Nat.add_0_r, mini_add_0_r.
+}
+rewrite <- Nat.add_succ_comm.
+rewrite IHn.
+do 2 rewrite rngl_of_nat_succ.
+...
+Theorem mini_of_nat_succ :
+  ∀ {mr : mini_rngl_prop T},
+  ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
+Proof.
+clear rp rl ac.
+intros. easy. Qed.
+...
+rngl_of_nat_succ is not universe polymorphic
+Arguments rngl_of_nat_succ {T}%type_scope {ro rp} n%nat_scope
+rngl_of_nat_succ is opaque
+Expands to: Constant Main.RingLike.rngl_of_nat_succ
+
+cbn.
+symmetry.
+rewrite mini_add_comm.
+... ...
+rewrite mini_of_nat_add.
+...
+cbn - [ "-" "^" ].
+rewrite mul_assoc_in_summation.
+rewrite mul_add_distr_r_in_summation.
+rewrite summation_add.
+rewrite Nat.add_assoc.
 ...
 Check @rngl_summation_split_first.
 Check @rngl_summation_split_last.
