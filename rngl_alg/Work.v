@@ -328,84 +328,8 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
-(* to be completed, if I can
-Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
-  ∀ m n i θ,
-  m < n ≤ 2 ^ i
-  → angle_add_overflow
-      (2 ^ i / n * (θ / ₂^i))
-      (m * (2 ^ i / n * (θ / ₂^i))) =
-      false.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 (_ * _)%A).
-  apply angle_add_overflow_0_l.
-}
-intros * (Hmi, Hni).
-assert (Hnz : n ≠ 0) by flia Hmi.
-progress unfold angle_add_overflow.
-rewrite <- angle_mul_succ_l.
-apply angle_ltb_ge.
-progress unfold angle_leb.
-remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
-remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
-symmetry in Hzs.
-rewrite Hu in Hzs.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
-rewrite Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
-  symmetry in Hzsm.
-  rewrite Hu in Hzsm.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
-  rewrite Hzsm.
-  destruct zsm; [ | easy ].
-  apply rngl_leb_le in Hzsm.
-  apply rngl_leb_le.
-(* we need cos(nx) in function of cos(x) and sin(x) *)
-Theorem rngl_cos_nx :
-  ∀ n θ,
-  rngl_cos (n * θ) =
-    (∑ (i = 0, n / 2),
-       minus_one_pow i * rngl_of_nat (binomial n (n - 2 * i)) *
-         (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i))%L.
-Proof.
-destruct_ac.
-intros.
-induction n. {
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_add_0_r.
-  now do 3 rewrite (rngl_mul_1_l Hon).
-}
-cbn - [ binomial "-" "*" "/" ].
-rewrite IHn.
-(* faut faire le calcul parallèlement avec rngl_sin (n * θ) *)
-(* pis faut voir le S n / 2 en fonction de n / 2 *)
+(* mini ring like *)
 
-(* peut-être qu'il faut que je prouve (a+b)^n = somme de aibj
-   et leurs coefficients binomiaux d'abord ? sauf que faut
-   l'appliquer sur des espèces d'anneaux et que les complexes
-   ne sont pas encore des espèces d'anneaux ; j'ai bien la
-   formule de Moivre, mais c'est tout *)
-Check gc_cos_sin_pow.
-specialize (gc_cos_sin_pow θ n) as H1.
-(*
-Theorem rngl_sum_pow :
-  ∀ a b n,
-  ((a + b) ^ n =
-     ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
-Proof.
-intros.
-progress unfold iter_seq.
-progress unfold iter_list.
-rewrite Nat.sub_0_r.
-*)
-(**)
 Class mini_rngl_prop T {ro : ring_like_op T} :=
   { mini_add_comm : ∀ a b, (a + b = b + a)%L;
     mini_mul_comm : ∀ a b, (a * b = b * a)%L;
@@ -485,6 +409,106 @@ intros; rewrite mini_add_comm; apply mini_add_0_l.
 apply mini_add_assoc.
 Qed.
 
+Theorem mini_pow_add_r :
+  ∀ {m : mini_rngl_prop T},
+  ∀ (a : T) (i j : nat), (a ^ (i + j))%L = (a ^ i * a ^ j)%L.
+Proof.
+clear rp rl ac.
+intros.
+revert j.
+induction i; intros. {
+  symmetry; apply mini_mul_1_l.
+}
+rewrite Nat.add_succ_comm.
+rewrite IHi.
+do 2 rewrite mini_pow_succ_r.
+rewrite mini_mul_comm.
+do 2 rewrite <- mini_mul_assoc.
+f_equal.
+apply mini_mul_comm.
+Qed.
+
+(* end mini ring like *)
+
+(* to be completed, if I can
+Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
+  ∀ m n i θ,
+  m < n ≤ 2 ^ i
+  → angle_add_overflow
+      (2 ^ i / n * (θ / ₂^i))
+      (m * (2 ^ i / n * (θ / ₂^i))) =
+      false.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%A).
+  apply angle_add_overflow_0_l.
+}
+intros * (Hmi, Hni).
+assert (Hnz : n ≠ 0) by flia Hmi.
+progress unfold angle_add_overflow.
+rewrite <- angle_mul_succ_l.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
+remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
+symmetry in Hzs.
+rewrite Hu in Hzs.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+rewrite Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
+  symmetry in Hzsm.
+  rewrite Hu in Hzsm.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  rewrite Hzsm.
+  destruct zsm; [ | easy ].
+  apply rngl_leb_le in Hzsm.
+  apply rngl_leb_le.
+(* we need cos(nx) in function of cos(x) and sin(x) *)
+Theorem rngl_cos_nx :
+  ∀ n θ,
+  rngl_cos (n * θ) =
+    (∑ (i = 0, n / 2),
+       minus_one_pow i * rngl_of_nat (binomial n (n - 2 * i)) *
+         (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i))%L.
+Proof.
+destruct_ac.
+intros.
+induction n. {
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_add_0_r.
+  now do 3 rewrite (rngl_mul_1_l Hon).
+}
+cbn - [ binomial "-" "*" "/" ].
+rewrite IHn.
+(* faut faire le calcul parallèlement avec rngl_sin (n * θ) *)
+(* pis faut voir le S n / 2 en fonction de n / 2 *)
+
+(* peut-être qu'il faut que je prouve (a+b)^n = somme de aibj
+   et leurs coefficients binomiaux d'abord ? sauf que faut
+   l'appliquer sur des espèces d'anneaux et que les complexes
+   ne sont pas encore des espèces d'anneaux ; j'ai bien la
+   formule de Moivre, mais c'est tout *)
+Check gc_cos_sin_pow.
+specialize (gc_cos_sin_pow θ n) as H1.
+(*
+Theorem rngl_sum_pow :
+  ∀ a b n,
+  ((a + b) ^ n =
+     ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
+Proof.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+rewrite Nat.sub_0_r.
+*)
+(**)
+
 Theorem newton_binomial :
   ∀ {m : mini_rngl_prop T},
   ∀ n a b,
@@ -507,11 +531,43 @@ rewrite IHn.
 rewrite mini_mul_summation_distr_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros * Hin.
+(*
+  rewrite (mini_mul_comm (a + b))%L.
+  do 2 rewrite <- mini_mul_assoc.
+  rewrite mini_mul_comm.
+  rewrite mini_mul_assoc.
+  rewrite mini_mul_add_distr_l.
+*)
   rewrite mini_mul_add_distr_r.
-  do 2 rewrite mini_mul_assoc.
+  do 4 rewrite mini_mul_assoc.
   rewrite (mini_mul_comm (a * _))%L.
   rewrite mini_mul_assoc.
-Search (_ ^ _ * _)%L.
+  replace a with (a ^ 1)%L at 2 by easy.
+  rewrite <- mini_pow_add_r.
+  rewrite (mini_mul_comm (a ^ _)%L).
+  rewrite mini_add_comm.
+  rewrite (mini_mul_comm _ (b ^ _))%L at 1.
+  do 2 rewrite mini_mul_assoc.
+  replace b with (b ^ 1)%L at 2 by easy.
+  rewrite <- mini_pow_add_r.
+  rewrite <- mini_mul_assoc.
+  rewrite mini_mul_comm.
+  do 2 rewrite <- mini_mul_assoc.
+  rewrite <- mini_mul_add_distr_l.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+symmetry.
+rewrite iter_seq_split_first.
+...
+Check @rngl_summation_split_first.
+Check @rngl_summation_split_last.
+About rngl_summation_split_first.
+...
+rewrite rngl_summation_split_first; [ | easy ].
+...
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite (rngl_summation_shift 1); [ | flia ].
 ...
 rewrite mul_add_distr_r_in_summation.
 rewrite summation_add.
