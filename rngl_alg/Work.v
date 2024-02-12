@@ -408,14 +408,22 @@ rewrite Nat.sub_0_r.
 (**)
 Class mini_rngl_prop T {ro : ring_like_op T} :=
   { mini_add_comm : ∀ a b, (a + b = b + a)%L;
+    mini_mul_comm : ∀ a b, (a * b = b * a)%L;
     mini_add_assoc: ∀ a b c, (a + (b + c))%L = (a + b + c)%L;
     mini_mul_assoc: ∀ a b c, (a * (b * c))%L = (a * b * c)%L;
     mini_add_0_l : ∀ a, (0 + a = a)%L;
     mini_mul_1_l : ∀ a, (1 * a = a)%L;
-    mini_mul_1_r : ∀ a, (a * 1 = a)%L;
-    mini_mul_0_r : ∀ a, (a * 0 = 0)%L;
-    mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L;
-    mini_mul_add_distr_r : ∀ a b c, ((a + b) * c)%L = (a * c + b * c)%L }.
+    mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L }.
+
+Theorem mini_mul_1_r :
+  ∀ {m : mini_rngl_prop T},
+  ∀ a, (a * 1 = a)%L.
+Proof.
+clear rp rl ac.
+intros.
+rewrite mini_mul_comm.
+apply mini_mul_1_l.
+Qed.
 
 Theorem mini_pow_succ_r :
   ∀ {m : mini_rngl_prop T} n a, (a ^ S n = a * a ^ n)%L.
@@ -439,6 +447,7 @@ progress unfold iter_list.
 remember (S e - b) as len eqn:Hlen.
 clear Hlen.
 revert b.
+...
 induction len; intros; cbn; [ apply mini_mul_0_r | ].
 do 2 rewrite mini_add_0_l.
 rewrite (fold_left_op_fun_from_d 0%L); cycle 1.
@@ -477,7 +486,15 @@ rewrite mini_mul_summation_distr_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros * Hin.
   rewrite mini_mul_add_distr_r.
-  rewrite mini_mul_assoc.
+  do 2 rewrite mini_mul_assoc.
+Theorem mini_mul_comm_rngl_of_nat_r :
+  ∀ {m : mini_rngl_prop T},
+  ∀ a n, (a * rngl_of_nat n = rngl_of_nat n * a)%L.
+Proof.
+clear rp rl ac.
+intros.
+induction n; cbn. {
+  rewrite mini_mul_0_r, mini_mul_0_l.
 ...
 rewrite mul_add_distr_r_in_summation.
 rewrite summation_add.
