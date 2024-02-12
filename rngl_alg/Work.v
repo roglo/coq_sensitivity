@@ -410,7 +410,9 @@ Class mini_rngl_prop T {ro : ring_like_op T} :=
   { mini_add_comm : ∀ a b, (a + b = b + a)%L;
     mini_add_0_l : ∀ a, (0 + a = a)%L;
     mini_mul_1_l : ∀ a, (1 * a = a)%L;
-    mini_mul_1_r : ∀ a, (a * 1 = a)%L }.
+    mini_mul_1_r : ∀ a, (a * 1 = a)%L;
+    mini_mul_0_r : ∀ a, (a * 0 = 0)%L;
+    mini_mul_add_distr_l : ∀ a b c, (a * (b + c))%L = (a * b + a * c)%L }.
 
 Theorem mini_pow_succ_r :
   ∀ (m : mini_rngl_prop T) n a, (a ^ S n = a * a ^ n)%L.
@@ -422,7 +424,79 @@ cbn; symmetry.
 apply mini_mul_1_r.
 Qed.
 
-Theorem mini_sum_pow :
+Theorem mini_mul_summation_distr_l :
+  ∀ (m : mini_rngl_prop T),
+  ∀ (a : T) (b e : nat) (f : nat → T),
+  (a * (∑ (i = b, e), f i))%L = ∑ (i = b, e), a * f i.
+Proof.
+clear rp rl ac.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+remember (S e - b) as len eqn:Hlen.
+clear Hlen.
+revert b.
+induction len; intros; cbn; [ apply mini_mul_0_r | ].
+...
+rewrite (fold_left_op_fun_from_d 0%L).
+...
+rewrite fold_left_rngl_add_fun_from_0.
+...
+ fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
+rewrite IHlen.
+...
+
+Theorem newton_binomial :
+  ∀ (m : mini_rngl_prop T) n a b,
+  ((a + b) ^ n)%L =
+    (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.
+Proof.
+clear rp rl ac.
+intros.
+induction n. {
+  cbn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite (mini_add_comm 1)%L.
+  do 2 rewrite mini_add_0_l.
+  now do 2 rewrite mini_mul_1_l.
+}
+rewrite (mini_pow_succ_r m).
+rewrite IHn.
+Check @rngl_mul_summation_distr_l.
+... ...
+rewrite mini_mul_summation_distr_l.
+rewrite mul_add_distr_r_in_summation.
+rewrite summation_add.
+do 2 rewrite <- double_mul_assoc_in_summation.
+rewrite power_shuffle1_in_summation.
+rewrite power_shuffle2_in_summation.
+symmetry.
+rewrite summation_split_first; [ | flia ].
+unfold binomial at 1.
+rewrite Nat.mul_1_l, Nat.sub_0_r, Nat.pow_0_r, Nat.mul_1_r at 1.
+rewrite summation_succ_succ.
+cbn - [ "-" "^" ].
+rewrite mul_assoc_in_summation.
+rewrite mul_add_distr_r_in_summation.
+rewrite summation_add.
+rewrite Nat.add_assoc.
+do 2 rewrite <- mul_assoc_in_summation.
+rewrite Nat.add_shuffle0.
+f_equal.
+rewrite <- (summation_succ_succ 0 n (λ i, binomial n i * a ^ (S n - i) * b ^ i)).
+rewrite summation_split_last; [ | flia | flia ].
+replace (S n - 1) with n by flia.
+rewrite binomial_succ_diag_r, Nat.mul_0_l, Nat.add_0_r.
+symmetry.
+rewrite summation_split_first; [ | flia ].
+now rewrite binomial_0_r, Nat.mul_1_l, Nat.sub_0_r, Nat.pow_0_r, Nat.mul_1_r.
+Qed.
+
+...
+
+Theorem mini_pow_sum :
   ∀ (m : mini_rngl_prop T) a b n,
   ((a + b) ^ n =
      ∑ (i = 0, n), rngl_of_nat (binomial n i) * a ^ (n - i) * b ^ i)%L.
@@ -440,6 +514,20 @@ induction n. {
 }
 rewrite (mini_pow_succ_r m).
 rewrite IHn.
+progress unfold iter_seq.
+do 2 rewrite Nat.sub_0_r.
+rewrite mul_iter_list_distr_l. 2: {
+  intros.
+  apply mini_mul_add_distr_l.
+}
+rewrite mini_mul_0_r.
+symmetry.
+...
+progress unfold iter_list.
+remember (S n) as sn; cbn; subst sn.
+...
+progress unfold iter_list.
+rewrite fold_iter_seq.
 rewrite rngl_mul_summation_distr_l.
 ...
 (*
