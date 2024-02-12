@@ -328,9 +328,6 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
-Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
-Proof. easy. Qed.
-
 (* to be completed, if I can
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -351,7 +348,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
-rewrite angle_add_mul_r_diag_r.
+rewrite <- angle_mul_succ_l.
 apply angle_ltb_ge.
 progress unfold angle_leb.
 remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
@@ -378,6 +375,18 @@ Theorem rngl_cos_nx :
        minus_one_pow i * rngl_of_nat (binomial n (n - 2 * i)) *
          (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i))%L.
 Proof.
+destruct_ac.
+intros.
+induction n. {
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_add_0_r.
+  now do 3 rewrite (rngl_mul_1_l Hon).
+}
+cbn - [ binomial "-" "*" "/" ].
+rewrite IHn.
+(* faut faire le calcul parallèlement avec rngl_sin (n * θ) *)
+(* pis faut voir le S n / 2 en fonction de n / 2 *)
+...
 destruct_ac.
 intros.
 destruct n. {
