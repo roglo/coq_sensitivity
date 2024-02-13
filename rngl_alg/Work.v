@@ -406,13 +406,13 @@ destruct n. {
   rewrite rngl_add_0_r.
   do 3 rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_add_opp_r Hop).
-  do 4 rewrite (rngl_mul_1_l Hon).
-  do 3 rewrite rngl_mul_add_distr_r.
   rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_mul_sub_distr_l Hop).
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_r.
-  do 2 rewrite rngl_add_assoc.
+  do 12 rewrite rngl_mul_add_distr_r.
+  do 2 rewrite (rngl_mul_1_l Hon).
+  do 4 rewrite (rngl_mul_sub_distr_l Hop).
+  do 5 rewrite rngl_mul_add_distr_l.
+  do 6 rewrite rngl_add_assoc.
+...
   rewrite <- (rngl_add_sub_swap Hop).
   rewrite <- (rngl_add_sub_assoc Hop).
   do 2 rewrite <- rngl_add_assoc.
