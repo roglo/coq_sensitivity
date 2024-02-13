@@ -322,45 +322,6 @@ now apply Nat.mul_le_mono_r.
 Qed.
 
 (* to be completed, if I can
-Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
-  ∀ m n i θ,
-  m < n ≤ 2 ^ i
-  → angle_add_overflow
-      (2 ^ i / n * (θ / ₂^i))
-      (m * (2 ^ i / n * (θ / ₂^i))) =
-      false.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 (_ * _)%A).
-  apply angle_add_overflow_0_l.
-}
-intros * (Hmi, Hni).
-assert (Hnz : n ≠ 0) by flia Hmi.
-progress unfold angle_add_overflow.
-rewrite <- angle_mul_succ_l.
-apply angle_ltb_ge.
-progress unfold angle_leb.
-remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
-remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
-symmetry in Hzs.
-rewrite Hu in Hzs.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
-rewrite Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
-  symmetry in Hzsm.
-  rewrite Hu in Hzsm.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
-  rewrite Hzsm.
-  destruct zsm; [ | easy ].
-  apply rngl_leb_le in Hzsm.
-  apply rngl_leb_le.
-(* we need cos(nx) in function of cos(x) and sin(x) *)
 Theorem rngl_cos_nx :
   ∀ n θ,
   rngl_cos (n * θ) =
@@ -485,6 +446,49 @@ destruct n. {
 }
 (* bon, ça veut dire que c'est bon ; j'ai plus qu'à le prouver
    par récurrence sur n *)
+..
+
+Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
+  ∀ m n i θ,
+  m < n ≤ 2 ^ i
+  → angle_add_overflow
+      (2 ^ i / n * (θ / ₂^i))
+      (m * (2 ^ i / n * (θ / ₂^i))) =
+      false.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%A).
+  apply angle_add_overflow_0_l.
+}
+intros * (Hmi, Hni).
+assert (Hnz : n ≠ 0) by flia Hmi.
+progress unfold angle_add_overflow.
+rewrite <- angle_mul_succ_l.
+apply angle_ltb_ge.
+progress unfold angle_leb.
+remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
+remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
+symmetry in Hzs.
+rewrite Hu in Hzs.
+progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+rewrite Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
+  symmetry in Hzsm.
+  rewrite Hu in Hzsm.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  rewrite Hzsm.
+  destruct zsm; [ | easy ].
+  apply rngl_leb_le in Hzsm.
+  apply rngl_leb_le.
+(* we need cos(nx) in function of cos(x) and sin(x) *)
+... ...
+  Check rngl_cos_nx.
 ... ...
   rewrite angle_add_diag in Hzsm |-*.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
