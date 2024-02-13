@@ -410,15 +410,17 @@ split. {
       rewrite (Nat.add_1_r (2 * (m - i))).
       rewrite binomial_succ_r.
       rewrite Nat.add_1_r.
-Search binomial.
-... ...
-rewrite <- binomial_succ_succ.
+      rewrite <- binomial_succ_succ.
       easy.
     }
     remember (∑ (i = _, _), _) as x; subst x.
-...
-Search (_ ^ _ * _)%L.
-rewrite
+    rewrite <- (Nat.add_1_r (m * 2 + 1)).
+    rewrite <- Nat.add_assoc.
+    rewrite Nat_add_diag.
+    rewrite (Nat.mul_comm m 2).
+    rewrite <- Nat.mul_add_distr_l.
+    rewrite (Nat.mul_comm 2 (m + 1)).
+    rewrite Nat.div_mul; [ | easy ].
 ...
 
 Theorem rngl_sin_nx :
