@@ -2785,6 +2785,39 @@ Fixpoint binomial n k :=
      end
   end.
 
+Theorem binomial_succ_succ : ∀ n k,
+  binomial (S n) (S k) = binomial n k + binomial n (S k).
+Proof. easy. Qed.
+
+Theorem binomial_succ_r : ∀ n k,
+  binomial n (S k) =
+    match n with
+    | 0 => 0
+    | S n' => binomial n' k + binomial n' (S k)
+    end.
+Proof.
+intros.
+now destruct n.
+Qed.
+
+Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; [ now destruct k | cbn ].
+destruct k; [ flia Hnk | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | easy ].
+rewrite Nat.add_0_l.
+apply IHn; flia Hnk.
+Qed.
+
+Theorem binomial_succ_diag_r : ∀ n, binomial n (S n) = 0.
+Proof.
+intros.
+apply binomial_lt; flia.
+Qed.
+
 (* end binomial *)
 
 Theorem NoDup_filter {A} : ∀ (f : A → _) {l}, NoDup l → NoDup (filter f l).

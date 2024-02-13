@@ -390,7 +390,35 @@ split. {
       rewrite (Nat.mul_comm _ 2).
       rewrite Nat.sub_add_distr.
       rewrite Nat_sub_sub_swap.
-2: {
+      rewrite Nat.add_sub.
+      replace (2 * m + 1 - 2 * i) with (2 * (m - i) + 1) by flia Hi.
+      replace (2 * m - 2 * i) with (2 * (m - i)) by flia Hi.
+      do 4 rewrite rngl_mul_assoc.
+      rewrite (rngl_mul_mul_swap Hic).
+      rewrite <- (rngl_mul_assoc (rngl_of_nat _)%L).
+      replace ct with (ct ^ 1)%L at 2 by easy.
+      rewrite <- (rngl_pow_add_r Hon).
+      rewrite <- Nat.add_assoc.
+      rewrite Nat_add_diag.
+      rewrite <- Nat.mul_add_distr_l.
+      replace st with (st ^ 1)%L at 3 by easy.
+      rewrite <- (rngl_mul_assoc _ _ (st ^ 1))%L.
+      rewrite <- (rngl_pow_add_r Hon).
+      rewrite <- Nat.add_assoc.
+      rewrite Nat_add_diag.
+      rewrite <- Nat.mul_add_distr_l.
+      rewrite (Nat.add_1_r (2 * (m - i))).
+      rewrite binomial_succ_r.
+      rewrite Nat.add_1_r.
+Search binomial.
+... ...
+rewrite <- binomial_succ_succ.
+      easy.
+    }
+    remember (∑ (i = _, _), _) as x; subst x.
+...
+Search (_ ^ _ * _)%L.
+rewrite
 ...
 
 Theorem rngl_sin_nx :
