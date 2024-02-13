@@ -326,8 +326,8 @@ Theorem rngl_sin_nx :
   ∀ n θ,
   rngl_sin (n * θ) =
     (∑ (i = 1, (n + 1) / 2),
-       minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i))) *
-         (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i - 1))%L.
+       minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i - 1))) *
+         (rngl_cos θ) ^ (n - (2 * i - 1)) * (rngl_sin θ) ^ (2 * i - 1))%L.
 Proof.
 destruct_ac.
 intros.
@@ -350,22 +350,82 @@ destruct n. {
   rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
   rewrite rngl_summation_only_one.
   cbn.
-...
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_add_diag Hon).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_1_l Hon).
+  now rewrite rngl_add_0_r.
+}
+destruct n. {
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
   progress unfold iter_seq.
   progress unfold iter_list.
-  rewrite Nat.sub_0_r.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
   progress unfold minus_one_pow.
   cbn - [ rngl_of_nat binomial "-" "*" ].
-  rewrite Nat.sub_diag, Nat.sub_0_r, Nat.sub_0_r; cbn.
+  rewrite Nat.sub_diag, Nat.sub_0_r; cbn.
   rewrite rngl_add_0_l.
   rewrite rngl_add_0_r.
   do 3 rewrite (rngl_mul_opp_l Hop).
   rewrite (rngl_add_opp_r Hop).
   do 4 rewrite (rngl_mul_1_l Hon).
-  now rewrite (rngl_mul_1_r Hon).
+  do 3 rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  do 2 rewrite rngl_add_assoc.
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  do 2 rewrite <- rngl_add_assoc.
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_mul_comm Hic).
+  rewrite rngl_mul_assoc.
+  f_equal.
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_mul_comm Hic).
+  now rewrite rngl_mul_assoc.
 }
 destruct n. {
   cbn - [ rngl_of_nat binomial "-" "*" ].
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_succ, Nat.sub_0_r.
+  progress unfold minus_one_pow.
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  rewrite Nat.sub_diag, Nat.sub_0_r; cbn.
+  rewrite rngl_add_0_l.
+  rewrite rngl_add_0_r.
+  do 3 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  do 4 rewrite (rngl_mul_1_l Hon).
+  do 3 rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite rngl_mul_add_distr_l.
+  rewrite rngl_mul_add_distr_r.
+  do 2 rewrite rngl_add_assoc.
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  do 2 rewrite <- rngl_add_assoc.
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_mul_comm Hic).
+  rewrite rngl_mul_assoc.
+  f_equal.
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite <- (rngl_add_sub_swap Hop).
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite (rngl_mul_comm Hic).
+  now rewrite rngl_mul_assoc.
+}
 ...
 
 Theorem rngl_cos_nx :
