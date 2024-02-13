@@ -412,19 +412,50 @@ destruct n. {
   do 4 rewrite (rngl_mul_sub_distr_l Hop).
   do 5 rewrite rngl_mul_add_distr_l.
   do 6 rewrite rngl_add_assoc.
-...
-  rewrite <- (rngl_add_sub_swap Hop).
-  rewrite <- (rngl_add_sub_assoc Hop).
-  do 2 rewrite <- rngl_add_assoc.
-  rewrite <- (rngl_add_sub_assoc Hop).
-  rewrite (rngl_mul_comm Hic).
-  rewrite rngl_mul_assoc.
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite (rngl_sub_add_distr Hos).
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite (rngl_add_sub_assoc Hop).
+  remember (rngl_sin θ) as s.
+  remember (rngl_cos θ) as c.
+  unfold rngl_sub.
+  rewrite Hop.
+  repeat rewrite <- rngl_add_assoc.
   f_equal.
-  rewrite <- (rngl_add_sub_assoc Hop).
-  rewrite <- (rngl_add_sub_swap Hop).
-  rewrite <- (rngl_add_sub_assoc Hop).
-  rewrite (rngl_mul_comm Hic).
-  now rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic _ s).
+  now repeat rewrite rngl_mul_assoc.
+  repeat rewrite rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  repeat rewrite rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  rewrite (rngl_mul_comm Hic _ c).
+  repeat rewrite rngl_mul_assoc.
+  f_equal.
+  repeat rewrite rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite rngl_add_assoc.
+  rewrite (rngl_mul_comm Hic _ s).
+  symmetry.
+  rewrite (rngl_mul_comm Hic _ s).
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic _ c).
+  rewrite (rngl_mul_comm Hic _ c).
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite (rngl_mul_comm Hic _ c).
+  repeat rewrite rngl_mul_assoc.
+  easy.
 }
 ...
 
