@@ -322,6 +322,35 @@ now apply Nat.mul_le_mono_r.
 Qed.
 
 (* to be completed
+Theorem rngl_cos_sin_nx :
+  ∀ n θ,
+  rngl_cos (n * θ) =
+    (∑ (i = 0, n / 2),
+       minus_one_pow i * rngl_of_nat (binomial n (n - 2 * i)) *
+         (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i))%L ∧
+  rngl_sin (n * θ) =
+    (∑ (i = 1, (n + 1) / 2),
+       minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i - 1))) *
+         (rngl_cos θ) ^ (n - (2 * i - 1)) * (rngl_sin θ) ^ (2 * i - 1))%L.
+Proof.
+destruct_ac.
+intros.
+induction n. {
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_summation_empty; [ | easy ].
+  split; [ | easy ].
+  rewrite rngl_add_0_r.
+  now do 3 rewrite (rngl_mul_1_l Hon).
+}
+destruct IHn as (Hc, Hs).
+cbn - [ binomial "-" "*" "/" ].
+rewrite Hc, Hs.
+remember (rngl_cos θ) as ct eqn:Hct.
+remember (rngl_sin θ) as st eqn:Hst.
+move st before ct.
+split. {
+...
+
 Theorem rngl_sin_nx :
   ∀ n θ,
   rngl_sin (n * θ) =
