@@ -332,6 +332,24 @@ Theorem binomial_succ_succ : ∀ n k,
   binomial (S n) (S k) = binomial n k + binomial n (S k).
 Proof. easy. Qed.
 
+Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; [ now destruct k | cbn ].
+destruct k; [ flia Hnk | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | easy ].
+rewrite Nat.add_0_l.
+apply IHn; flia Hnk.
+Qed.
+
+Theorem binomial_succ_diag_r : ∀ n, binomial n (S n) = 0.
+Proof.
+intros.
+apply binomial_lt; flia.
+Qed.
+
 (* mini ring like *)
 
 Class mini_rngl_prop T {ro : ring_like_op T} :=
@@ -461,6 +479,142 @@ Qed.
 
 (* end mini ring like *)
 
+Theorem newton_binomial :
+  ∀ {m : mini_rngl_prop T},
+  ∀ n a b,
+  ((a + b) ^ n)%L =
+    (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.
+Proof.
+clear rp rl ac.
+intros.
+induction n. {
+  cbn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite mini_add_0_l, mini_add_0_r.
+  now do 2 rewrite mini_mul_1_l.
+}
+rewrite mini_pow_succ_r.
+rewrite IHn.
+rewrite mini_mul_summation_distr_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite mini_mul_add_distr_r.
+  do 4 rewrite mini_mul_assoc.
+  rewrite (mini_mul_comm (a * _))%L.
+  rewrite mini_mul_assoc.
+  replace a with (a ^ 1)%L at 2 by easy.
+  rewrite <- mini_pow_add_r.
+  rewrite (mini_mul_comm (a ^ _)%L).
+  rewrite mini_add_comm.
+  rewrite (mini_mul_comm _ (b ^ _))%L at 1.
+  do 2 rewrite mini_mul_assoc.
+  replace b with (b ^ 1)%L at 2 by easy.
+  rewrite <- mini_pow_add_r.
+  rewrite <- mini_mul_assoc.
+  rewrite mini_mul_comm.
+  do 2 rewrite <- mini_mul_assoc.
+  rewrite <- mini_mul_add_distr_l.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+symmetry.
+rewrite iter_seq_split_first; cycle 1.
+apply mini_add_0_l.
+apply mini_add_0_r.
+apply mini_add_assoc.
+easy.
+progress unfold binomial at 1.
+rewrite Nat.sub_0_r, rngl_pow_0_r, mini_mul_1_r.
+rewrite (rngl_summation_shift 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+remember (rngl_of_nat 1) as x; cbn in Heqx; subst x.
+rewrite mini_add_0_r, mini_mul_1_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite (Nat.add_1_l i).
+  rewrite binomial_succ_succ.
+  rewrite Nat.sub_succ.
+  rewrite mini_of_nat_add.
+  do 2 rewrite mini_mul_add_distr_r.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+rewrite iter_seq_distr; cycle 1.
+apply mini_add_0_l.
+apply mini_add_comm.
+apply mini_add_assoc.
+rewrite mini_add_comm.
+rewrite <- mini_add_assoc.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite Nat.add_1_r.
+  rewrite mini_mul_add_distr_l.
+  rewrite mini_mul_assoc.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+rewrite iter_seq_distr; cycle 1.
+apply mini_add_0_l.
+apply mini_add_comm.
+apply mini_add_assoc.
+f_equal.
+symmetry.
+rewrite rngl_summation_rshift.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite Nat_sub_succ_1.
+  rewrite Nat_sub_sub_assoc; [ | flia Hin ].
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+symmetry.
+rewrite iter_seq_split_first; cycle 1.
+apply mini_add_0_l.
+apply mini_add_0_r.
+apply mini_add_assoc.
+easy.
+rewrite mini_add_comm.
+symmetry.
+rewrite iter_seq_split_last; [ | flia ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  cbn.
+  do 2 rewrite mini_add_0_l.
+  do 2 rewrite mini_mul_0_l.
+  rewrite mini_add_0_l, mini_add_0_r.
+  rewrite mini_mul_1_l, mini_mul_1_r.
+  easy.
+}
+rewrite (rngl_summation_shift 1); [ | flia Hnz ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros * Hin.
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite Nat.add_sub_swap; [ | easy ].
+  rewrite <- mini_mul_assoc.
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+rewrite <- mini_add_assoc.
+f_equal.
+rewrite Nat.add_1_r, Nat.sub_diag.
+rewrite Nat.sub_0_r.
+rewrite <- mini_mul_assoc.
+rewrite binomial_succ_diag_r.
+cbn.
+destruct n; [ easy | cbn ].
+rewrite Nat.add_1_r.
+rewrite mini_mul_0_l, mini_add_0_l.
+rewrite mini_add_0_r, mini_mul_1_l.
+now rewrite mini_mul_1_r.
+Qed.
+
 (* to be completed, if I can
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -539,106 +693,13 @@ progress unfold iter_list.
 rewrite Nat.sub_0_r.
 *)
 (**)
-
-Theorem newton_binomial :
-  ∀ {m : mini_rngl_prop T},
-  ∀ n a b,
-  ((a + b) ^ n)%L =
-    (∑ (k = 0, n), rngl_of_nat (binomial n k) * a ^ (n - k) * b ^ k)%L.
-Proof.
-clear rp rl ac.
-intros.
-induction n. {
-  cbn.
-  progress unfold iter_seq.
-  progress unfold iter_list.
-  cbn.
-  rewrite mini_add_0_l, mini_add_0_r.
-  now do 2 rewrite mini_mul_1_l.
-}
-rewrite mini_pow_succ_r.
-rewrite IHn.
-rewrite mini_mul_summation_distr_l.
-erewrite rngl_summation_eq_compat. 2: {
-  intros * Hin.
-(*
-  rewrite (mini_mul_comm (a + b))%L.
-  do 2 rewrite <- mini_mul_assoc.
-  rewrite mini_mul_comm.
-  rewrite mini_mul_assoc.
-  rewrite mini_mul_add_distr_l.
-*)
-  rewrite mini_mul_add_distr_r.
-  do 4 rewrite mini_mul_assoc.
-  rewrite (mini_mul_comm (a * _))%L.
-  rewrite mini_mul_assoc.
-  replace a with (a ^ 1)%L at 2 by easy.
-  rewrite <- mini_pow_add_r.
-  rewrite (mini_mul_comm (a ^ _)%L).
-  rewrite mini_add_comm.
-  rewrite (mini_mul_comm _ (b ^ _))%L at 1.
-  do 2 rewrite mini_mul_assoc.
-  replace b with (b ^ 1)%L at 2 by easy.
-  rewrite <- mini_pow_add_r.
-  rewrite <- mini_mul_assoc.
-  rewrite mini_mul_comm.
-  do 2 rewrite <- mini_mul_assoc.
-  rewrite <- mini_mul_add_distr_l.
-  easy.
-}
-remember (∑ (i = _, _), _) as x; subst x.
-symmetry.
-rewrite iter_seq_split_first; cycle 1.
-apply mini_add_0_l.
-apply mini_add_0_r.
-apply mini_add_assoc.
-easy.
-progress unfold binomial at 1.
-rewrite Nat.sub_0_r, rngl_pow_0_r, mini_mul_1_r.
-rewrite (rngl_summation_shift 1); [ | flia ].
-rewrite Nat.sub_diag, Nat_sub_succ_1.
-remember (rngl_of_nat 1) as x; cbn in Heqx; subst x.
-rewrite mini_add_0_r, mini_mul_1_l.
-erewrite rngl_summation_eq_compat. 2: {
-  intros * Hin.
-  rewrite (Nat.add_1_l i).
-  rewrite binomial_succ_succ.
-  rewrite Nat.sub_succ.
-  rewrite mini_of_nat_add.
-  do 2 rewrite mini_mul_add_distr_r.
-  easy.
-}
-remember (∑ (i = _, _), _) as x; subst x.
-rewrite iter_seq_distr; cycle 1.
-apply mini_add_0_l.
-apply mini_add_comm.
-apply mini_add_assoc.
-rewrite mini_add_comm.
-rewrite <- mini_add_assoc.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros * Hin.
-  rewrite Nat.add_1_r.
-  rewrite mini_mul_add_distr_l.
-  rewrite mini_mul_assoc.
-  easy.
-}
-remember (∑ (i = _, _), _) as x; subst x.
-rewrite iter_seq_distr; cycle 1.
-apply mini_add_0_l.
-apply mini_add_comm.
-apply mini_add_assoc.
-f_equal.
-symmetry.
-rewrite rngl_summation_rshift.
-erewrite rngl_summation_eq_compat. 2: {
-  intros * Hin.
-  rewrite <- Nat.sub_succ_l; [ | easy ].
-  rewrite Nat_sub_succ_1.
-  rewrite Nat_sub_sub_assoc; [ | flia Hin ].
-  easy.
-}
-remember (∑ (i = _, _), _) as x; subst x.
+... ...
+Check @newton_binomial.
+...
+cbn.
+rewrite <- Nat.add_sub_assoc.
+rewrite Nat.add_sub_swap.
+...
 remember (∑ (i = 1, S n), rngl_of_nat (binomial n i) * a ^ (n + 1 - i) * b ^ i)%L as x.
 ...
 rngl_of_nat_succ is not universe polymorphic
