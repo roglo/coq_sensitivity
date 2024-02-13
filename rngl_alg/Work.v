@@ -321,7 +321,53 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
-(* to be completed, if I can
+(* to be completed
+Theorem rngl_sin_nx :
+  ∀ n θ,
+  rngl_sin (n * θ) =
+    (∑ (i = 1, (n + 1) / 2),
+       minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i))) *
+         (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i - 1))%L.
+Proof.
+destruct_ac.
+intros.
+destruct n; [ now rewrite rngl_summation_empty | ].
+destruct n. {
+  rewrite rngl_summation_only_one.
+  cbn.
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
+  rewrite rngl_add_0_r.
+  do 2 rewrite (rngl_mul_1_r Hon).
+  symmetry.
+  apply (rngl_mul_1_l Hon).
+}
+destruct n. {
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  rewrite rngl_summation_only_one.
+  cbn.
+...
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  progress unfold minus_one_pow.
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  rewrite Nat.sub_diag, Nat.sub_0_r, Nat.sub_0_r; cbn.
+  rewrite rngl_add_0_l.
+  rewrite rngl_add_0_r.
+  do 3 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  do 4 rewrite (rngl_mul_1_l Hon).
+  now rewrite (rngl_mul_1_r Hon).
+}
+destruct n. {
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+...
+
 Theorem rngl_cos_nx :
   ∀ n θ,
   rngl_cos (n * θ) =
