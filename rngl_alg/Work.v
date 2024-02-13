@@ -329,16 +329,23 @@ Theorem rngl_cos_sin_nx :
        minus_one_pow i * rngl_of_nat (binomial n (n - 2 * i)) *
          (rngl_cos θ) ^ (n - 2 * i) * (rngl_sin θ) ^ (2 * i))%L ∧
   rngl_sin (n * θ) =
+    if n =? 0 then 0%L
+    else
+      ∑ (i = 0, (n - 1) / 2),
+        minus_one_pow i * rngl_of_nat (binomial n (n - (2 * i + 1))) *
+          rngl_cos θ ^ (n - (2 * i + 1)) * rngl_sin θ ^ (2 * i + 1).
+(*
     (∑ (i = 1, (n + 1) / 2),
        minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i - 1))) *
          (rngl_cos θ) ^ (n - (2 * i - 1)) * (rngl_sin θ) ^ (2 * i - 1))%L.
+*)
 Proof.
 destruct_ac.
 intros.
 induction n. {
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_summation_empty; [ | easy ].
+  cbn.
   split; [ | easy ].
+  rewrite rngl_summation_only_one; cbn.
   rewrite rngl_add_0_r.
   now do 3 rewrite (rngl_mul_1_l Hon).
 }
@@ -349,17 +356,71 @@ remember (rngl_cos θ) as ct eqn:Hct.
 remember (rngl_sin θ) as st eqn:Hst.
 move st before ct.
 split. {
+  destruct n. {
+    cbn.
 ...
 
 Theorem rngl_sin_nx :
   ∀ n θ,
   rngl_sin (n * θ) =
+  if n =? 0 then 0%L
+  else
+    ∑ (i = 0, (n - 1) / 2),
+      minus_one_pow i * rngl_of_nat (binomial n (n - (2 * i + 1))) *
+      rngl_cos θ ^ (n - (2 * i + 1)) * rngl_sin θ ^ (2 * i + 1).
+(*
+  rngl_sin (n * θ) =
+  rngl_sin (n * θ) =
     (∑ (i = 1, (n + 1) / 2),
        minus_one_pow (S i) * rngl_of_nat (binomial n (n - (2 * i - 1))) *
          (rngl_cos θ) ^ (n - (2 * i - 1)) * (rngl_sin θ) ^ (2 * i - 1))%L.
+*)
 Proof.
 destruct_ac.
 intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  now subst n; rewrite rngl_summation_empty.
+}
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
+  destruct n; [ easy | ].
+  rewrite Nat.add_succ_comm.
+  rewrite Nat.add_comm.
+  rewrite Nat_div_add_same_l.
+  flia.
+  easy.
+}
+rewrite Nat.sub_diag.
+replace ((n + 1) / 2 - 1) with ((n - 1) / 2). 2: {
+  destruct n; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  rewrite Nat.add_succ_comm.
+  rewrite Nat.add_comm.
+  rewrite Nat_div_add_same_l; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  do 2 rewrite (minus_one_pow_succ Hop).
+  rewrite (rngl_opp_involutive Hop).
+  cbn - [ rngl_of_nat binomial "-" "*" ].
+  replace (n - (2 * S i - 1)) with (n - (2 * i + 1)). 2: {
+    cbn.
+    f_equal.
+    rewrite <- Nat.add_succ_r.
+    rewrite Nat.add_0_r, Nat.sub_0_r.
+    now rewrite Nat.add_assoc.
+  }
+  replace (2 * S i - 1) with (2 * i + 1). 2: {
+    cbn.
+    rewrite Nat.add_0_r, Nat.sub_0_r.
+    rewrite Nat.add_1_r.
+    now rewrite <- Nat.add_succ_comm.
+  }
+  easy.
+}
+remember (∑ (i = _, _), _) as x; subst x.
+...
 destruct n; [ now rewrite rngl_summation_empty | ].
 destruct n. {
   rewrite rngl_summation_only_one.

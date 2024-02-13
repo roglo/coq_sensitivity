@@ -5841,6 +5841,49 @@ Definition minus_one_pow n :=
   | _ => (- 1%L)%L
   end.
 
+Theorem minus_one_pow_succ :
+  rngl_has_opp T = true →
+  ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%L.
+Proof.
+intros Hop *.
+unfold minus_one_pow.
+remember (i mod 2) as k eqn:Hk; symmetry in Hk.
+destruct k. {
+  apply Nat.mod_divides in Hk; [ | easy ].
+  destruct Hk as (k, Hk); subst i.
+  rewrite <- Nat.add_1_l, Nat.mul_comm.
+  now rewrite Nat.mod_add.
+}
+destruct k. {
+  rewrite <- Nat.add_1_l.
+  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
+  rewrite Hk; cbn.
+  symmetry.
+  now apply rngl_opp_involutive.
+}
+specialize (Nat.mod_upper_bound i 2) as H1.
+assert (H : 2 ≠ 0) by easy.
+specialize (H1 H); clear H.
+rewrite Hk in H1.
+do 2 apply Nat.succ_lt_mono in H1.
+easy.
+Qed.
+
+Theorem minus_one_pow_add :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
+Proof.
+intros Hon Hop *.
+induction a; cbn; [ now rewrite rngl_mul_1_l | ].
+rewrite (minus_one_pow_succ Hop).
+rewrite (minus_one_pow_succ Hop).
+rewrite IHa.
+now rewrite rngl_mul_opp_l.
+Qed.
+
+(* end (-1) ^ n *)
+
 (* comparison *)
 
 Definition rngl_compare a b :=

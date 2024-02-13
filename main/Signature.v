@@ -78,33 +78,6 @@ rewrite (rngl_mul_opp_r Hop).
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
-Theorem minus_one_pow_succ :
-  rngl_has_opp T = true →
-  ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%L.
-Proof.
-intros Hop *.
-unfold minus_one_pow.
-remember (i mod 2) as k eqn:Hk; symmetry in Hk.
-destruct k. {
-  apply Nat.mod_divides in Hk; [ | easy ].
-  destruct Hk as (k, Hk); subst i.
-  rewrite <- Nat.add_1_l, Nat.mul_comm.
-  now rewrite Nat.mod_add.
-}
-destruct k. {
-  rewrite <- Nat.add_1_l.
-  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
-  rewrite Hk; cbn.
-  symmetry.
-  now apply rngl_opp_involutive.
-}
-specialize (Nat.mod_upper_bound i 2) as H1.
-assert (H : 2 ≠ 0) by easy.
-specialize (H1 H); clear H.
-rewrite Hk in H1.
-flia H1.
-Qed.
-
 Theorem ε_app_cons :
   rngl_has_opp T = true →
   ∀ {n} la lb,
@@ -1166,18 +1139,6 @@ destruct (i ?= j). {
 }
 Qed.
 
-Theorem minus_one_pow_add :
-  rngl_has_opp T = true →
-  ∀ a b, minus_one_pow (a + b) = (minus_one_pow a * minus_one_pow b)%L.
-Proof.
-intros Hop *.
-induction a; cbn; [ now rewrite rngl_mul_1_l | ].
-rewrite (minus_one_pow_succ Hop).
-rewrite (minus_one_pow_succ Hop).
-rewrite IHa.
-now rewrite rngl_mul_opp_l.
-Qed.
-
 Theorem ε_app2 :
   rngl_has_opp T = true →
   ∀ p q,
@@ -1197,7 +1158,7 @@ rewrite IHp. 2: {
 }
 do 3 rewrite rngl_mul_assoc.
 f_equal; f_equal.
-rewrite (minus_one_pow_add Hop).
+rewrite (minus_one_pow_add Hon Hop).
 do 2 rewrite <- (minus_one_pow_mul_comm Hop).
 rewrite <- rngl_mul_assoc; f_equal.
 now apply ε_aux_app2.
