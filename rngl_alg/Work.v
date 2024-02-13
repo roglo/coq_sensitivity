@@ -357,7 +357,40 @@ remember (rngl_sin θ) as st eqn:Hst.
 move st before ct.
 split. {
   destruct n. {
+    do 3 rewrite rngl_summation_only_one.
     cbn.
+    rewrite rngl_add_0_r.
+    do 4 rewrite (rngl_mul_1_l Hon).
+    now rewrite (rngl_mul_0_r Hos), (rngl_sub_0_r Hos).
+  }
+  cbn - [ binomial "-" "*" "/" ].
+  rewrite Nat_sub_succ_1.
+  do 2 rewrite (rngl_mul_summation_distr_l Hos).
+  remember (n mod 2) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.mod_divides in Hb; [ | easy ].
+    destruct Hb as (m, Hm).
+    subst n.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite <- Nat.add_1_r.
+    rewrite Nat.div_add_l; [ | easy ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.add_0_r.
+    rewrite <- (rngl_add_opp_r Hop).
+    rewrite (rngl_opp_summation Hop).
+    rewrite <- rngl_summation_add_distr.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i (_, Hi).
+      rewrite (rngl_add_opp_r Hop).
+      rewrite (rngl_mul_comm Hic ct).
+      rewrite (rngl_mul_comm Hic st).
+      do 6 rewrite <- rngl_mul_assoc.
+      rewrite <- (rngl_mul_sub_distr_l Hop).
+      rewrite (Nat.mul_comm _ 2).
+      rewrite Nat.sub_add_distr.
+      rewrite Nat_sub_sub_swap.
+2: {
 ...
 
 Theorem rngl_sin_nx :
