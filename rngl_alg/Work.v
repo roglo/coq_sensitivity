@@ -640,23 +640,63 @@ split. {
   remember (∑ (i = _, _), _) as x; subst x.
   remember (Nat.even (S n)) as ev eqn:Hev; symmetry in Hev.
   destruct ev. 2: {
-   rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
-   rewrite Hev, rngl_add_0_r.
-   rewrite (rngl_summation_shift 1 1); [ | flia ].
-   rewrite Nat.sub_diag, Nat_sub_succ_1.
-   apply rngl_summation_eq_compat.
-   intros i (_, Hi).
-   rewrite Nat.add_comm, Nat.add_sub.
-   remember (Nat.even i) as evi eqn:Hevi; symmetry in Hevi.
-   destruct evi. 2: {
-destruct n. {
-  cbn.
-  now apply Nat.le_0_r in Hi; subst i.
-}
+    rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
+    rewrite (rngl_summation_shift 1 1); [ | flia ].
+    rewrite Nat.sub_diag, Nat_sub_succ_1.
+    symmetry.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i (_, Hi).
+      rewrite Nat.add_comm, Nat.add_sub.
+      easy.
+    }
+    remember (∑ (i = _, _), _) as x; subst x.
+    symmetry.
+    rewrite Hev, rngl_add_0_r.
+    symmetry.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros * (_, Hi).
+      cbn - [ "/" rngl_of_nat "-" ].
+...
+    destruct n. {
+      clear Hev.
+      do 2 rewrite rngl_summation_only_one.
+      cbn.
+    }
+    destruct n; [ easy | ].
+    destruct n. {
+      clear Hev.
+      unfold iter_seq, iter_list.
+      rewrite Nat.sub_0_r.
+      cbn.
+      repeat rewrite (rngl_mul_opp_l Hop).
+      repeat rewrite (rngl_add_0_l).
+      repeat rewrite (rngl_add_0_r).
+      repeat rewrite (rngl_mul_1_l Hon).
+      repeat rewrite (rngl_mul_1_r Hon).
+      repeat rewrite rngl_mul_add_distr_r.
+      repeat rewrite (rngl_mul_1_l Hon).
+      repeat rewrite rngl_add_assoc.
+      repeat rewrite (rngl_opp_add_distr Hop).
+      repeat rewrite <- (rngl_add_opp_r Hop).
+      repeat rewrite rngl_add_assoc.
+      repeat rewrite rngl_mul_assoc.
+      rewrite (rngl_opp_add_distr Hop).
+      repeat rewrite <- (rngl_add_opp_r Hop).
+      repeat rewrite rngl_add_assoc.
+      f_equal.
+      f_equal.
+      rewrite (rngl_mul_comm Hic).
+      now rewrite rngl_mul_assoc.
+    }
+    destruct n; [ easy | ].
+    destruct n. {
+...
 destruct i; [ easy | ].
-cbn in Hev, Hevi.
-destruct i. {
-  clear Hevi.
+cbn in Hev.
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hi.
+destruct n. {
+  destruct i.
   cbn.
 (* pffff... j'comprends rien *)
 ...
