@@ -368,11 +368,31 @@ induction n. {
 }
 destruct IHn as (Hc, Hs).
 cbn - [ binomial "-" "*" "/" ].
-rewrite Hc, Hs.
 remember (rngl_cos θ) as ct eqn:Hct.
 remember (rngl_sin θ) as st eqn:Hst.
 move st before ct.
 split. {
+(**)
+  remember (Nat.even (S n)) as ev eqn:Hev; symmetry in Hev.
+  destruct ev. 2: {
+    rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
+    rewrite Hev, rngl_add_0_r.
+    rewrite (rngl_summation_shift 1 1); [ | flia ].
+    rewrite Nat.sub_diag, Nat_sub_succ_1.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i (_, Hi).
+      rewrite Nat.add_comm, Nat.add_sub.
+      easy.
+    }
+    remember (∑ (i = _, _), _) as x; subst x.
+...
+   apply rngl_summation_eq_compat.
+   intros i (_, Hi).
+   rewrite Nat.add_comm, Nat.add_sub.
+   remember (Nat.even i) as evi eqn:Hevi; symmetry in Hevi.
+   destruct evi. 2: {
+...
+  rewrite Hc, Hs.
   clear Hc Hs.
   do 2 rewrite (rngl_mul_summation_distr_l Hos).
   rewrite <- (rngl_add_opp_r Hop).
@@ -402,6 +422,17 @@ split. {
     easy.
   }
   remember (∑ (i = _, _), _) as x; subst x.
+  remember (Nat.even (S n)) as ev eqn:Hev; symmetry in Hev.
+  destruct ev. 2: {
+   rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
+   rewrite Hev, rngl_add_0_r.
+   rewrite (rngl_summation_shift 1 1); [ | flia ].
+   rewrite Nat.sub_diag, Nat_sub_succ_1.
+   apply rngl_summation_eq_compat.
+   intros i (_, Hi).
+   rewrite Nat.add_comm, Nat.add_sub.
+   remember (Nat.even i) as evi eqn:Hevi; symmetry in Hevi.
+   destruct evi. 2: {
 ...
 Search (_ * if _ then _ else _)%L.
 ...
