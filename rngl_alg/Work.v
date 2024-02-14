@@ -357,6 +357,221 @@ Theorem rngl_cos_sin_nx :
          (rngl_cos θ) ^ (n - i) * (rngl_sin θ) ^ i
        else 0)%L.
 Proof.
+(*
+destruct_ac.
+intros.
+split. 2: {
+destruct n. {
+  now rewrite rngl_summation_only_one.
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  rewrite (rngl_mul_1_r Hon), (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite (rngl_add_0_l).
+  rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  now rewrite rngl_add_0_l.
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  rewrite (rngl_mul_1_r Hon), (rngl_mul_0_r Hos).
+  repeat rewrite (rngl_sub_0_r Hos).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  repeat rewrite (rngl_add_0_l).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rngl_add_diag Hon).
+  rewrite rngl_mul_add_distr_r.
+  f_equal.
+  apply (rngl_mul_comm Hic).
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  rewrite (rngl_mul_1_r Hon), (rngl_mul_0_r Hos).
+  repeat rewrite (rngl_sub_0_r Hos).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  cbn.
+  repeat rewrite (rngl_add_0_l).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_opp_l Hop).
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite rngl_mul_add_distr_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_add_opp_r Hop).
+  rewrite rngl_add_assoc.
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_add_distr_l).
+  repeat rewrite rngl_mul_assoc.
+  rewrite rngl_add_assoc.
+  repeat rewrite <- (rngl_add_opp_r Hop).
+  repeat rewrite <- rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  now rewrite rngl_mul_assoc.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic).
+  rewrite rngl_mul_assoc.
+  easy.
+}
+...
+destruct_ac.
+intros.
+split. {
+destruct n. {
+  rewrite rngl_summation_only_one.
+  cbn.
+  rewrite rngl_add_0_r.
+  now do 3 rewrite (rngl_mul_1_l Hon).
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  rewrite (rngl_mul_1_r Hon), (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos).
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  rewrite (rngl_add_0_l).
+  do 2 rewrite rngl_add_0_r.
+  do 2 rewrite (rngl_mul_1_l Hon).
+  now rewrite (rngl_mul_1_r Hon).
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  repeat rewrite (rngl_mul_1_r Hon).
+  repeat rewrite (rngl_mul_0_r Hos).
+  repeat rewrite (rngl_sub_0_r Hos).
+  repeat rewrite rngl_add_0_r.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  repeat rewrite (rngl_add_0_l).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  now rewrite (rngl_mul_1_l Hon).
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  repeat rewrite (rngl_mul_1_r Hon).
+  repeat rewrite (rngl_mul_0_r Hos).
+  repeat rewrite (rngl_sub_0_r Hos).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_add_0_l).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_1_r Hon).
+  repeat rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_add_distr_r).
+  rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite rngl_mul_add_distr_l.
+  repeat rewrite rngl_add_assoc.
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite (rngl_sub_add_distr Hos).
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  now rewrite rngl_mul_assoc.
+  now rewrite (rngl_mul_comm Hic (rngl_sin θ)).
+}
+destruct n. {
+  cbn - [ binomial "-" "*" "/" ].
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  cbn.
+  repeat rewrite (rngl_mul_1_r Hon).
+  repeat rewrite (rngl_mul_0_r Hos).
+  repeat rewrite (rngl_sub_0_r Hos).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_add_0_l).
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_1_r Hon).
+  repeat rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_add_distr_r).
+  rewrite (rngl_mul_1_l Hon).
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite rngl_mul_add_distr_l.
+  repeat rewrite rngl_add_assoc.
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite (rngl_sub_add_distr Hos).
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite rngl_mul_assoc.
+  rewrite (rngl_sub_sub_distr Hop).
+  repeat rewrite <- (rngl_add_opp_r Hop).
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  now repeat rewrite rngl_mul_assoc.
+  f_equal.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  now repeat rewrite rngl_mul_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  repeat rewrite rngl_mul_assoc.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  now repeat rewrite rngl_mul_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  repeat rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic).
+  now repeat rewrite rngl_mul_assoc.
+  rewrite rngl_add_comm.
+  f_equal.
+  f_equal.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  repeat rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic).
+  now repeat rewrite rngl_mul_assoc.
+}
+...
+*)
 destruct_ac.
 intros.
 induction n. {
@@ -434,6 +649,16 @@ split. {
    rewrite Nat.add_comm, Nat.add_sub.
    remember (Nat.even i) as evi eqn:Hevi; symmetry in Hevi.
    destruct evi. 2: {
+destruct n. {
+  cbn.
+  now apply Nat.le_0_r in Hi; subst i.
+}
+destruct i; [ easy | ].
+cbn in Hev, Hevi.
+destruct i. {
+  clear Hevi.
+  cbn.
+(* pffff... j'comprends rien *)
 ...
 Search (_ * if _ then _ else _)%L.
 ...
