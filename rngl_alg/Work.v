@@ -341,6 +341,18 @@ intros * Ht Hf.
 now destruct u; [ apply Ht | apply Hf ].
 Qed.
 
+Theorem binomial_0_r : ∀ n, binomial n 0 = 1.
+Proof. now intros; destruct n. Qed.
+
+Theorem binomial_succ_l :
+  ∀ n k,
+  binomial (S n) k =
+    match k with
+    | 0 => 1
+    | S k' => binomial n k' + binomial n k
+    end.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
@@ -652,6 +664,37 @@ split. {
     }
     remember (∑ (i = _, _), _) as x; subst x.
     rewrite Hev, rngl_add_0_r.
+    rewrite rngl_summation_split_first; [ | easy ].
+    cbn - [ "/" rngl_of_nat "-" ].
+    symmetry.
+    rewrite rngl_summation_split_first; [ | easy ].
+    cbn - [ "/" rngl_of_nat "-" ].
+    do 2 rewrite Nat.sub_0_r.
+    rewrite (rngl_mul_1_r Hon).
+    rewrite Nat.div_0_l; [ | easy ].
+    remember (minus_one_pow 0) as x; cbn in Heqx; subst x.
+    do 2 rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_1_r Hon).
+    cbn - [ "/" "-" "^"%L ].
+    rewrite rngl_add_0_r.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite binomial_0_r.
+    rewrite (rngl_pow_succ_r Hon).
+    rewrite rngl_of_nat_1.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_comm Hic _ ct).
+    f_equal.
+    destruct n. {
+      rewrite rngl_summation_empty; [ | easy ].
+      rewrite rngl_summation_empty; [ | easy ].
+      easy.
+    }
+    rewrite (rngl_summation_shift 1); [ | flia ].
+    symmetry.
+    rewrite (rngl_summation_shift 1); [ | flia ].
+    rewrite Nat.sub_diag, Nat_sub_succ_1.
+    cbn in Hev.
+(* bon, fait chier, tout ça *)
 ...
     erewrite rngl_summation_eq_compat. 2: {
       intros * (_, Hi).
