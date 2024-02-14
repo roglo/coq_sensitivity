@@ -638,6 +638,15 @@ split. {
     easy.
   }
   remember (∑ (i = _, _), _) as x; subst x.
+(**)
+  symmetry.
+  rewrite rngl_summation_split_first; [ | easy ].
+  cbn.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi).
+    cbn - [ "/" rngl_of_nat "-" ].
+...
   remember (Nat.even (S n)) as ev eqn:Hev; symmetry in Hev.
   destruct ev. 2: {
     rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
