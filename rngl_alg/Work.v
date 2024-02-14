@@ -372,7 +372,7 @@ remember (rngl_cos θ) as ct eqn:Hct.
 remember (rngl_sin θ) as st eqn:Hst.
 move st before ct.
 split. {
-(**)
+(*
   remember (Nat.even (S n)) as ev eqn:Hev; symmetry in Hev.
   destruct ev. 2: {
     rewrite (rngl_summation_split_last _ (S n)); [ | easy ].
@@ -392,6 +392,7 @@ split. {
    remember (Nat.even i) as evi eqn:Hevi; symmetry in Hevi.
    destruct evi. 2: {
 ...
+*)
   rewrite Hc, Hs.
   clear Hc Hs.
   do 2 rewrite (rngl_mul_summation_distr_l Hos).
