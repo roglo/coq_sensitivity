@@ -321,7 +321,142 @@ apply Nat.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 
+Theorem rngl_mul_if_then_else_distr_l :
+  ∀ (v : bool) a b c,
+  ((a * if v then b else c) = (if v then a * b else a * c))%L.
+Proof. now intros; destruct v. Qed.
+
+Theorem rngl_add_if_then_else_distr_r :
+  ∀ (v : bool) a b c,
+  ((if v then a else b) + c = if v then a + c else b + c)%L.
+Proof. intros; now destruct v. Qed.
+
+Theorem rngl_if_then_else_eq_compat :
+  ∀ {A} (u : bool) (a b c d : A),
+  (u = true → a = c)
+  → (u = false → b = d)
+  → ((if u then a else b) = (if u then c else d))%L.
+Proof.
+intros * Ht Hf.
+now destruct u; [ apply Ht | apply Hf ].
+Qed.
+
 (* to be completed
+Theorem rngl_cos_sin_nx :
+  ∀ n θ,
+  rngl_cos (n * θ) =
+    (∑ (i = 0, n),
+       if Nat.even i then
+         minus_one_pow (i / 2) * rngl_of_nat (binomial n i) *
+         (rngl_cos θ) ^ (n - i) * (rngl_sin θ) ^ i
+       else 0)%L ∧
+  rngl_sin (n * θ) =
+    (∑ (i = 0, n),
+       if Nat.odd i then
+         minus_one_pow (i / 2) * rngl_of_nat (binomial n i) *
+         (rngl_cos θ) ^ (n - i) * (rngl_sin θ) ^ i
+       else 0)%L.
+Proof.
+destruct_ac.
+intros.
+induction n. {
+  do 2 rewrite rngl_summation_only_one.
+  cbn.
+  split; [ | easy ].
+  rewrite rngl_add_0_r.
+  now do 3 rewrite (rngl_mul_1_l Hon).
+}
+destruct IHn as (Hc, Hs).
+cbn - [ binomial "-" "*" "/" ].
+rewrite Hc, Hs.
+remember (rngl_cos θ) as ct eqn:Hct.
+remember (rngl_sin θ) as st eqn:Hst.
+move st before ct.
+split. {
+  clear Hc Hs.
+  do 2 rewrite (rngl_mul_summation_distr_l Hos).
+  rewrite <- (rngl_add_opp_r Hop).
+  rewrite (rngl_opp_summation Hop).
+  rewrite <- rngl_summation_add_distr.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi).
+    rewrite <- Nat.negb_even.
+    do 2 rewrite rngl_mul_if_then_else_distr_l.
+    do 2 rewrite (rngl_mul_0_r Hos).
+    rewrite rngl_add_if_then_else_distr_r.
+    rewrite rngl_add_0_l.
+    rewrite (rngl_add_opp_r Hop).
+    erewrite rngl_if_then_else_eq_compat; cycle 1. {
+      intros H; rewrite H.
+      cbn - [ "/" ].
+      rewrite (rngl_sub_0_r Hos).
+      rewrite (rngl_mul_comm Hic).
+      easy.
+    } {
+      intros H; rewrite H.
+      cbn - [ "/" ].
+      rewrite (rngl_mul_comm Hic).
+      do 4 rewrite <- (rngl_mul_opp_l Hop).
+      easy.
+    }
+    easy.
+  }
+  remember (∑ (i = _, _), _) as x; subst x.
+...
+Search (_ * if _ then _ else _)%L.
+...
+Search (
+  remember (n mod 2) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    apply Nat.mod_divides in Hb; [ | easy ].
+    destruct Hb as (m, Hm).
+    subst n.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite <- Nat.add_1_r.
+    rewrite Nat.div_add_l; [ | easy ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.add_0_r.
+      rewrite (rngl_mul_comm Hic ct).
+      rewrite (rngl_mul_comm Hic st).
+      rewrite (Nat.mul_comm _ 2).
+      rewrite Nat.sub_add_distr.
+      rewrite Nat_sub_sub_swap.
+      rewrite Nat.add_sub.
+      replace (2 * m + 1 - 2 * i) with (2 * (m - i) + 1) by flia Hi.
+      replace (2 * m - 2 * i) with (2 * (m - i)) by flia Hi.
+      rewrite (rngl_mul_mul_swap Hic).
+      rewrite <- (rngl_mul_assoc _ _ ct).
+      replace ct with (ct ^ 1)%L at 2 by easy.
+      rewrite <- (rngl_pow_add_r Hon).
+      rewrite <- Nat.add_assoc.
+      rewrite Nat_add_diag.
+      rewrite <- Nat.mul_add_distr_l.
+      rewrite <- (rngl_mul_assoc _ _ st).
+      replace st with (st ^ 1)%L at 3 by easy.
+      rewrite <- (rngl_pow_add_r Hon).
+      rewrite <- Nat.add_assoc.
+      rewrite Nat_add_diag.
+      rewrite <- Nat.mul_add_distr_l.
+      do 3 rewrite <- (rngl_mul_opp_l Hop).
+      rewrite <- (minus_one_pow_succ Hop).
+      replace (2 * (m - i) + 1) with (2 * m + 1 - 2 * i) by flia Hi.
+      replace (2 * (m - i)) with (2 * m + 1 - (2 * i + 1)) by flia Hi.
+      replace (2 * (m - i + 1)) with (2 * m + 1 + 1 - 2 * i) by flia Hi.
+      easy.
+    }
+    remember (∑ (i = _, _), _) as x; subst x.
+    remember (2 * m + 1) as n eqn:Hn.
+    rewrite <- (Nat.add_1_r (m * 2 + 1)).
+    rewrite <- Nat.add_assoc.
+    rewrite Nat_add_diag.
+    rewrite (Nat.mul_comm m 2).
+    rewrite <- Nat.mul_add_distr_l.
+    rewrite (Nat.mul_comm 2 (m + 1)).
+    rewrite Nat.div_mul; [ | easy ].
+    replace ((m + 1) * 2) with (n + 1) by flia Hn.
+...
+
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
   rngl_cos (n * θ) =
