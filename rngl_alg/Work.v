@@ -412,8 +412,6 @@ split. {
     }
     remember (∑ (i = _, _), _) as x; subst x.
     remember (2 * m + 1) as n eqn:Hn.
-(* bon. à voir... *)
-...
     rewrite <- (Nat.add_1_r (m * 2 + 1)).
     rewrite <- Nat.add_assoc.
     rewrite Nat_add_diag.
@@ -421,6 +419,7 @@ split. {
     rewrite <- Nat.mul_add_distr_l.
     rewrite (Nat.mul_comm 2 (m + 1)).
     rewrite Nat.div_mul; [ | easy ].
+    replace ((m + 1) * 2) with (n + 1) by flia Hn.
 ...
 
 Theorem rngl_sin_nx :
