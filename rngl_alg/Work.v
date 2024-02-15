@@ -443,7 +443,44 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
+Theorem gc_power_im_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
+Proof.
+intros Hon Hos.
+intros.
+induction n; [ easy | ].
+rewrite (rngl_pow_succ_r Hon); cbn.
+rewrite IHn.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+now rewrite (rngl_mul_0_l Hos).
+Qed.
+
 (* to be completed
+Theorem gc_power_re_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ n y,
+  (mk_gc 0 y ^ n =
+     if Nat.even n then
+       mk_gc ((minus_one_pow (n / 2)) * (y ^ n))%L 0
+     else
+       mk_gc 0 ((minus_one_pow (n / 2)) * (y ^ n))%L)%C.
+Proof.
+intros Hon Hos.
+intros.
+induction n; [ now rewrite (rngl_mul_1_l Hon) | ].
+rewrite (rngl_pow_succ_r Hon); cbn.
+rewrite IHn.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+rewrite (rngl_mul_0_l Hos).
+Qed.
+
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
   rngl_cos (n * θ) =
@@ -503,26 +540,14 @@ split. {
   apply rngl_summation_eq_compat.
   intros * (_, Hi).
   do 2 rewrite (rngl_power_gc_power Hon Hos).
-Theorem gc_power_im_0 :
-  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
-Proof.
-intros.
-(*
-rewrite <- rngl_power_gc_power.
-*)
-induction n; [ easy | ].
-Search (_ ^ S _)%L.
-rewrite rngl_pow_succ_r.
-cbn.
-rewrite IHn.
-apply eq_gc_eq.
-cbn.
-... ...
-rewrite gc_power_im_0.
-cbn - [ "/" ].
-rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-cbn - [ "/" ].
+  rewrite (gc_power_im_0 Hon Hos).
+...
+  rewrite gc_power_re_0.
+  cbn - [ "/" ].
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos).
+...
+  cbn - [ "/" ].
 ...
 (*
 destruct_ac.
