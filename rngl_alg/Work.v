@@ -468,7 +468,32 @@ Theorem gc_power_re_0 :
 Proof.
 destruct_ac.
 intros.
+remember (Nat.even n) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.even_spec in Hb.
+  destruct Hb as (m, Hm).
+  subst n.
+  rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+  rewrite Nat.mul_comm.
+Search (_ ^ (_ * _))%L.
+Search (_ ^ (_ * _))%C.
+Search (_ ^ (_ * _)).
+Check Nat.pow_mul_r.
+Theorem rngl_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
+intros.
+...
+Theorem gc_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%C.
+intros.
+...
+rewrite rngl_pow_mul_r.
+rewrite gc_pow_mul_r.
+...
+rewrite <- (rngl_power_gc_power Hon Hos).
+...
+  cbn.
+...
 induction n; [ now rewrite (rngl_mul_1_l Hon) | ].
+
 rewrite (rngl_pow_succ_r Hon); cbn.
 rewrite IHn.
 apply eq_gc_eq; cbn.
