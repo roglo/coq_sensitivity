@@ -3,6 +3,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
+Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
@@ -430,6 +431,43 @@ rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
 rewrite rngl_power_gc_power in H1.
 rewrite gc_cos_sin_pow in H1.
+apply eq_gc_eq in H1.
+cbn - [ rngl_add rngl_zero ] in H1.
+Search (_ (∑ (_ = _, _), _) = _)%L.
+Theorem gre_summation :
+  let rop := gc_ring_like_op T in
+  ∀ b e (f : nat → GComplex T),
+  gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
+Proof.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+remember (S e - b) as len eqn:Hlen.
+clear e Hlen.
+cbn.
+revert b.
+induction len; intros; [ easy | cbn ].
+rewrite fold_left_rngl_add_fun_from_0.
+rewrite rngl_add_0_l.
+rewrite <- IHlen.
+rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
+apply gc_add_0_l.
+intros; cbn.
+rewrite gc_add_comm.
+...
+apply gc_add_0_r.
+...
+cbn.
+...
+apply iter_list_split_first; [ | | | easy ]. {
+...
+rewrite fold_left_split_1.
+...
+rewrite <- seq_shift at 1.
+rewrite List_fold_left_map.
+cbn.
+... ...
+rewrite gre_summation in H1.
 ...
 (*
 destruct_ac.
