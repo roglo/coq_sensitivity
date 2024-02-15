@@ -411,12 +411,35 @@ Proof.
 destruct_ac.
 intros.
 specialize (@newton_binomial) as H1.
+set (gro := gc_ring_like_op T).
 specialize (H1 (GComplex T)).
-specialize (H1 (gc_ring_like_op T)).
-(* have to build itermediate gc_ring_like_prop whose field
-   rngl_is_alg_closed = false *)
-...
-specialize (H1 (rngl_cos θ) (rngl_sin θ)).
+specialize (H1 gro).
+specialize (H1 (gc_ring_like_prop_not_alg_closed Hop)).
+assert (Honc : rngl_has_1 (GComplex T) = true). {
+  progress unfold rngl_has_1 in Hon.
+  progress unfold rngl_has_1.
+  cbn.
+  progress unfold gc_opt_one.
+  now destruct (rngl_opt_one T).
+}
+assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
+  progress unfold rngl_has_opp_or_subt in Hos.
+  progress unfold rngl_has_opp_or_subt.
+  cbn.
+  progress unfold gc_opt_opp_or_subt.
+  destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
+  now destruct s.
+}
+specialize (H1 Hic Honc Hosc n).
+specialize (H1 (mk_gc (rngl_cos θ) 0)).
+specialize (H1 (mk_gc 0 (rngl_sin θ))).
+cbn - [ rngl_add rngl_zero ] in H1.
+remember (∑ (k = _, _), _) as x in H1.
+cbn in H1; subst x.
+progress unfold gc_add in H1.
+cbn - [ rngl_add rngl_zero ] in H1.
+rewrite rngl_add_0_r in H1.
+rewrite rngl_add_0_l in H1.
 ...
 (*
 destruct_ac.
