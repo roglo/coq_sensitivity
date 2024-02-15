@@ -381,6 +381,37 @@ destruct n. {
 now rewrite IHn.
 Qed.
 
+Theorem gre_summation :
+  rngl_has_opp T = true →
+  let roc := gc_ring_like_op T in
+  ∀ b e (f : nat → GComplex T),
+  gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
+Proof.
+intros Hop.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+remember (S e - b) as len eqn:Hlen.
+clear e Hlen.
+cbn.
+revert b.
+induction len; intros; [ easy | cbn ].
+rewrite fold_left_rngl_add_fun_from_0.
+rewrite rngl_add_0_l.
+rewrite <- IHlen.
+rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
+apply gc_add_0_l.
+intros; cbn.
+set (rop := gc_ring_like_prop_not_alg_closed Hop).
+specialize gc_add_comm as H1; cbn in H1.
+rewrite H1; clear H1.
+apply gc_add_0_l.
+apply gc_add_assoc.
+cbn.
+f_equal.
+apply rngl_add_0_l.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
@@ -429,45 +460,13 @@ progress unfold gc_add in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
-rewrite rngl_power_gc_power in H1.
+rewrite (rngl_power_gc_power Hon Hos) in H1.
 rewrite gc_cos_sin_pow in H1.
 apply eq_gc_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
-Search (_ (∑ (_ = _, _), _) = _)%L.
-Theorem gre_summation :
-  let rop := gc_ring_like_op T in
-  ∀ b e (f : nat → GComplex T),
-  gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
-Proof.
-intros.
-progress unfold iter_seq.
-progress unfold iter_list.
-remember (S e - b) as len eqn:Hlen.
-clear e Hlen.
-cbn.
-revert b.
-induction len; intros; [ easy | cbn ].
-rewrite fold_left_rngl_add_fun_from_0.
-rewrite rngl_add_0_l.
-rewrite <- IHlen.
-rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
-apply gc_add_0_l.
-intros; cbn.
-rewrite gc_add_comm.
+rewrite (gre_summation Hop) in H1.
 ...
-apply gc_add_0_r.
-...
-cbn.
-...
-apply iter_list_split_first; [ | | | easy ]. {
-...
-rewrite fold_left_split_1.
-...
-rewrite <- seq_shift at 1.
-rewrite List_fold_left_map.
-cbn.
-... ...
-rewrite gre_summation in H1.
+rewrite gim_summation in H1.
 ...
 (*
 destruct_ac.
