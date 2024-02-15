@@ -497,6 +497,32 @@ apply eq_gc_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite (gre_summation Hop) in H1.
 rewrite (gim_summation Hop) in H1.
+destruct H1 as (Hc, Hs).
+split. {
+  rewrite Hc.
+  apply rngl_summation_eq_compat.
+  intros * (_, Hi).
+  do 2 rewrite (rngl_power_gc_power Hon Hos).
+Theorem gc_power_im_0 :
+  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
+Proof.
+intros.
+(*
+rewrite <- rngl_power_gc_power.
+*)
+induction n; [ easy | ].
+Search (_ ^ S _)%L.
+rewrite rngl_pow_succ_r.
+cbn.
+rewrite IHn.
+apply eq_gc_eq.
+cbn.
+... ...
+rewrite gc_power_im_0.
+cbn - [ "/" ].
+rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+cbn - [ "/" ].
 ...
 (*
 destruct_ac.
