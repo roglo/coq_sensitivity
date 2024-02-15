@@ -8,7 +8,7 @@ Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import TacChangeAngle.
-Require Import Complex.
+Require Import Complex NewtonBinomial.
 
 Section a.
 
@@ -369,6 +369,16 @@ Theorem rngl_cos_sin_nx :
          (rngl_cos θ) ^ (n - i) * (rngl_sin θ) ^ i
        else 0)%L.
 Proof.
+destruct_ac.
+intros.
+specialize (@newton_binomial) as H1.
+specialize (H1 (GComplex T)).
+specialize (H1 (gc_ring_like_op T)).
+(* have to build itermediate gc_ring_like_prop whose field
+   rngl_is_alg_closed = false *)
+...
+specialize (H1 (rngl_cos θ) (rngl_sin θ)).
+...
 (*
 destruct_ac.
 intros.
