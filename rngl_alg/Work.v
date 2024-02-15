@@ -353,6 +353,33 @@ Theorem binomial_succ_l :
     end.
 Proof. easy. Qed.
 
+Theorem rngl_power_gc_power :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  let rop := gc_ring_like_op T in
+  ∀ z n, (z ^ n)%L = (z ^ n)%C.
+Proof.
+intros Hon Hos.
+intros.
+induction n. {
+  cbn; progress unfold gc_one.
+  cbn; progress unfold rngl_one.
+  cbn; progress unfold gc_opt_one.
+  now destruct (rngl_opt_one T).
+}
+cbn.
+destruct n. {
+  cbn in IHn |-*.
+  progress unfold gc_mul.
+  cbn.
+  do 2 rewrite (rngl_mul_1_r Hon).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+  now apply eq_gc_eq.
+}
+now rewrite IHn.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
@@ -401,25 +428,7 @@ progress unfold gc_add in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
-specialize (@gc_cos_sin_pow T ro rp θ n) as H2.
-move H1 at bottom.
-(* peut-être qu'il faut redéfinir gc_power_nat à partir de rngl_power ? *)
-...
-gc_power_nat =
-fix gc_power_nat (T : Type) (ro : ring_like_op T) (z : GComplex T) (n : nat) {struct n} : GComplex T :=
-  match n with
-  | 0 => gc_one
-  | S n' => (z * gc_power_nat T ro z n')%C
-  end
-rngl_power =
-fix rngl_power (T : Type) (ro : ring_like_op T) (a : T) (n : nat) {struct n} : T :=
-  match n with
-  | 0 => 1%L
-  | 1 => a
-  | S (S _ as m) => (a * rngl_power T ro a m)%L
-  end
-     : ∀ T : Type, ring_like_op T → T → nat → T
-...
+rewrite rngl_power_gc_power in H1.
 rewrite gc_cos_sin_pow in H1.
 ...
 (*

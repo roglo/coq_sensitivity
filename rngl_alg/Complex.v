@@ -236,22 +236,10 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   | right _ => None
   end.
 
-Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
-  match n with
-  | 0 => gc_one
-  | S n' => gc_mul z (gc_power_nat z n')
-  end.
-
 End a.
 
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
-
-Notation "x + y" := (gc_add x y) : gc_scope.
-Notation "x * y" := (gc_mul x y) : gc_scope.
-Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
-Notation "x + 'ℹ' * y" := (mk_gc x y) (at level 50) : gc_scope.
-Notation "z ^ n" := (gc_power_nat z n) : gc_scope.
 
 Definition gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -264,6 +252,25 @@ Definition gc_ring_like_op T
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot;
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
+
+(*
+Definition gc_power_nat {T}
+    {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
+    (z : GComplex T) n :=
+  @rngl_power (GComplex T) (gc_ring_like_op T) z n.
+*)
+
+Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
+  match n with
+  | 0 => gc_one
+  | S n' => gc_mul z (gc_power_nat z n')
+  end.
+
+Notation "x + y" := (gc_add x y) : gc_scope.
+Notation "x * y" := (gc_mul x y) : gc_scope.
+Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+Notation "x + 'ℹ' * y" := (mk_gc x y) (at level 50) : gc_scope.
+Notation "z ^ n" := (gc_power_nat z n) : gc_scope.
 
 Section a.
 
