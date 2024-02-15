@@ -24,11 +24,8 @@ Proof.
 intros Hic Hon Hos.
 intros.
 induction n. {
-  cbn.
-  progress unfold iter_seq.
-  progress unfold iter_list.
-  cbn.
-  rewrite rngl_add_0_l, rngl_add_0_r.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_add_0_r.
   now do 2 rewrite (rngl_mul_1_l Hon).
 }
 rewrite (rngl_pow_succ_r Hon).
@@ -56,11 +53,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 remember (∑ (i = _, _), _) as x; subst x.
 symmetry.
-rewrite iter_seq_split_first; cycle 1.
-apply rngl_add_0_l.
-apply rngl_add_0_r.
-apply rngl_add_assoc.
-easy.
+rewrite rngl_summation_split_first; [ | easy ].
 progress unfold binomial at 1.
 rewrite Nat.sub_0_r, rngl_pow_0_r, (rngl_mul_1_r Hon).
 rewrite (rngl_summation_shift 1); [ | flia ].
@@ -77,10 +70,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 remember (∑ (i = _, _), _) as x; subst x.
-rewrite iter_seq_distr; cycle 1.
-apply rngl_add_0_l.
-apply rngl_add_comm.
-apply rngl_add_assoc.
+rewrite rngl_summation_add_distr.
 rewrite rngl_add_comm.
 rewrite <- rngl_add_assoc.
 symmetry.
@@ -92,10 +82,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 remember (∑ (i = _, _), _) as x; subst x.
-rewrite iter_seq_distr; cycle 1.
-apply rngl_add_0_l.
-apply rngl_add_comm.
-apply rngl_add_assoc.
+rewrite rngl_summation_add_distr.
 f_equal.
 symmetry.
 rewrite rngl_summation_rshift.
@@ -108,14 +95,10 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 remember (∑ (i = _, _), _) as x; subst x.
 symmetry.
-rewrite iter_seq_split_first; cycle 1.
-apply rngl_add_0_l.
-apply rngl_add_0_r.
-apply rngl_add_assoc.
-easy.
+rewrite rngl_summation_split_first; [ | easy ].
 rewrite rngl_add_comm.
 symmetry.
-rewrite iter_seq_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   rewrite rngl_summation_empty; [ | easy ].
