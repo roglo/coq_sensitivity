@@ -1041,6 +1041,45 @@ destruct ch. {
 }
 Qed.
 
+Definition gc_ring_like_prop_not_alg_closed
+  (Hop : rngl_has_opp T = true) : ring_like_prop (GComplex T) :=
+  let Hos := rngl_has_opp_has_opp_or_subt Hop in
+  let Hsu := rngl_has_opp_has_no_subt Hop in
+  {| rngl_mul_is_comm := rngl_mul_is_comm T;
+     rngl_is_integral_domain := false;
+     rngl_is_archimedean := true;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := rngl_characteristic T;
+     rngl_add_comm := gc_add_comm;
+     rngl_add_assoc := gc_add_assoc;
+     rngl_add_0_l := gc_add_0_l;
+     rngl_mul_assoc := gc_mul_assoc Hop;
+     rngl_opt_mul_1_l := gc_opt_mul_1_l Hos;
+     rngl_mul_add_distr_l := gc_mul_add_distr_l Hop;
+     rngl_opt_mul_comm := gc_opt_mul_comm;
+     rngl_opt_mul_1_r := gc_opt_mul_1_r Hos;
+     rngl_opt_mul_add_distr_r := gc_opt_mul_add_distr_r Hop;
+     rngl_opt_add_opp_diag_l := gc_opt_add_opp_diag_l Hop;
+     rngl_opt_add_sub := gc_opt_add_sub Hsu;
+     rngl_opt_sub_add_distr := gc_opt_sub_add_distr Hsu;
+     rngl_opt_mul_inv_diag_l := gc_opt_mul_inv_diag_l;
+     rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
+     rngl_opt_mul_div := gc_opt_mul_div;
+     rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
+     rngl_opt_le_dec := NA;
+     rngl_opt_integral := NA;
+     rngl_opt_alg_closed := NA;
+     rngl_opt_characteristic_prop := gc_characteristic_prop;
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat_non_opp := NA;
+     rngl_opt_not_le := NA;
+     rngl_opt_archimedean := NA |}.
+
 (* algebraically closed *)
 
 Definition gc_modl (z : GComplex T) :=
