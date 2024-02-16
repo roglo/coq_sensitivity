@@ -464,6 +464,50 @@ rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 now rewrite (rngl_mul_0_l Hos).
 Qed.
 
+Theorem rngl_pow_1_l : rngl_has_1 T = true → ∀ n, (1 ^ n = 1)%L.
+Proof.
+intros Hon *.
+induction n; [ easy | cbn ].
+rewrite IHn.
+apply (rngl_mul_1_l Hon).
+Qed.
+
+Theorem rngl_pow_mul_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a b n, ((a * b) ^ n = a ^ n * b ^ n)%L.
+Proof.
+intros Hic Hon *.
+induction n; cbn. {
+  symmetry; apply (rngl_mul_1_l Hon).
+}
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite IHn.
+rewrite (rngl_mul_comm Hic).
+rewrite <- rngl_mul_assoc.
+f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem rngl_pow_mul_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
+Proof.
+intros Hic Hon *.
+revert n.
+induction m; intros. {
+  symmetry; apply (rngl_pow_1_l Hon).
+}
+rewrite rngl_pow_succ_r.
+cbn.
+rewrite (rngl_pow_add_r Hon).
+rewrite IHm.
+symmetry.
+apply (rngl_pow_mul_l Hic Hon).
+Qed.
+
 (* to be completed
 Theorem gc_power_re_0 :
   ∀ n y,
@@ -482,13 +526,15 @@ destruct b. {
   subst n.
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
   rewrite Nat.mul_comm.
+  rewrite (rngl_pow_mul_r Hic Hon).
+  specialize rngl_pow_mul_r as H1.
+...
+  rewrite (rngl_pow_mul_r Hic Hon).
 Search (_ ^ (_ * _))%L.
 Search (_ ^ (_ * _))%C.
 Search (_ ^ (_ * _)).
 Check Nat.pow_mul_r.
-Theorem rngl_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
-Proof.
-intros.
+About rngl_pow_mul_r.
 ...
 Theorem gc_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%C.
 intros.
