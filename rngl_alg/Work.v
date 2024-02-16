@@ -16,6 +16,58 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+
+Theorem rngl_pow_1_l : rngl_has_1 T = true → ∀ n, (1 ^ n = 1)%L.
+Proof.
+intros Hon *.
+induction n; [ easy | cbn ].
+rewrite IHn.
+apply (rngl_mul_1_l Hon).
+Qed.
+
+Theorem rngl_pow_mul_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a b n, ((a * b) ^ n = a ^ n * b ^ n)%L.
+Proof.
+intros Hic Hon *.
+induction n; cbn. {
+  symmetry; apply (rngl_mul_1_l Hon).
+}
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite IHn.
+rewrite (rngl_mul_comm Hic).
+rewrite <- rngl_mul_assoc.
+f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem rngl_pow_mul_r :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
+Proof.
+intros Hic Hon *.
+revert n.
+induction m; intros. {
+  symmetry; apply (rngl_pow_1_l Hon).
+}
+rewrite rngl_pow_succ_r.
+cbn.
+rewrite (rngl_pow_add_r Hon).
+rewrite IHm.
+symmetry.
+apply (rngl_pow_mul_l Hic Hon).
+Qed.
+
+End a.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
@@ -464,50 +516,6 @@ rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 now rewrite (rngl_mul_0_l Hos).
 Qed.
 
-Theorem rngl_pow_1_l : rngl_has_1 T = true → ∀ n, (1 ^ n = 1)%L.
-Proof.
-intros Hon *.
-induction n; [ easy | cbn ].
-rewrite IHn.
-apply (rngl_mul_1_l Hon).
-Qed.
-
-Theorem rngl_pow_mul_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  ∀ a b n, ((a * b) ^ n = a ^ n * b ^ n)%L.
-Proof.
-intros Hic Hon *.
-induction n; cbn. {
-  symmetry; apply (rngl_mul_1_l Hon).
-}
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite IHn.
-rewrite (rngl_mul_comm Hic).
-rewrite <- rngl_mul_assoc.
-f_equal.
-apply (rngl_mul_comm Hic).
-Qed.
-
-Theorem rngl_pow_mul_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
-Proof.
-intros Hic Hon *.
-revert n.
-induction m; intros. {
-  symmetry; apply (rngl_pow_1_l Hon).
-}
-rewrite rngl_pow_succ_r.
-cbn.
-rewrite (rngl_pow_add_r Hon).
-rewrite IHm.
-symmetry.
-apply (rngl_pow_mul_l Hic Hon).
-Qed.
-
 (* to be completed
 Theorem gc_power_re_0 :
   ∀ n y,
@@ -527,7 +535,22 @@ destruct b. {
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
   rewrite Nat.mul_comm.
   rewrite (rngl_pow_mul_r Hic Hon).
-  specialize rngl_pow_mul_r as H1.
+  specialize @rngl_pow_mul_r as H1.
+  specialize (H1 (GComplex T)).
+  set (roc := gc_ring_like_op T).
+  set (rop := gc_ring_like_prop_not_alg_closed Hop).
+  specialize (H1 roc rop).
+  progress unfold roc in H1.
+  progress unfold gc_power_nat.
+  assert (Honc : rngl_has_1 (GComplex T) = true). {
+    progress unfold rngl_has_1 in Hon.
+    progress unfold rngl_has_1.
+    cbn.
+    progress unfold gc_opt_one.
+    now destruct (rngl_opt_one T).
+  }
+  specialize (H1 Hic Honc).
+  rewrite H1.
 ...
   rewrite (rngl_pow_mul_r Hic Hon).
 Search (_ ^ (_ * _))%L.
