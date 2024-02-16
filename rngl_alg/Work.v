@@ -480,6 +480,7 @@ Search (_ ^ (_ * _))%C.
 Search (_ ^ (_ * _)).
 Check Nat.pow_mul_r.
 Theorem rngl_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
+Proof.
 intros.
 ...
 Theorem gc_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%C.
