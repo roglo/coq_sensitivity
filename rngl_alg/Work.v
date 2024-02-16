@@ -445,15 +445,17 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
-(* to be completed
 Theorem gc_power_im_0 :
   ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
 Proof.
 destruct_ac.
 intros.
-induction n.
-...
-induction n; [ easy | ].
+progress unfold gc_power_nat.
+induction n. {
+  cbn; progress unfold rngl_one.
+  cbn; progress unfold gc_opt_one.
+  now destruct (rngl_opt_one T).
+}
 rewrite rngl_pow_succ_r; cbn.
 rewrite IHn.
 apply eq_gc_eq; cbn.
@@ -462,6 +464,7 @@ rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 now rewrite (rngl_mul_0_l Hos).
 Qed.
 
+(* to be completed
 Theorem gc_power_re_0 :
   ∀ n y,
   (mk_gc 0 y ^ n =
