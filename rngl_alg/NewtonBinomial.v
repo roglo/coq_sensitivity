@@ -28,7 +28,7 @@ induction n. {
   rewrite rngl_add_0_r.
   now do 2 rewrite (rngl_mul_1_l Hon).
 }
-rewrite (rngl_pow_succ_r Hon).
+rewrite rngl_pow_succ_r.
 rewrite IHn.
 rewrite (rngl_mul_summation_distr_l Hos).
 erewrite rngl_summation_eq_compat. 2: {
@@ -37,13 +37,13 @@ erewrite rngl_summation_eq_compat. 2: {
   do 4 rewrite rngl_mul_assoc.
   rewrite (rngl_mul_comm Hic (a * _))%L.
   rewrite rngl_mul_assoc.
-  replace a with (a ^ 1)%L at 2 by easy.
+  replace a with (a ^ 1)%L at 2 by apply (rngl_mul_1_r Hon).
   rewrite <- (rngl_pow_add_r Hon).
   rewrite (rngl_mul_comm Hic (a ^ _)%L).
   rewrite rngl_add_comm.
   rewrite (rngl_mul_comm Hic _ (b ^ _))%L at 1.
   do 2 rewrite rngl_mul_assoc.
-  replace b with (b ^ 1)%L at 2 by easy.
+  replace b with (b ^ 1)%L at 2 by apply (rngl_mul_1_r Hon).
   rewrite <- (rngl_pow_add_r Hon).
   rewrite <- rngl_mul_assoc.
   rewrite (rngl_mul_comm Hic).
@@ -107,7 +107,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   do 2 rewrite rngl_add_0_l.
   do 2 rewrite (rngl_mul_0_l Hos).
   rewrite rngl_add_0_l, rngl_add_0_r.
-  rewrite (rngl_mul_1_l Hon), (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_1_l Hon).
+  do 2 rewrite (rngl_mul_1_r Hon).
   easy.
 }
 rewrite (rngl_summation_shift 1); [ | flia Hnz ].

@@ -26,7 +26,7 @@ specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
 progress unfold rl_sqrt.
 specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
 rewrite <- (rngl_squ_1 Hon) in H1 at 2.
-rewrite <- rngl_squ_pow_2 in H1.
+rewrite <- (rngl_squ_pow_2 Hon) in H1.
 apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
   now apply rl_sqrt_nonneg.
@@ -67,7 +67,7 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
 assert (Hs2z : (√2 ≠ 0)%L). {
   intros H.
   apply (f_equal rngl_squ) in H.
-  rewrite rngl_squ_sqrt in H; [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_squ_sqrt Hon) in H; [ | now apply (rngl_lt_le_incl Hor) ].
   now rewrite (rngl_squ_0 Hos) in H.
 }
 intros * Haov.
@@ -324,7 +324,7 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
 assert (Hs2z : (√2 ≠ 0)%L). {
   intros H.
   apply (f_equal rngl_squ) in H.
-  rewrite rngl_squ_sqrt in H; [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_squ_sqrt Hon) in H; [ | now apply (rngl_lt_le_incl Hor) ].
   now rewrite (rngl_squ_0 Hos) in H.
 }
 generalize Haov; intros Haov_v.
@@ -649,7 +649,7 @@ destruct zs12. {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
-      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      rewrite (rl_sqrt_0 Hon Hop Hic Hor Hid).
       rewrite (rngl_mul_0_l Hos).
       rewrite (rngl_sub_0_r Hos).
       symmetry.
@@ -842,7 +842,7 @@ destruct zs12. {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
       rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
-      rewrite (rl_sqrt_0 Hop Hic Hor Hid).
+      rewrite (rl_sqrt_0 Hon Hop Hic Hor Hid).
       rewrite (rngl_mul_0_l Hos).
       rewrite (rngl_mul_0_r Hos).
       rewrite (rngl_sub_0_r Hos).
@@ -884,7 +884,7 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hop Hic Hor Hid).
+      apply (rl_sqrt_0 Hon Hop Hic Hor Hid).
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
       now apply (rngl_lt_le_incl Hor).
@@ -939,7 +939,7 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hop Hic Hor Hid).
+      apply (rl_sqrt_0 Hon Hop Hic Hor Hid).
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
       now apply (rngl_lt_le_incl Hor).

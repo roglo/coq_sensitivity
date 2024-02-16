@@ -161,7 +161,10 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   }
   rewrite Hbnan at 1.
   f_equal.
-  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    rewrite (rngl_mul_1_r Hon).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  } {
     now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
   f_equal.
@@ -172,6 +175,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   rewrite rngl_add_comm.
   progress unfold rngl_sub.
   rewrite Hop.
+  rewrite (rngl_mul_1_r Hon).
   rewrite <- rngl_add_assoc; f_equal.
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_1_r Hon a) at 2.
@@ -195,7 +199,10 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   }
   rewrite Hbnan at 1.
   f_equal.
-  rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+    rewrite (rngl_mul_1_r Hon).
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  } {
     now apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
   }
   f_equal.
@@ -210,6 +217,7 @@ destruct (is_upper_bound P _) as [H1| H1]. {
   progress unfold rngl_sub.
   rewrite Hop.
   rewrite (rngl_add_comm (- (a * _))%L).
+  rewrite (rngl_mul_1_r Hon).
   rewrite rngl_add_assoc; f_equal.
   rewrite (rngl_add_opp_r Hop).
   rewrite <- (rngl_mul_1_r Hon b) at 1.
@@ -321,6 +329,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   }
   specialize (IHp H Hpq Ha Hb); clear H.
   rewrite (rngl_middle_sub_l Hon Hop Hiv Hor) in IHp.
+  rewrite (rngl_mul_1_r Hon).
   rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 } {
@@ -330,6 +339,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   }
   specialize (IHp H Hpq Ha Hb); clear H.
   rewrite (rngl_middle_sub_r Hon Hop Hiv Hor) in IHp.
+  rewrite (rngl_mul_1_r Hon).
   rewrite <- (rngl_div_div Hos Hon Hiv); [ easy | | apply H2i ].
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }

@@ -354,6 +354,7 @@ Theorem binomial_succ_l :
     end.
 Proof. easy. Qed.
 
+(*
 Theorem rngl_power_gc_power :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
@@ -380,6 +381,7 @@ destruct n. {
 }
 now rewrite IHn.
 Qed.
+*)
 
 Theorem gre_summation :
   rngl_has_opp T = true →
@@ -449,7 +451,7 @@ Proof.
 destruct_ac.
 intros.
 induction n; [ easy | ].
-rewrite (rngl_pow_succ_r Hon); cbn.
+rewrite rngl_pow_succ_r; cbn.
 rewrite IHn.
 apply eq_gc_eq; cbn.
 do 2 rewrite (rngl_mul_0_r Hos).
@@ -3511,7 +3513,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hcc Hcs.
 intros ε Hε.
 assert (Hε2 : (0 < √(ε² / 2))%L). {
-  apply (rl_sqrt_pos Hos).
+  apply (rl_sqrt_pos Hon Hos).
   apply (rngl_lt_div_r Hon Hop Hiv Hor).
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   rewrite (rngl_mul_0_l Hos).
@@ -3536,7 +3538,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor ε)%L. 2: {
   now apply (rngl_lt_le_incl Hor) in Hε.
 }
 apply (rngl_squ_lt_abs_lt Hop Hor Hii).
-rewrite rngl_squ_sqrt. 2: {
+rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_add_nonneg_nonneg Hor).
   apply (rngl_squ_nonneg Hop Hor).
   apply (rngl_squ_nonneg Hop Hor).
@@ -3562,7 +3564,7 @@ assert (Hzε2 : (0 ≤ ε² / 2)%L). {
   rewrite (rngl_mul_0_l Hos).
   apply (rngl_squ_nonneg Hop Hor).
 }
-rewrite rngl_squ_sqrt in Hcc, Hcs; [ | easy | easy ].
+rewrite (rngl_squ_sqrt Hon) in Hcc, Hcs; [ | easy | easy ].
 specialize (rngl_div_add_distr_r Hiv ε² ε² 2)%L as H1.
 rewrite (rngl_add_diag2 Hon) in H1.
 rewrite (rngl_mul_div Hi1) in H1. 2: {

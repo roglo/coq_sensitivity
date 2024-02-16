@@ -423,7 +423,6 @@ Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
   | O => 1%L
-  | 1 => a (* to make it accessible even if 1 ∉ T *)
   | S m => (a * rngl_power a m)%L
   end.
 
@@ -2679,10 +2678,6 @@ Proof.
 intros Hon Hos *.
 induction n; cbn; [ apply rngl_add_0_r | ].
 rewrite fold_rngl_of_nat.
-destruct n. {
-  cbn; f_equal.
-  apply Nat.mul_1_r.
-}
 rewrite (rngl_of_nat_mul Hon Hos).
 now f_equal.
 Qed.
@@ -2860,7 +2855,6 @@ Theorem rngl_pow_0_l :
 Proof.
 intros Hos *.
 destruct n; [ easy | ].
-destruct n; [ easy | cbn ].
 apply (rngl_mul_0_l Hos).
 Qed.
 
@@ -2874,15 +2868,13 @@ Proof.
 intros Hon *.
 induction i; [ symmetry; apply (rngl_mul_1_l Hon) | ].
 destruct i. {
-  destruct j. {
-    symmetry; apply (rngl_mul_1_r Hon).
-  }
   cbn in IHi |-*.
-  now rewrite IHi.
+  rewrite IHi.
+  now rewrite (rngl_mul_1_r Hon).
 }
 cbn in IHi |-*.
 rewrite IHi.
-rewrite <- rngl_mul_assoc; f_equal.
+now do 3 rewrite <- rngl_mul_assoc.
 Qed.
 
 Theorem rngl_pow_nonzero :
@@ -2895,7 +2887,6 @@ Proof.
 intros Hon Hc1 Hos Hii * Haz.
 induction n; [ now apply (rngl_1_neq_0_iff Hon) | cbn ].
 intros H1; apply IHn.
-destruct n; [ easy | ].
 now apply (rngl_eq_mul_0_l Hos Hii) in H1.
 Qed.
 
@@ -3207,14 +3198,8 @@ apply (rngl_mul_mul_swap Hic).
 Qed.
 
 Theorem rngl_pow_succ_r :
-  rngl_has_1 T = true →
   ∀ n a, (a ^ S n = a * a ^ n)%L.
-Proof.
-intros Hon *.
-destruct n; [ | easy ].
-cbn; symmetry.
-apply (rngl_mul_1_r Hon).
-Qed.
+Proof. easy. Qed.
 
 Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
@@ -4727,8 +4712,13 @@ destruct Hab as [Hab| Hab]. {
 }
 Qed.
 
-Theorem rngl_squ_pow_2 : ∀ a, (a² = a ^ 2)%L.
-Proof. easy. Qed.
+Theorem rngl_squ_pow_2 :
+  rngl_has_1 T = true →
+  ∀ a, (a² = a ^ 2)%L.
+Proof.
+intros Hon *; cbn.
+now rewrite rngl_mul_1_r.
+Qed.
 
 Theorem rngl_squ_eq_cases :
   rngl_mul_is_comm T = true →
@@ -5230,7 +5220,6 @@ induction n; cbn. {
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct n; [ easy | ].
 now apply (rngl_mul_pos_pos Hop Hor Hii).
 Qed.
 
@@ -5243,7 +5232,6 @@ Proof.
 intros Hop Hon Hor * Hza.
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
 rewrite <- (rngl_mul_1_l Hon 1%L).
-destruct n; [ now rewrite (rngl_mul_1_l Hon) | ].
 apply (rngl_mul_le_compat_nonneg Hop Hor). {
   split; [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).

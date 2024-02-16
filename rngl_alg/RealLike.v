@@ -38,10 +38,15 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Theorem rngl_squ_sqrt : ∀ a, (0 ≤ a)%L → rngl_squ √a = a.
+Theorem rngl_squ_sqrt :
+  rngl_has_1 T = true →
+  ∀ a, (0 ≤ a)%L → rngl_squ √a = a.
 Proof.
-intros.
-now apply (rl_nth_root_pow 2 a).
+intros Hon *.
+specialize (rl_nth_root_pow 2 a) as H1.
+cbn in H1.
+rewrite (rngl_mul_1_r Hon) in H1.
+now apply H1.
 Qed.
 
 Theorem rl_sqrt_mul :
@@ -74,11 +79,12 @@ now apply rl_nth_root_inv.
 Qed.
 
 Theorem rl_sqrt_squ :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a, (√(a²))%L = rngl_abs a.
 Proof.
-intros Hop Hor *.
+intros Hon Hop Hor *.
 progress unfold rngl_squ.
 progress unfold rngl_abs.
 progress unfold rl_sqrt.
@@ -89,19 +95,20 @@ destruct az. {
   rewrite <- (rngl_mul_opp_opp Hop).
   rewrite rl_nth_root_mul; [ | easy | easy ].
   rewrite fold_rngl_squ.
-  rewrite rngl_squ_pow_2.
+  rewrite (rngl_squ_pow_2 Hon).
   now apply rl_nth_root_pow.
 } {
   apply (rngl_leb_gt Hor) in Haz.
   apply (rngl_lt_le_incl Hor) in Haz.
   rewrite rl_nth_root_mul; [ | easy | easy ].
   rewrite fold_rngl_squ.
-  rewrite rngl_squ_pow_2.
+  rewrite (rngl_squ_pow_2 Hon).
   now apply rl_nth_root_pow.
 }
 Qed.
 
 Theorem rl_sqrt_0 :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_is_ordered T = true →
@@ -109,11 +116,11 @@ Theorem rl_sqrt_0 :
      rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
   rl_sqrt 0%L = 0%L.
 Proof.
-intros Hop Hic Hor Hii.
+intros Hon Hop Hic Hor Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rl_nth_root_pow 2 0%L (rngl_le_refl Hor _)) as H1.
 rewrite <- (rngl_squ_0 Hos) in H1 at 2.
-rewrite <- rngl_squ_pow_2 in H1.
+rewrite <- (rngl_squ_pow_2 Hon) in H1.
 apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
 rewrite (rngl_abs_0 Hop) in H1.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H1; [ easy | ].
@@ -121,12 +128,13 @@ apply rl_sqrt_nonneg, (rngl_le_refl Hor).
 Qed.
 
 Theorem eq_rl_sqrt_0 :
+  rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
   ∀ a, (0 ≤ a)%L → rl_sqrt a = 0%L → a = 0%L.
 Proof.
-intros Hos * Hza Ha.
+intros Hon Hos * Hza Ha.
 apply (f_equal rngl_squ) in Ha.
-rewrite rngl_squ_sqrt in Ha; [ | easy ].
+rewrite (rngl_squ_sqrt Hon) in Ha; [ | easy ].
 progress unfold rngl_squ in Ha.
 now rewrite (rngl_mul_0_l Hos) in Ha.
 Qed.
@@ -157,10 +165,10 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
-rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 rewrite (rngl_squ_add Hic Hon √_)%L.
-rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
-rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 apply (rngl_le_sub_le_add_r Hop Hor).
 apply -> (rngl_le_sub_le_add_l Hop Hor).
 do 2 rewrite (rngl_squ_add Hic Hon)%L.
@@ -199,8 +207,8 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
 rewrite (rngl_squ_mul Hic).
-rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
-rewrite rngl_squ_sqrt; [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 (* c'est pas une formule connue, ça ? un truc chinois, chais plus *)
 rewrite (rngl_squ_add Hic Hon).
 do 2 rewrite (rngl_squ_mul Hic).
@@ -250,6 +258,7 @@ apply (rl_sqrt_sqr_le_sqrt_add_sqrt Hic Hon Hop Hiv Hor).
 Qed.
 
 Theorem rl_sqrt_le_rl_sqrt :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
@@ -258,7 +267,7 @@ Theorem rl_sqrt_le_rl_sqrt :
   → (a ≤ b)%L
   → (√ a ≤ √ b)%L.
 Proof.
-intros Hop Hor Hii.
+intros Hon Hop Hor Hii.
 intros * Ha Hab.
 apply (rngl_nlt_ge Hor).
 intros H1.
@@ -271,14 +280,15 @@ assert (H : (0 ≤ √b < √a)%L). {
 }
 specialize (H2 H H).
 do 2 rewrite fold_rngl_squ in H2.
-rewrite rngl_squ_sqrt in H2. 2: {
+rewrite (rngl_squ_sqrt Hon) in H2. 2: {
   now apply (rngl_le_trans Hor _ a).
 }
-rewrite rngl_squ_sqrt in H2; [ | easy ].
+rewrite (rngl_squ_sqrt Hon) in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
 Theorem rl_sqrt_lt_rl_sqrt :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a b,
@@ -286,7 +296,7 @@ Theorem rl_sqrt_lt_rl_sqrt :
   → (a < b)%L
   → (√ a < √ b)%L.
 Proof.
-intros Hop Hor * Ha Hab.
+intros Hon Hop Hor * Ha Hab.
 apply (rngl_nle_gt Hor).
 intros H1.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
@@ -299,11 +309,11 @@ assert (H : (0 ≤ √b ≤ √a)%L). {
 }
 specialize (H2 H H).
 do 2 rewrite fold_rngl_squ in H2.
-rewrite rngl_squ_sqrt in H2. 2: {
+rewrite (rngl_squ_sqrt Hon) in H2. 2: {
   apply (rngl_le_trans Hor _ a); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
-rewrite rngl_squ_sqrt in H2; [ | easy ].
+rewrite (rngl_squ_sqrt Hon) in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
