@@ -61,6 +61,27 @@ symmetry.
 apply (rngl_pow_mul_l Hic Hon).
 Qed.
 
+Context {rl : real_like_prop T}.
+
+Theorem gc_power_im_0 :
+  rngl_has_opp_or_subt T = true →
+  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
+Proof.
+intros Hos *.
+progress unfold gc_power_nat.
+induction n. {
+  cbn; progress unfold rngl_one.
+  cbn; progress unfold gc_opt_one.
+  now destruct (rngl_opt_one T).
+}
+rewrite rngl_pow_succ_r; cbn.
+rewrite IHn.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+now rewrite (rngl_mul_0_l Hos).
+Qed.
+
 End a.
 
 Section a.
@@ -497,25 +518,6 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
-Theorem gc_power_im_0 :
-  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
-Proof.
-destruct_ac.
-intros.
-progress unfold gc_power_nat.
-induction n. {
-  cbn; progress unfold rngl_one.
-  cbn; progress unfold gc_opt_one.
-  now destruct (rngl_opt_one T).
-}
-rewrite rngl_pow_succ_r; cbn.
-rewrite IHn.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-now rewrite (rngl_mul_0_l Hos).
-Qed.
-
 (* to be completed
 Theorem gc_power_re_0 :
   ∀ n y,
@@ -535,11 +537,11 @@ destruct b. {
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
   rewrite Nat.mul_comm.
   rewrite (rngl_pow_mul_r Hic Hon).
+  set (roc := gc_ring_like_op T).
+  set (rpc := gc_ring_like_prop_not_alg_closed Hop).
   specialize @rngl_pow_mul_r as H1.
   specialize (H1 (GComplex T)).
-  set (roc := gc_ring_like_op T).
-  set (rop := gc_ring_like_prop_not_alg_closed Hop).
-  specialize (H1 roc rop).
+  specialize (H1 roc rpc).
   progress unfold roc in H1.
   progress unfold gc_power_nat.
   assert (Honc : rngl_has_1 (GComplex T) = true). {
@@ -551,8 +553,31 @@ destruct b. {
   }
   specialize (H1 Hic Honc).
   rewrite H1.
-Search (_ * (mk_gc _ _))%C.
+  rewrite <- (rngl_squ_pow_2 Honc).
+  rewrite <- (rngl_squ_pow_2 Hon).
+  cbn.
+  progress unfold gc_mul.
+  cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_l.
+  rewrite fold_rngl_squ.
+  rewrite (rngl_sub_0_l Hop).
+  progress unfold gc_ring_like_op.
+  cbn.
+...
+Check @gc_power_im_0.
+  specialize @gc_power_im_0 as H2.
+  specialize (H2 (GComplex T) roc rpc).
+Check rl.
+Print real_like_prop.
+  specialize (H2 roc rpc rlc).
+...
+Set Printing All.
+cbn.
 Search (mk_gc _ _ ^ _)%C.
+...
+Search (_ * (mk_gc _ _))%C.
 ...
   rewrite (rngl_pow_mul_r Hic Hon).
 Search (_ ^ (_ * _))%L.
