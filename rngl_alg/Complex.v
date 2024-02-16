@@ -254,18 +254,18 @@ Definition gc_ring_like_op T
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
-(*
+(**)
 Definition gc_power_nat {T}
     {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
-*)
-
+(*
 Fixpoint gc_power_nat {T} {ro : ring_like_op T} (z : GComplex T) n :=
   match n with
   | 0 => gc_one
   | S n' => gc_mul z (gc_power_nat z n')
   end.
+*)
 
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
@@ -1372,31 +1372,16 @@ Theorem gc_cos_sin_pow :
   ((rngl_cos a + ℹ * rngl_sin a) ^ n)%C =
   (rngl_cos (n * a) + ℹ * rngl_sin (n * a))%C.
 Proof.
-(*
 intros.
+progress unfold gc_power_nat.
 induction n. {
   cbn; progress unfold rngl_one.
   cbn; progress unfold gc_opt_one.
   now destruct (rngl_opt_one T).
 }
-remember (rngl_has_1 T) as on eqn:Hon.
-symmetry in Hon.
-destruct on. 2: {
-  destruct n. {
-    cbn in IHn.
-cbn.
-...
-destruct n. {
-  cbn in IHn |-*.
-  rewrite (rngl_mul_1_r Hon).
-
-cbn.
 rewrite rngl_pow_succ_r.
-...
-*)
-intros.
-induction n; [ easy | cbn ].
-now rewrite IHn.
+rewrite IHn.
+now apply eq_gc_eq.
 Qed.
 
 Theorem rngl_rat_frac_part_lt_1 :
