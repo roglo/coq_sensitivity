@@ -551,6 +551,8 @@ destruct b. {
   }
   specialize (H1 Hic Honc).
   rewrite H1.
+Search (_ * (mk_gc _ _))%C.
+Search (mk_gc _ _ ^ _)%C.
 ...
   rewrite (rngl_pow_mul_r Hic Hon).
 Search (_ ^ (_ * _))%L.
