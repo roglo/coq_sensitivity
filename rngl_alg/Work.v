@@ -565,6 +565,10 @@ destruct b. {
   rewrite (rngl_sub_0_l Hop).
   progress unfold gc_ring_like_op.
   cbn.
+  induction m; cbn. {
+    rewrite (rngl_mul_1_l Hon).
+    apply eq_gc_eq; cbn.
+Search (gre 1).
 ...
 Check @gc_power_im_0.
   specialize @gc_power_im_0 as H2.
