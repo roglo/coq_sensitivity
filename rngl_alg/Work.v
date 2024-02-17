@@ -677,8 +677,10 @@ progress unfold gc_add in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
-rewrite (rngl_power_gc_power Hon Hos) in H1.
-rewrite gc_cos_sin_pow in H1.
+progress unfold gro in H1.
+specialize (gc_cos_sin_pow θ n) as H2.
+progress unfold gc_power_nat in H2.
+rewrite H2 in H1; clear H2.
 apply eq_gc_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
 rewrite (gre_summation Hop) in H1.
@@ -688,7 +690,7 @@ split. {
   rewrite Hc.
   apply rngl_summation_eq_compat.
   intros * (_, Hi).
-  do 2 rewrite (rngl_power_gc_power Hon Hos).
+...
   rewrite gc_power_im_0.
 ...
   rewrite gc_power_re_0.
