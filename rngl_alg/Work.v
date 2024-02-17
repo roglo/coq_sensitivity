@@ -994,12 +994,16 @@ destruct n. {
   apply angle_div_2_mul_2.
 }
 destruct n. {
-  eapply (angle_lim_eq_compat 2 0) in Hlim. 2: {
+remember 18 as x; clear Heqx.
+remember 18 as y; clear Heqy.
+  eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
     rewrite Nat.pow_add_r.
     cbn - [ "/" ].
-    rewrite (Nat_div_less_small (2 ^ i)). 2: {
+    rewrite (Nat_div_less_small y). 2: {
+... trouver x et y tels que
+    3y ≤ 2^i.2^x < 3(y+1)
       split. {
         apply Nat.mul_le_mono_l.
         now do 3 apply -> Nat.succ_le_mono.
