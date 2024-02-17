@@ -642,6 +642,19 @@ progress unfold gro.
 now rewrite gre_1.
 Qed.
 
+Theorem gim_rngl_of_nat :
+  let gro := gc_ring_like_op T : ring_like_op (GComplex T) in
+  ∀ n, gim (rngl_of_nat n) = 0%L.
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite rngl_of_nat_succ.
+cbn; rewrite IHn.
+progress unfold gro.
+rewrite gim_1.
+apply rngl_add_0_l.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
@@ -713,42 +726,24 @@ split. {
   do 2 rewrite (rngl_mul_0_r Hos).
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_r.
+  rewrite gre_rngl_of_nat.
+  rewrite gim_rngl_of_nat.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_sub_0_r Hos).
   remember (Nat.even i) as ei eqn:Hei.
   symmetry in Hei.
   destruct ei. {
-    rewrite (rngl_mul_0_r Hos).
-    rewrite (rngl_sub_0_r Hos).
-    apply Nat.even_spec in Hei.
-    destruct Hei as (m, Hm).
-    subst i.
-    rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
-    rewrite Nat.mul_comm.
     cbn - [ "/" "*" ].
     rewrite rngl_mul_assoc.
     f_equal.
     rewrite (rngl_mul_comm Hic).
-    rewrite rngl_mul_assoc.
-    f_equal; f_equal.
-    apply gre_rngl_of_nat.
+    apply rngl_mul_assoc.
   } {
-    destruct i; [ easy | ].
-    apply (f_equal negb) in Hei.
-    rewrite Nat.even_succ in Hei.
-    cbn in Hei.
-    rewrite Nat.negb_odd in Hei.
-    apply Nat.even_spec in Hei.
-    destruct Hei as (m, Hm).
-    subst i.
-    rewrite <- Nat.add_1_r.
-    rewrite Nat.mul_comm.
-    rewrite Nat.div_add_l; [ | easy ].
-    rewrite Nat.mul_comm.
-    rewrite Nat.div_small; [ | easy ].
-    rewrite Nat.add_0_r.
     cbn - [ "/" "*" ].
-    rewrite (rngl_mul_0_r Hos).
-    rewrite (rngl_sub_0_l Hop).
-(* ah ouais, y a un truc qui déconne, là *)
+    apply (rngl_mul_0_r Hos).
+  }
+}
+(* ah ! le cosinus est bon *)
 ...
 (*
 destruct_ac.
