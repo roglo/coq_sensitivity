@@ -963,6 +963,23 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
+(**)
+revert θ θ' Hlim.
+induction n as (n, IHn) using lt_wf_rec; intros.
+destruct n; [ easy | clear Hiz ].
+destruct n. {
+  rewrite angle_mul_1_l.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  eapply (angle_lim_eq_compat 0 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite Nat.div_1_r.
+    now rewrite angle_div_2_pow_mul_2_pow.
+  }
+  now apply angle_lim_const in Hlim.
+}
+destruct n. {
+...
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 (* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
 specialize (Hlim' Har Hch n θ' Hiz).
