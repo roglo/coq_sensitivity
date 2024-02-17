@@ -827,12 +827,30 @@ destruct zs. {
   remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
   remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
   move s before c.
-(* j'y arriverai jamais *)
-...
-  rewrite rngl_sin_nx in Hzs, Hzsm.
-  rewrite rngl_cos_nx in Hzsm.
-  remember (∑ (j = _, _), _) as x in Hzs; subst x.
+  destruct m. {
+    rewrite Nat.mul_1_l.
+    apply (rngl_le_refl Hor).
+  }
+  destruct m. {
+Search (binomial (_ + _)).
+Search (binomial (_ * _)).
+Search binomial.
+  rewrite rngl_sin_nx in Hzsm.
   remember (∑ (j = _, _), _) as x in Hzsm; subst x.
+  progress unfold iter_seq in Hzsm.
+  progress unfold iter_list in Hzsm.
+  rewrite Nat.sub_0_r in Hzsm.
+  cbn in Hzsm.
+  do 2 rewrite rngl_add_0_l in Hzsm.
+  do 2 rewrite rngl_add_0_r in Hzsm.
+  rewrite (rngl_mul_1_l Hon) in Hzsm.
+  do 2 rewrite (rngl_mul_1_r Hon) in Hzsm.
+  rewrite rngl_sin_nx in Hzsm.
+  rewrite rngl_cos_nx in Hzsm.
+  remember (∑ (j = _, _), _) as x in Hzsm; subst x.
+  rewrite <- Hc, <- Hs in Hzsm.
+...
+  remember (∑ (j = _, _), _) as x in Hzs; subst x.
   remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
   remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
   move s before c.
@@ -1009,7 +1027,6 @@ destruct m. {
   rewrite angle_mul_1_l.
   now apply angle_add_overflow_2_pow_div_mul_2_pow_diag.
 }
-2: {
 ... ...
 now apply angle_add_overflow_2_pow_div_mul_2_pow_mul.
 destruct m. {
