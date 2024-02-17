@@ -797,6 +797,13 @@ progress unfold angle_add_overflow.
 rewrite <- angle_mul_succ_l.
 apply angle_ltb_ge.
 progress unfold angle_leb.
+(*
+do 2 rewrite rngl_cos_nx.
+do 3 rewrite rngl_sin_nx.
+remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
+remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
+...
+*)
 remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -814,8 +821,26 @@ destruct zs. {
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
   do 2 rewrite rngl_cos_nx.
+...
+  rewrite rngl_sin_nx.
   remember (∑ (j = _, _), _) as x; subst x.
   remember (∑ (j = _, _ / _), _) as x; subst x.
+  rewrite rngl_sin_nx in Hzs, Hzsm.
+  rewrite rngl_cos_nx in Hzsm.
+  remember (∑ (j = _, _), _) as x in Hzs; subst x.
+  remember (∑ (j = _, _), _) as x in Hzsm; subst x.
+  remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
+  remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
+  move s before c.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    erewrite rngl_if_then_else_eq_compat; cycle 1. {
+      intros H1.
+      remember (∑ (k = _, _), _) as x in |-*.
+      remember (∑ (k = _, _), _) as y in |-*.
+...
+Search ((if _ then _ else _) = (if _ then _ else _)).
 ... ...
   rewrite angle_add_diag in Hzsm |-*.
   rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
