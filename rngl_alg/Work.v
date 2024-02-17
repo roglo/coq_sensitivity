@@ -774,7 +774,7 @@ intros.
 apply rngl_cos_sin_nx.
 Qed.
 
-(* to be completed
+(* to be completed, mais chais pas
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
@@ -964,12 +964,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hiz Hlim.
 (**)
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 revert θ θ' Hlim.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n; [ easy | clear Hiz ].
 destruct n. {
   rewrite angle_mul_1_l.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
   eapply (angle_lim_eq_compat 0 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
@@ -979,6 +979,53 @@ destruct n. {
   now apply angle_lim_const in Hlim.
 }
 destruct n. {
+  eapply (angle_lim_eq_compat 1 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite Nat.pow_add_r.
+    rewrite Nat.pow_1_r.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite Nat.add_comm.
+    rewrite angle_div_2_pow_succ_r_2.
+    now rewrite angle_div_2_pow_mul_2_pow.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'; symmetry.
+  apply angle_div_2_mul_2.
+}
+destruct n. {
+  eapply (angle_lim_eq_compat 2 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite Nat.pow_add_r.
+    cbn - [ "/" ].
+    rewrite (Nat_div_less_small (2 ^ i)). 2: {
+      split. {
+        apply Nat.mul_le_mono_l.
+        now do 3 apply -> Nat.succ_le_mono.
+      }
+      rewrite Nat.mul_add_distr_r.
+      rewrite Nat.mul_1_l.
+(* ouais, m'en fait, c'est pas ça,
+   mais l'idée est là : faut que je trouve la
+   formule magique pour la valeur donnée à
+   Nat_div_less_small *)
+...
+    rewrite Nat.mul_1_r.
+    rewrite Nat.div_mul; [ | easy ].
+    rewrite Nat.add_comm.
+    rewrite angle_div_2_pow_succ_r_2.
+    rewrite angle_div_2_pow_mul_2_pow.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'; symmetry.
+  apply angle_div_2_mul_2.
+}
+...
+    rewrite Nat.div_1_r.
+    now rewrite angle_div_2_pow_mul_2_pow.
+  }
+  now apply angle_lim_const in Hlim.
 ...
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 (* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
