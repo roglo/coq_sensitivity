@@ -820,11 +820,11 @@ destruct zs. {
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
+  rewrite angle_mul_nat_assoc.
   do 2 rewrite rngl_cos_nx.
-...
-  rewrite rngl_sin_nx.
   remember (∑ (j = _, _), _) as x; subst x.
   remember (∑ (j = _, _ / _), _) as x; subst x.
+...
   rewrite rngl_sin_nx in Hzs, Hzsm.
   rewrite rngl_cos_nx in Hzsm.
   remember (∑ (j = _, _), _) as x in Hzs; subst x.
