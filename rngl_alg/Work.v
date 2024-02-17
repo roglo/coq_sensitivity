@@ -518,7 +518,26 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
-(* to be completed
+Theorem gre_1 :
+  let roc := gc_ring_like_op T in
+  (gre 1 = 1%L).
+Proof.
+intros.
+cbn; progress unfold rngl_one.
+cbn; progress unfold gc_opt_one.
+now destruct (rngl_opt_one T).
+Qed.
+
+Theorem gim_1 :
+  let roc := gc_ring_like_op T in
+  (gim 1 = 0%L).
+Proof.
+intros.
+cbn; progress unfold rngl_one.
+cbn; progress unfold gc_opt_one.
+now destruct (rngl_opt_one T).
+Qed.
+
 Theorem gc_power_re_0 :
   ∀ n y,
   (mk_gc 0 y ^ n =
@@ -563,44 +582,52 @@ destruct b. {
   symmetry.
   apply (minus_one_pow_succ Hop).
 } {
-...
-Set Printing All.
-cbn.
-Search (mk_gc _ _ ^ _)%C.
-...
-Search (_ * (mk_gc _ _))%C.
-...
-  rewrite (rngl_pow_mul_r Hic Hon).
-Search (_ ^ (_ * _))%L.
-Search (_ ^ (_ * _))%C.
-Search (_ ^ (_ * _)).
-Check Nat.pow_mul_r.
-About rngl_pow_mul_r.
-...
-Theorem gc_pow_mul_r : ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%C.
-intros.
-...
-rewrite rngl_pow_mul_r.
-rewrite gc_pow_mul_r.
-...
-rewrite <- (rngl_power_gc_power Hon Hos).
-...
+  destruct n; [ easy | ].
+  apply (f_equal negb) in Hb.
+  rewrite Nat.even_succ in Hb.
+  cbn in Hb.
+  rewrite Nat.negb_odd in Hb.
+  apply Nat.even_spec in Hb.
+  destruct Hb as (m, Hm).
+  subst n.
+  rewrite <- Nat.add_1_r.
+  rewrite Nat.mul_comm, Nat.div_add_l; [ | easy ].
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.add_0_r.
+  progress unfold gc_power_nat.
+  induction m; cbn. {
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_1_r Hon).
+    apply eq_gc_eq; cbn.
+    rewrite gre_1, gim_1.
+    do 2 rewrite (rngl_mul_0_l Hos).
+    rewrite (rngl_mul_0_r Hos).
+    rewrite (rngl_sub_0_r Hos).
+    rewrite (rngl_mul_1_r Hon).
+    rewrite rngl_add_0_r.
+    easy.
+  }
+  rewrite IHm.
+  progress unfold gc_mul.
   cbn.
-...
-induction n; [ now rewrite (rngl_mul_1_l Hon) | ].
-
-rewrite (rngl_pow_succ_r Hon); cbn.
-rewrite IHn.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-rewrite (rngl_mul_0_l Hos).
+  do 4 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_mul_0_r Hos).
+  do 2 rewrite rngl_add_0_r.
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_opp_0 Hop).
+  f_equal.
+  rewrite <- (rngl_mul_opp_r Hop).
+  rewrite <- (rngl_mul_opp_l Hop).
+  do 4 rewrite rngl_mul_assoc.
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  rewrite <- rngl_mul_assoc.
+  f_equal.
+  symmetry.
+  apply (minus_one_pow_succ Hop).
+}
 Qed.
-do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_mul_0_r Hos).
-now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
-Qed.
-*)
 
 (* to be completed
 Theorem rngl_cos_sin_nx :
