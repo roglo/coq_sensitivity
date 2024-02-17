@@ -535,47 +535,34 @@ destruct b. {
   destruct Hb as (m, Hm).
   subst n.
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
-  rewrite Nat.mul_comm.
-  rewrite (rngl_pow_mul_r Hic Hon).
-  set (roc := gc_ring_like_op T).
-  set (rpc := gc_ring_like_prop_not_alg_closed Hop).
-  specialize @rngl_pow_mul_r as H1.
-  specialize (H1 (GComplex T)).
-  specialize (H1 roc rpc).
-  progress unfold roc in H1.
   progress unfold gc_power_nat.
-  assert (Honc : rngl_has_1 (GComplex T) = true). {
-    progress unfold rngl_has_1 in Hon.
-    progress unfold rngl_has_1.
-    cbn.
-    progress unfold gc_opt_one.
-    now destruct (rngl_opt_one T).
-  }
-  specialize (H1 Hic Honc).
-  rewrite H1.
-  rewrite <- (rngl_squ_pow_2 Honc).
-  rewrite <- (rngl_squ_pow_2 Hon).
-  cbn.
-  progress unfold gc_mul.
-  cbn.
-  do 2 rewrite (rngl_mul_0_l Hos).
-  rewrite (rngl_mul_0_r Hos).
-  rewrite rngl_add_0_l.
-  rewrite fold_rngl_squ.
-  rewrite (rngl_sub_0_l Hop).
-  progress unfold gc_ring_like_op.
-  cbn.
   induction m; cbn. {
     rewrite (rngl_mul_1_l Hon).
-    apply eq_gc_eq; cbn.
-Search (gre 1).
-...
-Check @gc_power_im_0.
-  specialize @gc_power_im_0 as H2.
-  specialize (H2 (GComplex T) roc rpc).
-Check rl.
-Print real_like_prop.
-  specialize (H2 roc rpc rlc).
+    apply eq_gc_eq.
+    cbn; progress unfold rngl_one.
+    cbn; progress unfold gc_opt_one.
+    now destruct (rngl_opt_one T).
+  }
+  rewrite IHm.
+  progress unfold gc_mul.
+  cbn.
+  do 4 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_mul_0_r Hos).
+  do 2 rewrite rngl_add_0_r.
+  rewrite (rngl_opp_0 Hop).
+  rewrite (rngl_mul_0_r Hos).
+  f_equal.
+  do 4 rewrite rngl_mul_assoc.
+  rewrite <- (rngl_mul_opp_l Hop).
+  f_equal.
+  rewrite (rngl_mul_comm Hic).
+  rewrite <- (rngl_mul_opp_l Hop).
+  rewrite <- rngl_mul_assoc.
+  f_equal.
+  symmetry.
+  apply (minus_one_pow_succ Hop).
+} {
 ...
 Set Printing All.
 cbn.
