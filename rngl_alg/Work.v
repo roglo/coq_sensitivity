@@ -65,7 +65,7 @@ Context {rl : real_like_prop T}.
 
 Theorem gc_power_im_0 :
   rngl_has_opp_or_subt T = true →
-  ∀ n x, (mk_gc x 0 ^ n = mk_gc (x ^ n) 0)%C.
+  ∀ n x, (mk_gc x 0%L ^ n)%C = (mk_gc (x ^ n) 0)%C.
 Proof.
 intros Hos *.
 progress unfold gc_power_nat.
@@ -629,6 +629,19 @@ destruct b. {
 }
 Qed.
 
+Theorem gre_rngl_of_nat :
+  let gro := gc_ring_like_op T : ring_like_op (GComplex T) in
+  ∀ n, gre (rngl_of_nat n) = rngl_of_nat n.
+Proof.
+intros.
+induction n; [ easy | ].
+do 2 rewrite rngl_of_nat_succ.
+cbn; rewrite IHn.
+f_equal.
+progress unfold gro.
+now rewrite gre_1.
+Qed.
+
 (* to be completed
 Theorem rngl_cos_sin_nx :
   ∀ n θ,
@@ -690,23 +703,52 @@ split. {
   rewrite Hc.
   apply rngl_summation_eq_compat.
   intros * (_, Hi).
-...
-  rewrite gc_power_im_0.
-...
-  rewrite gc_power_re_0.
+  specialize (gc_power_im_0 Hos) as H1.
+  progress unfold gc_power_nat in H1.
+  rewrite H1.
+  specialize gc_power_re_0 as H2.
+  progress unfold gc_power_nat in H2.
+  rewrite H2.
   cbn - [ "/" ].
-  rewrite (rngl_mul_0_r Hos).
+  do 2 rewrite (rngl_mul_0_r Hos).
   rewrite (rngl_sub_0_r Hos).
-...
-  cbn - [ "/" ].
-=======
-  rewrite gc_power_im_0.
-  cbn - [ "/" ].
-...
-rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-cbn - [ "/" ].
->>>>>>> Stashed changes
+  rewrite rngl_add_0_r.
+  remember (Nat.even i) as ei eqn:Hei.
+  symmetry in Hei.
+  destruct ei. {
+    rewrite (rngl_mul_0_r Hos).
+    rewrite (rngl_sub_0_r Hos).
+    apply Nat.even_spec in Hei.
+    destruct Hei as (m, Hm).
+    subst i.
+    rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+    rewrite Nat.mul_comm.
+    cbn - [ "/" "*" ].
+    rewrite rngl_mul_assoc.
+    f_equal.
+    rewrite (rngl_mul_comm Hic).
+    rewrite rngl_mul_assoc.
+    f_equal; f_equal.
+    apply gre_rngl_of_nat.
+  } {
+    destruct i; [ easy | ].
+    apply (f_equal negb) in Hei.
+    rewrite Nat.even_succ in Hei.
+    cbn in Hei.
+    rewrite Nat.negb_odd in Hei.
+    apply Nat.even_spec in Hei.
+    destruct Hei as (m, Hm).
+    subst i.
+    rewrite <- Nat.add_1_r.
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_add_l; [ | easy ].
+    rewrite Nat.mul_comm.
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.add_0_r.
+    cbn - [ "/" "*" ].
+    rewrite (rngl_mul_0_r Hos).
+    rewrite (rngl_sub_0_l Hop).
+(* ah ouais, y a un truc qui déconne, là *)
 ...
 (*
 destruct_ac.
