@@ -824,6 +824,10 @@ destruct zs. {
   do 2 rewrite rngl_cos_nx.
   remember (∑ (j = _, _), _) as x; subst x.
   remember (∑ (j = _, _ / _), _) as x; subst x.
+  remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
+  remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
+  move s before c.
+(* j'y arriverai jamais *)
 ...
   rewrite rngl_sin_nx in Hzs, Hzsm.
   rewrite rngl_cos_nx in Hzsm.
@@ -1005,6 +1009,7 @@ destruct m. {
   rewrite angle_mul_1_l.
   now apply angle_add_overflow_2_pow_div_mul_2_pow_diag.
 }
+2: {
 ... ...
 now apply angle_add_overflow_2_pow_div_mul_2_pow_mul.
 destruct m. {
