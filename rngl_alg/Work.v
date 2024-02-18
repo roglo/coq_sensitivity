@@ -774,6 +774,21 @@ intros.
 apply rngl_cos_sin_nx.
 Qed.
 
+Theorem angle_lim_move_0_r :
+  ∀ f θ, angle_lim f θ → angle_lim (λ i, (f i - θ)%A) 0%A.
+Proof.
+intros * Hlim.
+progress unfold angle_lim in Hlim.
+progress unfold angle_lim.
+intros ε Hε.
+specialize (Hlim ε Hε).
+destruct Hlim as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+now rewrite angle_eucl_dist_move_0_r in HN.
+Qed.
+
 (* to be completed, mais chais pas
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -963,6 +978,62 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
+apply angle_lim_move_0_r in Hlim.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+Theorem angle_lim_0_le_if :
+  ∀ f g, (∀ i, (f i ≤ g i)%A) → angle_lim g 0 → angle_lim f 0.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hfg Hg ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hfg Hg.
+intros ε Hε.
+assert (Hε2 : (0 < ε / 2)%L). {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  now rewrite (rngl_mul_0_l Hos).
+}
+specialize (Hg (ε / 2) Hε2)%L.
+destruct Hg as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (g n)).
+}
+specialize (angle_eucl_dist_triangular (f n) (g n) 0) as H1.
+specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
+rewrite (rngl_add_diag2 Hon) in Hεε2.
+rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite Hεε2.
+apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+...
+Search is_dist.
+...
+eapply (rngl_le_trans Hor). {
+  apply (angle_eucl_dist_triangular _ _ (f n)).
+}
+progress unfold angle_eucl_dist.
+cbn.
+Search (angle_eucl_dist _ ≤ angle_eucl_dist _)%L.
+Search (angle_eucl_dist _ < angle_eucl_dist _)%L.
+... ...
+eapply angle_lim_0_le_if in Hlim.
+...
+destruct_ac.
+intros Har Hch.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
+intros * Hiz Hlim.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
@@ -1015,6 +1086,14 @@ destruct ao. 2: {
       easy.
     }
     move Hlim' after Hlim.
+    eapply (angle_lim_eq_compat 2 0) in Hlim'. 2: {
+      intros i.
+      rewrite Nat.add_0_r.
+      rewrite Nat.pow_add_r.
+      cbn - [ "/" ].
+      easy.
+    }
+    apply angle_lim_move_0_r in Hlim.
 ...
 destruct_ac.
 intros Har Hch.
