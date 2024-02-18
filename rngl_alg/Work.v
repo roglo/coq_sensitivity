@@ -998,11 +998,13 @@ remember 18 as x; clear Heqx.
   eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
-    rewrite Nat.pow_add_r.
-    cbn - [ "/" ].
-    rewrite <- Nat.pow_add_r.
-(* trouver x et y tels que 3y ≤ 2^(i+x) < 3(y+1) *)
+    easy.
+  }
 ...
+Search (_ * (_ / ₂^_))%A.
+apply angle_div_2_pow_mul_le_angle.
+(* trouver x et y tels que 3y ≤ 2^(i+x) < 3(y+1) *)
+Check Nat_div_less_small.
     rewrite (Nat_div_less_small (2 ^ (i + x) / 3)). 2: {
       split. {
         rewrite Nat.mul_comm.
