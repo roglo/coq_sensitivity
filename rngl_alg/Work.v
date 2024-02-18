@@ -994,12 +994,37 @@ destruct n. {
   apply angle_div_2_mul_2.
 }
 destruct n. {
+  eapply (angle_lim_eq_compat 1 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+   rewrite Nat.pow_add_r.
+    cbn - [ "/" ].
+    easy.
+  }
+...
+    specialize (Nat.div_mod (2 ^ i * 4) 3) as H1.
+    specialize (H1 (Nat.neq_succ_0 _)).
+...
+Search angle_lim.
+Check angle_lim_mul.
+  apply (angle_lim_mul 3) in Hlim.
 remember 18 as x; clear Heqx.
   eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
-    easy.
-  }
+Search (_ = _ * (_ / ₂^_))%A.
+rewrite <- angle_div_2_pow_mul.
+rewrite <- angle_div_2_pow_mul.
+3: {
+...
+Search (_ * (_ / _)).
+rewrite <- Nat.divide_div_mul_exact.
+...
+Search (_ * (_ / ₂^_))%A.
+...
+  eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
 ...
 Search (_ * (_ / ₂^_))%A.
 apply angle_div_2_pow_mul_le_angle.
