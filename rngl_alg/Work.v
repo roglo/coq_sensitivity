@@ -1036,6 +1036,18 @@ apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
   apply (rngl_0_le_2 Hon Hop Hor).
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
+  split; [ | easy ].
+  destruct H12 as (H12, H2s).
+...
+  apply angle_add_le_mono_l with (θ1 := (θ2 - θ1)%A) in H12.
+Search (_ → _ ≤ _)%A.
+Search (_ - _ ≤ _)%A.
+Search (_ - _ < _)%A.
+angle_add_le_mono_l:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T
+    → ∀ θ1 θ2 θ3 : angle T,
+        angle_add_overflow θ1 θ2 = false → angle_add_overflow θ1 θ3 = false → (θ2 ≤ θ3)%A → (θ1 + θ2 ≤ θ1 + θ3)%A
 ...
 progress unfold angle_leb in H12.
 progress unfold angle_eucl_dist.
