@@ -4949,7 +4949,7 @@ Proof.
 destruct_ac.
 intros.
 split; intros H12. {
-  rewrite <- (angle_sub_0_l Hon Hos).
+  rewrite <- angle_sub_0_l.
   rewrite <- H12; symmetry.
   apply angle_add_sub.
 } {
@@ -5163,7 +5163,7 @@ rewrite Haov.
 rewrite angle_add_div_2_diag.
 destruct i. {
   cbn; symmetry.
-  apply (angle_sub_0_r Hon Hop).
+  apply angle_sub_0_r.
 }
 cbn.
 rewrite angle_add_div_2_diag.
@@ -5621,7 +5621,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
     rewrite (angle_sub_sub_distr Hic Hop).
     rewrite (angle_sub_sub_swap Hic Hop).
     rewrite angle_sub_diag.
-    rewrite (angle_sub_0_l Hon Hos).
+    rewrite angle_sub_0_l.
     rewrite (angle_add_opp_l Hic).
     now apply rngl_sin_sub_nonneg.
   }

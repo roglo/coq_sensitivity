@@ -753,11 +753,10 @@ now rewrite rngl_add_0_r.
 Qed.
 
 Theorem angle_sub_0_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ, (0 - θ = - θ)%A.
 Proof.
-intros Hon Hos *.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_1_l Hon).
 do 2 rewrite (rngl_mul_0_l Hos).
@@ -766,12 +765,10 @@ now rewrite rngl_add_0_l.
 Qed.
 
 Theorem angle_sub_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, (θ - 0 = θ)%A.
 Proof.
-intros Hon Hop *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_opp_0 Hop).
@@ -3223,9 +3220,7 @@ induction a; intros. {
   symmetry.
   apply angle_sub_diag.
 }
-destruct b. {
-  now rewrite (angle_sub_0_r Hon Hop).
-}
+destruct b; [ now rewrite angle_sub_0_r | ].
 apply Nat.succ_le_mono in Hba.
 rewrite Nat.sub_succ.
 rewrite IHa; [ cbn | easy ].

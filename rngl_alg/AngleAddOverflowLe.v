@@ -132,7 +132,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   apply eq_rngl_sin_0 in Hs12.
   destruct Hs12 as [Hs12| Hs12]. {
     apply angle_add_move_l in Hs12.
-    rewrite (angle_sub_0_l Hon Hos) in Hs12.
+    rewrite angle_sub_0_l in Hs12.
     subst θ2.
     cbn in Hc2z.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.

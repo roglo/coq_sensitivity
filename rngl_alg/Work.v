@@ -1014,6 +1014,44 @@ rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
 }
 rewrite Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+Theorem angle_le_eucl_dist_le :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2 ≤ angle_straight)%A
+  → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * H12.
+do 2 rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply rngl_cos_decr.
+...
+progress unfold angle_leb in H12.
+progress unfold angle_eucl_dist.
+cbn.
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_squ_opp Hop).
+... ...
+apply angle_le_eucl_dist_le.
+apply Hfg.
+...
+apply rngl_cos_le_anticompat_when_sin_nonneg in H2.
+...
+rngl_cos_le_anticompat_when_sin_nonneg:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) (θ1 θ2 : angle T),
+    (0 ≤ rngl_sin θ1)%L
+    → (0 ≤ rngl_sin θ2)%L → (rngl_cos θ1 ≤ rngl_cos θ2)%L ↔ (θ2 ≤ θ1)%A
 ...
 Search is_dist.
 ...

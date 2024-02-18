@@ -667,7 +667,7 @@ destruct H as [H| H]. {
   apply (eq_rngl_sin_0) in H.
   destruct H as [H| H]. {
     apply angle_add_move_l in H.
-    rewrite (angle_sub_0_l Hon Hos) in H.
+    rewrite angle_sub_0_l in H.
     subst θ2.
     cbn in Hzs2.
     apply (rngl_opp_pos_neg Hop Hor) in Hzs2.
@@ -715,7 +715,7 @@ rewrite (angle_add_sub_assoc Hop).
 rewrite <- (angle_add_sub_swap Hic Hop).
 rewrite <- (angle_sub_add_distr Hic Hop).
 rewrite (angle_straight_add_straight Hon Hop).
-rewrite (angle_sub_0_r Hon Hop).
+rewrite angle_sub_0_r.
 progress unfold angle_ltb.
 rewrite (rngl_sin_sub_straight_r Hon Hop).
 generalize Hs1z; intros H.
@@ -854,7 +854,7 @@ destruct H. {
   apply (eq_rngl_sin_0) in H1.
   move H1 at top.
   destruct H1; subst θ1. {
-    rewrite (angle_sub_0_r Hon Hop) in H.
+    rewrite angle_sub_0_r in H.
     subst θ2.
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
@@ -955,7 +955,7 @@ intros H; symmetry in H.
 apply (eq_rngl_sin_0) in H.
 destruct H as [H| H]. {
   apply angle_add_move_l in H.
-  rewrite (angle_sub_0_l Hon Hos) in H.
+  rewrite angle_sub_0_l in H.
   subst θ2.
   cbn in Hc2z.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
@@ -1203,7 +1203,7 @@ intros H1; symmetry in H1.
 apply (eq_rngl_sin_0) in H1.
 destruct H1 as [H1| H1]. {
   apply angle_add_move_l in H1.
-  rewrite (angle_sub_0_l Hon Hos) in H1.
+  rewrite angle_sub_0_l in H1.
   subst θ2.
   cbn in Hzs2.
   apply (rngl_opp_pos_neg Hop Hor) in Hzs2.
@@ -1482,7 +1482,7 @@ intros H; symmetry in H.
 apply (eq_rngl_sin_0) in H.
 destruct H as [H| H]. {
   apply angle_add_move_l in H.
-  rewrite (angle_sub_0_l Hon Hos) in H.
+  rewrite angle_sub_0_l in H.
   subst θ2.
   cbn in Hc2z.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
@@ -3219,7 +3219,7 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
       destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
         apply (eq_rngl_sin_0) in Hs1z.
         destruct Hs1z; subst θ1. {
-          rewrite (angle_sub_0_l Hon Hos) in Hzs13.
+          rewrite angle_sub_0_l in Hzs13.
           cbn in Hzs13.
           apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
           now apply (rngl_nlt_ge Hor) in Hzs13.
@@ -3248,7 +3248,7 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
         apply (eq_rngl_sin_0) in H.
         destruct H as [H| H]. {
           apply angle_sub_move_l in H.
-          rewrite (angle_sub_0_r Hon Hop) in H.
+          rewrite angle_sub_0_r in H.
           now subst θ3.
         }
         apply angle_sub_move_l in H.
