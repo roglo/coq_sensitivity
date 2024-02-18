@@ -995,18 +995,41 @@ destruct n. {
 }
 destruct n. {
 remember 18 as x; clear Heqx.
-remember 18 as y; clear Heqy.
   eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
     rewrite Nat.pow_add_r.
     cbn - [ "/" ].
-    rewrite (Nat_div_less_small y). 2: {
-... trouver x et y tels que
-    3y ≤ 2^i.2^x < 3(y+1)
+    rewrite <- Nat.pow_add_r.
+(* trouver x et y tels que 3y ≤ 2^(i+x) < 3(y+1) *)
+...
+    rewrite (Nat_div_less_small (2 ^ (i + x) / 3)). 2: {
       split. {
-        apply Nat.mul_le_mono_l.
-        now do 3 apply -> Nat.succ_le_mono.
+        rewrite Nat.mul_comm.
+        now apply Nat.mul_div_le.
+      } {
+        rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
+        rewrite (Nat.add_comm _ 3).
+        specialize (Nat.div_mod (2 ^ (i + x)) 3) as H1.
+        specialize (H1 (Nat.neq_succ_0 _)).
+        rewrite H1 at 1.
+        rewrite Nat.mul_comm.
+        rewrite Nat.add_comm.
+        eapply Nat.add_lt_le_mono. {
+          now apply Nat.mod_upper_bound.
+        }
+        apply Nat.le_refl.
+      }
+    }
+  ============================
+  (2 ^ (i + x) / 3 * (θ / ₂^(i + x)))%A = ?g i
+...
+Search (_ * (_ / _)).
+Search (_ * (_ / _)).
+eapply (Nat.lt_le_trans). 2: {
+  apply Nat.add_le_mono_l.
+  apply Nat.div_mul_le.
+Nat.div_mul_le: ∀ a b c : nat, b ≠ 0 → c * (a / b) ≤ c * a / b
       }
       rewrite Nat.mul_add_distr_r.
       rewrite Nat.mul_1_l.
