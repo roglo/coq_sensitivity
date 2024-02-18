@@ -963,9 +963,68 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
-(**)
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
+specialize (Hlim' Har Hch n θ' Hiz).
+remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
+symmetry in Hao.
+move Hlim before Hlim'.
+destruct ao. 2: {
+  specialize (Hlim' eq_refl).
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  eapply (angle_lim_eq_compat 0 0) in Hlim'. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite angle_div_2_pow_mul; [ | easy ].
+    rewrite angle_mul_nat_assoc.
+    easy.
+  }
+  induction n as (n, IHn) using lt_wf_rec; intros.
+  destruct n; [ easy | clear Hiz ].
+  destruct n. {
+    rewrite angle_mul_1_l.
+    eapply (angle_lim_eq_compat 0 0) in Hlim. 2: {
+      intros i.
+      rewrite Nat.add_0_r.
+      rewrite Nat.div_1_r.
+      now rewrite angle_div_2_pow_mul_2_pow.
+    }
+    now apply angle_lim_const in Hlim.
+  }
+  destruct n. {
+    eapply (angle_lim_eq_compat 1 0) in Hlim. 2: {
+      intros i.
+      rewrite Nat.add_0_r.
+      rewrite Nat.pow_add_r.
+      rewrite Nat.pow_1_r.
+      rewrite Nat.div_mul; [ | easy ].
+      rewrite Nat.add_comm.
+      rewrite angle_div_2_pow_succ_r_2.
+      now rewrite angle_div_2_pow_mul_2_pow.
+    }
+    apply angle_lim_const in Hlim.
+    subst θ'; symmetry.
+    apply angle_div_2_mul_2.
+  }
+  destruct n. {
+    eapply (angle_lim_eq_compat 2 0) in Hlim. 2: {
+      intros i.
+      rewrite Nat.add_0_r.
+      rewrite Nat.pow_add_r.
+      cbn - [ "/" ].
+      easy.
+    }
+    move Hlim' after Hlim.
+...
+destruct_ac.
+intros Har Hch.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
+}
+intros * Hiz Hlim.
 revert θ θ' Hlim.
+progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n; [ easy | clear Hiz ].
 destruct n. {
@@ -997,96 +1056,23 @@ destruct n. {
   eapply (angle_lim_eq_compat 1 0) in Hlim. 2: {
     intros i.
     rewrite Nat.add_0_r.
-   rewrite Nat.pow_add_r.
+    rewrite Nat.pow_add_r.
     cbn - [ "/" ].
     easy.
   }
 ...
-    specialize (Nat.div_mod (2 ^ i * 4) 3) as H1.
-    specialize (H1 (Nat.neq_succ_0 _)).
-...
-Search angle_lim.
-Check angle_lim_mul.
-  apply (angle_lim_mul 3) in Hlim.
-remember 18 as x; clear Heqx.
-  eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
-    intros i.
-    rewrite Nat.add_0_r.
-Search (_ = _ * (_ / ₂^_))%A.
-rewrite <- angle_div_2_pow_mul.
-rewrite <- angle_div_2_pow_mul.
-3: {
-...
-Search (_ * (_ / _)).
-rewrite <- Nat.divide_div_mul_exact.
-...
-Search (_ * (_ / ₂^_))%A.
-...
-  eapply (angle_lim_eq_compat x 0) in Hlim. 2: {
-    intros i.
-    rewrite Nat.add_0_r.
-...
-Search (_ * (_ / ₂^_))%A.
-apply angle_div_2_pow_mul_le_angle.
-(* trouver x et y tels que 3y ≤ 2^(i+x) < 3(y+1) *)
-Check Nat_div_less_small.
-    rewrite (Nat_div_less_small (2 ^ (i + x) / 3)). 2: {
-      split. {
-        rewrite Nat.mul_comm.
-        now apply Nat.mul_div_le.
-      } {
-        rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
-        rewrite (Nat.add_comm _ 3).
-        specialize (Nat.div_mod (2 ^ (i + x)) 3) as H1.
-        specialize (H1 (Nat.neq_succ_0 _)).
-        rewrite H1 at 1.
-        rewrite Nat.mul_comm.
-        rewrite Nat.add_comm.
-        eapply Nat.add_lt_le_mono. {
-          now apply Nat.mod_upper_bound.
-        }
-        apply Nat.le_refl.
-      }
-    }
-  ============================
-  (2 ^ (i + x) / 3 * (θ / ₂^(i + x)))%A = ?g i
-...
-Search (_ * (_ / _)).
-Search (_ * (_ / _)).
-eapply (Nat.lt_le_trans). 2: {
-  apply Nat.add_le_mono_l.
-  apply Nat.div_mul_le.
-Nat.div_mul_le: ∀ a b c : nat, b ≠ 0 → c * (a / b) ≤ c * a / b
-      }
-      rewrite Nat.mul_add_distr_r.
-      rewrite Nat.mul_1_l.
-(* ouais, m'en fait, c'est pas ça,
-   mais l'idée est là : faut que je trouve la
-   formule magique pour la valeur donnée à
-   Nat_div_less_small *)
-...
-    rewrite Nat.mul_1_r.
-    rewrite Nat.div_mul; [ | easy ].
-    rewrite Nat.add_comm.
-    rewrite angle_div_2_pow_succ_r_2.
-    rewrite angle_div_2_pow_mul_2_pow.
-  }
-  apply angle_lim_const in Hlim.
-  subst θ'; symmetry.
-  apply angle_div_2_mul_2.
+destruct_ac.
+intros Har Hch.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now rewrite Hc1 in Hch.
 }
-...
-    rewrite Nat.div_1_r.
-    now rewrite angle_div_2_pow_mul_2_pow.
-  }
-  now apply angle_lim_const in Hlim.
-...
+intros * Hiz Hlim.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 (* pourquoi il faut que nθ ne déborde pas ? on est fichus ! *)
 specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
-(**)
 destruct ao. {
   clear Hlim'.
   apply Bool.not_false_iff_true in Hao.
