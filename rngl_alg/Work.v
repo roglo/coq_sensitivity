@@ -984,6 +984,22 @@ progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
 Theorem angle_lim_0_le_if :
   ∀ f g, (∀ i, (f i ≤ g i)%A) → angle_lim g 0 → angle_lim f 0.
 Proof.
+(**)
+destruct_ac.
+intros * Hfg Hg.
+intros ε Hε.
+specialize (Hg ε Hε).
+destruct Hg as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+apply (rngl_cos_le_iff_angle_eucl_le (g n)).
+apply rngl_cos_decr.
+split; [ apply Hfg | ].
+(* bizarre... en fait, ce théorème ne devrait pas avoir comme condition
+   que g(n)≤π... mmm... faut réfléchir... *)
+...
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1016,11 +1032,13 @@ rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
 rewrite Hεε2.
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+...
 Theorem angle_le_eucl_dist_le :
   ∀ θ1 θ2,
   (θ1 ≤ θ2 ≤ angle_straight)%A
   → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
 Proof.
+intros * H12.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H12.
@@ -1093,6 +1111,14 @@ apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
     rewrite angle_sub_diag.
     now rewrite angle_add_0_l.
   }
+  exfalso.
+  apply (rngl_leb_gt Hor) in Hzs21.
+  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs21.
+  apply (rngl_opp_neg_pos Hop Hor) in Hzs21.
+  apply (rngl_nlt_ge Hor) in H12.
+  apply H12; clear H12.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos _ < rngl_cos _)%L.
 ...
     replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.
 Search (rngl_sin _ ≤ rngl_sin _)%L .
