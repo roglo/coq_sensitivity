@@ -790,6 +790,37 @@ specialize (HN n Hn).
 now rewrite angle_eucl_dist_move_0_r in HN.
 Qed.
 
+Theorem angle_lim_0_le_if :
+  ∀ f g,
+  (∀ i, (f i ≤ g i ≤ angle_straight)%A)
+  → angle_lim g 0 → angle_lim f 0.
+Proof.
+destruct_ac.
+intros * Hfg Hg.
+intros ε Hε.
+specialize (Hg ε Hε).
+destruct Hg as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+apply (rngl_cos_le_iff_angle_eucl_le (g n)).
+apply rngl_cos_decr.
+apply Hfg.
+Qed.
+
+Theorem angle_le_eucl_dist_le :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2 ≤ angle_straight)%A
+  → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
+Proof.
+destruct_ac.
+intros * H12.
+rewrite (angle_eucl_dist_symmetry Hic Hop θ2).
+apply angle_dist_le_r; [ easy | ].
+split; [ apply angle_nonneg | easy ].
+Qed.
+
 (* to be completed, mais chais pas
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -979,207 +1010,36 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
-apply angle_lim_move_0_r in Hlim.
 progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-Theorem angle_lim_0_le_if :
-  ∀ f g, (∀ i, (f i ≤ g i)%A) → angle_lim g 0 → angle_lim f 0.
+apply angle_lim_move_0_r in Hlim.
+(* ah ouais, mais si ça converge par valeurs inférieures (2π-ε)
+   ou, pire, si les angles oscillent de valeurs supérieures (ε)
+   à valeurs inférieures (2π-ε), ça risque de pas marcher *)
+Theorem seq_angle_decr :
+  ∀ n θ i j,
+  i < j
+  → (2 ^ j / n * (θ / ₂^j) ≤ 2 ^ i / n * (θ / ₂^i))%A.
 Proof.
-(**)
-destruct_ac.
-intros * Hfg Hg.
-intros ε Hε.
-specialize (Hg ε Hε).
-destruct Hg as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
-apply (rngl_cos_le_iff_angle_eucl_le (g n)).
-apply rngl_cos_decr.
-split; [ apply Hfg | ].
-(* bizarre... en fait, ce théorème ne devrait pas avoir comme condition
-   que g(n)≤π... mmm... faut réfléchir... *)
+intros * Hij.
+replace j with (i + (j - i)) by flia Hij.
+rewrite Nat.pow_add_r.
+rewrite angle_div_pow_2_add_distr.
+remember (θ / ₂^i)%A as θ' eqn:Hθ'.
+Search (_ * _ ≤ _ * _)%A.
 ...
-destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hfg Hg ε Hε.
-  rewrite H1 in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-intros * Hfg Hg.
-intros ε Hε.
-assert (Hε2 : (0 < ε / 2)%L). {
-  apply (rngl_lt_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  now rewrite (rngl_mul_0_l Hos).
-}
-specialize (Hg (ε / 2) Hε2)%L.
-destruct Hg as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-eapply (rngl_le_lt_trans Hor). {
-  apply (angle_eucl_dist_triangular _ (g n)).
-}
-specialize (angle_eucl_dist_triangular (f n) (g n) 0) as H1.
-specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as Hεε2.
-rewrite (rngl_add_diag2 Hon) in Hεε2.
-rewrite (rngl_mul_div Hi1) in Hεε2. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite Hεε2.
-apply (rngl_add_lt_compat Hop Hor); [ | easy ].
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+revert j Hij.
+induction i; intros; cbn.
 ...
-Theorem angle_le_eucl_dist_le :
-  ∀ θ1 θ2,
-  (θ1 ≤ θ2 ≤ angle_straight)%A
-  → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
-Proof.
-intros * H12.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * H12.
-do 2 rewrite angle_eucl_dist_is_sqrt.
-rewrite angle_sub_0_l.
-rewrite rngl_cos_opp.
-apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-} {
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_sub_le_mono_l Hop Hor).
-  apply rngl_cos_decr.
-  split; [ | easy ].
-  (* lemma ? *)
-  destruct H12 as (H12, H2s).
-  progress unfold angle_leb in H12.
-  progress unfold angle_leb in H2s.
-  progress unfold angle_leb.
-  cbn in H2s.
-  rewrite (rngl_leb_refl Hor) in H2s.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hzs1, Hzs2.
-  destruct zs2; [ clear H2s | easy ].
-  apply rngl_leb_le in Hzs2.
-  destruct zs1; [ | easy ].
-  apply rngl_leb_le in Hzs1.
-  apply rngl_leb_le in H12.
-  remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
-  symmetry in Hzs21.
-  destruct zs21. {
-    apply rngl_leb_le in Hzs21.
-    apply rngl_leb_le.
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
-      replace θ2 with (θ2 - θ1 + θ1)%A at 1 by now rewrite angle_sub_add.
-      apply quadrant_1_rngl_cos_add_le_cos_l; try easy. {
-        apply rngl_cos_sub_nonneg; try easy.
-        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-      }
-      now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-    }
-    apply (rngl_nle_gt Hor) in Hzc2.
-(*
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. 2: {
-      cbn.
-      apply (rngl_nle_gt Hor) in Hzc1.
 ...
-      replace θ2 with (θ2 - θ1 + θ1)%A at 1 by now rewrite angle_sub_add.
-      apply quadrant_1_rngl_cos_add_le_cos_l; try easy. {
-        apply rngl_cos_sub_nonneg; try easy.
-        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-      }
-      now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
-    }
-*)
-    change_angle_sub_r θ2 angle_right.
-    progress sin_cos_add_sub_right_hyp T Hzc2.
-    progress sin_cos_add_sub_right_hyp T Hzs21.
-    progress sin_cos_add_sub_right_hyp T H12.
-    progress sin_cos_add_sub_right_hyp T Hzs2.
-    progress sin_cos_add_sub_right_goal T.
-    apply AngleLeSubAdd.rngl_sin_sub_nonneg_sin_le_sin; try easy. {
-      now apply (rngl_lt_le_incl Hor) in Hzc2.
-    }
-    rewrite angle_sub_sub_distr.
-    rewrite angle_sub_diag.
-    now rewrite angle_add_0_l.
-  }
-  exfalso.
-  apply (rngl_leb_gt Hor) in Hzs21.
-  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs21.
-  apply (rngl_opp_neg_pos Hop Hor) in Hzs21.
-  apply (rngl_nlt_ge Hor) in H12.
-  apply H12; clear H12.
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-Search (rngl_cos _ < rngl_cos _)%L.
+remember (2 ^ i) as x.
+remember (2 ^ (j - i) / n) as y.
+Search (_ * _ / _)%A.
+rewrite angle_mul_nat_assoc.
 ...
-    replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.
-Search (rngl_sin _ ≤ rngl_sin _)%L .
+Search (_ * (_ / ₂^_) ≤ _ * (_ / ₂^_))%A.
 ...
-cbn.
-...
-replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.
-(* à ressusciter, peut-être ? *)
-Theorem angle_le_sub_le_add_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_eq_dec T = true →
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ2 θ3 = false
-  → angle_add_overflow θ1 (- θ2)%A = false
-  → (θ2 ≤ θ1)%A
-  → (θ1 - θ2 ≤ θ3)%A
-  → (θ1 ≤ θ2 + θ3)%A.
-Proof.
-... ...
-apply angle_le_sub_le_add_l; try easy.
-(* Ah oui, non, le but 2 est faux *)
-...
-  apply angle_add_le_mono_l with (θ1 := (θ2 - θ1)%A) in H12.
-Search (_ → _ ≤ _)%A.
-Search (_ - _ ≤ _)%A.
-Search (_ - _ < _)%A.
-angle_add_le_mono_l:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T
-    → ∀ θ1 θ2 θ3 : angle T,
-        angle_add_overflow θ1 θ2 = false → angle_add_overflow θ1 θ3 = false → (θ2 ≤ θ3)%A → (θ1 + θ2 ≤ θ1 + θ3)%A
-...
-progress unfold angle_leb in H12.
-progress unfold angle_eucl_dist.
-cbn.
-rewrite (rngl_sub_0_l Hop).
-rewrite (rngl_squ_opp Hop).
-... ...
-apply angle_le_eucl_dist_le.
-apply Hfg.
-...
-apply rngl_cos_le_anticompat_when_sin_nonneg in H2.
-...
-rngl_cos_le_anticompat_when_sin_nonneg:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) (θ1 θ2 : angle T),
-    (0 ≤ rngl_sin θ1)%L
-    → (0 ≤ rngl_sin θ2)%L → (rngl_cos θ1 ≤ rngl_cos θ2)%L ↔ (θ2 ≤ θ1)%A
-...
-Search is_dist.
-...
-eapply (rngl_le_trans Hor). {
-  apply (angle_eucl_dist_triangular _ _ (f n)).
-}
-progress unfold angle_eucl_dist.
-cbn.
-Search (angle_eucl_dist _ ≤ angle_eucl_dist _)%L.
-Search (angle_eucl_dist _ < angle_eucl_dist _)%L.
-... ...
-eapply angle_lim_0_le_if in Hlim.
+eapply angle_lim_0_le_if in Hlim. 2: {
+  intros i.
 ...
 destruct_ac.
 intros Har Hch.
