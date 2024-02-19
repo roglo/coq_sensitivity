@@ -863,11 +863,10 @@ apply (rngl_opp_involutive Hop).
 Qed.
 
 Theorem angle_sub_sub_distr :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2 θ3, (θ1 - (θ2 - θ3))%A = (θ1 - θ2 + θ3)%A.
 Proof.
-intros Hic Hop *.
+destruct_ac.
+intros.
 progress unfold angle_sub.
 rewrite <- (angle_add_assoc Hop).
 f_equal.
@@ -907,12 +906,12 @@ destruct_ac.
 intros.
 split; intros Ha. {
   subst θ3; symmetry.
-  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
   apply (angle_add_0_l Hon Hos).
 } {
   subst θ2.
-  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
   apply (angle_add_0_l Hon Hos).
 }

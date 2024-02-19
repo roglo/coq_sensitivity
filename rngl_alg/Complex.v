@@ -2379,7 +2379,7 @@ replace (_ * _ + _ * _)%L with (rngl_cos (θ - x))%A. 2: {
   now rewrite rngl_sub_opp_r.
 }
 subst x.
-rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
 rewrite (angle_add_0_l Hon Hos).
 rewrite <- rngl_add_assoc.
@@ -2418,12 +2418,12 @@ Proof.
 destruct_ac.
 intros.
 replace θ1 with (θ2 - (θ2 - θ1))%A. 2: {
-  rewrite (angle_sub_sub_distr Hic Hop).
+  rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
   apply (angle_add_0_l Hon Hos).
 }
 rewrite angle_eucl_dist_sub_l_diag.
-rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
 f_equal; symmetry.
 apply (angle_add_0_l Hon Hos).
@@ -4619,7 +4619,7 @@ rewrite angle_mul_1_l.
 rewrite (angle_sub_add_distr Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
-rewrite <- (angle_sub_sub_distr Hic Hop).
+rewrite <- angle_sub_sub_distr.
 rewrite angle_eucl_dist_sub_l_diag.
 rewrite <- angle_eucl_dist_opp_opp.
 rewrite (angle_opp_sub_distr Hic Hop).
@@ -4686,7 +4686,7 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 rewrite (angle_add_comm Hic).
 rewrite angle_eucl_dist_move_0_r.
 rewrite (angle_sub_sub_swap Hic Hop).
-rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_sub_sub_distr.
 rewrite angle_add_sub.
 rewrite (angle_sub_add_distr Hic Hop).
 now rewrite angle_add_sub.
@@ -4738,7 +4738,7 @@ apply (rngl_add_lt_compat Hop Hor); [ | easy ].
 rewrite angle_eucl_dist_move_0_l.
 rewrite <- angle_eucl_dist_opp_opp.
 rewrite (angle_opp_sub_distr Hic Hop).
-rewrite (angle_sub_sub_distr Hic Hop).
+rewrite angle_sub_sub_distr.
 do 2 rewrite <- (angle_add_sub_swap Hic Hop).
 rewrite (angle_add_comm Hic).
 rewrite <- (angle_sub_add_distr Hic Hop).
@@ -5618,7 +5618,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
     } {
       now apply rngl_sin_sub_nonneg.
     }
-    rewrite (angle_sub_sub_distr Hic Hop).
+    rewrite angle_sub_sub_distr.
     rewrite (angle_sub_sub_swap Hic Hop).
     rewrite angle_sub_diag.
     rewrite angle_sub_0_l.
@@ -5821,7 +5821,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
     } {
       now apply rngl_sin_sub_nonneg.
     }
-    rewrite (angle_sub_sub_distr Hic Hop).
+    rewrite angle_sub_sub_distr.
     rewrite (angle_sub_sub_swap Hic Hop).
     rewrite angle_sub_add.
     now apply rngl_sin_sub_nonneg.

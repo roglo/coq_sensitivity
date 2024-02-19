@@ -1089,8 +1089,10 @@ apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
     apply AngleLeSubAdd.rngl_sin_sub_nonneg_sin_le_sin; try easy. {
       now apply (rngl_lt_le_incl Hor) in Hzc2.
     }
-    rewrite (angle_sub_sub_distr Hic Hop).
+    rewrite angle_sub_sub_distr.
     rewrite angle_sub_diag.
+About angle_add_0_l.
+... ...
     now rewrite (angle_add_0_l Hon Hos).
   }
 ...
