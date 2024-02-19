@@ -793,7 +793,8 @@ Qed.
 Theorem angle_lim_0_le_if :
   ∀ f g,
   (∀ i, (f i ≤ g i ≤ angle_straight)%A)
-  → angle_lim g 0 → angle_lim f 0.
+  → angle_lim g 0
+  → angle_lim f 0.
 Proof.
 destruct_ac.
 intros * Hfg Hg.
@@ -1015,21 +1016,43 @@ apply angle_lim_move_0_r in Hlim.
 (* ah ouais, mais si ça converge par valeurs inférieures (2π-ε)
    ou, pire, si les angles oscillent de valeurs supérieures (ε)
    à valeurs inférieures (2π-ε), ça risque de pas marcher *)
+eapply angle_lim_0_le_if in Hlim. 2: {
+  intros i.
+Check angle_lim_0_le_if.
+...
 Theorem seq_angle_decr :
   ∀ n θ i j,
-  i < j
+  i ≤ j
   → (2 ^ j / n * (θ / ₂^j) ≤ 2 ^ i / n * (θ / ₂^i))%A.
 Proof.
 intros * Hij.
+(*
 replace j with (i + (j - i)) by flia Hij.
 rewrite Nat.pow_add_r.
 rewrite angle_div_pow_2_add_distr.
 remember (θ / ₂^i)%A as θ' eqn:Hθ'.
 Search (_ * _ ≤ _ * _)%A.
+*)
+...
+eapply angle_lim_0_le_if in Hlim. 2: {
+  intros i.
+  split. {
+    apply seq_angle_decr.
+...
+Theorem angle_mul_le_mono :
+  ∀ m n i j θ,
+  m ≤ n
+  → i ≤ j
+  → (θ ≤ angle_straight)%A
+  → angle_mul_nat_overflow m θ = false
+  → angle_mul_nat_overflow n θ = false
+  → (m * (θ / ₂^i) ≤ n * (θ / ₂^j))%A.
+(* non ça marche pas, ça *)
+....
+apply angle_mul_le_mono.
 ...
 revert j Hij.
 induction i; intros; cbn.
-...
 ...
 remember (2 ^ i) as x.
 remember (2 ^ (j - i) / n) as y.
