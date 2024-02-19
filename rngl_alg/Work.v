@@ -8,6 +8,7 @@ Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
+Require Import AngleLeSubAdd.
 Require Import TacChangeAngle.
 Require Import Complex NewtonBinomial.
 
@@ -1037,7 +1038,84 @@ apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
   apply (rngl_sub_le_mono_l Hop Hor).
   apply rngl_cos_decr.
   split; [ | easy ].
+  (* lemma ? *)
   destruct H12 as (H12, H2s).
+  progress unfold angle_leb in H12.
+  progress unfold angle_leb in H2s.
+  progress unfold angle_leb.
+  cbn in H2s.
+  rewrite (rngl_leb_refl Hor) in H2s.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  destruct zs2; [ clear H2s | easy ].
+  apply rngl_leb_le in Hzs2.
+  destruct zs1; [ | easy ].
+  apply rngl_leb_le in Hzs1.
+  apply rngl_leb_le in H12.
+  remember (0 ≤? rngl_sin (θ2 - θ1))%L as zs21 eqn:Hzs21.
+  symmetry in Hzs21.
+  destruct zs21. {
+    apply rngl_leb_le in Hzs21.
+    apply rngl_leb_le.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+      replace θ2 with (θ2 - θ1 + θ1)%A at 1 by now rewrite angle_sub_add.
+      apply quadrant_1_rngl_cos_add_le_cos_l; try easy. {
+        apply rngl_cos_sub_nonneg; try easy.
+        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+      }
+      now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+    }
+    apply (rngl_nle_gt Hor) in Hzc2.
+(*
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. 2: {
+      cbn.
+      apply (rngl_nle_gt Hor) in Hzc1.
+...
+      replace θ2 with (θ2 - θ1 + θ1)%A at 1 by now rewrite angle_sub_add.
+      apply quadrant_1_rngl_cos_add_le_cos_l; try easy. {
+        apply rngl_cos_sub_nonneg; try easy.
+        now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+      }
+      now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+    }
+*)
+    change_angle_sub_r θ2 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzc2.
+    progress sin_cos_add_sub_right_hyp T Hzs21.
+    progress sin_cos_add_sub_right_hyp T H12.
+    progress sin_cos_add_sub_right_hyp T Hzs2.
+    progress sin_cos_add_sub_right_goal T.
+    apply AngleLeSubAdd.rngl_sin_sub_nonneg_sin_le_sin; try easy. {
+      now apply (rngl_lt_le_incl Hor) in Hzc2.
+    }
+    rewrite (angle_sub_sub_distr Hic Hop).
+    rewrite angle_sub_diag.
+    now rewrite (angle_add_0_l Hon Hos).
+  }
+...
+    replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.
+Search (rngl_sin _ ≤ rngl_sin _)%L .
+...
+cbn.
+...
+replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.
+(* à ressusciter, peut-être ? *)
+Theorem angle_le_sub_le_add_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_eq_dec T = true →
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ2 θ3 = false
+  → angle_add_overflow θ1 (- θ2)%A = false
+  → (θ2 ≤ θ1)%A
+  → (θ1 - θ2 ≤ θ3)%A
+  → (θ1 ≤ θ2 + θ3)%A.
+Proof.
+... ...
+apply angle_le_sub_le_add_l; try easy.
+(* Ah oui, non, le but 2 est faux *)
 ...
   apply angle_add_le_mono_l with (θ1 := (θ2 - θ1)%A) in H12.
 Search (_ → _ ≤ _)%A.
