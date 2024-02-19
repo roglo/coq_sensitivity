@@ -1091,9 +1091,7 @@ apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
     }
     rewrite angle_sub_sub_distr.
     rewrite angle_sub_diag.
-About angle_add_0_l.
-... ...
-    now rewrite (angle_add_0_l Hon Hos).
+    now rewrite angle_add_0_l.
   }
 ...
     replace θ2 with (θ2 - θ1 + θ1)%A at 2 by now rewrite angle_sub_add.

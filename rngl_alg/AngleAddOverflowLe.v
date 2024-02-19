@@ -168,7 +168,7 @@ apply rngl_sin_sub_nonneg_sin_le_sin; try easy. {
 } {
   rewrite (angle_add_sub_swap Hic Hop).
   rewrite angle_sub_diag.
-  now rewrite (angle_add_0_l Hon Hos).
+  now rewrite angle_add_0_l.
 }
 Qed.
 
@@ -536,7 +536,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   destruct (rngl_eq_dec Hed (rngl_cos θ1) 1) as [H| H]. {
     apply eq_rngl_cos_1 in H.
     subst θ1.
-    rewrite (angle_add_0_l Hon Hos) in Hzs12.
+    rewrite angle_add_0_l in Hzs12.
     now apply (rngl_nlt_ge Hor) in Hzs12.
   } {
     apply angle_add_overflow_le_lemma_5 in H12; try easy.
@@ -594,7 +594,7 @@ apply H12; clear H12.
 destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
   apply eq_rngl_sin_0 in Hs1z.
   destruct Hs1z; subst θ1. {
-    rewrite (angle_add_0_l Hon Hos); cbn.
+    rewrite angle_add_0_l; cbn.
     now rewrite rngl_add_0_l.
   }
   exfalso.
@@ -1044,7 +1044,7 @@ apply (rngl_nle_gt Hor) in Hc2z.
 destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
   apply eq_rngl_sin_0 in Hs1z.
   destruct Hs1z; subst θ1. {
-    rewrite (angle_add_0_l Hon Hos).
+    rewrite angle_add_0_l.
     apply rngl_cos_bound.
   }
   destruct H12 as [H12| H12]; [ easy | ].

@@ -22,10 +22,10 @@ destruct_ac.
 intros.
 split; intros H12. {
   apply angle_sub_move_r in H12.
-  now rewrite (angle_add_0_l Hon Hos) in H12.
+  now rewrite angle_add_0_l in H12.
 } {
   apply angle_sub_move_r.
-  now rewrite (angle_add_0_l Hon Hos).
+  now rewrite angle_add_0_l.
 }
 Qed.
 
@@ -356,7 +356,7 @@ destruct zs2. {
     }
     rewrite angle_sub_sub_distr.
     rewrite angle_sub_diag.
-    rewrite (angle_add_0_l Hon Hos).
+    rewrite angle_add_0_l.
     now apply (rngl_lt_le_incl Hor).
   }
   intros H.
@@ -836,7 +836,7 @@ split. {
   } {
     rewrite angle_sub_sub_distr.
     rewrite angle_sub_diag.
-    rewrite (angle_add_0_l Hon Hos).
+    rewrite angle_add_0_l.
     now apply (rngl_lt_le_incl Hor).
   }
 }
@@ -1750,7 +1750,7 @@ now apply rngl_cos_sub_nonneg.
 rewrite angle_sub_sub_distr.
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite angle_sub_diag.
-rewrite (angle_add_0_l Hon Hos).
+rewrite angle_add_0_l.
 now apply rngl_sin_add_nonneg.
 Qed.
 
@@ -1821,7 +1821,7 @@ apply rngl_cos_sub_nonneg; try easy.
 apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
-now rewrite (angle_add_0_l Hon Hos).
+now rewrite angle_add_0_l.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_24 :
@@ -1843,7 +1843,7 @@ progress sin_cos_add_sub_right_goal T.
 apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
-now rewrite (angle_add_0_l Hon Hos).
+now rewrite angle_add_0_l.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_25 :
@@ -2241,7 +2241,7 @@ apply -> (rngl_opp_lt_compat Hop Hor).
 symmetry in H.
 apply (eq_rngl_sin_0) in H.
 destruct H; subst θ1. {
-  rewrite (angle_add_0_l Hon Hos); cbn.
+  rewrite angle_add_0_l; cbn.
   apply (rngl_lt_iff Hor).
   split; [ apply rngl_cos_bound | ].
   intros H.
@@ -3128,7 +3128,7 @@ destruct (rngl_lt_dec Hor (rngl_cos θ1) (rngl_cos θ2))
   apply (eq_rngl_sin_0) in H.
   destruct H as [H| H]. {
     apply angle_sub_move_r in H.
-    rewrite (angle_add_0_l Hon Hos) in H.
+    rewrite angle_add_0_l in H.
     now subst θ2.
   }
   apply angle_sub_move_r in H.
@@ -3300,7 +3300,7 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
       destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
         apply (eq_rngl_sin_0) in Hs1z.
         destruct Hs1z; subst θ1. {
-          rewrite (angle_add_0_l Hon Hos) in Hzs13.
+          rewrite angle_add_0_l in Hzs13.
           now apply (rngl_nlt_ge Hor) in Hzs13.
         }
         exfalso.

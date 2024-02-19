@@ -2381,7 +2381,7 @@ replace (_ * _ + _ * _)%L with (rngl_cos (θ - x))%A. 2: {
 subst x.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
-rewrite (angle_add_0_l Hon Hos).
+rewrite angle_add_0_l.
 rewrite <- rngl_add_assoc.
 rewrite cos2_sin2_1.
 rewrite <- (rngl_add_sub_swap Hop).
@@ -2420,13 +2420,13 @@ intros.
 replace θ1 with (θ2 - (θ2 - θ1))%A. 2: {
   rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
+  apply angle_add_0_l.
 }
 rewrite angle_eucl_dist_sub_l_diag.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
 f_equal; symmetry.
-apply (angle_add_0_l Hon Hos).
+apply angle_add_0_l.
 Qed.
 
 Theorem angle_eucl_dist_move_0_r :
@@ -4936,7 +4936,7 @@ intros.
 induction n. {
   do 3 rewrite angle_mul_0_l.
   symmetry.
-  apply (angle_add_0_l Hon Hos).
+  apply angle_add_0_l.
 }
 cbn.
 rewrite IHn.

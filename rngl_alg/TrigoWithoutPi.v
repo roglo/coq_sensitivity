@@ -728,12 +728,10 @@ rewrite (rngl_add_opp_r Hop).
 apply (rngl_sub_diag Hos).
 Qed.
 
-Theorem angle_add_0_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, (0 + θ = θ)%A.
+Theorem angle_add_0_l : ∀ θ, (0 + θ = θ)%A.
 Proof.
-intros Hon Hos *.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_1_l Hon).
 do 2 rewrite (rngl_mul_0_l Hos).
@@ -908,12 +906,12 @@ split; intros Ha. {
   subst θ3; symmetry.
   rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
+  apply angle_add_0_l.
 } {
   subst θ2.
   rewrite angle_sub_sub_distr.
   rewrite angle_sub_diag.
-  apply (angle_add_0_l Hon Hos).
+  apply angle_add_0_l.
 }
 Qed.
 
@@ -2377,7 +2375,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
       rewrite (angle_add_comm Hic).
       do 2 rewrite (angle_add_assoc Hop).
       rewrite (angle_straight_add_straight Hon Hop).
-      rewrite (angle_add_0_l Hon Hos).
+      rewrite angle_add_0_l.
       rewrite Hθ3 in Hzs3.
       now apply (rngl_lt_le_incl Hor).
     }
@@ -3191,7 +3189,7 @@ Theorem angle_mul_add_distr_r :
 Proof.
 destruct_ac.
 intros.
-induction a; cbn; [ symmetry; apply (angle_add_0_l Hon Hos) | ].
+induction a; cbn; [ symmetry; apply angle_add_0_l | ].
 rewrite IHa.
 apply (angle_add_assoc Hop).
 Qed.
