@@ -1062,6 +1062,14 @@ destruct ao. 2: {
       cbn - [ "/" ].
       easy.
     }
+    apply angle_lim_move_0_r in Hlim'.
+    apply angle_lim_0_le_if with (f := λ i, (3 * θ' - θ')%A) in Hlim'. 2: {
+      intros i.
+      split. {
+        progress unfold angle_sub.
+        do 2 rewrite (angle_add_comm Hic _ (- θ')%A).
+        apply angle_add_le_mono_l. {
+Search (angle_add_overflow _ _ = false).
 ...
 destruct_ac.
 intros Har Hch.
