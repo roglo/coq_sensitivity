@@ -1098,6 +1098,9 @@ destruct ao. 2: {
       rewrite Nat.add_0_l.
       easy.
     }
+Search angle_lim.
+...
+eapply angle_lim_0_le_if in Hlim'.
 ...
 Search (_ / _ * _).
 ...
