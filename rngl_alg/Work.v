@@ -822,6 +822,19 @@ apply angle_dist_le_r; [ easy | ].
 split; [ apply angle_nonneg | easy ].
 Qed.
 
+Theorem angle_lim_opp :
+  ∀ f θ, angle_lim f θ → angle_lim (λ i, (- f i)%A) (- θ).
+Proof.
+intros * Hft.
+intros ε Hε.
+specialize (Hft ε Hε).
+destruct Hft as (N, HN).
+exists N.
+intros n Hn.
+rewrite angle_eucl_dist_opp_opp.
+now apply HN.
+Qed.
+
 (* to be completed, mais chais pas
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -1055,6 +1068,7 @@ destruct ao. 2: {
     apply angle_div_2_mul_2.
   }
   destruct n. {
+(*
     eapply (angle_lim_eq_compat 2 0) in Hlim. 2: {
       intros i.
       rewrite Nat.add_0_r.
@@ -1062,7 +1076,32 @@ destruct ao. 2: {
       cbn - [ "/" ].
       easy.
     }
+*)
+    apply angle_lim_opp in Hlim'.
     apply angle_lim_move_0_r in Hlim'.
+    eapply (angle_lim_eq_compat 2 0) in Hlim'. 2: {
+      intros i.
+      rewrite Nat.add_0_r.
+      rewrite (angle_sub_opp_r Hop).
+      rewrite (angle_add_opp_l Hic).
+      rewrite <- (angle_div_2_pow_mul_2_pow (i + 2) θ') at 1.
+      rewrite <- angle_mul_sub_distr_r. 2: {
+        rewrite Nat.mul_comm.
+        now apply Nat.mul_div_le.
+      }
+      specialize (Nat.div_mod (2 ^ (i + 2)) 3) as H1.
+      specialize (H1 (Nat.neq_succ_0 _)).
+      rewrite H1 at 1.
+      rewrite Nat.mul_comm.
+      rewrite Nat.add_sub_swap; [ | apply Nat.le_refl ].
+      rewrite Nat.sub_diag.
+      rewrite Nat.add_0_l.
+      easy.
+    }
+...
+Search (_ / _ * _).
+...
+Search (2 ^ _ * _)%A.
     apply angle_lim_0_le_if with (f := λ i, (3 * θ' - θ')%A) in Hlim'. 2: {
       intros i.
       split. {
