@@ -1062,15 +1062,6 @@ destruct ao. 2: {
       cbn - [ "/" ].
       easy.
     }
-    move Hlim' after Hlim.
-    eapply (angle_lim_eq_compat 2 0) in Hlim'. 2: {
-      intros i.
-      rewrite Nat.add_0_r.
-      rewrite Nat.pow_add_r.
-      cbn - [ "/" ].
-      easy.
-    }
-    apply angle_lim_move_0_r in Hlim.
 ...
 destruct_ac.
 intros Har Hch.
