@@ -1077,14 +1077,19 @@ destruct ao. 2: {
       easy.
     }
 *)
-    apply angle_lim_opp in Hlim'.
-    apply angle_lim_move_0_r in Hlim'.
-    eapply (angle_lim_eq_compat 2 0) in Hlim'. 2: {
+clear Hlim' IHn.
+...
+Search (angle_lim _ _ → _).
+...
+    apply angle_lim_opp in Hlim.
+    apply angle_lim_move_0_r in Hlim.
+    eapply (angle_lim_eq_compat 2 0) in Hlim. 2: {
       intros i.
       rewrite Nat.add_0_r.
       rewrite (angle_sub_opp_r Hop).
       rewrite (angle_add_opp_l Hic).
       rewrite <- (angle_div_2_pow_mul_2_pow (i + 2) θ') at 1.
+...
       rewrite <- angle_mul_sub_distr_r. 2: {
         rewrite Nat.mul_comm.
         now apply Nat.mul_div_le.
