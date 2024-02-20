@@ -1011,13 +1011,27 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-apply angle_lim_move_0_r in Hlim.
-(* ah ouais, mais si ça converge par valeurs inférieures (2π-ε)
-   ou, pire, si les angles oscillent de valeurs supérieures (ε)
-   à valeurs inférieures (2π-ε), ça risque de pas marcher *)
-eapply angle_lim_0_le_if in Hlim. 2: {
-  intros i.
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
+specialize (Hlim' Har Hch n θ' Hiz).
+remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
+symmetry in Hao.
+move Hlim before Hlim'.
+destruct ao. 2: {
+  specialize (Hlim' eq_refl).
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  eapply (angle_lim_eq_compat 0 0) in Hlim'. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite angle_div_2_pow_mul; [ | easy ].
+    rewrite angle_mul_nat_assoc.
+    easy.
+  }
+  apply angle_lim_move_0_r in Hlim.
+  apply angle_lim_move_0_r in Hlim'.
+...
+  eapply angle_lim_0_le_if in Hlim. 2: {
+    intros i.
 Check angle_lim_0_le_if.
 ...
 Theorem seq_angle_decr :
