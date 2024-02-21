@@ -1122,24 +1122,21 @@ destruct ao. 2: {
     }
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
-Definition rngl_seq_diverges dist (u : nat → T) :=
-  ∀ M, ∃ n, (M < dist (u n) (u 0%nat))%L.
-
-  ∃ ε, (0 < ε)%L ∧
-  ∃ n, (ε ≤ dist (u n) (u 0))%L.
-...
-contraire de :
-  ∀ ε f l, (0 < ε)%L
-  → ∃ N : nat, ∀ n : nat, N ≤ n
-  → (dist (f n) l < ε)%L.
-...
-Theorem glop :
-  ∀ f g,
+Definition nat_seq_diverges dist (u : nat → nat) :=
+  ∀ M, ∃ n, M < dist (u n) (u 0).
+Theorem angle_lim_0_diverges_l :
+  ∀ (f : nat → nat) g,
   angle_lim (λ i, (f i * g i)%A) 0
-  → nat_seq_diverges f
+  → nat_seq_diverges abs_diff f
   → angle_lim g 0.
 Proof.
-intros *.
+intros * Hlim Hdiv.
+intros ε Hε.
+specialize (Hlim ε Hε).
+destruct Hlim as (N, HN).
+progress unfold nat_seq_diverges in Hdiv.
+... ...
+apply angle_lim_0_diverges_l in H. 2: {
 ...
 Theorem angle_div_2_pow_sub :
   ∀ n θ1 θ2,
