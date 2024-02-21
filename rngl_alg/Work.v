@@ -1118,8 +1118,8 @@ destruct ao. 2: {
       rewrite <- angle_mul_nat_assoc.
       rewrite <- angle_mul_sub_distr_l.
       rewrite <- angle_div_2_pow_mul; [ | easy ].
-      progress unfold angle_sub.
 ...
+      progress unfold angle_sub.
 Theorem angle_div_2_pow_opp :
   ∀ i θ,
   (- (θ / ₂^i) =
@@ -1130,6 +1130,11 @@ Theorem angle_div_2_pow_opp :
 Proof.
 destruct_ac.
 intros.
+apply eq_angle_eq.
+cbn.
+...
+ mk_angle (rngl_cos (θ / ₂^i)) (- rngl_sin (θ / ₂^i)))%A.
+cbn.
 revert θ.
 induction i; intros; [ easy | ].
 rewrite angle_div_2_pow_succ_r_2.
