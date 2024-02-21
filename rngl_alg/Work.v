@@ -3,6 +3,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
+Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
@@ -1077,6 +1078,68 @@ destruct ao. 2: {
       easy.
     }
 *)
+Search (_ - _)%A.
+Search (angle_lim _ _ → angle_lim _ _ → _).
+Theorem angle_same_lim_sub :
+  ∀ u v θ, angle_lim u θ → angle_lim v θ → angle_lim (λ i, (u i - v i)%A) 0.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hu Hv ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hu Hv.
+apply angle_lim_opp in Hv.
+intros ε Hε.
+    assert (Hε2 : (0 < ε / 2)%L). {
+      apply (rngl_lt_div_r Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      now rewrite (rngl_mul_0_l Hos).
+    }
+    specialize (Hu _ Hε2)%L.
+    specialize (Hv _ Hε2)%L.
+    destruct Hu as (M, HM).
+    destruct Hv as (N, HN).
+    exists (max M N).
+    intros n Hn.
+    specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as H2.
+    rewrite (rngl_add_diag2 Hon) in H2.
+    rewrite (rngl_mul_div Hi1) in H2. 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    rewrite H2.
+Search (angle_eucl_dist (_ - _)).
+...
+eapply angle_same_lim_sub in Hlim'; [ | apply Hlim ].
+cbn - [ "/" ] in Hlim'.
+eapply (angle_lim_eq_compat 0 0) in Hlim'. 2: {
+  intros i.
+  rewrite Nat.add_0_r.
+  rewrite <- angle_mul_nat_assoc.
+  rewrite <- angle_mul_sub_distr_l.
+  rewrite <- angle_div_2_pow_mul; [ | easy ].
+progress unfold angle_sub.
+Search (- (_ / ₂^_))%A.
+Theorem angle_div_2_pow_opp :
+  ∀ i θ, (- (θ / ₂^i) = ((- θ) / ₂^i))%A.
+...
+  rewrite angle_div_2_pow_opp.
+  rewrite <- angle_div_2_pow_add; [ | ... ].
+  rewrite angle_add_opp_r.
+  easy.
+}
+Search (angle_lim (λ _, (_ * (_ / ₂^_)))%A).
+...
+Search ((_ - _) / ₂^_)%A.
+Search (_ * (_ / ₂^_))%A.
+Search (angle_lim (λ _, (_ * _)%A)).
+...
+Search (_ * _ * _)%A.
+Search (_ * _ * (_ / ₂^_))%A.
+...
 clear Hlim' IHn.
 ...
 Search (angle_lim _ _ → _).
