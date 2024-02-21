@@ -1125,16 +1125,19 @@ Print is_limit_when_tending_to_inf.
 Definition nat_seq_diverges dist (u : nat → nat) :=
   ∀ M, ∃ n, M < dist (u n) (u 0).
 Theorem angle_lim_0_diverges_l :
-  ∀ (f : nat → nat) g,
-  angle_lim (λ i, (f i * g i)%A) 0
-  → nat_seq_diverges abs_diff f
-  → angle_lim g 0.
+  ∀ (u : nat → nat) f,
+  angle_lim (λ i, (u i * f i)%A) 0
+  → nat_seq_diverges abs_diff u
+  → angle_lim f 0.
 Proof.
 intros * Hlim Hdiv.
 intros ε Hε.
 specialize (Hlim ε Hε).
 destruct Hlim as (N, HN).
 progress unfold nat_seq_diverges in Hdiv.
+...
+specialize (Hdiv N).
+destruct Hdiv as (n, Hn).
 ... ...
 apply angle_lim_0_diverges_l in H. 2: {
 ...
