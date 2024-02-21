@@ -1168,6 +1168,11 @@ destruct M. {
   destruct b. 2: {
     apply Nat.ltb_ge in Hb.
     flia Hb Hn.
+  }
+  apply Nat.ltb_lt in Hb.
+  destruct Hlim as (N, HN).
+...
+  specialize (HN n).
 ...
 specialize (Hlim (ε / rngl_of_nat M))%L.
 assert (H : (0 < ε / rngl_of_nat M)%L). {
