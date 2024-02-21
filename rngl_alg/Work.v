@@ -1118,8 +1118,39 @@ destruct ao. 2: {
       rewrite <- angle_mul_nat_assoc.
       rewrite <- angle_mul_sub_distr_l.
       rewrite <- angle_div_2_pow_mul; [ | easy ].
+      easy.
+    }
+Print angle_lim.
+Print is_limit_when_tending_to_inf.
+Definition rngl_seq_diverges dist (u : nat → T) :=
+  ∀ M, ∃ n, (M < dist (u n) (u 0%nat))%L.
+
+  ∃ ε, (0 < ε)%L ∧
+  ∃ n, (ε ≤ dist (u n) (u 0))%L.
 ...
+contraire de :
+  ∀ ε f l, (0 < ε)%L
+  → ∃ N : nat, ∀ n : nat, N ≤ n
+  → (dist (f n) l < ε)%L.
+...
+Theorem glop :
+  ∀ f g,
+  angle_lim (λ i, (f i * g i)%A) 0
+  → nat_seq_diverges f
+  → angle_lim g 0.
+Proof.
+intros *.
+...
+Theorem angle_div_2_pow_sub :
+  ∀ n θ1 θ2,
+  angle_add_overflow θ1 (- θ2) = false
+  → ((θ1 - θ2) / ₂^n)%A = (θ1 / ₂^n - θ2 / ₂^n)%A.
+...
+rewrite <- angle_div_2_pow_sub. 2: {
+(* ah mais ça, c'est faux, en fait, parce que θ devrait être
+   égal à 3θ' *)
       progress unfold angle_sub.
+...
 Theorem angle_div_2_pow_opp :
   ∀ i θ,
   (- (θ / ₂^i) =
