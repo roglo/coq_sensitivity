@@ -1118,9 +1118,65 @@ destruct ao. 2: {
       rewrite <- angle_mul_nat_assoc.
       rewrite <- angle_mul_sub_distr_l.
       rewrite <- angle_div_2_pow_mul; [ | easy ].
+      progress unfold angle_sub.
+...
+Theorem angle_div_2_pow_opp :
+  ∀ i θ,
+  (- (θ / ₂^i) =
+     match i with
+     | 0 => -θ
+     | S i' => angle_straight / ₂^i' - θ / ₂^i
+     end)%A.
+Proof.
+destruct_ac.
+intros.
+revert θ.
+induction i; intros; [ easy | ].
+rewrite angle_div_2_pow_succ_r_2.
+rewrite IHi.
+...
+destruct i. {
+  cbn.
+  progress unfold angle_sub.
+Check angle_opp_div_2.
+  rewrite angle_opp_div_2.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz; subst θ.
+  rewrite angle_0_div_2.
+  now rewrite angle_add_0_r.
+}
+
+  apply (angle_eqb_eq Hed) in Htz; subst θ.
+  rewrite angle_0_div_2.
+  rewrite angle_add_0_r.
+  f_equal.
+}
+do 2 rewrite angle_div_2_pow_succ_r_2.
+rewrite IHi.
+cbn.
+rewrite Nat.sub_0_r.
+rewrite angle_opp_div_2.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz; subst θ.
+  rewrite angle_0_div_2.
+  rewrite angle_add_0_r.
+  f_equal.
+  remember (i =? 0) as iz eqn:Hiz.
+  symmetry in Hiz.
+  destruct iz. {
+    apply Nat.eqb_eq in Hiz.
+    subst i.
+    cbn.
+}
+...
 Theorem angle_div_2_pow_opp :
   ∀ i θ, (- (θ / ₂^i) = ((- θ) / ₂^i))%A.
 Proof.
+destruct_ac.
 intros.
 revert θ.
 induction i; intros; [ easy | ].
@@ -1128,7 +1184,13 @@ do 2 rewrite angle_div_2_pow_succ_r_2.
 rewrite IHi.
 f_equal.
 rewrite angle_opp_div_2.
-(* aïe aïe aïe *)
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz. {
+  apply (angle_eqb_eq Hed) in Htz; subst θ.
+  rewrite angle_0_div_2.
+  now rewrite angle_add_0_r.
+}
 ... ...
   rewrite angle_div_2_pow_opp.
   rewrite <- angle_div_2_pow_add; [ | ... ].
