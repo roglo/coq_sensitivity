@@ -1125,16 +1125,64 @@ Print is_limit_when_tending_to_inf.
 Definition nat_seq_diverges dist (u : nat → nat) :=
   ∀ M, ∃ n, M < dist (u n) (u 0).
 Theorem angle_lim_0_diverges_l :
+  rngl_is_archimedean T = true →
   ∀ (u : nat → nat) f,
   angle_lim (λ i, (u i * f i)%A) 0
   → nat_seq_diverges abs_diff u
   → angle_lim f 0.
 Proof.
+destruct_ac.
+intros Har.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hlim Hdiv.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hlim Hdiv.
 intros ε Hε.
+progress unfold nat_seq_diverges in Hdiv.
+Check int_part.
+specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+specialize (H1 (1 / ε)%L).
+destruct H1 as (M, HM).
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+destruct M. {
+  cbn in HM.
+  rewrite rngl_add_0_r in HM.
+  destruct HM as (_, HM).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ _ Hε) in HM.
+  rewrite (rngl_mul_1_l Hon) in HM.
+  specialize (Hlim 1)%L.
+  specialize (rngl_0_lt_1 Hon Hop Hc1 Hor) as H.
+  specialize (Hlim H); clear H.
+  specialize (Hdiv (u 0)).
+  destruct Hdiv as (n, Hn).
+  progress unfold abs_diff in Hn.
+  remember (u 0 <? u n) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. 2: {
+    apply Nat.ltb_ge in Hb.
+    flia Hb Hn.
+...
+specialize (Hlim (ε / rngl_of_nat M))%L.
+assert (H : (0 < ε / rngl_of_nat M)%L). {
+...
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor _ _ Hε).
+  destruct M. {
+    cbn in HM.
+    destruct HM as (_, HM).
+    rewrite rngl_add_0_r in HM.
+    apply (rngl_lt_div_l Hon Hop Hiv Hor _ _ _ Hε) in HM.
+    rewrite (rngl_mul_1_l Hon) in HM.
+...
+specialize (Hdiv (1 / ε)).
 specialize (Hlim ε Hε).
 destruct Hlim as (N, HN).
-progress unfold nat_seq_diverges in Hdiv.
 ...
 specialize (Hdiv N).
 destruct Hdiv as (n, Hn).
