@@ -1123,7 +1123,7 @@ destruct ao. 2: {
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
 Definition nat_seq_diverges (u : nat → nat) :=
-  ∀ M, ∃ N, ∀ n, N ≤ n → M < abs_diff (u n) (u 0).
+  ∀ M, ∃ N, ∀ n, N ≤ n → M < u n.
 
 Theorem angle_lim_0_diverges_l :
   rngl_is_archimedean T = true →
@@ -1147,13 +1147,39 @@ progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 progress unfold nat_seq_diverges in Hdiv.
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-...
 specialize (H1 (1 / ε)%L).
 destruct H1 as (M, HM).
+specialize (Hdiv M).
+destruct Hdiv as (N, HN).
+(**)
+specialize (Hlim (ε - 1)%L).
+assert (H : (0 < ε - 1)%L) by admit. (* faux, mais on va voir... *)
+specialize (Hlim H); clear H.
+(*
+specialize (Hlim ε Hε).
+specialize (Hlim 1%L).
+specialize (Hlim (rngl_0_lt_1 Hon Hop Hc1 Hor)).
+*)
+destruct Hlim as (P, HP).
 rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
 }
+exists (max N P).
+intros n Hn.
+specialize (HN _ (Nat.max_lub_l _ _ _ Hn)).
+specialize (HP _ (Nat.max_lub_r _ _ _ Hn)).
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (u n * f n)).
+}
+...
+rewrite angle_eucl_dist_is_sqrt in HP |-*.
+rewrite angle_sub_0_l in HP |-*.
+cbn in HP |-*.
+...
+Check (Nat.le_max_r _ _ Hn).
+specialize (HP n (Nat.le_max_r _ _ Hn)).
+...
 destruct M. {
   cbn in HM.
   rewrite rngl_add_0_r in HM.
