@@ -1151,27 +1151,36 @@ specialize (H1 (1 / ε)%L).
 destruct H1 as (M, HM).
 specialize (Hdiv M).
 destruct Hdiv as (N, HN).
-(**)
-specialize (Hlim (ε - 1)%L).
-assert (H : (0 < ε - 1)%L) by admit. (* faux, mais on va voir... *)
-specialize (Hlim H); clear H.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+...
 (*
 specialize (Hlim ε Hε).
 specialize (Hlim 1%L).
 specialize (Hlim (rngl_0_lt_1 Hon Hop Hc1 Hor)).
 *)
-destruct Hlim as (P, HP).
-rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-exists (max N P).
-intros n Hn.
-specialize (HN _ (Nat.max_lub_l _ _ _ Hn)).
-specialize (HP _ (Nat.max_lub_r _ _ _ Hn)).
-eapply (rngl_le_lt_trans Hor). {
-  apply (angle_eucl_dist_triangular _ (u n * f n)).
-}
+(**)
+destruct (rngl_lt_dec Hor 1 ε) as [Hε1| Hε1]. {
+  specialize (Hlim (ε - 1)%L) as H1.
+  assert (H : (0 < ε - 1)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (H1 H); clear H.
+  destruct H1 as (P, HP).
+  exists (max N P).
+  intros n Hn.
+  specialize (HN _ (Nat.max_lub_l _ _ _ Hn)) as H2.
+  specialize (HP _ (Nat.max_lub_r _ _ _ Hn)) as H3.
+  eapply (rngl_le_lt_trans Hor). {
+    apply (angle_eucl_dist_triangular _ (u n * f n)).
+  }
+  replace ε with (1 + (ε - 1))%L. 2: {
+    rewrite rngl_add_comm.
+    apply (rngl_sub_add Hop).
+  }
+  apply (rngl_add_le_lt_mono Hop Hor); [ | easy ].
+
+  rewrite angle_eucl_dist_is_sqrt.
 ...
 rewrite angle_eucl_dist_is_sqrt in HP |-*.
 rewrite angle_sub_0_l in HP |-*.
