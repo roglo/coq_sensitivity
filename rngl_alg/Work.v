@@ -1197,6 +1197,7 @@ destruct (rngl_lt_dec Hor 1 ε) as [Hε1| Hε1]. {
   }
 ...
   rewrite angle_eucl_dist_is_sqrt.
+  rewrite angle_sub_0_l; cbn.
 ...
 rewrite angle_eucl_dist_is_sqrt in HP |-*.
 rewrite angle_sub_0_l in HP |-*.
