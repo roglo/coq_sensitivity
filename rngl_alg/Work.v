@@ -1122,13 +1122,14 @@ destruct ao. 2: {
     }
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
-Definition nat_seq_diverges dist (u : nat → nat) :=
-  ∀ M, ∃ n, M < dist (u n) (u 0).
+Definition nat_seq_diverges (u : nat → nat) :=
+  ∀ M, ∃ N, ∀ n, N ≤ n → M < abs_diff (u n) (u 0).
+
 Theorem angle_lim_0_diverges_l :
   rngl_is_archimedean T = true →
   ∀ (u : nat → nat) f,
   angle_lim (λ i, (u i * f i)%A) 0
-  → nat_seq_diverges abs_diff u
+  → nat_seq_diverges u
   → angle_lim f 0.
 Proof.
 destruct_ac.
