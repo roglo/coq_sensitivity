@@ -876,6 +876,17 @@ specialize (HN _ (Nat.max_lub_r _ _ _ Hn)).
 now apply (rngl_add_lt_compat Hop Hor).
 Qed.
 
+Theorem angle_sub_mul_l_diag_r :
+  ∀ n θ, n ≠ 0 → (n * θ - θ)%A = ((n - 1) * θ)%A.
+Proof.
+intros * Hnz.
+rewrite angle_mul_sub_distr_r. 2: {
+  apply Nat.le_succ_l.
+  now apply Nat.neq_0_lt_0.
+}
+now rewrite angle_mul_1_l.
+Qed.
+
 (* to be completed, mais chais pas
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -1130,18 +1141,19 @@ Theorem angle_lim_0_diverges_l :
   ∀ (u : nat → nat) f,
   angle_lim (λ i, (u i * f i)%A) 0
   → nat_seq_diverges u
+  → (∀ i, angle_mul_nat_overflow (u i) (f i) = false)
   → angle_lim f 0.
 Proof.
 destruct_ac.
 intros Har.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlim Hdiv.
+  intros * Hlim Hdiv Hnov.
   intros ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros * Hlim Hdiv.
+intros * Hlim Hdiv Hnov.
 intros ε Hε.
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
@@ -1151,11 +1163,10 @@ specialize (H1 (1 / ε)%L).
 destruct H1 as (M, HM).
 specialize (Hdiv M).
 destruct Hdiv as (N, HN).
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
 }
-...
 (*
 specialize (Hlim ε Hε).
 specialize (Hlim 1%L).
@@ -1179,7 +1190,12 @@ destruct (rngl_lt_dec Hor 1 ε) as [Hε1| Hε1]. {
     apply (rngl_sub_add Hop).
   }
   apply (rngl_add_le_lt_mono Hop Hor); [ | easy ].
-
+  rewrite angle_eucl_dist_move_0_l.
+  rewrite angle_sub_mul_l_diag_r. 2: {
+    intros H.
+    now rewrite H in H2.
+  }
+...
   rewrite angle_eucl_dist_is_sqrt.
 ...
 rewrite angle_eucl_dist_is_sqrt in HP |-*.
