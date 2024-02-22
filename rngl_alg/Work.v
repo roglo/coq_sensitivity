@@ -1142,9 +1142,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hlim Hdiv.
 intros ε Hε.
+progress unfold angle_lim in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
 progress unfold nat_seq_diverges in Hdiv.
-Check int_part.
 specialize (int_part Hon Hop Hc1 Hor Har) as H1.
+...
 specialize (H1 (1 / ε)%L).
 destruct H1 as (M, HM).
 rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
