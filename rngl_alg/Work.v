@@ -908,6 +908,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 (**)
+progress unfold seq_angle_to_div_nat.
+Check angle_add_overflow_mul_div_2_pow.
+...
 destruct m. {
   rewrite angle_mul_0_l.
   apply (angle_add_overflow_0_r Hon Hos).
