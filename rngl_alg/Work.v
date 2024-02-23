@@ -887,7 +887,7 @@ rewrite angle_mul_sub_distr_r. 2: {
 now rewrite angle_mul_1_l.
 Qed.
 
-(* to be completed, mais chais pas
+(* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
@@ -907,10 +907,17 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
+(**)
+destruct m. {
+  rewrite angle_mul_0_l.
+  apply (angle_add_overflow_0_r Hon Hos).
+}
+destruct m. {
+  rewrite angle_mul_1_l.
+  apply angle_add_overflow_diag.
+...
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
-(**)
-...
 rewrite <- angle_mul_succ_l.
 progress unfold seq_angle_to_div_nat.
 progress unfold angle_leb.
