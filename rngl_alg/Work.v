@@ -300,18 +300,18 @@ assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 progress unfold angle_leb.
-remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
+remember (seq_angle_to_div_nat θ n) as u eqn:Hu.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
 symmetry in Hzs.
 rewrite Hu in Hzs.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+progress unfold seq_angle_to_div_nat in Hzs.
 rewrite Hzs.
 destruct zs. {
   apply rngl_leb_le in Hzs.
   remember (0 ≤? rngl_sin (u i + u i))%L as zsm eqn:Hzsm.
   symmetry in Hzsm.
   rewrite Hu in Hzsm.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  progress unfold seq_angle_to_div_nat in Hzsm.
   rewrite Hzsm.
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
@@ -322,12 +322,12 @@ destruct zs. {
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+  progress unfold seq_angle_to_div_nat in Hx.
   rewrite <- Hx.
   destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
     destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
       rewrite Hu in Hxz.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+      progress unfold seq_angle_to_div_nat in Hxz.
       apply eq_rngl_sin_0 in Hxz.
       destruct Hxz as [Hxz| Hxz]. {
         rewrite Hxz in Hx; cbn in Hx; subst x.
@@ -372,7 +372,7 @@ destruct zs. {
     }
     exfalso.
     rewrite Hu in Hxz.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+    progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -892,8 +892,8 @@ Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
   → angle_add_overflow
-      (2 ^ i / n * (θ / ₂^i))
-      (m * (2 ^ i / n * (θ / ₂^i))) =
+      (seq_angle_to_div_nat θ n i)
+      (m * seq_angle_to_div_nat θ n i) =
       false.
 Proof.
 destruct_ac.
@@ -901,14 +901,18 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros.
+  progress unfold seq_angle_to_div_nat.
   rewrite (H1 (_ * _)%A).
   apply angle_add_overflow_0_l.
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
-rewrite <- angle_mul_succ_l.
 apply angle_ltb_ge.
+(**)
+...
+rewrite <- angle_mul_succ_l.
+progress unfold seq_angle_to_div_nat.
 progress unfold angle_leb.
 (*
 do 2 rewrite rngl_cos_nx.
@@ -917,18 +921,18 @@ remember (rngl_cos (θ / ₂^i)) as c eqn:Hc.
 remember (rngl_sin (θ / ₂^i)) as s eqn:Hs.
 ...
 *)
-remember (seq_angle_converging_to_angle_div_nat θ n) as u eqn:Hu.
+remember (seq_angle_to_div_nat θ n) as u eqn:Hu.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
 symmetry in Hzs.
 rewrite Hu in Hzs.
-progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+progress unfold seq_angle_to_div_nat in Hzs.
 rewrite Hzs.
 destruct zs. {
   apply rngl_leb_le in Hzs.
   remember (0 ≤? rngl_sin (S m * u i))%L as zsm eqn:Hzsm.
   symmetry in Hzsm.
   rewrite Hu in Hzsm.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  progress unfold seq_angle_to_div_nat in Hzsm.
   rewrite Hzsm.
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
@@ -983,13 +987,13 @@ Search ((if _ then _ else _) = (if _ then _ else _)).
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+  progress unfold seq_angle_to_div_nat in Hx.
   rewrite <- Hx.
 ...
   destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
     destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
       rewrite Hu in Hxz.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+      progress unfold seq_angle_to_div_nat in Hxz.
       apply eq_rngl_sin_0 in Hxz.
       destruct Hxz as [Hxz| Hxz]. {
         rewrite Hxz in Hx; cbn in Hx; subst x.
@@ -1034,7 +1038,7 @@ Search ((if _ then _ else _) = (if _ then _ else _)).
     }
     exfalso.
     rewrite Hu in Hxz.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+    progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -1066,7 +1070,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow' :
   rngl_characteristic T = 0 →
   ∀ n θ θ',
   n ≠ 0
-  → angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  → angle_lim (seq_angle_to_div_nat θ n) θ'
   → θ = (n * θ')%A.
 Proof.
 destruct_ac.
@@ -1083,8 +1087,8 @@ symmetry in Hao.
 move Hlim before Hlim'.
 destruct ao. 2: {
   specialize (Hlim' eq_refl).
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  progress unfold seq_angle_to_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim'.
   eapply (angle_lim_eq_compat 0 0) in Hlim'. 2: {
     intros i.
     rewrite Nat.add_0_r.
@@ -1399,7 +1403,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hiz Hlim.
 revert θ θ' Hlim.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+progress unfold seq_angle_to_div_nat in Hlim.
 induction n as (n, IHn) using lt_wf_rec; intros.
 destruct n; [ easy | clear Hiz ].
 destruct n. {
@@ -1454,7 +1458,7 @@ destruct ao. {
   exfalso; apply Hao; clear Hao.
 Theorem seq_angle_not_mul_overflow :
   ∀ n u θ θ',
-  u = seq_angle_converging_to_angle_div_nat θ n
+  u = seq_angle_to_div_nat θ n
   → angle_lim u θ'
   → ∀ i, angle_mul_nat_overflow n (u i) = false.
 Proof.
@@ -1470,7 +1474,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hu Hlim i.
 rewrite Hu.
-progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_to_div_nat.
 destruct (lt_dec (2 ^ i) n) as [Hni| Hni]. {
   rewrite Nat.div_small; [ | easy ].
   rewrite angle_mul_0_l.
@@ -1546,8 +1550,8 @@ destruct n. {
   remember (0 ≤? rngl_sin (u i + u i))%L as zsm eqn:Hzsm.
   symmetry in Hzs, Hzsm.
   rewrite Hu in Hzs, Hzsm.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+  progress unfold seq_angle_to_div_nat in Hzs.
+  progress unfold seq_angle_to_div_nat in Hzsm.
   rewrite Hzs, Hzsm.
   destruct zs. {
     apply rngl_leb_le in Hzs.
@@ -1560,12 +1564,12 @@ destruct n. {
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
     rewrite Hu in Hx.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+    progress unfold seq_angle_to_div_nat in Hx.
     rewrite <- Hx.
     destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
       destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
         rewrite Hu.
-        progress unfold seq_angle_converging_to_angle_div_nat.
+        progress unfold seq_angle_to_div_nat.
         apply eq_rngl_sin_0.
         destruct Hxz as [Hxz| Hxz]. {
           rewrite Hxz in Hx; cbn in Hx; subst x.
@@ -1588,7 +1592,7 @@ destruct n. {
       }
       exfalso.
       rewrite Hu in Hxz.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+      progress unfold seq_angle_to_div_nat in Hxz.
       apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
       apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -1629,8 +1633,8 @@ destruct n. {
     remember (0 ≤? rngl_sin (u i + u i))%L as zsm eqn:Hzsm.
     symmetry in Hzs, Hzsm.
     rewrite Hu in Hzs, Hzsm.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+    progress unfold seq_angle_to_div_nat in Hzs.
+    progress unfold seq_angle_to_div_nat in Hzsm.
     rewrite Hzs, Hzsm.
     destruct zs. {
       apply rngl_leb_le in Hzs.
@@ -1643,12 +1647,12 @@ destruct n. {
       apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
       remember (rngl_cos (u i)) as x eqn:Hx.
       rewrite Hu in Hx.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hx.
+      progress unfold seq_angle_to_div_nat in Hx.
       rewrite <- Hx in Hzsm |-*.
       destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
         destruct (rngl_eq_dec Hed (rngl_sin (u i)) 0) as [Hxz| Hxz]. {
           rewrite Hu in Hxz.
-          progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+          progress unfold seq_angle_to_div_nat in Hxz.
           apply eq_rngl_sin_0 in Hxz.
           destruct Hxz as [Hxz| Hxz]. {
             rewrite Hxz in Hx; cbn in Hx; subst x.
@@ -1674,7 +1678,7 @@ destruct n. {
         }
         exfalso.
         rewrite Hu in Hxz.
-        progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+        progress unfold seq_angle_to_div_nat in Hxz.
         apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
         apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
           apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -1767,8 +1771,8 @@ remember (u i) as θ1 eqn:Hθ1.
       progress sin_cos_add_sub_straight_hyp T Hzcu.
 ...
       rewrite Hu in Hzcu, Hzs.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
-      progress unfold seq_angle_converging_to_angle_div_nat in Hzs.
+      progress unfold seq_angle_to_div_nat in Hzcu.
+      progress unfold seq_angle_to_div_nat in Hzs.
       destruct i; [ cbn in Hni; flia Hni | ].
       destruct i; [ cbn in Hni; flia Hni | ].
       remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ1 eqn:H1.
@@ -1858,7 +1862,7 @@ apply (rngl_mul_pos_neg Hop Hor Hid).
         exfalso.
         clear H1 H2 Hmi.
         rewrite Hu in Hzcu.
-        progress unfold seq_angle_converging_to_angle_div_nat in Hzcu.
+        progress unfold seq_angle_to_div_nat in Hzcu.
         destruct i; [ cbn in Hni; flia Hni | ].
         destruct i; [ cbn in Hni; flia Hni | ].
         apply angle_div_2_pow_mul_nat_if in Hzcu.
@@ -1897,7 +1901,7 @@ apply (rngl_mul_pos_neg Hop Hor Hid).
       }
       apply (rngl_nle_gt Hor) in Hzcu.
 rewrite Hu.
-progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_to_div_nat.
 ...
 remember (0 ≤? 1)%L as b eqn:Hb.
 symmetry in Hb.
@@ -1977,7 +1981,7 @@ destruct zs. {
           rewrite Hxz in Hx; cbn in Hx; subst x.
           exfalso; clear H1 H2 Hzs.
           rewrite Hu in Hxz.
-          progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+          progress unfold seq_angle_to_div_nat in Hxz.
           destruct i; [ cbn in Hni; flia Hni | ].
           rewrite angle_div_2_pow_succ_r_1 in Hxz.
           rewrite angle_mul_nat_div_2 in Hxz.
@@ -2021,7 +2025,7 @@ destruct zs. {
             rewrite Hxz in Hx; cbn in Hx; subst x.
             exfalso; clear H1 H2 Hzs.
             rewrite Hu in Hxz.
-            progress unfold seq_angle_converging_to_angle_div_nat in Hxz.
+            progress unfold seq_angle_to_div_nat in Hxz.
             destruct i; [ cbn in Hni; flia Hni | ].
             rewrite angle_div_2_pow_succ_r_1 in Hxz.
             rewrite angle_mul_nat_div_2 in Hxz.
@@ -2050,7 +2054,7 @@ destruct zs. {
     }
     destruct m; [ clear Hmi | flia Hmi ].
 (* ui = 2π/3 + ε ⇒ 3ui = 3ε ⇒ marche pas *)
-progress unfold seq_angle_converging_to_angle_div_nat in Hu.
+progress unfold seq_angle_to_div_nat in Hu.
 (* oui, mais est-ce que ui peut être égal à 2π/3+ε ? Si ça se
    trouve, non ! *)
 ...
@@ -2157,7 +2161,7 @@ apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
         }
 *)
         rewrite Hu in Hzc.
-        progress unfold seq_angle_converging_to_angle_div_nat in Hzc.
+        progress unfold seq_angle_to_div_nat in Hzc.
         destruct i. {
           cbn in Hzc.
           destruct n; [ easy | ].
@@ -2276,7 +2280,7 @@ cbn in Hc.
 ...
         clear Hzs.
         rewrite Hu in Hzsm.
-        progress unfold seq_angle_converging_to_angle_div_nat in Hzsm.
+        progress unfold seq_angle_to_div_nat in Hzsm.
         cbn - [ Nat.pow "*"%A ] in Hzsm.
         rewrite Hzc in Hzsm.
         destruct m. {
@@ -2475,7 +2479,7 @@ apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy. (* ça dépend *)
 ...
 Theorem angle_lim_seq_angle_not_mul_overflow :
   ∀ n θ θ',
-  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  angle_lim (seq_angle_to_div_nat θ n) θ'
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
@@ -2486,7 +2490,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (angle_mul_nat_overflow_0_r Hon Hos).
 }
 intros * Hlim.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+progress unfold seq_angle_to_div_nat in Hlim.
 apply (angle_all_add_not_overflow n θ').
 intros m Hm.
 progress unfold angle_add_overflow.
@@ -2568,11 +2572,11 @@ assert (Htt : (θ' ≤ θ)%A). {
     now rewrite angle_eucl_dist_diag.
   }
   intros.
-Theorem seq_angle_converging_to_angle_div_nat_le :
+Theorem seq_angle_to_div_nat_le :
   ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
 Proof.
 ... ...
-  apply seq_angle_converging_to_angle_div_nat_le.
+  apply seq_angle_to_div_nat_le.
 }
 ...
       specialize (Hlim (angle_eucl_dist θ' 0)).
@@ -2601,9 +2605,9 @@ eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply angle_add_overflow_le_lemma_4 with (θ2 := (m * θ')%A); try easy.
 apply quadrant_1_rngl_cos_add_le_cos_l.
-Check seq_angle_converging_to_angle_div_nat_le.
+Check seq_angle_to_div_nat_le.
 ... ...
-Theorem seq_angle_converging_to_angle_div_nat_le :
+Theorem seq_angle_to_div_nat_le :
   ∀ i n θ, (2 ^ i / n * (θ / ₂^i) ≤ θ)%A.
 Proof.
 destruct_ac.
@@ -2757,7 +2761,7 @@ destruct n. {
 Search (_ * _ ≤ _ * _)%A.
 ...
 Show.
-Check seq_angle_converging_to_angle_div_nat_le.
+Check seq_angle_to_div_nat_le.
 Search (_ → angle_mul_nat_overflow _ _ = false).
 ...
 (*
@@ -2899,8 +2903,8 @@ now apply angle_lim_seq_angle_not_mul_overflow in Hlim.
 ... ...
 destruct ao. 2: {
   specialize (Hlim' eq_refl).
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  progress unfold seq_angle_to_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim'.
   set (θi := λ i, (2 ^ i / n * (θ / ₂^i))%A).
   set (θ'i := λ i, (2 ^ i / n * (n * θ' / ₂^i))%A).
   progress fold θi in Hlim.
@@ -2917,7 +2921,7 @@ destruct ao. 2: {
   apply Bool.not_false_iff_true in Hao.
   exfalso; apply Hao; clear Hao Hlim'.
 (**)
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim.
 ...
 Theorem glop :
   ∀ n θ u,
@@ -2944,7 +2948,7 @@ clear Hlim Hiz.
 induction n; [ easy | ].
 cbn - [ div ].
 destruct n; [ easy | ].
-set (u := seq_angle_converging_to_angle_div_nat θ).
+set (u := seq_angle_to_div_nat θ).
 cbn in IHn.
 destruct n. {
   clear IHn.
@@ -2954,7 +2958,7 @@ destruct n. {
   split; [ | easy ].
   apply angle_add_diag_not_overflow; [ easy | ].
   progress unfold u; cbn - [ div ].
-  progress unfold seq_angle_converging_to_angle_div_nat.
+  progress unfold seq_angle_to_div_nat.
   induction i. {
     cbn.
     apply (angle_straight_pos Hc1).
@@ -3014,8 +3018,8 @@ Search (_ ≤ _ + _)%L.
 Search (_ → angle_add_overflow _ _ = false).
 Theorem glip :
   ∀ θ i,
-  angle_add_overflow (seq_angle_converging_to_angle_div_nat θ 2 i)
-    (seq_angle_converging_to_angle_div_nat θ 2 i) = false.
+  angle_add_overflow (seq_angle_to_div_nat θ 2 i)
+    (seq_angle_to_div_nat θ 2 i) = false.
 Proof.
 destruct_ac.
 intros.
@@ -3024,12 +3028,12 @@ induction i. {
   apply (angle_add_overflow_0_r Hon Hos).
 }
 cbn - [ div ].
-Theorem seq_angle_converging_to_angle_div_nat_succ_r :
+Theorem seq_angle_to_div_nat_succ_r :
   ∀ θ n i,
-  seq_angle_converging_to_angle_div_nat θ n (S i) = 0%A.
+  seq_angle_to_div_nat θ n (S i) = 0%A.
 Proof.
 intros.
-progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_to_div_nat.
 cbn.
 rewrite Nat.add_0_r.
 Search ((_ + _) / _).
@@ -3044,13 +3048,13 @@ Search ((_ + _) / _).
     rewrite angle_add_0_r.
     rewrite Bool.orb_false_r.
     clear IHn.
-    progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+    progress unfold seq_angle_to_div_nat in Hlim.
     progress unfold angle_lim in Hlim.
     progress unfold is_limit_when_tending_to_inf in Hlim.
 ...
   rewrite (angle_mul_nat_overflow_succ_l_false Hon Hos).
 ...
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim.
   progress unfold angle_lim in Hlim.
   progress unfold is_limit_when_tending_to_inf in Hlim.
 *)
@@ -3059,8 +3063,8 @@ Search ((_ + _) / _).
   specialize (Hlim' eq_refl).
   move Hao before Hiz.
 (**)
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim'.
+  progress unfold seq_angle_to_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim'.
   set (θi := λ i, (2 ^ i / n * (θ / ₂^i))%A).
   set (θ'i := λ i, (2 ^ i / n * (n * θ / ₂^i))%A).
   progress fold θi in Hlim.
@@ -3087,7 +3091,7 @@ Search ((_ + _) / _).
   }
   clear Hlim'; rename H into Hlim'.
 ...
-  set (u := seq_angle_converging_to_angle_div_nat) in Hlim, Hlim'.
+  set (u := seq_angle_to_div_nat) in Hlim, Hlim'.
   assert (H :
     ∀ ε, (0 < ε)%L →
     ∃ N, ∀ p, N ≤ p → (angle_eucl_dist (u θ n p) (u (n * θ')%A n p) < ε)%L). {
@@ -3132,7 +3136,7 @@ Search ((_ + _) / _).
     specialize (HN N (Nat.le_refl _)).
     rewrite <- Hdt in HN.
     progress unfold u in HN.
-    progress unfold seq_angle_converging_to_angle_div_nat in HN.
+    progress unfold seq_angle_to_div_nat in HN.
 ...
   remember (θ =? n * θ')%A as tt eqn:Htt.
   symmetry in Htt.
@@ -3165,7 +3169,7 @@ Search (_ <? _)%A.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 progress unfold is_angle_limit_when_tending_to_inf in Hlim.
 progress unfold is_gen_limit_when_tending_to_inf in Hlim.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+progress unfold seq_angle_to_div_nat in Hlim.
 assert
   (H :
     ∀ ε : T, (0 < ε)%L →
@@ -3213,7 +3217,7 @@ clear Hiz.
 destruct i. {
   clear IHi; cbn.
   rewrite angle_add_0_r.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim.
   assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) θ'). {
     intros ε Hε.
     specialize (Hlim ε Hε).
@@ -3241,7 +3245,7 @@ specialize (IHi (Nat.neq_succ_0 _)).
 destruct i. {
   clear IHi; cbn.
   rewrite angle_add_0_r.
-  progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+  progress unfold seq_angle_to_div_nat in Hlim.
   assert (H : is_angle_limit_when_tending_to_inf (λ _, θ) (2 * θ')%A). {
     intros ε Hε.
 enough (H2ε : (0 < 2 * ε)%L).
@@ -3275,8 +3279,8 @@ remember (S n) as sn; cbn; subst sn.
 rewrite (angle_add_comm Hic).
 apply (angle_sub_move_r Hic).
 apply IHn.
-progress unfold seq_angle_converging_to_angle_div_nat.
-progress unfold seq_angle_converging_to_angle_div_nat in Hlim.
+progress unfold seq_angle_to_div_nat.
+progress unfold seq_angle_to_div_nat in Hlim.
 ...
 Search (rngl_of_nat _ = 0%L).
   rewrite rngl_of_nat_succ.
@@ -3301,7 +3305,7 @@ specialize (rat_is_inf_sum_of_inv_rad_pow Hic Hon Hop Hiv Har) as H1.
 specialize (H1 2 1 n (le_refl _) Hnz).
 progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold seq_converging_to_rat in H1.
-progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_to_div_nat.
 Search angle_dist.
 ...
 progress unfold angle_lt in Hα.
@@ -3447,10 +3451,10 @@ now apply (rngl_add_lt_compat Hop Hor).
 Qed.
 
 (* to be completed
-Theorem seq_angle_converging_to_angle_div_nat_is_Cauchy :
+Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
   is_Cauchy_sequence angle_eucl_dist
-    (seq_angle_converging_to_angle_div_nat θ n).
+    (seq_angle_to_div_nat θ n).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3464,7 +3468,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 set (u := λ i, (2 ^ i / n * angle_div_2_pow θ i)%A).
 apply Cauchy_sin_cos_Cauchy_angle. {
-  progress unfold seq_angle_converging_to_angle_div_nat.
+  progress unfold seq_angle_to_div_nat.
   enough (H :
     ∀ ε, (0 < ε)%L →
     ∃ N : nat,
@@ -3516,7 +3520,7 @@ apply Cauchy_sin_cos_Cauchy_angle. {
 }
 intros ε Hε.
 ...
-set (u := seq_angle_converging_to_angle_div_nat θ n).
+set (u := seq_angle_to_div_nat θ n).
 ...
 
 Theorem all_gc_has_nth_root :
@@ -3537,8 +3541,8 @@ specialize (H1 ρ θ eq_refl eq_refl).
 set (ρ' := rl_nth_root n ρ).
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as H2.
 specialize (H2 Har Hch).
-remember (seq_angle_converging_to_angle_div_nat θ n) as θi eqn:Hθi.
-progress unfold seq_angle_converging_to_angle_div_nat in Hθi.
+remember (seq_angle_to_div_nat θ n) as θi eqn:Hθi.
+progress unfold seq_angle_to_div_nat in Hθi.
 ...
 set (θ' := angle_div_nat θ n).
 exists (mk_gc (ρ' * cos θ') (ρ' * sin θ')).

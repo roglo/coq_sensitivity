@@ -1604,7 +1604,7 @@ Compute (
 *)
 
 (* θ / 2^i * (2^i / n) *)
-Definition seq_angle_converging_to_angle_div_nat θ (n i : nat) :=
+Definition seq_angle_to_div_nat θ (n i : nat) :=
   ((2 ^ i / n) * angle_div_2_pow θ i)%A.
 
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
@@ -4233,7 +4233,7 @@ Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow :
   ∀ n θ,
   n ≠ 0
   → angle_mul_nat_overflow n θ = false
-  → angle_lim (seq_angle_converging_to_angle_div_nat (n * θ) n) θ.
+  → angle_lim (seq_angle_to_div_nat (n * θ) n) θ.
 Proof.
 destruct_ac.
 intros Har Hch.
@@ -4249,7 +4249,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 assert (H02 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
 intros * Hnz Haov.
-progress unfold seq_angle_converging_to_angle_div_nat.
+progress unfold seq_angle_to_div_nat.
 enough (H : angle_lim (λ i, (2 ^ i mod n * angle_div_2_pow θ i))%A 0%A). {
   progress unfold angle_lim.
   progress unfold is_limit_when_tending_to_inf.
@@ -6063,7 +6063,7 @@ Qed.
 
 Theorem angle_lim_seq_angle_le :
   ∀ n θ θ',
-  angle_lim (seq_angle_converging_to_angle_div_nat θ n) θ'
+  angle_lim (seq_angle_to_div_nat θ n) θ'
   → (θ' ≤ angle_straight)%A
   → (θ' ≤ θ)%A.
 Proof.
