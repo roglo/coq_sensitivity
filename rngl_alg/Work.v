@@ -922,53 +922,38 @@ destruct m. {
 specialize angle_div_2_pow_mul_le_angle as H1.
 specialize (H1 (2 ^ S i / n) i (θ / ₂)%A).
 assert (H : 2 ^ S i / n ≤ 2 ^ i). {
+clear - Hni Hmi.
+  destruct n; [ easy | ].
+  destruct n; [ flia Hmi Hni | ].
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 0 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 1 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 3 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 7 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 15 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
   destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+    cbn in Hni.
     do 31 (destruct n; [ cbn; flia | ]).
-    rewrite (Nat_div_less_small 1); [ flia | ].
-    flia Hni.
+    rewrite (Nat_div_less_small 1); cbn; [ flia | flia Hni ].
   }
 ...
     destruct i. {
