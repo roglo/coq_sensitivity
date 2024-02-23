@@ -914,7 +914,15 @@ destruct m. {
 }
 destruct m. {
   rewrite angle_mul_1_l.
-  apply angle_add_overflow_diag.
+  apply angle_add_overflow_diag. 2: {
+Search seq_angle_to_div_nat.
+    progress unfold seq_angle_to_div_nat.
+    destruct i. {
+      cbn in Hni.
+      now apply Nat.nlt_ge in Hni.
+    }
+    rewrite angle_div_2_pow_succ_r_1.
+    rewrite angle_mul_nat_div_2. 2: {
 ...
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
