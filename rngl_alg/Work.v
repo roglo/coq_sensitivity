@@ -907,10 +907,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
-(**)
-progress unfold seq_angle_to_div_nat.
-Check angle_add_overflow_mul_div_2_pow.
-...
 destruct m. {
   rewrite angle_mul_0_l.
   apply (angle_add_overflow_0_r Hon Hos).
@@ -923,6 +919,70 @@ destruct m. {
       cbn in Hni.
       now apply Nat.nlt_ge in Hni.
     }
+specialize angle_div_2_pow_mul_le_angle as H1.
+specialize (H1 (2 ^ S i / n) i (θ / ₂)%A).
+assert (H : 2 ^ S i / n ≤ 2 ^ i). {
+  destruct i. {
+    cbn in Hni.
+    replace n with 2 by flia Hmi Hni.
+    easy.
+  }
+  destruct i. {
+    cbn in Hni |-*.
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    flia Hni.
+  }
+  destruct i. {
+    cbn in Hni |-*.
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    rewrite (Nat_div_less_small 1); [ flia | ].
+    flia Hni.
+  }
+  destruct i. {
+    cbn in Hni |-*.
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    rewrite (Nat_div_less_small 1); [ flia | ].
+    flia Hni.
+  }
+  destruct i. {
+    cbn in Hni |-*.
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    rewrite (Nat_div_less_small 1); [ flia | ].
+    flia Hni.
+  }
+...
     destruct i. {
       cbn.
       destruct n; [ easy | clear Hnz ].
