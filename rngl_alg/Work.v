@@ -950,94 +950,21 @@ destruct m. {
   specialize angle_div_2_pow_mul_le_angle as H1.
   specialize (H1 (3 * (2 ^ S i / n)) (S i) θ).
   assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ S i). {
-clear - Hmi.
-destruct n; [ flia Hmi | ].
-apply Nat.succ_lt_mono in Hmi.
-destruct n; [ flia Hmi | ].
-apply Nat.succ_lt_mono in Hmi.
-destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
-(**)
-remember (2 ^ S i) as j eqn:Hj.
-clear i Hj.
-destruct j; [ easy | ].
-destruct j; [ easy | ].
-destruct j; [ easy | ].
-destruct j; [ now destruct n | ].
-destruct j. {
-  do 1 (destruct n; [ cbn; flia | ]).
-  destruct n; [ cbn; flia | easy ].
-}
-destruct j. {
-  do 2 (destruct n; [ cbn; flia | ]).
-  destruct n; [ cbn; flia | easy ].
-}
-destruct j. {
-  do 3 (destruct n; [ cbn; flia | ]).
-  destruct n; [ cbn; flia | easy ].
-}
-destruct j. {
-  do 4 (destruct n; [ cbn; flia | ]).
-  destruct n; [ cbn; flia | easy ].
-}
-destruct j. {
-  do 5 (destruct n; [ cbn; flia | ]).
-  destruct n; [ cbn; flia | easy ].
-}
-...
-destruct (lt_dec (2 ^ S i) (S (S (S n)))) as [Hin| Hni]. {
-  rewrite Nat.div_small; [ | easy ].
-  now rewrite Nat.mul_0_r.
-}
-apply Nat.nlt_ge in Hni.
-destruct (lt_dec (2 ^ S i) (2 * S (S (S n)))) as [Hin| Hni']. {
-  rewrite (Nat_div_less_small 1). 2: {
-    split; [ | easy ].
-    now rewrite Nat.mul_1_l.
-  }
-  rewrite Nat.mul_1_r.
-  destruct i; [ cbn in Hni; flia Hni | ].
-  rewrite Nat.pow_succ_r; [ | easy ].
-  rewrite Nat.pow_succ_r; [ | easy ].
-  rewrite Nat.mul_assoc.
-  replace (2 * 2) with 4 by easy.
-  rewrite <- (Nat.mul_1_r 3) at 1.
-  apply Nat.mul_le_mono; [ flia | ].
-  apply Nat.le_succ_l.
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-apply Nat.nlt_ge in Hni'.
-...
-destruct i. {
-  do 0 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  do 2 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  do 6 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  do 14 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  do 30 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-...
-    apply Nat.div_le_upper_bound; [ easy | ].
-    rewrite Nat.pow_succ_r; [ | easy ].
-    apply Nat.mul_le_mono_r.
-    now do 2 apply -> Nat.succ_le_mono.
+    clear - Hmi.
+    destruct n; [ flia Hmi | ].
+    apply Nat.succ_lt_mono in Hmi.
+    destruct n; [ flia Hmi | ].
+    apply Nat.succ_lt_mono in Hmi.
+    destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
+    remember (2 ^ S i) as j eqn:Hj.
+    clear i Hj.
+    eapply le_trans; [ | now apply (Nat.mul_div_le _ 3) ].
+    apply Nat.mul_le_mono_l.
+    apply Nat.div_le_compat_l.
+    split; [ easy | ].
+    now do 3 apply -> Nat.succ_le_mono.
   }
   specialize (H1 H); clear H.
-  rewrite <- angle_div_2_pow_succ_r_2 in H1.
-  rewrite <- angle_mul_nat_assoc in H1.
-  remember (2 ^ S i / n * (θ / ₂^S i))%A as θ1.
 ...
   cbn; rewrite angle_add_0_r.
 ...
