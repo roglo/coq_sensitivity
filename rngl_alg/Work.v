@@ -957,25 +957,27 @@ destruct n; [ flia Hmi | ].
 apply Nat.succ_lt_mono in Hmi.
 destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
 (**)
-destruct i. {
-  do 0 (destruct n; [ cbn; flia | ]).
-  rewrite Nat.div_small; [ easy | cbn; flia ].
+destruct (lt_dec (2 ^ S i) (S (S (S n)))) as [Hin| Hni]. {
+  rewrite Nat.div_small; [ | easy ].
+  now rewrite Nat.mul_0_r.
 }
+apply Nat.nlt_ge in Hni.
+destruct i; [ easy | ].
 destruct i. {
   do 2 (destruct n; [ cbn; flia | ]).
-  rewrite Nat.div_small; [ easy | cbn; flia ].
+  cbn in Hni; flia Hni.
 }
 destruct i. {
   do 6 (destruct n; [ cbn; flia | ]).
-  rewrite Nat.div_small; [ easy | cbn; flia ].
+  cbn in Hni; flia Hni.
 }
 destruct i. {
   do 14 (destruct n; [ cbn; flia | ]).
-  rewrite Nat.div_small; [ easy | cbn; flia ].
+  cbn in Hni; flia Hni.
 }
 destruct i. {
   do 30 (destruct n; [ cbn; flia | ]).
-  rewrite Nat.div_small; [ easy | cbn; flia ].
+  cbn in Hni; flia Hni.
 }
 ...
     apply Nat.div_le_upper_bound; [ easy | ].
