@@ -973,6 +973,12 @@ destruct i. {
   do 14 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
 }
+destruct i. {
+  destruct n; [ flia Hmi | ].
+  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
+  do 30 (destruct n; [ cbn; flia | ]).
+  rewrite Nat.div_small; [ easy | cbn; flia ].
+}
 ...
     apply Nat.div_le_upper_bound; [ easy | ].
     rewrite Nat.pow_succ_r; [ | easy ].
