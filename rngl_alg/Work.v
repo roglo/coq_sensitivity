@@ -972,6 +972,8 @@ destruct m. {
   apply angle_mul_nat_overflow_distr_add_overflow.
   rewrite Nat_add_mul_r_diag_r.
   replace (1 + 2) with 3 by easy.
+Search (_ → angle_mul_nat_overflow _ _ = false).
+eapply angle_mul_nat_overflow_le_r.
 ...
   apply angle_add_overflow_diag. 2: {
     intros H.
