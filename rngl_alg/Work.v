@@ -950,32 +950,29 @@ destruct m. {
   specialize angle_div_2_pow_mul_le_angle as H1.
   specialize (H1 (3 * (2 ^ S i / n)) (S i) θ).
   assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ S i). {
-    destruct n; [ flia Hmi Hni | clear Hnz ].
+clear - Hmi.
+destruct n; [ flia Hmi | ].
+apply Nat.succ_lt_mono in Hmi.
+destruct n; [ flia Hmi | ].
+apply Nat.succ_lt_mono in Hmi.
+destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
 destruct i. {
-  rewrite Nat.div_small; [ | easy ].
-  now rewrite Nat.mul_0_r.
+  do 0 (destruct n; [ cbn; flia | ]).
+  rewrite Nat.div_small; [ easy | cbn; flia ].
 }
 destruct i. {
-  destruct n; [ flia Hmi | ].
-  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
   do 2 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
 }
 destruct i. {
-  destruct n; [ flia Hmi | ].
-  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
   do 6 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
 }
 destruct i. {
-  destruct n; [ flia Hmi | ].
-  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
   do 14 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
 }
 destruct i. {
-  destruct n; [ flia Hmi | ].
-  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
   do 30 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
 }
