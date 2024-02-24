@@ -962,7 +962,10 @@ destruct (lt_dec (2 ^ S i) (S (S (S n)))) as [Hin| Hni]. {
   now rewrite Nat.mul_0_r.
 }
 apply Nat.nlt_ge in Hni.
-destruct i; [ easy | ].
+destruct i. {
+  do 0 (destruct n; [ cbn; flia | ]).
+  cbn in Hni; flia Hni.
+}
 destruct i. {
   do 2 (destruct n; [ cbn; flia | ]).
   cbn in Hni; flia Hni.
