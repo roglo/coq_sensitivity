@@ -946,11 +946,33 @@ destruct m. {
     cbn in Hni.
     flia Hmi Hni.
   }
+  progress unfold seq_angle_to_div_nat.
   specialize angle_div_2_pow_mul_le_angle as H1.
-  specialize (H1 (3 * (2 ^ S i / n)) i (θ / ₂)%A).
-  assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ i). {
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
+  specialize (H1 (3 * (2 ^ S i / n)) (S i) θ).
+  assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ S i). {
+    destruct n; [ flia Hmi Hni | clear Hnz ].
+destruct i. {
+  rewrite Nat.div_small; [ | easy ].
+  now rewrite Nat.mul_0_r.
+}
+destruct i. {
+  destruct n; [ flia Hmi | ].
+  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
+  do 2 (destruct n; [ cbn; flia | ]).
+  rewrite Nat.div_small; [ easy | cbn; flia ].
+}
+destruct i. {
+  destruct n; [ flia Hmi | ].
+  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
+  do 6 (destruct n; [ cbn; flia | ]).
+  rewrite Nat.div_small; [ easy | cbn; flia ].
+}
+destruct i. {
+  destruct n; [ flia Hmi | ].
+  destruct n; [ now apply Nat.lt_irrefl in Hmi | ].
+  do 14 (destruct n; [ cbn; flia | ]).
+  rewrite Nat.div_small; [ easy | cbn; flia ].
+}
 ...
     apply Nat.div_le_upper_bound; [ easy | ].
     rewrite Nat.pow_succ_r; [ | easy ].
@@ -960,7 +982,6 @@ destruct m. {
   specialize (H1 H); clear H.
   rewrite <- angle_div_2_pow_succ_r_2 in H1.
   rewrite <- angle_mul_nat_assoc in H1.
-  progress unfold seq_angle_to_div_nat.
   remember (2 ^ S i / n * (θ / ₂^S i))%A as θ1.
 ...
   cbn; rewrite angle_add_0_r.
