@@ -887,6 +887,9 @@ rewrite angle_mul_sub_distr_r. 2: {
 now rewrite angle_mul_1_l.
 Qed.
 
+Theorem Nat_add_mul_r_diag_r : ∀ a b, a + b * a = (1 + b) * a.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -965,8 +968,10 @@ destruct m. {
     now do 3 apply -> Nat.succ_le_mono.
   }
   specialize (H1 H); clear H.
-...
-  cbn; rewrite angle_add_0_r.
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_nat_overflow_distr_add_overflow.
+  rewrite Nat_add_mul_r_diag_r.
+  replace (1 + 2) with 3 by easy.
 ...
   apply angle_add_overflow_diag. 2: {
     intros H.
