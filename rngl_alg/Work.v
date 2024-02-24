@@ -942,6 +942,39 @@ destruct m. {
   apply angle_div_2_le_straight.
 }
 destruct m. {
+  destruct i. {
+    cbn in Hni.
+    flia Hmi Hni.
+  }
+  specialize angle_div_2_pow_mul_le_angle as H1.
+  specialize (H1 (3 * (2 ^ S i / n)) i (θ / ₂)%A).
+  assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ i). {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+...
+    apply Nat.div_le_upper_bound; [ easy | ].
+    rewrite Nat.pow_succ_r; [ | easy ].
+    apply Nat.mul_le_mono_r.
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  specialize (H1 H); clear H.
+  rewrite <- angle_div_2_pow_succ_r_2 in H1.
+  rewrite <- angle_mul_nat_assoc in H1.
+  progress unfold seq_angle_to_div_nat.
+  remember (2 ^ S i / n * (θ / ₂^S i))%A as θ1.
+...
+  cbn; rewrite angle_add_0_r.
+...
+  apply angle_add_overflow_diag. 2: {
+    intros H.
+    rewrite H in H1.
+    apply angle_nlt_ge in H1.
+    apply H1.
+    now apply angle_div_2_lt_straight.
+  }
+  apply rngl_sin_nonneg_angle_le_straight.
+  eapply angle_le_trans; [ apply H1 | ].
+  apply angle_div_2_le_straight.
 ...
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
