@@ -956,6 +956,7 @@ apply Nat.succ_lt_mono in Hmi.
 destruct n; [ flia Hmi | ].
 apply Nat.succ_lt_mono in Hmi.
 destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
+(**)
 destruct i. {
   do 0 (destruct n; [ cbn; flia | ]).
   rewrite Nat.div_small; [ easy | cbn; flia ].
