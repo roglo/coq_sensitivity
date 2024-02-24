@@ -957,6 +957,33 @@ destruct n; [ flia Hmi | ].
 apply Nat.succ_lt_mono in Hmi.
 destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
 (**)
+remember (2 ^ S i) as j eqn:Hj.
+clear i Hj.
+destruct j; [ easy | ].
+destruct j; [ easy | ].
+destruct j; [ easy | ].
+destruct j; [ now destruct n | ].
+destruct j. {
+  do 1 (destruct n; [ cbn; flia | ]).
+  destruct n; [ cbn; flia | easy ].
+}
+destruct j. {
+  do 2 (destruct n; [ cbn; flia | ]).
+  destruct n; [ cbn; flia | easy ].
+}
+destruct j. {
+  do 3 (destruct n; [ cbn; flia | ]).
+  destruct n; [ cbn; flia | easy ].
+}
+destruct j. {
+  do 4 (destruct n; [ cbn; flia | ]).
+  destruct n; [ cbn; flia | easy ].
+}
+destruct j. {
+  do 5 (destruct n; [ cbn; flia | ]).
+  destruct n; [ cbn; flia | easy ].
+}
+...
 destruct (lt_dec (2 ^ S i) (S (S (S n)))) as [Hin| Hni]. {
   rewrite Nat.div_small; [ | easy ].
   now rewrite Nat.mul_0_r.
@@ -964,11 +991,22 @@ destruct (lt_dec (2 ^ S i) (S (S (S n)))) as [Hin| Hni]. {
 apply Nat.nlt_ge in Hni.
 destruct (lt_dec (2 ^ S i) (2 * S (S (S n)))) as [Hin| Hni']. {
   rewrite (Nat_div_less_small 1). 2: {
-    cbn.
-    rewrite Nat.add_0_r.
-...
-  now rewrite Nat.mul_0_r.
+    split; [ | easy ].
+    now rewrite Nat.mul_1_l.
+  }
+  rewrite Nat.mul_1_r.
+  destruct i; [ cbn in Hni; flia Hni | ].
+  rewrite Nat.pow_succ_r; [ | easy ].
+  rewrite Nat.pow_succ_r; [ | easy ].
+  rewrite Nat.mul_assoc.
+  replace (2 * 2) with 4 by easy.
+  rewrite <- (Nat.mul_1_r 3) at 1.
+  apply Nat.mul_le_mono; [ flia | ].
+  apply Nat.le_succ_l.
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
 }
+apply Nat.nlt_ge in Hni'.
 ...
 destruct i. {
   do 0 (destruct n; [ cbn; flia | ]).
