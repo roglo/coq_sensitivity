@@ -976,6 +976,26 @@ destruct m. {
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
+(*
+θi ≤ 2 * (π / 3)
+sauf que je sais pas diviser un angle par 3...
+θi ≤ π
+
+1/3 = 0,010101...
+1/3 = 1/4+1/16+1/64
+1/3 = 5/16 + 1/64
+3*5/16 = 15/16
+θi ≤ 2π*15/16
+1/3 ≤ 1/4+1/8 = 3/8
+montrer θi ≤ 3 (π / 4)
+du coup on aurait π/4 ≤ θi
+...
+*)
+  assert (H2 : (θi ≤ 3 * (angle_straight / ₂^2))%A) by admit.
+  eapply angle_le_trans.
+apply H2.
+apply angle_mul_le_mono_l.
+(* pas gagné *)
 ...
   apply angle_mul_nat_overflow_distr_add_overflow.
   rewrite Nat_add_mul_r_diag_r.
