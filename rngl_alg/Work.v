@@ -890,6 +890,9 @@ Qed.
 Theorem Nat_add_mul_r_diag_r : ∀ a b, a + b * a = (1 + b) * a.
 Proof. easy. Qed.
 
+Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -968,11 +971,21 @@ destruct m. {
     now do 3 apply -> Nat.succ_le_mono.
   }
   specialize (H1 H); clear H.
-  rewrite angle_mul_nat_assoc.
+  rewrite <- angle_mul_nat_assoc in H1.
+  remember (2 ^ S i / n * (θ / ₂^S i))%A as θ1.
+  progress unfold angle_add_overflow.
+  apply angle_ltb_ge.
+  rewrite angle_add_mul_r_diag_r.
+(* ah, putain, crotte *)
+...
   apply angle_mul_nat_overflow_distr_add_overflow.
   rewrite Nat_add_mul_r_diag_r.
   replace (1 + 2) with 3 by easy.
-Search (_ → angle_mul_nat_overflow _ _ = false).
+...
+  apply angle_all_add_not_overflow.
+  intros m Hm.
+  destruct m. {
+...
 eapply angle_mul_nat_overflow_le_r.
 ...
   apply angle_add_overflow_diag. 2: {
