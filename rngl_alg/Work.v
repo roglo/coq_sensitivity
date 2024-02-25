@@ -972,11 +972,10 @@ destruct m. {
   }
   specialize (H1 H); clear H.
   rewrite <- angle_mul_nat_assoc in H1.
-  remember (2 ^ S i / n * (θ / ₂^S i))%A as θ1.
+  remember (2 ^ S i / n * (θ / ₂^S i))%A as θi.
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
-(* ah, putain, crotte *)
 ...
   apply angle_mul_nat_overflow_distr_add_overflow.
   rewrite Nat_add_mul_r_diag_r.
