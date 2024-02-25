@@ -976,6 +976,22 @@ destruct m. {
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
+(**)
+  progress unfold angle_leb in H1.
+  progress unfold angle_leb.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  remember (0 ≤? rngl_sin θi)%L as zsi eqn:Hzsi.
+  remember (0 ≤? rngl_sin (3 * θi))%L as zsi3 eqn:Hzsi3.
+  symmetry in Hzs, Hzsi, Hzsi3.
+  move zsi before zs; move zsi3 before zsi.
+  destruct zsi. {
+    destruct zsi3; [ | easy ].
+    apply rngl_leb_le in Hzsi3, Hzsi.
+    apply rngl_leb_le.
+    destruct zs. {
+      apply rngl_leb_le in Hzs, H1.
+      move Hzsi before Hzs.
+...
 (*
 θi ≤ 2 * (π / 3)
 sauf que je sais pas diviser un angle par 3...
@@ -991,7 +1007,7 @@ montrer θi ≤ 3 (π / 4)
 du coup on aurait π/4 ≤ θi
 ...
 *)
-  assert (H2 : (θi ≤ 3 * (angle_straight / ₂^2))%A) by admit.
+  assert (H2 : (θi ≤ 3 * (angle_straight / ₂^2))%A) by ...
   eapply angle_le_trans.
 apply H2.
 apply angle_mul_le_mono_l.
