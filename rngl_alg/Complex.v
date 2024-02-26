@@ -4500,7 +4500,7 @@ rewrite <- (rngl_cos_mul_2_l Hon Hos).
 rewrite (rngl_mul_comm Hic (rngl_cos (_ / ₂))).
 rewrite (rngl_add_diag Hon).
 rewrite rngl_mul_assoc.
-rewrite <- (rngl_sin_mul_2_l Hic Hon Hos).
+rewrite <- rngl_sin_mul_2_l.
 now rewrite angle_div_2_mul_2.
 Qed.
 
@@ -5467,7 +5467,7 @@ split; intros Hθ. {
   apply (rngl_ltb_ge Hor) in Hθ.
   apply (rngl_leb_gt Hor) in Hzst.
   rewrite angle_add_diag in Hzst.
-  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzst.
+  rewrite rngl_sin_mul_2_l in Hzst.
   rewrite <- rngl_mul_assoc in Hzst.
   apply (rngl_nle_gt Hor) in Hzst.
   apply Hzst; clear Hzst.

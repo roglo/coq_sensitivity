@@ -317,7 +317,7 @@ destruct zs. {
   apply rngl_leb_le in Hzsm.
   apply rngl_leb_le.
   rewrite angle_add_diag in Hzsm |-*.
-  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+  rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite (rngl_cos_mul_2_l' Hon Hop).
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
@@ -1022,6 +1022,24 @@ destruct m. {
       intros H2.
       apply (rngl_nlt_ge Hor) in H1.
       apply H1; clear H1.
+      assert (Hci : (rngl_cos θi ≤ 0)%L). {
+        apply (rngl_nlt_ge Hor).
+        intros H.
+        apply (rngl_nle_gt Hor) in H2.
+        apply H2; clear H2.
+        rewrite rngl_sin_mul_2_l.
+        apply (rngl_lt_le_incl Hor) in H.
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+        apply (rngl_0_le_2 Hon Hop Hor).
+      }
+...
+assert (Hs2i : (rngl_sin (2 * θi) ≤ 0)%L) by admit.
+assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L) by admit.
+      replace 3 with (2 + 1) by easy.
+      rewrite angle_mul_add_distr_r.
+      rewrite angle_mul_1_l.
+      cbn - [ "*"%A ].
 ...
       replace 3 with (2 + 1) in Hzsi3 by easy.
       rewrite angle_mul_add_distr_r in Hzsi3.
@@ -1153,7 +1171,7 @@ Search binomial.
 Search ((if _ then _ else _) = (if _ then _ else _)).
 ... ...
   rewrite angle_add_diag in Hzsm |-*.
-  rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+  rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite (rngl_cos_mul_2_l' Hon Hop).
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
@@ -1730,7 +1748,7 @@ destruct n. {
     apply rngl_leb_le in Hzsm.
     apply rngl_leb_le.
     rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
-    rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+    rewrite rngl_sin_mul_2_l in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
@@ -1813,7 +1831,7 @@ destruct n. {
       apply rngl_leb_le in Hzsm.
       apply rngl_leb_le.
       rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
-      rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+      rewrite rngl_sin_mul_2_l in Hzsm.
       rewrite (rngl_cos_mul_2_l' Hon Hop).
       apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
       remember (rngl_cos (u i)) as x eqn:Hx.
@@ -2136,7 +2154,7 @@ destruct zs. {
       apply (rngl_le_refl Hor).
     }
     destruct m; [ clear Hmi | flia Hmi ].
-    rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+    rewrite rngl_sin_mul_2_l in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
@@ -2181,7 +2199,7 @@ destruct zs. {
       apply (rngl_le_refl Hor).
     }
     destruct m. {
-      rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+      rewrite rngl_sin_mul_2_l in Hzsm.
       apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
       remember (rngl_cos (u i)) as x eqn:Hx.
       destruct Hzsm as [(H1, Hzsm)| (H1, H2)]. 2: {
@@ -2272,7 +2290,7 @@ Search (0 ≤ rngl_sin _ → _)%L.
 apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
 ...
     destruct m; [ clear Hmi | flia Hmi ].
-    rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hzsm.
+    rewrite rngl_sin_mul_2_l in Hzsm.
     rewrite (rngl_cos_mul_2_l' Hon Hop).
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
@@ -2379,7 +2397,7 @@ apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
         }
         destruct s. {
           rewrite (rngl_cos_mul_2_l Hon Hos) in Hc.
-          rewrite (rngl_sin_mul_2_l Hic Hon Hos) in Hs.
+          rewrite rngl_sin_mul_2_l in Hs.
           rewrite <- rngl_mul_assoc in Hs.
           apply (rngl_eq_mul_0_r Hos Hii) in Hs.
           2: apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
@@ -3435,7 +3453,7 @@ enough (H2ε : (0 < 2 * ε)%L).
     progress unfold angle_dist in HN.
     progress unfold angle_dist.
     rewrite (rngl_cos_mul_2_l Hon Hos).
-    rewrite (rngl_sin_mul_2_l Hic Hon Hos).
+    rewrite rngl_sin_mul_2_l.
 ...
     rewrite Nat.mul_div in HN.
     rewrite Nat.pow_add_r in HN.

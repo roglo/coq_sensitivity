@@ -3325,12 +3325,10 @@ apply (rngl_add_diag Hon).
 Qed.
 
 Theorem rngl_sin_mul_2_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_sin (2 * θ) = (2 * rngl_sin θ * rngl_cos θ)%L.
 Proof.
-intros Hic Hon Hos *; cbn.
+destruct_ac.
+intros; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
