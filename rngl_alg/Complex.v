@@ -4496,7 +4496,7 @@ intros.
 apply eq_angle_eq.
 cbn - [ angle_div_2 ].
 do 2 rewrite fold_rngl_squ.
-rewrite <- (rngl_cos_mul_2_l Hon Hos).
+rewrite <- rngl_cos_mul_2_l.
 rewrite (rngl_mul_comm Hic (rngl_cos (_ / ₂))).
 rewrite (rngl_add_diag Hon).
 rewrite rngl_mul_assoc.
@@ -5482,7 +5482,7 @@ split; intros Hθ. {
   apply (rngl_nlt_ge Hor) in Hθ.
   apply Hθ; clear Hθ.
   rewrite angle_add_diag.
-  rewrite (rngl_cos_mul_2_l Hon Hos).
+  rewrite rngl_cos_mul_2_l.
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   apply (rngl_le_lt_trans Hor _ (rngl_cos θ)). {
     progress unfold rngl_squ.

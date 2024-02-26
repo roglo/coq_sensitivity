@@ -318,7 +318,7 @@ destruct zs. {
   apply rngl_leb_le.
   rewrite angle_add_diag in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
-  rewrite (rngl_cos_mul_2_l' Hon Hop).
+  rewrite rngl_cos_mul_2_l'.
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
@@ -1033,9 +1033,15 @@ destruct m. {
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_0_le_2 Hon Hop Hor).
       }
+      assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
+(* pas sûr : par exemple si π/2 < θi < 3π/4
+   oui, mais dans ce cas, sin(3*θi), peut-il être positif ? *)
 ...
-assert (Hs2i : (rngl_sin (2 * θi) ≤ 0)%L) by admit.
-assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L) by admit.
+        rewrite rngl_cos_mul_2_l'.
+...
+        rewrite rngl_cos_mul_2_l.
+        apply (rngl_le_0_sub Hop Hor).
+...
       replace 3 with (2 + 1) by easy.
       rewrite angle_mul_add_distr_r.
       rewrite angle_mul_1_l.
@@ -1172,7 +1178,7 @@ Search ((if _ then _ else _) = (if _ then _ else _)).
 ... ...
   rewrite angle_add_diag in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
-  rewrite (rngl_cos_mul_2_l' Hon Hop).
+  rewrite rngl_cos_mul_2_l'.
   apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
   remember (rngl_cos (u i)) as x eqn:Hx.
   rewrite Hu in Hx.
@@ -1749,7 +1755,7 @@ destruct n. {
     apply rngl_leb_le.
     rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
     rewrite rngl_sin_mul_2_l in Hzsm.
-    rewrite (rngl_cos_mul_2_l' Hon Hop).
+    rewrite rngl_cos_mul_2_l'.
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
     rewrite Hu in Hx.
@@ -1832,7 +1838,7 @@ destruct n. {
       apply rngl_leb_le.
       rewrite (angle_add_diag Hon Hos) in Hzsm |-*.
       rewrite rngl_sin_mul_2_l in Hzsm.
-      rewrite (rngl_cos_mul_2_l' Hon Hop).
+      rewrite rngl_cos_mul_2_l'.
       apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
       remember (rngl_cos (u i)) as x eqn:Hx.
       rewrite Hu in Hx.
@@ -2155,7 +2161,7 @@ destruct zs. {
     }
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite rngl_sin_mul_2_l in Hzsm.
-    rewrite (rngl_cos_mul_2_l' Hon Hop).
+    rewrite rngl_cos_mul_2_l'.
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
     destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
@@ -2236,7 +2242,7 @@ destruct zs. {
         now rewrite rngl_mul_0_r.
       }
       (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
-      rewrite (rngl_cos_mul_2_l' Hon Hop).
+      rewrite rngl_cos_mul_2_l'.
       subst x.
       apply rngl_2_x2_sub_1_le_x.
       split; [ easy | apply rngl_cos_bound ].
@@ -2291,7 +2297,7 @@ apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
 ...
     destruct m; [ clear Hmi | flia Hmi ].
     rewrite rngl_sin_mul_2_l in Hzsm.
-    rewrite (rngl_cos_mul_2_l' Hon Hop).
+    rewrite rngl_cos_mul_2_l'.
     apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzsm.
     remember (rngl_cos (u i)) as x eqn:Hx.
     destruct Hzsm as [(_, Hzsm)| (H1, H2)]. 2: {
@@ -2396,7 +2402,7 @@ apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
           now apply eq_angle_div_2_pow_0 in Hc.
         }
         destruct s. {
-          rewrite (rngl_cos_mul_2_l Hon Hos) in Hc.
+          rewrite rngl_cos_mul_2_l in Hc.
           rewrite rngl_sin_mul_2_l in Hs.
           rewrite <- rngl_mul_assoc in Hs.
           apply (rngl_eq_mul_0_r Hos Hii) in Hs.
@@ -3452,7 +3458,7 @@ enough (H2ε : (0 < 2 * ε)%L).
     rewrite (angle_div_2_pow_mul_2_pow Hic) in HN.
     progress unfold angle_dist in HN.
     progress unfold angle_dist.
-    rewrite (rngl_cos_mul_2_l Hon Hos).
+    rewrite rngl_cos_mul_2_l.
     rewrite rngl_sin_mul_2_l.
 ...
     rewrite Nat.mul_div in HN.

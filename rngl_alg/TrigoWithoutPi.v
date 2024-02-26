@@ -3294,11 +3294,10 @@ split; intros H12. {
 Qed.
 
 Theorem rngl_cos_mul_2_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_cos (2 * θ) = ((rngl_cos θ)² - (rngl_sin θ)²)%L.
 Proof.
-intros Hon Hos *; cbn.
+destruct_ac.
+intros; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
@@ -3307,14 +3306,11 @@ now do 2 rewrite fold_rngl_squ.
 Qed.
 
 Theorem rngl_cos_mul_2_l' :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (2 * θ) = (2 * (rngl_cos θ)² - 1)%L.
 Proof.
-intros Hon Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
 intros.
-rewrite (rngl_cos_mul_2_l Hon Hos).
+rewrite rngl_cos_mul_2_l.
 specialize (cos2_sin2_1 θ) as H1.
 apply (rngl_add_sub_eq_l Hos) in H1.
 rewrite <- H1.
