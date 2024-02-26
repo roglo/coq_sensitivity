@@ -99,7 +99,7 @@ destruct zs3. {
         intros H; subst θ2.
         apply angle_nlt_ge in Haov.
         apply Haov; clear Haov.
-        rewrite (angle_straight_add_straight Hon Hop).
+        rewrite angle_straight_add_straight.
         apply (angle_straight_pos Hc1).
       }
       apply (angle_eqb_neq Hed) in Hs1.
@@ -205,7 +205,7 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
 rewrite (angle_add_assoc Hop) in Haov, Hzs3 |-*.
 rewrite <- (angle_add_assoc Hop) in Haov, Hzs3 |-*.
-rewrite (angle_straight_add_straight Hon Hop) in Haov, Hzs3 |-*.
+rewrite angle_straight_add_straight in Haov, Hzs3 |-*.
 rewrite (angle_add_0_r) in Haov, Hzs3 |-*.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
   as [Hzc12| Hc12z]. {
@@ -637,7 +637,7 @@ destruct zs12. {
       }
       apply (angle_eqb_eq Hed) in Ht2s.
       subst θ2.
-      rewrite (angle_straight_add_straight Hon Hop).
+      rewrite angle_straight_add_straight.
       cbn.
       rewrite (rngl_sub_opp_r Hop).
       rewrite (rngl_add_opp_r Hop).
@@ -830,7 +830,7 @@ destruct zs12. {
       }
       apply (angle_eqb_eq Hed) in Ht2s.
       subst θ2.
-      rewrite (angle_straight_add_straight Hon Hop).
+      rewrite angle_straight_add_straight.
       cbn.
       rewrite (rngl_sub_opp_r Hop).
       rewrite (rngl_add_opp_r Hop).

@@ -23,7 +23,7 @@ Proof.
 intros Hc1.
 destruct_ac.
 progress unfold angle_add_overflow.
-rewrite (angle_straight_add_straight Hon Hop).
+rewrite angle_straight_add_straight.
 progress unfold angle_ltb; cbn.
 rewrite (rngl_leb_refl Hor).
 apply rngl_ltb_lt.
@@ -217,7 +217,7 @@ destruct zs2. {
     symmetry in Hzs12.
     apply (eq_rngl_sin_0) in Hzs12.
     destruct Hzs12; subst θ1; [ apply (rngl_le_refl Hor) | ].
-    rewrite (angle_straight_add_straight Hon Hop) in Haov.
+    rewrite angle_straight_add_straight in Haov.
     exfalso.
     apply (rngl_nlt_ge Hor) in Haov.
     apply Haov; cbn.
@@ -701,7 +701,7 @@ apply Haov12; clear Haov12.
 rewrite (angle_add_sub_assoc Hop).
 rewrite <- (angle_add_sub_swap Hic Hop).
 rewrite <- (angle_sub_add_distr Hic Hop).
-rewrite (angle_straight_add_straight Hon Hop).
+rewrite angle_straight_add_straight.
 rewrite angle_sub_0_r.
 progress unfold angle_ltb.
 rewrite (rngl_sin_sub_straight_r Hon Hop).
@@ -846,7 +846,7 @@ destruct H. {
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
   apply angle_add_move_r in H.
-  rewrite (angle_straight_add_straight Hon Hop) in H.
+  rewrite angle_straight_add_straight in H.
   subst θ2.
   now apply (rngl_lt_irrefl Hor) in Hzs2.
 }
@@ -1489,7 +1489,7 @@ destruct Hzs2; subst θ1. {
   apply Haov12; clear Haov12.
   rewrite (angle_right_add_right Hon Hop).
   rewrite angle_sub_add.
-  rewrite (angle_straight_add_straight Hon Hop).
+  rewrite angle_straight_add_straight.
   progress unfold angle_ltb; cbn.
   rewrite (rngl_leb_refl Hor).
   apply rngl_ltb_lt.

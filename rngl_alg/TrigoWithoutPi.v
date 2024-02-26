@@ -1676,12 +1676,9 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem angle_straight_add_straight :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   (angle_straight + angle_straight = 0)%A.
 Proof.
-intros Hon Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
 apply eq_angle_eq; cbn.
 rewrite (rngl_mul_opp_opp Hop).
 rewrite (rngl_mul_1_l Hon).
@@ -2035,7 +2032,7 @@ destruct zc2. {
     apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
   }
   subst θ1.
-  rewrite (angle_straight_add_straight Hon Hop) in H2.
+  rewrite angle_straight_add_straight in H2.
   cbn in H2.
   apply (rngl_nle_gt Hor) in H2.
   apply H2; clear H2.
@@ -2110,7 +2107,7 @@ destruct Hs2 as [H| H]. {
   now rewrite angle_add_0_r in H12.
 }
 subst θ1.
-rewrite (angle_straight_add_straight Hon Hop) in H2.
+rewrite angle_straight_add_straight in H2.
 cbn in H2.
 apply (rngl_nle_gt Hor) in H2.
 apply H2; clear H2.
@@ -2533,7 +2530,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
       rewrite (angle_add_comm Hic θ1).
       rewrite (angle_add_comm Hic).
       do 2 rewrite (angle_add_assoc Hop).
-      rewrite (angle_straight_add_straight Hon Hop).
+      rewrite angle_straight_add_straight.
       rewrite angle_add_0_l.
       rewrite Hθ3 in Hzs3.
       now apply (rngl_lt_le_incl Hor).

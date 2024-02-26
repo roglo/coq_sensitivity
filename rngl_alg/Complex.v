@@ -5190,7 +5190,7 @@ destruct s2z. {
 clear Hs2z.
 rewrite (angle_add_assoc Hop).
 rewrite <- (angle_add_assoc Hop).
-rewrite (angle_straight_add_straight Hon Hop).
+rewrite angle_straight_add_straight.
 rewrite angle_add_0_r.
 rewrite angle_add_opp_r.
 remember (angle_add_overflow (θ / ₂^i) (- (angle_straight / ₂^i))) as aov2
@@ -5451,7 +5451,7 @@ split; intros Hθ. {
     intros H; symmetry in H.
     apply eq_rngl_cos_opp_1 in H.
     subst θ.
-    rewrite (angle_straight_add_straight Hon Hop) in Hθ.
+    rewrite angle_straight_add_straight in Hθ.
     cbn in Hθ.
     rewrite (rngl_leb_refl Hor) in Hθ.
     apply Bool.not_true_iff_false in Hθ.
@@ -6100,7 +6100,7 @@ rewrite <- angle_mul_nat_assoc in H.
 rewrite angle_div_2_mul_2 in H.
 apply (f_equal (λ θ, (2 * θ)%A)) in H.
 rewrite <- angle_add_diag in H.
-rewrite (angle_straight_add_straight Hon Hop) in H.
+rewrite angle_straight_add_straight in H.
 rewrite angle_mul_nat_assoc in H.
 rewrite Nat.mul_comm in H.
 rewrite <- angle_mul_nat_assoc in H.

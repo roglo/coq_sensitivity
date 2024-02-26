@@ -953,6 +953,17 @@ destruct m. {
     flia Hmi Hni.
   }
   progress unfold seq_angle_to_div_nat.
+  remember (2 ^ S i / n * (θ / ₂^S i))%A as θi eqn:Hi.
+  remember (θi =? angle_straight)%A as is eqn:His.
+  symmetry in His.
+  destruct is. {
+    apply (angle_eqb_eq Hed) in His.
+    rewrite His.
+    rewrite <- angle_add_diag.
+    rewrite angle_straight_add_straight.
+    apply (angle_add_overflow_0_r Hon Hos).
+  }
+  apply (angle_eqb_neq Hed) in His.
   specialize angle_div_2_pow_mul_le_angle as H1.
   specialize (H1 (3 * (2 ^ S i / n)) (S i) θ).
   assert (H : 3 * (2 ^ S i / n) ≤ 2 ^ S i). {
@@ -972,7 +983,6 @@ destruct m. {
   }
   specialize (H1 H); clear H.
   rewrite <- angle_mul_nat_assoc in H1.
-  remember (2 ^ S i / n * (θ / ₂^S i))%A as θi.
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
@@ -983,6 +993,7 @@ destruct m. {
   remember (0 ≤? rngl_sin θi)%L as zsi eqn:Hzsi.
   remember (0 ≤? rngl_sin (3 * θi))%L as zsi3 eqn:Hzsi3.
   symmetry in Hzs, Hzsi, Hzsi3.
+  rewrite <- Hi, Hzsi3 in H1.
   move zsi before zs; move zsi3 before zsi.
   destruct zsi. {
     destruct zsi3; [ | easy ].
@@ -991,18 +1002,7 @@ destruct m. {
     destruct zs. {
       apply rngl_leb_le in Hzs, H1.
       move Hzsi before Hzs.
-      apply rngl_sin_sub_nonneg_if; [ | easy | easy | ]. {
-left.
-intros H3i.
-clear Hzsi3 H1.
-...
-apply eq_angle_mul_0 in H3i.
-destruct H3i as [H| (H2, H3)]; [ easy | ].
-...
-right.
-rewrite Heqθi.
-Search (_ → _  ≠ angle_straight)%A.
-Search (_ = angle_straight → _).
+      apply rngl_sin_sub_nonneg_if; [ now right | easy | easy | ].
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 ...
@@ -2546,7 +2546,7 @@ apply angle_eq_mul_0_r in H. 2: {
 apply (f_equal (λ θ, (2 * θ)%A)) in H.
 symmetry in H.
 rewrite <- (angle_add_diag Hon Hos) in H.
-rewrite (angle_straight_add_straight Hon Hop) in H.
+rewrite angle_straight_add_straight in H.
 symmetry in H.
 apply angle_eq_mul_0_r in H; [ | easy ].
 cbn - [ div Nat.pow ] in H.
@@ -2584,7 +2584,7 @@ destruct n; [ flia Hmi | ].
           rewrite (angle_mul_add_distr_r Hon Hop).
           rewrite <- (angle_add_diag Hon Hos).
           rewrite (angle_right_add_right Hon Hop).
-          rewrite (angle_straight_add_straight Hon Hop).
+          rewrite angle_straight_add_straight.
           cbn.
           exfalso.
           replace 3 with (1 + 2) in Hsmu, Hcmu by easy.
