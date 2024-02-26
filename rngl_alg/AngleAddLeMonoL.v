@@ -16,19 +16,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem angle_sub_move_0_r : ∀ θ1 θ2, (θ1 - θ2)%A = 0%A ↔ θ1 = θ2.
-Proof.
-destruct_ac.
-intros.
-split; intros H12. {
-  apply angle_sub_move_r in H12.
-  now rewrite angle_add_0_l in H12.
-} {
-  apply angle_sub_move_r.
-  now rewrite angle_add_0_l.
-}
-Qed.
-
 Theorem angle_add_overflow_straight_straight :
   rngl_characteristic T ≠ 1 →
   angle_add_overflow angle_straight angle_straight = true.
