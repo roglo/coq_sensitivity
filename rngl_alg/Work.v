@@ -991,9 +991,18 @@ destruct m. {
     destruct zs. {
       apply rngl_leb_le in Hzs, H1.
       move Hzsi before Hzs.
-Search (rngl_cos _ ≤ rngl_cos _)%L.
-Search (0 ≤ rngl_sin (_ - _))%L.
-About rngl_sin_sub_nonneg.
+      apply rngl_sin_sub_nonneg_if; [ | easy | easy | ]. {
+left.
+intros H3i.
+clear Hzsi3 H1.
+...
+apply eq_angle_mul_0 in H3i.
+destruct H3i as [H| (H2, H3)]; [ easy | ].
+...
+right.
+rewrite Heqθi.
+Search (_ → _  ≠ angle_straight)%A.
+Search (_ = angle_straight → _).
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 ...
