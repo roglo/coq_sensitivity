@@ -983,6 +983,12 @@ destruct m. {
   }
   specialize (H1 H); clear H.
   rewrite <- angle_mul_nat_assoc in H1.
+  rewrite <- Hi in H1.
+(*
+  H1 : (3 * θi ≤ θ)%A
+  ============================
+  angle_add_overflow θi (2 * θi) = false
+*)
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
@@ -993,7 +999,6 @@ destruct m. {
   remember (0 ≤? rngl_sin θi)%L as zsi eqn:Hzsi.
   remember (0 ≤? rngl_sin (3 * θi))%L as zsi3 eqn:Hzsi3.
   symmetry in Hzs, Hzsi, Hzsi3.
-  rewrite <- Hi, Hzsi3 in H1.
   move zsi before zs; move zsi3 before zsi.
   destruct zsi. {
     destruct zsi3; [ | easy ].
@@ -1003,6 +1008,33 @@ destruct m. {
       apply rngl_leb_le in Hzs, H1.
       move Hzsi before Hzs.
       apply rngl_sin_sub_nonneg_if; [ now right | easy | easy | ].
+      rewrite angle_sub_mul_l_diag_r; [ | easy ].
+      cbn - [ rngl_sin angle_mul_nat ].
+(*
+  Hzs : (0 ≤ rngl_sin θ)%L
+  Hzsi : (0 ≤ rngl_sin θi)%L
+  Hzsi3 : (0 ≤ rngl_sin (3 * θi))%L
+  H1 : (rngl_cos θ ≤ rngl_cos (3 * θi))%L
+  ============================
+  (0 ≤ rngl_sin (2 * θi))%L
+*)
+      apply (rngl_nlt_ge Hor).
+      intros H2.
+      apply (rngl_nlt_ge Hor) in H1.
+      apply H1; clear H1.
+...
+      replace 3 with (2 + 1) in Hzsi3 by easy.
+      rewrite angle_mul_add_distr_r in Hzsi3.
+      rewrite angle_mul_1_l in Hzsi3.
+...
+  Hzs : (0 ≤ rngl_sin θ)%L
+  Hzsi : (0 ≤ rngl_sin θi)%L
+  Hzsi3 : (0 ≤ rngl_sin (2 * θi + θi))%L
+  H1 : (rngl_cos θ ≤ rngl_cos (3 * θi))%L
+  ============================
+  (0 ≤ rngl_sin (2 * θi))%L
+...
+      apply rngl_sin_add_nonneg_sin_nonneg in Hzsi3; [ easy | ].
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 ...
