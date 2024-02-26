@@ -1036,6 +1036,33 @@ destruct m. {
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
 (* pas sûr : par exemple si π/2 < θi < 3π/4
    oui, mais dans ce cas, sin(3*θi), peut-il être positif ? *)
+rewrite rngl_sin_nx in Hzsi3.
+progress unfold iter_seq in Hzsi3.
+progress unfold iter_list in Hzsi3.
+rewrite Nat.sub_0_r in Hzsi3.
+cbn - [ "/" binomial "-" ] in Hzsi3.
+do 2 rewrite rngl_add_0_l in Hzsi3.
+rewrite rngl_add_0_r in Hzsi3.
+rewrite Nat.div_small in Hzsi3; [ | easy ].
+rewrite (Nat_div_less_small 1) in Hzsi3; [ | cbn; flia ].
+rewrite (rngl_mul_1_r Hon) in Hzsi3.
+cbn - [ "^" ] in Hzsi3.
+rewrite (rngl_mul_1_l Hon) in Hzsi3.
+do 2 rewrite (rngl_mul_1_r Hon) in Hzsi3.
+rewrite rngl_add_0_r in Hzsi3.
+rewrite (rngl_mul_1_r Hon) in Hzsi3.
+rewrite (rngl_mul_opp_l Hop) in Hzsi3.
+rewrite (rngl_mul_1_l Hon) in Hzsi3.
+rewrite (rngl_add_opp_r Hop) in Hzsi3.
+(* pfff, chais pas *)
+...
+        replace 3 with (2 + 1) in Hzsi3 by easy.
+        rewrite angle_mul_add_distr_r in Hzsi3.
+        rewrite angle_mul_1_l in Hzsi3.
+        cbn - [ "*"%A ] in Hzsi3.
+Search (rngl_sin (_ * _)).
+        rewrite rngl_sin_mul_2_l in Hzsi3.
+        rewrite rngl_cos_mul_2_l in Hzsi3.
 ...
         rewrite rngl_cos_mul_2_l'.
 ...
