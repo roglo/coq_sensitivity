@@ -1034,6 +1034,25 @@ destruct m. {
         apply (rngl_0_le_2 Hon Hop Hor).
       }
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
+Theorem rngl_cos_neg_if :
+  ∀ θ,
+  (0 ≤ rngl_sin θ)%L
+  → (rngl_cos (2 * θ) < 0)%L
+  → (angle_right / ₂ ≤ θ ≤ 3 * (angle_right / ₂))%A.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hs Hc.
+rewrite rngl_cos_mul_2_l in Hc.
+apply -> (rngl_lt_sub_0 Hop Hor) in Hc.
+apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hc.
+rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hc; [ | easy ].
+split. {
+Check rngl_cos_decr.
+...
+apply (rngl_nlt_ge Hor).
+intros H.
+apply rngl_cos_neg_iff in H.
 ...
 (* pas sûr : par exemple si π/2 < θi < 3π/4
    oui, mais dans ce cas, sin(3*θi), peut-il être positif ? *)
