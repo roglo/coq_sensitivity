@@ -1072,12 +1072,36 @@ split. {
       rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
       split. {
 Search (_ / ₂ < _)%A.
-About angle_div_2_lt_diag.
+Theorem angle_right_div_2_lt :
+  ∀ θ,
+  (rngl_cos θ < rngl_sin θ)%L
+  → (0 ≤ rngl_sin θ)%L
+  → (0 ≤ rngl_cos θ)%L
+  → (angle_right / ₂ < θ)%A.
+Proof.
+destruct_ac.
+intros * Hcs Hs Hc.
+progress unfold angle_ltb.
+cbn.
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+apply rngl_leb_le in Hs; rewrite Hs.
+apply rngl_leb_le in Hs.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+apply rngl_leb_le in H1.
+rewrite H1; clear H1.
+rewrite (rngl_mul_1_l Hon).
+remember (0 ≤? √_)%L as z eqn:Hz.
+symmetry in Hz.
+destruct z. {
+  apply rngl_ltb_lt.
+  clear Hz.
 ...
-Check quadrant_1_rngl_cos_add_le_cos_l.
-Theorem quadrant_1_rngl_cos_add_le_cos_l
-...
-Search (rngl_cos _ < rngl_sin _)%L.
+specialize (rl_sqrt_nonneg (1 / 2)%L) as H1.
+Search (0 ≤? 1)%L.
+Search (_ ≤? _)%L.
+specialize (rn
+... ...
+now apply angle_right_div_2_lt.
 ...
       destruct (rngl_le_de
 Search (_ ↔ _ < _)%A.
