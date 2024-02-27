@@ -1159,12 +1159,28 @@ split. {
     destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
       rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
       split; [ now apply angle_right_div_2_lt | ].
+Theorem angle_lt_3_angle_right_div_2 :
+  ∀ θ,
+  (rngl_cos θ < rngl_sin θ)%L
+  → (0 ≤ rngl_sin θ)%L
+  → (0 ≤ rngl_cos θ)%L
+  → (θ < 3 * (angle_right / ₂))%A.
+Proof.
+intros * Hcs Hs Hc.
+progress unfold angle_ltb.
+Theorem rngl_sin_3_right_div_2 :
+  rngl_sin (3 * (angle_right / ₂)) = √(1 / 2)%L.
+... ...
+rewrite rngl_sin_3_right_div_2.
 ...
-  Hcz : (rngl_cos θ < rngl_sin θ)%L
-  Hs : (0 ≤ rngl_sin θ)%L
-  Hc : (0 ≤ rngl_cos θ)%L
-  ============================
-  (θ < 3 * (angle_right / ₂))%A
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+apply rngl_leb_le in Hs; rewrite Hs.
+apply rngl_leb_le in Hs.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+apply rngl_leb_le in H1.
+rewrite H1; clear H1.
+rewrite (rngl_mul_1_l Hon).
+assert (Hzs : (0 ≤ √(1 / 2))%L). {
 ...
 Check rngl_cos_decr.
 specialize (rngl_cos_decr θ (angle_right / ₂)) as H1.
