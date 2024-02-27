@@ -1034,6 +1034,7 @@ destruct m. {
         apply (rngl_0_le_2 Hon Hop Hor).
       }
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
+...
 (* pas sûr : par exemple si π/2 < θi < 3π/4
    oui, mais dans ce cas, sin(3*θi), peut-il être positif ? *)
 rewrite rngl_sin_nx in Hzsi3.
