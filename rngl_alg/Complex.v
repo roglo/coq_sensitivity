@@ -3392,7 +3392,7 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_div_2_lt : ∀ θ, (θ ≠ 0 → θ / ₂ < θ)%A.
+Theorem angle_div_2_lt_diag : ∀ θ, (θ ≠ 0 → θ / ₂ < θ)%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -3435,7 +3435,7 @@ Theorem angle_div_2_neq_0 : ∀ θ, (θ ≠ 0 → θ / ₂ ≠ θ)%A.
 Proof.
 destruct_ac.
 intros * H2.
-specialize (angle_div_2_lt _ H2) as H1.
+specialize (angle_div_2_lt_diag _ H2) as H1.
 now apply angle_lt_iff in H1.
 Qed.
 

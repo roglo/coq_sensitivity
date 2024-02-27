@@ -432,6 +432,8 @@ Notation "θ1 ≤ θ2 < θ3" :=
   (angle_leb θ1 θ2 = true ∧ angle_ltb θ2 θ3 = true)%L : angle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
   (angle_leb θ1 θ2 = true ∧ angle_leb θ2 θ3 = true)%L : angle_scope.
+Notation "θ1 < θ2 < θ3" :=
+  (angle_ltb θ1 θ2 = true ∧ angle_ltb θ2 θ3 = true)%L : angle_scope.
 Notation "θ1 < θ2 ≤ θ3" :=
   (angle_ltb θ1 θ2 = true ∧ angle_leb θ2 θ3 = true)%L : angle_scope.
 

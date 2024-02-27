@@ -1034,11 +1034,11 @@ destruct m. {
         apply (rngl_0_le_2 Hon Hop Hor).
       }
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
-Theorem rngl_cos_neg_if :
+Theorem rngl_cos_neg_iff :
   ∀ θ,
-  (0 ≤ rngl_sin θ)%L
-  → (rngl_cos (2 * θ) < 0)%L
-  → (angle_right / ₂ ≤ θ ≤ 3 * (angle_right / ₂))%A.
+  (rngl_cos (2 * θ) < 0)%L
+  ↔ (angle_right / ₂ < θ < 3 * (angle_right / ₂))%A ∨
+    (5 * (angle_right / ₂) < θ < 7 * (angle_right / ₂))%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1047,33 +1047,61 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   rewrite (H1 (_ / ₂))%A.
   rewrite (H1 θ).
-  rewrite (H1 (_ * _))%A.
-  split; apply angle_le_refl.
-}
-intros * Hs Hcz.
-rewrite rngl_cos_mul_2_l in Hcz.
-apply -> (rngl_lt_sub_0 Hop Hor) in Hcz.
-apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hcz.
-rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
-split. {
-  apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | | ]. {
-    apply rngl_sin_div_2_nonneg.
-  }
+  do 4 rewrite (H1 (_ * _))%A.
   cbn.
-  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-  apply rngl_leb_le in H1.
-  rewrite H1; clear H1.
-  rewrite rngl_add_0_r.
-  rewrite (rngl_mul_1_l Hon).
-  destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hc| Hc]. {
-    apply (rngl_lt_le_incl Hor) in Hc.
-    apply (rngl_le_trans Hor _ 0); [ easy | ].
-    apply rl_sqrt_nonneg.
-    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  split. {
+    intros H2.
+    exfalso.
+    apply (rngl_nle_gt Hor) in H2.
+    apply H2; clear H2.
     apply (rngl_0_le_1 Hon Hop Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  apply (rngl_nlt_ge Hor) in Hc.
+  intros H2.
+  now destruct H2 as [(H2, _)| (H2, _)]; apply angle_lt_irrefl in H2.
+}
+intros.
+split. {
+  intros Hcz.
+  rewrite rngl_cos_mul_2_l in Hcz.
+  apply -> (rngl_lt_sub_0 Hop Hor) in Hcz.
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hcz.
+  destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
+    rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
+    left.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
+      rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
+      split. {
+Search (_ / ₂ < _)%A.
+About angle_div_2_lt_diag.
+...
+Check quadrant_1_rngl_cos_add_le_cos_l.
+Theorem quadrant_1_rngl_cos_add_le_cos_l
+...
+Search (rngl_cos _ < rngl_sin _)%L.
+...
+      destruct (rngl_le_de
+Search (_ ↔ _ < _)%A.
+Check rngl_cos_le_anticompat_when_sin_nonneg.
+Check rngl_cos_lt_anticompat_when_sin_pos.
+...
+    apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | | ]. {
+        apply rngl_sin_div_2_nonneg.
+      }
+      cbn.
+      specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+      apply rngl_leb_le in H1.
+      rewrite H1; clear H1.
+      rewrite rngl_add_0_r.
+      rewrite (rngl_mul_1_l Hon).
+      destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hc| Hc]. {
+        apply (rngl_lt_le_incl Hor) in Hc.
+        apply (rngl_le_trans Hor _ 0); [ easy | ].
+        apply rl_sqrt_nonneg.
+        apply (rngl_div_nonneg Hon Hop Hiv Hor).
+        apply (rngl_0_le_1 Hon Hop Hor).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_nlt_ge Hor) in Hc.
 ...
 apply rngl_cos_le_cos_div_2.
 Check rngl_cos_decr.
