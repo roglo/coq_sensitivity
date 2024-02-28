@@ -1255,6 +1255,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now destruct H2 as [(H2, _)| (H2, _)]; apply angle_lt_irrefl in H2.
 }
 intros.
+assert (Hzs : (0 ≤ √(1 / 2))%L). {
+  apply rl_sqrt_nonneg.
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
 split. {
   intros Hcz.
   rewrite rngl_cos_mul_2_l in Hcz.
@@ -1269,33 +1275,32 @@ split. {
       now apply angle_lt_3_angle_right_div_2.
     } {
       apply (rngl_nle_gt Hor) in Hc.
-...
-rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-apply rngl_leb_le in Hs; rewrite Hs.
-apply rngl_leb_le in Hs.
-specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-apply rngl_leb_le in H1.
-rewrite H1; clear H1.
-rewrite (rngl_mul_1_l Hon).
-assert (Hzs : (0 ≤ √(1 / 2))%L). {
-...
-Check rngl_cos_decr.
-specialize (rngl_cos_decr θ (angle_right / ₂)) as H1.
-Search (rngl_cos (_ / ₂) = _).
-...
-Search (rngl_sin _ ≤ rngl_cos _)%L.
-...
-specialize (rl_sqrt_nonneg (1 / 2)%L) as H1.
-Search (0 ≤? 1)%L.
-Search (_ ≤? _)%L.
-specialize (rn
-... ...
-now apply angle_right_div_2_lt.
-...
-      destruct (rngl_le_de
-Search (_ ↔ _ < _)%A.
-Check rngl_cos_le_anticompat_when_sin_nonneg.
-Check rngl_cos_lt_anticompat_when_sin_pos.
+      rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
+        now apply (rngl_lt_le_incl Hor) in Hc.
+      }
+(*
+     change_angle_sub_l θ angle_straight.
+     progress sin_cos_add_sub_straight_hyp T Hc.
+     progress sin_cos_add_sub_straight_hyp T Hs.
+     progress sin_cos_add_sub_straight_hyp T Hcz.
+*)
+     split. {
+       (* lemma? *)
+       progress unfold angle_ltb.
+       specialize (rngl_sin_div_2_nonneg angle_right) as H1.
+       apply rngl_leb_le in H1.
+       rewrite H1; clear H1.
+       apply rngl_leb_le in Hs.
+       rewrite Hs.
+       apply rngl_leb_le in Hs.
+       apply rngl_ltb_lt; cbn.
+       specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+       apply rngl_leb_le in H1.
+       rewrite H1; clear H1.
+       rewrite (rngl_mul_1_l Hon).
+       rewrite rngl_add_0_r.
+       now apply (rngl_lt_le_trans Hor _ 0).
+     }
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | | ]. {
         apply rngl_sin_div_2_nonneg.
