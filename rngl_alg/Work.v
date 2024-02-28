@@ -1077,6 +1077,30 @@ f_equal.
 apply rngl_sin_3_right_div_2.
 Qed.
 
+Theorem rngl_sin_7_right_div_2 :
+  rngl_sin (7 * (angle_right / ₂)) = (- √(1 / 2))%L.
+Proof.
+destruct_ac.
+replace 7 with (2 + 5) by easy.
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_mul_2.
+rewrite (rngl_sin_add_right_l Hon Hos).
+apply rngl_cos_5_right_div_2.
+Qed.
+
+Theorem rngl_cos_7_right_div_2 :
+  rngl_cos (7 * (angle_right / ₂)) = √(1 / 2)%L.
+Proof.
+destruct_ac.
+replace 7 with (2 + 5) by easy.
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_mul_2.
+rewrite (rngl_cos_add_right_l Hon Hop).
+apply (rngl_opp_inj Hop).
+rewrite (rngl_opp_involutive Hop).
+apply rngl_sin_5_right_div_2.
+Qed.
+
 Theorem angle_lt_3_angle_right_div_2 :
   rngl_characteristic T ≠ 1 →
   ∀ θ,
@@ -1434,14 +1458,32 @@ split. {
     destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
       rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
       split; [ now apply angle_lt_5_angle_right_div_2 | ].
-...
-apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-apply (rngl_opp_neg_pos Hop Hor).
-apply (rl_sqrt_pos Hon Hos).
-apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+progress unfold angle_ltb.
+generalize Hs; intros H.
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+rewrite rngl_sin_7_right_div_2.
+rewrite rngl_cos_7_right_div_2.
+rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hsz.
+destruct sz. {
+  exfalso.
+  apply rngl_leb_le in Hsz.
+  apply (rngl_nlt_ge Hor) in Hsz.
+  apply Hsz; clear Hsz.
+  apply (rl_sqrt_pos Hon Hos).
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
-apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+apply rngl_ltb_lt.
+rewrite <- rngl_cos_7_right_div_2.
+Search (rngl_cos _ < rngl_cos _)%L.
+...
+(* bin non *)
+apply angle_add_le_mono_l_lemma_39; try easy. {
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | | ]. {
         apply rngl_sin_div_2_nonneg.
