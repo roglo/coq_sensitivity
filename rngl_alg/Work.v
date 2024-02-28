@@ -1278,12 +1278,6 @@ split. {
       rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
         now apply (rngl_lt_le_incl Hor) in Hc.
       }
-(*
-     change_angle_sub_l θ angle_straight.
-     progress sin_cos_add_sub_straight_hyp T Hc.
-     progress sin_cos_add_sub_straight_hyp T Hs.
-     progress sin_cos_add_sub_straight_hyp T Hcz.
-*)
      split. {
        (* lemma? *)
        progress unfold angle_ltb.
@@ -1300,7 +1294,25 @@ split. {
        rewrite (rngl_mul_1_l Hon).
        rewrite rngl_add_0_r.
        now apply (rngl_lt_le_trans Hor _ 0).
-     }
+     } {
+       progress unfold angle_ltb.
+       apply rngl_leb_le in Hs.
+       rewrite Hs.
+       apply rngl_leb_le in Hs.
+       rewrite rngl_sin_3_right_div_2.
+       rewrite rngl_cos_3_right_div_2.
+       generalize Hzs; intros H.
+       apply rngl_leb_le in H.
+       rewrite H; clear H.
+       apply rngl_ltb_lt.
+...
+apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
+apply (rngl_opp_neg_pos Hop Hor).
+apply (rl_sqrt_pos Hon Hos).
+apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | | ]. {
         apply rngl_sin_div_2_nonneg.
