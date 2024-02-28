@@ -981,6 +981,42 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
 }
 Qed.
 
+Theorem rngl_sin_3_right_div_2 :
+  rngl_sin (3 * (angle_right / ₂)) = √(1 / 2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  rewrite (H1 (rngl_sin _)); symmetry.
+  apply H1.
+}
+cbn.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+apply rngl_leb_le in H1.
+rewrite H1; clear H1.
+do 2 rewrite (rngl_mul_0_r Hos).
+do 2 rewrite (rngl_sub_0_r Hos).
+do 2 rewrite rngl_add_0_r.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_mul_0_r Hos).
+rewrite rngl_add_0_l.
+rewrite fold_rngl_squ.
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+apply (rngl_mul_1_r Hon).
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -1168,9 +1204,6 @@ Theorem angle_lt_3_angle_right_div_2 :
 Proof.
 intros * Hcs Hs Hc.
 progress unfold angle_ltb.
-Theorem rngl_sin_3_right_div_2 :
-  rngl_sin (3 * (angle_right / ₂)) = √(1 / 2)%L.
-... ...
 rewrite rngl_sin_3_right_div_2.
 ...
 rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
