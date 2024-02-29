@@ -907,6 +907,19 @@ apply (rngl_0_le_1 Hon Hop Hor).
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rl_sqrt_half_pos :
+  rngl_characteristic T ≠ 1 →
+  (0 < √(1 / 2))%L.
+Proof.
+destruct_ac.
+intros Hc1.
+apply (rl_sqrt_pos Hon Hos).
+apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+Qed.
+
 Theorem angle_right_div_2_lt :
   ∀ θ,
   (rngl_cos θ < rngl_sin θ)%L
@@ -982,11 +995,7 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
 Qed.
 
@@ -1132,11 +1141,7 @@ rewrite H; clear H.
 apply rngl_ltb_lt.
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
 apply (rngl_opp_neg_pos Hop Hor).
-apply (rl_sqrt_pos Hon Hos).
-apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
-apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+apply (rl_sqrt_half_pos Hc1).
 Qed.
 
 Theorem quadrant_4_angle_lt_5_angle_right_div_2 :
@@ -1166,11 +1171,7 @@ destruct sz; [ easy | ].
 apply rngl_ltb_lt.
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
 apply (rngl_opp_neg_pos Hop Hor).
-apply (rl_sqrt_pos Hon Hos).
-apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
-apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+apply (rl_sqrt_half_pos Hc1).
 Qed.
 
 Theorem rngl_cos_right_div_2 : rngl_cos (angle_right / ₂) = √(1 / 2)%L.
@@ -1218,11 +1219,7 @@ destruct sz. {
   apply rngl_leb_le in Hsz.
   apply (rngl_nlt_ge Hor) in Hsz.
   apply Hsz; clear Hsz.
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
 apply (rngl_leb_gt Hor) in Hs.
 rewrite Hs.
@@ -1257,11 +1254,7 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
 Qed.
 
@@ -1296,11 +1289,7 @@ destruct sz. {
   apply rngl_leb_le in Hsz.
   apply (rngl_nlt_ge Hor) in Hsz.
   apply Hsz; clear Hsz.
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
 apply rngl_ltb_lt.
 change_angle_opp θ.
@@ -1327,11 +1316,7 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
 Qed.
 
@@ -1442,12 +1427,52 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     now apply (rngl_lt_0_sub Hop Hor).
   }
-  apply (rl_sqrt_pos Hon Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  apply (rl_sqrt_half_pos Hc1).
 }
+Qed.
+
+Theorem quadrant_3_angle_lt_7_angle_right_div_2 :
+  ∀ θ,
+  (rngl_sin θ < 0)%L
+  → (rngl_cos θ < 0)%L
+  → (θ < 7 * (angle_right / ₂))%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hs Hc.
+  rewrite (H1 (rngl_sin _)) in Hs.
+  now apply (rngl_lt_irrefl Hor) in Hs.
+}
+specialize rl_sqrt_half_nonneg as Hzs.
+intros * Hs Hc.
+change_angle_add_r θ angle_straight.
+progress sin_cos_add_sub_straight_hyp T Hc.
+progress sin_cos_add_sub_straight_hyp T Hs.
+progress unfold angle_ltb.
+rewrite (rngl_sin_sub_straight_r Hon Hop).
+rewrite rngl_leb_opp_r.
+rewrite (rngl_opp_0 Hop).
+generalize Hs; intros H.
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+rewrite rngl_sin_7_right_div_2.
+rewrite rngl_leb_opp_r.
+rewrite (rngl_opp_0 Hop).
+remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hsz.
+destruct sz. {
+  exfalso.
+  apply rngl_leb_le in Hsz.
+  apply (rngl_nlt_ge Hor) in Hsz.
+  apply Hsz; clear Hsz.
+  apply (rl_sqrt_half_pos Hc1).
+}
+apply rngl_ltb_lt.
+rewrite (rngl_cos_sub_straight_r Hon Hop).
+rewrite rngl_cos_7_right_div_2.
+apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
+now apply (rngl_opp_neg_pos Hop Hor).
 Qed.
 
 (* to be completed
@@ -1662,12 +1687,20 @@ split. {
     apply (rngl_opp_lt_compat Hop Hor) in Hcz.
     split. {
       now apply quadrant_3_angle_lt_5_angle_right_div_2.
+    } {
+      now apply quadrant_3_angle_lt_7_angle_right_div_2.
     }
-Check quadrant_4_angle_lt_7_angle_right_div_2.
-change_angle_add_r θ angle_straight.
-progress sin_cos_add_sub_straight_hyp T Hc.
-progress sin_cos_add_sub_straight_hyp T Hs.
-progress sin_cos_add_sub_straight_hyp T Hcz.
+  }
+}
+...
+change_angle_opp θ.
+progress sin_cos_opp_hyp T Hc.
+...
+apply (rngl_lt_0_sub Hop Hor).
+specialize (rngl_cos_div_2 angle_right) as H1.
+cbn - [ rngl_cos ] in H1.
+specialize (rngl_0_le_1 Hon Hop Hor) as H2.
+apply rngl_leb_le in H2.
 ...
 ...
 (* pas sûr : par exemple si π/2 < θi < 3π/4
