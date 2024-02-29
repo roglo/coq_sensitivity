@@ -1679,14 +1679,13 @@ destruct m. {
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_0_le_2 Hon Hop Hor).
       }
+      apply (rngl_nle_gt Hor).
+      intros Hcc.
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
         apply (rngl_nlt_ge Hor).
         intros H1.
         apply rngl_cos_neg_if in H1.
         destruct H1 as [(H1, H3)| (H1, H3)]. {
-...
-change_angle_opp θ.
-progress sin_cos_opp_hyp T Hc.
 ...
 apply (rngl_lt_0_sub Hop Hor).
 specialize (rngl_cos_div_2 angle_right) as H1.
