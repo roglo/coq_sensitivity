@@ -1475,7 +1475,7 @@ apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
 now apply (rngl_opp_neg_pos Hop Hor).
 Qed.
 
-Theorem rngl_cos_neg_if :
+Theorem rngl_cos_mul_2_neg_if :
   ∀ θ,
   (rngl_cos (2 * θ) < 0)%L
   → (angle_right / ₂ < θ < 3 * (angle_right / ₂))%A ∨
@@ -1679,12 +1679,13 @@ destruct m. {
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_0_le_2 Hon Hop Hor).
       }
+...
       apply (rngl_nle_gt Hor).
       intros Hcc.
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
         apply (rngl_nlt_ge Hor).
         intros H1.
-        apply rngl_cos_neg_if in H1.
+        apply rngl_cos_mul_2_neg_if in H1.
         destruct H1 as [(H1, H3)| (H1, H3)]. {
 ...
 apply (rngl_lt_0_sub Hop Hor).
