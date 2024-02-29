@@ -1261,6 +1261,81 @@ apply angle_add_le_mono_l_lemma_39; try easy. {
 }
 Qed.
 
+Theorem angle_lt_7_angle_right_div_2 :
+  ∀ θ,
+  (rngl_cos θ < - rngl_sin θ)%L
+  → (rngl_sin θ < 0)%L
+  → (0 ≤ rngl_cos θ)%L
+  → (θ < 7 * (angle_right / ₂))%A.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hcs Hs Hc.
+  rewrite (H1 (rngl_sin _)) in Hs.
+  now apply (rngl_lt_irrefl Hor) in Hs.
+}
+assert (Hzs : (0 ≤ √(1 / 2))%L). {
+  apply rl_sqrt_nonneg.
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+intros * Hcs Hs Hc.
+progress unfold angle_ltb.
+generalize Hs; intros H.
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+rewrite rngl_sin_7_right_div_2.
+rewrite rngl_cos_7_right_div_2.
+rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hsz.
+destruct sz. {
+  exfalso.
+  apply rngl_leb_le in Hsz.
+  apply (rngl_nlt_ge Hor) in Hsz.
+  apply Hsz; clear Hsz.
+  apply (rl_sqrt_pos Hon Hos).
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply rngl_ltb_lt.
+change_angle_opp θ.
+progress sin_cos_opp_hyp T Hc.
+progress sin_cos_opp_hyp T Hs.
+progress sin_cos_opp_hyp T Hcs.
+rewrite (rngl_opp_involutive Hop) in Hcs.
+cbn.
+rewrite <- rngl_cos_right_div_2.
+apply angle_add_le_mono_l_lemma_39; try easy. {
+  now rewrite rngl_sin_right_div_2.
+} {
+  now rewrite rngl_cos_right_div_2.
+} {
+  cbn.
+  specialize (rngl_0_le_1 Hon Hop Hor) as H2.
+  apply rngl_leb_le in H2.
+  rewrite H2; clear H2.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  apply (rngl_mul_pos_pos Hop Hor Hii). {
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  apply (rl_sqrt_pos Hon Hos).
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -1549,57 +1624,10 @@ split. {
     right.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
       rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
-      split; [ now apply quadrant_4_angle_lt_5_angle_right_div_2 | ].
-      progress unfold angle_ltb.
-      generalize Hs; intros H.
-      apply (rngl_leb_gt Hor) in H.
-      rewrite H; clear H.
-      rewrite rngl_sin_7_right_div_2.
-      rewrite rngl_cos_7_right_div_2.
-      rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
-      remember (√(1 / 2) ≤? 0)%L as sz eqn:Hsz.
-      symmetry in Hsz.
-      destruct sz. {
-        exfalso.
-        apply rngl_leb_le in Hsz.
-        apply (rngl_nlt_ge Hor) in Hsz.
-        apply Hsz; clear Hsz.
-        apply (rl_sqrt_pos Hon Hos).
-        apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-        }
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      apply rngl_ltb_lt.
-      change_angle_opp θ.
-      progress sin_cos_opp_hyp T Hc.
-      progress sin_cos_opp_hyp T Hs.
-      progress sin_cos_opp_hyp T Hcz.
-      rewrite (rngl_opp_involutive Hop) in Hcz.
-      cbn.
-      rewrite <- rngl_cos_right_div_2.
-      apply angle_add_le_mono_l_lemma_39; try easy. {
-        now rewrite rngl_sin_right_div_2.
+      split. {
+        now apply quadrant_4_angle_lt_5_angle_right_div_2.
       } {
-        now rewrite rngl_cos_right_div_2.
-      } {
-        cbn.
-        specialize (rngl_0_le_1 Hon Hop Hor) as H2.
-        apply rngl_leb_le in H2.
-        rewrite H2; clear H2.
-        rewrite (rngl_mul_1_l Hon).
-        rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
-        rewrite (rngl_mul_opp_r Hop).
-        rewrite (rngl_add_opp_r Hop).
-        rewrite <- (rngl_mul_sub_distr_r Hop).
-        apply (rngl_mul_pos_pos Hop Hor Hii). {
-          now apply (rngl_lt_0_sub Hop Hor).
-        }
-        apply (rl_sqrt_pos Hon Hos).
-        apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
-          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-        }
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        now apply angle_lt_7_angle_right_div_2.
       }
     }
     apply (rngl_nle_gt Hor) in Hc.
