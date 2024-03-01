@@ -1539,6 +1539,73 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
 }
 Qed.
 
+Theorem angle_opp_lt_compat_if :
+  ∀ θ1 θ2,
+  (θ1 ≠ 0)%A
+  → (θ1 < θ2)%A
+  → (- θ2 < - θ1)%A.
+Proof.
+destruct_ac.
+intros * H1z H12.
+progress unfold angle_ltb in H12.
+progress unfold angle_ltb.
+cbn.
+do 2 rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+symmetry in Hzs1, Hs1z.
+symmetry in Hzs2, Hs2z.
+destruct s2z. {
+  destruct s1z; [ | easy ].
+  apply rngl_leb_le in Hs1z.
+  apply rngl_leb_le in Hs2z.
+  apply rngl_ltb_lt.
+  destruct zs2. {
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Hzs1.
+    apply rngl_leb_le in Hzs2.
+    apply rngl_ltb_lt in H12.
+    apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+    apply eq_rngl_sin_0 in Hzs1.
+    destruct Hzs1; subst θ1; [ easy | clear H1z ].
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H2; symmetry in H2.
+    apply eq_rngl_cos_opp_1 in H2; subst θ2.
+    now apply (rngl_lt_irrefl Hor) in H12.
+  }
+  apply (rngl_leb_gt Hor) in Hzs2.
+  destruct zs1; [ | now apply rngl_ltb_lt in H12 ].
+  apply rngl_leb_le in Hzs1.
+  apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+  apply eq_rngl_sin_0 in Hzs1.
+  destruct Hzs1; subst θ1; [ easy | clear H1z ].
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros Hc; symmetry in Hc.
+  apply eq_rngl_cos_opp_1 in Hc; subst θ2.
+  now apply (rngl_lt_irrefl Hor) in Hzs2.
+}
+apply (rngl_leb_gt Hor) in Hs2z.
+destruct zs2. 2: {
+  apply (rngl_leb_gt Hor) in Hzs2.
+  now apply (rngl_lt_asymm Hor) in Hzs2.
+}
+clear Hzs2.
+destruct zs1; [ | easy ].
+destruct s1z; [ | easy ].
+exfalso.
+apply rngl_leb_le in Hzs1, Hs1z.
+apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+apply eq_rngl_sin_0 in Hzs1.
+destruct Hzs1; subst θ1; [ easy | ].
+apply rngl_ltb_lt in H12.
+apply (rngl_nle_gt Hor) in H12.
+apply H12, rngl_cos_bound.
+Qed.
+
 (* to be completed
 Theorem rngl_sin_mul_2_neg_if :
   ∀ θ,
@@ -1570,50 +1637,22 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   change_angle_opp θ.
   progress sin_cos_opp_hyp T Hzc.
   progress sin_cos_opp_hyp T Hcz.
-Search (_ < - _)%A.
-Search (- - _)%A.
-Theorem angle_opp_lt_compat :
-  ∀ θ1 θ2,
-  (θ1 ≠ 0%A ∨ θ2 ≠ angle_straight)
-  → (θ1 < θ2 ↔ - θ2 < - θ1)%A.
-Proof.
-destruct_ac.
-intros * H1z2s.
-split; intros H12. {
-  progress unfold angle_ltb in H12.
+  rewrite <- (angle_opp_involutive Hop (_ * _)).
+  apply angle_opp_lt_compat_if. {
+    intros H; subst θ.
+    now apply (rngl_lt_irrefl Hor) in Hcz.
+  }
   progress unfold angle_ltb.
-  cbn.
-  do 2 rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
-  symmetry in Hzs1, Hs1z.
-  symmetry in Hzs2, Hs2z.
-  destruct s2z. {
-    destruct s1z; [ | easy ].
-    apply rngl_leb_le in Hs1z.
-    apply rngl_leb_le in Hs2z.
-    apply rngl_ltb_lt.
-    destruct zs2. {
-      destruct zs1; [ | easy ].
-      apply rngl_leb_le in Hzs1.
-      apply rngl_leb_le in Hzs2.
-      apply rngl_ltb_lt in H12.
-      apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
-      apply eq_rngl_sin_0 in Hzs1.
-      destruct Hzs1; subst θ1. {
-        apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-        apply eq_rngl_sin_0 in Hzs2.
-        destruct Hzs2; subst θ2; [ easy | ].
-        exfalso.
-        clear Hs2z Hs1z H12.
-(* θ1 = 0 ; θ2 = straight *)
-(* 0 < π <=> -π < 0 *)
-(* θ1 = straight *)
-(* π < θ ↔ -θ < π ok *)
-(* θ2 = straight *)
-(* θ < π ↔ π < θ pas ok *)
+  cbn - [ angle_mul_nat ].
+  generalize Hcz; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  rewrite rngl_leb_opp_r.
+  rewrite (rngl_opp_0 Hop).
+...
+rewrite rngl_sin_nx.
+Search (rngl_sin (_ * _)).
 ...
     destruct s1z. {
       apply rngl_leb_le in Hs1z.
