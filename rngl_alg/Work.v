@@ -1823,27 +1823,29 @@ destruct m. {
       intros H2.
       apply (rngl_nlt_ge Hor) in H1.
       apply H1; clear H1.
+      rename H2 into H1.
       assert (Hci : (rngl_cos θi ≤ 0)%L). {
         apply (rngl_nlt_ge Hor).
         intros H.
-        apply (rngl_nle_gt Hor) in H2.
-        apply H2; clear H2.
+        apply (rngl_nle_gt Hor) in H1.
+        apply H1; clear H1.
         rewrite rngl_sin_mul_2_l.
         apply (rngl_lt_le_incl Hor) in H.
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_0_le_2 Hon Hop Hor).
       }
-      apply rngl_sin_mul_2_neg_if in H2.
-      destruct H2 as [(H2, H3)| H2]. {
+      generalize H1; intros H.
+      apply rngl_sin_mul_2_neg_if in H.
+      destruct H as [(H2, H3)| H2]. {
 ...
       apply (rngl_nle_gt Hor).
       intros Hcc.
       assert (Hc2i : (0 ≤ rngl_cos (2 * θi))%L). {
         apply (rngl_nlt_ge Hor).
-        intros H1.
-        apply rngl_cos_mul_2_neg_if in H1.
-        destruct H1 as [(H1, H3)| (H1, H3)]. {
+        intros H4.
+        apply rngl_cos_mul_2_neg_if in H4.
+        destruct H4 as [(H4, H5)| (H4, H5)]. {
 ...
 apply (rngl_lt_0_sub Hop Hor).
 specialize (rngl_cos_div_2 angle_right) as H1.
