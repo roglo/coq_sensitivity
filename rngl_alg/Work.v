@@ -1573,10 +1573,12 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
 Search (_ < - _)%A.
 Search (- - _)%A.
 Theorem angle_opp_lt_compat :
-  ∀ θ1 θ2, (θ1 < θ2 ↔ - θ1 < - θ2)%A.
+  ∀ θ1 θ2,
+  (θ1 ≠ 0%A ∨ θ2 ≠ angle_straight)
+  → (θ1 < θ2 ↔ - θ2 < - θ1)%A.
 Proof.
 destruct_ac.
-intros.
+intros * H1z2s.
 split; intros H12. {
   progress unfold angle_ltb in H12.
   progress unfold angle_ltb.
@@ -1588,8 +1590,31 @@ split; intros H12. {
   remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
   symmetry in Hzs1, Hs1z.
   symmetry in Hzs2, Hs2z.
-  destruct zs1. {
-    apply rngl_leb_le in Hzs1.
+  destruct s2z. {
+    destruct s1z; [ | easy ].
+    apply rngl_leb_le in Hs1z.
+    apply rngl_leb_le in Hs2z.
+    apply rngl_ltb_lt.
+    destruct zs2. {
+      destruct zs1; [ | easy ].
+      apply rngl_leb_le in Hzs1.
+      apply rngl_leb_le in Hzs2.
+      apply rngl_ltb_lt in H12.
+      apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+      apply eq_rngl_sin_0 in Hzs1.
+      destruct Hzs1; subst θ1. {
+        apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+        apply eq_rngl_sin_0 in Hzs2.
+        destruct Hzs2; subst θ2; [ easy | ].
+        exfalso.
+        clear Hs2z Hs1z H12.
+(* θ1 = 0 ; θ2 = straight *)
+(* 0 < π <=> -π < 0 *)
+(* θ1 = straight *)
+(* π < θ ↔ -θ < π ok *)
+(* θ2 = straight *)
+(* θ < π ↔ π < θ pas ok *)
+...
     destruct s1z. {
       apply rngl_leb_le in Hs1z.
       apply (rngl_le_antisymm Hor) in Hs1z; [ | easy ].
@@ -1610,7 +1635,8 @@ split; intros H12. {
       }
       destruct zs2; [ easy | ].
       apply (rngl_leb_gt Hor) in Hzs2.
-cbn in Hzs1 |-*.
+      apply rngl_ltb_lt.
+      cbn in Hzs1 |-*.
 ... ...
 apply angle_opp_lt_compat.
 ...
