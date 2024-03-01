@@ -1571,6 +1571,48 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   progress sin_cos_opp_hyp T Hzc.
   progress sin_cos_opp_hyp T Hcz.
 Search (_ < - _)%A.
+Search (- - _)%A.
+Theorem angle_opp_lt_compat :
+  ∀ θ1 θ2, (θ1 < θ2 ↔ - θ1 < - θ2)%A.
+Proof.
+destruct_ac.
+intros.
+split; intros H12. {
+  progress unfold angle_ltb in H12.
+  progress unfold angle_ltb.
+  cbn.
+  do 2 rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+  symmetry in Hzs1, Hs1z.
+  symmetry in Hzs2, Hs2z.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct s1z. {
+      apply rngl_leb_le in Hs1z.
+      apply (rngl_le_antisymm Hor) in Hs1z; [ | easy ].
+      symmetry in Hs1z.
+      apply eq_rngl_sin_0 in Hs1z.
+      destruct s2z; [ | easy ].
+      apply rngl_leb_le in Hs2z.
+      destruct Hs1z; subst θ1. {
+        destruct zs2; [ easy | ].
+        apply (rngl_leb_gt Hor) in Hzs2.
+        apply rngl_ltb_lt.
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_cos_bound | ].
+        intros H.
+        apply eq_rngl_cos_1 in H.
+        subst θ2.
+        now apply (rngl_lt_irrefl Hor) in Hzs2.
+      }
+      destruct zs2; [ easy | ].
+      apply (rngl_leb_gt Hor) in Hzs2.
+cbn in Hzs1 |-*.
+... ...
+apply angle_opp_lt_compat.
 ...
   change_angle_add_r θ angle_right.
   progress sin_cos_add_sub_right_hyp T Hzc.
