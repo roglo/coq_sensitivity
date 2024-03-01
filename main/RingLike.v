@@ -5050,6 +5050,45 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ | easy ].
 now apply (rngl_le_lt_trans Hor _ a).
 Qed.
 
+Theorem rngl_lt_mul_0_if :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a * b < 0)%L → (a < 0 < b)%L ∨ (0 < a)%L ∧ (b < 0)%L.
+Proof.
+intros Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hab.
+remember (a <? 0)%L as az eqn:Haz.
+symmetry in Haz.
+destruct az. {
+  apply rngl_ltb_lt in Haz.
+  left.
+  split; [ easy | ].
+  remember (0 <? b)%L as zb eqn:Hzb.
+  symmetry in Hzb.
+  destruct zb; [ now apply rngl_ltb_lt in Hzb | exfalso ].
+  apply (rngl_ltb_ge Hor) in Hzb.
+  apply (rngl_nle_gt Hor) in Hab.
+  apply Hab; clear Hab.
+  apply (rngl_mul_nonpos_nonpos Hop Hor); [ | easy ].
+  now apply (rngl_lt_le_incl Hor) in Haz.
+}
+apply (rngl_ltb_ge Hor) in Haz.
+right.
+split. {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; subst a.
+  rewrite (rngl_mul_0_l Hos) in Hab.
+  now apply (rngl_lt_irrefl Hor) in Hab.
+}
+apply (rngl_nle_gt Hor).
+intros Hzb.
+apply (rngl_nle_gt Hor) in Hab.
+apply Hab; clear Hab.
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
 Theorem rngl_square_le_simpl_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

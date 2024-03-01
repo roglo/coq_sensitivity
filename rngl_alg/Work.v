@@ -1540,6 +1540,92 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
 Qed.
 
 (* to be completed
+Theorem rngl_sin_mul_2_neg_if :
+  ∀ θ,
+  (rngl_sin (2 * θ) < 0)%L
+  → (angle_right < θ < angle_straight)%A ∨
+    (3 * angle_right < θ)%A.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H2.
+  rewrite (H1 (rngl_sin _)) in H2.
+  now apply (rngl_lt_irrefl Hor) in H2.
+}
+specialize rl_sqrt_half_nonneg as Hzs.
+intros * Hsz.
+rewrite rngl_sin_mul_2_l in Hsz.
+apply (rngl_lt_mul_0_if Hop Hor) in Hsz.
+destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
+  apply (rngl_lt_mul_0_if Hop Hor) in H2sz.
+  destruct H2sz as [(H, _)| (_, Hcz)]. {
+    exfalso.
+    apply (rngl_nle_gt Hor) in H.
+    apply H; clear H.
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  right.
+  change_angle_opp θ.
+  progress sin_cos_opp_hyp T Hzc.
+  progress sin_cos_opp_hyp T Hcz.
+Search (_ < - _)%A.
+...
+  change_angle_add_r θ angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzc.
+  progress sin_cos_add_sub_right_hyp T Hcz.
+Search (_ < _ - _)%A.
+...
+apply -> (rngl_lt_sub_0 Hop Hor) in Hsz.
+apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hcz.
+destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
+  left.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
+    rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
+    split; [ now apply angle_right_div_2_lt | ].
+    now apply quadrant_1_angle_lt_3_angle_right_div_2.
+  } {
+    apply (rngl_nle_gt Hor) in Hc.
+    rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
+      now apply (rngl_lt_le_incl Hor) in Hc.
+    }
+    split. {
+      now apply quadrant_2_angle_right_div_2_lt.
+    } {
+      now apply quadrant_2_angle_lt_3_angle_right_div_2.
+    }
+  }
+} {
+  apply (rngl_nle_gt Hor) in Hs.
+  rewrite (rngl_abs_nonpos_eq Hop Hor (rngl_sin _)) in Hcz. 2: {
+    now apply (rngl_lt_le_incl Hor) in Hs.
+  }
+  right.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
+    rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
+    split. {
+      now apply quadrant_4_angle_lt_5_angle_right_div_2.
+    } {
+      now apply quadrant_4_angle_lt_7_angle_right_div_2.
+    }
+  }
+  apply (rngl_nle_gt Hor) in Hc.
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
+    now apply (rngl_lt_le_incl Hor) in Hc.
+  }
+  apply (rngl_opp_lt_compat Hop Hor) in Hcz.
+  split. {
+    now apply quadrant_3_angle_lt_5_angle_right_div_2.
+  } {
+    now apply quadrant_3_angle_lt_7_angle_right_div_2.
+  }
+}
+Qed.
+*)
+
+(* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
