@@ -1650,6 +1650,37 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   rewrite H; clear H.
   rewrite rngl_leb_opp_r.
   rewrite (rngl_opp_0 Hop).
+  remember (rngl_sin (_ * _) ≤? 0)%L as s3 eqn:Hs3.
+  symmetry in Hs3.
+  destruct s3; [ | easy ].
+  apply rngl_ltb_lt.
+  apply (rngl_le_lt_trans Hor _ 0); [ | easy ].
+  cbn.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_opp_0 Hop).
+  rewrite rngl_add_0_r.
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_opp_0 Hop).
+  apply (rngl_le_refl Hor).
+}
+apply (rngl_mul_pos_cancel_l Hop Hor Hii) in Hz2s. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+left.
+change_angle_sub_r θ angle_right.
+progress sin_cos_add_sub_right_hyp T Hcz.
+progress sin_cos_add_sub_right_hyp T Hz2s.
+split. {
+  progress unfold angle_ltb.
+  rewrite (rngl_sin_add_right_r Hon Hos).
+  rewrite (rngl_cos_add_right_r Hon Hop).
+  cbn.
+  specialize (rngl_0_le_1 Hon Hop Hor) as H2.
+  apply rngl_leb_le in H2.
+  rewrite H2.
+  generalize Hz2s; intros H.
 ...
 rewrite rngl_sin_nx.
 Search (rngl_sin (_ * _)).
