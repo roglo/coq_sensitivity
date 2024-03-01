@@ -1606,7 +1606,6 @@ apply (rngl_nle_gt Hor) in H12.
 apply H12, rngl_cos_bound.
 Qed.
 
-(* to be completed
 Theorem rngl_sin_mul_2_neg_if :
   ∀ θ,
   (rngl_sin (2 * θ) < 0)%L
@@ -1681,87 +1680,33 @@ split. {
   apply rngl_leb_le in H2.
   rewrite H2.
   generalize Hz2s; intros H.
-...
-rewrite rngl_sin_nx.
-Search (rngl_sin (_ * _)).
-...
-    destruct s1z. {
-      apply rngl_leb_le in Hs1z.
-      apply (rngl_le_antisymm Hor) in Hs1z; [ | easy ].
-      symmetry in Hs1z.
-      apply eq_rngl_sin_0 in Hs1z.
-      destruct s2z; [ | easy ].
-      apply rngl_leb_le in Hs2z.
-      destruct Hs1z; subst θ1. {
-        destruct zs2; [ easy | ].
-        apply (rngl_leb_gt Hor) in Hzs2.
-        apply rngl_ltb_lt.
-        apply (rngl_lt_iff Hor).
-        split; [ apply rngl_cos_bound | ].
-        intros H.
-        apply eq_rngl_cos_1 in H.
-        subst θ2.
-        now apply (rngl_lt_irrefl Hor) in Hzs2.
-      }
-      destruct zs2; [ easy | ].
-      apply (rngl_leb_gt Hor) in Hzs2.
-      apply rngl_ltb_lt.
-      cbn in Hzs1 |-*.
-... ...
-apply angle_opp_lt_compat.
-...
-  change_angle_add_r θ angle_right.
-  progress sin_cos_add_sub_right_hyp T Hzc.
-  progress sin_cos_add_sub_right_hyp T Hcz.
-Search (_ < _ - _)%A.
-...
-apply -> (rngl_lt_sub_0 Hop Hor) in Hsz.
-apply (rngl_squ_lt_abs_lt Hop Hor Hii) in Hcz.
-destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
-  rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_sin _)) in Hcz; [ | easy ].
-  left.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
-    rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
-    split; [ now apply angle_right_div_2_lt | ].
-    now apply quadrant_1_angle_lt_3_angle_right_div_2.
-  } {
-    apply (rngl_nle_gt Hor) in Hc.
-    rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
-      now apply (rngl_lt_le_incl Hor) in Hc.
-    }
-    split. {
-      now apply quadrant_2_angle_right_div_2_lt.
-    } {
-      now apply quadrant_2_angle_lt_3_angle_right_div_2.
-    }
-  }
-} {
-  apply (rngl_nle_gt Hor) in Hs.
-  rewrite (rngl_abs_nonpos_eq Hop Hor (rngl_sin _)) in Hcz. 2: {
-    now apply (rngl_lt_le_incl Hor) in Hs.
-  }
-  right.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hc| Hc]. {
-    rewrite (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) in Hcz; [ | easy ].
-    split. {
-      now apply quadrant_4_angle_lt_5_angle_right_div_2.
-    } {
-      now apply quadrant_4_angle_lt_7_angle_right_div_2.
-    }
-  }
-  apply (rngl_nle_gt Hor) in Hc.
-  rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
-    now apply (rngl_lt_le_incl Hor) in Hc.
-  }
-  apply (rngl_opp_lt_compat Hop Hor) in Hcz.
-  split. {
-    now apply quadrant_3_angle_lt_5_angle_right_div_2.
-  } {
-    now apply quadrant_3_angle_lt_7_angle_right_div_2.
-  }
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  apply rngl_ltb_lt.
+  now apply (rngl_opp_neg_pos Hop Hor).
 }
+apply angle_lt_iff.
+split. {
+  progress unfold angle_leb.
+  rewrite (rngl_sin_add_right_r Hon Hos).
+  rewrite (rngl_cos_add_right_r Hon Hop).
+  generalize Hz2s; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H; cbn.
+  rewrite (rngl_leb_refl Hor).
+  rewrite rngl_leb_opp_r.
+  rewrite (rngl_opp_involutive Hop).
+  apply rngl_leb_le.
+  apply rngl_sin_bound.
+}
+intros H.
+apply angle_add_move_r in H.
+rewrite (angle_straight_sub_right Hon Hop) in H.
+subst θ.
+now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
-*)
 
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
@@ -1854,15 +1799,9 @@ destruct m. {
   specialize (H1 H); clear H.
   rewrite <- angle_mul_nat_assoc in H1.
   rewrite <- Hi in H1.
-(*
-  H1 : (3 * θi ≤ θ)%A
-  ============================
-  angle_add_overflow θi (2 * θi) = false
-*)
   progress unfold angle_add_overflow.
   apply angle_ltb_ge.
   rewrite angle_add_mul_r_diag_r.
-(**)
   progress unfold angle_leb in H1.
   progress unfold angle_leb.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
@@ -1880,14 +1819,6 @@ destruct m. {
       apply rngl_sin_sub_nonneg_if; [ now right | easy | easy | ].
       rewrite angle_sub_mul_l_diag_r; [ | easy ].
       cbn - [ rngl_sin angle_mul_nat ].
-(*
-  Hzs : (0 ≤ rngl_sin θ)%L
-  Hzsi : (0 ≤ rngl_sin θi)%L
-  Hzsi3 : (0 ≤ rngl_sin (3 * θi))%L
-  H1 : (rngl_cos θ ≤ rngl_cos (3 * θi))%L
-  ============================
-  (0 ≤ rngl_sin (2 * θi))%L
-*)
       apply (rngl_nlt_ge Hor).
       intros H2.
       apply (rngl_nlt_ge Hor) in H1.
@@ -1903,6 +1834,8 @@ destruct m. {
         apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
         apply (rngl_0_le_2 Hon Hop Hor).
       }
+      apply rngl_sin_mul_2_neg_if in H2.
+      destruct H2 as [(H2, H3)| H2]. {
 ...
       apply (rngl_nle_gt Hor).
       intros Hcc.
