@@ -1820,6 +1820,8 @@ split; intros H12. {
         progress sin_cos_add_sub_right_hyp T Hzs12.
         progress sin_cos_add_sub_right_hyp T Hzc2.
         progress sin_cos_add_sub_right_goal T.
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+          cbn.
 ...
         cbn in Hcs.
         rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzc2.
