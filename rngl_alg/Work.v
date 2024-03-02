@@ -1815,12 +1815,24 @@ split; intros H12. {
       }
       apply (rngl_nle_gt Hor) in Hzs2.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+        change_angle_opp θ2.
+        progress sin_cos_opp_hyp T Hzs2.
+        progress sin_cos_opp_hyp T Hzs12.
+        progress sin_cos_opp_hyp T Hzc2.
+        progress sin_cos_opp_goal T.
+(*
         change_angle_add_r θ2 angle_right.
         progress sin_cos_add_sub_right_hyp T Hzs2.
         progress sin_cos_add_sub_right_hyp T Hzs12.
         progress sin_cos_add_sub_right_hyp T Hzc2.
         progress sin_cos_add_sub_right_goal T.
+*)
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+(* donc c'est faux *)
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_decr.
+...
           cbn.
 ...
         cbn in Hcs.
