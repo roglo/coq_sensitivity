@@ -1814,6 +1814,10 @@ split; intros H12. {
         apply (rngl_opp_1_le_0 Hon Hop Hor).
       }
       apply (rngl_nle_gt Hor) in Hzs2.
+(* j'arrive pas à comprendre pourquoi ça marche pas *)
+(* je n'arrive pas à trouver de contre-exemple
+   ni à démontrer le truc *)
+...
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
         change_angle_opp θ2.
         progress sin_cos_opp_hyp T Hzs2.
