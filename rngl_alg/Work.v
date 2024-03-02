@@ -1709,6 +1709,69 @@ now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
 
 (* to be completed
+Theorem angle_add_overflow_equiv :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  ↔ (θ1 / ₂ + θ2 / ₂ < angle_straight)%A.
+Proof.
+destruct_ac.
+intros Hc1.
+intros.
+split; intros H12. {
+  rewrite <- angle_div_2_add_not_overflow; [ | easy ].
+  now apply angle_div_2_lt_straight.
+} {
+  progress unfold angle_ltb in H12.
+(*
+  progress unfold angle_add_overflow.
+  progress unfold angle_ltb.
+  cbn - [ angle_add ] in H12.
+*)
+  rewrite (rngl_leb_refl Hor) in H12.
+  remember (0 ≤? rngl_sin (_ / ₂ + _))%L as zs12d eqn:Hzs12d.
+  symmetry in Hzs12d.
+  destruct zs12d; [ | easy ].
+  apply rngl_leb_le in Hzs12d.
+  apply rngl_ltb_lt in H12.
+  cbn - [ angle_add ] in H12.
+...
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  symmetry in Hzs12, Hzs1.
+  destruct zs12. {
+    destruct zs1. {
+      apply rngl_leb_le in Hzs12.
+      apply rngl_leb_le in Hzs1.
+      apply (rngl_ltb_ge Hor).
+      generalize Hzs12; intros H.
+Search (0 ≤ rngl_sin (_ + _))%L.
+apply rngl_sin_nonneg_add_nonneg in H; [ | easy ].
+...
+      assert (Hzs2 : (0 ≤ rngl_sin θ2)%L). {
+Search (0 ≤ rngl_sin (_ + _))%L.
+apply rngl_sin_add_nonneg_sin_nonneg in Hzs12.
+...
+}
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+      apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+
+..
+    apply rngl_leb_le in Hzs12, Hzs1.
+    apply (rngl_ltb_ge Hor) in H12.
+    rewrite <- angle_div_2_add_not_overflow. 2: {
+      progress unfold angle_add_overflow.
+      progress unfold angle_ltb.
+      generalize Hzs12.
+...
+  cbn - [ angle_div_2 ].
+Search (rngl_sin (_ / ₂)).
+Search (_ / ₂ + _ / ₂)%A.
+rewrite <- angle_div_2_add_not_overflow.
+...
+*)
+
+(* to be completed.
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
