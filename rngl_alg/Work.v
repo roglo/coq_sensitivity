@@ -1817,13 +1817,35 @@ split; intros H12. {
 (* j'arrive pas à comprendre pourquoi ça marche pas *)
 (* je n'arrive pas à trouver de contre-exemple
    ni à démontrer le truc *)
-...
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+(**)
         change_angle_opp θ2.
         progress sin_cos_opp_hyp T Hzs2.
         progress sin_cos_opp_hyp T Hzs12.
         progress sin_cos_opp_hyp T Hzc2.
         progress sin_cos_opp_goal T.
+Search (- _ / ₂)%A.
+rewrite angle_opp_div_2 in Hzs12d.
+remember (θ2 =? 0)%A as t2z eqn:Ht2z.
+symmetry in Ht2z.
+destruct t2z. {
+  apply (angle_eqb_eq Hed) in Ht2z.
+  subst θ2.
+  now apply (rngl_lt_irrefl Hor) in Hzs2.
+}
+rewrite (angle_add_assoc Hop) in Hzs12d.
+rewrite angle_add_opp_r in Hzs12d.
+rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
+apply (rngl_nlt_ge Hor).
+intros poubelle.
+apply (rngl_nlt_ge Hor) in Hzs12d.
+apply Hzs12d; clear Hzs12d.
+...
+Search (_ / ₂ - _ / ₂)%A.
+...
+cbn - [ angle_div_2 ].
+...
 (*
         change_angle_add_r θ2 angle_right.
         progress sin_cos_add_sub_right_hyp T Hzs2.
@@ -1832,7 +1854,12 @@ split; intros H12. {
         progress sin_cos_add_sub_right_goal T.
 *)
         destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-(* donc c'est faux *)
+Search ((_ - _) / ₂)%A.
+Search ((_ + _) / ₂)%A.
+rewrite <- angle_div_2_add_not_overflow in Hzs12d.
+2: {
+Search (angle_add_overflow _ (_ - _)).
+apply angle_add_le_mono_l_lemma_5.
 ...
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 apply rngl_cos_decr.
