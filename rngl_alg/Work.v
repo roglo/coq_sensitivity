@@ -1716,6 +1716,7 @@ Theorem angle_add_overflow_equiv :
   ↔ (θ1 / ₂ + θ2 / ₂ < angle_straight)%A.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros Hc1.
 intros.
 split; intros H12. {
@@ -1824,7 +1825,6 @@ split; intros H12. {
         progress sin_cos_opp_hyp T Hzs12.
         progress sin_cos_opp_hyp T Hzc2.
         progress sin_cos_opp_goal T.
-Search (- _ / ₂)%A.
 rewrite angle_opp_div_2 in Hzs12d.
 remember (θ2 =? 0)%A as t2z eqn:Ht2z.
 symmetry in Ht2z.
@@ -1841,8 +1841,33 @@ apply (rngl_nlt_ge Hor).
 intros poubelle.
 apply (rngl_nlt_ge Hor) in Hzs12d.
 apply Hzs12d; clear Hzs12d.
-...
-Search (_ / ₂ - _ / ₂)%A.
+cbn.
+generalize Hzs2; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+generalize Hzs1; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+apply (rngl_lt_0_sub Hop Hor).
+rewrite <- rl_sqrt_mul; cycle 1.
+apply rngl_1_add_cos_div_2_nonneg.
+apply rngl_1_sub_cos_div_2_nonneg.
+rewrite <- rl_sqrt_mul; cycle 1.
+apply rngl_1_sub_cos_div_2_nonneg.
+apply rngl_1_add_cos_div_2_nonneg.
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor).
+apply rngl_1_add_cos_div_2_nonneg.
+apply rngl_1_sub_cos_div_2_nonneg.
+do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
+apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
 ...
 cbn - [ angle_div_2 ].
 ...

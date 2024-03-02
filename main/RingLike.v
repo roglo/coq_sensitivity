@@ -4915,6 +4915,42 @@ split; intros Hbc. {
 }
 Qed.
 
+Theorem rngl_div_lt_mono_pos_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b c : T, (0 < a)%L → (b < c)%L ↔ (b / a < c / a)%L.
+Proof.
+intros Hon Hop Hiv Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hza.
+  rewrite (H1 a) in Hza.
+  now apply (rngl_lt_irrefl Hor) in Hza.
+}
+intros * Hza.
+split; intros Hbc. {
+  progress unfold rngl_div at 1 2.
+  rewrite Hiv.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii); [ | easy ].
+  now apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+} {
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii a) in Hbc; [ | easy ].
+  rewrite (rngl_div_mul Hon Hiv) in Hbc. 2: {
+    intros H; subst a.
+    now apply (rngl_lt_irrefl Hor) in Hza.
+  }
+  rewrite (rngl_div_mul Hon Hiv) in Hbc. 2: {
+    intros H; subst a.
+    now apply (rngl_lt_irrefl Hor) in Hza.
+  }
+  easy.
+}
+Qed.
+
 Theorem rngl_mul_le_mono_pos_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

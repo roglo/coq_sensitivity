@@ -3746,10 +3746,7 @@ induction n; intros. {
     apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
       apply rngl_1_add_cos_div_2_nonneg.
     }
-    progress unfold rngl_div at 1 2.
-    rewrite Hiv.
-    apply (rngl_mul_lt_mono_pos_r Hop Hor Hii). {
-      apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+    apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
     apply (rngl_add_lt_mono_l Hop Hor).
