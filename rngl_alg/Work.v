@@ -1781,23 +1781,53 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
 easy.
 Qed.
 
+Theorem angle_add_overflow_opp :
+  ∀ θ, θ ≠ 0%A → angle_add_overflow θ (- θ) = true.
+Proof.
+intros * Hz.
+progress unfold angle_add_overflow.
+rewrite angle_add_opp_r.
+rewrite angle_sub_diag.
+apply angle_lt_iff.
+split; [ apply angle_nonneg | ].
+now intros H; symmetry in H.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_equiv :
   rngl_characteristic T ≠ 1 →
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  ↔ (θ1 / ₂ + θ2 / ₂ < angle_straight)%A.
+  ↔ (θ1 = 0 ∨ θ1 + θ2 ≠ 0)%A ∧ (θ1 / ₂ + θ2 / ₂ < angle_straight)%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros Hc1.
 intros.
 split; intros H12. {
+  split. {
+    remember (θ1 =? 0)%A as t1z eqn:Ht1z.
+    symmetry in Ht1z.
+    destruct t1z. {
+      now apply (angle_eqb_eq Hed) in Ht1z; left.
+    }
+    apply (angle_eqb_neq Hed) in Ht1z; right.
+    intros H12z.
+    rewrite (angle_add_comm Hic) in H12z.
+    apply angle_add_move_0_r in H12z.
+    subst θ2.
+    apply Bool.not_true_iff_false in H12.
+    apply H12.
+    now apply angle_add_overflow_opp.
+  }
   rewrite <- angle_div_2_add_not_overflow; [ | easy ].
   now apply angle_div_2_lt_straight.
 } {
-(* ah oui mais si θ1≠0, θ2≠ 0 et θ1=-θ2, c'est faux *)
-...
+  destruct H12 as (H112, H12).
+  destruct H112 as [H1| H12z]. {
+    subst θ1.
+    apply angle_add_overflow_0_l.
+  }
   progress unfold angle_ltb in H12.
   rewrite (rngl_leb_refl Hor) in H12.
   remember (0 ≤? rngl_sin (_ / ₂ + _))%L as zs12d eqn:Hzs12d.
@@ -1890,6 +1920,7 @@ split; intros H12. {
         apply (rngl_opp_1_le_0 Hon Hop Hor).
       }
       apply (rngl_nle_gt Hor) in Hzs2.
+...
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
 (**)
         change_angle_opp θ2.
