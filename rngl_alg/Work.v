@@ -2014,6 +2014,13 @@ split; intros H12. {
       progress sin_cos_add_sub_right_hyp T Hzs12.
       progress sin_cos_add_sub_right_hyp T Hzc1.
       progress sin_cos_add_sub_right_goal T.
+      remember (angle_add_overflow (θ1 + angle_right) (θ2 - angle_straight))
+        as aov eqn:Haov.
+      symmetry in Haov.
+      destruct aov. 2: {
+Require Import AngleDiv2Add.
+        rewrite <- rngl_sin_angle_div_2_add_not_overflow in Hzs12d; [ | easy ].
+        rewrite (angle_add_sub_assoc Hop) in Hzs12d.
 ...
 (*
         change_angle_add_r θ2 angle_right.
