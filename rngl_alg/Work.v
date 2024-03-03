@@ -2135,11 +2135,29 @@ split; intros H12. {
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       apply (rngl_lt_sub_0 Hop Hor).
-Search (0 < √_)%L.
-Search (0 < _⁻¹)%L.
-Search (_ * _ < 0)%L.
-Search (_ / _ < 0)%L.
-Search (_ / _ ≤ 0)%L.
+Theorem rngl_cos_lt_sin_diag :
+  ∀ θ,
+  (θ < angle_right / ₂)%A ∨ (3 * angle_right / ₂ < θ)%A
+  ↔ (rngl_cos θ < rngl_sin θ)%L.
+Proof.
+intros.
+split. {
+  intros H.
+  destruct H as [Hr| Hr]. {
+    progress unfold angle_ltb in Hr.
+    rewrite rngl_sin_right_div_2 in Hr.
+    rewrite rngl_cos_right_div_2 in Hr.
+    specialize rl_sqrt_half_nonneg as H1.
+    generalize H1; intros H.
+    apply rngl_leb_le in H.
+    rewrite H in Hr; clear H.
+    remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+    symmetry in Hzs.
+    destruct zs. {
+      apply rngl_leb_le in Hzs.
+      apply rngl_ltb_lt in Hr.
+... ...
+apply rngl_cos_lt_sin_diag.
 ...
       rewrite <- angle_div_2_add_not_overflow. 2: {
         apply angle_add_not_overflow_comm.
