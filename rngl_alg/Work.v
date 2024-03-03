@@ -2014,6 +2014,8 @@ split; intros H12. {
       progress sin_cos_add_sub_right_hyp T Hzs12.
       progress sin_cos_add_sub_right_hyp T Hzc1.
       progress sin_cos_add_sub_right_goal T.
+(* y a peut-être un contre-exemple, là... *)
+...
       remember (angle_add_overflow (θ1 + angle_right) (θ2 - angle_straight))
         as aov eqn:Haov.
       symmetry in Haov.
