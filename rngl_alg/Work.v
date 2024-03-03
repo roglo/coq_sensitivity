@@ -1805,6 +1805,35 @@ symmetry.
 apply angle_add_0_r.
 Qed.
 
+Theorem rngl_cos_add_right_div_2_r :
+  ∀ θ,
+  rngl_cos (θ + angle_right / ₂) = ((rngl_cos θ - rngl_sin θ) / √2)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (rngl_cos _)).
+  symmetry.
+  apply H1.
+}
+intros.
+cbn.
+specialize (rngl_0_le_1 Hon Hop Hor) as H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_add_0_r.
+rewrite (rngl_sub_0_r Hos).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite (rngl_mul_1_l Hon).
+f_equal.
+apply rl_nth_root_inv.
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_equiv :
   rngl_characteristic T ≠ 1 →
@@ -1814,6 +1843,8 @@ Theorem angle_add_overflow_equiv :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros Hc1.
 intros.
 split; intros H12. {
@@ -2092,6 +2123,48 @@ split; intros H12. {
           now apply rngl_sin_nonneg_angle_le_straight.
         }
       }
+(**)
+      rewrite rngl_cos_add_right_div_2_r.
+      progress unfold rngl_div.
+      rewrite Hiv.
+      (* lemma *)
+      rewrite (rngl_mul_comm Hic).
+      apply (rngl_mul_pos_neg Hop Hor Hid). {
+        apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+        apply (rl_sqrt_pos Hon Hos).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_lt_sub_0 Hop Hor).
+Search (0 < √_)%L.
+Search (0 < _⁻¹)%L.
+Search (_ * _ < 0)%L.
+Search (_ / _ < 0)%L.
+Search (_ / _ ≤ 0)%L.
+...
+      rewrite <- angle_div_2_add_not_overflow. 2: {
+        apply angle_add_not_overflow_comm.
+        apply angle_add_overflow_lt_straight_le_straight. {
+          (* lemma? angle_right_lt_straight *)
+          progress unfold angle_ltb.
+          cbn.
+          rewrite (rngl_leb_refl Hor).
+          specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+          apply rngl_leb_le in H1.
+          rewrite H1.
+          apply rngl_ltb_lt.
+          apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+        } {
+          apply rngl_sin_nonneg_angle_le_straight.
+          apply (rngl_lt_le_incl Hor) in Hzs2, Hzc1, Hzc2.
+          now apply rngl_sin_add_nonneg.
+        }
+      }
+...
+Search (rngl_cos (_ / ₂) ≤ 0)%L.
+Search (rngl_cos (_ / ₂) < 0)%L.
+Search (rngl_cos _ ≤ 0)%L.
+Search (rngl_cos _ < 0)%L.
+(* est-ce qu'il existe une formule pour cos (x + π/4) ? *)
 ...
       remember (angle_add_overflow (θ1 + angle_right) (θ2 - angle_straight))
         as aov eqn:Haov.
