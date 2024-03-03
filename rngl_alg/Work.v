@@ -1708,6 +1708,79 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
 
+Theorem rngl_sin_sub_div_2_div_2_pos :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_cos θ1 < rngl_cos θ2)%L
+  → (0 < rngl_sin (θ1 / ₂ - θ2 / ₂))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hcc.
+  do 2 rewrite (H1 (rngl_cos _)) in Hcc.
+  now apply (rngl_lt_irrefl Hor) in Hcc.
+}
+intros * Hzs1 Hzs2 Hcc.
+cbn.
+generalize Hzs2; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+generalize Hzs1; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+apply (rngl_lt_0_sub Hop Hor).
+rewrite <- rl_sqrt_mul; cycle 1.
+apply rngl_1_add_cos_div_2_nonneg.
+apply rngl_1_sub_cos_div_2_nonneg.
+rewrite <- rl_sqrt_mul; cycle 1.
+apply rngl_1_sub_cos_div_2_nonneg.
+apply rngl_1_add_cos_div_2_nonneg.
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor).
+apply rngl_1_add_cos_div_2_nonneg.
+apply rngl_1_sub_cos_div_2_nonneg.
+do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
+apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+do 2 rewrite (rngl_mul_div_assoc Hiv).
+apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_add_sub_assoc Hop).
+apply (rngl_sub_lt_mono_r Hop Hor).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_sub_sub_distr Hop).
+progress unfold rngl_sub at 2.
+rewrite Hop.
+apply (rngl_add_lt_mono_l Hop Hor).
+rewrite (rngl_opp_sub_distr Hop).
+apply (rngl_lt_add_lt_sub_r Hop Hor).
+rewrite <- (rngl_add_sub_swap Hop).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+do 2 rewrite (rngl_add_diag Hon (rngl_cos _)).
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+easy.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_equiv :
   rngl_characteristic T ≠ 1 →
@@ -1841,35 +1914,31 @@ apply (rngl_nlt_ge Hor).
 intros poubelle.
 apply (rngl_nlt_ge Hor) in Hzs12d.
 apply Hzs12d; clear Hzs12d.
-cbn.
-generalize Hzs2; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-rewrite (rngl_mul_1_l Hon).
-generalize Hzs1; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
-apply (rngl_lt_0_sub Hop Hor).
-rewrite <- rl_sqrt_mul; cycle 1.
-apply rngl_1_add_cos_div_2_nonneg.
-apply rngl_1_sub_cos_div_2_nonneg.
-rewrite <- rl_sqrt_mul; cycle 1.
-apply rngl_1_sub_cos_div_2_nonneg.
-apply rngl_1_add_cos_div_2_nonneg.
-apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor).
-apply (rngl_mul_nonneg_nonneg Hop Hor).
-apply rngl_1_add_cos_div_2_nonneg.
-apply rngl_1_sub_cos_div_2_nonneg.
-do 2 rewrite (rngl_div_mul_mul_div Hic Hiv).
-apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+apply rngl_sin_sub_div_2_div_2_pos; [ easy | | ]. {
+  now apply (rngl_lt_le_incl Hor) in Hzs2.
 }
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+  apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy. {
+    now apply (rngl_lt_le_incl Hor) in Hzs2.
+  } {
+    apply (rngl_lt_iff Hor).
+    split; [ now apply rngl_sin_sub_nonneg_sin_le_sin | ].
+    intros H.
+    apply rngl_sin_eq in H.
+    destruct H; subst θ2. {
+(* ouais, bin non, hein *)
 ...
-cbn - [ angle_div_2 ].
+Search (rngl_sin _ = rngl_sin _)%L.
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+Search (0 ≤ rngl_sin (_ - _))%L.
+rngl_sin_sub_nonneg_sin_le_sin:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T
+    → ∀ θ1 θ2 : angle T,
+        (0 ≤ rngl_sin θ1)%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_sin (θ1 - θ2))%L → (rngl_sin θ2 ≤ rngl_sin θ1)%L
+Search (rngl_sin _ < rngl_sin _)%L.
+...
+Search (rngl_cos _ < rngl_cos _)%L.
 ...
 (*
         change_angle_add_r θ2 angle_right.
