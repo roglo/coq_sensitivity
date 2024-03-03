@@ -1796,6 +1796,8 @@ split; intros H12. {
   rewrite <- angle_div_2_add_not_overflow; [ | easy ].
   now apply angle_div_2_lt_straight.
 } {
+(* ah oui mais si θ1≠0, θ2≠ 0 et θ1=-θ2, c'est faux *)
+...
   progress unfold angle_ltb in H12.
   rewrite (rngl_leb_refl Hor) in H12.
   remember (0 ≤? rngl_sin (_ / ₂ + _))%L as zs12d eqn:Hzs12d.
@@ -1888,9 +1890,6 @@ split; intros H12. {
         apply (rngl_opp_1_le_0 Hon Hop Hor).
       }
       apply (rngl_nle_gt Hor) in Hzs2.
-(* j'arrive pas à comprendre pourquoi ça marche pas *)
-(* je n'arrive pas à trouver de contre-exemple
-   ni à démontrer le truc *)
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
 (**)
         change_angle_opp θ2.
@@ -1911,9 +1910,10 @@ rewrite angle_add_opp_r in Hzs12d.
 rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
 apply (rngl_nlt_ge Hor).
-intros poubelle.
+intros Hcc.
 apply (rngl_nlt_ge Hor) in Hzs12d.
 apply Hzs12d; clear Hzs12d.
+...
 apply rngl_sin_sub_div_2_div_2_pos; [ easy | | ]. {
   now apply (rngl_lt_le_incl Hor) in Hzs2.
 }
