@@ -1980,18 +1980,40 @@ split; intros H12. {
         now apply (rngl_lt_le_trans Hor _ 0).
       }
       apply (rngl_nle_gt Hor) in Hzc2.
-...
-Search (rngl_sin _ = rngl_sin _)%L.
-Search (rngl_sin _ ≤ rngl_sin _)%L.
-Search (0 ≤ rngl_sin (_ - _))%L.
-rngl_sin_sub_nonneg_sin_le_sin:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    angle_ctx T
-    → ∀ θ1 θ2 : angle T,
-        (0 ≤ rngl_sin θ1)%L → (0 ≤ rngl_cos θ1)%L → (0 ≤ rngl_sin (θ1 - θ2))%L → (rngl_sin θ2 ≤ rngl_sin θ1)%L
-Search (rngl_sin _ < rngl_sin _)%L.
-...
-Search (rngl_cos _ < rngl_cos _)%L.
+      change_angle_add_r θ2 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hzc2.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      progress sin_cos_add_sub_straight_goal T.
+      rewrite (angle_add_sub_assoc Hop) in H12z.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+        apply (rngl_nlt_ge Hor) in Hzs12.
+        apply (rngl_nlt_ge Hor).
+        intros Hcc.
+        apply Hzs12; clear Hzs12.
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply (rngl_lt_le_incl Hor) in Hzc2, Hzs2.
+          now apply rngl_sin_add_nonneg.
+        }
+        intros Hs; symmetry in Hs.
+        apply eq_rngl_sin_0 in Hs.
+        destruct Hs as [Hs| Hs]. {
+          apply (rngl_nle_gt Hor) in Hcc.
+          apply Hcc; clear Hcc.
+          rewrite Hs; cbn.
+          apply (rngl_le_opp_l Hop Hor).
+          apply rngl_cos_bound.
+        }
+        rewrite Hs in H12z.
+        now rewrite angle_sub_diag in H12z.
+      }
+      apply (rngl_nle_gt Hor) in Hzc1.
+      change_angle_sub_r θ1 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs1.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T Hzc1.
+      progress sin_cos_add_sub_right_goal T.
 ...
 (*
         change_angle_add_r θ2 angle_right.
