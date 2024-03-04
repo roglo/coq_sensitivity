@@ -2140,6 +2140,8 @@ Theorem rngl_cos_lt_sin_diag :
   (θ < angle_right / ₂)%A ∨ (3 * angle_right / ₂ < θ)%A
   ↔ (rngl_cos θ < rngl_sin θ)%L.
 Proof.
+(* ah non, c'est faux, ça : c'est le sin < cos *)
+...
 intros.
 split. {
   intros H.
