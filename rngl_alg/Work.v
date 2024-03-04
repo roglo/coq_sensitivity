@@ -2197,6 +2197,39 @@ destruct zs. {
     split; [ | easy ].
     apply rngl_leb_le in Hzs.
     apply rngl_ltb_lt.
+(**)
+    specialize rl_sqrt_half_nonneg as Hs2.
+    destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hzc| Hcz]. {
+      now apply (rngl_lt_le_trans Hor _ 0).
+    }
+    apply (rngl_nlt_ge Hor) in Hcz.
+    rewrite <- rngl_cos_right_div_2.
+    apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy. {
+      now rewrite rngl_sin_right_div_2.
+    } {
+      now rewrite rngl_cos_right_div_2.
+    }
+...
+specialize rngl_sin_nonneg_cos_lt_sin_lt as H1.
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+apply angle_add_le_mono_l_lemma_39; try easy.
+...
+
+    specialize rngl_sin_nonneg_cos_le_sin_le as H2.
+    specialize (H2 θ (angle_right / ₂) Hzs)%A.
+    rewrite rngl_sin_right_div_2 in H2.
+    rewrite rngl_cos_right_div_2 in H2.
+    specialize (H2 rl_sqrt_half_nonneg).
+    generalize Hcz; intros H.
+    apply rngl_leb_le in H.
+    rewrite H in H2; clear H.
+...
+    apply (rngl_lt_le_incl Hor) in H.
+    specialize (H2 H); clear H.
+    generalize Hcz; intros H.
+    apply rngl_leb_le in H.
+    now rewrite H in H2; clear H.
 ...
     apply (rngl_lt_le_trans Hor _ (rngl_sin θ)); [ easy | ].
 (*
