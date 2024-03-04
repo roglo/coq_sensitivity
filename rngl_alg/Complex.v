@@ -4979,6 +4979,29 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_ltb_opp_r :
+  ∀ a b, (a <? -b)%L = (b <? -a)%L.
+Proof.
+destruct_ac.
+intros.
+remember (a <? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_ltb_lt in Hab.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_lt_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_ltb_ge Hor) in Hab.
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_le_opp_l Hop Hor).
+}
+Qed.
+
 Theorem angle_opp_div_2 :
   ∀ θ, ((- θ) / ₂ = - (θ / ₂) + if (θ =? 0)%A then 0 else angle_straight)%A.
 Proof.

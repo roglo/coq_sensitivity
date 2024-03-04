@@ -2137,27 +2137,46 @@ split; intros H12. {
       apply (rngl_lt_sub_0 Hop Hor).
 Theorem rngl_cos_lt_sin_diag :
   ∀ θ,
-  (θ < angle_right / ₂)%A ∨ (3 * angle_right / ₂ < θ)%A
+  (angle_right / ₂ < θ < 5 * (angle_right / ₂))%A
   ↔ (rngl_cos θ < rngl_sin θ)%L.
 Proof.
-(* ah non, c'est faux, ça : c'est le sin < cos *)
-...
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H2.
+  intros.
+  rewrite (H2 (angle_right / ₂))%A.
+  rewrite (H2 θ), (H2 (_ * _))%A.
+  rewrite (H1 (rngl_cos _)), (H1 (rngl_sin _)).
+  split. {
+    intros (H, _).
+    now apply angle_lt_irrefl in H.
+  } {
+    intros H.
+    now apply (rngl_lt_irrefl Hor) in H.
+  }
+}
 intros.
-split. {
-  intros H.
-  destruct H as [Hr| Hr]. {
-    progress unfold angle_ltb in Hr.
-    rewrite rngl_sin_right_div_2 in Hr.
-    rewrite rngl_cos_right_div_2 in Hr.
-    specialize rl_sqrt_half_nonneg as H1.
-    generalize H1; intros H.
-    apply rngl_leb_le in H.
-    rewrite H in Hr; clear H.
-    remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-    symmetry in Hzs.
-    destruct zs. {
-      apply rngl_leb_le in Hzs.
-      apply rngl_ltb_lt in Hr.
+progress unfold angle_ltb.
+rewrite rngl_sin_right_div_2.
+rewrite rngl_cos_right_div_2.
+rewrite rngl_sin_5_right_div_2.
+rewrite rngl_cos_5_right_div_2.
+rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+specialize rl_sqrt_half_nonneg as H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+specialize (rl_sqrt_half_pos Hc1) as H.
+apply (rngl_leb_gt Hor) in H.
+rewrite H; clear H.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  split. {
+    intros (H1, _).
+    apply rngl_leb_le in Hzs.
+    apply rngl_ltb_lt in H1.
+Search (rngl_cos _ < √_)%L.
 ... ...
 apply rngl_cos_lt_sin_diag.
 ...
