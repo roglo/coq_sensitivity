@@ -2176,7 +2176,50 @@ destruct zs. {
     intros (H1, _).
     apply rngl_leb_le in Hzs.
     apply rngl_ltb_lt in H1.
-Search (rngl_cos _ < √_)%L.
+    destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hzc| Hcz]. {
+      now apply (rngl_lt_le_trans Hor _ 0).
+    }
+    apply (rngl_nlt_ge Hor) in Hcz.
+    apply (rngl_lt_le_trans Hor _ √(1/2))%L; [ easy | ].
+    specialize rngl_sin_nonneg_cos_le_sin_le as H2.
+    specialize (H2 θ (angle_right / ₂) Hzs)%A.
+    rewrite rngl_sin_right_div_2 in H2.
+    rewrite rngl_cos_right_div_2 in H2.
+    specialize (H2 rl_sqrt_half_nonneg).
+    generalize H1; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    specialize (H2 H); clear H.
+    generalize Hcz; intros H.
+    apply rngl_leb_le in H.
+    now rewrite H in H2; clear H.
+  } {
+    intros Hcs.
+    split; [ | easy ].
+    apply rngl_leb_le in Hzs.
+    apply rngl_ltb_lt.
+...
+    apply (rngl_lt_le_trans Hor _ (rngl_sin θ)); [ easy | ].
+(*
+    rewrite <- rngl_sin_right_div_2.
+Search (rngl_sin _ ≤ rngl_sin _)%L.
+...
+*)
+    specialize rngl_sin_nonneg_cos_le_sin_le as H2.
+    specialize (H2 (angle_right / ₂) θ)%A.
+    rewrite rngl_sin_right_div_2 in H2.
+    rewrite rngl_cos_right_div_2 in H2.
+    specialize (H2 rl_sqrt_half_nonneg Hzs).
+    specialize rl_sqrt_half_nonneg as H.
+    apply rngl_leb_le in H.
+    rewrite H in H2; clear H.
+    apply H2; clear H2.
+...
+    generalize H1; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    specialize (H2 H); clear H.
+    generalize Hcz; intros H.
+    apply rngl_leb_le in H.
+    now rewrite H in H2; clear H.
 ... ...
 apply rngl_cos_lt_sin_diag.
 ...
