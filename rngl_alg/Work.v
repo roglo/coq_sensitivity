@@ -2309,6 +2309,71 @@ split; intros H12. {
         rewrite H12; cbn.
         apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
+      progress unfold angle_ltb.
+      rewrite rngl_sin_5_right_div_2.
+      rewrite rngl_cos_5_right_div_2.
+      rewrite rngl_leb_opp_r.
+      rewrite (rngl_opp_0 Hop).
+      specialize (rl_sqrt_half_pos Hc1) as H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      specialize (rngl_sin_div_2_nonneg (θ1 + θ2)) as H.
+      apply rngl_leb_le in H.
+      now rewrite H; clear H.
+    }
+    exfalso.
+    apply rngl_leb_le in Hzs12.
+    apply rngl_leb_nle in Hzs1.
+    apply Hzs1; clear Hzs1.
+    remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+    symmetry in Haov.
+    destruct aov. 2: {
+      now apply (rngl_sin_add_nonneg_sin_nonneg _ θ2).
+    }
+    specialize (angle_div_2_add_overflow _ _ Haov) as H1.
+    symmetry in H1.
+    apply angle_add_move_r in H1.
+    rewrite angle_sub_straight_eq_add_straight in H1.
+    rewrite H1 in Hzs12d, H12.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    rewrite (rngl_cos_add_straight_r Hon Hop) in H12.
+    apply (rngl_nlt_ge Hor).
+    intros Hsz1.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
+    apply (rngl_nlt_ge Hor) in Hzs12d.
+    apply Hzs12d; clear Hzs12d.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_sin_div_2_nonneg | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H| H]. {
+      now apply eq_angle_div_2_0 in H.
+    }
+    now apply (angle_div_2_not_straight Hc1) in H.
+  }
+  destruct zs1; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs12, Hzs1.
+  apply (rngl_ltb_ge Hor).
+  remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+  symmetry in Haov.
+  destruct aov. 2: {
+Search (rngl_cos _ ≤ rngl_cos (_ + _))%L.
+apply angle_add_ove
+Check rngl_sin_add_nonneg_sin_nonneg.
+...
+    now apply (rngl_sin_add_nonneg_sin_nonneg _ θ2).
+  }
+  specialize (angle_div_2_add_overflow _ _ Haov) as H1.
+...
+    rewrite angle_div_2_add_overflow in Hzs12.
+Check angle_div_2_add_overflow.
+...
+rewrite <- angle_div_2_add_not_overflow in 
+Search (_ → 0 ≤ rngl_sin _)%L.
+...
+    apply (rngl_sin_add_nonneg_sin_nonneg _ θ2); [ | easy ].
+    progress unfold angle_add_overflow.
+    progress unfold angle_ltb.
 ...
     apply (rngl_le_lt_trans Hor _ √(1/2))%L; [ | easy ].
     specialize rngl_sin_nonneg_cos_lt_sin_lt as H2.
