@@ -2054,7 +2054,6 @@ split; intros H12. {
         now rewrite angle_sub_diag in H12z.
       }
       apply (rngl_nle_gt Hor) in Hzc1.
-(* y a peut-être un contre-exemple, là... *)
       change_angle_add_r θ2 angle_straight.
       progress sin_cos_add_sub_straight_hyp T Hzs12.
       progress sin_cos_add_sub_straight_hyp T Hzc2.
@@ -2223,6 +2222,23 @@ destruct zs. {
   split. {
     intros (_, H1).
     apply rngl_ltb_lt in H1.
+    change_angle_add_r θ angle_straight.
+    progress sin_cos_add_sub_straight_hyp T H1.
+    progress sin_cos_add_sub_straight_hyp T Hzs.
+    progress sin_cos_add_sub_straight_goal T.
+    rewrite (rngl_add_opp_r Hop).
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_le_lt_trans Hor _ √(1/2))%L; [ | easy ].
+    specialize rngl_sin_nonneg_cos_lt_sin_lt as H2.
+    specialize (H2 (angle_right / ₂) θ)%A.
+    rewrite rngl_sin_right_div_2 in H2.
+    rewrite rngl_cos_right_div_2 in H2.
+(* ouais, ça devrait le faire *)
+...
+  H1 : (√(1 / 2) < rngl_cos θ)%L
+  Hzs : (0 < rngl_sin θ)%L
+  ============================
+  (rngl_sin θ < rngl_cos θ)%L
 ...
     destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hzc| Hcz]. {
       now apply (rngl_lt_le_trans Hor _ 0).
