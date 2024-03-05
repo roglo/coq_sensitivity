@@ -1703,7 +1703,7 @@ split. {
 }
 intros H.
 apply angle_add_move_r in H.
-rewrite (angle_straight_sub_right Hon Hop) in H.
+rewrite angle_straight_sub_right in H.
 subst θ.
 now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
@@ -2026,7 +2026,7 @@ split; intros H12. {
   cbn - [ angle_add ] in H12.
   apply (rngl_lt_iff Hor) in H12.
   destruct H12 as (_, H12).
-  apply not_eq_symm in H12.
+  apply not_eq_sym in H12.
   progress unfold angle_add_overflow.
   progress unfold angle_ltb.
   cbn - [ angle_add ] in H12.
@@ -2468,6 +2468,33 @@ split; intros H12. {
         now apply quadrant_1_rngl_cos_add_le_cos_l.
       }
       specialize (angle_div_2_add_not_overflow θ1 θ2 Haov) as H1.
+      rewrite angle_sub_straight_eq_add_straight in Hzs12d.
+Search (rngl_sin (_ / ₂ + _ / ₂)).
+Require Import AngleDiv2Add.
+rewrite <- rngl_sin_angle_div_2_add_not_overflow in Hzs12d. 2: {
+Search (angle_add_overflow (_ + _)).
+  apply angle_add_not_overflow_comm.
+  apply angle_add_not_overflow_move_add. 2: {
+    rewrite <- (angle_add_sub_swap Hic Hop).
+    rewrite <- (angle_add_sub_assoc Hop).
+    rewrite angle_straight_sub_right.
+About angle_straight_sub_right.
+2: {
+...
+Search ((_ + angle_straight) / ₂)%L.
+      rewrite H1 in Hzs12d, H12.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
+    apply (rngl_nlt_ge Hor) in Hzs12d.
+    apply Hzs12d; clear Hzs12d.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_sin_div_2_nonneg | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H| H]. {
+      now apply eq_angle_div_2_0 in H.
+    }
+    now apply (angle_div_2_not_straight Hc1) in H.
 ...
       apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
       now apply quadrant_1_rngl_cos_add_le_cos_l.

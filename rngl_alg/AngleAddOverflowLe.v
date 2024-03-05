@@ -146,7 +146,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   symmetry in Hzs2.
   apply eq_rngl_cos_0 in Hzs2.
   destruct Hzs2; subst θ1. {
-    rewrite (angle_straight_sub_right Hon Hop) in H12.
+    rewrite angle_straight_sub_right in H12.
     rewrite (angle_right_add_right Hon Hop) in H12.
     apply (rngl_nlt_ge Hor) in H12.
     apply H12; cbn.

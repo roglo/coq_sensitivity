@@ -109,12 +109,10 @@ Qed.
 *)
 
 Theorem angle_straight_sub_right :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   (angle_straight - angle_right)%A = angle_right.
 Proof.
-intros Hon Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_mul_0_l Hos).

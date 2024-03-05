@@ -754,7 +754,7 @@ rewrite (angle_add_sub_assoc Hop).
 rewrite (angle_add_add_swap Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- angle_sub_sub_distr.
-rewrite (angle_straight_sub_right Hon Hop).
+rewrite angle_straight_sub_right.
 progress unfold angle_ltb.
 rewrite (rngl_sin_sub_right_r Hon Hop).
 generalize Hzs12; intros H.
@@ -1052,7 +1052,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   symmetry in Hzc3.
   apply (eq_rngl_cos_0) in Hzc3.
   destruct Hzc3; subst θ1. {
-    rewrite (angle_straight_sub_right Hon Hop) in Hs1s3z.
+    rewrite angle_straight_sub_right in Hs1s3z.
     now rewrite angle_sub_diag in Hs1s3z.
   }
   apply (rngl_nlt_ge Hor) in Hzs1.
@@ -1146,7 +1146,7 @@ rewrite (angle_add_sub_assoc Hop).
 rewrite (angle_add_add_swap Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- angle_sub_sub_distr.
-rewrite (angle_straight_sub_right Hon Hop).
+rewrite angle_straight_sub_right.
 progress unfold angle_ltb.
 rewrite (rngl_sin_sub_right_r Hon Hop).
 generalize Hzs12; intros H.
@@ -1204,7 +1204,7 @@ apply (rngl_le_antisymm Hor) in Hc2z; [ | easy ].
 symmetry in Hc2z.
 apply (eq_rngl_cos_0) in Hc2z.
 destruct Hc2z; subst θ1. {
-  rewrite (angle_straight_sub_right Hon Hop) in H.
+  rewrite angle_straight_sub_right in H.
   rewrite (angle_right_add_right Hon Hop) in H.
   cbn in H.
   rewrite (rngl_opp_0 Hop) in H.
@@ -2435,7 +2435,7 @@ rewrite (angle_add_sub_assoc Hop).
 rewrite (angle_add_add_swap Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
 rewrite <- angle_sub_sub_distr.
-rewrite (angle_straight_sub_right Hon Hop).
+rewrite angle_straight_sub_right.
 rewrite (rngl_sin_sub_right_r Hon Hop).
 now apply (rngl_opp_nonneg_nonpos Hop Hor).
 Qed.
@@ -3682,7 +3682,7 @@ progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_hyp T Hc2z.
 rewrite (angle_add_sub_swap Hic Hop) in Haov12.
 rewrite <- angle_sub_sub_distr in Haov12.
-rewrite (angle_straight_sub_right Hon Hop) in Haov12.
+rewrite angle_straight_sub_right in Haov12.
 apply Bool.not_true_iff_false in Haov12.
 apply Haov12; clear Haov12.
 progress unfold angle_add_overflow.
