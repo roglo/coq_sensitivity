@@ -966,12 +966,10 @@ apply (rngl_sub_0_l Hop).
 Qed.
 
 Theorem rngl_cos_add_right_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ + angle_right) = (- rngl_sin θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_0_r Hos).
 apply (rngl_sub_0_l Hop).

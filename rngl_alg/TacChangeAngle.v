@@ -46,7 +46,7 @@ Ltac sin_cos_add_sub_right_hyp T H :=
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop');
   repeat rewrite rngl_sin_add_right_r in H;
-  repeat rewrite (rngl_cos_add_right_r Hon' Hop') in H;
+  repeat rewrite rngl_cos_add_right_r in H;
   repeat rewrite rngl_sin_sub_right_r in H;
   repeat rewrite -> rngl_cos_sub_right_r in H;
   repeat rewrite (rngl_sin_add_right_l Hon' Hos') in H;
@@ -125,7 +125,7 @@ Ltac sin_cos_add_sub_right_goal T :=
   repeat rewrite -> rngl_sin_sub_right_l;
   repeat rewrite -> rngl_cos_sub_right_l;
   repeat rewrite rngl_sin_add_right_r;
-  repeat rewrite (rngl_cos_add_right_r Hon' Hop');
+  repeat rewrite rngl_cos_add_right_r;
   repeat rewrite -> rngl_sin_sub_right_r;
   repeat rewrite rngl_cos_sub_right_r;
   repeat rewrite -> (rngl_add_opp_r Hop');
