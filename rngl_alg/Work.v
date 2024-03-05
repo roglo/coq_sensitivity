@@ -2487,6 +2487,23 @@ split; intros H12. {
           rewrite angle_straight_sub_right.
           apply angle_lt_iff.
           split. {
+(**)
+progress unfold angle_leb.
+rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_sub_right_r.
+rewrite rngl_cos_sub_right_r.
+rewrite (rngl_cos_add_right_r Hon Hop).
+              rewrite rngl_leb_opp_r.
+              rewrite (rngl_opp_0 Hop).
+              generalize Hzs12; intros H.
+              apply (rngl_lt_le_incl Hor) in H.
+              apply rngl_leb_le in H.
+              rewrite H; clear H.
+              generalize Hzs12; intros H.
+              apply (rngl_leb_gt Hor) in H.
+              rewrite H; clear H.
+(* bin oui donc non *)
+...
             apply angle_add_le_mono_l. 2: {
               progress unfold angle_add_overflow.
               rewrite angle_add_opp_r.
