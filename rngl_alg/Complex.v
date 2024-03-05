@@ -5277,7 +5277,7 @@ destruct zs. {
   rewrite (rngl_cos_sub_comm Hic Hop).
   destruct i. {
     cbn - [ rngl_sin ] in Hzs, Hzs2.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs.
+    rewrite rngl_sin_add_straight_r in Hzs.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs.
     apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
     symmetry in Hzs.
@@ -5299,7 +5299,7 @@ destruct zs. {
       progress unfold angle_add_overflow in Haov.
       progress unfold angle_ltb in Haov.
       progress unfold angle_leb.
-      rewrite (rngl_sin_add_straight_r Hon Hop).
+      rewrite rngl_sin_add_straight_r.
       rewrite rngl_leb_opp_r.
       rewrite (rngl_opp_0 Hop).
       remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
@@ -5428,7 +5428,7 @@ destruct zs2. {
 apply (rngl_leb_gt Hor) in Hzs2.
 destruct i. {
   cbn - [ rngl_sin ] in Hzs.
-  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs.
+  rewrite rngl_sin_add_straight_r in Hzs.
   cbn in Hzs2.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs.
   apply (rngl_lt_le_incl Hor) in Hzs.

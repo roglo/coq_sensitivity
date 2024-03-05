@@ -2412,12 +2412,10 @@ apply rngl_add_cos_nonneg_when_sin_nonneg. {
 Qed.
 
 Theorem rngl_sin_add_straight_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, (rngl_sin (θ + angle_straight) = - rngl_sin θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_r.
 rewrite (rngl_mul_opp_r Hop).
@@ -2519,10 +2517,10 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
     apply (rngl_nle_gt Hor) in Hzc1.
     (* case rngl_cos θ1 ≤ 0 *)
     apply rngl_add_cos_nonneg_when_sin_nonpos; try easy. {
-      rewrite (rngl_sin_add_straight_r Hon Hop).
+      rewrite rngl_sin_add_straight_r.
       now apply (rngl_opp_nonpos_nonneg Hop Hor).
     } {
-      rewrite (rngl_sin_add_straight_r Hon Hop).
+      rewrite rngl_sin_add_straight_r.
       now apply (rngl_opp_nonpos_nonneg Hop Hor).
     } {
       rewrite angle_add_assoc.

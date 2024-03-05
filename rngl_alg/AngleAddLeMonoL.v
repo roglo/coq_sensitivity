@@ -209,7 +209,7 @@ destruct zs2. {
   destruct (rngl_eq_dec Hed (rngl_cos θ2) (- 1)) as [Hc2o1| Ho1c2]. {
     apply (eq_rngl_cos_opp_1) in Hc2o1.
     subst θ2.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12.
+    rewrite rngl_sin_add_straight_r in Hzs12.
     rewrite (rngl_cos_add_straight_r Hon Hop).
     apply -> (rngl_opp_le_compat Hop Hor).
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.

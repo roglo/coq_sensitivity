@@ -185,7 +185,7 @@ remember (θ1 - angle_straight)%A as θ.
 apply angle_add_move_r in Heqθ.
 subst θ1; rename θ into θ1.
 move θ1 after θ2.
-rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1.
+rewrite rngl_sin_add_straight_r in Hzs1.
 rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
 apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
 rewrite (rngl_cos_add_straight_r Hon Hop).
@@ -198,7 +198,7 @@ apply angle_add_move_r in Heqθ.
 subst θ2; rename θ into θ2.
 move θ2 before θ1.
 move Hzs3 after Hzs3.
-rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+rewrite rngl_sin_add_straight_r in Hzs2.
 apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
 rewrite (rngl_cos_add_straight_r Hon Hop θ2).
 rewrite (rngl_sub_opp_r Hop).
@@ -349,7 +349,7 @@ destruct zs1. {
     apply angle_add_move_r in Heqθ.
     subst θ2; rename θ into θ2.
     move θ2 before θ1.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+    rewrite rngl_sin_add_straight_r in Hzs2.
     rewrite <- (rngl_opp_0 Hop) in Hzs2.
     apply (rngl_opp_le_compat Hop Hor) in Hzs2.
     rewrite angle_add_assoc.
@@ -380,9 +380,9 @@ destruct zs1. {
   apply angle_add_move_r in Heqθ.
   subst θ2; rename θ into θ2.
   move θ2 before θ1.
-  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
+  rewrite rngl_sin_add_straight_r in Hzs2.
   rewrite angle_add_assoc in Hzs12.
-  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12.
+  rewrite rngl_sin_add_straight_r in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs2, Hzs12.
   rewrite angle_add_assoc.
   do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
@@ -427,7 +427,7 @@ destruct zs1. {
   subst θ3.
   rewrite angle_add_add_swap in Haov, Haov' |-*.
   do 2 rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
-  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs1, Haov.
+  rewrite rngl_sin_add_straight_r in Hzs1, Haov.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs1.
   do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
   do 2 rewrite (rngl_sub_opp_r Hop).
@@ -496,7 +496,7 @@ destruct zs1. {
   move θ2 before θ1.
   rewrite angle_add_assoc in Haov, Hzs12.
   rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
-  rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12, Hzs2.
+  rewrite rngl_sin_add_straight_r in Hzs12, Hzs2.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12, Hzs2.
   rewrite (rngl_opp_involutive Hop) in Hzs12.
   move Hzs2 before Hzs1.
@@ -786,7 +786,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1; apply H1.
 }
 intros * Haov.
-rewrite (rngl_sin_add_straight_r Hon Hop).
+rewrite rngl_sin_add_straight_r.
 cbn - [ angle_add ].
 progress unfold angle_add_overflow in Haov.
 progress unfold angle_ltb in Haov.

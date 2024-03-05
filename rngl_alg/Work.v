@@ -2126,7 +2126,7 @@ split; intros H12. {
         }
         rewrite angle_add_assoc in Hzs12d.
         rewrite angle_add_opp_r in Hzs12d.
-        rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+        rewrite rngl_sin_add_straight_r in Hzs12d.
         apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
         apply (rngl_nlt_ge Hor).
         intros Hcc.
@@ -2336,7 +2336,7 @@ split; intros H12. {
     apply angle_add_move_r in H1.
     rewrite angle_sub_straight_eq_add_straight in H1.
     rewrite H1 in Hzs12d, H12.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    rewrite rngl_sin_add_straight_r in Hzs12d.
 (*
     rewrite (rngl_cos_add_straight_r Hon Hop) in H12.
 *)
@@ -2405,7 +2405,7 @@ split; intros H12. {
     apply angle_add_move_r in H1.
     rewrite angle_sub_straight_eq_add_straight in H1.
     rewrite H1 in Hzs12d, H12.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    rewrite rngl_sin_add_straight_r in Hzs12d.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
     apply (rngl_nlt_ge Hor) in Hzs12d.
     apply Hzs12d; clear Hzs12d.
@@ -2471,7 +2471,7 @@ split; intros H12. {
       rewrite angle_sub_straight_eq_add_straight in Hzs12d.
       apply (rngl_opp_le_compat Hop Hor) in Hzs12d.
       rewrite (rngl_opp_0 Hop) in Hzs12d.
-      rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+      rewrite <- rngl_sin_add_straight_r in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
 (**)
 progress unfold angle_add_overflow.
@@ -2482,6 +2482,7 @@ rewrite angle_straight_sub_right.
 rewrite angle_add_add_swap.
 progress unfold angle_ltb.
 rewrite rngl_sin_add_right_r.
+rewrite rngl_sin_add_straight_r.
 ...
 progress unfold angle_ltb.
 rewrite rngl_sin_add_right_r.
@@ -2611,7 +2612,7 @@ Search (angle_add_overflow (_ + _)).
 ...
 Search ((_ + angle_straight) / ₂)%L.
       rewrite H1 in Hzs12d, H12.
-    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    rewrite rngl_sin_add_straight_r in Hzs12d.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
     apply (rngl_nlt_ge Hor) in Hzs12d.
     apply Hzs12d; clear Hzs12d.
