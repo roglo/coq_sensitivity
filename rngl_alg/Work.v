@@ -2001,7 +2001,7 @@ split; intros H12. {
     }
     apply (angle_eqb_neq Hed) in Ht1z; right.
     intros H12z.
-    rewrite (angle_add_comm Hic) in H12z.
+    rewrite angle_add_comm in H12z.
     apply angle_add_move_0_r in H12z.
     subst θ2.
     apply Bool.not_true_iff_false in H12.
@@ -2063,7 +2063,7 @@ split; intros H12. {
             apply (rngl_lt_le_incl Hor) in Hzc1.
             now apply rngl_sin_add_nonneg.
           }
-          rewrite (angle_add_comm Hic).
+          rewrite angle_add_comm.
           now rewrite angle_add_sub.
         }
         apply (rngl_nle_gt Hor) in Hzc2.
@@ -2148,7 +2148,7 @@ split; intros H12. {
             }
             apply H12z; clear H12z.
             rewrite angle_sub_sub_distr.
-            rewrite <- (angle_add_sub_swap Hic Hop).
+            rewrite <- angle_add_sub_swap.
             rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc2.
             apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc2.
             apply (rngl_le_antisymm Hor) in Hzc1; [ | easy ].
@@ -2248,7 +2248,7 @@ split; intros H12. {
       }
       rewrite angle_straight_div_2.
       rewrite angle_add_assoc.
-      rewrite (angle_add_add_swap Hic Hop (θ1 / ₂)).
+      rewrite (angle_add_add_swap (θ1 / ₂)).
       rewrite (rngl_sin_add_right_r Hon Hos).
       rewrite <- angle_div_2_add_not_overflow. 2: {
         apply angle_add_not_overflow_comm.
@@ -2300,7 +2300,7 @@ split; intros H12. {
         rename H12 into Hco1.
         destruct H as [H12| H12]. {
           apply H12z.
-          rewrite (angle_add_add_swap Hic Hop).
+          rewrite angle_add_add_swap.
           rewrite H12.
           rewrite (angle_right_add_right Hon Hop).
           apply angle_sub_diag.
@@ -2371,7 +2371,7 @@ split; intros H12. {
         } {
           now apply (rngl_lt_le_incl Hor) in Hzs12.
         }
-        rewrite (angle_add_comm Hic).
+        rewrite angle_add_comm.
         now rewrite angle_add_sub.
       }
       exfalso.
@@ -2476,6 +2476,7 @@ split; intros H12. {
 (**)
 progress unfold angle_add_overflow.
 rewrite angle_add_sub_assoc.
+rewrite angle_add_sub_swap.
 ...
 progress unfold angle_ltb.
 rewrite (rngl_sin_add_right_r Hon Hos).
@@ -2485,14 +2486,14 @@ rewrite (rngl_cos_add_right_r Hon Hop).
 ...
         apply angle_add_overflow_comm.
         apply angle_add_overflow_move_add. 2: {
-          rewrite <- (angle_add_sub_swap Hic Hop).
-          rewrite (angle_add_comm Hic).
+          rewrite <- angle_add_sub_swap.
+          rewrite angle_add_comm.
 (*
           rewrite <- angle_add_sub_assoc.
           rewrite angle_straight_sub_right.
 *)
           progress unfold angle_add_overflow.
-          rewrite <- (angle_add_sub_swap Hic Hop).
+          rewrite <- angle_add_sub_swap.
           rewrite <- angle_add_sub_assoc.
           rewrite angle_straight_sub_right.
           apply angle_lt_iff.
@@ -2536,7 +2537,7 @@ Search (_ + _ ≤ _ + _)%A.
 Search (_ + _ < _ + _)%A.
 Search (_ ≤? - _)%L.
 ...
-          rewrite (angle_add_comm Hic).
+          rewrite angle_add_comm.
           rewrite angle_add_assoc.
           progress unfold angle_ltb.
           do 2 rewrite (rngl_sin_add_right_r Hon Hos).
@@ -5014,7 +5015,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hsc| Hsc].
 specialize (angle_add_overflow_le_lemma_111 θ' (θ - θ')) as H1.
 Search (_ + (_ - _))%A.
 Search (_ - _ + _)%A.
-rewrite (angle_add_comm Hic) in H1.
+rewrite angle_add_comm in H1.
 rewrite angle_sub_add in H1.
 apply H1; try easy; [ now right; right; left | ].
 (* θ' ≤ θ ? *)
@@ -5070,7 +5071,7 @@ specialize (rngl_sin_nonneg_add_nonneg θ' (m * θ') Hzs Hzsm) as H1.
       apply angle_add_overflow_le_lemma_111; try easy. {
         now right; right; left.
       }
-      rewrite (angle_add_comm Hic) in Hzsm.
+      rewrite angle_add_comm in Hzsm.
       apply rngl_sin_add_nonneg_sin_nonneg with (θ2 := θ'); [ | easy ].
       progress unfold angle_add_overflow.
       apply angle_ltb_ge.
@@ -5508,7 +5509,7 @@ Search (_ ^ (_ + _)).
     rewrite angle_div_2_pow_mul_2_pow in HN.
 ...
 remember (S n) as sn; cbn; subst sn.
-rewrite (angle_add_comm Hic).
+rewrite angle_add_comm.
 apply (angle_sub_move_r Hic).
 apply IHn.
 progress unfold seq_angle_to_div_nat.

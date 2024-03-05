@@ -3102,8 +3102,8 @@ apply (angle_le_trans _ (θ1 + n * θ2))%A. {
     now apply angle_add_not_overflow_comm.
   }
 } {
-  rewrite (angle_add_comm Hic θ1).
-  rewrite (angle_add_comm Hic θ2).
+  rewrite (angle_add_comm θ1).
+  rewrite (angle_add_comm θ2).
   apply angle_add_le_mono_l; [ | | easy ]. {
     apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
     now apply angle_add_not_overflow_comm.
@@ -3196,7 +3196,7 @@ progress unfold angle_add_overflow in H132.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge in H132.
 apply angle_ltb_ge.
-rewrite (angle_add_add_swap Hic Hop) in H132.
+rewrite angle_add_add_swap in H132.
 rewrite <- angle_add_assoc in H132.
 apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
 progress unfold angle_add_overflow in H13.
@@ -3217,7 +3217,7 @@ intros H; apply H123.
 apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_move_add.
 now apply angle_add_not_overflow_comm.
-rewrite (angle_add_comm Hic).
+rewrite angle_add_comm.
 now apply angle_add_not_overflow_comm.
 Qed.
 
@@ -4565,7 +4565,7 @@ rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_comm.
 rewrite <- angle_mul_nat_assoc.
 rewrite <- angle_add_diag.
-rewrite (angle_add_add_swap Hic Hop).
+rewrite angle_add_add_swap.
 rewrite angle_add_assoc.
 rewrite <- angle_add_assoc.
 do 2 rewrite angle_add_diag.
@@ -4611,7 +4611,7 @@ intros.
 revert θ1 θ2.
 induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
 rewrite (angle_sub_add_distr Hic Hop).
-rewrite (angle_add_sub_swap Hic Hop).
+rewrite angle_add_sub_swap.
 rewrite <- angle_add_sub_assoc.
 f_equal.
 apply IHn.
@@ -4655,8 +4655,8 @@ rewrite <- (angle_add_div_2_diag θ) at 1.
 rewrite (angle_mul_add_distr_r 1)%L.
 rewrite angle_mul_1_l.
 rewrite (angle_sub_add_distr Hic Hop).
-rewrite (angle_add_sub_swap Hic Hop).
-rewrite (angle_add_sub_swap Hic Hop).
+rewrite angle_add_sub_swap.
+rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
 rewrite angle_eucl_dist_sub_l_diag.
 rewrite <- angle_eucl_dist_opp_opp.
@@ -4721,9 +4721,9 @@ eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ (θ1 - u n)).
 }
 apply (rngl_add_lt_compat Hop Hor); [ | easy ].
-rewrite (angle_add_comm Hic).
+rewrite angle_add_comm.
 rewrite angle_eucl_dist_move_0_r.
-rewrite (angle_sub_sub_swap Hic Hop).
+rewrite angle_sub_sub_swap.
 rewrite angle_sub_sub_distr.
 rewrite angle_add_sub.
 rewrite (angle_sub_add_distr Hic Hop).
@@ -4777,10 +4777,10 @@ rewrite angle_eucl_dist_move_0_l.
 rewrite <- angle_eucl_dist_opp_opp.
 rewrite (angle_opp_sub_distr Hic Hop).
 rewrite angle_sub_sub_distr.
-do 2 rewrite <- (angle_add_sub_swap Hic Hop).
-rewrite (angle_add_comm Hic).
+do 2 rewrite <- angle_add_sub_swap.
+rewrite angle_add_comm.
 rewrite <- (angle_sub_add_distr Hic Hop).
-rewrite (angle_add_comm Hic (v n)).
+rewrite (angle_add_comm (v n)).
 now rewrite angle_opp_0.
 Qed.
 
@@ -4979,7 +4979,7 @@ induction n. {
 cbn.
 rewrite IHn.
 do 2 rewrite angle_add_assoc.
-now rewrite (angle_add_add_swap Hic Hop θ1 _ θ2).
+now rewrite (angle_add_add_swap θ1 _ θ2).
 Qed.
 
 Theorem angle_add_move_0_r : ∀ θ1 θ2, (θ1 + θ2 = 0 ↔ θ1 = (- θ2))%A.
@@ -4992,7 +4992,7 @@ split; intros H12. {
   apply angle_add_sub.
 } {
   subst θ1.
-  rewrite (angle_add_opp_l Hic).
+  rewrite angle_add_opp_l.
   apply angle_sub_diag.
 }
 Qed.
@@ -5680,10 +5680,10 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
       now apply rngl_sin_sub_nonneg.
     }
     rewrite angle_sub_sub_distr.
-    rewrite (angle_sub_sub_swap Hic Hop).
+    rewrite angle_sub_sub_swap.
     rewrite angle_sub_diag.
     rewrite angle_sub_0_l.
-    rewrite (angle_add_opp_l Hic).
+    rewrite angle_add_opp_l.
     now apply rngl_sin_sub_nonneg.
   }
   apply (rngl_nle_gt Hor) in H32z.
@@ -5883,7 +5883,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
       now apply rngl_sin_sub_nonneg.
     }
     rewrite angle_sub_sub_distr.
-    rewrite (angle_sub_sub_swap Hic Hop).
+    rewrite angle_sub_sub_swap.
     rewrite angle_sub_add.
     now apply rngl_sin_sub_nonneg.
   }

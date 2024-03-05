@@ -166,7 +166,7 @@ apply rngl_sin_sub_nonneg_sin_le_sin; try easy. {
   now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 } {
-  rewrite (angle_add_sub_swap Hic Hop).
+  rewrite angle_add_sub_swap.
   rewrite angle_sub_diag.
   now rewrite angle_add_0_l.
 }
@@ -727,10 +727,10 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   } {
     now apply (rngl_lt_le_incl Hor).
   } {
-    rewrite (angle_add_comm Hic).
+    rewrite angle_add_comm.
     now rewrite angle_add_sub.
   } {
-    rewrite (angle_add_comm Hic).
+    rewrite angle_add_comm.
     rewrite angle_add_sub.
     now apply (rngl_lt_le_incl Hor).
   } {

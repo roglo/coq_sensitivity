@@ -33,14 +33,14 @@ Ltac sin_cos_add_sub_right_hyp T H :=
   repeat rewrite -> (angle_add_assoc _ _ angle_right) in H;
   repeat rewrite -> (angle_add_sub_assoc _ angle_right) in H;
   repeat rewrite -> (angle_add_sub_assoc _ _ angle_right) in H;
-  repeat rewrite (angle_add_add_swap Hic' Hop' _ angle_right) in H;
-  repeat rewrite (angle_add_sub_swap Hic' Hop' _ angle_right) in H;
-  repeat rewrite <- (angle_add_sub_swap Hic' Hop' _ _ angle_right) in H;
+  repeat rewrite (angle_add_add_swap _ angle_right) in H;
+  repeat rewrite (angle_add_sub_swap _ angle_right) in H;
+  repeat rewrite <- (angle_add_sub_swap _ _ angle_right) in H;
   repeat rewrite <- (angle_sub_sub_distr angle_right) in H;
   repeat rewrite -> (angle_sub_sub_distr _ angle_right) in H;
   repeat rewrite <- (angle_sub_add_distr Hic' Hop' angle_right) in H;
   repeat rewrite -> (angle_sub_add_distr Hic' Hop' _ _ angle_right) in H;
-  repeat rewrite -> (angle_add_comm Hic' (_ - angle_right))%A in H;
+  repeat rewrite -> (angle_add_comm (_ - angle_right))%A in H;
   repeat rewrite -> (angle_add_sub_assoc _ _ angle_right)%A in H;
   set (Hor' := ac_or);
   assert (Hos' : rngl_has_opp_or_subt T = true) by
@@ -73,13 +73,12 @@ Ltac sin_cos_add_sub_right_hyp T H :=
   clear Hic' Hon' Hop' Hos' Hor'.
 
 Ltac sin_cos_add_sub_straight_hyp T H :=
-  set (Hic' := ac_ic);
   set (Hon' := ac_on);
   set (Hop' := ac_op);
   repeat rewrite angle_add_sub_assoc in H;
-  repeat rewrite -> (angle_add_add_swap Hic' Hop' _ angle_straight) in H;
-  repeat rewrite <- (angle_add_sub_swap Hic' Hop' _ _ angle_straight) in H;
-  repeat rewrite -> (angle_add_sub_swap Hic' Hop' _ angle_straight) in H;
+  repeat rewrite -> (angle_add_add_swap _ angle_straight) in H;
+  repeat rewrite <- (angle_add_sub_swap _ _ angle_straight) in H;
+  repeat rewrite -> (angle_add_sub_swap _ angle_straight) in H;
   repeat rewrite <- (angle_sub_sub_distr angle_straight) in H;
   set (Hor' := ac_or);
   assert (Hos' : rngl_has_opp_or_subt T = true) by
@@ -97,7 +96,7 @@ Ltac sin_cos_add_sub_straight_hyp T H :=
   try apply -> (rngl_le_opp_r Hop' Hor') in H;
   try apply <- (rngl_opp_lt_compat Hop' Hor') in H;
   repeat rewrite (rngl_opp_involutive Hop') in H;
-  clear Hic' Hon' Hop' Hos' Hor'.
+  clear Hon' Hop' Hos' Hor'.
 
 Ltac sin_cos_opp_hyp T H :=
   set (Hop' := ac_op);
@@ -115,9 +114,9 @@ Ltac sin_cos_add_sub_right_goal T :=
   set (Hop' := ac_op);
   repeat rewrite angle_add_assoc;
   repeat rewrite -> angle_add_sub_assoc;
-  repeat rewrite (angle_add_add_swap Hic' Hop' _ angle_right);
-  repeat rewrite (angle_add_sub_swap Hic' Hop' _ angle_right);
-  repeat rewrite <- (angle_add_sub_swap Hic' Hop' _ _ angle_right);
+  repeat rewrite (angle_add_add_swap _ angle_right);
+  repeat rewrite (angle_add_sub_swap _ angle_right);
+  repeat rewrite <- (angle_add_sub_swap _ _ angle_right);
   repeat rewrite <- (angle_sub_sub_distr angle_right);
   repeat rewrite -> (angle_sub_add_distr Hic' Hop');
   set (Hor' := ac_or);
@@ -145,13 +144,12 @@ Ltac sin_cos_add_sub_right_goal T :=
   clear Hic' Hon' Hop' Hor' Hos'.
 
 Ltac sin_cos_add_sub_straight_goal T :=
-  set (Hic' := ac_ic);
   set (Hon' := ac_on);
   set (Hop' := ac_op);
   repeat rewrite -> angle_add_sub_assoc;
-  repeat rewrite -> (angle_add_add_swap Hic' Hop' _ angle_straight);
-  repeat rewrite <- (angle_add_sub_swap Hic' Hop' _ _ angle_straight);
-  repeat rewrite -> (angle_add_sub_swap Hic' Hop' _ angle_straight);
+  repeat rewrite -> (angle_add_add_swap _ angle_straight);
+  repeat rewrite <- (angle_add_sub_swap _ _ angle_straight);
+  repeat rewrite -> (angle_add_sub_swap _ angle_straight);
   repeat rewrite <- (angle_sub_sub_distr angle_straight);
   set (Hor' := ac_or);
   repeat rewrite -> (rngl_sin_sub_straight_l Hon' Hop');
@@ -170,7 +168,7 @@ Ltac sin_cos_add_sub_straight_goal T :=
   try apply <- (rngl_le_opp_r Hop' Hor');
   try apply <- (rngl_lt_opp_r Hop' Hor');
   try apply <- (rngl_le_0_sub Hop' Hor');
-  clear Hic' Hon' Hop' Hor'.
+  clear Hon' Hop' Hor'.
 
 Ltac sin_cos_opp_goal T :=
   repeat rewrite -> angle_add_opp_r.
