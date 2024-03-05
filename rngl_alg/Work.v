@@ -1799,7 +1799,7 @@ Proof.
 destruct_ac.
 intros.
 apply angle_sub_move_r.
-rewrite <- (angle_add_assoc Hop).
+rewrite <- angle_add_assoc.
 rewrite angle_straight_add_straight.
 symmetry.
 apply angle_add_0_r.
@@ -2124,7 +2124,7 @@ split; intros H12. {
           subst θ2.
           now apply (rngl_lt_irrefl Hor) in Hzs2.
         }
-        rewrite (angle_add_assoc Hop) in Hzs12d.
+        rewrite angle_add_assoc in Hzs12d.
         rewrite angle_add_opp_r in Hzs12d.
         rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
         apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
@@ -2247,7 +2247,7 @@ split; intros H12. {
         now rewrite H.
       }
       rewrite angle_straight_div_2.
-      rewrite (angle_add_assoc Hop).
+      rewrite angle_add_assoc.
       rewrite (angle_add_add_swap Hic Hop (θ1 / ₂)).
       rewrite (rngl_sin_add_right_r Hon Hos).
       rewrite <- angle_div_2_add_not_overflow. 2: {
@@ -2510,7 +2510,7 @@ Search (_ + _ < _ + _)%A.
 Search (_ ≤? - _)%L.
 ...
           rewrite (angle_add_comm Hic).
-          rewrite (angle_add_assoc Hop).
+          rewrite angle_add_assoc.
           progress unfold angle_ltb.
           do 2 rewrite (rngl_sin_add_right_r Hon Hos).
           do 2 rewrite (rngl_cos_add_right_r Hon Hop).
@@ -4001,7 +4001,7 @@ remember (u i) as θ1 eqn:Hθ1.
       rewrite angle_add_0_r.
       progress unfold angle_add_overflow.
       progress unfold angle_ltb.
-      rewrite (angle_add_assoc Hop).
+      rewrite angle_add_assoc.
       generalize Hzs; intros H.
       apply (rngl_leb_gt Hor) in H.
       rewrite H; clear H.
@@ -4016,8 +4016,8 @@ remember (u i) as θ1 eqn:Hθ1.
       rename θ'' into θ'.
       remember (2 ^ S (S i) / 3 * (θ / ₂^S (S i)))%A as θ2 eqn:H2.
       move Hθ' at top; subst θ2.
-      do 2 rewrite (angle_add_assoc Hop) in Hzs3.
-      do 2 rewrite (angle_add_assoc Hop).
+      do 2 rewrite angle_add_assoc in Hzs3.
+      do 2 rewrite angle_add_assoc.
       progress sin_cos_add_sub_straight_hyp T Hzs.
       progress sin_cos_add_sub_straight_hyp T Hzs3.
       progress sin_cos_add_sub_straight_hyp T Hzs3.

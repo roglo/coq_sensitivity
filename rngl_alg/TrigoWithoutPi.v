@@ -668,11 +668,10 @@ easy.
 Qed.
 
 Theorem angle_add_assoc :
-  rngl_has_opp T = true →
   ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%A.
 Proof.
-intros Hop *.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
@@ -797,7 +796,7 @@ Theorem angle_add_sub : ∀ θ1 θ2, (θ1 + θ2 - θ2)%A = θ1.
 Proof.
 destruct_ac; intros.
 progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
+rewrite <- angle_add_assoc.
 rewrite angle_add_opp_r.
 rewrite angle_sub_diag.
 apply (angle_add_0_r).
@@ -807,7 +806,7 @@ Theorem angle_sub_add : ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
 Proof.
 destruct_ac; intros.
 progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
+rewrite <- angle_add_assoc.
 rewrite angle_add_opp_diag_l.
 apply (angle_add_0_r).
 Qed.
@@ -868,7 +867,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_sub.
-rewrite <- (angle_add_assoc Hop).
+rewrite <- angle_add_assoc.
 f_equal.
 rewrite (angle_opp_add_distr Hic Hop).
 rewrite (angle_opp_involutive Hop).
@@ -2528,10 +2527,10 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
       rewrite (rngl_sin_add_straight_r Hon Hop).
       now apply (rngl_opp_nonpos_nonneg Hop Hor).
     } {
-      rewrite (angle_add_assoc Hop).
+      rewrite angle_add_assoc.
       rewrite (angle_add_comm Hic θ1).
       rewrite (angle_add_comm Hic).
-      do 2 rewrite (angle_add_assoc Hop).
+      do 2 rewrite angle_add_assoc.
       rewrite angle_straight_add_straight.
       rewrite angle_add_0_l.
       rewrite Hθ3 in Hzs3.
@@ -2789,7 +2788,7 @@ Theorem angle_add_add_swap :
   ∀ θ1 θ2 θ3, (θ1 + θ2 + θ3)%A = (θ1 + θ3 + θ2)%A.
 Proof.
 intros Hic Hop *.
-do 2 rewrite <- (angle_add_assoc Hop).
+do 2 rewrite <- angle_add_assoc.
 f_equal.
 apply (angle_add_comm Hic).
 Qed.
@@ -3136,7 +3135,7 @@ Theorem angle_add_sub_assoc :
 Proof.
 intros Hop *.
 progress unfold angle_sub.
-apply (angle_add_assoc Hop).
+apply angle_add_assoc.
 Qed.
 
 Theorem rngl_cos_lt_rngl_cos_sub :
@@ -3343,7 +3342,7 @@ destruct_ac.
 intros.
 induction a; cbn; [ symmetry; apply angle_add_0_l | ].
 rewrite IHa.
-apply (angle_add_assoc Hop).
+apply angle_add_assoc.
 Qed.
 
 Theorem angle_sub_add_distr :
@@ -3355,7 +3354,7 @@ intros Hic Hop *.
 progress unfold angle_sub.
 rewrite (angle_opp_add_distr Hic Hop).
 progress unfold angle_sub.
-rewrite (angle_add_assoc Hop).
+rewrite angle_add_assoc.
 apply (angle_add_add_swap Hic Hop).
 Qed.
 

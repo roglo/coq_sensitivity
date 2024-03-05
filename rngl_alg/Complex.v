@@ -3197,7 +3197,7 @@ progress unfold angle_add_overflow.
 apply angle_ltb_ge in H132.
 apply angle_ltb_ge.
 rewrite (angle_add_add_swap Hic Hop) in H132.
-rewrite <- (angle_add_assoc Hop) in H132.
+rewrite <- angle_add_assoc in H132.
 apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
 progress unfold angle_add_overflow in H13.
 now apply angle_ltb_ge in H13.
@@ -4566,8 +4566,8 @@ rewrite Nat.mul_comm.
 rewrite <- angle_mul_nat_assoc.
 rewrite <- angle_add_diag.
 rewrite (angle_add_add_swap Hic Hop).
-rewrite (angle_add_assoc Hop).
-rewrite <- (angle_add_assoc Hop).
+rewrite angle_add_assoc.
+rewrite <- angle_add_assoc.
 do 2 rewrite angle_add_diag.
 rewrite IHn.
 now do 2 rewrite angle_mul_nat_assoc.
@@ -4978,7 +4978,7 @@ induction n. {
 }
 cbn.
 rewrite IHn.
-do 2 rewrite (angle_add_assoc Hop).
+do 2 rewrite angle_add_assoc.
 now rewrite (angle_add_add_swap Hic Hop θ1 _ θ2).
 Qed.
 
@@ -5249,8 +5249,8 @@ destruct s2z. {
   now apply (angle_straight_neq_0 Hc1) in Hs2z.
 }
 clear Hs2z.
-rewrite (angle_add_assoc Hop).
-rewrite <- (angle_add_assoc Hop).
+rewrite angle_add_assoc.
+rewrite <- angle_add_assoc.
 rewrite angle_straight_add_straight.
 rewrite angle_add_0_r.
 rewrite angle_add_opp_r.

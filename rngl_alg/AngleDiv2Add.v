@@ -203,8 +203,8 @@ apply (rngl_opp_neg_pos Hop Hor) in Hzs2.
 rewrite (rngl_cos_add_straight_r Hon Hop θ2).
 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
-rewrite (angle_add_assoc Hop) in Haov, Hzs3 |-*.
-rewrite <- (angle_add_assoc Hop) in Haov, Hzs3 |-*.
+rewrite angle_add_assoc in Haov, Hzs3 |-*.
+rewrite <- angle_add_assoc in Haov, Hzs3 |-*.
 rewrite angle_straight_add_straight in Haov, Hzs3 |-*.
 rewrite (angle_add_0_r) in Haov, Hzs3 |-*.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
@@ -352,7 +352,7 @@ destruct zs1. {
     rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
     rewrite <- (rngl_opp_0 Hop) in Hzs2.
     apply (rngl_opp_le_compat Hop Hor) in Hzs2.
-    rewrite (angle_add_assoc Hop).
+    rewrite angle_add_assoc.
     do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
     do 2 rewrite (rngl_sub_opp_r Hop).
     rewrite (rngl_add_opp_r Hop).
@@ -381,10 +381,10 @@ destruct zs1. {
   subst θ2; rename θ into θ2.
   move θ2 before θ1.
   rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs2.
-  rewrite (angle_add_assoc Hop) in Hzs12.
+  rewrite angle_add_assoc in Hzs12.
   rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs2, Hzs12.
-  rewrite (angle_add_assoc Hop).
+  rewrite angle_add_assoc.
   do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
   do 2 rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_add_opp_r Hop).
@@ -494,7 +494,7 @@ destruct zs1. {
   apply angle_add_move_r in Heqθ.
   subst θ2; rename θ into θ2.
   move θ2 before θ1.
-  rewrite (angle_add_assoc Hop) in Haov, Hzs12.
+  rewrite angle_add_assoc in Haov, Hzs12.
   rewrite (rngl_cos_add_straight_r Hon Hop) in Haov.
   rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12, Hzs2.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12, Hzs2.
@@ -695,7 +695,7 @@ destruct zs12. {
   progress sin_cos_add_sub_straight_hyp T Hzs1.
   progress sin_cos_add_sub_straight_goal T.
   change_angle_sub_r θ2 angle_straight.
-  rewrite (angle_add_assoc Hop) in Hzs12 |-*.
+  rewrite angle_add_assoc in Hzs12 |-*.
   progress sin_cos_add_sub_straight_hyp T Hzs12.
   progress sin_cos_add_sub_straight_hyp T Hzs2.
   progress sin_cos_add_sub_straight_goal T.
@@ -752,7 +752,7 @@ progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_hyp T Hzs1.
 progress sin_cos_add_sub_straight_goal T.
 change_angle_sub_r θ2 angle_straight.
-rewrite (angle_add_assoc Hop) in Hzs12, Haov |-*.
+rewrite angle_add_assoc in Hzs12, Haov |-*.
 progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_hyp T Haov.
 progress sin_cos_add_sub_straight_hyp T Hzs2.
@@ -857,7 +857,7 @@ destruct zs12. {
     rewrite (rngl_add_opp_l Hop).
     change_angle_sub_r θ2 angle_straight.
     progress sin_cos_add_sub_straight_hyp T Hzs2.
-    rewrite (angle_add_assoc Hop) in Haov, Hzs12 |-*.
+    rewrite angle_add_assoc in Haov, Hzs12 |-*.
     progress sin_cos_add_sub_straight_hyp T Haov.
     progress sin_cos_add_sub_straight_hyp T Hzs12.
     progress sin_cos_add_sub_straight_goal T.
