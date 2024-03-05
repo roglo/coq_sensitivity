@@ -2474,15 +2474,41 @@ split; intros H12. {
       rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
         apply angle_add_overflow_comm.
-Check angle_add_overflow_move_add.
-...
-Check angle_add_overflow_move_add.
-...
         apply angle_add_overflow_move_add. 2: {
+          rewrite <- (angle_add_sub_swap Hic Hop).
+          rewrite (angle_add_comm Hic).
+(*
+          rewrite <- (angle_add_sub_assoc Hop).
+          rewrite angle_straight_sub_right.
+*)
+          progress unfold angle_add_overflow.
           rewrite <- (angle_add_sub_swap Hic Hop).
           rewrite <- (angle_add_sub_assoc Hop).
           rewrite angle_straight_sub_right.
-          progress unfold angle_add_overflow.
+          apply angle_lt_iff.
+          split. {
+            apply angle_add_le_mono_l. 2: {
+              progress unfold angle_add_overflow.
+              rewrite angle_add_opp_r.
+              progress unfold angle_ltb.
+              rewrite (rngl_sin_sub_right_r Hon Hop).
+              rewrite (rngl_cos_sub_right_r Hon Hop).
+              rewrite rngl_leb_opp_r.
+              rewrite (rngl_opp_0 Hop).
+              generalize Hzs12; intros H.
+              apply (rngl_lt_le_incl Hor) in H.
+              apply rngl_leb_le in H.
+              rewrite H; clear H.
+              generalize Hss; intros H.
+              apply rngl_leb_le in H.
+              rewrite H; clear H.
+              apply (rngl_ltb_ge Hor).
+(* c'est carrément faux *)
+...
+Search (_ + _ ≤ _ + _)%A.
+Search (_ + _ < _ + _)%A.
+Search (_ ≤? - _)%L.
+...
           rewrite (angle_add_comm Hic).
           rewrite (angle_add_assoc Hop).
           progress unfold angle_ltb.

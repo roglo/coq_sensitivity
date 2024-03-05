@@ -3203,6 +3203,24 @@ progress unfold angle_add_overflow in H13.
 now apply angle_ltb_ge in H13.
 Qed.
 
+Theorem angle_add_overflow_move_add :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ2 θ3 = false
+  → angle_add_overflow (θ1 + θ2) θ3 = true
+  → angle_add_overflow θ1 (θ2 + θ3) = true.
+Proof.
+destruct_ac.
+intros * H23 H123.
+apply Bool.not_false_iff_true in H123.
+apply Bool.not_false_iff_true.
+intros H; apply H123.
+apply angle_add_not_overflow_comm.
+apply angle_add_not_overflow_move_add.
+now apply angle_add_not_overflow_comm.
+rewrite (angle_add_comm Hic).
+now apply angle_add_not_overflow_comm.
+Qed.
+
 Theorem angle_add_diag : ∀ θ, (θ + θ = 2 * θ)%A.
 Proof.
 intros; cbn.
