@@ -48,7 +48,7 @@ TacChangeAngle.vio: TacChangeAngle.v ../main/RingLike.vio TrigoWithoutPi.vio
 TacChangeAngle.vo TacChangeAngle.glob TacChangeAngle.v.beautified TacChangeAngle.required_vo: TacChangeAngle.v ../main/RingLike.vo TrigoWithoutPi.vo
 TrigoWithoutPi.vio: TrigoWithoutPi.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio
 TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo
-Work.vio: Work.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio Misc.vio RealLike.vio TrigoWithoutPi.vio AngleAddOverflowLe.vio AngleAddLeMonoL.vio AngleLeSubAdd.vio TacChangeAngle.vio Complex.vio NewtonBinomial.vio
-Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleLeSubAdd.vo TacChangeAngle.vo Complex.vo NewtonBinomial.vo
+Work.vio: Work.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio Misc.vio RealLike.vio TrigoWithoutPi.vio AngleAddOverflowLe.vio AngleAddLeMonoL.vio AngleLeSubAdd.vio AngleDiv2Add.vio TacChangeAngle.vio Complex.vio NewtonBinomial.vio
+Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleLeSubAdd.vo AngleDiv2Add.vo TacChangeAngle.vo Complex.vo NewtonBinomial.vo
 Zrl.vio: Zrl.v ../main/RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v ../main/RingLike.vo

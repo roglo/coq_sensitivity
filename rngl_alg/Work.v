@@ -9,7 +9,7 @@ Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
-Require Import AngleLeSubAdd.
+Require Import AngleLeSubAdd AngleDiv2Add.
 Require Import TacChangeAngle.
 Require Import Complex NewtonBinomial.
 
@@ -2470,7 +2470,6 @@ split; intros H12. {
       specialize (angle_div_2_add_not_overflow θ1 θ2 Haov) as H1.
       rewrite angle_sub_straight_eq_add_straight in Hzs12d.
 Search (rngl_sin (_ / ₂ + _ / ₂)).
-Require Import AngleDiv2Add.
 rewrite <- rngl_sin_angle_div_2_add_not_overflow in Hzs12d. 2: {
 Search (angle_add_overflow (_ + _)).
   apply angle_add_not_overflow_comm.
@@ -2478,6 +2477,7 @@ Search (angle_add_overflow (_ + _)).
     rewrite <- (angle_add_sub_swap Hic Hop).
     rewrite <- (angle_add_sub_assoc Hop).
     rewrite angle_straight_sub_right.
+    progress unfold 
 About angle_straight_sub_right.
 2: {
 ...
