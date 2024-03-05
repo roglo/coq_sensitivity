@@ -2473,18 +2473,49 @@ split; intros H12. {
       rewrite (rngl_opp_0 Hop) in Hzs12d.
       rewrite <- rngl_sin_add_straight_r in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
-(**)
-progress unfold angle_add_overflow.
-rewrite angle_add_sub_assoc.
-rewrite angle_add_sub_swap.
-rewrite <- angle_add_sub_assoc.
-rewrite angle_straight_sub_right.
-rewrite angle_add_add_swap.
-progress unfold angle_ltb.
-rewrite rngl_sin_add_right_r.
-rewrite rngl_sin_add_straight_r.
-rewrite rngl_cos_add_straight_r.
-rewrite rngl_cos_add_right_r.
+        progress unfold angle_add_overflow.
+        rewrite angle_add_sub_assoc.
+        rewrite angle_add_sub_swap.
+        rewrite <- angle_add_sub_assoc.
+        rewrite angle_straight_sub_right.
+        rewrite angle_add_add_swap.
+        progress unfold angle_ltb.
+        rewrite rngl_sin_add_right_r.
+        rewrite rngl_sin_add_straight_r.
+        rewrite rngl_cos_add_straight_r.
+        rewrite rngl_cos_add_right_r.
+        rewrite rngl_leb_opp_r.
+        rewrite (rngl_opp_0 Hop).
+        generalize Hzs12; intros H.
+        apply (rngl_leb_gt Hor) in H.
+        rewrite H; clear H.
+        generalize Hzs1; intros H.
+        apply (rngl_leb_gt Hor) in H.
+        rewrite H; clear H.
+        rewrite rngl_ltb_opp_r, (rngl_opp_involutive Hop).
+        now apply rngl_ltb_lt.
+      }
+      apply (rngl_nlt_ge Hor) in Hzs12d.
+      apply Hzs12d; clear Hzs12d.
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_sin_div_2_nonneg | ].
+      rewrite angle_add_sub_assoc.
+      rewrite angle_add_add_swap.
+      rewrite <- angle_add_sub_assoc.
+      rewrite angle_straight_sub_right.
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H| H]. {
+        apply eq_angle_div_2_0 in H.
+        apply angle_add_move_0_r in H.
+        apply (rngl_nlt_ge Hor) in Hss.
+        apply Hss; clear Hss.
+        rewrite H; cbn.
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+      }
+      now apply (angle_div_2_not_straight Hc1) in H.
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
 ...
 progress unfold angle_ltb.
 rewrite rngl_sin_add_right_r.
