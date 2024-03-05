@@ -2355,6 +2355,13 @@ split; intros H12. {
   apply (rngl_leb_gt Hor) in Hzs12, Hzs1.
   apply (rngl_ltb_ge Hor).
 ...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_4.
+...
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff.
+...
   apply angle_add_overflow_le_lemma_11; [ | | easy ]. {
     now apply (rngl_lt_le_incl Hor) in Hzs1.
   }
