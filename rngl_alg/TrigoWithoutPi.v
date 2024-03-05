@@ -2978,23 +2978,20 @@ easy.
 Qed.
 
 Theorem rngl_sin_sub_right_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_sin (angle_right - θ) = rngl_cos θ.
 Proof.
-intros Hon Hos *; cbn.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_0_l Hos).
 rewrite rngl_add_0_r.
 apply (rngl_mul_1_l Hon).
 Qed.
 
 Theorem rngl_sin_sub_right_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_sin (θ - angle_right) = (- rngl_cos θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_l.
 rewrite (rngl_mul_opp_r Hop).
@@ -3003,12 +3000,10 @@ apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_cos_sub_right_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ - angle_right) = rngl_sin θ.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_l Hop).
 rewrite (rngl_mul_opp_r Hop).
@@ -3017,12 +3012,10 @@ apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_cos_sub_right_l :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (angle_right - θ) = rngl_sin θ.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_sub_opp_r Hop).

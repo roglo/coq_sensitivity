@@ -47,12 +47,12 @@ Ltac sin_cos_add_sub_right_hyp T H :=
     apply (rngl_has_opp_has_opp_or_subt Hop');
   repeat rewrite (rngl_sin_add_right_r Hon' Hos') in H;
   repeat rewrite (rngl_cos_add_right_r Hon' Hop') in H;
-  repeat rewrite (rngl_sin_sub_right_r Hon' Hop') in H;
-  repeat rewrite -> (rngl_cos_sub_right_r Hon' Hop') in H;
+  repeat rewrite rngl_sin_sub_right_r in H;
+  repeat rewrite -> rngl_cos_sub_right_r in H;
   repeat rewrite (rngl_sin_add_right_l Hon' Hos') in H;
   repeat rewrite (rngl_cos_add_right_l Hon' Hop') in H;
-  repeat rewrite (rngl_sin_sub_right_l Hon' Hos') in H;
-  repeat rewrite (rngl_cos_sub_right_l Hon' Hop') in H;
+  repeat rewrite rngl_sin_sub_right_l in H;
+  repeat rewrite rngl_cos_sub_right_l in H;
   repeat rewrite -> (rngl_add_opp_l Hop') in H;
   repeat rewrite -> (rngl_add_opp_r Hop') in H;
   try
@@ -123,12 +123,12 @@ Ltac sin_cos_add_sub_right_goal T :=
   set (Hor' := ac_or);
   assert (Hos' : rngl_has_opp_or_subt T = true) by
     apply (rngl_has_opp_has_opp_or_subt Hop');
-  repeat rewrite -> (rngl_sin_sub_right_l Hon' Hos');
-  repeat rewrite -> (rngl_cos_sub_right_l Hon' Hop');
+  repeat rewrite -> rngl_sin_sub_right_l;
+  repeat rewrite -> rngl_cos_sub_right_l;
   repeat rewrite (rngl_sin_add_right_r Hon' Hos');
   repeat rewrite (rngl_cos_add_right_r Hon' Hop');
-  repeat rewrite -> (rngl_sin_sub_right_r Hon' Hop');
-  repeat rewrite (rngl_cos_sub_right_r Hon' Hop');
+  repeat rewrite -> rngl_sin_sub_right_r;
+  repeat rewrite rngl_cos_sub_right_r;
   repeat rewrite -> (rngl_add_opp_r Hop');
   repeat rewrite (rngl_opp_involutive Hop');
   try apply -> (rngl_opp_le_compat Hop' Hor');

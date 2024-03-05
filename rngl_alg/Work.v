@@ -2491,8 +2491,8 @@ split; intros H12. {
               progress unfold angle_add_overflow.
               rewrite angle_add_opp_r.
               progress unfold angle_ltb.
-              rewrite (rngl_sin_sub_right_r Hon Hop).
-              rewrite (rngl_cos_sub_right_r Hon Hop).
+              rewrite rngl_sin_sub_right_r.
+              rewrite rngl_cos_sub_right_r.
               rewrite rngl_leb_opp_r.
               rewrite (rngl_opp_0 Hop).
               generalize Hzs12; intros H.

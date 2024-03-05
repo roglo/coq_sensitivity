@@ -569,7 +569,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   destruct (rngl_eq_dec Hed (rngl_cos θ1) 0) as [Hc1z| Hc1z]. {
     apply eq_rngl_cos_0 in Hc1z.
     destruct Hc1z; subst θ1. {
-      rewrite (rngl_sin_sub_right_l Hon Hos).
+      rewrite rngl_sin_sub_right_l.
       apply (rngl_lt_iff Hor).
       split; [ | easy ].
       apply rngl_cos_bound.
