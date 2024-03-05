@@ -2354,6 +2354,7 @@ split; intros H12. {
   destruct zs1; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs12, Hzs1.
   apply (rngl_ltb_ge Hor).
+...
   apply angle_add_overflow_le_lemma_11; [ | | easy ]. {
     now apply (rngl_lt_le_incl Hor) in Hzs1.
   }
@@ -2396,7 +2397,7 @@ split; intros H12. {
       rewrite (rngl_add_opp_r Hop).
       rewrite <- (rngl_opp_add_distr Hop).
       apply (rngl_opp_neg_pos Hop Hor).
-      admit. (* faisable, je pense *)
+      ... (* faisable, je pense *)
     }
     apply (rngl_nle_gt Hor) in Hc2z.
     change_angle_add_r θ1 angle_right.
