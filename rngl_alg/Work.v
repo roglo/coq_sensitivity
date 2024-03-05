@@ -2175,7 +2175,7 @@ split; intros H12. {
         progress sin_cos_add_sub_straight_hyp T Hzc2.
         progress sin_cos_add_sub_straight_hyp T Hzs2.
         progress sin_cos_add_sub_straight_goal T.
-        rewrite (angle_add_sub_assoc Hop) in H12z.
+        rewrite angle_add_sub_assoc in H12z.
         clear - ac Hzs12 Hzc2 Hzs2 Hzs1 Hzc1 H12z.
         destruct_ac.
         apply (rngl_nlt_ge Hor) in Hzs12.
@@ -2205,7 +2205,7 @@ split; intros H12. {
       progress sin_cos_add_sub_straight_hyp T Hzc2.
       progress sin_cos_add_sub_straight_hyp T Hzs2.
       progress sin_cos_add_sub_straight_goal T.
-      rewrite (angle_add_sub_assoc Hop) in H12z.
+      rewrite angle_add_sub_assoc in H12z.
       change_angle_sub_r θ1 angle_right.
       progress sin_cos_add_sub_right_hyp T Hzs1.
       progress sin_cos_add_sub_right_hyp T Hzs12.
@@ -2473,17 +2473,27 @@ split; intros H12. {
       rewrite (rngl_opp_0 Hop) in Hzs12d.
       rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
+(**)
+progress unfold angle_add_overflow.
+rewrite angle_add_sub_assoc.
+...
+progress unfold angle_ltb.
+rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_sub_right_r.
+rewrite rngl_cos_sub_right_r.
+rewrite (rngl_cos_add_right_r Hon Hop).
+...
         apply angle_add_overflow_comm.
         apply angle_add_overflow_move_add. 2: {
           rewrite <- (angle_add_sub_swap Hic Hop).
           rewrite (angle_add_comm Hic).
 (*
-          rewrite <- (angle_add_sub_assoc Hop).
+          rewrite <- angle_add_sub_assoc.
           rewrite angle_straight_sub_right.
 *)
           progress unfold angle_add_overflow.
           rewrite <- (angle_add_sub_swap Hic Hop).
-          rewrite <- (angle_add_sub_assoc Hop).
+          rewrite <- angle_add_sub_assoc.
           rewrite angle_straight_sub_right.
           apply angle_lt_iff.
           split. {
@@ -2830,7 +2840,7 @@ Search (rngl_cos _ < 0)%L.
       destruct aov. 2: {
 Require Import AngleDiv2Add.
         rewrite <- rngl_sin_angle_div_2_add_not_overflow in Hzs12d; [ | easy ].
-        rewrite (angle_add_sub_assoc Hop) in Hzs12d.
+        rewrite angle_add_sub_assoc in Hzs12d.
 ...
 (*
         change_angle_add_r θ2 angle_right.

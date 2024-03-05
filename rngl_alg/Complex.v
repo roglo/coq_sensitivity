@@ -4612,7 +4612,7 @@ revert θ1 θ2.
 induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
 rewrite (angle_sub_add_distr Hic Hop).
 rewrite (angle_add_sub_swap Hic Hop).
-rewrite <- (angle_add_sub_assoc Hop).
+rewrite <- angle_add_sub_assoc.
 f_equal.
 apply IHn.
 Qed.

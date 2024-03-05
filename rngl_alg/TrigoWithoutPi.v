@@ -3123,10 +3123,9 @@ apply (angle_add_add_swap Hic Hop).
 Qed.
 
 Theorem angle_add_sub_assoc :
-  rngl_has_opp T = true →
   ∀ θ1 θ2 θ3, (θ1 + (θ2 - θ3))%A = (θ1 + θ2 - θ3)%A.
 Proof.
-intros Hop *.
+intros.
 progress unfold angle_sub.
 apply angle_add_assoc.
 Qed.
