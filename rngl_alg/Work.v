@@ -2385,40 +2385,39 @@ split; intros H12. {
       now apply rngl_sin_add_nonneg.
     }
     apply (rngl_nle_gt Hor) in Hs2z.
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-      apply (rngl_nlt_ge Hor).
-      intros Hcc.
-      specialize (angle_div_2_add_overflow θ1 θ2) as H1.
-      assert (H : angle_add_overflow θ1 θ2 = true). {
-        progress unfold angle_add_overflow.
-        progress unfold angle_ltb.
-        generalize Hzs12; intros H.
-        apply (rngl_leb_gt Hor) in H.
-        rewrite H; clear H.
-        generalize Hzs1; intros H.
-        apply (rngl_leb_gt Hor) in H.
-        rewrite H; clear H.
-        now apply rngl_ltb_lt.
-      }
-      specialize (H1 H); clear H.
-      symmetry in H1.
-      apply angle_add_move_r in H1.
-      rewrite angle_sub_straight_eq_add_straight in H1.
-      rewrite H1 in Hzs12d, H12.
-      rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
-      apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
-      apply (rngl_nlt_ge Hor) in Hzs12d.
-      apply Hzs12d; clear Hzs12d.
-      apply (rngl_lt_iff Hor).
-      split; [ apply rngl_sin_div_2_nonneg | ].
-      intros H; symmetry in H.
-      apply eq_rngl_sin_0 in H.
-      destruct H as [H| H]. {
-        now apply eq_angle_div_2_0 in H.
-      }
-      now apply (angle_div_2_not_straight Hc1) in H.
+    apply (rngl_nlt_ge Hor).
+    intros Hcc.
+    specialize (angle_div_2_add_overflow θ1 θ2) as H1.
+    assert (H : angle_add_overflow θ1 θ2 = true). {
+      progress unfold angle_add_overflow.
+      progress unfold angle_ltb.
+      generalize Hzs12; intros H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      generalize Hzs1; intros H.
+      apply (rngl_leb_gt Hor) in H.
+      rewrite H; clear H.
+      now apply rngl_ltb_lt.
     }
-    apply (rngl_nle_gt Hor) in Hc2z.
+    specialize (H1 H); clear H.
+    symmetry in H1.
+    apply angle_add_move_r in H1.
+    rewrite angle_sub_straight_eq_add_straight in H1.
+    rewrite H1 in Hzs12d, H12.
+    rewrite (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12d.
+    apply (rngl_nlt_ge Hor) in Hzs12d.
+    apply Hzs12d; clear Hzs12d.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_sin_div_2_nonneg | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H| H]. {
+      now apply eq_angle_div_2_0 in H.
+    }
+    now apply (angle_div_2_not_straight Hc1) in H.
+  }
+  apply (rngl_nle_gt Hor) in Hzc1.
 ...
       change_angle_add_r θ1 angle_right.
       progress sin_cos_add_sub_right_hyp T Hzc1.
