@@ -5311,7 +5311,7 @@ destruct zs. {
         destruct zstt; [ | easy ].
         apply rngl_leb_le in Hzstt.
         apply rngl_ltb_lt in Haov.
-        rewrite (rngl_cos_add_straight_r Hon Hop).
+        rewrite rngl_cos_add_straight_r.
         remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
         symmetry in Hsz.
         destruct sz. {

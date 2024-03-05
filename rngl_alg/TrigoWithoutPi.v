@@ -943,12 +943,10 @@ apply (rngl_sub_0_r Hos).
 Qed.
 
 Theorem rngl_cos_add_straight_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ + angle_straight) = (- rngl_cos θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_0_r Hos).
@@ -2502,10 +2500,10 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
   progress unfold rngl_sub.
   rewrite Hop.
   do 2 rewrite <- (rngl_sub_opp_r Hop).
-  do 2 rewrite <- (rngl_cos_add_straight_r Hon Hop).
+  do 2 rewrite <- rngl_cos_add_straight_r.
   apply (rngl_add_cos_nonneg_sqrt_mul_le Hii). {
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-      do 2 rewrite (rngl_cos_add_straight_r Hon Hop).
+      do 2 rewrite rngl_cos_add_straight_r.
       rewrite (rngl_add_opp_r Hop).
       rewrite <- (rngl_opp_add_distr Hop).
       apply (rngl_opp_nonneg_nonpos Hop Hor).
@@ -2532,7 +2530,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
       rewrite Hθ3 in Hzs3.
       now apply (rngl_lt_le_incl Hor).
     }
-    rewrite (rngl_cos_add_straight_r Hon Hop).
+    rewrite rngl_cos_add_straight_r.
     apply (rngl_opp_nonneg_nonpos Hop Hor).
     now apply (rngl_lt_le_incl Hor).
   }

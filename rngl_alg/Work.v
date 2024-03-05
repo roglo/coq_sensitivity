@@ -2338,7 +2338,7 @@ split; intros H12. {
     rewrite H1 in Hzs12d, H12.
     rewrite rngl_sin_add_straight_r in Hzs12d.
 (*
-    rewrite (rngl_cos_add_straight_r Hon Hop) in H12.
+    rewrite rngl_cos_add_straight_r in H12.
 *)
     apply (rngl_nlt_ge Hor).
     intros Hsz1.
@@ -2483,6 +2483,7 @@ rewrite angle_add_add_swap.
 progress unfold angle_ltb.
 rewrite rngl_sin_add_right_r.
 rewrite rngl_sin_add_straight_r.
+rewrite rngl_cos_add_straight_r.
 ...
 progress unfold angle_ltb.
 rewrite rngl_sin_add_right_r.

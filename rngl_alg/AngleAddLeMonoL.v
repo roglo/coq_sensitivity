@@ -210,7 +210,7 @@ destruct zs2. {
     apply (eq_rngl_cos_opp_1) in Hc2o1.
     subst θ2.
     rewrite rngl_sin_add_straight_r in Hzs12.
-    rewrite (rngl_cos_add_straight_r Hon Hop).
+    rewrite rngl_cos_add_straight_r.
     apply -> (rngl_opp_le_compat Hop Hor).
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
     apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
