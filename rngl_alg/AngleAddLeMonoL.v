@@ -502,7 +502,7 @@ rewrite angle_add_opp_r.
 rewrite angle_add_sub.
 rewrite angle_sub_diag.
 progress unfold angle_ltb.
-rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_add_right_r.
 rewrite (rngl_leb_refl Hor).
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
@@ -774,7 +774,7 @@ apply (rngl_opp_le_compat Hop Hor) in H.
 rewrite (rngl_opp_0 Hop) in H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
-rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_add_right_r.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
 apply rngl_leb_le in Hzs1.
@@ -1166,7 +1166,7 @@ apply (rngl_opp_le_compat Hop Hor) in H.
 rewrite (rngl_opp_0 Hop) in H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
-rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_add_right_r.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1.
 apply rngl_leb_le in Hzs1.
@@ -1508,7 +1508,7 @@ destruct Hzs2; subst θ1. {
   apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 }
 rewrite (angle_sub_opp_r Hop) in Hc2z.
-rewrite (rngl_sin_add_right_r Hon Hos) in Hc2z.
+rewrite rngl_sin_add_right_r in Hc2z.
 apply (rngl_nlt_ge Hor) in Hc2z.
 apply Hc2z; clear Hc2z; cbn.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
@@ -2029,7 +2029,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply (eq_rngl_cos_0) in H.
     destruct H; subst θ3. {
       clear Hc3z Hc32 Hzs3.
-      rewrite (rngl_sin_add_right_r Hon Hos).
+      rewrite rngl_sin_add_right_r.
       rewrite (rngl_cos_add_right_r Hon Hop) in Hs13z.
       apply (rngl_opp_neg_pos Hop Hor) in Hs13z.
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {

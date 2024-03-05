@@ -991,11 +991,10 @@ apply rngl_add_0_r.
 Qed.
 
 Theorem rngl_sin_add_right_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ, rngl_sin (θ + angle_right) = rngl_cos θ.
 Proof.
-intros Hon Hos *; cbn.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_0_r Hos).
 apply rngl_add_0_l.

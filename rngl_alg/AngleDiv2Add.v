@@ -547,7 +547,7 @@ destruct zs1. {
   subst θ1; rename θ into θ1.
   move θ1 after θ2.
   rewrite angle_add_add_swap in Hzs12, Haov.
-  rewrite (rngl_sin_add_right_r Hon Hos) in Hzs1, Hzs12.
+  rewrite rngl_sin_add_right_r in Hzs1, Hzs12.
   rewrite (rngl_cos_add_right_r Hon Hop) in Hc1z.
   do 2 rewrite (rngl_cos_add_right_r Hon Hop) in Haov.
   apply (rngl_opp_neg_pos Hop Hor) in Hc1z.

@@ -1673,7 +1673,7 @@ progress sin_cos_add_sub_right_hyp T Hcz.
 progress sin_cos_add_sub_right_hyp T Hz2s.
 split. {
   progress unfold angle_ltb.
-  rewrite (rngl_sin_add_right_r Hon Hos).
+  rewrite rngl_sin_add_right_r.
   rewrite (rngl_cos_add_right_r Hon Hop).
   cbn.
   specialize (rngl_0_le_1 Hon Hop Hor) as H2.
@@ -1689,7 +1689,7 @@ split. {
 apply angle_lt_iff.
 split. {
   progress unfold angle_leb.
-  rewrite (rngl_sin_add_right_r Hon Hos).
+  rewrite rngl_sin_add_right_r.
   rewrite (rngl_cos_add_right_r Hon Hop).
   generalize Hz2s; intros H.
   apply (rngl_lt_le_incl Hor) in H.
@@ -2249,7 +2249,7 @@ split; intros H12. {
       rewrite angle_straight_div_2.
       rewrite angle_add_assoc.
       rewrite (angle_add_add_swap (θ1 / ₂)).
-      rewrite (rngl_sin_add_right_r Hon Hos).
+      rewrite rngl_sin_add_right_r.
       rewrite <- angle_div_2_add_not_overflow. 2: {
         apply angle_add_not_overflow_comm.
         apply angle_add_overflow_lt_straight_le_straight. {
@@ -2477,9 +2477,14 @@ split; intros H12. {
 progress unfold angle_add_overflow.
 rewrite angle_add_sub_assoc.
 rewrite angle_add_sub_swap.
+rewrite <- angle_add_sub_assoc.
+rewrite angle_straight_sub_right.
+rewrite angle_add_add_swap.
+progress unfold angle_ltb.
+rewrite rngl_sin_add_right_r.
 ...
 progress unfold angle_ltb.
-rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_add_right_r.
 rewrite rngl_sin_sub_right_r.
 rewrite rngl_cos_sub_right_r.
 rewrite (rngl_cos_add_right_r Hon Hop).
@@ -2500,7 +2505,7 @@ rewrite (rngl_cos_add_right_r Hon Hop).
           split. {
 (**)
 progress unfold angle_leb.
-rewrite (rngl_sin_add_right_r Hon Hos).
+rewrite rngl_sin_add_right_r.
 rewrite rngl_sin_sub_right_r.
 rewrite rngl_cos_sub_right_r.
 rewrite (rngl_cos_add_right_r Hon Hop).
@@ -2540,7 +2545,7 @@ Search (_ ≤? - _)%L.
           rewrite angle_add_comm.
           rewrite angle_add_assoc.
           progress unfold angle_ltb.
-          do 2 rewrite (rngl_sin_add_right_r Hon Hos).
+          do 2 rewrite rngl_sin_add_right_r.
           do 2 rewrite (rngl_cos_add_right_r Hon Hop).
           generalize Hzs12; intros H.
           apply (rngl_leb_gt Hor) in H.
@@ -2559,7 +2564,7 @@ Search (_ ≤? - _)%L.
           apply angle_add_not_overflow_comm.
           progress unfold angle_add_overflow.
           progress unfold angle_ltb.
-          rewrite (rngl_sin_add_right_r Hon Hos).
+          rewrite rngl_sin_add_right_r.
           rewrite (rngl_cos_add_right_r Hon Hop).
           generalize Hs2z; intros H.
           apply (rngl_lt_le_incl Hor) in H.
@@ -2582,7 +2587,7 @@ Search (_ ≤? - _)%L.
 2: {
 ...
         progress unfold angle_ltb.
-          rewrite (rngl_sin_add_right_r Hon Hos).
+          rewrite rngl_sin_add_right_r.
           rewrite (rngl_cos_add_right_r Hon Hop).
           generalize Hs2z; intros H.
           apply (rngl_lt_le_incl Hor) in H.
