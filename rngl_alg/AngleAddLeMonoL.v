@@ -363,6 +363,18 @@ destruct zs2. {
 }
 Qed.
 
+Theorem angle_add_overflow_comm :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = true
+  → angle_add_overflow θ2 θ1 = true.
+Proof.
+intros * H12.
+apply Bool.not_false_iff_true in H12.
+apply Bool.not_false_iff_true.
+intros H; apply H12.
+now apply angle_add_not_overflow_comm.
+Qed.
+
 Theorem angle_add_le_mono_l_lemma_1 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false

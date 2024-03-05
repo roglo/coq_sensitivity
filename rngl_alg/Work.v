@@ -2469,17 +2469,86 @@ split; intros H12. {
       }
       specialize (angle_div_2_add_not_overflow θ1 θ2 Haov) as H1.
       rewrite angle_sub_straight_eq_add_straight in Hzs12d.
-Search (rngl_sin (_ / ₂ + _ / ₂)).
-rewrite <- rngl_sin_angle_div_2_add_not_overflow in Hzs12d. 2: {
-Search (angle_add_overflow (_ + _)).
-  apply angle_add_not_overflow_comm.
-  apply angle_add_not_overflow_move_add. 2: {
-    rewrite <- (angle_add_sub_swap Hic Hop).
-    rewrite <- (angle_add_sub_assoc Hop).
-    rewrite angle_straight_sub_right.
-    progress unfold 
+      apply (rngl_opp_le_compat Hop Hor) in Hzs12d.
+      rewrite (rngl_opp_0 Hop) in Hzs12d.
+      rewrite <- (rngl_sin_add_straight_r Hon Hop) in Hzs12d.
+      rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
+        apply angle_add_overflow_comm.
+Check angle_add_overflow_move_add.
+...
+Check angle_add_overflow_move_add.
+...
+        apply angle_add_overflow_move_add. 2: {
+          rewrite <- (angle_add_sub_swap Hic Hop).
+          rewrite <- (angle_add_sub_assoc Hop).
+          rewrite angle_straight_sub_right.
+          progress unfold angle_add_overflow.
+          rewrite (angle_add_comm Hic).
+          rewrite (angle_add_assoc Hop).
+          progress unfold angle_ltb.
+          do 2 rewrite (rngl_sin_add_right_r Hon Hos).
+          do 2 rewrite (rngl_cos_add_right_r Hon Hop).
+          generalize Hzs12; intros H.
+          apply (rngl_leb_gt Hor) in H.
+          rewrite H; clear H.
+          generalize Hs2z; intros H.
+          apply (rngl_lt_le_incl Hor) in H.
+          apply rngl_leb_le in H.
+          now rewrite H.
+        }
+...
+        progress unfold angle_sub.
+        apply angle_add_not_overflow_comm.
+        apply angle_add_not_overflow_move_add. 2: {
+          rewrite angle_add_opp_r.
+          rewrite angle_straight_sub_right.
+          apply angle_add_not_overflow_comm.
+          progress unfold angle_add_overflow.
+          progress unfold angle_ltb.
+          rewrite (rngl_sin_add_right_r Hon Hos).
+          rewrite (rngl_cos_add_right_r Hon Hop).
+          generalize Hs2z; intros H.
+          apply (rngl_lt_le_incl Hor) in H.
+          apply rngl_leb_le in H.
+          rewrite H; clear H.
+          generalize Hzc2; intros H.
+          apply rngl_leb_le in H.
+          rewrite H; clear H.
+          apply (rngl_ltb_ge Hor).
+          apply (rngl_le_opp_l Hop Hor).
+          apply (rngl_lt_le_incl Hor) in Hs2z.
+          now apply (rngl_add_nonneg_nonneg Hor).
+        }
+        progress unfold angle_add_overflow.
+        rewrite angle_add_opp_r.
+        rewrite angle_straight_sub_right.
+        apply angle_ltb_ge.
+(* eh merde *)
+...
+2: {
+...
+        progress unfold angle_ltb.
+          rewrite (rngl_sin_add_right_r Hon Hos).
+          rewrite (rngl_cos_add_right_r Hon Hop).
+          generalize Hs2z; intros H.
+          apply (rngl_lt_le_incl Hor) in H.
+          apply rngl_leb_le in H.
+          rewrite H; clear H.
+          generalize Hzc2; intros H.
+          apply rngl_leb_le in H.
+          rewrite H; clear H.
+          apply (rngl_ltb_ge Hor).
+          apply (rngl_le_opp_l Hop Hor).
+          apply (rngl_lt_le_incl Hor) in Hs2z.
+          now apply (rngl_add_nonneg_nonneg Hor).
+Search (angle_add_overflow (_ - _)).
+...
+2: {
+    rew
 About angle_straight_sub_right.
 2: {
+Search (rngl_sin (_ / ₂ + _ / ₂)).
+Search (angle_add_overflow (_ + _)).
 ...
 Search ((_ + angle_straight) / ₂)%L.
       rewrite H1 in Hzs12d, H12.
