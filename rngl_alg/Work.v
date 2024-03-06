@@ -2726,23 +2726,25 @@ destruct m. {
 (**)
     subst θ'.
     rewrite angle_mul_nat_assoc in Htt.
+(**)
+    specialize (Nat.div_mod (2 ^ i) n Hnz) as H1.
+    symmetry in H1.
+    apply Nat.add_sub_eq_r in H1.
+...
     destruct n; [ easy | clear Hnz ].
     apply Nat.succ_lt_mono in Hmi.
     destruct n; [ easy | ].
     apply Nat.succ_lt_mono in Hmi.
     destruct n; [ easy | clear Hmi ].
     destruct n. {
-(**)
-specialize (Nat.div_mod (2 ^ i) 3) as H1.
-specialize (H1 (Nat.neq_succ_0 _)).
-symmetry in H1.
-Search (_ + _ = _ → _).
-apply Nat.add_sub_eq_r in H1.
-rewrite <- H1 in Htt; clear H1.
-Search ((_ - _) * _)%A.
-rewrite angle_mul_sub_distr_r in Htt. {
-  rewrite angle_div_2_pow_mul_2_pow in Htt.
-  apply <- angle_sub_move_0_r in Htt.
+      specialize (Nat.div_mod (2 ^ i) 3) as H1.
+      specialize (H1 (Nat.neq_succ_0 _)).
+      symmetry in H1.
+      apply Nat.add_sub_eq_r in H1.
+      rewrite <- H1 in Htt; clear H1.
+      rewrite angle_mul_sub_distr_r in Htt; [ | now apply Nat.mod_le ].
+      rewrite angle_div_2_pow_mul_2_pow in Htt.
+      apply -> angle_sub_move_0_r in Htt.
 ..
       destruct i; [ cbn in Hni; flia Hni | ].
       destruct i; [ cbn in Hni; flia Hni | ].
