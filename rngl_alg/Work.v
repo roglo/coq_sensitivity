@@ -2713,6 +2713,7 @@ destruct m. {
   apply (angle_add_not_overflow_equiv Hc1).
   progress unfold seq_angle_to_div_nat.
   remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
+  rewrite angle_mul_2_div_2.
   split. {
     destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
       subst θ θ'; left.
@@ -2722,6 +2723,29 @@ destruct m. {
     right.
     rewrite angle_add_mul_r_diag_r.
     intros Htt.
+(**)
+    subst θ'.
+    rewrite angle_mul_nat_assoc in Htt.
+    destruct n; [ easy | clear Hnz ].
+    apply Nat.succ_lt_mono in Hmi.
+    destruct n; [ easy | ].
+    apply Nat.succ_lt_mono in Hmi.
+    destruct n; [ easy | clear Hmi ].
+    destruct n. {
+      apply eq_angle_mul_0 in Htt.
+      destruct Htt as [Htt| Htt]. {
+        apply Nat.eq_add_0 in Htt.
+        destruct Htt as (H1, H2).
+        apply Nat.div_small_iff in H1; [ | easy ].
+        now apply Nat.nle_gt in H1.
+      }
+      destruct Htt as (H1, H2).
+Search (rngl_cos (_ * _)).
+... ...
+  }
+  destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
+    rewrite Hts.
+...
     apply eq_angle_mul_0 in Htt.
     destruct Htt as [| Htt]; [ easy | ].
     destruct Htt as (Hc, _).
@@ -2729,7 +2753,6 @@ destruct m. {
     rewrite angle_mul_nat_assoc in Hc.
     rewrite rngl_cos_nx in Hc.
     cbn - [ "/" "-" binomial ] in Hc.
-    (* pas l'air de marcher *)
 ...
 (**)
   destruct i. {

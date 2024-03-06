@@ -3285,6 +3285,14 @@ destruct tt. {
 }
 Qed.
 
+Theorem angle_lt_dec : ∀ θ1 θ2, {(θ1 < θ2)%A} + {¬ (θ1 < θ2)%A}.
+Proof.
+intros.
+remember (θ1 <? θ2)%A as tt eqn:Htt.
+symmetry in Htt.
+now destruct tt; [ left | right ].
+Qed.
+
 Theorem rngl_cos_mul_2_l :
   ∀ θ, rngl_cos (2 * θ) = ((rngl_cos θ)² - (rngl_sin θ)²)%L.
 Proof.
