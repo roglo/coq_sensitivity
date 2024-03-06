@@ -1217,7 +1217,7 @@ induction i; intros. {
   cbn in Hni.
   apply Nat.succ_le_mono in Hni.
   apply Nat.le_0_r in Hni; subst n.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 destruct (le_dec (S n) (2 ^ i)) as [Hsni| Hsni]. {
   rewrite angle_div_2_pow_succ_r_2.
@@ -2676,7 +2676,7 @@ intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 destruct m. {
   rewrite angle_mul_0_l.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 destruct m. {
   rewrite angle_mul_1_l.
@@ -2712,19 +2712,25 @@ destruct m. {
 (**)
   apply (angle_add_not_overflow_equiv Hc1).
   progress unfold seq_angle_to_div_nat.
+  remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
   split. {
     destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
-      subst θ; left.
+      subst θ θ'; left.
       rewrite angle_0_div_2_pow.
       apply angle_mul_0_r.
     }
     right.
     rewrite angle_add_mul_r_diag_r.
     intros Htt.
+...
     apply eq_angle_mul_0 in Htt.
     destruct Htt as [| Htt]; [ easy | ].
-    destruct Htt as (Hc, Hs).
+    destruct Htt as (Hc, _).
+    rewrite rngl_cos_nx in Hc.
+    cbn - [ "/" "-" binomial ] in Hc.
+    (* pas l'air de marcher *)
 ...
+(**)
   destruct i. {
     cbn in Hni.
     flia Hmi Hni.
@@ -2738,7 +2744,7 @@ destruct m. {
     rewrite His.
     rewrite <- angle_add_diag.
     rewrite angle_straight_add_straight.
-    apply (angle_add_overflow_0_r Hon Hos).
+    apply angle_add_overflow_0_r.
   }
   apply (angle_eqb_neq Hed) in His.
   specialize angle_div_2_pow_mul_le_angle as H1.
@@ -2800,7 +2806,6 @@ destruct m. {
       generalize H1; intros H.
       apply rngl_sin_mul_2_neg_if in H.
       destruct H as [(H2, H3)| H2]. {
-Inspect 1.
 ...
       apply (rngl_nle_gt Hor).
       intros Hcc.
@@ -3503,13 +3508,13 @@ destruct tz. {
   rewrite angle_0_div_2_pow.
   rewrite angle_mul_0_r.
   apply angle_add_not_overflow_comm.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 apply (angle_eqb_neq Hed) in Htz.
 (**)
 destruct m. {
   rewrite angle_mul_0_l.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 destruct m. {
   rewrite angle_mul_1_l.
@@ -3539,12 +3544,12 @@ destruct n; [ easy | clear Hnz ].
 destruct n. {
   apply Nat.lt_1_r in Hmi; subst m.
   rewrite angle_mul_0_l.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 destruct n. {
   destruct m. {
     rewrite angle_mul_0_l.
-    apply (angle_add_overflow_0_r Hon Hos).
+    apply angle_add_overflow_0_r.
   }
   destruct m; [ clear Hmi | flia Hmi ].
   rewrite angle_mul_1_l.
@@ -3625,7 +3630,7 @@ destruct n. {
 destruct n. {
   destruct m. {
     rewrite angle_mul_0_l.
-    apply (angle_add_overflow_0_r Hon Hos).
+    apply angle_add_overflow_0_r.
   }
   apply Nat.succ_lt_mono in Hmi.
   destruct m. {
@@ -5030,7 +5035,7 @@ destruct_ac.
 intros.
 induction i. {
   cbn.
-  apply (angle_add_overflow_0_r Hon Hos).
+  apply angle_add_overflow_0_r.
 }
 cbn - [ div ].
 Theorem seq_angle_to_div_nat_succ_r :

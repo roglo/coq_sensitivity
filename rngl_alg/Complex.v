@@ -3141,12 +3141,8 @@ eapply angle_add_overflow_le; [ | apply H2n2 ].
 now apply angle_mul_le_mono_l.
 Qed.
 
-Theorem angle_add_overflow_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ θ, angle_add_overflow θ 0 = false.
+Theorem angle_add_overflow_0_r : ∀ θ, angle_add_overflow θ 0 = false.
 Proof.
-intros Hon Hos.
 intros.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
