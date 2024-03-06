@@ -3160,12 +3160,10 @@ intros * Ha.
 now apply rl_sqrt_nonneg.
 Qed.
 
-Theorem angle_mul_0_r :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  ∀ n, (n * 0 = 0)%A.
+Theorem angle_mul_0_r : ∀ n, (n * 0 = 0)%A.
 Proof.
-intros Hon Hos *.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 induction n; [ easy | cbn ].
 do 2 rewrite (rngl_mul_1_l Hon).

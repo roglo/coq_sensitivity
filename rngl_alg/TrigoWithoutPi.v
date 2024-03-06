@@ -3272,6 +3272,19 @@ split; intros H12. {
 }
 Qed.
 
+Theorem angle_eq_dec : ∀ θ1 θ2 : angle T, {θ1 = θ2} + {θ1 ≠ θ2}.
+Proof.
+destruct_ac.
+intros.
+remember (θ1 =? θ2)%A as tt eqn:Htt.
+symmetry in Htt.
+destruct tt. {
+  now left; apply (angle_eqb_eq Hed) in Htt.
+} {
+  now right; apply (angle_eqb_neq Hed) in Htt.
+}
+Qed.
+
 Theorem rngl_cos_mul_2_l :
   ∀ θ, rngl_cos (2 * θ) = ((rngl_cos θ)² - (rngl_sin θ)²)%L.
 Proof.

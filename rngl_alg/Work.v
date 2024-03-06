@@ -2713,7 +2713,17 @@ destruct m. {
   apply (angle_add_not_overflow_equiv Hc1).
   progress unfold seq_angle_to_div_nat.
   split. {
-(* à voir... à essayer... *)
+    destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
+      subst θ; left.
+      rewrite angle_0_div_2_pow.
+      apply angle_mul_0_r.
+    }
+    right.
+    rewrite angle_add_mul_r_diag_r.
+    intros Htt.
+    apply eq_angle_mul_0 in Htt.
+    destruct Htt as [| Htt]; [ easy | ].
+    destruct Htt as (Hc, Hs).
 ...
   destruct i. {
     cbn in Hni.
@@ -3491,7 +3501,7 @@ destruct tz. {
   apply (angle_eqb_eq Hed) in Htz.
   subst θ.
   rewrite angle_0_div_2_pow.
-  rewrite (angle_mul_0_r Hon Hos).
+  rewrite angle_mul_0_r.
   apply angle_add_not_overflow_comm.
   apply (angle_add_overflow_0_r Hon Hos).
 }
@@ -4214,7 +4224,7 @@ apply rngl_cos_le_anticompat_when_sin_nonneg; try easy.
             destruct Hs as [Hs| Hs]. {
               rewrite Hs in Hzc.
               do 2 rewrite angle_0_div_2 in Hzc.
-              rewrite (angle_mul_0_r Hon Hos) in Hzc.
+              rewrite angle_mul_0_r in Hzc.
               symmetry in Hzc.
               now apply (angle_right_neq_0 Hc1) in Hzc.
             }
@@ -4581,7 +4591,7 @@ Proof.
         intros H; symmetry in H.
         apply angle_eucl_dist_separation in H.
         subst θ'.
-        rewrite (angle_mul_0_r Hon Hos) in Hzm.
+        rewrite angle_mul_0_r in Hzm.
         now apply (rngl_lt_irrefl Hor) in Hzm.
       }
       specialize (Hlim Htz).
