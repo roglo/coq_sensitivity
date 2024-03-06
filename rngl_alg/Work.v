@@ -2732,6 +2732,10 @@ destruct m. {
     apply Nat.succ_lt_mono in Hmi.
     destruct n; [ easy | clear Hmi ].
     destruct n. {
+(**)
+      destruct i; [ cbn in Hni; flia Hni | ].
+      cbn - [ "/" ] in Htt.
+...
       apply eq_angle_mul_0 in Htt.
       destruct Htt as [Htt| Htt]. {
         apply Nat.eq_add_0 in Htt.
@@ -2741,6 +2745,7 @@ destruct m. {
       }
       destruct Htt as (H1, H2).
 Search (rngl_cos (_ * _)).
+Print rngl_cos_mul.
 ... ...
   }
   destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
