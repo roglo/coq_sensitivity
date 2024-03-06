@@ -2722,10 +2722,11 @@ destruct m. {
     right.
     rewrite angle_add_mul_r_diag_r.
     intros Htt.
-...
     apply eq_angle_mul_0 in Htt.
     destruct Htt as [| Htt]; [ easy | ].
     destruct Htt as (Hc, _).
+    subst θ'.
+    rewrite angle_mul_nat_assoc in Hc.
     rewrite rngl_cos_nx in Hc.
     cbn - [ "/" "-" binomial ] in Hc.
     (* pas l'air de marcher *)
