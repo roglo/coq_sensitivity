@@ -2737,12 +2737,111 @@ Theorem glop :
 Proof.
 intros * Htz Hni.
 Admitted.
-apply glop in Htt.
-...
-specialize (glop (3 * (2 ^ i / n)) i θ Htz) as H1.
-rewrite Htt in H1.
+apply glop in Htt; [ easy | easy | ].
 destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   subst n.
+  clear Hnz Hmi.
+  specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+  symmetry in H1.
+  apply Nat.add_sub_eq_r in H1.
+  rewrite <- H1.
+  apply Nat.sub_lt; [ now apply Nat.mod_le | ].
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.mod_divides in H; [ | easy ].
+  destruct H as (c, Hc).
+  clear Hni Htt H1.
+Theorem neq_2_pow_3_mul_lemma : ∀ m n, gcd n 2 = 1 → 2 ^ m ≠ 3 * n.
+Proof.
+intros * Hn1.
+replace 3 with (2 + 1) by easy.
+rewrite Nat.mul_add_distr_r.
+rewrite Nat.mul_1_l.
+intros Hmn.
+symmetry in Hmn.
+apply Nat.add_sub_eq_l in Hmn.
+destruct m. {
+  cbn - [ "*" ] in Hmn.
+  now destruct n.
+}
+rewrite Nat.pow_succ_r' in Hmn.
+rewrite <- Nat.mul_sub_distr_l in Hmn.
+rewrite <- (Nat.mul_1_r 2) in Hn1.
+rewrite <- Hmn in Hn1.
+rewrite Nat.gcd_mul_mono_l in Hn1.
+now apply Nat.eq_mul_1 in Hn1.
+Qed.
+
+Theorem neq_2_pow_3_mul : ∀ m n, 2 ^ m ≠ 3 * n.
+Proof.
+intros *.
+...
+destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
+  apply neq_2_pow_3_mul_lemma.
+  specialize (Nat.mod_upper_bound n 2 (Nat.neq_succ_0 _)) as H1.
+  remember (n mod 2) as a.
+  destruct a; [ easy | ].
+  destruct a; [ easy | ].
+  now do 2 apply Nat.succ_lt_mono in H1.
+}
+replace 3 with (2 + 1) by easy.
+rewrite Nat.mul_add_distr_r.
+rewrite Nat.mul_1_l.
+intros Hmn.
+symmetry in Hmn.
+apply Nat.add_sub_eq_l in Hmn.
+revert n Hn2 Hmn.
+induction m; intros. {
+  cbn - [ "*" ] in Hmn.
+  now destruct n.
+}
+rewrite Nat.pow_succ_r' in Hmn.
+rewrite <- Nat.mul_sub_distr_l in Hmn.
+specialize (IHm n).
+...
+intros * Hmn.
+(**)
+revert m Hmn.
+induction n; intros. {
+  cbn in Hmn.
+  now apply Nat.pow_nonzero in Hmn.
+}
+destruct m. {
+  rewrite Nat.pow_0_r in Hmn.
+  symmetry in Hmn.
+  now apply Nat.eq_mul_1 in Hmn.
+}
+replace 3 with (2 + 1) in Hmn by easy.
+rewrite Nat.mul_add_distr_r in Hmn.
+rewrite Nat.mul_1_l in Hmn.
+symmetry in Hmn.
+apply Nat.add_sub_eq_l in Hmn.
+rewrite Nat.pow_succ_r' in Hmn.
+rewrite <- Nat.mul_sub_distr_l in Hmn.
+...
+  symmetry in Hc.
+  revert c Hc.
+  induction i; intros. {
+    rewrite Nat.pow_0_r in Hc.
+    now apply Nat.eq_mul_1 in Hc.
+  }
+  rewrite Nat.pow_succ_r' in Hc.
+  replace 3 with (2 + 1) in Hc by easy.
+  rewrite Nat.mul_add_distr_r in Hc.
+  rewrite Nat.mul_1_l in Hc.
+  apply Nat.add_sub_eq_l in Hc.
+  rewrite <- Nat.mul_sub_distr_l in Hc.
+... ...
+  apply neq_2_pow_3_mul in Hc.
+...
+(*
+specialize (glop (3 * (2 ^ i / n)) i θ Htz) as H1.
+rewrite Htt in H1.
+*)
+destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+  subst n.
+  clear Hnz Hmi.
+...
   assert (H : 3 * (2 ^ i / 3) < 2 ^ i). {
     clear Hni H1 Htt.
     specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
