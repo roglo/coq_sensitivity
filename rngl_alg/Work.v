@@ -2727,6 +2727,54 @@ destruct m. {
     subst θ'.
     rewrite angle_mul_nat_assoc in Htt.
 (**)
+Theorem glop :
+  ∀ n i θ,
+  θ ≠ 0%A
+  → n < 2 ^ i
+  → (n * (θ / ₂^i) ≠ 0)%A.
+Proof.
+intros * Htz Hni.
+Admitted.
+apply glop in Htt.
+...
+specialize (glop (3 * (2 ^ i / n)) i θ Htz) as H1.
+rewrite Htt in H1.
+destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+  subst n.
+  assert (H : 3 * (2 ^ i / 3) < 2 ^ i). {
+    clear Hni H1 Htt.
+    specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+    symmetry in H1.
+    apply Nat.add_sub_eq_r in H1.
+    rewrite <- H1.
+    apply Nat.sub_lt; [ now apply Nat.mod_le | ].
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.mod_divides in H; [ | easy ].
+    destruct H as (c, Hc).
+...
+  }
+  specialize (H1 H); clear H.
+...
+Search (_ / _ < _).
+    eapply Nat.le_lt_trans. {
+      apply (Nat.div_mul_le _ _ _ Hnz).
+    }
+apply Nat.div_lt_upper_bound; [ easy | ].
+...
+    cbn - [ "/" ].
+    do 2 rewrite Nat.add_0_r.
+....
+(* ouais, ça va pas forcément le faire, ça dépend de n mais
+   "glop" peut se révéler utile *)
+...
+  eapply Nat.lt_le_trans. {
+    apply (Nat.div_mul_le _ _ _ Hnz).
+  }
+  apply (Nat.div_lt_upper_bound _ _ _ Hnz).
+
+apply Nat.mul_lt_mono_nonneg.
+...
     specialize (Nat.div_mod (2 ^ i) n Hnz) as H1.
     symmetry in H1.
     apply Nat.add_sub_eq_r in H1.
