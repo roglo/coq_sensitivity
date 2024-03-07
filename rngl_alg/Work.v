@@ -592,7 +592,7 @@ Qed.
 Theorem angle_add_not_overflow_equiv :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  ↔ (θ1 = 0 ∨ θ1 + θ2 ≠ 0)%A ∧ (θ1 / ₂ + θ2 / ₂ ≤ angle_straight)%A.
+  ↔ (θ1 / ₂ + θ2 / ₂ ≤ angle_straight)%A ∧ (θ1 = 0 ∨ θ1 + θ2 ≠ 0)%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -604,7 +604,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 θ1).
   rewrite angle_add_overflow_0_l.
   split; [ intros _ | easy ].
-  split; [ now left | ].
+  split; [ | now left ].
   do 2 rewrite (H1 (_ / ₂))%A.
   rewrite angle_add_0_l.
   apply angle_nonneg.
@@ -612,6 +612,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 split; intros H12. {
   split. {
+    rewrite <- angle_div_2_add_not_overflow; [ | easy ].
+    apply angle_div_2_le_straight.
+  } {
     remember (θ1 =? 0)%A as t1z eqn:Ht1z.
     symmetry in Ht1z.
     destruct t1z. {
@@ -626,10 +629,8 @@ split; intros H12. {
     apply H12.
     now apply angle_add_overflow_opp.
   }
-  rewrite <- angle_div_2_add_not_overflow; [ | easy ].
-  apply angle_div_2_le_straight.
 } {
-  destruct H12 as (H112, H12).
+  destruct H12 as (H12, H112).
   destruct H112 as [H1| H12z]. {
     subst θ1.
     apply angle_add_overflow_0_l.
@@ -2715,7 +2716,7 @@ destruct m. {
   progress unfold seq_angle_to_div_nat.
   remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
   rewrite angle_mul_2_div_2.
-  split. {
+  split. 2: {
     destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
       subst θ θ'; left.
       rewrite angle_0_div_2_pow.
