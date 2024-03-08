@@ -2817,6 +2817,7 @@ split. {
   destruct (Nat.eq_dec (a mod n) 0) as [Hanz| Hanz]. {
     rewrite Hanz; cbn.
 (* ouais, chais pas *)
+Search Nat.testbit.
 ...
 Search (2 ^ Nat.log2 _).
 Search Nat.log2.
