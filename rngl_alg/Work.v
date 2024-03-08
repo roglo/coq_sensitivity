@@ -2844,14 +2844,9 @@ remember ((n - 2 ^ i) * (θ / ₂^i))%A as θ' eqn:Hθ'.
 assert (Htt : (θ' / ₂ < θ / ₂)%A). {
   apply angle_div_2_lt_compat.
   rewrite Hθ'.
-Search (_ * (_ / ₂^_) ≤ _)%A.
-Search (_ * (_ / ₂^_) < _)%A.
-About angle_div_2_pow_mul_le_angle.
-Check angle_div_2_pow_mul_le_angle.
+  now apply angle_div_2_pow_mul_lt_angle.
+}
 ...
-  apply angle_div_2_pow_mul_lt_angle.
-...
-Search (_ + _ ≤ _ + _)%A.
 rewrite angle_add_comm.
 apply angle_add_le_mono_l.
 ...
