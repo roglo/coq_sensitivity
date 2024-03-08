@@ -2732,10 +2732,19 @@ destruct m. {
 Theorem angle_div_2_pow_mul_neq_0 :
   ∀ n i θ,
   θ ≠ 0%A
-  → n < 2 ^ i
+  → 0 < n < 2 ^ i
   → (n * (θ / ₂^i) ≠ 0)%A.
 Proof.
 intros * Htz Hni.
+revert i Hni.
+induction n; intros; [ easy | cbn ].
+destruct Hni as (_, Hni).
+intros H.
+apply angle_add_move_0_r in H.
+Search (- (_ * _))%A.
+...
+specialize angle_add_not_overflow_equiv as H1.
+specialize (proj1 (H1 (θ / ₂^i) (n * θ / ₂^i))%A) as H2.
 ... ...
 apply angle_div_2_pow_mul_neq_0 in Htt; [ easy | easy | ].
 destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
