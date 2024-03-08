@@ -2736,12 +2736,28 @@ Theorem angle_div_2_pow_mul_neq_0 :
   → (n * (θ / ₂^i) ≠ 0)%A.
 Proof.
 intros * Htz Hni.
-revert i Hni.
-induction n; intros; [ easy | cbn ].
+revert θ n Htz Hni.
+induction i; intros. {
+  cbn in Hni.
+  flia Hni.
+}
+destruct (lt_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
+  rewrite angle_div_2_pow_succ_r_2.
+  apply IHi; [ | flia Hni Hn2i ].
+  intros H.
+  now apply eq_angle_div_2_0 in H.
+}
+apply Nat.nlt_ge in Hn2i.
+...
+intros * Htz Hni.
+revert θ i Htz Hni.
+induction n; intros; [ easy | ].
 destruct Hni as (_, Hni).
 intros H.
-apply angle_add_move_0_r in H.
-Search (- (_ * _))%A.
+destruct i. {
+  cbn in Hni.
+  now apply Nat.succ_lt_mono in Hni.
+}
 ...
 specialize angle_add_not_overflow_equiv as H1.
 specialize (proj1 (H1 (θ / ₂^i) (n * θ / ₂^i))%A) as H2.
