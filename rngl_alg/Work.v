@@ -1370,6 +1370,79 @@ rewrite angle_add_div_2_diag.
 apply angle_le_refl.
 Qed.
 
+(* to be completed
+Theorem angle_div_2_pow_mul_lt_angle :
+  ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ / ₂^i) < θ)%A.
+Proof.
+intros * Htz Hni.
+revert n θ Hni Htz.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.lt_1_r in Hni; subst n; cbn.
+  apply angle_lt_iff.
+  split; [ apply angle_nonneg | ].
+  now intros H; apply Htz; symmetry.
+}
+destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
+  rewrite angle_div_2_pow_succ_r_2.
+  apply (angle_lt_le_trans _ (θ / ₂)). {
+    apply IHi; [ easy | ].
+    intros H.
+    now apply eq_angle_div_2_0 in H.
+  }
+  apply angle_div_2_le.
+}
+apply Nat.nlt_ge in Hin.
+assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
+  specialize (Nat.div_mod n (2 ^ i)) as H1.
+  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
+  specialize (H1 H); clear H.
+  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
+  now rewrite Nat.mul_1_l.
+}
+rewrite H1.
+...
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_pow_succ_r_2 at 1.
+rewrite angle_div_2_pow_mul_2_pow.
+apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+  apply angle_add_le_mono_l; cycle 1. {
+    apply angle_add_overflow_div_2_div_2.
+  } {
+    rewrite angle_div_2_pow_succ_r_2.
+    apply IHi.
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
+  }
+  apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  rewrite angle_div_2_pow_succ_r_2.
+  apply IHi.
+  apply Nat.mod_upper_bound.
+  now apply Nat.pow_nonzero.
+}
+rewrite angle_add_div_2_diag.
+apply angle_le_refl.
+Qed.
+...
+intros * Htz Hni.
+apply angle_lt_iff.
+split. {
+  apply angle_div_2_pow_mul_le_angle.
+  now apply Nat.lt_le_incl in Hni.
+}
+intros Hnti.
+revert n θ Htz Hni Hnti.
+induction i; intros. {
+  cbn in Hni.
+  apply Nat.lt_1_r in Hni; subst n.
+  now symmetry in Hnti.
+}
+rewrite angle_div_2_pow_succ_r_2 in Hnti.
+...
+*)
+
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_diag :
   ∀ n i θ,
   1 < n ≤ 2 ^ i
@@ -2758,6 +2831,22 @@ rewrite angle_mul_nat_div_2. 2: {
   cbn in Hni.
   flia Hni.
 }
+assert (Hnii : n - 2 ^ i < 2 ^ i) by (cbn in Hni; flia Hni).
+intros H.
+remember ((n - 2 ^ i) * (θ / ₂^i))%A as θ' eqn:Hθ'.
+assert (Htt : (θ' / ₂ < θ / ₂)%A). {
+  apply angle_div_2_lt_compat.
+  rewrite Hθ'.
+Search (_ * (_ / ₂^_) ≤ _)%A.
+Search (_ * (_ / ₂^_) < _)%A.
+About angle_div_2_pow_mul_le_angle.
+Check angle_div_2_pow_mul_le_angle.
+...
+  apply angle_div_2_pow_mul_lt_angle.
+...
+Search (_ + _ ≤ _ + _)%A.
+rewrite angle_add_comm.
+apply angle_add_le_mono_l.
 ...
 rewrite <- angle_div_2_add_not_overflow. 2: {
   rewrite <- (angle_div_2_pow_mul_2_pow i θ) at 2.
