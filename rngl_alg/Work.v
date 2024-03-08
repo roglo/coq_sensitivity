@@ -2748,6 +2748,34 @@ destruct (lt_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
   now apply eq_angle_div_2_0 in H.
 }
 apply Nat.nlt_ge in Hn2i.
+replace n with ((n - 2 ^ i) + 2 ^ i) by flia Hn2i.
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_pow_succ_r_2 at 2.
+rewrite angle_div_2_pow_mul_2_pow.
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply angle_mul_nat_overflow_div_2_pow.
+  cbn in Hni.
+  flia Hni.
+}
+...
+rewrite <- angle_div_2_add_not_overflow. 2: {
+  rewrite <- (angle_div_2_pow_mul_2_pow i θ) at 2.
+  apply angle_mul_nat_overflow_distr_add_overflow.
+  rewrite Nat.sub_add; [ | easy ].
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+apply angle_mul_nat_overflow_div_2_pow.
+...
+  ============================
+  angle_mul_nat_overflow n (θ / ₂^i) = false
+...
+Search (2 ^ _ * _)%A.
+...
+intros H.
+Search (_ / ₂ = 0)%A.
+apply eq_angle_div_2_0 in H.
+...
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
 ...
 intros * Htz Hni.
 revert θ i Htz Hni.
