@@ -2747,10 +2747,26 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   rewrite <- H1.
   apply Nat.sub_lt; [ now apply Nat.mod_le | ].
   apply Nat.neq_0_lt_0.
+(*
   intros H.
   apply Nat.mod_divides in H; [ | easy ].
   destruct H as (c, Hc).
   clear Hni Htt H1.
+*)
+Theorem pow_2_l_mod_3_neq_0 : ∀ n, 2 ^ n mod 3 ≠ 0.
+Proof.
+intros * Hn.
+induction n; [ easy | ].
+cbn - [ "mod" ] in Hn.
+rewrite Nat.add_0_r in Hn.
+rewrite <- Nat.add_mod_idemp_l in Hn; [ | easy ].
+rewrite <- Nat.add_mod_idemp_r in Hn; [ | easy ].
+...
+apply Nat.mod_divides in Hn; [ | easy ].
+destruct Hn as (c, Hc).
+destruct (Nat.eq_dec (2 ^ n mod 3) 0) as [Hnz| Hnz]; [ easy | ].
+...
+
 Theorem neq_2_pow_3_mul_lemma : ∀ m n, gcd n 2 = 1 → 2 ^ m ≠ 3 * n.
 Proof.
 intros * Hn1.
