@@ -2774,7 +2774,52 @@ Qed.
 
 Theorem neq_2_pow_3_mul : ∀ m n, 2 ^ m ≠ 3 * n.
 Proof.
-intros *.
+intros.
+Search (2 ^ _ * _).
+Search (_ * 2 ^ _).
+Fixpoint pow_n_of_nat_loop it n a :=
+  match it with
+  | 0 => 0
+  | S it' =>
+      if a =? 0 then 0
+      else if a mod n =? 0 then 1 + pow_n_of_nat_loop it' n (a / n)
+      else 0
+  end.
+
+Definition pow_n_of_nat n a := pow_n_of_nat_loop a n a.
+
+Theorem pow_n_of_nat_prop :
+  ∀ n a,
+  let p := pow_n_of_nat n a in
+  a = n ^ p * (a / n ^ p) ∧ (a = 0 ∨ (a / n ^ p) mod n ≠ 0).
+Proof.
+intros.
+progress unfold pow_n_of_nat in p.
+Theorem glip :
+  ∀ it n a,
+  a ≤ it
+  → let p := pow_n_of_nat_loop it n a in
+     a = n ^ p * (a / n ^ p) ∧ (a = 0 ∨ (a / n ^ p) mod n ≠ 0).
+Proof.
+intros * Hit *.
+subst p.
+revert a Hit.
+induction it; intros. {
+  apply Nat.le_0_r in Hit; subst a.
+  split; [ easy | now left ].
+}
+split. {
+  cbn.
+  destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
+  generalize Haz; intros H.
+  apply Nat.eqb_neq in H.
+  rewrite H; clear H.
+  destruct (Nat.eq_dec (a mod n) 0) as [Hanz| Hanz]. {
+    rewrite Hanz; cbn.
+(* ouais, chais pas *)
+...
+Search (2 ^ Nat.log2 _).
+Search Nat.log2.
 ...
 destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
   apply neq_2_pow_3_mul_lemma.
