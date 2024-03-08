@@ -1389,7 +1389,6 @@ subst θ3.
 now apply angle_lt_irrefl in H23.
 Qed.
 
-(* to be completed
 Theorem angle_div_2_pow_mul_lt_angle :
   ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ / ₂^i) < θ)%A.
 Proof.
@@ -1435,35 +1434,21 @@ apply angle_lt_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
     intros H.
     now apply eq_angle_div_2_0 in H.
   }
-...
   apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
     apply angle_add_overflow_div_2_div_2.
   }
   rewrite angle_div_2_pow_succ_r_2.
-  apply IHi.
-  apply Nat.mod_upper_bound.
-  now apply Nat.pow_nonzero.
+  apply angle_lt_le_incl.
+  apply IHi. {
+    apply Nat.mod_upper_bound.
+    now apply Nat.pow_nonzero.
+  }
+  intros H.
+  now apply eq_angle_div_2_0 in H.
 }
 rewrite angle_add_div_2_diag.
 apply angle_le_refl.
 Qed.
-...
-intros * Htz Hni.
-apply angle_lt_iff.
-split. {
-  apply angle_div_2_pow_mul_le_angle.
-  now apply Nat.lt_le_incl in Hni.
-}
-intros Hnti.
-revert n θ Htz Hni Hnti.
-induction i; intros. {
-  cbn in Hni.
-  apply Nat.lt_1_r in Hni; subst n.
-  now symmetry in Hnti.
-}
-rewrite angle_div_2_pow_succ_r_2 in Hnti.
-...
-*)
 
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_diag :
   ∀ n i θ,
