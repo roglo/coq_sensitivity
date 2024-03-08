@@ -2729,15 +2729,15 @@ destruct m. {
     subst θ'.
     rewrite angle_mul_nat_assoc in Htt.
 (**)
-Theorem glop :
+Theorem angle_div_2_pow_mul_neq_0 :
   ∀ n i θ,
   θ ≠ 0%A
   → n < 2 ^ i
   → (n * (θ / ₂^i) ≠ 0)%A.
 Proof.
 intros * Htz Hni.
-Admitted.
-apply glop in Htt; [ easy | easy | ].
+... ...
+apply angle_div_2_pow_mul_neq_0 in Htt; [ easy | easy | ].
 destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   subst n.
   clear Hnz Hmi.
@@ -2747,96 +2747,14 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   rewrite <- H1.
   apply Nat.sub_lt; [ now apply Nat.mod_le | ].
   apply Nat.neq_0_lt_0.
-(*
-  intros H.
-  apply Nat.mod_divides in H; [ | easy ].
-  destruct H as (c, Hc).
   clear Hni Htt H1.
-*)
-Theorem pow_2_l_mod_3_neq_0 : ∀ n, 2 ^ n mod 3 ≠ 0.
-Proof.
-intros * Hn.
-induction n; [ easy | ].
-cbn - [ "mod" ] in Hn.
-rewrite Nat.add_0_r in Hn.
-rewrite <- Nat.add_mod_idemp_l in Hn; [ | easy ].
-rewrite <- Nat.add_mod_idemp_r in Hn; [ | easy ].
-...
-apply Nat.mod_divides in Hn; [ | easy ].
-destruct Hn as (c, Hc).
-destruct (Nat.eq_dec (2 ^ n mod 3) 0) as [Hnz| Hnz]; [ easy | ].
-...
-
-Theorem neq_2_pow_3_mul_lemma : ∀ m n, gcd n 2 = 1 → 2 ^ m ≠ 3 * n.
-Proof.
-intros * Hn1.
-replace 3 with (2 + 1) by easy.
-rewrite Nat.mul_add_distr_r.
-rewrite Nat.mul_1_l.
-intros Hmn.
-symmetry in Hmn.
-apply Nat.add_sub_eq_l in Hmn.
-destruct m. {
-  cbn - [ "*" ] in Hmn.
-  now destruct n.
+  induction i; [ easy | ].
+  intros H; apply IHi; clear IHi.
+  rewrite Nat.pow_succ_r' in H.
+  apply Nat.mod_divide in H; [ | easy ].
+  apply Nat.gauss in H; [ | easy ].
+  now apply Nat.mod_divide.
 }
-rewrite Nat.pow_succ_r' in Hmn.
-rewrite <- Nat.mul_sub_distr_l in Hmn.
-rewrite <- (Nat.mul_1_r 2) in Hn1.
-rewrite <- Hmn in Hn1.
-rewrite Nat.gcd_mul_mono_l in Hn1.
-now apply Nat.eq_mul_1 in Hn1.
-Qed.
-
-Theorem neq_2_pow_3_mul : ∀ m n, 2 ^ m ≠ 3 * n.
-Proof.
-intros.
-Search (2 ^ _ * _).
-Search (_ * 2 ^ _).
-Fixpoint pow_n_of_nat_loop it n a :=
-  match it with
-  | 0 => 0
-  | S it' =>
-      if a =? 0 then 0
-      else if a mod n =? 0 then 1 + pow_n_of_nat_loop it' n (a / n)
-      else 0
-  end.
-
-Definition pow_n_of_nat n a := pow_n_of_nat_loop a n a.
-
-Theorem pow_n_of_nat_prop :
-  ∀ n a,
-  let p := pow_n_of_nat n a in
-  a = n ^ p * (a / n ^ p) ∧ (a = 0 ∨ (a / n ^ p) mod n ≠ 0).
-Proof.
-intros.
-progress unfold pow_n_of_nat in p.
-Theorem glip :
-  ∀ it n a,
-  a ≤ it
-  → let p := pow_n_of_nat_loop it n a in
-     a = n ^ p * (a / n ^ p) ∧ (a = 0 ∨ (a / n ^ p) mod n ≠ 0).
-Proof.
-intros * Hit *.
-subst p.
-revert a Hit.
-induction it; intros. {
-  apply Nat.le_0_r in Hit; subst a.
-  split; [ easy | now left ].
-}
-split. {
-  cbn.
-  destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
-  generalize Haz; intros H.
-  apply Nat.eqb_neq in H.
-  rewrite H; clear H.
-  destruct (Nat.eq_dec (a mod n) 0) as [Hanz| Hanz]. {
-    rewrite Hanz; cbn.
-(* ouais, chais pas *)
-Search Nat.testbit.
-...
-Search (2 ^ Nat.log2 _).
-Search Nat.log2.
 ...
 destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
   apply neq_2_pow_3_mul_lemma.
