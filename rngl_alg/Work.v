@@ -2866,12 +2866,24 @@ destruct m. {
     }
 clear Hnz Htz.
       cbn in Hni.
+(**)
+replace (2 ^ i) with (n + (2 ^ i - n)) by flia Hni.
+rewrite Nat_div_add_same_l; [ | flia Hmi ].
+rewrite Nat.mul_add_distr_l.
+rewrite Nat.mul_1_r.
+apply Nat.add_le_lt_mono; [ easy | ].
+revert n Hmi Hni.
+induction i; intros. {
+  rewrite Nat.div_small. {
+...
+  rewrite Nat.div_small; cbn; [ easy | flia Hmi ].
+}
+...
       destruct n; [ easy | ].
       destruct n; [ flia Hmi | ].
       destruct n; [ flia Hmi | ].
 clear Hmi.
 replace (S (S (S n))) with (3 + n) in Hni |-* by easy.
-...
     destruct i; [ now cbn | ].
     destruct i; [ now cbn | ].
     destruct i. {
@@ -2887,11 +2899,6 @@ replace (S (S (S n))) with (3 + n) in Hni |-* by easy.
     destruct i. {
       replace (2 ^ 4) with 16 in Hni |-* by easy.
       do 14 (destruct n; [ cbn; flia | ]).
-      flia Hni.
-    }
-    destruct i. {
-      replace (2 ^ 5) with 32 in Hni |-* by easy.
-      do 30 (destruct n; [ cbn; flia | ]).
       flia Hni.
     }
 ...
