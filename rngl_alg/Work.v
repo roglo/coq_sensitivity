@@ -2736,6 +2736,54 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
 
+Theorem angle_div_2_pow_mul_neq_0 :
+  ∀ n i θ,
+  θ ≠ 0%A
+  → 0 < n < 2 ^ i
+  → (n * (θ / ₂^i) ≠ 0)%A.
+Proof.
+intros * Htz Hni.
+revert θ n Htz Hni.
+induction i; intros. {
+  cbn in Hni.
+  flia Hni.
+}
+destruct (lt_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
+  rewrite angle_div_2_pow_succ_r_2.
+  apply IHi; [ | flia Hni Hn2i ].
+  intros H.
+  now apply eq_angle_div_2_0 in H.
+}
+apply Nat.nlt_ge in Hn2i.
+replace n with ((n - 2 ^ i) + 2 ^ i) by flia Hn2i.
+rewrite angle_mul_add_distr_r.
+rewrite angle_div_2_pow_succ_r_2 at 2.
+rewrite angle_div_2_pow_mul_2_pow.
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply angle_mul_nat_overflow_div_2_pow.
+  cbn in Hni.
+  flia Hni.
+}
+assert (Hnii : n - 2 ^ i < 2 ^ i) by (cbn in Hni; flia Hni).
+intros H.
+remember ((n - 2 ^ i) * (θ / ₂^i))%A as θ' eqn:Hθ'.
+assert (Htt : (θ' / ₂ < θ / ₂)%A). {
+  apply angle_div_2_lt_compat.
+  rewrite Hθ'.
+  now apply angle_div_2_pow_mul_lt_angle.
+}
+apply (angle_add_lt_mono_l (θ' / ₂)) in Htt; cycle 1. {
+  apply angle_add_overflow_div_2_div_2.
+} {
+  apply angle_add_overflow_div_2_div_2.
+}
+rewrite H in Htt.
+apply angle_nle_gt in Htt.
+apply Htt; clear Htt.
+apply angle_nonneg.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2808,44 +2856,58 @@ destruct m. {
 (**)
     subst θ'.
     rewrite angle_mul_nat_assoc in Htt.
-(**)
-Theorem angle_div_2_pow_mul_neq_0 :
-  ∀ n i θ,
-  θ ≠ 0%A
-  → 0 < n < 2 ^ i
-  → (n * (θ / ₂^i) ≠ 0)%A.
-Proof.
-intros * Htz Hni.
-revert θ n Htz Hni.
-induction i; intros. {
-  cbn in Hni.
-  flia Hni.
-}
-destruct (lt_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
-  rewrite angle_div_2_pow_succ_r_2.
-  apply IHi; [ | flia Hni Hn2i ].
-  intros H.
-  now apply eq_angle_div_2_0 in H.
-}
-apply Nat.nlt_ge in Hn2i.
-replace n with ((n - 2 ^ i) + 2 ^ i) by flia Hn2i.
-rewrite angle_mul_add_distr_r.
-rewrite angle_div_2_pow_succ_r_2 at 2.
-rewrite angle_div_2_pow_mul_2_pow.
-rewrite angle_div_2_pow_succ_r_1.
-rewrite angle_mul_nat_div_2. 2: {
-  apply angle_mul_nat_overflow_div_2_pow.
-  cbn in Hni.
-  flia Hni.
-}
-assert (Hnii : n - 2 ^ i < 2 ^ i) by (cbn in Hni; flia Hni).
-intros H.
-remember ((n - 2 ^ i) * (θ / ₂^i))%A as θ' eqn:Hθ'.
-assert (Htt : (θ' / ₂ < θ / ₂)%A). {
-  apply angle_div_2_lt_compat.
-  rewrite Hθ'.
-  now apply angle_div_2_pow_mul_lt_angle.
-}
+    revert Htt.
+    apply angle_div_2_pow_mul_neq_0; [ easy | ].
+    split. {
+      apply Nat.mul_pos_pos; [ easy | ].
+      apply Nat.div_str_pos.
+      split; [ | easy ].
+      now apply Nat.neq_0_lt_0.
+    }
+    destruct i. {
+      cbn - [ "*" ].
+      rewrite Nat.div_small; [ | flia Hmi ].
+      now rewrite Nat.mul_0_r.
+    }
+    destruct i. {
+      cbn - [ "*" ].
+      rewrite Nat.div_small; [ | flia Hmi ].
+      now cbn.
+    }
+    destruct i. {
+      cbn in Hni.
+      destruct n; [ easy | ].
+      destruct n; [ flia Hmi | ].
+      destruct n; [ flia Hmi | ].
+      cbn - [ "*" "/" ].
+      rewrite Nat.mul_1_r.
+      replace (2 * 2) with 4 by easy.
+      destruct n; [ now cbn | ].
+      destruct n; [ now cbn | ].
+      flia Hni.
+    }
+    destruct i. {
+      cbn in Hni.
+      destruct n; [ easy | ].
+      destruct n; [ flia Hmi | ].
+      destruct n; [ flia Hmi | ].
+      cbn - [ "*" "/" ].
+      rewrite Nat.mul_1_r.
+      replace (2 * (2 * 2)) with 8 by easy.
+      do 6 (destruct n; [ cbn; flia | ]).
+      flia Hni.
+    }
+    destruct i. {
+      cbn in Hni.
+      destruct n; [ easy | ].
+      destruct n; [ flia Hmi | ].
+      destruct n; [ flia Hmi | ].
+      cbn - [ "*" "/" ].
+      rewrite Nat.mul_1_r.
+      replace (2 * (2 * (2 * 2))) with 16 by easy.
+      do 14 (destruct n; [ cbn; flia | ]).
+      flia Hni.
+    }
 ...
 rewrite angle_add_comm.
 apply angle_add_le_mono_l.
