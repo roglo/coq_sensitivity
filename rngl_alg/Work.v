@@ -2872,9 +2872,17 @@ rewrite Nat_div_add_same_l; [ | flia Hmi ].
 rewrite Nat.mul_add_distr_l.
 rewrite Nat.mul_1_r.
 apply Nat.add_le_lt_mono; [ easy | ].
+specialize (Nat_div_sub (2 ^ i) 1 n) as H1.
+rewrite Nat.mul_1_l in H1.
+rewrite H1; [ clear H1 | flia Hmi ].
+rewrite Nat.mul_sub_distr_l.
+rewrite Nat.mul_1_r.
+...
+  ============================
+  3 * (2 ^ i / n) < 2 ^ i
+...
 revert n Hmi Hni.
-induction i; intros. {
-  rewrite Nat.div_small. {
+induction i; intros; [ cbn in Hni; flia Hni Hmi | ].
 ...
   rewrite Nat.div_small; cbn; [ easy | flia Hmi ].
 }
