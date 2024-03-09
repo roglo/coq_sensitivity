@@ -2864,48 +2864,34 @@ destruct m. {
       split; [ | easy ].
       now apply Nat.neq_0_lt_0.
     }
-    destruct i. {
-      cbn - [ "*" ].
-      rewrite Nat.div_small; [ | flia Hmi ].
-      now rewrite Nat.mul_0_r.
-    }
-    destruct i. {
-      cbn - [ "*" ].
-      rewrite Nat.div_small; [ | flia Hmi ].
-      now cbn.
-    }
-    destruct i. {
+clear Hnz Htz.
       cbn in Hni.
       destruct n; [ easy | ].
       destruct n; [ flia Hmi | ].
       destruct n; [ flia Hmi | ].
-      cbn - [ "*" "/" ].
-      rewrite Nat.mul_1_r.
-      replace (2 * 2) with 4 by easy.
-      destruct n; [ now cbn | ].
-      destruct n; [ now cbn | ].
+clear Hmi.
+replace (S (S (S n))) with (3 + n) in Hni |-* by easy.
+...
+    destruct i; [ now cbn | ].
+    destruct i; [ now cbn | ].
+    destruct i. {
+      replace (2 ^ 2) with 4 in Hni |-* by easy.
+      do 2 (destruct n; [ now cbn | ]).
       flia Hni.
     }
     destruct i. {
-      cbn in Hni.
-      destruct n; [ easy | ].
-      destruct n; [ flia Hmi | ].
-      destruct n; [ flia Hmi | ].
-      cbn - [ "*" "/" ].
-      rewrite Nat.mul_1_r.
-      replace (2 * (2 * 2)) with 8 by easy.
+      replace (2 ^ 3) with 8 in Hni |-* by easy.
       do 6 (destruct n; [ cbn; flia | ]).
       flia Hni.
     }
     destruct i. {
-      cbn in Hni.
-      destruct n; [ easy | ].
-      destruct n; [ flia Hmi | ].
-      destruct n; [ flia Hmi | ].
-      cbn - [ "*" "/" ].
-      rewrite Nat.mul_1_r.
-      replace (2 * (2 * (2 * 2))) with 16 by easy.
+      replace (2 ^ 4) with 16 in Hni |-* by easy.
       do 14 (destruct n; [ cbn; flia | ]).
+      flia Hni.
+    }
+    destruct i. {
+      replace (2 ^ 5) with 32 in Hni |-* by easy.
+      do 30 (destruct n; [ cbn; flia | ]).
       flia Hni.
     }
 ...
