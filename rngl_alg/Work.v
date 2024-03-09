@@ -2864,107 +2864,23 @@ destruct m. {
       split; [ | easy ].
       now apply Nat.neq_0_lt_0.
     }
-clear Hnz Htz.
-      cbn in Hni.
-(*
-replace (2 ^ i) with (n + (2 ^ i - n)) by flia Hni.
-rewrite Nat_div_add_same_l; [ | flia Hmi ].
-rewrite Nat.mul_add_distr_l.
-rewrite Nat.mul_1_r.
-apply Nat.add_le_lt_mono; [ easy | ].
-specialize (Nat_div_sub (2 ^ i) 1 n) as H1.
-rewrite Nat.mul_1_l in H1.
-rewrite H1; [ clear H1 | flia Hmi ].
-rewrite Nat.mul_sub_distr_l.
-rewrite Nat.mul_1_r.
-*)
-(*
-...
-  ============================
-  3 * (2 ^ i / n) < 2 ^ i
-...
-revert n Hmi Hni.
-induction i; intros; [ cbn in Hni; flia Hni Hmi | ].
-...
-  rewrite Nat.div_small; cbn; [ easy | flia Hmi ].
-}
-...
-      destruct n; [ easy | ].
-      destruct n; [ flia Hmi | ].
-      destruct n; [ flia Hmi | ].
-clear Hmi.
-replace (S (S (S n))) with (3 + n) in Hni |-* by easy.
-    destruct i; [ now cbn | ].
-    destruct i; [ now cbn | ].
-    destruct i. {
-      replace (2 ^ 2) with 4 in Hni |-* by easy.
-      do 2 (destruct n; [ now cbn | ]).
-      flia Hni.
+    destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+      subst n.
+      clear Hmi.
+      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+      symmetry in H1.
+      apply Nat.add_sub_eq_r in H1.
+      rewrite <- H1.
+      apply Nat.sub_lt; [ now apply Nat.mod_le | ].
+      apply Nat.neq_0_lt_0.
+      clear Hni H1.
+      induction i; [ easy | ].
+      intros H; apply IHi; clear IHi.
+      rewrite Nat.pow_succ_r' in H.
+      apply Nat.mod_divide in H; [ | easy ].
+      apply Nat.gauss in H; [ | easy ].
+      now apply Nat.mod_divide.
     }
-    destruct i. {
-      replace (2 ^ 3) with 8 in Hni |-* by easy.
-      do 6 (destruct n; [ cbn; flia | ]).
-      flia Hni.
-    }
-    destruct i. {
-      replace (2 ^ 4) with 16 in Hni |-* by easy.
-      do 14 (destruct n; [ cbn; flia | ]).
-      flia Hni.
-    }
-...
-rewrite angle_add_comm.
-apply angle_add_le_mono_l.
-...
-rewrite <- angle_div_2_add_not_overflow. 2: {
-  rewrite <- (angle_div_2_pow_mul_2_pow i θ) at 2.
-  apply angle_mul_nat_overflow_distr_add_overflow.
-  rewrite Nat.sub_add; [ | easy ].
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
-apply angle_mul_nat_overflow_div_2_pow.
-...
-  ============================
-  angle_mul_nat_overflow n (θ / ₂^i) = false
-...
-Search (2 ^ _ * _)%A.
-...
-intros H.
-Search (_ / ₂ = 0)%A.
-apply eq_angle_div_2_0 in H.
-...
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
-...
-intros * Htz Hni.
-revert θ i Htz Hni.
-induction n; intros; [ easy | ].
-destruct Hni as (_, Hni).
-intros H.
-destruct i. {
-  cbn in Hni.
-  now apply Nat.succ_lt_mono in Hni.
-}
-...
-specialize angle_add_not_overflow_equiv as H1.
-specialize (proj1 (H1 (θ / ₂^i) (n * θ / ₂^i))%A) as H2.
-... ...
-apply angle_div_2_pow_mul_neq_0 in Htt; [ easy | easy | ].
-*)
-destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
-  subst n.
-  clear Hmi.
-  specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
-  symmetry in H1.
-  apply Nat.add_sub_eq_r in H1.
-  rewrite <- H1.
-  apply Nat.sub_lt; [ now apply Nat.mod_le | ].
-  apply Nat.neq_0_lt_0.
-  clear Hni H1.
-  induction i; [ easy | ].
-  intros H; apply IHi; clear IHi.
-  rewrite Nat.pow_succ_r' in H.
-  apply Nat.mod_divide in H; [ | easy ].
-  apply Nat.gauss in H; [ | easy ].
-  now apply Nat.mod_divide.
-}
 ...
 destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
   apply neq_2_pow_3_mul_lemma.
