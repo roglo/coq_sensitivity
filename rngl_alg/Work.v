@@ -2866,7 +2866,7 @@ destruct m. {
     }
 clear Hnz Htz.
       cbn in Hni.
-(**)
+(*
 replace (2 ^ i) with (n + (2 ^ i - n)) by flia Hni.
 rewrite Nat_div_add_same_l; [ | flia Hmi ].
 rewrite Nat.mul_add_distr_l.
@@ -2877,6 +2877,8 @@ rewrite Nat.mul_1_l in H1.
 rewrite H1; [ clear H1 | flia Hmi ].
 rewrite Nat.mul_sub_distr_l.
 rewrite Nat.mul_1_r.
+*)
+(*
 ...
   ============================
   3 * (2 ^ i / n) < 2 ^ i
@@ -2945,16 +2947,17 @@ specialize angle_add_not_overflow_equiv as H1.
 specialize (proj1 (H1 (θ / ₂^i) (n * θ / ₂^i))%A) as H2.
 ... ...
 apply angle_div_2_pow_mul_neq_0 in Htt; [ easy | easy | ].
+*)
 destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
   subst n.
-  clear Hnz Hmi.
+  clear Hmi.
   specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
   symmetry in H1.
   apply Nat.add_sub_eq_r in H1.
   rewrite <- H1.
   apply Nat.sub_lt; [ now apply Nat.mod_le | ].
   apply Nat.neq_0_lt_0.
-  clear Hni Htt H1.
+  clear Hni H1.
   induction i; [ easy | ].
   intros H; apply IHi; clear IHi.
   rewrite Nat.pow_succ_r' in H.
