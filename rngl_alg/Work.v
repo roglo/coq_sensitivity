@@ -2884,6 +2884,28 @@ destruct m. {
     rewrite Hts.
     destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
       subst n; clear Hnz Hmi.
+      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+      symmetry in H1.
+      apply Nat.add_sub_eq_r in H1.
+      rewrite <- (angle_div_2_mul_2 θ') at 2.
+      rewrite angle_add_mul_r_diag_r.
+Search (_ * (_ / ₂))%A.
+rewrite angle_mul_nat_div_2.
+(* ah bin non, le goal 2, c'est justement ce que je veux prouver *)
+...
+      rewrite Hθ'.
+      rewrite <- angle_mul_nat_assoc.
+...
+      rewrite <- H1.
+      apply Nat.sub_lt; [ now apply Nat.mod_le | ].
+      apply Nat.neq_0_lt_0.
+      clear Hni H1.
+      induction i; [ easy | ].
+      intros H; apply IHi; clear IHi.
+      rewrite Nat.pow_succ_r' in H.
+      apply Nat.mod_divide in H; [ | easy ].
+      apply Nat.gauss in H; [ | easy ].
+      now apply Nat.mod_divide.
 ...
 destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
   apply neq_2_pow_3_mul_lemma.
