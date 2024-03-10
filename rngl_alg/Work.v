@@ -2912,6 +2912,15 @@ destruct m. {
       rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
       rewrite angle_div_2_pow_succ_r_2 at 1.
       rewrite angle_div_2_pow_mul_2_pow.
+      apply (angle_le_trans _ (θ / ₂)); [ | apply angle_div_2_le_straight ].
+Theorem glop :
+  ∀ θ1 θ2,
+  (θ2 ≤ θ1)%A
+  → (θ1 - θ2 ≤ θ1)%A.
+Proof.
+intros * H21.
+... ...
+apply glop.
 ...
       eapply angle_le_trans. {
         apply angle_mul_nat_le_mono_nonneg_r. 2: {
