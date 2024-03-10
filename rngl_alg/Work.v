@@ -2790,9 +2790,7 @@ Theorem angle_mul_mul_div_2 :
   → (m * ((n * θ) / ₂))%A = (m * n * (θ / ₂))%A.
 Proof.
 intros * Haov.
-induction m; [ easy | cbn ].
-rewrite IHm.
-rewrite angle_mul_add_distr_r.
+rewrite <- angle_mul_nat_assoc.
 f_equal.
 symmetry.
 now apply angle_mul_nat_div_2.
@@ -2905,14 +2903,25 @@ destruct m. {
       rewrite angle_add_mul_r_diag_r.
       rewrite Hθ'.
       rewrite angle_mul_mul_div_2. 2: {
-         specialize angle_mul_nat_overflow_2_pow_div_angle_mul as H2.
-         specialize (H2 3 i θ).
-Search (_ → angle_mul_nat_overflow _ _ = false).
-Check angle_mul_nat_overflow_2_pow_div_angle_mul.
-         apply (angle_mul_nat_overflow_le_r _ (3 * θ / ₂^ i)). 2: {
-Search (_ * _ / ₂^_)%A.
-rewrite angle_div_2_pow_mul.
-easy.
+        apply angle_mul_nat_overflow_div_2_pow.
+        apply Nat.div_le_upper_bound; [ easy | ].
+        apply Nat.le_add_r.
+      }
+      rewrite <- H1.
+      rewrite <- angle_div_2_pow_succ_r_1.
+      rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
+      rewrite angle_div_2_pow_succ_r_2 at 1.
+      rewrite angle_div_2_pow_mul_2_pow.
+...
+      eapply angle_le_trans. {
+        apply angle_mul_nat_le_mono_nonneg_r. 2: {
+          now apply Nat.div_mul_le.
+        }
+...
+        specialize angle_mul_nat_overflow_2_pow_div_angle_mul as H2.
+        specialize (H2 3 i θ).
+        apply (angle_mul_nat_overflow_le_r _ (3 * θ / ₂^ i)). 2: {
+          rewrite angle_div_2_pow_mul; [ easy | ].
 (* ah bin non, pas forcément *)
 ...
       rewrite <- H1.
