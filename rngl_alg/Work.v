@@ -2841,18 +2841,15 @@ destruct m. {
 destruct m. {
   apply angle_add_not_overflow_equiv.
   progress unfold seq_angle_to_div_nat.
-  remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
-  rewrite angle_mul_2_div_2.
   split. 2: {
     destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
-      subst θ θ'; left.
+      subst θ; left.
       rewrite angle_0_div_2_pow.
       apply angle_mul_0_r.
     }
     right.
     rewrite angle_add_mul_r_diag_r.
     intros Htt.
-    subst θ'.
     rewrite angle_mul_nat_assoc in Htt.
     revert Htt.
     apply angle_div_2_pow_mul_neq_0; [ easy | ].
@@ -2881,8 +2878,12 @@ destruct m. {
     apply Nat.div_le_compat_l.
     easy.
   }
+  remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
+  rewrite angle_mul_2_div_2.
   destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
     rewrite Hts.
+    destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+      subst n; clear Hnz Hmi.
 ...
 destruct (Nat.eq_dec (Nat.gcd n 2) 0) as [Hn2| Hn2]. 2: {
   apply neq_2_pow_3_mul_lemma.
