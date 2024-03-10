@@ -2784,6 +2784,20 @@ apply Htt; clear Htt.
 apply angle_nonneg.
 Qed.
 
+Theorem angle_mul_mul_div_2 :
+  ∀ m n θ,
+  angle_mul_nat_overflow n θ = false
+  → (m * ((n * θ) / ₂))%A = (m * n * (θ / ₂))%A.
+Proof.
+intros * Haov.
+induction m; [ easy | cbn ].
+rewrite IHm.
+rewrite angle_mul_add_distr_r.
+f_equal.
+symmetry.
+now apply angle_mul_nat_div_2.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2889,12 +2903,17 @@ destruct m. {
       apply Nat.add_sub_eq_r in H1.
       rewrite <- (angle_div_2_mul_2 θ') at 2.
       rewrite angle_add_mul_r_diag_r.
-Search (_ * (_ / ₂))%A.
-rewrite angle_mul_nat_div_2.
-(* ah bin non, le goal 2, c'est justement ce que je veux prouver *)
-...
       rewrite Hθ'.
-      rewrite <- angle_mul_nat_assoc.
+      rewrite angle_mul_mul_div_2. 2: {
+         specialize angle_mul_nat_overflow_2_pow_div_angle_mul as H2.
+         specialize (H2 3 i θ).
+Search (_ → angle_mul_nat_overflow _ _ = false).
+Check angle_mul_nat_overflow_2_pow_div_angle_mul.
+         apply (angle_mul_nat_overflow_le_r _ (3 * θ / ₂^ i)). 2: {
+Search (_ * _ / ₂^_)%A.
+rewrite angle_div_2_pow_mul.
+easy.
+(* ah bin non, pas forcément *)
 ...
       rewrite <- H1.
       apply Nat.sub_lt; [ now apply Nat.mod_le | ].
