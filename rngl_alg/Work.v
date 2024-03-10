@@ -3001,9 +3001,28 @@ destruct zs2. 2: {
       apply (rngl_lt_iff Hor).
       split; [ easy | ].
       intros H; symmetry in H.
-      apply eq_rngl
-apply rngl_cos_cos_sin
-Search (rngl_cos _ < rngl_cos _)%L.
+      apply eq_rngl_sin_0 in H.
+      destruct H; subst θ2. {
+        rewrite angle_sub_0_l in Hzs12.
+        cbn in Hzs12.
+        apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
+        now apply (rngl_nle_gt Hor) in Hzs12.
+      }
+      apply (rngl_nle_gt Hor) in Hzs2.
+      apply Hzs2; clear Hzs2; cbn.
+      apply (rngl_opp_1_le_0 Hon Hop Hor).
+    }
+    progress unfold angle_leb.
+    generalize Hzc2; intros H.
+    apply rngl_leb_le in H.
+    rewrite H; clear H; cbn.
+    specialize (rngl_0_le_1 Hon Hop Hor) as H.
+    apply rngl_leb_le in H.
+    rewrite H; clear H.
+    apply rngl_leb_le.
+    now apply (rngl_lt_le_incl Hor) in Hzs2.
+  }
+  apply (rngl_nle_gt Hor) in Hc2z.
 ... ...
 apply angle_le_sub_diag.
 ...
