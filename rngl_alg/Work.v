@@ -3201,7 +3201,37 @@ destruct m. {
   }
   clear Hts.
   apply (rngl_leb_gt Hor) in Hzst.
-(* oh la vache, je crois que ça marche pas *)
+  (* oh la vache, je crois que ça marche pas *)
+  exfalso.
+  apply (rngl_nle_gt Hor) in Hzst.
+  apply Hzst; clear Hzst.
+  rewrite Hθ'.
+  destruct i; [ cbn in Hni; flia Hmi Hni | ].
+...
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_mul_nat_div_2. {
+  apply rngl_sin_div_2_nonneg.
+}
+apply angle_mul_nat_overflow_div_2_pow.
+apply Nat.div_le_upper_bound; [ easy | ].
+rewrite Nat.pow_succ_r'.
+apply Nat.mul_le_mono_r.
+now apply Nat.lt_le_incl in Hmi.
+...
+rewrite <- angle_mul_mul_div_2.
+...
+rewrite
+  destruct n; [ easy | clear Hnz ].
+  destruct n; [ flia Hmi | ].
+  destruct n; [ flia Hmi | clear Hmi ].
+  destruct n. {
+    destruct i; [ apply (rngl_le_refl Hor) | ].
+    destruct i; [ apply (rngl_le_refl Hor) | ].
+    destruct i. {
+      cbn - [ angle_mul_nat ].
+      rewrite angle_mul_1_l.
+      apply rngl_sin_div_2_nonneg.
+    }
 ...
   apply rngl_leb_le.
   apply rngl_leb_le in Hzsa.
