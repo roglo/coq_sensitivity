@@ -3064,21 +3064,22 @@ destruct m. {
   rewrite angle_mul_2_div_2.
   destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
     rewrite Hts.
+    rewrite <- (angle_div_2_mul_2 θ') at 2.
+    rewrite angle_add_mul_r_diag_r.
+    rewrite Hθ'.
+    rewrite angle_mul_mul_div_2. 2: {
+      apply angle_mul_nat_overflow_div_2_pow.
+      apply Nat.div_le_upper_bound; [ easy | ].
+      destruct n; [ easy | cbn ].
+      apply Nat.le_add_r.
+    }
+    rewrite <- angle_div_2_pow_succ_r_1.
     destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
       subst n; clear Hnz Hmi.
       specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
       symmetry in H1.
       apply Nat.add_sub_eq_r in H1.
-      rewrite <- (angle_div_2_mul_2 θ') at 2.
-      rewrite angle_add_mul_r_diag_r.
-      rewrite Hθ'.
-      rewrite angle_mul_mul_div_2. 2: {
-        apply angle_mul_nat_overflow_div_2_pow.
-        apply Nat.div_le_upper_bound; [ easy | ].
-        apply Nat.le_add_r.
-      }
       rewrite <- H1.
-      rewrite <- angle_div_2_pow_succ_r_1.
       rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
       rewrite angle_div_2_pow_succ_r_2 at 1.
       rewrite angle_div_2_pow_mul_2_pow.
