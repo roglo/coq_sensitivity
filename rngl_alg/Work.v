@@ -3084,17 +3084,17 @@ destruct m. {
       rewrite angle_div_2_pow_mul_2_pow.
       apply (angle_le_trans _ (θ / ₂)); [ | apply angle_div_2_le_straight ].
       apply angle_le_sub_diag.
-...
-      eapply angle_le_trans. {
-        apply angle_mul_nat_le_mono_nonneg_r. 2: {
-          now apply Nat.div_mul_le.
-        }
-...
-        specialize angle_mul_nat_overflow_2_pow_div_angle_mul as H2.
-        specialize (H2 3 i θ).
-        apply (angle_mul_nat_overflow_le_r _ (3 * θ / ₂^ i)). 2: {
-          rewrite angle_div_2_pow_mul; [ easy | ].
-(* ah bin non, pas forcément *)
+      rewrite angle_div_2_pow_succ_r_1.
+      rewrite angle_mul_nat_div_2. 2: {
+        apply angle_mul_nat_overflow_div_2_pow.
+        now apply Nat.mod_le.
+      }
+      apply angle_div_2_le_compat.
+      apply angle_div_2_pow_mul_le_angle.
+      now apply Nat.mod_le.
+    }
+    assert (H : 3 < n) by flia Hmi Hn3.
+    move H before Hmi; clear Hmi Hn3; rename H into H3n.
 ...
       rewrite <- H1.
       apply Nat.sub_lt; [ now apply Nat.mod_le | ].
