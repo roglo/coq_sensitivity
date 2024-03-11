@@ -3095,7 +3095,16 @@ destruct m. {
       now apply Nat.mod_le.
     }
     assert (H : 3 < n) by flia Hmi Hn3.
+    (* perhaps, the case n=3 above could be included here *)
     move H before Hmi; clear Hmi Hn3; rename H into H3n.
+    apply angle_mul_div_2_pow_le_straight.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.mul_le_mono_r.
+    now apply Nat.lt_le_incl in H3n.
+  }
 ...
       rewrite <- H1.
       apply Nat.sub_lt; [ now apply Nat.mod_le | ].
