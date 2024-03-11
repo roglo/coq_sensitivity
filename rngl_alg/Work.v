@@ -3168,97 +3168,33 @@ destruct m. {
   apply angle_nlt_ge in Hts.
   rewrite angle_add_assoc.
   apply angle_add_straight_r_le_straight.
-(**)
-  progress unfold angle_leb.
-  progress unfold angle_leb in Hts.
-  cbn in Hts.
-  cbn - [ angle_add ].
-  rewrite (rngl_leb_refl Hor) in Hts |-*.
-  remember (0 ≤? rngl_sin (θ' / ₂ + θ'))%L as zsa eqn:Hzsa.
-  symmetry in Hzsa.
-  destruct zsa; [ | easy ].
-  apply rngl_leb_le.
-  apply rngl_leb_le in Hzsa.
-  apply (rngl_lt_eq_cases Hor); right.
-  remember (0 ≤? rngl_sin θ')%L as zst eqn:Hzst.
-  symmetry in Hzst.
-  destruct zst. {
-    apply rngl_leb_le in Hzst, Hts.
-    apply (rngl_lt_eq_cases Hor) in Hts.
-    destruct Hts as [Hts| Hts]. {
-      exfalso.
-      apply (rngl_nle_gt Hor) in Hts.
-      apply Hts, rngl_cos_bound.
-    }
-    apply eq_rngl_cos_opp_1 in Hts.
-    move Hts at top; subst θ'.
-    rewrite rngl_sin_add_straight_r in Hzsa.
-    rewrite angle_straight_div_2 in Hzsa.
-    exfalso.
-    apply (rngl_nlt_ge Hor) in Hzsa.
-    apply Hzsa; clear Hzsa; cbn.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  clear Hts.
-  apply (rngl_leb_gt Hor) in Hzst.
-  (* oh la vache, je crois que ça marche pas *)
   exfalso.
-  apply (rngl_nle_gt Hor) in Hzst.
-  apply Hzst; clear Hzst.
-  rewrite Hθ'.
+  apply angle_nlt_ge in Hts.
+  apply Hts; clear Hts.
+  subst θ'.
   destruct i; [ cbn in Hni; flia Hmi Hni | ].
-  destruct i. {
-    cbn.
-    rewrite Nat.div_small; [ | easy ].
-    apply (rngl_le_refl Hor).
+  apply (angle_le_lt_trans _ (2 ^ i * (θ / ₂^S i)))%A. 2: {
+    rewrite angle_div_2_pow_succ_r_2.
+    rewrite angle_div_2_pow_mul_2_pow.
+    apply (angle_div_2_lt_straight Hc1).
   }
-  destruct i. {
-    cbn in Hni |-*.
-    rewrite (Nat_div_less_small 1); [ | cbn; flia Hmi Hni ].
-    rewrite angle_mul_1_l.
-    apply rngl_sin_div_2_nonneg.
+  apply angle_mul_nat_le_mono_nonneg_r. {
+    apply angle_mul_nat_overflow_div_2_pow.
+    apply Nat.pow_le_mono_r; [ easy | ].
+    apply Nat.le_succ_diag_r.
   }
-  destruct i. {
-    cbn in Hni |-*.
-    destruct n; [ easy | clear Hnz ].
-    apply Nat.succ_lt_mono in Hmi.
-    apply Nat.succ_le_mono in Hni.
-    destruct n; [ flia Hmi | ].
-    destruct n; [ flia Hmi | clear Hmi ].
-    do 2 apply Nat.succ_le_mono in Hni.
-    destruct n. {
-      rewrite (Nat_div_less_small 2); [ | flia Hni ].
-      rewrite angle_div_2_mul_2.
-      apply rngl_sin_div_2_nonneg.
-    }
-    apply Nat.succ_le_mono in Hni.
-    destruct n. {
-      rewrite (Nat_div_less_small 2); [ | flia Hni ].
-      rewrite angle_div_2_mul_2.
-      apply rngl_sin_div_2_nonneg.
-    }
-    destruct n. {
-      rewrite (Nat_div_less_small 1); [ | flia Hni ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_r.
+  now apply Nat.lt_le_incl in Hmi.
+}
+destruct m. {
+  apply angle_add_not_overflow_equiv.
+...
+Search (_ * (_ / ₂^_))%A.
       rewrite angle_mul_1_l.
       apply rngl_sin_div_2_nonneg.
     }
-    destruct n. {
-      rewrite (Nat_div_less_small 1); [ | flia Hni ].
-      rewrite angle_mul_1_l.
-      apply rngl_sin_div_2_nonneg.
-    }
-    destruct n. {
-      rewrite (Nat_div_less_small 1); [ | flia Hni ].
-      rewrite angle_mul_1_l.
-      apply rngl_sin_div_2_nonneg.
-    }
-    destruct n. {
-      rewrite (Nat_div_less_small 1); [ | flia Hni ].
-      rewrite angle_mul_1_l.
-      apply rngl_sin_div_2_nonneg.
-    }
-    flia Hni.
-  }
 ...
 rewrite angle_div_2_pow_succ_r_1.
 rewrite angle_mul_nat_div_2. {
