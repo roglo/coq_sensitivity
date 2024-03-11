@@ -2796,123 +2796,6 @@ symmetry.
 now apply angle_mul_nat_div_2.
 Qed.
 
-(* to be completed
-Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
-  ∀ m n i θ,
-  m < n ≤ 2 ^ i
-  → angle_add_overflow
-      (seq_angle_to_div_nat θ n i)
-      (m * seq_angle_to_div_nat θ n i) =
-      false.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  intros.
-  progress unfold seq_angle_to_div_nat.
-  rewrite (H1 (_ * _)%A).
-  apply angle_add_overflow_0_l.
-}
-intros * (Hmi, Hni).
-assert (Hnz : n ≠ 0) by flia Hmi.
-destruct m. {
-  rewrite angle_mul_0_l.
-  apply angle_add_overflow_0_r.
-}
-destruct m. {
-  rewrite angle_mul_1_l.
-  destruct i. {
-    cbn in Hni.
-    now apply Nat.nlt_ge in Hni.
-  }
-  specialize angle_div_2_pow_mul_le_angle as H1.
-  specialize (H1 (2 ^ S i / n) i (θ / ₂)%A).
-  assert (H : 2 ^ S i / n ≤ 2 ^ i). {
-    destruct n; [ easy | ].
-    destruct n; [ flia Hmi Hni | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
-    rewrite Nat.pow_succ_r; [ | easy ].
-    apply Nat.mul_le_mono_r.
-    now do 2 apply -> Nat.succ_le_mono.
-  }
-  specialize (H1 H); clear H.
-  rewrite <- angle_div_2_pow_succ_r_2 in H1.
-  progress unfold seq_angle_to_div_nat.
-  apply angle_add_overflow_diag. 2: {
-    intros H.
-    rewrite H in H1.
-    apply angle_nlt_ge in H1.
-    apply H1.
-    now apply angle_div_2_lt_straight.
-  }
-  apply rngl_sin_nonneg_angle_le_straight.
-  eapply angle_le_trans; [ apply H1 | ].
-  apply angle_div_2_le_straight.
-}
-destruct m. {
-  apply angle_add_not_overflow_equiv.
-  progress unfold seq_angle_to_div_nat.
-  split. 2: {
-    destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
-      subst θ; left.
-      rewrite angle_0_div_2_pow.
-      apply angle_mul_0_r.
-    }
-    right.
-    rewrite angle_add_mul_r_diag_r.
-    intros Htt.
-    rewrite angle_mul_nat_assoc in Htt.
-    revert Htt.
-    apply angle_div_2_pow_mul_neq_0; [ easy | ].
-    split. {
-      apply Nat.mul_pos_pos; [ easy | ].
-      apply Nat.div_str_pos.
-      split; [ | easy ].
-      now apply Nat.neq_0_lt_0.
-    }
-    apply (le_lt_trans _ (3 * (2 ^ i / 3))). 2: {
-      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
-      symmetry in H1.
-      apply Nat.add_sub_eq_r in H1.
-      rewrite <- H1.
-      apply Nat.sub_lt; [ now apply Nat.mod_le | ].
-      apply Nat.neq_0_lt_0.
-      clear Hni H1.
-      induction i; [ easy | ].
-      intros H; apply IHi; clear IHi.
-      rewrite Nat.pow_succ_r' in H.
-      apply Nat.mod_divide in H; [ | easy ].
-      apply Nat.gauss in H; [ | easy ].
-      now apply Nat.mod_divide.
-    }
-    apply Nat.mul_le_mono_l.
-    apply Nat.div_le_compat_l.
-    easy.
-  }
-  remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
-  rewrite angle_mul_2_div_2.
-  destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
-    rewrite Hts.
-    destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
-      subst n; clear Hnz Hmi.
-      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
-      symmetry in H1.
-      apply Nat.add_sub_eq_r in H1.
-      rewrite <- (angle_div_2_mul_2 θ') at 2.
-      rewrite angle_add_mul_r_diag_r.
-      rewrite Hθ'.
-      rewrite angle_mul_mul_div_2. 2: {
-        apply angle_mul_nat_overflow_div_2_pow.
-        apply Nat.div_le_upper_bound; [ easy | ].
-        apply Nat.le_add_r.
-      }
-      rewrite <- H1.
-      rewrite <- angle_div_2_pow_succ_r_1.
-      rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
-      rewrite angle_div_2_pow_succ_r_2 at 1.
-      rewrite angle_div_2_pow_mul_2_pow.
-      apply (angle_le_trans _ (θ / ₂)); [ | apply angle_div_2_le_straight ].
 Theorem angle_le_sub_diag :
   ∀ θ1 θ2,
   (θ2 ≤ θ1)%A
@@ -3066,8 +2949,141 @@ destruct zs2. 2: {
   apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
   now apply rngl_sin_sub_nonneg.
 }
-... ...
-apply angle_le_sub_diag.
+apply rngl_leb_le in Hzs2.
+destruct zs1. {
+  exfalso.
+  apply rngl_leb_le in Hzs1, H21.
+  apply (rngl_nle_gt Hor) in Hzs12.
+  apply Hzs12; clear Hzs12.
+  now apply rngl_sin_sub_nonneg.
+}
+clear H21.
+apply (rngl_leb_gt Hor) in Hzs1.
+apply rngl_leb_le.
+rewrite <- (angle_sub_add θ1 θ2) at 2.
+apply angle_add_overflow_le_lemma_11; [ | easy | ].
+now apply (rngl_lt_le_incl Hor) in Hzs12.
+now rewrite angle_sub_add.
+Qed.
+
+(* to be completed
+Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
+  ∀ m n i θ,
+  m < n ≤ 2 ^ i
+  → angle_add_overflow
+      (seq_angle_to_div_nat θ n i)
+      (m * seq_angle_to_div_nat θ n i) =
+      false.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  progress unfold seq_angle_to_div_nat.
+  rewrite (H1 (_ * _)%A).
+  apply angle_add_overflow_0_l.
+}
+intros * (Hmi, Hni).
+assert (Hnz : n ≠ 0) by flia Hmi.
+destruct m. {
+  rewrite angle_mul_0_l.
+  apply angle_add_overflow_0_r.
+}
+destruct m. {
+  rewrite angle_mul_1_l.
+  destruct i. {
+    cbn in Hni.
+    now apply Nat.nlt_ge in Hni.
+  }
+  specialize angle_div_2_pow_mul_le_angle as H1.
+  specialize (H1 (2 ^ S i / n) i (θ / ₂)%A).
+  assert (H : 2 ^ S i / n ≤ 2 ^ i). {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi Hni | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    rewrite Nat.pow_succ_r; [ | easy ].
+    apply Nat.mul_le_mono_r.
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  specialize (H1 H); clear H.
+  rewrite <- angle_div_2_pow_succ_r_2 in H1.
+  progress unfold seq_angle_to_div_nat.
+  apply angle_add_overflow_diag. 2: {
+    intros H.
+    rewrite H in H1.
+    apply angle_nlt_ge in H1.
+    apply H1.
+    now apply angle_div_2_lt_straight.
+  }
+  apply rngl_sin_nonneg_angle_le_straight.
+  eapply angle_le_trans; [ apply H1 | ].
+  apply angle_div_2_le_straight.
+}
+destruct m. {
+  apply angle_add_not_overflow_equiv.
+  progress unfold seq_angle_to_div_nat.
+  split. 2: {
+    destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
+      subst θ; left.
+      rewrite angle_0_div_2_pow.
+      apply angle_mul_0_r.
+    }
+    right.
+    rewrite angle_add_mul_r_diag_r.
+    intros Htt.
+    rewrite angle_mul_nat_assoc in Htt.
+    revert Htt.
+    apply angle_div_2_pow_mul_neq_0; [ easy | ].
+    split. {
+      apply Nat.mul_pos_pos; [ easy | ].
+      apply Nat.div_str_pos.
+      split; [ | easy ].
+      now apply Nat.neq_0_lt_0.
+    }
+    apply (le_lt_trans _ (3 * (2 ^ i / 3))). 2: {
+      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+      symmetry in H1.
+      apply Nat.add_sub_eq_r in H1.
+      rewrite <- H1.
+      apply Nat.sub_lt; [ now apply Nat.mod_le | ].
+      apply Nat.neq_0_lt_0.
+      clear Hni H1.
+      induction i; [ easy | ].
+      intros H; apply IHi; clear IHi.
+      rewrite Nat.pow_succ_r' in H.
+      apply Nat.mod_divide in H; [ | easy ].
+      apply Nat.gauss in H; [ | easy ].
+      now apply Nat.mod_divide.
+    }
+    apply Nat.mul_le_mono_l.
+    apply Nat.div_le_compat_l.
+    easy.
+  }
+  remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
+  rewrite angle_mul_2_div_2.
+  destruct (angle_lt_dec θ' angle_straight) as [Hts| Hts]. {
+    rewrite Hts.
+    destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
+      subst n; clear Hnz Hmi.
+      specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+      symmetry in H1.
+      apply Nat.add_sub_eq_r in H1.
+      rewrite <- (angle_div_2_mul_2 θ') at 2.
+      rewrite angle_add_mul_r_diag_r.
+      rewrite Hθ'.
+      rewrite angle_mul_mul_div_2. 2: {
+        apply angle_mul_nat_overflow_div_2_pow.
+        apply Nat.div_le_upper_bound; [ easy | ].
+        apply Nat.le_add_r.
+      }
+      rewrite <- H1.
+      rewrite <- angle_div_2_pow_succ_r_1.
+      rewrite angle_mul_sub_distr_r; [ | now apply Nat.mod_le ].
+      rewrite angle_div_2_pow_succ_r_2 at 1.
+      rewrite angle_div_2_pow_mul_2_pow.
+      apply (angle_le_trans _ (θ / ₂)); [ | apply angle_div_2_le_straight ].
+      apply angle_le_sub_diag.
 ...
       eapply angle_le_trans. {
         apply angle_mul_nat_le_mono_nonneg_r. 2: {
