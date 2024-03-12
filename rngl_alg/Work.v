@@ -3258,68 +3258,44 @@ destruct i. {
     }
     now do 4 apply Nat.succ_lt_mono in Hmi.
   }
-  destruct n. {
-    destruct m; [ apply angle_add_overflow_0_r | ].
-    destruct m. {
-      rewrite angle_mul_1_l.
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_div_2_div_2.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 2 apply -> Nat.succ_lt_mono.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 3 apply -> Nat.succ_lt_mono.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 4 apply -> Nat.succ_lt_mono.
-    }
-    now do 5 apply Nat.succ_lt_mono in Hmi.
+(**)
+  do 5 apply Nat.succ_le_mono in Hni.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  destruct m. {
+    rewrite angle_mul_1_l.
+    progress unfold seq_angle_to_div_nat.
+    cbn - [ angle_mul_nat angle_div_2_pow "/" ].
+    rewrite (Nat_div_less_small 1); [ | flia Hni ].
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_div_2_div_2.
   }
+  destruct m. {
+    progress unfold seq_angle_to_div_nat.
+    cbn - [ angle_mul_nat angle_div_2_pow "/" ].
+    rewrite (Nat_div_less_small 1); [ | flia Hni ].
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_mul_div_2_pow; cbn.
+    now do 2 apply -> Nat.succ_lt_mono.
+  }
+  destruct m. {
+    progress unfold seq_angle_to_div_nat.
+    cbn - [ angle_mul_nat angle_div_2_pow "/" ].
+    rewrite (Nat_div_less_small 1); [ | flia Hni ].
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_mul_div_2_pow; cbn.
+    now do 3 apply -> Nat.succ_lt_mono.
+  }
+  destruct m. {
+    progress unfold seq_angle_to_div_nat.
+    cbn - [ angle_mul_nat angle_div_2_pow "/" ].
+    rewrite (Nat_div_less_small 1); [ | flia Hni ].
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_mul_div_2_pow; cbn.
+    now do 4 apply -> Nat.succ_lt_mono.
+  }
+  do 5 apply Nat.succ_lt_mono in Hmi.
+  destruct n; [ easy | ].
   destruct n. {
-    destruct m; [ apply angle_add_overflow_0_r | ].
-    destruct m. {
-      rewrite angle_mul_1_l.
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_div_2_div_2.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 2 apply -> Nat.succ_lt_mono.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 3 apply -> Nat.succ_lt_mono.
-    }
-    destruct m. {
-      progress unfold seq_angle_to_div_nat.
-      cbn - [ angle_mul_nat angle_div_2_pow ].
-      rewrite angle_mul_1_l.
-      apply angle_add_overflow_mul_div_2_pow; cbn.
-      now do 4 apply -> Nat.succ_lt_mono.
-    }
     destruct m. {
       progress unfold seq_angle_to_div_nat.
       cbn - [ angle_mul_nat angle_div_2_pow ].
@@ -3327,7 +3303,7 @@ destruct i. {
       apply angle_add_overflow_mul_div_2_pow; cbn.
       now do 5 apply -> Nat.succ_lt_mono.
     }
-    now do 6 apply Nat.succ_lt_mono in Hmi.
+    now apply Nat.succ_lt_mono in Hmi.
   }
 ...
 specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
