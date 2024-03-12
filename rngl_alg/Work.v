@@ -3141,8 +3141,54 @@ destruct i. {
     destruct m; [ apply angle_add_overflow_0_r | ].
     destruct m. {
       rewrite angle_mul_1_l.
-Search (angle_add_overflow _ _ = false).
-apply angle_add_overflow_diag.
+      progress unfold seq_angle_to_div_nat.
+      cbn - [ angle_mul_nat ].
+      rewrite angle_div_2_mul_2.
+      apply angle_add_overflow_div_2_div_2.
+    }
+    now do 2 apply Nat.succ_lt_mono in Hmi.
+  }
+  destruct n. {
+    destruct m; [ apply angle_add_overflow_0_r | ].
+    destruct m. {
+      rewrite angle_mul_1_l.
+      progress unfold seq_angle_to_div_nat.
+      cbn - [ angle_mul_nat ].
+      rewrite angle_mul_1_l.
+      apply angle_add_overflow_div_2_div_2.
+    }
+    destruct m. {
+      progress unfold seq_angle_to_div_nat.
+      cbn - [ angle_mul_nat ].
+      rewrite angle_mul_1_l.
+      rewrite angle_div_2_mul_2.
+      apply angle_add_overflow_div_2_div_2.
+    }
+    now do 3 apply Nat.succ_lt_mono in Hmi.
+  }
+  do 4 apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  progress unfold seq_angle_to_div_nat.
+  cbn - [ angle_mul_nat ].
+  rewrite angle_mul_1_l.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  destruct m. {
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct m. {
+    rewrite angle_div_2_mul_2.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct m. {
+    rewrite <- angle_div_2_pow_1.
+    rewrite <- angle_div_2_pow_1.
+    rewrite <- angle_div_pow_2_add_distr.
+    now apply angle_add_overflow_mul_div_2_pow.
+  }
+  now do 4 apply Nat.succ_lt_mono in Hmi.
+}
+destruct i. {
 ...
 specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
 specialize (H1 m n i (θ / ₂)%A).
