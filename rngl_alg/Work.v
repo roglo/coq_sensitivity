@@ -3107,15 +3107,43 @@ destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
-(*
 destruct i. {
   cbn in Hni.
   apply Nat.le_1_r in Hni.
-  destruct Hni as [| Hni]; [ easy | subst n].
+  destruct Hni as [| Hni]; [ easy | subst n ].
   apply Nat.lt_1_r in Hmi; subst m; cbn.
   apply angle_add_overflow_0_r.
 }
-*)
+destruct i. {
+  cbn in Hni.
+  destruct n; [ easy | clear Hnz ].
+  destruct n. {
+    cbn.
+    apply Nat.lt_1_r in Hmi; subst m; cbn.
+    apply angle_add_overflow_0_r.
+  }
+  destruct n; [ | flia Hni ].
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  destruct m; [ | flia Hmi ].
+  cbn.
+  do 2 rewrite angle_add_0_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+destruct i. {
+  cbn in Hni.
+  destruct n; [ easy | clear Hnz ].
+  destruct n. {
+    cbn.
+    apply Nat.lt_1_r in Hmi; subst m; cbn.
+    apply angle_add_overflow_0_r.
+  }
+  destruct n. {
+    destruct m; [ apply angle_add_overflow_0_r | ].
+    destruct m. {
+      rewrite angle_mul_1_l.
+Search (angle_add_overflow _ _ = false).
+apply angle_add_overflow_diag.
+...
 specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
 specialize (H1 m n i (θ / ₂)%A).
 assert (H : m < n ≤ 2 ^ i) by easy.
