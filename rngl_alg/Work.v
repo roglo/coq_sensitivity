@@ -3107,7 +3107,23 @@ destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
-Check angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
+(*
+destruct i. {
+  cbn in Hni.
+  apply Nat.le_1_r in Hni.
+  destruct Hni as [| Hni]; [ easy | subst n].
+  apply Nat.lt_1_r in Hmi; subst m; cbn.
+  apply angle_add_overflow_0_r.
+}
+*)
+specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
+specialize (H1 m n i (θ / ₂)%A).
+assert (H : m < n ≤ 2 ^ i) by easy.
+specialize (H1 H); clear H.
+assert (H : (θ / ₂ < angle_straight)%A) by apply (angle_div_2_lt_straight Hc1).
+specialize (H1 H); clear H.
+progress unfold seq_angle_to_div_nat in H1.
+progress unfold seq_angle_to_div_nat.
 ...
 destruct m. {
   rewrite angle_mul_0_l.
