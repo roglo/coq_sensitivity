@@ -3398,6 +3398,7 @@ destruct i. {
     destruct m. {
       progress unfold seq_angle_to_div_nat.
       cbn - [ angle_mul_nat angle_div_2_pow ].
+...
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 rewrite angle_add_mul_r_diag_r.
@@ -3411,11 +3412,22 @@ rewrite angle_div_2_pow_succ_r_1.
 rewrite angle_div_2_mul_2.
 do 2 rewrite <- angle_div_2_pow_succ_r_1.
 rewrite angle_mul_add_distr_l.
-replace 3 with (2 + 1) at 2 4 by easy.
-do 2 rewrite angle_mul_add_distr_r.
-do 2 rewrite angle_mul_1_l.
+replace 3 with (2 + 1) at 4 by easy.
+rewrite angle_mul_add_distr_r.
+rewrite angle_mul_1_l.
 rewrite angle_add_assoc.
-apply angle_add_le_mono_r.
+apply angle_add_le_mono_r. {
+  do 3 rewrite angle_div_2_pow_succ_r_1.
+  apply angle_add_overflow_div_2_div_2.
+} {
+  progress unfold angle_add_overflow.
+  apply angle_ltb_ge.
+  rewrite <- angle_add_assoc.
+  apply angle_add_le_mono_l. {
+...
+Search (angle_add_overflow (_ * (_ / ₂^_))).
+...
+Search ((_ / ₂^_) + (_ / ₂^_))%A.
 ...
 Check quadrant_3_angle_lt_5_angle_right_div_2.
 Theorem quadrant_4_angle_lt_5_angle_right_div_2 :
