@@ -96,19 +96,55 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
 Definition angle_add_not_overflow3 θ1 θ2 :=
-  θ2 = 0%A ∨ (θ1 ≤ θ2)%A.
+  θ2 = 0%A ∨ (θ1 ≤ -θ2)%A.
 
 (* to be completed
 Theorem angle_add_not_overflow_equiv3 :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false ↔ angle_add_not_overflow3 θ1 θ2.
 Proof.
+destruct_ac.
 intros.
 progress unfold angle_add_overflow.
 progress unfold angle_add_not_overflow3.
 split; intros H12. {
+  destruct (angle_eq_dec θ2 0) as [H2z| H2z]; [ now left | right ].
   progress unfold angle_ltb in H12.
   progress unfold angle_leb.
+  move H2z before θ2.
+  cbn.
+  rewrite rngl_leb_opp_r.
+  rewrite (rngl_opp_0 Hop).
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  symmetry in Hzs1, Hsz2, Hzs12.
+  destruct zs12. {
+    destruct zs1; [ | easy ].
+    destruct sz2; [ | easy ].
+    apply rngl_leb_le in Hzs1, Hzs12, Hsz2.
+    apply rngl_leb_le.
+    apply (rngl_ltb_ge Hor) in H12.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+...
+    apply rngl_cos_le_anticompat_when_sin_nonneg; [ | easy | ].
+...
+Search (_ → (_ ≤ _)%A).
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+specialize rngl_sin_nonneg_cos_le_sin_le as H1.
+specialize (H1 (θ1 + θ2) θ1)%A.
+specialize (H1 Hzs12 Hzs1 H12).
+...
+apply (rngl_nlt_ge Hor).
+intros Hcc.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply angle_add_overflow_le_lemma_10 in H12.
+...
+    apply rngl_cos_le_anticompat_when_sin_nonneg; [ easy | easy | ].
+...
+    progress unfold angle_leb.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 ...
 *)
 
