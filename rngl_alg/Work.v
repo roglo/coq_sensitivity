@@ -125,6 +125,26 @@ split; intros H12. {
     apply rngl_leb_le in Hzs1, Hzs12, Hsz2.
     apply rngl_leb_le.
     apply (rngl_ltb_ge Hor) in H12.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      change_angle_add_r θ2 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzc2.
+      progress sin_cos_add_sub_right_hyp T Hsz2.
+      progress sin_cos_add_sub_right_hyp T H12.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_goal T.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+        change_angle_sub_l θ1 angle_right.
+        progress sin_cos_add_sub_right_hyp T Hzs1.
+        progress sin_cos_add_sub_right_hyp T Hzc1.
+        progress sin_cos_add_sub_right_hyp T Hzs12.
+        progress sin_cos_add_sub_right_hyp T H12.
+        progress sin_cos_add_sub_right_goal T.
+        apply (rngl_opp_le_compat Hop Hor) in Hzs12.
+        rewrite (rngl_opp_0 Hop) in Hzs12.
+        rewrite <- rngl_sin_sub_anticomm in Hzs12.
+About rngl_sin_sub_anticomm.
+...
+Search (0 < rngl_sin _)%L.
 Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ | easy | ].
@@ -1828,7 +1848,7 @@ destruct zs2. 2: {
     progress sin_cos_add_sub_right_hyp T Hzs12.
     apply (rngl_opp_lt_compat Hop Hor) in Hzs12.
     rewrite (rngl_opp_0 Hop) in Hzs12.
-    rewrite <- (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+    rewrite <- rngl_sin_sub_anticomm in Hzs12.
     apply (rngl_nlt_ge Hor) in H21.
     apply H21; clear H21.
     apply rngl_sin_incr_lt.

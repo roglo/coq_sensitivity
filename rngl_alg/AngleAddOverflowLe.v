@@ -638,7 +638,7 @@ sin_cos_add_sub_right_hyp T Hzc2.
 sin_cos_add_sub_right_hyp T Hzs2.
 sin_cos_add_sub_right_hyp T H32.
 sin_cos_add_sub_right_hyp T Hzs12.
-rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+rewrite rngl_sin_sub_anticomm in Hzs12.
 sin_cos_add_sub_right_hyp T Hzs12.
 apply (rngl_nlt_ge Hor) in H32.
 apply H32; clear H32.
@@ -647,7 +647,7 @@ split. 2: {
   intros H.
   apply rngl_cos_eq in H.
   destruct H; subst θ2. {
-    rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs12.
+    rewrite rngl_sin_sub_anticomm in Hzs12.
     apply (rngl_opp_pos_neg Hop Hor) in Hzs12.
     now apply (rngl_nle_gt Hor) in Hzs12.
   }

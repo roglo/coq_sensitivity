@@ -355,7 +355,7 @@ destruct zs2. {
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
   rewrite (angle_opp_sub_distr Hic Hop) in H.
-  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hc12z.
+  rewrite rngl_sin_sub_anticomm in Hc12z.
   rewrite <- H in Hc12z.
   apply (rngl_opp_pos_neg Hop Hor) in Hc12z.
   apply (rngl_lt_le_incl Hor) in Hc12z.
@@ -844,7 +844,7 @@ apply rngl_cos_eq in H.
 destruct H. {
   apply (rngl_nlt_ge Hor) in Hzs12.
   apply Hzs12; clear Hzs12.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   rewrite <- H.
   apply (rngl_opp_neg_pos Hop Hor).
   apply (rngl_lt_iff Hor).
@@ -1600,7 +1600,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   progress sin_cos_add_sub_straight_hyp T Hc1z.
   progress sin_cos_add_sub_straight_hyp T Hzs1.
   progress sin_cos_add_sub_straight_goal T.
-  rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzs13, Hzs12.
+  rewrite rngl_sin_sub_anticomm in Hzs13, Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs13, Hzs12.
   do 2 rewrite (rngl_cos_sub_comm Hic Hop θ1).
   destruct (rngl_eq_dec Hed (rngl_sin θ2) (rngl_sin θ3)) as
@@ -1786,7 +1786,7 @@ progress sin_cos_add_sub_right_hyp T Hzs3.
 progress sin_cos_add_sub_right_hyp T Hzc3.
 progress sin_cos_add_sub_right_hyp T Hs13z.
 progress sin_cos_add_sub_right_goal T.
-rewrite (rngl_sin_sub_anticomm Hic Hop) in Hs13z.
+rewrite rngl_sin_sub_anticomm in Hs13z.
 rewrite (rngl_cos_sub_comm Hic Hop).
 progress sin_cos_add_sub_right_hyp T Hs13z.
 apply rngl_add_cos_nonneg_when_sin_nonneg; try easy.
@@ -2753,7 +2753,7 @@ progress sin_cos_add_sub_right_hyp T Hzc13.
 progress sin_cos_add_sub_right_hyp T Hzc1.
 progress sin_cos_add_sub_right_hyp T Hzs1.
 progress sin_cos_add_sub_right_goal T.
-rewrite (rngl_sin_sub_anticomm Hic Hop) in Hc12z.
+rewrite rngl_sin_sub_anticomm in Hc12z.
 apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc12z.
 apply (rngl_nlt_ge Hor).
 intros Hc12s13.
@@ -3115,7 +3115,7 @@ destruct (rngl_lt_dec Hor (rngl_cos θ1) (rngl_cos θ2))
   exfalso.
   apply (rngl_nlt_ge Hor) in Hzs12.
   apply Hzs12; clear Hzs12.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   apply (rngl_lt_opp_l Hop Hor).
   rewrite rngl_add_0_r.
   apply (rngl_lt_iff Hor).

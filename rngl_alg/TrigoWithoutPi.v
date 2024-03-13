@@ -1887,13 +1887,11 @@ now apply rngl_sin_nonneg_sin_nonneg_add_1_cos_add_sub.
 Qed.
 
 Theorem rngl_sin_sub_anticomm :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2, rngl_sin (θ1 - θ2) = (- rngl_sin (θ2 - θ1))%L.
 Proof.
-intros Hic Hop *; cbn.
+destruct_ac.
+intros; cbn.
 do 2 rewrite (rngl_mul_opp_r Hop).
-(**)
 do 2 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_sub_distr Hop).
 rewrite (rngl_mul_comm Hic).
@@ -1993,7 +1991,7 @@ destruct zc2. {
   apply rngl_leb_le in Hzc2.
   apply (rngl_nlt_ge Hor) in Hc12.
   apply Hc12; clear Hc12.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   apply (rngl_opp_neg_pos Hop Hor).
   apply (rngl_lt_iff Hor).
   split. {
@@ -2040,7 +2038,7 @@ destruct zc1. {
   apply rngl_leb_le in Hzc1.
   apply (rngl_nlt_ge Hor) in Hc12.
   apply Hc12; clear Hc12.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   apply (rngl_opp_neg_pos Hop Hor).
   apply (rngl_lt_iff Hor).
   split. {
@@ -2075,7 +2073,7 @@ destruct zc1. {
 apply (rngl_leb_gt Hor) in Hzc1.
 apply (rngl_nlt_ge Hor) in Hc12.
 apply Hc12; clear Hc12.
-rewrite (rngl_sin_sub_anticomm Hic Hop).
+rewrite rngl_sin_sub_anticomm.
 apply (rngl_opp_neg_pos Hop Hor).
 apply (rngl_lt_iff Hor).
 split. {
@@ -2252,7 +2250,7 @@ destruct aov. {
   symmetry in Hθ3.
   apply angle_add_move_l in Hθ3.
   subst θ2.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   apply (rngl_opp_nonpos_nonneg Hop Hor).
   apply rngl_sin_sub_nonneg; [ easy | easy | ].
   now apply (rngl_lt_le_incl Hor).

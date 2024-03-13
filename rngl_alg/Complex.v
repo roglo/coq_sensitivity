@@ -2361,7 +2361,7 @@ destruct zs1. 2: {
       apply Hzs12; clear Hzs12.
       apply (rngl_opp_lt_compat Hop Hor).
       rewrite (rngl_opp_0 Hop).
-      rewrite <- (rngl_sin_sub_anticomm Hic Hop).
+      rewrite <- rngl_sin_sub_anticomm.
       apply (rngl_lt_iff Hor).
       split. {
         apply rngl_sin_sub_nonneg; [ easy | easy | ].
@@ -5836,7 +5836,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
      progress sin_cos_add_sub_right_hyp T Hzc31.
      progress sin_cos_add_sub_right_hyp T Hc3z.
      progress sin_cos_add_sub_right_goal T.
-     rewrite (rngl_sin_sub_anticomm Hic Hop) in Hzc31 |-*.
+     rewrite rngl_sin_sub_anticomm in Hzc31 |-*.
      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc31.
      apply (rngl_opp_nonpos_nonneg Hop Hor).
      clear Hzc32.
@@ -6049,7 +6049,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   progress sin_cos_add_sub_right_hyp T Hzc21.
   progress sin_cos_add_sub_right_hyp T Hc2z.
   progress sin_cos_add_sub_right_goal T.
-  rewrite (rngl_sin_sub_anticomm Hic Hop).
+  rewrite rngl_sin_sub_anticomm.
   apply (rngl_opp_nonpos_nonneg Hop Hor).
   destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
     exfalso.
