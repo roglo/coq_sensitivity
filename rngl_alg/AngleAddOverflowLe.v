@@ -469,7 +469,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   progress sin_cos_opp_hyp T Hzc2.
   apply (rngl_nlt_ge Hor) in H12.
   apply H12; clear H12.
-  rewrite (rngl_cos_sub_comm Hic Hop).
+  rewrite rngl_cos_sub_comm.
   destruct (rngl_eq_dec Hed (rngl_cos θ1) (rngl_cos θ2)) as [Hc1c2| Hc1c2]. {
     apply rngl_cos_eq in Hc1c2.
     destruct Hc1c2; subst θ1. {
@@ -954,7 +954,7 @@ progress sin_cos_opp_hyp T Hzs12.
 progress sin_cos_opp_hyp T H12.
 apply (rngl_nlt_ge Hor) in H12.
 apply H12; clear H12.
-rewrite (rngl_cos_sub_comm Hic Hop).
+rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_iff Hor).

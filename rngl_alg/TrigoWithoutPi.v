@@ -3009,11 +3009,10 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_cos_sub_comm :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2, rngl_cos (θ1 - θ2) = rngl_cos (θ2 - θ1).
 Proof.
-intros Hic Hop *; cbn.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_comm Hic).
 f_equal.
 do 2 rewrite (rngl_mul_opp_r Hop).
@@ -3578,7 +3577,7 @@ Theorem angle_eucl_dist_symmetry :
 Proof.
 intros Hic Hop *.
 do 2 rewrite angle_eucl_dist_is_sqrt.
-now rewrite (rngl_cos_sub_comm Hic Hop).
+now rewrite rngl_cos_sub_comm.
 Qed.
 
 Theorem angle_eucl_dist_separation :

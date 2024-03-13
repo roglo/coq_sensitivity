@@ -5404,7 +5404,7 @@ destruct zs. {
   apply rngl_leb_le in Hzs2.
   apply rngl_ltb_lt.
   rewrite IHi.
-  rewrite (rngl_cos_sub_comm Hic Hop).
+  rewrite rngl_cos_sub_comm.
   destruct i. {
     cbn - [ rngl_sin ] in Hzs, Hzs2.
     rewrite rngl_sin_add_straight_r in Hzs.
@@ -5421,7 +5421,7 @@ destruct zs. {
   }
   apply (rngl_lt_iff Hor).
   split. {
-    rewrite (rngl_cos_sub_comm Hic Hop).
+    rewrite rngl_cos_sub_comm.
     apply rngl_cos_decr.
     split. {
       rewrite <- IHi.
@@ -5483,7 +5483,7 @@ destruct zs. {
     apply angle_div_2_le_straight.
   }
   intros H.
-  rewrite (rngl_cos_sub_comm Hic Hop) in H.
+  rewrite rngl_cos_sub_comm in H.
   apply rngl_cos_eq in H.
   destruct H as [H| H]. {
     symmetry in H.
