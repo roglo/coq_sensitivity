@@ -95,6 +95,23 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Definition angle_add_not_overflow3 θ1 θ2 :=
+  θ2 = 0%A ∨ (θ1 ≤ θ2)%A.
+
+(* to be completed
+Theorem angle_add_not_overflow_equiv3 :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false ↔ angle_add_not_overflow3 θ1 θ2.
+Proof.
+intros.
+progress unfold angle_add_overflow.
+progress unfold angle_add_not_overflow3.
+split; intros H12. {
+  progress unfold angle_ltb in H12.
+  progress unfold angle_leb.
+...
+*)
+
 Theorem angle_mul_nat_overflow_2_pow_div_angle_mul :
   ∀ n i θ,
   angle_mul_nat_overflow (2 ^ i / n) (n * (θ / ₂^i)) = false.
