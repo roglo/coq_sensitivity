@@ -2341,6 +2341,52 @@ destruct zs1. 2: {
   }
   apply rngl_leb_le in Hsz, H2.
   destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+    change_angle_add_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T H1.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hzc1.
+    progress sin_cos_add_sub_right_hyp T Hzs12.
+    change_angle_add_r θ angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs.
+    progress sin_cos_add_sub_right_hyp T H1.
+    progress sin_cos_add_sub_right_hyp T Hsz.
+    progress sin_cos_add_sub_right_hyp T H2.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      change_angle_sub_l θ2 angle_right.
+      progress sin_cos_add_sub_right_hyp T H2.
+      progress sin_cos_add_sub_right_hyp T Hzs2.
+      progress sin_cos_add_sub_right_hyp T Hzc2.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      apply (rngl_nlt_ge Hor) in Hzs12.
+      apply Hzs12; clear Hzs12.
+      apply (rngl_opp_lt_compat Hop Hor).
+      rewrite (rngl_opp_0 Hop).
+      rewrite <- (rngl_sin_sub_anticomm Hic Hop).
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply rngl_sin_sub_nonneg; [ easy | easy | ].
+        apply (rngl_lt_le_incl Hor) in Hzs1, H1.
+        apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+        now apply (rngl_le_trans Hor _ (rngl_sin θ)).
+      }
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H| H]. {
+        apply -> angle_sub_move_0_r in H.
+        subst θ2.
+        now apply (rngl_nle_gt Hor) in H1.
+      }
+      apply -> angle_sub_move_r in H.
+      rewrite angle_add_comm in H.
+      subst θ2.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      now apply (rngl_nlt_ge Hor) in Hzs2.
+    }
+    apply Hc2z; clear Hc2z.
+    apply (rngl_lt_le_incl Hor) in H1.
+    apply (rngl_le_trans Hor _ (rngl_sin θ)); [ | easy ].
+    now apply (rngl_le_trans Hor _ (rngl_sin θ1)).
+  }
 ...
 destruct zs1; [ | easy ].
 destruct zs2; [ | easy ].
