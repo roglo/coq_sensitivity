@@ -3835,4 +3835,17 @@ apply (rngl_leb_gt Hor) in Hzs13.
 now apply angle_add_le_mono_l_lemma_52.
 Qed.
 
+Theorem angle_add_le_mono_r :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → angle_add_overflow θ2 θ3 = false
+  → (θ1 ≤ θ2)%A
+  → (θ1 + θ3 ≤ θ2 + θ3)%A.
+Proof.
+intros * H13 H23 H12.
+do 2 rewrite (angle_add_comm _ θ3).
+apply angle_add_not_overflow_comm in H13, H23.
+now apply angle_add_le_mono_l.
+Qed.
+
 End a.
