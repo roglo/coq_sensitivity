@@ -2317,6 +2317,7 @@ Theorem angle_add_overflow_lt_le :
   (θ1 < θ)%A
   → (θ2 ≤ - θ)%A
   → angle_add_overflow θ1 θ2 = false.
+(* en principe dans Complex.v *)
 ...
 apply (angle_add_overflow_lt_le angle_straight).
 (* par exemple *)
