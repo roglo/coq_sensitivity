@@ -2235,6 +2235,142 @@ destruct zs. {
 }
 Qed.
 
+Theorem rngl_leb_opp_r :
+  ∀ a b, (a ≤? -b)%L = (b ≤? -a)%L.
+Proof.
+destruct_ac.
+intros.
+remember (a ≤? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  apply rngl_leb_le.
+  apply (rngl_le_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_le_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_leb_gt Hor).
+  apply (rngl_lt_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_lt_opp_l Hop Hor).
+}
+Qed.
+
+Theorem rngl_ltb_opp_r :
+  ∀ a b, (a <? -b)%L = (b <? -a)%L.
+Proof.
+destruct_ac.
+intros.
+remember (a <? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_ltb_lt in Hab.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_lt_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_ltb_ge Hor) in Hab.
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_le_opp_l Hop Hor).
+}
+Qed.
+
+(* to be completed
+Theorem angle_add_overflow_lt_le :
+  ∀ θ θ1 θ2,
+  (θ1 < θ)%A
+  → (θ2 ≤ -θ)%A
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+destruct_ac.
+intros * H1 H2.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+progress unfold angle_ltb in H1.
+progress unfold angle_leb in H2.
+cbn in H1, H2.
+rewrite rngl_leb_opp_r in H2.
+rewrite (rngl_opp_0 Hop) in H2.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs, Hsz, Hzs1, Hzs2, Hzs12.
+destruct zs12. 2: {
+  destruct zs1; [ easy | ].
+  destruct zs; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs1, Hzs12, Hzs.
+  apply rngl_ltb_lt in H1.
+  apply (rngl_ltb_ge Hor).
+  destruct zs2. 2: {
+    destruct sz; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hsz.
+    now apply (rngl_lt_asymm Hor) in Hzs.
+  }
+  apply rngl_leb_le in Hzs2.
+  destruct sz. 2: {
+    apply (rngl_leb_gt Hor) in Hsz.
+    now apply (rngl_lt_asymm Hor) in Hzs.
+  }
+  apply rngl_leb_le in Hsz, H2.
+  apply (rngl_lt_le_incl Hor) in Hzs1.
+  now apply angle_add_overflow_le_lemma_11.
+}
+apply rngl_leb_le in Hzs12.
+destruct zs1. 2: {
+  exfalso.
+  destruct zs; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs, Hzs1.
+  apply rngl_ltb_lt in H1.
+  destruct zs2. 2: {
+    destruct sz; [ easy | ].
+    apply (rngl_leb_gt Hor) in Hsz.
+    now apply (rngl_lt_asymm Hor) in Hzs.
+  }
+  apply rngl_leb_le in Hzs2.
+  destruct sz. 2: {
+    apply (rngl_leb_gt Hor) in Hsz.
+    now apply (rngl_lt_asymm Hor) in Hzs.
+  }
+  apply rngl_leb_le in Hsz, H2.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+...
+destruct zs1; [ | easy ].
+destruct zs2; [ | easy ].
+destruct zs12; [ | easy ].
+apply rngl_ltb_lt in H1.
+clear H2.
+apply rngl_leb_le in Hzs1.
+apply rngl_leb_le in Hzs2.
+apply rngl_leb_le in Hzs12.
+apply (rngl_ltb_ge Hor).
+remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+symmetry in Hzc1.
+destruct zc1. {
+  apply rngl_leb_le in Hzc1.
+  apply angle_add_overflow_le_lemma_111; try easy.
+  now right; right; left.
+}
+apply (rngl_leb_gt Hor) in Hzc1.
+apply angle_add_overflow_le_lemma_2; try easy. 2: {
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H.
+apply (eq_rngl_cos_opp_1) in H.
+subst θ1.
+now apply (rngl_lt_irrefl Hor) in H1.
+Qed.
+
+...
+*)
+
 Theorem angle_add_overflow_lt_straight_le_straight :
   ∀ θ1 θ2,
   (θ1 < angle_straight)%A
@@ -4988,52 +5124,6 @@ split; intros H12. {
   subst θ1.
   rewrite angle_add_opp_l.
   apply angle_sub_diag.
-}
-Qed.
-
-Theorem rngl_leb_opp_r :
-  ∀ a b, (a ≤? -b)%L = (b ≤? -a)%L.
-Proof.
-destruct_ac.
-intros.
-remember (a ≤? -b)%L as ab eqn:Hab.
-symmetry in Hab.
-symmetry.
-destruct ab. {
-  apply rngl_leb_le in Hab.
-  apply rngl_leb_le.
-  apply (rngl_le_opp_r Hop Hor) in Hab.
-  rewrite rngl_add_comm in Hab.
-  now apply (rngl_le_opp_r Hop Hor) in Hab.
-} {
-  apply (rngl_leb_gt Hor) in Hab.
-  apply (rngl_leb_gt Hor).
-  apply (rngl_lt_opp_l Hop Hor).
-  rewrite rngl_add_comm.
-  now apply (rngl_lt_opp_l Hop Hor).
-}
-Qed.
-
-Theorem rngl_ltb_opp_r :
-  ∀ a b, (a <? -b)%L = (b <? -a)%L.
-Proof.
-destruct_ac.
-intros.
-remember (a <? -b)%L as ab eqn:Hab.
-symmetry in Hab.
-symmetry.
-destruct ab. {
-  apply rngl_ltb_lt in Hab.
-  apply rngl_ltb_lt.
-  apply (rngl_lt_opp_r Hop Hor) in Hab.
-  rewrite rngl_add_comm in Hab.
-  now apply (rngl_lt_opp_r Hop Hor) in Hab.
-} {
-  apply (rngl_ltb_ge Hor) in Hab.
-  apply (rngl_ltb_ge Hor).
-  apply (rngl_le_opp_l Hop Hor).
-  rewrite rngl_add_comm.
-  now apply (rngl_le_opp_l Hop Hor).
 }
 Qed.
 

@@ -3399,13 +3399,14 @@ destruct i. {
       progress unfold seq_angle_to_div_nat.
       cbn - [ angle_mul_nat angle_div_2_pow ].
 Check angle_add_overflow_lt_straight_le_straight.
-Theorem glop :
+About angle_add_overflow_lt_straight_le_straight.
+Theorem angle_add_overflow_lt_le :
   ∀ θ θ1 θ2,
   (θ1 < θ)%A
   → (θ2 ≤ - θ)%A
   → angle_add_overflow θ1 θ2 = false.
-Admitted.
-apply (glop angle_straight).
+...
+apply (angle_add_overflow_lt_le angle_straight).
 (* par exemple *)
 (* ça pourrait être un lemme de
    angle_add_overflow_lt_straight_le_straight *)
