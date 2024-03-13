@@ -3111,9 +3111,9 @@ apply angle_ltb_ge in Hts.
 specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
 specialize (H1 m n (S i) (2 * θ)%A).
 (* θ + straight = (2 * θ) / ₂ *)
-assert (H : m < n ≤ 2 ^ S i) by admit.
+assert (H : m < n ≤ 2 ^ S i) by ...
 specialize (H1 H); clear H.
-assert (H : (2 * θ < angle_straight)%A) by admit.
+assert (H : (2 * θ < angle_straight)%A) by ...
 specialize (H1 H); clear H.
 progress unfold seq_angle_to_div_nat in H1.
 progress unfold seq_angle_to_div_nat.
@@ -3123,9 +3123,10 @@ generalize Hts; intros H.
 apply angle_nlt_ge in H.
 apply Bool.not_true_iff_false in H.
 rewrite H in H1; clear H.
-replace (θ + angle_straight)%A with ((2 * θ) / ₂)%A in H1 by admit.
+replace (θ + angle_straight)%A with ((2 * θ) / ₂)%A in H1 by ...
 rewrite <- angle_div_2_pow_succ_r_2 in H1.
 rewrite angle_mul_2_div_2_pow in H1.
+progress unfold two_straight_div_2_pow in H1.
 ...
 rewrite angle_div_2_pow_mul in H1.
 ...
