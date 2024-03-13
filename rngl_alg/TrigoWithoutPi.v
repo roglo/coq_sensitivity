@@ -1038,12 +1038,10 @@ now rewrite (rngl_sub_0_r Hos).
 Qed.
 
 Theorem rngl_sin_sub_straight_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_sin (θ - angle_straight) = (- rngl_sin θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_0_r Hos).

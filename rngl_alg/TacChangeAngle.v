@@ -85,7 +85,7 @@ Ltac sin_cos_add_sub_straight_hyp T H :=
     apply (rngl_has_opp_has_opp_or_subt Hop');
   repeat rewrite rngl_sin_add_straight_r in H;
   repeat rewrite rngl_cos_add_straight_r in H;
-  repeat rewrite (rngl_sin_sub_straight_r Hon' Hop') in H;
+  repeat rewrite rngl_sin_sub_straight_r in H;
   repeat rewrite -> (rngl_sin_sub_straight_l Hon' Hop') in H;
   repeat rewrite -> (rngl_cos_sub_straight_l Hon' Hop') in H;
   repeat rewrite -> (rngl_cos_sub_straight_r Hon' Hop') in H;
@@ -156,7 +156,7 @@ Ltac sin_cos_add_sub_straight_goal T :=
   repeat rewrite -> (rngl_cos_sub_straight_l Hon' Hop');
   repeat rewrite rngl_sin_add_straight_r;
   repeat rewrite rngl_cos_add_straight_r;
-  repeat rewrite (rngl_sin_sub_straight_r Hon' Hop');
+  repeat rewrite rngl_sin_sub_straight_r;
   repeat rewrite (rngl_cos_sub_straight_r Hon' Hop');
   repeat rewrite (rngl_opp_involutive Hop');
   try apply <- (rngl_opp_nonpos_nonneg Hop' Hor');
