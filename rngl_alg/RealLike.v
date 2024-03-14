@@ -317,4 +317,45 @@ rewrite (rngl_squ_sqrt Hon) in H2; [ | easy ].
 now apply (rngl_nle_gt Hor) in Hab.
 Qed.
 
+Theorem rl_sqrt_pos :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 < a)%L → (0 < √a)%L.
+Proof.
+intros Hon Hos Hor.
+intros a Ha.
+apply (rngl_lt_iff Hor).
+split. {
+  apply rl_sqrt_nonneg.
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H; symmetry in H.
+apply (eq_rl_sqrt_0 Hon Hos) in H; [ | now apply (rngl_lt_le_incl Hor) ].
+subst a.
+now apply (rngl_lt_irrefl Hor) in Ha.
+Qed.
+
+Theorem rl_sqrt_1 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  rl_sqrt 1%L = 1%L.
+Proof.
+intros Hic Hon Hop Hor Hii.
+specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
+progress unfold rl_sqrt.
+specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
+rewrite <- (rngl_squ_1 Hon) in H1 at 2.
+rewrite <- (rngl_squ_pow_2 Hon) in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
+  now apply rl_sqrt_nonneg.
+}
+now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
+Qed.
+
 End a.

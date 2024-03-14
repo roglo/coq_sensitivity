@@ -12,28 +12,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem rl_sqrt_1 :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
- rl_sqrt 1%L = 1%L.
-Proof.
-intros Hic Hon Hop Hor Hii.
-specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
-progress unfold rl_sqrt.
-specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
-rewrite <- (rngl_squ_1 Hon) in H1 at 2.
-rewrite <- (rngl_squ_pow_2 Hon) in H1.
-apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
-rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
-  now apply rl_sqrt_nonneg.
-}
-now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
-Qed.
-
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
@@ -1046,6 +1024,26 @@ destruct aov. 2: {
     now apply rngl_sin_angle_div_2_add_overflow.
   }
 }
+Qed.
+
+Theorem angle_div_2_add_not_overflow :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
+Proof.
+intros * Haov.
+rewrite angle_div_2_add.
+now rewrite Haov.
+Qed.
+
+Theorem angle_div_2_add_overflow :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = true
+  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂ + angle_straight)%A.
+Proof.
+intros * Haov.
+rewrite angle_div_2_add.
+now rewrite Haov.
 Qed.
 
 End a.

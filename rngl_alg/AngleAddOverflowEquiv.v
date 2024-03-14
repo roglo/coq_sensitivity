@@ -7,7 +7,6 @@ Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleLeSubAdd AngleDiv2Add.
 Require Import TacChangeAngle.
-Require Import Complex.
 
 Section a.
 
@@ -280,7 +279,7 @@ Theorem rl_sqrt_half_pos :
 Proof.
 destruct_ac.
 intros Hc1.
-apply (rl_sqrt_pos Hon Hos).
+apply (rl_sqrt_pos Hon Hos Hor).
 apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
@@ -315,7 +314,7 @@ rewrite rngl_sin_right_div_2.
 rewrite rngl_cos_right_div_2.
 rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
-rewrite rngl_leb_opp_r, (rngl_opp_0 Hop).
+rewrite (rngl_leb_opp_r Hop Hor), (rngl_opp_0 Hop).
 specialize rl_sqrt_half_nonneg as H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
@@ -487,7 +486,7 @@ progress unfold angle_add_overflow.
 progress unfold angle_ltb.
 rewrite rngl_sin_add_straight_r.
 rewrite rngl_cos_add_straight_r.
-rewrite rngl_leb_opp_r.
+rewrite (rngl_leb_opp_r Hop Hor).
 rewrite (rngl_opp_0 Hop).
 destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hzs| Hsz]. {
   generalize Hzs; intros H.
@@ -773,7 +772,7 @@ split; intros H12. {
         progress unfold angle_add_overflow.
         progress unfold angle_ltb.
         progress sin_cos_add_sub_straight_goal T.
-        rewrite rngl_leb_opp_r.
+        rewrite (rngl_leb_opp_r Hop Hor).
         rewrite (rngl_opp_0 Hop).
         generalize Hzs2; intros H.
         apply (rngl_lt_le_incl Hor) in H.
@@ -812,7 +811,7 @@ split; intros H12. {
       rewrite (rngl_mul_comm Hic).
       apply (rngl_mul_pos_neg Hop Hor Hid). {
         apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-        apply (rl_sqrt_pos Hon Hos).
+        apply (rl_sqrt_pos Hon Hos Hor).
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       apply (rngl_lt_sub_0 Hop Hor).
@@ -850,7 +849,7 @@ split; intros H12. {
       progress unfold angle_ltb.
       rewrite rngl_sin_5_right_div_2.
       rewrite rngl_cos_5_right_div_2.
-      rewrite rngl_leb_opp_r.
+      rewrite (rngl_leb_opp_r Hop Hor).
       rewrite (rngl_opp_0 Hop).
       specialize (rl_sqrt_half_pos Hc1) as H.
       apply (rngl_leb_gt Hor) in H.
@@ -1018,7 +1017,7 @@ split; intros H12. {
         rewrite rngl_sin_add_straight_r.
         rewrite rngl_cos_add_straight_r.
         rewrite rngl_cos_add_right_r.
-        rewrite rngl_leb_opp_r.
+        rewrite (rngl_leb_opp_r Hop Hor).
         rewrite (rngl_opp_0 Hop).
         generalize Hzs12; intros H.
         apply (rngl_leb_gt Hor) in H.
@@ -1026,7 +1025,7 @@ split; intros H12. {
         generalize Hzs1; intros H.
         apply (rngl_leb_gt Hor) in H.
         rewrite H; clear H.
-        rewrite rngl_ltb_opp_r, (rngl_opp_involutive Hop).
+        rewrite (rngl_ltb_opp_r Hop Hor), (rngl_opp_involutive Hop).
         now apply rngl_ltb_lt.
       }
       apply (rngl_nlt_ge Hor) in Hzs12d.
