@@ -141,6 +141,10 @@ split; intros H12. {
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
         rewrite rngl_cos_sub_comm.
+Search (rngl_cos _ ≤ rngl_cos (_ - _))%L.
+Search (rngl_cos _ < rngl_cos (_ - _))%L.
+About rngl_cos_lt_rngl_cos_sub.
+...
         apply rngl_cos_lt_rngl_cos_sub; [ easy | | ]. {
           apply (rngl_lt_iff Hor).
           split; [ easy | ].

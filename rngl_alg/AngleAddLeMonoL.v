@@ -1049,27 +1049,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   }
   apply not_eq_sym in Hs1s3z.
   apply rngl_cos_lt_rngl_cos_sub; try easy.
-  apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
   now apply (rngl_lt_le_incl Hor).
-  apply (rngl_lt_iff Hor).
-  split; [ now apply rngl_sin_sub_nonneg_sin_le_sin | ].
-  intros H.
-  apply rngl_sin_eq in H.
-  destruct H; subst θ3. {
-    now rewrite angle_sub_diag in Hs1s3z.
-  }
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc3.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc3.
-  apply (rngl_le_antisymm Hor) in Hzc3; [ | easy].
-  symmetry in Hzc3.
-  apply (eq_rngl_cos_0) in Hzc3.
-  destruct Hzc3; subst θ1. {
-    rewrite angle_straight_sub_right in Hs1s3z.
-    now rewrite angle_sub_diag in Hs1s3z.
-  }
-  apply (rngl_nlt_ge Hor) in Hzs1.
-  apply Hzs1; cbn.
-  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  now apply rngl_sin_sub_nonneg_sin_le_sin.
 }
 apply (rngl_nle_gt Hor) in Hc1z.
 change_angle_sub_r θ1 angle_right.
@@ -2372,10 +2354,8 @@ destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hs12| Hs12]. {
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 apply rngl_sin_sub_nonneg_sin_le_sin in Hzs12; try easy.
-apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 now apply (rngl_lt_le_incl Hor).
-apply not_eq_sym in Hs12.
-now apply (rngl_lt_iff Hor).
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_37 :
@@ -2598,7 +2578,8 @@ rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_le_incl Hor) in Hc1z, Hzs3.
-now apply angle_add_le_mono_l_lemma_39.
+apply (rngl_lt_le_incl Hor).
+apply angle_add_le_mono_l_lemma_39; try easy.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_41 :
@@ -2683,6 +2664,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
       rewrite rngl_cos_sub_comm.
       apply rngl_cos_lt_rngl_cos_sub; try easy.
       now apply (rngl_lt_le_incl Hor).
+      apply (rngl_lt_le_incl Hor).
       apply angle_add_le_mono_l_lemma_39; try easy.
       now apply (rngl_lt_le_incl Hor).
     } {
@@ -3109,6 +3091,7 @@ progress sin_cos_add_sub_right_goal T.
 destruct (rngl_lt_dec Hor (rngl_cos θ1) (rngl_cos θ2))
     as [Hc12| Hc12]. {
   rewrite rngl_cos_sub_comm.
+  apply (rngl_lt_le_incl Hor) in Hc12.
   now apply rngl_cos_lt_rngl_cos_sub.
 } {
   apply (rngl_nlt_ge Hor) in Hc12.
@@ -3231,6 +3214,7 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
       }
       rewrite rngl_cos_sub_comm.
       apply rngl_cos_lt_rngl_cos_sub; try easy.
+      apply (rngl_lt_le_incl Hor).
       apply angle_add_le_mono_l_lemma_39; try easy. {
         apply not_eq_sym in Hs1z.
         now apply (rngl_lt_iff Hor).
@@ -3728,6 +3712,7 @@ progress sin_cos_add_sub_right_goal T.
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
+apply (rngl_lt_le_incl Hor).
 apply angle_add_le_mono_l_lemma_39; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).

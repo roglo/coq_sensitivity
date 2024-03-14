@@ -495,8 +495,6 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     now apply (rngl_lt_le_incl Hor).
   }
   apply rngl_cos_lt_rngl_cos_sub; try easy.
-  apply (rngl_lt_iff Hor).
-  split; [ | easy ].
   apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
@@ -957,25 +955,12 @@ apply H12; clear H12.
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
-apply (rngl_lt_iff Hor).
-split. {
-  apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-}
-intros H.
-apply rngl_cos_eq in H.
-destruct H; subst θ1. {
-  rewrite angle_sub_diag in Hzs12.
-  now apply (rngl_lt_irrefl Hor) in Hzs12.
-}
-cbn in Hzs1.
-apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
-apply (rngl_lt_le_incl Hor) in Hzs1.
-now apply (rngl_nlt_ge Hor) in Hzs1.
+apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
+now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Theorem angle_add_overflow_le_lemma_111 :
