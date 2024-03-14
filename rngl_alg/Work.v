@@ -453,7 +453,6 @@ destruct zs1. {
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       apply (rngl_nlt_ge Hor).
       intros Hcc.
-...
       change_angle_opp θ2.
       progress sin_cos_opp_hyp T Hzc2.
       progress sin_cos_opp_hyp T Hcc.
