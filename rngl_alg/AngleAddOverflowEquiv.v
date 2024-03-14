@@ -694,9 +694,9 @@ split; intros H12. {
               apply angle_sub_diag.
             }
             rewrite angle_add_opp_r.
-            rewrite <- (angle_opp_add_distr Hic Hop).
+            rewrite <- angle_opp_add_distr.
             rewrite (angle_right_add_right Hon Hop).
-            rewrite <- (angle_opp_add_distr Hic Hop).
+            rewrite <- angle_opp_add_distr.
             rewrite angle_straight_add_straight.
             apply angle_opp_0.
           }

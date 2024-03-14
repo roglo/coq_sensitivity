@@ -811,11 +811,10 @@ apply (angle_add_0_r).
 Qed.
 
 Theorem angle_opp_add_distr :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2, (- (θ1 + θ2))%A = (- θ2 - θ1)%A.
 Proof.
-intros Hic Hop *.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_opp_l Hop).
@@ -868,7 +867,7 @@ intros.
 progress unfold angle_sub.
 rewrite <- angle_add_assoc.
 f_equal.
-rewrite (angle_opp_add_distr Hic Hop).
+rewrite angle_opp_add_distr.
 rewrite (angle_opp_involutive Hop).
 apply angle_add_comm.
 Qed.
@@ -2394,7 +2393,7 @@ apply rngl_add_cos_nonneg_when_sin_nonneg. {
   now apply (rngl_opp_nonneg_nonpos Hop Hor).
 } {
   rewrite angle_add_opp_r.
-  rewrite <- (angle_opp_add_distr Hic Hop).
+  rewrite <- angle_opp_add_distr.
   rewrite rngl_sin_opp.
   apply (rngl_opp_nonneg_nonpos Hop Hor).
   now rewrite angle_add_comm.
@@ -3424,7 +3423,7 @@ Theorem angle_sub_add_distr :
 Proof.
 intros Hic Hop *.
 progress unfold angle_sub.
-rewrite (angle_opp_add_distr Hic Hop).
+rewrite angle_opp_add_distr.
 progress unfold angle_sub.
 rewrite angle_add_assoc.
 apply angle_add_add_swap.

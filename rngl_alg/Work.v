@@ -260,6 +260,31 @@ split; intros H12. {
   }
   apply (rngl_leb_gt Hor) in Hzs1.
   apply (rngl_ltb_ge Hor) in H12.
+  destruct sz2. {
+    exfalso.
+    apply rngl_leb_le in Hsz2.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      change_angle_opp θ2.
+      progress sin_cos_opp_hyp T Hzc2.
+      progress sin_cos_opp_hyp T Hsz2.
+      progress sin_cos_opp_hyp T Hzs12.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hsz2.
+      rewrite angle_add_opp_r in H12.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+        change_angle_opp θ1.
+        rewrite <- angle_opp_add_distr in Hzs12.
+...
+        progress sin_cos_opp_hyp T Hzs1.
+        progress sin_cos_opp_hyp T Hzc1.
+        progress sin_cos_opp_hyp T Hzs12.
+...
+        apply (rngl_opp_lt_compat Hop Hor) in Hzs12.
+        rewrite (rngl_opp_0 Hop) in Hzs12.
+        rewrite <- rngl_sin_sub_anticomm in Hzs12.
+        apply (rngl_lt_le_incl Hor) in Hzs12.
+        now apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le.
+      }
+      exfalso.
 ...
 Search (_ → (_ ≤ _)%A).
 ...
@@ -4122,11 +4147,11 @@ remember (u i) as θ1 eqn:Hθ1.
 (* c'est faux, ça ; c'est fou, ça *)
 ...
 rewrite (angle_add_opp_l Hic).
-        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite <- angle_opp_add_distr.
         rewrite (angle_right_add_right Hon Hop).
         progress unfold angle_add_overflow.
         rewrite angle_add_opp_r.
-        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite <- angle_opp_add_distr.
         progress unfold angle_ltb.
         rewrite rngl_sin_opp.
         rewrite (rngl_sin_add_straight_l Hon Hop).
@@ -4180,11 +4205,11 @@ apply (rngl_mul_pos_neg Hop Hor Hid).
         left; cbn.
         rewrite angle_add_0_r.
         rewrite (angle_add_opp_l Hic).
-        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite <- angle_opp_add_distr.
         rewrite (angle_right_add_right Hon Hop).
         progress unfold angle_add_overflow.
         rewrite angle_add_opp_r.
-        rewrite <- (angle_opp_add_distr Hic Hop).
+        rewrite <- angle_opp_add_distr.
         progress unfold angle_ltb.
         rewrite rngl_sin_opp.
         rewrite (rngl_sin_add_straight_l Hon Hop).
@@ -4216,7 +4241,7 @@ apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 }
 ...
 rewrite angle_add_opp_r.
-rewrite <- (angle_opp_add_distr Hic Hop).
+rewrite <- angle_opp_add_distr.
 rewrite angle_add_opp_r.
 rewrite (angle_right_add_right Hon Hop).
 ...
