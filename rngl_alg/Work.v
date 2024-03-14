@@ -104,6 +104,7 @@ Theorem angle_add_not_overflow_equiv3 :
   angle_add_overflow θ1 θ2 = false ↔ angle_add_not_overflow3 θ1 θ2.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
 progress unfold angle_add_overflow.
 progress unfold angle_add_not_overflow3.
@@ -150,7 +151,38 @@ split; intros H12. {
         apply (rngl_nle_gt Hor) in Hcc.
         apply Hcc, rngl_cos_bound.
       }
+      exfalso.
+      apply (rngl_nlt_ge Hor) in H12.
+      apply H12; clear H12.
       apply (rngl_nle_gt Hor) in Hc1z.
+      change_angle_sub_r θ1 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T Hzs1.
+      progress sin_cos_add_sub_right_hyp T Hc1z.
+      progress sin_cos_add_sub_right_goal T.
+      change_angle_add_r θ2 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T Hzc2.
+      progress sin_cos_add_sub_right_hyp T Hsz2.
+      progress sin_cos_add_sub_right_goal T.
+      apply (rngl_lt_opp_l Hop Hor); cbn.
+      rewrite rngl_add_comm.
+      rewrite (rngl_add_sub_assoc Hop).
+      rewrite (rngl_add_sub_swap Hop).
+      rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+      apply (rngl_add_pos_nonneg Hor). {
+        apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+        apply (rngl_lt_0_sub Hop Hor).
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_sin_bound | ].
+        intros H.
+        apply eq_rngl_sin_1 in H.
+        subst θ2.
+        now rewrite angle_sub_diag in H2z.
+      }
+      now apply (rngl_mul_nonneg_nonneg Hop Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ | easy | ].
 ...
