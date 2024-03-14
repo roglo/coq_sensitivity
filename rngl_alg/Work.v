@@ -425,6 +425,11 @@ split; intros H12. {
   now apply (rngl_sin_sub_nonneg).
 }
 apply angle_ltb_ge.
+(*
+  H12 : θ2 = 0%A ∨ (θ1 ≤ - θ2)%A
+  ============================
+  (θ1 ≤ θ1 + θ2)%A
+*)
 destruct H12 as [H12| H12]. {
   subst θ2.
   rewrite angle_add_0_r.
@@ -443,11 +448,12 @@ destruct zs1. {
   destruct zs12; [ | easy ].
   apply rngl_leb_le in Hzs1, Hzs12.
   apply rngl_leb_le.
-  destruct sz2.{
+  destruct sz2. {
     apply rngl_leb_le in Hsz2, H12.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       apply (rngl_nlt_ge Hor).
       intros Hcc.
+...
       change_angle_opp θ2.
       progress sin_cos_opp_hyp T Hzc2.
       progress sin_cos_opp_hyp T Hcc.
