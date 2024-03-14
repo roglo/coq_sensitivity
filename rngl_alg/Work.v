@@ -424,6 +424,63 @@ split; intros H12. {
   apply (rngl_lt_le_incl Hor) in Hzs1, Hsz2, Hcc.
   now apply (rngl_sin_sub_nonneg).
 }
+apply angle_ltb_ge.
+destruct H12 as [H12| H12]. {
+  subst θ2.
+  rewrite angle_add_0_r.
+  apply angle_le_refl.
+}
+progress unfold angle_leb in H12.
+progress unfold angle_leb.
+cbn in H12.
+rewrite (rngl_leb_opp_r Hop Hor) in H12.
+rewrite (rngl_opp_0 Hop) in H12.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
+remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+symmetry in Hzs1, Hsz2, Hzs12.
+destruct zs1. {
+  destruct zs12; [ | easy ].
+  apply rngl_leb_le in Hzs1, Hzs12.
+  apply rngl_leb_le.
+  destruct sz2.{
+    apply rngl_leb_le in Hsz2, H12.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      apply (rngl_nlt_ge Hor).
+      intros Hcc.
+      change_angle_opp θ2.
+      progress sin_cos_opp_hyp T Hzc2.
+      progress sin_cos_opp_hyp T Hcc.
+      progress sin_cos_opp_hyp T Hzs12.
+      progress sin_cos_opp_hyp T H12.
+      progress sin_cos_opp_hyp T Hsz2.
+      apply (rngl_opp_nonpos_nonneg Hop Hor) in Hsz2.
+      apply (rngl_opp_le_compat Hop Hor) in Hzs12.
+      rewrite (rngl_opp_0 Hop) in Hzs12.
+      rewrite <- rngl_sin_sub_anticomm in Hzs12.
+      apply (rngl_nlt_ge Hor) in Hzs12.
+      apply Hzs12; clear Hzs12.
+      apply (rngl_lt_iff Hor).
+      split; [ now apply rngl_sin_sub_nonneg | ].
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H| H]. {
+        apply -> angle_sub_move_0_r in H.
+        subst θ2.
+        rewrite angle_sub_diag in Hcc; cbn in Hcc.
+(* ah, tiens, ça marche pas *)
+...
+      change_angle_add_r θ2 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzc2.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T H12.
+      progress sin_cos_add_sub_right_hyp T Hsz2.
+      progress sin_cos_add_sub_right_goal T.
+...
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+apply angle_add_overflow_le_lemma_111; try easy.
+apply angle_add_overflow_le_lemma_2; try easy.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
 ...
 *)
 
