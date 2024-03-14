@@ -126,6 +126,7 @@ split; intros H12. {
     apply rngl_leb_le in Hzs1, Hzs12, Hsz2.
     apply rngl_leb_le.
     apply (rngl_ltb_ge Hor) in H12.
+    (* lemma? *)
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
         change_angle_opp θ2.
@@ -212,6 +213,7 @@ split; intros H12. {
     destruct sz2; [ | easy ].
     apply rngl_leb_le in Hzs1, Hsz2.
     apply rngl_leb_le.
+    (* lemma? *)
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       change_angle_opp θ2.
       progress sin_cos_opp_hyp T Hzc2.
