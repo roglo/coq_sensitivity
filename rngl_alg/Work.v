@@ -293,10 +293,7 @@ split; intros H12. {
       apply (rngl_nle_gt Hor) in Hc1z.
       change_angle_add_r θ1 angle_straight.
       progress sin_cos_add_sub_straight_hyp T Hzs1.
-    progress sin_cos_add_sub_straight_hyp T Hc1z.
-    progress sin_cos_add_sub_straight_hyp T Hzs12.
-    progress sin_cos_add_sub_straight_goal T.
-    apply (rngl_lt_le_incl Hor) in Hc2z, Hc1z, Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hc1z.
 ...
 Search (_ → (_ ≤ _)%A).
 ...
