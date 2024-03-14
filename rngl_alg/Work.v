@@ -346,6 +346,18 @@ split; intros H12. {
       now apply (rngl_lt_asymm Hor) in Hzs12.
       now rewrite angle_sub_diag in H2z.
     }
+    apply (rngl_nle_gt Hor) in Hc1z.
+    change_angle_add_r θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    apply (rngl_nle_gt Hor) in Hzs12.
+    apply Hzs12; clear Hzs12.
+    apply (rngl_lt_le_incl Hor) in Hzs1, Hc2z, Hc1z.
+    now apply rngl_sin_add_nonneg.
+  }
+  apply (rngl_leb_gt Hor) in Hsz2.
+  apply rngl_leb_le.
 ...
 Search (_ → (_ ≤ _)%A).
 ...
