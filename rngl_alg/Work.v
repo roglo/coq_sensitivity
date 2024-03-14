@@ -114,7 +114,7 @@ split; intros H12. {
   progress unfold angle_leb.
   move H2z before θ2.
   cbn.
-  rewrite rngl_leb_opp_r.
+  rewrite (rngl_leb_opp_r Hop Hor).
   rewrite (rngl_opp_0 Hop).
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
   remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
@@ -183,6 +183,37 @@ split; intros H12. {
       now apply (rngl_mul_nonneg_nonneg Hop Hor).
     }
     apply (rngl_nle_gt Hor) in Hc2z.
+    change_angle_add_r θ2 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hc2z.
+    progress sin_cos_add_sub_straight_hyp T Hsz2.
+    progress sin_cos_add_sub_straight_hyp T H12.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_goal T.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      apply (rngl_lt_le_incl Hor) in Hc2z.
+      now apply (rngl_add_nonneg_nonneg Hor).
+    }
+    exfalso.
+    apply (rngl_nle_gt Hor) in Hc1z.
+    apply (rngl_nlt_ge Hor) in H12.
+    apply H12; clear H12.
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hc1z.
+    progress sin_cos_add_sub_right_hyp T Hzs12.
+    progress sin_cos_add_sub_right_goal T.
+    apply (rngl_add_pos_nonneg Hor); [ easy | ].
+    apply (rngl_lt_le_incl Hor) in Hc1z, Hc2z.
+    now apply rngl_sin_add_nonneg.
+  }
+  apply (rngl_leb_gt Hor) in Hzs12.
+  destruct zs1. {
+    clear H12.
+    destruct sz2; [ | easy ].
+    apply rngl_leb_le in Hzs1, Hsz2.
+    apply rngl_leb_le.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
 ...
     apply rngl_cos_le_anticompat_when_sin_nonneg; [ | easy | ].
 ...
