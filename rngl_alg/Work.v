@@ -96,7 +96,7 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
 Definition angle_add_not_overflow3 θ1 θ2 :=
-  θ2 = 0%A ∨ (θ1 ≤ -θ2)%A.
+  θ2 = 0%A ∨ (θ1 < -θ2)%A.
 
 (* to be completed
 Theorem angle_add_not_overflow_equiv3 :
@@ -111,7 +111,7 @@ progress unfold angle_add_not_overflow3.
 split; intros H12. {
   destruct (angle_eq_dec θ2 0) as [H2z| H2z]; [ now left | right ].
   progress unfold angle_ltb in H12.
-  progress unfold angle_leb.
+  progress unfold angle_ltb.
   move H2z before θ2.
   cbn.
   rewrite (rngl_leb_opp_r Hop Hor).
@@ -124,7 +124,7 @@ split; intros H12. {
     destruct zs1; [ | easy ].
     destruct sz2; [ | easy ].
     apply rngl_leb_le in Hzs1, Hzs12, Hsz2.
-    apply rngl_leb_le.
+    apply rngl_ltb_lt.
     apply (rngl_ltb_ge Hor) in H12.
     (* lemma? *)
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
@@ -136,21 +136,35 @@ split; intros H12. {
         progress sin_cos_opp_hyp T Hzs12.
         apply (rngl_opp_nonpos_nonneg Hop Hor) in Hsz2.
         cbn.
-        apply (rngl_nlt_ge Hor).
+        apply (rngl_nle_gt Hor).
         intros Hcc.
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
         rewrite rngl_cos_sub_comm.
-        apply rngl_cos_lt_rngl_cos_sub; [ easy | | easy ].
+        apply rngl_cos_lt_rngl_cos_sub; [ easy | | ]. {
+          apply (rngl_lt_iff Hor).
+          split; [ easy | ].
+          intros H; symmetry in H.
+          apply eq_rngl_sin_0 in H.
+          destruct H; subst θ2. {
+            now rewrite angle_opp_0 in H2z.
+          }
+          cbn in Hzc2.
+          apply (rngl_nlt_ge Hor) in Hzc2.
+          apply Hzc2; clear Hzc2.
+          destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+            specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+            now rewrite (H1 (- angle_straight)%A) in H2z.
+          }
+          apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+        }
         apply (rngl_lt_iff Hor).
         split; [ easy | ].
-        intros H; symmetry in H.
-        apply eq_rngl_sin_0 in H.
-        destruct H; subst θ2. {
-          now rewrite angle_opp_0 in H2z.
-        }
-        apply (rngl_nle_gt Hor) in Hcc.
-        apply Hcc, rngl_cos_bound.
+        intros H.
+        apply rngl_cos_eq in H.
+        destruct H; subst θ1.
+(* mouais, ça marche pas *)
+...
       }
       exfalso.
       apply (rngl_nlt_ge Hor) in H12.
