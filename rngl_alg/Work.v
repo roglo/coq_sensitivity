@@ -292,8 +292,60 @@ split; intros H12. {
       }
       apply (rngl_nle_gt Hor) in Hc1z.
       change_angle_add_r θ1 angle_straight.
+      rewrite angle_sub_sub_swap in Hzs12, H12.
       progress sin_cos_add_sub_straight_hyp T Hzs1.
       progress sin_cos_add_sub_straight_hyp T Hc1z.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T H12.
+      rewrite (rngl_add_opp_l Hop) in H12.
+      apply -> (rngl_le_sub_0 Hop Hor) in H12.
+      apply (rngl_nlt_ge Hor) in H12.
+      apply H12; clear H12.
+      rewrite rngl_cos_sub_comm.
+      (* lemma? *)
+      apply rngl_cos_lt_rngl_cos_sub. {
+        now apply (rngl_lt_le_incl Hor) in Hzs1.
+      } {
+        apply (rngl_lt_iff Hor).
+        split; [ easy | ].
+        intros H; symmetry in H.
+        apply eq_rngl_sin_0 in H.
+        destruct H; subst θ2; [ now rewrite angle_opp_0 in H2z | ].
+        progress sin_cos_add_sub_straight_hyp T Hzs12.
+        now apply (rngl_lt_asymm Hor) in Hzs12.
+      }
+      apply (rngl_lt_le_incl Hor) in Hc1z.
+      now apply angle_add_le_mono_l_lemma_39.
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
+    change_angle_add_r θ2 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hc2z.
+    progress sin_cos_add_sub_straight_hyp T Hsz2.
+    progress sin_cos_add_sub_straight_hyp T H12.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      change_angle_add_r θ1 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs1.
+      progress sin_cos_add_sub_right_hyp T Hzc1.
+      progress sin_cos_add_sub_right_hyp T Hzs12.
+      progress sin_cos_add_sub_right_hyp T H12.
+      apply (rngl_nlt_ge Hor) in H12.
+      apply H12; clear H12.
+      apply (rngl_add_nonneg_pos Hor); [ easy | ].
+      cbn.
+      apply (rngl_add_nonneg_pos Hor).
+      apply (rngl_lt_le_incl Hor) in Hc2z.
+      now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+      apply (rngl_lt_iff Hor).
+      split; [ easy | ].
+      intros H; symmetry in H.
+      apply (eq_rngl_sin_0) in H.
+      destruct H; subst θ2.
+      rewrite angle_add_0_r in Hzs12.
+      now apply (rngl_lt_asymm Hor) in Hzs12.
+      now rewrite angle_sub_diag in H2z.
+    }
 ...
 Search (_ → (_ ≤ _)%A).
 ...
