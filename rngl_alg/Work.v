@@ -518,15 +518,8 @@ destruct zs1. {
       intros Hcc.
       apply (rngl_nlt_ge Hor) in Hzs12.
       apply Hzs12; clear Hzs12.
-...
-      apply (rngl_lt_iff Hor).
-      split. {
-        apply (rngl_lt_le_incl Hor) in Hc2z.
-        now apply rngl_sin_add_nonneg.
-      }
-      intros H; symmetry in H.
-      apply eq_rngl_sin_0 in H.
-      destruct H as [H| H]. {
+      apply rngl_sin_nonneg_is_pos. {
+        intros H.
         apply angle_add_move_0_r in H.
         subst θ1.
         cbn in Hzs1.
@@ -543,11 +536,15 @@ destruct zs1. {
         apply (rngl_nle_gt Hor) in Hc2z.
         apply Hc2z; clear Hc2z.
         apply (rngl_opp_1_le_0 Hon Hop Hor).
+      } {
+        intros H.
+        apply angle_add_move_r in H.
+        subst θ1.
+        rewrite rngl_cos_sub_straight_l in H12.
+        now apply (rngl_lt_irrefl Hor) in H12.
       }
-      apply angle_add_move_r in H.
-      subst θ1.
-      rewrite rngl_cos_sub_straight_l in H12.
-      now apply (rngl_lt_irrefl Hor) in H12.
+      apply (rngl_lt_le_incl Hor) in Hc2z.
+      now apply rngl_sin_add_nonneg.
     }
     apply (rngl_nle_gt Hor) in Hc1z.
     change_angle_sub_l θ1 angle_straight.
