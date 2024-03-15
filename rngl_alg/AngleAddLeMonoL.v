@@ -2298,17 +2298,17 @@ apply (rngl_le_0_sub Hop Hor).
 apply rngl_sin_bound.
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_36 :
+Theorem quadrant_1_quadrant_4_cos_lt_cos_add :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
   → (0 ≤ rngl_cos θ1)%L
+  → (rngl_sin θ2 < 0)%L
   → (0 ≤ rngl_cos θ2)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
 Proof.
 destruct_ac.
-intros * Hzs1 Hzs2 Hzc1 Hzc2 Hzs12.
+intros * Hzs1 Hzc1 Hzs2 Hzc2 Hzs12.
 change_angle_opp θ2.
 progress sin_cos_opp_hyp T Hzs2.
 progress sin_cos_opp_hyp T Hzs12.
@@ -2345,7 +2345,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
 } {
   apply (rngl_nle_gt Hor) in Hzc1.
   apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
-  now apply angle_add_le_mono_l_lemma_36.
+  now apply quadrant_1_quadrant_4_cos_lt_cos_add.
 }
 Qed.
 

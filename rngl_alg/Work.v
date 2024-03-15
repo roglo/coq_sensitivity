@@ -140,7 +140,7 @@ split; intros H12. {
         intros Hcc.
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
-        apply angle_add_le_mono_l_lemma_36; try easy.
+        apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
         apply (rngl_lt_iff Hor).
         split; [ easy | ].
         intros H.
