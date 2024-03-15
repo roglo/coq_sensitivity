@@ -2308,54 +2308,16 @@ Theorem angle_add_le_mono_l_lemma_36 :
   → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzs1 Hzs2 Hzc1 Hzc2 Hzs12.
-  rewrite (H1 (rngl_sin _)) in Hzs2.
-  now apply (rngl_lt_irrefl Hor) in Hzs2.
-}
 intros * Hzs1 Hzs2 Hzc1 Hzc2 Hzs12.
 change_angle_opp θ2.
 progress sin_cos_opp_hyp T Hzs2.
 progress sin_cos_opp_hyp T Hzs12.
 progress sin_cos_opp_hyp T Hzc2.
 progress sin_cos_opp_goal T.
-destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hs12| Hs12]. {
-  apply rngl_sin_eq in Hs12.
-  destruct Hs12; subst θ1. {
-    rewrite angle_sub_diag.
-    apply (rngl_lt_iff Hor).
-    split; [ apply rngl_cos_bound | ].
-    intros H.
-    apply (eq_rngl_cos_1) in H.
-    subst θ2.
-    now apply (rngl_lt_irrefl Hor) in Hzs2.
-  }
-  rewrite rngl_cos_sub_straight_l in Hzc1.
-  rewrite <- angle_sub_add_distr in Hzs12.
-  rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12.
-  rewrite <- angle_sub_add_distr.
-  do 2 rewrite rngl_cos_sub_straight_l.
-  apply -> (rngl_opp_lt_compat Hop Hor).
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc1.
-  apply (rngl_le_antisymm Hor) in Hzc1; [ | easy ].
-  symmetry in Hzc1.
-  rewrite Hzc1.
-  apply (eq_rngl_cos_0) in Hzc1.
-  destruct Hzc1; subst θ2. {
-    rewrite (angle_right_add_right Hon Hop).
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  exfalso.
-  apply (rngl_nle_gt Hor) in Hzs2.
-  apply Hzs2; cbn.
-  apply (rngl_opp_1_le_0 Hon Hop Hor).
-}
 rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; try easy.
-apply rngl_sin_sub_nonneg_sin_le_sin in Hzs12; try easy.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-now apply (rngl_lt_le_incl Hor).
+apply rngl_cos_lt_rngl_cos_sub; [ easy | easy | ].
+apply (rngl_lt_le_incl Hor) in Hzs2.
+now apply quadrant_1_sin_sub_nonneg_cos_le.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_37 :

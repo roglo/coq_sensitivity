@@ -105,6 +105,13 @@ Theorem angle_add_not_overflow_equiv3 :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 θ2), angle_add_overflow_0_r.
+  progress unfold angle_add_not_overflow3.
+  split; [ now intros; left | easy ].
+}
 intros.
 progress unfold angle_add_overflow.
 progress unfold angle_add_not_overflow3.
@@ -129,31 +136,19 @@ split; intros H12. {
     (* lemma? *)
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-        change_angle_opp θ2.
-        progress sin_cos_opp_hyp T Hzc2.
-        progress sin_cos_opp_hyp T Hsz2.
-        progress sin_cos_opp_hyp T H12.
-        progress sin_cos_opp_hyp T Hzs12.
-        apply (rngl_opp_nonpos_nonneg Hop Hor) in Hsz2.
-        cbn.
         apply (rngl_nle_gt Hor).
         intros Hcc.
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
-        rewrite rngl_cos_sub_comm.
-        apply rngl_cos_lt_rngl_cos_sub; [ easy | | easy ].
+        apply angle_add_le_mono_l_lemma_36; try easy.
         apply (rngl_lt_iff Hor).
         split; [ easy | ].
-        intros H; symmetry in H.
+        intros H.
         apply eq_rngl_sin_0 in H.
-        destruct H; subst θ2; [ now rewrite angle_opp_0 in H2z | ].
+        destruct H; subst θ2; [ easy | ].
         cbn in Hzc2.
         apply (rngl_nlt_ge Hor) in Hzc2.
         apply Hzc2; clear Hzc2.
-        destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-          specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-          now rewrite (H1 (- angle_straight)%A) in H2z.
-        }
         apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
       exfalso.
