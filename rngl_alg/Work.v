@@ -95,28 +95,20 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem quadrant_4_sin_neg :
+Theorem rngl_sin_nonpos_is_neg :
   ∀ θ,
   θ ≠ 0%A
+  → θ ≠ angle_straight
   → (rngl_sin θ ≤ 0)%L
-  → (0 ≤ rngl_cos θ)%L
   → (rngl_sin θ < 0)%L.
 Proof.
-intros * Hz Hsz Hzc.
+intros * Hz Hs Hsz.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
-  now rewrite (H1 θ) in Hz.
-}
 apply (rngl_lt_iff Hor).
 split; [ easy | ].
 intros H.
 apply eq_rngl_sin_0 in H.
-destruct H; subst θ; [ easy | ].
-cbn in Hzc.
-apply (rngl_nlt_ge Hor) in Hzc.
-apply Hzc; clear Hzc.
-apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+now destruct H.
 Qed.
 
 Definition angle_add_not_overflow3 θ1 θ2 :=
@@ -164,7 +156,11 @@ split; intros H12. {
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
         apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
-        now apply quadrant_4_sin_neg.
+        apply rngl_sin_nonpos_is_neg; [ easy | | easy ].
+        intros H; subst θ2.
+        apply (rngl_nlt_ge Hor) in Hzc2.
+        apply Hzc2; clear Hzc2; cbn.
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
       exfalso.
       apply (rngl_nlt_ge Hor) in H12.
