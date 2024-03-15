@@ -95,6 +95,22 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem rngl_sin_nonneg_is_pos :
+  ∀ θ,
+  θ ≠ 0%A
+  → θ ≠ angle_straight
+  → (0 ≤ rngl_sin θ)%L
+  → (0 < rngl_sin θ)%L.
+Proof.
+intros * Hz Hs Hsz.
+destruct_ac.
+apply (rngl_lt_iff Hor).
+split; [ easy | ].
+intros H; symmetry in H.
+apply eq_rngl_sin_0 in H.
+now destruct H.
+Qed.
+
 Theorem rngl_sin_nonpos_is_neg :
   ∀ θ,
   θ ≠ 0%A
@@ -288,15 +304,13 @@ split; intros H12. {
         apply (rngl_nlt_ge Hor) in H12.
         apply H12; clear H12.
         apply rngl_sin_sub_lt_sin_l; [ easy | | easy ].
-        apply (rngl_lt_iff Hor).
-        split; [ easy | ].
-        intros H; symmetry in H.
-        apply eq_rngl_sin_0 in H.
-        destruct H; subst θ2. {
-          now rewrite angle_opp_0 in H2z.
+        apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
+          now intros H; subst θ2; rewrite angle_opp_0 in H2z.
+        } {
+          intros H; subst θ2.
+          progress sin_cos_add_sub_straight_hyp T Hzs12.
+          now apply (rngl_lt_asymm Hor) in Hzs12.
         }
-        progress sin_cos_add_sub_straight_hyp T Hzs12.
-        now apply (rngl_lt_asymm Hor) in Hzs12.
       }
       apply (rngl_nle_gt Hor) in Hc1z.
       change_angle_add_r θ1 angle_straight.
@@ -314,13 +328,13 @@ split; intros H12. {
       apply rngl_cos_lt_rngl_cos_sub. {
         now apply (rngl_lt_le_incl Hor) in Hzs1.
       } {
-        apply (rngl_lt_iff Hor).
-        split; [ easy | ].
-        intros H; symmetry in H.
-        apply eq_rngl_sin_0 in H.
-        destruct H; subst θ2; [ now rewrite angle_opp_0 in H2z | ].
-        progress sin_cos_add_sub_straight_hyp T Hzs12.
-        now apply (rngl_lt_asymm Hor) in Hzs12.
+        apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
+          now intros H; subst θ2; rewrite angle_opp_0 in H2z.
+        } {
+          intros H; subst θ2.
+          progress sin_cos_add_sub_straight_hyp T Hzs12.
+          now apply (rngl_lt_asymm Hor) in Hzs12.
+        }
       }
       apply (rngl_lt_le_incl Hor) in Hc1z.
       apply (rngl_lt_le_incl Hor) in Hzs1, Hzs12.
@@ -346,13 +360,12 @@ split; intros H12. {
       apply (rngl_lt_le_incl Hor) in Hc2z.
       now apply (rngl_mul_nonneg_nonneg Hop Hor).
       apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
-      apply (rngl_lt_iff Hor).
-      split; [ easy | ].
-      intros H; symmetry in H.
-      apply (eq_rngl_sin_0) in H.
-      destruct H; subst θ2.
-      rewrite angle_add_0_r in Hzs12.
-      now apply (rngl_lt_asymm Hor) in Hzs12.
+      apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
+        intros H; subst θ2.
+        rewrite angle_add_0_r in Hzs12.
+        now apply (rngl_lt_asymm Hor) in Hzs12.
+      }
+      intros H; subst θ2.
       now rewrite angle_sub_diag in H2z.
     }
     apply (rngl_nle_gt Hor) in Hc1z.
@@ -475,26 +488,23 @@ destruct zs1. {
       rewrite <- rngl_sin_sub_anticomm in Hzs12.
       apply (rngl_nlt_ge Hor) in Hzs12.
       apply Hzs12; clear Hzs12.
-      apply (rngl_lt_iff Hor).
-      split. {
-        apply (rngl_lt_le_incl Hor) in H12.
-        now apply rngl_sin_sub_nonneg.
-      }
-      intros H; symmetry in H.
-      apply eq_rngl_sin_0 in H.
-      destruct H as [H| H]. {
-        apply -> angle_sub_move_0_r in H.
-        subst θ2.
+      apply rngl_sin_nonneg_is_pos. {
+        intros H.
+        apply -> angle_sub_move_0_r in H; subst θ2.
         now apply (rngl_lt_irrefl Hor) in H12.
+      } {
+        intros H.
+        apply angle_sub_move_r in H; subst θ2.
+        rewrite angle_sub_add_distr in Hcc.
+        rewrite angle_sub_sub_swap in Hcc.
+        rewrite angle_sub_diag in Hcc.
+        rewrite angle_sub_0_l in Hcc.
+        apply (rngl_nle_gt Hor) in Hcc.
+        apply Hcc; clear Hcc; cbn.
+        apply rngl_cos_bound.
       }
-      apply -> angle_sub_move_r in H.
-      subst θ2.
-      rewrite angle_sub_add_distr in Hcc.
-      rewrite angle_sub_sub_swap in Hcc.
-      rewrite angle_sub_diag in Hcc.
-      rewrite angle_sub_0_l in Hcc.
-      apply (rngl_nle_gt Hor) in Hcc.
-      apply Hcc, rngl_cos_bound.
+      apply (rngl_lt_le_incl Hor) in H12.
+      now apply rngl_sin_sub_nonneg.
     }
     apply (rngl_nle_gt Hor) in Hc2z.
     change_angle_add_r θ2 angle_straight.
@@ -508,6 +518,7 @@ destruct zs1. {
       intros Hcc.
       apply (rngl_nlt_ge Hor) in Hzs12.
       apply Hzs12; clear Hzs12.
+...
       apply (rngl_lt_iff Hor).
       split. {
         apply (rngl_lt_le_incl Hor) in Hc2z.
@@ -1852,7 +1863,7 @@ destruct sz. {
   apply (rl_sqrt_half_pos Hc1).
 }
 apply rngl_ltb_lt.
-rewrite (rngl_cos_sub_straight_r Hon Hop).
+rewrite rngl_cos_sub_straight_r.
 rewrite rngl_cos_7_right_div_2.
 apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
 now apply (rngl_opp_neg_pos Hop Hor).

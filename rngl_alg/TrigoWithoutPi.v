@@ -1021,12 +1021,10 @@ apply (rngl_opp_involutive Hop).
 Qed.
 
 Theorem rngl_cos_sub_straight_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (θ - angle_straight) = (- rngl_cos θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_opp_0 Hop).

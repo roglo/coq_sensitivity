@@ -651,7 +651,7 @@ destruct H as [H| H]. {
   rewrite (rngl_opp_0 Hop) in H.
   apply (rngl_leb_gt Hor) in H.
   rewrite H; clear H.
-  rewrite (rngl_cos_sub_straight_r Hon Hop).
+  rewrite rngl_cos_sub_straight_r.
   do 2 rewrite rngl_cos_sub_right_r.
   destruct (0 ≤? rngl_cos _)%L; [ easy | ].
   apply rngl_ltb_lt.
@@ -723,7 +723,7 @@ rewrite (rngl_opp_0 Hop) in H.
 apply (rngl_nle_gt Hor) in H.
 apply rngl_leb_nle in H.
 rewrite H; clear H.
-rewrite (rngl_cos_sub_straight_r Hon Hop).
+rewrite rngl_cos_sub_straight_r.
 apply rngl_leb_le in Hzs12.
 now rewrite Hzs12.
 Qed.
@@ -2213,7 +2213,7 @@ destruct H as [H| H]. {
   apply rngl_leb_nle in H.
   now rewrite H.
 }
-do 2 rewrite (rngl_cos_sub_straight_r Hon Hop).
+do 2 rewrite rngl_cos_sub_straight_r.
 rewrite <- H.
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_leb_refl Hor).
@@ -2383,7 +2383,7 @@ apply Haov13; clear Haov13.
 apply angle_add_le_mono_l_lemma_11; try easy.
 rewrite rngl_sin_sub_straight_r.
 now apply (rngl_opp_neg_pos Hop Hor).
-rewrite (rngl_cos_sub_straight_r Hon Hop).
+rewrite rngl_cos_sub_straight_r.
 now apply (rngl_opp_neg_pos Hop Hor).
 rewrite angle_add_sub_assoc.
 rewrite angle_add_add_swap.
@@ -2459,7 +2459,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   apply (rngl_nle_gt Hor) in H.
   apply rngl_leb_nle in H.
   rewrite H; clear H.
-  rewrite (rngl_cos_sub_straight_r Hon Hop).
+  rewrite rngl_cos_sub_straight_r.
   rewrite rngl_cos_sub_right_r.
   apply rngl_ltb_lt.
   apply (rngl_lt_opp_l Hop Hor).
@@ -2499,7 +2499,7 @@ rewrite (rngl_opp_0 Hop) in H.
 apply (rngl_nle_gt Hor) in H.
 apply rngl_leb_nle in H.
 rewrite H; clear H.
-do 2 rewrite (rngl_cos_sub_straight_r Hon Hop).
+do 2 rewrite rngl_cos_sub_straight_r.
 rewrite rngl_cos_sub_right_r.
 apply rngl_ltb_lt.
 apply -> (rngl_opp_lt_compat Hop Hor).
@@ -2631,7 +2631,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
       apply (rngl_nle_gt Hor) in H.
       apply rngl_leb_nle in H.
       rewrite H; clear H.
-      rewrite (rngl_cos_sub_straight_r Hon Hop).
+      rewrite rngl_cos_sub_straight_r.
       rewrite rngl_cos_sub_right_r.
       apply rngl_ltb_lt.
       apply (rngl_lt_opp_l Hop Hor).
@@ -3517,7 +3517,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
     apply (rngl_nle_gt Hor) in H.
     apply rngl_leb_nle in H.
     rewrite H; clear H.
-    rewrite (rngl_cos_sub_straight_r Hon Hop).
+    rewrite rngl_cos_sub_straight_r.
     do 2 rewrite rngl_cos_sub_right_r.
     apply rngl_ltb_lt.
     apply (rngl_lt_opp_l Hop Hor).
@@ -3552,7 +3552,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
   apply (rngl_nle_gt Hor) in H.
   apply rngl_leb_nle in H.
   rewrite H; clear H.
-  rewrite (rngl_cos_sub_straight_r Hon Hop).
+  rewrite rngl_cos_sub_straight_r.
   rewrite rngl_cos_sub_right_r.
   apply rngl_ltb_lt.
   apply (rngl_lt_opp_l Hop Hor).
@@ -3632,7 +3632,7 @@ rewrite (rngl_opp_0 Hop) in H.
 apply (rngl_nle_gt Hor) in H.
 apply rngl_leb_nle in H.
 rewrite H; clear H.
-do 2 rewrite (rngl_cos_sub_straight_r Hon Hop).
+do 2 rewrite rngl_cos_sub_straight_r.
 rewrite rngl_cos_sub_right_r.
 apply rngl_ltb_lt.
 apply -> (rngl_opp_lt_compat Hop Hor).
