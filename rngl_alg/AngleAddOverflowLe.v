@@ -180,7 +180,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   }
   apply angle_add_move_l in Hs12.
   subst θ2.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+  rewrite rngl_cos_sub_straight_l in Hzs2.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
   apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
   symmetry in Hzs2.
@@ -263,7 +263,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   apply angle_add_move_l in H.
   subst θ2.
   clear Hc12 Hc2z.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+  rewrite rngl_cos_sub_straight_l in Hzs2.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
   apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
   symmetry in Hzs2.
@@ -451,7 +451,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
   apply angle_add_move_l in H.
   subst θ3.
   clear Hc3z.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs3.
+  rewrite rngl_cos_sub_straight_l in Hzs3.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs3.
   apply (rngl_le_antisymm Hor) in Hzs3; [ | easy ].
   symmetry in Hzs3.

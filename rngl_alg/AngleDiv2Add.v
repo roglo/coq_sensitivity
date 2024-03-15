@@ -205,8 +205,8 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   move θ1 after θ2.
   rewrite <- angle_sub_sub_distr in Hzs3 |-*.
   rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs1, Hzs3.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc12z, Hc1z.
-  do 2 rewrite (rngl_cos_sub_straight_l Hon Hop).
+  rewrite rngl_cos_sub_straight_l in Hc12z, Hc1z.
+  do 2 rewrite rngl_cos_sub_straight_l.
   apply -> (rngl_opp_lt_compat Hop Hor).
   rewrite rngl_add_comm in Hc12z.
   rewrite (rngl_add_opp_r Hop) in Hc12z.
@@ -256,7 +256,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
     rewrite angle_add_comm in Hzs3 |-*.
     rewrite <- angle_sub_sub_distr in Hzs3 |-*.
     rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2, Hzs3.
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z, Hc12z |-*.
+    rewrite rngl_cos_sub_straight_l in Hc2z, Hc12z |-*.
     apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
     rewrite (rngl_add_opp_r Hop) in Hc12z |-*.
     apply (rngl_lt_sub_lt_add_l Hop Hor) in Hc12z.
@@ -497,7 +497,7 @@ destruct zs1. {
     rewrite angle_add_comm in Hzs12, Haov.
     rewrite <- angle_sub_sub_distr in Hzs12, Haov.
     rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12, Hzs2.
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in Haov, Hc2z.
+    rewrite rngl_cos_sub_straight_l in Haov, Hc2z.
     rewrite (rngl_opp_involutive Hop) in Haov.
     apply (rngl_opp_neg_pos Hop Hor) in Hc2z.
     move Hzs2 before Hzs1.
@@ -854,7 +854,7 @@ destruct zs12. {
       cbn.
       apply angle_add_move_l in Hs12.
       subst θ2.
-      rewrite (rngl_cos_sub_straight_l Hon Hop).
+      rewrite rngl_cos_sub_straight_l.
       rewrite (rngl_sub_opp_r Hop).
       do 2 rewrite (rngl_add_opp_r Hop).
       rewrite (rngl_mul_comm Hic).
@@ -909,7 +909,7 @@ destruct zs12. {
       cbn.
       apply angle_add_move_l in Hs12.
       subst θ2.
-      rewrite (rngl_cos_sub_straight_l Hon Hop).
+      rewrite rngl_cos_sub_straight_l.
       rewrite (rngl_sub_opp_r Hop).
       do 2 rewrite (rngl_add_opp_r Hop).
       rewrite (rngl_mul_comm Hic).

@@ -996,12 +996,10 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_cos_sub_straight_l :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
   ∀ θ, rngl_cos (angle_straight - θ) = (- rngl_cos θ)%L.
 Proof.
-intros Hon Hop *; cbn.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct_ac.
+intros; cbn.
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
@@ -1287,7 +1285,7 @@ destruct (rngl_eq_dec Hed (rngl_cos θ1) (rngl_cos θ2)) as [Hcc| Hcc]. {
 }
 right.
 apply eq_angle_eq.
-rewrite (rngl_cos_sub_straight_l Hon Hop).
+rewrite rngl_cos_sub_straight_l.
 rewrite (rngl_sin_sub_straight_l Hon Hop).
 rewrite Hss; f_equal.
 specialize (cos2_sin2_1 θ1) as H1.
@@ -1372,7 +1370,7 @@ split. {
   intros H.
   apply rngl_sin_eq in H.
   destruct H; subst θ2; [ now apply (rngl_lt_irrefl Hor) in Hcc | ].
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hcc, Hzc2.
+  rewrite rngl_cos_sub_straight_l in Hcc, Hzc2.
   apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc2.
   apply (rngl_le_antisymm Hor) in Hzc2; [ | easy ].
   rewrite Hzc2 in Hcc.
@@ -1523,7 +1521,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     apply angle_sub_move_l in Hθ.
     subst θ2; rename θ into θ2.
     move θ2 before θ1.
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in Hcc, Hzc2.
+    rewrite rngl_cos_sub_straight_l in Hcc, Hzc2.
     rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2 |-*.
     rewrite (rngl_add_opp_r Hop) in Hcc.
     apply -> (rngl_lt_sub_0 Hop Hor) in Hcc.
@@ -2332,7 +2330,7 @@ assert (Hs21 : (rngl_sin θ1 ≤ rngl_sin θ2)%L). {
   apply angle_sub_move_l in Hθ.
   subst θ2; rename θ into θ2.
   move θ2 before θ1.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hcc, Hzc2.
+  rewrite rngl_cos_sub_straight_l in Hcc, Hzc2.
   rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs2 |-*.
   rewrite (rngl_add_opp_r Hop) in Hcc.
   apply -> (rngl_le_0_sub Hop Hor) in Hcc.

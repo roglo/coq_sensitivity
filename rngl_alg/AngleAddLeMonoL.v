@@ -674,7 +674,7 @@ destruct H as [H| H]. {
   }
   apply angle_add_move_l in H.
   subst θ2.
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z.
+  rewrite rngl_cos_sub_straight_l in Hc2z.
   apply (rngl_opp_pos_neg Hop Hor) in Hc2z.
   now apply (rngl_nle_gt Hor) in Hc2z.
 }
@@ -962,7 +962,7 @@ destruct H as [H| H]. {
 }
 apply angle_add_move_l in H.
 subst θ2.
-rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+rewrite rngl_cos_sub_straight_l in Hzs2.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
 now apply (rngl_nlt_ge Hor) in Hzs2.
 Qed.
@@ -1192,7 +1192,7 @@ destruct H1 as [H1| H1]. {
 }
 apply angle_add_move_l in H1.
 subst θ2.
-rewrite (rngl_cos_sub_straight_l Hon Hop) in Hc2z.
+rewrite rngl_cos_sub_straight_l in Hc2z.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hc2z.
 apply (rngl_le_antisymm Hor) in Hc2z; [ | easy ].
 symmetry in Hc2z.
@@ -1471,7 +1471,7 @@ destruct H as [H| H]. {
 }
 apply angle_add_move_l in H.
 subst θ2.
-rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+rewrite rngl_cos_sub_straight_l in Hzs2.
 apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
 apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
 symmetry in Hzs2.
@@ -1589,10 +1589,10 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
     [Hes23| Hes23]. {
     apply rngl_sin_eq in Hes23.
     destruct Hes23; subst θ2; [ apply (rngl_le_refl Hor) | ].
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in H23.
+    rewrite rngl_cos_sub_straight_l in H23.
     rewrite <- angle_sub_add_distr in Hzs12 |-*.
     rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12.
-    rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc2 |-*.
+    rewrite rngl_cos_sub_straight_l in Hzc2 |-*.
     apply (rngl_opp_pos_neg Hop Hor) in Hzc2.
     apply (rngl_le_opp_r Hop Hor).
     cbn.
@@ -2331,11 +2331,11 @@ destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hs12| Hs12]. {
     subst θ2.
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
-  rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc1.
+  rewrite rngl_cos_sub_straight_l in Hzc1.
   rewrite <- angle_sub_add_distr in Hzs12.
   rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12.
   rewrite <- angle_sub_add_distr.
-  do 2 rewrite (rngl_cos_sub_straight_l Hon Hop).
+  do 2 rewrite rngl_cos_sub_straight_l.
   apply -> (rngl_opp_lt_compat Hop Hor).
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc1.
   apply (rngl_le_antisymm Hor) in Hzc1; [ | easy ].

@@ -631,7 +631,7 @@ split; intros H12. {
         rewrite Ha12 in Hcs.
         apply angle_add_move_l in Ha12.
         subst θ2.
-        rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzs2.
+        rewrite rngl_cos_sub_straight_l in Hzs2.
         apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
         apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
         apply eq_rngl_cos_0 in Hzs1.
@@ -685,7 +685,7 @@ split; intros H12. {
             apply H12z; clear H12z.
             rewrite angle_sub_sub_distr.
             rewrite <- angle_add_sub_swap.
-            rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc2.
+            rewrite rngl_cos_sub_straight_l in Hzc2.
             apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc2.
             apply (rngl_le_antisymm Hor) in Hzc1; [ | easy ].
             apply eq_rngl_cos_0 in Hzc1.
