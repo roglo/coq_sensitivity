@@ -129,12 +129,13 @@ Qed.
 
 Theorem quadrant_2_quadrant_34_rngl_cos_lt_cos_add :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
+  θ2 ≠ 0%A
+  → (0 ≤ rngl_sin θ1)%L
   → (rngl_cos θ1 < 0)%L
-  → (rngl_sin θ2 < 0)%L
+  → (rngl_sin θ2 ≤ 0)%L
   → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
 Proof.
-intros * Hzs1 Hc1z Hsz2.
+intros * Hs2z Hzs1 Hc1z Hsz2.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 change_angle_sub_r θ1 angle_right.
@@ -157,10 +158,43 @@ apply (rngl_add_pos_nonneg Hor). {
   intros H.
   apply eq_rngl_sin_1 in H.
   subst θ2.
-  now apply (rngl_lt_irrefl Hor) in Hsz2.
+  now rewrite angle_sub_diag in Hs2z.
 }
-apply (rngl_lt_le_incl Hor) in Hsz2.
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
+Theorem quadrant_12_quadrant_2_rngl_cos_lt :
+  ∀ θ1 θ2,
+  θ2 ≠ 0%A
+  → (0 ≤ rngl_sin θ1)%L
+  → (rngl_sin θ2 ≤ 0)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L
+  → (rngl_cos θ2 < rngl_cos θ1)%L.
+Proof.
+intros * H2z Hzs1 Hsz2 Hzc2 Hzs12 H12.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  exfalso; apply H2z, H1.
+}
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H12.
+  apply H12; clear H12.
+  apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
+  apply rngl_sin_nonpos_is_neg; [ easy | | easy ].
+  intros H; subst θ2.
+  apply (rngl_nlt_ge Hor) in Hzc2.
+  apply Hzc2; clear Hzc2; cbn.
+  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+}
+exfalso.
+apply (rngl_nlt_ge Hor) in H12.
+apply H12; clear H12.
+apply (rngl_nle_gt Hor) in Hc1z.
+apply quadrant_2_quadrant_34_rngl_cos_lt_cos_add; try easy.
 Qed.
 
 Definition angle_add_not_overflow3 θ1 θ2 :=
@@ -203,29 +237,10 @@ split; intros H12. {
     apply (rngl_ltb_ge Hor) in H12.
     (* lemma? *)
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-        exfalso.
-        apply (rngl_nlt_ge Hor) in H12.
-        apply H12; clear H12.
-        apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
-        apply rngl_sin_nonpos_is_neg; [ easy | | easy ].
-        intros H; subst θ2.
-        apply (rngl_nlt_ge Hor) in Hzc2.
-        apply Hzc2; clear Hzc2; cbn.
-        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-      }
-      exfalso.
-      apply (rngl_nlt_ge Hor) in H12.
-      apply H12; clear H12.
-      apply (rngl_nle_gt Hor) in Hc1z.
-      apply quadrant_2_quadrant_34_rngl_cos_lt_cos_add; try easy.
-      apply rngl_sin_nonpos_is_neg; [ easy | | easy ].
-      intros H; subst θ2.
-      apply (rngl_nlt_ge Hor) in Hzc2.
-      apply Hzc2; clear Hzc2; cbn.
-      apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+      now apply quadrant_12_quadrant_2_rngl_cos_lt.
     }
     apply (rngl_nle_gt Hor) in Hc2z.
+...
     change_angle_add_r θ2 angle_straight.
     progress sin_cos_add_sub_straight_hyp T Hc2z.
     progress sin_cos_add_sub_straight_hyp T Hsz2.
@@ -1980,7 +1995,6 @@ destruct s2z. {
     apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
     apply eq_rngl_sin_0 in Hzs1.
     destruct Hzs1; subst θ1; [ easy | clear H1z ].
-(* ... *)
     apply (rngl_lt_iff Hor).
     split; [ apply rngl_cos_bound | ].
     intros H2; symmetry in H2.
