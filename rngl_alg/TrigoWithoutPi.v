@@ -3406,7 +3406,6 @@ Qed.
 Theorem angle_mul_add_distr_r :
   ∀ a b θ, ((a + b) * θ = a * θ + b * θ)%A.
 Proof.
-destruct_ac.
 intros.
 induction a; cbn; [ symmetry; apply angle_add_0_l | ].
 rewrite IHa.
@@ -3414,11 +3413,9 @@ apply angle_add_assoc.
 Qed.
 
 Theorem angle_sub_add_distr :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2 θ3, (θ1 - (θ2 + θ3))%A = (θ1 - θ2 - θ3)%A.
 Proof.
-intros Hic Hop *.
+intros.
 progress unfold angle_sub.
 rewrite angle_opp_add_distr.
 progress unfold angle_sub.
@@ -3429,7 +3426,7 @@ Qed.
 Theorem angle_mul_sub_distr_r :
   ∀ a b θ, b ≤ a → ((a - b) * θ = a * θ - b * θ)%A.
 Proof.
-destruct_ac; intros * Hba.
+intros * Hba.
 revert b Hba.
 induction a; intros. {
   apply Nat.le_0_r in Hba; subst b; cbn.
@@ -3440,7 +3437,7 @@ destruct b; [ now rewrite angle_sub_0_r | ].
 apply Nat.succ_le_mono in Hba.
 rewrite Nat.sub_succ.
 rewrite IHa; [ cbn | easy ].
-rewrite (angle_sub_add_distr Hic Hop).
+rewrite angle_sub_add_distr.
 rewrite angle_add_comm.
 now rewrite angle_add_sub.
 Qed.

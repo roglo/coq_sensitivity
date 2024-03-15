@@ -4177,11 +4177,10 @@ Proof. easy. Qed.
 Theorem angle_mul_sub_distr_l :
   ∀ n θ1 θ2, (n * (θ1 - θ2) = n * θ1 - n * θ2)%A.
 Proof.
-destruct_ac.
 intros.
 revert θ1 θ2.
 induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
-rewrite (angle_sub_add_distr Hic Hop).
+rewrite angle_sub_add_distr.
 rewrite angle_add_sub_swap.
 rewrite <- angle_add_sub_assoc.
 f_equal.
@@ -4225,7 +4224,7 @@ eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
 rewrite <- (angle_add_div_2_diag θ) at 1.
 rewrite (angle_mul_add_distr_r 1)%L.
 rewrite angle_mul_1_l.
-rewrite (angle_sub_add_distr Hic Hop).
+rewrite angle_sub_add_distr.
 rewrite angle_add_sub_swap.
 rewrite angle_add_sub_swap.
 rewrite <- angle_sub_sub_distr.
@@ -4297,7 +4296,7 @@ rewrite angle_eucl_dist_move_0_r.
 rewrite angle_sub_sub_swap.
 rewrite angle_sub_sub_distr.
 rewrite angle_add_sub.
-rewrite (angle_sub_add_distr Hic Hop).
+rewrite angle_sub_add_distr.
 now rewrite angle_add_sub.
 Qed.
 
@@ -4350,7 +4349,7 @@ rewrite (angle_opp_sub_distr Hic Hop).
 rewrite angle_sub_sub_distr.
 do 2 rewrite <- angle_add_sub_swap.
 rewrite angle_add_comm.
-rewrite <- (angle_sub_add_distr Hic Hop).
+rewrite <- angle_sub_add_distr.
 rewrite (angle_add_comm (v n)).
 now rewrite angle_opp_0.
 Qed.
@@ -5089,7 +5088,7 @@ assert (Hzc21 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
 }
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ2))) as [Hz32| H32z]. {
-    apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
+    apply quadrant_1_sin_sub_nonneg_cos_le; try easy. {
       apply rngl_sin_sub_nonneg; [ easy | easy | ].
       now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
     } {
@@ -5292,7 +5291,7 @@ assert (Hzc21 : (rngl_cos θ2 ≤ rngl_cos θ1)%L). {
 }
 destruct (rngl_le_dec Hor 0 (rngl_cos (θ3 - θ1))) as [Hzc31| Hc31z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos (θ2 - θ1))) as [Hz21| H21z]. {
-    apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
+    apply quadrant_1_sin_sub_nonneg_cos_le; try easy. {
       apply rngl_sin_sub_nonneg; [ easy | easy | ].
       now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
     } {

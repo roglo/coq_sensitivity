@@ -12,7 +12,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Theorem rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le :
+Theorem quadrant_1_sin_sub_nonneg_cos_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
@@ -66,6 +66,46 @@ rewrite <- (rngl_cos_sub Hop).
 rewrite <- (rngl_mul_1_l Hon).
 apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
 apply rngl_cos_bound.
+Qed.
+
+Theorem quadrant_1_sin_sub_pos_cos_lt :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 < rngl_sin (θ1 - θ2))%L
+  → (rngl_cos θ1 < rngl_cos θ2)%L.
+Proof.
+destruct_ac.
+intros * Hs1z Hzs2 Hc1z Hzc2 Hzs12.
+apply (rngl_lt_iff Hor).
+split. {
+  apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
+  now apply (rngl_lt_le_incl Hor).
+}
+intros H.
+apply rngl_cos_eq in H.
+destruct H; subst θ1. {
+  rewrite angle_sub_diag in Hzs12.
+  now apply (rngl_lt_irrefl Hor) in Hzs12.
+}
+cbn in Hs1z.
+rewrite <- angle_opp_add_distr in Hzs12.
+cbn - [ angle_add ] in Hzs12.
+apply (rngl_opp_nonneg_nonpos Hop Hor) in Hs1z.
+apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+apply eq_rngl_sin_0 in Hzs2.
+destruct Hzs2; subst θ2. {
+  rewrite angle_add_0_r in Hzs12.
+  cbn in Hzs12.
+  rewrite (rngl_opp_0 Hop) in Hzs12.
+  now apply (rngl_lt_irrefl Hor) in Hzs12.
+}
+rewrite angle_straight_add_straight in Hzs12.
+cbn in Hzs12.
+rewrite (rngl_opp_0 Hop) in Hzs12.
+now apply (rngl_lt_irrefl Hor) in Hzs12.
 Qed.
 
 Theorem angle_add_overflow_le_lemma_1 :
@@ -495,7 +535,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     now apply (rngl_lt_le_incl Hor).
   }
   apply rngl_cos_lt_rngl_cos_sub; try easy.
-  apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+  apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
@@ -955,7 +995,7 @@ apply H12; clear H12.
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
-apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).

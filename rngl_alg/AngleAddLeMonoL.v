@@ -326,7 +326,7 @@ destruct zs2. {
   progress sin_cos_add_sub_right_goal T.
   apply (rngl_lt_iff Hor).
   split. {
-    apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+    apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor). {
@@ -712,7 +712,7 @@ apply angle_nlt_ge in Haov12.
 apply Haov12; clear Haov12.
 rewrite angle_add_sub_assoc.
 rewrite <- angle_add_sub_swap.
-rewrite <- (angle_sub_add_distr Hic Hop).
+rewrite <- angle_sub_add_distr.
 rewrite angle_straight_add_straight.
 rewrite angle_sub_0_r.
 progress unfold angle_ltb.
@@ -824,7 +824,7 @@ rewrite rngl_cos_sub_comm.
 apply (rngl_lt_iff Hor).
 split. {
   rewrite rngl_cos_sub_comm.
-  apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy. {
+  apply quadrant_1_sin_sub_nonneg_cos_le; try easy. {
     cbn.
     rewrite (rngl_mul_opp_r Hop).
     rewrite (rngl_sub_opp_r Hop).
@@ -1590,7 +1590,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
     apply rngl_sin_eq in Hes23.
     destruct Hes23; subst θ2; [ apply (rngl_le_refl Hor) | ].
     rewrite (rngl_cos_sub_straight_l Hon Hop) in H23.
-    rewrite <- (angle_sub_add_distr Hic Hop) in Hzs12 |-*.
+    rewrite <- angle_sub_add_distr in Hzs12 |-*.
     rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12.
     rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc2 |-*.
     apply (rngl_opp_pos_neg Hop Hor) in Hzc2.
@@ -1722,7 +1722,7 @@ progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_hyp T Hzc2.
 progress sin_cos_add_sub_right_hyp T Hzs12.
 progress sin_cos_add_sub_right_goal T.
-apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
@@ -2332,9 +2332,9 @@ destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hs12| Hs12]. {
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
   rewrite (rngl_cos_sub_straight_l Hon Hop) in Hzc1.
-  rewrite <- (angle_sub_add_distr Hic Hop) in Hzs12.
+  rewrite <- angle_sub_add_distr in Hzs12.
   rewrite (rngl_sin_sub_straight_l Hon Hop) in Hzs12.
-  rewrite <- (angle_sub_add_distr Hic Hop).
+  rewrite <- angle_sub_add_distr.
   do 2 rewrite (rngl_cos_sub_straight_l Hon Hop).
   apply -> (rngl_opp_lt_compat Hop Hor).
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzc1.
@@ -2432,34 +2432,6 @@ rewrite rngl_sin_sub_right_r.
 now apply (rngl_opp_nonneg_nonpos Hop Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_39 :
-  ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 < rngl_sin (θ1 - θ2))%L
-  → (rngl_cos θ1 < rngl_cos θ2)%L.
-Proof.
-destruct_ac.
-intros * Hs1z Hzs2 Hc1z Hzc2 Hzs12.
-apply (rngl_lt_iff Hor).
-split. {
-  apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-}
-intros H.
-apply rngl_cos_eq in H.
-destruct H; subst θ1. {
-  rewrite angle_sub_diag in Hzs12.
-  now apply (rngl_lt_irrefl Hor) in Hzs12.
-}
-cbn in Hs1z.
-apply (rngl_opp_pos_neg Hop Hor) in Hs1z.
-now apply (rngl_nle_gt Hor) in Hs1z.
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_40 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 (θ3 - angle_right)%A = false
@@ -2508,7 +2480,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
   progress unfold angle_add_overflow.
   rewrite angle_add_sub_assoc.
   rewrite <- angle_add_sub_swap.
-  rewrite <- (angle_sub_add_distr Hic Hop).
+  rewrite <- angle_sub_add_distr.
   rewrite (angle_right_add_right Hon Hop).
   progress unfold angle_ltb.
   rewrite rngl_sin_sub_straight_r.
@@ -2577,9 +2549,9 @@ progress sin_cos_add_sub_right_goal T.
 rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
-apply (rngl_lt_le_incl Hor) in Hc1z, Hzs3.
+apply (rngl_lt_le_incl Hor) in Hc1z, Hzs3, Hs1z.
 apply (rngl_lt_le_incl Hor).
-apply angle_add_le_mono_l_lemma_39; try easy.
+apply quadrant_1_sin_sub_pos_cos_lt; try easy.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_41 :
@@ -2665,7 +2637,8 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
       apply rngl_cos_lt_rngl_cos_sub; try easy.
       now apply (rngl_lt_le_incl Hor).
       apply (rngl_lt_le_incl Hor).
-      apply angle_add_le_mono_l_lemma_39; try easy.
+      apply quadrant_1_sin_sub_pos_cos_lt; try easy.
+      now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
     } {
       apply (rngl_nle_gt Hor) in Hzc1.
@@ -2679,7 +2652,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0)%L as [Hc2z| Hzc2]. {
       progress unfold angle_add_overflow.
       rewrite angle_add_sub_assoc.
       rewrite <- angle_add_sub_swap.
-      rewrite <- (angle_sub_add_distr Hic Hop).
+      rewrite <- angle_sub_add_distr.
       rewrite (angle_right_add_right Hon Hop).
       progress unfold angle_ltb.
       rewrite rngl_sin_sub_straight_r.
@@ -2773,7 +2746,7 @@ apply (rngl_nle_gt Hor) in Hc23.
 rewrite angle_add_comm in Hc12z.
 apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 apply rngl_sin_add_nonneg; try easy.
-apply rngl_sin_cos_nonneg_sin_sub_nonneg_cos_le; try easy.
+apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
 apply rngl_sin_add_nonneg; try easy.
 rewrite angle_sub_sub_distr.
 rewrite (angle_add_comm θ1).
@@ -3215,11 +3188,9 @@ destruct (rngl_lt_dec Hor (rngl_sin θ1) 0) as [Hs1z| Hzs1]. {
       rewrite rngl_cos_sub_comm.
       apply rngl_cos_lt_rngl_cos_sub; try easy.
       apply (rngl_lt_le_incl Hor).
-      apply angle_add_le_mono_l_lemma_39; try easy. {
+      apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
         apply not_eq_sym in Hs1z.
         now apply (rngl_lt_iff Hor).
-      } {
-        now apply (rngl_lt_le_incl Hor) in Hzs3.
       } {
         now apply (rngl_lt_le_incl Hor) in Hzc1.
       } {
@@ -3713,7 +3684,8 @@ rewrite rngl_cos_sub_comm.
 apply rngl_cos_lt_rngl_cos_sub; try easy.
 now apply (rngl_lt_le_incl Hor).
 apply (rngl_lt_le_incl Hor).
-apply angle_add_le_mono_l_lemma_39; try easy.
+apply quadrant_1_sin_sub_pos_cos_lt; try easy.
+now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).

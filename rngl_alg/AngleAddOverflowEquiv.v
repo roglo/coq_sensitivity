@@ -402,9 +402,9 @@ destruct zs. {
     rewrite (rngl_add_opp_r Hop).
     apply (rngl_lt_0_sub Hop Hor).
     rewrite <- rngl_cos_right_div_2.
-    apply angle_add_le_mono_l_lemma_39. {
+    apply quadrant_1_sin_sub_pos_cos_lt. {
       rewrite rngl_sin_right_div_2.
-      apply (rl_sqrt_half_pos Hc1).
+      apply rl_sqrt_half_nonneg.
     } {
       now apply (rngl_lt_le_incl Hor) in Hzs.
     } {
