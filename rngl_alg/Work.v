@@ -2548,8 +2548,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 (**)
+apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
+progress unfold seq_angle_to_div_nat.
 ...
 (**)
 remember (θ <? angle_straight)%A as ts eqn:Hts.
