@@ -2119,63 +2119,79 @@ destruct zsm. {
       clear Hnz.
       cbn - [ angle_div_2_pow ] in Hθ'.
       cbn in Hni.
+      rename Hmi into Hn1.
       destruct (le_dec n 2) as [Hn2| Hn2]. {
-        rewrite (Nat_div_less_small 16) in Hθ'; [ | cbn; flia Hn2 Hmi ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 16 4 θ) as H1.
+        set (m := 32 / 2).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 16 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 3) as [Hn3| Hn3]. {
-        rewrite (Nat_div_less_small 10) in Hθ'; [ | cbn; flia Hn3 Hn2 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 10 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 3) as [Hn2| Hn2]. {
+        set (m := 32 / 3).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 10 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 4) as [Hn4| Hn4]. {
-        rewrite (Nat_div_less_small 8) in Hθ'; [ | cbn; flia Hn4 Hn3 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 8 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 4) as [Hn2| Hn2]. {
+        set (m := 32 / 4).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 8 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 5) as [Hn5| Hn5]. {
-        rewrite (Nat_div_less_small 6) in Hθ'; [ | cbn; flia Hn5 Hn4 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 6 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 5) as [Hn2| Hn2]. {
+        set (m := 32 / 5).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 6 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 6) as [Hn6| Hn6]. {
-        rewrite (Nat_div_less_small 5) in Hθ'; [ | cbn; flia Hn6 Hn5 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 5 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 6) as [Hn2| Hn2]. {
+        set (m := 32 / 6).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 5 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 8) as [Hn8| Hn8]. {
-        rewrite (Nat_div_less_small 4) in Hθ'; [ | cbn; flia Hn8 Hn6 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 4 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 8) as [Hn2| Hn2]. {
+        set (m := 32 / 8).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 4 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 10) as [Hn10| Hn10]. {
-        rewrite (Nat_div_less_small 3) in Hθ'; [ | cbn; flia Hn10 Hn8 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 3 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 10) as [Hn2| Hn2]. {
+        set (m := 32 / 10).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 3 apply -> Nat.succ_le_mono.
       }
-      destruct (le_dec n 16) as [Hn16| Hn16]. {
-        rewrite (Nat_div_less_small 2) in Hθ'; [ | cbn; flia Hn16 Hn10 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 2 4 θ) as H1.
+      clear Hn1; rename Hn2 into Hn1.
+      destruct (le_dec n 16) as [Hn2| Hn2]. {
+        set (m := 32 / 16).
+        rewrite (Nat_div_less_small m) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 m 4 θ) as H1.
         rewrite Hθ' in H1.
         apply (angle_lt_irrefl angle_straight), H1.
         now cbn; do 2 apply -> Nat.succ_le_mono.
       }
-      rewrite (Nat_div_less_small 1) in Hθ'; [ | cbn; flia Hn16 Hni ].
+      rewrite (Nat_div_less_small 1) in Hθ'; [ | cbn; flia Hn2 Hni ].
       rewrite angle_mul_1_l in Hθ'.
       now apply (angle_div_2_not_straight Hc1) in Hθ'.
     }
