@@ -2027,6 +2027,30 @@ destruct zsm. {
     destruct n; [ flia Hmi | ].
     cbn; flia.
   }
+  destruct m. {
+    destruct i; [ cbn in Hni; flia Hmi Hni | ].
+    enough (Hθ : (2 ^ S i / n * (θ / ₂^S i) < angle_straight)%A). {
+      exfalso.
+      rewrite <- Hθ' in Hθ.
+      apply (rngl_nlt_ge Hor) in Hsz.
+      apply Hsz; clear Hsz.
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply rngl_sin_nonneg_angle_le_straight.
+        now apply angle_lt_le_incl in Hθ.
+      }
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      move H at top.
+      destruct H; [ easy | subst θ' ].
+      now apply angle_lt_irrefl in Hθ.
+    }
+    apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
+    apply Nat.div_le_upper_bound; [ flia Hmi | ].
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi | ].
+    cbn; flia.
+  }
 ...
 destruct i. {
   cbn in Hni.
