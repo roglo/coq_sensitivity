@@ -1968,7 +1968,6 @@ destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
-(**)
 apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
@@ -1980,53 +1979,6 @@ rewrite (rngl_leb_opp_r Hop Hor).
 rewrite (rngl_opp_0 Hop).
 destruct (angle_eq_dec θ' 0) as [Htz| Htz]; [ now left | right ].
 ...
-(**)
-(*
-specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
-specialize (H1 m n (S i) (2 * θ)%A).
-(* θ + straight = (2 * θ) / ₂ *)
-assert (H : m < n ≤ 2 ^ S i) by ...
-specialize (H1 H); clear H.
-assert (H : (2 * θ < angle_straight)%A) by ...
-specialize (H1 H); clear H.
-progress unfold seq_angle_to_div_nat in H1.
-progress unfold seq_angle_to_div_nat.
-rewrite angle_div_2_pow_succ_r_2 in H1.
-rewrite angle_mul_2_div_2 in H1.
-generalize Hts; intros H.
-apply angle_nlt_ge in H.
-apply Bool.not_true_iff_false in H.
-rewrite H in H1; clear H.
-replace (θ + angle_straight)%A with ((2 * θ) / ₂)%A in H1 by ...
-rewrite <- angle_div_2_pow_succ_r_2 in H1.
-rewrite angle_mul_2_div_2_pow in H1.
-progress unfold two_straight_div_2_pow in H1.
-...
-rewrite angle_div_2_pow_mul in H1.
-...
-rewrite angle_div_2_pow_succ_r_1 in H1.
-...
-destruct i. {
-  cbn in Hni.
-  apply Nat.le_1_r in Hni.
-  destruct Hni as [| Hni]; [ easy | subst n ].
-  apply Nat.lt_1_r in Hmi; subst m; cbn.
-  apply angle_add_overflow_0_r.
-}
-destruct (le_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
-  specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
-  specialize (H1 m n i (θ / ₂)%A).
-  assert (H : m < n ≤ 2 ^ i) by easy.
-  specialize (H1 H); clear H.
-  specialize (angle_div_2_lt_straight Hc1 θ) as H.
-  specialize (H1 H); clear H.
-  progress unfold seq_angle_to_div_nat in H1.
-  progress unfold seq_angle_to_div_nat.
-  rewrite <- angle_div_2_pow_succ_r_2 in H1.
-...
-Search (angle_add_overflow _ _ = false).
-...
-*)
 destruct i. {
   cbn in Hni.
   apply Nat.le_1_r in Hni.
@@ -2274,12 +2226,6 @@ destruct i. {
       cbn - [ angle_mul_nat angle_div_2_pow ].
 Check angle_add_overflow_lt_straight_le_straight.
 About angle_add_overflow_lt_straight_le_straight.
-Theorem angle_add_overflow_lt_le :
-  ∀ θ θ1 θ2,
-  (θ1 < θ)%A
-  → (θ2 ≤ - θ)%A
-  → angle_add_overflow θ1 θ2 = false.
-(* en principe dans Complex.v *)
 ...
 apply (angle_add_overflow_lt_le angle_straight).
 (* par exemple *)
