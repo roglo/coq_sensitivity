@@ -1962,19 +1962,25 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
-(**)
-apply angle_add_not_overflow_comm.
-apply angle_add_not_overflow_equiv3.
-progress unfold angle_add_not_overflow3.
-progress unfold seq_angle_to_div_nat.
-...
-(**)
 remember (θ <? angle_straight)%A as ts eqn:Hts.
 symmetry in Hts.
 destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
+(**)
+apply angle_add_not_overflow_comm.
+apply angle_add_not_overflow_equiv3.
+progress unfold angle_add_not_overflow3.
+progress unfold seq_angle_to_div_nat.
+progress unfold angle_ltb.
+remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
+cbn.
+rewrite (rngl_leb_opp_r Hop Hor).
+rewrite (rngl_opp_0 Hop).
+destruct (angle_eq_dec θ' 0) as [Htz| Htz]; [ now left | right ].
+...
+(**)
 (*
 specialize angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight as H1.
 specialize (H1 m n (S i) (2 * θ)%A).
