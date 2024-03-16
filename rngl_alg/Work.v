@@ -2017,115 +2017,16 @@ destruct zsm. {
     clear Hsz Htz.
     symmetry in Hθ'.
     destruct i; [ now apply Nat.nle_gt in Hmi | ].
-    destruct i. {
-      cbn in Hni.
-      replace n with 2 in Hθ' by flia Hmi Hni.
-      cbn in Hθ'.
-      rewrite angle_add_0_r in Hθ'.
-      now apply (angle_div_2_not_straight Hc1) in Hθ'.
-    }
-    destruct i. {
-      cbn - [ angle_div_2_pow ] in Hθ'.
-      cbn in Hni.
-      destruct n; [ easy | clear Hnz ].
-      apply Nat.succ_lt_mono in Hmi.
-      destruct n; [ easy | clear Hmi ].
-      do 2 apply Nat.succ_le_mono in Hni.
-      destruct n. {
-        cbn - [ angle_mul_nat ] in Hθ'.
-        rewrite angle_div_2_mul_2 in Hθ'.
-        now apply (angle_div_2_not_straight Hc1) in Hθ'.
-      }
-      rewrite (Nat_div_less_small 1) in Hθ'; [ | cbn; flia Hni ].
-      rewrite angle_mul_1_l in Hθ'.
-      now apply (angle_div_2_not_straight Hc1) in Hθ'.
-    }
-    destruct i. {
-      cbn - [ angle_div_2_pow ] in Hθ'.
-      cbn in Hni.
-      destruct n; [ easy | clear Hnz ].
-      apply Nat.succ_lt_mono in Hmi.
-      apply Nat.neq_0_lt_0 in Hmi.
-      destruct n; [ easy | clear Hmi ].
-      do 2 apply Nat.succ_le_mono in Hni.
-      destruct n. {
-        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
-        rewrite angle_div_2_pow_succ_r_2 in Hθ'.
-        replace 4 with (2 ^ 2) in Hθ' by easy.
-        rewrite angle_div_2_pow_mul_2_pow in Hθ'.
-        now apply (angle_div_2_not_straight Hc1) in Hθ'.
-      }
-      destruct n. {
-        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
-        rewrite angle_div_2_pow_succ_r_1 in Hθ'.
-        rewrite angle_div_2_mul_2 in Hθ'.
-        now apply (angle_div_2_not_straight Hc1) in Hθ'.
-      }
-      destruct n. {
-        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
-        rewrite angle_div_2_pow_succ_r_1 in Hθ'.
-        rewrite angle_div_2_mul_2 in Hθ'.
-        now apply (angle_div_2_not_straight Hc1) in Hθ'.
-      }
-      do 3 apply Nat.succ_le_mono in Hni.
-      rewrite (Nat_div_less_small 1) in Hθ'; [ | flia Hni ].
-      rewrite angle_mul_1_l in Hθ'.
-      now apply (angle_div_2_not_straight Hc1) in Hθ'.
-    }
-    destruct i. {
-      clear Hnz.
-      cbn - [ angle_div_2_pow ] in Hθ'.
-      cbn in Hni.
-      destruct (le_dec n 2) as [Hn2| Hn2]. {
-        rewrite (Nat_div_less_small 8) in Hθ'; [ | cbn; flia Hn2 Hmi ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 8 3 θ) as H1.
-        rewrite Hθ' in H1.
-        apply (angle_lt_irrefl angle_straight), H1.
-        now cbn; do 8 apply -> Nat.succ_le_mono.
-      }
-      destruct (le_dec n 3) as [Hn3| Hn3]. {
-        rewrite (Nat_div_less_small 5) in Hθ'; [ | cbn; flia Hn3 Hn2 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 5 3 θ) as H1.
-        rewrite Hθ' in H1.
-        apply (angle_lt_irrefl angle_straight), H1.
-        now cbn; do 5 apply -> Nat.succ_le_mono.
-      }
-      destruct (le_dec n 4) as [Hn4| Hn4]. {
-        rewrite (Nat_div_less_small 4) in Hθ'; [ | cbn; flia Hn4 Hn3 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 4 3 θ) as H1.
-        rewrite Hθ' in H1.
-        apply (angle_lt_irrefl angle_straight), H1.
-        now cbn; do 4 apply -> Nat.succ_le_mono.
-      }
-      destruct (le_dec n 5) as [Hn5| Hn5]. {
-        rewrite (Nat_div_less_small 3) in Hθ'; [ | cbn; flia Hn5 Hn4 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 3 3 θ) as H1.
-        rewrite Hθ' in H1.
-        apply (angle_lt_irrefl angle_straight), H1.
-        now cbn; do 3 apply -> Nat.succ_le_mono.
-      }
-      destruct (le_dec n 8) as [Hn6| Hn6]. {
-        rewrite (Nat_div_less_small 2) in Hθ'; [ | cbn; flia Hn6 Hn5 ].
-        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 2 3 θ) as H1.
-        rewrite Hθ' in H1.
-        apply (angle_lt_irrefl angle_straight), H1.
-        now cbn; do 2 apply -> Nat.succ_le_mono.
-      }
-      rewrite (Nat_div_less_small 1) in Hθ'; [ | cbn; flia Hn6 Hni ].
-      rewrite angle_mul_1_l in Hθ'.
-      now apply (angle_div_2_not_straight Hc1) in Hθ'.
-    }
-    destruct i. {
-      assert (Hθ : (2 ^ 5 / n * (θ / ₂^5) < angle_straight)%A). {
-        apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-        apply Nat.div_le_upper_bound; [ flia Hmi | ].
-        destruct n; [ easy | ].
-        destruct n; [ flia Hmi | ].
-        cbn; flia.
-      }
+    enough (Hθ : (2 ^ S i / n * (θ / ₂^S i) < angle_straight)%A). {
       rewrite Hθ' in Hθ.
       now apply angle_lt_irrefl in Hθ.
     }
+    apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
+    apply Nat.div_le_upper_bound; [ flia Hmi | ].
+    destruct n; [ easy | ].
+    destruct n; [ flia Hmi | ].
+    cbn; flia.
+  }
 ...
 destruct i. {
   cbn in Hni.
