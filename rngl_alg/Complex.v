@@ -2837,15 +2837,6 @@ eapply angle_add_overflow_le; [ | apply H2n2 ].
 now apply angle_mul_le_mono_l.
 Qed.
 
-Theorem angle_add_overflow_0_r : ∀ θ, angle_add_overflow θ 0 = false.
-Proof.
-intros.
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-rewrite angle_add_0_r.
-apply angle_le_refl.
-Qed.
-
 Theorem rl_sqrt_nonneg : ∀ a, (0 ≤ a → 0 ≤ √ a)%L.
 Proof.
 intros * Ha.

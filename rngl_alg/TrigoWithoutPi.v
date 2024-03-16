@@ -2196,13 +2196,21 @@ apply rngl_leb_le.
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_add_overflow_0_l :
-  ∀ θ, angle_add_overflow 0 θ = false.
+Theorem angle_add_overflow_0_l : ∀ θ, angle_add_overflow 0 θ = false.
 Proof.
 intros.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 apply angle_nonneg.
+Qed.
+
+Theorem angle_add_overflow_0_r : ∀ θ, angle_add_overflow θ 0 = false.
+Proof.
+intros.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_0_r.
+apply angle_le_refl.
 Qed.
 
 Theorem rngl_sin_nonneg_add_nonneg :

@@ -7,7 +7,6 @@ Require Import TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleLeSubAdd.
 Require Import TacChangeAngle.
-Require Import Complex.
 
 Section a.
 
