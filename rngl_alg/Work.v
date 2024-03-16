@@ -1942,6 +1942,21 @@ apply Nat.mul_le_mono_r.
 now do 2 apply -> Nat.succ_le_mono.
 Qed.
 
+Theorem angle_div_2_pow_succ_mul_lt_straight :
+  rngl_characteristic T ≠ 1 →
+  ∀ n i θ,
+  n ≤ 2 ^ i
+  → (n * (θ / ₂^S i) < angle_straight)%A.
+Proof.
+intros Hc1 * Hni.
+apply (angle_add_diag_not_overflow Hc1).
+apply angle_mul_nat_overflow_distr_add_overflow.
+rewrite Nat_add_diag.
+rewrite angle_div_2_pow_succ_r_1.
+apply angle_mul_nat_overflow_mul_2_div_2.
+now apply angle_mul_nat_overflow_div_2_pow.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2065,6 +2080,38 @@ destruct zsm. {
       apply Nat.neq_0_lt_0 in Hmi.
       destruct n; [ easy | clear Hmi ].
       do 2 apply Nat.succ_le_mono in Hni.
+      destruct (le_dec n 0) as [Hnz| Hnz]. {
+        rewrite (Nat_div_less_small 8) in Hθ'; [ | cbn; flia Hnz ].
+        replace 8 with (2 ^ 3) in Hθ' by easy.
+        rewrite angle_div_2_pow_succ_r_2 in Hθ'.
+        rewrite angle_div_2_pow_mul_2_pow in Hθ'.
+        now apply (angle_div_2_not_straight Hc1) in Hθ'.
+      }
+      destruct (le_dec n 1) as [Hn1| Hn1]. {
+        rewrite (Nat_div_less_small 5) in Hθ'; [ | cbn; flia Hn1 Hnz ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 5 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 5 apply -> Nat.succ_le_mono.
+      }
+      destruct (le_dec n 2) as [Hn2| Hn2]. {
+        rewrite (Nat_div_less_small 4) in Hθ'; [ | cbn; flia Hn2 Hn1 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 4 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 4 apply -> Nat.succ_le_mono.
+      }
+      destruct (le_dec n 3) as [Hn3| Hn3]. {
+        rewrite (Nat_div_less_small 3) in Hθ'; [ | cbn; flia Hn3 Hn2 ].
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 3 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 3 apply -> Nat.succ_le_mono.
+      }
+...
       destruct n. {
         cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
         rewrite angle_div_2_pow_succ_r_2 in Hθ'.
@@ -2075,8 +2122,52 @@ destruct zsm. {
       destruct n. {
         clear Hni.
         cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
-Search (_ * (_ / ₂^_) < angle_straight)%A.
-Search (_ * _ < angle_straight)%A.
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 5 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 5 apply -> Nat.succ_le_mono.
+      }
+      destruct n. {
+        clear Hni.
+        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 4 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 4 apply -> Nat.succ_le_mono.
+      }
+      destruct n. {
+        clear Hni.
+        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 3 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 3 apply -> Nat.succ_le_mono.
+      }
+      destruct (le_dec n 2) as [Hn3| Hn3]. {
+        rewrite (Nat_div_less_small 2) in Hθ'; [ | cbn; flia Hn3 ].
+        rewrite angle_div_2_pow_succ_r_1 in Hθ'.
+        rewrite angle_div_2_mul_2 in Hθ'.
+        now apply (angle_div_2_not_straight Hc1) in Hθ'.
+      }
+      apply Nat.nle_gt in Hn3.
+      rewrite (Nat_div_less_small 1) in Hθ'; [ | cbn; flia Hn3 Hni ].
+      rewrite angle_mul_1_l in Hθ'.
+      now apply (angle_div_2_not_straight Hc1) in Hθ'.
+    }
+    destruct i. {
+...
+      destruct n. {
+        clear Hni.
+        cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+        specialize (angle_div_2_pow_succ_mul_lt_straight Hc1 1 3 θ) as H1.
+        rewrite Hθ' in H1.
+        specialize (angle_lt_irrefl angle_straight) as H2.
+        apply H2, H1.
+        now cbn; do 1 apply -> Nat.succ_le_mono.
+      }
 ...
 destruct i. {
   cbn in Hni.
