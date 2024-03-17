@@ -1977,12 +1977,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
+(*
 remember (θ <? angle_straight)%A as ts eqn:Hts.
 symmetry in Hts.
 destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
+*)
 apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
@@ -2029,6 +2031,60 @@ destruct zsm. {
   destruct n; [ flia Hmi | ].
   cbn; flia.
 }
+apply (rngl_leb_gt Hor) in Hzsm.
+destruct i. {
+  cbn in Hni.
+  apply Nat.le_1_r in Hni.
+  destruct Hni; [ easy | subst n ].
+  apply Nat.lt_1_r in Hmi; subst m.
+  cbn in Hzsm.
+  now apply (rngl_lt_irrefl Hor) in Hzsm.
+}
+destruct sz. {
+  exfalso.
+  apply rngl_leb_le in Hsz.
+  apply (rngl_nlt_ge Hor) in Hsz.
+  apply Hsz; clear Hsz.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply rngl_sin_nonneg_angle_le_straight.
+    rewrite Hθ'.
+    apply angle_lt_le_incl.
+    apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
+    apply Nat.div_le_upper_bound; [ flia Hmi | ].
+    destruct n; [ easy | ].
+    destruct n. {
+      apply Nat.lt_1_r in Hmi; subst m.
+      cbn in Hzsm.
+      now apply (rngl_lt_irrefl Hor) in Hzsm.
+    }
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_r.
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  intros H; symmetry in H.
+  apply eq_rngl_sin_0 in H.
+  move H at top.
+  destruct H; [ easy | subst θ' ].
+  symmetry in Hθ'.
+  enough (Hθ : (2 ^ S i / n * (θ / ₂^S i) < angle_straight)%A). {
+    rewrite Hθ' in Hθ.
+    now apply angle_lt_irrefl in Hθ.
+  }
+  apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
+  apply Nat.div_le_upper_bound; [ flia Hmi | ].
+  destruct n; [ easy | ].
+  destruct n. {
+    apply Nat.lt_1_r in Hmi; subst m.
+    cbn in Hzsm.
+    now apply (rngl_lt_irrefl Hor) in Hzsm.
+  }
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_r.
+  now do 2 apply -> Nat.succ_le_mono.
+}
+apply (rngl_leb_gt Hor) in Hsz.
+apply rngl_ltb_lt.
 ...
 destruct i. {
   cbn in Hni.
