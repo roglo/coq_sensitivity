@@ -1977,14 +1977,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
-(**)
+(*
 remember (θ <? angle_straight)%A as ts eqn:Hts.
 symmetry in Hts.
 destruct ts. {
   now apply angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
 }
 apply angle_ltb_ge in Hts.
-(**)
+*)
 apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
@@ -2088,7 +2088,7 @@ apply rngl_ltb_lt.
 apply (rngl_nle_gt Hor).
 intros Hcc.
 apply (rngl_nle_gt Hor) in Hzsm.
-apply Hzsm.
+apply Hzsm; clear Hzsm.
 rewrite Hθ'.
 rewrite angle_mul_nat_assoc.
 destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
@@ -2102,6 +2102,18 @@ destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
   now apply Nat.mul_le_mono_r.
 }
 apply Nat.nle_gt in Hmn.
+Search (rngl_sin (_ * _)).
+...
+rewrite <- angle_div_2_pow_mul. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ S i)). {
+    eapply le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.mul_le_mono_r.
+    now apply Nat.lt_le_incl in Hmi.
+  }
+...
+Search (angle_mul_nat_overflow _ _ = false).
+apply angle_mul_nat_overflow_div_2_pow
 ...
 destruct i. {
   cbn in Hni.
