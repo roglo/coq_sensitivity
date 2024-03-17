@@ -2234,6 +2234,27 @@ destruct i. {
   apply (rngl_lt_sub_0 Hop Hor).
   specialize (cos2_sin2_1 θ') as H1.
   apply (rngl_add_move_l Hop) in H1.
+  rewrite H1.
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_1_r Hon).
+  apply (rngl_lt_add_lt_sub_r Hop Hor).
+  rewrite (rngl_add_mul_r_diag_r Hon).
+Notation "3" := (1 + 2)%L : ring_like_scope.
+Notation "4" := (1 + 3)%L : ring_like_scope.
+Show.
+  (* lemma *)
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+    apply (rngl_add_nonneg_pos Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite Hθ'.
+Search (rngl_cos (_ / ₂)).
 ...
 Search ((_ / ₂^_) = angle_right)%A.
 Search (angle_right = (_ / ₂^_))%A.
