@@ -2102,21 +2102,51 @@ destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
   now apply Nat.mul_le_mono_r.
 }
 apply Nat.nle_gt in Hmn.
-...
-apply rngl_sin_nonneg_angle_le_straight.
-apply angle_lt_le_incl.
-apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-...
-rewrite <- angle_div_2_pow_mul. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ S i)). {
-    eapply le_trans; [ now apply Nat.div_mul_le | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
-    apply Nat.mul_le_mono_r.
-    now apply Nat.lt_le_incl in Hmi.
+destruct i. {
+  cbn in Hni.
+  destruct n; [ easy | clear Hnz ].
+  destruct n; [ now apply Nat.lt_1_r in Hmi; subst m | ].
+  do 2 apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  cbn in Hθ'.
+  rewrite angle_add_0_r in Hθ'; subst θ'.
+  destruct m. {
+    rewrite angle_mul_0_l; cbn.
+    apply (rngl_le_refl Hor).
   }
-...
-Search (angle_mul_nat_overflow _ _ = false).
-apply angle_mul_nat_overflow_div_2_pow
+  apply Nat.succ_lt_mono in Hmi.
+  apply Nat.lt_1_r in Hmi; subst m.
+  now apply Nat.lt_irrefl in Hmn.
+}
+destruct i. {
+  cbn in Hni.
+  destruct n; [ easy | clear Hnz ].
+  destruct n; [ now apply Nat.lt_1_r in Hmi; subst m | ].
+  destruct n; [ flia Hmi Hmn | ].
+  destruct n. {
+    destruct m; [ flia Hmn | ].
+    destruct m; [ flia Hmn | ].
+    do 2 apply Nat.succ_lt_mono in Hmi.
+    apply Nat.lt_1_r in Hmi; subst m.
+    cbn - [ angle_div_2_pow ] in Hθ'.
+    rewrite angle_add_0_r in Hθ'; subst θ'.
+    rewrite angle_div_2_pow_succ_r_1.
+    rewrite angle_div_2_mul_2.
+    apply rngl_sin_div_2_nonneg.
+  }
+  do 4 apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  cbn - [ angle_div_2_pow ] in Hθ'.
+  rewrite angle_add_0_r in Hθ'; subst θ'.
+  destruct m; [ flia Hmn | ].
+  destruct m; [ flia Hmn | ].
+  destruct m. {
+    rewrite angle_div_2_pow_succ_r_1.
+    rewrite angle_div_2_mul_2.
+    apply rngl_sin_div_2_nonneg.
+  }
+  do 3 apply Nat.succ_lt_mono in Hmi.
+  apply Nat.lt_1_r in Hmi; subst m.
 ...
 destruct i. {
   cbn in Hni.
