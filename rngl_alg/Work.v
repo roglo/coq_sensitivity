@@ -1957,6 +1957,41 @@ apply angle_mul_nat_overflow_mul_2_div_2.
 now apply angle_mul_nat_overflow_div_2_pow.
 Qed.
 
+Theorem rngl_cos_div_2_pow_2_nonneg :
+  ∀ θ, (0 ≤ rngl_cos (θ / ₂^2))%L.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_div_2_pow_succ_r_1.
+cbn - [ angle_div_2_pow ].
+remember (0 ≤? _)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. 2: {
+  exfalso.
+  apply Bool.not_true_iff_false in Hzs.
+  apply Hzs; clear Hzs.
+  apply rngl_leb_le.
+  apply rl_sqrt_nonneg.
+  apply rngl_1_sub_cos_div_2_nonneg.
+}
+rewrite (rngl_mul_1_l Hon).
+apply rl_sqrt_nonneg.
+apply rngl_1_add_cos_div_2_nonneg.
+Qed.
+
+Theorem rngl_cos_div_2_pow_nonneg :
+  ∀ n θ, 2 ≤ n → (0 ≤ rngl_cos (θ / ₂^n))%L.
+Proof.
+intros * H2n.
+destruct n; [ easy | ].
+rewrite angle_div_2_pow_succ_r_1.
+apply rngl_cos_div_2_nonneg.
+apply Nat.succ_le_mono in H2n.
+destruct n; [ easy | clear H2n ].
+rewrite angle_div_2_pow_succ_r_1.
+apply rngl_sin_div_2_nonneg.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -1968,6 +2003,8 @@ Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
   intros.
@@ -2103,6 +2140,7 @@ destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
 }
 apply Nat.nle_gt in Hmn.
 destruct i. {
+  exfalso.
   cbn in Hni.
   destruct n; [ easy | clear Hnz ].
   destruct n; [ now apply Nat.lt_1_r in Hmi; subst m | ].
@@ -2110,10 +2148,7 @@ destruct i. {
   apply Nat.le_0_r in Hni; subst n.
   cbn in Hθ'.
   rewrite angle_add_0_r in Hθ'; subst θ'.
-  destruct m. {
-    rewrite angle_mul_0_l; cbn.
-    apply (rngl_le_refl Hor).
-  }
+  destruct m; [ easy | ].
   apply Nat.succ_lt_mono in Hmi.
   apply Nat.lt_1_r in Hmi; subst m.
   now apply Nat.lt_irrefl in Hmn.
@@ -2147,6 +2182,90 @@ destruct i. {
   }
   do 3 apply Nat.succ_lt_mono in Hmi.
   apply Nat.lt_1_r in Hmi; subst m.
+  clear Hmn.
+  exfalso.
+  apply (rngl_nlt_ge Hor) in Hcc.
+  apply Hcc; clear Hcc.
+  apply (rngl_lt_le_trans Hor _ 0); [ | now apply rngl_cos_div_2_pow_nonneg ].
+  remember (θ / ₂^2)%A as θ' eqn:Hθ'.
+  rewrite rngl_cos_nx.
+  progress unfold iter_seq.
+  rewrite Nat.sub_0_r.
+  progress unfold iter_list.
+  cbn - [ "-" "/" binomial ].
+  rewrite rngl_add_0_l, rngl_add_0_r, rngl_add_0_r.
+  rewrite Nat.sub_0_r.
+  cbn - [ "-" "/" binomial ].
+  do 3 rewrite (rngl_mul_1_r Hon).
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.div_same; [ | easy ].
+  cbn - [ "/" binomial ].
+  do 3 rewrite (rngl_mul_opp_l Hop).
+  do 2 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_1_r Hon).
+  cbn.
+  rewrite rngl_add_0_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_add_opp_r Hop).
+  rewrite <- (rngl_mul_sub_distr_r Hop).
+  do 2 rewrite fold_rngl_squ.
+  specialize (rngl_cos_div_2_pow_2_nonneg θ) as Hzc.
+  rewrite <- Hθ' in Hzc.
+  (* lemma *)
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_pos_neg Hop Hor Hid). {
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_cos_0 in H.
+    move H at top.
+    destruct H; subst θ'. {
+      rewrite <- angle_straight_div_2 in Hθ'.
+      apply angle_div_2_eq_compat in Hθ'.
+      symmetry in Hθ'.
+      now apply (angle_div_2_not_straight Hc1) in Hθ'.
+    }
+    apply (rngl_nle_gt Hor) in Hsz.
+    apply Hsz; clear Hsz; cbn.
+    apply (rngl_opp_1_le_0 Hon Hop Hor).
+  }
+  apply (rngl_lt_sub_0 Hop Hor).
+  specialize (cos2_sin2_1 θ') as H1.
+  apply (rngl_add_move_l Hop) in H1.
+...
+Search ((_ / ₂^_) = angle_right)%A.
+Search (angle_right = (_ / ₂^_))%A.
+...
+Search (rngl_cos _ ≤ 0)%L.
+...
+destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hcz]. {
+...
+  replace 3 with (1 + 2) by easy.
+  rewrite angle_mul_add_distr_r.
+  rewrite angle_mul_1_l.
+  remember (2 * θ')%A as θ''; cbn; subst θ''.
+  rewrite rngl_cos_mul_2_l, rngl_sin_mul_2_l. θ''. θ''.
+  rewrite rngl_cos_mul_2_l, rngl_sin_mul_2_l θ''.
+  rewrite rngl_cos_mul_2_l, rngl_sin_mul_2_l θ''.
+  rewrite rngl_cos_mul_2_l, rngl_sin_mul_2_l
+  rewrite rngl_cos_mul_2_l, rngl_sin_mul_2_l
+  rewrite (rngl_mul_sub_distr_l Hop).
+...
+  cbn.
+  rewrite (rngl_mul_0_r Hos), (rngl_sub_0_r Hos).
+  rewrite (rngl_mul_0_r Hos), rngl_add_0_r.
+  do 2 rewrite (rngl_mul_1_r Hon).
+...
+  remember (2 * θ')%A as θ''.
+  cbn; subst θ''.
+cbn.
+Search (rngl_cos (3 * _)).
+...
+  cbn - [ angle_div_2_pow ].
+...
+Search (rngl_cos (_ / ₂^_)).
 ...
 destruct i. {
   cbn in Hni.
