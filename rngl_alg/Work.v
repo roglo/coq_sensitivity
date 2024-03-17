@@ -2007,17 +2007,16 @@ destruct zsm. {
     intros H.
     now apply eq_rngl_cos_1 in H.
   }
+  destruct i; [ cbn in Hni; flia Hmi Hni | ].
   destruct m. {
-    exfalso.
-    rewrite angle_mul_1_l in Hzsm.
-    apply (rngl_le_antisymm Hor) in Hzsm; [ | easy ].
-    apply eq_rngl_sin_0 in Hzsm.
-    move Hzsm at top.
-    destruct Hzsm; subst θ'; [ easy | ].
-    clear Hsz Htz.
-    symmetry in Hθ'.
-    destruct i; [ now apply Nat.nle_gt in Hmi | ].
     enough (Hθ : (2 ^ S i / n * (θ / ₂^S i) < angle_straight)%A). {
+      rewrite angle_mul_1_l in Hzsm.
+      apply (rngl_le_antisymm Hor) in Hzsm; [ | easy ].
+      apply eq_rngl_sin_0 in Hzsm.
+      move Hzsm at top.
+      destruct Hzsm; subst θ'; [ easy | ].
+      clear Hsz Htz.
+      symmetry in Hθ'.
       rewrite Hθ' in Hθ.
       now apply angle_lt_irrefl in Hθ.
     }
@@ -2028,7 +2027,6 @@ destruct zsm. {
     cbn; flia.
   }
   destruct m. {
-    destruct i; [ cbn in Hni; flia Hmi Hni | ].
     enough (Hθ : (2 ^ S i / n * (θ / ₂^S i) < angle_straight)%A). {
       exfalso.
       rewrite <- Hθ' in Hθ.
