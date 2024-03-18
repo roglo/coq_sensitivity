@@ -2022,6 +2022,10 @@ destruct ts. {
 }
 apply angle_ltb_ge in Hts.
 (**)
+progress unfold seq_angle_to_div_nat.
+remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
+...
+(**)
 apply angle_add_not_overflow_comm.
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
@@ -2139,6 +2143,8 @@ destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
   now apply Nat.mul_le_mono_r.
 }
 apply Nat.nle_gt in Hmn.
+Check angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight.
+...
 destruct i. {
   exfalso.
   cbn in Hni.
