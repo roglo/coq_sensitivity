@@ -849,11 +849,10 @@ symmetry.
 apply (rngl_add_opp_r Hop).
 Qed.
 
-Theorem angle_opp_involutive :
-  rngl_has_opp T = true →
-  ∀ θ, (- - θ)%A = θ.
+Theorem angle_opp_involutive : ∀ θ, (- - θ)%A = θ.
 Proof.
-intros Hop *.
+destruct_ac.
+intros.
 apply eq_angle_eq; cbn.
 f_equal.
 apply (rngl_opp_involutive Hop).
@@ -862,13 +861,12 @@ Qed.
 Theorem angle_sub_sub_distr :
   ∀ θ1 θ2 θ3, (θ1 - (θ2 - θ3))%A = (θ1 - θ2 + θ3)%A.
 Proof.
-destruct_ac.
 intros.
 progress unfold angle_sub.
 rewrite <- angle_add_assoc.
 f_equal.
 rewrite angle_opp_add_distr.
-rewrite (angle_opp_involutive Hop).
+rewrite angle_opp_involutive.
 apply angle_add_comm.
 Qed.
 
@@ -2761,7 +2759,7 @@ rewrite (rngl_squ_opp Hop).
 rewrite (rngl_add_comm √_)%L.
 remember (- θ2)%A as θ eqn:Hθ.
 symmetry in Hθ.
-rewrite <- (angle_opp_involutive Hop) in Hθ.
+rewrite <- angle_opp_involutive in Hθ.
 apply (angle_opp_inj Hop) in Hθ.
 subst θ2; rename θ into θ2.
 move θ2 before θ1.

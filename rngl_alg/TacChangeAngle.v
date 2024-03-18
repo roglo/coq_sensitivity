@@ -23,7 +23,7 @@ Ltac change_angle_sub_l θ a :=
 Ltac change_angle_opp θ :=
   remember (- θ)%A as θ' eqn:Hθ';
   apply (f_equal angle_opp) in Hθ';
-  rewrite (angle_opp_involutive ac_op) in Hθ';
+  rewrite angle_opp_involutive in Hθ';
   subst θ; rename θ' into θ.
 
 Ltac sin_cos_add_sub_right_hyp T H :=

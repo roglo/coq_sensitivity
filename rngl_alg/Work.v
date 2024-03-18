@@ -1539,7 +1539,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   change_angle_opp θ.
   progress sin_cos_opp_hyp T Hzc.
   progress sin_cos_opp_hyp T Hcz.
-  rewrite <- (angle_opp_involutive Hop (_ * _)).
+  rewrite <- (angle_opp_involutive (_ * _)).
   apply angle_opp_lt_compat_if. {
     intros H; subst θ.
     now apply (rngl_lt_irrefl Hor) in Hcz.
@@ -2061,8 +2061,37 @@ apply angle_add_overflow_le with (θ2 := θ). {
 }
 clear m Hmi.
 apply angle_add_not_overflow_comm.
-apply (angle_add_overflow_lt_le (- θ)).
-(* ouais, bof, faut voir... *)
+apply (angle_add_overflow_lt_le (- θ')). 2: {
+  rewrite angle_opp_involutive.
+  apply angle_le_refl.
+}
+rewrite <- (angle_opp_involutive θ).
+apply angle_opp_lt_compat_if. {
+  rewrite Hθ'.
+  apply angle_div_2_pow_mul_neq_0. {
+    intros H; subst θ.
+    apply angle_nlt_ge in Hts.
+    apply Hts, (angle_straight_pos Hc1).
+  }
+  split. {
+    apply Nat.div_str_pos.
+    split; [ now apply Nat.neq_0_lt_0 | easy ].
+  }
+  apply Nat.div_lt. {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
+}
+...
+apply (angle_lt_le_trans _ angle_straight); [ easy | ].
+(* aïe aïe aïe aïe... *)
+...
+angle_div_2_pow_mul_neq_0: ∀ (n i : nat) (θ : angle T), θ ≠ 0%A → 0 < n < 2 ^ i → (n * (θ / ₂^i))%A ≠ 0%A
+  intros H.
+Search (_ * _ = 0)%A.
 ...
 apply angle_add_overflow_lt_straight_le_straight; [ easy | ].
 ...
@@ -4763,7 +4792,7 @@ rewrite H1 in Hnt.
 (* ah, fait chier *)
 ...
 apply (angle_opp_inj Hop).
-rewrite (angle_opp_involutive Hop).
+rewrite angle_opp_involutive.
 Search (- angle_straight)%A.
 Search (n mod _ ≠ 0).
 rewrite
