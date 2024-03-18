@@ -2047,6 +2047,22 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
+apply angle_add_overflow_le with (θ2 := θ). {
+  rewrite <- (angle_div_2_pow_mul_2_pow i θ).
+  rewrite Hθ'.
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_nat_le_mono_nonneg_r. {
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.mul_le_mono_r.
+  now apply Nat.lt_le_incl in Hmi.
+}
+clear m Hmi.
+About angle_add_overflow_lt_straight_le_straight.
+...
+apply angle_add_overflow_lt_straight_le_straight; [ easy | ].
 ...
 (**)
 apply angle_add_not_overflow_comm.
