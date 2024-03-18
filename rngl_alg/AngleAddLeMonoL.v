@@ -7,6 +7,7 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi AngleLeSubAdd.
 Require Import AngleAddOverflowLe.
+Require Import AngleAddOverflowEquiv3.
 Require Import TacChangeAngle.
 
 Section a.
@@ -80,24 +81,6 @@ progress sin_cos_add_sub_right_hyp T Hzc1.
 progress sin_cos_add_sub_right_goal T.
 apply (rngl_lt_le_incl Hor) in Hs1z.
 now apply rngl_sin_add_nonneg.
-Qed.
-
-Theorem rngl_cos_sub_nonneg :
-  ∀ θ1 θ2 : angle T,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_cos (θ1 - θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hcs1 Hcs2.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-apply (rngl_add_nonneg_nonneg Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_sin_add_nonneg_sin_nonneg :
@@ -2296,28 +2279,6 @@ now apply (rngl_mul_pos_pos Hop Hor Hii).
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 apply (rngl_le_0_sub Hop Hor).
 apply rngl_sin_bound.
-Qed.
-
-Theorem quadrant_1_quadrant_4_cos_lt_cos_add :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzc1 Hzs2 Hzc2 Hzs12.
-change_angle_opp θ2.
-progress sin_cos_opp_hyp T Hzs2.
-progress sin_cos_opp_hyp T Hzs12.
-progress sin_cos_opp_hyp T Hzc2.
-progress sin_cos_opp_goal T.
-rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; [ easy | easy | ].
-apply (rngl_lt_le_incl Hor) in Hzs2.
-now apply quadrant_1_sin_sub_nonneg_cos_le.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_37 :

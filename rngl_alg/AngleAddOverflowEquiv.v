@@ -6,6 +6,7 @@ Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleLeSubAdd AngleDiv2Add.
+Require Import AngleAddOverflowEquiv3.
 Require Import TacChangeAngle.
 
 Section a.
