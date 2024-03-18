@@ -2060,7 +2060,9 @@ apply angle_add_overflow_le with (θ2 := θ). {
   now apply Nat.lt_le_incl in Hmi.
 }
 clear m Hmi.
-About angle_add_overflow_lt_straight_le_straight.
+apply angle_add_not_overflow_comm.
+apply (angle_add_overflow_lt_le (- θ)).
+(* ouais, bof, faut voir... *)
 ...
 apply angle_add_overflow_lt_straight_le_straight; [ easy | ].
 ...
