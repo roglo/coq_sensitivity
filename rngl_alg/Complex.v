@@ -1902,6 +1902,7 @@ Theorem angle_add_overflow_lt_le :
   → angle_add_overflow θ1 θ2 = false.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H1 H2.
 progress unfold angle_add_overflow.
 progress unfold angle_ltb.
@@ -2000,6 +2001,62 @@ destruct zs1. 2: {
     apply (rngl_le_trans Hor _ (rngl_sin θ)); [ | easy ].
     now apply (rngl_le_trans Hor _ (rngl_sin θ1)).
   }
+  apply (rngl_nle_gt Hor) in Hc1z.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+    change_angle_add_r θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T H1.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    apply (rngl_nlt_ge Hor) in Hzs12.
+    apply Hzs12; clear Hzs12.
+    apply (rngl_lt_iff Hor).
+    split. {
+      apply (rngl_lt_le_incl Hor) in Hzs1, Hc1z.
+      now apply (rngl_sin_add_nonneg).
+    }
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H| H]. {
+      apply angle_add_move_0_r in H.
+      subst θ1.
+      cbn in Hzs1.
+      apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
+      now apply (rngl_nle_gt Hor) in Hzs1.
+    }
+    apply angle_add_move_r in H.
+    subst θ1.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    now apply (rngl_nle_gt Hor) in Hc1z.
+  }
+  apply (rngl_nle_gt Hor) in Hzc2.
+  change_angle_add_r θ1 angle_straight.
+  progress sin_cos_add_sub_straight_hyp T H1.
+  progress sin_cos_add_sub_straight_hyp T Hzs1.
+  progress sin_cos_add_sub_straight_hyp T Hc1z.
+  progress sin_cos_add_sub_straight_hyp T Hzs12.
+  change_angle_sub_r θ2 angle_right.
+  progress sin_cos_add_sub_right_hyp T H2.
+  progress sin_cos_add_sub_right_hyp T Hzs2.
+  progress sin_cos_add_sub_right_hyp T Hzc2.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  move Hzs1 after Hzs.
+  move Hc1z before Hzs1.
+  move Hzc2 before Hc1z.
+  move θ2 before θ1.
+  move Hzs2 before Hzc2.
+  move Hzs12 before Hzs2.
+  apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Hzs12; clear Hzs12.
+...
+  cbn.
+  apply (rngl_lt_0_sub Hop Hor).
+  apply (rngl_le_lt_trans Hor _ (rngl_sin θ1 * - rngl_cos θ)%L). {
+    (* lemma *)
+    rewrite rngl_add_comm in H2.
+    apply (rngl_le_opp_r Hop Hor) in H2.
+    now apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+  }
 ...
 destruct zs1; [ | easy ].
 destruct zs2; [ | easy ].
@@ -2026,8 +2083,8 @@ apply (eq_rngl_cos_opp_1) in H.
 subst θ1.
 now apply (rngl_lt_irrefl Hor) in H1.
 Qed.
-
 ...
+AngleAddOverflowLe.v:Theorem angle_add_overflow_lt_straight_le_straight :
 *)
 
 Theorem angle_add_overflow_div_2_div_2 :
