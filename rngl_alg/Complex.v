@@ -1664,38 +1664,6 @@ destruct z1. {
 }
 Qed.
 
-Theorem angle_lt_le_trans :
-  ∀ θ1 θ2 θ3,
-  (θ1 < θ2 → θ2 ≤ θ3 → θ1 < θ3)%A.
-Proof.
-destruct_ac.
-intros * H12 H23.
-progress unfold angle_ltb in H12.
-progress unfold angle_leb in H23.
-progress unfold angle_ltb.
-remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
-remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
-remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
-symmetry in Hz1, Hz2, Hz3.
-destruct z1. {
-  apply rngl_leb_le in Hz1.
-  destruct z3; [ | easy ].
-  apply rngl_ltb_lt.
-  apply rngl_leb_le in Hz3.
-  destruct z2; [ | easy ].
-  apply rngl_leb_le in Hz2, H23.
-  apply rngl_ltb_lt in H12.
-  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
-} {
-  destruct z2; [ easy | ].
-  destruct z3; [ easy | ].
-  apply rngl_ltb_lt in H12.
-  apply rngl_leb_le in H23.
-  apply rngl_ltb_lt.
-  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
-}
-Qed.
-
 Theorem angle_le_lt_trans :
   ∀ θ1 θ2 θ3,
   (θ1 ≤ θ2 → θ2 < θ3 → θ1 < θ3)%A.

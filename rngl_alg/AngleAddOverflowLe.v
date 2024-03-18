@@ -1047,7 +1047,38 @@ apply rngl_leb_le in H32.
 apply angle_add_overflow_le_lemma_10 in H12; try easy.
 Qed.
 
-(*
+Theorem angle_lt_le_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 < θ2 → θ2 ≤ θ3 → θ1 < θ3)%A.
+Proof.
+destruct_ac.
+intros * H12 H23.
+progress unfold angle_ltb in H12.
+progress unfold angle_leb in H23.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  destruct z3; [ | easy ].
+  apply rngl_ltb_lt.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H23.
+  apply rngl_ltb_lt in H12.
+  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_ltb_lt in H12.
+  apply rngl_leb_le in H23.
+  apply rngl_ltb_lt.
+  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+}
+Qed.
+
 Theorem angle_add_overflow_lt_le :
   ∀ θ θ1 θ2,
   (θ1 < θ)%A
@@ -1119,7 +1150,14 @@ destruct sz2. {
 apply (rngl_leb_gt Hor) in Hsz.
 now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
-*)
+
+Theorem angle_opp_straight : (- angle_straight)%A = angle_straight.
+Proof.
+destruct_ac.
+apply eq_angle_eq; cbn.
+f_equal.
+apply (rngl_opp_0 Hop).
+Qed.
 
 Theorem angle_add_overflow_lt_straight_le_straight :
   ∀ θ1 θ2,
@@ -1127,43 +1165,9 @@ Theorem angle_add_overflow_lt_straight_le_straight :
   → (θ2 ≤ angle_straight)%A
   → angle_add_overflow θ1 θ2 = false.
 Proof.
-destruct_ac.
 intros * H1 H2.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-progress unfold angle_ltb in H1.
-progress unfold angle_leb in H2.
-cbn in H1, H2.
-rewrite (rngl_leb_refl Hor) in H1.
-rewrite (rngl_leb_refl Hor) in H2.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
-symmetry in Hzs1, Hzs2, Hzs12.
-destruct zs1; [ | easy ].
-destruct zs2; [ | easy ].
-destruct zs12; [ | easy ].
-apply rngl_ltb_lt in H1.
-clear H2.
-apply rngl_leb_le in Hzs1.
-apply rngl_leb_le in Hzs2.
-apply rngl_leb_le in Hzs12.
-apply (rngl_ltb_ge Hor).
-remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
-symmetry in Hzc1.
-destruct zc1. {
-  apply rngl_leb_le in Hzc1.
-  apply angle_add_overflow_le_lemma_111; try easy.
-  now right; right; left.
-}
-apply (rngl_leb_gt Hor) in Hzc1.
-apply angle_add_overflow_le_lemma_2; try easy. 2: {
-  now apply (rngl_lt_le_incl Hor).
-}
-intros H.
-apply (eq_rngl_cos_opp_1) in H.
-subst θ1.
-now apply (rngl_lt_irrefl Hor) in H1.
+apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
+now rewrite angle_opp_straight.
 Qed.
 
 End a.
