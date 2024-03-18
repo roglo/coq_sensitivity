@@ -2029,6 +2029,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite angle_mul_0_l.
   apply angle_add_overflow_0_r.
 }
+move Hn1 before Hnz.
 remember (2 ^ i / n * (θ / ₂^i))%A as θ' eqn:Hθ'.
 assert (Hts' : (θ' < angle_straight)%A). {
   rewrite Hθ'.
