@@ -2047,6 +2047,7 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
+...
 apply angle_add_overflow_le with (θ2 := θ). {
   rewrite <- (angle_div_2_pow_mul_2_pow i θ).
   rewrite Hθ'.
@@ -2060,6 +2061,11 @@ apply angle_add_overflow_le with (θ2 := θ). {
   now apply Nat.lt_le_incl in Hmi.
 }
 clear m Hmi.
+(* contre-exemple :
+    θ = 3π/2 ; n = 2 ; i = 2 ; θ' = 4/2 * θ/4 = π/2
+    θ' + θ = π/2+3π/2 = 2π
+*)
+...
 apply angle_add_not_overflow_comm.
 apply (angle_add_overflow_lt_le (- θ')). 2: {
   rewrite angle_opp_involutive.
@@ -2085,6 +2091,11 @@ apply angle_opp_lt_compat_if. {
   destruct n; [ easy | ].
   now apply -> Nat.succ_lt_mono.
 }
+(* contre-exemple :
+    θ = 3π/2 ; n = 2 ; i = 2 ; θ' = 4/2 * θ/4 = π/2 ; -θ = π/2
+   exemple :
+    θ = 3π/2 ; n = 4 ; i = 2 ; θ' = 4/4 * θ/4 = 3π/8 ; -θ = π/2
+*)
 ...
 apply (angle_lt_le_trans _ angle_straight); [ easy | ].
 (* aïe aïe aïe aïe... *)
