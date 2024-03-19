@@ -1509,6 +1509,74 @@ apply (rngl_nle_gt Hor) in H12.
 apply H12, rngl_cos_bound.
 Qed.
 
+Theorem angle_le_antisymm : ∀ θ1 θ2, (θ1 ≤ θ2)%A → (θ2 ≤ θ1)%A → θ1 = θ2.
+Proof.
+destruct_ac.
+intros * H12 H21.
+progress unfold angle_leb in H12.
+progress unfold angle_leb in H21.
+apply eq_angle_eq.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.
+symmetry in Hzs1, Hzs2, Hzc1, Hzc2.
+destruct zs1. 2: {
+  destruct zs2; [ easy | ].
+  apply rngl_leb_le in H12, H21.
+  apply (rngl_le_antisymm Hor) in H12; [ clear H21 | easy ].
+  rewrite H12; f_equal.
+  apply (rngl_leb_gt Hor) in Hzs1, Hzs2.
+  (* lemma? *)
+  change_angle_opp θ1.
+  progress sin_cos_opp_hyp T Hzs1.
+  change_angle_opp θ2.
+  progress sin_cos_opp_hyp T Hzs2.
+  cbn in H12 |-*.
+  f_equal.
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+  specialize (rngl_sin_nonneg_cos_le_sin_le θ1 θ2 Hzs1 Hzs2) as H1.
+  specialize (rngl_sin_nonneg_cos_le_sin_le θ2 θ1 Hzs2 Hzs1) as H2.
+  rewrite H12 in H1, H2.
+  specialize (H1 (rngl_le_refl Hor _)).
+  specialize (H2 (rngl_le_refl Hor _)).
+  cbn in Hzc1.
+  rewrite Hzc1 in H1, H2.
+  now destruct zc1; apply (rngl_le_antisymm Hor).
+}
+destruct zs2; [ | easy ].
+apply rngl_leb_le in H12, H21.
+apply (rngl_le_antisymm Hor) in H12; [ clear H21 | easy ].
+rewrite H12; f_equal.
+apply rngl_leb_le in Hzs1, Hzs2.
+specialize (rngl_sin_nonneg_cos_le_sin_le θ1 θ2 Hzs1 Hzs2) as H1.
+specialize (rngl_sin_nonneg_cos_le_sin_le θ2 θ1 Hzs2 Hzs1) as H2.
+rewrite H12 in H1, H2.
+specialize (H1 (rngl_le_refl Hor _)).
+specialize (H2 (rngl_le_refl Hor _)).
+cbn in Hzc2.
+rewrite Hzc2 in H1, H2.
+now destruct zc2; apply (rngl_le_antisymm Hor).
+Qed.
+
+Theorem angle_opp_le_compat_if :
+  ∀ θ1 θ2,
+  (θ1 ≠ 0)%A
+  → (θ1 ≤ θ2)%A
+  → (- θ2 ≤ - θ1)%A.
+Proof.
+intros * H1z H12.
+destruct (angle_lt_dec θ1 θ2) as [Hl12| Hl12]. {
+  specialize (angle_opp_lt_compat_if θ1 θ2 H1z Hl12) as H1.
+  now apply angle_lt_le_incl in H1.
+}
+apply Bool.not_true_iff_false in Hl12.
+apply angle_ltb_ge in Hl12.
+apply angle_le_antisymm in H12; [ | easy ].
+subst θ2.
+apply angle_le_refl.
+Qed.
+
 Theorem rngl_sin_mul_2_neg_if :
   ∀ θ,
   (rngl_sin (2 * θ) < 0)%L
@@ -2047,8 +2115,36 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
+(**)
+apply angle_add_not_overflow_equiv3.
+progress unfold angle_add_not_overflow3.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]; [ now subst m; left | ].
+destruct m; [ easy | clear Hmz ].
+destruct m. {
+  right.
+  rewrite angle_mul_1_l.
+  apply (angle_lt_le_trans _ angle_straight); [ easy | ].
+  rewrite <- angle_opp_straight.
+  apply angle_opp_le_compat_if; [ | now apply angle_lt_le_incl ].
+  intros H; move H at top; subst θ'.
+  symmetry in Hθ'.
+  apply angle_div_2_pow_mul_neq_0 in Hθ'; [ easy | | ]. {
+    intros H; subst θ.
+    apply angle_nlt_ge in Hts.
+    apply Hts; clear Hts.
+    apply (angle_straight_pos Hc1).
+  }
+  split. {
+    apply Nat.div_str_pos.
+    split; [ | easy ].
+    now apply Nat.neq_0_lt_0.
+  }
+  apply Nat.div_lt; [ | easy ].
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+destruct m. {
 ...
-apply angle_add_overflow_le with (θ2 := θ). {
+apply angle_add_overflow_le with (θ2 := θ). 2: {
   rewrite <- (angle_div_2_pow_mul_2_pow i θ).
   rewrite Hθ'.
   rewrite angle_mul_nat_assoc.
