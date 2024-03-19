@@ -2143,6 +2143,7 @@ destruct m. {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 destruct m. {
+  right.
 ...
 apply angle_add_overflow_le with (θ2 := θ). 2: {
   rewrite <- (angle_div_2_pow_mul_2_pow i θ).
