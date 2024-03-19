@@ -2161,6 +2161,9 @@ split; intros Hn. {
   specialize (Nat.log2_log2_up_exact n) as H4.
   rewrite <- H1 in H4.
 ...
+Compute (let n := 9 in (n = 2 ^ Nat.log2 n, Nat.log2_up (S n) = S (Nat.log2_up n))).
+(* ouais, c'est juste *)
+...
 Search Nat.log2.
 Nat.log2_log2_up_exact:
   ∀ a : nat, 0 < a → Nat.log2 a = Nat.log2_up a ↔ (∃ b : nat, a = 2 ^ b)
