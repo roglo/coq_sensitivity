@@ -2115,7 +2115,52 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
-(**)
+assert (Hts'' : (θ' < angle_straight / ₂^Nat.log2_up n)%A). {
+  rewrite Hθ'.
+  destruct n; [ easy | clear Hnz ].
+  destruct i. {
+    cbn in Hni.
+    apply Nat.succ_le_mono in Hni.
+    now apply Nat.le_0_r in Hni; subst n.
+  }
+About angle_div_2_pow_succ_mul_lt_straight.
+Theorem glop :
+  ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ 2 ^ Nat.log2_up n * (θ / ₂^i))%A.
+Proof.
+intros * Hni.
+destruct (le_dec n 1) as [Hn1| Hn1]. {
+  destruct n; [ apply angle_nonneg | ].
+  apply Nat.succ_le_mono, Nat.le_0_r in Hn1; subst n.
+  do 2 rewrite angle_mul_1_l.
+  apply angle_le_refl.
+}
+apply Nat.nle_gt in Hn1.
+apply angle_mul_nat_le_mono_nonneg_r; [ | now apply Nat.log2_up_spec ].
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+  apply angle_mul_nat_overflow_pow_div.
+}
+apply Nat.pow_le_mono_r; [ easy | ].
+apply Nat.log2_up_le_mono in Hni.
+now rewrite Nat.log2_up_pow2 in Hni.
+Qed.
+eapply angle_le_lt_trans.
+apply glop.
+...
+angle_div_2_pow_succ_mul_lt_straight is not universe polymorphic
+Arguments angle_div_2_pow_succ_mul_lt_straight _ (n i)%nat_scope
+  θ%angle_scope _
+angle_div_2_pow_succ_mul_lt_straight is opaque
+Expands to: Constant RnglAlg.Work.a.angle_div_2_pow_succ_mul_lt_straight
+
+..
+  apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_r.
+  apply -> Nat.succ_le_mono.
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+...
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]; [ now subst m; left | ].
