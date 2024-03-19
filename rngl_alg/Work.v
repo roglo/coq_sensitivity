@@ -2144,7 +2144,37 @@ apply Nat.log2_up_le_mono in Hni.
 now rewrite Nat.log2_up_pow2 in Hni.
 Qed.
 eapply angle_le_lt_trans.
-apply glop.
+apply glop. 2: {
+Check (Nat.log2_up_succ_or n).
+Search (2 ^ Nat.log2 _).
+Theorem Nat_pow_log2_eq :
+  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
+Proof.
+intros.
+split; intros Hn. {
+  specialize (Nat.log2_up_succ_or n) as H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+  exfalso.
+  specialize (Nat.log2_spec_alt n) as H2.
+  rewrite Hn in H2.
+  specialize (Nat.log2_lt_pow2 n) as H3.
+  specialize (Nat.log2_log2_up_exact n) as H4.
+  rewrite <- H1 in H4.
+...
+Search Nat.log2.
+Nat.log2_log2_up_exact:
+  ∀ a : nat, 0 < a → Nat.log2 a = Nat.log2_up a ↔ (∃ b : nat, a = 2 ^ b)
+Nat.log2_lt_pow2: ∀ a b : nat, 0 < a → a < 2 ^ b ↔ Nat.log2 a < b
+...
+  specialize (Nat.log2_up_succ_or n) as H1.
+  destruct H1 as [H1| H1]. {
+    rewrite H1.
+Search (2 ^ S (Nat.log2_up _)).
+...
+Search (2 ^ Nat.log2_up _).
+Search (Nat.log2_up _).
+  ∀ a : nat,
+    Nat.log2_up (S a) = S (Nat.log2_up a) ∨ Nat.log2_up (S a) = Nat.log2_up a
 ...
 angle_div_2_pow_succ_mul_lt_straight is not universe polymorphic
 Arguments angle_div_2_pow_succ_mul_lt_straight _ (n i)%nat_scope
