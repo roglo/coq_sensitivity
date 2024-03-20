@@ -2060,6 +2060,43 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
+Theorem Nat_pow2_log2_eq :
+  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+destruct (Nat.eq_dec n 1) as [H| H]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+assert (Hn1 : 1 < n). {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
+}
+clear H.
+split; intros Hn. {
+  specialize (Nat.log2_up_succ_or n) as H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+  exfalso.
+  rewrite <- Hn in H1 at 1.
+  rewrite Nat.log2_up_succ_pow2 in H1; [ | easy ].
+  specialize (Nat.log2_up_eqn n Hn1) as H2.
+  rewrite <- H1 in H2.
+  apply Nat.succ_inj in H2.
+  rewrite <- Hn in H2 at 2.
+  rewrite Nat.log2_pred_pow2 in H2; [ | now apply Nat.log2_pos ].
+  destruct (Nat.log2 n); [ now cbn in Hn; subst n | ].
+  cbn in H2.
+  now apply Nat.neq_succ_diag_l in H2.
+} {
+  rewrite Nat.log2_up_eqn in Hn; [ | now apply -> Nat.succ_lt_mono ].
+  apply Nat.succ_inj in Hn.
+  cbn in Hn.
+  apply Nat.log2_log2_up_exact in Hn; [ | easy ].
+  destruct Hn as (m, Hm); subst n.
+  now rewrite Nat.log2_pow2.
+}
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2145,24 +2182,15 @@ now rewrite Nat.log2_up_pow2 in Hni.
 Qed.
 eapply angle_le_lt_trans.
 apply glop. 2: {
-Check (Nat.log2_up_succ_or n).
-Search (2 ^ Nat.log2 _).
-Theorem Nat_2_pow_log2_eq :
-  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-split; intros Hn. {
-  specialize (Nat.log2_up_succ_or n) as H1.
-  destruct H1 as [H1| H1]; [ easy | ].
-  exfalso.
-Search (Nat.log2_up _ = Nat.log2_up _).
-generalize H1; intros H2.
-apply Nat.log2_up_same in H2; [ | easy | easy ].
+  specialize Nat_pow2_log2_eq as H1.
+  specialize (H1 (2 ^ S i / S n)).
+  specialize (proj2 H1) as H2.
 ...
-  rewrite <- Hn in H1 at 1.
-  rewrite Nat.log2_up_succ_pow2 in H1; [ | easy ].
+Check (Nat.log2_up_succ_or n).
+  remember (2 ^ S i / S n) as p eqn:Hp.
+Check Nat_pow2_log2_eq.
+  destruct (Nat.eq_dec (2 ^ Nat.log2_up
+...
   apply (f_equal (λ i, 2 ^ i)) in H1.
   rewrite Nat.pow_succ_r' in H1.
   rewrite Hn in H1.
