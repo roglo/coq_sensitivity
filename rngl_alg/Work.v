@@ -2154,14 +2154,16 @@ assert (Hts' : (θ' < angle_straight)%A). {
 }
 assert (Hts'' : (θ' < angle_straight / ₂^Nat.log2_up n)%A). {
   rewrite Hθ'.
+(*
   destruct n; [ easy | clear Hnz ].
   destruct i. {
     cbn in Hni.
     apply Nat.succ_le_mono in Hni.
     now apply Nat.le_0_r in Hni; subst n.
   }
+*)
 About angle_div_2_pow_succ_mul_lt_straight.
-Theorem glop :
+Theorem angle_div_2_pow_mul_div_2_pow_mul_2_pow_log2 :
   ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ 2 ^ Nat.log2_up n * (θ / ₂^i))%A.
 Proof.
 intros * Hni.
@@ -2181,7 +2183,15 @@ apply Nat.log2_up_le_mono in Hni.
 now rewrite Nat.log2_up_pow2 in Hni.
 Qed.
 eapply angle_le_lt_trans.
-apply glop. 2: {
+apply angle_div_2_pow_mul_div_2_pow_mul_2_pow_log2. 2: {
+...
+Check Nat_pow2_log2_eq.
+Search (2 ^ Nat.log2_up _).
+Search (_ < _ / ₂^_)%A.
+  ============================
+  (2 ^ S i / S n * (θ / ₂^S i) < angle_straight / ₂^Nat.log2_up (S n))%A
+  ============================
+  (2 ^ Nat.log2_up (2 ^ S i / S n) * (θ / ₂^S i) < angle_straight / ₂^Nat.log2_up (S n))%A
 ...
   specialize Nat_pow2_log2_eq as H1.
   specialize (H1 n).
