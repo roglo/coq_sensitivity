@@ -2097,6 +2097,26 @@ split; intros Hn. {
 }
 Qed.
 
+Theorem angle_le_2_pow_log2 :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → angle_mul_nat_overflow n θ1 = false
+  → (n * θ1 ≤ θ2
+  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
+Proof.
+intros * Hnz Haov Hn.
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite <- (angle_div_2_pow_mul_2_pow (Nat.log2 n) θ1).
+rewrite <- angle_div_2_pow_mul. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ n); [ | easy ].
+  now apply Nat.log2_spec.
+}
+apply angle_div_2_pow_le.
+apply (angle_le_trans _ (n * θ1)); [ | easy ].
+apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
+now apply Nat.log2_spec.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2152,30 +2172,44 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
-assert (Hts'' : (θ' ≤ angle_straight / ₂^Nat.log2 n)%A). {
+assert (Hts'' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
   rewrite Hθ'.
-Search (2 ^ Nat.log2_up _).
-Theorem glop :
-  ∀ n θ1 θ2,
-  n ≠ 0
-  → angle_mul_nat_overflow n θ1 = false
-  → (n * θ1 ≤ θ2
-  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
-Proof.
-intros * Hnz Haov Hn.
-apply Nat.neq_0_lt_0 in Hnz.
-rewrite <- (angle_div_2_pow_mul_2_pow (Nat.log2 n) θ1).
-rewrite <- angle_div_2_pow_mul. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ n); [ | easy ].
-  now apply Nat.log2_spec.
-}
-apply angle_div_2_pow_le.
-apply (angle_le_trans _ (n * θ1)); [ | easy ].
-apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
-now apply Nat.log2_spec.
-Qed.
-Check glop.
-apply glop; [ easy | | ]. {
+  rewrite <- angle_mul_nat_div_2. 2: {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+      apply Nat.div_le_upper_bound; [ easy | ].
+      (* lemma *)
+      rewrite Nat.mul_comm.
+      apply Nat_mul_le_pos_r.
+      destruct n; [ easy | ].
+      now apply -> Nat.succ_le_mono.
+    }
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  rewrite <- angle_div_2_pow_succ_r_1.
+  apply angle_le_2_pow_log2; [ easy | | ]. {
+    apply Bool.not_true_iff_false.
+    intros H.
+    apply angle_mul_nat_overflow_true_assoc in H.
+    apply Bool.not_false_iff_true in H.
+    apply H; clear H.
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+      now apply Nat.mul_div_le.
+    }
+    rewrite angle_div_2_pow_succ_r_2.
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  eapply angle_le_trans. 2: {
+    apply angle_lt_le_incl, Hts'.
+  }
+  rewrite Hθ'.
+...
+  rewrite angle_div_2_pow_succ_r_2.
+...
+Search (angle_mul_nat_overflow (_ / _)).
+Search (angle_mul_nat_overflow _ _ = false).
+Search ((_ * _) / ₂)%A.
+...
+apply angle_le_2_pow_log2; [ easy | | ]. {
   (* lemma *)
   apply Bool.not_true_iff_false.
   intros H.
