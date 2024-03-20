@@ -2182,9 +2182,12 @@ now rewrite Nat.log2_up_pow2 in Hni.
 Qed.
 eapply angle_le_lt_trans.
 apply glop. 2: {
+...
   specialize Nat_pow2_log2_eq as H1.
-  specialize (H1 (2 ^ S i / S n)).
-  specialize (proj2 H1) as H2.
+  specialize (H1 n).
+  rewrite (proj1 H1).
+  specialize (proj1 H1) as H2.
+rewrite H2.
 ...
 Check (Nat.log2_up_succ_or n).
   remember (2 ^ S i / S n) as p eqn:Hp.
