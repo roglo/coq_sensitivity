@@ -2152,8 +2152,43 @@ assert (Hts' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
-assert (Hts'' : (θ' < angle_straight / ₂^Nat.log2_up n)%A). {
+assert (Hts'' : (θ' ≤ angle_straight / ₂^Nat.log2 n)%A). {
   rewrite Hθ'.
+Search (2 ^ Nat.log2_up _).
+Theorem glop :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → angle_mul_nat_overflow n θ1 = false
+  → (n * θ1 ≤ θ2
+  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
+Proof.
+intros * Hnz Haov Hn.
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite <- (angle_div_2_pow_mul_2_pow (Nat.log2 n) θ1).
+rewrite <- angle_div_2_pow_mul. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ n); [ | easy ].
+  now apply Nat.log2_spec.
+}
+apply angle_div_2_pow_le.
+apply (angle_le_trans _ (n * θ1)); [ | easy ].
+apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
+now apply Nat.log2_spec.
+Qed.
+Check glop.
+apply glop; [ easy | | ].
+2: {
+rewrite <- Hθ'.
+(* bah non *)
+...
+Search (_ / ₂^_ ≤ _ / ₂^_)%A.
+Search (_ / ₂^_ < _ / ₂^_)%A.
+...
+Search (angle_mul_nat_overflow _ _ = false).
+...
+  apply (angle_mul_nat_overflow_le_r _ θ2).
+...
+apply glop.
+...
 (*
   destruct n; [ easy | clear Hnz ].
   destruct i. {
@@ -2184,6 +2219,7 @@ now rewrite Nat.log2_up_pow2 in Hni.
 Qed.
 eapply angle_le_lt_trans.
 apply angle_div_2_pow_mul_div_2_pow_mul_2_pow_log2. 2: {
+Search (Nat.log2_up (_ / _)).
 ...
 Check Nat_pow2_log2_eq.
 Search (2 ^ Nat.log2_up _).
