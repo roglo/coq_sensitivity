@@ -2198,12 +2198,32 @@ assert (Hts'' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
     rewrite angle_div_2_pow_succ_r_2.
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply angle_le_trans. 2: {
-    apply angle_lt_le_incl, Hts'.
-  }
+  eapply angle_le_trans; [ | apply angle_lt_le_incl, Hts' ].
   rewrite Hθ'.
+  rewrite angle_mul_nat_assoc.
+  rewrite Nat.mul_comm.
+  rewrite <- angle_mul_nat_assoc.
+  apply angle_mul_le_mono_l. 2: {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+      apply Nat.div_le_upper_bound; [ easy | ].
+      rewrite Nat.mul_comm.
+      apply Nat_mul_le_pos_r.
+      destruct n; [ easy | ].
+      now apply -> Nat.succ_le_mono.
+    }
+    apply angle_mul_nat_overflow_pow_div.
+  }
 ...
-  rewrite angle_div_2_pow_succ_r_2.
+  apply angle_le_trans with (θ2 := (θ / ₂^i)%A). 2: {
+  eapply angle_le_trans. 2: {
+...
+    rewrite angle_div_2_pow_succ_r_2.
+    now apply angle_div_2_pow_mul_le_angle.
+  }
+(* ah bin non *)
+...
+  rewrite angle_div_2_pow_succ_r_1.
+  rewrite <- angle_div_2_pow_mul. 2: {
 ...
 Search (angle_mul_nat_overflow (_ / _)).
 Search (angle_mul_nat_overflow _ _ = false).
