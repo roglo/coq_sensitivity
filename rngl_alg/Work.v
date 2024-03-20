@@ -2147,19 +2147,52 @@ eapply angle_le_lt_trans.
 apply glop. 2: {
 Check (Nat.log2_up_succ_or n).
 Search (2 ^ Nat.log2 _).
-Theorem Nat_pow_log2_eq :
+Theorem Nat_2_pow_log2_eq :
   ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
 Proof.
 intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
 split; intros Hn. {
   specialize (Nat.log2_up_succ_or n) as H1.
   destruct H1 as [H1| H1]; [ easy | ].
   exfalso.
+Search (Nat.log2_up _ = Nat.log2_up _).
+generalize H1; intros H2.
+apply Nat.log2_up_same in H2; [ | easy | easy ].
+...
+  rewrite <- Hn in H1 at 1.
+  rewrite Nat.log2_up_succ_pow2 in H1; [ | easy ].
+  apply (f_equal (λ i, 2 ^ i)) in H1.
+  rewrite Nat.pow_succ_r' in H1.
+  rewrite Hn in H1.
+Search (2 ^ Nat.log2_up _).
+specialize (Nat.log2_log2_up_spec n Hnz) as H2.
+rewrite <- H1 in H2.
+rewrite Hn in H2.
+...
+Search (S (Nat.log2 _)).
+...
+specialize (Nat.le_log2_up_succ_log2 n) as H2.
+apply Nat.le_antisymm in H1.
+...
+Search Nat.log2_up.
+specialize (Nat.log2_spec n) as H2.
+specialize (Nat.log2_log2_up_spec n) as H2.
+...
+apply (f_equal (λ i, 2 ^ i)) in H1.
+rewrite Nat.pow_succ_r' in H1.
+rewrite Hn in H1.
+Search (2 ^ Nat.log2_up _).
+...
+Search (S (Nat.log2 _)).
+...
   specialize (Nat.log2_spec_alt n) as H2.
   rewrite Hn in H2.
   specialize (Nat.log2_lt_pow2 n) as H3.
   specialize (Nat.log2_log2_up_exact n) as H4.
   rewrite <- H1 in H4.
+Check Nat.log2_up_pow2.
 ...
 Compute (let n := 9 in (n = 2 ^ Nat.log2 n, Nat.log2_up (S n) = S (Nat.log2_up n))).
 (* ouais, c'est juste *)
