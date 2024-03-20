@@ -2175,8 +2175,18 @@ apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
 now apply Nat.log2_spec.
 Qed.
 Check glop.
-apply glop; [ easy | | ].
-2: {
+apply glop; [ easy | | ]. {
+  (* lemma *)
+  apply Bool.not_true_iff_false.
+  intros H.
+  apply angle_mul_nat_overflow_true_assoc in H.
+  apply Bool.not_false_iff_true in H.
+  apply H; clear H.
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+    now apply Nat.mul_div_le.
+  }
+  apply angle_mul_nat_overflow_pow_div.
+}
 rewrite <- Hθ'.
 (* bah non *)
 ...
