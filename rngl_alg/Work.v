@@ -2238,7 +2238,8 @@ assert (Hts'' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
   }
   now apply Nat.mul_div_le.
 }
-apply angle_le_2_pow_pred in Hts''. 2: {
+generalize Hts''; intros Hts'''.
+apply angle_le_2_pow_pred in Hts'''. 2: {
   intros H.
   apply Nat.log2_null in H.
   destruct n; [ easy | ].
@@ -2246,6 +2247,19 @@ apply angle_le_2_pow_pred in Hts''. 2: {
   apply Nat.le_0_r in H.
   now subst n.
 }
+apply angle_add_not_overflow_equiv.
+progress unfold angle_add_not_overflow2.
+split. {
+Check angle_le_2_pow_pred.
+  specialize (angle_le_2_pow_pred (S n) (m * θ')%A) as H1.
+  rewrite Nat_sub_succ_1 in H1.
+  specialize (H1 θ').
+...
+apply angle_add_not_overflow_equiv3.
+progress unfold angle_add_not_overflow3.
+...
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
 ...
 Theorem angle_mul_nat_not_overflow_mul_comm :
   ∀ m n θ,
