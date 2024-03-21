@@ -2116,6 +2116,23 @@ apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
 now apply Nat.log2_spec.
 Qed.
 
+Theorem angle_le_2_pow_pred :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
+  → (θ1 ≤ θ2 / ₂^(n-1))%A.
+Proof.
+intros * Hnz H12.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat_sub_succ_1.
+specialize (angle_mul_le_mono_l _ _ H12 2) as H1.
+rewrite angle_div_2_pow_succ_r_1 in H1.
+do 2 rewrite angle_div_2_mul_2 in H1.
+apply H1.
+rewrite <- (Nat.mul_1_r 2).
+now apply angle_mul_nat_overflow_mul_2_div_2.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
@@ -2221,29 +2238,13 @@ assert (Hts'' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
   }
   now apply Nat.mul_div_le.
 }
-Search (_ / ₂ ≤ _)%A.
-Theorem angle_le_2_pow_pred :
-  ∀ n θ1 θ2,
-  n ≠ 0
-  → (θ2 / ₂^n ≤ angle_straight)%A
-  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
-  → (θ1 ≤ θ2 / ₂^(n-1))%A.
-Proof.
-intros * Hnz H2s H12.
-destruct n; [ easy | clear Hnz ].
-rewrite Nat_sub_succ_1.
-cbn in H12.
-cbn in H2s.
-... ...
-apply angle_le_2_pow_pred in Hts''; cycle 1. {
+apply angle_le_2_pow_pred in Hts''. 2: {
   intros H.
   apply Nat.log2_null in H.
   destruct n; [ easy | ].
   apply Nat.succ_le_mono in H.
   apply Nat.le_0_r in H.
   now subst n.
-} {
-  apply angle_div_2_pow_le_diag.
 }
 ...
 Theorem angle_mul_nat_not_overflow_mul_comm :
