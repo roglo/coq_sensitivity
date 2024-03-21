@@ -2117,6 +2117,7 @@ now apply Nat.log2_spec.
 Qed.
 
 (* to be completed
+... en fait c'est faux
 Theorem angle_mul_nat_overflow_distr_add_overflow' :
   ∀ m n θ,
   angle_mul_nat_overflow n θ = false
@@ -2129,6 +2130,20 @@ revert n Hn Hmov.
 induction m; intros; [ now rewrite Nat.add_0_l | ].
 rewrite Nat.add_succ_l.
 rewrite angle_mul_nat_overflow_succ_l.
+apply Bool.orb_false_iff.
+cbn in Hmov.
+remember (angle_add_overflow θ (m * θ)) as ov eqn:Hov.
+symmetry in Hov.
+destruct ov. 2: {
+  apply (angle_add_not_overflow_move_add) in Hmov; [ | easy ].
+  rewrite <- angle_mul_add_distr_r in Hmov.
+  rewrite Nat.add_comm in Hmov.
+  split; [ | easy ].
+  apply IHm; [ easy | ].
+  apply angle_mul_nat_overflow_distr_add_overflow.
+  apply IHm; [ easy | ].
+...
+Search (angle_add_overflow (_ + _)).
 ...
 induction m; intros; [ apply angle_add_overflow_0_l | ].
 rewrite Nat.add_succ_l in Hmov.
