@@ -1758,13 +1758,12 @@ split; intros Hn. {
 Qed.
 
 Theorem angle_mul_nat_overflow_succ_l :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   ∀ θ n,
   angle_mul_nat_overflow (S n) θ =
     (angle_mul_nat_overflow n θ || angle_add_overflow θ (n * θ))%bool.
 Proof.
-intros Hon Hos *.
+destruct_ac.
+intros.
 remember (_ || _)%bool as b eqn:Hb.
 symmetry in Hb.
 destruct b. {
@@ -5522,7 +5521,7 @@ intros * Hmov.
 revert n Hmov.
 induction m; intros; [ apply angle_add_overflow_0_l | ].
 rewrite Nat.add_succ_l in Hmov.
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hmov.
+rewrite angle_mul_nat_overflow_succ_l in Hmov.
 apply Bool.orb_false_iff in Hmov.
 destruct Hmov as (Hmov, Hov).
 specialize (IHm _ Hmov) as Hov'.
@@ -5541,11 +5540,10 @@ Theorem angle_mul_nat_overflow_true_assoc :
   angle_mul_nat_overflow m (n * θ) = true
   → angle_mul_nat_overflow (m * n) θ = true.
 Proof.
-destruct_ac.
 intros * Hmn.
 revert n θ Hmn.
 induction m; intros; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos) in Hmn.
+rewrite angle_mul_nat_overflow_succ_l in Hmn.
 apply Bool.orb_true_iff in Hmn.
 destruct Hmn as [Hmn| Hmn]. {
   apply (angle_mul_nat_overflow_le_l (m * n)); [ now apply IHm | ].
