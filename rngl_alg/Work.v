@@ -2117,6 +2117,7 @@ now apply Nat.log2_spec.
 Qed.
 
 (* to be completed
+(*
 ... en fait c'est faux
 Theorem angle_mul_nat_overflow_distr_add_overflow' :
   ∀ m n θ,
@@ -2160,8 +2161,8 @@ apply angle_add_not_overflow_move_add. 2: {
 }
 now apply angle_add_not_overflow_comm.
 Qed.
-
 ...
+*)
 
 Theorem angle_mul_nat_overflow_true_assoc' :
   ∀ m n θ,
@@ -2170,11 +2171,45 @@ Theorem angle_mul_nat_overflow_true_assoc' :
 Proof.
 destruct_ac.
 intros * Hmn.
+destruct m; [ easy | ].
+destruct m. {
+  exfalso.
+  rewrite Nat.mul_1_l in Hmn.
+...
+destruct_ac.
+intros * Hmn.
+revert m θ Hmn.
+induction n; intros; [ now rewrite Nat.mul_0_r in Hmn | ].
+destruct m; [ easy | ].
+destruct m. {
+  cbn in Hmn |-*.
+  exfalso.
+  rewrite Nat.add_0_r in Hmn.
+  destruct n; [ easy | ].
+  apply Bool.orb_true_iff in Hmn.
+  destruct Hmn as [Hmn| Hmn]. {
+    destruct n. {
+      rewrite angle_mul_1_l in Hmn.
+(* ouais, bon, ça marche pas *)
+...
+Search (angle_mul_nat_overflow _ (_ + _)).
+Search (angle_mul_nat_overflow (_ + _)).
+...
+destruct_ac.
+intros * Hmn.
 revert n θ Hmn.
 induction m; intros; [ easy | ].
-rewrite (angle_mul_nat_overflow_succ_l Hon Hos).
+rewrite angle_mul_nat_overflow_succ_l.
 apply Bool.orb_true_iff.
 cbn in Hmn.
+remember (angle_mul_nat_overflow m (n * θ)) as ov eqn:Hov.
+symmetry in Hov.
+destruct ov; [ now left | right ].
+...
+Search (angle_mul_nat_overflow _ (_ * _)).
+...
+Search (angle_add_overflow (_ * _) (_ * _)).
+...
 Search (angle_mul_nat_overflow (_ + _)).
 About angle_mul_nat_overflow_distr_add_overflow.
 ...
