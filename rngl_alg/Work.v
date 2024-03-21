@@ -2222,6 +2222,29 @@ assert (Hts'' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
   now apply Nat.mul_div_le.
 }
 Search (_ / ₂ ≤ _)%A.
+Theorem angle_le_2_pow_pred :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → (θ2 / ₂^n ≤ angle_straight)%A
+  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
+  → (θ1 ≤ θ2 / ₂^(n-1))%A.
+Proof.
+intros * Hnz H2s H12.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat_sub_succ_1.
+cbn in H12.
+cbn in H2s.
+... ...
+apply angle_le_2_pow_pred in Hts''; cycle 1. {
+  intros H.
+  apply Nat.log2_null in H.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in H.
+  apply Nat.le_0_r in H.
+  now subst n.
+} {
+  apply angle_div_2_pow_le_diag.
+}
 ...
 Theorem angle_mul_nat_not_overflow_mul_comm :
   ∀ m n θ,
