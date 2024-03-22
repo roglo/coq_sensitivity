@@ -905,6 +905,18 @@ apply (rngl_leb_gt Hor) in Hsz.
 now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
 
+Theorem angle_add_overflow_le_lt :
+  ∀ θ θ1 θ2,
+  (θ1 ≤ θ)%A
+  → (θ2 < -θ)%A
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+intros * H1 H2.
+apply angle_add_not_overflow_comm.
+apply (angle_add_overflow_lt_le (-θ)); [ easy | ].
+now rewrite angle_opp_involutive.
+Qed.
+
 Theorem angle_opp_straight : (- angle_straight)%A = angle_straight.
 Proof.
 destruct_ac.

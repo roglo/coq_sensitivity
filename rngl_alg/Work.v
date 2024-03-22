@@ -2093,7 +2093,20 @@ apply angle_add_overflow_le with (θ2 := θ). {
   now apply Nat.lt_le_incl in Hmi.
 }
 clear m Hmi.
-(**)
+(*
+clear Hts.
+(*
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n.
+  rewrite Nat.div_1_r.
+  rewrite angle_div_2_pow_mul_2_pow.
+(* ah merde *)
+...
+*)
+eapply angle_add_overflow_le_lt.
+apply seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred.
+...
+*)
 apply angle_add_not_overflow_comm.
 apply angle_add_overflow_lt_straight_le_straight; [ easy | ].
 destruct i. {
