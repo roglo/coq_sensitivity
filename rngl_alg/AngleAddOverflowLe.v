@@ -1040,7 +1040,7 @@ apply rngl_leb_le.
 destruct zs3. {
   apply rngl_leb_le in Hzs3.
   apply (rngl_lt_le_incl Hor) in Hzs1.
-  now apply angle_add_overflow_le_lemma_11.
+  now apply rngl_cos_le_cos_add.
 }
 destruct zs2; [ easy | ].
 apply (rngl_leb_gt Hor) in Hzs2, Hzs3.

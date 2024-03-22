@@ -675,7 +675,7 @@ destruct zs12. {
 apply (rngl_leb_gt Hor) in Hzs12.
 apply rngl_leb_le.
 apply (rngl_lt_le_incl Hor) in Hzs1, Hsz2.
-apply angle_add_overflow_le_lemma_11; try easy.
+apply rngl_cos_le_cos_add; try easy.
 Qed.
 
 End a.

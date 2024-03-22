@@ -165,7 +165,7 @@ apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_add_overflow_le_lemma_11 :
+Theorem rngl_cos_le_cos_add :
   ∀ θ1 θ2,
   (rngl_sin θ1 ≤ 0)%L
   → (0 ≤ rngl_sin θ2)%L

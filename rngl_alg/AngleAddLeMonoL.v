@@ -227,7 +227,7 @@ destruct zs2. {
     clear Haov.
     apply rngl_leb_le in Hzs1.
     rewrite angle_add_comm.
-    apply angle_add_overflow_le_lemma_11; try easy.
+    apply rngl_cos_le_cos_add; try easy.
     now apply (rngl_lt_le_incl Hor).
     now rewrite angle_add_comm.
   }

@@ -1890,7 +1890,7 @@ clear H21.
 apply (rngl_leb_gt Hor) in Hzs1.
 apply rngl_leb_le.
 rewrite <- (angle_sub_add θ1 θ2) at 2.
-apply angle_add_overflow_le_lemma_11; [ | easy | ].
+apply rngl_cos_le_cos_add; [ | easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzs12.
 now rewrite angle_sub_add.
 Qed.
@@ -5433,7 +5433,7 @@ destruct zsm. {
     cbn - [ rngl_cos ].
     destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hzc| Hzc]. {
       destruct (rngl_le_dec Hor 0 (rngl_sin (m * θ'))) as [Hzm| Hzm]. {
-        apply angle_add_overflow_le_lemma_111; try easy.
+        apply rngl_cos_le_cos_add1; try easy.
         now right; right; left.
       }
       apply (rngl_nle_gt Hor) in Hzm.
@@ -5689,10 +5689,10 @@ rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ / ₂^S n) = r
 Search (_ * _)%A.
 rewrite rngl
 Search (rngl_cos _ ≤ rngl_cos _)%L.
-Check angle_add_overflow_le_lemma_111.
+Check rngl_cos_le_cos_add1.
 remember ((2 ^ i / n * (θ / ₂^i)))%A as θ' eqn:Hθ'.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ')) as [Hsc| Hsc].
-specialize (angle_add_overflow_le_lemma_111 θ' (θ - θ')) as H1.
+specialize (rngl_cos_le_cos_add1 θ' (θ - θ')) as H1.
 Search (_ + (_ - _))%A.
 Search (_ - _ + _)%A.
 rewrite angle_add_comm in H1.
