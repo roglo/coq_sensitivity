@@ -12,7 +12,6 @@ Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleDiv2Add.
-Require Import AngleAddOverflowEquiv3.
 Require Import TacChangeAngle.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
