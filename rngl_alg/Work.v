@@ -2268,7 +2268,8 @@ progress unfold angle_add_not_overflow2.
 split. {
   specialize (angle_le_2_pow_pred (S n) (m * θ')%A) as H1.
   rewrite Nat_sub_succ_1 in H1.
-  specialize (H1 θ').
+...
+  specialize (H1 θ' (Nat.neq_succ_0 _)).
 ...
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
