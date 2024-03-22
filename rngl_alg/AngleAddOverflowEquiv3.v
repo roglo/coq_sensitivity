@@ -86,28 +86,6 @@ apply (rngl_add_pos_nonneg Hor). {
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
-Theorem quadrant_1_quadrant_4_cos_lt_cos_add :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzc1 Hzs2 Hzc2 Hzs12.
-change_angle_opp θ2.
-progress sin_cos_opp_hyp T Hzs2.
-progress sin_cos_opp_hyp T Hzs12.
-progress sin_cos_opp_hyp T Hzc2.
-progress sin_cos_opp_goal T.
-rewrite rngl_cos_sub_comm.
-apply rngl_cos_lt_rngl_cos_sub; [ easy | easy | ].
-apply (rngl_lt_le_incl Hor) in Hzs2.
-now apply quadrant_1_sin_sub_nonneg_cos_le.
-Qed.
-
 Theorem quadrant_12_quadrant_2_rngl_cos_lt :
   ∀ θ1 θ2,
   θ2 ≠ 0%A
@@ -175,64 +153,6 @@ progress sin_cos_add_sub_right_goal T.
 apply (rngl_add_pos_nonneg Hor); [ easy | ].
 apply (rngl_lt_le_incl Hor) in Hc1z, Hc2z.
 now apply rngl_sin_add_nonneg.
-Qed.
-
-Theorem quadrant_1_sin_sub_pos_cos_lt :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 < rngl_sin (θ1 - θ2))%L
-  → (rngl_cos θ1 < rngl_cos θ2)%L.
-Proof.
-destruct_ac.
-intros * Hs1z Hzs2 Hc1z Hzc2 Hzs12.
-apply (rngl_lt_iff Hor).
-split. {
-  apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
-  now apply (rngl_lt_le_incl Hor).
-}
-intros H.
-apply rngl_cos_eq in H.
-destruct H; subst θ1. {
-  rewrite angle_sub_diag in Hzs12.
-  now apply (rngl_lt_irrefl Hor) in Hzs12.
-}
-cbn in Hs1z.
-rewrite <- angle_opp_add_distr in Hzs12.
-cbn - [ angle_add ] in Hzs12.
-apply (rngl_opp_nonneg_nonpos Hop Hor) in Hs1z.
-apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-apply eq_rngl_sin_0 in Hzs2.
-destruct Hzs2; subst θ2. {
-  rewrite angle_add_0_r in Hzs12.
-  cbn in Hzs12.
-  rewrite (rngl_opp_0 Hop) in Hzs12.
-  now apply (rngl_lt_irrefl Hor) in Hzs12.
-}
-rewrite angle_straight_add_straight in Hzs12.
-cbn in Hzs12.
-rewrite (rngl_opp_0 Hop) in Hzs12.
-now apply (rngl_lt_irrefl Hor) in Hzs12.
-Qed.
-
-Theorem rngl_cos_sub_nonneg :
-  ∀ θ1 θ2 : angle T,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_cos (θ1 - θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hcs1 Hcs2.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_sub_opp_r Hop).
-apply (rngl_add_nonneg_nonneg Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
 Theorem angle_add_not_overflow_equiv3 :
