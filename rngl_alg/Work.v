@@ -2103,8 +2103,9 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
 (* ah merde *)
 ...
 *)
-eapply angle_add_overflow_le_lt.
-apply seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred.
+eapply angle_add_overflow_le_lt. {
+  apply seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred.
+}
 ...
 *)
 apply angle_add_not_overflow_comm.
@@ -2219,6 +2220,61 @@ split; intros Hn. {
 Qed.
 
 (* to be completed
+Theorem angle_mul_nat_not_overflow :
+  ∀ n i θ,
+  n ≤ 2 ^ i
+  → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (seq_angle_to_div_nat _ _ _)).
+  apply angle_mul_nat_overflow_0_r.
+}
+intros * Hni.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
+specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H1.
+specialize (H1 n i θ Hn1).
+(*
+(* lemma *)
+apply Bool.not_true_iff_false.
+intros H.
+apply angle_mul_nat_overflow_true_assoc in H.
+apply Bool.not_false_iff_true in H.
+apply H; clear H.
+...
+progress unfold seq_angle_to_div_nat in H1.
+progress unfold seq_angle_to_div_nat.
+*)
+remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
+apply angle_all_add_not_overflow.
+intros m Hm.
+(**)
+apply angle_add_not_overflow_equiv3.
+progress unfold angle_add_not_overflow3.
+right.
+eapply angle_le_lt_trans; [ apply H1 | ].
+(* ouais, chais pas *)
+...
+apply angle_add_not_overflow_equiv.
+progress unfold angle_add_not_overflow2.
+...
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+...
+eapply angle_le_trans; [ apply H1 | ].
+...
+specialize (angle_div_2_pow_succ_mul_lt_straight Hc1) as H1.
+destruct i. {
+  cbn in Hni.
+  destruct n; [ easy | ].
+  apply Nat.succ_le_mono in Hni.
+  now apply Nat.le_0_r in Hni; subst n.
+}
+specialize (H1 (2 ^ S i / n) i).
+...
+
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
@@ -2277,11 +2333,39 @@ assert (Hts'' : (θ' < angle_straight)%A). {
   destruct n; [ easy | ].
   now apply -> Nat.succ_le_mono.
 }
+assert (Hts''' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
+  subst θ'.
+  now apply seq_angle_to_div_nat_div_2_le_straight_div_2_pow_log2.
+}
 apply angle_add_not_overflow_equiv.
 progress unfold angle_add_not_overflow2.
 split. {
-  specialize (angle_le_2_pow_pred (S n) (m * θ')%A) as H1.
-  rewrite Nat_sub_succ_1 in H1.
+(*
+  specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H1.
+  specialize (H1 n i (m * θ)%A Hn1).
+  progress unfold seq_angle_to_div_nat in H1.
+  specialize (angle_le_2_pow_pred (S n) (m * θ')%A) as H2.
+  rewrite Nat_sub_succ_1 in H2.
+  generalize Hts'; intros H.
+  specialize (angle_mul_nat_le_mono_nonneg_r m (S n)) as H1.
+  specialize (H1 θ').
+Search (_ * _ ≤ _ * _)%A.
+*)
+  eapply angle_le_trans. {
+    apply angle_add_le_mono_r; cycle 2. {
+      apply Hts'''.
+    } {
+      apply angle_add_overflow_div_2_div_2.
+    }
+    remember (Nat.log2 n) as p eqn:Hp.
+    symmetry in Hp.
+    destruct p. {
+      apply Nat.log2_null in Hp.
+      flia Hnz Hn1 Hp.
+    }
+    cbn.
+    apply angle_add_overflow_div_2_div_2.
+  }
 ...
   specialize (H1 θ' (Nat.neq_succ_0 _)).
 ...
