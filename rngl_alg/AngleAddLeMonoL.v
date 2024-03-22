@@ -5,7 +5,8 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
-Require Import TrigoWithoutPi AngleLeSubAdd.
+Require Import TrigoWithoutPi TrigoWithoutPiExt.
+Require Import AngleLeSubAdd.
 Require Import AngleAddOverflowLe.
 Require Import AngleAddOverflowEquiv3.
 Require Import TacChangeAngle.

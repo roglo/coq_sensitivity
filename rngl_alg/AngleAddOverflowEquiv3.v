@@ -4,6 +4,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi.
+Require Import TrigoWithoutPiExt.
 Require Import AngleLeSubAdd.
 Require Import TacChangeAngle.
 
@@ -214,61 +215,6 @@ rewrite angle_straight_add_straight in Hzs12.
 cbn in Hzs12.
 rewrite (rngl_opp_0 Hop) in Hzs12.
 now apply (rngl_lt_irrefl Hor) in Hzs12.
-Qed.
-
-Theorem angle_add_overflow_le_lemma_11 :
-  ∀ θ1 θ2,
-  (rngl_sin θ1 ≤ 0)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (rngl_sin (θ1 + θ2) < 0)%L
-  → (rngl_cos θ1 ≤ rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hzs12.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-  change_angle_add_r θ1 angle_right.
-  progress sin_cos_add_sub_right_hyp T Hzs1.
-  progress sin_cos_add_sub_right_hyp T Hzc1.
-  progress sin_cos_add_sub_right_hyp T Hzs12.
-  progress sin_cos_add_sub_right_goal T.
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-    move Hzc2 before Hzc1.
-    assert (Hzc12 : (0 ≤ rngl_sin (θ1 + θ2))%L). {
-      cbn.
-      apply (rngl_add_nonneg_nonneg Hor).
-      now apply (rngl_mul_nonneg_nonneg Hop Hor).
-      now apply (rngl_mul_nonneg_nonneg Hop Hor).
-    }
-    apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-    now apply (rngl_lt_le_incl Hor).
-    apply angle_le_sub_le_add_l_lemma_1; try easy.
-    rewrite angle_sub_diag.
-    apply rngl_cos_bound.
-    rewrite angle_sub_diag.
-    apply (rngl_le_refl Hor).
-  }
-  apply (rngl_nle_gt Hor) in Hc2z.
-  exfalso.
-  change_angle_sub_r θ2 angle_right.
-  progress sin_cos_add_sub_right_hyp T Hzs2.
-  progress sin_cos_add_sub_right_hyp T Hc2z.
-  progress sin_cos_add_sub_right_hyp T Hzs12.
-  apply (rngl_nle_gt Hor) in Hzs12.
-  apply Hzs12; clear Hzs12; cbn.
-  apply (rngl_add_nonneg_nonneg Hor).
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
-  now apply (rngl_lt_le_incl Hor).
-}
-apply (rngl_nle_gt Hor) in Hc1z.
-change_angle_sub_r θ1 angle_straight.
-progress sin_cos_add_sub_straight_hyp T Hzs1.
-progress sin_cos_add_sub_straight_hyp T Hc1z.
-progress sin_cos_add_sub_straight_hyp T Hzs12.
-progress sin_cos_add_sub_straight_goal T.
-apply (rngl_lt_le_incl Hor) in Hc1z, Hzs12.
-apply rngl_cos_add_le_cos; try easy.
-now right; right; left.
 Qed.
 
 Theorem rngl_cos_sub_nonneg :

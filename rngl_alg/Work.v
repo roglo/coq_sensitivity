@@ -7,7 +7,7 @@ Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
-Require Import RealLike TrigoWithoutPi.
+Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleLeSubAdd AngleDiv2Add.
 Require Import TacChangeAngle.
