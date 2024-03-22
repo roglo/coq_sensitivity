@@ -85,62 +85,6 @@ apply (rngl_add_pos_nonneg Hor). {
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
-Theorem quadrant_1_sin_sub_nonneg_cos_le :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 - θ2))%L
-  → (rngl_cos θ1 ≤ rngl_cos θ2)%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  do 2 rewrite (H1 (rngl_cos _)).
-  apply (rngl_le_refl Hor).
-}
-intros * Hsz1 Hzs2 Hzc1 Hzc2 Hzs12.
-destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [Hs2z| Hs2z]. {
-  apply eq_rngl_sin_0 in Hs2z.
-  destruct Hs2z; subst θ2. {
-    apply rngl_cos_bound.
-  }
-  exfalso.
-  apply (rngl_nlt_ge Hor) in Hzc2.
-  apply Hzc2; clear Hzc2; cbn.
-  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-}
-cbn in Hzs12.
-rewrite (rngl_mul_opp_r Hop) in Hzs12.
-rewrite (rngl_add_opp_r Hop) in Hzs12.
-apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
-apply (rngl_lt_eq_cases Hor) in Hzs2.
-apply not_eq_sym in Hs2z.
-destruct Hzs2 as [Hzs2| Hzs2]; [ | easy ].
-clear Hs2z.
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ2) Hzs2) in Hzs12.
-rewrite <- rngl_mul_assoc in Hzs12.
-rewrite fold_rngl_squ in Hzs12.
-specialize (cos2_sin2_1 θ2) as H1.
-apply (rngl_add_move_l Hop) in H1.
-rewrite H1 in Hzs12; clear H1.
-rewrite (rngl_mul_sub_distr_l Hop) in Hzs12.
-rewrite (rngl_mul_1_r Hon) in Hzs12.
-apply (rngl_le_sub_le_add_l Hop Hor) in Hzs12.
-eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
-rewrite (rngl_mul_mul_swap Hic).
-progress unfold rngl_squ.
-rewrite rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_r.
-rewrite <- (rngl_cos_sub Hop).
-rewrite <- (rngl_mul_1_l Hon).
-apply (rngl_mul_le_mono_nonneg_r Hop Hor); [ easy | ].
-apply rngl_cos_bound.
-Qed.
-
 Theorem quadrant_1_quadrant_4_cos_lt_cos_add :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
