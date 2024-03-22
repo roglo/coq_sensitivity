@@ -1952,6 +1952,114 @@ intros * Haov.
 now apply angle_ltb_ge in Haov.
 Qed.
 
+Theorem angle_le_2_pow_log2 :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → angle_mul_nat_overflow n θ1 = false
+  → (n * θ1 ≤ θ2
+  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
+Proof.
+intros * Hnz Haov Hn.
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite <- (angle_div_2_pow_mul_2_pow (Nat.log2 n) θ1).
+rewrite <- angle_div_2_pow_mul. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ n); [ | easy ].
+  now apply Nat.log2_spec.
+}
+apply angle_div_2_pow_le.
+apply (angle_le_trans _ (n * θ1)); [ | easy ].
+apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
+now apply Nat.log2_spec.
+Qed.
+
+Theorem seq_angle_to_div_nat_div_2_le_straight_div_2_pow_log2 :
+  ∀ n i θ,
+  n ≠ 0
+  → (seq_angle_to_div_nat θ n i / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A.
+Proof.
+intros * Hnz.
+progress unfold seq_angle_to_div_nat.
+assert (Hin : 2 ^ i / n ≤ 2 ^ i). {
+  apply Nat.div_le_upper_bound; [ easy | ].
+  (* lemma *)
+  rewrite Nat.mul_comm.
+  apply Nat_mul_le_pos_r.
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite <- angle_mul_nat_div_2. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
+  apply angle_mul_nat_overflow_pow_div.
+}
+rewrite <- angle_div_2_pow_succ_r_1.
+apply angle_le_2_pow_log2; [ easy | | ]. {
+  apply Bool.not_true_iff_false.
+  intros H.
+  apply angle_mul_nat_overflow_true_assoc in H.
+  apply Bool.not_false_iff_true in H.
+  apply H; clear H.
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
+    now apply Nat.mul_div_le.
+  }
+  rewrite angle_div_2_pow_succ_r_2.
+  apply angle_mul_nat_overflow_pow_div.
+}
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_mul_nat_div_2. 2: {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
+  apply angle_mul_nat_overflow_pow_div.
+}
+rewrite angle_mul_nat_div_2; [ apply angle_div_2_le_straight | ].
+(* lemma *)
+apply Bool.not_true_iff_false.
+intros H.
+apply angle_mul_nat_overflow_true_assoc in H.
+apply Bool.not_false_iff_true in H.
+apply H; clear H.
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+  apply angle_mul_nat_overflow_pow_div.
+}
+now apply Nat.mul_div_le.
+Qed.
+
+Theorem angle_le_2_pow_pred :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
+  → (θ1 ≤ θ2 / ₂^(n-1))%A.
+Proof.
+intros * Hnz H12.
+destruct n; [ easy | clear Hnz ].
+rewrite Nat_sub_succ_1.
+specialize (angle_mul_le_mono_l _ _ H12 2) as H1.
+rewrite angle_div_2_pow_succ_r_1 in H1.
+do 2 rewrite angle_div_2_mul_2 in H1.
+apply H1.
+rewrite <- (Nat.mul_1_r 2).
+now apply angle_mul_nat_overflow_mul_2_div_2.
+Qed.
+
+Theorem seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred :
+  ∀ n i θ,
+  n ≠ 1
+  → (seq_angle_to_div_nat θ n i ≤ angle_straight / ₂^(Nat.log2 n - 1))%A.
+Proof.
+intros * Hn1.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply angle_nonneg.
+}
+specialize seq_angle_to_div_nat_div_2_le_straight_div_2_pow_log2 as H1.
+specialize (H1 n i θ Hnz).
+apply angle_le_2_pow_pred; [ | easy ].
+intros H.
+apply Nat.log2_null in H.
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in H.
+apply Nat.le_0_r in H.
+now subst n.
+Qed.
+
 Theorem angle_add_overflow_2_pow_div_mul_2_pow_mul_when_lt_straight :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
@@ -1985,6 +2093,7 @@ apply angle_add_overflow_le with (θ2 := θ). {
   now apply Nat.lt_le_incl in Hmi.
 }
 clear m Hmi.
+(**)
 apply angle_add_not_overflow_comm.
 apply angle_add_overflow_lt_straight_le_straight; [ easy | ].
 destruct i. {
@@ -2094,114 +2203,6 @@ split; intros Hn. {
   destruct Hn as (m, Hm); subst n.
   now rewrite Nat.log2_pow2.
 }
-Qed.
-
-Theorem angle_le_2_pow_log2 :
-  ∀ n θ1 θ2,
-  n ≠ 0
-  → angle_mul_nat_overflow n θ1 = false
-  → (n * θ1 ≤ θ2
-  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
-Proof.
-intros * Hnz Haov Hn.
-apply Nat.neq_0_lt_0 in Hnz.
-rewrite <- (angle_div_2_pow_mul_2_pow (Nat.log2 n) θ1).
-rewrite <- angle_div_2_pow_mul. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ n); [ | easy ].
-  now apply Nat.log2_spec.
-}
-apply angle_div_2_pow_le.
-apply (angle_le_trans _ (n * θ1)); [ | easy ].
-apply angle_mul_nat_le_mono_nonneg_r; [ easy | ].
-now apply Nat.log2_spec.
-Qed.
-
-Theorem angle_le_2_pow_pred :
-  ∀ n θ1 θ2,
-  n ≠ 0
-  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
-  → (θ1 ≤ θ2 / ₂^(n-1))%A.
-Proof.
-intros * Hnz H12.
-destruct n; [ easy | clear Hnz ].
-rewrite Nat_sub_succ_1.
-specialize (angle_mul_le_mono_l _ _ H12 2) as H1.
-rewrite angle_div_2_pow_succ_r_1 in H1.
-do 2 rewrite angle_div_2_mul_2 in H1.
-apply H1.
-rewrite <- (Nat.mul_1_r 2).
-now apply angle_mul_nat_overflow_mul_2_div_2.
-Qed.
-
-Theorem seq_angle_to_div_nat_div_2_le_straight_div_2_pow_log2 :
-  ∀ n i θ,
-  n ≠ 0
-  → (seq_angle_to_div_nat θ n i / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A.
-Proof.
-intros * Hnz.
-progress unfold seq_angle_to_div_nat.
-assert (Hin : 2 ^ i / n ≤ 2 ^ i). {
-  apply Nat.div_le_upper_bound; [ easy | ].
-  (* lemma *)
-  rewrite Nat.mul_comm.
-  apply Nat_mul_le_pos_r.
-  destruct n; [ easy | ].
-  now apply -> Nat.succ_le_mono.
-}
-rewrite <- angle_mul_nat_div_2. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
-  apply angle_mul_nat_overflow_pow_div.
-}
-rewrite <- angle_div_2_pow_succ_r_1.
-apply angle_le_2_pow_log2; [ easy | | ]. {
-  apply Bool.not_true_iff_false.
-  intros H.
-  apply angle_mul_nat_overflow_true_assoc in H.
-  apply Bool.not_false_iff_true in H.
-  apply H; clear H.
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
-    now apply Nat.mul_div_le.
-  }
-  rewrite angle_div_2_pow_succ_r_2.
-  apply angle_mul_nat_overflow_pow_div.
-}
-rewrite angle_div_2_pow_succ_r_1.
-rewrite angle_mul_nat_div_2. 2: {
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
-  apply angle_mul_nat_overflow_pow_div.
-}
-rewrite angle_mul_nat_div_2; [ apply angle_div_2_le_straight | ].
-(* lemma *)
-apply Bool.not_true_iff_false.
-intros H.
-apply angle_mul_nat_overflow_true_assoc in H.
-apply Bool.not_false_iff_true in H.
-apply H; clear H.
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-  apply angle_mul_nat_overflow_pow_div.
-}
-now apply Nat.mul_div_le.
-Qed.
-
-Theorem seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred :
-  ∀ n i θ,
-  n ≠ 1
-  → (seq_angle_to_div_nat θ n i ≤ angle_straight / ₂^(Nat.log2 n - 1))%A.
-Proof.
-intros * Hn1.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  apply angle_nonneg.
-}
-specialize seq_angle_to_div_nat_div_2_le_straight_div_2_pow_log2 as H1.
-specialize (H1 n i θ Hnz).
-apply angle_le_2_pow_pred; [ | easy ].
-intros H.
-apply Nat.log2_null in H.
-destruct n; [ easy | ].
-apply Nat.succ_le_mono in H.
-apply Nat.le_0_r in H.
-now subst n.
 Qed.
 
 (* to be completed
