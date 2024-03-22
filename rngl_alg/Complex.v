@@ -4586,7 +4586,7 @@ destruct zs. {
         apply (rngl_leb_gt Hor) in Hsz.
         apply (rngl_nle_gt Hor) in Haov.
         apply Haov; clear Haov.
-        apply angle_add_overflow_le_lemma_111; try easy.
+        apply rngl_cos_add_le_cos; try easy.
         left.
         intros H; subst θ.
         cbn in Hsz.

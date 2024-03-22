@@ -599,7 +599,7 @@ destruct zs12. {
         exfalso.
         apply (rngl_nle_gt Hor) in Haov.
         apply Haov; clear Haov.
-        apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+        apply rngl_cos_add_le_cos; [ | easy | easy | easy ].
         now left.
       }
       apply (angle_eqb_eq Hed) in Ht1s.
@@ -611,7 +611,7 @@ destruct zs12. {
         exfalso.
         apply (rngl_nle_gt Hor) in Haov.
         apply Haov; clear Haov.
-        apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+        apply rngl_cos_add_le_cos; [ | easy | easy | easy ].
         now right; left.
       }
       apply (angle_eqb_eq Hed) in Ht2s.
@@ -711,7 +711,7 @@ destruct zs2. {
   exfalso.
   apply (rngl_nle_gt Hor) in Haov.
   apply Haov; clear Haov.
-  apply angle_add_overflow_le_lemma_111; try easy; cycle 1.
+  apply rngl_cos_add_le_cos; try easy; cycle 1.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
   left; intros H; subst θ1.
@@ -792,7 +792,7 @@ destruct zs12. {
         exfalso.
         apply (rngl_nle_gt Hor) in Haov.
         apply Haov; clear Haov.
-        apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+        apply rngl_cos_add_le_cos; [ | easy | easy | easy ].
         now left.
       }
       apply (angle_eqb_eq Hed) in Ht1s.
@@ -804,7 +804,7 @@ destruct zs12. {
         exfalso.
         apply (rngl_nle_gt Hor) in Haov.
         apply Haov; clear Haov.
-        apply angle_add_overflow_le_lemma_111; [ | easy | easy | easy ].
+        apply rngl_cos_add_le_cos; [ | easy | easy | easy ].
         now right; left.
       }
       apply (angle_eqb_eq Hed) in Ht2s.
@@ -969,7 +969,7 @@ destruct zs2. {
   exfalso.
   apply (rngl_nle_gt Hor) in Haov.
   apply Haov; clear Haov.
-  apply angle_add_overflow_le_lemma_111; try easy; cycle 1. {
+  apply rngl_cos_add_le_cos; try easy; cycle 1. {
     now apply (rngl_lt_le_incl Hor).
   } {
     now apply (rngl_lt_le_incl Hor).

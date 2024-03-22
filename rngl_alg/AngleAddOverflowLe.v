@@ -918,7 +918,7 @@ Theorem quadrant_1_rngl_cos_add_le_cos_l :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
-apply angle_add_overflow_le_lemma_111; try easy.
+apply rngl_cos_add_le_cos; try easy.
 now right; right; left.
 cbn.
 apply (rngl_add_nonneg_nonneg Hor).

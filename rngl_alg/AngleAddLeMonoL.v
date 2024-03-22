@@ -184,7 +184,7 @@ destruct zs2. {
   apply rngl_leb_le.
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     rewrite angle_add_comm.
-    apply angle_add_overflow_le_lemma_111; try easy.
+    apply rngl_cos_add_le_cos; try easy.
     now right; right; left.
     now rewrite angle_add_comm.
   }
@@ -3373,7 +3373,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   clear Haov13.
   apply (rngl_ltb_ge Hor).
   destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
-    apply angle_add_overflow_le_lemma_111; try easy.
+    apply rngl_cos_add_le_cos; try easy.
     now right; right; left.
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
