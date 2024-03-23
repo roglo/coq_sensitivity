@@ -2217,6 +2217,14 @@ split; intros Hn. {
 }
 Qed.
 
+(* to be completed, analyzed
+Theorem Nat_pow2_log2_eq :
+  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2 n = Nat.log2 (2 * n - 1).
+Proof.
+Compute (map (λ n, ((2 ^ Nat.log2 n, max 1 n), (Nat.log2 n, Nat.log2 (2 * n - 1)))) (seq 0 34)).
+...
+*)
+
 Theorem Nat_pow2_log2_eq :
   ∀ n, 2 ^ Nat.log2 n = n ↔ n = 1 ∨ Nat.log2 n = S (Nat.log2 (pred n)).
 Proof.
@@ -2291,6 +2299,7 @@ progress unfold angle_add_not_overflow2.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 rewrite angle_add_mul_r_diag_r.
+Search (_ * _ ≤ _ * _)%A.
 ...
 specialize (angle_mul_le_mono_l _ _ H1 (S m)) as H2.
 assert
