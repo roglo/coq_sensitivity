@@ -2180,7 +2180,49 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
+(* to be completed
 Theorem Nat_pow2_log2_eq :
+  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2 (S n) = S (Nat.log2 n).
+Proof.
+intros.
+split; intros Hn. {
+  specialize (Nat.log2_succ_or n) as H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+  exfalso.
+Check Nat.log2_up_succ_pow2.
+Search (Nat.log2 (S _)).
+...
+Search (Nat.log2 _ = Nat.log2 _).
+apply Nat.log2_same in H1.
+...
+  rewrite <- Hn in H1 at 1.
+  specialize (Nat.log2_succ_le (2 ^ Nat.log2 n)) as H2.
+  rewrite H1 in H2.
+  rewrite Nat.log2_pow2 in H2; [ | easy ].
+...
+Search (Nat.log2 (S _)).
+Check Nat.log2_up_succ_pow2.
+...
+  rewrite Nat.log2_up_succ_pow2 in H1; [ | easy ].
+  specialize (Nat.log2_up_eqn n Hn1) as H2.
+  rewrite <- H1 in H2.
+  apply Nat.succ_inj in H2.
+  rewrite <- Hn in H2 at 2.
+  rewrite Nat.log2_pred_pow2 in H2; [ | now apply Nat.log2_pos ].
+  destruct (Nat.log2 n); [ now cbn in Hn; subst n | ].
+  cbn in H2.
+  now apply Nat.neq_succ_diag_l in H2.
+} {
+  rewrite Nat.log2_up_eqn in Hn; [ | now apply -> Nat.succ_lt_mono ].
+  apply Nat.succ_inj in Hn.
+  cbn in Hn.
+  apply Nat.log2_log2_up_exact in Hn; [ | easy ].
+  destruct Hn as (m, Hm); subst n.
+  now rewrite Nat.log2_pow2.
+}
+*)
+
+Theorem Nat_pow2_log2_up_eq :
   ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
 Proof.
 intros.
