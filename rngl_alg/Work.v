@@ -2290,7 +2290,6 @@ progress unfold angle_add_not_overflow2.
 *)
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
-Search (_ * _ ≤ _ * _)%A.
 specialize (angle_mul_le_mono_l _ _ H1 m) as H2.
 assert
   (H :
@@ -2307,6 +2306,25 @@ assert
     now do 2 apply -> Nat.succ_le_mono.
   }
   rewrite Nat.pow_1_r.
+  apply Nat.div_le_lower_bound; [ easy | ].
+(**)
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ cbn; flia Hm | ].
+  destruct n. {
+    cbn.
+    (* faux *)
+...
+  remember (Nat.log2 n) as p eqn:Hp.
+  symmetry in Hp.
+  destruct p. {
+    apply Nat.log2_null in Hp.
+    destruct n; [ easy | ].
+    apply Nat.succ_le_mono in Hp.
+    apply Nat.le_0_r in Hp.
+    now subst n.
+  }
+  rewrite Nat.pow_succ_r'.
 ...
     destruct n; [ easy | ].
     destruct n; [ easy | ].
