@@ -4148,11 +4148,9 @@ easy.
 Qed.
 
 Theorem angle_eucl_dist_symmetry :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist θ2 θ1.
 Proof.
-intros Hic Hop *.
+intros.
 do 2 rewrite angle_eucl_dist_is_sqrt.
 now rewrite rngl_cos_sub_comm.
 Qed.
@@ -4209,9 +4207,9 @@ Qed.
 
 Theorem angle_eucl_dist_is_dist : is_dist angle_eucl_dist.
 Proof.
-destruct_ac; intros.
+intros.
 split. {
-  apply (angle_eucl_dist_symmetry Hic Hop).
+  apply angle_eucl_dist_symmetry.
 } {
   apply angle_eucl_dist_separation.
 } {

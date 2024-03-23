@@ -899,9 +899,8 @@ Theorem angle_le_eucl_dist_le :
   (θ1 ≤ θ2 ≤ angle_straight)%A
   → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
 Proof.
-destruct_ac.
 intros * H12.
-rewrite (angle_eucl_dist_symmetry Hic Hop θ2).
+rewrite (angle_eucl_dist_symmetry θ2).
 apply angle_dist_le_r; [ easy | ].
 split; [ apply angle_nonneg | easy ].
 Qed.
@@ -953,7 +952,7 @@ rewrite <- angle_eucl_dist_move_0_r.
 eapply (rngl_le_lt_trans Hor). {
   apply (angle_eucl_dist_triangular _ θ).
 }
-rewrite (angle_eucl_dist_symmetry Hic Hop θ).
+rewrite (angle_eucl_dist_symmetry θ).
 specialize (HM _ (Nat.max_lub_l _ _ _ Hn)).
 specialize (HN _ (Nat.max_lub_r _ _ _ Hn)).
 now apply (rngl_add_lt_compat Hop Hor).
@@ -5609,7 +5608,7 @@ specialize (H1 θ' (2 ^ N / n * (θ / ₂^N)) 0)%A.
 exfalso.
 apply (rngl_nlt_ge Hor) in H1.
 apply H1; clear H1.
-rewrite (angle_eucl_dist_symmetry Hic Hop).
+rewrite angle_eucl_dist_symmetry.
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 (* ah bin non *)
 ...
@@ -6124,7 +6123,7 @@ Search ((_ + _) / _).
     specialize (HN' _ H); clear H.
     specialize (angle_eucl_dist_triangular) as H1.
     specialize (H1 (u θ n p) θ' (u (n * θ')%A n p)).
-    rewrite (angle_eucl_dist_symmetry Hic Hop θ') in H1.
+    rewrite (angle_eucl_dist_symmetry θ') in H1.
     eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
     specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as H2.
     rewrite (rngl_add_diag2 Hon) in H2.

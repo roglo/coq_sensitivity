@@ -4214,7 +4214,7 @@ intros * H1.
 progress unfold angle_lim in H1.
 progress unfold is_limit_when_tending_to_inf in H1.
 apply angle_eucl_dist_separation.
-rewrite (angle_eucl_dist_symmetry Hic Hop).
+rewrite angle_eucl_dist_symmetry.
 specialize (angle_eucl_dist_nonneg θ1 θ2) as Hzx.
 remember (angle_eucl_dist θ1 θ2) as x eqn:Hx.
 clear θ1 θ2 Hx.
@@ -5290,7 +5290,7 @@ progress unfold ε in H1.
 specialize (Hut N) as H2.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
-rewrite (angle_eucl_dist_symmetry Hic Hop θ).
+rewrite (angle_eucl_dist_symmetry θ).
 apply angle_dist_le_r; [ easy | ].
 split; [ easy | ].
 now apply angle_lt_le_incl.
@@ -5325,7 +5325,7 @@ progress unfold ε in H1.
 specialize (Hut N) as H2.
 apply (rngl_nle_gt Hor) in H1.
 apply H1; clear H1.
-do 2 rewrite (angle_eucl_dist_symmetry Hic Hop _ θ').
+do 2 rewrite (angle_eucl_dist_symmetry _ θ').
 apply angle_dist_le_l. 2: {
   split; [ | easy ].
   now apply angle_lt_le_incl.
