@@ -447,7 +447,7 @@ exfalso.
 symmetry in H.
 apply (eq_rngl_cos_0) in H.
 destruct H; subst θ1. {
-  rewrite (rngl_cos_add_right_l Hon Hop) in Hzs12.
+  rewrite rngl_cos_add_right_l in Hzs12.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
   now apply (rngl_nlt_ge Hor) in Hzs12.
 }

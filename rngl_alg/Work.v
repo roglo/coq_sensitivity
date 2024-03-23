@@ -1051,7 +1051,7 @@ destruct_ac.
 replace 7 with (2 + 5) by easy.
 rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_mul_2.
-rewrite (rngl_cos_add_right_l Hon Hop).
+rewrite rngl_cos_add_right_l.
 apply (rngl_opp_inj Hop).
 rewrite (rngl_opp_involutive Hop).
 apply rngl_sin_5_right_div_2.

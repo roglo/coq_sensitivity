@@ -250,11 +250,10 @@ Qed.
 Theorem rngl_cos_5_right_div_2 :
   rngl_cos (5 * (angle_right / ₂)) = (- √(1 / 2))%L.
 Proof.
-destruct_ac.
 replace 5 with (2 + 3) by easy.
 rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_mul_2.
-rewrite (rngl_cos_add_right_l Hon Hop).
+rewrite rngl_cos_add_right_l.
 f_equal.
 apply rngl_sin_3_right_div_2.
 Qed.
