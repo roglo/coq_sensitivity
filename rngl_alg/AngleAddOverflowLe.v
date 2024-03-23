@@ -93,7 +93,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   apply eq_rngl_cos_0 in Hzs2.
   destruct Hzs2; subst θ1. {
     rewrite angle_straight_sub_right in H12.
-    rewrite (angle_right_add_right Hon Hop) in H12.
+    rewrite angle_right_add_right in H12.
     apply (rngl_nlt_ge Hor) in H12.
     apply H12; cbn.
     apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
@@ -133,8 +133,8 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc1o| Hc1o]. {
     apply eq_rngl_cos_opp_1 in Hc1o.
     subst θ1.
-    rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12, Hzs13.
-    rewrite (rngl_cos_add_straight_l Hon Hop).
+    rewrite rngl_sin_add_straight_l in Hzs12, Hzs13.
+    rewrite rngl_cos_add_straight_l.
     apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
     apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
     apply (rngl_le_antisymm Hor) in Hzs13; [ | easy ].
@@ -192,16 +192,16 @@ intros * Hzs1 Hzs2 Hzs3 Hzs12 Hzs13.
 destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hc1o| Hc1o]. {
   apply eq_rngl_cos_opp_1 in Hc1o.
   subst θ1.
-  rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs13.
+  rewrite rngl_sin_add_straight_l in Hzs13.
   apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
   apply (rngl_le_antisymm Hor) in Hzs13; [ | easy ].
   symmetry in Hzs13.
   apply eq_rngl_sin_0 in Hzs13.
   destruct Hzs13; subst θ3. {
-    rewrite (rngl_cos_add_straight_l Hon Hop).
+    rewrite rngl_cos_add_straight_l.
     apply (rngl_le_refl Hor).
   }
-  rewrite (rngl_sin_add_straight_l Hon Hop) in Hzs12.
+  rewrite rngl_sin_add_straight_l in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
   apply (rngl_lt_le_incl Hor) in Hzs12.
   now apply (rngl_nlt_ge Hor) in Hzs12.

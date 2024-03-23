@@ -293,7 +293,7 @@ destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H2.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H2.
   intros.
   rewrite (H2 (angle_right / ₂))%A.
   rewrite (H2 θ), (H2 (_ * _))%A.
@@ -471,7 +471,7 @@ Theorem angle_add_straight_r_not_overflow :
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros * Hts.
   rewrite (H1 θ), (H1 angle_straight) in Hts.
   now apply angle_lt_irrefl in Hts.
@@ -522,7 +522,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   rewrite (H1 θ1).
   rewrite angle_add_overflow_0_l.
@@ -541,9 +541,9 @@ split; intros H12. {
     remember (θ1 =? 0)%A as t1z eqn:Ht1z.
     symmetry in Ht1z.
     destruct t1z. {
-      now apply (angle_eqb_eq Hed) in Ht1z; left.
+      now apply angle_eqb_eq in Ht1z; left.
     }
-    apply (angle_eqb_neq Hed) in Ht1z; right.
+    apply angle_eqb_neq in Ht1z; right.
     intros H12z.
     rewrite angle_add_comm in H12z.
     apply angle_add_move_0_r in H12z.
@@ -634,7 +634,7 @@ split; intros H12. {
         apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
         apply eq_rngl_cos_0 in Hzs1.
         destruct Hzs1; subst θ1. {
-          rewrite (angle_right_add_right Hon Hop) in H12z.
+          rewrite angle_right_add_right in H12z.
           rewrite angle_sub_add in H12z.
           now rewrite angle_straight_add_straight in H12z.
         }
@@ -654,7 +654,7 @@ split; intros H12. {
         remember (θ2 =? 0)%A as t2z eqn:Ht2z.
         symmetry in Ht2z.
         destruct t2z. {
-          apply (angle_eqb_eq Hed) in Ht2z.
+          apply angle_eqb_eq in Ht2z.
           subst θ2.
           now apply (rngl_lt_irrefl Hor) in Hzs2.
         }
@@ -688,12 +688,12 @@ split; intros H12. {
             apply (rngl_le_antisymm Hor) in Hzc1; [ | easy ].
             apply eq_rngl_cos_0 in Hzc1.
             destruct Hzc1; subst θ1. {
-              rewrite (angle_right_add_right Hon Hop).
+              rewrite angle_right_add_right.
               apply angle_sub_diag.
             }
             rewrite angle_add_opp_r.
             rewrite <- angle_opp_add_distr.
-            rewrite (angle_right_add_right Hon Hop).
+            rewrite angle_right_add_right.
             rewrite <- angle_opp_add_distr.
             rewrite angle_straight_add_straight.
             apply angle_opp_0.
@@ -836,7 +836,7 @@ split; intros H12. {
           apply H12z.
           rewrite angle_add_add_swap.
           rewrite H12.
-          rewrite (angle_right_add_right Hon Hop).
+          rewrite angle_right_add_right.
           apply angle_sub_diag.
         }
         apply (rngl_nlt_ge Hor) in Hzs12.

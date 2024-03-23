@@ -197,7 +197,7 @@ Theorem angle_mul_div_2_pow_le_straight :
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   rewrite (H1 (_ * _)%A).
   apply angle_nonneg.
@@ -373,7 +373,7 @@ Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   rewrite (H1 (_ * _)%A).
   apply angle_add_overflow_0_l.
@@ -1900,7 +1900,7 @@ Theorem angle_add_straight_r_le_straight :
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros * Hst.
   rewrite (H1 (_ + _)%A).
   apply angle_nonneg.
@@ -2070,7 +2070,7 @@ Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   progress unfold seq_angle_to_div_nat.
   rewrite (H1 (_ * _)%A).
@@ -2225,7 +2225,7 @@ Theorem angle_mul_nat_not_overflow :
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   rewrite (H1 (seq_angle_to_div_nat _ _ _)).
   apply angle_mul_nat_overflow_0_r.
