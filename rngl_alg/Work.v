@@ -2248,7 +2248,7 @@ progress unfold seq_angle_to_div_nat.
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 apply angle_all_add_not_overflow.
 intros m Hm.
-(**)
+(*
 apply angle_add_not_overflow_equiv3.
 progress unfold angle_add_not_overflow3.
 right.
@@ -2258,8 +2258,36 @@ eapply angle_le_lt_trans; [ apply H1 | ].
 apply angle_add_not_overflow_equiv.
 progress unfold angle_add_not_overflow2.
 ...
+*)
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
+Search (_ * _ ≤ _ * _)%A.
+specialize (angle_mul_le_mono_l _ _ H1 m) as H2.
+assert
+  (H :
+     angle_mul_nat_overflow m (angle_straight / ₂^(Nat.log2 n - 1)) =
+       false). {
+  eapply angle_mul_nat_not_overflow_le_l. 2: {
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  specialize Nat.log2_spec as H3.
+  rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    specialize (Nat.log2_succ_or (S n)) as H4.
+    destruct H4 as [H4| H4]. {
+      rewrite H4.
+      now apply -> Nat.succ_le_mono.
+    }
+    rewrite H4.
+    specialize (Nat_pow2_log2_eq (S n)) as H5.
+...
+Search Nat.log2.
+...
+Search (_ < _ ^ _).
+Search (_ ^ (_ - _)).
+...
+Search (_ ≤ _ ^ _).
 ...
 eapply angle_le_trans; [ apply H1 | ].
 ...
