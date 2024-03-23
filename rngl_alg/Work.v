@@ -2186,11 +2186,26 @@ Theorem Nat_pow2_log2_eq :
 Proof.
 intros.
 split; intros Hn. {
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  apply Nat.neq_0_lt_0 in Hnz.
   specialize (Nat.log2_succ_or n) as H1.
   destruct H1 as [H1| H1]; [ easy | ].
   exfalso.
-Check Nat.log2_up_succ_pow2.
+  generalize H1; intros H.
+  apply Nat.log2_same in H; [ | easy | easy ].
+Search (Nat.log2 _ < Nat.log2 _).
+...
+cbn in H1.
+Search Nat.log2_iter.
+specialize Nat.log2_iter_spec as H2.
+specialize (H2 n 0 1 0 eq_refl Nat.lt_0_1).
+rewrite H1 in H2.
+cbn in H2.
+rewrite Hn in H2.
 Search (Nat.log2 (S _)).
+...
+  apply Nat.log2_eq_succ_iff_pow2.
+Check Nat.log2_up_succ_pow2.
 ...
 Search (Nat.log2 _ = Nat.log2 _).
 apply Nat.log2_same in H1.
