@@ -2301,6 +2301,13 @@ assert
   }
   specialize Nat.log2_spec as H3.
   rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
+    apply Nat.log2_le_pow2; [ now destruct n | cbn ].
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  rewrite Nat.pow_1_r.
+...
     destruct n; [ easy | ].
     destruct n; [ easy | ].
     specialize (Nat.log2_succ_or (S n)) as H4.
@@ -2309,7 +2316,10 @@ assert
       now apply -> Nat.succ_le_mono.
     }
     rewrite H4.
-    specialize (Nat_pow2_log2_eq (S n)) as H5.
+    specialize (Nat_pow2_log2_up_eq (S n)) as H5.
+    specialize (Nat_pow2_log2_eq (S n)) as H6.
+    cbn - [ Nat.log2 ] in H6.
+Search (Nat.log2 (S _)).
 ...
 Search Nat.log2.
 ...
