@@ -2180,8 +2180,8 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
-Theorem Nat_pow2_log2_up_eq :
-  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2_up (S n) = S (Nat.log2_up n).
+Theorem Nat_pow2_log2_up_succ :
+  ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
@@ -2194,6 +2194,13 @@ assert (Hn1 : 1 < n). {
 }
 clear H.
 split; intros Hn. {
+  rewrite Nat.log2_up_eqn in Hn; [ | now apply -> Nat.succ_lt_mono ].
+  apply Nat.succ_inj in Hn.
+  cbn in Hn.
+  apply Nat.log2_log2_up_exact in Hn; [ | easy ].
+  destruct Hn as (m, Hm); subst n.
+  now rewrite Nat.log2_pow2.
+} {
   specialize (Nat.log2_up_succ_or n) as H1.
   destruct H1 as [H1| H1]; [ easy | ].
   exfalso.
@@ -2207,50 +2214,24 @@ split; intros Hn. {
   destruct (Nat.log2 n); [ now cbn in Hn; subst n | ].
   cbn in H2.
   now apply Nat.neq_succ_diag_l in H2.
-} {
-  rewrite Nat.log2_up_eqn in Hn; [ | now apply -> Nat.succ_lt_mono ].
-  apply Nat.succ_inj in Hn.
-  cbn in Hn.
-  apply Nat.log2_log2_up_exact in Hn; [ | easy ].
-  destruct Hn as (m, Hm); subst n.
-  now rewrite Nat.log2_pow2.
 }
 Qed.
 
-(* to be completed, analyzed
-Theorem Nat_pow2_log2_eq :
-  ∀ n, 2 ^ Nat.log2 n = n ↔ Nat.log2 n = Nat.log2 (2 * n - 1).
-Proof.
-Compute (map (λ n, ((2 ^ Nat.log2 n, max 1 n), (Nat.log2 n, Nat.log2 (2 * n - 1)))) (seq 0 34)).
-...
-*)
-
-Theorem Nat_pow2_log2_eq :
-  ∀ n, 2 ^ Nat.log2 n = n ↔ n = 1 ∨ Nat.log2 n = S (Nat.log2 (pred n)).
+Theorem Nat_pow2_log2_succ :
+  ∀ n, Nat.log2 (S n) = S (Nat.log2 n) ↔ n ≠ 0 ∧ 2 ^ Nat.log2 (S n) = S n.
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  split; [ easy | ].
-  intros H; now destruct H.
-}
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply Nat.neq_0_lt_0 in Hnz.
 split; intros Hn. {
-  apply Nat_pow2_log2_up_eq in Hn.
-  apply Nat.log2_up_eq_succ_iff_pow2 in Hn; [ | easy ].
-  destruct Hn as (m, Hm).
-  subst n.
-  destruct m; [ now left | right ].
-  rewrite Nat.log2_pow2; [ f_equal | easy ].
-  now rewrite Nat.log2_pred_pow2.
-} {
-  destruct Hn as [Hn| Hn]; [ now subst n | ].
-  destruct n; [ easy | ].
-  cbn - [ Nat.log2 ] in Hn.
-  apply Nat.log2_eq_succ_is_pow2 in Hn.
-  destruct Hn as (m, Hm).
-  rewrite Hm.
+  split; [ now intros H; subst n | ].
+  apply Nat.log2_eq_succ_iff_pow2 in Hn; [ | easy ].
+  destruct Hn as (m, Hm); rewrite Hm.
   now rewrite Nat.log2_pow2.
+} {
+  destruct Hn as (_, Hn).
+  apply Nat.log2_eq_succ_iff_pow2; [ easy | ].
+  now exists (Nat.log2 (S n)).
 }
 Qed.
 
