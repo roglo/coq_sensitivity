@@ -49,8 +49,8 @@ Ltac sin_cos_add_sub_right_hyp T H :=
   repeat rewrite rngl_cos_add_right_r in H;
   repeat rewrite rngl_sin_sub_right_r in H;
   repeat rewrite -> rngl_cos_sub_right_r in H;
-  repeat rewrite (rngl_sin_add_right_l Hon' Hos') in H;
-  repeat rewrite (rngl_cos_add_right_l Hon' Hop') in H;
+  repeat rewrite rngl_sin_add_right_l in H;
+  repeat rewrite rngl_cos_add_right_l in H;
   repeat rewrite rngl_sin_sub_right_l in H;
   repeat rewrite rngl_cos_sub_right_l in H;
   repeat rewrite -> (rngl_add_opp_l Hop') in H;

@@ -1178,7 +1178,7 @@ apply (rngl_le_antisymm Hor) in H; [ | easy ].
 symmetry in H.
 apply (eq_rngl_cos_0) in H.
 destruct H; subst θ1. {
-  rewrite (rngl_sin_add_right_l Hon Hos) in Hzs12.
+  rewrite rngl_sin_add_right_l in Hzs12.
   apply (rngl_le_antisymm Hor) in Hzs12; [ | easy ].
   symmetry in Hzs12.
   apply (eq_rngl_cos_0) in Hzs12.

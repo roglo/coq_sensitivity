@@ -239,11 +239,10 @@ Qed.
 Theorem rngl_sin_5_right_div_2 :
   rngl_sin (5 * (angle_right / ₂)) = (- √(1 / 2))%L.
 Proof.
-destruct_ac.
 replace 5 with (2 + 3) by easy.
 rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_mul_2.
-rewrite (rngl_sin_add_right_l Hon Hos).
+rewrite rngl_sin_add_right_l.
 apply rngl_cos_3_right_div_2.
 Qed.
 
