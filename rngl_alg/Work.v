@@ -2314,6 +2314,7 @@ destruct n. {
       now apply rngl_sin_nonneg_angle_le_straight.
     }
     intros H; move H at top; subst θ'.
+    clear Hm H1.
     destruct i; [ cbn in Hni; flia Hni | ].
     progress unfold seq_angle_to_div_nat in Hθ'.
     symmetry in Hθ'.
@@ -2332,7 +2333,34 @@ destruct n. {
     }
     destruct i. {
       cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
-Search (5 * _)%A.
+      specialize (angle_div_2_pow_succ_mul_lt_straight Hc1) as H1.
+      specialize (H1 5 3 θ).
+      rewrite Hθ' in H1.
+      cbn in H1.
+      assert (H : 5 ≤ 8) by now do 5 apply -> Nat.succ_le_mono.
+      specialize (H1 H); clear H.
+      now apply angle_lt_irrefl in H1.
+    }
+    destruct i. {
+      cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+      specialize (angle_div_2_pow_succ_mul_lt_straight Hc1) as H1.
+      specialize (H1 10 4 θ).
+      rewrite Hθ' in H1.
+      cbn in H1.
+      assert (H : 10 ≤ 16) by now do 10 apply -> Nat.succ_le_mono.
+      specialize (H1 H); clear H.
+      now apply angle_lt_irrefl in H1.
+    }
+    destruct i. {
+      cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+      specialize (angle_div_2_pow_succ_mul_lt_straight Hc1) as H1.
+      specialize (H1 21 5 θ).
+      rewrite Hθ' in H1.
+      cbn in H1.
+      assert (H : 21 ≤ 32) by now do 21 apply -> Nat.succ_le_mono.
+      specialize (H1 H); clear H.
+      now apply angle_lt_irrefl in H1.
+    }
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
