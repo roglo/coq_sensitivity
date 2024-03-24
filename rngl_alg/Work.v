@@ -2276,11 +2276,64 @@ eapply angle_le_lt_trans; [ apply H1 | ].
 apply angle_add_not_overflow_equiv.
 progress unfold angle_add_not_overflow2.
 ...
-*)
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 rewrite angle_add_mul_r_diag_r.
+*)
 move H1 at bottom.
+(**)
+destruct n; [ easy | ].
+destruct n; [ easy | clear Hn1 ].
+destruct n. {
+  cbn in H1.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m.
+  rewrite angle_mul_1_l.
+  apply angle_add_overflow_diag. {
+    now apply rngl_sin_nonneg_angle_le_straight.
+  }
+  intros H; move H at top; subst θ'.
+  destruct i; [ cbn in Hni; flia Hni | ].
+  progress unfold seq_angle_to_div_nat in Hθ'.
+  symmetry in Hθ'.
+  rewrite Nat.pow_succ_r' in Hθ'.
+  rewrite Nat.mul_comm in Hθ'.
+  rewrite Nat.div_mul in Hθ'; [ | easy ].
+  rewrite angle_div_2_pow_succ_r_2 in Hθ'.
+  rewrite angle_div_2_pow_mul_2_pow in Hθ'.
+  now apply (angle_div_2_not_straight Hc1) in Hθ'.
+}
+destruct n. {
+  cbn in H1.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_diag. {
+      now apply rngl_sin_nonneg_angle_le_straight.
+    }
+    intros H; move H at top; subst θ'.
+    destruct i; [ cbn in Hni; flia Hni | ].
+    progress unfold seq_angle_to_div_nat in Hθ'.
+    symmetry in Hθ'.
+    rewrite Nat.pow_succ_r' in Hθ'.
+    rewrite Nat.mul_comm in Hθ'.
+    destruct i; [ cbn in Hni; flia Hni | clear Hni ].
+    destruct i. {
+      cbn in Hθ'.
+      rewrite angle_add_0_r in Hθ'.
+      now apply (angle_div_2_not_straight Hc1) in Hθ'.
+    }
+    destruct i. {
+      cbn - [ angle_mul_nat ] in Hθ'.
+      rewrite angle_div_2_mul_2 in Hθ'.
+      now apply (angle_div_2_not_straight Hc1) in Hθ'.
+    }
+    destruct i. {
+      cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+Search (5 * _)%A.
+...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
     apply angle_mul_nat_overflow_pow_div.
