@@ -2361,6 +2361,16 @@ destruct n. {
       specialize (H1 H); clear H.
       now apply angle_lt_irrefl in H1.
     }
+    destruct i. {
+      cbn - [ angle_mul_nat angle_div_2_pow ] in Hθ'.
+      specialize (angle_div_2_pow_succ_mul_lt_straight Hc1) as H1.
+      specialize (H1 42 6 θ).
+      rewrite Hθ' in H1.
+      cbn in H1.
+      assert (H : 42 ≤ 64) by now do 42 apply -> Nat.succ_le_mono.
+      specialize (H1 H); clear H.
+      now apply angle_lt_irrefl in H1.
+    }
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
