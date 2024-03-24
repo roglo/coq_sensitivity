@@ -2280,9 +2280,17 @@ progress unfold angle_add_not_overflow2.
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 rewrite angle_add_mul_r_diag_r.
-Search (_ * _ ≤ _ * _)%A.
+move H1 at bottom.
+apply (angle_mul_le_mono_l) with (n := S m) in H1.
+...
+progress unfold angle_leb in H1.
+progress unfold angle_leb.
+...
+rewrite <- (angle_mul_1_l θ') at 1.
+apply angle_mul_nat_le_mono_nonneg_r; [ | now apply -> Nat.succ_le_mono ].
 ...
 specialize (angle_mul_le_mono_l _ _ H1 (S m)) as H2.
+...
 assert
   (H :
      angle_mul_nat_overflow m (angle_straight / ₂^(Nat.log2 n - 1)) =
