@@ -2281,7 +2281,13 @@ progress unfold angle_add_overflow.
 apply angle_ltb_ge.
 rewrite angle_add_mul_r_diag_r.
 move H1 at bottom.
-apply (angle_mul_le_mono_l) with (n := S m) in H1.
+apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
+  eapply angle_mul_nat_not_overflow_le_l. 2: {
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  apply Nat.le_succ_l.
+  apply (Nat.lt_trans _ n); [ easy | ].
+(* bin non, of course *)
 ...
 progress unfold angle_leb in H1.
 progress unfold angle_leb.
