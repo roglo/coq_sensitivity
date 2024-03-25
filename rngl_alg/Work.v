@@ -2348,6 +2348,9 @@ Theorem glop :
   ∀ i θ, (2 ^ i / 3 * (θ / ₂^i) ≤ 3 * (θ / ₂^3))%A.
 Proof.
 intros.
+(* θ/3 ≤ 3(θ/8)
+   1/3 ≤ 3/8
+   8 ≤ 9 *)
 destruct i; [ apply angle_nonneg | ].
 destruct i; [ apply angle_nonneg | ].
 destruct i. {
