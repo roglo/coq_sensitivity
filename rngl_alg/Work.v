@@ -2344,8 +2344,8 @@ destruct n. {
   (* et c'est là que ça déconne : ça se simplifie en θ' ≤ angle_straight *)
   (* on pourrait pas avoir une version plus précise ? *)
   cbn in H2.
-Theorem glop :
-  ∀ i θ, (2 ^ i / 3 * (θ / ₂^i) ≤ 3 * (θ / ₂^3))%A.
+Theorem seq_angle_to_div_nat_3_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A.
 Proof.
 intros.
 (* θ/3 ≤ 3(θ/8)
@@ -2353,6 +2353,7 @@ intros.
    8 ≤ 9 *)
 destruct i; [ apply angle_nonneg | ].
 destruct i; [ apply angle_nonneg | ].
+progress unfold seq_angle_to_div_nat.
 destruct i. {
   cbn - [ angle_mul_nat angle_div_2_pow ].
   rewrite angle_mul_1_l.
@@ -2412,6 +2413,10 @@ destruct i. {
   apply angle_mul_nat_overflow_div_2_pow.
   now do 24 apply -> Nat.succ_le_mono.
 }
+...
+specialize (seq_angle_to_div_nat_3_le i θ) as H3.
+progress unfold seq_angle_to_div_nat in H3.
+rewrite <- Hθ' in H3.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
