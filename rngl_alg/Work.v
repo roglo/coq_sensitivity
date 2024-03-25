@@ -2433,6 +2433,21 @@ destruct n. {
   }
   rewrite Hθ'.
   progress unfold seq_angle_to_div_nat.
+  eapply angle_mul_nat_not_overflow_le_l. 2: {
+    apply angle_mul_nat_overflow_2_pow_div_angle_mul.
+  }
+  apply Nat.div_le_lower_bound. {
+    intros H.
+    apply Nat.div_small_iff in H; [ | easy ].
+    now apply Nat.nle_gt in H.
+  }
+  (* lemma *)
+  rewrite Nat.mul_comm.
+  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+  rewrite Nat.mul_comm.
+  now rewrite Nat.div_mul.
+}
+destruct n. {
 ...
 Search (angle_mul_nat_overflow _ (_ * _)).
 apply angle_mul_nat_overflo
