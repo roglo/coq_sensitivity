@@ -2344,6 +2344,37 @@ destruct n. {
   (* et c'est là que ça déconne : ça se simplifie en θ' ≤ angle_straight *)
   (* on pourrait pas avoir une version plus précise ? *)
   cbn in H2.
+Theorem glop :
+  ∀ i θ, (2 ^ i / 3 * (θ / ₂^i) ≤ 3 * (θ / ₂^3))%A.
+Proof.
+intros.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
+  rewrite angle_mul_1_l.
+  replace 3 with (2 + 1) at 2 by easy.
+  rewrite angle_mul_add_distr_r.
+  rewrite angle_mul_1_l.
+  remember (θ / ₂^3)%A as θ' eqn:Hθ.
+  rewrite Hθ at 2.
+  rewrite angle_div_2_pow_succ_r_1 in Hθ; subst θ'.
+  rewrite angle_div_2_mul_2.
+  rewrite <- (angle_add_0_r (θ / ₂^2)) at 1.
+  apply angle_add_le_mono_l; [ | | apply angle_nonneg ].
+  apply angle_add_overflow_0_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
+  apply angle_mul_nat_le_mono_nonneg_r. 2: {
+    now do 2 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow.
+  now do 3 apply -> Nat.succ_le_mono.
+}
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
