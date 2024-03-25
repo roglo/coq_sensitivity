@@ -2235,6 +2235,60 @@ split; intros Hn. {
 }
 Qed.
 
+Theorem angle_div_2_pow_mul_pow_sub :
+  ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ / ₂^i) = θ / ₂^j)%A.
+Proof.
+intros * Hji.
+replace i with (j + (i - j)) at 1 by flia Hji.
+rewrite angle_div_pow_2_add_distr.
+apply angle_div_2_pow_mul_2_pow.
+Qed.
+
+Theorem seq_angle_to_div_nat_3_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A.
+Proof.
+intros.
+(* θ/3 ≤ 3(θ/8)
+   1/3 ≤ 3/8
+   8 ≤ 9 *)
+progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
+  rewrite angle_mul_1_l.
+  replace 3 with (2 + 1) at 2 by easy.
+  rewrite angle_mul_add_distr_r.
+  rewrite angle_mul_1_l.
+  remember (θ / ₂^3)%A as θ' eqn:Hθ.
+  rewrite Hθ at 2.
+  rewrite angle_div_2_pow_succ_r_1 in Hθ; subst θ'.
+  rewrite angle_div_2_mul_2.
+  rewrite <- (angle_add_0_r (θ / ₂^2)) at 1.
+  apply angle_add_le_mono_l; [ | | apply angle_nonneg ].
+  apply angle_add_overflow_0_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+rewrite <- (angle_div_2_pow_mul_pow_sub (3 + i) 3); [ | apply Nat.le_add_r ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm.
+rewrite angle_mul_nat_assoc.
+apply angle_mul_nat_le_mono_nonneg_r. 2: {
+  replace (S (S (S i))) with (3 + i) by easy.
+  rewrite Nat.pow_add_r.
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite Nat.mul_assoc.
+  apply Nat.mul_le_mono_r; cbn.
+  now do 8 apply -> Nat.succ_le_mono.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (3 + i))). {
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  now do 3 apply -> Nat.succ_le_mono.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+
 (* to be completed
 Theorem angle_mul_nat_not_overflow :
   ∀ n i θ,
@@ -2334,89 +2388,8 @@ destruct n. {
   apply Nat.succ_lt_mono in Hm.
   apply Nat.lt_1_r in Hm.
   subst m.
-  progress unfold seq_angle_to_div_nat in Hθ'.
-  specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H2.
-  specialize (H2 3 i θ).
-  assert (H : 3 ≠ 1) by easy.
-  specialize (H2 H); clear H.
-  progress unfold seq_angle_to_div_nat in H2.
+  specialize (seq_angle_to_div_nat_3_le i θ) as H2.
   rewrite <- Hθ' in H2.
-  (* et c'est là que ça déconne : ça se simplifie en θ' ≤ angle_straight *)
-  (* on pourrait pas avoir une version plus précise ? *)
-  cbn in H2.
-Theorem seq_angle_to_div_nat_3_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A.
-Proof.
-intros.
-(* θ/3 ≤ 3(θ/8)
-   1/3 ≤ 3/8
-   8 ≤ 9 *)
-progress unfold seq_angle_to_div_nat.
-destruct i; [ apply angle_nonneg | ].
-destruct i; [ apply angle_nonneg | ].
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite angle_mul_1_l.
-  replace 3 with (2 + 1) at 2 by easy.
-  rewrite angle_mul_add_distr_r.
-  rewrite angle_mul_1_l.
-  remember (θ / ₂^3)%A as θ' eqn:Hθ.
-  rewrite Hθ at 2.
-  rewrite angle_div_2_pow_succ_r_1 in Hθ; subst θ'.
-  rewrite angle_div_2_mul_2.
-  rewrite <- (angle_add_0_r (θ / ₂^2)) at 1.
-  apply angle_add_le_mono_l; [ | | apply angle_nonneg ].
-  apply angle_add_overflow_0_r.
-  apply angle_add_overflow_div_2_div_2.
-}
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite <- (angle_div_2_pow_mul_2_pow 0 (θ / ₂^3)) at 2.
-  rewrite <- angle_div_pow_2_add_distr.
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_nat_le_mono_nonneg_r. 2: {
-    now do 2 apply -> Nat.succ_le_mono.
-  }
-  cbn - [ angle_mul_nat_overflow angle_div_2_pow ].
-  apply angle_mul_nat_overflow_div_2_pow.
-  now do 3 apply -> Nat.succ_le_mono.
-}
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite <- (angle_div_2_pow_mul_2_pow 1 (θ / ₂^3)).
-  rewrite <- angle_div_pow_2_add_distr.
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_nat_le_mono_nonneg_r. 2: {
-    now do 5 apply -> Nat.succ_le_mono.
-  }
-  cbn - [ angle_mul_nat_overflow angle_div_2_pow ].
-  apply angle_mul_nat_overflow_div_2_pow.
-  now do 6 apply -> Nat.succ_le_mono.
-}
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite <- (angle_div_2_pow_mul_2_pow 2 (θ / ₂^3)).
-  rewrite <- angle_div_pow_2_add_distr.
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_nat_le_mono_nonneg_r. 2: {
-    now do 10 apply -> Nat.succ_le_mono.
-  }
-  cbn - [ angle_mul_nat_overflow angle_div_2_pow ].
-  apply angle_mul_nat_overflow_div_2_pow.
-  now do 12 apply -> Nat.succ_le_mono.
-}
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite <- (angle_div_2_pow_mul_2_pow 3 (θ / ₂^3)).
-  rewrite <- angle_div_pow_2_add_distr.
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_nat_le_mono_nonneg_r. 2: {
-    now do 21 apply -> Nat.succ_le_mono.
-  }
-  cbn - [ angle_mul_nat_overflow angle_div_2_pow ].
-  apply angle_mul_nat_overflow_div_2_pow.
-  now do 24 apply -> Nat.succ_le_mono.
-}
 ...
 specialize (seq_angle_to_div_nat_3_le i θ) as H3.
 progress unfold seq_angle_to_div_nat in H3.
