@@ -2448,6 +2448,30 @@ destruct n. {
   now rewrite Nat.div_mul.
 }
 destruct n. {
+  cbn in H1.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_diag. {
+      apply rngl_sin_nonneg_angle_le_straight.
+      eapply angle_le_trans; [ apply H1 | ].
+      apply angle_div_2_le.
+    }
+    intros H; move H at top; subst θ'.
+    apply angle_nlt_ge in H1.
+    apply H1; clear H1.
+    apply angle_div_2_lt_diag.
+    apply (angle_straight_neq_0 Hc1).
+  }
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    clear Hm.
+    apply angle_add_overflow_lt_straight_le_straight. {
+      eapply angle_le_lt_trans; [ apply H1 | ].
+      apply angle_div_2_lt_diag.
+      apply (angle_straight_neq_0 Hc1).
+    }
 ...
 Search (angle_mul_nat_overflow _ (_ * _)).
 apply angle_mul_nat_overflo
