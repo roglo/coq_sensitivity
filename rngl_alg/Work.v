@@ -2351,9 +2351,9 @@ intros.
 (* θ/3 ≤ 3(θ/8)
    1/3 ≤ 3/8
    8 ≤ 9 *)
-destruct i; [ apply angle_nonneg | ].
-destruct i; [ apply angle_nonneg | ].
 progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
 destruct i. {
   cbn - [ angle_mul_nat angle_div_2_pow ].
   rewrite angle_mul_1_l.
@@ -2371,9 +2371,13 @@ destruct i. {
 }
 destruct i. {
   cbn - [ angle_mul_nat angle_div_2_pow ].
+  rewrite <- (angle_div_2_pow_mul_2_pow 0 (θ / ₂^3)) at 2.
+  rewrite <- angle_div_pow_2_add_distr.
+  rewrite angle_mul_nat_assoc.
   apply angle_mul_nat_le_mono_nonneg_r. 2: {
     now do 2 apply -> Nat.succ_le_mono.
   }
+  cbn - [ angle_mul_nat_overflow angle_div_2_pow ].
   apply angle_mul_nat_overflow_div_2_pow.
   now do 3 apply -> Nat.succ_le_mono.
 }
