@@ -2334,6 +2334,16 @@ destruct n. {
   apply Nat.succ_lt_mono in Hm.
   apply Nat.lt_1_r in Hm.
   subst m.
+  progress unfold seq_angle_to_div_nat in Hθ'.
+  specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H2.
+  specialize (H2 3 i θ).
+  assert (H : 3 ≠ 1) by easy.
+  specialize (H2 H); clear H.
+  progress unfold seq_angle_to_div_nat in H2.
+  rewrite <- Hθ' in H2.
+  (* et c'est là que ça déconne : ça se simplifie en θ' ≤ angle_straight *)
+  (* on pourrait pas avoir une version plus précise ? *)
+  cbn in H2.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
