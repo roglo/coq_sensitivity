@@ -2472,10 +2472,59 @@ destruct n. {
       apply angle_div_2_lt_diag.
       apply (angle_straight_neq_0 Hc1).
     }
-...
-Search (angle_mul_nat_overflow _ (_ * _)).
-apply angle_mul_nat_overflo
-replace 3 with (1 * 3)
+    rewrite Hθ'.
+    progress unfold seq_angle_to_div_nat.
+    rewrite angle_mul_nat_assoc.
+    apply angle_mul_div_2_pow_le_straight.
+    rewrite Nat.mul_assoc.
+    now apply Nat.mul_div_le.
+  }
+  apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m.
+  replace 3 with (2 + 1) by easy.
+  rewrite angle_mul_add_distr_r.
+  rewrite angle_mul_1_l.
+  apply angle_add_not_overflow_move_add. {
+    apply angle_add_overflow_lt_straight_le_straight. {
+      eapply angle_le_lt_trans; [ apply H1 | ].
+      apply angle_div_2_lt_diag.
+      apply (angle_straight_neq_0 Hc1).
+    }
+    eapply angle_le_trans; [ apply H1 | ].
+    apply angle_div_2_le.
+  }
+  rewrite angle_add_diag.
+  apply angle_add_overflow_lt_straight_le_straight. {
+    rewrite <- (angle_div_2_mul_2 angle_straight).
+    apply angle_lt_iff.
+    split. {
+      apply angle_mul_le_mono_l; [ easy | ].
+      rewrite <- (Nat.mul_1_r 2).
+      now apply angle_mul_nat_overflow_mul_2_div_2.
+    }
+    intros H.
+    rewrite angle_div_2_mul_2 in H.
+    rewrite Hθ' in H.
+    progress unfold seq_angle_to_div_nat in H.
+    rewrite angle_mul_nat_assoc in H.
+    destruct i; [ cbn in Hni; flia Hni | ].
+    destruct i; [ cbn in Hni; flia Hni | ].
+    replace 4 with (2 ^ 2) in H by easy.
+    rewrite <- Nat.pow_sub_r in H; [ | easy | flia ].
+    do 2 rewrite Nat.sub_succ in H.
+    rewrite Nat.sub_0_r in H.
+    rewrite <- Nat.pow_succ_r' in H.
+    rewrite angle_div_2_pow_succ_r_2 in H.
+    rewrite angle_div_2_pow_mul_2_pow in H.
+    now apply (angle_div_2_not_straight Hc1) in H.
+  }
+  rewrite <- (angle_div_2_mul_2 angle_straight).
+  apply angle_mul_le_mono_l; [ easy | ].
+  rewrite <- (Nat.mul_1_r 2).
+  now apply angle_mul_nat_overflow_mul_2_div_2.
+}
+destruct n. {
+  cbn in H1.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
