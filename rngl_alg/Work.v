@@ -2290,6 +2290,33 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (3 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
+Theorem seq_angle_to_div_nat_5_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ (θ / ₂^2))%A.
+Proof.
+intros.
+progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+rewrite <- (angle_div_2_pow_mul_pow_sub (2 + i) 2); [ | apply Nat.le_add_r ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm.
+apply angle_mul_nat_le_mono_nonneg_r. 2: {
+  replace (S (S i)) with (2 + i) by easy.
+  rewrite Nat.pow_add_r.
+  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.mul_le_mono_r; cbn.
+  now do 4 apply -> Nat.succ_le_mono.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (2 + i))). {
+  rewrite Nat.pow_add_r.
+  (* lemma *)
+  rewrite Nat.mul_comm.
+  apply Nat_mul_le_pos_r.
+  now apply -> Nat.succ_le_mono.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+
 (* to be completed
 Theorem angle_mul_nat_not_overflow :
   ∀ n i θ,
@@ -2569,25 +2596,8 @@ destruct n. {
     rewrite Hθ'.
     progress unfold seq_angle_to_div_nat at 2.
     rewrite angle_mul_nat_assoc.
-Theorem seq_angle_to_div_nat_5_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ (θ / ₂^2))%A.
-Proof.
-intros.
-progress unfold seq_angle_to_div_nat.
-destruct i; [ apply angle_nonneg | ].
-destruct i; [ apply angle_nonneg | ].
-destruct i; [ apply angle_nonneg | ].
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-  rewrite angle_mul_1_l.
-  rewrite angle_div_2_pow_succ_r_1.
-  apply angle_div_2_le.
-}
-destruct i. {
-  cbn - [ angle_mul_nat angle_div_2_pow ].
-...
-specialize (seq_angle_to_div_nat_5_le i θ) as H2.
-eapply angle_le_trans; [ apply H2 | ].
+    specialize (seq_angle_to_div_nat_5_le i θ) as H2.
+    eapply angle_le_trans; [ apply H2 | ].
 ...
     destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
     destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
