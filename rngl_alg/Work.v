@@ -2568,19 +2568,36 @@ destruct n. {
     rewrite angle_add_mul_r_diag_r.
     rewrite Hθ'.
     progress unfold seq_angle_to_div_nat at 2.
+    rewrite angle_mul_nat_assoc.
+Theorem seq_angle_to_div_nat_5_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ (θ / ₂^2))%A.
+Proof.
+intros.
+progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
+  rewrite angle_mul_1_l.
+  rewrite angle_div_2_pow_succ_r_1.
+  apply angle_div_2_le.
+}
+destruct i. {
+  cbn - [ angle_mul_nat angle_div_2_pow ].
+...
+specialize (seq_angle_to_div_nat_5_le i θ) as H2.
+eapply angle_le_trans; [ apply H2 | ].
+...
     destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
     destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
     rewrite angle_mul_nat_assoc.
     rewrite Nat.mul_comm.
-    rewrite <- angle_mul_nat_assoc.
-    replace 4 with (2 ^ 2) by easy.
+    replace 4 with (2 ^ 2) at 2 by easy.
     replace (S (S i)) with (i + 2) by apply Nat.add_comm.
-Search (_ / ₂^(_ + _))%A.
-About angle_div_2_pow_add_r.
     rewrite angle_div_2_pow_add_r.
-...
-    do 2 rewrite angle_div_2_pow_succ_r_1.
     rewrite angle_div_2_pow_mul_2_pow.
+Inspect 1.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
