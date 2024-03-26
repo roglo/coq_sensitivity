@@ -2291,6 +2291,76 @@ apply angle_mul_nat_overflow_pow_div.
 Qed.
 
 Theorem seq_angle_to_div_nat_5_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 13 * (θ / ₂^6))%A.
+Proof.
+intros.
+(* 1/5 = 1/8 + 3/40 *)
+(* 1/16 < 3/40 < 1/8 *)
+(* 1/5 = 1/8 + 1/16 + 1/80 *)
+(* 1/128 < 1/80 < 1/64 *)
+(* 1/5 < 1/8 + 1/16 + 1/64 = (8+4+1)/64 = 13/64 *)
+progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i. {
+  rewrite (Nat_div_less_small 1); [ | cbn; flia ].
+  rewrite angle_mul_1_l.
+  rewrite <- (angle_div_2_pow_mul_pow_sub 6). 2: {
+    now do 3 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_le_mono_nonneg_r. 2: {
+    now cbn; do 8 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow; cbn.
+  now do 13 apply -> Nat.succ_le_mono.
+}
+destruct i. {
+  rewrite (Nat_div_less_small 3); [ | cbn; flia ].
+  rewrite <- (angle_div_2_pow_mul_pow_sub 6). 2: {
+    now do 4 apply -> Nat.succ_le_mono.
+  }
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_nat_le_mono_nonneg_r. 2: {
+    now cbn; do 12 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow; cbn.
+  now do 13 apply -> Nat.succ_le_mono.
+}
+destruct i. {
+  rewrite (Nat_div_less_small 6); [ | cbn; flia ].
+  rewrite <- (angle_div_2_pow_mul_pow_sub 6). 2: {
+    now do 5 apply -> Nat.succ_le_mono.
+  }
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_nat_le_mono_nonneg_r. 2: {
+    now cbn; do 12 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow; cbn.
+  now do 13 apply -> Nat.succ_le_mono.
+}
+rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i) 6); [ | apply Nat.le_add_r ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm.
+rewrite angle_mul_nat_assoc.
+apply angle_mul_nat_le_mono_nonneg_r. 2: {
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite Nat.mul_assoc.
+  replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  now cbn; do 64 apply -> Nat.succ_le_mono.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (6 + i))). {
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  now do 13 apply -> Nat.succ_le_mono.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+
+(* moins bien
+Theorem seq_angle_to_div_nat_5_le :
   ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ (θ / ₂^2))%A.
 Proof.
 intros.
@@ -2316,6 +2386,7 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (2 + i))). {
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
+*)
 
 (* to be completed
 Theorem angle_mul_nat_not_overflow :
