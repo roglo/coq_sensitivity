@@ -3040,43 +3040,28 @@ destruct n. {
       rewrite (Nat.mul_comm 2).
       rewrite <- Nat.mul_assoc.
       apply Nat.mul_le_mono_l.
-...
-      replace 6 with (2 * 3) at 1 by easy.Nat.mul.
-      do 2 rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l..mul_assoc.
-      rewrite (Nat.mul_comm 3).
-      rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l.
+      replace (i + 4) with (S (i + 3)) by easy.
+      rewrite Nat.pow_succ_r'.
+      apply Nat.div_le_lower_bound; [ easy | ].
       replace 6 with (2 * 3) by easy.
       rewrite Nat.div_mul_cancel_l; [ | easy | easy ].
-(* ah oui non *)
-...
-      do 2 rewrite <- Nat.mul_assoc.
-Search (_ * (_ / _)).
-Search (_ * (_ / _) ≤ _).
-Search (_ * _ / _).
-2: apply Nat.div_mul_le.
-...
-      replace 4 with (2 * 2) at 1 by easy.
-      rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l.
-      eapply Nat.le_trans; [ apply IHi | ].
-      replace 4 with (2 * 2) at 1 by easy.
-      rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l.
-      rewrite Nat.add_succ_r.
-      rewrite Nat.pow_succ_r'.
-      now apply Nat.div_mul_le.
+      eapply Nat.le_trans. {
+        apply Nat.mul_le_mono_l.
+        now apply Nat.div_mul_le.
+      }
+      eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+      now rewrite Nat.mul_comm, Nat.div_mul.
     }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (6 + i))). 2: {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (i + 4))). 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
     eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
     apply Nat.div_le_upper_bound; [ easy | ].
     apply Nat.mul_le_mono_r.
-    now do 4 apply -> Nat.succ_le_mono.
+    now do 5 apply -> Nat.succ_le_mono.
   }
   apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
