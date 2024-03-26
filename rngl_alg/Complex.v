@@ -283,12 +283,6 @@ symmetry.
 apply angle_mul_add_distr_r.
 Qed.
 
-Fixpoint angle_div_2_pow θ i :=
-  match i with
-  | 0 => θ
-  | S i' => angle_div_2 (angle_div_2_pow θ i')
-  end.
-
 Fixpoint angle_mul_nat_overflow n θ :=
   match n with
   | 0 | 1 => false
@@ -298,9 +292,6 @@ Fixpoint angle_mul_nat_overflow n θ :=
   end.
 
 End a.
-
-Notation "θ / ₂ ^ n" := (angle_div_2_pow θ n)
-  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
 
 Section a.
 
@@ -1899,19 +1890,6 @@ Qed.
 (*
 Notation "⌊ a / b ⌋" := (div a b).
 *)
-
-Theorem angle_div_2_pow_succ_r_1 :
-  ∀ n θ, angle_div_2_pow θ (S n) = (angle_div_2_pow θ n / ₂)%A.
-Proof. easy. Qed.
-
-Theorem angle_div_2_pow_succ_r_2 :
-  ∀ n θ, angle_div_2_pow θ (S n) = angle_div_2_pow (θ / ₂) n.
-Proof.
-intros.
-induction n; intros; [ easy | ].
-remember (S n) as sn; cbn; subst sn.
-now rewrite IHn.
-Qed.
 
 Theorem angle_div_2_pow_add :
   ∀ n θ1 θ2,
@@ -4052,17 +4030,6 @@ rewrite (rngl_mul_comm Hic). 2: {
 }
 rewrite <- (rngl_add_diag Hon).
 apply (rngl_add_lt_compat Hop Hor _ _ _ _ HN HN).
-Qed.
-
-Theorem angle_div_pow_2_add_distr :
-  ∀ i j θ, (θ / ₂^(i + j) = θ / ₂^i / ₂^j)%A.
-Proof.
-intros.
-revert j θ.
-induction i; intros; [ easy | ].
-rewrite Nat.add_succ_l.
-do 2 rewrite angle_div_2_pow_succ_r_2.
-apply IHi.
 Qed.
 
 Theorem angle_lim_add_add :

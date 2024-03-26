@@ -3,6 +3,7 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi.
 Require Import AngleLeSubAdd.
+Require Import RealLike.
 Require Import TacChangeAngle.
 
 Section a.
@@ -763,6 +764,51 @@ rewrite angle_straight_add_straight in Hzs12.
 cbn in Hzs12.
 rewrite (rngl_opp_0 Hop) in Hzs12.
 now apply (rngl_lt_irrefl Hor) in Hzs12.
+Qed.
+
+Context {rl : real_like_prop T}.
+
+Fixpoint angle_div_2_pow θ i :=
+  match i with
+  | 0 => θ
+  | S i' => angle_div_2 (angle_div_2_pow θ i')
+  end.
+
+End a.
+
+Notation "θ / ₂ ^ n" := (angle_div_2_pow θ n)
+  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
+
+Theorem angle_div_2_pow_succ_r_1 :
+  ∀ n θ, angle_div_2_pow θ (S n) = (angle_div_2_pow θ n / ₂)%A.
+Proof. easy. Qed.
+
+Theorem angle_div_2_pow_succ_r_2 :
+  ∀ n θ, angle_div_2_pow θ (S n) = angle_div_2_pow (θ / ₂) n.
+Proof.
+intros.
+induction n; intros; [ easy | ].
+remember (S n) as sn; cbn; subst sn.
+now rewrite IHn.
+Qed.
+
+Theorem angle_div_2_pow_add_r :
+  ∀ i j θ, (θ / ₂^(i + j) = θ / ₂^i / ₂^j)%A.
+Proof.
+intros.
+revert j θ.
+induction i; intros; [ easy | ].
+rewrite Nat.add_succ_l.
+do 2 rewrite angle_div_2_pow_succ_r_2.
+apply IHi.
 Qed.
 
 End a.

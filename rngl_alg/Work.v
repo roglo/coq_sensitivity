@@ -2240,7 +2240,7 @@ Theorem angle_div_2_pow_mul_pow_sub :
 Proof.
 intros * Hji.
 replace i with (j + (i - j)) at 1 by flia Hji.
-rewrite angle_div_pow_2_add_distr.
+rewrite angle_div_2_pow_add_r.
 apply angle_div_2_pow_mul_2_pow.
 Qed.
 
@@ -2562,6 +2562,24 @@ destruct n. {
   apply Nat.succ_lt_mono in Hm.
   destruct m. {
     clear Hm.
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    rewrite angle_add_mul_r_diag_r.
+    rewrite Hθ'.
+    progress unfold seq_angle_to_div_nat at 2.
+    destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
+    destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
+    rewrite angle_mul_nat_assoc.
+    rewrite Nat.mul_comm.
+    rewrite <- angle_mul_nat_assoc.
+    replace 4 with (2 ^ 2) by easy.
+    replace (S (S i)) with (i + 2) by apply Nat.add_comm.
+Search (_ / ₂^(_ + _))%A.
+About angle_div_2_pow_add_r.
+    rewrite angle_div_2_pow_add_r.
+...
+    do 2 rewrite angle_div_2_pow_succ_r_1.
+    rewrite angle_div_2_pow_mul_2_pow.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
@@ -3416,7 +3434,7 @@ destruct i. {
   destruct m. {
     rewrite <- angle_div_2_pow_1.
     rewrite <- angle_div_2_pow_1.
-    rewrite <- angle_div_pow_2_add_distr.
+    rewrite <- angle_div_2_pow_add_r.
     now apply angle_add_overflow_mul_div_2_pow.
   }
   now do 4 apply Nat.succ_lt_mono in Hmi.
