@@ -2728,10 +2728,46 @@ destruct n. {
     rewrite Nat.add_comm, Nat.add_sub.
     rewrite Nat.add_comm.
     rewrite angle_mul_nat_assoc.
-    apply angle_mul_nat_le_mono_nonneg_r. 2: {
     replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
+    apply angle_mul_nat_le_mono_nonneg_r. 2: {
+      clear Hni Hθ' H2.
+      induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
+      rewrite Nat.pow_succ_r'.
+      rewrite Nat.mul_comm.
+      replace 4 with (2 * 2) at 2 by easy.
+      do 2 rewrite <- Nat.mul_assoc.
+      apply Nat.mul_le_mono_l.
+      rewrite Nat.mul_comm.
+      eapply Nat.le_trans; [ apply IHi | ].
+      replace 4 with (2 * 2) at 1 by easy.
+      rewrite <- Nat.mul_assoc.
+      apply Nat.mul_le_mono_l.
+      rewrite Nat.add_succ_r.
+      rewrite Nat.pow_succ_r'.
+      now apply Nat.div_mul_le.
+    }
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (6 + i))). 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.mul_le_mono_r.
+    now do 4 apply -> Nat.succ_le_mono.
+  }
+  apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m.
 ...
-Check Nat.div_le_lower_bound.
+Search (_ * _ ≤ _ * _).
+...
+destruct i. {
+  now cbn; do 13 apply -> Nat.succ_le_mono.
+}
+destruct i. {
+  now cbn; do 26 apply -> Nat.succ_le_mono.
+}
+destruct i. {
+  now cbn; do 52 apply -> Nat.succ_le_mono.
+}
 ...
     rewrite Nat.pow_add_r.
 Search (_ * (_ / _)).
