@@ -2525,6 +2525,43 @@ destruct n. {
 }
 destruct n. {
   cbn in H1.
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    rewrite angle_mul_1_l.
+    apply angle_add_overflow_diag. {
+      apply rngl_sin_nonneg_angle_le_straight.
+      eapply angle_le_trans; [ apply H1 | ].
+      apply angle_div_2_le.
+    }
+    intros H; move H at top; subst θ'.
+    apply angle_nlt_ge in H1.
+    apply H1; clear H1.
+    apply angle_div_2_lt_diag.
+    apply (angle_straight_neq_0 Hc1).
+  }
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    clear Hm.
+    apply angle_add_overflow_lt_straight_le_straight. {
+      eapply angle_le_lt_trans; [ apply H1 | ].
+      apply angle_div_2_lt_diag.
+      apply (angle_straight_neq_0 Hc1).
+    }
+    rewrite Hθ'.
+    progress unfold seq_angle_to_div_nat.
+    rewrite angle_mul_nat_assoc.
+    apply angle_mul_div_2_pow_le_straight.
+    rewrite Nat.mul_assoc.
+    eapply Nat.le_trans. {
+      apply (Nat.mul_le_mono_r _ 5); cbn.
+      now do 4 apply -> Nat.succ_le_mono.
+    }
+    now apply Nat.mul_div_le.
+  }
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    clear Hm.
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
