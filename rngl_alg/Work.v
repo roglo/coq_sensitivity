@@ -11,7 +11,8 @@ Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe AngleAddLeMonoL.
 Require Import AngleLeSubAdd AngleDiv2Add.
 Require Import TacChangeAngle.
-Require Import Complex NewtonBinomial.
+Require Import Complex.
+Require Import NewtonBinomial.
 Require Import AngleAddOverflowEquiv.
 Require Import AngleAddOverflowEquiv3.
 
