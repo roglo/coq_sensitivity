@@ -2754,13 +2754,55 @@ destruct n. {
       apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
         apply angle_mul_nat_overflow_pow_div.
       }
-...
       eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
       apply Nat.div_le_upper_bound; [ easy | ].
       apply Nat.mul_le_mono_r.
       now do 4 apply -> Nat.succ_le_mono.
     }
     clear Hni Hθ' H2.
+Theorem glop :
+  ∀ a b m n,
+  0 < m ≤ n
+  → a * n / 2 ^ b = 1
+  → ∀ i, b ≤ i → a * 2 ^ (i - b) ≤ m * (2 ^ i / n).
+Proof.
+intros * Hmn Hban * Hbi.
+induction i. {
+  cbn.
+  rewrite Nat.mul_1_r.
+  apply Nat.le_0_r in Hbi; subst b.
+  rewrite Nat.pow_0_r in Hban.
+  rewrite Nat.div_1_r in Hban.
+  apply Nat.eq_mul_1 in Hban.
+  destruct Hban; subst a n.
+  destruct m; [ easy | ].
+  rewrite Nat.div_1_r, Nat.mul_1_r.
+  now apply -> Nat.succ_le_mono.
+}
+Search (_ / _ = 1).
+... ...
+specialize (glop 3 3 3 3) as H2.
+assert (H : 0 < 3 ≤ 3) by easy.
+specialize (H2 H); clear H.
+assert (H : 3 * 3 / 2 ^ 3 = 1) by now cbn; flia.
+specialize (H2 H); clear H.
+specialize (glop 13 6 4 5) as H3.
+assert (H : 0 < 4 ≤ 5). {
+  split; [ easy | now do 4 apply -> Nat.succ_le_mono ].
+}
+specialize (H3 H); clear H.
+assert (H : 15 * 5 / 2 ^ 6 = 1) by now cbn; flia.
+specialize (H3 H); clear H.
+specialize (glop 3 4 5 6) as H4.
+assert (H : 0 < 5 ≤ 6). {
+  split; [ easy | now do 5 apply -> Nat.succ_le_mono ].
+}
+specialize (H4 H); clear H.
+assert (H : 3 * 6 / 2 ^ 4 = 1) by now cbn; flia.
+specialize (H4 H); clear H.
+now apply H3.
+... ...
+apply glop.
     induction i; [ easy | ].
     apply Nat.succ_le_mono in Hi6.
     rewrite Nat.sub_succ.
