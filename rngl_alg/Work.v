@@ -2791,7 +2791,19 @@ destruct (Nat.eq_dec (S i) b) as [Hib| Hib]. {
   rewrite Nat.mul_1_l in Hban.
   destruct Hban as (H1, H2).
   cbn - [ "^" "*" ] in H2.
-Search (_ * (_ / _)).
+  apply (Nat.mul_le_mono_pos_r _ _ n). {
+    apply Nat.neq_0_lt_0.
+    intros H; subst n.
+    destruct Hmn as (H3, H4).
+    now apply Nat.le_0_r in H4; subst m.
+  }
+  eapply le_trans; [ apply Nat.lt_le_incl, H2 | ].
+  destruct m; [ easy | ].
+  destruct m. {
+    rewrite Nat.mul_1_l.
+    remember (2 ^ S i) as x.
+    (* donc ça chie *)
+...
 }
 rewrite Nat.sub_succ_l.
 2: flia Hbi Hib.
