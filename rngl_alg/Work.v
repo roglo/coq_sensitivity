@@ -2787,6 +2787,11 @@ destruct (Nat.eq_dec (S i) b) as [Hib| Hib]. {
   subst b.
   rewrite Nat.sub_diag.
   rewrite Nat.pow_0_r, Nat.mul_1_r.
+  apply (Nat_div_less_small_iff 1) in Hban; [ | now apply Nat.pow_nonzero ].
+  rewrite Nat.mul_1_l in Hban.
+  destruct Hban as (H1, H2).
+  cbn - [ "^" "*" ] in H2.
+Search (_ * (_ / _)).
 }
 rewrite Nat.sub_succ_l.
 2: flia Hbi Hib.
