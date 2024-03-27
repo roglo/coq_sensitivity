@@ -2448,6 +2448,13 @@ rewrite angle_add_mul_r_diag_r.
 *)
 move H1 at bottom.
 (**)
+(*
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+progress unfold seq_angle_to_div_nat.
+*)
 destruct n; [ easy | ].
 destruct n; [ easy | clear Hn1 ].
 destruct n. {
