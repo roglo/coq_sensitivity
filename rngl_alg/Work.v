@@ -3123,6 +3123,26 @@ destruct n. {
   }
   destruct i. {
     clear Hni.
+Inspect 3.
+...
+(* putain j'ai pas l'esprit clair, là *)
+Compute (let n := 5 in 2^Nat.log2 n + 1).
+Compute (let n := 5 in (2^Nat.log2 n - S n, n * (2^Nat.log2 n - 1))).
+Theorem seq_angle_to_div_nat_le :
+   ∀ i n θ, (seq_angle_to_div_nat θ n i ≤ 13 * (θ / ₂^6))%A.
+Search (2 ^ (Nat.log2 _ - 1)).
+...
+(* 1/n = 1/(2^Nat.log2 n-1) + ... *)
+(* 1/n-1/(2^Nat.log2 n-1) = (2^Nat.log2 n - S n)/(n * (2^Nat.log2 n - 1)) *)
+...
+(* 1/6 = 1/8 + 1/32 + 1/128 + ... *)
+(* 1/6 < 1/8 + 1/16 = 3/16 *)
+...
+(* 1/5 = 1/8 + 3/40 *)
+(* 1/16 < 3/40 < 1/8 *)
+(* 1/5 = 1/8 + 1/16 + 1/80 *)
+(* 1/128 < 1/80 < 1/64 *)
+(* 1/5 < 1/8 + 1/16 + 1/64 = (8+4+1)/64 = 13/64 *)
 ...
 apply (angle_mul_le_mono_l) with (n := S m) in H1. 2: {
   eapply angle_mul_nat_not_overflow_le_l. 2: {
