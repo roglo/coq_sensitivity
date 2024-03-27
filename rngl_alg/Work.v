@@ -2763,11 +2763,15 @@ destruct n. {
 Theorem glop :
   ∀ a b m n,
   0 < m ≤ n
+(*
+  → 2 ^ b ≤ a * n < 2 ^ S b
+*)
   → a * n / 2 ^ b = 1
   → ∀ i, b ≤ i → a * 2 ^ (i - b) ≤ m * (2 ^ i / n).
 Proof.
 intros * Hmn Hban * Hbi.
-induction i. {
+revert b Hban Hbi.
+induction i; intros. {
   cbn.
   rewrite Nat.mul_1_r.
   apply Nat.le_0_r in Hbi; subst b.
@@ -2779,7 +2783,13 @@ induction i. {
   rewrite Nat.div_1_r, Nat.mul_1_r.
   now apply -> Nat.succ_le_mono.
 }
-Search (_ / _ = 1).
+destruct (Nat.eq_dec (S i) b) as [Hib| Hib]. {
+  subst b.
+  rewrite Nat.sub_diag.
+  rewrite Nat.pow_0_r, Nat.mul_1_r.
+}
+rewrite Nat.sub_succ_l.
+2: flia Hbi Hib.
 ... ...
 specialize (glop 3 3 3 3) as H2.
 assert (H : 0 < 3 ≤ 3) by easy.
