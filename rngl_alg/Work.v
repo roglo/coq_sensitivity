@@ -2750,40 +2750,42 @@ destruct n. {
     apply Nat.nlt_ge in Hi6.
     rewrite <- (angle_div_2_pow_mul_pow_sub i 6); [ | easy ].
     rewrite angle_mul_nat_assoc.
-    apply angle_mul_le_mono_r. 2: {
-      clear Hni Hθ' H2.
-      induction i; [ easy | ].
-      apply Nat.succ_le_mono in Hi6.
-      rewrite Nat.sub_succ.
-      destruct (Nat.eq_dec i 5) as [Hi5| Hi5]. {
-        subst i; cbn.
-        now do 13 apply -> Nat.succ_le_mono.
+    apply angle_mul_le_mono_r. {
+      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+        apply angle_mul_nat_overflow_pow_div.
       }
-      assert (H : 6 ≤ i) by flia Hi6 Hi5.
-      clear Hi5 Hi6; rename H into Hi6.
-      specialize (IHi Hi6).
-      rewrite <- Nat.sub_succ.
-      rewrite Nat.sub_succ_l; [ | easy ].
-      rewrite Nat.pow_succ_r'.
-      rewrite Nat.mul_comm.
-      replace 4 with (2 * 2) at 3 by easy.
-      do 2 rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l.
-      rewrite Nat.mul_comm.
-      eapply Nat.le_trans; [ apply IHi | ].
-      replace 4 with (2 * 2) at 1 by easy.
-      rewrite <- Nat.mul_assoc.
-      apply Nat.mul_le_mono_l.
-      rewrite Nat.pow_succ_r'.
-      now apply Nat.div_mul_le.
+...
+      eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.mul_le_mono_r.
+      now do 4 apply -> Nat.succ_le_mono.
     }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-      apply angle_mul_nat_overflow_pow_div.
+    clear Hni Hθ' H2.
+    induction i; [ easy | ].
+    apply Nat.succ_le_mono in Hi6.
+    rewrite Nat.sub_succ.
+    destruct (Nat.eq_dec i 5) as [Hi5| Hi5]. {
+      subst i; cbn.
+      now do 13 apply -> Nat.succ_le_mono.
     }
-    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
-    apply Nat.mul_le_mono_r.
-    now do 4 apply -> Nat.succ_le_mono.
+    assert (H : 6 ≤ i) by flia Hi6 Hi5.
+    clear Hi5 Hi6; rename H into Hi6.
+    specialize (IHi Hi6).
+    rewrite <- Nat.sub_succ.
+    rewrite Nat.sub_succ_l; [ | easy ].
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm.
+    replace 4 with (2 * 2) at 3 by easy.
+    do 2 rewrite <- Nat.mul_assoc.
+    apply Nat.mul_le_mono_l.
+    rewrite Nat.mul_comm.
+    eapply Nat.le_trans; [ apply IHi | ].
+    replace 4 with (2 * 2) at 1 by easy.
+    rewrite <- Nat.mul_assoc.
+    apply Nat.mul_le_mono_l.
+    rewrite Nat.pow_succ_r'.
+    now apply Nat.div_mul_le.
+...
   }
   apply Nat.succ_lt_mono in Hm.
   apply Nat.lt_1_r in Hm; subst m.
