@@ -811,4 +811,101 @@ do 2 rewrite angle_div_2_pow_succ_r_2.
 apply IHi.
 Qed.
 
+Fixpoint angle_mul_nat_overflow n θ :=
+  match n with
+  | 0 | 1 => false
+  | S n' =>
+      (angle_add_overflow θ (n' * θ) ||
+       angle_mul_nat_overflow n' θ)%bool
+  end.
+
+Theorem angle_mul_nat_overflow_succ_l_false :
+  ∀ θ n,
+  angle_mul_nat_overflow (S n) θ = false
+  ↔ angle_mul_nat_overflow n θ = false ∧
+    angle_add_overflow θ (n * θ) = false.
+Proof.
+intros.
+split; intros Hn. {
+  destruct n. {
+    split; [ easy | cbn ].
+    progress unfold angle_add_overflow.
+    rewrite angle_add_0_r.
+    apply angle_ltb_ge.
+    apply angle_le_refl.
+  }
+  remember (S n) as sn; cbn in Hn; subst sn.
+  now apply Bool.orb_false_iff in Hn.
+} {
+  destruct n; [ easy | ].
+  remember (S n) as sn; cbn; subst sn.
+  now apply Bool.orb_false_iff.
+}
+Qed.
+
+Theorem angle_le_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2 → θ2 ≤ θ3 → θ1 ≤ θ3)%A.
+Proof.
+destruct_ac.
+intros * H12 H23.
+progress unfold angle_leb in H12.
+progress unfold angle_leb in H23.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  (* c'est bizarre, quand même : si j'avais utilisé rngl_eq_dec,
+     il m'aurait fallu que "rngl_has_eq_dec T = true" soit en
+     hypothèse. Tandis que là, non *)
+  destruct z3; [ | easy ].
+  apply rngl_leb_le.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H12, H23.
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_leb_le in H12, H23.
+  apply rngl_leb_le.
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
+}
+Qed.
+
+Theorem angle_le_lt_trans :
+  ∀ θ1 θ2 θ3,
+  (θ1 ≤ θ2 → θ2 < θ3 → θ1 < θ3)%A.
+Proof.
+destruct_ac.
+intros * H12 H23.
+progress unfold angle_leb in H12.
+progress unfold angle_ltb in H23.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
+remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
+remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
+symmetry in Hz1, Hz2, Hz3.
+destruct z1. {
+  apply rngl_leb_le in Hz1.
+  destruct z3; [ | easy ].
+  apply rngl_ltb_lt.
+  apply rngl_leb_le in Hz3.
+  destruct z2; [ | easy ].
+  apply rngl_leb_le in Hz2, H12.
+  apply rngl_ltb_lt in H23.
+  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
+} {
+  destruct z2; [ easy | ].
+  destruct z3; [ easy | ].
+  apply rngl_leb_le in H12.
+  apply rngl_ltb_lt in H23.
+  apply rngl_ltb_lt.
+  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
+}
+Qed.
+
 End a.

@@ -3510,4 +3510,61 @@ apply angle_add_not_overflow_comm in H13, H23.
 now apply angle_add_le_mono_l.
 Qed.
 
+Theorem angle_mul_le_mono_l :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2)%A
+  → ∀ n,
+  angle_mul_nat_overflow n θ2 = false
+  → (n * θ1 ≤ n * θ2)%A.
+Proof.
+destruct_ac.
+intros * H12 * Hn2.
+revert θ1 θ2 H12 Hn2.
+induction n; intros; [ apply angle_le_refl | cbn ].
+apply angle_mul_nat_overflow_succ_l_false in Hn2.
+destruct Hn2 as (Hn2, H2n2).
+generalize Hn2; intros Hn12.
+apply (IHn θ1) in Hn12; [ | easy ].
+apply (angle_le_trans _ (θ1 + n * θ2))%A. {
+  apply angle_add_le_mono_l; [ | | easy ]. {
+    apply (angle_add_overflow_le _ (n * θ2))%A; [ easy | ].
+    apply angle_add_not_overflow_comm.
+    apply (angle_add_overflow_le _ θ2); [ easy | ].
+    now apply angle_add_not_overflow_comm.
+  } {
+    apply angle_add_not_overflow_comm.
+    apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
+    now apply angle_add_not_overflow_comm.
+  }
+} {
+  rewrite (angle_add_comm θ1).
+  rewrite (angle_add_comm θ2).
+  apply angle_add_le_mono_l; [ | | easy ]. {
+    apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
+    now apply angle_add_not_overflow_comm.
+  } {
+    now apply angle_add_not_overflow_comm.
+  }
+}
+Qed.
+
+Theorem angle_mul_le_mono_r :
+  ∀ a b θ, angle_mul_nat_overflow b θ = false → a ≤ b → (a * θ ≤ b * θ)%A.
+Proof.
+intros * Hb Hab.
+revert a Hab.
+induction b; intros. {
+  apply Nat.le_0_r in Hab; subst a.
+  apply angle_le_refl.
+}
+destruct a; [ apply angle_nonneg | cbn ].
+move a after b.
+apply Nat.succ_le_mono in Hab.
+apply (angle_mul_nat_overflow_succ_l_false θ b) in Hb.
+destruct Hb as (H1, H2).
+specialize (IHb H1 _ Hab).
+apply angle_add_le_mono_l; try easy.
+now apply (angle_add_overflow_le _ (b * θ))%A.
+Qed.
+
 End a.
