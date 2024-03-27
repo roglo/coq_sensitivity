@@ -2418,43 +2418,10 @@ intros * Hni.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
 specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H1.
 specialize (H1 n i θ Hn1).
-(*
-(* lemma *)
-apply Bool.not_true_iff_false.
-intros H.
-apply angle_mul_nat_overflow_true_assoc in H.
-apply Bool.not_false_iff_true in H.
-apply H; clear H.
-...
-progress unfold seq_angle_to_div_nat in H1.
-progress unfold seq_angle_to_div_nat.
-*)
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 apply angle_all_add_not_overflow.
 intros m Hm.
-(*
-apply angle_add_not_overflow_equiv3.
-progress unfold angle_add_not_overflow3.
-right.
-eapply angle_le_lt_trans; [ apply H1 | ].
-(* ouais, chais pas *)
-...
-apply angle_add_not_overflow_equiv.
-progress unfold angle_add_not_overflow2.
-...
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-rewrite angle_add_mul_r_diag_r.
-*)
 move H1 at bottom.
-(**)
-(*
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-rewrite angle_add_mul_r_diag_r.
-rewrite Hθ'.
-progress unfold seq_angle_to_div_nat.
-*)
 destruct n; [ easy | ].
 destruct n; [ easy | clear Hn1 ].
 destruct n. {
@@ -2516,39 +2483,41 @@ destruct n. {
   apply angle_mul_le_mono_l. {
     rewrite Hθ'.
     progress unfold seq_angle_to_div_nat.
-    destruct i. {
-      cbn in Hni.
-      now apply Nat.succ_le_mono in Hni.
+    destruct (lt_dec i 3) as [Hi3| Hi3]. {
+      destruct i. {
+        cbn in Hni.
+        now apply Nat.succ_le_mono in Hni.
+      }
+      destruct i. {
+        cbn in Hni.
+        now do 2 apply Nat.succ_le_mono in Hni.
+      }
+      destruct i. {
+        cbn; rewrite angle_add_0_r.
+        apply angle_div_2_le.
+      }
+      flia Hi3.
     }
-    destruct i. {
-      cbn in Hni.
-      now do 2 apply Nat.succ_le_mono in Hni.
-    }
-    destruct i. {
-      cbn; rewrite angle_add_0_r.
-      apply angle_div_2_le.
-    }
-    rewrite <- (angle_div_2_pow_mul_pow_sub (3 + i) 3). 2: {
-      apply Nat.le_add_r.
-    }
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.add_comm.
-    apply angle_mul_le_mono_r. 2: {
-      replace (S (S (S i))) with (3 + i) by easy.
-      rewrite Nat.pow_add_r.
-      apply Nat.div_le_lower_bound; [ easy | ].
-      apply Nat.mul_le_mono_r; cbn.
-      now do 3 apply -> Nat.succ_le_mono.
-    }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (S (S (S i))))). {
+    apply Nat.nlt_ge in Hi3.
+    rewrite <- (angle_div_2_pow_mul_pow_sub i 3); [ | easy ].
+    apply angle_mul_le_mono_r. {
+      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+        apply angle_mul_nat_overflow_pow_div.
+      }
       apply Nat.div_le_upper_bound; [ easy | ].
       (* lemma *)
       rewrite Nat.mul_comm.
       apply Nat_mul_le_pos_r.
       now apply -> Nat.succ_le_mono.
     }
-    apply angle_mul_nat_overflow_div_2_pow.
-    apply Nat.le_refl.
+    do 3 (destruct i; [ flia Hi3 | ]).
+    do 3 rewrite Nat.sub_succ.
+    rewrite Nat.sub_0_r.
+    apply Nat.div_le_lower_bound; [ easy | ].
+    do 3 rewrite Nat.pow_succ_r'.
+    do 2 rewrite Nat.mul_assoc.
+    apply Nat.mul_le_mono_r; cbn.
+    now do 3 apply -> Nat.succ_le_mono.
   }
   rewrite Hθ'.
   progress unfold seq_angle_to_div_nat.
@@ -2690,6 +2659,7 @@ destruct n. {
     specialize (seq_angle_to_div_nat_5_le i θ) as H2.
     eapply angle_le_trans; [ apply H2 | ].
     destruct (lt_dec i 6) as [Hi6| Hi6]. {
+      clear - Hni Hi6.
       destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
       destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
       destruct i; [ now cbn in Hni; do 4 apply Nat.succ_le_mono in Hni | ].
@@ -2760,76 +2730,6 @@ destruct n. {
       now do 4 apply -> Nat.succ_le_mono.
     }
     clear Hni Hθ' H2.
-Theorem glop :
-  ∀ a b m n,
-  0 < m ≤ n
-(*
-  → 2 ^ b ≤ a * n < 2 ^ S b
-*)
-  → a * n / 2 ^ b = 1
-  → ∀ i, b ≤ i → a * 2 ^ (i - b) ≤ m * (2 ^ i / n).
-Proof.
-intros * Hmn Hban * Hbi.
-revert b Hban Hbi.
-induction i; intros. {
-  cbn.
-  rewrite Nat.mul_1_r.
-  apply Nat.le_0_r in Hbi; subst b.
-  rewrite Nat.pow_0_r in Hban.
-  rewrite Nat.div_1_r in Hban.
-  apply Nat.eq_mul_1 in Hban.
-  destruct Hban; subst a n.
-  destruct m; [ easy | ].
-  rewrite Nat.div_1_r, Nat.mul_1_r.
-  now apply -> Nat.succ_le_mono.
-}
-destruct (Nat.eq_dec (S i) b) as [Hib| Hib]. {
-  subst b.
-  rewrite Nat.sub_diag.
-  rewrite Nat.pow_0_r, Nat.mul_1_r.
-  apply (Nat_div_less_small_iff 1) in Hban; [ | now apply Nat.pow_nonzero ].
-  rewrite Nat.mul_1_l in Hban.
-  destruct Hban as (H1, H2).
-  cbn - [ "^" "*" ] in H2.
-  apply (Nat.mul_le_mono_pos_r _ _ n). {
-    apply Nat.neq_0_lt_0.
-    intros H; subst n.
-    destruct Hmn as (H3, H4).
-    now apply Nat.le_0_r in H4; subst m.
-  }
-  eapply le_trans; [ apply Nat.lt_le_incl, H2 | ].
-  destruct m; [ easy | ].
-  destruct m. {
-    rewrite Nat.mul_1_l.
-    remember (2 ^ S i) as x.
-    (* donc ça chie *)
-...
-}
-rewrite Nat.sub_succ_l.
-2: flia Hbi Hib.
-... ...
-specialize (glop 3 3 3 3) as H2.
-assert (H : 0 < 3 ≤ 3) by easy.
-specialize (H2 H); clear H.
-assert (H : 3 * 3 / 2 ^ 3 = 1) by now cbn; flia.
-specialize (H2 H); clear H.
-specialize (glop 13 6 4 5) as H3.
-assert (H : 0 < 4 ≤ 5). {
-  split; [ easy | now do 4 apply -> Nat.succ_le_mono ].
-}
-specialize (H3 H); clear H.
-assert (H : 15 * 5 / 2 ^ 6 = 1) by now cbn; flia.
-specialize (H3 H); clear H.
-specialize (glop 3 4 5 6) as H4.
-assert (H : 0 < 5 ≤ 6). {
-  split; [ easy | now do 5 apply -> Nat.succ_le_mono ].
-}
-specialize (H4 H); clear H.
-assert (H : 3 * 6 / 2 ^ 4 = 1) by now cbn; flia.
-specialize (H4 H); clear H.
-now apply H3.
-... ...
-apply glop.
     induction i; [ easy | ].
     apply Nat.succ_le_mono in Hi6.
     rewrite Nat.sub_succ.
@@ -2854,7 +2754,6 @@ apply glop.
     apply Nat.mul_le_mono_l.
     rewrite Nat.pow_succ_r'.
     now apply Nat.div_mul_le.
-...
   }
   apply Nat.succ_lt_mono in Hm.
   apply Nat.lt_1_r in Hm; subst m.
