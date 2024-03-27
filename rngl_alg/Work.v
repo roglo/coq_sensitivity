@@ -2689,7 +2689,6 @@ destruct n. {
     rewrite angle_mul_nat_assoc.
     specialize (seq_angle_to_div_nat_5_le i θ) as H2.
     eapply angle_le_trans; [ apply H2 | ].
-(**)
     destruct (lt_dec i 6) as [Hi6| Hi6]. {
       destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
       destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
@@ -2749,29 +2748,25 @@ destruct n. {
       flia Hi6.
     }
     apply Nat.nlt_ge in Hi6.
-(*
-replace i with (6 + (i - 6)) at 1 by flia Hi6.
-Search (_ / ₂^(_ + _))%A.
-rewrite angle_div_2_pow_add_r.
-Search (_ / ₂^_ / ₂^_)%A.
     rewrite <- (angle_div_2_pow_mul_pow_sub i 6); [ | easy ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.add_comm.
-    rewrite angle_mul_nat_assoc.
-...
-*)
-do 6 (destruct i; [ flia Hi6 | ]).
-    replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
-    rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i) 6); [ | apply Nat.le_add_r ].
-    rewrite Nat.add_comm, Nat.add_sub.
-    rewrite Nat.add_comm.
     rewrite angle_mul_nat_assoc.
     apply angle_mul_le_mono_r. 2: {
-      clear Hni Hθ' H2 Hi6.
-      induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
+      clear Hni Hθ' H2.
+      induction i; [ easy | ].
+      apply Nat.succ_le_mono in Hi6.
+      rewrite Nat.sub_succ.
+      destruct (Nat.eq_dec i 5) as [Hi5| Hi5]. {
+        subst i; cbn.
+        now do 13 apply -> Nat.succ_le_mono.
+      }
+      assert (H : 6 ≤ i) by flia Hi6 Hi5.
+      clear Hi5 Hi6; rename H into Hi6.
+      specialize (IHi Hi6).
+      rewrite <- Nat.sub_succ.
+      rewrite Nat.sub_succ_l; [ | easy ].
       rewrite Nat.pow_succ_r'.
       rewrite Nat.mul_comm.
-      replace 4 with (2 * 2) at 2 by easy.
+      replace 4 with (2 * 2) at 3 by easy.
       do 2 rewrite <- Nat.mul_assoc.
       apply Nat.mul_le_mono_l.
       rewrite Nat.mul_comm.
@@ -2779,11 +2774,10 @@ do 6 (destruct i; [ flia Hi6 | ]).
       replace 4 with (2 * 2) at 1 by easy.
       rewrite <- Nat.mul_assoc.
       apply Nat.mul_le_mono_l.
-      rewrite Nat.add_succ_r.
       rewrite Nat.pow_succ_r'.
       now apply Nat.div_mul_le.
     }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (6 + i))). 2: {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
     eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
