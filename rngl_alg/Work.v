@@ -3053,10 +3053,12 @@ destruct n. {
   rewrite angle_mul_nat_assoc.
   specialize (seq_angle_to_div_nat_6_le i θ) as H2.
   eapply angle_le_trans; [ apply H2 | clear H2 ].
-  destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
-  destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
-  destruct i; [ now cbn in Hni; do 4 apply Nat.succ_le_mono in Hni | ].
-  destruct i. {
+  destruct (lt_dec i 4) as [Hi4| Hi4]. {
+    destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
+    destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
+    destruct i; [ now cbn in Hni; do 4 apply Nat.succ_le_mono in Hni | ].
+    do 3 apply Nat.succ_lt_mono in Hi4.
+    apply Nat.lt_1_r in Hi4; subst i.
     clear Hni.
     rewrite (Nat_div_less_small 1); [ | cbn; flia ].
     rewrite Nat.mul_1_r.
@@ -3084,36 +3086,38 @@ destruct n. {
     }
     now apply angle_mul_nat_overflow_div_2_pow.
   }
-  destruct i. {
-    clear Hni.
-    rewrite (Nat_div_less_small 2); [ | cbn; flia ].
-    replace 6 with (3 * 2) by easy.
-    do 2 rewrite <- angle_mul_nat_assoc.
-    apply angle_mul_le_mono_l. 2: {
-      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4 / (2 * 2))). {
-        now cbn; do 3 apply -> Nat.succ_le_mono.
-      }
-      rewrite angle_mul_nat_assoc.
-      apply angle_mul_nat_overflow_2_pow_div_angle_mul.
+  apply Nat.nlt_ge in Hi4.
+  rewrite <- (angle_div_2_pow_mul_pow_sub i 4); [ | easy ].
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+      apply angle_mul_nat_overflow_pow_div.
     }
-    rewrite <- (angle_mul_1_l (θ / ₂^4)) at 1.
-    rewrite angle_mul_nat_assoc.
-    apply angle_mul_le_mono_r; [ | now apply -> Nat.succ_le_mono ].
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4)). {
-      now cbn; do 4 apply -> Nat.succ_le_mono.
-    }
-    now apply angle_mul_nat_overflow_div_2_pow.
+    now apply Nat.mul_div_le.
   }
-  destruct i. {
-    clear Hni.
-Inspect 3.
-...
-(* putain j'ai pas l'esprit clair, là *)
-Compute (let n := 5 in 2^Nat.log2 n + 1).
-Compute (let n := 5 in (2^Nat.log2 n - S n, n * (2^Nat.log2 n - 1))).
-Theorem seq_angle_to_div_nat_le :
-   ∀ i n θ, (seq_angle_to_div_nat θ n i ≤ 13 * (θ / ₂^6))%A.
-Search (2 ^ (Nat.log2 _ - 1)).
+  clear Hni Hθ'.
+  replace 6 with (3 * 2) at 1 by easy.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  induction i; [ easy | ].
+  apply Nat.succ_le_mono in Hi4.
+  rewrite Nat.sub_succ.
+  destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
+    subst i; cbn.
+    now apply -> Nat.succ_le_mono.
+  }
+  assert (H : 4 ≤ i) by flia Hi4 Hi3.
+  clear Hi3 Hi4; rename H into Hi4.
+  specialize (IHi Hi4).
+  rewrite <- Nat.sub_succ.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_l.
+  eapply le_trans; [ apply IHi | ].
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  now rewrite Nat.pow_succ_r'.
+}
+destruct n. {
 ...
 (* 1/n = 1/(2^Nat.log2 n-1) + ... *)
 (* 1/n-1/(2^Nat.log2 n-1) = (2^Nat.log2 n - S n)/(n * (2^Nat.log2 n - 1)) *)
