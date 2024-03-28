@@ -2839,23 +2839,32 @@ destruct n. {
     now do 4 apply -> Nat.succ_le_mono.
   }
   clear Hni Hθ' H2.
-  do 6 (destruct i; [ flia Hi6 | ]).
-  clear Hi6.
-  replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
-  rewrite Nat.add_comm, Nat.add_sub.
-  induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
+  induction i; [ easy | ].
+  apply Nat.succ_le_mono in Hi6.
+  rewrite Nat.sub_succ.
+  destruct (Nat.eq_dec i 5) as [Hi5| Hi5]. {
+    subst i; cbn.
+    now do 13 apply -> Nat.succ_le_mono.
+  }
+  assert (H : 6 ≤ i) by flia Hi6 Hi5.
+  clear Hi5 Hi6; rename H into Hi6.
+  specialize (IHi Hi6).
+  rewrite <- Nat.sub_succ.
+  rewrite Nat.sub_succ_l; [ | easy ].
   rewrite Nat.pow_succ_r'.
+  rewrite (Nat.mul_comm 2).
   rewrite Nat.mul_assoc.
-  rewrite (Nat.mul_comm 13).
-  rewrite <- Nat.mul_assoc.
-  eapply Nat.le_trans; [ apply Nat.mul_le_mono_l, IHi | ].
+  rewrite Nat.mul_comm.
+  eapply le_trans. {
+    apply Nat.mul_le_mono_l.
+    apply IHi.
+  }
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
   rewrite Nat.mul_comm.
-  rewrite Nat.add_succ_l.
-  rewrite Nat.pow_succ_r'.
-  now apply Nat.div_mul_le.
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  now rewrite Nat.pow_succ_r'.
 }
 destruct n. {
   cbn in H1.
