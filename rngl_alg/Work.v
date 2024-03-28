@@ -2829,16 +2829,33 @@ destruct n. {
   apply Nat.nlt_ge in Hi6.
 (*
   rewrite <- (angle_div_2_pow_mul_pow_sub i 6); [ | easy ].
-...
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.mul_le_mono_r.
+    now do 4 apply -> Nat.succ_le_mono.
+  }
+  clear Hni Hθ' H2.
+  rewrite Nat.pow_sub_r; [ | easy | easy ].
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  replace 6 with (4 + 2) at 2 by easy.
+  rewrite Nat.pow_add_r.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono; [ now do 13 apply -> Nat.succ_le_mono | ].
+  rewrite Nat.mul_assoc.
 *)
   do 6 (destruct i; [ flia Hi6 | ]).
   clear Hi6.
-(**)
+  replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
   rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i) 6); [ | apply Nat.le_add_r ].
   rewrite Nat.add_comm, Nat.add_sub.
   rewrite Nat.add_comm.
   rewrite angle_mul_nat_assoc.
-  replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
   apply angle_mul_le_mono_r. 2: {
     clear Hni Hθ' H2.
     induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
@@ -2907,60 +2924,65 @@ destruct n. {
     rewrite angle_mul_nat_assoc.
     specialize (seq_angle_to_div_nat_6_le i θ) as H2.
     eapply angle_le_trans; [ apply H2 | clear H2 ].
-    destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
-    destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
-    destruct i; [ now cbn in Hni; do 4 apply Nat.succ_le_mono in Hni | ].
-    destruct i. {
-      clear Hni.
-      rewrite (Nat_div_less_small 1); [ | cbn; flia ].
-      rewrite Nat.mul_1_r.
-      rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 2.
-      rewrite angle_div_2_pow_mul. 2: {
+    destruct (lt_dec i 6) as [Hi6| Hi6]. {
+      destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
+      destruct i; [ now cbn in Hni; do 2 apply Nat.succ_le_mono in Hni | ].
+      destruct i; [ now cbn in Hni; do 4 apply Nat.succ_le_mono in Hni | ].
+      destruct i. {
+        clear Hni.
+        rewrite (Nat_div_less_small 1); [ | cbn; flia ].
+        rewrite Nat.mul_1_r.
+        rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 2.
+        rewrite angle_div_2_pow_mul. 2: {
+          now apply angle_mul_nat_overflow_div_2_pow.
+        }
+        rewrite <- angle_div_2_pow_add_r.
+        rewrite angle_mul_nat_assoc.
+        apply angle_mul_le_mono_r. 2: {
+          now cbn; do 3 apply -> Nat.succ_le_mono.
+        }
+        replace (4 * 2 ^ 1) with (2 ^ 3) by easy.
+        replace (1 + 3) with 4 by easy.
+        rewrite angle_div_2_pow_succ_r_2.
         now apply angle_mul_nat_overflow_div_2_pow.
       }
-      rewrite <- angle_div_2_pow_add_r.
-      rewrite angle_mul_nat_assoc.
-      apply angle_mul_le_mono_r. 2: {
-        now cbn; do 3 apply -> Nat.succ_le_mono.
-      }
-      replace (4 * 2 ^ 1) with (2 ^ 3) by easy.
-      replace (1 + 3) with 4 by easy.
-      rewrite angle_div_2_pow_succ_r_2.
-      now apply angle_mul_nat_overflow_div_2_pow.
-    }
-    destruct i. {
-      rewrite (Nat_div_less_small 2); [ | cbn; flia ].
-      apply angle_mul_le_mono_r. 2: {
-        now cbn; do 3 apply -> Nat.succ_le_mono.
-      }
-      replace (4 * 2) with (2 ^ 3) by easy.
-      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4)). {
-        now cbn; do 8 apply -> Nat.succ_le_mono.
-      }
-      now apply angle_mul_nat_overflow_div_2_pow.
-    }
-    destruct i. {
-      rewrite (Nat_div_less_small 5); [ | cbn; flia ].
-      rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 1.
-      rewrite angle_div_2_pow_mul. 2: {
+      destruct i. {
+        rewrite (Nat_div_less_small 2); [ | cbn; flia ].
+        apply angle_mul_le_mono_r. 2: {
+          now cbn; do 3 apply -> Nat.succ_le_mono.
+        }
+        replace (4 * 2) with (2 ^ 3) by easy.
+        apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4)). {
+          now cbn; do 8 apply -> Nat.succ_le_mono.
+        }
         now apply angle_mul_nat_overflow_div_2_pow.
       }
-      rewrite <- angle_div_2_pow_add_r.
-      rewrite angle_mul_nat_assoc.
-      apply angle_mul_le_mono_r. 2: {
-        now cbn; do 6 apply -> Nat.succ_le_mono.
+      destruct i. {
+        rewrite (Nat_div_less_small 5); [ | cbn; flia ].
+        rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 1.
+        rewrite angle_div_2_pow_mul. 2: {
+          now apply angle_mul_nat_overflow_div_2_pow.
+        }
+        rewrite <- angle_div_2_pow_add_r.
+        rewrite angle_mul_nat_assoc.
+        apply angle_mul_le_mono_r. 2: {
+          now cbn; do 6 apply -> Nat.succ_le_mono.
+        }
+        apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
+          now cbn; do 20 apply -> Nat.succ_le_mono.
+        }
+        now apply angle_mul_nat_overflow_div_2_pow.
       }
-      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
-        now cbn; do 20 apply -> Nat.succ_le_mono.
-      }
-      now apply angle_mul_nat_overflow_div_2_pow.
+      flia Hi6.
     }
+    apply Nat.nlt_ge in Hi6.
+    do 6 (destruct i; [ flia Hi6 | ]).
     replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
     rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i)); [ | flia ].
     replace (6 + i - 4) with (2 + i) by easy.
     rewrite angle_mul_nat_assoc.
     apply angle_mul_le_mono_r. 2: {
-      clear Hni Hθ'.
+      clear Hni Hθ' Hi6.
       induction i; [ now cbn; do 12 apply -> Nat.succ_le_mono | ].
       rewrite Nat.add_succ_r.
       rewrite Nat.pow_succ_r'.
