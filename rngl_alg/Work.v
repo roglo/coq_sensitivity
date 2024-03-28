@@ -2827,7 +2827,6 @@ destruct n. {
     flia Hi6.
   }
   apply Nat.nlt_ge in Hi6.
-(*
   rewrite <- (angle_div_2_pow_mul_pow_sub i 6); [ | easy ].
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
@@ -2840,42 +2839,23 @@ destruct n. {
     now do 4 apply -> Nat.succ_le_mono.
   }
   clear Hni Hθ' H2.
-  rewrite Nat.pow_sub_r; [ | easy | easy ].
-  eapply le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
-  replace 6 with (4 + 2) at 2 by easy.
-  rewrite Nat.pow_add_r.
-  rewrite <- Nat.mul_assoc.
-  apply Nat.mul_le_mono; [ now do 13 apply -> Nat.succ_le_mono | ].
-  rewrite Nat.mul_assoc.
-*)
   do 6 (destruct i; [ flia Hi6 | ]).
   clear Hi6.
   replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
-  rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i) 6); [ | apply Nat.le_add_r ].
   rewrite Nat.add_comm, Nat.add_sub.
-  rewrite Nat.add_comm.
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r. 2: {
-    clear Hni Hθ' H2.
-    induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
-    rewrite Nat.pow_succ_r'.
-    rewrite Nat.mul_assoc.
-    rewrite (Nat.mul_comm 13).
-    rewrite <- Nat.mul_assoc.
-    eapply Nat.le_trans; [ apply Nat.mul_le_mono_l, IHi | ].
-    rewrite Nat.mul_comm.
-    rewrite <- Nat.mul_assoc.
-    apply Nat.mul_le_mono_l.
-    rewrite Nat.mul_comm.
-    rewrite Nat.add_succ_r.
-    rewrite Nat.pow_succ_r'.
-    now apply Nat.div_mul_le.
-  }
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (6 + i))). 2: {
-    apply angle_mul_nat_overflow_pow_div.
-  }
-  now apply Nat.mul_div_le.
+  induction i; [ now cbn; do 13 apply -> Nat.succ_le_mono | ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm 13).
+  rewrite <- Nat.mul_assoc.
+  eapply Nat.le_trans; [ apply Nat.mul_le_mono_l, IHi | ].
+  rewrite Nat.mul_comm.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  rewrite Nat.mul_comm.
+  rewrite Nat.add_succ_l.
+  rewrite Nat.pow_succ_r'.
+  now apply Nat.div_mul_le.
 }
 destruct n. {
   cbn in H1.
@@ -2976,6 +2956,7 @@ destruct n. {
       flia Hi6.
     }
     apply Nat.nlt_ge in Hi6.
+(**)
     do 6 (destruct i; [ flia Hi6 | ]).
     replace (S (S (S (S (S (S i)))))) with (6 + i) by easy.
     rewrite <- (angle_div_2_pow_mul_pow_sub (6 + i)); [ | flia ].
