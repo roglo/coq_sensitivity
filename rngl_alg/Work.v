@@ -3227,44 +3227,87 @@ destruct n. {
         clear Hni Hi5.
         rewrite (Nat_div_less_small 1); [ | cbn; flia ].
         rewrite Nat.mul_1_r.
-...
-        rewrite <- (angle_div_2_pow_mul_2_pow 3 θ) at 1.
+        rewrite <- (angle_div_2_pow_mul_2_pow 2 θ) at 2.
         rewrite angle_div_2_pow_mul. 2: {
           now apply angle_mul_nat_overflow_div_2_pow.
         }
         rewrite <- angle_div_2_pow_add_r.
-        rewrite Nat.add_comm.
-        rewrite angle_div_2_pow_add_r.
-        rewrite angle_div_2_pow_mul_2_pow.
-...
-    apply Nat.lt_1_r in Hi4; subst i.
-    clear Hni.
-    rewrite (Nat_div_less_small 1); [ | cbn; flia ].
-    rewrite Nat.mul_1_r.
-    replace 6 with (3 * 2) by easy.
-    rewrite <- angle_mul_nat_assoc.
-    apply angle_mul_le_mono_l. 2: {
-      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 3 / 2)). {
-        now cbn; do 3 apply -> Nat.succ_le_mono.
+        rewrite angle_mul_nat_assoc.
+        apply angle_mul_le_mono_r. 2: {
+          now cbn; do 5 apply -> Nat.succ_le_mono.
+        }
+        apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
+          now cbn; do 16 apply -> Nat.succ_le_mono.
+        }
+        now apply angle_mul_nat_overflow_div_2_pow.
       }
-      apply angle_mul_nat_overflow_2_pow_div_angle_mul.
-    }
-    rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 2.
-    rewrite angle_div_2_pow_mul. 2: {
+      apply Nat.succ_lt_mono in Hi5.
+      apply Nat.lt_1_r in Hi5; subst i.
+      clear Hni.
+      rewrite (Nat_div_less_small 2); [ | cbn; flia ].
+      rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 2.
+      rewrite angle_div_2_pow_mul. 2: {
+        now apply angle_mul_nat_overflow_div_2_pow.
+      }
+      rewrite <- angle_div_2_pow_add_r.
+      rewrite angle_mul_nat_assoc.
+      apply angle_mul_le_mono_r. 2: {
+        now cbn; do 5 apply -> Nat.succ_le_mono.
+      }
+      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
+        now cbn; do 16 apply -> Nat.succ_le_mono.
+      }
       now apply angle_mul_nat_overflow_div_2_pow.
     }
-    rewrite <- angle_div_2_pow_add_r.
+    apply Nat.nlt_ge in Hi5.
+    rewrite <- (angle_div_2_pow_mul_pow_sub i 5); [ | easy ].
     rewrite angle_mul_nat_assoc.
-    rewrite <- (angle_mul_1_l (θ / ₂^4)).
-    apply angle_mul_le_mono_r. 2: {
-      now cbn; apply -> Nat.succ_le_mono.
-    }
-    replace (1 + 3) with 4 by easy.
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4)). {
+    apply angle_mul_le_mono_r. {
+      apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+        apply angle_mul_nat_overflow_pow_div.
+      }
+      eapply le_trans; [ now apply Nat.div_mul_le | ].
+      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.mul_le_mono_r.
       now cbn; do 4 apply -> Nat.succ_le_mono.
     }
-    now apply angle_mul_nat_overflow_div_2_pow.
+    clear Hni Hθ'.
+    induction i; [ easy | ].
+    apply Nat.succ_le_mono in Hi5.
+    rewrite Nat.sub_succ.
+    destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
+      subst i; cbn.
+      now do 5 apply -> Nat.succ_le_mono.
+    }
+    assert (H : 5 ≤ i) by flia Hi5 Hi4.
+    clear Hi5 Hi4; rename H into Hi5.
+    specialize (IHi Hi5).
+    rewrite <- Nat.sub_succ.
+    rewrite Nat.sub_succ_l; [ | easy ].
+    rewrite Nat.pow_succ_r'.
+    rewrite (Nat.mul_comm 2).
+    rewrite Nat.mul_assoc.
+    rewrite Nat.mul_comm.
+    eapply le_trans; [ apply Nat.mul_le_mono_l, IHi | ].
+    rewrite Nat.mul_assoc, (Nat.mul_comm 2).
+    rewrite <- Nat.mul_assoc.
+    apply Nat.mul_le_mono_l.
+    rewrite Nat.pow_succ_r'.
+    now apply Nat.div_mul_le.
   }
+  apply Nat.succ_lt_mono in Hm.
+  destruct m. {
+    clear Hm.
+    progress unfold angle_add_overflow.
+    apply angle_ltb_ge.
+    rewrite angle_add_mul_r_diag_r.
+    rewrite Hθ'.
+    progress unfold seq_angle_to_div_nat at 2.
+    rewrite angle_mul_nat_assoc.
+    specialize (seq_angle_to_div_nat_7_le i θ) as H2.
+    eapply angle_le_trans; [ apply H2 | clear H2 ].
+    destruct (lt_dec i 5) as [Hi5| Hi5]. {
+      destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
 ...
 (* 1/n = 1/(2^Nat.log2 n-1) + ... *)
 (* 1/n-1/(2^Nat.log2 n-1) = (2^Nat.log2 n - S n)/(n * (2^Nat.log2 n - 1)) *)
