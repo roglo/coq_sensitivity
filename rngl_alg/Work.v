@@ -3443,25 +3443,29 @@ destruct n. {
       now do 6 apply -> Nat.succ_le_mono.
     }
     clear Hni Hθ'.
-...
-    apply Nat.mul_le_mono_l.
     induction i; [ easy | ].
     apply Nat.succ_le_mono in Hi5.
-    rewrite Nat.sub_succ.
     destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
       subst i; cbn.
-      now apply -> Nat.succ_le_mono.
+      now do 5 apply -> Nat.succ_le_mono.
     }
     assert (H : 5 ≤ i) by flia Hi5 Hi4.
     clear Hi5 Hi4; rename H into Hi5.
     specialize (IHi Hi5).
-    rewrite <- Nat.sub_succ.
     rewrite Nat.sub_succ_l; [ | easy ].
     rewrite Nat.pow_succ_r'.
+    rewrite (Nat.mul_comm 2).
+    rewrite Nat.mul_assoc.
+    rewrite Nat.mul_comm.
     eapply le_trans; [ apply Nat.mul_le_mono_l, IHi | ].
+    rewrite Nat.mul_assoc, (Nat.mul_comm 2).
+    rewrite <- Nat.mul_assoc.
+    apply Nat.mul_le_mono_l.
     rewrite Nat.pow_succ_r'.
     now apply Nat.div_mul_le.
   }
+  apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m.
 ...
 (* 1/n = 1/(2^Nat.log2 n-1) + ... *)
 (* 1/n-1/(2^Nat.log2 n-1) = (2^Nat.log2 n - S n)/(n * (2^Nat.log2 n - 1)) *)
