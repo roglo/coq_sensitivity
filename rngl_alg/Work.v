@@ -2472,6 +2472,16 @@ progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_7_le i θ) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
+assert (Hm5 : S (S m) * 2 ^ 2 ≤ 2 ^ 5). {
+  destruct m; [ now do 8 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 12 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 16 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 20 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 24 apply -> Nat.succ_le_mono | ].
+  do 6 apply Nat.succ_lt_mono in Hm.
+  apply Nat.lt_1_r in Hm; subst m; cbn.
+  now do 28 apply -> Nat.succ_le_mono.
+}
 destruct (lt_dec i 5) as [Hi5| Hi5]. {
   destruct i; [ now apply Nat.succ_le_mono in Hni | ].
   destruct i; [ now do 2 apply Nat.succ_le_mono in Hni | ].
@@ -2491,16 +2501,7 @@ destruct (lt_dec i 5) as [Hi5| Hi5]. {
       do 6 (destruct m; [ now do 5 apply -> Nat.succ_le_mono | ]).
       now do 7 apply Nat.succ_lt_mono in Hm.
     }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
-      destruct m; [ now do 8 apply -> Nat.succ_le_mono | ].
-      destruct m; [ now do 12 apply -> Nat.succ_le_mono | ].
-      destruct m; [ now do 16 apply -> Nat.succ_le_mono | ].
-      destruct m; [ now do 20 apply -> Nat.succ_le_mono | ].
-      destruct m; [ now do 24 apply -> Nat.succ_le_mono | ].
-      do 6 apply Nat.succ_lt_mono in Hm.
-      apply Nat.lt_1_r in Hm; subst m; cbn.
-      now do 28 apply -> Nat.succ_le_mono.
-    }
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)); [ easy | ].
     now apply angle_mul_nat_overflow_div_2_pow.
   }
   apply Nat.succ_lt_mono in Hi5.
@@ -2516,16 +2517,9 @@ destruct (lt_dec i 5) as [Hi5| Hi5]. {
   apply angle_mul_le_mono_r. 2: {
     now do 5 apply -> Nat.succ_le_mono.
   }
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)). {
-    destruct m; [ now do 8 apply -> Nat.succ_le_mono | ].
-    destruct m; [ now do 12 apply -> Nat.succ_le_mono | ].
-    destruct m; [ now do 16 apply -> Nat.succ_le_mono | ].
-    destruct m; [ now do 20 apply -> Nat.succ_le_mono | ].
-    destruct m; [ now do 24 apply -> Nat.succ_le_mono | ].
-    do 6 apply Nat.succ_lt_mono in Hm.
-    apply Nat.lt_1_r in Hm; subst m; cbn.
-    now do 28 apply -> Nat.succ_le_mono.
-  }
+  rewrite Nat.pow_1_r, <- Nat.mul_assoc.
+  replace (2 * 2) with (2 ^ 2) by easy.
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)); [ easy | ].
   now apply angle_mul_nat_overflow_div_2_pow.
 }
 apply Nat.nlt_ge in Hi5.
