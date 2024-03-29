@@ -2455,6 +2455,40 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (5 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
+Theorem angle_add_overflow_mul_by_lt_4 :
+  ∀ i θ θ',
+  4 ≤ 2 ^ i
+  → θ' = seq_angle_to_div_nat θ 4 i
+  → ∀ m : nat, m < 4
+  → angle_add_overflow θ' (m * θ') = false.
+Proof.
+intros * Hni Hθ' * Hm.
+destruct m; [ apply angle_add_overflow_0_r | ].
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+progress unfold seq_angle_to_div_nat.
+rewrite angle_mul_nat_assoc.
+apply angle_mul_le_mono_r. {
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+    apply angle_mul_nat_overflow_pow_div.
+  }
+  destruct i; [ now apply Nat.succ_le_mono in Hni | ].
+  destruct i; [ now do 2 apply Nat.succ_le_mono in Hni | ].
+  rewrite Nat.pow_succ_r', (Nat.mul_comm 2).
+  rewrite Nat.pow_succ_r', (Nat.mul_comm 2).
+  rewrite <- Nat.mul_assoc.
+  rewrite Nat.div_mul; [ | easy ].
+  rewrite Nat.mul_comm.
+  now apply Nat.mul_le_mono_l.
+}
+(* lemma *)
+rewrite Nat.mul_comm.
+apply Nat_mul_le_pos_r.
+now apply -> Nat.succ_le_mono.
+Qed.
+
 (* à nettoyer les "destruct i..." *)
 Theorem angle_add_overflow_mul_by_lt_5 :
   ∀ i θ θ',
@@ -2914,82 +2948,7 @@ destruct n. {
   rewrite Nat.mul_comm.
   now rewrite Nat.div_mul.
 }
-destruct n. {
-  cbn in H1.
-  destruct m; [ apply angle_add_overflow_0_r | ].
-  apply Nat.succ_lt_mono in Hm.
-  destruct m. {
-    rewrite angle_mul_1_l.
-    apply angle_add_overflow_diag. {
-      apply rngl_sin_nonneg_angle_le_straight.
-      eapply angle_le_trans; [ apply H1 | ].
-      apply angle_div_2_le.
-    }
-    intros H; move H at top; subst θ'.
-    apply angle_nlt_ge in H1.
-    apply H1; clear H1.
-    apply angle_div_2_lt_diag.
-    apply (angle_straight_neq_0 Hc1).
-  }
-  apply Nat.succ_lt_mono in Hm.
-  destruct m. {
-    clear Hm.
-    apply angle_add_overflow_lt_straight_le_straight. {
-      eapply angle_le_lt_trans; [ apply H1 | ].
-      apply angle_div_2_lt_diag.
-      apply (angle_straight_neq_0 Hc1).
-    }
-    rewrite Hθ'.
-    progress unfold seq_angle_to_div_nat.
-    rewrite angle_mul_nat_assoc.
-    apply angle_mul_div_2_pow_le_straight.
-    rewrite Nat.mul_assoc.
-    now apply Nat.mul_div_le.
-  }
-  apply Nat.succ_lt_mono in Hm.
-  apply Nat.lt_1_r in Hm; subst m.
-  replace 3 with (2 + 1) by easy.
-  rewrite angle_mul_add_distr_r.
-  rewrite angle_mul_1_l.
-  apply angle_add_not_overflow_move_add. {
-    apply angle_add_overflow_lt_straight_le_straight. {
-      eapply angle_le_lt_trans; [ apply H1 | ].
-      apply angle_div_2_lt_diag.
-      apply (angle_straight_neq_0 Hc1).
-    }
-    eapply angle_le_trans; [ apply H1 | ].
-    apply angle_div_2_le.
-  }
-  rewrite angle_add_diag.
-  apply angle_add_overflow_lt_straight_le_straight. {
-    rewrite <- (angle_div_2_mul_2 angle_straight).
-    apply angle_lt_iff.
-    split. {
-      apply angle_mul_le_mono_l; [ easy | ].
-      rewrite <- (Nat.mul_1_r 2).
-      now apply angle_mul_nat_overflow_mul_2_div_2.
-    }
-    intros H.
-    rewrite angle_div_2_mul_2 in H.
-    rewrite Hθ' in H.
-    progress unfold seq_angle_to_div_nat in H.
-    rewrite angle_mul_nat_assoc in H.
-    destruct i; [ cbn in Hni; flia Hni | ].
-    destruct i; [ cbn in Hni; flia Hni | ].
-    replace 4 with (2 ^ 2) in H by easy.
-    rewrite <- Nat.pow_sub_r in H; [ | easy | flia ].
-    do 2 rewrite Nat.sub_succ in H.
-    rewrite Nat.sub_0_r in H.
-    rewrite <- Nat.pow_succ_r' in H.
-    rewrite angle_div_2_pow_succ_r_2 in H.
-    rewrite angle_div_2_pow_mul_2_pow in H.
-    now apply (angle_div_2_not_straight Hc1) in H.
-  }
-  rewrite <- (angle_div_2_mul_2 angle_straight).
-  apply angle_mul_le_mono_l; [ easy | ].
-  rewrite <- (Nat.mul_1_r 2).
-  now apply angle_mul_nat_overflow_mul_2_div_2.
-}
+destruct n; [ now apply (angle_add_overflow_mul_by_lt_4 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_5 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_6 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_7 i θ) | ].
