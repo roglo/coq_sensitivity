@@ -2430,21 +2430,15 @@ Qed.
 
 (* to be completed
 (* first n binary digits of a/b with a<b *)
-1/7=
-
-2/7=0
-4/7=0
-8/7=1 reste 1/7
-
 Fixpoint binary_div n a b :=
   match n with
   | 0 => []
   | S n' =>
-      if (2 * a) mod b =? 0 then 0 :: binary_div n' (a / b) b
-      else 1 :: binary_div n' (a / b) b
+      if 2 * a / b =? 0 then 0 :: binary_div n' (2 * a mod b) b
+      else 1 :: binary_div n' (2 * a mod b) b
   end.
 
-Compute (binary_div 10 1 3).
+Compute (binary_div 20 1 5).
 ...
 
 Fixpoint rank_fst_0_aft_1 n :=
