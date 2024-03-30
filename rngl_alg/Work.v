@@ -2446,9 +2446,24 @@ Fixpoint rank_fst_1' k a n :=
       else 0
   end.
 
-Definition rank_fst_1 n := Nat.log2_up n - 1.
+Definition rank_fst_1_inv n := Nat.log2_up n - 1.
 
-Compute (map (λ n, (n, rank_fst_1' n 1 n, rank_fst_1 n)) (seq 1 50)).
+Compute (map (λ n, (n, rank_fst_1' n 1 n, rank_fst_1_inv n)) (seq 1 50)).
+
+Fixpoint rank_loop n a b :=
+  match n with
+  | 0 => 0
+  | S n' =>
+      if 2 * a / b =? 0 then 0
+      else 1 + rank_loop n' (2 * a mod b) b
+  end.
+
+Compute (let n := 239 in (binary_div 20 1 n, binary_div 20 (n - 1) n)).
+
+Definition rank_snd_0_inv n :=
+  rank_loop n (n - 1) n.
+
+Compute (map (λ n, (n, rank_fst_1_inv n + rank_snd_0_inv n, rank_fst_1_inv n)) (seq 3 50)).
 
 ...
 
