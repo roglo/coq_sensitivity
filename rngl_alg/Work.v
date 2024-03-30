@@ -2402,11 +2402,11 @@ apply angle_mul_nat_overflow_pow_div.
 Qed.
 
 Theorem seq_angle_to_div_nat_7_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 7 i ≤ 5 * (θ / ₂^5))%A.
+  ∀ i θ, (seq_angle_to_div_nat θ 7 i ≤ 3 * (θ / ₂^4))%A.
 Proof.
 intros.
 (* 1/7 = 1/8 + 1/64 + ...
-   1/7 < 1/8 + 1/32 = 5/32 *)
+   1/7 < 1/8 + 1/16 = 3/16 *)
 progress unfold seq_angle_to_div_nat.
 destruct i; [ apply angle_nonneg | ].
 destruct i; [ apply angle_nonneg | ].
@@ -2414,43 +2414,31 @@ destruct i; [ apply angle_nonneg | ].
 destruct i. {
   rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite angle_mul_1_l.
-  rewrite <- (angle_div_2_pow_mul_pow_sub 5). 2: {
+  rewrite <- (angle_div_2_pow_mul_pow_sub 4). 2: {
     now do 3 apply -> Nat.succ_le_mono.
   }
   apply angle_mul_le_mono_r. 2: {
-    now cbn; do 4 apply -> Nat.succ_le_mono.
+    now cbn; do 2 apply -> Nat.succ_le_mono.
   }
   apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 5 apply -> Nat.succ_le_mono.
+  now do 3 apply -> Nat.succ_le_mono.
 }
-destruct i. {
-  rewrite (Nat_div_less_small 2); [ | cbn; flia ].
-  rewrite <- (angle_div_2_pow_mul_pow_sub 5). 2: {
-    now do 4 apply -> Nat.succ_le_mono.
-  }
-  rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r. 2: {
-    now cbn; do 4 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 5 apply -> Nat.succ_le_mono.
-}
-rewrite <- (angle_div_2_pow_mul_pow_sub (5 + i) 5); [ | apply Nat.le_add_r ].
+replace (S (S (S (S i)))) with (4 + i) by easy.
+rewrite <- (angle_div_2_pow_mul_pow_sub (4 + i) 4); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite Nat.add_comm.
 rewrite angle_mul_nat_assoc.
-replace (S (S (S (S (S i))))) with (5 + i) by easy.
 apply angle_mul_le_mono_r. 2: {
   apply Nat.div_le_upper_bound; [ easy | ].
   rewrite Nat.mul_assoc.
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r.
-  now cbn; do 32 apply -> Nat.succ_le_mono.
+  now do 16 apply -> Nat.succ_le_mono.
 }
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (5 + i))). {
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r.
-  now do 5 apply -> Nat.succ_le_mono.
+  now do 3 apply -> Nat.succ_le_mono.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2783,42 +2771,23 @@ progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_7_le i θ) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
-assert (Hm5 : S (S m) * 2 ^ 2 ≤ 2 ^ 5). {
+assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
+  destruct m; [ now do 4 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 6 apply -> Nat.succ_le_mono | ].
   destruct m; [ now do 8 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 10 apply -> Nat.succ_le_mono | ].
   destruct m; [ now do 12 apply -> Nat.succ_le_mono | ].
-  destruct m; [ now do 16 apply -> Nat.succ_le_mono | ].
-  destruct m; [ now do 20 apply -> Nat.succ_le_mono | ].
-  destruct m; [ now do 24 apply -> Nat.succ_le_mono | ].
-  do 6 apply Nat.succ_lt_mono in Hm.
-  apply Nat.lt_1_r in Hm; subst m; cbn.
-  now do 28 apply -> Nat.succ_le_mono.
+  destruct m; [ now do 14 apply -> Nat.succ_le_mono | ].
+  now do 7 apply Nat.succ_lt_mono in Hm.
 }
-destruct (lt_dec i 5) as [Hi5| Hi5]. {
+destruct (lt_dec i 4) as [Hi4| Hi4]. {
   destruct i; [ now apply Nat.succ_le_mono in Hni | ].
   destruct i; [ now do 2 apply Nat.succ_le_mono in Hni | ].
   destruct i; [ now do 4 apply Nat.succ_le_mono in Hni | ].
-  do 3 apply Nat.succ_lt_mono in Hi5.
-  destruct i. {
-    clear Hni Hi5.
-    rewrite (Nat_div_less_small 1); [ | cbn; flia ].
-    rewrite Nat.mul_1_r.
-    rewrite <- (angle_div_2_pow_mul_2_pow 2 θ) at 2.
-    rewrite angle_div_2_pow_mul. 2: {
-      now apply angle_mul_nat_overflow_div_2_pow.
-    }
-    rewrite <- angle_div_2_pow_add_r.
-    rewrite angle_mul_nat_assoc.
-    apply angle_mul_le_mono_r. 2: {
-      do 6 (destruct m; [ now do 5 apply -> Nat.succ_le_mono | ]).
-      now do 7 apply Nat.succ_lt_mono in Hm.
-    }
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)); [ easy | ].
-    now apply angle_mul_nat_overflow_div_2_pow.
-  }
-  apply Nat.succ_lt_mono in Hi5.
-  apply Nat.lt_1_r in Hi5; subst i.
+  do 3 apply Nat.succ_lt_mono in Hi4.
+  apply Nat.lt_1_r in Hi4; subst i.
   clear Hni.
-  rewrite (Nat_div_less_small 2); [ | cbn; flia ].
+  rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite <- (angle_div_2_pow_mul_2_pow 1 θ) at 2.
   rewrite angle_div_2_pow_mul. 2: {
     now apply angle_mul_nat_overflow_div_2_pow.
@@ -2826,15 +2795,15 @@ destruct (lt_dec i 5) as [Hi5| Hi5]. {
   rewrite <- angle_div_2_pow_add_r.
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. 2: {
-    now do 5 apply -> Nat.succ_le_mono.
+    now do 3 apply -> Nat.succ_le_mono.
   }
   rewrite Nat.pow_1_r, <- Nat.mul_assoc.
-  replace (2 * 2) with (2 ^ 2) by easy.
-  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 5)); [ easy | ].
+  rewrite Nat.mul_1_l.
+  apply (angle_mul_nat_not_overflow_le_l _ (2 ^ 4)); [ easy | ].
   now apply angle_mul_nat_overflow_div_2_pow.
 }
-apply Nat.nlt_ge in Hi5.
-rewrite <- (angle_div_2_pow_mul_pow_sub i 5); [ | easy ].
+apply Nat.nlt_ge in Hi4.
+rewrite <- (angle_div_2_pow_mul_pow_sub i 4); [ | easy ].
 rewrite angle_mul_nat_assoc.
 apply angle_mul_le_mono_r. {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
@@ -2846,14 +2815,14 @@ apply angle_mul_le_mono_r. {
 }
 clear Hni Hθ'.
 induction i; [ easy | ].
-apply Nat.succ_le_mono in Hi5.
-destruct (Nat.eq_dec i 4) as [Hi4| Hi4]. {
+apply Nat.succ_le_mono in Hi4.
+destruct (Nat.eq_dec i 3) as [Hi3| Hi3]. {
   subst i; cbn.
-  now do 5 apply -> Nat.succ_le_mono.
+  now do 3 apply -> Nat.succ_le_mono.
 }
-assert (H : 5 ≤ i) by flia Hi5 Hi4.
-clear Hi5 Hi4; rename H into Hi5.
-specialize (IHi Hi5).
+assert (H : 4 ≤ i) by flia Hi4 Hi3.
+clear Hi4 Hi3; rename H into Hi4.
+specialize (IHi Hi4).
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite Nat.pow_succ_r'.
 rewrite (Nat.mul_comm 2).
@@ -2892,6 +2861,22 @@ destruct n. {
   destruct m; [ apply angle_add_overflow_0_r | ].
   apply Nat.succ_lt_mono in Hm.
   destruct m. {
+...
+Inspect 10.
+(* la règle, c'est que quand on écrit 1/n en base 2, qui s'écrit sous la forme
+     0.000011110... ou plutôt 0. un certain nombre de 0, un certain nombre de 1, puis un 0
+   on peut le maximiser par
+     0.000011111... ou plutôt 0. un certain nombre de 0, un certain nombre de 1, puis un autre 1
+*)
+...
+seq_angle_to_div_nat_3_le : ∀ (i : nat) (θ : angle T), (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A
+0.0101010101010 1/4+1/8 = 3/8 ok
+seq_angle_to_div_nat_5_le : ∀ (i : nat) (θ : angle T), (seq_angle_to_div_nat θ 5 i ≤ 13 * (θ / ₂^6))%A
+0.0011001100110 1/8+1/16+1/32 = 7/32 ... ah, tiens... --------> à corriger
+seq_angle_to_div_nat_6_le : ∀ (i : nat) (θ : angle T), (seq_angle_to_div_nat θ 6 i ≤ 3 * (θ / ₂^4))%A
+0.0010101010101 1/8+1/16 = 3/16 ok
+seq_angle_to_div_nat_7_le : ∀ (i : nat) (θ : angle T), (seq_angle_to_div_nat θ 7 i ≤ 3 * (θ / ₂^4))%A
+0.0010010010010 1/8+1/16 = 3/16 ok
 ...
 (* 1/n = 1/(2^Nat.log2 n-1) + ... *)
 (* 1/n-1/(2^Nat.log2 n-1) = (2^Nat.log2 n - S n)/(n * (2^Nat.log2 n - 1)) *)
