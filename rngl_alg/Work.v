@@ -2455,6 +2455,28 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (5 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
+Theorem angle_add_overflow_mul_by_lt_2 :
+  ∀ i θ θ',
+  2 ≤ 2 ^ i
+  → θ' = seq_angle_to_div_nat θ 2 i
+  → ∀ m : nat, m < 2
+  → angle_add_overflow θ' (m * θ') = false.
+Proof.
+intros * Hni Hθ' * Hm.
+destruct m; [ apply angle_add_overflow_0_r | ].
+apply Nat.succ_lt_mono in Hm.
+apply Nat.lt_1_r in Hm; subst m.
+rewrite angle_mul_1_l.
+destruct i; [ now apply Nat.succ_le_mono in Hni | ].
+subst θ'.
+progress unfold seq_angle_to_div_nat.
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+rewrite angle_div_2_pow_succ_r_2.
+rewrite angle_div_2_pow_mul_2_pow.
+apply angle_add_overflow_div_2_div_2.
+Qed.
+
 Theorem angle_add_overflow_mul_by_lt_3 :
   ∀ i θ θ',
   3 ≤ 2 ^ i
@@ -2851,50 +2873,22 @@ Theorem angle_mul_nat_not_overflow :
   n ≤ 2 ^ i
   → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
 Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros.
-  rewrite (H1 (seq_angle_to_div_nat _ _ _)).
-  apply angle_mul_nat_overflow_0_r.
-}
 intros * Hni.
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
-specialize seq_angle_to_div_nat_le_straight_div_2_pow_log2_pred as H1.
-specialize (H1 n i θ Hn1).
-remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 apply angle_all_add_not_overflow.
 intros m Hm.
-move H1 at bottom.
 destruct n; [ easy | ].
-destruct n; [ easy | clear Hn1 ].
 destruct n. {
-  cbn in H1.
-  destruct m; [ apply angle_add_overflow_0_r | ].
-  apply Nat.succ_lt_mono in Hm.
   apply Nat.lt_1_r in Hm; subst m.
-  rewrite angle_mul_1_l.
-  apply angle_add_overflow_diag. {
-    now apply rngl_sin_nonneg_angle_le_straight.
-  }
-  intros H; move H at top; subst θ'.
-  destruct i; [ cbn in Hni; flia Hni | ].
-  progress unfold seq_angle_to_div_nat in Hθ'.
-  symmetry in Hθ'.
-  rewrite Nat.pow_succ_r' in Hθ'.
-  rewrite Nat.mul_comm in Hθ'.
-  rewrite Nat.div_mul in Hθ'; [ | easy ].
-  rewrite angle_div_2_pow_succ_r_2 in Hθ'.
-  rewrite angle_div_2_pow_mul_2_pow in Hθ'.
-  now apply (angle_div_2_not_straight Hc1) in Hθ'.
+  rewrite angle_mul_0_l.
+  apply angle_add_overflow_0_r.
 }
+destruct n; [ now apply (angle_add_overflow_mul_by_lt_2 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_3 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_4 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_5 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_6 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_7 i θ) | ].
 destruct n. {
-  cbn in H1.
   destruct m; [ apply angle_add_overflow_0_r | ].
   apply Nat.succ_lt_mono in Hm.
   destruct m. {
