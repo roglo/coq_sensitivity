@@ -2465,7 +2465,7 @@ Fixpoint rank_fst_0_aft_1 n :=
 ...
 
 Theorem seq_angle_to_div_nat_le :
-  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_fst_0_aft_1 n))%A.
+  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_snd_0 n))%A.
 Proof.
 (*
 1/n = 0..
