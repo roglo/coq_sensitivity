@@ -2428,6 +2428,59 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
+(* to be completed
+Theorem seq_angle_to_div_nat_le :
+  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_fst_0_aft_1))%A.
+Proof.
+(*
+1/n = 0..
+
+1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
+1/5 = 0.0011001100110 < 0.00111 = 1/8+1/16+1/32 = 7/2^5
+1/6 = 0.0010101010101 < 0.0011 = 1/8+1/16 = 3/2^4
+1/7 = 0.0010010010010 < 0.0011 = 1/8+1/16 = 3/2^4
+*)
+intros.
+(* 1/7 = 1/8 + 1/64 + ...
+   1/7 < 1/8 + 1/16 = 3/16 *)
+...
+progress unfold seq_angle_to_div_nat.
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i; [ apply angle_nonneg | ].
+destruct i. {
+  rewrite (Nat_div_less_small 1); [ | cbn; flia ].
+  rewrite angle_mul_1_l.
+  rewrite <- (angle_div_2_pow_mul_pow_sub 4). 2: {
+    now do 3 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_le_mono_r. 2: {
+    now cbn; do 2 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow; cbn.
+  now do 3 apply -> Nat.succ_le_mono.
+}
+replace (S (S (S (S i)))) with (4 + i) by easy.
+rewrite <- (angle_div_2_pow_mul_pow_sub (4 + i) 4); [ | apply Nat.le_add_r ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm.
+rewrite angle_mul_nat_assoc.
+apply angle_mul_le_mono_r. 2: {
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite Nat.mul_assoc.
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  now do 16 apply -> Nat.succ_le_mono.
+}
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  now do 3 apply -> Nat.succ_le_mono.
+}
+apply angle_mul_nat_overflow_pow_div.
+Qed.
+*)
+
 Theorem angle_add_overflow_mul_by_lt_2 :
   ∀ i θ θ',
   2 ≤ 2 ^ i
@@ -2796,6 +2849,29 @@ apply Nat.mul_le_mono_l.
 rewrite Nat.pow_succ_r'.
 now apply Nat.div_mul_le.
 Qed.
+
+(* to be completed
+Theorem angle_add_overflow_mul_by_lt :
+  ∀ n i θ θ',
+  n ≤ 2 ^ i
+  → θ' = seq_angle_to_div_nat θ n i
+  → ∀ m, m < n
+  → angle_add_overflow θ' (m * θ') = false.
+Proof.
+intros * Hni Hθ' * Hm.
+destruct m; [ apply angle_add_overflow_0_r | ].
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+progress unfold seq_angle_to_div_nat at 2.
+rewrite angle_mul_nat_assoc.
+...
+specialize (seq_angle_to_div_nat_7_le i θ) as H2.
+eapply angle_le_trans; [ apply H2 | clear H2 ].
+assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
+...
+*)
 
 (* to be completed
 Theorem angle_mul_nat_not_overflow :
