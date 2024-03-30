@@ -2429,8 +2429,31 @@ apply angle_mul_nat_overflow_pow_div.
 Qed.
 
 (* to be completed
+(* first n binary digits of a/b with a<b *)
+1/7=
+
+2/7=0
+4/7=0
+8/7=1 reste 1/7
+
+Fixpoint binary_div n a b :=
+  match n with
+  | 0 => []
+  | S n' =>
+      if (2 * a) mod b =? 0 then 0 :: binary_div n' (a / b) b
+      else 1 :: binary_div n' (a / b) b
+  end.
+
+Compute (binary_div 10 1 3).
+...
+
+Fixpoint rank_fst_0_aft_1 n :=
+  match n with
+  | 0 =>
+...
+
 Theorem seq_angle_to_div_nat_le :
-  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_fst_0_aft_1))%A.
+  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_fst_0_aft_1 n))%A.
 Proof.
 (*
 1/n = 0..
