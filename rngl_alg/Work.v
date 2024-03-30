@@ -2438,7 +2438,25 @@ Fixpoint binary_div n a b :=
       else 1 :: binary_div n' (2 * a mod b) b
   end.
 
-Compute (binary_div 20 1 5).
+Fixpoint rank_fst_1' k a n :=
+  match k with
+  | 0 => 0
+  | S k' =>
+      if 2 * a / n =? 0 then 1 + rank_fst_1' k' (2 * a mod n) n
+      else 0
+  end.
+
+Definition rank_fst_1 n := Nat.log2_up n - 1.
+
+Compute (map (λ n, (n, rank_fst_1' n 1 n, rank_fst_1 n)) (seq 1 50)).
+
+...
+
+n 2^rank_fst_1(n)
+3   1
+5   2
+6   2
+7   2
 ...
 
 Fixpoint rank_fst_0_aft_1 n :=
