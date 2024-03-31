@@ -2537,35 +2537,71 @@ destruct i. {
 }
 destruct i. {
   rewrite (Nat_div_less_small 3); [ | cbn; flia ].
-  eapply (angle_le_trans _ (2 ^ 3 * (θ / ₂^7))). {
+  eapply (angle_le_trans _ (3 * (2 ^ 2 * (θ / ₂^7)))). {
     replace 7 with (5 + 2) by easy.
     rewrite angle_div_2_pow_add_r.
-    rewrite Nat.pow_succ_r', <- angle_mul_nat_assoc.
     rewrite angle_div_2_pow_mul_2_pow.
-(* hou la la, mais c'est faux, du coup *)
-...
     apply angle_le_refl.
   }
+  rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. 2: {
-    now do 8 apply -> Nat.succ_le_mono.
+    now do 12 apply -> Nat.succ_le_mono.
   }
   apply angle_mul_nat_overflow_div_2_pow; cbn.
   now do 15 apply -> Nat.succ_le_mono.
-...
-replace (S (S (S (S (S i))))) with (5 + i) by easy.
-rewrite <- (angle_div_2_pow_mul_pow_sub (5 + i) 7); [ | ].
-...
-rewrite <- (angle_div_2_pow_mul_pow_sub (5 + i) 5); [ | apply Nat.le_add_r ].
+}
+destruct i. {
+  rewrite (Nat_div_less_small 7); [ | cbn; flia ].
+  eapply (angle_le_trans _ (7 * (2 ^ 1 * (θ / ₂^7)))). {
+    replace 7 with (6 + 1) by easy.
+    rewrite angle_div_2_pow_add_r.
+    rewrite angle_div_2_pow_mul_2_pow.
+    apply angle_le_refl.
+  }
+  rewrite Nat.pow_1_r.
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. 2: {
+    now do 14 apply -> Nat.succ_le_mono.
+  }
+  apply angle_mul_nat_overflow_div_2_pow; cbn.
+  now do 15 apply -> Nat.succ_le_mono.
+}
+replace (S (S (S (S (S (S (S i))))))) with (7 + i) by easy.
+rewrite <- (angle_div_2_pow_mul_pow_sub (7 + i) 7); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite Nat.add_comm.
 rewrite angle_mul_nat_assoc.
 apply angle_mul_le_mono_r. 2: {
   apply Nat.div_le_upper_bound; [ easy | ].
   rewrite Nat.mul_assoc.
-  replace (S (S (S (S i)))) with (4 + i) by easy.
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r.
-  now cbn; do 16 apply -> Nat.succ_le_mono.
+  cbn.
+cbn.
+Search (_ ≤ _ - _)%L.
+Search (_ ≤ _ - _).
+Check rngl_le_0_sub.
+assert (H : 128 ≤ 135) by flia.
+Show Proof.
+...
+Theorem Nat_le_0_sub :
+  ∀ a b, 0 ≤ b - a ↔ a ≤ b.
+Proof.
+intros.
+split; intros Hab. {
+  apply (Nat.le_le_add_le 0 (b - a)); [ easy | ].
+  rewrite Nat.add_comm, Nat.add_0_r.
+Search (_ - _ + _).
+...
+  rewrite Nat.sub_add.
+  eapply Nat.le_le_add_le with (n := 0) (m := b - a); [ easy | ].
+
+  apply Nat.add_le_mono_r with (p := a) in Hab.
+  rewrite Nat.add_0_r in Hab.
+
+apply Nat_le_0_sub.
+...
+  now do 128 apply -> Nat.succ_le_mono.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
   rewrite Nat.pow_add_r.
