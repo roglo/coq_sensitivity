@@ -2538,10 +2538,12 @@ destruct i. {
 destruct i. {
   rewrite (Nat_div_less_small 3); [ | cbn; flia ].
   eapply (angle_le_trans _ (2 ^ 3 * (θ / ₂^7))). {
-...
-    replace 7 with (4 + 3) by easy.
+    replace 7 with (5 + 2) by easy.
     rewrite angle_div_2_pow_add_r.
+    rewrite Nat.pow_succ_r', <- angle_mul_nat_assoc.
     rewrite angle_div_2_pow_mul_2_pow.
+(* hou la la, mais c'est faux, du coup *)
+...
     apply angle_le_refl.
   }
   apply angle_mul_le_mono_r. 2: {
@@ -2606,8 +2608,9 @@ Definition rank_fst_1_inv n := Nat.log2_up n - 1.
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) (seq 1 66)).
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6;7]).
 
-Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 7)).
+Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 77)).
 *)
+
 
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
