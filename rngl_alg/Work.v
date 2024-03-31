@@ -2438,61 +2438,41 @@ Fixpoint binary_div n a b :=
       else 1 :: binary_div n' (2 * a mod b) b
   end.
 
-Fixpoint rank_fst_1' k a n :=
-  match k with
-  | 0 => 0
-  | S k' =>
-      if 2 * a / n =? 0 then 1 + rank_fst_1' k' (2 * a mod n) n
-      else 0
+Fixpoint rank_fst_loop it k a b :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      if 2 * a / b =? k then (0, a)
+      else
+        let (r, a') := rank_fst_loop it' k (2 * a mod b) b in
+        (S r, a')
   end.
+
+Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
+Definition rank_snd_0 a b :=
+  let (r, a') := rank_fst_loop b 1 a b in
+  fst (rank_fst_loop b 0 a' b).
+
+Definition angle_ub_coeff n := 2 ^ S (rank_snd_0 1 n) - 1.
+Definition angle_ub_2_pow n := S (rank_fst_1 1 n + rank_snd_0 1 n).
 
 Definition rank_fst_1_inv n := Nat.log2_up n - 1.
+Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) (seq 1 66)).
+Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6;7]).
 
-Compute (map (λ n, (n, rank_fst_1' n 1 n, rank_fst_1_inv n)) (seq 1 50)).
-
-Fixpoint rank_loop n a b :=
-  match n with
-  | 0 => 0
-  | S n' =>
-      if 2 * a / b =? 0 then 0
-      else 1 + rank_loop n' (2 * a mod b) b
-  end.
-
-Compute (let n := 239 in (binary_div 20 1 n, binary_div 20 (n - 1) n)).
-
-Definition rank_snd_0_inv n :=
-  rank_loop n (n - 1) n.
-
-Compute (map (λ n, (n, rank_fst_1_inv n + rank_snd_0_inv n, rank_fst_1_inv n)) (seq 3 50)).
-
-...
-
-n 2^rank_fst_1(n)
-3   1
-5   2
-6   2
-7   2
-...
-
-Fixpoint rank_fst_0_aft_1 n :=
-  match n with
-  | 0 =>
-...
+Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) [3;5;6;7]).
 
 Theorem seq_angle_to_div_nat_le :
-  ∀ n i θ, (seq_angle_to_div_nat θ n i ≤ 3 * (θ / ₂^rank_snd_0 n))%A.
+  ∀ n i θ,
+  (seq_angle_to_div_nat θ n i ≤ angle_ub_coeff n * (θ / ₂^angle_ub_2_pow n))%A.
 Proof.
 (*
-1/n = 0..
-
 1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
 1/5 = 0.0011001100110 < 0.00111 = 1/8+1/16+1/32 = 7/2^5
 1/6 = 0.0010101010101 < 0.0011 = 1/8+1/16 = 3/2^4
 1/7 = 0.0010010010010 < 0.0011 = 1/8+1/16 = 3/2^4
 *)
 intros.
-(* 1/7 = 1/8 + 1/64 + ...
-   1/7 < 1/8 + 1/16 = 3/16 *)
 ...
 progress unfold seq_angle_to_div_nat.
 destruct i; [ apply angle_nonneg | ].
