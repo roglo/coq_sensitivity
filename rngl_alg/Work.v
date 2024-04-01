@@ -2578,7 +2578,6 @@ Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6
 Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 77)).
 *)
 
-
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2613,6 +2612,13 @@ destruct (Nat.eq_dec n 1) as [H| H]. {
 }
 clear Hn1; rename H into Hn1.
 specialize (IHn Hn1).
+destruct (lt_dec (2 ^ i) (S n)) as [Hin| Hin]. {
+  rewrite Nat.div_small; [ | easy ].
+  apply angle_nonneg.
+}
+apply Nat.nlt_ge in Hin.
+cbn - [ "/" ].
+rewrite Nat.add_0_r.
 ...
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; apply angle_nonneg | ].
 assert (Hn : 1 < n). {
