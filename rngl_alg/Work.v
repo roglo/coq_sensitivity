@@ -2479,7 +2479,6 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
-(* to be completed
 Theorem seq_angle_to_div_nat_9_le :
   ∀ i θ, (seq_angle_to_div_nat θ 9 i ≤ 15 * (θ / ₂^7))%A.
 Proof.
@@ -2537,41 +2536,12 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r; cbn; flia.
 }
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (7 + i))). {
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r; cbn; flia.
 }
-rewrite <- angle_div_2_pow_mul_pow_sub.
-...
-Theorem Nat_le_0_sub :
-  ∀ a b, 0 ≤ b - a ↔ a ≤ b.
-Proof.
-intros.
-split; intros Hab. {
-  apply Nat.nlt_ge.
-  intros H.
-  apply (Nat.le_le_add_le 0 (b - a)); [ easy | ].
-  rewrite Nat.add_comm, Nat.add_0_r.
-Search (_ - _ + _).
-...
-  rewrite Nat.sub_add.
-  eapply Nat.le_le_add_le with (n := 0) (m := b - a); [ easy | ].
-
-  apply Nat.add_le_mono_r with (p := a) in Hab.
-  rewrite Nat.add_0_r in Hab.
-
-apply Nat_le_0_sub.
-...
-  now do 128 apply -> Nat.succ_le_mono.
-}
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
-  rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
-}
 apply angle_mul_nat_overflow_pow_div.
-...
-*)
+Qed.
 
 (* first n binary digits of a/b with a<b *)
 Fixpoint binary_div n a b :=
@@ -2680,7 +2650,6 @@ destruct n; [ apply seq_angle_to_div_nat_5_le | ].
 destruct n; [ apply seq_angle_to_div_nat_6_le | ].
 destruct n; [ apply seq_angle_to_div_nat_7_le | ].
 destruct n; [ apply seq_angle_to_div_nat_8_le | ].
-...
 destruct n; [ apply seq_angle_to_div_nat_9_le | ].
 ...
   cbn - [ "/" "*" "^" angle_div_2_pow ].
@@ -3131,6 +3100,10 @@ destruct n; [ now apply (angle_add_overflow_mul_by_lt_4 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_5 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_6 i θ) | ].
 destruct n; [ now apply (angle_add_overflow_mul_by_lt_7 i θ) | ].
+Inspect 17.
+...
+destruct n; [ now apply (angle_add_overflow_mul_by_lt_9 i θ) | ].
+destruct n; [ now apply (angle_add_overflow_mul_by_lt_8 i θ) | ].
 destruct n. {
   destruct m; [ apply angle_add_overflow_0_r | ].
   apply Nat.succ_lt_mono in Hm.
