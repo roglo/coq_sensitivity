@@ -2537,7 +2537,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.pow_add_r.
   apply Nat.mul_le_mono_r; cbn; flia.
 }
-Search (angle_mul_nat_overflow (_ * 2 ^ _)).
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r; cbn; flia.
+}
+rewrite <- angle_div_2_pow_mul_pow_sub.
 ...
 Theorem Nat_le_0_sub :
   ∀ a b, 0 ≤ b - a ↔ a ≤ b.
