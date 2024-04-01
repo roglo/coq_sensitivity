@@ -2616,10 +2616,79 @@ Compute (binary_div 10 1 5).
      second range of 0s, after the dot, starting at 1
        e.g. 1/5 = 0.00110011.. i.e. 5
             1/9 = 0.00011100.. i.e. 7
-*)
 ...
      = [3; 3; 7; 3; 3; 3; 15; 7; 3; 3]
      : list nat
+*)
+destruct i. {
+  cbn in Hin.
+  apply Nat.le_1_r in Hin.
+  destruct Hin; [ subst n | easy ].
+  apply angle_nonneg.
+}
+destruct i. {
+  cbn in Hin.
+  rewrite Nat.pow_1_r.
+  destruct n; [ apply angle_nonneg | ].
+  destruct n; [ easy | ].
+  do 2 apply Nat.succ_le_mono in Hin.
+  apply Nat.le_0_r in Hin; subst n.
+  rewrite Nat.div_same; [ | easy ].
+  rewrite angle_mul_1_l; cbn.
+  rewrite angle_add_0_r.
+  rewrite angle_add_assoc.
+  rewrite angle_add_div_2_diag.
+  apply angle_le_add_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+destruct i. {
+  cbn in Hin.
+  destruct n; [ apply angle_nonneg | ].
+  destruct n; [ easy | ].
+  do 2 apply Nat.succ_le_mono in Hin.
+  destruct n. {
+    cbn.
+    rewrite angle_add_0_r.
+    rewrite angle_add_assoc.
+    apply angle_le_add_r.
+    rewrite angle_add_div_2_diag.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    rewrite angle_add_assoc.
+    rewrite angle_add_div_2_diag.
+    apply angle_le_add_r.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    rewrite angle_add_assoc.
+    rewrite angle_add_div_2_diag.
+    apply angle_le_add_r.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  now do 2 apply Nat.succ_le_mono in Hin.
+}
+destruct i. {
+  cbn in Hin.
+  destruct n; [ apply angle_nonneg | ].
+  destruct n; [ easy | ].
+  do 2 apply Nat.succ_le_mono in Hin.
+  destruct n. {
+    cbn.
+    do 2 rewrite angle_add_0_r.
+    do 3 rewrite angle_add_assoc.
+    do 2 rewrite angle_add_div_2_diag.
+    rewrite <- angle_add_assoc.
+    do 2 rewrite angle_add_div_2_diag.
+    apply angle_le_add_r.
+    apply angle_add_overflow_div_2_div_2.
+  }
+  destruct n. {
+    cbn.
 ...
 induction n; [ apply angle_nonneg | ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
