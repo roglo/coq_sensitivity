@@ -2601,16 +2601,21 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
 apply Nat.nlt_ge in Hin.
 Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 10)).
 Compute (map (λ n, angle_ub_coeff n) (seq 3 10)).
+Compute (map (λ n, angle_ub_2_pow n) (seq 3 10)).
 Compute (map (λ n, binary_div 10 1 n) (seq 3 10)).
-Compute (binary_div 10 1 9).
+Compute (binary_div 10 1 5).
 (* angle_ub_coeff n is the number formed with this:
-   we take the first range of 1s in 1/n in binary,
-     e.g. 1/5 = 0.00110011.. this first range is 11
-          1/9 = 0.00011100.. this first range is 111
-   and take 2 times this number minus 1; in other
-   words, this number with another 1 concatenated.
-   In the first example, 111, i.e. 7. In the second
-   one, 1111, i.e. 15
+     we take the first range of 1s in 1/n in binary,
+       e.g. 1/5 = 0.00110011.. this first range is 11
+            1/9 = 0.00011100.. this first range is 111
+     and take 2 times this number minus 1; in other
+     words, this number with another 1 concatenated.
+     In the first example, 111, i.e. 7. In the second
+     one, 1111, i.e. 15.
+   angle_ub_2_pow n is the rank of the first 0 in the
+     second range of 0s, after the dot, starting at 1
+       e.g. 1/5 = 0.00110011.. i.e. 5
+            1/9 = 0.00011100.. i.e. 7
 *)
 ...
      = [3; 3; 7; 3; 3; 3; 15; 7; 3; 3]
