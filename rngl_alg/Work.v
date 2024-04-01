@@ -2279,13 +2279,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.pow_add_r.
   apply Nat.div_le_upper_bound; [ easy | ].
   rewrite Nat.mul_assoc.
-  apply Nat.mul_le_mono_r; cbn.
-  now do 8 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (3 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2321,13 +2319,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.pow_add_r.
   apply Nat.div_le_upper_bound; [ easy | ].
   rewrite Nat.mul_assoc.
-  apply Nat.mul_le_mono_r; cbn.
-  now do 8 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (3 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2345,26 +2341,16 @@ destruct i; [ apply angle_nonneg | ].
 destruct i. {
   rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite angle_mul_1_l.
-  rewrite <- (angle_div_2_pow_mul_pow_sub 5). 2: {
-    now do 3 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_le_mono_r. 2: {
-    now cbn; do 4 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 7 apply -> Nat.succ_le_mono.
+  rewrite <- (angle_div_2_pow_mul_pow_sub 5); [ | cbn; flia ].
+  apply angle_mul_le_mono_r; [ | cbn; flia ].
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 destruct i. {
   rewrite (Nat_div_less_small 3); [ | cbn; flia ].
-  rewrite <- (angle_div_2_pow_mul_pow_sub 5). 2: {
-    now do 4 apply -> Nat.succ_le_mono.
-  }
+  rewrite <- (angle_div_2_pow_mul_pow_sub 5); [ | cbn; flia ].
   rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r. 2: {
-    now cbn; do 6 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 7 apply -> Nat.succ_le_mono.
+  apply angle_mul_le_mono_r; [ | cbn; flia ].
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 rewrite <- (angle_div_2_pow_mul_pow_sub (5 + i) 5); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
@@ -2375,13 +2361,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.mul_assoc.
   replace (S (S (S (S (S i))))) with (5 + i) by easy.
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now cbn; do 32 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (5 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 7 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2399,14 +2383,11 @@ destruct i; [ apply angle_nonneg | ].
 destruct i. {
   rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite angle_mul_1_l.
-  rewrite <- (angle_div_2_pow_mul_pow_sub 4). 2: {
-    now do 3 apply -> Nat.succ_le_mono.
-  }
+  rewrite <- (angle_div_2_pow_mul_pow_sub 4); [ | cbn; flia ].
   apply angle_mul_le_mono_r. 2: {
     now cbn; do 2 apply -> Nat.succ_le_mono.
   }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 rewrite <- (angle_div_2_pow_mul_pow_sub (4 + i) 4); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
@@ -2417,13 +2398,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.mul_assoc.
   replace (S (S (S (S i)))) with (4 + i) by easy.
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now cbn; do 16 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2440,14 +2419,11 @@ destruct i; [ apply angle_nonneg | ].
 destruct i. {
   rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite angle_mul_1_l.
-  rewrite <- (angle_div_2_pow_mul_pow_sub 4). 2: {
-    now do 3 apply -> Nat.succ_le_mono.
-  }
+  rewrite <- (angle_div_2_pow_mul_pow_sub 4); [ | cbn; flia ].
   apply angle_mul_le_mono_r. 2: {
     now cbn; do 2 apply -> Nat.succ_le_mono.
   }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 rewrite <- (angle_div_2_pow_mul_pow_sub (4 + i) 4); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
@@ -2458,13 +2434,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.mul_assoc.
   replace (S (S (S (S i)))) with (4 + i) by easy.
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now cbn; do 16 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2481,14 +2455,11 @@ destruct i; [ apply angle_nonneg | ].
 destruct i. {
   rewrite (Nat_div_less_small 1); [ | cbn; flia ].
   rewrite angle_mul_1_l.
-  rewrite <- (angle_div_2_pow_mul_pow_sub 4). 2: {
-    now do 3 apply -> Nat.succ_le_mono.
-  }
+  rewrite <- (angle_div_2_pow_mul_pow_sub 4); [ | cbn; flia ].
   apply angle_mul_le_mono_r. 2: {
     now cbn; do 2 apply -> Nat.succ_le_mono.
   }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 rewrite <- (angle_div_2_pow_mul_pow_sub (4 + i) 4); [ | apply Nat.le_add_r ].
 rewrite Nat.add_comm, Nat.add_sub.
@@ -2499,13 +2470,11 @@ apply angle_mul_le_mono_r. 2: {
   rewrite Nat.mul_assoc.
   replace (S (S (S (S i)))) with (4 + i) by easy.
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now cbn; do 16 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  now do 3 apply -> Nat.succ_le_mono.
+  apply Nat.mul_le_mono_r; cbn; flia.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
@@ -2529,11 +2498,8 @@ destruct i. {
     rewrite angle_div_2_pow_mul_2_pow.
     apply angle_le_refl.
   }
-  apply angle_mul_le_mono_r. 2: {
-    now do 8 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 15 apply -> Nat.succ_le_mono.
+  apply angle_mul_le_mono_r; [ | cbn; flia ].
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 destruct i. {
   rewrite (Nat_div_less_small 3); [ | cbn; flia ].
@@ -2544,11 +2510,8 @@ destruct i. {
     apply angle_le_refl.
   }
   rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r. 2: {
-    now do 12 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 15 apply -> Nat.succ_le_mono.
+  apply angle_mul_le_mono_r; [ | cbn; flia ].
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 destruct i. {
   rewrite (Nat_div_less_small 7); [ | cbn; flia ].
@@ -2560,11 +2523,8 @@ destruct i. {
   }
   rewrite Nat.pow_1_r.
   rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r. 2: {
-    now do 14 apply -> Nat.succ_le_mono.
-  }
-  apply angle_mul_nat_overflow_div_2_pow; cbn.
-  now do 15 apply -> Nat.succ_le_mono.
+  apply angle_mul_le_mono_r; [ | cbn; flia ].
+  apply angle_mul_nat_overflow_div_2_pow; cbn; flia.
 }
 replace (S (S (S (S (S (S (S i))))))) with (7 + i) by easy.
 rewrite <- (angle_div_2_pow_mul_pow_sub (7 + i) 7); [ | apply Nat.le_add_r ].
@@ -2575,20 +2535,17 @@ apply angle_mul_le_mono_r. 2: {
   apply Nat.div_le_upper_bound; [ easy | ].
   rewrite Nat.mul_assoc.
   rewrite Nat.pow_add_r.
-  apply Nat.mul_le_mono_r.
-  cbn.
-cbn.
-Search (_ ≤ _ - _)%L.
-Search (_ ≤ _ - _).
-Check rngl_le_0_sub.
-assert (H : 128 ≤ 135) by flia.
-Show Proof.
+  apply Nat.mul_le_mono_r; cbn; flia.
+}
+Search (angle_mul_nat_overflow (_ * 2 ^ _)).
 ...
 Theorem Nat_le_0_sub :
   ∀ a b, 0 ≤ b - a ↔ a ≤ b.
 Proof.
 intros.
 split; intros Hab. {
+  apply Nat.nlt_ge.
+  intros H.
   apply (Nat.le_le_add_le 0 (b - a)); [ easy | ].
   rewrite Nat.add_comm, Nat.add_0_r.
 Search (_ - _ + _).
