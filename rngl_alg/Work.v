@@ -2594,6 +2594,26 @@ Proof.
 *)
 intros * Hn1.
 progress unfold seq_angle_to_div_nat.
+(**)
+induction n; [ apply angle_nonneg | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+destruct (Nat.eq_dec n 1) as [H| H]. {
+  subst n.
+  destruct i; [ apply angle_nonneg | ].
+  rewrite Nat.pow_succ_r', Nat.mul_comm.
+  rewrite Nat.div_mul; [ | easy ].
+  rewrite angle_div_2_pow_succ_r_2.
+  rewrite angle_div_2_pow_mul_2_pow.
+  cbn.
+  rewrite angle_add_0_r.
+  rewrite angle_add_assoc.
+  rewrite angle_add_div_2_diag.
+  apply angle_le_add_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+clear Hn1; rename H into Hn1.
+specialize (IHn Hn1).
+...
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; apply angle_nonneg | ].
 assert (Hn : 1 < n). {
   destruct n; [ easy | ].
@@ -2625,6 +2645,7 @@ destruct i. {
 }
 clear Hn1 Hnz.
 induction n; [ easy | ].
+...
 destruct n; [ now apply Nat.lt_irrefl in Hn | clear Hn ].
 destruct n. {
   rewrite Nat.pow_succ_r', Nat.mul_comm, Nat.div_mul; [ | easy ].
@@ -2644,6 +2665,7 @@ assert (H : S (S n) ≤ 2 ^ S (S i)). {
   apply Nat.le_succ_diag_r.
 }
 specialize (IHn H); clear H.
+...
 destruct n; [ apply seq_angle_to_div_nat_3_le | ].
 destruct n; [ apply seq_angle_to_div_nat_4_le | ].
 destruct n; [ apply seq_angle_to_div_nat_5_le | ].
