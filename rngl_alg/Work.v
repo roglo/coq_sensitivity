@@ -2556,27 +2556,27 @@ Fixpoint rank_fst_loop it k a b :=
   match it with
   | 0 => (0, 0)
   | S it' =>
-      if 2 * a / b =? k then (0, a)
+      if a / b =? k then (0, a)
       else
-        let (r, a') := rank_fst_loop it' k (2 * a mod b) b in
+        let (r, a') := rank_fst_loop it' k (2 * (a mod b)) b in
         (S r, a')
   end.
 
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
-  let (r1, a') := rank_fst_loop b 1 a b in
-  fst (rank_fst_loop b 0 a' b).
+  fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
-Definition inv_ub_den_2_pow n := S (rank_fst_1 1 n + fst_1_len 1 n).
+Definition inv_ub_den_2_pow n := rank_fst_1 1 n + fst_1_len 1 n.
 
 Definition rank_fst_1_inv n := Nat.log2_up n - 1.
 (*
-Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 10)).
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 1 10)).
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) (seq 1 66)).
-Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6;7]).
-
-Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 77)).
+Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) [3;5;6;7]).
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) [3;4;5;6;7;9]).
+Compute
+  (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 *)
 
 (* to be completed
@@ -2591,10 +2591,34 @@ Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 77)).
      an=2^bn/n+1
 *)
 Theorem glop :
-  ∀ n, n ≠ 1 → inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
+  ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
+intros.
+progress unfold inv_ub_num.
+...
+(*
+progress unfold inv_ub_den_2_pow.
+progress unfold fst_1_len.
+*)
+rewrite Nat.pow_succ_r'.
+induction n; [ easy | ].
+cbn - [ "/" ].
+rewrite Nat.add_0_r.
+...
 intros * Hn1.
+progress unfold inv_ub_num.
+progress unfold inv_ub_den_2_pow.
+cbn.
+rewrite Nat.pow_add_r.
+rewrite Nat.add_0_r.
+
+
+progress unfold fst_1_len.
+progress unfold rank_fst_1.
+
+...
 destruct n; [ easy | ].
+
 destruct n; [ easy | ].
 destruct n; [ easy | ].
 destruct n; [ easy | ].
