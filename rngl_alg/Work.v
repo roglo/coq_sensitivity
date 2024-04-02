@@ -2594,7 +2594,46 @@ Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
+Compute (map (λ n, (n, fst_1_len 1 n)) [130]).
+Compute (binary_div 40 1 239).
+Compute (map (λ n, inv_ub_den_2_pow n) [239]).
+Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [239]).
 progress unfold inv_ub_num.
+progress unfold inv_ub_den_2_pow.
+...
+Compute (
+  let f n := rank_fst_1 1 n in
+  map
+    (λ n, (2 ^ S (fst_1_len 1 n) - 1 = 2 ^ (f n + fst_1_len 1 n) / n + 1)) [239]).
+...
+     = [0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1]
+     : list nat
+...
+Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [5]).
+Print inv_ub_num.
+...
+...
+rewrite Nat.pow_succ_r'.
+symmetry.
+rewrite Nat.add_comm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.add_sub_eq_nz. {
+  intros H.
+  apply Nat.div_small_iff in H; [ | easy ].
+  progress unfold fst_1_len in H.
+...
+apply Nat.sub_add_eq_r.
+rewrite <- Nat.add_assoc.
+rewrite Nat_add_mul_l_diag_
+...
+progress unfold fst_1_len.
+progress unfold rank_fst_1.
+cbn.
+rewrite Nat.add_0_r.
+...
+rewrite Nat.pow_succ_r'.
+rewrite Nat.pow_add_r.
+remember (2 ^ fst_1_len 1 n) as x eqn:Hx.
 ...
 (*
 progress unfold inv_ub_den_2_pow.
@@ -2611,14 +2650,10 @@ progress unfold inv_ub_den_2_pow.
 cbn.
 rewrite Nat.pow_add_r.
 rewrite Nat.add_0_r.
-
-
 progress unfold fst_1_len.
 progress unfold rank_fst_1.
-
 ...
 destruct n; [ easy | ].
-
 destruct n; [ easy | ].
 destruct n; [ easy | ].
 destruct n; [ easy | ].
@@ -2657,6 +2692,9 @@ progress unfold inv_ub_den_2_pow.
 progress unfold inv_ub_num.
 remember (fst_1_len n) as r1 eqn:Hr1.
 ...
+*)
+
+(* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -2672,6 +2710,10 @@ Proof.
 intros * Hn1.
 progress unfold seq_angle_to_div_nat.
 (**)
+rewrite glop.
+rewrite angle_mul_add_distr_r.
+rewrite angle_mul_1_l.
+...
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
 remember (rank_fst_1 1 n) as r1 eqn:Hr1.
