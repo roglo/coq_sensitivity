@@ -2594,19 +2594,41 @@ Proof.
 intros * Hn1.
 progress unfold seq_angle_to_div_nat.
 (**)
+progress unfold inv_ub_num.
+progress unfold inv_ub_den_2_pow.
+remember (rank_snd_0 1 n) as rz eqn:Hrz.
+remember (rank_fst_1 1 n) as r1 eqn:Hr1.
+move r1 before rz.
+(*
+progress unfold rank_snd_0 in Hrz.
+progress unfold rank_fst_1 in Hr1.
+*)
+rewrite angle_mul_sub_distr_r. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite angle_mul_1_l.
+rewrite <- Nat.add_succ_r at 1.
+rewrite angle_div_2_pow_add_r.
+rewrite angle_div_2_pow_mul_2_pow.
+...
 destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   rewrite Nat.div_small; [ | easy ].
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
-destruct (le_dec i (inv_ub_den_2_pow n)) as [Hii| Hii]. {
+...
+destruct (le_dec (inv_ub_den_2_pow n) i) as [Hii| Hii]. {
 Theorem glop :
   ∀ a b i j θ,
-  i ≤ j → (a * (θ / ₂^i) ≤ b * (θ / ₂^j))%A.
+  j ≤ i
+  → (a * θ ≤ b * (θ / ₂^(i-j)))%A
+  → (a * (θ / ₂^i) ≤ b * (θ / ₂^j))%A.
 Proof.
-intros * Hij.
-... ...
-  now apply glop.
+intros * Hji Hab.
+...
+  apply glop; [ easy | ].
+  progress unfold inv_ub_den_2_pow in Hii.
 ...
 Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 10)).
 Compute (map (λ n, inv_ub_num n) (seq 3 10)).
