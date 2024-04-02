@@ -2567,15 +2567,15 @@ Definition rank_snd_0 a b :=
   let a' := snd (rank_fst_loop b 1 a b) in
   fst (rank_fst_loop b 0 a' b).
 
-Definition angle_ub_coeff n := 2 ^ S (rank_snd_0 1 n) - 1.
-Definition angle_ub_2_pow n := S (rank_fst_1 1 n + rank_snd_0 1 n).
+Definition inv_ub_num n := 2 ^ S (rank_snd_0 1 n) - 1.
+Definition inv_ub_den_2_pow n := S (rank_fst_1 1 n + rank_snd_0 1 n).
 
 Definition rank_fst_1_inv n := Nat.log2_up n - 1.
 (*
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) (seq 1 66)).
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6;7]).
 
-Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 77)).
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 77)).
 *)
 
 (* to be completed
@@ -2583,7 +2583,7 @@ Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
   → (seq_angle_to_div_nat θ n i ≤
-       angle_ub_coeff n * (θ / ₂^angle_ub_2_pow n))%A.
+       inv_ub_num n * (θ / ₂^inv_ub_den_2_pow n))%A.
 Proof.
 (*
 1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
@@ -2599,12 +2599,21 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
-Compute (map (λ n, (n, angle_ub_coeff n, angle_ub_2_pow n)) (seq 3 10)).
-Compute (map (λ n, angle_ub_coeff n) (seq 3 10)).
-Compute (map (λ n, angle_ub_2_pow n) (seq 3 10)).
+destruct (le_dec i (inv_ub_den_2_pow n)) as [Hii| Hii]. {
+Theorem glop :
+  ∀ a b i j θ,
+  i ≤ j → (a * (θ / ₂^i) ≤ b * (θ / ₂^j))%A.
+Proof.
+intros * Hij.
+... ...
+  now apply glop.
+...
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 10)).
+Compute (map (λ n, inv_ub_num n) (seq 3 10)).
+Compute (map (λ n, inv_ub_den_2_pow n) (seq 3 10)).
 Compute (map (λ n, binary_div 10 1 n) (seq 3 10)).
 Compute (binary_div 10 1 5).
-(* angle_ub_coeff n is the number formed with this:
+(* inv_ub_num n is the number formed with this:
      we take the first range of 1s in 1/n in binary,
        e.g. 1/5 = 0.00110011.. this first range is 11
             1/9 = 0.00011100.. this first range is 111
@@ -2612,7 +2621,7 @@ Compute (binary_div 10 1 5).
      words, this number with another 1 concatenated.
      In the first example, 111, i.e. 7. In the second
      one, 1111, i.e. 15.
-   angle_ub_2_pow n is the rank of the first 0 in the
+   inv_ub_den_2_pow n is the rank of the first 0 in the
      second range of 0s, after the dot, starting at 1
        e.g. 1/5 = 0.00110011.. i.e. 5
             1/9 = 0.00011100.. i.e. 7
@@ -2780,7 +2789,7 @@ destruct n; [ apply seq_angle_to_div_nat_9_le | ].
   destruct i. {
     cbn.
 ...
-progress unfold angle_ub_coeff.
+progress unfold inv_ub_num.
 progress unfold rank_snd_0.
 Print rank_fst_loop.
 Theorem rank_fst_loop_succ :
