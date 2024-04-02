@@ -2586,11 +2586,37 @@ Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 77)).
              an= 1..11
              bn=len(0..01..10)
      2^bn*(1/n)=1..1
-     (2^(bn+1)-1)/n=1..11=an
+     (2^bn-1)/n=1..1=an/2
+     2^bn*(1/n)*2+1=an
+     an=2^bn/n+1
 *)
 Theorem glop :
-  ∀ n, 2 ^ (inv_ub_den_2_pow n + 1) / n = inv_ub_num n.
+  ∀ n, n ≠ 1 → inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
+intros * Hn1.
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+...
+Compute (binary_div 10 1 5).
+Compute (inv_ub_num 5 / 2).
+Compute (2 ^ (inv_ub_den_2_pow 5 - 1) / 5).
+Compute
+  (map (λ n, (inv_ub_num n / 2, 2 ^ (inv_ub_den_2_pow n - 1) / n)) (seq 2 50)).
+Compute
+  (map (λ n, (inv_ub_num n, 2 ^ (inv_ub_den_2_pow n - 1) / n * 2 + 1)) (seq 2 50)).
+Compute
+  (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 2 50)).
+...
+an/2 = 2^(bn-1)/n
+an = 2^(bn-1)/n*2+1
+an = 2^bn/n+1
+...
 Compute (map (λ n, inv_ub_num n) (seq 1 10)).
 Compute (map (λ n, inv_ub_den_2_pow n) (seq 1 10)).
 Compute (map (λ n, 2 ^ (inv_ub_den_2_pow n)) (seq 3 10)).
