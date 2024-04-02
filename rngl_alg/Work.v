@@ -2580,6 +2580,33 @@ Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 77)).
 *)
 
 (* to be completed
+(*
+   2^i/n * (θ/₂^i) ≤ an * (θ/2^bn)
+     1/n = 0.0..01..10..
+             an= 1..11
+             bn=len(0..01..10)
+     2^bn*(1/n)=1..1
+     (2^(bn+1)-1)/n=1..11=an
+*)
+Theorem glop :
+  ∀ n, 2 ^ (inv_ub_den_2_pow n + 1) / n = inv_ub_num n.
+Proof.
+Compute (map (λ n, inv_ub_num n) (seq 1 10)).
+Compute (map (λ n, inv_ub_den_2_pow n) (seq 1 10)).
+Compute (map (λ n, 2 ^ (inv_ub_den_2_pow n)) (seq 3 10)).
+Compute (map (λ n, inv_ub_num n + 1) (seq 3 10)).
+...
+     = [8; 8; 32; 16; 16; 16; 128; 64; 32; 32]
+     : list nat
+     = [4; 4; 8; 4; 4; 4; 16; 8; 4; 4]
+     : list nat
+...
+Compute (map (λ n, (2 ^ (inv_ub_den_2_pow n) - 1) / n = inv_ub_num n) (seq 1 10)).
+intros.
+progress unfold inv_ub_den_2_pow.
+progress unfold inv_ub_num.
+remember (fst_1_len n) as r1 eqn:Hr1.
+...
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -2612,6 +2639,8 @@ rewrite angle_mul_1_l.
 rewrite <- Nat.add_succ_r.
 rewrite angle_div_2_pow_add_r at 1.
 rewrite angle_div_2_pow_mul_2_pow.
+Compute (map (λ n, binary_div 10 1 n) (seq 3 10)).
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 10)).
 ...
 destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   rewrite Nat.div_small; [ | easy ].
