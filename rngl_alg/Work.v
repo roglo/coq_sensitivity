@@ -2563,15 +2563,16 @@ Fixpoint rank_fst_loop it k a b :=
   end.
 
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
-Definition rank_snd_0 a b :=
-  let a' := snd (rank_fst_loop b 1 a b) in
+Definition fst_1_len a b :=
+  let (r1, a') := rank_fst_loop b 1 a b in
   fst (rank_fst_loop b 0 a' b).
 
-Definition inv_ub_num n := 2 ^ S (rank_snd_0 1 n) - 1.
-Definition inv_ub_den_2_pow n := S (rank_fst_1 1 n + rank_snd_0 1 n).
+Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
+Definition inv_ub_den_2_pow n := S (rank_fst_1 1 n + fst_1_len 1 n).
 
 Definition rank_fst_1_inv n := Nat.log2_up n - 1.
 (*
+Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) (seq 3 10)).
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1_inv n)) (seq 1 66)).
 Compute (map (λ n, (n, rank_fst_1 1 n, rank_fst_1 1 n + rank_snd_0 1 n)) [3;5;6;7]).
 
@@ -2596,9 +2597,9 @@ progress unfold seq_angle_to_div_nat.
 (**)
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
-remember (rank_snd_0 1 n) as rz eqn:Hrz.
 remember (rank_fst_1 1 n) as r1 eqn:Hr1.
-move r1 before rz.
+remember (fst_1_len 1 n) as l1 eqn:Hl1.
+move l1 before r1.
 (*
 progress unfold rank_snd_0 in Hrz.
 progress unfold rank_fst_1 in Hr1.
@@ -2608,8 +2609,8 @@ rewrite angle_mul_sub_distr_r. 2: {
   now apply Nat.pow_nonzero.
 }
 rewrite angle_mul_1_l.
-rewrite <- Nat.add_succ_r at 1.
-rewrite angle_div_2_pow_add_r.
+rewrite <- Nat.add_succ_r.
+rewrite angle_div_2_pow_add_r at 1.
 rewrite angle_div_2_pow_mul_2_pow.
 ...
 destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
