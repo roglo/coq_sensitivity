@@ -2601,6 +2601,8 @@ Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [239]).
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
 ...
+(*
+...
 Compute (
   let f n := rank_fst_1 1 n in
   map
@@ -2692,6 +2694,7 @@ progress unfold inv_ub_den_2_pow.
 progress unfold inv_ub_num.
 remember (fst_1_len n) as r1 eqn:Hr1.
 ...
+*)
 *)
 
 (* to be completed
