@@ -2615,6 +2615,20 @@ now rewrite fst_rank_fst_loop_succ.
 Qed.
 
 (* to be completed
+Theorem seq_angle_to_div_nat_le :
+  ∀ n i θ,
+  n ≠ 1
+  → (seq_angle_to_div_nat θ n i ≤
+       inv_ub_num n * (θ / ₂^inv_ub_den_2_pow n))%A.
+Proof.
+(*
+1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
+1/5 = 0.0011001100110 < 0.00111 = 1/8+1/16+1/32 = 7/2^5
+1/6 = 0.0010101010101 < 0.0011 = 1/8+1/16 = 3/2^4
+1/7 = 0.0010010010010 < 0.0011 = 1/8+1/16 = 3/2^4
+*)
+intros * Hn1.
+progress unfold seq_angle_to_div_nat.
 (*
    2^i/n * (θ/₂^i) ≤ an * (θ/2^bn)
      1/n = 0.0..01..10..
@@ -2629,10 +2643,15 @@ Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
+Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 200)).
+... ...
+rewrite glop.
+rewrite angle_mul_add_distr_r.
+rewrite angle_mul_1_l.
+...
 (*
 Compute (map (λ n, (n, fst_1_len 1 n)) [130]).
 Compute (binary_div 40 1 239).
-Compute (map (λ n, inv_ub_den_2_pow n) [239]).
 Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [239]).
 *)
 progress unfold inv_ub_num.
@@ -2648,8 +2667,7 @@ apply Nat.add_sub_eq_nz. {
   apply Nat.div_small_iff in H; [ | easy ].
   apply Nat.nle_gt in H.
   apply H; clear H.
-Compute (map (λ n, (n, inv_ub_den_2_pow n)) (seq 1 40)).
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n)) (seq 1 40)).
+progress unfold inv_ub_den_2_pow.
 ...
   destruct n; [ easy | ].
 ...
@@ -2751,28 +2769,6 @@ intros.
 progress unfold inv_ub_den_2_pow.
 progress unfold inv_ub_num.
 remember (fst_1_len n) as r1 eqn:Hr1.
-...
-*)
-
-(* to be completed
-Theorem seq_angle_to_div_nat_le :
-  ∀ n i θ,
-  n ≠ 1
-  → (seq_angle_to_div_nat θ n i ≤
-       inv_ub_num n * (θ / ₂^inv_ub_den_2_pow n))%A.
-Proof.
-(*
-1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
-1/5 = 0.0011001100110 < 0.00111 = 1/8+1/16+1/32 = 7/2^5
-1/6 = 0.0010101010101 < 0.0011 = 1/8+1/16 = 3/2^4
-1/7 = 0.0010010010010 < 0.0011 = 1/8+1/16 = 3/2^4
-*)
-intros * Hn1.
-progress unfold seq_angle_to_div_nat.
-(**)
-rewrite glop.
-rewrite angle_mul_add_distr_r.
-rewrite angle_mul_1_l.
 ...
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
