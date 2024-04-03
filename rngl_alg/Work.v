@@ -2591,6 +2591,29 @@ destruct (a / b =? k); [ easy | ].
 now destruct (rank_fst_loop _ _ _ _).
 Qed.
 
+Theorem snd_rank_fst_loop_succ :
+  ∀ it k a b,
+  snd (rank_fst_loop (S it) k a b) =
+    if a / b =? k then a
+    else snd (rank_fst_loop it k (2 * (a mod b)) b).
+Proof.
+intros.
+cbn.
+destruct (a / b =? k); [ easy | ].
+now destruct (rank_fst_loop _ _ _ _).
+Qed.
+
+Theorem rank_fst_1_succ_r :
+  ∀ a b,
+  rank_fst_1 a (S b) =
+    if a / S b =? 1 then 0
+    else S (fst (rank_fst_loop b 1 (2 * (a mod S b)) (S b))).
+Proof.
+intros.
+progress unfold rank_fst_1.
+now rewrite fst_rank_fst_loop_succ.
+Qed.
+
 (* to be completed
 (*
    2^i/n * (θ/₂^i) ≤ an * (θ/2^bn)
@@ -2606,12 +2629,16 @@ Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
+(*
 Compute (map (λ n, (n, fst_1_len 1 n)) [130]).
 Compute (binary_div 40 1 239).
 Compute (map (λ n, inv_ub_den_2_pow n) [239]).
 Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [239]).
+*)
 progress unfold inv_ub_num.
+(*
 progress unfold inv_ub_den_2_pow.
+*)
 rewrite Nat.pow_succ_r'.
 symmetry.
 rewrite Nat.add_comm.
@@ -2621,13 +2648,30 @@ apply Nat.add_sub_eq_nz. {
   apply Nat.div_small_iff in H; [ | easy ].
   apply Nat.nle_gt in H.
   apply H; clear H.
+Compute (map (λ n, (n, inv_ub_den_2_pow n)) (seq 1 40)).
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n)) (seq 1 40)).
+...
+  destruct n; [ easy | ].
+...
+Theorem inv_ub_den_2_pow_succ :
+  ∀ n, inv_ub_den_2_pow (S n) = 42.
+Proof.
+intros.
+progress unfold inv_ub_den_2_pow.
+rewrite rank_fst_1_succ_r.
+...
   progress unfold rank_fst_1.
   destruct n; [ easy | ].
+  destruct n; [ cbn; flia | ].
   rewrite fst_rank_fst_loop_succ.
-  remember (1 / S n =? 1) as b eqn:Hb.
+  remember (1 / S (S n) =? 1) as b eqn:Hb.
   symmetry in Hb.
   destruct b. {
     apply Nat.eqb_eq in Hb.
+    rewrite Nat.div_small in Hb; [ easy | flia ].
+  }
+  rewrite Nat.mod_1_l; [ | flia ].
+  rewrite fst_rank_fst_loop_succ.
 ...
   destruct n; [ easy | ].
   destruct n; [ cbn; flia | ].
