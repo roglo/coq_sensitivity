@@ -2579,6 +2579,18 @@ Compute
   (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 *)
 
+Theorem fst_rank_fst_loop_succ :
+  ∀ it k a b,
+  fst (rank_fst_loop (S it) k a b) =
+    if a / b =? k then 0
+    else S (fst (rank_fst_loop it k ( 2 * (a mod b)) b)).
+Proof.
+intros.
+cbn.
+destruct (a / b =? k); [ easy | ].
+now destruct (rank_fst_loop _ _ _ _).
+Qed.
+
 (* to be completed
 (*
    2^i/n * (θ/₂^i) ≤ an * (θ/2^bn)
@@ -2600,21 +2612,6 @@ Compute (map (λ n, inv_ub_den_2_pow n) [239]).
 Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [239]).
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
-...
-(*
-...
-Compute (
-  let f n := rank_fst_1 1 n in
-  map
-    (λ n, (2 ^ S (fst_1_len 1 n) - 1 = 2 ^ (f n + fst_1_len 1 n) / n + 1)) [239]).
-...
-     = [0; 0; 0; 0; 0; 1; 1; 1; 1; 1; 0; 0; 0; 0; 0; 1; 1; 1; 1; 1]
-     : list nat
-...
-Compute (map (λ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1) [5]).
-Print inv_ub_num.
-...
-...
 rewrite Nat.pow_succ_r'.
 symmetry.
 rewrite Nat.add_comm.
@@ -2622,7 +2619,24 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply Nat.add_sub_eq_nz. {
   intros H.
   apply Nat.div_small_iff in H; [ | easy ].
-  progress unfold fst_1_len in H.
+  apply Nat.nle_gt in H.
+  apply H; clear H.
+  progress unfold rank_fst_1.
+  destruct n; [ easy | ].
+  rewrite fst_rank_fst_loop_succ.
+  remember (1 / S n =? 1) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply Nat.eqb_eq in Hb.
+...
+  destruct n; [ easy | ].
+  destruct n; [ cbn; flia | ].
+  destruct n; [ cbn; flia | ].
+  destruct n; [ cbn; flia | ].
+  destruct n; [ cbn; flia | ].
+  destruct n; [ cbn; flia | ].
+  destruct n. {
+    cbn.
 ...
 apply Nat.sub_add_eq_r.
 rewrite <- Nat.add_assoc.
@@ -2694,7 +2708,6 @@ progress unfold inv_ub_den_2_pow.
 progress unfold inv_ub_num.
 remember (fst_1_len n) as r1 eqn:Hr1.
 ...
-*)
 *)
 
 (* to be completed
