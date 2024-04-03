@@ -2645,12 +2645,17 @@ Theorem glop :
 Proof.
 intros.
 progress unfold inv_ub_num.
-rewrite Nat.pow_succ_r'.
 symmetry.
-rewrite Nat.add_comm.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 (**)
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) (seq 1 40)).
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) [17]).
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n, 2 ^ inv_ub_den_2_pow n / n)) [17]).
+Compute (binary_div 40 1 17).
+...
 progress unfold inv_ub_den_2_pow.
+remember (fst_1_len 1 n) as len eqn:Hlen.
+symmetry in Hlen.
 ...
 apply Nat.add_sub_eq_nz. {
   intros H.
