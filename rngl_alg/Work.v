@@ -2649,6 +2649,9 @@ rewrite Nat.pow_succ_r'.
 symmetry.
 rewrite Nat.add_comm.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+(**)
+progress unfold inv_ub_den_2_pow.
+...
 apply Nat.add_sub_eq_nz. {
   intros H.
   apply Nat.div_small_iff in H; [ | easy ].
@@ -2667,6 +2670,30 @@ Compute (map (λ n, Nat.leb n (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
 seems good
 *)
   progress unfold rank_fst_1.
+  induction n; intros; [ easy | clear Hnz ].
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  specialize (IHn Hnz).
+  rewrite fst_rank_fst_loop_succ.
+  remember (1 / S n =? 1) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply Nat.eqb_eq in Hb.
+    destruct n; [ easy | ].
+    rewrite Nat.div_small in Hb; [ easy | flia ].
+  }
+  apply Nat.eqb_neq in Hb.
+  rewrite Nat.mod_1_l. 2: {
+    destruct n; [ easy | flia ].
+  }
+  rewrite Nat.mul_1_r.
+...
+apply Nat.succ_le_mono in Hnm.
+specialize (IHn _ Hnm) as H1.
+...
 Theorem glop :
   ∀ m n,
   n ≤ m
@@ -2691,8 +2718,20 @@ rewrite Nat.mod_1_l. 2: {
 rewrite Nat.mul_1_r.
 apply Nat.succ_le_mono in Hnm.
 specialize (IHn _ Hnm) as H1.
+Compute (
+  map (λ n,
+  let m := n in
+  S n <=? 2 ^ S (fst (rank_fst_loop m 1 2 (S n))))
+  (seq 1 40)).
+...
 apply Nat.succ_le_mono in H1.
 eapply le_trans; [ apply H1 | ].
+Compute (
+  map (λ n,
+  let m := n in
+  S (2 ^ fst (rank_fst_loop m 1 1 n)) <=? 2 ^ S (fst (rank_fst_loop m 1 2 (S n))))
+  (seq 1 40)).
+
 ...
 Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n + fst_1_len 1 n)) (seq 1 40)).
 ... ...
