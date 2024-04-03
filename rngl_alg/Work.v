@@ -2639,15 +2639,46 @@ progress unfold seq_angle_to_div_nat.
      2^bn*(1/n)*2+1=an
      an=2^bn/n+1
 *)
+Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
-Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 200)).
+progress unfold inv_ub_num.
+rewrite Nat.pow_succ_r'.
+symmetry.
+rewrite Nat.add_comm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.add_sub_eq_nz. {
+  intros H.
+  apply Nat.div_small_iff in H; [ | easy ].
+  apply Nat.nle_gt in H.
+  apply H; clear H.
+  progress unfold inv_ub_den_2_pow.
+  rewrite Nat.pow_add_r.
+  rewrite <- (Nat.mul_1_r n) at 1.
+  apply Nat.mul_le_mono. 2: {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+(*
+Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) (seq 1 40)).
+Compute (map (λ n, Nat.leb n (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
+seems good
+*)
+...
+  progress unfold rank_fst_1.
+Print rank_fst_loop.
+...
+  induction n; [ easy | clear Hnz ].
+  rewrite fst_rank_fst_loop_succ.
+...
+Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n + fst_1_len 1 n)) (seq 1 40)).
 ... ...
 rewrite glop.
 rewrite angle_mul_add_distr_r.
 rewrite angle_mul_1_l.
+remember (inv_ub_den_2_pow n) as bn eqn:Hbn.
 ...
 (*
 Compute (map (λ n, (n, fst_1_len 1 n)) [130]).
@@ -2658,16 +2689,6 @@ progress unfold inv_ub_num.
 (*
 progress unfold inv_ub_den_2_pow.
 *)
-rewrite Nat.pow_succ_r'.
-symmetry.
-rewrite Nat.add_comm.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.add_sub_eq_nz. {
-  intros H.
-  apply Nat.div_small_iff in H; [ | easy ].
-  apply Nat.nle_gt in H.
-  apply H; clear H.
-progress unfold inv_ub_den_2_pow.
 ...
   destruct n; [ easy | ].
 ...
