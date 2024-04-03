@@ -2666,12 +2666,33 @@ Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) (seq 1 40)).
 Compute (map (λ n, Nat.leb n (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
 seems good
 *)
-...
   progress unfold rank_fst_1.
-Print rank_fst_loop.
-...
-  induction n; [ easy | clear Hnz ].
-  rewrite fst_rank_fst_loop_succ.
+Theorem glop :
+  ∀ m n,
+  n ≤ m
+  → n ≤ 2 ^ fst (rank_fst_loop m 1 1 n).
+Proof.
+intros * Hnm.
+revert m Hnm.
+induction n; intros; [ easy | ].
+destruct m; [ easy | ].
+rewrite fst_rank_fst_loop_succ.
+remember (1 / S n =? 1) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Nat.eqb_eq in Hb.
+  destruct n; [ easy | ].
+  rewrite Nat.div_small in Hb; [ easy | flia ].
+}
+apply Nat.eqb_neq in Hb.
+rewrite Nat.mod_1_l. 2: {
+  destruct n; [ easy | flia ].
+}
+rewrite Nat.mul_1_r.
+apply Nat.succ_le_mono in Hnm.
+specialize (IHn _ Hnm) as H1.
+apply Nat.succ_le_mono in H1.
+eapply le_trans; [ apply H1 | ].
 ...
 Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n + fst_1_len 1 n)) (seq 1 40)).
 ... ...
@@ -2702,16 +2723,6 @@ rewrite rank_fst_1_succ_r.
   progress unfold rank_fst_1.
   destruct n; [ easy | ].
   destruct n; [ cbn; flia | ].
-  rewrite fst_rank_fst_loop_succ.
-  remember (1 / S (S n) =? 1) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b. {
-    apply Nat.eqb_eq in Hb.
-    rewrite Nat.div_small in Hb; [ easy | flia ].
-  }
-  rewrite Nat.mod_1_l; [ | flia ].
-  rewrite fst_rank_fst_loop_succ.
-...
   destruct n; [ easy | ].
   destruct n; [ cbn; flia | ].
   destruct n; [ cbn; flia | ].
