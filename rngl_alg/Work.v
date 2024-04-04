@@ -2652,21 +2652,25 @@ Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) (seq 1 40)).
 Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
 Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
 Compute (binary_div 32 1 19).
-Compute (map (λ n, (n, binary_div 32 1 n)) (seq 1 50)).
+Compute (map (λ n, (n, binary_div 22 1 n)) (seq 1 50)).
+Compute (map (λ n, (n, binary_div 50 1 n)) [19]).
 Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) [19]).
+(*
 ...
   (19, [0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0; 0; 1; 0; 1; 0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0]);
 ...
+*)
 progress unfold inv_ub_den_2_pow.
+(*
 remember (fst_1_len 1 n) as len eqn:Hlen.
 symmetry in Hlen.
-...
+*)
+rewrite Nat.add_comm.
 apply Nat.add_sub_eq_nz. {
   intros H.
   apply Nat.div_small_iff in H; [ | easy ].
   apply Nat.nle_gt in H.
   apply H; clear H.
-  progress unfold inv_ub_den_2_pow.
   rewrite Nat.pow_add_r.
   rewrite <- (Nat.mul_1_r n) at 1.
   apply Nat.mul_le_mono. 2: {
@@ -2679,7 +2683,9 @@ Compute (map (λ n, Nat.leb n (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
 seems good
 *)
   progress unfold rank_fst_1.
-  induction n; intros; [ easy | clear Hnz ].
+Print rank_fst_loop.
+...
+  induction n; [ easy | clear Hnz ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
     subst n.
     apply Nat.neq_0_lt_0.
@@ -2699,6 +2705,9 @@ seems good
     destruct n; [ easy | flia ].
   }
   rewrite Nat.mul_1_r.
+Print rank_fst_loop.
+...
+  rewrite fst_1_len_succ in Hlen.
 ...
 apply Nat.succ_le_mono in Hnm.
 specialize (IHn _ Hnm) as H1.
