@@ -2649,9 +2649,13 @@ symmetry.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 (**)
 Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) (seq 1 40)).
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) [17]).
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n, 2 ^ inv_ub_den_2_pow n / n)) [17]).
-Compute (binary_div 40 1 17).
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
+Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
+Compute (binary_div 32 1 19).
+Compute (map (λ n, (n, binary_div 32 1 n)) (seq 1 50)).
+Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) [19]).
+...
+  (19, [0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0; 0; 1; 0; 1; 0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0]);
 ...
 progress unfold inv_ub_den_2_pow.
 remember (fst_1_len 1 n) as len eqn:Hlen.
