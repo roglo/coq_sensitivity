@@ -2640,6 +2640,8 @@ progress unfold seq_angle_to_div_nat.
      an=2^bn/n+1
 *)
 Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
+Print inv_ub_num.
+Print inv_ub_den_2_pow.
 Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
@@ -3487,6 +3489,13 @@ Theorem angle_add_overflow_mul_by_lt :
   → angle_add_overflow θ' (m * θ') = false.
 Proof.
 intros * Hni Hθ' * Hm.
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+progress unfold seq_angle_to_div_nat.
+...
+intros * Hni Hθ' * Hm.
 destruct m; [ apply angle_add_overflow_0_r | ].
 progress unfold angle_add_overflow.
 apply angle_ltb_ge.
@@ -3507,6 +3516,37 @@ Theorem angle_mul_nat_not_overflow :
   n ≤ 2 ^ i
   → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
 Proof.
+intros * Hni.
+apply angle_all_add_not_overflow.
+intros m Hm.
+remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
+progress unfold seq_angle_to_div_nat in Hθ'.
+Check angle_add_overflow_mul_by_lt_7.
+destruct m; [ apply angle_add_overflow_0_r | ].
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+rewrite angle_mul_nat_assoc.
+Check seq_angle_to_div_nat_7_le.
+...
+specialize (seq_angle_to_div_nat_7_le i θ) as H2.
+eapply angle_le_trans; [ apply H2 | clear H2 ].
+assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
+  destruct m; [ now do 4 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 6 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 8 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 10 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 12 apply -> Nat.succ_le_mono | ].
+  destruct m; [ now do 14 apply -> Nat.succ_le_mono | ].
+  now do 7 apply Nat.succ_lt_mono in Hm.
+}
+destruct (lt_dec i 4) as [Hi4| Hi4]. {
+...
+progress unfold angle_add_overflow.
+apply angle_ltb_ge.
+rewrite angle_add_mul_r_diag_r.
+...
 intros * Hni.
 apply angle_all_add_not_overflow.
 intros m Hm.
