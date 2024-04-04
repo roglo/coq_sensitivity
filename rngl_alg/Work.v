@@ -2614,6 +2614,12 @@ progress unfold rank_fst_1.
 now rewrite fst_rank_fst_loop_succ.
 Qed.
 
+Theorem Nat_sub_mul_l_diag_l : ∀ a b, a * b - a = a * (b - 1).
+Proof.
+intros.
+now rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2646,28 +2652,24 @@ Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
-progress unfold inv_ub_num.
-symmetry.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-(**)
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) (seq 1 40)).
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
-Compute (map (λ n, (n, 2 ^ inv_ub_den_2_pow n, 2 ^ inv_ub_den_2_pow n / n)) [19]).
-Compute (binary_div 32 1 19).
-Compute (map (λ n, (n, binary_div 22 1 n)) (seq 1 50)).
-Compute (map (λ n, (n, binary_div 50 1 n)) [19]).
-Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) [19]).
-(*
-...
-  (19, [0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0; 0; 1; 0; 1; 0; 0; 0; 0; 1; 1; 0; 1; 0; 1; 1; 1; 1; 0]);
-...
-*)
 progress unfold inv_ub_den_2_pow.
 (*
 remember (fst_1_len 1 n) as len eqn:Hlen.
 symmetry in Hlen.
 *)
 rewrite Nat.add_comm.
+symmetry.
+apply Nat.add_sub_eq_nz. 2: {
+  progress unfold inv_ub_num.
+  rewrite <- Nat.sub_add_distr.
+  rewrite Nat.pow_succ_r'.
+  cbn - [ "*" ].
+  rewrite Nat_sub_mul_l_diag_l.
+  symmetry.
+  apply Nat_div_less_small_iff; [ easy | ].
+  split. {
+...
 apply Nat.add_sub_eq_nz. {
   intros H.
   apply Nat.div_small_iff in H; [ | easy ].
