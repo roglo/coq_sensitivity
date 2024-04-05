@@ -2652,19 +2652,26 @@ Theorem glop :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
-Print Nat.log2_up.
-Print Nat.log2.
-Print Nat.log2_iter.
-Print rank_fst_1.
-Print rank_fst_loop.
-induction n; [ easy | ].
-(*
-Search (rank_fst_1 (S _)).
-progress unfold rank_fst_1.
-rewrite fst_rank_fst_loop_succ.
+induction n; [ easy | cbn ].
+destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
+  rewrite Hn, <- IHn.
+  assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
+    intros H; symmetry in H.
+    specialize (Nat_pow2_log2_up_succ n) as H1.
+    apply H1 in H.
+    rewrite Hn in H.
+    symmetry in H.
+    now apply Nat.neq_succ_diag_l in H.
+  }
 ...
-*)
-destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
+Search (_ < _ ^ _).
+  specialize (Nat.pow_gt_lin_r 2 n) as H1.
+Compute (map (λ n, (n, 2 ^ Nat.log2 n)) (seq 1 20)).
+...
+  destruct n; [ easy | cbn ].
+  destruct n; [ easy | cbn ].
+  destruct n; [ easy | cbn ].
+...
   rewrite Hn.
   rewrite <- IHn.
   progress unfold rank_fst_1.
@@ -2685,6 +2692,7 @@ destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   generalize Hn; intros H1.
   apply Nat_pow2_log2_up_succ in H1.
 Print rank_fst_loop.
+...
 Theorem glop :
   ∀ it a n,
   fst (rank_fst_loop it 1 a (2 ^ n)) = n.
