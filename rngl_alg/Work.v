@@ -2687,12 +2687,19 @@ destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
 Print rank_fst_loop.
 Theorem glop :
   ∀ it a n,
-  fst (rank_fst_loop it 1 a (2 ^ n)) = n + 1 - a.
+  fst (rank_fst_loop it 1 a (2 ^ n)) = n.
 Proof.
+intros.
 Compute (
-  let a := 3 in
-  map (λ n, pair (fst (rank_fst_loop n 1 a (2 ^ n))) (n + 2 ^ Nat.log2_up a)) (seq 0 10)).
-
+map (λ a, (a,
+  map (λ n, pair (fst (rank_fst_loop (2 ^ n) 1 a (2 ^ n))) (n - Nat.log2 a)) (seq 0 10)))
+(seq 1 20)).
+(* c'est pas bon *)
+...
+... ...
+rewrite <- H1, glop.
+rewrite H1.
+...
   map (λ n, Nat.eqb (fst (rank_fst_loop n 1 a (2 ^ n))) (n + 2 ^ Nat.log2_up a)) (seq 0 10)).
 ...
 Theorem glop :
