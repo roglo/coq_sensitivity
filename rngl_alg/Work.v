@@ -2660,6 +2660,7 @@ symmetry in Hlen.
 *)
 rewrite Nat.add_comm.
 symmetry.
+(*
 apply Nat.add_sub_eq_nz. 2: {
   progress unfold inv_ub_num.
   rewrite <- Nat.sub_add_distr.
@@ -2670,11 +2671,14 @@ apply Nat.add_sub_eq_nz. 2: {
   apply Nat_div_less_small_iff; [ easy | ].
   split. {
 ...
+*)
 apply Nat.add_sub_eq_nz. {
   intros H.
   apply Nat.div_small_iff in H; [ | easy ].
   apply Nat.nle_gt in H.
   apply H; clear H.
+(* mouais... pas évident à prouver *)
+...
   rewrite Nat.pow_add_r.
   rewrite <- (Nat.mul_1_r n) at 1.
   apply Nat.mul_le_mono. 2: {
