@@ -2652,7 +2652,21 @@ Theorem glop :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
+intros.
 induction n; [ easy | cbn ].
+rewrite rank_fst_1_succ_r.
+remember (1 / S n =? 1) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Nat.eqb_eq in Hb.
+  destruct n; [ easy | ].
+  rewrite Nat.div_small in Hb; [ easy | flia ].
+}
+apply Nat.eqb_neq in Hb.
+rewrite Nat.mod_1_l. 2: {
+  destruct n; [ easy | flia ].
+}
+rewrite Nat.mul_1_r.
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
   rewrite Hn, <- IHn.
   assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
@@ -2663,6 +2677,7 @@ destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
     symmetry in H.
     now apply Nat.neq_succ_diag_l in H.
   }
+Search (fst (rank_fst_loop _ _ _ _)).
 ...
 Search (_ < _ ^ _).
   specialize (Nat.pow_gt_lin_r 2 n) as H1.
