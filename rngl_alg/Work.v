@@ -2658,10 +2658,42 @@ Print Nat.log2_iter.
 Print rank_fst_1.
 Print rank_fst_loop.
 induction n; [ easy | ].
+(*
 Search (rank_fst_1 (S _)).
+progress unfold rank_fst_1.
+rewrite fst_rank_fst_loop_succ.
 ...
+*)
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
-Search (Nat.log2_up (S _)).
+  rewrite Hn.
+  rewrite <- IHn.
+  progress unfold rank_fst_1.
+  rewrite fst_rank_fst_loop_succ.
+  remember (1 / S n =? 1) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    apply Nat.eqb_eq in Hb.
+    destruct n; [ easy | ].
+    rewrite Nat.div_small in Hb; [ easy | flia ].
+  }
+  apply Nat.eqb_neq in Hb.
+  f_equal.
+  rewrite Nat.mod_1_l. 2: {
+    destruct n; [ easy | flia ].
+  }
+  rewrite Nat.mul_1_r.
+  generalize Hn; intros H1.
+  apply Nat_pow2_log2_up_succ in H1.
+Print rank_fst_loop.
+Theorem glop :
+  ∀ it a n,
+  fst (rank_fst_loop it 1 a (2 ^ n)) = n + 1 - a.
+Proof.
+Compute (
+  let a := 3 in
+  map (λ n, pair (fst (rank_fst_loop n 1 a (2 ^ n))) (n + 2 ^ Nat.log2_up a)) (seq 0 10)).
+
+  map (λ n, Nat.eqb (fst (rank_fst_loop n 1 a (2 ^ n))) (n + 2 ^ Nat.log2_up a)) (seq 0 10)).
 ...
 Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
