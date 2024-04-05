@@ -2649,6 +2649,21 @@ Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50))
 Print inv_ub_num.
 Print inv_ub_den_2_pow.
 Theorem glop :
+  ∀ n, rank_fst_1 1 n = Nat.log2_up n.
+Proof.
+intros.
+Print Nat.log2_up.
+Print Nat.log2.
+Print Nat.log2_iter.
+Print rank_fst_1.
+Print rank_fst_loop.
+induction n; [ easy | ].
+Search (rank_fst_1 (S _)).
+...
+destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
+Search (Nat.log2_up (S _)).
+...
+Theorem glop :
   ∀ n, inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1.
 Proof.
 intros.
@@ -2677,14 +2692,14 @@ apply Nat.add_sub_eq_nz. {
   apply Nat.div_small_iff in H; [ | easy ].
   apply Nat.nle_gt in H.
   apply H; clear H.
-(* mouais... pas évident à prouver *)
-...
   rewrite Nat.pow_add_r.
   rewrite <- (Nat.mul_1_r n) at 1.
   apply Nat.mul_le_mono. 2: {
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
+Compute (map (λ n, Nat.eqb (Nat.log2_up n) (rank_fst_1 1 n)) (seq 1 200)).
+Compute (map (λ n, (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
 (*
 Compute (map (λ n, n ≤ 2 ^ (rank_fst_1 1 n)) (seq 1 40)).
 Compute (map (λ n, Nat.leb n (2 ^ (rank_fst_1 1 n))) (seq 1 200)).
