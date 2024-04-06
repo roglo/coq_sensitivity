@@ -2642,6 +2642,16 @@ split; [ | easy ].
 now rewrite Nat.mul_1_l.
 Qed.
 
+Theorem fst_let :
+  ∀ A B C D E a (f : A → (B * C)) (g : B → D) (h : C → E),
+  fst (let (b, c) := f a in (g b, h c)) = g (fst (f a)).
+Proof.
+intros.
+remember (f a) as bc eqn:Hbc.
+symmetry in Hbc.
+now destruct bc.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2683,7 +2693,11 @@ Proof.
 intros.
 progress unfold rank_fst_1.
 specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as Hb.
-(**)
+(*
+  Hb : 2 ^ n ≠ 0
+  ============================
+  fst (rank_fst_loop (2 ^ n) 1 1 (2 ^ n)) = n
+*)
 replace (2 ^ n) with (S (2 ^ n - 1)) at 1 by flia Hb.
 cbn - [ "*" ].
 remember (1 / 2 ^ n =? 1) as c eqn:Hc.
@@ -2702,7 +2716,12 @@ apply Nat_neq_div_1 in Hc.
 destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
-(**)
+rewrite fst_let.
+(*
+  Hb : 1 < 2 ^ n
+  ============================
+  S (fst (rank_fst_loop (2 ^ n - 1) 1 (2 * (1 mod 2 ^ n)) (2 ^ n))) = n
+*)
 replace (2 ^ n - 1) with (S (2 ^ n - 2)) by flia Hb.
 rewrite Nat.mod_small; [ cbn | easy ].
 rewrite Nat.add_0_r, Nat_add_diag.
@@ -2724,7 +2743,12 @@ apply Nat_neq_div_1 in Hc.
 destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
-(**)
+rewrite fst_let.
+(*
+  Hb : 2 < 2 ^ n
+  ============================
+  S (S (fst (rank_fst_loop (2 ^ n - 2) 1 (2 * (2 mod 2 ^ n)) (2 ^ n)))) = n
+*)
 replace (2 ^ n - 2) with (S (2 ^ n - 3)) by flia Hb.
 rewrite Nat.mod_small; [ cbn | easy ].
 rewrite Nat.add_0_r, Nat_add_diag.
@@ -2747,7 +2771,12 @@ apply Nat_neq_div_1 in Hc.
 destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
-(**)
+rewrite fst_let.
+(*
+  Hb : 4 < 2 ^ n
+  ============================
+  S (S (S (fst (rank_fst_loop (2 ^ n - 3) 1 (2 * (4 mod 2 ^ n)) (2 ^ n))))) = n
+*)
 replace (2 ^ n - 3) with (S (2 ^ n - 4)) by flia Hb.
 rewrite Nat.mod_small; [ cbn | easy ].
 rewrite Nat.add_0_r, Nat_add_diag.
@@ -2771,10 +2800,12 @@ apply Nat_neq_div_1 in Hc.
 destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
-replace (2 ^ n - 4) with (S (2 ^ n - 5)) by flia Hb.
-rewrite Nat.mod_small; [ cbn | easy ].
-rewrite Nat.add_0_r, Nat_add_diag.
-(**)
+rewrite fst_let.
+(*
+  Hb : 8 < 2 ^ n
+  ============================
+  S (S (S (S (fst (rank_fst_loop (2 ^ n - 4) 1 (2 * (8 mod 2 ^ n)) (2 ^ n)))))) = n
+*)
 ...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
