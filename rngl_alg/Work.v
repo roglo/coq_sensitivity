@@ -2687,7 +2687,7 @@ intros.
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   generalize Hn; intros H1.
   apply Nat_pow2_log2_up_succ in H1.
-Theorem glop :
+Theorem rank_fst_1_1_2_pow :
   ∀ n, rank_fst_1 1 (2 ^ n) = n.
 Proof.
 intros.
@@ -2698,6 +2698,7 @@ specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as Hb.
   ============================
   fst (rank_fst_loop (2 ^ n) 1 1 (2 ^ n)) = n
 *)
+apply Nat.neq_0_lt_0 in Hb.
 replace (2 ^ n) with (S (2 ^ n - 1)) at 1 by flia Hb.
 cbn - [ "*" ].
 remember (1 / 2 ^ n =? 1) as c eqn:Hc.
@@ -2717,14 +2718,14 @@ destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
 rewrite fst_let.
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mul_1_r.
 (*
   Hb : 1 < 2 ^ n
   ============================
-  S (fst (rank_fst_loop (2 ^ n - 1) 1 (2 * (1 mod 2 ^ n)) (2 ^ n))) = n
+  S (fst (rank_fst_loop (2 ^ n - 1) 1 2 (2 ^ n))) = n
 *)
 replace (2 ^ n - 1) with (S (2 ^ n - 2)) by flia Hb.
-rewrite Nat.mod_small; [ cbn | easy ].
-rewrite Nat.add_0_r, Nat_add_diag.
 cbn - [ "*" ].
 remember (2 / 2 ^ n =? 1) as c eqn:Hc.
 symmetry in Hc.
@@ -2744,14 +2745,13 @@ destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
 rewrite fst_let.
+rewrite Nat.mod_small; [ cbn | easy ].
 (*
   Hb : 2 < 2 ^ n
   ============================
-  S (S (fst (rank_fst_loop (2 ^ n - 2) 1 (2 * (2 mod 2 ^ n)) (2 ^ n)))) = n
+  S (S (fst (rank_fst_loop (2 ^ n - 2) 1 4 (2 ^ n)))) = n
 *)
 replace (2 ^ n - 2) with (S (2 ^ n - 3)) by flia Hb.
-rewrite Nat.mod_small; [ cbn | easy ].
-rewrite Nat.add_0_r, Nat_add_diag.
 cbn - [ "*" ].
 remember (4 / 2 ^ n =? 1) as c eqn:Hc.
 symmetry in Hc.
@@ -2772,14 +2772,13 @@ destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
 rewrite fst_let.
+rewrite Nat.mod_small; [ cbn | easy ].
 (*
   Hb : 4 < 2 ^ n
   ============================
-  S (S (S (fst (rank_fst_loop (2 ^ n - 3) 1 (2 * (4 mod 2 ^ n)) (2 ^ n))))) = n
+  S (S (S (fst (rank_fst_loop (2 ^ n - 3) 1 8 (2 ^ n))))) = n
 *)
 replace (2 ^ n - 3) with (S (2 ^ n - 4)) by flia Hb.
-rewrite Nat.mod_small; [ cbn | easy ].
-rewrite Nat.add_0_r, Nat_add_diag.
 cbn - [ "*" ].
 remember (8 / 2 ^ n =? 1) as c eqn:Hc.
 symmetry in Hc.
@@ -2801,11 +2800,15 @@ destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
 clear Hb.
 rename Hc into Hb.
 rewrite fst_let.
+rewrite Nat.mod_small; [ cbn | easy ].
 (*
   Hb : 8 < 2 ^ n
   ============================
-  S (S (S (S (fst (rank_fst_loop (2 ^ n - 4) 1 (2 * (8 mod 2 ^ n)) (2 ^ n)))))) = n
+  S (S (S (S (fst (rank_fst_loop (2 ^ n - 4) 1 16 (2 ^ n)))))) = n
 *)
+...
+replace 8 with (2 ^ 3) in Hb by easy.
+now apply glop in Hb.
 ...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
