@@ -2735,6 +2735,11 @@ rewrite Nat.mod_1_l in Hr. 2: {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 rewrite Nat.mul_1_r in Hr.
+destruct it; [ cbn in Hit; flia Hit | ].
+destruct it; [ cbn in Hit; flia Hit | ].
+destruct it. {
+  cbn in Hit.
+  cbn in Hr.
 ...
 Search (_ / _ = _ → _).
 Search (_ = _ / _ → _).
