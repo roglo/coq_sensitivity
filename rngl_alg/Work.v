@@ -2620,7 +2620,29 @@ intros.
 now rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
 Qed.
 
+Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 → b ≤ a < 2 * b.
+Proof.
+intros * Hab.
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+apply Nat_div_less_small_iff in Hab; [ | easy ].
+now rewrite Nat.mul_1_l in Hab.
+Qed.
+
 (* to be completed
+Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → 2 * b ≤ a.
+Proof.
+intros * Hab.
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+apply Nat.nlt_ge.
+intros H.
+apply Hab; clear Hab.
+apply Nat_div_less_small_iff; [ easy | ].
+split; [ | easy ].
+rewrite Nat.mul_1_l.
+...
+now rewrite Nat.mul_1_l in Hab.
+Qed.
+
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -2679,6 +2701,7 @@ destruct b. {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 apply Nat.eqb_neq in Hb.
+...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (r, a); cbn.
