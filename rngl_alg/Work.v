@@ -2652,6 +2652,69 @@ Theorem glop :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
+destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
+  generalize Hn; intros H1.
+  apply Nat_pow2_log2_up_succ in H1.
+Theorem glop :
+  ∀ n, rank_fst_1 1 (2 ^ n) = n.
+Proof.
+intros.
+progress unfold rank_fst_1.
+replace (2 ^ n) with (S (2 ^ n - 1)) at 1. 2: {
+  rewrite <- Nat.sub_succ_l.
+  now rewrite Nat.sub_succ, Nat.sub_0_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+cbn - [ "*" ].
+remember (1 / 2 ^ n =? 1) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Nat.eqb_eq in Hb.
+  destruct n; [ easy | exfalso ].
+  rewrite Nat.div_small in Hb; [ easy | clear Hb ].
+  rewrite Nat.pow_succ_r'.
+  progress unfold lt.
+  rewrite <- (Nat.mul_1_r 2) at 1.
+  apply Nat.mul_le_mono_l.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+apply Nat.eqb_neq in Hb.
+remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
+symmetry in Hr.
+destruct r as (r, a); cbn.
+...
+Search (_ / _ = _ → _).
+Search (_ = _ / _ → _).
+Search (_ / _ = _ ↔ _).
+Search (_ = _ / _ ↔ _).
+apply Nat.div_1_l in Hb.
+...
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+Print rank_fst_loop.
+...
+Theorem glop :
+  ∀ n, n ≠ 0 → rank_fst_1 1 (2 * n) = S (rank_fst_1 1 n).
+Proof.
+intros * Hnz.
+induction n; [ easy | clear Hnz ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+...
+progress unfold rank_fst_1.
+rewrite <- Nat_add_diag.
+do 2 rewrite Nat.add_succ_r.
+do 2 rewrite Nat.add_succ_l.
+cbn.
+...
 intros.
 induction n; [ easy | cbn ].
 rewrite rank_fst_1_succ_r.
@@ -2668,7 +2731,6 @@ rewrite Nat.mod_1_l. 2: {
 }
 rewrite Nat.mul_1_r.
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
-  rewrite Hn, <- IHn.
   assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
     intros H; symmetry in H.
     specialize (Nat_pow2_log2_up_succ n) as H1.
@@ -2677,7 +2739,62 @@ destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
     symmetry in H.
     now apply Nat.neq_succ_diag_l in H.
   }
+  rewrite Hn, <- IHn.
+  progress unfold rank_fst_1.
+...
 Search (fst (rank_fst_loop _ _ _ _)).
+Print rank_fst_loop.
+Theorem rank_fst_loop_enough_iter :
+  ∀ it1 it2 k a b,
+  b ≠ 0
+  → b ≤ it1
+  → b ≤ it2
+  → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
+Proof.
+intros * Hbz Hit1 Hit2.
+revert it2 Hit2.
+revert k a b Hbz Hit1.
+induction it1; intros; cbn. {
+  now apply Nat.le_0_r in Hit1; subst b.
+}
+destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+  destruct b; [ easy | ].
+  apply Nat.succ_inj in Hb1; subst it1.
+  clear Hit1 Hbz.
+  remember (a / S b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. 2: {
+    rewrite Nat.add_0_r.
+    remember (rank_fst_loop b _ _ _) as r1 eqn:Hr1.
+    symmetry in Hr1.
+    destruct r1 as (r1, a1).
+    destruct it2; [ easy | ].
+    cbn - [ "/" "mod" ].
+    rewrite Habk.
+    rewrite Nat.add_0_r.
+    remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
+    symmetry in Hr2.
+    destruct r2 as (r2, a2).
+    specialize (IHit1 k (a mod S b + a mod S b)).
+    specialize (IHit1 b).
+...
+remember (a / b =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk. 2: {
+  rewrite Nat.add_0_r.
+  remember (rank_fst_loop it1 _ _ _) as r1 eqn:Hr1.
+  symmetry in Hr1.
+  destruct r1 as (r1, a1).
+  destruct b; [ easy | clear Hbz ].
+  destruct it2; [ easy | ].
+  cbn - [ "/" "mod" ].
+  rewrite Habk.
+  rewrite Nat.add_0_r.
+  remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
+  symmetry in Hr2.
+  destruct r2 as (r2, a2).
+  specialize (IHit1 k (a mod S b + a mod S b)).
+  specialize (IHit1 (S b)).
 ...
 Search (_ < _ ^ _).
   specialize (Nat.pow_gt_lin_r 2 n) as H1.
