@@ -2628,21 +2628,21 @@ apply Nat_div_less_small_iff in Hab; [ | easy ].
 now rewrite Nat.mul_1_l in Hab.
 Qed.
 
-(* to be completed
-Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → 2 * b ≤ a.
+Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → 2 * b ≤ a ∨ a < b.
 Proof.
 intros * Hab.
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now left; subst b | ].
+destruct (lt_dec a b) as [Ha| Ha]; [ now right | left ].
+apply Nat.nlt_ge in Ha.
 apply Nat.nlt_ge.
 intros H.
 apply Hab; clear Hab.
 apply Nat_div_less_small_iff; [ easy | ].
 split; [ | easy ].
-rewrite Nat.mul_1_l.
-...
-now rewrite Nat.mul_1_l in Hab.
+now rewrite Nat.mul_1_l.
 Qed.
 
+(* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -2701,6 +2701,20 @@ destruct b. {
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 apply Nat.eqb_neq in Hb.
+apply Nat_neq_div_1 in Hb.
+destruct Hb as [Hb| Hb]. {
+  exfalso.
+  apply Nat.nlt_ge in Hb.
+  apply Hb; clear Hb.
+  progress unfold lt.
+  rewrite <- (Nat.mul_1_r 2) at 1.
+  apply Nat.mul_le_mono_l.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+replace (2 ^ n - 1) with (S (2 ^ n - 2)) by flia Hb.
+cbn - [ "*" ].
+rewrite Nat.mod_1_l; [ | easy ].
+rewrite Nat.mul_1_r.
 ...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
