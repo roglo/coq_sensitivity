@@ -2682,6 +2682,59 @@ apply Nat.eqb_neq in Hb.
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (r, a); cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+clear Hb.
+rewrite Nat.mod_1_l in Hr. 2: {
+  progress unfold lt.
+  destruct n; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat_mul_le_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat.mul_1_r in Hr.
+remember (2 ^ n - 1) as it eqn:Hit.
+symmetry in Hit.
+destruct it; cbn - [ "*" ] in Hr. {
+  apply Nat.sub_0_le in Hit.
+  injection Hr; clear Hr; intros; subst r a.
+  destruct n; [ easy | clear Hnz ].
+  destruct n; [ easy | exfalso ].
+  apply Nat.nlt_ge in Hit.
+  apply Hit; clear Hit.
+  rewrite Nat.pow_succ_r'.
+  apply Nat_mul_le_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+destruct n; [ easy | clear Hnz ].
+f_equal.
+destruct n. {
+  cbn in Hit.
+  apply Nat.succ_inj in Hit; subst it.
+  cbn in Hr.
+  now injection Hr; clear Hr; intros; subst r a.
+}
+rewrite Nat.div_small in Hr. 2: {
+  rewrite Nat.pow_succ_r'.
+  progress unfold lt.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_assoc.
+  apply (le_trans _ 4); [ flia | ].
+  apply Nat_mul_le_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+cbn - [ "*" ] in Hr.
+rewrite Nat.mod_mul_r in Hr; [ | easy | ]. 2: {
+  apply Nat.neq_mul_0.
+  split; [ easy | now apply Nat.pow_nonzero ].
+}
+rewrite Nat.div_same in Hr; [ | easy ].
+rewrite Nat.mod_same in Hr; [ | easy ].
+rewrite Nat.add_0_l in Hr.
+rewrite Nat.mod_1_l in Hr. 2: {
+  apply Nat_mul_le_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat.mul_1_r in Hr.
 ...
 Search (_ / _ = _ → _).
 Search (_ = _ / _ → _).
