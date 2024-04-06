@@ -2778,6 +2778,64 @@ rewrite Nat.mod_small; [ cbn | easy ].
   ============================
   S (S (S (fst (rank_fst_loop (2 ^ n - 3) 1 8 (2 ^ n))))) = n
 *)
+Theorem glop :
+  ∀ m n,
+  m < n
+  → S (m + fst (rank_fst_loop (2 ^ n - S m) 1 (2 ^ S m) (2 ^ n))) = n.
+Proof.
+intros * Hmn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+f_equal.
+destruct m. {
+  clear Hmn.
+  rewrite Nat.add_0_l, Nat.pow_1_r.
+  rewrite Nat_succ_sub_succ_r. 2: {
+    apply (lt_le_trans _ 2); [ easy | ].
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  cbn - [ "*" "^" ].
+  rewrite Nat.pow_succ_r'.
+  rewrite <- Nat.div_div; [ | easy | now apply Nat.pow_nonzero ].
+  rewrite Nat.div_same; [ | easy ].
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  rewrite Nat.div_small. 2: {
+    destruct n ; [ easy | ].
+    apply (lt_le_trans _ 2); [ easy | ].
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+  cbn - [ "*" ].
+  rewrite fst_let.
+  rewrite <- Nat.pow_succ_r'.
+  rewrite Nat.mod_small. 2: {
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    destruct n; [ easy | ].
+    apply (lt_le_trans _ 2); [ easy | ].
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  }
+Theorem glop :
+  ∀ it k a b,
+  rank_fst_loop it k (2 * a) (2 * b) = rank_fst_loop it k a b.
+... ...
+rewrite Nat.pow_succ_r' at 2.
+rewrite glop.
+replace 2 with (2 ^ 1) at 3.
+... ...
+replace 4 with (2 ^ 2) in Hb by easy.
+apply Nat.pow_lt_mono_r_iff in Hb; [ | easy ].
+now apply glop in Hb.
+...
 replace (2 ^ n - 3) with (S (2 ^ n - 4)) by flia Hb.
 cbn - [ "*" ].
 remember (8 / 2 ^ n =? 1) as c eqn:Hc.
@@ -2808,6 +2866,7 @@ rewrite Nat.mod_small; [ cbn | easy ].
 *)
 ...
 replace 8 with (2 ^ 3) in Hb by easy.
+apply Nat.pow_lt_mono_r_iff in Hb; [ | easy ].
 now apply glop in Hb.
 ...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
