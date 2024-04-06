@@ -2652,6 +2652,39 @@ symmetry in Hbc.
 now destruct bc.
 Qed.
 
+Theorem fst_rank_fst_loop_mul_diag :
+  ∀ it k a b c,
+  c ≠ 0
+  → fst (rank_fst_loop it k (c * a) (c * b)) =
+    fst (rank_fst_loop it k a b).
+Proof.
+intros * Hcz.
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+  subst b.
+  rewrite Nat.mul_0_r.
+  revert a.
+  induction it; intros; [ easy | ].
+  cbn - [ "*" ].
+  destruct k; [ easy | ].
+  do 2 rewrite fst_let.
+  f_equal.
+  rewrite Nat.mul_assoc, (Nat.mul_comm 2).
+  rewrite <- Nat.mul_assoc.
+  apply IHit.
+}
+revert a.
+induction it; intros; [ easy | ].
+cbn - [ "*" ].
+rewrite Nat.div_mul_cancel_l; [ | easy | easy ].
+destruct (a / b =? k); [ easy | ].
+do 2 rewrite fst_let.
+f_equal.
+rewrite Nat.mul_mod_distr_l; [ | easy | easy ].
+rewrite Nat.mul_assoc, (Nat.mul_comm 2).
+rewrite <- Nat.mul_assoc.
+apply IHit.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2824,13 +2857,9 @@ destruct m. {
     apply Nat.mul_le_mono_l.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-Theorem glop :
-  ∀ it k a b,
-  rank_fst_loop it k (2 * a) (2 * b) = rank_fst_loop it k a b.
-... ...
-rewrite Nat.pow_succ_r' at 2.
-rewrite glop.
-replace 2 with (2 ^ 1) at 3.
+  rewrite Nat.pow_succ_r' at 2.
+  rewrite fst_rank_fst_loop_mul_diag; [ | easy ].
+  replace 2 with (2 ^ 1) at 3 by easy.
 ... ...
 replace 4 with (2 ^ 2) in Hb by easy.
 apply Nat.pow_lt_mono_r_iff in Hb; [ | easy ].
