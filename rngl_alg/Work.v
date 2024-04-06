@@ -2715,6 +2715,78 @@ replace (2 ^ n - 1) with (S (2 ^ n - 2)) by flia Hb.
 cbn - [ "*" ].
 rewrite Nat.mod_1_l; [ | easy ].
 rewrite Nat.mul_1_r.
+remember (2 / 2 ^ n =? 1) as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply Nat.eqb_eq in Hc; cbn.
+  apply Nat_eq_div_1 in Hc.
+  destruct Hc as (H1, H2).
+  assert (H : 2 ^ n = 2) by flia Hb H1.
+  rewrite <- (Nat.pow_1_r 2) in H at 2.
+  now apply Nat.pow_inj_r in H.
+}
+apply Nat.eqb_neq in Hc.
+apply Nat_neq_div_1 in Hc.
+destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
+clear Hb.
+replace (2 ^ n - 2) with (S (2 ^ n - 3)) by flia Hc.
+rewrite Nat.mod_small; [ cbn | easy ].
+rewrite Nat.add_0_r, Nat_add_diag.
+(**)
+remember (4 / 2 ^ n =? 1) as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Nat.eqb_eq in Hb; cbn.
+  apply Nat_eq_div_1 in Hb.
+  destruct Hb as (H1, H2).
+...
+  assert (H : 2 ^ n = 3) by flia Hc H1.
+  rewrite <- (Nat.pow_1_r 2) in H at 2.
+  now apply Nat.pow_inj_r in H.
+...
+rewrite Nat_succ_sub_succ_r. 2: {
+  destruct n; [ cbn in Hc; flia Hc | ].
+  destruct n; [ cbn in Hc; flia Hc | ].
+  apply (lt_le_trans _ (2 ^ 2)); [ cbn; flia | ].
+  apply Nat.pow_le_mono_r; [ easy | flia ].
+}
+cbn - [ "*" ].
+rewrite Nat.mod_1_l; [ | easy ].
+rewrite Nat.mul_1_r.
+remember (2 / 2 ^ n =? 1) as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply Nat.eqb_eq in Hc; cbn.
+  apply Nat_eq_div_1 in Hc.
+  destruct Hc as (H1, H2).
+  assert (H : 2 ^ n = 2) by flia Hb H1.
+  rewrite <- (Nat.pow_1_r 2) in H at 2.
+  now apply Nat.pow_inj_r in H.
+}
+apply Nat.eqb_neq in Hc.
+apply Nat_neq_div_1 in Hc.
+destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
+clear Hb.
+replace (2 ^ n - 2) with (S (2 ^ n - 3)) by flia Hc.
+rewrite Nat.mod_small; [ cbn | easy ].
+rewrite Nat.add_0_r, Nat_add_diag.
+...
+rewrite Nat.mod_1_l; [ | easy ].
+rewrite Nat.mul_1_r.
+remember (2 / 2 ^ n =? 1) as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply Nat.eqb_eq in Hc; cbn.
+  apply Nat_eq_div_1 in Hc.
+  destruct Hc as (H1, H2).
+  assert (H : 2 ^ n = 2) by flia Hb H1.
+  rewrite <- (Nat.pow_1_r 2) in H at 2.
+  now apply Nat.pow_inj_r in H.
+}
+apply Nat.eqb_neq in Hc.
+apply Nat_neq_div_1 in Hc.
+destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
+clear Hb.
 ...
 remember (rank_fst_loop _ _ _ _) as r eqn:Hr.
 symmetry in Hr.
