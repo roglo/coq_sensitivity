@@ -2798,6 +2798,7 @@ assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
   now apply Nat.neq_succ_diag_l in H.
 }
 progress unfold rank_fst_1.
+Inspect 2.
 ...
 Search (fst (rank_fst_loop _ _ _ _)).
 Print rank_fst_loop.
