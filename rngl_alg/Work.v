@@ -2687,67 +2687,54 @@ Qed.
 
 Theorem rank_fst_1_1_2_pow_lemma :
   ∀ it m n,
-  S m ≤ n
-  → 2 ^ n - S m ≤ it
-  → S (m + fst (rank_fst_loop it 1 (2 ^ S m) (2 ^ n))) = n.
+  m ≤ n
+  → 2 ^ n - m ≤ it
+  → m + fst (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = n.
 Proof.
 intros * Hmn Hit.
 apply Nat.le_sub_le_add_r in Hit.
 rewrite Nat.add_comm in Hit.
 revert m it Hmn Hit.
-induction n; intros; [ easy | ].
-f_equal.
+induction n; intros. {
+  apply Nat.le_0_r in Hmn; subst m.
+  cbn in Hit |-*.
+  now destruct it.
+}
 destruct m. {
   clear Hmn.
-  rewrite Nat.add_0_l, Nat.pow_1_r.
   destruct it. {
     cbn in Hit.
     specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
     flia Hit H3.
   }
   cbn - [ "*" "^" ].
-  rewrite Nat.pow_succ_r'.
-  rewrite <- Nat.div_div; [ | easy | now apply Nat.pow_nonzero ].
-  rewrite Nat.div_same; [ | easy ].
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  assert (H12n : 1 < 2 ^ n). {
-    destruct n ; [ easy | ].
-    apply (lt_le_trans _ 2); [ easy | ].
-    rewrite <- (Nat.mul_1_r 2) at 1.
-    rewrite Nat.pow_succ_r'.
-    apply Nat.mul_le_mono_l.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-  }
-  rewrite Nat.div_small; [ | easy ].
-  destruct n ; [ easy | ].
-  destruct it. {
-    cbn in Hit.
+  rewrite Nat.div_small. 2: {
     specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
-    flia Hit H3.
+    cbn; flia H3.
   }
-  cbn - [ rank_fst_loop "*" "^" ].
-  rewrite fst_let.
-  rewrite <- Nat.pow_succ_r'.
   rewrite Nat.mod_small. 2: {
-    rewrite <- (Nat.mul_1_r 2) at 1.
-    rewrite Nat.pow_succ_r'.
-    now apply Nat.mul_lt_mono_pos_l.
+    specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
+    cbn; flia H3.
   }
-  rewrite Nat.pow_succ_r'.
+  cbn.
+  rewrite fst_let.
+  f_equal.
+  replace 2 with (2 * 2 ^ 0) at 1 by easy.
+  rewrite Nat.add_0_r, Nat_add_diag.
   rewrite fst_rank_fst_loop_mul_diag; [ | easy ].
-  specialize (IHn 0 (S it) (Nat.lt_0_succ _)).
+  rewrite <- (Nat.add_0_l (fst _)).
+  apply IHn; [ easy | ].
   rewrite Nat.pow_succ_r' in Hit.
-  assert (H : 2 ^ S n ≤ 1 + S it) by flia Hit.
-  specialize (IHn H); clear H.
-  apply IHn.
+  flia Hit.
 }
-apply Nat.succ_lt_mono in Hmn.
+apply Nat.succ_le_mono in Hmn.
 specialize (IHn m it Hmn) as H1.
-assert (H : 2 ^ n ≤ S m + it). {
+assert (H : 2 ^ n ≤ m + it). {
   rewrite Nat.pow_succ_r' in Hit.
   flia Hit.
 }
 specialize (H1 H); clear H.
+rewrite Nat.add_succ_l; f_equal.
 rewrite Nat.pow_succ_r'.
 rewrite (Nat.pow_succ_r' 2 n).
 now rewrite fst_rank_fst_loop_mul_diag.
@@ -2793,7 +2780,7 @@ rewrite Nat.mul_1_r.
 *)
 specialize rank_fst_1_1_2_pow_lemma as H1.
 replace 2 with (2 ^ 1) at 2 by easy.
-apply (H1 (2 ^ n - 1) 0 n); [ | easy ].
+apply (H1 (2 ^ n - 1) 1 n); [ | easy ].
 destruct n; [ cbn in Hb; flia Hb | flia ].
 Qed.
 
