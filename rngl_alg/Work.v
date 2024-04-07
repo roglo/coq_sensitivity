@@ -2812,30 +2812,32 @@ rewrite Nat.mod_small; [ cbn | easy ].
   S (S (S (fst (rank_fst_loop (2 ^ n - 3) 1 8 (2 ^ n))))) = n
 *)
 Theorem glop :
-  ∀ m n,
+  ∀ it m n,
   m < n
-  → S (m + fst (rank_fst_loop (2 ^ n - S m) 1 (2 ^ S m) (2 ^ n))) = n.
+  → 2 ^ n - S m ≤ it
+  → S (m + fst (rank_fst_loop it 1 (2 ^ S m) (2 ^ n))) = n.
 Proof.
-intros * Hmn.
-revert m Hmn.
+intros * Hmn Hit.
+apply Nat.le_sub_le_add_r in Hit.
+rewrite Nat.add_comm in Hit.
+revert m it Hmn Hit.
 induction n; intros; [ easy | ].
 f_equal.
+(**)
 destruct m. {
   clear Hmn.
   rewrite Nat.add_0_l, Nat.pow_1_r.
-  rewrite Nat_succ_sub_succ_r. 2: {
-    apply (lt_le_trans _ 2); [ easy | ].
-    rewrite <- (Nat.mul_1_r 2) at 1.
-    rewrite Nat.pow_succ_r'.
-    apply Nat.mul_le_mono_l.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+  destruct it. {
+    cbn in Hit.
+    specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
+    flia Hit H3.
   }
   cbn - [ "*" "^" ].
   rewrite Nat.pow_succ_r'.
   rewrite <- Nat.div_div; [ | easy | now apply Nat.pow_nonzero ].
   rewrite Nat.div_same; [ | easy ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  rewrite Nat.div_small. 2: {
+  assert (H12n : 1 < 2 ^ n). {
     destruct n ; [ easy | ].
     apply (lt_le_trans _ 2); [ easy | ].
     rewrite <- (Nat.mul_1_r 2) at 1.
@@ -2843,23 +2845,29 @@ destruct m. {
     apply Nat.mul_le_mono_l.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-  cbn - [ "*" ].
+  rewrite Nat.div_small; [ | easy ].
+  destruct n ; [ easy | ].
+  destruct it. {
+    cbn in Hit.
+    specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
+    flia Hit H3.
+  }
+  cbn - [ rank_fst_loop "*" "^" ].
   rewrite fst_let.
   rewrite <- Nat.pow_succ_r'.
   rewrite Nat.mod_small. 2: {
     rewrite <- (Nat.mul_1_r 2) at 1.
     rewrite Nat.pow_succ_r'.
-    apply Nat.mul_lt_mono_pos_l; [ easy | ].
-    destruct n; [ easy | ].
-    apply (lt_le_trans _ 2); [ easy | ].
-    rewrite <- (Nat.mul_1_r 2) at 1.
-    rewrite Nat.pow_succ_r'.
-    apply Nat.mul_le_mono_l.
-    now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+    now apply Nat.mul_lt_mono_pos_l.
   }
-  rewrite Nat.pow_succ_r' at 2.
+  rewrite Nat.pow_succ_r'.
   rewrite fst_rank_fst_loop_mul_diag; [ | easy ].
-  replace 2 with (2 ^ 1) at 3 by easy.
+  specialize (IHn 0 (S it) (Nat.lt_0_succ _)).
+  rewrite Nat.pow_succ_r' in Hit.
+  assert (H : 2 ^ S n ≤ 1 + S it) by flia Hit.
+  specialize (IHn H); clear H.
+  apply IHn.
+}
 ... ...
 replace 4 with (2 ^ 2) in Hb by easy.
 apply Nat.pow_lt_mono_r_iff in Hb; [ | easy ].
