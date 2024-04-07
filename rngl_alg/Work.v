@@ -2782,6 +2782,11 @@ Theorem rank_fst_1_log2_up :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
+(*
+progress unfold rank_fst_1.
+  ============================
+  fst (rank_fst_loop n 1 1 n) = Nat.log2_up n
+*)
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   apply Nat_pow2_log2_up_succ in Hn.
 (*
@@ -2807,16 +2812,37 @@ clear Hn.
   ============================
   rank_fst_1 1 n = Nat.log2_up n
 *)
+Theorem glop :
+  ∀ a b i,
+  rank_fst_1 a b = i
+  ↔ (∀ j, j < i → nth j (binary_div i a b) 0 = 0) ∧
+     nth i (binary_div i a b) 0 = 1.
+Proof.
+intros.
+split. {
+  intros Hab.
+  split. {
+    intros j Hji.
+    induction j. {
+      destruct i; cbn.
+... ...
+apply glop.
+...
 Theorem rank_fst_1_1_2_pow_log2_up :
   ∀ n, rank_fst_1 1 n = rank_fst_1 1 (2 ^ Nat.log2_up n).
 Proof.
 intros.
 progress unfold rank_fst_1.
+induction n; [ easy | ].
+rewrite fst_rank_fst_loop_succ.
+...
 specialize rank_fst_1_1_2_pow_lemma as H1.
 specialize (H1 (2 ^ Nat.log2_up n) 0 (Nat.log2_up n)).
-rewrite Nat.add_0_l in H1.
 cbn in H1.
-rewrite H1; [ | easy | now rewrite Nat.sub_0_r ].
+rewrite H1; [ clear H1 | easy | now rewrite Nat.sub_0_r ].
+...
+  ============================
+  fst (rank_fst_loop n 1 1 n) = Nat.log2_up n
 ...
 Qed.
 ... ...
