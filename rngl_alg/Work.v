@@ -2783,9 +2783,13 @@ Theorem rank_fst_1_log2_up :
 Proof.
 intros.
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
-  generalize Hn; intros H1.
-  apply Nat_pow2_log2_up_succ in H1.
-  rewrite <- H1.
+  apply Nat_pow2_log2_up_succ in Hn.
+(*
+  Hn : 2 ^ Nat.log2 n = n
+  ============================
+  rank_fst_1 1 n = Nat.log2_up n
+*)
+  rewrite <- Hn.
   rewrite rank_fst_1_1_2_pow.
   now rewrite Nat.log2_up_pow2.
 }
@@ -2798,42 +2802,28 @@ assert (Hn2 : 2 ^ Nat.log2 n ≠ n). {
   now apply Nat.neq_succ_diag_l in H.
 }
 clear Hn.
+(*
+  Hn2 : 2 ^ Nat.log2 n ≠ n
+  ============================
+  rank_fst_1 1 n = Nat.log2_up n
+*)
+Theorem rank_fst_1_1_2_pow_log2_up :
+  ∀ n, rank_fst_1 1 n = rank_fst_1 1 (2 ^ Nat.log2_up n).
+Proof.
+intros.
 progress unfold rank_fst_1.
-(* faudra sûrement ajouter un "m" comme dans rank_fst_1_1_2_pow_lemma *)
+specialize rank_fst_1_1_2_pow_lemma as H1.
+specialize (H1 (2 ^ Nat.log2_up n) 0 (Nat.log2_up n)).
+rewrite Nat.add_0_l in H1.
+cbn in H1.
+rewrite H1; [ | easy | now rewrite Nat.sub_0_r ].
 ...
-destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
+Qed.
+... ...
+rewrite rank_fst_1_1_2_pow_log2_up.
+... ...
+progress unfold rank_fst_1.
 ...
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ easy | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ reflexivity | ].
-  destruct n; [ easy | ].
-...
-Search (fst (rank_fst_loop _ _ _ _)).
-Print rank_fst_loop.
 Theorem rank_fst_loop_enough_iter :
   ∀ it1 it2 k a b,
   b ≠ 0
