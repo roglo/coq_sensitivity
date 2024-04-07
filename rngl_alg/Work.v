@@ -2868,6 +2868,10 @@ destruct m. {
   specialize (IHn H); clear H.
   apply IHn.
 }
+apply Nat.succ_lt_mono in Hmn.
+specialize (IHn m n Hmn) as H1.
+destruct it. {
+  cbn; rewrite Nat.add_0_r.
 ... ...
 replace 4 with (2 ^ 2) in Hb by easy.
 apply Nat.pow_lt_mono_r_iff in Hb; [ | easy ].
