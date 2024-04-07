@@ -2799,19 +2799,38 @@ assert (Hn2 : 2 ^ Nat.log2 n ≠ n). {
 }
 clear Hn.
 progress unfold rank_fst_1.
-Inspect 2.
 (* faudra sûrement ajouter un "m" comme dans rank_fst_1_1_2_pow_lemma *)
-induction n; [ easy | ].
+...
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
-  generalize Hn; intros H1.
-  apply Nat_pow2_log2_up_succ in H1.
-  cbn - [ "mod" "*" ].
+...
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
   destruct n; [ easy | ].
-  cbn - [ rank_fst_loop "mod" "*" Nat.log2_up ].
-  rewrite fst_let.
-  rewrite Hn.
-  f_equal.
-  rewrite Nat.mod_1_l; [ | flia ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ reflexivity | ].
+  destruct n; [ easy | ].
 ...
 Search (fst (rank_fst_loop _ _ _ _)).
 Print rank_fst_loop.
