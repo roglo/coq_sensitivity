@@ -2687,7 +2687,7 @@ Qed.
 
 Theorem rank_fst_1_1_2_pow_lemma :
   ∀ it m n,
-  m < n
+  S m ≤ n
   → 2 ^ n - S m ≤ it
   → S (m + fst (rank_fst_loop it 1 (2 ^ S m) (2 ^ n))) = n.
 Proof.
@@ -2791,36 +2791,9 @@ rewrite Nat.mul_1_r.
   ============================
   S (fst (rank_fst_loop (2 ^ n - 1) 1 2 (2 ^ n))) = n
 *)
-replace (2 ^ n - 1) with (S (2 ^ n - 2)) by flia Hb.
-cbn - [ "*" ].
-remember (2 / 2 ^ n =? 1) as c eqn:Hc.
-symmetry in Hc.
-destruct c. {
-  apply Nat.eqb_eq in Hc; cbn.
-  apply Nat_eq_div_1 in Hc.
-  destruct Hc as (H1, H2).
-  destruct n; [ cbn in Hb; flia Hb | ].
-  destruct n; [ easy | exfalso ].
-  cbn in H1.
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
-  flia H1 H3.
-}
-apply Nat.eqb_neq in Hc.
-apply Nat_neq_div_1 in Hc.
-destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
-clear Hb.
-rename Hc into Hb.
-rewrite fst_let.
-rewrite Nat.mod_small; [ cbn | easy ].
-(*
-  Hb : 2 < 2 ^ n
-  ============================
-  S (S (fst (rank_fst_loop (2 ^ n - 2) 1 4 (2 ^ n)))) = n
-*)
 specialize rank_fst_1_1_2_pow_lemma as H1.
-replace 4 with (2 ^ 2) by easy.
-apply (H1 (2 ^ n - 2) 1 n); [ | easy ].
-destruct n; [ cbn in Hb; flia Hb | ].
+replace 2 with (2 ^ 1) at 2 by easy.
+apply (H1 (2 ^ n - 1) 0 n); [ | easy ].
 destruct n; [ cbn in Hb; flia Hb | flia ].
 Qed.
 
