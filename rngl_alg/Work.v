@@ -2740,48 +2740,14 @@ rewrite (Nat.pow_succ_r' 2 n).
 now rewrite fst_rank_fst_loop_mul_diag.
 Qed.
 
-Theorem rank_fst_1_1_2_pow :
-  ∀ n, rank_fst_1 1 (2 ^ n) = n.
+Theorem rank_fst_1_1_2_pow : ∀ n, rank_fst_1 1 (2 ^ n) = n.
 Proof.
 intros.
 progress unfold rank_fst_1.
-specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as Hb.
-(*
-  Hb : 2 ^ n ≠ 0
-  ============================
-  fst (rank_fst_loop (2 ^ n) 1 1 (2 ^ n)) = n
-*)
-apply Nat.neq_0_lt_0 in Hb.
-replace (2 ^ n) with (S (2 ^ n - 1)) at 1 by flia Hb.
-cbn - [ "*" ].
-remember (1 / 2 ^ n =? 1) as c eqn:Hc.
-symmetry in Hc.
-destruct c. {
-  apply Nat.eqb_eq in Hc; cbn.
-  apply Nat_eq_div_1 in Hc.
-  destruct Hc as (H1, H2).
-  destruct n; [ easy | exfalso ].
-  cbn in H1.
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
-  flia H1 H3.
-}
-apply Nat.eqb_neq in Hc.
-apply Nat_neq_div_1 in Hc.
-destruct Hc as [Hc| Hc]; [ flia Hb Hc | ].
-clear Hb.
-rename Hc into Hb.
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_1_r.
-(*
-  Hb : 1 < 2 ^ n
-  ============================
-  S (fst (rank_fst_loop (2 ^ n - 1) 1 2 (2 ^ n))) = n
-*)
 specialize rank_fst_1_1_2_pow_lemma as H1.
 replace 2 with (2 ^ 1) at 2 by easy.
-apply (H1 (2 ^ n - 1) 1 n); [ | easy ].
-destruct n; [ cbn in Hb; flia Hb | flia ].
+apply (H1 (2 ^ n) 0 n); [ easy | ].
+now rewrite Nat.sub_0_r.
 Qed.
 
 (* to be completed
@@ -2812,57 +2778,26 @@ progress unfold seq_angle_to_div_nat.
 Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 Print inv_ub_num.
 Print inv_ub_den_2_pow.
-Theorem glop :
+Theorem rank_fst_1_log2_up :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   generalize Hn; intros H1.
   apply Nat_pow2_log2_up_succ in H1.
-...
-Show.
-Check rank_fst_1_1_2_pow.
-...
-Theorem glop :
-  ∀ n, n ≠ 0 → rank_fst_1 1 (2 * n) = S (rank_fst_1 1 n).
-Proof.
-intros * Hnz.
-induction n; [ easy | clear Hnz ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-...
+  rewrite <- H1.
+  rewrite rank_fst_1_1_2_pow.
+  now rewrite Nat.log2_up_pow2.
+}
+assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
+  intros H; symmetry in H.
+  specialize (Nat_pow2_log2_up_succ n) as H1.
+  apply H1 in H.
+  rewrite Hn in H.
+  symmetry in H.
+  now apply Nat.neq_succ_diag_l in H.
+}
 progress unfold rank_fst_1.
-rewrite <- Nat_add_diag.
-do 2 rewrite Nat.add_succ_r.
-do 2 rewrite Nat.add_succ_l.
-cbn.
-...
-intros.
-induction n; [ easy | cbn ].
-rewrite rank_fst_1_succ_r.
-remember (1 / S n =? 1) as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  apply Nat.eqb_eq in Hb.
-  destruct n; [ easy | ].
-  rewrite Nat.div_small in Hb; [ easy | flia ].
-}
-apply Nat.eqb_neq in Hb.
-rewrite Nat.mod_1_l. 2: {
-  destruct n; [ easy | flia ].
-}
-rewrite Nat.mul_1_r.
-destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. 2: {
-  assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
-    intros H; symmetry in H.
-    specialize (Nat_pow2_log2_up_succ n) as H1.
-    apply H1 in H.
-    rewrite Hn in H.
-    symmetry in H.
-    now apply Nat.neq_succ_diag_l in H.
-  }
-  rewrite Hn, <- IHn.
-  progress unfold rank_fst_1.
 ...
 Search (fst (rank_fst_loop _ _ _ _)).
 Print rank_fst_loop.
