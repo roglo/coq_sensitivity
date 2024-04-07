@@ -2789,16 +2789,29 @@ destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   rewrite rank_fst_1_1_2_pow.
   now rewrite Nat.log2_up_pow2.
 }
-assert (Hn2 : n ≠ 2 ^ Nat.log2 n). {
-  intros H; symmetry in H.
+assert (Hn2 : 2 ^ Nat.log2 n ≠ n). {
+  intros H.
   specialize (Nat_pow2_log2_up_succ n) as H1.
   apply H1 in H.
   rewrite Hn in H.
   symmetry in H.
   now apply Nat.neq_succ_diag_l in H.
 }
+clear Hn.
 progress unfold rank_fst_1.
 Inspect 2.
+(* faudra sûrement ajouter un "m" comme dans rank_fst_1_1_2_pow_lemma *)
+induction n; [ easy | ].
+destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
+  generalize Hn; intros H1.
+  apply Nat_pow2_log2_up_succ in H1.
+  cbn - [ "mod" "*" ].
+  destruct n; [ easy | ].
+  cbn - [ rank_fst_loop "mod" "*" Nat.log2_up ].
+  rewrite fst_let.
+  rewrite Hn.
+  f_equal.
+  rewrite Nat.mod_1_l; [ | flia ].
 ...
 Search (fst (rank_fst_loop _ _ _ _)).
 Print rank_fst_loop.
