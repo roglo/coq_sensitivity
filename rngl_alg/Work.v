@@ -2543,13 +2543,13 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (7 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
-(* first n binary digits of a/b with a<b *)
+(* first n binary digits of a/b with a≤b *)
 Fixpoint binary_div n a b :=
   match n with
   | 0 => []
   | S n' =>
-      if 2 * a / b =? 0 then 0 :: binary_div n' (2 * a mod b) b
-      else 1 :: binary_div n' (2 * a mod b) b
+      if a / b =? 0 then 0 :: binary_div n' (2 * (a mod b)) b
+      else 1 :: binary_div n' (2 * (a mod b)) b
   end.
 
 Fixpoint rank_fst_loop it k a b :=
@@ -2814,35 +2814,41 @@ clear Hn.
 *)
 Theorem glop :
   ∀ a b i,
-  rank_fst_1 a b = i
-  ↔ (∀ j, j < i → nth j (binary_div i a b) 0 = 0) ∧
-     nth i (binary_div i a b) 0 = 1.
+  0 < a < b
+  → rank_fst_1 a b = i
+    ↔ (∀ j, j < i → nth j (binary_div b a b) 0 = 0) ∧
+       nth i (binary_div b a b) 0 = 1.
 Proof.
-intros.
+intros * (Haz, Hab).
+(*
+destruct (Nat.eq_dec b 1) as [Hb1| Hb1]. {
+  subst b.
+  now apply Nat.lt_1_r in Hab; subst a.
+}
+*)
 split. {
-  intros Hab.
+  intros Habi.
   split. {
     intros j Hji.
-    induction j. {
+    revert i Habi Hji.
+    induction j; intros. {
       destruct i; [ easy | clear Hji ].
-      cbn - [ "*" ].
-      remember (2 * a / b =? 0) as abz eqn:Habz.
+      replace b with (S (b - 1)) at 1 by flia Hab.
+      cbn - [ "/" "mod" "*" ].
+      remember (a / b =? 0) as abz eqn:Habz.
       symmetry in Habz.
       destruct abz; cbn - [ "*" ]; [ easy | exfalso ].
       apply Nat.eqb_neq in Habz.
       apply Habz; clear Habz.
-      progress unfold rank_fst_1 in Hab.
-      destruct b; [ easy | ].
-      cbn - [ "/" "mod" "*" ] in Hab.
-      remember (a / S b =? 1) as ab1 eqn:Hab1.
-      symmetry in Hab1.
-      destruct ab1; [ easy | ].
-      apply Nat.eqb_neq in Hab1.
-      apply Nat_neq_div_1 in Hab1.
-      rewrite fst_let in Hab.
-      apply Nat.succ_inj in Hab.
-      destruct Hab1 as [Hab1| Hab1]. {
-        apply Nat.div_small.
+      now apply Nat.div_small.
+    }
+    destruct b; [ easy | ].
+    cbn - [ "/" "mod" "*" ].
+    apply Nat.div_small in Hab.
+    apply Nat.eqb_eq in Hab.
+    rewrite Hab.
+    cbn - [ "/" "mod" "*" ].
+(* mouais, ça va déconner *)
 ... ...
 apply glop.
 ...
