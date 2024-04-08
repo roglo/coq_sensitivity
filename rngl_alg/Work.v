@@ -2812,6 +2812,25 @@ clear Hn.
   ============================
   rank_fst_1 1 n = Nat.log2_up n
 *)
+progress unfold rank_fst_1.
+...
+induction n; [ easy | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+cbn - [ "/" "mod" "*" ].
+remember (1 / S n =? 1) as sn1 eqn:Hsn1.
+symmetry in Hsn1.
+destruct sn1. {
+  apply Nat.eqb_eq in Hsn1; cbn.
+  destruct n; [ reflexivity | exfalso ].
+  now rewrite Nat.div_small in Hsn1.
+}
+rewrite fst_let.
+apply Nat.eqb_neq in Hsn1.
+destruct n; [ easy | clear Hnz ].
+clear Hsn1.
+rewrite Nat.mod_1_l; [ | flia ].
+rewrite Nat.mul_1_r.
+...
 Theorem glop :
   ∀ a b i,
   0 < a < b
