@@ -2813,7 +2813,6 @@ clear Hn.
   rank_fst_1 1 n = Nat.log2_up n
 *)
 progress unfold rank_fst_1.
-...
 induction n; [ easy | ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 cbn - [ "/" "mod" "*" ].
@@ -2830,6 +2829,29 @@ destruct n; [ easy | clear Hnz ].
 clear Hsn1.
 rewrite Nat.mod_1_l; [ | flia ].
 rewrite Nat.mul_1_r.
+destruct (Nat.log2_up_succ_or (S (S n))) as [Hn| Hn]. {
+  now apply Nat_pow2_log2_up_succ in Hn.
+}
+rewrite <- Hn.
+Search (Nat.log2_up (S _)).
+...
+specialize (rank_fst_1_1_2_pow_lemma (S n) 1) as H1.
+specialize (H1 (Nat.log2 (S (S n)))).
+rewrite Nat.pow_1_r in H1.
+rewrite <- Nat.add_1_l.
+rewrite H1; cycle 1. {
+easy.
+    rewrite < Hn.
+    apply Nat.neq_0_lt_0.
+
+...
+  replace 2 with (2 ^ 1) at 1 by easy.
+  specialize
+  apply (H1 (2 ^ S n) 0 n); [ easy | ].
+now rewrite Nat.sub_0_r.
+Check rank_fst_1_1_2_pow.
+  rewrite rank_fst_1_1_2_pow.
+  now rewrite Nat.log2_up_pow2.
 ...
 Theorem glop :
   ∀ a b i,
