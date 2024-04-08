@@ -2824,7 +2824,25 @@ split. {
   split. {
     intros j Hji.
     induction j. {
-      destruct i; cbn.
+      destruct i; [ easy | clear Hji ].
+      cbn - [ "*" ].
+      remember (2 * a / b =? 0) as abz eqn:Habz.
+      symmetry in Habz.
+      destruct abz; cbn - [ "*" ]; [ easy | exfalso ].
+      apply Nat.eqb_neq in Habz.
+      apply Habz; clear Habz.
+      progress unfold rank_fst_1 in Hab.
+      destruct b; [ easy | ].
+      cbn - [ "/" "mod" "*" ] in Hab.
+      remember (a / S b =? 1) as ab1 eqn:Hab1.
+      symmetry in Hab1.
+      destruct ab1; [ easy | ].
+      apply Nat.eqb_neq in Hab1.
+      apply Nat_neq_div_1 in Hab1.
+      rewrite fst_let in Hab.
+      apply Nat.succ_inj in Hab.
+      destruct Hab1 as [Hab1| Hab1]. {
+        apply Nat.div_small.
 ... ...
 apply glop.
 ...
