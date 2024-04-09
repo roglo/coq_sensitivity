@@ -2652,6 +2652,11 @@ Theorem fst_if :
   fst (if a then b else c) = if a then fst b else fst c.
 Proof. now intros; destruct a. Qed.
 
+Theorem S_if :
+  ∀ (a : bool) b c,
+  S (if a then b else c) = if a then S b else S c.
+Proof. now intros; destruct a. Qed.
+
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
   c ≠ 0
@@ -2841,7 +2846,7 @@ rewrite Nat.mod_small; [ | flia ].
 cbn - [ rank_fst_loop Nat.log2_up ].
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
-rewrite fst_if, fst_let.
+rewrite fst_if, fst_let, S_if.
 remember (2 / S (S n) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
@@ -2855,71 +2860,53 @@ rewrite Nat.mod_small; [ | flia ].
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 rewrite fst_if, fst_let.
+do 2 rewrite S_if.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 2) with 4 by easy.
 remember (4 / S (S (S n)) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
+  do 2 (destruct n; [ easy | ]).
   now rewrite Nat.div_small in Hsn.
 }
 apply Nat.eqb_neq in Hsn.
-destruct n; [ easy | ].
-destruct n; [ easy | clear Hsn ].
+do 2 (destruct n; [ easy | ]).
+clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
-rewrite fst_if, fst_let.
-rewrite fst_if, fst_let.
+do 2 rewrite fst_if, fst_let.
+do 7 rewrite S_if.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 4) with 8 by easy.
 remember (8 / S (S (S (S (S n)))) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
+  do 4 (destruct n; [ easy | ]).
   now rewrite Nat.div_small in Hsn.
 }
 apply Nat.eqb_neq in Hsn.
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | clear Hsn ].
+do 4 (destruct n; [ easy | ]).
+clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
-rewrite fst_if, fst_let.
-rewrite fst_if, fst_let.
-rewrite fst_if, fst_let.
-rewrite fst_if, fst_let.
+do 4 rewrite fst_if, fst_let.
+do 26 rewrite S_if.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 8) with 16 by easy.
 remember (16 / S (S (S (S (S (S (S (S (S n)))))))) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
+  do 8 (destruct n; [ easy | ]).
   now rewrite Nat.div_small in Hsn.
 }
 apply Nat.eqb_neq in Hsn.
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | clear Hsn ].
+do 8 (destruct n; [ easy | ]).
+clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
 (**)
 ...
