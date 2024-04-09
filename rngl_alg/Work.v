@@ -2892,6 +2892,8 @@ Theorem glop :
   ∀ n, fst (rank_fst_loop (2 ^ S n) 1 1 (2 ^ n + 1)) = n + 1.
 Proof.
 intros.
+Compute (map (λ m, fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1) (seq 0 13)).
+...
 destruct n; [ easy | ].
 cbn - [ "*" ].
 ...
