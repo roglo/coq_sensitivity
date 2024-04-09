@@ -2861,6 +2861,11 @@ intros.
 revert m.
 induction n; intros. {
   cbn.
+  rewrite (Nat.add_1_r (2 ^ m)).
+  rewrite Nat.log2_up_succ_pow2; [ | easy ].
+...
+2 a / (a + 1)
+2 * 2 ^ m / (2 ^ m + 1)
 ... ...
 specialize (glop 0 n) as H1.
 cbn in H1.
