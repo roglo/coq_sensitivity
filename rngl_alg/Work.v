@@ -2755,6 +2755,15 @@ apply (H1 (2 ^ n) 0 n); [ easy | ].
 now rewrite Nat.sub_0_r.
 Qed.
 
+Theorem fst_rank_fst_loop_1_mul_2_add_1 :
+  ∀ it a, a ≠ 0 → fst (rank_fst_loop it 1 (2 * a) (a + 1)) = 0.
+Proof.
+intros * Haz.
+destruct it; [ easy | ].
+cbn - [ "*" ].
+rewrite (Nat_div_less_small 1); [ easy | flia Haz ].
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2863,24 +2872,38 @@ induction n; intros. {
   cbn.
   rewrite (Nat.add_1_r (2 ^ m)).
   rewrite Nat.log2_up_succ_pow2; [ | easy ].
+  rewrite (Nat.add_1_r m).
+  rewrite Nat.pow_succ_r'.
+  rewrite <- (Nat.add_1_r (2 ^ m)).
+  rewrite fst_rank_fst_loop_1_mul_2_add_1; [ | now apply Nat.pow_nonzero ].
+  rewrite Nat.add_0_l; symmetry.
+Compute (map (λ m, fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1) (seq 0 13)).
+Compute (map (λ m, binary_div 20 1 (2 ^ m + 1)) (seq 0 13)).
+...
+rank_fst_1_1_2_pow_lemma:
+  ∀ it m n : nat,
+    m ≤ n → 2 ^ n - m ≤ it → m + fst (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = n
+...
 Theorem glop :
-  ∀ it k a, fst (rank_fst_loop it k (2 * a) (a + 1)) = 0.
+  ∀ it n, it ≠ 0 → fst (rank_fst_loop it 1 1 (2 ^ n + 1)) = n + 1.
 Proof.
-intros.
-...
-    rewrite (Nat.add_1_r m).
-    rewrite Nat.pow_succ_r'.
-    rewrite <- (Nat.add_1_r (2 ^ m)).
-rewrite glop.
-...
-assert (fst (rank_fst_loop (2 ^ S m) 1 1 (S (2 ^ m))) = m + 1).
-Compute (map (λ m, fst (rank_fst_loop (2 ^ m - m) 1 (2 ^ (m + 1)) (S (2 ^ m)))) (seq 0 10)).
-Compute (map (λ m, fst (rank_fst_loop (2 ^ S m) 1 1 (S (2 ^ m)))) (seq 0 10)).
+intros * Hit.
+induction it; [ easy | clear Hit; cbn ].
+rewrite Nat.div_small. 2: {
+  apply Nat.lt_add_pos_l.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat.mod_small. 2: {
+  apply Nat.lt_add_pos_l.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+cbn.
+rewrite fst_let.
+rewrite <- Nat.add_1_r; f_equal.
 ...
 cbn.
 rewrite Nat.add_0_r.
 ...
-2 a / (a + 1)
 2 * 2 ^ m / (2 ^ m + 1)
 ... ...
 specialize (glop 0 n) as H1.
