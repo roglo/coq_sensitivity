@@ -2852,6 +2852,26 @@ replace (S (S n)) with (n + 2) by flia.
   S (fst (rank_fst_loop (S n) 1 2 (n + 2))) =
   fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2)) 1 1 (n + 2))
 *)
+Theorem glop :
+  ∀ m n,
+  fst (rank_fst_loop (n + 2 ^ m - m) 1 (2 ^ (m + 1)) (n + 2 ^ m + 1)) + m + 1 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ m + 1)) 1 1 (n + 2 ^ m + 1)).
+Proof.
+intros.
+revert m.
+induction n; intros. {
+  cbn.
+... ...
+specialize (glop 0 n) as H1.
+cbn in H1.
+progress replace (n + 1 - 0) with (n + 1) in H1 by flia.
+progress replace (n + 1 + 1) with (n + 2) in H1 by flia.
+rewrite Nat.add_1_r in H1.
+rewrite <- Nat.add_succ_l in H1.
+rewrite Nat.add_0_r in H1.
+rewrite <- (Nat.add_1_r n).
+apply H1.
+...
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 rewrite fst_if, fst_let, S_if.
 remember (2 / (n + 2) =? 1) as sn eqn:Hsn.
@@ -2875,6 +2895,13 @@ replace (2 * 2) with 4 by easy.
   ============================
   fst (rank_fst_loop (n + 1) 1 4 (n + 3)) + 2 =
   fst (rank_fst_loop (2 ^ Nat.log2_up (n + 3)) 1 1 (n + 3))
+...
+specialize (glop 1 n) as H1.
+cbn in H1.
+progress replace (n + 2 - 1) with (n + 1) in H1 by flia.
+progress replace (n + 2 + 1) with (n + 3) in H1 by flia.
+rewrite <- Nat.add_assoc in H1.
+apply H1.
 *)
 replace (n + 1) with (S n) by now rewrite Nat.add_comm.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
@@ -2901,6 +2928,13 @@ replace (2 * 4) with 8 by easy.
 (*
   fst (rank_fst_loop (n + 2)) 1 8 (n + 5)) + 3 =
   fst (rank_fst_loop (2 ^ Nat.log2_up (n + 5)) 1 1 (n + 5))
+...
+specialize (glop 2 n) as H1.
+cbn in H1.
+progress replace (n + 4 - 2) with (n + 2) in H1 by flia.
+progress replace (n + 4 + 1) with (n + 5) in H1 by flia.
+rewrite <- Nat.add_assoc in H1.
+apply H1.
 *)
 replace (n + 2) with (S (n + 1)) by flia.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
@@ -2923,10 +2957,18 @@ progress replace (S (S (S (S n))) + 1) with (n + 5) by flia.
 rewrite <- Nat.add_1_r.
 rewrite <- Nat.add_assoc.
 replace (1 + 3) with 4 by easy.
+replace (2 * 8) with 16 by easy.
 (*
   ============================
-  fst (rank_fst_loop (n + 5) 1 (2 * 8) (n + 9)) + 4 =
+  fst (rank_fst_loop (n + 5) 1 16 (n + 9)) + 4 =
   fst (rank_fst_loop (2 ^ Nat.log2_up (n + 9)) 1 1 (n + 9))
+...
+specialize (glop 3 n) as H1.
+cbn in H1.
+progress replace (n + 8 - 3) with (n + 5) in H1 by flia.
+progress replace (n + 8 + 1) with (n + 9) in H1 by flia.
+rewrite <- Nat.add_assoc in H1.
+apply H1.
 *)
 replace (n + 5) with (S (n + 4)) by flia.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
@@ -2954,9 +2996,14 @@ progress replace (S (S (S (S (S (S (S (S n))))))) + 8) with (n + 16) in IHn
   fst (rank_fst_loop (n + 12) 1 32 (n + 17)) + 5 =
   fst (rank_fst_loop (2 ^ Nat.log2_up (n + 17)) 1 1 (n + 17))
 *)
-(* m = 1 *)
-Theorem glop :
-  ∀ n,
+...
+specialize (glop 4 n) as H1.
+cbn in H1.
+progress replace (n + 16 - 4) with (n + 12) in H1 by flia.
+progress replace (n + 16 + 1) with (n + 17) in H1 by flia.
+rewrite Nat.add_1_r in H1.
+rewrite <- Nat.add_succ_l in H1.
+apply H1.
 ...
   m = 4
   fst (rank_fst_loop (n + 2 ^ m - m) 1 (2 ^ (m + 1)) (n + 2 ^ m + 1)) + m + 1 =
