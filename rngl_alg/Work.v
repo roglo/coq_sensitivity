@@ -2845,69 +2845,79 @@ destruct n; [ easy | clear Hsn ].
 rewrite Nat.mod_small; [ | flia ].
 cbn - [ rank_fst_loop Nat.log2_up ].
 (**)
+replace (S (S n)) with (n + 2) by flia.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 rewrite fst_if, fst_let, S_if.
-remember (2 / S (S n) =? 1) as sn eqn:Hsn.
+remember (2 / (n + 2) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
   destruct n; [ easy | ].
-  now rewrite Nat.div_small in Hsn.
+  rewrite Nat.div_small in Hsn; [ easy | flia ].
 }
 apply Nat.eqb_neq in Hsn.
 destruct n; [ easy | clear Hsn ].
 rewrite Nat.mod_small; [ | flia ].
 (**)
+replace (S (S n)) with (n + 2) in IHn by flia.
+replace (S n + 2) with (n + 3) by flia.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 rewrite fst_if, fst_let.
 do 2 rewrite S_if.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 2) with 4 by easy.
-remember (4 / S (S (S n)) =? 1) as sn eqn:Hsn.
+remember (4 / (n + 3) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
   do 2 (destruct n; [ easy | ]).
-  now rewrite Nat.div_small in Hsn.
+  rewrite Nat.div_small in Hsn; [ easy | flia ].
 }
 apply Nat.eqb_neq in Hsn.
 do 2 (destruct n; [ easy | ]).
 clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
+progress replace (S (S n) + 2) with (n + 4) in IHn by flia.
+progress replace (S (S n) + 3) with (n + 5) by flia.
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 do 2 rewrite fst_if, fst_let.
 do 7 rewrite S_if.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 4) with 8 by easy.
-remember (8 / S (S (S (S (S n)))) =? 1) as sn eqn:Hsn.
+remember (8 / (n + 5) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
   do 4 (destruct n; [ easy | ]).
-  now rewrite Nat.div_small in Hsn.
+  rewrite Nat.div_small in Hsn; [ easy | flia ].
 }
 apply Nat.eqb_neq in Hsn.
 do 4 (destruct n; [ easy | ]).
 clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
+progress replace (S (S (S (S n))) + 4) with (n + 8) in IHn by flia.
+progress replace (S (S (S (S n))) + 5) with (n + 9) by flia.
 (**)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 do 4 rewrite fst_if, fst_let.
 do 26 rewrite S_if.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 8) with 16 by easy.
-remember (16 / S (S (S (S (S (S (S (S (S n)))))))) =? 1) as sn eqn:Hsn.
+remember (16 / (n + 9) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
   do 8 (destruct n; [ easy | ]).
-  now rewrite Nat.div_small in Hsn.
+  rewrite Nat.div_small in Hsn; [ easy | flia ].
 }
 apply Nat.eqb_neq in Hsn.
 do 8 (destruct n; [ easy | ]).
 clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
+progress replace (S (S (S (S (S (S (S (S n))))))) + 8) with (n + 16) in IHn
+  by flia.
+progress replace (S (S (S (S (S (S (S (S n))))))) + 9) with (n + 17) by flia.
 (**)
 ...
 induction n; [ easy | ].
