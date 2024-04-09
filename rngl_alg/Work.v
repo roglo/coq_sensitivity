@@ -2842,10 +2842,16 @@ destruct sn. {
 apply Nat.eqb_neq in Hsn.
 rewrite fst_let.
 destruct n; [ easy | clear Hsn ].
+specialize (IHn (Nat.neq_succ_0 _)).
 rewrite Nat.mod_small; [ | flia ].
 cbn - [ rank_fst_loop Nat.log2_up ].
 (**)
 replace (S (S n)) with (n + 2) by flia.
+(*
+  ============================
+  S (fst (rank_fst_loop (S n) 1 2 (n + 2))) =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2)) 1 1 (n + 2))
+*)
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 rewrite fst_if, fst_let, S_if.
 remember (2 / (n + 2) =? 1) as sn eqn:Hsn.
@@ -2861,12 +2867,19 @@ rewrite Nat.mod_small; [ | flia ].
 (**)
 replace (S (S n)) with (n + 2) in IHn by flia.
 replace (S n + 2) with (n + 3) by flia.
-cbn - [ "/" "mod" "*" Nat.log2_up ].
-rewrite fst_if, fst_let.
-do 2 rewrite S_if.
-cbn - [ "/" "mod" "*" Nat.log2_up ].
+do 3 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc.
+replace (1 + 1) with 2 by easy.
 replace (2 * 2) with 4 by easy.
+(*
+  ============================
+  fst (rank_fst_loop (n + 1) 1 4 (n + 3)) + 2 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 3)) 1 1 (n + 3))
+*)
+replace (n + 1) with (S n) by now rewrite Nat.add_comm.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
 remember (4 / (n + 3) =? 1) as sn eqn:Hsn.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
 symmetry in Hsn.
 destruct sn. {
   apply Nat.eqb_eq in Hsn.
@@ -2879,12 +2892,20 @@ clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
 progress replace (S (S n) + 2) with (n + 4) in IHn by flia.
 progress replace (S (S n) + 3) with (n + 5) by flia.
-(**)
-cbn - [ "/" "mod" "*" Nat.log2_up ].
-do 2 rewrite fst_if, fst_let.
-do 7 rewrite S_if.
-cbn - [ "/" "mod" "*" Nat.log2_up ].
+rewrite fst_let.
+do 3 rewrite <- Nat.add_1_r.
+do 2 rewrite <- Nat.add_assoc.
+replace (1 + 1) with 2 by easy.
+replace (1 + 2) with 3 by easy.
 replace (2 * 4) with 8 by easy.
+(*
+  fst (rank_fst_loop (n + 2)) 1 8 (n + 5)) + 3 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 5)) 1 1 (n + 5))
+*)
+replace (n + 2) with (S (n + 1)) by flia.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
+rewrite fst_if, fst_let.
+cbn - [ "/" "mod" "*" Nat.log2_up ].
 remember (8 / (n + 5) =? 1) as sn eqn:Hsn.
 symmetry in Hsn.
 destruct sn. {
@@ -2898,10 +2919,18 @@ clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
 progress replace (S (S (S (S n))) + 4) with (n + 8) in IHn by flia.
 progress replace (S (S (S (S n))) + 5) with (n + 9) by flia.
-(**)
+progress replace (S (S (S (S n))) + 1) with (n + 5) by flia.
+rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc.
+replace (1 + 3) with 4 by easy.
+(*
+  ============================
+  fst (rank_fst_loop (n + 5) 1 (2 * 8) (n + 9)) + 4 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 9)) 1 1 (n + 9))
+*)
+replace (n + 5) with (S (n + 4)) by flia.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
-do 4 rewrite fst_if, fst_let.
-do 26 rewrite S_if.
+rewrite fst_if, fst_let.
 cbn - [ "/" "mod" "*" Nat.log2_up ].
 replace (2 * 8) with 16 by easy.
 remember (16 / (n + 9) =? 1) as sn eqn:Hsn.
@@ -2915,9 +2944,43 @@ apply Nat.eqb_neq in Hsn.
 do 8 (destruct n; [ easy | ]).
 clear Hsn.
 rewrite Nat.mod_small; [ | flia ].
+replace (S (S (S (S (S (S (S (S n))))))) + 4) with (n + 12) by flia.
+replace (2 * 16) with 32 by easy.
+replace (S (S (S (S (S (S (S (S n))))))) + 9) with (n + 17) by flia.
 progress replace (S (S (S (S (S (S (S (S n))))))) + 8) with (n + 16) in IHn
   by flia.
-progress replace (S (S (S (S (S (S (S (S n))))))) + 9) with (n + 17) by flia.
+(*
+  ============================
+  fst (rank_fst_loop (n + 12) 1 32 (n + 17)) + 5 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 17)) 1 1 (n + 17))
+*)
+(* m = 1 *)
+Theorem glop :
+  ∀ n,
+...
+  m = 4
+  fst (rank_fst_loop (n + 2 ^ m - m) 1 (2 ^ (m + 1)) (n + 2 ^ m + 1)) + m + 1 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ m + 1)) 1 1 (n + 2 ^ m + 1))
+...
+  m = 3
+  fst (rank_fst_loop (n + 2 ^ m - m) 1 (2 ^ (m + 1)) (n + 2 ^ m + 1)) + m + 1 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ m + 1)) 1 1 (n + 2 ^ m + 1))
+...
+  m = 2
+  fst (rank_fst_loop (n + 2 ^ m - m) 1 (2 ^ (m + 1)) (n + 2 ^ m + 1)) + m + 1 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ m + 1)) 1 1 (n + 2 ^ m + 1)).
+...
+...
+...
+  fst (rank_fst_loop (n + 12) 1 32 (n + 17)) + 5 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ 4 + 1)) 1 1 (n + 2 ^ 4 + 1))
+...
+  fst (rank_fst_loop (n + 5) 1 16 (n + 9)) + 4 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ 3 + 1)) 1 1 (n + 2 ^ 3 + 1))
+...
+  fst (rank_fst_loop (n + 2) 1 8 (n + 5)) + 3 =
+  fst (rank_fst_loop (2 ^ Nat.log2_up (n + 2 ^ 2 + 1)) 1 1 (n + 2 ^ 2 + 1)).
+...
 (**)
 ...
 induction n; [ easy | ].
