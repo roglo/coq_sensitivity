@@ -2879,16 +2879,23 @@ induction n; intros. {
   rewrite Nat.add_0_l; symmetry.
 Compute (map (λ m, fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1) (seq 0 13)).
 Compute (map (λ m, binary_div 20 1 (2 ^ m + 1)) (seq 0 13)).
+(*
+  ============================
+  fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1
 ...
 rank_fst_1_1_2_pow_lemma:
   ∀ it m n : nat,
     m ≤ n → 2 ^ n - m ≤ it → m + fst (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = n
 ...
+*)
 Theorem glop :
-  ∀ it n, it ≠ 0 → fst (rank_fst_loop it 1 1 (2 ^ n + 1)) = n + 1.
+  ∀ n, fst (rank_fst_loop (2 ^ S n) 1 1 (2 ^ n + 1)) = n + 1.
 Proof.
-intros * Hit.
-induction it; [ easy | clear Hit; cbn ].
+intros.
+destruct n; [ easy | ].
+cbn - [ "*" ].
+...
+destruct n; [ easy | ].
 rewrite Nat.div_small. 2: {
   apply Nat.lt_add_pos_l.
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
@@ -2900,6 +2907,8 @@ rewrite Nat.mod_small. 2: {
 cbn.
 rewrite fst_let.
 rewrite <- Nat.add_1_r; f_equal.
+destruct it. {
+  cbn.
 ...
 cbn.
 rewrite Nat.add_0_r.
