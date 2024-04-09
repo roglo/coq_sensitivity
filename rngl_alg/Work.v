@@ -2863,6 +2863,22 @@ induction n; intros. {
   cbn.
   rewrite (Nat.add_1_r (2 ^ m)).
   rewrite Nat.log2_up_succ_pow2; [ | easy ].
+Theorem glop :
+  ∀ it k a, fst (rank_fst_loop it k (2 * a) (a + 1)) = 0.
+Proof.
+intros.
+...
+    rewrite (Nat.add_1_r m).
+    rewrite Nat.pow_succ_r'.
+    rewrite <- (Nat.add_1_r (2 ^ m)).
+rewrite glop.
+...
+assert (fst (rank_fst_loop (2 ^ S m) 1 1 (S (2 ^ m))) = m + 1).
+Compute (map (λ m, fst (rank_fst_loop (2 ^ m - m) 1 (2 ^ (m + 1)) (S (2 ^ m)))) (seq 0 10)).
+Compute (map (λ m, fst (rank_fst_loop (2 ^ S m) 1 1 (S (2 ^ m)))) (seq 0 10)).
+...
+cbn.
+rewrite Nat.add_0_r.
 ...
 2 a / (a + 1)
 2 * 2 ^ m / (2 ^ m + 1)
