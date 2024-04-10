@@ -2983,6 +2983,7 @@ destruct c. {
   destruct Hc; subst b; [ easy | flia Haz Hab ].
 }
 cbn - [ "*" ].
+rewrite Nat.mod_small; [ | easy ].
 rewrite fst_if.
 cbn - [ "*" ].
 rewrite fst_let.
@@ -2996,6 +2997,20 @@ destruct it. {
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
 cbn - [ "*" ].
+(**)
+clear Hn1.
+remember (2 * a / b =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  generalize Hn1; intros Hn1v.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, _).
+  destruct c; [ easy | ].
+  cbn - [ "*" ].
+  now rewrite Hn1v.
+}
+apply Nat.eqb_neq in Hn1.
 ...
 Compute (
   let a := 2 in
