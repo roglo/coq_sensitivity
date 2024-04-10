@@ -2764,6 +2764,47 @@ cbn - [ "*" ].
 rewrite (Nat_div_less_small 1); [ easy | flia Haz ].
 Qed.
 
+Theorem fst_rank_fst_loop_2_pow_succ_lemma :
+  ∀ m n,
+  fst (rank_fst_loop n 1 (2 ^ S m) (2 ^ (m + n) + 1)) = n.
+Proof.
+intros.
+revert m.
+induction n; intros; [ easy | ].
+cbn - [ "*" "^" ].
+assert (Hmn : 2 ^ S m < 2 ^ (m + S n) + 1). {
+  rewrite <- (Nat.add_succ_comm m).
+  rewrite Nat.pow_add_r.
+  eapply le_lt_trans; [ | now apply Nat.lt_add_pos_r ].
+  apply Nat_mul_le_pos_r.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+cbn - [ "*" "^" ].
+rewrite fst_let; f_equal.
+rewrite <- (Nat.add_succ_comm m).
+rewrite <- Nat.pow_succ_r'.
+apply IHn.
+Qed.
+
+Theorem fst_rank_fst_loop_2_pow_succ :
+  ∀ n, fst (rank_fst_loop (n + 1) 1 1 (2 ^ n + 1)) = n + 1.
+Proof.
+intros.
+rewrite Nat.add_1_r.
+cbn.
+assert (Hn : 1 < 2 ^ n + 1). {
+  apply Nat.lt_add_pos_l.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat.div_small; [ | easy ].
+rewrite Nat.mod_small; [ | easy ].
+cbn.
+rewrite fst_let; f_equal.
+apply (fst_rank_fst_loop_2_pow_succ_lemma 0 n).
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -2892,7 +2933,8 @@ Theorem glop :
   ∀ n, fst (rank_fst_loop (2 ^ S n) 1 1 (2 ^ n + 1)) = n + 1.
 Proof.
 intros.
-Compute (map (λ m, fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1) (seq 0 13)).
+specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
+... ...
 ...
 destruct n; [ easy | ].
 cbn - [ "*" ].
