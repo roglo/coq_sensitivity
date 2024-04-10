@@ -2944,12 +2944,22 @@ intros.
 specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
   ∀ it a b,
-  a ≤ b
+  b ≠ 0
+  → a ≤ b
   → Nat.log2_up b ≤ it
   → fst (rank_fst_loop it 1 a b) =
     fst (rank_fst_loop (Nat.log2_up b) 1 a b).
 Proof.
-intros * Hab Hit.
+intros * Hbz Hab Hit.
+destruct (Nat.eq_dec a b) as [Heab| Heab]. {
+  subst b.
+  rewrite fst_rank_fst_loop_diag; [ | easy ].
+  now rewrite fst_rank_fst_loop_diag.
+}
+specialize (Nat_le_neq_lt _ _ Hab Heab) as H.
+clear Hab Heab.
+rename H into Hab; clear Hbz.
+move Hab after Hit.
 revert a b Hab Hit.
 induction it; intros; cbn - [ "*" ]. {
   apply Nat.le_0_r in Hit.
@@ -2961,45 +2971,32 @@ remember (a / b =? 1) as n1 eqn:Hn1.
 symmetry in Hn1.
 destruct n1. {
   apply Nat.eqb_eq in Hn1.
-  apply Nat_eq_div_1 in Hn1; cbn.
-  destruct Hn1 as (Hba, Ha2b).
-  apply Nat.le_antisymm in Hba; [ subst b | easy ].
-  symmetry.
-  apply fst_rank_fst_loop_diag.
-  now intros H; subst a.
+  now rewrite Nat.div_small in Hn1.
 }
 rewrite fst_let.
 apply Nat.eqb_neq in Hn1.
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
-  subst b.
-  apply Nat.le_0_r in Hab; subst a.
-  cbn in Hn1 |-*.
-...
-  destruct b. {
-    cbn in Hn1.
-    cbn.
-  rewrite Nat.div_same in Hn1; [ easy | ].
-...
-rewrite Nat.mod_small. 2: {
-  apply Nat_le_neq_lt; [ easy | ].
-  intros H; subst b.
-  rewrite Nat.div_same in Hn1; [ easy | ].
-  intros H; subst a.
+rewrite Nat.mod_small; [ | easy ].
+remember (Nat.log2_up b) as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply Nat.log2_up_null in Hc.
+  destruct b; [ easy | ].
+  destruct b; [ | flia Hc ].
+  apply Nat.lt_1_r in Hab; subst a.
   cbn in Hn1.
+(* ah bin non ça marche pas, revoir les hypothèses *)
 ...
-rewrite Nat.mod_1_l. 2: {
-  destruct n; [ easy | ].
-  destruct n; [ easy | flia ].
-}
-rewrite Nat.mul_1_r.
-Search rank_fst_loop.
+Compute (
+  let a := 0 in
+  map (λ b, let it := Nat.log2_up b + 5 in
+  fst (rank_fst_loop it 1 a b) =
+  fst (rank_fst_loop (Nat.log2_up b) 1 a b)) (seq 0 40)).
+...
 Compute (
   let a := 9 in
   map (λ n, let it := Nat.log2_up n + 7 in
   fst (rank_fst_loop it 1 a n) =
   fst (rank_fst_loop (Nat.log2_up n) 1 a n)) (seq a 40)).
-...
-... ...
 ...
 destruct n; [ easy | ].
 cbn - [ "*" ].
