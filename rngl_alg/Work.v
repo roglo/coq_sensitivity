@@ -2944,28 +2944,28 @@ intros.
 specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
   ∀ it a b,
-  b ≠ 0
-  → a ≤ b
+  0 < a ≤ b
   → Nat.log2_up b ≤ it
   → fst (rank_fst_loop it 1 a b) =
     fst (rank_fst_loop (Nat.log2_up b) 1 a b).
 Proof.
-intros * Hbz Hab Hit.
+intros * (Haz, Hab) Hit.
 destruct (Nat.eq_dec a b) as [Heab| Heab]. {
   subst b.
+  apply Nat.neq_0_lt_0 in Haz.
   rewrite fst_rank_fst_loop_diag; [ | easy ].
   now rewrite fst_rank_fst_loop_diag.
 }
 specialize (Nat_le_neq_lt _ _ Hab Heab) as H.
 clear Hab Heab.
-rename H into Hab; clear Hbz.
+rename H into Hab.
 move Hab after Hit.
-revert a b Hab Hit.
+revert a b Haz Hab Hit.
 induction it; intros; cbn - [ "*" ]. {
   apply Nat.le_0_r in Hit.
   apply Nat.log2_up_null in Hit.
   apply Nat.le_1_r in Hit.
-  now destruct Hit; subst b.
+  flia Haz Hab Hit.
 }
 remember (a / b =? 1) as n1 eqn:Hn1.
 symmetry in Hn1.
@@ -2974,23 +2974,34 @@ destruct n1. {
   now rewrite Nat.div_small in Hn1.
 }
 rewrite fst_let.
-apply Nat.eqb_neq in Hn1.
 rewrite Nat.mod_small; [ | easy ].
 remember (Nat.log2_up b) as c eqn:Hc.
 symmetry in Hc.
 destruct c. {
   apply Nat.log2_up_null in Hc.
-  destruct b; [ easy | ].
-  destruct b; [ | flia Hc ].
-  apply Nat.lt_1_r in Hab; subst a.
-  cbn in Hn1.
-(* ah bin non ça marche pas, revoir les hypothèses *)
+  apply Nat.le_1_r in Hc.
+  destruct Hc; subst b; [ easy | flia Haz Hab ].
+}
+cbn - [ "*" ].
+rewrite fst_if.
+cbn - [ "*" ].
+rewrite fst_let.
+rewrite Hn1.
+apply Nat.eqb_neq in Hn1.
+f_equal.
+apply Nat.succ_le_mono in Hit.
+destruct it. {
+  now apply Nat.le_0_r in Hit; subst c.
+}
+cbn - [ "*" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" ].
 ...
 Compute (
-  let a := 0 in
-  map (λ b, let it := Nat.log2_up b + 5 in
+  let a := 2 in
+  map (λ b, let it := Nat.log2_up b + 3 in
   fst (rank_fst_loop it 1 a b) =
-  fst (rank_fst_loop (Nat.log2_up b) 1 a b)) (seq 0 40)).
+  fst (rank_fst_loop (Nat.log2_up b) 1 a b)) (seq 1 40)).
 ...
 Compute (
   let a := 9 in
