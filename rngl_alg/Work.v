@@ -3115,16 +3115,87 @@ replace (2 * 2) with 4 by easy.
 remember (2 * ((4 * a) mod b) / b =? 1) as n4 eqn:Hn4.
 symmetry in Hn4.
 destruct n4. {
+  specialize Nat.log2_log2_up_spec as H1.
+  assert (H : 0 < b) by flia Hb3.
+  specialize (H1 _ H); clear H.
+  rewrite Hc in H1.
+  destruct c; [ cbn in H1; flia Hb3 H1 | ].
   destruct c. {
     exfalso.
+    cbn in H1.
+    destruct (Nat.eq_dec b 3) as [Hb3'| Hb3']. {
+      subst b.
+      clear it IHit Hc Hit H1 Hb3 Hn1.
+      destruct a; [ easy | clear Haz ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      flia Hab.
+    }
+    destruct (Nat.eq_dec b 4) as [Hb4| Hb4]. {
+      subst b.
+      now rewrite (Nat.mul_comm 4), Nat.mod_mul in Hn4.
+    }
+    flia Hb3 H1 Hb3' Hb4.
+  }
+  cbn - [ "*" ].
+  apply Nat.eqb_neq in Hn2; rewrite Hn2, Hn3.
+  do 2 rewrite fst_let.
+  destruct c; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let, S_if, S_if.
+  cbn - [ "*" ].
+  rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
+  rewrite Nat.mul_assoc.
+  replace (2 * 2) with 4 by easy.
+  now rewrite Hn4.
+}
+destruct it. {
+  cbn - [ "*" ].
+  destruct c. {
+    exfalso.
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
     specialize Nat.log2_log2_up_spec as H1.
-    assert (H : 0 < b) by flia Hb3.
+    assert (H : 0 < b) by flia Haz Hab.
     specialize (H1 _ H); clear H.
     rewrite Hc in H1.
-    cbn in H1.
     flia Hb3 H1.
   }
   destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S (S (S b))))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+  destruct c. {
+...
+  destruct c; [ | flia Hit ].
+  cbn - [ "*" ].
+  apply Nat.eqb_neq in Hn2; rewrite Hn2.
+  rewrite fst_let, fst_if, S_if.
+  now rewrite Hn3.
+}
+cbn - [ "*" ].
 ...
 cbn - [ "*" ].
 rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
