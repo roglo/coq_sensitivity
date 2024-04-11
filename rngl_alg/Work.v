@@ -2943,6 +2943,86 @@ Proof.
 intros.
 specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
+  ∀ it1 it2 a b,
+  0 < a ≤ b
+  → Nat.log2_up b ≤ it1
+  → Nat.log2_up b ≤ it2
+  → fst (rank_fst_loop it1 1 a b) =
+    fst (rank_fst_loop it2 1 a b).
+Proof.
+intros * Hzab Hit1 Hit2.
+destruct (Nat.eq_dec a b) as [Heab| Heab]. {
+  subst b.
+  rewrite fst_rank_fst_loop_diag; [ | flia Hzab ].
+  rewrite fst_rank_fst_loop_diag; [ | flia Hzab ].
+  easy.
+}
+assert (H : 0 < a < b) by flia Hzab Heab.
+clear Hzab Heab.
+rename H into Hzab.
+move Hzab after Hit1.
+revert a b it2 Hzab Hit1 Hit2.
+induction it1; intros. {
+  apply Nat.le_0_r in Hit1.
+  apply Nat.log2_up_null in Hit1.
+  flia Hzab Hit1.
+}
+cbn - [ "*" ].
+remember (a / b =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  now rewrite Nat.div_small in Hn1.
+}
+rewrite fst_let.
+rewrite Nat.mod_small; [ | easy ].
+remember (Nat.log2_up b) as c eqn:Hc.
+symmetry in Hc.
+destruct it2. {
+  apply Nat.le_0_r in Hit2; subst c.
+  apply Nat.log2_up_null in Hit2.
+  flia Hzab Hit2.
+}
+cbn - [ "*" ].
+rewrite Hn1.
+rewrite fst_let.
+rewrite Nat.mod_small; [ | easy ].
+f_equal.
+destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
+  destruct (Nat.eq_dec c (S it1)) as [Hc1| Hc1]. 2: {
+    destruct (Nat.eq_dec c (S it2)) as [Hc2| Hc2]. 2: {
+      apply IHit1; [ flia Hzab Htab | flia Hc Hit1 Hc1 | flia Hc Hit2 Hc2 ].
+    }
+    move Hc2 at top; subst c.
+    clear Hit2.
+    apply Nat.succ_le_mono in Hit1.
+    apply -> Nat.succ_inj_wd_neg in Hc1.
+    assert (H : it2 < it1) by flia Hit1 Hc1.
+    clear Hit1 Hc1.
+    rename H into H21.
+    remember (it1 - it2) as n eqn:Hn.
+    assert (it1 = it2 + n) by flia Hn H21.
+    subst it1; rename it2 into it.
+    assert (Hnz : n ≠ 0) by flia H21; clear H21.
+    clear Hn IHit1 Hn1.
+...
+    specialize (IHit1 a b (S it2) Hzab) as H1.
+    rewrite Hc in H1.
+    assert (H : S it2 ≤ it1) by flia Hit1 Hc1.
+    specialize (H1 H (le_refl _)); clear H.
+    cbn - [ "*" ] in H1.
+    rewrite Nat.mod_small in H1; [ | easy ].
+    rewrite Hn1 in H1.
+    rewrite fst_let in H1.
+...
+    apply Nat.succ_inj.
+    rewrite <- H1.
+...
+    destruct it1; [ flia Hit1 Hc1 | ].
+    cbn - [ "*" ].
+    rewrite Hn1, fst_let.
+...
+Theorem glop :
   ∀ it a b,
   0 < a ≤ b
   → Nat.log2_up b ≤ it
