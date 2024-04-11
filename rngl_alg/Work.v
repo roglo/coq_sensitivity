@@ -3112,10 +3112,28 @@ cbn - [ "*" ].
 rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
 rewrite fst_if, fst_let, S_if, S_if.
 cbn - [ "*" ].
-...
-remember (2 * ((2 * a) mod b) / b =? 1) as n3 eqn:Hn3.
-symmetry in Hn3.
-destruct n3. {
+rewrite Nat.mul_assoc.
+replace (2 * 2) with 4 by easy.
+remember (2 * ((4 * a) mod b) / b =? 1) as n4 eqn:Hn4.
+symmetry in Hn4.
+destruct n4. {
+  destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+(* peut-être il faudrait mettre le code ci-dessus plus haut,
+   puisqu'il n'arrête pas de se répéter *)
   destruct c. {
 ...
 cbn - [ "*" ].
