@@ -3108,6 +3108,15 @@ destruct it. {
   rewrite fst_let, fst_if, S_if.
   now rewrite Hn3.
 }
+cbn - [ "*" ].
+rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
+rewrite fst_if, fst_let, S_if, S_if.
+cbn - [ "*" ].
+...
+remember (2 * ((2 * a) mod b) / b =? 1) as n3 eqn:Hn3.
+symmetry in Hn3.
+destruct n3. {
+  destruct c. {
 ...
 cbn - [ "*" ].
 rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
