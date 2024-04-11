@@ -2987,30 +2987,141 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite fst_if.
 cbn - [ "*" ].
 rewrite fst_let.
-rewrite Hn1.
-apply Nat.eqb_neq in Hn1.
-f_equal.
+rewrite Hn1; f_equal.
 apply Nat.succ_le_mono in Hit.
-destruct it. {
-  now apply Nat.le_0_r in Hit; subst c.
-}
+destruct it; [ now apply Nat.le_0_r in Hit; subst c | ].
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
 cbn - [ "*" ].
 (**)
-clear Hn1.
-remember (2 * a / b =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  generalize Hn1; intros Hn1v.
-  apply Nat.eqb_eq in Hn1.
-  apply Nat_eq_div_1 in Hn1.
-  destruct Hn1 as (Hn1, _).
+apply Nat.eqb_neq in Hn1.
+remember (2 * a / b =? 1) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. {
+  generalize Hn2; intros Hn2v.
+  apply Nat.eqb_eq in Hn2.
+  apply Nat_eq_div_1 in Hn2.
+  destruct Hn2 as (Hn2, _).
   destruct c; [ easy | ].
   cbn - [ "*" ].
-  now rewrite Hn1v.
+  now rewrite Hn2v.
 }
-apply Nat.eqb_neq in Hn1.
+apply Nat.eqb_neq in Hn2.
+destruct it. {
+  cbn - [ "*" ].
+  destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+  destruct c; [ | flia Hit ].
+  cbn - [ "*" ].
+  now apply Nat.eqb_neq in Hn2; rewrite Hn2.
+}
+cbn - [ "*" ].
+rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
+rewrite fst_if, fst_let, S_if.
+cbn - [ "*" ].
+remember (2 * ((2 * a) mod b) / b =? 1) as n3 eqn:Hn3.
+symmetry in Hn3.
+destruct n3. {
+  destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if.
+  apply Nat.eqb_neq in Hn2; rewrite Hn2.
+  rewrite fst_let.
+  destruct c; [ easy | ].
+  do 2 apply Nat.succ_le_mono in Hit.
+  cbn - [ "*" ].
+  now rewrite Hn3.
+}
+destruct it. {
+  cbn - [ "*" ].
+  destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+  destruct c. {
+    exfalso.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    destruct b. {
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | ].
+      destruct a; [ easy | flia Hab ].
+    }
+    apply (f_equal (λ i, 2 ^ i)) in Hc.
+    cbn - [ Nat.log2_up ] in Hc.
+    specialize Nat.log2_log2_up_spec as H1.
+    specialize (H1 (S (S (S (S (S b))))) (Nat.lt_0_succ _)).
+    rewrite Hc in H1.
+    flia H1.
+  }
+  destruct c; [ | flia Hit ].
+  cbn - [ "*" ].
+  apply Nat.eqb_neq in Hn2; rewrite Hn2.
+  rewrite fst_let, fst_if, S_if.
+  now rewrite Hn3.
+}
+...
+cbn - [ "*" ].
+rewrite Nat.mul_mod_idemp_r; [ | flia Hab ].
+rewrite fst_if, fst_let, S_if.
+cbn - [ "*" ].
+remember (2 * ((2 * a) mod b) / b =? 1) as n3 eqn:Hn3.
+symmetry in Hn3.
+destruct n3. {
+...
+rewrite Nat.div_small. 2: {
+  apply (le_lt_trans _ (2 * (2 * a))). {
+    apply Nat.mul_le_mono_l.
+    apply Nat.mod_le; flia Hab.
+  }
 ...
 Compute (
   let a := 2 in
