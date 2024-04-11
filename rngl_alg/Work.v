@@ -3188,6 +3188,25 @@ destruct it. {
     flia H1.
   }
   destruct c. {
+    exfalso.
+    clear Hit.
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct b; [ easy | clear Hb3 ].
+    destruct b; [ easy | ].
+    destruct b; [ easy | ].
+    destruct a; [ easy | clear Haz ].
+    destruct a. {
+      clear Hab Hn1 Hn2 Hn3.
+      rewrite Nat.mod_small in Hn4; [ | flia ].
+      destruct b; [ easy | ].
+      destruct b; [ easy | ].
+      destruct b; [ easy | ].
+      destruct b; [ easy | ].
+      rewrite Nat.div_small in Hn4; [ clear Hn4 | flia ].
+Search (Nat.log2_up (S _)).
+      destruct b; [ easy | ].
+      destruct b; [ easy | ].
 ...
   destruct c; [ | flia Hit ].
   cbn - [ "*" ].
