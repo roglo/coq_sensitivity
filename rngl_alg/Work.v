@@ -2994,6 +2994,19 @@ cbn - [ "*" ].
 rewrite fst_if, fst_let.
 cbn - [ "*" ].
 (**)
+destruct (lt_dec b 3) as [Hb3| Hb3]. {
+  destruct b; [ easy | ].
+  destruct b; [ easy | ].
+  destruct b. {
+    destruct a; [ easy | ].
+    destruct a; [ | flia Hab ].
+    rewrite Nat.mul_1_r.
+    rewrite Nat.div_same; [ | easy ].
+    now destruct c.
+  }
+  flia Hb3.
+}
+apply Nat.nlt_ge in Hb3.
 apply Nat.eqb_neq in Hn1.
 remember (2 * a / b =? 1) as n2 eqn:Hn2.
 symmetry in Hn2.
@@ -3011,18 +3024,13 @@ destruct it. {
   cbn - [ "*" ].
   destruct c. {
     exfalso.
-    destruct b; [ easy | ].
-    destruct b; [ easy | ].
-    destruct b. {
-      destruct a; [ easy | ].
-      destruct a; [ easy | flia Hab ].
-    }
     apply (f_equal (λ i, 2 ^ i)) in Hc.
     cbn - [ Nat.log2_up ] in Hc.
     specialize Nat.log2_log2_up_spec as H1.
-    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    assert (H : 0 < b) by flia Haz Hab.
+    specialize (H1 _ H); clear H.
     rewrite Hc in H1.
-    flia H1.
+    flia Hb3 H1.
   }
   destruct c; [ | flia Hit ].
   cbn - [ "*" ].
@@ -3037,18 +3045,13 @@ symmetry in Hn3.
 destruct n3. {
   destruct c. {
     exfalso.
-    destruct b; [ easy | ].
-    destruct b; [ easy | ].
-    destruct b. {
-      destruct a; [ easy | ].
-      destruct a; [ easy | flia Hab ].
-    }
     apply (f_equal (λ i, 2 ^ i)) in Hc.
     cbn - [ Nat.log2_up ] in Hc.
     specialize Nat.log2_log2_up_spec as H1.
-    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    assert (H : 0 < b) by flia Haz Hab.
+    specialize (H1 _ H); clear H.
     rewrite Hc in H1.
-    flia H1.
+    flia Hb3 H1.
   }
   cbn - [ "*" ].
   rewrite fst_if.
@@ -3063,18 +3066,13 @@ destruct it. {
   cbn - [ "*" ].
   destruct c. {
     exfalso.
-    destruct b; [ easy | ].
-    destruct b; [ easy | ].
-    destruct b. {
-      destruct a; [ easy | ].
-      destruct a; [ easy | flia Hab ].
-    }
     apply (f_equal (λ i, 2 ^ i)) in Hc.
     cbn - [ Nat.log2_up ] in Hc.
     specialize Nat.log2_log2_up_spec as H1.
-    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    assert (H : 0 < b) by flia Haz Hab.
+    specialize (H1 _ H); clear H.
     rewrite Hc in H1.
-    flia H1.
+    flia Hb3 H1.
   }
   destruct c. {
     exfalso.
@@ -3119,21 +3117,13 @@ symmetry in Hn4.
 destruct n4. {
   destruct c. {
     exfalso.
-    destruct b; [ easy | ].
-    destruct b; [ easy | ].
-    destruct b. {
-      destruct a; [ easy | ].
-      destruct a; [ easy | flia Hab ].
-    }
-    apply (f_equal (λ i, 2 ^ i)) in Hc.
-    cbn - [ Nat.log2_up ] in Hc.
     specialize Nat.log2_log2_up_spec as H1.
-    specialize (H1 (S (S (S b))) (Nat.lt_0_succ _)).
+    assert (H : 0 < b) by flia Hb3.
+    specialize (H1 _ H); clear H.
     rewrite Hc in H1.
-    flia H1.
+    cbn in H1.
+    flia Hb3 H1.
   }
-(* peut-être il faudrait mettre le code ci-dessus plus haut,
-   puisqu'il n'arrête pas de se répéter *)
   destruct c. {
 ...
 cbn - [ "*" ].
