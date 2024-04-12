@@ -3124,13 +3124,23 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     rewrite fst_let.
     rewrite Nat.mod_small; [ | easy ].
     specialize fst_rank_fst_loop_eq_succ as H1.
-    symmetry.
     rewrite (H1 it (2 * a)); cycle 1. {
       apply Nat.neq_mul_0.
       split; [ easy | flia Hzab ].
     } {
       split; [ easy | now subst b ].
     }
+    f_equal.
+    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+      now subst n; rewrite Nat.add_0_r.
+    }
+    apply IHn; [ easy | | | easy | easy ]. {
+      split; [ | easy ].
+      now apply Nat.mul_pos_pos.
+    } {
+...
+      apply Nat.eqb_neq in Hab.
+      apply Nat_neq_div_1 in Hab.
 ...
   rewrite Nat.add_0_r.
   symmetry.
