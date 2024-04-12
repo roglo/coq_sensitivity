@@ -2816,7 +2816,7 @@ Qed.
 Theorem fst_rank_fst_loop_eq_succ_lemma :
   ∀ it a b n,
   a ≠ 0
-  → b = n + it
+  → Nat.log2_up b = n + it
   → 2 ^ n * a < b
   → fst (rank_fst_loop it 1 (2 ^ n * a) b) =
     S (fst (rank_fst_loop it 1 (2 ^ S n * a) b)).
@@ -2827,11 +2827,14 @@ induction it; intros. {
   exfalso.
   apply Nat.nle_gt in Hab.
   apply Hab; clear Hab.
-  rewrite Nat.add_0_r in Hb; subst b.
+  rewrite Nat.add_0_r in Hb.
   destruct a; [ easy | ].
+  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
   rewrite Nat.mul_succ_r.
   apply (le_trans _ (2 ^ n)); [ | apply Nat_le_add_l ].
-  now apply Nat.lt_le_incl, Nat.pow_gt_lin_r.
+  subst n.
+  apply Nat.log2_log2_up_spec.
+  now apply Nat.neq_0_lt_0.
 }
 cbn - [ "*" ].
 remember (2 ^ n * a / b =? 1) as ab eqn:H.
@@ -2872,19 +2875,21 @@ Qed.
 
 Theorem fst_rank_fst_loop_eq_succ :
   ∀ it a b,
-  a ≠ 0
-  → a < b ≤ it
+  0 < a < b
+  → Nat.log2_up b ≤ it
   → fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b)).
 Proof.
-intros * Haz Hit.
-revert a Haz Hit.
-induction it; intros; [ flia Hit | ].
+intros * Hzab Hit.
+revert a Hzab.
+induction it; intros. {
+  apply Nat.le_0_r in Hit.
+  apply Nat.log2_up_null in Hit.
+  flia Hit Hzab.
+}
 cbn - [ "*" ].
 remember (a / b =? 1) as ab eqn:Hab.
 symmetry in Hab.
-destruct ab. {
-  now rewrite Nat.div_small in Hab.
-}
+destruct ab; [ now rewrite Nat.div_small in Hab | ].
 rewrite fst_let; f_equal.
 remember (2 * a / b =? 1) as ab2 eqn:Hab2.
 symmetry in Hab2.
@@ -2904,15 +2909,16 @@ destruct Hab2 as [Hab2| Hab2]. {
   now apply Nat.nlt_ge in Hab2.
 }
 rewrite Nat.mod_small; [ | easy ].
-destruct (Nat.eq_dec b (S it)) as [Hbs| Hbs]. 2: {
-  apply IHit; [ flia Haz | ].
-  split; [ easy | ].
-  flia Hit Hbs.
+destruct (Nat.eq_dec (Nat.log2_up b) (S it)) as [Hbs| Hbs]. 2: {
+  apply IHit; [ flia Hit Hbs | ].
+  split; [ | easy ].
+  now apply Nat.mul_pos_pos.
 }
 rewrite Nat.mul_assoc.
-specialize (fst_rank_fst_loop_eq_succ_lemma it a b 1 Haz Hbs) as H1.
+specialize (fst_rank_fst_loop_eq_succ_lemma it a b 1) as H1.
+assert (H : a ≠ 0) by flia Hzab.
+specialize (H1 H Hbs Hab2); clear H.
 rewrite Nat.pow_1_r in H1.
-specialize (H1 Hab2).
 apply H1.
 Qed.
 
@@ -3050,8 +3056,8 @@ specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
   ∀ it1 it2 a b,
   0 < a ≤ b
-  → b < it1
-  → b < it2
+  → Nat.log2_up b < it1
+  → Nat.log2_up b < it2
   → fst (rank_fst_loop it1 1 a b) =
     fst (rank_fst_loop it2 1 a b).
 Proof.
@@ -3084,24 +3090,15 @@ rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
 f_equal.
 destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
-  destruct (Nat.eq_dec b it1) as [Hc1| Hc1]. 2: {
-    destruct (Nat.eq_dec b it2) as [Hc2| Hc2]. 2: {
+  destruct (Nat.eq_dec (Nat.log2_up b) it1) as [Hc1| Hc1]. 2: {
+    destruct (Nat.eq_dec (Nat.log2_up b) it2) as [Hc2| Hc2]. 2: {
       apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
-(*
-    move Hc2 at top; subst b.
-    clear Hit2.
-    apply Nat.succ_le_mono in Hit1.
-    apply -> Nat.succ_inj_wd_neg in Hc1.
-    assert (H : it2 < it1) by flia Hit1 Hc1.
-    clear Hit1 Hc1.
-    rename H into H21.
-*)
     remember (it1 - it2) as n eqn:Hn.
     assert (it1 = it2 + n). {
       symmetry.
       apply Nat_sub_add_eq_l; [ | easy ].
-      subst b.
+      subst it2.
       now apply Nat.succ_le_mono in Hit1.
     }
     subst it1; rename it2 into it.
@@ -3125,10 +3122,10 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     rewrite Nat.mod_small; [ | easy ].
     specialize fst_rank_fst_loop_eq_succ as H1.
     rewrite (H1 it (2 * a)); cycle 1. {
-      apply Nat.neq_mul_0.
-      split; [ easy | flia Hzab ].
+      split; [ | easy ].
+      now apply Nat.mul_pos_pos.
     } {
-      split; [ easy | now subst b ].
+      now rewrite Hc2.
     }
     f_equal.
     destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
