@@ -3158,6 +3158,33 @@ destruct n. {
   symmetry in Hab2.
   destruct ab2. {
     cbn - [ "*" ].
+    destruct it; [ easy | ].
+    cbn - [ "*" ].
+    now rewrite Hab2.
+  }
+  rewrite fst_let.
+  symmetry.
+  rewrite H1; cycle 1. {
+    apply Nat.eqb_neq in Hab2.
+    apply Nat_neq_div_1 in Hab2.
+    split. {
+      apply Nat.mul_pos_pos; [ easy | ].
+      now apply Nat.mul_pos_pos.
+    }
+    destruct Hab2 as [Hab2| Hab2]; [ | easy ].
+    apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
+    now apply Nat.nlt_ge in Hab2.
+  } {
+    now rewrite Hc2.
+  }
+  f_equal.
+  rewrite Nat.mod_small; [ easy | ].
+  apply Nat.eqb_neq in Hab2.
+  apply Nat_neq_div_1 in Hab2.
+  destruct Hab2 as [Hab2| Hab2]; [ | easy ].
+  apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
+  now apply Nat.nlt_ge in Hab2.
+}
 ...
     apply IHn; [ easy | | | easy ]. {
       split; [ | easy ].
