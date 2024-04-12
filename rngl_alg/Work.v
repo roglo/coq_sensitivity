@@ -2940,10 +2940,10 @@ progress unfold seq_angle_to_div_nat.
      (2^bn-1)/n=1..1=an/2
      2^bn*(1/n)*2+1=an
      an=2^bn/n+1
-*)
 Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 Print inv_ub_num.
 Print inv_ub_den_2_pow.
+*)
 Theorem rank_fst_1_log2_up :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
@@ -3029,8 +3029,10 @@ induction n; intros. {
   rewrite <- (Nat.add_1_r (2 ^ m)).
   rewrite fst_rank_fst_loop_1_mul_2_add_1; [ | now apply Nat.pow_nonzero ].
   rewrite Nat.add_0_l; symmetry.
+(*
 Compute (map (λ m, fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1) (seq 0 13)).
 Compute (map (λ m, binary_div 20 1 (2 ^ m + 1)) (seq 0 13)).
+*)
 (*
   ============================
   fst (rank_fst_loop (2 * 2 ^ m) 1 1 (2 ^ m + 1)) = m + 1
