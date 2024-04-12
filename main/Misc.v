@@ -258,6 +258,24 @@ apply Nat.leb_gt.
 now apply Nat.add_lt_mono_l.
 Qed.
 
+Theorem Nat_sub_add_eq_l :
+  ∀ n m p, m ≤ n → n - m = p → m + p = n.
+Proof.
+intros * Hmn Hnmp.
+subst p.
+rewrite Nat.add_sub_assoc; [ | easy ].
+rewrite Nat.add_comm.
+apply Nat.add_sub.
+Qed.
+
+Theorem Nat_sub_add_eq_r :
+  ∀ n m p, p ≤ n → n - p = m → m + p = n.
+Proof.
+intros * Hpn Hnpm.
+rewrite Nat.add_comm.
+now apply Nat_sub_add_eq_l.
+Qed.
+
 Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
 Proof.
 intros.
@@ -2553,7 +2571,6 @@ now cbn; f_equal.
 Qed.
 
 (* App : a notation for iterating concatenation of a list of lists *)
-
 
 Notation "'App' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, c ++ g) [])

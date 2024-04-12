@@ -3048,8 +3048,8 @@ specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
   ∀ it1 it2 a b,
   0 < a ≤ b
-  → Nat.log2_up b ≤ it1
-  → Nat.log2_up b ≤ it2
+  → b ≤ it1
+  → b ≤ it2
   → fst (rank_fst_loop it1 1 a b) =
     fst (rank_fst_loop it2 1 a b).
 Proof.
@@ -3067,8 +3067,7 @@ move Hzab after Hit1.
 revert a b it2 Hzab Hit1 Hit2.
 induction it1; intros. {
   apply Nat.le_0_r in Hit1.
-  apply Nat.log2_up_null in Hit1.
-  flia Hzab Hit1.
+  now subst b.
 }
 cbn - [ "*" ].
 remember (a / b =? 1) as n1 eqn:Hn1.
@@ -3079,12 +3078,9 @@ destruct n1. {
 }
 rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
-remember (Nat.log2_up b) as c eqn:Hc.
-symmetry in Hc.
 destruct it2. {
-  apply Nat.le_0_r in Hit2; subst c.
-  apply Nat.log2_up_null in Hit2.
-  flia Hzab Hit2.
+  apply Nat.le_0_r in Hit2.
+  now subst b.
 }
 cbn - [ "*" ].
 rewrite Hn1.
@@ -3092,19 +3088,38 @@ rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
 f_equal.
 destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
-  destruct (Nat.eq_dec c (S it1)) as [Hc1| Hc1]. 2: {
-    destruct (Nat.eq_dec c (S it2)) as [Hc2| Hc2]. 2: {
-      apply IHit1; [ flia Hzab Htab | flia Hc Hit1 Hc1 | flia Hc Hit2 Hc2 ].
+  destruct (Nat.eq_dec b (S it1)) as [Hc1| Hc1]. 2: {
+    destruct (Nat.eq_dec b (S it2)) as [Hc2| Hc2]. 2: {
+      apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
-    move Hc2 at top; subst c.
+(*
+    move Hc2 at top; subst b.
     clear Hit2.
     apply Nat.succ_le_mono in Hit1.
     apply -> Nat.succ_inj_wd_neg in Hc1.
     assert (H : it2 < it1) by flia Hit1 Hc1.
     clear Hit1 Hc1.
     rename H into H21.
+*)
     remember (it1 - it2) as n eqn:Hn.
-    assert (it1 = it2 + n) by flia Hn H21.
+    assert (it1 = it2 + n). {
+...
+symmetry.
+apply Nat_sub_add_eq_l; [ | easy ].
+subst b.
+now apply Nat.succ_le_mono in Hit1.
+}
+...
+symmetry.
+apply Nat_sub_add_eq_r.
+...
+
+Search (_ - _ = _).
+Search (_ = _ - _)%L.
+symmetry.
+apply Nat.add_sub_eq_r.
+...
+    assert (it1 = it2 + n) by flia Hn Hc2.
     subst it1; rename it2 into it.
     assert (Hnz : n ≠ 0) by flia H21; clear H21.
     clear Hn IHit1 Hn1.
