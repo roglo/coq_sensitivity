@@ -3092,6 +3092,8 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct (Nat.eq_dec b (S it2)) as [Hc2| Hc2]. 2: {
       apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
+...
+    specialize fst_rank_fst_loop_eq_succ as H1.
 (*
     move Hc2 at top; subst b.
     clear Hit2.
@@ -3103,40 +3105,42 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
 *)
     remember (it1 - it2) as n eqn:Hn.
     assert (it1 = it2 + n). {
-...
-symmetry.
-apply Nat_sub_add_eq_l; [ | easy ].
-subst b.
-now apply Nat.succ_le_mono in Hit1.
-}
-...
-symmetry.
-apply Nat_sub_add_eq_r.
-...
-
-Search (_ - _ = _).
-Search (_ = _ - _)%L.
-symmetry.
-apply Nat.add_sub_eq_r.
-...
-    assert (it1 = it2 + n) by flia Hn Hc2.
+      symmetry.
+      apply Nat_sub_add_eq_l; [ | easy ].
+      subst b.
+      now apply Nat.succ_le_mono in Hit1.
+    }
     subst it1; rename it2 into it.
-    assert (Hnz : n ≠ 0) by flia H21; clear H21.
-    clear Hn IHit1 Hn1.
-revert it Hc.
-revert a Hzab Htab.
-induction n; intros; [ easy | clear Hnz ].
-rewrite Nat.add_succ_r.
-cbn - [ "*" ].
-remember (2 * a / b =? 1) as ab eqn:Hab.
-symmetry in Hab.
-destruct ab. {
-  apply Nat.eqb_eq in Hab.
-  now rewrite Nat.div_small in Hab.
-}
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-destruct n. {
+    assert (Hnz : n ≠ 0). {
+      intros H; subst n.
+      now rewrite Nat.add_0_r in Hc1.
+    }
+    clear Hn IHit1 Hit1 Hn1 Hc1.
+    revert it Hit2 Hc2.
+    revert a Hzab Htab.
+    induction n; intros; [ easy | clear Hnz ].
+    rewrite Nat.add_succ_r.
+    cbn - [ "*" ].
+    remember (2 * a / b =? 1) as ab eqn:Hab.
+    symmetry in Hab.
+    destruct ab. {
+      apply Nat.eqb_eq in Hab.
+      now rewrite Nat.div_small in Hab.
+    }
+    rewrite fst_let.
+    rewrite Nat.mod_small; [ | easy ].
+(**)
+Check fst_rank_fst_loop_eq_succ.
+...
+    specialize fst_rank_fst_loop_eq_succ as H1.
+    symmetry.
+    rewrite (H1 it (2 * a)); cycle 1. {
+      apply Nat.neq_mul_0.
+      split; [ easy | flia Hzab ].
+    } {
+      split; [ easy | ].
+...
+    destruct n. {
   rewrite Nat.add_0_r.
   symmetry.
   apply fst_rank_fst_loop_eq_succ. {
