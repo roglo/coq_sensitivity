@@ -2813,6 +2813,109 @@ destruct it; [ easy | cbn ].
 now rewrite Nat.div_same.
 Qed.
 
+Theorem fst_rank_fst_loop_eq_succ_lemma :
+  ∀ it a b n,
+  a ≠ 0
+  → b = n + it
+  → 2 ^ n * a < b
+  → fst (rank_fst_loop it 1 (2 ^ n * a) b) =
+    S (fst (rank_fst_loop it 1 (2 ^ S n * a) b)).
+Proof.
+intros * Haz Hb Hab.
+revert a b n Haz Hb Hab.
+induction it; intros. {
+  exfalso.
+  apply Nat.nle_gt in Hab.
+  apply Hab; clear Hab.
+  rewrite Nat.add_0_r in Hb; subst b.
+  destruct a; [ easy | ].
+  rewrite Nat.mul_succ_r.
+  apply (le_trans _ (2 ^ n)); [ | apply Nat_le_add_l ].
+  now apply Nat.lt_le_incl, Nat.pow_gt_lin_r.
+}
+cbn - [ "*" ].
+remember (2 ^ n * a / b =? 1) as ab eqn:H.
+symmetry in H.
+destruct ab. {
+  apply Nat.eqb_eq in H.
+  apply Nat_eq_div_1 in H.
+  destruct H as (H, _).
+  now apply Nat.nlt_ge in H.
+}
+clear H.
+rewrite fst_let, fst_if.
+f_equal.
+cbn - [ "*" ].
+rewrite fst_let.
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mul_assoc.
+remember (2 * 2 ^ n * a / b =? 1) as abs eqn:Habs.
+symmetry in Habs.
+destruct abs. {
+  destruct it; [ easy | ].
+  cbn - [ "*" ].
+  now rewrite Habs.
+}
+apply Nat.eqb_neq in Habs.
+apply Nat_neq_div_1 in Habs.
+destruct Habs as [Habs| Habs]. {
+  rewrite <- Nat.mul_assoc in Habs.
+  apply Nat.mul_le_mono_pos_l in Habs; [ | easy ].
+  now apply Nat.nlt_ge in Habs.
+}
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mul_assoc.
+rewrite <- Nat.add_succ_comm in Hb.
+rewrite <- Nat.pow_succ_r' in Habs |-*.
+now apply IHit.
+Qed.
+
+Theorem fst_rank_fst_loop_eq_succ :
+  ∀ it a b,
+  a ≠ 0
+  → a < b ≤ it
+  → fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b)).
+Proof.
+intros * Haz Hit.
+revert a Haz Hit.
+induction it; intros; [ flia Hit | ].
+cbn - [ "*" ].
+remember (a / b =? 1) as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  now rewrite Nat.div_small in Hab.
+}
+rewrite fst_let; f_equal.
+remember (2 * a / b =? 1) as ab2 eqn:Hab2.
+symmetry in Hab2.
+destruct ab2. {
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ "*" ].
+  destruct it; [ easy | ].
+  cbn - [ "*" ].
+  now rewrite Hab2.
+}
+rewrite fst_let.
+rewrite Nat.mod_small; [ | easy ].
+apply Nat.eqb_neq in Hab2.
+apply Nat_neq_div_1 in Hab2.
+destruct Hab2 as [Hab2| Hab2]. {
+  apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
+  now apply Nat.nlt_ge in Hab2.
+}
+rewrite Nat.mod_small; [ | easy ].
+destruct (Nat.eq_dec b (S it)) as [Hbs| Hbs]. 2: {
+  apply IHit; [ flia Haz | ].
+  split; [ easy | ].
+  flia Hit Hbs.
+}
+rewrite Nat.mul_assoc.
+specialize (fst_rank_fst_loop_eq_succ_lemma it a b 1 Haz Hbs) as H1.
+rewrite Nat.pow_1_r in H1.
+specialize (H1 Hab2).
+apply H1.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -3020,170 +3123,14 @@ rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
 destruct n. {
   rewrite Nat.add_0_r.
-Theorem glop :
-  ∀ it a b,
-  a ≠ 0
-  → a < b ≤ it
-  → fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b)).
-Proof.
-intros * Haz Hit.
-revert a Haz Hit.
-induction it; intros; [ flia Hit | ].
-cbn - [ "*" ].
-remember (a / b =? 1) as ab eqn:Hab.
-symmetry in Hab.
-destruct ab. {
-  now rewrite Nat.div_small in Hab.
-}
-rewrite fst_let; f_equal.
-remember (2 * a / b =? 1) as ab2 eqn:Hab2.
-symmetry in Hab2.
-destruct ab2. {
-  rewrite Nat.mod_small; [ | easy ].
-  cbn - [ "*" ].
-  destruct it; [ easy | ].
-  cbn - [ "*" ].
-  now rewrite Hab2.
-}
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-apply Nat.eqb_neq in Hab2.
-apply Nat_neq_div_1 in Hab2.
-destruct Hab2 as [Hab2| Hab2]. {
-  apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
-  now apply Nat.nlt_ge in Hab2.
-}
-rewrite Nat.mod_small; [ | easy ].
-destruct (Nat.eq_dec b (S it)) as [Hbs| Hbs]. 2: {
-  apply IHit; [ flia Haz | ].
+  symmetry.
+  apply fst_rank_fst_loop_eq_succ. {
+    apply Nat.neq_mul_0; split; [ easy | ].
+    now apply Nat.neq_0_lt_0.
+  }
   split; [ easy | ].
-  flia Hit Hbs.
-}
-clear - Haz Hbs Hab2.
-(*
-  ============================
-  fst (rank_fst_loop it 1 (2 * a) b) = S (fst (rank_fst_loop it 1 (2 * (2 * a)) b))
-*)
-destruct it; [ subst b; flia Haz Hab2 | ].
-cbn - [ "*" ].
-remember (2 * a / b =? 1) as ab eqn:H.
-symmetry in H.
-destruct ab. {
-  apply Nat.eqb_eq in H.
-  apply Nat_eq_div_1 in H.
-  flia H Hab2.
-}
-clear H.
-rewrite fst_let, fst_if.
-f_equal.
-cbn - [ "*" ].
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 2) with 4 by easy.
-remember (4 * a / b =? 1) as ab4 eqn:Hab4.
-symmetry in Hab4.
-destruct ab4. {
-  destruct it; [ easy | ].
-  cbn - [ "*" ].
-  now rewrite Hab4.
-}
-apply Nat.eqb_neq in Hab4.
-apply Nat_neq_div_1 in Hab4.
-destruct Hab4 as [Hab4| Hab4]. {
-  replace 4 with (2 * 2) in Hab4 by easy.
-  rewrite <- Nat.mul_assoc in Hab4.
-  apply Nat.mul_le_mono_pos_l in Hab4; [ | easy ].
-  now apply Nat.nlt_ge in Hab4.
-}
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 8) with 16 by easy.
-clear - Haz Hbs Hab4.
-(*
-  ============================
-  fst (rank_fst_loop it 1 (4 * a) b) = S (fst (rank_fst_loop it 1 (8 * a) b))
-*)
-destruct it; [ subst b; flia Haz Hab4 | ].
-cbn - [ "*" ].
-remember (4 * a / b =? 1) as ab eqn:H.
-symmetry in H.
-destruct ab. {
-  apply Nat.eqb_eq in H.
-  apply Nat_eq_div_1 in H.
-  flia H Hab4.
-}
-clear H.
-rewrite fst_let, fst_if.
-f_equal.
-cbn - [ "*" ].
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 4) with 8 by easy.
-remember (8 * a / b =? 1) as ab8 eqn:Hab8.
-symmetry in Hab8.
-destruct ab8. {
-  destruct it; [ easy | ].
-  cbn - [ "*" ].
-  now rewrite Hab8.
-}
-apply Nat.eqb_neq in Hab8.
-apply Nat_neq_div_1 in Hab8.
-destruct Hab8 as [Hab8| Hab8]. {
-  replace 8 with (2 * 4) in Hab8 by easy.
-  rewrite <- Nat.mul_assoc in Hab8.
-  apply Nat.mul_le_mono_pos_l in Hab8; [ | easy ].
-  now apply Nat.nlt_ge in Hab8.
-}
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 8) with 16 by easy.
-clear - Haz Hbs Hab8.
-(*
-  ============================
-  fst (rank_fst_loop it 1 (8 * a) b) = S (fst (rank_fst_loop it 1 (16 * a) b))
-*)
-destruct it; [ subst b; flia Haz Hab8 | ].
-cbn - [ "*" ].
-remember (8 * a / b =? 1) as ab eqn:H.
-symmetry in H.
-destruct ab. {
-  apply Nat.eqb_eq in H.
-  apply Nat_eq_div_1 in H.
-  flia H Hab8.
-}
-clear H.
-rewrite fst_let, fst_if.
-f_equal.
-cbn - [ "*" ].
-rewrite fst_let.
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 8) with 16 by easy.
-remember (16 * a / b =? 1) as ab16 eqn:Hab16.
-symmetry in Hab16.
-destruct ab16. {
-  destruct it; [ easy | ].
-  cbn - [ "*" ].
-  now rewrite Hab16.
-}
-apply Nat.eqb_neq in Hab16.
-apply Nat_neq_div_1 in Hab16.
-destruct Hab16 as [Hab16| Hab16]. {
-  replace 16 with (2 * 8) in Hab16 by easy.
-  rewrite <- Nat.mul_assoc in Hab16.
-  apply Nat.mul_le_mono_pos_l in Hab16; [ | easy ].
-  now apply Nat.nlt_ge in Hab16.
-}
-rewrite Nat.mod_small; [ | easy ].
-rewrite Nat.mul_assoc.
-replace (2 * 16) with 32 by easy.
-clear - Haz Hbs Hab16.
-(*
-  ============================
-  fst (rank_fst_loop it 1 (16 * a) b) = S (fst (rank_fst_loop it 1 (32 * a) b))
-*)
+... ...
+specialize ( 0 n) as H1.
 ...
 Theorem glop :
   ∀ it a b,
