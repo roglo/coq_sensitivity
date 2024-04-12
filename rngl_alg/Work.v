@@ -3072,6 +3072,7 @@ assert (H : 0 < a < b) by flia Hzab Heab.
 clear Hzab Heab.
 rename H into Hzab.
 move Hzab after Hit1.
+(**)
 revert a b it2 Hzab Hit1 Hit2.
 induction it1; intros; [ now apply Nat.le_0_r in Hit1 | ].
 cbn - [ "*" ].
@@ -3083,7 +3084,16 @@ destruct n1. {
 }
 rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
+(*
+symmetry.
+rewrite fst_rank_fst_loop_eq_succ; [ | easy | now apply Nat.lt_le_incl ].
+f_equal.
+symmetry.
+...
+*)
 destruct it2; [ now apply Nat.le_0_r in Hit2 | ].
+apply -> Nat.lt_succ_r in Hit1.
+apply -> Nat.lt_succ_r in Hit2.
 cbn - [ "*" ].
 rewrite Hn1.
 rewrite fst_let.
@@ -3094,12 +3104,19 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct (Nat.eq_dec (Nat.log2_up b) it2) as [Hc2| Hc2]. 2: {
       apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
+(*
+rewrite fst_rank_fst_loop_eq_succ; [ | | easy ]. 2: {
+  split; [ | easy ].
+  now apply Nat.mul_pos_pos.
+}
+symmetry.
+...
+*)
     remember (it1 - it2) as n eqn:Hn.
     assert (it1 = it2 + n). {
       symmetry.
       apply Nat_sub_add_eq_l; [ | easy ].
-      subst it2.
-      now apply Nat.succ_le_mono in Hit1.
+      now subst it2.
     }
     subst it1; rename it2 into it.
     assert (Hnz : n ≠ 0). {
@@ -3107,7 +3124,8 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
       now rewrite Nat.add_0_r in Hc1.
     }
     clear Hn IHit1 Hit1 Hn1 Hc1.
-    revert it Hit2 Hc2.
+    clear Hit2.
+    revert it Hc2.
     revert a Hzab Htab.
     induction n; intros; [ easy | clear Hnz ].
     rewrite Nat.add_succ_r.
@@ -3131,7 +3149,17 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
       now subst n; rewrite Nat.add_0_r.
     }
-    apply IHn; [ easy | | | easy | easy ]. {
+(**)
+destruct n; [ easy | ].
+destruct n. {
+  rewrite Nat.add_1_r.
+  cbn - [ "*" ].
+  remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
+  symmetry in Hab2.
+  destruct ab2. {
+    cbn - [ "*" ].
+...
+    apply IHn; [ easy | | | easy ]. {
       split; [ | easy ].
       now apply Nat.mul_pos_pos.
     } {
