@@ -3050,8 +3050,8 @@ specialize (fst_rank_fst_loop_2_pow_succ n) as H1.
 Theorem glop :
   ∀ it1 it2 a b,
   0 < a ≤ b
-  → b ≤ it1
-  → b ≤ it2
+  → b < it1
+  → b < it2
   → fst (rank_fst_loop it1 1 a b) =
     fst (rank_fst_loop it2 1 a b).
 Proof.
@@ -3067,10 +3067,7 @@ clear Hzab Heab.
 rename H into Hzab.
 move Hzab after Hit1.
 revert a b it2 Hzab Hit1 Hit2.
-induction it1; intros. {
-  apply Nat.le_0_r in Hit1.
-  now subst b.
-}
+induction it1; intros; [ now apply Nat.le_0_r in Hit1 | ].
 cbn - [ "*" ].
 remember (a / b =? 1) as n1 eqn:Hn1.
 symmetry in Hn1.
@@ -3080,22 +3077,17 @@ destruct n1. {
 }
 rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
-destruct it2. {
-  apply Nat.le_0_r in Hit2.
-  now subst b.
-}
+destruct it2; [ now apply Nat.le_0_r in Hit2 | ].
 cbn - [ "*" ].
 rewrite Hn1.
 rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
 f_equal.
 destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
-  destruct (Nat.eq_dec b (S it1)) as [Hc1| Hc1]. 2: {
-    destruct (Nat.eq_dec b (S it2)) as [Hc2| Hc2]. 2: {
+  destruct (Nat.eq_dec b it1) as [Hc1| Hc1]. 2: {
+    destruct (Nat.eq_dec b it2) as [Hc2| Hc2]. 2: {
       apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
-...
-    specialize fst_rank_fst_loop_eq_succ as H1.
 (*
     move Hc2 at top; subst b.
     clear Hit2.
@@ -3131,18 +3123,15 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     }
     rewrite fst_let.
     rewrite Nat.mod_small; [ | easy ].
-(**)
-Check fst_rank_fst_loop_eq_succ.
-...
     specialize fst_rank_fst_loop_eq_succ as H1.
     symmetry.
     rewrite (H1 it (2 * a)); cycle 1. {
       apply Nat.neq_mul_0.
       split; [ easy | flia Hzab ].
     } {
-      split; [ easy | ].
+      split; [ easy | now subst b ].
+    }
 ...
-    destruct n. {
   rewrite Nat.add_0_r.
   symmetry.
   apply fst_rank_fst_loop_eq_succ. {
