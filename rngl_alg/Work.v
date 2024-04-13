@@ -3375,7 +3375,7 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
     destruct n. {
       rewrite Nat.add_0_r.
       symmetry.
-...
+      specialize fst_rank_fst_loop_eq_succ as H1.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
         split; [ | easy ].
         apply Nat.mul_pos_pos; [ easy | ].
@@ -3384,6 +3384,14 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       f_equal.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
         split; [ | easy ].
+        apply Nat.mul_pos_pos; [ easy | ].
+        apply Nat.mul_pos_pos; [ easy | ].
+        now apply Nat.mul_pos_pos.
+      }
+      f_equal.
+      rewrite H1; [ | | now rewrite Hc2 ]. 2: {
+        split; [ | easy ].
+        apply Nat.mul_pos_pos; [ easy | ].
         apply Nat.mul_pos_pos; [ easy | ].
         apply Nat.mul_pos_pos; [ easy | ].
         now apply Nat.mul_pos_pos.
@@ -3394,16 +3402,16 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       apply Nat.mul_pos_pos; [ easy | ].
       apply Nat.mul_pos_pos; [ easy | ].
       apply Nat.mul_pos_pos; [ easy | ].
+      apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
-    rewrite fst_if, S_if, fst_let, S_if, S_if.
+    rewrite fst_if, S_if, fst_let, S_if, S_if, S_if.
     cbn - [ "*" ].
-    cbn - [ "*" ].
-    remember (2 * (2 * (2 * (2 * (2 * a)))) / b =? 1) as ab5 eqn:Hab5.
-    symmetry in Hab5.
-    destruct ab5. {
+    remember (2 * (2 * (2 * (2 * (2 * (2 * a))))) / b =? 1) as ab6 eqn:Hab6.
+    symmetry in Hab6.
+    destruct ab6. {
       cbn - [ "*" ].
       destruct it. {
         apply Nat.log2_up_null in Hc2.
@@ -3437,11 +3445,6 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       rewrite fst_if, fst_let.
       cbn - [ "*" ].
       f_equal.
-      destruct it; [ easy | ].
-      cbn - [ "*" ].
-      now rewrite Hab5.
-    }
-    apply Nat.eqb_neq in Hab5.
 ...
 Compute (map (λ n, (n, Nat.log2_up n)) (seq 1 20)).
 ...
