@@ -3134,8 +3134,20 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
       now subst n; rewrite Nat.add_0_r.
     }
-(**)
 destruct n; [ easy | ].
+rewrite <- Nat.add_succ_comm.
+cbn - [ "*" ].
+remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
+symmetry in Hab2.
+destruct ab2. {
+  cbn - [ "*" ].
+  destruct it; [ easy | ].
+  cbn - [ "*" ].
+  now rewrite Hab2.
+}
+rewrite fst_let.
+rewrite H1.
+...
 destruct n. {
   rewrite Nat.add_1_r.
   cbn - [ "*" ].
@@ -3171,6 +3183,8 @@ destruct n. {
   now apply Nat.nlt_ge in Hab2.
 }
 destruct n. {
+  clear - Hzab Htab Hc2.
+  destruct Hzab as (Hza, _).
   rewrite <- Nat.add_succ_comm.
   cbn - [ "*" ].
   remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
@@ -3188,9 +3202,9 @@ destruct n. {
     now apply Nat.nlt_ge in Hab2.
   }
   move Hab2 before Htab.
-  clear Hnz.
   rewrite fst_let.
   symmetry.
+  specialize fst_rank_fst_loop_eq_succ as H1.
   rewrite H1; cycle 1. {
     split; [ | easy ].
     apply Nat.mul_pos_pos; [ easy | ].
