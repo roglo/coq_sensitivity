@@ -3147,30 +3147,53 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     revert it Hc2.
     revert a Hzab Htab.
     destruct n; intros; [ easy | clear Hnz ].
-clear - Htab Hzab Hc2.
+destruct Hzab as (Hza, Hab1).
+move it before a.
+clear - Hza Hab1 Hc2.
+(*
+  Hza : 0 < a
+  Hab1 : a < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  fst (rank_fst_loop (it + S n) 1 (2 * a) b) = fst (rank_fst_loop it 1 (2 * a) b)
+*)
     rewrite Nat.add_succ_r.
     cbn - [ "*" ].
     remember (2 * a / b =? 1) as ab eqn:Hab.
     symmetry in Hab.
     destruct ab. {
-      apply Nat.eqb_eq in Hab.
-      now rewrite Nat.div_small in Hab.
+      cbn - [ "*" ].
+      destruct it; [ easy | ].
+      cbn - [ "*" ].
+      now rewrite Hab.
     }
     rewrite fst_let.
+    apply Nat.eqb_neq in Hab.
+    apply Nat_neq_div_1 in Hab.
+    destruct Hab as [Hab| Hab]. {
+      apply Nat.mul_le_mono_pos_l in Hab; [ | easy ].
+      now apply Nat.nlt_ge in Hab.
+    }
+    move Hab before Hab1.
     rewrite Nat.mod_small; [ | easy ].
     specialize fst_rank_fst_loop_eq_succ as H1.
-    rewrite (H1 it (2 * a)); cycle 1. {
+    rewrite (H1 it (2 * a)); [ | | now rewrite Hc2 ]. 2: {
       split; [ | easy ].
       now apply Nat.mul_pos_pos.
-    } {
-      now rewrite Hc2.
     }
     f_equal.
     destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
       now subst n; rewrite Nat.add_0_r.
     }
     destruct n; [ easy | ].
-clear - Hzab Htab Hc2.
+clear - Hza Hab Hc2.
+(*
+  Hza : 0 < a
+  Htab : 2 * a < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  fst (rank_fst_loop (it + S n) 1 (2 * (2 * a)) b) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
@@ -3188,7 +3211,7 @@ clear - Hzab Htab Hc2.
       apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
       now apply Nat.nlt_ge in Hab2.
     }
-    move Hab2 before Htab.
+    move Hab2 before Hab.
     rewrite Nat.mod_small; [ | easy ].
     destruct n. {
       rewrite Nat.add_0_r.
@@ -3199,8 +3222,13 @@ clear - Hzab Htab Hc2.
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+clear - Hc2 Hza Hab2.
 (*
-clear - Hc2 Hzab Hab2 Htab.
+  Hza : 0 < a
+  Hab2 : 2 * (2 * a) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * a))) b)) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
 *)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
@@ -3211,8 +3239,9 @@ clear - Hc2 Hzab Hab2 Htab.
     destruct ab3. {
       cbn - [ "*" ].
       destruct it. {
+        exfalso.
         apply Nat.log2_up_null in Hc2.
-        flia Hzab Hc2.
+        flia Hza Hc2 Hab2.
       }
       cbn - [ "*" ].
       rewrite Nat.mod_small; [ | easy ].
@@ -3247,8 +3276,13 @@ clear - Hc2 Hzab Hab2 Htab.
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+clear - Hc2 Hza Hab3.
 (*
-clear - Hc2 Hzab Hab2 Htab Hab3.
+  Hza : 0 < a
+  Hab3 : 2 * (2 * (2 * a)) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * a)))) b))) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
 *)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
@@ -3260,11 +3294,17 @@ clear - Hc2 Hzab Hab2 Htab Hab3.
       cbn - [ "*" ].
       destruct it. {
         apply Nat.log2_up_null in Hc2.
-        flia Hzab Hc2.
+        flia Hza Hab3 Hc2.
       }
       cbn - [ "*" ].
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab3 ].
+        flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab3 ].
+        flia.
+      }
       rewrite fst_if.
       cbn - [ "*" ].
       rewrite fst_let.
@@ -3273,7 +3313,7 @@ clear - Hc2 Hzab Hab2 Htab Hab3.
         exfalso.
         apply Nat_log2_up_1 in Hc2.
         subst b.
-        flia Htab Hzab.
+        flia Hza Hab3.
       }
       cbn - [ "*" ].
       rewrite fst_if, fst_let.
@@ -3298,9 +3338,12 @@ clear - Hc2 Hzab Hab2 Htab Hab3.
       symmetry.
       specialize fst_rank_fst_loop_eq_succ as H1.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
-        split; [ | easy ].
-        apply Nat.mul_pos_pos; [ easy | ].
-        now apply Nat.mul_pos_pos.
+        split. {
+          apply Nat.mul_pos_pos; [ easy | ].
+          now apply Nat.mul_pos_pos.
+        }
+        eapply Nat.le_lt_trans; [ | apply Hab3 ].
+        flia.
       }
       f_equal.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
@@ -3317,8 +3360,14 @@ clear - Hc2 Hzab Hab2 Htab Hab3.
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+clear - Hc2 Hza Hab4.
 (*
-clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
+  Hza : 0 < a
+  Hab4 : 2 * (2 * (2 * (2 * a))) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * (2 * a))))) b)))) =
+  fst (rank_fst_loop it 1 (2 * (2 * a)) b)
 *)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
@@ -3330,29 +3379,37 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       cbn - [ "*" ].
       destruct it. {
         apply Nat.log2_up_null in Hc2.
-        flia Hzab Hc2.
+        flia Hza Hab4 Hc2.
       }
       cbn - [ "*" ].
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab4 ]; flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab4 ]; flia.
+      }
       rewrite fst_if, fst_let.
       cbn - [ "*" ].
       f_equal; symmetry.
       destruct it. {
         apply Nat_log2_up_1 in Hc2.
         subst b.
-        flia Htab Hzab.
+        flia Hza Hab4.
       }
       cbn - [ "*" ].
       rewrite fst_if, fst_let.
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab4 ]; flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab4 ]; flia.
+      }
       cbn - [ "*" ].
       f_equal.
       destruct it. {
         exfalso.
         apply Nat_log2_up_2 in Hc2.
-        destruct Hc2; subst b; flia Hab2 Hzab.
+        destruct Hc2; subst b; flia Hza Hab4.
       }
       cbn - [ "*" ].
       rewrite Nat.mod_small; [ | easy ].
@@ -3377,13 +3434,13 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       symmetry.
       specialize fst_rank_fst_loop_eq_succ as H1.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
-        split; [ | easy ].
+        split; [ | flia Hab4 ].
         apply Nat.mul_pos_pos; [ easy | ].
         now apply Nat.mul_pos_pos.
       }
       f_equal.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
-        split; [ | easy ].
+        split; [ | flia Hab4 ].
         apply Nat.mul_pos_pos; [ easy | ].
         apply Nat.mul_pos_pos; [ easy | ].
         now apply Nat.mul_pos_pos.
@@ -3405,6 +3462,16 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+clear - Hc2 Hza Hab5.
+(*
+  Hza : 0 < a
+  Hab5 : 2 * (2 * (2 * (2 * (2 * a)))) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (S (S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * (2 * (2 * a)))))) b))))) =
+  fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
+...
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     rewrite fst_if, S_if, fst_let, S_if, S_if, S_if.
@@ -3415,33 +3482,45 @@ clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
       cbn - [ "*" ].
       destruct it. {
         apply Nat.log2_up_null in Hc2.
-        flia Hzab Hc2.
+        flia Hza Hab5 Hc2.
       }
       cbn - [ "*" ].
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
       rewrite fst_if, fst_let.
       cbn - [ "*" ].
       f_equal; symmetry.
       destruct it. {
         apply Nat_log2_up_1 in Hc2.
         subst b.
-        flia Htab Hzab.
+        flia Hza Hab5.
       }
       cbn - [ "*" ].
       rewrite fst_if, fst_let.
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
       cbn - [ "*" ].
       f_equal.
       destruct it. {
         exfalso.
         apply Nat_log2_up_2 in Hc2.
-        destruct Hc2; subst b; flia Hab2 Hzab.
+        destruct Hc2; subst b; flia Hza Hab5.
       }
       cbn - [ "*" ].
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab5 ]; flia.
+      }
       rewrite fst_if, fst_let.
       cbn - [ "*" ].
       f_equal.
