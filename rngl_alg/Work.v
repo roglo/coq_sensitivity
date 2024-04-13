@@ -3147,6 +3147,7 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     revert it Hc2.
     revert a Hzab Htab.
     destruct n; intros; [ easy | clear Hnz ].
+clear - Htab Hzab Hc2.
     rewrite Nat.add_succ_r.
     cbn - [ "*" ].
     remember (2 * a / b =? 1) as ab eqn:Hab.
@@ -3169,6 +3170,7 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
       now subst n; rewrite Nat.add_0_r.
     }
     destruct n; [ easy | ].
+clear - Hzab Htab Hc2.
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
@@ -3188,15 +3190,18 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     }
     move Hab2 before Htab.
     rewrite Nat.mod_small; [ | easy ].
-    clear Hnz.
     destruct n. {
       rewrite Nat.add_0_r.
       symmetry.
+      specialize fst_rank_fst_loop_eq_succ as H1.
       rewrite H1; [ easy | | now rewrite Hc2 ].
       split; [ | easy ].
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+(*
+clear - Hc2 Hzab Hab2 Htab.
+*)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     rewrite fst_if, S_if, fst_let.
@@ -3229,6 +3234,7 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct n. {
       rewrite Nat.add_0_r.
       symmetry.
+      specialize fst_rank_fst_loop_eq_succ as H1.
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
         split; [ | easy ].
         apply Nat.mul_pos_pos; [ easy | ].
@@ -3241,6 +3247,9 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
       apply Nat.mul_pos_pos; [ easy | ].
       now apply Nat.mul_pos_pos.
     }
+(*
+clear - Hc2 Hzab Hab2 Htab Hab3.
+*)
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     rewrite fst_if, S_if, fst_let, S_if.
@@ -3255,9 +3264,8 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
       }
       cbn - [ "*" ].
       rewrite Nat.mod_small; [ | easy ].
-      rewrite fst_if.
-      cbn - [ "*" ].
       rewrite Nat.div_small; [ | easy ].
+      rewrite fst_if.
       cbn - [ "*" ].
       rewrite fst_let.
       f_equal; symmetry.
@@ -3288,6 +3296,86 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct n. {
       rewrite Nat.add_0_r.
       symmetry.
+      specialize fst_rank_fst_loop_eq_succ as H1.
+      rewrite H1; [ | | now rewrite Hc2 ]. 2: {
+        split; [ | easy ].
+        apply Nat.mul_pos_pos; [ easy | ].
+        now apply Nat.mul_pos_pos.
+      }
+      f_equal.
+      rewrite H1; [ | | now rewrite Hc2 ]. 2: {
+        split; [ | easy ].
+        apply Nat.mul_pos_pos; [ easy | ].
+        apply Nat.mul_pos_pos; [ easy | ].
+        now apply Nat.mul_pos_pos.
+      }
+      f_equal.
+      apply H1; [ | now rewrite Hc2 ].
+      split; [ | easy ].
+      apply Nat.mul_pos_pos; [ easy | ].
+      apply Nat.mul_pos_pos; [ easy | ].
+      apply Nat.mul_pos_pos; [ easy | ].
+      now apply Nat.mul_pos_pos.
+    }
+(*
+clear - Hc2 Hzab Hab2 Htab Hab3 Hab4.
+*)
+    rewrite <- Nat.add_succ_comm.
+    cbn - [ "*" ].
+    rewrite fst_if, S_if, fst_let, S_if, S_if.
+    cbn - [ "*" ].
+    remember (2 * (2 * (2 * (2 * (2 * a)))) / b =? 1) as ab5 eqn:Hab5.
+    symmetry in Hab5.
+    destruct ab5. {
+      cbn - [ "*" ].
+      destruct it. {
+        apply Nat.log2_up_null in Hc2.
+        flia Hzab Hc2.
+      }
+      cbn - [ "*" ].
+      rewrite Nat.mod_small; [ | easy ].
+      rewrite Nat.div_small; [ | easy ].
+      rewrite fst_if, fst_let.
+      cbn - [ "*" ].
+      f_equal; symmetry.
+      destruct it. {
+        apply Nat_log2_up_1 in Hc2.
+        subst b.
+        flia Htab Hzab.
+      }
+      cbn - [ "*" ].
+      rewrite fst_if, fst_let.
+      rewrite Nat.mod_small; [ | easy ].
+      rewrite Nat.div_small; [ | easy ].
+      cbn - [ "*" ].
+      f_equal.
+      destruct it. {
+        exfalso.
+        apply Nat_log2_up_2 in Hc2.
+        destruct Hc2; subst b; flia Hab2 Hzab.
+      }
+      cbn - [ "*" ].
+      rewrite Nat.mod_small; [ | easy ].
+      rewrite Nat.div_small; [ | easy ].
+      rewrite fst_if, fst_let.
+      cbn - [ "*" ].
+      f_equal.
+      destruct it; [ easy | ].
+      cbn - [ "*" ].
+      now rewrite Hab5.
+    }
+    apply Nat.eqb_neq in Hab5.
+    apply Nat_neq_div_1 in Hab5.
+    destruct Hab5 as [Hab5| Hab5]. {
+      apply Nat.mul_le_mono_pos_l in Hab5; [ | easy ].
+      now apply Nat.nlt_ge in Hab5.
+    }
+    move Hab5 before Hab4.
+    rewrite Nat.mod_small; [ | easy ].
+    destruct n. {
+      rewrite Nat.add_0_r.
+      symmetry.
+...
       rewrite H1; [ | | now rewrite Hc2 ]. 2: {
         split; [ | easy ].
         apply Nat.mul_pos_pos; [ easy | ].
