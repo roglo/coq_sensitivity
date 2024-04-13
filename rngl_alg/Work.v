@@ -3084,13 +3084,6 @@ destruct n1. {
 }
 rewrite fst_let.
 rewrite Nat.mod_small; [ | easy ].
-(*
-symmetry.
-rewrite fst_rank_fst_loop_eq_succ; [ | easy | now apply Nat.lt_le_incl ].
-f_equal.
-symmetry.
-...
-*)
 destruct it2; [ now apply Nat.le_0_r in Hit2 | ].
 apply -> Nat.lt_succ_r in Hit1.
 apply -> Nat.lt_succ_r in Hit2.
@@ -3104,14 +3097,6 @@ destruct (lt_dec (2 * a) b) as [Htab| Htab]. {
     destruct (Nat.eq_dec (Nat.log2_up b) it2) as [Hc2| Hc2]. 2: {
       apply IHit1; [ flia Hzab Htab | flia Hit1 Hc1 | flia Hit2 Hc2 ].
     }
-(*
-rewrite fst_rank_fst_loop_eq_succ; [ | | easy ]. 2: {
-  split; [ | easy ].
-  now apply Nat.mul_pos_pos.
-}
-symmetry.
-...
-*)
     remember (it1 - it2) as n eqn:Hn.
     assert (it1 = it2 + n). {
       symmetry.
@@ -3127,7 +3112,7 @@ symmetry.
     clear Hit2.
     revert it Hc2.
     revert a Hzab Htab.
-    induction n; intros; [ easy | clear Hnz ].
+    destruct n; intros; [ easy | clear Hnz ].
     rewrite Nat.add_succ_r.
     cbn - [ "*" ].
     remember (2 * a / b =? 1) as ab eqn:Hab.
@@ -3196,31 +3181,50 @@ destruct n. {
     cbn - [ "*" ].
     now rewrite Hab2.
   }
+  apply Nat.eqb_neq in Hab2.
+  apply Nat_neq_div_1 in Hab2.
+  destruct Hab2 as [Hab2| Hab2]. {
+    apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
+    now apply Nat.nlt_ge in Hab2.
+  }
+  move Hab2 before Htab.
+  clear Hnz.
   rewrite fst_let.
   symmetry.
   rewrite H1; cycle 1. {
-    apply Nat.eqb_neq in Hab2.
-    apply Nat_neq_div_1 in Hab2.
-    split. {
-      apply Nat.mul_pos_pos; [ easy | ].
-      now apply Nat.mul_pos_pos.
-    }
-    destruct Hab2 as [Hab2| Hab2]; [ | easy ].
-    apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
-    now apply Nat.nlt_ge in Hab2.
+    split; [ | easy ].
+    apply Nat.mul_pos_pos; [ easy | ].
+    now apply Nat.mul_pos_pos.
   } {
     now rewrite Hc2.
   }
   f_equal.
-(**)
-  rewrite Nat.mod_small. 2: {
-    apply Nat.eqb_neq in Hab2.
-    apply Nat_neq_div_1 in Hab2.
-    destruct Hab2 as [Hab2| Hab2]; [ | easy ].
-    apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
-    now apply Nat.nlt_ge in Hab2.
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.add_comm.
+  cbn - [ "*" ].
+  remember (2 * (2 * (2 * a)) / b =? 1) as ab3 eqn:Hab3.
+  symmetry in Hab3.
+  destruct ab3. {
+    cbn - [ "*" ].
+    destruct it; [ easy | ].
+    cbn - [ "*" ].
+    now rewrite Hab3.
   }
-Print rank_fst_loop.
+  apply Nat.eqb_neq in Hab3.
+  apply Nat_neq_div_1 in Hab3.
+  destruct Hab3 as [Hab3| Hab3]. {
+    apply Nat.mul_le_mono_pos_l in Hab3; [ | easy ].
+    now apply Nat.nlt_ge in Hab3.
+  }
+  move Hab3 before Hab2.
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite fst_let.
+  apply H1; [ | now rewrite Hc2 ].
+  split; [ | easy ].
+  apply Nat.mul_pos_pos; [ easy | ].
+  apply Nat.mul_pos_pos; [ easy | ].
+  now apply Nat.mul_pos_pos.
+}
 ...
     apply IHn; [ easy | | | easy ]. {
       split; [ | easy ].
