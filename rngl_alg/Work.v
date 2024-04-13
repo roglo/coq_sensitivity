@@ -3220,6 +3220,7 @@ destruct n. {
     apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
     now apply Nat.nlt_ge in Hab2.
   }
+Print rank_fst_loop.
 ...
     apply IHn; [ easy | | | easy ]. {
       split; [ | easy ].
@@ -3231,7 +3232,7 @@ destruct n. {
 ...
   rewrite Nat.add_0_r.
   symmetry.
-  apply fst_rank_fst_loop_eq_succ. {
+  rewrite fst_rank_fst_loop_eq_succ. {
     apply Nat.neq_mul_0; split; [ easy | ].
     now apply Nat.neq_0_lt_0.
   }
