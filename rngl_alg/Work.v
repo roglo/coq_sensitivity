@@ -2956,6 +2956,35 @@ specialize (IHa H1).
 destruct IHa; subst a; [ now right | easy ].
 Qed.
 
+Theorem Nat_log2_up_3 :
+  ∀ a, Nat.log2_up a = 3 ↔ 5 ≤ a ≤ 8.
+Proof.
+intros.
+split; intros Ha. {
+  destruct a; [ easy | ].
+  destruct a; [ easy | ].
+  cbn in Ha.
+  apply Nat.succ_inj in Ha.
+  specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
+  rewrite Ha in H1.
+  cbn in H1.
+  flia H1.
+}
+destruct Ha as (H5a, Ha8).
+destruct a; [ easy | apply Nat.succ_le_mono in H5a, Ha8 ].
+destruct a; [ easy | apply Nat.succ_le_mono in H5a, Ha8 ].
+cbn; f_equal.
+specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
+cbn - [ "*" ] in H1.
+remember (Nat.log2_iter a 0 1 0) as s eqn:Hs.
+cbn - [ "*" ] in H1.
+destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
+destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
+destruct s; [ easy | exfalso ].
+cbn - [ "*" ] in H1.
+flia H1 H5a Ha8.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -3330,24 +3359,68 @@ clear - Hza Hmab Hbma Hit Hab3.
   remember ((16 * a) / b =? 1) as ab4 eqn:Hab4.
   symmetry in Hab4.
   destruct ab4. {
-...
-    cbn - [ "*" ].
     apply Nat.eqb_eq in Hab4.
     apply Nat_eq_div_1 in Hab4.
     destruct Hab4 as (Hab4, _).
-    destruct m. {
-...
-    destruct m; [ now apply Nat.nle_gt in Hab4 | ].
     destruct m; [ easy | exfalso ].
     apply Nat.nle_gt in Hmab.
     apply Hmab; clear Hmab.
-    eapply le_trans; [ apply Hab8 | ].
+    eapply le_trans; [ apply Hab4 | ].
     apply Nat.mul_le_mono_r.
-    replace 8 with (2 ^ 3) by easy.
+    replace 16 with (2 ^ 4) by easy.
     apply Nat.pow_le_mono_r; [ easy | ].
-    now do 3 apply -> Nat.succ_le_mono.
+    now do 4 apply -> Nat.succ_le_mono.
   }
-  apply Nat.eqb_neq in Hab8.
+  apply Nat.eqb_neq in Hab4.
+  apply Nat_neq_div_1 in Hab4.
+  destruct Hab4 as [Hab4| Hab4]. {
+    replace 16 with (2 * 8) in Hab4 by easy.
+    rewrite <- Nat.mul_assoc in Hab4.
+    apply Nat.mul_le_mono_pos_l in Hab4; [ | easy ].
+    now apply Nat.nlt_ge in Hab4.
+  }
+  clear Hab3.
+  destruct m. {
+    progress replace (2 ^ 4) with 16 in Hbma by easy.
+    now apply Nat.nlt_ge in Hbma.
+  }
+  f_equal.
+(*
+clear - Hza Hmab Hbma Hit Hab4.
+*)
+  destruct it. {
+    cbn.
+...
+    apply Nat_log2_up_3 in Hit.
+    destruct Hit; subst b; flia Hza Hab3.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember ((16 * a) / b =? 1) as ab4 eqn:Hab4.
+  symmetry in Hab4.
+  destruct ab4. {
+    apply Nat.eqb_eq in Hab4.
+    apply Nat_eq_div_1 in Hab4.
+    destruct Hab4 as (Hab4, _).
+    destruct m; [ easy | exfalso ].
+    apply Nat.nle_gt in Hmab.
+    apply Hmab; clear Hmab.
+    eapply le_trans; [ apply Hab4 | ].
+    apply Nat.mul_le_mono_r.
+    replace 16 with (2 ^ 4) by easy.
+    apply Nat.pow_le_mono_r; [ easy | ].
+    now do 4 apply -> Nat.succ_le_mono.
+  }
+  apply Nat.eqb_neq in Hab4.
+  apply Nat_neq_div_1 in Hab4.
+  destruct Hab4 as [Hab4| Hab4]. {
+    replace 16 with (2 * 8) in Hab4 by easy.
+    rewrite <- Nat.mul_assoc in Hab4.
+    apply Nat.mul_le_mono_pos_l in Hab4; [ | easy ].
+    now apply Nat.nlt_ge in Hab4.
+  }
+  clear Hab3.
 ...
     destruct it; [ easy | ].
       cbn - [ "*" ].
