@@ -3230,19 +3230,19 @@ clear - Hza Hit Hmab Hbma.
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
   cbn - [ "*" ].
-  remember (4 * a / b =? 1) as ab4 eqn:Hab4.
-  symmetry in Hab4.
-  destruct ab4. {
-    apply Nat.eqb_eq in Hab4.
-    apply Nat_eq_div_1 in Hab4.
-    destruct Hab4 as (Hab4, Hab2).
-    replace 4 with (2 * 2) in Hab2 by easy.
-    rewrite <- Nat.mul_assoc in Hab2.
-    apply Nat.mul_lt_mono_pos_l in Hab2; [ | easy ].
+  remember (4 * a / b =? 1) as ab2 eqn:Hab2.
+  symmetry in Hab2.
+  destruct ab2. {
+    apply Nat.eqb_eq in Hab2.
+    apply Nat_eq_div_1 in Hab2.
+    destruct Hab2 as (Hab2, Hab1).
+    replace 4 with (2 * 2) in Hab1 by easy.
+    rewrite <- Nat.mul_assoc in Hab1.
+    apply Nat.mul_lt_mono_pos_l in Hab1; [ | easy ].
     destruct m; [ easy | exfalso ].
     apply Nat.nle_gt in Hmab.
     apply Hmab; clear Hmab.
-    eapply le_trans; [ apply Hab4 | ].
+    eapply le_trans; [ apply Hab2 | ].
     apply Nat.mul_le_mono_r.
     rewrite Nat.pow_succ_r'.
     replace 4 with (2 * 2) by easy.
@@ -3251,12 +3251,12 @@ clear - Hza Hit Hmab Hbma.
     apply Nat_mul_le_pos_r.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
-  apply Nat.eqb_neq in Hab4.
-  apply Nat_neq_div_1 in Hab4.
-  destruct Hab4 as [Hab4| Hab4]. {
+  apply Nat.eqb_neq in Hab2.
+  apply Nat_neq_div_1 in Hab2.
+  destruct Hab2 as [Hab2| Hab2]. {
     exfalso.
-    apply Nat.nlt_ge in Hab4.
-    apply Hab4; clear Hab4.
+    apply Nat.nlt_ge in Hab2.
+    apply Hab2; clear Hab2.
     replace 4 with (2 * 2) by easy.
     rewrite <- Nat.mul_assoc.
     apply Nat.mul_lt_mono_pos_l; [ easy | ].
@@ -3269,20 +3269,74 @@ clear - Hza Hit Hmab Hbma.
   rewrite Nat.mod_small; [ | easy ].
   rewrite Nat.mul_assoc.
   replace (2 * 4) with 8 by easy.
-clear - Hza Hit Hab4 Hmab Hbma.
+  destruct m. {
+    replace (2 ^ 2) with 4 in Hbma by easy.
+    now apply Nat.nlt_ge in Hbma.
+  }
+  f_equal.
+(*
+clear - Hza Hit Hab2 Hmab Hbma.
+*)
   destruct it. {
     apply Nat_log2_up_1 in Hit; subst b.
-    flia Hza Hab4.
+    flia Hza Hab2.
   }
   cbn - [ "*" ].
-  rewrite fst_if, fst_let, S_if.
+  rewrite fst_if, fst_let.
   cbn - [ "*" ].
-  remember (8 * a / b =? 1) as ab8 eqn:Hab8.
-  symmetry in Hab8.
-  destruct ab8. {
-    apply Nat.eqb_eq in Hab8.
-    apply Nat_eq_div_1 in Hab8.
-    destruct Hab8 as (Hab8, _).
+  remember (8 * a / b =? 1) as ab3 eqn:Hab3.
+  symmetry in Hab3.
+  destruct ab3. {
+    destruct m; [ easy | exfalso ].
+    apply Nat.eqb_eq in Hab3.
+    apply Nat_eq_div_1 in Hab3.
+    destruct Hab3 as (Hab3, _).
+    destruct m; [ now apply Nat.nle_gt in Hab3 | ].
+    apply Nat.nle_gt in Hmab.
+    apply Hmab; clear Hmab.
+    eapply le_trans; [ apply Hab3 | ].
+    apply Nat.mul_le_mono_r.
+    replace 8 with (2 ^ 3) by easy.
+    apply Nat.pow_le_mono_r; [ easy | flia ].
+  }
+  apply Nat.eqb_neq in Hab3.
+  apply Nat_neq_div_1 in Hab3.
+  destruct Hab3 as [Hab3| Hab3]. {
+    replace 8 with (2 * 4) in Hab3 by easy.
+    rewrite <- Nat.mul_assoc in Hab3.
+    apply Nat.mul_le_mono_pos_l in Hab3; [ | easy ].
+    now apply Nat.nlt_ge in Hab3.
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_assoc.
+  replace (2 * 8) with 16 by easy.
+  clear Hab2.
+  destruct m. {
+    replace (2 ^ 3) with 8 in Hbma by easy.
+    now apply Nat.nlt_ge in Hbma.
+  }
+  f_equal.
+(*
+clear - Hza Hmab Hbma Hit Hab3.
+*)
+  destruct it. {
+    cbn.
+    apply Nat_log2_up_2 in Hit.
+    destruct Hit; subst b; flia Hza Hab3.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember ((16 * a) / b =? 1) as ab4 eqn:Hab4.
+  symmetry in Hab4.
+  destruct ab4. {
+...
+    cbn - [ "*" ].
+    apply Nat.eqb_eq in Hab4.
+    apply Nat_eq_div_1 in Hab4.
+    destruct Hab4 as (Hab4, _).
+    destruct m. {
+...
     destruct m; [ now apply Nat.nle_gt in Hab4 | ].
     destruct m; [ easy | exfalso ].
     apply Nat.nle_gt in Hmab.
@@ -3294,25 +3348,8 @@ clear - Hza Hit Hab4 Hmab Hbma.
     now do 3 apply -> Nat.succ_le_mono.
   }
   apply Nat.eqb_neq in Hab8.
-  apply Nat_neq_div_1 in Hab8.
-  destruct Hab8 as [Hab8| Hab8]. {
-    replace 8 with (2 * 4) in Hab8 by easy.
-    rewrite <- Nat.mul_assoc in Hab8.
-    apply Nat.mul_le_mono_pos_l in Hab8; [ | easy ].
-    now apply Nat.nlt_ge in Hab8.
-  }
-  rewrite Nat.mod_small; [ | easy ].
-clear - Hza Hmab Hbma Hit Hab8.
-  destruct it. {
-    cbn.
 ...
-    rewrite <- Nat.add_succ_comm.
-    cbn - [ "*" ].
-    remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
-    symmetry in Hab2.
-    destruct ab2. {
-      cbn - [ "*" ].
-      destruct it; [ easy | ].
+    destruct it; [ easy | ].
       cbn - [ "*" ].
       now rewrite Hab2.
     }
