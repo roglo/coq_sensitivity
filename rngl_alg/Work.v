@@ -3194,6 +3194,87 @@ clear - Hza Hab Hc2.
   ============================
   fst (rank_fst_loop (it + S n) 1 (2 * (2 * a)) b) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
 *)
+Theorem fst_rank_fst_loop_add_l :
+  ∀ m a b it n,
+  0 < a
+  → 2 ^ S m * a < b
+  → Nat.log2_up b = it
+  → m + fst (rank_fst_loop (it + S n) 1 (2 ^ S (S m) * a) b) =
+    fst (rank_fst_loop it 1 (4 * a) b).
+Proof.
+intros * Hza Hmab Hit.
+rewrite <- Nat.add_succ_comm.
+cbn - [ "*" ].
+rewrite fst_if, fst_let.
+do 2 rewrite <- Nat.pow_succ_r'.
+remember (2 ^ S (S m) * a / b =? 1) as ab eqn:Hab.
+symmetry in Hab.
+cbn - [ "*" ].
+destruct ab. {
+  rewrite Nat.add_0_r.
+  destruct it. {
+    apply Nat.log2_up_null in Hit.
+    destruct b; [ easy | ].
+    apply Nat.succ_le_mono in Hit.
+    apply Nat.le_0_r in Hit; subst b.
+    apply Nat.lt_1_r in Hmab.
+    apply Nat.eq_mul_0 in Hmab.
+    destruct Hmab as [Hmab| Hmab]; [ | now apply Nat.neq_0_lt_0 in Hmab ].
+    now apply Nat.pow_nonzero in Hmab.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  apply Nat.eqb_eq in Hab.
+  apply Nat_eq_div_1 in Hab.
+  destruct Hab as (Hbma, Hab).
+  rewrite Nat.pow_succ_r' in Hab.
+  rewrite <- Nat.mul_assoc in Hab.
+  apply Nat.mul_lt_mono_pos_l in Hab; [ | easy ].
+  remember (4 * a / b =? 1) as ab4 eqn:Hab4.
+  symmetry in Hab4.
+  destruct ab4. {
+    apply Nat.eqb_eq in Hab4.
+    apply Nat_eq_div_1 in Hab4.
+    destruct Hab4 as (Hab4, Hab2).
+    replace 4 with (2 * 2) in Hab2 by easy.
+    rewrite <- Nat.mul_assoc in Hab2.
+    apply Nat.mul_lt_mono_pos_l in Hab2; [ | easy ].
+    destruct m; [ easy | exfalso ].
+    move Hab before Hmab; clear Hmab.
+    apply Nat.nle_gt in Hab.
+    apply Hab; clear Hab.
+    destruct m; [ easy | ].
+...
+  rewrite Nat.mod_small. 2: {
+    destruct m. {
+      rewrite Nat.pow_1_r in Hmab, Hab.
+      replace (2 ^ 2) with 4 in Hbma by easy.
+...
+    eapply Nat.le_lt_trans; [ | apply Hmab ].
+    apply Nat.mul_le_mono_r.
+    destruct m; cbn.
+        flia.
+      }
+      rewrite Nat.div_small. 2: {
+        eapply Nat.le_lt_trans; [ | apply Hab3 ].
+        flia.
+      }
+      rewrite fst_if.
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+...
+revert m Hab.
+induction n; intros. {
+  cbn - [ "*" ].
+... ...
+specialize (fst_rank_fst_loop_add_l 0 a b it n Hza) as H1.
+cbn - [ "*" ] in H1.
+rewrite Nat.mul_1_r in H1.
+specialize (H1 Hab Hc2).
+rewrite Nat.mul_assoc.
+easy.
+...
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
     remember (2 * (2 * a) / b =? 1) as ab2 eqn:Hab2.
@@ -3471,6 +3552,50 @@ clear - Hc2 Hza Hab5.
   S (S (S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * (2 * (2 * a)))))) b))))) =
   fst (rank_fst_loop it 1 (2 * (2 * a)) b)
 *)
+(*
+  Hza : 0 < a
+  Hab4 : 2 * (2 * (2 * (2 * a))) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * (2 * a))))) b)))) =
+  fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
+(*
+  Hza : 0 < a
+  Hab3 : 2 * (2 * (2 * a)) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * (2 * a)))) b))) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
+(*
+  Hza : 0 < a
+  Hab2 : 2 * (2 * a) < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  S (fst (rank_fst_loop (it + S n) 1 (2 * (2 * (2 * a))) b)) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
+(*
+  Hza : 0 < a
+  Htab : 2 * a < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  fst (rank_fst_loop (it + S n) 1 (2 * (2 * a)) b) = fst (rank_fst_loop it 1 (2 * (2 * a)) b)
+*)
+(*
+  Hza : 0 < a
+  Hab1 : a < b
+  Hc2 : Nat.log2_up b = it
+  ============================
+  fst (rank_fst_loop (it + S n) 1 (2 * a) b) = fst (rank_fst_loop it 1 (2 * a) b)
+*)
+specialize (fst_rank_fst_loop_add_l 4 a b it n Hza) as H1.
+assert (H : 2 ^ 5 * a < b). {
+  now do 4 rewrite Nat.mul_assoc in Hab5.
+}
+specialize (H1 H Hc2); clear H.
+do 6 rewrite Nat.mul_assoc.
+easy.
+}
 ...
     rewrite <- Nat.add_succ_comm.
     cbn - [ "*" ].
