@@ -3380,6 +3380,9 @@ clear - Hza Hmab Hbma Hit Hab3.
     now apply Nat.nlt_ge in Hab4.
   }
   clear Hab3.
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 16) with 32 by easy.
   destruct m. {
     progress replace (2 ^ 4) with 16 in Hbma by easy.
     now apply Nat.nlt_ge in Hbma.
@@ -3390,60 +3393,44 @@ clear - Hza Hmab Hbma Hit Hab4.
 *)
   destruct it. {
     cbn.
-...
     apply Nat_log2_up_3 in Hit.
-    destruct Hit; subst b; flia Hza Hab3.
+    flia Hza Hit Hab4.
   }
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
   cbn - [ "*" ].
-  remember ((16 * a) / b =? 1) as ab4 eqn:Hab4.
-  symmetry in Hab4.
-  destruct ab4. {
-    apply Nat.eqb_eq in Hab4.
-    apply Nat_eq_div_1 in Hab4.
-    destruct Hab4 as (Hab4, _).
+  remember ((32 * a) / b =? 1) as ab5 eqn:Hab5.
+  symmetry in Hab5.
+  destruct ab5. {
+    apply Nat.eqb_eq in Hab5.
+    apply Nat_eq_div_1 in Hab5.
+    destruct Hab5 as (Hab5, _).
     destruct m; [ easy | exfalso ].
     apply Nat.nle_gt in Hmab.
     apply Hmab; clear Hmab.
-    eapply le_trans; [ apply Hab4 | ].
+    eapply le_trans; [ apply Hab5 | ].
     apply Nat.mul_le_mono_r.
-    replace 16 with (2 ^ 4) by easy.
-    apply Nat.pow_le_mono_r; [ easy | ].
-    now do 4 apply -> Nat.succ_le_mono.
+    progress replace 32 with (2 ^ 5) by easy.
+    apply Nat.pow_le_mono_r; [ easy | flia ].
   }
-  apply Nat.eqb_neq in Hab4.
-  apply Nat_neq_div_1 in Hab4.
-  destruct Hab4 as [Hab4| Hab4]. {
-    replace 16 with (2 * 8) in Hab4 by easy.
-    rewrite <- Nat.mul_assoc in Hab4.
-    apply Nat.mul_le_mono_pos_l in Hab4; [ | easy ].
-    now apply Nat.nlt_ge in Hab4.
+  apply Nat.eqb_neq in Hab5.
+  apply Nat_neq_div_1 in Hab5.
+  destruct Hab5 as [Hab5| Hab5]. {
+    progress replace 32 with (2 * 16) in Hab5 by easy.
+    rewrite <- Nat.mul_assoc in Hab5.
+    apply Nat.mul_le_mono_pos_l in Hab5; [ | easy ].
+    now apply Nat.nlt_ge in Hab5.
   }
-  clear Hab3.
+  clear Hab4.
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 32) with 64 by easy.
+  destruct m. {
+    progress replace (2 ^ 5) with 32 in Hbma by easy.
+    now apply Nat.nlt_ge in Hbma.
+  }
+  f_equal.
 ...
-    destruct it; [ easy | ].
-      cbn - [ "*" ].
-      now rewrite Hab2.
-    }
-    rewrite fst_let.
-    apply Nat.eqb_neq in Hab2.
-    apply Nat_neq_div_1 in Hab2.
-    destruct Hab2 as [Hab2| Hab2]. {
-      apply Nat.mul_le_mono_pos_l in Hab2; [ | easy ].
-      now apply Nat.nlt_ge in Hab2.
-    }
-    move Hab2 before Hab.
-    rewrite Nat.mod_small; [ | easy ].
-    destruct n. {
-      rewrite Nat.add_0_r.
-      symmetry.
-      specialize fst_rank_fst_loop_eq_succ as H1.
-      rewrite H1; [ easy | | now rewrite Hc2 ].
-      split; [ | easy ].
-      apply Nat.mul_pos_pos; [ easy | ].
-      now apply Nat.mul_pos_pos.
-    }
 clear - Hc2 Hza Hab2.
 (*
   Hza : 0 < a
