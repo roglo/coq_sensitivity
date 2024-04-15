@@ -2922,69 +2922,6 @@ rewrite Nat.pow_1_r in H1.
 apply H1.
 Qed.
 
-Theorem Nat_log2_up_1 :
-  ∀ a, Nat.log2_up a = 1 ↔ a = 2.
-Proof.
-intros.
-split; intros H; [ | now subst a ].
-induction a; [ easy | ].
-specialize (Nat.log2_up_succ_or a) as H1.
-rewrite H in H1.
-destruct H1 as [H1| H1]; symmetry in H1. {
-  apply Nat.succ_inj in H1.
-  apply Nat.log2_up_null in H1.
-  apply Nat.le_1_r in H1.
-  now destruct H1; subst a.
-}
-now specialize (IHa H1); subst a.
-Qed.
-
-Theorem Nat_log2_up_2 :
-  ∀ a, Nat.log2_up a = 2 ↔ a = 3 ∨ a = 4.
-Proof.
-intros.
-split; intros H; [ | now destruct H; subst a ].
-induction a; [ easy | ].
-specialize (Nat.log2_up_succ_or a) as H1.
-rewrite H in H1.
-destruct H1 as [H1| H1]; symmetry in H1. {
-  apply Nat.succ_inj in H1.
-  apply Nat_log2_up_1 in H1; subst a.
-  now left.
-}
-specialize (IHa H1).
-destruct IHa; subst a; [ now right | easy ].
-Qed.
-
-Theorem Nat_log2_up_3 :
-  ∀ a, Nat.log2_up a = 3 ↔ 5 ≤ a ≤ 8.
-Proof.
-intros.
-split; intros Ha. {
-  destruct a; [ easy | ].
-  destruct a; [ easy | ].
-  cbn in Ha.
-  apply Nat.succ_inj in Ha.
-  specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
-  rewrite Ha in H1.
-  cbn in H1.
-  flia H1.
-}
-destruct Ha as (H5a, Ha8).
-destruct a; [ easy | apply Nat.succ_le_mono in H5a, Ha8 ].
-destruct a; [ easy | apply Nat.succ_le_mono in H5a, Ha8 ].
-cbn; f_equal.
-specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
-cbn - [ "*" ] in H1.
-remember (Nat.log2_iter a 0 1 0) as s eqn:Hs.
-cbn - [ "*" ] in H1.
-destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
-destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
-destruct s; [ easy | exfalso ].
-cbn - [ "*" ] in H1.
-flia H1 H5a Ha8.
-Qed.
-
 Theorem Nat_eq_log2 :
   ∀ a n, a ≠ 0 ∧ Nat.log2 a = n ↔ 2 ^ n ≤ a < 2 ^ (n + 1).
 Proof.
@@ -3370,8 +3307,9 @@ clear - Hza Hit Hmab Hbma.
 clear - Hza Hit Hab2 Hmab Hbma.
 *)
   destruct it. {
-    apply Nat_log2_up_1 in Hit; subst b.
-    flia Hza Hab2.
+    apply Nat_eq_log2_up_succ in Hit.
+    cbn in Hit.
+    flia Hza Hit Hab2.
   }
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
@@ -3412,9 +3350,9 @@ clear - Hza Hit Hab2 Hmab Hbma.
 clear - Hza Hmab Hbma Hit Hab3.
 *)
   destruct it. {
-    cbn.
-    apply Nat_log2_up_2 in Hit.
-    destruct Hit; subst b; flia Hza Hab3.
+    apply Nat_eq_log2_up_succ in Hit.
+    cbn in Hit.
+    flia Hza Hit Hab3.
   }
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
@@ -3455,8 +3393,8 @@ clear - Hza Hmab Hbma Hit Hab3.
 clear - Hza Hmab Hbma Hit Hab4.
 *)
   destruct it. {
-    cbn.
-    apply Nat_log2_up_3 in Hit.
+    apply Nat_eq_log2_up_succ in Hit.
+    cbn in Hit.
     flia Hza Hit Hab4.
   }
   cbn - [ "*" ].
@@ -3497,42 +3435,41 @@ clear - Hza Hmab Hbma Hit Hab4.
 clear - Hza Hmab Hbma Hit Hab5.
 *)
   destruct it. {
-    cbn.
-... ...
-    apply Nat_log2_up_4 in Hit.
-    flia Hza Hit Hab4.
+    apply Nat_eq_log2_up_succ in Hit.
+    cbn in Hit.
+    flia Hza Hit Hab5.
   }
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
   cbn - [ "*" ].
-  remember ((32 * a) / b =? 1) as ab5 eqn:Hab5.
-  symmetry in Hab5.
-  destruct ab5. {
-    apply Nat.eqb_eq in Hab5.
-    apply Nat_eq_div_1 in Hab5.
-    destruct Hab5 as (Hab5, _).
+  remember ((64 * a) / b =? 1) as ab6 eqn:Hab6.
+  symmetry in Hab6.
+  destruct ab6. {
+    apply Nat.eqb_eq in Hab6.
+    apply Nat_eq_div_1 in Hab6.
+    destruct Hab6 as (Hab6, _).
     destruct m; [ easy | exfalso ].
     apply Nat.nle_gt in Hmab.
     apply Hmab; clear Hmab.
-    eapply le_trans; [ apply Hab5 | ].
+    eapply le_trans; [ apply Hab6 | ].
     apply Nat.mul_le_mono_r.
-    progress replace 32 with (2 ^ 5) by easy.
+    progress replace 64 with (2 ^ 6) by easy.
     apply Nat.pow_le_mono_r; [ easy | flia ].
   }
-  apply Nat.eqb_neq in Hab5.
-  apply Nat_neq_div_1 in Hab5.
-  destruct Hab5 as [Hab5| Hab5]. {
-    progress replace 32 with (2 * 16) in Hab5 by easy.
-    rewrite <- Nat.mul_assoc in Hab5.
-    apply Nat.mul_le_mono_pos_l in Hab5; [ | easy ].
-    now apply Nat.nlt_ge in Hab5.
+  apply Nat.eqb_neq in Hab6.
+  apply Nat_neq_div_1 in Hab6.
+  destruct Hab6 as [Hab6| Hab6]. {
+    progress replace 64 with (2 * 32) in Hab6 by easy.
+    rewrite <- Nat.mul_assoc in Hab6.
+    apply Nat.mul_le_mono_pos_l in Hab6; [ | easy ].
+    now apply Nat.nlt_ge in Hab6.
   }
-  clear Hab4.
+  clear Hab5.
   rewrite Nat.mod_small; [ | easy ].
   rewrite Nat.mul_assoc.
-  progress replace (2 * 32) with 64 by easy.
+  progress replace (2 * 64) with 128 by easy.
   destruct m. {
-    progress replace (2 ^ 5) with 32 in Hbma by easy.
+    progress replace (2 ^ 6) with 64 in Hbma by easy.
     now apply Nat.nlt_ge in Hbma.
   }
   f_equal.
