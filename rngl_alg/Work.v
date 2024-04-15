@@ -2985,33 +2985,32 @@ cbn - [ "*" ] in H1.
 flia H1 H5a Ha8.
 Qed.
 
-(* to be completed
 Theorem Nat_eq_log2 :
-  ∀ a n, S (2 ^ n) ≤ S a ≤ 2 ^ S n → Nat.log2 a = n.
+  ∀ a n, a ≠ 0 ∧ Nat.log2 a = n ↔ 2 ^ n ≤ a < 2 ^ (n + 1).
 Proof.
-intros * Ha.
-destruct a. {
+intros.
+split. {
+  intros (Haz, Han).
+  apply Nat.neq_0_lt_0 in Haz.
+  specialize (Nat.log2_spec a Haz) as H1.
+  now rewrite Han, <- (Nat.add_1_r n) in H1.
+} {
+  intros Ha.
   specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  split; [ flia Ha H1 | ].
+  apply Nat.le_antisymm. 2: {
+    rewrite <- (Nat.log2_pow2 n); [ | easy ].
+    now apply Nat.log2_le_mono.
+  }
+  apply Nat.lt_succ_r.
+  apply (Nat.pow_lt_mono_r_iff 2); [ easy | ].
+  rewrite <- (Nat.add_1_r n).
+  eapply lt_le_trans; [ | apply Ha ].
+  apply Nat.lt_succ_r.
+  apply Nat.log2_spec.
   flia Ha H1.
 }
-specialize (Nat.log2_succ_or a) as H1.
-destruct H1 as [H1| H1]. {
-  rewrite H1.
-  destruct n. {
-    cbn in Ha.
-    now replace a with 0 in H1 by flia Ha.
-  }
-  rewrite <- H1.
-  apply Nat_pow2_log2_succ in H1.
-  destruct H1 as (Haz, H1).
-...
-Nat_pow2_log2_succ: ∀ n : nat, Nat.log2 (S n) = S (Nat.log2 n) ↔ n ≠ 0 ∧ 2 ^ Nat.log2 (S n) = S n
-Nat_pow2_log2_up_succ: ∀ n : nat, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n
-Inspect 10.
-...
-Search (Nat.log2 (S _)).
-Nat.log2_succ_or: ∀ a : nat, Nat.log2 (S a) = S (Nat.log2 a) ∨ Nat.log2 (S a) = Nat.log2 a
-...
+Qed.
 
 Theorem Nat_eq_log2_up_succ :
   ∀ a n, Nat.log2_up a = S n ↔ S (2 ^ n) ≤ a ≤ 2 ^ S n.
@@ -3028,7 +3027,6 @@ split; intros Ha. {
   rewrite Nat.add_1_r in H1.
   flia H1.
 }
-(**)
 progress unfold Nat.log2_up.
 remember (1 ?= a) as a1 eqn:Ha1.
 symmetry in Ha1.
@@ -3041,93 +3039,16 @@ destruct a1. {
   apply Nat.compare_lt_iff in Ha1.
   destruct a; [ easy | cbn ].
   clear Ha1.
-... ...
-  now apply Nat_eq_log2.
-...
-  destruct Ha as (Hna, Han).
-  apply Nat.succ_le_mono in Hna.
-  revert n Ha.
-  induction a; intros. {
-    specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
-    flia Ha H1.
-  }
-Search (Nat.log2 (S _)).
-...
-Search ((_ ?= _) = Lt).
-...
-destruct (Nat.eq_dec a 1) as [Ha1| Ha1]. {
-  subst a.
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
-  flia Ha H1.
-}
-symmetry in Ha1.
-destruct a1. {
-  apply
-...
-revert a Ha.
-induction n; intros. {
-  cbn in Ha.
-  apply Nat_log2_up_1.
+  apply Nat_eq_log2.
+  rewrite Nat.add_1_r.
   flia Ha.
+} {
+  apply Nat.compare_gt_iff in Ha1.
+  now apply Nat.lt_1_r in Ha1; subst a.
 }
-destruct a; [ easy | ].
-destruct a. {
-  specialize (Nat.pow_nonzero 2 (S n) (Nat.neq_succ_0 _)) as H1.
-  flia Ha H1.
-}
-cbn.
-f_equal.
-Search Nat.log2_iter.
-...
-destruct Ha as (Hsna, Hasn).
-destruct a; [ easy | apply Nat.succ_le_mono in Hsna, Hasn ].
-destruct a. {
-  apply Nat.le_0_r in Hsna.
-  now apply Nat.pow_nonzero in Hsna.
-}
-cbn; f_equal.
-(**)
-apply Nat.succ_le_mono in Hasn.
-revert a Hsna Hasn.
-induction n; intros. {
-  cbn in Hasn.
-  do 2 apply Nat.succ_le_mono in Hasn.
-  now apply Nat.le_0_r in Hasn; subst a.
-}
-destruct a. {
-  rewrite <- (Nat.pow_0_r 2) in Hsna at 2.
-  now apply Nat.pow_le_mono_r_iff in Hsna.
-}
-cbn.
-...
-specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
-cbn - [ "*" "^" ] in H1.
-remember (Nat.log2_iter a 0 1 0) as s eqn:Hs.
-rewrite Nat.add_1_r in H1.
-apply Nat.succ_le_mono in Hasn.
-clear Hs.
-revert a n Hsna Hasn H1.
-destruct s. {
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H2.
-  destruct n; [ easy | exfalso ].
-  cbn in Hsna, H1, H2.
-  flia Hsna H1 H2.
-}
-destruct n. {
-  exfalso.
-  cbn in Hasn.
-  do 3 apply Nat.succ_le_mono in Hasn.
-  now apply Nat.le_0_r in Hasn; subst a.
-}
-f_equal.
-...
-destruct s; [ cbn in H1; flia H1 Hsna Hasn | ].
-destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
-destruct s; [ easy | exfalso ].
-cbn - [ "*" ] in H1.
-flia H1 H5a Ha8.
 Qed.
 
+(* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
