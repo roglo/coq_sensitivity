@@ -2986,6 +2986,127 @@ flia H1 H5a Ha8.
 Qed.
 
 (* to be completed
+Theorem Nat_eq_log2 :
+  ∀ a n, S (2 ^ n) ≤ S a ≤ 2 ^ S n → Nat.log2 a = n.
+Proof.
+intros * Ha.
+...
+
+Theorem Nat_eq_log2_up_succ :
+  ∀ a n, Nat.log2_up a = S n ↔ S (2 ^ n) ≤ a ≤ 2 ^ S n.
+Proof.
+intros.
+split; intros Ha. {
+  destruct a; [ easy | ].
+  destruct a; [ easy | ].
+  cbn in Ha.
+  apply Nat.succ_inj in Ha.
+  specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
+  rewrite Ha in H1.
+  cbn - [ "^" ] in H1.
+  rewrite Nat.add_1_r in H1.
+  flia H1.
+}
+(**)
+progress unfold Nat.log2_up.
+remember (1 ?= a) as a1 eqn:Ha1.
+symmetry in Ha1.
+destruct a1. {
+  apply Nat.compare_eq in Ha1; subst a.
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  flia Ha H1.
+} {
+  f_equal.
+  apply Nat.compare_lt_iff in Ha1.
+  destruct a; [ easy | cbn ].
+  clear Ha1.
+... ...
+  now apply Nat_eq_log2.
+...
+  destruct Ha as (Hna, Han).
+  apply Nat.succ_le_mono in Hna.
+  revert n Ha.
+  induction a; intros. {
+    specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+    flia Ha H1.
+  }
+Search (Nat.log2 (S _)).
+...
+Search ((_ ?= _) = Lt).
+...
+destruct (Nat.eq_dec a 1) as [Ha1| Ha1]. {
+  subst a.
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  flia Ha H1.
+}
+symmetry in Ha1.
+destruct a1. {
+  apply
+...
+revert a Ha.
+induction n; intros. {
+  cbn in Ha.
+  apply Nat_log2_up_1.
+  flia Ha.
+}
+destruct a; [ easy | ].
+destruct a. {
+  specialize (Nat.pow_nonzero 2 (S n) (Nat.neq_succ_0 _)) as H1.
+  flia Ha H1.
+}
+cbn.
+f_equal.
+Search Nat.log2_iter.
+...
+destruct Ha as (Hsna, Hasn).
+destruct a; [ easy | apply Nat.succ_le_mono in Hsna, Hasn ].
+destruct a. {
+  apply Nat.le_0_r in Hsna.
+  now apply Nat.pow_nonzero in Hsna.
+}
+cbn; f_equal.
+(**)
+apply Nat.succ_le_mono in Hasn.
+revert a Hsna Hasn.
+induction n; intros. {
+  cbn in Hasn.
+  do 2 apply Nat.succ_le_mono in Hasn.
+  now apply Nat.le_0_r in Hasn; subst a.
+}
+destruct a. {
+  rewrite <- (Nat.pow_0_r 2) in Hsna at 2.
+  now apply Nat.pow_le_mono_r_iff in Hsna.
+}
+cbn.
+...
+specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
+cbn - [ "*" "^" ] in H1.
+remember (Nat.log2_iter a 0 1 0) as s eqn:Hs.
+rewrite Nat.add_1_r in H1.
+apply Nat.succ_le_mono in Hasn.
+clear Hs.
+revert a n Hsna Hasn H1.
+destruct s. {
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H2.
+  destruct n; [ easy | exfalso ].
+  cbn in Hsna, H1, H2.
+  flia Hsna H1 H2.
+}
+destruct n. {
+  exfalso.
+  cbn in Hasn.
+  do 3 apply Nat.succ_le_mono in Hasn.
+  now apply Nat.le_0_r in Hasn; subst a.
+}
+f_equal.
+...
+destruct s; [ cbn in H1; flia H1 Hsna Hasn | ].
+destruct s; [ cbn in H1; flia H1 H5a Ha8 | ].
+destruct s; [ easy | exfalso ].
+cbn - [ "*" ] in H1.
+flia H1 H5a Ha8.
+Qed.
+
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -3394,6 +3515,49 @@ clear - Hza Hmab Hbma Hit Hab4.
   destruct it. {
     cbn.
     apply Nat_log2_up_3 in Hit.
+    flia Hza Hit Hab4.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember ((32 * a) / b =? 1) as ab5 eqn:Hab5.
+  symmetry in Hab5.
+  destruct ab5. {
+    apply Nat.eqb_eq in Hab5.
+    apply Nat_eq_div_1 in Hab5.
+    destruct Hab5 as (Hab5, _).
+    destruct m; [ easy | exfalso ].
+    apply Nat.nle_gt in Hmab.
+    apply Hmab; clear Hmab.
+    eapply le_trans; [ apply Hab5 | ].
+    apply Nat.mul_le_mono_r.
+    progress replace 32 with (2 ^ 5) by easy.
+    apply Nat.pow_le_mono_r; [ easy | flia ].
+  }
+  apply Nat.eqb_neq in Hab5.
+  apply Nat_neq_div_1 in Hab5.
+  destruct Hab5 as [Hab5| Hab5]. {
+    progress replace 32 with (2 * 16) in Hab5 by easy.
+    rewrite <- Nat.mul_assoc in Hab5.
+    apply Nat.mul_le_mono_pos_l in Hab5; [ | easy ].
+    now apply Nat.nlt_ge in Hab5.
+  }
+  clear Hab4.
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 32) with 64 by easy.
+  destruct m. {
+    progress replace (2 ^ 5) with 32 in Hbma by easy.
+    now apply Nat.nlt_ge in Hbma.
+  }
+  f_equal.
+(*
+clear - Hza Hmab Hbma Hit Hab5.
+*)
+  destruct it. {
+    cbn.
+... ...
+    apply Nat_log2_up_4 in Hit.
     flia Hza Hit Hab4.
   }
   cbn - [ "*" ].
