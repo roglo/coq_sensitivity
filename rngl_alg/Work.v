@@ -2985,6 +2985,19 @@ destruct a1. {
 }
 Qed.
 
+Theorem Nat_eq_log2_up :
+  ∀ a n, Nat.log2_up a = n ↔
+  match n with
+  | 0 => a ≤ 1
+  | S _ => 2 ^ (n - 1) < a ≤ 2 ^ n
+  end.
+Proof.
+intros.
+destruct n; [ now apply Nat.log2_up_null | ].
+rewrite Nat_sub_succ_1.
+apply Nat_eq_log2_up_succ.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -3254,18 +3267,51 @@ clear - Hza Hit Hmab Hbma.
   ============================
   m = fst (rank_fst_loop it 1 (4 * a) b)
 *)
+(**)
 Theorem glop :
   ∀ p m a b it,
   0 < a
   → 2 ^ S (p + m) * a < b
   → b ≤ 2 ^ S (S (p + m)) * a
   → Nat.log2_up b = p + it
-  → 2 ^ S p * a < b
   → m = fst (rank_fst_loop it 1 (2 ^ S (S p) * a) b).
 Proof.
-intros * Hza Hmab Hbma Hit Hab.
-clear T ro rp rl ac.
-Admitted.
+intros * Hza Hmab Hbma Hit.
+assert (Hab : 2 ^ S p * a < b). {
+  eapply le_lt_trans; [ | apply Hmab ].
+  apply Nat.mul_le_mono_pos_r; [ easy | ].
+  apply Nat.pow_le_mono_r; [ easy | ].
+  apply -> Nat.succ_le_mono.
+  apply Nat.le_add_r.
+}
+revert p m Hmab Hbma Hit Hab.
+induction it; intros. {
+  rewrite Nat.add_0_r in Hit.
+  apply Nat_eq_log2_up in Hit.
+  destruct p. {
+    cbn.
+    apply Nat.le_1_r in Hit.
+    destruct Hit; subst b; [ easy | ].
+    cbn in Hab; flia Hza Hab.
+  }
+  cbn.
+  rewrite Nat_sub_succ_1 in Hit.
+...
+  apply Nat_eq_log2_up_succ in Hit.
+  destruct b; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  apply Nat.le_0_r in Hit; subst b.
+  apply Nat.lt_1_r in Hmab.
+  apply Nat.eq_mul_0 in Hmab.
+  destruct Hmab as [Hmab| Hmab]; [ | now apply Nat.neq_0_lt_0 in Hmab ].
+  now apply Nat.pow_nonzero in Hmab.
+}
+  apply Nat_eq_log2_up_succ in Hit.
+  cbn - [ "*" ].
+...
+...
+  rewrote
+...
 progress replace 4 with (2 ^ S (S 0)) by easy.
 apply glop; try easy.
 rewrite Nat.pow_1_r.
