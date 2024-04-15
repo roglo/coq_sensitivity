@@ -3246,6 +3246,34 @@ destruct ab. {
   destruct Hab as (Hbma, _).
   move Hbma before Hmab.
 clear - Hza Hit Hmab Hbma.
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S m * a < b
+  Hbma : b ≤ 2 ^ S (S m) * a
+  Hit : Nat.log2_up b = it
+  ============================
+  m = fst (rank_fst_loop it 1 (4 * a) b)
+*)
+Theorem glop :
+  ∀ p m a b it,
+  0 < a
+  → 2 ^ S (p + m) * a < b
+  → b ≤ 2 ^ S (S (p + m)) * a
+  → Nat.log2_up b = p + it
+  → 2 ^ S p * a < b
+  → m = fst (rank_fst_loop it 1 (2 ^ S (S p) * a) b).
+Proof.
+intros * Hza Hmab Hbma Hit Hab.
+clear T ro rp rl ac.
+Admitted.
+progress replace 4 with (2 ^ S (S 0)) by easy.
+apply glop; try easy.
+rewrite Nat.pow_1_r.
+eapply le_lt_trans; [ | apply Hmab ].
+rewrite Nat.pow_succ_r'.
+rewrite <- Nat.mul_assoc.
+apply Nat.mul_le_mono_l.
+...
   destruct it. {
     apply Nat.log2_up_null in Hit.
     destruct b; [ easy | ].
@@ -3306,6 +3334,19 @@ clear - Hza Hit Hmab Hbma.
 (*
 clear - Hza Hit Hab2 Hmab Hbma.
 *)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S m) * a < b
+  Hbma : b ≤ 2 ^ S (S (S m)) * a
+  Hit : Nat.log2_up b = S it
+  Hab2 : 4 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (8 * a) b)
+*)
+... ...
+progress replace 8 with (2 ^ S (S 1)) by easy.
+now apply glop.
+...
   destruct it. {
     apply Nat_eq_log2_up_succ in Hit.
     cbn in Hit.
@@ -3349,6 +3390,19 @@ clear - Hza Hit Hab2 Hmab Hbma.
 (*
 clear - Hza Hmab Hbma Hit Hab3.
 *)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S m)) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S m))) * a
+  Hit : Nat.log2_up b = S (S it)
+  Hab3 : 8 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (16 * a) b)
+*)
+... ...
+progress replace 16 with (2 ^ S (S 2)) by easy.
+now apply glop.
+...
   destruct it. {
     apply Nat_eq_log2_up_succ in Hit.
     cbn in Hit.
@@ -3392,6 +3446,19 @@ clear - Hza Hmab Hbma Hit Hab3.
 (*
 clear - Hza Hmab Hbma Hit Hab4.
 *)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S (S m))) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S (S m)))) * a
+  Hit : Nat.log2_up b = S (S (S it))
+  Hab4 : 16 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (32 * a) b)
+*)
+... ...
+progress replace 32 with (2 ^ S (S 3)) by easy.
+now apply glop.
+...
   destruct it. {
     apply Nat_eq_log2_up_succ in Hit.
     cbn in Hit.
@@ -3434,6 +3501,19 @@ clear - Hza Hmab Hbma Hit Hab4.
 (*
 clear - Hza Hmab Hbma Hit Hab5.
 *)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S (S (S m)))) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S (S (S m))))) * a
+  Hit : Nat.log2_up b = S (S (S (S it)))
+  Hab5 : 32 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (64 * a) b)
+*)
+... ...
+progress replace 64 with (2 ^ S (S 4)) by easy.
+now apply glop.
+...
   destruct it. {
     apply Nat_eq_log2_up_succ in Hit.
     cbn in Hit.
@@ -3473,6 +3553,54 @@ clear - Hza Hmab Hbma Hit Hab5.
     now apply Nat.nlt_ge in Hbma.
   }
   f_equal.
+... ...
+progress replace 128 with (2 ^ S (S 5)) by easy.
+apply glop; try easy.
+...
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S (S (S (S m))))) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S (S (S (S m)))))) * a
+  Hit : Nat.log2_up b = S (S (S (S (S it))))
+  Hab6 : 64 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (128 * a) b)
+*)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S (S (S m)))) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S (S (S m))))) * a
+  Hit : Nat.log2_up b = S (S (S (S it)))
+  Hab5 : 32 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (64 * a) b)
+*)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S (S m))) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S (S m)))) * a
+  Hit : Nat.log2_up b = S (S (S it))
+  Hab4 : 16 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (32 * a) b)
+*)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S (S (S m)) * a < b
+  Hbma : b ≤ 2 ^ S (S (S (S m))) * a
+  Hit : Nat.log2_up b = S (S it)
+  Hab3 : 8 * a < b
+  ============================
+  m = fst (rank_fst_loop it 1 (16 * a) b)
+*)
+(*
+  Hza : 0 < a
+  Hmab : 2 ^ S m * a < b
+  Hbma : b ≤ 2 ^ S (S m) * a
+  Hit : Nat.log2_up b = it
+  ============================
+  m = fst (rank_fst_loop it 1 (4 * a) b)
+*)
 ...
 clear - Hc2 Hza Hab2.
 (*
