@@ -2990,6 +2990,27 @@ Theorem Nat_eq_log2 :
   ∀ a n, S (2 ^ n) ≤ S a ≤ 2 ^ S n → Nat.log2 a = n.
 Proof.
 intros * Ha.
+destruct a. {
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  flia Ha H1.
+}
+specialize (Nat.log2_succ_or a) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  destruct n. {
+    cbn in Ha.
+    now replace a with 0 in H1 by flia Ha.
+  }
+  rewrite <- H1.
+  apply Nat_pow2_log2_succ in H1.
+  destruct H1 as (Haz, H1).
+...
+Nat_pow2_log2_succ: ∀ n : nat, Nat.log2 (S n) = S (Nat.log2 n) ↔ n ≠ 0 ∧ 2 ^ Nat.log2 (S n) = S n
+Nat_pow2_log2_up_succ: ∀ n : nat, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n
+Inspect 10.
+...
+Search (Nat.log2 (S _)).
+Nat.log2_succ_or: ∀ a : nat, Nat.log2 (S a) = S (Nat.log2 a) ∨ Nat.log2 (S a) = Nat.log2 a
 ...
 
 Theorem Nat_eq_log2_up_succ :
