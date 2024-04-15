@@ -3322,6 +3322,12 @@ Theorem fst_rank_fst_loop_add_l :
     fst (rank_fst_loop it 1 (4 * a) b).
 Proof.
 intros * Hza Hmab Hit.
+revert b m Hit Hmab.
+induction it; intros.
+2: {
+(* ouais bin c'est la merde *)
+...
+intros * Hza Hmab Hit.
 rewrite <- Nat.add_succ_comm.
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
@@ -3338,6 +3344,17 @@ destruct ab. {
   progress replace 4 with (2 ^ S (S 0)) by easy.
   now apply fst_rank_fst_loop_2_pow_mul.
 }
+apply Nat.eqb_neq in Hab.
+apply Nat_neq_div_1 in Hab.
+destruct Hab as [Hab| Hab]. {
+  rewrite Nat.pow_succ_r' in Hab.
+  rewrite <- Nat.mul_assoc in Hab.
+  apply Nat.mul_le_mono_pos_l in Hab; [ | easy ].
+  now apply Nat.nlt_ge in Hab.
+}
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mul_assoc.
+do 3 rewrite <- Nat.pow_succ_r'.
 ...
   destruct it. {
     apply Nat_eq_log2_up_succ in Hit.
