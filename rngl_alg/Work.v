@@ -2579,6 +2579,10 @@ Compute
   (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 *)
 
+Theorem fold_rank_fst_1 :
+  ∀ a b, fst (rank_fst_loop b 1 a b) = rank_fst_1 a b.
+Proof. easy. Qed.
+
 Theorem fst_rank_fst_loop_succ :
   ∀ it k a b,
   fst (rank_fst_loop (S it) k a b) =
@@ -3076,6 +3080,7 @@ now apply IHit.
 Qed.
 
 (* to be completed
+(* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
   n ≠ 1
@@ -3103,17 +3108,37 @@ Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50))
 Print inv_ub_num.
 Print inv_ub_den_2_pow.
 *)
-(* je suis parti complètement en couille, là, je ne sais plus ce que je fais *)
-...
-Theorem rank_fst_1_log2_up :
-  ∀ n, rank_fst_1 1 n = Nat.log2_up n.
+progress unfold inv_ub_num.
+progress unfold inv_ub_den_2_pow.
+Theorem rank_fst_1_log2_up : ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
-(*
-progress unfold rank_fst_1.
-  ============================
-  fst (rank_fst_loop n 1 1 n) = Nat.log2_up n
-*)
+(**)
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+symmetry.
+apply Nat_eq_log2_up; [ easy | ].
+split. {
+  apply Nat.div_lt_upper_bound; [ easy | ].
+  progress unfold rank_fst_1.
+  induction n; [ easy | clear Hnz ].
+  cbn - [ "/" "mod" "*" ].
+  remember (1 / S n =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1; [ cbn; flia | ].
+  rewrite fst_let.
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_1_r.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy |].
+  assert (Hnz : n ≠ 0) by flia Hn1.
+  clear Hn1.
+  specialize (IHn Hnz).
+...
+Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
+...
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
   apply Nat_pow2_log2_up_succ in Hn.
 (*
