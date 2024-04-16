@@ -3081,9 +3081,9 @@ Qed.
 
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
-  2 ^ S m - (3 + m) < n
-  → 2 ^ (m + S (fst (rank_fst_loop (S n) 1 (2 ^ (2 + m)) (3 + m + n)))) <
-      3 + m + n.
+  2 ^ S m - (2 + S m) < n
+  → 2 ^ (S m + fst (rank_fst_loop (S n) 1 (2 ^ (1 + S m)) (2 + S m + n))) <
+      2 + S m + n.
 Proof.
 intros * Hn.
 rewrite Nat.pow_add_r.
@@ -3092,7 +3092,7 @@ induction n; intros; [ easy | ].
 remember (S n) as n'.
 cbn - [ "/" "mod" "*" ].
 subst n'.
-do 2 rewrite Nat.mul_assoc.
+rewrite Nat.mul_assoc.
 progress replace (2 * 2) with 4 by easy.
 rewrite Nat.add_succ_r.
 rewrite <- (Nat.add_1_l (m + n)).
@@ -3114,18 +3114,20 @@ progress replace (2 * 2 ^ m * 2) with (2 ^ S (S m)). 2: {
   f_equal.
   now rewrite Nat.pow_succ_r', Nat.mul_comm.
 }
-rewrite (Nat.mul_comm (2 ^ m)).
 progress replace 4 with (2 ^ 2) at 1 by easy.
 rewrite <- (Nat.pow_add_r 2 2).
 do 2 rewrite <- Nat.pow_succ_r'.
-progress replace (S (2 + m)) with (2 + S m) by easy.
-progress replace (4 + m) with (3 + S m) by easy.
+progress replace (S (2 + m)) with (1 + S (S m)) by easy.
+progress replace (4 + m) with (2 + S (S m)) by easy.
+rewrite <- Nat.pow_add_r.
+rewrite <- Nat.add_succ_comm.
+rewrite Nat.pow_add_r.
 apply IHn.
 do 2 rewrite Nat.pow_succ_r'.
 rewrite Nat.pow_succ_r' in Hn.
 rewrite Nat.mul_assoc.
 progress replace (2 * 2) with 4 by easy.
-rewrite <- Nat.add_succ_comm.
+do 2 rewrite <- Nat.add_succ_comm.
 apply Nat.le_lt_add_lt with (m := 4 + m) (n := 4 + m); [ easy | ].
 rewrite (Nat.add_comm n).
 rewrite Nat.sub_add; [ easy | ].
