@@ -3215,27 +3215,11 @@ split. {
   destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
-  cbn - [ "/" "mod" "*" ].
-  remember (4 / S (S (S n)) =? 1) as n1 eqn:Hn1.
-  symmetry in Hn1.
-  destruct n1; [ cbn; flia | ].
-  rewrite fst_let.
-  apply Nat.eqb_neq in Hn1.
-  apply Nat_neq_div_1 in Hn1.
-  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
-  rewrite Nat.mod_small; [ | easy ].
-  do 3 apply Nat.succ_lt_mono in Hn1.
-  clear Hnz.
-  progress replace (2 * 4) with 8 by easy.
-  destruct n; [ easy | ].
-  apply Nat.succ_lt_mono in Hn1.
-  rename Hn1 into Hn.
-(**)
-  specialize (two_pow_mul_fst_rank_fst_loop 1 n) as H1.
-  (* à remonter au cas précédent *)
-  rewrite Nat.sub_diag in H1.
-  rewrite Nat.pow_1_r in H1.
-  now apply H1.
+  specialize (two_pow_mul_fst_rank_fst_loop 0 n) as H1.
+  rewrite Nat.pow_0_r in H1.
+  rewrite Nat.mul_1_l in H1.
+  apply H1.
+  now apply Nat.neq_0_lt_0.
 }
 progress unfold rank_fst_1.
 ...
