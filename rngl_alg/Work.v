@@ -3079,13 +3079,81 @@ rewrite <- Nat.add_succ_comm in Hit, Hbma, Hmab.
 now apply IHit.
 Qed.
 
+(* to be completed, if possible
+Theorem two_pow_mul_fst_rank_fst_loop :
+  ∀ m n,
+  2 ^ m - (2 + m) < n
+  → 2 ^ (m + fst (rank_fst_loop (S n) 1 (2 ^ (1 + m)) (2 + m + n))) <
+      2 + m + n.
+Proof.
+intros * Hn.
+rewrite Nat.pow_add_r.
+revert m Hn.
+induction n; intros; [ easy | ].
+remember (S n) as n'.
+cbn - [ "/" "mod" "*" ].
+subst n'.
+rewrite Nat.add_succ_r.
+progress replace (S (S (S (m + n)))) with (3 + m + n) by easy.
+remember (2 * 2 ^ m / (3 + m + n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  cbn; flia Hn1.
+}
+rewrite fst_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ cbn in Hn, Hn1; flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+progress replace (2 * 2 ^ m * 2) with (2 ^ S (S m)). 2: {
+  rewrite Nat.pow_succ_r', <- Nat.mul_assoc.
+  f_equal.
+  now rewrite Nat.pow_succ_r', Nat.mul_comm.
+}
+(*
+progress replace 4 with (2 ^ 2) at 1 by easy.
+rewrite <- (Nat.pow_add_r 2 2).
+do 2 rewrite <- Nat.pow_succ_r'.
+*)
+rewrite <- Nat.pow_add_r.
+rewrite <- Nat.add_succ_comm.
+rewrite Nat.pow_add_r.
+rewrite <- Nat.pow_succ_r'.
+(*
+progress replace (S (2 + m)) with (2 + S m) by easy.
+*)
+progress replace (3 + m) with (2 + S m) by easy.
+apply IHn.
+rewrite Nat.pow_succ_r'.
+rewrite <- Nat.add_succ_comm.
+...
+apply Nat.le_lt_add_lt with (m := 3 + m) (n := 3 + m); [ easy | ].
+rewrite (Nat.add_comm n).
+rewrite Nat.sub_add; [ easy | ].
+induction m.
+cbn.
+cbn in Hn1.
+induction m; [ cbn; flia | ].
+progress replace (4 + S m) with (S (4 + m)) by easy.
+apply Nat.succ_le_mono in IHm.
+eapply le_trans; [ apply IHm | ].
+cbn.
+specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
+flia IHm H1.
+Qed.
+...
+*)
+
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
   2 ^ S m - (3 + m) < n
-  → 2 ^ m * 2 ^ S (fst (rank_fst_loop (S n) 1 (2 ^ (2 + m)) (3 + m + n))) <
+  → 2 ^ (m + S (fst (rank_fst_loop (S n) 1 (2 ^ (2 + m)) (3 + m + n)))) <
       3 + m + n.
 Proof.
 intros * Hn.
+rewrite Nat.pow_add_r.
 revert m Hn.
 induction n; intros; [ easy | ].
 remember (S n) as n'.
@@ -3216,8 +3284,6 @@ split. {
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
   specialize (two_pow_mul_fst_rank_fst_loop 0 n) as H1.
-  rewrite Nat.pow_0_r in H1.
-  rewrite Nat.mul_1_l in H1.
   apply H1.
   now apply Nat.neq_0_lt_0.
 }
