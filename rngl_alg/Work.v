@@ -3079,16 +3079,17 @@ rewrite <- Nat.add_succ_comm in Hit, Hbma, Hmab.
 now apply IHit.
 Qed.
 
-(* to be completed, if possible
+(*
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
-  2 ^ m - (2 + m) < n
+  m ≠ 0
+  → 2 ^ m - (2 + m) < n
   → 2 ^ (m + fst (rank_fst_loop (S n) 1 (2 ^ (1 + m)) (2 + m + n))) <
       2 + m + n.
 Proof.
-intros * Hn.
+intros * Hmz Hn.
 rewrite Nat.pow_add_r.
-revert m Hn.
+revert m Hmz Hn.
 induction n; intros; [ easy | ].
 remember (S n) as n'.
 cbn - [ "/" "mod" "*" ].
@@ -3125,27 +3126,27 @@ rewrite <- Nat.pow_succ_r'.
 progress replace (S (2 + m)) with (2 + S m) by easy.
 *)
 progress replace (3 + m) with (2 + S m) by easy.
-apply IHn.
+apply IHn; [ easy | ].
 rewrite Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm.
-...
 apply Nat.le_lt_add_lt with (m := 3 + m) (n := 3 + m); [ easy | ].
 rewrite (Nat.add_comm n).
 rewrite Nat.sub_add; [ easy | ].
-induction m.
-cbn.
-cbn in Hn1.
-induction m; [ cbn; flia | ].
-progress replace (4 + S m) with (S (4 + m)) by easy.
+clear Hn Hn1.
+induction m; [ easy | ].
+progress replace (3 + S m) with (S (3 + m)) by easy.
+clear Hmz.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]; [ now subst m | ].
+specialize (IHm Hmz).
 apply Nat.succ_le_mono in IHm.
 eapply le_trans; [ apply IHm | ].
 cbn.
 specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
 flia IHm H1.
 Qed.
-...
 *)
 
+(**)
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
   2 ^ S m - (3 + m) < n
