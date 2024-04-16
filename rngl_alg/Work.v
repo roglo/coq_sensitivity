@@ -3081,11 +3081,13 @@ Qed.
 
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
-  2 ^ S m - (2 + S m) < n
-  → 2 ^ (S m + fst (rank_fst_loop (S n) 1 (2 ^ (1 + S m)) (2 + S m + n))) <
-      2 + S m + n.
+  m ≠ 0
+  → 2 ^ m - (2 + m) < n
+  → 2 ^ (m + fst (rank_fst_loop (S n) 1 (2 ^ (1 + m)) (2 + m + n))) <
+      2 + m + n.
 Proof.
-intros * Hn.
+intros * Hmz Hn.
+destruct m; [ easy | clear Hmz ].
 rewrite Nat.pow_add_r.
 revert m Hn.
 induction n; intros; [ easy | ].
@@ -3218,8 +3220,8 @@ split. {
   destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
-  specialize (two_pow_mul_fst_rank_fst_loop 0 n) as H1.
-  apply H1.
+  specialize (two_pow_mul_fst_rank_fst_loop 1 n) as H1.
+  apply H1; [ easy | ].
   now apply Nat.neq_0_lt_0.
 }
 progress unfold rank_fst_1.
