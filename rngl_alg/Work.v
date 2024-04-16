@@ -3087,6 +3087,32 @@ Theorem two_pow_mul_fst_rank_fst_loop :
       2 + m + n.
 Proof.
 intros * Hmz Hn.
+(* devrait pouvoir se prouver...
+   auquel cas, l'hypothèse m ≠ 0 serait inutile
+clear Hmz.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  cbn in Hn.
+  cbn - [ "/" "mod" "*" ].
+  rewrite Nat.mul_1_r.
+  rewrite Nat.div_small; [ | flia Hn ].
+  rewrite Nat.mod_small; [ | flia Hn ].
+  rewrite fst_if, fst_let.
+  cbn - [ "/" "mod" "*" ].
+  destruct n; [ easy | ].
+  cbn - [ "/" "mod" "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "/" "mod" "*" ].
+  remember (2 * 2 / S (S (S n)) =? 1) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2; [ cbn; flia | ].
+  apply Nat.eqb_neq in Hn2.
+  apply Nat_neq_div_1 in Hn2.
+  destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+  rewrite Nat.mod_small; [ | easy ].
+  cbn - [ "/" "mod" "*" ].
+...
+*)
 destruct m; [ easy | clear Hmz ].
 rewrite Nat.pow_add_r.
 revert m Hn.
