@@ -3099,6 +3099,9 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite Nat.mod_small; [ | flia Hn ].
   rewrite fst_if, fst_let.
   cbn - [ "/" "mod" "*" ].
+  rewrite <- Nat.pow_succ_r'.
+Search (_ ^ S _).
+...
   destruct n; [ easy | ].
   cbn - [ "/" "mod" "*" ].
   rewrite fst_if, fst_let.
