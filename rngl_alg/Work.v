@@ -3103,6 +3103,8 @@ Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50))
 Print inv_ub_num.
 Print inv_ub_den_2_pow.
 *)
+(* je suis parti complètement en couille, là, je ne sais plus ce que je fais *)
+...
 Theorem rank_fst_1_log2_up :
   ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
