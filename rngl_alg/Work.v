@@ -3081,23 +3081,22 @@ Qed.
 
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
-  2 ^ fst (rank_fst_loop (3 + m + n) 1 1 (3 + m + n)) < 2 * (3 + m + n)
-  → 2 ^ S (S m) - (4 + m) < n
-  → 2 ^ S m * 2 ^ S (fst (rank_fst_loop (S n) 1 (2 ^ (3 + m)) (4 + m + n))) < 4 + m + n.
+  2 ^ S m - (3 + m) < n
+  → 2 ^ m * 2 ^ S (fst (rank_fst_loop (S n) 1 (2 ^ (2 + m)) (3 + m + n))) <
+      3 + m + n.
 Proof.
-intros * IHn Hn.
-clear IHn.
+intros * Hn.
 revert m Hn.
 induction n; intros; [ easy | ].
 remember (S n) as n'.
 cbn - [ "/" "mod" "*" ].
 subst n'.
-do 3 rewrite Nat.mul_assoc.
-progress replace (2 * 2 * 2) with 8 by easy.
+do 2 rewrite Nat.mul_assoc.
+progress replace (2 * 2) with 4 by easy.
 rewrite Nat.add_succ_r.
 rewrite <- (Nat.add_1_l (m + n)).
-progress replace (S (S (S (S (1 + (m + n)))))) with (5 + m + n) by easy.
-remember (8 * 2 ^ m / (5 + m + n) =? 1) as n1 eqn:Hn1.
+progress replace (S (S (S (1 + (m + n))))) with (4 + m + n) by easy.
+remember (4 * 2 ^ m / (4 + m + n) =? 1) as n1 eqn:Hn1.
 symmetry in Hn1.
 destruct n1. {
   apply Nat.eqb_eq in Hn1.
@@ -3114,26 +3113,26 @@ progress replace (2 * 2 ^ m * 2) with (2 ^ S (S m)). 2: {
   f_equal.
   now rewrite Nat.pow_succ_r', Nat.mul_comm.
 }
-replace 8 with (2 ^ 3) by easy.
-rewrite <- (Nat.pow_add_r 2 3).
-rewrite <- Nat.pow_succ_r'.
-replace (S (3 + m)) with (3 + S m) by easy.
-replace (5 + m) with (4 + S m) by easy.
+rewrite (Nat.mul_comm (2 ^ m)).
+progress replace 4 with (2 ^ 2) at 1 by easy.
+rewrite <- (Nat.pow_add_r 2 2).
+do 2 rewrite <- Nat.pow_succ_r'.
+progress replace (S (2 + m)) with (2 + S m) by easy.
+progress replace (4 + m) with (3 + S m) by easy.
 apply IHn.
-do 3 rewrite Nat.pow_succ_r'.
-do 2 rewrite Nat.pow_succ_r' in Hn.
-do 2 rewrite Nat.mul_assoc.
-replace (2 * 2 * 2) with 8 by easy.
+do 2 rewrite Nat.pow_succ_r'.
+rewrite Nat.pow_succ_r' in Hn.
+rewrite Nat.mul_assoc.
+progress replace (2 * 2) with 4 by easy.
 rewrite <- Nat.add_succ_comm.
-apply Nat.le_lt_add_lt with (m := 5 + m) (n := 5 + m); [ easy | ].
+apply Nat.le_lt_add_lt with (m := 4 + m) (n := 4 + m); [ easy | ].
 rewrite (Nat.add_comm n).
 rewrite Nat.sub_add; [ easy | ].
 clear.
 induction m; [ cbn; flia | ].
-replace (5 + S m) with (S (5 + m)) by easy.
+progress replace (4 + S m) with (S (4 + m)) by easy.
 apply Nat.succ_le_mono in IHm.
 eapply le_trans; [ apply IHm | ].
-remember 8 as n.
 cbn.
 specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
 flia IHm H1.
@@ -3232,15 +3231,13 @@ split. {
   apply Nat.succ_lt_mono in Hn1.
   rename Hn1 into Hn.
 (**)
-  specialize (two_pow_mul_fst_rank_fst_loop 0 n) as H1.
+  specialize (two_pow_mul_fst_rank_fst_loop 1 n) as H1.
+  (* à remonter au cas précédent *)
   rewrite Nat.sub_diag in H1.
   rewrite Nat.pow_1_r in H1.
-  do 2 rewrite Nat.add_0_r in H1.
-  apply H1; [ | easy ].
-  apply IHn.
+  now apply H1.
 }
 progress unfold rank_fst_1.
-Search (2 ^ fst _).
 ...
 Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
 ...
