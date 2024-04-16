@@ -3136,8 +3136,9 @@ split. {
   rewrite Nat.mul_1_r.
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_lt_mono_pos_l; [ easy |].
-  clear Hn1.
-  destruct n; [ easy | clear Hnz ].
+  apply Nat.succ_lt_mono in Hn1.
+  clear Hnz.
+  destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
   cbn - [ "/" "mod" "*" ].
@@ -3149,9 +3150,10 @@ split. {
   apply Nat_neq_div_1 in Hn1.
   destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
   rewrite Nat.mod_small; [ | easy ].
-  clear Hn1.
+  do 2 apply Nat.succ_lt_mono in Hn1.
+  clear Hnz.
   progress replace (2 * 2) with 4 by easy.
-  destruct n; [ easy | clear Hnz ].
+  destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
   cbn - [ "/" "mod" "*" ].
@@ -3229,6 +3231,18 @@ split. {
   destruct n; [ easy | ].
   apply Nat.succ_lt_mono in Hn1.
   rename Hn1 into Hn.
+(**)
+do 3 rewrite Nat.mul_assoc.
+progress replace (2 * 2 * 2 * 2) with 16 by easy.
+Theorem glop :
+  ∀ n,
+  2 ^ fst (rank_fst_loop (6 + n) 1 1 (6 + n)) < 2 * (6 + n)
+  → 25 < n
+  → 16 * 2 ^ S (fst (rank_fst_loop (S n) 1 64 (7 + n))) < 7 + n.
+Proof.
+... ...
+now apply glop.
+(* 3 10 25 *)
 ...
 Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
 ...
