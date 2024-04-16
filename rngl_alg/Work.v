@@ -3079,8 +3079,7 @@ rewrite <- Nat.add_succ_comm in Hit, Hbma, Hmab.
 now apply IHit.
 Qed.
 
-(*
-Theorem two_pow_mul_fst_rank_fst_loop :
+Theorem two_pow_mul_fst_rank_fst_loop' :
   ∀ m n,
   m ≠ 0
   → 2 ^ m - (2 + m) < n
@@ -3113,18 +3112,10 @@ progress replace (2 * 2 ^ m * 2) with (2 ^ S (S m)). 2: {
   f_equal.
   now rewrite Nat.pow_succ_r', Nat.mul_comm.
 }
-(*
-progress replace 4 with (2 ^ 2) at 1 by easy.
-rewrite <- (Nat.pow_add_r 2 2).
-do 2 rewrite <- Nat.pow_succ_r'.
-*)
 rewrite <- Nat.pow_add_r.
 rewrite <- Nat.add_succ_comm.
 rewrite Nat.pow_add_r.
 rewrite <- Nat.pow_succ_r'.
-(*
-progress replace (S (2 + m)) with (2 + S m) by easy.
-*)
 progress replace (3 + m) with (2 + S m) by easy.
 apply IHn; [ easy | ].
 rewrite Nat.pow_succ_r'.
@@ -3144,7 +3135,6 @@ cbn.
 specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
 flia IHm H1.
 Qed.
-*)
 
 (**)
 Theorem two_pow_mul_fst_rank_fst_loop :
@@ -3284,6 +3274,10 @@ split. {
   destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 (**)
+  specialize (two_pow_mul_fst_rank_fst_loop' 1 n) as H1.
+  apply H1; [ easy | ].
+  now apply Nat.neq_0_lt_0.
+...
   specialize (two_pow_mul_fst_rank_fst_loop 0 n) as H1.
   apply H1.
   now apply Nat.neq_0_lt_0.
