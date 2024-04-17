@@ -3266,6 +3266,49 @@ progress replace 2 with (2 * 1) at 1 by easy.
 now apply Nat.mul_le_mono_pos_l.
 Qed.
 
+Theorem snd_rank_fst_loop :
+  ∀ m n it,
+  n ≤ S m + it
+  → 2 ^ m < n
+  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
+Proof.
+intros * Hit Hmn.
+revert m n Hit Hmn.
+induction it; intros. {
+  exfalso.
+  rewrite Nat.add_0_r in Hit.
+  apply Nat.nle_gt in Hmn.
+  apply Hmn; clear Hmn.
+  apply (le_trans _ (S m)); [ easy | ].
+  now apply Nat.pow_gt_lin_r.
+}
+cbn - [ "*" "^" ].
+remember (2 ^ S m / n =? 1) as mn1 eqn:Hmn1.
+symmetry in Hmn1.
+destruct mn1. {
+  symmetry; cbn - [ "^" ].
+  f_equal.
+  apply Nat_eq_log2_up; [ flia Hmn | ].
+  apply Nat.eqb_eq in Hmn1.
+  apply Nat_eq_div_1 in Hmn1.
+  split; [ | easy ].
+  rewrite Nat.pow_succ_r'.
+  now rewrite Nat.mul_comm, Nat.div_mul.
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hmn1.
+apply Nat_neq_div_1 in Hmn1.
+destruct Hmn1 as [Hmn1| Hmn1]. {
+  rewrite Nat.pow_succ_r' in Hmn1.
+  apply Nat.mul_le_mono_pos_l in Hmn1; [ | easy ].
+  now apply Nat.nlt_ge in Hmn1.
+}
+rewrite Nat.mod_small; [ | easy ].
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat.add_succ_comm in Hit.
+now apply IHit.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3443,24 +3486,7 @@ clear Hn; rename Hn1 into Hn.
   ============================
   snd (rank_fst_loop it 1 8 n) = 2 ^ Nat.log2_up n
 *)
-Theorem glop :
-  ∀ m n it,
-  n ≤ S m + it
-  → 2 ^ m < n
-  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
-Proof.
-intros * Hit Hmn.
-revert m n Hit Hmn.
-induction it; intros. {
-  exfalso.
-  rewrite Nat.add_0_r in Hit.
-  apply Nat.nle_gt in Hmn.
-  apply Hmn; clear Hmn.
-  apply (le_trans _ (S m)); [ easy | ].
-  now apply Nat.pow_gt_lin_r.
-}
-... ...
-now apply (glop 3).
+now apply (snd_rank_fst_loop 3).
 ... ...
 rewrite snd_rank_fst_1; [ | easy ].
 Search rank_fst_loop.
