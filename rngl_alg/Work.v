@@ -3164,7 +3164,7 @@ rewrite (Nat.add_comm n).
 rewrite Nat.sub_add; [ easy | ].
 clear.
 induction m; [ cbn; flia | ].
-progress replace (4 + S m) with (S (4 + m)) by easy.
+rewrite Nat.add_succ_r.
 apply Nat.succ_le_mono in IHm.
 eapply le_trans; [ apply IHm | ].
 cbn.
