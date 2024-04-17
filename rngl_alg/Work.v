@@ -3277,7 +3277,13 @@ rewrite rank_fst_1_log2_up.
 rewrite angle_div_2_pow_add_r.
 Compute (map (λ n, (fst_1_len 1 n)) (seq 0 40)).
 Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
+Print rank_fst_loop.
+Print fst_1_len.
+Compute (map (λ b, snd (rank_fst_loop b 1 1 b)) (seq 0 20)).
 ...
+Compute (map (λ n, (fst_1_len 1 n)) (seq 0 20)).
+Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
+Compute (map (λ a, (a, map (λ b, snd (rank_fst_loop b 1 a b)) (seq a 20))) (seq 0 10)).
 Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
 ...
 destruct (Nat.log2_up_succ_or n) as [Hn| Hn]. {
