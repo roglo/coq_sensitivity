@@ -3275,7 +3275,8 @@ progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
 rewrite rank_fst_1_log2_up.
 rewrite angle_div_2_pow_add_r.
-Search (_ / ₂^Nat.log2_up _)%A.
+Compute (map (λ n, (fst_1_len 1 n)) (seq 0 40)).
+Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
 ...
 Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
 ...
