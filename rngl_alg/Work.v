@@ -2661,6 +2661,11 @@ Theorem S_if :
   S (if a then b else c) = if a then S b else S c.
 Proof. now intros; destruct a. Qed.
 
+Theorem snd_let :
+  ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
+  snd (let (b, c) := a in (f b, g c)) = g (snd a).
+Proof. now intros; destruct a. Qed.
+
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
   c ≠ 0
@@ -3275,11 +3280,190 @@ progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
 rewrite rank_fst_1_log2_up.
 rewrite angle_div_2_pow_add_r.
+progress unfold fst_1_len.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply angle_nonneg.
+}
 Compute (map (λ n, (fst_1_len 1 n)) (seq 0 40)).
 Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
 Print rank_fst_loop.
 Print fst_1_len.
-Compute (map (λ b, snd (rank_fst_loop b 1 1 b)) (seq 0 20)).
+Compute (map (λ b, (b, snd (rank_fst_loop b 1 1 b))) (seq 0 20)).
+Compute (map (λ n, snd (rank_fst_loop n 1 1 n) = 2 ^ Nat.log2_up n) (seq 0 30)).
+Inspect 3.
+Theorem snd_rank_fst_1 :
+  ∀ it n,
+  n ≠ 0
+  → n ≤ it
+  → snd (rank_fst_loop it 1 1 n) = 2 ^ Nat.log2_up n.
+Proof.
+intros * Hnz Hit.
+(**)
+destruct it; [ now apply Nat.le_0_r in Hit | ].
+cbn - [ "*" ].
+remember (1 / n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  symmetry; cbn.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (H, _).
+  apply Nat.le_1_r in H.
+  destruct H; [ easy | now subst n].
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hnz Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+rewrite Nat.mul_1_r.
+clear Hnz; rename Hn1 into Hn.
+(*
+Theorem glop :
+  ∀ m n it,
+  n ≤ S m + it
+  → 2 ^ m < n
+  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
+Admitted.
+now apply (glop 0).
+...
+*)
+destruct it; [ now apply Nat.nle_gt in Hn | ].
+cbn - [ "*" ].
+remember (2 / n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  symmetry; cbn.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
+  destruct n; [ easy | ].
+  do 2 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+progress replace (2 * 2) with 4 by easy.
+clear Hn; rename Hn1 into Hn.
+(*
+Theorem glop :
+  ∀ m n it,
+  n ≤ S m + it
+  → 2 ^ m < n
+  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
+Admitted.
+now apply (glop 1).
+...
+*)
+destruct it; [ now apply Nat.nle_gt in Hn | ].
+cbn - [ "*" ].
+remember (4 / n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  symmetry; cbn.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
+  destruct n; [ easy | clear Hn ].
+  destruct n; [ easy | ].
+  do 4 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+progress replace (2 * 4) with 8 by easy.
+clear Hn; rename Hn1 into Hn.
+(**)
+(*
+  Hit : n ≤ S (S (S it))
+  Hn : 4 < n
+  ============================
+  snd (rank_fst_loop it 1 8 n) = 2 ^ Nat.log2_up n
+*)
+(*
+Theorem glop :
+  ∀ m n it,
+  n ≤ S m + it
+  → 2 ^ m < n
+  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
+Admitted.
+now apply (glop 2).
+...
+*)
+destruct it; [ flia Hit Hn | ].
+cbn - [ "*" ].
+remember (8 / n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  symmetry; cbn.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+  do 8 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+progress replace (2 * 8) with 16 by easy.
+clear Hn; rename Hn1 into Hn.
+(**)
+(*
+  Hit : n ≤ S (S (S (S it)))
+  Hn : 8 < n
+  ============================
+  snd (rank_fst_loop it 1 16 n) = 2 ^ Nat.log2_up n
+*)
+(*
+  Hit : n ≤ S (S (S it))
+  Hn : 4 < n
+  ============================
+  snd (rank_fst_loop it 1 8 n) = 2 ^ Nat.log2_up n
+*)
+Theorem glop :
+  ∀ m n it,
+  n ≤ S m + it
+  → 2 ^ m < n
+  → snd (rank_fst_loop it 1 (2 ^ S m) n) = 2 ^ Nat.log2_up n.
+Proof.
+intros * Hit Hmn.
+revert m n Hit Hmn.
+induction it; intros. {
+  exfalso.
+  rewrite Nat.add_0_r in Hit.
+  apply Nat.nle_gt in Hmn.
+  apply Hmn; clear Hmn.
+  apply (le_trans _ (S m)); [ easy | ].
+  now apply Nat.pow_gt_lin_r.
+}
+... ...
+now apply (glop 3).
+... ...
+rewrite snd_rank_fst_1; [ | easy ].
+Search rank_fst_loop.
 ...
 Compute (map (λ n, (fst_1_len 1 n)) (seq 0 20)).
 Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
