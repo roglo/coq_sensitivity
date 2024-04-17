@@ -3172,41 +3172,42 @@ specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
 flia IHm H1.
 Qed.
 
-(* to be completed
-(* upper bound of θi (seq_angle i) independant from i *)
-Theorem seq_angle_to_div_nat_le :
-  ∀ n i θ,
-  n ≠ 1
-  → (seq_angle_to_div_nat θ n i ≤
-       inv_ub_num n * (θ / ₂^inv_ub_den_2_pow n))%A.
+Theorem le_fst_rank_fst_loop :
+  ∀ m n,
+  2 ^ m - 2 * m < 2 * n
+  → m + n ≤ 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n))).
 Proof.
-(*
-1/3 = 0.0101010101010 < 0.011 = 1/4+1/8 = 3/2^3
-1/5 = 0.0011001100110 < 0.00111 = 1/8+1/16+1/32 = 7/2^5
-1/6 = 0.0010101010101 < 0.0011 = 1/8+1/16 = 3/2^4
-1/7 = 0.0010010010010 < 0.0011 = 1/8+1/16 = 3/2^4
-*)
-intros * Hn1.
-progress unfold seq_angle_to_div_nat.
-(*
-   2^i/n * (θ/₂^i) ≤ an * (θ/2^bn)
-     1/n = 0.0..01..10..
-             an= 1..11
-             bn=len(0..01..10)
-     2^bn*(1/n)=1..1
-     (2^bn-1)/n=1..1=an/2
-     2^bn*(1/n)*2+1=an
-     an=2^bn/n+1
-Compute (map (λ n, (inv_ub_num n = 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
-Print inv_ub_num.
-Print inv_ub_den_2_pow.
-*)
-progress unfold inv_ub_num.
-progress unfold inv_ub_den_2_pow.
+intros * Hn.
+revert m Hn.
+induction n; intros; [ easy | ].
+cbn - [ "*" ].
+remember (2 ^ m / (m + S n) =? 1) as mn eqn:Hmn.
+symmetry in Hmn.
+destruct mn. {
+  cbn.
+  rewrite Nat.add_0_r.
+  apply Nat.eqb_eq in Hmn.
+  now apply Nat_eq_div_1 in Hmn.
+}
+rewrite fst_let.
+apply Nat.eqb_neq in Hmn.
+apply Nat_neq_div_1 in Hmn.
+destruct Hmn as [Hmn| Hmn]; [ flia Hn Hmn | ].
+rewrite Nat.mod_small; [ | easy ].
+do 2 rewrite <- Nat.add_succ_comm.
+rewrite <- Nat.pow_succ_r'.
+apply IHn.
+rewrite Nat.pow_succ_r'.
+rewrite <- Nat.mul_sub_distr_l.
+apply Nat.mul_lt_mono_pos_l; [ easy | ].
+apply Nat.le_lt_add_lt with (m := S m) (n := S m); [ easy | ].
+rewrite Nat.sub_add; [ | now apply Nat.pow_gt_lin_r ].
+now rewrite <- Nat.add_succ_comm, Nat.add_comm.
+Qed.
+
 Theorem rank_fst_1_log2_up : ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
-(**)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 symmetry.
 apply Nat_eq_log2_up; [ easy | ].
@@ -3216,7 +3217,6 @@ split. {
   induction n; [ easy | clear Hnz ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
   specialize (IHn Hnz).
-(**)
   cbn - [ "/" "mod" "*" ].
   remember (1 / S n =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3233,7 +3233,6 @@ split. {
   clear Hnz.
   destruct n; [ easy | clear Hn1 ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
-(**)
   cbn - [ "/" "mod" "*" ].
   remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3255,126 +3254,28 @@ split. {
 progress unfold rank_fst_1.
 rename Hnz into Hn.
 apply Nat.neq_0_lt_0 in Hn.
-(**)
-(*
-  Hn : 0 < n
-  ============================
-  n ≤ 2 ^ fst (rank_fst_loop n 1 1 n)
-*)
-destruct n; [ easy | ].
-cbn - [ "/" "mod" "*" "^" ].
-rewrite fst_if, fst_let.
-remember (1 / S n =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.eqb_eq in Hn1; cbn.
-  now apply Nat_eq_div_1 in Hn1.
-}
-apply Nat.eqb_neq in Hn1.
-apply Nat_neq_div_1 in Hn1.
-destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
-rewrite Nat.mod_small; [ | easy ].
-do 1 apply Nat.succ_lt_mono in Hn1.
-clear Hn; rename Hn1 into Hn.
-progress replace (2 * 1) with 2 by easy.
-(**)
-(*
-  Hn : 0 < n
-  ============================
-  S n ≤ 2 ^ S (fst (rank_fst_loop n 1 2 (S n)))
-*)
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hn.
-cbn - [ "/" "mod" "*" "^" ].
-rewrite fst_if, fst_let.
-remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.eqb_eq in Hn1; cbn.
-  now apply Nat_eq_div_1 in Hn1.
-}
-apply Nat.eqb_neq in Hn1.
-apply Nat_neq_div_1 in Hn1.
-destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
-rewrite Nat.mod_small; [ | easy ].
-do 2 apply Nat.succ_lt_mono in Hn1.
-clear Hn; rename Hn1 into Hn.
-progress replace (2 * 2) with 4 by easy.
-(**)
-(*
-  Hn : 0 < n
-  ============================
-  S (S n) ≤ 2 ^ S (S (fst (rank_fst_loop n 1 4 (S (S n)))))
-*)
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hn.
-cbn - [ "/" "mod" "*" "^" ].
-rewrite fst_if, fst_let.
-remember (4 / S (S (S n)) =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.eqb_eq in Hn1; cbn.
-  now apply Nat_eq_div_1 in Hn1.
-}
-apply Nat.eqb_neq in Hn1.
-apply Nat_neq_div_1 in Hn1.
-destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
-rewrite Nat.mod_small; [ | easy ].
-do 3 apply Nat.succ_lt_mono in Hn1.
-clear Hn; rename Hn1 into Hn.
-progress replace (2 * 4) with 8 by easy.
-(**)
-(*
-  Hn : 1 < n
-  ============================
-  S (S (S n)) ≤ 2 ^ S (S (S (fst (rank_fst_loop n 1 8 (S (S (S n)))))))
-*)
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hn.
-cbn - [ "/" "mod" "*" "^" ].
-rewrite fst_if, fst_let.
-remember (8 / S (S (S (S n))) =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.eqb_eq in Hn1; cbn.
-  now apply Nat_eq_div_1 in Hn1.
-}
-apply Nat.eqb_neq in Hn1.
-apply Nat_neq_div_1 in Hn1.
-destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
-rewrite Nat.mod_small; [ | easy ].
-do 4 apply Nat.succ_lt_mono in Hn1.
-clear Hn; rename Hn1 into Hn.
-progress replace (2 * 8) with 16 by easy.
-(**)
-(*
-  Hn : 4 < n
-  ============================
-  S (S (S (S n))) ≤ 2 ^ S (S (S (S (fst (rank_fst_loop n 1 16 (S (S (S (S n)))))))))
-*)
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hn.
-cbn - [ "/" "mod" "*" "^" ].
-rewrite fst_if, fst_let.
-remember (16 / S (S (S (S (S n)))) =? 1) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.eqb_eq in Hn1; cbn.
-  now apply Nat_eq_div_1 in Hn1.
-}
-apply Nat.eqb_neq in Hn1.
-apply Nat_neq_div_1 in Hn1.
-destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
-rewrite Nat.mod_small; [ | easy ].
-do 5 apply Nat.succ_lt_mono in Hn1.
-clear Hn; rename Hn1 into Hn.
-progress replace (2 * 16) with 32 by easy.
-(**)
-(*
-  Hn : 11 < n
-  ============================
-  S (S (S (S (S n)))) ≤ 2 ^ S (S (S (S (S (fst (rank_fst_loop n 1 32 (S (S (S (S (S n)))))))))))
-*)
+apply (le_fst_rank_fst_loop 0 n).
+remember (2 * n) as x; cbn; subst x.
+progress unfold lt.
+progress replace 2 with (2 * 1) at 1 by easy.
+now apply Nat.mul_le_mono_pos_l.
+Qed.
+
+(* to be completed
+(* upper bound of θi (seq_angle i) independant from i *)
+Theorem seq_angle_to_div_nat_le :
+  ∀ n i θ,
+  n ≠ 1
+  → (seq_angle_to_div_nat θ n i ≤
+       inv_ub_num n * (θ / ₂^inv_ub_den_2_pow n))%A.
+Proof.
+intros * Hn1.
+progress unfold seq_angle_to_div_nat.
+progress unfold inv_ub_num.
+progress unfold inv_ub_den_2_pow.
+rewrite rank_fst_1_log2_up.
+rewrite angle_div_2_pow_add_r.
+Search (_ / ₂^Nat.log2_up _)%A.
 ...
 Compute (map (λ n, (2 ^ rank_fst_1 1 n, 2 * n)) (seq 0 20)).
 ...
