@@ -3342,6 +3342,16 @@ rewrite Nat.mul_1_r.
 now apply (snd_rank_fst_loop 0).
 Qed.
 
+Theorem Nat_le_add_le_sub_l : ∀ n m p, n ≤ m → n + p ≤ m ↔ p ≤ m - n.
+Proof.
+intros * Hnm.
+split; intros Hn; [ now apply Nat.le_add_le_sub_l | ].
+apply Nat.add_le_mono_l with (p := n) in Hn.
+eapply le_trans; [ apply Hn | ].
+rewrite Nat.add_comm.
+now rewrite Nat.sub_add.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3390,6 +3400,72 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     now apply Nat.pow_nonzero.
   }
   apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  rewrite Nat.mul_comm.
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  rewrite (Nat.mul_comm n).
+  rewrite Nat.mul_comm.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  progress unfold inv_ub_den_2_pow.
+  progress unfold inv_ub_num.
+  rewrite rank_fst_1_log2_up.
+  rewrite Nat.pow_add_r.
+  rewrite Nat.mul_sub_distr_r.
+  rewrite Nat.mul_1_l.
+  apply Nat.le_add_le_sub_r.
+  apply Nat_le_add_le_sub_l. {
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_shuffle0.
+    apply Nat.mul_le_mono_r.
+...
+Compute (
+  map (λ n, Nat.leb (2 ^ Nat.log2_up n) (2 * n)) (seq 1 40)).
+ok
+...
+Search (_ + _ ≤ _).
+Search (_ + _ < _).
+Search (_ - _ ≤ _).
+Check Nat.lt_add_lt_sub_l.
+Check Nat.le_add_le_sub_l.
+...
+Check Nat.le_sub_le_add_r.
+...
+Search (_ + _ ≤ _ ↔ _).
+Search (_ → _ + _ ≤ _).
+  rewrite Nat.add_comm.
+  apply Nat.le_add_le_sub_l.
+  apply Nat.le_sub_le_add_r.
+  remember (fst_1_len 1 n) as m eqn:Hm.
+...
+Compute (
+  let m := 4 in
+map (λ m,
+  map (λ n, Nat.leb (2 ^ Nat.log2_up n * 2 ^ m) (2 ^ S m * n - n)) (seq 1 20))
+(seq 4 12)).
+
+...
+Search (2 ^ Nat.log2_up _).
+Compute (
+  map (λ n,
+    Nat.leb (2 ^ Nat.log2_up n * 2 ^ fst_1_len 1 n) (2 ^ S (fst_1_len 1 n) * n - n)) (seq 1 20)).
+
+...
+...
+Compute (
+  map (λ n, Nat.leb (2 ^ inv_ub_den_2_pow n) (inv_ub_num n * n)) (seq 1 20)).
+Compute (
+  let n := 31 in
+  map (λ i, Nat.leb (2 ^ inv_ub_den_2_pow n * 2 ^ i) (n * (2 ^ i * inv_ub_num n))) (seq 0 15)).
+...
+Compute (
+  let n := 4 in
+  map (λ i, 2 ^ i / n * 2 ^ inv_ub_den_2_pow n ≤ 2 ^ i * inv_ub_num n)
+   (seq 0 10)).
+Compute (
+  let n := 9 in
+  map (λ i, Nat.leb (2 ^ i / n * 2 ^ inv_ub_den_2_pow n) (2 ^ i * inv_ub_num n))
+   (seq 0 12)).
 ...
   apply (Nat.pow_le_mono_r_iff 2) in Hni; [ | easy ].
 Search (_ ^ (_ - _)).
