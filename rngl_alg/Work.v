@@ -3364,6 +3364,26 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite fold_rank_fst_0.
 Compute (map (λ n, (n, rank_fst_0 (2 ^ Nat.log2_up n) n)) (seq 0 40)).
+Compute (map (λ n, (n, 2 ^ S (rank_fst_0 (2 ^ Nat.log2_up n) n) - 1)) (seq 0 40)).
+Compute (let n := 5 in
+  (2 ^ S (rank_fst_0 (2 ^ Nat.log2_up n) n) - 1,
+   2^Nat.log2_up n, 2^rank_fst_0 (2 ^ Nat.log2_up n) n)).
+...
+log2 5 = 3
+...
+θ/2^3/2^2
+Inspect 20.
+Theorem seq_angle_to_div_nat_5_le' :
+  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
+Proof.
+intros.
+progress unfold seq_angle_to_div_nat.
+...
+  ============================
+  (2 ^ i / 5 * (θ / ₂^i) ≤ 7 * (θ / ₂^5))%A
+  ============================
+  (2 ^ i / 5 * (θ / ₂^i) ≤ (2^3-1) * (θ / ₂^3 / ₂^2))%A
+...
 Compute (binary_div 20 64 33).
 Compute (binary_div 20 64 38).
 Compute (binary_div 20 32 17).
