@@ -3369,6 +3369,10 @@ Compute (let n := 5 in
   (2 ^ S (rank_fst_0 (2 ^ Nat.log2_up n) n) - 1,
    2^Nat.log2_up n, 2^rank_fst_0 (2 ^ Nat.log2_up n) n)).
 ...
+1/5 = 0.0011001100...
+    ≤ 0.00111
+          ^^^ = 7
+            ^ position = 5
 log2 5 = 3
 ...
 θ/2^3/2^2
