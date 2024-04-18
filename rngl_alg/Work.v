@@ -3418,6 +3418,42 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     rewrite Nat.pow_succ_r'.
     rewrite Nat.mul_shuffle0.
     apply Nat.mul_le_mono_r.
+    clear Hn1 Hin Hni.
+    specialize (Nat.log2_up_succ_or n) as H1.
+    destruct H1 as [H1| H1]. {
+      apply Nat_pow2_log2_up_succ in H1.
+      rewrite <- H1 at 2.
+      rewrite <- Nat.pow_succ_r'.
+      apply Nat.pow_le_mono_r; [ easy | ].
+      apply Nat.le_log2_up_succ_log2.
+    }
+    generalize H1; intros H2.
+    symmetry in H2.
+    apply Nat_eq_log2_up in H2; [ | easy ].
+    destruct H2 as (H2, H3).
+    rewrite H1 in H2, H3.
+...
+    apply (Nat.mul_lt_mono_pos_l 2) in H2; [ | easy ].
+Search (_ * (_ / _)).
+    specialize (Nat.div_mul_le (2 ^ Nat.log2_up (S n)) 2 2) as H4.
+    specialize (H4 (Nat.neq_succ_0 _)).
+...
+    eapply le_trans; [ | apply Nat.lt_le_incl, H2 ].
+
+eapply le_trans; [ apply H1 | ].
+rewrite Nat.mul_comm in H1.
+...
+Search (_ / _ < _).
+apply Nat.div_lt_upper_bound in
+Search (Nat.log2_up).
+...
+Search Nat.log2_up.
+    specialize Nat.log2_up_spec as H1.
+Search (2 ^ Nat.log2_up _ ≤ _).
+Nat_pow2_log2_up_succ: ∀ n : nat, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n
+...
+    destruct n; [ easy | clear Hnz ].
+Search (Nat.log2_up (S _)).
 ...
 Compute (
   map (λ n, Nat.leb (2 ^ Nat.log2_up n) (2 * n)) (seq 1 40)).
