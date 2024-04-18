@@ -2562,6 +2562,7 @@ Fixpoint rank_fst_loop it k a b :=
         (S r, a')
   end.
 
+Definition rank_fst_0 a b := fst (rank_fst_loop b 0 a b).
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
@@ -2578,6 +2579,10 @@ Compute (map (λ n, (n, inv_ub_num n, inv_ub_den_2_pow n)) [3;4;5;6;7;9]).
 Compute
   (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_2_pow n / n + 1)) (seq 1 50)).
 *)
+
+Theorem fold_rank_fst_0 :
+  ∀ a b, fst (rank_fst_loop b 0 a b) = rank_fst_0 a b.
+Proof. easy. Qed.
 
 Theorem fold_rank_fst_1 :
   ∀ a b, fst (rank_fst_loop b 1 a b) = rank_fst_1 a b.
@@ -3357,6 +3362,11 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply angle_nonneg.
 }
 rewrite snd_rank_fst_1; [ | easy | easy ].
+rewrite fold_rank_fst_0.
+Compute (map (λ n, (n, rank_fst_0 (2 ^ Nat.log2_up n) n)) (seq 0 40)).
+Compute (binary_div 20 64 33).
+Compute (binary_div 20 64 38).
+Compute (binary_div 20 32 17).
 ...
 Compute (map (λ n, (fst_1_len 1 n)) (seq 0 40)).
 Compute (map (λ n, (n, fst_1_len 1 n)) (seq 0 20)).
