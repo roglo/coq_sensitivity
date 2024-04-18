@@ -3356,6 +3356,77 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   apply angle_nonneg.
 }
+destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
+  rewrite Nat.div_small; [ | easy ].
+  apply angle_nonneg.
+}
+apply Nat.nlt_ge in Hin.
+destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
+  rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_2_pow n) i); [ | easy ].
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
+    eapply angle_mul_nat_not_overflow_le_l. 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    progress unfold inv_ub_num.
+    progress unfold inv_ub_den_2_pow.
+    rewrite rank_fst_1_log2_up.
+    (* lemma *)
+    eapply le_trans; [ apply Nat.le_sub_l | ].
+    apply Nat.pow_le_mono_r; [ easy | ].
+    rewrite <- Nat.add_1_l.
+    apply Nat.add_le_mono_r.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.log2_up_null in H.
+    destruct n; [ easy | ].
+    apply Nat.succ_le_mono in H.
+    apply Nat.le_0_r in H.
+    now subst n.
+  }
+  rewrite Nat.pow_sub_r; [ | easy | easy ].
+  eapply le_trans. {
+    apply Nat.div_mul_le.
+    now apply Nat.pow_nonzero.
+  }
+  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+...
+  apply (Nat.pow_le_mono_r_iff 2) in Hni; [ | easy ].
+Search (_ ^ (_ - _)).
+...
+  progress unfold inv_ub_den_2_pow in Hni.
+  progress unfold inv_ub_den_2_pow.
+  rewrite rank_fst_1_log2_up in Hni |-*.
+  rewrite Nat.pow_add_r in Hni.
+...
+Compute (
+  let n := 5 in
+  map (λ i, (i ≤ inv_ub_den_2_pow n, 2 ^ i / n * 2 ^ (inv_ub_den_2_pow n - i) ≤ inv_ub_num n))
+    (seq 1 12)).
+...
+Search (_ - _ ≤ _).
+...
+  apply Nat.le_sub_le_add_l.
+Search (_ ≤ _ + _).
+
+  apply Nat_le_add_l.
+
+Search (_ ≤ S _).
+Search (inv_ub_num).
+Search (inv_ub_den_2_pow).
+...
+
+rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_2_pow n) i).
+rewrite <- (angle_div_2_pow_mul_pow_sub i (inv_ub_den_2_pow n)).
+
+progress unfold inv_ub_den_2_pow in Hni.
+rewrite rank_fst_1_log2_up in Hni.
+...
+rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_2_pow n) i).
+...
+rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_2_pow n + i) (inv_ub_den_2_pow n)). 2: {
+  progress unfold inv_ub_den_2_pow.
+...
 destruct i. {
   cbn - [ "^" ].
   rewrite Nat.div_small; [ | cbn; flia Hnz Hn1 ].
