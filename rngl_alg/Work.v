@@ -3352,6 +3352,24 @@ Theorem seq_angle_to_div_nat_le :
 Proof.
 intros * Hn1.
 progress unfold seq_angle_to_div_nat.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply angle_nonneg.
+}
+destruct i. {
+  cbn - [ "^" ].
+  rewrite Nat.div_small; [ | cbn; flia Hnz Hn1 ].
+  apply angle_nonneg.
+}
+rewrite <- (angle_div_2_pow_mul_pow_sub (1 + i) (inv_ub_den_2_pow n)). 2: {
+  progress unfold inv_ub_den_2_pow.
+...
+rewrite <- (angle_div_2_pow_mul_pow_sub (5 + i) 5); [ | apply Nat.le_add_r ].
+  ============================
+  (2 ^ S (S (S (S (S i)))) / 5 * (θ / ₂^S (S (S (S (S i))))) ≤ 7 * (θ / ₂^5))%A
+...
+intros * Hn1.
+progress unfold seq_angle_to_div_nat.
 progress unfold inv_ub_num.
 progress unfold inv_ub_den_2_pow.
 rewrite rank_fst_1_log2_up.
@@ -3363,6 +3381,13 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite fold_rank_fst_0.
+destruct i. {
+  cbn - [ "^" ].
+  rewrite Nat.div_small; [ | cbn; flia Hnz Hn1 ].
+  apply angle_nonneg.
+}
+rewrite <- (angle_div_2_pow_mul_pow_sub (5 + S i) (S i)); [ | ].
+...
 Compute (map (λ n, (n, rank_fst_0 (2 ^ Nat.log2_up n) n)) (seq 0 40)).
 Compute (map (λ n, (n, 2 ^ S (rank_fst_0 (2 ^ Nat.log2_up n) n) - 1)) (seq 0 40)).
 Compute (let n := 5 in
