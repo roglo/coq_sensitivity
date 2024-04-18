@@ -3374,10 +3374,9 @@ log2 5 = 3
 θ/2^3/2^2
 Inspect 20.
 Theorem seq_angle_to_div_nat_5_le' :
-  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
+  ∀ i θ, (2 ^ i / 5 * (θ / ₂^i) ≤ 7 * (θ / ₂^5))%A.
 Proof.
 intros.
-progress unfold seq_angle_to_div_nat.
 ...
   ============================
   (2 ^ i / 5 * (θ / ₂^i) ≤ 7 * (θ / ₂^5))%A
