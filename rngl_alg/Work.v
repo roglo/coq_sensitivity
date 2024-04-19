@@ -3427,6 +3427,34 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
       apply Nat.pow_le_mono_r; [ easy | ].
       apply Nat.le_log2_up_succ_log2.
     }
+    destruct n; [ easy | clear Hnz ].
+    cbn in H1.
+    rewrite <- H1.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    specialize (Nat.log2_iter_spec n 0 1 0) as H2.
+    specialize (H2 eq_refl (Nat.lt_0_succ _)).
+    remember (Nat.log2_iter n 0 1 0) as x eqn:Hx.
+    cbn in H2.
+    now rewrite <- (Nat.add_1_r n).
+  }
+  rewrite Nat.mul_comm.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_assoc.
+  rewrite <- Nat.mul_sub_distr_r.
+  rewrite (Nat.mul_comm n).
+  progress unfold inv_ub_den_2_pow in Hni.
+  rewrite rank_fst_1_log2_up in Hni.
+...
+Check Nat.log2_up_spec.
+specialize (Nat.log2_up_spec (S n)) as H2.
+assert (H : 1 < S n) by flia Hnz.
+specialize (H2 H); clear H.
+rewrite H1 in H2.
+...
+Check Nat.le_log2_up_succ_log2.
+Search Nat.log2.
+...
     generalize H1; intros H2.
     symmetry in H2.
     apply Nat_eq_log2_up in H2; [ | easy ].
