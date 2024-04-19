@@ -3553,9 +3553,63 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     progress replace (2 * 2) with 4 by easy.
     rewrite (Nat.mul_comm _ 2).
     rewrite <- Nat.pow_succ_r'.
+Print rank_fst_loop.
+Theorem glop :
+  ∀ it k a b, snd (rank_fst_loop it k a b) mod b ≤ 1.
+Proof.
+intros.
+revert a.
+induction it; intros. {
+  destruct b; [ easy | cbn ].
+  now rewrite Nat.sub_diag.
+}
+cbn - [ "*" ].
+rewrite snd_if, snd_let.
+cbn - [ "*" ].
+remember (a / b =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk. {
+  apply Nat.eqb_eq in Habk.
+...
+Search (_ / _ = _ → _).
+Search (_ / _ = _ ↔ _).
+Search (_ ↔ _ / _ = _).
+  apply (Nat_div_less_small_iff k) in Habk.
+  apply Nat
+... ...
+specialize (glop n 1 4 (S (S n))) as H1.
+remember (snd _) as x.
+...
+Compute (map (λ n,
+  (n,
+   Nat.leb (S (S n)) (4 * S (S n) - 2 ^ S (S (Nat.log2 (S n)))))) (seq 0 20)).
+...
 rewrite Nat.mod_small in Htsr. 2: {
+  destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" ].
+  remember (4 / S (S (S n)) =? 1) as n4 eqn:Hn4.
+  symmetry in Hn4.
+  destruct n4. {
+    exfalso.
+    apply Nat.eqb_eq in Hn4.
+    apply Nat_eq_div_1 in Hn4.
+    destruct Hn4 as (Hn4, Hn5).
+    do 3 apply Nat.succ_le_mono in Hn4.
+    destruct n. {
+      cbn in Htsr, Hn5.
+      (* donc faux *)
+...
+remember (snd _) as x.
+Compute (
+  map (λ n,
+    let x := 3 in
+    (Nat.ltb (2 * (x mod S (S n))) (S (S n)),
+     x < S (S n))) (seq 1 20)).
+...
 Search (snd _ mod _).
 Print rank_fst_loop.
+Compute (map (λ n,
+  snd (rank_fst_loop n 1 4 (S (S n))) < S (S n)) (seq 0 40)).
 ...
 Compute (map (λ n,
   (n, Nat.ltb
