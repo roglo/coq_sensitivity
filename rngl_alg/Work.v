@@ -3520,6 +3520,61 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     apply Hsr; clear Hsr.
     now apply (lt_snd_rank_fst_loop 0).
   }
+  clear. (* seems true inconditionnally *)
+  destruct n; [ now cbn; apply -> Nat.succ_le_mono | ].
+(**)
+  cbn - [ "*" "/" "mod" "^" Nat.log2 ].
+  rewrite fst_if, snd_if, fst_let, snd_let, S_if.
+  cbn - [ "*" "/" "mod" "^" Nat.log2 ].
+  remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    destruct Hn1 as (Hn1, Hn2).
+    do 2 apply Nat.succ_le_mono in Hn1.
+    apply Nat.le_0_r in Hn1; subst n.
+    cbn; flia.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+  rewrite (Nat.mod_small 2); [ | easy ].
+  do 2 apply Nat.succ_lt_mono in Hn1.
+  progress replace (2 * 2) with 4 by easy.
+  remember (_ =? 0) as tsr eqn:Htsr.
+  symmetry in Htsr.
+  destruct tsr. {
+    apply Nat.eqb_eq in Htsr.
+    apply Nat.div_small_iff in Htsr; [ | easy ].
+    rewrite Nat.pow_1_r.
+    rewrite Nat.mul_sub_distr_r.
+    rewrite Nat.mul_shuffle0.
+    progress replace (2 * 2) with 4 by easy.
+    rewrite (Nat.mul_comm _ 2).
+    rewrite <- Nat.pow_succ_r'.
+rewrite Nat.mod_small in Htsr. 2: {
+Search (snd _ mod _).
+Print rank_fst_loop.
+...
+Compute (map (λ n,
+  (n, Nat.ltb
+     (2 * (snd (rank_fst_loop n 1 4 (S (S n))) mod S (S n)))
+     (S (S n)),
+   Nat.leb (S (S n)) (4 * S (S n) - 2 ^ S (S (Nat.log2 (S n)))))) (seq 0 20)).
+...
+Compute (map (λ n,
+  Nat.leb
+  (S n)
+  ((2 * S n - 2 ^ Nat.log2_up (S n)) *
+    2
+    ^ S
+        (fst
+           (rank_fst_loop n 0 (2 * (snd (rank_fst_loop n 1 2 (S n)) mod S n))
+              (S n))))) (seq 0 40)).
+
+apply Nat.eqb_neq in Hsr.
+cbn - [ "*" "mod" "^" ].
 ...
 Compute (map (λ n,
   Nat.ltb n (snd (rank_fst_loop n 1 2 (S n)))) (seq 1 40)).
