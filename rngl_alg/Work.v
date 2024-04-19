@@ -3554,11 +3554,11 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     rewrite (Nat.mul_comm _ 2).
     rewrite <- Nat.pow_succ_r'.
 Print rank_fst_loop.
-Theorem glop :
-  ∀ it k a b, snd (rank_fst_loop it k a b) mod b ≤ 1.
+Theorem snd_rank_fst_loop_le_2_den :
+  ∀ it a b, a < 2 * b → snd (rank_fst_loop it 1 a b) mod b ≤ 2 * b.
 Proof.
-intros.
-revert a.
+intros * Hab.
+revert a Hab.
 induction it; intros. {
   destruct b; [ easy | cbn ].
   now rewrite Nat.sub_diag.
@@ -3566,19 +3566,26 @@ induction it; intros. {
 cbn - [ "*" ].
 rewrite snd_if, snd_let.
 cbn - [ "*" ].
-remember (a / b =? k) as abk eqn:Habk.
-symmetry in Habk.
-destruct abk. {
-  apply Nat.eqb_eq in Habk.
-...
-Search (_ / _ = _ → _).
-Search (_ / _ = _ ↔ _).
-Search (_ ↔ _ / _ = _).
-  apply (Nat_div_less_small_iff k) in Habk.
-  apply Nat
-... ...
-specialize (glop n 1 4 (S (S n))) as H1.
-remember (snd _) as x.
+remember (a / b =? 1) as ab1 eqn:Hab1.
+symmetry in Hab1.
+destruct ab1. {
+  apply (le_trans _ b); [ | flia ].
+  apply Nat.lt_le_incl, Nat.mod_upper_bound.
+  flia Hab.
+}
+apply Nat.eqb_neq in Hab1.
+apply Nat_neq_div_1 in Hab1.
+destruct Hab1 as [Hab1| Hab1]; [ now apply Nat.nlt_ge in Hab1 | ].
+rewrite (Nat.mod_small a); [ | easy ].
+apply IHit.
+now apply Nat.mul_lt_mono_pos_l.
+Qed.
+specialize (snd_rank_fst_loop_le_2_den n 4 (S (S n))) as H1.
+assert (H : 4 < 2 * S (S n)) by flia Hn1.
+specialize (H1 H); clear H.
+remember (snd _ mod S (S n)) as x.
+(* le H1 sert strictement à rien *)
+(* donc le théorème ci-dessus non plus *)
 ...
 Compute (map (λ n,
   (n,
