@@ -3550,6 +3550,21 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     progress replace (2 * 16) with 32 by easy.
     clear Hn; rename Hn1 into Hn.
 (**)
+(*
+  Hn : 11 < n
+  ============================
+  S (S (S (S n))) < snd (rank_fst_loop n 1 32 (S (S (S (S (S n))))))
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ m - S m < n
+  → m + n < snd (rank_fst_loop n 1 (2 ^ S m) (S m + n)).
+Proof.
+clear T ro rp rl ac.
+...
+now apply (glop 4).
+*)
     destruct n; [ easy | ].
     cbn - [ "*" "mod" "/" ].
     remember (32 / S (S (S (S (S (S n))))) =? 1) as n1 eqn:Hn1.
@@ -3566,6 +3581,51 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     do 6 apply Nat.succ_lt_mono in Hn1.
     progress replace (2 * 32) with 64 by easy.
     clear Hn; rename Hn1 into Hn.
+(*
+  Hn : 26 < n
+  ============================
+  S (S (S (S (S n)))) < snd (rank_fst_loop n 1 64 (S (S (S (S (S (S n)))))))
+*)
+Theorem glop :
+  ∀ m n,
+  2 ^ m - S m < n
+  → m + n < snd (rank_fst_loop n 1 (2 ^ S m) (S m + n)).
+Proof.
+intros * Hmn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+cbn - [ "*" "/" "mod" "^" ].
+remember (2 ^ S m / S (m + S n) =? 1) as mn1 eqn:Hmn1.
+symmetry in Hmn1.
+destruct mn1. {
+  cbn - [ "^" ].
+...
+destruct mn1. {
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite snd_let.
+  apply Nat.div_small_iff in Hmn1; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite <- Nat.pow_succ_r'.
+  rewrite <- Nat.add_succ_comm.
+  apply IHn.
+  apply (Nat.add_lt_mono_r _ _ (S (S m))).
+  rewrite Nat.sub_add; [ | now apply Nat.pow_gt_lin_r ].
+  rewrite Nat.add_comm.
+  now rewrite Nat.add_succ_comm.
+}
+rewrite snd_if.
+cbn - [ "*" "/" "mod" "^" ].
+
+...
+Compute (let n := 1 in
+  map (λ m,
+    (Nat.ltb (2 ^ m - S m) (S n),
+     Nat.leb (S (m + S n)) (2 * 2 ^ m))) (seq 0 12)).
+...
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite snd_let.
+... ...
+now apply (glop 5).
 ...
 Compute (map (λ n,
   Nat.ltb n (snd (rank_fst_loop n 1 2 (S n)))) (seq 1 40)).
