@@ -3582,13 +3582,28 @@ Compute (
 exfalso.
 apply Nat.nle_gt in Htsr.
 apply Htsr; clear Htsr.
+apply Nat.le_succ_l.
+specialize (lt_snd_rank_fst_loop 1 n Hnz) as H2.
+cbn in H2.
+eapply lt_le_trans; [ apply H2 | ].
+remember (snd (rank_fst_loop n 1 4 (S (S n)))) as x eqn:Hx.
+Search (_ * (_ mod _)).
+rewrite <- Nat.mul_mod_distr_l; [ | easy | easy ].
+...
+Search (rank_fst_loop _ _ (2 ^ _)).
+remember (snd (rank_fst_loop n 1 4 (S (S n)))) as x eqn:Hx.
+eapply (le_trans _ (S x)). {
+  apply Nat.succ_lt_mono in H2.
+  now apply Nat.lt_le_incl.
+}
+Search (S _ ≤ _).
+apply N
 ...
 Compute (map (λ n,
   if 2 ^ Nat.log2 (S n) =? S n then
     Some (S (S n) ≤ 2 * (snd (rank_fst_loop n 1 4 (S (S n))) mod S (S n)))
   else
     None) (seq 2 40)).
-
 ...
 progress replace 4 with (2 ^ 2) in Htsr by easy.
 Search (rank_fst_loop _ _ _ (2 ^ _ + 1)).
