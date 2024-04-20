@@ -3587,9 +3587,11 @@ specialize (lt_snd_rank_fst_loop 1 n Hnz) as H2.
 cbn in H2.
 eapply lt_le_trans; [ apply H2 | ].
 remember (snd (rank_fst_loop n 1 4 (S (S n)))) as x eqn:Hx.
-Search (_ * (_ mod _)).
 rewrite <- Nat.mul_mod_distr_l; [ | easy | easy ].
+Compute (map (λ n,
+  (n, snd (rank_fst_loop n 1 4 (S (S n))))) (seq 0 40)).
 ...
+Search (_ * (_ mod _)).
 Search (rank_fst_loop _ _ (2 ^ _)).
 remember (snd (rank_fst_loop n 1 4 (S (S n)))) as x eqn:Hx.
 eapply (le_trans _ (S x)). {
