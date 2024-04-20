@@ -3569,16 +3569,54 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
       destruct H1 as (_, H1).
       do 2 rewrite Nat.pow_succ_r'.
       rewrite H1.
+      rename Hn1 into Hnz.
+      destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n; flia | ].
+      move Hn1 before Hnz.
+Compute (
+  map (λ n,
+    if 2 ^ Nat.log2 (S n) =? S n then
+      (2 * (snd (rank_fst_loop n 1 4 (S (S n))) mod S (S n)), S (S n))
+    else
+      (0, 0))
+    (seq 0 12)).
+exfalso.
+apply Nat.nle_gt in Htsr.
+apply Htsr; clear Htsr.
+...
+Compute (map (λ n,
+  if 2 ^ Nat.log2 (S n) =? S n then
+    Some (S (S n) ≤ 2 * (snd (rank_fst_loop n 1 4 (S (S n))) mod S (S n)))
+  else
+    None) (seq 2 40)).
+
+...
+progress replace 4 with (2 ^ 2) in Htsr by easy.
+Search (rank_fst_loop _ _ _ (2 ^ _ + 1)).
 ...
 Theorem rank_snd_1_1_2_pow_lemma :
   ∀ it m n,
   m ≤ n
   → 2 ^ n - m ≤ it
-  → snd (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = 0.
+  → snd (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) =
+      if m =? n then 2 ^ m else 0.
 Proof.
+(*
+Compute (
+   let m := 2 in
+   let it := 24 in
+   map (λ n, snd (rank_fst_loop it 1 (2 ^ m) (2 ^ n))) (seq 0 12)).
+*)
 intros * Hmn Hit.
 revert m n Hmn Hit.
-induction it; intros; [ easy | ].
+induction it; intros. {
+  apply Nat.le_0_r in Hit.
+  apply Nat.sub_0_le in Hit.
+  exfalso.
+  apply Nat.nlt_ge in Hit.
+  apply Hit; clear Hit.
+  apply (Nat.le_lt_trans _ n); [ easy | ].
+  now apply Nat.pow_gt_lin_r.
+}
 cbn - [ "*" ].
 remember (2 ^ m / 2 ^ n =? 1) as mn eqn:Hmn1.
 symmetry in Hmn1.
@@ -3588,7 +3626,13 @@ destruct mn. {
   destruct Hmn1 as (Hnm, Hmn1).
   apply Nat.pow_le_mono_r_iff in Hnm; [ | easy ].
   apply Nat.le_antisymm in Hnm; [ subst m | easy ].
-  clear Hmn.
+  now rewrite Nat.eqb_refl.
+}
+clear T ro rp rl ac.
+...
+progress replace 4 with (2 ^ 2) in Htsr by easy.
+rewrite <- H1 in Htsr at 1.
+rewrite rank_snd_1_1_2_pow_lemma in Htsr.
 ...
 Search (_ ^ _ ≤ _ ^ _).
 rank_fst_1_1_2_pow_lemma:
