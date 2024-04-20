@@ -2629,6 +2629,12 @@ intros.
 now rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
 Qed.
 
+Theorem Nat_sub_mul_l_diag_r : ∀ a b, a * b - b = (a - 1) * b.
+Proof.
+intros.
+now rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
+Qed.
+
 Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 → b ≤ a < 2 * b.
 Proof.
 intros * Hab.
@@ -3553,6 +3559,73 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     progress replace (2 * 2) with 4 by easy.
     rewrite (Nat.mul_comm _ 2).
     rewrite <- Nat.pow_succ_r'.
+    apply Nat.le_add_le_sub_r.
+    apply Nat_le_add_le_sub_l; [ flia | ].
+    rewrite Nat_sub_mul_l_diag_r.
+    cbn - [ "*" "^" Nat.log2 ].
+    specialize (Nat.log2_succ_or n) as H1.
+    destruct H1 as [H1| H1]. {
+      apply Nat_pow2_log2_succ in H1.
+      destruct H1 as (_, H1).
+      do 2 rewrite Nat.pow_succ_r'.
+      rewrite H1.
+...
+Theorem rank_snd_1_1_2_pow_lemma :
+  ∀ it m n,
+  m ≤ n
+  → 2 ^ n - m ≤ it
+  → snd (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = 0.
+Proof.
+intros * Hmn Hit.
+revert m n Hmn Hit.
+induction it; intros; [ easy | ].
+cbn - [ "*" ].
+remember (2 ^ m / 2 ^ n =? 1) as mn eqn:Hmn1.
+symmetry in Hmn1.
+destruct mn. {
+  apply Nat.eqb_eq in Hmn1.
+  apply Nat_eq_div_1 in Hmn1.
+  destruct Hmn1 as (Hnm, Hmn1).
+  apply Nat.pow_le_mono_r_iff in Hnm; [ | easy ].
+  apply Nat.le_antisymm in Hnm; [ subst m | easy ].
+  clear Hmn.
+...
+Search (_ ^ _ ≤ _ ^ _).
+rank_fst_1_1_2_pow_lemma:
+  ∀ it m n : nat,
+    m ≤ n → 2 ^ n - m ≤ it → m + fst (rank_fst_loop it 1 (2 ^ m) (2 ^ n)) = n
+      rewrite H1.
+      rewrite Nat.mul_assoc.
+      progress replace (2 * 2) with 4 by easy.
+      destruct n; [ cbn; flia | ].
+...
+clear Htsr.
+remember (S n) as m.
+clear n Hn1 Heqm.
+rename m into n.
+Compute (map (λ m,
+  let n := 2 ^ m in
+  Nat.leb (4 * n) (3 * S n)) (seq 0 10)).
+
+...
+rewrite <- (Nat.add_1_r (S n)).
+...
+    destruct n; [ easy | clear Hn1 ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn in Htsr; flia Htsr | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn in Htsr; flia Htsr | ].
+    destruct n; [ cbn in Htsr; flia Htsr | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+...
 Print rank_fst_loop.
 Theorem snd_rank_fst_loop_le_2_den :
   ∀ it a b, a < 2 * b → snd (rank_fst_loop it 1 a b) mod b ≤ 2 * b.
