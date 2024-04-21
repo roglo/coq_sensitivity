@@ -3565,17 +3565,27 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite snd_rank_fst_1_2_succ in Hsr; [ | easy | easy ].
   apply Nat.eqb_neq in Hsr.
   rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
-  Search (_ / _ ≠ _).
+  rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+  rewrite <- Nat_pow2_log2 in Hsr; [ | now apply Nat.neq_0_lt_0 ].
   rewrite (Nat_mod_less_small 1). 2: {
     rewrite Nat.mul_1_l.
     cbn - [ "*" ].
-(* ouais, chais pas, faut voir *)
-...
-  rewrite Nat.mod_small. 2: {
-    apply Nat.log2_up_lt_pow2; [ easy | ].
-
-Search (2 ^ _ < _).
-(* presque ! *)
+    specialize (Nat.log2_spec n Hn1) as H1.
+    split; [ easy | ].
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    now apply Nat.lt_succ_r.
+  }
+  rewrite Nat.pow_succ_r' in Hsr.
+  do 2 rewrite Nat.pow_succ_r'.
+  rewrite <- Nat.mul_sub_distr_l.
+  rewrite Nat.mul_1_l.
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm _ 2).
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 2) with 4 by easy.
+Search (2 ^ fst _).
+Search (fst (rank_fst_loop _ _ _ _)).
+(* ouais, bof *)
 ...
 specialize (Nat.log2_up_spec (S n)) as H1.
 ...
