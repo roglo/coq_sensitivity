@@ -3562,6 +3562,14 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     apply Hsr; clear Hsr.
     now apply (lt_snd_rank_fst_loop 0).
   }
+  rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
+...
+  rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+...
+apply (le_trans _ (S it)); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
+rewrite snd_rank_fst_1_2; [ | | ].
 (*
 Compute (map (λ n,
   (2 ^ S (Nat.log2 n), snd (rank_fst_loop n 1 2 (S n)))) (seq 0 40)).
@@ -3577,14 +3585,6 @@ Compute (map (λ n,
   (2 ^ Nat.log2_up n, snd (rank_fst_loop n 1 2 n))) (seq 0 40)).
 ...
 *)
-rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
-rewrite <- Nat_pow2_log2.
-...
-apply (le_trans _ (S it)); [ easy | ].
-apply Nat.le_succ_diag_r.
-Qed.
-rewrite snd_rank_fst_1_2; [ | | ].
-(* ah merde ça marche pas *)
 ...
   clear. (* seems true inconditionnally *)
   destruct n; [ now cbn; apply -> Nat.succ_le_mono | ].
