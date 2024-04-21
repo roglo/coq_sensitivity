@@ -3562,7 +3562,22 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     apply Hsr; clear Hsr.
     now apply (lt_snd_rank_fst_loop 0).
   }
+  rewrite snd_rank_fst_1_2_succ in Hsr; [ | easy | easy ].
+  apply Nat.eqb_neq in Hsr.
   rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
+  Search (_ / _ ≠ _).
+  rewrite (Nat_mod_less_small 1). 2: {
+    rewrite Nat.mul_1_l.
+    cbn - [ "*" ].
+(* ouais, chais pas, faut voir *)
+...
+  rewrite Nat.mod_small. 2: {
+    apply Nat.log2_up_lt_pow2; [ easy | ].
+
+Search (2 ^ _ < _).
+(* presque ! *)
+...
+specialize (Nat.log2_up_spec (S n)) as H1.
 ...
   rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
 ...
