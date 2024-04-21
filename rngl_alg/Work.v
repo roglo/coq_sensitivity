@@ -3630,9 +3630,28 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   }
   clear Hsr; rename H into Hsr.
   apply Nat_eq_div_1 in Hsr.
-...
+(*
   remember (2 ^ Nat.log2_up (S n)) as x eqn:Hx.
   remember (S n) as m eqn:Hm.
+*)
+(**)
+clear.
+Print lt.
+apply Nat.succ_lt_mono.
+apply -> Nat.succ_lt_mono.
+apply -> Nat.le_succ_r.
+destruct n; [ cbn; flia | ].
+cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+remember (_ / _ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  
+...
+Compute (map (λ n,
+  S n
+  ≤ (2 * S n - 2 ^ Nat.log2_up (S n)) *
+    2 ^ S (fst (rank_fst_loop n 0 (2 * (2 ^ Nat.log2_up (S n) - S n)) (S n)))) (seq 0 20)).
 ...
   rewrite Nat.pow_succ_r' in Hsr.
 Search (2 ^ fst _).
