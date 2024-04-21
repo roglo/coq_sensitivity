@@ -2635,12 +2635,17 @@ intros.
 now rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
 Qed.
 
-Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 → b ≤ a < 2 * b.
+Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 ↔ b ≤ a < 2 * b.
 Proof.
-intros * Hab.
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
-apply Nat_div_less_small_iff in Hab; [ | easy ].
-now rewrite Nat.mul_1_l in Hab.
+intros.
+split; intros Hab. {
+  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+  apply Nat_div_less_small_iff in Hab; [ | easy ].
+  now rewrite Nat.mul_1_l in Hab.
+} {
+  apply Nat_div_less_small.
+  now rewrite Nat.mul_1_l.
+}
 Qed.
 
 Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → 2 * b ≤ a ∨ a < b.
@@ -3528,6 +3533,27 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- Nat.mul_sub_distr_r.
   rewrite (Nat.mul_comm n).
 (**)
+(*
+  assert (H : 1 ≤ 2 ^ Nat.log2_up n / n ≤ 2). {
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    specialize (Nat.log2_up_spec (S (S n))) as H1.
+    assert (H : 1 < S (S n)) by now apply -> Nat.succ_lt_mono.
+    specialize (H1 H); clear H.
+    destruct H1 as (H1, H2).
+    apply Nat_eq_div_1.
+...
+    split; [ easy | ].
+    rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    apply Nat.lt_succ_r.
+    now apply Nat.log2_spec.
+  }
+  clear Hsr; rename H into Hsr.
+  apply Nat_eq_div_1 in Hsr.
+...
+*)
   progress unfold fst_1_len.
   destruct n; [ easy | ].
   cbn - [ "*" "/" "mod" ].
@@ -3566,7 +3592,9 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   apply Nat.eqb_neq in Hsr.
   rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
   rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+(*
   rewrite <- Nat_pow2_log2 in Hsr; [ | now apply Nat.neq_0_lt_0 ].
+*)
   rewrite (Nat_mod_less_small 1). 2: {
     rewrite Nat.mul_1_l.
     cbn - [ "*" ].
@@ -3575,16 +3603,39 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     apply Nat.mul_lt_mono_pos_l; [ easy | ].
     now apply Nat.lt_succ_r.
   }
-  rewrite Nat.pow_succ_r' in Hsr.
+(*
   do 2 rewrite Nat.pow_succ_r'.
   rewrite <- Nat.mul_sub_distr_l.
+*)
   rewrite Nat.mul_1_l.
+(*
   rewrite Nat.mul_assoc.
   rewrite (Nat.mul_comm _ 2).
   rewrite Nat.mul_assoc.
   progress replace (2 * 2) with 4 by easy.
+*)
+  rewrite Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+  remember (2 ^ Nat.log2_up (S n)) as x eqn:Hx.
+  remember (S n) as m eqn:Hm.
+  assert (2 ^ Nat.log2_up (S n) / S n = 1). {
+    specialize (Nat.log2_up_spec (S n)) as H1.
+    assert (H : 1 < S n) by now apply -> Nat.succ_lt_mono.
+    specialize (H1 H); clear H.
+    destruct H1 as (H1, H2).
+    apply Nat_eq_div_1.
+    split; [ easy | ].
+    rewrite <- Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    apply Nat.lt_succ_r.
+    now apply Nat.log2_spec.
+  }
+  clear Hsr; rename H into Hsr.
+  apply Nat_eq_div_1 in Hsr.
+  rewrite <- Hm, <- Hx in Hsr.
+...
+  rewrite Nat.pow_succ_r' in Hsr.
 Search (2 ^ fst _).
-Search (fst (rank_fst_loop _ _ _ _)).
 (* ouais, bof *)
 ...
 specialize (Nat.log2_up_spec (S n)) as H1.
