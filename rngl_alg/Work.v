@@ -3526,11 +3526,59 @@ destruct (le_dec i (inv_ub_den_2_pow n)) as [Hni| Hni]. {
     apply Hsr; clear Hsr.
     now apply (lt_snd_rank_fst_loop 0).
   }
+Compute (map (λ n,
+  (2 ^ S (Nat.log2 n), snd (rank_fst_loop n 1 2 (S n)))) (seq 0 40)).
+Compute (map (λ n,
+  (2 ^ Nat.log2_up n, snd (rank_fst_loop n 1 2 n))) (seq 0 40)).
+Compute (map (λ n,
+  (2 ^ Nat.log2_up (S n), snd (rank_fst_loop n 1 2 (S n)))) (seq 0 40)).
+...
+(**)
+Theorem snd_rank_fst_1_2 :
+  ∀ it n,
+  1 < n
+  → n ≤ it
+  → snd (rank_fst_loop it 1 2 n) = 2 ^ Nat.log2_up n.
+Proof.
+intros * Hn2 Hit.
+destruct it; [ now apply Nat.le_0_r in Hit; subst n | ].
+cbn - [ "*" "/" "mod" ].
+remember (2 / n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  symmetry; cbn.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (H, _).
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn2.
+  apply Nat.succ_le_mono in H.
+  apply Nat.le_1_r in H.
+  now destruct H; subst n.
+}
+rewrite snd_let.
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn2 Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+progress replace (2 * 2) with (2 ^ 2) by easy.
+Check snd_rank_fst_loop.
+rewrite (snd_rank_fst_loop 1); [ easy | | easy ].
+apply (le_trans _ (S it)); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
+rewrite snd_rank_fst_1_2; [ | | ].
+(* ah merde ça marche pas *)
+...
   clear. (* seems true inconditionnally *)
   destruct n; [ now cbn; apply -> Nat.succ_le_mono | ].
 (**)
   cbn - [ "*" "/" "mod" "^" Nat.log2 ].
+(**)
   rewrite fst_if, snd_if, fst_let, snd_let, S_if.
+(*
+  rewrite fst_if, fst_let.
+*)
   cbn - [ "*" "/" "mod" "^" Nat.log2 ].
   remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3589,7 +3637,7 @@ eapply lt_le_trans; [ apply H2 | ].
 remember (snd (rank_fst_loop n 1 4 (S (S n)))) as x eqn:Hx.
 rewrite <- Nat.mul_mod_distr_l; [ | easy | easy ].
 Compute (map (λ n,
-  (n, snd (rank_fst_loop n 1 4 (S (S n))))) (seq 0 40)).
+  (2 ^ S (Nat.log2 (S n)), snd (rank_fst_loop n 1 4 (S (S n))))) (seq 0 40)).
 ...
 Search (_ * (_ mod _)).
 Search (rank_fst_loop _ _ (2 ^ _)).
