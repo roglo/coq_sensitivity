@@ -3615,8 +3615,6 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   progress replace (2 * 2) with 4 by easy.
 *)
   rewrite Nat_pow2_log2; [ | now apply Nat.neq_0_lt_0 ].
-  remember (2 ^ Nat.log2_up (S n)) as x eqn:Hx.
-  remember (S n) as m eqn:Hm.
   assert (2 ^ Nat.log2_up (S n) / S n = 1). {
     specialize (Nat.log2_up_spec (S n)) as H1.
     assert (H : 1 < S n) by now apply -> Nat.succ_lt_mono.
@@ -3632,7 +3630,9 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   }
   clear Hsr; rename H into Hsr.
   apply Nat_eq_div_1 in Hsr.
-  rewrite <- Hm, <- Hx in Hsr.
+...
+  remember (2 ^ Nat.log2_up (S n)) as x eqn:Hx.
+  remember (S n) as m eqn:Hm.
 ...
   rewrite Nat.pow_succ_r' in Hsr.
 Search (2 ^ fst _).
