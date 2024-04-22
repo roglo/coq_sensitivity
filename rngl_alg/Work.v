@@ -3459,7 +3459,51 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
+(*
+destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. 2: {
+  apply Nat.nle_gt in Hni.
+  rewrite <- (angle_div_2_pow_mul_pow_sub i (inv_ub_den_pow2 n)). 2: {
+    now apply Nat.lt_le_incl in Hni.
+  }
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
+    eapply angle_mul_nat_not_overflow_le_l. 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    progress unfold inv_ub_num.
+    rewrite Nat.mul_sub_distr_r.
+    rewrite Nat.mul_1_l.
+    apply Nat.le_sub_le_add_r.
+    rewrite <- Nat.pow_add_r.
+    rewrite Nat.add_sub_assoc; [ | now apply Nat.lt_le_incl in Hni ].
+    progress unfold inv_ub_den_pow2.
+    rewrite Nat.sub_add_distr.
+    rewrite Nat_sub_sub_swap.
+    rewrite Nat.add_sub_swap; [ | apply Nat.le_succ_diag_r ].
+    rewrite Nat.sub_succ_l; [ | easy ].
+    rewrite Nat.sub_diag.
+    rewrite (Nat.add_1_l i).
 ...
+    eapply le_trans; [ | apply Nat.le_add_r ].
+    rewrite rank_fst_1_log2_up.
+...
+    apply Nat.pow_le_mono_r; [ easy | ].
+    rewrite Nat.sub_succ_l. 2: {
+      rewrite rank_fst_1_log2_up.
+      apply (Nat.pow_le_mono_r_iff 2); [ easy | ].
+      eapply le_trans; [ | apply Hin ].
+....
+    rewrite <- Nat.add_1_l.
+    apply Nat.add_le_mono_r.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.log2_up_null in H.
+    destruct n; [ easy | ].
+    apply Nat.succ_le_mono in H.
+    apply Nat.le_0_r in H.
+    now subst n.
+...
+*)
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
@@ -3496,9 +3540,14 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+(*
+clear - Hnz.
+*)
   progress unfold inv_ub_den_pow2.
   progress unfold inv_ub_num.
+(*
   rewrite rank_fst_1_log2_up.
+*)
   rewrite Nat.pow_add_r.
   rewrite Nat.mul_sub_distr_r.
   rewrite Nat.mul_1_l.
@@ -3514,10 +3563,12 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
       rewrite <- H1 at 2.
       rewrite <- Nat.pow_succ_r'.
       apply Nat.pow_le_mono_r; [ easy | ].
+      rewrite rank_fst_1_log2_up.
       apply Nat.le_log2_up_succ_log2.
     }
     destruct n; [ easy | clear Hnz ].
     cbn in H1.
+    rewrite rank_fst_1_log2_up.
     rewrite <- H1.
     rewrite Nat.pow_succ_r'.
     apply Nat.mul_le_mono_l.
@@ -3534,6 +3585,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- Nat.mul_sub_distr_r.
   rewrite (Nat.mul_comm n).
 (**)
+...
 (*
   assert (H : 1 ≤ 2 ^ Nat.log2_up n / n ≤ 2). {
     destruct n; [ easy | ].
