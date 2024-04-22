@@ -3620,13 +3620,13 @@ Compute (map (λ n,
 (*
 Theorem glop :
   ∀ m n,
-  11 < n
+  2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
 clear T ro rp rl ac.
-...
-apply (glop 1).
+Admitted.
+now apply (glop 1).
 ...
 *)
   destruct n; [ easy | clear Hn ].
@@ -3657,13 +3657,13 @@ apply (glop 1).
 (*
 Theorem glop :
   ∀ m n,
-  11 < n
+  2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
 clear T ro rp rl ac.
-...
-apply (glop 2).
+Admitted.
+now apply (glop 2).
 ...
 *)
   destruct n; [ easy | clear Hn ].
@@ -3696,13 +3696,13 @@ apply (glop 2).
 (*
 Theorem glop :
   ∀ m n,
-  11 < n
+  2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
 clear T ro rp rl ac.
-...
-apply (glop 3).
+Admitted.
+now apply (glop 3).
 ...
 *)
   destruct n; [ easy | ].
@@ -3746,13 +3746,13 @@ Finished transaction in 0.456 secs (0.456u,0.s) (successful)
 (*
 Theorem glop :
   ∀ m n,
-  11 < n
+  2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
 clear T ro rp rl ac.
 Admitted.
-apply (glop 4).
+now apply (glop 4).
 ...
 *)
   destruct n; [ easy | ].
@@ -3794,7 +3794,7 @@ apply (glop 4).
 *)
 Theorem glop :
   ∀ m n,
-  11 < n
+  2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
