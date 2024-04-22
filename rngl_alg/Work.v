@@ -3459,6 +3459,7 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
+...
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
@@ -3635,10 +3636,30 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   remember (S n) as m eqn:Hm.
 *)
 (**)
-clear.
-Print lt.
 apply Nat.succ_lt_mono.
 apply -> Nat.succ_lt_mono.
+Search (rank_fst_loop _ _ (2 * _)).
+Check fst_rank_fst_loop_eq_succ.
+Compute (map (λ n,
+  (n, fst (rank_fst_loop n 0 (2 * (2 ^ Nat.log2_up (S n) - S n)) (S n)))) (seq 0 30)).
+...
+Theorem fst_rank_fst_loop_0_eq_0 :
+  ∀ it a b : nat,
+  0 < a < b
+  → Nat.log2_up b ≤ it
+  → fst (rank_fst_loop it 0 a b) = 0.
+(*
+Compute (map (λ b,
+  let a := 1 in
+  let it := Nat.log2_up b + 1 in
+  fst (rank_fst_loop it 0 a b) = 0) (seq 2 12)).
+*)
+clear T ro rp rl ac.
+...
+rewrite fst_rank_fst_loop_0_eq_0.
+...
+rewrite <- fst_rank_fst_loop_eq_succ
+...
 apply -> Nat.le_succ_r.
 destruct n; [ cbn; flia | ].
 cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
