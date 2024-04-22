@@ -3589,10 +3589,13 @@ Compute (map (λ n,
   rewrite Nat.mul_assoc.
   rewrite <- Nat.mul_sub_distr_r.
   rewrite (Nat.mul_comm n).
-(**)
+  progress unfold rank_fst_1.
+(*
+  ============================
+  n ≤ (2 * n - 2 ^ fst (rank_fst_loop n 1 1 n)) * 2 ^ fst_1_len 1 n
+*)
   destruct n; [ easy | ].
-  cbn - [ "-" "*" ].
-  rewrite rank_fst_1_succ_r.
+  cbn - [ "-" "*" "/" "mod" ].
   remember (1 / S n =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
   destruct n1. {
@@ -3607,7 +3610,26 @@ Compute (map (λ n,
   rewrite Nat.mod_small; [ | easy ].
   apply Nat.succ_lt_mono in Hn1.
   rewrite Nat.mul_1_r.
-  destruct n; [ easy | clear Hn1 ].
+  rename Hn1 into Hn.
+  rewrite fst_let.
+(*
+  Hn : 0 < n
+  ============================
+  S n ≤ (2 * S n - 2 ^ S (fst (rank_fst_loop n 1 2 (S n)))) * 2 ^ fst_1_len 1 (S n)
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  11 < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+clear T ro rp rl ac.
+...
+apply (glop 1).
+...
+*)
+  destruct n; [ easy | clear Hn ].
   cbn - [ "-" "*" "/" "mod" "^" ].
   remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3623,8 +3645,28 @@ Compute (map (λ n,
   rewrite Nat.mod_small; [ | easy ].
   progress replace (2 * 2) with 4 by easy.
   do 2 apply Nat.succ_lt_mono in Hn1.
+  rename Hn1 into Hn.
   rewrite fst_let.
-  destruct n; [ easy | clear Hn1 ].
+(*
+  Hn : 0 < n
+  ============================
+  S (S n)
+  ≤ (2 * S (S n) - 2 ^ S (fst (let (r, a') := rank_fst_loop n 1 4 (S (S n)) in (S r, a')))) *
+    2 ^ fst_1_len 1 (S (S n))
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  11 < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+clear T ro rp rl ac.
+...
+apply (glop 2).
+...
+*)
+  destruct n; [ easy | clear Hn ].
   cbn - [ "-" "*" "/" "mod" "^" ].
   remember (4 / S (S (S n)) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3642,10 +3684,29 @@ Compute (map (λ n,
   rewrite Nat.mod_small; [ | easy ].
   progress replace (2 * 4) with 8 by easy.
   do 3 apply Nat.succ_lt_mono in Hn1.
-  rewrite fst_let.
-  destruct n; [ easy | ].
-  apply Nat.succ_lt_mono in Hn1.
   rename Hn1 into Hn.
+  rewrite fst_let.
+(*
+  Hn : 1 < n
+  ============================
+  S (S (S n))
+  ≤ (2 * S (S (S n)) - 2 ^ S (S (fst (let (r, a') := rank_fst_loop n 1 8 (S (S (S n))) in (S r, a'))))) *
+    2 ^ fst_1_len 1 (S (S (S n)))
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  11 < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+clear T ro rp rl ac.
+...
+apply (glop 3).
+...
+*)
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
   cbn - [ "-" "*" "/" "mod" "^" ].
   remember (8 / S (S (S (S n))) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
@@ -3674,6 +3735,26 @@ Finished transaction in 0.456 secs (0.456u,0.s) (successful)
   do 4 apply Nat.succ_lt_mono in Hn1.
   clear Hn; rename Hn1 into Hn.
   rewrite fst_let.
+(*
+  Hn : 4 < n
+  ============================
+  S (S (S (S n)))
+  ≤ (2 * S (S (S (S n))) -
+     2 ^ S (S (S (fst (let (r, a') := rank_fst_loop n 1 16 (S (S (S (S n)))) in (S r, a')))))) *
+    2 ^ fst_1_len 1 (S (S (S (S n))))
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  11 < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+clear T ro rp rl ac.
+Admitted.
+apply (glop 4).
+...
+*)
   destruct n; [ easy | ].
   apply Nat.succ_lt_mono in Hn.
   cbn - [ "-" "*" "/" "mod" "^" ].
@@ -3688,6 +3769,44 @@ Finished transaction in 0.456 secs (0.456u,0.s) (successful)
     destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
     destruct n; [ easy | clear Hn ].
     do 9 apply Nat.succ_le_mono in Hn1.
+    do 8 (destruct n; [ cbn; flia | ]).
+    flia Hn1.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]. {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hn | ].
+    destruct n; [ flia Hn | ].
+    destruct n; [ flia Hn | flia Hn1 ].
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 16) with 32 by easy.
+  do 5 apply Nat.succ_lt_mono in Hn1.
+  clear Hn; rename Hn1 into Hn.
+  rewrite fst_let.
+(*
+  Hn : 11 < n
+  ============================
+  S (S (S (S (S n))))
+  ≤ (2 * S (S (S (S (S n)))) - 2 ^ S (S (S (S (S (fst (rank_fst_loop n 1 32 (S (S (S (S (S n)))))))))))) *
+    2 ^ fst_1_len 1 (S (S (S (S (S n)))))
+*)
+Theorem glop :
+  ∀ m n,
+  11 < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+clear T ro rp rl ac.
+Admitted.
+now apply (glop 5).
+...
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (32 / S (S (S (S (S (S n))))) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
 ...
 (*
   assert (H : 1 ≤ 2 ^ Nat.log2_up n / n ≤ 2). {
