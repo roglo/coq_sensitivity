@@ -3792,15 +3792,72 @@ now apply (glop 4).
   ≤ (2 * S (S (S (S (S n)))) - 2 ^ S (S (S (S (S (fst (rank_fst_loop n 1 32 (S (S (S (S (S n)))))))))))) *
     2 ^ fst_1_len 1 (S (S (S (S (S n)))))
 *)
-Theorem glop :
+Theorem le_sub_fst_rank_fst_loop :
   ∀ m n,
   2 ^ m / 2 - m < n
   → m + n
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
+Proof.
+intros * Hmn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+cbn - [ "-" "*" "/" "mod" "^" ].
+remember (2 ^ m / (m + S n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  cbn - [ "*" ].
+  rewrite Nat.add_0_r.
+  apply (Nat.mul_lt_mono_pos_r 2) in Hmn; [ | easy ].
+  rewrite Nat.mul_sub_distr_r in Hmn.
+(* bon, y a un truc qui va pas, dans ce théorème ; l'hypothèse
+   2 ^ m / 2 - m < n c'est peut-être elle qui déconne *)
+...
+  specialize (IHn (S m)) as H1.
+  rewrite Nat.add_succ_comm in H1.
+  cbn - [ "*" "/" ] in H1.
+Compute (map (λ n,
+  let m := 0 in
+  fst (rank_fst_loop n 1 (2 * 2 ^ m) (m + S n))) (seq 0 10)).
+...
+  assert (H : 2 ^ S m / 2 - S m < n). {
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+    apply (Nat.mul_lt_mono_pos_r 2) in Hmn; [ | easy ].
+    rewrite Nat.mul_sub_distr_r in Hmn.
+...
+  eapply le_trans; [ apply Hn1 | ].
+...
+  cbn - [  "mod" "^" ].
+
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | clear Hn ].
+    do 9 apply Nat.succ_le_mono in Hn1.
+    do 8 (destruct n; [ cbn; flia | ]).
+    flia Hn1.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]. {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hn | ].
+    destruct n; [ flia Hn | ].
+    destruct n; [ flia Hn | flia Hn1 ].
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 16) with 32 by easy.
+  do 5 apply Nat.succ_lt_mono in Hn1.
+  clear Hn; rename Hn1 into Hn.
+  rewrite fst_let.
+...
 clear T ro rp rl ac.
-Admitted.
-now apply (glop 5).
+... ...
+now apply (le_sub_fst_rank_fst_loop 5).
 ...
   destruct n; [ easy | ].
   apply Nat.succ_lt_mono in Hn.
