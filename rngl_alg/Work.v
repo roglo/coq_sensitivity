@@ -3579,12 +3579,115 @@ clear - Hnz.
     now rewrite <- (Nat.add_1_r n).
   }
   clear.
+(*
+Compute (map (λ n,
+  Nat.leb n (2 ^ S (fst_1_len 1 n) * n - 2 ^ rank_fst_1 1 n * 2 ^ fst_1_len 1 n))
+(seq 0 40)).
+*)
   rewrite Nat.mul_comm.
   rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
   rewrite <- Nat.mul_sub_distr_r.
   rewrite (Nat.mul_comm n).
 (**)
+  destruct n; [ easy | ].
+  cbn - [ "-" "*" ].
+  rewrite rank_fst_1_succ_r.
+  remember (1 / S n =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    replace n with 0 by flia Hn1.
+    cbn; flia.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+  rewrite Nat.mod_small; [ | easy ].
+  apply Nat.succ_lt_mono in Hn1.
+  rewrite Nat.mul_1_r.
+  destruct n; [ easy | clear Hn1 ].
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    replace n with 0 by flia Hn1.
+    cbn; flia.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 2) with 4 by easy.
+  do 2 apply Nat.succ_lt_mono in Hn1.
+  rewrite fst_let.
+  destruct n; [ easy | clear Hn1 ].
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (4 / S (S (S n)) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    destruct Hn1 as (Hn1, _).
+    do 3 apply Nat.succ_le_mono in Hn1.
+    apply Nat.le_1_r in Hn1.
+    destruct Hn1; subst n; cbn; flia.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 4) with 8 by easy.
+  do 3 apply Nat.succ_lt_mono in Hn1.
+  rewrite fst_let.
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn1.
+  rename Hn1 into Hn.
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (8 / S (S (S (S n))) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    destruct Hn1 as (Hn1, _).
+    destruct n; [ easy | clear Hn ].
+    destruct n; [ cbn; flia | ].
+    destruct n; [ cbn; flia | ].
+    do 7 apply Nat.succ_le_mono in Hn1.
+    apply Nat.le_1_r in Hn1.
+(*
+Time destruct Hn1; subst n; cbn.
+Finished transaction in 0.456 secs (0.456u,0.s) (successful)
+*)
+    destruct Hn1; subst n; cbn; flia.
+  }
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]. {
+    destruct n; [ easy | flia Hn1 ].
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 8) with 16 by easy.
+  do 4 apply Nat.succ_lt_mono in Hn1.
+  clear Hn; rename Hn1 into Hn.
+  rewrite fst_let.
+  destruct n; [ easy | ].
+  apply Nat.succ_lt_mono in Hn.
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (16 / S (S (S (S (S n)))) =? 1) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    destruct Hn1 as (Hn1, _).
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
+    destruct n; [ easy | clear Hn ].
+    do 9 apply Nat.succ_le_mono in Hn1.
 ...
 (*
   assert (H : 1 ≤ 2 ^ Nat.log2_up n / n ≤ 2). {
