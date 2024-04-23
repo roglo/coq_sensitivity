@@ -3590,6 +3590,7 @@ Compute (map (λ n,
   rewrite <- Nat.mul_sub_distr_r.
   rewrite (Nat.mul_comm n).
   progress unfold rank_fst_1.
+  progress unfold fst_1_len.
 (*
   ============================
   n ≤ (2 * n - 2 ^ fst (rank_fst_loop n 1 1 n)) * 2 ^ fst_1_len 1 n
@@ -3611,17 +3612,30 @@ Compute (map (λ n,
   apply Nat.succ_lt_mono in Hn1.
   rewrite Nat.mul_1_r.
   rename Hn1 into Hn.
-  rewrite fst_let.
+  rewrite fst_let, snd_let.
+  rewrite fst_if, fst_let.
+  cbn - [ "-" "*" "/" "mod" "^" ].
+  remember (snd _ / S n =? 0) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2. {
+    apply Nat.eqb_eq in Hn2.
+    apply Nat.div_small_iff in Hn2; [ | easy ].
+    rewrite Nat.mul_1_r.
+Print rank_fst_loop.
+...
+Compute (map (λ n,
+  snd (rank_fst_loop n 1 2 (S n)) < S n
+(*
+  S n ≤ 2 * S n - 2 ^ S (fst (rank_fst_loop n 1 2 (S n)))
+*)
+) (seq 0 12)).
+...
 (*
   Hn : 0 < n
   ============================
   S n ≤ (2 * S n - 2 ^ S (fst (rank_fst_loop n 1 2 (S n)))) * 2 ^ fst_1_len 1 (S n)
 *)
-(* faut d'abord décomposer fst_1_len si je veux avoir une chance
-   de trouver un principe de récurrence *)
-  progress unfold fst_1_len.
-  cbn - [ "-" "*" "/" "mod" "^" ].
-... ...
+...
 (*
 Theorem glop :
   ∀ m n,
