@@ -3617,6 +3617,11 @@ Compute (map (λ n,
   ============================
   S n ≤ (2 * S n - 2 ^ S (fst (rank_fst_loop n 1 2 (S n)))) * 2 ^ fst_1_len 1 (S n)
 *)
+(* faut d'abord décomposer fst_1_len si je veux avoir une chance
+   de trouver un principe de récurrence *)
+  progress unfold fst_1_len.
+  cbn - [ "-" "*" "/" "mod" "^" ].
+... ...
 (*
 Theorem glop :
   ∀ m n,
@@ -3792,6 +3797,7 @@ now apply (glop 4).
   ≤ (2 * S (S (S (S (S n)))) - 2 ^ S (S (S (S (S (fst (rank_fst_loop n 1 32 (S (S (S (S (S n)))))))))))) *
     2 ^ fst_1_len 1 (S (S (S (S (S n)))))
 *)
+(*
 Theorem le_sub_fst_rank_fst_loop :
   ∀ m n,
   2 ^ m / 2 - m < n
@@ -3799,6 +3805,7 @@ Theorem le_sub_fst_rank_fst_loop :
       ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
         2 ^ fst_1_len 1 (m + n).
 Proof.
+(*
 intros * Hmn.
 revert m Hmn.
 induction n; intros; [ easy | ].
@@ -3813,6 +3820,21 @@ destruct n1. {
   rewrite Nat.add_0_r.
   apply (Nat.mul_lt_mono_pos_r 2) in Hmn; [ | easy ].
   rewrite Nat.mul_sub_distr_r in Hmn.
+(* l'important, c'est Hn2 *)
+Compute (map (λ m,
+map (λ n,
+(*
+if m + S n <=? 2 ^ m then
+*)
+  if 2 ^ m <? 2 * (m + S n) then
+  Nat.leb (m + S n) ((2 * (m + S n) - 2 ^ m) * 2 ^ fst_1_len 1 (m + S n))
+  else true
+(*
+else true
+*)
+) (seq 0 25)
+) (seq 0 20)).
+...
 (* bon, y a un truc qui va pas, dans ce théorème ; l'hypothèse
    2 ^ m / 2 - m < n c'est peut-être elle qui déconne *)
 ...
@@ -3832,7 +3854,6 @@ Compute (map (λ n,
   eapply le_trans; [ apply Hn1 | ].
 ...
   cbn - [  "mod" "^" ].
-
     destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
     destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
     destruct n; [ easy | apply Nat.succ_lt_mono in Hn ].
@@ -3855,15 +3876,52 @@ Compute (map (λ n,
   clear Hn; rename Hn1 into Hn.
   rewrite fst_let.
 ...
+*)
 clear T ro rp rl ac.
-... ...
+Admitted.
 now apply (le_sub_fst_rank_fst_loop 5).
-...
+*)
   destruct n; [ easy | ].
   apply Nat.succ_lt_mono in Hn.
   cbn - [ "-" "*" "/" "mod" "^" ].
   remember (32 / S (S (S (S (S (S n))))) =? 1) as n1 eqn:Hn1.
   symmetry in Hn1.
+destruct n1; [ admit | ].
+(*
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat_eq_div_1 in Hn1.
+    destruct Hn1 as (Hn1, Hn2).
+    do 11 (destruct n; [ easy | apply Nat.succ_lt_mono in Hn ]).
+    do 12 apply Nat.succ_le_mono in Hn1.
+... trop long
+    do 8 (destruct n; [ cbn; flia | ]).
+    flia Hn1.
+  }
+*)
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]. {
+    destruct n; [ easy | ].
+    do 10 (destruct n; [ flia Hn | ]).
+    flia Hn1.
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  progress replace (2 * 32) with 64 by easy.
+  do 6 apply Nat.succ_lt_mono in Hn1.
+  clear Hn; rename Hn1 into Hn.
+  rewrite fst_let.
+Theorem le_sub_fst_rank_fst_loop :
+  ∀ m n,
+  2 ^ m / 2 - m < n
+  → m + n
+      ≤ (2 * (m + n) - 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))) *
+        2 ^ fst_1_len 1 (m + n).
+Proof.
+clear T ro rp rl ac.
+... ...
+apply (le_sub_fst_rank_fst_loop 6).
+cbn.
 ...
 (*
   assert (H : 1 ≤ 2 ^ Nat.log2_up n / n ≤ 2). {
