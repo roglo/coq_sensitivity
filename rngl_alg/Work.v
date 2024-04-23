@@ -3634,6 +3634,128 @@ clear - Hnz.
     now apply (snd_rank_fst_loop_interval 1).
   }
   rewrite Nat.mul_1_l.
+  remember (snd _ / _ =? 0) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat.div_small_iff in Hn1; [ | easy ].
+    cbn - [ "*" ].
+    do 2 rewrite Nat.mul_1_r.
+    rewrite <- (Nat_add_diag (S n)).
+    apply Nat.add_le_mono_r.
+    rewrite <- Nat.pow_succ_r'.
+(**)
+    destruct n; [ easy | clear Hn ].
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    rewrite snd_if, snd_let in Hn1.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    cbn - [ "*" "/" "mod" "^" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" "/" "mod" "^" ].
+    remember (2 / S (S n) =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2. {
+      rewrite Nat.pow_1_r.
+      now apply Nat.lt_le_incl.
+    }
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+    rewrite Nat.mod_small in Hn1; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    do 2 apply Nat.succ_lt_mono in Hn2.
+    rename Hn2 into Hn.
+    progress replace (2 * 2) with 4 in Hn1 by easy.
+    progress replace (2 * 2) with 4 by easy.
+(**)
+    destruct n; [ easy | clear Hn ].
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    rewrite snd_if, snd_let in Hn1.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    cbn - [ "*" "/" "mod" "^" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" "/" "mod" "^" ].
+    remember (4 / S (S (S n)) =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2; [ now apply Nat.lt_le_incl | ].
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+    rewrite Nat.mod_small in Hn1; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    do 3 apply Nat.succ_lt_mono in Hn2.
+    rename Hn2 into Hn.
+    progress replace (2 * 4) with 8 in Hn1 by easy.
+    progress replace (2 * 4) with 8 by easy.
+(**)
+    destruct n; [ easy | ].
+    apply Nat.succ_lt_mono in Hn.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    rewrite snd_if, snd_let in Hn1.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    cbn - [ "*" "/" "mod" "^" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" "/" "mod" "^" ].
+    remember (8 / S (S (S (S n))) =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2; [ now apply Nat.lt_le_incl | ].
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn Hn2 | ].
+    rewrite Nat.mod_small in Hn1; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    do 4 apply Nat.succ_lt_mono in Hn2.
+    clear Hn; rename Hn2 into Hn.
+    progress replace (2 * 8) with 16 in Hn1 by easy.
+    progress replace (2 * 8) with 16 by easy.
+(**)
+    destruct n; [ easy | ].
+    apply Nat.succ_lt_mono in Hn.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    rewrite snd_if, snd_let in Hn1.
+    cbn - [ "*" "/" "mod" ] in Hn1.
+    cbn - [ "*" "/" "mod" "^" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" "/" "mod" "^" ].
+    remember (16 / S (S (S (S (S n)))) =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2; [ now apply Nat.lt_le_incl | ].
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn Hn2 | ].
+    rewrite Nat.mod_small in Hn1; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    do 5 apply Nat.succ_lt_mono in Hn2.
+    clear Hn; rename Hn2 into Hn.
+    progress replace (2 * 16) with 32 in Hn1 by easy.
+    progress replace (2 * 16) with 32 by easy.
+(*
+  Hn : 11 < n
+  Hn1 : snd (rank_fst_loop n 1 32 (S (S (S (S (S n)))))) < S (S (S (S (S n))))
+  ============================
+  2 ^ S (S (S (S (S (fst (rank_fst_loop n 1 32 (S (S (S (S (S n)))))))))))
+  ≤ S (S (S (S (S n))))
+*)
+Theorem pow2_snd_rank_fst_loop_le :
+  ∀ m n,
+  2 ^ m / 2 - m < n
+  → snd (rank_fst_loop n 1 (2 ^ m) (m + n)) < m + n
+  → 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n))) ≤ m + n.
+clear T ro rp rl ac.
+Admitted.
+apply (pow2_snd_rank_fst_loop_le 5); [ easy | ].
+...
+Compute (map (λ n,
+  2 ^ S (fst (rank_fst_loop n 1 2 (S n))) ≤ S n
+) (seq 1 10)).
+...
+    rewrite <- (Nat.mul_1_r 2) at 2.
+    rewrite <- fst_rank_fst_loop_eq_succ.
+...
+Search (2 ^ S _).
+specialize fst_rank_fst_loop_eq_succ as H1.
+rewrite <- H1.
+specialize fst_rank_fst_loop_eq_succ_lemma as H1.
 ...
 Compute (map (λ n,
 (
