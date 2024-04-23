@@ -3580,7 +3580,11 @@ clear - Hnz.
   rewrite (Nat_mod_less_small 1). 2: {
     rewrite Nat.mul_1_l.
     cbn - [ "*" ].
-(**)
+(*
+  Hn : 0 < n
+  ============================
+  S n ≤ snd (rank_fst_loop n 1 2 (S n)) < 2 * S n
+*)
     destruct n; [ easy | clear Hn ].
     cbn - [ "-" "*" "/" "mod" ].
     rewrite snd_if, snd_let.
@@ -3598,7 +3602,11 @@ clear - Hnz.
     do 2 apply Nat.succ_lt_mono in Hn1.
     rename Hn1 into Hn.
     replace (2 * 2) with 4 by easy.
-(**)
+(*
+  Hn : 0 < n
+  ============================
+  S (S n) ≤ snd (rank_fst_loop n 1 4 (S (S n))) < 2 * S (S n)
+*)
     destruct n; [ easy | clear Hn ].
     cbn - [ "-" "*" "/" "mod" ].
     rewrite snd_if, snd_let.
@@ -3616,7 +3624,11 @@ clear - Hnz.
     do 3 apply Nat.succ_lt_mono in Hn1.
     rename Hn1 into Hn.
     progress replace (2 * 4) with 8 by easy.
-(**)
+(*
+  Hn : 1 < n
+  ============================
+  S (S (S n)) ≤ snd (rank_fst_loop n 1 8 (S (S (S n)))) < 2 * S (S (S n))
+*)
     destruct n; [ easy | ].
     apply Nat.succ_lt_mono in Hn.
     cbn - [ "-" "*" "/" "mod" ].
@@ -3636,7 +3648,12 @@ clear - Hnz.
     clear Hn.
     rename Hn1 into Hn.
     progress replace (2 * 8) with 16 by easy.
-(**)
+(*
+  Hn : 4 < n
+  ============================
+  S (S (S (S n))) ≤ snd (rank_fst_loop n 1 16 (S (S (S (S n))))) <
+  2 * S (S (S (S n)))
+*)
     destruct n; [ easy | ].
     apply Nat.succ_lt_mono in Hn.
     cbn - [ "-" "*" "/" "mod" ].
@@ -3656,7 +3673,24 @@ clear - Hnz.
     clear Hn.
     rename Hn1 into Hn.
     progress replace (2 * 16) with 32 by easy.
-(**)
+(*
+  Hn : 11 < n
+  ============================
+  S (S (S (S (S n)))) ≤ snd (rank_fst_loop n 1 32 (S (S (S (S (S n)))))) <
+  2 * S (S (S (S (S n))))
+*)
+(*
+Theorem snd_rank_fst_loop_interval :
+  ∀ m n,
+  2 ^ m / 2 - m < n
+  → m + n ≤ snd (rank_fst_loop n 1 (2 ^ m) (m + n)) < 2 * (m + n).
+Proof.
+intros * Hn.
+clear T ro rp rl ac.
+Admitted.
+now apply (snd_rank_fst_loop_interval 5).
+...
+*)
     destruct n; [ easy | ].
     apply Nat.succ_lt_mono in Hn.
     cbn - [ "-" "*" "/" "mod" ].
@@ -3676,6 +3710,49 @@ clear - Hnz.
     clear Hn.
     rename Hn1 into Hn.
     progress replace (2 * 32) with 64 by easy.
+(*
+  Hn : 26 < n
+  ============================
+  S (S (S (S (S (S n)))))
+  ≤ snd (rank_fst_loop n 1 64 (S (S (S (S (S (S n))))))) <
+  2 * S (S (S (S (S (S n)))))
+*)
+Theorem snd_rank_fst_loop_interval :
+  ∀ m n,
+  2 ^ m / 2 - m < n
+  → m + n ≤ snd (rank_fst_loop n 1 (2 ^ m) (m + n)) < 2 * (m + n).
+Proof.
+intros * Hn.
+revert m Hn.
+induction n; intros; [ easy | ].
+cbn - [ "*" ].
+rewrite snd_if, snd_let.
+cbn - [ "*" ].
+remember (2 ^ m / (m + S n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  flia Hn1.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]. 2: {
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite <- Nat.add_succ_comm.
+  rewrite <- Nat.pow_succ_r'.
+  apply IHn.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+  apply (Nat.add_lt_mono_r _ _ (S m)).
+  rewrite Nat.add_comm, Nat.add_succ_comm in Hn1.
+  rewrite Nat.sub_add; [ easy | ].
+  now apply Nat.pow_gt_lin_r.
+}
+...
+clear T ro rp rl ac.
+Admitted.
+now apply (snd_rank_fst_loop_interval 6).
 ...
 Compute (map (λ n,
 (
