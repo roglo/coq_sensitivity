@@ -3688,7 +3688,13 @@ clear - Hnz.
     rewrite <- Nat.pow_succ_r'.
     now apply (pow2_snd_rank_fst_loop_le 1).
   }
-  apply Nat.eqb_neq in Hn1.
+  clear Hn1.
+  rewrite <- Nat.pow_add_r.
+  rewrite Nat.add_succ_l.
+  rewrite (Nat.add_succ_r (fst _)).
+  rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
+...
+Search (fst (rank_fst_loop _ 0 _ _)).
   remember (rank_fst_loop n 1 2 (S n)) as x.
   remember (fst (rank_fst_loop _ _ _ _)) as y.
 ...
