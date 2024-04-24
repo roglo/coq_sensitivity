@@ -3689,6 +3689,8 @@ clear - Hnz.
     now apply (pow2_snd_rank_fst_loop_le 1).
   }
   apply Nat.eqb_neq in Hn1.
+  remember (rank_fst_loop n 1 2 (S n)) as x.
+  remember (fst (rank_fst_loop _ _ _ _)) as y.
 ...
 Search (2 ^ S _).
 specialize fst_rank_fst_loop_eq_succ as H1.
