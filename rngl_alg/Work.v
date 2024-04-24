@@ -3635,15 +3635,35 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
 Compute (map (λ n,
+(n,
   2 ^ inv_ub_den_pow2 n ≤ inv_ub_num n * n
+)
 ) (seq 1 20)).
-...
   progress unfold inv_ub_den_pow2.
   progress unfold inv_ub_num.
+Compute (map (λ n,
+  let m := Nat.log2_up n in
+(n,
+  2 ^ (rank_fst_1 1 n + m) ≤ (2 ^ S m - 1) * n
+)
+) (seq 1 15)).
+Compute (map (λ n,
+(n,
+Nat.leb (fst_1_len 1 n)
+(Nat.log2 n)
+)
+) (seq 2 30)).
+Print fst_1_len.
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ (rank_fst_1 1 n + fst_1_len 1 n))
+  ((2 ^ S (Nat.log2  n) - 1) * n)
+) (seq 1 20)).
+(* oui mais non, il faudrait que Nat.log2 n ≤ fst_1_len 1 n *)
+...
 Search rank_fst_1.
 rewrite rank_fst_1_log2_up.
 clear i Hin Hni.
-
 ...
 (*
   rewrite rank_fst_1_log2_up.
