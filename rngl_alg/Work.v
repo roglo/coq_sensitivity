@@ -3636,11 +3636,15 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   apply Nat.mul_le_mono_l.
 Compute (map (λ n,
 (n,
-  2 ^ inv_ub_den_pow2 n ≤ inv_ub_num n * n
+  Nat.leb (2 ^ inv_ub_den_pow2 n) (inv_ub_num n * n)
 )
-) (seq 1 20)).
+) (seq 0 30)).
+(* a l'air toujours vrai, à condition que n ≠ 0 *)
+...
   progress unfold inv_ub_den_pow2.
   progress unfold inv_ub_num.
+rewrite rank_fst_1_log2_up.
+...
 Compute (map (λ n,
   let m := Nat.log2_up n in
 (n,
