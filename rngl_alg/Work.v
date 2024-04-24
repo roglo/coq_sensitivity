@@ -3634,11 +3634,17 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-(*
-clear - Hnz.
-*)
+Compute (map (λ n,
+  2 ^ inv_ub_den_pow2 n ≤ inv_ub_num n * n
+) (seq 1 20)).
+...
   progress unfold inv_ub_den_pow2.
   progress unfold inv_ub_num.
+Search rank_fst_1.
+rewrite rank_fst_1_log2_up.
+clear i Hin Hni.
+
+...
 (*
   rewrite rank_fst_1_log2_up.
 *)
@@ -3693,10 +3699,11 @@ clear - Hnz.
   rewrite Nat.add_succ_l.
   rewrite (Nat.add_succ_r (fst _)).
   rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
-...
-Search (fst (rank_fst_loop _ 0 _ _)).
   remember (rank_fst_loop n 1 2 (S n)) as x.
   remember (fst (rank_fst_loop _ _ _ _)) as y.
+Compute (map (λ n,
+  2 ^ Nat.log2_up n - n
+) (seq 0 20)).
 ...
 Search (2 ^ S _).
 specialize fst_rank_fst_loop_eq_succ as H1.
