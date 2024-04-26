@@ -3636,6 +3636,58 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   apply Nat.mul_le_mono_l.
 progress unfold inv_ub_den_pow2.
 assert (fst_1_len 1 n = Nat.log2_up (inv_ub_num n)). {
+progress unfold inv_ub_num.
+Theorem glop :
+  ∀ n, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n.
+Proof.
+intros * Hn1.
+specialize (Nat.log2_up_succ_or (2 ^ n - 1)) as H1.
+destruct H1 as [H1| H1]. 2: {
+  rewrite <- Nat.sub_succ_l in H1. 2: {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite Nat_sub_succ_1 in H1.
+  rewrite <- H1.
+  now apply Nat.log2_up_pow2.
+}
+apply Nat_pow2_log2_up_succ in H1.
+...
+apply Nat.succ_inj.
+rewrite <- H1.
+Check Nat_pow2_log2_up_succ.
+...
+Search (Nat.log2_up _ = Nat.log2_up _).
+apply Nat.log2_up_same.
+...
+apply Nat.le_antisymm. 2: {
+Search (_ ≤ Nat.log2_up _).
+...
+intros * Hn1.
+induction n; intros; [ easy | ].
+rewrite Nat.pow_succ_r'.
+rewrite <- Nat_add_diag.
+rewrite <- Nat.add_sub_assoc. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+apply Nat.le_antisymm. {
+  eapply le_trans.
+  apply Nat.log2_up_add_le.
+...
+destruct n; [ easy | clear Hn1 ].
+...
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+...
   remember (inv_ub_num n) as m eqn:Hm.
   symmetry in Hm.
   destruct m. {
