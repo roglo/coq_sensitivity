@@ -3634,6 +3634,24 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+progress unfold inv_ub_den_pow2.
+assert (fst_1_len 1 n = Nat.log2_up (inv_ub_num n)). {
+  remember (inv_ub_num n) as m eqn:Hm.
+  symmetry in Hm.
+  destruct m. {
+    cbn.
+    progress unfold inv_ub_num in Hm.
+    apply Nat.sub_0_le in Hm.
+    apply Nat.le_1_r in Hm.
+    destruct Hm as [Hm| Hm]; [ now apply Nat.pow_nonzero in Hm | ].
+    cbn in Hm; flia Hm.
+  }
+  specialize (Nat.log2_up_succ_or m) as H1.
+  destruct H1 as [H1| H1]. {
+    rewrite H1.
+...
+    apply Nat_pow2_log2_up_succ in H1.
+...
 Compute (map (λ n,
 (n,
   Nat.leb (2 ^ inv_ub_den_pow2 n) (inv_ub_num n * n)
