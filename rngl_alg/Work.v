@@ -3682,17 +3682,77 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+(*
+  progress unfold inv_ub_num.
+Check Nat_log2_up_pow2_sub_1.
+...
   progress unfold inv_ub_den_pow2.
   rewrite rank_fst_1_log2_up.
+Print inv_ub_num.
+...
+  progress unfold inv_ub_num.
+  rewrite Nat.pow_add_r.
+Print fst_1_len.
+  progress unfold fst_1_len.
+...
+Check Nat_log2_up_pow2_sub_1.
+Inspect 1.
+...
+*)
   progress unfold inv_ub_num.
   assert (S (fst_1_len 1 n) = Nat.log2_up (inv_ub_num n)). {
     progress unfold inv_ub_num.
     rewrite Nat_log2_up_pow2_sub_1; [ easy | ].
-    intros H.
-    apply Nat.succ_inj in H.
+    intros H1.
+    apply Nat.succ_inj in H1.
+    destruct n; [ easy | clear Hnz ].
+    progress unfold fst_1_len in H1.
+    remember (rank_fst_loop (S n) 0) as f.
+    cbn - [ "-" "*" "/" "mod" ] in H1.
+    subst f.
+    remember (1 / S n =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2. {
+      cbn - [ "-" "*" "/" "mod" ] in H1.
+      apply Nat.eqb_eq in Hn2.
+      rewrite Hn2 in H1.
+      cbn - [ "-" "*" "/" "mod" ] in H1.
+      now rewrite fst_let in H1.
+    }
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+    rewrite Nat.mod_small in H1; [ | easy ].
+    rewrite snd_let in H1.
+    rewrite Nat.mul_1_r in H1.
+    cbn - [ "-" "*" "/" "mod" ] in H1.
+    rewrite fst_if, fst_let in H1.
+    cbn - [ "-" "*" "/" "mod" ] in H1.
+    remember (snd (rank_fst_loop n 1 2 (S n)) / S n =? 0) as n3 eqn:Hn3.
+    symmetry in Hn3.
+    destruct n3; [ clear H1 | easy ].
+    apply Nat.eqb_eq in Hn3.
+    apply Nat.div_small_iff in Hn3; [ | easy ].
+(* ahhhh, pute vierge ! *)
+...
     destruct n; [ easy | ].
     progress unfold fst_1_len in H.
     cbn - [ "-" "*" "/" "mod" ] in H.
+    rewrite snd_if, snd_let in H.
+    rewrite fst_if, fst_let in H.
+    cbn - [ "-" "*" "/" "mod" ] in H.
+    remember (1 / S n =? 1) as n2 eqn:Hn2.
+    symmetry in Hn2.
+    destruct n2. {
+      cbn - [ "-" "*" "/" "mod" ] in H.
+      apply Nat.eqb_eq in Hn2.
+      apply Nat_eq_div_1 in Hn2.
+      flia Hn1 Hn2.
+    }
+    apply Nat.eqb_neq in Hn2.
+    apply Nat_neq_div_1 in Hn2.
+    destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+    rewrite Nat.mod_small in H; [ | easy ].
 ...
 Search (fst (rank_fst_loop _ _ _ _) = 0).
 Search (fst_1_len _ _ = 0).
