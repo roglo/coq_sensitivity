@@ -3646,11 +3646,17 @@ assert (fst_1_len 1 n = Nat.log2_up (inv_ub_num n)). {
     destruct Hm as [Hm| Hm]; [ now apply Nat.pow_nonzero in Hm | ].
     cbn in Hm; flia Hm.
   }
+  rewrite <- Hm.
+  progress unfold inv_ub_num.
+...
   specialize (Nat.log2_up_succ_or m) as H1.
   destruct H1 as [H1| H1]. {
-    rewrite H1.
+progress unfold inv_ub_num in Hm.
 ...
+    rewrite H1.
     apply Nat_pow2_log2_up_succ in H1.
+Search ( 2 ^ Nat.log2 _).
+...
 ...
 Compute (map (λ n,
 (n,
