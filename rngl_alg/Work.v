@@ -3534,6 +3534,54 @@ rewrite Nat.sub_add; [ easy | ].
 now apply Nat.pow_gt_lin_r.
 Qed.
 
+(* to be cleaned *)
+Theorem Nat_log2_up_pow2_sub_1 :
+  ∀ n, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n.
+Proof.
+intros * Hn1.
+specialize (Nat.log2_up_succ_or (2 ^ n - 1)) as H1.
+destruct H1 as [H1| H1]. 2: {
+  rewrite <- Nat.sub_succ_l in H1. 2: {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite Nat_sub_succ_1 in H1.
+  rewrite <- H1.
+  now apply Nat.log2_up_pow2.
+}
+rewrite <- Nat.sub_succ_l in H1. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite Nat_sub_succ_1 in H1.
+rewrite Nat.log2_up_pow2 in H1; [ | easy ].
+symmetry in H1.
+destruct n; [ easy | ].
+apply Nat.succ_inj in H1.
+apply Nat_eq_log2_up in H1. {
+  rewrite Nat.pow_succ_r' in H1.
+  destruct H1 as (H1, H2).
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
+  remember (2 ^ n) as m eqn:Hm.
+  destruct m; [ easy | ].
+  exfalso.
+  apply Nat.nlt_ge in H2.
+  apply H2; clear H2.
+  apply Nat.lt_add_lt_sub_r.
+  rewrite <- Nat_add_diag.
+  apply Nat.add_lt_mono_l.
+  destruct m; [ | flia ].
+  cbn in H1.
+  symmetry in Hm.
+  destruct n; [ easy | ].
+  rewrite Nat.pow_succ_r' in Hm.
+  flia Hm.
+}
+rewrite Nat.pow_succ_r'.
+specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
+flia H3.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3634,34 +3682,20 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-progress unfold inv_ub_den_pow2.
-assert (fst_1_len 1 n = Nat.log2_up (inv_ub_num n)). {
-progress unfold inv_ub_num.
-Theorem glop :
-  ∀ n, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n.
-Proof.
-intros * Hn1.
-specialize (Nat.log2_up_succ_or (2 ^ n - 1)) as H1.
-destruct H1 as [H1| H1]. 2: {
-  rewrite <- Nat.sub_succ_l in H1. 2: {
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite Nat_sub_succ_1 in H1.
-  rewrite <- H1.
-  now apply Nat.log2_up_pow2.
-}
-rewrite <- Nat.sub_succ_l in H1. 2: {
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-Check Nat_pow2_log2_up_succ.
+  progress unfold inv_ub_den_pow2.
+  rewrite rank_fst_1_log2_up.
+  progress unfold inv_ub_num.
+  assert (S (fst_1_len 1 n) = Nat.log2_up (inv_ub_num n)). {
+    progress unfold inv_ub_num.
+    rewrite Nat_log2_up_pow2_sub_1; [ easy | ].
+    intros H.
+    apply Nat.succ_inj in H.
+    destruct n; [ easy | ].
+    progress unfold fst_1_len in H.
+    cbn - [ "-" "*" "/" "mod" ] in H.
 ...
-rewrite Nat_sub_succ_1 in H1.
-rewrite Nat.log2_up_pow2 in H1; [ | easy ].
-symmetry in H1.
-...
-specialize Nat.log2_log2_up_spec as H2.
+Search (fst (rank_fst_loop _ _ _ _) = 0).
+Search (fst_1_len _ _ = 0).
 ...
 specialize (H2 (2 ^ n - 1)).
 destruct n; [ easy | ].
