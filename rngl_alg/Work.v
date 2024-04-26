@@ -3651,7 +3651,40 @@ destruct H1 as [H1| H1]. 2: {
   rewrite <- H1.
   now apply Nat.log2_up_pow2.
 }
+rewrite <- Nat.sub_succ_l in H1. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+Check Nat_pow2_log2_up_succ.
+...
+rewrite Nat_sub_succ_1 in H1.
+rewrite Nat.log2_up_pow2 in H1; [ | easy ].
+symmetry in H1.
+...
+specialize Nat.log2_log2_up_spec as H2.
+...
+specialize (H2 (2 ^ n - 1)).
+destruct n; [ easy | ].
+destruct n; [ easy | clear Hn1 ].
+assert (H : 0 < 2 ^ S (S n) - 1) by admit.
+specialize (H2 H); clear H.
+destruct H2 as (H2, H3).
+apply Nat.succ_le_mono in H3.
+rewrite H1 in H3.
+...
+apply Nat.succ_inj.
+rewrite <- H1.
+rewrite <- Nat.sub_succ_l. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite Nat_sub_succ_1.
+Search (Nat.log2_up (2 ^ _)).
+rewrite Nat.log2_up_pow2; [ | easy ].
+...
+apply (Nat.pow_inj_r 2); [ easy | ].
 apply Nat_pow2_log2_up_succ in H1.
+Search (_ ^ _ = _ ^ _).
 ...
 apply Nat.succ_inj.
 rewrite <- H1.
