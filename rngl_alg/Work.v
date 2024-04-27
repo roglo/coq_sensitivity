@@ -3731,6 +3731,25 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   progress unfold inv_ub_den_pow2.
   rewrite fst_1_len_log2_up.
   rewrite rank_fst_1_log2_up.
+  remember (inv_ub_num n) as a eqn:Ha.
+  rewrite Nat.add_sub_assoc.
+  apply (le_trans _ (2 ^ Nat.log2_up (n * a - 1))). {
+    apply Nat.pow_le_mono_r; [ easy | ].
+progress unfold inv_ub_num in Ha.
+rewrite fst_1_len_log2_up in Ha.
+(* bon, chais pas, chuis parti en couille, là *)
+...
+    apply (le_trans _ (Nat.log2_up n + Nat.log2_up a)); [ flia | ].
+...
+  rewrite <- Nat.sub_succ_l.
+  rewrite Nat_sub_succ_1.
+...
+  rewrite Nat.pow_add_r.
+  rewrite Nat.mul_comm.
+
+
+Search (2 ^ Nat.log2_up _).
+rewrite <-
   rewrite Nat.pow_add_r.
 ...
 Search (fst (rank_fst_loop _ _ _ _) = 0).
