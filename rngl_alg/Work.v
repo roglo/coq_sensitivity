@@ -3812,16 +3812,33 @@ Compute (map (λ n,
   Nat.leb
     (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n))) (2 * (inv_ub_num n * n))
 ) (seq 0 30)).
-  destruct n; [ easy | clear Hnz ].
+(* ok, si n≠0 *)
 Compute (map (λ n,
-  pair
-    (2 ^ (Nat.log2_up (S n) + Nat.log2_up (inv_ub_num (S n))))
-    (2 * (inv_ub_num (S n) * S n))
-) (seq 0 30)).
-(* ok *)
+pair
+(
+  Nat.add
+    (Nat.log2_up n)
+    (Nat.log2_up (inv_ub_num n))
+) (
+  Nat.log2_up
+    (n * inv_ub_num n)
+)
+) (seq 0 40)).
+(* ah bin ils ont même l'air égaux ! *)
+Search (Nat.log2_up _ + Nat.log2_up _).
+Theorem glop :
+  ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
+Proof.
+Search inv_ub_num.
+Print inv_ub_num.
+(* c'est pas toujours vrai, if faut une condition, laquelle a l'air
+   vraie dans notre cas, mais pourquoi ? *)
+(* inv_ub_num est une (puissance de 2) moins 1 *)
+...
+Search (Nat.log2_up _ + Nat.log2_up _).
   eapply le_trans. {
     apply Nat.pow_le_mono_r; [ easy | ].
-    apply Nat.log2_up_mul_below; [ easy | ].
+    apply Nat.log2_up_mul_below; [ flia Hnz | ].
     apply Nat.neq_0_lt_0.
     intros H.
     progress unfold inv_ub_num in H.
@@ -3833,8 +3850,8 @@ Compute (map (λ n,
   }
 Compute (map (λ n,
   Nat.leb
-    (2 ^ S (Nat.log2_up (S n * inv_ub_num (S n))))
-    (2 * (inv_ub_num (S n) * S n))
+    (2 ^ S (Nat.log2_up (n * inv_ub_num n)))
+    (2 * (inv_ub_num n * n))
 ) (seq 0 30)).
 (* plus ok *)
 ...
