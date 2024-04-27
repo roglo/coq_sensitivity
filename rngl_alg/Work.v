@@ -3814,7 +3814,7 @@ Compute (map (λ n,
 ) (seq 0 30)).
 (* ok, si n≠0 *)
 Compute (map (λ n,
-pair
+Nat.eqb
 (
   Nat.add
     (Nat.log2_up n)
@@ -3823,17 +3823,20 @@ pair
   Nat.log2_up
     (n * inv_ub_num n)
 )
-) (seq 0 40)).
+) (seq 0 60)).
 (* ah bin ils ont même l'air égaux ! *)
+Compute (map (λ n,
+    (n * inv_ub_num n)
+) (seq 0 40)).
 Search (Nat.log2_up _ + Nat.log2_up _).
 Theorem glop :
   ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
-Search inv_ub_num.
-Print inv_ub_num.
+intros.
 (* c'est pas toujours vrai, if faut une condition, laquelle a l'air
    vraie dans notre cas, mais pourquoi ? *)
 (* inv_ub_num est une (puissance de 2) moins 1 *)
+apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
 ...
 Search (Nat.log2_up _ + Nat.log2_up _).
   eapply le_trans. {
