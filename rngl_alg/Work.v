@@ -3808,6 +3808,20 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   }
   rewrite Nat.pow_1_r.
   apply Nat.div_le_upper_bound; [ easy | ].
+Compute (map (λ n,
+  pair
+    (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n))) (2 * (inv_ub_num n * n))
+) (seq 0 30)).
+  destruct n; [ easy | clear Hnz ].
+Check Nat.log2_up_mul_below.
+...
+Print inv_ub_num.
+progress unfold inv_ub_num.
+Search (Nat.log2_up (_ - _)).
+rewrite Nat_log2_up_pow2_sub_1.
+Search fst_1_len.
+rewrite fst_1_len_log2_up.
+...
   eapply le_trans. {
     apply Nat.pow_le_mono_r; [ easy | ].
     apply Nat.log2_up_mul_below; [ flia Hnz | ].
