@@ -3760,7 +3760,55 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
       rewrite <- (Nat.pow_1_r 2) in H at 2.
       apply Nat.pow_inj_r in H; [ | easy ].
       apply Nat.succ_inj in H.
-(**)
+      progress unfold fst_1_len in H.
+      destruct n; [ easy | clear Hnz ].
+      remember (snd _) as x.
+      cbn - [ "*" "/" "mod" ] in H.
+      rewrite fst_if, fst_let in H.
+      cbn - [ "*" "/" "mod" ] in H.
+      remember (x / S n =? 0) as n2 eqn:Hn2.
+      symmetry in Hn2.
+      destruct n2; [ clear H | easy ].
+      apply Nat.eqb_eq in Hn2.
+      apply Nat.div_small_iff in Hn2; [ | easy ].
+      subst x.
+      exfalso.
+      apply Nat.nlt_ge in Hn2.
+      apply Hn2; clear Hn2.
+      apply -> Nat.succ_lt_mono.
+      cbn - [ "*" "/" "mod" ].
+      rewrite snd_if, snd_let.
+      cbn - [ "*" "/" "mod" ].
+      remember (1 / S n =? 1) as n2 eqn:Hn2.
+      symmetry in Hn2.
+      destruct n2. 2: {
+                   apply Nat.eqb_neq in Hn2.
+                   apply Nat_neq_div_1 in Hn2.
+                   destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+                   rewrite Nat.mod_small; [ | easy ].
+                   apply (lt_snd_rank_fst_loop 0).
+                   cbn; flia Hn1.
+                 }
+                 apply Nat.eqb_eq in Hn2.
+      apply Nat_eq_div_1 in Hn2.
+      easy.
+    }
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+...
+Check lt_snd_rank_fst_loop.
+Search (_ < snd _).
+Compute (map (λ n,
+  Nat.ltb n (snd (rank_fst_loop (S n) 1 1 (S n)))
+) (seq 0 20)).
+(* a l'air bon *)
+...
+Print rank_fst_loop.
+Compute (map (λ n,
+  fst_1_len 1 n
+) (seq 1 40)).
+
       rewrite fst_1_len_log2_up in H.
       apply Nat.sub_0_le in H.
       apply Nat.le_1_r in H.
@@ -3778,6 +3826,11 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
         destruct H; [ easy | ].
 (**)
 (* ça tourne en rond *)
+...
+  H : fst_1_len 1 n = 0
+  ============================
+  False
+...
         rewrite fst_1_len_log2_up in H.
         apply Nat.sub_0_le in H.
         apply Nat.le_1_r in H.
