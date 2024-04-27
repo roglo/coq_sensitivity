@@ -3760,7 +3760,45 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
       rewrite <- (Nat.pow_1_r 2) in H at 2.
       apply Nat.pow_inj_r in H; [ | easy ].
       apply Nat.succ_inj in H.
+(**)
       rewrite fst_1_len_log2_up in H.
+      apply Nat.sub_0_le in H.
+      apply Nat.le_1_r in H.
+      progress unfold inv_ub_num in H.
+      destruct H as [H| H]. {
+        apply Nat.log2_up_null in H.
+        apply Nat.le_sub_le_add_r in H.
+        cbn - [ "^" ] in H.
+        rewrite <- (Nat.mul_1_r 2) in H at 2.
+        rewrite Nat.pow_succ_r' in H.
+        apply Nat.mul_le_mono_pos_l in H; [ | easy ].
+        apply Nat.le_1_r in H.
+        destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+        apply Nat_eq_pow_1 in H.
+        destruct H; [ easy | ].
+(**)
+(* ça tourne en rond *)
+        rewrite fst_1_len_log2_up in H.
+        apply Nat.sub_0_le in H.
+        apply Nat.le_1_r in H.
+        progress unfold inv_ub_num in H.
+        destruct H as [H| H]. {
+          apply Nat.log2_up_null in H.
+          apply Nat.le_sub_le_add_r in H.
+...
+  H : 2 ^ S (fst_1_len 1 n) ≤ 1 + 1
+  ============================
+  False
+...
+        progress unfold fst_1_len in H.
+        destruct n; [ easy | cbn in H ].
+destruct n; [ easy | cbn in H ].
+Search (fst_1_len _ _ = 0).
+    }
+...
+      destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+      apply Nat_eq_pow_1 in H.
+      now destruct H.
 ...
   rewrite Nat.pow_sub_r; [ | easy | ].
   rewrite Nat.pow_1_r.
