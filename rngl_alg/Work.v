@@ -3796,6 +3796,33 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
+  rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.eq_add_0 in H.
+    destruct H as (H, _).
+    apply Nat.log2_up_null in H.
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    now apply Nat.succ_le_mono in H.
+  }
+  rewrite Nat.pow_1_r.
+  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply le_trans. {
+    apply Nat.pow_le_mono_r; [ easy | ].
+    apply Nat.log2_up_mul_below; [ flia Hnz | ].
+    apply Nat.neq_0_lt_0.
+    intros H.
+    progress unfold inv_ub_num in H.
+    apply Nat.sub_0_le in H.
+    apply Nat.le_1_r in H.
+    destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+    apply Nat_eq_pow_1 in H.
+    now destruct H.
+  }
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_l.
+(* ah bin non, c'est faux, ça, c'est le contraire ! *)
 ...
 Check lt_snd_rank_fst_loop.
 Search (_ < snd _).
