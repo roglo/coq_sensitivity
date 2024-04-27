@@ -3627,6 +3627,14 @@ apply Nat.log2_up_spec.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
+Theorem Nat_eq_pow_1 : ∀ a b, a ^ b = 1 → a = 1 ∨ b = 0.
+Proof.
+intros * Hab.
+destruct b; [ now right | left ].
+cbn in Hab.
+now apply Nat.eq_mul_1 in Hab.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3727,6 +3735,45 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+(**)
+  progress unfold inv_ub_den_pow2.
+  rewrite rank_fst_1_log2_up.
+  rewrite fst_1_len_log2_up.
+(*
+  remember (inv_ub_num n) as an eqn:Han.
+*)
+  rewrite Nat.add_sub_assoc. 2: {
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.log2_up_null in H.
+    apply Nat.le_1_r in H.
+    progress unfold inv_ub_num in H.
+    destruct H as [H| H]. {
+      apply Nat.sub_0_le in H.
+      apply Nat.le_1_r in H.
+      destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+      apply Nat_eq_pow_1 in H.
+      now destruct H.
+    }
+    apply Nat_sub_add_eq_l in H. {
+      symmetry in H; cbn - [ "^" ] in H.
+      rewrite <- (Nat.pow_1_r 2) in H at 2.
+      apply Nat.pow_inj_r in H; [ | easy ].
+      apply Nat.succ_inj in H.
+      rewrite fst_1_len_log2_up in H.
+...
+  rewrite Nat.pow_sub_r; [ | easy | ].
+  rewrite Nat.pow_1_r.
+  apply Nat.div_le_upper_bound; [ easy | ].
+  Search (Nat.log2_up _ ≤ Nat.log2_up _).
+  apply Nat.lt_le_incl.
+  Search (Nat.log2_up _ < Nat.log2_up _).
+  apply Nat.log2_up_lt_cancel.
+  rewrite Nat.log2_up_pow2.
+  eapply le_lt_trans.
+  Search (Nat.log2_up _ + Nat.log2_up _).
+apply Nat.log2_up_mul_below; [ flia Hnz | ].
+...
   progress unfold inv_ub_num.
   progress unfold inv_ub_den_pow2.
   rewrite fst_1_len_log2_up.
