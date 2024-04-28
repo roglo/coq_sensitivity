@@ -3856,18 +3856,47 @@ intros * (Hab, Hba).
    vraie dans notre cas, mais pourquoi ? *)
 (* inv_ub_num est une (puissance de 2) moins 1 *)
 apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
-(*
+(**)
 Compute (map (λ a, (a, map (λ b,
   Nat.b2n (
   Nat.eqb (Nat.log2_up a + Nat.log2_up b) (Nat.log2_up (a * b))
 )
 ) (seq 0 35))) (seq 0 35)).
-*)
+Compute (map (λ a, (a+100, map (λ b,
+  if b =? inv_ub_num a then 3
+  else
+    Nat.b2n (
+    Nat.eqb (Nat.log2_up a + Nat.log2_up b) (Nat.log2_up (a * b)))
+) (seq 0 20))) (seq 0 30)).
+(**)
 Compute (map (λ n,
 pair
     n
     (inv_ub_num n)
 ) (seq 0 130)).
+(*
+Compute (map (λ n,
+(
+    (Nat.log2_up n)
+,
+    (Nat.log2_up (inv_ub_num n))
+,
+    (Nat.log2_up (n * inv_ub_num n))
+)
+) (seq 0 130)).
+*)
+Print inv_ub_num.
+Search (Nat.log2_up (_ + _)).
+Search (Nat.log2_up (_ - _)).
+...
+Nat_log2_up_pow2_sub_1: ∀ n : nat, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n
+log2_up (inv_ub_num n) = log2_up (2 ^ (p + 1) - 1) = p + 1
+...
+n * inv_ub_num n = n * (2 ^ (p + 1) - 1) = n * 2 ^ (p+1) - n
+log2_up (n * inv_ub_num n) = l2u (n * (2 ^ (p + 1) - 1)) =
+  (log2_up (n * 2 ^ (p+1) - n))
+...
+inv_ub_num n est une "puissance de 2" moins 1
 ...
 vrai si a est une puissance de 2
 a≥9 faux (0) si
