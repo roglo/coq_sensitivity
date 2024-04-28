@@ -3810,6 +3810,7 @@ Search (Nat.log2_up _ + Nat.log2_up _).
 Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.log2_up b ≤ S (Nat.log2_up (a * b))
 ...
 *)
+(**)
   rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
     apply Nat.neq_0_lt_0.
     intros H.
@@ -3822,6 +3823,12 @@ Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.lo
   }
   rewrite Nat.pow_1_r.
   apply Nat.div_le_upper_bound; [ easy | ].
+...
+progress unfold inv_ub_num.
+rewrite Nat_log2_up_pow2_sub_1.
+rewrite Nat.pow_add_r.
+rewrite Nat.mul_assoc.
+...
 Compute (map (λ n,
   Nat.leb
     (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n))) (2 * (inv_ub_num n * n))
@@ -3848,6 +3855,8 @@ progress unfold inv_ub_num at 1.
 Search (Nat.log2_up _ + Nat.log2_up _).
 Search (Nat.log2 _ + Nat.log2 _).
 *)
+Search (Nat.log2_up (_ - _)).
+...
 Theorem glop :
   ∀ a b, (a = 0 ↔ b = 0) → Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
@@ -3945,6 +3954,9 @@ a≥9 faux (0) si
 33  0 1 1 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0
 34  0 1 1 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0
 ...
+    0 1 2 3 4 5 6 7 8 9  11  13  15  17  19  21  23  25  27  29  31  33
+                       10  12  14  16  18  20  22  24  26  28  30  32  34
+
 0   1 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 1   1 1 1 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 2   0 1 1 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
