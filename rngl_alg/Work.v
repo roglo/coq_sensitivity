@@ -3863,6 +3863,11 @@ Compute (map (λ a, (a, map (λ b,
 )
 ) (seq 0 35))) (seq 0 35)).
 *)
+Compute (map (λ n,
+pair
+    n
+    (inv_ub_num n)
+) (seq 0 130)).
 ...
 vrai si a est une puissance de 2
 a≥9 faux (0) si
