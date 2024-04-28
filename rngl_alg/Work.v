@@ -3823,20 +3823,43 @@ Nat.eqb
   Nat.log2_up
     (n * inv_ub_num n)
 )
-) (seq 0 60)).
+) (seq 0 130)).
 (* ah bin ils ont même l'air égaux ! *)
 Compute (map (λ n,
     (n * inv_ub_num n)
 ) (seq 0 40)).
+Search inv_ub_num.
+progress unfold inv_ub_num at 1.
 Search (Nat.log2_up _ + Nat.log2_up _).
+Search (Nat.log2 _ + Nat.log2 _).
 Theorem glop :
-  ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
+  ∀ a b, (a = 0 ↔ b = 0) → Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
-intros.
+intros * (Hab, Hba).
 (* c'est pas toujours vrai, if faut une condition, laquelle a l'air
    vraie dans notre cas, mais pourquoi ? *)
 (* inv_ub_num est une (puissance de 2) moins 1 *)
 apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
+...
+apply Nat.nlt_ge.
+intros H1.
+...
+destruct a; [ now rewrite Hab | clear Hab ].
+cbn.
+destruct a; [ now rewrite Nat.add_0_r | ].
+destruct a. {
+  cbn; rewrite Nat.add_0_r.
+  rewrite Nat_add_diag.
+  rewrite Nat.log2_up_double; [ easy | ].
+  apply Nat.neq_0_lt_0.
+  intros H.
+  now specialize (Hba H).
+}
+destruct a. {
+  cbn.
+  rewrite Nat.add_0_r.
+  destruct b; [ now specialize (Hba eq_refl) | clear Hba ].
+  cbn.
 ...
 Search (Nat.log2_up _ + Nat.log2_up _).
   eapply le_trans. {
