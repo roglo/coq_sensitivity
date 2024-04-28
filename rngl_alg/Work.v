@@ -3782,20 +3782,49 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
       remember (1 / S n =? 1) as n2 eqn:Hn2.
       symmetry in Hn2.
       destruct n2. 2: {
-                   apply Nat.eqb_neq in Hn2.
-                   apply Nat_neq_div_1 in Hn2.
-                   destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
-                   rewrite Nat.mod_small; [ | easy ].
-                   apply (lt_snd_rank_fst_loop 0).
-                   cbn; flia Hn1.
-                 }
-                 apply Nat.eqb_eq in Hn2.
+        apply Nat.eqb_neq in Hn2.
+        apply Nat_neq_div_1 in Hn2.
+        destruct Hn2 as [Hn2| Hn2]; [ flia Hn2 | ].
+        rewrite Nat.mod_small; [ | easy ].
+        apply (lt_snd_rank_fst_loop 0).
+        cbn; flia Hn1.
+      }
+      apply Nat.eqb_eq in Hn2.
       apply Nat_eq_div_1 in Hn2.
       easy.
     }
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
+(**)
+  apply (le_trans _ (2 ^ Nat.log2_up (n * inv_ub_num n))). {
+    apply Nat.pow_le_mono_r; [ easy | ].
+    apply Nat.le_sub_le_add_l.
+    rewrite Nat.add_1_l.
+    apply Nat.log2_up_mul_below; [ flia Hnz | ].
+    progress unfold inv_ub_num.
+    apply Nat.lt_add_lt_sub_r.
+    rewrite Nat.add_0_l.
+    rewrite Nat.pow_succ_r'.
+    apply Nat.lt_1_mul_pos; [ easy | ].
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+Check Nat.log2_up_spec.
+(* ah, fait chier *)
+...
+  rewrite Nat.sub_1_r.
+  apply Nat.lt_le_incl.
+Search (2 ^ pred _).
+  apply Nat.log2_up_spec.
+Search (_ - 1 = pred _).
+Search (2 ^ Nat.log2_up _).
+rewrite Nat.mul_comm.
+Check Nat.log2_up_spec.
+...
+Search (Nat.log2_up _ + Nat.log2_up _).
+Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.log2_up b ≤ S (Nat.log2_up (a * b))
+...
   rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
     apply Nat.neq_0_lt_0.
     intros H.
