@@ -3823,6 +3823,98 @@ Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.lo
   }
   rewrite Nat.pow_1_r.
   apply Nat.div_le_upper_bound; [ easy | ].
+(**)
+Theorem Nat_log2_up_mul :
+  ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
+Proof.
+intros.
+(* cf Theorem glop below for all the comment and the analysis I've made *)
+... ...
+rewrite Nat_log2_up_mul.
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ Nat.log2_up (n * inv_ub_num n)) (2 * (inv_ub_num n * n))
+) (seq 0 50)).
+(* vrai *)
+Check Nat.log2_up_spec.
+  apply
+    (Nat.le_trans _ (2 * 2 ^ Nat.pred (Nat.log2_up (inv_ub_num n * n)))). 2: {
+    apply Nat.mul_le_mono_l.
+    apply Nat.lt_le_incl.
+    apply Nat.log2_up_spec.
+    eapply (lt_le_trans _ n); [ flia Hnz Hn1 | ].
+    rewrite Nat.mul_comm.
+    apply Nat_mul_le_pos_r.
+    apply Nat.neq_0_lt_0.
+    progress unfold inv_ub_num.
+    intros H.
+    apply Nat.sub_0_le in H.
+    apply Nat.le_1_r in H.
+    destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+    apply Nat_eq_pow_1 in H.
+    now destruct H.
+  }
+  rewrite <- Nat.pow_succ_r'.
+  rewrite Nat.succ_pred. 2: {
+    intros H.
+    apply Nat.log2_up_null in H.
+    apply Nat.le_1_r in H.
+    destruct H as [H| H]. {
+      apply Nat.eq_mul_0 in H.
+      destruct H as [H| H]; [ | easy ].
+      progress unfold inv_ub_num in H.
+      apply Nat.sub_0_le in H.
+      apply Nat.le_1_r in H.
+      destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+      apply Nat_eq_pow_1 in H.
+      now destruct H.
+    }
+    now apply Nat.eq_mul_1 in H.
+  }
+  now rewrite Nat.mul_comm.
+}
+...
+Check Nat.log2_up_spec.
+rewrite <- (Nat_sub_succ_1 (Nat.log2_up _)).
+eapply le_trans. {
+  rewrite <- pred_of_minus.
+  apply Nat.lt_le_incl.
+  apply Nat.log2_up_spec.
+  ...
+}
+rewrite Nat.pred_succ.
+rewrite Nat.log2_up_succ_pow2; [ | easy ].
+rewrite Nat.pow_succ_r'.
+apply Nat.mul_le_mono_l.
+Search (2 ^ Nat.log2_up _).
+...
+Compute (map (λ n,
+  Nat.leb
+    (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n)))
+    (2 * (inv_ub_num n * n))
+) (seq 0 50)).
+(* ça a l'air vrai, sauf pour n=0, mais ce cas-là, c'est pas grave *)
+Print inv_ub_num.
+(* mais si on fait la méthode suivante, ça ne marche plus *)
+  apply (le_trans _ (2 ^ S (Nat.log2_up (n * inv_ub_num n)))). {
+    apply Nat.pow_le_mono_r; [ easy | ].
+    apply Nat.log2_up_mul_below; [ flia Hnz | ].
+    apply Nat.neq_0_lt_0.
+    intros H.
+    progress unfold inv_ub_num in H.
+    apply Nat.sub_0_le in H.
+    apply Nat.le_1_r in H.
+    destruct H as [H| H]; [ now apply Nat.pow_nonzero in H | ].
+    apply Nat_eq_pow_1 in H.
+    now destruct H.
+  }
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_l.
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ Nat.log2_up (n * inv_ub_num n)) (inv_ub_num n * n)
+) (seq 0 30)).
+(* ah bin non, c'est faux, on est d'accord *)
 ...
 progress unfold inv_ub_num.
 rewrite Nat_log2_up_pow2_sub_1.
