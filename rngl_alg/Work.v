@@ -3669,6 +3669,27 @@ rewrite Nat.pow_add_r.
 now apply Nat.mul_le_mono.
 Qed.
 
+Theorem eq_fst_rank_fst_loop_0 :
+  ∀ it k a b,
+  fst (rank_fst_loop it k a b) = 0
+  ↔ it = 0 ∨ a / b = k.
+Proof.
+intros.
+destruct it. {
+  split; [ now intros; left | easy ].
+}
+cbn - [ "*" ]; rewrite fst_if, fst_let; cbn - [ "*" ].
+remember (a / b =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk. {
+  apply Nat.eqb_eq in Habk.
+  split; [ now intros; right | easy ].
+}
+apply Nat.eqb_neq in Habk.
+split; [ easy | ].
+now intros [H| H].
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3875,38 +3896,42 @@ specialize (Nat.log2_up_spec _ H1b) as Hb.
 rewrite <- Hna in Ha.
 rewrite <- Hnb in Hb.
 rewrite pred_of_minus in Ha, Hb.
+specialize (Geoffroy_1 a b na nb H1a H1b Hna Hnb) as H1.
+split; [ | easy ].
 Admitted.
-assert (H1a : 1 < inv_ub_num n) by admit.
-assert (H1b : 1 < n) by flia Hn1 Hnz.
-specialize Geoffroy_2 as H1.
-specialize (H1 (inv_ub_num n) n).
-specialize (H1 _ _ H1a H1b eq_refl eq_refl).
-progress unfold inv_ub_num in H1 at 2.
-rewrite Nat_log2_up_pow2_sub_1 in H1. 2: {
-  intros H.
-  apply Nat.succ_inj in H.
+assert (H1a : 1 < inv_ub_num n). {
+  (* lemma to do *)
+  progress unfold inv_ub_num.
+  apply Nat.lt_add_lt_sub_r.
+  cbn - [ "*" ].
+  rewrite <- (Nat.mul_1_r 2) at 1.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  progress unfold fst_1_len.
   destruct n; [ easy | ].
-  progress unfold fst_1_len in H.
-  remember (rank_fst_loop (S n) 1) as f.
-  cbn - [ "/" "mod" ] in H; subst f.
-  rewrite fst_if, fst_let in H.
-  cbn - [ "/" "mod" rank_fst_loop ] in H.
-  remember (_ / _ =? 0) as sz eqn:Hsz.
-  symmetry in Hsz.
-  destruct sz; [ clear H | easy ].
-  apply Nat.eqb_eq in Hsz.
-  apply Nat.div_small_iff in Hsz; [ | easy ].
-  apply Nat.nle_gt in Hsz.
-  apply Hsz; clear Hsz.
+  remember (snd _) as x.
   cbn - [ "*" "/" "mod" ].
-  rewrite Nat.div_small; [ | easy ].
-  rewrite Nat.mod_small; [ | easy ].
-  rewrite Nat.mul_1_r.
-  rewrite snd_if, snd_let.
+  rewrite fst_if, fst_let.
   cbn - [ "*" "/" "mod" ].
-  apply (snd_rank_fst_loop_interval 1).
-  now apply Nat.succ_lt_mono in H1b.
-}
+  remember (x / S n =? 0) as xn eqn:Hxn.
+  symmetry in Hxn.
+  destruct xn. {
+    exfalso.
+    subst x; apply Nat.eqb_eq in Hxn.
+    apply Nat.div_small_iff in Hxn; [ | easy ].
+    apply Nat.nlt_ge in Hxn.
+    apply Hxn; clear Hxn.
+    apply -> Nat.succ_lt_mono.
+    cbn - [ "*" "/" "mod" ].
+    rewrite snd_if, snd_let.
+    cbn - [ "*" "/" "mod" ].
+    rewrite Nat.div_small; [ | flia Hn1 ].
+    rewrite Nat.mod_small; [ | flia Hn1 ].
+    cbn.
+    apply (lt_snd_rank_fst_loop 0).
+    cbn; flia Hn1.
+  }
+  rewrite Nat.pow_succ_r'.
+...
 specialize (H1 eq_refl).
 assert (H : 2 ^ (Nat.log2_up n - 1) < inv_ub_num n). {
 Compute (map (λ n,
