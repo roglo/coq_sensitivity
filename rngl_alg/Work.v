@@ -3636,29 +3636,29 @@ now apply Nat.eq_mul_1 in Hab.
 Qed.
 
 Theorem Geoffroy_1 :
-  ∀ a b an bn,
+  ∀ a b na nb,
   1 < a
   → 1 < b
-  → an = Nat.log2_up a
-  → bn = Nat.log2_up b
-  → 2 ^ (an + bn - 2) < a * b ≤ 2 ^ (an + bn).
+  → na = Nat.log2_up a
+  → nb = Nat.log2_up b
+  → 2 ^ (na + nb - 2) < a * b ≤ 2 ^ (na + nb).
 Proof.
-intros * H1a H1b Han Hbn.
+intros * H1a H1b Hna Hnb.
 specialize (Nat.log2_up_spec _ H1a) as Ha.
 specialize (Nat.log2_up_spec _ H1b) as Hb.
-rewrite <- Han in Ha.
-rewrite <- Hbn in Hb.
+rewrite <- Hna in Ha.
+rewrite <- Hnb in Hb.
 rewrite pred_of_minus in Ha, Hb.
 split. {
   replace 2 with (1 + 1) at 2 by easy.
   rewrite Nat.sub_add_distr.
   rewrite Nat.add_sub_swap. 2: {
-    rewrite Han.
+    rewrite Hna.
     replace 1 with (Nat.log2_up 2) by easy.
     now apply Nat.log2_up_le_mono.
   }
   rewrite <- Nat.add_sub_assoc. 2: {
-    rewrite Hbn.
+    rewrite Hnb.
     replace 1 with (Nat.log2_up 2) by easy.
     now apply Nat.log2_up_le_mono.
   }
@@ -3858,27 +3858,59 @@ Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.lo
   rewrite Nat.pow_1_r.
   apply Nat.div_le_upper_bound; [ easy | ].
 (**)
+Check Geoffroy_1.
+Theorem Geoffroy_2 :
+  ∀ a b na nb,
+  1 < a
+  → 1 < b
+  → na = Nat.log2_up a
+  → nb = Nat.log2_up b
+  → a = 2 ^ na - 1
+  → 2 ^ (nb - 1) < a
+  → 2 ^ (na + nb - 1) < a * b ≤ 2 ^ (na + nb).
+Proof.
+intros * H1a H1b Hna Hnb Hnaa Hnba.
+specialize (Nat.log2_up_spec _ H1a) as Ha.
+specialize (Nat.log2_up_spec _ H1b) as Hb.
+rewrite <- Hna in Ha.
+rewrite <- Hnb in Hb.
+rewrite pred_of_minus in Ha, Hb.
+Admitted.
+assert (H1a : 1 < inv_ub_num n) by admit.
+assert (H1b : 1 < n) by flia Hn1 Hnz.
+specialize Geoffroy_2 as H1.
+specialize (H1 (inv_ub_num n) n).
+specialize (H1 _ _ H1a H1b eq_refl eq_refl).
+progress unfold inv_ub_num in H1 at 2.
+rewrite Nat_log2_up_pow2_sub_1 in H1. 2: {
+  intros H.
+  apply Nat.succ_inj in H.
+Search (fst_1_len _ _ = 0).
+  progress unfold fst_1_len in H.
+Search (fst _ = 0).
+(* chiasse ; enfin, bon, faut voir *)
+...
+specialize (H1 eq_refl).
+Search (Nat.log2_up (2 ^ _ - _)).
+...
 Theorem Nat_log2_up_mul :
   ∀ a b,
   (a = 0 ↔ b = 0)
   → Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
 intros * Hab.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
-  subst a; cbn.
-  now rewrite (proj1 Hab).
+destruct (le_dec a 1) as [H1a| H1a]. {
+  destruct a; [ now cbn; rewrite (proj1 Hab) | ].
+  destruct a; [ now cbn; rewrite Nat.add_0_r | ].
+  now apply Nat.succ_le_mono in H1a.
 }
-destruct (Nat.eq_dec a 1) as [Ha1| Ha1]. {
-  subst a; cbn.
-  now rewrite Nat.add_0_r.
+destruct (le_dec b 1) as [H1b| H1b]. {
+  destruct b; [ now cbn; rewrite (proj2 Hab) | ].
+  destruct b; [ now rewrite Nat.mul_1_r, Nat.add_0_r | ].
+  now apply Nat.succ_le_mono in H1b.
 }
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
-  subst b; cbn.
-  now rewrite (proj2 Hab).
-}
+apply Nat.nle_gt in H1a, H1b.
 apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
-Search (_ ^ _ < _ ≤ _ ^ _).
-Check Geoffroy_1.
 ...
 apply (Nat.pow_le_mono_r_iff 2); [ easy | ].
 rewrite Nat.pow_add_r.
