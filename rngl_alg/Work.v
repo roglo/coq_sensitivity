@@ -3885,12 +3885,39 @@ progress unfold inv_ub_num in H1 at 2.
 rewrite Nat_log2_up_pow2_sub_1 in H1. 2: {
   intros H.
   apply Nat.succ_inj in H.
-Search (fst_1_len _ _ = 0).
+  destruct n; [ easy | ].
   progress unfold fst_1_len in H.
-Search (fst _ = 0).
-(* chiasse ; enfin, bon, faut voir *)
-...
+  remember (rank_fst_loop (S n) 1) as f.
+  cbn - [ "/" "mod" ] in H; subst f.
+  rewrite fst_if, fst_let in H.
+  cbn - [ "/" "mod" rank_fst_loop ] in H.
+  remember (_ / _ =? 0) as sz eqn:Hsz.
+  symmetry in Hsz.
+  destruct sz; [ clear H | easy ].
+  apply Nat.eqb_eq in Hsz.
+  apply Nat.div_small_iff in Hsz; [ | easy ].
+  apply Nat.nle_gt in Hsz.
+  apply Hsz; clear Hsz.
+  cbn - [ "*" "/" "mod" ].
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_small; [ | easy ].
+  rewrite Nat.mul_1_r.
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" ].
+  apply (snd_rank_fst_loop_interval 1).
+  now apply Nat.succ_lt_mono in H1b.
+}
 specialize (H1 eq_refl).
+assert (H : 2 ^ (Nat.log2_up n - 1) < inv_ub_num n). {
+Compute (map (λ n,
+  Nat.ltb
+    (2 ^ (Nat.log2_up n - 1)) (inv_ub_num n)
+) (seq 0 40)).
+(* chiasse *)
+...
+progress unfold inv_ub_num in H1 at 1.
+Search fst_1_len.
+rewrite fst_1_len_log2_up in H1.
 Search (Nat.log2_up (2 ^ _ - _)).
 ...
 Theorem Nat_log2_up_mul :
