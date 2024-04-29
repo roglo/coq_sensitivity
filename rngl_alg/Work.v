@@ -3828,6 +3828,21 @@ Theorem Nat_log2_up_mul :
   ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
 intros.
+apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
+apply (Nat.pow_le_mono_r_iff 2); [ easy | ].
+rewrite Nat.pow_add_r.
+Search (Nat.log2_up (_ * _)).
+Search (2 ^ Nat.log2_up _).
+...
+eapply le_trans. 2: {
+  apply Nat.log2_up_spec.
+...
+}
+Nat.log2_up_spec: ∀ a : nat, 1 < a → 2 ^ Nat.pred (Nat.log2_up a) < a ≤ 2 ^ Nat.log2_up a
+...
+Search (_ ^ Nat.log2_up _).
+Search (_ ^ (_ * _)).
+rewrite Nat.pow_mul_r.
 (* cf Theorem glop below for all the comment and the analysis I've made *)
 ... ...
 rewrite Nat_log2_up_mul.
