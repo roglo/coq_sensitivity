@@ -3635,6 +3635,40 @@ cbn in Hab.
 now apply Nat.eq_mul_1 in Hab.
 Qed.
 
+Theorem Geoffroy_1 :
+  ∀ a b an bn,
+  1 < a
+  → 1 < b
+  → an = Nat.log2_up a
+  → bn = Nat.log2_up b
+  → 2 ^ (an + bn - 2) < a * b ≤ 2 ^ (an + bn).
+Proof.
+intros * H1a H1b Han Hbn.
+specialize (Nat.log2_up_spec _ H1a) as Ha.
+specialize (Nat.log2_up_spec _ H1b) as Hb.
+rewrite <- Han in Ha.
+rewrite <- Hbn in Hb.
+rewrite pred_of_minus in Ha, Hb.
+split. {
+  replace 2 with (1 + 1) at 2 by easy.
+  rewrite Nat.sub_add_distr.
+  rewrite Nat.add_sub_swap. 2: {
+    rewrite Han.
+    replace 1 with (Nat.log2_up 2) by easy.
+    now apply Nat.log2_up_le_mono.
+  }
+  rewrite <- Nat.add_sub_assoc. 2: {
+    rewrite Hbn.
+    replace 1 with (Nat.log2_up 2) by easy.
+    now apply Nat.log2_up_le_mono.
+  }
+  rewrite Nat.pow_add_r.
+  now apply Nat.mul_lt_mono.
+}
+rewrite Nat.pow_add_r.
+now apply Nat.mul_le_mono.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3843,6 +3877,9 @@ destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
   now rewrite (proj2 Hab).
 }
 apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
+Search (_ ^ _ < _ ≤ _ ^ _).
+Check Geoffroy_1.
+...
 apply (Nat.pow_le_mono_r_iff 2); [ easy | ].
 rewrite Nat.pow_add_r.
 eapply le_trans. 2: {
