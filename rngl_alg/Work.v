@@ -3825,12 +3825,33 @@ Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.lo
   apply Nat.div_le_upper_bound; [ easy | ].
 (**)
 Theorem Nat_log2_up_mul :
-  ∀ a b, Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
+  ∀ a b,
+  (a = 0 ↔ b = 0)
+  → Nat.log2_up a + Nat.log2_up b = Nat.log2_up (a * b).
 Proof.
-intros.
+intros * Hab.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
+  subst a; cbn.
+  now rewrite (proj1 Hab).
+}
+destruct (Nat.eq_dec a 1) as [Ha1| Ha1]. {
+  subst a; cbn.
+  now rewrite Nat.add_0_r.
+}
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+  subst b; cbn.
+  now rewrite (proj2 Hab).
+}
 apply Nat.le_antisymm; [ | now apply Nat.log2_up_mul_above ].
 apply (Nat.pow_le_mono_r_iff 2); [ easy | ].
 rewrite Nat.pow_add_r.
+eapply le_trans. 2: {
+  apply Nat.log2_up_spec.
+  apply Nat.lt_1_mul_pos; [ flia Haz Ha1 | flia Hbz ].
+}
+(* ah bin non *)
+...
+  apply Nat.pow_le_mono_r; [ easy | ].
 Search (Nat.log2_up (_ * _)).
 Search (2 ^ Nat.log2_up _).
 ...
