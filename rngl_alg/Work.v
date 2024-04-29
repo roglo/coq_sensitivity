@@ -3691,7 +3691,6 @@ now intros [H| H].
 Qed.
 
 (* to be completed
-...
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
