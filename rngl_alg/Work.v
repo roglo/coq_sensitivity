@@ -3931,6 +3931,10 @@ assert (H1a : 1 < inv_ub_num n). {
     cbn; flia Hn1.
   }
   rewrite Nat.pow_succ_r'.
+  apply Nat.lt_1_mul_pos; [ easy | ].
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
 ...
 specialize (H1 eq_refl).
 assert (H : 2 ^ (Nat.log2_up n - 1) < inv_ub_num n). {
