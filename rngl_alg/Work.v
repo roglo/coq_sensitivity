@@ -3929,6 +3929,11 @@ rewrite Nat.add_comm.
 apply Nat.lt_le_incl.
 apply Geoffroy_2; [ easy | easy | easy | easy | ].
 Compute (map (λ n,
+  pair n (inv_ub_num n)
+) (seq 0 20)).
+(* non *)
+...
+Compute (map (λ n,
   Nat.eqb (inv_ub_num n) (2 ^ Nat.log2_up (inv_ub_num n) - 1)
 (*
   Nat.ltb (inv_ub_num n) (2 ^ Nat.log2_up n - 1)
