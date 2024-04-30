@@ -3865,20 +3865,6 @@ Search (Nat.log2_up _ + Nat.log2_up _).
 Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.log2_up b ≤ S (Nat.log2_up (a * b))
 ...
 *)
-(**)
-  rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
-    apply Nat.neq_0_lt_0.
-    intros H.
-    apply Nat.eq_add_0 in H.
-    destruct H as (H, _).
-    apply Nat.log2_up_null in H.
-    destruct n; [ easy | ].
-    destruct n; [ easy | ].
-    now apply Nat.succ_le_mono in H.
-  }
-  rewrite Nat.pow_1_r.
-  apply Nat.div_le_upper_bound; [ easy | ].
-(**)
 Check Geoffroy_1.
 Theorem Geoffroy_2 :
   ∀ a b na nb,
@@ -3935,6 +3921,32 @@ assert (H1a : 1 < inv_ub_num n). {
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
+assert (H1n : 1 < n) by flia Hn1 Hnz.
+rewrite Nat.add_comm.
+apply Nat.lt_le_incl.
+apply Geoffroy_2; [ easy | easy | easy | easy | | ].
+Compute (map (λ n,
+  Nat.ltb (inv_ub_num n) (2 ^ Nat.log2_up (inv_ub_num n) - 1)
+(*
+  Nat.ltb (2 ^ (Nat.log2_up n - 1)) (inv_ub_num n)
+*)
+) (seq 0 20)).
+(* ça ne marche donc pas *)
+...
+(**)
+  rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply Nat.eq_add_0 in H.
+    destruct H as (H, _).
+    apply Nat.log2_up_null in H.
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    now apply Nat.succ_le_mono in H.
+  }
+  rewrite Nat.pow_1_r.
+  apply Nat.div_le_upper_bound; [ easy | ].
+(**)
 ...
 specialize (H1 eq_refl).
 assert (H : 2 ^ (Nat.log2_up n - 1) < inv_ub_num n). {
