@@ -3944,6 +3944,35 @@ Compute (map (λ n,
   pair (inv_ub_num n) (2 ^ S (Nat.log2_up n) - 1)
 ) (seq 0 20)).
 *)
+(**)
+remember (Nat.log2_up (inv_ub_num n)) as na eqn:Hna.
+remember (Nat.log2_up n) as nb eqn:Hnb.
+remember (inv_ub_num n) as a eqn:Ha.
+remember n as b eqn:Hb.
+move a before n.
+move b before a.
+move na before b.
+move nb before na.
+(* (a,b) = (3,5) n'est pas censé marcher *)
+rewrite Hna, Hnb.
+replace a with 3.
+replace b with 5.
+cbn.
+(* donc, c'est bien ça ; c'est faux *)
+...
+apply Geoffroy_2; [ easy | easy | easy | easy | | ].
+rewrite Hna, Ha.
+progress unfold inv_ub_num.
+f_equal.
+f_equal.
+rewrite fst_1_len_log2_up.
+rewrite Nat_log2_up_pow2_sub_1; [ easy | ].
+Search (S (_ - S _)).
+rewrite <- Nat_succ_sub_succ_r.
+rewrite Nat_sub_succ_1.
+...
+Check Geoffroy_2.
+...
 apply Geoffroy_2; [ easy | easy | easy | easy | | ].
 Compute (map (λ n,
   Nat.eqb (inv_ub_num n) (2 ^ Nat.log2_up (inv_ub_num n) - 1)
@@ -3951,6 +3980,48 @@ Compute (map (λ n,
 Compute (map (λ n,
   Nat.leb (inv_ub_num n) (2 * n)
 ) (seq 0 200)).
+(*
+Check Geoffroy_1.
+Compute (map (λ a, (a, map (λ b,
+  let na := Nat.log2_up a in
+  let nb := Nat.log2_up b in
+  Nat.b2n (
+    Nat.ltb (2 ^ (na + nb - 2)) (a * b) &&
+    Nat.leb (a * b) (2 ^ (na + nb)))
+) (seq 0 20))) (seq 0 10)).
+(* ok *)
+*)
+Check Geoffroy_2.
+Compute (map (λ a, (a, map (λ b,
+  let na := Nat.log2_up a in
+  let nb := Nat.log2_up b in
+  if a =? 2 ^ na - 1 then
+  if a <=? 2 * b then
+  Nat.b2n (
+    (Nat.ltb (2 ^ (na + nb - 1)) (a * b)) &&
+    (Nat.leb (a * b) (2 ^ (na + nb))))
+  else 1
+  else 1
+) (seq 0 20))) (seq 0 10)).
+(* pas ok *)
+(* (a,b) (3,5) ne fonctionne pas *)
+Check Geoffroy_2.
+Compute
+  (let a := 3 in let b := 5 in
+   let na := Nat.log2_up a in
+   let nb := Nat.log2_up b in
+   (
+    (Nat.eqb a (2 ^ na - 1),
+     Nat.leb a (2 * b)),
+     2 ^ (na + nb - 1) < a * b ≤ 2 ^ (na + nb))).
+...
+Compute (map (λ a, (a, map (λ b,
+  let na := Nat.log2_up a in
+  let nb := Nat.log2_up b in
+  Nat.b2n (
+    (Nat.leb (2 ^ (na + nb - 1)) (a * b)) &&
+    (Nat.leb (a * b) (2 ^ (na + nb))))
+) (seq 0 20))) (seq 0 20)).
 ...
 a = inv_ub_num n
 b = n
