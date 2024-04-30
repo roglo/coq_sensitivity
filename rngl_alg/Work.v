@@ -3873,13 +3873,10 @@ Theorem Geoffroy_2 :
   → na = Nat.log2_up a
   → nb = Nat.log2_up b
   → a = 2 ^ na - 1
-(*
-  → 2 ^ (nb - 1) < a
-  → a < 2 ^ (nb - 1)
-*)
+  → a ≤ 2 * b
   → 2 ^ (na + nb - 1) < a * b ≤ 2 ^ (na + nb).
 Proof.
-intros * H1a H1b Hna Hnb Hnaa (*Hnba*).
+intros * H1a H1b Hna Hnb Hnaa Hnba.
 specialize (Nat.log2_up_spec _ H1a) as Ha.
 specialize (Nat.log2_up_spec _ H1b) as Hb.
 rewrite <- Hna in Ha.
@@ -3927,21 +3924,36 @@ assert (H1a : 1 < inv_ub_num n). {
 assert (H1n : 1 < n) by flia Hn1 Hnz.
 rewrite Nat.add_comm.
 apply Nat.lt_le_incl.
-apply Geoffroy_2; [ easy | easy | easy | easy | ].
+(*
+Print inv_ub_num.
 Compute (map (λ n,
-  pair n (inv_ub_num n)
-) (seq 0 20)).
-(* non *)
+  Nat.leb
+    ((inv_ub_num n + 1) / 2) n
+) (seq 0 200)).
+Compute (map (λ n,
+  Nat.leb
+    ((inv_ub_num n + 1)) (2 * n)
+) (seq 0 200)).
+...
+a = inv_ub_num n
+b = n
+...
+a ≤ 2 * b
 ...
 Compute (map (λ n,
-  Nat.eqb (inv_ub_num n) (2 ^ Nat.log2_up (inv_ub_num n) - 1)
-(*
-  Nat.ltb (inv_ub_num n) (2 ^ Nat.log2_up n - 1)
-*)
-(*
-  Nat.ltb (2 ^ (Nat.log2_up n - 1)) (inv_ub_num n)
-*)
+  pair (inv_ub_num n) (2 ^ S (Nat.log2_up n) - 1)
 ) (seq 0 20)).
+*)
+apply Geoffroy_2; [ easy | easy | easy | easy | | ].
+Compute (map (λ n,
+  Nat.eqb (inv_ub_num n) (2 ^ Nat.log2_up (inv_ub_num n) - 1)
+) (seq 0 200)).
+Compute (map (λ n,
+  Nat.leb (inv_ub_num n) (2 * n)
+) (seq 0 200)).
+...
+a = inv_ub_num n
+b = n
 ...
 (**)
   rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
