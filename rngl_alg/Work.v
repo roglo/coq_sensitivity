@@ -3904,7 +3904,22 @@ Search (Nat.log2_up _ + Nat.log2_up _).
 Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.log2_up b ≤ S (Nat.log2_up (a * b))
 ...
 *)
-Check Geoffroy_1.
+progress unfold inv_ub_num.
+progress unfold fst_1_len.
+remember (rank_fst_loop n 0) as x.
+replace n with (S (n - 1)) at 2 6 by flia Hnz.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite snd_if, snd_let.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite Nat.div_small; [ | flia Hnz Hn1 ].
+rewrite Nat.mod_small; [ | flia Hnz Hn1 ].
+cbn - [ "*" "/" "mod" "^" ].
+rewrite Nat.mul_1_r.
+specialize (snd_rank_fst_loop 0) as H1.
+cbn in H1.
+replace (S (n - 1)) with n by flia Hnz Hn1.
+rewrite H1; [ | flia | flia Hnz Hn1 ].
+...
 Theorem Geoffroy_2 :
   ∀ a b na nb,
   1 < a
