@@ -3910,6 +3910,19 @@ Compute (map (λ n,
     (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n) - 1))
     (n * inv_ub_num n)
 ) (seq 0 100)).
+clear i Hin Hni.
+clear Hn1.
+...
+inv_ub_num n
+  1/n = 0.0000011110
+  fst_1_len 1 n = 4
+  inv_ub_num n = 31
+  (* enfin, je crois : ce serait pas mal de vérifier avec binary_div *)
+...
+Print fst_1_len.
+destruct n; [ easy | ].
+destruct n; [ cbn; flia | ].
+cbn - [ "*" "^" ].
 ...
 progress unfold inv_ub_num.
 progress unfold fst_1_len.
