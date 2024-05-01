@@ -3919,6 +3919,7 @@ specialize (snd_rank_fst_loop 0) as H1.
 cbn in H1.
 replace (S (n - 1)) with n by flia Hnz Hn1.
 rewrite H1; [ | flia | flia Hnz Hn1 ].
+(* mmm... ça devient trop compliqué *)
 ...
 Theorem Geoffroy_2 :
   ∀ a b na nb,
