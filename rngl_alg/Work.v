@@ -3690,6 +3690,45 @@ split; [ easy | ].
 now intros [H| H].
 Qed.
 
+Theorem inv_ub_num_gt_1 :
+  ∀ n, 1 < n → 1 < inv_ub_num n.
+Proof.
+intros * Hn1.
+progress unfold inv_ub_num.
+apply Nat.lt_add_lt_sub_r.
+cbn - [ "*" ].
+rewrite <- (Nat.mul_1_r 2) at 1.
+apply Nat.mul_lt_mono_pos_l; [ easy | ].
+progress unfold fst_1_len.
+destruct n; [ easy | ].
+remember (snd _) as x.
+cbn - [ "*" "/" "mod" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" ].
+remember (x / S n =? 0) as xn eqn:Hxn.
+symmetry in Hxn.
+destruct xn. {
+  exfalso.
+  subst x; apply Nat.eqb_eq in Hxn.
+  apply Nat.div_small_iff in Hxn; [ | easy ].
+  apply Nat.nlt_ge in Hxn.
+  apply Hxn; clear Hxn.
+  apply -> Nat.succ_lt_mono.
+  cbn - [ "*" "/" "mod" ].
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" ].
+  rewrite Nat.div_small; [ | flia Hn1 ].
+  rewrite Nat.mod_small; [ | flia Hn1 ].
+  cbn.
+  apply (lt_snd_rank_fst_loop 0).
+  cbn; flia Hn1.
+}
+rewrite Nat.pow_succ_r'.
+apply Nat.lt_1_mul_pos; [ easy | ].
+apply Nat.neq_0_lt_0.
+now apply Nat.pow_nonzero.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3884,42 +3923,13 @@ rewrite <- Hnb in Hb.
 rewrite pred_of_minus in Ha, Hb.
 specialize (Geoffroy_1 a b na nb H1a H1b Hna Hnb) as H1.
 split; [ | easy ].
-Admitted.
+(* faux, en fait, il y a des contre exemples *)
+...
 assert (H1a : 1 < inv_ub_num n). {
-  (* lemma to do *)
-  progress unfold inv_ub_num.
-  apply Nat.lt_add_lt_sub_r.
-  cbn - [ "*" ].
-  rewrite <- (Nat.mul_1_r 2) at 1.
-  apply Nat.mul_lt_mono_pos_l; [ easy | ].
-  progress unfold fst_1_len.
+  apply inv_ub_num_gt_1.
   destruct n; [ easy | ].
-  remember (snd _) as x.
-  cbn - [ "*" "/" "mod" ].
-  rewrite fst_if, fst_let.
-  cbn - [ "*" "/" "mod" ].
-  remember (x / S n =? 0) as xn eqn:Hxn.
-  symmetry in Hxn.
-  destruct xn. {
-    exfalso.
-    subst x; apply Nat.eqb_eq in Hxn.
-    apply Nat.div_small_iff in Hxn; [ | easy ].
-    apply Nat.nlt_ge in Hxn.
-    apply Hxn; clear Hxn.
-    apply -> Nat.succ_lt_mono.
-    cbn - [ "*" "/" "mod" ].
-    rewrite snd_if, snd_let.
-    cbn - [ "*" "/" "mod" ].
-    rewrite Nat.div_small; [ | flia Hn1 ].
-    rewrite Nat.mod_small; [ | flia Hn1 ].
-    cbn.
-    apply (lt_snd_rank_fst_loop 0).
-    cbn; flia Hn1.
-  }
-  rewrite Nat.pow_succ_r'.
-  apply Nat.lt_1_mul_pos; [ easy | ].
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
 }
 assert (H1n : 1 < n) by flia Hn1 Hnz.
 rewrite Nat.add_comm.
