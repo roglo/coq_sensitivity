@@ -3904,6 +3904,13 @@ Search (Nat.log2_up _ + Nat.log2_up _).
 Nat.log2_up_mul_below: ∀ a b : nat, 0 < a → 0 < b → Nat.log2_up a + Nat.log2_up b ≤ S (Nat.log2_up (a * b))
 ...
 *)
+rewrite Nat.mul_comm.
+Compute (map (λ n,
+  pair
+    (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num n) - 1))
+    (n * inv_ub_num n)
+) (seq 0 100)).
+...
 progress unfold inv_ub_num.
 progress unfold fst_1_len.
 remember (rank_fst_loop n 0) as x.
