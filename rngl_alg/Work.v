@@ -3912,6 +3912,60 @@ Compute (map (λ n,
 ) (seq 0 100)).
 clear i Hin Hni.
 clear Hn1.
+Compute (binary_div 10 1 7).
+Fixpoint extract_pow2_loop it n :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      if n mod 2 =? 0 then
+        let (p, r) := extract_pow2_loop it' (n / 2) in
+        (S p, r)
+      else
+        (0, n)
+  end.
+Definition extract_pow2 n := extract_pow2_loop n n.
+Compute (map (λ n,
+  (n, extract_pow2 n)
+) (seq 0 50)).
+Compute (map (λ n,
+  Nat.leb (inv_ub_num n) (2 * n)
+) (seq 0 50)).
+(* oui *)
+Compute (map (λ n,
+  (Nat.leb (snd (extract_pow2 n)) n)
+) (seq 0 30)).
+(* toujours inférieur à n, normal *)
+Compute (map (λ n,
+  Nat.leb (inv_ub_num n) (2 ^ (snd (extract_pow2 n)) + 1)
+) (seq 0 20)).
+(* oui, il semble, mais on ne peut pas aller loin *)
+Compute (map (λ a, (a, map (λ b,
+  let na := Nat.log2_up a in
+  let nb := Nat.log2_up b in
+  if a =? 2 ^ na - 1 then
+  if 2 ^ (snd (extract_pow2 a)) <=? b then
+  Nat.b2n (
+    (Nat.ltb (2 ^ (na + nb - 1)) (a * b)) &&
+    (Nat.leb (a * b) (2 ^ (na + nb))))
+  else 1
+  else 1
+) (seq 0 20))) (seq 0 10)).
+(* pas ok *)
+(* pfff... fait chier, faut réfléchir *)
+...
+Compute (map (λ a, (a, map (λ b,
+  let na := Nat.log2_up a in
+  let nb := Nat.log2_up b in
+  if a =? 2 ^ na - 1 then
+  if a <=? 2 * b then
+  Nat.b2n (
+    (Nat.ltb (2 ^ (na + nb - 1)) (a * b)) &&
+    (Nat.leb (a * b) (2 ^ (na + nb))))
+  else 1
+  else 1
+) (seq 0 20))) (seq 0 10)).
+(* pas ok *)
+(* (a,b) (3,5) ne fonctionne pas *)
 ...
 inv_ub_num n
   1/n = 0.0000011110
