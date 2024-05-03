@@ -3928,8 +3928,30 @@ let m := snd (extract_pow2 n) in
     (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num m) - 1))
     (n * inv_ub_num n)
 ) (seq 0 100)).
-(* ah, fait chier *)
-Search (Nat.log2_up (S _)).
+Compute (map (λ n,
+  Nat.leb (inv_ub_num n) (inv_ub_num (snd (extract_pow2 n)))
+) (seq 0 80)).
+(* ah ! ça peut le faire *)
+set (m := snd (extract_pow2 n)).
+apply (le_trans _ (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num m) - 1))). {
+  apply Nat.pow_le_mono_r; [ easy | ].
+  apply Nat.sub_le_mono_r.
+  apply Nat.add_le_mono_l.
+  apply Nat.log2_up_le_mono.
+  subst m.
+  clear.
+  destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" "^" ].
+  remember (S n mod 2 =? 0) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2; [ | easy ].
+  apply Nat.eqb_eq in Hn2.
+  apply Nat.mod_divides in Hn2; [ | easy ].
+  destruct Hn2 as (m, Hm).
+  rewrite Hm at 2.
+  rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
 ...
 clear i Hin Hni.
 clear Hn1.
