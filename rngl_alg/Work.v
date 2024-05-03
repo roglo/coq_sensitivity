@@ -3929,17 +3929,23 @@ let m := snd (extract_pow2 n) in
     (n * inv_ub_num n)
 ) (seq 0 100)).
 Compute (map (λ n,
+  Nat.eqb (inv_ub_num n) (inv_ub_num (snd (extract_pow2 n)))
+) (seq 0 80)).
+Compute (map (λ n,
   Nat.leb (inv_ub_num n) (inv_ub_num (snd (extract_pow2 n)))
 ) (seq 0 80)).
 (* ah ! ça peut le faire *)
 set (m := snd (extract_pow2 n)).
+replace (inv_ub_num n) with (inv_ub_num m). 2: {
+...
 apply (le_trans _ (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num m) - 1))). {
   apply Nat.pow_le_mono_r; [ easy | ].
   apply Nat.sub_le_mono_r.
   apply Nat.add_le_mono_l.
   apply Nat.log2_up_le_mono.
+  clear - m.
+assert (m mod 2 = 1) by admit.
   subst m.
-  clear.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
   replace n with (S (n - 1)) at 2 by flia Hnz.
   cbn - [ "*" "/" "mod" "^" ].
