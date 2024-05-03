@@ -3929,6 +3929,7 @@ let m := snd (extract_pow2 n) in
     (n * inv_ub_num n)
 ) (seq 0 100)).
 (* ah, fait chier *)
+Search (Nat.log2_up (S _)).
 ...
 clear i Hin Hni.
 clear Hn1.
