@@ -3940,14 +3940,17 @@ apply (le_trans _ (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num m) - 1))). {
   apply Nat.log2_up_le_mono.
   subst m.
   clear.
-  destruct n; [ easy | ].
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  replace n with (S (n - 1)) at 2 by flia Hnz.
   cbn - [ "*" "/" "mod" "^" ].
+  replace (S (n - 1)) with n by flia Hnz.
   rewrite snd_if, snd_let.
   cbn - [ "*" "/" "mod" "^" ].
-  remember (S n mod 2 =? 0) as n2 eqn:Hn2.
+  remember (n mod 2 =? 0) as n2 eqn:Hn2.
   symmetry in Hn2.
   destruct n2; [ | easy ].
   apply Nat.eqb_eq in Hn2.
+...
   apply Nat.mod_divides in Hn2; [ | easy ].
   destruct Hn2 as (m, Hm).
   rewrite Hm at 2.
