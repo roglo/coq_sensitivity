@@ -3959,10 +3959,27 @@ cbn.
    comme ça je pourrai
      l'approuver *)
 Theorem snd_extract_pow2_odd :
-  ∀ n, Nat.Odd (snd (extract_pow2 n)).
+  ∀ n, n ≠ 0 → Nat.Odd (snd (extract_pow2 n)).
 Proof.
-intros.
-progress unfold Nat.Odd.
+intros * Hnz.
+progress unfold extract_pow2.
+(* faire un truc plus general avec extract_pow2_loop m n
+   avec n ≤ m *)
+...
+induction n; [ easy | clear Hnz ].
+cbn - [ "/" "mod" ].
+rewrite snd_if, snd_let.
+cbn - [ "/" "mod" ].
+remember (S n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. {
+  apply Nat.eqb_eq in Hn2.
+  apply Nat.mod_divides in Hn2; [ | easy ].
+  destruct Hn2 as (m, Hm).
+  rewrite Hm, Nat.mul_comm, Nat.div_mul; [ | easy ].
+  apply IHn.
+...
+  destruct n; [ flia Hm | ].
 ...
 cbn - [ "*" ].
 progress unfold fst_1_len.
