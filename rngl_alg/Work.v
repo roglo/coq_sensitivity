@@ -4000,6 +4000,24 @@ cbn - [ "*" ].
 progress unfold fst_1_len.
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
+(* essayer de voir la sémantique de
+     fst (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m)
+   et de son copain *)
+...
+Search (fst (rank_fst_loop _ 0 (2 ^ _) _)).
+Search (snd (rank_fst_loop _ 0 (2 ^ _) _)).
+...
+specialize (le_fst_rank_fst_loop (Nat.log2_up m)) as H1.
+specialize (H1 (m - Nat.log2_up m)).
+rewrite Nat.add_sub_assoc in H1.
+rewrite Nat.add_comm, Nat.add_sub in H1.
+...
+le_fst_rank_fst_loop:
+  ∀ m n : nat, 2 ^ m - 2 * m < 2 * n → m + n ≤ 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)))
+pow2_snd_rank_fst_loop_le:
+  ∀ m n : nat,
+    2 ^ m / 2 - m < n
+    → snd (rank_fst_loop n 1 (2 ^ m) (m + n)) < m + n → 2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n))) ≤ m + n
 ...
 assert (snd (rank_fst_loop m 1 1 m) = 1).
 ...
