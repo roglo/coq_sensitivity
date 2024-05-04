@@ -3958,6 +3958,11 @@ cbn.
      à prouver
    comme ça je pourrai
      l'approuver *)
+Theorem snd_extract_pow2_odd :
+  ∀ n, Nat.Odd (snd (extract_pow2 n)).
+Proof.
+intros.
+progress unfold Nat.Odd.
 ...
 cbn - [ "*" ].
 progress unfold fst_1_len.
