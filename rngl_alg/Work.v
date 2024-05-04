@@ -3779,6 +3779,35 @@ progress unfold extract_pow2.
 now apply snd_extract_pow2_loop.
 Qed.
 
+Theorem extract_pow2_enough_iter :
+  ∀ n it1 it2,
+  n ≠ 0
+  → n ≤ it1
+  → n ≤ it2
+  → extract_pow2_loop it1 n = extract_pow2_loop it2 n.
+Proof.
+intros * Hnz Hit1 Hit2.
+revert n Hnz it2 Hit1 Hit2.
+induction it1; intros; [ now apply Nat.le_0_r in Hit1 | ].
+destruct it2; [ now apply Nat.le_0_r in Hit2 | ].
+cbn - [ "mod" "/" ].
+remember (n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2; [ | easy ].
+apply Nat.eqb_eq in Hn2.
+apply Nat.mod_divides in Hn2; [ | easy ].
+destruct Hn2 as (c, Hc).
+rewrite Hc.
+rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+rewrite IHit1 with (it2 := it2); [ easy | | | ]. {
+  now intros H; rewrite H, Nat.mul_0_r in Hc.
+} {
+  flia Hit1 Hc.
+} {
+  flia Hit2 Hc.
+}
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4018,6 +4047,12 @@ Theorem exercice :
     snd (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m) * 2 ^ k.
 Proof.
 intros * Hmk.
+progress unfold extract_pow2 in Hmk.
+remember n as it eqn:H in n.
+assert (Hit : n ≤ it) by now subst n.
+clear H.
+rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | | now subst it | ].
+...
 revert m k Hmk.
 induction n; intros. {
   cbn in Hmk.
@@ -4037,6 +4072,11 @@ destruct n2. {
   rewrite Nat.log2_up_double.
   rewrite Nat.pow_succ_r'.
   rewrite Nat.div_mul_cancel_l; [ | | easy ].
+  remember (extract_pow2_loop n c) as nc eqn:Hnc.
+  symmetry in Hnc.
+  destruct nc as (m', k').
+  injection Hmk; clear Hmk; intros; subst m k.
+Print extract_pow2.
 (* pfff... fatigué *)
 ...
   cbn - [ "/" ] in Hmk.
