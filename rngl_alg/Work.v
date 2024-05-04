@@ -4051,7 +4051,13 @@ progress unfold extract_pow2 in Hmk.
 remember n as it eqn:H in n.
 assert (Hit : n ≤ it) by now subst n.
 clear H.
-rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | | now subst it | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  cbn in Hmk |-*.
+  now injection Hmk; clear Hmk; intros; subst m k.
+}
+rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
+(* euh... chais pas trop, là *)
 ...
 revert m k Hmk.
 induction n; intros. {
