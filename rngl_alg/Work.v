@@ -3743,6 +3743,42 @@ Fixpoint extract_pow2_loop it n :=
 
 Definition extract_pow2 n := extract_pow2_loop n n.
 
+Theorem snd_extract_pow2_loop :
+  ∀ it n, n ≠ 0 → n ≤ it → Nat.Odd (snd (extract_pow2_loop it n)).
+Proof.
+intros * Hnz Hit.
+revert n Hnz Hit.
+induction it; intros; [ now apply Nat.le_0_r in Hit | ].
+cbn - [ "/" "mod" ].
+rewrite snd_if, snd_let.
+cbn - [ "/" "mod" ].
+remember (n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. 2: {
+  apply Nat.eqb_neq in Hn2.
+  destruct (Nat.Even_or_Odd n) as [H1| H1]; [ | easy ].
+  exfalso; apply Hn2; clear Hn2.
+  progress unfold Nat.Even in H1.
+  destruct H1 as (m, Hm); subst n.
+  rewrite Nat.mul_comm.
+  now apply Nat.mod_mul.
+}
+apply Nat.eqb_eq in Hn2.
+apply Nat.mod_divides in Hn2; [ | easy ].
+destruct Hn2 as (m, Hm).
+rewrite Hm, Nat.mul_comm, Nat.div_mul; [ | easy ].
+apply IHit; [ | flia Hit Hm ].
+now intros H; subst m.
+Qed.
+
+Theorem snd_extract_pow2_is_odd :
+  ∀ n, n ≠ 0 → Nat.Odd (snd (extract_pow2 n)).
+Proof.
+intros * Hnz.
+progress unfold extract_pow2.
+now apply snd_extract_pow2_loop.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3953,39 +3989,17 @@ symmetry in Hkm.
 destruct km as (k, m).
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   subst m.
-cbn.
-(* en fait m est forcément impair :
-     à prouver
-   comme ça je pourrai
-     l'approuver *)
-Theorem snd_extract_pow2_odd :
-  ∀ n, n ≠ 0 → Nat.Odd (snd (extract_pow2 n)).
-Proof.
-intros * Hnz.
-progress unfold extract_pow2.
-(* faire un truc plus general avec extract_pow2_loop m n
-   avec n ≤ m *)
-...
-induction n; [ easy | clear Hnz ].
-cbn - [ "/" "mod" ].
-rewrite snd_if, snd_let.
-cbn - [ "/" "mod" ].
-remember (S n mod 2 =? 0) as n2 eqn:Hn2.
-symmetry in Hn2.
-destruct n2. {
-  apply Nat.eqb_eq in Hn2.
-  apply Nat.mod_divides in Hn2; [ | easy ].
-  destruct Hn2 as (m, Hm).
-  rewrite Hm, Nat.mul_comm, Nat.div_mul; [ | easy ].
-  apply IHn.
-...
-  destruct n; [ flia Hm | ].
-...
+  specialize (snd_extract_pow2_is_odd n Hnz) as H1.
+  rewrite Hkm in H1.
+  cbn in H1.
+  apply Nat.Even_succ in H1.
+  apply Nat.even_spec in H1.
+  now rewrite Nat.even_1 in H1.
+}
 cbn - [ "*" ].
 progress unfold fst_1_len.
-Search (snd (rank_fst_loop _ _ _ _)).
-rewrite snd_rank_fst_1; [ | | easy ].
-rewrite snd_rank_fst_1; [ | | easy ].
+rewrite snd_rank_fst_1; [ | easy | easy ].
+rewrite snd_rank_fst_1; [ | easy | easy ].
 ...
 assert (snd (rank_fst_loop m 1 1 m) = 1).
 ...
