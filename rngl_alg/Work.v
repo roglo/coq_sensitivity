@@ -4057,16 +4057,13 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now injection Hmk; clear Hmk; intros; subst m k.
 }
 rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
-(* euh... chais pas trop, là *)
-...
-revert m k Hmk.
-induction n; intros. {
-  cbn in Hmk.
-  now injection Hmk; intros; subst m k.
-}
+revert it m k Hmk Hit.
+induction n; intros; [ easy | clear Hnz ].
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
 cbn - [ "*" "/" "mod" "^" ] in Hmk |-*.
 rewrite snd_if, snd_let.
-cbn - [ "*" "/" "mod" "^" ] in Hmk |-*.
+cbn - [ "*" "/" "mod" "^" ].
 remember (S n mod 2 =? 0) as n2 eqn:Hn2.
 symmetry in Hn2.
 destruct n2. {
@@ -4081,6 +4078,7 @@ destruct n2. {
   remember (extract_pow2_loop n c) as nc eqn:Hnc.
   symmetry in Hnc.
   destruct nc as (m', k').
+...
   injection Hmk; clear Hmk; intros; subst m k.
 Print extract_pow2.
 (* pfff... fatigué *)
