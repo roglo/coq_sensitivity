@@ -3997,9 +3997,63 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   now rewrite Nat.even_1 in H1.
 }
 cbn - [ "*" ].
+(* y a-t-il une démo de ça sur le Web ? *)
 progress unfold fst_1_len.
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
+Compute (map (λ n,
+  let mk := extract_pow2 n in
+  let m := snd mk in
+(
+Nat.eqb
+  (snd (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m) * 2 ^ fst mk)
+  (snd (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n))
+)
+) (seq 0 200)).
+Search (snd (rank_fst_loop _ _ _ _)).
+Theorem exercice :
+  ∀ n m k,
+  extract_pow2 n = (m, k)
+  → snd (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n) =
+    snd (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m) * 2 ^ k.
+Proof.
+intros * Hmk.
+revert m k Hmk.
+induction n; intros. {
+  cbn in Hmk.
+  now injection Hmk; intros; subst m k.
+}
+cbn - [ "*" "/" "mod" "^" ] in Hmk |-*.
+rewrite snd_if, snd_let.
+cbn - [ "*" "/" "mod" "^" ] in Hmk |-*.
+remember (S n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. {
+  apply Nat.eqb_eq in Hn2.
+  apply Nat.mod_divides in Hn2; [ | easy ].
+  destruct Hn2 as (c, Hc).
+  rewrite Hc, Nat.mul_comm, Nat.div_mul in Hmk; [ | easy ].
+  rewrite Hc.
+  rewrite Nat.log2_up_double.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.div_mul_cancel_l; [ | | easy ].
+(* pfff... fatigué *)
+...
+  cbn - [ "/" ] in Hmk.
+...
+Compute (map (λ n,
+  let mk := extract_pow2 n in
+  let m := snd mk in
+(n,
+pair
+(*
+pair_eqb Nat.eqb Nat.eqb
+*)
+  (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m)
+  (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n)
+)
+) (seq 0 20)).
+...
 (* essayer de voir la sémantique de
      fst (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m)
    et de son copain *)
