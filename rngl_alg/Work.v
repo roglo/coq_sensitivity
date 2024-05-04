@@ -3729,6 +3729,20 @@ apply Nat.neq_0_lt_0.
 now apply Nat.pow_nonzero.
 Qed.
 
+(* find k and m such n = 2^k * m where m is odd *)
+Fixpoint extract_pow2_loop it n :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      if n mod 2 =? 0 then
+        let (p, r) := extract_pow2_loop it' (n / 2) in
+        (S p, r)
+      else
+        (0, n)
+  end.
+
+Definition extract_pow2 n := extract_pow2_loop n n.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -3911,17 +3925,6 @@ Compute (map (λ n,
     (n * inv_ub_num n)
 ) (seq 0 100)).
 (* ok *)
-Fixpoint extract_pow2_loop it n :=
-  match it with
-  | 0 => (0, 0)
-  | S it' =>
-      if n mod 2 =? 0 then
-        let (p, r) := extract_pow2_loop it' (n / 2) in
-        (S p, r)
-      else
-        (0, n)
-  end.
-Definition extract_pow2 n := extract_pow2_loop n n.
 Compute (map (λ n,
 let m := snd (extract_pow2 n) in
   Nat.leb
@@ -3937,7 +3940,56 @@ Compute (map (λ n,
 (* ah ! ça peut le faire *)
 set (m := snd (extract_pow2 n)).
 replace (inv_ub_num n) with (inv_ub_num m). 2: {
+  subst m.
+Theorem inv_ub_num_snd_extract_pow2 :
+  ∀ n, inv_ub_num (snd (extract_pow2 n)) = inv_ub_num n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+progress unfold inv_ub_num.
+f_equal; f_equal; f_equal.
+remember (extract_pow2 n) as km eqn:Hkm.
+symmetry in Hkm.
+destruct km as (k, m).
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+cbn.
+(* en fait m est forcément impair :
+     à prouver
+   comme ça je pourrai
+     l'approuver *)
 ...
+cbn - [ "*" ].
+progress unfold fst_1_len.
+Search (snd (rank_fst_loop _ _ _ _)).
+rewrite snd_rank_fst_1; [ | | easy ].
+rewrite snd_rank_fst_1; [ | | easy ].
+...
+assert (snd (rank_fst_loop m 1 1 m) = 1).
+...
+assert (snd (rank_fst_loop n 1 1 n) = 2 ^ k).
+...
+do 2 rewrite fst_1_len_log2_up.
+f_equal.
+Print inv_ub_num.
+... ...
+Compute (map (λ n,
+   Nat.eqb (inv_ub_num (snd (extract_pow2 n))) (inv_ub_num n)
+) (seq 0 50)).
+Compute (map (λ n,
+  Nat.eqb (fst_1_len 1 (snd (extract_pow2 n))) (fst_1_len 1 n)
+) (seq 0 200)).
+(* ok *)
+Compute (map (λ n,
+let kn1 :=
+  rank_fst_loop (snd (extract_pow2 n)) 0
+    (snd (rank_fst_loop (snd (extract_pow2 n)) 1 1 (snd (extract_pow2 n))))
+    (snd (extract_pow2 n)) in
+let kn2 := rank_fst_loop n 0 (snd (rank_fst_loop n 1 1 n)) n in
+pair (snd kn1) (snd kn2)
+) (seq 0 50)).
+(* non *)
+... ...
 apply (le_trans _ (2 ^ (Nat.log2_up n + Nat.log2_up (inv_ub_num m) - 1))). {
   apply Nat.pow_le_mono_r; [ easy | ].
   apply Nat.sub_le_mono_r.
