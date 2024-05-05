@@ -2199,7 +2199,7 @@ split; intros Hn. {
 Qed.
 
 Theorem Nat_pow2_log2_up_succ :
-  ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n.
+  ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2_up n = n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
@@ -2217,7 +2217,7 @@ split; intros Hn. {
   cbn in Hn.
   apply Nat.log2_log2_up_exact in Hn; [ | easy ].
   destruct Hn as (m, Hm); subst n.
-  now rewrite Nat.log2_pow2.
+  now rewrite Nat.log2_up_pow2.
 } {
   specialize (Nat.log2_up_succ_or n) as H1.
   destruct H1 as [H1| H1]; [ easy | ].
@@ -2228,8 +2228,8 @@ split; intros Hn. {
   rewrite <- H1 in H2.
   apply Nat.succ_inj in H2.
   rewrite <- Hn in H2 at 2.
-  rewrite Nat.log2_pred_pow2 in H2; [ | now apply Nat.log2_pos ].
-  destruct (Nat.log2 n); [ now cbn in Hn; subst n | ].
+  rewrite Nat.log2_pred_pow2 in H2; [ | now apply Nat.log2_up_pos ].
+  destruct (Nat.log2_up n); [ now cbn in Hn; subst n | ].
   cbn in H2.
   now apply Nat.neq_succ_diag_l in H2.
 }
