@@ -4088,26 +4088,27 @@ destruct n2. 2: {
   rewrite snd_if, snd_let.
   cbn - [ "*" "/" "mod" ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  rewrite (Nat_mod_less_small 1). 2: {
+  assert (H : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < 2 * S n). {
+    rewrite Nat.mul_1_l.
     split. {
-      rewrite Nat.mul_1_l.
       apply Nat.log2_up_spec.
       apply -> Nat.succ_lt_mono.
       now apply Nat.neq_0_lt_0.
     }
-    cbn - [ "*" ].
-    destruct (Nat.log2_up_succ_or n) as [H1| H1]. {
-      rewrite H1.
-      apply Nat_pow2_log2_up_succ in H1.
-      rewrite Nat.pow_succ_r'.
-      rewrite H1.
-      now apply Nat.mul_lt_mono_pos_l.
-    }
-...
-Check Nat.log2_up_spec.
-Search (2 ^ Nat.log2_up _ ≤ _).
-...
-cbn in Hn2.
+    specialize (Nat.log2_up_spec (S n)) as H2.
+    assert (H : 1 < S n) by flia Hnz.
+    specialize (H2 H); clear H.
+    destruct H2 as (H2, H3).
+    apply (Nat.mul_lt_mono_pos_l 2) in H2; [ | easy ].
+    rewrite <- Nat.pow_succ_r' in H2.
+    rewrite (Nat.lt_succ_pred 0) in H2; [ easy | ].
+    apply Nat.log2_up_pos.
+    flia Hnz.
+  }
+  rewrite (Nat_mod_less_small 1); [ | easy ].
+  rewrite (Nat_div_less_small 1); [ | easy ].
+  rewrite Nat.mul_1_l, Nat.mul_0_l.
+  cbn - [ "*" ].
 ...
   remember (extract_pow2_loop it n) as mk eqn:Hmk.
   symmetry in Hmk.
