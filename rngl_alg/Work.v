@@ -4098,12 +4098,12 @@ destruct n2. 2: {
     cbn - [ "*" ].
     destruct (Nat.log2_up_succ_or n) as [H1| H1]. {
       rewrite H1.
-...
       apply Nat_pow2_log2_up_succ in H1.
       rewrite Nat.pow_succ_r'.
-Search (2 ^ Nat.log2 _).
+      rewrite H1.
+      now apply Nat.mul_lt_mono_pos_l.
+    }
 ...
-
 Check Nat.log2_up_spec.
 Search (2 ^ Nat.log2_up _ ≤ _).
 ...
