@@ -2181,56 +2181,22 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
-(* to be completed
 Theorem Nat_pow2_log2_diag_pow2_up_log2_diag :
   ∀ n, 2 ^ Nat.log2 n = n ↔ 2 ^ Nat.log2_up n = n.
 Proof.
 intros.
-(*
-Compute (map (λ n,
-  Bool.eqb
-    (Nat.eqb (2 ^ Nat.log2 n) n)
-    (Nat.eqb (2 ^ Nat.log2_up n) n)
-) (seq 0 50)).
-ok
-*)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply Nat.neq_0_lt_0 in Hnz.
-specialize (Nat.log2_spec n Hnz) as H1.
-specialize (Nat.log2_log2_up_spec n Hnz) as H2.
-...
-progress unfold Nat.log2_up.
-remember (1 ?= n) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1. {
-  apply Nat.compare_eq in Hn1.
-  now subst n.
-} {
-  apply Nat.compare_lt_iff in Hn1.
-  destruct n; [ easy | ].
-(**)
-  cbn - [ "*" ].
-  specialize (Nat.log2_iter_spec n 0 1 0 eq_refl Nat.lt_0_1) as H1.
-  cbn - [ "*" ] in H1.
-  rewrite Nat.add_1_r in H1.
-  split; intros Hn. {
-    rewrite Hn in H1.
-Search (2 ^ S (Nat.log2 _)).
-...
-  cbn - [ "*" Nat.log2 ].
-  split; intros Hn. {
-    rewrite <- Nat.pow_succ_r'.
-Search (Nat.log2 (S _)).
-Search (2 ^ S (Nat.log2 _)).
-...
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-specialize (Nat.log2_log2_up_spec n Hnz) as H1.
 split; intros Hn. {
-Print Nat.log2_up.
-Print Nat.log2.
-...
-*)
+  rewrite <- Hn at 2; symmetry; f_equal.
+  apply Nat.log2_log2_up_exact; [ easy | ].
+  now exists (Nat.log2 n).
+} {
+  rewrite <- Hn at 2; f_equal.
+  apply Nat.log2_log2_up_exact; [ easy | ].
+  now exists (Nat.log2_up n).
+}
+Qed.
 
 Theorem Nat_pow2_log2_up_succ :
   ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n.
