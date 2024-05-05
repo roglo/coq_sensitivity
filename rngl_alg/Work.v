@@ -2181,6 +2181,57 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
+(* to be completed
+Theorem Nat_pow2_log2_diag_pow2_up_log2_diag :
+  ∀ n, 2 ^ Nat.log2 n = n ↔ 2 ^ Nat.log2_up n = n.
+Proof.
+intros.
+(*
+Compute (map (λ n,
+  Bool.eqb
+    (Nat.eqb (2 ^ Nat.log2 n) n)
+    (Nat.eqb (2 ^ Nat.log2_up n) n)
+) (seq 0 50)).
+ok
+*)
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (Nat.log2_spec n Hnz) as H1.
+specialize (Nat.log2_log2_up_spec n Hnz) as H2.
+...
+progress unfold Nat.log2_up.
+remember (1 ?= n) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.compare_eq in Hn1.
+  now subst n.
+} {
+  apply Nat.compare_lt_iff in Hn1.
+  destruct n; [ easy | ].
+(**)
+  cbn - [ "*" ].
+  specialize (Nat.log2_iter_spec n 0 1 0 eq_refl Nat.lt_0_1) as H1.
+  cbn - [ "*" ] in H1.
+  rewrite Nat.add_1_r in H1.
+  split; intros Hn. {
+    rewrite Hn in H1.
+Search (2 ^ S (Nat.log2 _)).
+...
+  cbn - [ "*" Nat.log2 ].
+  split; intros Hn. {
+    rewrite <- Nat.pow_succ_r'.
+Search (Nat.log2 (S _)).
+Search (2 ^ S (Nat.log2 _)).
+...
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (Nat.log2_log2_up_spec n Hnz) as H1.
+split; intros Hn. {
+Print Nat.log2_up.
+Print Nat.log2.
+...
+*)
+
 Theorem Nat_pow2_log2_up_succ :
   ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2 n = n.
 Proof.
@@ -4057,6 +4108,56 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now injection Hmk; clear Hmk; intros; subst m k.
 }
 rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
+(**)
+revert n m k Hmk Hit Hnz.
+induction it; intros; [ now apply Nat.le_0_r in Hit | ].
+destruct n; [ easy | clear Hnz ].
+cbn - [ "/" "mod" ] in Hmk.
+remember (S n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. 2: {
+  injection Hmk; clear Hmk; intros; subst m k.
+  apply Nat.eqb_neq in Hn2.
+  cbn - [ "*" "/" "mod" ].
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" ].
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  rewrite (Nat_mod_less_small 1). 2: {
+    split. {
+      rewrite Nat.mul_1_l.
+      apply Nat.log2_up_spec.
+      apply -> Nat.succ_lt_mono.
+      now apply Nat.neq_0_lt_0.
+    }
+    cbn - [ "*" ].
+    destruct (Nat.log2_up_succ_or n) as [H1| H1]. {
+      rewrite H1.
+...
+      apply Nat_pow2_log2_up_succ in H1.
+      rewrite Nat.pow_succ_r'.
+Search (2 ^ Nat.log2 _).
+...
+
+Check Nat.log2_up_spec.
+Search (2 ^ Nat.log2_up _ ≤ _).
+...
+cbn in Hn2.
+...
+  remember (extract_pow2_loop it n) as mk eqn:Hmk.
+  symmetry in Hmk.
+  destruct mk as (m, k).
+  rewrite (IHit _ m k); [ | | | easy ]. 2: {
+...
+  cbn - [ "*" "/" "mod" ].
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" ].
+  remember (extract_pow2_loop it n) as mk eqn:Hmk.
+  symmetry in Hmk.
+  destruct mk as (m, k).
+  rewrite (IHit _ m k); [ | easy | | easy ]. 2: {
+...
+Search (snd (rank_fst_loop _ _ (2 ^ _) _)).
+...
 revert it m k Hmk Hit.
 induction n; intros; [ easy | clear Hnz ].
 destruct it; [ easy | ].
@@ -4075,13 +4176,17 @@ destruct n2. {
   rewrite Nat.log2_up_double.
   rewrite Nat.pow_succ_r'.
   rewrite Nat.div_mul_cancel_l; [ | | easy ].
-  remember (extract_pow2_loop n c) as nc eqn:Hnc.
+  remember (extract_pow2_loop it c) as nc eqn:Hnc.
   symmetry in Hnc.
   destruct nc as (m', k').
+  injection Hmk; clear Hmk; intros; subst m k'.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    symmetry in Hc.
+    now apply Nat.eq_mul_1 in Hc.
+  }
 ...
-  injection Hmk; clear Hmk; intros; subst m k.
-Print extract_pow2.
-(* pfff... fatigué *)
+  apply IHn in Hnc.
 ...
   cbn - [ "/" ] in Hmk.
 ...
