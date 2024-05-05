@@ -4078,6 +4078,7 @@ rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
 revert n m k Hmk Hit Hnz.
 induction it; intros; [ now apply Nat.le_0_r in Hit | ].
 destruct n; [ easy | clear Hnz ].
+apply Nat.succ_le_mono in Hit.
 cbn - [ "/" "mod" ] in Hmk.
 remember (S n mod 2 =? 0) as n2 eqn:Hn2.
 symmetry in Hn2.
@@ -4109,10 +4110,12 @@ destruct n2. 2: {
   rewrite (Nat_div_less_small 1); [ | easy ].
   rewrite Nat.mul_1_l, Nat.mul_0_l.
   cbn - [ "*" ].
-...
   remember (extract_pow2_loop it n) as mk eqn:Hmk.
   symmetry in Hmk.
   destruct mk as (m, k).
+  apply IHit in Hmk; [ | easy | easy ].
+(* bof, chais pas *)
+...
   rewrite (IHit _ m k); [ | | | easy ]. 2: {
 ...
   cbn - [ "*" "/" "mod" ].
