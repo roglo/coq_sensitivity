@@ -2564,9 +2564,7 @@ Qed.
 Fixpoint binary_div n a b :=
   match n with
   | 0 => []
-  | S n' =>
-      if a / b =? 0 then 0 :: binary_div n' (2 * (a mod b)) b
-      else 1 :: binary_div n' (2 * (a mod b)) b
+  | S n' => a / b :: binary_div n' (2 * (a mod b)) b
   end.
 
 Fixpoint rank_fst_loop it k a b :=
@@ -4074,7 +4072,17 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now injection Hmk; clear Hmk; intros; subst m k.
 }
 rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
+Compute (map (λ n,
+  binary_div 10 (2 ^ Nat.log2_up n) n
+) (seq 0 20)).
+Compute (map (λ n,
+  let '(m, k) := extract_pow2_loop n n in
+(n,
+  binary_div 10 (2 ^ Nat.log2_up m) m
+)
+) (seq 0 20)).
 (**)
+...
 revert n m k Hmk Hit Hnz.
 induction it; intros; [ now apply Nat.le_0_r in Hit | ].
 destruct n; [ easy | clear Hnz ].
