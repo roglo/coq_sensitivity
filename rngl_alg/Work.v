@@ -4090,12 +4090,8 @@ remember (S n mod 2 =? 0) as n2 eqn:Hn2.
 symmetry in Hn2.
 destruct n2. 2: {
   injection Hmk; clear Hmk; intros; subst m k.
-  apply Nat.eqb_neq in Hn2.
-  cbn - [ "*" "/" "mod" ].
-  rewrite snd_if, snd_let.
-  cbn - [ "*" "/" "mod" ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  assert (H : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < 2 * S n). {
+  assert (Hni : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < 2 * S n). {
     rewrite Nat.mul_1_l.
     split. {
       apply Nat.log2_up_spec.
@@ -4112,6 +4108,10 @@ destruct n2. 2: {
     apply Nat.log2_up_pos.
     flia Hnz.
   }
+  apply Nat.eqb_neq in Hn2.
+  cbn - [ "*" "/" "mod" ].
+  rewrite snd_if, snd_let.
+  cbn - [ "*" "/" "mod" ].
   rewrite (Nat_div_less_small 1); [ | easy ].
   rewrite (Nat_mod_less_small 1); [ | easy ].
   cbn - [ "*" ].
@@ -4122,6 +4122,33 @@ remember (extract_pow2_loop it (S n / 2)) as km eqn:Hkm.
 symmetry in Hkm.
 destruct km as (k', m').
 injection Hmk; clear Hmk; intros; subst k m'.
+apply IHit in Hkm.
+cbn - [ "*" "/" "mod" ].
+rewrite snd_if, snd_let.
+cbn - [ "*" "/" "mod" ].
+assert (Hni : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < 2 * S n). {
+  rewrite Nat.mul_1_l.
+  split. {
+    apply Nat.log2_up_spec.
+    apply -> Nat.succ_lt_mono.
+    destruct n; [ easy | flia ].
+  }
+  specialize (Nat.log2_up_spec (S n)) as H2.
+  assert (H : 1 < S n) by (destruct n; [ easy | flia ]).
+  specialize (H2 H); clear H.
+  destruct H2 as (H2, H3).
+  apply (Nat.mul_lt_mono_pos_l 2) in H2; [ | easy ].
+  rewrite <- Nat.pow_succ_r' in H2.
+  rewrite (Nat.lt_succ_pred 0) in H2; [ easy | ].
+  apply Nat.log2_up_pos.
+  destruct n; [ easy | flia ].
+}
+rewrite (Nat_div_less_small 1); [ | easy ].
+rewrite (Nat_mod_less_small 1); [ | easy ].
+cbn - [ "*" ].
+rewrite Nat.mul_1_l.
+(* ouais, mais c'est la merde *)
+...
 apply IHit.
 ...
   rewrite (IHit _ m k); [ | | | easy ]. 2: {
