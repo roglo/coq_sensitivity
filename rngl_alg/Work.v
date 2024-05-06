@@ -4054,10 +4054,9 @@ Nat.eqb
   (snd (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n))
 )
 ) (seq 0 200)).
-Search (snd (rank_fst_loop _ _ _ _)).
 Theorem exercice :
-  ∀ n m k,
-  extract_pow2 n = (m, k)
+  ∀ n k m,
+  extract_pow2 n = (k, m)
   → snd (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n) =
     snd (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m) * 2 ^ k.
 Proof.
@@ -4072,6 +4071,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now injection Hmk; clear Hmk; intros; subst m k.
 }
 rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
+...
 Compute (map (λ n,
   binary_div 10 (2 ^ Nat.log2_up n) n
 ) (seq 0 20)).
