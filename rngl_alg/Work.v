@@ -4045,6 +4045,9 @@ cbn - [ "*" ].
 progress unfold fst_1_len.
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
+(* voir si on peut pas faire un enough_iter pour rank_fst_loop
+   et voir si ça résoudrait le problème *)
+...
 Compute (map (λ n,
   let mk := extract_pow2 n in
   let m := snd mk in
@@ -4054,6 +4057,8 @@ Nat.eqb
   (snd (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n))
 )
 ) (seq 0 200)).
+(* ok *)
+...
 Theorem exercice :
   ∀ n k m,
   extract_pow2 n = (k, m)
@@ -4122,7 +4127,12 @@ remember (extract_pow2_loop it (S n / 2)) as km eqn:Hkm.
 symmetry in Hkm.
 destruct km as (k', m').
 injection Hmk; clear Hmk; intros; subst k m'.
-apply IHit in Hkm.
+(**)
+Search rank_fst_loop.
+apply IHit; [ | | easy ].
+...
+generalize Hkm; intros H.
+apply IHit in H.
 cbn - [ "*" "/" "mod" ].
 rewrite snd_if, snd_let.
 cbn - [ "*" "/" "mod" ].
@@ -4134,8 +4144,8 @@ assert (Hni : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < 2 * S n). {
     destruct n; [ easy | flia ].
   }
   specialize (Nat.log2_up_spec (S n)) as H2.
-  assert (H : 1 < S n) by (destruct n; [ easy | flia ]).
-  specialize (H2 H); clear H.
+  assert (H1 : 1 < S n) by (destruct n; [ easy | flia ]).
+  specialize (H2 H1); clear H1.
   destruct H2 as (H2, H3).
   apply (Nat.mul_lt_mono_pos_l 2) in H2; [ | easy ].
   rewrite <- Nat.pow_succ_r' in H2.
@@ -4147,7 +4157,8 @@ rewrite (Nat_div_less_small 1); [ | easy ].
 rewrite (Nat_mod_less_small 1); [ | easy ].
 cbn - [ "*" ].
 rewrite Nat.mul_1_l.
-(* ouais, mais c'est la merde *)
+rewrite <- Nat.pow_succ_r'.
+rewrite <- (IHit n).
 ...
 apply IHit.
 ...
