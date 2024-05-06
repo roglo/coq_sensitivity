@@ -4071,7 +4071,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now injection Hmk; clear Hmk; intros; subst m k.
 }
 rewrite (extract_pow2_enough_iter n n it) in Hmk; [ | easy | easy | easy ].
-...
 Compute (map (λ n,
   binary_div 10 (2 ^ Nat.log2_up n) n
 ) (seq 0 20)).
@@ -4082,7 +4081,6 @@ Compute (map (λ n,
 )
 ) (seq 0 20)).
 (**)
-...
 revert n m k Hmk Hit Hnz.
 induction it; intros; [ now apply Nat.le_0_r in Hit | ].
 destruct n; [ easy | clear Hnz ].
@@ -4114,15 +4112,17 @@ destruct n2. 2: {
     apply Nat.log2_up_pos.
     flia Hnz.
   }
-  rewrite (Nat_mod_less_small 1); [ | easy ].
   rewrite (Nat_div_less_small 1); [ | easy ].
-  rewrite Nat.mul_1_l, Nat.mul_0_l.
+  rewrite (Nat_mod_less_small 1); [ | easy ].
   cbn - [ "*" ].
-  remember (extract_pow2_loop it n) as mk eqn:Hmk.
-  symmetry in Hmk.
-  destruct mk as (m, k).
-  apply IHit in Hmk; [ | easy | easy ].
-(* bof, chais pas *)
+  now rewrite Nat.mul_1_r.
+}
+apply Nat.eqb_eq in Hn2.
+remember (extract_pow2_loop it (S n / 2)) as km eqn:Hkm.
+symmetry in Hkm.
+destruct km as (k', m').
+injection Hmk; clear Hmk; intros; subst k m'.
+apply IHit.
 ...
   rewrite (IHit _ m k); [ | | | easy ]. 2: {
 ...
