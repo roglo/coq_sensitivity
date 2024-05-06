@@ -4048,23 +4048,37 @@ rewrite snd_rank_fst_1; [ | easy | easy ].
 (* voir si on peut pas faire un enough_iter pour rank_fst_loop
    et voir si ça résoudrait le problème *)
 Theorem rank_fst_loop_enough_iter :
-  ∀ it1 it2 k a b,
+  ∀ it1 it2 a b,
   b ≠ 0
   → b ≤ it1
   → b ≤ it2
-  → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
+  → rank_fst_loop it1 0 a b = rank_fst_loop it2 0 a b.
 Proof.
 intros * Hbz Hit1 Hit2.
 revert it2 Hit2.
-revert k a b Hbz Hit1.
+revert a b Hbz Hit1.
 induction it1; intros; [ now apply Nat.le_0_r in Hit1; subst b | ].
 (**)
 destruct it2; [ now apply Nat.le_0_r in Hit2; subst b | ].
 cbn - [ "*" ].
-remember (a / b =? k) as abk eqn:Habk.
+remember (a / b =? 0) as abk eqn:Habk.
 symmetry in Habk.
 destruct abk; [ easy | ].
 apply Nat.eqb_neq in Habk.
+...
+rewrite Nat.mod_small. 2: {
+  apply Nat.nle_gt; intros H; apply Habk; clear Habk.
+...
+(**)
+remember (rank_fst_loop it1 k _ _) as ra1 eqn:Hra1.
+remember (rank_fst_loop it2 k _ _) as ra2 eqn:Hra2.
+symmetry in Hra1, Hra2.
+destruct ra1 as (r1, a1).
+destruct ra2 as (r2, a2).
+move it2 before b.
+move r1 before it2; move r2 before r1.
+move a1 before r2; move a2 before a1.
+...
 destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
   destruct b; [ easy | ].
   apply Nat.succ_inj in Hb1; subst it1.
