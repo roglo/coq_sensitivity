@@ -4047,6 +4047,92 @@ rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
 (* voir si on peut pas faire un enough_iter pour rank_fst_loop
    et voir si ça résoudrait le problème *)
+Theorem rank_fst_loop_enough_iter :
+  ∀ it1 it2 k a b,
+  b ≠ 0
+  → b ≤ it1
+  → b ≤ it2
+  → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
+Proof.
+intros * Hbz Hit1 Hit2.
+revert it2 Hit2.
+revert k a b Hbz Hit1.
+induction it1; intros; [ now apply Nat.le_0_r in Hit1; subst b | ].
+(**)
+destruct it2; [ now apply Nat.le_0_r in Hit2; subst b | ].
+cbn - [ "*" ].
+remember (a / b =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk; [ easy | ].
+apply Nat.eqb_neq in Habk.
+destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+  destruct b; [ easy | ].
+  apply Nat.succ_inj in Hb1; subst it1.
+  clear Hit1 Hbz.
+  apply Nat.succ_le_mono in Hit2.
+  clear IHit1.
+  revert b Hit2 Habk.
+  induction it2; intros; [ now apply Nat.le_0_r in Hit2; subst b | ].
+  cbn - [ "*" "/" "mod" ].
+  (* peut-être qu'il faudrait ajouter que k=0 ou 1 ? *)
+  remember (2 * (a mod S b) / S b =? k) as abk eqn:Hasbk.
+  symmetry in Hasbk.
+  destruct abk. {
+    apply Nat.eqb_eq in Hasbk.
+    destruct b; [ easy | ].
+    cbn - [ "*" "/" "mod" ].
+    now rewrite Hasbk, Nat.eqb_refl.
+  }
+  apply Nat.eqb_neq in Hasbk.
+  destruct (Nat.eq_dec b (S it2)) as [Hb2| Hb2]. {
+    destruct b; [ easy | ].
+    apply Nat.succ_inj in Hb2; subst it2.
+    clear Hit2.
+    cbn - [ "*" "/" "mod" ].
+    remember (_ =? k) as k' eqn:H1.
+    symmetry in H1.
+    destruct k'; [ now apply Nat.eqb_eq in H1 | easy ].
+  }
+  rewrite Nat.mul_mod_idemp_r; [ | easy ].
+  rewrite IHit2; [ | flia Hit2 Hb2 | easy ].
+...
+  remember (rank_fst_loop _ _ _ _) as x eqn:Hx.
+...
+  remember (a / S b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. 2: {
+    rewrite Nat.add_0_r.
+    remember (rank_fst_loop b _ _ _) as r1 eqn:Hr1.
+    symmetry in Hr1.
+    destruct r1 as (r1, a1).
+    destruct it2; [ easy | ].
+    cbn - [ "/" "mod" ].
+    rewrite Habk.
+    rewrite Nat.add_0_r.
+    remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
+    symmetry in Hr2.
+    destruct r2 as (r2, a2).
+    specialize (IHit1 k (a mod S b + a mod S b)).
+    specialize (IHit1 b).
+...
+destruct b; [ easy | ].
+apply Nat.succ_le_mono in Hit1, Hit2.
+rewrite IHit1 with (it2 := it2).
+...
+  remember (rank_fst_loop it1 _ _ _) as r1 eqn:Hr1.
+  symmetry in Hr1.
+  destruct r1 as (r1, a1).
+  destruct b; [ easy | clear Hbz ].
+  destruct it2; [ easy | ].
+  cbn - [ "/" "mod" ].
+  rewrite Habk.
+  rewrite Nat.add_0_r.
+  remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
+  symmetry in Hr2.
+  destruct r2 as (r2, a2).
+  specialize (IHit1 k (a mod S b + a mod S b)).
+  specialize (IHit1 (S b)).
+......
 ...
 Compute (map (λ n,
   let mk := extract_pow2 n in
@@ -7763,57 +7849,8 @@ rewrite rank_fst_1_1_pow2_log2_up.
 ... ...
 progress unfold rank_fst_1.
 ...
-Theorem rank_fst_loop_enough_iter :
-  ∀ it1 it2 k a b,
-  b ≠ 0
-  → b ≤ it1
-  → b ≤ it2
-  → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
-Proof.
-intros * Hbz Hit1 Hit2.
-revert it2 Hit2.
-revert k a b Hbz Hit1.
-induction it1; intros; cbn. {
-  now apply Nat.le_0_r in Hit1; subst b.
-}
-destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
-  destruct b; [ easy | ].
-  apply Nat.succ_inj in Hb1; subst it1.
-  clear Hit1 Hbz.
-  remember (a / S b =? k) as abk eqn:Habk.
-  symmetry in Habk.
-  destruct abk. 2: {
-    rewrite Nat.add_0_r.
-    remember (rank_fst_loop b _ _ _) as r1 eqn:Hr1.
-    symmetry in Hr1.
-    destruct r1 as (r1, a1).
-    destruct it2; [ easy | ].
-    cbn - [ "/" "mod" ].
-    rewrite Habk.
-    rewrite Nat.add_0_r.
-    remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
-    symmetry in Hr2.
-    destruct r2 as (r2, a2).
-    specialize (IHit1 k (a mod S b + a mod S b)).
-    specialize (IHit1 b).
 ...
-remember (a / b =? k) as abk eqn:Habk.
-symmetry in Habk.
-destruct abk. 2: {
-  rewrite Nat.add_0_r.
-  remember (rank_fst_loop it1 _ _ _) as r1 eqn:Hr1.
-  symmetry in Hr1.
-  destruct r1 as (r1, a1).
-  destruct b; [ easy | clear Hbz ].
-  destruct it2; [ easy | ].
-  cbn - [ "/" "mod" ].
-  rewrite Habk.
-  rewrite Nat.add_0_r.
-  remember (rank_fst_loop it2 _ _ _) as r2 eqn:Hr2.
-  symmetry in Hr2.
-  destruct r2 as (r2, a2).
-  specialize (IHit1 k (a mod S b + a mod S b)).
-  specialize (IHit1 (S b)).
+(* suite possible de enough_iter *)
 ...
 Search (_ < _ ^ _).
   specialize (Nat.pow_gt_lin_r 2 n) as H1.
