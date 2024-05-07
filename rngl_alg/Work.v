@@ -4066,6 +4066,19 @@ Compute (map (λ n,
 (* à 2^n+1, ça devient n, on dirait, puis ça diminue, et quand ça atteint
    1, c'est stable jusqu'à 2^(n+1) compris *)
 ...
+Compute (map (λ n,
+let m := snd (extract_pow2 n) in
+(n,
+  fst (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m)
+)
+) (seq 0 128)).
+Compute (map (λ n,
+let m := 2 * n + 1 in
+(n,
+  fst (rank_fst_loop m 0 (2 ^ Nat.log2_up m) m)
+)
+) (seq 0 64)).
+...
 (* voir si on peut pas faire un enough_iter pour rank_fst_loop
    et voir si ça résoudrait le problème *)
 Theorem rank_fst_loop_0_enough_iter :
