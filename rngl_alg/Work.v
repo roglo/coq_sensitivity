@@ -4038,9 +4038,13 @@ Theorem inv_ub_num_snd_extract_pow2 :
   ∀ n, inv_ub_num (snd (extract_pow2 n)) = inv_ub_num n.
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 progress unfold inv_ub_num.
 f_equal; f_equal; f_equal.
+Theorem fst_1_len_1_snd_extract_pow2 :
+  ∀ n, fst_1_len 1 (snd (extract_pow2 n)) = fst_1_len 1 n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (extract_pow2 n) as km eqn:Hkm.
 symmetry in Hkm.
 destruct km as (k, m).
@@ -4066,6 +4070,11 @@ Compute (map (λ n,
 (* à 2^n+1, ça devient n, on dirait, puis ça diminue, et quand ça atteint
    1, c'est stable jusqu'à 2^(n+1) compris *)
 ...
+Compute (map (λ n,
+(n,
+  binary_div 10 (2 ^ Nat.log2_up n) n
+)
+) (seq 0 128)).
 Compute (map (λ n,
 let m := snd (extract_pow2 n) in
 (n,
