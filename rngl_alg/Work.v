@@ -4055,6 +4055,70 @@ Theorem rank_fst_loop_enough_iter :
   → rank_fst_loop it1 0 a b = rank_fst_loop it2 0 a b.
 Proof.
 intros * Hbz Hit1 Hit2.
+destruct it1; [ now apply Nat.le_0_r in Hit1; subst b | ].
+destruct it2; [ now apply Nat.le_0_r in Hit2; subst b | ].
+cbn - [ "*" ].
+remember (a / b =? 0) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk; [ easy | ].
+apply Nat.eqb_neq in Habk.
+remember (a mod b) as a' eqn:Ha'.
+specialize (Nat.mod_upper_bound a b Hbz) as Hab.
+rewrite <- Ha' in Hab.
+clear a Habk Ha'.
+rename a' into a; move a after b.
+clear Hbz.
+...
+revert a b Hab Hit1 Hit2.
+revert it2.
+induction it1; intros. {
+  replace a with 0 by flia Hab Hit1.
+  replace b with 1 by flia Hab Hit1.
+  now destruct it2; cbn.
+}
+destruct it2. {
+  replace a with 0 by flia Hab Hit2.
+  replace b with 1 by flia Hab Hit2.
+  easy.
+}
+cbn - [ "*" ].
+remember (2 * a / b =? 0) as ab eqn:Htab.
+symmetry in Htab.
+destruct ab; [ easy | ].
+apply Nat.eqb_neq in Htab.
+assert (Hba : b ≤ 2 * a). {
+  apply Nat.nlt_ge; intros H; apply Htab.
+  apply Nat.div_small_iff; [ flia Hab | easy ].
+}
+clear Htab.
+rewrite (Nat_mod_less_small 1). 2: {
+  split; [ now rewrite Nat.mul_1_l | ].
+  now apply Nat.mul_lt_mono_pos_l.
+}
+rewrite Nat.mul_1_l.
+destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+  subst b.
+  clear Hit1.
+  destruct it1; [ flia Hba Hab | ].
+  do 2 apply Nat.succ_le_mono in Hit2.
+  destruct it2. {
+    apply Nat.le_0_r in Hit2; subst it1.
+    destruct a; [ easy | ].
+    apply Nat.succ_lt_mono in Hab.
+    now apply Nat.lt_1_r in Hab; subst a.
+  }
+  cbn - [ "*" "/" "mod" ].
+  remember (_ =? 0) as z eqn:Hz.
+  symmetry in Hz.
+  destruct z; [ easy | ].
+  apply Nat.eqb_neq in Hz.
+  rewrite Nat.mod_small.
+...
+  flia Hit2 Hit1 Hba Hab.
+... ...
+rewrite (IHit1 it2).
+...
+intros * Hbz Hit1 Hit2.
 revert it2 Hit2.
 revert a b Hbz Hit1.
 induction it1; intros; [ now apply Nat.le_0_r in Hit1; subst b | ].
