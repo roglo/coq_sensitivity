@@ -4058,6 +4058,14 @@ cbn - [ "*" ].
 progress unfold fst_1_len.
 rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
+Compute (map (λ n,
+(n,
+  fst (rank_fst_loop n 0 (2 ^ Nat.log2_up n) n)
+)
+) (seq 0 128)).
+(* à 2^n+1, ça devient n, on dirait, puis ça diminue, et quand ça atteint
+   1, c'est stable jusqu'à 2^(n+1) compris *)
+...
 (* voir si on peut pas faire un enough_iter pour rank_fst_loop
    et voir si ça résoudrait le problème *)
 Theorem rank_fst_loop_0_enough_iter :
@@ -4121,6 +4129,7 @@ destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
   destruct z; [ easy | ].
   apply Nat.eqb_neq in Hz.
   apply Nat_div_not_small_iff in Hz; [ | easy ].
+(* pas l'air simple *)
 ...
   rewrite Nat.mod_small.
 ...
