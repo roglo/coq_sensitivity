@@ -3823,6 +3823,19 @@ rewrite IHit1 with (it2 := it2); [ easy | | | ]. {
 }
 Qed.
 
+Theorem Nat_div_not_small_iff :
+  ∀ a b, b ≠ 0 → a / b ≠ 0 ↔ b ≤ a.
+Proof.
+intros * Hbz.
+split; intros H1. {
+  apply Nat.nlt_ge; intros H; apply H1.
+  now apply Nat.div_small_iff.
+} {
+  apply Nat.nlt_ge in H1; intros H; apply H1.
+  now apply Nat.div_small_iff.
+}
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4047,7 +4060,7 @@ rewrite snd_rank_fst_1; [ | easy | easy ].
 rewrite snd_rank_fst_1; [ | easy | easy ].
 (* voir si on peut pas faire un enough_iter pour rank_fst_loop
    et voir si ça résoudrait le problème *)
-Theorem rank_fst_loop_enough_iter :
+Theorem rank_fst_loop_0_enough_iter :
   ∀ it1 it2 a b,
   b ≠ 0
   → b ≤ it1
@@ -4068,7 +4081,6 @@ rewrite <- Ha' in Hab.
 clear a Habk Ha'.
 rename a' into a; move a after b.
 clear Hbz.
-...
 revert a b Hab Hit1 Hit2.
 revert it2.
 induction it1; intros. {
@@ -4086,11 +4098,7 @@ remember (2 * a / b =? 0) as ab eqn:Htab.
 symmetry in Htab.
 destruct ab; [ easy | ].
 apply Nat.eqb_neq in Htab.
-assert (Hba : b ≤ 2 * a). {
-  apply Nat.nlt_ge; intros H; apply Htab.
-  apply Nat.div_small_iff; [ flia Hab | easy ].
-}
-clear Htab.
+apply Nat_div_not_small_iff in Htab; [ | flia Hab ].
 rewrite (Nat_mod_less_small 1). 2: {
   split; [ now rewrite Nat.mul_1_l | ].
   now apply Nat.mul_lt_mono_pos_l.
@@ -4098,8 +4106,8 @@ rewrite (Nat_mod_less_small 1). 2: {
 rewrite Nat.mul_1_l.
 destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
   subst b.
-  clear Hit1.
-  destruct it1; [ flia Hba Hab | ].
+  clear Hit1 IHit1.
+  destruct it1; [ flia Htab Hab | ].
   do 2 apply Nat.succ_le_mono in Hit2.
   destruct it2. {
     apply Nat.le_0_r in Hit2; subst it1.
@@ -4112,6 +4120,8 @@ destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
   symmetry in Hz.
   destruct z; [ easy | ].
   apply Nat.eqb_neq in Hz.
+  apply Nat_div_not_small_iff in Hz; [ | easy ].
+...
   rewrite Nat.mod_small.
 ...
   flia Hit2 Hit1 Hba Hab.
