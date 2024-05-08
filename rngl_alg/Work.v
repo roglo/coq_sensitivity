@@ -4213,8 +4213,32 @@ apply Nat_neq_div_1 in Hn1.
 destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
 rewrite Nat.mod_small; [ | easy ].
 do 6 apply Nat.succ_lt_mono in Hn1.
-...
-progress replace (2 * 16) with 32 by easy.
+progress replace (2 * 32) with 64 by easy.
+clear Hn; rename Hn1 into Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" ].
+remember (64 / S (S (S (S (S (S (S n)))))) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  do 26 (destruct n; [ flia Hn | ]).
+  clear Hn Hn2.
+  do 33 apply Nat.succ_le_mono in Hn1.
+  do 32 (destruct n; [ easy | ]).
+  do 31 apply Nat.succ_lt_mono in Hn1.
+  easy.
+}
+apply Nat.eqb_neq in Hn1.
+rewrite snd_let.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+do 7 apply Nat.succ_lt_mono in Hn1.
+progress replace (2 * 64) with 128 by easy.
 clear Hn; rename Hn1 into Hn.
 ...
 Theorem glop :
