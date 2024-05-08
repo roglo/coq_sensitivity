@@ -4078,6 +4078,63 @@ apply IHit in Hkm. 2: {
   flia Hit.
 }
 rewrite Hkm.
+(**)
+clear - Hn2.
+apply Nat.mod_divides in Hn2; [ | easy ].
+destruct Hn2 as (c, Hc); subst n.
+rename c into n.
+rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+symmetry.
+progress unfold fst_1_len.
+Compute (map (λ n,
+  snd (rank_fst_loop (n * 2) 1 1 (n * 2)) =
+  2 * snd (rank_fst_loop n 1 1 n)
+) (seq 0 20)).
+Theorem glop :
+  ∀ n,
+  snd (rank_fst_loop (n * 2) 1 1 (n * 2)) =
+  2 * snd (rank_fst_loop n 1 1 n).
+Proof.
+intros.
+induction n; [ easy | ].
+cbn - [ "*" "/" "mod" ].
+remember (1 / S n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ now destruct n | ].
+apply Nat.eqb_neq in Hn1.
+rewrite snd_let.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+apply Nat.succ_lt_mono in Hn1.
+rewrite Nat.mul_1_r.
+...
+rewrite Nat.div_small.
+Print rank_fst_loop.
+...
+clear T ro rp rl ac.
+... ...
+rewrite glop.
+...
+...
+destruct n; [ easy | cbn ].
+destruct n; [ easy | cbn ].
+...
+Theorem glop :
+  ∀ k n, fst_1_len 1 (n * 2 ^ k) = fst_1_len 1 n.
+Proof.
+intros.
+revert n.
+induction k; intros; [ f_equal; apply Nat.mul_1_r | ].
+rewrite Nat.pow_succ_r', Nat.mul_assoc.
+rewrite IHk.
+...
+clear T ro rp rl ac.
+... ...
+apply (glop 1).
+...
+induction n; [ easy | ].
+...
 apply (IHit k).
 (* ah non, mais c'est pauet-être pas perdu pour autant *)
 ...
