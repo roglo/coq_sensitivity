@@ -4048,6 +4048,44 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (extract_pow2 n) as km eqn:Hkm.
 symmetry in Hkm.
 destruct km as (k, m).
+progress unfold extract_pow2 in Hkm.
+remember n as it eqn:H in n.
+assert (Hit : n ≤ it) by now subst n.
+clear H.
+rewrite (extract_pow2_enough_iter n n it) in Hkm; [ | easy | easy | easy ].
+clear Hnz; cbn.
+revert k n m Hkm Hit.
+induction it; intros. {
+  apply Nat.le_0_r in Hit; subst n.
+  cbn in Hkm.
+  now injection Hkm; intros; subst m.
+}
+cbn - [ "/" "mod" ] in Hkm.
+remember (n mod 2 =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2; [ | now injection Hkm; clear Hkm; intros; subst m ].
+apply Nat.eqb_eq in Hn2.
+remember (extract_pow2_loop it (n / 2)) as km eqn:Hkm'.
+symmetry in Hkm'.
+destruct km as (k', m').
+injection Hkm; clear Hkm; intros; subst k m'.
+rename k' into k.
+generalize Hkm'; intros Hkm.
+apply IHit in Hkm. 2: {
+  apply Nat.mod_divides in Hn2; [ | easy ].
+  destruct Hn2 as (c, Hc); subst n.
+  rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+  flia Hit.
+}
+rewrite Hkm.
+apply (IHit k).
+(* ah non, mais c'est pauet-être pas perdu pour autant *)
+...
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+remember (extract_pow2 n) as km eqn:Hkm.
+symmetry in Hkm.
+destruct km as (k, m).
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   subst m.
   specialize (snd_extract_pow2_is_odd n Hnz) as H1.
