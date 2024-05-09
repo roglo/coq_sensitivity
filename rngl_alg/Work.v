@@ -4371,6 +4371,10 @@ apply Nat_eq_div_1 in Hn1.
 (* mouais... faut voir... *)
 clear Hmn. (* je crois *)
 destruct Hn1 as (Hn1, Hn2).
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat.add_succ_comm.
+clear IHn.
+...
 destruct n. {
   destruct m; [ easy | ].
   destruct m; [ easy | ].
