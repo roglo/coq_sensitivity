@@ -4369,6 +4369,17 @@ destruct n1. 2: {
 apply Nat.eqb_eq in Hn1.
 apply Nat_eq_div_1 in Hn1.
 (* mouais... faut voir... *)
+clear Hmn. (* je crois *)
+destruct Hn1 as (Hn1, Hn2).
+destruct n. {
+  destruct m; [ easy | ].
+  destruct m; [ easy | ].
+  destruct m; [ easy | ].
+cbn.
+...
+cbn in Hmn, Hn1.
+flia Hmn Hn1.
+  destruct m. {
 ... ...
 now apply (glop 7).
 (* essayer avec les itérations prédédentes *)
