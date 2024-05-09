@@ -4375,6 +4375,29 @@ rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm.
 clear IHn.
 (**)
+revert n Hn1 Hn2.
+induction m; intros. {
+  cbn in Hn1.
+  apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+rewrite Nat.add_succ_comm.
+rewrite (IHm (S n)).
+(* caca *)
+... si ça marche pas, reprendre ici
+(**)
+Theorem glop :
+  ∀ p m n,
+  p + m + S n ≤ 2 ^ (p + m)
+  → 2 ^ (p + m) < 2 * (p + m + S n)
+  → snd (rank_fst_loop ((S (p + m) + n) * 2) 1 1 ((S (p + m) + n) * 2)) =
+    2 ^ (S (p + m)).
+Proof.
+intros * Hn1 Hn2.
+Admitted.
+... ...
+now apply (glop 0).
+...
 destruct m. {
   cbn in Hn1.
   apply Nat.succ_le_mono in Hn1.
@@ -4405,6 +4428,17 @@ destruct m. {
   do 16 apply Nat.succ_le_mono in Hn1.
   now apply Nat.le_0_r in Hn1; subst n.
 }
+(*
+Theorem glop :
+  ∀ p m n,
+  p + m + S n ≤ 2 ^ (p + m)
+  → 2 ^ (p + m) < 2 * (p + m + S n)
+  → snd (rank_fst_loop ((S p + m + n) * 2) 1 1 ((S p + m + n) * 2)) =
+    2 ^ (S p + m).
+Proof.
+Admitted.
+now apply (glop 5).
+*)
 destruct m. {
   cbn in Hn1.
   do 11 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
@@ -4413,6 +4447,18 @@ destruct m. {
   do 32 apply Nat.succ_le_mono in Hn1.
   now apply Nat.le_0_r in Hn1; subst n.
 }
+(*
+Theorem glop :
+  ∀ p m n,
+  p + m + S n ≤ 2 ^ (p + m)
+  → 2 ^ (p + m) < 2 * (p + m + S n)
+  → snd (rank_fst_loop ((S p + m + n) * 2) 1 1 ((S p + m + n) * 2)) =
+    2 ^ (S p + m).
+Proof.
+Admitted.
+now apply (glop 6).
+...
+*)
 destruct m. {
   cbn in Hn1.
   do 26 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
@@ -4421,16 +4467,17 @@ destruct m. {
   do 64 apply Nat.succ_le_mono in Hn1.
   now apply Nat.le_0_r in Hn1; subst n.
 }
+(*
 Theorem glop :
-  ∀ m n,
-  7 + m + S n ≤ 2 ^ (7 + m)
-  → 2 ^ (7 + m) < 2 * (7 + m + S n)
-  → snd (rank_fst_loop ((8 + m + n) * 2) 1 1 ((8 + m + n) * 2)) =
-    2 ^ (8 + m).
+  ∀ p m n,
+  p + m + S n ≤ 2 ^ (p + m)
+  → 2 ^ (p + m) < 2 * (p + m + S n)
+  → snd (rank_fst_loop ((S p + m + n) * 2) 1 1 ((S p + m + n) * 2)) =
+    2 ^ (S p + m).
 Proof.
 Admitted.
-now apply glop.
-...
+now apply (glop 7).
+*)
 destruct m. {
   cbn in Hn1.
   do 57 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
@@ -4439,16 +4486,17 @@ destruct m. {
   do 128 apply Nat.succ_le_mono in Hn1.
   now apply Nat.le_0_r in Hn1; subst n.
 }
+...
 Theorem glop :
-  ∀ m n,
-  8 + m + S n ≤ 2 ^ (8 + m)
-  → 2 ^ (8 + m) < 2 * (8 + m + S n)
-  → snd (rank_fst_loop ((9 + m + n) * 2) 1 1 ((9 + m + n) * 2)) =
-    2 ^ (9 + m).
+  ∀ p m n,
+  p + m + S n ≤ 2 ^ (p + m)
+  → 2 ^ (p + m) < 2 * (p + m + S n)
+  → snd (rank_fst_loop ((S (p + m) + n) * 2) 1 1 ((S (p + m) + n) * 2)) =
+    2 ^ (S (p + m)).
 Proof.
 intros * Hn1 Hn2.
-Admitted.
-now apply glop.
+...
+now apply (glop 8).
 ...
 destruct n. {
   rewrite Nat.add_0_r.
