@@ -4109,7 +4109,15 @@ destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
 rewrite Nat.mod_small; [ | easy ].
 apply Nat.succ_lt_mono in Hn1.
 rewrite Nat.mul_1_r.
-(**)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 1).
+*)
 destruct n; [ easy | clear Hn1 ].
 cbn - [ "*" "/" "mod" ].
 remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
@@ -4122,7 +4130,15 @@ destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
 rewrite Nat.mod_small; [ | easy ].
 do 2 apply Nat.succ_lt_mono in Hn1.
 progress replace (2 * 2) with 4 by easy.
-(**)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 2).
+*)
 destruct n; [ easy | clear Hn1 ].
 cbn - [ "*" "/" "mod" ].
 remember (4 / S (S (S n)) =? 1) as n1 eqn:Hn1.
@@ -4143,7 +4159,15 @@ rewrite Nat.mod_small; [ | easy ].
 do 3 apply Nat.succ_lt_mono in Hn1.
 progress replace (2 * 4) with 8 by easy.
 rename Hn1 into Hn.
-(**)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 3).
+*)
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hn.
 cbn - [ "*" "/" "mod" ].
@@ -4165,7 +4189,15 @@ rewrite Nat.mod_small; [ | easy ].
 do 4 apply Nat.succ_lt_mono in Hn1.
 progress replace (2 * 8) with 16 by easy.
 clear Hn; rename Hn1 into Hn.
-(**)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 4).
+*)
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hn.
 cbn - [ "*" "/" "mod" ].
@@ -4196,6 +4228,15 @@ clear Hn; rename Hn1 into Hn.
   snd (rank_fst_loop (S (S (S (S (S n)))) * 2) 1 1 (S (S (S (S (S n)))) * 2)) =
   2 * snd (rank_fst_loop n 1 32 (S (S (S (S (S n))))))
 *)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 5).
+*)
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hn.
 cbn - [ "*" "/" "mod" ].
@@ -4225,6 +4266,15 @@ clear Hn; rename Hn1 into Hn.
   ============================
   snd (rank_fst_loop (S (S (S (S (S (S n))))) * 2) 1 1 (S (S (S (S (S (S n))))) * 2)) =
   2 * snd (rank_fst_loop n 1 64 (S (S (S (S (S (S n)))))))
+*)
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ (m - 1) - m < n
+  → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
+    2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Admitted.
+now apply (glop 6).
 *)
 destruct n; [ easy | ].
 apply Nat.succ_lt_mono in Hn.
@@ -4261,7 +4311,34 @@ Theorem glop :
   2 ^ (m - 1) - m < n
   → snd (rank_fst_loop ((m + n) * 2) 1 1 ((m + n) * 2)) =
     2 * snd (rank_fst_loop n 1 (2 ^ m) (m + n)).
-Admitted.
+Proof.
+intros * Hmn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+rewrite <- Nat.add_succ_comm.
+apply (Nat.add_lt_mono_r _ _ m) in Hmn.
+rewrite Nat.sub_add in Hmn. 2: {
+  destruct m; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  now apply Nat.pow_gt_lin_r.
+}
+...
+rewrite IHn. 2: {
+  apply (Nat.add_lt_mono_r _ _ m) in Hmn.
+  rewrite Nat.sub_add in Hmn. 2: {
+    destruct m; [ easy | ].
+    rewrite Nat_sub_succ_1.
+    now apply Nat.pow_gt_lin_r.
+  }
+  rewrite Nat_sub_succ_1.
+  apply (Nat.add_lt_mono_r _ _ (S m)).
+  rewrite Nat.sub_add. 2: {
+    now apply Nat.pow_gt_lin_r.
+  }
+  rewrite <- Nat.add_succ_comm.
+  eapply le_lt_trans; [ | apply Hmn ].
+(* shit *)
+... ...
 now apply (glop 7).
 (* essayer avec les itérations prédédentes *)
 ...
