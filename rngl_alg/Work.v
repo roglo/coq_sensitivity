@@ -4374,9 +4374,97 @@ destruct Hn1 as (Hn1, Hn2).
 rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm.
 clear IHn.
+(**)
+destruct m. {
+  cbn in Hn1.
+  apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  do 2 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  do 3 apply Nat.succ_le_mono in Hn1.
+  apply Nat.le_1_r in Hn1.
+  now destruct Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  destruct n; [ cbn in Hn2; flia Hn2 | ].
+  do 3 (destruct n; [ easy | ]).
+  do 8 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  do 4 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
+  do 7 (destruct n; [ easy | ]).
+  do 16 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  do 11 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
+  clear Hn2.
+  do 15 (destruct n; [ easy | ]).
+  do 32 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+destruct m. {
+  cbn in Hn1.
+  do 26 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
+  clear Hn2.
+  do 31 (destruct n; [ easy | ]).
+  do 64 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+Theorem glop :
+  ∀ m n,
+  7 + m + S n ≤ 2 ^ (7 + m)
+  → 2 ^ (7 + m) < 2 * (7 + m + S n)
+  → snd (rank_fst_loop ((8 + m + n) * 2) 1 1 ((8 + m + n) * 2)) =
+    2 ^ (8 + m).
+Proof.
+Admitted.
+now apply glop.
+...
+destruct m. {
+  cbn in Hn1.
+  do 57 (destruct n; [ cbn in Hn2; flia Hn2 | ]).
+  clear Hn2.
+  do 63 (destruct n; [ easy | ]).
+  do 128 apply Nat.succ_le_mono in Hn1.
+  now apply Nat.le_0_r in Hn1; subst n.
+}
+Theorem glop :
+  ∀ m n,
+  8 + m + S n ≤ 2 ^ (8 + m)
+  → 2 ^ (8 + m) < 2 * (8 + m + S n)
+  → snd (rank_fst_loop ((9 + m + n) * 2) 1 1 ((9 + m + n) * 2)) =
+    2 ^ (9 + m).
+Proof.
+intros * Hn1 Hn2.
+Admitted.
+now apply glop.
 ...
 destruct n. {
+  rewrite Nat.add_0_r.
+  remember (S m * 2) as x eqn:Hx.
+  cbn in  Hx; subst x.
+  remember (S (m * 2)) as x eqn:Hx.
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite snd_if, snd_let.
+  rewrite Nat.div_small; [ | subst x; flia ].
+  rewrite Nat.mod_small; [ | subst x; flia ].
+  cbn - [ "/" "mod" "^" ].
+  subst x.
+Search (rank_fst_loop _ _ (2 * _)).
+...
   destruct m; [ easy | ].
+cbn.
   destruct m; [ easy | ].
   destruct m; [ easy | ].
 cbn.
