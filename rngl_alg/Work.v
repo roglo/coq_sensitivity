@@ -4315,29 +4315,60 @@ Proof.
 intros * Hmn.
 revert m Hmn.
 induction n; intros; [ easy | ].
-rewrite <- Nat.add_succ_comm.
-apply (Nat.add_lt_mono_r _ _ m) in Hmn.
-rewrite Nat.sub_add in Hmn. 2: {
-  destruct m; [ easy | ].
-  rewrite Nat_sub_succ_1.
-  now apply Nat.pow_gt_lin_r.
-}
-...
-rewrite IHn. 2: {
+(**)
+cbn - [ "*" ].
+rewrite snd_if, snd_let.
+cbn - [ "*" ].
+remember (2 ^ m / (m + S n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. 2: {
+  apply Nat.eqb_neq in Hn1.
+  apply Nat_neq_div_1 in Hn1.
+  destruct Hn1 as [Hn1| Hn1]. 2: {
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite <- Nat.add_succ_comm.
+    rewrite <- Nat.pow_succ_r'.
+    apply IHn.
+    rewrite Nat_sub_succ_1.
+    apply (Nat.add_lt_mono_r _ _ (S m)).
+    rewrite Nat.sub_add; [ | now apply Nat.pow_gt_lin_r ].
+    now rewrite Nat.add_comm, Nat.add_succ_comm.
+  }
   apply (Nat.add_lt_mono_r _ _ m) in Hmn.
   rewrite Nat.sub_add in Hmn. 2: {
     destruct m; [ easy | ].
     rewrite Nat_sub_succ_1.
     now apply Nat.pow_gt_lin_r.
   }
-  rewrite Nat_sub_succ_1.
-  apply (Nat.add_lt_mono_r _ _ (S m)).
-  rewrite Nat.sub_add. 2: {
-    now apply Nat.pow_gt_lin_r.
+  rewrite Nat.pow_sub_r in Hmn; [ | easy | ]. 2: {
+    destruct m; [ cbn in Hn1; flia Hn1 | flia ].
   }
-  rewrite <- Nat.add_succ_comm.
-  eapply le_lt_trans; [ | apply Hmn ].
-(* shit *)
+  rewrite Nat.pow_1_r in Hmn.
+  rewrite (Nat_mod_less_small 1). 2: {
+    rewrite Nat.mul_1_l.
+    split. {
+      eapply Nat.le_trans; [ | apply Hn1 ].
+      flia.
+    }
+    rewrite (Nat.add_comm m).
+    eapply le_lt_trans. 2: {
+      apply (Nat.mul_lt_mono_pos_l 2) in Hmn; [ | easy ].
+      apply Hmn.
+    }
+    destruct m; [ cbn in Hn1; flia Hn1 | ].
+    rewrite Nat.pow_succ_r'.
+    rewrite (Nat.mul_comm _ (2 ^ m)), Nat.div_mul; [ | easy ].
+    now rewrite Nat.mul_comm.
+  }
+  exfalso.
+  apply Nat.nle_gt in Hmn.
+  apply Hmn; clear Hmn.
+  rewrite Nat.add_comm in Hn1.
+  now apply Nat.div_le_lower_bound.
+}
+apply Nat.eqb_eq in Hn1.
+apply Nat_eq_div_1 in Hn1.
+(* mouais... faut voir... *)
 ... ...
 now apply (glop 7).
 (* essayer avec les itérations prédédentes *)
