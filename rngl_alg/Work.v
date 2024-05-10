@@ -2594,6 +2594,7 @@ Fixpoint rank_fst_loop it k a b :=
         (S r, a')
   end.
 
+(* rank starting at 0 for the first binary digit of a/b with a<b *)
 Definition rank_fst_0 a b := fst (rank_fst_loop b 0 a b).
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
@@ -2784,7 +2785,7 @@ rewrite Nat.mul_mod_distr_l; [ | easy | easy ].
 apply IHit.
 Qed.
 
-(* to be completed
+(*
 Theorem rank_fst_1_1_pow2_lemma :
   ∀ it m n,
   m ≤ n
@@ -2798,6 +2799,9 @@ revert m it Hmn Hit.
 induction n; intros. {
   apply Nat.le_0_r in Hmn; subst m.
   cbn in Hit |-*.
+  destruct it; [ easy | cbn ].
+...
+  rewrite fst_let; cbn.
   now destruct it.
 }
 destruct m. {
@@ -2839,10 +2843,23 @@ rewrite Nat.pow_succ_r'.
 rewrite (Nat.pow_succ_r' 2 n).
 now rewrite fst_rank_fst_loop_mul_diag.
 Qed.
+*)
 
+(* to be completed
 Theorem rank_fst_1_1_pow2 : ∀ n, rank_fst_1 1 (2 ^ n) = n.
 Proof.
 intros.
+Compute (map (λ n,
+  rank_fst_1 1 (2 ^ n) = n
+) (seq 0 20)).
+Compute (map (λ n,
+pair
+  (rank_fst_1 1 n) (old_rank_fst_1 1 n)
+) (seq 0 20)).
+Compute (map (λ n,
+  rank_fst_1 1 n = Nat.log2_up n - 1
+) (seq 0 20)).
+...
 progress unfold rank_fst_1.
 specialize rank_fst_1_1_pow2_lemma as H1.
 replace 2 with (2 ^ 1) at 2 by easy.
