@@ -2567,13 +2567,30 @@ Fixpoint binary_div n a b :=
   | S n' => a / b :: binary_div n' (2 * (a mod b)) b
   end.
 
-Fixpoint rank_fst_loop it k a b :=
+Fixpoint old_rank_fst_loop it k a b :=
   match it with
   | 0 => (0, 0)
   | S it' =>
       if a / b =? k then (0, a)
       else
-        let (r, a') := rank_fst_loop it' k (2 * (a mod b)) b in
+        let (r, a') := old_rank_fst_loop it' k (2 * (a mod b)) b in
+        (S r, a')
+  end.
+
+Definition old_rank_fst_0 a b := fst (old_rank_fst_loop b 0 a b).
+Definition old_rank_fst_1 a b := fst (old_rank_fst_loop b 1 a b).
+Definition old_fst_1_len a b :=
+  fst (old_rank_fst_loop b 0 (snd (old_rank_fst_loop b 1 a b)) b).
+
+(* work only if a < b *)
+(* "a" recursively remains less than "b" *)
+Fixpoint rank_fst_loop it k a b :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      if 2 * a / b =? k then (0, a)
+      else
+        let (r, a') := rank_fst_loop it' k ((2 * a) mod b) b in
         (S r, a')
   end.
 
@@ -2581,24 +2598,6 @@ Definition rank_fst_0 a b := fst (rank_fst_loop b 0 a b).
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
-
-(* equal to rank_fst_loop it k a b, but only if a < b *)
-(* has the advantage to rank_fst_loop that "a" recursively remains
-   less than "b" *)
-Fixpoint rank_fst_loop' it k a b :=
-  match it with
-  | 0 => (0, 0)
-  | S it' =>
-      if 2 * a / b =? k then (0, a)
-      else
-        let (r, a') := rank_fst_loop' it' k ((2 * a) mod b) b in
-        (S r, a')
-  end.
-
-Definition rank_fst_0' a b := fst (rank_fst_loop' b 0 a b).
-Definition rank_fst_1' a b := fst (rank_fst_loop' b 1 a b).
-Definition fst_1_len' a b :=
-  fst (rank_fst_loop' b 0 (snd (rank_fst_loop' b 1 a b)) b).
 (*
 Compute (map (λ n,
   let a := 10 in
@@ -2626,9 +2625,11 @@ Compute (binary_div 20 1 12).
 Compute (map (λ b,
   let a := 10 in
   if a <? b then
-    fst_1_len a b = fst_1_len' a b
-  else True
+Nat.eqb
+    (fst_1_len a b) (old_fst_1_len a b)
+  else true
 ) (seq 0 100)).
+(* ok *)
 *)
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
@@ -2644,6 +2645,31 @@ Compute
   (map (λ n, (inv_ub_num n, 2 ^ inv_ub_den_pow2 n / n + 1)) (seq 1 50)).
 *)
 
+Theorem fst_let :
+  ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
+  fst (let (b, c) := a in (f b, g c)) = f (fst a).
+Proof. now intros; destruct a. Qed.
+
+Theorem fst_if :
+  ∀ B C (a : bool) (b c : B * C),
+  fst (if a then b else c) = if a then fst b else fst c.
+Proof. now intros; destruct a. Qed.
+
+Theorem S_if :
+  ∀ (a : bool) b c,
+  S (if a then b else c) = if a then S b else S c.
+Proof. now intros; destruct a. Qed.
+
+Theorem snd_let :
+  ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
+  snd (let (b, c) := a in (f b, g c)) = g (snd a).
+Proof. now intros; destruct a. Qed.
+
+Theorem snd_if :
+  ∀ B C (a : bool) (b c : B * C),
+  snd (if a then b else c) = if a then snd b else snd c.
+Proof. now intros; destruct a. Qed.
+
 Theorem fold_rank_fst_0 :
   ∀ a b, fst (rank_fst_loop b 0 a b) = rank_fst_0 a b.
 Proof. easy. Qed.
@@ -2655,27 +2681,28 @@ Proof. easy. Qed.
 Theorem fst_rank_fst_loop_succ :
   ∀ it k a b,
   fst (rank_fst_loop (S it) k a b) =
-    if a / b =? k then 0
-    else S (fst (rank_fst_loop it k ( 2 * (a mod b)) b)).
+    if 2 * a / b =? k then 0
+    else S (fst (rank_fst_loop it k ((2 * a) mod b) b)).
 Proof.
 intros.
-cbn.
-destruct (a / b =? k); [ easy | ].
-now destruct (rank_fst_loop _ _ _ _).
+cbn - [ "*" ].
+rewrite fst_if, fst_let.
+now destruct (2 * a / b =? k).
 Qed.
 
 Theorem snd_rank_fst_loop_succ :
   ∀ it k a b,
   snd (rank_fst_loop (S it) k a b) =
-    if a / b =? k then a
-    else snd (rank_fst_loop it k (2 * (a mod b)) b).
+    if 2 * a / b =? k then a
+    else snd (rank_fst_loop it k ((2 * a) mod b) b).
 Proof.
 intros.
-cbn.
-destruct (a / b =? k); [ easy | ].
-now destruct (rank_fst_loop _ _ _ _).
+cbn - [ "*" ].
+rewrite snd_if, snd_let.
+now destruct (2 * a / b =? k).
 Qed.
 
+(* to be completed
 Theorem rank_fst_1_succ_r :
   ∀ a b,
   rank_fst_1 a (S b) =
@@ -2725,31 +2752,6 @@ apply Nat_div_less_small_iff; [ easy | ].
 split; [ | easy ].
 now rewrite Nat.mul_1_l.
 Qed.
-
-Theorem fst_let :
-  ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
-  fst (let (b, c) := a in (f b, g c)) = f (fst a).
-Proof. now intros; destruct a. Qed.
-
-Theorem fst_if :
-  ∀ B C (a : bool) (b c : B * C),
-  fst (if a then b else c) = if a then fst b else fst c.
-Proof. now intros; destruct a. Qed.
-
-Theorem S_if :
-  ∀ (a : bool) b c,
-  S (if a then b else c) = if a then S b else S c.
-Proof. now intros; destruct a. Qed.
-
-Theorem snd_let :
-  ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
-  snd (let (b, c) := a in (f b, g c)) = g (snd a).
-Proof. now intros; destruct a. Qed.
-
-Theorem snd_if :
-  ∀ B C (a : bool) (b c : B * C),
-  snd (if a then b else c) = if a then snd b else snd c.
-Proof. now intros; destruct a. Qed.
 
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
@@ -3884,6 +3886,7 @@ split; intros H1. {
   now apply Nat.div_small_iff.
 }
 Qed.
+*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
