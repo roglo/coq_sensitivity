@@ -2752,7 +2752,6 @@ split; [ | easy ].
 now rewrite Nat.mul_1_l.
 Qed.
 
-(* to be completed
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
   c ≠ 0
@@ -2782,12 +2781,10 @@ destruct (2 * a / b =? k); [ easy | ].
 do 2 rewrite fst_let.
 f_equal.
 rewrite Nat.mul_mod_distr_l; [ | easy | easy ].
-...
-rewrite Nat.mul_assoc, (Nat.mul_comm 2).
-rewrite <- Nat.mul_assoc.
 apply IHit.
 Qed.
 
+(* to be completed
 Theorem rank_fst_1_1_pow2_lemma :
   ∀ it m n,
   m ≤ n
