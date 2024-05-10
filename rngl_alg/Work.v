@@ -2776,11 +2776,13 @@ destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
 revert a.
 induction it; intros; [ easy | ].
 cbn - [ "*" ].
+rewrite Nat.mul_assoc, (Nat.mul_comm 2), <- Nat.mul_assoc.
 rewrite Nat.div_mul_cancel_l; [ | easy | easy ].
-destruct (a / b =? k); [ easy | ].
+destruct (2 * a / b =? k); [ easy | ].
 do 2 rewrite fst_let.
 f_equal.
 rewrite Nat.mul_mod_distr_l; [ | easy | easy ].
+...
 rewrite Nat.mul_assoc, (Nat.mul_comm 2).
 rewrite <- Nat.mul_assoc.
 apply IHit.
