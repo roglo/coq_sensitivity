@@ -2582,7 +2582,6 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 
-(*
 (* equal to rank_fst_loop it k a b, but only if a < b *)
 (* has the advantage to rank_fst_loop that "a" recursively remains
    less than "b" *)
@@ -2596,7 +2595,9 @@ Fixpoint rank_fst_loop' it k a b :=
         (S r, a')
   end.
 
+Definition rank_fst_0' a b := fst (rank_fst_loop' b 0 a b).
 Definition rank_fst_1' a b := fst (rank_fst_loop' b 1 a b).
+(*
 Compute (map (λ n,
   let a := 10 in
   if a <? n then
@@ -2604,6 +2605,22 @@ Compute (map (λ n,
   else True
 ) (seq 0 200)).
 (* seems ok *)
+Compute (map (λ b,
+  let a := 10 in
+  if a <? b then
+    snd (rank_fst_loop  b 1 a b) = snd (rank_fst_loop' b 1 a b)
+  else True
+) (seq 0 100)).
+(* not ok, half, but normal *)
+Compute (map (λ b,
+  let a := 10 in
+  if a <? b then
+    fst (rank_fst_loop b 0 a b) = fst (rank_fst_loop' b 0 a b)
+  else True
+) (seq 0 100)).
+(* not ok *)
+(* pourquoi ça marche pas ? *)
+Compute (binary_div 20 1 12).
 *)
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
