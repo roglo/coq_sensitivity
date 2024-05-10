@@ -2989,9 +2989,17 @@ rewrite <- Nat.add_succ_comm.
 rewrite IHn. 2: {
   rewrite Nat.pow_succ_r'.
   apply (Nat.add_lt_mono_r _ _ m) in Hmn.
+  apply (Nat.add_lt_mono_r _ _ (S m)).
   rewrite Nat.sub_add in Hmn. 2: {
-  apply (le_trans _ _ (S m)).
-Search (_ < _ ^ _).
+    apply (le_trans _ (S m)); [ | now apply Nat.pow_gt_lin_r ].
+    apply Nat.le_succ_diag_r.
+  }
+  rewrite Nat.sub_add. 2: {
+    apply (le_trans _ (2 ^ m)); [ now apply Nat.pow_gt_lin_r | ].
+    rewrite <- Nat_add_diag.
+    apply Nat.le_add_r.
+  }
+  (* ah bin non c'est faux *)
 ...
 Search (_ ≤ _ ^ _).
     apply Nat.pow_gt_lin_r.
