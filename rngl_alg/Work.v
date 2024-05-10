@@ -2858,9 +2858,149 @@ Compute (map (λ n,
 Theorem fst_rank_fst_loop_twice :
   ∀ n, 1 < n → rank_fst_1 1 (2 * n) = S (rank_fst_1 1 n).
 Proof.
-intros * H1n.
-induction n; [ easy | ].
-cbn - [ "*" ].
+intros * Hn.
+progress unfold rank_fst_1.
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" ].
+rewrite Nat.mul_1_r.
+remember (2 / S n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  apply Nat.succ_le_mono in Hn1.
+  apply Nat.le_1_r in Hn1.
+  now destruct Hn1; subst n.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" ].
+progress replace (2 * 2) with 4 by easy.
+remember (4 / S (S n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  destruct n; [ easy | clear Hn ].
+  do 3 apply Nat.succ_le_mono in Hn1.
+  apply Nat.le_1_r in Hn1.
+  now destruct Hn1; subst n.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+do 2 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(*
+Theorem glop :
+  ∀ m n,
+  2 < n
+  → fst (rank_fst_loop (2 * (m + n)) 1 1 (2 * (m + n))) =
+    S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Proof.
+Admitted.
+now apply (glop 2).
+...
+*)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" ].
+progress replace (2 * 4) with 8 by easy.
+remember (8 / S (S (S n)) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  destruct n; [ easy | clear Hn ].
+  destruct n; [ flia Hn2 | clear Hn2 ].
+  do 4 (destruct n; [ easy | ]).
+  now do 8 apply Nat.succ_le_mono in Hn1.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+do 3 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(*
+Theorem glop :
+  ∀ m n,
+  2 ^ m - m < n
+  → fst (rank_fst_loop (2 * (m + n)) 1 1 (2 * (m + n))) =
+    S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Proof.
+Admitted.
+now apply (glop 3).
+...
+*)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" ].
+progress replace (2 * 8) with 16 by easy.
+remember (16 / S (S (S (S n))) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  do 5 (destruct n; [ flia Hn | ]).
+  clear Hn.
+  do 9 apply Nat.succ_le_mono in Hn1.
+  do 8 (destruct n; [ easy | ]).
+  do 7 apply Nat.succ_le_mono in Hn1.
+  flia Hn1.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1.
+destruct Hn1 as [Hn1| Hn1]; [ flia Hn Hn1 | ].
+rewrite Nat.mod_small; [ | easy ].
+do 4 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+Theorem glop :
+  ∀ m n,
+  2 ^ m - m < n
+  → fst (rank_fst_loop (2 * (m + n)) 1 1 (2 * (m + n))) =
+    S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
+Proof.
+intros * Hmn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+rewrite <- Nat.add_succ_comm.
+rewrite IHn. 2: {
+  rewrite Nat.pow_succ_r'.
+  apply (Nat.add_lt_mono_r _ _ m) in Hmn.
+  rewrite Nat.sub_add in Hmn. 2: {
+  apply (le_trans _ _ (S m)).
+Search (_ < _ ^ _).
+...
+Search (_ ≤ _ ^ _).
+    apply Nat.pow_gt_lin_r.
+... ...
+now apply (glop 4).
+...
+m = 4     12   2^m-m
+m = 3     5    2^m-m
+m = 2     2    2^m-m
 ...
 progress unfold rank_fst_1.
 destruct n; [ easy | ].
