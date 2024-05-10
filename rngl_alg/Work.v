@@ -2589,7 +2589,7 @@ Fixpoint rank_fst_loop' it k a b :=
   match it with
   | 0 => (0, 0)
   | S it' =>
-      if 2 * a / b =? k then (1, a)
+      if 2 * a / b =? k then (0, a)
       else
         let (r, a') := rank_fst_loop' it' k ((2 * a) mod b) b in
         (S r, a')
@@ -2597,6 +2597,8 @@ Fixpoint rank_fst_loop' it k a b :=
 
 Definition rank_fst_0' a b := fst (rank_fst_loop' b 0 a b).
 Definition rank_fst_1' a b := fst (rank_fst_loop' b 1 a b).
+Definition fst_1_len' a b :=
+  fst (rank_fst_loop' b 0 (snd (rank_fst_loop' b 1 a b)) b).
 (*
 Compute (map (λ n,
   let a := 10 in
@@ -2621,6 +2623,12 @@ Compute (map (λ b,
 (* not ok *)
 (* pourquoi ça marche pas ? *)
 Compute (binary_div 20 1 12).
+Compute (map (λ b,
+  let a := 10 in
+  if a <? b then
+    fst_1_len a b = fst_1_len' a b
+  else True
+) (seq 0 100)).
 *)
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
