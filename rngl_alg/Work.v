@@ -2800,8 +2800,8 @@ induction n; intros. {
   apply Nat.le_0_r in Hmn; subst m.
   cbn in Hit |-*.
   destruct it; [ easy | cbn ].
-...
   rewrite fst_let; cbn.
+...
   now destruct it.
 }
 destruct m. {
@@ -2846,21 +2846,28 @@ Qed.
 *)
 
 (* to be completed
-Theorem rank_fst_1_1_pow2 : ∀ n, rank_fst_1 1 (2 ^ n) = n.
+Theorem rank_fst_1_1_pow2 : ∀ n, rank_fst_1 1 (2 ^ S n) = n.
 Proof.
 intros.
+(**)
+rewrite Nat.pow_succ_r'.
 Compute (map (λ n,
-  rank_fst_1 1 (2 ^ n) = n
+  rank_fst_1 1 (2 * n) =
+  S (rank_fst_1 1 n)
 ) (seq 0 20)).
-Compute (map (λ n,
-pair
-  (rank_fst_1 1 n) (old_rank_fst_1 1 n)
-) (seq 0 20)).
-Compute (map (λ n,
-  rank_fst_1 1 n = Nat.log2_up n - 1
-) (seq 0 20)).
+Theorem fst_rank_fst_loop_twice :
+  ∀ n, 1 < n → rank_fst_1 1 (2 * n) = S (rank_fst_1 1 n).
+Proof.
+intros * H1n.
+induction n; [ easy | ].
+cbn - [ "*" ].
 ...
 progress unfold rank_fst_1.
+destruct n; [ easy | ].
+Search (rank_fst_1 _ (2 * _)).
+...
+destruct n; [ easy | ].
+...
 specialize rank_fst_1_1_pow2_lemma as H1.
 replace 2 with (2 ^ 1) at 2 by easy.
 apply (H1 (2 ^ n) 0 n); [ easy | ].
