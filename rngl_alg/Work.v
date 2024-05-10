@@ -2702,12 +2702,11 @@ rewrite snd_if, snd_let.
 now destruct (2 * a / b =? k).
 Qed.
 
-(* to be completed
 Theorem rank_fst_1_succ_r :
   ∀ a b,
   rank_fst_1 a (S b) =
-    if a / S b =? 1 then 0
-    else S (fst (rank_fst_loop b 1 (2 * (a mod S b)) (S b))).
+    if 2 * a / S b =? 1 then 0
+    else S (fst (rank_fst_loop b 1 ((2 * a) mod S b) (S b))).
 Proof.
 intros.
 progress unfold rank_fst_1.
@@ -2753,6 +2752,7 @@ split; [ | easy ].
 now rewrite Nat.mul_1_l.
 Qed.
 
+(* to be completed
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
   c ≠ 0
