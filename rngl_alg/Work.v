@@ -2582,6 +2582,30 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 
+(*
+(* equal to rank_fst_loop it k a b, but only if a < b *)
+(* has the advantage to rank_fst_loop that "a" recursively remains
+   less than "b" *)
+Fixpoint rank_fst_loop' it k a b :=
+  match it with
+  | 0 => (0, 0)
+  | S it' =>
+      if 2 * a / b =? k then (1, a)
+      else
+        let (r, a') := rank_fst_loop' it' k ((2 * a) mod b) b in
+        (S r, a')
+  end.
+
+Definition rank_fst_1' a b := fst (rank_fst_loop' b 1 a b).
+Compute (map (λ n,
+  let a := 10 in
+  if a <? n then
+    rank_fst_1 a n = rank_fst_1' a n
+  else True
+) (seq 0 200)).
+(* seems ok *)
+*)
+
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
 Definition inv_ub_den_pow2 n := rank_fst_1 1 n + fst_1_len 1 n.
 
@@ -4375,6 +4399,17 @@ rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm.
 clear IHn.
 (**)
+Compute (map (λ n,
+  let m := 1 in
+if m + S n <=? 2 ^m then
+  if 2 ^ m <? 2 * (m + S n) then
+  snd (rank_fst_loop ((S m + n) * 2) 1 1 ((S m + n) * 2)) = 2 ^ S m
+  else 6 = 6
+else (7 = 7)
+) (seq 0 70)).
+(* ok *)
+Print rank_fst_loop.
+...
 revert n Hn1 Hn2.
 induction m; intros. {
   cbn in Hn1.
@@ -4382,6 +4417,11 @@ induction m; intros. {
   now apply Nat.le_0_r in Hn1; subst n.
 }
 rewrite Nat.add_succ_comm.
+...
+specialize (IHm (S n)) as H1.
+rewrite Nat.add_succ_comm in Hn1.
+specialize (H1 Hn1).
+...
 rewrite (IHm (S n)).
 (* caca *)
 ... si ça marche pas, reprendre ici
