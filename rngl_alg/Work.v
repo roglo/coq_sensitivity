@@ -2986,7 +2986,11 @@ intros * Hmn.
 revert m Hmn.
 induction n; intros; [ easy | ].
 rewrite <- Nat.add_succ_comm.
+destruct m. {
+  admit.
+}
 rewrite IHn. 2: {
+...
   rewrite Nat.pow_succ_r'.
   apply (Nat.add_lt_mono_r _ _ m) in Hmn.
   apply (Nat.add_lt_mono_r _ _ (S m)).
