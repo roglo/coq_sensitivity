@@ -2845,11 +2845,97 @@ now rewrite fst_rank_fst_loop_mul_diag.
 Qed.
 *)
 
+Theorem Nat_eq_log2 :
+  ∀ a n, a ≠ 0 ∧ Nat.log2 a = n ↔ 2 ^ n ≤ a < 2 ^ (n + 1).
+Proof.
+intros.
+split. {
+  intros (Haz, Han).
+  apply Nat.neq_0_lt_0 in Haz.
+  specialize (Nat.log2_spec a Haz) as H1.
+  now rewrite Han, <- (Nat.add_1_r n) in H1.
+} {
+  intros Ha.
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  split; [ flia Ha H1 | ].
+  apply Nat.le_antisymm. 2: {
+    rewrite <- (Nat.log2_pow2 n); [ | easy ].
+    now apply Nat.log2_le_mono.
+  }
+  apply Nat.lt_succ_r.
+  apply (Nat.pow_lt_mono_r_iff 2); [ easy | ].
+  rewrite <- (Nat.add_1_r n).
+  eapply lt_le_trans; [ | apply Ha ].
+  apply Nat.lt_succ_r.
+  apply Nat.log2_spec.
+  flia Ha H1.
+}
+Qed.
+
+Theorem Nat_eq_log2_up_succ :
+  ∀ a n, Nat.log2_up a = S n ↔ S (2 ^ n) ≤ a ≤ 2 ^ S n.
+Proof.
+intros.
+split; intros Ha. {
+  destruct a; [ easy | ].
+  destruct a; [ easy | ].
+  cbn in Ha.
+  apply Nat.succ_inj in Ha.
+  specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
+  rewrite Ha in H1.
+  cbn - [ "^" ] in H1.
+  rewrite Nat.add_1_r in H1.
+  flia H1.
+}
+progress unfold Nat.log2_up.
+remember (1 ?= a) as a1 eqn:Ha1.
+symmetry in Ha1.
+destruct a1. {
+  apply Nat.compare_eq in Ha1; subst a.
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
+  flia Ha H1.
+} {
+  f_equal.
+  apply Nat.compare_lt_iff in Ha1.
+  destruct a; [ easy | cbn ].
+  clear Ha1.
+  apply Nat_eq_log2.
+  rewrite Nat.add_1_r.
+  flia Ha.
+} {
+  apply Nat.compare_gt_iff in Ha1.
+  now apply Nat.lt_1_r in Ha1; subst a.
+}
+Qed.
+
+Theorem Nat_eq_log2_up :
+  ∀ a n, a ≠ 0 →
+  Nat.log2_up a = n ↔ 2 ^ n / 2 < a ≤ 2 ^ n.
+Proof.
+intros * Haz.
+destruct n. {
+  apply Nat.neq_0_lt_0 in Haz.
+  specialize (Nat.log2_up_null a) as H1; cbn.
+  split; intros Ha; [ | now apply H1 ].
+  split; [ easy | apply H1, Ha ].
+}
+rewrite Nat.pow_succ_r' at 1.
+rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+apply Nat_eq_log2_up_succ.
+Qed.
+
 (* to be completed
 Theorem rank_fst_1_1_pow2 : ∀ n, rank_fst_1 1 (2 ^ S n) = n.
 Proof.
 intros.
-(**)
+(*
+Compute (map (λ n,
+  rank_fst_1 1 (2 ^ S n) = n
+) (seq 0 10)).
+...
+ok *)
+Search rank_fst_1.
+...
 rewrite Nat.pow_succ_r'.
 Compute (map (λ n,
   rank_fst_1 1 (2 * n) =
@@ -2983,6 +3069,8 @@ Theorem glop :
     S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
 Proof.
 intros * Hmn.
+Search (rank_fst_loop (2 * _)).
+...
 revert m Hmn.
 induction n; intros; [ easy | ].
 rewrite <- Nat.add_succ_comm.
@@ -3221,6 +3309,12 @@ Theorem fst_rank_fst_loop_eq_succ :
   → fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b)).
 Proof.
 intros * Hzab Hit.
+Compute (map (λ b,
+  let a := 1 in
+  let it := Nat.log2_up b in
+  fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b))
+) (seq 2 20)).
+...
 revert a Hzab.
 induction it; intros. {
   apply Nat.le_0_r in Hit.
@@ -3228,8 +3322,14 @@ induction it; intros. {
   flia Hit Hzab.
 }
 cbn - [ "*" ].
-remember (a / b =? 1) as ab eqn:Hab.
+remember (2 * a / b =? 1) as ab eqn:Hab.
 symmetry in Hab.
+destruct ab. {
+  apply Nat.eqb_eq in Hab.
+  apply Nat_eq_div_1 in Hab.
+...
+  exfalso.
+...
 destruct ab; [ now rewrite Nat.div_small in Hab | ].
 rewrite fst_let; f_equal.
 remember (2 * a / b =? 1) as ab2 eqn:Hab2.
@@ -3263,84 +3363,7 @@ rewrite Nat.pow_1_r in H1.
 apply H1.
 Qed.
 
-Theorem Nat_eq_log2 :
-  ∀ a n, a ≠ 0 ∧ Nat.log2 a = n ↔ 2 ^ n ≤ a < 2 ^ (n + 1).
-Proof.
-intros.
-split. {
-  intros (Haz, Han).
-  apply Nat.neq_0_lt_0 in Haz.
-  specialize (Nat.log2_spec a Haz) as H1.
-  now rewrite Han, <- (Nat.add_1_r n) in H1.
-} {
-  intros Ha.
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
-  split; [ flia Ha H1 | ].
-  apply Nat.le_antisymm. 2: {
-    rewrite <- (Nat.log2_pow2 n); [ | easy ].
-    now apply Nat.log2_le_mono.
-  }
-  apply Nat.lt_succ_r.
-  apply (Nat.pow_lt_mono_r_iff 2); [ easy | ].
-  rewrite <- (Nat.add_1_r n).
-  eapply lt_le_trans; [ | apply Ha ].
-  apply Nat.lt_succ_r.
-  apply Nat.log2_spec.
-  flia Ha H1.
-}
-Qed.
-
-Theorem Nat_eq_log2_up_succ :
-  ∀ a n, Nat.log2_up a = S n ↔ S (2 ^ n) ≤ a ≤ 2 ^ S n.
-Proof.
-intros.
-split; intros Ha. {
-  destruct a; [ easy | ].
-  destruct a; [ easy | ].
-  cbn in Ha.
-  apply Nat.succ_inj in Ha.
-  specialize (Nat.log2_iter_spec a 0 1 0 eq_refl (Nat.lt_0_succ _)) as H1.
-  rewrite Ha in H1.
-  cbn - [ "^" ] in H1.
-  rewrite Nat.add_1_r in H1.
-  flia H1.
-}
-progress unfold Nat.log2_up.
-remember (1 ?= a) as a1 eqn:Ha1.
-symmetry in Ha1.
-destruct a1. {
-  apply Nat.compare_eq in Ha1; subst a.
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H1.
-  flia Ha H1.
-} {
-  f_equal.
-  apply Nat.compare_lt_iff in Ha1.
-  destruct a; [ easy | cbn ].
-  clear Ha1.
-  apply Nat_eq_log2.
-  rewrite Nat.add_1_r.
-  flia Ha.
-} {
-  apply Nat.compare_gt_iff in Ha1.
-  now apply Nat.lt_1_r in Ha1; subst a.
-}
-Qed.
-
-Theorem Nat_eq_log2_up :
-  ∀ a n, a ≠ 0 →
-  Nat.log2_up a = n ↔ 2 ^ n / 2 < a ≤ 2 ^ n.
-Proof.
-intros * Haz.
-destruct n. {
-  apply Nat.neq_0_lt_0 in Haz.
-  specialize (Nat.log2_up_null a) as H1; cbn.
-  split; intros Ha; [ | now apply H1 ].
-  split; [ easy | apply H1, Ha ].
-}
-rewrite Nat.pow_succ_r' at 1.
-rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
-apply Nat_eq_log2_up_succ.
-Qed.
+...
 
 Theorem fst_rank_fst_loop_pow2_mul :
   ∀ p m a b it,
