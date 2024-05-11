@@ -2986,20 +2986,44 @@ intros * Hmn.
 revert m Hmn.
 induction n; intros; [ easy | ].
 rewrite <- Nat.add_succ_comm.
-destruct m. {
-  admit.
-}
-rewrite IHn. 2: {
-...
-  rewrite Nat.pow_succ_r'.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite <- Nat.pow_succ_r'.
+remember (2 ^ S m / S (m + n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat_eq_div_1 in Hn1.
+  destruct Hn1 as (Hn1, Hn2).
+  rewrite Nat.pow_succ_r' in Hn1, Hn2.
   apply (Nat.add_lt_mono_r _ _ m) in Hmn.
-  apply (Nat.add_lt_mono_r _ _ (S m)).
   rewrite Nat.sub_add in Hmn. 2: {
     apply (le_trans _ (S m)); [ | now apply Nat.pow_gt_lin_r ].
     apply Nat.le_succ_diag_r.
   }
+  rewrite Nat.mul_comm.
+...
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite Nat.mul_comm.
+  cbn - [ "/" "mod" "^" ].
+  rewrite 
+  rewrite Nat_add_diag.
+...
+destruct m. {
+  cbn - [ "*" "/" "mod" ].
+...
+}
+rewrite IHn. 2: {
+  rewrite Nat.pow_succ_r'.
+  apply (Nat.add_lt_mono_r _ _ (S m)) in Hmn.
+  apply (Nat.add_lt_mono_r _ _ (S (S m))).
+  rewrite Nat.sub_add in Hmn. 2: {
+    apply (le_trans _ (S (S m))); [ | now apply Nat.pow_gt_lin_r ].
+    apply Nat.le_succ_diag_r.
+  }
   rewrite Nat.sub_add. 2: {
-    apply (le_trans _ (2 ^ m)); [ now apply Nat.pow_gt_lin_r | ].
+    apply (le_trans _ (2 ^ S m)); [ now apply Nat.pow_gt_lin_r | ].
     rewrite <- Nat_add_diag.
     apply Nat.le_add_r.
   }
