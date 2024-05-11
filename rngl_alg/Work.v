@@ -2993,6 +2993,7 @@ rewrite <- Nat.pow_succ_r'.
 remember (2 ^ S m / S (m + n) =? 1) as n1 eqn:Hn1.
 symmetry in Hn1.
 destruct n1. {
+  rewrite Nat.add_0_r.
   apply Nat.eqb_eq in Hn1.
   apply Nat_eq_div_1 in Hn1.
   destruct Hn1 as (Hn1, Hn2).
@@ -3003,6 +3004,51 @@ destruct n1. {
     apply Nat.le_succ_diag_r.
   }
   rewrite Nat.mul_comm.
+  cbn - [ "/" "mod" "^" ].
+  rewrite Nat.div_small; [ | flia Hn1 Hn2 ].
+  rewrite Nat.mod_small; [ | flia Hn1 Hn2 ].
+  cbn - [ "/" "mod" "^" ].
+  rewrite fst_let, fst_if, fst_let.
+  cbn - [ "/" "mod" "^" ].
+  remember (4 / _ =? 1) as n3 eqn:Hn3.
+  symmetry in Hn3.
+  destruct n3. {
+    apply Nat.eqb_eq in Hn3.
+    apply Nat_eq_div_1 in Hn3.
+    destruct m; [ easy | exfalso ].
+    destruct Hn3 as (Hn3, Hn4).
+    cbn in Hn3.
+    rewrite Nat.add_succ_r in Hmn.
+    rewrite Nat.add_succ_l in Hmn, Hn1, Hn2, Hn4.
+    rewrite (Nat.add_comm n) in Hmn.
+    destruct m. {
+      cbn in Hmn, Hn1, Hn2, Hn3, Hn4.
+      do 2 apply Nat.succ_lt_mono in Hmn.
+      destruct n; [ easy | flia Hn3 ].
+    }
+    flia Hn3.
+  }
+  apply Nat.eqb_neq in Hn3.
+  apply Nat_neq_div_1 in Hn3.
+  destruct Hn3 as [Hn3| Hn3]. {
+    destruct m. {
+      cbn in Hmn, Hn1, Hn2, Hn3.
+      do 2 apply Nat.succ_lt_mono in Hmn.
+      destruct n; [ | flia Hn3 ].
+      flia Hn2.
+    }
+    flia Hn3.
+  }
+  destruct m. {
+    cbn in Hmn, Hn1, Hn2, Hn3.
+    apply Nat.succ_lt_mono in Hmn.
+    destruct n; [ easy | ].
+    destruct n; [ | flia Hn1 ].
+    flia Hn3.
+  }
+  rewrite Nat.mod_small; [ | easy ].
+  f_equal; f_equal.
+(* ah merde faut réfléchir *)
 ...
   cbn - [ "*" "/" "mod" "^" ].
   rewrite Nat.mul_comm.
