@@ -2976,17 +2976,48 @@ Search (rank_fst_loop _ _ (2 * _)).
 Theorem fst_rank_fst_loop_twice :
   ∀ it k a b,
   k ≤ 1
-  → a < b ≤ it
-  → fst (rank_fst_loop it k (2 * a) b) = S (fst (rank_fst_loop it k a b)).
+  → 2 * a < b ≤ it
+  → fst (rank_fst_loop it k a b) = S (fst (rank_fst_loop it k (2 * a) b)).
 Proof.
 intros * Hk1 Hit.
+(*
+Compute (
+  let a := 1 in
+map (λ b,
+  let it := b in
+  let k := 1 in
+  S (fst (rank_fst_loop it k (2 * a) b)) = fst (rank_fst_loop it k a b)
+) (seq (2 * a + 1) 40)).
+... ok
+*)
 induction it; [ flia Hit | ].
 cbn - [ "*" ].
 remember (2 * (2 * a) / b =? k) as abk2 eqn:Habk2.
 symmetry in Habk2.
 destruct abk2. {
-  exfalso.
   apply Nat.eqb_eq in Habk2.
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. {
+    apply Nat.eqb_eq in Habk.
+    destruct k. {
+      apply Nat.div_small_iff in Habk2; [ | flia Hit ].
+      apply Nat.div_small_iff in Habk; [ | flia Hit ].
+...
+    rewrite <- Habk2 in Habk.
+Search (_ / _ = _ / _).
+...
+    apply (f_equal (Nat.mul b)) in Habk.
+Search (_ * (_ / _)).
+Search (_ / _ * _).
+    rewrite Nat.mul_div in Habk.
+
+    rewrite Nat.mul_comm in Ha
+Search (_ * _ = _ * _).
+apply Nat.
+...
+...
+  exfalso.
   destruct k. {
     apply Nat.div_small_iff in Habk2; [ | flia Hit ].
 (* marche pas *)
