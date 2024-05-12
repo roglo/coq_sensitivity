@@ -2745,11 +2745,6 @@ Theorem Nat_neq_div :
 Proof.
 intros * Hbz.
 split; intros Habk. {
-(*
-  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
-    now right; subst b; rewrite Nat.mul_0_r.
-  }
-*)
   destruct (lt_dec a (k * b)) as [Ha| Ha]; [ now left | right ].
   apply Nat.nlt_ge in Ha.
   apply Nat.nlt_ge.
@@ -2772,6 +2767,28 @@ split; intros Habk. {
   rewrite Nat.mul_1_l in Habk.
   apply Nat.nlt_ge in Habk.
   apply Habk; clear Habk.
+  specialize (Nat.div_mod a b Hbz) as H1.
+  rewrite H1 at 1.
+  rewrite Nat.mul_comm.
+  apply Nat.add_lt_mono_l.
+  now apply Nat.mod_upper_bound.
+}
+Qed.
+... ...
+apply (glop 5).
+...
+  apply Nat.succ_lt_mono in IHa.
+  eapply lt_le_trans; [ apply IHa | ].
+  rewrite <- Nat.add_succ_l.
+  apply Nat.add_le_mono_r.
+  rewrite Nat.mul_comm.
+  eapply le_trans. {
+    apply -> Nat.succ_le_mono.
+    now apply Nat.mul_div_le.
+  }
+Search (_ ≤ _ / _ * _).
+Search (_ * (_ / _) ≤ _).
+Search (_ / _ * _ ≤ _).
 ...
 Compute (map (λ a, map (λ b,
 (b,
