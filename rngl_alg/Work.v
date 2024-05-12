@@ -2739,7 +2739,6 @@ split; intros Hab. {
 }
 Qed.
 
-(* to be completed
 Theorem Nat_neq_div :
   ∀ k a b : nat, b ≠ 0 → a / b ≠ k ↔ a < k * b ∨ S k * b ≤ a.
 Proof.
@@ -2774,41 +2773,13 @@ split; intros Habk. {
   now apply Nat.mod_upper_bound.
 }
 Qed.
-... ...
-apply (glop 5).
-...
-  apply Nat.succ_lt_mono in IHa.
-  eapply lt_le_trans; [ apply IHa | ].
-  rewrite <- Nat.add_succ_l.
-  apply Nat.add_le_mono_r.
-  rewrite Nat.mul_comm.
-  eapply le_trans. {
-    apply -> Nat.succ_le_mono.
-    now apply Nat.mul_div_le.
-  }
-Search (_ ≤ _ / _ * _).
-Search (_ * (_ / _) ≤ _).
-Search (_ / _ * _ ≤ _).
-...
-Compute (map (λ a, map (λ b,
-(b,
-  Nat.ltb a (a / b * b + b)
-)
-) (seq 1 15)) (seq 0 15)).
-...
-Qed.
 
-Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 ↔ a < b ∨ 2 * b ≤ a.
+Theorem Nat_neq_div_1 : ∀ a b, b ≠ 0 → a / b ≠ 1 ↔ a < b ∨ 2 * b ≤ a.
 Proof.
-intros.
-split; intros Hab. {
-  specialize (Nat_neq_div 1 a b Hab) as H1.
-  now rewrite Nat.mul_1_l in H1.
-}
-intros H.
-apply Nat_eq_div_1 in 
+intros * Hbz.
+specialize (Nat_neq_div 1 a b Hbz) as H1.
+now rewrite Nat.mul_1_l in H1.
 Qed.
-*)
 
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
@@ -3051,7 +3022,7 @@ destruct abk2. {
     flia Habk2 Habk.
   }
   apply Nat.eqb_neq in Habk.
-  apply Nat_neq_div_1 in Habk.
+  apply Nat_neq_div_1 in Habk; [ | flia Hit ].
   rewrite fst_let; f_equal.
   cbn - [ "*" ].
   destruct Habk as [Habk| Habk]. {
@@ -3067,8 +3038,7 @@ destruct abk2. {
   flia Hit Habk.
 }
 apply Nat.eqb_neq in Habk2.
-apply Nat_neq_div_1 in Habk2.
-...
+apply Nat_neq_div_1 in Habk2; [ | flia Hit ].
 rewrite fst_if, fst_let, fst_let.
 rewrite Nat.div_small; [ | easy ].
 rewrite Nat.mod_small; [ | easy ].
@@ -3077,10 +3047,12 @@ f_equal.
 destruct Habk2 as [Habk2| Habk2]. {
   rewrite Nat.mod_small; [ | easy ].
   destruct it. {
+    cbn.
     exfalso.
     replace a with 0 in * by flia Hit.
     replace b with 1 in * by flia Hit.
 cbn in Hit, Habk2.
+(* mon cul *)
 ...
 (*
 Compute (map (λ b,
