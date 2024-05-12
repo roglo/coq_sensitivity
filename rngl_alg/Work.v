@@ -2741,11 +2741,10 @@ Qed.
 
 (* to be completed
 Theorem Nat_neq_div :
-  ∀ k a b : nat, a / b ≠ k ∧ b ≠ 0 ↔ a < k * b ∨ S k * b ≤ a.
+  ∀ k a b : nat, b ≠ 0 → a / b ≠ k ↔ a < k * b ∨ S k * b ≤ a.
 Proof.
-intros.
+intros * Hbz.
 split; intros Habk. {
-  destruct Habk as (Habk, Hbz).
 (*
   destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
     now right; subst b; rewrite Nat.mul_0_r.
@@ -2760,24 +2759,19 @@ split; intros Habk. {
   split; [ easy | ].
   now rewrite Nat.add_1_r.
 } {
-  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. 2: {
-    split; [ | easy ].
-    intros Hab.
-    subst k.
-    destruct Habk as [Habk| Habk]. {
-(*
-      destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
-*)
-      apply Nat.nle_gt in Habk.
-      apply Habk.
-      rewrite Nat.mul_comm.
-      now apply Nat.mul_div_le.
-    }
-    rewrite <- Nat.add_1_r in Habk.
-    rewrite Nat.mul_add_distr_r in Habk.
-    rewrite Nat.mul_1_l in Habk.
-    apply Nat.nlt_ge in Habk.
-    apply Habk; clear Habk.
+  intros Hab.
+  subst k.
+  destruct Habk as [Habk| Habk]. {
+    apply Nat.nle_gt in Habk.
+    apply Habk.
+    rewrite Nat.mul_comm.
+    now apply Nat.mul_div_le.
+  }
+  rewrite <- Nat.add_1_r in Habk.
+  rewrite Nat.mul_add_distr_r in Habk.
+  rewrite Nat.mul_1_l in Habk.
+  apply Nat.nlt_ge in Habk.
+  apply Habk; clear Habk.
 ...
 Compute (map (λ a, map (λ b,
 (b,
