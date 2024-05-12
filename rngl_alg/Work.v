@@ -2739,18 +2739,28 @@ split; intros Hab. {
 }
 Qed.
 
-Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → 2 * b ≤ a ∨ a < b.
+Theorem Nat_neq_div :
+  ∀ k a b : nat, a / b ≠ k → a < k * b ∨ S k * b ≤ a.
 Proof.
-intros * Hab.
-destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now left; subst b | ].
-destruct (lt_dec a b) as [Ha| Ha]; [ now right | left ].
+intros * Habk.
+destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+  now right; subst b; rewrite Nat.mul_0_r.
+}
+destruct (lt_dec a (k * b)) as [Ha| Ha]; [ now left | right ].
 apply Nat.nlt_ge in Ha.
 apply Nat.nlt_ge.
 intros H.
-apply Hab; clear Hab.
+apply Habk; clear Habk.
 apply Nat_div_less_small_iff; [ easy | ].
-split; [ | easy ].
-now rewrite Nat.mul_1_l.
+split; [ easy | ].
+now rewrite Nat.add_1_r.
+Qed.
+
+Theorem Nat_neq_div_1 : ∀ a b, a / b ≠ 1 → a < b ∨ 2 * b ≤ a.
+Proof.
+intros * Hab.
+specialize (Nat_neq_div 1 a b Hab) as H1.
+now rewrite Nat.mul_1_l in H1.
 Qed.
 
 Theorem fst_rank_fst_loop_mul_diag :
@@ -2925,6 +2935,90 @@ apply Nat_eq_log2_up_succ.
 Qed.
 
 (* to be completed
+Theorem rank_fst_loop_enough_iter :
+  ∀ k it1 it2 a b,
+  a < b
+  → 1 < b
+  → b ≤ it1
+  → b ≤ it2
+  → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
+Proof.
+intros * Hab H1b Hit1 Hit2.
+(*
+Compute (map (λ b,
+  let k := 0 in
+  let a := 2 in
+  let it1 := b + 7 in
+  let it2 := b + 2 in
+  rank_fst_loop it1 k a b = rank_fst_loop it2 k a b
+) (seq 3 20)).
+(* ok *)
+...
+*)
+revert a Hab.
+induction it1; intros; [ now apply Nat.le_0_r in Hit1; subst b | ].
+destruct it2; [ now apply Nat.le_0_r in Hit2; subst b | ].
+cbn - [ "*" ].
+remember (2 * a / b =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk; [ easy | ].
+apply Nat.eqb_neq in Habk.
+apply Nat_neq_div in Habk.
+destruct Habk as [Habk| Habk]. {
+  destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+    clear Hit1.
+...
+  destruct k; [ easy | ].
+...
+  destruct k. {
+    rewrite Nat.mul_1_l in Habk.
+    rewrite Nat.mod_small; [ | easy ].
+    revert a b Hab H1b Habk Hit1 Hit2.
+    revert it2.
+    induction it1; intros; [ now apply Nat.nlt_ge in Hit1 | ].
+    destruct it2; intros; [ now apply Nat.nlt_ge in Hit2 | ].
+    cbn - [ "*" ].
+    rewrite Nat.mul_assoc.
+    progress replace (2 * 2) with 4 at 1 2 by easy.
+    remember (4 * a / b =? 1) as ab eqn:Htab.
+    symmetry in Htab.
+    destruct ab; [ easy | ].
+    apply Nat.eqb_neq in Htab.
+    apply Nat_neq_div_1 in Htab.
+    destruct Htab as [Htab| Htab]. {
+      rewrite Nat.mod_small; [ | easy ].
+      rewrite <- Nat.mul_assoc.
+      destruct (Nat.eq_dec b (S (S it1))) as [Hb1| Hb1].
+...
+      rewrite (IHit1 it2); [ easy | easy | easy | | | ].
+2: {
+...
+    apply Nat_div_not_small_iff in Htab; [ | flia Hab ].
+rewrite (Nat_mod_less_small 1). 2: {
+  split; [ now rewrite Nat.mul_1_l | ].
+  now apply Nat.mul_lt_mono_pos_l.
+}
+rewrite Nat.mul_1_l.
+destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+  subst b.
+  clear Hit1 IHit1.
+  destruct it1; [ flia Htab Hab | ].
+  do 2 apply Nat.succ_le_mono in Hit2.
+  destruct it2. {
+    apply Nat.le_0_r in Hit2; subst it1.
+    destruct a; [ easy | ].
+    apply Nat.succ_lt_mono in Hab.
+    now apply Nat.lt_1_r in Hab; subst a.
+  }
+  cbn - [ "*" "/" "mod" ].
+  remember (_ =? 0) as z eqn:Hz.
+  symmetry in Hz.
+  destruct z; [ easy | ].
+  apply Nat.eqb_neq in Hz.
+  apply Nat_div_not_small_iff in Hz; [ | easy ].
+(* pas l'air simple *)
+...
+
 Theorem rank_fst_1_1_pow2 : ∀ n, rank_fst_1 1 (2 ^ S n) = n.
 Proof.
 intros.
@@ -2934,7 +3028,7 @@ Compute (map (λ n,
 ) (seq 0 10)).
 ...
 ok *)
-Search rank_fst_1.
+progress unfold rank_fst_1.
 ...
 rewrite Nat.pow_succ_r'.
 Compute (map (λ n,
