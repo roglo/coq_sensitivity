@@ -2937,16 +2937,17 @@ Qed.
 (* to be completed
 Theorem rank_fst_loop_enough_iter :
   ∀ k it1 it2 a b,
-  a < b
+  k ≤ 1
+  → a < b
   → 1 < b
   → b ≤ it1
   → b ≤ it2
   → rank_fst_loop it1 k a b = rank_fst_loop it2 k a b.
 Proof.
-intros * Hab H1b Hit1 Hit2.
+intros * Hk1 Hab H1b Hit1 Hit2.
 (*
 Compute (map (λ b,
-  let k := 0 in
+  let k := 2 in
   let a := 2 in
   let it1 := b + 7 in
   let it2 := b + 2 in
@@ -2965,8 +2966,36 @@ destruct abk; [ easy | ].
 apply Nat.eqb_neq in Habk.
 apply Nat_neq_div in Habk.
 destruct Habk as [Habk| Habk]. {
+  destruct k; [ easy | ].
+  destruct k; [ | flia Hk1 ].
+  rewrite Nat.mul_1_l in Habk.
+  clear Hk1 Hab.
+  rewrite Nat.mod_small; [ | easy ].
   destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+Search (rank_fst_loop _ _ (2 * _)).
+Theorem fst_rank_fst_loop_twice :
+  ∀ it k a b,
+  k ≤ 1
+  → a < b ≤ it
+  → fst (rank_fst_loop it k (2 * a) b) = S (fst (rank_fst_loop it k a b)).
+Proof.
+intros * Hk1 Hit.
+induction it; [ flia Hit | ].
+cbn - [ "*" ].
+remember (2 * (2 * a) / b =? k) as abk2 eqn:Habk2.
+symmetry in Habk2.
+destruct abk2. {
+  exfalso.
+  apply Nat.eqb_eq in Habk2.
+  destruct k. {
+    apply Nat.div_small_iff in Habk2; [ | flia Hit ].
+(* marche pas *)
+...
     clear Hit1.
+    rewrite Nat.mod_small. 2: {
+      destruct k; [ easy | ].
+      now rewrite Nat.mul_1_l in Habk.
+    }
 ...
   destruct k; [ easy | ].
 ...
