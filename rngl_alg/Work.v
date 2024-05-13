@@ -4405,9 +4405,29 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
+    destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+      subst n.
+      cbn.
+      rewrite angle_add_0_r.
+      apply Bool.orb_false_iff.
+      cbn in Hni.
+      split. 2: {
+        apply Bool.orb_false_iff.
+        split; [ | easy ].
+        apply angle_add_overflow_div_2_div_2.
+      }
+      (* ah oui, ça peut déborder *)
+      Search (angle_add_overflow (_ / ₂)).
+      (* bref, c'est la merde *)
+...
     eapply angle_mul_nat_not_overflow_le_l. 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
+Compute (map (λ n,
+  inv_ub_num n ≤ 2 ^ inv_ub_den_pow2 n
+) (seq 2 20)).
+(* ah oui, marche pas pour n=2 *)
+...
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
     rewrite rank_fst_1_log2_up; [ | flia Hn1 Hnz ].
@@ -4426,6 +4446,18 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
     rewrite <- Nat.pow_succ_r'.
     apply Nat.le_sub_le_add_r.
+    progress unfold inv_ub_den_pow2 in Hni.
+Compute (map (λ n,
+  2 ^ S (S (fst_1_len 1 n)) ≤ 2 ^ (Nat.log2_up n + fst_1_len 1 n) + 2
+) (seq 2 22)).
+(* marche pas pour n=2, tiens... *)
+destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+  subst n; cbn.
+  cbn in Hni.
+  destruct i; cbn in Hin; [ flia Hin | ].
+  destruct i; [ | flia Hni ].
+  cbn in Hin.
+  (* ah oui, échec *)
 ...
       destruct n; [ easy | ].
 Search (Nat.log2_up (S _)).
