@@ -3343,12 +3343,17 @@ now rewrite Nat.sub_0_r.
 Qed.
 *)
 
-(* to be completed
+(*
 Theorem fst_rank_fst_loop_pow2_succ_lemma :
   ∀ m n,
   fst (rank_fst_loop n 1 (2 ^ S m) (2 ^ (m + n) + 1)) = n.
 Proof.
 intros.
+Compute (map (λ m, map (λ n,
+  fst (rank_fst_loop n 1 (2 ^ S m) (2 ^ (m + n) + 1)) = n
+) (seq 0 10)) (seq 0 10)).
+(* no *)
+...
 revert m.
 induction n; intros; [ easy | ].
 cbn - [ "*" "^" ].
@@ -3367,14 +3372,19 @@ rewrite <- (Nat.add_succ_comm m).
 rewrite <- Nat.pow_succ_r'.
 apply IHn.
 Qed.
+*)
 
+(*
 Theorem fst_rank_fst_loop_pow2_succ :
   ∀ n, fst (rank_fst_loop (n + 1) 1 1 (2 ^ n + 1)) = n + 1.
 Proof.
 intros.
 rewrite Nat.add_1_r.
 cbn.
-assert (Hn : 1 < 2 ^ n + 1). {
+assert (Hn : 2 < 2 ^ n + 1). {
+  rewrite <- Nat.add_1_r at 1.
+  apply Nat.add_lt_mono_r.
+...
   apply Nat.lt_add_pos_l.
   now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
@@ -3384,15 +3394,25 @@ cbn.
 rewrite fst_let; f_equal.
 apply (fst_rank_fst_loop_pow2_succ_lemma 0 n).
 Qed.
+*)
 
+(*
 Theorem fst_rank_fst_loop_diag :
   ∀ it n, n ≠ 0 → fst (rank_fst_loop it 1 n n) = 0.
 Proof.
 intros * Hnz.
-destruct it; [ easy | cbn ].
+destruct it; [ easy | ].
+cbn - [ "*" ].
+rewrite Nat.div_mul; [ | easy ].
+rewrite Nat.mod_mul; [ | easy ].
+cbn - [ "*" ].
+rewrite fst_let.
+...
 now rewrite Nat.div_same.
 Qed.
+*)
 
+(*
 Theorem fst_rank_fst_loop_eq_succ_lemma :
   ∀ it a b n,
   a ≠ 0
@@ -3426,6 +3446,7 @@ destruct ab. {
   now apply Nat.nlt_ge in H.
 }
 clear H.
+...
 rewrite fst_let, fst_if.
 f_equal.
 cbn - [ "*" ].
@@ -3452,7 +3473,9 @@ rewrite <- Nat.add_succ_comm in Hb.
 rewrite <- Nat.pow_succ_r' in Habs |-*.
 now apply IHit.
 Qed.
+*)
 
+(*
 Theorem fst_rank_fst_loop_eq_succ :
   ∀ it a b,
   0 < a < b
@@ -3513,9 +3536,9 @@ specialize (H1 H Hbs Hab2); clear H.
 rewrite Nat.pow_1_r in H1.
 apply H1.
 Qed.
+*)
 
-...
-
+(*
 Theorem fst_rank_fst_loop_pow2_mul :
   ∀ p m a b it,
   0 < a
@@ -3553,6 +3576,7 @@ destruct pab. {
   rewrite Nat.pow_succ_r' in Hpab.
   rewrite <- Nat.mul_assoc in Hpab.
   apply Nat.mul_lt_mono_pos_l in Hpab; [ | easy ].
+...
   destruct m; [ easy | exfalso ].
   apply Nat.nle_gt in Hmab.
   apply Hmab; clear Hmab.
@@ -3589,7 +3613,9 @@ rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm in Hit, Hbma, Hmab.
 now apply IHit.
 Qed.
+*)
 
+(*
 Theorem two_pow_mul_fst_rank_fst_loop :
   ∀ m n,
   m ≠ 0
@@ -3644,6 +3670,7 @@ symmetry in Hn1.
 destruct n1. {
   apply Nat.eqb_eq in Hn1.
   apply Nat_eq_div_1 in Hn1.
+...
   cbn; flia Hn1.
 }
 rewrite fst_let.
@@ -3682,7 +3709,9 @@ cbn.
 specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
 flia IHm H1.
 Qed.
+*)
 
+(*
 Theorem le_fst_rank_fst_loop :
   ∀ m n,
   2 ^ m - 2 * m < 2 * n
@@ -3698,6 +3727,7 @@ destruct mn. {
   cbn.
   rewrite Nat.add_0_r.
   apply Nat.eqb_eq in Hmn.
+...
   now apply Nat_eq_div_1 in Hmn.
 }
 rewrite fst_let.
@@ -3715,7 +3745,9 @@ apply Nat.le_lt_add_lt with (m := S m) (n := S m); [ easy | ].
 rewrite Nat.sub_add; [ | now apply Nat.pow_gt_lin_r ].
 now rewrite <- Nat.add_succ_comm, Nat.add_comm.
 Qed.
+*)
 
+(*
 Theorem rank_fst_1_log2_up : ∀ n, rank_fst_1 1 n = Nat.log2_up n.
 Proof.
 intros.
@@ -3726,6 +3758,7 @@ split. {
   apply Nat.div_lt_upper_bound; [ easy | ].
   progress unfold rank_fst_1.
   induction n; [ easy | clear Hnz ].
+...
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
   specialize (IHn Hnz).
   cbn - [ "/" "mod" "*" ].
@@ -3771,7 +3804,9 @@ progress unfold lt.
 progress replace 2 with (2 * 1) at 1 by easy.
 now apply Nat.mul_le_mono_pos_l.
 Qed.
+*)
 
+(*
 Theorem snd_rank_fst_loop :
   ∀ m n it,
   n ≤ S m + it
@@ -3794,6 +3829,7 @@ symmetry in Hmn1.
 destruct mn1. {
   symmetry; cbn - [ "^" ].
   f_equal.
+...
   apply Nat_eq_log2_up; [ flia Hmn | ].
   apply Nat.eqb_eq in Hmn1.
   apply Nat_eq_div_1 in Hmn1.
@@ -3814,7 +3850,9 @@ rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.add_succ_comm in Hit.
 now apply IHit.
 Qed.
+*)
 
+(*
 Theorem snd_rank_fst_1 :
   ∀ it n,
   n ≠ 0
@@ -3832,6 +3870,7 @@ destruct n1. {
   apply Nat_eq_div_1 in Hn1.
   destruct Hn1 as (H, _).
   apply Nat.le_1_r in H.
+...
   destruct H; [ easy | now subst n].
 }
 rewrite snd_let.
@@ -3842,7 +3881,9 @@ rewrite Nat.mod_small; [ | easy ].
 rewrite Nat.mul_1_r.
 now apply (snd_rank_fst_loop 0).
 Qed.
+*)
 
+(*
 Theorem snd_rank_fst_1_2_succ :
   ∀ it n,
   0 < n
@@ -3860,6 +3901,7 @@ destruct n1. {
   destruct Hn1 as (H, _).
   apply Nat.succ_le_mono in H.
   apply Nat.le_1_r in H.
+...
   now destruct H; subst n.
 }
 rewrite snd_let.
@@ -3871,6 +3913,7 @@ progress replace (2 * 2) with (2 ^ 2) by easy.
 rewrite (snd_rank_fst_loop 1); [ easy | | easy ].
 now apply -> Nat.succ_le_mono.
 Qed.
+*)
 
 Theorem Nat_le_add_le_sub_l : ∀ n m p, n ≤ m → n + p ≤ m ↔ p ≤ m - n.
 Proof.
@@ -3882,6 +3925,7 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add.
 Qed.
 
+(*
 Theorem lt_snd_rank_fst_loop :
   ∀ m n,
   2 ^ m - S m < n
@@ -3897,6 +3941,7 @@ destruct mn1. {
   cbn - [ "^" ].
   apply Nat.eqb_eq in Hmn1.
   apply Nat_eq_div_1 in Hmn1.
+...
   eapply lt_le_trans; [ | apply Hmn1 ].
   apply Nat.lt_succ_diag_r.
 }
@@ -3917,6 +3962,7 @@ apply Nat.lt_succ_r.
 apply -> Nat.succ_lt_mono.
 now apply Nat.pow_gt_lin_r.
 Qed.
+*)
 
 Theorem Nat_pow2_log2 :
   ∀ n, n ≠ 0 → 2 ^ S (Nat.log2 n) = 2 ^ Nat.log2_up (S n).
@@ -3925,6 +3971,7 @@ intros * Hnz.
 now destruct n.
 Qed.
 
+(*
 Theorem snd_rank_fst_loop_interval :
   ∀ m n,
   2 ^ m / 2 - m < n
@@ -3941,6 +3988,7 @@ symmetry in Hn1.
 destruct n1. {
   apply Nat.eqb_eq in Hn1.
   apply Nat_eq_div_1 in Hn1.
+...
   flia Hn1.
 }
 apply Nat.eqb_neq in Hn1.
@@ -3976,7 +4024,9 @@ rewrite Nat.pow_succ_r', Nat.add_comm in Hn1.
 apply Nat.mul_le_mono_pos_l in Hn1; [ | easy ].
 now apply Nat.nlt_ge in Hn1.
 Qed.
+*)
 
+(*
 Theorem pow2_snd_rank_fst_loop_le :
   ∀ m n,
   2 ^ m / 2 - m < n
@@ -3994,6 +4044,7 @@ remember (2 ^ m / (m + S n) =? 1) as n2 eqn:Hn2.
 symmetry in Hn2.
 destruct n2. {
   cbn; rewrite Nat.add_0_r.
+...
   now apply Nat.lt_le_incl.
 }
 apply Nat.eqb_neq in Hn2.
@@ -4018,6 +4069,7 @@ apply (Nat.add_lt_mono_r _ _ (S m)).
 rewrite Nat.sub_add; [ easy | ].
 now apply Nat.pow_gt_lin_r.
 Qed.
+*)
 
 (* to be cleaned *)
 Theorem Nat_log2_up_pow2_sub_1 :
@@ -4067,6 +4119,7 @@ specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
 flia H3.
 Qed.
 
+(*
 Theorem fst_1_len_log2_up :
   ∀ n, fst_1_len 1 n = Nat.log2_up (inv_ub_num n) - 1.
 Proof.
@@ -4086,6 +4139,7 @@ symmetry in Hn2.
 destruct n2. {
   cbn - [ "-" "*" "/" "mod" ] in H1.
   apply Nat.eqb_eq in Hn2.
+...
   rewrite Hn2 in H1.
   cbn - [ "-" "*" "/" "mod" ] in H1.
   now rewrite fst_let in H1.
@@ -4111,6 +4165,7 @@ rewrite snd_rank_fst_1_2_succ; [ | easy | easy ].
 apply Nat.log2_up_spec.
 now apply -> Nat.succ_lt_mono.
 Qed.
+*)
 
 Theorem Nat_eq_pow_1 : ∀ a b, a ^ b = 1 → a = 1 ∨ b = 0.
 Proof.
@@ -4154,6 +4209,7 @@ rewrite Nat.pow_add_r.
 now apply Nat.mul_le_mono.
 Qed.
 
+(*
 Theorem eq_fst_rank_fst_loop_0 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 0
@@ -4168,13 +4224,16 @@ remember (a / b =? k) as abk eqn:Habk.
 symmetry in Habk.
 destruct abk. {
   apply Nat.eqb_eq in Habk.
+...
   split; [ now intros; right | easy ].
 }
 apply Nat.eqb_neq in Habk.
 split; [ easy | ].
 now intros [H| H].
 Qed.
+*)
 
+(*
 Theorem inv_ub_num_gt_1 :
   ∀ n, 1 < n → 1 < inv_ub_num n.
 Proof.
@@ -4202,6 +4261,7 @@ destruct xn. {
   cbn - [ "*" "/" "mod" ].
   rewrite snd_if, snd_let.
   cbn - [ "*" "/" "mod" ].
+...
   rewrite Nat.div_small; [ | flia Hn1 ].
   rewrite Nat.mod_small; [ | flia Hn1 ].
   cbn.
@@ -4213,6 +4273,7 @@ apply Nat.lt_1_mul_pos; [ easy | ].
 apply Nat.neq_0_lt_0.
 now apply Nat.pow_nonzero.
 Qed.
+*)
 
 (* find k and m such n = 2^k * m where m is odd *)
 Fixpoint extract_pow2_loop it n :=
@@ -4305,7 +4366,6 @@ split; intros H1. {
   now apply Nat.div_small_iff.
 }
 Qed.
-*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
