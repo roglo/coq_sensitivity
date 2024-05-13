@@ -3747,35 +3747,40 @@ now rewrite <- Nat.add_succ_comm, Nat.add_comm.
 Qed.
 *)
 
-(*
-Theorem rank_fst_1_log2_up : ∀ n, rank_fst_1 1 n = Nat.log2_up n.
+(* to be completed
+Theorem rank_fst_1_log2_up : ∀ n, 2 ≤ n → rank_fst_1 1 n = Nat.log2_up n.
 Proof.
-intros.
+intros * H2n.
+(*
+Compute (map (λ n,
+  rank_fst_1 1 n = Nat.log2_up n - 1
+) (seq 2 20)).
+*)
+(*
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+*)
 symmetry.
-apply Nat_eq_log2_up; [ easy | ].
+apply Nat_eq_log2_up; [ flia H2n | ].
 split. {
   apply Nat.div_lt_upper_bound; [ easy | ].
   progress unfold rank_fst_1.
-  induction n; [ easy | clear Hnz ].
-...
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
-  specialize (IHn Hnz).
+  induction n; [ easy | ].
+  apply Nat.succ_le_mono in H2n.
+  destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ subst n; cbn; flia | ].
+  rename H2n into H1n.
+  assert (H2n : 2 ≤ n) by flia H1n Hn1.
+  clear H1n Hn1.
+  specialize (IHn H2n).
   cbn - [ "/" "mod" "*" ].
-  remember (1 / S n =? 1) as n1 eqn:Hn1.
-  symmetry in Hn1.
-  destruct n1; [ cbn; flia | ].
-  rewrite fst_let.
-  apply Nat.eqb_neq in Hn1.
-  apply Nat_neq_div_1 in Hn1.
-  destruct Hn1 as [Hn1| Hn1]; [ flia Hn1 | ].
-  rewrite Nat.mod_small; [ | easy ].
   rewrite Nat.mul_1_r.
+  rewrite Nat.div_small; [ | flia H2n ].
+  rewrite Nat.mod_small; [ | flia H2n ].
+  cbn - [ "/" "mod" "*" ].
+  rewrite fst_let.
   rewrite Nat.pow_succ_r'.
-  apply Nat.mul_lt_mono_pos_l; [ easy |].
-  apply Nat.succ_lt_mono in Hn1.
-  clear Hnz.
-  destruct n; [ easy | clear Hn1 ].
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+...
+  destruct n; [ easy | ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
   cbn - [ "/" "mod" "*" ].
   remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
@@ -4440,6 +4445,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     }
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
+...
     rewrite rank_fst_1_log2_up.
     (* lemma *)
     eapply le_trans; [ apply Nat.le_sub_l | ].
