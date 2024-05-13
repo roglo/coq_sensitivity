@@ -2952,7 +2952,7 @@ rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
 apply Nat_eq_log2_up_succ.
 Qed.
 
-(* to be completed
+(*
 Theorem rank_fst_loop_enough_iter :
   ∀ k it1 it2 a b,
   k ≤ 1
@@ -2990,6 +2990,7 @@ destruct Habk as [Habk| Habk]. {
   clear Hk1 Hab.
   rewrite Nat.mod_small; [ | easy ].
   destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
+...
 Search (rank_fst_loop _ _ (2 * _)).
 Theorem fst_rank_fst_loop_1_twice :
   ∀ it a b,
@@ -3340,7 +3341,9 @@ replace 2 with (2 ^ 1) at 2 by easy.
 apply (H1 (2 ^ n) 0 n); [ easy | ].
 now rewrite Nat.sub_0_r.
 Qed.
+*)
 
+(* to be completed
 Theorem fst_rank_fst_loop_pow2_succ_lemma :
   ∀ m n,
   fst (rank_fst_loop n 1 (2 ^ S m) (2 ^ (m + n) + 1)) = n.
