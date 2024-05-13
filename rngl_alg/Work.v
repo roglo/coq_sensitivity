@@ -4411,15 +4411,54 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
     rewrite rank_fst_1_log2_up; [ | flia Hn1 Hnz ].
-...
     (* lemma *)
+    rewrite <- Nat.add_sub_swap. 2: {
+      apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
+      cbn; flia Hnz Hn1.
+    }
+    rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
+      eapply Nat.le_trans; [ | apply Nat.le_add_r ].
+      apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
+      cbn; flia Hnz Hn1.
+    }
+    rewrite Nat.pow_1_r.
+    apply Nat.div_le_lower_bound; [ easy | ].
+    rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+    rewrite <- Nat.pow_succ_r'.
+    apply Nat.le_sub_le_add_r.
+...
+      destruct n; [ easy | ].
+Search (Nat.log2_up (S _)).
+Search (_ ≤ Nat.log2_up _).
+apply Nat.nlt_ge.
+intros H.
+Search (Nat.log2_up _ < _).
+apply 
+...
     eapply le_trans; [ apply Nat.le_sub_l | ].
     apply Nat.pow_le_mono_r; [ easy | ].
     rewrite <- Nat.add_1_l.
     apply Nat.add_le_mono_r.
     apply Nat.neq_0_lt_0.
     intros H.
-    apply Nat.log2_up_null in H.
+    apply Nat.sub_0_le in H.
+    apply Nat.nlt_ge in H.
+    apply H; clear H.
+    apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
+    cbn.
+    destruct n; [ easy | clear Hnz ].
+    destruct n; [ easy | clear Hn1 ].
+    destruct n; [ exfalso | flia ].
+    cbn in Hni.
+    destruct i; [ cbn in Hin; flia Hin | ].
+    destruct i. {
+      cbn in Hin, Hni.
+...
+    apply Nat.le_1_r in H.
+    destruct H as [H| H]. {
+      apply Nat.log2_up_null in H.
+      flia Hn1 Hnz H.
+    }
     destruct n; [ easy | ].
     apply Nat.succ_le_mono in H.
     apply Nat.le_0_r in H.
