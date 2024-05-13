@@ -2993,10 +2993,11 @@ destruct Habk as [Habk| Habk]. {
 Search (rank_fst_loop _ _ (2 * _)).
 Theorem fst_rank_fst_loop_1_twice :
   ∀ it a b,
-  2 * a < b ≤ it
+  a ≠ 0
+  → 2 * a < b ≤ it
   → fst (rank_fst_loop it 1 a b) = S (fst (rank_fst_loop it 1 (2 * a) b)).
 Proof.
-intros * Hit.
+intros * Haz Hit.
 (*
 Compute (
   let a := 1 in
@@ -3030,7 +3031,6 @@ destruct abk2. {
     clear Hit IHit.
     destruct Habk2 as (H1, _).
     rename Habk into H2.
-    revert a H1 H2.
     induction it; intros; [ easy | ].
     cbn - [ "*" ].
     rewrite (Nat_div_less_small 1); [ easy | flia H1 H2 ].
@@ -3046,71 +3046,24 @@ cbn - [ "*" ].
 f_equal.
 destruct Habk2 as [Habk2| Habk2]. {
   rewrite Nat.mod_small; [ | easy ].
-  destruct it. {
-    cbn.
-    exfalso.
-    replace a with 0 in * by flia Hit.
-    replace b with 1 in * by flia Hit.
-cbn in Hit, Habk2.
-(* mon cul *)
-...
 (*
-Compute (map (λ b,
-  let a := 4 in
+Compute (
+  let a := 1 in
+map (λ b,
   let it := b - 1 in
-  if 2 * a <? b then
-  if b <=? 4 * a then
-    fst (rank_fst_loop it 1 (2 * a) b) = 0
-  else True
-  else True
-) (seq 0 40)).
-(* ok *)
+  fst (rank_fst_loop it 1 (2 * a) b) = S (fst (rank_fst_loop it 1 (2 * (2 * a)) b))
+) (seq (4 * a + 1) 80)).
+(* bin oui, pourtant ça marche *)
 *)
+  destruct (Nat.eq_dec b (S it)) as [Hbi| Hbi]. {
+    subst b.
+Compute (
+let a := 1 in
+map (λ it,
+  fst (rank_fst_loop it 1 (2 * a) (S it)) = S (fst (rank_fst_loop it 1 (2 * (2 * a)) (S it)))
+) (seq 4 20)).
+(* ah zut, hein *)
 ...
-  exfalso.
-  destruct k. {
-    apply Nat.div_small_iff in Habk2; [ | flia Hit ].
-(* marche pas *)
-...
-    clear Hit1.
-    rewrite Nat.mod_small. 2: {
-      destruct k; [ easy | ].
-      now rewrite Nat.mul_1_l in Habk.
-    }
-...
-  destruct k; [ easy | ].
-...
-  destruct k. {
-    rewrite Nat.mul_1_l in Habk.
-    rewrite Nat.mod_small; [ | easy ].
-    revert a b Hab H1b Habk Hit1 Hit2.
-    revert it2.
-    induction it1; intros; [ now apply Nat.nlt_ge in Hit1 | ].
-    destruct it2; intros; [ now apply Nat.nlt_ge in Hit2 | ].
-    cbn - [ "*" ].
-    rewrite Nat.mul_assoc.
-    progress replace (2 * 2) with 4 at 1 2 by easy.
-    remember (4 * a / b =? 1) as ab eqn:Htab.
-    symmetry in Htab.
-    destruct ab; [ easy | ].
-    apply Nat.eqb_neq in Htab.
-    apply Nat_neq_div_1 in Htab.
-    destruct Htab as [Htab| Htab]. {
-      rewrite Nat.mod_small; [ | easy ].
-      rewrite <- Nat.mul_assoc.
-      destruct (Nat.eq_dec b (S (S it1))) as [Hb1| Hb1].
-...
-      rewrite (IHit1 it2); [ easy | easy | easy | | | ].
-2: {
-...
-    apply Nat_div_not_small_iff in Htab; [ | flia Hab ].
-rewrite (Nat_mod_less_small 1). 2: {
-  split; [ now rewrite Nat.mul_1_l | ].
-  now apply Nat.mul_lt_mono_pos_l.
-}
-rewrite Nat.mul_1_l.
-destruct (Nat.eq_dec b (S it1)) as [Hb1| Hb1]. {
-  subst b.
   clear Hit1 IHit1.
   destruct it1; [ flia Htab Hab | ].
   do 2 apply Nat.succ_le_mono in Hit2.
