@@ -3779,8 +3779,31 @@ split. {
   rewrite fst_let.
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_lt_mono_pos_l; [ easy | ].
-...
   destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" ].
+  cbn - [ "*" "/" "mod" ] in IHn.
+  rewrite Nat.mul_1_r in IHn.
+  apply Nat.succ_le_mono in H2n.
+  replace (2 * 2) with 4 by easy.
+  remember (4 / S (S n) =? 1) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2; [ cbn; flia | ].
+  rewrite fst_let.
+  apply Nat.eqb_neq in Hn2.
+  apply Nat_neq_div_1 in Hn2; [ | easy ].
+  destruct Hn2 as [Hn2| Hn2]. {
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite Nat.div_small in IHn; [ | flia Hn2 ].
+    rewrite Nat.mod_small in IHn; [ | flia Hn2 ].
+    rewrite fst_if, fst_let in IHn.
+    cbn - [ "*" ] in IHn.
+    apply Nat.mul_lt_mono_pos_l in IHn; [ | easy ].
+    do 2 apply Nat.succ_le_mono in Hn2.
+    clear H2n.
+    destruct n; [ easy | ].
+    apply Nat.succ_le_mono in Hn2.
+    cbn - [ "*" "/" "mod" ] in IHn |-*.
+...
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
   cbn - [ "/" "mod" "*" ].
   remember (2 / S (S n) =? 1) as n1 eqn:Hn1.
