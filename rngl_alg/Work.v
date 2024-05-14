@@ -4395,14 +4395,43 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite rank_fst_1_log2_up; [ | flia Hnz Hn1 ].
   rewrite Nat.add_shuffle0.
   rewrite Nat.sub_add; [ | easy ].
+  progress unfold inv_ub_num.
+  rewrite Nat.pow_add_r.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
+  apply Nat.le_add_le_sub_r.
 (*
 Compute (map (λ n,
   Nat.leb
-  (2 ^ (Nat.log2_up n + fst_1_len 1 n)) (inv_ub_num n * n)
+  (2 ^ Nat.log2_up n * 2 ^ fst_1_len 1 n + n) (2 * 2 ^ fst_1_len 1 n * n)
 ) (seq 1 80)).
 ok
 *)
-  progress unfold inv_ub_num.
+  apply Nat_le_add_le_sub_l. {
+    rewrite Nat.mul_shuffle0.
+    apply Nat.mul_le_mono_r.
+    destruct n; [ easy | ].
+    rewrite <- Nat_pow2_log2; [ | flia Hn1 ].
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
+    apply Nat.log2_spec; flia Hn1.
+  }
+  rewrite Nat.mul_shuffle0.
+  rewrite <- Nat.mul_sub_distr_r.
+Compute (map (λ n,
+  Nat.leb n ((2 * n - 2 ^ Nat.log2_up n) * 2 ^ fst_1_len 1 n)
+) (seq 0 80)).
+(* ok *)
+...
+Compute (map (λ n,
+  (2 ^ fst_1_len 1 n)
+) (seq 0 80)).
+Compute (map (λ n,
+  ((2 * n - 2 ^ Nat.log2_up n))
+) (seq 0 80)).
+...
+apply Nat.log2_log
 ...
   rewrite fst_1_len_log2_up.
 (*
