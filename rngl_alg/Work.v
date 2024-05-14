@@ -4356,100 +4356,31 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
-(*
-(* le cas n=2 semble ne pas marcher (voir plus loin) ; voyons voir *)
-destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-  subst n.
-  clear Hnz Hn1.
-  progress replace (inv_ub_den_pow2 2) with 2 by easy.
-  progress replace (inv_ub_num 2) with 3 by easy.
-  rewrite angle_div_pow2_1.
-  destruct i; [ cbn in Hin; flia Hin | ].
-  clear Hin.
-  rewrite Nat.pow_succ_r', Nat.mul_comm.
-  rewrite Nat.div_mul; [ | easy ].
-  rewrite angle_div_2_pow_succ_r_2.
-  rewrite angle_div_2_pow_mul_2_pow.
-  (* ah oui, effectivement, ça ne marche pas *)
-  (* y a des contre-exemples évidents *)
-  (* par exemple θ=-ε
-       θ/2 = π-2ε
-       3 * (θ / ₂) = 3 * ((2π-ε)/2) = 3 * (π-2ε) = π-6ε
-   *)
-Compute (inv_ub_num 3, inv_ub_den_pow2 3).
-Compute (inv_ub_num 4, inv_ub_den_pow2 4).
-Compute (inv_ub_num 5, inv_ub_den_pow2 5).
-...
-Theorem angle_div_2_pow_mul_pow_sub :
-  ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ / ₂^i) = θ / ₂^j)%A.
-Theorem seq_angle_to_div_nat_3_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A.
-Theorem seq_angle_to_div_nat_4_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 4 i ≤ 3 * (θ / ₂^3))%A.
-Theorem seq_angle_to_div_nat_5_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
-...
-*)
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
-(*
-  (* le angle_mul_le_mono_r ne marche pas pour n=2, d'après ce que j'ai
-     vu plus loin ; voyons voir *)
-  destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-    subst n.
-    clear Hnz Hn1.
-    cbn in Hni.
-    replace (inv_ub_den_pow2 2) with 1 by easy.
-    cbn - [ "*" "/" "^" ].
-    destruct i; [ cbn in Hin; flia Hin | ].
-    destruct i; [ clear Hni Hin | flia Hni ].
-    rewrite angle_div_pow2_1.
-    rewrite Nat.div_same; [ | easy ].
-    rewrite angle_mul_1_l.
-    replace (inv_ub_num 2) with 3 by easy.
-    (* ah ouais, effectivement ça déconne *)
-...
-*)
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
-(*
-  destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
   apply angle_mul_le_mono_r. {
-...
-(* ça ne marche pas pour n=2, d'après ce que j'ai vu plus loin *)
-    destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-      subst n.
-      cbn.
-      rewrite angle_add_0_r.
-      apply Bool.orb_false_iff.
-      cbn in Hni.
-      split. 2: {
-        apply Bool.orb_false_iff.
-        split; [ | easy ].
-        apply angle_add_overflow_div_2_div_2.
-      }
-      (* ah oui, ça peut déborder *)
-...
-      Search (angle_add_overflow (_ / ₂)).
-      (* bref, c'est la merde *)
-...
-*)
-...
     eapply angle_mul_nat_not_overflow_le_l. 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
-Compute (map (λ n,
-  inv_ub_num n ≤ 2 ^ inv_ub_den_pow2 n
-) (seq 2 20)).
-(* ah oui, marche pas pour n=2 *)
-...
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
     rewrite rank_fst_1_log2_up; [ | flia Hn1 Hnz ].
-    (* lemma *)
-    rewrite <- Nat.add_sub_swap. 2: {
+    assert (H1ln : 1 ≤ Nat.log2_up n). {
       apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
       cbn; flia Hnz Hn1.
     }
+    rewrite <- Nat.add_sub_swap; [ | easy ].
+    rewrite Nat.sub_add; [ | flia H1ln ].
+    apply Nat.le_sub_le_add_r.
+    rewrite Nat.pow_succ_r'.
+Compute (map (λ n,
+  Nat.leb
+    (2 * 2 ^ fst_1_len 1 n)
+    (2 ^ (Nat.log2_up n + fst_1_len 1 n) + 1)
+) (seq 0 40)).
+(* ça a l'air bon *)
+...
     rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
       eapply Nat.le_trans; [ | apply Nat.le_add_r ].
       apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
