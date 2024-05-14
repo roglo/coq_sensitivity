@@ -4356,6 +4356,10 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_nonneg.
 }
 apply Nat.nlt_ge in Hin.
+assert (H1ln : 1 ≤ Nat.log2_up n). {
+  apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
+  cbn; flia Hnz Hn1.
+}
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
@@ -4366,80 +4370,13 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     progress unfold inv_ub_num.
     progress unfold inv_ub_den_pow2.
     rewrite rank_fst_1_log2_up; [ | flia Hn1 Hnz ].
-    assert (H1ln : 1 ≤ Nat.log2_up n). {
-      apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
-      cbn; flia Hnz Hn1.
-    }
     rewrite <- Nat.add_sub_swap; [ | easy ].
     rewrite Nat.sub_add; [ | flia H1ln ].
     apply Nat.le_sub_le_add_r.
-    rewrite Nat.pow_succ_r'.
-Compute (map (λ n,
-  Nat.leb
-    (2 * 2 ^ fst_1_len 1 n)
-    (2 ^ (Nat.log2_up n + fst_1_len 1 n) + 1)
-) (seq 0 40)).
-(* ça a l'air bon *)
-...
-    rewrite Nat.pow_sub_r; [ | easy | ]. 2: {
-      eapply Nat.le_trans; [ | apply Nat.le_add_r ].
-      apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
-      cbn; flia Hnz Hn1.
-    }
-    rewrite Nat.pow_1_r.
-    apply Nat.div_le_lower_bound; [ easy | ].
-    rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
-    rewrite <- Nat.pow_succ_r'.
-    apply Nat.le_sub_le_add_r.
-    progress unfold inv_ub_den_pow2 in Hni.
-Compute (map (λ n,
-  2 ^ S (S (fst_1_len 1 n)) ≤ 2 ^ (Nat.log2_up n + fst_1_len 1 n) + 2
-) (seq 2 22)).
-(* marche pas pour n=2, tiens... *)
-destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-  subst n; cbn.
-  cbn in Hni.
-  destruct i; cbn in Hin; [ flia Hin | ].
-  destruct i; [ | flia Hni ].
-  cbn in Hin.
-  (* ah oui, échec *)
-...
-      destruct n; [ easy | ].
-Search (Nat.log2_up (S _)).
-Search (_ ≤ Nat.log2_up _).
-apply Nat.nlt_ge.
-intros H.
-Search (Nat.log2_up _ < _).
-apply 
-...
-    eapply le_trans; [ apply Nat.le_sub_l | ].
+    eapply Nat.le_trans; [ | apply Nat.le_add_r ].
     apply Nat.pow_le_mono_r; [ easy | ].
     rewrite <- Nat.add_1_l.
-    apply Nat.add_le_mono_r.
-    apply Nat.neq_0_lt_0.
-    intros H.
-    apply Nat.sub_0_le in H.
-    apply Nat.nlt_ge in H.
-    apply H; clear H.
-    apply Nat.log2_up_lt_pow2; [ flia Hnz | ].
-    cbn.
-    destruct n; [ easy | clear Hnz ].
-    destruct n; [ easy | clear Hn1 ].
-    destruct n; [ exfalso | flia ].
-    cbn in Hni.
-    destruct i; [ cbn in Hin; flia Hin | ].
-    destruct i. {
-      cbn in Hin, Hni.
-...
-    apply Nat.le_1_r in H.
-    destruct H as [H| H]. {
-      apply Nat.log2_up_null in H.
-      flia Hn1 Hnz H.
-    }
-    destruct n; [ easy | ].
-    apply Nat.succ_le_mono in H.
-    apply Nat.le_0_r in H.
-    now subst n.
+    now apply Nat.add_le_mono_r.
   }
   rewrite Nat.pow_sub_r; [ | easy | easy ].
   eapply le_trans. {
@@ -4454,9 +4391,19 @@ apply
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-(**)
   progress unfold inv_ub_den_pow2.
-  rewrite rank_fst_1_log2_up.
+  rewrite rank_fst_1_log2_up; [ | flia Hnz Hn1 ].
+  rewrite Nat.add_shuffle0.
+  rewrite Nat.sub_add; [ | easy ].
+(*
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ (Nat.log2_up n + fst_1_len 1 n)) (inv_ub_num n * n)
+) (seq 1 80)).
+ok
+*)
+  progress unfold inv_ub_num.
+...
   rewrite fst_1_len_log2_up.
 (*
   remember (inv_ub_num n) as an eqn:Han.
