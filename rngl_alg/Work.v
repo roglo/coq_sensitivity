@@ -4423,6 +4423,29 @@ Compute (map (λ n,
   Nat.leb n ((2 * n - 2 ^ Nat.log2_up n) * 2 ^ fst_1_len 1 n)
 ) (seq 0 80)).
 (* ok *)
+Compute (map (λ n,
+if snd (extract_pow2 n) =? 1 then (0, true)
+else
+pair n
+(Nat.eqb
+  (
+   fst_1_len 1 n)
+   (fst_1_len 1 (snd (extract_pow2 n))))
+) (seq 0 80)).
+...
+Compute (map (λ n,
+pair n
+  (
+    2 ^ fst_1_len 1 n,
+    2 ^ fst_1_len 1 (snd (extract_pow2 n)))
+) (seq 0 80)).
+...
+Compute (map (λ n,
+pair n
+  ((2 * n - 2 ^ Nat.log2_up n),
+    2 ^ fst_1_len 1 n,
+    2 ^ fst_1_len 1 (snd (extract_pow2 n) + 1))
+) (seq 0 80)).
 ...
 Compute (map (λ n,
   (2 ^ fst_1_len 1 n)
