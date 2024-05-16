@@ -2596,12 +2596,12 @@ Fixpoint rank_fst_loop it k a b :=
         (S r, a')
   end.
 
-Fixpoint new_rank_fst_loop it k a b :=
+Fixpoint new_rank_fst_loop it a b :=
   match it with
   | 0 => 0
   | S it' =>
-      if 2 * a / b =? k then 0
-      else S (new_rank_fst_loop it' k ((2 * a) mod b) b)
+      if 2 * a / b =? 0 then 0
+      else S (new_rank_fst_loop it' ((2 * a) mod b) b)
   end.
 
 (* rank starting at 0 for the first binary digit of a/b with a<b *)
@@ -2610,7 +2610,7 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 Definition new_fst_1_len b :=
-  new_rank_fst_loop b 0 ((((2 ^ Nat.log2_up b / 2) mod b))) b.
+  new_rank_fst_loop b ((((2 ^ (Nat.log2_up b - 1)) mod b))) b.
 (*
 Print rank_fst_loop.
 Compute (map (λ b,
