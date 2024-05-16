@@ -2610,7 +2610,7 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 Definition new_fst_1_len b :=
-  new_rank_fst_loop b 0 ((((2 ^ (Nat.log2_up b - 1)) mod b))) b.
+  new_rank_fst_loop b 0 ((((2 ^ Nat.log2_up b / 2) mod b))) b.
 (*
 Print rank_fst_loop.
 Compute (map (λ b,
@@ -2618,7 +2618,7 @@ Compute (map (λ b,
    snd (rank_fst_loop b 1 1 b))
 ) (seq 0 33)).
 Compute (map (λ b,
-let a := 2 in
+let a := 1 in
 Nat.eqb
 (
   fst_1_len a b)
