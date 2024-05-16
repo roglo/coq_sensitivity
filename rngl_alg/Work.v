@@ -4391,20 +4391,30 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-Print inv_ub_den_pow2.
-Print fst_1_len.
-Print rank_fst_loop.
-...
-(**)
-  progress unfold inv_ub_den_pow2.
-  rewrite rank_fst_1_log2_up; [ | flia Hnz Hn1 ].
-  rewrite Nat.add_shuffle0.
-  rewrite Nat.sub_add; [ | easy ].
-  progress unfold inv_ub_num.
-  rewrite Nat.pow_add_r.
-  rewrite Nat.pow_succ_r'.
-  rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
-  apply Nat.le_add_le_sub_r.
+  rewrite Nat.mul_comm.
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ inv_ub_den_pow2 n) (inv_ub_num n * n)
+) (seq 2 80)).
+Theorem pow2_den_le_mul_num :
+  ∀ n,
+  2 ≤ n
+  → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
+Proof.
+intros * H2n.
+assert (H1ln : 1 ≤ Nat.log2_up n). {
+  apply Nat.log2_up_lt_pow2; [ flia H2n | ].
+  cbn; flia H2n.
+}
+progress unfold inv_ub_den_pow2.
+rewrite rank_fst_1_log2_up; [ | easy ].
+rewrite Nat.add_shuffle0.
+rewrite Nat.sub_add; [ | easy ].
+progress unfold inv_ub_num.
+rewrite Nat.pow_add_r.
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+apply Nat.le_add_le_sub_r.
 (*
 Compute (map (λ n,
   Nat.leb
@@ -4412,21 +4422,22 @@ Compute (map (λ n,
 ) (seq 1 80)).
 ok
 *)
-  apply Nat_le_add_le_sub_l. {
-    rewrite Nat.mul_shuffle0.
-    apply Nat.mul_le_mono_r.
-    destruct n; [ easy | ].
-    rewrite <- Nat_pow2_log2; [ | flia Hn1 ].
-    rewrite Nat.pow_succ_r'.
-    apply Nat.mul_le_mono_l.
-    apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
-    apply Nat.log2_spec; flia Hn1.
-  }
-  rewrite Nat.mul_shuffle0.
-  rewrite <- Nat.mul_sub_distr_r.
-...
-  rewrite <- Nat_add_diag.
-  rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia Hnz Hn1 ].
+apply Nat_le_add_le_sub_l. {
+  rewrite Nat.mul_assoc.
+  apply Nat.mul_le_mono_r.
+  destruct n; [ easy | ].
+  rewrite <- Nat_pow2_log2; [ | flia H2n ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_r.
+  apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
+  apply Nat.log2_spec; flia H2n.
+}
+rewrite Nat.mul_assoc.
+rewrite <- Nat.mul_sub_distr_r.
+rewrite (Nat.mul_comm n).
+rewrite <- Nat_add_diag.
+rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia H2n ].
 ...
 Search (_ - (_ - _)).
 Compute (map (λ a, pair a ((2 * a - 2 ^ Nat.log2_up a) * 2)) (seq 0 20)).
