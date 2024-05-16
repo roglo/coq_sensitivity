@@ -2610,7 +2610,7 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 Definition new_fst_1_len b :=
-  new_rank_fst_loop b 0 (((2 ^ (Nat.log2_up b - 1)))) b.
+  new_rank_fst_loop b 0 ((((2 ^ (Nat.log2_up b - 1)) mod b))) b.
 (*
 Print rank_fst_loop.
 Compute (map (λ b,
@@ -2618,13 +2618,15 @@ Compute (map (λ b,
    snd (rank_fst_loop b 1 1 b))
 ) (seq 0 33)).
 Compute (map (λ b,
+let a := 2 in
 Nat.eqb
 (
-  old_fst_1_len 1 b)
+  fst_1_len a b)
 (
   new_fst_1_len b
 )
-) (seq 2 80)).
+) (seq 0 80)).
+
 (* j'aimerais pouvoir traiter a/b et non pas seulement 1/b dans
    ce nouveau new_fst_1_len, histoire d'être plus général, mais
    bon, si j'y arrive pas, c'est peut-être pas si grave, chais
