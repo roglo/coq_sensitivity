@@ -4391,6 +4391,11 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_comm.
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+Print inv_ub_den_pow2.
+Print fst_1_len.
+Print rank_fst_loop.
+...
+(**)
   progress unfold inv_ub_den_pow2.
   rewrite rank_fst_1_log2_up; [ | flia Hnz Hn1 ].
   rewrite Nat.add_shuffle0.
