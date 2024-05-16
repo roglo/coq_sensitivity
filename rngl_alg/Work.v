@@ -4409,8 +4409,22 @@ intros * H2n.
    i.e. we must prove that
      2 ^ log2_up n * 2 ^ len n ≤ n * (2 ^ (len n + 1) - 1)
    with
-      len n = 0             si 2 / n = 1
-              len (2 mod n) si 2 / n = 0
+     len n = v (u 1)
+   with, for the given n,
+     u a = a               if 2 a / n = 1
+           u ((2 a) mod n) if 2 a / n = 0
+   and
+     v a = 0               if 2 a / n = 0
+           v ((2 a) mod n) if 2 a / n = 1
+ *)
+progress unfold inv_ub_den_pow2.
+rewrite rank_fst_1_log2_up; [ | easy ].
+progress unfold inv_ub_num.
+progress unfold fst_1_len.
+Print rank_fst_loop.
+...
+Print rank_fst_loop.
+(*
  *)
 ...
 assert (H1ln : 1 ≤ Nat.log2_up n). {
