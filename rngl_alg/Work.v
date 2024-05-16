@@ -2579,8 +2579,10 @@ Fixpoint old_rank_fst_loop it k a b :=
 
 Definition old_rank_fst_0 a b := fst (old_rank_fst_loop b 0 a b).
 Definition old_rank_fst_1 a b := fst (old_rank_fst_loop b 1 a b).
+(*
 Definition old_fst_1_len a b :=
   fst (old_rank_fst_loop b 0 (snd (old_rank_fst_loop b 1 a b)) b).
+*)
 
 (* work only if a < b *)
 (* "a" recursively remains less than "b" *)
@@ -2594,43 +2596,40 @@ Fixpoint rank_fst_loop it k a b :=
         (S r, a')
   end.
 
+Fixpoint new_rank_fst_loop it k a b :=
+  match it with
+  | 0 => 0
+  | S it' =>
+      if 2 * a / b =? k then 0
+      else S (new_rank_fst_loop it' k ((2 * a) mod b) b)
+  end.
+
 (* rank starting at 0 for the first binary digit of a/b with a<b *)
 Definition rank_fst_0 a b := fst (rank_fst_loop b 0 a b).
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
+Definition new_fst_1_len b :=
+  new_rank_fst_loop b 0 (((2 ^ (Nat.log2_up b - 1)))) b.
 (*
-Compute (map (λ n,
-  let a := 10 in
-  if a <? n then
-    rank_fst_1 a n = rank_fst_1' a n
-  else True
-) (seq 0 200)).
-(* seems ok *)
+Print rank_fst_loop.
 Compute (map (λ b,
-  let a := 10 in
-  if a <? b then
-    snd (rank_fst_loop  b 1 a b) = snd (rank_fst_loop' b 1 a b)
-  else True
-) (seq 0 100)).
-(* not ok, half, but normal *)
+  (2 ^ (Nat.log2_up b - 1),
+   snd (rank_fst_loop b 1 1 b))
+) (seq 0 33)).
 Compute (map (λ b,
-  let a := 10 in
-  if a <? b then
-    fst (rank_fst_loop b 0 a b) = fst (rank_fst_loop' b 0 a b)
-  else True
-) (seq 0 100)).
-(* not ok *)
-(* pourquoi ça marche pas ? *)
-Compute (binary_div 20 1 12).
-Compute (map (λ b,
-  let a := 10 in
-  if a <? b then
 Nat.eqb
-    (fst_1_len a b) (old_fst_1_len a b)
-  else true
-) (seq 0 100)).
-(* ok *)
+(
+  old_fst_1_len 1 b)
+(
+  new_fst_1_len b
+)
+) (seq 2 80)).
+(* j'aimerais pouvoir traiter a/b et non pas seulement 1/b dans
+   ce nouveau new_fst_1_len, histoire d'être plus général, mais
+   bon, si j'y arrive pas, c'est peut-être pas si grave, chais
+   pas *)
+...
 *)
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
