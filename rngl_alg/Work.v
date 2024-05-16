@@ -4402,6 +4402,17 @@ Theorem pow2_den_le_mul_num :
   → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
 Proof.
 intros * H2n.
+(* to prove that
+     θi ≤ an (θ / 2^bn)
+   we need to prove that
+     2 ^ bn ≤ n * an
+   i.e. we must prove that
+     2 ^ log2_up n * 2 ^ len n ≤ n * (2 ^ (len n + 1) - 1)
+   with
+      len n = 0             si 2 / n = 1
+              len (2 mod n) si 2 / n = 0
+ *)
+...
 assert (H1ln : 1 ≤ Nat.log2_up n). {
   apply Nat.log2_up_lt_pow2; [ flia H2n | ].
   cbn; flia H2n.
