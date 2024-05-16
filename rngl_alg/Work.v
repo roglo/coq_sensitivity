@@ -2610,7 +2610,7 @@ Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
 Definition new_fst_1_len b :=
-  new_rank_fst_loop b ((((2 ^ (Nat.log2_up b - 1)) mod b))) b.
+  new_rank_fst_loop b (2 ^ (Nat.log2_up b - 1) mod b) b.
 (*
 Print rank_fst_loop.
 Compute (map (λ b,
