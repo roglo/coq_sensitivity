@@ -4419,10 +4419,23 @@ ok
   }
   rewrite Nat.mul_shuffle0.
   rewrite <- Nat.mul_sub_distr_r.
+...
+  rewrite <- Nat_add_diag.
+  rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia Hnz Hn1 ].
+...
+Search (_ - (_ - _)).
+Compute (map (λ a, pair a ((2 * a - 2 ^ Nat.log2_up a) * 2)) (seq 0 20)).
 Compute (map (λ n,
   Nat.leb n ((2 * n - 2 ^ Nat.log2_up n) * 2 ^ fst_1_len 1 n)
 ) (seq 0 80)).
 (* ok *)
+Compute (map (λ n,
+pair n (
+  Nat.leb n ((2 * n - 2 ^ Nat.log2_up n))
+)
+) (seq 0 80)).
+(* not ok *)
+Compute (binary_div 20 1 17).
 Compute (map (λ n,
 if snd (extract_pow2 n) =? 1 then (0, true)
 else
@@ -4432,6 +4445,15 @@ pair n
    fst_1_len 1 n)
    (fst_1_len 1 (snd (extract_pow2 n))))
 ) (seq 0 80)).
+  rewrite <- Nat_add_diag.
+  rewrite <- Nat_sub_sub_distr. 2: {
+    apply Nat.log2_up_spec.
+    flia Hnz Hn1.
+  }
+Compute (map (λ a, pair a (2 ^ Nat.log2_up a - a)) (seq 0 20)).
+...
+  rewrite Nat.add_sub_swap.
+  rewrite <- Nat.sub_add_assoc.
 ...
 Compute (map (λ n,
 pair n
