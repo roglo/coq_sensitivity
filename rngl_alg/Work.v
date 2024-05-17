@@ -4587,6 +4587,23 @@ destruct n1. {
   intros Hn1.
   apply Nat.nle_gt in H.
   apply H; clear H.
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite Nat.pow_1_r.
+  rewrite Nat.mul_sub_distr_r.
+  apply Nat.le_add_le_sub_r.
+  apply Nat_le_add_le_sub_l; [ flia | ].
+  rewrite (Nat.mul_comm 2), <- Nat.mul_assoc.
+  rewrite <- (Nat.mul_1_r (S (S n))) at 3.
+  rewrite <- Nat.mul_sub_distr_l.
+  replace (2 * 2 - 1) with 3 by easy.
+  rewrite (Nat.mul_comm _ 3).
+  eapply le_trans; [ | apply Nat.lt_le_incl, Hn1 ].
+  now rewrite Nat.mul_comm, Nat.pow_succ_r'.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_div_not_small_iff in Hn1; [ | easy ].
+rewrite fst_let.
+(* ¡ que bordel ! *)
 ...
   apply Nat.log2_up_spec.
   flia H2n.
