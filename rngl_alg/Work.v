@@ -2983,6 +2983,83 @@ apply (rank_fst_1_log2_up_lemma_2 0); apply H2n.
 Qed.
 
 (* to be completed
+Theorem snd_rank_pow2_fst_rank :
+  ∀ n, 2 ≤ n
+  → snd (rank_fst_loop n 1 1 n) = 2 ^ fst (rank_fst_loop n 1 1 n).
+Proof.
+intros * Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" "^" ].
+progress replace (2 * 1) with 2 by easy.
+remember (2 / S n =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ easy | ].
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1; [ | easy ].
+rewrite snd_let, fst_let.
+destruct Hn1 as [Hn1| Hn1]; [ | flia Hn Hn1 ].
+rewrite Nat.mod_small; [ | easy ].
+apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" "^" ].
+progress replace (2 * 2) with 4 by easy.
+remember (4 / S (S n) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ easy | ].
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1; [ | easy ].
+rewrite snd_let, fst_let.
+destruct Hn1 as [Hn1| Hn1]; [ | flia Hn Hn1 ].
+rewrite Nat.mod_small; [ | easy ].
+do 2 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" "^" ].
+progress replace (2 * 4) with 8 by easy.
+remember (8 / S (S (S n)) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ easy | ].
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1; [ | easy ].
+rewrite snd_let, fst_let.
+destruct Hn1 as [Hn1| Hn1]; [ | flia Hn Hn1 ].
+rewrite Nat.mod_small; [ | easy ].
+do 3 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(**)
+destruct n; [ easy | ].
+apply Nat.succ_lt_mono in Hn.
+cbn - [ "*" "/" "mod" "^" ].
+progress replace (2 * 8) with 16 by easy.
+remember (16 / S (S (S (S n))) =? 1) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ easy | ].
+apply Nat.eqb_neq in Hn1.
+apply Nat_neq_div_1 in Hn1; [ | easy ].
+rewrite snd_let, fst_let.
+destruct Hn1 as [Hn1| Hn1]; [ | flia Hn Hn1 ].
+rewrite Nat.mod_small; [ | easy ].
+do 4 apply Nat.succ_lt_mono in Hn1.
+clear Hn; rename Hn1 into Hn.
+(**)
+Theorem snd_rank_pow2_fst_rank_lemma :
+  ∀ m n,
+  2 ^ m - m < n
+  → snd (rank_fst_loop n 1 (2 ^ m) (m + n)) =
+    2 ^ (m + fst (rank_fst_loop n 1 (2 ^ m) (m + n))).
+Proof.
+intros * Hmn.
+...
+*)
+
+(* to be completed
 Theorem snd_rank_fst_loop_1_log2_up :
   ∀ n, 2 ≤ n → snd (rank_fst_loop n 1 1 n) = 2 ^ (Nat.log2_up n - 1).
 Proof.
