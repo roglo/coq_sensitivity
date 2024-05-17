@@ -4524,8 +4524,20 @@ rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia H2n ].
 progress unfold fst_1_len.
 rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
 rewrite fold_rank_fst_0.
+Compute (map (λ n,
+(n,
+  rank_fst_0 (2 ^ (Nat.log2_up n - 1)) n,
+  binary_div 10 (2 ^ (Nat.log2_up n - 1)) n
+)
+) (seq 1 20)).
+(* bizarre *)
+...
+Print rank_fst_0.
+Print rank_fst_loop.
+...
 progress unfold rank_fst_0.
 clear H1ln.
+...
 (**)
 destruct n; [ easy | ].
 cbn - [ "*" "/" "mod" "^" ].
