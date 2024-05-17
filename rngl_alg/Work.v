@@ -4525,6 +4525,8 @@ Compute (map (λ n,
     (snd (rank_fst_loop n 1 1 n))
     (2 ^ (Nat.log2_up n - 1))
 ) (seq 2 20)).
+rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
+rewrite fold_rank_fst_0.
 ...
 assert (H : n ≤ (n - (2 ^ Nat.log2_up n - n)) * 2 ^ new_fst_1_len n).
   progress unfold new_fst_1_len.
