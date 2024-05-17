@@ -4517,16 +4517,110 @@ apply Nat_le_add_le_sub_l. {
 rewrite Nat.mul_assoc.
 rewrite <- Nat.mul_sub_distr_r.
 rewrite (Nat.mul_comm n).
+(*
 rewrite <- Nat_add_diag.
 rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia H2n ].
+*)
 progress unfold fst_1_len.
-Compute (map (λ n,
-  Nat.eqb
-    (snd (rank_fst_loop n 1 1 n))
-    (2 ^ (Nat.log2_up n - 1))
-) (seq 2 20)).
 rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
 rewrite fold_rank_fst_0.
+progress unfold rank_fst_0.
+clear H1ln.
+(**)
+destruct n; [ easy | ].
+cbn - [ "*" "/" "mod" "^" ].
+apply Nat.succ_le_mono in H2n.
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat_succ_sub_succ_r. 2: {
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.log2_up_null in H.
+  flia H2n H.
+}
+rewrite Nat.sub_0_r.
+remember (_ / _ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat.div_small_iff in Hn1; [ | easy ].
+  exfalso.
+  apply Nat.nle_gt in Hn1.
+  apply Hn1; clear Hn1.
+  apply Nat.log2_up_spec.
+  flia H2n.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_div_not_small_iff in Hn1; [ | easy ].
+rewrite fst_let.
+rewrite (Nat_mod_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+  cbn - [ "*" ].
+  eapply Nat.le_lt_trans; [ | apply Nat.log2_up_spec; flia ].
+  apply Nat.pow_le_mono_r; [ easy | ].
+  rewrite <- Nat.sub_1_r.
+  rewrite Nat.log2_up_double; [ | easy ].
+  now rewrite Nat_sub_succ_1.
+}
+rewrite Nat.mul_1_l.
+clear Hn1.
+(**)
+destruct n; [ easy | ].
+cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+apply Nat.succ_le_mono in H2n.
+remember (_ / _ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat.div_small_iff in Hn1; [ | easy ].
+  apply Nat.nlt_ge.
+  intros H.
+  apply Nat.nle_gt in Hn1.
+  apply Hn1; clear Hn1.
+  rewrite Nat.mul_sub_distr_l.
+  apply Nat.le_add_le_sub_r.
+  rewrite <- (Nat.mul_1_l (S (S n))) at 1.
+  rewrite <- Nat.mul_add_distr_r.
+  cbn - [ "*" Nat.log2_up ].
+  rewrite <- Nat.pow_succ_r'.
+  apply Nat.nlt_ge.
+  intros Hn1.
+  apply Nat.nle_gt in H.
+  apply H; clear H.
+...
+  apply Nat.log2_up_spec.
+  flia H2n.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_div_not_small_iff in Hn1; [ | easy ].
+rewrite fst_let.
+rewrite (Nat_mod_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+  cbn - [ "*" ].
+  eapply Nat.le_lt_trans; [ | apply Nat.log2_up_spec; flia ].
+  apply Nat.pow_le_mono_r; [ easy | ].
+  rewrite <- Nat.sub_1_r.
+  rewrite Nat.log2_up_double; [ | easy ].
+  now rewrite Nat_sub_succ_1.
+}
+rewrite Nat.mul_1_l.
+(**)
+...
+Check Nat.log2_up_spec.
+Search (2 ^ Nat.log2_up _ ≤ _).
+Search (2 ^ Nat.log2_up _ < _).
+...
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite Nat.mul_1_r.
+  apply Nat.le_add_le_sub_r.
+  apply Nat_le_add_le_sub_l; [ flia | ].
+  rewrite <- Nat_add_diag, Nat.add_sub.
+  eapply le_trans; [ | apply Nat.lt_le_incl, Hn1 ].
+...
+  apply Nat.le_sub_le_add_r.
+  rewrite Nat.add_comm.
+  apply Nat.le_sub_le_add_r.
 ...
 assert (H : n ≤ (n - (2 ^ Nat.log2_up n - n)) * 2 ^ new_fst_1_len n).
   progress unfold new_fst_1_len.
