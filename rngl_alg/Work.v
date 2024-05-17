@@ -4418,16 +4418,17 @@ intros * H2n.
      v a = 0               if 2 a / n = 0
            v ((2 a) mod n) if 2 a / n = 1
  *)
+(*
 progress unfold inv_ub_den_pow2.
 rewrite rank_fst_1_log2_up; [ | easy ].
 progress unfold inv_ub_num.
 progress unfold fst_1_len.
-Print rank_fst_loop.
 ...
 Print rank_fst_loop.
 (*
  *)
 ...
+*)
 assert (H1ln : 1 ≤ Nat.log2_up n). {
   apply Nat.log2_up_lt_pow2; [ flia H2n | ].
   cbn; flia H2n.
@@ -4437,6 +4438,10 @@ rewrite rank_fst_1_log2_up; [ | easy ].
 rewrite Nat.add_shuffle0.
 rewrite Nat.sub_add; [ | easy ].
 progress unfold inv_ub_num.
+(*
+assert (H : 2 ^ (Nat.log2_up n + new_fst_1_len n) ≤ n * (2 ^ S (new_fst_1_len n) - 1)).
+  progress unfold new_fst_1_len.
+*)
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
@@ -4464,6 +4469,22 @@ rewrite <- Nat.mul_sub_distr_r.
 rewrite (Nat.mul_comm n).
 rewrite <- Nat_add_diag.
 rewrite <- Nat_sub_sub_distr; [ | apply Nat.log2_up_spec; flia H2n ].
+progress unfold fst_1_len.
+assert (H : n ≤ (n - (2 ^ Nat.log2_up n - n)) * 2 ^ new_fst_1_len n).
+  progress unfold new_fst_1_len.
+(* ouais, bof, et puis ce "mod n", là, il gêne, il n'est utile que pour
+   le cas n=1, mais on s'en fout puisque 2≤n *)
+(* et puis ce new_rank_fst_loop, c'est bien joli, mais chais pas si ça
+   apporte grand chose *)
+(* bon, c'est juste rank_fst_loop spécialisé pour k=0 et où on ne
+   considère que fst *)
+Print new_rank_fst_loop.
+Print rank_fst_loop.
+(* donc, chais pas si c'est un vrai progrès *)
+Search (snd (rank_fst_loop _ _ _ _)).
+(* ah oui, en fait, si, parce que dans la version avec fst_1_len, on
+   ne voit pas apparaître 2^(Nat.log2_up n - 1), c'est bizarre *)
+(* je comprends pas bien *)
 ...
 Search (_ - (_ - _)).
 Compute (map (λ a, pair a ((2 * a - 2 ^ Nat.log2_up a) * 2)) (seq 0 20)).
