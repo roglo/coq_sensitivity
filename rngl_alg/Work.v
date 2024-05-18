@@ -4453,15 +4453,28 @@ Theorem pow2_den_le_mul_num :
   → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
 Proof.
 intros * H2n.
-(* to prove that
-     θi ≤ an (θ / 2^bn)
-   we need to prove that
+progress unfold inv_ub_den_pow2.
+rewrite rank_fst_1_log2_up.
+(* This theorem says
      2 ^ bn ≤ n * an
-   i.e. we must prove that
-     2 ^ log2_up n * 2 ^ len n ≤ n * (2 ^ (len n + 1) - 1)
-   i.e.
-     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ len n
+   and it is required to prove that
+     θi ≤ an * (θ / 2^bn)
+   where
+     an = 2 ^ (len n + 1) - 1
+     bn = log2_up n + len n
    with
+     len n = length of the first sequence of 1s in the binary
+             decomposition of 1/n
+   1/n = 0.0.............01.........10...
+           <- log2_up n -><- len n ->
+     an = 1.........11
+          <- len n ->
+
+   Then we need to prove that
+     2 ^ (log2_up n + len n) ≤ n * (2 ^ (len n + 1) - 1)
+   that we can rewrite as
+     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ len n
+   we can compute "len n" with
      len n = rfz (2 ^ (log2_up n - 1) n
    with
      rfz a b = position of the 1st zero in the binary
