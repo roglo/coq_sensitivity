@@ -4459,26 +4459,17 @@ intros * H2n.
      2 ^ bn ≤ n * an
    i.e. we must prove that
      2 ^ log2_up n * 2 ^ len n ≤ n * (2 ^ (len n + 1) - 1)
+   i.e.
+     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ len n
    with
-     len n = v (u 1)
-   with, for the given n,
-     u a = a               if 2 a / n = 1
-           u ((2 a) mod n) if 2 a / n = 0
-   and
-     v a = 0               if 2 a / n = 0
-           v ((2 a) mod n) if 2 a / n = 1
+     len n = rfz (2 ^ (log2_up n - 1) n
+   with
+     rfz a b = position of the 1st zero in the binary
+               decomposition of a/b
+   and since the first digit of 2 ^ (log2_up n - 1) / n
+   is necessarily 1, this is the length of the first
+   sequence of 1s.
  *)
-(*
-progress unfold inv_ub_den_pow2.
-rewrite rank_fst_1_log2_up; [ | easy ].
-progress unfold inv_ub_num.
-progress unfold fst_1_len.
-...
-Print rank_fst_loop.
-(*
- *)
-...
-*)
 assert (H1ln : 1 ≤ Nat.log2_up n). {
   apply Nat.log2_up_lt_pow2; [ flia H2n | ].
   cbn; flia H2n.
@@ -4488,21 +4479,10 @@ rewrite rank_fst_1_log2_up; [ | easy ].
 rewrite Nat.add_shuffle0.
 rewrite Nat.sub_add; [ | easy ].
 progress unfold inv_ub_num.
-(*
-assert (H : 2 ^ (Nat.log2_up n + new_fst_1_len n) ≤ n * (2 ^ S (new_fst_1_len n) - 1)).
-  progress unfold new_fst_1_len.
-*)
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
 apply Nat.le_add_le_sub_r.
-(*
-Compute (map (λ n,
-  Nat.leb
-  (2 ^ Nat.log2_up n * 2 ^ fst_1_len 1 n + n) (2 * 2 ^ fst_1_len 1 n * n)
-) (seq 1 80)).
-ok
-*)
 apply Nat_le_add_le_sub_l. {
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_r.
