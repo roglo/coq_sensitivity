@@ -4498,6 +4498,7 @@ Nat.ltb
 (* ok *)
 Search (Nat.log2_up _ < Nat.log2_up _).
 *)
+(*
 apply Nat.lt_le_incl.
 apply Nat.log2_up_lt_cancel.
 (*
@@ -4563,7 +4564,7 @@ Search (_ * (_ / _)).
 specialize (Nat.log2_up_spec (S n)) as H1.
 eapply le_trans; [ apply H1; flia H2n | ].
 ...
-(**)
+*)
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
