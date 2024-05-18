@@ -4490,6 +4490,80 @@ rewrite rank_fst_1_log2_up; [ | easy ].
 rewrite Nat.add_shuffle0.
 rewrite Nat.sub_add; [ | easy ].
 progress unfold inv_ub_num.
+(*
+Compute (map (λ n,
+Nat.ltb
+  (2 ^ (Nat.log2_up n + fst_1_len 1 n)) (n * (2 ^ S (fst_1_len 1 n) - 1))
+) (seq 2 60)).
+(* ok *)
+Search (Nat.log2_up _ < Nat.log2_up _).
+*)
+apply Nat.lt_le_incl.
+apply Nat.log2_up_lt_cancel.
+(*
+Compute (map (λ n,
+Nat.ltb
+  (Nat.log2_up (2 ^ (Nat.log2_up n + fst_1_len 1 n)))
+  (Nat.log2_up (n * (2 ^ S (fst_1_len 1 n) - 1)))
+) (seq 2 80)).
+(* ok *)
+*)
+rewrite Nat.log2_up_pow2; [ | easy ].
+apply Nat.eq_le_incl.
+rewrite <- Nat.add_1_r.
+(*
+Compute (map (λ n,
+Nat.eqb
+  (Nat.log2_up n + fst_1_len 1 n + 1)
+  (Nat.log2_up (n * (2 ^ S (fst_1_len 1 n) - 1)))
+) (seq 2 200)).
+(* ok *)
+*)
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]. {
+  apply Nat_pow2_log2_up_succ in H1.
+  rewrite <- H1 at 3.
+  rewrite Nat.mul_comm.
+  rewrite Nat.log2_up_mul_pow2; [ | | easy ]. 2: {
+    apply Nat.lt_add_lt_sub_r.
+    rewrite Nat.add_0_l.
+    progress unfold lt.
+    rewrite Nat.pow_succ_r'.
+    apply Nat_mul_le_pos_r.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite <- Nat.add_assoc; f_equal.
+  rewrite Nat.add_1_r; symmetry.
+  apply Nat_log2_up_pow2_sub_1.
+  intros H.
+  apply Nat.succ_inj in H.
+Theorem neq_fst_1_len_0 : ∀ n, 2 ≤ n → fst_1_len 1 n ≠ 0.
+Proof.
+intros * H2n.
+progress unfold fst_1_len.
+rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
+induction n; [ easy | ].
+apply Nat.succ_le_mono in H2n.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+remember (_ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1; [ exfalso | easy ].
+apply Nat.eqb_eq in Hn1.
+apply Nat.div_small_iff in Hn1; [ | easy ].
+apply Nat.nle_gt in Hn1.
+apply Hn1; clear Hn1.
+rewrite Nat.pow_sub_r; [ | easy | ].
+rewrite Nat.pow_1_r.
+Search (_ * (_ / _)).
+(* ah, fait chier, pourtant ce théorème est vrai *)
+...
+specialize (Nat.log2_up_spec (S n)) as H1.
+eapply le_trans; [ apply H1; flia H2n | ].
+...
+(**)
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
