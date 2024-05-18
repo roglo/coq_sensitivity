@@ -4527,10 +4527,10 @@ rewrite fold_rank_fst_0.
 Compute (map (λ n,
 (n,
   rank_fst_0 (2 ^ (Nat.log2_up n - 1)) n,
+  binary_div 10 1 n,
   binary_div 10 (2 ^ (Nat.log2_up n - 1)) n
 )
 ) (seq 1 20)).
-(* bizarre *)
 ...
 Print rank_fst_0.
 Print rank_fst_loop.
