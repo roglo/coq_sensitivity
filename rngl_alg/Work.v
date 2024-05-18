@@ -4468,7 +4468,7 @@ intros * H2n.
      an = 1.........11
           <- len n ->
 
-   Then we need to prove that
+   Then we need to equivalently prove that
      2 ^ (log2_up n + len n) ≤ n * (2 ^ (len n + 1) - 1)
    that we can rewrite as
      n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ len n
