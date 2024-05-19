@@ -4448,11 +4448,37 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_shuffle0.
   apply Nat.mul_le_mono_r.
   (* 2^bn ≤ n * an *)
-...
+(*
+   1/n = 0.0.............01.........10...
+           <- log2_up n -><- len n ->
+     an = 1.........11
+          <- len n ->
+     bn = log2_up n + len n
+   1/n = 0.0.............01.........10...
+  2^bn =   10............00.........0
+     an =                111111111111
+     an =               100.........0 - 1
+      n =  1..............
+           <- log2_up n ->
+n * an =   11...
+    mouais, enfin, chais pas...
+
+ça voudrait dire que n * an ≥ 2 ^ bn + 2 ^ (bn-1) ?
+*)
 Compute (map (λ n,
   Nat.leb
-  (2 ^ inv_ub_den_pow2 n) (n * inv_ub_num n)
-) (seq 2 80)).
+  (2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 9))
+  (n * inv_ub_num n)
+) (seq 2 256)).
+(* peut-être une piste, là, si
+    2^bn + 2^(bn-log2_up n) ≤ n an
+ *)
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 2 * Nat.log2_up n))
+  (n * inv_ub_num n)
+) (seq 2 512)).
+...
 (* ok *)
 Theorem pow2_den_le_mul_num :
   ∀ n,
