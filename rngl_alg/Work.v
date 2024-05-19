@@ -4471,13 +4471,22 @@ Compute (map (λ n,
   (n * inv_ub_num n)
 ) (seq 2 256)).
 (* peut-être une piste, là, si
-    2^bn + 2^(bn-log2_up n) ≤ n an
+    2^bn + 2^(bn-2*log2_up n) ≤ n an
  *)
 Compute (map (λ n,
   Nat.leb
   (2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 2 * Nat.log2_up n))
   (n * inv_ub_num n)
-) (seq 2 512)).
+) (seq 2 200)).
+apply (le_trans _ ((2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 2 * Nat.log2_up n)))).
+flia.
+rewrite Nat.pow_sub_r; [ | easy | ].
+Compute (map (λ n,
+  Nat.leb
+  (2 * Nat.log2_up n)
+  (inv_ub_den_pow2 n)
+) (seq 0 80)).
+(* ah, chiasse de pute *)
 ...
 (* ok *)
 Theorem pow2_den_le_mul_num :
