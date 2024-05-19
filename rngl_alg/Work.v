@@ -4435,31 +4435,20 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     rewrite <- Nat.pow_add_r.
     now rewrite Nat.sub_add.
   }
-(**)
-(* (2^i/n * 2^bn)/2^i ≤ an *)
-(**)
+  (* (2^i/n * 2^bn)/2^i ≤ an *)
   apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
-(**)
-(* 2^i/n * 2^bn ≤ 2^i * an *)
-(**)
+  (* 2^i/n * 2^bn ≤ 2^i * an *)
   rewrite Nat.mul_comm.
-(**)
-(* 2^bn * (2^i/n) ≤ 2^i * an *)
-(**)
+  (* 2^bn * (2^i/n) ≤ 2^i * an *)
   eapply le_trans; [ now apply Nat.div_mul_le | ].
-(**)
-(* (2^bn * 2^i) / n ≤ 2^i * an *)
-(**)
+  (* (2^bn * 2^i) / n ≤ 2^i * an *)
   apply Nat.div_le_upper_bound; [ easy | ].
-(**)
-(* 2^bn * 2^i ≤ n * (2^i * an) *)
-(**)
+  (* 2^bn * 2^i ≤ n * (2^i * an) *)
   rewrite Nat.mul_assoc.
   rewrite Nat.mul_shuffle0.
   apply Nat.mul_le_mono_r.
-(**)
-(* 2^bn ≤ inv_ub_num n * n *)
-(**)
+  (* 2^bn ≤ n * an *)
+...
 Compute (map (λ n,
   Nat.leb
   (2 ^ inv_ub_den_pow2 n) (n * inv_ub_num n)
