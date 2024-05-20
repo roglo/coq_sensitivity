@@ -4487,8 +4487,6 @@ Compute (map (λ n,
   (inv_ub_den_pow2 n)
 ) (seq 0 80)).
 (* ah, chiasse de pute *)
-...
-(* ok *)
 Theorem pow2_den_le_mul_num :
   ∀ n,
   2 ≤ n
@@ -4607,6 +4605,37 @@ specialize (Nat.log2_up_spec (S n)) as H1.
 eapply le_trans; [ apply H1; flia H2n | ].
 ...
 *)
+progress unfold fst_1_len.
+rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
+remember (Nat.log2_up n) as m eqn:Hm.
+Compute (map (λ n, map (λ m,
+  if m <=? Nat.log2_up n then
+    Nat.leb
+    (2 ^ (m + fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)))
+    (n * (2 ^ S (fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)) - 1))
+  else true
+) (seq 2 20)) (seq 2 60)).
+(* ouais, bon, faut voir : *)
+Theorem glop :
+  ∀ m n,
+  m ≤ Nat.log2_up n
+  → 2 ≤ n
+  → 2 ^ (m + fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)) ≤
+    n * (2 ^ S (fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)) - 1).
+Proof.
+intros * Hmn Hn.
+revert m Hmn.
+induction n; intros; [ easy | ].
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite <- Nat.pow_succ_r'.
+destruct (lt_dec 0 m) as [Hmz| Hmz]. 2: {
+  replace m with 0 by flia Hmz.
+  cbn - [ "*" "/" "mod" "^" ].
+...
+rewrite <- Nat_succ_sub_succ_r.
+...
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
