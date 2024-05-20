@@ -3936,13 +3936,21 @@ now apply -> Nat.succ_le_mono.
 Qed.
 *)
 
-Theorem Nat_le_add_le_sub_l : ∀ n m p, n ≤ m → n + p ≤ m ↔ p ≤ m - n.
+Theorem Nat_le_add_le_sub_l_iff : ∀ n m p, n ≤ m → n + p ≤ m ↔ p ≤ m - n.
 Proof.
 intros * Hnm.
-split; intros Hn; [ now apply Nat.le_add_le_sub_l | ].
+split; intros Hn; [ apply Nat.le_add_le_sub_l, Hn | ].
 apply Nat.add_le_mono_l with (p := n) in Hn.
 eapply le_trans; [ apply Hn | ].
 rewrite Nat.add_comm.
+now rewrite Nat.sub_add.
+Qed.
+
+Theorem Nat_lt_sub_lt_add_r_iff : ∀ n m p, p ≤ n → n - p < m ↔ n < m + p.
+Proof.
+intros * Hpm.
+split; intros Hn; [ apply Nat.lt_sub_lt_add_r, Hn | ].
+apply Nat.add_lt_mono_r with (p := p).
 now rewrite Nat.sub_add.
 Qed.
 
@@ -4625,6 +4633,106 @@ Theorem glop :
   → 2 ^ (m + fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)) ≤
     n * (2 ^ S (fst (rank_fst_loop n 0 (2 ^ (m - 1)) n)) - 1).
 Proof.
+intros * Hmn Hn.
+(*1*)
+destruct n; [ easy | ].
+apply Nat.succ_le_mono in Hn.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+rewrite <- Nat.pow_succ_r'.
+destruct (lt_dec 0 m) as [Hmz| Hmz]. 2: {
+  replace m with 0 by flia Hmz.
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite Nat.pow_1_r.
+  remember (2 / S n =? 0) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2; [ cbn; flia | ].
+  apply Nat.eqb_neq in Hn2.
+  apply Nat_div_not_small_iff in Hn2; [ | easy ].
+  replace n with 1 by flia Hn Hn2.
+  cbn; flia.
+}
+rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+rewrite Nat.sub_0_r.
+remember (2 ^ m / S n =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. {
+  apply Nat.eqb_eq in Hn2.
+  apply Nat.div_small_iff in Hn2; [ | easy ].
+  cbn.
+  rewrite Nat.add_0_r, Nat.mul_1_r.
+  now apply Nat.lt_le_incl.
+}
+apply Nat.eqb_neq in Hn2.
+apply Nat_div_not_small_iff in Hn2; [ | easy ].
+generalize Hmn; intros H1.
+apply (Nat.pow_le_mono_r 2) in H1; [ | easy ].
+rewrite (Nat_mod_less_small 1). 2: {
+  split; [ now rewrite Nat.mul_1_l | ].
+  eapply le_lt_trans; [ apply H1 | ].
+  rewrite <- Nat_pow2_log2; [ | flia Hn ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply (le_lt_trans _ n); [ | easy ].
+  now apply Nat.log2_spec.
+}
+rewrite Nat.mul_1_l.
+clear H1.
+(**)
+destruct n; [ easy | clear Hn ].
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+remember (_ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  apply Nat.eqb_eq in Hn1.
+  apply Nat.div_small_iff in Hn1; [ | easy ].
+  cbn.
+  rewrite Nat.mul_sub_distr_l in Hn1.
+  apply Nat.lt_sub_lt_add_l in Hn1.
+  rewrite <- Nat.pow_succ_r' in Hn1.
+  rewrite <- (Nat.add_1_r m) in Hn1.
+  eapply le_trans; [ apply Nat.lt_le_incl, Hn1 | ].
+  flia.
+}
+apply Nat.eqb_neq in Hn1.
+apply Nat_div_not_small_iff in Hn1; [ | easy ].
+rewrite (Nat_mod_less_small 1). 2: {
+  split; [ now rewrite Nat.mul_1_l | ].
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply Nat_lt_sub_lt_add_r_iff; [ easy | ].
+  generalize Hmn; intros H1.
+  apply (Nat.pow_le_mono_r 2) in H1; [ | easy ].
+  eapply le_lt_trans; [ apply H1 | ].
+  rewrite <- Nat_pow2_log2; [ | easy ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat_add_diag.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply (le_lt_trans _ (S n)); [ | easy ].
+  now apply Nat.log2_spec.
+}
+rewrite Nat.mul_1_l.
+rewrite Nat.mul_sub_distr_l in Hn1.
+apply Nat_le_add_le_sub_l_iff in Hn1; [ | flia Hn2 ].
+rewrite <- (Nat.mul_1_l (S (S n))) in Hn1 at 2.
+rewrite <- Nat.mul_add_distr_r in Hn1.
+progress replace (2 + 1) with 3 in Hn1 by easy.
+rewrite <- Nat.pow_succ_r' in Hn1.
+rewrite Nat.mul_sub_distr_l.
+rewrite <- Nat.sub_add_distr.
+rewrite <- (Nat.mul_1_l (S (S n))) at 2 6.
+rewrite <- Nat.mul_add_distr_r.
+progress replace (2 + 1) with 3 by easy.
+rewrite <- Nat.pow_succ_r'.
+(**)
+destruct n. {
+  cbn in Hmn.
+  replace m with 1 by flia Hmn Hmz.
+  cbn; flia.
+}
+...1
 intros * Hmn Hn.
 revert m Hmn.
 induction n; intros; [ easy | ].
