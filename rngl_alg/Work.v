@@ -4732,6 +4732,59 @@ destruct n. {
   replace m with 1 by flia Hmn Hmz.
   cbn; flia.
 }
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+remember (_ =? 0) as n3 eqn:Hn3.
+symmetry in Hn3.
+destruct n3. {
+  apply Nat.eqb_eq in Hn3.
+  apply Nat.div_small_iff in Hn3; [ | easy ].
+  cbn.
+  rewrite Nat.mul_sub_distr_l in Hn3.
+  apply Nat.lt_sub_lt_add_l in Hn3.
+  rewrite <- Nat.pow_succ_r' in Hn3.
+  rewrite <- (Nat.add_1_r m) in Hn3.
+  rewrite <- Nat.add_succ_r in Hn3.
+  eapply le_trans; [ apply Nat.lt_le_incl, Hn3 | ].
+  flia.
+}
+apply Nat.eqb_neq in Hn3.
+apply Nat_div_not_small_iff in Hn3; [ | easy ].
+rewrite (Nat_mod_less_small 1). 2: {
+  split; [ now rewrite Nat.mul_1_l | ].
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply Nat_lt_sub_lt_add_r_iff; [ easy | ].
+  generalize Hmn; intros H1.
+  rewrite <- (Nat.mul_1_l (S (S (S n)))) at 1.
+  rewrite <- Nat.mul_add_distr_r.
+  progress replace (1 + 3) with (2 * 2) by easy.
+  rewrite <- Nat.mul_assoc.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply (Nat.pow_le_mono_r 2) in H1; [ | easy ].
+  eapply le_lt_trans; [ apply H1 | ].
+  rewrite <- Nat_pow2_log2; [ | easy ].
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply (le_lt_trans _ (S (S n))); [ | easy ].
+  now apply Nat.log2_spec.
+}
+rewrite Nat.mul_1_l.
+rewrite Nat.mul_sub_distr_l in Hn3.
+apply Nat_le_add_le_sub_l_iff in Hn3; [ | flia Hn1 ].
+rewrite Nat.mul_assoc in Hn3.
+rewrite <- (Nat.mul_1_l (S (S (S n)))) in Hn3 at 2.
+rewrite <- Nat.mul_add_distr_r in Hn3.
+progress replace (2 * 3 + 1) with 7 in Hn3 by easy.
+rewrite <- Nat.pow_succ_r' in Hn3.
+rewrite Nat.mul_sub_distr_l.
+rewrite <- Nat.sub_add_distr.
+rewrite <- (Nat.mul_1_l (S (S (S n)))) at 2 6.
+rewrite Nat.mul_assoc.
+rewrite <- Nat.mul_add_distr_r.
+progress replace (2 * 3 + 1) with 7 by easy.
+(* bon, voir si on peut faire un lemme général *)
 ...1
 intros * Hmn Hn.
 revert m Hmn.
