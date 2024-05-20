@@ -4498,28 +4498,30 @@ intros * H2n.
    and it is required to prove that
      θi ≤ an * (θ / 2^bn)
    where
-     an = 2 ^ (len n + 1) - 1
-     bn = log2_up n + len n
+     an = 2 ^ (un + 1) - 1
+     bn = log2_up n + un
    with
-     len n = length of the first sequence of 1s in the binary
-             decomposition of 1/n
-   1/n = 0.0.............01.........10...
-           <- log2_up n -><- len n ->
-     an = 1.........11
-          <- len n ->
+     un = length of the first sequence of 1s in the binary
+          decomposition of 1/n
+   1/n = 0.0.............01......10...
+           <- log2_up n -><- un ->
+     an = 11........1
+           <- un n ->
 
    Then we need to equivalently prove that
-     2 ^ (log2_up n + len n) ≤ n * (2 ^ (len n + 1) - 1)
+     2 ^ (log2_up n + un) ≤ n * (2 ^ (un + 1) - 1)
    that we can rewrite as
-     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ len n
+     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ un n
    we can compute "len n" with
-     len n = rfz (2 ^ (log2_up n - 1) n
+     un = fn (2 ^ (log2_up n - 1))
    with
-     rfz a b = position of the 1st zero in the binary
-               decomposition of a/b
-   and since the first digit of 2 ^ (log2_up n - 1) / n
-   is necessarily 1, this is the length of the first
-   sequence of 1s.
+     fn i = position of the 1st zero in the binary
+            decomposition of 1/a
+
+     fn(i) = | i              if 2i/n = 0
+             | fn((2i) mod n) otherwize
+
+    we must also prove that fn terminates
  *)
 assert (H1ln : 1 ≤ Nat.log2_up n). {
   apply Nat.log2_up_lt_pow2; [ flia H2n | ].
@@ -4633,8 +4635,44 @@ rewrite <- Nat.pow_succ_r'.
 destruct (lt_dec 0 m) as [Hmz| Hmz]. 2: {
   replace m with 0 by flia Hmz.
   cbn - [ "*" "/" "mod" "^" ].
+  rewrite Nat.pow_1_r.
+  remember (2 / S n =? 0) as n2 eqn:Hn2.
+  symmetry in Hn2.
+  destruct n2; [ cbn; flia | ].
+  apply Nat.eqb_neq in Hn2.
+  apply Nat_div_not_small_iff in Hn2; [ | easy ].
+  replace n with 1 by flia Hn Hn2.
+  cbn; flia.
+}
+rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+rewrite Nat.sub_0_r.
+remember (2 ^ m / S n =? 0) as n2 eqn:Hn2.
+symmetry in Hn2.
+destruct n2. {
+  apply Nat.eqb_eq in Hn2.
+  apply Nat.div_small_iff in Hn2; [ | easy ].
+  cbn.
+  rewrite Nat.add_0_r, Nat.mul_1_r.
+  now apply Nat.lt_le_incl.
+}
+apply Nat.eqb_neq in Hn2.
+apply Nat_div_not_small_iff in Hn2; [ | easy ].
+rewrite <- Nat.add_succ_comm.
+(* cul de sac *)
 ...
-rewrite <- Nat_succ_sub_succ_r.
+Search (_ ^ _ mod _).
+rewrite <- Nat_mod_pow_mod.
+...
+apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
+exfalso.
+apply Nat.nlt_ge in Hmn.
+apply Hmn; clear Hmn.
+eapply lt_le_trans; [ | apply Hn2 ].
+(* ah non, c'est faux *)
+...
+rewrite <- Nat_pow2_log2 in Hmn; [ | flia Hn ].
+...
+rewrite (Nat_mod_less_small 1).
 ...
 rewrite Nat.pow_add_r.
 rewrite Nat.pow_succ_r'.
