@@ -4938,6 +4938,12 @@ Compute (map (λ p,
 ) (seq 0 16)).
 (* ok *)
 *)
+Compute (map (λ p,
+  Nat.sub
+  (S p * 2 ^ S (S p) - S p)
+  (2 ^ (Nat.log2_up (S p) + S p))
++ S p
+) (seq 0 12)).
 ...
 (*
   eapply le_trans. 2: {
