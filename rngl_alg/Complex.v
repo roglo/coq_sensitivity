@@ -2514,13 +2514,16 @@ destruct_ac.
 intros * H13 H132.
 progress unfold angle_add_overflow in H132.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge in H132.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false in H132.
+apply angle_nlt_ge in H132.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_add_swap in H132.
 rewrite <- angle_add_assoc in H132.
 apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
 progress unfold angle_add_overflow in H13.
-now apply angle_ltb_ge in H13.
+apply Bool.not_true_iff_false in H13.
+now apply angle_nlt_ge in H13.
 Qed.
 
 Theorem angle_add_overflow_move_add :

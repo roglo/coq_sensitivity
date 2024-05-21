@@ -2183,7 +2183,8 @@ Proof.
 intros.
 progress unfold angle_add_overflow.
 rewrite angle_add_0_l.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 apply angle_nonneg.
 Qed.
 
