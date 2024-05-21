@@ -4900,12 +4900,30 @@ induction n; intros. {
   apply Nat.le_add_le_sub_l.
 (**)
   rewrite Nat.pow_add_r.
+(*
+Compute (map (λ m, map (λ p,
+  if m <=? Nat.log2_up (S p) then
+Nat.leb
+  (S p + 2 ^ m * 2 ^ S p) (S p * 2 ^ S (S p))
+  else true
+) (seq 1 10)) (seq 0 20)).
+(* ok *)
+*)
   eapply le_trans. {
     apply Nat.add_le_mono_l.
     apply Nat.mul_le_mono_r.
     apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
     apply Hmn.
   }
+(**)
+Compute (map (λ m, map (λ p,
+  if m <=? Nat.log2_up (S p) then
+Nat.leb
+  (S p + 2 ^ Nat.log2_up (S p) * 2 ^ S p) (S p * 2 ^ S (S p))
+  else true
+) (seq 1 10)) (seq 0 20)).
+(* ok *)
+...
   eapply le_trans. 2: {
     apply Nat.add_le_mul. {
       destruct p; [ cbn in Hmn; flia Hmz Hmn | flia ].
@@ -4917,6 +4935,14 @@ induction n; intros. {
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
+Compute (map (λ m, map (λ p,
+  if m <=? Nat.log2_up (S p) then
+Nat.leb
+  (S p + 2 ^ Nat.log2_up (S p) * 2 ^ S p) (S p + 2 ^ S (S p))
+  else true
+) (seq 1 10)) (seq 0 20)).
+(* not ok *)
+...
   apply Nat.add_le_mono_l.
   rewrite (Nat.pow_succ_r' _ (S p)).
   apply Nat.mul_le_mono_r.
