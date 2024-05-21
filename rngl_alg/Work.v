@@ -382,8 +382,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-progress unfold angle_leb.
+progress unfold angle_ltb.
 remember (seq_angle_to_div_nat θ n) as u eqn:Hu.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -399,7 +398,7 @@ destruct zs. {
   rewrite Hzsm.
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
-  apply rngl_leb_le.
+  apply (rngl_ltb_ge Hor).
   rewrite angle_add_diag in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite rngl_cos_mul_2_l'.
@@ -1568,8 +1567,7 @@ destruct (angle_lt_dec θ1 θ2) as [Hl12| Hl12]. {
   specialize (angle_opp_lt_compat_if θ1 θ2 H1z Hl12) as H1.
   now apply angle_lt_le_incl in H1.
 }
-apply Bool.not_true_iff_false in Hl12.
-apply angle_ltb_ge in Hl12.
+apply angle_nlt_ge in Hl12.
 apply angle_le_antisymm in H12; [ | easy ].
 subst θ2.
 apply angle_le_refl.
@@ -1948,7 +1946,9 @@ Theorem angle_le_add_r :
   → (θ1 ≤ θ1 + θ2)%A.
 Proof.
 intros * Haov.
-now apply angle_ltb_ge in Haov.
+progress unfold angle_add_overflow in Haov.
+apply Bool.not_true_iff_false in Haov.
+now apply angle_nlt_ge in Haov.
 Qed.
 
 Theorem angle_le_pow2_log2 :
