@@ -692,13 +692,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * H32 H12.
   progress unfold angle_add_overflow.
-  apply angle_ltb_ge.
-  progress unfold angle_leb.
+  progress unfold angle_ltb.
   rewrite (H1 (rngl_sin θ1)).
   rewrite (rngl_leb_refl Hor).
   rewrite (H1 (rngl_sin (θ1 + θ3))).
   rewrite (rngl_leb_refl Hor).
-  apply rngl_leb_le.
+  apply (rngl_ltb_ge Hor).
   rewrite H1.
   rewrite (H1 (rngl_cos _)).
   apply (rngl_le_refl Hor).
@@ -707,11 +706,9 @@ intros * H32 H12.
 generalize H12; intros Haov.
 progress unfold angle_add_overflow in H12.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge in H12.
-apply angle_ltb_ge.
 progress unfold angle_leb in H32.
-progress unfold angle_leb in H12.
-progress unfold angle_leb.
+progress unfold angle_ltb in H12.
+progress unfold angle_ltb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
@@ -724,7 +721,7 @@ destruct zs1. {
   apply rngl_leb_le in Hzs1.
   destruct zs13; [ | easy ].
   apply rngl_leb_le in Hzs13.
-  apply rngl_leb_le.
+  apply (rngl_ltb_ge Hor).
   destruct zs3. {
     apply rngl_leb_le in Hzs3.
     destruct zs2. {
@@ -732,7 +729,7 @@ destruct zs1. {
       apply rngl_leb_le in H32.
       destruct zs12. {
         apply rngl_leb_le in Hzs12.
-        apply rngl_leb_le in H12.
+        apply (rngl_ltb_ge Hor) in H12.
         now apply angle_add_overflow_le_lemma_1 with (θ2 := θ2).
       } {
         clear H12.
@@ -743,7 +740,8 @@ destruct zs1. {
       clear H32.
       destruct zs12. {
         exfalso.
-        apply rngl_leb_le in Hzs12, H12.
+        apply rngl_leb_le in Hzs12.
+        apply (rngl_ltb_ge Hor) in H12.
         apply (rngl_leb_gt Hor) in Hzs2.
         clear - Hzs12 H12 Hzs2 Hor ac Hzs1 Haov.
         apply (rngl_nle_gt Hor) in Hzs2.
@@ -763,7 +761,7 @@ destruct zs1. {
     apply rngl_leb_le in H32.
     destruct zs12. {
       apply rngl_leb_le in Hzs12.
-      apply rngl_leb_le in H12.
+      apply (rngl_ltb_ge Hor) in H12.
       now apply angle_add_overflow_le_lemma_6 in H12.
     }
     clear H12.
@@ -773,7 +771,7 @@ destruct zs1. {
 }
 destruct zs12; [ easy | ].
 apply (rngl_leb_gt Hor) in Hzs1, Hzs12.
-apply rngl_leb_le in H12.
+apply (rngl_ltb_ge Hor) in H12.
 destruct zs13. {
   exfalso.
   apply rngl_leb_le in Hzs13.
@@ -789,7 +787,7 @@ destruct zs13. {
   }
 }
 apply (rngl_leb_gt Hor) in Hzs13.
-apply rngl_leb_le.
+apply (rngl_ltb_ge Hor).
 destruct zs3. {
   apply rngl_leb_le in Hzs3.
   apply (rngl_lt_le_incl Hor) in Hzs1.
