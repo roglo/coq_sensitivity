@@ -4681,7 +4681,19 @@ rewrite (Nat_mod_less_small 1). 2: {
 }
 rewrite Nat.mul_1_l.
 clear H1 Hn1.
-(**)
+(*
+Theorem pow2_den_le_mul_num_lemma :
+  ∀ p m n,
+  0 < m ≤ Nat.log2_up (S p + n)
+  → 2 ^ (m + (S p + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n)))) ≤
+    (S p + n) * (2 ^ (S (S p) + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n))) - 1).
+Proof.
+intros * (Hmz, Hmn).
+Admitted.
+specialize (pow2_den_le_mul_num_lemma 0 m n) as H1.
+rewrite Nat.mul_1_l in H1.
+now apply H1.
+*)
 destruct n; [ easy | clear Hn ].
 cbn - [ "*" "/" "mod" "^" ].
 rewrite fst_if, fst_let.
@@ -4729,7 +4741,17 @@ rewrite <- Nat.mul_add_distr_r.
 progress replace (2 + 1) with 3 by easy.
 rewrite <- Nat.pow_succ_r'.
 clear Hn1.
-(**)
+(*
+Theorem pow2_den_le_mul_num_lemma :
+  ∀ p m n,
+  0 < m ≤ Nat.log2_up (S p + n)
+  → 2 ^ (m + (S p + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n)))) ≤
+    (S p + n) * (2 ^ (S (S p) + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n))) - 1).
+Proof.
+intros * (Hmz, Hmn).
+Admitted.
+now apply (pow2_den_le_mul_num_lemma 1).
+*)
 destruct n. {
   cbn in Hmn.
   replace m with 1 by flia Hmn Hmz.
@@ -4789,7 +4811,17 @@ rewrite <- Nat.mul_add_distr_r.
 progress replace (2 * 3 + 1) with 7 by easy.
 rewrite <- Nat.pow_succ_r'.
 clear Hn1.
-(**)
+(*
+Theorem pow2_den_le_mul_num_lemma :
+  ∀ p m n,
+  0 < m ≤ Nat.log2_up (S p + n)
+  → 2 ^ (m + (S p + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n)))) ≤
+    (S p + n) * (2 ^ (S (S p) + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n))) - 1).
+Proof.
+intros * (Hmz, Hmn).
+Admitted.
+now apply (pow2_den_le_mul_num_lemma 2).
+*)
 destruct n. {
   cbn in Hmn.
   destruct m; [ easy | clear Hmz ].
@@ -4852,6 +4884,51 @@ progress replace (2 * 7 + 1) with 15 by easy.
 rewrite <- Nat.pow_succ_r'.
 clear Hn1.
 (* bon, voir si on peut faire un lemme général *)
+Theorem pow2_den_le_mul_num_lemma :
+  ∀ p m n,
+  0 < m ≤ Nat.log2_up (S p + n)
+  → 2 ^ (m + (S p + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n)))) ≤
+    (S p + n) * (2 ^ (S (S p) + fst (rank_fst_loop n 0 (2 ^ (p + m) - (2 ^ S p - 1) * (S p + n)) (S p + n))) - 1).
+Proof.
+intros * (Hmz, Hmn).
+revert p Hmn.
+induction n; intros. {
+  cbn - [ "*" ].
+  rewrite Nat.add_0_r.
+  destruct m; [ easy | clear Hmz ].
+  destruct m. {
+    do 2 rewrite <- Nat.pow_succ_r'.
+    rewrite (Nat.add_1_l (S p)).
+...
+    destruct p; [ now cbn in Hmn | ].
+    rewrite Nat.pow_succ_r; [ | easy ].
+    destruct p; [ cbn; flia | ].
+    destruct p; [ cbn; flia | ].
+    destruct p; [ cbn; flia | ].
+...
+    cbn - [ "*" ].
+    rewrite Nat.pow_succ_r in Hn1.
+    rewrite Nat.pow_add_r in Hn1.
+    progress replace (2 ^ 1) with 2 in Hn1 by easy.
+    specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
+    destruct p; [ cbn in Hn1 | ].
+cbn in Hmn.
+...
+Compute (map (λ p,
+  2 * (2 * 2 ^ p) ≤ S p * (2 * (2 * 2 ^ p) - 1)
+) (seq 0 10)).
+...
+    do 2 rewrite Nat.add_0_r.
+    destruct p; [ easy | ].
+    cbn.
+    specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
+    destruct p; [ cbn; flia | ].
+...
+
+  destruct m; [ cbn; flia | ].
+  destruct m; [ cbn; flia | flia Hmn ].
+... ...
+now apply (pow2_den_le_mul_num_lemma 3).
 ...1
 intros * Hmn Hn.
 revert m Hmn.
