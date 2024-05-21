@@ -447,38 +447,6 @@ Context {ac : angle_ctx T}.
 
 Definition angle_add_overflow θ1 θ2 := (θ1 + θ2 <? θ1)%A.
 
-Theorem angle_ltb_ge : ∀ θ1 θ2, (θ1 <? θ2)%A = false ↔ (θ2 ≤ θ1)%A.
-Proof.
-intros.
-destruct_ac.
-progress unfold angle_ltb.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-split; intros H12. {
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
-  } {
-    destruct zs2; [ easy | ].
-    apply (rngl_ltb_ge Hor) in H12.
-    now apply rngl_leb_le.
-  }
-} {
-  destruct zs1. {
-    destruct zs2; [ | easy ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
-  } {
-    destruct zs2; [ easy | ].
-    apply rngl_leb_le in H12.
-    now apply (rngl_ltb_ge Hor).
-  }
-}
-Qed.
-
 Theorem angle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
 Proof.
 destruct_ac.
