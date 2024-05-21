@@ -53,7 +53,6 @@ assert (Hs2z : (√2 ≠ 0)%L). {
 intros * Haov.
 generalize Haov; intros Haov_v.
 progress unfold angle_add_overflow in Haov.
-apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 cbn.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -77,7 +76,7 @@ destruct zs3. {
         apply angle_eqb_eq in Hs1; right.
         subst θ1.
         intros H; subst θ2.
-        apply angle_nlt_ge in Haov.
+        apply Bool.not_true_iff_false in Haov.
         apply Haov; clear Haov.
         rewrite angle_straight_add_straight.
         apply (angle_straight_pos Hc1).
@@ -97,13 +96,15 @@ destruct zs3. {
     destruct zs2. {
       apply rngl_leb_le in Hzs2.
       exfalso.
-      progress unfold angle_leb in Haov.
+      progress unfold angle_ltb in Haov.
       apply (rngl_leb_gt Hor) in Hzs1.
       rewrite Hzs1 in Haov.
       apply rngl_leb_le in Hzs3.
       now rewrite Hzs3 in Haov.
     }
     apply (rngl_leb_gt Hor) in Hzs2.
+    apply Bool.not_true_iff_false in Haov.
+    apply angle_nlt_ge in Haov.
     apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
     now apply (rngl_nlt_ge Hor) in Hzs3.
   }
@@ -121,6 +122,8 @@ destruct zs1. {
     apply rngl_leb_le in Hzs2.
     rewrite (rngl_mul_1_l Hon).
     subst θ3.
+    apply Bool.not_true_iff_false in Haov.
+    apply angle_nlt_ge in Haov.
     now apply rngl_sin_nonneg_sin_nonneg_sin_neg.
   } {
     apply (rngl_leb_gt Hor) in Hzs2.
@@ -152,13 +155,13 @@ rewrite (rngl_mul_mul_swap Hic (-1))%L.
 rewrite (rngl_squ_opp_1 Hon Hop).
 rewrite (rngl_mul_1_l Hon).
 subst θ3.
-progress unfold angle_leb in Haov.
+progress unfold angle_ltb in Haov.
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
 apply rngl_leb_nle in Hzs1, Hzs3.
 rewrite Hzs1, Hzs3 in Haov.
 apply rngl_leb_nle in Hzs1, Hzs3.
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
-apply rngl_leb_le in Haov.
+apply (rngl_ltb_ge Hor) in Haov.
 move Haov at bottom.
 (* changing θ1 into θ1 - angle_straight *)
 remember (θ1 - angle_straight)%A as θ.
@@ -309,12 +312,11 @@ assert (Hs2z : (√2 ≠ 0)%L). {
 }
 generalize Haov; intros Haov_v.
 progress unfold angle_add_overflow in Haov.
-apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 cbn.
 move Haov at bottom.
 generalize Haov; intros Haov'.
-progress unfold angle_leb in Haov.
+progress unfold angle_ltb in Haov.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 symmetry in Hzs1, Hzs2.
@@ -418,7 +420,7 @@ destruct zs1. {
   apply (rngl_leb_gt Hor) in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
   move Hzs12 at bottom.
-  apply rngl_leb_le in Haov.
+  apply (rngl_ltb_ge Hor) in Haov.
   apply (rngl_opp_le_compat Hop Hor) in Haov.
   move Haov at bottom.
   destruct zs2. {
