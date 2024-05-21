@@ -2182,6 +2182,7 @@ Theorem angle_add_overflow_0_l : ∀ θ, angle_add_overflow 0 θ = false.
 Proof.
 intros.
 progress unfold angle_add_overflow.
+rewrite angle_add_0_l.
 apply angle_ltb_ge.
 apply angle_nonneg.
 Qed.
@@ -2190,9 +2191,9 @@ Theorem angle_add_overflow_0_r : ∀ θ, angle_add_overflow θ 0 = false.
 Proof.
 intros.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
 rewrite angle_add_0_r.
-apply angle_le_refl.
+apply Bool.not_true_iff_false.
+apply angle_lt_irrefl.
 Qed.
 
 Theorem rngl_sin_nonneg_add_nonneg :
@@ -2239,11 +2240,10 @@ destruct aov. {
   now apply (rngl_lt_le_incl Hor).
 }
 progress unfold angle_add_overflow in Haov.
-apply angle_ltb_ge in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge Hor).
 intros Hzs2.
-progress unfold angle_leb in Haov.
+progress unfold angle_ltb in Haov.
 cbn in Haov.
 apply rngl_leb_le in Hzs1.
 rewrite Hzs1 in Haov.
@@ -2251,7 +2251,7 @@ apply rngl_leb_le in Hzs1.
 apply rngl_leb_le in Hzs3.
 rewrite Hzs3 in Haov.
 apply rngl_leb_le in Hzs3.
-apply rngl_leb_le in Haov.
+apply (rngl_ltb_ge Hor) in Haov.
 apply (rngl_nle_gt Hor) in Hzs2.
 apply Hzs2; clear Hzs2.
 symmetry in Hθ3.
