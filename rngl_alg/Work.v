@@ -10323,7 +10323,8 @@ Proof.
 intros * Hni Hθ' * Hm.
 destruct m; [ apply angle_add_overflow_0_r | ].
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat.
@@ -10354,7 +10355,8 @@ Proof.
 intros * Hni Hθ' * Hm.
 destruct m; [ apply angle_add_overflow_0_r | ].
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat.
