@@ -4915,15 +4915,31 @@ Nat.leb
     apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
     apply Hmn.
   }
-(**)
-Compute (map (λ m, map (λ p,
-  if m <=? Nat.log2_up (S p) then
+  clear m Hmz Hmn.
+(*
+Compute (map (λ p,
 Nat.leb
   (S p + 2 ^ Nat.log2_up (S p) * 2 ^ S p) (S p * 2 ^ S (S p))
-  else true
-) (seq 1 10)) (seq 0 20)).
+) (seq 0 16)).
 (* ok *)
+*)
+  rewrite <- Nat.pow_add_r.
+  rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite Nat.mul_add_distr_l, Nat.mul_1_r.
+  rewrite Nat.add_comm.
+  apply Nat.add_le_mono_r.
+(*
+Compute (map (λ p,
+  Nat.leb
+  (2 ^ (Nat.log2_up (S p) + S p)) (S p * (2 ^ S (S p) - 1))
+) (seq 0 16)).
+(* ok *)
+*)
 ...
+(*
   eapply le_trans. 2: {
     apply Nat.add_le_mul. {
       destruct p; [ cbn in Hmn; flia Hmz Hmn | flia ].
@@ -4948,20 +4964,24 @@ Nat.leb
   apply Nat.mul_le_mono_r.
   (* marche pas *)
 ...
+*)
   eapply le_trans. {
     apply Nat.add_le_mul. {
       destruct p; [ cbn in Hmn; flia Hmz Hmn | flia ].
     }
-    rewrite Nat.add_succ_r, Nat.pow_succ_r'.
+    rewrite Nat.pow_succ_r'.
     apply (lt_le_trans _ 2); [ easy | ].
-    rewrite <- (Nat.mul_1_r 2) at 1.
-    apply Nat.mul_le_mono_l.
+    rewrite <- (Nat.mul_1_l 2) at 1.
+    apply Nat.mul_le_mono. {
+      apply Nat.neq_0_lt_0.
+      now apply Nat.pow_nonzero.
+    }
+    apply Nat_mul_le_pos_r.
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
   apply Nat.mul_le_mono_l.
-  rewrite Nat.pow_succ_r'.
-  rewrite Nat.pow_add_r.
+  rewrite (Nat.pow_succ_r' _ (S p)).
   apply Nat.mul_le_mono_r.
   (* marche pas *)
 ...
