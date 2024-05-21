@@ -484,22 +484,20 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Haov.
   progress unfold angle_add_overflow.
-  apply angle_ltb_ge.
-  progress unfold angle_leb.
+  progress unfold angle_ltb.
   rewrite (H1 (rngl_sin _)).
   rewrite (rngl_leb_refl Hor).
   rewrite (H1 (rngl_sin _)).
   rewrite (rngl_leb_refl Hor).
   do 2 rewrite (H1 (rngl_cos _)).
-  apply (rngl_leb_refl Hor).
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_refl Hor).
 }
 intros * Haov.
 progress unfold angle_add_overflow in Haov.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge in Haov.
-apply angle_ltb_ge.
-progress unfold angle_leb in Haov.
-progress unfold angle_leb.
+progress unfold angle_ltb in Haov.
+progress unfold angle_ltb.
 rewrite (angle_add_comm θ2).
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -508,8 +506,9 @@ symmetry in Hzs12, Hzs1, Hzs2.
 destruct zs2. {
   destruct zs12; [ | easy ].
   destruct zs1; [ | easy ].
-  apply rngl_leb_le in Hzs1, Hzs12, Hzs2, Haov.
-  apply rngl_leb_le.
+  apply rngl_leb_le in Hzs1, Hzs12, Hzs2.
+  apply (rngl_ltb_ge Hor) in Haov.
+  apply (rngl_ltb_ge Hor).
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     rewrite angle_add_comm.
     apply rngl_cos_add_le_cos; try easy.
@@ -545,11 +544,11 @@ destruct zs2. {
     destruct zs1; [ | easy ].
     apply rngl_leb_le in Hzs1.
     apply rngl_leb_le in Hzs12.
-    apply rngl_leb_le in Haov.
+    apply (rngl_ltb_ge Hor) in Haov.
     apply angle_add_overflow_le_lemma_6 in Haov; try easy.
   }
   apply (rngl_leb_gt Hor) in Hzs12.
-  apply rngl_leb_le.
+  apply (rngl_ltb_ge Hor).
   destruct zs1. {
     clear Haov.
     apply rngl_leb_le in Hzs1.
@@ -559,7 +558,7 @@ destruct zs2. {
     now rewrite angle_add_comm.
   }
   apply (rngl_leb_gt Hor) in Hzs1.
-  apply rngl_leb_le in Haov.
+  apply (rngl_ltb_ge Hor) in Haov.
   apply (rngl_nlt_ge Hor).
   intros Hc12.
   apply (rngl_nle_gt Hor) in Hzs12.
@@ -831,8 +830,8 @@ split; intros Hn. {
     split; [ easy | cbn ].
     progress unfold angle_add_overflow.
     rewrite angle_add_0_r.
-    apply angle_ltb_ge.
-    apply angle_le_refl.
+    apply Bool.not_true_iff_false.
+    apply angle_lt_irrefl.
   }
   remember (S n) as sn; cbn in Hn; subst sn.
   now apply Bool.orb_false_iff in Hn.
