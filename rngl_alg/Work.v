@@ -4893,26 +4893,51 @@ Proof.
 intros * (Hmz, Hmn).
 revert p Hmn.
 induction n; intros. {
-  cbn - [ "*" ].
-  rewrite Nat.add_0_r.
-  destruct m; [ easy | clear Hmz ].
-  destruct m. {
-    do 2 rewrite <- Nat.pow_succ_r'.
-    rewrite (Nat.add_1_l (S p)).
+  cbn - [ "*" "^" ].
+  rewrite Nat.add_0_r in Hmn |-*.
+  rewrite Nat.mul_sub_distr_l.
+  rewrite Nat.mul_1_r.
+  apply Nat.le_add_le_sub_l.
+(**)
+  rewrite Nat.pow_add_r.
+  eapply le_trans. {
+    apply Nat.add_le_mono_l.
+    apply Nat.mul_le_mono_r.
+    apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
+    apply Hmn.
+  }
+  eapply le_trans. 2: {
+    apply Nat.add_le_mul. {
+      destruct p; [ cbn in Hmn; flia Hmz Hmn | flia ].
+    }
+    apply (lt_le_trans _ 2); [ easy | ].
+    rewrite Nat.pow_succ_r'.
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    apply Nat.mul_le_mono_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  apply Nat.add_le_mono_l.
+  rewrite (Nat.pow_succ_r' _ (S p)).
+  apply Nat.mul_le_mono_r.
+  (* marche pas *)
 ...
-    destruct p; [ now cbn in Hmn | ].
-    rewrite Nat.pow_succ_r; [ | easy ].
-    destruct p; [ cbn; flia | ].
-    destruct p; [ cbn; flia | ].
-    destruct p; [ cbn; flia | ].
-...
-    cbn - [ "*" ].
-    rewrite Nat.pow_succ_r in Hn1.
-    rewrite Nat.pow_add_r in Hn1.
-    progress replace (2 ^ 1) with 2 in Hn1 by easy.
-    specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
-    destruct p; [ cbn in Hn1 | ].
-cbn in Hmn.
+  eapply le_trans. {
+    apply Nat.add_le_mul. {
+      destruct p; [ cbn in Hmn; flia Hmz Hmn | flia ].
+    }
+    rewrite Nat.add_succ_r, Nat.pow_succ_r'.
+    apply (lt_le_trans _ 2); [ easy | ].
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    apply Nat.mul_le_mono_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  apply Nat.mul_le_mono_l.
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_le_mono_r.
+  (* marche pas *)
 ...
 Compute (map (λ p,
   2 * (2 * 2 ^ p) ≤ S p * (2 * (2 * 2 ^ p) - 1)
