@@ -4974,6 +4974,22 @@ Compute (map (λ n, map (λ p,
 (* donc ça va pas *)
 (* ouais, chais pas *)
 (* peut-être que Hn1 est contradictoire, qui sait ? *)
+rewrite Nat.mul_sub_distr_l in Hn1.
+apply Nat.lt_sub_lt_add_l in Hn1.
+rewrite Nat.mul_assoc in Hn1.
+rewrite <- (Nat.mul_1_l (S (p + S n))) in Hn1 at 2.
+rewrite <- Nat.mul_add_distr_r in Hn1.
+rewrite Nat.mul_sub_distr_l in Hn1.
+rewrite Nat.mul_1_r in Hn1.
+do 2 rewrite <- Nat.pow_succ_r' in Hn1.
+replace (2 ^ S (S p) - 2 + 1) with (2 ^ S (S p) - 1) in Hn1. 2: {
+  enough (H : 2 ≤ 2 ^ S (S p)); [ flia H | ].
+  rewrite <- (Nat.pow_1_r 2) at 1.
+  apply Nat.pow_le_mono_r; [ easy | flia ].
+}
+(* ah non parce que m peut se retrouver très grand dans H1 ;
+   ah oui, mais non, il est limité dans Hmn *)
+(* pfff... c'est compliqué *)
 ...
   rewrite <- Nat.pow_add_r.
   rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
