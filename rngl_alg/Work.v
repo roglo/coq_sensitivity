@@ -4944,12 +4944,21 @@ Compute (map (λ p,
   (2 ^ (Nat.log2_up (S p) + S p))
 + S p
 ) (seq 0 12)).
-Compute (map (λ p,
-  Nat.sub
-  (p * (2 ^ S p - 1))
-  (2 ^ (Nat.log2_up p + p))
-+ p
-) (seq 0 13)).
+remember (S p) as n.
+Theorem pow2_add_l_log2_le_mul_pow2_sub1 :
+  ∀ n, n ≠ 0 → 2 ^ (Nat.log2_up n + n) ≤ n * (2 ^ S n - 1).
+Proof.
+intros * Hnz.
+(*
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ (Nat.log2_up n + n))
+  (n * (2 ^ S n - 1))
+) (seq 1 13)).
+*)
+... ...
+  apply pow2_add_l_log2_le_mul_pow2_sub1.
+}
 ...
 (*
   eapply le_trans. 2: {
