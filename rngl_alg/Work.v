@@ -4962,7 +4962,19 @@ destruct n1. {
     apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
     apply Hmn.
   }
-  clear m Hmz Hmn IHn Hn1.
+  apply Nat.eqb_eq in Hn1.
+  apply Nat.div_small_iff in Hn1; [ | easy ].
+Compute (map (λ n, map (λ p,
+(p,
+  Nat.leb
+    (S (p + S n) + 2 ^ Nat.log2_up (S (S p) + n) * 2 ^ S p)
+    (S (p + S n) * 2 ^ S (S p))
+)
+) (seq 0 7)) (seq 0 12)).
+(* donc ça va pas *)
+(* ouais, chais pas *)
+(* peut-être que Hn1 est contradictoire, qui sait ? *)
+...
   rewrite <- Nat.pow_add_r.
   rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
     apply Nat.neq_0_lt_0.
@@ -4971,7 +4983,26 @@ destruct n1. {
   rewrite Nat.mul_add_distr_l, Nat.mul_1_r.
   rewrite Nat.add_comm.
   apply Nat.add_le_mono_r.
-Check pow2_add_l_log2_le_mul_pow2_sub1.
+  rewrite <- Nat.add_succ_l.
+  remember (S p) as m.
+  clear p Heqm.
+  rewrite Nat.add_succ_comm.
+  remember (S n) as p.
+  clear n Heqp.
+  rename m into n; rename p into m.
+  rewrite (Nat.add_comm n).
+Theorem new_pow2_add_l_log2_le_mul_pow2_sub1 :
+  ∀ m n, 2 ^ (Nat.log2_up (m + n) + n) ≤ (m + n) * (2 ^ S n - 1).
+Proof.
+intros.
+Compute (map (λ n,
+  let m := 7 in
+  Nat.leb
+    (2 ^ (Nat.log2_up (m + n) + n))
+    ((m + n) * (2 ^ S n - 1))
+) (seq 2 13)).
+... ...
+apply new_pow2_add_l_log2_le_mul_pow2_sub1.
 ...
   now apply pow2_add_l_log2_le_mul_pow2_sub1.
 ...
