@@ -4946,7 +4946,7 @@ Compute (map (λ p,
 ) (seq 0 12)).
 Compute (map (λ p,
   Nat.sub
-  (p * 2 ^ S p - p)
+  (p * (2 ^ S p - 1))
   (2 ^ (Nat.log2_up p + p))
 + p
 ) (seq 0 13)).
