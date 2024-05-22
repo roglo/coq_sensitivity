@@ -4943,6 +4943,37 @@ induction n; intros. {
   apply Nat.add_le_mono_r.
   now apply pow2_add_l_log2_le_mul_pow2_sub1.
 }
+rewrite <- Nat.add_succ_comm in Hmn.
+specialize (IHn (S p) Hmn).
+cbn - [ "*" "/" "mod" "^" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" "/" "mod" "^" ].
+remember (_ =? 0) as n1 eqn:Hn1.
+symmetry in Hn1.
+destruct n1. {
+  rewrite Nat.add_0_r.
+  rewrite Nat.mul_sub_distr_l.
+  rewrite Nat.mul_1_r.
+  apply Nat.le_add_le_sub_l.
+  rewrite Nat.pow_add_r.
+  eapply le_trans. {
+    apply Nat.add_le_mono_l.
+    apply Nat.mul_le_mono_r.
+    apply (Nat.pow_le_mono_r 2) in Hmn; [ | easy ].
+    apply Hmn.
+  }
+  clear m Hmz Hmn IHn Hn1.
+  rewrite <- Nat.pow_add_r.
+  rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite Nat.mul_add_distr_l, Nat.mul_1_r.
+  rewrite Nat.add_comm.
+  apply Nat.add_le_mono_r.
+Check pow2_add_l_log2_le_mul_pow2_sub1.
+...
+  now apply pow2_add_l_log2_le_mul_pow2_sub1.
 ...
 (*
   eapply le_trans. 2: {
