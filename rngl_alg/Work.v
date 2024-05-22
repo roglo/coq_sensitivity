@@ -4396,6 +4396,33 @@ split; intros H1. {
 }
 Qed.
 
+Theorem pow2_add_l_log2_le_mul_pow2_sub1 :
+  ∀ n, n ≠ 0 → 2 ^ (Nat.log2_up n + n) ≤ n * (2 ^ S n - 1).
+Proof.
+intros * Hnz.
+induction n; intros; [ easy | clear Hnz ].
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  apply Nat_pow2_log2_up_succ in H1.
+  rewrite Nat.add_succ_l, Nat.pow_succ_r'.
+  rewrite Nat.pow_add_r, H1.
+  do 3 rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
+  flia H2.
+}
+rewrite H1.
+rewrite Nat.add_succ_r.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
+specialize (IHn Hnz).
+rewrite Nat.pow_succ_r'.
+apply (Nat.mul_le_mono_l _ _ 2) in IHn.
+eapply le_trans; [ apply IHn | ].
+do 3 rewrite Nat.pow_succ_r'.
+specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
+flia H2.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4898,17 +4925,7 @@ induction n; intros. {
   rewrite Nat.mul_sub_distr_l.
   rewrite Nat.mul_1_r.
   apply Nat.le_add_le_sub_l.
-(**)
   rewrite Nat.pow_add_r.
-(*
-Compute (map (λ m, map (λ p,
-  if m <=? Nat.log2_up (S p) then
-Nat.leb
-  (S p + 2 ^ m * 2 ^ S p) (S p * 2 ^ S (S p))
-  else true
-) (seq 1 10)) (seq 0 20)).
-(* ok *)
-*)
   eapply le_trans. {
     apply Nat.add_le_mono_l.
     apply Nat.mul_le_mono_r.
@@ -4916,13 +4933,6 @@ Nat.leb
     apply Hmn.
   }
   clear m Hmz Hmn.
-(*
-Compute (map (λ p,
-Nat.leb
-  (S p + 2 ^ Nat.log2_up (S p) * 2 ^ S p) (S p * 2 ^ S (S p))
-) (seq 0 16)).
-(* ok *)
-*)
   rewrite <- Nat.pow_add_r.
   rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
     apply Nat.neq_0_lt_0.
@@ -4931,53 +4941,7 @@ Nat.leb
   rewrite Nat.mul_add_distr_l, Nat.mul_1_r.
   rewrite Nat.add_comm.
   apply Nat.add_le_mono_r.
-(*
-Compute (map (λ p,
-  Nat.leb
-  (2 ^ (Nat.log2_up (S p) + S p)) (S p * (2 ^ S (S p) - 1))
-) (seq 0 16)).
-(* ok *)
-*)
-Compute (map (λ p,
-  Nat.sub
-  (S p * 2 ^ S (S p) - S p)
-  (2 ^ (Nat.log2_up (S p) + S p))
-+ S p
-) (seq 0 12)).
-remember (S p) as n.
-Theorem pow2_add_l_log2_le_mul_pow2_sub1 :
-  ∀ n, n ≠ 0 → 2 ^ (Nat.log2_up n + n) ≤ n * (2 ^ S n - 1).
-Proof.
-intros * Hnz.
-(*
-Compute (map (λ n,
-  Nat.leb
-  (2 ^ (Nat.log2_up n + n))
-  (n * (2 ^ S n - 1))
-) (seq 1 13)).
-(* ok *)
-*)
-induction n; intros; [ easy | clear Hnz ].
-specialize (Nat.log2_up_succ_or n) as H1.
-destruct H1 as [H1| H1]. {
-  rewrite H1.
-  apply Nat_pow2_log2_up_succ in H1.
-  rewrite Nat.add_succ_l, Nat.pow_succ_r'.
-  rewrite Nat.pow_add_r, H1.
-  do 3 rewrite Nat.pow_succ_r'.
-  specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
-  flia H2.
-}
-rewrite H1.
-rewrite Nat.add_succ_r.
-...
-  rewrite Nat.sub_succ_diag_r.
-...
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H2.
-  rewrite Nat.add_succ_r, Nat.add_succ_l.
-  do 2 rewrite Nat.pow_succ_r'.
-... ...
-  apply pow2_add_l_log2_le_mul_pow2_sub1.
+  now apply pow2_add_l_log2_le_mul_pow2_sub1.
 }
 ...
 (*
