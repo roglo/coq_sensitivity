@@ -4955,7 +4955,27 @@ Compute (map (λ n,
   (2 ^ (Nat.log2_up n + n))
   (n * (2 ^ S n - 1))
 ) (seq 1 13)).
+(* ok *)
 *)
+induction n; intros; [ easy | clear Hnz ].
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  apply Nat_pow2_log2_up_succ in H1.
+  rewrite Nat.add_succ_l, Nat.pow_succ_r'.
+  rewrite Nat.pow_add_r, H1.
+  do 3 rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
+  flia H2.
+}
+rewrite H1.
+rewrite Nat.add_succ_r.
+...
+  rewrite Nat.sub_succ_diag_r.
+...
+  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H2.
+  rewrite Nat.add_succ_r, Nat.add_succ_l.
+  do 2 rewrite Nat.pow_succ_r'.
 ... ...
   apply pow2_add_l_log2_le_mul_pow2_sub1.
 }
