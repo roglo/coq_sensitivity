@@ -4691,7 +4691,18 @@ destruct (lt_dec n (2 * x)) as [Hn2| Hn2]. {
     rewrite Nat.mul_sub_distr_l.
     rewrite <- Nat.pow_succ_r'.
     apply Nat.le_sub_le_add_l.
-(* ah, fait chier *)
+    rewrite <- Nat_succ_sub_succ_r. 2: {
+      apply Nat.neq_0_lt_0.
+      intros H.
+      apply Nat.log2_up_null in H.
+      flia H2n H.
+    }
+    rewrite Nat.sub_0_r.
+    rewrite Nat.pow_succ_r'.
+    remember (2 ^ _) as x eqn:Hx.
+    progress replace (2 * x + S x) with (3 * x + 1) by flia.
+    rewrite Nat.mul_assoc.
+    progress replace (2 * 2) with 4 by easy.
 ...
   rewrite (Nat_div_less_small 1). 2: {
     split. {
