@@ -4987,10 +4987,9 @@ replace (2 ^ S (S p) - 2 + 1) with (2 ^ S (S p) - 1) in Hn1. 2: {
   rewrite <- (Nat.pow_1_r 2) at 1.
   apply Nat.pow_le_mono_r; [ easy | flia ].
 }
-(* ah non parce que m peut se retrouver très grand dans H1 ;
-   ah oui, mais non, il est limité dans Hmn *)
-(* pfff... c'est compliqué *)
-...
+rewrite Nat.mul_sub_distr_r, Nat.mul_1_l in Hn1.
+apply Nat.lt_add_lt_sub_r in Hn1.
+do 2 rewrite <- Nat.add_succ_l in Hn1.
   rewrite <- Nat.pow_add_r.
   rewrite <- (Nat.sub_add 1 (2 ^ S (S p))). 2: {
     apply Nat.neq_0_lt_0.
@@ -5000,13 +4999,15 @@ replace (2 ^ S (S p) - 2 + 1) with (2 ^ S (S p) - 1) in Hn1. 2: {
   rewrite Nat.add_comm.
   apply Nat.add_le_mono_r.
   rewrite <- Nat.add_succ_l.
-  remember (S p) as m.
-  clear p Heqm.
+  remember (S p) as q.
+  clear p Heqq IHn.
   rewrite Nat.add_succ_comm.
   remember (S n) as p.
-  clear n Heqp.
-  rename m into n; rename p into m.
-  rewrite (Nat.add_comm n).
+  clear n Heqp Hmn.
+  rewrite (Nat.add_comm q).
+  rename q into n.
+  rename m into q.
+  rename p into m.
 Theorem new_pow2_add_l_log2_le_mul_pow2_sub1 :
   ∀ m n, 2 ^ (Nat.log2_up (m + n) + n) ≤ (m + n) * (2 ^ S n - 1).
 Proof.
@@ -5017,6 +5018,7 @@ Compute (map (λ n,
     (2 ^ (Nat.log2_up (m + n) + n))
     ((m + n) * (2 ^ S n - 1))
 ) (seq 2 13)).
+(* ah bin non *)
 ... ...
 apply new_pow2_add_l_log2_le_mul_pow2_sub1.
 ...
