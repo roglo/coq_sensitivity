@@ -4530,7 +4530,7 @@ Theorem pow2_den_le_mul_num :
   → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
 Proof.
 intros * H2n.
-(* This theorem says
+(* This theorem states that
      2 ^ bn ≤ n * an
    and it is required to prove that
      θi ≤ an * (θ / 2^bn)
