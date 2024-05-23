@@ -4650,8 +4650,87 @@ set (fn := λ i, fst (rank_fst_loop n 0 i n)).
 set (un := fn (2 ^ (Nat.log2_up n - 1))).
 fold (fn (2 ^ (Nat.log2_up n - 1))).
 fold un.
-set (an := 2 ^ S un - 1).
-set (bn := Nat.log2_up n + un).
+rewrite Nat.pow_add_r.
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+apply Nat.le_add_le_sub_r.
+apply Nat_le_add_le_sub_l_iff. {
+  rewrite Nat.mul_assoc.
+  apply Nat.mul_le_mono_r.
+  destruct n; [ easy | ].
+  rewrite <- Nat_pow2_log2; [ | flia H2n ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_r.
+  apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
+  apply Nat.log2_spec; flia H2n.
+}
+rewrite Nat.mul_assoc.
+rewrite <- Nat.mul_sub_distr_r.
+rewrite (Nat.mul_comm n).
+set (x := 2 * n - 2 ^ Nat.log2_up n).
+destruct (lt_dec n (2 * x)) as [Hn2| Hn2]. {
+  subst un fn.
+  cbn - [ "*" ].
+(**)
+  destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite <- Nat.pow_succ_r'.
+  remember (_ =? 0) as n1 eqn:Hn1.
+  symmetry in Hn1.
+  destruct n1. {
+    apply Nat.eqb_eq in Hn1.
+    apply Nat.div_small_iff in Hn1; [ | easy ].
+    exfalso.
+    apply Nat.nlt_ge in Hn1.
+    apply Hn1; clear Hn1.
+    eapply lt_le_trans; [ apply Hn2 | ].
+    subst x.
+    rewrite Nat.mul_sub_distr_l.
+    rewrite <- Nat.pow_succ_r'.
+    apply Nat.le_sub_le_add_l.
+(* ah, fait chier *)
+...
+  rewrite (Nat_div_less_small 1). 2: {
+    split. {
+      rewrite Nat.mul_1_l.
+      eapply le_trans; [ apply Nat.lt_le_incl, Hn2 | ].
+      rewrite Nat.pow_succ_r'.
+      apply Nat.mul_le_mono_l.
+      subst x.
+...
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    apply Nat.mul_le_mono_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+...
+    cbn - [ "*" "/" "mod" "^" ].
+    rewrite Nat.pow_succ_r'.
+    eapply le_trans; [ apply Nat.lt_le_incl, Hn2 | ].
+    rewrite Nat.mul_comm.
+    apply Nat.mul_le_mono_l.
+    rewrite <- (Nat.mul_1_r 2) at 1.
+    apply Nat.mul_le_mono_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+...
+  eapply le_trans; [ apply Nat.lt_le_incl, Hn2 | ].
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_l.
+  destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" "/" "mod" "^" ].
+  rewrite <- Nat.pow_succ_r'.
+...
+rewrite (Nat.mul_comm n).
+  set (an := 2 ^ S un - 1).
+  set (bn := Nat.log2_up n + un).
+assert (∃ i, i < Nat.log2_up n ∧ n / 2 ^ S i ≤ x < n / 2 ^ i). {
+  subst x.
 ...
 remember (Nat.log2_up n) as m eqn:Hm.
 (*
