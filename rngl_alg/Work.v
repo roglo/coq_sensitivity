@@ -4569,14 +4569,14 @@ rewrite rank_fst_1_log2_up; [ | easy ].
 rewrite Nat.add_shuffle0.
 rewrite Nat.sub_add; [ | easy ].
 progress unfold inv_ub_num.
-(*
+(**)
 Compute (map (λ n,
 Nat.ltb
   (2 ^ (Nat.log2_up n + fst_1_len 1 n)) (n * (2 ^ S (fst_1_len 1 n) - 1))
 ) (seq 2 60)).
 (* ok *)
 Search (Nat.log2_up _ < Nat.log2_up _).
-*)
+(**)
 (*
 apply Nat.lt_le_incl.
 apply Nat.log2_up_lt_cancel.
@@ -4646,7 +4646,15 @@ eapply le_trans; [ apply H1; flia H2n | ].
 *)
 progress unfold fst_1_len.
 rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
+set (fn := λ i, fst (rank_fst_loop n 0 i n)).
+set (un := fn (2 ^ (Nat.log2_up n - 1))).
+fold (fn (2 ^ (Nat.log2_up n - 1))).
+fold un.
+set (an := 2 ^ S un - 1).
+set (bn := Nat.log2_up n + un).
+...
 remember (Nat.log2_up n) as m eqn:Hm.
+(*
 Compute (map (λ n, map (λ m,
   if m <=? Nat.log2_up n then
     Nat.leb
@@ -4655,6 +4663,7 @@ Compute (map (λ n, map (λ m,
   else true
 ) (seq 2 20)) (seq 2 60)).
 (* ouais, bon, faut voir : *)
+*)
 Theorem glop :
   ∀ m n,
   m ≤ Nat.log2_up n
