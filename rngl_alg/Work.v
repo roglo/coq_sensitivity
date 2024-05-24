@@ -4685,7 +4685,14 @@ destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
       rewrite Nat.mul_1_l.
       now apply Nat.log2_up_spec.
     }
-Search (2 ^ Nat.log2_up _ ≤ _).
+Theorem Nat_log2_up_lt_twice : ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n < 2 * n.
+Proof.
+intros * Hnz.
+...
+Search (2 ^ Nat.log2_up _).
+specialize (Nat.log2_up_spec (S n)) as H1.
+... ...
+apply Nat_log2_up_lt_twice.
 ...
 Compute (map (λ n,
   2 ^ S (Nat.log2_up (S n) - 1) < S n
