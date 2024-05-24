@@ -4520,6 +4520,47 @@ now right.
 Qed.
 
 (* to be completed
+Theorem eq_fst_rank_fst_loop_2 :
+  ∀ it k a b,
+  fst (rank_fst_loop it k a b) = 2 ↔
+  it ≠ 0 ∧ 2 * a / b ≠ k ∧
+  (it = 1 ∨ 2 * ((2 * a) mod b) / b = k).
+Proof.
+intros.
+split; intros H1. {
+  destruct it; [ easy | ].
+  split; [ easy | ].
+  cbn - [ "*" ] in H1.
+  rewrite fst_if, fst_let in H1.
+  cbn - [ "*" ] in H1.
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk; [ easy | ].
+  apply Nat.eqb_neq in Habk.
+  split; [ easy | ].
+  apply Nat.succ_inj in H1.
+  apply eq_fst_rank_fst_loop_0 in H1.
+  destruct H1 as [H1| H1]; [ left | now right ].
+  now f_equal.
+}
+destruct H1 as (Hit & Habk & H1).
+apply Nat.eqb_neq in Habk.
+destruct H1 as [H1| H1]. {
+  subst it.
+  cbn - [ "*" ].
+  now rewrite Habk.
+}
+destruct it; [ easy | clear Hit ].
+cbn - [ "*" ].
+rewrite Habk.
+rewrite fst_let.
+f_equal.
+apply eq_fst_rank_fst_loop_0.
+now right.
+Qed.
+*)
+
+(* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
   ∀ n i θ,
@@ -4852,10 +4893,16 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   rewrite Nat.mul_assoc.
   progress replace (2 * 2) with 4 by easy.
   eapply le_trans; [ apply Hn8 | ].
-  destruct (2 ^ y); [ easy | ].
   progress replace 8 with (4 * 2) by easy.
   do 2 rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_l.
+  destruct y. {
+    exfalso.
+    clear H1.
+...
+  destruct (2 ^ y); [ easy | ].
   rewrite Nat.mul_succ_r, Nat.add_comm.
 ...
   apply Nat.le_add_r.
