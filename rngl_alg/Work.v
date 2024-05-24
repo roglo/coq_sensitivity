@@ -4709,6 +4709,38 @@ set (x := 2 * n - 2 ^ Nat.log2_up n).
 destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
   subst un fn.
   cbn - [ "*" ].
+(**)
+  exfalso.
+  apply Nat.nlt_ge in Hn2.
+  apply Hn2; clear Hn2.
+  subst x.
+  rewrite Nat.mul_sub_distr_l.
+  rewrite <- Nat.pow_succ_r'.
+  rewrite <- Nat.add_1_r.
+  rewrite <- Nat.add_sub_swap. 2: {
+    rewrite Nat.pow_succ_r'.
+    apply Nat.mul_le_mono_l.
+    apply Nat.lt_le_incl.
+    apply Nat_log2_up_lt_twice; flia H2n.
+  }
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 2) with 4 by easy.
+  apply Nat.lt_add_lt_sub_r.
+  progress replace 4 with (1 + 3) by easy.
+  rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
+  rewrite <- Nat.add_assoc.
+  apply Nat.add_lt_mono_l.
+Compute (map (λ n,
+  Nat.leb
+  (2 ^ S (Nat.log2_up n)) (3 * n + 1)
+) (seq 1 20)).
+(* no *)
+...
+  eapply lt_trans. {
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    apply Nat_log2_up_lt_twice; flia H2n.
+  }
+...
   destruct n; [ easy | ].
   cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
   rewrite fst_if, fst_let.
