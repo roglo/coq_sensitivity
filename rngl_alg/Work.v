@@ -4459,6 +4459,66 @@ apply Nat.div_le_lower_bound; [ easy | ].
 now rewrite H1 in H3.
 Qed.
 
+Theorem eq_fst_rank_fst_loop_0 :
+  ∀ it k a b,
+  fst (rank_fst_loop it k a b) = 0 ↔
+  it = 0 ∨ 2 * a / b = k.
+Proof.
+intros.
+split; intros H1. {
+  destruct it; [ now left | right ].
+  cbn - [ "*" ] in H1.
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk; [ now apply Nat.eqb_eq in Habk | ].
+  now rewrite fst_let in H1.
+}
+destruct H1 as [H1| H1]; [ now subst it | ].
+destruct it; [ easy | ].
+cbn - [ "*" ].
+rewrite H1.
+now rewrite Nat.eqb_refl.
+Qed.
+
+Theorem eq_fst_rank_fst_loop_1 :
+  ∀ it k a b,
+  fst (rank_fst_loop it k a b) = 1 ↔
+  it ≠ 0 ∧ 2 * a / b ≠ k ∧
+  (it = 1 ∨ 2 * ((2 * a) mod b) / b = k).
+Proof.
+intros.
+split; intros H1. {
+  destruct it; [ easy | ].
+  split; [ easy | ].
+  cbn - [ "*" ] in H1.
+  rewrite fst_if, fst_let in H1.
+  cbn - [ "*" ] in H1.
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk; [ easy | ].
+  apply Nat.eqb_neq in Habk.
+  split; [ easy | ].
+  apply Nat.succ_inj in H1.
+  apply eq_fst_rank_fst_loop_0 in H1.
+  destruct H1 as [H1| H1]; [ left | now right ].
+  now f_equal.
+}
+destruct H1 as (Hit & Habk & H1).
+apply Nat.eqb_neq in Habk.
+destruct H1 as [H1| H1]. {
+  subst it.
+  cbn - [ "*" ].
+  now rewrite Habk.
+}
+destruct it; [ easy | clear Hit ].
+cbn - [ "*" ].
+rewrite Habk.
+rewrite fst_let.
+f_equal.
+apply eq_fst_rank_fst_loop_0.
+now right.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4706,6 +4766,67 @@ rewrite <- Nat.mul_sub_distr_r.
 rewrite (Nat.mul_comm n).
 set (x := 2 * n - 2 ^ Nat.log2_up n).
 (**)
+subst un fn.
+cbn - [ "*" ].
+remember (fst _) as y eqn:Hy.
+symmetry in Hy.
+destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
+  move Hyz at top; subst y.
+  apply eq_fst_rank_fst_loop_0 in Hy.
+  destruct Hy as [Hy| Hy]; [ now subst n | ].
+  rewrite <- Nat.pow_succ_r' in Hy.
+  apply Nat.div_small_iff in Hy; [ | flia H2n ].
+  rewrite Nat.pow_0_r, Nat.mul_1_r.
+  apply Nat.nlt_ge; intros Hnx.
+  apply Nat.nle_gt in Hy; apply Hy; clear Hy.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
+  now apply Nat.log2_up_spec.
+}
+destruct (le_dec n (2 * x)) as [Hn2| Hn2]. {
+  destruct y; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
+  rewrite Nat.mul_assoc, (Nat.mul_comm _ 2).
+  eapply le_trans; [ apply Hn2 | ].
+  destruct (2 ^ y); [ easy | ].
+  rewrite Nat.mul_succ_r, Nat.add_comm.
+  apply Nat.le_add_r.
+}
+apply Nat.nle_gt in Hn2.
+destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
+  destruct y; [ easy | clear Hyz ].
+  destruct y. {
+    exfalso.
+    apply eq_fst_rank_fst_loop_1 in Hy.
+    rewrite <- Nat.pow_succ_r' in Hy.
+    rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
+    rewrite Nat.sub_0_r in Hy.
+    destruct Hy as (Hnz & Habk & Hy).
+    apply Nat_div_not_small_iff in Habk; [ | easy ].
+    destruct Hy as [Hy| Hy]; [ now subst n | ].
+    apply Nat.div_small_iff in Hy; [ | easy ].
+    rewrite (Nat_mod_less_small 1) in Hy. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ now apply Nat.log2_up_spec | ].
+      now apply Nat_log2_up_lt_twice.
+    }
+    rewrite Nat.mul_1_l in Hy.
+    apply Nat.nle_gt in Hy.
+    apply Hy; clear Hy.
+    eapply le_trans; [ apply Habk | ].
+    subst x.
+...
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
+  rewrite Nat.mul_assoc, (Nat.mul_comm _ 2).
+  eapply le_trans; [ apply Hn4 | ].
+...
+  destruct (2 ^ y); [ easy | ].
+  rewrite Nat.mul_succ_r, Nat.add_comm.
+  apply Nat.le_add_r.
+}
+...
 destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
   subst un fn.
   cbn - [ "*" ].
@@ -4733,7 +4854,7 @@ destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
 Compute (map (λ n,
   Nat.leb
   (2 ^ S (Nat.log2_up n)) (3 * n + 1)
-) (seq 1 20)).
+) (seq 1 40)).
 (* no *)
 ...
   eapply lt_trans. {
