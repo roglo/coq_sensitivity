@@ -4423,6 +4423,42 @@ specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
 flia H2.
 Qed.
 
+Theorem Nat_log2_up_lt_twice : ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n < 2 * n.
+Proof.
+intros * Hnz.
+destruct n; [ easy | clear Hnz ].
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply Nat_pow2_log2_up_succ in H1.
+  now rewrite H1.
+}
+rewrite H1.
+destruct n; [ now cbn | ].
+specialize (Nat.log2_up_spec (S (S n))) as H2.
+assert (H : 1 < S (S n)) by flia.
+specialize (H2 H); clear H.
+destruct H2 as (H2, H3).
+rewrite <- Nat.sub_1_r in H2.
+rewrite H1 in H2.
+rewrite Nat.pow_sub_r in H2; [ | easy | ]. 2: {
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.log2_up_null in H.
+  apply Nat.succ_le_mono in H.
+  now apply Nat.le_0_r in H; subst n.
+}
+rewrite Nat.pow_1_r in H2.
+apply Nat.nle_gt.
+intros H4.
+apply Nat.nle_gt in H2.
+apply H2; clear H2.
+apply Nat.div_le_lower_bound; [ easy | ].
+now rewrite H1 in H3.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4680,19 +4716,18 @@ destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
   rewrite <- Nat.pow_succ_r'.
   rewrite <- Nat_succ_sub_succ_r; [ | easy ].
   rewrite Nat.sub_0_r.
-  rewrite (Nat_div_less_small 1). 2: {
+  assert (H1 : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < (1 + 1) * S n). {
     split. {
       rewrite Nat.mul_1_l.
       now apply Nat.log2_up_spec.
     }
-Theorem Nat_log2_up_lt_twice : ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n < 2 * n.
-Proof.
-intros * Hnz.
-...
-Search (2 ^ Nat.log2_up _).
-specialize (Nat.log2_up_spec (S n)) as H1.
-... ...
-apply Nat_log2_up_lt_twice.
+    now apply Nat_log2_up_lt_twice.
+  }
+  rewrite (Nat_div_less_small 1); [ | easy ].
+  rewrite (Nat_mod_less_small 1); [ | easy ].
+  clear H1.
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite Nat.mul_1_l.
 ...
 Compute (map (λ n,
   2 ^ S (Nat.log2_up (S n) - 1) < S n
