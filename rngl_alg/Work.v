@@ -4812,10 +4812,40 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
       now apply Nat_log2_up_lt_twice.
     }
     rewrite Nat.mul_1_l in Hy.
+...
     apply Nat.nle_gt in Hy.
     apply Hy; clear Hy.
     eapply le_trans; [ apply Habk | ].
     subst x.
+    rewrite Nat.mul_sub_distr_l.
+    rewrite <- Nat_add_diag.
+    apply Nat.le_add_le_sub_l.
+    apply Nat.add_le_mono_r.
+    rewrite Nat.mul_sub_distr_l in Hn2.
+    apply Nat.lt_sub_lt_add_l in Hn2.
+    apply Nat_lt_sub_lt_add_r_iff in Hn2; [ | flia ].
+    rewrite Nat.mul_assoc in Hn2.
+    rewrite <- (Nat.mul_1_l n) in Hn2 at 2.
+    rewrite <- Nat.mul_sub_distr_r in Hn2.
+    progress replace (2 * 2 - 1) with 3 in Hn2 by easy.
+    rewrite Nat.mul_sub_distr_l in Hn4.
+    apply Nat_le_add_le_sub_l_iff in Hn4. 2: {
+      apply Nat.mul_le_mono_l.
+      apply Nat.lt_le_incl.
+      now apply Nat_log2_up_lt_twice.
+    }
+    apply Nat.le_add_le_sub_r in Hn4.
+    rewrite Nat.mul_assoc in Hn4.
+    rewrite <- (Nat.mul_1_l n) in Hn4 at 3.
+    rewrite <- Nat.mul_sub_distr_r in Hn4.
+    progress replace (4 * 2 - 1) with 7 in Hn4 by easy.
+...
+    apply (Nat.mul_le_mono_pos_l _ _ 2); [ easy | ].
+    eapply le_trans; [ | apply Nat.lt_le_incl, Hn2 ].
+
+...
+    apply Nat_lt_sub_lt_add_l in Hn2.
+    apply Nat.lt_add_lt_sub_r in Hn2.
 ...
   rewrite Nat.pow_succ_r'.
   specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
