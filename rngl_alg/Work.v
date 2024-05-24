@@ -4830,26 +4830,36 @@ clear Hn2.
 destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct y; [ easy | clear Hyz ].
   destruct y. {
-...
-  destruct n; [ easy | ].
-  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
-  rewrite fst_if, fst_let.
-  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
-  rewrite <- Nat.pow_succ_r'.
-  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
-  rewrite Nat.sub_0_r.
-  assert (H1 : 1 * S n ≤ 2 ^ Nat.log2_up (S n) < (1 + 1) * S n). {
-    split. {
+    exfalso.
+    apply eq_fst_rank_fst_loop_1 in Hy.
+    rewrite <- Nat.pow_succ_r' in Hy.
+    rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
+    rewrite Nat.sub_0_r in Hy.
+    destruct Hy as (Hnz & Habk & Hy).
+    destruct Hy as [Hy| Hy]; [ now subst n | ].
+    apply Nat.div_small_iff in Hy; [ | easy ].
+    rewrite (Nat_mod_less_small 1) in Hy. 2: {
       rewrite Nat.mul_1_l.
-      now apply Nat.log2_up_spec.
+      split; [ now apply Nat.log2_up_spec | ].
+      now apply Nat_log2_up_lt_twice.
     }
-    now apply Nat_log2_up_lt_twice.
+    flia Hy Hn4.
   }
-  rewrite (Nat_div_less_small 1); [ | easy ].
-  rewrite (Nat_mod_less_small 1); [ | easy ].
-  clear H1.
-  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
-  rewrite Nat.mul_1_l.
+  do 2 rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
+  do 2 rewrite Nat.mul_assoc.
+  do 2 rewrite (Nat.mul_comm _ 2).
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 2) with 4 by easy.
+  eapply le_trans; [ apply Hn8 | ].
+  destruct (2 ^ y); [ easy | ].
+  progress replace 8 with (4 * 2) by easy.
+  do 2 rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  rewrite Nat.mul_succ_r, Nat.add_comm.
+...
+  apply Nat.le_add_r.
+}
 ...
 Compute (map (λ n,
   2 ^ S (Nat.log2_up (S n) - 1) < S n
