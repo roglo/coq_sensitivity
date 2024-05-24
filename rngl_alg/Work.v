@@ -4913,12 +4913,56 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
       flia Hn8 Hn4.
     }
     destruct Hy as (H1 & H2 & H3 & H4).
-...
-  destruct (2 ^ y); [ easy | ].
-  rewrite Nat.mul_succ_r, Nat.add_comm.
-...
-  apply Nat.le_add_r.
+    apply Nat_div_not_small_iff in H2; [ | flia H1 ].
+    apply Nat_div_not_small_iff in H3; [ | flia H1 ].
+    apply Nat.div_small_iff in H4; [ | flia H1 ].
+    rewrite <- Nat.pow_succ_r' in H2, H3, H4.
+    rewrite <- Nat_succ_sub_succ_r in H2; [ | easy ].
+    rewrite <- Nat_succ_sub_succ_r in H3; [ | easy ].
+    rewrite <- Nat_succ_sub_succ_r in H4; [ | easy ].
+    rewrite Nat.sub_0_r in H2, H3, H4.
+    rewrite (Nat_mod_less_small 1) in H4. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      apply Nat.mul_lt_mono_pos_l; [ easy | ].
+      apply Nat.mod_upper_bound; flia H1.
+    }
+    rewrite Nat.mul_1_l in H4.
+    rewrite (Nat_mod_less_small 1) in H4. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      apply Nat_log2_up_lt_twice; flia H1.
+    }
+    rewrite Nat.mul_1_l in H4.
+    rewrite (Nat_mod_less_small 1) in H3. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      apply Nat_log2_up_lt_twice; flia H1.
+    }
+    rewrite Nat.mul_1_l in H3.
+    rewrite Nat.mul_sub_distr_l in H3.
+    apply Nat_le_add_le_sub_l_iff in H3; [ | now apply Nat.mul_le_mono_l ].
+    rewrite <- (Nat.mul_1_l n) in H3 at 2.
+    rewrite <- Nat.mul_add_distr_r in H3.
+    progress replace (2 + 1) with 3 in H3 by easy.
+    rewrite Nat.mul_sub_distr_l in H4.
+    apply Nat.lt_sub_lt_add_l in H4.
+    rewrite <- (Nat.mul_1_l n) in H4 at 4.
+    rewrite <- Nat.mul_add_distr_r in H4.
+    progress replace (2 + 1) with 3 in H4 by easy.
+    rewrite Nat.mul_assoc in H4.
+    rewrite Nat.mul_sub_distr_l in H4.
+    apply Nat.lt_sub_lt_add_l in H4.
+    rewrite <- Nat.mul_add_distr_r in H4.
+    progress replace (2 * 2 + 3) with 7 in H4 by easy.
+    flia Hn4 H4.
+  }
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H2.
+  flia H2.
 }
+apply Nat.nle_gt in Hn8.
+(* bon, ouais, faut trouver une loi, quoi *)
 ...
 Compute (map (λ n,
   2 ^ S (Nat.log2_up (S n) - 1) < S n
