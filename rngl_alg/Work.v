@@ -4519,17 +4519,16 @@ apply eq_fst_rank_fst_loop_0.
 now right.
 Qed.
 
-(* to be completed
 Theorem eq_fst_rank_fst_loop_2 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 2 ↔
-  it ≠ 0 ∧ 2 * a / b ≠ k ∧
-  (it = 1 ∨ 2 * ((2 * a) mod b) / b = k).
+  it = 2 ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∨
+  2 < it ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∧
+    2 * ((2 * ((2 * a) mod b)) mod b) / b = k.
 Proof.
 intros.
 split; intros H1. {
   destruct it; [ easy | ].
-  split; [ easy | ].
   cbn - [ "*" ] in H1.
   rewrite fst_if, fst_let in H1.
   cbn - [ "*" ] in H1.
@@ -4537,28 +4536,35 @@ split; intros H1. {
   symmetry in Habk.
   destruct abk; [ easy | ].
   apply Nat.eqb_neq in Habk.
-  split; [ easy | ].
   apply Nat.succ_inj in H1.
-  apply eq_fst_rank_fst_loop_0 in H1.
-  destruct H1 as [H1| H1]; [ left | now right ].
-  now f_equal.
+  apply eq_fst_rank_fst_loop_1 in H1.
+  destruct H1 as (Hit & H1 & H2).
+  destruct it; [ easy | clear Hit ].
+  destruct H2 as [H2| H2]; [ now left; rewrite H2 | ].
+  destruct it; [ now left | ].
+  right.
+  split; [ flia | easy ].
 }
-destruct H1 as (Hit & Habk & H1).
-apply Nat.eqb_neq in Habk.
 destruct H1 as [H1| H1]. {
+  destruct H1 as (Hit & Habk & H1).
   subst it.
   cbn - [ "*" ].
-  now rewrite Habk.
+  apply Nat.eqb_neq in Habk.
+  rewrite Habk.
+  rewrite fst_let, fst_if.
+  cbn - [ "*" ].
+  apply Nat.eqb_neq in H1.
+  now rewrite H1.
 }
-destruct it; [ easy | clear Hit ].
+destruct H1 as (Hit & H1 & H2 & H3).
+destruct it; [ easy | ].
+destruct it; [ flia Hit | ].
+destruct it; [ flia Hit | clear Hit ].
 cbn - [ "*" ].
-rewrite Habk.
-rewrite fst_let.
-f_equal.
-apply eq_fst_rank_fst_loop_0.
-now right.
+apply Nat.eqb_neq in H1, H2.
+apply Nat.eqb_eq in H3.
+now rewrite H1, H2, H3.
 Qed.
-*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
@@ -4901,6 +4907,12 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct y. {
     exfalso.
     clear H1.
+    apply eq_fst_rank_fst_loop_2 in Hy.
+    destruct Hy as [Hy| Hy]. {
+      destruct Hy as (H1 & H2 & H3); subst n.
+      flia Hn8 Hn4.
+    }
+    destruct Hy as (H1 & H2 & H3 & H4).
 ...
   destruct (2 ^ y); [ easy | ].
   rewrite Nat.mul_succ_r, Nat.add_comm.
