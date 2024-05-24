@@ -4669,10 +4669,96 @@ rewrite Nat.mul_assoc.
 rewrite <- Nat.mul_sub_distr_r.
 rewrite (Nat.mul_comm n).
 set (x := 2 * n - 2 ^ Nat.log2_up n).
+(**)
+destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
+  subst un fn.
+  cbn - [ "*" ].
+  destruct n; [ easy | ].
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
+  rewrite <- Nat.pow_succ_r'.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
+  rewrite (Nat_div_less_small 1). 2: {
+    split. {
+      rewrite Nat.mul_1_l.
+      now apply Nat.log2_up_spec.
+    }
+Search (2 ^ Nat.log2_up _ ≤ _).
+...
+Compute (map (λ n,
+  2 ^ S (Nat.log2_up (S n) - 1) < S n
+) (seq 0 20)).
+
+    eapply le_lt_trans; [ | apply Hn2 ].
+    subst x.
+    rewrite Nat.mul_sub_distr_l.
+    rewrite <- Nat.pow_succ_r'.
+    apply Nat.le_add_le_sub_l.
+    rewrite <- Nat_succ_sub_succ_r. 2: {
+      apply Nat.neq_0_lt_0.
+      intros H.
+      apply Nat.log2_up_null in H.
+      flia H2n H.
+    }
+    rewrite Nat.sub_0_r.
+    rewrite Nat.pow_succ_r'.
+    remember (2 ^ _) as x eqn:Hx.
+    progress replace (2 * x + x) with (3 * x) by flia.
+    rewrite Nat.mul_assoc.
+    progress replace (2 * 2) with 4 by easy.
+    subst x.
+    specialize (Nat.log2_up_spec (S n) H2n) as H1.
+    rewrite <- Nat.sub_1_r in H1.
+    destruct H1 as (H1, H2).
+    apply Nat.nlt_ge; intros H3.
+    apply Nat.nle_gt in H1.
+    apply H1; clear H1.
+    rewrite Nat.pow_sub_r; [ | easy | easy ].
+    rewrite Nat.pow_1_r.
+    apply Nat.div_le_lower_bound; [ easy | ].
+    apply Nat.nlt_ge.
+    intros H1; move H1 after H2.
+    apply Nat.nle_gt in H3.
+    apply H3; clear H3.
+Search (_ ≤ _ / _).
+...
+Search (_ / _ ≤ _).
+
+
+    rewrite Nat.pow_sub_r in H1; [ | easy | easy ].
+    rewrite Nat.pow_1_r in H1.
+...  remember (
+...
+    apply (Nat.mul_lt_mono_pos_r 2) in H1; [ | easy ].
+eapply le_lt_trans in H1. 2: {
+Search (_ * (_ / _)).
+apply Nat.div_mul_le.
+rewrite Nat.
+Search (_ / _ < _).
+...
+    flia H1 H1ln.
+Search (Nat.pred _ = _).
+Search (_ = Nat.pred _).
+...
+Search (2 ^ Nat.log2_up _ ≤ _).
+Search (2 ^ Nat.log2_up _ < _).
+Check Nat.log2_up_spec.
+...
+Search (Nat.log2_up _ < _).
+Check Nat.log2_up_lt_lin.
+eapply le_trans.
+apply Nat.lt_le_incl.
+apply Nat.mul_lt_mono_pos_l; [ easy | ].
+Search (2 ^ Nat.log2_up _ ≤ _).
+Search (2 ^ Nat.log2_up _).
+apply Nat.log2_up_lt_lin.
+Check Nat.log2_up_spec.
+...
 destruct (lt_dec n (2 * x)) as [Hn2| Hn2]. {
   subst un fn.
   cbn - [ "*" ].
-(**)
   destruct n; [ easy | ].
   cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
   rewrite fst_if, fst_let.
