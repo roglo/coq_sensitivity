@@ -4803,7 +4803,6 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
     rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
     rewrite Nat.sub_0_r in Hy.
     destruct Hy as (Hnz & Habk & Hy).
-    apply Nat_div_not_small_iff in Habk; [ | easy ].
     destruct Hy as [Hy| Hy]; [ now subst n | ].
     apply Nat.div_small_iff in Hy; [ | easy ].
     rewrite (Nat_mod_less_small 1) in Hy. 2: {
@@ -4811,86 +4810,26 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
       split; [ now apply Nat.log2_up_spec | ].
       now apply Nat_log2_up_lt_twice.
     }
-    rewrite Nat.mul_1_l in Hy.
-...
-    apply Nat.nle_gt in Hy.
-    apply Hy; clear Hy.
-    eapply le_trans; [ apply Habk | ].
-    subst x.
-    rewrite Nat.mul_sub_distr_l.
-    rewrite <- Nat_add_diag.
-    apply Nat.le_add_le_sub_l.
-    apply Nat.add_le_mono_r.
-    rewrite Nat.mul_sub_distr_l in Hn2.
-    apply Nat.lt_sub_lt_add_l in Hn2.
-    apply Nat_lt_sub_lt_add_r_iff in Hn2; [ | flia ].
-    rewrite Nat.mul_assoc in Hn2.
-    rewrite <- (Nat.mul_1_l n) in Hn2 at 2.
-    rewrite <- Nat.mul_sub_distr_r in Hn2.
-    progress replace (2 * 2 - 1) with 3 in Hn2 by easy.
-    rewrite Nat.mul_sub_distr_l in Hn4.
-    apply Nat_le_add_le_sub_l_iff in Hn4. 2: {
-      apply Nat.mul_le_mono_l.
-      apply Nat.lt_le_incl.
-      now apply Nat_log2_up_lt_twice.
-    }
-    apply Nat.le_add_le_sub_r in Hn4.
-    rewrite Nat.mul_assoc in Hn4.
-    rewrite <- (Nat.mul_1_l n) in Hn4 at 3.
-    rewrite <- Nat.mul_sub_distr_r in Hn4.
-    progress replace (4 * 2 - 1) with 7 in Hn4 by easy.
-...
-    apply (Nat.mul_le_mono_pos_l _ _ 2); [ easy | ].
-    eapply le_trans; [ | apply Nat.lt_le_incl, Hn2 ].
-
-...
-    apply Nat_lt_sub_lt_add_l in Hn2.
-    apply Nat.lt_add_lt_sub_r in Hn2.
-...
-  rewrite Nat.pow_succ_r'.
+    flia Hy Hn2.
+  }
+  do 2 rewrite Nat.pow_succ_r'.
   specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
-  rewrite Nat.mul_assoc, (Nat.mul_comm _ 2).
+  do 2 rewrite Nat.mul_assoc.
+  do 2 rewrite (Nat.mul_comm _ 2).
+  rewrite Nat.mul_assoc.
+  progress replace (2 * 2) with 4 by easy.
   eapply le_trans; [ apply Hn4 | ].
-...
   destruct (2 ^ y); [ easy | ].
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
   rewrite Nat.mul_succ_r, Nat.add_comm.
   apply Nat.le_add_r.
 }
-...
-destruct (lt_dec (2 * x) n) as [Hn2| Hn2]. {
-  subst un fn.
-  cbn - [ "*" ].
-(**)
-  exfalso.
-  apply Nat.nlt_ge in Hn2.
-  apply Hn2; clear Hn2.
-  subst x.
-  rewrite Nat.mul_sub_distr_l.
-  rewrite <- Nat.pow_succ_r'.
-  rewrite <- Nat.add_1_r.
-  rewrite <- Nat.add_sub_swap. 2: {
-    rewrite Nat.pow_succ_r'.
-    apply Nat.mul_le_mono_l.
-    apply Nat.lt_le_incl.
-    apply Nat_log2_up_lt_twice; flia H2n.
-  }
-  rewrite Nat.mul_assoc.
-  progress replace (2 * 2) with 4 by easy.
-  apply Nat.lt_add_lt_sub_r.
-  progress replace 4 with (1 + 3) by easy.
-  rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
-  rewrite <- Nat.add_assoc.
-  apply Nat.add_lt_mono_l.
-Compute (map (λ n,
-  Nat.leb
-  (2 ^ S (Nat.log2_up n)) (3 * n + 1)
-) (seq 1 40)).
-(* no *)
-...
-  eapply lt_trans. {
-    apply Nat.mul_lt_mono_pos_l; [ easy | ].
-    apply Nat_log2_up_lt_twice; flia H2n.
-  }
+apply Nat.nle_gt in Hn4.
+clear Hn2.
+destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
+  destruct y; [ easy | clear Hyz ].
+  destruct y. {
 ...
   destruct n; [ easy | ].
   cbn - [ "*" "/" "mod" "^" Nat.log2_up ].
