@@ -4491,10 +4491,6 @@ Theorem eq_fst_rank_fst_loop_1 :
   fst (rank_fst_loop it k a b) = 1 ↔
   it ≠ 0 ∧ nth_bit_of_div 0 a b ≠ k ∧
   (it = 1 ∨ nth_bit_of_div 1 a b = k).
-(*
-  it ≠ 0 ∧ 2 * a / b ≠ k ∧
-  (it = 1 ∨ 2 * ((2 * a) mod b) / b = k).
-*)
 Proof.
 intros.
 split; intros H1. {
@@ -4532,9 +4528,14 @@ Qed.
 Theorem eq_fst_rank_fst_loop_2 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 2 ↔
+  it = 2 ∧ nth_bit_of_div 0 a b ≠ k ∧ nth_bit_of_div 1 a b ≠ k ∨
+  2 < it ∧ nth_bit_of_div 0 a b ≠ k ∧ nth_bit_of_div 1 a b ≠ k ∧
+    nth_bit_of_div 2 a b = k.
+(*
   it = 2 ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∨
   2 < it ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∧
     2 * ((2 * ((2 * a) mod b)) mod b) / b = k.
+*)
 Proof.
 intros.
 split; intros H1. {
@@ -4558,7 +4559,7 @@ split; intros H1. {
 destruct H1 as [H1| H1]. {
   destruct H1 as (Hit & Habk & H1).
   subst it.
-  cbn - [ "*" ].
+  cbn - [ "*" ] in Habk, H1 |-*.
   apply Nat.eqb_neq in Habk.
   rewrite Habk.
   rewrite fst_let, fst_if.
@@ -4570,7 +4571,7 @@ destruct H1 as (Hit & H1 & H2 & H3).
 destruct it; [ easy | ].
 destruct it; [ flia Hit | ].
 destruct it; [ flia Hit | clear Hit ].
-cbn - [ "*" ].
+cbn - [ "*" ] in H1, H2, H3 |-*.
 apply Nat.eqb_neq in H1, H2.
 apply Nat.eqb_eq in H3.
 now rewrite H1, H2, H3.
