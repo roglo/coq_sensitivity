@@ -4593,6 +4593,8 @@ split; intros H1. {
     split; [ easy | ].
     intros * Ht.
     destruct it; [ easy | ].
+    apply Nat.succ_inj in Hiu.
+    subst it.
     cbn - [ "*" ] in H1.
     rewrite fst_if, fst_let in H1.
     cbn - [ "*" ] in H1.
@@ -4600,34 +4602,70 @@ split; intros H1. {
     symmetry in Habk.
     destruct abk; [ easy | ].
     apply Nat.succ_inj in H1.
-...
-    destruct t.
-    cbn - [ "*" ].
-...
+    apply IHu in H1.
+    destruct H1 as [H1| H1]. {
+      destruct H1 as (_ & H1).
+      apply Nat.eqb_neq in Habk.
+      destruct t; [ easy | ].
+      apply Nat.succ_lt_mono in Ht.
+      cbn - [ "*" ].
+      now apply H1.
+    }
+    destruct H1 as (H1 & _).
+    now apply Nat.lt_irrefl in H1.
+  }
+  right.
+  destruct it; [ easy | ].
   cbn - [ "*" ] in H1.
   rewrite fst_if, fst_let in H1.
   cbn - [ "*" ] in H1.
   remember (2 * a / b =? k) as abk eqn:Habk.
   symmetry in Habk.
-  destruct abk. {
-    subst u; right.
-    split; [ easy | ].
-    now apply Nat.eqb_eq in Habk.
-  }
-  apply Nat.eqb_neq in Habk.
-...
+  destruct abk; [ easy | ].
   apply Nat.succ_inj in H1.
-  apply eq_fst_rank_fst_loop_1 in H1.
-  destruct H1 as (Hit & H1 & H2).
-  destruct it; [ easy | clear Hit ].
-  destruct H2 as [H2| H2]; [ now left; rewrite H2 | ].
-  destruct it; [ now left | ].
-  right.
-  split; [ flia | easy ].
+  apply IHu in H1.
+  destruct H1 as [H1| H1]. {
+    now destruct H1 as (H1, _); subst it.
+  }
+  destruct H1 as (H1 & H2 & H3).      
+  split; [ now apply -> Nat.succ_lt_mono | ].
+  split; [ | easy ].
+  intros * Htu.
+  apply Nat.eqb_neq in Habk.
+  destruct t; [ easy | ].
+  apply Nat.succ_lt_mono in Htu.
+  cbn - [ "*" ].
+  now apply H2.
 }
 destruct H1 as [H1| H1]. {
-  destruct H1 as (Hit & Habk & H1).
-  subst it.
+  destruct H1 as (H1, H2); subst it.
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. {
+    apply Nat.eqb_eq in Habk.
+    now specialize (H2 0 (Nat.lt_0_succ _)).
+  }
+  f_equal.
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  specialize (H2 (S u) (Nat.lt_succ_diag_r _)) as H3.
+  cbn - [ "*" ] in H3.
+  destruct u. {
+    cbn - [ "*" ] in H3.
+    apply Nat.eqb_neq in H3.
+    now rewrite H3.
+  }
+  cbn - [ "*" ] in H3.
+  remember (2 * ((2 * a) mod b) / b =? k) as abbk eqn:Habbk.
+  symmetry in Habbk.
+  destruct abbk.
+...
   cbn - [ "*" ] in Habk, H1 |-*.
   apply Nat.eqb_neq in Habk.
   rewrite Habk.
