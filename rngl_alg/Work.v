@@ -4489,8 +4489,12 @@ Qed.
 Theorem eq_fst_rank_fst_loop_1 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 1 ↔
+  it ≠ 0 ∧ nth_bit_of_div 0 a b ≠ k ∧
+  (it = 1 ∨ nth_bit_of_div 1 a b = k).
+(*
   it ≠ 0 ∧ 2 * a / b ≠ k ∧
   (it = 1 ∨ 2 * ((2 * a) mod b) / b = k).
+*)
 Proof.
 intros.
 split; intros H1. {
@@ -4513,11 +4517,11 @@ destruct H1 as (Hit & Habk & H1).
 apply Nat.eqb_neq in Habk.
 destruct H1 as [H1| H1]. {
   subst it.
-  cbn - [ "*" ].
+  cbn - [ "*" ] in Habk |-*.
   now rewrite Habk.
 }
 destruct it; [ easy | clear Hit ].
-cbn - [ "*" ].
+cbn - [ "*" ] in Habk |-*.
 rewrite Habk.
 rewrite fst_let.
 f_equal.
@@ -4884,6 +4888,7 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
   destruct y. {
     exfalso.
     apply eq_fst_rank_fst_loop_1 in Hy.
+    cbn - [ "*" ] in Hy.
     rewrite <- Nat.pow_succ_r' in Hy.
     rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
     rewrite Nat.sub_0_r in Hy.
@@ -4917,6 +4922,7 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct y. {
     exfalso.
     apply eq_fst_rank_fst_loop_1 in Hy.
+    cbn - [ "*" ] in Hy.
     rewrite <- Nat.pow_succ_r' in Hy.
     rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
     rewrite Nat.sub_0_r in Hy.
