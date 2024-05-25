@@ -4639,22 +4639,23 @@ split; intros H1. {
 }
 destruct H1 as [H1| H1]. {
   destruct H1 as (H1, H2); subst it.
-  destruct u; [ easy | ].
-  cbn - [ "*" ].
-  rewrite fst_if, fst_let.
-  cbn - [ "*" ].
-  remember (2 * a / b =? k) as abk eqn:Habk.
-  symmetry in Habk.
-  destruct abk. {
-    apply Nat.eqb_eq in Habk.
-    now specialize (H2 0 (Nat.lt_0_succ _)).
-  }
-  f_equal.
-  destruct u; [ easy | ].
-  cbn - [ "*" ].
-  rewrite fst_if, fst_let.
-  cbn - [ "*" ].
 (**)
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  specialize (H2 0) as H3.
+  assert (H : 0 < S u) by flia.
+  specialize (H3 H); clear H.
+  cbn - [ "*" ] in H3.
+  apply Nat.eqb_neq in H3.
+  rewrite H3; clear H3.
+  f_equal.
+(**)
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
   specialize (H2 1) as H3.
   assert (H : 1 < S (S u)) by flia.
   specialize (H3 H); clear H.
@@ -4662,10 +4663,28 @@ destruct H1 as [H1| H1]. {
   apply Nat.eqb_neq in H3.
   rewrite H3; clear H3.
   f_equal.
+(**)
   destruct u; [ easy | ].
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
   cbn - [ "*" ].
+  specialize (H2 2) as H3.
+  assert (H : 2 < S (S (S u))) by flia.
+  specialize (H3 H); clear H.
+  cbn - [ "*" ] in H3.
+  apply Nat.eqb_neq in H3.
+  rewrite H3; clear H3.
+  f_equal.
+(**)
+Print nth_bit_of_div.
+...
+Theorem glop :
+  ∀ u a b k,
+  (∀ t, t < 3 + u → nth_bit_of_div t a b ≠ k)
+  → fst (rank_fst_loop u k ((2 * ((2 * ((2 * a) mod b)) mod b)) mod b) b) = u.
+Proof.
+Admitted.
+apply glop.
 ...
   specialize (H2 (S u) (Nat.lt_succ_diag_r _)) as H3.
   cbn - [ "*" ] in H3.
