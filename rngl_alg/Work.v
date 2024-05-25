@@ -4459,17 +4459,13 @@ apply Nat.div_le_lower_bound; [ easy | ].
 now rewrite H1 in H3.
 Qed.
 
-Fixpoint nth_bit_of_div n a b :=
-  match n with
-  | 0 => 2 * a / b
-  | S n' => nth_bit_of_div n' ((2 * a) mod b) b
-  end.
-
 Fixpoint nth_rest_of_div n a b :=
   match n with
   | 0 => a
   | S n' => nth_rest_of_div n' ((2 * a) mod b) b
   end.
+
+Definition nth_bit_of_div n a b := 2 * nth_rest_of_div n a b / b.
 
 Theorem eq_fst_rank_fst_loop_0 :
   ∀ it k a b,
@@ -4488,6 +4484,8 @@ split; intros H1. {
 destruct H1 as [H1| H1]; [ now subst it | ].
 destruct it; [ easy | ].
 cbn - [ "*" ] in H1 |-*.
+progress unfold nth_bit_of_div in H1.
+cbn - [ "*" ] in H1.
 rewrite H1.
 now rewrite Nat.eqb_refl.
 Qed.
@@ -4520,10 +4518,14 @@ apply Nat.eqb_neq in Habk.
 destruct H1 as [H1| H1]. {
   subst it.
   cbn - [ "*" ] in Habk |-*.
+  progress unfold nth_bit_of_div in Habk.
+  cbn - [ "*" ] in Habk.
   now rewrite Habk.
 }
 destruct it; [ easy | clear Hit ].
 cbn - [ "*" ] in Habk |-*.
+progress unfold nth_bit_of_div in Habk.
+cbn - [ "*" ] in Habk.
 rewrite Habk.
 rewrite fst_let.
 f_equal.
@@ -4562,10 +4564,14 @@ destruct H1 as [H1| H1]. {
   subst it.
   cbn - [ "*" ] in Habk, H1 |-*.
   apply Nat.eqb_neq in Habk.
+  progress unfold nth_bit_of_div in Habk.
+  cbn - [ "*" ] in Habk.
   rewrite Habk.
   rewrite fst_let, fst_if.
   cbn - [ "*" ].
   apply Nat.eqb_neq in H1.
+  progress unfold nth_bit_of_div in H1.
+  cbn - [ "*" ] in H1.
   now rewrite H1.
 }
 destruct H1 as (Hit & H1 & H2 & H3).
@@ -4575,6 +4581,10 @@ destruct it; [ flia Hit | clear Hit ].
 cbn - [ "*" ] in H1, H2, H3 |-*.
 apply Nat.eqb_neq in H1, H2.
 apply Nat.eqb_eq in H3.
+progress unfold nth_bit_of_div in H1.
+progress unfold nth_bit_of_div in H2.
+progress unfold nth_bit_of_div in H3.
+cbn - [ "*" ] in H1, H2, H3.
 now rewrite H1, H2, H3.
 Qed.
 
@@ -4664,6 +4674,8 @@ now apply glop.
   specialize (H3 H); clear H.
   cbn - [ "*" ] in H3.
   apply Nat.eqb_neq in H3.
+  progress unfold nth_bit_of_div in H3.
+  cbn - [ "*" ] in H3.
   rewrite H3; clear H3.
   f_equal.
   progress fold (nth_rest_of_div 1 a b).
@@ -4677,6 +4689,8 @@ now apply glop.
   specialize (H3 H); clear H.
   cbn - [ "*" ] in H3.
   apply Nat.eqb_neq in H3.
+  progress unfold nth_bit_of_div in H3.
+  cbn - [ "*" ] in H3.
   rewrite H3; clear H3.
   f_equal.
   progress fold (nth_rest_of_div 2 a b).
@@ -4698,6 +4712,8 @@ now apply glop.
   specialize (H3 H); clear H.
   cbn - [ "*" ] in H3.
   apply Nat.eqb_neq in H3.
+  progress unfold nth_bit_of_div in H3.
+  cbn - [ "*" ] in H3.
   rewrite H3; clear H3.
   f_equal.
   progress fold (nth_rest_of_div 3 a b).
@@ -4709,7 +4725,7 @@ Theorem glop :
   → fst (rank_fst_loop u k (nth_rest_of_div n a b) b) = u.
 Proof.
 intros * Hbz Hab.
-revert n Hab.
+revert a n Hab.
 induction u; intros; [ easy | ].
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
@@ -4719,8 +4735,17 @@ symmetry in Habk.
 destruct abk. {
   exfalso.
   apply Nat.eqb_eq in Habk.
-  apply Nat_div_less_small_iff in Habk; [ | easy ].
-  apply Nat.mul_le_mono_pos_l in Habk.
+  progress unfold nth_bit_of_div in Hab.
+  specialize (Hab n).
+  assert (H : n < n + S u) by flia.
+  now specialize (Hab H); clear H.
+}
+f_equal.
+...
+specialize (IHu a (S n)).
+cbn - [ "*" ] in IHu.
+apply IHu.
+apply IHu.
 ...
 now apply glop.
 ...
