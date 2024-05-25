@@ -4465,6 +4465,12 @@ Fixpoint nth_bit_of_div n a b :=
   | S n' => nth_bit_of_div n' ((2 * a) mod b) b
   end.
 
+Fixpoint nth_rest_of_div n a b :=
+  match n with
+  | 0 => a
+  | S n' => nth_rest_of_div n' ((2 * a) mod b) b
+  end.
+
 Theorem eq_fst_rank_fst_loop_0 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 0 ↔
@@ -4639,7 +4645,16 @@ split; intros H1. {
 }
 destruct H1 as [H1| H1]. {
   destruct H1 as (H1, H2); subst it.
-(**)
+  progress fold (nth_rest_of_div 0 a b).
+(*
+Theorem glop :
+  ∀ n u a b k,
+  (∀ t, t < n + u → nth_bit_of_div t a b ≠ k)
+  → fst (rank_fst_loop u k (nth_rest_of_div n a b) b) = u.
+Proof.
+Admitted.
+now apply glop.
+*)
   destruct u; [ easy | ].
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
@@ -4651,6 +4666,7 @@ destruct H1 as [H1| H1]. {
   apply Nat.eqb_neq in H3.
   rewrite H3; clear H3.
   f_equal.
+  progress fold (nth_rest_of_div 1 a b).
 (**)
   destruct u; [ easy | ].
   cbn - [ "*" ].
@@ -4663,7 +4679,16 @@ destruct H1 as [H1| H1]. {
   apply Nat.eqb_neq in H3.
   rewrite H3; clear H3.
   f_equal.
-(**)
+  progress fold (nth_rest_of_div 2 a b).
+(*
+Theorem glop :
+  ∀ n u a b k,
+  (∀ t, t < n + u → nth_bit_of_div t a b ≠ k)
+  → fst (rank_fst_loop u k (nth_rest_of_div n a b) b) = u.
+Proof.
+Admitted.
+now apply glop.
+*)
   destruct u; [ easy | ].
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
@@ -4675,16 +4700,29 @@ destruct H1 as [H1| H1]. {
   apply Nat.eqb_neq in H3.
   rewrite H3; clear H3.
   f_equal.
+  progress fold (nth_rest_of_div 3 a b).
 (**)
-Print nth_bit_of_div.
-...
 Theorem glop :
-  ∀ u a b k,
-  (∀ t, t < 3 + u → nth_bit_of_div t a b ≠ k)
-  → fst (rank_fst_loop u k ((2 * ((2 * ((2 * a) mod b)) mod b)) mod b) b) = u.
+  ∀ n u a b k,
+  b ≠ 0
+  → (∀ t, t < n + u → nth_bit_of_div t a b ≠ k)
+  → fst (rank_fst_loop u k (nth_rest_of_div n a b) b) = u.
 Proof.
-Admitted.
-apply glop.
+intros * Hbz Hab.
+revert n Hab.
+induction u; intros; [ easy | ].
+cbn - [ "*" ].
+rewrite fst_if, fst_let.
+cbn - [ "*" ].
+remember (_ / _ =? k) as abk eqn:Habk.
+symmetry in Habk.
+destruct abk. {
+  exfalso.
+  apply Nat.eqb_eq in Habk.
+  apply Nat_div_less_small_iff in Habk; [ | easy ].
+  apply Nat.mul_le_mono_pos_l in Habk.
+...
+now apply glop.
 ...
   specialize (H2 (S u) (Nat.lt_succ_diag_r _)) as H3.
   cbn - [ "*" ] in H3.
