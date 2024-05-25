@@ -4459,10 +4459,16 @@ apply Nat.div_le_lower_bound; [ easy | ].
 now rewrite H1 in H3.
 Qed.
 
+Fixpoint nth_bit_of_div n a b :=
+  match n with
+  | 0 => 2 * a / b
+  | S n' => nth_bit_of_div n' ((2 * a) mod b) b
+  end.
+
 Theorem eq_fst_rank_fst_loop_0 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 0 ↔
-  it = 0 ∨ 2 * a / b = k.
+  it = 0 ∨ nth_bit_of_div 0 a b = k.
 Proof.
 intros.
 split; intros H1. {
@@ -4475,7 +4481,7 @@ split; intros H1. {
 }
 destruct H1 as [H1| H1]; [ now subst it | ].
 destruct it; [ easy | ].
-cbn - [ "*" ].
+cbn - [ "*" ] in H1 |-*.
 rewrite H1.
 now rewrite Nat.eqb_refl.
 Qed.
@@ -4565,6 +4571,37 @@ apply Nat.eqb_neq in H1, H2.
 apply Nat.eqb_eq in H3.
 now rewrite H1, H2, H3.
 Qed.
+
+(*
+Theorem eq_fst_rank_fst_loop_iff :
+  ∀ it k a b u,
+  fst (rank_fst_loop it k a b) = u ↔
+  it = u ∧
+    2 * a / b ≠ k ∧
+    2 * ((2 * a) mod b) / b ≠ k ∨
+    2 * ((2 * ((2 * a) mod b)) mod b) / b ≠ k
+.
+intros.
+  u < it ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∧
+    2 * ((2 * ((2 * a) mod b)) mod b) / b = k.
+Proof.
+...
+Theorem eq_fst_rank_fst_loop_inv_iff :
+  ∀ it k n v,
+  2 < n
+  → fst (rank_fst_loop it k 1 n) = v ↔
+    it = v ∧
+      2 / n ≠ k ∧
+      2 * 2 / n ≠ k ∧
+      2 * (2 * 2 mod n) / n ≠ k.
+...
+  it = n ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∨
+  2 < it ∧ 2 * a / b ≠ k ∧ 2 * ((2 * a) mod b) / b ≠ k ∧
+    2 * ((2 * ((2 * a) mod b)) mod b) / b = k.
+Proof.
+intros.
+...
+*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
@@ -4821,6 +4858,7 @@ destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
   apply eq_fst_rank_fst_loop_0 in Hy.
   destruct Hy as [Hy| Hy]; [ now subst n | ].
+  cbn - [ "*" ] in Hy.
   rewrite <- Nat.pow_succ_r' in Hy.
   apply Nat.div_small_iff in Hy; [ | flia H2n ].
   rewrite Nat.pow_0_r, Nat.mul_1_r.
