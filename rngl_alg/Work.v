@@ -4765,6 +4765,32 @@ destruct Habk as [Habk| Habk]. {
   apply Nat.le_0_r in Hk1; subst k.
   rewrite Nat.mul_1_l in Habk.
   rewrite Nat.mod_small; [ | easy ].
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember (_ / _ =? 1) as a2bk eqn:Ha2bk.
+  symmetry in Ha2bk.
+  destruct a2bk. 2: {
+    apply Nat.eqb_neq in Ha2bk.
+    apply Nat_neq_div_1 in Ha2bk; [ | ].
+...
+    exfalso.
+    apply Nat.eqb_eq in Ha2bk.
+    apply Nat_eq_div_1 in Ha2bk.
+...
+    specialize (Hab (S n)) as H1.
+    assert (H : S n < n + S (S u)) by flia.
+    specialize (H1 H); clear H.
+    progress unfold nth_bit_of_div in H1.
+    apply Nat_neq_div in H1; [ | flia Hbz ].
+    rewrite Nat.mul_1_l in H1.
+    cbn - [ "*" ] in H1.
+    spe
+...
+  destruct (Nat.eq_dec (nth_rest_of_div n a b) 0) as [Hnz| Hnz]. {
+    rewrite Hnz; cbn.
+...
 Search (rank_fst_loop _ _ (_ * _)).
 (* ouah, ça chie *)
 ...
