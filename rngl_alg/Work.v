@@ -4746,6 +4746,18 @@ induction u; intros; [ easy | ].
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
 cbn - [ "*" ].
+(**)
+specialize (Hab n) as H3.
+assert (H : n < n + S u) by flia.
+specialize (H3 H); clear H.
+progress unfold nth_bit_of_div in H3.
+apply Nat.eqb_neq in H3.
+rewrite H3; clear H3.
+f_equal.
+Print nth_rest_of_div.
+remember (nth_rest_of_div (S n) a b) as x eqn:Hx.
+cbn - [ "*" ] in Hx.
+...
 remember (_ / _ =? k) as abk eqn:Habk.
 symmetry in Habk.
 destruct abk. {
