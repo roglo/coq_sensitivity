@@ -4720,12 +4720,13 @@ now apply glop.
 (**)
 Theorem glop :
   ∀ n u a b k,
-  b ≠ 0
+  a < b
+  → k ≤ 1
   → (∀ t, t < n + u → nth_bit_of_div t a b ≠ k)
   → fst (rank_fst_loop u k (nth_rest_of_div n a b) b) = u.
 Proof.
-intros * Hbz Hab.
-revert a n Hab.
+intros * Hbz Hk1 Hab.
+revert a n Hbz Hab.
 induction u; intros; [ easy | ].
 cbn - [ "*" ].
 rewrite fst_if, fst_let.
@@ -4741,9 +4742,32 @@ destruct abk. {
   now specialize (Hab H); clear H.
 }
 f_equal.
+apply Nat.eqb_neq in Habk.
+apply Nat_neq_div in Habk; [ | flia Hbz ].
+destruct Habk as [Habk| Habk]. {
+  destruct k; [ easy | ].
+  apply Nat.succ_le_mono in Hk1.
+  apply Nat.le_0_r in Hk1; subst k.
+  rewrite Nat.mul_1_l in Habk.
+  rewrite Nat.mod_small; [ | easy ].
+Search (rank_fst_loop _ _ (_ * _)).
+(* ouah, ça chie *)
 ...
-specialize (IHu a (S n)).
-cbn - [ "*" ] in IHu.
+(**)
+  specialize (IHu a (S n)).
+  cbn - [ "*" ] in IHu.
+Print rank_fst_loop.
+...
+  rewrite Nat.mod_small in IHu. 2: {
+    destruct k; [ easy | ].
+    apply Nat.succ_le_mono in Hk1.
+    apply Nat.le_0_r in Hk1; subst k.
+    now rewrite Nat.mul_1_l in Habk.
+  }
+...
+  specialize (IHu (nth_rest_of_div n a b) (S n)).
+  cbn - [ "*" ] in IHu.
+...
 apply IHu.
 apply IHu.
 ...
