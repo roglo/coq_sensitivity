@@ -4722,6 +4722,18 @@ now apply glop.
   cbn - [ "*" ].
   rewrite fst_if, fst_let.
   cbn - [ "*" ].
+(*
+  H2 : ∀ t : nat, t < S (S (S (S u))) → nth_bit_of_div t a b ≠ k
+  ============================
+  (if 2 * ((2 * ((2 * ((2 * a) mod b)) mod b)) mod b) / b =? k
+   then 0
+   else
+    S
+      (fst
+         (rank_fst_loop u k
+            ((2 * ((2 * ((2 * ((2 * a) mod b)) mod b)) mod b)) mod b) b))) =
+  S u
+*)
   specialize (H2 3) as H3.
   assert (H : 3 < S (S (S (S u)))) by flia.
   specialize (H3 H); clear H.
@@ -4733,6 +4745,8 @@ now apply glop.
   f_equal.
   progress fold (nth_rest_of_div 4 a b).
 (**)
+progress unfold nth_bit_of_div in H2.
+...
 Theorem glop :
   ∀ n u a b k,
   a < b
@@ -4754,9 +4768,39 @@ progress unfold nth_bit_of_div in H3.
 apply Nat.eqb_neq in H3.
 rewrite H3; clear H3.
 f_equal.
-Print nth_rest_of_div.
-remember (nth_rest_of_div (S n) a b) as x eqn:Hx.
-cbn - [ "*" ] in Hx.
+(**)
+progress unfold nth_bit_of_div in Hab.
+destruct n. {
+  cbn - [ "*" ] in Hab |-*.
+  specialize (Hab 0 (Nat.lt_0_succ _)) as H1.
+  cbn - [ "*" ] in H1.
+  apply Nat_neq_div in H1; [ | flia Hbz ].
+  destruct H1 as [H1| H1]. {
+    destruct k; [ easy | ].
+    destruct k; [ | flia Hk1 ].
+    rewrite Nat.mul_1_l in H1.
+    rewrite Nat.mod_small; [ | easy ].
+    clear IHu.
+    revert a Hbz H1 Hab.
+    induction u; intros; [ easy | ].
+    cbn - [ "*" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" ].
+    specialize (Hab 1) as H2.
+    assert (H : 1 < S (S u)) by flia.
+    specialize (H2 H); clear H.
+    apply Nat_neq_div in H2; [ | flia Hbz ].
+    cbn - [ "*" ] in H2.
+    rewrite Nat.mul_1_l in H2.
+    destruct H2 as [H2| H2]. {
+      rewrite Nat.mod_small in H2; [ | easy ].
+      rewrite Nat.div_small; [ | easy ].
+      rewrite Nat.mod_small; [ | easy ].
+      cbn - [ "*" ].
+      f_equal.
+      apply IHu; [ easy | easy | ].
+      intros * Htu.
+      apply Nat_neq_div; [ flia Hbz | ].
 ...
 remember (_ / _ =? k) as abk eqn:Habk.
 symmetry in Habk.
