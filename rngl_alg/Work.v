@@ -4718,6 +4718,21 @@ now apply glop.
   f_equal.
   progress fold (nth_rest_of_div 3 a b).
 (**)
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  specialize (H2 3) as H3.
+  assert (H : 3 < S (S (S (S u)))) by flia.
+  specialize (H3 H); clear H.
+  cbn - [ "*" ] in H3.
+  apply Nat.eqb_neq in H3.
+  progress unfold nth_bit_of_div in H3.
+  cbn - [ "*" ] in H3.
+  rewrite H3; clear H3.
+  f_equal.
+  progress fold (nth_rest_of_div 4 a b).
+(**)
 Theorem glop :
   ∀ n u a b k,
   a < b
