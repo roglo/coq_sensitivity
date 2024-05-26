@@ -4773,7 +4773,10 @@ destruct Habk as [Habk| Habk]. {
   symmetry in Ha2bk.
   destruct a2bk. 2: {
     apply Nat.eqb_neq in Ha2bk.
-    apply Nat_neq_div_1 in Ha2bk; [ | ].
+    apply Nat_neq_div_1 in Ha2bk; [ | flia Hbz ].
+    destruct Ha2bk as [Ha2bk| Ha2bk]. {
+      f_equal.
+      rewrite Nat.mod_small; [ | easy ].
 ...
     exfalso.
     apply Nat.eqb_eq in Ha2bk.
