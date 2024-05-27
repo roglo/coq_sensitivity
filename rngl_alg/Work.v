@@ -4745,8 +4745,6 @@ now apply glop.
   f_equal.
   progress fold (nth_rest_of_div 4 a b).
 (**)
-progress unfold nth_bit_of_div in H2.
-...
 Theorem glop :
   ∀ n u a b k,
   a < b
@@ -4792,15 +4790,79 @@ destruct n. {
     apply Nat_neq_div in H2; [ | flia Hbz ].
     cbn - [ "*" ] in H2.
     rewrite Nat.mul_1_l in H2.
-    destruct H2 as [H2| H2]. {
-      rewrite Nat.mod_small in H2; [ | easy ].
-      rewrite Nat.div_small; [ | easy ].
-      rewrite Nat.mod_small; [ | easy ].
-      cbn - [ "*" ].
+    rewrite Nat.mod_small in H2; [ | easy ].
+    destruct H2 as [H2| H2]; [ | flia H1 H2 ].
+    rewrite Nat.div_small; [ | easy ].
+    rewrite Nat.mod_small; [ | easy ].
+    cbn - [ "*" ].
+    f_equal.
+    apply IHu; [ easy | easy | ].
+    intros * Htu.
+    specialize (Hab (S t)) as H3.
+    assert (H : S t < S (S u)) by flia Htu.
+    specialize (H3 H); clear H.
+    cbn - [ "*" ] in H3.
+    now rewrite Nat.mod_small in H3.
+  }
+  destruct k. {
+    rewrite Nat.mul_1_l in H1.
+    clear IHu.
+    revert a Hbz H1 Hab.
+    induction u; intros; [ easy | ].
+    cbn - [ "*" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" ].
+    rewrite (Nat_mod_less_small 1); [ | flia Hbz H1 ].
+    rewrite Nat.mul_1_l.
+    remember (_ / _ =? 0) as ab2 eqn:Hab2.
+    symmetry in Hab2.
+    destruct ab2. 2: {
       f_equal.
-      apply IHu; [ easy | easy | ].
-      intros * Htu.
+      apply IHu; [ flia Hbz | | ]. {
+        apply Nat.eqb_neq in Hab2.
+        apply Nat_neq_div in Hab2; [ | flia Hbz ].
+        rewrite Nat.mul_1_l in Hab2.
+        now destruct Hab2.
+      }
+      intros t Ht.
+      clear Hab2.
       apply Nat_neq_div; [ flia Hbz | ].
+      rewrite Nat.mul_1_l.
+      right.
+      specialize (Hab (S t)) as H2.
+      assert (H : S t < S (S u)) by flia Ht.
+      specialize (H2 H); clear H.
+      cbn - [ "*" ] in H2.
+      rewrite (Nat_mod_less_small 1)in H2; [ | flia Hbz H1 ].
+      rewrite Nat.mul_1_l in H2.
+      apply Nat_neq_div in H2; [ | flia Hbz ].
+      destruct H2 as [H2| H2]; [ easy | ].
+      now rewrite Nat.mul_1_l in H2.
+    }
+    exfalso.
+    apply Nat.eqb_eq in Hab2.
+    apply Nat.div_small_iff in Hab2; [ | flia Hbz ].
+    assert (H2 : 4 * a < 3 * b) by flia Hab2.
+    clear Hab2.
+    specialize (Hab 1) as H3.
+    assert (H : 1 < S (S u)) by flia.
+    specialize (H3 H); clear H.
+    apply Nat_neq_div in H3; [ | flia Hbz ].
+    destruct H3 as [H3| H3]; [ easy | ].
+    rewrite Nat.mul_1_l in H3.
+    cbn - [ "*" ] in H3.
+...
+    rewrite (Nat_div_less_small 0) in H3; [ easy | ].
+    cbn - [ "*" ].
+    split; [ easy | ].
+...
+    specialize (Hab 1) as H2.
+    assert (H : 1 < S (S u)) by flia.
+    specialize (H2 H); clear H.
+    apply Nat_neq_div in H2; [ | flia Hbz ].
+    destruct H2 as [H2| H2]; [ easy | ].
+    rewrite Nat.mul_1_l in H2.
+    cbn - [ "*" ] in H2.
 ...
 remember (_ / _ =? k) as abk eqn:Habk.
 symmetry in Habk.
