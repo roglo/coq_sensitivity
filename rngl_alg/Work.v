@@ -3,15 +3,20 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
+(*
 Require Import Init.Nat.
+*)
 Import List List.ListNotations.
-Require Import Main.Misc Main.RingLike Main.IterAdd.
+Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
-Require Import AngleAddOverflowLe AngleAddLeMonoL.
-Require Import AngleLeSubAdd AngleDiv2Add.
+Require Import (*AngleAddOverflowLe*) AngleAddLeMonoL.
+Require Import (*AngleLeSubAdd*) AngleDiv2Add.
+(*
 Require Import TacChangeAngle.
+*)
 Require Import Complex.
+(*
 Require Import NewtonBinomial.
 Require Import AngleAddOverflowEquiv.
 Require Import AngleAddOverflowEquiv3.
@@ -88,6 +93,7 @@ now rewrite (rngl_mul_0_l Hos).
 Qed.
 
 End a.
+*)
 
 Section a.
 
@@ -99,6 +105,7 @@ Context {ac : angle_ctx T}.
 
 (* *)
 
+(*
 Theorem angle_mul_nat_overflow_pow2_div_angle_mul :
   ∀ n i θ,
   angle_mul_nat_overflow (2 ^ i / n) (n * (θ / ₂^i)) = false.
@@ -122,6 +129,7 @@ Qed.
 
 Theorem angle_div_pow2_1 : ∀ θ, (θ / ₂^1 = θ / ₂)%A.
 Proof. easy. Qed.
+*)
 
 Theorem angle_add_overflow_mul_div_pow2 :
   ∀ n i θ,
@@ -191,6 +199,7 @@ split. {
 now apply angle_add_overflow_mul_div_pow2.
 Qed.
 
+(*
 Theorem angle_mul_div_pow2_le_straight :
   ∀ n i θ,
   2 * n ≤ 2 ^ i
@@ -917,6 +926,7 @@ intros n Hn.
 rewrite angle_eucl_dist_opp_opp.
 now apply HN.
 Qed.
+*)
 
 Theorem angle_same_lim_sub :
   ∀ u v θ, angle_lim u θ → angle_lim v θ → angle_lim (λ i, (u i - v i)%A) 0.
@@ -969,12 +979,15 @@ rewrite angle_mul_sub_distr_r. 2: {
 now rewrite angle_mul_1_l.
 Qed.
 
+(*
 Theorem Nat_add_mul_r_diag_r : ∀ a b, a + b * a = (1 + b) * a.
 Proof. easy. Qed.
+*)
 
 Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
 Proof. easy. Qed.
 
+(*
 Theorem angle_right_div_2_lt :
   ∀ θ,
   (rngl_cos θ < rngl_sin θ)%L
@@ -2237,6 +2250,7 @@ split; intros Hn. {
   now exists (Nat.log2 (S n)).
 }
 Qed.
+*)
 
 Theorem angle_div_2_pow_mul_pow_sub :
   ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ / ₂^i) = θ / ₂^j)%A.
@@ -2247,6 +2261,7 @@ rewrite angle_div_2_pow_add_r.
 apply angle_div_2_pow_mul_2_pow.
 Qed.
 
+(*
 Theorem seq_angle_to_div_nat_3_le :
   ∀ i θ, (seq_angle_to_div_nat θ 3 i ≤ 3 * (θ / ₂^3))%A.
 Proof.
@@ -2329,6 +2344,7 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (3 + i))). {
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
+*)
 
 Theorem seq_angle_to_div_nat_5_le :
   ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
@@ -2445,6 +2461,7 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ (4 + i))). {
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
+(*
 Theorem seq_angle_to_div_nat_8_le :
   ∀ i θ, (seq_angle_to_div_nat θ 8 i ≤ 3 * (θ / ₂^4))%A.
 Proof.
@@ -2564,6 +2581,7 @@ Fixpoint old_rank_fst_loop it k a b :=
 
 Definition old_rank_fst_0 a b := fst (old_rank_fst_loop b 0 a b).
 Definition old_rank_fst_1 a b := fst (old_rank_fst_loop b 1 a b).
+*)
 
 (* work only if a < b *)
 (* "a" recursively remains less than "b" *)
@@ -2577,6 +2595,7 @@ Fixpoint rank_fst_loop it k a b :=
         (S r, a')
   end.
 
+(*
 Fixpoint new_rank_fst_loop it a b :=
   match it with
   | 0 => 0
@@ -2587,16 +2606,21 @@ Fixpoint new_rank_fst_loop it a b :=
 
 (* rank starting at 0 for the first binary digit of a/b with a<b *)
 Definition rank_fst_0 a b := fst (rank_fst_loop b 0 a b).
+*)
 Definition rank_fst_1 a b := fst (rank_fst_loop b 1 a b).
 Definition fst_1_len a b :=
   fst (rank_fst_loop b 0 (snd (rank_fst_loop b 1 a b)) b).
+(*
 Definition new_fst_1_len b :=
   new_rank_fst_loop b (2 ^ (Nat.log2_up b - 1) mod b) b.
+*)
 
 Definition inv_ub_num n := 2 ^ S (fst_1_len 1 n) - 1.
 Definition inv_ub_den_pow2 n := rank_fst_1 1 n + fst_1_len 1 n + 1.
 
+(*
 Definition rank_fst_1_inv n := Nat.log2_up n - 1.
+*)
 
 Theorem fst_let :
   ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
@@ -2608,16 +2632,19 @@ Theorem fst_if :
   fst (if a then b else c) = if a then fst b else fst c.
 Proof. now intros; destruct a. Qed.
 
+(*
 Theorem S_if :
   ∀ (a : bool) b c,
   S (if a then b else c) = if a then S b else S c.
 Proof. now intros; destruct a. Qed.
+*)
 
 Theorem snd_let :
   ∀ B C D E (a : B * C) (f : B → D) (g : C → E),
   snd (let (b, c) := a in (f b, g c)) = g (snd a).
 Proof. now intros; destruct a. Qed.
 
+(*
 Theorem snd_if :
   ∀ B C (a : bool) (b c : B * C),
   snd (if a then b else c) = if a then snd b else snd c.
@@ -2626,11 +2653,13 @@ Proof. now intros; destruct a. Qed.
 Theorem fold_rank_fst_0 :
   ∀ a b, fst (rank_fst_loop b 0 a b) = rank_fst_0 a b.
 Proof. easy. Qed.
+*)
 
 Theorem fold_rank_fst_1 :
   ∀ a b, fst (rank_fst_loop b 1 a b) = rank_fst_1 a b.
 Proof. easy. Qed.
 
+(*
 Theorem fst_rank_fst_loop_succ :
   ∀ it k a b,
   fst (rank_fst_loop (S it) k a b) =
@@ -2677,6 +2706,7 @@ Proof.
 intros.
 now rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
 Qed.
+*)
 
 Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 ↔ b ≤ a < 2 * b.
 Proof.
@@ -2733,6 +2763,7 @@ specialize (Nat_neq_div 1 a b Hbz) as H1.
 now rewrite Nat.mul_1_l in H1.
 Qed.
 
+(*
 Theorem fst_rank_fst_loop_mul_diag :
   ∀ it k a b c,
   c ≠ 0
@@ -2764,6 +2795,7 @@ f_equal.
 rewrite Nat.mul_mod_distr_l; [ | easy | easy ].
 apply IHit.
 Qed.
+*)
 
 Theorem Nat_eq_log2 :
   ∀ a n, a ≠ 0 ∧ Nat.log2 a = n ↔ 2 ^ n ≤ a < 2 ^ (n + 1).
@@ -2993,6 +3025,7 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add.
 Qed.
 
+(*
 Theorem Nat_lt_sub_lt_add_r_iff : ∀ n m p, p ≤ n → n - p < m ↔ n < m + p.
 Proof.
 intros * Hpm.
@@ -3000,6 +3033,7 @@ split; intros Hn; [ apply Nat.lt_sub_lt_add_r, Hn | ].
 apply Nat.add_lt_mono_r with (p := p).
 now rewrite Nat.sub_add.
 Qed.
+*)
 
 Theorem Nat_pow2_log2 :
   ∀ n, n ≠ 0 → 2 ^ S (Nat.log2 n) = 2 ^ Nat.log2_up (S n).
@@ -3008,6 +3042,7 @@ intros * Hnz.
 now destruct n.
 Qed.
 
+(*
 (* to be cleaned *)
 Theorem Nat_log2_up_pow2_sub_1 :
   ∀ n, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n.
@@ -3252,6 +3287,7 @@ apply H2; clear H2.
 apply Nat.div_le_lower_bound; [ easy | ].
 now rewrite H1 in H3.
 Qed.
+*)
 
 Fixpoint nth_rest_of_div n a b :=
   match n with
@@ -3284,6 +3320,7 @@ rewrite H1.
 now rewrite Nat.eqb_refl.
 Qed.
 
+(*
 Theorem eq_fst_rank_fst_loop_1 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 1 ↔
@@ -3381,6 +3418,7 @@ progress unfold nth_bit_of_div in H3.
 cbn - [ "*" ] in H1, H2, H3.
 now rewrite H1, H2, H3.
 Qed.
+*)
 
 (* to be completed
 Theorem eq_fst_rank_fst_loop_iff :
@@ -4017,6 +4055,7 @@ destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   apply eq_fst_rank_fst_loop_0 in Hy.
   destruct Hy as [Hy| Hy]; [ now subst n | ].
   cbn - [ "*" ] in Hy.
+...
   rewrite <- Nat.pow_succ_r' in Hy.
   apply Nat.div_small_iff in Hy; [ | flia H2n ].
   rewrite Nat.pow_0_r, Nat.mul_1_r.
@@ -10466,7 +10505,8 @@ Theorem angle_add_overflow_mul_by_lt :
 Proof.
 intros * Hni Hθ' * Hm.
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat.
@@ -10500,7 +10540,8 @@ progress unfold seq_angle_to_div_nat in Hθ'.
 Check angle_add_overflow_mul_by_lt_7.
 destruct m; [ apply angle_add_overflow_0_r | ].
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 rewrite angle_mul_nat_assoc.
@@ -15069,6 +15110,7 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
+...
 *)
 
 End a.
