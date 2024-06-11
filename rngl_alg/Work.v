@@ -4680,8 +4680,15 @@ destruct H3 as [H3| H3]. 2: {
   destruct abk. {
     exfalso.
     apply Nat.eqb_eq in Habk.
-Search (_ / _ = _).
-    apply Nat.div_small_iff in Habk.
+    apply Nat_div_less_small_iff in Habk. 2: {
+      intros Hb; subst b k; cbn in H2.
+      now apply (H2 0).
+    }
+    apply Nat_div_less_small_iff in H3. 2: {
+      intros Hb; subst b k; cbn in H2.
+      now apply (H2 0).
+    }
+    rewrite (Nat_mod_less_small k) in H3; [ | easy ].
 ...
   cbn in H3.
   subst it; clear H1.
