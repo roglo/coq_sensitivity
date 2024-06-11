@@ -5259,20 +5259,20 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
   destruct y. {
     exfalso.
     apply eq_fst_rank_fst_loop_1 in Hy.
+    progress unfold nth_bit_of_div in Hy.
     cbn - [ "*" ] in Hy.
-...
     rewrite <- Nat.pow_succ_r' in Hy.
     rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
     rewrite Nat.sub_0_r in Hy.
-    destruct Hy as (Hnz & Habk & Hy).
-    destruct Hy as [Hy| Hy]; [ now subst n | ].
-    apply Nat.div_small_iff in Hy; [ | easy ].
-    rewrite (Nat_mod_less_small 1) in Hy. 2: {
+    destruct Hy as (Hnz & Hy1 & Hy2).
+    destruct Hy2 as [Hy2| Hy2]; [ now subst n | ].
+    apply Nat.div_small_iff in Hy2; [ | easy ].
+    rewrite (Nat_mod_less_small 1) in Hy2. 2: {
       rewrite Nat.mul_1_l.
       split; [ now apply Nat.log2_up_spec | ].
       now apply Nat_log2_up_lt_twice.
     }
-    flia Hy Hn2.
+    flia Hy2 Hn2.
   }
   do 2 rewrite Nat.pow_succ_r'.
   specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
@@ -5295,6 +5295,7 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
     exfalso.
     apply eq_fst_rank_fst_loop_1 in Hy.
     cbn - [ "*" ] in Hy.
+...
     rewrite <- Nat.pow_succ_r' in Hy.
     rewrite <- Nat_succ_sub_succ_r in Hy; [ | easy ].
     rewrite Nat.sub_0_r in Hy.
