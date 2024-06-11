@@ -4851,18 +4851,15 @@ destruct n. {
     destruct H3 as [H3| H3]; [ easy | ].
     rewrite Nat.mul_1_l in H3.
     cbn - [ "*" ] in H3.
-...
-    rewrite (Nat_div_less_small 0) in H3; [ easy | ].
-    cbn - [ "*" ].
-    split; [ easy | ].
-...
-    specialize (Hab 1) as H2.
-    assert (H : 1 < S (S u)) by flia.
-    specialize (H2 H); clear H.
-    apply Nat_neq_div in H2; [ | flia Hbz ].
-    destruct H2 as [H2| H2]; [ easy | ].
-    rewrite Nat.mul_1_l in H2.
-    cbn - [ "*" ] in H2.
+    rewrite (Nat_mod_less_small 1) in H3. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ easy | ].
+      now apply Nat.mul_lt_mono_pos_l.
+    }
+    flia H2 H3.
+  }
+  flia Hbz H1.
+}
 ...
 remember (_ / _ =? k) as abk eqn:Habk.
 symmetry in Habk.
