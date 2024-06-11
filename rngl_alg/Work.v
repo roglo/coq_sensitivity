@@ -4606,25 +4606,25 @@ Qed.
 Theorem eq_fst_rank_fst_loop_iff :
   ∀ it k a b u,
   fst (rank_fst_loop it k a b) = u ↔
+  u ≤ it ∧ (∀ t, t < u → nth_bit_of_div t a b ≠ k) ∧
+    (it = u ∨ nth_bit_of_div u a b = k).
+(*
   it = u ∧ (∀ t, t < u → nth_bit_of_div t a b ≠ k) ∨
   u < it ∧ (∀ t, t < u → nth_bit_of_div t a b ≠ k) ∧
     nth_bit_of_div u a b = k.
+*)
 Proof.
 intros.
 split; intros H1. {
   revert it a H1.
   induction u; intros. {
-    apply eq_fst_rank_fst_loop_0 in H1.
-    destruct H1 as [H1| H1]; [ now left | ].
-    destruct it; [ now left | now right ].
+    now apply eq_fst_rank_fst_loop_0 in H1.
   }
   destruct (Nat.eq_dec it (S u)) as [Hiu| Hiu]. {
-    left.
-    split; [ easy | ].
-    intros * Ht.
-    destruct it; [ easy | ].
-    apply Nat.succ_inj in Hiu.
     subst it.
+    split; [ easy | ].
+    split; [ | now left ].
+    intros * Ht.
     cbn - [ "*" ] in H1.
     rewrite fst_if, fst_let in H1.
     cbn - [ "*" ] in H1.
@@ -4633,18 +4633,14 @@ split; intros H1. {
     destruct abk; [ easy | ].
     apply Nat.succ_inj in H1.
     apply IHu in H1.
-    destruct H1 as [H1| H1]. {
-      destruct H1 as (_ & H1).
-      apply Nat.eqb_neq in Habk.
-      destruct t; [ easy | ].
-      apply Nat.succ_lt_mono in Ht.
-      cbn - [ "*" ].
-      now apply H1.
-    }
-    destruct H1 as (H1 & _).
-    now apply Nat.lt_irrefl in H1.
+    destruct H1 as (_ & H1 & H2).
+    apply Nat.eqb_neq in Habk.
+    destruct t; [ easy | ].
+    apply Nat.succ_lt_mono in Ht.
+    progress unfold nth_bit_of_div.
+    cbn - [ "*" ].
+    now apply H1.
   }
-  right.
   destruct it; [ easy | ].
   cbn - [ "*" ] in H1.
   rewrite fst_if, fst_let in H1.
@@ -4654,19 +4650,44 @@ split; intros H1. {
   destruct abk; [ easy | ].
   apply Nat.succ_inj in H1.
   apply IHu in H1.
-  destruct H1 as [H1| H1]. {
-    now destruct H1 as (H1, _); subst it.
-  }
-  destruct H1 as (H1 & H2 & H3).      
-  split; [ now apply -> Nat.succ_lt_mono | ].
-  split; [ | easy ].
-  intros * Htu.
+  destruct H1 as (H1 & H2 & H3).
+  split; [ flia H1 | ].
   apply Nat.eqb_neq in Habk.
-  destruct t; [ easy | ].
-  apply Nat.succ_lt_mono in Htu.
-  cbn - [ "*" ].
-  now apply H2.
+  split. {
+    intros t Ht.
+    destruct t; [ easy | ].
+    apply Nat.succ_lt_mono in Ht.
+    now apply H2.
+  }
+  destruct H3 as [H3| H3]; [ now subst it | now right; apply H3 ].
 }
+destruct H1 as (H1 & H2 & H3).
+destruct H3 as [H3| H3]. 2: {
+  progress unfold nth_bit_of_div in H3.
+  destruct u. {
+    cbn - [ "*" ] in H3.
+    destruct it; [ easy | ].
+    cbn - [ "*" ].
+    now rewrite H3, Nat.eqb_refl.
+  }
+  cbn - [ "*" ] in H3.
+  destruct it; [ easy | ].
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. {
+    exfalso.
+    apply Nat.eqb_eq in Habk.
+Search (_ / _ = _).
+    apply Nat.div_small_iff in Habk.
+...
+  cbn in H3.
+  subst it; clear H1.
+  destruct u; [ easy | ].
+  cbn - [ "*" ].
+...
 destruct H1 as [H1| H1]. {
   destruct H1 as (H1, H2); subst it.
   progress fold (nth_rest_of_div 0 a b).
