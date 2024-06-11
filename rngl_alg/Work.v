@@ -4861,6 +4861,56 @@ destruct n. {
   flia Hbz H1.
 }
 ...
+destruct n. {
+  cbn - [ "*" ] in Hab |-*.
+  specialize (Hab 1) as H1.
+  assert (H : 1 < S (S u)) by flia.
+  specialize (H1 H); clear H.
+  cbn - [ "*" ] in H1.
+  apply Nat_neq_div in H1; [ | flia Hbz ].
+  destruct H1 as [H1| H1]. {
+    destruct k; [ easy | ].
+    destruct k; [ | flia Hk1 ].
+    rewrite Nat.mul_1_l in H1.
+    rewrite Nat.mod_small; [ | easy ].
+    clear IHu.
+    revert a Hbz H1 Hab.
+    induction u; intros; [ easy | ].
+    cbn - [ "*" ].
+    rewrite fst_if, fst_let.
+    cbn - [ "*" ].
+...
+    rewrite (Nat_div_less_small 1); [ | flia Hbz H1 ].
+    rewrite Nat.mul_1_l.
+    remember (_ / _ =? 0) as ab2 eqn:Hab2.
+    symmetry in Hab2.
+    destruct ab2. 2: {
+      f_equal.
+      apply IHu; [ flia Hbz | | ]. {
+        apply Nat.eqb_neq in Hab2.
+        apply Nat_neq_div in Hab2; [ | flia Hbz ].
+        rewrite Nat.mul_1_l in Hab2.
+        now destruct Hab2.
+      }
+      intros t Ht.
+      clear Hab2.
+      apply Nat_neq_div; [ flia Hbz | ].
+      rewrite Nat.mul_1_l.
+      right.
+      specialize (Hab (S t)) as H2.
+      assert (H : S t < S (S u)) by flia Ht.
+      specialize (H2 H); clear H.
+      cbn - [ "*" ] in H2.
+      rewrite (Nat_mod_less_small 1)in H2; [ | flia Hbz H1 ].
+      rewrite Nat.mul_1_l in H2.
+      apply Nat_neq_div in H2; [ | flia Hbz ].
+      destruct H2 as [H2| H2]; [ easy | ].
+      now rewrite Nat.mul_1_l in H2.
+    }
+...
+Print nth_rest_of_div.
+specialize (IHu ((2 * a) mod b)) as H1.
+...
 remember (_ / _ =? k) as abk eqn:Habk.
 symmetry in Habk.
 destruct abk. {
