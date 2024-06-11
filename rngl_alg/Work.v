@@ -4588,6 +4588,20 @@ cbn - [ "*" ] in H1, H2, H3.
 now rewrite H1, H2, H3.
 Qed.
 
+Theorem nth_rest_of_div_lt :
+  ∀ n a b,
+  a < b
+  → nth_rest_of_div n a b < b.
+Proof.
+intros * Hab.
+revert a Hab.
+induction n; intros; [ easy | ].
+cbn - [ "*" ].
+apply IHn.
+apply Nat.mod_upper_bound.
+flia Hab.
+Qed.
+
 (* to be completed
 Theorem eq_fst_rank_fst_loop_iff :
   ∀ it k a b u,
@@ -4759,15 +4773,32 @@ cbn - [ "*" ].
 rewrite fst_if, fst_let.
 cbn - [ "*" ].
 (**)
-specialize (Hab n) as H3.
 assert (H : n < n + S u) by flia.
-specialize (H3 H); clear H.
+specialize (Hab n H) as H3; clear H.
 progress unfold nth_bit_of_div in H3.
 apply Nat.eqb_neq in H3.
 rewrite H3; clear H3.
 f_equal.
 (**)
 progress unfold nth_bit_of_div in Hab.
+destruct k. {
+  assert (H : n < n + S u) by flia.
+  specialize (Hab n H) as H3; clear H.
+  apply Nat_neq_div in H3; [ | flia Hbz ].
+  destruct H3 as [H3| H3]; [ easy | ].
+  rewrite Nat.mul_1_l in H3.
+  rewrite (Nat_mod_less_small 1). 2: {
+    rewrite Nat.mul_1_l.
+    split; [ easy | ].
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    now apply nth_rest_of_div_lt.
+  }
+  rewrite Nat.mul_1_l.
+...
+Print nth_rest_of_div.
+remember (nth_rest_of_div (S n) a b) as x eqn:Hx.
+cbn - [ "*" ] in Hx.
+...
 destruct n. {
   cbn - [ "*" ] in Hab |-*.
   specialize (Hab 0 (Nat.lt_0_succ _)) as H1.
