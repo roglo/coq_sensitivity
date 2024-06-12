@@ -4962,6 +4962,47 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
       flia Hn4.
     }
 ...
+    progress unfold nth_bit_of_div in Hy2.
+    cbn - [ "*" ] in Hy2.
+    rewrite <- Nat.pow_succ_r' in Hy2.
+    rewrite <- Nat_succ_sub_succ_r in Hy2; [ | easy ].
+    rewrite Nat.sub_0_r in Hy2.
+    rewrite (Nat_mod_less_small 1 (2 ^ _)) in Hy2. 2: {
+      rewrite Nat.mul_1_l.
+      split; [ now apply Nat.log2_up_spec | ].
+      apply Nat_log2_up_lt_twice; flia H2n.
+    }
+    rewrite Nat.mul_1_l in Hy2.
+    rewrite (Nat_mod_less_small 0) in Hy2. 2: {
+      split; [ easy | ].
+      rewrite Nat.mul_sub_distr_l.
+      apply Nat_lt_sub_lt_add_r_iff. {
+        apply Nat.mul_le_mono_l.
+        now apply Nat.log2_up_spec.
+      }
+      rewrite Nat.add_0_l.
+      rewrite <- Nat.mul_add_distr_r.
+      replace (1 + 2) with 3 by easy.
+...
+      apply Nat.lt_add_lt_sub_r.
+      rewrite Nat.mul_1_l.
+      split. {
+        rewrite Nat.mul_sub_distr_l.
+        apply Nat.le_add_le_sub_r.
+        rewrite <- (Nat.mul_1_l n) at 1.
+        rewrite <- Nat.mul_add_distr_r.
+        replace (1 + 2) with 3 by easy.
+...
+        eapply le_trans. {
+          apply Nat.mul_le_mono_l.
+          now apply Nat.log2_up_spec.
+        }
+...
+      split; [ now apply Nat.log2_up_spec | ].
+      apply Nat_log2_up_lt_twice; flia H2n.
+    }
+    flia Hy2 Hn4.
+...
     apply eq_fst_rank_fst_loop_2 in Hy.
     destruct Hy as [Hy| Hy]. {
       destruct Hy as (H1 & H2 & H3); subst n.
