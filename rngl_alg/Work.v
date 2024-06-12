@@ -4855,14 +4855,14 @@ rewrite (Nat.mul_comm n).
 set (x := 2 * n - 2 ^ Nat.log2_up n).
 subst un fn.
 cbn - [ "*" ].
-remember (fst _) as y eqn:Hy.
-symmetry in Hy.
+remember (fst _) as m eqn:Hm.
+symmetry in Hm.
 (**)
-apply eq_fst_rank_fst_loop_iff in Hy.
-destruct Hy as (Hy1 & Hy2 & Hy3).
-clear Hy1 Hy2.
-destruct Hy3 as [Hy3|Hy3]. {
-  subst y x.
+apply eq_fst_rank_fst_loop_iff in Hm.
+destruct Hm as (Hm1 & Hm2 & Hm3).
+clear Hm1 Hm2.
+destruct Hm3 as [Hm3|Hm3]. {
+  subst m x.
   rewrite <- (Nat.mul_1_l n) at 1.
   apply Nat.mul_le_mono. 2: {
     apply Nat.lt_le_incl.
@@ -4873,31 +4873,45 @@ destruct Hy3 as [Hy3|Hy3]. {
   flia H1.
 }
 subst x.
-progress unfold nth_bit_of_div in Hy3.
-induction y. {
+progress unfold nth_bit_of_div in Hm3.
+clear H1ln.
+apply Nat.div_small_iff in Hm3; [ | flia H2n ].
+rewrite Nat.mul_sub_distr_r.
+rewrite Nat.mul_shuffle0.
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat.pow_add_r.
+apply Nat.le_add_le_sub_r.
+revert n H2n Hm3.
+induction m; intros. {
   exfalso.
-  cbn - [ "*" ] in Hy3.
-  apply Nat.div_small_iff in Hy3; [ | flia H2n ].
-  apply Nat.nle_gt in Hy3.
-  apply Hy3; clear Hy3.
+  cbn - [ "*" ] in Hm3.
+  apply Nat.nle_gt in Hm3.
+  apply Hm3; clear Hm3.
   rewrite <- Nat.pow_succ_r'.
-  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite <- Nat_succ_sub_succ_r. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia H2n | now cbn ].
+  }
   rewrite Nat.sub_0_r.
   now apply Nat.log2_up_spec.
 }
-destruct y. {
-  cbn - [ "*" ] in Hy3.
-  apply Nat.div_small_iff in Hy3; [ | flia H2n ].
-  rewrite <- Nat.pow_succ_r' in Hy3.
-  rewrite <- Nat_succ_sub_succ_r in Hy3; [ | easy ].
-  rewrite Nat.sub_0_r in Hy3.
-  rewrite (Nat_mod_less_small 1) in Hy3. 2: {
+(* tu parles d'un bordel, toi *)
+...
+destruct m. {
+  cbn - [ "*" ] in Hm3.
+  rewrite <- Nat.pow_succ_r' in Hm3.
+  rewrite <- Nat_succ_sub_succ_r in Hm3. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia H2n | now cbn ].
+  }
+  rewrite Nat.sub_0_r in Hm3.
+  rewrite (Nat_mod_less_small 1) in Hm3. 2: {
     rewrite Nat.mul_1_l.
     split; [ now apply Nat.log2_up_spec | ].
     apply Nat_log2_up_lt_twice; flia H2n.
   }
   rewrite Nat.pow_1_r, Nat.mul_comm.
-  flia Hy3.
+  flia Hm3.
 }
 ...
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
