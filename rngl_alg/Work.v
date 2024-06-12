@@ -111,7 +111,6 @@ intros H1.
 apply angle_mul_nat_overflow_true_assoc in H1.
 apply Bool.not_false_iff_true in H1.
 apply H1; clear H1.
-(**)
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
   rewrite Nat.mul_comm.
@@ -4608,60 +4607,6 @@ apply Nat.succ_lt_mono in Ht.
 apply (H2 (S t) Ht).
 Qed.
 
-(*
-Theorem eq_fst_rank_fst_loop_2 :
-  ∀ it k a b,
-  fst (rank_fst_loop it k a b) = 2 ↔
-  it = 2 ∧ nth_bit_of_div 0 a b ≠ k ∧ nth_bit_of_div 1 a b ≠ k ∨
-  2 < it ∧ nth_bit_of_div 0 a b ≠ k ∧ nth_bit_of_div 1 a b ≠ k ∧
-    nth_bit_of_div 2 a b = k.
-Proof.
-intros.
-split; intros H1. {
-  apply eq_fst_rank_fst_loop_iff in H1.
-  destruct H1 as (H1 & H2 & H3).
-  destruct H3 as [H3| H3]. {
-    subst it.
-    left.
-    split; [ easy | ].
-    now split; apply H2.
-  }
-  destruct (Nat.eq_dec it 2) as [Hit| Hit]. {
-    subst it.
-    left.
-    split; [ easy | ].
-    now split; apply H2.
-  }
-  right.
-  split; [ flia H1 Hit | ].
-  split; [ now apply H2 | ].
-  split; [ now apply H2 | easy ].
-}
-apply eq_fst_rank_fst_loop_iff.
-destruct H1 as [H1| H1]. {
-  destruct H1 as (H1 & H2 & H3).
-  subst it.
-  split; [ easy | ].
-  split. {
-    intros t Ht.
-    destruct t; [ easy | ].
-    destruct t; [ easy | ].
-    flia Ht.
-  }
-  now left.
-}
-destruct H1 as (H1 & H2 & H3 & H4).
-split; [ now apply Nat.lt_le_incl | ].
-split. {
-  intros t Ht.
-  destruct t; [ easy | ].
-  destruct t; [ easy | ].
-  flia Ht.
-}
-now right.
-Qed.
-*)
-
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -4908,7 +4853,6 @@ rewrite Nat.mul_assoc.
 rewrite <- Nat.mul_sub_distr_r.
 rewrite (Nat.mul_comm n).
 set (x := 2 * n - 2 ^ Nat.log2_up n).
-(**)
 subst un fn.
 cbn - [ "*" ].
 remember (fst _) as y eqn:Hy.
@@ -5010,7 +4954,6 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct y. {
     exfalso.
     clear H1.
-(**)
     apply eq_fst_rank_fst_loop_iff in Hy.
     destruct Hy as (_ & Hy1 & Hy2).
     destruct Hy2 as [Hy2| Hy2]. {
