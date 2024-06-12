@@ -4871,6 +4871,11 @@ destruct Hy3 as [Hy3|Hy3]. {
   specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
   flia H1.
 }
+destruct y. {
+  rewrite Nat.pow_0_r, Nat.mul_1_r.
+  clear Hy1.
+  progress unfold nth_bit_of_div in Hy3.
+  cbn - [ "*" ] in Hy3.
 ...
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
