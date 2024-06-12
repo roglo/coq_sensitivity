@@ -4467,29 +4467,6 @@ Fixpoint nth_rest_of_div n a b :=
 
 Definition nth_bit_of_div n a b := 2 * nth_rest_of_div n a b / b.
 
-Theorem eq_fst_rank_fst_loop_0 :
-  ∀ it k a b,
-  fst (rank_fst_loop it k a b) = 0 ↔
-  it = 0 ∨ nth_bit_of_div 0 a b = k.
-Proof.
-intros.
-split; intros H1. {
-  destruct it; [ now left | right ].
-  cbn - [ "*" ] in H1.
-  remember (2 * a / b =? k) as abk eqn:Habk.
-  symmetry in Habk.
-  destruct abk; [ now apply Nat.eqb_eq in Habk | ].
-  now rewrite fst_let in H1.
-}
-destruct H1 as [H1| H1]; [ now subst it | ].
-destruct it; [ easy | ].
-cbn - [ "*" ] in H1 |-*.
-progress unfold nth_bit_of_div in H1.
-cbn - [ "*" ] in H1.
-rewrite H1.
-now rewrite Nat.eqb_refl.
-Qed.
-
 Theorem nth_rest_of_div_lt :
   ∀ n a b,
   a < b
@@ -4514,7 +4491,16 @@ intros.
 split; intros H1. {
   revert it a H1.
   induction u; intros. {
-    now apply eq_fst_rank_fst_loop_0 in H1.
+    split; [ easy | ].
+    split; [ easy | ].
+    destruct it; [ now left | right ].
+    progress unfold nth_bit_of_div.
+    cbn - [ "*" ] in H1 |-*.
+    rewrite fst_if, fst_let in H1.
+    cbn - [ "*" ] in H1.
+    apply Nat.eqb_eq.
+    apply Bool.not_false_iff_true.
+    now intros H; rewrite H in H1.
   }
   destruct (Nat.eq_dec it (S u)) as [Hiu| Hiu]. {
     subst it.
@@ -4620,6 +4606,18 @@ apply IHit.
 intros t Ht.
 apply Nat.succ_lt_mono in Ht.
 apply (H2 (S t) Ht).
+Qed.
+
+Theorem eq_fst_rank_fst_loop_0 :
+  ∀ it k a b,
+  fst (rank_fst_loop it k a b) = 0 ↔
+  it = 0 ∨ nth_bit_of_div 0 a b = k.
+Proof.
+intros.
+split; intros H1. {
+  now apply eq_fst_rank_fst_loop_iff in H1.
+}
+now apply eq_fst_rank_fst_loop_iff.
 Qed.
 
 Theorem eq_fst_rank_fst_loop_1 :
@@ -4959,6 +4957,7 @@ remember (fst _) as y eqn:Hy.
 symmetry in Hy.
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
+...
   apply eq_fst_rank_fst_loop_0 in Hy.
   destruct Hy as [Hy| Hy]; [ now subst n | ].
   cbn - [ "*" ] in Hy.
