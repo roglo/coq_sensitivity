@@ -4867,6 +4867,10 @@ destruct Hy3 as [Hy3|Hy3]. {
     apply Nat.lt_le_incl.
     now apply Nat.pow_gt_lin_r.
   }
+  assert (H : n ≠ 0) by flia H2n.
+  specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
+  flia H1.
+}
 ...
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
