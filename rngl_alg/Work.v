@@ -4693,6 +4693,14 @@ destruct H3 as [H3| H3]. 2: {
       now apply (H2 0).
     }
     rewrite (Nat_mod_less_small k) in H3; [ | easy ].
+    specialize (H2 0 (Nat.lt_0_succ _)).
+    apply Nat_neq_div in H2; [ | flia Habk ].
+    destruct Habk as (H4, H5).
+    destruct H2 as [H2| H2]; [ now apply Nat.nle_gt in H2 | ].
+    cbn - [ "*" ] in H2.
+    rewrite <- Nat.add_1_r in H2.
+    now apply Nat.nlt_ge in H2.
+  }
 ...
   destruct u. {
     cbn - [ "*" ] in H3.
