@@ -4608,18 +4608,6 @@ apply Nat.succ_lt_mono in Ht.
 apply (H2 (S t) Ht).
 Qed.
 
-Theorem eq_fst_rank_fst_loop_0 :
-  ∀ it k a b,
-  fst (rank_fst_loop it k a b) = 0 ↔
-  it = 0 ∨ nth_bit_of_div 0 a b = k.
-Proof.
-intros.
-split; intros H1. {
-  now apply eq_fst_rank_fst_loop_iff in H1.
-}
-now apply eq_fst_rank_fst_loop_iff.
-Qed.
-
 Theorem eq_fst_rank_fst_loop_1 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 1 ↔
@@ -4957,28 +4945,18 @@ remember (fst _) as y eqn:Hy.
 symmetry in Hy.
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
-...
-  apply eq_fst_rank_fst_loop_0 in Hy.
+  apply eq_fst_rank_fst_loop_iff in Hy.
+  destruct Hy as (_ & _ & Hy).
   destruct Hy as [Hy| Hy]; [ now subst n | ].
-  cbn - [ "*" ] in Hy.
+  progress unfold nth_bit_of_div in Hy.
+  exfalso.
   apply Nat.div_small_iff in Hy; [ | flia H2n ].
-  rewrite Nat.pow_0_r, Nat.mul_1_r.
-  apply Nat.nlt_ge; intros Hnx.
-  apply Nat.nle_gt in Hy; apply Hy; clear Hy.
+  apply Nat.nle_gt in Hy.
+  apply Hy; clear Hy.
   cbn - [ "*" ].
-  rewrite Nat.pow_sub_r; [ | easy | easy ].
-  rewrite Nat.pow_1_r.
-  destruct (Nat.eq_dec (Nat.log2_up n) 0) as [Hnz| Hnz]. {
-    rewrite Hnz.
-    apply Nat.log2_up_null in Hnz.
-    flia H2n Hnz.
-  }
-  remember (Nat.log2_up n) as y eqn:Hy.
-  destruct y; [ easy | ].
-  rewrite Nat.pow_succ_r'.
-  rewrite (Nat.mul_comm _ (2 ^ y)), Nat.div_mul; [ | easy ].
   rewrite <- Nat.pow_succ_r'.
-  rewrite Hy.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
   now apply Nat.log2_up_spec.
 }
 destruct (le_dec n (2 * x)) as [Hn2| Hn2]. {
@@ -4996,6 +4974,7 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
   destruct y; [ easy | clear Hyz ].
   destruct y. {
     exfalso.
+...
     apply eq_fst_rank_fst_loop_1 in Hy.
     progress unfold nth_bit_of_div in Hy.
     cbn - [ "*" ] in Hy.
