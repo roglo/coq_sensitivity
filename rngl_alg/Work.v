@@ -4608,6 +4608,7 @@ apply Nat.succ_lt_mono in Ht.
 apply (H2 (S t) Ht).
 Qed.
 
+(*
 Theorem eq_fst_rank_fst_loop_2 :
   ∀ it k a b,
   fst (rank_fst_loop it k a b) = 2 ↔
@@ -4659,6 +4660,7 @@ split. {
 }
 now right.
 Qed.
+*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
@@ -5008,21 +5010,28 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct y. {
     exfalso.
     clear H1.
+(**)
+    apply eq_fst_rank_fst_loop_iff in Hy.
+    destruct Hy as (_ & Hy1 & Hy2).
+    destruct Hy2 as [Hy2| Hy2]. {
+      subst n.
+      cbn in x; subst x.
+      flia Hn4.
+    }
+...
     apply eq_fst_rank_fst_loop_2 in Hy.
     destruct Hy as [Hy| Hy]. {
       destruct Hy as (H1 & H2 & H3); subst n.
       flia Hn8 Hn4.
     }
-    destruct Hy as (H1 & H2 & H3 & H4).
-    apply Nat_div_not_small_iff in H2; [ | flia H1 ].
+    destruct Hy as (H1 & _ & H3 & H4).
     apply Nat_div_not_small_iff in H3; [ | flia H1 ].
     apply Nat.div_small_iff in H4; [ | flia H1 ].
-...
-    rewrite <- Nat.pow_succ_r' in H2, H3, H4.
-    rewrite <- Nat_succ_sub_succ_r in H2; [ | easy ].
+    cbn - [ "*" ] in H3, H4.
+    rewrite <- Nat.pow_succ_r' in H3, H4.
     rewrite <- Nat_succ_sub_succ_r in H3; [ | easy ].
     rewrite <- Nat_succ_sub_succ_r in H4; [ | easy ].
-    rewrite Nat.sub_0_r in H2, H3, H4.
+    rewrite Nat.sub_0_r in H3, H4.
     rewrite (Nat_mod_less_small 1) in H4. 2: {
       rewrite Nat.mul_1_l.
       split; [ easy | ].
@@ -5032,21 +5041,15 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
     rewrite Nat.mul_1_l in H4.
     rewrite (Nat_mod_less_small 1) in H4. 2: {
       rewrite Nat.mul_1_l.
-      split; [ easy | ].
+      split; [ now apply Nat.log2_up_spec | ].
       apply Nat_log2_up_lt_twice; flia H1.
     }
     rewrite Nat.mul_1_l in H4.
     rewrite (Nat_mod_less_small 1) in H3. 2: {
       rewrite Nat.mul_1_l.
-      split; [ easy | ].
+      split; [ now apply Nat.log2_up_spec | ].
       apply Nat_log2_up_lt_twice; flia H1.
     }
-    rewrite Nat.mul_1_l in H3.
-    rewrite Nat.mul_sub_distr_l in H3.
-    apply Nat_le_add_le_sub_l_iff in H3; [ | now apply Nat.mul_le_mono_l ].
-    rewrite <- (Nat.mul_1_l n) in H3 at 2.
-    rewrite <- Nat.mul_add_distr_r in H3.
-    progress replace (2 + 1) with 3 in H3 by easy.
     rewrite Nat.mul_sub_distr_l in H4.
     apply Nat.lt_sub_lt_add_l in H4.
     rewrite <- (Nat.mul_1_l n) in H4 at 4.
