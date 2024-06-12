@@ -4663,7 +4663,37 @@ split; intros H1. {
 }
 destruct H1 as (H1 & H2 & H3).
 destruct H3 as [H3| H3]. 2: {
+  progress unfold nth_bit_of_div in H2.
   progress unfold nth_bit_of_div in H3.
+(**)
+  revert a u H1 H2 H3.
+  induction it; intros. {
+    now apply Nat.le_0_r in H1; subst u.
+  }
+  cbn - [ "*" ].
+  rewrite fst_if, fst_let.
+  cbn - [ "*" ].
+  destruct u. {
+    cbn - [ "*" ] in H3.
+    now rewrite H3, Nat.eqb_refl.
+  }
+  apply Nat.succ_le_mono in H1.
+  cbn - [ "*" ] in H3.
+  remember (2 * a / b =? k) as abk eqn:Habk.
+  symmetry in Habk.
+  destruct abk. {
+    exfalso.
+    apply Nat.eqb_eq in Habk.
+    apply Nat_div_less_small_iff in Habk. 2: {
+      intros Hb; subst b k; cbn in H2.
+      now apply (H2 0).
+    }
+    apply Nat_div_less_small_iff in H3. 2: {
+      intros Hb; subst b k; cbn in H2.
+      now apply (H2 0).
+    }
+    rewrite (Nat_mod_less_small k) in H3; [ | easy ].
+...
   destruct u. {
     cbn - [ "*" ] in H3.
     destruct it; [ easy | ].
