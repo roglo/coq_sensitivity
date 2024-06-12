@@ -4857,6 +4857,17 @@ subst un fn.
 cbn - [ "*" ].
 remember (fst _) as y eqn:Hy.
 symmetry in Hy.
+(**)
+apply eq_fst_rank_fst_loop_iff in Hy.
+destruct Hy as (Hy1 & Hy2 & Hy3).
+destruct Hy3 as [Hy3|Hy3]. {
+  subst y x.
+  rewrite <- (Nat.mul_1_l n) at 1.
+  apply Nat.mul_le_mono. 2: {
+    apply Nat.lt_le_incl.
+    now apply Nat.pow_gt_lin_r.
+  }
+...
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
   apply eq_fst_rank_fst_loop_iff in Hy.
