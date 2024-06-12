@@ -4860,6 +4860,7 @@ symmetry in Hy.
 (**)
 apply eq_fst_rank_fst_loop_iff in Hy.
 destruct Hy as (Hy1 & Hy2 & Hy3).
+clear Hy1 Hy2.
 destruct Hy3 as [Hy3|Hy3]. {
   subst y x.
   rewrite <- (Nat.mul_1_l n) at 1.
@@ -4871,9 +4872,10 @@ destruct Hy3 as [Hy3|Hy3]. {
   specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
   flia H1.
 }
-destruct y. {
+subst x.
+progress unfold nth_bit_of_div in Hy3.
+induction y. {
   exfalso.
-  progress unfold nth_bit_of_div in Hy3.
   cbn - [ "*" ] in Hy3.
   apply Nat.div_small_iff in Hy3; [ | flia H2n ].
   apply Nat.nle_gt in Hy3.
@@ -4884,40 +4886,19 @@ destruct y. {
   now apply Nat.log2_up_spec.
 }
 destruct y. {
+  cbn - [ "*" ] in Hy3.
+  apply Nat.div_small_iff in Hy3; [ | flia H2n ].
+  rewrite <- Nat.pow_succ_r' in Hy3.
+  rewrite <- Nat_succ_sub_succ_r in Hy3; [ | easy ].
+  rewrite Nat.sub_0_r in Hy3.
+  rewrite (Nat_mod_less_small 1) in Hy3. 2: {
+    rewrite Nat.mul_1_l.
+    split; [ now apply Nat.log2_up_spec | ].
+    apply Nat_log2_up_lt_twice; flia H2n.
+  }
   rewrite Nat.pow_1_r, Nat.mul_comm.
-  progress unfold x.
-  rewrite Nat.mul_sub_distr_l.
-  apply Nat.le_add_le_sub_l.
-  rewrite Nat.add_comm.
-  apply Nat_le_add_le_sub_l_iff; [ flia | ].
-  rewrite Nat.mul_assoc.
-  rewrite <- (Nat.mul_1_l n) at 3.
-  rewrite <- Nat.mul_sub_distr_r.
-  replace (2 * 2 - 1) with 3 by easy.
-  rewrite <- Nat.pow_succ_r'.
-(* faux *)
-...
-Compute (map (λ n,
-  2 ^ S (Nat.log2_up n) ≤ 3 * n
-) (seq 0 20)).
-...
-  apply Nat.mul_le_mono_pos_l.
-Search (_ ≤ _ - _).
-apply Nat_le_add_le_sub_l_iff.
-...
-specialize (Hy2 y (Nat.lt_succ_diag_r _)) as H1.
-progress unfold nth_bit_of_div in H1.
-cbn - [ "*" ] in H1.
-Search (_ / _ ≠ 0).
-apply Nat_div_not_small_iff in H1; [ | flia H2n ].
-...
-progress unfold nth_bit_of_div in Hy3.
-cbn - [ "*" ] in Hy3.
-specialize (Hy2 0 (Nat.lt_0_succ _)) as H1.
-progress unfold nth_bit_of_div in H1.
-cbn - [ "*" ] in H1.
-Search (_ / _ ≠ 0).
-apply Nat_div_not_small_iff in H1; [ | flia H2n ].
+  flia Hy3.
+}
 ...
 destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
   move Hyz at top; subst y.
