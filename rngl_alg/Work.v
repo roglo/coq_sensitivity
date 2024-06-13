@@ -4887,6 +4887,7 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite Nat.sub_0_r.
   now apply Nat.log2_up_spec.
 }
+(**)
 destruct (le_dec n (2 * x)) as [Hn2| Hn2]. {
   destruct m; [ easy | ].
   rewrite Nat.pow_succ_r'.
@@ -4927,14 +4928,17 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
   apply Nat.le_add_r.
 }
 apply Nat.nle_gt in Hn4.
-clear Hn2.
+clear Hn2 H1ln.
 destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct m; [ easy | clear Hmz ].
   destruct m. {
     exfalso.
     cbn - [ "*" ] in Hm3.
     rewrite <- Nat.pow_succ_r' in Hm3.
-    rewrite <- Nat_succ_sub_succ_r in Hm3; [ | easy ].
+    rewrite <- Nat_succ_sub_succ_r in Hm3. 2: {
+      destruct n; [ easy | ].
+      destruct n; [ flia H2n | now cbn ].
+    }
     rewrite Nat.sub_0_r in Hm3.
     rewrite (Nat_mod_less_small 1) in Hm3. 2: {
       rewrite Nat.mul_1_l.
@@ -4960,7 +4964,10 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
     clear H1.
     cbn - [ "*" ] in Hm3.
     rewrite <- Nat.pow_succ_r' in Hm3.
-    rewrite <- Nat_succ_sub_succ_r in Hm3; [ | easy ].
+    rewrite <- Nat_succ_sub_succ_r in Hm3. 2: {
+      destruct n; [ easy | ].
+      destruct n; [ flia H2n | now cbn ].
+    }
     rewrite Nat.sub_0_r in Hm3.
     rewrite (Nat_mod_less_small 1 (2 ^ _)) in Hm3. 2: {
       rewrite Nat.mul_1_l.
@@ -4991,6 +4998,29 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
     rewrite <- (Nat.mul_1_l n) in Hm3 at 1.
     rewrite <- Nat.mul_add_distr_r in Hm3.
     replace (1 + 2) with 3 in Hm3 by easy.
+    subst m.
+    rewrite Nat.mul_assoc in Hm3.
+    rewrite Nat.mul_sub_distr_l in Hm3.
+    apply Nat.lt_sub_lt_add_r in Hm3.
+    rewrite <- Nat.mul_add_distr_r in Hm3.
+    replace (2 * 2) with 4 in Hm3 by easy.
+    replace (3 + 4) with 7 in Hm3 by easy.
+    subst x.
+    rewrite Nat.mul_sub_distr_l in Hn4.
+    apply Nat.lt_sub_lt_add_l in Hn4.
+    apply Nat_lt_sub_lt_add_r_iff in Hn4; [ | flia ].
+    rewrite <- (Nat.mul_1_l n) in Hn4 at 2.
+    rewrite Nat.mul_assoc in Hn4.
+    rewrite <- Nat.mul_sub_distr_r in Hn4.
+    progress replace (4 * 2 - 1) with 7 in Hn4 by easy.
+    flia Hn4 Hm3.
+  }
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H2.
+  flia H2.
+}
+apply Nat.nle_gt in Hn8.
+clear Hn4.
 ...
 unfold x in Hn4.
 rewrite Nat.mul_sub_distr_l in Hn4.
