@@ -4888,6 +4888,12 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   now apply Nat.log2_up_spec.
 }
 (**)
+enough (∃ k, 2 ^ k * x ≤ n < 2 ^ S k * x).
+destruct H as (k & Hk1 & Hk2).
+  destruct m; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  destruct m. {
+...
 destruct (le_dec n (2 * x)) as [Hn2| Hn2]. {
   destruct m; [ easy | ].
   rewrite Nat.pow_succ_r'.
