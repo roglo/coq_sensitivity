@@ -5007,6 +5007,16 @@ destruct m. {
     apply Nat.mul_lt_mono_pos_l; [ easy | ].
     assert (H : n ≠ 0) by flia H2n.
     specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
+    flia H1.
+  }
+  rewrite Nat.mul_1_l in Hm3.
+...
+    split; [ flia H3n | ].
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    assert (H : n ≠ 0) by flia H2n.
+    specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
+    flia H1.
+  }
 ...
   destruct (lt_dec (2 ^ S (Nat.log2_up n)) (3 * n)) as [H3n| H3n]. {
     rewrite Nat.mod_small in Hm3; [ flia Hm3 | ].
