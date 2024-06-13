@@ -4991,21 +4991,22 @@ destruct m. {
       rewrite Nat.mul_1_l.
       rewrite Nat.mul_assoc.
       rewrite Nat.mul_sub_distr_l.
-      split. {
-        apply Nat.le_add_le_sub_r.
-        rewrite <- (Nat.mul_1_l n) at 1.
-        progress replace (2 * 2) with 4 by easy.
-        now rewrite <- Nat.mul_add_distr_r.
-      }
-...
-    rewrite Nat.mul_1_l.
-    split. {
-      apply Nat.
-
-    split; [ now apply Nat.log2_up_spec | ].
-    apply Nat_log2_up_lt_twice; flia H2n.
+      split; [ | flia H3n ].
+      apply Nat.le_add_le_sub_r.
+      rewrite <- (Nat.mul_1_l n) at 1.
+      progress replace (2 * 2) with 4 by easy.
+      now rewrite <- Nat.mul_add_distr_r.
+    }
+    rewrite Nat.pow_succ_r' in H3n.
+    flia H3n.
   }
-  rewrite Nat.mul_1_l in Hm3.
+  apply Nat.nlt_ge in H3n.
+  rewrite Nat.pow_succ_r' in H3n.
+  rewrite (Nat_mod_less_small 1 (_ * (_ - _))) in Hm3. 2: {
+    split; [ flia H3n | ].
+    apply Nat.mul_lt_mono_pos_l; [ easy | ].
+    assert (H : n ≠ 0) by flia H2n.
+    specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
 ...
   destruct (lt_dec (2 ^ S (Nat.log2_up n)) (3 * n)) as [H3n| H3n]. {
     rewrite Nat.mod_small in Hm3; [ flia Hm3 | ].
