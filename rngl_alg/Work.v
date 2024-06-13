@@ -4929,6 +4929,16 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
 }
 apply Nat.nle_gt in Hn4.
 clear Hn2 H1ln.
+(*
+  H2n : 2 ≤ n
+  x := 2 * n - 2 ^ Nat.log2_up n : nat
+  m : nat
+  Hm3 : 2 * nth_rest_of_div m (2 ^ (Nat.log2_up n - 1)) n < n
+  Hmz : m ≠ 0
+  Hn4 : 4 * x < n
+  ============================
+  n ≤ x * 2 ^ m
+*)
 destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
   destruct m; [ easy | clear Hmz ].
   destruct m. {
@@ -4975,7 +4985,6 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
       apply Nat_log2_up_lt_twice; flia H2n.
     }
     rewrite Nat.mul_1_l in Hm3.
-(**)
     remember (2 * (2 ^ Nat.log2_up n - n)) as m eqn:Hm.
     destruct (lt_dec m n) as [Hmn| Hmn]. {
       rewrite Nat.mod_small in Hm3; [ | easy ].
@@ -5021,6 +5030,24 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
 }
 apply Nat.nle_gt in Hn8.
 clear Hn4.
+Theorem glop :
+  ∀ k m n x,
+  2 ≤ n
+  → x = 2 * n - 2 ^ Nat.log2_up n
+  → 2 * nth_rest_of_div m (2 ^ (Nat.log2_up n - 1)) n < n
+  → m ≠ 0
+  → 2 ^ k * x < n
+  → n ≤ x * 2 ^ m.
+(* ça n'a pas de sens : si c'est ∀ k, alors x=0 *)
+...
+  H2n : 2 ≤ n
+  x := 2 * n - 2 ^ Nat.log2_up n : nat
+  m : nat
+  Hm3 : 2 * nth_rest_of_div m (2 ^ (Nat.log2_up n - 1)) n < n
+  Hmz : m ≠ 0
+  Hn8 : 8 * x < n
+  ============================
+  n ≤ x * 2 ^ m
 ...
 unfold x in Hn4.
 rewrite Nat.mul_sub_distr_l in Hn4.
