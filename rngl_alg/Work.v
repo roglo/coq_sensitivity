@@ -4986,12 +4986,11 @@ destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
       apply Nat_log2_up_lt_twice; flia H2n.
     }
     rewrite Nat.mul_1_l in Hm3.
-...
-    rewrite Nat.mul_sub_distr_l.
-    apply Nat.le_add_le_sub_r.
-    rewrite Hm.
-    rewrite Nat.mul_assoc.
-    rewrite Nat.mul_sub_distr_l.
+    rewrite Nat.mul_sub_distr_l in Hm3.
+    apply Nat.lt_sub_lt_add_r in Hm3.
+    rewrite <- (Nat.mul_1_l n) in Hm3 at 1.
+    rewrite <- Nat.mul_add_distr_r in Hm3.
+    replace (1 + 2) with 3 in Hm3 by easy.
 ...
 unfold x in Hn4.
 rewrite Nat.mul_sub_distr_l in Hn4.
