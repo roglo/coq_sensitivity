@@ -4894,11 +4894,18 @@ destruct m; [ easy | clear Hmz ].
 rewrite Nat.pow_succ_r'.
 destruct m. {
   rewrite <- Nat.pow_succ_r', Nat.pow_1_r.
-  destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
-    subst k.
-    rewrite Nat.pow_1_r, Nat.mul_comm in Hk2.
-    now apply Nat.lt_le_incl.
+  cbn - [ "*" ] in Hm3.
+  rewrite <- Nat.pow_succ_r' in Hm3.
+  rewrite <- Nat_succ_sub_succ_r in Hm3; [ | easy ].
+  rewrite Nat.sub_0_r in Hm3.
+  rewrite (Nat_mod_less_small 1) in Hm3. 2: {
+    rewrite Nat.mul_1_l.
+    split; [ now apply Nat.log2_up_spec | ].
+    apply Nat_log2_up_lt_twice; flia H2n.
   }
+  flia Hm3.
+}
+destruct m. {
 ...
   cbn - [ "*" ] in Hm3.
   rewrite <- Nat.pow_succ_r' in Hm3.
