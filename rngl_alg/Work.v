@@ -4872,17 +4872,9 @@ destruct Hm3 as [Hm3|Hm3]. {
   specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
   flia H1.
 }
-subst x.
-progress unfold nth_bit_of_div in Hm3.
-clear H1ln.
 apply Nat.div_small_iff in Hm3; [ | flia H2n ].
-rewrite Nat.mul_sub_distr_r.
-rewrite Nat.mul_shuffle0.
-rewrite <- Nat.pow_succ_r'.
-rewrite <- Nat.pow_add_r.
-apply Nat.le_add_le_sub_r.
-revert n H2n Hm3.
-induction m; intros. {
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  move Hmz at top; subst m.
   exfalso.
   cbn - [ "*" ] in Hm3.
   apply Nat.nle_gt in Hm3.
@@ -4895,80 +4887,40 @@ induction m; intros. {
   rewrite Nat.sub_0_r.
   now apply Nat.log2_up_spec.
 }
-(* tu parles d'un bordel, toi *)
-...
-destruct m. {
-  cbn - [ "*" ] in Hm3.
-  rewrite <- Nat.pow_succ_r' in Hm3.
-  rewrite <- Nat_succ_sub_succ_r in Hm3. 2: {
-    destruct n; [ easy | ].
-    destruct n; [ flia H2n | now cbn ].
-  }
-  rewrite Nat.sub_0_r in Hm3.
-  rewrite (Nat_mod_less_small 1) in Hm3. 2: {
-    rewrite Nat.mul_1_l.
-    split; [ now apply Nat.log2_up_spec | ].
-    apply Nat_log2_up_lt_twice; flia H2n.
-  }
-  rewrite Nat.pow_1_r, Nat.mul_comm.
-  flia Hm3.
-}
-...
-destruct (Nat.eq_dec y 0) as [Hyz| Hyz]. {
-  move Hyz at top; subst y.
-  apply eq_fst_rank_fst_loop_iff in Hy.
-  destruct Hy as (_ & _ & Hy).
-  destruct Hy as [Hy| Hy]; [ now subst n | ].
-  progress unfold nth_bit_of_div in Hy.
-  exfalso.
-  apply Nat.div_small_iff in Hy; [ | flia H2n ].
-  apply Nat.nle_gt in Hy.
-  apply Hy; clear Hy.
-  cbn - [ "*" ].
-  rewrite <- Nat.pow_succ_r'.
-  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
-  rewrite Nat.sub_0_r.
-  now apply Nat.log2_up_spec.
-}
 destruct (le_dec n (2 * x)) as [Hn2| Hn2]. {
-  destruct y; [ easy | ].
+  destruct m; [ easy | ].
   rewrite Nat.pow_succ_r'.
-  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
   rewrite Nat.mul_assoc, (Nat.mul_comm _ 2).
   eapply le_trans; [ apply Hn2 | ].
-  destruct (2 ^ y); [ easy | ].
+  destruct (2 ^ m); [ easy | ].
   rewrite Nat.mul_succ_r, Nat.add_comm.
   apply Nat.le_add_r.
 }
 apply Nat.nle_gt in Hn2.
 destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
-  destruct y; [ easy | clear Hyz ].
-  destruct y. {
+  destruct m; [ easy | clear Hmz ].
+  destruct m. {
     exfalso.
-    apply eq_fst_rank_fst_loop_iff in Hy.
-    destruct Hy as (_ & Hy1 & Hy2).
-    destruct Hy2 as [Hy2| Hy2]; [ now subst n | ].
-    progress unfold nth_bit_of_div in Hy2.
-    apply Nat.div_small_iff in Hy2; [ | flia H2n ].
-    cbn - [ "*" ] in Hy2.
-    rewrite <- Nat.pow_succ_r' in Hy2.
-    rewrite <- Nat_succ_sub_succ_r in Hy2; [ | easy ].
-    rewrite Nat.sub_0_r in Hy2.
-    rewrite (Nat_mod_less_small 1) in Hy2. 2: {
+    cbn - [ "*" ] in Hm3.
+    rewrite <- Nat.pow_succ_r' in Hm3.
+    rewrite <- Nat_succ_sub_succ_r in Hm3; [ | easy ].
+    rewrite Nat.sub_0_r in Hm3.
+    rewrite (Nat_mod_less_small 1) in Hm3. 2: {
       rewrite Nat.mul_1_l.
       split; [ now apply Nat.log2_up_spec | ].
       apply Nat_log2_up_lt_twice; flia H2n.
     }
-    flia Hy2 Hn2.
+    flia Hm3 Hn2.
   }
   do 2 rewrite Nat.pow_succ_r'.
-  specialize (Nat.pow_nonzero 2 y (Nat.neq_succ_0 _)) as H1.
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
   do 2 rewrite Nat.mul_assoc.
   do 2 rewrite (Nat.mul_comm _ 2).
   rewrite Nat.mul_assoc.
   progress replace (2 * 2) with 4 by easy.
   eapply le_trans; [ apply Hn4 | ].
-  destruct (2 ^ y); [ easy | ].
+  destruct (2 ^ m); [ easy | ].
   rewrite <- Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
   rewrite Nat.mul_succ_r, Nat.add_comm.
@@ -4977,9 +4929,10 @@ destruct (le_dec n (4 * x)) as [Hn4| Hn4]. {
 apply Nat.nle_gt in Hn4.
 clear Hn2.
 destruct (le_dec n (8 * x)) as [Hn8| Hn8]. {
-  destruct y; [ easy | clear Hyz ].
-  destruct y. {
+  destruct m; [ easy | clear Hmz ].
+  destruct m. {
     exfalso.
+...
     apply eq_fst_rank_fst_loop_iff in Hy.
     destruct Hy as (_ & Hy1 & Hy2).
     destruct Hy2 as [Hy2| Hy2]; [ now subst n | ].
