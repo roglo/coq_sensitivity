@@ -288,8 +288,23 @@ apply Nat.div_small_iff in Hm3; [ | flia H2n ].
 clear H1ln.
 (**)
 subst x.
-Print nth_rest_of_div.
-Print nth_bit_of_div.
+rewrite Nat.mul_sub_distr_r.
+apply Nat.le_add_le_sub_r.
+apply Nat_le_add_le_sub_l_iff. {
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
+  rewrite Nat.mul_comm.
+  destruct (2 ^ m); [ easy | flia ].
+}
+rewrite (Nat.mul_comm 2), <- Nat.mul_assoc.
+rewrite <- (Nat.mul_1_r n) at 3.
+rewrite <- Nat.mul_sub_distr_l.
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat.pow_add_r.
+Compute (map (λ m,
+  let n := 7 in
+  let a := 2 ^ (Nat.log2_up n - 1) in
+  nth_rest_of_div m a n
+) (seq 0 10)).
 ...
 (* en faisant ça à la main, en augmentant m : *)
 (*
