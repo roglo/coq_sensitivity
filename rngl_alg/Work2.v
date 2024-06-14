@@ -287,6 +287,13 @@ destruct Hm3 as [Hm3|Hm3]. {
 apply Nat.div_small_iff in Hm3; [ | flia H2n ].
 clear H1ln.
 (**)
+subst x.
+(*
+  H2n : 2 ≤ n
+  Hm3 : 2 * nth_rest_of_div m (2 ^ (Nat.log2_up n - 1)) n < n
+  ============================
+  n ≤ (2 * n - 2 ^ Nat.log2_up n) * 2 ^ m
+*)
 destruct m. {
   exfalso.
   cbn - [ "*" ] in Hm3.
@@ -300,6 +307,12 @@ destruct m. {
   rewrite Nat.sub_0_r.
   now apply Nat.log2_up_spec.
 }
+(*
+  H2n : 2 ≤ n
+  Hm3 : 2 * nth_rest_of_div (S m) (2 ^ (Nat.log2_up n - 1)) n < n
+  ============================
+  n ≤ (2 * n - 2 ^ Nat.log2_up n) * 2 ^ S m
+*)
 destruct m. {
   rewrite Nat.pow_1_r.
   cbn - [ "*" ] in Hm3.
@@ -316,6 +329,12 @@ destruct m. {
   }
   flia Hm3.
 }
+(*
+  H2n : 2 ≤ n
+  Hm3 : 2 * nth_rest_of_div (S (S m)) (2 ^ (Nat.log2_up n - 1)) n < n
+  ============================
+  n ≤ (2 * n - 2 ^ Nat.log2_up n) * 2 ^ S (S m)
+*)
 destruct m. {
   progress replace (2 ^ 2) with 4 by easy.
   cbn - [ "*" ] in Hm3.
@@ -360,6 +379,12 @@ destruct m. {
   apply Nat.mul_lt_mono_pos_l; [ easy | ].
   apply Nat_log2_up_lt_twice; flia H2n.
 }
+(*
+  H2n : 2 ≤ n
+  Hm3 : 2 * nth_rest_of_div (S (S (S m))) (2 ^ (Nat.log2_up n - 1)) n < n
+  ============================
+  n ≤ (2 * n - 2 ^ Nat.log2_up n) * 2 ^ S (S (S m))
+*)
 destruct m. {
   progress replace (2 ^ 3) with 8 by easy.
   cbn - [ "*" ] in Hm3.
@@ -457,12 +482,12 @@ destruct m. {
   do 2 rewrite <- Nat.mul_add_distr_r.
   easy.
 }
-...
+(*
   H2n : 2 ≤ n
-  x := 2 * n - 2 ^ Nat.log2_up n : nat
   Hm3 : 2 * nth_rest_of_div (S (S (S (S m)))) (2 ^ (Nat.log2_up n - 1)) n < n
   ============================
-  n ≤ x * (2 * 2 ^ S (S (S m)))
+  n ≤ (2 * n - 2 ^ Nat.log2_up n) * 2 ^ S (S (S (S m)))
+*)
 ...
 unfold x in Hn4.
 rewrite Nat.mul_sub_distr_l in Hn4.
