@@ -3,24 +3,12 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
-(*
-Require Import Init.Nat.
-*)
 Import List List.ListNotations.
-Require Import Main.Misc Main.RingLike (*Main.IterAdd*).
+Require Import Main.Misc Main.RingLike.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
-Require Import (*AngleAddOverflowLe*) AngleAddLeMonoL.
-(*
-Require Import AngleLeSubAdd AngleDiv2Add.
-Require Import TacChangeAngle.
-*)
+Require Import AngleAddLeMonoL.
 Require Import Complex.
-(*
-Require Import NewtonBinomial.
-Require Import AngleAddOverflowEquiv.
-Require Import AngleAddOverflowEquiv3.
-*)
 Require Import Work.
 
 Section a.
