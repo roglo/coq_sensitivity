@@ -288,6 +288,10 @@ apply Nat.div_small_iff in Hm3; [ | flia H2n ].
 clear H1ln.
 (**)
 subst x.
+Print nth_rest_of_div.
+Print nth_bit_of_div.
+...
+(* en faisant ça à la main, en augmentant m : *)
 (*
   H2n : 2 ≤ n
   Hm3 : 2 * nth_rest_of_div m (2 ^ (Nat.log2_up n - 1)) n < n
