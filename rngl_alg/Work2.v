@@ -422,13 +422,37 @@ destruct m. {
     flia H1.
   }
   rewrite Nat.mul_1_l in Hm3.
-...
-    split; [ flia H3n | ].
-    apply Nat.mul_lt_mono_pos_l; [ easy | ].
-    assert (H : n ≠ 0) by flia H2n.
-    specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
-    flia H1.
+  destruct (le_dec (7 * n) (4 * 2 ^ Nat.log2_up n)) as [H4n| H4n]. {
+    rewrite (Nat_mod_less_small 1) in Hm3; [ flia Hm3 | ].
+    rewrite Nat.mul_1_l.
+    rewrite Nat.mul_sub_distr_l.
+    split. 2: {
+      apply Nat_lt_sub_lt_add_r_iff. {
+        apply Nat.mul_le_mono_l.
+        rewrite Nat.mul_sub_distr_l.
+        apply Nat_le_add_le_sub_l_iff. {
+          apply Nat.mul_le_mono_l.
+          now apply Nat.log2_up_spec.
+        }
+        rewrite <- (Nat.mul_1_l n) at 2.
+        now rewrite <- Nat.mul_add_distr_r.
+      }
+      rewrite Nat.mul_assoc.
+      rewrite <- Nat.mul_add_distr_r.
+      apply Nat.mul_lt_mono_pos_l; [ flia | ].
+      assert (H : n ≠ 0) by flia H2n.
+      specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
+      flia H1.
+    }
+    apply Nat.le_add_le_sub_l.
+    rewrite Nat.mul_assoc.
+    rewrite Nat.mul_sub_distr_l.
+    apply Nat.le_add_le_sub_l.
+    rewrite <- (Nat.mul_1_l n) at 3.
+    do 2 rewrite <- Nat.mul_add_distr_r.
+    easy.
   }
+  apply Nat.nle_gt in H4n.
 ...
   destruct (lt_dec (2 ^ S (Nat.log2_up n)) (3 * n)) as [H3n| H3n]. {
     rewrite Nat.mod_small in Hm3; [ flia Hm3 | ].
