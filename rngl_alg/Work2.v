@@ -166,15 +166,43 @@ destruct H3 as [H3| H3]. 2: {
   apply Nat.eqb_neq in Habk.
   destruct (lt_dec (2 * a) b) as [H2ab| H2ab]. {
     rewrite Nat.mod_small; [ | easy ].
+    progress unfold nth_rest_of_div in H2.
     apply IHit; [ easy | easy | | ]. {
       intros t Ht.
-      progress unfold nth_rest_of_div in H2.
       progress unfold nth_rest_of_div.
       apply Nat.succ_lt_mono in Ht.
       specialize (H2 (S t) Ht) as H4.
       now rewrite (Nat.mul_comm _ a), <- Nat.mul_assoc.
     }
-x...
+    progress unfold nth_rest_of_div.
+    rewrite (Nat.mul_comm _ a).
+    now rewrite <- Nat.mul_assoc.
+  }
+  apply Nat.nlt_ge in H2ab.
+  rewrite (Nat_mod_less_small 1). 2: {
+    rewrite Nat.mul_1_l.
+    split; [ easy | ].
+    now apply Nat.mul_lt_mono_pos_l.
+  }
+  rewrite Nat.mul_1_l.
+  apply IHit; [ flia Hab | easy | | ]. {
+    intros t Ht.
+    progress unfold nth_rest_of_div in H2.
+    progress unfold nth_rest_of_div.
+    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
+Search ((_ * _) mod _).
+...
+Search ((_ - _) mod _).
+Search ((_ - _) mod _).
+...
+    rewrite Nat.mul_sub_distr_r.
+Search ((_ - _) mod _).
+Search ((_ + _) mod _).
+...
+    apply Nat.succ_lt_mono in Ht.
+    specialize (H2 (S t) Ht) as H4.
+    now rewrite (Nat.mul_comm _ a), <- Nat.mul_assoc.
+...
     apply Nat.succ_lt_mono in Ht.
   apply (H2 (S t) Ht).
 ...
