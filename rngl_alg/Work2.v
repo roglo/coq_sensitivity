@@ -31,6 +31,17 @@ intros * Hbz.
 now apply Nat.mod_upper_bound.
 Qed.
 
+Theorem Nat_mod_sub :
+  ∀ a b c, c ≠ 0 → b * c ≤ a → (a - b * c) mod c = a mod c.
+Proof.
+intros * Hcz Hbca.
+remember (a - b * c) as d eqn:Hd.
+assert (H : a = d + b * c) by flia Hd Hbca.
+subst a.
+symmetry.
+now apply Nat.mod_add.
+Qed.
+
 (* to be completed
 Theorem eq_fst_rank_fst_loop_iff :
   ∀ it k a b u,
@@ -190,14 +201,15 @@ destruct H3 as [H3| H3]. 2: {
     progress unfold nth_rest_of_div in H2.
     progress unfold nth_rest_of_div.
     rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
-Search ((_ * _) mod _).
-...
-Search ((_ - _) mod _).
-Search ((_ - _) mod _).
-...
-    rewrite Nat.mul_sub_distr_r.
-Search ((_ - _) mod _).
-Search ((_ + _) mod _).
+    specialize (Nat_mod_sub (2 * a) 1 b) as H.
+    rewrite Nat.mul_1_l in H.
+    rewrite H; [ clear H | flia Hab | easy ].
+    rewrite Nat.mul_mod_idemp_l; [ | flia Hab ].
+    rewrite (Nat.mul_comm _ a), <- Nat.mul_assoc.
+    rewrite <- Nat.pow_succ_r'.
+    apply Nat.succ_lt_mono in Ht.
+    now apply H2.
+  }
 ...
     apply Nat.succ_lt_mono in Ht.
     specialize (H2 (S t) Ht) as H4.
