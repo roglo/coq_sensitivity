@@ -19,45 +19,40 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Fixpoint nth_rest_of_div n a b :=
-  match n with
-  | 0 => a
-  | S n' => nth_rest_of_div n' ((2 * a) mod b) b
-  end.
-
+Definition nth_rest_of_div n a b := a * 2 ^ n mod b.
 Definition nth_bit_of_div n a b := 2 * nth_rest_of_div n a b / b.
 
 Theorem nth_rest_of_div_lt :
   ∀ n a b,
-  a < b
+  b ≠ 0
   → nth_rest_of_div n a b < b.
 Proof.
-intros * Hab.
-revert a Hab.
-induction n; intros; [ easy | ].
-cbn - [ "*" ].
-apply IHn.
-apply Nat.mod_upper_bound.
-flia Hab.
+intros * Hbz.
+now apply Nat.mod_upper_bound.
 Qed.
 
+(* to be completed
 Theorem eq_fst_rank_fst_loop_iff :
   ∀ it k a b u,
-  fst (rank_fst_loop it k a b) = u ↔
-  u ≤ it ∧ (∀ t, t < u → nth_bit_of_div t a b ≠ k) ∧
-    (it = u ∨ nth_bit_of_div u a b = k).
+  a < b
+  → fst (rank_fst_loop it k a b) = u ↔
+    u ≤ it ∧ (∀ t, t < u → nth_bit_of_div t a b ≠ k) ∧
+      (it = u ∨ nth_bit_of_div u a b = k).
 Proof.
-intros.
+intros * Hab.
 split; intros H1. {
-  revert it a H1.
+  revert it a Hab H1.
   induction u; intros. {
     split; [ easy | ].
     split; [ easy | ].
     destruct it; [ now left | right ].
     progress unfold nth_bit_of_div.
+    progress unfold nth_rest_of_div.
     cbn - [ "*" ] in H1 |-*.
     rewrite fst_if, fst_let in H1.
     cbn - [ "*" ] in H1.
+    rewrite Nat.mul_1_r.
+    rewrite Nat.mod_small; [ | easy ].
     apply Nat.eqb_eq.
     apply Bool.not_false_iff_true.
     now intros H; rewrite H in H1.
@@ -74,13 +69,21 @@ split; intros H1. {
     symmetry in Habk.
     destruct abk; [ easy | ].
     apply Nat.succ_inj in H1.
-    apply IHu in H1.
+    apply IHu in H1; [ | apply Nat.mod_upper_bound; flia Hab ].
     destruct H1 as (_ & H1 & H2).
     apply Nat.eqb_neq in Habk.
-    destruct t; [ easy | ].
-    apply Nat.succ_lt_mono in Ht.
     progress unfold nth_bit_of_div.
-    cbn - [ "*" ].
+    progress unfold nth_rest_of_div.
+    destruct t. {
+      rewrite Nat.mul_1_r.
+      now rewrite Nat.mod_small.
+    }
+    apply Nat.succ_lt_mono in Ht.
+    progress unfold nth_bit_of_div in H1.
+    progress unfold nth_rest_of_div in H1.
+    rewrite Nat.pow_succ_r', Nat.mul_assoc.
+    rewrite (Nat.mul_comm a).
+    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
     now apply H1.
   }
   destruct it; [ easy | ].
@@ -91,23 +94,40 @@ split; intros H1. {
   symmetry in Habk.
   destruct abk; [ easy | ].
   apply Nat.succ_inj in H1.
-  apply IHu in H1.
+  apply IHu in H1; [ | apply Nat.mod_upper_bound; flia Hab ].
   destruct H1 as (H1 & H2 & H3).
   split; [ flia H1 | ].
   apply Nat.eqb_neq in Habk.
   split. {
     intros t Ht.
-    destruct t; [ easy | ].
+    progress unfold nth_bit_of_div.
+    progress unfold nth_rest_of_div.
+    destruct t. {
+      rewrite Nat.mul_1_r.
+      now rewrite Nat.mod_small.
+    }
     apply Nat.succ_lt_mono in Ht.
+    progress unfold nth_bit_of_div in H2.
+    progress unfold nth_rest_of_div in H2.
+    rewrite Nat.pow_succ_r', Nat.mul_assoc.
+    rewrite (Nat.mul_comm a).
+    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
     now apply H2.
   }
-  destruct H3 as [H3| H3]; [ now subst it | now right; apply H3 ].
+  destruct H3 as [H3| H3]; [ now subst it | right ].
+  progress unfold nth_bit_of_div in H3.
+  progress unfold nth_rest_of_div in H3.
+  progress unfold nth_bit_of_div.
+  progress unfold nth_rest_of_div.
+  rewrite Nat.pow_succ_r', Nat.mul_assoc.
+  rewrite (Nat.mul_comm a).
+  rewrite <- Nat.mul_mod_idemp_l; [ easy | flia Hab ].
 }
 destruct H1 as (H1 & H2 & H3).
 destruct H3 as [H3| H3]. 2: {
   progress unfold nth_bit_of_div in H2.
   progress unfold nth_bit_of_div in H3.
-  revert a u H1 H2 H3.
+  revert a u Hab H1 H2 H3.
   induction it; intros. {
     now apply Nat.le_0_r in H1; subst u.
   }
@@ -116,9 +136,13 @@ destruct H3 as [H3| H3]. 2: {
   cbn - [ "*" ].
   destruct u. {
     cbn - [ "*" ] in H3.
+    progress unfold nth_rest_of_div in H3.
+    rewrite Nat.mul_1_r in H3.
+    rewrite Nat.mod_small in H3; [ | easy ].
     now rewrite H3, Nat.eqb_refl.
   }
   apply Nat.succ_le_mono in H1.
+  progress unfold nth_rest_of_div in H3.
   cbn - [ "*" ] in H3.
   remember (2 * a / b =? k) as abk eqn:Habk.
   symmetry in Habk.
@@ -129,10 +153,18 @@ destruct H3 as [H3| H3]. 2: {
       intros Hb; subst b k; cbn in H2.
       now apply (H2 0).
     }
-    apply Nat_div_less_small_iff in H3. 2: {
-      intros Hb; subst b k; cbn in H2.
-      now apply (H2 0).
-    }
+    apply Nat_div_less_small_iff in H3; [ | flia Hab ].
+    rewrite (Nat_mod_less_small k) in H3. 2: {
+      split. {
+        eapply le_trans; [ apply Habk | ].
+        specialize (Nat.pow_nonzero 2 u (Nat.neq_succ_0 _)) as H4.
+        rewrite Nat.mul_assoc.
+        rewrite (Nat.mul_comm 2).
+        rewrite (Nat.mul_comm _ (2 ^ u)).
+        destruct (2 ^ u); [ easy | cbn; flia ].
+      }
+      eapply le_lt_trans; [ | apply H3 ].
+...
     rewrite (Nat_mod_less_small k) in H3; [ | easy ].
     specialize (H2 0 (Nat.lt_0_succ _)).
     apply Nat_neq_div in H2; [ | flia Habk ].
@@ -167,6 +199,7 @@ intros t Ht.
 apply Nat.succ_lt_mono in Ht.
 apply (H2 (S t) Ht).
 Qed.
+*)
 
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
