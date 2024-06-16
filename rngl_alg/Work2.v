@@ -484,6 +484,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   (* 2^bn ≤ n * an *)
   apply pow2_den_le_mul_num; flia Hn1 Hnz.
 }
+apply Nat.nle_gt in Hni.
 ...
 rewrite Nat.pow_add_r in Hp.
 ...
