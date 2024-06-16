@@ -562,8 +562,8 @@ rewrite <- (Nat.sub_add 1 (_ + _)). 2: {
   destruct n; [ flia H2n | cbn; flia ].
 }
 rewrite Nat.pow_add_r, Nat.pow_1_r, Nat.mul_comm.
-remember (2 ^ (Nat.log2_up n + m - 1)) as p eqn:Hp.
-destruct (lt_dec p n) as [Hpn| Hpn]. {
+remember (Nat.log2_up n + m - 1) as p eqn:Hp.
+destruct (lt_dec (2 ^ p) n) as [Hpn| Hpn]. {
   rewrite Nat.mod_small in Hm3; [ | easy ].
   eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
   rewrite Nat.pow_succ_r'.
