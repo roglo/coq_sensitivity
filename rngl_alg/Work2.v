@@ -571,7 +571,9 @@ destruct (lt_dec (2 ^ p) n) as [Hpn| Hpn]. {
   destruct (2 ^ m); [ easy | flia ].
 }
 apply Nat.nlt_ge in Hpn.
+...
 rewrite <- (Nat.log2_up_pow2 m) in Hp; [ | easy ].
+rewrite Nat.pow_succ_r'.
 Search (Nat.log2_up _ + Nat.log2_up _).
 Search (Nat.log2_up (_ * _)).
 ...
