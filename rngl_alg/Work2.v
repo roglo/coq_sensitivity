@@ -248,6 +248,180 @@ rewrite Nat.pow_succ_r', Nat.mul_assoc, (Nat.mul_comm a) in H3.
 rewrite Nat.mul_mod_idemp_l; [ easy | flia Hab ].
 Qed.
 
+Theorem pow2_den_le_mul_num :
+  ∀ n,
+  2 ≤ n
+  → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
+Proof.
+intros * H2n.
+(* This theorem states that
+     2 ^ bn ≤ n * an
+   and it is required to prove that
+     θi ≤ an * (θ / 2^bn)
+   where
+     an = 2 ^ (un + 1) - 1
+     bn = log2_up n + un
+   with
+     un = length of the first sequence of 1s in the binary
+          decomposition of 1/n
+   1/n = 0.0.............01......10...
+           <- log2_up n -><- un ->
+     an = 11........1
+           <- un n ->
+
+   Then we need to equivalently prove that
+     2 ^ (log2_up n + un) ≤ n * (2 ^ (un + 1) - 1)
+   that we can rewrite as
+     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ un n
+   we can compute "len n" with
+     un = fn (2 ^ (log2_up n - 1))
+   with
+     fn i = position of the 1st zero in the binary
+            decomposition of 1/a
+
+     fn(i) = | i              if 2i/n = 0
+             | fn((2i) mod n) otherwize
+
+    we must also prove that fn terminates
+ *)
+assert (H1ln : 1 ≤ Nat.log2_up n). {
+  apply Nat.log2_up_lt_pow2; [ flia H2n | ].
+  cbn; flia H2n.
+}
+progress unfold inv_ub_den_pow2.
+rewrite rank_fst_1_log2_up; [ | easy ].
+rewrite Nat.add_shuffle0.
+rewrite Nat.sub_add; [ | easy ].
+progress unfold inv_ub_num.
+progress unfold fst_1_len.
+rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
+set (fn := λ i, fst (rank_fst_loop n 0 i n)).
+set (un := fn (2 ^ (Nat.log2_up n - 1))).
+fold (fn (2 ^ (Nat.log2_up n - 1))).
+fold un.
+rewrite Nat.pow_add_r.
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+apply Nat.le_add_le_sub_r.
+apply Nat_le_add_le_sub_l_iff. {
+  rewrite Nat.mul_assoc.
+  apply Nat.mul_le_mono_r.
+  destruct n; [ easy | ].
+  rewrite <- Nat_pow2_log2; [ | flia H2n ].
+  rewrite Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_le_mono_r.
+  apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
+  apply Nat.log2_spec; flia H2n.
+}
+rewrite Nat.mul_assoc.
+rewrite <- Nat.mul_sub_distr_r.
+rewrite (Nat.mul_comm n).
+set (x := 2 * n - 2 ^ Nat.log2_up n).
+subst un fn.
+cbn - [ "*" ].
+remember (fst _) as m eqn:Hm.
+symmetry in Hm.
+apply eq_fst_rank_fst_loop_iff in Hm. 2: {
+  rewrite Nat.sub_1_r.
+  now apply Nat.log2_up_spec.
+}
+destruct Hm as (Hm1 & Hm2 & Hm3).
+clear Hm1 Hm2.
+destruct Hm3 as [Hm3|Hm3]. {
+  subst m x.
+  rewrite <- (Nat.mul_1_l n) at 1.
+  apply Nat.mul_le_mono. 2: {
+    apply Nat.lt_le_incl.
+    now apply Nat.pow_gt_lin_r.
+  }
+  assert (H : n ≠ 0) by flia H2n.
+  specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
+  flia H1.
+}
+apply Nat.div_small_iff in Hm3; [ | flia H2n ].
+clear H1ln.
+(**)
+subst x.
+rewrite Nat.mul_sub_distr_r.
+apply Nat.le_add_le_sub_r.
+apply Nat_le_add_le_sub_l_iff. {
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
+  rewrite Nat.mul_comm.
+  destruct (2 ^ m); [ easy | flia ].
+}
+rewrite (Nat.mul_comm 2), <- Nat.mul_assoc.
+rewrite <- (Nat.mul_1_r n) at 3.
+rewrite <- Nat.mul_sub_distr_l.
+rewrite <- Nat.pow_succ_r'.
+rewrite <- Nat.pow_add_r.
+progress unfold nth_rest_of_div in Hm3.
+rewrite <- Nat.pow_add_r in Hm3.
+(**)
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  rewrite Nat.add_0_r in Hm3 |-*.
+  rewrite Nat.mul_1_r.
+  rewrite Nat.mod_small in Hm3. 2: {
+    rewrite Nat.sub_1_r.
+    now apply Nat.log2_up_spec.
+  }
+  rewrite <- Nat.pow_succ_r' in Hm3.
+  rewrite <- Nat.sub_succ_l in Hm3. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia H2n | cbn; flia ].
+  }
+  rewrite Nat_sub_succ_1 in Hm3.
+  now apply Nat.lt_le_incl.
+}
+rewrite <- Nat.add_sub_swap in Hm3. 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite <- (Nat.sub_add 1 (_ + _)). 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite Nat.pow_add_r, Nat.pow_1_r, Nat.mul_comm.
+remember (2 ^ (Nat.log2_up n + m - 1)) as p eqn:Hp.
+destruct (lt_dec p n) as [Hpn| Hpn]. {
+  rewrite Nat.mod_small in Hm3; [ | easy ].
+  eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
+  destruct (2 ^ m); [ easy | flia ].
+}
+apply Nat.nlt_ge in Hpn.
+rewrite Nat.mod_eq in Hm3; [ | flia H2n ].
+rewrite Nat.mul_sub_distr_l in Hm3.
+apply Nat.lt_sub_lt_add_l in Hm3.
+rewrite (Nat.mul_comm _ (_ * _)) in Hm3.
+rewrite <- Nat.mul_assoc in Hm3.
+rewrite <- (Nat.mul_1_r n) in Hm3 at 3.
+rewrite <- Nat.mul_add_distr_l in Hm3.
+eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
+apply Nat.mul_le_mono_l.
+apply Nat.le_add_le_sub_r.
+rewrite <- Nat.add_assoc.
+progress replace (1 + 1) with (1 * 2) by easy.
+rewrite <- Nat.mul_add_distr_r.
+rewrite Nat.mul_comm.
+rewrite Nat.pow_succ_r'.
+apply Nat.mul_le_mono_l.
+rewrite Nat.add_1_r.
+apply Nat.le_succ_l.
+apply Nat.div_lt_upper_bound; [ flia H2n | ].
+rewrite Hp.
+rewrite Nat.add_sub_swap. 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite Nat.pow_add_r.
+apply Nat.mul_lt_mono_pos_r; [ now apply Nat.neq_0_lt_0, Nat.pow_nonzero | ].
+rewrite Nat.sub_1_r.
+now apply Nat.log2_up_spec.
+Qed.
+
 (* to be completed
 (* upper bound of θi (seq_angle i) independant from i *)
 Theorem seq_angle_to_div_nat_le :
@@ -308,270 +482,9 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   rewrite Nat.mul_shuffle0.
   apply Nat.mul_le_mono_r.
   (* 2^bn ≤ n * an *)
-(*
-   1/n = 0.0.............01.........10...
-           <- log2_up n -><- len n ->
-     an = 1.........11
-          <- len n ->
-     bn = log2_up n + len n
-   1/n = 0.0.............01.........10...
-  2^bn =   10............00.........0
-     an =                111111111111
-     an =               100.........0 - 1
-      n =  1..............
-           <- log2_up n ->
-n * an =   11...
-    mouais, enfin, chais pas...
-
-ça voudrait dire que n * an ≥ 2 ^ bn + 2 ^ (bn-1) ?
-*)
-Compute (map (λ n,
-  Nat.leb
-  (2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 9))
-  (n * inv_ub_num n)
-) (seq 2 256)).
-(* peut-être une piste, là, si
-    2^bn + 2^(bn-2*log2_up n) ≤ n an
- *)
-Compute (map (λ n,
-  Nat.leb
-  (2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 2 * Nat.log2_up n))
-  (n * inv_ub_num n)
-) (seq 2 200)).
-(*
-apply (le_trans _ ((2 ^ inv_ub_den_pow2 n + 2 ^ (inv_ub_den_pow2 n - 2 * Nat.log2_up n)))).
-flia.
-rewrite Nat.pow_sub_r; [ | easy | ].
-*)
-Compute (map (λ n,
-  Nat.leb
-  (2 * Nat.log2_up n)
-  (inv_ub_den_pow2 n)
-) (seq 0 80)).
-(* ah, chiasse de pute *)
-Theorem pow2_den_le_mul_num :
-  ∀ n,
-  2 ≤ n
-  → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n.
-Proof.
-intros * H2n.
-(* This theorem states that
-     2 ^ bn ≤ n * an
-   and it is required to prove that
-     θi ≤ an * (θ / 2^bn)
-   where
-     an = 2 ^ (un + 1) - 1
-     bn = log2_up n + un
-   with
-     un = length of the first sequence of 1s in the binary
-          decomposition of 1/n
-   1/n = 0.0.............01......10...
-           <- log2_up n -><- un ->
-     an = 11........1
-           <- un n ->
-
-   Then we need to equivalently prove that
-     2 ^ (log2_up n + un) ≤ n * (2 ^ (un + 1) - 1)
-   that we can rewrite as
-     n ≤ (2 * n - 2 ^ log2_up n) * 2 ^ un n
-   we can compute "len n" with
-     un = fn (2 ^ (log2_up n - 1))
-   with
-     fn i = position of the 1st zero in the binary
-            decomposition of 1/a
-
-     fn(i) = | i              if 2i/n = 0
-             | fn((2i) mod n) otherwize
-
-    we must also prove that fn terminates
- *)
-assert (H1ln : 1 ≤ Nat.log2_up n). {
-  apply Nat.log2_up_lt_pow2; [ flia H2n | ].
-  cbn; flia H2n.
+  apply pow2_den_le_mul_num; flia Hn1 Hnz.
 }
-progress unfold inv_ub_den_pow2.
-rewrite rank_fst_1_log2_up; [ | easy ].
-rewrite Nat.add_shuffle0.
-rewrite Nat.sub_add; [ | easy ].
-progress unfold inv_ub_num.
-(**)
-Compute (map (λ n,
-Nat.ltb
-  (2 ^ (Nat.log2_up n + fst_1_len 1 n)) (n * (2 ^ S (fst_1_len 1 n) - 1))
-) (seq 2 60)).
-(* ok *)
-Search (Nat.log2_up _ < Nat.log2_up _).
-(**)
-(*
-apply Nat.lt_le_incl.
-apply Nat.log2_up_lt_cancel.
-(*
-Compute (map (λ n,
-Nat.ltb
-  (Nat.log2_up (2 ^ (Nat.log2_up n + fst_1_len 1 n)))
-  (Nat.log2_up (n * (2 ^ S (fst_1_len 1 n) - 1)))
-) (seq 2 80)).
-(* ok *)
-*)
-rewrite Nat.log2_up_pow2; [ | easy ].
-apply Nat.eq_le_incl.
-rewrite <- Nat.add_1_r.
-(*
-Compute (map (λ n,
-Nat.eqb
-  (Nat.log2_up n + fst_1_len 1 n + 1)
-  (Nat.log2_up (n * (2 ^ S (fst_1_len 1 n) - 1)))
-) (seq 2 200)).
-(* ok *)
-*)
-specialize (Nat.log2_up_succ_or n) as H1.
-destruct H1 as [H1| H1]. {
-  apply Nat_pow2_log2_up_succ in H1.
-  rewrite <- H1 at 3.
-  rewrite Nat.mul_comm.
-  rewrite Nat.log2_up_mul_pow2; [ | | easy ]. 2: {
-    apply Nat.lt_add_lt_sub_r.
-    rewrite Nat.add_0_l.
-    progress unfold lt.
-    rewrite Nat.pow_succ_r'.
-    apply Nat_mul_le_pos_r.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite <- Nat.add_assoc; f_equal.
-  rewrite Nat.add_1_r; symmetry.
-  apply Nat_log2_up_pow2_sub_1.
-  intros H.
-  apply Nat.succ_inj in H.
-Theorem neq_fst_1_len_0 : ∀ n, 2 ≤ n → fst_1_len 1 n ≠ 0.
-Proof.
-intros * H2n.
-progress unfold fst_1_len.
-rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
-induction n; [ easy | ].
-apply Nat.succ_le_mono in H2n.
-cbn - [ "*" "/" "mod" "^" ].
-rewrite fst_if, fst_let.
-cbn - [ "*" "/" "mod" "^" ].
-remember (_ =? 0) as n1 eqn:Hn1.
-symmetry in Hn1.
-destruct n1; [ exfalso | easy ].
-apply Nat.eqb_eq in Hn1.
-apply Nat.div_small_iff in Hn1; [ | easy ].
-apply Nat.nle_gt in Hn1.
-apply Hn1; clear Hn1.
-rewrite Nat.pow_sub_r; [ | easy | ].
-rewrite Nat.pow_1_r.
-Search (_ * (_ / _)).
-(* ah, fait chier, pourtant ce théorème est vrai *)
 ...
-specialize (Nat.log2_up_spec (S n)) as H1.
-eapply le_trans; [ apply H1; flia H2n | ].
-...
-*)
-progress unfold fst_1_len.
-rewrite snd_rank_fst_loop_1_log2_up; [ | easy ].
-set (fn := λ i, fst (rank_fst_loop n 0 i n)).
-set (un := fn (2 ^ (Nat.log2_up n - 1))).
-fold (fn (2 ^ (Nat.log2_up n - 1))).
-fold un.
-rewrite Nat.pow_add_r.
-rewrite Nat.pow_succ_r'.
-rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
-apply Nat.le_add_le_sub_r.
-apply Nat_le_add_le_sub_l_iff. {
-  rewrite Nat.mul_assoc.
-  apply Nat.mul_le_mono_r.
-  destruct n; [ easy | ].
-  rewrite <- Nat_pow2_log2; [ | flia H2n ].
-  rewrite Nat.pow_succ_r'.
-  rewrite Nat.mul_comm.
-  apply Nat.mul_le_mono_r.
-  apply (le_trans _ n); [ | apply Nat.le_succ_diag_r ].
-  apply Nat.log2_spec; flia H2n.
-}
-rewrite Nat.mul_assoc.
-rewrite <- Nat.mul_sub_distr_r.
-rewrite (Nat.mul_comm n).
-set (x := 2 * n - 2 ^ Nat.log2_up n).
-subst un fn.
-cbn - [ "*" ].
-remember (fst _) as m eqn:Hm.
-symmetry in Hm.
-(**)
-apply eq_fst_rank_fst_loop_iff in Hm. 2: {
-  rewrite Nat.sub_1_r.
-  now apply Nat.log2_up_spec.
-}
-destruct Hm as (Hm1 & Hm2 & Hm3).
-clear Hm1 Hm2.
-destruct Hm3 as [Hm3|Hm3]. {
-  subst m x.
-  rewrite <- (Nat.mul_1_l n) at 1.
-  apply Nat.mul_le_mono. 2: {
-    apply Nat.lt_le_incl.
-    now apply Nat.pow_gt_lin_r.
-  }
-  assert (H : n ≠ 0) by flia H2n.
-  specialize (Nat_log2_up_lt_twice n H) as H1; clear H.
-  flia H1.
-}
-apply Nat.div_small_iff in Hm3; [ | flia H2n ].
-clear H1ln.
-(**)
-subst x.
-rewrite Nat.mul_sub_distr_r.
-apply Nat.le_add_le_sub_r.
-apply Nat_le_add_le_sub_l_iff. {
-  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
-  rewrite Nat.mul_comm.
-  destruct (2 ^ m); [ easy | flia ].
-}
-rewrite (Nat.mul_comm 2), <- Nat.mul_assoc.
-rewrite <- (Nat.mul_1_r n) at 3.
-rewrite <- Nat.mul_sub_distr_l.
-rewrite <- Nat.pow_succ_r'.
-rewrite <- Nat.pow_add_r.
-progress unfold nth_rest_of_div in Hm3.
-rewrite <- Nat.pow_add_r in Hm3.
-(**)
-destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-  subst m.
-  rewrite Nat.add_0_r in Hm3 |-*.
-  rewrite Nat.mul_1_r.
-  rewrite Nat.mod_small in Hm3. 2: {
-    rewrite Nat.sub_1_r.
-    now apply Nat.log2_up_spec.
-  }
-  rewrite <- Nat.pow_succ_r' in Hm3.
-  rewrite <- Nat.sub_succ_l in Hm3. 2: {
-    destruct n; [ easy | ].
-    destruct n; [ flia H2n | cbn; flia ].
-  }
-  rewrite Nat_sub_succ_1 in Hm3.
-  now apply Nat.lt_le_incl.
-}
-(**)
-rewrite <- Nat.add_sub_swap in Hm3. 2: {
-  destruct n; [ easy | ].
-  destruct n; [ flia H2n | cbn; flia ].
-}
-(**)
-rewrite <- (Nat.sub_add 1 (_ + _)). 2: {
-  destruct n; [ easy | ].
-  destruct n; [ flia H2n | cbn; flia ].
-}
-rewrite Nat.pow_add_r, Nat.pow_1_r, Nat.mul_comm.
-remember (2 ^ (Nat.log2_up n + m - 1)) as p eqn:Hp.
-rewrite <- Nat.add_sub_assoc in Hp; [ | flia Hmz ].
-destruct (lt_dec p n) as [Hpn| Hpn]. {
-  rewrite Nat.mod_small in Hm3; [ | easy ].
-  eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
-  rewrite Nat.pow_succ_r'.
-  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
-  destruct (2 ^ m); [ easy | flia ].
-}
-apply Nat.nlt_ge in Hpn.
 rewrite Nat.pow_add_r in Hp.
 ...
 rewrite <- (Nat.log2_up_pow2 m) in Hp; [ | easy ].
