@@ -533,6 +533,35 @@ rewrite <- Nat.mul_sub_distr_l.
 rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.pow_add_r.
 progress unfold nth_rest_of_div in Hm3.
+rewrite <- Nat.pow_add_r in Hm3.
+(*
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  rewrite Nat.add_0_r in Hm3 |-*.
+  rewrite Nat.mul_1_r.
+  rewrite Nat.mod_small in Hm3. 2: {
+    rewrite Nat.sub_1_r.
+    now apply Nat.log2_up_spec.
+  }
+  rewrite <- Nat.pow_succ_r' in Hm3.
+  rewrite <- Nat.sub_succ_l in Hm3. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia H2n | cbn; flia ].
+  }
+  rewrite Nat_sub_succ_1 in Hm3.
+  now apply Nat.lt_le_incl.
+}
+*)
+rewrite <- Nat.add_sub_swap in Hm3. 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite Nat.pow_sub_r in Hm3; [ | easy | ]. 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite Nat.pow_1_r in Hm3.
+remember (2 ^ (Nat.log2_up n + m)) as p eqn:Hp.
 ...
 (* en faisant ça à la main, en augmentant m : *)
 (*
