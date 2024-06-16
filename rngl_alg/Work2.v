@@ -499,7 +499,10 @@ cbn - [ "*" ].
 remember (fst _) as m eqn:Hm.
 symmetry in Hm.
 (**)
-apply eq_fst_rank_fst_loop_iff in Hm.
+apply eq_fst_rank_fst_loop_iff in Hm. 2: {
+  rewrite Nat.sub_1_r.
+  now apply Nat.log2_up_spec.
+}
 destruct Hm as (Hm1 & Hm2 & Hm3).
 clear Hm1 Hm2.
 destruct Hm3 as [Hm3|Hm3]. {
@@ -529,15 +532,7 @@ rewrite <- (Nat.mul_1_r n) at 3.
 rewrite <- Nat.mul_sub_distr_l.
 rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.pow_add_r.
-Compute (map (λ n, (map (λ m,
-  let a := 2 ^ (Nat.log2_up n - 1) in
-(
-  nth_rest_of_div m a n
-,
-  a * 2 ^ m mod n
-)
-) (seq 0 10))) (seq 0 10)).
-Print nth_rest_of_div.
+progress unfold nth_rest_of_div in Hm3.
 ...
 (* en faisant ça à la main, en augmentant m : *)
 (*
