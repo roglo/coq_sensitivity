@@ -534,7 +534,7 @@ rewrite <- Nat.pow_succ_r'.
 rewrite <- Nat.pow_add_r.
 progress unfold nth_rest_of_div in Hm3.
 rewrite <- Nat.pow_add_r in Hm3.
-(*
+(**)
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   subst m.
   rewrite Nat.add_0_r in Hm3 |-*.
@@ -551,7 +551,7 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite Nat_sub_succ_1 in Hm3.
   now apply Nat.lt_le_incl.
 }
-*)
+(**)
 rewrite <- Nat.add_sub_swap in Hm3. 2: {
   destruct n; [ easy | ].
   destruct n; [ flia H2n | cbn; flia ].
@@ -562,8 +562,9 @@ rewrite <- (Nat.sub_add 1 (_ + _)). 2: {
   destruct n; [ flia H2n | cbn; flia ].
 }
 rewrite Nat.pow_add_r, Nat.pow_1_r, Nat.mul_comm.
-remember (Nat.log2_up n + m - 1) as p eqn:Hp.
-destruct (lt_dec (2 ^ p) n) as [Hpn| Hpn]. {
+remember (2 ^ (Nat.log2_up n + m - 1)) as p eqn:Hp.
+rewrite <- Nat.add_sub_assoc in Hp; [ | flia Hmz ].
+destruct (lt_dec p n) as [Hpn| Hpn]. {
   rewrite Nat.mod_small in Hm3; [ | easy ].
   eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
   rewrite Nat.pow_succ_r'.
@@ -571,6 +572,7 @@ destruct (lt_dec (2 ^ p) n) as [Hpn| Hpn]. {
   destruct (2 ^ m); [ easy | flia ].
 }
 apply Nat.nlt_ge in Hpn.
+rewrite Nat.pow_add_r in Hp.
 ...
 rewrite <- (Nat.log2_up_pow2 m) in Hp; [ | easy ].
 rewrite Nat.pow_succ_r'.
