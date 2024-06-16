@@ -556,12 +556,52 @@ rewrite <- Nat.add_sub_swap in Hm3. 2: {
   destruct n; [ easy | ].
   destruct n; [ flia H2n | cbn; flia ].
 }
+(**)
+rewrite <- (Nat.sub_add 1 (_ + _)). 2: {
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | cbn; flia ].
+}
+rewrite Nat.pow_add_r, Nat.pow_1_r, Nat.mul_comm.
+remember (2 ^ (Nat.log2_up n + m - 1)) as p eqn:Hp.
+destruct (lt_dec p n) as [Hpn| Hpn]. {
+  rewrite Nat.mod_small in Hm3; [ | easy ].
+  eapply le_trans; [ apply Nat.lt_le_incl, Hm3 | ].
+  rewrite Nat.pow_succ_r'.
+  specialize (Nat.pow_nonzero 2 m (Nat.neq_succ_0 _)) as H1.
+  destruct (2 ^ m); [ easy | flia ].
+}
+apply Nat.nlt_ge in Hpn.
+...
+rewrite (Nat_mod_less_small 1) in Hm3. 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+...
 rewrite Nat.pow_sub_r in Hm3; [ | easy | ]. 2: {
   destruct n; [ easy | ].
   destruct n; [ flia H2n | cbn; flia ].
 }
 rewrite Nat.pow_1_r in Hm3.
 remember (2 ^ (Nat.log2_up n + m)) as p eqn:Hp.
+...
+assert (H : p mod 2 = 0). {
+  apply Nat.mod_divides; [ easy | ].
+  rewrite Hp.
+  destruct n; [ easy | ].
+  destruct n; [ flia H2n | ].
+  cbn - [ "*" ].
+  now exists (2 ^ (Nat.log2_iter n 0 1 0 + m)).
+}
+apply Nat.mod_divides in H; [ | easy ].
+destruct H as (q, H); move H at top; subst p.
+rewrite (Nat.mul_comm _ q), Nat.div_mul in Hm3; [ | easy ].
+...
+destruct (lt_dec (p / 2) n) as [Hp2n| Hp2n]. {
+  rewrite Nat.mod_small in Hm3; [ | easy ].
+  apply (Nat.add_lt_mono_r _ _ (p mod 2)) in Hm3.
+  rewrite <- Nat.div_mod in Hm3; [ | apply Nat.neq_succ_0 ].
+  eapply le_trans. {
+    apply Nat.lt_le_incl, Hm3.
+  }
 ...
 (* en faisant ça à la main, en augmentant m : *)
 (*
