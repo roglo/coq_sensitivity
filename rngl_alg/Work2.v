@@ -906,6 +906,10 @@ rewrite Nat.pow_succ_r'.
 now apply Nat.div_mul_le.
 Qed.
 
+Theorem fold_seq_angle_to_div_nat :
+  ∀ θ n i, (2 ^ i / n * (θ / ₂^i))%A = seq_angle_to_div_nat θ n i.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem angle_add_overflow_mul_by_lt :
   ∀ n i θ θ',
@@ -920,7 +924,7 @@ apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
-progress unfold seq_angle_to_div_nat.
+Check seq_angle_to_div_nat_le.
 ...
 intros * Hni Hθ' * Hm.
 destruct m; [ apply angle_add_overflow_0_r | ].
@@ -948,14 +952,26 @@ apply angle_all_add_not_overflow.
 intros m Hm.
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 progress unfold seq_angle_to_div_nat in Hθ'.
-Check angle_add_overflow_mul_by_lt_7.
+(*
 destruct m; [ apply angle_add_overflow_0_r | ].
+*)
 progress unfold angle_add_overflow.
-apply angle_ltb_ge.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
+rewrite fold_seq_angle_to_div_nat.
+Check seq_angle_to_div_nat_le.
+...
 rewrite angle_mul_nat_assoc.
-Check seq_angle_to_div_nat_7_le.
+rewrite fold_seq_angle_to_div_nat.
+...
+Arguments seq_angle_to_div_nat {T}%type_scope {ro rp rl ac} 
+  θ%angle_scope (n i)%nat_scope
+
+Search seq_angle_to_div_nat.
+...
+Check angle_add_overflow_mul_by_lt_7.
 ...
 specialize (seq_angle_to_div_nat_7_le i θ) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
