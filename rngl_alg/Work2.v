@@ -951,8 +951,8 @@ intros * Hni.
 apply angle_all_add_not_overflow.
 intros m Hm.
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
-progress unfold seq_angle_to_div_nat in Hθ'.
 (*
+progress unfold seq_angle_to_div_nat in Hθ'.
 destruct m; [ apply angle_add_overflow_0_r | ].
 *)
 progress unfold angle_add_overflow.
@@ -960,8 +960,19 @@ apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
+(*
 rewrite fold_seq_angle_to_div_nat.
+*)
 Check seq_angle_to_div_nat_le.
+Search (seq_angle_to_div_nat _ _ _ ≤ _)%A.
+eapply angle_le_trans.
+apply seq_angle_to_div_nat_le.
+(* chais pas *)
+...
+rewrite <- (angle_mul_1_l (seq_angle_to_div_nat θ n i)) at 1.
+apply angle_mul_le_mono_r; [ | flia ].
+Search angle_mul_nat_overflow.
+Search seq_angle_to_div_nat.
 ...
 rewrite angle_mul_nat_assoc.
 rewrite fold_seq_angle_to_div_nat.
