@@ -483,8 +483,13 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   apply Nat.mul_le_mono_r.
   (* 2^bn ≤ n * an *)
   apply pow2_den_le_mul_num; flia Hn1 Hnz.
-}
-apply Nat.nle_gt in Hni.
+} {
+  apply Nat.nle_gt in Hni.
+  rewrite <- (angle_div_2_pow_mul_pow_sub i (inv_ub_den_pow2 n)). 2: {
+    now apply Nat.lt_le_incl in Hni.
+  }
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
 ...
 rewrite Nat.pow_add_r in Hp.
 ...
