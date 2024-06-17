@@ -942,12 +942,58 @@ assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
 *)
 
 (* to be completed
+(* if a sequence of angles n*θi which don't overflow has a limit,
+   its limit does not overflow either *)
+Theorem angle_seq_not_overflow_has_not_overflow_limit :
+  ∀ n θ θ',
+  (∀ i, angle_mul_nat_overflow n (θ i) = false)
+  → angle_lim (λ i, n * θ i)%A (n * θ')
+  → angle_mul_nat_overflow n θ' = false.
+Proof.
+intros * Hi Hlim.
 Theorem angle_mul_nat_not_overflow :
   ∀ n i θ,
   n ≤ 2 ^ i
   → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
 Proof.
 intros * Hni.
+Admitted.
+(* ah, chais pas, zut *)
+...
+apply
+  (angle_seq_not_overflow_has_not_overflow_limit n (seq_angle_to_div_nat θ n)).
+intros j.
+...
+Check seq_angle_to_div_nat_le.
+...
+Print seq_angle_to_div_nat.
+Search angle_lim.
+Check angle_div_nat_is_inf_sum_of_angle_div_2_pow.
+...
+(*
+revert i Hni.
+induction n; intros; [ easy | ].
+cbn - [ seq_angle_to_div_nat ].
+destruct n; [ easy | ].
+apply Bool.orb_false_iff.
+split. {
+...
+Check seq_angle_to_div_nat_le.
+Search angle_mul_nat_overflow.
+*)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
+eapply angle_mul_nat_overflow_le_r. {
+  now apply seq_angle_to_div_nat_le.
+}
+Compute (map (λ n,
+(*
+  angle_mul_nat_overflow n (inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))
+*)
+  inv_ub_den_pow2 n
+) (seq 0 10)).
+...
+apply angle_all_add_not_overflow.
+...
 apply angle_all_add_not_overflow.
 intros m Hm.
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
@@ -959,6 +1005,8 @@ progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
+Check seq_angle_to_div_nat_le.
+...
 rewrite Hθ'.
 (*
 rewrite fold_seq_angle_to_div_nat.
