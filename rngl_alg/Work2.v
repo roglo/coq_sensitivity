@@ -8,6 +8,7 @@ Require Import Main.Misc Main.RingLike.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddLeMonoL.
+Require Import AngleAddOverflowLe.
 Require Import Complex.
 Require Import Work.
 
@@ -951,15 +952,41 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 intros * Hi Hlim.
-Theorem angle_mul_nat_not_overflow :
+Theorem seq_angle_mul_nat_not_overflow :
   ∀ n i θ,
   n ≤ 2 ^ i
   → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
 Proof.
 intros * Hni.
-Admitted.
-(* ah, chais pas, zut *)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
+apply angle_all_add_not_overflow.
+intros m Hm.
+apply angle_add_not_overflow_comm.
+eapply angle_add_overflow_le; [ now apply seq_angle_to_div_nat_le | ].
+apply angle_add_not_overflow_comm.
+eapply angle_add_overflow_le. {
+Check seq_angle_to_div_nat_le.
+Theorem mul_seq_angle_to_div_nat_le :
+  ∀ m n i θ,
+  m < n
+  → (m * seq_angle_to_div_nat θ n i ≤
+       m * inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))%A.
+Proof.
+intros * Hmn.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n.
+  apply Nat.lt_1_r in Hmn; subst m.
+  apply angle_le_refl.
+}
+rewrite <- angle_mul_nat_assoc.
+apply angle_mul_le_mono_l; [ now apply seq_angle_to_div_nat_le | ].
+Search (angle_mul_nat_overflow _ (_ * _)).
+... ...
+  now apply mul_seq_angle_to_div_nat_le.
 ...
+Search (angle_add_overflow (_ * _) _ = false).
+apply angle_mul_nat_overflow_distr_add_overflow.
+... ...
 apply
   (angle_seq_not_overflow_has_not_overflow_limit n (seq_angle_to_div_nat θ n)).
 intros j.
