@@ -975,7 +975,49 @@ eapply angle_le_trans; [ apply H2 | clear H2 ].
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
-  apply angle_mul_le_mono_r.
+  apply angle_mul_le_mono_r. {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+      rewrite <- (Nat.sub_add i (inv_ub_den_pow2 n)); [ | easy ].
+      rewrite angle_div_2_pow_add_r.
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    rewrite Nat.mul_shuffle0.
+    eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
+    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    apply Nat.mul_le_mono_r.
+(* j'ai des doutes *)
+...
+  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  apply Nat.div_le_upper_bound; [ easy | ].
+  now apply Nat.mul_le_mono_r.
+...
+    progress unfold inv_ub_num.
+    progress unfold inv_ub_den_pow2.
+    rewrite rank_fst_1_log2_up; [ | flia Hm ].
+    rewrite <- Nat.add_sub_swap. 2: {
+      destruct n; [ easy | ].
+      destruct n; [ easy | cbn; flia ].
+    }
+    rewrite Nat.sub_add. 2: {
+      destruct n; [ easy | ].
+      destruct n; [ easy | cbn; flia ].
+    }
+    progress unfold inv_ub_den_pow2 in Hii.
+    rewrite rank_fst_1_log2_up in Hii; [ | flia Hm ].
+...
+    rewrite Nat.add_comm.
+    rewrite <- Nat.add_sub_assoc. 2: {
+      progress unfold inv_ub_den_pow2 in Hii.
+      eapply le_trans; [ apply Hii | ].
+Compute (map (λ n,
+  rank_fst_1 1 n + fst_1_len 1 n + 1 ≤ Nat.log2_up n
+) (seq 0 20)).
+(* faux sur toute la ligne *)
+...
+    rewrite Nat.add_sub_swap. 2: {
+      rewrite rank_fst_1_log2_up; [ | flia Hm ].
+      apply Nat.le_add_le_sub_l.
+      apply Nat.le_succ_l.
 ...
   destruct i; [ cbn in Hni; flia Hni Hm | ].
 ...
