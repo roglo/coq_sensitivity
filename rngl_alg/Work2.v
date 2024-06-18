@@ -533,40 +533,6 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
 }
 Qed.
 
-Theorem seq_angle_to_div_nat_5_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
-Proof.
-intros.
-now apply seq_angle_to_div_nat_le.
-Qed.
-
-Theorem seq_angle_to_div_nat_6_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 6 i ≤ 3 * (θ / ₂^4))%A.
-intros.
-now apply seq_angle_to_div_nat_le.
-Qed.
-
-Theorem seq_angle_to_div_nat_7_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 7 i ≤ 3 * (θ / ₂^4))%A.
-Proof.
-intros.
-now apply seq_angle_to_div_nat_le.
-Qed.
-
-Theorem seq_angle_to_div_nat_8_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 8 i ≤ 3 * (θ / ₂^4))%A.
-Proof.
-intros.
-now apply seq_angle_to_div_nat_le.
-Qed.
-
-Theorem seq_angle_to_div_nat_9_le :
-  ∀ i θ, (seq_angle_to_div_nat θ 9 i ≤ 15 * (θ / ₂^7))%A.
-Proof.
-intros.
-now apply seq_angle_to_div_nat_le.
-Qed.
-
 Theorem angle_add_overflow_mul_by_lt_2 :
   ∀ i θ θ',
   2 ≤ 2 ^ i
@@ -673,7 +639,8 @@ rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
-specialize (seq_angle_to_div_nat_5_le i θ) as H2.
+assert (H : 5 ≠ 1) by easy.
+specialize (seq_angle_to_div_nat_le 5 i θ H) as H2; clear H.
 eapply angle_le_trans; [ apply H2 | ].
 destruct (lt_dec i 5) as [Hi5| Hi5]. {
   clear - Hni Hi5 Hm.
@@ -782,7 +749,8 @@ rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
-specialize (seq_angle_to_div_nat_6_le i θ) as H2.
+assert (H : 6 ≠ 1) by easy.
+specialize (seq_angle_to_div_nat_le 6 i θ H) as H2; clear H.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 destruct (lt_dec i 4) as [Hi4| Hi4]. {
   destruct i; [ now cbn in Hni; apply Nat.succ_le_mono in Hni | ].
@@ -858,7 +826,7 @@ eapply le_trans; [ now apply Nat.div_mul_le | ].
 now rewrite Nat.pow_succ_r'.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_add_overflow_mul_by_lt_7 :
   ∀ i θ θ',
   7 ≤ 2 ^ i
@@ -875,13 +843,8 @@ rewrite angle_add_mul_r_diag_r.
 rewrite Hθ'.
 progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
-specialize (seq_angle_to_div_nat_7_le i θ) as H2.
-(*
 assert (H : 7 ≠ 1) by easy.
-specialize (seq_angle_to_div_nat_le 7 i θ H) as H3; clear H.
-progress unfold inv_ub_num in H3.
-*)
-...
+specialize (seq_angle_to_div_nat_le 7 i θ H) as H2; clear H.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
   destruct m; [ now do 4 apply -> Nat.succ_le_mono | ].
@@ -947,7 +910,6 @@ apply Nat.mul_le_mono_l.
 rewrite Nat.pow_succ_r'.
 now apply Nat.div_mul_le.
 Qed.
-*)
 
 Theorem fold_seq_angle_to_div_nat :
   ∀ θ n i, (2 ^ i / n * (θ / ₂^i))%A = seq_angle_to_div_nat θ n i.
