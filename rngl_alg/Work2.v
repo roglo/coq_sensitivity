@@ -972,6 +972,16 @@ progress unfold seq_angle_to_div_nat at 2.
 rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_le n i θ Hn1) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
+destruct (lt_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
+  destruct i; [ cbn in Hni; flia Hni Hm | ].
+...
+  destruct i; [ now do 2 apply Nat.succ_le_mono in Hni | ].
+}
+... ...
+apply Nat.nlt_ge in Hii.
+rewrite <- (angle_div_2_pow_mul_pow_sub i (inv_ub_den_pow2 n)); [ | easy ].
+...
+rewrite <- (angle_div_2_pow_mul_pow_sub i 4); [ | easy ].
 ...
 apply angle_add_not_overflow_comm.
 eapply angle_add_overflow_le; [ now apply seq_angle_to_div_nat_le | ].
