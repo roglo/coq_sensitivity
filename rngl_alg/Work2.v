@@ -959,12 +959,23 @@ Theorem seq_angle_mul_nat_not_overflow :
 Proof.
 intros * Hni.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
+remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 apply angle_all_add_not_overflow.
 intros m Hm.
+destruct m; [ apply angle_add_overflow_0_r | ].
+progress unfold angle_add_overflow.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
+rewrite angle_add_mul_r_diag_r.
+rewrite Hθ'.
+progress unfold seq_angle_to_div_nat at 2.
+rewrite angle_mul_nat_assoc.
+specialize (seq_angle_to_div_nat_le n i θ Hn1) as H2.
+eapply angle_le_trans; [ apply H2 | clear H2 ].
+...
 apply angle_add_not_overflow_comm.
 eapply angle_add_overflow_le; [ now apply seq_angle_to_div_nat_le | ].
 apply angle_add_not_overflow_comm.
-...
 eapply angle_add_overflow_le. {
 Check seq_angle_to_div_nat_le.
 Theorem mul_seq_angle_to_div_nat_le :
@@ -974,6 +985,8 @@ Theorem mul_seq_angle_to_div_nat_le :
        m * inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))%A.
 Proof.
 intros * Hmn.
+Inspect 10.
+...
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n.
   apply Nat.lt_1_r in Hmn; subst m.
