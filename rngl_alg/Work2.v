@@ -973,6 +973,19 @@ rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_le n i θ Hn1) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
+...
+  progress unfold inv_ub_den_pow2 in Hii.
+  rewrite rank_fst_1_log2_up in Hii; [ | flia Hm ].
+  rewrite <- Nat.add_assoc in Hii.
+  rewrite (Nat.add_comm _ 1) in Hii.
+  rewrite Nat.add_assoc in Hii.
+  rewrite Nat.sub_add in Hii. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ easy | cbn; flia ].
+  }
+  apply Nat.log2_up_le_mono in Hni.
+  rewrite Nat.log2_up_pow2 in Hni; [ | easy ].
+...
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
@@ -985,7 +998,8 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
     eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
     apply Nat.div_le_upper_bound; [ flia Hm | ].
     apply Nat.mul_le_mono_r.
-(* j'ai des doutes *)
+    eapply le_trans; [ | apply Hm ].
+(* j'ai des doutes, grave *)
 ...
   eapply le_trans; [ now apply Nat.div_mul_le | ].
   apply Nat.div_le_upper_bound; [ easy | ].
