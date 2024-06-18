@@ -533,6 +533,40 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
 }
 Qed.
 
+Theorem seq_angle_to_div_nat_5_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 5 i ≤ 7 * (θ / ₂^5))%A.
+Proof.
+intros.
+now apply seq_angle_to_div_nat_le.
+Qed.
+
+Theorem seq_angle_to_div_nat_6_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 6 i ≤ 3 * (θ / ₂^4))%A.
+intros.
+now apply seq_angle_to_div_nat_le.
+Qed.
+
+Theorem seq_angle_to_div_nat_7_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 7 i ≤ 3 * (θ / ₂^4))%A.
+Proof.
+intros.
+now apply seq_angle_to_div_nat_le.
+Qed.
+
+Theorem seq_angle_to_div_nat_8_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 8 i ≤ 3 * (θ / ₂^4))%A.
+Proof.
+intros.
+now apply seq_angle_to_div_nat_le.
+Qed.
+
+Theorem seq_angle_to_div_nat_9_le :
+  ∀ i θ, (seq_angle_to_div_nat θ 9 i ≤ 15 * (θ / ₂^7))%A.
+Proof.
+intros.
+now apply seq_angle_to_div_nat_le.
+Qed.
+
 Theorem angle_add_overflow_mul_by_lt_2 :
   ∀ i θ θ',
   2 ≤ 2 ^ i
