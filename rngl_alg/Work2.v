@@ -964,6 +964,7 @@ intros m Hm.
 apply angle_add_not_overflow_comm.
 eapply angle_add_overflow_le; [ now apply seq_angle_to_div_nat_le | ].
 apply angle_add_not_overflow_comm.
+...
 eapply angle_add_overflow_le. {
 Check seq_angle_to_div_nat_le.
 Theorem mul_seq_angle_to_div_nat_le :
@@ -980,7 +981,26 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
 }
 rewrite <- angle_mul_nat_assoc.
 apply angle_mul_le_mono_l; [ now apply seq_angle_to_div_nat_le | ].
-Search (angle_mul_nat_overflow _ (_ * _)).
+(* lemma to do *)
+apply Bool.not_true_iff_false.
+intros H.
+apply angle_mul_nat_overflow_true_assoc in H.
+apply Bool.not_false_iff_true in H.
+apply H; clear H.
+apply angle_mul_nat_overflow_div_pow2.
+Compute (map (λ m,
+  let n := m + 1 in
+  m * inv_ub_num n ≤ 2 ^ inv_ub_den_pow2 n
+) (seq 0 10)).
+Compute (
+  let m := 3 in
+  let n := 4 in
+  m * inv_ub_num n ≤ 2 ^ inv_ub_den_pow2 n
+).
+(* faux pour m=3 et n=4 *)
+... et ça contredit :
+pow2_den_le_mul_num : ∀ n : nat, 2 ≤ n → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n
+... ou presque : ici on multiplie par m<n
 ... ...
   now apply mul_seq_angle_to_div_nat_le.
 ...
