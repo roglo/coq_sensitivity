@@ -952,6 +952,39 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
     }
     apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
     apply Nat.mul_le_mono_r.
+    eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
+    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    now apply Nat.mul_le_mono_r.
+  }
+  rewrite Nat.pow_sub_r; [ | easy | easy ].
+  rewrite <- Nat.divide_div_mul_exact; cycle 1. {
+    now apply Nat.pow_nonzero.
+  } {
+    exists (2 ^ (inv_ub_den_pow2 n - i)).
+    rewrite <- Nat.pow_add_r.
+    now rewrite Nat.sub_add.
+  }
+  apply Nat.div_le_lower_bound; [ now apply Nat.pow_nonzero | ].
+  progress unfold inv_ub_num.
+  rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
+  apply Nat.le_sub_le_add_r.
+  progress unfold inv_ub_den_pow2.
+(* ouais, chais pas *)
+...
+Compute (map (λ m,
+map (λ i,
+  let n := m + 1 in
+  if n <=? 2 ^ i then
+  2 ^ i * inv_ub_num n <=? S m * (2 ^ i / n) * 2 ^ inv_ub_den_pow2 n
+  else true
+) (seq 0 10)
+) (seq 0 20)).
+(* ok *)
+...
+pow2_den_le_mul_num : ∀ n : nat, 2 ≤ n → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n
+...
+seq_angle_to_div_nat_le : 
+∀ (n i : nat) (θ : angle T), n ≠ 1 → (seq_angle_to_div_nat θ n i ≤ inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))%A
 ...
 (*
 Compute (map (λ m,
