@@ -1011,7 +1011,8 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
 remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
 apply angle_all_add_not_overflow.
 intros m Hm.
-...
+... ...
+now apply (angle_add_overflow_mul_by_lt n i θ).
 ...
     rewrite Nat.mul_shuffle0.
     eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
