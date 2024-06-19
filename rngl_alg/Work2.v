@@ -826,7 +826,6 @@ eapply le_trans; [ now apply Nat.div_mul_le | ].
 now rewrite Nat.pow_succ_r'.
 Qed.
 
-(* to be completed *)
 Theorem angle_add_overflow_mul_by_lt_7 :
   ∀ i θ θ',
   7 ≤ 2 ^ i
@@ -977,6 +976,7 @@ rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_le n i θ Hn1) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
+(*
   progress unfold inv_ub_den_pow2 in Hii.
   rewrite rank_fst_1_log2_up in Hii; [ | flia Hm ].
   rewrite <- Nat.add_assoc in Hii.
@@ -989,14 +989,29 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   apply Nat.log2_up_le_mono in Hni.
   rewrite Nat.log2_up_pow2 in Hni; [ | easy ].
 ...
+*)
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-      rewrite <- (Nat.sub_add i (inv_ub_den_pow2 n)); [ | easy ].
-      rewrite angle_div_2_pow_add_r.
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ inv_ub_den_pow2 n)). 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
+(*
+Compute (map (λ m,
+  let n := m + 2 in
+(m,
+  map (λ i,
+if n <=? 2 ^ i then
+  if i <=? inv_ub_den_pow2 n then
+    S (S m) * (2 ^ i / n) * 2 ^ (inv_ub_den_pow2 n - i) ≤ 2 ^ inv_ub_den_pow2 n
+  else True
+else True
+  ) (seq 0 (inv_ub_den_pow2 n - 1))
+)
+) (seq 0 30)).
+(* seems ok *)
+*)
+...
     rewrite Nat.mul_shuffle0.
     eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
     apply Nat.div_le_upper_bound; [ flia Hm | ].
