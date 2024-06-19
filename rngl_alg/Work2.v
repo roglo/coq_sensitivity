@@ -929,6 +929,10 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   cbn.
   apply angle_add_overflow_0_r.
 }
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  apply angle_add_overflow_0_r.
+}
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -969,7 +973,45 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
   apply Nat.le_sub_le_add_r.
   progress unfold inv_ub_den_pow2.
-(* ouais, chais pas *)
+  rewrite <- Nat.add_assoc, Nat.add_1_r.
+  rewrite Nat.pow_add_r.
+  eapply le_trans; [ | apply Nat.le_add_r ].
+  rewrite Nat.mul_assoc.
+  apply Nat.mul_le_mono_r.
+  rewrite rank_fst_1_log2_up; [ | flia Hm Hn1 ].
+...
+Compute (map (λ m,
+map (λ i,
+  let n := m + 10 in
+  if n <=? 2 ^ i then
+  if i <=? inv_ub_den_pow2 n then
+  2 ^ i <=? S m * 2 ^ i / n * 2 ^ (Nat.log2_up n - 1)
+  else true
+  else true
+) (seq 0 9)
+) (seq 1 80)).
+yes
+...
+Compute (map (λ m,
+map (λ i,
+  let n := m + 10 in
+  if n <=? 2 ^ i then
+  2 ^ i <=? S m * (2 ^ i / n) * 2 ^ (Nat.log2_up n - 1)
+  else true
+) (seq 0 9)
+) (seq 1 80)).
+ok
+...
+Compute (map (λ m,
+map (λ i,
+  let n := m + 1 in
+  if n <=? 2 ^ i then
+  2 ^ i * 2 ^ S (fst_1_len 1 n)
+  <=? S m * (2 ^ i / n) * (2 ^ rank_fst_1 1 n * 2 ^ S (fst_1_len 1 n))
+  else true
+) (seq 0 10)
+) (seq 0 20)).
+ok
 ...
 Compute (map (λ m,
 map (λ i,
