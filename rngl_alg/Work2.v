@@ -923,6 +923,7 @@ Theorem angle_add_overflow_mul_by_lt :
   → angle_add_overflow θ' (m * θ') = false.
 Proof.
 intros * Hni Hθ' * Hm.
+(*
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -943,7 +944,16 @@ specialize (seq_angle_to_div_nat_7_le i θ) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
 ...
+*)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n.
+  apply Nat.lt_1_r in Hm; subst m.
+  cbn.
+  apply angle_add_overflow_0_r.
+}
+(*
 destruct m; [ apply angle_add_overflow_0_r | ].
+*)
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -3196,6 +3206,7 @@ destruct ao. 2: {
       rewrite <- angle_div_2_pow_mul; [ | easy ].
       easy.
     }
+...
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
 Definition nat_seq_diverges (u : nat → nat) :=
