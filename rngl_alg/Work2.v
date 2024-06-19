@@ -982,14 +982,18 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
 ...
 Compute (map (λ m,
 map (λ i,
-  let n := m + 10 in
+  let n := m + 20 in
   if n <=? 2 ^ i then
+(*
   if i <=? inv_ub_den_pow2 n then
+*)
   2 ^ i <=? S m * 2 ^ i / n * 2 ^ (Nat.log2_up n - 1)
+(*
   else true
+*)
   else true
-) (seq 0 9)
-) (seq 1 80)).
+) (seq 0 15)
+) (seq 1 10)).
 yes
 ...
 Compute (map (λ m,
