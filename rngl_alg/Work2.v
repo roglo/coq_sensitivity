@@ -923,37 +923,12 @@ Theorem angle_add_overflow_mul_by_lt :
   → angle_add_overflow θ' (m * θ') = false.
 Proof.
 intros * Hni Hθ' * Hm.
-(*
-progress unfold angle_add_overflow.
-apply Bool.not_true_iff_false.
-apply angle_nlt_ge.
-rewrite angle_add_mul_r_diag_r.
-rewrite Hθ'.
-Check seq_angle_to_div_nat_le.
-...
-intros * Hni Hθ' * Hm.
-destruct m; [ apply angle_add_overflow_0_r | ].
-progress unfold angle_add_overflow.
-apply angle_ltb_ge.
-rewrite angle_add_mul_r_diag_r.
-rewrite Hθ'.
-progress unfold seq_angle_to_div_nat at 2.
-rewrite angle_mul_nat_assoc.
-...
-specialize (seq_angle_to_div_nat_7_le i θ) as H2.
-eapply angle_le_trans; [ apply H2 | clear H2 ].
-assert (Hm4 : S (S m) * 2 ≤ 2 ^ 4). {
-...
-*)
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n.
   apply Nat.lt_1_r in Hm; subst m.
   cbn.
   apply angle_add_overflow_0_r.
 }
-(*
-destruct m; [ apply angle_add_overflow_0_r | ].
-*)
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -964,41 +939,40 @@ rewrite angle_mul_nat_assoc.
 specialize (seq_angle_to_div_nat_le n i θ Hn1) as H2.
 eapply angle_le_trans; [ apply H2 | clear H2 ].
 destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
-(*
-  progress unfold inv_ub_den_pow2 in Hii.
-  rewrite rank_fst_1_log2_up in Hii; [ | flia Hm ].
-  rewrite <- Nat.add_assoc in Hii.
-  rewrite (Nat.add_comm _ 1) in Hii.
-  rewrite Nat.add_assoc in Hii.
-  rewrite Nat.sub_add in Hii. 2: {
-    destruct n; [ easy | ].
-    destruct n; [ easy | cbn; flia ].
-  }
-  apply Nat.log2_up_le_mono in Hni.
-  rewrite Nat.log2_up_pow2 in Hni; [ | easy ].
-...
-*)
   rewrite <- (angle_div_2_pow_mul_pow_sub (inv_ub_den_pow2 n) i); [ | easy ].
   rewrite angle_mul_nat_assoc.
   apply angle_mul_le_mono_r. {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ inv_ub_den_pow2 n)). 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
+    rewrite Nat.pow_sub_r; [ | easy | easy ].
+    eapply le_trans. {
+      apply Nat.div_mul_le.
+      now apply Nat.pow_nonzero.
+    }
+    apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+    apply Nat.mul_le_mono_r.
+...
 (*
 Compute (map (λ m,
-  let n := m + 2 in
+  let n := m + 1 in
 (m,
   map (λ i,
 if n <=? 2 ^ i then
+(*
   if i <=? inv_ub_den_pow2 n then
-    S (S m) * (2 ^ i / n) * 2 ^ (inv_ub_den_pow2 n - i) ≤ 2 ^ inv_ub_den_pow2 n
+*)
+    S m * (2 ^ i / n) * 2 ^ (inv_ub_den_pow2 n - i) ≤ 2 ^ inv_ub_den_pow2 n
   else True
+(*
 else True
+*)
   ) (seq 0 (inv_ub_den_pow2 n - 1))
 )
 ) (seq 0 30)).
 (* seems ok *)
 *)
+...
 *)
 
 (* to be completed
