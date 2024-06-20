@@ -983,7 +983,6 @@ rewrite <- Nat.pow_succ_r'.
 now apply Nat_pow2_succ_le_pow2_log2_up.
 Qed.
 
-(* to be completed
 Theorem angle_add_overflow_mul_by_lt :
   ∀ n i θ θ',
   n ≤ 2 ^ i
@@ -1067,143 +1066,58 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite Nat_sub_succ_1.
   apply Nat_pow2_le_pow2_mul_pow2_div.
   split; [ flia Hm | easy ].
+} {
+  apply Nat.nle_gt in Hii.
+  generalize Hii; intros Hii'.
+  apply Nat.lt_le_incl in Hii'.
+  rewrite <- (angle_div_2_pow_mul_pow_sub i (inv_ub_den_pow2 n)); [ | easy ].
+  rewrite angle_mul_nat_assoc.
+  apply angle_mul_le_mono_r. {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
+    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    now apply Nat.mul_le_mono_r.
+  }
+  rewrite Nat.pow_sub_r; [ | easy | easy ].
+  rewrite <- Nat.divide_div_mul_exact; cycle 1. {
+    now apply Nat.pow_nonzero.
+  } {
+    exists (2 ^ (i - inv_ub_den_pow2 n)).
+    rewrite <- Nat.pow_add_r.
+    now rewrite Nat.sub_add.
+  }
+  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  progress unfold inv_ub_num.
+  rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
+  apply Nat.le_sub_le_add_r.
+  progress unfold inv_ub_den_pow2.
+  rewrite <- Nat.add_assoc, Nat.add_1_r.
+  rewrite Nat.pow_add_r.
+  eapply le_trans; [ | apply Nat.le_add_r ].
+  rewrite (Nat.mul_comm (2 ^ rank_fst_1 _ _)).
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  rewrite rank_fst_1_log2_up; [ | flia Hm Hn1 ].
+  rewrite Nat.mul_assoc.
+  rewrite (Nat.mul_comm _ (S m)).
+  eapply le_trans. 2: {
+    apply Nat.mul_le_mono_r.
+    apply Nat.mul_le_mono_r.
+    assert (H : 2 ≤ S m) by flia Hm2.
+    apply H.
+  }
+  rewrite <- Nat.pow_succ_r'.
+  rewrite <- Nat.sub_succ_l. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hn1 | cbn; flia ].
+  }
+  rewrite Nat_sub_succ_1.
+  apply Nat_pow2_le_pow2_mul_pow2_div.
+  split; [ flia Hm | easy ].
 }
-apply Nat.nle_gt in Hii.
-...
-Compute (map (λ n,
-map (λ i,
-  if 2 ^ i <? n then
-  2 * 2 ^ i <=? 2 ^ Nat.log2_up n
-  else true
-) (seq 0 18)
-) (seq 1 20)).
-...
-destruct i. {
-  cbn.
-  do 3 (destruct n; [ easy | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  cbn.
-  do 5 (destruct n; [ easy | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  cbn.
-  do 9 (destruct n; [ easy | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  cbn.
-  do 3 (destruct n; [ easy | ]).
-  do 14 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-destruct i. {
-  cbn.
-  do 3 (destruct n; [ easy | ]).
-  do 30 (destruct n; [ cbn; flia | ]).
-  cbn in Hni; flia Hni.
-}
-...
-Compute (map (λ n,
-map (λ i,
-  if n <=? 2 ^ i then
-    2 ^ i <=? 2 ^ Nat.log2_up n * (2 ^ i / n)
-  else true
-) (seq 0 15)
-) (seq 1 10)).
-ok
-...
-... ...
-apply Nat_pow2_le_pow2_mul_pow2_div.
-...
-Compute (map (λ n,
-map (λ i,
-  if n <=? 2 ^ i then
-(*
-  if i <=? inv_ub_den_pow2 n then
-*)
-  2 ^ i <=? 2 * 2 ^ i / n * 2 ^ (Nat.log2_up n - 1)
-(*
-  else true
-*)
-  else true
-) (seq 0 15)
-) (seq 1 10)).
-Compute (map (λ n,
-map (λ i,
-  let m := 1 in
-  if n <=? 2 ^ i then
-(*
-  if i <=? inv_ub_den_pow2 n then
-*)
-  2 ^ i <=? S m * 2 ^ i / n * 2 ^ (Nat.log2_up n - 1)
-(*
-  else true
-*)
-  else true
-) (seq 0 15)
-) (seq 1 10)).
-yes
-...
-Compute (map (λ m,
-map (λ i,
-  let n := m + 10 in
-  if n <=? 2 ^ i then
-  2 ^ i <=? S m * (2 ^ i / n) * 2 ^ (Nat.log2_up n - 1)
-  else true
-) (seq 0 9)
-) (seq 1 80)).
-ok
-...
-Compute (map (λ m,
-map (λ i,
-  let n := m + 1 in
-  if n <=? 2 ^ i then
-  2 ^ i * 2 ^ S (fst_1_len 1 n)
-  <=? S m * (2 ^ i / n) * (2 ^ rank_fst_1 1 n * 2 ^ S (fst_1_len 1 n))
-  else true
-) (seq 0 10)
-) (seq 0 20)).
-ok
-...
-Compute (map (λ m,
-map (λ i,
-  let n := m + 1 in
-  if n <=? 2 ^ i then
-  2 ^ i * inv_ub_num n <=? S m * (2 ^ i / n) * 2 ^ inv_ub_den_pow2 n
-  else true
-) (seq 0 10)
-) (seq 0 20)).
-(* ok *)
-...
-pow2_den_le_mul_num : ∀ n : nat, 2 ≤ n → 2 ^ inv_ub_den_pow2 n ≤ n * inv_ub_num n
-...
-seq_angle_to_div_nat_le : 
-∀ (n i : nat) (θ : angle T), n ≠ 1 → (seq_angle_to_div_nat θ n i ≤ inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))%A
-...
-(*
-Compute (map (λ m,
-  let n := m + 1 in
-(m,
-  map (λ i,
-if n <=? 2 ^ i then
-(*
-  if i <=? inv_ub_den_pow2 n then
-*)
-    S m * (2 ^ i / n) * 2 ^ (inv_ub_den_pow2 n - i) ≤ 2 ^ inv_ub_den_pow2 n
-  else True
-(*
-else True
-*)
-  ) (seq 0 (inv_ub_den_pow2 n - 1))
-)
-) (seq 0 30)).
-(* seems ok *)
-*)
-...
-*)
+Qed.
 
 (* to be completed
 (* if a sequence of angles n*θi which don't overflow has a limit,
