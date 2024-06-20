@@ -996,6 +996,30 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
     destruct n; [ flia Hn1 | cbn; flia ].
   }
   rewrite Nat_sub_succ_1.
+assert (Hnz : 0 < n ≤ 2 ^ i) by flia Hni Hm.
+clear m θ' Hθ' Hm Hm2 Hn1 Hii.
+Theorem Nat_pow2_le_pow2_mul_pow2_div :
+  ∀ n i,
+  0 < n ≤ 2 ^ i
+  → 2 ^ i ≤ 2 ^ Nat.log2_up n * (2 ^ i / n).
+Proof.
+intros * Hni.
+revert n Hni.
+induction i; intros. {
+  now replace n with 1 by (cbn in Hni; flia Hni).
+}
+...
+Compute (map (λ n,
+map (λ i,
+  if n <=? 2 ^ i then
+    2 ^ i <=? 2 ^ Nat.log2_up n * (2 ^ i / n)
+  else true
+) (seq 0 15)
+) (seq 1 10)).
+ok
+...
+... ...
+apply Nat_pow2_le_pow2_mul_pow2_div.
 ...
 Compute (map (λ n,
 map (λ i,
