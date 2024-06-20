@@ -914,6 +914,75 @@ Theorem fold_seq_angle_to_div_nat :
   ∀ θ n i, (2 ^ i / n * (θ / ₂^i))%A = seq_angle_to_div_nat θ n i.
 Proof. easy. Qed.
 
+Theorem Nat_pow2_succ_le_pow2_log2_up :
+  ∀ n i,
+  2 ^ i < n
+  → 2 ^ S i ≤ 2 ^ Nat.log2_up n.
+Proof.
+intros * Hin.
+apply Nat.pow_le_mono_r; [ easy | ].
+apply Nat.le_succ_l.
+generalize Hin; intros Hni.
+apply Nat.lt_le_incl in Hni.
+apply Nat.log2_up_le_mono in Hni.
+rewrite Nat.log2_up_pow2 in Hni; [ | easy ].
+apply Nat.lt_eq_cases in Hni.
+destruct Hni as [Hni| Hni]; [ easy | ].
+subst i.
+exfalso.
+apply Nat.nle_gt in Hin.
+apply Hin; clear Hin.
+destruct (le_dec n 1) as [Hn1| Hn1]. {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  flia Hn1.
+}
+apply Nat.nle_gt in Hn1.
+now apply Nat.log2_up_spec.
+Qed.
+
+Theorem Nat_pow2_le_pow2_mul_pow2_div :
+  ∀ n i,
+  0 < n ≤ 2 ^ i
+  → 2 ^ i ≤ 2 ^ Nat.log2_up n * (2 ^ i / n).
+Proof.
+intros * (Hnz, Hni).
+revert n Hnz Hni.
+induction i; intros. {
+  now replace n with 1 by (cbn in Hni; flia Hnz Hni).
+}
+rewrite Nat.pow_succ_r' at 1.
+destruct (le_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
+  eapply le_trans. {
+    apply Nat.mul_le_mono_l.
+    apply IHi; [ apply Hnz | easy ].
+  }
+  rewrite Nat.mul_comm.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  apply Nat.div_le_lower_bound; [ flia Hnz | ].
+  rewrite Nat.mul_comm.
+  rewrite (Nat.mul_comm _ 2).
+  rewrite <- Nat.mul_assoc.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_l.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_div_le; flia Hnz.
+}
+apply Nat.nle_gt in Hn2i.
+rewrite (Nat_div_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  now apply Nat.mul_lt_mono_pos_l.
+}
+rewrite Nat.mul_1_r.
+clear Hni.
+clear IHi Hnz.
+rewrite <- Nat.pow_succ_r'.
+now apply Nat_pow2_succ_le_pow2_log2_up.
+Qed.
+
 (* to be completed
 Theorem angle_add_overflow_mul_by_lt :
   ∀ n i θ θ',
@@ -996,57 +1065,10 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
     destruct n; [ flia Hn1 | cbn; flia ].
   }
   rewrite Nat_sub_succ_1.
-assert (Hnz : 0 < n ≤ 2 ^ i) by flia Hni Hm.
-clear m θ' Hθ' Hm Hm2 Hn1 Hii.
-Theorem Nat_pow2_le_pow2_mul_pow2_div :
-  ∀ n i,
-  0 < n ≤ 2 ^ i
-  → 2 ^ i ≤ 2 ^ Nat.log2_up n * (2 ^ i / n).
-Proof.
-intros * (Hnz, Hni).
-revert n Hnz Hni.
-induction i; intros. {
-  now replace n with 1 by (cbn in Hni; flia Hnz Hni).
+  apply Nat_pow2_le_pow2_mul_pow2_div.
+  split; [ flia Hm | easy ].
 }
-rewrite Nat.pow_succ_r' at 1.
-destruct (le_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
-  eapply le_trans. {
-    apply Nat.mul_le_mono_l.
-    apply IHi; [ apply Hnz | easy ].
-  }
-  rewrite Nat.mul_comm.
-  rewrite <- Nat.mul_assoc.
-  apply Nat.mul_le_mono_l.
-  apply Nat.div_le_lower_bound; [ flia Hnz | ].
-  rewrite Nat.mul_comm.
-  rewrite (Nat.mul_comm _ 2).
-  rewrite <- Nat.mul_assoc.
-  rewrite Nat.pow_succ_r'.
-  apply Nat.mul_le_mono_l.
-  rewrite Nat.mul_comm.
-  apply Nat.mul_div_le; flia Hnz.
-}
-apply Nat.nle_gt in Hn2i.
-rewrite (Nat_div_less_small 1). 2: {
-  rewrite Nat.mul_1_l.
-  split; [ easy | ].
-  rewrite Nat.pow_succ_r'.
-  now apply Nat.mul_lt_mono_pos_l.
-}
-rewrite Nat.mul_1_r.
-clear Hni.
-clear IHi Hnz.
-revert n Hn2i.
-induction i; intros. {
-  cbn in Hn2i.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  cbn - [ Nat.log2 "*" ].
-  rewrite <- (Nat.mul_1_r 2) at 1.
-  apply Nat.mul_le_mono_l.
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
+apply Nat.nle_gt in Hii.
 ...
 Compute (map (λ n,
 map (λ i,
