@@ -1034,6 +1034,27 @@ rewrite (Nat_div_less_small 1). 2: {
   now apply Nat.mul_lt_mono_pos_l.
 }
 rewrite Nat.mul_1_r.
+clear Hni.
+clear IHi Hnz.
+revert n Hn2i.
+induction i; intros. {
+  cbn in Hn2i.
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  cbn - [ Nat.log2 "*" ].
+  rewrite <- (Nat.mul_1_r 2) at 1.
+  apply Nat.mul_le_mono_l.
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+...
+Compute (map (λ n,
+map (λ i,
+  if 2 ^ i <? n then
+  2 * 2 ^ i <=? 2 ^ Nat.log2_up n
+  else true
+) (seq 0 18)
+) (seq 1 20)).
 ...
 destruct i. {
   cbn.
