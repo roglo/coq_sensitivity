@@ -929,10 +929,14 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   cbn.
   apply angle_add_overflow_0_r.
 }
-destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-  subst m.
-  apply angle_add_overflow_0_r.
+destruct (lt_dec m 2) as [Hm2| Hm2]. {
+  destruct m; [ apply angle_add_overflow_0_r | ].
+  destruct m; [ | flia Hm2 ].
+  rewrite angle_mul_1_l.
+  subst θ'.
+  now apply angle_add_overflow_pow2_div_mul_pow2_diag.
 }
+apply Nat.nlt_ge in Hm2.
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -979,28 +983,36 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_r.
   rewrite rank_fst_1_log2_up; [ | flia Hm Hn1 ].
-...
-  assert (H : n ≠ 0) by flia Hm.
-  specialize (Nat.div_mod (2 ^ i) n H) as H1; clear H.
-  rewrite H1 at 1; clear H1.
-Search (_ / _ = _ + _).
-Search (_ mod _ = _ - _).
-...
+  eapply le_trans. 2: {
+    apply Nat.mul_le_mono_r.
+    apply Nat.mul_le_mono_r.
+    assert (H : 2 ≤ S m) by flia Hm2.
+    apply H.
+  }
   rewrite Nat.mul_shuffle0.
+  rewrite <- Nat.pow_succ_r'.
+  rewrite <- Nat.sub_succ_l. 2: {
+    destruct n; [ easy | ].
+    destruct n; [ flia Hn1 | cbn; flia ].
+  }
+  rewrite Nat_sub_succ_1.
 ...
-  apply (Nat.mul_le_mono_pos_r _ _ n); [ flia Hm | ].
-Search ((_ / _) * _).
-
-Search (_ * _ ≤ _ * _).
-...
-Search (_ * (_ / _)).
-Search (_ ≤ _ * (_ / _)).
-Search (_ ≤ (_ / _) * _).
-  apply Nat.div_le_lower_bound.
-...
-Compute (map (λ m,
+Compute (map (λ n,
 map (λ i,
-  let n := m + 20 in
+  if n <=? 2 ^ i then
+(*
+  if i <=? inv_ub_den_pow2 n then
+*)
+  2 ^ i <=? 2 * 2 ^ i / n * 2 ^ (Nat.log2_up n - 1)
+(*
+  else true
+*)
+  else true
+) (seq 0 15)
+) (seq 1 10)).
+Compute (map (λ n,
+map (λ i,
+  let m := 1 in
   if n <=? 2 ^ i then
 (*
   if i <=? inv_ub_den_pow2 n then
