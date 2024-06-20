@@ -980,6 +980,24 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
   apply Nat.mul_le_mono_r.
   rewrite rank_fst_1_log2_up; [ | flia Hm Hn1 ].
 ...
+  assert (H : n ≠ 0) by flia Hm.
+  specialize (Nat.div_mod (2 ^ i) n H) as H1; clear H.
+  rewrite H1 at 1; clear H1.
+Search (_ / _ = _ + _).
+Search (_ mod _ = _ - _).
+...
+  rewrite Nat.mul_shuffle0.
+...
+  apply (Nat.mul_le_mono_pos_r _ _ n); [ flia Hm | ].
+Search ((_ / _) * _).
+
+Search (_ * _ ≤ _ * _).
+...
+Search (_ * (_ / _)).
+Search (_ ≤ _ * (_ / _)).
+Search (_ ≤ (_ / _) * _).
+  apply Nat.div_le_lower_bound.
+...
 Compute (map (λ m,
 map (λ i,
   let n := m + 20 in
