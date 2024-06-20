@@ -1008,6 +1008,32 @@ revert n Hnz Hni.
 induction i; intros. {
   now replace n with 1 by (cbn in Hni; flia Hnz Hni).
 }
+rewrite Nat.pow_succ_r' at 1.
+destruct (le_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
+  eapply le_trans. {
+    apply Nat.mul_le_mono_l.
+    apply IHi; [ apply Hnz | easy ].
+  }
+  rewrite Nat.mul_comm.
+  rewrite <- Nat.mul_assoc.
+  apply Nat.mul_le_mono_l.
+  apply Nat.div_le_lower_bound; [ flia Hnz | ].
+  rewrite Nat.mul_comm.
+  rewrite (Nat.mul_comm _ 2).
+  rewrite <- Nat.mul_assoc.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_le_mono_l.
+  rewrite Nat.mul_comm.
+  apply Nat.mul_div_le; flia Hnz.
+}
+apply Nat.nle_gt in Hn2i.
+rewrite (Nat_div_less_small 1). 2: {
+  rewrite Nat.mul_1_l.
+  split; [ easy | ].
+  rewrite Nat.pow_succ_r'.
+  now apply Nat.mul_lt_mono_pos_l.
+}
+rewrite Nat.mul_1_r.
 ...
 destruct i. {
   cbn.
