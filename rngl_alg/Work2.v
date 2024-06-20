@@ -1003,10 +1003,38 @@ Theorem Nat_pow2_le_pow2_mul_pow2_div :
   0 < n ≤ 2 ^ i
   → 2 ^ i ≤ 2 ^ Nat.log2_up n * (2 ^ i / n).
 Proof.
-intros * Hni.
-revert n Hni.
+intros * (Hnz, Hni).
+revert n Hnz Hni.
 induction i; intros. {
-  now replace n with 1 by (cbn in Hni; flia Hni).
+  now replace n with 1 by (cbn in Hni; flia Hnz Hni).
+}
+...
+destruct i. {
+  cbn.
+  do 3 (destruct n; [ easy | ]).
+  cbn in Hni; flia Hni.
+}
+destruct i. {
+  cbn.
+  do 5 (destruct n; [ easy | ]).
+  cbn in Hni; flia Hni.
+}
+destruct i. {
+  cbn.
+  do 9 (destruct n; [ easy | ]).
+  cbn in Hni; flia Hni.
+}
+destruct i. {
+  cbn.
+  do 3 (destruct n; [ easy | ]).
+  do 14 (destruct n; [ cbn; flia | ]).
+  cbn in Hni; flia Hni.
+}
+destruct i. {
+  cbn.
+  do 3 (destruct n; [ easy | ]).
+  do 30 (destruct n; [ cbn; flia | ]).
+  cbn in Hni; flia Hni.
 }
 ...
 Compute (map (λ n,
