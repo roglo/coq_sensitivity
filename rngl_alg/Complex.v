@@ -4145,17 +4145,27 @@ Qed.
 Theorem angle_all_add_not_overflow :
   ∀ n θ,
   (∀ m, m < n → angle_add_overflow θ (m * θ) = false)
-  → angle_mul_nat_overflow n θ = false.
+  ↔ angle_mul_nat_overflow n θ = false.
 Proof.
 destruct_ac.
-intros * Ha.
-induction n; [ easy | ].
-rewrite angle_mul_nat_overflow_succ_l_false.
-split; [ | now apply Ha ].
-apply IHn.
-intros m Hm.
-apply Ha.
-now apply Nat.lt_lt_succ_r.
+intros.
+split; intros Ha. {
+  induction n; [ easy | ].
+  rewrite angle_mul_nat_overflow_succ_l_false.
+  split; [ | now apply Ha ].
+  apply IHn.
+  intros m Hm.
+  apply Ha.
+  now apply Nat.lt_lt_succ_r.
+} {
+  intros m Hm.
+  induction n; [ easy | ].
+  rewrite angle_mul_nat_overflow_succ_l_false in Ha.
+  destruct Ha as (Ha1, Ha2).
+  destruct (Nat.eq_dec m n) as [Hmen| Hmen]; [ now subst m | ].
+  apply IHn; [ easy | ].
+  flia Hm Hmen.
+}
 Qed.
 
 Theorem angle_mul_add_distr_l :
