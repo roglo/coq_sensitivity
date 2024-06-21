@@ -1167,6 +1167,8 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
 move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
+(* voir sur papier *)
+...
 set (ε := angle_eucl_dist θ' (S m * θ')).
 specialize (Hlim ε).
 assert (H : (0 < ε)%L). {
@@ -1182,6 +1184,13 @@ assert (H : (0 < ε)%L). {
 specialize (Hlim H); clear H.
 destruct Hlim as (N & Hlim).
 specialize angle_eucl_dist_triangular as H1.
+progress unfold ε in Hlim.
+specialize (Hlim N (Nat.le_refl _)).
+apply (rngl_nle_gt Hor) in Hlim.
+apply Hlim; clear Hlim.
+specialize (H1 θ' (n * θ N) (S m * θ'))%A.
+eapply (rngl_le_trans Hor); [ apply H1 | ].
+(* voir sur papier *)
 ...
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
