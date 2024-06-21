@@ -1167,6 +1167,7 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
 move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
+specialize angle_eucl_dist_triangular as H1.
 (* voir sur papier *)
 ...
 set (ε := angle_eucl_dist θ' (S m * θ')).
@@ -1183,7 +1184,6 @@ assert (H : (0 < ε)%L). {
 }
 specialize (Hlim H); clear H.
 destruct Hlim as (N & Hlim).
-specialize angle_eucl_dist_triangular as H1.
 progress unfold ε in Hlim.
 specialize (Hlim N (Nat.le_refl _)).
 apply (rngl_nle_gt Hor) in Hlim.
