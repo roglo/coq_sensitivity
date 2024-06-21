@@ -1145,6 +1145,13 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite (H1 θ').
+  apply angle_mul_nat_overflow_0_r.
+}
 intros * Hi Hlim.
 apply angle_all_add_not_overflow.
 intros * Hmn.
@@ -1168,11 +1175,15 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 specialize angle_eucl_dist_triangular as H1.
-(* voir sur papier *)
-...
 set (ε := angle_eucl_dist θ' (S m * θ')).
-specialize (Hlim ε).
-assert (H : (0 < ε)%L). {
+(* voir sur papier *)
+specialize (Hlim (rngl_of_nat n * ε)%L).
+assert (H : (0 < (rngl_of_nat n * ε))%L). {
+  apply (rngl_mul_pos_pos Hop Hor Hii). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    flia Hmn.
+  }
   progress unfold ε.
   apply (rngl_lt_iff Hor).
   split; [ apply angle_eucl_dist_nonneg | ].
@@ -1185,6 +1196,7 @@ assert (H : (0 < ε)%L). {
 specialize (Hlim H); clear H.
 destruct Hlim as (N & Hlim).
 progress unfold ε in Hlim.
+...
 specialize (Hlim N (Nat.le_refl _)).
 apply (rngl_nle_gt Hor) in Hlim.
 apply Hlim; clear Hlim.
