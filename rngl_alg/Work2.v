@@ -1119,6 +1119,22 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
 }
 Qed.
 
+Theorem seq_angle_mul_nat_not_overflow :
+  ∀ n i θ,
+  angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
+Proof.
+intros.
+apply angle_all_add_not_overflow.
+intros m Hm.
+destruct (lt_dec (2 ^ i) n) as [Hin| Hni]. {
+  progress unfold seq_angle_to_div_nat.
+  rewrite Nat.div_small; [ | easy ].
+  apply angle_add_overflow_0_l.
+}
+apply Nat.nlt_ge in Hni.
+now apply (angle_add_overflow_mul_by_lt n i θ).
+Qed.
+
 (* to be completed
 (* if a sequence of angles n*θi which don't overflow has a limit,
    its limit does not overflow either *)
@@ -1129,18 +1145,7 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 intros * Hi Hlim.
-Theorem seq_angle_mul_nat_not_overflow :
-  ∀ n i θ,
-  n ≤ 2 ^ i
-  → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
-Proof.
-intros * Hni.
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]; [ now subst n | ].
-remember (seq_angle_to_div_nat θ n i) as θ' eqn:Hθ'.
-apply angle_all_add_not_overflow.
-intros m Hm.
-... ...
-now apply (angle_add_overflow_mul_by_lt n i θ).
+Inspect 1.
 ...
     rewrite Nat.mul_shuffle0.
     eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
