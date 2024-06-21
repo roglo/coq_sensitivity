@@ -1164,6 +1164,9 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
   now rewrite angle_add_mul_r_diag_r in H.
 }
 move H before Hi; clear Hi; rename H into Hi.
+apply angle_lt_eq_cases.
+destruct (angle_eq_dec θ' (S m * θ')) as [Htt| Htt]; [ now right | left ].
+(* soit ε la distance entre θ' et (S m * θ')... *)
 ...
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
