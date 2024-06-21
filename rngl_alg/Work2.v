@@ -1144,6 +1144,7 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   → angle_lim (λ i, n * θ i)%A (n * θ')
   → angle_mul_nat_overflow n θ' = false.
 Proof.
+destruct_ac.
 intros * Hi Hlim.
 apply angle_all_add_not_overflow.
 intros * Hmn.
@@ -1164,9 +1165,23 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
   now rewrite angle_add_mul_r_diag_r in H.
 }
 move H before Hi; clear Hi; rename H into Hi.
-apply angle_lt_eq_cases.
-destruct (angle_eq_dec θ' (S m * θ')) as [Htt| Htt]; [ now right | left ].
-(* soit ε la distance entre θ' et (S m * θ')... *)
+apply angle_nlt_ge.
+intros Hmt.
+set (ε := angle_eucl_dist θ' (S m * θ')).
+specialize (Hlim ε).
+assert (H : (0 < ε)%L). {
+  progress unfold ε.
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  apply not_eq_sym.
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  rewrite <- H in Hmt.
+  now apply angle_lt_irrefl in Hmt.
+}
+specialize (Hlim H); clear H.
+destruct Hlim as (N & Hlim).
+specialize angle_eucl_dist_triangular as H1.
 ...
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
