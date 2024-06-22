@@ -1202,18 +1202,35 @@ destruct H2 as (N, H2).
      S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 Theorem dist_triangular_mul_r :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ (dist : T → T → T) n a,
   is_dist dist
-  → (rngl_of_nat n * a ≤ dist a (rngl_of_nat n * a))%L.
+  → (rngl_of_nat n * a ≤ dist a (rngl_of_nat (S n) * a))%L.
 Proof.
-intros Hon Hos Hor.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hd.
 induction n. {
   cbn.
   rewrite (rngl_mul_0_l Hos).
-About angle_eucl_dist_nonneg.
+  now apply (dist_nonneg Hon Hop Hiv Hor).
+}
+do 2 rewrite rngl_of_nat_succ.
+do 2 rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_add_le_mono_l Hop Hor a) in IHn.
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+(* mmm... chais pas si c'est juste, tout ça *)
+destruct Hd as (Hd1, Hd2, Hd3).
+...
+  (a + dist a (rngl_of_nat n * a) ≤ dist a (a + rngl_of_nat n * a))%L
+...
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_le_refl Hor).
+}
 ...
   replace (dist 0 0)%L with 0%L. 2: {
     symmetry.
