@@ -1176,10 +1176,10 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 specialize angle_eucl_dist_triangular as H1.
-set (ε := angle_eucl_dist θ' (S m * θ')).
+set (ε₁ := angle_eucl_dist θ' (S m * θ')).
 (**)
-assert (Hεz : (0 < ε)%L). {
-  progress unfold ε.
+assert (Hε₁z : (0 < ε₁)%L). {
+  progress unfold ε₁.
   apply (rngl_lt_iff Hor).
   split; [ apply angle_eucl_dist_nonneg | ].
   apply not_eq_sym.
@@ -1188,16 +1188,68 @@ assert (Hεz : (0 < ε)%L). {
   rewrite <- H in Hmt.
   now apply angle_lt_irrefl in Hmt.
 }
-specialize (Hlim ε Hεz) as H2.
+specialize (Hlim ε₁ Hε₁z) as H2.
 destruct H2 as (N, H2).
-(* choose i=N
+(* for all i≥N
    by triangular
      d (S m * θ i, S m * θ') ≤
        d (S m * θ i, θ i) + d (θ i, θ') + d (θ', S m * θ')
-   by definition ε
-     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + d (θ i, θ') + ε
+   by definition ε₁
+     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + d (θ i, θ') + ε₁
    by H2
-     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + ε + ε *)
+     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁
+   by ... some property to be proved
+     S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
+Theorem dist_triangular_mul_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ (dist : T → T → T) n a,
+  is_dist dist
+  → (rngl_of_nat n * a ≤ dist a (rngl_of_nat n * a))%L.
+Proof.
+intros Hon Hos Hor.
+intros * Hd.
+induction n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+About angle_eucl_dist_nonneg.
+...
+  replace (dist 0 0)%L with 0%L. 2: {
+    symmetry.
+    now apply Hd.
+  }
+  apply (rngl_le_refl Hor).
+}
+rewrite rngl_of_nat_succ.
+do 3 rewrite rngl_mul_add_distr_r.
+do 3 rewrite (rngl_mul_1_l Hon).
+Print is_dist.
+...
+Theorem dist_triangular_mul :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_is_ordered T = true →
+  ∀ (dist : T → T → T) n a b,
+  is_dist dist
+  → (rngl_of_nat n * dist a b ≤
+       dist (rngl_of_nat n * a) (rngl_of_nat n * b))%L.
+Proof.
+intros Hon Hos Hor.
+intros * Hd.
+induction n. {
+  cbn.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  replace (dist 0 0)%L with 0%L. 2: {
+    symmetry.
+    now apply Hd.
+  }
+  apply (rngl_le_refl Hor).
+}
+rewrite rngl_of_nat_succ.
+do 3 rewrite rngl_mul_add_distr_r.
+do 3 rewrite (rngl_mul_1_l Hon).
+Print is_dist.
 ...
 (* voir sur papier *)
 specialize (Hlim (rngl_of_nat n * ε)%L).

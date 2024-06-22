@@ -4000,6 +4000,17 @@ cbn.
 now apply angle_lim_add_add.
 Qed.
 
+(* to be completed
+Theorem dist_nonneg : ∀ A dist (a b : A), is_dist dist → (0 ≤ dist a b)%L.
+Proof.
+intros * Hd.
+destruct Hd as (Hd1, Hd2, Hd3).
+...
+apply rl_sqrt_nonneg.
+apply (rngl_add_squ_nonneg Hop Hor).
+Qed.
+*)
+
 Theorem angle_eucl_dist_nonneg : ∀ θ1 θ2, (0 ≤ angle_eucl_dist θ1 θ2)%L.
 Proof.
 destruct_ac.
