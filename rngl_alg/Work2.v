@@ -1190,6 +1190,14 @@ assert (Hεz : (0 < ε)%L). {
 }
 specialize (Hlim ε Hεz) as H2.
 destruct H2 as (N, H2).
+(* choose i=N
+   by triangular
+     d (S m * θ i, S m * θ') ≤
+       d (S m * θ i, θ i) + d (θ i, θ') + d (θ', S m * θ')
+   by definition ε
+     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + d (θ i, θ') + ε
+   by H2
+     d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + ε + ε *)
 ...
 (* voir sur papier *)
 specialize (Hlim (rngl_of_nat n * ε)%L).
