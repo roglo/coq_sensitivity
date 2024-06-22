@@ -1136,12 +1136,13 @@ now apply (angle_add_overflow_mul_by_lt n i θ).
 Qed.
 
 (* to be completed
-(* if a sequence of angles n*θi which don't overflow has a limit,
-   its limit does not overflow either *)
+(* if a sequence of angles θi has a limit θ',
+   and if ∀ i, n*θi does not overflow,
+   then n*θ' does not overflow either *)
 Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
-  → angle_lim (λ i, n * θ i)%A (n * θ')
+  → angle_lim θ θ'
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
@@ -1176,6 +1177,20 @@ apply angle_nlt_ge.
 intros Hmt.
 specialize angle_eucl_dist_triangular as H1.
 set (ε := angle_eucl_dist θ' (S m * θ')).
+(**)
+assert (Hεz : (0 < ε)%L). {
+  progress unfold ε.
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  apply not_eq_sym.
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  rewrite <- H in Hmt.
+  now apply angle_lt_irrefl in Hmt.
+}
+specialize (Hlim ε Hεz) as H2.
+destruct H2 as (N, H2).
+...
 (* voir sur papier *)
 specialize (Hlim (rngl_of_nat n * ε)%L).
 assert (H : (0 < (rngl_of_nat n * ε))%L). {
