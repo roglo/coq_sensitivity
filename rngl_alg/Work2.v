@@ -1217,46 +1217,6 @@ destruct H2 as (N, H2).
    or ... perhaps the true property gives
      d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 (* voir sur papier *)
-Theorem angle_eucl_dist_mul_cancel_l :
-  ∀ n θ1 θ2,
-  n ≠ 0
-  → angle_eucl_dist (n * θ1) (n * θ2) = angle_eucl_dist θ1 θ2.
-Proof.
-intros * Hnz.
-revert θ1 θ2.
-induction n; intros; [ easy | clear Hnz ].
-rewrite angle_eucl_dist_move_0_l.
-...
-Check angle_eucl_dist_add_cancel_l.
-...
-symmetry.
-rewrite <- (angle_eucl_dist_add_cancel_l θ2).
-...
-rewrite angle_eucl_dist_move_0_l.
-rewrite angle_sub_add_distr.
-rewrite angle_add_sub_swap.
-rewrite angle_sub_diag.
-rewrite angle_add_0_l.
-symmetry.
-apply angle_eucl_dist_move_0_l.
-Qed.
-...
-cbn.
-angle_eucl_dist_move_0_l:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T)
-    (rl : real_like_prop T),
-    angle_ctx T
-    → ∀ θ1 θ2 : angle T, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ2 - θ1) 0
-angle_eucl_dist_move_0_r:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T)
-    (rl : real_like_prop T),
-    angle_ctx T
-    → ∀ θ1 θ2 : angle T, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ1 - θ2) 0
-angle_eucl_dist_sub_l_diag:
-  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T)
-    (rl : real_like_prop T),
-    angle_ctx T
-    → ∀ θ Δθ : angle T, angle_eucl_dist (θ - Δθ) θ = angle_eucl_dist Δθ 0
 ...
 Theorem dist_triangular_mul :
   ∀ n a b,
