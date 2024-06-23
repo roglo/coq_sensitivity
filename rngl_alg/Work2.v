@@ -1201,6 +1201,36 @@ destruct H2 as (N, H2).
    by ... some property to be proved
      S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 (* voir sur papier *)
+Theorem dist_triangular_mul :
+  ∀ n a b,
+  (rngl_of_nat n * angle_eucl_dist a b ≤
+     angle_eucl_dist (n * a)%A (n * b)%A)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+(* chais même pas si c'est vrai *)
+...
+induction n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+  apply angle_eucl_dist_nonneg.
+}
+rewrite rngl_of_nat_succ.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist a b)) in IHn.
+eapply (rngl_le_trans Hor); [ apply IHn | ].
+Search (angle_eucl_dist (_ * _)).
+Search (angle_eucl_dist (_ + _)).
+...
+  ============================
+  (angle_eucl_dist a b + angle_eucl_dist (n * a) (n * b)
+   ≤ angle_eucl_dist (S n * a) (S n * b))%L
+...
+  ============================
+  (angle_eucl_dist a b + rngl_of_nat n * angle_eucl_dist a b
+   ≤ angle_eucl_dist (S n * a) (S n * b))%L
 ...
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
