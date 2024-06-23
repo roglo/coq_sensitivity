@@ -1181,6 +1181,24 @@ rewrite angle_eucl_dist_symmetry.
 now apply (rngl_add_le_mono_l Hop Hor).
 Qed.
 
+Theorem angle_eucl_dist_mul_mul_le :
+  ∀ n θ1 θ2,
+  (angle_eucl_dist (n * θ1) (n * θ2) ≤
+     rngl_of_nat n * (angle_eucl_dist θ1 0 + angle_eucl_dist θ2 0))%L.
+Proof.
+destruct_ac.
+intros.
+eapply (rngl_le_trans Hor). {
+  eapply (rngl_le_trans Hor). {
+    apply angle_eucl_dist_triangular with (θ2 := 0%A).
+  }
+  rewrite (angle_eucl_dist_symmetry 0%A).
+  eapply (rngl_add_le_compat Hor); apply angle_eucl_dist_mul_le.
+}
+rewrite rngl_mul_add_distr_l.
+apply (rngl_le_refl Hor).
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1245,11 +1263,9 @@ destruct H2 as (N, H2).
    by H2
      d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁
    by ... some property to be proved
-     S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁
-   or ... perhaps the true property gives
-     d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
+     S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 (* voir sur papier *)
-Inspect 2.
+Inspect 3.
 ...
 apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist θ 0)) in IHn.
 eapply (rngl_le_trans Hor); [ | apply IHn ].
