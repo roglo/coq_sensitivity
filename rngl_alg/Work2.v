@@ -1149,6 +1149,38 @@ symmetry.
 apply angle_eucl_dist_move_0_l.
 Qed.
 
+Theorem angle_eucl_dist_mul_le :
+  ∀ n θ,
+  (angle_eucl_dist (n * θ) 0 ≤ rngl_of_nat n * angle_eucl_dist θ 0)%L.
+Proof.
+intros.
+destruct_ac.
+intros.
+induction n. {
+  rewrite angle_eucl_dist_diag.
+  cbn; rewrite (rngl_mul_0_l Hos).
+  apply (rngl_le_refl Hor).
+}
+rewrite rngl_of_nat_succ.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+rewrite <- (angle_eucl_dist_sub_l_diag θ).
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite angle_opp_sub_distr.
+cbn.
+rewrite angle_add_sub_swap.
+rewrite angle_sub_diag.
+rewrite angle_add_0_l.
+eapply (rngl_le_trans Hor). {
+  apply angle_eucl_dist_triangular with (θ2 := 0%A).
+}
+rewrite <- angle_opp_0 at 2.
+rewrite angle_eucl_dist_opp_opp.
+rewrite rngl_add_comm.
+rewrite angle_eucl_dist_symmetry.
+now apply (rngl_add_le_mono_l Hop Hor).
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1217,25 +1249,20 @@ destruct H2 as (N, H2).
    or ... perhaps the true property gives
      d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 (* voir sur papier *)
+Inspect 2.
 ...
-Theorem dist_triangular_mul :
-  ∀ n a b,
-  (rngl_of_nat n * angle_eucl_dist a b ≤
-     angle_eucl_dist (n * a)%A (n * b)%A)%L.
-Proof.
-destruct_ac.
-intros.
-progress unfold angle_eucl_dist.
-(* chais même pas si c'est vrai *)
+apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist θ 0)) in IHn.
+eapply (rngl_le_trans Hor); [ | apply IHn ].
+cbn.
+Search (angle_eucl_dist _ 0).
 ...
-induction n. {
-  cbn.
-  rewrite (rngl_mul_0_l Hos).
-  apply angle_eucl_dist_nonneg.
-}
-rewrite rngl_of_nat_succ.
-rewrite rngl_mul_add_distr_r.
-rewrite (rngl_mul_1_l Hon).
+Search (angle_eucl_dist (_ - _)).
+Theorem glop :
+  ∀ θ1 θ2, angle_eucl_dist θ1 (θ1 + θ2) = angle_eucl_dist θ2 0.
+  ∀ θ1 θ2, angle_eucl_dist θ1 (θ1 + θ2) = angle_eucl_dist θ2 0.
+Check angle_eucl_dist_move_0_l.
+...
+Inspect 1.
 apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist a b)) in IHn.
 eapply (rngl_le_trans Hor); [ apply IHn | ].
 Search (angle_eucl_dist (_ * _)).
