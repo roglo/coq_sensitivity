@@ -1262,10 +1262,63 @@ destruct H2 as (N, H2).
      d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + d (θ i, θ') + ε₁
    by H2
      d (S m * θ i, S m * θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁
-   by ... some property to be proved
-     S m * d (θ i, θ') ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
+   by angle_eucl_dist_mul_mul_le
+     S m * (d (θ i, 0) + d (θ', 0)) ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
+(* euh, en fait, non, l'inégalité est dans l'autre sens *)
 (* voir sur papier *)
 Inspect 3.
+Theorem angle_eucl_dist_mul_mul_succ_ge :
+  ∀ (n : nat) (θ1 θ2 : angle T),
+  (rngl_of_nat n * (angle_eucl_dist θ1 0 + angle_eucl_dist θ2 0) ≤
+    angle_eucl_dist (S n * θ1) (S n * θ2))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite (H1 θ1), (H1 θ2).
+  rewrite angle_eucl_dist_diag, rngl_add_0_l.
+  rewrite (rngl_mul_0_r Hos).
+  apply angle_eucl_dist_nonneg.
+}
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite (rngl_mul_0_l Hos).
+  apply angle_eucl_dist_nonneg.
+}
+cbn.
+rewrite rngl_mul_add_distr_l.
+eapply (rngl_le_trans Hor). {
+  eapply (rngl_add_le_compat Hor). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      now apply Nat.neq_0_lt_0.
+    }
+    apply (angle_eucl_dist_triangular _ (n * θ1)).
+  } {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+      rewrite <- rngl_of_nat_0.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+      now apply Nat.neq_0_lt_0.
+    }
+    apply (angle_eucl_dist_triangular _ (n * θ2)).
+  }
+}
+(* j'ai fait ça au pif, mais je ne sais pas si c'est vrai *)
+...
+Search (rngl_of_nat _ < rngl_of_nat _)%L.
+...
+  eapply (rngl_le_trans Hor). {
+    apply angle_eucl_dist_triangular with (θ2 := 0%A).
+  }
+  rewrite (angle_eucl_dist_symmetry 0%A).
+  eapply (rngl_add_le_compat Hor); apply angle_eucl_dist_mul_le.
+}
+rewrite rngl_mul_add_distr_l.
+apply (rngl_le_refl Hor).
 ...
 apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist θ 0)) in IHn.
 eapply (rngl_le_trans Hor); [ | apply IHn ].
