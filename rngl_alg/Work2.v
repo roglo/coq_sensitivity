@@ -1240,6 +1240,37 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 specialize angle_eucl_dist_triangular as H1.
+(* voir sur papier *)
+Print seq_angle_to_div_nat.
+Search (seq_angle_to_div_nat _ _ _ < _)%A.
+Search (seq_angle_to_div_nat _ _ _ ≤ _)%A.
+Inspect 4.
+...
+seq_angle_to_div_nat_le:
+  ∀ (n i : nat) (θ : angle T),
+    n ≠ 1
+    → (seq_angle_to_div_nat θ n i ≤ inv_ub_num n * (θ / ₂^inv_ub_den_pow2 n))%A
+seq_angle_to_div_nat_le_straight_div_pow2_log2_pred:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) 
+    (rl : real_like_prop T) (ac : angle_ctx T) (n i : nat) 
+    (θ : angle T),
+    n ≠ 1
+    → (seq_angle_to_div_nat θ n i ≤ angle_straight / ₂^(Nat.log2 n - 1))%A
+...
+seq_angle_mul_nat_not_overflow : 
+∀ (n i : nat) (θ : angle T),
+  angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false
+angle_eucl_dist_add_cancel_l : 
+∀ θ1 θ2 θ3 : angle T,
+  angle_eucl_dist (θ1 + θ2) (θ1 + θ3) = angle_eucl_dist θ2 θ3
+angle_eucl_dist_mul_le : 
+∀ (n : nat) (θ : angle T),
+  (angle_eucl_dist (n * θ) 0 ≤ rngl_of_nat n * angle_eucl_dist θ 0)%L
+angle_eucl_dist_mul_mul_le : 
+∀ (n : nat) (θ1 θ2 : angle T),
+  (angle_eucl_dist (n * θ1) (n * θ2)
+   ≤ rngl_of_nat n * (angle_eucl_dist θ1 0 + angle_eucl_dist θ2 0))%L
+...
 set (ε₁ := angle_eucl_dist θ' (S m * θ')).
 (**)
 assert (Hε₁z : (0 < ε₁)%L). {
@@ -1279,6 +1310,8 @@ assert (Hθ : (0 < ε)%L). {
      d (S m * θ', θ') ≤ d (S m * θ', θ N) + d (S m * θ', θ')
    donc
      d (S m * θ', θ') ≤ d (S m * θ', θ N) + d (S m * θ', θ')
+   donc
+     0 ≤ d (S m * θ', θ N)
 bon chais pas
 *)
 ...
