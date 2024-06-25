@@ -1313,6 +1313,16 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
 intros ε Hε.
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
+(*1*)
+specialize (Hlim ε Hε).
+destruct Hlim as (N, Hlim).
+exists N.
+intros p Hp.
+specialize (Hlim p Hp).
+specialize (angle_eucl_dist_mul_mul_le m (θ p) θ') as H1.
+eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
+Search (angle_eucl_dist _ 0 ≤ _)%L.
+...1
 specialize (Hlim (ε / rngl_of_nat m)%L).
 assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
   apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
@@ -1331,9 +1341,9 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
   now apply Nat.neq_0_lt_0.
 }
 rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
-...
 specialize (angle_eucl_dist_mul_mul_le m (θ p) θ') as H1.
 eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
+Search (angle_eucl_dist _ 0).
 Search (_ < _ / _)%L.
 ...
 Search (angle_eucl_dist (_ - _)).
