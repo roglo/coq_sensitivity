@@ -1200,25 +1200,23 @@ apply (rngl_le_refl Hor).
 Qed.
 
 Theorem angle_lim_angle_lim_mul_mul :
-  ∀ m n θ θ',
-  (∀ i, angle_mul_nat_overflow n (θ i) = false)
-  → m ≤ n
-  → angle_lim θ θ'
-  → angle_lim (λ i, m * θ i)%A (m * θ').
+  ∀ n θ θ',
+  angle_lim θ θ'
+  → angle_lim (λ i, n * θ i)%A (n * θ').
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros ε Hε.
+  intros * Hlim ε Hε.
   exists 0.
   intros m Hm.
-  rewrite (H1 (ε * θ m)%A).
-  rewrite (H1 (ε * θ')%A).
+  rewrite (H1 (n * θ m)%A).
+  rewrite (H1 (n * θ')%A).
   now rewrite angle_eucl_dist_diag.
 }
-intros * Hov Hmn Hlim.
-destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-  subst m.
+intros * Hlim.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
   intros ε Hε.
   exists 0.
   intros m Hm.
@@ -1228,8 +1226,8 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
 intros ε Hε.
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
-specialize (Hlim (ε / rngl_of_nat m)%L).
-assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
+specialize (Hlim (ε / rngl_of_nat n)%L).
+assert (Hεz : (0 < ε / rngl_of_nat n)%L). {
   apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
   rewrite <- rngl_of_nat_0.
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
@@ -1238,8 +1236,8 @@ assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
 specialize (Hlim Hεz).
 destruct Hlim as (N, Hlim).
 exists N.
-intros p Hp.
-specialize (Hlim p Hp).
+intros m Hm.
+specialize (Hlim m Hm).
 rewrite angle_eucl_dist_move_0_r in Hlim.
 rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_l.
