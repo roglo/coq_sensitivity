@@ -1199,6 +1199,59 @@ rewrite rngl_mul_add_distr_l.
 apply (rngl_le_refl Hor).
 Qed.
 
+Theorem angle_lim_angle_lim_mul_mul :
+  ∀ m n θ θ',
+  (∀ i, angle_mul_nat_overflow n (θ i) = false)
+  → m ≤ n
+  → angle_lim θ θ'
+  → angle_lim (λ i, m * θ i)%A (m * θ').
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros ε Hε.
+  exists 0.
+  intros m Hm.
+  rewrite (H1 (ε * θ m)%A).
+  rewrite (H1 (ε * θ')%A).
+  now rewrite angle_eucl_dist_diag.
+}
+intros * Hov Hmn Hlim.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m.
+  intros ε Hε.
+  exists 0.
+  intros m Hm.
+  do 2 rewrite angle_mul_0_l.
+  now rewrite angle_eucl_dist_diag.
+}
+intros ε Hε.
+progress unfold angle_lim in Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+specialize (Hlim (ε / rngl_of_nat m)%L).
+assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+specialize (Hlim Hεz).
+destruct Hlim as (N, Hlim).
+exists N.
+intros p Hp.
+specialize (Hlim p Hp).
+rewrite angle_eucl_dist_move_0_r in Hlim.
+rewrite angle_eucl_dist_move_0_r.
+rewrite <- angle_mul_sub_distr_l.
+eapply (rngl_le_lt_trans Hor); [ apply angle_eucl_dist_mul_le | ].
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+now rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1284,67 +1337,7 @@ assert (Hθ : (0 < ε)%L). {
      0 ≤ d (S m * θ', θ N)
 bon chais pas
 *)
-Theorem glop :
-  ∀ m n θ θ',
-  (∀ i, angle_mul_nat_overflow n (θ i) = false)
-  → m ≤ n
-  → angle_lim θ θ'
-  → angle_lim (λ i, m * θ i)%A (m * θ').
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros ε Hε.
-  exists 0.
-  intros m Hm.
-  rewrite (H1 (ε * θ m)%A).
-  rewrite (H1 (ε * θ')%A).
-  now rewrite angle_eucl_dist_diag.
-}
-intros * Hov Hmn Hlim.
-destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-  subst m.
-  intros ε Hε.
-  exists 0.
-  intros m Hm.
-  do 2 rewrite angle_mul_0_l.
-  now rewrite angle_eucl_dist_diag.
-}
-intros ε Hε.
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
-(*1*)
-specialize (Hlim ε Hε).
-destruct Hlim as (N, Hlim).
-exists N.
-intros p Hp.
-specialize (Hlim p Hp).
-specialize (angle_eucl_dist_mul_mul_le m (θ p) θ') as H1.
-eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
-Search (angle_eucl_dist _ 0 ≤ _)%L.
-...1
-specialize (Hlim (ε / rngl_of_nat m)%L).
-assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
-  rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  now apply Nat.neq_0_lt_0.
-}
-specialize (Hlim Hεz).
-destruct Hlim as (N, Hlim).
-exists N.
-intros p Hp.
-specialize (Hlim p Hp).
-apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
-  rewrite <- rngl_of_nat_0.
-  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  now apply Nat.neq_0_lt_0.
-}
-rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
-specialize (angle_eucl_dist_mul_mul_le m (θ p) θ') as H1.
-eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
-Search (angle_eucl_dist _ 0).
-Search (_ < _ / _)%L.
+Check angle_lim_angle_lim_mul_mul.
 ...
 Search (angle_eucl_dist (_ - _)).
 Theorem glop :
