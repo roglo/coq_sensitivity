@@ -1318,20 +1318,23 @@ assert (Hεz : (0 < ε / rngl_of_nat m)%L). {
   apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
   rewrite <- rngl_of_nat_0.
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-  flia Hmz.
+  now apply Nat.neq_0_lt_0.
 }
 specialize (Hlim Hεz).
 destruct Hlim as (N, Hlim).
 exists N.
 intros p Hp.
 specialize (Hlim p Hp).
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
+...
 specialize (angle_eucl_dist_mul_mul_le m (θ p) θ') as H1.
 eapply (rngl_le_lt_trans Hor); [ apply H1 | ].
-...
-apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist θ 0)) in IHn.
-eapply (rngl_le_trans Hor); [ | apply IHn ].
-cbn.
-Search (angle_eucl_dist _ 0).
+Search (_ < _ / _)%L.
 ...
 Search (angle_eucl_dist (_ - _)).
 Theorem glop :
