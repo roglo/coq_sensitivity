@@ -1271,13 +1271,17 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hi Hlim.
 apply angle_all_add_not_overflow.
 intros * Hmn.
-assert (H : ∀ n, angle_lim (λ i, (n * θ i)%A) (n * θ')). {
+assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
   intros k.
   now apply (angle_lim_angle_lim_mul_mul).
 }
 move H before Hlim; clear Hlim; rename H into Hlim.
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
+assert (H :
+  ∀ k ε,
+  (0 < ε)%L
+  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (k * θ i) (k * θ') < ε)%L)
+by apply Hlim.
+move H before Hlim; clear Hlim; rename H into Hlim.
 progress unfold angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
@@ -1295,6 +1299,8 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
 move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
+move Hmt before Hi; move m after n.
+...
 specialize angle_eucl_dist_triangular as H1.
 (* voir sur papier *)
 set (ε₁ := angle_eucl_dist θ' (S m * θ')).
