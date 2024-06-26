@@ -1271,6 +1271,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hi Hlim.
 apply angle_all_add_not_overflow.
 intros * Hmn.
+assert (H : ∀ n, angle_lim (λ i, (n * θ i)%A) (n * θ')). {
+  intros k.
+  now apply (angle_lim_angle_lim_mul_mul).
+}
+move H before Hlim; clear Hlim; rename H into Hlim.
 progress unfold angle_lim in Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 progress unfold angle_add_overflow.
@@ -1304,7 +1309,7 @@ assert (Hε₁z : (0 < ε₁)%L). {
   rewrite <- H in Hmt.
   now apply angle_lt_irrefl in Hmt.
 }
-specialize (Hlim ε₁ Hε₁z) as H2.
+specialize (Hlim n ε₁ Hε₁z) as H2.
 destruct H2 as (N, H2).
 (* for all i≥N
    by triangular
@@ -1319,12 +1324,9 @@ destruct H2 as (N, H2).
      S m * (d (θ i, 0) + d (θ', 0)) ≤ d (S m * θ i, θ i) + ε₁ + ε₁ *)
 (* euh, en fait, non, l'inégalité est dans l'autre sens *)
 (* voir sur papier *)
-Inspect 3.
+Inspect 4.
 set (ε := angle_eucl_dist (θ N) (S m * θ')).
 specialize (H2 N (Nat.le_refl _)) as H3.
-assert (Hθ : (0 < ε)%L). {
-  subst ε.
-  progress unfold ε₁ in H3.
 (* by triangular
      d (S m * θ', θ') ≤ d (S m * θ', θ N) + d (θ N, θ')
    by H3
@@ -1335,27 +1337,6 @@ assert (Hθ : (0 < ε)%L). {
      0 ≤ d (S m * θ', θ N)
 bon chais pas
 *)
-Check angle_lim_angle_lim_mul_mul.
-...
-Search (angle_eucl_dist (_ - _)).
-Theorem glop :
-  ∀ θ1 θ2, angle_eucl_dist θ1 (θ1 + θ2) = angle_eucl_dist θ2 0.
-  ∀ θ1 θ2, angle_eucl_dist θ1 (θ1 + θ2) = angle_eucl_dist θ2 0.
-Check angle_eucl_dist_move_0_l.
-...
-Inspect 1.
-apply (rngl_add_le_mono_l Hop Hor (angle_eucl_dist a b)) in IHn.
-eapply (rngl_le_trans Hor); [ apply IHn | ].
-Search (angle_eucl_dist (_ * _)).
-Search (angle_eucl_dist (_ + _)).
-...
-  ============================
-  (angle_eucl_dist a b + angle_eucl_dist (n * a) (n * b)
-   ≤ angle_eucl_dist (S n * a) (S n * b))%L
-...
-  ============================
-  (angle_eucl_dist a b + rngl_of_nat n * angle_eucl_dist a b
-   ≤ angle_eucl_dist (S n * a) (S n * b))%L
 ...
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
