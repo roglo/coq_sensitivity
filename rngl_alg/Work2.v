@@ -1300,7 +1300,6 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
-Inspect 4.
 specialize (angle_eucl_dist_mul_le (S m) (θ' - θ m)) as H1.
 apply (rngl_nlt_ge Hor) in H1.
 apply H1; clear H1.
@@ -1313,6 +1312,13 @@ apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_of_nat (S m))) in H1. 2: {
 }
 eapply (rngl_le_lt_trans Hor); [ apply H1 | clear H1 ].
 specialize (angle_eucl_dist_triangular (S m * θ m) (S m * θ') θ') as H1.
+eapply (rngl_lt_le_trans Hor). 2: {
+  apply (rngl_le_sub_le_add_r Hop Hor) in H1.
+  apply H1.
+}
+apply (rngl_lt_add_lt_sub_l Hop Hor).
+remember (angle_eucl_dist (S m * θ m) θ') as x eqn:Hx.
+(* ah oui mais non, je dis des conneries *)
 ...
 specialize angle_eucl_dist_triangular as H1.
 (* voir sur papier *)
