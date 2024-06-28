@@ -1301,10 +1301,11 @@ apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
 specialize (angle_eucl_dist_mul_le (S m) (θ' - θ m)) as H1.
+rewrite angle_mul_sub_distr_l in H1.
+do 2 rewrite <- angle_eucl_dist_move_0_l in H1.
+...
 apply (rngl_nlt_ge Hor) in H1.
 apply H1; clear H1.
-rewrite angle_mul_sub_distr_l.
-do 2 rewrite <- angle_eucl_dist_move_0_l.
 specialize (angle_eucl_dist_triangular (θ m) (S m * θ m) θ') as H1.
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_of_nat (S m))) in H1. 2: {
   rewrite <- rngl_of_nat_0.
