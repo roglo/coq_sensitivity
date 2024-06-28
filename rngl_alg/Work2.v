@@ -1300,9 +1300,25 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
-specialize (angle_eucl_dist_mul_le (S m) (θ' - θ m)) as H1.
+specialize (angle_eucl_dist_mul_le (S m) (θ' - θ (S m))) as H1.
 rewrite angle_mul_sub_distr_l in H1.
 do 2 rewrite <- angle_eucl_dist_move_0_l in H1.
+specialize (angle_eucl_dist_triangular (θ (S m)) (S m * θ (S m)) θ') as H2.
+specialize (angle_eucl_dist_triangular (S m * θ (S m)) (S m * θ') θ') as
+  H3.
+remember (angle_eucl_dist (S m * θ (S m)) (S m * θ')) as a eqn:Ha.
+remember (angle_eucl_dist (θ (S m)) θ') as b eqn:Hb.
+remember (angle_eucl_dist (S m * θ (S m)) θ') as c eqn:Hc.
+remember (angle_eucl_dist (θ (S m)) (S m * θ (S m))) as d eqn:Hd.
+move H1 before H2.
+...
+apply (rngl_nlt_ge Hor) in H3.
+apply H3; clear H3.
+apply (rngl_add_lt_mono_l Hop Hor _ _ d).
+eapply (rngl_lt_le_trans Hor); [ | apply H2 ].
+  apply <- (rngl_add_lt_mono_l).
+  apply H2.
+}
 ...
 apply (rngl_nlt_ge Hor) in H1.
 apply H1; clear H1.
