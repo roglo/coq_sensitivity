@@ -1250,6 +1250,14 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
 now rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
 Qed.
 
+Theorem angle_le_dec : ∀ θ1 θ2, {(θ1 ≤ θ2)%A} + {¬ (θ1 ≤ θ2)%A}.
+Proof.
+intros.
+remember (angle_leb θ1 θ2) as b eqn:Hb.
+symmetry in Hb.
+now destruct b; [ left | right ].
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1300,6 +1308,12 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
+specialize (Hi m _ Hmn) as H1.
+move Hmt before H1.
+destruct (angle_le_dec θ' (θ m)) as [Hθθ| Hθθ]. {
+  set (ε := (angle_eucl_dist (θ m) (S m * θ m) / 2)%L).
+  specialize (Hlim (S m) ε) as H2.
+...
 specialize (angle_eucl_dist_mul_le (S m) (θ' - θ (S m))) as H1.
 rewrite angle_mul_sub_distr_l in H1.
 do 2 rewrite <- angle_eucl_dist_move_0_l in H1.
