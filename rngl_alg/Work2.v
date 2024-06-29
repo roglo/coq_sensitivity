@@ -1310,7 +1310,11 @@ remember (angle_eucl_dist (S m * θ (S m)) (S m * θ')) as a eqn:Ha.
 remember (angle_eucl_dist (θ (S m)) θ') as b eqn:Hb.
 remember (angle_eucl_dist (S m * θ (S m)) θ') as c eqn:Hc.
 remember (angle_eucl_dist (θ (S m)) (S m * θ (S m))) as d eqn:Hd.
+remember (angle_eucl_dist (S m * θ') θ') as e eqn:He.
+move H2 before H3.
 move H1 before H2.
+assert (H : (a ≤ rngl_of_nat (S m) * (b + a + e))%L).
+(* aucun intérêt *)
 ...
 apply (rngl_nlt_ge Hor) in H3.
 apply H3; clear H3.
