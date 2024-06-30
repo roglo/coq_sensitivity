@@ -1315,6 +1315,12 @@ destruct (angle_lt_dec θ' (θ m)) as [Hθθ| Hθθ]. {
     apply (rngl_add_le_mono_r Hop Hor).
     apply angle_eucl_dist_triangular.
   }
+  assert (Hdd : ∀ i : nat, False). {
+    intros.
+    set (ε := (angle_eucl_dist θ' (θ i) / rngl_of_nat 4)%L).
+    specialize (Hddd i) as H2.
+specialize (Hlim (S m) ε) as H3.
+...
 ...
   set (ε := (angle_eucl_dist θ' (θ m) / rngl_of_nat 4)%L).
   specialize (angle_eucl_dist_triangular θ' (S m * θ') (θ m)) as H2.
