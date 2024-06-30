@@ -3,6 +3,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
+Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike.
 Require Import Misc.
@@ -1315,6 +1316,22 @@ destruct (angle_lt_dec θ' (θ m)) as [Hθθ| Hθθ]. {
     apply (rngl_add_le_mono_r Hop Hor).
     apply angle_eucl_dist_triangular.
   }
+  assert (Hdd : ∀ i : nat, ∃ ε : T, ∃ N, ∀ j, N < j → False). {
+    intros.
+    set (ε := (angle_eucl_dist θ' (θ m) / rngl_of_nat 4)%L).
+    exists ε.
+    specialize (Hlim (S m) ε) as H2.
+    assert (Hε : (0 < ε)%L) by admit.
+    specialize (H2 Hε).
+    destruct H2 as (N, H2).
+    specialize (H2 (S N) (Nat.le_succ_diag_r _)).
+    rewrite angle_eucl_dist_symmetry in H2.
+    exists (max N (S m)).
+    intros j Hj.
+(* ouais, bon, chais pas, ça a l'air d'être du n'importe quoi, de toutes
+   façons *)
+...
+
   assert (Hdd : ∀ i : nat, False). {
     intros.
     set (ε := (angle_eucl_dist θ' (θ i) / rngl_of_nat 4)%L).
