@@ -1303,6 +1303,19 @@ move Hmt before Hi; move m after n.
 specialize (Hi m _ Hmn) as H1.
 move Hmt before H1.
 destruct (angle_lt_dec θ' (θ m)) as [Hθθ| Hθθ]. {
+  assert (Hddd : ∀ i,
+    (angle_eucl_dist (S m * θ') (S m * θ i) ≤
+       angle_eucl_dist (S m * θ') θ' +
+       angle_eucl_dist θ' (θ i) +
+       angle_eucl_dist (θ i) (S m * θ i))%L). {
+    intros i.
+    eapply (rngl_le_trans Hor). {
+      apply (angle_eucl_dist_triangular _ (θ i)).
+    }
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply angle_eucl_dist_triangular.
+  }
+...
   set (ε := (angle_eucl_dist θ' (θ m) / rngl_of_nat 4)%L).
   specialize (angle_eucl_dist_triangular θ' (S m * θ') (θ m)) as H2.
   specialize (angle_eucl_dist_triangular (S m * θ') (S m * θ m) (θ m)) as H3.
