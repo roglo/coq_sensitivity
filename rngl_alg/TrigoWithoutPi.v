@@ -3230,6 +3230,14 @@ destruct tt. {
 }
 Qed.
 
+Theorem angle_le_dec : ∀ θ1 θ2, {(θ1 ≤ θ2)%A} + {¬ (θ1 ≤ θ2)%A}.
+Proof.
+intros.
+remember (θ1 ≤? θ2)%A as b eqn:Hb.
+symmetry in Hb.
+now destruct b; [ left | right ].
+Qed.
+
 Theorem angle_lt_dec : ∀ θ1 θ2, {(θ1 < θ2)%A} + {¬ (θ1 < θ2)%A}.
 Proof.
 intros.
