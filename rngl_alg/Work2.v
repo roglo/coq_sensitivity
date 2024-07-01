@@ -1317,7 +1317,52 @@ assert (H : ∀ i : nat, False). {
       apply (rngl_add_le_mono_r Hop Hor).
       apply angle_eucl_dist_triangular.
     }
+    move Hθθ after H1.
     set (ε := (angle_eucl_dist θ' (θ i) / rngl_of_nat 4)%L).
+Print seq_angle_to_div_nat.
+Theorem seq_angle_to_div_nat_decr :
+  ∀ n i j θ,
+  n ≤ 2 ^ i
+  → i < j
+  → (seq_angle_to_div_nat θ n j < seq_angle_to_div_nat θ n i)%A.
+Proof.
+intros * Hni Hij.
+remember (j - i) as m eqn:Hm.
+replace j with (m + i) in * by flia Hij Hm.
+clear Hm.
+assert (Hmz : m ≠ 0) by flia Hij.
+clear j Hij.
+induction m; [ easy | clear Hmz ].
+destruct m. {
+  clear IHm; cbn.
+  progress unfold seq_angle_to_div_nat.
+...
+(*
+  rewrite angle_div_2_pow_succ_r_1.
+*)
+  apply angle_le_lt_trans with (θ2 := (2 ^ S i / n * (θ / ₂^i))%A).
+...
+eapply angle_le_lt_trans.
+apply angle_mul_le_mono_r.
+  Search (_ * _ ≤ _ * _)%A.
+Search (_ * _ < _ * _)%A.
+apply angle_mul_nat_lt_mono_l.
+Search (_ / ₂ < _)%A.
+  Search (_ * _ < _ * _)%A.
+...
+...
+Search (seq_angle_to_div_nat _ _ (S _)).
+Search (_ / ₂^S _)%A.
+...
+Compute (map (λ n,
+let θ := 5000 in
+pair (θ / n) (
+  map (λ i,
+  (2 ^ i / n) * (θ / 2 ^ i)
+) (seq 0 (Nat.log2_up θ))
+)
+) (seq 3 20)).
+Compute (1000 / 4).
 ...
   assert (Hdd : ∀ i : nat, ∃ ε : T, ∃ N, ∀ j, N < j → False). {
     intros.
