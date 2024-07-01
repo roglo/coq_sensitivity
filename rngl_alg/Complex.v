@@ -1663,6 +1663,47 @@ destruct b. {
 }
 Qed.
 
+Theorem angle_mul_lt_mono_r :
+  ∀ a b θ,
+  angle_mul_nat_overflow b θ = false
+  → θ ≠ 0%A
+  → a < b
+  → (a * θ < b * θ)%A.
+Proof.
+intros * Hov Htz Hab.
+apply angle_lt_iff.
+split. {
+  apply Nat.lt_le_incl in Hab.
+  now apply angle_mul_le_mono_r.
+}
+intros Habt.
+revert a Hab Habt.
+induction b; intros; [ easy | ].
+rewrite angle_mul_nat_overflow_succ_l in Hov.
+apply Bool.orb_false_iff in Hov.
+destruct Hov as (Hov, Hovb).
+specialize (IHb Hov).
+destruct a. {
+  cbn in Habt.
+  progress unfold angle_add_overflow in Hovb.
+  apply Bool.not_true_iff_false in Hovb.
+  apply Hovb; clear Hovb.
+  rewrite <- Habt.
+  apply angle_lt_iff.
+  split; [ | now apply not_eq_sym ].
+  apply angle_nonneg.
+}
+apply Nat.succ_lt_mono in Hab.
+specialize (IHb a Hab).
+cbn in Habt.
+(* lemma to do *)
+rewrite angle_add_comm in Habt.
+apply angle_add_move_r in Habt.
+rewrite angle_add_comm in Habt.
+rewrite angle_add_sub in Habt.
+easy.
+Qed.
+
 (**)
 
 Theorem angle_div_2_lt_straight :

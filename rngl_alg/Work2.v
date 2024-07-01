@@ -1343,17 +1343,6 @@ Search (_ * _ ≤ _ * _)%L.
 Check rngl_mul_le_mono_pos_r.
 Check rngl_mul_lt_mono_pos_r.
 Check angle_mul_le_mono_r.
-Theorem angle_mul_lt_mono_r :
-  ∀ a b θ, angle_mul_nat_overflow b θ = false → a < b → (a * θ < b * θ)%A.
-Proof.
-intros * Hov Hab.
-apply angle_lt_iff.
-split. {
-  apply Nat.lt_le_incl in Hab.
-  now apply angle_mul_le_mono_r.
-}
-intros H.
-Print angle_mul_nat.
 ,,,
   apply angle_mul_lt_mono_pos_r. {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
