@@ -1301,21 +1301,23 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
-specialize (Hi m _ Hmn) as H1.
-move Hmt before H1.
-destruct (angle_lt_dec θ' (θ m)) as [Hθθ| Hθθ]. {
-  assert (Hddd : ∀ i,
-    (angle_eucl_dist (S m * θ') (S m * θ i) ≤
-       angle_eucl_dist (S m * θ') θ' +
-       angle_eucl_dist θ' (θ i) +
-       angle_eucl_dist (θ i) (S m * θ i))%L). {
-    intros i.
-    eapply (rngl_le_trans Hor). {
-      apply (angle_eucl_dist_triangular _ (θ i)).
+assert (H : ∀ i : nat, False). {
+  intros.
+  specialize (Hi i _ Hmn) as H1.
+  move Hmt before H1.
+  destruct (angle_lt_dec θ' (θ i)) as [Hθθ| Hθθ]. {
+    assert (Hddd :
+      (angle_eucl_dist (S m * θ') (S m * θ i) ≤
+         angle_eucl_dist (S m * θ') θ' +
+         angle_eucl_dist θ' (θ i) +
+         angle_eucl_dist (θ i) (S m * θ i))%L). {
+      eapply (rngl_le_trans Hor). {
+        apply (angle_eucl_dist_triangular _ (θ i)).
+      }
+      apply (rngl_add_le_mono_r Hop Hor).
+      apply angle_eucl_dist_triangular.
     }
-    apply (rngl_add_le_mono_r Hop Hor).
-    apply angle_eucl_dist_triangular.
-  }
+...
   assert (Hdd : ∀ i : nat, ∃ ε : T, ∃ N, ∀ j, N < j → False). {
     intros.
     set (ε := (angle_eucl_dist θ' (θ m) / rngl_of_nat 4)%L).
