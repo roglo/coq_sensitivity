@@ -1336,6 +1336,33 @@ induction m; [ easy | clear Hmz ].
 destruct m. {
   clear IHm; cbn.
   progress unfold seq_angle_to_div_nat.
+  rewrite <- (angle_div_2_pow_mul_pow_sub (S i) i); [ | flia ].
+  rewrite angle_mul_nat_assoc.
+Check angle_mul_le_mono_r.
+Search (_ * _ ≤ _ * _)%L.
+Check rngl_mul_le_mono_pos_r.
+Check rngl_mul_lt_mono_pos_r.
+Check angle_mul_le_mono_r.
+Theorem angle_mul_lt_mono_r :
+  ∀ a b θ, angle_mul_nat_overflow b θ = false → a < b → (a * θ < b * θ)%A.
+Proof.
+intros * Hov Hab.
+apply angle_lt_iff.
+split. {
+  apply Nat.lt_le_incl in Hab.
+  now apply angle_mul_le_mono_r.
+}
+intros H.
+Print angle_mul_nat.
+,,,
+  apply angle_mul_lt_mono_pos_r. {
+    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
+    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    now apply Nat.mul_le_mono_r.
+  }
 ...
 (*
   rewrite angle_div_2_pow_succ_r_1.
