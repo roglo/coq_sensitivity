@@ -1320,14 +1320,17 @@ assert (H : ∀ i : nat, False). {
     move Hθθ after H1.
     set (ε := (angle_eucl_dist θ' (θ i) / rngl_of_nat 4)%L).
 Print seq_angle_to_div_nat.
-Theorem seq_angle_to_div_nat_decr :
+Theorem seq_angle_to_div_nat_not_incr :
   ∀ n i j θ,
-  θ ≠ 0%A
-  → n ≤ 2 ^ i
+  n ≤ 2 ^ i
   → i < j
-  → (seq_angle_to_div_nat θ n j < seq_angle_to_div_nat θ n i)%A.
+  → (seq_angle_to_div_nat θ n j ≤ seq_angle_to_div_nat θ n i)%A.
 Proof.
-intros * Htz Hni Hij.
+intros * Hni Hij.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply angle_le_refl.
+}
 remember (j - i) as m eqn:Hm.
 replace j with (m + i) in * by flia Hij Hm.
 clear Hm.
@@ -1342,8 +1345,30 @@ destruct m. {
   rewrite Nat.sub_succ_l; [ | easy ].
   rewrite Nat.sub_diag.
   rewrite Nat.pow_1_r.
-  apply angle_mul_lt_mono_r.
-(* ça devrait le faire *)
+  apply angle_mul_le_mono_r. {
+    eapply angle_mul_nat_not_overflow_le_l. 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    rewrite Nat.mul_comm.
+    rewrite Nat.pow_succ_r'.
+    eapply le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    destruct n; [ easy | flia ].
+  }
+  rewrite Nat.mul_comm.
+  rewrite Nat.pow_succ_r'.
+Search (_ * (_ / _) ≤ _).
+(* merde c'est faux *)
+Compute (map (λ n,
+let θ := 5000 in
+pair (θ / n) (
+  map (λ i,
+if n <=? 2 ^ i then
+  (2 ^ i / n) * (θ / 2 ^ i)
+else 0
+) (seq 0 (Nat.log2_up θ))
+)
+) (seq 3 20)).
 ...
 (*
   rewrite angle_div_2_pow_succ_r_1.
