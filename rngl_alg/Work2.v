@@ -1317,6 +1317,7 @@ assert (H : ∀ i : nat, False). {
       apply (rngl_add_le_mono_r Hop Hor).
       apply angle_eucl_dist_triangular.
     }
+    set (ε := (angle_eucl_dist θ' (θ i) / rngl_of_nat 4)%L).
 ...
   assert (Hdd : ∀ i : nat, ∃ ε : T, ∃ N, ∀ j, N < j → False). {
     intros.
