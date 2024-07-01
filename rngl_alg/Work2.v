@@ -1322,11 +1322,12 @@ assert (H : ∀ i : nat, False). {
 Print seq_angle_to_div_nat.
 Theorem seq_angle_to_div_nat_decr :
   ∀ n i j θ,
-  n ≤ 2 ^ i
+  θ ≠ 0%A
+  → n ≤ 2 ^ i
   → i < j
   → (seq_angle_to_div_nat θ n j < seq_angle_to_div_nat θ n i)%A.
 Proof.
-intros * Hni Hij.
+intros * Htz Hni Hij.
 remember (j - i) as m eqn:Hm.
 replace j with (m + i) in * by flia Hij Hm.
 clear Hm.
@@ -1338,20 +1339,11 @@ destruct m. {
   progress unfold seq_angle_to_div_nat.
   rewrite <- (angle_div_2_pow_mul_pow_sub (S i) i); [ | flia ].
   rewrite angle_mul_nat_assoc.
-Check angle_mul_le_mono_r.
-Search (_ * _ ≤ _ * _)%L.
-Check rngl_mul_le_mono_pos_r.
-Check rngl_mul_lt_mono_pos_r.
-Check angle_mul_le_mono_r.
-,,,
-  apply angle_mul_lt_mono_pos_r. {
-    apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-      apply angle_mul_nat_overflow_pow_div.
-    }
-    eapply le_trans; [ apply Nat.div_mul_le; flia Hm | ].
-    apply Nat.div_le_upper_bound; [ flia Hm | ].
-    now apply Nat.mul_le_mono_r.
-  }
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  rewrite Nat.pow_1_r.
+  apply angle_mul_lt_mono_r.
+(* ça devrait le faire *)
 ...
 (*
   rewrite angle_div_2_pow_succ_r_1.
