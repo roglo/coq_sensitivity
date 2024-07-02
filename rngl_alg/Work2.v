@@ -1298,9 +1298,12 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
   now rewrite angle_add_mul_r_diag_r in H.
 }
 move H before Hi; clear Hi; rename H into Hi.
+assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
+move Him before Hi.
+move m before n.
 apply angle_nlt_ge.
 intros Hmt.
-move Hmt before Hi; move m after n.
+move Hmt before Him; move m after n.
 ...
 assert (H : ∀ i : nat, False). {
   intros.
