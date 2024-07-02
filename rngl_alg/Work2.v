@@ -1313,6 +1313,57 @@ Proof.
 intros * Hlim.
 progress unfold seq_angle_to_div_nat in Hlim.
 progress unfold seq_angle_to_div_nat.
+(*2*)
+destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
+  rewrite Nat.div_small; [ | easy ].
+  apply angle_nonneg.
+}
+apply Nat.nlt_ge in Hin.
+destruct n; [ apply angle_nonneg | ].
+destruct n. {
+  rewrite Nat.div_1_r.
+  rewrite angle_div_2_pow_mul_2_pow.
+  apply (angle_lim_eq_compat 0 0 _ (λ i, θ)) in Hlim. 2: {
+    intros j.
+    rewrite Nat.add_0_r, Nat.div_1_r.
+    apply angle_div_2_pow_mul_2_pow.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'.
+  apply angle_le_refl.
+}
+destruct n. {
+  destruct i; [ cbn in Hin; flia Hin | ].
+  rewrite Nat.pow_succ_r', Nat.mul_comm.
+  rewrite Nat.div_mul; [ | easy ].
+  rewrite angle_div_2_pow_succ_r_2.
+  rewrite angle_div_2_pow_mul_2_pow.
+Search (_ / ₂ ≤ _)%A.
+...2
+(*1*)
+revert n θ θ' Hlim.
+induction i; intros. {
+  cbn.
+  destruct n; [ apply angle_nonneg | ].
+  destruct n. {
+    rewrite Nat.div_1_r.
+    rewrite angle_mul_1_l.
+    apply (angle_lim_eq_compat 0 0 _ (λ i, θ)) in Hlim. 2: {
+      intros j.
+      rewrite Nat.add_0_r, Nat.div_1_r.
+      apply angle_div_2_pow_mul_2_pow.
+    }
+    apply angle_lim_const in Hlim.
+    subst θ'.
+    apply angle_le_refl.
+  }
+  rewrite Nat.div_small; [ | flia ].
+  apply angle_nonneg.
+}
+Search (_ * _ ≤ _)%A.
+apply angle_div_2_pow_mul_le_angle.
+rewrite Nat.pow_succ_r'.
+...1
 revert i θ θ' Hlim.
 induction n; intros; [ apply angle_nonneg | ].
 destruct n. {
