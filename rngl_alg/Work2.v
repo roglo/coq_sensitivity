@@ -1301,6 +1301,7 @@ move H before Hi; clear Hi; rename H into Hi.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
+...
 assert (H : ∀ i : nat, False). {
   intros.
   specialize (Hi i _ Hmn) as H1.
