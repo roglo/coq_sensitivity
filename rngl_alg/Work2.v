@@ -1304,6 +1304,33 @@ move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
+Print angle_lim.
+Theorem glop :
+  ∀ n i θ θ',
+  angle_lim (seq_angle_to_div_nat θ n) θ'
+  → (seq_angle_to_div_nat θ n i ≤ θ')%A.
+Proof.
+intros * Hlim.
+progress unfold seq_angle_to_div_nat in Hlim.
+progress unfold seq_angle_to_div_nat.
+revert i θ θ' Hlim.
+induction n; intros; [ apply angle_nonneg | ].
+destruct n. {
+  rewrite Nat.div_1_r.
+  rewrite angle_div_2_pow_mul_2_pow.
+  apply (angle_lim_eq_compat 0 0 _ (λ i, θ)) in Hlim. 2: {
+    intros j.
+    rewrite Nat.add_0_r, Nat.div_1_r.
+    apply angle_div_2_pow_mul_2_pow.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'.
+  apply angle_le_refl.
+}
+eapply angle_le_trans.
+apply angle_mul_div_succ_succ_le.
+apply IHn.
+(* chiasse *)
 ...
 assert (H : ∀ i : nat, False). {
   intros.
