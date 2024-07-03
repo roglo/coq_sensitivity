@@ -1371,10 +1371,13 @@ destruct n. {
 (* donc essai du même théorème, mais avec ça *)
 (* (et il faudra que je prouve que c'est bien une suite de Cauchy *)
 Theorem glop :
+  rngl_is_archimedean T = true →
   ∀ n i θ θ',
   angle_lim (λ i, ((2 ^ i / n + 1) * (θ / ₂^i))%A) θ'
   → (θ' ≤ (2 ^ i / n + 1) * (θ / ₂^i))%A.
 Proof.
+destruct_ac.
+intros Har.
 intros * Hlim.
 destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   rewrite Nat.div_small; [ | easy ].
@@ -1390,14 +1393,8 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   rewrite <- (angle_add_0_l θ') in Hlim.
   apply angle_lim_add_add_if in Hlim. 2: {
     intros ε Hε.
-(* hou la la, va falloir se servir du fait que T est archimédien,
-   je crois ; et en plus l'autre but n'est pas si trivial *)
-Search rngl_is_archimedean.
-Check rngl_opt_archimedean.
-Check rngl_archimedean_ub.
-Check int_part.
-specialize (rngl_opt_archimedean
-...
+    specialize (rngl_archimedean Har Hor) as H1.
+    specialize (H1 ε 0%L Hε).
 ...
 Search rngl_is_archimedean.
 angle_div_nat_is_inf_sum_of_angle_div_2_pow:
