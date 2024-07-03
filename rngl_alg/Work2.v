@@ -1361,20 +1361,56 @@ destruct n. {
 destruct n. {
   specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
 (* 2^i/n, c'est les i premières decimales binaires de 1/n *)
-(* il me semble que si on fait 2^i/n + 1 à la place de 2^i/n,
-   ça converge aussi par valeurs supérieures, mais le test
-   avec des entiers au lieu d'angles n'a pas l'air de confirmer;
-   donc faut voir: essayer peut-être avec des entiers relatifs
-   avec lesquels on peut monter beaucoup plus haut pour θ ? *)
+(* il me semble que si on fait 2^i/n + 1 à la place de 2^i/n, ça
+   converge aussi par valeurs supérieures, mais le test avec des
+   entiers au lieu d'angles n'a pas l'air de confirmer;
+   donc faut voir: mais avec des entiers relatifs avec lesquels on
+   peut monter beaucoup plus haut pour θ, ça marche peut-être *)
+(* bon, du coup, j'essaie de voir si la suite avec 2^i/n + 1,
+   est bien, comme je le pense, toujours supérieure à sa limite *)
+(* donc essai du même théorème, mais avec ça *)
+(* (et il faudra que je prouve que c'est bien une suite de Cauchy *)
+Theorem glop :
+  ∀ n i θ θ',
+  angle_lim (λ i, ((2 ^ i / n + 1) * (θ / ₂^i))%A) θ'
+  → (θ' ≤ (2 ^ i / n + 1) * (θ / ₂^i))%A.
+Proof.
+intros * Hlim.
+destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.add_0_l, angle_mul_1_l.
+  eapply (angle_lim_eq_compat 0 0) in Hlim. 2: {
+    intros j.
+    rewrite Nat.add_0_r.
+    rewrite angle_mul_add_distr_r.
+    rewrite angle_mul_1_l.
+    easy.
+  }
+  rewrite <- (angle_add_0_r θ') in Hlim.
+  apply angle_lim_add_add_if in Hlim. {
+Search (angle_lim (angle_div_2_pow _)).
+Search (angle_lim _ 0).
 ...
+    rewrite Nat.div_small; [ | ].
+    apply angle_div_2_pow_mul_2_pow.
+...
+(* ça, c'est le test que la suite avec 2^i/n + 1 est bien
+   toujours supérieure à sa limite; ça a l'air d'être vrai
+   pour une simulation avec un θ assez grand, mais faut voir *)
 Compute (map (λ n,
-let θ := 5000 in
-pair (θ / n) (
+let m := Z.of_nat n in
+let θ := 500000000000%Z in
+pair (θ / m)%Z (
   map (λ i,
-Nat.leb (
-  (2 ^ i / n + 1) * (θ / 2 ^ i)
-) (θ / n)
-) (seq 0 (Nat.log2_up θ))
+let j := Z.of_nat i in
+(**)
+Z.leb (
+(**)
+  ((2 ^ j / m + 1) * (θ / 2 ^ j))%Z
+(**)
+) (θ / m)
+(**)
+) (seq 0 20)
 )
 ) (seq 3 20)).
 ...
