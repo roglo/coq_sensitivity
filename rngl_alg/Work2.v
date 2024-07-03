@@ -1394,7 +1394,12 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_lim_add_add_if in Hlim. 2: {
     intros ε Hε.
     specialize (rngl_archimedean Har Hor) as H1.
-    specialize (H1 ε 0%L Hε).
+    specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
+    destruct H1 as (m, Hm).
+    set (ε' := rngl_mul_nat ε m) in Hm.
+    exists i.
+    intros j Hij.
+(* ah, chais pas, faut voir *)
 ...
 Search rngl_is_archimedean.
 angle_div_nat_is_inf_sum_of_angle_div_2_pow:
