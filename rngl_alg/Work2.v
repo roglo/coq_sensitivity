@@ -1361,6 +1361,23 @@ destruct n. {
 destruct n. {
   specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
 (* 2^i/n, c'est les i premières decimales binaires de 1/n *)
+(* il me semble que si on fait 2^i/n + 1 à la place de 2^i/n,
+   ça converge aussi par valeurs supérieures, mais le test
+   avec des entiers au lieu d'angles n'a pas l'air de confirmer;
+   donc faut voir: essayer peut-être avec des entiers relatifs
+   avec lesquels on peut monter beaucoup plus haut pour θ ? *)
+...
+Compute (map (λ n,
+let θ := 5000 in
+pair (θ / n) (
+  map (λ i,
+Nat.leb (
+  (2 ^ i / n + 1) * (θ / 2 ^ i)
+) (θ / n)
+) (seq 0 (Nat.log2_up θ))
+)
+) (seq 3 20)).
+...
 Compute (map (λ i,
    2 ^ i / 3
 ) (seq 0 12)).
