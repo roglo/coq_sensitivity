@@ -1338,7 +1338,21 @@ destruct n. {
   rewrite Nat.div_mul; [ | easy ].
   rewrite angle_div_2_pow_succ_r_2.
   rewrite angle_div_2_pow_mul_2_pow.
-Search (_ / ₂ ≤ _)%A.
+  eapply (angle_lim_eq_compat 1 0) in Hlim. 2: {
+    intros j.
+    rewrite Nat.add_1_r.
+    rewrite Nat.pow_succ_r'.
+    rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
+    rewrite angle_div_2_pow_succ_r_2.
+    rewrite angle_div_2_pow_mul_2_pow.
+    now rewrite Nat.add_0_r.
+  }
+  apply angle_lim_const in Hlim.
+  subst θ'.
+  apply angle_le_refl.
+}
+destruct n. {
+  specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
 ...2
 (*1*)
 revert n θ θ' Hlim.
