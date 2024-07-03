@@ -1388,6 +1388,10 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   }
   rewrite <- (angle_add_0_r θ') in Hlim.
   apply angle_lim_add_add_if in Hlim. {
+(* ah oui mais non... Hlim est en fait évident ; donc
+   θ' se retrouve juste dans la conclusion; donc,
+   impossible à prouver *)
+...
 Search (angle_lim (angle_div_2_pow _)).
 Search (angle_lim _ 0).
 ...
