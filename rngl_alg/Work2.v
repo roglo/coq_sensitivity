@@ -1384,13 +1384,31 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     rewrite Nat.add_0_r.
     rewrite angle_mul_add_distr_r.
     rewrite angle_mul_1_l.
+    rewrite angle_add_comm.
     easy.
   }
-  rewrite <- (angle_add_0_r θ') in Hlim.
-  apply angle_lim_add_add_if in Hlim. {
-(* ah oui mais non... Hlim est en fait évident ; donc
-   θ' se retrouve juste dans la conclusion; donc,
-   impossible à prouver *)
+  rewrite <- (angle_add_0_l θ') in Hlim.
+  apply angle_lim_add_add_if in Hlim. 2: {
+    intros ε Hε.
+(* hou la la, va falloir se servir du fait que T est archimédien,
+   je crois ; et en plus l'autre but n'est pas si trivial *)
+Search rngl_is_archimedean.
+Check rngl_opt_archimedean.
+Check rngl_archimedean_ub.
+Check int_part.
+specialize (rngl_opt_archimedean
+...
+...
+Search rngl_is_archimedean.
+angle_div_nat_is_inf_sum_of_angle_div_2_pow:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) 
+    (rl : real_like_prop T) (ac : angle_ctx T),
+    rngl_is_archimedean T = true
+    → rngl_characteristic T = 0
+      → ∀ (n : nat) (θ : angle T),
+          n ≠ 0
+          → angle_mul_nat_overflow n θ = false
+            → angle_lim (seq_angle_to_div_nat (n * θ) n) θ
 ...
 Search (angle_lim (angle_div_2_pow _)).
 Search (angle_lim _ 0).
