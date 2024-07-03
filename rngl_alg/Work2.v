@@ -1359,6 +1359,8 @@ destruct n. {
   apply angle_le_refl.
 }
 destruct n. {
+  specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+(* 2^i/n, c'est les i premières decimales binaires de 1/n *)
 Compute (map (λ i,
    2 ^ i / 3
 ) (seq 0 12)).
