@@ -1305,6 +1305,13 @@ apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
 Print angle_lim.
+(* not sure it is useful, but it seems to be true, so I'm trying
+   to prove it as an exercise *)
+(* it says that all terms of our sequence are less than the limit;
+   but warning: it does not mean that the sequence is always
+   increasing, it can oscillate *)
+(* I have another idea: perhaps there is another sequence still converging
+   to θ', but whose terms are always greater than θ' ? *)
 Theorem glop :
   ∀ n i θ θ',
   angle_lim (seq_angle_to_div_nat θ n) θ'
@@ -1352,7 +1359,13 @@ destruct n. {
   apply angle_le_refl.
 }
 destruct n. {
-  specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
+Compute (map (λ i,
+   2 ^ i / 3
+) (seq 0 12)).
+...
+  destruct i; [ cbn in Hin; flia Hin | ].
+  destruct i; [ cbn in Hin; flia Hin | clear Hin ].
+  specialize (Nat.div_mod (2 ^ S (S i)) 3 (Nat.neq_succ_0 _)) as H1.
 ...2
 (*1*)
 revert n θ θ' Hlim.
