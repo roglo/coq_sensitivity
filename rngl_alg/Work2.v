@@ -1397,7 +1397,25 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
 (* ah oui, c'est casse-couilles, parce que ça boucle : je ne sais
    pas quelle valeur choisir pour "a" dans H1; dois-je prendre ε ?
    ou bien ε/n ? *)
-....
+    specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
+    destruct H1 as (N, HN).
+    rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in HN.
+    exists (Nat.log2_up N + i).
+    intros m Hm.
+    remember (m - (Nat.log2_up N + i)) as p eqn:Hp.
+    assert (H : m = i + (p + Nat.log2_up N)) by flia Hm Hp.
+    subst m.
+    clear Hm Hp.
+    rewrite angle_div_2_pow_add_r.
+Search (_ / ₂^(_ + _))%A.
+Search (angle_eucl_dist (_ / ₂^_)).
+...
+(* un truc comme ça : *)
+Theorem glop :
+  angle_eucl_dist (θ / ₂^n) 0 ≤ 2 ^ n * angle_eucl_dist θ 0.
+...
+  angle_eucl_dist (θ / ₂^n) 0 ≤ angle_eucl_dist θ 0.
+...
     set (ε' := (ε / rngl_of_nat n)%L).
     specialize (H1 ε' (angle_eucl_dist (θ / ₂^i) 0)).
     assert (H : (0 < ε')%L) by ...
@@ -1405,17 +1423,17 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     destruct H1 as (N, HN).
     rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in HN.
     subst ε'.
-    rewrite rngl_div_mul in HN.
-Search (_ / _ * _)%L.
-About rngl_div_mul.
+(* peut-être qu'il faut que je reparte de Hlim, en le décalant
+   avec angle_lim_eq_compat et en faisant intervenir n et N d'une
+   manière ou d'une autre *)
 ...
+    specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
+    destruct H1 as (m, Hm).
+....
 Search (rngl_mul_nat (_ / _)).
 progress unfold rngl_mul_nat in H1.
 Search mul_nat.
 About rngl_mul_nat.
-...
-    specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
-    destruct H1 as (m, Hm).
 ...
     set (ε' := rngl_mul_nat ε m) in Hm.
 ...
