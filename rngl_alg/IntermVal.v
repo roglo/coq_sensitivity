@@ -87,13 +87,13 @@ specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H2z.
 split. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L); [ easy | ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
   rewrite rngl_mul_add_distr_l.
   rewrite (rngl_mul_1_r Hon).
   apply (rngl_add_le_compat Hor); [ apply (rngl_le_refl Hor) | easy ].
 } {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L); [ easy | ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ | easy ].
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
   rewrite rngl_mul_add_distr_l.
   rewrite (rngl_mul_1_r Hon).
   apply (rngl_add_le_compat Hor); [ easy | apply (rngl_le_refl Hor) ].
@@ -428,7 +428,7 @@ split. {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
-  rewrite (rngl_mul_div_r Hon Hiv) in HM2. 2: {
+  rewrite (rngl_div_mul Hon Hiv) in HM2. 2: {
     intros H; rewrite H in Hε.
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
@@ -500,7 +500,7 @@ split. {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := ε) in HM2; [ | easy ].
-  rewrite (rngl_mul_div_r Hon Hiv) in HM2. 2: {
+  rewrite (rngl_div_mul Hon Hiv) in HM2. 2: {
     intros H; rewrite H in Hε.
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
@@ -629,7 +629,7 @@ apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
   now apply (rngl_add_lt_compat Hop Hor).
 }
 rewrite (rngl_add_diag2 Hon).
-rewrite (rngl_mul_div_r Hon Hiv).
+rewrite (rngl_div_mul Hon Hiv).
 apply (rngl_le_refl Hor).
 apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.

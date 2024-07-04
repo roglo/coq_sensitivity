@@ -3906,7 +3906,7 @@ rewrite angle_eucl_dist_sub_l_diag.
 rewrite <- angle_eucl_dist_opp_opp.
 rewrite angle_opp_sub_distr.
 rewrite angle_opp_0.
-rewrite <- (rngl_mul_div_r Hon Hiv ε 2)%L.
+rewrite <- (rngl_div_mul Hon Hiv ε 2)%L.
 rewrite (rngl_mul_comm Hic). 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }

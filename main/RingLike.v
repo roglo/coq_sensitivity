@@ -1202,15 +1202,13 @@ apply rngl_has_inv_and_1_or_quot_iff in Hii.
 destruct Hii as [(H1, H2)|]; congruence.
 Qed.
 
-Theorem rngl_mul_div_r :
+Theorem rngl_div_mul :
   rngl_has_1 T = true →
   rngl_has_inv T = true →
-  ∀ a b : T,
-  b ≠ 0%L
-  → (a / b * b)%L = a.
+  ∀ a b, b ≠ 0%L → (a / b * b)%L = a.
 Proof.
 intros Hon Hiv * Hbz.
-progress unfold "/"%L.
+unfold rngl_div.
 rewrite Hiv.
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_diag_l Hon Hiv _ Hbz).
@@ -1593,19 +1591,6 @@ Proof.
 intros Hon Hop *.
 rewrite (rngl_mul_sub_distr_l Hop).
 now rewrite (rngl_mul_1_r Hon).
-Qed.
-
-Theorem rngl_div_mul :
-  rngl_has_1 T = true →
-  rngl_has_inv T = true →
-  ∀ a b, b ≠ 0%L → (a / b * b)%L = a.
-Proof.
-intros Hon Hiv * Hbz.
-unfold rngl_div.
-rewrite Hiv.
-rewrite <- rngl_mul_assoc.
-rewrite (rngl_mul_inv_diag_l Hon Hiv _ Hbz).
-apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_div_mul_mul_div :
@@ -5205,12 +5190,12 @@ intros Hon Hop Hiv Hor * Hzc.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 split; intros Habq. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := c); [ easy | ].
-  rewrite (rngl_mul_div_r Hon Hiv); [ easy | ].
+  rewrite (rngl_div_mul Hon Hiv); [ easy | ].
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
 } {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ c) in Habq; [ | easy ].
-  rewrite (rngl_mul_div_r Hon Hiv) in Habq; [ easy | ].
+  rewrite (rngl_div_mul Hon Hiv) in Habq; [ easy | ].
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
 }
@@ -5231,10 +5216,10 @@ assert (Hcz : c ≠ 0%L). {
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 split; intros Habq. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := c); [ easy | ].
-  now rewrite (rngl_mul_div_r Hon Hiv).
+  now rewrite (rngl_div_mul Hon Hiv).
 } {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ c) in Habq; [ | easy ].
-  now rewrite (rngl_mul_div_r Hon Hiv) in Habq.
+  now rewrite (rngl_div_mul Hon Hiv) in Habq.
 }
 Qed.
 
@@ -5253,10 +5238,10 @@ assert (Hcz : c ≠ 0%L). {
 }
 split; intros Habq. {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := c); [ easy | ].
-  now rewrite (rngl_mul_div_r Hon Hiv).
+  now rewrite (rngl_div_mul Hon Hiv).
 } {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii c) in Habq; [ | easy ].
-  now rewrite (rngl_mul_div_r Hon Hiv) in Habq.
+  now rewrite (rngl_div_mul Hon Hiv) in Habq.
 }
 Qed.
 
@@ -5275,10 +5260,10 @@ assert (Hcz : c ≠ 0%L). {
 }
 split; intros Habq. {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := c); [ easy | ].
-  now rewrite (rngl_mul_div_r Hon Hiv).
+  now rewrite (rngl_div_mul Hon Hiv).
 } {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii c) in Habq; [ | easy ].
-  now rewrite (rngl_mul_div_r Hon Hiv) in Habq.
+  now rewrite (rngl_div_mul Hon Hiv) in Habq.
 }
 Qed.
 

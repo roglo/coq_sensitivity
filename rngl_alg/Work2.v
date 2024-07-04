@@ -1394,9 +1394,38 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_lim_add_add_if in Hlim. 2: {
     intros ε Hε.
     specialize (rngl_archimedean Har Hor) as H1.
+    set (ε' := (ε / rngl_of_nat n)%L).
+    specialize (H1 ε' (angle_eucl_dist (θ / ₂^i) 0)).
+    assert (H : (0 < ε')%L) by admit.
+    specialize (H1 H); clear H.
+    destruct H1 as (N, HN).
+    rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in HN.
+    subst ε'.
+Search (_ / _ * _)%L.
+About rngl_mul_div_r.
+About rngl_div_mul.
+specialize rngl_mul_div_r as H1.
+specialize rngl_div_mul as H2.
+...
+rewrite rngl_div_mul 
+...
+rngl_mul_div_r:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_1 T = true → rngl_has_inv T = true → ∀ a b : T, b ≠ 0%L → (a / b * b)%L = a
+rngl_div_mul:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_1 T = true → rngl_has_inv T = true → ∀ a b : T, b ≠ 0%L → (a / b * b)%L = a
+...
+Search (rngl_mul_nat (_ / _)).
+progress unfold rngl_mul_nat in H1.
+Search mul_nat.
+About rngl_mul_nat.
+...
     specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
     destruct H1 as (m, Hm).
+...
     set (ε' := rngl_mul_nat ε m) in Hm.
+...
     exists i.
     intros j Hij.
 (* ah, chais pas, faut voir *)
