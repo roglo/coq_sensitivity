@@ -1394,21 +1394,66 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
   apply angle_lim_add_add_if in Hlim. 2: {
     intros ε Hε.
     specialize (rngl_archimedean Har Hor) as H1.
-(* ah oui, c'est casse-couilles, parce que ça boucle : je ne sais
-   pas quelle valeur choisir pour "a" dans H1; dois-je prendre ε ?
-   ou bien ε/n ? *)
     specialize (H1 ε (angle_eucl_dist (θ / ₂^i) 0) Hε).
     destruct H1 as (N, HN).
     rewrite (rngl_mul_nat_mul_nat_1 Hon Hos) in HN.
-    exists (Nat.log2_up N + i).
+    exists (N + i).
     intros m Hm.
-    remember (m - (Nat.log2_up N + i)) as p eqn:Hp.
-    assert (H : m = i + (p + Nat.log2_up N)) by flia Hm Hp.
+    remember (m - (N + i)) as p eqn:Hp.
+    assert (H : m = i + (p + N)) by flia Hm Hp.
     subst m.
     clear Hm Hp.
     rewrite angle_div_2_pow_add_r.
-Search (_ / ₂^(_ + _))%A.
+...
 Search (angle_eucl_dist (_ / ₂^_)).
+Theorem angle_eucl_dist_div_2_pow_0_lt :
+  ∀ n a θ,
+  (angle_eucl_dist θ 0 < a * 2 ^ n)%L
+  → (angle_eucl_dist (θ / ₂^n) 0 < a)%L.
+Proof.
+destruct_ac.
+intros * Hd.
+revert θ Hd.
+induction n; intros. {
+  rewrite rngl_pow_0_r in Hd.
+  now rewrite (rngl_mul_1_r Hon) in Hd.
+}
+rewrite angle_div_2_pow_succ_r_2.
+apply IHn.
+Theorem angle_eucl_dist_div_2_0_lt :
+  ∀ a θ,
+  (angle_eucl_dist θ 0 < a * 2)%L
+  → (angle_eucl_dist (θ / ₂) 0 < a)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hd.
+  rewrite (H1 (angle_eucl_dist _ _)) in Hd.
+  rewrite (H1 (_ * _)%L) in Hd.
+  now apply (rngl_lt_irrefl Hor) in Hd.
+}
+intros * Hd.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+rewrite angle_eucl_dist_is_sqrt in Hd.
+rewrite angle_sub_0_l in Hd.
+rewrite rngl_cos_opp in Hd.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2%L). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+eapply (rngl_le_lt_trans Hor); [ | apply Hd ].
+Search (1 - rngl_cos _)%L.
+Search (1 - rngl_cos (_ / ₂))%L.
+Search (rngl_cos (_ / ₂))%L.
+cbn.
+rewrite rngl_cos_div_2.
+...
+progress unfold angle_eucl_dist.
+...
+Search (_ / ₂^(_ + _))%A.
 ...
 (* un truc comme ça : *)
 Theorem glop :
