@@ -1404,8 +1404,10 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     subst m.
     clear Hm Hp.
     rewrite angle_div_2_pow_add_r.
-...
+remember (θ / ₂^i)%A as t.
 Search (angle_eucl_dist (_ / ₂^_)).
+(* ci-dessous : faux *)
+...
 Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a θ,
   (angle_eucl_dist θ 0 < a * 2 ^ n)%L
@@ -1420,6 +1422,7 @@ induction n; intros. {
 }
 rewrite angle_div_2_pow_succ_r_2.
 apply IHn.
+...
 Theorem angle_eucl_dist_div_2_0_lt :
   ∀ a θ,
   (angle_eucl_dist θ 0 < a * 2)%L
