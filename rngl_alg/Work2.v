@@ -1468,8 +1468,18 @@ destruct zs. {
   apply (rngl_nlt_ge Hor) in H1b.
   destruct (rngl_eq_dec Hed b 1) as [Hb1|Hb1]. {
     subst b.
+    destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)) as [Hc1| Hc1]. {
+      rewrite Hc1 in Ha.
+      rewrite (rngl_add_opp_r Hop) in Ha.
+      apply (rngl_lt_add_lt_sub_l Hop Hor) in Ha.
 (* j'en ai besoin plus loin *)
 (* bon, chais plus comment faire *)
+(* est-ce qu'il ne faudrait pas plutôt avoir un lemme comme suit :
+Theorem glop :
+  ∀ a b θ,
+  (a < rngl_cos θ)%L
+  → (b < rngl_cos (θ / ₂))%L.
+*)
 ...
   apply (rngl_lt_sub_lt_add_l Hop Hor).
   rewrite <- (rngl_abs_nonneg_eq Hop Hor (1 - b))%L. 2: {
