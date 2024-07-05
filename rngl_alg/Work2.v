@@ -1409,7 +1409,6 @@ Search (angle_eucl_dist (_ / ₂^_)).
 (* Theorem ci-dessous : faux *)
 (* voir si on ne peut pas voir si (p + N) est suffisant ; avant,
    j'avais mis "(p + Nat.log2_up N)" *)
-...
 Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a θ,
   (angle_eucl_dist θ 0 < a * 2 ^ n)%L
@@ -1424,7 +1423,70 @@ induction n; intros. {
 }
 rewrite angle_div_2_pow_succ_r_2.
 apply IHn.
+(* experimental version: je ne sais pas encore quelle relation
+   donner entre a et b *)
+Theorem angle_eucl_dist_div_2_0_lt :
+  ∀ a b θ,
+  (angle_eucl_dist θ 0 < b)%L
+  → (angle_eucl_dist (θ / ₂) 0 < a)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hd.
+  rewrite (H1 (angle_eucl_dist _ _)) in Hd.
+  rewrite (H1 b) in Hd.
+  now apply (rngl_lt_irrefl Hor) in Hd.
+}
+intros * Hd.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+rewrite angle_eucl_dist_is_sqrt in Hd.
+rewrite angle_sub_0_l in Hd.
+rewrite rngl_cos_opp in Hd.
+Theorem glop :
+  ∀ a b θ,
+  (1 < a + rngl_cos θ)%L
+  → (1 < b + rngl_cos (θ / ₂))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Ha.
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon).
+  destruct (rngl_lt_dec Hor 1 b) as [H1b| H1b]. {
+    eapply (rngl_lt_le_trans Hor); [ apply H1b | ].
+    apply (rngl_le_add_r Hor).
+    apply rl_sqrt_nonneg.
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  apply (rngl_nlt_ge Hor) in H1b.
+  destruct (rngl_eq_dec Hed b 1) as [Hb1|Hb1]. {
+    subst b.
+(* j'en ai besoin plus loin *)
+(* bon, chais plus comment faire *)
 ...
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (1 - b))%L. 2: {
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+    apply rl_sqrt_nonneg.
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_lt_0_sub Hop Hor).
+...
+(* previous version *)
 Theorem angle_eucl_dist_div_2_0_lt :
   ∀ a θ,
   (angle_eucl_dist θ 0 < a * 2)%L
@@ -1443,6 +1505,13 @@ intros * Hd.
 rewrite angle_eucl_dist_is_sqrt.
 rewrite angle_sub_0_l.
 rewrite rngl_cos_opp.
+(*1*)
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon).
+...1
 rewrite angle_eucl_dist_is_sqrt in Hd.
 rewrite angle_sub_0_l in Hd.
 rewrite rngl_cos_opp in Hd.
