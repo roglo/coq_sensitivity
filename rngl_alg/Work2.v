@@ -1500,6 +1500,11 @@ Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Ha.
+(*1*)
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+apply (rngl_lt_cos_lt_cos_div2 a).
+(* mouais, bon, c'est pas gagné *)
+...1
 cbn.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
@@ -1518,8 +1523,13 @@ destruct zs. {
       rewrite Hc1 in Ha.
       rewrite (rngl_add_opp_r Hop) in Ha.
       apply (rngl_lt_add_lt_sub_l Hop Hor) in Ha.
-(* j'en ai besoin plus loin *)
-(* bon, chais plus comment faire *)
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply rl_sqrt_nonneg.
+        apply rngl_1_add_cos_div_2_nonneg.
+      }
+      apply not_eq_sym.
 Check rngl_lt_cos_lt_cos_div2.
 ...
 (* previous version *)
