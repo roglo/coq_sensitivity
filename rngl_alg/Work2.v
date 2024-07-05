@@ -1406,7 +1406,9 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     rewrite angle_div_2_pow_add_r.
 remember (θ / ₂^i)%A as t.
 Search (angle_eucl_dist (_ / ₂^_)).
-(* ci-dessous : faux *)
+(* Theorem ci-dessous : faux *)
+(* voir si on ne peut pas voir si (p + N) est suffisant ; avant,
+   j'avais mis "(p + Nat.log2_up N)" *)
 ...
 Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a θ,
