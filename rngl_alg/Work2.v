@@ -1474,17 +1474,36 @@ destruct zs. {
       apply (rngl_lt_add_lt_sub_l Hop Hor) in Ha.
 (* j'en ai besoin plus loin *)
 (* bon, chais plus comment faire *)
-(* est-ce qu'il ne faudrait pas plutôt avoir un lemme comme suit :
+(* est-ce qu'il ne faudrait pas plutôt avoir un lemme comme suit *)
 Theorem glop :
   ∀ a b θ,
-  (a < rngl_cos θ)%L
+  b ≠ 0%L
+  → (a < rngl_cos θ)%L
   → (b < rngl_cos (θ / ₂))%L.
-*)
-...
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor (1 - b))%L. 2: {
-    now apply (rngl_le_0_sub Hop Hor).
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hbz Hc.
+  rewrite (H1 a) in Hc.
+  rewrite (H1 (rngl_cos _)) in Hc.
+  now apply (rngl_lt_irrefl Hor) in Hc.
+}
+intros * Hbz Hc.
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  rewrite (rngl_mul_1_l Hon).
+  destruct (rngl_lt_dec Hor b 0) as [Hblz| Hbgz]. {
+    eapply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+    apply rl_sqrt_nonneg.
+    apply rngl_1_add_cos_div_2_nonneg.
   }
+  apply (rngl_nlt_ge Hor) in Hbgz.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor b)%L; [ | easy ].
   rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
     apply rl_sqrt_nonneg.
     apply rngl_1_add_cos_div_2_nonneg.
@@ -1493,8 +1512,9 @@ Theorem glop :
   rewrite (rngl_squ_sqrt Hon). 2: {
     apply rngl_1_add_cos_div_2_nonneg.
   }
-  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-    apply (rngl_lt_0_sub Hop Hor).
+  apply -> (rngl_lt_div_r Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
 ...
 (* previous version *)
 Theorem angle_eucl_dist_div_2_0_lt :
