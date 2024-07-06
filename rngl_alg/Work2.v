@@ -1496,6 +1496,7 @@ apply IHn.
 Theorem angle_eucl_dist_div_2_0_lt :
   ∀ a b θ,
   (0 ≤ b)%L
+  → b ≠ √2%L
   → (angle_eucl_dist θ 0 < a)%L
   → (angle_eucl_dist (θ / ₂) 0 < b)%L.
 Proof.
@@ -1505,12 +1506,12 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzb Hd.
+  intros * Hzb Hb2 Hd.
   rewrite (H1 (angle_eucl_dist _ _)) in Hd.
   rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
-intros * Hzb Hd.
+intros * Hzb Hb2 Hd.
 assert (Hza : (0 ≤ a)%L). {
   eapply (rngl_le_trans Hor). 2: {
     apply (rngl_lt_le_incl Hor) in Hd.
@@ -1565,7 +1566,25 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hd. 2: {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
-apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | | | easy ].
+apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | | | easy ]. {
+  intros H; apply Hb2.
+  apply (f_equal (λ x, (x * 2)%L)) in H.
+  rewrite (rngl_div_mul Hon Hiv) in H. 2: {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_1_l Hon) in H.
+  rewrite <- H.
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  symmetry.
+  now apply (rngl_abs_nonneg_eq Hop Hor).
+} {
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii _ _ 2)%L. {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_comm Hic).
+  rewrite (rngl_mul_div Hii).
+...
+Search (_ / _ = _ → _)%L.
 ...
 Check rngl_lt_add_cos_lt_add_cos_div2.
 Search (_ < _ / _)%L.
