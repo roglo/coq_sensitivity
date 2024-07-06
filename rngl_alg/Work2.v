@@ -1576,15 +1576,42 @@ Theorem angle_eucl_dist_div_2_pow_0_lt :
   → (angle_eucl_dist (θ / ₂^n) 0 < a)%L.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hd.
+  rewrite (H1 (angle_eucl_dist _ _)) in Hd.
+  rewrite (H1 (_ * _))%L in Hd.
+  now apply (rngl_lt_irrefl Hor) in Hd.
+}
 intros * Hd.
 revert θ Hd.
 induction n; intros. {
   rewrite rngl_pow_0_r in Hd.
   now rewrite (rngl_mul_1_r Hon) in Hd.
 }
+destruct (rngl_le_dec Hor a 0) as [Haz| Hza]. {
+  apply (rngl_nlt_ge Hor) in Haz.
+  exfalso; apply Haz; clear Haz.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (2 ^ S n))%L. {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  eapply (rngl_le_lt_trans Hor); [ | apply Hd ].
+  apply angle_eucl_dist_nonneg.
+}
+apply (rngl_nle_gt Hor) in Hza.
 rewrite angle_div_2_pow_succ_r_2.
 apply IHn.
-apply (angle_eucl_dist_div_2_0_lt (a * 2 ^ S n))%L; [ | | | | easy ].
+apply (angle_eucl_dist_div_2_0_lt (a * 2 ^ S n))%L; [ | | | | easy ]. {
+  apply (rngl_lt_le_incl Hor) in Hza.
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+} {
+  intros Ha.
 ...
 Search (_ / _ = _ → _)%L.
 ...
