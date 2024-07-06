@@ -1297,6 +1297,28 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hc ].
 now apply (rngl_le_sub_le_add_r Hop Hor).
 Qed.
 
+Theorem rngl_lt_add_cos_lt_add_cos_div2 :
+  ∀ a b θ,
+  b ≠ 1%L
+  → (2 * (1 - b)² ≤ 2 - a)%L
+  → (0 ≤ rngl_sin θ)%L
+  → (1 < a + rngl_cos θ)%L
+  → (1 < b + rngl_cos (θ / ₂))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hb1 Hba Hzs Ha.
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | | easy | ]. {
+  intros H; apply Hb1.
+  now apply -> (rngl_sub_move_0_r Hop) in H.
+} {
+  now rewrite <- (rngl_add_sub_swap Hop).
+} {
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
+}
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1492,50 +1514,7 @@ rewrite rngl_cos_opp.
 rewrite angle_eucl_dist_is_sqrt in Hd.
 rewrite angle_sub_0_l in Hd.
 rewrite rngl_cos_opp in Hd.
-Theorem glop :
-  ∀ a b θ,
-  b ≠ 1%L
-  → (2 * (1 - b)² ≤ 2 - a)%L
-  → (1 < a + rngl_cos θ)%L
-  → (1 < b + rngl_cos (θ / ₂))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hb1 Hba Ha.
-(*1*)
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  apply rngl_leb_le in Hzs.
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | | easy | ]. {
-...1
-cbn.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  rewrite (rngl_mul_1_l Hon).
-  destruct (rngl_lt_dec Hor 1 b) as [H1b| H1b]. {
-    eapply (rngl_lt_le_trans Hor); [ apply H1b | ].
-    apply (rngl_le_add_r Hor).
-    apply rl_sqrt_nonneg.
-    apply rngl_1_add_cos_div_2_nonneg.
-  }
-  apply (rngl_nlt_ge Hor) in H1b.
-  destruct (rngl_eq_dec Hed b 1) as [Hb1|Hb1]. {
-    subst b.
-    destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)) as [Hc1| Hc1]. {
-      rewrite Hc1 in Ha.
-      rewrite (rngl_add_opp_r Hop) in Ha.
-      apply (rngl_lt_add_lt_sub_l Hop Hor) in Ha.
-      apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_lt_iff Hor).
-      split. {
-        apply rl_sqrt_nonneg.
-        apply rngl_1_add_cos_div_2_nonneg.
-      }
-      apply not_eq_sym.
-Check rngl_lt_cos_lt_cos_div2.
+Check rngl_lt_add_cos_lt_add_cos_div2.
 ...
 (* previous version *)
 Theorem angle_eucl_dist_div_2_0_lt :
