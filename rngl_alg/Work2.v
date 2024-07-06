@@ -1494,16 +1494,21 @@ rewrite angle_sub_0_l in Hd.
 rewrite rngl_cos_opp in Hd.
 Theorem glop :
   ∀ a b θ,
-  (1 < a + rngl_cos θ)%L
+  b ≠ 1%L
+  → (2 * (1 - b)² ≤ 2 - a)%L
+  → (1 < a + rngl_cos θ)%L
   → (1 < b + rngl_cos (θ / ₂))%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Ha.
+intros * Hb1 Hba Ha.
 (*1*)
-apply (rngl_lt_sub_lt_add_l Hop Hor).
-apply (rngl_lt_cos_lt_cos_div2 a).
-(* mouais, bon, c'est pas gagné *)
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | | easy | ]. {
 ...1
 cbn.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
