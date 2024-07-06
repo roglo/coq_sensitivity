@@ -1504,6 +1504,7 @@ destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzb Hb2 Hd.
@@ -1511,6 +1512,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
+assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 intros * Hzb Hb2 Hd.
 assert (Hza : (0 ≤ a)%L). {
   eapply (rngl_le_trans Hor). 2: {
@@ -1569,9 +1571,7 @@ apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
 apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | | | easy ]. {
   intros H; apply Hb2.
   apply (f_equal (λ x, (x * 2)%L)) in H.
-  rewrite (rngl_div_mul Hon Hiv) in H. 2: {
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  }
+  rewrite (rngl_div_mul Hon Hiv) in H; [ | easy ].
   rewrite (rngl_mul_1_l Hon) in H.
   rewrite <- H.
   rewrite (rl_sqrt_squ Hon Hop Hor).
@@ -1582,7 +1582,13 @@ apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | | | easy ]. {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_div Hii).
+  rewrite (rngl_mul_div Hi1); [ | easy ].
+  rewrite (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite (rngl_div_div Hos Hon Hiv); [ | easy | easy ].
+  rewrite fold_rngl_squ.
+  rewrite <- (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  apply (rngl_le_add_le_sub_l Hop Hor).
 ...
 Search (_ / _ = _ → _)%L.
 ...
