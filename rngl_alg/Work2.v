@@ -1495,25 +1495,83 @@ apply IHn.
    donner entre a et b *)
 Theorem angle_eucl_dist_div_2_0_lt :
   ∀ a b θ,
-  (angle_eucl_dist θ 0 < b)%L
-  → (angle_eucl_dist (θ / ₂) 0 < a)%L.
+  (0 ≤ b)%L
+  → (angle_eucl_dist θ 0 < a)%L
+  → (angle_eucl_dist (θ / ₂) 0 < b)%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hd.
+  intros * Hzb Hd.
   rewrite (H1 (angle_eucl_dist _ _)) in Hd.
-  rewrite (H1 b) in Hd.
+  rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
-intros * Hd.
+intros * Hzb Hd.
+assert (Hza : (0 ≤ a)%L). {
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_lt_le_incl Hor) in Hd.
+    apply Hd.
+  }
+  apply angle_eucl_dist_nonneg.
+}
+move Hza after Hzb.
 rewrite angle_eucl_dist_is_sqrt.
 rewrite angle_sub_0_l.
 rewrite rngl_cos_opp.
 rewrite angle_eucl_dist_is_sqrt in Hd.
 rewrite angle_sub_0_l in Hd.
 rewrite rngl_cos_opp in Hd.
+(*
+rewrite <- one_sub_squ_cos_add_squ_sin.
+rewrite <- one_sub_squ_cos_add_squ_sin in Hd.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite angle_sub_0_l.
+rewrite rngl_cos_opp.
+*)
+rewrite <- (rngl_abs_nonneg_eq Hop Hor b)%L; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+  apply rl_sqrt_nonneg.
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+(**)
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a)%L in Hd; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hd. 2: {
+  apply rl_sqrt_nonneg.
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd.
+rewrite (rngl_squ_sqrt Hon) in Hd. 2: {
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite (rngl_mul_comm Hic) in Hd.
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hd. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
+apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | | | easy ].
+...
+Check rngl_lt_add_cos_lt_add_cos_div2.
+Search (_ < _ / _)%L.
+...
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
 Check rngl_lt_add_cos_lt_add_cos_div2.
 ...
 (* previous version *)
