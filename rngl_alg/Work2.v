@@ -1565,8 +1565,43 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     subst m.
     clear Hm Hp.
     rewrite angle_div_2_pow_add_r.
-remember (θ / ₂^i)%A as t.
-Search (angle_eucl_dist (_ / ₂^_)).
+Theorem angle_eucl_dist_div_2_pow_0_lt :
+  ∀ n a b θ,
+  (0 ≤ a ≤ b)%L
+  → a ≠ √2%L
+  → (0 ≤ rngl_sin θ)%L
+  → (angle_eucl_dist θ 0 < a)%L
+  → (angle_eucl_dist (θ / ₂^n) 0 < b)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hab Ha2 Hzs Hd.
+  rewrite (H1 (angle_eucl_dist _ _)) in Hd.
+  rewrite (H1 a) in Hd.
+  now apply (rngl_lt_irrefl Hor) in Hd.
+}
+...
+intros * Hab Ha2 Hzs Hd.
+revert θ Hd Hzs.
+induction n; intros. {
+  cbn.
+  eapply (rngl_lt_le_trans Hor); [ apply Hd | easy ].
+}
+rewrite angle_div_2_pow_succ_r_2.
+apply IHn; [ | apply rngl_sin_div_2_nonneg ].
+apply (angle_eucl_dist_div_2_0_lt a); [ easy | easy | | easy | easy ].
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1).
+...
+  rewrite rngl_pow_0_r in Hd.
+  now rewrite (rngl_mul_1_r Hon) in Hd.
+}
+...
 (* Theorem ci-dessous : faux *)
 (* voir si on ne peut pas voir si (p + N) est suffisant ; avant,
    j'avais mis "(p + Nat.log2_up N)" *)
@@ -1585,6 +1620,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
 intros * Hd.
+...
 revert θ Hd.
 induction n; intros. {
   rewrite rngl_pow_0_r in Hd.
@@ -1612,6 +1648,23 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2 ^ S n))%L; [ | | | | easy ]. {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 } {
   intros Ha.
+  apply (f_equal rngl_squ) in Ha.
+  rewrite (rngl_squ_sqrt Hon) in Ha. 2: {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  rewrite (rngl_squ_mul Hic) in Ha.
+(*1*)
+  destruct n. {
+    cbn in Ha.
+    rewrite (rngl_squ_1 Hon) in Ha.
+    rewrite (rngl_mul_1_r Hon) in Ha.
+...1
+  (* lemma *)
+  progress unfold rngl_squ in Ha at 2.
+  rewrite <- (rngl_pow_add_r Hon) in Ha.
+  rewrite Nat_add_diag in Ha.
+  rewrite _add_diag Hon _ n) in Ha.
+  rewrite (rngl_squ_pow) in Ha.
 ...
 Search (_ / _ = _ → _)%L.
 ...
