@@ -1564,10 +1564,12 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     assert (H : m = i + (p + N)) by flia Hm Hp.
     subst m.
     clear Hm Hp.
+(*
     rewrite angle_div_2_pow_add_r.
+*)
 Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a b θ,
-  (0 ≤ a ≤ b)%L
+  (0 ≤ a ≤ b * 2^n)%L
   → a ≠ √2%L
   → (0 ≤ rngl_sin θ)%L
   → (angle_eucl_dist θ 0 < a)%L
@@ -1581,14 +1583,25 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
-...
 intros * Hab Ha2 Hzs Hd.
-revert θ Hd Hzs.
+revert a θ Hd Hzs Hab Ha2.
 induction n; intros. {
+  rewrite rngl_pow_0_r in Hab.
+  rewrite (rngl_mul_1_r Hon) in Hab.
   cbn.
   eapply (rngl_lt_le_trans Hor); [ apply Hd | easy ].
 }
+(*1*)
+rewrite angle_div_2_pow_succ_r_1.
+Inspect 1.
+apply (angle_eucl_dist_div_2_0_lt a).
+...1
 rewrite angle_div_2_pow_succ_r_2.
+apply (IHn a).
+...
+apply IHn. 2: {
+cbn.
+...
 apply IHn; [ | apply rngl_sin_div_2_nonneg ].
 apply (angle_eucl_dist_div_2_0_lt a); [ easy | easy | | easy | easy ].
 rewrite (rngl_squ_sub Hop Hic Hon).
@@ -1596,7 +1609,8 @@ rewrite (rngl_squ_1 Hon).
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_comm Hic).
 rewrite (rngl_div_mul Hon Hiv). 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1).
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
 ...
   rewrite rngl_pow_0_r in Hd.
   now rewrite (rngl_mul_1_r Hon) in Hd.
