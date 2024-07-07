@@ -1591,9 +1591,12 @@ induction n; intros. {
   cbn.
   eapply (rngl_lt_le_trans Hor); [ apply Hd | easy ].
 }
+Admitted.
+...
+apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
+...
 (*1*)
 rewrite angle_div_2_pow_succ_r_1.
-Inspect 1.
 apply (angle_eucl_dist_div_2_0_lt a).
 ...1
 rewrite angle_div_2_pow_succ_r_2.
