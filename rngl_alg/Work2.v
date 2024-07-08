@@ -1396,6 +1396,26 @@ rewrite <- (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
 now apply (rngl_le_add_le_sub_l Hop Hor).
 Qed.
 
+Theorem rngl_pow_le_mono_r :
+  rngl_has_opp T = true →
+  rngl_has_1 T = true →
+  rngl_is_ordered T = true →
+  ∀ a m n, (1 ≤ a)%L → m ≤ n → (a ^ m ≤ a ^ n)%L.
+Proof.
+intros Hop Hon Hor * H1a Hmn.
+revert n Hmn.
+induction m; intros; cbn. {
+  now apply (rngl_pow_ge_1 Hop Hon Hor).
+}
+destruct n; [ easy | cbn ].
+apply Nat.succ_le_mono in Hmn.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_le_trans Hor _ 1); [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+now apply IHm.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1583,7 +1603,8 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 *)
 (*1*)
 rewrite angle_div_2_pow_succ_r_1.
-apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L; [ | | | ].
+apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
+...
 2: {
   rewrite rngl_pow_succ_r, (rngl_mul_comm Hic 2)%L.
   rewrite rngl_mul_assoc.
@@ -1594,10 +1615,14 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L; [ | | | ].
   apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
     apply (rngl_squ_nonneg Hop Hor).
   }
-Search ((_ ^ _)²)%L.
-Search ((_ ^ _)^ _)%L.
-About rngl_pow_mul_r.
-Check rngl_pow_squ.
+  do 2 rewrite (rngl_pow_squ Hic Hon).
+  apply (rngl_pow_le_mono_r Hop Hon Hor). {
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply Nat.mul_le_mono_l.
+  apply Nat.le_succ_diag_r.
+}
 ...
 4: {
   apply (IHn a); [ easy | easy | ].
