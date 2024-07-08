@@ -1603,6 +1603,11 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 ...
 *)
 (*1*)
+(*2*)
+specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
+(* ah non, c'est dans l'autre sens, je crois, mais faut que je réfléchisse
+   quand même à cette piste *)
+...2
 rewrite angle_div_2_pow_succ_r_1.
 apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (2 ^ S n))%L. {
@@ -1632,6 +1637,8 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   destruct n; [ easy | ].
   now apply rngl_sin_div_2_pow_nat_nonneg.
 } {
+  specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
+...
   apply (IHn a); [ easy | easy | | ].
 2: {
 ...1
