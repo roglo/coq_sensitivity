@@ -1604,9 +1604,18 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 *)
 (*1*)
 (*2*)
-specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
-(* ah non, c'est dans l'autre sens, je crois, mais faut que je réfléchisse
-   quand même à cette piste *)
+eapply (rngl_le_lt_trans Hor). {
+  apply (angle_eucl_dist_triangular (θ / ₂^S n) (θ / ₂^n) 0).
+}
+rewrite angle_eucl_dist_move_0_l.
+rewrite <- angle_add_div_2_pow_diag at 1.
+rewrite angle_div_2_pow_succ_r_1.
+rewrite angle_add_sub.
+rewrite <- angle_div_2_pow_succ_r_1.
+(* mouais, bon, ça complique le problème au lieu de le résoudre *)
+...
+  ============================
+  (angle_eucl_dist (θ / ₂^S n) 0 + angle_eucl_dist (θ / ₂^n) 0 < b)%L
 ...2
 rewrite angle_div_2_pow_succ_r_1.
 apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
