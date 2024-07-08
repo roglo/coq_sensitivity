@@ -1628,11 +1628,12 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   }
   apply Nat.mul_le_mono_l.
   apply Nat.le_succ_diag_r.
-}
-...
-4: {
-  apply (IHn a); [ easy | easy | ].
-  (* ok *)
+} {
+  destruct n; [ easy | ].
+  now apply rngl_sin_div_2_pow_nat_nonneg.
+} {
+  apply (IHn a); [ easy | easy | | ].
+2: {
 ...1
 rewrite angle_div_2_pow_succ_r_2.
 apply (IHn a).
