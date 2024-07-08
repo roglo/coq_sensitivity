@@ -1581,6 +1581,7 @@ Theorem angle_eucl_dist_div_2_pow_0_lt :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hab Hab2 Hzs Hd.
@@ -1604,8 +1605,13 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 (*1*)
 rewrite angle_div_2_pow_succ_r_1.
 apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
-...
-2: {
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (2 ^ S n))%L. {
+    apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  now apply (rngl_le_trans Hor _ a).
+} {
   rewrite rngl_pow_succ_r, (rngl_mul_comm Hic 2)%L.
   rewrite rngl_mul_assoc.
   rewrite (rngl_mul_div Hi1); [ | apply (rngl_2_neq_0 Hon Hop Hc1 Hor) ].
