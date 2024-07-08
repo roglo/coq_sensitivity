@@ -21,51 +21,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-
-Theorem rngl_pow_1_l : rngl_has_1 T = true → ∀ n, (1 ^ n = 1)%L.
-Proof.
-intros Hon *.
-induction n; [ easy | cbn ].
-rewrite IHn.
-apply (rngl_mul_1_l Hon).
-Qed.
-
-Theorem rngl_pow_mul_l :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  ∀ a b n, ((a * b) ^ n = a ^ n * b ^ n)%L.
-Proof.
-intros Hic Hon *.
-induction n; cbn. {
-  symmetry; apply (rngl_mul_1_l Hon).
-}
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite IHn.
-rewrite (rngl_mul_comm Hic).
-rewrite <- rngl_mul_assoc.
-f_equal.
-apply (rngl_mul_comm Hic).
-Qed.
-
-Theorem rngl_pow_mul_r :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  ∀ a m n, (a ^ (m * n) = (a ^ m) ^ n)%L.
-Proof.
-intros Hic Hon *.
-revert n.
-induction m; intros. {
-  symmetry; apply (rngl_pow_1_l Hon).
-}
-rewrite rngl_pow_succ_r.
-cbn.
-rewrite (rngl_pow_add_r Hon).
-rewrite IHm.
-symmetry.
-apply (rngl_pow_mul_l Hic Hon).
-Qed.
-
 Context {rl : real_like_prop T}.
 
 Theorem gc_power_im_0 :

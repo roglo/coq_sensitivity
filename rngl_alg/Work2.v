@@ -1554,20 +1554,22 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
 Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a b θ,
   (0 ≤ a ≤ b * 2^n)%L
+  → ((a * 2 ^ n)² + (1 - b² / 2)² ≤ 1)%L
   → (0 ≤ rngl_sin θ)%L
   → (angle_eucl_dist θ 0 < a)%L
   → (angle_eucl_dist (θ / ₂^n) 0 < b)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hab Hzs Hd.
+  intros * Hab Hab2 Hzs Hd.
   rewrite (H1 (angle_eucl_dist _ _)) in Hd.
   rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
-intros * Hab Hzs Hd.
-revert a b θ Hd Hzs Hab.
+intros * Hab Hab2 Hzs Hd.
+revert a b θ Hd Hzs Hab Hab2.
 induction n; intros. {
   rewrite rngl_pow_0_r in Hab.
   rewrite (rngl_mul_1_r Hon) in Hab.
@@ -1581,11 +1583,21 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 *)
 (*1*)
 rewrite angle_div_2_pow_succ_r_1.
-apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L; [ | | | ]. 2: {
-(* ça ne va pas le faire, il y a un terme en b^4 à gauche de l'inégalité *)
-...
-  ============================
-  ((a * 2 ^ n)² + (1 - b² / 2)² ≤ 1)%L
+apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L; [ | | | ].
+2: {
+  rewrite rngl_pow_succ_r, (rngl_mul_comm Hic 2)%L.
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_div Hi1); [ | apply (rngl_2_neq_0 Hon Hop Hc1 Hor) ].
+  eapply (rngl_le_trans Hor); [ | apply Hab2 ].
+  apply (rngl_add_le_mono_r Hop Hor).
+  do 2 rewrite (rngl_squ_mul Hic).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+Search ((_ ^ _)²)%L.
+Search ((_ ^ _)^ _)%L.
+About rngl_pow_mul_r.
+Check rngl_pow_squ.
 ...
 4: {
   apply (IHn a); [ easy | easy | ].
