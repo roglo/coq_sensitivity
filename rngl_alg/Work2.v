@@ -1553,6 +1553,7 @@ Theorem angle_eucl_dist_div_2_pow_0_lt :
   ∀ n a b θ,
   (0 ≤ a ≤ b * 2^n)%L
   → ((a * 2 ^ n)² + (1 - b² / 2)² ≤ 1)%L
+  → ((a * 2 ^ n)² ≤ rngl_of_nat 3)%L
   → (0 ≤ rngl_sin θ)%L
   → (angle_eucl_dist θ 0 < a)%L
   → (angle_eucl_dist (θ / ₂^n) 0 < b)%L.
@@ -1562,13 +1563,13 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hab Hab2 Hzs Hd.
+  intros * Hab Hab2 Ha3 Hzs Hd.
   rewrite (H1 (angle_eucl_dist _ _)) in Hd.
   rewrite (H1 a) in Hd.
   now apply (rngl_lt_irrefl Hor) in Hd.
 }
-intros * Hab Hab2 Hzs Hd.
-revert a b θ Hd Hzs Hab Hab2.
+intros * Hab Hab2 Ha3 Hzs Hd.
+revert a b θ Hd Hzs Hab Hab2 Ha3.
 induction n; intros. {
   rewrite rngl_pow_0_r in Hab.
   rewrite (rngl_mul_1_r Hon) in Hab.
@@ -1610,7 +1611,28 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   destruct n; [ easy | ].
   now apply rngl_sin_div_2_pow_nat_nonneg.
 } {
-  apply (IHn a); [ easy | easy | | ]. {
+  apply (IHn a); [ easy | easy | | | ]; cycle 2.  {
+    eapply (rngl_le_trans Hor); [ | apply Ha3 ].
+    apply (rngl_abs_le_squ_le Hop Hor).
+    do 2 rewrite (rngl_abs_mul Hop Hi1 Hor).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+      apply (rngl_abs_nonneg Hop Hor).
+    }
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_lt_le_incl Hor).
+      apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+      apply (rngl_lt_le_incl Hor).
+      apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_pow_le_mono_r Hop Hon Hor).
+...
+2: {
+...
+  } {
     split; [ easy | ].
     rewrite <- rngl_mul_assoc.
     rewrite <- (rngl_pow_add_r Hon).
@@ -1620,6 +1642,7 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
     apply (rngl_le_add_l Hor).
     apply (rngl_0_le_1 Hon Hop Hor).
   }
+...
   do 2 rewrite (rngl_squ_mul Hic).
   replace (2 ^ S n)²%L with (2 * 2 ^ S (2 * n))%L. 2: {
     rewrite <- rngl_pow_succ_r.
