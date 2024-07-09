@@ -5356,6 +5356,26 @@ apply (rngl_mul_le_compat_nonneg Hop Hor). {
 }
 Qed.
 
+Theorem rngl_pow_le_mono_r :
+  rngl_has_opp T = true →
+  rngl_has_1 T = true →
+  rngl_is_ordered T = true →
+  ∀ a m n, (1 ≤ a)%L → m ≤ n → (a ^ m ≤ a ^ n)%L.
+Proof.
+intros Hop Hon Hor * H1a Hmn.
+revert n Hmn.
+induction m; intros; cbn. {
+  now apply (rngl_pow_ge_1 Hop Hon Hor).
+}
+destruct n; [ easy | cbn ].
+apply Nat.succ_le_mono in Hmn.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  apply (rngl_le_trans Hor _ 1%L); [ | easy ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+now apply IHm.
+Qed.
+
 Theorem rngl_le_0_mul :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
