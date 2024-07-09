@@ -1592,7 +1592,7 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   rewrite (rngl_mul_0_l Hos).
   now apply (rngl_le_trans Hor _ a).
 } {
-  rewrite rngl_pow_succ_r, (rngl_mul_comm Hic 2)%L.
+  rewrite rngl_pow_succ_r, (rngl_mul_comm Hic 2).
   rewrite rngl_mul_assoc.
   rewrite (rngl_mul_div Hi1); [ | apply (rngl_2_neq_0 Hon Hop Hc1 Hor) ].
   eapply (rngl_le_trans Hor); [ | apply Hab2 ].
@@ -1625,12 +1625,10 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   do 2 rewrite (rngl_squ_mul Hic).
   replace (2 ^ S n)²%L with (2 * 2 ^ S (2 * n))%L. 2: {
     rewrite <- rngl_pow_succ_r.
-...
-    rewrite (rngl_pow_squ Hic Hon 2 (S n))%L.
+    rewrite (rngl_pow_squ Hic Hon 2 (S n)).
     f_equal; flia.
   }
-...
-  rewrite (rngl_mul_comm Hic 2)%L.
+  rewrite (rngl_mul_comm Hic 2).
   rewrite rngl_mul_assoc.
   rewrite (rngl_mul_div Hi1). 2: {
     apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
@@ -1640,15 +1638,13 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   rewrite (rngl_mul_1_r Hon).
   rewrite rngl_add_assoc.
   rewrite (rngl_add_sub_assoc Hop).
-...
-  rewrite (rngl_add_comm _ 1)%L.
+  rewrite (rngl_add_comm _ 1).
   rewrite <- (rngl_add_sub_swap Hop).
   apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite <- rngl_add_assoc.
   apply (rngl_add_le_mono_l Hop Hor).
   apply (rngl_le_add_le_sub_l Hop Hor).
-...
-  rewrite (rngl_mul_comm Hic 2)%L.
+  rewrite (rngl_mul_comm Hic 2).
   rewrite <- rngl_mul_assoc.
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_squ_mul Hic).
@@ -1657,10 +1653,28 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
     apply (rngl_squ_nonneg Hop Hor).
   }
-About rngl_mul_comm.
-  rewrite (rngl_mul_comm Hic _ 2).
-...
-2: {
+  progress replace (2 ^ S (2 * n) * 2 - (2 ^ n)²)%L
+  with (rngl_of_nat 3 * (2 ^ n)²)%L. 2: {
+    progress unfold rngl_squ at 2.
+    rewrite (rngl_mul_comm Hic _ 2).
+    rewrite <- rngl_pow_succ_r.
+    progress replace (S (S (2 * n))) with (n + (n + 2)) by flia.
+    rewrite (rngl_pow_add_r Hon).
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    rewrite (rngl_pow_add_r Hon).
+    rewrite <- (rngl_mul_1_r Hon (2 ^ n))%L at 4.
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    rewrite rngl_mul_assoc.
+    rewrite fold_rngl_squ.
+    rewrite (rngl_mul_comm Hic).
+    f_equal; cbn.
+    rewrite rngl_mul_add_distr_r.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_1_r Hon).
+    do 3 rewrite rngl_add_assoc.
+    rewrite (rngl_add_sub Hos).
+    now rewrite rngl_add_0_r.
+  }
 ....
   specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
 ...
