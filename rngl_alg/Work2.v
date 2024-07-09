@@ -1673,47 +1673,25 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
     rewrite (rngl_add_sub Hos).
     now rewrite rngl_add_0_r.
   }
-  progress replace (2 ^ S (2 * n))²%L with (2 ^ 3 * (2 ^ n)²)%L. 2: {
+  progress replace (2 ^ S (2 * n))²%L with (2 ^ 2 * ((2 ^ n)²)²)%L. 2: {
     symmetry.
     progress unfold rngl_squ.
     rewrite rngl_mul_assoc.
-    do 3 rewrite <- (rngl_pow_add_r Hon).
-    f_equal.
-    cbn.
-    rewrite Nat.add_0_r.
-...
-  progress replace (2 ^ S (2 * n))²%L with (2 ^ (2 ^ n + 2) * (2 ^ n)²)%L. 2: {
-(2 ^ (2n+1)) ^ 2
-2 ^ (2*(2n+1))
-2 ^ (4n+2)
-4 * 2 ^ 4n
-4 * (2 ^ n)^4
-4 * (2 ^ n)^2 * (2 ^ n)^2
-...
-    symmetry.
-    progress unfold rngl_squ.
-    rewrite rngl_mul_assoc.
-    do 3 rewrite <- (rngl_pow_add_r Hon).
-    f_equal.
-    cbn.
-    rewrite Nat.add_0_r.
-...2: {
-    rewrite (rngl_pow_squ Hic Hon).
-    rewrite (rngl_pow_mul_r Hic Hon).
-    rewrite rngl_pow_succ_r.
-    rewrite (rngl_pow_add_r Hon).
-    rewrite <- (rngl_pow_mul_r Hic Hon).
-2: {
-...
-    cbn.
-    rewrite Nat.add_0_r.
-    rewrite rngl_pow_mul_r.
-(2 ^ (2n+1)) ^ 2
-(2 ^ 2n * 2) ^ 2
-4 * (2 ^ 2n)^2
-4 * (2 ^ n)^2 ^2
-2 ^ (2 ^ n + 2) * (2 ^ n)^2
-4 * (2 ^ n)^2 * (2 ^ n)^2
+    do 4 rewrite <- (rngl_pow_add_r Hon).
+    f_equal; flia.
+  }
+  progress unfold rngl_squ at 2.
+  do 2 rewrite rngl_mul_assoc.
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor). {
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+  rewrite <- rngl_mul_assoc.
+  rewrite <- (rngl_squ_pow_2 Hon).
+  rewrite <- (rngl_squ_mul Hic).
+  rewrite <- rngl_pow_succ_r.
+  rewrite <- (rngl_squ_mul Hic).
+(* bon, je vais mettre ça en hypothèse, en espérant que l'appelant
+   de ce théorème va s'en contenter *)
 ...
 2: {
 ....
