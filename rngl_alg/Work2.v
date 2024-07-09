@@ -1225,8 +1225,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now rewrite angle_eucl_dist_diag.
 }
 intros ε Hε.
-progress unfold angle_lim in Hlim.
-progress unfold is_limit_when_tending_to_inf in Hlim.
 specialize (Hlim (ε / rngl_of_nat n)%L).
 assert (Hεz : (0 < ε / rngl_of_nat n)%L). {
   apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
@@ -1278,8 +1276,8 @@ destruct (rngl_lt_dec Hor b 0) as [Hblz| Hbgz]. {
   apply rngl_1_add_cos_div_2_nonneg.
 }
 apply (rngl_nlt_ge Hor) in Hbgz.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor b)%L; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
@@ -1350,8 +1348,8 @@ rewrite rngl_cos_opp.
 rewrite angle_eucl_dist_is_sqrt in Hd.
 rewrite angle_sub_0_l in Hd.
 rewrite rngl_cos_opp in Hd.
-rewrite <- (rngl_abs_nonneg_eq Hop Hor b)%L; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply rl_sqrt_nonneg.
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
@@ -1366,8 +1364,8 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 apply (rngl_lt_sub_lt_add_r Hop Hor).
-rewrite <- (rngl_abs_nonneg_eq Hop Hor a)%L in Hd; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hd. 2: {
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a) in Hd; [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd. 2: {
   apply rl_sqrt_nonneg.
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
@@ -1383,7 +1381,7 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hd. 2: {
 }
 apply (rngl_lt_sub_lt_add_r Hop Hor) in Hd.
 apply (rngl_lt_add_cos_lt_add_cos_div2 (a² / 2))%L; [ | easy | easy ].
-apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii _ _ 2)%L. {
+apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii _ _ 2). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 rewrite (rngl_mul_comm Hic).
@@ -1585,7 +1583,7 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 (*1*)
 rewrite angle_div_2_pow_succ_r_1.
 apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (2 ^ S n))%L. {
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (2 ^ S n)). {
     apply (rngl_pow_pos_nonneg Hon Hop Hiv Hc1 Hor).
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
@@ -1662,7 +1660,7 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
     rewrite (rngl_pow_add_r Hon).
     rewrite <- (rngl_mul_sub_distr_l Hop).
     rewrite (rngl_pow_add_r Hon).
-    rewrite <- (rngl_mul_1_r Hon (2 ^ n))%L at 4.
+    rewrite <- (rngl_mul_1_r Hon (2 ^ n)) at 4.
     rewrite <- (rngl_mul_sub_distr_l Hop).
     rewrite rngl_mul_assoc.
     rewrite fold_rngl_squ.
