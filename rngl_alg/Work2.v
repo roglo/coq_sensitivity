@@ -1583,20 +1583,6 @@ apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
 ...
 *)
 (*1*)
-(*2*)
-eapply (rngl_le_lt_trans Hor). {
-  apply (angle_eucl_dist_triangular (θ / ₂^S n) (θ / ₂^n) 0).
-}
-rewrite angle_eucl_dist_move_0_l.
-rewrite <- angle_add_div_2_pow_diag at 1.
-rewrite angle_div_2_pow_succ_r_1.
-rewrite angle_add_sub.
-rewrite <- angle_div_2_pow_succ_r_1.
-(* mouais, bon, ça complique le problème au lieu de le résoudre *)
-...
-  ============================
-  (angle_eucl_dist (θ / ₂^S n) 0 + angle_eucl_dist (θ / ₂^n) 0 < b)%L
-...2
 rewrite angle_div_2_pow_succ_r_1.
 apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (2 ^ S n))%L. {
@@ -1626,10 +1612,26 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   destruct n; [ easy | ].
   now apply rngl_sin_div_2_pow_nat_nonneg.
 } {
+  apply (IHn a); [ easy | easy | | ]. {
+    split; [ easy | ].
+    rewrite <- rngl_mul_assoc.
+    rewrite <- (rngl_pow_add_r Hon).
+    rewrite <- (rngl_mul_1_r Hon a) at 1.
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+    apply (rngl_pow_ge_1 Hop Hon Hor).
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  do 2 rewrite (rngl_squ_mul Hic).
+  rewrite (rngl_pow_squ Hic Hon 2 (S n))%L.
+  rewrite (rngl_pow_mul_r Hic Hon).
+  rewrite (rngl_pow_succ_r 1).
+Search (_ ^ 1)%L.
+  rewrite (rngl_pow_1_r).
+2: {
+...
   specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
 ...
-  apply (IHn a); [ easy | easy | | ].
-2: {
 ...1
 rewrite angle_div_2_pow_succ_r_2.
 apply (IHn a).

@@ -5356,6 +5356,14 @@ apply (rngl_mul_le_compat_nonneg Hop Hor). {
 }
 Qed.
 
+Theorem rngl_pow_1_r :
+  rngl_has_1 T = true →
+  ∀ a, (a ^ 1)%L = a.
+Proof.
+intros Hon *; cbn.
+apply (rngl_mul_1_r Hon).
+Qed.
+
 Theorem rngl_pow_le_mono_r :
   rngl_has_opp T = true →
   rngl_has_1 T = true →
