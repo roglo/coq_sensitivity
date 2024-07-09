@@ -1625,9 +1625,11 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   do 2 rewrite (rngl_squ_mul Hic).
   replace (2 ^ S n)²%L with (2 * 2 ^ S (2 * n))%L. 2: {
     rewrite <- rngl_pow_succ_r.
+...
     rewrite (rngl_pow_squ Hic Hon 2 (S n))%L.
     f_equal; flia.
   }
+...
   rewrite (rngl_mul_comm Hic 2)%L.
   rewrite rngl_mul_assoc.
   rewrite (rngl_mul_div Hi1). 2: {
@@ -1638,19 +1640,25 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
   rewrite (rngl_mul_1_r Hon).
   rewrite rngl_add_assoc.
   rewrite (rngl_add_sub_assoc Hop).
+...
   rewrite (rngl_add_comm _ 1)%L.
   rewrite <- (rngl_add_sub_swap Hop).
   apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite <- rngl_add_assoc.
   apply (rngl_add_le_mono_l Hop Hor).
   apply (rngl_le_add_le_sub_l Hop Hor).
+...
   rewrite (rngl_mul_comm Hic 2)%L.
   rewrite <- rngl_mul_assoc.
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_squ_mul Hic).
   progress unfold rngl_squ at 1.
   rewrite <- rngl_mul_assoc.
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+About rngl_mul_comm.
+  rewrite (rngl_mul_comm Hic _ 2).
 ...
 2: {
 ....
