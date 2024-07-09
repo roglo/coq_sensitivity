@@ -1675,6 +1675,49 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
     rewrite (rngl_add_sub Hos).
     now rewrite rngl_add_0_r.
   }
+  progress replace (2 ^ S (2 * n))²%L with (2 ^ 3 * (2 ^ n)²)%L. 2: {
+    symmetry.
+    progress unfold rngl_squ.
+    rewrite rngl_mul_assoc.
+    do 3 rewrite <- (rngl_pow_add_r Hon).
+    f_equal.
+    cbn.
+    rewrite Nat.add_0_r.
+...
+  progress replace (2 ^ S (2 * n))²%L with (2 ^ (2 ^ n + 2) * (2 ^ n)²)%L. 2: {
+(2 ^ (2n+1)) ^ 2
+2 ^ (2*(2n+1))
+2 ^ (4n+2)
+4 * 2 ^ 4n
+4 * (2 ^ n)^4
+4 * (2 ^ n)^2 * (2 ^ n)^2
+...
+    symmetry.
+    progress unfold rngl_squ.
+    rewrite rngl_mul_assoc.
+    do 3 rewrite <- (rngl_pow_add_r Hon).
+    f_equal.
+    cbn.
+    rewrite Nat.add_0_r.
+...2: {
+    rewrite (rngl_pow_squ Hic Hon).
+    rewrite (rngl_pow_mul_r Hic Hon).
+    rewrite rngl_pow_succ_r.
+    rewrite (rngl_pow_add_r Hon).
+    rewrite <- (rngl_pow_mul_r Hic Hon).
+2: {
+...
+    cbn.
+    rewrite Nat.add_0_r.
+    rewrite rngl_pow_mul_r.
+(2 ^ (2n+1)) ^ 2
+(2 ^ 2n * 2) ^ 2
+4 * (2 ^ 2n)^2
+4 * (2 ^ n)^2 ^2
+2 ^ (2 ^ n + 2) * (2 ^ n)^2
+4 * (2 ^ n)^2 * (2 ^ n)^2
+...
+2: {
 ....
   specialize (angle_eucl_dist_triangular 0 (θ / ₂^S n) (θ / ₂^n)) as H1.
 ...
