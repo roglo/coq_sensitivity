@@ -411,7 +411,7 @@ destruct zs. {
     rewrite Hu in Hxz.
     progress unfold seq_angle_to_div_nat in Hxz.
     apply (rngl_le_antisymm Hor) in Hzs; [ easy | ].
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2%L). {
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ 2). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
     now rewrite rngl_mul_0_r.
@@ -896,7 +896,7 @@ destruct Hu as (M, HM).
 destruct Hv as (N, HN).
 exists (max M N).
 intros n Hn.
-specialize (rngl_div_add_distr_r Hiv ε ε 2)%L as H2.
+specialize (rngl_div_add_distr_r Hiv ε ε 2) as H2.
 rewrite (rngl_add_diag2 Hon) in H2.
 rewrite (rngl_mul_div Hi1) in H2. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
