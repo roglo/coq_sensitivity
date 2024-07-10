@@ -1706,8 +1706,7 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     assert (H : m = i + (p + N)) by flia Hm Hp.
     subst m.
     clear Hm Hp.
-    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N)%L).
-(* ah mais non, le but 5 n'est pas bon *)
+    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N * 2 ^ i)%L).
 ...
 Search (_ / _ = _ → _)%L.
 ...
