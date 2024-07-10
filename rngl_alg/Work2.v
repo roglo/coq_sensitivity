@@ -1554,6 +1554,27 @@ apply (angle_eucl_dist_div_2_0_lt (a * 2^S n))%L. {
 }
 Qed.
 
+Theorem angle_sub_le_mono_l :
+  ∀ θ2 θ3 θ1,
+  angle_add_overflow θ3 (- θ1) = false
+  → θ1 ≠ 0%A
+  → (θ1 ≤ θ2)%A
+  → (θ3 - θ2 ≤ θ3 - θ1)%A.
+Proof.
+intros * Hov H1z H12.
+apply angle_add_le_mono_l; [ easy | ].
+now apply angle_opp_le_compat_if.
+Qed.
+
+Theorem angle_mul_opp : ∀ n θ, (- (n * θ) = n * (- θ))%A.
+Proof.
+intros.
+induction n; cbn; [ apply angle_opp_0 | ].
+rewrite angle_opp_add_distr.
+rewrite IHn.
+apply angle_add_comm.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1674,20 +1695,19 @@ Theorem angle_mul_le_mono_l_iff :
 Proof.
 intros * Hnz Hov H12.
 (*1*)
-Check angle_add_le_mono_l.
-Theorem angle_sub_le_mono_l :
-  ∀ θ2 θ3 θ1,
-  (θ1 ≤ θ2)%A
-  → (θ3 - θ2 ≤ θ3 - θ1)%A.
-Proof.
-intros * H12.
-Check angle_add_le_mono_l.
-apply (angle_add_le_mono_l (- θ3)) in H12.
-do 2 rewrite angle_add_opp_l in H12.
-(* ouais, bon, faut voir, c'est pas perdu, mais faut pas déconner non plus *)
-... ...
+destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
+  subst θ1.
+  apply angle_nonneg.
+}
 apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
-Search (_ - _ ≤ _ - _)%A.
+3: {
+  intros H1.
+  apply eq_angle_mul_0 in H1.
+  destruct H1 as [H1| (Hc, Hs)]; [ easy | ].
+...
+2: {
+  rewrite angle_mul_opp.
+Search (angle_add_overflow (_ * _) (_ * _)).
 ...1
 intros * Hnz Hov H12.
 induction n; [ easy | clear Hnz ].
