@@ -1664,6 +1664,27 @@ destruct n. {
 destruct n. {
   specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
   (* 2^i/n, c'est les i premières decimales binaires de 1/n *)
+(* et si j'essayais ça, et après je l'applique avec n=3 *)
+Theorem angle_mul_le_mono_l_iff :
+  ∀ n θ1 θ2,
+  n ≠ 0
+  → angle_mul_nat_overflow n θ2 = false
+  → (n * θ1 ≤ n * θ2)%A
+  → (θ1 ≤ θ2)%A.
+Proof.
+intros * Hnz Hov H12.
+induction n; [ easy | clear Hnz ].
+cbn in H12.
+Search (_ + _ ≤ _ + _)%A.
+(* mmm... soit je démontre _+_≤_+_ → _≤_, soit j'écris sous la
+   forme 0≤θ2-θ1... faut réfléchir *)
+...
+Check angle_mul_le_mono_l.
+apply (angle_mul_le_mono_l_iff 3).
+Search (angle_mul_nat_overflow _ _ = false).
+Search (_ * _ ≤ _ * _)%A.
+(* Ah oui, mais il faudrait démontrer angle_lim_seq_angle_not_mul_overflow.
+   Il y a un début loin ci-dessous mais pas fini *)
 ...
 (* il me semble que si on fait 2^i/n + 1 à la place de 2^i/n, ça
    converge aussi par valeurs supérieures, mais le test avec des
