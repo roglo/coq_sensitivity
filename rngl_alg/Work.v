@@ -219,17 +219,7 @@ rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_2 at 1.
 rewrite angle_div_2_pow_mul_2_pow.
 apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
-  apply angle_add_le_mono_l; cycle 1. {
-    apply angle_add_overflow_div_2_div_2.
-  } {
-    rewrite angle_div_2_pow_succ_r_2.
-    apply IHi.
-    apply Nat.mod_upper_bound.
-    now apply Nat.pow_nonzero.
-  }
-  apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
-    apply angle_add_overflow_div_2_div_2.
-  }
+  apply angle_add_le_mono_l; [ apply angle_add_overflow_div_2_div_2 | ].
   rewrite angle_div_2_pow_succ_r_2.
   apply IHi.
   apply Nat.mod_upper_bound.
@@ -241,14 +231,13 @@ Qed.
 
 Theorem angle_add_lt_mono_l :
   ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ2 = false
-  → angle_add_overflow θ1 θ3 = false
+  angle_add_overflow θ1 θ3 = false
   → (θ2 < θ3)%A → (θ1 + θ2 < θ1 + θ3)%A.
 Proof.
-intros * H12 H13 H23.
+intros * H13 H23.
 apply angle_lt_iff.
 split. {
-  apply angle_add_le_mono_l; [ easy | easy | ].
+  apply angle_add_le_mono_l; [ easy | ].
   now apply angle_lt_le_incl in H23.
 }
 intros H.
@@ -292,22 +281,8 @@ rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_2 at 1.
 rewrite angle_div_2_pow_mul_2_pow.
 apply angle_lt_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
-  apply angle_add_lt_mono_l; cycle 1. {
-    apply angle_add_overflow_div_2_div_2.
-  } {
-    rewrite angle_div_2_pow_succ_r_2.
-    apply IHi. {
-      apply Nat.mod_upper_bound.
-      now apply Nat.pow_nonzero.
-    }
-    intros H.
-    now apply eq_angle_div_2_0 in H.
-  }
-  apply angle_add_overflow_le with (θ2 := (θ / ₂)%A). 2: {
-    apply angle_add_overflow_div_2_div_2.
-  }
+  apply angle_add_lt_mono_l; [ apply angle_add_overflow_div_2_div_2 | ].
   rewrite angle_div_2_pow_succ_r_2.
-  apply angle_lt_le_incl.
   apply IHi. {
     apply Nat.mod_upper_bound.
     now apply Nat.pow_nonzero.
@@ -1666,9 +1641,7 @@ assert (Htt : (θ' / ₂ < θ / ₂)%A). {
   rewrite Hθ'.
   now apply angle_div_2_pow_mul_lt_angle.
 }
-apply (angle_add_lt_mono_l (θ' / ₂)) in Htt; cycle 1. {
-  apply angle_add_overflow_div_2_div_2.
-} {
+apply (angle_add_lt_mono_l (θ' / ₂)) in Htt. 2: {
   apply angle_add_overflow_div_2_div_2.
 }
 rewrite H in Htt.

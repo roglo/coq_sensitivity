@@ -1072,10 +1072,7 @@ split; intros H12. {
           apply (rngl_lt_le_incl Hor) in Hs2z.
           apply angle_add_overflow_lt_straight_le_straight.
           now apply rngl_sin_pos_lt_straight.
-          now apply rngl_sin_nonneg_le_straight.
-        } {
-          apply angle_add_straight_r_not_overflow.
-          now apply rngl_sin_pos_lt_straight.
+          apply angle_le_refl.
         } {
           apply (rngl_lt_le_incl Hor) in Hs2z.
           now apply rngl_sin_nonneg_angle_le_straight.

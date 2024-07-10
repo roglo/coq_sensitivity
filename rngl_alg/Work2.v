@@ -1675,9 +1675,20 @@ Proof.
 intros * Hnz Hov H12.
 induction n; [ easy | clear Hnz ].
 cbn in H12.
+(*
 Search (_ + _ ≤ _ + _)%A.
 (* mmm... soit je démontre _+_≤_+_ → _≤_, soit j'écris sous la
    forme 0≤θ2-θ1... faut réfléchir *)
+*)
+destruct n. {
+  do 2 rewrite angle_mul_0_l in H12.
+  now do 2 rewrite angle_add_0_r in H12.
+}
+destruct n. {
+  do 2 rewrite angle_mul_1_l in H12.
+  clear IHn.
+Search (_ + _ ≤ _ + _)%A.
+About angle_add_le_mono_l.
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).

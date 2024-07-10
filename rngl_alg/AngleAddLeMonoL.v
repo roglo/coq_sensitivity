@@ -3386,8 +3386,7 @@ Qed.
 
 Theorem angle_add_le_mono_l :
   ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ2 = false
-  → angle_add_overflow θ1 θ3 = false
+  angle_add_overflow θ1 θ3 = false
   → (θ2 ≤ θ3)%A
   → (θ1 + θ2 ≤ θ1 + θ3)%A.
 Proof.
@@ -3397,7 +3396,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Haov12 Haov13 H23.
+  intros * Haov13 H23.
   progress unfold angle_leb.
   rewrite (H1 (rngl_sin (θ1 + θ2))).
   rewrite (rngl_leb_refl Hor).
@@ -3406,7 +3405,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   do 2 rewrite (H1 (rngl_cos _)).
   apply (rngl_leb_refl Hor).
 }
-intros * Haov12 Haov13 H23.
+intros * Haov13 H23.
 progress unfold angle_leb in H23.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
@@ -3432,7 +3431,12 @@ destruct zs12. {
   destruct zs3; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
   apply rngl_leb_le in H23.
-  now apply angle_add_le_mono_l_lemma_49.
+  apply angle_add_le_mono_l_lemma_49; try easy.
+  apply (angle_add_overflow_le _ θ3); [ | easy ].
+  progress unfold angle_leb.
+  apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
+  rewrite Hzs2, Hzs3.
+  now apply rngl_leb_le.
 }
 apply (rngl_leb_gt Hor) in Hzs12.
 destruct zs2. {
@@ -3482,19 +3486,23 @@ destruct zs13. {
 }
 apply rngl_leb_le.
 apply (rngl_leb_gt Hor) in Hzs13.
-now apply angle_add_le_mono_l_lemma_52.
+apply angle_add_le_mono_l_lemma_52; try easy.
+apply (angle_add_overflow_le _ θ3); [ | easy ].
+progress unfold angle_leb.
+apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
+rewrite Hzs2, Hzs3.
+now apply rngl_leb_le.
 Qed.
 
 Theorem angle_add_le_mono_r :
   ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
-  → angle_add_overflow θ2 θ3 = false
+  angle_add_overflow θ2 θ3 = false
   → (θ1 ≤ θ2)%A
   → (θ1 + θ3 ≤ θ2 + θ3)%A.
 Proof.
-intros * H13 H23 H12.
+intros * H23 H12.
 do 2 rewrite (angle_add_comm _ θ3).
-apply angle_add_not_overflow_comm in H13, H23.
+apply angle_add_not_overflow_comm in H23.
 now apply angle_add_le_mono_l.
 Qed.
 
@@ -3514,25 +3522,15 @@ destruct Hn2 as (Hn2, H2n2).
 generalize Hn2; intros Hn12.
 apply (IHn θ1) in Hn12; [ | easy ].
 apply (angle_le_trans _ (θ1 + n * θ2))%A. {
-  apply angle_add_le_mono_l; [ | | easy ]. {
-    apply (angle_add_overflow_le _ (n * θ2))%A; [ easy | ].
-    apply angle_add_not_overflow_comm.
-    apply (angle_add_overflow_le _ θ2); [ easy | ].
-    now apply angle_add_not_overflow_comm.
-  } {
-    apply angle_add_not_overflow_comm.
-    apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
-    now apply angle_add_not_overflow_comm.
-  }
+  apply angle_add_le_mono_l; [ | easy ].
+  apply angle_add_not_overflow_comm.
+  apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
+  now apply angle_add_not_overflow_comm.
 } {
   rewrite (angle_add_comm θ1).
   rewrite (angle_add_comm θ2).
-  apply angle_add_le_mono_l; [ | | easy ]. {
-    apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
-    now apply angle_add_not_overflow_comm.
-  } {
-    now apply angle_add_not_overflow_comm.
-  }
+  apply angle_add_le_mono_l; [ | easy ].
+  now apply angle_add_not_overflow_comm.
 }
 Qed.
 
@@ -3551,8 +3549,7 @@ apply Nat.succ_le_mono in Hab.
 apply (angle_mul_nat_overflow_succ_l_false θ b) in Hb.
 destruct Hb as (H1, H2).
 specialize (IHb H1 _ Hab).
-apply angle_add_le_mono_l; try easy.
-now apply (angle_add_overflow_le _ (b * θ))%A.
+now apply angle_add_le_mono_l.
 Qed.
 
 End a.
