@@ -1676,11 +1676,17 @@ intros * Hnz Hov H12.
 (*1*)
 Check angle_add_le_mono_l.
 Theorem angle_sub_le_mono_l :
-  ∀ θ1 θ2 θ3,
-  (θ3 ≤ θ1)%A
-  → (θ1 - θ2 ≤ θ1 - θ3)%A.
+  ∀ θ2 θ3 θ1,
+  (θ1 ≤ θ2)%A
+  → (θ3 - θ2 ≤ θ3 - θ1)%A.
+Proof.
+intros * H12.
+Check angle_add_le_mono_l.
+apply (angle_add_le_mono_l (- θ3)) in H12.
+do 2 rewrite angle_add_opp_l in H12.
+(* ouais, bon, faut voir, c'est pas perdu, mais faut pas déconner non plus *)
 ... ...
-apply (angle_sub_le_mono_l (n * θ1)) in H12.
+apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
 Search (_ - _ ≤ _ - _)%A.
 ...1
 intros * Hnz Hov H12.
