@@ -1663,7 +1663,8 @@ destruct n. {
 }
 destruct n. {
   specialize (Nat.div_mod (2 ^ i) 3 (Nat.neq_succ_0 _)) as H1.
-(* 2^i/n, c'est les i premières decimales binaires de 1/n *)
+  (* 2^i/n, c'est les i premières decimales binaires de 1/n *)
+...
 (* il me semble que si on fait 2^i/n + 1 à la place de 2^i/n, ça
    converge aussi par valeurs supérieures, mais le test avec des
    entiers au lieu d'angles n'a pas l'air de confirmer;
@@ -1707,6 +1708,7 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hin]. {
     subst m.
     clear Hm Hp.
     apply (angle_eucl_dist_div_2_pow_0_lt _ (ε * rngl_of_nat N * 2 ^ i)%L).
+(* bof, c'est compliqué *)
 ...
 Search (_ / _ = _ → _)%L.
 ...
