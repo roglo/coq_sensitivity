@@ -1708,12 +1708,16 @@ apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
   apply H1z; clear H1z.
   revert θ1 Hov1 H1.
   induction n; intros; [ easy | clear Hnz ].
+(*2*)
+  cbn in H1.
+  rewrite angle_add_comm in H1.
+  apply angle_add_move_0_r in H1.
+...2
   cbn in Hov1.
   destruct n; [ now rewrite angle_mul_1_l in H1 | ].
   specialize (IHn (Nat.neq_succ_0 _)).
   apply Bool.orb_false_iff in Hov1.
   destruct Hov1 as (Hov, Hmov).
-  (* je vois pas *)
 ...1
   apply eq_angle_mul_0 in H1.
   destruct H1 as [H1| (Hc, Hs)]; [ easy | ].
