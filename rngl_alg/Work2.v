@@ -1575,7 +1575,7 @@ rewrite IHn.
 apply angle_add_comm.
 Qed.
 
-(* to be completed
+(* to be completed *)
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
@@ -1689,11 +1689,12 @@ destruct n. {
 Theorem angle_mul_le_mono_l_iff :
   ∀ n θ1 θ2,
   n ≠ 0
+  → angle_mul_nat_overflow n θ1 = false
   → angle_mul_nat_overflow n θ2 = false
   → (n * θ1 ≤ n * θ2)%A
   → (θ1 ≤ θ2)%A.
 Proof.
-intros * Hnz Hov H12.
+intros * Hnz Hov1 Hov2 H12.
 (*1*)
 destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   subst θ1.
@@ -1702,9 +1703,20 @@ destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
 apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
 3: {
   intros H1.
+(*1*)
+  clear θ2 Hov2 H12.
+  apply H1z; clear H1z.
+  revert θ1 Hov1 H1.
+  induction n; intros; [ easy | clear Hnz ].
+  cbn in Hov1.
+  destruct n; [ now rewrite angle_mul_1_l in H1 | ].
+  specialize (IHn (Nat.neq_succ_0 _)).
+  apply Bool.orb_false_iff in Hov1.
+  destruct Hov1 as (Hov, Hmov).
+  (* je vois pas *)
+...1
   apply eq_angle_mul_0 in H1.
   destruct H1 as [H1| (Hc, Hs)]; [ easy | ].
-(* possible si n=2 et θ1=π *)
 ...
 2: {
   rewrite angle_mul_opp.
