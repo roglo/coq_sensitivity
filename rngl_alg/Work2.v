@@ -1575,7 +1575,7 @@ rewrite IHn.
 apply angle_add_comm.
 Qed.
 
-(* to be completed *)
+(* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
