@@ -1700,6 +1700,7 @@ destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   subst θ1.
   apply angle_nonneg.
 }
+...
 apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
 3: {
   intros H1.
