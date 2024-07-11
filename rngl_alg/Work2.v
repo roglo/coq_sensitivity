@@ -1704,6 +1704,7 @@ apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
   intros H1.
   apply eq_angle_mul_0 in H1.
   destruct H1 as [H1| (Hc, Hs)]; [ easy | ].
+(* possible si n=2 et θ1=π *)
 ...
 2: {
   rewrite angle_mul_opp.
