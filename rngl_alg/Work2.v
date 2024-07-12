@@ -1701,6 +1701,9 @@ destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   apply angle_nonneg.
 }
 ...
+(* en fait, utiliser angle_sub_le_mono_l comme ci-dessous n'a aucun
+   intérêt, parce que de toutes façons, tout angle est positif ou nul
+ *)
 apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
 3: {
   intros H1.
