@@ -1719,6 +1719,38 @@ destruct n. {
   rewrite angle_mul_1_l in Hov1, Hov2.
   apply angle_add_diag_not_overflow in Hov1; [ | easy ].
   apply angle_add_diag_not_overflow in Hov2; [ | easy ].
+  progress unfold angle_leb in H12.
+  progress unfold angle_leb.
+  progress unfold angle_ltb in Hov1.
+  progress unfold angle_ltb in Hov2.
+(*
+  do 2 rewrite rngl_sin_mul_2_l in H12.
+  do 2 rewrite rngl_cos_mul_2_l in H12.
+*)
+  cbn in Hov1, Hov2.
+  rewrite (rngl_leb_refl Hor) in Hov1, Hov2.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  destruct zs1; [ | easy ].
+  destruct zs2; [ | easy ].
+  apply rngl_leb_le.
+  apply rngl_leb_le in Hzs1, Hzs2.
+  apply rngl_ltb_lt in Hov1, Hov2.
+  remember (0 ≤? rngl_sin (2 * θ1))%L as zs21 eqn:Hzs21.
+  remember (0 ≤? rngl_sin (2 * θ2))%L as zs22 eqn:Hzs22.
+  symmetry in Hzs21, Hzs22.
+  destruct zs21. 2: {
+    destruct zs22; [ easy | ].
+    apply rngl_leb_le in H12.
+    apply (rngl_leb_gt Hor) in Hzs21, Hzs22.
+...
+    rewrite rngl_sin_mul_2_l in Hzs21.
+    apply rngl_leb_nle in Hzs21.
+    exfalso.
+    apply Hzs21; clear Hzs21.
+
+2: {
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).
