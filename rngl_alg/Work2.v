@@ -1694,72 +1694,34 @@ Theorem angle_mul_le_mono_l_iff :
   → (n * θ1 ≤ n * θ2)%A
   → (θ1 ≤ θ2)%A.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hnz Hov1 Hov2 H12.
+  rewrite (H1 θ1).
+  apply angle_nonneg.
+}
 intros * Hnz Hov1 Hov2 H12.
-(*1*)
 destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   subst θ1.
   apply angle_nonneg.
 }
-...
-(* en fait, utiliser angle_sub_le_mono_l comme ci-dessous n'a aucun
-   intérêt, parce que de toutes façons, tout angle est positif ou nul
- *)
-apply (angle_sub_le_mono_l _ (n * θ2)) in H12.
-3: {
-  intros H1.
-(*1*)
-  clear θ2 Hov2 H12.
-  apply H1z; clear H1z.
-  revert θ1 Hov1 H1.
-  induction n; intros; [ easy | clear Hnz ].
-(*2*)
-  cbn in H1.
-  rewrite angle_add_comm in H1.
-  cbn in Hov1.
-  destruct n. {
-    cbn in H1.
-    now rewrite angle_add_0_l in H1.
-  }
-  specialize (IHn (Nat.neq_succ_0 _)).
-  apply Bool.orb_false_iff in Hov1.
-  destruct Hov1 as (Hov, Hmov).
-...2
-  cbn in Hov1.
-  destruct n; [ now rewrite angle_mul_1_l in H1 | ].
-  specialize (IHn (Nat.neq_succ_0 _)).
-  apply Bool.orb_false_iff in Hov1.
-  destruct Hov1 as (Hov, Hmov).
-...1
-  apply eq_angle_mul_0 in H1.
-  destruct H1 as [H1| (Hc, Hs)]; [ easy | ].
-...
-2: {
-  rewrite angle_mul_opp.
-Search (angle_add_overflow (_ * _) (_ * _)).
-...1
-intros * Hnz Hov H12.
 induction n; [ easy | clear Hnz ].
-(*
-Search (_ + _ ≤ _ + _)%A.
-(* mmm... soit je démontre _+_≤_+_ → _≤_, soit j'écris sous la
-   forme 0≤θ2-θ1... faut réfléchir *)
-*)
 destruct n. {
   cbn in H12.
   now do 2 rewrite angle_add_0_r in H12.
 }
 destruct n. {
   clear IHn. (* useless *)
-Check angle_mul_le_mono_l.
-...
-Check angle_add_le_mono_l.
-  apply (angle_add_le_mono_r _ _ (- θ1))%A in H12.
-...
-Search (_ + _ ≤ _ + _)%A.
+  apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+  destruct Hov1 as (_, Hov1).
+  destruct Hov2 as (_, Hov2).
+  rewrite angle_mul_1_l in Hov1, Hov2.
+  apply angle_add_diag_not_overflow in Hov1; [ | easy ].
+  apply angle_add_diag_not_overflow in Hov2; [ | easy ].
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).
-Search (angle_mul_nat_overflow _ _ = false).
 Search (_ * _ ≤ _ * _)%A.
 (* Ah oui, mais il faudrait démontrer angle_lim_seq_angle_not_mul_overflow.
    Il y a un début loin ci-dessous mais pas fini *)
