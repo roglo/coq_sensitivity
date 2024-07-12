@@ -1575,6 +1575,54 @@ rewrite IHn.
 apply angle_add_comm.
 Qed.
 
+Theorem rngl_cos_sin_twice_lemma_1 :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (rngl_sin (2 * θ1) < 0)%L
+  → (rngl_sin (2 * θ2) < 0)%L
+  → (rngl_cos (2 * θ1) ≤ rngl_cos (2 * θ2))%L
+  → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
+  do 2 rewrite (H1 (rngl_cos _)).
+  apply (rngl_le_refl Hor).
+}
+intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
+rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
+rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
+apply (rngl_lt_mul_0_if Hop Hor) in Hzs21, Hzs22.
+destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
+  exfalso; apply (rngl_nle_gt Hor) in H; apply H.
+  apply (rngl_0_le_2 Hon Hop Hor).
+}
+destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
+  exfalso; apply (rngl_nle_gt Hor) in H; apply H.
+  apply (rngl_0_le_2 Hon Hop Hor).
+}
+apply (rngl_lt_mul_0_if Hop Hor) in Hzs21, Hzs22.
+destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
+  now apply (rngl_nle_gt Hor) in H.
+}
+destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
+  now apply (rngl_nle_gt Hor) in H.
+}
+do 2 rewrite rngl_cos_mul_2_l' in H12.
+apply (rngl_sub_le_mono_r Hop Hor) in H12.
+apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H12. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_squ_le_abs_le Hop Hor Hii) in H12.
+apply (rngl_lt_le_incl Hor) in Hzs21, Hzs22.
+rewrite (rngl_abs_nonpos_eq Hop Hor) in H12; [ | easy ].
+rewrite (rngl_abs_nonpos_eq Hop Hor) in H12; [ | easy ].
+now apply (rngl_opp_le_compat Hop Hor) in H12.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1744,13 +1792,8 @@ destruct n. {
     destruct zs22; [ easy | ].
     apply rngl_leb_le in H12.
     apply (rngl_leb_gt Hor) in Hzs21, Hzs22.
-...
-    rewrite rngl_sin_mul_2_l in Hzs21.
-    apply rngl_leb_nle in Hzs21.
-    exfalso.
-    apply Hzs21; clear Hzs21.
-
-2: {
+    now apply rngl_cos_sin_twice_lemma_1.
+  }
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).
