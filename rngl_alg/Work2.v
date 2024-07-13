@@ -1863,10 +1863,28 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 (*1*)
 apply IHn; [ easy | | | ].
 3: {
+(*1*)
+  clear IHn Hnz H1z.
+  induction n. {
+    rewrite angle_mul_0_l.
+    apply angle_nonneg.
+  }
+...1
+  apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+  destruct Hov1 as (Hov1, Hovn1).
+  destruct Hov2 as (Hov2, Hovn2).
+  move Hov2 before Hov1.
+  progress unfold angle_add_overflow in Hovn1.
+  progress unfold angle_add_overflow in Hovn2.
+  apply Bool.not_true_iff_false in Hovn1, Hovn2.
+  apply angle_nlt_ge in Hovn1, Hovn2.
+  rewrite <- angle_mul_succ_l in Hovn1, Hovn2.
+...
   cbn in H12.
   rewrite (angle_add_comm θ2) in H12.
   apply (angle_add_le_mono_r _ _ (- θ2)) in H12. 2: {
     apply angle_add_not_overflow_comm.
+...
     apply angle_add_not_overflow_move_add. 2: {
       rewrite angle_add_opp_l.
       rewrite angle_sub_diag.
