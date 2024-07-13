@@ -1865,7 +1865,15 @@ apply IHn; [ easy | | | ].
 3: {
   cbn in H12.
   rewrite (angle_add_comm θ2) in H12.
-  apply (angle_add_le_mono_r _ _ (- θ2)) in H12.
+  apply (angle_add_le_mono_r _ _ (- θ2)) in H12. 2: {
+    apply angle_add_not_overflow_comm.
+    apply angle_add_not_overflow_move_add. 2: {
+      rewrite angle_add_opp_l.
+      rewrite angle_sub_diag.
+      apply angle_add_overflow_0_l.
+    }
+    (* ah oui mais non c'est faux, ça, sauf si θ2=0 *)
+...
   do 2 rewrite angle_add_opp_r in H12.
   rewrite angle_add_sub in H12.
   eapply angle_le_trans; [ | apply H12 ].
