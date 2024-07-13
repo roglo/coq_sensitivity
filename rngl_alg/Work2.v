@@ -1625,24 +1625,22 @@ Qed.
 
 Theorem rngl_cos_sin_twice_lemma_2 :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ2)%L
+  (0 < rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_sin (2 * θ1))%L
   → (0 ≤ rngl_sin (2 * θ2))%L
   → (rngl_cos (2 * θ2) ≤ rngl_cos (2 * θ1))%L
-  → (-1 < rngl_cos θ1)%L
-  → (0 ≤ rngl_sin θ1)%L
-  → θ1 ≠ 0%A
   → (rngl_cos θ2 ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzs2 Hzs21 Hzs22 H12 Hov1 Hzs1 H1z.
+  intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
   do 2 rewrite (H1 (rngl_cos _)).
   apply (rngl_le_refl Hor).
 }
-intros * Hzs2 Hzs21 Hzs22 H12 Hov1 Hzs1 H1z.
+intros * Hzs1 Hzs2 Hzs21 Hzs22 H12.
 rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
@@ -1656,12 +1654,7 @@ destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
 }
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
-  apply (rngl_le_antisymm Hor) in H1; [ | easy ].
-  symmetry in H1.
-  apply eq_rngl_sin_0 in H1.
-  destruct H1 as [H1| H1]; [ easy | ].
-  rewrite H1 in Hov1; cbn in Hov1.
-  now apply (rngl_lt_irrefl Hor) in Hov1.
+  now apply (rngl_nlt_ge Hor) in H1.
 }
 destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply (rngl_le_antisymm Hor) in H1; [ | easy ].
@@ -1859,8 +1852,17 @@ destruct n. {
   destruct zs22. {
     apply rngl_leb_le in Hzs22.
     apply rngl_leb_le in H12.
-    now apply rngl_cos_sin_twice_lemma_2.
+    apply rngl_cos_sin_twice_lemma_2; try easy.
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    apply not_eq_sym.
+    intros H; apply H1z; clear H1z.
+    apply (eq_rngl_sin_0) in H.
+    destruct H; subst θ1; [ easy | ].
+    now apply (rngl_lt_irrefl Hor) in Hov1.
   }
+  clear H12.
+  apply (rngl_leb_gt Hor) in Hzs22.
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).
