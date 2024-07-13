@@ -1855,10 +1855,14 @@ destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   apply angle_nonneg.
 }
 induction n; [ easy | clear Hnz ].
-destruct n. {
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
   cbn in H12.
   now do 2 rewrite angle_add_0_r in H12.
 }
+(*1*)
+apply IHn; [ easy | | | ].
+...1
 destruct n. {
   clear IHn. (* useless *)
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
@@ -1909,6 +1913,7 @@ destruct n. {
   intros H; subst θ1.
   now apply (rngl_lt_irrefl Hor) in Hov1.
 }
+apply IHn.
 ...
 Check angle_mul_le_mono_l.
 apply (angle_mul_le_mono_l_iff 3).
