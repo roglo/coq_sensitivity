@@ -1862,6 +1862,33 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 (*1*)
 apply IHn; [ easy | | | ].
+3: {
+  cbn in H12.
+  rewrite (angle_add_comm θ2) in H12.
+  apply (angle_add_le_mono_r _ _ (- θ2)) in H12.
+  do 2 rewrite angle_add_opp_r in H12.
+  rewrite angle_add_sub in H12.
+  eapply angle_le_trans; [ | apply H12 ].
+  rewrite angle_add_comm.
+  rewrite <- angle_add_sub_assoc.
+  apply angle_le_add_r.
+...
+Inspect 5.
+...
+angle_sub_le_mono_l
+     : ∀ θ2 θ3 θ1 : angle T,
+         angle_add_overflow θ3 (- θ1) = false
+         → θ1 ≠ 0%A → (θ1 ≤ θ2)%A → (θ3 - θ2 ≤ θ3 - θ1)%A
+angle_add_le_mono_r:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T
+    → ∀ θ1 θ2 θ3 : angle T,
+        angle_add_overflow θ2 θ3 = false → (θ1 ≤ θ2)%A → (θ1 + θ3 ≤ θ2 + θ3)%A
+angle_add_le_mono_l:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
+    angle_ctx T
+    → ∀ θ1 θ2 θ3 : angle T,
+        angle_add_overflow θ1 θ3 = false → (θ2 ≤ θ3)%A → (θ1 + θ2 ≤ θ1 + θ3)%A
 ...1
 destruct n. {
   clear IHn. (* useless *)
