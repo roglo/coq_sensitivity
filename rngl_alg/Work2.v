@@ -1864,9 +1864,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 (*1*)
 apply IHn; [ easy | | | ].
 3: {
-(*
-  clear IHn Hnz H1z.
-*)
   destruct n. {
     rewrite angle_mul_0_l.
     apply angle_nonneg.
@@ -1875,12 +1872,17 @@ apply IHn; [ easy | | | ].
   destruct n. {
     clear IHn.
     do 2 rewrite angle_mul_1_l.
-    do 2 rewrite <- angle_add_diag in H12.
+    apply angle_div_2_le_compat in H12.
+    rewrite angle_mul_2_div_2 in H12.
     apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
     rewrite angle_mul_1_l in Hov1, Hov2.
     destruct Hov1 as (_, Hov1).
     destruct Hov2 as (_, Hov2).
     apply (angle_add_diag_not_overflow Hc1) in Hov1, Hov2.
+    rewrite Hov1 in H12.
+    rewrite angle_mul_2_div_2 in H12.
+    now rewrite Hov2 in H12.
+  }
 ...1
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
