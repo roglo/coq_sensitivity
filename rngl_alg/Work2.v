@@ -1845,9 +1845,10 @@ Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * Hnz Hov1 Hov2 H12.
+  intros * Hnz Hov1 Hov2.
   rewrite (H1 θ1).
-  apply angle_nonneg.
+  rewrite angle_mul_0_r.
+  intros; apply angle_nonneg.
 }
 intros * Hnz Hov1 Hov2 H12.
 destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
@@ -1857,18 +1858,32 @@ destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
 induction n; [ easy | clear Hnz ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
-  cbn in H12.
-  now do 2 rewrite angle_add_0_r in H12.
+  do 2 rewrite angle_mul_1_l in H12.
+  easy.
 }
 (*1*)
 apply IHn; [ easy | | | ].
 3: {
-(*1*)
+(*
   clear IHn Hnz H1z.
-  induction n. {
+*)
+  destruct n. {
     rewrite angle_mul_0_l.
     apply angle_nonneg.
   }
+  specialize (IHn Hnz); clear Hnz.
+  destruct n. {
+    clear IHn.
+    do 2 rewrite angle_mul_1_l.
+    do 2 rewrite <- angle_add_diag in H12.
+    apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+    rewrite angle_mul_1_l in Hov1, Hov2.
+    destruct Hov1 as (_, Hov1).
+    destruct Hov2 as (_, Hov2).
+    progress unfold angle_add_overflow in Hov1.
+    progress unfold angle_add_overflow in Hov2.
+    apply Bool.not_true_iff_false in Hov1, Hov2.
+    apply angle_nlt_ge in Hov1, Hov2.
 ...1
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
