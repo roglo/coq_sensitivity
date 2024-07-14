@@ -1880,10 +1880,7 @@ apply IHn; [ easy | | | ].
     rewrite angle_mul_1_l in Hov1, Hov2.
     destruct Hov1 as (_, Hov1).
     destruct Hov2 as (_, Hov2).
-    progress unfold angle_add_overflow in Hov1.
-    progress unfold angle_add_overflow in Hov2.
-    apply Bool.not_true_iff_false in Hov1, Hov2.
-    apply angle_nlt_ge in Hov1, Hov2.
+    apply (angle_add_diag_not_overflow Hc1) in Hov1, Hov2.
 ...1
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
