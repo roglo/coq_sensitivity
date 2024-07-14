@@ -1851,11 +1851,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros; apply angle_nonneg.
 }
 intros * Hnz Hov1 Hov2 H12.
+(*
 destruct (angle_eq_dec θ1 0) as [H1z| H1z]. {
   subst θ1.
   apply angle_nonneg.
 }
-induction n; [ easy | clear Hnz ].
+*)
+revert θ1 θ2 Hov1 Hov2 H12.
+induction n; intros; [ easy | clear Hnz ].
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   do 2 rewrite angle_mul_1_l in H12.
@@ -1868,21 +1871,23 @@ apply IHn; [ easy | | | ].
     rewrite angle_mul_0_l.
     apply angle_nonneg.
   }
+  apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+  destruct Hov1 as (Hov1, Hovn1).
+  destruct Hov2 as (Hov2, Hovn2).
+  move Hov2 before Hov1.
   specialize (IHn Hnz); clear Hnz.
   destruct n. {
     clear IHn.
     do 2 rewrite angle_mul_1_l.
     apply angle_div_2_le_compat in H12.
     rewrite angle_mul_2_div_2 in H12.
-    apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
-    rewrite angle_mul_1_l in Hov1, Hov2.
-    destruct Hov1 as (_, Hov1).
-    destruct Hov2 as (_, Hov2).
-    apply (angle_add_diag_not_overflow Hc1) in Hov1, Hov2.
-    rewrite Hov1 in H12.
+    rewrite angle_mul_1_l in Hovn1, Hovn2.
+    apply (angle_add_diag_not_overflow Hc1) in Hovn1, Hovn2.
+    rewrite Hovn1 in H12.
     rewrite angle_mul_2_div_2 in H12.
-    now rewrite Hov2 in H12.
+    now rewrite Hovn2 in H12.
   }
+  destruct n. {
 ...1
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
