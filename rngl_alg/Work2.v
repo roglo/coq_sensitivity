@@ -1888,6 +1888,17 @@ apply IHn; [ easy | | | ].
     now rewrite Hovn2 in H12.
   }
   destruct n. {
+    progress unfold angle_add_overflow in Hovn1.
+    progress unfold angle_add_overflow in Hovn2.
+    apply Bool.not_true_iff_false in Hovn1, Hovn2.
+    apply angle_nlt_ge in Hovn1, Hovn2.
+    rewrite <- angle_mul_succ_l in Hovn1, Hovn2.
+    specialize (IHn _ _ Hov1 Hov2) as H2.
+    apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+    destruct Hov1 as (_, Hov1).
+    destruct Hov2 as (_, Hov2).
+    rewrite angle_mul_1_l in Hov1, Hov2.
+    apply (angle_add_diag_not_overflow Hc1) in Hov1, Hov2.
 ...1
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
