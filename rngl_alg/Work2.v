@@ -1750,9 +1750,9 @@ assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
 }
 move H before Hlim; clear Hlim; rename H into Hlim.
 assert (H :
-  ∀ k ε,
+  ∀ m ε,
   (0 < ε)%L
-  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (k * θ i) (k * θ') < ε)%L)
+  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (m * θ i) (m * θ') < ε)%L)
 by apply Hlim.
 move H before Hlim; clear Hlim; rename H into Hlim.
 progress unfold angle_add_overflow.
@@ -1786,11 +1786,10 @@ remember (S m) as p.
 assert (H : 0 < p ≤ n) by flia Heqp Hmn.
 clear m Heqp.
 clear Hmn; rename H into Hmn; rename p into m.
-assert (Him : ∀ i, (θ i ≤ m * θ i)%A) by now intros i; apply Hi.
-move Him before Hi; move m before n.
+move m before n.
 apply angle_nlt_ge.
 intros Hmt.
-move Hmt before Him; move m after n.
+move Hmt before Hi; move m after n.
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
