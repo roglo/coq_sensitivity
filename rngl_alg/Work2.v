@@ -1776,9 +1776,10 @@ move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
+...
 Print angle_lim.
-(* not sure it is useful, but it seems to be true, so I'm trying
-   to prove it as an exercise *)
+(* not sure the following theorem is useful, but it seems to be true,
+   so I'm trying to prove it as an exercise *)
 (* it says that all terms of our sequence are less than the limit;
    but warning: it does not mean that the sequence is always
    increasing, it can oscillate *)
