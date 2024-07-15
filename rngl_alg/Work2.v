@@ -1776,7 +1776,6 @@ move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
-...
 Print angle_lim.
 (* not sure the following theorem is useful, but it seems to be true,
    so I'm trying to prove it as an exercise *)
@@ -1868,6 +1867,25 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 (*1*)
 apply IHn; [ easy | | | ].
 3: {
+  clear IHn.
+(*1*)
+  apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
+  destruct Hov1 as (Hov1, Hovn1).
+  destruct Hov2 as (Hov2, Hovn2).
+  move Hov2 before Hov1.
+  progress unfold angle_add_overflow in Hovn1.
+  progress unfold angle_add_overflow in Hovn2.
+  apply Bool.not_true_iff_false in Hovn1, Hovn2.
+  apply angle_nlt_ge in Hovn1, Hovn2.
+  do 2 rewrite angle_mul_succ_l in H12.
+  remember (n * θ1)%A as θ3 eqn:Hθ3.
+  remember (n * θ2)%A as θ4 eqn:Hθ4.
+  clear Hθ3 Hθ4.
+  move θ3 before θ2; move θ4 before θ3.
+  clear n Hov1 Hov2 Hnz.
+  (* voyons donc ce que ça donne avec ça ; est-ce que ça a l'air
+     vrai, d'abord ? *)
+...1
   destruct n. {
     rewrite angle_mul_0_l.
     apply angle_nonneg.
@@ -1876,9 +1894,8 @@ apply IHn; [ easy | | | ].
   destruct Hov1 as (Hov1, Hovn1).
   destruct Hov2 as (Hov2, Hovn2).
   move Hov2 before Hov1.
-  specialize (IHn Hnz); clear Hnz.
+  clear Hnz.
   destruct n. {
-    clear IHn.
     do 2 rewrite angle_mul_1_l.
     apply angle_div_2_le_compat in H12.
     rewrite angle_mul_2_div_2 in H12.
@@ -1894,7 +1911,6 @@ apply IHn; [ easy | | | ].
     apply Bool.not_true_iff_false in Hovn1, Hovn2.
     apply angle_nlt_ge in Hovn1, Hovn2.
     rewrite <- angle_mul_succ_l in Hovn1, Hovn2.
-    specialize (IHn _ _ Hov1 Hov2) as H2.
     apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
     destruct Hov1 as (_, Hov1).
     destruct Hov2 as (_, Hov2).
