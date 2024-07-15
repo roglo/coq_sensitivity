@@ -1770,12 +1770,36 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
   now rewrite angle_add_mul_r_diag_r in H.
 }
 move H before Hi; clear Hi; rename H into Hi.
+(**)
+assert (H : ∀ i m, 0 < m ≤ n → (θ i ≤ m * θ i)%A). {
+  clear m Hmn.
+  intros * (Hmz, Hmn).
+  specialize (Hi i (m - 1)).
+  rewrite <- Nat_succ_sub_succ_r in Hi; [ | easy ].
+  rewrite Nat.sub_0_r in Hi.
+  apply Hi.
+  flia Hmz Hmn.
+}
+move H before Hi; clear Hi; rename H into Hi.
+progress unfold lt in Hmn.
+remember (S m) as p.
+assert (H : 0 < p ≤ n) by flia Heqp Hmn.
+clear m Heqp.
+clear Hmn; rename H into Hmn; rename p into m.
+assert (Him : ∀ i, (θ i ≤ m * θ i)%A) by now intros i; apply Hi.
+move Him before Hi; move m before n.
+apply angle_nlt_ge.
+intros Hmt.
+move Hmt before Him; move m after n.
+(*
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
 move Him before Hi.
 move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
+*)
+...
 Print angle_lim.
 (* not sure the following theorem is useful, but it seems to be true,
    so I'm trying to prove it as an exercise *)
@@ -1869,20 +1893,24 @@ apply IHn; [ easy | | | ].
 3: {
   clear IHn.
 (*1*)
+...
   apply angle_mul_nat_overflow_succ_l_false in Hov1, Hov2.
   destruct Hov1 as (Hov1, Hovn1).
   destruct Hov2 as (Hov2, Hovn2).
   move Hov2 before Hov1.
+(*
   progress unfold angle_add_overflow in Hovn1.
   progress unfold angle_add_overflow in Hovn2.
   apply Bool.not_true_iff_false in Hovn1, Hovn2.
   apply angle_nlt_ge in Hovn1, Hovn2.
+*)
   do 2 rewrite angle_mul_succ_l in H12.
   remember (n * θ1)%A as θ3 eqn:Hθ3.
   remember (n * θ2)%A as θ4 eqn:Hθ4.
   clear Hθ3 Hθ4.
   move θ3 before θ2; move θ4 before θ3.
   clear n Hov1 Hov2 Hnz.
+  clear Hovn1.
   (* voyons donc ce que ça donne avec ça ; est-ce que ça a l'air
      vrai, d'abord ? *)
 ...1
