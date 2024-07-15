@@ -1791,7 +1791,8 @@ move Him before Hi; move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
-(*
+...
+(* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
 move Him before Hi.
 move m before n.
@@ -1799,7 +1800,6 @@ apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Him; move m after n.
 *)
-...
 Print angle_lim.
 (* not sure the following theorem is useful, but it seems to be true,
    so I'm trying to prove it as an exercise *)
