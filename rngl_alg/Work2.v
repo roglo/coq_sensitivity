@@ -1790,6 +1790,11 @@ move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
+Theorem glop :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ1 - θ2) 0.
+Proof.
+intros.
+progress unfold angle_eucl_dist.
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
