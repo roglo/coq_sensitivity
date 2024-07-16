@@ -1803,6 +1803,17 @@ assert (Hlim' :
   now rewrite <- angle_mul_sub_distr_l in HN.
 }
 Search (angle_eucl_dist (_ * _)).
+Print angle_lim.
+Print is_limit_when_tending_to_inf.
+Theorem glop :
+  ∀ a b u dist,
+  is_dist dist
+  → (a ≤ b)%L
+  → is_limit_when_tending_to_inf dist u b
+  → ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (a ≤ u n)%L.
+Proof.
+intros * Hd Hab Hub ε Hε.
+progress unfold is_limit_when_tending_to_inf in Hub.
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
