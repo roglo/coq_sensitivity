@@ -1790,7 +1790,19 @@ move m before n.
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
-Check angle_eucl_dist_move_0_r.
+assert (Hlim' :
+  ∀ m ε,
+  (0 < ε)%L
+  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (m * (θ i - θ')) 0 < ε)%L). {
+  intros p ε Hε.
+  specialize (Hlim p ε Hε).
+  destruct Hlim as (N, HN).
+  exists N; intros j Hj.
+  specialize (HN j Hj).
+  rewrite angle_eucl_dist_move_0_r in HN.
+  now rewrite <- angle_mul_sub_distr_l in HN.
+}
+Search (angle_eucl_dist (_ * _)).
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
