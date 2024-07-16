@@ -1814,6 +1814,10 @@ Theorem glop :
 Proof.
 intros * Hd Hab Hub ε Hε.
 progress unfold is_limit_when_tending_to_inf in Hub.
+Print is_dist.
+Check angle_eucl_dist_nonneg.
+About dist_nonneg.
+Print angle_leb.
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.

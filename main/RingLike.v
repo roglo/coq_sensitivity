@@ -5852,21 +5852,9 @@ specialize (proj2 (Hdsep a a) eq_refl) as H1.
 specialize (Hdtri a b a) as H2.
 rewrite H1, (Hdsym b a) in H2.
 rewrite (rngl_add_diag Hon) in H2.
-apply (rngl_mul_le_mono_nonneg_l Hop Hor) with (a := 2⁻¹%L) in H2. 2: {
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) with (c := 2%L). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_mul_inv_diag_r Hon Hiv).
-  apply (rngl_0_le_1 Hon Hop Hor).
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_0_r Hos) in H2.
-rewrite rngl_mul_assoc in H2.
-rewrite (rngl_mul_inv_diag_l Hon Hiv) in H2. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-now rewrite (rngl_mul_1_l Hon) in H2.
+replace 0%L with (2 * 0)%L in H2 by apply (rngl_mul_0_r Hos).
+apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H2; [ easy | ].
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
 
 Theorem limit_unique :
