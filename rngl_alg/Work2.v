@@ -1824,15 +1824,29 @@ assert (Hlim' :
   rewrite angle_eucl_dist_move_0_r in HN.
   now rewrite <- angle_mul_sub_distr_l in HN.
 }
+(*1*)
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
+remember (0 ≤? rngl_sin (m * θ'))%L as zms eqn:Hzms.
+symmetry in Hzs, Hzms.
+destruct zs. 2: {
+  apply (rngl_leb_gt Hor) in Hzs.
+  destruct zms. {
+    exfalso.
+    apply rngl_leb_le in Hzms.
+...1
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
 Check angle_le_angle_eucl_dist_le.
 apply angle_le_angle_eucl_dist_le.
-3: {
-...
 2: {
 (* chais pas, faut voir... *)
+...
+3: {
+  progress unfold angle_eucl_dist.
+  cbn.
+  (* clairement, il faut que mθ'≤π *)
 ...
 (* essai de combinaison entre la distance et la relation d'ordre
    car c'est un peu le problème qui a l'air de se poser, dans cette
