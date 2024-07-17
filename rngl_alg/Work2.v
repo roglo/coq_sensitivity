@@ -1807,7 +1807,9 @@ assert (Hlim' :
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
-...
+(* essai de combinaison entre la distance et la relation d'ordre
+   car c'est un peu le problème qui a l'air de se poser, dans cette
+   histoire... *)
 Theorem glop :
   ∀ a b u dist,
   is_dist dist
@@ -1816,11 +1818,8 @@ Theorem glop :
   → ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (a ≤ u n)%L.
 Proof.
 intros * Hd Hab Hub ε Hε.
-progress unfold is_limit_when_tending_to_inf in Hub.
-Print is_dist.
-Check angle_eucl_dist_nonneg.
-About dist_nonneg.
-Print angle_leb.
+specialize (Hub ε Hε).
+destruct Hub as (N, HN).
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.
