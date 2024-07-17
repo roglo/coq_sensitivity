@@ -1787,9 +1787,11 @@ assert (H : 0 < p ≤ n) by flia Heqp Hmn.
 clear m Heqp.
 clear Hmn; rename H into Hmn; rename p into m.
 move m before n.
+(*
 apply angle_nlt_ge.
 intros Hmt.
 move Hmt before Hi; move m after n.
+*)
 assert (Hlim' :
   ∀ m ε,
   (0 < ε)%L
@@ -1805,6 +1807,7 @@ assert (Hlim' :
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
+...
 Theorem glop :
   ∀ a b u dist,
   is_dist dist
