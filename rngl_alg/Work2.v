@@ -1723,6 +1723,26 @@ apply (rngl_lt_le_incl Hor) in Hzs22.
 now apply (rngl_le_trans Hor _ 0).
 Qed.
 
+Theorem angle_le_angle_eucl_dist_le :
+  ∀ θ1 θ2,
+  (θ1 ≤ angle_straight)%A
+  → (θ2 ≤ angle_straight)%A
+  → (θ1 ≤ θ2)%A ↔ (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L.
+Proof.
+intros * Ht1 Ht2.
+progress unfold angle_leb.
+apply rngl_sin_nonneg_angle_le_straight in Ht1, Ht2.
+apply rngl_leb_le in Ht1, Ht2.
+rewrite Ht1, Ht2.
+split; intros H12. {
+  apply rngl_leb_le in H12.
+  now apply rngl_cos_le_iff_angle_eucl_le.
+} {
+  apply rngl_leb_le.
+  now apply rngl_cos_le_iff_angle_eucl_le in H12.
+}
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1807,6 +1827,11 @@ assert (Hlim' :
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
 Print is_limit_when_tending_to_inf.
+Check angle_le_angle_eucl_dist_le.
+apply angle_le_angle_eucl_dist_le.
+2: {
+(* chais pas, faut voir... *)
+...
 (* essai de combinaison entre la distance et la relation d'ordre
    car c'est un peu le problème qui a l'air de se poser, dans cette
    histoire... *)
@@ -1820,6 +1845,8 @@ Proof.
 intros * Hd Hab Hub ε Hε.
 specialize (Hub ε Hε).
 destruct Hub as (N, HN).
+specialize (is_dist_triangular dist Hd a b (u N)) as H1.
+Check angle_le_angle_eucl_dist_le.
 ...
 (* version où je manipulais S m au lieu de m :
 assert (Him : ∀ i, (θ i ≤ S m * θ i)%A) by now intros i; apply Hi.

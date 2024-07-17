@@ -1,5 +1,4 @@
 (* equivalent definition of angle_add_overflow *)
-
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
 Require Import Main.RingLike.
@@ -449,21 +448,6 @@ intros H; symmetry in H.
 apply eq_rngl_cos_opp_1 in H.
 subst θ.
 now apply (rngl_lt_irrefl Hor) in Hzs.
-Qed.
-
-Theorem rngl_sin_nonneg_le_straight :
-  ∀ θ,
-  (0 ≤ rngl_sin θ)%L
-  → (θ ≤ angle_straight)%A.
-Proof.
-destruct_ac.
-intros * Hzs.
-progress unfold angle_leb.
-rewrite (rngl_leb_refl Hor).
-apply rngl_leb_le in Hzs.
-rewrite Hzs.
-apply rngl_leb_le; cbn.
-apply rngl_cos_bound.
 Qed.
 
 Theorem angle_add_straight_r_not_overflow :
