@@ -1829,6 +1829,8 @@ Print angle_lim.
 Print is_limit_when_tending_to_inf.
 Check angle_le_angle_eucl_dist_le.
 apply angle_le_angle_eucl_dist_le.
+3: {
+...
 2: {
 (* chais pas, faut voir... *)
 ...
