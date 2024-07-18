@@ -1787,7 +1787,7 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
   → angle_lim θ θ'
-  → (θ' ≤ angle_straight)%A
+  → (θ' < angle_straight)%A
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
@@ -1799,6 +1799,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_mul_nat_overflow_0_r.
 }
 intros * Hi Hlim Hts.
+destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
+  subst θ'.
+  apply angle_mul_nat_overflow_0_r.
+}
 apply angle_all_add_not_overflow.
 intros * Hmn.
 assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
@@ -1863,6 +1867,7 @@ remember (0 ≤? rngl_sin (m * θ'))%L as zms eqn:Hzms.
 symmetry in Hzs, Hzms.
 destruct zs. 2: {
   apply (rngl_leb_nle) in Hzs.
+  apply angle_lt_le_incl in Hts.
   now apply rngl_sin_nonneg_angle_le_straight in Hts.
 }
 apply rngl_leb_le in Hzs.
@@ -1872,7 +1877,17 @@ apply rngl_leb_le.
 destruct m; [ easy | ].
 rewrite angle_mul_succ_l.
 rewrite angle_mul_succ_l in Hzms.
-apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos; try easy.
+apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos; try easy. {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  apply not_eq_sym.
+  intros H.
+  apply eq_rngl_sin_0 in H.
+  destruct H as [H| H]; [ easy | ].
+  rewrite H in Hts.
+  now apply angle_lt_irrefl in Hts.
+}
+(* bof ; l'induction sur m ne marche pas *)
 ...
 apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...1
