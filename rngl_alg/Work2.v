@@ -1831,9 +1831,17 @@ remember (0 ≤? rngl_sin (m * θ'))%L as zms eqn:Hzms.
 symmetry in Hzs, Hzms.
 destruct zs. 2: {
   apply (rngl_leb_gt Hor) in Hzs.
-  destruct zms. {
+(* faut-il que je mette en hypothèse que θ'≤π, c'est-à-dire
+   que sin θ'≥0 ? pourtant, c'est pas à moi de décider que la
+   limite de θi est inférieure à π ! *)
+...
+  destruct zms. 2: {
+    apply (rngl_leb_gt Hor) in Hzms.
+    apply rngl_leb_le.
+...
     exfalso.
     apply rngl_leb_le in Hzms.
+  }
 ...1
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
