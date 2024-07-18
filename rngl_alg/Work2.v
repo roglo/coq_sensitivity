@@ -1838,6 +1838,26 @@ apply rngl_leb_le in Hzs.
 destruct zms; [ | easy ].
 apply rngl_leb_le in Hzms.
 apply rngl_leb_le.
+destruct m; [ easy | ].
+rewrite angle_mul_succ_l.
+rewrite angle_mul_succ_l in Hzms.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+Check quadrant_1_rngl_cos_add_le_cos_l.
+Check angle_add_overflow_le_lemma_2.
+(* théorème ci-dessous : ah oui, non, θ2 peut être grand et ça devient faux *)
+(* faut peut-être voir par induction sur m, par exemple ? *)
+Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
+  ∀ θ1 θ2 : angle T,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+intros * Hs1 Hs2.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+... ...
+now apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos.
+...
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...1
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
