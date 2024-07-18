@@ -1751,6 +1751,7 @@ Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
   → angle_lim θ θ'
+  → (θ' ≤ angle_straight)%A
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
@@ -1761,7 +1762,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 θ').
   apply angle_mul_nat_overflow_0_r.
 }
-intros * Hi Hlim.
+intros * Hi Hlim Hts.
 apply angle_all_add_not_overflow.
 intros * Hmn.
 assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
@@ -1830,18 +1831,13 @@ remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
 remember (0 ≤? rngl_sin (m * θ'))%L as zms eqn:Hzms.
 symmetry in Hzs, Hzms.
 destruct zs. 2: {
-  apply (rngl_leb_gt Hor) in Hzs.
-(* faut-il que je mette en hypothèse que θ'≤π, c'est-à-dire
-   que sin θ'≥0 ? pourtant, c'est pas à moi de décider que la
-   limite de θi est inférieure à π ! *)
-...
-  destruct zms. 2: {
-    apply (rngl_leb_gt Hor) in Hzms.
-    apply rngl_leb_le.
-...
-    exfalso.
-    apply rngl_leb_le in Hzms.
-  }
+  apply (rngl_leb_nle) in Hzs.
+  now apply rngl_sin_nonneg_angle_le_straight in Hts.
+}
+apply rngl_leb_le in Hzs.
+destruct zms; [ | easy ].
+apply rngl_leb_le in Hzms.
+apply rngl_leb_le.
 ...1
 Search (angle_eucl_dist (_ * _)).
 Print angle_lim.
