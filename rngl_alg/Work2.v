@@ -1860,6 +1860,10 @@ assert (Hlim' :
   rewrite angle_eucl_dist_move_0_r in HN.
   now rewrite <- angle_mul_sub_distr_l in HN.
 }
+(*2*)
+move Hlim' before Hlim; clear Hlim; rename Hlim' into Hlim.
+Search (angle_eucl_dist (_ * _)).
+...2
 (*1*)
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ')%L as zs eqn:Hzs.
