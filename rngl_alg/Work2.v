@@ -1887,7 +1887,14 @@ apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos; try easy. {
   rewrite H in Hts.
   now apply angle_lt_irrefl in Hts.
 }
-(* bof ; l'induction sur m ne marche pas *)
+destruct m. {
+  rewrite angle_mul_0_l.
+  apply (rngl_le_refl Hor).
+}
+destruct m; [ now rewrite angle_mul_1_l | ].
+destruct m. {
+(* je pense que ça ne marchera pas ; il faut quand même avoir
+   à utiliser Hlim ou Hlim' *)
 ...
 apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...1
