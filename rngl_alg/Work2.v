@@ -12,6 +12,7 @@ Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
 Require Import Complex.
 Require Import Work.
+Require Import TacChangeAngle.
 
 Section a.
 
@@ -1743,6 +1744,41 @@ split; intros H12. {
 }
 Qed.
 
+Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
+  ∀ θ1 θ2 : angle T,
+  (0 < rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
+Proof.
+destruct_ac.
+intros * Hs1 Hs2 Hs12.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+  apply (rngl_lt_le_incl Hor) in Hs1.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+    now apply quadrant_1_rngl_cos_add_le_cos_l.
+  }
+  apply (rngl_nle_gt Hor) in Hzc2.
+  change_angle_sub_r θ2 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hs2.
+  progress sin_cos_add_sub_right_hyp T Hzc2.
+  progress sin_cos_add_sub_right_goal T.
+  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+  apply (rngl_lt_le_incl Hor) in Hzc2.
+  apply rngl_sin_add_nonneg; try easy.
+}
+apply (rngl_nle_gt Hor) in Hzc1.
+destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
+  generalize Hzc1; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply (rngl_lt_le_incl Hor) in Hs1.
+  now apply angle_add_overflow_le_lemma_2.
+}
+apply eq_rngl_cos_opp_1 in Hco1.
+rewrite Hco1 in Hs1.
+now apply (rngl_lt_irrefl Hor) in Hs1.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1808,11 +1844,6 @@ assert (H : 0 < p ≤ n) by flia Heqp Hmn.
 clear m Heqp.
 clear Hmn; rename H into Hmn; rename p into m.
 move m before n.
-(*
-apply angle_nlt_ge.
-intros Hmt.
-move Hmt before Hi; move m after n.
-*)
 assert (Hlim' :
   ∀ m ε,
   (0 < ε)%L
@@ -1841,21 +1872,7 @@ apply rngl_leb_le.
 destruct m; [ easy | ].
 rewrite angle_mul_succ_l.
 rewrite angle_mul_succ_l in Hzms.
-Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
-Check quadrant_1_rngl_cos_add_le_cos_l.
-Check angle_add_overflow_le_lemma_2.
-(* théorème ci-dessous : ah oui, non, θ2 peut être grand et ça devient faux *)
-(* faut peut-être voir par induction sur m, par exemple ? *)
-Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
-  ∀ θ1 θ2 : angle T,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
-Proof.
-intros * Hs1 Hs2.
-apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
-... ...
-now apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos.
+apply quadrant_1_2_rngl_cos_add_l_le_rngl_cos; try easy.
 ...
 apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
 ...1
