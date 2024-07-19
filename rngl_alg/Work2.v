@@ -1885,7 +1885,9 @@ eapply (rngl_le_trans Hor). {
   apply (rngl_add_le_mono_l Hop Hor).
   apply IHn.
 }
-(* ah bin non, ça marche pas... *)
+destruct n. {
+  cbn.
+(* faux *)
 ...
 assert (Hlim' :
   ∀ m ε,
