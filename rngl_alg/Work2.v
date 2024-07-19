@@ -1870,19 +1870,36 @@ Theorem angle_eucl_dist_succ_l_mul_ge :
   ∀ n θ,
   (rngl_of_nat n * angle_eucl_dist θ 0 ≤ angle_eucl_dist (S n * θ) 0)%L.
 Proof.
-Admitted.
+destruct_ac.
+intros.
+induction n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+  apply angle_eucl_dist_nonneg.
+}
+remember (S n) as sn; cbn; subst sn.
+rewrite rngl_of_nat_succ.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_mul_1_l Hon).
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply IHn.
+}
+(* ah bin non, ça marche pas... *)
+...
 assert (Hlim' :
   ∀ m ε,
   (0 < ε)%L
   → ∃ N : nat, ∀ i,
     N ≤ i → (rngl_of_nat m * angle_eucl_dist (θ i - θ') 0 < ε)%L). {
   intros p ε Hε.
-  specialize (Hlim (S m) ε Hε).
+  specialize (Hlim (S p) ε Hε).
   destruct Hlim as (N, HN).
   exists N; intros j Hj.
   eapply (rngl_le_lt_trans Hor).
   apply angle_eucl_dist_succ_l_mul_ge.
-(* euh... faut voir... *)
+  now apply HN.
+}
 ...
   apply HN.
 ...2
