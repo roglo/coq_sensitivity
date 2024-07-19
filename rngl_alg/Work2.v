@@ -1863,6 +1863,28 @@ assert (Hlim' :
 (*2*)
 move Hlim' before Hlim; clear Hlim; rename Hlim' into Hlim.
 Search (angle_eucl_dist (_ * _)).
+(* il faudrait une borne inf de angle_eucl_dist (m * θ) 0,
+   genre rngl_of_nat (m - 1) * angle_eucl_dist θ 0, par
+   exemple, à supposer que c'est vrai *)
+Theorem angle_eucl_dist_succ_l_mul_ge :
+  ∀ n θ,
+  (rngl_of_nat n * angle_eucl_dist θ 0 ≤ angle_eucl_dist (S n * θ) 0)%L.
+Proof.
+Admitted.
+assert (Hlim' :
+  ∀ m ε,
+  (0 < ε)%L
+  → ∃ N : nat, ∀ i,
+    N ≤ i → (rngl_of_nat m * angle_eucl_dist (θ i - θ') 0 < ε)%L). {
+  intros p ε Hε.
+  specialize (Hlim (S m) ε Hε).
+  destruct Hlim as (N, HN).
+  exists N; intros j Hj.
+  eapply (rngl_le_lt_trans Hor).
+  apply angle_eucl_dist_succ_l_mul_ge.
+(* euh... faut voir... *)
+...
+  apply HN.
 ...2
 (*1*)
 progress unfold angle_leb.
