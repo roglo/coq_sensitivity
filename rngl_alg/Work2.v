@@ -1887,6 +1887,14 @@ induction n. {
   rewrite (rngl_mul_0_l Hos).
   apply angle_eucl_dist_nonneg.
 }
+rewrite rngl_of_nat_succ.
+rewrite (rngl_div_add_distr_r Hiv).
+rewrite rngl_mul_add_distr_r.
+eapply (rngl_le_trans Hor). {
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply IHn.
+}
+(* c'est pas sûr que ça soit vrai, ça *)
 ...
 assert (Hlim' :
   ∀ m ε,
