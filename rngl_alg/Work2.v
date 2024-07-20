@@ -1866,6 +1866,8 @@ Search (angle_eucl_dist (_ * _)).
 (* il faudrait une borne inf de angle_eucl_dist (m * θ) 0,
    genre rngl_of_nat m / 2 * angle_eucl_dist θ 0, par
    exemple, à supposer que c'est vrai *)
+(* bon : testé mais pas convaincant : probablement faux *)
+...
 Theorem angle_eucl_dist_succ_l_mul_ge :
   ∀ n θ,
   (rngl_of_nat n / 2 * angle_eucl_dist θ 0 ≤ angle_eucl_dist (n * θ) 0)%L.
@@ -1879,6 +1881,26 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_eucl_dist_nonneg.
 }
 intros.
+(*3*)
+assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
+do 2 rewrite angle_eucl_dist_is_sqrt.
+do 2 rewrite angle_sub_0_l.
+do 2 rewrite rngl_cos_opp.
+rewrite rl_sqrt_mul; [ | easy | ]. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite rl_sqrt_mul; [ | easy | ]. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic).
+rewrite <- rngl_mul_assoc.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+  now apply rl_sqrt_nonneg.
+}
+(* ouais, je le sens pas... *)
+...3
 induction n. {
   cbn.
   rewrite (rngl_div_0_l Hos Hi1). 2: {
@@ -1895,6 +1917,9 @@ eapply (rngl_le_trans Hor). {
   apply IHn.
 }
 (* c'est pas sûr que ça soit vrai, ça *)
+Search (angle_eucl_dist).
+Check angle_eucl_dist_is_sqrt.
+do 3 rewrite angle_eucl_dist_is_sqrt.
 ...
 assert (Hlim' :
   ∀ m ε,
