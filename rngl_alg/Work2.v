@@ -1864,30 +1864,29 @@ assert (Hlim' :
 move Hlim' before Hlim; clear Hlim; rename Hlim' into Hlim.
 Search (angle_eucl_dist (_ * _)).
 (* il faudrait une borne inf de angle_eucl_dist (m * θ) 0,
-   genre rngl_of_nat (m - 1) * angle_eucl_dist θ 0, par
+   genre rngl_of_nat m / 2 * angle_eucl_dist θ 0, par
    exemple, à supposer que c'est vrai *)
 Theorem angle_eucl_dist_succ_l_mul_ge :
   ∀ n θ,
-  (rngl_of_nat n * angle_eucl_dist θ 0 ≤ angle_eucl_dist (S n * θ) 0)%L.
+  (rngl_of_nat n / 2 * angle_eucl_dist θ 0 ≤ angle_eucl_dist (n * θ) 0)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _)%L).
+  apply angle_eucl_dist_nonneg.
+}
 intros.
 induction n. {
   cbn.
+  rewrite (rngl_div_0_l Hos Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
   rewrite (rngl_mul_0_l Hos).
   apply angle_eucl_dist_nonneg.
 }
-remember (S n) as sn; cbn; subst sn.
-rewrite rngl_of_nat_succ.
-rewrite rngl_mul_add_distr_r.
-rewrite (rngl_mul_1_l Hon).
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_mono_l Hop Hor).
-  apply IHn.
-}
-destruct n. {
-  cbn.
-(* faux *)
 ...
 assert (Hlim' :
   ∀ m ε,
