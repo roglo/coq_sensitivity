@@ -1867,10 +1867,15 @@ Search (angle_eucl_dist (_ * _)).
    genre rngl_of_nat m / 2 * angle_eucl_dist θ 0, par
    exemple, à supposer que c'est vrai *)
 (* bon : testé mais pas convaincant : probablement faux *)
+(* bof, j'essaie log2(n), on va voir *)
+(* bon, pas convaincant : peut-être qu'il faut que je change ma
+   définition de distance sur les angles, qui ne fonctionne pas
+   bien si c'est un angle supérieur à π ; chais pas *)
 ...
 Theorem angle_eucl_dist_succ_l_mul_ge :
   ∀ n θ,
-  (rngl_of_nat n / 2 * angle_eucl_dist θ 0 ≤ angle_eucl_dist (n * θ) 0)%L.
+  (rngl_of_nat (Nat.log2_up n) * angle_eucl_dist θ 0 ≤
+     angle_eucl_dist (n * θ) 0)%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -1881,45 +1886,23 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_eucl_dist_nonneg.
 }
 intros.
-(*3*)
-assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
-do 2 rewrite angle_eucl_dist_is_sqrt.
-do 2 rewrite angle_sub_0_l.
-do 2 rewrite rngl_cos_opp.
-rewrite rl_sqrt_mul; [ | easy | ]. 2: {
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite rl_sqrt_mul; [ | easy | ]. 2: {
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_mul_comm Hic).
-rewrite <- rngl_mul_assoc.
-apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-  now apply rl_sqrt_nonneg.
-}
-(* ouais, je le sens pas... *)
-...3
-induction n. {
+destruct n. {
   cbn.
-  rewrite (rngl_div_0_l Hos Hi1). 2: {
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  }
   rewrite (rngl_mul_0_l Hos).
   apply angle_eucl_dist_nonneg.
 }
-rewrite rngl_of_nat_succ.
-rewrite (rngl_div_add_distr_r Hiv).
-rewrite rngl_mul_add_distr_r.
-eapply (rngl_le_trans Hor). {
-  apply (rngl_add_le_mono_l Hop Hor).
-  apply IHn.
+destruct n. {
+  cbn.
+  rewrite (rngl_mul_0_l Hos).
+  apply angle_eucl_dist_nonneg.
 }
-(* c'est pas sûr que ça soit vrai, ça *)
-Search (angle_eucl_dist).
-Check angle_eucl_dist_is_sqrt.
-do 3 rewrite angle_eucl_dist_is_sqrt.
+destruct n. {
+  cbn.
+  rewrite rngl_add_0_r.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite angle_add_0_r.
+Search (angle_eucl_dist (_ + _)).
+  (* vrai si θ < π/2 *)
 ...
 assert (Hlim' :
   ∀ m ε,
