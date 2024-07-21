@@ -4418,6 +4418,8 @@ intros * Hiz Hlim.
 (*1*)
 specialize (angle_lim_angle_lim_mul_mul n _ _ Hlim) as H1.
 specialize (seq_angle_mul_nat_not_overflow n θ) as H2.
+enough (angle_mul_nat_overflow n θ' = false).
+Search (angle_mul_nat_overflow _ _ = false → _).
 ...1
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hch n θ' Hiz).
