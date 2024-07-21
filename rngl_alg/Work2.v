@@ -1871,6 +1871,8 @@ Search (angle_eucl_dist (_ * _)).
 (* bon, pas convaincant : peut-être qu'il faut que je change ma
    définition de distance sur les angles, qui ne fonctionne pas
    bien si c'est un angle supérieur à π ; chais pas *)
+(* en fait d(mθ,0) ne peut pas être minimisé : c'est une ligne
+   droite entre 0 et mθ *)
 ...
 Theorem angle_eucl_dist_succ_l_mul_ge :
   ∀ n θ,
