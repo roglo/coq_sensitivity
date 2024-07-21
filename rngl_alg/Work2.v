@@ -1122,7 +1122,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
 Qed.
 
 Theorem seq_angle_mul_nat_not_overflow :
-  ∀ n i θ,
+  ∀ n θ i,
   angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
 Proof.
 intros.
@@ -1136,6 +1136,8 @@ destruct (lt_dec (2 ^ i) n) as [Hin| Hni]. {
 apply Nat.nlt_ge in Hni.
 now apply (angle_add_overflow_mul_by_lt n i θ).
 Qed.
+
+(**)
 
 Theorem angle_eucl_dist_add_cancel_l :
   ∀ θ1 θ2 θ3,
@@ -1249,6 +1251,8 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hlim. 2: {
 }
 now rewrite <- (rngl_mul_nat_comm Hon Hos) in Hlim.
 Qed.
+
+(**)
 
 Theorem rngl_lt_cos_lt_cos_div2 :
   ∀ a b θ,
@@ -4411,6 +4415,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now rewrite Hc1 in Hch.
 }
 intros * Hiz Hlim.
+(*1*)
+specialize (angle_lim_angle_lim_mul_mul n _ _ Hlim) as H1.
+specialize (seq_angle_mul_nat_not_overflow n θ) as H2.
+...1
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hch n θ' Hiz).
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
