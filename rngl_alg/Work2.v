@@ -2590,7 +2590,9 @@ specialize (H2 N (Nat.le_refl _)) as H3.
 bon chais pas
 *)
 ...
+*)
 
+(* to be completed
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
