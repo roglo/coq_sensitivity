@@ -1867,6 +1867,30 @@ assert (Hlim' :
 (*3*)
 apply angle_nlt_ge.
 intros Hmt.
+set (ε := angle_eucl_dist (m * θ') θ').
+assert (Hε : (0 < ε / 2)%L). {
+  progress unfold ε.
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  apply not_eq_sym.
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  rewrite H in Hmt.
+  now apply angle_lt_irrefl in Hmt.
+}
+specialize (Hlim 1 (ε / 2)%L Hε) as H1.
+specialize (Hlim m (ε / 2)%L Hε) as H2.
+destruct H1 as (N1, H1).
+destruct H2 as (N2, H2).
+specialize (H1 (max N1 N2) (Nat.le_max_l _ _)).
+specialize (H2 (max N1 N2) (Nat.le_max_r _ _)).
+do 2 rewrite angle_mul_1_l in H1.
+remember (θ (max N1 N2)) as θ1 eqn:Hθ1.
+specialize (angle_eucl_dist_triangular) as H3.
+specialize (H3 (m * θ')%A θ1 θ').
 ...3
 (*2*)
 move Hlim' before Hlim; clear Hlim; rename Hlim' into Hlim.
