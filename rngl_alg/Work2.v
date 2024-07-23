@@ -1867,7 +1867,11 @@ assert (Hlim' :
 (*3*)
 apply angle_nlt_ge.
 intros Hmt.
-set (ε := angle_eucl_dist (m * θ') θ').
+(*4*)
+set (ε1 := angle_eucl_dist (m * θ') 0).
+set (ε2 := angle_eucl_dist (m * θ') θ').
+...4
+set (ε1 := angle_eucl_dist (m * θ') θ').
 assert (Hε : (0 < ε / 2)%L). {
   progress unfold ε.
   apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
