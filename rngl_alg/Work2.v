@@ -1864,6 +1864,10 @@ assert (Hlim' :
   rewrite angle_eucl_dist_move_0_r in HN.
   now rewrite <- angle_mul_sub_distr_l in HN.
 }
+(*3*)
+apply angle_nlt_ge.
+intros Hmt.
+...3
 (*2*)
 move Hlim' before Hlim; clear Hlim; rename Hlim' into Hlim.
 Search (angle_eucl_dist (_ * _)).
