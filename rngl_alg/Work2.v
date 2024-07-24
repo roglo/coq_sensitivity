@@ -1919,6 +1919,8 @@ assert (Hlim' :
 apply angle_nlt_ge.
 intros Hmt.
 (*4*)
+...
+(* je crois qu'il faut faire deux cas : mθ'=0 et mθ'≠0 *)
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
 specialize (Hlim 1 (rngl_min ε1 (ε2 / 2))%L) as H1.
