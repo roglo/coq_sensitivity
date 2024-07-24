@@ -1899,6 +1899,10 @@ split. 2: {
 intros Hnt.
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
+(*1*)
+specialize (proj2 (angle_all_add_not_overflow _ _) Hov) as H.
+clear Hov; rename H into Hov.
+...1
 clear Hs.
 induction n; [ now left | right ].
 rewrite angle_mul_nat_overflow_succ_l in Hov.
