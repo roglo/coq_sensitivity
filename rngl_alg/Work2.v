@@ -1897,12 +1897,22 @@ split. 2: {
   }
 }
 intros Hnt.
-apply eq_angle_mul_0 in Hnt.
-destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
 (*1*)
 specialize (proj2 (angle_all_add_not_overflow _ _) Hov) as H.
 clear Hov; rename H into Hov.
+assert (∀ m, m < n → (θ ≤ θ + m * θ)%A). {
+  intros * Hmn.
+  specialize (Hov _ Hmn).
+  progress unfold angle_add_overflow in Hov.
+  apply Bool.not_true_iff_false in Hov.
+  now apply angle_nlt_ge in Hov.
+}
+clear Hov; rename H into Hov.
+move Hov after Hnt.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now left | right ].
 ...1
+apply eq_angle_mul_0 in Hnt.
+destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
 clear Hs.
 induction n; [ now left | right ].
 rewrite angle_mul_nat_overflow_succ_l in Hov.
