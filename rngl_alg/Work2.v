@@ -1870,8 +1870,57 @@ intros Hmt.
 (*4*)
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
+specialize (Hlim 1 (rngl_min ε1 (ε2 / 2))%L) as H1.
+specialize (Hlim m (rngl_min ε1 (ε2 / 2))%L) as H2.
+assert (Hε : (0 < rngl_min ε1 (ε2 / 2))%L). {
+  apply rngl_min_glb_lt. {
+    progress unfold ε1.
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    apply not_eq_sym.
+    intros H.
+    apply angle_eucl_dist_separation in H.
+Theorem eq_angle_mul_0_iff :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → (n * θ = 0)%A
+  ↔ n = 0 ∨ θ = 0%A.
+Proof.
+intros * Hov.
+split. 2: {
+  intros [H| H]. {
+    subst n.
+    apply angle_mul_0_l.
+  } {
+    subst θ.
+    apply angle_mul_0_r.
+  }
+}
+intros Hnt.
+apply eq_angle_mul_0 in Hnt.
+destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
+clear Hs.
+induction n; [ now left | right ].
+rewrite angle_mul_nat_overflow_succ_l in Hov.
+apply Bool.orb_false_iff in Hov.
+destruct Hov as (Hov1, Hov2).
+specialize (IHn Hov1).
+cbn in Hc.
+...
+apply eq_angle_mul_0_iff in H. {
+  destruct H; [ now subst m | easy ].
+}
+...
+    apply eq_angle_mul_0 in H.
+    destruct H as [H| (Hc, Hs)]; [ now subst m | ].
+Search (rngl_cos (_ * _)).
+Print rngl_cos_mul.
+Search rngl_cos_mul.
+...
+    rewrite H in Hmt.
+  now apply angle_lt_irrefl in Hmt.
 ...4
-set (ε1 := angle_eucl_dist (m * θ') θ').
+set (ε := angle_eucl_dist (m * θ') θ').
 assert (Hε : (0 < ε / 2)%L). {
   progress unfold ε.
   apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
