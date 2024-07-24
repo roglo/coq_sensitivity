@@ -1783,6 +1783,57 @@ rewrite Hco1 in Hs1.
 now apply (rngl_lt_irrefl Hor) in Hs1.
 Qed.
 
+Theorem angle_le_0_r : ∀ θ, (θ ≤ 0 ↔ θ = 0)%A.
+Proof.
+destruct_ac.
+intros.
+split; intros H; [ | subst θ; apply angle_le_refl ].
+progress unfold angle_leb in H.
+cbn in H.
+rewrite (rngl_leb_refl Hor) in H.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ | easy ].
+apply rngl_leb_le in H.
+apply (rngl_le_antisymm Hor) in H; [ | apply rngl_cos_bound ].
+now apply eq_rngl_cos_1 in H.
+Qed.
+
+Theorem eq_angle_mul_0_iff :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → (n * θ = 0)%A
+  ↔ n = 0 ∨ θ = 0%A.
+Proof.
+intros * Hov.
+split. 2: {
+  intros [H| H]. {
+    subst n.
+    apply angle_mul_0_l.
+  } {
+    subst θ.
+    apply angle_mul_0_r.
+  }
+}
+intros Hnt.
+specialize (proj2 (angle_all_add_not_overflow _ _) Hov) as H.
+clear Hov; rename H into Hov.
+assert (∀ m, m < n → (θ ≤ θ + m * θ)%A). {
+  intros * Hmn.
+  specialize (Hov _ Hmn).
+  progress unfold angle_add_overflow in Hov.
+  apply Bool.not_true_iff_false in Hov.
+  now apply angle_nlt_ge in Hov.
+}
+clear Hov; rename H into Hov.
+move Hov after Hnt.
+destruct n; [ now left | right ].
+specialize (Hov n (Nat.lt_succ_diag_r _)) as H1.
+rewrite <- angle_mul_succ_l in H1.
+rewrite Hnt in H1.
+now apply angle_le_0_r in H1.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1880,37 +1931,9 @@ assert (Hε : (0 < rngl_min ε1 (ε2 / 2))%L). {
     apply not_eq_sym.
     intros H.
     apply angle_eucl_dist_separation in H.
-Theorem eq_angle_mul_0_iff :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = false
-  → (n * θ = 0)%A
-  ↔ n = 0 ∨ θ = 0%A.
-Proof.
-intros * Hov.
-split. 2: {
-  intros [H| H]. {
-    subst n.
-    apply angle_mul_0_l.
-  } {
-    subst θ.
-    apply angle_mul_0_r.
-  }
-}
-intros Hnt.
-(*1*)
-specialize (proj2 (angle_all_add_not_overflow _ _) Hov) as H.
-clear Hov; rename H into Hov.
-assert (∀ m, m < n → (θ ≤ θ + m * θ)%A). {
-  intros * Hmn.
-  specialize (Hov _ Hmn).
-  progress unfold angle_add_overflow in Hov.
-  apply Bool.not_true_iff_false in Hov.
-  now apply angle_nlt_ge in Hov.
-}
-clear Hov; rename H into Hov.
-move Hov after Hnt.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now left | right ].
-...1
+    apply eq_angle_mul_0_iff in H. 2: {
+(* ah oui mais non, justement, j'ai le contraire en hypothèse *)
+...
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
 clear Hs.
