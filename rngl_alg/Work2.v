@@ -1834,7 +1834,7 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-(* to be completed *)
+(* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
