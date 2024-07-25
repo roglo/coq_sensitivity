@@ -1921,6 +1921,20 @@ intros Hmt.
 (*4*)
 (* je crois qu'il faut faire deux cas : mθ'=0 et mθ'≠0 *)
 destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
+  specialize (Hlim m) as H1.
+  rewrite Hmtz in H1.
+  set (ε := angle_eucl_dist θ' 0).
+  specialize (H1 ε).
+  assert (H : (0 < ε)%L). {
+    progress unfold ε.
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    apply not_eq_sym.
+    intros H.
+    now apply angle_eucl_dist_separation in H.
+  }
+  specialize (H1 H); clear H.
+  destruct H1 as (N, HN).
 ...
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
