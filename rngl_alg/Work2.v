@@ -1896,7 +1896,7 @@ assert (H : ∀ i m, 0 < m ≤ n → (θ i ≤ m * θ i)%A). {
   apply Hi.
   flia Hmz Hmn.
 }
-move H before Hi; clear Hi; rename H into Hi.
+move H before Hi; clear Hi; rename H into Hni.
 progress unfold lt in Hmn.
 remember (S m) as p.
 assert (H : 0 < p ≤ n) by flia Heqp Hmn.
@@ -1935,6 +1935,14 @@ destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
   }
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
+  assert (H : ∀ i, N ≤ i → (angle_eucl_dist (θ i) 0 < ε)%L). {
+    intros i Hi.
+    specialize (HN i Hi).
+(* marche pas : il faut que θi et mθi soient tous deux < π *)
+...
+    eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+    apply angle_le_angle_eucl_dist_le.
 ...
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
