@@ -1936,8 +1936,11 @@ destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
 Check eq_angle_mul_0_iff.
-(* ce théorème est complètement idiot : si nθ = 0, c'est forcément
-   que nθ déborde ! *)
+(* peux pas appliquer ce théorème, puisque le fait que mθ' ne déborde
+   pas, c'est justement ce que je veux démontrer *)
+...
+  apply eq_angle_mul_0_iff in Hmtz.
+2: {
 ...
   assert (H : ∀ i, N ≤ i → (angle_eucl_dist (θ i) 0 < ε)%L). {
     intros i Hi.
