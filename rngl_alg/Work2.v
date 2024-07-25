@@ -1834,7 +1834,7 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-(* to be completed
+(* to be completed *)
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
@@ -1935,6 +1935,10 @@ destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
   }
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
+Check eq_angle_mul_0_iff.
+(* ce théorème est complètement idiot : si nθ = 0, c'est forcément
+   que nθ déborde ! *)
+...
   assert (H : ∀ i, N ≤ i → (angle_eucl_dist (θ i) 0 < ε)%L). {
     intros i Hi.
     specialize (HN i Hi).
