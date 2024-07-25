@@ -1860,6 +1860,10 @@ destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
 }
 apply angle_all_add_not_overflow.
 intros * Hmn.
+destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
+  rewrite Hmtz.
+  apply angle_add_overflow_0_r.
+}
 assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
   intros k.
   now apply (angle_lim_angle_lim_mul_mul).
@@ -1876,7 +1880,7 @@ apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
 assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
-  clear m Hmn.
+  clear m Hmn Hmtz.
   intros * Hmn.
   specialize (Hi i).
   specialize (proj2 (angle_all_add_not_overflow _ _) Hi m Hmn) as H.
@@ -1888,7 +1892,7 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
 move H before Hi; clear Hi; rename H into Hi.
 (**)
 assert (H : ∀ i m, 0 < m ≤ n → (θ i ≤ m * θ i)%A). {
-  clear m Hmn.
+  clear m Hmn Hmtz.
   intros * (Hmz, Hmn).
   specialize (Hi i (m - 1)).
   rewrite <- Nat_succ_sub_succ_r in Hi; [ | easy ].
@@ -1900,7 +1904,7 @@ move H before Hi; clear Hi; rename H into Hi.
 progress unfold lt in Hmn.
 remember (S m) as p.
 assert (H : 0 < p ≤ n) by flia Heqp Hmn.
-clear m Heqp.
+clear m Heqp Hmtz.
 clear Hmn; rename H into Hmn; rename p into m.
 move m before n.
 assert (Hlim' :
