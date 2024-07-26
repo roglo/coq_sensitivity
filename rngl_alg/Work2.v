@@ -1938,6 +1938,9 @@ destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
 Check eq_angle_mul_0_iff.
 (* peux pas appliquer ce théorème, puisque le fait que mθ' ne déborde
    pas, c'est justement ce que je veux démontrer *)
+(* il y a un problème avec ma définition de distance entre les angles ;
+   si l'angle est supérieur à π, la distance à 0 diminue alors qu'elle
+   devrait augmenter *)
 ...
   apply eq_angle_mul_0_iff in Hmtz.
 2: {
