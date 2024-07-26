@@ -1838,6 +1838,9 @@ Qed.
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
+(* bon, ce théorème est faux, si la suite θi converge vers 0 par le
+   bas. Il faut donc rajouter une hypothèse. *)
+...
 Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
@@ -1935,6 +1938,7 @@ destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
   }
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
+...
 Check eq_angle_mul_0_iff.
 (* peux pas appliquer ce théorème, puisque le fait que mθ' ne déborde
    pas, c'est justement ce que je veux démontrer *)
