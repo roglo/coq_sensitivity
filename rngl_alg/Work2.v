@@ -1950,6 +1950,12 @@ assert (Hε : (0 < rngl_min ε1 (ε2 / 2))%L). {
 }
 specialize (H1 Hε).
 specialize (H2 Hε).
+destruct H1 as (N1, HN1).
+destruct H2 as (N2, HN2).
+set (i := max N1 N2).
+specialize (HN1 i (Nat.le_max_l _ _)).
+specialize (HN2 i (Nat.le_max_r _ _)).
+do 2 rewrite angle_mul_1_l in HN1.
 ...
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
