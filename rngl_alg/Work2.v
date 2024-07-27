@@ -1841,12 +1841,12 @@ Qed.
 (* bon, ce théorème est faux, si la suite θi converge vers 0 par le
    bas. Il faut donc rajouter une hypothèse. Ou alors ne considérer
    que notre cas de θi=2^i/n.θ/2^i*)
-...
 Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
   → angle_lim θ θ'
   → (θ' < angle_straight)%A
+  → (∀ m, 0 < m ≤ n → (m * θ' ≠ 0)%A)
   → angle_mul_nat_overflow n θ' = false.
 Proof.
 destruct_ac.
@@ -1857,7 +1857,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 θ').
   apply angle_mul_nat_overflow_0_r.
 }
-intros * Hi Hlim Hts.
+intros * Hi Hlim Hts Hnt.
 destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
   subst θ'.
   apply angle_mul_nat_overflow_0_r.
@@ -1922,40 +1922,7 @@ assert (Hlim' :
 (*3*)
 apply angle_nlt_ge.
 intros Hmt.
-(*4*)
-(* je crois qu'il faut faire deux cas : mθ'=0 et mθ'≠0 *)
-destruct (angle_eq_dec (m * θ') 0) as [Hmtz| Hmtz]. {
-  specialize (Hlim m) as H1.
-  rewrite Hmtz in H1.
-  set (ε := angle_eucl_dist θ' 0).
-  specialize (H1 ε).
-  assert (H : (0 < ε)%L). {
-    progress unfold ε.
-    apply (rngl_lt_iff Hor).
-    split; [ apply angle_eucl_dist_nonneg | ].
-    apply not_eq_sym.
-    intros H.
-    now apply angle_eucl_dist_separation in H.
-  }
-  specialize (H1 H); clear H.
-  destruct H1 as (N, HN).
-...
-Check eq_angle_mul_0_iff.
-(* peux pas appliquer ce théorème, puisque le fait que mθ' ne déborde
-   pas, c'est justement ce que je veux démontrer *)
-...
-  apply eq_angle_mul_0_iff in Hmtz.
-2: {
-...
-  assert (H : ∀ i, N ≤ i → (angle_eucl_dist (θ i) 0 < ε)%L). {
-    intros i Hi.
-    specialize (HN i Hi).
-(* marche pas : il faut que θi et mθi soient tous deux < π *)
-...
-    eapply (rngl_le_lt_trans Hor); [ | apply HN ].
-Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
-    apply angle_le_angle_eucl_dist_le.
-...
+specialize (Hnt _ Hmn) as Hmtz.
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
 specialize (Hlim 1 (rngl_min ε1 (ε2 / 2))%L) as H1.
@@ -1967,9 +1934,22 @@ assert (Hε : (0 < rngl_min ε1 (ε2 / 2))%L). {
     split; [ apply angle_eucl_dist_nonneg | ].
     apply not_eq_sym.
     intros H.
-    apply angle_eucl_dist_separation in H.
-    apply eq_angle_mul_0_iff in H. 2: {
-(* ah oui mais non, justement, j'ai le contraire en hypothèse *)
+    now apply angle_eucl_dist_separation in H.
+  }
+  progress unfold ε2.
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  apply not_eq_sym.
+  intros H.
+  apply angle_eucl_dist_separation in H.
+  rewrite H in Hmt.
+  now apply angle_lt_irrefl in Hmt.
+}
+specialize (H1 Hε).
+specialize (H2 Hε).
 ...
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
