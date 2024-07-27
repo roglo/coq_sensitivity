@@ -1956,13 +1956,20 @@ set (i := max N1 N2).
 specialize (HN1 i (Nat.le_max_l _ _)).
 specialize (HN2 i (Nat.le_max_r _ _)).
 do 2 rewrite angle_mul_1_l in HN1.
+...
+(* oui, non, ça va pas, l'informatique m'abandonne *)
 Theorem glop :
-  θ1 < θ2
-  → θ3 < θ4
-  → ε = angle_eucl_dist ...
-  → angle_eucl_dist θ1 θ2 < ε
-  → angle_eucl_dist θ3 θ4 < ε
-(* oh pis zut *)
+  ∀ θ1 θ2 θ3 θ4 ε1 ε2,
+  (θ1 < θ4)%A
+  → ε1 = angle_eucl_dist θ1 0
+  → ε2 = angle_eucl_dist θ1 θ4
+  → (angle_eucl_dist θ3 θ4 < rngl_min ε1 (ε2 / 2))%L
+  → (angle_eucl_dist θ2 θ1 < rngl_min ε1 (ε2 / 2))%L
+  → (θ2 < θ3)%A.
+Proof.
+intros * H14 He1 He2 H34 H21.
+... ...
+apply (glop _ _ (θ i) θ') in HN2; [ | apply Hmt | easy | easy | easy ].
 ...
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
