@@ -1956,6 +1956,13 @@ set (i := max N1 N2).
 specialize (HN1 i (Nat.le_max_l _ _)).
 specialize (HN2 i (Nat.le_max_r _ _)).
 do 2 rewrite angle_mul_1_l in HN1.
+Theorem glop :
+  θ1 < θ2
+  → θ3 < θ4
+  → ε = angle_eucl_dist ...
+  → angle_eucl_dist θ1 θ2 < ε
+  → angle_eucl_dist θ3 θ4 < ε
+(* oh pis zut *)
 ...
 apply eq_angle_mul_0 in Hnt.
 destruct Hnt as [H| (Hc, Hs)]; [ now left | ].
