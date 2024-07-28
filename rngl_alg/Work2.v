@@ -1959,15 +1959,15 @@ do 2 rewrite angle_mul_1_l in HN1.
 Theorem glop :
   ∀ θ1 θ2 θ3 θ4 ε1 ε2,
   ε1 = angle_eucl_dist θ1 0
-  → ε2 = angle_eucl_dist θ1 θ2
-  → (angle_eucl_dist θ4 θ2 < rngl_min ε1 (ε2 / 2))%L
-  → (angle_eucl_dist θ3 θ1 < rngl_min ε1 (ε2 / 2))%L
-  → (θ1 < θ2)%A
-  → (θ3 < θ4)%A.
+  → ε2 = angle_eucl_dist θ1 θ4
+  → (angle_eucl_dist θ3 θ4 < rngl_min ε1 (ε2 / 2))%L
+  → (angle_eucl_dist θ2 θ1 < rngl_min ε1 (ε2 / 2))%L
+  → (θ1 < θ4)%A
+  → (θ2 < θ3)%A.
 Proof.
-intros * He1 He2 H42 H31 H12.
-...
-specialize (glop (m * θ') θ' (m * θ i) (θ i))%A as H1.
+intros * He1 He2 H34 H21 H14.
+... ...
+specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
 (* ok, contradiction *)
 ...
