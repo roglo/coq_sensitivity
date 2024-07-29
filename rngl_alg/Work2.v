@@ -1974,6 +1974,7 @@ Theorem glip :
   → (θ2 < θ3)%A.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hd12 H13.
 progress unfold angle_ltb in H13.
 progress unfold angle_ltb.
@@ -2001,34 +2002,10 @@ destruct zs1. 2: {
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   }
-Theorem rngl_mul_min_distr_l :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  rngl_has_eq_dec T = true →
-  ∀ a b c, (0 ≤ a)%L → rngl_min (a * b) (a * c) = (a * rngl_min b c)%L.
-Proof.
-intros Hop Hor Hed.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hza.
-destruct (rngl_eq_dec Hed a 0) as [Haz| Haz]. {
-  subst a.
-  do 3 rewrite (rngl_mul_0_l Hos).
-  progress unfold rngl_min.
-...
-progress unfold rngl_min.
-remember (_ * _ ≤? _ * _)%L as abc eqn:Habc.
-remember (b ≤? c)%L as bc eqn:Hbc.
-symmetry in Habc, Hbc.
-destruct abc. {
-  f_equal.
-  destruct bc; [ easy | ].
-  apply rngl_leb_le in Habc.
-  apply (rngl_leb_gt Hor) in Hbc.
-Check rngl_mul_le_mono_pos_l.
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor) in Habc.
-Search (Z.min (_ * _)).
-... ...
-  rewrite rngl_mul_min_distr_l in Hd12.
+  rewrite (rngl_mul_min_distr_l Hop Hor Hed Hii) in Hd12. 2: {
+    now apply rl_sqrt_nonneg.
+  }
+Search (_ * _ < _ * _)%L.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).

@@ -5081,6 +5081,47 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ | easy ].
 now apply (rngl_le_lt_trans Hor _ a).
 Qed.
 
+Theorem rngl_mul_min_distr_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rngl_has_eq_dec T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b c, (0 ≤ a)%L → rngl_min (a * b)%L (a * c)%L = (a * rngl_min b c)%L.
+Proof.
+intros Hop Hor Hed Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hza.
+destruct (rngl_eq_dec Hed a 0%L) as [Haz| Haz]. {
+  subst a.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  apply (rngl_min_id Hor).
+}
+assert (H : (0 < a)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+}
+clear Hza Haz; rename H into Hza.
+progress unfold rngl_min.
+remember (_ * _ ≤? _ * _)%L as abc eqn:Habc.
+remember (b ≤? c)%L as bc eqn:Hbc.
+symmetry in Habc, Hbc.
+destruct abc. {
+  f_equal.
+  destruct bc; [ easy | ].
+  apply rngl_leb_le in Habc.
+  apply (rngl_leb_gt Hor) in Hbc.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Habc; [ | easy ].
+  now apply (rngl_nle_gt Hor) in Hbc.
+}
+destruct bc; [ | easy ].
+f_equal.
+apply rngl_leb_le in Hbc.
+apply (rngl_leb_gt Hor) in Habc.
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Habc; [ | easy ].
+now apply (rngl_nle_gt Hor) in Habc.
+Qed.
+
 Theorem rngl_lt_mul_0_if :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
