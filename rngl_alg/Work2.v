@@ -1834,6 +1834,33 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
+Theorem rngl_sqrt_min_distr :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (0 ≤ a)%L → (0 ≤ b)%L → rngl_min √a √b = √(rngl_min a b)%L.
+Proof.
+intros Hon Hop Hor Hii * Hza Hzb.
+progress unfold rngl_min.
+remember (√a ≤? √b)%L as sab eqn:Hsab.
+remember (a ≤? b)%L as ab eqn:Hab.
+symmetry in Hsab, Hab.
+destruct sab. {
+  destruct ab; [ easy | ].
+  apply rngl_leb_le in Hsab.
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_le_antisymm Hor); [ easy | ].
+  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+destruct ab; [ | easy ].
+apply (rngl_leb_gt Hor) in Hsab.
+apply rngl_leb_le in Hab.
+apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hor) | ].
+now apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii).
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -1975,8 +2002,19 @@ Theorem glip :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hd12 H13.
+  rewrite (H1 θ1), (H1 θ3) in H13.
+  now apply angle_lt_irrefl in H13.
+}
 intros * Hd12 H13.
+destruct (angle_le_dec θ2 θ1) as [H21| H12]. {
+  now apply (angle_le_lt_trans _ θ1).
+}
+apply angle_nle_gt in H12.
 progress unfold angle_ltb in H13.
+progress unfold angle_ltb in H12.
 progress unfold angle_ltb.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
@@ -1987,7 +2025,7 @@ destruct zs1. 2: {
   destruct zs3; [ easy | ].
   destruct zs2; [ easy | ].
   apply (rngl_leb_gt Hor) in Hzs1, Hzs2, Hzs3.
-  apply rngl_ltb_lt in H13.
+  apply rngl_ltb_lt in H13, H12.
   apply rngl_ltb_lt.
   do 3 rewrite angle_eucl_dist_is_sqrt in Hd12.
   rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
@@ -2005,7 +2043,18 @@ destruct zs1. 2: {
   rewrite (rngl_mul_min_distr_l Hop Hor Hed Hii) in Hd12. 2: {
     now apply rl_sqrt_nonneg.
   }
-Search (_ * _ < _ * _)%L.
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hd12. 2: {
+    apply (rl_sqrt_pos Hon Hos Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_sqrt_min_distr Hon Hop Hor Hii) in Hd12; cycle 1. {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  } {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+Search (√_ < √_)%L.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
