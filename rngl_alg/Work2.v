@@ -2002,6 +2002,8 @@ Theorem glip :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros * Hd12 H13.
@@ -2054,6 +2056,45 @@ destruct zs1. 2: {
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hd12. 2: {
+    apply rl_sqrt_nonneg.
+    apply rngl_min_glb. {
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    } {
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    }
+  }
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd12. 2: {
+    apply rl_sqrt_nonneg.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd12.
+  rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
+    apply rngl_min_glb. {
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    } {
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    }
+  }
+Search (rngl_min (_ - _) (_ - _)).
+Search (rngl_max (_ - _) (_ - _)).
+Search (rngl_min (_ + _) (_ + _)).
+Search (rngl_max (_ + _) (_ + _)).
+...
+Search (0 ≤ rngl_min _ _)%L.
+Search (_ ≤ rngl_min _ _)%L.
+Search (_ ² < _ ²)%L.
+Search (rngl_abs _ = _).
+
 Search (√_ < √_)%L.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
