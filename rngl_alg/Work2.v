@@ -1966,6 +1966,12 @@ Theorem glop :
   → (θ2 < θ3)%A.
 Proof.
 intros * He1 He2 H34 H21 H14.
+Theorem glip :
+  ∀ θ1 θ2 θ3,
+  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ1 θ3)%L
+  → (θ1 < θ3)%A
+  → (θ2 < θ3)%A.
+Proof.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
