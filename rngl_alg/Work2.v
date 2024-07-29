@@ -1968,10 +1968,67 @@ Proof.
 intros * He1 He2 H34 H21 H14.
 Theorem glip :
   ∀ θ1 θ2 θ3,
-  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ1 θ3)%L
+  (angle_eucl_dist θ1 θ2 <
+     rngl_min (angle_eucl_dist θ1 θ3) (angle_eucl_dist θ1 0))%L
   → (θ1 < θ3)%A
   → (θ2 < θ3)%A.
 Proof.
+destruct_ac.
+intros * Hd12 H13.
+progress unfold angle_ltb in H13.
+progress unfold angle_ltb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+symmetry in Hzs1, Hzs2, Hzs3.
+assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
+destruct zs1. 2: {
+  destruct zs3; [ easy | ].
+  destruct zs2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs1, Hzs2, Hzs3.
+  apply rngl_ltb_lt in H13.
+  apply rngl_ltb_lt.
+  do 3 rewrite angle_eucl_dist_is_sqrt in Hd12.
+  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+Theorem rngl_mul_min_distr_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a b c, (0 ≤ a)%L → rngl_min (a * b) (a * c) = (a * rngl_min b c)%L.
+Proof.
+intros Hop Hor Hed.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hza.
+destruct (rngl_eq_dec Hed a 0) as [Haz| Haz]. {
+  subst a.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  progress unfold rngl_min.
+...
+progress unfold rngl_min.
+remember (_ * _ ≤? _ * _)%L as abc eqn:Habc.
+remember (b ≤? c)%L as bc eqn:Hbc.
+symmetry in Habc, Hbc.
+destruct abc. {
+  f_equal.
+  destruct bc; [ easy | ].
+  apply rngl_leb_le in Habc.
+  apply (rngl_leb_gt Hor) in Hbc.
+Check rngl_mul_le_mono_pos_l.
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor) in Habc.
+Search (Z.min (_ * _)).
+... ...
+  rewrite rngl_mul_min_distr_l in Hd12.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
