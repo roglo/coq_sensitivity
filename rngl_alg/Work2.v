@@ -2114,10 +2114,13 @@ destruct zs1. 2: {
     progress sin_cos_add_sub_right_hyp T H13.
     progress sin_cos_add_sub_right_hyp T Hzs3.
     progress sin_cos_add_sub_right_goal T.
+    apply -> (rngl_lt_0_sub Hop Hor) in Hc213.
     move θ2 before θ1; move θ3 before θ2.
     move Hzc1 before Hzs1.
     move H12 before Hzc1; move Hzs2 before H12.
     move H13 before Hzs2; move Hzs3 before H13.
+    rewrite rngl_cos_sub in Hc211.
+    do 2 rewrite rngl_cos_sub in Hc213.
 (* mouais bof *)
 ...
 Search (_ < min _ _).
