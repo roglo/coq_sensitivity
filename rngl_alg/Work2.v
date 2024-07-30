@@ -2085,6 +2085,18 @@ destruct zs1. 2: {
       apply rngl_cos_bound.
     }
   }
+  apply (rngl_min_glb_lt_iff Hor) in Hd12.
+  destruct Hd12 as (Hc213, Hc211).
+  apply (rngl_sub_lt_mono_l Hop Hor) in Hc213, Hc211.
+  rewrite angle_sub_0_l in Hc211.
+  rewrite rngl_cos_opp in Hc211.
+...
+  change_angle_sub_r θ1 angle_right.
+  sin_cos_add_sub_right_hyp T H :=
+...
+Search (_ < min _ _).
+Search (_ < rngl_min _ _)%L.
+Search (_ < rngl_max _ _)%L.
 Search (rngl_min (_ - _) (_ - _)).
 Search (rngl_max (_ - _) (_ - _)).
 Search (rngl_min (_ + _) (_ + _)).

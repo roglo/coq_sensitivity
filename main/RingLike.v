@@ -4561,6 +4561,25 @@ progress unfold rngl_min.
 now rewrite (rngl_leb_refl Hor).
 Qed.
 
+Theorem rngl_min_glb_lt_iff :
+  rngl_is_ordered T = true →
+  ∀ a b c, (c < rngl_min a b ↔ c < a ∧ c < b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+remember (a ≤? b)%L as ab eqn:Hab.
+symmetry in Hab.
+split; intros Hcab; [ | now destruct ab ].
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  split; [ easy | ].
+  now apply (rngl_lt_le_trans Hor _ a).
+}
+apply (rngl_leb_gt Hor) in Hab.
+split; [ | easy ].
+now apply (rngl_lt_trans Hor _ b).
+Qed.
+
 Theorem rngl_le_min_l :
   rngl_is_ordered T = true →
   ∀ a b, (rngl_min a b ≤ a)%L.
