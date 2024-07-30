@@ -2090,9 +2090,35 @@ destruct zs1. 2: {
   apply (rngl_sub_lt_mono_l Hop Hor) in Hc213, Hc211.
   rewrite angle_sub_0_l in Hc211.
   rewrite rngl_cos_opp in Hc211.
-...
-  change_angle_sub_r θ1 angle_right.
-  sin_cos_add_sub_right_hyp T H :=
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+    change_angle_add_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    rewrite angle_sub_sub_distr in Hc211.
+    do 2 rewrite angle_sub_sub_distr in Hc213.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    progress sin_cos_add_sub_right_hyp T Hc213.
+    progress sin_cos_add_sub_right_hyp T H13.
+    progress sin_cos_add_sub_right_hyp T H12.
+    progress sin_cos_add_sub_right_hyp T Hzc1.
+    rewrite <- rngl_sin_sub_anticomm in Hc211, Hc213.
+    change_angle_add_r θ2 angle_right.
+    rewrite angle_sub_sub_distr in Hc213, Hc211.
+    progress sin_cos_add_sub_right_hyp T Hc213.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    progress sin_cos_add_sub_right_hyp T H12.
+    progress sin_cos_add_sub_right_hyp T Hzs2.
+    progress sin_cos_add_sub_right_goal T.
+    change_angle_add_r θ3 angle_right.
+    rewrite angle_sub_sub_swap in Hc213.
+    progress sin_cos_add_sub_right_hyp T Hc213.
+    progress sin_cos_add_sub_right_hyp T H13.
+    progress sin_cos_add_sub_right_hyp T Hzs3.
+    progress sin_cos_add_sub_right_goal T.
+    move θ2 before θ1; move θ3 before θ2.
+    move Hzc1 before Hzs1.
+    move H12 before Hzc1; move Hzs2 before H12.
+    move H13 before Hzs2; move Hzs3 before H13.
+(* mouais bof *)
 ...
 Search (_ < min _ _).
 Search (_ < rngl_min _ _)%L.
