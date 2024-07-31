@@ -2107,6 +2107,24 @@ destruct zs1. 2: {
     progress sin_cos_opp_hyp T Hzs2.
     progress sin_cos_opp_hyp T Hzc1.
     do 2 rewrite rngl_cos_opp.
+    apply quadrant_1_sin_sub_pos_cos_lt.
+    now apply (rngl_lt_le_incl Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+    now apply (rngl_lt_le_incl Hor).
+    now apply (rngl_lt_le_incl Hor).
+    apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+    now apply (rngl_lt_le_incl Hor).
+    now apply (rngl_lt_le_incl Hor).
+...
+apply (rngl_lt_iff Hor).
+split.
+Search (0 < rngl_sin (_ - _))%L.
+Search (0 ≤ rngl_sin (_ - _))%L.
+apply AngleLeSubAdd.rngl_sin_sub_nonneg_sin_le_sin.
+apply rngl_sin_sub_nonneg.
+    now apply (rngl_lt_le_incl Hor).
+    now apply (rngl_lt_le_incl Hor).
 ...
     change_angle_add_r θ1 angle_right.
     progress sin_cos_add_sub_right_hyp T Hzs1.
