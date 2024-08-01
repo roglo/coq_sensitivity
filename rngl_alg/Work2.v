@@ -2207,16 +2207,22 @@ destruct zs1. 2: {
   progress sin_cos_add_sub_straight_hyp T Hzc1.
   apply (rngl_lt_opp_l Hop Hor) in H13, H12.
   destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
-    change_angle_add_r θ2 angle_straight.
-    rewrite angle_sub_sub_swap in Hc213, Hc211.
-    progress sin_cos_add_sub_straight_hyp T Hc213.
-    progress sin_cos_add_sub_straight_hyp T Hc211.
-    progress sin_cos_add_sub_straight_hyp T H12.
-    progress sin_cos_add_sub_straight_hyp T Hzs2.
-    progress sin_cos_add_sub_straight_hyp T Hzc2.
-    progress sin_cos_add_sub_straight_goal T.
-...
+    change_angle_opp θ2.
+    rewrite <- angle_opp_add_distr in Hc213, Hc211.
+    progress sin_cos_opp_hyp T Hc213.
+    progress sin_cos_opp_hyp T Hc211.
+    progress sin_cos_opp_hyp T H12.
+    progress sin_cos_opp_hyp T Hzs2.
+    progress sin_cos_opp_hyp T Hzc2.
+    cbn.
     destruct (rngl_lt_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3].
+      change_angle_opp θ3.
+      rewrite <- angle_opp_add_distr in Hc213.
+      progress sin_cos_opp_hyp T Hc213.
+      progress sin_cos_opp_hyp T H13.
+      progress sin_cos_opp_hyp T Hzs3.
+      progress sin_cos_opp_hyp T Hzc3.
+      cbn.
 ...
     change_angle_add_r θ1 angle_right.
     progress sin_cos_add_sub_right_hyp T Hzs1.
