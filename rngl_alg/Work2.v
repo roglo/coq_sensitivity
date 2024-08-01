@@ -2180,9 +2180,6 @@ destruct zs1. 2: {
   rewrite angle_sub_0_l in Hc211.
   rewrite rngl_cos_opp in Hc211.
   destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-clear - θ1 ac Hzs1 Hzs2 H12 Hzs3 H13 Hzc1 Hc213.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
     change_angle_opp θ1.
     change_angle_opp θ2.
     change_angle_opp θ3.
@@ -2198,7 +2195,28 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
     apply (rngl_lt_le_incl Hor) in Hzs2, Hzs3.
     now apply (quadrant_1_rngl_cos_sub_lt_iff θ1).
   }
-(* chouette *)
+  apply (rngl_nlt_ge Hor) in Hzc1.
+  change_angle_add_r θ1 angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hzs1.
+  rewrite angle_sub_sub_distr in Hc211.
+  do 2 rewrite angle_sub_sub_distr in Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc211.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T H13.
+  progress sin_cos_add_sub_straight_hyp T H12.
+  progress sin_cos_add_sub_straight_hyp T Hzc1.
+  apply (rngl_lt_opp_l Hop Hor) in H13, H12.
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+    change_angle_add_r θ2 angle_straight.
+    rewrite angle_sub_sub_swap in Hc213, Hc211.
+    progress sin_cos_add_sub_straight_hyp T Hc213.
+    progress sin_cos_add_sub_straight_hyp T Hc211.
+    progress sin_cos_add_sub_straight_hyp T H12.
+    progress sin_cos_add_sub_straight_hyp T Hzs2.
+    progress sin_cos_add_sub_straight_hyp T Hzc2.
+    progress sin_cos_add_sub_straight_goal T.
+...
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3].
 ...
     change_angle_add_r θ1 angle_right.
     progress sin_cos_add_sub_right_hyp T Hzs1.
