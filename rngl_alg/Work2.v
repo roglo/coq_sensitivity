@@ -2260,7 +2260,7 @@ destruct zs1. 2: {
       now apply (quadrant_1_rngl_cos_add_lt θ1).
     }
 (*
-0 < rngl_sin θ1
+rngl_sin θ1 < 0
 rngl_cos θ1 < 0
 
 rngl_sin θ2 < 0
@@ -2269,7 +2269,6 @@ rngl_sin θ2 < 0
 rngl_sin θ3 < 0
 rngl_cos θ3 < 0
 *)
-...
     apply (rngl_nlt_ge Hor) in Hzc3.
     exfalso.
     change_angle_add_r θ3 angle_straight.
