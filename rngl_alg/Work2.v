@@ -2091,41 +2091,48 @@ destruct zs1. 2: {
   rewrite angle_sub_0_l in Hc211.
   rewrite rngl_cos_opp in Hc211.
   destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+clear - θ1 ac Hzs1 Hzs2 H12 Hzs3 H13 Hzc1 Hc213.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
     change_angle_opp θ1.
     change_angle_opp θ2.
     change_angle_opp θ3.
     progress sin_cos_opp_hyp T Hzs1.
     do 2 rewrite angle_sub_opp_r in Hc213.
     do 2 rewrite angle_add_opp_l in Hc213.
-    progress sin_cos_opp_hyp T Hc211.
-    rewrite angle_sub_opp_r in Hc211.
-    rewrite angle_add_opp_l in Hc211.
     progress sin_cos_opp_hyp T H13.
     progress sin_cos_opp_hyp T Hzs3.
     progress sin_cos_opp_hyp T H12.
     progress sin_cos_opp_hyp T Hzs2.
-    progress sin_cos_opp_hyp T Hzc1.
     do 2 rewrite rngl_cos_opp.
+    rewrite rngl_cos_opp in Hzc1.
+clear - ac θ1 Hzs1 Hzs2 H12 Hzs3 H13 Hzc1 Hc213.
+destruct_ac.
+apply (rngl_lt_le_incl Hor) in Hzs2, Hzs3.
+clear - ac θ1 Hzs1 Hzs2 H12 Hzs3 H13 Hzc1 Hc213.
+...
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
     assert (H1 : (rngl_sin (θ1 - θ2) < rngl_sin (θ1 - θ3))%L). {
       apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
       apply rngl_sin_sub_nonneg.
       now apply (rngl_lt_le_incl Hor).
-      now apply (rngl_lt_le_incl Hor).
+      easy.
       now apply (rngl_lt_le_incl Hor).
       apply rngl_sin_sub_nonneg.
       now apply (rngl_lt_le_incl Hor).
-      now apply (rngl_lt_le_incl Hor).
+      easy.
       now apply (rngl_lt_le_incl Hor).
       apply rngl_cos_sub_nonneg.
       now apply (rngl_lt_le_incl Hor).
-      now apply (rngl_lt_le_incl Hor).
+      easy.
       now apply (rngl_lt_le_incl Hor).
       apply (rngl_le_trans Hor _ (rngl_cos θ1)).
       now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
       apply rngl_cos_sub_nonneg.
       now apply (rngl_lt_le_incl Hor).
-      now apply (rngl_lt_le_incl Hor).
+      easy.
       now apply (rngl_lt_le_incl Hor).
       apply (rngl_le_trans Hor _ (rngl_cos θ1)).
       now apply (rngl_lt_le_incl Hor).
@@ -2170,8 +2177,8 @@ destruct zs1. 2: {
       now apply (rngl_lt_le_incl Hor).
     }
     apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff.
-    now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
+    easy.
+    easy.
     apply (rngl_le_trans Hor _ (rngl_cos θ1)).
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
@@ -2179,6 +2186,7 @@ destruct zs1. 2: {
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
     easy.
+...
   }
 (* chouette *)
 ...
