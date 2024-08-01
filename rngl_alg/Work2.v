@@ -1950,6 +1950,39 @@ now apply (rngl_lt_le_incl Hor).
 easy.
 Qed.
 
+Theorem quadrant_1_rngl_cos_add_lt :
+  ∀ θ1 θ2 θ3,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_sin θ3)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_cos θ3)%L
+  → (rngl_cos (θ1 + θ2) < rngl_cos (θ1 + θ3))%L
+  → (rngl_cos θ2 < rngl_cos θ3)%L.
+Proof.
+destruct_ac.
+intros * Hzs1 Hzs2 Hzs3 Hzc1 Hzc2 Hzc3 Hc213.
+apply (rngl_nle_gt Hor).
+intros H32.
+apply (rngl_nle_gt Hor) in Hc213.
+apply Hc213; clear Hc213.
+do 2 rewrite rngl_cos_add.
+apply (rngl_le_sub_le_add_r Hop Hor).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_add_nonneg_nonneg Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+now apply (rngl_le_0_sub Hop Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+apply (rngl_le_0_sub Hop Hor).
+now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2215,7 +2248,7 @@ destruct zs1. 2: {
     progress sin_cos_opp_hyp T Hzs2.
     progress sin_cos_opp_hyp T Hzc2.
     cbn.
-    destruct (rngl_lt_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3].
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hzc3]. {
       change_angle_opp θ3.
       rewrite <- angle_opp_add_distr in Hc213.
       progress sin_cos_opp_hyp T Hc213.
@@ -2223,59 +2256,9 @@ destruct zs1. 2: {
       progress sin_cos_opp_hyp T Hzs3.
       progress sin_cos_opp_hyp T Hzc3.
       cbn.
-...
-    change_angle_add_r θ1 angle_right.
-    progress sin_cos_add_sub_right_hyp T Hzs1.
-    rewrite angle_sub_sub_distr in Hc211.
-    do 2 rewrite angle_sub_sub_distr in Hc213.
-    progress sin_cos_add_sub_right_hyp T Hc211.
-    progress sin_cos_add_sub_right_hyp T Hc213.
-    progress sin_cos_add_sub_right_hyp T H13.
-    progress sin_cos_add_sub_right_hyp T H12.
-    progress sin_cos_add_sub_right_hyp T Hzc1.
-    rewrite <- rngl_sin_sub_anticomm in Hc211, Hc213.
-(*
-    progress sin_cos_opp_hyp T Hzs1.
-    progress sin_cos_opp_hyp T Hc211.
-    rewrite angle_sub_opp_r in Hc211.
-    do 2 rewrite angle_sub_opp_r in Hc213.
-    progress sin_cos_opp_hyp T H13.
-    progress sin_cos_opp_hyp T H12.
-    progress sin_cos_opp_hyp T Hzc1.
-*)
-    change_angle_add_r θ2 angle_right.
-    rewrite angle_sub_sub_distr in Hc213, Hc211.
-    progress sin_cos_add_sub_right_hyp T Hc213.
-    progress sin_cos_add_sub_right_hyp T Hc211.
-    progress sin_cos_add_sub_right_hyp T H12.
-    progress sin_cos_add_sub_right_hyp T Hzs2.
-    progress sin_cos_add_sub_right_goal T.
-(*
-    change_angle_opp θ2.
-    rewrite angle_sub_opp_r in Hc213.
-    rewrite angle_sub_opp_r in Hc211.
-    progress sin_cos_opp_hyp T H12.
-    progress sin_cos_opp_hyp T Hzs2.
-    rewrite rngl_cos_opp.
-
-*)
-    change_angle_add_r θ3 angle_right.
-    rewrite angle_sub_sub_swap in Hc213.
-    progress sin_cos_add_sub_right_hyp T Hc213.
-    progress sin_cos_add_sub_right_hyp T H13.
-    progress sin_cos_add_sub_right_hyp T Hzs3.
-    progress sin_cos_add_sub_right_goal T.
-    apply -> (rngl_lt_0_sub Hop Hor) in Hc213.
-    move θ2 before θ1; move θ3 before θ2.
-    move Hzc1 before Hzs1.
-    move H12 before Hzc1; move Hzs2 before H12.
-    move H13 before Hzs2; move Hzs3 before H13.
-Search (rngl_cos (_ - _) < _)%L.
-Search (_ < rngl_cos (_ - _))%L.
-...
-    rewrite rngl_cos_sub in Hc211.
-    do 2 rewrite rngl_cos_sub in Hc213.
-(* mouais bof *)
+      apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2, Hzs3, Hzc2, Hzc3.
+      now apply (quadrant_1_rngl_cos_add_lt θ1).
+    }
 ...
 Search (_ < min _ _).
 Search (_ < rngl_min _ _)%L.
