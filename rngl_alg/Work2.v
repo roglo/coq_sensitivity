@@ -2259,6 +2259,37 @@ destruct zs1. 2: {
       apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2, Hzs3, Hzc2, Hzc3.
       now apply (quadrant_1_rngl_cos_add_lt θ1).
     }
+(*
+0 < rngl_sin θ1
+rngl_cos θ1 < 0
+
+rngl_sin θ2 < 0
+0 < rngl_cos θ2
+
+rngl_sin θ3 < 0
+rngl_cos θ3 < 0
+*)
+...
+    apply (rngl_nlt_ge Hor) in Hzc3.
+    exfalso.
+    change_angle_add_r θ3 angle_straight.
+    rewrite angle_sub_sub_swap in Hc213.
+    progress sin_cos_add_sub_straight_hyp T Hc213.
+    progress sin_cos_add_sub_straight_hyp T H13.
+    progress sin_cos_add_sub_straight_hyp T Hzs3.
+    progress sin_cos_add_sub_straight_hyp T Hzc3.
+    rewrite (rngl_add_opp_r Hop) in H13.
+    apply -> (rngl_lt_0_sub Hop Hor) in H13.
+    clear H12.
+    apply (rngl_lt_opp_r Hop Hor) in Hc213.
+...
+    rewrite rngl_cos_add in Hc213.
+    rewrite rngl_cos_sub in Hc213.
+    apply (rngl_lt_opp_r Hop Hor) in Hc213.
+    rewrite rngl_add_assoc in Hc213.
+    rewrite <- (rngl_add_sub_swap Hop) in Hc213.
+    rewrite (rngl_mul_comm Hic _ (rngl_cos θ1)) in Hc213.
+    rewrite <- rngl_mul_add_distr_l in Hc213.
 ...
 Search (_ < min _ _).
 Search (_ < rngl_min _ _)%L.
