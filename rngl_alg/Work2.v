@@ -2303,6 +2303,8 @@ rngl_cos θ3 < 0
       now apply (rngl_le_0_sub Hop Hor).
     }
     apply (rngl_nle_gt Hor) in Hs23.
+    apply (rngl_nle_gt Hor) in Hc213.
+    apply Hc213; clear Hc213.
 ...
 change_angle_sub_l θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
