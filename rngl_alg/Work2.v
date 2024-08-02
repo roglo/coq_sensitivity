@@ -2305,6 +2305,17 @@ rngl_cos θ3 < 0
     apply (rngl_nle_gt Hor) in Hs23.
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
+    destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc12| Hzc12]. {
+      apply (rngl_add_nonneg_nonneg Hor); [ easy | ].
+      apply rngl_cos_sub_nonneg.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      easy.
+      easy.
+    }
+    apply (rngl_nle_gt Hor) in Hzc12.
+    rewrite rngl_cos_add in Hzc12.
+    apply -> (rngl_lt_sub_0 Hop Hor) in Hzc12.
 ...
 change_angle_sub_l θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
