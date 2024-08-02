@@ -2379,16 +2379,24 @@ destruct zs1. 2: {
     now apply (rngl_lt_le_trans Hor _ 0).
   }
   apply (rngl_nle_gt Hor) in Hzc3.
-...
-change_angle_sub_l θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs1.
-progress sin_cos_add_sub_right_hyp T H13.
-progress sin_cos_add_sub_right_hyp T Hc211.
-progress sin_cos_add_sub_right_hyp T Hc213.
-progress sin_cos_add_sub_right_hyp T Hzc1.
-rewrite rngl_sin_sub_anticomm in Hc213.
-rewrite (rngl_add_opp_l Hop) in Hc213.
-apply -> (rngl_lt_sub_0 Hop Hor) in Hc213.
+  change_angle_add_r θ2 angle_straight.
+  change_angle_add_r θ3 angle_straight.
+  do 2 rewrite (angle_sub_sub_swap _ angle_straight) in Hc213.
+  rewrite (angle_sub_sub_swap _ angle_straight) in Hc211.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc211.
+  progress sin_cos_add_sub_straight_hyp T H13.
+  progress sin_cos_add_sub_straight_hyp T Hzs3.
+  progress sin_cos_add_sub_straight_hyp T H12.
+  progress sin_cos_add_sub_straight_hyp T Hzs2.
+  progress sin_cos_add_sub_straight_hyp T Hzc2.
+  progress sin_cos_add_sub_straight_hyp T Hzc3.
+  progress sin_cos_add_sub_straight_goal T.
+  apply (rngl_lt_opp_l Hop Hor) in Hc211.
+  rewrite (rngl_add_opp_r Hop) in H13, H12 |-*.
+  apply -> (rngl_lt_0_sub Hop Hor) in H13.
+  apply -> (rngl_lt_0_sub Hop Hor) in H12.
+  apply (rngl_lt_0_sub Hop Hor).
 ...
     rewrite rngl_cos_add in Hc213.
     rewrite rngl_cos_sub in Hc213.
