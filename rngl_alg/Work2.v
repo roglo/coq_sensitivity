@@ -10,6 +10,7 @@ Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
+Require Import AngleDiv2Add.
 Require Import Complex.
 Require Import Work.
 Require Import TacChangeAngle.
@@ -2305,17 +2306,86 @@ rngl_cos θ3 < 0
     apply (rngl_nle_gt Hor) in Hs23.
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
-    destruct (rngl_le_dec Hor 0 (rngl_cos (θ1 + θ2))) as [Hzc12| Hzc12]. {
-      apply (rngl_add_nonneg_nonneg Hor); [ easy | ].
-      apply rngl_cos_sub_nonneg.
+    rewrite rngl_cos_add_rngl_cos.
+    rewrite <- rngl_mul_assoc.
+    apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+    apply (rngl_mul_nonneg_nonneg Hop Hor). {
+      rewrite <- angle_div_2_add_not_overflow. 2: {
+        progress unfold angle_add_overflow.
+        rewrite angle_add_comm.
+        rewrite angle_add_assoc.
+        rewrite angle_sub_add.
+        apply Bool.not_true_iff_false.
+        intros H1.
+        apply angle_nle_gt in H1.
+        apply H1; clear H1.
+        apply angle_add_le_mono_r.
+        apply angle_add_overflow_lt_straight_le_straight.
+        progress unfold angle_ltb.
+        apply (rngl_lt_le_incl Hor) in Hzs3.
+        apply rngl_leb_le in Hzs3.
+        rewrite Hzs3; cbn.
+        rewrite (rngl_leb_refl Hor).
+        apply rngl_ltb_lt.
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_cos_bound | ].
+        intros H1.
+        symmetry in H1.
+        apply (rngl_nlt_ge Hor) in Hzc3.
+        apply Hzc3; rewrite H1.
+        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+        progress unfold angle_leb.
+        apply (rngl_lt_le_incl Hor) in Hzs2.
+        apply rngl_leb_le in Hzs2.
+        rewrite Hzs2; cbn.
+        rewrite (rngl_leb_refl Hor).
+        apply rngl_leb_le.
+        apply rngl_cos_bound.
+        progress unfold angle_leb.
+        apply (rngl_lt_le_incl Hor) in Hzs1.
+        apply rngl_leb_le in Hzs1.
+        rewrite Hzs1; cbn.
+        apply (rngl_lt_le_incl Hor) in Hzs3.
+        apply rngl_leb_le in Hzs3.
+        rewrite Hzs3; cbn.
+        apply rngl_leb_le.
+        now apply (rngl_lt_le_incl Hor).
+      }
+      rewrite angle_add_comm.
+      rewrite angle_add_assoc.
+      rewrite angle_sub_add.
+      apply rngl_cos_div_2_nonneg.
+      apply rngl_sin_add_nonneg.
       now apply (rngl_lt_le_incl Hor).
       now apply (rngl_lt_le_incl Hor).
       easy.
-      easy.
+      now apply (rngl_lt_le_incl Hor).
     }
-    apply (rngl_nle_gt Hor) in Hzc12.
-    rewrite rngl_cos_add in Hzc12.
-    apply -> (rngl_lt_sub_0 Hop Hor) in Hzc12.
+    progress unfold angle_sub at 1.
+    specialize (angle_opp_div_2 (θ3 - θ1)) as H1.
+    symmetry in H1.
+    apply angle_add_move_r in H1.
+    rewrite H1; clear H1.
+    remember (θ3 - θ1 =? 0)%A as z31 eqn:Hz31.
+    symmetry in Hz31.
+    destruct z31. {
+      apply angle_eqb_eq in Hz31.
+      apply -> angle_sub_move_0_r in Hz31; subst θ3.
+      rewrite angle_sub_diag.
+      rewrite angle_sub_0_r.
+      rewrite angle_opp_0.
+      rewrite angle_0_div_2.
+      rewrite angle_add_0_r.
+      apply rngl_cos_div_2_nonneg.
+      apply rngl_sin_add_nonneg.
+      now apply (rngl_lt_le_incl Hor).
+      now apply (rngl_lt_le_incl Hor).
+      easy.
+      now apply (rngl_lt_le_incl Hor).
+    }
+    rewrite angle_add_sub_assoc.
+    rewrite rngl_cos_sub_straight_r.
+(* hou la la, malheureueueueueux... *)
 ...
 change_angle_sub_l θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
