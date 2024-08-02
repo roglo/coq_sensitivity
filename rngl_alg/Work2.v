@@ -2282,6 +2282,16 @@ rngl_cos θ3 < 0
     clear H12.
     apply (rngl_lt_opp_r Hop Hor) in Hc213.
 ...
+change_angle_sub_l θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T H13.
+progress sin_cos_add_sub_right_hyp T Hc211.
+progress sin_cos_add_sub_right_hyp T Hc213.
+progress sin_cos_add_sub_right_hyp T Hzc1.
+rewrite rngl_sin_sub_anticomm in Hc213.
+rewrite (rngl_add_opp_l Hop) in Hc213.
+apply -> (rngl_lt_sub_0 Hop Hor) in Hc213.
+...
     rewrite rngl_cos_add in Hc213.
     rewrite rngl_cos_sub in Hc213.
     apply (rngl_lt_opp_r Hop Hor) in Hc213.
