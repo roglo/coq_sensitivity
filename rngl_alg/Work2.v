@@ -2284,73 +2284,73 @@ remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
 symmetry in Hzs1, Hzs2, Hzs3.
 assert (Hz2 : (0 ≤ 2)%L) by apply (rngl_0_le_2 Hon Hop Hor).
-destruct zs1. 2: {
-  destruct zs3; [ easy | ].
-  destruct zs2; [ easy | ].
-  apply (rngl_leb_gt Hor) in Hzs1, Hzs2, Hzs3.
-  apply rngl_ltb_lt in H13, H12.
-  apply rngl_ltb_lt.
-  do 3 rewrite angle_eucl_dist_is_sqrt in Hd12.
-  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite (rngl_mul_min_distr_l Hop Hor Hed Hii) in Hd12. 2: {
-    now apply rl_sqrt_nonneg.
-  }
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hd12. 2: {
-    apply (rl_sqrt_pos Hon Hos Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_sqrt_min_distr Hon Hop Hor Hii) in Hd12; cycle 1. {
+do 3 rewrite angle_eucl_dist_is_sqrt in Hd12.
+rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_min_distr_l Hop Hor Hed Hii) in Hd12. 2: {
+  now apply rl_sqrt_nonneg.
+}
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hd12. 2: {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_sqrt_min_distr Hon Hop Hor Hii) in Hd12; cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hd12. 2: {
+  apply rl_sqrt_nonneg.
+  apply rngl_min_glb. {
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   } {
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hd12. 2: {
-    apply rl_sqrt_nonneg.
-    apply rngl_min_glb. {
-      apply (rngl_le_0_sub Hop Hor).
-      apply rngl_cos_bound.
-    } {
-      apply (rngl_le_0_sub Hop Hor).
-      apply rngl_cos_bound.
-    }
-  }
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd12. 2: {
-    apply rl_sqrt_nonneg.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd12. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd12.
+rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
+  apply rngl_min_glb. {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  } {
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   }
-  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd12.
-  rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
-    apply rngl_min_glb. {
-      apply (rngl_le_0_sub Hop Hor).
-      apply rngl_cos_bound.
-    } {
-      apply (rngl_le_0_sub Hop Hor).
-      apply rngl_cos_bound.
-    }
-  }
-  apply (rngl_min_glb_lt_iff Hor) in Hd12.
-  destruct Hd12 as (Hc213, Hc211).
-  apply (rngl_sub_lt_mono_l Hop Hor) in Hc213, Hc211.
-  rewrite angle_sub_0_l in Hc211.
-  rewrite rngl_cos_opp in Hc211.
+}
+apply (rngl_min_glb_lt_iff Hor) in Hd12.
+destruct Hd12 as (Hc213, Hc211).
+apply (rngl_sub_lt_mono_l Hop Hor) in Hc213, Hc211.
+rewrite angle_sub_0_l in Hc211.
+rewrite rngl_cos_opp in Hc211.
+destruct zs1. 2: {
+  destruct zs3; [ easy | ].
+  destruct zs2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs1, Hzs2, Hzs3.
+  apply rngl_ltb_lt in H13, H12.
+  apply rngl_ltb_lt.
   destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
     change_angle_opp θ1.
     change_angle_opp θ2.
@@ -2446,6 +2446,44 @@ destruct zs1. 2: {
   now apply quadrant_1_cos_sub_le_cos_sub.
 }
 apply rngl_leb_le in Hzs1.
+destruct zs2. {
+  apply rngl_leb_le in Hzs2.
+  apply rngl_ltb_lt in H12.
+  destruct zs3; [ | easy ].
+  apply rngl_leb_le in Hzs3.
+  apply rngl_ltb_lt.
+  apply rngl_ltb_lt in H13.
+  destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T ...
+...
+    change_angle_add_r θ2 angle_right.
+    change_angle_add_r θ3 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hc213.
+    do 2 rewrite (angle_sub_sub_swap _ angle_right) in Hc213.
+    progress sin_cos_add_sub_right_hyp T Hc213.
+    rewrite (rngl_add_opp_r Hop) in Hc213.
+    apply -> (rngl_lt_0_sub Hop Hor) in Hc213.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    rewrite (angle_sub_sub_swap _ angle_right) in Hc211.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    apply -> (rngl_lt_0_sub Hop Hor) in Hc211.
+    progress sin_cos_add_sub_right_hyp T H13.
+    progress sin_cos_add_sub_right_hyp T Hzs3.
+...
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+    progress sin_cos_add_sub_right_hyp T Hc211.
+...
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+  progress sin_cos_add_sub_straight_goal T.
+...
+Check quadrant_1_cos_sub_le_cos_sub.
+Check quadrant_1_rngl_add_cos_add_cos_sub.
+Check quadrant_1_rngl_cos_add_lt.
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
