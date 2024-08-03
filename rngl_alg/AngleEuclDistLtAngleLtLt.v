@@ -546,6 +546,16 @@ destruct zs2. {
     }
   }
   apply (rngl_nle_gt Hor) in Hzc1.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    destruct (rngl_lt_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
+      now apply (rngl_lt_le_trans Hor _ 0).
+    }
+    apply (rngl_nlt_ge Hor) in Hzc3.
+    apply (rngl_nle_gt Hor).
+    intros H32.
+    apply (rngl_nle_gt Hor) in Hc213.
+    apply Hc213; clear Hc213.
+    apply quadrant_1_cos_sub_le_cos_sub; try easy.
 ...
 *)
 
