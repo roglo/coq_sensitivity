@@ -583,6 +583,7 @@ destruct zs2. {
     easy.
   }
   apply (rngl_nle_gt Hor) in Hc2z.
+(*
   change_angle_sub_r θ2 angle_right.
   progress sin_cos_add_sub_right_hyp T Hc211.
   progress sin_cos_add_sub_right_hyp T Hc213.
@@ -590,15 +591,23 @@ destruct zs2. {
   progress sin_cos_add_sub_right_hyp T Hzs2.
   progress sin_cos_add_sub_right_hyp T Hc2z.
   progress sin_cos_add_sub_right_goal T.
+*)
   destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
     exfalso.
+    change_angle_sub_l θ2 angle_straight.
+    rewrite <- angle_sub_add_distr in Hc211, Hc213.
+    progress sin_cos_add_sub_straight_hyp T Hc211.
+    progress sin_cos_add_sub_straight_hyp T Hc213.
+    progress sin_cos_add_sub_straight_hyp T H12.
+    progress sin_cos_add_sub_straight_hyp T Hzs2.
+    progress sin_cos_add_sub_straight_hyp T Hc2z.
+    apply (rngl_lt_opp_r Hop Hor) in Hc211, Hc213.
+    apply (rngl_lt_opp_l Hop Hor) in H12.
+...
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
     rewrite <- rngl_sin_sub_anticomm.
     rewrite <- rngl_sin_sub_anticomm in Hc211.
-(* faut peut-être essayer de faire π-θ2 ci-dessus au lieu
-   de θ2-π/2 histoire de pas transformer les sinus en cosinus
-   et vice-versa *)
 ...
     rewrite rngl_sin_sub, rngl_cos_sub.
 (* ouais, chais pas *)
