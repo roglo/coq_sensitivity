@@ -595,6 +595,11 @@ destruct zs2. {
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
     rewrite <- rngl_sin_sub_anticomm.
+    rewrite <- rngl_sin_sub_anticomm in Hc211.
+(* faut peut-être essayer de faire π-θ2 ci-dessus au lieu
+   de θ2-π/2 histoire de pas transformer les sinus en cosinus
+   et vice-versa *)
+...
     rewrite rngl_sin_sub, rngl_cos_sub.
 (* ouais, chais pas *)
 ...
