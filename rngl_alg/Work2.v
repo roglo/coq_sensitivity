@@ -1862,7 +1862,7 @@ apply (rngl_le_antisymm Hor); [ now apply (rngl_lt_le_incl Hor) | ].
 now apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii).
 Qed.
 
-Theorem quadrant_1_rngl_cos_sub_lt_iff :
+Theorem quadrant_1_rngl_cos_sub_lt :
   ∀ θ1 θ2 θ3,
   (0 < rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
@@ -2079,6 +2079,50 @@ apply (rngl_add_nonneg_nonneg Hor). {
 apply (rngl_mul_nonneg_nonneg Hop Hor).
 apply rngl_sin_div_2_nonneg.
 apply rngl_sin_div_2_nonneg.
+Qed.
+
+Theorem quadrant_1_cos_sub_le_cos_sub :
+  ∀ θ1 θ2 θ3,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (0 < rngl_sin θ3)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (rngl_cos θ2 ≤ rngl_cos θ3 ≤ rngl_cos θ1)%L
+  → (rngl_cos (θ2 - θ1) ≤ rngl_cos (θ3 - θ1))%L.
+Proof.
+destruct_ac.
+intros * Hzs1 Hzs2 Hzs3 Hzc2 (H23, H31).
+apply (rngl_lt_eq_cases Hor) in H23.
+destruct H23 as [H23| H23]. 2: {
+  apply rngl_cos_eq in H23.
+  destruct H23; subst θ2; [ apply (rngl_le_refl Hor) | ].
+  cbn in Hzs2.
+  apply (rngl_opp_pos_neg Hop Hor) in Hzs2.
+  apply (rngl_lt_le_incl Hor) in Hzs2.
+  now apply (rngl_nlt_ge Hor) in Hzs2.
+}
+apply (rngl_lt_iff Hor).
+apply (rngl_lt_le_incl Hor) in Hzs2, Hzs3.
+apply (quadrant_1_rngl_cos_add_lt θ1).
+easy.
+apply rngl_sin_sub_nonneg; [ easy | easy | ].
+apply (rngl_le_trans Hor _ (rngl_cos θ3)); [ | easy ].
+now apply (rngl_lt_le_incl Hor).
+now apply rngl_sin_sub_nonneg.
+apply (rngl_le_trans Hor _ (rngl_cos θ3)); [ | easy ].
+apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+apply rngl_cos_sub_nonneg; [ easy | easy | easy | ].
+apply (rngl_le_trans Hor _ (rngl_cos θ3)); [ | easy ].
+apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+apply rngl_cos_sub_nonneg; [ easy | easy | | ].
+apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+apply (rngl_le_trans Hor _ (rngl_cos θ3)); [ | easy ].
+apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+now do 2 rewrite angle_add_comm, angle_sub_add.
 Qed.
 
 (* to be completed
@@ -2324,7 +2368,7 @@ destruct zs1. 2: {
     do 2 rewrite rngl_cos_opp.
     rewrite rngl_cos_opp in Hzc1.
     apply (rngl_lt_le_incl Hor) in Hzs2, Hzs3.
-    now apply (quadrant_1_rngl_cos_sub_lt_iff θ1).
+    now apply (quadrant_1_rngl_cos_sub_lt θ1).
   }
   apply (rngl_nlt_ge Hor) in Hzc1.
   change_angle_add_r θ1 angle_straight.
@@ -2394,22 +2438,17 @@ destruct zs1. 2: {
   progress sin_cos_add_sub_straight_goal T.
   apply (rngl_lt_opp_l Hop Hor) in Hc211.
   rewrite (rngl_add_opp_r Hop) in H13, H12 |-*.
-  apply -> (rngl_lt_0_sub Hop Hor) in H13.
-  apply -> (rngl_lt_0_sub Hop Hor) in H12.
+  apply (rngl_lt_le_incl Hor) in Hzs1, H12, H13, Hzc2, Hzc3.
+  apply -> (rngl_le_0_sub Hop Hor) in H13.
+  apply -> (rngl_le_0_sub Hop Hor) in H12.
   apply (rngl_lt_0_sub Hop Hor).
-apply (rngl_nle_gt Hor).
-intros H32.
-apply (rngl_nle_gt Hor) in Hc213.
-apply Hc213; clear Hc213.
-do 2 rewrite rngl_cos_sub.
-apply (rngl_le_sub_le_add_r Hop Hor).
-(**)
-rewrite <- (rngl_add_sub_assoc Hop).
-rewrite <- (rngl_mul_sub_distr_r Hop).
-apply (rngl_le_add_le_sub_l Hop Hor).
-rewrite <- (rngl_mul_sub_distr_r Hop).
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ1) Hzs1).
-(* ouais mais il faut que je réfléchisse sur papier *)
+  apply (rngl_nle_gt Hor).
+  intros H32.
+  apply (rngl_nle_gt Hor) in Hc213.
+  apply Hc213; clear Hc213.
+  now apply quadrant_1_cos_sub_le_cos_sub.
+}
+apply rngl_leb_le in Hzs1.
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
