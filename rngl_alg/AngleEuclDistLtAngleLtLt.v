@@ -556,6 +556,33 @@ destruct zs2. {
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
     apply quadrant_1_cos_sub_le_cos_sub; try easy.
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ2. {
+      rewrite angle_sub_0_l in Hc211.
+      now apply (rngl_lt_irrefl Hor) in Hc211.
+    }
+    apply (rngl_nlt_ge Hor) in Hzc2.
+    apply Hzc2.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ3. {
+      apply (rngl_nle_gt Hor) in H13.
+      apply H13.
+      apply rngl_cos_bound.
+    }
+    apply (rngl_nlt_ge Hor) in Hzc3.
+    apply Hzc3.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+    apply (rngl_lt_le_incl Hor) in H13.
+    easy.
+  }
+  apply (rngl_nle_gt Hor) in Hc2z.
 ...
 *)
 
