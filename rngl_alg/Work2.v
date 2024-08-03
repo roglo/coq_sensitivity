@@ -2129,9 +2129,6 @@ Qed.
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
-(* bon, ce théorème est faux, si la suite θi converge vers 0 par le
-   bas. Il faut donc rajouter une hypothèse. Ou alors ne considérer
-   que notre cas de θi=2^i/n.θ/2^i*)
 Theorem angle_seq_not_overflow_has_not_overflow_limit :
   ∀ n θ θ',
   (∀ i, angle_mul_nat_overflow n (θ i) = false)
