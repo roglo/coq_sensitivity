@@ -2254,7 +2254,7 @@ Theorem glop :
   → (θ2 < θ3)%A.
 Proof.
 intros * He1 He2 H34 H21 H14.
-Theorem glip :
+Theorem angle_eucl_dist_lt_angle_lt :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ1 θ2 <
      rngl_min (angle_eucl_dist θ1 θ3) (angle_eucl_dist θ1 0))%L
