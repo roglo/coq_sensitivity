@@ -3,13 +3,11 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike.
-Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
 Require Import AngleDiv2Add.
 Require Import Complex.
-Require Import Work.
 Require Import TacChangeAngle.
 
 Section a.
