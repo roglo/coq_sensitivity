@@ -2455,31 +2455,42 @@ destruct zs2. {
   apply rngl_ltb_lt in H13.
   destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
     change_angle_sub_r θ1 angle_right.
-    progress sin_cos_add_sub_right_hyp T Hzs1.
-    progress sin_cos_add_sub_right_hyp T ...
-...
-    change_angle_add_r θ2 angle_right.
-    change_angle_add_r θ3 angle_right.
+    change_angle_sub_r θ2 angle_right.
+    change_angle_sub_r θ3 angle_right.
     progress sin_cos_add_sub_right_hyp T Hzs1.
     progress sin_cos_add_sub_right_hyp T Hc213.
-    do 2 rewrite (angle_sub_sub_swap _ angle_right) in Hc213.
-    progress sin_cos_add_sub_right_hyp T Hc213.
-    rewrite (rngl_add_opp_r Hop) in Hc213.
-    apply -> (rngl_lt_0_sub Hop Hor) in Hc213.
     progress sin_cos_add_sub_right_hyp T Hc211.
-    rewrite (angle_sub_sub_swap _ angle_right) in Hc211.
-    progress sin_cos_add_sub_right_hyp T Hc211.
-    apply -> (rngl_lt_0_sub Hop Hor) in Hc211.
     progress sin_cos_add_sub_right_hyp T H13.
     progress sin_cos_add_sub_right_hyp T Hzs3.
-...
-    progress sin_cos_add_sub_right_hyp T Hc211.
-    progress sin_cos_add_sub_right_hyp T Hc211.
-    progress sin_cos_add_sub_right_hyp T Hc211.
-...
-    progress sin_cos_add_sub_right_hyp T Hzs1.
-    progress sin_cos_add_sub_right_hyp T Hzs1.
-  progress sin_cos_add_sub_straight_goal T.
+    progress sin_cos_add_sub_right_hyp T H12.
+    progress sin_cos_add_sub_right_hyp T Hzs2.
+    progress sin_cos_add_sub_right_hyp T Hc1z.
+    progress sin_cos_add_sub_right_goal T.
+    rewrite (rngl_add_opp_r Hop) in H13, H12 |-*.
+    apply -> (rngl_lt_0_sub Hop Hor) in H13.
+    apply -> (rngl_lt_0_sub Hop Hor) in H12.
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_nle_gt Hor).
+    intros H32.
+    apply (rngl_nle_gt Hor) in Hc213.
+    apply Hc213; clear Hc213.
+    apply quadrant_1_cos_sub_le_cos_sub; try easy.
+    now apply (rngl_le_lt_trans Hor _ (rngl_sin θ1)).
+    now apply (rngl_le_lt_trans Hor _ (rngl_sin θ1)).
+    split. {
+      apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32; try easy.
+      apply (rngl_lt_le_incl Hor) in H13.
+      now apply (rngl_le_trans Hor _ (rngl_sin θ1)).
+      apply (rngl_lt_le_incl Hor) in H12.
+      now apply (rngl_le_trans Hor _ (rngl_sin θ1)).
+    } {
+      apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff in H13; try easy.
+      now apply (rngl_lt_le_incl Hor) in H13.
+      apply (rngl_lt_le_incl Hor) in H13.
+      now apply (rngl_le_trans Hor _ (rngl_sin θ1)).
+    }
+  }
+  apply (rngl_nle_gt Hor) in Hzc1.
 ...
 Check quadrant_1_cos_sub_le_cos_sub.
 Check quadrant_1_rngl_add_cos_add_cos_sub.
