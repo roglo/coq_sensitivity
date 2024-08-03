@@ -2397,6 +2397,38 @@ destruct zs1. 2: {
   apply -> (rngl_lt_0_sub Hop Hor) in H13.
   apply -> (rngl_lt_0_sub Hop Hor) in H12.
   apply (rngl_lt_0_sub Hop Hor).
+apply (rngl_nle_gt Hor).
+intros H32.
+apply (rngl_nle_gt Hor) in Hc213.
+apply Hc213; clear Hc213.
+do 2 rewrite rngl_cos_sub.
+apply (rngl_le_sub_le_add_r Hop Hor).
+(**)
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+apply (rngl_le_add_le_sub_l Hop Hor).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (rngl_sin θ1) Hzs1).
+(* ouais mais il faut que je réfléchisse sur papier *)
+...
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_add_nonneg_nonneg Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+now apply (rngl_le_0_sub Hop Hor).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+apply (rngl_le_0_sub Hop Hor).
+now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+...
+Inspect 4.
+...
+apply (quadrant_1_rngl_cos_add_lt (- θ1)).
+...
+apply (quadrant_1_rngl_cos_sub_lt_iff θ1); try easy.
 ...
     rewrite rngl_cos_add in Hc213.
     rewrite rngl_cos_sub in Hc213.
