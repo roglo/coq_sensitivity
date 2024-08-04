@@ -707,6 +707,18 @@ destruct zs3. {
       now apply (rngl_mul_nonneg_nonneg Hop Hor).
     }
     apply (rngl_nle_gt Hor) in Hc32.
+    apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+    apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z.
+    now apply quadrant_1_rngl_cos_add_le_cos_l.
+    apply quadrant_1_sin_sub_nonneg_cos_le; [ easy | | easy | | ].
+    apply (rngl_lt_le_incl Hor) in H13.
+    now apply rngl_sin_sub_nonneg.
+    apply rngl_cos_sub_nonneg; [ easy | easy | easy | ].
+    apply (rngl_lt_le_incl Hor) in H13.
+    now apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+    now rewrite angle_sub_sub_distr, angle_sub_diag, angle_add_0_l.
+  }
+  apply (rngl_nle_gt Hor) in Hzc1.
 ...
 Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
 Search (_ → rngl_cos _ < rngl_cos _)%L.
