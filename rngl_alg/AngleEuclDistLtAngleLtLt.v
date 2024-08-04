@@ -622,11 +622,34 @@ destruct zs2. {
   apply -> (rngl_lt_sub_0 Hop Hor) in Hc213.
   apply (rngl_lt_sub_0 Hop Hor).
   apply (rngl_lt_opp_l Hop Hor) in H13.
-...
-apply (rngl_nle_gt Hor) in Hc211.
-apply Hc211; clear Hc211.
-rewrite <- rngl_sin_sub_anticomm.
-rewrite rngl_sin_sub.
+  clear H12 H13.
+  apply (rngl_nle_gt Hor).
+  intros H32.
+  apply (rngl_nle_gt Hor) in Hc213.
+  apply Hc213; clear Hc213.
+  do 2 rewrite (angle_add_comm _ θ1).
+  apply angle_add_le_mono_l_lemma_3; try easy.
+  apply angle_add_overflow_lt_straight_le_straight.
+  (* lemma like rngl_sin_nonneg_angle_le_straight used below *)
+  progress unfold angle_ltb.
+  apply rngl_leb_le in Hzs1.
+  rewrite Hzs1; cbn.
+  rewrite (rngl_leb_refl Hor).
+  apply rngl_ltb_lt.
+  apply (rngl_le_lt_trans Hor _ 0); [ | easy ].
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+  now apply rngl_sin_nonneg_angle_le_straight.
+  apply (rngl_lt_le_incl Hor) in Hzc1, Hc2z.
+  now apply rngl_sin_add_nonneg.
+  apply (rngl_lt_le_incl Hor) in Hzc1, Hc3z.
+  now apply rngl_sin_add_nonneg.
+}
+clear H12.
+apply (rngl_leb_gt Hor) in Hzs2.
+destruct zs3. {
+  exfalso.
+  apply rngl_leb_le in Hzs3.
+  apply rngl_ltb_lt in H13.
 ...
 *)
 
