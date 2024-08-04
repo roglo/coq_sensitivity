@@ -651,31 +651,37 @@ destruct zs3. {
   apply rngl_leb_le in Hzs3.
   apply rngl_ltb_lt in H13.
 (*1*)
-  destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
-...1
-  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-    change_angle_opp θ2.
-    rewrite <- angle_opp_add_distr in Hc211, Hc213.
-    progress sin_cos_opp_hyp T Hc211.
-    progress sin_cos_opp_hyp T Hc213.
-    progress sin_cos_opp_hyp T Hzs2.
-    progress sin_cos_opp_hyp T Hzc2.
-apply (rngl_nle_gt Hor) in Hc211.
-apply Hc211; clear Hc211.
-rewrite rngl_cos_add.
-eapply (rngl_le_trans Hor). {
-  apply (rngl_le_sub_nonneg Hop Hor).
-  apply (rngl_lt_le_incl Hor) in Hzs2.
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-}
-apply (rngl_le_0_sub Hop Hor).
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-...
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ | ].
-Search (_ * _ ≤ _)%L.
-apply (rngl_le_sub_le_add_r Hop Hor).
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+  destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+    change_angle_sub_l θ1 angle_straight.
+    change_angle_sub_l θ3 angle_straight.
+    rewrite angle_sub_sub_distr in Hc211.
+    rewrite <- angle_add_sub_swap in Hc211.
+    do 2 rewrite angle_sub_sub_distr in Hc213.
+    do 2 rewrite <- angle_add_sub_swap in Hc213.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_hyp T Hc211.
+    progress sin_cos_add_sub_straight_hyp T Hc213.
+    rewrite <- angle_add_sub_assoc in Hc213.
+    rewrite rngl_cos_add_straight_l in Hc213.
+    progress sin_cos_add_sub_straight_hyp T H13.
+    progress sin_cos_add_sub_straight_hyp T Hzs3.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+      change_angle_opp θ2.
+      progress sin_cos_opp_hyp T Hzs2.
+      progress sin_cos_opp_hyp T Hzc2.
       apply (rngl_nle_gt Hor) in Hc213.
+      apply Hc213; clear Hc213.
+      apply (rngl_le_opp_l Hop Hor).
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply rngl_cos_sub_nonneg; [ easy | easy | easy | ].
+      apply (rngl_lt_le_incl Hor) in H13.
+      now apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+      rewrite angle_add_opp_l.
+      apply (rngl_lt_le_incl Hor) in Hzs2.
+      now apply rngl_cos_sub_nonneg.
+    }
+    apply (rngl_nle_gt Hor) in Hc2z.
 ...
 Inspect 4.
 quadrant_1_rngl_add_cos_add_cos_sub :
