@@ -691,6 +691,22 @@ destruct zs3. {
       now apply (rngl_le_trans Hor _ (rngl_cos θ1)).
     }
     apply (rngl_nle_gt Hor) in Hzc12.
+    destruct (rngl_le_dec Hor (rngl_cos θ2) (rngl_cos θ3)) as [Hc23| Hc32]. {
+      rewrite rngl_cos_add.
+      apply (rngl_le_sub_le_add_r Hop Hor).
+      rewrite rngl_cos_sub.
+      eapply (rngl_le_trans Hor). {
+        apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply Hc23 ].
+        easy.
+      }
+      rewrite <- rngl_add_assoc.
+      apply (rngl_le_add_r Hor).
+      apply (rngl_add_nonneg_nonneg Hor).
+      now apply (rngl_mul_nonneg_nonneg Hop Hor).
+      apply (rngl_lt_le_incl Hor) in Hzs2.
+      now apply (rngl_mul_nonneg_nonneg Hop Hor).
+    }
+    apply (rngl_nle_gt Hor) in Hc32.
 ...
 Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
 Search (_ → rngl_cos _ < rngl_cos _)%L.
