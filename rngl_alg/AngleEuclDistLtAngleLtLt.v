@@ -684,6 +684,13 @@ destruct zs3. {
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
     rewrite angle_add_comm.
+    destruct (rngl_le_dec Hor (rngl_cos (θ1 + θ2)) 0) as [Hc12z| Hzc12]. {
+      apply (rngl_le_trans Hor _ 0); [ easy | ].
+      apply rngl_cos_sub_nonneg; [ easy | easy | easy | ].
+      apply (rngl_lt_le_incl Hor) in H13.
+      now apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+    }
+    apply (rngl_nle_gt Hor) in Hzc12.
 ...
 Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
 Search (_ → rngl_cos _ < rngl_cos _)%L.
