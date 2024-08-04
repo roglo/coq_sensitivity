@@ -650,6 +650,16 @@ destruct zs3. {
   exfalso.
   apply rngl_leb_le in Hzs3.
   apply rngl_ltb_lt in H13.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    change_angle_opp θ2.
+    rewrite <- angle_opp_add_distr in Hc211, Hc213.
+    progress sin_cos_opp_hyp T Hc211.
+    progress sin_cos_opp_hyp T Hc213.
+    progress sin_cos_opp_hyp T Hzs2.
+    progress sin_cos_opp_hyp T Hzc2.
+...
+Inspect 4.
+quadrant_1_rngl_add_cos_add_cos_sub :
 ...
 *)
 
