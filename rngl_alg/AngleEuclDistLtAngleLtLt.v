@@ -603,14 +603,14 @@ destruct zs2. {
     progress sin_cos_add_sub_straight_hyp T Hc2z.
     apply (rngl_lt_opp_r Hop Hor) in Hc211, Hc213.
     apply (rngl_lt_opp_l Hop Hor) in H12.
-...
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
-    rewrite <- rngl_sin_sub_anticomm.
-    rewrite <- rngl_sin_sub_anticomm in Hc211.
-...
-    rewrite rngl_sin_sub, rngl_cos_sub.
-(* ouais, chais pas *)
+    rewrite rngl_add_comm, angle_add_comm.
+    apply (rngl_lt_le_incl Hor) in Hzc1, Hc2z, H13.
+    now apply quadrant_1_rngl_add_cos_add_cos_sub.
+  }
+  apply (rngl_nle_gt Hor) in Hc3z.
+  clear H13 H12.
 ...
 apply (rngl_nle_gt Hor) in Hc211.
 apply Hc211; clear Hc211.
