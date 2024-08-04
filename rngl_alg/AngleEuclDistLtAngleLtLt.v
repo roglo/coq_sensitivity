@@ -685,8 +685,13 @@ destruct zs3. {
     apply Hc213; clear Hc213.
     rewrite angle_add_comm.
 ...
-    rewrite rngl_cos_sub_comm.
 Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
+Search (_ → rngl_cos _ < rngl_cos _)%L.
+apply rngl_cos_decr.
+split. {
+progress unfold angle_leb.
+...
+    rewrite rngl_cos_sub_comm.
     apply quadrant_1_sin_sub_nonneg_cos_le.
 ...
 *)
