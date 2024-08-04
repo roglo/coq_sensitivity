@@ -592,17 +592,18 @@ destruct zs2. {
   progress sin_cos_add_sub_right_hyp T Hc2z.
   progress sin_cos_add_sub_right_goal T.
 *)
+  change_angle_sub_l θ2 angle_straight.
+  rewrite <- angle_sub_add_distr in Hc211, Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc211.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T H12.
+  progress sin_cos_add_sub_straight_hyp T Hzs2.
+  progress sin_cos_add_sub_straight_hyp T Hc2z.
+  progress sin_cos_add_sub_straight_goal T.
+  apply (rngl_lt_opp_r Hop Hor) in Hc211, Hc213.
+  apply (rngl_lt_opp_l Hop Hor) in H12.
   destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
     exfalso.
-    change_angle_sub_l θ2 angle_straight.
-    rewrite <- angle_sub_add_distr in Hc211, Hc213.
-    progress sin_cos_add_sub_straight_hyp T Hc211.
-    progress sin_cos_add_sub_straight_hyp T Hc213.
-    progress sin_cos_add_sub_straight_hyp T H12.
-    progress sin_cos_add_sub_straight_hyp T Hzs2.
-    progress sin_cos_add_sub_straight_hyp T Hc2z.
-    apply (rngl_lt_opp_r Hop Hor) in Hc211, Hc213.
-    apply (rngl_lt_opp_l Hop Hor) in H12.
     apply (rngl_nle_gt Hor) in Hc213.
     apply Hc213; clear Hc213.
     rewrite rngl_add_comm, angle_add_comm.
@@ -610,7 +611,17 @@ destruct zs2. {
     now apply quadrant_1_rngl_add_cos_add_cos_sub.
   }
   apply (rngl_nle_gt Hor) in Hc3z.
-  clear H13 H12.
+  change_angle_sub_l θ3 angle_straight.
+  rewrite <- angle_sub_add_distr in Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T H13.
+  progress sin_cos_add_sub_straight_hyp T Hzs3.
+  progress sin_cos_add_sub_straight_hyp T Hc3z.
+  progress sin_cos_add_sub_straight_goal T.
+  rewrite (rngl_add_opp_l Hop) in Hc213 |-*.
+  apply -> (rngl_lt_sub_0 Hop Hor) in Hc213.
+  apply (rngl_lt_sub_0 Hop Hor).
+  apply (rngl_lt_opp_l Hop Hor) in H13.
 ...
 apply (rngl_nle_gt Hor) in Hc211.
 apply Hc211; clear Hc211.
