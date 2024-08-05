@@ -11,6 +11,7 @@ Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
 Require Import AngleDiv2Add.
+Require Import AngleEuclDistLtAngleLtLt.
 Require Import Complex.
 Require Import Work.
 Require Import TacChangeAngle.
@@ -1965,9 +1966,6 @@ Theorem glop :
 Proof.
 intros * He1 He2 H34 H21 H14.
 About angle_eucl_dist_lt_angle_lt_lt.
-Check quadrant_1_cos_sub_le_cos_sub.
-Check quadrant_1_rngl_add_cos_add_cos_sub.
-Check quadrant_1_rngl_cos_add_lt.
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
