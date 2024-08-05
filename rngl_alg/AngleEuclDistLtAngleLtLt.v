@@ -748,7 +748,18 @@ destruct zs3. {
 }
 clear H13.
 apply (rngl_leb_gt Hor) in Hzs3.
-apply rngl_ltb_lt
+apply rngl_ltb_lt.
+destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
+  change_angle_sub_l θ1 angle_straight.
+  rewrite angle_sub_sub_distr in Hc211.
+  rewrite <- angle_add_sub_swap in Hc211.
+  do 2 rewrite angle_sub_sub_distr in Hc213.
+  do 2 rewrite <- angle_add_sub_swap in Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hzs1.
+  progress sin_cos_add_sub_straight_hyp T Hc211.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc1z.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
 ...
 *)
 
