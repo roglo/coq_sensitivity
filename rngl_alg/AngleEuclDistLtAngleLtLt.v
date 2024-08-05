@@ -833,6 +833,33 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   now apply (quadrant_1_rngl_cos_add_lt θ1).
 }
 apply (rngl_nle_gt Hor) in Hzc1.
+destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
+  apply (rngl_nle_gt Hor).
+  intros Hc32.
+  change_angle_add_r θ2 angle_straight.
+  change_angle_add_r θ3 angle_straight.
+  move θ3 before θ2.
+  rewrite angle_sub_sub_swap in Hc211.
+  do 2 rewrite (angle_sub_sub_swap _ angle_straight) in Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hc211.
+  progress sin_cos_add_sub_straight_hyp T Hc213.
+  progress sin_cos_add_sub_straight_hyp T Hzs3.
+  progress sin_cos_add_sub_straight_hyp T Hzs2.
+  progress sin_cos_add_sub_straight_hyp T Hc32.
+  progress sin_cos_add_sub_straight_hyp T Hc2z.
+  rewrite (rngl_add_opp_l Hop) in Hc32.
+  apply -> (rngl_le_sub_0 Hop Hor) in Hc32.
+  apply (rngl_nle_gt Hor) in Hc213.
+  apply Hc213; clear Hc213.
+Check quadrant_1_cos_sub_le_cos_sub.
+  apply quadrant_1_cos_sub_le_cos_sub; try easy.
+(* ah bin non *)
+...
+apply (rngl_lt_le_incl Hor) in Hzs3, Hzs2.
+  apply (quadrant_1_rngl_cos_sub_lt θ1); try easy.
+...
+  apply quadrant_1_cos_sub_le_cos_sub; try easy.
+  now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
 ...
 *)
 
