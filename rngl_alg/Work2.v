@@ -1965,7 +1965,8 @@ Theorem glop :
   → (θ2 < θ3)%A.
 Proof.
 intros * He1 He2 H34 H21 H14.
-About angle_eucl_dist_lt_angle_lt_lt.
+Check angle_eucl_dist_lt_angle_lt_lt.
+apply (angle_eucl_dist_lt_angle_lt_lt θ1).
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
