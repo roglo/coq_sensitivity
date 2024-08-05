@@ -780,6 +780,16 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
       now apply rngl_cos_lt_rngl_cos_sub.
     }
     apply (rngl_nle_gt Hor) in Hc3z.
+    exfalso.
+    change_angle_opp θ2.
+    change_angle_add_r θ3 angle_straight.
+    rewrite <- angle_add_sub_swap in Hc213.
+    rewrite angle_add_opp_l in Hc213, Hc211.
+    progress sin_cos_add_sub_straight_hyp T Hc213.
+    progress sin_cos_add_sub_straight_hyp T Hzs3.
+    progress sin_cos_opp_hyp T Hzs2.
+    progress sin_cos_opp_hyp T Hzc2.
+    progress sin_cos_add_sub_straight_hyp T Hc3z.
 ...
 *)
 
