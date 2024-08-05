@@ -308,7 +308,7 @@ now apply (rngl_lt_le_incl Hor).
 now do 2 rewrite angle_add_comm, angle_sub_add.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem angle_eucl_dist_lt_angle_lt_lt :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ1 θ2 <
@@ -858,7 +858,18 @@ destruct (rngl_le_dec Hor (rngl_cos θ2) 0) as [Hc2z| Hzc2]. {
   now apply rngl_cos_sub_nonneg.
 }
 apply (rngl_nle_gt Hor) in Hzc2.
-...
-*)
+change_angle_opp θ2.
+rewrite <- angle_opp_add_distr in Hc213.
+rewrite <- angle_opp_add_distr in Hc211.
+progress sin_cos_opp_hyp T Hc211.
+progress sin_cos_opp_hyp T Hc213.
+progress sin_cos_opp_hyp T Hzs2.
+progress sin_cos_opp_hyp T Hzc2.
+exfalso.
+apply (rngl_nle_gt Hor) in Hc211.
+apply Hc211; clear Hc211.
+apply (rngl_lt_le_incl Hor) in Hzs2, Hzc1, Hzc2.
+now apply quadrant_1_rngl_cos_add_le_cos_l.
+Qed.
 
 End a.
