@@ -1965,7 +1965,14 @@ Theorem glop :
   → (θ2 < θ3)%A.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * He1 He2 Hd34 Hd21 H14.
+  rewrite (H1 θ1), (H1 θ4) in H14.
+  now apply angle_lt_irrefl in H14.
+}
 intros * He1 He2 Hd34 Hd21 H14.
+...
 destruct (angle_lt_dec θ4 θ3) as [H43| H34]. {
   apply (angle_eucl_dist_lt_angle_lt_lt θ1). 2: {
     (* lemma to do *)
@@ -1977,6 +1984,33 @@ destruct (angle_lt_dec θ4 θ3) as [H43| H34]. {
   rewrite angle_eucl_dist_symmetry in Hd21.
   eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
   apply (rngl_min_le_compat_l Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_add_diag2 Hon).
+  rewrite He2.
+  eapply (rngl_le_trans Hor). {
+    apply (angle_eucl_dist_triangular _ θ3).
+  }
+  apply (rngl_add_le_mono_l Hop Hor).
+...
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_lt_le_incl Hor).
+    apply Hd34.
+  }
+  apply (rngl_min_le_iff Hor); right.
+  rewrite He2.
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_add_diag2 Hon).
+  eapply (rngl_le_trans Hor). {
+    apply (angle_eucl_dist_triangular _ θ3).
+  }
+  apply (rngl_add_le_mono_l Hop Hor).
+Search (min _ _ ≤ _).
+...
+apply rngl_min_le_iff.
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
