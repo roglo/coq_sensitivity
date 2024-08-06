@@ -1964,9 +1964,20 @@ Theorem glop :
   → (θ1 < θ4)%A
   → (θ2 < θ3)%A.
 Proof.
-intros * He1 He2 H34 H21 H14.
+destruct_ac.
+intros * He1 He2 Hd34 Hd21 H14.
+destruct (angle_lt_dec θ4 θ3) as [H43| H34]. {
+  apply (angle_eucl_dist_lt_angle_lt_lt θ1). 2: {
+    (* lemma to do *)
+    apply (angle_lt_le_trans _ θ4); [ easy | ].
+    now apply angle_lt_le_incl in H43.
+  }
+  rewrite <- He1.
+  rewrite (rngl_min_comm Hor).
+  rewrite angle_eucl_dist_symmetry in Hd21.
+  eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
+...
 Check angle_eucl_dist_lt_angle_lt_lt.
-apply (angle_eucl_dist_lt_angle_lt_lt θ1).
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).

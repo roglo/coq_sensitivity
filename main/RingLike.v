@@ -4561,6 +4561,26 @@ progress unfold rngl_min.
 now rewrite (rngl_leb_refl Hor).
 Qed.
 
+Theorem rngl_min_comm :
+  rngl_is_ordered T = true →
+  ∀ a b, rngl_min a b = rngl_min b a.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (b ≤? a)%L as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab. {
+  destruct ba; [ | easy ].
+  apply rngl_leb_le in Hab, Hba.
+  now apply (rngl_le_antisymm Hor).
+} {
+  destruct ba; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hab, Hba.
+  now apply (rngl_lt_asymm Hor) in Hba.
+}
+Qed.
+
 Theorem rngl_min_glb_lt_iff :
   rngl_is_ordered T = true →
   ∀ a b c, (c < rngl_min a b ↔ c < a ∧ c < b)%L.
