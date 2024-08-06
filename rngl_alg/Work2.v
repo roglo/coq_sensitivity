@@ -1976,8 +1976,7 @@ destruct (angle_lt_dec θ4 θ3) as [H43| H34]. {
   rewrite (rngl_min_comm Hor).
   rewrite angle_eucl_dist_symmetry in Hd21.
   eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
-...
-Check angle_eucl_dist_lt_angle_lt_lt.
+  apply (rngl_min_le_compat_l Hor).
 ...
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).

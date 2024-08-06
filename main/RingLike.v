@@ -4623,6 +4623,26 @@ destruct c; [ | apply (rngl_le_refl Hor) ].
 now apply rngl_leb_le in Hc.
 Qed.
 
+Theorem rngl_min_le_compat_l :
+  rngl_is_ordered T = true →
+  ∀ a b c, (b ≤ c → rngl_min a b ≤ rngl_min a c)%L.
+Proof.
+intros Hor * Hbc.
+progress unfold rngl_min.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (a ≤? c)%L as ac eqn:Hac.
+symmetry in Hab, Hac.
+destruct ab. {
+  destruct ac; [ apply (rngl_le_refl Hor) | ].
+  apply rngl_leb_le in Hab.
+  now apply (rngl_le_trans Hor _ b).
+} {
+  destruct ac; [ | easy ].
+  apply (rngl_leb_gt Hor) in Hab.
+  now apply (rngl_lt_le_incl Hor) in Hab.
+}
+Qed.
+
 Theorem rngl_le_max_l :
   rngl_is_ordered T = true →
   ∀ a b, (a ≤ rngl_max a b)%L.
