@@ -174,6 +174,33 @@ split. {
       apply rngl_sin_bound.
     }
   }
+  rewrite angle_sub_sub_distr in H21.
+  rewrite <- angle_add_sub_swap in H21.
+  rewrite angle_right_add_right in H21.
+  apply angle_nle_gt in H21.
+  apply H21; clear H21.
+  progress unfold angle_leb.
+  rewrite rngl_sin_sub_straight_l.
+  rewrite rngl_cos_sub_straight_l.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  destruct zs2. {
+    destruct zs1; [ | easy ].
+    apply rngl_leb_le in Hzs1, Hzs2.
+    apply rngl_leb_le.
+    apply (rngl_le_opp_l Hop Hor).
+    apply (rngl_lt_le_incl Hor) in Hs1z.
+    apply (rngl_add_nonneg_nonneg Hor).
+...
+    generalize Hs1z; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply rngl_leb_le in H; rewrite H; clear H.
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+    symmetry in Hzs2.
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in Hzs2.
+    apply rngl_leb_le.
 ...
     generalize Hzs12; intros H.
     apply (rngl_opp_le_compat Hop Hor) in H.
