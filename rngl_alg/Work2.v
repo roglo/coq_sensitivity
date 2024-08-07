@@ -1996,11 +1996,9 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 ... ...
-  apply (angle_eucl_dist_lt_angle_lt_lt2 θ4); [ | ].
-...
+  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); [ | easy ].
   rewrite <- He1, <- He2.
-  rewrite angle_eucl_dist_symmetry.
-  eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
+  eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
   rewrite (rngl_min_comm Hor ε2).
   apply (rngl_min_le_compat_l Hor).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
