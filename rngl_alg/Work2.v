@@ -2035,8 +2035,8 @@ rewrite angle_sub_diag in Hd23.
 rewrite angle_sub_0_l in Hd23.
 rewrite angle_add_opp_l in Hd23.
 rewrite <- angle_eucl_dist_move_0_r in Hd23.
-...
 Check angle_sub_lt_mono_l.
+...
 apply angle_sub_lt_mono_l.
 3: {
   apply (angle_eucl_dist_lt_angle_lt_lt θ3).
