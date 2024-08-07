@@ -83,7 +83,7 @@ apply (rngl_lt_le_incl Hor) in Hs1z.
 now apply rngl_sin_add_nonneg.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem rngl_sin_add_nonneg_sin_nonneg' :
   ∀ θ1 θ2,
   (θ2 < -θ1 ∨ angle_right - θ1 < θ2)%A
@@ -191,7 +191,7 @@ split. {
     apply rngl_leb_le.
     apply (rngl_le_opp_l Hop Hor).
     apply (rngl_lt_le_incl Hor) in Hs1z.
-    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_add_nonneg_nonneg Hor); [ easy | ].
 ...
     generalize Hs1z; intros H.
     apply (rngl_lt_le_incl Hor) in H.
