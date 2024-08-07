@@ -83,6 +83,53 @@ apply (rngl_lt_le_incl Hor) in Hs1z.
 now apply rngl_sin_add_nonneg.
 Qed.
 
+(* to be completed
+Theorem rngl_sin_add_nonneg_sin_nonneg' :
+  ∀ θ1 θ2,
+  (θ2 < -θ1 ∨ angle_right - θ1 < θ2)%A
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  ↔ (0 ≤ rngl_sin θ1)%L.
+Proof.
+destruct_ac.
+intros * H21.
+split. {
+  intros Hzs12.
+  apply (rngl_nlt_ge Hor).
+  intros Hs1z.
+  change_angle_add_r θ1 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hs1z.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  destruct H21 as [H21| H21]. {
+    apply angle_nle_gt in H21.
+    apply H21; clear H21.
+    rewrite angle_opp_sub_distr.
+    progress unfold angle_leb.
+    rewrite rngl_sin_sub_right_l.
+    generalize Hs1z; intros H.
+    apply (rngl_lt_le_incl Hor) in H.
+    apply rngl_leb_le in H; rewrite H; clear H.
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+    symmetry in Hzs2.
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in Hzs2.
+    apply rngl_leb_le.
+    rewrite rngl_cos_sub_right_l.
+...
+    generalize Hzs12; intros H.
+    apply (rngl_opp_le_compat Hop Hor) in H.
+    rewrite (rngl_opp_0 Hop) in H.
+    apply rngl_leb_le in H.
+rewrite H; clear H.
+rewrite rngl_sin_sub_right_r.
+generalize Hs1z; intros H.
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply (rngl_nle_gt Hor) in H.
+apply rngl_leb_nle in H.
+now rewrite H; clear H.
+...
+*)
+
 Theorem rngl_sin_add_nonneg_sin_nonneg :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
