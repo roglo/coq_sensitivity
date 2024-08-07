@@ -1573,6 +1573,18 @@ apply angle_add_le_mono_l; [ easy | ].
 now apply angle_opp_le_compat_if.
 Qed.
 
+Theorem angle_sub_lt_mono_l :
+  ∀ θ2 θ3 θ1,
+  angle_add_overflow θ3 (- θ1) = false
+  → θ1 ≠ 0%A
+  → (θ1 < θ2)%A
+  → (θ3 - θ2 < θ3 - θ1)%A.
+Proof.
+intros * Hov H1z H12.
+apply angle_add_lt_mono_l; [ easy | ].
+now apply angle_opp_lt_compat_if.
+Qed.
+
 Theorem angle_mul_opp : ∀ n θ, (- (n * θ) = n * (- θ))%A.
 Proof.
 intros.
@@ -1995,6 +2007,44 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
      rngl_min (angle_eucl_dist θ1 θ3) (angle_eucl_dist θ1 0))%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
+Proof.
+intros * Hd23 H13.
+change_angle_sub_l θ1 angle_right.
+change_angle_sub_l θ2 angle_right.
+change_angle_sub_l θ3 angle_right.
+(*
+apply (angle_add_lt_mono_l (- angle_right)) in H13.
+do 2 rewrite angle_add_sub_assoc in H13.
+rewrite angle_add_opp_l in H13.
+rewrite angle_sub_diag in H13.
+do 2 rewrite angle_sub_0_l in H13.
+apply angle_opp_lt_compat_if in H13.
+do 2 rewrite angle_opp_involutive in H13.
+*)
+rewrite angle_eucl_dist_move_0_r in Hd23.
+rewrite angle_sub_sub_distr in Hd23.
+rewrite angle_sub_sub_swap in Hd23.
+rewrite angle_sub_diag in Hd23.
+rewrite angle_sub_0_l in Hd23.
+rewrite angle_add_opp_l in Hd23.
+rewrite <- angle_eucl_dist_move_0_r in Hd23.
+rewrite (angle_eucl_dist_move_0_r (_ - _)) in Hd23.
+rewrite angle_sub_sub_distr in Hd23.
+rewrite angle_sub_sub_swap in Hd23.
+rewrite angle_sub_diag in Hd23.
+rewrite angle_sub_0_l in Hd23.
+rewrite angle_add_opp_l in Hd23.
+rewrite <- angle_eucl_dist_move_0_r in Hd23.
+...
+Check angle_sub_lt_mono_l.
+apply angle_sub_lt_mono_l.
+3: {
+  apply (angle_eucl_dist_lt_angle_lt_lt θ3).
+Search (_ + _ < _ + _)%A.
+Search (angle_eucl_dist (_ - _)).
+...
+Search (_ - _ ≤ _ - _)%A.
+About angle_sub_le_mono_l.
 ... ...
   apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); [ | easy ].
   rewrite <- He1, <- He2.
