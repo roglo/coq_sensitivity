@@ -2035,7 +2035,18 @@ rewrite angle_sub_diag in Hd23.
 rewrite angle_sub_0_l in Hd23.
 rewrite angle_add_opp_l in Hd23.
 rewrite <- angle_eucl_dist_move_0_r in Hd23.
+Check angle_add_lt_mono_l.
 Check angle_sub_lt_mono_l.
+Check angle_add_le_mono_l.
+(* est-ce que je pourrais avoir
+  angle_add_le_mono_l : ∀ θ1 θ2 θ3,
+    angle_add_overflow θ1 θ3 = false ∨ angle_add_overflow θ1 θ2 = true
+    → (θ2 ≤ θ3)%A → (θ1 + θ2 ≤ θ1 + θ3)%A
+  ?
+  à réfléchir...
+*)
+Check angle_sub_le_mono_l.
+About angle_add_lt_mono_l.
 ...
 apply angle_sub_lt_mono_l.
 3: {
