@@ -308,7 +308,6 @@ now apply (rngl_lt_le_incl Hor).
 now do 2 rewrite angle_add_comm, angle_sub_add.
 Qed.
 
-(* to be completed *)
 Theorem angle_eucl_dist_lt_angle_lt_lt :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ1 θ2 <
