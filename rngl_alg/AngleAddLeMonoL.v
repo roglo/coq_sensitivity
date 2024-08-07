@@ -83,7 +83,7 @@ apply (rngl_lt_le_incl Hor) in Hs1z.
 now apply rngl_sin_add_nonneg.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem rngl_sin_add_nonneg_sin_nonneg' :
   ∀ θ1 θ2,
   (θ2 < -θ1 ∨ angle_right - θ1 < θ2)%A
