@@ -1848,7 +1848,7 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-Theorem angle_lt_sub_right_l_cos_add_pos :
+Theorem rngl_cos_add_pos :
   ∀ θ1 θ2,
   (θ2 < angle_right - θ1)%A ∨ (- angle_right - θ1 < θ2)%A
   → (0 < rngl_cos θ1)%L
@@ -2005,6 +2005,31 @@ destruct H21 as [H21| H21]. {
 }
 Qed.
 
+Theorem rngl_sin_add_nonneg_sin_nonneg :
+  ∀ θ1 θ2,
+  (θ2 < - θ1)%A ∨ (angle_straight - θ1 < θ2)%A
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → (0 ≤ rngl_sin θ1)%L.
+Proof.
+destruct_ac.
+intros * H21 Hzs12.
+apply (rngl_nlt_ge Hor).
+intros Hs1z.
+change_angle_add_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hs1z.
+progress sin_cos_add_sub_right_hyp T Hzs12.
+apply (rngl_nlt_ge Hor) in Hzs12.
+apply Hzs12; clear Hzs12.
+rewrite angle_opp_sub_distr in H21.
+rewrite <- angle_opp_straight in H21.
+rewrite <- angle_opp_add_distr in H21.
+rewrite <- angle_add_sub_swap in H21.
+rewrite <- angle_add_sub_assoc in H21.
+rewrite angle_straight_sub_right in H21.
+rewrite angle_opp_add_distr in H21.
+now apply rngl_cos_add_pos.
+Qed.
+
 (* to be completed
 Theorem rngl_sin_add_nonneg_sin_nonneg' :
   ∀ θ1 θ2,
@@ -2017,21 +2042,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H21.
 split. {
   intros Hzs12.
-  apply (rngl_nlt_ge Hor).
-  intros Hs1z.
-  change_angle_add_r θ1 angle_right.
-  progress sin_cos_add_sub_right_hyp T Hs1z.
-  progress sin_cos_add_sub_right_hyp T Hzs12.
-  apply (rngl_nlt_ge Hor) in Hzs12.
-  apply Hzs12; clear Hzs12.
-  rewrite angle_opp_sub_distr in H21.
-  rewrite <- angle_opp_straight in H21.
-  rewrite <- angle_opp_add_distr in H21.
-  rewrite <- angle_add_sub_swap in H21.
-  rewrite <- angle_add_sub_assoc in H21.
-  rewrite angle_straight_sub_right in H21.
-  rewrite angle_opp_add_distr in H21.
-  now apply angle_lt_sub_right_l_cos_add_pos.
+  now apply (rngl_sin_add_nonneg_sin_nonneg _ θ2).
 }
 intros Hzs1.
 destruct H21 as [H21| H21]. {
