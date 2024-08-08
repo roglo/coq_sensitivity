@@ -2382,6 +2382,42 @@ f_equal.
 apply (rngl_mul_1_r Hon).
 Qed.
 
+Theorem rngl_sin_sub_nonneg_sin_le_sin :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_sin (θ1 - θ2))%L
+  → (rngl_sin θ2 ≤ rngl_sin θ1)%L.
+Proof.
+destruct_ac; intros * Hzs1 Hcs1 Hzs12.
+cbn in Hzs12.
+rewrite rngl_add_comm in Hzs12.
+rewrite (rngl_mul_opp_r Hop) in Hzs12.
+rewrite (rngl_add_opp_l Hop) in Hzs12.
+apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
+apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cos θ1)) in Hzs12; [ | easy ].
+rewrite rngl_mul_assoc in Hzs12.
+rewrite fold_rngl_squ in Hzs12.
+specialize (cos2_sin2_1 θ1) as H1.
+apply (rngl_add_move_r Hop) in H1.
+rewrite H1 in Hzs12; clear H1.
+rewrite (rngl_mul_sub_distr_r Hop) in Hzs12.
+rewrite (rngl_mul_1_l Hon) in Hzs12.
+apply (rngl_le_sub_le_add_r Hop Hor) in Hzs12.
+rewrite (rngl_mul_comm Hic) in Hzs12.
+progress unfold rngl_squ in Hzs12.
+do 2 rewrite <- rngl_mul_assoc in Hzs12.
+rewrite <- rngl_mul_add_distr_l in Hzs12.
+rewrite (rngl_mul_comm Hic (rngl_cos θ2)) in Hzs12.
+rewrite <- rngl_cos_sub in Hzs12.
+eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+apply (rngl_le_0_sub Hop Hor).
+apply rngl_cos_bound.
+Qed.
+
 Theorem rngl_sin_nonneg_sin_nonneg_sin_neg :
   ∀ θ1 θ2,
   (θ1 ≤ θ1 + θ2)%A

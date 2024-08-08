@@ -1966,6 +1966,40 @@ split. {
   rewrite (rngl_mul_1_r Hon).
   apply (rngl_leb_gt Hor) in Hs1z, Hzs2.
   apply (rngl_le_opp_r Hop Hor).
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+    change_angle_add_r θ2 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzc2.
+    progress sin_cos_add_sub_right_hyp T Hzs2.
+    progress sin_cos_add_sub_right_hyp T Hzs12.
+    progress sin_cos_add_sub_right_goal T.
+    destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hc1z]. {
+      exfalso.
+      apply (rngl_nlt_ge Hor) in Hzs12.
+      apply Hzs12; clear Hzs12.
+      apply (rngl_lt_le_incl Hor) in Hs1z.
+      now apply rngl_sin_add_pos_2.
+    }
+    apply (rngl_nlt_ge Hor) in Hc1z.
+    change_angle_opp θ1.
+    progress sin_cos_opp_hyp T Hs1z.
+    progress sin_cos_opp_hyp T Hc1z.
+    rewrite angle_add_opp_l in Hzs12.
+    rewrite rngl_sin_sub_anticomm in Hzs12.
+    apply (rngl_opp_nonpos_nonneg Hop Hor) in Hc1z, Hzs12.
+    cbn.
+    rewrite (rngl_add_opp_r Hop).
+    apply (rngl_le_sub_0 Hop Hor).
+    apply (rngl_lt_le_incl Hor) in Hs1z.
+    now apply rngl_sin_sub_nonneg_sin_le_sin.
+  }
+  apply (rngl_nle_gt Hor) in Hc2z.
+...
+  apply (rngl_nlt_ge Hor).
+  intros Hc2s1.
+  apply (rngl_nlt_ge Hor) in Hzs12.
+  apply Hzs12; clear Hzs12.
+Search (0 < rngl_cos (_ + _))%L.
+Search (0 ≤ rngl_cos (_ + _))%L.
 ...
 About angle_div_2_add_not_overflow.
 ...
