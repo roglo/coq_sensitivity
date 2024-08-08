@@ -1955,8 +1955,29 @@ split. {
     apply rngl_leb_le in Hzs1, Hzs2.
     apply rngl_leb_le.
     apply (rngl_le_opp_l Hop Hor).
+    rewrite rngl_cos_add_rngl_cos.
+    rewrite <- rngl_mul_assoc.
+    apply (rngl_mul_nonneg_nonneg Hop Hor). {
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+Check rngl_cos_add_nonneg.
+(* aïe aïe aïe, ça ne se présente pas très bien *)
 ...
-Search (rngl_cos _ + rngl_cos _)%L.
+2: {
+      apply rngl_cos_sub_nonneg; [ | | | ].
+...
+      apply rngl_cos_add_nonneg; [ | | | ].
+4: {
+cbn.
+
+...
+About angle_div_2_add_not_overflow.
+...
+    rewrite <- angle_div_2_add_not_overflow. 2: {
+    progress unfold angle_add_overflow.
+    rewrite angle_add_comm.
+...
 apply (rngl_lt_le_incl Hor) in Hs1z.
 apply rngl_add_cos_nonneg_when_sin_nonneg; try easy.
 ...
