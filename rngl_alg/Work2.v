@@ -2033,7 +2033,7 @@ Qed.
 (* to be completed
 Theorem rngl_sin_add_nonneg_sin_nonneg' :
   ∀ θ1 θ2,
-  (θ2 < -θ1 ∨ angle_straight - θ1 < θ2)%A
+  (θ2 < -θ1 ∧ θ1 ≠ angle_straight ∨ angle_straight - θ1 < θ2)%A
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   ↔ (0 ≤ rngl_sin θ1)%L.
 Proof.
@@ -2042,10 +2042,13 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H21.
 split. {
   intros Hzs12.
+  assert (H : (θ2 < -θ1 ∨ angle_straight - θ1 < θ2)%A). {
+    destruct H21 as [H21| H21]; [ now left | now right ].
+  }
   now apply (rngl_sin_add_nonneg_sin_nonneg _ θ2).
 }
 intros Hzs1.
-destruct H21 as [H21| H21]. {
+destruct H21 as [(H21, H1s)| H21]. {
   progress unfold angle_ltb in H21.
   cbn in H21.
   rewrite (rngl_leb_opp_r Hop Hor) in H21.
@@ -2060,12 +2063,10 @@ destruct H21 as [H21| H21]. {
       apply rngl_ltb_lt in H21.
       apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
       apply eq_rngl_sin_0 in Hzs1.
-      destruct Hzs1; subst θ1; [ now rewrite angle_add_0_l | ].
-      cbn in H21.
-      clear Hs1z.
-      rewrite rngl_sin_add_straight_l.
-      apply (rngl_opp_nonneg_nonpos Hop Hor).
-(* ah putain ça marche pas *)
+      destruct Hzs1; subst θ1; [ now rewrite angle_add_0_l | easy ].
+    }
+    clear H21.
+    apply (rngl_leb_gt Hor) in Hs1z.
 ...
 *)
 
