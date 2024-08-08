@@ -2067,6 +2067,8 @@ destruct H21 as [(H21, H1s)| H21]. {
     }
     clear H21.
     apply (rngl_leb_gt Hor) in Hs1z.
+    clear Hzs1.
+    (* bin non, c'est faux *)
 ...
 *)
 
