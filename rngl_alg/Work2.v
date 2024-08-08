@@ -1955,6 +1955,7 @@ split. {
     apply rngl_leb_le in Hzs1, Hzs2.
     apply rngl_leb_le.
     apply (rngl_le_opp_l Hop Hor).
+...
     rewrite rngl_cos_add_rngl_cos.
     rewrite <- rngl_mul_assoc.
     apply (rngl_mul_nonneg_nonneg Hop Hor). {
