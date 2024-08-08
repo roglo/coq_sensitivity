@@ -1851,7 +1851,7 @@ Qed.
 (* to be completed
 Theorem rngl_sin_add_nonneg_sin_nonneg' :
   ∀ θ1 θ2,
-  (θ2 < -θ1 ∨ angle_right - θ1 < θ2)%A
+  (θ2 < -θ1 ∨ angle_straight - θ1 < θ2)%A
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   ↔ (0 ≤ rngl_sin θ1)%L.
 Proof.
@@ -1939,39 +1939,33 @@ split. {
       apply rngl_sin_bound.
     }
   }
-  rewrite angle_sub_sub_distr in H21.
+  rewrite <- angle_opp_straight in H21.
+  rewrite <- angle_opp_add_distr in H21.
   rewrite <- angle_add_sub_swap in H21.
-  rewrite angle_right_add_right in H21.
+  rewrite <- angle_add_sub_assoc in H21.
+  rewrite angle_straight_sub_right in H21.
   apply angle_nle_gt in H21.
   apply H21; clear H21.
   progress unfold angle_leb.
-  rewrite rngl_sin_sub_straight_l.
-  rewrite rngl_cos_sub_straight_l.
-  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  rewrite angle_add_comm.
+  rewrite angle_opp_add_distr.
+  rewrite rngl_sin_sub_right_r.
+  cbn.
+  rewrite <- (rngl_leb_opp_r Hop Hor).
+  rewrite (rngl_opp_0 Hop).
+  apply (rngl_leb_gt Hor) in Hs1z.
+  rewrite Hs1z.
   remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hzs1, Hzs2.
-  destruct zs2. {
-    destruct zs1; [ | easy ].
-    apply rngl_leb_le in Hzs1, Hzs2.
-    apply rngl_leb_le.
-    apply (rngl_le_opp_l Hop Hor).
-...
-    rewrite rngl_cos_add_rngl_cos.
-    rewrite <- rngl_mul_assoc.
-    apply (rngl_mul_nonneg_nonneg Hop Hor). {
-      apply (rngl_0_le_2 Hon Hop Hor).
-    }
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-Check rngl_cos_add_nonneg.
-(* aïe aïe aïe, ça ne se présente pas très bien *)
-...
-2: {
-      apply rngl_cos_sub_nonneg; [ | | | ].
-...
-      apply rngl_cos_add_nonneg; [ | | | ].
-4: {
-cbn.
-
+  symmetry in Hzs2.
+  destruct zs2; [ easy | ].
+  apply rngl_leb_le.
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite <- (rngl_mul_opp_r Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_mul_1_r Hon).
+  apply (rngl_leb_gt Hor) in Hs1z, Hzs2.
+  apply (rngl_le_opp_r Hop Hor).
 ...
 About angle_div_2_add_not_overflow.
 ...

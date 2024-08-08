@@ -1632,6 +1632,19 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_l.
 Qed.
 
+Theorem angle_straight_sub_right :
+  (angle_straight - angle_right)%A = angle_right.
+Proof.
+destruct_ac.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+f_equal.
+rewrite (rngl_squ_opp_1 Hon Hop).
+apply rngl_add_0_l.
+Qed.
+
 Theorem angle_straight_nonneg :
   rngl_characteristic T ≠ 1 →
   (0 ≤ angle_straight)%A.

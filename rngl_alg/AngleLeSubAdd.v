@@ -57,20 +57,6 @@ apply (rngl_le_0_sub Hop Hor).
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_straight_sub_right :
-  (angle_straight - angle_right)%A = angle_right.
-Proof.
-destruct_ac.
-intros.
-apply eq_angle_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_diag Hos).
-f_equal.
-rewrite (rngl_squ_opp_1 Hon Hop).
-apply rngl_add_0_l.
-Qed.
-
 Theorem rngl_sin_sub_lt_sin_l :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
