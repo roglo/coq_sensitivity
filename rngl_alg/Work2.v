@@ -2014,6 +2014,27 @@ split. {
   now apply quadrant_1_sin_sub_nonneg_cos_le.
 }
 intros Hzs1.
+destruct H21 as [H21| H21]. {
+  progress unfold angle_ltb in H21.
+  cbn in H21.
+  rewrite (rngl_leb_opp_r Hop Hor) in H21.
+  rewrite (rngl_opp_0 Hop) in H21.
+  remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hs1z, Hzs2.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    destruct s1z. {
+      apply rngl_leb_le in Hs1z.
+      apply rngl_ltb_lt in H21.
+      apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+      apply eq_rngl_sin_0 in Hzs1.
+      destruct Hzs1; subst θ1; [ now rewrite angle_add_0_l | ].
+      cbn in H21.
+      clear Hs1z.
+      rewrite rngl_sin_add_straight_l.
+      apply (rngl_opp_nonneg_nonpos Hop Hor).
+(* ah putain ça marche pas *)
 ...
 *)
 
