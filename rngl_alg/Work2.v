@@ -1848,7 +1848,7 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-Theorem rngl_cos_add_pos :
+Theorem angle_lt_rngl_cos_add_pos :
   ∀ θ1 θ2,
   (θ2 < angle_right - θ1)%A ∨ (- angle_right - θ1 < θ2)%A
   → (0 < rngl_cos θ1)%L
@@ -2005,7 +2005,7 @@ destruct H21 as [H21| H21]. {
 }
 Qed.
 
-Theorem rngl_sin_add_nonneg_sin_nonneg :
+Theorem angle_lt_rngl_sin_add_nonneg_sin_nonneg :
   ∀ θ1 θ2,
   (θ2 < - θ1)%A ∨ (angle_straight - θ1 < θ2)%A
   → (0 ≤ rngl_sin (θ1 + θ2))%L
@@ -2027,7 +2027,7 @@ rewrite <- angle_add_sub_swap in H21.
 rewrite <- angle_add_sub_assoc in H21.
 rewrite angle_straight_sub_right in H21.
 rewrite angle_opp_add_distr in H21.
-now apply rngl_cos_add_pos.
+now apply angle_lt_rngl_cos_add_pos.
 Qed.
 
 (* to be completed
@@ -2045,7 +2045,7 @@ split. {
   assert (H : (θ2 < -θ1 ∨ angle_straight - θ1 < θ2)%A). {
     destruct H21 as [H21| H21]; [ now left | now right ].
   }
-  now apply (rngl_sin_add_nonneg_sin_nonneg _ θ2).
+  now apply (angle_lt_rngl_sin_add_nonneg_sin_nonneg _ θ2).
 }
 intros Hzs1.
 destruct H21 as [(H21, H1s)| H21]. {
