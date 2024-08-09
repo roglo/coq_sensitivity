@@ -1860,10 +1860,8 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H21.
 split. {
   intros Hzs12.
-  assert (H : (θ2 < -θ1 ∨ angle_straight - θ1 < θ2)%A). {
-    destruct H21 as [H21| H21]; [ now left | now right ].
-  }
-  now apply (angle_lt_rngl_sin_add_nonneg_sin_nonneg _ θ2).
+  apply (angle_lt_rngl_sin_add_nonneg_sin_nonneg _ θ2); [ | easy ].
+  destruct H21 as [H21| H21]; [ now left | now right ].
 }
 intros Hzs1.
 destruct H21 as [(H21, H1s)| H21]. {
