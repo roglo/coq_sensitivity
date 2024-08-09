@@ -440,6 +440,13 @@ Theorem angle_add_le_mono_l_lemma_2' :
 Proof.
 destruct_ac.
 intros * Haov13 Hzs1 Hzs2 Hzs3 Hc1z Hzs12 Hzs13 H23.
+destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
+  subst θ2.
+  rewrite angle_add_0_r.
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+  apply rngl_cos_add_le_cos; try easy.
+apply 
+...
 change_angle_sub_r θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
 progress sin_cos_add_sub_right_hyp T Hzs13.
@@ -523,6 +530,27 @@ progress sin_cos_add_sub_right_hyp T Hzs3.
 apply (rngl_le_antisymm Hor) in Hzs1; [ clear Hzs3 | easy ].
 apply eq_rngl_cos_0 in Hzs1.
 destruct Hzs1; subst θ1. {
+  clear H23 Hc1z.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  apply (rngl_le_antisymm Hor) in Hzs2; [ clear Hzs12 | easy ].
+  apply eq_rngl_sin_0 in Hzs2.
+  rewrite <- (angle_opp_add_distr _ angle_right) in H1.
+  rewrite angle_right_add_right in H1.
+  rewrite angle_opp_straight in H1.
+  rewrite rngl_sin_sub_straight_l in H1.
+  cbn in H1.
+...
+  destruct Hzs2; subst θ2. {
+    clear H1.
+    rewrite <- (angle_opp_add_distr _ angle_right) in Haov13.
+    rewrite angle_right_add_right in Haov13.
+(* ne marche pas *)
+...
+  rewrite rngl_cos_add_right_l in Hzs12.
+  rewrite <- angle_opp_add_distr in H23.
+  rewrite angle_right_add_right in H23.
+  rewrite angle_opp_straight in H23.
+  cbn in H23.
 ...
 progress unfold angle_add_overflow in Haov13.
 apply Bool.not_true_iff_false in Haov13.
