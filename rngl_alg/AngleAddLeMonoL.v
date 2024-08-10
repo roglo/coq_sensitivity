@@ -265,6 +265,19 @@ rewrite angle_opp_add_distr in H21.
 now apply angle_lt_rngl_cos_add_pos.
 Qed.
 
+(* ça fait réfléchir...
+Theorem angle_add_overflow_if :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → (θ1 = 0 ∨ θ2 < - θ1)%A.
+Proof.
+intros * Haov.
+apply angle_add_not_overflow_comm in Haov.
+Require Import AngleAddOverflowEquiv3.
+now apply angle_add_not_overflow_equiv3 in Haov.
+Qed.
+*)
+
 Theorem rngl_sin_add_nonneg_sin_nonneg :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
