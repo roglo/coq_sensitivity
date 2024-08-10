@@ -479,7 +479,15 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   subst θ2.
   rewrite angle_add_0_r.
   clear Hzs2 Hzs12 H23.
-...
+(*1*)
+  change_angle_sub_r θ1 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs1.
+  progress sin_cos_add_sub_right_hyp T Haov13.
+  progress sin_cos_add_sub_right_hyp T Hzs13.
+  progress sin_cos_add_sub_right_hyp T Hc1z.
+  progress sin_cos_add_sub_right_goal T.
+  Search (rngl_sin _ ≤ rngl_sin (_ + _))%L.
+...1
   apply rngl_cos_add_le_cos; try easy.
   destruct (angle_eq_dec θ1 angle_straight) as [H1s| H1z]. {
     subst θ1; right.
