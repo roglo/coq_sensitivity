@@ -468,6 +468,7 @@ Theorem angle_add_le_mono_l_lemma_2' :
   → (rngl_cos (θ1 + θ3) ≤ rngl_cos (θ1 + θ2))%L.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Haov13 Hzs1 Hzs2 Hzs3 Hc1z Hzs12 Hzs13 H23.
@@ -480,6 +481,39 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   rewrite angle_add_0_r.
   clear Hzs2 Hzs12 H23.
 (*1*)
+  change_angle_sub_l θ1 angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hzs1.
+  progress sin_cos_add_sub_straight_hyp T Hzs13.
+  progress sin_cos_add_sub_straight_hyp T Hc1z.
+  progress sin_cos_add_sub_straight_goal T.
+  apply quadrant_1_sin_sub_nonneg_cos_le; try easy; cycle 2. {
+    now rewrite angle_sub_sub_distr, angle_sub_diag, angle_add_0_l.
+  } {
+    now apply (rngl_lt_le_incl Hor) in Hc1z.
+  }
+  apply rngl_cos_sub_nonneg; try easy. {
+    now apply (rngl_lt_le_incl Hor) in Hc1z.
+  }
+  rewrite rngl_sin_sub in Hzs13.
+  apply -> (rngl_le_0_sub Hop Hor) in Hzs13.
+  destruct (angle_eq_dec θ3 0) as [H3z| H3z]. {
+    subst θ3.
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_sin θ1)). {
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ1. {
+      cbn in Hzs13.
+      rewrite (rngl_mul_1_l Hon) in Hzs13.
+      rewrite (rngl_mul_0_l Hos) in Hzs13.
+      apply (rngl_le_antisymm Hor) in Hzs3; [ | easy ].
+      apply eq_rngl_sin_0 in Hzs3.
+      destruct Hzs3; subst θ3; [ easy | ].
+      (* chiasse *)
+...
   change_angle_sub_r θ1 angle_right.
   progress sin_cos_add_sub_right_hyp T Hzs1.
   progress sin_cos_add_sub_right_hyp T Haov13.
