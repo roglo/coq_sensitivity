@@ -444,7 +444,7 @@ Qed.
 (* to be completed
 Theorem angle_add_le_mono_l_lemma_2' :
   ∀ θ1 θ2 θ3,
-  (θ3 < - θ1 + angle_right)%A ∨ (- θ1 - angle_right < θ3)%A
+  (θ3 < - θ1)%A ∨ (angle_straight - θ1 < θ3)%A
   → (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_sin θ3)%L
@@ -466,6 +466,7 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   subst θ2.
   rewrite angle_add_0_r.
   clear Hzs2 Hzs12 H23.
+...
   apply rngl_cos_add_le_cos; try easy.
   destruct (angle_eq_dec θ1 angle_straight) as [H1s| H1z]. {
     subst θ1; right.
@@ -480,20 +481,16 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
         apply not_eq_sym.
         apply (angle_straight_neq_0 Hc1).
       }
-      cbn in *.
-...
-      intros H; subst θ3.
-      cbn in *.
-cbn in Hc1z.
-  clear Hzs3.
-  rewrite rngl_sin_add_straight_r in Hzs13.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
-  apply (rngl_le_antisymm Hor) in Hzs1; [ clear Hzs13 | easy ].
-  apply eq_rngl_sin_0 in Hzs1.
-  destruct Hzs1; subst θ1.
-2: {
-cbn in Hc1z.
-cbn in Haov13.
+      rewrite angle_opp_straight in H3.
+      now apply angle_lt_irrefl in H3.
+    }
+    rewrite angle_sub_diag in H3.
+    rewrite rngl_sin_add_straight_l in Hzs13.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs13.
+    apply (rngl_le_antisymm Hor) in Hzs3; [ clear Hzs13 | easy ].
+    apply eq_rngl_sin_0 in Hzs3.
+    destruct Hzs3; subst θ3; [ now apply angle_lt_irrefl in H3 | ].
+    cbn.
 ...
   cbn in Hc1z.
   destruct Hzs3; subst θ3. {
