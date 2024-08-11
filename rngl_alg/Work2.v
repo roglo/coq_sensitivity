@@ -1984,6 +1984,18 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply angle_lt_irrefl in H14.
 }
 intros * He1 He2 Hd34 Hd21 H14.
+(*2*)
+assert (H114 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
+  apply (angle_eucl_dist_lt_angle_lt_lt θ1). {
+    rewrite <- He1.
+    rewrite angle_eucl_dist_symmetry.
+    eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
+    rewrite (rngl_min_comm Hor _ ε1).
+    apply (rngl_min_le_compat_l Hor).
+    rewrite <- (angle_add_div_2_diag θ1) at 1.
+    rewrite angle_eucl_dist_add_cancel_l.
+Search (angle_eucl_dist (_ / ₂)).
+...2
 (*1*)
 assert (H24 : (θ2 < θ4)%A). {
   apply (angle_eucl_dist_lt_angle_lt_lt θ1); [ | easy ].
