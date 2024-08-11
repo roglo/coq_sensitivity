@@ -1848,46 +1848,6 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-(* to be completed but not sure useful
-Theorem rngl_sin_add_nonneg_sin_nonneg' :
-  ∀ θ1 θ2,
-  (θ2 < -θ1 ∧ θ1 ≠ angle_straight ∨ angle_straight - θ1 < θ2)%A
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  ↔ (0 ≤ rngl_sin θ1)%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * H21.
-split. {
-  intros Hzs12.
-  apply (angle_lt_rngl_sin_add_nonneg_sin_nonneg _ θ2); [ | easy ].
-  destruct H21 as [H21| H21]; [ now left | now right ].
-}
-intros Hzs1.
-destruct H21 as [(H21, H1s)| H21]. {
-  progress unfold angle_ltb in H21.
-  cbn in H21.
-  rewrite (rngl_leb_opp_r Hop Hor) in H21.
-  rewrite (rngl_opp_0 Hop) in H21.
-  remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hs1z, Hzs2.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    destruct s1z. {
-      apply rngl_leb_le in Hs1z.
-      apply rngl_ltb_lt in H21.
-      apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
-      apply eq_rngl_sin_0 in Hzs1.
-      destruct Hzs1; subst θ1; [ now rewrite angle_add_0_l | easy ].
-    }
-    clear H21.
-    apply (rngl_leb_gt Hor) in Hs1z.
-    clear Hzs1.
-    (* bin non, c'est faux *)
-...
-*)
-
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2087,10 +2047,9 @@ Check angle_add_le_mono_l.
 *)
 Check angle_sub_le_mono_l.
 About angle_add_lt_mono_l.
-...
 apply angle_sub_lt_mono_l.
 3: {
-  apply (angle_eucl_dist_lt_angle_lt_lt θ3).
+  apply (angle_eucl_dist_lt_angle_lt_lt θ3). 2: {
 Search (_ + _ < _ + _)%A.
 Search (angle_eucl_dist (_ - _)).
 ...
