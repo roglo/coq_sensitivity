@@ -2005,7 +2005,14 @@ Theorem angle_eucl_dist_le_twice_twice_div_2_div_2 :
   ∀ θ1 θ2,
   (angle_eucl_dist θ1 θ2 ≤ 2 * angle_eucl_dist (θ1 / ₂) (θ2 / ₂))%L.
 Proof.
+destruct_ac.
 intros.
+rewrite <- (rngl_add_diag Hon).
+eapply (rngl_le_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (θ1 / ₂ + θ2 / ₂)).
+}
+(* ouais, chais pas *)
+Search (angle_eucl_dist (_ + _)).
 Search (angle_eucl_dist (_ / ₂)).
 ... ...
     apply angle_eucl_dist_le_twice_dist_div_2_div_2.
