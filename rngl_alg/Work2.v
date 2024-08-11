@@ -1997,22 +1997,19 @@ assert (H114 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     apply (rngl_le_div_l Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    replace 2%L with (rngl_of_nat 2). 2: {
-      now rewrite rngl_of_nat_succ, rngl_of_nat_1.
-    }
+    rewrite <- rngl_of_nat_2.
     rewrite <- (rngl_mul_nat_comm Hon Hos).
-About rngl_of_nat_1.
-...
-Search (_ * _ = _ * _)%L.
-rewrite <- rngl_add
-...
-Search (angle_eucl_dist (_ / ₂)).
-Theorem glop :
+    rewrite rngl_of_nat_2.
+    rewrite He2.
+Theorem angle_eucl_dist_le_twice_twice_div_2_div_2 :
   ∀ θ1 θ2,
   (angle_eucl_dist θ1 θ2 ≤ 2 * angle_eucl_dist (θ1 / ₂) (θ2 / ₂))%L.
-Admitted.
-eapply (rngl_le_trans Hor).
-
+Proof.
+intros.
+Search (angle_eucl_dist (_ / ₂)).
+... ...
+    apply angle_eucl_dist_le_twice_dist_div_2_div_2.
+  }
 ...2
 (*1*)
 assert (H24 : (θ2 < θ4)%A). {
