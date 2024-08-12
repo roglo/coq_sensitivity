@@ -1849,6 +1849,108 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
+(* to be simplified *)
+Theorem angle_eucl_dist_le_twice_twice_div_2_div_2 :
+  ∀ θ1 θ2,
+  (angle_eucl_dist θ1 θ2 ≤ 2 * angle_eucl_dist (θ1 / ₂) (θ2 / ₂))%L.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_eucl_dist_move_0_l.
+rewrite (angle_eucl_dist_move_0_l (θ1 / ₂)).
+progress unfold angle_sub at 2.
+rewrite angle_opp_div_2'.
+remember (θ1 =? 0)%A as t1z eqn:Ht1z.
+symmetry in Ht1z.
+destruct t1z. {
+  apply angle_eqb_eq in Ht1z; subst θ1.
+  rewrite angle_sub_0_r.
+  rewrite angle_opp_0.
+  rewrite angle_0_div_2.
+  do 2 rewrite angle_add_0_r.
+  rewrite <- angle_add_div_2_diag at 1.
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
+rewrite angle_add_assoc.
+remember (angle_add_overflow θ2 (- θ1)) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. {
+  rewrite <- angle_div_2_add_overflow; [ | easy ].
+  rewrite angle_add_opp_r.
+  rewrite <- angle_add_div_2_diag at 1.
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
+apply angle_add_not_overflow_equiv3 in Haov.
+progress unfold angle_add_not_overflow3 in Haov.
+destruct Haov as [Haov| H21]. {
+  apply (f_equal angle_opp) in Haov.
+  rewrite angle_opp_involutive in Haov.
+  apply angle_eqb_neq in Ht1z.
+  now rewrite angle_opp_0 in Haov.
+}
+rewrite angle_opp_involutive in H21.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite angle_opp_sub_distr.
+rewrite angle_opp_0.
+rewrite <- (angle_eucl_dist_opp_opp (_ + _)).
+rewrite angle_opp_add_distr.
+rewrite angle_sub_add_distr.
+rewrite angle_opp_div_2.
+rewrite Ht1z.
+rewrite angle_sub_add_distr.
+rewrite angle_sub_opp_r.
+rewrite angle_add_sub_swap.
+rewrite angle_sub_sub_swap.
+rewrite angle_opp_straight.
+rewrite angle_sub_diag.
+rewrite angle_sub_0_l.
+rewrite angle_add_comm.
+rewrite angle_opp_0.
+rewrite angle_add_opp_r.
+progress unfold angle_sub at 2.
+rewrite angle_opp_div_2'.
+remember (θ2 =? 0)%A as t2z eqn:Ht2z.
+symmetry in Ht2z.
+destruct t2z. {
+  apply angle_eqb_eq in Ht2z; subst θ2.
+  rewrite angle_sub_0_r.
+  rewrite angle_opp_0.
+  rewrite angle_0_div_2.
+  do 2 rewrite angle_add_0_r.
+  rewrite <- angle_add_div_2_diag at 1.
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
+rewrite angle_add_assoc.
+remember (angle_add_overflow θ1 (- θ2)) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. {
+  rewrite <- angle_div_2_add_overflow; [ | easy ].
+  rewrite angle_add_opp_r.
+  rewrite <- angle_add_div_2_diag at 1.
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
+apply angle_add_not_overflow_equiv3 in Haov.
+progress unfold angle_add_not_overflow3 in Haov.
+destruct Haov as [Haov| H12]. {
+  apply (f_equal angle_opp) in Haov.
+  rewrite angle_opp_involutive in Haov.
+  apply angle_eqb_neq in Ht2z.
+  now rewrite angle_opp_0 in Haov.
+}
+rewrite angle_opp_involutive in H12.
+apply angle_lt_le_incl in H12.
+apply angle_nlt_ge in H12.
+now exfalso; apply H12.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2002,67 +2104,8 @@ assert (H114 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     rewrite <- (rngl_mul_nat_comm Hon Hos).
     rewrite rngl_of_nat_2.
     rewrite He2.
-Theorem angle_eucl_dist_le_twice_twice_div_2_div_2 :
-  ∀ θ1 θ2,
-  (angle_eucl_dist θ1 θ2 ≤ 2 * angle_eucl_dist (θ1 / ₂) (θ2 / ₂))%L.
-Proof.
-destruct_ac.
-intros.
-rewrite angle_eucl_dist_move_0_l.
-rewrite (angle_eucl_dist_move_0_l (θ1 / ₂)).
-progress unfold angle_sub at 2.
-rewrite angle_opp_div_2'.
-remember (θ1 =? 0)%A as t1z eqn:Ht1z.
-symmetry in Ht1z.
-destruct t1z. {
-  apply angle_eqb_eq in Ht1z; subst θ1.
-  rewrite angle_sub_0_r.
-  rewrite angle_opp_0.
-  rewrite angle_0_div_2.
-  do 2 rewrite angle_add_0_r.
-  rewrite <- angle_add_div_2_diag at 1.
-  rewrite angle_add_diag.
-  rewrite <- rngl_of_nat_2.
-  apply angle_eucl_dist_mul_le.
-}
-rewrite angle_add_assoc.
-remember (angle_add_overflow θ2 (- θ1)) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. {
-  rewrite <- angle_div_2_add_overflow; [ | easy ].
-  rewrite angle_add_opp_r.
-  rewrite <- angle_add_div_2_diag at 1.
-  rewrite angle_add_diag.
-  rewrite <- rngl_of_nat_2.
-  apply angle_eucl_dist_mul_le.
-}
-apply angle_add_not_overflow_equiv3 in Haov.
-progress unfold angle_add_not_overflow3 in Haov.
-destruct Haov as [Haov| Haov]. {
-  apply (f_equal angle_opp) in Haov.
-  rewrite angle_opp_involutive in Haov.
-  apply angle_eqb_neq in Ht1z.
-  now rewrite angle_opp_0 in Haov.
-}
-rewrite angle_opp_involutive in Haov.
-rewrite <- angle_eucl_dist_opp_opp.
-rewrite angle_opp_sub_distr.
-rewrite angle_opp_0.
-rewrite <- (angle_eucl_dist_opp_opp (_ + _)).
-rewrite angle_opp_add_distr.
-rewrite angle_sub_add_distr.
-rewrite angle_opp_div_2.
-rewrite Ht1z.
-rewrite angle_sub_add_distr.
-rewrite angle_sub_opp_r.
-rewrite angle_add_sub_swap.
-rewrite angle_sub_sub_swap.
-rewrite angle_opp_straight.
-rewrite angle_sub_diag.
-rewrite angle_sub_0_l.
-rewrite angle_add_comm.
-rewrite angle_opp_0.
-rewrite angle_add_opp_r.
+    apply angle_eucl_dist_le_twice_twice_div_2_div_2.
+  }
 ...
 progress unfold angle_add_overflow in Haov.
 ...
