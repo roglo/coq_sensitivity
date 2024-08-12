@@ -2007,6 +2007,30 @@ Theorem angle_eucl_dist_le_twice_twice_div_2_div_2 :
 Proof.
 destruct_ac.
 intros.
+rewrite angle_eucl_dist_move_0_l.
+rewrite (angle_eucl_dist_move_0_l (θ1 / ₂)).
+progress unfold angle_sub at 2.
+rewrite angle_opp_div_2'.
+remember (θ1 =? 0)%A as t1z eqn:Ht1z.
+symmetry in Ht1z.
+destruct t1z. {
+  apply angle_eqb_eq in Ht1z; subst θ1.
+  rewrite angle_sub_0_r.
+  rewrite angle_opp_0.
+  rewrite angle_0_div_2.
+  do 2 rewrite angle_add_0_r.
+  rewrite <- angle_add_div_2_diag at 1.
+Search (angle_eucl_dist (_ + _)).
+...
+Search (- (_ / ₂))%A.
+Search (- (_ / _))%Z.
+remember (- (θ1 / ₂))%A as x.
+rewrite angle_opp_div_2 in Heqx.
+Search (_ / ₂ + _ / ₂)%A.
+
+Search (_ / ₂ - _ / ₂)%A.
+...
+Search (angle_eucl_dist (_ - _)).
 rewrite <- (rngl_add_diag Hon).
 eapply (rngl_le_trans Hor). {
   apply (angle_eucl_dist_triangular _ (θ1 / ₂ + θ2 / ₂)).

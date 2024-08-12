@@ -3858,6 +3858,19 @@ destruct zs. {
 }
 Qed.
 
+Theorem angle_opp_div_2' :
+  ∀ θ, (- (θ / ₂) = (- θ) / ₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
+Proof.
+intros.
+rewrite angle_opp_div_2.
+remember (θ =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
+destruct tz; [ now do 2 rewrite angle_add_0_r | ].
+rewrite <- angle_add_assoc.
+rewrite angle_straight_add_straight.
+symmetry; apply angle_add_0_r.
+Qed.
+
 Theorem angle_straight_div_2 : (angle_straight / ₂ = angle_right)%A.
 Proof.
 destruct_ac.
