@@ -2020,7 +2020,10 @@ destruct t1z. {
   rewrite angle_0_div_2.
   do 2 rewrite angle_add_0_r.
   rewrite <- angle_add_div_2_diag at 1.
-Search (angle_eucl_dist (_ + _)).
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
 ...
 Search (- (_ / ₂))%A.
 Search (- (_ / _))%Z.
