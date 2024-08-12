@@ -12,6 +12,7 @@ Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
 Require Import AngleDiv2Add.
 Require Import AngleEuclDistLtAngleLtLt.
+Require Import AngleAddOverflowEquiv3.
 Require Import Complex.
 Require Import Work.
 Require Import TacChangeAngle.
@@ -2024,6 +2025,52 @@ destruct t1z. {
   rewrite <- rngl_of_nat_2.
   apply angle_eucl_dist_mul_le.
 }
+rewrite angle_add_assoc.
+remember (angle_add_overflow θ2 (- θ1)) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. {
+  rewrite <- angle_div_2_add_overflow; [ | easy ].
+  rewrite angle_add_opp_r.
+  rewrite <- angle_add_div_2_diag at 1.
+  rewrite angle_add_diag.
+  rewrite <- rngl_of_nat_2.
+  apply angle_eucl_dist_mul_le.
+}
+apply angle_add_not_overflow_equiv3 in Haov.
+progress unfold angle_add_not_overflow3 in Haov.
+destruct Haov as [Haov| Haov]. {
+  apply (f_equal angle_opp) in Haov.
+  rewrite angle_opp_involutive in Haov.
+  apply angle_eqb_neq in Ht1z.
+  now rewrite angle_opp_0 in Haov.
+}
+rewrite angle_opp_involutive in Haov.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite angle_opp_sub_distr.
+rewrite angle_opp_0.
+rewrite <- (angle_eucl_dist_opp_opp (_ + _)).
+rewrite angle_opp_add_distr.
+rewrite angle_sub_add_distr.
+rewrite angle_opp_div_2.
+rewrite Ht1z.
+rewrite angle_sub_add_distr.
+rewrite angle_sub_opp_r.
+rewrite angle_add_sub_swap.
+rewrite angle_sub_sub_swap.
+rewrite angle_opp_straight.
+rewrite angle_sub_diag.
+rewrite angle_sub_0_l.
+rewrite angle_add_comm.
+rewrite angle_opp_0.
+rewrite angle_add_opp_r.
+...
+progress unfold angle_add_overflow in Haov.
+...
+rewrite <- angle_opp_straight.
+rewrite angle_add_opp_r.
+rewrite <- (angle_eucl_dist_move_0_r _ angle_straight).
+...
+Search (angle_eucl_dist _ angle_straight).
 ...
 Search (- (_ / ₂))%A.
 Search (- (_ / _))%Z.
