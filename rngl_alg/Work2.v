@@ -2088,7 +2088,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * He1 He2 Hd34 Hd21 H14.
 (*2*)
-assert (H114 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
+assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   apply (angle_eucl_dist_lt_angle_lt_lt θ1). {
     rewrite <- He1.
     rewrite angle_eucl_dist_symmetry.
@@ -2106,6 +2106,13 @@ assert (H114 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     rewrite He2.
     apply angle_eucl_dist_le_twice_twice_div_2_div_2.
   }
+  rewrite <- (angle_add_div_2_diag θ1) at 1.
+  apply angle_add_lt_mono_l. {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  now apply angle_div_2_lt_compat.
+}
+assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
 ...
 progress unfold angle_add_overflow in Haov.
 ...
