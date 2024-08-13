@@ -1968,6 +1968,30 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   → (θ1 < θ2)%A.
 Proof.
 intros * Hd23 H13.
+(*1*)
+remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
+change_angle_sub_l θ1 θ4.
+change_angle_sub_l θ2 θ4.
+change_angle_sub_l θ3 θ4.
+remember (θ4 - θ1)%A as θ'1.
+remember (θ4 - θ2)%A as θ'2.
+remember (θ4 - θ3)%A as θ'3.
+apply (angle_eucl_dist_lt_angle_lt_lt _ θ'2) in H13.
+...
+Check angle_eucl_dist_lt_angle_lt_lt.
+remember (θ4 - θ2)%A as θ'3.
+Check angle_eucl_dist_lt_angle_lt_lt.
+...
+destruct (angle_le_dec θ3 θ2) as [H32| H23]. {
+  now apply (angle_lt_le_trans _ θ3).
+}
+apply angle_nle_gt in H23.
+...
+apply angle_nle_gt.
+intros H21.
+Check angle_eucl_dist_lt_angle_lt_lt.
+...1
+intros * Hd23 H13.
 change_angle_sub_l θ1 angle_right.
 change_angle_sub_l θ2 angle_right.
 change_angle_sub_l θ3 angle_right.
