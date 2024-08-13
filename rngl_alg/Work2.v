@@ -1156,6 +1156,15 @@ symmetry.
 apply angle_eucl_dist_move_0_l.
 Qed.
 
+Theorem angle_eucl_dist_add_cancel_r :
+  ∀ θ1 θ2 θ3,
+  angle_eucl_dist (θ1 + θ3) (θ2 + θ3) = angle_eucl_dist θ1 θ2.
+Proof.
+intros.
+do 2 rewrite (angle_add_comm _ θ3).
+apply angle_eucl_dist_add_cancel_l.
+Qed.
+
 Theorem angle_eucl_dist_mul_le :
   ∀ n θ,
   (angle_eucl_dist (n * θ) 0 ≤ rngl_of_nat n * angle_eucl_dist θ 0)%L.
@@ -2113,19 +2122,39 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   now apply angle_div_2_lt_compat.
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
-(* il faut vérifier que ce théorème est bon et ce, avant
-   d'essayer de le prouver, car il peut manquer des
-   hypothèses. Et il faut vérifier aussi qu'on peut bien
-   l'appliquer dans notre cas *)
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 Proof.
-Admitted.
+... ...
   apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
     eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
+    apply (rngl_min_le_iff Hor).
+    right.
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- rngl_of_nat_2.
+    rewrite <- (rngl_mul_nat_comm Hon Hos).
+    rewrite rngl_of_nat_2.
+    rewrite <- (angle_add_div_2_diag θ4) at 2.
+    rewrite angle_eucl_dist_add_cancel_r.
+    rewrite He2.
+    apply angle_eucl_dist_le_twice_twice_div_2_div_2.
+  }
+  rewrite <- (angle_add_div_2_diag θ4) at 2.
+  apply angle_add_lt_mono_r. {
+    apply angle_add_overflow_div_2_div_2.
+  }
+  now apply angle_div_2_lt_compat.
+}
+...
+Search (rngl_min _ _ ≤ _)%L.
+Check Nat.min_le_compat.
+Check rngl_min_le_compat_l.
+    apply (rngl_min_le_compat_l Hor).
 ...
     rewrite (rngl_min_comm Hor _ ε1).
     apply (rngl_min_le_compat_l Hor).

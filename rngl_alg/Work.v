@@ -247,6 +247,17 @@ subst θ3.
 now apply angle_lt_irrefl in H23.
 Qed.
 
+Theorem angle_add_lt_mono_r :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ2 θ3 = false
+  → (θ1 < θ2)%A → (θ1 + θ3 < θ2 + θ3)%A.
+Proof.
+intros * H23 H12.
+do 2 rewrite (angle_add_comm _ θ3).
+apply angle_add_not_overflow_comm in H23.
+now apply angle_add_lt_mono_l.
+Qed.
+
 Theorem angle_div_2_pow_mul_lt_angle :
   ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ / ₂^i) < θ)%A.
 Proof.
