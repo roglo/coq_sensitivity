@@ -2113,13 +2113,34 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   now apply angle_div_2_lt_compat.
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
+(* il faut vérifier que ce théorème est bon et ce, avant
+   d'essayer de le prouver, car il peut manquer des
+   hypothèses. Et il faut vérifier aussi qu'on peut bien
+   l'appliquer dans notre cas *)
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
-  (angle_eucl_dist θ2 θ3 <
-     rngl_min (angle_eucl_dist θ1 θ3) (angle_eucl_dist θ1 0))%L
+  (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 Proof.
+Admitted.
+  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
+    eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
+...
+    rewrite (rngl_min_comm Hor _ ε1).
+    apply (rngl_min_le_compat_l Hor).
+    rewrite <- (angle_add_div_2_diag θ1) at 1.
+    rewrite angle_eucl_dist_add_cancel_l.
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite <- rngl_of_nat_2.
+    rewrite <- (rngl_mul_nat_comm Hon Hos).
+    rewrite rngl_of_nat_2.
+    rewrite He2.
+    apply angle_eucl_dist_le_twice_twice_div_2_div_2.
+  }
+...
 intros * Hd23 H13.
 change_angle_sub_l θ1 angle_right.
 change_angle_sub_l θ2 angle_right.
