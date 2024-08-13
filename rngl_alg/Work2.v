@@ -2113,52 +2113,6 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   now apply angle_div_2_lt_compat.
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
-...
-progress unfold angle_add_overflow in Haov.
-...
-rewrite <- angle_opp_straight.
-rewrite angle_add_opp_r.
-rewrite <- (angle_eucl_dist_move_0_r _ angle_straight).
-...
-Search (angle_eucl_dist _ angle_straight).
-...
-Search (- (_ / ₂))%A.
-Search (- (_ / _))%Z.
-remember (- (θ1 / ₂))%A as x.
-rewrite angle_opp_div_2 in Heqx.
-Search (_ / ₂ + _ / ₂)%A.
-
-Search (_ / ₂ - _ / ₂)%A.
-...
-Search (angle_eucl_dist (_ - _)).
-rewrite <- (rngl_add_diag Hon).
-eapply (rngl_le_trans Hor). {
-  apply (angle_eucl_dist_triangular _ (θ1 / ₂ + θ2 / ₂)).
-}
-(* ouais, chais pas *)
-Search (angle_eucl_dist (_ + _)).
-Search (angle_eucl_dist (_ / ₂)).
-... ...
-    apply angle_eucl_dist_le_twice_dist_div_2_div_2.
-  }
-...2
-(*1*)
-assert (H24 : (θ2 < θ4)%A). {
-  apply (angle_eucl_dist_lt_angle_lt_lt θ1); [ | easy ].
-  rewrite <- He1, <- He2.
-  rewrite angle_eucl_dist_symmetry.
-  eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
-  rewrite (rngl_min_comm Hor ε2).
-  apply (rngl_min_le_compat_l Hor).
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite <- (rngl_add_diag2 Hon).
-  apply (rngl_le_add_l Hor).
-  rewrite He2.
-  apply angle_eucl_dist_nonneg.
-}
-assert (H13 : (θ1 < θ3)%A). {
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ2 θ3 <
@@ -2210,9 +2164,57 @@ apply angle_sub_lt_mono_l.
   apply (angle_eucl_dist_lt_angle_lt_lt θ3). 2: {
 Search (_ + _ < _ + _)%A.
 Search (angle_eucl_dist (_ - _)).
+... ...
+  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
 ...
 Search (_ - _ ≤ _ - _)%A.
 About angle_sub_le_mono_l.
+...
+progress unfold angle_add_overflow in Haov.
+...
+rewrite <- angle_opp_straight.
+rewrite angle_add_opp_r.
+rewrite <- (angle_eucl_dist_move_0_r _ angle_straight).
+...
+Search (angle_eucl_dist _ angle_straight).
+...
+Search (- (_ / ₂))%A.
+Search (- (_ / _))%Z.
+remember (- (θ1 / ₂))%A as x.
+rewrite angle_opp_div_2 in Heqx.
+Search (_ / ₂ + _ / ₂)%A.
+
+Search (_ / ₂ - _ / ₂)%A.
+...
+Search (angle_eucl_dist (_ - _)).
+rewrite <- (rngl_add_diag Hon).
+eapply (rngl_le_trans Hor). {
+  apply (angle_eucl_dist_triangular _ (θ1 / ₂ + θ2 / ₂)).
+}
+(* ouais, chais pas *)
+Search (angle_eucl_dist (_ + _)).
+Search (angle_eucl_dist (_ / ₂)).
+... ...
+    apply angle_eucl_dist_le_twice_dist_div_2_div_2.
+  }
+...2
+(*1*)
+assert (H24 : (θ2 < θ4)%A). {
+  apply (angle_eucl_dist_lt_angle_lt_lt θ1); [ | easy ].
+  rewrite <- He1, <- He2.
+  rewrite angle_eucl_dist_symmetry.
+  eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
+  rewrite (rngl_min_comm Hor ε2).
+  apply (rngl_min_le_compat_l Hor).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_add_diag2 Hon).
+  apply (rngl_le_add_l Hor).
+  rewrite He2.
+  apply angle_eucl_dist_nonneg.
+}
+assert (H13 : (θ1 < θ3)%A). {
 ... ...
   apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); [ | easy ].
   rewrite <- He1, <- He2.
