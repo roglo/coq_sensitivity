@@ -1969,7 +1969,21 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
 Proof.
 intros * Hd23 H13.
 (*1*)
+(*2*)
+destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
+  subst θ2.
+(* ça marche peut-être *)
+...
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
+specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
+specialize (H1 (θ4 - θ3) (θ4 - θ2) (θ4 - θ1))%A.
+rewrite <- (angle_opp_involutive θ1).
+rewrite <- (angle_opp_involutive θ2).
+apply angle_opp_lt_compat_if.
+...
+Search (- _ < - _)%A.
+Search (_ - _ < _ - _)%A.
+...2
 change_angle_sub_l θ1 θ4.
 change_angle_sub_l θ2 θ4.
 change_angle_sub_l θ3 θ4.
