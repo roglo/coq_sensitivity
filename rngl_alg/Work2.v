@@ -1960,6 +1960,38 @@ apply angle_nlt_ge in H12.
 now exfalso; apply H12.
 Qed.
 
+Theorem angle_eucl_dist_lt_cos_lt :
+  ∀ θ1 θ2 θ3 θ4,
+  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
+  → (rngl_cos (θ4 - θ3) < rngl_cos (θ2 - θ1))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * H1234.
+  do 2 rewrite (H1 (angle_eucl_dist _ _)) in H1234.
+  now apply (rngl_lt_irrefl Hor) in H1234.
+}
+intros * H1234.
+do 2 rewrite angle_eucl_dist_is_sqrt in H1234.
+apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234; cycle 1. {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1234. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+now apply (rngl_sub_lt_mono_l Hop Hor) in H1234.
+Qed.
+
 (* to be completed
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
@@ -1973,30 +2005,9 @@ intros * Hd23 H13.
 destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   subst θ2.
   exfalso.
-(* ça marche peut-être *)
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
-do 2 rewrite angle_eucl_dist_is_sqrt in Hd23.
-Theorem glop :
-  ∀ θ1 θ2 θ3 θ4,
-  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
-  → False.
-Proof.
-destruct_ac.
-intros * H1234.
-do 2 rewrite angle_eucl_dist_is_sqrt in H1234.
-apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234.
-...
-Search (√_ < √_)%L.
-Search (_² < _²)%L.
-...
-Search (_² < _²)%L.
-
-Check rngl_abs_lt_squ_lt.
-Search (√_ < √_)%L.
-Search (_ * _ < _ * _)%L.
-Search (0 < √_)%L.
-Locate "√".
-About rl_sqrt.
+  apply angle_eucl_dist_lt_cos_lt in Hd23.
+  rewrite angle_sub_0_r in Hd23.
+  progress unfold angle_ltb in H13.
 ...
 rewrite <- rngl_abs_sqrt in Halz.
 rewrite <- rngl_abs_0 in Halz.
