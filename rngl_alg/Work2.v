@@ -1972,7 +1972,63 @@ intros * Hd23 H13.
 (*2*)
 destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   subst θ2.
+  exfalso.
 (* ça marche peut-être *)
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+do 2 rewrite angle_eucl_dist_is_sqrt in Hd23.
+Theorem glop :
+  ∀ θ1 θ2 θ3 θ4,
+  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
+  → False.
+Proof.
+destruct_ac.
+intros * H1234.
+do 2 rewrite angle_eucl_dist_is_sqrt in H1234.
+apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234.
+...
+Search (√_ < √_)%L.
+Search (_² < _²)%L.
+...
+Search (_² < _²)%L.
+
+Check rngl_abs_lt_squ_lt.
+Search (√_ < √_)%L.
+Search (_ * _ < _ * _)%L.
+Search (0 < √_)%L.
+Locate "√".
+About rl_sqrt.
+...
+rewrite <- rngl_abs_sqrt in Halz.
+rewrite <- rngl_abs_0 in Halz.
+Check rngl_abs_nonneg_eq.
+apply (rngl_abs_nonneg_eq Hop Hor) in Haz.
+Search (rngl_abs _ = _).
+...
+rewrite <- rngl_abs_0 in Haz.
+Search (_² < _²)%L.
+Search (√ _ ≤ _)%L.
+Search (√_ = _)%L.
+apply (rl_sqrt_le_rl_sqrt) in Halz.
+...
+apply rngl_leb_le in Haz.
+...
+apply (rngl_add_move_0_r Hop).
+Search (_ * _ = 0)%L.
+...
+Search (_ + _ = 0)%L.
+...
+Search (_ * _ = 0)%L.
+Search (_ = - _)%L.
+...
+Search (√_ ≤ _)%L.
+Print rl_sqrt.
+Search rl_sqrt.
+Search rl_nth_root.
+...
+Search (rngl_abs _).
+...
+apply rngl_abs_lt_squ_lt in H1234.
+
 ...
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
