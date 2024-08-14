@@ -1995,7 +1995,7 @@ Qed.
 (* to be completed
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
-  (0 ≤ rngl_sin θ3)%L
+  (0 < rngl_sin θ3)%L
   → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
@@ -2012,6 +2012,7 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   apply (rngl_nle_gt Hor) in Hd23.
   apply Hd23; clear Hd23.
   progress unfold angle_ltb in H13.
+  apply (rngl_lt_le_incl Hor) in Hzs3.
   apply rngl_leb_le in Hzs3.
   rewrite Hzs3 in H13.
   apply rngl_leb_le in Hzs3.
@@ -2036,6 +2037,33 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   }
   now apply (rngl_lt_le_incl Hor) in H13.
 }
+(*3*)
+specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
+specialize (H1 (angle_straight - θ3) (angle_straight - θ2))%A.
+specialize (H1 (angle_straight - θ1))%A.
+enough (H : (angle_straight - θ2 < angle_straight - θ1)%A). {
+  progress unfold angle_ltb in H13.
+  progress unfold angle_ltb in H.
+  progress unfold angle_ltb.
+  do 2 rewrite rngl_sin_sub_straight_l in H.
+  do 2 rewrite rngl_cos_sub_straight_l in H.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  generalize Hzs3; intros H2.
+  apply (rngl_lt_le_incl Hor) in H2.
+  apply rngl_leb_le in H2.
+  rewrite H2 in H13; clear H2.
+  destruct zs1; [ | easy ].
+  apply rngl_leb_le in Hzs1.
+  destruct zs2; [ | easy ].
+  apply rngl_ltb_lt in H.
+  apply rngl_ltb_lt.
+  now apply (rngl_opp_lt_compat Hop Hor) in H.
+}
+apply H1.
+...
+...3
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
 specialize (H1 (θ4 - θ3) (θ4 - θ2) (θ4 - θ1))%A.
