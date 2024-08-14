@@ -2036,6 +2036,17 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
     }
     clear H13.
     apply (rngl_leb_gt Hor) in Hzs3.
+(* peut-être qu'il faut ajouter comme hypothèse que sin θ3 ≥ 0 *)
+(* ou voir un rngl_min comme pour... *)
+Check angle_eucl_dist_lt_angle_lt_lt.
+...
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+      change_angle_opp θ3.
+      progress sin_cos_opp_hyp T Hzc3.
+      progress sin_cos_opp_hyp T Hzs3.
+      rewrite <- angle_opp_add_distr.
+      do 2 rewrite rngl_cos_opp.
+(* je pense que c'est faux *)
 ...
 apply rngl_cos_le_anticompat_when_sin_nonneg.
 ...
