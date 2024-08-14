@@ -2024,6 +2024,13 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   → (θ1 < θ2)%A.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hzs3 Hd23 H13.
+  rewrite (H1 θ1), (H1 θ3) in H13.
+  now apply angle_lt_irrefl in H13.
+}
 intros * Hzs3 Hd23 H13.
 (*1*)
 (*2*)
@@ -2093,6 +2100,27 @@ rewrite angle_sub_diag, angle_add_0_l.
 do 3 rewrite <- angle_eucl_dist_move_0_l.
 apply (rngl_min_glb_lt_iff Hor).
 split; [ easy | ].
+rewrite angle_eucl_dist_symmetry.
+do 2 rewrite angle_eucl_dist_is_sqrt.
+rewrite rngl_cos_sub_straight_l.
+rewrite (rngl_sub_opp_r Hop).
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_add_opp_r Hop).
+apply (rngl_add_lt_mono_l Hop Hor).
+apply (rngl_lt_opp_l Hop Hor).
+rewrite rngl_add_comm.
+rewrite rngl_cos_sub.
+...
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+apply angle_eucl_dist_lt_cos_lt.
 ...3
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
