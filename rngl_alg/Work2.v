@@ -1992,6 +1992,29 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1234. 2: {
 now apply (rngl_sub_lt_mono_l Hop Hor) in H1234.
 Qed.
 
+Theorem angle_sub_lt_straight_l :
+  ∀ θ1 θ2,
+  (θ1 ≤ angle_straight)%A
+  → (angle_straight - θ2 < angle_straight - θ1)%A
+  → (θ1 < θ2)%A.
+Proof.
+destruct_ac.
+intros * H1s H21.
+progress unfold angle_ltb in H21.
+progress unfold angle_ltb.
+do 2 rewrite rngl_sin_sub_straight_l in H21.
+do 2 rewrite rngl_cos_sub_straight_l in H21.
+apply rngl_sin_nonneg_angle_le_straight in H1s.
+apply rngl_leb_le in H1s.
+rewrite H1s in H21 |-*.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+apply rngl_ltb_lt in H21.
+apply rngl_ltb_lt.
+now apply (rngl_opp_lt_compat Hop Hor) in H21.
+Qed.
+
 (* to be completed
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
@@ -2042,26 +2065,19 @@ specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
 specialize (H1 (angle_straight - θ3) (angle_straight - θ2))%A.
 specialize (H1 (angle_straight - θ1))%A.
 enough (H : (angle_straight - θ2 < angle_straight - θ1)%A). {
+  apply angle_sub_lt_straight_l; [ | easy ].
   progress unfold angle_ltb in H13.
-  progress unfold angle_ltb in H.
-  progress unfold angle_ltb.
-  do 2 rewrite rngl_sin_sub_straight_l in H.
-  do 2 rewrite rngl_cos_sub_straight_l in H.
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-  symmetry in Hzs1, Hzs2.
-  generalize Hzs3; intros H2.
-  apply (rngl_lt_le_incl Hor) in H2.
-  apply rngl_leb_le in H2.
-  rewrite H2 in H13; clear H2.
-  destruct zs1; [ | easy ].
-  apply rngl_leb_le in Hzs1.
-  destruct zs2; [ | easy ].
-  apply rngl_ltb_lt in H.
-  apply rngl_ltb_lt.
-  now apply (rngl_opp_lt_compat Hop Hor) in H.
+  symmetry in Hzs1.
+  apply rngl_sin_nonneg_angle_le_straight.
+  apply rngl_leb_le.
+  destruct zs1; [ easy | ].
+  apply (rngl_lt_le_incl Hor) in Hzs3.
+  apply rngl_leb_le in Hzs3.
+  now rewrite Hzs3 in H13.
 }
-apply H1.
+apply H1. 2: {
+  progress unfold angle_ltb in H13.
 ...
 ...3
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
