@@ -1999,6 +1999,7 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 Proof.
+destruct_ac.
 intros * Hd23 H13.
 (*1*)
 (*2*)
@@ -2007,7 +2008,36 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   exfalso.
   apply angle_eucl_dist_lt_cos_lt in Hd23.
   rewrite angle_sub_0_r in Hd23.
+  apply (rngl_nle_gt Hor) in Hd23.
+  apply Hd23; clear Hd23.
   progress unfold angle_ltb in H13.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+  symmetry in Hzs1, Hzs3.
+  destruct zs1. {
+    apply rngl_leb_le in Hzs1.
+    destruct zs3. {
+      apply rngl_leb_le in Hzs3.
+      apply rngl_ltb_lt in H13.
+      apply (rngl_lt_eq_cases Hor).
+      destruct (rngl_eq_dec Hed (rngl_cos θ3) (rngl_cos (θ3 - θ1))) as
+        [Hc31| Hc31]; [ now right | left ].
+      rewrite rngl_cos_sub_comm.
+      apply rngl_cos_lt_rngl_cos_sub; [ easy | | ].
+      apply (rngl_lt_iff Hor).
+      split; [ easy | ].
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H; subst θ1; [ now rewrite angle_sub_0_r in Hc31 | ].
+      cbn in H13.
+      apply (rngl_nle_gt Hor) in H13.
+      apply H13, rngl_cos_bound.
+      now apply (rngl_lt_le_incl Hor) in H13.
+    }
+    clear H13.
+    apply (rngl_leb_gt Hor) in Hzs3.
+...
+apply rngl_cos_le_anticompat_when_sin_nonneg.
 ...
 rewrite <- rngl_abs_sqrt in Halz.
 rewrite <- rngl_abs_0 in Halz.
