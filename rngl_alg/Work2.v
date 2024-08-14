@@ -2077,8 +2077,22 @@ enough (H : (angle_straight - θ2 < angle_straight - θ1)%A). {
   now rewrite Hzs3 in H13.
 }
 apply H1. 2: {
-  progress unfold angle_ltb in H13.
-...
+  apply angle_sub_lt_straight_l. 2: {
+    do 2 rewrite angle_sub_sub_distr.
+    rewrite angle_sub_diag.
+    now do 2 rewrite angle_add_0_l.
+  }
+  apply angle_le_sub_diag.
+  apply rngl_sin_nonneg_angle_le_straight.
+  now apply (rngl_lt_le_incl Hor) in Hzs3.
+}
+do 2 rewrite (angle_eucl_dist_move_0_l (angle_straight - _)).
+do 2 rewrite (angle_sub_sub_swap angle_straight _ (_ - _)).
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag, angle_add_0_l.
+do 3 rewrite <- angle_eucl_dist_move_0_l.
+apply (rngl_min_glb_lt_iff Hor).
+split; [ easy | ].
 ...3
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
