@@ -1995,12 +1995,13 @@ Qed.
 (* to be completed
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
-  (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
+  (0 ≤ rngl_sin θ3)%L
+  → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 Proof.
 destruct_ac.
-intros * Hd23 H13.
+intros * Hzs3 Hd23 H13.
 (*1*)
 (*2*)
 destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
@@ -2011,86 +2012,55 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   apply (rngl_nle_gt Hor) in Hd23.
   apply Hd23; clear Hd23.
   progress unfold angle_ltb in H13.
+  apply rngl_leb_le in Hzs3.
+  rewrite Hzs3 in H13.
+  apply rngl_leb_le in Hzs3.
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-  remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
-  symmetry in Hzs1, Hzs3.
-  destruct zs1. {
-    apply rngl_leb_le in Hzs1.
-    destruct zs3. {
-      apply rngl_leb_le in Hzs3.
-      apply rngl_ltb_lt in H13.
-      apply (rngl_lt_eq_cases Hor).
-      destruct (rngl_eq_dec Hed (rngl_cos θ3) (rngl_cos (θ3 - θ1))) as
-        [Hc31| Hc31]; [ now right | left ].
-      rewrite rngl_cos_sub_comm.
-      apply rngl_cos_lt_rngl_cos_sub; [ easy | | ].
-      apply (rngl_lt_iff Hor).
-      split; [ easy | ].
-      intros H; symmetry in H.
-      apply eq_rngl_sin_0 in H.
-      destruct H; subst θ1; [ now rewrite angle_sub_0_r in Hc31 | ].
-      cbn in H13.
-      apply (rngl_nle_gt Hor) in H13.
-      apply H13, rngl_cos_bound.
-      now apply (rngl_lt_le_incl Hor) in H13.
-    }
-    clear H13.
-    apply (rngl_leb_gt Hor) in Hzs3.
-(* peut-être qu'il faut ajouter comme hypothèse que sin θ3 ≥ 0 *)
-(* ou voir un rngl_min comme pour... *)
-Check angle_eucl_dist_lt_angle_lt_lt.
-...
-    destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
-      change_angle_opp θ3.
-      progress sin_cos_opp_hyp T Hzc3.
-      progress sin_cos_opp_hyp T Hzs3.
-      rewrite <- angle_opp_add_distr.
-      do 2 rewrite rngl_cos_opp.
-(* je pense que c'est faux *)
-...
-apply rngl_cos_le_anticompat_when_sin_nonneg.
-...
-rewrite <- rngl_abs_sqrt in Halz.
-rewrite <- rngl_abs_0 in Halz.
-Check rngl_abs_nonneg_eq.
-apply (rngl_abs_nonneg_eq Hop Hor) in Haz.
-Search (rngl_abs _ = _).
-...
-rewrite <- rngl_abs_0 in Haz.
-Search (_² < _²)%L.
-Search (√ _ ≤ _)%L.
-Search (√_ = _)%L.
-apply (rl_sqrt_le_rl_sqrt) in Halz.
-...
-apply rngl_leb_le in Haz.
-...
-apply (rngl_add_move_0_r Hop).
-Search (_ * _ = 0)%L.
-...
-Search (_ + _ = 0)%L.
-...
-Search (_ * _ = 0)%L.
-Search (_ = - _)%L.
-...
-Search (√_ ≤ _)%L.
-Print rl_sqrt.
-Search rl_sqrt.
-Search rl_nth_root.
-...
-Search (rngl_abs _).
-...
-apply rngl_abs_lt_squ_lt in H1234.
-
-...
+  symmetry in Hzs1.
+  destruct zs1; [ | easy ].
+  apply rngl_leb_le in Hzs1.
+  apply rngl_ltb_lt in H13.
+  apply (rngl_lt_eq_cases Hor).
+  destruct (rngl_eq_dec Hed (rngl_cos θ3) (rngl_cos (θ3 - θ1))) as
+      [Hc31| Hc31]; [ now right | left ].
+  rewrite rngl_cos_sub_comm.
+  apply rngl_cos_lt_rngl_cos_sub; [ easy | | ]. {
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ1; [ now rewrite angle_sub_0_r in Hc31 | ].
+    cbn in H13.
+    apply (rngl_nle_gt Hor) in H13.
+    apply H13, rngl_cos_bound.
+  }
+  now apply (rngl_lt_le_incl Hor) in H13.
+}
 remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
 specialize (H1 (θ4 - θ3) (θ4 - θ2) (θ4 - θ1))%A.
 rewrite <- (angle_opp_involutive θ1).
 rewrite <- (angle_opp_involutive θ2).
-apply angle_opp_lt_compat_if.
+apply angle_opp_lt_compat_if. {
+  intros H.
+  apply (f_equal angle_opp) in H.
+  rewrite angle_opp_involutive in H.
+  now rewrite angle_opp_0 in H.
+}
 ...
-Search (- _ < - _)%A.
 Search (_ - _ < _ - _)%A.
+Theorem glop :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → (θ1 + θ2 < θ1 + θ3)%A
+  → (θ2 < θ3)%A.
+... ...
+apply (glop θ4). {
+  progress unfold angle_add_overflow.
+  apply Bool.not_true_iff_false.
+  apply angle_nlt_ge.
+  rewrite Ht4.
+(* mouais, chais pas *)
 ...2
 change_angle_sub_l θ1 θ4.
 change_angle_sub_l θ2 θ4.
