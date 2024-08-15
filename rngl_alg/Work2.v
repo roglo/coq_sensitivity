@@ -2122,7 +2122,29 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   now apply angle_div_2_lt_compat.
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
-  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
+  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); cycle 1. {
+    rewrite <- (angle_add_div_2_diag θ4) at 3.
+    rewrite angle_eucl_dist_add_cancel_r.
+    apply rngl_min_glb_lt. {
+      eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
+      apply (rngl_min_le_iff Hor); right.
+      rewrite He2.
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite <- rngl_of_nat_2.
+      rewrite <- (rngl_mul_nat_comm Hon Hos).
+      rewrite rngl_of_nat_2.
+      apply angle_eucl_dist_le_twice_twice_div_2_div_2.
+    }
+    eapply (rngl_lt_trans Hor); [ apply Hd34 | ].
+    apply (rngl_min_lt_iff Hor).
+    rewrite He1, He2.
+(* aïe, j'ai peur que ça marche pas *)
+...
+    rewrite (angle_eucl_dist_move_0_r (_ + _)).
+Search (angle_eucl_dist (_ - _)).
+Search (_ / ₂ + _ / ₂)%A.
 ...
     eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
     apply (rngl_min_le_iff Hor).
