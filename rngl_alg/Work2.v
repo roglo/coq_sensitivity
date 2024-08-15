@@ -2015,11 +2015,11 @@ apply rngl_ltb_lt.
 now apply (rngl_opp_lt_compat Hop Hor) in H21.
 Qed.
 
-(* to be completed
 Theorem angle_eucl_dist_lt_angle_lt_lt2 :
   ∀ θ1 θ2 θ3,
   (0 < rngl_sin θ3)%L
-  → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L
+  → (angle_eucl_dist θ2 θ3 <
+        rngl_min (angle_eucl_dist θ1 θ3) (angle_eucl_dist θ3 angle_straight))%L
   → (θ1 < θ3)%A
   → (θ1 < θ2)%A.
 Proof.
@@ -2032,11 +2032,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply angle_lt_irrefl in H13.
 }
 intros * Hzs3 Hd23 H13.
-(*1*)
-(*2*)
 destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   subst θ2.
   exfalso.
+  apply (rngl_min_glb_lt_iff Hor) in Hd23.
+  destruct Hd23 as (Hd23, Hd33).
   apply angle_eucl_dist_lt_cos_lt in Hd23.
   rewrite angle_sub_0_r in Hd23.
   apply (rngl_nle_gt Hor) in Hd23.
@@ -2067,7 +2067,6 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
   }
   now apply (rngl_lt_le_incl Hor) in H13.
 }
-(*3*)
 specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
 specialize (H1 (angle_straight - θ3) (angle_straight - θ2))%A.
 specialize (H1 (angle_straight - θ1))%A.
@@ -2098,155 +2097,8 @@ do 2 rewrite (angle_sub_sub_swap angle_straight _ (_ - _)).
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag, angle_add_0_l.
 do 3 rewrite <- angle_eucl_dist_move_0_l.
-apply (rngl_min_glb_lt_iff Hor).
-split; [ easy | ].
-rewrite angle_eucl_dist_symmetry.
-do 2 rewrite angle_eucl_dist_is_sqrt.
-rewrite rngl_cos_sub_straight_l.
-rewrite (rngl_sub_opp_r Hop).
-apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-rewrite <- (rngl_add_opp_r Hop).
-apply (rngl_add_lt_mono_l Hop Hor).
-apply (rngl_lt_opp_l Hop Hor).
-rewrite rngl_add_comm.
-rewrite rngl_cos_sub.
-...
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
-apply angle_eucl_dist_lt_cos_lt.
-...3
-remember (θ3 / ₂ + angle_straight)%A as θ4 eqn:Ht4.
-specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
-specialize (H1 (θ4 - θ3) (θ4 - θ2) (θ4 - θ1))%A.
-rewrite <- (angle_opp_involutive θ1).
-rewrite <- (angle_opp_involutive θ2).
-apply angle_opp_lt_compat_if. {
-  intros H.
-  apply (f_equal angle_opp) in H.
-  rewrite angle_opp_involutive in H.
-  now rewrite angle_opp_0 in H.
-}
-...
-Search (_ - _ < _ - _)%A.
-Theorem glop :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
-  → (θ1 + θ2 < θ1 + θ3)%A
-  → (θ2 < θ3)%A.
-... ...
-apply (glop θ4). {
-  progress unfold angle_add_overflow.
-  apply Bool.not_true_iff_false.
-  apply angle_nlt_ge.
-  rewrite Ht4.
-(* mouais, chais pas *)
-...2
-change_angle_sub_l θ1 θ4.
-change_angle_sub_l θ2 θ4.
-change_angle_sub_l θ3 θ4.
-remember (θ4 - θ1)%A as θ'1.
-remember (θ4 - θ2)%A as θ'2.
-remember (θ4 - θ3)%A as θ'3.
-apply (angle_eucl_dist_lt_angle_lt_lt _ θ'2) in H13.
-...
-Check angle_eucl_dist_lt_angle_lt_lt.
-remember (θ4 - θ2)%A as θ'3.
-Check angle_eucl_dist_lt_angle_lt_lt.
-...
-destruct (angle_le_dec θ3 θ2) as [H32| H23]. {
-  now apply (angle_lt_le_trans _ θ3).
-}
-apply angle_nle_gt in H23.
-...
-apply angle_nle_gt.
-intros H21.
-Check angle_eucl_dist_lt_angle_lt_lt.
-...1
-intros * Hd23 H13.
-change_angle_sub_l θ1 angle_right.
-change_angle_sub_l θ2 angle_right.
-change_angle_sub_l θ3 angle_right.
-(*
-apply (angle_add_lt_mono_l (- angle_right)) in H13.
-do 2 rewrite angle_add_sub_assoc in H13.
-rewrite angle_add_opp_l in H13.
-rewrite angle_sub_diag in H13.
-do 2 rewrite angle_sub_0_l in H13.
-apply angle_opp_lt_compat_if in H13.
-do 2 rewrite angle_opp_involutive in H13.
-*)
-rewrite angle_eucl_dist_move_0_r in Hd23.
-rewrite angle_sub_sub_distr in Hd23.
-rewrite angle_sub_sub_swap in Hd23.
-rewrite angle_sub_diag in Hd23.
-rewrite angle_sub_0_l in Hd23.
-rewrite angle_add_opp_l in Hd23.
-rewrite <- angle_eucl_dist_move_0_r in Hd23.
-rewrite (angle_eucl_dist_move_0_r (_ - _)) in Hd23.
-rewrite angle_sub_sub_distr in Hd23.
-rewrite angle_sub_sub_swap in Hd23.
-rewrite angle_sub_diag in Hd23.
-rewrite angle_sub_0_l in Hd23.
-rewrite angle_add_opp_l in Hd23.
-rewrite <- angle_eucl_dist_move_0_r in Hd23.
-Check angle_add_lt_mono_l.
-Check angle_sub_lt_mono_l.
-Check angle_add_le_mono_l.
-(* est-ce que je pourrais avoir
-  angle_add_le_mono_l : ∀ θ1 θ2 θ3,
-    angle_add_overflow θ1 θ3 = false ∨ angle_add_overflow θ1 θ2 = true
-    → (θ2 ≤ θ3)%A → (θ1 + θ2 ≤ θ1 + θ3)%A
-  ?
-  à réfléchir...
-*)
-Check angle_sub_le_mono_l.
-About angle_add_lt_mono_l.
-apply angle_sub_lt_mono_l.
-3: {
-  apply (angle_eucl_dist_lt_angle_lt_lt θ3). 2: {
-Search (_ + _ < _ + _)%A.
-Search (angle_eucl_dist (_ - _)).
-... ...
-  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
-...
-Search (_ - _ ≤ _ - _)%A.
-About angle_sub_le_mono_l.
-...
-progress unfold angle_add_overflow in Haov.
-...
-rewrite <- angle_opp_straight.
-rewrite angle_add_opp_r.
-rewrite <- (angle_eucl_dist_move_0_r _ angle_straight).
-...
-Search (angle_eucl_dist _ angle_straight).
-...
-Search (- (_ / ₂))%A.
-Search (- (_ / _))%Z.
-remember (- (θ1 / ₂))%A as x.
-rewrite angle_opp_div_2 in Heqx.
-Search (_ / ₂ + _ / ₂)%A.
-
-Search (_ / ₂ - _ / ₂)%A.
-...
-Search (angle_eucl_dist (_ - _)).
-rewrite <- (rngl_add_diag Hon).
-eapply (rngl_le_trans Hor). {
-  apply (angle_eucl_dist_triangular _ (θ1 / ₂ + θ2 / ₂)).
-}
-(* ouais, chais pas *)
-Search (angle_eucl_dist (_ + _)).
-Search (angle_eucl_dist (_ / ₂)).
-... ...
-    apply angle_eucl_dist_le_twice_dist_div_2_div_2.
-  }
-*)
+easy.
+Qed.
 
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
@@ -2410,8 +2262,8 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   now apply angle_div_2_lt_compat.
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
-... ...
   apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4). {
+...
     eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
     apply (rngl_min_le_iff Hor).
     right.
