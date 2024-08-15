@@ -2029,31 +2029,6 @@ apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
 now apply (rngl_le_trans Hor _ (rngl_cos θ2)).
 Qed.
 
-Theorem rngl_sin_incr_lt :
-  ∀ θ1 θ2,
-  (θ1 < θ2 ≤ angle_right)%A
-  → (rngl_sin θ1 < rngl_sin θ2)%L.
-Proof.
-destruct_ac.
-intros * (H12, H2s).
-progress unfold angle_ltb in H12.
-progress unfold angle_leb in H2s.
-cbn in H2s.
-specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-apply rngl_leb_le in H1.
-rewrite H1 in H2s; clear H1.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs2; [ | easy ].
-destruct zs1; [ | easy ].
-apply rngl_leb_le in Hzs1, Hzs2, H2s.
-apply rngl_ltb_lt in H12.
-apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
-apply (rngl_le_trans Hor _ (rngl_cos θ2)); [ easy | ].
-now apply (rngl_lt_le_incl Hor).
-Qed.
-
 Theorem rngl_cos_add_rngl_cos :
   ∀ p q,
   (rngl_cos p + rngl_cos q =
