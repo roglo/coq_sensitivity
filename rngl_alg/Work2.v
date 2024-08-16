@@ -2133,8 +2133,8 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2' :
   → (θ1 < θ2)%A.
 Proof.
 destruct_ac.
-Admitted.
-  apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); cycle 1. {
+... ...
+  apply (angle_eucl_dist_lt_angle_lt_lt2' _ _ θ4). {
     rewrite <- (angle_add_div_2_diag θ4) at 3.
     rewrite angle_eucl_dist_add_cancel_r.
     apply rngl_min_glb_lt. {
@@ -2152,6 +2152,13 @@ Admitted.
     eapply (rngl_lt_trans Hor); [ apply Hd34 | ].
     apply (rngl_min_lt_iff Hor).
     rewrite He1, He2.
+    rewrite angle_add_add_swap.
+    rewrite <- (angle_add_div_2_diag θ4) at 1 4.
+    rewrite angle_eucl_dist_add_cancel_r.
+    (* faut introduire un ε3 = angle_eucl_dist θ4 (θ1 + angle_straight)
+       truc genre ; mais faut voir parce qu'il y a un θ1/2 ici au lieu
+       de θ1 ? Bon faudra que je regarde quand j'aurai prouvé
+       angle_eucl_dist_lt_angle_lt_lt2' *)
 ...1
   apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ θ4); cycle 1. {
     rewrite <- (angle_add_div_2_diag θ4) at 3.
@@ -2172,6 +2179,10 @@ Admitted.
     apply (rngl_min_lt_iff Hor).
     rewrite He1, He2.
 (* aïe, j'ai peur que ça marche pas *)
+...
+  ============================
+  (angle_eucl_dist θ1 0 < angle_eucl_dist θ4 angle_straight)%L
+  ∨ (angle_eucl_dist θ1 θ4 / 2 < angle_eucl_dist θ4 angle_straight)%L
 ...
     rewrite (angle_eucl_dist_move_0_r (_ + _)).
 Search (angle_eucl_dist (_ - _)).
