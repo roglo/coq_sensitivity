@@ -1960,6 +1960,21 @@ apply angle_nlt_ge in H12.
 now exfalso; apply H12.
 Qed.
 
+(* to be completed and then moving to AngleEuclDistLtAngleLtLt.v
+   replacing angle_eucl_dist_lt_angle_lt_lt2 (without "prime")
+Theorem angle_eucl_dist_lt_angle_lt_lt2' :
+  ∀ θ1 θ2 θ3,
+  (angle_eucl_dist θ2 θ3 <
+     rngl_min
+       (angle_eucl_dist θ1 θ3)
+       (angle_eucl_dist θ3 (θ1 + angle_straight)))%L
+  → (θ1 < θ3 < θ1 + angle_straight)%A
+  → (θ1 < θ2)%A.
+Proof.
+destruct_ac.
+...
+*)
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2123,16 +2138,6 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
 }
 assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
 (*1*)
-Theorem angle_eucl_dist_lt_angle_lt_lt2' :
-  ∀ θ1 θ2 θ3,
-  (angle_eucl_dist θ2 θ3 <
-     rngl_min
-       (angle_eucl_dist θ1 θ3)
-       (angle_eucl_dist θ3 (θ1 + angle_straight)))%L
-  → (θ1 < θ3 < θ1 + angle_straight)%A
-  → (θ1 < θ2)%A.
-Proof.
-destruct_ac.
 ... ...
   apply (angle_eucl_dist_lt_angle_lt_lt2' _ _ θ4). {
     rewrite <- (angle_add_div_2_diag θ4) at 3.
