@@ -1960,8 +1960,9 @@ apply angle_nlt_ge in H12.
 now exfalso; apply H12.
 Qed.
 
-(* to be completed and then moving to AngleEuclDistLtAngleLtLt.v
-   replacing angle_eucl_dist_lt_angle_lt_lt2 (without "prime")
+(* to be completed
+(* and then moving to AngleEuclDistLtAngleLtLt.v
+   replacing angle_eucl_dist_lt_angle_lt_lt2 (without "prime") *)
 Theorem angle_eucl_dist_lt_angle_lt_lt2' :
   ∀ θ1 θ2 θ3,
   (angle_eucl_dist θ2 θ3 <
@@ -1972,6 +1973,82 @@ Theorem angle_eucl_dist_lt_angle_lt_lt2' :
   → (θ1 < θ2)%A.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hd23 (H13, H31).
+  rewrite (H1 θ1), (H1 θ3) in H13.
+  now apply angle_lt_irrefl in H13.
+}
+intros * Hd23 (H13, H31).
+destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
+  subst θ2.
+  exfalso.
+  apply (rngl_min_glb_lt_iff Hor) in Hd23.
+  destruct Hd23 as (Hd23, Hd33).
+  apply angle_eucl_dist_lt_cos_lt in Hd23.
+  rewrite angle_sub_0_r in Hd23.
+  apply (rngl_nle_gt Hor) in Hd23.
+  apply Hd23; clear Hd23.
+  progress unfold angle_ltb in H13.
+...
+  apply (rngl_lt_le_incl Hor) in Hzs3.
+  apply rngl_leb_le in Hzs3.
+  rewrite Hzs3 in H13.
+  apply rngl_leb_le in Hzs3.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  symmetry in Hzs1.
+  destruct zs1; [ | easy ].
+  apply rngl_leb_le in Hzs1.
+  apply rngl_ltb_lt in H13.
+  apply (rngl_lt_eq_cases Hor).
+  destruct (rngl_eq_dec Hed (rngl_cos θ3) (rngl_cos (θ3 - θ1))) as
+      [Hc31| Hc31]; [ now right | left ].
+  rewrite rngl_cos_sub_comm.
+  apply rngl_cos_lt_rngl_cos_sub; [ easy | | ]. {
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ1; [ now rewrite angle_sub_0_r in Hc31 | ].
+    cbn in H13.
+    apply (rngl_nle_gt Hor) in H13.
+    apply H13, rngl_cos_bound.
+  }
+  now apply (rngl_lt_le_incl Hor) in H13.
+}
+specialize (angle_eucl_dist_lt_angle_lt_lt) as H1.
+specialize (H1 (angle_straight - θ3) (angle_straight - θ2))%A.
+specialize (H1 (angle_straight - θ1))%A.
+enough (H : (angle_straight - θ2 < angle_straight - θ1)%A). {
+  apply angle_sub_lt_straight_l; [ | easy ].
+  progress unfold angle_ltb in H13.
+  remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  symmetry in Hzs1.
+  apply rngl_sin_nonneg_angle_le_straight.
+  apply rngl_leb_le.
+  destruct zs1; [ easy | ].
+  apply (rngl_lt_le_incl Hor) in Hzs3.
+  apply rngl_leb_le in Hzs3.
+  now rewrite Hzs3 in H13.
+}
+apply H1. 2: {
+  apply angle_sub_lt_straight_l. 2: {
+    do 2 rewrite angle_sub_sub_distr.
+    rewrite angle_sub_diag.
+    now do 2 rewrite angle_add_0_l.
+  }
+  apply angle_le_sub_diag.
+  apply rngl_sin_nonneg_angle_le_straight.
+  now apply (rngl_lt_le_incl Hor) in Hzs3.
+}
+do 2 rewrite (angle_eucl_dist_move_0_l (angle_straight - _)).
+do 2 rewrite (angle_sub_sub_swap angle_straight _ (_ - _)).
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag, angle_add_0_l.
+do 3 rewrite <- angle_eucl_dist_move_0_l.
+easy.
+Qed.
 ...
 *)
 
