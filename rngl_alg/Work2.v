@@ -2141,6 +2141,16 @@ enough (H21 : (θ1 + angle_straight - θ2 < angle_straight)%A). {
     }
   }
   apply (rngl_leb_gt Hor) in Hzs1.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2.
+    exfalso.
+    rewrite rngl_sin_sub_anticomm in Hzs21.
+    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs21.
+    apply (rngl_nlt_ge Hor) in Hzs21.
+    apply Hzs21; clear Hzs21.
+...
+Search (0 < rngl_sin (_ - _))%L.
+Search (rngl_sin _ < 0)%L.
 ...
   rewrite <- (angle_sub_0_r angle_straight) in H at 2.
   apply angle_sub_lt_straight_l in H. 2: {
