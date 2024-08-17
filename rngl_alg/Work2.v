@@ -2040,6 +2040,8 @@ enough (H : (θ1 + angle_straight - θ2 < angle_straight)%A). {
   }
 Search (0 < _ - _)%A.
 Search (0 < _ - _)%Z.
+...
+(* ah oui, non, ça ne marche pas si θ2 + (-θ1) déborde ! *)
 Theorem angle_lt_0_sub : ∀ θ1 θ2, (0 < θ2 - θ1)%A ↔ (θ1 < θ2)%A.
 Proof.
 destruct_ac.
@@ -2064,9 +2066,11 @@ split; intros H12. {
 *)
   destruct zs1. {
     apply rngl_leb_le in Hzs1.
+(* 0 ≤ sin θ1 *)
     destruct zs2; [ | easy ].
     apply rngl_leb_le in Hzs2.
     apply rngl_ltb_lt.
+(* 0 ≤ sin θ2 *)
     destruct zs21. {
       apply rngl_leb_le in Hzs21.
       destruct c211; [ clear H12 | easy ].
@@ -2084,6 +2088,7 @@ split; intros H12. {
         now apply (rngl_lt_le_trans Hor _ 0).
       }
       apply (rngl_nle_gt Hor) in Hc1z.
+(* cos θ2 < 0 *)
 (*1*)
       change_angle_sub_l θ1 angle_straight.
       progress sin_cos_add_sub_straight_hyp T Hzs1.
@@ -2098,6 +2103,7 @@ split; intros H12. {
       progress sin_cos_add_sub_straight_hyp T Hzs21.
       progress sin_cos_add_sub_straight_hyp T Hc1z.
       progress sin_cos_add_sub_straight_goal T.
+...
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
         exfalso.
         apply (rngl_nlt_ge Hor) in Hzs21.
