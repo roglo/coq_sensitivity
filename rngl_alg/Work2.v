@@ -2080,6 +2080,56 @@ split; intros H12. {
           rewrite angle_sub_diag in Hc211.
           now apply (rngl_lt_irrefl Hor) in Hc211.
         }
+        apply (rngl_nle_gt Hor) in Hc2z.
+        now apply (rngl_lt_le_trans Hor _ 0).
+      }
+      apply (rngl_nle_gt Hor) in Hc1z.
+(*1*)
+      change_angle_sub_l θ1 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs1.
+      rewrite rngl_cos_sub_comm in Hc211.
+      rewrite <- angle_sub_add_distr in Hc211.
+      progress sin_cos_add_sub_straight_hyp T Hc211.
+      apply (rngl_lt_opp_l Hop Hor) in Hc211.
+      rewrite rngl_add_comm in Hc211.
+      apply (rngl_lt_opp_l Hop Hor) in Hc211.
+      rewrite rngl_sin_sub_anticomm in Hzs21.
+      rewrite <- angle_sub_add_distr in Hzs21.
+      progress sin_cos_add_sub_straight_hyp T Hzs21.
+      progress sin_cos_add_sub_straight_hyp T Hc1z.
+      progress sin_cos_add_sub_straight_goal T.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hzs21.
+        apply Hzs21; clear Hzs21.
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply (rngl_lt_le_incl Hor) in Hc1z.
+          now apply rngl_sin_add_nonneg.
+        }
+        intros H; symmetry in H.
+        apply eq_rngl_sin_0 in H.
+        destruct H as [H| H]. {
+          apply angle_add_move_0_r in H.
+          subst θ1.
+          cbn in Hzs1, Hc1z.
+          apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs1.
+          apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
+          apply eq_rngl_sin_0 in Hzs2.
+          destruct Hzs2; subst θ2. {
+            rewrite angle_add_0_r in Hc211.
+            cbn in *.
+...1
+      change_angle_sub_r θ1 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs1.
+      progress sin_cos_add_sub_right_hyp T Hc211.
+      progress sin_cos_add_sub_right_hyp T Hzs21.
+      progress sin_cos_add_sub_right_hyp T Hc1z.
+      progress sin_cos_add_sub_right_goal T.
+...
+  apply (rngl_add_nonneg_nonneg Hor); [ | easy ].
+  apply (rngl_lt_le_incl Hor) in Hzc2.
+  apply rngl_sin_add_nonneg; try easy.
 ...
   apply angle_sub_lt_straight_l; [ | easy ].
   progress unfold angle_ltb in H13.
