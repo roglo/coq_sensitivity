@@ -2141,15 +2141,23 @@ enough (H21 : (θ1 + angle_straight - θ2 < angle_straight)%A). {
     }
   }
   apply (rngl_leb_gt Hor) in Hzs1.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    exfalso.
-    rewrite rngl_sin_sub_anticomm in Hzs21.
-    apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs21.
-    apply (rngl_nlt_ge Hor) in Hzs21.
-    apply Hzs21; clear Hzs21.
-(* ça ne marche pas si θ2+(-θ1) déborde *)
-(* est-ce que θ1<π par H31 et H13 ? *)
+  progress unfold angle_ltb in H13.
+  progress unfold angle_ltb in H31.
+  rewrite rngl_sin_add_straight_r in H31.
+  rewrite rngl_cos_add_straight_r in H31.
+  rewrite (rngl_leb_opp_r Hop Hor) in H31.
+  rewrite (rngl_opp_0 Hop) in H31.
+  remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+  symmetry in Hzs3.
+  generalize Hzs1; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H in H31; clear H.
+  apply (rngl_leb_gt Hor) in Hzs1.
+  rewrite Hzs1 in H13.
+  now destruct zs3.
+}
+apply H1.
 ...
 Search (0 < rngl_sin (_ - _))%L.
 Search (rngl_sin _ < 0)%L.
