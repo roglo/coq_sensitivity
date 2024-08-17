@@ -2149,6 +2149,7 @@ enough (H21 : (θ1 + angle_straight - θ2 < angle_straight)%A). {
     apply (rngl_nlt_ge Hor) in Hzs21.
     apply Hzs21; clear Hzs21.
 (* ça ne marche pas si θ2+(-θ1) déborde *)
+(* est-ce que θ1<π par H31 et H13 ? *)
 ...
 Search (0 < rngl_sin (_ - _))%L.
 Search (rngl_sin _ < 0)%L.
