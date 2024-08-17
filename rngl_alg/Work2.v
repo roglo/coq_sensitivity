@@ -2050,6 +2050,18 @@ destruct (angle_eq_dec θ2 0) as [H2z| H2z]. {
       now apply rngl_sin_nonneg_angle_le_straight.
     }
     apply (rngl_nle_gt Hor) in Hc1z.
+    change_angle_sub_l θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    progress sin_cos_add_sub_straight_hyp T H31.
+    progress sin_cos_add_sub_straight_hyp T Hs1z.
+    rewrite angle_sub_sub_distr.
+    progress sin_cos_add_sub_straight_goal T.
+...
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hc1z.
+    progress sin_cos_add_sub_right_hyp T H31.
+    progress sin_cos_add_sub_right_hyp T Hs1z.
+    progress sin_cos_add_sub_right_goal T.
 ...
     apply rngl_ltb_lt in H13.
     destruct (rngl_le_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
