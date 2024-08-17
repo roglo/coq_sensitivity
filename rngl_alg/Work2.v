@@ -1960,7 +1960,7 @@ apply angle_nlt_ge in H12.
 now exfalso; apply H12.
 Qed.
 
-Theorem quadrant_1_sin_sub_nonneg_cos_le :
+Theorem quadrant_1_sin_sub_nonneg_cos_lt :
   ∀ θ1 θ2,
   θ1 ≠ θ2
   → (0 ≤ rngl_sin (θ2 - θ1))%L
@@ -2074,7 +2074,7 @@ split; intros H12. {
       (* lemma to do from here *)
       destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
         destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
-          apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
+          apply quadrant_1_sin_sub_nonneg_cos_lt; try easy.
           intros H.
           subst θ2.
           rewrite angle_sub_diag in Hc211.
