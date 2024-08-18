@@ -2185,6 +2185,77 @@ split. {
   apply -> angle_sub_move_0_r in H; subst θ3.
   now apply angle_lt_irrefl in H13.
 }
+progress unfold angle_ltb in H13.
+progress unfold angle_ltb in H31.
+progress unfold angle_ltb.
+rewrite rngl_sin_add_straight_r in H31.
+rewrite rngl_cos_add_straight_r in H31.
+cbn - [ angle_sub ].
+rewrite (rngl_leb_refl Hor).
+rewrite (rngl_leb_opp_r Hop Hor) in H31.
+rewrite (rngl_opp_0 Hop) in H31.
+remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+remember (0 ≤? rngl_sin (θ3 - θ1))%L as zs31 eqn:Hzs31.
+symmetry in Hzs3, Hs1z, Hzs31.
+destruct zs3. 2: {
+  destruct s1z; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hs1z, Hzs3.
+  apply rngl_ltb_lt in H31.
+  clear H13.
+  destruct zs31. {
+    apply rngl_leb_le in Hzs31.
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H; symmetry in H.
+    apply eq_rngl_cos_opp_1 in H.
+    apply angle_sub_move_l in H.
+    subst θ1.
+    rewrite rngl_cos_sub_straight_r in H31.
+    rewrite (rngl_opp_involutive Hop) in H31.
+    now apply (rngl_lt_irrefl Hor) in H31.
+  }
+  exfalso.
+  clear H1 Hd23.
+  apply (rngl_leb_gt Hor) in Hzs31.
+  apply (rngl_nle_gt Hor) in H31.
+  apply H31; clear H31.
+  apply (rngl_le_opp_l Hop Hor).
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
+    change_angle_opp θ3.
+    progress sin_cos_opp_hyp T Hzs3.
+    progress sin_cos_opp_hyp T Hzc3.
+    rewrite <- angle_opp_add_distr in Hzs31.
+    progress sin_cos_opp_hyp T Hzs31.
+    cbn.
+    rewrite angle_add_comm in Hzs31.
+    rewrite rngl_add_comm.
+    apply (rngl_lt_le_incl Hor) in Hzs3, Hs1z, Hzs31.
+    now apply rngl_add_cos_nonneg_when_sin_nonneg.
+  }
+  apply (rngl_nle_gt Hor) in Hc3z.
+  change_angle_add_r θ3 angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hzs3.
+  progress sin_cos_add_sub_straight_hyp T Hc3z.
+  rewrite angle_sub_sub_swap in Hzs31.
+  progress sin_cos_add_sub_straight_hyp T Hzs31.
+  progress sin_cos_add_sub_straight_goal T.
+  destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+    apply (rngl_lt_le_incl Hor) in Hzs3, Hs1z, Hzs31, Hc3z.
+    now apply quadrant_1_sin_sub_nonneg_cos_le.
+  }
+  apply (rngl_nle_gt Hor) in Hc1z.
+  exfalso.
+  apply (rngl_nle_gt Hor) in Hzs31.
+  apply Hzs31; clear Hzs31.
+  rewrite rngl_sin_sub.
+  apply (rngl_le_sub_0 Hop Hor).
+  apply (rngl_lt_le_incl Hor) in Hzs3, Hs1z, Hc1z, Hc3z.
+  apply (rngl_le_trans Hor _ 0).
+  now apply (rngl_mul_nonneg_nonpos Hop Hor).
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
 ...
   apply angle_lt_iff.
 Search (_ - _ ≤ _)%A.
