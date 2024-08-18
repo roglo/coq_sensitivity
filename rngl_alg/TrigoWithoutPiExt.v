@@ -1107,4 +1107,20 @@ now apply (rngl_lt_le_incl Hor) in Hzs12.
 now rewrite angle_sub_add.
 Qed.
 
+Theorem angle_lt_sub_diag :
+  ∀ θ1 θ2, (0 < θ2 < θ1)%A → (θ1 - θ2 < θ1)%A.
+Proof.
+intros * (Hz2, H21).
+apply angle_lt_iff.
+split. {
+  apply angle_le_sub_diag.
+  now apply angle_lt_le_incl in H21.
+}
+intros H.
+apply angle_sub_move_l in H.
+rewrite angle_sub_diag in H.
+rewrite H in Hz2.
+now apply angle_lt_irrefl in Hz2.
+Qed.
+
 End a.
