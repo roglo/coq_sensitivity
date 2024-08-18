@@ -2079,23 +2079,25 @@ set (i := max N1 N2).
 specialize (HN1 i (Nat.le_max_l _ _)).
 specialize (HN2 i (Nat.le_max_r _ _)).
 do 2 rewrite angle_mul_1_l in HN1.
+Definition rngl_min3 a b c := rngl_min (rngl_min a b) c.
 Theorem glop :
-  ∀ θ1 θ2 θ3 θ4 ε1 ε2,
+  ∀ θ1 θ2 θ3 θ4 ε1 ε2 ε3,
   ε1 = angle_eucl_dist θ1 0
   → ε2 = angle_eucl_dist θ1 θ4
-  → (angle_eucl_dist θ3 θ4 < rngl_min ε1 (ε2 / 2))%L
-  → (angle_eucl_dist θ2 θ1 < rngl_min ε1 (ε2 / 2))%L
+  → ε3 = angle_eucl_dist θ4 (θ1 + angle_straight)
+  → (angle_eucl_dist θ3 θ4 < rngl_min3 ε1 (ε2 / 2) ε3)%L
+  → (angle_eucl_dist θ2 θ1 < rngl_min3 ε1 (ε2 / 2) ε3)%L
   → (θ1 < θ4)%A
   → (θ2 < θ3)%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * He1 He2 Hd34 Hd21 H14.
+  intros * He1 He2 He3 Hd34 Hd21 H14.
   rewrite (H1 θ1), (H1 θ4) in H14.
   now apply angle_lt_irrefl in H14.
 }
-intros * He1 He2 Hd34 Hd21 H14.
+intros * He1 He2 He3 Hd34 Hd21 H14.
 (*2*)
 assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   apply (angle_eucl_dist_lt_angle_lt_lt θ1). {
@@ -2103,6 +2105,10 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     rewrite angle_eucl_dist_symmetry.
     eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
     rewrite (rngl_min_comm Hor _ ε1).
+    progress unfold rngl_min3.
+Search (rngl_min (rngl_min _ _)).
+Check Z.add_assoc.
+...
     apply (rngl_min_le_compat_l Hor).
     rewrite <- (angle_add_div_2_diag θ1) at 1.
     rewrite angle_eucl_dist_add_cancel_l.

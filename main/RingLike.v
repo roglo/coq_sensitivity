@@ -4584,6 +4584,33 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_min_assoc :
+  rngl_is_ordered T = true →
+  ∀ a b c,
+  rngl_min a (rngl_min b c) = rngl_min (rngl_min a b) c.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (b ≤? c)%L as bc eqn:Hbc.
+symmetry in Hab, Hbc.
+destruct ab. {
+  destruct bc; [ | easy ].
+  rewrite Hab.
+  apply rngl_leb_le in Hab, Hbc.
+  apply (rngl_le_trans Hor a) in Hbc; [ | easy ].
+  apply rngl_leb_le in Hbc.
+  now rewrite Hbc.
+}
+rewrite Hbc.
+destruct bc; [ now rewrite Hab | ].
+apply (rngl_leb_gt Hor) in Hab, Hbc.
+apply (rngl_lt_le_incl Hor) in Hbc.
+apply (rngl_le_lt_trans Hor c) in Hab; [ | easy ].
+apply (rngl_leb_gt Hor) in Hab.
+now rewrite Hab.
+Qed.
+
 Theorem rngl_min_glb_lt_iff :
   rngl_is_ordered T = true →
   ∀ a b c, (c < rngl_min a b ↔ c < a ∧ c < b)%L.
