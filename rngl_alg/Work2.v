@@ -2256,9 +2256,27 @@ destruct zs3. 2: {
   now apply (rngl_mul_nonneg_nonpos Hop Hor).
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
+apply rngl_leb_le in Hzs3.
+destruct zs31. {
+  apply rngl_leb_le in Hzs31.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_iff Hor).
+  split; [ apply rngl_cos_bound | ].
+  intros H; symmetry in H.
+  apply eq_rngl_cos_opp_1 in H.
+  clear Hzs31.
+  apply angle_sub_move_l in H.
+  subst θ1.
+  rewrite rngl_sin_sub_straight_r in H13, Hs1z.
+  rewrite rngl_cos_sub_straight_r in H13, H31.
+  rewrite (rngl_leb_opp_r Hop Hor) in H13.
+  rewrite (rngl_opp_0 Hop) in H13.
 ...
-  apply angle_lt_iff.
-Search (_ - _ ≤ _)%A.
+Search (- _ ≤? _)%L.
+About rngl_leb_opp_r.
+...
+  rewrite (rngl_leb_opp_l Hop Hor) in Hs1z.
+2: {
 ...
   apply angle_sub_lt_straight_l. 2: {
 rewrite angle_sub_sub_distr.
