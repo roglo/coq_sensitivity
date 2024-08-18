@@ -2110,7 +2110,8 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     apply (rngl_min_le_compat_l Hor).
     rewrite <- (angle_add_div_2_diag θ1) at 1.
     rewrite angle_eucl_dist_add_cancel_l.
-...
+    apply (rngl_min_le_iff Hor).
+    left.
     apply (rngl_le_div_l Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
@@ -2133,7 +2134,10 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     rewrite angle_eucl_dist_add_cancel_r.
     apply rngl_min_glb_lt. {
       eapply (rngl_lt_le_trans Hor); [ apply Hd34 | ].
+      progress unfold rngl_min3.
+      rewrite <- (rngl_min_assoc Hor).
       apply (rngl_min_le_iff Hor); right.
+      apply (rngl_min_le_iff Hor); left.
       rewrite He2.
       apply (rngl_le_div_l Hon Hop Hiv Hor). {
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -2145,7 +2149,9 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     }
     eapply (rngl_lt_trans Hor); [ apply Hd34 | ].
     apply (rngl_min_lt_iff Hor).
-    rewrite He1, He2.
+    rewrite He1, He2, He3.
+(*2*)
+...2
     rewrite angle_add_add_swap.
     rewrite <- (angle_add_div_2_diag θ4) at 1 4.
     rewrite angle_eucl_dist_add_cancel_r.
