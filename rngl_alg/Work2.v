@@ -2106,12 +2106,11 @@ assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
     eapply (rngl_lt_le_trans Hor); [ apply Hd21 | ].
     rewrite (rngl_min_comm Hor _ ε1).
     progress unfold rngl_min3.
-Search (rngl_min (rngl_min _ _)).
-Check Z.add_assoc.
-...
+    rewrite <- (rngl_min_assoc Hor).
     apply (rngl_min_le_compat_l Hor).
     rewrite <- (angle_add_div_2_diag θ1) at 1.
     rewrite angle_eucl_dist_add_cancel_l.
+...
     apply (rngl_le_div_l Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
