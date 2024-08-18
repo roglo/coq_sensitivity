@@ -5888,6 +5888,30 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_ltb_opp_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (-a <? b)%L = (-b <? a)%L.
+Proof.
+intros Hop Hor *.
+remember (-a <? b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_ltb_lt in Hab.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_opp_l Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_lt_opp_l Hop Hor) in Hab.
+} {
+  apply (rngl_ltb_ge Hor) in Hab.
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_opp_r Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_le_opp_r Hop Hor).
+}
+Qed.
+
 Theorem rngl_ltb_opp_r :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

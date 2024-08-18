@@ -2271,12 +2271,30 @@ destruct zs31. {
   rewrite rngl_cos_sub_straight_r in H13, H31.
   rewrite (rngl_leb_opp_r Hop Hor) in H13.
   rewrite (rngl_opp_0 Hop) in H13.
-...
-Search (- _ ≤? _)%L.
-About rngl_leb_opp_r.
-...
   rewrite (rngl_leb_opp_l Hop Hor) in Hs1z.
-2: {
+  rewrite (rngl_opp_0 Hop) in Hs1z.
+  apply rngl_leb_le in Hzs3.
+  rewrite Hzs3 in Hs1z.
+  apply rngl_leb_le in Hzs3.
+  subst s1z.
+  rewrite (rngl_opp_involutive Hop) in H31.
+  apply rngl_ltb_lt in H31.
+  now apply (rngl_lt_irrefl Hor) in H31.
+}
+exfalso.
+rewrite rngl_sin_sub_anticomm in Hzs31.
+rewrite (rngl_leb_opp_r Hop Hor) in Hzs31.
+rewrite (rngl_opp_0 Hop) in Hzs31.
+apply (rngl_leb_gt Hor) in Hzs31.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+symmetry in Hzs1.
+destruct zs1; [ | easy ].
+apply rngl_leb_le in Hzs1.
+apply rngl_ltb_lt in H13.
+destruct s1z. {
+  apply rngl_leb_le in Hs1z.
+About rngl_ltb_opp_r.
+  rewrite rngl_ltb_opp_l in H31.
 ...
   apply angle_sub_lt_straight_l. 2: {
 rewrite angle_sub_sub_distr.
