@@ -2087,17 +2087,17 @@ Theorem glop :
   → ε3 = angle_eucl_dist θ4 (θ1 + angle_straight)
   → (angle_eucl_dist θ3 θ4 < rngl_min3 ε1 (ε2 / 2) ε3)%L
   → (angle_eucl_dist θ2 θ1 < rngl_min3 ε1 (ε2 / 2) ε3)%L
-  → (θ1 < θ4)%A
+  → (θ1 < θ4 < θ1 + angle_straight)%A
   → (θ2 < θ3)%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * He1 He2 He3 Hd34 Hd21 H14.
+  intros * He1 He2 He3 Hd34 Hd21 (H14, H41).
   rewrite (H1 θ1), (H1 θ4) in H14.
   now apply angle_lt_irrefl in H14.
 }
-intros * He1 He2 He3 Hd34 Hd21 H14.
+intros * He1 He2 He3 Hd34 Hd21 (H14, H41).
 (*2*)
 assert (H214 : (θ2 < θ1 / ₂ + θ4 / ₂)%A). {
   apply (angle_eucl_dist_lt_angle_lt_lt θ1). {
@@ -2265,7 +2265,6 @@ Search (_ / ₂ + _ / ₂)%A.
   }
   now apply angle_div_2_lt_compat.
 }
-...
 ...2
 (*1*)
 assert (H24 : (θ2 < θ4)%A). {
@@ -2380,6 +2379,8 @@ Search (rngl_abs _ = _).
 Search (√_ < √_)%L.
 ... ...
 specialize (glop (m * θ') (m * θ i) (θ i) θ')%A as H1.
+specialize (H1 _ _ _ eq_refl eq_refl eq_refl).
+...
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
 (* ok, contradiction *)
 ...
