@@ -311,33 +311,47 @@ Qed.
 Theorem angle_eucl_dist_lt_cos_lt :
   ∀ θ1 θ2 θ3 θ4,
   (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
-  → (rngl_cos (θ4 - θ3) < rngl_cos (θ2 - θ1))%L.
+  ↔ (rngl_cos (θ4 - θ3) < rngl_cos (θ2 - θ1))%L.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * H1234.
-  do 2 rewrite (H1 (angle_eucl_dist _ _)) in H1234.
-  now apply (rngl_lt_irrefl Hor) in H1234.
+  intros.
+  do 2 rewrite (H1 (angle_eucl_dist _ _)).
+  do 2 rewrite (H1 (rngl_cos _)).
+  easy.
 }
-intros * H1234.
-do 2 rewrite angle_eucl_dist_is_sqrt in H1234.
-apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234; cycle 1. {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
+intros.
+do 2 rewrite angle_eucl_dist_is_sqrt.
+split; intros H1234. {
+  apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234; cycle 1. {
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  } {
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1234. 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_sub_lt_mono_l Hop Hor) in H1234.
 } {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_sub_lt_mono_l Hop Hor).
 }
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1234. 2: {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-now apply (rngl_sub_lt_mono_l Hop Hor) in H1234.
 Qed.
 
 Theorem angle_sub_lt_straight_l :
