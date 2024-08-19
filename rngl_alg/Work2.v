@@ -1965,19 +1965,30 @@ Qed.
 Theorem angle_dist_lt_r :
   ∀ θ1 θ2 θ3,
   (θ3 ≤ angle_straight)%A
-  → (θ1 ≤ θ2 < θ3)%A
+  → (θ1 < θ2 ≤ θ3)%A
   → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L.
 Proof.
 destruct_ac.
-intros * H3s H123.
+intros * H3s (H12, H23).
 apply (rngl_lt_iff Hor).
 split. {
   apply angle_dist_le_r; [ easy | ].
-  split; [ easy | ].
+  split; [ | easy ].
   now apply angle_lt_le_incl.
 }
 intros H.
 apply angle_eucl_dist_eq_cos_eq in H.
+apply rngl_cos_eq in H.
+destruct H as [H3| H3]. {
+  apply (f_equal (λ θ, (θ3 - θ)%A)) in H3.
+  do 2 rewrite angle_sub_sub_distr in H3.
+  rewrite angle_sub_diag in H3.
+  do 2 rewrite angle_add_0_l in H3.
+  subst θ2.
+  now apply angle_lt_irrefl in H12.
+}
+rewrite angle_opp_sub_distr in H3.
+(* ouais, chais pas *)
 ...
 rewrite angle_eucl_dist_move_0_l in H.
 ...
