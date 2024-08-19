@@ -2161,10 +2161,18 @@ rewrite angle_sub_add_distr.
 rewrite angle_add_sub.
 rewrite rngl_cos_sub_comm.
 rewrite (rngl_cos_sub_comm (_ / ₂)).
-(*3*)
-progress unfold angle_ltb in H14.
-(* bon, chais pas *)
-...3
+rewrite <- (angle_add_div_2_diag θ4) at 1.
+rewrite <- (angle_add_div_2_diag θ1) at 1.
+rewrite angle_sub_add_distr.
+rewrite angle_add_sub_swap.
+rewrite <- angle_add_sub_assoc.
+rewrite angle_add_diag.
+remember (θ4 / ₂ - θ1 / ₂)%A as θ eqn:Hθ.
+(* il faut que θ ≤ π/2 ou θ ≥ -π/2 *)
+...
+Search (rngl_cos (2 * _))%L.
+rewrite rngl_cos_mul_2_l.
+...
 progress unfold angle_sub at 2.
 (* lemma to do : θ1 / ₂ - θ2 / ₂ *)
 rewrite angle_opp_div_2'.
