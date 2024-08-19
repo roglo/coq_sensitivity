@@ -1977,7 +1977,7 @@ split. {
   now apply angle_lt_le_incl.
 }
 intros H.
-Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+apply angle_eucl_dist_eq_cos_eq in H.
 ...
 rewrite angle_eucl_dist_move_0_l in H.
 ...
