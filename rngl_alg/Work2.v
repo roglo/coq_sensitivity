@@ -2152,10 +2152,52 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     rewrite He1, He2, He3.
 (*2*)
 right.
+apply angle_eucl_dist_lt_cos_lt.
+do 2 rewrite (angle_add_sub_swap _ angle_straight).
+do 2 rewrite rngl_cos_add_straight_r.
+apply -> (rngl_opp_lt_compat Hop Hor).
+rewrite <- (angle_add_div_2_diag θ4) at 3.
+rewrite angle_sub_add_distr.
+rewrite angle_add_sub.
+rewrite rngl_cos_sub_comm.
+rewrite (rngl_cos_sub_comm (_ / ₂)).
+(*3*)
+progress unfold angle_ltb in H14.
+(* bon, chais pas *)
+...3
+progress unfold angle_sub at 2.
+(* lemma to do : θ1 / ₂ - θ2 / ₂ *)
+rewrite angle_opp_div_2'.
+remember (θ1 =? 0)%A as t1z eqn:Ht1z.
+symmetry in Ht1z.
+destruct t1z. {
+  exfalso.
+  apply (rngl_nle_gt Hor) in Hd34.
+  apply Hd34; clear Hd34.
+  apply angle_eqb_eq in Ht1z; subst θ1.
+  rewrite angle_eucl_dist_diag in He1; subst ε1.
+  progress unfold rngl_min3.
+  rewrite <- (rngl_min_assoc Hor).
+  apply (rngl_le_trans Hor _ 0); [ | apply angle_eucl_dist_nonneg ].
+  apply (rngl_le_min_l Hor).
+}
+apply angle_eqb_neq in Ht1z.
+rewrite angle_add_assoc.
 ...
-Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
-About angle_eucl_dist_lt_cos_lt.
-do 2 rewrite angle_eucl_dist_is_sqrt.
+rewrite <- angle_div_2_add_not_overflow. 2: {
+  apply angle_add_not_overflow_equiv3.
+  progress unfold angle_add_not_overflow3.
+  rewrite angle_opp_involutive.
+  (* non *)
+...
+Search (_ / ₂ + _ / ₂)%A.
+Search (rngl_cos _ < rngl_cos (_ / ₂))%L.
+...
+Search (_ / ₂ + _ / ₂)%A.
+Search (- (_ / ₂))%A.
+...
+Search (_ / ₂ - _ / ₂)%A.
+Search (rngl_cos (_ / ₂ - _ / ₂)%A).
 ...2
     rewrite angle_add_add_swap.
     rewrite <- (angle_add_div_2_diag θ4) at 1 4.
