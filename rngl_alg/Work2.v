@@ -2151,6 +2151,7 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     apply (rngl_min_lt_iff Hor).
     rewrite He1, He2, He3.
 (*2*)
+...
 right.
 apply angle_eucl_dist_lt_cos_lt.
 do 2 rewrite (angle_add_sub_swap _ angle_straight).
@@ -2169,6 +2170,7 @@ rewrite <- angle_add_sub_assoc.
 rewrite angle_add_diag.
 remember (θ4 / ₂ - θ1 / ₂)%A as θ eqn:Hθ.
 (* il faut que θ ≤ π/2 ou θ ≥ -π/2 *)
+(* soit θ4 < θ1 + π *)
 ...
 Search (rngl_cos (2 * _))%L.
 rewrite rngl_cos_mul_2_l.
