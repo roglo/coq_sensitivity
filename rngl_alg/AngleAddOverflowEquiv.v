@@ -428,28 +428,6 @@ destruct zs. {
 }
 Qed.
 
-Theorem rngl_sin_pos_lt_straight :
-  ∀ θ,
-  (0 < rngl_sin θ)%L
-  → (θ < angle_straight)%A.
-Proof.
-destruct_ac.
-intros * Hzs.
-progress unfold angle_ltb.
-rewrite (rngl_leb_refl Hor).
-generalize Hzs; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-apply rngl_ltb_lt; cbn.
-apply (rngl_lt_iff Hor).
-split; [ apply rngl_cos_bound | ].
-intros H; symmetry in H.
-apply eq_rngl_cos_opp_1 in H.
-subst θ.
-now apply (rngl_lt_irrefl Hor) in Hzs.
-Qed.
-
 Theorem angle_add_straight_r_not_overflow :
   ∀ θ, (θ < angle_straight)%A → angle_add_overflow θ angle_straight = false.
 Proof.

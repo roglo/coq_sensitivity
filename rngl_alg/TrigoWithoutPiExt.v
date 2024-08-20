@@ -1127,7 +1127,6 @@ Theorem angle_eucl_dist_eq_cos_eq :
   ∀ θ1 θ2 θ3 θ4,
   (angle_eucl_dist θ1 θ2 = angle_eucl_dist θ3 θ4)%L ↔
   (rngl_cos (θ4 - θ3) = rngl_cos (θ2 - θ1))%L.
-About angle_eucl_dist_lt_cos_lt.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -1207,6 +1206,28 @@ split; intros H1234. {
   }
   now apply (rngl_sub_lt_mono_l Hop Hor).
 }
+Qed.
+
+Theorem rngl_sin_pos_lt_straight :
+  ∀ θ,
+  (0 < rngl_sin θ)%L
+  → (θ < angle_straight)%A.
+Proof.
+destruct_ac.
+intros * Hzs.
+progress unfold angle_ltb.
+rewrite (rngl_leb_refl Hor).
+generalize Hzs; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+apply rngl_ltb_lt; cbn.
+apply (rngl_lt_iff Hor).
+split; [ apply rngl_cos_bound | ].
+intros H; symmetry in H.
+apply eq_rngl_cos_opp_1 in H.
+subst θ.
+now apply (rngl_lt_irrefl Hor) in Hzs.
 Qed.
 
 End a.

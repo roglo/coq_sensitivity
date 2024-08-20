@@ -2280,7 +2280,31 @@ split. {
     subst θ4.
     now apply angle_lt_irrefl in H14.
   }
+  apply rngl_sin_pos_lt_straight.
+  (* lemma to do *)
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply rngl_sin_sub_nonneg.
+    apply rngl_sin_div_2_nonneg.
+    apply rngl_sin_div_2_nonneg.
+    apply rngl_cos_decr.
+    split; [ | apply angle_div_2_le_straight ].
+    apply angle_div_2_le_compat.
+    now apply angle_lt_le_incl in H14.
+  }
+  intro H; symmetry in H.
+  apply eq_rngl_sin_0 in H.
+  destruct H as [H41z| H41s]. {
+    apply -> angle_sub_move_0_r in H41z.
+    apply angle_div_2_eq_compat in H41z; subst θ4.
+    now apply angle_lt_irrefl in H14.
+  }
+  apply angle_sub_move_r in H41s.
+...
+Search (_ - _ = 0)%A.
+Search (rngl_cos (_ / ₂) ≤ _)%L.
 Search (_ - _ < _)%A.
+Search (_ < angle_straight)%A.
 ...
 Search (_ / ₂ - _ / ₂)%A.
 Search (_ < _ - _)%A.
