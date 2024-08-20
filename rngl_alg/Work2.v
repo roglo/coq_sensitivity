@@ -1960,6 +1960,88 @@ apply angle_nlt_ge in H12.
 now exfalso; apply H12.
 Qed.
 
+Theorem angle_lt_twice : ∀ θ, (0 < θ < angle_straight)%A → (θ < 2 * θ)%A.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * (Hzt, Hts).
+  rewrite (H1 θ) in Hzt.
+  now apply angle_lt_irrefl in Hzt.
+}
+intros * (Hzt, Hts).
+progress unfold angle_ltb in Hzt.
+progress unfold angle_ltb in Hts.
+progress unfold angle_ltb.
+cbn in Hzt, Hts.
+rewrite (rngl_leb_refl Hor) in Hzt, Hts.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst; [ | easy ].
+apply rngl_leb_le in Hzst.
+apply rngl_ltb_lt in Hzt, Hts.
+assert (H : (0 < rngl_sin θ)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; symmetry in H.
+  apply eq_rngl_sin_0 in H.
+  destruct H; subst θ. {
+    now apply (rngl_lt_irrefl Hor) in Hzt.
+  } {
+    now apply (rngl_lt_irrefl Hor) in Hts.
+  }
+}
+move H before Hzst; clear Hzst; rename H into Hzst.
+remember (0 ≤? rngl_sin (2 * θ))%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+apply rngl_leb_le in Hzs2.
+apply rngl_ltb_lt.
+generalize Hzs2; intros Hzs2v.
+rewrite rngl_sin_mul_2_l in Hzs2.
+apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs2.
+destruct Hzs2 as [Hzs2| Hzs2]. 2: {
+  destruct Hzs2 as (H2, _).
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H2.
+  apply H2; clear H2.
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+destruct Hzs2 as (_, Hzc).
+destruct (angle_lt_dec angle_right (2 * θ)) as [Hrt| Hrt]. {
+  apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
+  apply (rngl_nle_gt Hor).
+  intros Hzc2.
+  apply angle_nle_gt in Hrt.
+  apply Hrt.
+  progress unfold angle_leb.
+  apply rngl_leb_le in Hzs2v.
+  rewrite Hzs2v.
+  cbn - [ angle_mul_nat ].
+  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+  apply rngl_leb_le in H1.
+  rewrite H1; clear H1.
+  now apply rngl_leb_le.
+}
+apply angle_nlt_ge in Hrt.
+apply quadrant_1_sin_sub_pos_cos_lt; try easy; cycle 2. {
+  rewrite <- angle_add_diag.
+  now rewrite angle_add_sub.
+} {
+  now apply (rngl_lt_le_incl Hor) in Hzst.
+}
+progress unfold angle_leb in Hrt.
+cbn - [ angle_mul_nat ] in Hrt.
+apply rngl_leb_le in Hzs2v.
+rewrite Hzs2v in Hrt.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+apply rngl_leb_le in H1.
+rewrite H1 in Hrt.
+now apply rngl_leb_le in Hrt.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2179,78 +2261,8 @@ split. {
   rewrite angle_add_sub_swap.
   rewrite <- angle_add_sub_assoc.
   rewrite angle_add_diag.
-Theorem angle_lt_twice : ∀ θ, (0 < θ < angle_straight)%A → (θ < 2 * θ)%A.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * (Hzt, Hts).
-  rewrite (H1 θ) in Hzt.
-  now apply angle_lt_irrefl in Hzt.
-}
-intros * (Hzt, Hts).
-progress unfold angle_ltb in Hzt.
-progress unfold angle_ltb in Hts.
-progress unfold angle_ltb.
-cbn in Hzt, Hts.
-rewrite (rngl_leb_refl Hor) in Hzt, Hts.
-remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
-symmetry in Hzst.
-destruct zst; [ | easy ].
-apply rngl_leb_le in Hzst.
-apply rngl_ltb_lt in Hzt, Hts.
-assert (H : (0 < rngl_sin θ)%L). {
-  apply (rngl_lt_iff Hor).
-  split; [ easy | ].
-  intros H; symmetry in H.
-  apply eq_rngl_sin_0 in H.
-  destruct H; subst θ. {
-    now apply (rngl_lt_irrefl Hor) in Hzt.
-  } {
-    now apply (rngl_lt_irrefl Hor) in Hts.
-  }
-}
-move H before Hzst; clear Hzst; rename H into Hzst.
-remember (0 ≤? rngl_sin (2 * θ))%L as zs2 eqn:Hzs2.
-symmetry in Hzs2.
-destruct zs2; [ | easy ].
-apply rngl_leb_le in Hzs2.
-apply rngl_ltb_lt.
-generalize Hzs2; intros Hzs2v.
-rewrite rngl_sin_mul_2_l in Hzs2.
-apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs2.
-destruct Hzs2 as [Hzs2| Hzs2]. 2: {
-  destruct Hzs2 as (H2, _).
-  exfalso.
-  apply (rngl_nlt_ge Hor) in H2.
-  apply H2; clear H2.
-  apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-destruct Hzs2 as (_, Hzc).
-destruct (angle_lt_dec angle_right (2 * θ)) as [Hrt| Hrt]. {
-  apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-  apply (rngl_nle_gt Hor).
-  intros Hzc2.
-  apply angle_nle_gt in Hrt.
-  apply Hrt.
-  progress unfold angle_leb.
-  apply rngl_leb_le in Hzs2v.
-  rewrite Hzs2v.
-  cbn - [ angle_mul_nat ].
-  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-  apply rngl_leb_le in H1.
-  rewrite H1; clear H1.
-  now apply rngl_leb_le.
-}
-apply angle_nlt_ge in Hrt.
-apply quadrant_1_sin_sub_pos_cos_lt; try easy; cycle 2. {
-  rewrite <- angle_add_diag.
-  now rewrite angle_add_sub.
-} {
-  now apply (rngl_lt_le_incl Hor) in Hzst.
-}
+  apply angle_lt_twice.
+  split. {
 ...
 destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
 ...
