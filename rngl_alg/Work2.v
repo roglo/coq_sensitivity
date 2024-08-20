@@ -2233,73 +2233,90 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     apply (rngl_min_lt_iff Hor).
     rewrite He1, He2, He3.
 (*2*)
-right.
+    right.
 (*3*)
 (*
 apply (rngl_lt_iff Hor).
 split.
 *)
-rewrite <- (angle_eucl_dist_add_cancel_r _ _ (- θ1)).
-rewrite angle_add_add_swap.
-do 2 rewrite angle_add_opp_r.
-rewrite angle_sub_diag, angle_add_0_l.
-remember (θ1 / ₂ + θ4 / ₂)%A as θ.
-rewrite <- (angle_eucl_dist_add_cancel_r _ (_ + angle_straight) (- θ)).
-rewrite angle_add_add_swap.
-do 2 rewrite angle_add_opp_r.
-rewrite angle_sub_diag, angle_add_0_l.
-apply angle_dist_lt_r; [ apply angle_le_refl | ].
-split. {
-  subst θ.
-  rewrite angle_add_comm.
-  rewrite angle_sub_add_distr.
-  rewrite <- (angle_add_div_2_diag θ4) at 1.
-  rewrite angle_add_sub.
-  rewrite <- (angle_add_div_2_diag θ1) at 2.
-  rewrite angle_sub_add_distr.
-  rewrite <- (angle_add_div_2_diag θ4) at 2.
-  rewrite angle_add_sub_swap.
-  rewrite <- angle_add_sub_assoc.
-  rewrite angle_add_diag.
-  apply angle_lt_twice.
-  split. {
-    progress unfold angle_ltb.
-    cbn - [ angle_sub ].
-    rewrite (rngl_leb_refl Hor).
-    remember (0 ≤? rngl_sin _)%L as zs eqn:Hzs.
-    symmetry in Hzs.
-    destruct zs; [ | easy ].
-    apply rngl_ltb_lt.
-    apply (rngl_lt_iff Hor).
-    split; [ apply rngl_cos_bound | ].
-    intros H.
-    apply eq_rngl_cos_1 in H.
-    apply -> angle_sub_move_0_r in H.
-    apply (f_equal (λ a, (2 * a)%A)) in H.
-    do 2 rewrite angle_div_2_mul_2 in H.
-    subst θ4.
-    now apply angle_lt_irrefl in H14.
-  }
-  apply rngl_sin_pos_lt_straight.
-  (* lemma to do *)
-  apply (rngl_lt_iff Hor).
-  split. {
+    rewrite <- (angle_eucl_dist_add_cancel_r _ _ (- θ1)).
+    rewrite angle_add_add_swap.
+    do 2 rewrite angle_add_opp_r.
+    rewrite angle_sub_diag, angle_add_0_l.
+    remember (θ1 / ₂ + θ4 / ₂)%A as θ.
+    rewrite <- (angle_eucl_dist_add_cancel_r _ (_ + angle_straight) (- θ)).
+    rewrite angle_add_add_swap.
+    do 2 rewrite angle_add_opp_r.
+    rewrite angle_sub_diag, angle_add_0_l.
+    apply angle_dist_lt_r; [ apply angle_le_refl | ].
+    split. {
+      subst θ.
+      rewrite angle_add_comm.
+      rewrite angle_sub_add_distr.
+      rewrite <- (angle_add_div_2_diag θ4) at 1.
+      rewrite angle_add_sub.
+      rewrite <- (angle_add_div_2_diag θ1) at 2.
+      rewrite angle_sub_add_distr.
+      rewrite <- (angle_add_div_2_diag θ4) at 2.
+      rewrite angle_add_sub_swap.
+      rewrite <- angle_add_sub_assoc.
+      rewrite angle_add_diag.
+      apply angle_lt_twice.
+      split. {
+        progress unfold angle_ltb.
+        cbn - [ angle_sub ].
+        rewrite (rngl_leb_refl Hor).
+        remember (0 ≤? rngl_sin _)%L as zs eqn:Hzs.
+        symmetry in Hzs.
+        destruct zs; [ | easy ].
+        apply rngl_ltb_lt.
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_cos_bound | ].
+        intros H.
+        apply eq_rngl_cos_1 in H.
+        apply -> angle_sub_move_0_r in H.
+        apply (f_equal (λ a, (2 * a)%A)) in H.
+        do 2 rewrite angle_div_2_mul_2 in H.
+        subst θ4.
+        now apply angle_lt_irrefl in H14.
+      }
+      apply rngl_sin_pos_lt_straight.
+      (* lemma to do *)
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply rngl_sin_sub_nonneg.
+        apply rngl_sin_div_2_nonneg.
+        apply rngl_sin_div_2_nonneg.
+        apply rngl_cos_decr.
+        split; [ | apply angle_div_2_le_straight ].
+        apply angle_div_2_le_compat.
+        now apply angle_lt_le_incl in H14.
+      }
+      intro H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H41z| H41s]. {
+        apply -> angle_sub_move_0_r in H41z.
+        apply angle_div_2_eq_compat in H41z; subst θ4.
+        now apply angle_lt_irrefl in H14.
+      }
+      apply angle_sub_move_r in H41s.
+      apply (f_equal (λ a, (2 * a)%A)) in H41s.
+      rewrite angle_mul_add_distr_l in H41s.
+      do 2 rewrite angle_div_2_mul_2 in H41s.
+      rewrite <- angle_add_diag in H41s.
+      rewrite angle_straight_add_straight, angle_add_0_l in H41s.
+      subst θ4.
+      now apply angle_lt_irrefl in H14.
+    }
+    (* lemma to do *)
+    apply rngl_sin_nonneg_angle_le_straight.
+...
     apply rngl_sin_sub_nonneg.
-    apply rngl_sin_div_2_nonneg.
-    apply rngl_sin_div_2_nonneg.
-    apply rngl_cos_decr.
-    split; [ | apply angle_div_2_le_straight ].
-    apply angle_div_2_le_compat.
-    now apply angle_lt_le_incl in H14.
-  }
-  intro H; symmetry in H.
-  apply eq_rngl_sin_0 in H.
-  destruct H as [H41z| H41s]. {
-    apply -> angle_sub_move_0_r in H41z.
-    apply angle_div_2_eq_compat in H41z; subst θ4.
-    now apply angle_lt_irrefl in H14.
-  }
-  apply angle_sub_move_r in H41s.
+Search (_ → 0 ≤ rngl_sin _)%L.
+...
+Search (_ - _ ≤ angle_straight)%A.
+Search (_ - _ ≤ _)%A.
+Search (_ ≤ angle_straight)%A.
 ...
 Search (_ - _ = 0)%A.
 Search (rngl_cos (_ / ₂) ≤ _)%L.
