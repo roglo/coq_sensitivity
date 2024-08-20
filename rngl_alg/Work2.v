@@ -2193,10 +2193,6 @@ intros * (Hzt, Hts).
 progress unfold angle_ltb in Hzt.
 progress unfold angle_ltb in Hts.
 progress unfold angle_ltb.
-(*
-rewrite rngl_sin_mul_2_l.
-rewrite rngl_cos_mul_2_l.
-*)
 cbn in Hzt, Hts.
 rewrite (rngl_leb_refl Hor) in Hzt, Hts.
 remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
@@ -2204,20 +2200,7 @@ symmetry in Hzst.
 destruct zst; [ | easy ].
 apply rngl_leb_le in Hzst.
 apply rngl_ltb_lt in Hzt, Hts.
-remember (0 ≤? rngl_sin (2 * θ))%L as zs2 eqn:Hzs2.
-symmetry in Hzs2.
-destruct zs2; [ | easy ].
-apply rngl_leb_le in Hzs2.
-apply rngl_ltb_lt.
-rewrite rngl_sin_mul_2_l in Hzs2.
-apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs2.
-destruct Hzs2 as [Hzs2| Hzs2]. 2: {
-  destruct Hzs2 as (H2, _).
-  exfalso.
-  apply (rngl_nlt_ge Hor) in H2.
-  apply H2; clear H2.
-  apply (rngl_mul_pos_pos Hop Hor Hii).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+assert (H : (0 < rngl_sin θ)%L). {
   apply (rngl_lt_iff Hor).
   split; [ easy | ].
   intros H; symmetry in H.
@@ -2228,24 +2211,46 @@ destruct Hzs2 as [Hzs2| Hzs2]. 2: {
     now apply (rngl_lt_irrefl Hor) in Hts.
   }
 }
+move H before Hzst; clear Hzst; rename H into Hzst.
+remember (0 ≤? rngl_sin (2 * θ))%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+apply rngl_leb_le in Hzs2.
+apply rngl_ltb_lt.
+generalize Hzs2; intros Hzs2v.
+rewrite rngl_sin_mul_2_l in Hzs2.
+apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs2.
+destruct Hzs2 as [Hzs2| Hzs2]. 2: {
+  destruct Hzs2 as (H2, _).
+  exfalso.
+  apply (rngl_nlt_ge Hor) in H2.
+  apply H2; clear H2.
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
 destruct Hzs2 as (_, Hzc).
 destruct (angle_lt_dec angle_right (2 * θ)) as [Hrt| Hrt]. {
   apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-(* bon, chais pas *)
-...
-  apply quadrant_1_sin_sub_pos_cos_lt; try easy; cycle 2. {
-    rewrite <- angle_add_diag.
-    rewrite angle_add_sub.
-    apply (rngl_lt_iff Hor).
-    split; [ easy | ].
-    intros H; symmetry in H.
-    apply eq_rngl_sin_0 in H.
-    destruct H; subst θ. {
-      now apply (rngl_lt_irrefl Hor) in Hzt.
-    } {
-      now apply (rngl_lt_irrefl Hor) in Hts.
-    }
-  }
+  apply (rngl_nle_gt Hor).
+  intros Hzc2.
+  apply angle_nle_gt in Hrt.
+  apply Hrt.
+  progress unfold angle_leb.
+  apply rngl_leb_le in Hzs2v.
+  rewrite Hzs2v.
+  cbn - [ angle_mul_nat ].
+  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+  apply rngl_leb_le in H1.
+  rewrite H1; clear H1.
+  now apply rngl_leb_le.
+}
+apply angle_nlt_ge in Hrt.
+apply quadrant_1_sin_sub_pos_cos_lt; try easy; cycle 2. {
+  rewrite <- angle_add_diag.
+  now rewrite angle_add_sub.
+} {
+  now apply (rngl_lt_le_incl Hor) in Hzst.
+}
 ...
 destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
 ...
