@@ -2168,7 +2168,101 @@ do 2 rewrite angle_add_opp_r.
 rewrite angle_sub_diag, angle_add_0_l.
 apply angle_dist_lt_r; [ apply angle_le_refl | ].
 split. {
+  subst θ.
+  rewrite angle_add_comm.
+  rewrite angle_sub_add_distr.
+  rewrite <- (angle_add_div_2_diag θ4) at 1.
+  rewrite angle_add_sub.
+  rewrite <- (angle_add_div_2_diag θ1) at 2.
+  rewrite angle_sub_add_distr.
+  rewrite <- (angle_add_div_2_diag θ4) at 2.
+  rewrite angle_add_sub_swap.
+  rewrite <- angle_add_sub_assoc.
+  rewrite angle_add_diag.
+Theorem angle_lt_twice : ∀ θ, (0 < θ < angle_straight)%A → (θ < 2 * θ)%A.
+Proof.
+destruct_ac.
+intros * (Hzt, Hts).
+progress unfold angle_ltb in Hzt.
+progress unfold angle_ltb in Hts.
+progress unfold angle_ltb.
+(*
+rewrite rngl_sin_mul_2_l.
+rewrite rngl_cos_mul_2_l.
+*)
+cbn in Hzt, Hts.
+rewrite (rngl_leb_refl Hor) in Hzt, Hts.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst; [ | easy ].
+apply rngl_leb_le in Hzst.
+apply rngl_ltb_lt in Hzt, Hts.
+remember (0 ≤? rngl_sin (2 * θ))%L as zs2 eqn:Hzs2.
+symmetry in Hzs2.
+destruct zs2; [ | easy ].
+apply rngl_leb_le in Hzs2.
+apply rngl_ltb_lt.
+destruct (angle_le_dec angle_right (2 * θ)) as [Hrt| Hrt]. {
+  apply (rngl_le_lt_trans Hor _ 0).
+(* bon, chais pas *)
+...
+  apply quadrant_1_sin_sub_pos_cos_lt; try easy; cycle 2. {
+    rewrite <- angle_add_diag.
+    rewrite angle_add_sub.
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ. {
+      now apply (rngl_lt_irrefl Hor) in Hzt.
+    } {
+      now apply (rngl_lt_irrefl Hor) in Hts.
+    }
+  }
+...
+destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+...
+  apply quadrant_1_sin_sub_pos_cos_lt; try easy. 2: {
+    rewrite <- angle_add_diag.
+    rewrite angle_add_sub.
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H; subst θ. {
+      now apply (rngl_lt_irrefl Hor) in Hzt.
+    } {
+      now apply (rngl_lt_irrefl Hor) in Hts.
+    }
+  }
+(* ah mais c'est faux, ça, si θ > π/4 *)
+...
+  rewrite rngl_cos_mul_2_l'.
+  rewrite <- angle_add_diag.
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+... ...
+apply angle_lt_twice.
+...
+Search (_ < 2 * _)%A.
+Search (_ < _ + _)%A.
+...
+  do 3 rewrite <- angle_add_opp_r.
+  apply angle_add_lt_mono_r. {
+    rewrite angle_add_opp_r.
+    apply angle_add_not_overflow_equiv3.
+    progress unfold angle_add_not_overflow3.
+...
+Search (_ + _ < _ + _)%A.
+  apply angle_sub_lt_mono_r.
+...
   apply angle_sub_lt_mono_l.
+(**)
+...
+  apply angle_sub_lt_mono_l.
+  apply angle_add_not_overflow_equiv3.
+  progress unfold angle_add_not_overflow3.
+  rewrite angle_opp_involutive.
 ...
 subst θ.
 rewrite angle_sub_add_distr.
