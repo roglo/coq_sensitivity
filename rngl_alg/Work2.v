@@ -2363,6 +2363,28 @@ split.
       apply (rngl_lt_le_incl Hor) in Hzs4, Hzs1, H14.
       apply rngl_sin_sub_nonneg; try easy.
     }
+    apply rngl_leb_le in Hzs1.
+    destruct zs4. {
+      apply rngl_leb_le in Hzs4.
+      apply rngl_ltb_lt in H14.
+      apply (rngl_lt_le_incl Hor) in H14.
+      now apply (rngl_sin_sub_nonneg).
+    }
+    clear H14.
+    apply (rngl_leb_gt Hor) in Hzs4.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ4)) as [Hzc4| Hc4z]. {
+        change_angle_opp θ4.
+        progress sin_cos_opp_hyp T Hzs4.
+        progress sin_cos_opp_hyp T Hzc4.
+        rewrite <- angle_opp_add_distr.
+(* carrément ça marche pas, là *)
+...
+        apply (rngl_lt_le_incl Hor) in Hzs1, Hzs4, H14.
+        now apply rngl_sin_sub_nonneg.
+...
+apply (rngl_sin_sub_nonneg); try easy.
+rewrite rngl_sin_sub.
 ...
       apply (rngl_lt_le_incl Hor) in Hzs1. (*, Hzs4, H14.*)
       apply rngl_sin_sub_nonneg; try easy.
