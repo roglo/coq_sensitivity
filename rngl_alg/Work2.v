@@ -2378,7 +2378,38 @@ split.
         progress sin_cos_opp_hyp T Hzs4.
         progress sin_cos_opp_hyp T Hzc4.
         rewrite <- angle_opp_add_distr.
-(* carrément ça marche pas, là *)
+        progress unfold angle_ltb in H41.
+        rewrite rngl_sin_opp in H41.
+        rewrite rngl_sin_add_straight_r in H41.
+        rewrite rngl_cos_add_straight_r in H41.
+        cbn in H41.
+        do 2 rewrite (rngl_leb_opp_r Hop Hor 0%L) in H41.
+        rewrite (rngl_opp_0 Hop) in H41.
+        remember (rngl_sin θ4 ≤? 0)%L as z4s eqn:Hz4s.
+        remember (rngl_sin θ1 ≤? 0)%L as z1s eqn:Hz1s.
+        symmetry in Hz4s, Hz1s.
+        destruct z4s. 2: {
+          destruct z1s; [ easy | ].
+          apply (rngl_leb_gt Hor) in Hz4s, Hz1s.
+          apply rngl_ltb_lt in H41.
+          exfalso.
+          apply (rngl_nle_gt Hor) in H41.
+          apply H41; clear H41.
+          apply (rngl_le_opp_l Hop Hor).
+          now apply (rngl_add_nonneg_nonneg Hor).
+        }
+        apply rngl_leb_le in Hz4s.
+        now apply (rngl_nle_gt Hor) in Hz4s.
+      }
+      apply rngl_n
+...
+Search (rngl_sin (_ + _) ≤ 0)%L.
+2: {
+          apply (rngl_le_opp_nonneg).
+...
+        rewrite (rngl_leb_opp_r Hop Hor) in H41.
+Check rngl_leb_opp_r.
+Search (_ ≤? - _)%L.
 ...
         apply (rngl_lt_le_incl Hor) in Hzs1, Hzs4, H14.
         now apply rngl_sin_sub_nonneg.
