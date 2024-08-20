@@ -1961,40 +1961,6 @@ now exfalso; apply H12.
 Qed.
 
 (* to be completed
-(* ... et à déplacer dans Complex.v après angle_dist_le_r *)
-Theorem angle_dist_lt_r :
-  ∀ θ1 θ2 θ3,
-  (θ3 ≤ angle_straight)%A
-  → (θ1 < θ2 ≤ θ3)%A
-  → (angle_eucl_dist θ2 θ3 < angle_eucl_dist θ1 θ3)%L.
-Proof.
-destruct_ac.
-intros * H3s (H12, H23).
-apply (rngl_lt_iff Hor).
-split. {
-  apply angle_dist_le_r; [ easy | ].
-  split; [ | easy ].
-  now apply angle_lt_le_incl.
-}
-intros H.
-apply angle_eucl_dist_eq_cos_eq in H.
-apply rngl_cos_eq in H.
-destruct H as [H3| H3]. {
-  apply (f_equal (λ θ, (θ3 - θ)%A)) in H3.
-  do 2 rewrite angle_sub_sub_distr in H3.
-  rewrite angle_sub_diag in H3.
-  do 2 rewrite angle_add_0_l in H3.
-  subst θ2.
-  now apply angle_lt_irrefl in H12.
-}
-rewrite angle_opp_sub_distr in H3.
-(* ouais, chais pas *)
-...
-rewrite angle_eucl_dist_move_0_l in H.
-...
-*)
-
-(* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
    then n*θ' does not overflow either *)
@@ -2187,8 +2153,10 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
 (*2*)
 right.
 (*3*)
+(*
 apply (rngl_lt_iff Hor).
 split.
+*)
 rewrite <- (angle_eucl_dist_add_cancel_r _ _ (- θ1)).
 rewrite angle_add_add_swap.
 do 2 rewrite angle_add_opp_r.
@@ -2198,12 +2166,21 @@ rewrite <- (angle_eucl_dist_add_cancel_r _ (_ + angle_straight) (- θ)).
 rewrite angle_add_add_swap.
 do 2 rewrite angle_add_opp_r.
 rewrite angle_sub_diag, angle_add_0_l.
+apply angle_dist_lt_r; [ apply angle_le_refl | ].
+split. {
+  apply angle_sub_lt_mono_l.
+...
 subst θ.
 rewrite angle_sub_add_distr.
 rewrite angle_sub_sub_swap.
 rewrite <- (angle_add_div_2_diag θ4) at 2.
 rewrite angle_add_sub.
+apply angle_dist_le_r; [ apply angle_le_refl | ].
+...
+Check angle_dist_lt_r.
 About angle_dist_le_r.
+Check angle_dist_lt_r.
+...
 ...
 apply angle_dist_lt_r; [ apply angle_le_refl | ].
 apply angle_dist_le_r; [ apply angle_le_refl | ].
