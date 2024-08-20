@@ -2263,6 +2263,28 @@ split. {
   rewrite angle_add_diag.
   apply angle_lt_twice.
   split. {
+    progress unfold angle_ltb.
+    cbn - [ angle_sub ].
+    rewrite (rngl_leb_refl Hor).
+    remember (0 ≤? rngl_sin _)%L as zs eqn:Hzs.
+    symmetry in Hzs.
+    destruct zs; [ | easy ].
+    apply rngl_ltb_lt.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H.
+    apply eq_rngl_cos_1 in H.
+    apply -> angle_sub_move_0_r in H.
+    apply (f_equal (λ a, (2 * a)%A)) in H.
+    do 2 rewrite angle_div_2_mul_2 in H.
+    subst θ4.
+    now apply angle_lt_irrefl in H14.
+  }
+Search (_ - _ < _)%A.
+...
+Search (_ / ₂ - _ / ₂)%A.
+Search (_ < _ - _)%A.
+apply angle_sub_lt_straight_l.
 ...
 destruct (rngl_le_dec Hor 0 (rngl_cos θ)) as [Hzc| Hzc]. {
 ...
