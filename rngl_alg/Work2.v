@@ -2487,7 +2487,45 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
       apply angle_add_overflow_div_2_div_2.
     }
     apply angle_add_straight_r_not_overflow.
+    apply rngl_sin_pos_lt_straight.
+(*1*)
+...
+    apply rngl_sin_add_pos_2. {
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_sin_div_2_nonneg | ].
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H| H]. {
+        apply eq_angle_div_2_0 in H.
+        subst θ4.
+        apply angle_nle_gt in H14.
+        apply H14.
+        apply angle_nonneg.
+      }
+      now apply (angle_div_2_not_straight Hc1) in H.
+    } {
+      apply rngl_sin_div_2_nonneg.
+    } {
+      apply rngl_cos_div_2_nonneg.
+...1
+    apply rngl_sin_add_pos_1.
+    apply rngl_sin_div_2_nonneg.
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_sin_div_2_nonneg | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H| H]; [ | apply angle_div_2_not_straight in H ].
+    apply eq_angle_div_2_0 in H.
+    subst θ1.
+Search (_ / ₂ = 0)%A.
+Search (0 < rngl_sin (_ / ₂))%L.
+Search (0 < rngl_sin (_ + _))%L.
+...
+    rewrite <- rngl_sin_angle_div_2_add_not_overflow.
+Search (rngl_sin (_ / ₂ + _)).
+Search (_ + _ < _)%A.
 Search (_ + _ < angle_straight)%A.
+Search (_ < angle_straight)%A.
 Search (angle_add_overflow _ angle_straight).
 ...
   apply angle_add_lt_mono_r; [ apply angle_add_overflow_div_2_div_2 | ].
