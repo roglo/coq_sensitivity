@@ -2212,6 +2212,13 @@ apply (rngl_lt_le_incl Hor) in Hc4z.
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
+Theorem angle_not_neg : ∀ θ, ¬ (θ < 0)%A.
+Proof.
+intros.
+apply angle_nlt_ge.
+apply angle_nonneg.
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2489,24 +2496,59 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     apply angle_add_straight_r_not_overflow.
     apply rngl_sin_pos_lt_straight.
 (*1*)
-...
-    apply rngl_sin_add_pos_2. {
-      apply (rngl_lt_iff Hor).
-      split; [ apply rngl_sin_div_2_nonneg | ].
-      intros H; symmetry in H.
-      apply eq_rngl_sin_0 in H.
-      destruct H as [H| H]. {
-        apply eq_angle_div_2_0 in H.
-        subst θ4.
-        apply angle_nle_gt in H14.
-        apply H14.
-        apply angle_nonneg.
+    destruct (rngl_le_dec Hor 0 (rngl_sin θ4)) as [Hzs4| Hs4z]. {
+      apply rngl_sin_add_pos_2. {
+        apply (rngl_lt_iff Hor).
+        split; [ apply rngl_sin_div_2_nonneg | ].
+        intros H; symmetry in H.
+        apply eq_rngl_sin_0 in H.
+        destruct H as [H| H]. {
+          apply eq_angle_div_2_0 in H.
+          subst θ4.
+          now apply angle_not_neg in H14.
+        }
+        now apply (angle_div_2_not_straight Hc1) in H.
+      } {
+        apply rngl_sin_div_2_nonneg.
+      } {
+        now apply rngl_cos_div_2_nonneg.
+      } {
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply rngl_cos_div_2_nonneg.
+          apply rngl_sin_nonneg_angle_le_straight.
+          apply (angle_le_trans _ θ4); [ now apply angle_lt_le_incl | ].
+          now apply rngl_sin_nonneg_angle_le_straight.
+        }
+        intros H; symmetry in H.
+        apply eq_rngl_cos_0 in H.
+        destruct H as [H1r| H1r]. {
+          (* lemma to do *)
+          apply (f_equal (λ a, (2 * a)%A)) in H1r.
+          rewrite angle_div_2_mul_2 in H1r.
+          (* lemma to do *)
+          rewrite <- angle_add_diag in H1r.
+          rewrite angle_right_add_right in H1r.
+          subst θ1.
+          rewrite angle_straight_add_straight in H41.
+          now apply angle_not_neg in H41.
+        }
+        apply (f_equal (λ a, (2 * a)%A)) in H1r.
+        rewrite angle_div_2_mul_2 in H1r.
+        (* lemma to do *)
+        rewrite <- angle_mul_opp in H1r.
+        rewrite <- angle_add_diag in H1r.
+        rewrite angle_right_add_right in H1r.
+        rewrite angle_opp_straight in H1r.
+        subst θ1.
+        rewrite angle_straight_add_straight in H41.
+        now apply angle_not_neg in H41.
       }
-      now apply (angle_div_2_not_straight Hc1) in H.
-    } {
-      apply rngl_sin_div_2_nonneg.
-    } {
-      apply rngl_cos_div_2_nonneg.
+    }
+    apply (rngl_nle_gt Hor) in Hs4z.
+(*
+          apply angle_le_add_le_sub_straight_r in H41; [ | easy ].
+*)
 ...1
     apply rngl_sin_add_pos_1.
     apply rngl_sin_div_2_nonneg.
