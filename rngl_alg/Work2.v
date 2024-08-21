@@ -2536,28 +2536,47 @@ intros Hmt.
 specialize (Hnt _ Hmn) as Hmtz.
 set (ε1 := angle_eucl_dist (m * θ') 0).
 set (ε2 := angle_eucl_dist (m * θ') θ').
-specialize (Hlim 1 (rngl_min ε1 (ε2 / 2))%L) as H1.
-specialize (Hlim m (rngl_min ε1 (ε2 / 2))%L) as H2.
-assert (Hε : (0 < rngl_min ε1 (ε2 / 2))%L). {
+set (ε3 := angle_eucl_dist θ' (m * θ' + angle_straight)).
+specialize (Hlim 1 (rngl_min3 ε1 (ε2 / 2) ε3)%L) as H1.
+specialize (Hlim m (rngl_min3 ε1 (ε2 / 2) ε3)%L) as H2.
+assert (Hε : (0 < rngl_min3 ε1 (ε2 / 2) ε3)%L). {
   apply rngl_min_glb_lt. {
-    progress unfold ε1.
+    apply rngl_min_glb_lt. {
+      progress unfold ε1.
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      apply not_eq_sym.
+      intros H.
+      now apply angle_eucl_dist_separation in H.
+    }
+    progress unfold ε2.
+    apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
     apply (rngl_lt_iff Hor).
     split; [ apply angle_eucl_dist_nonneg | ].
     apply not_eq_sym.
     intros H.
-    now apply angle_eucl_dist_separation in H.
+    apply angle_eucl_dist_separation in H.
+    rewrite H in Hmt.
+    now apply angle_lt_irrefl in Hmt.
   }
-  progress unfold ε2.
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
+  progress unfold ε3.
   apply (rngl_lt_iff Hor).
   split; [ apply angle_eucl_dist_nonneg | ].
   apply not_eq_sym.
   intros H.
   apply angle_eucl_dist_separation in H.
-  rewrite H in Hmt.
-  now apply angle_lt_irrefl in Hmt.
+  apply angle_nle_gt in Hts.
+  apply Hts; clear Hts.
+  rewrite H.
+  (* lemma to do *)
+  rewrite angle_add_comm.
+  apply angle_le_add_r.
+  apply (angle_add_overflow_le_lt angle_straight).
+  apply angle_le_refl.
+  rewrite angle_opp_straight.
+...
 }
 specialize (H1 Hε).
 specialize (H2 Hε).
@@ -2570,6 +2589,9 @@ do 2 rewrite angle_mul_1_l in HN1.
 specialize angle_eucl_dist_lt_angle_lt_le_lt as H1.
 specialize (H1 (m * θ') (m * θ i) (θ i) θ')%A.
 specialize (H1 _ _ _ eq_refl eq_refl eq_refl).
+progress fold ε1 in H1.
+progress fold ε2 in H1.
+set (ε3 := angle_eucl_dist θ' (m * θ' + angle_straight)) in H1.
 ...
 specialize (H1 ε1 ε2 eq_refl eq_refl HN1 HN2 Hmt).
 (* ok, contradiction *)
