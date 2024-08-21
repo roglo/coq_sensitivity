@@ -1230,4 +1230,49 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hzs.
 Qed.
 
+Theorem angle_add_straight_r_not_overflow :
+  ∀ θ, (θ < angle_straight)%A → angle_add_overflow θ angle_straight = false.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hts.
+  rewrite (H1 θ), (H1 angle_straight) in Hts.
+  now apply angle_lt_irrefl in Hts.
+}
+intros * Hts.
+progress unfold angle_ltb in Hts.
+cbn in Hts.
+rewrite (rngl_leb_refl Hor) in Hts.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+rewrite rngl_sin_add_straight_r.
+rewrite rngl_cos_add_straight_r.
+rewrite (rngl_leb_0_opp Hop Hor).
+destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hzs| Hsz]. {
+  generalize Hzs; intros H.
+  apply rngl_leb_le in H.
+  rewrite H in Hts |-*; clear H.
+  apply rngl_ltb_lt in Hts.
+  destruct (rngl_le_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
+    apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
+    apply eq_rngl_sin_0 in Hzs.
+    destruct Hzs; subst θ; cbn; rewrite (rngl_leb_refl Hor). {
+      apply (rngl_ltb_ge Hor).
+      apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
+    }
+    exfalso.
+    now apply (rngl_lt_irrefl Hor) in Hts.
+  }
+  apply (rngl_nle_gt Hor) in Hsz.
+  generalize Hsz; intros H.
+  apply (rngl_leb_gt Hor) in H.
+  now rewrite H; clear H.
+}
+apply (rngl_nle_gt Hor) in Hsz.
+generalize Hsz; intros H.
+apply (rngl_leb_gt Hor) in H.
+now rewrite H in Hts.
+Qed.
+
 End a.

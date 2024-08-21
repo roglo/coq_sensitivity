@@ -2472,6 +2472,25 @@ assert (H143 : (θ1 / ₂ + θ4 / ₂ < θ3)%A). {
     }
     now apply angle_le_add_le_sub_straight_r.
   }
+  split. {
+    rewrite <- (angle_add_div_2_diag θ4) at 2.
+    apply angle_add_lt_mono_r; [ apply angle_add_overflow_div_2_div_2 | ].
+    now apply angle_div_2_lt_compat.
+  }
+  rewrite <- (angle_add_div_2_diag θ4) at 1.
+  rewrite angle_add_add_swap.
+  apply angle_add_lt_mono_r. {
+    (* lemma to do *)
+    apply angle_add_not_overflow_comm.
+    rewrite angle_add_comm.
+    apply angle_add_not_overflow_move_add. {
+      apply angle_add_overflow_div_2_div_2.
+    }
+    apply angle_add_straight_r_not_overflow.
+Search (_ + _ < angle_straight)%A.
+Search (angle_add_overflow _ angle_straight).
+...
+  apply angle_add_lt_mono_r; [ apply angle_add_overflow_div_2_div_2 | ].
 ...
       apply (rngl_lt_le_incl Hor) in Hzs4, Hzs1, H14.
 ...
