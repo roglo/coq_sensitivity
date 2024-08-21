@@ -2614,7 +2614,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
   progress unfold seq_angle_to_div_nat.
   rewrite (H1 (_ * _)%A).
@@ -2628,7 +2628,8 @@ symmetry in Hts.
 destruct ts. {
   now apply angle_add_overflow_pow2_div_mul_pow2_mul_when_lt_straight.
 }
-apply angle_ltb_ge in Hts.
+apply Bool.not_true_iff_false in Hts.
+apply angle_nlt_ge in Hts.
 (**)
 progress unfold seq_angle_to_div_nat.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
@@ -2663,6 +2664,7 @@ assert (Hts''' : (θ' / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A). {
   subst θ'.
   now apply seq_angle_to_div_nat_div_2_le_straight_div_pow2_log2.
 }
+...
 apply angle_add_not_overflow_equiv.
 progress unfold angle_add_not_overflow2.
 split. {
