@@ -2042,6 +2042,16 @@ rewrite H1 in Hrt.
 now apply rngl_leb_le in Hrt.
 Qed.
 
+Theorem rngl_leb_0_opp :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤? - a)%L = (a ≤? 0)%L.
+Proof.
+intros Hop Hor *.
+rewrite (rngl_leb_opp_r Hop Hor).
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2379,8 +2389,7 @@ split.
         rewrite rngl_sin_add_straight_r in H41.
         rewrite rngl_cos_add_straight_r in H41.
         cbn in H41.
-        do 2 rewrite (rngl_leb_opp_r Hop Hor 0%L) in H41.
-        rewrite (rngl_opp_0 Hop) in H41.
+        do 2 rewrite (rngl_leb_0_opp Hop Hor) in H41.
         remember (rngl_sin θ4 ≤? 0)%L as z4s eqn:Hz4s.
         remember (rngl_sin θ1 ≤? 0)%L as z1s eqn:Hz1s.
         symmetry in Hz4s, Hz1s.
@@ -2404,9 +2413,7 @@ split.
       generalize Hzs4; intros H.
       apply (rngl_leb_gt Hor) in H.
       rewrite H in H41; clear H.
-      (* lemma to do *)
-      rewrite (rngl_leb_opp_r Hop Hor) in H41.
-      rewrite (rngl_opp_0 Hop) in H41.
+      rewrite (rngl_leb_0_opp Hop Hor) in H41.
       remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
       symmetry in Hs1z.
       destruct s1z; [ easy | ].
@@ -2423,6 +2430,58 @@ split.
       now apply rngl_sin_sub_nonneg.
     }
     apply (rngl_nle_gt Hor) in Hc1z.
+(*
+    change_angle_sub_l θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_hyp T Hc1z.
+    rewrite angle_sub_sub_distr.
+    rewrite <- angle_add_sub_swap.
+    progress sin_cos_add_sub_straight_goal T.
+*)
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hc1z.
+    progress sin_cos_add_sub_right_goal T.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ4)) as [Hzc4| Hc4z]. {
+      change_angle_add_r θ4 angle_right.
+      progress sin_cos_add_sub_right_hyp T Hzs4.
+      progress sin_cos_add_sub_right_hyp T Hzc4.
+      rewrite angle_sub_sub_swap.
+      progress sin_cos_add_sub_right_goal T.
+      rewrite rngl_sin_sub_anticomm.
+      apply (rngl_opp_nonpos_nonneg Hop Hor).
+      progress unfold angle_ltb in H41.
+      rewrite rngl_sin_sub_right_r in H41.
+      rewrite rngl_sin_add_straight_r in H41.
+      rewrite rngl_sin_add_right_r in H41.
+      rewrite rngl_cos_sub_right_r in H41.
+      rewrite rngl_cos_add_straight_r in H41.
+      rewrite rngl_cos_add_right_r in H41.
+      do 2 rewrite (rngl_leb_0_opp Hop Hor) in H41.
+      rewrite (rngl_opp_involutive Hop) in H41.
+      rename Hzs1 into Hzc1; rename Hc1z into Hzs1.
+      remember (rngl_cos θ4 ≤? 0)%L as c4z eqn:Hc4z.
+      remember (rngl_cos θ1 ≤? 0)%L as c1z eqn:Hc1z.
+      symmetry in Hc4z, Hc1z.
+      destruct c4z. {
+        apply rngl_leb_le in Hc4z.
+        now apply (rngl_nlt_ge Hor) in Hc4z.
+      }
+      destruct c1z; [ easy | ].
+      apply rngl_ltb_lt in H41.
+      apply (rngl_lt_le_incl Hor) in Hzs1.
+      apply rngl_sin_sub_nonneg; [ easy | easy | ].
+      apply (rngl_lt_le_incl Hor) in H41, Hzs4.
+      now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
+    }
+    apply (rngl_nle_gt Hor) in Hc4z.
+...
+do 2 rewrite rngl_leb_0_opp in H41.
+...
+rngl_leb_opp_r:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_opp T = true → rngl_is_ordered T = true → ∀ a b : T, (a ≤? - b)%L = (b ≤? - a)%L
+
 ...
       apply (rngl_lt_le_incl Hor) in Hzs4, Hzs1, H14.
 ...
