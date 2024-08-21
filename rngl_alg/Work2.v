@@ -2465,6 +2465,10 @@ split.
       now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
     }
     apply (rngl_nle_gt Hor) in Hc4z.
+    change_angle_add_r θ4 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs4.
+    progress sin_cos_add_sub_straight_hyp T Hc4z.
+    progress sin_cos_add_sub_straight_goal T.
 ...
       apply (rngl_lt_le_incl Hor) in Hzs4, Hzs1, H14.
 ...

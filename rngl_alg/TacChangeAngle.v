@@ -78,6 +78,7 @@ Ltac sin_cos_add_sub_straight_hyp T H :=
   repeat rewrite -> (angle_add_add_swap _ angle_straight) in H;
   repeat rewrite <- (angle_add_sub_swap _ _ angle_straight) in H;
   repeat rewrite -> (angle_add_sub_swap _ angle_straight) in H;
+  repeat rewrite -> (angle_sub_sub_swap _ angle_straight) in H;
   repeat rewrite <- (angle_sub_sub_distr angle_straight) in H;
   set (Hor' := ac_or);
   assert (Hos' : rngl_has_opp_or_subt T = true) by
@@ -148,6 +149,7 @@ Ltac sin_cos_add_sub_straight_goal T :=
   repeat rewrite -> (angle_add_add_swap _ angle_straight);
   repeat rewrite <- (angle_add_sub_swap _ _ angle_straight);
   repeat rewrite -> (angle_add_sub_swap _ angle_straight);
+  repeat rewrite -> (angle_sub_sub_swap _ angle_straight);
   repeat rewrite <- (angle_sub_sub_distr angle_straight);
   set (Hor' := ac_or);
   repeat rewrite -> rngl_sin_sub_straight_l;
