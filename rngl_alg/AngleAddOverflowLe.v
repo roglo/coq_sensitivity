@@ -829,8 +829,7 @@ apply (angle_lt_le_trans _ θ); [ easy | ].
 progress unfold angle_leb in H2.
 progress unfold angle_leb.
 cbn in H2 |-*.
-rewrite (rngl_leb_opp_r Hop Hor) in H2.
-rewrite (rngl_opp_0 Hop) in H2.
+rewrite (rngl_leb_0_opp Hop Hor) in H2.
 rewrite (rngl_leb_opp_r Hop Hor).
 rewrite (rngl_opp_0 Hop).
 remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.

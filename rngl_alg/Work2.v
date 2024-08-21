@@ -2042,16 +2042,6 @@ rewrite H1 in Hrt.
 now apply rngl_leb_le in Hrt.
 Qed.
 
-Theorem rngl_leb_0_opp :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a, (0 ≤? - a)%L = (a ≤? 0)%L.
-Proof.
-intros Hop Hor *.
-rewrite (rngl_leb_opp_r Hop Hor).
-now rewrite (rngl_opp_0 Hop).
-Qed.
-
 (* to be completed
 (* if a sequence of angles θi has a limit θ',
    and if ∀ i, n*θi does not overflow,
@@ -2476,21 +2466,12 @@ split.
     }
     apply (rngl_nle_gt Hor) in Hc4z.
 ...
-do 2 rewrite rngl_leb_0_opp in H41.
-...
-rngl_leb_opp_r:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → rngl_has_opp T = true → rngl_is_ordered T = true → ∀ a b : T, (a ≤? - b)%L = (b ≤? - a)%L
-
-...
       apply (rngl_lt_le_incl Hor) in Hzs4, Hzs1, H14.
 ...
 Search (rngl_sin (_ + _) ≤ 0)%L.
 2: {
           apply (rngl_le_opp_nonneg).
 ...
-        rewrite (rngl_leb_opp_r Hop Hor) in H41.
-Check rngl_leb_opp_r.
 Search (_ ≤? - _)%L.
 ...
         apply (rngl_lt_le_incl Hor) in Hzs1, Hzs4, H14.

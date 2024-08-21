@@ -1162,8 +1162,7 @@ enough (H21 : (θ1 + angle_straight - θ2 < angle_straight)%A). {
   progress unfold angle_ltb in H31.
   rewrite rngl_sin_add_straight_r in H31.
   rewrite rngl_cos_add_straight_r in H31.
-  rewrite (rngl_leb_opp_r Hop Hor) in H31.
-  rewrite (rngl_opp_0 Hop) in H31.
+  rewrite (rngl_leb_0_opp Hop Hor) in H31.
   remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
   symmetry in Hzs3.
   generalize Hzs1; intros H.
@@ -1209,8 +1208,7 @@ rewrite rngl_sin_add_straight_r in H31.
 rewrite rngl_cos_add_straight_r in H31.
 cbn - [ angle_sub ].
 rewrite (rngl_leb_refl Hor).
-rewrite (rngl_leb_opp_r Hop Hor) in H31.
-rewrite (rngl_opp_0 Hop) in H31.
+rewrite (rngl_leb_0_opp Hop Hor) in H31.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
 remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
 remember (0 ≤? rngl_sin (θ3 - θ1))%L as zs31 eqn:Hzs31.
@@ -1286,8 +1284,7 @@ destruct zs31. {
   subst θ1.
   rewrite rngl_sin_sub_straight_r in H13, Hs1z.
   rewrite rngl_cos_sub_straight_r in H13, H31.
-  rewrite (rngl_leb_opp_r Hop Hor) in H13.
-  rewrite (rngl_opp_0 Hop) in H13.
+  rewrite (rngl_leb_0_opp Hop Hor) in H13.
   rewrite (rngl_leb_opp_l Hop Hor) in Hs1z.
   rewrite (rngl_opp_0 Hop) in Hs1z.
   apply rngl_leb_le in Hzs3.
@@ -1301,8 +1298,7 @@ destruct zs31. {
 exfalso.
 clear H1 Hd23.
 rewrite rngl_sin_sub_anticomm in Hzs31.
-rewrite (rngl_leb_opp_r Hop Hor) in Hzs31.
-rewrite (rngl_opp_0 Hop) in Hzs31.
+rewrite (rngl_leb_0_opp Hop Hor) in Hzs31.
 apply (rngl_leb_gt Hor) in Hzs31.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 symmetry in Hzs1.

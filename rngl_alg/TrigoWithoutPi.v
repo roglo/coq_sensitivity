@@ -3814,8 +3814,7 @@ rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
 do 2 rewrite (rngl_mul_opp_r Hop).
 do 2 rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_leb_opp_r Hop Hor).
-rewrite (rngl_opp_0 Hop).
+rewrite (rngl_leb_0_opp Hop Hor).
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_r.
 rewrite (rngl_opp_involutive Hop).

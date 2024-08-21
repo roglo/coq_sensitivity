@@ -5915,6 +5915,16 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_leb_0_opp :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤? - a)%L = (a ≤? 0)%L.
+Proof.
+intros Hop Hor *.
+rewrite (rngl_leb_opp_r Hop Hor).
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
 Theorem rngl_ltb_opp_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

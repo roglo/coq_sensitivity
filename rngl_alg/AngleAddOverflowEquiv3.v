@@ -177,8 +177,7 @@ split; intros H12. {
   progress unfold angle_ltb.
   move H2z before θ2.
   cbn.
-  rewrite (rngl_leb_opp_r Hop Hor).
-  rewrite (rngl_opp_0 Hop).
+  rewrite (rngl_leb_0_opp Hop Hor).
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
   remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
   remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
@@ -424,8 +423,7 @@ destruct H12 as [H12| H12]. {
 progress unfold angle_ltb in H12.
 progress unfold angle_ltb.
 cbn in H12.
-rewrite (rngl_leb_opp_r Hop Hor) in H12.
-rewrite (rngl_opp_0 Hop) in H12.
+rewrite (rngl_leb_0_opp Hop Hor) in H12.
 remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
 remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
 remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.

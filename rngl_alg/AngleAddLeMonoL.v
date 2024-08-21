@@ -177,8 +177,7 @@ destruct H21 as [H21| H21]. {
   rewrite angle_opp_add_distr.
   rewrite rngl_sin_sub_right_r.
   cbn.
-  rewrite <- (rngl_leb_opp_r Hop Hor).
-  rewrite (rngl_opp_0 Hop).
+  rewrite (rngl_leb_0_opp Hop Hor).
   apply (rngl_leb_gt Hor) in Hs1z.
   rewrite Hs1z.
   remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.

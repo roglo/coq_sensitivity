@@ -311,7 +311,7 @@ rewrite rngl_sin_right_div_2.
 rewrite rngl_cos_right_div_2.
 rewrite rngl_sin_5_right_div_2.
 rewrite rngl_cos_5_right_div_2.
-rewrite (rngl_leb_opp_r Hop Hor), (rngl_opp_0 Hop).
+rewrite (rngl_leb_0_opp Hop Hor).
 specialize rl_sqrt_half_nonneg as H.
 apply rngl_leb_le in H.
 rewrite H; clear H.
@@ -446,8 +446,7 @@ progress unfold angle_add_overflow.
 progress unfold angle_ltb.
 rewrite rngl_sin_add_straight_r.
 rewrite rngl_cos_add_straight_r.
-rewrite (rngl_leb_opp_r Hop Hor).
-rewrite (rngl_opp_0 Hop).
+rewrite (rngl_leb_0_opp Hop Hor).
 destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hzs| Hsz]. {
   generalize Hzs; intros H.
   apply rngl_leb_le in H.
@@ -732,8 +731,7 @@ split; intros H12. {
         progress unfold angle_add_overflow.
         progress unfold angle_ltb.
         progress sin_cos_add_sub_straight_goal T.
-        rewrite (rngl_leb_opp_r Hop Hor).
-        rewrite (rngl_opp_0 Hop).
+        rewrite (rngl_leb_0_opp Hop Hor).
         generalize Hzs2; intros H.
         apply (rngl_lt_le_incl Hor) in H.
         apply rngl_leb_le in H.
@@ -809,8 +807,7 @@ split; intros H12. {
       progress unfold angle_ltb.
       rewrite rngl_sin_5_right_div_2.
       rewrite rngl_cos_5_right_div_2.
-      rewrite (rngl_leb_opp_r Hop Hor).
-      rewrite (rngl_opp_0 Hop).
+      rewrite (rngl_leb_0_opp Hop Hor).
       specialize (rl_sqrt_half_pos Hc1) as H.
       apply (rngl_leb_gt Hor) in H.
       rewrite H; clear H.
@@ -977,8 +974,7 @@ split; intros H12. {
         rewrite rngl_sin_add_straight_r.
         rewrite rngl_cos_add_straight_r.
         rewrite rngl_cos_add_right_r.
-        rewrite (rngl_leb_opp_r Hop Hor).
-        rewrite (rngl_opp_0 Hop).
+        rewrite (rngl_leb_0_opp Hop Hor).
         generalize Hzs12; intros H.
         apply (rngl_leb_gt Hor) in H.
         rewrite H; clear H.

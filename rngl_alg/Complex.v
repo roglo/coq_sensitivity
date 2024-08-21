@@ -4369,8 +4369,7 @@ destruct zs. {
       progress unfold angle_ltb in Haov.
       progress unfold angle_leb.
       rewrite rngl_sin_add_straight_r.
-      rewrite (rngl_leb_opp_r Hop Hor).
-      rewrite (rngl_opp_0 Hop).
+      rewrite (rngl_leb_0_opp Hop Hor).
       remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
       symmetry in Hzst.
       destruct zst. {
