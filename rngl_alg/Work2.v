@@ -2609,6 +2609,9 @@ Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
       (m * seq_angle_to_div_nat θ n i) =
       false.
 Proof.
+(*1*)
+Inspect 1.
+...1
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
