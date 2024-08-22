@@ -2688,6 +2688,22 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_to_div_nat θ n).
 Proof.
+intros * ε Hε.
+progress unfold seq_angle_to_div_nat.
+enough (H :
+  ∃ N : nat,
+    ∀ p q : nat,
+      N ≤ p
+      → N ≤ q
+        → (angle_eucl_dist (2 ^ p / n * (θ / ₂^p) - 2 ^ q / n * (θ / ₂^q)) 0
+           < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  rewrite angle_eucl_dist_move_0_r.
+  now apply HN.
+}
+...
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
