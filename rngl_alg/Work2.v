@@ -2468,6 +2468,19 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_mul_nat_overflow_0_r.
 }
 intros * Hi Hlim Hts Hnt.
+(* to be completed
+clear Hts.
+destruct (angle_le_dec angle_straight θ') as [Hts| Hts]. {
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  apply angle_lt_eq_cases in Hts.
+  destruct Hts as [Hts| Hts]. 2: {
+    subst θ'.
+    specialize (Hnt n).
+    assert (H : 0 < n ≤ n) by flia Hnz.
+    specialize (Hnt H); clear H.
+}
+apply angle_nle_gt in Hts.
+*)
 destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
   subst θ'.
   apply angle_mul_nat_overflow_0_r.
