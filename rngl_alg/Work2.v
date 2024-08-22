@@ -2470,15 +2470,42 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hi Hlim Hts Hnt.
 (* to be completed
 clear Hts.
-destruct (angle_le_dec angle_straight θ') as [Hts| Hts]. {
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  apply angle_lt_eq_cases in Hts.
-  destruct Hts as [Hts| Hts]. 2: {
-    subst θ'.
-    specialize (Hnt n).
-    assert (H : 0 < n ≤ n) by flia Hnz.
-    specialize (Hnt H); clear H.
+destruct (lt_dec n 2) as [Hn2| Hn2]. {
+  destruct n; [ easy | ].
+  destruct n; [ easy | flia Hn2 ].
 }
+apply Nat.nlt_ge in Hn2.
+destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
+  set (θ2 := ((angle_straight + θ') / ₂)%A).
+  set (ε := angle_eucl_dist angle_straight θ2).
+  specialize (Hlim ε).
+  assert (H : (0 < ε)%L) by admit.
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  specialize (Hi N).
+  exfalso.
+  apply Bool.not_true_iff_false in Hi.
+  apply Hi; clear Hi.
+  assert (Htn : (angle_straight < θ N)%A). {
+    specialize (angle_eucl_dist_lt_angle_lt_lt angle_straight θ2 (θ N)) as H1.
+    eapply angle_lt_trans; [ | apply H1 ].
+    admit.
+...
+    apply (angle_lt_le_trans _ θ2).
+...
+    specialize (angle_eucl_dist_lt_angle_lt_lt angle_straight (θ N) θ') as H1.
+...
+    apply (angle_eucl_dist_lt_angle_lt_lt (θ N) angle_straight θ').
+    apply (angle_eucl_dist_lt_angle_lt_lt angle_straight (θ N) θ').
+    apply (angle_eucl_dist_lt_angle_lt_lt2 angle_straight (θ N) (θ N)).
+Check angle_eucl_dist_lt_angle_lt_lt.
+    specialize (angle_eucl_dist_lt_angle_lt_lt2 angle_straight (θ N) θ') as H1.
+...
+    specialize (angle_eucl_dist_lt_angle_lt_lt (θ N) θ') as H1.
+...
+    apply (angle_lt_le_trans _ ((angle_straight + θ') / ₂)).
+...
 apply angle_nle_gt in Hts.
 *)
 destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
