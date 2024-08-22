@@ -2698,10 +2698,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros.
-set (u := λ i, (2 ^ i / n * angle_div_2_pow θ i)%A).
 apply Cauchy_sin_cos_Cauchy_angle. {
   (* lemma to do *)
-...
+  set (u := λ i, (2 ^ i / n * angle_div_2_pow θ i)%A).
   progress unfold seq_angle_to_div_nat.
   enough (H :
     ∀ ε, (0 < ε)%L →
@@ -2710,49 +2709,49 @@ apply Cauchy_sin_cos_Cauchy_angle. {
       N ≤ p
       → N ≤ q
       → (rngl_abs (rngl_sin (u p / ₂ + u q / ₂)) < ε / 2)%L). {
-  intros ε Hε.
-  progress unfold rngl_dist.
-  specialize (H ε Hε).
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hp Hq.
-  specialize (HN p q Hp Hq).
-  progress fold (u p).
-  progress fold (u q).
-  rewrite rngl_cos_sub_rngl_cos.
-  rewrite (rngl_abs_opp Hop Hor).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  replace (rngl_abs 2) with 2%L. 2: {
-    symmetry; apply (rngl_abs_nonneg_eq Hop Hor).
-    apply (rngl_0_le_2 Hon Hop Hor).
-  }
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  remember (rngl_sin _)%L as s eqn:Hs.
-  eapply (rngl_le_lt_trans Hor _ (rngl_abs s * 1))%L. {
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
-      apply (rngl_abs_nonneg Hop Hor).
+    intros ε Hε.
+    progress unfold rngl_dist.
+    specialize (H ε Hε).
+    destruct H as (N, HN).
+    exists N.
+    intros p q Hp Hq.
+    specialize (HN p q Hp Hq).
+    progress fold (u p).
+    progress fold (u q).
+    rewrite rngl_cos_sub_rngl_cos.
+    rewrite (rngl_abs_opp Hop Hor).
+    rewrite <- rngl_mul_assoc.
+    rewrite (rngl_abs_mul Hop Hi1 Hor).
+    replace (rngl_abs 2) with 2%L. 2: {
+                                   symmetry; apply (rngl_abs_nonneg_eq Hop Hor).
+                                   apply (rngl_0_le_2 Hon Hop Hor).
+                                 }
+                                 rewrite (rngl_mul_comm Hic).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    clear s Hs HN.
-    remember (rngl_sin _) as s eqn:Hs.
-    progress unfold rngl_abs.
-    remember (s ≤? 0)%L as sz eqn:Hsz.
-    symmetry in Hsz; subst s.
-    destruct sz. {
-      apply (rngl_opp_le_compat Hop Hor).
-      rewrite (rngl_opp_involutive Hop).
+    rewrite (rngl_abs_mul Hop Hi1 Hor).
+    remember (rngl_sin _)%L as s eqn:Hs.
+    eapply (rngl_le_lt_trans Hor _ (rngl_abs s * 1))%L. {
+      apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+        apply (rngl_abs_nonneg Hop Hor).
+      }
+      clear s Hs HN.
+      remember (rngl_sin _) as s eqn:Hs.
+      progress unfold rngl_abs.
+      remember (s ≤? 0)%L as sz eqn:Hsz.
+      symmetry in Hsz; subst s.
+      destruct sz. {
+        apply (rngl_opp_le_compat Hop Hor).
+        rewrite (rngl_opp_involutive Hop).
+        apply rngl_sin_bound.
+      }
       apply rngl_sin_bound.
     }
-    apply rngl_sin_bound.
+    rewrite (rngl_mul_1_r Hon).
+    easy.
   }
-  rewrite (rngl_mul_1_r Hon).
-  easy.
-}
-intros ε Hε.
+  intros ε Hε.
 ...
 set (u := seq_angle_to_div_nat θ n).
 ...
