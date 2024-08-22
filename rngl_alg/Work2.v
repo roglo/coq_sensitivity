@@ -2488,6 +2488,34 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
   apply Bool.not_true_iff_false in Hi.
   apply Hi; clear Hi.
   assert (Htn : (angle_straight < θ N)%A). {
+    progress unfold angle_ltb in Hts.
+    progress unfold angle_ltb.
+    cbn in Hts |-*.
+    rewrite (rngl_leb_refl Hor) in Hts |-*.
+    rewrite angle_eucl_dist_is_sqrt in HN.
+    remember (0 ≤? rngl_sin θ')%L as zst eqn:Hzst.
+    symmetry in Hzst.
+    destruct zst. {
+      exfalso.
+      rewrite rngl_ltb_lt in Hts.
+      apply (rngl_nle_gt Hor) in Hts.
+      apply Hts, rngl_cos_bound.
+    }
+    clear Hts.
+    apply (rngl_leb_gt Hor) in Hzst.
+    remember (0 ≤? rngl_sin (θ N))%L as zsn eqn:Hzsn.
+    symmetry in Hzsn.
+    destruct zsn; [ exfalso | easy ].
+    apply rngl_leb_le in Hzsn.
+...
+    remember (θ N) as θ3 eqn:Ht3; clear Ht3.
+    rename θ' into θ4.
+
+    change_angle_add_r θ1 angle_straight.
+    remember (θ N + angle_straight)%A as θ' eqn:Hθ'.
+    apply angle_sub_move_r in Hθ'.
+    subst θ; rename θ' into θ.
+...
     apply (angle_lt_trans _ θ2); [ admit | ].
 ...
     specialize (angle_eucl_dist_lt_angle_lt_lt angle_straight θ2 (θ N)) as H1.
