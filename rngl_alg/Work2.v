@@ -2488,9 +2488,12 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
   apply Bool.not_true_iff_false in Hi.
   apply Hi; clear Hi.
   assert (Htn : (angle_straight < θ N)%A). {
+    apply (angle_lt_trans _ θ2); [ admit | ].
+...
     specialize (angle_eucl_dist_lt_angle_lt_lt angle_straight θ2 (θ N)) as H1.
     eapply angle_lt_trans; [ | apply H1 ].
     admit.
+2: {
 ...
     apply (angle_lt_le_trans _ θ2).
 ...
