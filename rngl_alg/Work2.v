@@ -2478,21 +2478,23 @@ apply Nat.nlt_ge in Hn2.
 destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
   set (θ2 := ((angle_straight + θ') / ₂)%A).
   set (ε := angle_eucl_dist angle_straight θ2).
-  specialize (Hlim ε).
+  specialize (Hlim ε) as H1.
   assert (H : (0 < ε)%L) by admit.
-  specialize (Hlim H); clear H.
-  destruct Hlim as (N, HN).
+  specialize (H1 H); clear H.
+  destruct H1 as (N, HN).
   specialize (HN N (Nat.le_refl _)).
-  specialize (Hi N).
+  specialize (Hi N) as H2.
   exfalso.
-  apply Bool.not_true_iff_false in Hi.
-  apply Hi; clear Hi.
+  apply Bool.not_true_iff_false in H2.
+  apply H2; clear H2.
   assert (Htn : (angle_straight < θ N)%A). {
     progress unfold angle_ltb in Hts.
     progress unfold angle_ltb.
     cbn in Hts |-*.
     rewrite (rngl_leb_refl Hor) in Hts |-*.
+(*
     rewrite angle_eucl_dist_is_sqrt in HN.
+*)
     remember (0 ≤? rngl_sin θ')%L as zst eqn:Hzst.
     symmetry in Hzst.
     destruct zst. {
