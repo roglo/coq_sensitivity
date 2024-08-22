@@ -2699,8 +2699,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 apply Cauchy_sin_cos_Cauchy_angle. {
-  (* lemma to do *)
-  set (u := λ i, (2 ^ i / n * angle_div_2_pow θ i)%A).
+  set (u := λ i, (2 ^ i / n * (θ / ₂^i))%A).
   progress unfold seq_angle_to_div_nat.
   enough (H :
     ∀ ε, (0 < ε)%L →
@@ -2723,10 +2722,10 @@ apply Cauchy_sin_cos_Cauchy_angle. {
     rewrite <- rngl_mul_assoc.
     rewrite (rngl_abs_mul Hop Hi1 Hor).
     replace (rngl_abs 2) with 2%L. 2: {
-                                   symmetry; apply (rngl_abs_nonneg_eq Hop Hor).
-                                   apply (rngl_0_le_2 Hon Hop Hor).
-                                 }
-                                 rewrite (rngl_mul_comm Hic).
+      symmetry; apply (rngl_abs_nonneg_eq Hop Hor).
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    rewrite (rngl_mul_comm Hic).
     apply (rngl_lt_div_r Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
