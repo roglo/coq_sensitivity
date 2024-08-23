@@ -2468,7 +2468,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_mul_nat_overflow_0_r.
 }
 intros * Hi Hlim Hts Hnt.
-(* on pourrait considérer que l'hypothèse θ' < angle_straight
+(* to be completed
+   on pourrait considérer que l'hypothèse θ' < angle_straight
    n'est pas nécessaire, mais ça semble compliqué à prouver
    formellement
 clear Hts.
@@ -2481,7 +2482,21 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
   set (θ2 := (angle_right + θ' / ₂)%A).
   set (ε := angle_eucl_dist angle_straight θ2).
   specialize (Hlim ε) as H1.
-  assert (H : (0 < ε)%L) by ...
+  assert (H : (0 < ε)%L). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply angle_eucl_dist_nonneg | ].
+    subst ε.
+    intros H; symmetry in H.
+    apply angle_eucl_dist_separation in H.
+    subst θ2.
+    symmetry in H.
+    apply angle_add_move_l in H.
+    rewrite angle_straight_sub_right in H.
+    rewrite <- angle_straight_div_2 in H.
+    apply angle_div_2_eq_compat in H.
+    subst θ'.
+    now apply angle_lt_irrefl in Hts.
+  }
   specialize (H1 H); clear H.
   destruct H1 as (N, HN).
   specialize (HN N (Nat.le_refl _)).
