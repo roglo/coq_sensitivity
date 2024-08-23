@@ -2509,6 +2509,8 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
     symmetry in Hzsn.
     destruct zsn; [ exfalso | easy ].
     apply rngl_leb_le in Hzsn.
+    subst ε.
+    subst θ2.
 ...
     remember (θ N) as θ3 eqn:Ht3; clear Ht3.
     rename θ' into θ4.
