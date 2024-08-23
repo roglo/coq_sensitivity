@@ -2479,6 +2479,7 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
 }
 apply Nat.nlt_ge in Hn2.
 destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
+...
   set (θ2 := (angle_right + θ' / ₂)%A).
   set (ε := angle_eucl_dist angle_straight θ2).
   specialize (Hlim ε) as H1.
@@ -2533,9 +2534,10 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
     apply (rngl_nle_gt Hor) in HN.
     apply HN; clear HN.
     rewrite angle_eucl_dist_symmetry.
+    rewrite (angle_eucl_dist_symmetry _ θ').
     (* lemma to do *)
     rewrite angle_eucl_dist_move_0_r.
-    rewrite (angle_eucl_dist_move_0_r (θ N)).
+    rewrite (angle_eucl_dist_move_0_r θ').
 ...
     apply angle_le_angle_eucl_dist_le. {
       apply angle_le_add_le_sub_straight_r. {
