@@ -2476,7 +2476,7 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
 }
 apply Nat.nlt_ge in Hn2.
 destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
-  set (θ2 := ((angle_straight + θ') / ₂)%A).
+  set (θ2 := (angle_right + θ' / ₂)%A).
   set (ε := angle_eucl_dist angle_straight θ2).
   specialize (Hlim ε) as H1.
   assert (H : (0 < ε)%L) by admit.
@@ -2511,6 +2511,62 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
     apply rngl_leb_le in Hzsn.
     subst ε.
     subst θ2.
+    rewrite <- angle_right_add_right in HN.
+    rewrite angle_eucl_dist_add_cancel_l in HN.
+    apply (rngl_nle_gt Hor) in HN.
+    apply HN; clear HN.
+    rewrite angle_eucl_dist_symmetry.
+    (* lemma to do *)
+    rewrite angle_eucl_dist_move_0_r.
+    rewrite (angle_eucl_dist_move_0_r (θ N)).
+...
+    apply angle_le_angle_eucl_dist_le. {
+      apply angle_le_add_le_sub_straight_r. {
+        rewrite <- angle_straight_div_2.
+        apply angle_div_2_lt_compat.
+        apply angle_nle_gt.
+        intros H.
+        apply (rngl_nle_gt Hor) in Hzst.
+        apply Hzst.
+        now apply rngl_sin_nonneg_angle_le_straight.
+      }
+      apply (angle_le_trans _ angle_straight). {
+        apply angle_div_2_le_straight.
+      }
+      (* lemma to do *)
+      rewrite angle_add_comm.
+      apply angle_le_add_r.
+      apply angle_add_not_overflow_comm.
+      apply angle_add_straight_r_not_overflow.
+      apply rngl_sin_pos_lt_straight.
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    } {
+...
+      rewrite <- (angle_opp_involutive (_ - _)).
+      rewrite <- angle_opp_straight.
+      apply angle_opp_le_compat_if.
+...
+      apply angle_le_add_le_sub_straight_r. {
+Search (_ → _ < _)%A.
+Search (_ - _ ≤ _)%A.
+...
+Search (angle_add_overflow _ angle_straight).
+Search (_ ≤ angle_straight)%A.
+apply
+Search (_ / ₂ < _ / ₂)%A.
+Search (angle_straight / ₂)%A.
+...
+Search (_ - _ ≤ _)%A.
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+Search (angle_eucl_dist (_ / ₂)).
+Search (angle_eucl_dist (_ * _)).
+angle_le_angle_eucl_dist_le:
+  ∀ θ1 θ2 : angle T,
+    (θ1 ≤ angle_straight)%A
+    → (θ2 ≤ angle_straight)%A
+      → (θ1 ≤ θ2)%A ↔ (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L
+...
+Search (angle_eucl_dist (_ + _)).
 ...
     remember (θ N) as θ3 eqn:Ht3; clear Ht3.
     rename θ' into θ4.
