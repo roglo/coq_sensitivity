@@ -2564,16 +2564,34 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
           apply rngl_sin_div_2_nonneg.
         }
         apply (rngl_nle_gt Hor) in Hzc.
-cbn.
+        cbn.
 (*
 2 * cos² θ ≤ 1 - cos θ
 2 * cos² θ + cos θ ≤ 1
 cos θ * (2 cos θ + 1) ≤ 1
 ah oui, mais c'est bon, ça
 *)
+        rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) at 1. 2: {
+          now apply (rngl_lt_le_incl Hor) in Hzc.
+        }
+        rewrite <- (rngl_abs_sqrt Hop Hor). 2: {
+          apply rngl_1_sub_cos_div_2_nonneg.
+        }
+        apply (rngl_squ_le_abs_le Hop Hor Hii).
+        rewrite (rngl_squ_sqrt Hon). 2: {
+          apply rngl_1_sub_cos_div_2_nonneg.
+        }
+        apply -> (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        apply (rngl_le_add_le_sub_r Hop Hor).
+        progress unfold rngl_squ.
+        rewrite <- rngl_mul_assoc.
+        rewrite (rngl_add_mul_l_diag_l Hon).
+Search (_ * _ ≤ 1).
+(* ah oui mais non c'est pas sûr, ça *)
+...
 Search (_² ≤ _²)%L.
-rewrite rngl_abs_nonneg_eq.
-rewrite (rngl_abs_nonneg (rngl_cos θ')).
 Check rngl_squ_le_abs_le.
 apply rngl_squ_le_abs_le.
 ...
