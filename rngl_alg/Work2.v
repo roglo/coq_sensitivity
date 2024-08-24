@@ -2479,30 +2479,82 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
 }
 apply Nat.nlt_ge in Hn2.
 destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
+  assert (H : ∃ n, (angle_straight < θ n)%A). {
+    set (θ2 := (angle_right + θ' / ₂)%A).
+    set (ε := angle_eucl_dist angle_straight θ2).
+    specialize (Hlim ε) as H1.
+    assert (H : (0 < ε)%L). {
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      subst ε.
+      intros H; symmetry in H.
+      apply angle_eucl_dist_separation in H.
+      subst θ2.
+      symmetry in H.
+      apply angle_add_move_l in H.
+      rewrite angle_straight_sub_right in H.
+      rewrite <- angle_straight_div_2 in H.
+      apply angle_div_2_eq_compat in H.
+      subst θ'.
+      now apply angle_lt_irrefl in Hts.
+    }
+    specialize (H1 H); clear H.
+    destruct H1 as (N, HN).
+    specialize (HN N (Nat.le_refl _)).
+    exists N.
+(*
+    specialize (angle_eucl_dist_lt_angle_lt_lt2) as H1.
+*)
+    enough (H : (0 < θ N - angle_straight)%A). {
+      (* lemma to do *)
+      progress unfold angle_ltb in H.
+      progress unfold angle_ltb.
+      rewrite rngl_sin_sub_straight_r in H.
+      rewrite rngl_cos_sub_straight_r in H.
+      rewrite (rngl_leb_0_opp Hop Hor) in H.
+      cbn in H |-*.
+      rewrite (rngl_leb_refl Hor) in H |-*.
+      remember (0 ≤? rngl_sin (θ N))%L as zsn eqn:Hzsn.
+      symmetry in Hzsn.
+      destruct zsn; [ | easy ].
+      exfalso.
+      apply rngl_leb_le in Hzsn.
+      remember (rngl_sin (θ N) ≤? 0)%L as snz eqn:Hsnz.
+      symmetry in Hsnz.
+      destruct snz. {
+        rewrite (rngl_ltb_opp_l Hop Hor) in H.
+        apply rngl_ltb_lt in H.
+        apply rngl_leb_le in Hsnz.
+        apply (rngl_le_antisymm Hor) in Hzsn; [ | easy ].
+        apply eq_rngl_sin_0 in Hzsn.
+        destruct Hzsn as [Hnz| Hns]. 2: {
+          rewrite Hns in H.
+          now apply (rngl_lt_irrefl Hor) in H.
+        }
+        clear Hsnz H.
+        apply (rngl_nle_gt Hor) in HN.
+        apply HN; clear HN.
+        rewrite Hnz.
+        subst ε θ2.
+        clear N Hnz.
+        rewrite <- angle_right_add_right.
+        rewrite angle_eucl_dist_add_cancel_l.
+        rewrite angle_eucl_dist_symmetry.
+        rewrite (angle_eucl_dist_symmetry _ θ').
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 ...
-  set (θ2 := (angle_right + θ' / ₂)%A).
-  set (ε := angle_eucl_dist angle_straight θ2).
-  specialize (Hlim ε) as H1.
-  assert (H : (0 < ε)%L). {
-    apply (rngl_lt_iff Hor).
-    split; [ apply angle_eucl_dist_nonneg | ].
-    subst ε.
-    intros H; symmetry in H.
-    apply angle_eucl_dist_separation in H.
-    subst θ2.
-    symmetry in H.
-    apply angle_add_move_l in H.
-    rewrite angle_straight_sub_right in H.
-    rewrite <- angle_straight_div_2 in H.
-    apply angle_div_2_eq_compat in H.
-    subst θ'.
-    now apply angle_lt_irrefl in Hts.
-  }
-  specialize (H1 H); clear H.
-  destruct H1 as (N, HN).
-  specialize (HN N (Nat.le_refl _)).
-  specialize (Hi N) as H2.
-  exfalso.
+Search (- _ <? _)%L.
+...
+2: {
+Search (angle_straight < _)%A.
+Search (angle_straight ≤ _)%A.
+Search (_ < _ - _)%A.
+Search (- _ < _)%A.
+Search (_ < _ - _)%A.
+Search (angle_straight < _)%A.
+...
+    specialize (Hi N) as H2.
+    exfalso.
   apply Bool.not_true_iff_false in H2.
   apply H2; clear H2.
   assert (Htn : (angle_straight < θ N)%A). {
