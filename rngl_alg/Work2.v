@@ -2519,7 +2519,7 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
 (*
     specialize (angle_eucl_dist_lt_angle_lt_lt2) as H1.
 *)
-    enough (H : (0 < θ N - angle_straight)%A). {
+    enough (H : (0 < θ N - angle_straight < angle_straight)%A). {
       (* lemma to do *)
       progress unfold angle_ltb in H.
       progress unfold angle_ltb.
@@ -2528,6 +2528,7 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
       rewrite (rngl_leb_0_opp Hop Hor) in H.
       cbn in H |-*.
       rewrite (rngl_leb_refl Hor) in H |-*.
+      destruct H as (H1, H2).
       remember (0 ≤? rngl_sin (θ N))%L as zsn eqn:Hzsn.
       symmetry in Hzsn.
       destruct zsn; [ | easy ].
@@ -2535,61 +2536,21 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
       apply rngl_leb_le in Hzsn.
       remember (rngl_sin (θ N) ≤? 0)%L as snz eqn:Hsnz.
       symmetry in Hsnz.
-      destruct snz. {
-        rewrite (rngl_ltb_opp_l Hop Hor) in H.
-        apply rngl_ltb_lt in H.
-        apply rngl_leb_le in Hsnz.
-        apply (rngl_le_antisymm Hor) in Hzsn; [ | easy ].
-        apply eq_rngl_sin_0 in Hzsn.
-        destruct Hzsn as [Hnz| Hns]. 2: {
-          rewrite Hns in H.
-          now apply (rngl_lt_irrefl Hor) in H.
-        }
-        clear Hsnz H.
-        apply (rngl_nle_gt Hor) in HN.
-        apply HN; clear HN.
-        rewrite Hnz.
-        subst ε θ2.
-        clear N Hnz.
-        rewrite <- angle_right_add_right.
-        rewrite angle_eucl_dist_add_cancel_l.
-        rewrite angle_eucl_dist_symmetry.
-        rewrite (angle_eucl_dist_symmetry _ θ').
-        apply angle_eucl_dist_le_cos_le.
-        rewrite angle_sub_0_l.
-        rewrite rngl_cos_sub_right_l.
-        cbn - [ angle_div_2 ].
-        destruct (rngl_le_dec Hor (rngl_cos θ') 0) as [Hcz| Hzc]. {
-          apply (rngl_le_trans Hor _ 0); [ easy | ].
-          apply rngl_sin_div_2_nonneg.
-        }
-        apply (rngl_nle_gt Hor) in Hzc.
-        cbn.
-(*
-2 * cos² θ ≤ 1 - cos θ
-2 * cos² θ + cos θ ≤ 1
-cos θ * (2 cos θ + 1) ≤ 1
-ah oui, mais c'est bon, ça
-*)
-        rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos _)) at 1. 2: {
-          now apply (rngl_lt_le_incl Hor) in Hzc.
-        }
-        rewrite <- (rngl_abs_sqrt Hop Hor). 2: {
-          apply rngl_1_sub_cos_div_2_nonneg.
-        }
-        apply (rngl_squ_le_abs_le Hop Hor Hii).
-        rewrite (rngl_squ_sqrt Hon). 2: {
-          apply rngl_1_sub_cos_div_2_nonneg.
-        }
-        apply -> (rngl_le_div_r Hon Hop Hiv Hor). 2: {
-          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-        }
-        apply (rngl_le_add_le_sub_r Hop Hor).
-        progress unfold rngl_squ.
-        rewrite <- rngl_mul_assoc.
-        rewrite (rngl_add_mul_l_diag_l Hon).
-Search (_ * _ ≤ 1).
-(* ah oui mais non c'est pas sûr, ça *)
+      destruct snz; [ | easy ].
+      rewrite (rngl_ltb_opp_l Hop Hor) in H1, H2.
+      rewrite (rngl_opp_involutive Hop) in H2.
+      apply rngl_ltb_lt in H1, H2.
+      apply rngl_leb_le in Hsnz.
+      apply (rngl_le_antisymm Hor) in Hzsn; [ | easy ].
+      apply eq_rngl_sin_0 in Hzsn.
+      destruct Hzsn as [Hnz| Hns]. {
+        rewrite Hnz in H2.
+        now apply (rngl_lt_irrefl Hor) in H2.
+      } {
+        rewrite Hns in H1.
+        now apply (rngl_lt_irrefl Hor) in H1.
+      }
+    }
 ...
 Search (_² ≤ _²)%L.
 Check rngl_squ_le_abs_le.
