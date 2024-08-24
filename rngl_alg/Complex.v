@@ -4668,26 +4668,6 @@ rewrite (rngl_leb_refl Hor).
 now destruct (0 ≤? 1)%L.
 Qed.
 
-Theorem angle_lt_eq_cases :
-  ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (θ1 < θ2)%A ∨ θ1 = θ2.
-Proof.
-intros.
-split; intros H12. {
-  remember (θ1 =? θ2)%A as e12 eqn:He12.
-  symmetry in He12.
-  destruct e12. {
-    apply angle_eqb_eq in He12.
-    now right.
-  }
-  left.
-  apply angle_eqb_neq in He12.
-  now apply angle_lt_iff.
-}
-destruct H12 as [H12| H12]; [ now apply angle_lt_le_incl | ].
-subst θ2.
-apply angle_le_refl.
-Qed.
-
 Theorem angle_dist_le_r :
   ∀ θ1 θ2 θ3,
   (θ3 ≤ angle_straight)%A

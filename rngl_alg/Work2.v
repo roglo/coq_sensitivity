@@ -1758,6 +1758,20 @@ Theorem angle_le_angle_eucl_dist_le :
   → (θ2 ≤ angle_straight)%A
   → (θ1 ≤ θ2)%A ↔ (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L.
 Proof.
+(*
+intros * Ht1 Ht2.
+split; intros H12. {
+  apply angle_eucl_dist_le_cos_le.
+  do 2 rewrite angle_sub_0_l.
+  cbn.
+  now apply rngl_cos_decr.
+} {
+  apply angle_eucl_dist_le_cos_le in H12.
+  do 2 rewrite angle_sub_0_l in H12.
+  cbn in H12.
+Check rngl_cos_decr.
+  apply rngl_cos_decr in H12.
+*)
 intros * Ht1 Ht2.
 progress unfold angle_leb.
 apply rngl_sin_nonneg_angle_le_straight in Ht1, Ht2.
@@ -2541,7 +2555,15 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
         rewrite angle_eucl_dist_add_cancel_l.
         rewrite angle_eucl_dist_symmetry.
         rewrite (angle_eucl_dist_symmetry _ θ').
+        apply angle_eucl_dist_le_cos_le.
+        rewrite angle_sub_0_l.
+        rewrite rngl_cos_sub_right_l.
+        cbn - [ angle_div_2 ].
+...
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+About angle_eucl_dist_lt_cos_lt.
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+    specialize (angle_eucl_dist_lt_angle_lt_lt2) as H1.
 ...
 Search (- _ <? _)%L.
 ...

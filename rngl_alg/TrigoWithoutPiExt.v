@@ -1132,6 +1132,26 @@ rewrite H in Hz2.
 now apply angle_lt_irrefl in Hz2.
 Qed.
 
+Theorem angle_lt_eq_cases :
+  ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (θ1 < θ2)%A ∨ θ1 = θ2.
+Proof.
+intros.
+split; intros H12. {
+  remember (θ1 =? θ2)%A as e12 eqn:He12.
+  symmetry in He12.
+  destruct e12. {
+    apply angle_eqb_eq in He12.
+    now right.
+  }
+  left.
+  apply angle_eqb_neq in He12.
+  now apply angle_lt_iff.
+}
+destruct H12 as [H12| H12]; [ now apply angle_lt_le_incl | ].
+subst θ2.
+apply angle_le_refl.
+Qed.
+
 Theorem angle_eucl_dist_eq_cos_eq :
   ∀ θ1 θ2 θ3 θ4,
   (angle_eucl_dist θ1 θ2 = angle_eucl_dist θ3 θ4)%L ↔
@@ -1214,6 +1234,32 @@ split; intros H1234. {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   now apply (rngl_sub_lt_mono_l Hop Hor).
+}
+Qed.
+
+Theorem angle_eucl_dist_le_cos_le :
+  ∀ θ1 θ2 θ3 θ4,
+  (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ3 θ4)%L
+  ↔ (rngl_cos (θ4 - θ3) ≤ rngl_cos (θ2 - θ1))%L.
+Proof.
+destruct_ac.
+intros.
+split; intros H1234. {
+  apply (rngl_lt_eq_cases Hor) in H1234.
+  apply (rngl_lt_eq_cases Hor).
+  destruct H1234 as [H| H]. {
+    now apply angle_eucl_dist_lt_cos_lt in H; left.
+  } {
+    now apply angle_eucl_dist_eq_cos_eq in H; right.
+  }
+} {
+  apply (rngl_lt_eq_cases Hor) in H1234.
+  apply (rngl_lt_eq_cases Hor).
+  destruct H1234 as [H| H]. {
+    now left; apply angle_eucl_dist_lt_cos_lt.
+  } {
+    now right; apply angle_eucl_dist_eq_cos_eq in H.
+  }
 }
 Qed.
 
