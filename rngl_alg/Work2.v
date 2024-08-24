@@ -2559,6 +2559,27 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
         rewrite angle_sub_0_l.
         rewrite rngl_cos_sub_right_l.
         cbn - [ angle_div_2 ].
+        destruct (rngl_le_dec Hor (rngl_cos θ') 0) as [Hcz| Hzc]. {
+          apply (rngl_le_trans Hor _ 0); [ easy | ].
+          apply rngl_sin_div_2_nonneg.
+        }
+        apply (rngl_nle_gt Hor) in Hzc.
+cbn.
+(*
+2 * cos² θ ≤ 1 - cos θ
+2 * cos² θ + cos θ ≤ 1
+cos θ * (2 cos θ + 1) ≤ 1
+ah oui, mais c'est bon, ça
+*)
+Search (_² ≤ _²)%L.
+rewrite rngl_abs_nonneg_eq.
+rewrite (rngl_abs_nonneg (rngl_cos θ')).
+Check rngl_squ_le_abs_le.
+apply rngl_squ_le_abs_le.
+...
+Search (_ ≤ rngl_sin (_ / ₂))%L.
+Search (rngl_cos _ ≤ rngl_sin _)%L.
+Search (rngl_cos _ < rngl_sin _)%L.
 ...
 Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 About angle_eucl_dist_lt_cos_lt.
