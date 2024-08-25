@@ -2572,6 +2572,55 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
       apply Bool.orb_true_r.
     }
     split; [ easy | ].
+(**)
+    apply (angle_eucl_dist_lt_angle_lt_lt (θ' - angle_straight)). 2: {
+      apply angle_lt_iff.
+      split. {
+        progress unfold angle_sub.
+        rewrite angle_opp_straight.
+        apply angle_add_straight_r_le_straight.
+        now apply angle_lt_le_incl.
+      }
+      intros H.
+      apply angle_sub_move_0_r in H.
+      rewrite <- angle_sub_add_distr in H.
+      rewrite angle_straight_add_straight in H.
+      rewrite angle_sub_0_r in H.
+      subst θ'.
+      apply angle_nle_gt in Hts.
+      apply Hts, angle_nonneg.
+    }
+    progress unfold angle_sub at 1 2.
+    rewrite angle_eucl_dist_add_cancel_r.
+    rewrite angle_eucl_dist_symmetry.
+    eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+    subst ε.
+...
+      apply angle_sub_lt_straight_l. 2: {
+        rewrite angle_sub_diag.
+        rewrite angle_sub_sub_distr.
+        rewrite <- angle_add_sub_swap.
+        rewrite angle_straight_add_straight.
+        rewrite angle_sub_0_l.
+        apply angle_lt_iff.
+        split; [ apply angle_nonneg | ].
+        intros H; symmetry in H.
+        apply (f_equal angle_opp) in H.
+        rewrite angle_opp_involutive, angle_opp_0 in H.
+        subst θ'.
+        apply angle_nle_gt in Hts.
+        apply Hts, angle_nonneg.
+      }
+      progress unfold angle_sub.
+      rewrite angle_opp_straight.
+Search (_ + _ ≤ _)%A.
+apply angle_add_straight_r_le_straight.
+...
+      apply angle_le_add_le_sub_straight_r; [ easy | ].
+(* chierie *)
+Search (_ ≤ angle_straight)%A.
+...
+...
     apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ angle_straight).
     rewrite angle_sub_add.
     rewrite angle_eucl_dist_diag.
