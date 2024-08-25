@@ -2493,6 +2493,7 @@ destruct (lt_dec n 2) as [Hn2| Hn2]. {
 }
 apply Nat.nlt_ge in Hn2.
 destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
+  exfalso.
   assert (H : ∃ n, (angle_straight < θ n)%A). {
     set (θ2 := (angle_right + θ' / ₂)%A).
     set (ε := angle_eucl_dist angle_straight θ2).
@@ -2598,6 +2599,32 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
       rewrite (angle_eucl_dist_symmetry 0).
       apply rngl_cos_le_iff_angle_eucl_le.
       rewrite rngl_cos_sub_comm.
+      rewrite rngl_cos_sub_right_r.
+cbn.
+replace θ' with (angle_right / ₂)%A.
+cbn.
+remember (0 ≤? 1)%L as x eqn:Hx.
+symmetry in Hx.
+destruct x.
+rewrite rngl_add_0_r.
+rewrite rngl_mul_1_l.
+assert (
+  ((1 ) ≤ ((1 - √(1 / 2))))%L). {
+(* c'est bien ce que je pensais : c'est faux *)
+(* grâce au contre-exemple θ'=-π/4 *)
+...
+(*
+cos θ ≤ √((1-cos θ)/2)
+cos² θ ≤ ((1-cos θ)/2
+2 * cos² θ ≤ (1-cos θ)
+2 * cos² θ + cos θ ≤ 1
+2 * cos² θ + cos θ ≤ 1
+cos θ * (2 * cos θ + 1) ≤ 1
+*)
+...
+rename θ' into θ1.
+change_angle_add_r θ1 angle_straight.
+progress sin_cos_add_sub_straight_goal T.
 (* je pense qu'il faut que θ' soit inférieur à 3π/2 *)
 ...
       rewrite rngl_cos_sub_right_l.
