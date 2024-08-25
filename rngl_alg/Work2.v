@@ -2595,6 +2595,14 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
     rewrite angle_eucl_dist_symmetry.
     eapply (rngl_lt_le_trans Hor); [ apply HN | ].
     subst ε.
+    rewrite <- (angle_eucl_dist_add_cancel_r _ angle_straight angle_straight).
+    progress unfold angle_sub at 1.
+    rewrite angle_opp_straight.
+    rewrite <- angle_add_assoc.
+    rewrite angle_straight_add_straight.
+    rewrite angle_add_0_r.
+Search (_ ≤ rngl_min _ _)%L.
+    apply rngl_min_glb.
 ...
       apply angle_sub_lt_straight_l. 2: {
         rewrite angle_sub_diag.
