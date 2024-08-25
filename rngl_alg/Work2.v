@@ -2551,6 +2551,27 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
         now apply (rngl_lt_irrefl Hor) in H1.
       }
     }
+    split. {
+      apply angle_lt_iff.
+      split; [ apply angle_nonneg | ].
+      intros H; symmetry in H.
+      apply -> angle_sub_move_0_r in H.
+      specialize (Hi N) as H1.
+      apply Bool.not_true_iff_false in H1.
+      apply H1; clear H1.
+      rewrite H.
+      clear Hi Hnt.
+      induction n; [ easy | cbn ].
+      destruct n; [ flia Hn2 | clear Hn2 ].
+      destruct n. {
+        rewrite angle_mul_1_l; cbn.
+        now rewrite (angle_add_overflow_straight_straight Hc1).
+      }
+      rewrite IHn; [ | flia ].
+      apply Bool.orb_true_r.
+    }
+    apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ (θ' - angle_straight)).
+    rewrite angle_sub_add.
 ...
 Search (_² ≤ _²)%L.
 Check rngl_squ_le_abs_le.
@@ -2562,9 +2583,9 @@ Search (rngl_cos _ < rngl_sin _)%L.
 ...
 Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
 About angle_eucl_dist_lt_cos_lt.
-Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L..
     specialize (angle_eucl_dist_lt_angle_lt_lt2) as H1.
-...
+..
 Search (- _ <? _)%L.
 ...
 2: {
