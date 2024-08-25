@@ -2551,7 +2551,7 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
         now apply (rngl_lt_irrefl Hor) in H1.
       }
     }
-    split. {
+    assert (Hztn : (0 < θ N - angle_straight)%A). {
       apply angle_lt_iff.
       split; [ apply angle_nonneg | ].
       intros H; symmetry in H.
@@ -2570,8 +2570,48 @@ destruct (angle_lt_dec angle_straight θ') as [Hts| Hts]. {
       rewrite IHn; [ | flia ].
       apply Bool.orb_true_r.
     }
-    apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ (θ' - angle_straight)).
+    split; [ easy | ].
+    apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ angle_straight).
     rewrite angle_sub_add.
+    rewrite angle_eucl_dist_diag.
+    apply (rngl_min_glb_lt_iff Hor).
+    split. {
+      rewrite angle_eucl_dist_move_0_l.
+      rewrite angle_sub_sub_distr.
+      rewrite <- angle_add_sub_swap.
+      rewrite angle_straight_add_straight.
+      rewrite angle_sub_0_l.
+      rewrite <- angle_eucl_dist_opp_opp.
+      rewrite angle_opp_involutive.
+      rewrite angle_opp_0.
+      apply (rngl_lt_iff Hor).
+      split; [ apply angle_eucl_dist_nonneg | ].
+      intros H; symmetry in H.
+      apply angle_eucl_dist_separation in H.
+      apply (rngl_nle_gt Hor) in HN.
+      apply HN; clear HN.
+      rewrite H.
+      subst ε θ2.
+      rewrite angle_eucl_dist_move_0_r.
+      rewrite angle_sub_add_distr.
+      rewrite angle_straight_sub_right.
+      rewrite (angle_eucl_dist_symmetry 0).
+      apply rngl_cos_le_iff_angle_eucl_le.
+      rewrite rngl_cos_sub_comm.
+(* je pense qu'il faut que θ' soit inférieur à 3π/2 *)
+...
+      rewrite rngl_cos_sub_right_l.
+Search (rngl
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+      apply angle_le_angle_eucl_dist_le.
+...
+Search (angle_eucl_dist _ _ = 0)%L.
+Search (angle_eucl_dist (_ - _)).
+rewrite angle_eucl_dist_sub_l_diag.
+Search (_ < rngl_min _ _)%L.
+Check angle_eucl_dist_lt_angle_lt_lt2.
+...
+    apply (angle_eucl_dist_lt_angle_lt_lt2 _ _ (θ' - angle_straight)).
 ...
 Search (_² ≤ _²)%L.
 Check rngl_squ_le_abs_le.
