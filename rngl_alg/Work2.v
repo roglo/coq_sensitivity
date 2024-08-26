@@ -2611,7 +2611,21 @@ rewrite angle_straight_sub_right.
 rewrite angle_add_comm, angle_add_sub.
 rewrite <- angle_eucl_dist_move_0_l.
 rewrite <- angle_straight_div_2.
+Theorem angle_eucl_dist_div_2_div_2_le :
+  ∀ θ1 θ2,
+  (angle_eucl_dist (θ1 / ₂) (θ2 / ₂) ≤ angle_eucl_dist θ1 θ2)%L.
+Proof.
+intros.
+apply angle_eucl_dist_le_cos_le.
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (_ / ₂ - _ / ₂)%A.
+Search (rngl_cos (_ / ₂)).
+(* faux *)
 ...
+... ...
+apply angle_eucl_dist_div_2_div_2_le.
+...
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 Search (angle_eucl_dist (_ / ₂) (_ / ₂)).
 Search (angle_eucl_dist (_ / ₂)).
 Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
