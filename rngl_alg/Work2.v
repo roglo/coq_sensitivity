@@ -2610,12 +2610,14 @@ do 2 rewrite angle_add_opp_r.
 rewrite angle_straight_sub_right.
 rewrite angle_add_comm, angle_add_sub.
 rewrite <- angle_eucl_dist_move_0_l.
-Search (angle_straight / ₂)%A.
 rewrite <- angle_straight_div_2.
+...
 Search (angle_eucl_dist (_ / ₂) (_ / ₂)).
+Search (angle_eucl_dist (_ / ₂)).
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+Search (angle_straight / ₂)%A.
 Search (angle_eucl_dist (_ * _) (_ * _)).
 ...
-Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
 apply angle
 ...
       apply angle_sub_lt_straight_l. 2: {
