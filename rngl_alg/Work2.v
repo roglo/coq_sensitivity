@@ -3092,6 +3092,13 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
     (seq_angle_to_div_nat θ n).
 Proof.
 intros * ε Hε.
+Search seq_angle_to_div_nat.
+(* il faudrait déjà décaler la suite seq_angle_to_div_nat pour qu'elle
+   commence à un indice N ou tous les angles y sont inférieurs à π, si
+   c'est possible *)
+...
+(*
+intros * ε Hε.
 progress unfold seq_angle_to_div_nat.
 enough (H :
   ∃ N : nat,
@@ -3107,6 +3114,7 @@ enough (H :
   now apply HN.
 }
 ...
+*)
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
