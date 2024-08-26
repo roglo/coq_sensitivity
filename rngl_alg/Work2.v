@@ -2485,7 +2485,10 @@ intros * Hi Hlim Hts Hnt.
 (* to be completed
    on pourrait considérer que l'hypothèse θ' < angle_straight
    n'est pas nécessaire, mais ça semble compliqué à prouver
-   formellement
+   formellement.
+(* bon, il est possible que ça ne marche que jusqu'à 3π/2,
+   c'est-à-dire angle_straight + angle_right, ou alors, ce
+   qui est pareil, - angle_right ; à vérifier si utile *)
 clear Hts.
 destruct (lt_dec n 2) as [Hn2| Hn2]. {
   destruct n; [ easy | ].
@@ -2611,6 +2614,7 @@ rewrite angle_straight_sub_right.
 rewrite angle_add_comm, angle_add_sub.
 rewrite <- angle_eucl_dist_move_0_l.
 rewrite <- angle_straight_div_2.
+...
 Theorem angle_eucl_dist_div_2_div_2_le :
   ∀ θ1 θ2,
   (angle_eucl_dist (θ1 / ₂) (θ2 / ₂) ≤ angle_eucl_dist θ1 θ2)%L.
