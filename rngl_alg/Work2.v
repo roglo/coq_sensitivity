@@ -3214,11 +3214,25 @@ enough (H :
   rewrite rngl_cos_sub_comm.
   now apply HN.
 }
+... merde, ça va pas du tout, ça...
+enough (H :
+  ∀ N p q r b c,
+  N ≤ p
+  → q = p + r
+  → 2 ^ p = b * n + c
+  → c < 2 ^ p
+  → (1 - ε² / 2 < rngl_cos ((c * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
+...
 enough (H :
   ∃ N, ∀ p,
   N ≤ p
   → ∃ c r,
   (1 - ε² / 2 < rngl_cos ((c * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hpq.
+  specialize (HN p (proj1 Hpq)).
+  destruct HN as (c & r & Hcr).
 ...
 }
 
