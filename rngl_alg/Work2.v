@@ -3199,6 +3199,14 @@ enough (H :
   apply rngl_cos_lt_angle_eucl_dist_lt; [ easy | ].
   apply (HN _ _ Hq Hp).
 }
+enough (H :
+  ∃ N, ∀ p,
+  N ≤ p
+  → ∃ c r,
+  (1 - ε² / 2 < rngl_cos ((c * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
+...
+}
+
 ...
 (*
 intros * ε Hε.
