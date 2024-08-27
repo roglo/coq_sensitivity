@@ -3200,6 +3200,21 @@ enough (H :
   apply (HN _ _ Hq Hp).
 }
 enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p ≤ q
+  → (1 - ε² / 2 <
+      rngl_cos
+        (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  apply (rngl_lt_le_incl Hor) in Hε.
+  destruct (le_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
+  apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
+  rewrite rngl_cos_sub_comm.
+  now apply HN.
+}
+enough (H :
   ∃ N, ∀ p,
   N ≤ p
   → ∃ c r,
