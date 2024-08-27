@@ -3278,11 +3278,21 @@ enough (H :
   rewrite angle_sub_0_r.
   easy.
 }
+enough (H :
+  ∃ N, ∀ p r,
+  N ≤ p
+  → (1 - ε² / 2 < rngl_cos ((2 ^ p mod n * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hp Hq Hbc Hcn.
+  replace c with (2 ^ p mod n); [ now apply HN | ].
+  rewrite Hbc.
+  rewrite <- Nat.add_mod_idemp_l; [ | flia Hcn ].
+  rewrite Nat.mul_comm, Nat.mod_mul; [ | flia Hcn ].
+  now apply Nat.mod_small.
+}
 (* maintenant, c'est cool, parce qu'il n'y a qu'un seul θ et plus
-   de soustraction, on devrait donc pouvoir prouver le machin ;
-   néanmoins, avant, j'aimerais bien avoir une version plus simple
-   sans ce "b" et ce "c", un truc comme ça ; même "q" fait bizarre
- *)
+   de soustraction, on devrait donc pouvoir prouver le machin *)
 ...
 (*
 intros * ε Hε.
