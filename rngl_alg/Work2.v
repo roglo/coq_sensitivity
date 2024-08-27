@@ -2482,7 +2482,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_mul_nat_overflow_0_r.
 }
 intros * Hi Hlim Hts Hnt.
-(* to be completed
+(* essai...
    on pourrait considérer que l'hypothèse θ' < angle_straight
    n'est pas nécessaire, mais ça semble compliqué à prouver
    formellement.
@@ -3085,17 +3085,88 @@ rewrite (rngl_squ_sub_comm Hop) in Hcc, Hcs.
 now apply (rngl_add_lt_compat Hop Hor).
 Qed.
 
+Theorem rngl_cos_lt_angle_eucl_dist_lt :
+  ∀ a θ1 θ2,
+  (0 ≤ a)%L
+  → (1 - a² / 2 < rngl_cos (θ2 - θ1))%L
+  → (angle_eucl_dist θ1 θ2 < a)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * ε Hε.
+  rewrite (H1 (_ - _))%L, (H1 (rngl_cos _)) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hza Hc.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+now apply (rngl_lt_sub_lt_add_r Hop Hor).
+Qed.
+
+(* to do : voir si angle_eucl_dist_div_2_0_lt pourrait se démontrer
+   plus facilement avec rngl_cos_lt_angle_eucl_dist_lt ci-dessus *)
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_to_div_nat θ n).
 Proof.
+destruct_ac.
 intros * ε Hε.
-Search seq_angle_to_div_nat.
-(* il faudrait déjà décaler la suite seq_angle_to_div_nat pour qu'elle
-   commence à un indice N ou tous les angles y sont inférieurs à π, si
-   c'est possible *)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n.
+  exists 0.
+  intros * _ _.
+  progress unfold seq_angle_to_div_nat.
+  do 2 rewrite Nat.div_1_r.
+  do 2 rewrite angle_div_2_pow_mul_2_pow.
+  now rewrite angle_eucl_dist_diag.
+}
+assert (Hss : ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_straight)%A). {
+  intros i.
+  specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H1.
+  specialize (H1 n i θ Hn1).
+  eapply angle_le_trans; [ apply H1 | ].
+  apply angle_div_2_pow_le_diag.
+}
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p
+  → N ≤ q
+  → (1 - ε² / 2 <
+      rngl_cos
+        (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  apply (rngl_lt_le_incl Hor) in Hε.
+  apply rngl_cos_lt_angle_eucl_dist_lt; [ easy | ].
+  apply (HN _ _ Hq Hp).
+}
 ...
 (*
 intros * ε Hε.
