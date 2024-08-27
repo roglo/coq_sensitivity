@@ -3155,6 +3155,14 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
     (seq_angle_to_div_nat θ n).
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * ε Hε.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n.
@@ -3214,14 +3222,44 @@ enough (H :
   rewrite rngl_cos_sub_comm.
   now apply HN.
 }
-... merde, ça va pas du tout, ça...
 enough (H :
-  ∀ N p q r b c,
+  ∃ N, ∀ p q r b c,
   N ≤ p
   → q = p + r
-  → 2 ^ p = b * n + c
-  → c < 2 ^ p
+  → 2 ^ p = n * b + c
+  → c < n
   → (1 - ε² / 2 < rngl_cos ((c * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hpq.
+  specialize (HN p q (q - p)).
+  specialize (Nat.div_mod (2 ^ p) n) as Hx.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    cbn.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite (rngl_mul_0_l Hos).
+    rewrite (rngl_sub_0_r Hos).
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_l Hos).
+    rewrite <- (rngl_squ_0 Hos).
+    apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+    rewrite (rngl_abs_0 Hop).
+    rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
+    now apply (rngl_lt_le_incl Hor) in Hε.
+  }
+  specialize (Hx Hnz).
+  specialize (HN (2 ^ p / n) (2 ^ p mod n) (proj1 Hpq)).
+  assert (H : q = p + (q - p)) by flia Hpq.
+  specialize (HN H Hx); clear H.
+  assert (H : 2 ^ p mod n < n) by now apply Nat.mod_upper_bound.
+  specialize (HN H).
+...
+Search (_ mod _ < _).
 ...
 enough (H :
   ∃ N, ∀ p,
