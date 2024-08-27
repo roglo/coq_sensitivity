@@ -3129,6 +3129,25 @@ Qed.
 (* to do : voir si angle_eucl_dist_div_2_0_lt pourrait se démontrer
    plus facilement avec rngl_cos_lt_angle_eucl_dist_lt ci-dessus *)
 
+Theorem angle_div_2_pow_le_compat_l :
+  ∀ a b θ, b ≤ a → (θ / ₂^a ≤ θ / ₂^b)%A.
+Proof.
+intros * Hab.
+revert b Hab.
+induction a; intros. {
+  apply Nat.le_0_r in Hab; subst b.
+  apply angle_le_refl.
+}
+destruct b; cbn. {
+  eapply angle_le_trans; [ | apply angle_div_2_le ].
+  apply angle_div_2_le_compat.
+  apply angle_div_2_pow_le_diag.
+}
+apply Nat.succ_le_mono in Hab.
+apply angle_div_2_le_compat.
+now apply IHa.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3152,6 +3171,19 @@ assert (Hss : ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_straight)%A). {
   specialize (H1 n i θ Hn1).
   eapply angle_le_trans; [ apply H1 | ].
   apply angle_div_2_pow_le_diag.
+}
+assert (Hsr : n ≤ 3 ∨ ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_right)%A). {
+  destruct (le_dec n 3) as [Hn3| Hn3]; [ now left | right ].
+  apply Nat.nle_gt in Hn3.
+  intros i.
+  specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H1.
+  specialize (H1 n i θ Hn1).
+  eapply angle_le_trans; [ apply H1 | ].
+  rewrite <- angle_straight_div_2.
+  rewrite <- angle_div_pow2_1.
+  apply angle_div_2_pow_le_compat_l.
+  apply Nat.le_add_le_sub_l; cbn.
+  apply Nat.log2_le_pow2; cbn; flia Hn3.
 }
 enough (H :
   ∃ N, ∀ p q,
