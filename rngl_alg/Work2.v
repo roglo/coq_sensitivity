@@ -3258,22 +3258,31 @@ enough (H :
   specialize (HN H Hx); clear H.
   assert (H : 2 ^ p mod n < n) by now apply Nat.mod_upper_bound.
   specialize (HN H).
-...
-Search (_ mod _ < _).
-...
-enough (H :
-  ∃ N, ∀ p,
-  N ≤ p
-  → ∃ c r,
-  (1 - ε² / 2 < rngl_cos ((c * 2 ^ r / n) * (θ / ₂^(p + r))))%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hpq.
-  specialize (HN p (proj1 Hpq)).
-  destruct HN as (c & r & Hcr).
-...
+  progress unfold seq_angle_to_div_nat.
+  replace q with (p + (q - p)) by flia Hpq.
+  rewrite Nat.pow_add_r.
+  remember (2 ^ p mod n) as c eqn:Hc.
+  remember (2 ^ p / n) as b eqn:Hb.
+  rewrite Hx.
+  rewrite Nat.mul_add_distr_r.
+  rewrite <- Nat.mul_assoc.
+  rewrite (Nat.mul_comm n).
+  rewrite Nat.div_add_l; [ | easy ].
+  rewrite angle_mul_add_distr_r.
+  rewrite angle_sub_add_distr.
+  rewrite angle_div_2_pow_add_r at 1.
+  rewrite <- angle_mul_nat_assoc.
+  rewrite angle_div_2_pow_mul_2_pow.
+  rewrite angle_sub_diag.
+  rewrite rngl_cos_sub_comm.
+  rewrite angle_sub_0_r.
+  easy.
 }
-
+(* maintenant, c'est cool, parce qu'il n'y a qu'un seul θ et plus
+   de soustraction, on devrait donc pouvoir prouver le machin ;
+   néanmoins, avant, j'aimerais bien avoir une version plus simple
+   sans ce "b" et ce "c", un truc comme ça ; même "q" fait bizarre
+ *)
 ...
 (*
 intros * ε Hε.
