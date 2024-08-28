@@ -3266,8 +3266,36 @@ enough (H :
   rewrite seq_angle_to_div_nat_sub; [ | easy ].
   now apply HN.
 }
-(* maintenant, c'est cool, parce qu'il n'y a qu'un seul θ et plus
-   de soustraction, on devrait donc pouvoir prouver le machin *)
+Theorem rngl_acos_decr :
+  ∀ a b, (-1 ≤ a < b ≤ 1)%L → (rngl_acos b < rngl_acos a)%A.
+Proof.
+destruct_ac.
+intros * (H1a & Hab & Hb1).
+progress unfold angle_ltb.
+rewrite rngl_cos_acos. 2: {
+  apply (rngl_lt_le_incl Hor) in Hab.
+  split; [ easy | ].
+  now apply (rngl_le_trans Hor _ b).
+}
+rewrite rngl_cos_acos. 2: {
+  apply (rngl_lt_le_incl Hor) in Hab.
+  split; [ | easy ].
+  now apply (rngl_le_trans Hor _ a).
+}
+...
+rewrite rngl_sin_acos.
+...
+Theorem glop :
+  ∀ a n θ ε,
+  a ≠ 0
+  → (rngl_cos (a * (θ / ₂^n)) < 1 - ε)%L.
+Proof.
+intros * Haz.
+induction a; [ easy | clear Haz ].
+destruct a. {
+  rewrite angle_mul_1_l.
+  clear IHa.
+  induction n; cbn.
 ...
 (*
 intros * ε Hε.
