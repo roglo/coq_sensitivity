@@ -3181,6 +3181,45 @@ rewrite angle_add_0_l.
 now replace (p + (q - p)) with q by flia Hpq.
 Qed.
 
+Theorem rngl_leb_0_sqrt :
+  ∀ a, (0 ≤ a)%L → (0 ≤? √a)%L = true.
+Proof.
+intros * Hza.
+apply rngl_leb_le.
+now apply rl_sqrt_nonneg.
+Qed.
+
+Theorem rngl_acos_decr :
+  ∀ a b, (-1 ≤ a < b ≤ 1)%L → (rngl_acos b < rngl_acos a)%A.
+Proof.
+destruct_ac.
+intros * (H1a & Hab & Hb1).
+assert (H1a1 : (-1 ≤ a ≤ 1)%L). {
+  apply (rngl_lt_le_incl Hor) in Hab.
+  split; [ easy | ].
+  now apply (rngl_le_trans Hor _ b).
+}
+assert (H1b1 : (-1 ≤ b ≤ 1)%L). {
+  apply (rngl_lt_le_incl Hor) in Hab.
+  split; [ | easy ].
+  now apply (rngl_le_trans Hor _ a).
+}
+progress unfold angle_ltb.
+rewrite rngl_cos_acos; [ | easy ].
+rewrite rngl_cos_acos; [ | easy ].
+rewrite rngl_sin_acos; [ | easy ].
+rewrite rngl_sin_acos; [ | easy ].
+rewrite rngl_leb_0_sqrt. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_squ_le_1 Hon Hop Hor).
+}
+rewrite rngl_leb_0_sqrt. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_squ_le_1 Hon Hop Hor).
+}
+now apply rngl_ltb_lt.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3266,27 +3305,7 @@ enough (H :
   rewrite seq_angle_to_div_nat_sub; [ | easy ].
   now apply HN.
 }
-Theorem rngl_acos_decr :
-  ∀ a b, (-1 ≤ a < b ≤ 1)%L → (rngl_acos b < rngl_acos a)%A.
-Proof.
-destruct_ac.
-intros * (H1a & Hab & Hb1).
-assert (H1a1 : (-1 ≤ a ≤ 1)%L). {
-  apply (rngl_lt_le_incl Hor) in Hab.
-  split; [ easy | ].
-  now apply (rngl_le_trans Hor _ b).
-}
-assert (H1b1 : (-1 ≤ b ≤ 1)%L). {
-  apply (rngl_lt_le_incl Hor) in Hab.
-  split; [ | easy ].
-  now apply (rngl_le_trans Hor _ a).
-}
-progress unfold angle_ltb.
-rewrite rngl_cos_acos; [ | easy ].
-rewrite rngl_cos_acos; [ | easy ].
-rewrite rngl_sin_acos; [ | easy ].
-rewrite rngl_sin_acos; [ | easy ].
-Search (0 ≤? √_)%L.
+Check rngl_acos_decr.
 ...
 Theorem glop :
   ∀ a n θ ε,
