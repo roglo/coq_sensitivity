@@ -3291,6 +3291,20 @@ enough (H :
   rewrite Nat.mul_comm, Nat.mod_mul; [ | flia Hcn ].
   now apply Nat.mod_small.
 }
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p ≤ q
+  → (1 - ε² / 2 <
+       rngl_cos ((2 ^ p mod n * 2 ^ (q - p) / n) * (θ / ₂^q)))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p r Hp.
+  specialize (HN p (p + r)).
+  assert (H : N ≤ p ≤ p + r) by flia Hp.
+  specialize (HN H); clear H.
+  rewrite Nat.add_comm, Nat.add_sub in HN.
+  now rewrite Nat.add_comm in HN.
+}
 (* maintenant, c'est cool, parce qu'il n'y a qu'un seul θ et plus
    de soustraction, on devrait donc pouvoir prouver le machin *)
 ...
