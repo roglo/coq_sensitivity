@@ -3311,9 +3311,37 @@ Theorem seq_angle_to_div_nat_sub :
   ∀ n θ p q,
   p ≤ q
   → (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q =
-     2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
+     - (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q)))%A.
 Proof.
 intros * Hpq.
+remember (- (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q)))%A as u eqn:Hu.
+specialize (Nat.div_mod (2 ^ p) n) as Hx.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n u; cbn.
+  rewrite angle_opp_0.
+  apply angle_sub_0_r.
+}
+specialize (Hx Hnz).
+progress unfold seq_angle_to_div_nat.
+replace q with (p + (q - p)) by flia Hpq.
+rewrite Nat.pow_add_r.
+remember (2 ^ p mod n) as c eqn:Hc.
+remember (2 ^ p / n) as b eqn:Hb.
+rewrite Hx.
+rewrite Nat.mul_add_distr_r.
+rewrite <- Nat.mul_assoc.
+rewrite (Nat.mul_comm n).
+rewrite Nat.div_add_l; [ | easy ].
+rewrite angle_mul_add_distr_r.
+rewrite angle_sub_add_distr.
+rewrite angle_div_2_pow_add_r at 1.
+rewrite <- angle_mul_nat_assoc.
+rewrite angle_div_2_pow_mul_2_pow.
+rewrite angle_sub_diag.
+rewrite angle_sub_0_l.
+replace (p + (q - p)) with q by flia Hpq.
+easy.
+Qed.
 ...
 (*
 intros * ε Hε.
