@@ -3271,19 +3271,22 @@ Theorem rngl_acos_decr :
 Proof.
 destruct_ac.
 intros * (H1a & Hab & Hb1).
-progress unfold angle_ltb.
-rewrite rngl_cos_acos. 2: {
+assert (H1a1 : (-1 ≤ a ≤ 1)%L). {
   apply (rngl_lt_le_incl Hor) in Hab.
   split; [ easy | ].
   now apply (rngl_le_trans Hor _ b).
 }
-rewrite rngl_cos_acos. 2: {
+assert (H1b1 : (-1 ≤ b ≤ 1)%L). {
   apply (rngl_lt_le_incl Hor) in Hab.
   split; [ | easy ].
   now apply (rngl_le_trans Hor _ a).
 }
-...
-rewrite rngl_sin_acos.
+progress unfold angle_ltb.
+rewrite rngl_cos_acos; [ | easy ].
+rewrite rngl_cos_acos; [ | easy ].
+rewrite rngl_sin_acos; [ | easy ].
+rewrite rngl_sin_acos; [ | easy ].
+Search (0 ≤? √_)%L.
 ...
 Theorem glop :
   ∀ a n θ ε,

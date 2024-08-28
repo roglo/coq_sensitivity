@@ -296,6 +296,17 @@ exfalso; apply H; clear H.
 now apply (rngl_squ_le_1 Hon Hop Hor).
 Qed.
 
+Theorem rngl_sin_acos :
+  ∀ x, (-1 ≤ x ≤ 1)%L → rngl_sin (rngl_acos x) = √(1 - x²)%L.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold rngl_acos.
+destruct (rngl_le_dec ac_or x² 1) as [| H]; [ easy | ].
+exfalso; apply H; clear H.
+now apply (rngl_squ_le_1 Hon Hop Hor).
+Qed.
+
 Theorem angle_mul_nat_assoc :
   ∀ a b θ, (a * (b * θ) = (a * b) * θ)%A.
 Proof.
