@@ -3307,6 +3307,12 @@ enough (H :
 }
 (* maintenant, c'est cool, parce qu'il n'y a qu'un seul θ et plus
    de soustraction, on devrait donc pouvoir prouver le machin *)
+Theorem seq_angle_to_div_nat_sub :
+  ∀ n θ p q,
+  (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q =
+   2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
+Proof.
+intros.
 ...
 (*
 intros * ε Hε.
