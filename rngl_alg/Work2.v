@@ -3395,7 +3395,7 @@ enough (H :
   now apply HN.
 }
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
-  exists 0.
+  exists 1.
   intros * Hpq.
   apply (rngl_lt_le_trans Hor _ 0). {
     apply (rngl_lt_sub_0 Hop Hor).
@@ -3406,7 +3406,27 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   }
   rewrite pow2_mod_mul_div; [ | easy ].
   apply rngl_le_0_cos.
-Search (_ * _ ≤ angle_right)%A.
+  apply (angle_le_trans _ (2 ^ q * (θ / ₂^q))). {
+    apply angle_mul_le_mono_r. {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    apply Nat.div_le_upper_bound. {
+      apply Nat.neq_mul_0.
+      split; [ now apply Nat.pow_nonzero | easy ].
+    }
+    rewrite Nat.mul_comm.
+    apply Nat.mul_le_mono_r.
+    apply (le_trans _ n). {
+      apply Nat.lt_le_incl.
+      now apply Nat.mod_upper_bound.
+    }
+    (* lemma to do *)
+    rewrite Nat.mul_comm.
+    apply Nat_mul_le_pos_r.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite angle_div_2_pow_mul_2_pow.
 ...
 enough (H :
   ∃ N, ∀ p q,
@@ -3415,8 +3435,7 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-
-*)
+...
   assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
     split. {
       apply (rngl_le_add_le_sub_l Hop Hor).
