@@ -3148,17 +3148,15 @@ apply angle_div_2_le_compat.
 now apply IHa.
 Qed.
 
-Theorem seq_angle_to_div_nat_sub :
-  ∀ n θ p q,
+Theorem pow2_mod_mul_div :
+  ∀ n p q,
   p ≤ q
-  → (seq_angle_to_div_nat θ n q - seq_angle_to_div_nat θ n p)%A =
-     (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
+  → 2 ^ p mod n * 2 ^ (q - p) / n =
+    2 ^ q * (2 ^ p mod n) / (2 ^ p * n).
 Proof.
-(*
 intros * Hpq.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  apply angle_sub_0_r.
+  now subst n; cbn; rewrite Nat.mul_0_r.
 }
 rewrite Nat.pow_sub_r; [ | easy | easy ].
 rewrite <- Nat.divide_div_mul_exact; cycle 1. {
@@ -3169,12 +3167,16 @@ rewrite <- Nat.divide_div_mul_exact; cycle 1. {
   now rewrite Nat.sub_add.
 }
 rewrite Nat.mul_comm.
-rewrite Nat.div_div; [ | | easy ]. 2: {
-  now apply Nat.pow_nonzero.
-}
-rewrite Nat.mul_comm.
-...
-*)
+apply Nat.div_div; [ | easy ].
+now apply Nat.pow_nonzero.
+Qed.
+
+Theorem seq_angle_to_div_nat_sub :
+  ∀ n θ p q,
+  p ≤ q
+  → (seq_angle_to_div_nat θ n q - seq_angle_to_div_nat θ n p)%A =
+    (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
+Proof.
 intros * Hpq.
 specialize (Nat.div_mod (2 ^ p) n) as Hx.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3300,6 +3302,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * ε Hε.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  exists 0.
+  intros * _ _.
+  cbn.
+  now rewrite angle_eucl_dist_diag.
+}
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   subst n.
   exists 0.
@@ -3376,7 +3385,11 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-  assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L) by admit.
+  assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
+    split. {
+Search (_ ≤ _ / _).
+      apply Nat.le_div_r.
+...
   rewrite <- (rngl_cos_acos (_ - _))%L; [ | easy ].
   apply (rngl_lt_iff Hor).
   split. {
@@ -3416,6 +3429,27 @@ enough (H :
     subst ε.
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
+  rewrite pow2_mod_mul_div; [ | easy ].
+  apply (angle_le_lt_trans _ (2 ^ q * (θ / ₂^q))). {
+    apply angle_mul_le_mono_r. {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    apply Nat.div_le_upper_bound. {
+      apply Nat.neq_mul_0.
+      split; [ now apply Nat.pow_nonzero | easy ].
+    }
+    rewrite Nat.mul_comm.
+    apply Nat.mul_le_mono_r.
+...
+Search (_ * _ ≠ 0).
+...
+    apply angle_mul_le_mono_r. 2: {
+
+      apply eq_angle_div_2_pow_0 in H2.
+      subst θ.
+Search (_ / ₂^_ = 0)%A.
+
+2: {
 ...
 Check rngl_acos_decr.
 ...
