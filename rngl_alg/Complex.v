@@ -256,6 +256,8 @@ Definition rngl_acos (x : T) :=
       angle_zero
   end.
 
+Arguments rngl_acos x%L.
+
 Theorem rngl_squ_le_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -5467,3 +5469,5 @@ now apply angle_mul_nat_overflow_distr_add_overflow.
 Qed.
 
 End a.
+
+Arguments rngl_acos {T ro rp rl ac} x%L.

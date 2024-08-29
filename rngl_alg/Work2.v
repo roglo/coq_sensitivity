@@ -3220,6 +3220,37 @@ rewrite rngl_leb_0_sqrt. 2: {
 now apply rngl_ltb_lt.
 Qed.
 
+Theorem rngl_acos_bound : ∀ a, (0 ≤ rngl_acos a ≤ angle_straight)%A.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite (H1 (rngl_acos _)), (H1 angle_straight).
+  split; apply angle_le_refl.
+}
+intros.
+progress unfold rngl_acos.
+fold Hor.
+destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]. {
+  progress unfold angle_leb.
+  cbn.
+  rewrite (rngl_leb_refl Hor).
+  rewrite rngl_leb_0_sqrt; [ | now apply (rngl_le_0_sub Hop Hor) ].
+  split. {
+    apply rngl_leb_le.
+    now apply (rngl_between_opp_1_and_1 Hon Hop Hor Hii) in Ha1.
+  } {
+    apply rngl_leb_le.
+    now apply (rngl_between_opp_1_and_1 Hon Hop Hor Hii) in Ha1.
+  }
+} {
+  split; [ apply angle_le_refl | ].
+  apply (angle_straight_nonneg Hc1).
+}
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3301,6 +3332,52 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
+  rewrite rngl_cos_sub_comm.
+  rewrite seq_angle_to_div_nat_sub; [ | easy ].
+  now apply HN.
+}
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p ≤ q
+  → (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q) < rngl_acos (1 - ε² / 2)%L)%A). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hpq.
+  rewrite <- (rngl_cos_acos (_ - _))%L.
+  apply (rngl_lt_iff Hor).
+  split. {
+    apply rngl_cos_decr.
+    split. {
+      apply angle_lt_le_incl.
+      now apply HN.
+    }
+    apply rngl_acos_bound.
+  }
+  intros H.
+  apply rngl_cos_eq in H.
+  specialize (HN p q Hpq).
+  destruct H as [H| H]. {
+    rewrite H in HN.
+    now apply angle_lt_irrefl in HN.
+  }
+  specialize (rngl_acos_bound (1 - (ε² / 2))%L) as H1.
+  rewrite H in H1.
+  destruct H1 as (H1, H2).
+  apply angle_nlt_ge in H2.
+  apply H2; clear H2.
+  rewrite <- angle_opp_straight.
+  apply angle_opp_lt_compat_if. {
+    intros H2.
+    rewrite H2 in H.
+(* ah, fait chier, bon je verrai plus tard *)
+...
+Check rngl_acos_decr.
+...
+Search (rngl_acos _ < rngl_acos _)%A.
+  specialize rngl_acos_decr as H1.
+  specialize (H1 (rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q)))).
+  specialize (H1 (1 - (ε² / 2))%L).
+...
   rewrite rngl_cos_sub_comm.
   rewrite seq_angle_to_div_nat_sub; [ | easy ].
   now apply HN.
