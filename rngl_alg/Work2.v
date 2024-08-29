@@ -3286,6 +3286,22 @@ exfalso; apply H1a.
 now apply (rngl_squ_le_1 Hon Hop Hor) in H1a1.
 Qed.
 
+Theorem rngl_le_0_cos :
+  ∀ θ, (θ ≤ angle_right)%A → (0 ≤ rngl_cos θ)%L.
+Proof.
+destruct_ac.
+intros * Htr.
+progress unfold angle_leb in Htr.
+cbn in Htr.
+specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+apply rngl_leb_le in H1.
+rewrite H1 in Htr.
+remember (0 ≤? rngl_sin θ)%L as zst eqn:Hzst.
+symmetry in Hzst.
+destruct zst; [ | easy ].
+now apply rngl_leb_le in Htr.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3378,6 +3394,20 @@ enough (H :
   rewrite seq_angle_to_div_nat_sub; [ | easy ].
   now apply HN.
 }
+destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
+  exists 0.
+  intros * Hpq.
+  apply (rngl_lt_le_trans Hor _ 0). {
+    apply (rngl_lt_sub_0 Hop Hor).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    now rewrite (rngl_mul_1_l Hon).
+  }
+  rewrite pow2_mod_mul_div; [ | easy ].
+  apply rngl_le_0_cos.
+Search (_ * _ ≤ angle_right)%A.
+...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p ≤ q
@@ -3385,9 +3415,23 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
+
+*)
   assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
     split. {
-Search (_ ≤ _ / _).
+      apply (rngl_le_add_le_sub_l Hop Hor).
+      apply (rngl_le_add_le_sub_r Hop Hor).
+      rewrite (rngl_sub_opp_r Hop).
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite fold_rngl_squ.
+...
+2: {
+Search (_ ≤ _ - _)%L.
+      apply rngl_le_move_0_r.
+Search (_ ≤ _ / _)%L.
+apply (rngl_le_div_r Hon Hop Hiv Hor).
       apply Nat.le_div_r.
 ...
   rewrite <- (rngl_cos_acos (_ - _))%L; [ | easy ].
