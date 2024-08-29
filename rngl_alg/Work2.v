@@ -3232,7 +3232,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 progress unfold rngl_acos.
-fold Hor.
+progress fold Hor.
 destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]. {
   progress unfold angle_leb.
   cbn.
@@ -3249,6 +3249,18 @@ destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]. {
   split; [ apply angle_le_refl | ].
   apply (angle_straight_nonneg Hc1).
 }
+Qed.
+
+Theorem eq_rngl_acos_0 :
+  ∀ a, (-1 ≤ a ≤ 1)%L → rngl_acos a = 0%A → a = 1%L.
+Proof.
+destruct_ac.
+intros * H1a1 Haz.
+progress unfold rngl_acos in Haz.
+progress fold Hor in Haz.
+destruct (rngl_le_dec Hor a² 1) as [Ha1| H1a]; [ now injection Haz | ].
+exfalso; apply H1a.
+now apply (rngl_squ_le_1 Hon Hop Hor) in H1a1.
 Qed.
 
 (* to be completed
@@ -3343,7 +3355,8 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-  rewrite <- (rngl_cos_acos (_ - _))%L.
+  assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L) by admit.
+  rewrite <- (rngl_cos_acos (_ - _))%L; [ | easy ].
   apply (rngl_lt_iff Hor).
   split. {
     apply rngl_cos_decr.
@@ -3369,7 +3382,11 @@ enough (H :
   apply angle_opp_lt_compat_if. {
     intros H2.
     rewrite H2 in H.
-(* ah, fait chier, bon je verrai plus tard *)
+    rewrite angle_opp_0 in H.
+    apply eq_rngl_acos_0 in H; [ | easy ].
+    apply (rngl_sub_move_l Hop) in H.
+    rewrite (rngl_sub_diag Hos) in H.
+Search (_ / _ = 0)%L.
 ...
 Check rngl_acos_decr.
 ...

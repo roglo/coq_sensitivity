@@ -1320,7 +1320,7 @@ assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
 remember (0 ≤? zi)%L as zzi eqn:Hzzi; symmetry in Hzzi.
 destruct zzi. {
   progress unfold rngl_acos.
-  fold Hor.
+  progress fold Hor.
   destruct (rngl_le_dec Hor (zr / ρ)² 1)%L as [Hzρ1| Hzρ1]; [ | easy ].
   apply rngl_leb_le in Hzzi.
   cbn.
@@ -1343,7 +1343,7 @@ destruct zzi. {
   apply (rngl_leb_gt Hor) in Hzzi.
   apply (rngl_lt_le_incl Hor) in Hzzi.
   progress unfold rngl_acos.
-  fold Hor.
+  progress fold Hor.
   destruct (rngl_le_dec Hor (zr / ρ)² 1)%L as [Hzρ1| Hzρ1]; [ | easy ].
   cbn.
   apply (rngl_add_sub_eq_l Hos) in Hri.
