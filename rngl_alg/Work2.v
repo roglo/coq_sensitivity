@@ -3154,6 +3154,27 @@ Theorem seq_angle_to_div_nat_sub :
   → (seq_angle_to_div_nat θ n q - seq_angle_to_div_nat θ n p)%A =
      (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
 Proof.
+(*
+intros * Hpq.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  apply angle_sub_0_r.
+}
+rewrite Nat.pow_sub_r; [ | easy | easy ].
+rewrite <- Nat.divide_div_mul_exact; cycle 1. {
+  now apply Nat.pow_nonzero.
+} {
+  exists (2 ^ (q - p)).
+  rewrite <- Nat.pow_add_r.
+  now rewrite Nat.sub_add.
+}
+rewrite Nat.mul_comm.
+rewrite Nat.div_div; [ | | easy ]. 2: {
+  now apply Nat.pow_nonzero.
+}
+rewrite Nat.mul_comm.
+...
+*)
 intros * Hpq.
 specialize (Nat.div_mod (2 ^ p) n) as Hx.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3386,7 +3407,15 @@ enough (H :
     apply eq_rngl_acos_0 in H; [ | easy ].
     apply (rngl_sub_move_l Hop) in H.
     rewrite (rngl_sub_diag Hos) in H.
-Search (_ / _ = 0)%L.
+    apply (f_equal (λ a, (a * 2)%L)) in H.
+    rewrite (rngl_div_mul Hon Hiv) in H. 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_l Hos) in H.
+    apply (eq_rngl_squ_0 Hos Hid) in H.
+    subst ε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
 ...
 Check rngl_acos_decr.
 ...
