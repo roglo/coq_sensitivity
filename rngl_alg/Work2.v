@@ -3452,8 +3452,13 @@ apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 do 2 rewrite <- Nat.add_1_r.
 rewrite <- Nat.add_assoc.
 rewrite angle_div_2_pow_add_r.
+rewrite Nat.pow_succ_r' in Hni1, Hni.
+apply Nat.mul_lt_mono_pos_l in Hni1; [ | easy ].
+apply -> Nat.lt_succ_r in Hni1.
+...
 rewrite angle_mul_nat_div_2_pow. 2: {
-Search (angle_mul_nat_overflow _ (_ / ₂)).
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+  apply angle_mul_nat_overflow_div_pow2.
 ...
 About angle_mul_nat_div_2.
 (*
