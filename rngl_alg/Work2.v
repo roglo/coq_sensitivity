@@ -3406,12 +3406,22 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   }
   rewrite pow2_mod_mul_div; [ | easy ].
   apply rngl_le_0_cos.
-  assert (H4l1 : 4 * (2 ^ p mod n) / (2 ^ p * n) ≤ 1). {
+  apply
+    (angle_le_trans _ (2 ^ q * (2 ^ p mod n) / (2 ^ p * n) * (θ / ₂^(q-2)))). {
+    apply angle_mul_le_mono_l. {
+      apply angle_div_2_pow_le_compat_l; flia.
+    }
+    apply angle_mul_nat_overflow_div_pow2.
+    replace q with (q - 2 + 2) at 1 by flia Hpq.
+    rewrite Nat.pow_add_r.
+    cbn.
+    rewrite (Nat.mul_comm _ 4).
     apply Nat.div_le_upper_bound. {
       apply Nat.neq_mul_0.
       split; [ now apply Nat.pow_nonzero | easy ].
     }
-    rewrite Nat.mul_1_r.
+    rewrite Nat.mul_shuffle0.
+    apply Nat.mul_le_mono_r.
     apply (Nat.le_trans _ (4 * n)). {
       apply Nat.mul_le_mono_l.
       now apply Nat.lt_le_incl, Nat.mod_upper_bound.
@@ -3422,16 +3432,7 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
     specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
     cbn; flia H1.
   }
-  apply
-    (angle_le_trans _ (2 ^ q * (2 ^ p mod n) / (2 ^ p * n) * (θ / ₂^(q-2)))). {
-    apply angle_mul_le_mono_l. {
-      apply angle_div_2_pow_le_compat_l; flia.
-    }
-    apply angle_mul_nat_overflow_div_pow2.
-    rewrite <- (Nat.mul_1_r (2 ^ (q - 2))).
-    replace q with (q - 2 + 2) at 1 by flia Hpq.
-    rewrite Nat.pow_add_r.
-    cbn.
+  remember (_ / _) as x eqn:Hx.
 ...
 Search (angle_mul_nat_overflow _ (_ / ₂^_)).
 Search (_ * _ ≤ _ * _)%A.
