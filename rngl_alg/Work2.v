@@ -3302,6 +3302,25 @@ destruct zst; [ | easy ].
 now apply rngl_leb_le in Htr.
 Qed.
 
+Theorem angle_div_2_pow_sub_r :
+  ∀ a b θ, b ≤ a → (θ / ₂^(a - b) = 2 ^ b * (θ / ₂^a))%A.
+Proof.
+intros * Hba.
+revert a Hba.
+induction b; intros. {
+  rewrite Nat.sub_0_r.
+  now rewrite angle_mul_1_l.
+}
+destruct a; [ easy | ].
+apply Nat.succ_le_mono in Hba.
+cbn - [ Nat.pow ].
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+rewrite <- angle_mul_nat_assoc.
+rewrite angle_div_2_mul_2.
+now apply IHb.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3433,6 +3452,19 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
     cbn; flia H1.
   }
   remember (_ / _) as x eqn:Hx.
+  rewrite angle_div_2_pow_sub_r.
+(* bin non, c'est à l'envers, mon truc *)
+...
+
+Search (_ / ₂^(_ + _))%A.
+Search (_ / ₂^(_ - _))%A.
+...
+  progress unfold angle_leb.
+  cbn.
+  (* lemma to do *)
+  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
+  apply rngl_leb_le in H1.
+  rewrite H1; clear H1.
 ...
 Search (_ * (_ / ₂^_))%A.
 rewrite <- (angle_div_2_pow_mul_2_pow 2 θ).
