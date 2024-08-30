@@ -151,18 +151,12 @@ Theorem angle_mul_div_pow2_le_straight :
   → (n * (θ / ₂^i) ≤ angle_straight)%A.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros.
-  rewrite (H1 (_ * _)%A).
-  apply angle_nonneg.
-}
 intros * Hni.
 revert θ.
 induction i; intros. {
   cbn in Hni.
   rewrite Nat.add_0_r in Hni.
-  destruct n; [ apply (angle_straight_nonneg Hc1) | ].
+  destruct n; [ apply angle_nonneg | ].
   cbn in Hni.
   apply Nat.succ_le_mono in Hni.
   rewrite <- Nat.add_succ_comm in Hni; cbn in Hni.

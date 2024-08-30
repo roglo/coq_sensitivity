@@ -3425,6 +3425,17 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   }
   rewrite pow2_mod_mul_div; [ | easy ].
   apply rngl_le_0_cos.
+Search (_ * _ ≤ _)%A.
+About angle_mul_div_pow2_le_straight.
+Theorem angle_mul_div_pow2_le_right :
+  ∀ n i θ, 2 * S n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
+Proof.
+Admitted.
+apply angle_mul_div_pow2_le_right.
+Search (_ * S _).
+rewrite Nat.mul_succ_r.
+rewrite Nat.pow_succ_r.
+...
   apply
     (angle_le_trans _ (2 ^ q * (2 ^ p mod n) / (2 ^ p * n) * (θ / ₂^(q-2)))). {
     apply angle_mul_le_mono_l. {
