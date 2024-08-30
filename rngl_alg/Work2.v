@@ -3434,6 +3434,9 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   }
   remember (_ / _) as x eqn:Hx.
 ...
+Search (_ * (_ / ₂^_))%A.
+rewrite <- (angle_div_2_pow_mul_2_pow 2 θ).
+...
 Search (angle_mul_nat_overflow _ (_ / ₂^_)).
 Search (_ * _ ≤ _ * _)%A.
 ...
