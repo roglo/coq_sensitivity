@@ -3746,6 +3746,21 @@ symmetry.
 now apply angle_div_2_add_not_overflow.
 Qed.
 
+Theorem angle_mul_nat_div_2_pow :
+  ∀ n i θ,
+  angle_mul_nat_overflow n θ = false → (n * (θ / ₂^i))%A = ((n * θ) / ₂^i)%A.
+Proof.
+destruct_ac.
+intros * Haov.
+induction n; cbn. {
+  symmetry; apply angle_0_div_2_pow.
+}
+apply angle_mul_nat_overflow_succ_l_false in Haov.
+rewrite IHn; [ | easy ].
+symmetry.
+now apply angle_div_2_pow_add.
+Qed.
+
 Theorem angle_add_overflow_diag :
   ∀ θ,
   (0 ≤ rngl_sin θ)%L

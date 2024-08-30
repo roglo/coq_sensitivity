@@ -3430,11 +3430,73 @@ About angle_mul_div_pow2_le_straight.
 Theorem angle_mul_div_pow2_le_right :
   ∀ n i θ, 2 * S n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
 Proof.
-Admitted.
+destruct_ac.
+intros * Hni.
+revert θ.
+induction i; intros; [ cbn in Hni; flia Hni | ].
+destruct (le_dec ((2 * S n)) (2 ^ i)) as [Hni1| Hni1]. {
+  rewrite angle_div_2_pow_succ_r_2.
+  now apply IHi.
+}
+apply Nat.nle_gt in Hni1.
+clear IHi.
+rewrite Nat.pow_succ_r' in Hni.
+destruct i. {
+  apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  apply angle_nonneg.
+}
+apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+do 2 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc.
+rewrite angle_div_2_pow_add_r.
+rewrite angle_mul_nat_div_2_pow. 2: {
+Search (angle_mul_nat_overflow _ (_ / ₂)).
+...
+About angle_mul_nat_div_2.
+(*
+angle_mul_nat_div_2
+     : ∀ (n : nat) (θ : angle T),
+         angle_mul_nat_overflow n θ = false → (n * (θ / ₂))%A = ((n * θ) / ₂)%A
+*)
+...
+apply angle_div_2_add_not_overflow.
+now apply angle_div_2_add_not_overflow.
+...
+apply angle_mul_nat_
+Search (_ * (_ / ₂^_) = (_ * _) / ₂^_)%A.
+...
+Check angle_div_2_le_straight.
+Theorem angle_div_4_le_right :
+  ∀ θ, (θ / ₂^2 ≤ angle_right)%A.
+...
+apply angle_div_4_le_right.
+...
+Search (_ * (_ / ₂^_) ≤ _)%A.
+...
+apply angle_div_2_pow_mul_le_angle.
+...
+rewrite angle_mul_nat_div_2. 2: {
+Search (angle_mul_nat_overflow _ (_ / ₂)).
+...
+  apply angle_mul_nat_overflow_div2.
+  apply (le_trans _ (S n)); [ apply Nat.le_succ_diag_r | easy ].
+}
+destruct i. {
+  cbn in Hni.
+  apply Nat.succ_le_mono in Hni.
+  apply Nat.le_0_r in Hni; subst n.
+  cbn.
+  apply angle_nonneg.
+...
+rewrite angle_mul_nat_div_2. 2: {
+...
+apply angle_div_2_le_straight.
+...
 apply angle_mul_div_pow2_le_right.
-Search (_ * S _).
 rewrite Nat.mul_succ_r.
-rewrite Nat.pow_succ_r.
 ...
   apply
     (angle_le_trans _ (2 ^ q * (2 ^ p mod n) / (2 ^ p * n) * (θ / ₂^(q-2)))). {
