@@ -3428,26 +3428,33 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
 Search (_ * _ ≤ _)%A.
 About angle_mul_div_pow2_le_straight.
 Theorem angle_mul_div_pow2_le_right :
-  ∀ n i θ, 2 * S n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
+  ∀ n i θ, 4 * n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
 Proof.
 destruct_ac.
 intros * Hni.
-revert θ.
-induction i; intros; [ cbn in Hni; flia Hni | ].
-destruct (le_dec ((2 * S n)) (2 ^ i)) as [Hni1| Hni1]. {
+revert n θ Hni.
+induction i; intros. {
+  destruct n; [ apply angle_nonneg | ].
+  cbn in Hni; flia Hni.
+}
+destruct (le_dec ((4 * n)) (2 ^ i)) as [H4ni| H4ni]. {
   rewrite angle_div_2_pow_succ_r_2.
   now apply IHi.
 }
-apply Nat.nle_gt in Hni1.
-clear IHi.
+apply Nat.nle_gt in H4ni.
 rewrite Nat.pow_succ_r' in Hni.
+replace 4 with (2 * 2) in Hni by easy.
+rewrite <- Nat.mul_assoc in Hni.
+apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 destruct i. {
-  apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  apply angle_nonneg.
+  destruct n; [ apply angle_nonneg | ].
+  cbn in Hni; flia Hni.
 }
+rewrite Nat.pow_succ_r' in Hni.
+rewrite angle_div_2_pow_succ_r_1.
+...
+apply IHi.
+...
 apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 do 2 rewrite <- Nat.add_1_r.
 rewrite <- Nat.add_assoc.
