@@ -3321,6 +3321,33 @@ rewrite angle_div_2_mul_2.
 now apply IHb.
 Qed.
 
+Theorem angle_mul_div_pow2_le_right :
+  ∀ n i θ, 4 * n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
+Proof.
+destruct_ac.
+intros * Hni.
+destruct i. {
+  destruct n; [ apply angle_nonneg | ].
+  cbn in Hni; flia Hni.
+}
+rewrite angle_div_2_pow_succ_r_1.
+rewrite <- angle_straight_div_2.
+rewrite Nat.pow_succ_r' in Hni.
+replace 4 with (2 * 2) in Hni by easy.
+rewrite <- Nat.mul_assoc in Hni.
+apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
+rewrite angle_mul_nat_div_2. 2: {
+  apply angle_mul_nat_overflow_div_pow2.
+  apply (le_trans _ (2 * n)); [ | easy ].
+  (* lemma to do Nat_mul_le_pos_l *)
+  rewrite Nat.mul_comm.
+  apply Nat_mul_le_pos_r.
+  now apply -> Nat.succ_le_mono.
+}
+apply angle_div_2_le_compat.
+now apply angle_mul_div_pow2_le_straight.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3425,35 +3452,8 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   }
   rewrite pow2_mod_mul_div; [ | easy ].
   apply rngl_le_0_cos.
-Search (_ * _ ≤ _)%A.
-About angle_mul_div_pow2_le_straight.
-Theorem angle_mul_div_pow2_le_right :
-  ∀ n i θ, 4 * n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ angle_right)%A.
-Proof.
-destruct_ac.
-intros * Hni.
-revert n θ Hni.
-induction i; intros. {
-  destruct n; [ apply angle_nonneg | ].
-  cbn in Hni; flia Hni.
-}
-destruct (le_dec ((4 * n)) (2 ^ i)) as [H4ni| H4ni]. {
-  rewrite angle_div_2_pow_succ_r_2.
-  now apply IHi.
-}
-apply Nat.nle_gt in H4ni.
-rewrite Nat.pow_succ_r' in Hni.
-replace 4 with (2 * 2) in Hni by easy.
-rewrite <- Nat.mul_assoc in Hni.
-apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
-destruct i. {
-  destruct n; [ apply angle_nonneg | ].
-  cbn in Hni; flia Hni.
-}
-rewrite Nat.pow_succ_r' in Hni.
-rewrite angle_div_2_pow_succ_r_1.
-...
-apply IHi.
+  apply angle_mul_div_pow2_le_right.
+(* bon c'est mieux mais pas gagné, faut voir *)
 ...
 apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 do 2 rewrite <- Nat.add_1_r.
