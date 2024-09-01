@@ -3453,7 +3453,29 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   rewrite pow2_mod_mul_div; [ | easy ].
   apply rngl_le_0_cos.
   apply angle_mul_div_pow2_le_right.
-(* bon c'est mieux mais pas gagné, faut voir *)
+  destruct (lt_dec (2 ^ p) n) as [Hpn| Hpn]. {
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite (Nat.mul_comm _ n).
+    rewrite Nat.div_mul_cancel_r; [ | easy | now apply Nat.pow_nonzero ].
+    eapply le_trans; [ now apply Nat.div_mul_le | ].
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.mul_le_mono_r.
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    destruct n. {
+      destruct p; [ easy | ].
+      cbn in Hpn.
+      specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
+      flia Hpn H1.
+    }
+    destruct n; [ | flia ].
+    destruct p; [ easy | ].
+    destruct p; [ flia Hpq | ].
+    cbn in Hpn.
+    specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
+    flia Hpn H1.
+  }
+  apply Nat.nlt_ge in Hpn.
 ...
 apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 do 2 rewrite <- Nat.add_1_r.
