@@ -3566,11 +3566,54 @@ enough (H :
     now apply Nat.pow_nonzero.
   }
   rewrite angle_div_2_pow_mul_2_pow.
-....
-  specialize (Hss 0) as H2.
+  specialize (Hss (Nat.log2_up n)) as H2.
   progress unfold seq_angle_to_div_nat in H2.
+  replace (2 ^ Nat.log2_up n / n) with 1 in H2. 2: {
+    symmetry.
+    apply Nat_eq_div_1.
+    split. {
+      apply Nat.log2_log2_up_spec.
+      now apply Nat.neq_0_lt_0.
+    }
+    now apply Nat_log2_up_lt_twice.
+  }
+  rewrite angle_mul_1_l in H2.
+Search (_ / ₂^Nat.log2_up _)%A.
+Theorem angle_div_2_pow_log2_up : ∀ n θ, (θ / ₂^Nat.log2_up n)%A = θ.
+Proof.
+intros.
+induction n; [ easy | ].
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]; [ | now rewrite H1 ].
+Search (_ / ₂^S _)%A.
+(* ouais, bon, chais pas trop, faut peut-être utiliser Nat.log2 n
+   ou Nat.log2_up n, suivant les cas *)
+Search Nat.log2.
+(* par exemple inventer un Nat.log2_round *)
+(* ouais quoique, bon, ça va pas non plus *)
+(* enfin, chais pas *)
+... ...
+rewrite angle_div_2_pow_log2_up in H2.
+...
+Search (_ ≤ 2 ^ Nat.log2_up _).
+...
+Search (2 ^ Nat.log2_up _).
+destruct (Nat.eq_dec n (2 ^
+...
+  eapply angle_lt_le_trans; [ | apply H2 ].
+...
+  apply (angle_le_lt_trans _ (θ / ₂^Nat.log2_up n))%A. {
+Search (2 ^ Nat.log2 _)%A.
+Search (_ / ₂ ^ Nat.log2 _)%A.
+...
+...
+Search (_ / ₂ ^ Nat.log2_up _)%A.
+...
+Search (_ ≤ _ / ₂^_)%A.
+...
+Search (2 ^ Nat.log2_up _).
   cbn in H2.
-  (* ah non, zut *)
+  rewrite Nat.div_small in H2.
 ...
     apply angle_mul_le_mono_r. 2: {
 
