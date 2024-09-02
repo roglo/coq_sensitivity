@@ -3518,32 +3518,32 @@ enough (H :
     }
     apply rngl_acos_bound.
   }
-  intros H.
-  apply rngl_cos_eq in H.
+  intros Hcc.
+  apply rngl_cos_eq in Hcc.
   specialize (HN p q Hpq).
-  destruct H as [H| H]. {
-    rewrite H in HN.
+  destruct Hcc as [Hcc| Hcc]. {
+    rewrite Hcc in HN.
     now apply angle_lt_irrefl in HN.
   }
   specialize (rngl_acos_bound (1 - (ε² / 2))%L) as H1.
-  rewrite H in H1.
+  rewrite Hcc in H1.
   destruct H1 as (H1, H2).
   apply angle_nlt_ge in H2.
   apply H2; clear H2.
   rewrite <- angle_opp_straight.
   apply angle_opp_lt_compat_if. {
     intros H2.
-    rewrite H2 in H.
-    rewrite angle_opp_0 in H.
-    apply eq_rngl_acos_0 in H; [ | easy ].
-    apply (rngl_sub_move_l Hop) in H.
-    rewrite (rngl_sub_diag Hos) in H.
-    apply (f_equal (λ a, (a * 2)%L)) in H.
-    rewrite (rngl_div_mul Hon Hiv) in H. 2: {
+    rewrite H2 in Hcc.
+    rewrite angle_opp_0 in Hcc.
+    apply eq_rngl_acos_0 in Hcc; [ | easy ].
+    apply (rngl_sub_move_l Hop) in Hcc.
+    rewrite (rngl_sub_diag Hos) in Hcc.
+    apply (f_equal (λ a, (a * 2)%L)) in Hcc.
+    rewrite (rngl_div_mul Hon Hiv) in Hcc. 2: {
       apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
     }
-    rewrite (rngl_mul_0_l Hos) in H.
-    apply (eq_rngl_squ_0 Hos Hid) in H.
+    rewrite (rngl_mul_0_l Hos) in Hcc.
+    apply (eq_rngl_squ_0 Hos Hid) in Hcc.
     subst ε.
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
@@ -3566,12 +3566,11 @@ enough (H :
     now apply Nat.pow_nonzero.
   }
   rewrite angle_div_2_pow_mul_2_pow.
+....
   specialize (Hss 0) as H2.
   progress unfold seq_angle_to_div_nat in H2.
   cbn in H2.
   (* ah non, zut *)
-...
-Search (_ * _ ≠ 0).
 ...
     apply angle_mul_le_mono_r. 2: {
 
