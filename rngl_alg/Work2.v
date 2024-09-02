@@ -586,9 +586,7 @@ apply angle_mul_le_mono_r. {
   apply Nat.div_le_upper_bound; [ easy | ].
   now apply Nat.mul_le_mono_r.
 }
-(* lemma *)
-rewrite Nat.mul_comm.
-apply Nat_mul_le_pos_r.
+apply Nat_mul_le_pos_l.
 now apply -> Nat.succ_le_mono.
 Qed.
 
@@ -621,9 +619,7 @@ apply angle_mul_le_mono_r. {
   rewrite Nat.mul_comm.
   now apply Nat.mul_le_mono_l.
 }
-(* lemma *)
-rewrite Nat.mul_comm.
-apply Nat_mul_le_pos_r.
+apply Nat_mul_le_pos_l.
 now apply -> Nat.succ_le_mono.
 Qed.
 
@@ -3339,9 +3335,7 @@ apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 rewrite angle_mul_nat_div_2. 2: {
   apply angle_mul_nat_overflow_div_pow2.
   apply (le_trans _ (2 * n)); [ | easy ].
-  (* lemma to do Nat_mul_le_pos_l *)
-  rewrite Nat.mul_comm.
-  apply Nat_mul_le_pos_r.
+  apply Nat_mul_le_pos_l.
   now apply -> Nat.succ_le_mono.
 }
 apply angle_div_2_le_compat.
@@ -3564,6 +3558,18 @@ enough (H :
     }
     rewrite Nat.mul_comm.
     apply Nat.mul_le_mono_r.
+    apply (Nat.le_trans _ n). {
+      now apply Nat.lt_le_incl, Nat.mod_upper_bound.
+    }
+    apply Nat_mul_le_pos_l.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite angle_div_2_pow_mul_2_pow.
+  specialize (Hss 0) as H2.
+  progress unfold seq_angle_to_div_nat in H2.
+  cbn in H2.
+  (* ah non, zut *)
 ...
 Search (_ * _ ≠ 0).
 ...

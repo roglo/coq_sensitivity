@@ -202,6 +202,13 @@ rewrite IHc; [ | easy ].
 now rewrite Nat.mul_mod_idemp_r.
 Qed.
 
+Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ b → a ≤ b * a.
+Proof.
+intros * Ha.
+rewrite <- (Nat.mul_1_l a) at 1.
+now apply Nat.mul_le_mono_nonneg_r.
+Qed.
+
 Theorem Nat_mul_le_pos_r : ∀ a b, 1 ≤ b → a ≤ a * b.
 Proof.
 intros * Ha.
