@@ -3357,6 +3357,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * ε Hε.
@@ -3479,131 +3480,6 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hε2.
-...
-apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
-do 2 rewrite <- Nat.add_1_r.
-rewrite <- Nat.add_assoc.
-rewrite angle_div_2_pow_add_r.
-rewrite Nat.pow_succ_r' in Hni1, Hni.
-apply Nat.mul_lt_mono_pos_l in Hni1; [ | easy ].
-apply -> Nat.lt_succ_r in Hni1.
-...
-rewrite angle_mul_nat_div_2_pow. 2: {
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
-  apply angle_mul_nat_overflow_div_pow2.
-...
-About angle_mul_nat_div_2.
-(*
-angle_mul_nat_div_2
-     : ∀ (n : nat) (θ : angle T),
-         angle_mul_nat_overflow n θ = false → (n * (θ / ₂))%A = ((n * θ) / ₂)%A
-*)
-...
-apply angle_div_2_add_not_overflow.
-now apply angle_div_2_add_not_overflow.
-...
-apply angle_mul_nat_
-Search (_ * (_ / ₂^_) = (_ * _) / ₂^_)%A.
-...
-Check angle_div_2_le_straight.
-Theorem angle_div_4_le_right :
-  ∀ θ, (θ / ₂^2 ≤ angle_right)%A.
-...
-apply angle_div_4_le_right.
-...
-Search (_ * (_ / ₂^_) ≤ _)%A.
-...
-apply angle_div_2_pow_mul_le_angle.
-...
-rewrite angle_mul_nat_div_2. 2: {
-Search (angle_mul_nat_overflow _ (_ / ₂)).
-...
-  apply angle_mul_nat_overflow_div2.
-  apply (le_trans _ (S n)); [ apply Nat.le_succ_diag_r | easy ].
-}
-destruct i. {
-  cbn in Hni.
-  apply Nat.succ_le_mono in Hni.
-  apply Nat.le_0_r in Hni; subst n.
-  cbn.
-  apply angle_nonneg.
-...
-rewrite angle_mul_nat_div_2. 2: {
-...
-apply angle_div_2_le_straight.
-...
-apply angle_mul_div_pow2_le_right.
-rewrite Nat.mul_succ_r.
-...
-  apply
-    (angle_le_trans _ (2 ^ q * (2 ^ p mod n) / (2 ^ p * n) * (θ / ₂^(q-2)))). {
-    apply angle_mul_le_mono_l. {
-      apply angle_div_2_pow_le_compat_l; flia.
-    }
-    apply angle_mul_nat_overflow_div_pow2.
-    replace q with (q - 2 + 2) at 1 by flia Hpq.
-    rewrite Nat.pow_add_r.
-    cbn.
-    rewrite (Nat.mul_comm _ 4).
-    apply Nat.div_le_upper_bound. {
-      apply Nat.neq_mul_0.
-      split; [ now apply Nat.pow_nonzero | easy ].
-    }
-    rewrite Nat.mul_shuffle0.
-    apply Nat.mul_le_mono_r.
-    apply (Nat.le_trans _ (4 * n)). {
-      apply Nat.mul_le_mono_l.
-      now apply Nat.lt_le_incl, Nat.mod_upper_bound.
-    }
-    apply Nat.mul_le_mono_r.
-    destruct p; [ easy | ].
-    destruct p; [ flia Hpq | ].
-    specialize (Nat.pow_nonzero 2 p (Nat.neq_succ_0 _)) as H1.
-    cbn; flia H1.
-  }
-  remember (_ / _) as x eqn:Hx.
-  rewrite angle_div_2_pow_sub_r.
-(* bin non, c'est à l'envers, mon truc *)
-...
-
-Search (_ / ₂^(_ + _))%A.
-Search (_ / ₂^(_ - _))%A.
-...
-  progress unfold angle_leb.
-  cbn.
-  (* lemma to do *)
-  specialize (rngl_0_le_1 Hon Hop Hor) as H1.
-  apply rngl_leb_le in H1.
-  rewrite H1; clear H1.
-...
-Search (_ * (_ / ₂^_))%A.
-rewrite <- (angle_div_2_pow_mul_2_pow 2 θ).
-...
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
-Search (_ * _ ≤ _ * _)%A.
-...
-  apply (angle_le_trans _ (2 ^ q * (θ / ₂^q))). {
-    apply angle_mul_le_mono_r. {
-      apply angle_mul_nat_overflow_pow_div.
-    }
-    apply Nat.div_le_upper_bound. {
-      apply Nat.neq_mul_0.
-      split; [ now apply Nat.pow_nonzero | easy ].
-    }
-    rewrite Nat.mul_comm.
-    apply Nat.mul_le_mono_r.
-    apply (le_trans _ n). {
-      apply Nat.lt_le_incl.
-      now apply Nat.mod_upper_bound.
-    }
-    (* lemma to do *)
-    rewrite Nat.mul_comm.
-    apply Nat_mul_le_pos_r.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite angle_div_2_pow_mul_2_pow.
-...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p ≤ q
@@ -3611,7 +3487,6 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-...
   assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
     split. {
       apply (rngl_le_add_le_sub_l Hop Hor).
@@ -3621,14 +3496,24 @@ enough (H :
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       rewrite fold_rngl_squ.
-...
-2: {
-Search (_ ≤ _ - _)%L.
-      apply rngl_le_move_0_r.
-Search (_ ≤ _ / _)%L.
-apply (rngl_le_div_r Hon Hop Hiv Hor).
-      apply Nat.le_div_r.
-...
+      apply (rngl_le_trans Hor _ 2); [ easy | ].
+      progress unfold rngl_squ.
+      (* lemma to do rngl_mul_le_pos_l *)
+      rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_le_add_l Hor).
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_sub_diag Hos).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_squ_nonneg Hop Hor).
+  }
   rewrite <- (rngl_cos_acos (_ - _))%L; [ | easy ].
   apply (rngl_lt_iff Hor).
   split. {
