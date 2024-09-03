@@ -3527,9 +3527,9 @@ enough (H :
   }
   specialize (rngl_acos_bound (1 - (ε² / 2))%L) as H1.
   rewrite Hcc in H1.
-  destruct H1 as (H1, H2).
-  apply angle_nlt_ge in H2.
-  apply H2; clear H2.
+  destruct H1 as (_, H1).
+  apply angle_nlt_ge in H1.
+  apply H1; clear H1.
   rewrite <- angle_opp_straight.
   apply angle_opp_lt_compat_if. {
     intros H2.
