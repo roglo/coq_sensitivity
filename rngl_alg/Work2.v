@@ -3575,6 +3575,11 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hε2.
+Check rngl_acos_bound.
+(* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough" ci-dessous,
+   c'est peut-être lui qui finit par m'exiger que θ soit lui-même inférieur à π.
+   Faut que je vérifie ça et que j'essaie de voir si je peux m'en sortir *)
+...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p ≤ q
