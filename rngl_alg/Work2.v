@@ -3566,9 +3566,10 @@ enough (H :
     now apply Nat.pow_nonzero.
   }
   rewrite angle_div_2_pow_mul_2_pow.
+...
   specialize (Hss (Nat.log2_up n)) as H2.
   progress unfold seq_angle_to_div_nat in H2.
-  replace (2 ^ Nat.log2_up n / n) with 1 in H2. 2: {
+  progress replace (2 ^ Nat.log2_up n / n) with 1 in H2. 2: {
     symmetry.
     apply Nat_eq_div_1.
     split. {
