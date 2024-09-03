@@ -3439,26 +3439,16 @@ intros.
      Donc, chais pas si ce serait utile, mais c'est un exercice qui a
    l'air faisable. *)
 (* bon, faut voir... *)
-enough (H : ∀ k,
+(* mouis, bof, ceci marche, mais je vois pas l'intérêt
+enough (H : ∃ k,
   is_Cauchy_sequence angle_eucl_dist
-    (λ i, seq_angle_to_div_nat θ n (i + k))). {
-  specialize (H 0).
-  intros ε Hε.
-  specialize (H ε Hε).
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hp Hq.
-  specialize (HN p q Hp Hq).
-  now do 2 rewrite Nat.add_0_r in HN.
+    (λ i, seq_angle_to_div_nat θ n (k + i))). {
+  destruct H as (k, H).
+  eapply (angle_Cauchy_sequence_eq_compat 0 k); [ | apply H ].
+  now intros i; rewrite Nat.add_0_r, Nat.add_comm.
 }
-intros k.
-...
-Search angle_lim.
-Print angle_lim.
-Search is_limit_when_tending_to_inf.
-Search angle_lim.
-About angle_lim_eq_compat.
-...
+exists 0.
+*)
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
