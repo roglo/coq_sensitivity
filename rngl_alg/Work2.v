@@ -3575,11 +3575,37 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hε2.
+assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
+  split. {
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite (rngl_sub_opp_r Hop).
+    apply (rngl_le_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite fold_rngl_squ.
+    apply (rngl_le_trans Hor _ 2); [ easy | ].
+    progress unfold rngl_squ.
+    (* lemma to do rngl_mul_le_pos_l *)
+    rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_squ_nonneg Hop Hor).
+}
 Check rngl_acos_bound.
 (* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough" ci-dessous,
    c'est peut-être lui qui finit par m'exiger que θ soit lui-même inférieur à π.
    Faut que je vérifie ça et que j'essaie de voir si je peux m'en sortir *)
-...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p ≤ q
@@ -3587,34 +3613,7 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-  assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
-    split. {
-      apply (rngl_le_add_le_sub_l Hop Hor).
-      apply (rngl_le_add_le_sub_r Hop Hor).
-      rewrite (rngl_sub_opp_r Hop).
-      apply (rngl_le_div_l Hon Hop Hiv Hor). {
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      rewrite fold_rngl_squ.
-      apply (rngl_le_trans Hor _ 2); [ easy | ].
-      progress unfold rngl_squ.
-      (* lemma to do rngl_mul_le_pos_l *)
-      rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-      }
-      apply (rngl_le_add_l Hor).
-      apply (rngl_0_le_1 Hon Hop Hor).
-    }
-    apply (rngl_le_sub_le_add_r Hop Hor).
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    rewrite (rngl_sub_diag Hos).
-    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_squ_nonneg Hop Hor).
-  }
-  rewrite <- (rngl_cos_acos (_ - _))%L; [ | easy ].
+  rewrite <- (rngl_cos_acos (_ - _))%L; [ | apply H1e1 ].
   apply (rngl_lt_iff Hor).
   split. {
     apply rngl_cos_decr.
@@ -3641,7 +3640,7 @@ enough (H :
     intros H2.
     rewrite H2 in Hcc.
     rewrite angle_opp_0 in Hcc.
-    apply eq_rngl_acos_0 in Hcc; [ | easy ].
+    apply eq_rngl_acos_0 in Hcc; [ | apply H1e1 ].
     apply (rngl_sub_move_l Hop) in Hcc.
     rewrite (rngl_sub_diag Hos) in Hcc.
     apply (f_equal (λ a, (a * 2)%L)) in Hcc.
