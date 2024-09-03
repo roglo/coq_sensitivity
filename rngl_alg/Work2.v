@@ -3348,6 +3348,23 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_to_div_nat θ n).
 Proof.
+(* apparemment, je tombe sur le fait de devoir démontrer que θ < π ;
+   or, il n'y a pas de raison ! alors, serait-il suffisant de montrer
+      is_Cauchy_sequence angle_eucl_dist
+        (λ i, seq_angle_to_div_nat θ n (i + k)).
+   pour un certain k ? c'est-à-dire de ne commencer la suite qu'à partir
+   d'un certain rang ; l'équivalence entre les deux énoncés devrait pouvoir
+   se faire, d'autant plus que je l'ai démontré pour les limites (une sous
+   suite commençant à un certain rang, n'importe lequel, même lointain a
+   la même limite que la suite).
+     Du coup, si je démontre ça, il faudrait être sûr que je n'aie plus
+   besoin de montrer que θ < π ; bon, mais c'est pas clair.
+     Une première étape serait donc déjà d'essayer de montrer le lemme
+   du décalage ci-dessus ; peut-être que je pourrais trouver une autre
+   idée après, en m'en servant.
+     Donc, chais pas si ce serait utile, mais c'est un exercice qui a
+   l'air faisable. *)
+...
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
