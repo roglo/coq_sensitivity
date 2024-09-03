@@ -3422,9 +3422,6 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
     (seq_angle_to_div_nat θ n).
 Proof.
 intros.
-eapply angle_Cauchy_sequence_eq_compat.
-(* bon, faut voir... *)
-...
 (* apparemment, je tombe sur le fait de devoir démontrer que θ < π ;
    or, il n'y a pas de raison ! alors, serait-il suffisant de montrer
       is_Cauchy_sequence angle_eucl_dist
@@ -3441,6 +3438,20 @@ eapply angle_Cauchy_sequence_eq_compat.
    idée après, en m'en servant.
      Donc, chais pas si ce serait utile, mais c'est un exercice qui a
    l'air faisable. *)
+(* bon, faut voir... *)
+enough (H : ∀ k,
+  is_Cauchy_sequence angle_eucl_dist
+    (λ i, seq_angle_to_div_nat θ n (i + k))). {
+  specialize (H 0).
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  specialize (HN p q Hp Hq).
+  now do 2 rewrite Nat.add_0_r in HN.
+}
+intros k.
 ...
 Search angle_lim.
 Print angle_lim.
