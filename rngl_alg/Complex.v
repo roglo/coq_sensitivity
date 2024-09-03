@@ -3836,25 +3836,6 @@ rewrite IHn.
 now do 2 rewrite angle_mul_nat_assoc.
 Qed.
 
-Theorem angle_lim_eq_compat :
-  ∀ a b f g θ,
-  (∀ i, f (i + a) = g (i + b))
-  → angle_lim f θ
-  → angle_lim g θ.
-Proof.
-intros * Hfg Hf.
-intros ε Hε.
-specialize (Hf ε Hε).
-destruct Hf as (N, HN).
-exists (N + max a b).
-intros n Hn.
-specialize (HN (n - b + a)).
-assert (H : N ≤ n - b + a) by flia Hn.
-specialize (HN H).
-rewrite Hfg in HN.
-rewrite Nat.sub_add in HN; [ easy | flia Hn ].
-Qed.
-
 Theorem rngl_cos_div_2 :
   ∀ θ,
   rngl_cos (θ / ₂) =
@@ -4102,12 +4083,6 @@ apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 rewrite <- (rngl_add_diag2 Hon).
 apply (rngl_le_add_l Hor).
 now apply (rngl_lt_le_incl Hor).
-Qed.
-
-Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
-Proof.
-intros.
-now apply angle_eucl_dist_separation.
 Qed.
 
 Theorem angle_add_div_2_pow_diag :

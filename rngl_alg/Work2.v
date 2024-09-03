@@ -1161,6 +1161,18 @@ do 2 rewrite (angle_add_comm _ θ3).
 apply angle_eucl_dist_add_cancel_l.
 Qed.
 
+Theorem dist_diag : ∀ A dist (a : A), is_dist dist → dist a a = 0%L.
+Proof.
+intros * Hd.
+now apply (is_dist_separation dist Hd).
+Qed.
+
+Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
+Proof.
+intros.
+now apply angle_eucl_dist_separation.
+Qed.
+
 Theorem angle_eucl_dist_mul_le :
   ∀ n θ,
   (angle_eucl_dist (n * θ) 0 ≤ rngl_of_nat n * angle_eucl_dist θ 0)%L.
@@ -3342,12 +3354,77 @@ apply angle_div_2_le_compat.
 now apply angle_mul_div_pow2_le_straight.
 Qed.
 
+Theorem is_Cauchy_sequence_eq_compat :
+  ∀ A (dist : A → _) a b f g,
+  (∀ i, f (i + a) = g (i + b))
+  → is_Cauchy_sequence dist f
+  → is_Cauchy_sequence dist g.
+Proof.
+intros * Hfg Hf.
+intros ε Hε.
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists (N + max a b).
+intros p q Hnp Hnq.
+specialize (HN (p - b + a) (q - b + a)).
+assert (Hp : N ≤ p - b + a) by flia Hnp.
+assert (Hq : N ≤ q - b + a) by flia Hnq.
+specialize (HN Hp Hq).
+do 2 rewrite Hfg in HN.
+rewrite Nat.sub_add in HN; [ | flia Hnp ].
+rewrite Nat.sub_add in HN; [ | flia Hnq ].
+easy.
+Qed.
+
+Theorem is_limit_when_tending_to_inf_eq_compat :
+  ∀ A (dist : A → _) a b f g z,
+  (∀ i, f (i + a) = g (i + b))
+  → is_limit_when_tending_to_inf dist f z
+  → is_limit_when_tending_to_inf dist g z.
+Proof.
+intros * Hfg Hf.
+intros ε Hε.
+specialize (Hf ε Hε).
+destruct Hf as (N, HN).
+exists (N + max a b).
+intros n Hn.
+specialize (HN (n - b + a)).
+assert (H : N ≤ n - b + a) by flia Hn.
+specialize (HN H).
+rewrite Hfg in HN.
+rewrite Nat.sub_add in HN; [ easy | flia Hn ].
+Qed.
+
+Theorem angle_Cauchy_sequence_eq_compat :
+  ∀ a b θ1 θ2,
+  (∀ i, θ1 (i + a) = θ2 (i + b))
+  → is_Cauchy_sequence angle_eucl_dist θ1
+  → is_Cauchy_sequence angle_eucl_dist θ2.
+Proof.
+intros * H12 H1.
+eapply is_Cauchy_sequence_eq_compat; [ apply H12 | easy ].
+Qed.
+
+Theorem angle_lim_eq_compat :
+  ∀ a b f g θ,
+  (∀ i, f (i + a) = g (i + b))
+  → angle_lim f θ
+  → angle_lim g θ.
+Proof.
+intros * Hfg Hf.
+eapply is_limit_when_tending_to_inf_eq_compat; [ apply Hfg | easy ].
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_to_div_nat θ n).
 Proof.
+intros.
+eapply angle_Cauchy_sequence_eq_compat.
+(* bon, faut voir... *)
+...
 (* apparemment, je tombe sur le fait de devoir démontrer que θ < π ;
    or, il n'y a pas de raison ! alors, serait-il suffisant de montrer
       is_Cauchy_sequence angle_eucl_dist
@@ -3364,6 +3441,12 @@ Proof.
    idée après, en m'en servant.
      Donc, chais pas si ce serait utile, mais c'est un exercice qui a
    l'air faisable. *)
+...
+Search angle_lim.
+Print angle_lim.
+Search is_limit_when_tending_to_inf.
+Search angle_lim.
+About angle_lim_eq_compat.
 ...
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
