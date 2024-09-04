@@ -3673,9 +3673,10 @@ assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 Check rngl_acos_bound.
-(* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough" ci-dessous,
-   c'est peut-être lui qui finit par m'exiger que θ soit lui-même inférieur à π.
-   Faut que je vérifie ça et que j'essaie de voir si je peux m'en sortir *)
+(* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough"
+   ci-dessous, c'est peut-être lui qui finit par m'exiger que θ soit
+   lui-même inférieur à π.  Faut que je vérifie ça et que j'essaie de
+   voir si je peux m'en sortir *)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3723,6 +3724,67 @@ enough (H :
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
   rewrite pow2_mod_mul_div; [ | flia Hpq ].
+(* essai *)
+(*1*)
+  destruct (Nat.eq_dec q 0) as [Hqz| Hqz]; [ subst q; flia Hpq | ].
+  apply (angle_lt_le_trans _ (2 ^ (q - 1) * (θ / ₂^q))). 2: {
+    destruct q; [ easy | ].
+    rewrite Nat_sub_succ_1.
+    rewrite angle_div_2_pow_succ_r_2.
+    rewrite angle_div_2_pow_mul_2_pow.
+    apply angle_div_2_le_straight.
+  }
+  apply angle_mul_lt_mono_r. {
+    destruct q; [ easy | ].
+    rewrite Nat_sub_succ_1.
+    rewrite angle_div_2_pow_succ_r_2.
+    apply angle_mul_nat_overflow_pow_div.
+  } {
+    intros H.
+    now apply eq_angle_div_2_pow_0 in H.
+  }
+  apply Nat.div_lt_upper_bound. {
+    apply Nat.neq_mul_0.
+    split; [ now apply Nat.pow_nonzero | easy ].
+  }
+  destruct q; [ easy | clear Hqz ].
+  rewrite Nat_sub_succ_1.
+  rewrite Nat.pow_succ_r.
+  rewrite Nat.mul_shuffle0.
+  apply Nat.mul_lt_mono_pos_r. {
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite Nat.mul_comm.
+Search (_ * _ < _ * _).
+  apply Nat.mul_lt_mono.
+(*
+2: {
+  faire le cas n=2 avant
+*)
+1: {
+    apply (Nat.lt_le_trans _ n). {
+      now apply Nat.mod_upper_bound.
+    }
+(* faire le cas (2 ^ p < n) avant *)
+...
+    specialize (Nat.div_mod (2 ^ p) n Hnz) as H1.
+    rewrite H1 at 2.
+    apply Nat.lt_lt_add_r.
+    rewrite <-
+...
+Search (_ < _ + _).
+...
+...
+2: {
+Search (_ < _ + _).
+apply Nat.lt
+...
+2: {
+Search (_ mod _ < _).
+Check Nat_mod_less_small.
+Check
+...1
   apply (angle_lt_le_trans _ (2 ^ q * (θ / ₂^q))). {
     apply angle_mul_lt_mono_r. {
       apply angle_mul_nat_overflow_pow_div.
