@@ -3515,6 +3515,15 @@ assert (Hsr : n ≤ 3 ∨ ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_right)%A
   apply Nat.le_add_le_sub_l; cbn.
   apply Nat.log2_le_pow2; cbn; flia Hn3.
 }
+assert (He1 : (1 - ε² / 2 < 1)%L). {
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_mul_pos_pos Hop Hor Hii).
+}
 (*
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   exists 2.
@@ -3572,15 +3581,6 @@ enough (H :
   apply (rngl_lt_le_incl Hor) in Hε.
   apply rngl_cos_lt_angle_eucl_dist_lt; [ easy | ].
   apply (HN _ _ Hq Hp).
-}
-assert (He1 : (1 - ε² / 2 < 1)%L). {
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  rewrite (rngl_sub_diag Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  now apply (rngl_mul_pos_pos Hop Hor Hii).
 }
 enough (H :
   ∃ N, ∀ p q,
@@ -3654,25 +3654,23 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
 }
 apply (rngl_nlt_ge Hor) in Hε2.
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
-  split. {
-    apply (rngl_le_add_le_sub_l Hop Hor).
-    apply (rngl_le_add_le_sub_r Hop Hor).
-    rewrite (rngl_sub_opp_r Hop).
-    apply (rngl_le_div_l Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    rewrite fold_rngl_squ.
-    apply (rngl_le_trans Hor _ 2); [ easy | ].
-    progress unfold rngl_squ.
-    (* lemma to do rngl_mul_le_pos_l *)
-    rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_le_add_l Hor).
-    apply (rngl_0_le_1 Hon Hop Hor).
+  split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite (rngl_sub_opp_r Hop).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  now apply (rngl_lt_le_incl Hor) in He1.
+  rewrite fold_rngl_squ.
+  apply (rngl_le_trans Hor _ 2); [ easy | ].
+  progress unfold rngl_squ.
+  (* lemma to do rngl_mul_le_pos_l *)
+  rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_add_l Hor).
+  apply (rngl_0_le_1 Hon Hop Hor).
 }
 Check rngl_acos_bound.
 (* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough" ci-dessous,
