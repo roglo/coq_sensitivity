@@ -138,35 +138,6 @@ rewrite Him in Hmi.
 now apply Hmi.
 Qed.
 
-Theorem rl_sqrt_squ :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a, (√(a²))%L = rngl_abs a.
-Proof.
-intros Hon Hop Hor *.
-progress unfold rngl_squ.
-progress unfold rngl_abs.
-progress unfold rl_sqrt.
-remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
-destruct az. {
-  apply rngl_leb_le in Haz.
-  apply (rngl_opp_nonneg_nonpos Hop Hor) in Haz.
-  rewrite <- (rngl_mul_opp_opp Hop).
-  rewrite rl_nth_root_mul; [ | easy | easy ].
-  rewrite fold_rngl_squ.
-  rewrite (rngl_squ_pow_2 Hon).
-  now apply rl_nth_root_pow.
-} {
-  apply (rngl_leb_gt Hor) in Haz.
-  apply (rngl_lt_le_incl Hor) in Haz.
-  rewrite rl_nth_root_mul; [ | easy | easy ].
-  rewrite fold_rngl_squ.
-  rewrite (rngl_squ_pow_2 Hon).
-  now apply rl_nth_root_pow.
-}
-Qed.
-
 Theorem gc_eq_dec :
   rngl_has_eq_dec T = true →
   ∀ a b : GComplex T, {a = b} + {a ≠ b}.
