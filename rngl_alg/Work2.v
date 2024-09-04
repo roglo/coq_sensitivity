@@ -3515,6 +3515,50 @@ assert (Hsr : n ≤ 3 ∨ ∀ i, (seq_angle_to_div_nat θ n i ≤ angle_right)%A
   apply Nat.le_add_le_sub_l; cbn.
   apply Nat.log2_le_pow2; cbn; flia Hn3.
 }
+(*
+destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
+  exists 2.
+  intros * Hp Hq.
+  rewrite angle_eucl_dist_is_sqrt.
+  rewrite rl_sqrt_mul; cycle 1. {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  } {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite <- (rngl_mul_1_r Hon ε).
+  apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). {
+    split. {
+      apply rl_sqrt_nonneg.
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+      now apply rngl_lt_le_incl.
+    }
+    rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+    apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor); [ | easy ].
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  split. {
+    apply rl_sqrt_nonneg.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite <- (rl_sqrt_1 Hic Hon Hop Hor Hid).
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+...
+    apply (rngl_0_le_2 Hon Hop Hor).
+  rewrite <- (rngl_abs_1 Hon Hop Hor).
+...
+*)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p
@@ -3529,30 +3573,45 @@ enough (H :
   apply rngl_cos_lt_angle_eucl_dist_lt; [ easy | ].
   apply (HN _ _ Hq Hp).
 }
+assert (He1 : (1 - ε² / 2 < 1)%L). {
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_mul_pos_pos Hop Hor Hii).
+}
 enough (H :
   ∃ N, ∀ p q,
-  N ≤ p ≤ q
+  N ≤ p < q
   → (1 - ε² / 2 <
       rngl_cos
         (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q))%L). {
   destruct H as (N, HN).
   exists N.
   intros p q Hp Hq.
+  destruct (Nat.eq_dec q p) as [Hqp| Hqp]. {
+    subst q.
+    now rewrite angle_sub_diag; cbn.
+  }
   apply (rngl_lt_le_incl Hor) in Hε.
-  destruct (le_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
-  apply Nat.nle_gt, Nat.lt_le_incl in Hpq.
+  destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
+  apply Nat.nlt_ge in Hpq.
   rewrite rngl_cos_sub_comm.
-  now apply HN.
+  apply HN.
+  split; [ easy | ].
+  flia Hpq Hqp.
 }
 enough (H :
   ∃ N, ∀ p q,
-  N ≤ p ≤ q
+  N ≤ p < q
   → (1 - ε² / 2 < rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q)))%L). {
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
   rewrite rngl_cos_sub_comm.
-  rewrite seq_angle_to_div_nat_sub; [ | easy ].
+  rewrite seq_angle_to_div_nat_sub; [ | flia Hpq ].
   now apply HN.
 }
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
@@ -3565,7 +3624,7 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
     }
     now rewrite (rngl_mul_1_l Hon).
   }
-  rewrite pow2_mod_mul_div; [ | easy ].
+  rewrite pow2_mod_mul_div; [ | flia Hpq ].
   apply rngl_le_0_cos.
   apply angle_mul_div_pow2_le_right.
   apply (le_trans _ (4 * (2 ^ q * n / (2 ^ p * n)))). {
@@ -3613,13 +3672,7 @@ assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
     apply (rngl_le_add_l Hor).
     apply (rngl_0_le_1 Hon Hop Hor).
   }
-  apply (rngl_le_sub_le_add_r Hop Hor).
-  apply (rngl_le_sub_le_add_l Hop Hor).
-  rewrite (rngl_sub_diag Hos).
-  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_squ_nonneg Hop Hor).
+  now apply (rngl_lt_le_incl Hor) in He1.
 }
 Check rngl_acos_bound.
 (* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough" ci-dessous,
@@ -3627,7 +3680,7 @@ Check rngl_acos_bound.
    Faut que je vérifie ça et que j'essaie de voir si je peux m'en sortir *)
 enough (H :
   ∃ N, ∀ p q,
-  N ≤ p ≤ q
+  N ≤ p < q
   → (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q) < rngl_acos (1 - ε² / 2)%L)%A). {
   destruct H as (N, HN).
   exists N.
@@ -3671,7 +3724,7 @@ enough (H :
     subst ε.
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
-  rewrite pow2_mod_mul_div; [ | easy ].
+  rewrite pow2_mod_mul_div; [ | flia Hpq ].
   apply (angle_lt_le_trans _ (2 ^ q * (θ / ₂^q))). {
     apply angle_mul_lt_mono_r. {
       apply angle_mul_nat_overflow_pow_div.
