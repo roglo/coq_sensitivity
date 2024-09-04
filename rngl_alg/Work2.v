@@ -3422,23 +3422,6 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
     (seq_angle_to_div_nat θ n).
 Proof.
 intros.
-(* apparemment, je tombe sur le fait de devoir démontrer que θ ≤ π ;
-   or, il n'y a pas de raison ! alors, serait-il suffisant de montrer
-      is_Cauchy_sequence angle_eucl_dist
-        (λ i, seq_angle_to_div_nat θ n (i + k)).
-   pour un certain k ? c'est-à-dire de ne commencer la suite qu'à partir
-   d'un certain rang ; l'équivalence entre les deux énoncés devrait pouvoir
-   se faire, d'autant plus que je l'ai démontré pour les limites (une sous
-   suite commençant à un certain rang, n'importe lequel, même lointain a
-   la même limite que la suite).
-     Du coup, si je démontre ça, il faudrait être sûr que je n'aie plus
-   besoin de montrer que θ < π ; bon, mais c'est pas clair.
-     Une première étape serait donc déjà d'essayer de montrer le lemme
-   du décalage ci-dessus ; peut-être que je pourrais trouver une autre
-   idée après, en m'en servant.
-     Donc, chais pas si ce serait utile, mais c'est un exercice qui a
-   l'air faisable. *)
-(* bon, faut voir... *)
 (* mouis, bof, ceci marche, mais je vois pas l'intérêt
 enough (H : ∃ k,
   is_Cauchy_sequence angle_eucl_dist
@@ -3672,11 +3655,6 @@ assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
-Check rngl_acos_bound.
-(* ouais, sachant que rngl_acos est compris entre 0 et π, ce "enough"
-   ci-dessous, c'est peut-être lui qui finit par m'exiger que θ soit
-   lui-même inférieur à π.  Faut que je vérifie ça et que j'essaie de
-   voir si je peux m'en sortir *)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3777,118 +3755,7 @@ enough (H :
   apply Nat.mul_lt_mono; [ | flia Hnz Hn1 Hn2 ].
   apply (Nat.lt_le_trans _ n); [ now apply Nat.mod_upper_bound | easy ].
 }
-...
-2: {
-Search (_ mod _ < _).
-Check Nat_mod_less_small.
-Check
-...1
-  apply (angle_lt_le_trans _ (2 ^ q * (θ / ₂^q))). {
-    apply angle_mul_lt_mono_r. {
-      apply angle_mul_nat_overflow_pow_div.
-    } {
-      intros H.
-      now apply eq_angle_div_2_pow_0 in H.
-    }
-    apply Nat.div_lt_upper_bound. {
-      apply Nat.neq_mul_0.
-      split; [ now apply Nat.pow_nonzero | easy ].
-    }
-    rewrite Nat.mul_comm.
-    apply Nat.mul_lt_mono_pos_r. {
-      apply Nat.neq_0_lt_0.
-      now apply Nat.pow_nonzero.
-    }
-    apply (Nat.lt_le_trans _ n). {
-      now apply Nat.mod_upper_bound.
-    }
-    apply Nat_mul_le_pos_l.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite angle_div_2_pow_mul_2_pow.
-...
-  specialize (Hss (Nat.log2_up n)) as H2.
-  progress unfold seq_angle_to_div_nat in H2.
-  progress replace (2 ^ Nat.log2_up n / n) with 1 in H2. 2: {
-    symmetry.
-    apply Nat_eq_div_1.
-    split. {
-      apply Nat.log2_log2_up_spec.
-      now apply Nat.neq_0_lt_0.
-    }
-    now apply Nat_log2_up_lt_twice.
-  }
-  rewrite angle_mul_1_l in H2.
-Search (_ / ₂^Nat.log2_up _)%A.
-Theorem angle_div_2_pow_log2_up : ∀ n θ, (θ / ₂^Nat.log2_up n)%A = θ.
-Proof.
-intros.
-induction n; [ easy | ].
-specialize (Nat.log2_up_succ_or n) as H1.
-destruct H1 as [H1| H1]; [ | now rewrite H1 ].
-Search (_ / ₂^S _)%A.
-(* ouais, bon, chais pas trop, faut peut-être utiliser Nat.log2 n
-   ou Nat.log2_up n, suivant les cas *)
-Search Nat.log2.
-(* par exemple inventer un Nat.log2_round *)
-(* ouais quoique, bon, ça va pas non plus *)
-(* enfin, chais pas *)
-... ...
-rewrite angle_div_2_pow_log2_up in H2.
-...
-Search (_ ≤ 2 ^ Nat.log2_up _).
-...
-Search (2 ^ Nat.log2_up _).
-destruct (Nat.eq_dec n (2 ^
-...
-  eapply angle_lt_le_trans; [ | apply H2 ].
-...
-  apply (angle_le_lt_trans _ (θ / ₂^Nat.log2_up n))%A. {
-Search (2 ^ Nat.log2 _)%A.
-Search (_ / ₂ ^ Nat.log2 _)%A.
-...
-...
-Search (_ / ₂ ^ Nat.log2_up _)%A.
-...
-Search (_ ≤ _ / ₂^_)%A.
-...
-Search (2 ^ Nat.log2_up _).
-  cbn in H2.
-  rewrite Nat.div_small in H2.
-...
-    apply angle_mul_le_mono_r. 2: {
-
-      apply eq_angle_div_2_pow_0 in H2.
-      subst θ.
-Search (_ / ₂^_ = 0)%A.
-
-2: {
-...
-Check rngl_acos_decr.
-...
-Search (rngl_acos _ < rngl_acos _)%A.
-  specialize rngl_acos_decr as H1.
-  specialize (H1 (rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q)))).
-  specialize (H1 (1 - (ε² / 2))%L).
-...
-  rewrite rngl_cos_sub_comm.
-  rewrite seq_angle_to_div_nat_sub; [ | easy ].
-  now apply HN.
-}
-Check rngl_acos_decr.
-...
-Theorem glop :
-  ∀ a n θ ε,
-  a ≠ 0
-  → (rngl_cos (a * (θ / ₂^n)) < 1 - ε)%L.
-Proof.
-intros * Haz.
-induction a; [ easy | clear Haz ].
-destruct a. {
-  rewrite angle_mul_1_l.
-  clear IHa.
-  induction n; cbn.
+Print rngl_acos.
 ...
 (*
 intros * ε Hε.
