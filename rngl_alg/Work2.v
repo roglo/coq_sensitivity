@@ -3682,8 +3682,9 @@ enough (H :
   N ≤ p < q
   → (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q) < rngl_acos (1 - ε² / 2)%L)%A). {
   destruct H as (N, HN).
-  exists N.
-  intros * Hpq.
+  exists (N + 2).
+  intros * Hpq2.
+  assert (Hpq : N ≤ p < q) by flia Hpq2.
   rewrite <- (rngl_cos_acos (_ - _))%L; [ | apply H1e1 ].
   apply (rngl_lt_iff Hor).
   split. {
@@ -3724,8 +3725,6 @@ enough (H :
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
   rewrite pow2_mod_mul_div; [ | flia Hpq ].
-(* essai *)
-(*1*)
   destruct (Nat.eq_dec q 0) as [Hqz| Hqz]; [ subst q; flia Hpq | ].
   apply (angle_lt_le_trans _ (2 ^ (q - 1) * (θ / ₂^q))). 2: {
     destruct q; [ easy | ].
@@ -3749,36 +3748,35 @@ enough (H :
   }
   destruct q; [ easy | clear Hqz ].
   rewrite Nat_sub_succ_1.
-  rewrite Nat.pow_succ_r.
+  rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_shuffle0.
   apply Nat.mul_lt_mono_pos_r. {
     apply Nat.neq_0_lt_0.
     now apply Nat.pow_nonzero.
   }
   rewrite Nat.mul_comm.
-Search (_ * _ < _ * _).
-  apply Nat.mul_lt_mono.
-(*
-2: {
-  faire le cas n=2 avant
-*)
-1: {
-    apply (Nat.lt_le_trans _ n). {
-      now apply Nat.mod_upper_bound.
-    }
-(* faire le cas (2 ^ p < n) avant *)
-...
-    specialize (Nat.div_mod (2 ^ p) n Hnz) as H1.
-    rewrite H1 at 2.
-    apply Nat.lt_lt_add_r.
-    rewrite <-
-...
-Search (_ < _ + _).
-...
-...
-2: {
-Search (_ < _ + _).
-apply Nat.lt
+  destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+    subst n.
+    clear Hnz Hn1.
+    apply Nat.mul_lt_mono_pos_r; [ easy | ].
+    apply (lt_le_trans _ 2); [ now apply Nat.mod_upper_bound | ].
+    destruct p; [ flia Hpq2 | ].
+    rewrite Nat.pow_succ_r'.
+    apply Nat_mul_le_pos_r.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  move Hn2 before Hn1.
+  destruct (lt_dec (2 ^ p) n) as [H2pn| Hn2p]. {
+    rewrite Nat.mod_small; [ | easy ].
+    apply Nat.mul_lt_mono_pos_l; [ | flia Hnz Hn1 Hn2 ].
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  apply Nat.nlt_ge in Hn2p.
+  apply Nat.mul_lt_mono; [ | flia Hnz Hn1 Hn2 ].
+  apply (Nat.lt_le_trans _ n); [ now apply Nat.mod_upper_bound | easy ].
+}
 ...
 2: {
 Search (_ mod _ < _).
