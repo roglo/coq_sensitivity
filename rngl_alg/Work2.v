@@ -3422,7 +3422,7 @@ Theorem seq_angle_to_div_nat_is_Cauchy :
     (seq_angle_to_div_nat θ n).
 Proof.
 intros.
-(* apparemment, je tombe sur le fait de devoir démontrer que θ < π ;
+(* apparemment, je tombe sur le fait de devoir démontrer que θ ≤ π ;
    or, il n'y a pas de raison ! alors, serait-il suffisant de montrer
       is_Cauchy_sequence angle_eucl_dist
         (λ i, seq_angle_to_div_nat θ n (i + k)).
@@ -3458,6 +3458,25 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros * ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
+}
+destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
+  subst θ.
+  enough (H : is_Cauchy_sequence angle_eucl_dist (λ _, 0%A)). {
+    intros ε Hε.
+    specialize (H ε Hε).
+    destruct H as (N, HN).
+    exists N.
+    intros p q Hp Hq.
+    (* lemma to do seq_angle_to_div_nat_0_l *)
+    progress unfold seq_angle_to_div_nat.
+    do 2 rewrite angle_0_div_2_pow.
+    do 2 rewrite angle_mul_0_r.
+    now rewrite angle_eucl_dist_diag.
+  }
+  (* lemma to do const_seq_is_Cauchy *)
+  exists 0.
+  intros p q _ _.
+  now rewrite angle_eucl_dist_diag.
 }
 intros * ε Hε.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3653,18 +3672,24 @@ enough (H :
     now apply (rngl_lt_irrefl Hor) in Hε.
   }
   rewrite pow2_mod_mul_div; [ | easy ].
-  apply (angle_le_lt_trans _ (2 ^ q * (θ / ₂^q))). {
-    apply angle_mul_le_mono_r. {
+  apply (angle_lt_le_trans _ (2 ^ q * (θ / ₂^q))). {
+    apply angle_mul_lt_mono_r. {
       apply angle_mul_nat_overflow_pow_div.
+    } {
+      intros H.
+      now apply eq_angle_div_2_pow_0 in H.
     }
-    apply Nat.div_le_upper_bound. {
+    apply Nat.div_lt_upper_bound. {
       apply Nat.neq_mul_0.
       split; [ now apply Nat.pow_nonzero | easy ].
     }
     rewrite Nat.mul_comm.
-    apply Nat.mul_le_mono_r.
-    apply (Nat.le_trans _ n). {
-      now apply Nat.lt_le_incl, Nat.mod_upper_bound.
+    apply Nat.mul_lt_mono_pos_r. {
+      apply Nat.neq_0_lt_0.
+      now apply Nat.pow_nonzero.
+    }
+    apply (Nat.lt_le_trans _ n). {
+      now apply Nat.mod_upper_bound.
     }
     apply Nat_mul_le_pos_l.
     apply Nat.neq_0_lt_0.
