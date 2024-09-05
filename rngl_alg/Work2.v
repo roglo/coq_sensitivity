@@ -3560,14 +3560,25 @@ Search (angle_eucl_dist (_ / ₂^_)).
 Search (_ / ₂^_ - _ / ₂^_)%A.
 Theorem angle_sub_mul_div_2_pow :
   ∀ a b n θ1 θ2,
-  (a * (θ1 / ₂^n) - b * (θ2 / ₂^n) = (a * θ1 - b * θ2) / ₂^n)%A.
+  angle_mul_nat_overflow a θ1 = false
+  → angle_mul_nat_overflow b θ2 = false
+  → (a * (θ1 / ₂^n) - b * (θ2 / ₂^n) = (a * θ1 - b * θ2) / ₂^n)%A.
 Proof.
-intros.
+intros * Ha1 Hb2.
 apply angle_sub_move_r.
-rewrite <- angle_div_2_pow_mul.
-rewrite <- angle_div_2_pow_mul.
-rewrite <- angle_div_2_pow_add.
-now rewrite angle_sub_add.
+rewrite <- angle_div_2_pow_mul; [ | easy ].
+rewrite <- angle_div_2_pow_mul; [ | easy ].
+rewrite <- angle_div_2_pow_add; [ now rewrite angle_sub_add | ].
+(* lemma to do *)
+progress unfold angle_sub.
+apply angle_add_not_overflow_comm.
+Search (_ → angle_add_overflow _ (_ + _) = false).
+apply angle_add_not_overflow_move_add.
+...
+Search (_ → angle_add_overflow (_ - _) _ = false).
+Search (_ → angle_add_overflow _ (_ - _) = false).
+Search (_ → angle_add_overflow (_ + _) _ = false).
+
 ...
 Search (((_ * _) / ₂^_) + ((_ * _) / ₂^_))%A.
 Search ((_ * (_ / ₂^_)) + (_ * (_ / ₂^_)))%A.
