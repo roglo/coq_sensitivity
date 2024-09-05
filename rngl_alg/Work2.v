@@ -3655,6 +3655,8 @@ assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
+...
+(* démontré mais chais pas si c'est vraiment utile
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3755,7 +3757,7 @@ enough (H :
   apply Nat.mul_lt_mono; [ | flia Hnz Hn1 Hn2 ].
   apply (Nat.lt_le_trans _ n); [ now apply Nat.mod_upper_bound | easy ].
 }
-Print rngl_acos.
+*)
 ...
 (*
 intros * ε Hε.
