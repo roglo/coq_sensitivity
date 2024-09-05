@@ -3557,6 +3557,54 @@ Check angle_eucl_dist_div_2_pow_0_lt.
 Search (angle_eucl_dist (_ * (_ / ₂^_))).
 Search (angle_eucl_dist (_ * (_ / ₂))).
 Search (angle_eucl_dist (_ / ₂^_)).
+Search (_ / ₂^_ - _ / ₂^_)%A.
+Theorem angle_sub_mul_div_2_pow :
+  ∀ a b n θ1 θ2,
+  (a * (θ1 / ₂^n) - b * (θ2 / ₂^n) = (a * θ1 - b * θ2) / ₂^n)%A.
+Proof.
+intros.
+apply angle_sub_move_r.
+rewrite <- angle_div_2_pow_mul.
+rewrite <- angle_div_2_pow_mul.
+rewrite <- angle_div_2_pow_add.
+now rewrite angle_sub_add.
+...
+Search (((_ * _) / ₂^_) + ((_ * _) / ₂^_))%A.
+Search ((_ * (_ / ₂^_)) + (_ * (_ / ₂^_)))%A.
+Search ((_ / ₂^_) - (_ / ₂^_))%A.
+Search ((_ / ₂^_) + (_ / ₂^_))%A.
+...
+angle_div_2_pow_add:
+  ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T)
+    (rl : real_like_prop T) (ac : angle_ctx T) (n : nat)
+    (θ1 θ2 : angle T),
+    angle_add_overflow θ1 θ2 = false
+    → ((θ1 + θ2) / ₂^n)%A = (θ1 / ₂^n + θ2 / ₂^n)%A
+Search ((_ * _ / ₂^_) + (_ * _ / ₂^_))%A.
+...
+Search ((_ / ₂) - (_ / ₂))%A.
+... ...
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p < q
+  → (angle_eucl_dist
+       (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q) 0 < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hpq.
+  replace q with ((q - p) + p) by flia Hpq.
+  rewrite angle_div_2_pow_add_r.
+  rewrite angle_sub_mul_div_2_pow.
+...
+}
+...
+angle_div_2_pow_le_compat_l:
+  ∀ (a b : nat) (θ : angle T), b ≤ a → (θ / ₂^a ≤ θ / ₂^b)%A
+seq_angle_to_div_nat_sub :
+  ∀ n θ p q,
+  p ≤ q
+  → (seq_angle_to_div_nat θ n q - seq_angle_to_div_nat θ n p)%A =
+    (2 ^ p mod n * 2 ^ (q - p) / n * (θ / ₂^q))%A.
 ...
 (*
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
