@@ -3431,6 +3431,25 @@ intros * Hfg Hf.
 eapply is_limit_when_tending_to_inf_eq_compat; [ apply Hfg | easy ].
 Qed.
 
+Theorem angle_sub_mul_div_2_pow :
+  ∀ a b n θ1 θ2,
+  (b * θ2 ≤ a * θ1)%A
+  → angle_mul_nat_overflow a θ1 = false
+  → angle_mul_nat_overflow b θ2 = false
+  → (a * (θ1 / ₂^n) - b * (θ2 / ₂^n) = (a * θ1 - b * θ2) / ₂^n)%A.
+Proof.
+intros * Hba Ha1 Hb2.
+apply angle_sub_move_r.
+rewrite <- angle_div_2_pow_mul; [ | easy ].
+rewrite <- angle_div_2_pow_mul; [ | easy ].
+rewrite <- angle_div_2_pow_add; [ now rewrite angle_sub_add | ].
+progress unfold angle_add_overflow.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
+rewrite angle_sub_add.
+now apply angle_le_sub_diag.
+Qed.
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3551,31 +3570,36 @@ enough (H :
   rewrite angle_eucl_dist_move_0_r.
   now apply HN.
 }
-progress unfold seq_angle_to_div_nat.
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p < q
+  → (angle_eucl_dist
+       (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q) 0 < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hpq.
+  progress unfold seq_angle_to_div_nat.
+  replace q with ((q - p) + p) at 1 by flia Hpq.
+  rewrite angle_div_2_pow_add_r.
+  rewrite angle_sub_mul_div_2_pow. {
+    remember (2 ^ p / n * θ - 2 ^ q / n * (θ / ₂^(q - p)))%A as θ' eqn:Ht.
+Search (angle_eucl_dist (_ / ₂^_)).
+...
+    apply (angle_eucl_dist_div_2_pow_0_lt _ ε).
+...
+Search (angle_eucl_dist (_ / ₂^_)).
+Search (angle_eucl_dist _ (_ * (_ / ₂^_))).
+...
+}
+...
 Check angle_eucl_dist_div_2_0_lt.
 Check angle_eucl_dist_div_2_pow_0_lt.
-Search (angle_eucl_dist (_ * (_ / ₂^_))).
-Search (angle_eucl_dist (_ * (_ / ₂))).
-Search (angle_eucl_dist (_ / ₂^_)).
-Search (_ / ₂^_ - _ / ₂^_)%A.
-Theorem angle_sub_mul_div_2_pow :
-  ∀ a b n θ1 θ2,
-  angle_mul_nat_overflow a θ1 = false
-  → angle_mul_nat_overflow b θ2 = false
-  → (a * (θ1 / ₂^n) - b * (θ2 / ₂^n) = (a * θ1 - b * θ2) / ₂^n)%A.
-Proof.
-intros * Ha1 Hb2.
-apply angle_sub_move_r.
-rewrite <- angle_div_2_pow_mul; [ | easy ].
-rewrite <- angle_div_2_pow_mul; [ | easy ].
-rewrite <- angle_div_2_pow_add; [ now rewrite angle_sub_add | ].
-(* lemma to do *)
-(*1*)
-progress unfold angle_add_overflow.
-apply Bool.not_true_iff_false.
-apply angle_nlt_ge.
-rewrite angle_sub_add.
+Check angle_sub_mul_div_2_pow.
+...
 Search (_ - _ ≤ _)%A.
+Search (angle_eucl_dist (_ * (_ / ₂))).
+Search (_ / ₂^_ - _ / ₂^_)%A.
+...
 About angle_sub_le_mono_l.
 Check angle_add_le_mono_l.
 (* ceci, ci-dessous, ne marcherait pas puisque ça ne marche qu'avec θ1=0 *)
@@ -3598,7 +3622,6 @@ apply angle_add_not_overflow_move_add.
 Search (_ → angle_add_overflow (_ - _) _ = false).
 Search (_ → angle_add_overflow _ (_ - _) = false).
 Search (_ → angle_add_overflow (_ + _) _ = false).
-
 ...
 Search (((_ * _) / ₂^_) + ((_ * _) / ₂^_))%A.
 Search ((_ * (_ / ₂^_)) + (_ * (_ / ₂^_)))%A.
@@ -3614,20 +3637,6 @@ angle_div_2_pow_add:
 Search ((_ * _ / ₂^_) + (_ * _ / ₂^_))%A.
 ...
 Search ((_ / ₂) - (_ / ₂))%A.
-... ...
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q
-  → (angle_eucl_dist
-       (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q) 0 < ε)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hpq.
-  replace q with ((q - p) + p) by flia Hpq.
-  rewrite angle_div_2_pow_add_r.
-  rewrite angle_sub_mul_div_2_pow.
-...
-}
 ...
 angle_div_2_pow_le_compat_l:
   ∀ (a b : nat) (θ : angle T), b ≤ a → (θ / ₂^a ≤ θ / ₂^b)%A
