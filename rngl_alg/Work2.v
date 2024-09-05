@@ -3652,6 +3652,7 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hε2.
+...
 assert (Hze : (0 ≤ 1 - ε² / 2)%L). {
   apply (rngl_le_0_sub Hop Hor).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
