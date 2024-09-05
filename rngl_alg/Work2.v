@@ -3636,26 +3636,20 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hε2.
-assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
-  split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
-  apply (rngl_le_add_le_sub_l Hop Hor).
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  rewrite (rngl_sub_opp_r Hop).
+assert (Hze : (0 ≤ 1 - ε² / 2)%L). {
+  apply (rngl_le_0_sub Hop Hor).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  rewrite fold_rngl_squ.
-  apply (rngl_le_trans Hor _ 2); [ easy | ].
-  progress unfold rngl_squ.
-  (* lemma to do rngl_mul_le_pos_l *)
-  rewrite <- (rngl_mul_1_r Hon 2%L) at 1.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_le_add_l Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
+  now rewrite (rngl_mul_1_l Hon).
 }
+move Hze after He1.
 ...
+assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
+  split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
+  apply (rngl_le_trans Hor _ 0); [ | easy ].
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+}
 (* démontré mais chais pas si c'est vraiment utile
 enough (H :
   ∃ N, ∀ p q,
