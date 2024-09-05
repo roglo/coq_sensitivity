@@ -3613,16 +3613,10 @@ enough (H :
   rewrite seq_angle_to_div_nat_sub; [ | flia Hpq ].
   now apply HN.
 }
-destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
+destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   exists 2.
   intros * Hpq.
-  apply (rngl_lt_le_trans Hor _ 0). {
-    apply (rngl_lt_sub_0 Hop Hor).
-    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    now rewrite (rngl_mul_1_l Hon).
-  }
+  apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
   rewrite pow2_mod_mul_div; [ | flia Hpq ].
   apply rngl_le_0_cos.
   apply angle_mul_div_pow2_le_right.
@@ -3651,15 +3645,7 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
-apply (rngl_nlt_ge Hor) in Hε2.
-...
-assert (Hze : (0 ≤ 1 - ε² / 2)%L). {
-  apply (rngl_le_0_sub Hop Hor).
-  apply (rngl_le_div_l Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  now rewrite (rngl_mul_1_l Hon).
-}
+apply (rngl_nlt_ge Hor) in Hze.
 move Hze after He1.
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
