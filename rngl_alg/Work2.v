@@ -3570,6 +3570,26 @@ rewrite <- angle_div_2_pow_mul; [ | easy ].
 rewrite <- angle_div_2_pow_mul; [ | easy ].
 rewrite <- angle_div_2_pow_add; [ now rewrite angle_sub_add | ].
 (* lemma to do *)
+(*1*)
+progress unfold angle_add_overflow.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
+rewrite angle_sub_add.
+Search (_ - _ ≤ _)%A.
+About angle_sub_le_mono_l.
+Check angle_add_le_mono_l.
+(* ceci, ci-dessous, ne marcherait pas puisque ça ne marche qu'avec θ1=0 *)
+...
+angle_sub_le_mono_l:
+  ∀ θ2 θ3 θ1 : angle T, angle_add_overflow θ3 (- θ1) = false → θ1 ≠ 0%A → (θ1 ≤ θ2)%A → (θ3 - θ2 ≤ θ3 - θ1)%A
+...
+rewrite angle_add_add_swap in H132.
+rewrite <- angle_add_assoc in H132.
+apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
+progress unfold angle_add_overflow in H13.
+apply Bool.not_true_iff_false in H13.
+now apply angle_nlt_ge in H13.
+...1
 progress unfold angle_sub.
 apply angle_add_not_overflow_comm.
 Search (_ → angle_add_overflow _ (_ + _) = false).
