@@ -3523,6 +3523,41 @@ assert (He1 : (1 - ε² / 2 < 1)%L). {
   }
   now apply (rngl_mul_pos_pos Hop Hor Hii).
 }
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p < q
+  → (angle_eucl_dist (seq_angle_to_div_nat θ n p)
+       (seq_angle_to_div_nat θ n q) < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hp Hq.
+  destruct (lt_dec p q) as [Hpq| Hpq]; [ apply (HN p q (conj Hp Hpq)) | ].
+  destruct (lt_dec q p) as [Hqp| Hqp]. {
+    rewrite angle_eucl_dist_symmetry.
+    apply (HN q p (conj Hq Hqp)).
+  }
+  apply Nat.nlt_ge in Hpq, Hqp.
+  apply Nat.le_antisymm in Hpq; [ subst q | easy ].
+  now rewrite angle_eucl_dist_diag.
+}
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p < q
+  → (angle_eucl_dist
+       (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q) 0 < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros p q Hpq.
+  rewrite angle_eucl_dist_move_0_r.
+  now apply HN.
+}
+progress unfold seq_angle_to_div_nat.
+Check angle_eucl_dist_div_2_0_lt.
+Check angle_eucl_dist_div_2_pow_0_lt.
+Search (angle_eucl_dist (_ * (_ / ₂^_))).
+Search (angle_eucl_dist (_ * (_ / ₂))).
+Search (angle_eucl_dist (_ / ₂^_)).
+...
 (*
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   exists 2.
