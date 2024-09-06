@@ -3660,6 +3660,12 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
 (* peut-être commencer par se débarasser de /₂^₂ en
    utilisant Hpq ? ça donnerait 0 < cos (_/4) à prouver
    ensuite *)
+Search (0 < rngl_cos (_ / ₂^_))%L.
+(* ah oui, merde, ça marche pas, l'angle / 2^_ est
+   multiplié par un entier ! *)
+Search (0 < rngl_cos (_ * _ / ₂^_))%L.
+...
+apply rngl_cos_div_pow2_2_pos.
 ...
 enough (H :
   ∃ N, ∀ p q,

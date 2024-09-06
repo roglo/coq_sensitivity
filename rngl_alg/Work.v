@@ -1916,6 +1916,53 @@ apply angle_mul_nat_overflow_mul_2_div_2.
 now apply angle_mul_nat_overflow_div_pow2.
 Qed.
 
+Theorem rngl_cos_div_pow2_2_pos :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ, (0 < rngl_cos (θ / ₂^2))%L.
+Proof.
+destruct_ac.
+intros Hc1 *.
+rewrite angle_div_2_pow_succ_r_1.
+cbn - [ angle_div_2_pow ].
+remember (0 ≤? _)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. 2: {
+  exfalso.
+  apply Bool.not_true_iff_false in Hzs.
+  apply Hzs; clear Hzs.
+  apply rngl_leb_le.
+  apply rl_sqrt_nonneg.
+  apply rngl_1_sub_cos_div_2_nonneg.
+}
+rewrite (rngl_mul_1_l Hon).
+(* lemma to do, perhaps *)
+apply (rngl_lt_iff Hor).
+split. {
+  apply rl_sqrt_nonneg.
+  apply rngl_1_add_cos_div_2_nonneg.
+}
+intros H; symmetry in H.
+apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+}
+(* lemma? *)
+apply (f_equal (λ a, rngl_mul a 2)) in H.
+rewrite (rngl_div_mul Hon Hiv) in H. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_0_l Hos) in H.
+(* lemma? *)
+rewrite rngl_add_comm in H.
+apply (rngl_add_move_0_r Hop) in H.
+apply (eq_rngl_cos_opp_1) in H.
+cbn in H.
+now apply (angle_div_2_not_straight Hc1) in H.
+Qed.
+
 Theorem rngl_cos_div_pow2_2_nonneg :
   ∀ θ, (0 ≤ rngl_cos (θ / ₂^2))%L.
 Proof.
