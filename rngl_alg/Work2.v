@@ -3615,6 +3615,52 @@ enough (H :
   rewrite angle_eucl_dist_move_0_r.
   now apply HN.
 }
+destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
+  exists 2.
+  intros * Hpq.
+  rewrite angle_eucl_dist_is_sqrt.
+  rewrite rl_sqrt_mul; cycle 1. {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  } {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite <- (rngl_mul_1_r Hon ε).
+  apply (rngl_mul_lt_mono_nonneg Hop Hor Hii). {
+    split. {
+      apply rl_sqrt_nonneg.
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+      now apply rngl_lt_le_incl.
+    }
+    rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+    apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor); [ | easy ].
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  split. {
+    apply rl_sqrt_nonneg.
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite <- (rl_sqrt_1 Hic Hon Hop Hor Hid).
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  rewrite angle_sub_0_l.
+  rewrite angle_opp_sub_distr.
+  (* lemma to do ? *)
+  progress unfold seq_angle_to_div_nat.
+(* peut-être commencer par se débarasser de /₂^₂ en
+   utilisant Hpq ? ça donnerait 0 < cos (_/4) à prouver
+   ensuite *)
+...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3654,6 +3700,17 @@ Search (angle_eucl_dist (_ / ₂^_)).
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       apply (rngl_squ_le_diag Hon Hop Hor).
+      split. {
+        apply (rngl_le_div_r Hon Hop Hiv Hor). {
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite (rngl_mul_0_l Hos).
+        apply (rngl_squ_nonneg Hop Hor).
+      }
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_mul_1_l Hon).
 ...
     apply (angle_eucl_dist_div_2_pow_0_lt _ (ε/2^p))%L; cycle 1. {
       rewrite (rngl_div_mul Hon Hiv). 2: {
