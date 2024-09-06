@@ -3450,6 +3450,51 @@ rewrite angle_sub_add.
 now apply angle_le_sub_diag.
 Qed.
 
+Theorem rngl_squ_le_diag :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ a ≤ 1 → a² ≤ a)%L.
+Proof.
+intros Hon Hop Hor * Ha.
+rewrite <- (rngl_mul_1_r Hon a) at 2.
+now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+Qed.
+
+(* good but needs to be simplified
+Theorem rngl_squ_le_diag_if :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (rngl_is_integral_domain T
+    || rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a, (a² ≤ a → 0 ≤ a ≤ 1)%L.
+Proof.
+intros Hon Hop Hor Hii Hid * Ha.
+split. {
+  apply (rngl_le_trans Hor _ a²); [ | easy ].
+  apply (rngl_squ_nonneg Hop Hor).
+}
+destruct (rngl_lt_dec Hor 0 a) as [Hza| Hza]. {
+  rewrite <- (rngl_mul_1_r Hon a) in Ha at 2.
+  now apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Ha.
+}
+apply (rngl_nlt_ge Hor).
+intros H1a; apply Hza; clear Hza.
+apply (rngl_lt_le_trans Hor _ a²); [ | easy ].
+apply (rngl_lt_iff Hor).
+split; [ apply (rngl_squ_nonneg Hop Hor) | ].
+intros H; symmetry in H.
+apply (rngl_nle_gt Hor) in H1a.
+apply H1a; clear H1a.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+apply (eq_rngl_squ_0 Hos Hid) in H.
+subst a.
+apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+*)
+
 (* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
   ∀ n θ,
@@ -3584,8 +3629,48 @@ enough (H :
   rewrite angle_sub_mul_div_2_pow. {
     remember (2 ^ p / n * θ - 2 ^ q / n * (θ / ₂^(q - p)))%A as θ' eqn:Ht.
 Search (angle_eucl_dist (_ / ₂^_)).
-    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε/2^p))%L.
-: {
+    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε²/2^S p))%L; cycle 1. {
+      rewrite rngl_pow_succ_r.
+      rewrite (rngl_mul_comm Hic 2).
+      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      } {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_squ_sub Hop Hic Hon).
+      rewrite (rngl_squ_1 Hon), (rngl_mul_1_r Hon).
+      rewrite rngl_add_comm.
+      rewrite <- rngl_add_assoc.
+      rewrite (rngl_add_diag Hon (ε² / 2)²)%L.
+      rewrite <- (rngl_sub_sub_distr Hop).
+      apply (rngl_le_sub_nonneg Hop Hor).
+      apply (rngl_le_0_sub Hop Hor).
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_squ_le_diag Hon Hop Hor).
+...
+    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε/2^p))%L; cycle 1. {
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_squ_sub Hop Hic Hon).
+      rewrite (rngl_squ_1 Hon), (rngl_mul_1_r Hon).
+      rewrite (rngl_mul_comm Hic).
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite rngl_add_assoc.
+      rewrite (rngl_add_sub_assoc Hop).
+      rewrite (rngl_add_sub_swap Hop).
+      rewrite (rngl_sub_diag Hos), rngl_add_0_l.
+      (* marche pas *)
 ...
 Search (angle_eucl_dist (_ / ₂^_)).
 Search (angle_eucl_dist _ (_ * (_ / ₂^_))).
