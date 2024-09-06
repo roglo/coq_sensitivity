@@ -3656,13 +3656,12 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   rewrite angle_sub_0_l.
   rewrite angle_opp_sub_distr.
   (* lemma to do ? *)
-  progress unfold seq_angle_to_div_nat.
+  rewrite seq_angle_to_div_nat_sub; [ | flia Hpq ].
 (* peut-être commencer par se débarasser de /₂^₂ en
    utilisant Hpq ? ça donnerait 0 < cos (_/4) à prouver
    ensuite *)
+...
 Search (0 < rngl_cos (_ / ₂^_))%L.
-(* ah oui, merde, ça marche pas, l'angle / 2^_ est
-   multiplié par un entier ! *)
 Search (0 < rngl_cos (_ * _ / ₂^_))%L.
 ...
 apply rngl_cos_div_pow2_2_pos.
