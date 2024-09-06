@@ -3584,8 +3584,8 @@ enough (H :
   rewrite angle_sub_mul_div_2_pow. {
     remember (2 ^ p / n * θ - 2 ^ q / n * (θ / ₂^(q - p)))%A as θ' eqn:Ht.
 Search (angle_eucl_dist (_ / ₂^_)).
-...
-    apply (angle_eucl_dist_div_2_pow_0_lt _ ε).
+    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε/2^p))%L.
+: {
 ...
 Search (angle_eucl_dist (_ / ₂^_)).
 Search (angle_eucl_dist _ (_ * (_ / ₂^_))).
