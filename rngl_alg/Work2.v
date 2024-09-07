@@ -3669,8 +3669,20 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   rewrite (rngl_sub_diag Hos).
   rewrite angle_sub_0_l.
   rewrite rngl_cos_opp.
+  remember (2 ^ p mod n * 2 ^ (q - p) / n) as a eqn:Ha.
+(* c'est pas gagné du tout, ça.
+   le théorème angle_div_2_pow_mul ne va pas le faire
+   parce que rien ne prouve que a*θ ne déborde pas *)
 Check rngl_cos_div_pow2_2_pos.
-(* ah oui, ça devrait le faire, ça, puisque q est supérieur à 2 *)
+(* le théorème rngl_cos_div_pow2_2_pow ne marche pas
+   à cause de la multiplication par "a" ; il faut donc
+   faire un équivalent de rngl_cos_div_pow2_2_pos mais
+   avec une telle mulitiplication *)
+...
+  rewrite <- angle_div_2_pow_mul.
+...
+Check rngl_cos_div_pow2_2_pos.
+Search (_ * (_ / ₂^_))%A.
 ...
 apply rngl_cos_div_pow2_2_pos.
 ...
