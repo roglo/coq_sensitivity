@@ -3615,6 +3615,7 @@ enough (H :
   rewrite angle_eucl_dist_move_0_r.
   now apply HN.
 }
+(*
 destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   exists 2.
   intros * Hpq.
@@ -3666,6 +3667,7 @@ Search (0 < rngl_cos (_ * _ / ₂^_))%L.
 ...
 apply rngl_cos_div_pow2_2_pos.
 ...
+*)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3679,8 +3681,51 @@ enough (H :
   rewrite angle_div_2_pow_add_r.
   rewrite angle_sub_mul_div_2_pow. {
     remember (2 ^ p / n * θ - 2 ^ q / n * (θ / ₂^(q - p)))%A as θ' eqn:Ht.
-Search (angle_eucl_dist (_ / ₂^_)).
-    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε²/2^S p))%L; cycle 1. {
+    apply (angle_eucl_dist_div_2_pow_0_lt _ (ε²/2^S p))%L.
+3: {
+      rewrite rngl_pow_succ_r.
+      rewrite (rngl_mul_comm Hic 2).
+      rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      } {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_div_mul Hon Hiv). 2: {
+        apply (rngl_pow_nonzero Hon Hc1 Hos Hii).
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+        apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_le_div_l Hon Hop Hiv Hor). {
+        apply (rngl_mul_pos_pos Hop Hor Hii).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_le_trans Hor _ 2²)%L. 2: {
+        rewrite <- (rngl_mul_1_l Hon 2²)%L at 1.
+        apply (rngl_mul_le_mono_pos_r Hop Hor Hii). {
+          apply (rngl_mul_pos_pos Hop Hor Hii).
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+        rewrite <- rngl_of_nat_1.
+        apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+        now apply -> Nat.succ_le_mono.
+      }
+      apply (rngl_abs_le_squ_le Hop Hor).
+      (* lemma to do rngl_abs a² = a² *)
+      rewrite (rngl_abs_nonneg_eq Hop Hor ε²). 2: {
+        apply (rngl_squ_nonneg Hop Hor).
+      }
+      rewrite (rngl_abs_2 Hon Hop Hor).
+      (* il faut que ε² ≤ 2 ; or, je ne l'ai pas démontré ;
+         je l'avais démontré quand je passais par le cosinus
+         mais là, en restant sur les angles, je n'y arrive
+         pas, il faut que je réfléchisse *)
+...
+2: {
       rewrite rngl_pow_succ_r.
       rewrite (rngl_mul_comm Hic 2).
       rewrite <- (rngl_div_div Hos Hon Hiv); cycle 1. {
@@ -3716,6 +3761,7 @@ Search (angle_eucl_dist (_ / ₂^_)).
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
       rewrite (rngl_mul_1_l Hon).
+      (* il faut que ε² ≤ 2 aussi *)
 ...
     apply (angle_eucl_dist_div_2_pow_0_lt _ (ε/2^p))%L; cycle 1. {
       rewrite (rngl_div_mul Hon Hiv). 2: {
