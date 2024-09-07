@@ -3682,6 +3682,13 @@ enough (H :
   rewrite angle_sub_mul_div_2_pow. {
     remember (2 ^ p / n * θ - 2 ^ q / n * (θ / ₂^(q - p)))%A as θ' eqn:Ht.
     apply (angle_eucl_dist_div_2_pow_0_lt _ (ε²/2^S p))%L.
+5: {
+(* (angle_eucl_dist θ' 0 < ε² / 2 ^ S p)%L *)
+...
+4: {
+(* 0 ≤ rngl_sin θ'
+   pas gagné *)
+...
 3: {
       rewrite rngl_pow_succ_r.
       rewrite (rngl_mul_comm Hic 2).
