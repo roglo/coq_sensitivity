@@ -3738,9 +3738,6 @@ enough (H :
   rewrite seq_angle_to_div_nat_sub; [ | now apply Nat.lt_le_incl ].
   now apply HN.
 }
-(* bon, je l'ai, maintenant mon "ε² ≤ 2" ; c'était censé m'être utile
-   mais je ne vois plus où, bordel, j'ai dû supprimer le code en
-   question, faut que je revoie dans le git *)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3749,6 +3746,44 @@ enough (H :
   exists N.
   intros p q Hpq.
   rewrite angle_eucl_dist_is_sqrt.
+  (* lemma √a² = a if 0 < a *)
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+    now apply (rngl_lt_le_incl Hor) in Hε.
+  }
+  rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+  rewrite angle_sub_0_l.
+  rewrite rngl_cos_opp.
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rngl_mul_nonneg_nonneg Hop Hor). {
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H1.
+    apply eq_rngl_cos_1 in H1.
+    apply eq_angle_mul_0_iff in H1. 2: {
+      apply angle_mul_nat_overflow_div_pow2.
+      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.mul_le_mono. {
+        now apply Nat.lt_le_incl, Nat.mod_upper_bound.
+      }
+      apply Nat.pow_le_mono_r; [ easy | ].
+      apply Nat.le_sub_l.
+    }
+    destruct H1 as [H1| H1]. 2: {
+      now apply eq_angle_div_2_pow_0 in H1.
+    }
+    (* mmm... faut voir *)
+...
+Search (√_ < √_)%L.
+Check rl_sqrt_squ.
+Search (rngl_abs _ = _).
+...
   rewrite rl_sqrt_mul; cycle 1. {
     apply (rngl_0_le_2 Hon Hop Hor).
   } {
