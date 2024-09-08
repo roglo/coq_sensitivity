@@ -3326,6 +3326,31 @@ destruct zst; [ | easy ].
 now apply rngl_ltb_lt in Htr.
 Qed.
 
+Theorem rngl_lt_0_sin :
+  ∀ θ,
+  (0 < θ < angle_straight)%A
+  → (0 < rngl_sin θ)%L.
+Proof.
+destruct_ac.
+intros * (Hzt, Hts).
+progress unfold angle_ltb in Hzt.
+progress unfold angle_ltb in Hts.
+cbn in Hzt, Hts.
+rewrite (rngl_leb_refl Hor) in Hzt, Hts.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ | easy ].
+apply rngl_leb_le in Hzs.
+apply rngl_ltb_lt in Hzt, Hts.
+apply rngl_sin_nonneg_is_pos; [ | | easy ]. {
+  intros H; subst θ.
+  now apply (rngl_lt_irrefl Hor) in Hzt.
+} {
+  intros H; subst θ.
+  now apply (rngl_lt_irrefl Hor) in Hts.
+}
+Qed.
+
 Theorem angle_div_2_pow_sub_r :
   ∀ a b θ, b ≤ a → (θ / ₂^(a - b) = 2 ^ b * (θ / ₂^a))%A.
 Proof.
@@ -3682,11 +3707,11 @@ Check rngl_cos_div_pow2_2_pos.
    que ça ferait une seule condition plus simple ;
    enfin, je crois *)
   rewrite <- rngl_sin_add_right_r.
-(* bof, rien de plus... *)
-Check rngl_lt_0_cos.
-Search (_ → 0 < rngl_sin _)%L.
-Search (_ → 0 ≤ rngl_sin _)%L.
-Check rngl_lt_sin.
+  apply rngl_lt_0_sin.
+  split. {
+    apply angle_lt_iff.
+    split; [ apply angle_nonneg | ].
+    intros H1; symmetry in H1.
 ...
   remember (a * (θ / ₂^q))%A as θ1 eqn:Hθ1.
   change_angle_sub_r θ1 angle_right.
