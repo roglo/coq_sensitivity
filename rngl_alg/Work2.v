@@ -3678,6 +3678,37 @@ Check rngl_cos_div_pow2_2_pos.
    à cause de la multiplication par "a" ; il faut donc
    faire un équivalent de rngl_cos_div_pow2_2_pos mais
    avec une telle multiplication *)
+(* essayons de voir de transformer ça en sinus, parce
+   que ça ferait une seule condition plus simple ;
+   enfin, je crois *)
+  rewrite <- rngl_sin_add_right_r.
+(* bof, rien de plus... *)
+Check rngl_lt_0_cos.
+Search (_ → 0 < rngl_sin _)%L.
+Search (_ → 0 ≤ rngl_sin _)%L.
+Check rngl_lt_sin.
+...
+  remember (a * (θ / ₂^q))%A as θ1 eqn:Hθ1.
+  change_angle_sub_r θ1 angle_right.
+  rewrite - Hθ'
+  progress sin_cos_add_sub_right_hyp T Hs2.
+...
+About rngl_cos_div_pow2_2_pos.
+apply rngl_lt_0_cos.
+
+progress unfold angle_ltb.
+cbn.
+...
+Theorem rngl_cos_mul_pos :
+  ∀ a θ,
+  (0 < rngl_cos (a * θ))%L.
+Proof.
+intros.
+Search (0 < rngl_cos (_ * _))%L.
+Search (0 ≤ rngl_cos (_ * _))%L.
+Search (_ → 0 < rngl_cos _)%L.
+...
+apply rngl_cos_div_2pow_mul_pos.
 ...
   rewrite <- angle_div_2_pow_mul.
 ...
