@@ -3760,6 +3760,17 @@ enough (H :
     apply (rngl_le_0_sub Hop Hor).
     apply rngl_cos_bound.
   }
+  destruct (Nat.eq_dec (2 ^ p mod n) 0) as [Hpnz| Hpnz]. {
+    rewrite Hpnz.
+    rewrite Nat.mul_0_l, Nat.div_0_l; [ | easy ].
+    rewrite angle_mul_0_l; cbn.
+    rewrite (rngl_sub_diag Hos).
+    rewrite (rngl_mul_0_r Hos).
+    now apply (rngl_mul_pos_pos Hop Hor Hii).
+  }
+(*
+  rewrite (rngl_mul_comm Hic).
+*)
   apply (rngl_lt_div_r Hon Hop Hiv Hor). {
     apply (rngl_lt_0_sub Hop Hor).
     apply (rngl_lt_iff Hor).
@@ -3778,7 +3789,13 @@ enough (H :
     destruct H1 as [H1| H1]. 2: {
       now apply eq_angle_div_2_pow_0 in H1.
     }
-    (* mmm... faut voir *)
+    apply Nat.div_small_iff in H1; [ | easy ].
+    apply Nat.nle_gt in H1.
+    apply H1; clear H1.
+    apply (le_trans _ (2 ^ (q - p))). 2: {
+      apply Nat_mul_le_pos_l.
+      now apply Nat.neq_0_lt_0.
+    }
 ...
 Search (√_ < √_)%L.
 Check rl_sqrt_squ.
