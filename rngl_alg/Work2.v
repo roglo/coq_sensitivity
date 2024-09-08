@@ -3741,7 +3741,6 @@ enough (H :
 (* bon, je l'ai, maintenant mon "ε² ≤ 2" ; c'était censé m'être utile
    mais je ne vois plus où, bordel, j'ai dû supprimer le code en
    question, faut que je revoie dans le git *)
-...
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
@@ -3749,6 +3748,13 @@ enough (H :
   destruct H as (N, HN).
   exists N.
   intros p q Hpq.
+  rewrite angle_eucl_dist_is_sqrt.
+  rewrite rl_sqrt_mul; cycle 1. {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  } {
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
 ...
 }
 ...
