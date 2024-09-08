@@ -3677,7 +3677,7 @@ Check rngl_cos_div_pow2_2_pos.
 (* le théorème rngl_cos_div_pow2_2_pow ne marche pas
    à cause de la multiplication par "a" ; il faut donc
    faire un équivalent de rngl_cos_div_pow2_2_pos mais
-   avec une telle mulitiplication *)
+   avec une telle multiplication *)
 ...
   rewrite <- angle_div_2_pow_mul.
 ...
