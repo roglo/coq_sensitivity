@@ -3855,6 +3855,8 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
 }
 apply (rngl_nlt_ge Hor) in Hze.
 move Hze after He1.
+(* bon, monter que 1-ε²/2 < cos n'a pas l'air évident, je ne sais pas
+   très bien comment avancer *)
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
