@@ -3858,15 +3858,14 @@ move Hze after He1.
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
-  → (1 - ε² / 2 < rngl_cos (2 ^ q / n * (θ / ₂^q)))%L). {
+  → (1 - ε² / 2 < rngl_cos (seq_angle_to_div_nat θ n q))%L). {
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
   eapply (rngl_lt_le_trans Hor).
-apply (HN p), Hpq.
-Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
-apply rngl_cos_decr.
-split. {
+  apply (HN p), Hpq.
+  apply rngl_cos_decr.
+  split; [ | apply Hss ].
   apply angle_mul_le_mono_r. {
     eapply angle_mul_nat_not_overflow_le_l. 2: {
       apply angle_mul_nat_overflow_pow_div.
