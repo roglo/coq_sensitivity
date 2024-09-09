@@ -3855,8 +3855,40 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
 }
 apply (rngl_nlt_ge Hor) in Hze.
 move Hze after He1.
-(* bon, monter que 1-ε²/2 < cos n'a pas l'air évident, je ne sais pas
-   très bien comment avancer *)
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p < q
+  → (1 - ε² / 2 < rngl_cos (2 ^ q / n * (θ / ₂^q)))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hpq.
+  eapply (rngl_lt_le_trans Hor).
+apply (HN p), Hpq.
+Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
+apply rngl_cos_decr.
+split. {
+  apply angle_mul_le_mono_r. {
+    eapply angle_mul_nat_not_overflow_le_l. 2: {
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat_mul_le_pos_l.
+    now apply Nat.neq_0_lt_0.
+  }
+  apply Nat.div_le_mono; [ easy | ].
+  rewrite Nat.pow_sub_r; [ | easy | flia Hpq ].
+  apply (Nat.le_trans _ (2 ^ p * (2 ^ q / 2 ^ p))). {
+    apply Nat.mul_le_mono_r.
+    now apply Nat.mod_le.
+  }
+  apply Nat.mul_div_le.
+  now apply Nat.pow_nonzero.
+}
+...
+Search angle_mul_nat_overflow.
+Search (angle_mul_nat_overflow _ (_ / ₂^_)).
+:
+}
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
