@@ -3860,8 +3860,9 @@ enough (H :
   N ≤ p < q
   → (1 - ε² / 2 < rngl_cos (2 ^ (q - p) * (θ / ₂^q)))%L). {
   destruct H as (N, HN).
-  exists N.
+  exists (N + 1).
   intros * Hpq.
+  assert (Hpq' : N ≤ p < q) by flia Hpq.
   eapply (rngl_lt_le_trans Hor); [ now apply HN | ].
   apply rngl_cos_decr.
   split. {
@@ -3877,31 +3878,13 @@ enough (H :
     apply Nat.lt_le_incl.
     now apply Nat.mod_upper_bound.
   }
-  destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
-    subst p.
-    rewrite Nat.sub_0_r.
-    rewrite angle_div_2_pow_mul_2_pow.
-(* θ ≤ angle_straight
-   il faudrait donc que je traite l'hypothèse θ > angle_straight
-   d'abord ; ou alors que je le mette en hypothèse du théorème *)
-...
-Search (2 ^ _ * (_ / ₂^_))%A.
-    apply angle_mul_div_pow2_le_straight.
-Search (_ * _ ≤ angle_straight)%A.
-Check seq_angle_to_div_nat.
-Search (seq_angle_to_div_nat _ _ _ < _)%A.
-...
   apply angle_mul_div_pow2_le_straight.
+  destruct p; [ flia Hpq | ].
   rewrite <- Nat.pow_succ_r'.
   apply Nat.pow_le_mono_r; [ easy | ].
   rewrite <- Nat.sub_succ_l; [ | flia Hpq ].
-  destruct p. {
-...
-  rewrite Nat.pow_sub_r; [ | easy | flia Hpq ].
-...
-Search angle_mul_nat_overflow.
-Search (angle_mul_nat_overflow _ (_ / ₂^_)).
-:
+  cbn.
+  apply Nat.le_sub_l.
 }
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
