@@ -3858,31 +3858,49 @@ move Hze after He1.
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
-  → (1 - ε² / 2 < rngl_cos (seq_angle_to_div_nat θ n q))%L). {
+  → (1 - ε² / 2 < rngl_cos (2 ^ (q - p) * (θ / ₂^q)))%L). {
   destruct H as (N, HN).
   exists N.
   intros * Hpq.
-  eapply (rngl_lt_le_trans Hor).
-  apply (HN p), Hpq.
+(* non, ça ne marche pas ; si p=0, par exemple, ça voudrait dire
+   que la suite converge vers l'angle nul *)
+(* il faut choisir un N assez grand pour que p fasse vraiment
+   diminuer l'angle *)
+(* enfin, je crois... *)
+...
+  eapply (rngl_lt_le_trans Hor); [ now apply HN | ].
   apply rngl_cos_decr.
-  split; [ | apply Hss ].
-  apply angle_mul_le_mono_r. {
-    eapply angle_mul_nat_not_overflow_le_l. 2: {
-      apply angle_mul_nat_overflow_pow_div.
+  split. {
+    apply angle_mul_le_mono_r. {
+      apply (angle_mul_nat_overflow_le_r _ (θ / ₂^(q - p))). 2: {
+        apply angle_mul_nat_overflow_pow_div.
+      }
+      apply angle_div_2_pow_le_compat_l.
+      apply Nat.le_sub_l.
     }
     apply Nat.div_le_upper_bound; [ easy | ].
-    apply Nat_mul_le_pos_l.
-    now apply Nat.neq_0_lt_0.
-  }
-  apply Nat.div_le_mono; [ easy | ].
-  rewrite Nat.pow_sub_r; [ | easy | flia Hpq ].
-  apply (Nat.le_trans _ (2 ^ p * (2 ^ q / 2 ^ p))). {
     apply Nat.mul_le_mono_r.
-    now apply Nat.mod_le.
+    apply Nat.lt_le_incl.
+    now apply Nat.mod_upper_bound.
   }
-  apply Nat.mul_div_le.
-  now apply Nat.pow_nonzero.
-}
+  destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+    subst p.
+    rewrite Nat.sub_0_r.
+    rewrite angle_div_2_pow_mul_2_pow.
+...
+Search (2 ^ _ * (_ / ₂^_))%A.
+    apply angle_mul_div_pow2_le_straight.
+Search (_ * _ ≤ angle_straight)%A.
+Check seq_angle_to_div_nat.
+Search (seq_angle_to_div_nat _ _ _ < _)%A.
+...
+  apply angle_mul_div_pow2_le_straight.
+  rewrite <- Nat.pow_succ_r'.
+  apply Nat.pow_le_mono_r; [ easy | ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hpq ].
+  destruct p. {
+...
+  rewrite Nat.pow_sub_r; [ | easy | flia Hpq ].
 ...
 Search angle_mul_nat_overflow.
 Search (angle_mul_nat_overflow _ (_ / ₂^_)).
