@@ -3864,7 +3864,7 @@ enough (H :
   intros * Hpq.
 (* non, ça ne marche pas ; si p=0, par exemple, ça voudrait dire
    que la suite converge vers l'angle nul *)
-(* il faut choisir un N assez grand pour que p fasse vraiment
+(* il faudra choisir un N assez grand pour que p fasse vraiment
    diminuer l'angle *)
 (* enfin, je crois... *)
 ...
