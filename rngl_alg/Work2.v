@@ -3858,61 +3858,8 @@ move Hze after He1.
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q
-  → (1 - ε² / 2 < rngl_cos (2 ^ (q - S p) * (θ / ₂^q)))%L). {
+  → (1 - ε² / 2 < rngl_cos (2 ^ (q - p) * (θ / ₂^q)))%L). {
   destruct H as (N, HN).
-(*1*)
-  exists N.
-  intros * Hpq.
-  eapply (rngl_lt_le_trans Hor). {
-    apply (HN p q); flia Hpq.
-  }
-  replace (q + 1 - S p) with (q - p) by flia.
-  apply rngl_cos_decr.
-  split. {
-    apply angle_mul_le_mono_r. {
-      apply (angle_mul_nat_overflow_le_r _ (θ / ₂^(q - S p))). 2: {
-        apply angle_mul_nat_overflow_pow_div.
-      }
-      apply angle_div_2_pow_le_compat_l.
-      apply Nat.le_sub_l.
-    }
-    apply Nat.div_le_upper_bound; [ easy | ].
-    apply Nat.mul_le_mono. {
-      now apply Nat.lt_le_incl, Nat.mod_upper_bound.
-    }
-    apply Nat.pow_le_mono_r; [ easy | ].
-    apply Nat.sub_le_mono_l.
-(* merde, ça marche pas, faut que je réfléchisse *)
-...
-    apply (Nat.le_trans _ (2 ^ p * 2 ^ (q - p))). {
-      apply
-      apply Nat.mul_le_mono_nonneg_r.
-...
-Search (_ * (_ / ₂^_) ≤ _ * (_ / ₂^_))%A.
-Search (_ * _ ≤ _ * _)%A.
-Check angle_mul_le_mono_l.
-...
-Check angle_mul_le_mono_r.
-...
-  apply rngl_cos_decr.
-  split. {
-    apply angle_mul_le_mono_r. {
-      apply (angle_mul_nat_overflow_le_r _ (θ / ₂^(q - p))). 2: {
-        apply angle_mul_nat_overflow_pow_div.
-      }
-      apply angle_div_2_pow_le_compat_l.
-      apply Nat.le_sub_l.
-    }
-    apply Nat.div_le_upper_bound; [ easy | ].
-    apply Nat.mul_le_mono_r.
-    apply Nat.lt_le_incl.
-    now apply Nat.mod_upper_bound.
-  }
-  destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
-    subst p.
-    rewrite Nat.sub_0_r.
-    rewrite angle_div_2_pow_mul_2_pow.
-...1
   exists N.
   intros * Hpq.
   eapply (rngl_lt_le_trans Hor); [ now apply HN | ].
@@ -3934,6 +3881,9 @@ Check angle_mul_le_mono_r.
     subst p.
     rewrite Nat.sub_0_r.
     rewrite angle_div_2_pow_mul_2_pow.
+(* θ ≤ angle_straight
+   il faudrait donc que je traite l'hypothèse θ > angle_straight
+   d'abord ; ou alors que je le mette en hypothèse du théorème *)
 ...
 Search (2 ^ _ * (_ / ₂^_))%A.
     apply angle_mul_div_pow2_le_straight.
