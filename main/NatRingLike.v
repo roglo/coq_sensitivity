@@ -70,13 +70,12 @@ Qed.
 
 Theorem Nat_opt_quot_mul :
   let ro := nat_ring_like_op in
-  if rngl_has_quot _ then
-    ∀ a b c : nat, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
+  if rngl_has_quot _ then ∀ a b c : nat, (a / (b * c))%L = (a / b / c)%L
   else not_applicable.
 Proof.
 intros; cbn.
-intros * Hbz Hcz.
-symmetry; apply (Nat.div_div _ _ _ Hbz Hcz).
+intros.
+symmetry; apply Nat.Div0.div_div.
 Qed.
 
 Theorem Nat_opt_le_dec :
