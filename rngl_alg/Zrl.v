@@ -177,7 +177,7 @@ rewrite <- Nat2Pos.inj_mul.
   apply Pos2Nat_neq_0.
 
  intros H; rewrite H in Hm; simpl in Hm.
- apply gt_not_le in Hm; apply Hm.
+ apply Nat.nle_gt in Hm; apply Hm.
  apply Nat.lt_le_incl.
  apply Pos2Nat.is_pos.
 
