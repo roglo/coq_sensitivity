@@ -2088,8 +2088,7 @@ Theorem List_last_nth : ∀ A (la : list A) d,
 Proof.
 intros.
 destruct la as [| a] using rev_ind; [ easy | cbn ].
-...
-rewrite last_last, app_length, Nat.add_sub.
+rewrite last_last, length_app, Nat.add_sub.
 rewrite app_nth2; [ | now progress unfold ge ].
 now rewrite Nat.sub_diag.
 Qed.
@@ -2560,7 +2559,7 @@ Theorem List_flat_length_map : ∀ A B (f : A → list B) l,
 Proof.
 intros.
 induction l as [| a]; [ now rewrite iter_list_empty | cbn ].
-rewrite app_length.
+rewrite length_app.
 rewrite iter_list_cons; cycle 1. {
   apply Nat.add_0_l.
 } {
@@ -3095,16 +3094,11 @@ Theorem to_radix_inv_to_radix_loop : ∀ it n k,
   to_radix_inv n (to_radix_loop it n k) = k mod (n ^ it).
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  destruct it; [ easy | apply Nat.add_0_r ].
-}
-revert n k Hnz.
+revert k.
 induction it; intros; [ easy | cbn ].
-rewrite IHit; [ | easy ].
+rewrite IHit.
 symmetry.
-apply Nat.mod_mul_r; [ easy | ].
-now apply Nat.pow_nonzero.
+apply Nat.Div0.mod_mul_r.
 Qed.
 
 Theorem to_radix_loop_to_radix_inv : ∀ l d n it,

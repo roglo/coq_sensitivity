@@ -429,6 +429,8 @@ Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   | S m => (a * rngl_power a m)%L
   end.
 
+...
+
 Arguments rngl_power {T ro} a%L n%nat.
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
