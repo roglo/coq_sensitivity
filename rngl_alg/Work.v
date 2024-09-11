@@ -2492,8 +2492,11 @@ Search (_ = _ + _ → _ = _ - _).
 Search (_ + _ = _ → _ = _ - _).
 Search (_ = _ + _ → _ - _ = _).
 Search (_ + _ = _ → _ = _ - _).
-Search (_ = pred _).
-Search (pred _ = _).
+Search (_ = Nat.pred _).
+rewrite Nat.sub_1_r.
+Search (Nat.pred (Nat.log2_up _)).
+Search (Nat.pred _ = _).
+Search (_ + 1 = _).
 ...
 apply plus_minus. (* y a-t-il une version plus moderne ? *)
 apply Nat_eq_log2_up; [ flia H2n | ].
