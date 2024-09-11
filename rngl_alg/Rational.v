@@ -2167,7 +2167,7 @@ Proof.
 intros.
 destruct a; [ now destruct b | ].
 destruct b. {
-  rewrite den_0, Nat.gcd_1_r, num_pair_1_r.
+  rewrite den_0, Nat.gcd_comm, num_pair_1_r.
   symmetry; apply Nat.div_1_r.
 }
 progress unfold "//"%Q.
