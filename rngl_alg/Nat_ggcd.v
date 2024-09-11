@@ -283,7 +283,6 @@ Theorem ggcd_1_l : ∀ n, ggcd 1 n = (1, (1, n)).
 Proof.
 intros.
 erewrite ggcd_split; [ | easy ].
-rewrite Nat.gcd_1_l.
 now do 2 rewrite Nat.div_1_r.
 Qed.
 
@@ -291,7 +290,7 @@ Theorem ggcd_1_r : ∀ n, ggcd n 1 = (1, (n, 1)).
 Proof.
 intros.
 erewrite ggcd_split; [ | easy ].
-rewrite Nat.gcd_1_r.
+rewrite Nat.gcd_comm.
 now do 2 rewrite Nat.div_1_r.
 Qed.
 
