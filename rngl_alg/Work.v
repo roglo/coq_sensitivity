@@ -1856,7 +1856,7 @@ apply angle_add_overflow_le with (θ2 := θ). {
   apply angle_mul_le_mono_r. {
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply le_trans; [ now apply Nat.div_mul_le | ].
+  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
   apply Nat.div_le_upper_bound; [ easy | ].
   apply Nat.mul_le_mono_r.
   now apply Nat.lt_le_incl in Hmi.
@@ -2353,7 +2353,7 @@ split. {
   apply Nat.lt_succ_r.
   apply (Nat.pow_lt_mono_r_iff 2); [ easy | ].
   rewrite <- (Nat.add_1_r n).
-  eapply lt_le_trans; [ | apply Ha ].
+  eapply Nat.lt_le_trans; [ | apply Ha ].
   apply Nat.lt_succ_r.
   apply Nat.log2_spec.
   flia Ha H1.
@@ -2486,6 +2486,15 @@ Qed.
 Theorem rank_fst_1_log2_up : ∀ n, 2 ≤ n → rank_fst_1 1 n = Nat.log2_up n - 1.
 Proof.
 intros * H2n.
+Check Nat_eq_log2_up.
+Search (_ → _ = _ - _).
+Search (_ = _ + _ → _ = _ - _).
+Search (_ + _ = _ → _ = _ - _).
+Search (_ = _ + _ → _ - _ = _).
+Search (_ + _ = _ → _ = _ - _).
+Search (_ = pred _).
+Search (pred _ = _).
+...
 apply plus_minus. (* y a-t-il une version plus moderne ? *)
 apply Nat_eq_log2_up; [ flia H2n | ].
 split. {
