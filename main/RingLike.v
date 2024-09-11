@@ -429,9 +429,7 @@ Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   | S m => (a * rngl_power a m)%L
   end.
 
-...
-
-Arguments rngl_power {T ro} a%L n%nat.
+Arguments rngl_power {T ro} a%_L n%_nat.
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
 Section a.
@@ -2534,7 +2532,7 @@ now apply (rngl_opp_nonneg_nonpos Hop Hor).
 now apply -> (rngl_opp_le_compat Hop Hor).
 Qed.
 
-Arguments rngl_mul_nat {T ro} a%L n%nat.
+Arguments rngl_mul_nat {T ro} a%_L n%_nat.
 
 Theorem rngl_mul_nat_mul_nat_1 :
   rngl_has_1 T = true →
@@ -6154,11 +6152,11 @@ assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   }
   apply (rngl_add_lt_compat Hop Hor). {
     apply Hu1.
-    eapply le_trans; [ | apply HN ].
+    eapply Nat.le_trans; [ | apply HN ].
     apply Nat.le_max_l.
   } {
     apply Hu2.
-    eapply le_trans; [ | apply HN ].
+    eapply Nat.le_trans; [ | apply HN ].
     apply Nat.le_max_r.
   }
 }
@@ -6272,6 +6270,7 @@ intros Hop *.
 unfold minus_one_pow.
 remember (i mod 2) as k eqn:Hk; symmetry in Hk.
 destruct k. {
+...
   apply Nat.mod_divides in Hk; [ | easy ].
   destruct Hk as (k, Hk); subst i.
   rewrite <- Nat.add_1_l, Nat.mul_comm.
