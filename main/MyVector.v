@@ -376,7 +376,7 @@ Theorem vect_add_size :
 Proof.
 intros.
 unfold vect_size; cbn.
-apply map2_length.
+apply length_map2.
 Qed.
 
 Theorem vect_mul_scal_l_add_distr_r :

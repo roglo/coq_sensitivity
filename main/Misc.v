@@ -621,7 +621,7 @@ destruct ld as [| d]; [ easy | cbn ].
 apply IHlc.
 Qed.
 
-Theorem map2_length : ∀ A B C (f : A → B → C) la lb,
+Theorem length_map2 : ∀ A B C (f : A → B → C) la lb,
   length (map2 f la lb) = min (length la) (length lb).
 Proof.
 intros.

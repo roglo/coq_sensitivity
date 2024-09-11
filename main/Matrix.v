@@ -515,7 +515,7 @@ Theorem mat_repl_vect_nrows : ∀ k (M : matrix T) V,
   → mat_nrows (mat_repl_vect k M V) = mat_nrows M.
 Proof.
 intros * Hv; cbn.
-rewrite map2_length.
+rewrite length_map2.
 rewrite fold_mat_nrows, fold_vect_size, Hv.
 apply Nat.min_id.
 Qed.
@@ -1305,7 +1305,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
 } {
   rewrite fold_mat_nrows; flia Hrbz Hcrbc.
 }
-rewrite map2_length; cbn.
+rewrite length_map2; cbn.
 do 2 rewrite <- List_hd_nth_0.
 do 2 rewrite fold_mat_ncols.
 rewrite <- Hcbc, Nat.min_id.
@@ -1368,7 +1368,7 @@ assert (Hcaz : mat_ncols MA ≠ 0). {
 }
 unfold "*"%M, "+"%M.
 f_equal; cbn.
-rewrite map2_length.
+rewrite length_map2.
 do 2 rewrite fold_mat_nrows.
 rewrite map2_map_l, map2_map_r, <- Hrarb, map2_diag.
 rewrite Nat.min_id.
@@ -1387,7 +1387,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
 } {
   rewrite fold_mat_nrows, <- Hrarb; flia Hraz.
 }
-rewrite map2_length.
+rewrite length_map2.
 do 2 rewrite <- List_hd_nth_0.
 do 2 rewrite fold_mat_ncols.
 rewrite <- Hcacb, Nat.min_id.
@@ -2513,7 +2513,7 @@ destruct Ha as (Hcra & Hca).
 destruct Hb as (Hcrb & Hcb).
 split. {
   intros Hcc.
-  rewrite map2_length.
+  rewrite length_map2.
   do 2 rewrite fold_mat_nrows.
   unfold mat_ncols in Hcc; cbn in Hcc.
   destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
@@ -2525,7 +2525,7 @@ split. {
   apply Nat.neq_0_lt_0 in Hraz, Hrbz.
   rewrite List_hd_nth_0 in Hcc.
   rewrite map2_nth with (a := []) (b := []) in Hcc; [ | easy | easy ].
-  rewrite map2_length in Hcc.
+  rewrite length_map2 in Hcc.
   do 2 rewrite <- List_hd_nth_0 in Hcc.
   do 2 rewrite fold_mat_ncols in Hcc.
   apply Nat.le_0_r, Nat.min_le in Hcc.
@@ -2539,7 +2539,7 @@ split. {
   apply in_map2_iff in Hl.
   destruct Hl as (i & Him & a & b & Hl).
   subst l.
-  do 2 rewrite map2_length.
+  do 2 rewrite length_map2.
   do 2 rewrite fold_mat_nrows in Him |-*.
   apply Nat.min_glb_lt_iff in Him.
   rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows ].
@@ -2714,7 +2714,7 @@ intros.
 unfold mZ, "+"%M, mat_nrows.
 destruct MA as (lla).
 destruct MB as (llb); cbn.
-apply map2_length.
+apply length_map2.
 Qed.
 
 Theorem mat_add_ncols : ∀ MA MB : matrix T,
@@ -2726,7 +2726,7 @@ destruct MA as (lla).
 destruct MB as (llb); cbn.
 destruct lla as [| la]; [ easy | cbn ].
 destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
-apply map2_length.
+apply length_map2.
 Qed.
 
 Theorem mat_el_add : ∀ (MA MB : matrix T) i j,

@@ -2925,7 +2925,7 @@ induction la as [| a]; intros; cbn. {
   }
   apply Nat.nlt_ge in Hil.
   apply nth_overflow.
-  now rewrite map2_length, repeat_length, Nat.min_id.
+  now rewrite length_map2, repeat_length, Nat.min_id.
 }
 destruct lb as [| b]. {
   cbn - [ nth ].
