@@ -6277,8 +6277,7 @@ destruct k. {
 }
 destruct k. {
   rewrite <- Nat.add_1_l.
-...
-  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
+  rewrite <- Nat.Div0.add_mod_idemp_r.
   rewrite Hk; cbn.
   symmetry.
   now apply rngl_opp_involutive.
@@ -6471,32 +6470,32 @@ easy.
 Qed.
 *)
 
-Arguments rngl_abs {T ro} a%L.
-Arguments rngl_abs_nonneg_eq {T ro rp} Hop Hor a%L.
-Arguments rngl_add {T ring_like_op} (a b)%L.
-Arguments rngl_add_comm {T ro ring_like_prop} (a b)%L.
-Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
-Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%L.
-Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%L.
-Arguments rngl_div_le_mono_pos_r {T ro rp} Hon Hop Hiv Hor Hii (a b c)%L.
-Arguments rngl_eq_dec {T ro} Hed (a b)%L.
-Arguments rngl_le_add_r {T ro rp} Hor (a b)%L Hb.
-Arguments rngl_le_dec {T ro rp} Hor (a b)%L.
-Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
-Arguments rngl_le_lt_trans {T}%type {ro rp} Hor (a b c)%L.
-Arguments rngl_lt_le_trans {T}%type {ro rp} Hor (a b c)%L.
-Arguments rngl_lt_dec {T ro rp} Hor (a b)%L.
-Arguments rngl_min {T ro} (a b)%L.
-Arguments rngl_mul {T ring_like_op} (a b)%L.
-Arguments rngl_mul_comm {T ro rp} Hic (a b)%L.
-Arguments rngl_mul_le_mono_pos_l {T ro rp} Hop Hor Hii (a b c)%L.
-Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%L.
-Arguments rngl_mul_nat {T ro} a%L n%nat.
-Arguments rngl_mul_0_r {T ro rp} Hom a%L.
-Arguments rngl_mul_1_r {T ro rp} Hon a%L.
-Arguments rngl_pow_squ {T ro rp} Hic Hon a%L n%nat.
-Arguments rngl_squ {T ro} x%L.
-Arguments rngl_sub {T ro} (a b)%L.
-Arguments rngl_subt {T ro} (a b)%L.
+Arguments rngl_abs {T ro} a%_L.
+Arguments rngl_abs_nonneg_eq {T ro rp} Hop Hor a%_L.
+Arguments rngl_add {T ring_like_op} (a b)%_L.
+Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
+Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
+Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%_L.
+Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
+Arguments rngl_div_le_mono_pos_r {T ro rp} Hon Hop Hiv Hor Hii (a b c)%_L.
+Arguments rngl_eq_dec {T ro} Hed (a b)%_L.
+Arguments rngl_le_add_r {T ro rp} Hor (a b)%_L Hb.
+Arguments rngl_le_dec {T ro rp} Hor (a b)%_L.
+Arguments rngl_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_le_lt_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_dec {T ro rp} Hor (a b)%_L.
+Arguments rngl_min {T ro} (a b)%_L.
+Arguments rngl_mul {T ring_like_op} (a b)%_L.
+Arguments rngl_mul_comm {T ro rp} Hic (a b)%_L.
+Arguments rngl_mul_le_mono_pos_l {T ro rp} Hop Hor Hii (a b c)%_L.
+Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%_L.
+Arguments rngl_mul_nat {T ro} a%_L n%_nat.
+Arguments rngl_mul_0_r {T ro rp} Hom a%_L.
+Arguments rngl_mul_1_r {T ro rp} Hon a%_L.
+Arguments rngl_pow_squ {T ro rp} Hic Hon a%_L n%_nat.
+Arguments rngl_squ {T ro} x%_L.
+Arguments rngl_sub {T ro} (a b)%_L.
+Arguments rngl_subt {T ro} (a b)%_L.
 
 Arguments rngl_is_complete T {ro}.
