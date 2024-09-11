@@ -596,7 +596,7 @@ f_equal. {
   now rewrite (Nat.add_comm 1 i), Nat.add_sub.
 } {
   rewrite Nat.div_mul; [ | easy ].
-  rewrite Nat.mod_mul; [ | easy ].
+  rewrite Nat.Div0.mod_mul.
   destruct b. {
     unfold iter_seq at 1, iter_list at 1.
     cbn - [ "mod" "/" ].
