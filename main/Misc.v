@@ -1812,7 +1812,7 @@ induction len; intros; [ easy | cbn ].
 rewrite IHlen.
 apply List_fold_left_ext_in.
 intros i lb Hi; apply in_seq in Hi.
-now rewrite map_length, length_seq.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem List_eq_firstn_nil : ∀ A n (l : list A),
@@ -1867,7 +1867,7 @@ Theorem List_length_map_seq''' : ∀ A (f : _ → A) a len,
   length (map f (seq a len)) = len.
 Proof.
 intros.
-now rewrite map_length, length_seq.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem List_map_map_seq : ∀ {A B} d (f : A → B) la,
@@ -2088,6 +2088,7 @@ Theorem List_last_nth : ∀ A (la : list A) d,
 Proof.
 intros.
 destruct la as [| a] using rev_ind; [ easy | cbn ].
+...
 rewrite last_last, app_length, Nat.add_sub.
 rewrite app_nth2; [ | now progress unfold ge ].
 now rewrite Nat.sub_diag.
@@ -2554,7 +2555,7 @@ apply iter_list_cons. {
 }
 Qed.
 
-Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
+Theorem List_flat_length_map : ∀ A B (f : A → list B) l,
   length (flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
 Proof.
 intros.
@@ -2672,14 +2673,17 @@ Proof.
 intros * Hll.
 revert Hll.
 induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
-rewrite iter_list_cons; cycle 1.
+rewrite iter_list_cons; cycle 1. {
   apply Nat.mul_1_l.
+} {
   apply Nat.mul_1_r.
+} {
   apply Nat.mul_assoc.
-rewrite List_flat_map_length.
+}
+rewrite List_flat_length_map.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
-  now rewrite map_length.
+  now rewrite length_map.
 }
 cbn.
 destruct ll as [| l2]. {
@@ -3163,8 +3167,7 @@ progress unfold to_radix.
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
 do 2 rewrite Nat.add_0_r in H1.
-...
-specialize (H1 Hlen Hl (le_refl _)).
+specialize (H1 Hlen Hl (Nat.le_refl _)).
 now rewrite Nat.sub_diag, app_nil_r in H1.
 Qed.
 
