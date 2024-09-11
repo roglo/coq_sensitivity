@@ -878,7 +878,7 @@ assert
   apply IHit.
   apply (Nat.mul_lt_mono_pos_r (n ^ 1)); [ rewrite Nat.pow_1_r; flia Hnz | ].
   rewrite <- Nat.pow_add_r, Nat.add_1_r, Nat.pow_1_r.
-  apply (le_lt_trans _ i); [ | easy ].
+  apply (Nat.le_lt_trans _ i); [ | easy ].
   rewrite Nat.mul_comm.
   now apply Nat.mul_div_le.
 }
@@ -989,7 +989,7 @@ transitivity (fold_left (λ a i : nat, a * n + i) l b mod n). 2: {
 clear - Hnz.
 revert b n j Hnz.
 induction l as [| a]; intros. {
-  now apply Nat_mod_add_l_mul_r.
+  apply Nat_mod_add_l_mul_r''''.
 }
 cbn.
 rewrite IHl; [ | easy ].
@@ -1529,7 +1529,7 @@ assert
 }
 specialize (Hft n n (seq 0 n) 0) as H1.
 rewrite seq_length in H1.
-specialize (H1 eq_refl (le_refl _)).
+specialize (H1 eq_refl (Nat.le_refl _)).
 rewrite Nat.add_0_r in H1.
 assert (H : ∀ i, i ∈ seq 0 n → i < n). {
   now intros i Hi; apply in_seq in Hi.
