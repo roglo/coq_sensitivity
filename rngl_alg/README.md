@@ -6,5 +6,6 @@ Examples of algebras of the Ring Like theory (RingLike.v in
 Daniel de Rauglaudre
 
 # COQ VERSION
-  The Coq Proof Assistant, version 8.15.0
-  compiled with OCaml 4.14.1
+  $ coqtop -v
+  The Coq Proof Assistant, version 8.20.0
+  compiled with OCaml 4.13.1
