@@ -1863,7 +1863,7 @@ apply map_ext_in.
 intros; f_equal; flia.
 Qed.
 
-Theorem List_length_map_seq''' : ∀ A (f : _ → A) a len,
+Theorem List_length_map_seq'''' : ∀ A (f : _ → A) a len,
   length (map f (seq a len)) = len.
 Proof.
 intros.

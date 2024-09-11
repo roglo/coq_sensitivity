@@ -2338,7 +2338,7 @@ Proof.
 intros.
 unfold swap, swap_d.
 destruct la as [| a]; [ easy | ].
-now rewrite List_map_seq_length.
+apply List_length_map_seq''''.
 Qed.
 
 Theorem apply_transp_list_shift_1_cons : ∀ A (a : A) la trl,
