@@ -12,8 +12,8 @@ Require Import RingLike IterAdd.
 Record vector T := mk_vect
   { vect_list : list T }.
 
-Arguments mk_vect [T]%type.
-Arguments vect_list [T]%type.
+Arguments mk_vect [T]%_type.
+Arguments vect_list [T]%_type.
 
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
@@ -192,7 +192,7 @@ now apply (rngl_mul_cancel_r Hi1) in H2.
 Qed.
 
 Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
-Proof. now intros; cbn; rewrite map_length. Qed.
+Proof. now intros; cbn; rewrite length_map. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_has_opp_or_subt T = true →
@@ -321,7 +321,7 @@ rewrite <- rngl_summation_list_add_distr.
 apply rngl_summation_list_eq_compat.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ cbn | easy ].
 apply rngl_mul_add_distr_r.
 Qed.
@@ -345,7 +345,7 @@ rewrite <- rngl_summation_list_add_distr.
 apply rngl_summation_list_eq_compat.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ cbn | easy ].
 apply rngl_mul_add_distr_l.
 Qed.
@@ -354,7 +354,7 @@ Theorem vect_opp_size : ∀ v, vect_size (vect_opp v) = vect_size v.
 Proof.
 intros.
 unfold vect_size; cbn.
-now rewrite map_length.
+now rewrite length_map.
 Qed.
 
 Theorem vect_opp_el :
@@ -364,7 +364,7 @@ Proof.
 intros Hop *; unfold vect_el; cbn.
 destruct (lt_dec (i - 1) (length (vect_list v))) as [Hil| Hil]. 2: {
   apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite map_length ].
+  rewrite nth_overflow; [ | now rewrite length_map ].
   rewrite nth_overflow; [ | easy ].
   symmetry; apply (rngl_opp_0 Hop).
 }
@@ -385,7 +385,7 @@ Proof.
 intros.
 unfold "×", vect_add; cbn; f_equal.
 rewrite (map2_map_min 0%L 0%L).
-do 2 rewrite map_length.
+do 2 rewrite length_map.
 rewrite Nat.min_id.
 rewrite List_map_map_seq with (d := 0%L).
 rewrite fold_vect_size.
@@ -408,7 +408,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 move Hos before Hop.
 unfold "×", vect_sub, vect_add; cbn; f_equal.
 rewrite (map2_map_min 0%L 0%L).
-do 3 rewrite map_length.
+do 3 rewrite length_map.
 rewrite Nat.min_id.
 rewrite List_map_map_seq with (d := 0%L).
 rewrite fold_vect_size.
@@ -416,7 +416,7 @@ apply map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 rewrite (List_map_nth' 0%L); [ | easy ].
-rewrite (List_map_nth' 0%L); [ | now rewrite map_length ].
+rewrite (List_map_nth' 0%L); [ | now rewrite length_map ].
 rewrite (List_map_nth' 0%L); [ | easy ].
 rewrite (rngl_mul_sub_distr_r Hop).
 unfold rngl_sub.
@@ -430,7 +430,7 @@ intros.
 unfold "×", vect_add; f_equal; cbn.
 rewrite (map2_map_min 0%L 0%L).
 rewrite (map2_map_min 0%L 0%L).
-do 2 rewrite map_length.
+do 2 rewrite length_map.
 do 2 rewrite fold_vect_size.
 rewrite map_map.
 apply map_ext_in.
@@ -460,12 +460,12 @@ apply map_ext_in.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   rewrite <- Nat.min_assoc in Hi.
   now apply Nat.min_glb_lt_iff in Hi.
 }
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   now apply Nat.min_glb_lt_iff in Hi.
 }
 rewrite seq_nth. 2: {
