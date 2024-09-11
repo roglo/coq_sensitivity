@@ -2486,30 +2486,18 @@ Qed.
 Theorem rank_fst_1_log2_up : ∀ n, 2 ≤ n → rank_fst_1 1 n = Nat.log2_up n - 1.
 Proof.
 intros * H2n.
-Check Nat_eq_log2_up.
-Search (_ → _ = _ - _).
-Search (_ = _ + _ → _ = _ - _).
-Search (_ + _ = _ → _ = _ - _).
-Search (_ = _ + _ → _ - _ = _).
-Search (_ + _ = _ → _ = _ - _).
-Search (_ = Nat.pred _).
-rewrite Nat.sub_1_r.
-Search (Nat.pred (Nat.log2_up _)).
-Search (Nat.pred _ = _).
-Search (_ + 1 = _).
-...
-apply plus_minus. (* y a-t-il une version plus moderne ? *)
+rewrite <- (Nat.add_sub _ 1).
+f_equal; symmetry.
 apply Nat_eq_log2_up; [ flia H2n | ].
+rewrite Nat.add_1_r.
 split. {
   apply Nat.div_lt_upper_bound; [ easy | ].
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_lt_mono_pos_l; [ easy | ].
   progress unfold rank_fst_1.
-  rename H2n into Hn.
   now apply (rank_fst_1_log2_up_lemma 0).
 }
 progress unfold rank_fst_1.
-rewrite (Nat.add_1_l (fst _)).
 apply (rank_fst_1_log2_up_lemma_2 0); apply H2n.
 Qed.
 
@@ -3472,7 +3460,7 @@ Proof.
 intros * Hnm.
 split; intros Hn; [ apply Nat.le_add_le_sub_l, Hn | ].
 apply Nat.add_le_mono_l with (p := n) in Hn.
-eapply le_trans; [ apply Hn | ].
+eapply Nat.le_trans; [ apply Hn | ].
 rewrite Nat.add_comm.
 now rewrite Nat.sub_add.
 Qed.
@@ -3748,7 +3736,7 @@ specialize (Nat.log2_up_spec _ H1a) as Ha.
 specialize (Nat.log2_up_spec _ H1b) as Hb.
 rewrite <- Hna in Ha.
 rewrite <- Hnb in Hb.
-rewrite pred_of_minus in Ha, Hb.
+rewrite PeanoNat.pred_of_minus in Ha, Hb.
 split. {
   replace 2 with (1 + 1) at 2 by easy.
   rewrite Nat.sub_add_distr.
@@ -3948,7 +3936,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
 specialize (IHn Hnz).
 rewrite Nat.pow_succ_r'.
 apply (Nat.mul_le_mono_l _ _ 2) in IHn.
-eapply le_trans; [ apply IHn | ].
+eapply Nat.le_trans; [ apply IHn | ].
 do 3 rewrite Nat.pow_succ_r'.
 specialize (Nat.pow_gt_lin_r 2 n Nat.lt_1_2) as H2.
 flia H2.
