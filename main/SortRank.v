@@ -49,7 +49,7 @@ Proof.
 intros.
 induction l as [| d]; [ easy | ].
 cbn - [ nth ].
-now rewrite isort_rank_insert_length, map_length; f_equal.
+now rewrite isort_rank_insert_length, length_map; f_equal.
 Qed.
 
 Theorem isort_rank_insert_nth_indep : ∀ A rel (d d' : A) ia lrank l_ini,
@@ -378,7 +378,7 @@ destruct Hia as [Hia| Hia]. {
   destruct Hib as (ic & H & Hib); subst ib.
   do 2 rewrite List_nth_succ_cons.
   apply in_isort_rank in Hib.
-  rewrite map_length in Hib.
+  rewrite length_map in Hib.
   rewrite (List_map_nth' 0); [ | easy ].
   rewrite (List_map_nth' 0); [ | easy ].
   now do 2 rewrite Nat_leb_add_mono_l.
@@ -387,7 +387,7 @@ apply in_map_iff in Hia.
 destruct Hia as (ic & H & Hic); subst ia.
 do 2 rewrite List_nth_succ_cons.
 apply in_isort_rank in Hic.
-rewrite map_length in Hic.
+rewrite length_map in Hic.
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite (List_map_nth' 0); [ | easy ].
 destruct Hib as [Hib| Hib]. {
@@ -398,7 +398,7 @@ apply in_map_iff in Hib.
 destruct Hib as (id & H & Hid); subst ib.
 do 2 rewrite List_nth_succ_cons.
 apply in_isort_rank in Hid.
-rewrite map_length in Hid.
+rewrite length_map in Hid.
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite (List_map_nth' 0); [ | easy ].
 now do 2 rewrite Nat_leb_add_mono_l.
