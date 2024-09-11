@@ -743,7 +743,7 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
     subst len; cbn.
     apply -> Nat.succ_lt_mono.
     rewrite H1; cbn.
-    rewrite app_length; cbn.
+    rewrite length_app; cbn.
     flia.
   }
   rewrite H2, List_app_cons, app_assoc.
@@ -753,7 +753,7 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   apply (permutation_app_tail Heqb).
   apply IHlen with (m := length (l'' ++ [a])); [ | easy ].
   rewrite <- Hlen, H1;cbn.
-  do 3 rewrite app_length; cbn.
+  do 3 rewrite length_app; cbn.
   flia.
 }
 destruct l'' as [| x]. {
@@ -772,7 +772,7 @@ rewrite <- app_assoc.
 apply (permutation_app_head Heqb).
 apply IHlen with (m := length (l'' ++ [a])); [ | easy ].
 rewrite <- Hlen, H2.
-do 3 rewrite app_length; cbn; flia.
+do 3 rewrite length_app; cbn; flia.
 Qed.
 
 Theorem permutation_cons_app : ∀ {A} {eqb : A → _},
@@ -891,8 +891,8 @@ remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb); subst lb.
-rewrite app_length; cbn.
-rewrite Nat.add_succ_r, <- app_length; f_equal.
+rewrite length_app; cbn.
+rewrite Nat.add_succ_r, <- length_app; f_equal.
 now apply IHla.
 Qed.
 
@@ -1153,7 +1153,7 @@ remember (extract (Nat.eqb i) f) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. {
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & H & Haft); subst f.
-  rewrite app_length in Hx; cbn in Hx; flia Hx.
+  rewrite length_app in Hx; cbn in Hx; flia Hx.
 }
 clear Hx.
 specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
@@ -1306,14 +1306,14 @@ apply Heqb in H; subst b.
 destruct i. {
   rewrite List_nth_0_cons.
   apply (f_equal (λ l, length l)) in Hlb.
-  rewrite app_length in Hlb; cbn in Hlb.
+  rewrite length_app in Hlb; cbn in Hlb.
   rewrite Hlb; flia.
 }
 cbn in Hla; apply Nat.succ_lt_mono in Hla.
 rewrite List_nth_succ_cons.
 replace (length lbo) with (length (bef ++ None :: aft)). 2: {
   rewrite Hlb.
-  now do 2 rewrite app_length.
+  now do 2 rewrite length_app.
 }
 apply IHla; [ | easy ].
 subst lbo.
@@ -1394,7 +1394,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
   destruct Hlbc' as (ldo & H4).
   destruct H4 as [(H4, H5)| (H4, H5)]. {
     subst lbo.
-    rewrite app_length in Hfo.
+    rewrite length_app in Hfo.
     destruct ldo as [| d]; [ cbn in Hfo; flia Hfo | ].
     cbn in H5; clear Hfo.
     injection H5; clear H5; intros; subst d aft'.
@@ -1404,14 +1404,14 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
     destruct Hlbc as (lfo & H4).
     destruct H4 as [(H4, H5)| (H4, H5)]. {
       subst bef'; clear Hbef; rename Hbef' into Hbef.
-      rewrite app_length, Nat.add_comm.
+      rewrite length_app, Nat.add_comm.
       destruct lfo as [| d]. {
         f_equal.
         rewrite app_nil_r.
         injection H5; clear H5; intros; subst aft.
         replace (length (bef ++ Some a :: ldo)) with
           (length (bef ++ None :: ldo)). 2: {
-          now do 2 rewrite app_length.
+          now do 2 rewrite length_app.
         }
         rewrite List_cons_is_app.
         do 2 rewrite app_assoc.
@@ -1434,14 +1434,14 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
       }
     } {
       subst bef; rename bef' into bef; clear Hbef'.
-      rewrite app_length, Nat.add_comm.
+      rewrite length_app, Nat.add_comm.
       destruct lfo as [| d]. {
         f_equal.
         rewrite app_nil_r.
         injection H5; clear H5; intros; subst aft.
         replace (length (bef ++ Some a :: ldo)) with
           (length (bef ++ None :: ldo)). 2: {
-          now do 2 rewrite app_length.
+          now do 2 rewrite length_app.
         }
         rewrite List_cons_is_app.
         do 2 rewrite app_assoc.
@@ -1465,7 +1465,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
     }
   } {
     subst bef' lco.
-    rewrite app_length in Hfo; flia Hfo.
+    rewrite length_app in Hfo; flia Hfo.
   }
 } {
   apply Nat.nlt_ge in Hfo.
@@ -1473,7 +1473,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
   destruct Hlbc' as (ldo & H4).
   destruct H4 as [(H4, H5)| (H4, H5)]. {
     subst lbo.
-    rewrite app_length in Hfo.
+    rewrite length_app in Hfo.
     destruct ldo; [ | cbn in Hfo; flia Hfo ].
     cbn in H5; clear Hfo.
     subst lco.
@@ -1493,7 +1493,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
       now rewrite (equality_refl Heqb) in H1.
     } {
       subst bef.
-      rewrite app_length, Nat.add_comm.
+      rewrite length_app, Nat.add_comm.
       destruct lfo as [| d]; [ easy | ].
       destruct lfo as [| d']. {
         f_equal.
@@ -1528,7 +1528,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
       now rewrite (equality_refl Heqb) in H1.
     } {
       subst bef.
-      do 2 rewrite app_length; cbn - [ "<?" ].
+      do 2 rewrite length_app; cbn - [ "<?" ].
       rewrite <- Nat.add_succ_r.
       destruct lfo as [| d]; [ easy | ].
       cbn - [ "<?" ].
@@ -1538,7 +1538,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
       destruct H5 as [(H4, H5)| (H4, H5)]. {
         subst ldo.
         do 2 rewrite Nat.add_succ_r.
-        rewrite app_length, (Nat.add_comm (length lfo)).
+        rewrite length_app, (Nat.add_comm (length lfo)).
         rewrite Nat.add_assoc.
         rewrite (Nat.add_comm _ (length lgo)).
         destruct lgo as [| d]. {
@@ -1560,7 +1560,7 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
       } {
         subst lfo.
         do 2 rewrite Nat.add_succ_r.
-        rewrite app_length, Nat.add_assoc, Nat.add_comm.
+        rewrite length_app, Nat.add_assoc, Nat.add_comm.
         destruct lgo as [| d]. {
           f_equal.
           rewrite app_nil_r.
@@ -1745,18 +1745,18 @@ cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
 specialize (IHla _ Hpab) as H3.
 rewrite List_seq_cut3 with (i := length bef). 2: {
   apply in_seq; split; [ easy | cbn ].
-  rewrite H1, map_length.
+  rewrite H1, length_map.
   apply permutation_length in Hpab.
-  rewrite app_length in Hpab.
+  rewrite length_app in Hpab.
   flia Hpab.
 }
 rewrite Nat.sub_0_r, Nat.add_0_l.
 cbn - [ "<?" ].
 replace (length la - length bef) with (length aft). 2: {
   rewrite H1, H2.
-  do 2 rewrite map_length.
+  do 2 rewrite length_map.
   apply permutation_length in Hpab.
-  rewrite app_length in Hpab.
+  rewrite length_app in Hpab.
   flia Hpab.
 }
 remember (length bef) as i eqn:Hi.
@@ -1787,7 +1787,7 @@ destruct (Nat.eq_dec (length aft) 0) as [Haz| Haz]. {
   rewrite map_id.
   replace (length bef) with (length la). 2: {
     rewrite (permutation_length Hpab).
-    now rewrite H1, filter_Some_map_Some, map_length.
+    now rewrite H1, filter_Some_map_Some, length_map.
   }
   rewrite H1.
   rewrite fold_permutation_assoc.
@@ -1835,9 +1835,9 @@ replace (seq 0 i ++ seq (S i) (length aft)) with
 apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
 replace (i + length aft) with (length la). 2: {
   rewrite (permutation_length Hpab).
-  rewrite app_length.
-  rewrite <- (map_length Some (filter_Some _)), <- H1.
-  rewrite <- (map_length Some (filter_Some _)), <- H2.
+  rewrite length_app.
+  rewrite <- (length_map Some (filter_Some _)), <- H1.
+  rewrite <- (length_map Some (filter_Some _)), <- H2.
   now rewrite Hi.
 }
 rewrite H1, H2, <- map_app.
@@ -1883,7 +1883,7 @@ destruct x as [x| ]; [ | easy ].
 apply Heqb in H; subst x.
 rewrite map_app in Hlb; cbn in Hlb.
 apply List_app_eq_app' in Hlb. 2: {
-  rewrite map_length.
+  rewrite length_map.
   clear Hpab.
   revert bef' Hbef' Hlb.
   induction bef as [| b]; intros. {
@@ -1913,13 +1913,13 @@ apply List_app_eq_app' in Hlb. 2: {
 destruct Hlb as (Hbb' & Haa').
 subst bef'.
 injection Haa'; clear Haa'; intros; subst aft'.
-rewrite map_length.
+rewrite length_map.
 cbn.
 rewrite app_nth2; [ | now unfold ge ].
 rewrite Nat.sub_diag; cbn.
 f_equal.
 rewrite (permutation_assoc_loop_None_inside Heqb).
-rewrite map_length.
+rewrite length_map.
 rewrite <- map_app.
 rewrite map_map.
 erewrite map_ext_in. 2: {
@@ -2031,7 +2031,7 @@ split. {
     rewrite if_eqb_eq_dec in Hij.
     destruct (Nat.eq_dec (length bef) (length la)) as [Hba| Hba]. {
       apply (f_equal (λ l, length l)) in Hp.
-      rewrite (permutation_assoc_length Heqb Hpab), app_length in Hp.
+      rewrite (permutation_assoc_length Heqb Hpab), length_app in Hp.
       cbn in Hp; flia Hp Hba.
     }
     remember (extract (Nat.eqb j) _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -2052,7 +2052,7 @@ split. {
     rewrite if_eqb_eq_dec in Hij.
     destruct (Nat.eq_dec (length bef') (length la)) as [Hba'| Hba']. {
       apply (f_equal (λ l, length l)) in Hp'.
-      rewrite (permutation_assoc_length Heqb Hpab), app_length in Hp'.
+      rewrite (permutation_assoc_length Heqb Hpab), length_app in Hp'.
       cbn in Hp'; flia Hp' Hba'.
     }
     rewrite Hp' in Hp.
@@ -2098,7 +2098,7 @@ split. {
   set (f' := λ i, if i <? g 0 then f i - 1 else f (S i) - 1).
   set (g' := λ i, if g 0 <? g (S i) then g (S i) - 1 else g (S i)).
   apply (IHlen f' g'); [ easy | | | | | ]. {
-    rewrite app_length, firstn_length, skipn_length.
+    rewrite length_app, length_firstn, length_skipn.
     rewrite Hbl, Nat.min_l; [ cbn | flia Hgb ].
     rewrite Nat.add_sub_assoc; [ | flia Hgb ].
     now rewrite Nat.add_comm, Nat.add_sub.
@@ -2200,13 +2200,13 @@ split. {
     rewrite if_ltb_lt_dec.
     destruct (lt_dec i (g 0)) as [Higz| Higz]. {
       rewrite app_nth1. 2: {
-        rewrite firstn_length, Hbl.
+        rewrite length_firstn, Hbl.
         apply Nat.min_glb_lt; [ easy | flia Hi ].
       }
       specialize (Hn i His) as H2.
       rewrite <- (firstn_skipn (g 0) lb) in H2.
       rewrite app_nth1 in H2. 2: {
-        rewrite firstn_length, Hbl.
+        rewrite length_firstn, Hbl.
         apply Nat.min_glb_lt; [ easy | flia Hi ].
       }
       remember (f i) as fi eqn:Hfi.
@@ -2218,11 +2218,11 @@ split. {
     }
     apply Nat.nlt_ge in Higz.
     rewrite app_nth2. 2: {
-      rewrite firstn_length, Hbl; unfold ge.
+      rewrite length_firstn, Hbl; unfold ge.
       transitivity (g 0); [ | easy ].
       apply Nat.le_min_l.
     }
-    rewrite firstn_length, Hbl.
+    rewrite length_firstn, Hbl.
     rewrite Nat.min_l; [ | flia Hgb ].
     rewrite List_nth_skipn.
     replace (i - g 0 + S (g 0)) with (S i) by flia Higz.
@@ -2403,7 +2403,7 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hx & Hla); subst la.
 apply Heqb in Hx; subst x.
-rewrite app_length in Hlab; cbn in Hlab.
+rewrite length_app in Hlab; cbn in Hlab.
 rewrite Nat.add_succ_r in Hlab.
 apply Nat.succ_inj in Hlab.
 destruct bef as [| c]; cbn. {
@@ -2413,17 +2413,17 @@ destruct bef as [| c]; cbn. {
 destruct Htab as [Htab | Htab]. {
   injection Htab; clear Htab; intros; subst k j.
   split; [ flia | ].
-  rewrite app_length; cbn.
+  rewrite length_app; cbn.
   rewrite <- Nat.add_succ_comm, <- Nat.add_succ_l.
   apply Nat.add_lt_mono_l; flia.
 }
 specialize (IHlb (S k) (bef ++ c :: aft)) as H1.
 assert (H : length (bef ++ c :: aft) = length lb). {
-  rewrite app_length; cbn.
+  rewrite length_app; cbn.
   now rewrite Nat.add_succ_r.
 }
 specialize (H1 H Htab); clear H.
-rewrite app_length in H1 |-*; cbn in H1 |-*.
+rewrite length_app in H1 |-*; cbn in H1 |-*.
 now rewrite Nat.add_succ_r.
 Qed.
 
@@ -2491,7 +2491,7 @@ replace (swap _ _ _) with (b :: bef ++ a :: aft). 2: {
   rewrite Nat.sub_diag; cbn; f_equal.
   rewrite <- seq_shift, map_map; cbn.
   rewrite List_map_nth_seq with (la := bef ++ a :: aft) (d := a).
-  do 2 rewrite app_length.
+  do 2 rewrite length_app.
   apply map_ext_in.
   intros i Hi.
   rewrite if_eqb_eq_dec.
@@ -2536,8 +2536,8 @@ Proof.
 intros.
 unfold swap_d.
 rewrite List_map_nth_seq with (d := d).
-do 3 rewrite app_length; cbn.
-do 2 rewrite app_length; cbn.
+do 3 rewrite length_app; cbn.
+do 2 rewrite length_app; cbn.
 apply map_ext_in.
 intros i Hi.
 do 2 rewrite if_eqb_eq_dec.
@@ -2635,14 +2635,14 @@ specialize (nth_split la d H) as H1; clear H.
 destruct H1 as (l1 & l2 & Hla & Hi).
 remember (nth i la d) as x eqn:Hx.
 subst la.
-rewrite app_length in Hij; cbn in Hij.
+rewrite length_app in Hij; cbn in Hij.
 assert (H : j - S i < length l2) by flia Hij Hi.
 specialize (nth_split l2 d H) as H1; clear H.
 destruct H1 as (l3 & l4 & Hl2 & Hj).
 remember (nth (j - S i) l2 d) as y eqn:Hy.
 subst l2; rename l3 into l2; rename l4 into l3.
 assert (H : j = S (length (l1 ++ l2))). {
-  rewrite app_length, Hj, Hi.
+  rewrite length_app, Hj, Hi.
   flia Hij.
 }
 rewrite <- Hi, H.
@@ -2680,10 +2680,10 @@ destruct Hlxl as (Hbef & H & Hl2).
 apply Heqb in H; subst x.
 subst l2.
 cbn in H1; apply Nat.succ_inj in H1.
-rewrite app_length in H2; cbn in H2.
+rewrite length_app in H2; cbn in H2.
 rewrite Nat.add_succ_r in H2.
 apply Nat.succ_inj in H2.
-rewrite <- app_length in H2.
+rewrite <- length_app in H2.
 destruct n. {
   apply length_zero_iff_nil in H1.
   apply length_zero_iff_nil in H2.
@@ -2800,7 +2800,7 @@ assert (Hbn : length bef ≤ n). {
   assert (H : S n ≤ length bef < length (ma :: la)). {
     split; [ easy | ].
     apply permutation_length in Hpab.
-    rewrite app_length in Hpab; cbn; flia Hpab.
+    rewrite length_app in Hpab; cbn; flia Hpab.
   }
   specialize (H2 H); clear H.
   destruct H2 as (H2, H3).
