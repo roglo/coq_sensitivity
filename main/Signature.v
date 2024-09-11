@@ -204,7 +204,7 @@ split. {
     destruct Hj as [Hini| Hini]. {
       apply (In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
-      rewrite firstn_length, min_l in Hjl; [ | flia Hil ].
+      rewrite length_firstn, min_l in Hjl; [ | flia Hil ].
       specialize (NoDup_nat _ Hpi i j Hil) as H2.
       assert (H : j < length l) by flia Hjl Hil.
       specialize (H2 H); clear H.
@@ -217,7 +217,7 @@ split. {
     } {
       apply (In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
-      rewrite skipn_length in Hjl.
+      rewrite length_skipn in Hjl.
       rewrite List_nth_skipn in Hjn.
       specialize (NoDup_nat _ Hpi i (j + S i) Hil) as H2.
       assert (H : j + S i < length l) by flia Hjl.
@@ -902,15 +902,15 @@ rewrite <- List_last_nth.
    length "n"... *)
 assert (Hra : length (removelast la) = n). {
   apply (f_equal (λ l, length l)) in H4.
-  rewrite app_length, Nat.add_1_r in H4.
+  rewrite length_app, Nat.add_1_r in H4.
   rewrite Hla in H4.
   now apply Nat.succ_inj in H4.
 }
 (* and that "lb1++lb2" also has length "n" *)
 assert (Hbbl : length (lb1 ++ lb2) = n). {
   apply (f_equal (λ l, length l)) in Hlb.
-  rewrite app_length in Hlb; cbn in Hlb.
-  rewrite Nat.add_succ_r, <- app_length in Hlb.
+  rewrite length_app in Hlb; cbn in Hlb.
+  rewrite Nat.add_succ_r, <- length_app in Hlb.
   destruct Hbp as (Hbp1, Hbp2).
   rewrite Hbp2 in Hlb.
   now apply Nat.succ_inj in Hlb.
@@ -1011,7 +1011,7 @@ split. {
   split. {
     intros i Hi.
     unfold transposition.
-    rewrite map_length, seq_length.
+    rewrite length_map, length_seq.
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
     apply in_seq in Hj.
@@ -1022,8 +1022,8 @@ split. {
     rewrite List_length_map_seq.
     intros i j Hi Hj Hs.
     unfold transposition in Hs.
-    rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite length_seq ].
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite length_seq ].
     rewrite seq_nth in Hs; [ | easy ].
     rewrite seq_nth in Hs; [ | easy ].
     do 4 rewrite if_eqb_eq_dec in Hs.
@@ -1041,7 +1041,7 @@ split. {
     easy.
   }
 }
-now rewrite map_length, seq_length.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem ε_aux_app : ∀ i p q,
@@ -1287,7 +1287,7 @@ rewrite (ε_app2 Hop). 2: {
   }
   now apply in_seq in Hi.
 }
-rewrite app_length, seq_length.
+rewrite length_app, length_seq.
 cbn - [ ε ].
 rewrite Nat.mul_1_r.
 replace (ε [p]) with 1%L by now cbn; rewrite (rngl_mul_1_l Hon).
@@ -1302,7 +1302,7 @@ rewrite (ε_app2 Hop). 2: {
   now rewrite Nat.add_comm, Nat.sub_add in Hj.
 }
 rewrite ε_seq, (rngl_mul_1_r Hon).
-rewrite seq_length; cbn.
+rewrite length_seq; cbn.
 rewrite Nat.add_0_r.
 do 2 rewrite (rngl_mul_1_r Hon).
 now apply minus_one_pow_mul_same.
@@ -1339,7 +1339,7 @@ apply permut_seq_iff.
 split. {
   intros i Hi.
   unfold comp_list in Hi |-*.
-  rewrite map_length.
+  rewrite length_map.
   apply in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
   subst i.
@@ -1352,7 +1352,7 @@ split. {
 } {
   unfold comp_list.
   apply nat_NoDup.
-  rewrite map_length.
+  rewrite length_map.
   intros i j Hi Hj.
   rewrite (List_map_nth' 0); [ | easy ].
   rewrite (List_map_nth' 0); [ | easy ].
@@ -1380,7 +1380,7 @@ Proof.
 intros * Hp1 Hp2.
 split; [ now apply (comp_permut_seq n) | ].
 unfold "°".
-rewrite map_length.
+rewrite length_map.
 now destruct Hp2.
 Qed.
 
@@ -1638,7 +1638,7 @@ specialize sorted_strongly_sorted as H1.
 specialize (H1 _ _ Nat_leb_trans _ Hsl).
 specialize strongly_sorted_if as H2.
 specialize (H2 _ _ Nat_leb_trans _ H1 0).
-rewrite map_length, Hlr, isort_rank_length in H2.
+rewrite length_map, Hlr, isort_rank_length in H2.
 specialize (H2 i' j' Hi'l Hj'l Hc1).
 apply Nat.leb_le in H2.
 rewrite <- Hlr in H2.
@@ -1901,11 +1901,11 @@ intros d i.
 unfold comp_list.
 destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
   apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ | now rewrite map_length, collapse_length ].
+  rewrite nth_overflow; [ | now rewrite length_map, collapse_length ].
   now rewrite nth_overflow.
 }
 rewrite nth_indep with (d' := 0). 2: {
-  now rewrite map_length, collapse_length.
+  now rewrite length_map, collapse_length.
 }
 symmetry.
 rewrite nth_indep with (d' := 0); [ | easy ].
@@ -2094,7 +2094,7 @@ destruct b. {
   apply Nat.ltb_lt in Hkn.
   apply Nat.leb_le in Hni.
   rewrite nth_overflow; [ easy | ].
-  rewrite map_length.
+  rewrite length_map.
   now rewrite canon_sym_gr_list_length.
 }
 apply Bool.andb_false_iff in Hb.
@@ -2106,7 +2106,7 @@ destruct Hb as [Hb| Hb]. {
   } {
     apply Nat.nlt_ge in Hin.
     rewrite nth_overflow. 2: {
-      now rewrite map_length, canon_sym_gr_list_length.
+      now rewrite length_map, canon_sym_gr_list_length.
     }
     unfold succ_when_ge.
     rewrite Hσ'.
@@ -2284,7 +2284,7 @@ rewrite (ε_aux_app_all_gt_l Hop). 2: {
   intros j Hj.
   now apply in_seq in Hj.
 }
-rewrite seq_length, <- (rngl_mul_1_r Hon); f_equal.
+rewrite length_seq, <- (rngl_mul_1_r Hon); f_equal.
 erewrite map_ext_in. 2: {
   intros j Hj.
   apply in_seq in Hj; destruct Hj as (Hij, Hjn).
@@ -2353,7 +2353,7 @@ intros Hop * Hkn; cbn.
 f_equal. {
   apply (ε_aux_map_succ_when_ge_canon_sym_gr_list Hop). {
     apply Nat.lt_succ_r.
-    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+    apply Nat.Div0.div_lt_upper_bound.
     now rewrite Nat.mul_comm, <- Nat_fact_succ.
   } {
     apply Nat.mod_upper_bound, fact_neq_0.
