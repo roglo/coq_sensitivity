@@ -3156,6 +3156,7 @@ apply (sorted_unique Heqb Href Hant Htra). {
   split; [ | now apply sorted_bsort ].
   now apply permutation_sym, permuted_bsort.
 }
+Qed.
 
 (* bsort and isort return same *)
 
