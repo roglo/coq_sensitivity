@@ -325,12 +325,12 @@ apply NoDup_concat_if. {
 intros i j Hij a Ha.
 destruct (lt_dec i m) as [Him| Him]. 2: {
   apply Nat.nlt_ge in Him.
-  rewrite nth_overflow in Ha; [ easy | now rewrite List_map_seq_length ].
+  rewrite nth_overflow in Ha; [ easy | now rewrite List_length_map_seq'''' ].
 }
 rewrite (List_map_nth' 0) in Ha; [ | now rewrite seq_length ].
 destruct (lt_dec j m) as [Hjm| Hjm]. 2: {
   apply Nat.nlt_ge in Hjm.
-  rewrite nth_overflow; [ easy | now rewrite List_map_seq_length ].
+  rewrite nth_overflow; [ easy | now rewrite List_length_map_seq'''' ].
 }
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 intros Hb.
@@ -490,7 +490,7 @@ rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
 apply (ε_of_sym_gr_permut_succ Hon); [ easy | ].
-apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
+apply (Nat.le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
@@ -748,7 +748,7 @@ rewrite Hr.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
-    eapply le_lt_trans; [ apply Hk | ].
+    eapply Nat.le_lt_trans; [ apply Hk | ].
     apply Nat.sub_lt; [ | flia ].
     apply Nat.neq_0_lt_0, fact_neq_0.
   }
@@ -996,7 +996,7 @@ apply is_scm_mat_iff in Hsm.
 apply is_scm_mat_iff.
 destruct Hsm as (Hcr & Hc).
 cbn; unfold list_swap_elem.
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 unfold mat_swap_rows, list_swap_elem; cbn.
 split. {
   unfold mat_ncols; cbn.
@@ -1170,7 +1170,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite (rngl_product_list_permut Hon Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
-    replace n with (length la) by now rewrite Hla, List_map_seq_length.
+    replace n with (length la) by now rewrite Hla, List_length_map_seq''''.
     subst la.
     now apply transposition_permut_seq_with_len.
   }
@@ -1288,7 +1288,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   rewrite (sign_comp Hon); [ | easy | ]. 2: {
     split. 2: {
-      rewrite List_map_seq_length.
+      rewrite List_length_map_seq''''.
       unfold f.
       rewrite list_swap_elem_length.
       symmetry.
@@ -1297,9 +1297,9 @@ erewrite rngl_summation_eq_compat. 2: {
     apply permut_seq_iff.
     split. {
       intros i Hi.
-      rewrite List_map_seq_length.
+      rewrite List_length_map_seq''''.
       apply In_nth with (d := 0) in Hi.
-      rewrite List_map_seq_length in Hi.
+      rewrite List_length_map_seq'''' in Hi.
       destruct Hi as (j & Hj & Hji).
       rewrite (List_map_nth' 0) in Hji; [ | now rewrite seq_length ].
       rewrite seq_nth in Hji; [ | easy ].
@@ -1401,7 +1401,7 @@ rewrite Nat_sub_succ_1.
 rewrite (rngl_summation_list_permut Nat.eqb_eq) with (lb := seq 0 n!);
     cycle 1. {
   remember (map _ _) as la eqn:Hla.
-  replace n! with (length la) by now rewrite Hla, List_map_seq_length.
+  replace n! with (length la) by now rewrite Hla, List_length_map_seq''''.
   subst la.
 (* lemma to do? *)
   unfold g, f.
@@ -1785,14 +1785,14 @@ rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 remember (map _ _) as la eqn:Hla.
-replace n! with (length la) by now rewrite Hla, List_map_seq_length.
+replace n! with (length la) by now rewrite Hla, List_length_map_seq''''.
 subst la.
 (* lemma to do? *)
 unfold h.
 apply permut_seq_iff.
 split. {
   intros i Hi.
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   apply in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
   apply in_seq in Hj.
@@ -1980,7 +1980,7 @@ cbn.
 apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   intros i Hi.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
@@ -1999,7 +1999,7 @@ split. {
   }
 }
 split. {
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   intros i j Hi Hj Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -2217,7 +2217,7 @@ cbn.
 apply (det_by_any_sym_gr Hop H10); [ easy | easy | easy | ].
 unfold sg.
 split. {
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   intros i Hi.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
@@ -2234,7 +2234,7 @@ split. {
   }
 }
 split. {
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   intros i j Hi Hj Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -2400,7 +2400,7 @@ Theorem det_mI :
   ∀ n, det (mI n) = 1%L.
 Proof.
 intros Hop *; cbn.
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 induction n; intros; [ easy | ].
 rewrite determinant_succ.
 rewrite rngl_summation_split_first; [ | flia ].
