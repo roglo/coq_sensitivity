@@ -254,7 +254,7 @@ apply rlap_rem_prop in Hqr. 2: {
   now intros H; apply List_eq_rev_nil in H.
 }
 rewrite rev_length in Hqr |-*.
-eapply le_lt_trans; [ | apply Hqr ].
+eapply Nat.le_lt_trans; [ | apply Hqr ].
 apply strip_0s_length_le.
 Qed.
 
@@ -1562,7 +1562,7 @@ generalize Hqr; intros Hqrb.
 apply (rlap_quot_rem_length _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
-  apply lt_le_S.
+  apply Nat.le_succ_l.
   destruct rlb as [| b]; [ easy | ].
   cbn in Hqrlr.
   destruct rla as [| a]; [ easy | ].
