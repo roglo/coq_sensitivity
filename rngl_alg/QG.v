@@ -609,7 +609,7 @@ destruct x as [x| x| ]; [ | | easy ]. {
     now apply IHn.
   } {
     rewrite Pos2Nat.inj_1.
-    apply Nat.gcd_1_r.
+    apply Nat.gcd_comm.
   }
 } {
   cbn in Hn.
@@ -636,7 +636,7 @@ destruct x as [x| x| ]; [ | | easy ]. {
     apply Nat.le_succ_diag_r.
   } {
     rewrite Pos2Nat.inj_1.
-    apply Nat.gcd_1_r.
+    apply Nat.gcd_comm.
   }
 }
 Qed.
