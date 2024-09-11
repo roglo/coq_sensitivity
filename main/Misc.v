@@ -1213,7 +1213,7 @@ destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
 } {
   apply Nat.ltb_ge in Hn.
   rewrite Nat.sub_0_r.
-  rewrite butn_out; [ | now rewrite seq_length ].
+  rewrite butn_out; [ | now rewrite length_seq ].
   apply map_ext_in.
   intros i Hi.
   apply in_seq in Hi.
@@ -1812,7 +1812,7 @@ induction len; intros; [ easy | cbn ].
 rewrite IHlen.
 apply List_fold_left_ext_in.
 intros i lb Hi; apply in_seq in Hi.
-now rewrite map_length, seq_length.
+now rewrite map_length, length_seq.
 Qed.
 
 Theorem List_eq_firstn_nil : ∀ A n (l : list A),
@@ -1863,11 +1863,11 @@ apply map_ext_in.
 intros; f_equal; flia.
 Qed.
 
-Theorem List_map_seq_length : ∀ A (f : _ → A) a len,
+Theorem List_length_map_seq''' : ∀ A (f : _ → A) a len,
   length (map f (seq a len)) = len.
 Proof.
 intros.
-now rewrite map_length, seq_length.
+now rewrite map_length, length_seq.
 Qed.
 
 Theorem List_map_map_seq : ∀ {A B} d (f : A → B) la,
@@ -1939,14 +1939,14 @@ cbn.
 destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
   subst n.
   rewrite app_nth2. 2: {
-    now rewrite length_rev, seq_length; progress unfold ge.
+    now rewrite length_rev, length_seq; progress unfold ge.
   }
-  rewrite length_rev, seq_length, Nat.sub_diag; cbn.
+  rewrite length_rev, length_seq, Nat.sub_diag; cbn.
   now rewrite Nat.add_sub.
 }
 assert (H : n < len) by flia Hn Hnl.
 specialize (IHlen H).
-rewrite app_nth1; [ | now rewrite length_rev, seq_length ].
+rewrite app_nth1; [ | now rewrite length_rev, length_seq ].
 rewrite IHlen.
 now rewrite Nat.add_succ_r.
 Qed.
@@ -3130,8 +3130,6 @@ destruct it; [ cbn in Hlen; flia Hlen Hit | ].
 cbn - [ "-" ].
 f_equal. {
   rewrite Nat.mul_comm, Nat.Div0.mod_add.
-...
-  rewrite Nat.mul_comm, Nat.Div0.mod_add; [ | now subst n ].
   now apply Nat.mod_small, Hl; left.
 }
 rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
@@ -3165,6 +3163,7 @@ progress unfold to_radix.
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
 do 2 rewrite Nat.add_0_r in H1.
+...
 specialize (H1 Hlen Hl (le_refl _)).
 now rewrite Nat.sub_diag, app_nil_r in H1.
 Qed.
