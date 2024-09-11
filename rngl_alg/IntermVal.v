@@ -442,10 +442,10 @@ split. {
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   apply Nat.log2_up_le_pow2; [ easy | cbn ].
   apply Nat.min_glb. {
-    eapply le_trans; [ | apply Hp ].
+    eapply Nat.le_trans; [ | apply Hp ].
     apply Nat.log2_up_succ_le.
   } {
-    eapply le_trans; [ | apply Hq ].
+    eapply Nat.le_trans; [ | apply Hq ].
     apply Nat.log2_up_succ_le.
   }
 } {
@@ -514,10 +514,10 @@ split. {
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   apply Nat.log2_up_le_pow2; [ easy | cbn ].
   apply Nat.min_glb. {
-    eapply le_trans; [ | apply Hp ].
+    eapply Nat.le_trans; [ | apply Hp ].
     apply Nat.log2_up_succ_le.
   } {
-    eapply le_trans; [ | apply Hq ].
+    eapply Nat.le_trans; [ | apply Hq ].
     apply Nat.log2_up_succ_le.
   }
 }
@@ -984,7 +984,7 @@ assert (Hl : (rngl_is_limit_when_tending_to_inf (λ n, (u n - v n)) 0)%L). {
   apply (rngl_lt_div_l Hon Hop Hiv Hor); [ easy | ].
   eapply (rngl_lt_le_trans Hor); [ apply HN | ].
   apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-  eapply le_trans; [ apply Hn | ].
+  eapply Nat.le_trans; [ apply Hn | ].
   apply Nat.log2_up_le_pow2; [ flia Hn | ].
   now apply Nat.log2_up_le_lin.
 }
