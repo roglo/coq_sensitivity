@@ -164,7 +164,7 @@ intros.
 induction len; [ easy | ].
 rewrite seq_S.
 rewrite fold_left_app; cbn.
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 apply IHlen.
 Qed.
 
@@ -295,7 +295,7 @@ destruct (Nat.eq_dec i (sta + len)) as [Hisl| Hisl]. {
   cbn.
   rewrite <- Nat.add_succ_comm in Hi.
   rewrite <- Nat.add_succ_comm.
-  rewrite IHlen; [ | now rewrite List_length_map_seq'''' ].
+  rewrite IHlen; [ | now rewrite List_length_map_seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
   rewrite seq_nth; [ | flia Hi ].
   rewrite Nat.add_0_l, Nat.add_1_r.
@@ -810,14 +810,14 @@ Theorem map_permut_seq_permut_seq_with_len : ∀ n σ,
   → permut_seq_with_len n (map (λ i, nth i σ 0) (seq 0 n)).
 Proof.
 intros * Hσ.
-split; [ | now rewrite List_length_map_seq'''' ].
+split; [ | now rewrite List_length_map_seq ].
 apply permut_seq_iff.
 split. {
   intros i Hi.
   apply in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
   apply in_seq in Hj.
-  rewrite List_length_map_seq''''.
+  rewrite List_length_map_seq.
   rewrite <- Hji.
   destruct Hσ as (H1, H2).
   rewrite <- H2 in Hj |-*.
@@ -842,7 +842,7 @@ Theorem comatrix_nrows : ∀ M, mat_nrows (com M) = mat_nrows M.
 Proof.
 intros.
 unfold com; cbn.
-now rewrite List_length_map_seq''''.
+now rewrite List_length_map_seq.
 Qed.
 
 Theorem comatrix_ncols : ∀ M, mat_ncols (com M) = mat_ncols M.
@@ -857,7 +857,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
 }
 apply Nat.neq_0_lt_0 in Hrz.
 rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-now rewrite List_length_map_seq''''.
+now rewrite List_length_map_seq.
 Qed.
 
 Theorem comatrix_is_square : ∀ M,
@@ -874,7 +874,7 @@ split; [ easy | ].
 intros l Hl.
 apply in_map_iff in Hl.
 destruct Hl as (i & Hil & Hi).
-now rewrite <- Hil; rewrite List_length_map_seq''''.
+now rewrite <- Hil; rewrite List_length_map_seq.
 Qed.
 
 Theorem comatrix_is_correct : ∀ M,
@@ -890,7 +890,7 @@ split; [ easy | ].
 intros l Hl.
 apply in_map_iff in Hl.
 destruct Hl as (i & Hil & Hi).
-now rewrite <- Hil; rewrite List_length_map_seq''''.
+now rewrite <- Hil; rewrite List_length_map_seq.
 Qed.
 
 Theorem comatrix_transpose :
@@ -1098,9 +1098,9 @@ assert (Hasm : is_square_matrix A = true). {
   subst A.
   apply is_scm_mat_iff; cbn.
   unfold mat_ncols; cbn.
-  rewrite List_length_map_seq''''.
+  rewrite List_length_map_seq.
   rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hir ].
-  rewrite List_length_map_seq''''.
+  rewrite List_length_map_seq.
   rewrite fold_mat_ncols.
   apply is_scm_mat_iff in Hsm.
   split; [ easy | ].
@@ -1108,10 +1108,10 @@ assert (Hasm : is_square_matrix A = true). {
   apply in_map_iff in Hl.
   destruct Hl as (j & Hjl & Hj).
   apply in_seq in Hj.
-  now rewrite <- Hjl, List_length_map_seq''''.
+  now rewrite <- Hjl, List_length_map_seq.
 }
 assert (Hira : mat_nrows A = mat_nrows M). {
-  now subst A; cbn; rewrite List_length_map_seq''''.
+  now subst A; cbn; rewrite List_length_map_seq.
 }
 assert (H1 : det A = 0%L). {
   apply (determinant_same_rows Hon Hic Hop Hch Hii) with (p := i) (q := k). {
@@ -1191,7 +1191,7 @@ rewrite <- Nat.sub_succ_l; [ | easy ].
 rewrite Nat_sub_succ_1, Nat.add_0_l, Nat.sub_0_r.
 do 2 rewrite map_app.
 do 3 rewrite butn_app.
-do 2 rewrite List_length_map_seq''''.
+do 2 rewrite List_length_map_seq.
 rewrite Nat.ltb_irrefl.
 rewrite Nat.sub_diag.
 rewrite map_length.
@@ -1314,12 +1314,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite Nat_sub_succ_1.
   rewrite <- rngl_mul_assoc; f_equal.
   cbn - [ det ].
-  rewrite List_length_map_seq''''.
+  rewrite List_length_map_seq.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     unfold mat_ncols; cbn.
     rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-    rewrite List_length_map_seq''''.
+    rewrite List_length_map_seq.
     unfold mat_ncols.
     rewrite Hcl; [ flia Hk Hll | ].
     now apply List_hd_in.
@@ -1465,7 +1465,7 @@ destruct (Nat.eq_dec (length ll) 1) as [Hl1| Hl1]. {
 }
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 rewrite comatrix_ncols.
 generalize Hsm; intros Hsm_v.
 apply is_scm_mat_iff in Hsm.
@@ -1873,7 +1873,7 @@ cbn - [ mat_el vect_el ].
 unfold mat_mul_vect_r.
 cbn - [ mat_el com ].
 rewrite comatrix_ncols.
-rewrite (List_map_nth' []); [ | now rewrite List_length_map_seq'''' ].
+rewrite (List_map_nth' []); [ | now rewrite List_length_map_seq ].
 unfold vect_dot_mul.
 cbn - [ mat_el com ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].

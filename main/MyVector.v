@@ -313,7 +313,7 @@ intros n (la) (lb) (lc) Ha Hb Hc.
 cbn in Ha, Hb, Hc.
 unfold vect_dot_mul; cbn.
 do 4 rewrite (map2_map_min 0%L 0%L).
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 rewrite Ha, Hb, Hc.
 do 2 rewrite Nat.min_id.
 do 3 rewrite rngl_summation_list_map.
@@ -337,7 +337,7 @@ intros n (la) (lb) (lc) Ha Hb Hc.
 cbn in Ha, Hb, Hc.
 unfold vect_dot_mul; cbn.
 do 4 rewrite (map2_map_min 0%L 0%L).
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 rewrite Ha, Hb, Hc.
 do 2 rewrite Nat.min_id.
 do 3 rewrite rngl_summation_list_map.
@@ -453,7 +453,7 @@ Proof.
 intros.
 unfold vect_add; f_equal; cbn.
 do 4 rewrite (map2_map_min 0%L 0%L).
-do 2 rewrite List_length_map_seq''''.
+do 2 rewrite List_length_map_seq.
 do 3 rewrite fold_vect_size.
 rewrite Nat.min_assoc.
 apply map_ext_in.

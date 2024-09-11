@@ -988,10 +988,7 @@ transitivity (fold_left (λ a i : nat, a * n + i) l b mod n). 2: {
 }
 clear - Hnz.
 revert b n j Hnz.
-induction l as [| a]; intros. {
-  apply Nat_mod_add_l_mul_r''''.
-}
-cbn.
+induction l as [| a]; intros; [ apply Nat_mod_add_l_mul_r | cbn ].
 rewrite IHl; [ | easy ].
 now rewrite IHl.
 Qed.

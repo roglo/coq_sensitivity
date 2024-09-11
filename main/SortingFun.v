@@ -3420,7 +3420,7 @@ specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_trans as Htra.
 apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 split. {
   intros ll Hll.
   apply in_map_iff in Hll.

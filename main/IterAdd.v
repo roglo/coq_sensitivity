@@ -623,7 +623,7 @@ f_equal. {
   rewrite Nat.div_add_l; [ | easy ].
   rewrite (Nat.div_small (S i)); [ | flia Hi ].
   f_equal; [ symmetry; apply Nat.add_0_r | ].
-  rewrite Nat_mod_add_l_mul_r''''.
+  rewrite Nat_mod_add_l_mul_r.
   symmetry.
   apply Nat.mod_small; flia Hi.
 }

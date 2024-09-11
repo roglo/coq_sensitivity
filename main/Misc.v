@@ -314,7 +314,7 @@ rewrite Nat_sub_succ_1.
 apply Hij.
 Qed.
 
-Theorem Nat_mod_add_l_mul_r'''' : ∀ a b c,
+Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   (c * b + a) mod b = a mod b.
 Proof.
 intros.
@@ -1863,7 +1863,7 @@ apply map_ext_in.
 intros; f_equal; flia.
 Qed.
 
-Theorem List_length_map_seq'''' : ∀ A (f : _ → A) a len,
+Theorem List_length_map_seq : ∀ A (f : _ → A) a len,
   length (map f (seq a len)) = len.
 Proof.
 intros.

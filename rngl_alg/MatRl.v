@@ -42,7 +42,7 @@ Proof.
 intros.
 apply Bool.andb_true_iff.
 split; [ | apply mI_is_square_matrix ].
-cbn; rewrite List_length_map_seq''''.
+cbn; rewrite List_length_map_seq.
 apply Nat.eqb_refl.
 Qed.
 
@@ -68,7 +68,7 @@ intros.
 apply Bool.andb_true_iff.
 split; [ | apply square_matrix_mul_is_square ].
 apply Nat.eqb_eq; cbn.
-rewrite List_length_map_seq''''.
+rewrite List_length_map_seq.
 apply smat_nrows.
 Qed.
 
@@ -212,7 +212,7 @@ rewrite H1; clear H1; cbn.
 rewrite map_map.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite List_map_nth' with (a := 0%L). 2: {
-  now rewrite List_length_map_seq''''.
+  now rewrite List_length_map_seq.
 }
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
@@ -647,12 +647,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
     rewrite fold_mat_nrows.
     clear Hi.
     induction i; cbn; [ now rewrite repeat_length | ].
-    rewrite map2_length, List_length_map_seq''''.
+    rewrite map2_length, List_length_map_seq.
     rewrite fold_mat_nrows.
     flia Hnz IHi.
   }
   rewrite map2_nth with (a := 0%L) (b := 0%L) in Hi; cycle 1. {
-    now rewrite List_length_map_seq''''.
+    now rewrite List_length_map_seq.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     subst rom.
