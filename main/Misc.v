@@ -314,12 +314,12 @@ rewrite Nat_sub_succ_1.
 apply Hij.
 Qed.
 
-Theorem Nat_mod_add_l_mul_r : ∀ a b c,
-  b ≠ 0 → (c * b + a) mod b = a mod b.
+Theorem Nat_mod_add_l_mul_r''' : ∀ a b c,
+  (c * b + a) mod b = a mod b.
 Proof.
-intros * Hbz.
+intros.
 rewrite Nat.add_comm.
-now apply Nat.mod_add.
+apply Nat.Div0.mod_add.
 Qed.
 
 Theorem Nat_pow_nonneg: ∀ a b, 0 ≤ a ^ b.
@@ -843,16 +843,16 @@ cbn in Hab; apply Nat.succ_inj in Hab.
 rewrite (IHla _ Hab).
 rewrite map2_app_l.
 rewrite firstn_app.
-do 2 rewrite rev_length.
+do 2 rewrite length_rev.
 rewrite Hab, Nat.sub_diag; cbn.
 rewrite app_nil_r.
-rewrite <- (rev_length lb).
+rewrite <- (length_rev lb).
 rewrite firstn_all.
 f_equal.
-rewrite rev_length.
+rewrite length_rev.
 rewrite skipn_app.
-rewrite rev_length, Nat.sub_diag; cbn.
-rewrite <- (rev_length lb).
+rewrite length_rev, Nat.sub_diag; cbn.
+rewrite <- (length_rev lb).
 rewrite skipn_all.
 easy.
 Qed.
@@ -1939,14 +1939,14 @@ cbn.
 destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
   subst n.
   rewrite app_nth2. 2: {
-    now rewrite rev_length, seq_length; progress unfold ge.
+    now rewrite length_rev, seq_length; progress unfold ge.
   }
-  rewrite rev_length, seq_length, Nat.sub_diag; cbn.
+  rewrite length_rev, seq_length, Nat.sub_diag; cbn.
   now rewrite Nat.add_sub.
 }
 assert (H : n < len) by flia Hn Hnl.
 specialize (IHlen H).
-rewrite app_nth1; [ | now rewrite rev_length, seq_length ].
+rewrite app_nth1; [ | now rewrite length_rev, seq_length ].
 rewrite IHlen.
 now rewrite Nat.add_succ_r.
 Qed.
@@ -3129,7 +3129,9 @@ cbn - [ "-" ].
 destruct it; [ cbn in Hlen; flia Hlen Hit | ].
 cbn - [ "-" ].
 f_equal. {
-  rewrite Nat.mul_comm, Nat.mod_add; [ | now subst n ].
+  rewrite Nat.mul_comm, Nat.Div0.mod_add.
+...
+  rewrite Nat.mul_comm, Nat.Div0.mod_add; [ | now subst n ].
   now apply Nat.mod_small, Hl; left.
 }
 rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
