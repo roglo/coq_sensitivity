@@ -344,7 +344,7 @@ destruct la as [| x2]. {
   specialize (proj1 (NoDup_map_iff 0 _ _) Hfd) as H1.
   apply (NoDup_map_iff 0).
   intros x x' Hx Hx' Hxx.
-  rewrite seq_length in Hx, Hx', H1.
+  rewrite length_seq in Hx, Hx', H1.
   rewrite seq_nth in Hxx; [ | easy ].
   rewrite seq_nth in Hxx; [ cbn | easy ].
   cbn in Hxx.
@@ -505,7 +505,7 @@ split. {
     now apply IHlen in Hs.
   }
   apply List_app_eq_app' in Hs. 2: {
-    rewrite seq_length, Nat.add_comm.
+    rewrite length_seq, Nat.add_comm.
     apply Nat.add_sub.
   }
   destruct Hs as (Hla1 & Hs); symmetry in Hla1.
@@ -515,9 +515,9 @@ split. {
   move Hx after Hla1.
   split. {
     apply (f_equal (λ l, length l)) in Hsv.
-    rewrite seq_length in Hsv.
-    rewrite app_length in Hsv; cbn in Hsv.
-    rewrite app_length in Hsv; cbn in Hsv.
+    rewrite length_seq in Hsv.
+    rewrite length_app in Hsv; cbn in Hsv.
+    rewrite length_app in Hsv; cbn in Hsv.
     flia Hsv.
   }
   split; [ easy | ].
@@ -527,12 +527,12 @@ split. {
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
     apply (f_equal (λ l, length l)) in Hs.
-    rewrite seq_length in Hs.
-    rewrite app_length in Hs.
+    rewrite length_seq in Hs.
+    rewrite length_app in Hs.
     cbn in Hs; flia Hs.
   }
   rewrite Nat.add_comm, Nat.add_sub in Hs.
-  apply List_app_eq_app' in Hs; [ | now rewrite seq_length ].
+  apply List_app_eq_app' in Hs; [ | now rewrite length_seq ].
   destruct Hs as (Hla2, Hs); symmetry in Hla2; cbn in Hs.
   injection Hs; clear Hs; intros Hla3 Hy.
   move Hy before Hx; symmetry in Hy.
@@ -541,7 +541,7 @@ split. {
     rewrite Hx, <- Nat.add_succ_r.
     apply Nat.add_le_mono_l.
     apply (f_equal (λ l, length l)) in Hsv.
-    rewrite seq_length, app_length in Hsv; cbn in Hsv.
+    rewrite length_seq, length_app in Hsv; cbn in Hsv.
     flia Hsv.
   }
   rewrite Nat.add_comm in Hla3.
