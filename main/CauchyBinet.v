@@ -399,7 +399,7 @@ Theorem mat_select_rows_ncols : ∀ (A : matrix T) kl,
 Proof.
 intros * Hkl; cbn.
 destruct kl as [| k]; [ easy | ].
-now cbn; rewrite List_map_seq_length.
+now cbn; rewrite List_length_map_seq''''.
 Qed.
 
 Theorem mat_select_cols_nrows : ∀ (A : matrix T) kl,
@@ -408,7 +408,7 @@ Theorem mat_select_cols_nrows : ∀ (A : matrix T) kl,
   → mat_nrows (mat_select_cols kl A) = mat_nrows A.
 Proof.
 intros * Hlk Hcz; cbn.
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 rewrite mat_select_rows_ncols; [ | easy ].
 rewrite mat_transp_ncols.
 now apply Nat.eqb_neq in Hcz; rewrite Hcz.
@@ -489,7 +489,7 @@ split. {
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
   clear Hnz; cbn in Hc.
-  rewrite List_map_seq_length in Hc.
+  rewrite List_length_map_seq'''' in Hc.
   now rewrite Hca in Hc.
 } {
   intros l Hl.
@@ -498,7 +498,7 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
-  now rewrite List_map_seq_length.
+  now rewrite List_length_map_seq''''.
 }
 Qed.
 
@@ -1482,12 +1482,12 @@ unfold mat_select_rows.
 destruct A as (lla); cbn; f_equal.
 cbn in Hsm, Hc, Hcla.
 apply List_eq_iff.
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 split; [ easy | ].
 intros d i.
 destruct (lt_dec i (length lla)) as [Hila| Hila]. 2: {
   apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+  rewrite nth_overflow; [ | now rewrite List_length_map_seq'''' ].
   now rewrite nth_overflow.
 }
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -1547,9 +1547,9 @@ assert (Hab : is_square_matrix (A * B) = true). {
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length.
       cbn in Hp.
-      now rewrite List_map_seq_length in Hp.
+      now rewrite List_length_map_seq'''' in Hp.
     }
-    now rewrite List_map_seq_length.
+    now rewrite List_length_map_seq''''.
   }
 }
 rewrite (det_is_det'' Hon); [ | easy | easy ].
