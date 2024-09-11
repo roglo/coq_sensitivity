@@ -538,12 +538,12 @@ destruct ab; cbn; f_equal. {
   now apply Nat.succ_le_mono in Hit.
 }
 rewrite IHit; cbn. {
-  do 2 rewrite app_length; cbn.
+  do 2 rewrite length_app; cbn.
   symmetry; apply Nat.add_succ_r.
 } {
-  rewrite app_length in Hit; cbn in Hit.
+  rewrite length_app in Hit; cbn in Hit.
   apply Nat.succ_le_mono in Hit.
-  now rewrite Nat.add_succ_r, <- app_length in Hit.
+  now rewrite Nat.add_succ_r, <- length_app in Hit.
 }
 Qed.
 
@@ -553,7 +553,7 @@ Proof.
 intros.
 unfold merge.
 apply merge_loop_length.
-now rewrite app_length.
+now rewrite length_app.
 Qed.
 
 Theorem split_list_length : ∀ A la (lb lc : list A),
@@ -621,7 +621,7 @@ induction it; intros; [ easy | cbn ].
 remember (split_list la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (lb, lc).
 rewrite merge_length.
-rewrite app_length.
+rewrite length_app.
 do 2 rewrite IHit.
 now symmetry; apply split_list_length.
 Qed.
@@ -768,7 +768,7 @@ Theorem sorted_merge_loop_cons_cons_r_aux : ∀ {A} {rel : A → _},
     merge_loop rel it (a :: la) (repeat a n ++ b :: lb).
 Proof.
 intros * Hant Htra * Hit Haa Hs Hla.
-rewrite app_length, repeat_length in Hit; cbn in Hit.
+rewrite length_app, repeat_length in Hit; cbn in Hit.
 rewrite <- Nat.add_assoc in Hit.
 apply Nat.add_le_mono_l in Hit.
 do 2 rewrite Nat.add_succ_r in Hit.
@@ -2344,11 +2344,11 @@ destruct H1 as (la & lb & Hl & Hla).
 remember (nth i l d) as a eqn:Ha; clear Ha.
 subst l i.
 rewrite List_app_cons, app_assoc.
-rewrite app_nth2; rewrite app_length, Nat.add_comm; cbn; [ | easy ].
+rewrite app_nth2; rewrite length_app, Nat.add_comm; cbn; [ | easy ].
 remember (j - S (length la)) as k eqn:Hkj.
 assert (Hk : k < length lb). {
   subst k.
-  rewrite app_length in Hj; cbn in Hj.
+  rewrite length_app in Hj; cbn in Hj.
   flia Hj Hij.
 }
 specialize nth_split as H1.
@@ -2479,7 +2479,7 @@ destruct (Nat.eq_dec n (length la)) as [Hnla| Hnla]. {
     right; apply in_or_app; right.
     apply nth_In.
     cbn in Hlenb.
-    rewrite app_length in Hlenb; cbn in Hlenb.
+    rewrite length_app in Hlenb; cbn in Hlenb.
     flia Hlena Hlenb Hilen Hib Hib1.
   }
   apply (In_nth _ _ d) in H.
@@ -3428,8 +3428,8 @@ split. {
   apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
 }
 intros j k Hjk la lb Ha Hb.
-rewrite (List_map_nth' 0) in Ha; [ | rewrite seq_length; flia Hjk ].
-rewrite (List_map_nth' 0) in Hb; [ | rewrite seq_length; easy ].
+rewrite (List_map_nth' 0) in Ha; [ | rewrite length_seq; flia Hjk ].
+rewrite (List_map_nth' 0) in Hb; [ | rewrite length_seq; easy ].
 apply in_map_iff in Ha, Hb.
 destruct Ha as (lc & Hc & Hlc).
 destruct Hb as (ld & Hd & Hld).
