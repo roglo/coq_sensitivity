@@ -6270,14 +6270,14 @@ intros Hop *.
 unfold minus_one_pow.
 remember (i mod 2) as k eqn:Hk; symmetry in Hk.
 destruct k. {
-...
-  apply Nat.mod_divides in Hk; [ | easy ].
+  apply Nat.Div0.mod_divides in Hk.
   destruct Hk as (k, Hk); subst i.
   rewrite <- Nat.add_1_l, Nat.mul_comm.
-  now rewrite Nat.mod_add.
+  now rewrite Nat.Div0.mod_add.
 }
 destruct k. {
   rewrite <- Nat.add_1_l.
+...
   rewrite <- Nat.add_mod_idemp_r; [ | easy ].
   rewrite Hk; cbn.
   symmetry.

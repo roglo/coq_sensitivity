@@ -314,7 +314,7 @@ rewrite Nat_sub_succ_1.
 apply Hij.
 Qed.
 
-Theorem Nat_mod_add_l_mul_r''' : ∀ a b c,
+Theorem Nat_mod_add_l_mul_r'''' : ∀ a b c,
   (c * b + a) mod b = a mod b.
 Proof.
 intros.
