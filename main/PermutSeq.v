@@ -81,10 +81,10 @@ destruct H as (l1 & l2 & Hl); subst l.
 apply (permutation_elt Nat.eqb_eq).
 rewrite app_nil_r.
 apply IHlen. {
-  rewrite app_length in Hlen; cbn in Hlen.
+  rewrite length_app in Hlen; cbn in Hlen.
   rewrite Nat.add_succ_r in Hlen.
   apply Nat.succ_inj in Hlen.
-  now rewrite <- app_length in Hlen.
+  now rewrite <- length_app in Hlen.
 } {
   intros i Hi.
   specialize (Hp1 i) as H1.
@@ -306,7 +306,7 @@ Theorem comp_length : ∀ la lb,
 Proof.
 intros.
 unfold "°"; cbn.
-now rewrite map_length.
+now rewrite length_map.
 Qed.
 
 Theorem comp_isort_rank_r : ∀ rel l,
@@ -385,7 +385,7 @@ Theorem permut_seq_app_max : ∀ l,
 Proof.
 intros * Hp.
 unfold permut_seq in Hp |-*.
-rewrite app_length in Hp; cbn in Hp.
+rewrite length_app in Hp; cbn in Hp.
 rewrite Nat.add_1_r, seq_S in Hp; cbn in Hp.
 apply (permutation_app_inv Nat.eqb_eq) in Hp.
 now do 2 rewrite app_nil_r in Hp.
@@ -471,13 +471,13 @@ Theorem permut_comp_isort_rank_l : ∀ [l],
 Proof.
 intros * Hp.
 apply List_eq_iff.
-rewrite comp_length, seq_length.
+rewrite comp_length, length_seq.
 split; [ easy | ].
 intros d i.
 destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
   apply Nat.nlt_ge in Hil.
   rewrite nth_overflow; [ | now rewrite comp_length ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+  rewrite nth_overflow; [ easy | now rewrite length_seq ].
 }
 rewrite seq_nth; [ | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
@@ -571,7 +571,7 @@ Theorem list_swap_elem_length : ∀ A (d : A) l p q,
 Proof.
 intros.
 unfold list_swap_elem.
-now rewrite map_length, seq_length.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem list_swap_elem_involutive : ∀ A (d : A) l i j,
@@ -581,11 +581,11 @@ Theorem list_swap_elem_involutive : ∀ A (d : A) l i j,
 Proof.
 intros * Hi Hj.
 unfold list_swap_elem.
-rewrite map_length, seq_length.
+rewrite length_map, length_seq.
 erewrite map_ext_in. 2: {
   intros k Hk; apply in_seq in Hk.
   rewrite (List_map_nth' 0). 2: {
-    now rewrite seq_length; apply transposition_lt.
+    now rewrite length_seq; apply transposition_lt.
   }
   rewrite seq_nth; [ | now apply transposition_lt ].
   rewrite Nat.add_0_l.
@@ -649,7 +649,7 @@ Proof.
 intros * Hp Hq Hσ.
 apply permut_seq_iff.
 unfold list_swap_elem.
-rewrite map_length, seq_length.
+rewrite length_map, length_seq.
 split; cbn. {
   intros i Hi.
   apply in_map_iff in Hi.
@@ -663,8 +663,8 @@ split; cbn. {
   apply nat_NoDup.
   rewrite List_length_map_seq.
   intros i j Hi Hj Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite length_seq ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite length_seq ].
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
@@ -773,14 +773,14 @@ Theorem seq_permut_seq : ∀ n, permut_seq (seq 0 n).
 Proof.
 intros.
 unfold permut_seq.
-rewrite seq_length.
+rewrite length_seq.
 apply (permutation_refl Nat.eqb_eq).
 Qed.
 
 Theorem seq_permut_seq_with_len : ∀ n, permut_seq_with_len n (seq 0 n).
 Proof.
 intros.
-split; [ | apply seq_length ].
+split; [ | apply length_seq ].
 apply seq_permut_seq.
 Qed.
 
@@ -916,7 +916,7 @@ Proof.
 intros.
 revert k.
 induction n; intros; [ easy | cbn ].
-f_equal; rewrite map_length.
+f_equal; rewrite length_map.
 apply IHn.
 Qed.
 
@@ -929,7 +929,7 @@ intros * Hkn Hi.
 revert i k Hkn Hi.
 induction n; intros; [ easy | cbn ].
 destruct i. {
-  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  apply Nat.Div0.div_lt_upper_bound.
   now rewrite Nat.mul_succ_r, Nat.add_comm, Nat.mul_comm.
 }
 apply Nat.succ_lt_mono in Hi.
@@ -947,7 +947,7 @@ Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
 Proof.
 intros * Hkn Hjn.
 unfold canon_sym_gr_inv_list.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ cbn | easy ].
 revert k j Hkn Hjn.
 induction n; intros; [ easy | cbn ].
@@ -965,8 +965,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
     rewrite Nat_fact_succ in Hkn.
     rewrite Nat.mul_comm in Hkn.
     apply Nat.lt_succ_r.
-    apply Nat.div_lt_upper_bound; [ | easy ].
-    apply fact_neq_0.
+    now apply Nat.Div0.div_lt_upper_bound.
   } {
     apply IHn; [ easy | flia Hjn Hjsn ].
   }
@@ -989,7 +988,7 @@ Proof.
 intros * Hkn Hi.
 unfold canon_sym_gr_inv_list.
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   now apply canon_sym_gr_list_ub.
 }
 rewrite seq_nth; [ | now apply canon_sym_gr_list_ub ].
@@ -1033,7 +1032,7 @@ destruct (lt_dec i (k / n!)) as [Hikn| Hikn]. {
     subst i; clear Hi.
     rewrite Nat_fact_succ in Hkn.
     assert (Hkns : k / n! < S n). {
-      apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+      apply Nat.Div0.div_lt_upper_bound.
       now rewrite Nat.mul_comm.
     }
     flia Hikn Hkns.
@@ -1052,7 +1051,7 @@ Theorem canon_sym_gr_sym_gr_inv : ∀ n k i,
 Proof.
 intros * Hkn Hi.
 unfold canon_sym_gr_inv_list.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
 revert k i Hi Hkn.
@@ -1085,7 +1084,7 @@ destruct (lt_dec (S i) (k / n!)) as [Hsikn| Hsikn]. {
     rewrite Hsin in Hsikn.
     rewrite Nat_fact_succ in Hkn.
     assert (Hkns : k / n! < S n). {
-      apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+      apply Nat.Div0.div_lt_upper_bound.
       now rewrite Nat.mul_comm.
     }
     flia Hsikn Hkns.
@@ -1300,7 +1299,7 @@ Theorem sub_canon_permut_list_length : ∀ l,
 Proof.
 intros.
 destruct l as [| a]; [ easy | ].
-now cbn; rewrite map_length, Nat.sub_0_r.
+now cbn; rewrite length_map, Nat.sub_0_r.
 Qed.
 
 Theorem canon_sym_gr_list_inv_ub : ∀ n l,
@@ -1384,7 +1383,7 @@ f_equal. {
     apply sub_canon_permut_list_permut_seq_with_len.
     now apply permut_seq_iff.
   } {
-    cbn; rewrite map_length.
+    cbn; rewrite length_map.
     now cbn in Hln; apply Nat.succ_inj in Hln.
   }
 } {
@@ -1440,7 +1439,7 @@ f_equal. {
     apply H1; clear H1.
     rewrite Nat.div_small; [ flia Hai | ].
     apply canon_sym_gr_list_inv_ub.
-    split; [ | now cbn; rewrite map_length ].
+    split; [ | now cbn; rewrite length_map ].
     apply sub_canon_permut_list_permut_seq_with_len.
     now apply permut_seq_iff.
   }
@@ -1550,7 +1549,7 @@ remember (sub_canon_permut_list _) as x; cbn; subst x.
 specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
 rewrite Nat.mul_comm in H1.
 replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
-rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
+rewrite <- Nat.add_sub_swap; [ | apply Nat.Div0.mod_le ].
 apply Nat.add_sub_eq_r; f_equal.
 clear H1.
 rewrite <- (IHn (k mod fact n)) at 1; [ | easy ].
@@ -1648,7 +1647,7 @@ assert
   specialize (Hsg k pk) as H1.
   unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
+    rewrite length_seq.
     now apply canon_sym_gr_list_inv_ub.
   }
   rewrite seq_nth; [ | now apply canon_sym_gr_list_inv_ub ].
@@ -1675,7 +1674,7 @@ assert
         sg []) = k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
   unfold canon_sym_gr_list_list.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
   rewrite seq_nth; [ cbn | easy ].
   rewrite (@nth_sym_gr_inv_sym_gr _ _ n); cycle 1. {
     easy.
@@ -1750,7 +1749,7 @@ Theorem isort_rank_leb_seq : ∀ n, isort_rank Nat.leb (seq 0 n) = seq 0 n.
 Proof.
 intros.
 rewrite (eq_sorted_isort_rank_seq Nat_leb_trans). {
-  now rewrite seq_length.
+  now rewrite length_seq.
 }
 apply sorted_nat_ltb_leb_incl.
 apply sorted_seq.
@@ -1760,7 +1759,7 @@ Theorem isort_rank_ltb_seq : ∀ n, isort_rank Nat.ltb (seq 0 n) = seq 0 n.
 Proof.
 intros.
 rewrite (eq_sorted_isort_rank_seq Nat_ltb_trans). {
-  now rewrite seq_length.
+  now rewrite length_seq.
 }
 apply sorted_seq.
 Qed.
@@ -1783,28 +1782,28 @@ apply (permut_if_isort Nat.ltb Nat.eqb_eq).
 rewrite isort_isort_rank with (d := 0).
 rewrite isort_isort_rank with (d := 0).
 apply List_eq_iff.
-do 2 rewrite map_length.
+do 2 rewrite length_map.
 do 3 rewrite isort_rank_length.
-rewrite seq_length.
+rewrite length_seq.
 split; [ easy | ].
 intros d i.
 destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
   apply Nat.nlt_ge in Hila.
   rewrite nth_overflow. 2: {
-    rewrite map_length.
+    rewrite length_map.
     now do 2 rewrite isort_rank_length.
   }
   rewrite nth_overflow. 2: {
-    now rewrite map_length, isort_rank_length, seq_length.
+    now rewrite length_map, isort_rank_length, length_seq.
   }
   easy.
 }
 rewrite (List_map_nth' 0); [ | now do 2 rewrite isort_rank_length ].
-rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length, seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length, length_seq ].
 rewrite seq_nth. 2: {
   specialize (isort_rank_ub Nat.ltb) as H1.
   specialize (H1 (seq 0 (length la)) i).
-  rewrite seq_length in H1.
+  rewrite length_seq in H1.
   apply H1; intros H2.
   apply List_seq_eq_nil in H2.
   now rewrite H2 in Hila.
@@ -1984,7 +1983,7 @@ intros * Hin Hkn.
 revert i k Hin Hkn.
 induction n; intros; [ easy | cbn ].
 destruct i. {
-  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  apply Nat.Div0.div_lt_upper_bound.
   rewrite Nat.mul_comm.
   now rewrite <- Nat_fact_succ.
 }
@@ -2179,7 +2178,7 @@ clear la Hla.
 assert (Hin : i < n). {
   apply Nat.succ_lt_mono.
   rewrite Ha.
-  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  apply Nat.Div0.div_lt_upper_bound.
   now rewrite Nat.mul_comm, <- Nat_fact_succ.
 }
 subst lc.
@@ -2282,8 +2281,8 @@ apply (NoDup_map_iff []).
 unfold canon_sym_gr_list_list.
 rewrite List_length_map_seq.
 intros * Hi Hj Hij.
-rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite length_seq ].
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite length_seq ].
 rewrite seq_nth in Hij; [ | easy ].
 rewrite seq_nth in Hij; [ | easy ].
 do 2 rewrite Nat.add_0_l in Hij.
