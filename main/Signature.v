@@ -1019,7 +1019,7 @@ split. {
     now apply transposition_lt.
   } {
     apply nat_NoDup.
-    rewrite List_map_seq_length.
+    rewrite List_length_map_seq''''.
     intros i j Hi Hj Hs.
     unfold transposition in Hs.
     rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
