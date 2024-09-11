@@ -14,5 +14,6 @@ rngl_alg: examples of algebras of the theory RingLike
 Daniel de Rauglaudre
 
 # COQ VERSION
-  The Coq Proof Assistant, version 8.15.0
+  $ coqtop -v
+  The Coq Proof Assistant, version 8.20.0
   compiled with OCaml 4.14.1
