@@ -2044,7 +2044,7 @@ Theorem sorted_bsort_loop : ∀ A (rel : A → _),
 Proof.
 intros * Htot * Hit.
 rename l into la.
-eapply le_trans in Hit. 2: {
+eapply Nat.le_trans in Hit. 2: {
   apply (nb_disorder_le_square rel).
 }
 now apply sorted_bsort_loop_nb_disorder.
@@ -3078,7 +3078,7 @@ Theorem Nat_leb_antisym : antisymmetric Nat.leb.
 Proof.
 intros a b Hab Hba.
 apply Nat.leb_le in Hab, Hba.
-now apply le_antisym.
+now apply Nat.le_antisymm.
 Qed.
 
 Theorem Nat_leb_trans : transitive Nat.leb.
@@ -3156,6 +3156,7 @@ apply (sorted_unique Heqb Href Hant Htra). {
   split; [ | now apply sorted_bsort ].
   now apply permutation_sym, permuted_bsort.
 }
+Qed.
 
 (* bsort and isort return same *)
 
@@ -3419,7 +3420,7 @@ specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_trans as Htra.
 apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 split. {
   intros ll Hll.
   apply in_map_iff in Hll.
