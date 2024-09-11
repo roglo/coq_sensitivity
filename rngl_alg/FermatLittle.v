@@ -117,7 +117,7 @@ Theorem Nat_gcd_prime_fact_lt : ∀ p,
   prime p → ∀ k, k < p → Nat.gcd p (fact k) = 1.
 Proof.
 intros * Hp * Hkp.
-induction k; [ apply Nat.gcd_1_r | ].
+induction k; [ now rewrite Nat.gcd_comm | ].
 rewrite Nat_fact_succ.
 apply Nat_gcd_1_mul_r; [ | apply IHk; flia Hkp ].
 apply eq_gcd_prime_small_1; [ easy | flia Hkp ].
