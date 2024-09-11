@@ -661,7 +661,7 @@ split; cbn. {
   now apply transposition_lt.
 } {
   apply nat_NoDup.
-  rewrite List_map_seq_length.
+  rewrite List_length_map_seq''''.
   intros i j Hi Hj Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -1177,7 +1177,7 @@ Theorem canon_sym_gr_inv_list_length : ∀ n i,
 Proof.
 intros.
 unfold canon_sym_gr_inv_list.
-apply List_map_seq_length.
+apply List_length_map_seq''''.
 Qed.
 
 Theorem NoDup_canon_sym_gr_inv_list : ∀ n i,
@@ -1391,7 +1391,7 @@ f_equal. {
   cbn in Hln.
   apply Nat.succ_inj in Hln.
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-  rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+  rewrite Nat_mod_add_l_mul_r''''.
   rewrite Nat.mod_small. 2: {
     apply canon_sym_gr_list_inv_ub.
     split. {
@@ -2280,7 +2280,7 @@ clear la Hlb.
 rename lb into la.
 apply (NoDup_map_iff []).
 unfold canon_sym_gr_list_list.
-rewrite List_map_seq_length.
+rewrite List_length_map_seq''''.
 intros * Hi Hj Hij.
 rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
 rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
