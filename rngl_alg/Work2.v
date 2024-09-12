@@ -968,7 +968,7 @@ destruct (le_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_le_mono_l.
   rewrite Nat.mul_comm.
-  apply Nat.mul_div_le; flia Hnz.
+  apply Nat.Div0.mul_div_le; flia Hnz.
 }
 apply Nat.nle_gt in Hn2i.
 rewrite (Nat_div_less_small 1). 2: {
@@ -4295,7 +4295,7 @@ apply angle_le_pow2_log2; [ easy | | ]. {
   apply Bool.not_false_iff_true in H.
   apply H; clear H.
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
-    now apply Nat.mul_div_le.
+    now apply Nat.Div0.mul_div_le.
   }
   apply angle_mul_nat_overflow_pow_div.
 }
@@ -5572,7 +5572,7 @@ Print rngl_cos_mul.
     destruct n; [ now apply Nat.lt_irrefl in Hmi | clear Hmi ].
     remember (2 ^ S i) as j eqn:Hj.
     clear i Hj.
-    eapply Nat.le_trans; [ | now apply (Nat.mul_div_le _ 3) ].
+    eapply Nat.le_trans; [ | now apply (Nat.Div0.mul_div_le _ 3) ].
     apply Nat.mul_le_mono_l.
     apply Nat.div_le_compat_l.
     split; [ easy | ].
@@ -6200,7 +6200,7 @@ Search (angle_lim _ _ → _).
 ...
       rewrite <- angle_mul_sub_distr_r. 2: {
         rewrite Nat.mul_comm.
-        now apply Nat.mul_div_le.
+        now apply Nat.Div0.mul_div_le.
       }
       specialize (Nat.div_mod (2 ^ (i + 2)) 3) as H1.
       specialize (H1 (Nat.neq_succ_0 _)).
@@ -6613,7 +6613,7 @@ remember (u i) as θ1 eqn:Hθ1.
       apply (angle_mul_nat_not_overflow_le_l 3) in H1. 2: {
         apply Nat.div_le_lower_bound. 2: {
           rewrite Nat.mul_comm.
-          now apply Nat.mul_div_le.
+          now apply Nat.Div0.mul_div_le.
         }
         intros H.
         apply Nat.div_small_iff in H; [ | easy ].
@@ -6700,7 +6700,7 @@ apply (rngl_mul_pos_neg Hop Hor Hid).
         apply (angle_mul_nat_not_overflow_le_l 3) in Hzcu. 2: {
           apply Nat.div_le_lower_bound. 2: {
             rewrite Nat.mul_comm.
-            now apply Nat.mul_div_le.
+            now apply Nat.Div0.mul_div_le.
           }
           intros H.
           apply Nat.div_small_iff in H; [ | easy ].

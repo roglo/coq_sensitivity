@@ -2,8 +2,6 @@
 
 (* ideals on a RingLike *)
 
-Set Nested Proofs Allowed.
-
 Require Import Utf8 Arith.
 Require Import Main.Misc.
 Require Import Main.RingLike.
@@ -12,9 +10,9 @@ Record ideal {T} (P : T → bool) := mk_I
   { i_val : T;
     i_mem : P i_val = true }.
 
-Arguments mk_I {T P} i_val%L i_mem.
-Arguments i_val {T P} i%L.
-Arguments i_mem {T P} i%L.
+Arguments mk_I {T P} i_val%_L i_mem.
+Arguments i_val {T P} i%_L.
+Arguments i_mem {T P} i%_L.
 
 Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;

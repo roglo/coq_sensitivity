@@ -12,7 +12,6 @@
    opinion, but it may change)
 *)
 
-Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 ZArith.
@@ -557,10 +556,10 @@ destruct (Nat.eq_dec (Nat.gcd a c) 0) as [Hgz| Hgz]. {
   now apply Nat.gcd_eq_0 in Hgz.
 }
 apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+rewrite Nat.Lcm0.divide_div_mul_exact in Habc. 2: {
   apply Nat.gcd_divide_l.
 }
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+rewrite Nat.Lcm0.divide_div_mul_exact in Habc. 2: {
   apply Nat.gcd_divide_r.
 }
 remember (a / Nat.gcd a c) as a' eqn:Ha'.
@@ -581,10 +580,10 @@ move Ha'z before Haz.
 rewrite (Nat.mul_comm a) in Habc.
 rewrite Nat.mul_shuffle0 in Habc.
 apply (f_equal (λ x, Nat.div x (Nat.gcd a c))) in Habc.
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+rewrite Nat.Lcm0.divide_div_mul_exact in Habc. 2: {
   apply Nat.gcd_divide_l.
 }
-rewrite Nat.divide_div_mul_exact in Habc; [ | easy | ]. 2: {
+rewrite Nat.Lcm0.divide_div_mul_exact in Habc. 2: {
   apply Nat.gcd_divide_r.
 }
 rewrite <- Ha', <- Hc' in Habc.
@@ -719,8 +718,6 @@ destruct z as [| z| z]; [ easy | | ]. {
 }
 Qed.
 
-Require Import Zeuclid.
-
 Section a.
 
 Context [d : Z].
@@ -776,9 +773,7 @@ specialize (H1 H); clear H.
 apply H1; clear H1.
 rewrite <- Hk.
 rewrite Zabs2Nat.inj_mul.
-apply Nat.mod_same.
-rewrite <- Hk in Hnz.
-now rewrite Zabs2Nat.inj_mul in Hnz.
+apply Nat.Div0.mod_same.
 Qed.
 
 Theorem quad_int_eq_dec : ∀ a b : quad_int d, {a = b} + {a ≠ b}.
