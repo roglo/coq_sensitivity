@@ -478,7 +478,7 @@ Theorem dispatch_list_length : ∀ l, length (dispatch_list l) = length l.
 Proof.
 intros.
 unfold dispatch_list.
-now rewrite map_length, seq_length.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem dispatch_list_is_pre_partition : ∀ l,
@@ -527,7 +527,7 @@ split. {
   rewrite Nat.sub_diag in H1; cbn in H1.
   rewrite dispatch_list_length.
   apply H1.
-  rewrite app_length; cbn; flia.
+  rewrite length_app; cbn; flia.
 }
 split. {
   intros i Hi.
@@ -536,14 +536,14 @@ split. {
   split. {
     apply nth_In.
     unfold dispatch_list.
-    rewrite map_length.
-    rewrite seq_length.
+    rewrite length_map.
+    rewrite length_seq.
     apply Hl.
     now apply nth_In.
   }
   unfold dispatch_list.
   rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
+    rewrite length_seq.
     apply Hl.
     now apply nth_In.
   }
@@ -796,7 +796,7 @@ remember (dispatch_list l) as ll.
 unfold dispatch_list in Heqll.
 rewrite Heqll.
 unfold locate_list.
-rewrite map_length, seq_length.
+rewrite length_map, length_seq.
 replace l with (map (λ i, nth i l 0) (seq 0 (length l))) at 2. 2: {
   clear.
   induction l as [| a]; [ easy | ].
@@ -830,7 +830,7 @@ rewrite nth_find_loop_app_2. 2: {
   rewrite Nat.sub_0_r in Hj; subst k.
   flia Hka.
 }
-rewrite map_length, seq_length, Nat.add_0_l; cbn.
+rewrite length_map, length_seq, Nat.add_0_l; cbn.
 remember (nat_in_list a _) as b eqn:Hb; symmetry in Hb.
 destruct b; [ easy | ].
 specialize ((proj1 (nat_in_list_false_iff _ _)) Hb a) as H1.
@@ -880,7 +880,7 @@ assert
   rewrite <- Nat.pow_add_r, Nat.add_1_r, Nat.pow_1_r.
   apply (Nat.le_lt_trans _ i); [ | easy ].
   rewrite Nat.mul_comm.
-  now apply Nat.mul_div_le.
+  apply Nat.Div0.mul_div_le.
 }
 now apply H.
 Qed.
@@ -896,14 +896,14 @@ unfold locate, dispatch.
 rewrite locate_dispatch_list. 2: {
   intros a Ha.
   apply in_rev in Ha.
-  rewrite rev_length.
+  rewrite length_rev.
   unfold to_radix in Ha |-*.
   rewrite to_radix_loop_length.
   apply in_to_radix_loop in Ha; [ easy | ].
   now intros H; subst n.
 }
 rewrite dispatch_list_length.
-rewrite rev_length.
+rewrite length_rev.
 assert
   (H : ∀ i b l,
    fold_left (λ a j, a * length (to_radix n i) + j) l b =
@@ -1023,7 +1023,7 @@ Theorem locate_list_length : ∀ ll, length (locate_list ll) = length ll.
 Proof.
 intros.
 unfold locate_list.
-now rewrite map_length, seq_length.
+now rewrite length_map, length_seq.
 Qed.
 
 Theorem eq_nth_find_all_loop_nil : ∀ A f (l : list A) i,
@@ -1518,14 +1518,14 @@ assert
     }
     now right; apply IHl.
   }
-  rewrite rev_length.
+  rewrite length_rev.
   apply Nat.succ_inj.
   rewrite Hnl, Hrl; cbn.
   rewrite Hlr.
-  now rewrite rev_length.
+  now rewrite length_rev.
 }
 specialize (Hft n n (seq 0 n) 0) as H1.
-rewrite seq_length in H1.
+rewrite length_seq in H1.
 specialize (H1 eq_refl (Nat.le_refl _)).
 rewrite Nat.add_0_r in H1.
 assert (H : ∀ i, i ∈ seq 0 n → i < n). {
@@ -1593,14 +1593,14 @@ specialize (@nth_split _ j ll []) as H1.
 assert (H : j < length ll). {
   rewrite Hj, Hll.
   unfold pre_partitions.
-  rewrite map_length, seq_length.
+  rewrite length_map, length_seq.
   unfold locate.
   rewrite locate_dispatch_list. 2: {
     intros a Ha.
-    rewrite seq_length.
+    rewrite length_seq.
     now apply in_seq in Ha.
   }
-  rewrite dispatch_list_length, seq_length.
+  rewrite dispatch_list_length, length_seq.
   apply fold_left_mul_seq_lt.
 }
 specialize (H1 H); clear H.
@@ -1609,10 +1609,10 @@ unfold locate in Hj.
 rewrite locate_dispatch_list in Hj. 2: {
   intros a Ha.
   apply in_seq in Ha.
-  now rewrite seq_length.
+  now rewrite length_seq.
 }
 rewrite dispatch_list_length in Hj.
-rewrite seq_length in Hj.
+rewrite length_seq in Hj.
 rewrite Hll12.
 rewrite map_app.
 rewrite fold_right_app; cbn.
@@ -1623,7 +1623,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
     rewrite Hj.
     apply fold_left_mul_seq_lt.
   }
-  rewrite (List_map_nth' 0) by now rewrite seq_length.
+  rewrite (List_map_nth' 0) by now rewrite length_seq.
   rewrite seq_nth; [ cbn | easy ].
   unfold dispatch.
   rewrite Hj.
@@ -1631,12 +1631,12 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
   rewrite rev_involutive.
   clear.
   unfold dispatch_list.
-  rewrite seq_length.
+  rewrite length_seq.
   apply map_ext_in_iff.
   intros a Ha.
   unfold nth_find_all.
   apply (eq_nth_find_all_loop_cons _ _ 0).
-  rewrite seq_length, Nat.sub_0_r, Nat.sub_0_r; cbn.
+  rewrite length_seq, Nat.sub_0_r, Nat.sub_0_r; cbn.
   apply in_seq in Ha.
   split; [ easy | ]; destruct Ha as (_, Ha); cbn in Ha.
   rewrite seq_nth; [ | easy ].
