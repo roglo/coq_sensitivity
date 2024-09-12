@@ -27,13 +27,13 @@ Definition Nat_pow_mod a b c := Nat_pow_mod_loop a b c.
 (* ... and, in fact, it is a ^ b *)
 
 Theorem Nat_pow_mod_is_pow_mod : ∀ a b c,
-  c ≠ 0 → Nat_pow_mod a b c = (a ^ b) mod c.
+  Nat_pow_mod a b c = (a ^ b) mod c.
 Proof.
-intros * Hcz.
+intros.
 revert a.
 induction b; intros; [ easy | ].
 cbn; rewrite IHb.
-now rewrite Nat.mul_mod_idemp_r.
+now rewrite Nat.Div0.mul_mod_idemp_r.
 Qed.
 
 Definition inv_mod i n := Nat_pow_mod i (n - 2) n.
@@ -45,8 +45,8 @@ Theorem prime_mul_inv_l_mod : ∀ p a,
 Proof.
 intros * Hp Haz.
 progress unfold inv_mod.
-rewrite Nat_pow_mod_is_pow_mod; [ | now intros H; subst p ].
-rewrite Nat.mul_mod_idemp_l; [ | now intros H; subst p ].
+rewrite Nat_pow_mod_is_pow_mod.
+rewrite Nat.Div0.mul_mod_idemp_l.
 replace a with (a ^ 1); [ | apply Nat.pow_1_r ].
 rewrite Nat.pow_1_r at 1.
 rewrite <- Nat.pow_add_r.
@@ -129,8 +129,8 @@ Theorem Zn_add_assoc :
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.add_mod_idemp_l; [ | easy ].
-rewrite Nat.add_mod_idemp_r; [ | easy ].
+rewrite Nat.Div0.add_mod_idemp_l.
+rewrite Nat.Div0.add_mod_idemp_r.
 now rewrite Nat.add_assoc.
 Qed.
 
@@ -152,8 +152,8 @@ Theorem Zn_mul_assoc :
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
-rewrite Nat.mul_mod_idemp_r; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_l.
+rewrite Nat.Div0.mul_mod_idemp_r.
 now rewrite Nat.mul_assoc.
 Qed.
 
@@ -162,7 +162,7 @@ Theorem Zn_mul_1_l :
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_l.
 rewrite Nat.mul_1_l.
 destruct a as (a, Ha); cbn - [ "mod" ].
 apply Nat.ltb_lt in Ha.
@@ -175,9 +175,9 @@ Theorem Zn_mul_add_distr_l :
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
-rewrite Nat.add_mod_idemp_l; [ | easy ].
-rewrite Nat.add_mod_idemp_r; [ | easy ].
-rewrite Nat.mul_mod_idemp_r; [ | easy ].
+rewrite Nat.Div0.add_mod_idemp_l.
+rewrite Nat.Div0.add_mod_idemp_r.
+rewrite Nat.Div0.mul_mod_idemp_r.
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
@@ -195,12 +195,12 @@ Proof.
 intros n (a, Ha).
 apply Zn_eq; cbn - [ "mod" "-" ].
 apply Nat.ltb_lt in Ha.
-rewrite Nat.add_mod_idemp_l; [ | easy ].
+rewrite Nat.Div0.add_mod_idemp_l.
 rewrite (Nat.mod_small 0); [ | apply Nat.lt_0_succ ].
 rewrite Nat.sub_add. 2: {
   now apply Nat.lt_le_incl.
 }
-now apply Nat.mod_same.
+apply Nat.Div0.mod_same.
 Qed.
 
 Theorem Zn_eqb_eq :
@@ -283,7 +283,7 @@ rewrite (Nat.mod_small 1). 2: {
   apply -> Nat.succ_lt_mono.
   flia Hn2.
 }
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_l.
 replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].
   destruct n'; [ easy | ].
@@ -301,7 +301,7 @@ rewrite Nat.sub_diag; symmetry.
 destruct a; [ easy | exfalso ].
 apply Nat.ltb_lt in Ha.
 progress unfold at_least_1 in Ha.
-apply Nat.mod_divides in H; [ | flia Hn2 ].
+apply Nat.Div0.mod_divides in H.
 destruct H as (c, Hc).
 replace (S (S (n - 2))) with n in Ha by flia Hn2.
 rewrite Hc in Ha.
@@ -363,13 +363,13 @@ progress unfold rngl_mul_nat.
 progress unfold mul_nat; cbn - [ "mod" ].
 induction i. {
   cbn - [ "mod" ].
-  now rewrite Nat.mod_0_l.
+  now rewrite Nat.Div0.mod_0_l.
 }
 cbn - [ "mod" ].
 cbn - [ "mod" ] in IHi.
 rewrite IHi.
-rewrite Nat.add_mod_idemp_l; [ | easy ].
-rewrite Nat.add_mod_idemp_r; [ | easy ].
+rewrite Nat.Div0.add_mod_idemp_l.
+rewrite Nat.Div0.add_mod_idemp_r.
 easy.
 Qed.
 
@@ -398,7 +398,7 @@ split. {
 intros.
 apply Zn_eq.
 rewrite proj1_sig_Zn_of_nat.
-rewrite Nat.mod_same; [ | easy ].
+rewrite Nat.Div0.mod_same.
 cbn; symmetry.
 apply Nat.sub_diag.
 Qed.

@@ -56,8 +56,8 @@ destruct (zerop a) as [Ha| Ha]. {
   apply Nat.divide_0_l in Hap; flia Hap Hp2.
 }
 apply Nat.neq_0_lt_0 in Ha.
-apply Nat.mod_divide in Hap; [ | easy ].
-apply Nat.mod_divides in Hap; [ | easy ].
+apply Nat.Lcm0.mod_divide in Hap.
+apply Nat.Div0.mod_divides in Hap.
 destruct Hap as (k, Hk).
 symmetry in Hk.
 destruct p; [ easy | ].
@@ -75,7 +75,7 @@ assert (H : 2 ≤ S (S k) < S (S p)). {
 }
 specialize (H2 H); clear H.
 apply H2; rewrite <- Hk.
-now rewrite Nat.mod_mul.
+now rewrite Nat.Div0.mod_mul.
 Qed.
 
 Theorem eq_gcd_prime_small_1 : ∀ p n,
@@ -84,6 +84,7 @@ Theorem eq_gcd_prime_small_1 : ∀ p n,
   → Nat.gcd p n = 1.
 Proof.
 intros * Hp Hnp.
+destruct Hnp as (Hzn, Hnp).
 remember (Nat.gcd p n) as g eqn:Hg; symmetry in Hg.
 destruct g; [ now apply Nat.gcd_eq_0 in Hg; rewrite (proj1 Hg) in Hp | ].
 destruct g; [ easy | exfalso ].
@@ -104,8 +105,8 @@ destruct d. {
   specialize (Nat.gcd_divide_r p n) as H2.
   rewrite Hg in H2.
   destruct H2 as (d2, Hd2).
-  destruct d2; [ rewrite Hd2 in Hnp; flia Hnp | ].
-  rewrite Hd2 in Hnp; flia Hnp.
+  subst n.
+  destruct d2; [ now apply Nat.lt_irrefl in Hzn | flia Hnp ].
 }
 replace (S (S d)) with (1 + S d) in H1 by flia.
 rewrite Nat.mul_add_distr_r, Nat.mul_1_l in H1.
@@ -131,6 +132,7 @@ Theorem smaller_than_prime_all_different_multiples : ∀ p,
   → ∀ i j, i < j < p → (i * a) mod p ≠ (j * a) mod p.
 Proof.
 intros * Hp * Hap * Hijp.
+destruct Hap as (H1a, Hap).
 intros Haa; symmetry in Haa.
 apply Nat_mul_mod_cancel_r in Haa. 2: {
   rewrite Nat.gcd_comm.
@@ -142,17 +144,16 @@ flia Hijp Haa.
 Qed.
 
 Theorem fold_left_mul_map_mod : ∀ a b l,
-  a ≠ 0
-  → fold_left Nat.mul (map (λ i, i mod a) l) b mod a =
-    fold_left Nat.mul l b mod a.
+  fold_left Nat.mul (map (λ i, i mod a) l) b mod a =
+  fold_left Nat.mul l b mod a.
 Proof.
-intros * Haz.
+intros.
 induction l as [| c l]; [ easy | cbn ].
 rewrite <- List_fold_left_mul_assoc.
-rewrite Nat.mul_mod_idemp_r; [ | easy ].
-rewrite <- Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_r.
+rewrite <- Nat.Div0.mul_mod_idemp_l.
 rewrite IHl.
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_l.
 now rewrite List_fold_left_mul_assoc.
 Qed.
 
@@ -187,7 +188,7 @@ assert
      permutation Nat.eqb (map (λ i, (i * a) mod p) (seq 1 (p - 1)))
        (seq 1 (p - 1))). {
   apply (NoDup_permutation_bis Nat.eqb_eq); cycle 1. {
-    now rewrite map_length, seq_length.
+    now rewrite length_map, length_seq.
   } {
     intros i Hi.
     apply in_map_iff in Hi.
@@ -199,7 +200,7 @@ assert
     split; [ | now apply Nat.mod_upper_bound ].
     apply Nat.neq_0_lt_0.
     intros Hi.
-    apply Nat.mod_divide in Hi; [ | easy ].
+    apply Nat.Lcm0.mod_divide in Hi.
     specialize (Nat.gauss _ _ _ Hi) as H2.
     assert (H : Nat.gcd p j = 1) by now apply eq_gcd_prime_small_1.
     specialize (H2 H); clear H.
@@ -256,9 +257,9 @@ assert (Hx1 : x mod p = fact (p - 1) mod p). {
 assert (Hx2 : x mod p = (fact (p - 1) * a ^ (p - 1)) mod p). {
   subst x; rewrite Hf.
   rewrite <- (map_map (λ i, i * a) (λ j, j mod p)).
-  rewrite fold_left_mul_map_mod; [ | easy ].
+  rewrite fold_left_mul_map_mod.
   rewrite fold_left_mul_map_mul.
-  rewrite seq_length.
+  rewrite length_seq.
   f_equal; f_equal.
   symmetry.
   now apply fact_eq_fold_left.
