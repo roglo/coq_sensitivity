@@ -3833,7 +3833,7 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   do 2 rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-  apply Nat.Div0.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  apply Nat.Div0.div_le_upper_bound.
   apply Nat.mul_le_mono_r.
   destruct p; [ easy | ].
   destruct p; [ flia Hpq | ].
@@ -3863,7 +3863,7 @@ enough (H :
       apply angle_div_2_pow_le_compat_l.
       apply Nat.le_sub_l.
     }
-    apply Nat.Div0.div_le_upper_bound; [ easy | ].
+    apply Nat.Div0.div_le_upper_bound.
     apply Nat.mul_le_mono_r.
     apply Nat.lt_le_incl.
     now apply Nat.mod_upper_bound.
