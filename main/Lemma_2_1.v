@@ -353,7 +353,7 @@ intros.
 unfold mat_ncols; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply Nat.neq_0_lt_0 in Hnz.
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+rewrite (List_map_hd 0); [ | now rewrite length_seq ].
 now rewrite List_length_map_seq.
 Qed.
 
@@ -367,7 +367,7 @@ apply is_scm_mat_iff.
 split. {
   unfold mat_ncols; cbn.
   rewrite List_length_map_seq.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now rewrite List_length_map_seq.
 } {
   unfold mat_ncols; cbn.
@@ -394,8 +394,8 @@ Theorem mat_with_vect_el : ∀ n lv i j,
   → mat_el (mat_with_vect n lv) i j = vect_el (nth (j - 1) lv (vect_zero n)) i.
 Proof.
 intros * Hin Hjn; cbn.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hjn ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hin ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hjn ].
 rewrite seq_nth; [ | flia Hjn ].
 rewrite seq_nth; [ | flia Hin ].
 rewrite Nat.add_0_l, Nat.add_comm, Nat.sub_add; [ | easy ].
@@ -410,7 +410,7 @@ Proof. easy. Qed.
 Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
 Proof.
 intros; cbn.
-now rewrite map_length.
+now rewrite length_map.
 Qed.
 
 Theorem mat_mul_vect_dot_vect :
@@ -437,8 +437,8 @@ rewrite vect_dot_mul_dot_mul'; [ | easy ].
 unfold vect_dot_mul'.
 rewrite Hur, Hvr.
 cbn.
-do 3 rewrite map_length.
-rewrite seq_length.
+do 3 rewrite length_map.
+rewrite length_seq.
 rewrite fold_mat_nrows.
 rewrite squ_mat_ncols; [ | easy ].
 rewrite Nat.min_id.
@@ -481,7 +481,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 rewrite <- rngl_mul_summation_distr_l; [ | easy ].
 f_equal.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hrz ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hi Hrz ].
 rewrite vect_dot_mul_dot_mul'; [ | easy ].
 unfold vect_dot_mul'; cbn.
 rewrite List_length_map_seq.
@@ -489,7 +489,7 @@ rewrite Hvr, Nat.min_id.
 eapply rngl_summation_eq_compat.
 intros j Hj.
 f_equal.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hrz ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hj Hrz ].
 rewrite seq_nth; [ | flia Hi Hrz ].
 rewrite seq_nth; [ | flia Hj Hrz ].
 rewrite Nat.add_comm, Nat.add_sub.
@@ -564,8 +564,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hi ].
+rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hj ].
 rewrite seq_nth; [ | flia Hi ].
 rewrite seq_nth; [ | flia Hj ].
 cbn.
@@ -705,7 +705,7 @@ assert (Hus : is_square_matrix U = true). {
   apply is_scm_mat_iff; cbn.
   unfold mat_ncols; cbn.
   rewrite List_length_map_seq.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   rewrite List_length_map_seq.
   split; [ easy | ].
   intros l Hl.
@@ -719,7 +719,7 @@ assert (Hdc : is_correct_matrix D = true). {
   apply is_scm_mat_iff; cbn.
   unfold mat_ncols; cbn.
   rewrite List_length_map_seq.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   rewrite List_length_map_seq.
   split; [ easy | ].
   intros l Hl.
@@ -746,53 +746,53 @@ apply matrix_eq; cycle 1. {
   now do 3 rewrite List_length_map_seq.
 } {
   unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length, Hrn ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq, Hrn ].
   rewrite (List_map_hd 0). 2: {
-    rewrite seq_length, Hmo; cbn.
+    rewrite length_seq, Hmo; cbn.
     now rewrite List_length_map_seq.
   }
   do 2 rewrite List_length_map_seq.
   rewrite Hmo, Hmd; unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now do 2 rewrite List_length_map_seq.
 }
 unfold mat_ncols; cbn.
 rewrite List_length_map_seq, Hrn, Hmd.
 rewrite (List_map_hd 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   rewrite Hmo; cbn.
   now rewrite List_length_map_seq.
 }
 rewrite List_length_map_seq.
 intros i j Hi Hj.
 unfold mat_ncols, mat_with_diag in Hj; cbn in Hj.
-rewrite (List_map_hd 0) in Hj; [ | now rewrite seq_length ].
+rewrite (List_map_hd 0) in Hj; [ | now rewrite length_seq ].
 rewrite List_length_map_seq in Hj.
 assert (Hi' : i - 1 < n) by now apply Nat_1_le_sub_lt.
 assert (Hj' : j - 1 < n) by now apply Nat_1_le_sub_lt.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   rewrite Hmo; unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now rewrite List_length_map_seq.
 }
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   rewrite Hmo; cbn.
   now rewrite List_length_map_seq.
 }
 rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
+  rewrite length_seq.
   unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now rewrite List_length_map_seq.
 }
 rewrite seq_nth; [ | easy ].
 rewrite seq_nth. 2: {
   rewrite Hmo; unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now rewrite List_length_map_seq.
 }
 rewrite seq_nth. 2: {
@@ -801,7 +801,7 @@ rewrite seq_nth. 2: {
 }
 rewrite seq_nth. 2: {
   unfold mat_ncols, mat_with_diag; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite length_seq ].
   now rewrite List_length_map_seq.
 }
 cbn.
@@ -839,14 +839,14 @@ rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   assert (Hk' : k - 1 - 1 < n) by flia Hk Hj.
   rewrite Hmo; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
   rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | easy ].
   cbn.
   rewrite Hmd; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
   rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | easy ].
   cbn; rewrite if_eqb_eq_dec.
@@ -860,8 +860,8 @@ rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   assert (Hk' : k - 1 < n) by flia Hk.
   rewrite Hmd; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
   rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | easy ].
   cbn; rewrite if_eqb_eq_dec.
@@ -870,21 +870,21 @@ rewrite all_0_rngl_summation_0. 2: {
 }
 rewrite rngl_add_0_r.
 rewrite Hmd; cbn - [ iter_seq ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ cbn | easy ].
 rewrite Nat.eqb_refl.
 rewrite Hmo.
 cbn - [ iter_seq ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
+rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ | easy ].
 rewrite seq_nth; [ | easy ].
 cbn - [ iter_seq ].
 erewrite rngl_summation_eq_compat. 2: {
   intros u Hu.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hnz ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hu Hnz ].
+  rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
   rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | flia Hu Hnz ].
   now cbn.
@@ -1255,7 +1255,7 @@ assert (Hyi : ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth_eV i, x ≻). {
   unfold nth_eV.
   rewrite Hmax; cbn.
   rewrite map_map, Hur, Huc.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hi ].
   rewrite HU; cbn.
   f_equal.
   rewrite seq_nth; [ | flia Hi ].
@@ -1267,10 +1267,10 @@ assert (Hyi : ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth_eV i, x ≻). {
     rewrite Nat_sub_succ_1.
     apply in_seq in Hj.
     rewrite (List_map_nth' 0); [ | now rewrite List_length_map_seq ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+    rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hi ].
     rewrite seq_nth; [ | flia Hi ].
     rewrite Nat.add_0_l.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
     rewrite seq_nth; [ | easy ].
     rewrite Nat.add_0_l.
     unfold vect_el.
@@ -1463,7 +1463,7 @@ rewrite Hx1.
 rewrite vect_dot_mul_dot_mul'; [ | now left ].
 unfold vect_dot_mul'.
 cbn - [ vect_el ].
-rewrite map_length, fold_mat_nrows, Hr, Hsx.
+rewrite length_map, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 (*
 ...
@@ -1578,7 +1578,7 @@ rewrite vect_dot_mul_dot_mul'; [ | easy ].
 unfold vect_dot_mul'.
 rewrite Nat.min_id.
 cbn - [ vect_el ].
-rewrite map_length, fold_mat_nrows, Hr, Hsx.
+rewrite length_map, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 (**)
 f_equal.
@@ -1621,7 +1621,7 @@ f_equal. 2: {
 *)
       rewrite Hcu; flia Hi Hnz.
     }
-    rewrite (List_map_nth' 0); [ | rewrite seq_length, Hcu; flia Hi Hnz ].
+    rewrite (List_map_nth' 0); [ | rewrite length_seq, Hcu; flia Hi Hnz ].
     erewrite map_ext_in. 2: {
       intros j Hj; apply in_seq in Hj.
       rewrite Hru in Hj.
