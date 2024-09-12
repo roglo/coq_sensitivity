@@ -17,7 +17,7 @@ Context {ac : angle_ctx T}.
 Theorem rngl_cos_angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  → rngl_cos ((θ1 + θ2) / ₂) = rngl_cos (θ1 / ₂ + θ2 / ₂).
+  → rngl_cos ((θ1 + θ2) /₂) = rngl_cos (θ1 /₂ + θ2 /₂).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -558,7 +558,7 @@ Qed.
 Theorem rngl_cos_angle_div_2_add_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = true
-  → rngl_cos ((θ1 + θ2) / ₂) = rngl_cos (θ1 / ₂ + θ2 / ₂ + angle_straight).
+  → rngl_cos ((θ1 + θ2) /₂) = rngl_cos (θ1 /₂ + θ2 /₂ + angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -756,7 +756,7 @@ Qed.
 Theorem rngl_sin_angle_div_2_add_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = true
-  → rngl_sin ((θ1 + θ2) / ₂) = rngl_sin (θ1 / ₂ + θ2 / ₂ + angle_straight).
+  → rngl_sin ((θ1 + θ2) /₂) = rngl_sin (θ1 /₂ + θ2 /₂ + angle_straight).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1004,11 +1004,11 @@ Qed.
 
 Theorem angle_div_2_add :
   ∀ θ1 θ2,
-  ((θ1 + θ2) / ₂)%A =
+  ((θ1 + θ2) /₂)%A =
     if angle_add_overflow θ1 θ2 then
-      (θ1 / ₂ + θ2 / ₂ + angle_straight)%A
+      (θ1 /₂ + θ2 /₂ + angle_straight)%A
     else
-      (θ1 / ₂ + θ2 / ₂)%A.
+      (θ1 /₂ + θ2 /₂)%A.
 Proof.
 intros.
 remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
@@ -1033,7 +1033,7 @@ Qed.
 Theorem angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂)%A.
+  → ((θ1 + θ2) /₂)%A = (θ1 /₂ + θ2 /₂)%A.
 Proof.
 intros * Haov.
 rewrite angle_div_2_add.
@@ -1043,7 +1043,7 @@ Qed.
 Theorem angle_div_2_add_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = true
-  → ((θ1 + θ2) / ₂)%A = (θ1 / ₂ + θ2 / ₂ + angle_straight)%A.
+  → ((θ1 + θ2) /₂)%A = (θ1 /₂ + θ2 /₂ + angle_straight)%A.
 Proof.
 intros * Haov.
 rewrite angle_div_2_add.

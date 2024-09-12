@@ -427,7 +427,7 @@ Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : angle_scope.
 Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : angle_scope.
 Notation "n * θ" := (angle_mul_nat θ n) : angle_scope.
-Notation "θ / ₂" := (angle_div_2 θ) (at level 40) : angle_scope.
+Notation "θ /₂" := (angle_div_2 θ) (at level 40) : angle_scope.
 Notation "θ1 ≤ θ2 < θ3" :=
   (angle_leb θ1 θ2 = true ∧ angle_ltb θ2 θ3 = true) : angle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
@@ -3457,7 +3457,7 @@ Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
 Proof. easy. Qed.
 
 Theorem angle_div_2_mul_2 :
-  ∀ a, (2 * (a / ₂))%A = a.
+  ∀ a, (2 * (a /₂))%A = a.
 Proof.
 intros *.
 destruct_ac.
@@ -3662,7 +3662,7 @@ apply (rngl_le_0_sub Hop Hor).
 now apply rngl_cos_bound.
 Qed.
 
-Theorem rngl_sin_div_2_nonneg : ∀ θ, (0 ≤ rngl_sin (θ / ₂))%L.
+Theorem rngl_sin_div_2_nonneg : ∀ θ, (0 ≤ rngl_sin (θ /₂))%L.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -3680,7 +3680,7 @@ apply (rngl_le_0_sub Hop Hor).
 apply rngl_cos_bound.
 Qed.
 
-Theorem angle_div_2_le_straight : ∀ θ, (θ / ₂ ≤ angle_straight)%A.
+Theorem angle_div_2_le_straight : ∀ θ, (θ /₂ ≤ angle_straight)%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -3689,7 +3689,7 @@ specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  rewrite (H1 (_ / ₂))%A, (H1 angle_straight).
+  rewrite (H1 (_ /₂))%A, (H1 angle_straight).
   apply angle_le_refl.
 }
 intros.
@@ -3751,7 +3751,7 @@ split; intros H12. {
 }
 Qed.
 
-Theorem angle_0_div_2 : (0 / ₂ = 0)%A.
+Theorem angle_0_div_2 : (0 /₂ = 0)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -3786,7 +3786,7 @@ apply (rngl_opp_0 Hop).
 Qed.
 
 Theorem angle_opp_div_2 :
-  ∀ θ, ((- θ) / ₂ = - (θ / ₂) + if (θ =? 0)%A then 0 else angle_straight)%A.
+  ∀ θ, ((- θ) /₂ = - (θ /₂) + if (θ =? 0)%A then 0 else angle_straight)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -3858,7 +3858,7 @@ destruct zs. {
 Qed.
 
 Theorem angle_opp_div_2' :
-  ∀ θ, (- (θ / ₂) = (- θ) / ₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
+  ∀ θ, (- (θ /₂) = (- θ) /₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
 Proof.
 intros.
 rewrite angle_opp_div_2.
@@ -3870,7 +3870,7 @@ rewrite angle_straight_add_straight.
 symmetry; apply angle_add_0_r.
 Qed.
 
-Theorem angle_straight_div_2 : (angle_straight / ₂ = angle_right)%A.
+Theorem angle_straight_div_2 : (angle_straight /₂ = angle_right)%A.
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -3944,14 +3944,14 @@ destruct z1. {
 Qed.
 
 Theorem angle_div_2_le_compat :
-  ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 / ₂ ≤ θ2 / ₂)%A.
+  ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 /₂ ≤ θ2 /₂)%A.
 Proof.
 destruct_ac.
 intros * H12.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  do 2 rewrite (H1 (_ / ₂))%A.
+  do 2 rewrite (H1 (_ /₂))%A.
   apply angle_le_refl.
 }
 progress unfold angle_leb in H12.
@@ -4040,7 +4040,7 @@ now apply (rngl_add_le_mono_l Hop Hor).
 Qed.
 
 Theorem angle_div_2_eq_compat :
-  ∀ θ1 θ2, (θ1 / ₂ = θ2 / ₂ → θ1 = θ2)%A.
+  ∀ θ1 θ2, (θ1 /₂ = θ2 /₂ → θ1 = θ2)%A.
 Proof.
 intros * H12.
 apply (f_equal (λ θ, (2 * θ)%A)) in H12.
@@ -4048,7 +4048,7 @@ now do 2 rewrite angle_div_2_mul_2 in H12.
 Qed.
 
 Theorem angle_div_2_lt_compat :
-  ∀ θ1 θ2, (θ1 < θ2 → θ1 / ₂ < θ2 / ₂)%A.
+  ∀ θ1 θ2, (θ1 < θ2 → θ1 /₂ < θ2 /₂)%A.
 Proof.
 intros * H12.
 apply angle_lt_iff.
@@ -4062,7 +4062,7 @@ subst θ2.
 now apply angle_lt_irrefl in H12.
 Qed.
 
-Theorem eq_angle_div_2_0 : ∀ θ, (θ / ₂ = 0 → θ = 0)%A.
+Theorem eq_angle_div_2_0 : ∀ θ, (θ /₂ = 0 → θ = 0)%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -4090,7 +4090,7 @@ Qed.
 
 Theorem angle_div_2_not_straight :
   rngl_characteristic T ≠ 1 →
-  ∀ θ, (θ / ₂)%A ≠ angle_straight.
+  ∀ θ, (θ /₂)%A ≠ angle_straight.
 Proof.
 destruct_ac.
 intros Hc1.

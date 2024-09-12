@@ -775,8 +775,8 @@ Fixpoint angle_div_2_pow θ i :=
 
 End a.
 
-Notation "θ / ₂ ^ n" := (angle_div_2_pow θ n)
-  (at level 40, format "θ  /  ₂ ^ n") : angle_scope.
+Notation "θ /₂^ n" := (angle_div_2_pow θ n)
+  (at level 40, format "θ  /₂^ n") : angle_scope.
 
 Section a.
 
@@ -787,11 +787,11 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
 Theorem angle_div_2_pow_succ_r_1 :
-  ∀ n θ, angle_div_2_pow θ (S n) = (angle_div_2_pow θ n / ₂)%A.
+  ∀ n θ, angle_div_2_pow θ (S n) = (angle_div_2_pow θ n /₂)%A.
 Proof. easy. Qed.
 
 Theorem angle_div_2_pow_succ_r_2 :
-  ∀ n θ, angle_div_2_pow θ (S n) = angle_div_2_pow (θ / ₂) n.
+  ∀ n θ, angle_div_2_pow θ (S n) = angle_div_2_pow (θ /₂) n.
 Proof.
 intros.
 induction n; intros; [ easy | ].
@@ -800,7 +800,7 @@ now rewrite IHn.
 Qed.
 
 Theorem angle_div_2_pow_add_r :
-  ∀ i j θ, (θ / ₂^(i + j) = θ / ₂^i / ₂^j)%A.
+  ∀ i j θ, (θ /₂^(i + j) = θ /₂^i /₂^j)%A.
 Proof.
 intros.
 revert j θ.

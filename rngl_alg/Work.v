@@ -56,7 +56,7 @@ Context {ac : angle_ctx T}.
 
 Theorem angle_mul_nat_overflow_pow2_div_angle_mul :
   ∀ n i θ,
-  angle_mul_nat_overflow (2 ^ i / n) (n * (θ / ₂^i)) = false.
+  angle_mul_nat_overflow (2 ^ i / n) (n * (θ /₂^i)) = false.
 Proof.
 destruct_ac.
 intros.
@@ -69,18 +69,18 @@ apply H1; clear H1.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
   rewrite Nat.mul_comm.
-  now apply Nat.mul_div_le.
+  apply Nat.Div0.mul_div_le.
 }
 apply angle_mul_nat_overflow_pow_div.
 Qed.
 
-Theorem angle_div_pow2_1 : ∀ θ, (θ / ₂^1 = θ / ₂)%A.
+Theorem angle_div_pow2_1 : ∀ θ, (θ /₂^1 = θ /₂)%A.
 Proof. easy. Qed.
 
 Theorem angle_add_overflow_mul_div_pow2 :
   ∀ n i θ,
   n < 2 ^ i
-  → angle_add_overflow (θ / ₂^i) (n * (θ / ₂^i)) = false.
+  → angle_add_overflow (θ /₂^i) (n * (θ /₂^i)) = false.
 Proof.
 destruct_ac.
 intros * Hni.
@@ -130,7 +130,7 @@ Qed.
 Theorem angle_mul_nat_overflow_div_pow2 :
   ∀ n i θ,
   n ≤ 2 ^ i
-  → angle_mul_nat_overflow n (θ / ₂^i) = false.
+  → angle_mul_nat_overflow n (θ /₂^i) = false.
 Proof.
 intros * Hni.
 revert i θ Hni.
@@ -148,7 +148,7 @@ Qed.
 Theorem angle_mul_div_pow2_le_straight :
   ∀ n i θ,
   2 * n ≤ 2 ^ i
-  → (n * (θ / ₂^i) ≤ angle_straight)%A.
+  → (n * (θ /₂^i) ≤ angle_straight)%A.
 Proof.
 destruct_ac.
 intros * Hni.
@@ -178,7 +178,7 @@ apply angle_div_2_le_straight.
 Qed.
 
 Theorem angle_div_2_pow_mul_le_angle :
-  ∀ n i θ, n ≤ 2 ^ i → (n * (θ / ₂^i) ≤ θ)%A.
+  ∀ n i θ, n ≤ 2 ^ i → (n * (θ /₂^i) ≤ θ)%A.
 Proof.
 intros * Hni.
 destruct (le_dec (2 ^ i) n) as [Hin| Hin]. {
@@ -197,7 +197,7 @@ induction i; intros. {
 }
 destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
   rewrite angle_div_2_pow_succ_r_2.
-  apply (angle_le_trans _ (θ / ₂)); [ now apply IHi | ].
+  apply (angle_le_trans _ (θ /₂)); [ now apply IHi | ].
   apply angle_div_2_le.
 }
 apply Nat.nlt_ge in Hin.
@@ -212,7 +212,7 @@ rewrite H1.
 rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_2 at 1.
 rewrite angle_div_2_pow_mul_2_pow.
-apply angle_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+apply angle_le_trans with (θ2 := (θ /₂ + θ /₂)%A). {
   apply angle_add_le_mono_l; [ apply angle_add_overflow_div_2_div_2 | ].
   rewrite angle_div_2_pow_succ_r_2.
   apply IHi.
@@ -253,7 +253,7 @@ now apply angle_add_lt_mono_l.
 Qed.
 
 Theorem angle_div_2_pow_mul_lt_angle :
-  ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ / ₂^i) < θ)%A.
+  ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ /₂^i) < θ)%A.
 Proof.
 intros * Htz Hni.
 revert n θ Hni Htz.
@@ -266,7 +266,7 @@ induction i; intros. {
 }
 destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
   rewrite angle_div_2_pow_succ_r_2.
-  apply (angle_lt_le_trans _ (θ / ₂)). {
+  apply (angle_lt_le_trans _ (θ /₂)). {
     apply IHi; [ easy | ].
     intros H.
     now apply eq_angle_div_2_0 in H.
@@ -285,7 +285,7 @@ rewrite H1.
 rewrite angle_mul_add_distr_r.
 rewrite angle_div_2_pow_succ_r_2 at 1.
 rewrite angle_div_2_pow_mul_2_pow.
-apply angle_lt_le_trans with (θ2 := (θ / ₂ + θ / ₂)%A). {
+apply angle_lt_le_trans with (θ2 := (θ /₂ + θ /₂)%A). {
   apply angle_add_lt_mono_l; [ apply angle_add_overflow_div_2_div_2 | ].
   rewrite angle_div_2_pow_succ_r_2.
   apply IHi. {
@@ -302,7 +302,7 @@ Qed.
 Theorem angle_add_overflow_pow2_div_mul_pow2_diag :
   ∀ n i θ,
   1 < n ≤ 2 ^ i
-  → angle_add_overflow (2 ^ i / n * (θ / ₂^i)) (2 ^ i / n * (θ / ₂^i)) =
+  → angle_add_overflow (2 ^ i / n * (θ /₂^i)) (2 ^ i / n * (θ /₂^i)) =
       false.
 Proof.
 destruct_ac.
@@ -372,10 +372,10 @@ destruct zs. {
         destruct i; [ cbn in Hni; flia Hni | ].
         rewrite angle_div_2_pow_succ_r_2.
         specialize angle_div_2_pow_mul_le_angle as H1.
-        specialize (H1 (2 ^ S i / S (S (S n))) i (θ / ₂)%A).
+        specialize (H1 (2 ^ S i / S (S (S n))) i (θ /₂)%A).
         assert (H : 2 ^ S i / S (S (S n)) ≤ 2 ^ i). {
           rewrite Nat.pow_succ_r'.
-          apply Nat.div_le_upper_bound; [ easy | ].
+          apply Nat.Div0.div_le_upper_bound.
           apply Nat.mul_le_mono_r.
           now do 2 apply -> Nat.succ_le_mono.
         }
@@ -410,7 +410,7 @@ destruct i; [ cbn in Hni; flia Hni Hmi | ].
 apply rngl_sin_nonneg_angle_le_straight.
 apply angle_mul_div_pow2_le_straight.
 eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-apply Nat.div_le_upper_bound; [ easy | ].
+apply Nat.Div0.div_le_upper_bound.
 now apply Nat.mul_le_mono_r.
 Qed.
 
@@ -914,7 +914,7 @@ Theorem angle_right_div_2_lt :
   (rngl_cos θ < rngl_sin θ)%L
   → (0 ≤ rngl_sin θ)%L
   → (0 ≤ rngl_cos θ)%L
-  → (angle_right / ₂ < θ)%A.
+  → (angle_right /₂ < θ)%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -968,7 +968,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
 Qed.
 
 Theorem rngl_sin_7_right_div_2 :
-  rngl_sin (7 * (angle_right / ₂)) = (- √(1 / 2))%L.
+  rngl_sin (7 * (angle_right /₂)) = (- √(1 / 2))%L.
 Proof.
 replace 7 with (2 + 5) by easy.
 rewrite angle_mul_add_distr_r.
@@ -978,7 +978,7 @@ apply rngl_cos_5_right_div_2.
 Qed.
 
 Theorem rngl_cos_7_right_div_2 :
-  rngl_cos (7 * (angle_right / ₂)) = √(1 / 2)%L.
+  rngl_cos (7 * (angle_right /₂)) = √(1 / 2)%L.
 Proof.
 destruct_ac.
 replace 7 with (2 + 5) by easy.
@@ -995,7 +995,7 @@ Theorem quadrant_1_angle_lt_3_angle_right_div_2 :
   ∀ θ,
   (0 ≤ rngl_sin θ)%L
   → (0 ≤ rngl_cos θ)%L
-  → (θ < 3 * (angle_right / ₂))%A.
+  → (θ < 3 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
 intros Hc1 * Hs Hc.
@@ -1019,7 +1019,7 @@ Theorem quadrant_4_angle_lt_5_angle_right_div_2 :
   ∀ θ,
   (rngl_sin θ < 0)%L
   → (0 ≤ rngl_cos θ)%L
-  → (5 * (angle_right / ₂) < θ)%A.
+  → (5 * (angle_right /₂) < θ)%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1050,7 +1050,7 @@ Theorem quadrant_3_angle_lt_5_angle_right_div_2 :
   (rngl_sin θ < rngl_cos θ)%L
   → (rngl_sin θ < 0)%L
   → (rngl_cos θ < 0)%L
-  → (5 * (angle_right / ₂) < θ)%A.
+  → (5 * (angle_right /₂) < θ)%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1117,7 +1117,7 @@ Theorem quadrant_4_angle_lt_7_angle_right_div_2 :
   (rngl_cos θ < - rngl_sin θ)%L
   → (rngl_sin θ < 0)%L
   → (0 ≤ rngl_cos θ)%L
-  → (θ < 7 * (angle_right / ₂))%A.
+  → (θ < 7 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1180,7 +1180,7 @@ Theorem quadrant_2_angle_right_div_2_lt :
   ∀ θ,
   (0 ≤ rngl_sin θ)%L
   → (rngl_cos θ < 0)%L
-  → (angle_right / ₂ < θ)%A.
+  → (angle_right /₂ < θ)%A.
 Proof.
 destruct_ac.
 specialize rl_sqrt_half_nonneg as Hzs.
@@ -1206,7 +1206,7 @@ Theorem quadrant_2_angle_lt_3_angle_right_div_2 :
   (- rngl_cos θ < rngl_sin θ)%L
   → (0 ≤ rngl_sin θ)%L
   → (rngl_cos θ < 0)%L
-  → (θ < 3 * (angle_right / ₂))%A.
+  → (θ < 3 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1268,7 +1268,7 @@ Theorem quadrant_3_angle_lt_7_angle_right_div_2 :
   ∀ θ,
   (rngl_sin θ < 0)%L
   → (rngl_cos θ < 0)%L
-  → (θ < 7 * (angle_right / ₂))%A.
+  → (θ < 7 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1309,8 +1309,8 @@ Qed.
 Theorem rngl_cos_mul_2_neg_if :
   ∀ θ,
   (rngl_cos (2 * θ) < 0)%L
-  → (angle_right / ₂ < θ < 3 * (angle_right / ₂))%A ∨
-    (5 * (angle_right / ₂) < θ < 7 * (angle_right / ₂))%A.
+  → (angle_right /₂ < θ < 3 * (angle_right /₂))%A ∨
+    (5 * (angle_right /₂) < θ < 7 * (angle_right /₂))%A.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1609,7 +1609,7 @@ Theorem angle_div_2_pow_mul_neq_0 :
   ∀ n i θ,
   θ ≠ 0%A
   → 0 < n < 2 ^ i
-  → (n * (θ / ₂^i) ≠ 0)%A.
+  → (n * (θ /₂^i) ≠ 0)%A.
 Proof.
 intros * Htz Hni.
 revert θ n Htz Hni.
@@ -1636,13 +1636,13 @@ rewrite angle_mul_nat_div_2. 2: {
 }
 assert (Hnii : n - 2 ^ i < 2 ^ i) by (cbn in Hni; flia Hni).
 intros H.
-remember ((n - 2 ^ i) * (θ / ₂^i))%A as θ' eqn:Hθ'.
-assert (Htt : (θ' / ₂ < θ / ₂)%A). {
+remember ((n - 2 ^ i) * (θ /₂^i))%A as θ' eqn:Hθ'.
+assert (Htt : (θ' /₂ < θ /₂)%A). {
   apply angle_div_2_lt_compat.
   rewrite Hθ'.
   now apply angle_div_2_pow_mul_lt_angle.
 }
-apply (angle_add_lt_mono_l (θ' / ₂)) in Htt. 2: {
+apply (angle_add_lt_mono_l (θ' /₂)) in Htt. 2: {
   apply angle_add_overflow_div_2_div_2.
 }
 rewrite H in Htt.
@@ -1654,7 +1654,7 @@ Qed.
 Theorem angle_mul_mul_div_2 :
   ∀ m n θ,
   angle_mul_nat_overflow n θ = false
-  → (m * ((n * θ) / ₂))%A = (m * n * (θ / ₂))%A.
+  → (m * ((n * θ) /₂))%A = (m * n * (θ /₂))%A.
 Proof.
 intros * Haov.
 rewrite <- angle_mul_nat_assoc.
@@ -1726,7 +1726,7 @@ Theorem angle_le_pow2_log2 :
   n ≠ 0
   → angle_mul_nat_overflow n θ1 = false
   → (n * θ1 ≤ θ2
-  → θ1 ≤ θ2 / ₂^Nat.log2 n)%A.
+  → θ1 ≤ θ2 /₂^Nat.log2 n)%A.
 Proof.
 intros * Hnz Haov Hn.
 apply Nat.neq_0_lt_0 in Hnz.
@@ -1744,12 +1744,12 @@ Qed.
 Theorem seq_angle_to_div_nat_div_2_le_straight_div_pow2_log2 :
   ∀ n i θ,
   n ≠ 0
-  → (seq_angle_to_div_nat θ n i / ₂ ≤ angle_straight / ₂^Nat.log2 n)%A.
+  → (seq_angle_to_div_nat θ n i /₂ ≤ angle_straight /₂^Nat.log2 n)%A.
 Proof.
 intros * Hnz.
 progress unfold seq_angle_to_div_nat.
 assert (Hin : 2 ^ i / n ≤ 2 ^ i). {
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound.
   (* lemma *)
   rewrite Nat.mul_comm.
   apply Nat_mul_le_pos_r.
@@ -1794,8 +1794,8 @@ Qed.
 Theorem angle_le_pow2_pred :
   ∀ n θ1 θ2,
   n ≠ 0
-  → (θ1 / ₂ ≤ θ2 / ₂^n)%A
-  → (θ1 ≤ θ2 / ₂^(n-1))%A.
+  → (θ1 /₂ ≤ θ2 /₂^n)%A
+  → (θ1 ≤ θ2 /₂^(n-1))%A.
 Proof.
 intros * Hnz H12.
 destruct n; [ easy | clear Hnz ].
@@ -1811,7 +1811,7 @@ Qed.
 Theorem seq_angle_to_div_nat_le_straight_div_pow2_log2_pred :
   ∀ n i θ,
   n ≠ 1
-  → (seq_angle_to_div_nat θ n i ≤ angle_straight / ₂^(Nat.log2 n - 1))%A.
+  → (seq_angle_to_div_nat θ n i ≤ angle_straight /₂^(Nat.log2 n - 1))%A.
 Proof.
 intros * Hn1.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1857,7 +1857,7 @@ apply angle_add_overflow_le with (θ2 := θ). {
     apply angle_mul_nat_overflow_pow_div.
   }
   eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound.
   apply Nat.mul_le_mono_r.
   now apply Nat.lt_le_incl in Hmi.
 }
@@ -1895,7 +1895,7 @@ destruct n. {
 rewrite angle_div_2_pow_succ_r_1.
 rewrite angle_mul_nat_div_2; [ apply angle_div_2_le_straight | ].
 apply angle_mul_nat_overflow_div_pow2.
-apply Nat.div_le_upper_bound; [ easy | ].
+apply Nat.Div0.div_le_upper_bound.
 rewrite Nat.pow_succ_r'.
 apply Nat.mul_le_mono_r.
 now do 2 apply -> Nat.succ_le_mono.
@@ -1905,7 +1905,7 @@ Theorem angle_div_2_pow_succ_mul_lt_straight :
   rngl_characteristic T ≠ 1 →
   ∀ n i θ,
   n ≤ 2 ^ i
-  → (n * (θ / ₂^S i) < angle_straight)%A.
+  → (n * (θ /₂^S i) < angle_straight)%A.
 Proof.
 intros Hc1 * Hni.
 apply (angle_add_diag_not_overflow Hc1).
@@ -1918,7 +1918,7 @@ Qed.
 
 Theorem rngl_cos_div_pow2_2_pos :
   rngl_characteristic T ≠ 1 →
-  ∀ θ, (0 < rngl_cos (θ / ₂^2))%L.
+  ∀ θ, (0 < rngl_cos (θ /₂^2))%L.
 Proof.
 destruct_ac.
 intros Hc1 *.
@@ -1964,7 +1964,7 @@ now apply (angle_div_2_not_straight Hc1) in H.
 Qed.
 
 Theorem rngl_cos_div_pow2_2_nonneg :
-  ∀ θ, (0 ≤ rngl_cos (θ / ₂^2))%L.
+  ∀ θ, (0 ≤ rngl_cos (θ /₂^2))%L.
 Proof.
 destruct_ac.
 intros.
@@ -1986,7 +1986,7 @@ apply rngl_1_add_cos_div_2_nonneg.
 Qed.
 
 Theorem rngl_cos_div_pow2_nonneg :
-  ∀ n θ, 2 ≤ n → (0 ≤ rngl_cos (θ / ₂^n))%L.
+  ∀ n θ, 2 ≤ n → (0 ≤ rngl_cos (θ /₂^n))%L.
 Proof.
 intros * H2n.
 destruct n; [ easy | ].
@@ -2071,7 +2071,7 @@ split; intros Hn. {
 Qed.
 
 Theorem angle_div_2_pow_mul_pow_sub :
-  ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ / ₂^i) = θ / ₂^j)%A.
+  ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ /₂^i) = θ /₂^j)%A.
 Proof.
 intros * Hji.
 replace i with (j + (i - j)) at 1 by flia Hji.
@@ -3555,7 +3555,7 @@ destruct Hn1 as [Hn1| Hn1]. 2: {
 }
 apply (Nat.add_lt_mono_r _ _ m) in Hn.
 rewrite Nat.sub_add in Hn. 2: {
-  apply Nat.div_le_lower_bound; [ easy | ].
+  apply Nat.div_le_lower_bound.
   (* lemma *)
   clear.
   induction m; [ easy | ].
