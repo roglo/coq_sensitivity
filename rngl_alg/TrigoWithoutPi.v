@@ -45,7 +45,7 @@ Class angle_ctx :=
 End a.
 
 Arguments angle T {ro rp}.
-Arguments mk_angle {T ro rp} (rngl_cos rngl_sin)%L.
+Arguments mk_angle {T ro rp} (rngl_cos rngl_sin)%_L.
 Arguments angle_ctx T {ro rp}.
 
 Ltac destruct_ac :=

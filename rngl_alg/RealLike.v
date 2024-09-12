@@ -28,7 +28,7 @@ Definition rl_sqrt a := rl_nth_root 2 a.
 
 End a.
 
-Arguments rl_sqrt {T ro rp rl} a%L.
+Arguments rl_sqrt {T ro rp rl} a%_L.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 
 Section a.

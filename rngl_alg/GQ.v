@@ -1304,7 +1304,7 @@ unfold GQ_of_PQ in Hnd; cbn in Hnd.
 unfold PQred in Hnd.
 remember ggcd as f; cbn in Hnd; subst f.
 destruct b; [ easy | clear Hbz ].
-destruct a; [ now rewrite Nat.mod_0_l | ].
+destruct a; [ apply Nat.Div0.mod_0_l | ].
 rewrite Nat.sub_add in Hnd; [ | flia ].
 rewrite Nat.sub_add in Hnd; [ | flia ].
 remember (ggcd (S a) (S b)) as g eqn:Hg.
@@ -1321,10 +1321,7 @@ rewrite Nat_sub_succ_1, Nat.add_1_r in Hnd.
 rewrite Ha, Hb, Hnd.
 replace (g * S bb) with (g * S bb * 1) by flia.
 rewrite Nat.mul_assoc.
-rewrite Nat.mul_mod_distr_l; [ | easy | ]; cycle 1. {
-  intros H; apply Nat.eq_mul_0 in H.
-  destruct H; [ now subst g | easy ].
-}
+rewrite Nat.Div0.mul_mod_distr_l.
 now rewrite Nat.mod_1_r, Nat.mul_comm.
 Qed.
 

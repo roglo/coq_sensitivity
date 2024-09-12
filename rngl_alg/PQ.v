@@ -1723,8 +1723,8 @@ destruct a.
  rewrite Nat.sub_add.
  +rewrite Nat.sub_add.
   *rewrite Nat.sub_add; [ | easy ].
-   rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
-  --rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
+   rewrite <- Nat.Lcm0.divide_div_mul_exact.
+  --rewrite <- Nat.Lcm0.divide_div_mul_exact.
    ++replace (S a * (xn + 1)) with ((xn + 1) * S a) by apply Nat.mul_comm.
      replace (S a * (xd + 1)) with ((xd + 1) * S a) by apply Nat.mul_comm.
      rewrite Nat.div_mul; [ | easy ].
@@ -1732,7 +1732,7 @@ destruct a.
    ++rewrite Ha; apply Nat.gcd_divide_r.
   --rewrite Ha; apply Nat.gcd_divide_l.
   *rewrite Nat.sub_add; [ | easy ].
-   rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
+   rewrite <- Nat.Lcm0.divide_div_mul_exact.
   --rewrite Nat.mul_comm, Nat.div_mul; [ flia | easy ].
   --rewrite Ha; apply Nat.gcd_divide_r.
  +rewrite Nat.sub_add.
@@ -1740,11 +1740,11 @@ destruct a.
    do 2 rewrite Nat.add_1_r.
    eapply Nat.le_trans; [ | apply Nat_mul_le_pos_r; flia ].
    do 2 rewrite Nat.add_1_r in Ha.
-   rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
+   rewrite <- Nat.Lcm0.divide_div_mul_exact.
   --rewrite Nat.mul_comm, Nat.div_mul; [ flia | easy ].
   --rewrite Ha; apply Nat.gcd_divide_r.
   *rewrite Nat.sub_add; [ | easy ].
-   rewrite <- Nat.divide_div_mul_exact; [ | easy | ].
+   rewrite <- Nat.Lcm0.divide_div_mul_exact.
   --rewrite Nat.mul_comm, Nat.div_mul; [ flia | easy ].
   --rewrite Ha; apply Nat.gcd_divide_r.
 Qed.
