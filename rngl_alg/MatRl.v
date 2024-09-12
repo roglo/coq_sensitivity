@@ -54,7 +54,7 @@ intros.
 apply Bool.andb_true_iff.
 split; [ | apply square_matrix_add_is_square ].
 apply Nat.eqb_eq; cbn.
-rewrite map2_length.
+rewrite length_map2.
 do 2 rewrite fold_mat_nrows.
 do 2 rewrite smat_nrows.
 apply Nat.min_id.
@@ -79,7 +79,7 @@ intros.
 apply Bool.andb_true_iff.
 split; [ | apply square_matrix_opp_is_square ].
 apply Nat.eqb_eq; cbn.
-rewrite map_length.
+rewrite length_map.
 apply smat_nrows.
 Qed.
 
@@ -210,11 +210,11 @@ specialize sm_mat_of_nat as H1.
 progress unfold rngl_of_nat in H1; cbn in H1.
 rewrite H1; clear H1; cbn.
 rewrite map_map.
-rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
 rewrite List_map_nth' with (a := 0%L). 2: {
   now rewrite List_length_map_seq.
 }
-rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
 rewrite seq_nth; [ cbn | easy ].
 unfold δ.
 now rewrite Nat.eqb_refl, rngl_mul_1_r.
@@ -493,7 +493,7 @@ move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n; cbn.
   unfold "*"%M, "+"%M; cbn.
-  rewrite map2_length; cbn.
+  rewrite length_map2; cbn.
   do 2 rewrite fold_mat_nrows.
   now rewrite Hra.
 }
@@ -642,12 +642,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
   rewrite map2_map_l in Hi.
   rewrite map2_nth with (a := 0) (b := []) in Hi; cycle 1. {
-    now rewrite seq_length.
+    now rewrite length_seq.
   } {
     rewrite fold_mat_nrows.
     clear Hi.
     induction i; cbn; [ now rewrite repeat_length | ].
-    rewrite map2_length, List_length_map_seq.
+    rewrite length_map2, List_length_map_seq.
     rewrite fold_mat_nrows.
     flia Hnz IHi.
   }
@@ -662,7 +662,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
     progress unfold mul_nat in H2; cbn in H2.
     now rewrite H2.
   }
-  rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
+  rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite length_seq ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
   replace (mat_el (sm_mat (fold_right _ _ _)) 1 1) with
