@@ -226,8 +226,8 @@ destruct g1.
  apply Nat.gcd_eq_0 in Hg1.
  now destruct Hg1; subst a b.
 -subst g.
- rewrite Nat.div_mul_cancel_l; [ | easy | easy ].
- rewrite Nat.div_mul_cancel_l; [ | easy | easy ].
+ rewrite Nat.Div0.div_mul_cancel_l; [ | easy ].
+ rewrite Nat.Div0.div_mul_cancel_l; [ | easy ].
  now rewrite (ggcd_split _ _ (S g1)).
 Qed.
 
