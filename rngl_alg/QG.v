@@ -416,14 +416,14 @@ remember (c / Nat.gcd a c)%nat as c' eqn:Hc'.
 specialize (Nat_gcd_mul_r_1 a' b c') as H2.
 assert (Ha : a = (a' * Nat.gcd a c)%nat). {
   rewrite Ha', Nat.mul_comm.
-  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     apply Nat.gcd_divide_l.
   }
   now rewrite Nat.mul_comm, Nat.div_mul.
 }
 assert (Hc : c = (c' * Nat.gcd a c)%nat). {
   rewrite Hc', Nat.mul_comm.
-  rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     apply Nat.gcd_divide_r.
   }
   now rewrite Nat.mul_comm, Nat.div_mul.
@@ -478,22 +478,22 @@ apply Nat_div_gcd_1 with (b := (b / gab)%nat) (d := (d / gcd)%nat); cycle 1. {
 } {
   now apply Nat.gcd_div_gcd.
 }
-rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
   rewrite Hgcd.
   apply Nat.gcd_divide_r.
 }
-rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
   rewrite Hgcd.
   apply Nat.gcd_divide_l.
 }
 f_equal.
 rewrite Nat.mul_comm.
-rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
   rewrite Hgab.
   apply Nat.gcd_divide_l.
 }
 rewrite (Nat.mul_comm _ c).
-rewrite <- Nat.divide_div_mul_exact; [ | easy | ]. 2: {
+rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
   rewrite Hgab.
   apply Nat.gcd_divide_r.
 }
@@ -1873,9 +1873,7 @@ Theorem nat_of_inv_Q :
 Proof.
 intros.
 destruct n as [| n| n]; [ easy | easy | cbn ].
-symmetry; apply Nat.div_0_l.
-apply Nat.neq_0_lt_0.
-apply Pos2Nat.is_pos.
+symmetry; apply Nat.Div0.div_0_l.
 Qed.
 
 Theorem QG_add_sub : ∀ a b, (a + b - b)%QG = a.

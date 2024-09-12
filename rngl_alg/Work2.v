@@ -45,7 +45,7 @@ remember (a - b * c) as d eqn:Hd.
 assert (H : a = d + b * c) by flia Hd Hbca.
 subst a.
 symmetry.
-now apply Nat.mod_add.
+apply Nat.Div0.mod_add.
 Qed.
 
 Theorem eq_fst_rank_fst_loop_iff :
@@ -99,7 +99,7 @@ split; intros H1. {
     progress unfold nth_rest_of_div in H1.
     rewrite Nat.pow_succ_r', Nat.mul_assoc.
     rewrite (Nat.mul_comm a).
-    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
+    rewrite <- Nat.Div0.mul_mod_idemp_l.
     now apply H1.
   }
   destruct it; [ easy | ].
@@ -127,7 +127,7 @@ split; intros H1. {
     progress unfold nth_rest_of_div in H2.
     rewrite Nat.pow_succ_r', Nat.mul_assoc.
     rewrite (Nat.mul_comm a).
-    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
+    rewrite <- Nat.Div0.mul_mod_idemp_l.
     now apply H2.
   }
   destruct H3 as [H3| H3]; [ now subst it | right ].
@@ -137,7 +137,7 @@ split; intros H1. {
   progress unfold nth_rest_of_div.
   rewrite Nat.pow_succ_r', Nat.mul_assoc.
   rewrite (Nat.mul_comm a).
-  rewrite <- Nat.mul_mod_idemp_l; [ easy | flia Hab ].
+  now rewrite <- Nat.Div0.mul_mod_idemp_l.
 }
 destruct H1 as (H1 & H2 & H3).
 destruct H3 as [H3| H3]. 2: {
@@ -205,11 +205,11 @@ destruct H3 as [H3| H3]. 2: {
     intros t Ht.
     progress unfold nth_rest_of_div in H2.
     progress unfold nth_rest_of_div.
-    rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
+    rewrite <- Nat.Div0.mul_mod_idemp_l.
     specialize (Nat_mod_sub (2 * a) 1 b) as H.
     rewrite Nat.mul_1_l in H.
     rewrite H; [ clear H | flia Hab | easy ].
-    rewrite Nat.mul_mod_idemp_l; [ | flia Hab ].
+    rewrite Nat.Div0.mul_mod_idemp_l.
     rewrite (Nat.mul_comm _ a), <- Nat.mul_assoc.
     rewrite <- Nat.pow_succ_r'.
     apply Nat.succ_lt_mono in Ht.
@@ -217,11 +217,11 @@ destruct H3 as [H3| H3]. 2: {
   }
   progress unfold nth_rest_of_div in H2.
   progress unfold nth_rest_of_div.
-  rewrite <- Nat.mul_mod_idemp_l; [ | flia Hab ].
+  rewrite <- Nat.Div0.mul_mod_idemp_l.
   specialize (Nat_mod_sub (2 * a) 1 b) as H.
   rewrite Nat.mul_1_l in H.
   rewrite H; [ clear H | flia Hab | easy ].
-  rewrite Nat.mul_mod_idemp_l; [ | flia Hab ].
+  rewrite Nat.Div0.mul_mod_idemp_l.
   now rewrite (Nat.mul_comm _ a), <- Nat.mul_assoc.
 }
 subst u; clear H1.
@@ -251,7 +251,7 @@ progress unfold nth_rest_of_div in H2.
 progress unfold nth_rest_of_div.
 specialize (H2 (S t) Ht) as H3.
 rewrite Nat.pow_succ_r', Nat.mul_assoc, (Nat.mul_comm a) in H3.
-rewrite Nat.mul_mod_idemp_l; [ easy | flia Hab ].
+now rewrite Nat.Div0.mul_mod_idemp_l.
 Qed.
 
 Theorem pow2_den_le_mul_num :
@@ -398,7 +398,7 @@ destruct (lt_dec p n) as [Hpn| Hpn]. {
   destruct (2 ^ m); [ easy | flia ].
 }
 apply Nat.nlt_ge in Hpn.
-rewrite Nat.mod_eq in Hm3; [ | flia H2n ].
+rewrite Nat.Div0.mod_eq in Hm3.
 rewrite Nat.mul_sub_distr_l in Hm3.
 apply Nat.lt_sub_lt_add_l in Hm3.
 rewrite (Nat.mul_comm _ (_ * _)) in Hm3.
@@ -416,7 +416,7 @@ rewrite Nat.pow_succ_r'.
 apply Nat.mul_le_mono_l.
 rewrite Nat.add_1_r.
 apply Nat.le_succ_l.
-apply Nat.div_lt_upper_bound; [ flia H2n | ].
+apply Nat.Div0.div_lt_upper_bound.
 rewrite Hp.
 rewrite Nat.add_sub_swap. 2: {
   destruct n; [ easy | ].
@@ -469,19 +469,19 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
     now apply Nat.add_le_mono_r.
   }
   rewrite Nat.pow_sub_r; [ | easy | easy ].
-  rewrite <- Nat.divide_div_mul_exact; [ | now apply Nat.pow_nonzero | ]. 2: {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     exists (2 ^ (inv_ub_den_pow2 n - i)).
     rewrite <- Nat.pow_add_r.
     now rewrite Nat.sub_add.
   }
   (* (2^i/n * 2^bn)/2^i ≤ an *)
-  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  apply Nat.Div0.div_le_upper_bound.
   (* 2^i/n * 2^bn ≤ 2^i * an *)
   rewrite Nat.mul_comm.
   (* 2^bn * (2^i/n) ≤ 2^i * an *)
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
   (* (2^bn * 2^i) / n ≤ 2^i * an *)
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound.
   (* 2^bn * 2^i ≤ n * (2^i * an) *)
   rewrite Nat.mul_assoc.
   rewrite Nat.mul_shuffle0.
@@ -519,7 +519,7 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   }
   rewrite Nat.pow_sub_r; [ | easy | now apply Nat.lt_le_incl ].
   (* 2^i/n ≤ an * (2^i / 2^bn) *)
-  rewrite <- Nat.divide_div_mul_exact; [ | now apply Nat.pow_nonzero | ]. 2: {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     exists (2 ^ (i - inv_ub_den_pow2 n)).
     rewrite <- Nat.pow_add_r.
     apply Nat.lt_le_incl in Hni.
@@ -528,9 +528,9 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hni| Hni]. {
   (* 2^i/n ≤ an * 2^i / 2^bn *)
   apply Nat.div_le_lower_bound; [ now apply Nat.pow_nonzero | ].
   (* 2^bn * (2^i/n) ≤ an * 2^i *)
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
   (* (2^bn * 2^i) / n ≤ an * 2^i *)
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound.
   (* 2^bn * 2^i ≤ n * (an * 2^i) *)
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_r.
@@ -582,8 +582,8 @@ apply angle_mul_le_mono_r. {
   }
   destruct i; [ now apply Nat.succ_le_mono in Hni | ].
   destruct i; [ now do 2 apply Nat.succ_le_mono in Hni | ].
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound.
   now apply Nat.mul_le_mono_r.
 }
 apply Nat_mul_le_pos_l.
@@ -702,8 +702,8 @@ apply angle_mul_le_mono_r. {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound.
   apply Nat.mul_le_mono_r.
   now apply -> Nat.succ_le_mono.
 }
@@ -730,7 +730,7 @@ rewrite (Nat.mul_comm 2).
 rewrite <- Nat.mul_assoc.
 apply Nat.mul_le_mono_l.
 rewrite Nat.pow_succ_r'.
-now apply Nat.div_mul_le.
+apply Nat.Div0.div_mul_le.
 Qed.
 
 Theorem angle_add_overflow_mul_by_lt_6 :
@@ -791,8 +791,8 @@ apply angle_mul_le_mono_r. {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound.
   apply Nat.mul_le_mono_r.
   destruct m; [ now apply -> Nat.succ_le_mono | ].
   destruct m; [ now apply -> Nat.succ_le_mono | ].
@@ -823,7 +823,7 @@ rewrite Nat.mul_comm.
 rewrite <- Nat.mul_assoc.
 apply Nat.mul_le_mono_l.
 rewrite Nat.mul_comm.
-eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
+eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
 now rewrite Nat.pow_succ_r'.
 Qed.
 
@@ -884,8 +884,8 @@ apply angle_mul_le_mono_r. {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound.
   now apply Nat.mul_le_mono_r.
 }
 clear Hni Hθ'.
@@ -908,7 +908,7 @@ rewrite Nat.mul_assoc, (Nat.mul_comm 2).
 rewrite <- Nat.mul_assoc.
 apply Nat.mul_le_mono_l.
 rewrite Nat.pow_succ_r'.
-now apply Nat.div_mul_le.
+apply Nat.Div0.div_mul_le.
 Qed.
 
 Theorem fold_seq_angle_to_div_nat :
@@ -1023,20 +1023,15 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
       apply angle_mul_nat_overflow_pow_div.
     }
     rewrite Nat.pow_sub_r; [ | easy | easy ].
-    eapply Nat.le_trans. {
-      apply Nat.div_mul_le.
-      now apply Nat.pow_nonzero.
-    }
-    apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+    eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le | ].
+    apply Nat.Div0.div_le_upper_bound.
     apply Nat.mul_le_mono_r.
-    eapply Nat.le_trans; [ apply Nat.div_mul_le; flia Hm | ].
-    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le; flia Hm | ].
+    apply Nat.Div0.div_le_upper_bound.
     now apply Nat.mul_le_mono_r.
   }
   rewrite Nat.pow_sub_r; [ | easy | easy ].
-  rewrite <- Nat.divide_div_mul_exact; cycle 1. {
-    now apply Nat.pow_nonzero.
-  } {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     exists (2 ^ (inv_ub_den_pow2 n - i)).
     rewrite <- Nat.pow_add_r.
     now rewrite Nat.sub_add.
@@ -1077,19 +1072,17 @@ destruct (le_dec i (inv_ub_den_pow2 n)) as [Hii| Hii]. {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
       apply angle_mul_nat_overflow_pow_div.
     }
-    eapply Nat.le_trans; [ apply Nat.div_mul_le; flia Hm | ].
-    apply Nat.div_le_upper_bound; [ flia Hm | ].
+    eapply Nat.le_trans; [ apply Nat.Div0.div_mul_le; flia Hm | ].
+    apply Nat.Div0.div_le_upper_bound.
     now apply Nat.mul_le_mono_r.
   }
   rewrite Nat.pow_sub_r; [ | easy | easy ].
-  rewrite <- Nat.divide_div_mul_exact; cycle 1. {
-    now apply Nat.pow_nonzero.
-  } {
+  rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
     exists (2 ^ (i - inv_ub_den_pow2 n)).
     rewrite <- Nat.pow_add_r.
     now rewrite Nat.sub_add.
   }
-  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  apply Nat.Div0.div_le_upper_bound.
   progress unfold inv_ub_num.
   rewrite Nat.mul_sub_distr_r, Nat.mul_1_l.
   apply Nat.le_sub_le_add_r.
@@ -3167,16 +3160,13 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now subst n; cbn; rewrite Nat.mul_0_r.
 }
 rewrite Nat.pow_sub_r; [ | easy | easy ].
-rewrite <- Nat.divide_div_mul_exact; cycle 1. {
-  now apply Nat.pow_nonzero.
-} {
+rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
   exists (2 ^ (q - p)).
   rewrite <- Nat.pow_add_r.
   now rewrite Nat.sub_add.
 }
 rewrite Nat.mul_comm.
-apply Nat.div_div; [ | easy ].
-now apply Nat.pow_nonzero.
+apply Nat.Div0.div_div.
 Qed.
 
 Theorem seq_angle_to_div_nat_sub :
@@ -3687,7 +3677,7 @@ destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
   do 2 rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  apply Nat.Div0.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
   apply Nat.mul_le_mono_r.
   destruct p; [ easy | ].
   destruct p; [ flia Hpq | ].
@@ -3843,7 +3833,7 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   do 2 rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
   apply Nat.mul_le_mono_l.
-  apply Nat.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
+  apply Nat.Div0.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
   apply Nat.mul_le_mono_r.
   destruct p; [ easy | ].
   destruct p; [ flia Hpq | ].
@@ -3873,7 +3863,7 @@ enough (H :
       apply angle_div_2_pow_le_compat_l.
       apply Nat.le_sub_l.
     }
-    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.Div0.div_le_upper_bound; [ easy | ].
     apply Nat.mul_le_mono_r.
     apply Nat.lt_le_incl.
     now apply Nat.mod_upper_bound.
@@ -3958,7 +3948,7 @@ enough (H :
     intros H.
     now apply eq_angle_div_2_pow_0 in H.
   }
-  apply Nat.div_lt_upper_bound. {
+  apply Nat.Div0.div_lt_upper_bound. {
     apply Nat.neq_mul_0.
     split; [ now apply Nat.pow_nonzero | easy ].
   }
@@ -4148,7 +4138,7 @@ assert (Hts'' : (θ' < angle_straight)%A). {
     now apply Nat.le_0_r in Hni; subst n.
   }
   apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound; [ easy | ].
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_le_mono_r.
   apply -> Nat.succ_le_mono.
@@ -4228,7 +4218,7 @@ Search (angle_mul_nat_overflow _ (_ * _)).
 apply angle_mul_nat_overflow_true_assoc.
 ...
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
-      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.Div0.div_le_upper_bound; [ easy | ].
       (* lemma *)
       rewrite Nat.mul_comm.
       apply Nat_mul_le_pos_r.
@@ -4244,7 +4234,7 @@ apply angle_mul_nat_overflow_true_assoc.
 ...
   apply angle_mul_le_mono_l. 2: {
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
-      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.Div0.div_le_upper_bound; [ easy | ].
       (* lemma *)
       rewrite Nat.mul_comm.
       apply Nat_mul_le_pos_r.
@@ -4274,7 +4264,7 @@ angle_div_2_pow_mul_le_angle: ∀ (n i : nat) (θ : angle T), n ≤ 2 ^ i → (n
   apply angle_le_trans with (θ2 := (θ /₂^i)%A). 2: {
 ...
     apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i / 2 ^ Nat.log2 n)). {
-      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.Div0.div_le_upper_bound; [ easy | ].
       rewrite Nat.mul_comm.
 Search (2 ^ Nat.log2 _).
 ...
@@ -4429,7 +4419,7 @@ Expands to: Constant RnglAlg.Work.a.angle_div_2_pow_succ_mul_lt_straight
 
 ..
   apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-  apply Nat.div_le_upper_bound; [ easy | ].
+  apply Nat.Div0.div_le_upper_bound; [ easy | ].
   rewrite Nat.pow_succ_r'.
   apply Nat.mul_le_mono_r.
   apply -> Nat.succ_le_mono.
@@ -4472,8 +4462,8 @@ apply angle_add_overflow_le with (θ2 := θ). 2: {
   apply angle_mul_le_mono_r. {
     apply angle_mul_nat_overflow_pow_div.
   }
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ now apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound; [ easy | ].
   apply Nat.mul_le_mono_r.
   now apply Nat.lt_le_incl in Hmi.
 }
@@ -4565,7 +4555,7 @@ destruct zsm. {
     now apply angle_lt_irrefl in Hθ.
   }
   apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-  apply Nat.div_le_upper_bound; [ flia Hmi | ].
+  apply Nat.Div0.div_le_upper_bound; [ flia Hmi | ].
   destruct n; [ easy | ].
   destruct n; [ flia Hmi | ].
   cbn; flia.
@@ -4590,7 +4580,7 @@ destruct sz. {
     rewrite Hθ'.
     apply angle_lt_le_incl.
     apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-    apply Nat.div_le_upper_bound; [ flia Hmi | ].
+    apply Nat.Div0.div_le_upper_bound; [ flia Hmi | ].
     destruct n; [ easy | ].
     destruct n. {
       apply Nat.lt_1_r in Hmi; subst m.
@@ -4611,7 +4601,7 @@ destruct sz. {
     now apply angle_lt_irrefl in Hθ.
   }
   apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-  apply Nat.div_le_upper_bound; [ flia Hmi | ].
+  apply Nat.Div0.div_le_upper_bound; [ flia Hmi | ].
   destruct n; [ easy | ].
   destruct n. {
     apply Nat.lt_1_r in Hmi; subst m.
@@ -4634,8 +4624,8 @@ destruct (le_dec (m * 2) n) as [Hmn| Hmn]. {
   apply rngl_sin_nonneg_angle_le_straight.
   apply angle_lt_le_incl.
   apply (angle_div_2_pow_succ_mul_lt_straight Hc1).
-  eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-  apply Nat.div_le_upper_bound; [ easy | ].
+  eapply Nat.le_trans; [ now apply Nat.Div0.div_mul_le | ].
+  apply Nat.Div0.div_le_upper_bound; [ easy | ].
   rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
   now apply Nat.mul_le_mono_r.
@@ -5217,7 +5207,7 @@ destruct m. {
   assert (H : 2 ^ S i / n ≤ 2 ^ i). {
     destruct n; [ easy | ].
     destruct n; [ flia Hmi Hni | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.Div0.div_le_upper_bound; [ easy | ].
     rewrite Nat.pow_succ_r; [ | easy ].
     apply Nat.mul_le_mono_r.
     now do 2 apply -> Nat.succ_le_mono.
@@ -5249,7 +5239,7 @@ destruct m. {
       rewrite Hθ'.
       rewrite angle_mul_mul_div_2. 2: {
         apply angle_mul_nat_overflow_div_pow2.
-        apply Nat.div_le_upper_bound; [ easy | ].
+        apply Nat.Div0.div_le_upper_bound; [ easy | ].
         destruct n; [ easy | cbn ].
         apply Nat.le_add_r.
       }
@@ -5280,8 +5270,8 @@ destruct m. {
       apply angle_mul_div_pow2_le_straight.
       rewrite Nat.pow_succ_r'.
       apply Nat.mul_le_mono_l.
-      eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-      apply Nat.div_le_upper_bound; [ easy | ].
+      eapply Nat.le_trans; [ now apply Nat.Div0.div_mul_le | ].
+      apply Nat.Div0.div_le_upper_bound; [ easy | ].
       apply Nat.mul_le_mono_r.
       now apply Nat.lt_le_incl in H3n.
     }
@@ -5306,7 +5296,7 @@ destruct m. {
       apply Nat.pow_le_mono_r; [ easy | ].
       apply Nat.le_succ_diag_r.
     }
-    apply Nat.div_le_upper_bound; [ easy | ].
+    apply Nat.Div0.div_le_upper_bound; [ easy | ].
     rewrite Nat.pow_succ_r'.
     apply Nat.mul_le_mono_r.
     now apply Nat.lt_le_incl in Hmi.
@@ -5357,7 +5347,7 @@ rewrite angle_mul_nat_div_2. {
   apply rngl_sin_div_2_nonneg.
 }
 apply angle_mul_nat_overflow_div_pow2.
-apply Nat.div_le_upper_bound; [ easy | ].
+apply Nat.Div0.div_le_upper_bound; [ easy | ].
 rewrite Nat.pow_succ_r'.
 apply Nat.mul_le_mono_r.
 now apply Nat.lt_le_incl in Hmi.
@@ -5491,9 +5481,9 @@ destruct (Nat.eq_dec n 3) as [Hn3| Hn3]. {
 ...
 Search (_ / _ < _).
     eapply Nat.le_lt_trans. {
-      apply (Nat.div_mul_le _ _ _ Hnz).
+      apply (Nat.Div0.div_mul_le _ _ _ Hnz).
     }
-apply Nat.div_lt_upper_bound; [ easy | ].
+apply Nat.Div0.div_lt_upper_bound; [ easy | ].
 ...
     cbn - [ "/" ].
     do 2 rewrite Nat.add_0_r.
@@ -5502,9 +5492,9 @@ apply Nat.div_lt_upper_bound; [ easy | ].
    "glop" peut se révéler utile *)
 ...
   eapply Nat.lt_le_trans. {
-    apply (Nat.div_mul_le _ _ _ Hnz).
+    apply (Nat.Div0.div_mul_le _ _ _ Hnz).
   }
-  apply (Nat.div_lt_upper_bound _ _ _ Hnz).
+  apply (Nat.Div0.div_lt_upper_bound _ _ _ Hnz).
 
 apply Nat.mul_lt_mono_nonneg.
 ...
@@ -5858,7 +5848,7 @@ Search ((if _ then _ else _) = (if _ then _ else _)).
         specialize (H1 (2 ^ S i / S (S (S n))) i (θ /₂)%A).
         assert (H : 2 ^ S i / S (S (S n)) ≤ 2 ^ i). {
           rewrite Nat.pow_succ_r'.
-          apply Nat.div_le_upper_bound; [ easy | ].
+          apply Nat.Div0.div_le_upper_bound; [ easy | ].
           apply Nat.mul_le_mono_r.
           now do 2 apply -> Nat.succ_le_mono.
         }
@@ -5892,8 +5882,8 @@ apply Hzs; clear Hzs.
 destruct i; [ cbn in Hni; flia Hni Hmi | ].
 apply rngl_sin_nonneg_angle_le_straight.
 apply angle_mul_div_pow2_le_straight.
-eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-apply Nat.div_le_upper_bound; [ easy | ].
+eapply Nat.le_trans; [ now apply Nat.Div0.div_mul_le | ].
+apply Nat.Div0.div_le_upper_bound; [ easy | ].
 now apply Nat.mul_le_mono_r.
 Qed.
 *)
@@ -6537,8 +6527,8 @@ destruct n. {
     apply Hzs; clear Hzs.
     apply rngl_sin_nonneg_angle_le_straight.
     apply angle_mul_div_pow2_le_straight.
-    eapply Nat.le_trans; [ now apply Nat.div_mul_le | ].
-    apply Nat.div_le_upper_bound; [ easy | ].
+    eapply Nat.le_trans; [ now apply Nat.Div0.div_mul_le | ].
+    apply Nat.Div0.div_le_upper_bound; [ easy | ].
     apply Nat.mul_le_mono_r.
     now do 2 apply -> Nat.succ_le_mono.
   }
@@ -7646,7 +7636,7 @@ rewrite Hzs2, Hzs.
       rewrite <- (angle_mul_1_l Hon Hos θ) at 2.
       apply angle_mul_le_mono_r; [ easy | ].
       destruct n; [ easy | ].
-      apply Nat.div_le_upper_bound; [ easy | ].
+      apply Nat.Div0.div_le_upper_bound; [ easy | ].
       cbn.
       now apply -> Nat.succ_le_mono.
     }
