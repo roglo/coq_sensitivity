@@ -93,7 +93,7 @@ rewrite H1, H2, Hab.
 rewrite (Nat.add_comm (c * (b / c))).
 rewrite Nat.sub_add_distr, Nat.add_sub.
 rewrite <- Nat.mul_sub_distr_l, Nat.mul_comm.
-now apply Nat.mod_mul.
+apply Nat.Div0.mod_mul.
 Qed.
 
 Theorem Nat_bezout_mul : ∀ a b c,
@@ -183,7 +183,7 @@ assert (Hb : b ≠ 0). {
   now intros Hb; rewrite Hb, (Nat.mul_comm (n + 1)) in Hab.
 }
 replace a with (a - n * b + n * b) at 1 by now apply Nat.sub_add.
-rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.Div0.mod_add.
 apply Nat.mod_small.
 apply Nat.add_lt_mono_r with (p := n * b).
 rewrite Nat.add_comm in Hab; cbn in Hab.
@@ -196,10 +196,10 @@ intros.
 destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
 revert a b Hbz.
 induction c; intros; [ easy | cbn ].
-rewrite Nat.mul_mod_idemp_l; [ | easy ].
-rewrite <- Nat.mul_mod_idemp_r; [ | easy ].
+rewrite Nat.Div0.mul_mod_idemp_l.
+rewrite <- Nat.Div0.mul_mod_idemp_r.
 rewrite IHc; [ | easy ].
-now rewrite Nat.mul_mod_idemp_r.
+now rewrite Nat.Div0.mul_mod_idemp_r.
 Qed.
 
 Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ b → a ≤ b * a.
@@ -233,25 +233,25 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 destruct (le_dec b a) as [Hba| Hba]. {
   apply Nat_eq_mod_sub_0 in Hab.
   rewrite <- Nat.mul_sub_distr_r in Hab.
-  apply Nat.mod_divide in Hab; [ | easy ].
+  apply Nat.Lcm0.mod_divide in Hab.
   rewrite Nat.gcd_comm in Hg.
   rewrite Nat.mul_comm in Hab.
   specialize (Nat.gauss n c (a - b) Hab Hg) as H1.
   destruct H1 as (k, Hk).
   replace a with (b + k * n) by flia Hba Hk.
-  now rewrite Nat.mod_add.
+  now rewrite Nat.Div0.mod_add.
 } {
   apply Nat.nle_gt in Hba.
   symmetry in Hab.
   apply Nat_eq_mod_sub_0 in Hab.
   rewrite <- Nat.mul_sub_distr_r in Hab.
-  apply Nat.mod_divide in Hab; [ | easy ].
+  apply Nat.Lcm0.mod_divide in Hab.
   rewrite Nat.gcd_comm in Hg.
   rewrite Nat.mul_comm in Hab.
   specialize (Nat.gauss n c (b - a) Hab Hg) as H1.
   destruct H1 as (k, Hk).
   replace b with (a + k * n) by flia Hba Hk.
-  now rewrite Nat.mod_add.
+  now rewrite Nat.Div0.mod_add.
 }
 Qed.
 
@@ -280,7 +280,7 @@ assert (H1 : a = (c + d) / b). {
   now rewrite Nat.div_mul.
 }
 rewrite H1.
-apply Nat.div_le_mono; [ easy | ].
+apply Nat.Div0.div_le_mono.
 apply Nat_le_add_l.
 Qed.
 
@@ -291,7 +291,7 @@ intros * Hcz.
 revert a.
 induction b; intros; [ easy | ].
 cbn; rewrite IHb.
-now rewrite Nat.mul_mod_idemp_r.
+now rewrite Nat.Div0.mul_mod_idemp_r.
 Qed.
 
 Theorem Nat_sub_sub_assoc : ∀ a b c,
@@ -322,7 +322,7 @@ destruct (le_dec a (b * c)) as [Hbca| Hbca]. {
   symmetry.
   apply Nat.sub_0_le.
   rewrite Nat.mul_comm in Hbca.
-  now apply Nat.div_le_upper_bound.
+  now apply Nat.Div0.div_le_upper_bound.
 }
 apply Nat.nle_gt in Hbca.
 symmetry.
