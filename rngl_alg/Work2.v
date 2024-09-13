@@ -5594,7 +5594,33 @@ Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   is_Cauchy_sequence angle_eucl_dist u
   → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (u i)).
 Proof.
+destruct_ac.
 intros * Hcs.
+intros ε Hε.
+specialize (Hcs ε Hε).
+destruct Hcs as (N, HN).
+exists N.
+intros p q Hp Hq.
+specialize (HN p q Hp Hq).
+rewrite angle_eucl_dist_is_sqrt in HN.
+progress unfold rngl_dist.
+(*
+destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  apply (rngl_le_lt_trans Hor _ 0); [ | easy ].
+  rewrite (rngl_opp_sub_distr Hop).
+*)
+destruct (rngl_le_dec Hor (rngl_cos (u p)) (rngl_cos (u q))) as [Hpq| Hpq]. {
+  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
+    now apply (rngl_le_sub_0 Hop Hor).
+  }
+  rewrite (rngl_opp_sub_distr Hop).
+Search (_² < _²)%L.
+Theorem glop :
+  ∀ a b,
+  (0 < a < b → a² < b²)%L.
 ... ...
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
