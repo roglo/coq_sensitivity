@@ -1267,6 +1267,24 @@ Qed.
 
 (**)
 
+Theorem rngl_squ_lt_squ_nonneg :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  ∀ a b,
+  (0 ≤ a → a < b → a² < b²)%L.
+Proof.
+intros Hic Hop Hor Hid.
+intros * Hza Hab.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
+apply (rngl_le_trans Hor _ a); [ easy | ].
+now apply (rngl_lt_le_incl Hor) in Hab.
+Qed.
+
 Theorem rngl_lt_cos_lt_cos_div2 :
   ∀ a b θ,
   (2 * b² ≤ a + 1)%L
@@ -1382,13 +1400,11 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 apply (rngl_lt_sub_lt_add_r Hop Hor).
-rewrite <- (rngl_abs_nonneg_eq Hop Hor a) in Hd; [ | easy ].
-rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd. 2: {
+apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in Hd. 2: {
   apply rl_sqrt_nonneg.
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
 }
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd.
 rewrite (rngl_squ_sqrt Hon) in Hd. 2: {
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
@@ -3066,8 +3082,17 @@ specialize (Hcs H); clear H.
 progress unfold rngl_dist in Hcc.
 progress unfold rngl_dist in Hcs.
 apply (rngl_lt_le_incl Hor) in Hε2.
+(*
+apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in Hcc. 2: {
+  apply (rngl_abs_nonneg Hop Hor).
+}
+apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in Hcs. 2: {
+  apply (rngl_abs_nonneg Hop Hor).
+}
+*)
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hcc, Hcs; [ | easy | easy ].
 apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hcc, Hcs.
+(**)
 assert (Hzε2 : (0 ≤ ε² / 2)%L). {
   apply (rngl_le_div_r Hon Hop Hiv Hor).
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -5595,6 +5620,8 @@ Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (u i)).
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * Hcs.
 intros ε Hε.
 specialize (Hcs ε Hε).
@@ -5617,10 +5644,11 @@ destruct (rngl_le_dec Hor (rngl_cos (u p)) (rngl_cos (u q))) as [Hpq| Hpq]. {
     now apply (rngl_le_sub_0 Hop Hor).
   }
   rewrite (rngl_opp_sub_distr Hop).
-Search (_² < _²)%L.
-Theorem glop :
-  ∀ a b,
-  (0 < a < b → a² < b²)%L.
+  apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in HN. 2: {
+    apply rl_sqrt_nonneg.
+    rewrite <- one_sub_squ_cos_add_squ_sin.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
 ... ...
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
@@ -5765,6 +5793,7 @@ specialize (H1 (1 / ε)%L).
 destruct H1 as (M, HM).
 specialize (Hdiv M).
 destruct Hdiv as (N, HN).
+...
 rewrite (rngl_abs_nonneg_eq Hop Hor) in HM. 2: {
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
