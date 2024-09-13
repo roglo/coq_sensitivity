@@ -3876,6 +3876,19 @@ enough (H :
   cbn.
   apply Nat.le_sub_l.
 }
+enough (H :
+  ∃ N, ∀ p,
+  N ≤ p
+  → (1 - ε² / 2 < rngl_cos (θ /₂^p))%L). {
+  destruct H as (N, HN).
+  exists (N + 1).
+  intros * Hpq.
+  replace q with (p + (q - p)) at 1 by flia Hpq.
+  rewrite angle_div_2_pow_add_r.
+  rewrite angle_div_2_pow_mul_2_pow.
+  apply HN; flia Hpq.
+}
+Search (_ < rngl_cos (_ /₂^_))%L.
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
