@@ -5582,6 +5582,25 @@ intros Hco.
 progress unfold is_complete in Hco.
 progress unfold is_complete.
 intros u Hcs.
+(*
+progress unfold is_Cauchy_sequence in Hcs.
+*)
+Search (angle_eucl_dist _ _ < _)%L.
+Check angle_eucl_dist_is_sqrt.
+Print rngl_dist.
+specialize (Hco (λ i, rngl_cos (u i))) as H1.
+Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
+  ∀ u,
+  is_Cauchy_sequence angle_eucl_dist u
+  → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (u i)).
+Proof.
+intros * Hcs.
+... ...
+apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
+specialize (H1 Hcs).
+...
+  angle_eucl_dist θ1 θ2 < ε
+  → rngl_dist (rngl_cos θ1) (rngl_cos θ2) < ε
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
 }
