@@ -5622,6 +5622,13 @@ Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hcs.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hcs.
 intros ε Hε.
 specialize (Hcs ε Hε).
@@ -5649,6 +5656,17 @@ destruct (rngl_le_dec Hor (rngl_cos (u p)) (rngl_cos (u q))) as [Hpq| Hpq]. {
     rewrite <- one_sub_squ_cos_add_squ_sin.
     apply (rngl_add_squ_nonneg Hop Hor).
   }
+  rewrite (rngl_squ_sqrt Hon) in HN. 2: {
+    rewrite <- one_sub_squ_cos_add_squ_sin.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
+  rewrite (rngl_mul_comm Hic) in HN.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+(* ouais mais en fait ça marche pas, ça *)
 ... ...
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
