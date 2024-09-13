@@ -3742,12 +3742,7 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 easy.
 Qed.
 
-(*
-Inspect 1.
-Check angle_lim_angle_lim_mul_mul.
-*)
-
-(* to be completed
+(* to be completed later perhaps
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
   ∀ m n i θ,
   m < n ≤ 2 ^ i
@@ -5565,6 +5560,57 @@ Qed.
 *)
 
 (* to be completed
+Theorem glop :
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  ∀ n θ,
+  ∃ θ', angle_lim (seq_angle_to_div_nat θ n) θ'.
+Proof.
+intros Har Hco *.
+specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
+assert (H2 : is_complete _ angle_eucl_dist). {
+  intros u Hu.
+  progress unfold rngl_is_complete in Hco.
+(*
+  progress unfold is_complete in Hco.
+*)
+Theorem rngl_is_complete_angle_is_complete :
+  is_complete T rngl_dist
+  → is_complete (angle T) angle_eucl_dist.
+Proof.
+intros Hco.
+progress unfold is_complete in Hco.
+progress unfold is_complete.
+intros u Hcs.
+... ...
+apply rngl_is_complete_angle_is_complete in Hco.
+}
+... ...
+progress unfold is_complete in H2.
+specialize (H2 _ H1).
+destruct H2 as (θ', Hθ).
+exists θ'.
+apply Hθ.
+...
+About is_complete.
+...
+Search is_Cauchy_sequence.
+...
+assert (H2 : is_complete angle_eucl_dist). {
+  progress unfold is_complete.
+  intros u Hu.
+...
+Search is_Cauchy_sequence.
+Print rngl_is_complete.
+Search rngl_is_complete.
+Print is_complete.
+Print rngl_is_complete.
+About rngl_is_complete.
+...
+Inspect 1.
+Check angle_lim_angle_lim_mul_mul.
+...
+
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow' :
   rngl_is_archimedean T = true →
   rngl_characteristic T = 0 →

@@ -6027,7 +6027,7 @@ Definition is_limit_when_tending_to {A} (dist : A → A → T) f a l :=
 Definition is_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
 
-Definition is_complete {A} (dist : A → A → T) :=
+Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
@@ -6057,7 +6057,7 @@ Definition rngl_is_derivative :=
   is_derivative rngl_dist.
 
 Definition rngl_is_complete :=
-  is_complete rngl_dist.
+  is_complete T rngl_dist.
 
 Definition rngl_continuous_at :=
   continuous_at rngl_dist.
