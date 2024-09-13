@@ -2904,7 +2904,6 @@ assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
   now rewrite angle_add_mul_r_diag_r in H.
 }
 move H before Hi; clear Hi; rename H into Hi.
-(**)
 assert (H : ∀ i m, 0 < m ≤ n → (θ i ≤ m * θ i)%A). {
   clear m Hmn.
   intros * (Hmz, Hmn).
@@ -3742,6 +3741,11 @@ apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 easy.
 Qed.
+
+(*
+Inspect 1.
+Check angle_lim_angle_lim_mul_mul.
+*)
 
 (* to be completed
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul :
