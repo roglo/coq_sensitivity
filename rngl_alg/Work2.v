@@ -2849,11 +2849,11 @@ Search (angle_eucl_dist (_ + _)).
     apply angle_sub_move_r in Hθ'.
     subst θ; rename θ' into θ.
 ...
-    apply (angle_lt_trans _ θ2); [ admit | ].
+    apply (angle_lt_trans _ θ2); [ ... | ].
 ...
     specialize (angle_eucl_dist_lt_angle_lt_lt angle_straight θ2 (θ N)) as H1.
     eapply angle_lt_trans; [ | apply H1 ].
-    admit.
+    ...
 2: {
 ...
     apply (angle_lt_le_trans _ θ2).
@@ -3510,23 +3510,13 @@ apply (rngl_0_le_1 Hon Hop Hor).
 Qed.
 *)
 
-(* to be completed
 Theorem seq_angle_to_div_nat_is_Cauchy :
+  rngl_is_archimedean T = true →
   ∀ n θ,
   is_Cauchy_sequence angle_eucl_dist
     (seq_angle_to_div_nat θ n).
 Proof.
-intros.
-(* mouis, bof, ceci marche, mais je vois pas l'intérêt
-enough (H : ∃ k,
-  is_Cauchy_sequence angle_eucl_dist
-    (λ i, seq_angle_to_div_nat θ n (k + i))). {
-  destruct H as (k, H).
-  eapply (angle_Cauchy_sequence_eq_compat 0 k); [ | apply H ].
-  now intros i; rewrite Nat.add_0_r, Nat.add_comm.
-}
-exists 0.
-*)
+intros Har *.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -3602,169 +3592,6 @@ assert (He1 : (1 - ε² / 2 < 1)%L). {
   }
   now apply (rngl_mul_pos_pos Hop Hor Hii).
 }
-(*
-destruct (rngl_lt_dec Hor 2 ε²) as [H2ε| Hε2]. {
-  enough (H :
-    ∃ N, ∀ p q,
-    N ≤ p
-    → N ≤ q
-    → (1 - ε² / 2 <
-        rngl_cos
-          (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q))%L). {
-    destruct H as (N, HN).
-    exists N.
-    intros p q Hp Hq.
-    apply (rngl_lt_le_incl Hor) in Hε.
-    apply rngl_cos_lt_angle_eucl_dist_lt; [ easy | ].
-    apply (HN _ _ Hq Hp).
-  }
-  enough (H :
-    ∃ N, ∀ p q,
-    N ≤ p < q
-    → (1 - ε² / 2 <
-        rngl_cos
-          (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q))%L). {
-    destruct H as (N, HN).
-    exists N.
-    intros p q Hp Hq.
-    destruct (Nat.eq_dec q p) as [Hqp| Hqp]. {
-      subst q.
-      now rewrite angle_sub_diag; cbn.
-    }
-    apply (rngl_lt_le_incl Hor) in Hε.
-    destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
-    apply Nat.nlt_ge in Hpq.
-    rewrite rngl_cos_sub_comm.
-    apply HN.
-    split; [ easy | ].
-    flia Hpq Hqp.
-  }
-  enough (H :
-    ∃ N, ∀ p q,
-    N ≤ p < q
-    → (1 - ε² / 2 < rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ /₂^q)))%L). {
-    destruct H as (N, HN).
-    exists N.
-    intros * Hpq.
-    rewrite rngl_cos_sub_comm.
-    rewrite seq_angle_to_div_nat_sub; [ | flia Hpq ].
-    now apply HN.
-  }
-  exists 2.
-  intros * Hpq.
-  apply (rngl_lt_le_trans Hor _ 0). {
-    apply (rngl_lt_sub_0 Hop Hor).
-    apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    now rewrite (rngl_mul_1_l Hon).
-  }
-  rewrite pow2_mod_mul_div; [ | flia Hpq ].
-  apply rngl_le_0_cos.
-  apply angle_mul_div_pow2_le_right.
-  apply (Nat.le_trans _ (4 * (2 ^ q * n / (2 ^ p * n)))). {
-    apply Nat.mul_le_mono_l.
-    apply Nat.div_le_mono. {
-      apply Nat.neq_mul_0.
-      split; [ now apply Nat.pow_nonzero | easy ].
-    }
-    apply Nat.mul_le_mono_l.
-    now apply Nat.lt_le_incl, Nat.mod_upper_bound.
-  }
-  rewrite Nat.div_mul_cancel_r; [ | now apply Nat.pow_nonzero | easy ].
-  destruct q; [ flia Hpq | ].
-  destruct q; [ flia Hpq | ].
-  do 2 rewrite Nat.pow_succ_r'.
-  rewrite Nat.mul_assoc.
-  apply Nat.mul_le_mono_l.
-  apply Nat.Div0.div_le_upper_bound; [ now apply Nat.pow_nonzero | ].
-  apply Nat.mul_le_mono_r.
-  destruct p; [ easy | ].
-  destruct p; [ flia Hpq | ].
-  do 2 rewrite Nat.pow_succ_r'.
-  rewrite Nat.mul_assoc.
-  apply Nat_mul_le_pos_r.
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-apply (rngl_nlt_ge Hor) in Hε2.
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q
-  → (angle_eucl_dist (seq_angle_to_div_nat θ n p)
-       (seq_angle_to_div_nat θ n q) < ε)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hp Hq.
-  destruct (lt_dec p q) as [Hpq| Hpq]; [ apply (HN p q (conj Hp Hpq)) | ].
-  destruct (lt_dec q p) as [Hqp| Hqp]. {
-    rewrite angle_eucl_dist_symmetry.
-    apply (HN q p (conj Hq Hqp)).
-  }
-  apply Nat.nlt_ge in Hpq, Hqp.
-  apply Nat.le_antisymm in Hpq; [ subst q | easy ].
-  now rewrite angle_eucl_dist_diag.
-}
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q
-  → (angle_eucl_dist
-       (seq_angle_to_div_nat θ n p - seq_angle_to_div_nat θ n q) 0 < ε)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hpq.
-  rewrite angle_eucl_dist_move_0_r.
-  now apply HN.
-}
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q
-  → (angle_eucl_dist (2 ^ p mod n * 2 ^ (q - p) / n * (θ /₂^q)) 0 < ε)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hpq.
-  rewrite <- angle_eucl_dist_move_0_r.
-  rewrite angle_eucl_dist_symmetry.
-  rewrite angle_eucl_dist_move_0_r.
-  rewrite seq_angle_to_div_nat_sub; [ | now apply Nat.lt_le_incl ].
-  now apply HN.
-}
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q
-  → (1 - ε² / 2 < rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ /₂^q)))%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros p q Hpq.
-  rewrite angle_eucl_dist_is_sqrt.
-  (* lemma √a² = a if 0 < a *)
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
-    now apply (rngl_lt_le_incl Hor) in Hε.
-  }
-  rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
-  rewrite angle_sub_0_l.
-  rewrite rngl_cos_opp.
-  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
-    apply (rngl_mul_nonneg_nonneg Hop Hor). {
-      apply (rngl_0_le_2 Hon Hop Hor).
-    }
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
-  now apply HN.
-}
-...
-  He1 : (1 - ε² / 2 < 1)%L
-  Hε2 : (ε² ≤ 2)%L
-  ============================
-  ∃ N : nat, ∀ p q : nat, N ≤ p < q → (1 - ε² / 2 < rngl_cos (2 ^ p mod n * 2 ^ (q - p) / n * (θ /₂^q)))%L
-*)
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p
@@ -3820,14 +3647,11 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   apply angle_mul_div_pow2_le_right.
   apply (Nat.le_trans _ (4 * (2 ^ q * n / (2 ^ p * n)))). {
     apply Nat.mul_le_mono_l.
-    apply Nat.div_le_mono. {
-      apply Nat.neq_mul_0.
-      split; [ now apply Nat.pow_nonzero | easy ].
-    }
+    apply Nat.Div0.div_le_mono.
     apply Nat.mul_le_mono_l.
     now apply Nat.lt_le_incl, Nat.mod_upper_bound.
   }
-  rewrite Nat.div_mul_cancel_r; [ | now apply Nat.pow_nonzero | easy ].
+  rewrite Nat.Div0.div_mul_cancel_r; [ | easy ].
   destruct q; [ flia Hpq | ].
   destruct q; [ flia Hpq | ].
   do 2 rewrite Nat.pow_succ_r'.
@@ -3888,7 +3712,43 @@ enough (H :
   rewrite angle_div_2_pow_mul_2_pow.
   apply HN; flia Hpq.
 }
+specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
+specialize (H1 Hc1 Har θ).
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold rngl_dist in H1.
+specialize (H1 (ε² / 2))%L.
+assert (Hε2 : (0 < ε² / 2)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hop Hor) | ].
+  apply not_eq_sym.
+  intros H.
+  apply (eq_rngl_squ_0 Hos Hid) in H.
+  now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (H1 Hε2); clear Hε2.
+destruct H1 as (N, HN).
+exists N.
+intros p Hp.
+specialize (HN p Hp).
+rewrite (rngl_abs_sub_comm Hop Hor) in HN.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+easy.
+Qed.
+
+(* to be completed
+...
+Search (rngl_abs (_ - _)).
+Search (rngl_abs _ = _).
 Search (_ < rngl_cos (_ /₂^_))%L.
+Search (rngl_cos (_ /₂^_))%L.
 ...
 assert (H1e1 : (-1 ≤ 1 - ε² / 2 ≤ 1)%L). {
   split; [ | now apply (rngl_lt_le_incl Hor) in He1 ].
