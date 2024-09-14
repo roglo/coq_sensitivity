@@ -5678,6 +5678,21 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
 progress unfold rngl_dist.
+destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+  progress unfold rngl_dist in H1.
+...
+Theorem glop :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2 ≤ angle_right)%A
+  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
+Proof.
+... ...
+eapply (rngl_le_lt_trans Hor). {
+  apply glop.
+(* mmm... pas forcément intéressant... *)
 ...1
 progress unfold rngl_dist.
 (*
