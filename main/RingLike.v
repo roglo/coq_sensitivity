@@ -2979,6 +2979,17 @@ specialize (H3 1 1 H2 H2)%L.
 now rewrite (rngl_mul_1_l Hon) in H3.
 Qed.
 
+Theorem rngl_0_leb_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (0 ≤? 1)%L = true.
+Proof.
+intros * Hon Hop Hor.
+apply rngl_leb_le.
+apply (rngl_0_le_1 Hon Hop Hor).
+Qed.
+
 Theorem rngl_0_lt_inv_compat :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

@@ -5614,79 +5614,6 @@ Search (angle_eucl_dist _ _ < _)%L.
 Check angle_eucl_dist_is_sqrt.
 Print rngl_dist.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
-Theorem glop :
-  ∀ θ1 θ2,
-  (θ1 ≤ θ2)%A
-  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * H12.
-progress unfold angle_leb in H12.
-rewrite rngl_sin_sub.
-(*
-apply (rngl_le_sub_le_add_l Hop Hor).
-rewrite (rngl_add_sub_assoc Hop).
-rewrite rngl_add_comm.
-rewrite <- (rngl_add_sub_assoc Hop).
-apply (rngl_le_sub_le_add_l Hop Hor).
-rewrite (rngl_sub_mul_r_diag_r Hon Hop).
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-*)
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2, H12.
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    rewrite (rngl_add_sub_assoc Hop).
-    apply (rngl_le_add_le_sub_r Hop Hor).
-...
-(*3*)
-    apply (rngl_le_add_le_sub_l Hop Hor).
-    rewrite <- (rngl_add_sub_assoc Hop).
-    apply (rngl_le_sub_le_add_l Hop Hor).
-    rewrite (rngl_sub_mul_l_diag_l Hon Hop).
-    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
-    destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hz2| Hz2]. {
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2)). {
-        easy.
-      }
-      rewrite rngl_mul_assoc.
-      rewrite fold_rngl_squ.
-      specialize (cos2_sin2_1 θ2) as H1.
-      apply (rngl_add_move_r Hop) in H1.
-      rewrite H1.
-      rewrite (rngl_mul_sub_distr_r Hop).
-      rewrite (rngl_mul_1_l Hon).
-...3
-    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
-      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ1)). {
-        easy.
-      }
-      do 2 rewrite rngl_mul_add_distr_l.
-      rewrite fold_rngl_squ.
-      specialize (cos2_sin2_1 θ1) as H1.
-      apply (rngl_add_move_r Hop) in H1.
-      rewrite H1.
-      unfold rngl_squ.
-      rewrite rngl_mul_assoc.
-      rewrite <- rngl_add_
-...
-Search (_ * _ ≤ _ * _)%L.
-   apply (rngl_mul_le_mono_compat).
-...
-2: {
-  destruct zs2; [ easy | ].
-  apply (rngl_leb_gt Hor) in Hzs1.
-  apply (rngl_leb_gt Hor) in Hzs2.
-  apply rngl_leb_le in H12.
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_mul_le_compat_nonneg Hop Hor). {
-    split; [ | easy ].
-...
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ u,
   is_Cauchy_sequence angle_eucl_dist u
@@ -5704,7 +5631,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hcs.
 intros ε Hε.
-...
 (*
 enough (H :
   ∃ N, ∀ p q,
@@ -5751,6 +5677,7 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
 apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
 specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
+progress unfold rngl_dist.
 ...1
 progress unfold rngl_dist.
 (*
@@ -5793,6 +5720,84 @@ exists (rngl_acos c).
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
 }
+...
+Theorem glop :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2 ≤ angle_right)%A
+  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * H12.
+progress unfold angle_leb in H12.
+cbn in H12.
+rewrite (rngl_0_leb_1 Hon Hop Hor) in H12.
+destruct H12 as (H12, H2s).
+rewrite rngl_sin_sub.
+(*
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+rewrite <- (rngl_add_sub_assoc Hop).
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_sub_mul_r_diag_r Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+*)
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs2; [ | easy ].
+apply rngl_leb_le in Hzs2, H2s.
+destruct zs1; [ | easy ].
+apply rngl_leb_le in Hzs1.
+apply rngl_leb_le in H12.
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_add_sub_assoc Hop).
+apply (rngl_le_add_le_sub_r Hop Hor).
+...
+(*3*)
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite <- (rngl_add_sub_assoc Hop).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hz2| Hz2]. {
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2)). {
+        easy.
+      }
+      rewrite rngl_mul_assoc.
+      rewrite fold_rngl_squ.
+      specialize (cos2_sin2_1 θ2) as H1.
+      apply (rngl_add_move_r Hop) in H1.
+      rewrite H1.
+      rewrite (rngl_mul_sub_distr_r Hop).
+      rewrite (rngl_mul_1_l Hon).
+...3
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ1)). {
+        easy.
+      }
+      do 2 rewrite rngl_mul_add_distr_l.
+      rewrite fold_rngl_squ.
+      specialize (cos2_sin2_1 θ1) as H1.
+      apply (rngl_add_move_r Hop) in H1.
+      rewrite H1.
+      unfold rngl_squ.
+      rewrite rngl_mul_assoc.
+      rewrite <- rngl_add_
+...
+Search (_ * _ ≤ _ * _)%L.
+   apply (rngl_mul_le_mono_compat).
+...
+2: {
+  destruct zs2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs1.
+  apply (rngl_leb_gt Hor) in Hzs2.
+  apply rngl_leb_le in H12.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_le_compat_nonneg Hop Hor). {
+    split; [ | easy ].
+...
 ... ...
 progress unfold is_complete in H2.
 specialize (H2 _ H1).
