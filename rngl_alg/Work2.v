@@ -5631,12 +5631,53 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hcs.
 intros ε Hε.
+(*
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p
+  → N ≤ q
+  → (rngl_abs (rngl_sin (u p /₂ + u q /₂) * rngl_sin (u p /₂ - u q /₂)) <
+       ε / 2)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hp Hq.
+  progress unfold rngl_dist.
+  rewrite rngl_cos_sub_rngl_cos.
+  rewrite (rngl_abs_opp Hop Hor).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_abs_mul Hop Hi1 Hor).
+  rewrite (rngl_abs_2 Hon Hop Hor).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply HN.
+}
+*)
 specialize (Hcs ε Hε).
 destruct Hcs as (N, HN).
 exists N.
 intros p q Hp Hq.
 specialize (HN p q Hp Hq).
 rewrite angle_eucl_dist_is_sqrt in HN.
+(*1*)
+apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in HN. 2: {
+  apply rl_sqrt_nonneg.
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite (rngl_squ_sqrt Hon) in HN. 2: {
+  rewrite <- one_sub_squ_cos_add_squ_sin.
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite (rngl_mul_comm Hic) in HN.
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
+...1
 progress unfold rngl_dist.
 (*
 destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
@@ -5666,10 +5707,12 @@ destruct (rngl_le_dec Hor (rngl_cos (u p)) (rngl_cos (u q))) as [Hpq| Hpq]. {
   }
   apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
   apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-(* ouais mais en fait ça marche pas, ça *)
+  rewrite rngl_cos_sub_rngl_cos.
 ... ...
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
+destruct H1 as (c, Hc).
+exists (rngl_acos c).
 ...
   angle_eucl_dist θ1 θ2 < ε
   → rngl_dist (rngl_cos θ1) (rngl_cos θ2) < ε
