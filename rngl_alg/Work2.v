@@ -5617,12 +5617,12 @@ specialize (Hco (λ i, rngl_cos (u i))) as H1.
 Theorem glop :
   ∀ θ1 θ2,
   (θ1 ≤ θ2)%A
-  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_cos (θ2 - θ1))%L.
+  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
 Proof.
 destruct_ac.
 intros * H12.
 progress unfold angle_leb in H12.
-rewrite rngl_cos_sub.
+rewrite rngl_sin_sub.
 (*
 apply (rngl_le_sub_le_add_l Hop Hor).
 rewrite (rngl_add_sub_assoc Hop).
@@ -5639,6 +5639,9 @@ destruct zs1. {
   apply rngl_leb_le in Hzs1.
   destruct zs2. {
     apply rngl_leb_le in Hzs2, H12.
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_add_sub_assoc Hop).
+    apply (rngl_le_add_le_sub_r Hop Hor).
 ...
 2: {
   destruct zs2; [ easy | ].
