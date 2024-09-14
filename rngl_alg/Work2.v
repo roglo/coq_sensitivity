@@ -5686,13 +5686,13 @@ destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
 ...
 Theorem glop :
   ∀ θ1 θ2,
-  (θ1 ≤ θ2 ≤ angle_right)%A
+  (0 ≤ rngl_cos θ2 ≤ rngl_cos θ1)%L
   → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
 Proof.
 ... ...
 eapply (rngl_le_lt_trans Hor). {
   apply glop.
-(* mmm... pas forcément intéressant... *)
+  split; [ | easy ].
 ...1
 progress unfold rngl_dist.
 (*
