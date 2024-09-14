@@ -5616,16 +5616,38 @@ Print rngl_dist.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
 Theorem glop :
   ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1 * rngl_sin θ2)%L
-  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_cos (θ1 - θ2))%L.
+  (θ1 ≤ θ2)%A
+  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_cos (θ2 - θ1))%L.
 Proof.
 destruct_ac.
-intros.
+intros * H12.
+progress unfold angle_leb in H12.
 rewrite rngl_cos_sub.
+(*
 apply (rngl_le_sub_le_add_l Hop Hor).
-rewrite rngl_add_assoc.
-rewrite (rngl_add_mul_r_diag_r Hon).
-(* euh... chais pas, faut réfléchir *)
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_comm.
+rewrite <- (rngl_add_sub_assoc Hop).
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite (rngl_sub_mul_r_diag_r Hon Hop).
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+*)
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  apply rngl_leb_le in Hzs1.
+  destruct zs2. {
+    apply rngl_leb_le in Hzs2, H12.
+...
+2: {
+  destruct zs2; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hzs1.
+  apply (rngl_leb_gt Hor) in Hzs2.
+  apply rngl_leb_le in H12.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_le_compat_nonneg Hop Hor). {
+    split; [ | easy ].
 ...
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ u,
