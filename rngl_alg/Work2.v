@@ -5620,6 +5620,7 @@ Theorem glop :
   → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * H12.
 progress unfold angle_leb in H12.
 rewrite rngl_sin_sub.
@@ -5642,6 +5643,40 @@ destruct zs1. {
     apply (rngl_le_sub_le_add_l Hop Hor).
     rewrite (rngl_add_sub_assoc Hop).
     apply (rngl_le_add_le_sub_r Hop Hor).
+...
+(*3*)
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite <- (rngl_add_sub_assoc Hop).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_sub_mul_l_diag_l Hon Hop).
+    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hz2| Hz2]. {
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ2)). {
+        easy.
+      }
+      rewrite rngl_mul_assoc.
+      rewrite fold_rngl_squ.
+      specialize (cos2_sin2_1 θ2) as H1.
+      apply (rngl_add_move_r Hop) in H1.
+      rewrite H1.
+      rewrite (rngl_mul_sub_distr_r Hop).
+      rewrite (rngl_mul_1_l Hon).
+...3
+    destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hz1| Hz1]. {
+      apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ (rngl_cos θ1)). {
+        easy.
+      }
+      do 2 rewrite rngl_mul_add_distr_l.
+      rewrite fold_rngl_squ.
+      specialize (cos2_sin2_1 θ1) as H1.
+      apply (rngl_add_move_r Hop) in H1.
+      rewrite H1.
+      unfold rngl_squ.
+      rewrite rngl_mul_assoc.
+      rewrite <- rngl_add_
+...
+Search (_ * _ ≤ _ * _)%L.
+   apply (rngl_mul_le_mono_compat).
 ...
 2: {
   destruct zs2; [ easy | ].
