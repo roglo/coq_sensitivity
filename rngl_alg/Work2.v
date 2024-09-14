@@ -5614,6 +5614,19 @@ Search (angle_eucl_dist _ _ < _)%L.
 Check angle_eucl_dist_is_sqrt.
 Print rngl_dist.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
+Theorem glop :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1 * rngl_sin θ2)%L
+  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_cos (θ1 - θ2))%L.
+Proof.
+destruct_ac.
+intros.
+rewrite rngl_cos_sub.
+apply (rngl_le_sub_le_add_l Hop Hor).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_mul_r_diag_r Hon).
+(* euh... chais pas, faut réfléchir *)
+...
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ u,
   is_Cauchy_sequence angle_eucl_dist u
@@ -5631,6 +5644,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hcs.
 intros ε Hε.
+...
 (*
 enough (H :
   ∃ N, ∀ p q,
