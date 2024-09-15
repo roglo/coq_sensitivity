@@ -3110,6 +3110,56 @@ rewrite (rngl_squ_sub_comm Hop) in Hcc, Hcs.
 now apply (rngl_add_lt_compat Hop Hor).
 Qed.
 
+Theorem angle_eucl_dist_lt_rngl_cos_lt :
+  ∀ a θ1 θ2,
+  (angle_eucl_dist θ1 θ2 < a)%L
+  → (1 - a² / 2 < rngl_cos (θ2 - θ1))%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hd.
+  rewrite (H1 (angle_eucl_dist _ _))%L, (H1 a) in Hd.
+  now apply (rngl_lt_irrefl Hor) in Hd.
+}
+intros * Hd.
+destruct (rngl_le_dec Hor a 0) as [Haz| Haz]. {
+  exfalso; apply (rngl_nle_gt Hor) in Hd.
+  apply Hd; clear Hd.
+  apply (rngl_le_trans Hor _ 0); [ easy | ].
+  apply angle_eucl_dist_nonneg.
+}
+apply (rngl_nle_gt Hor) in Haz.
+apply (rngl_lt_le_incl Hor) in Haz.
+rewrite angle_eucl_dist_is_sqrt in Hd.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd. 2: {
+  apply rl_sqrt_nonneg.
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a) in Hd; [ | easy ].
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd.
+rewrite (rngl_squ_sqrt Hon) in Hd. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic) in Hd.
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hd. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+now apply (rngl_lt_sub_lt_add_r Hop Hor).
+Qed.
+
 Theorem rngl_cos_lt_angle_eucl_dist_lt :
   ∀ a θ1 θ2,
   (0 ≤ a)%L
@@ -5650,6 +5700,30 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
   }
 }
 apply (rngl_nlt_ge Hor) in H2e.
+(*4*)
+progress unfold is_Cauchy_sequence in Hcs.
+specialize (Hcs (√(2 * ε)))%L.
+assert (H : (0 < √(2 * ε))%L). {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+specialize (Hcs H); clear H.
+destruct Hcs as (N, HN).
+exists N.
+intros p q Hp Hq.
+specialize (HN p q Hp Hq).
+apply angle_eucl_dist_lt_rngl_cos_lt in HN.
+rewrite (rngl_squ_sqrt Hon) in HN. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+rewrite (rngl_mul_comm Hic) in HN.
+rewrite (rngl_mul_div Hi1) in HN. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+...4
 enough (H :
   ∃ N, ∀ p q,
   N ≤ p < q → (rngl_dist (rngl_cos (u p)) (rngl_cos (u q)) < ε)%L). {
