@@ -5650,12 +5650,27 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
   }
 }
 apply (rngl_nlt_ge Hor) in H2e.
+enough (H :
+  ∃ N, ∀ p q,
+  N ≤ p → N ≤ q → (rngl_cos (u p) - rngl_cos (u q) < ε)%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros * Hp Hq.
+  progress unfold rngl_dist.
+  progress unfold rngl_abs.
+Search (_ - _ ≤? _)%L.
+Search (_ - _ ≤ _)%L.
+
+... ...
+rewrite rngl_leb_sub_0.
+...
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   progress unfold rngl_dist.
   specialize (Hcs (ε / 2))%L as H1.
   specialize (Hcs (ε / (ε - 1)))%L as H2.
 (* lequel des deux ? ou alors encore un autre ? ou alors faut voir
    les choses autrement ? *)
+
 ...
   assert (H : (0 < ε - 1)%L). {
     now apply (rngl_lt_0_sub Hop Hor).

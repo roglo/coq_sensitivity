@@ -731,6 +731,30 @@ rewrite H1 in H.
 apply H.
 Qed.
 
+Theorem rngl_le_iff_leb_iff :
+  ∀ a b c d,
+  (a ≤ b ↔ c ≤ d)%L
+  → ((a ≤? b) = (c ≤? d))%L.
+Proof.
+intros * Habcd.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (c ≤? d)%L as cd eqn:Hcd.
+symmetry in Hab, Hcd.
+destruct ab. {
+  destruct cd; [ easy | ].
+  apply rngl_leb_le in Hab.
+  apply rngl_leb_nle in Hcd.
+  exfalso; apply Hcd.
+  apply Habcd, Hab.
+} {
+  destruct cd; [ | easy ].
+  apply rngl_leb_nle in Hab.
+  apply rngl_leb_le in Hcd.
+  exfalso; apply Hab.
+  apply Habcd, Hcd.
+}
+Qed.
+
 Theorem rngl_lt_iff :
   rngl_is_ordered T = true → ∀ a b, (a < b ↔ a ≤ b ∧ a ≠ b)%L.
 Proof.
@@ -2377,6 +2401,17 @@ split; intros Hab. {
   do 2 rewrite (rngl_add_opp_r Hop) in H1.
   now rewrite (rngl_sub_diag Hos) in H1.
 }
+Qed.
+
+Theorem rngl_leb_sub_0 :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, ((a - b ≤? 0) = (a ≤? b))%L.
+Proof.
+intros Hop Hor.
+intros.
+apply rngl_le_iff_leb_iff.
+apply (rngl_le_sub_0 Hop Hor).
 Qed.
 
 Theorem rngl_lt_0_sub :
