@@ -5620,6 +5620,7 @@ Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (u i)).
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -5631,45 +5632,56 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hcs.
 intros ε Hε.
-(*
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p
-  → N ≤ q
-  → (rngl_abs (rngl_sin (u p /₂ + u q /₂) * rngl_sin (u p /₂ - u q /₂)) <
-       ε / 2)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros * Hp Hq.
+destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
+...
+  exists 0.
+  intros p q _ _.
+  apply (rngl_lt_le_trans Hor _ 1); [ | easy ].
   progress unfold rngl_dist.
-  rewrite rngl_cos_sub_rngl_cos.
-  rewrite (rngl_abs_opp Hop Hor).
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_abs_mul Hop Hi1 Hor).
-  rewrite (rngl_abs_2 Hon Hop Hor).
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+...
+specialize (Hcs (√(2 * (1 - rngl_min 1 ε)))%L).
+assert (H : (0 < √(2 * (1 - rngl_min 1 ε)))%L). {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_mul_pos_pos Hop Hor Hii). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  now apply HN.
+  apply (rngl_lt_0_sub Hop Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_le_min_l Hor) | ].
+  intros H.
+  apply (rngl_min_l_iff Hor) in H.
+...
+  apply rngl_min
 }
-*)
-specialize (Hcs ε Hε).
+specialize (Hcs H); clear H.
 destruct Hcs as (N, HN).
 exists N.
 intros p q Hp Hq.
 specialize (HN p q Hp Hq).
 rewrite angle_eucl_dist_is_sqrt in HN.
 (*1*)
+(*2*)
 apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in HN. 2: {
   apply rl_sqrt_nonneg.
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
 }
 rewrite (rngl_squ_sqrt Hon) in HN. 2: {
-  rewrite <- one_sub_squ_cos_add_squ_sin.
-  apply (rngl_add_squ_nonneg Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
 }
+rewrite (rngl_squ_sqrt Hon) in HN. 2: {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_min_l Hor).
+}
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in HN. 2: {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_sub_lt_mono_l Hop Hor) in HN.
+...2
 rewrite (rngl_mul_comm Hic) in HN.
 apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
