@@ -5658,11 +5658,13 @@ enough (H :
   intros * Hp Hq.
   progress unfold rngl_dist.
   progress unfold rngl_abs.
-Search (_ - _ ≤? _)%L.
-Search (_ - _ ≤ _)%L.
-
-... ...
-rewrite rngl_leb_sub_0.
+  rewrite (rngl_leb_sub_0 Hop Hor).
+  remember (rngl_cos (u p) ≤? rngl_cos (u q))%L as pq eqn:Hpq.
+  symmetry in Hpq.
+  destruct pq; [ | now apply HN ].
+  rewrite (rngl_opp_sub_distr Hop).
+  now apply HN.
+}
 ...
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   progress unfold rngl_dist.
