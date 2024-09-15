@@ -5665,9 +5665,9 @@ Check angle_eucl_dist_is_sqrt.
 Print rngl_dist.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
-  ∀ u,
-  is_Cauchy_sequence angle_eucl_dist u
-  → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (u i)).
+  ∀ θ,
+  is_Cauchy_sequence angle_eucl_dist θ
+  → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (θ i)).
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -5702,6 +5702,9 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
 apply (rngl_nlt_ge Hor) in H2e.
 (*4*)
 progress unfold is_Cauchy_sequence in Hcs.
+...
+(* mmm... ce √(2ε) n'a pas l'air de convenir, comme ε
+   il faudrait plutôt que ça contienne un 1-ε, comme avant *)
 specialize (Hcs (√(2 * ε)))%L.
 assert (H : (0 < √(2 * ε))%L). {
   apply (rl_sqrt_pos Hon Hos Hor).
@@ -5728,6 +5731,11 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 eapply (rngl_le_lt_trans Hor); [ | apply HN ].
 progress unfold rngl_dist.
 (* est-ce que c'est vrai, ça ? *)
+destruct (rngl_le_dec Hor (rngl_cos (θ q)) (rngl_cos (θ p))) as [Hpq| Hpq]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+    now apply (rngl_le_0_sub Hop Hor).
+  }
+(* non, ça a l'air faux *)
 ...4
 enough (H :
   ∃ N, ∀ p q,
