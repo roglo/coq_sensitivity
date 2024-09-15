@@ -6526,6 +6526,7 @@ Arguments rngl_le_dec {T ro rp} Hor (a b)%_L.
 Arguments rngl_le_trans {T ro rp} Hor (a b c)%_L.
 Arguments rngl_le_lt_trans {T ro rp} Hor (a b c)%_L.
 Arguments rngl_lt_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_trans {T ro rp} Hor (a b c)%_L.
 Arguments rngl_lt_dec {T ro rp} Hor (a b)%_L.
 Arguments rngl_min {T ro} (a b)%_L.
 Arguments rngl_mul {T ring_like_op} (a b)%_L.

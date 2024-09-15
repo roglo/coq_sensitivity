@@ -5632,6 +5632,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hcs.
 intros ε Hε.
+destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
+  exists 0.
+  intros p q _ _.
+About rngl_lt_le_trans.
+About rngl_lt_trans.
+  apply (rngl_lt_trans Hor _ 2); [ | easy ].
+  progress unfold rngl_dist.
+...
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   progress unfold rngl_dist.
   specialize (Hcs (ε / 2))%L as H1.
