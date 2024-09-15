@@ -5723,6 +5723,11 @@ rewrite (rngl_mul_comm Hic) in HN.
 rewrite (rngl_mul_div Hi1) in HN. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+progress unfold rngl_dist.
+(* est-ce que c'est vrai, ça ? *)
 ...4
 enough (H :
   ∃ N, ∀ p q,
