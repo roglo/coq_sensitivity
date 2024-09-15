@@ -5635,11 +5635,21 @@ intros ε Hε.
 destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
   exists 0.
   intros p q _ _.
-About rngl_lt_le_trans.
-About rngl_lt_trans.
-  apply (rngl_lt_trans Hor _ 2); [ | easy ].
+  apply (rngl_le_lt_trans Hor _ 2); [ | easy ].
   progress unfold rngl_dist.
-...
+  apply -> (rngl_abs_le Hop Hor).
+  rewrite (rngl_opp_add_distr Hop).
+  split. {
+    apply (rngl_sub_le_compat Hop Hor); apply rngl_cos_bound.
+  } {
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_le_trans Hor _ 1); [ apply rngl_cos_bound | ].
+    apply (rngl_le_add_r Hor).
+    apply (rngl_le_opp_l Hop Hor), rngl_cos_bound.
+  }
+}
+apply (rngl_nlt_ge Hor) in H2e.
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   progress unfold rngl_dist.
   specialize (Hcs (ε / 2))%L as H1.
