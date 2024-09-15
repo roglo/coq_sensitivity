@@ -5666,6 +5666,7 @@ enough (H :
   rewrite dist_diag; [ easy | ].
   apply (rngl_dist_is_dist Hop Hor).
 }
+(*
 ...
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   progress unfold rngl_dist.
@@ -5673,7 +5674,6 @@ destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   specialize (Hcs (ε / (ε - 1)))%L as H2.
 (* lequel des deux ? ou alors encore un autre ? ou alors faut voir
    les choses autrement ? *)
-
 ...
   assert (H : (0 < ε - 1)%L). {
     now apply (rngl_lt_0_sub Hop Hor).
@@ -5686,6 +5686,7 @@ destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
 ...
 }
 apply (rngl_nlt_ge Hor) in H1e.
+*)
 specialize (Hcs (√(2 * (1 - rngl_min 1 ε)))%L).
 assert (H : (0 < √(2 * (1 - rngl_min 1 ε)))%L). {
   apply (rl_sqrt_pos Hon Hos Hor).
@@ -5697,6 +5698,8 @@ assert (H : (0 < √(2 * (1 - rngl_min 1 ε)))%L). {
   split; [ apply (rngl_le_min_l Hor) | ].
   intros H.
   apply (rngl_min_l_iff Hor) in H.
+(* donc, c'est pas √(2 * (1 - rngl_min 1 ε)) qu'il faut prendre
+   car il ne garantit pas que ce soit stricement positif *)
 ...
   apply rngl_min
 }
