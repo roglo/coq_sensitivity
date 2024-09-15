@@ -5652,18 +5652,19 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
 apply (rngl_nlt_ge Hor) in H2e.
 enough (H :
   ∃ N, ∀ p q,
-  N ≤ p → N ≤ q → (rngl_cos (u p) - rngl_cos (u q) < ε)%L). {
+  N ≤ p < q → (rngl_dist (rngl_cos (u p)) (rngl_cos (u q)) < ε)%L). {
   destruct H as (N, HN).
   exists N.
   intros * Hp Hq.
-  progress unfold rngl_dist.
-  progress unfold rngl_abs.
-  rewrite (rngl_leb_sub_0 Hop Hor).
-  remember (rngl_cos (u p) ≤? rngl_cos (u q))%L as pq eqn:Hpq.
-  symmetry in Hpq.
-  destruct pq; [ | now apply HN ].
-  rewrite (rngl_opp_sub_distr Hop).
-  now apply HN.
+  destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
+  destruct (lt_dec q p) as [Hqp| Hqp]. {
+    rewrite (is_dist_symmetry _ (rngl_dist_is_dist Hop Hor)).
+    now apply HN.
+  }
+  apply Nat.nlt_ge in Hpq, Hqp.
+  apply Nat.le_antisymm in Hqp; [ subst q | easy ].
+  rewrite dist_diag; [ easy | ].
+  apply (rngl_dist_is_dist Hop Hor).
 }
 ...
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
