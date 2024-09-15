@@ -5633,12 +5633,23 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hcs.
 intros ε Hε.
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
-...
-  exists 0.
-  intros p q _ _.
-  apply (rngl_lt_le_trans Hor _ 1); [ | easy ].
   progress unfold rngl_dist.
+  specialize (Hcs (ε / 2))%L as H1.
+  specialize (Hcs (ε / (ε - 1)))%L as H2.
+(* lequel des deux ? ou alors encore un autre ? ou alors faut voir
+   les choses autrement ? *)
 ...
+  assert (H : (0 < ε - 1)%L). {
+    now apply (rngl_lt_0_sub Hop Hor).
+  }
+  specialize (Hcs H); clear H.
+  destruct Hcs as (N, HN).
+  exists N.
+  intros * Hp Hq.
+  specialize (HN p q Hp Hq).
+...
+}
+apply (rngl_nlt_ge Hor) in H1e.
 specialize (Hcs (√(2 * (1 - rngl_min 1 ε)))%L).
 assert (H : (0 < √(2 * (1 - rngl_min 1 ε)))%L). {
   apply (rl_sqrt_pos Hon Hos Hor).
