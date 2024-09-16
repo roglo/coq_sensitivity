@@ -5680,36 +5680,6 @@ rewrite <- (rngl_squ_sub Hop Hic Hon).
 apply (rngl_squ_nonneg Hop Hor).
 Qed.
 
-(* to be completed
-Theorem glop :
-  rngl_is_archimedean T = true →
-  rngl_is_complete T →
-  ∀ n θ,
-  ∃ θ', angle_lim (seq_angle_to_div_nat θ n) θ'.
-Proof.
-intros Har Hco *.
-specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
-assert (H2 : is_complete _ angle_eucl_dist). {
-  intros u Hu.
-  progress unfold rngl_is_complete in Hco.
-(*
-  progress unfold is_complete in Hco.
-*)
-Theorem rngl_is_complete_angle_is_complete :
-  is_complete T rngl_dist
-  → is_complete (angle T) angle_eucl_dist.
-Proof.
-intros Hco.
-progress unfold is_complete in Hco.
-progress unfold is_complete.
-intros u Hcs.
-(*
-progress unfold is_Cauchy_sequence in Hcs.
-*)
-Search (angle_eucl_dist _ _ < _)%L.
-Check angle_eucl_dist_is_sqrt.
-Print rngl_dist.
-specialize (Hco (λ i, rngl_cos (u i))) as H1.
 Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   ∀ θ,
   is_Cauchy_sequence angle_eucl_dist θ
@@ -5747,260 +5717,52 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
   }
 }
 apply (rngl_nlt_ge Hor) in H2e.
-(*
-destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
-  specialize (Hcs 1)%L.
-  specialize (rngl_0_lt_1 Hon Hop Hc1 Hor) as H.
-  specialize (Hcs H); clear H.
-  destruct Hcs as (N, HN).
-  exists N.
-  intros * Hp Hq.
-  specialize (HN _ _ Hp Hq).
-  apply (rngl_lt_le_trans Hor _ 1); [ | easy ].
-(**)
-  progress unfold rngl_dist.
-  progress unfold rngl_abs.
-  rewrite (rngl_leb_sub_0 Hop Hor).
-  remember (_ ≤? _)%L as cpq eqn:Hcpq.
-  symmetry in Hcpq.
-  destruct cpq. {
-    apply rngl_leb_le in Hcpq.
-    rewrite (rngl_opp_sub_distr Hop).
-    rewrite angle_eucl_dist_is_sqrt in HN.
-    rewrite <- (rl_sqrt_1 Hic Hon Hop Hor Hid) in HN at 4.
-    apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in HN; cycle 1. {
-      apply (rngl_mul_nonneg_nonneg Hop Hor). {
-        apply (rngl_0_le_2 Hon Hop Hor).
-      }
-      apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
-    } {
-      apply (rngl_0_le_1 Hon Hop Hor).
-    }
-    rewrite (rngl_mul_comm Hic) in HN.
-    apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-    apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-    (* lemma to do : a - a / 2 = a / 2 *)
-    rewrite <- (rngl_div_diag Hon Hiq 2)%L in HN at 1. 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-    }
-    rewrite <- (rngl_div_sub_distr_r Hop Hiv) in HN.
-    rewrite (rngl_add_sub Hos) in HN.
-... possible aussi comme ça...
-  apply (rngl_nle_gt Hor) in HN.
-  apply (rngl_nle_gt Hor).
-  intros H1; apply HN; clear HN.
-...
-*)
-(* c'est con, celui-ci : 1-ε est toujours inférieur à 1
-   puisque ε>0
-specialize (Hcs √(2 * rngl_max 1 (1 - ε)))%L.
-*)
-Check rngl_cos_diff_le_eucl_dist.
-...
-specialize (Hcs √(2))%L.
-(* oui, mais si ça dépend pas de ε, c'est nul *)
-(* pfff... chais pas *)
-...
-progress unfold angle_eucl_dist.
-...
-Search (_ ≤ angle_eucl_dist _ _)%L.
-angle_eucl_dist_le_cos_le:
-  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T}
-    {rl : real_like_prop T},
-    angle_ctx T
-    → ∀ θ1 θ2 θ3 θ4 : angle T,
-        (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ3 θ4)%L
-        ↔ (rngl_cos (θ4 - θ3) ≤ rngl_cos (θ2 - θ1))%L
-Search (_ < angle_eucl_dist _ _)%L.
-...
-assert (H : (0 < √(2 * rngl_max 1 (1 - ε)))%L). {
-  apply (rl_sqrt_pos Hon Hos Hor).
-  apply (rngl_mul_pos_pos Hop Hor Hii). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  progress unfold rngl_max.
-  remember (1 ≤? 1 - ε)%L as e1 eqn:He1.
-  symmetry in He1.
-  destruct e1. {
-    apply rngl_leb_le in He1.
-    exfalso; apply (rngl_nlt_ge Hor) in He1.
-    apply He1; clear He1.
-    apply (rngl_lt_sub_lt_add_r Hop Hor).
-    apply (rngl_lt_sub_lt_add_l Hop Hor).
-    now rewrite (rngl_sub_diag Hos).
-  }
-  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-}
-specialize (Hcs H); clear H.
+specialize (Hcs ε Hε).
 destruct Hcs as (N, HN).
 exists N.
-intros p q Hp Hq.
-specialize (HN p q Hp Hq).
-apply angle_eucl_dist_lt_rngl_cos_lt in HN.
-rewrite (rngl_squ_sqrt Hon) in HN. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_trans Hor _ 1). {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  apply (rngl_le_max_l Hor).
-}
-...
-rewrite (rngl_mul_comm Hic) in HN.
-rewrite (rngl_mul_div Hi1) in HN. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+intros * Hp Hq.
 progress unfold rngl_dist.
-(* est-ce que c'est vrai, ça ? *)
 destruct (rngl_le_dec Hor (rngl_cos (θ q)) (rngl_cos (θ p))) as [Hpq| Hpq]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     now apply (rngl_le_0_sub Hop Hor).
   }
-(* non, ça a l'air faux *)
-...4
-enough (H :
-  ∃ N, ∀ p q,
-  N ≤ p < q → (rngl_dist (rngl_cos (u p)) (rngl_cos (u q)) < ε)%L). {
-  destruct H as (N, HN).
-  exists N.
-  intros * Hp Hq.
-  destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply HN | ].
-  destruct (lt_dec q p) as [Hqp| Hqp]. {
-    rewrite (is_dist_symmetry _ (rngl_dist_is_dist Hop Hor)).
-    now apply HN.
-  }
-  apply Nat.nlt_ge in Hpq, Hqp.
-  apply Nat.le_antisymm in Hqp; [ subst q | easy ].
-  rewrite dist_diag; [ easy | ].
-  apply (rngl_dist_is_dist Hop Hor).
-}
-(*
-...
-destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
-  progress unfold rngl_dist.
-  specialize (Hcs (ε / 2))%L as H1.
-  specialize (Hcs (ε / (ε - 1)))%L as H2.
-(* lequel des deux ? ou alors encore un autre ? ou alors faut voir
-   les choses autrement ? *)
-...
-  assert (H : (0 < ε - 1)%L). {
-    now apply (rngl_lt_0_sub Hop Hor).
-  }
-  specialize (Hcs H); clear H.
-  destruct Hcs as (N, HN).
-  exists N.
-  intros * Hp Hq.
-  specialize (HN p q Hp Hq).
-...
-}
-apply (rngl_nlt_ge Hor) in H1e.
-*)
-specialize (Hcs (√(2 * (1 - rngl_min 1 ε)))%L).
-assert (H : (0 < √(2 * (1 - rngl_min 1 ε)))%L). {
-  apply (rl_sqrt_pos Hon Hos Hor).
-  apply (rngl_mul_pos_pos Hop Hor Hii). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_lt_0_sub Hop Hor).
-  apply (rngl_lt_iff Hor).
-  split; [ apply (rngl_le_min_l Hor) | ].
-  intros H.
-  apply (rngl_min_l_iff Hor) in H.
-(* donc, c'est pas √(2 * (1 - rngl_min 1 ε)) qu'il faut prendre
-   car il ne garantit pas que ce soit stricement positif *)
-...
-  apply rngl_min
-}
-specialize (Hcs H); clear H.
-destruct Hcs as (N, HN).
-exists N.
-intros p q Hp Hq.
-specialize (HN p q Hp Hq).
-rewrite angle_eucl_dist_is_sqrt in HN.
-(*1*)
-(*2*)
-apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in HN. 2: {
-  apply rl_sqrt_nonneg.
-  rewrite <- one_sub_squ_cos_add_squ_sin.
-  apply (rngl_add_squ_nonneg Hop Hor).
-}
-rewrite (rngl_squ_sqrt Hon) in HN. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
-}
-rewrite (rngl_squ_sqrt Hon) in HN. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply (rngl_le_min_l Hor).
-}
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in HN. 2: {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-apply (rngl_sub_lt_mono_l Hop Hor) in HN.
-...2
-rewrite (rngl_mul_comm Hic) in HN.
-apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
-progress unfold rngl_dist.
-destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
+  eapply (rngl_le_lt_trans Hor); [ apply rngl_cos_diff_le_eucl_dist | ].
+  now apply HN.
+} {
+  apply (rngl_nle_gt Hor), (rngl_lt_le_incl Hor) in Hpq.
+  rewrite (rngl_abs_sub_comm Hop Hor).
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     now apply (rngl_le_0_sub Hop Hor).
   }
-  progress unfold rngl_dist in H1.
-...
+  eapply (rngl_le_lt_trans Hor); [ apply rngl_cos_diff_le_eucl_dist | ].
+  now apply HN.
+}
+Qed.
+
+(* to be completed
 Theorem glop :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_cos θ2 ≤ rngl_cos θ1)%L
-  → (rngl_cos θ1 - rngl_cos θ2 ≤ rngl_sin (θ2 - θ1))%L.
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  ∀ n θ,
+  ∃ θ', angle_lim (seq_angle_to_div_nat θ n) θ'.
 Proof.
-... ...
-eapply (rngl_le_lt_trans Hor). {
-  apply glop.
-  split; [ | easy ].
-...1
-progress unfold rngl_dist.
-(*
-destruct (rngl_le_dec Hor (rngl_cos (u q)) (rngl_cos (u p))) as [Hpq| Hpq]. {
-  rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-    now apply (rngl_le_0_sub Hop Hor).
-  }
-  apply (rngl_le_lt_trans Hor _ 0); [ | easy ].
-  rewrite (rngl_opp_sub_distr Hop).
-*)
-destruct (rngl_le_dec Hor (rngl_cos (u p)) (rngl_cos (u q))) as [Hpq| Hpq]. {
-  rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
-    now apply (rngl_le_sub_0 Hop Hor).
-  }
-  rewrite (rngl_opp_sub_distr Hop).
-  apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in HN. 2: {
-    apply rl_sqrt_nonneg.
-    rewrite <- one_sub_squ_cos_add_squ_sin.
-    apply (rngl_add_squ_nonneg Hop Hor).
-  }
-  rewrite (rngl_squ_sqrt Hon) in HN. 2: {
-    rewrite <- one_sub_squ_cos_add_squ_sin.
-    apply (rngl_add_squ_nonneg Hop Hor).
-  }
-  rewrite (rngl_mul_comm Hic) in HN.
-  apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-  apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-  rewrite rngl_cos_sub_rngl_cos.
-... ...
+intros Har Hco *.
+specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
+assert (H2 : is_complete _ angle_eucl_dist). {
+  intros u Hu.
+  progress unfold rngl_is_complete in Hco.
+Theorem rngl_is_complete_angle_is_complete :
+  is_complete T rngl_dist
+  → is_complete (angle T) angle_eucl_dist.
+Proof.
+intros Hco.
+progress unfold is_complete in Hco.
+progress unfold is_complete.
+intros u Hcs.
+Search (angle_eucl_dist _ _ < _)%L.
+Check angle_eucl_dist_is_sqrt.
+Print rngl_dist.
+specialize (Hco (λ i, rngl_cos (u i))) as H1.
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
 destruct H1 as (c, Hc).
