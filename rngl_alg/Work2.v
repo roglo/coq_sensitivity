@@ -5703,6 +5703,28 @@ apply (rngl_nlt_ge Hor) in H2e.
 (*4*)
 (*5*)
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
+  specialize (Hcs 1)%L.
+  specialize (rngl_0_lt_1 Hon Hop Hc1 Hor) as H.
+  specialize (Hcs H); clear H.
+  destruct Hcs as (N, HN).
+  exists N.
+  intros * Hp Hq.
+  specialize (HN _ _ Hp Hq).
+  apply (rngl_lt_le_trans Hor _ 1); [ | easy ].
+(**)
+  progress unfold rngl_dist.
+  progress unfold rngl_abs.
+  rewrite (rngl_leb_sub_0 Hop Hor).
+  remember (_ ≤? _)%L as cpq eqn:Hcpq.
+  symmetry in Hcpq.
+  destruct cpq. {
+    apply rngl_leb_le in Hcpq.
+    rewrite (rngl_opp_sub_distr Hop).
+    rewrite angle_eucl_dist_is_sqrt in HN.
+... possible auss comme ça...
+  apply (rngl_nle_gt Hor) in HN.
+  apply (rngl_nle_gt Hor).
+  intros H1; apply HN; clear HN.
 ...
 specialize (Hcs √(2 * (1 - ε)))%L.
 assert (H : (0 < √(2 * (1 - ε)))%L). {
