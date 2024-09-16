@@ -5701,8 +5701,7 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
   }
 }
 apply (rngl_nlt_ge Hor) in H2e.
-(*4*)
-(*5*)
+(*
 destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
   specialize (Hcs 1)%L.
   specialize (rngl_0_lt_1 Hon Hop Hc1 Hor) as H.
@@ -5743,26 +5742,37 @@ destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
     }
     rewrite <- (rngl_div_sub_distr_r Hop Hiv) in HN.
     rewrite (rngl_add_sub Hos) in HN.
-... possible auss comme ça...
+... possible aussi comme ça...
   apply (rngl_nle_gt Hor) in HN.
   apply (rngl_nle_gt Hor).
   intros H1; apply HN; clear HN.
 ...
-specialize (Hcs √(2 * (1 - ε)))%L.
-assert (H : (0 < √(2 * (1 - ε)))%L). {
+*)
+(* c'est con, celui-ci : 1-ε est toujours inférieur à 1
+   puisque ε>0
+specialize (Hcs √(2 * rngl_max 1 (1 - ε)))%L.
+*)
+specialize (Hcs √(2))%L.
+(* oui, mais si ça dépend pas de ε, c'est nul *)
+(* pfff... chais pas *)
+...
+assert (H : (0 < √(2 * rngl_max 1 (1 - ε)))%L). {
   apply (rl_sqrt_pos Hon Hos Hor).
   apply (rngl_mul_pos_pos Hop Hor Hii). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  apply (rngl_lt_0_sub Hop Hor).
-...5
-(* mmm... ce √(2ε) n'a pas l'air de convenir, comme ε
-   il faudrait plutôt que ça contienne un 1-ε, comme avant *)
-specialize (Hcs (√(2 * ε)))%L.
-assert (H : (0 < √(2 * ε))%L). {
-  apply (rl_sqrt_pos Hon Hos Hor).
-  apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  progress unfold rngl_max.
+  remember (1 ≤? 1 - ε)%L as e1 eqn:He1.
+  symmetry in He1.
+  destruct e1. {
+    apply rngl_leb_le in He1.
+    exfalso; apply (rngl_nlt_ge Hor) in He1.
+    apply He1; clear He1.
+    apply (rngl_lt_sub_lt_add_r Hop Hor).
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    now rewrite (rngl_sub_diag Hos).
+  }
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
 specialize (Hcs H); clear H.
 destruct Hcs as (N, HN).
@@ -5773,8 +5783,12 @@ apply angle_eucl_dist_lt_rngl_cos_lt in HN.
 rewrite (rngl_squ_sqrt Hon) in HN. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor).
   apply (rngl_0_le_2 Hon Hop Hor).
-  now apply (rngl_lt_le_incl Hor) in Hε.
+  apply (rngl_le_trans Hor _ 1). {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_le_max_l Hor).
 }
+...
 rewrite (rngl_mul_comm Hic) in HN.
 rewrite (rngl_mul_div Hi1) in HN. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).

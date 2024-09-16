@@ -731,7 +731,7 @@ rewrite H1 in H.
 apply H.
 Qed.
 
-Theorem rngl_le_iff_leb_iff :
+Theorem rngl_le_iff_leb_eq :
   ∀ a b c d,
   (a ≤ b ↔ c ≤ d)%L
   → ((a ≤? b) = (c ≤? d))%L.
@@ -2410,7 +2410,7 @@ Theorem rngl_leb_sub_0 :
 Proof.
 intros Hop Hor.
 intros.
-apply rngl_le_iff_leb_iff.
+apply rngl_le_iff_leb_eq.
 apply (rngl_le_sub_0 Hop Hor).
 Qed.
 
