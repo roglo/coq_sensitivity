@@ -5670,6 +5670,7 @@ Theorem rngl_is_Cauchy_angle_is_Cauchy_cos :
   → is_Cauchy_sequence rngl_dist (λ i, rngl_cos (θ i)).
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -5721,6 +5722,27 @@ destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
     apply rngl_leb_le in Hcpq.
     rewrite (rngl_opp_sub_distr Hop).
     rewrite angle_eucl_dist_is_sqrt in HN.
+    rewrite <- (rl_sqrt_1 Hic Hon Hop Hor Hid) in HN at 4.
+    apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in HN; cycle 1. {
+      apply (rngl_mul_nonneg_nonneg Hop Hor). {
+        apply (rngl_0_le_2 Hon Hop Hor).
+      }
+      apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+    } {
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    rewrite (rngl_mul_comm Hic) in HN.
+    apply (rngl_lt_div_r Hon Hop Hiv Hor) in HN. 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+    apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+    (* lemma to do : a - a / 2 = a / 2 *)
+    rewrite <- (rngl_div_diag Hon Hiq 2)%L in HN at 1. 2: {
+      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_div_sub_distr_r Hop Hiv) in HN.
+    rewrite (rngl_add_sub Hos) in HN.
 ... possible auss comme ça...
   apply (rngl_nle_gt Hor) in HN.
   apply (rngl_nle_gt Hor).
