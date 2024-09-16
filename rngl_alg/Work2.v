@@ -5634,6 +5634,52 @@ now apply Nat.mul_le_mono_r.
 Qed.
 *)
 
+Theorem rngl_cos_diff_le_eucl_dist :
+  ∀ θ1 θ2, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros.
+destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos θ2)) as [Hc12| Hc12]. {
+  apply (rngl_le_trans Hor _ 0); [ now apply (rngl_le_sub_0 Hop Hor) | ].
+  apply angle_eucl_dist_nonneg.
+}
+apply (rngl_nle_gt Hor) in Hc12.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite <- (rngl_abs_nonneg_eq  Hop Hor (_ - _)). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_lt_le_incl Hor) in Hc12.
+}
+rewrite <- (rl_sqrt_squ Hon Hop Hor).
+apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+  apply (rngl_squ_nonneg Hop Hor).
+}
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_1_r Hon).
+rewrite rngl_cos_sub.
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_sub_add_distr Hos).
+do 2 rewrite rngl_mul_assoc.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop).
+rewrite (rngl_mul_mul_swap Hic).
+apply (rngl_sub_le_mono_r Hop Hor).
+specialize (cos2_sin2_1 θ1) as H1.
+specialize (cos2_sin2_1 θ2) as H2.
+apply (rngl_add_move_r Hop) in H1, H2.
+rewrite H1, H2; clear H1 H2.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+apply (rngl_sub_le_mono_l Hop Hor).
+apply (rngl_le_0_sub Hop Hor).
+rewrite (rngl_mul_mul_swap Hic).
+rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_squ_sub Hop Hic Hon).
+apply (rngl_squ_nonneg Hop Hor).
+Qed.
+
 (* to be completed
 Theorem glop :
   rngl_is_archimedean T = true →
@@ -5752,32 +5798,11 @@ destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
    puisque ε>0
 specialize (Hcs √(2 * rngl_max 1 (1 - ε)))%L.
 *)
+Check rngl_cos_diff_le_eucl_dist.
+...
 specialize (Hcs √(2))%L.
 (* oui, mais si ça dépend pas de ε, c'est nul *)
 (* pfff... chais pas *)
-Theorem rngl_cos_diff_le_eucl_dist :
-  ∀ θ1 θ2, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros.
-destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos θ2)) as [Hc12| Hc12]. {
-  apply (rngl_le_trans Hor _ 0); [ now apply (rngl_le_sub_0 Hop Hor) | ].
-  apply angle_eucl_dist_nonneg.
-}
-apply (rngl_nle_gt Hor) in Hc12.
-rewrite angle_eucl_dist_is_sqrt.
-rewrite <- (rngl_abs_nonneg_eq  Hop Hor (_ - _)). 2: {
-  apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_lt_le_incl Hor) in Hc12.
-}
-rewrite <- (rl_sqrt_squ Hon Hop Hor).
-apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-  apply (rngl_squ_nonneg Hop Hor).
-}
-Search ((rngl_cos _ - rngl_cos _)²)%L.
-Search (_ ≤ _ * (1 - _))%L.
-(* possible, mais pas gagné *)
 ...
 progress unfold angle_eucl_dist.
 ...
