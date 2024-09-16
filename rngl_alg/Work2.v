@@ -5759,14 +5759,49 @@ intros Hco.
 progress unfold is_complete in Hco.
 progress unfold is_complete.
 intros u Hcs.
-Search (angle_eucl_dist _ _ < _)%L.
-Check angle_eucl_dist_is_sqrt.
-Print rngl_dist.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
 destruct H1 as (c, Hc).
+Search (is_limit_when_tending_to_inf).
+Theorem limit_interv :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ dist u a b c,
+  is_dist dist
+  → (∀ i, (a ≤ u i ≤ b)%L)
+  → is_limit_when_tending_to_inf dist u c
+  → (a ≤ c ≤ b)%L.
+Proof.
+intros Hop Hor.
+intros * Hd Hi Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+split. {
+  apply (rngl_nlt_ge Hor).
+  intros Hca.
+  specialize (Hlim (a - c))%L.
+  assert (H : (0 < a - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  apply (rngl_nle_gt Hor) in HN.
+  apply HN; clear HN.
+  apply (rngl_le_sub_le_add_l Hop Hor).
+(* ah, putain merde, ça marche pas *)
+... ...
+generalize Hc; intros H.
+apply (limit_interv _ _ (-1) 1)%L in H.
+...
 exists (rngl_acos c).
+intros ε Hε.
+specialize (Hc ε Hε).
+destruct Hc as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold angle_eucl_dist.
+rewrite rngl_cos_acos.
+rewrite rngl_sin_acos.
 ...
   angle_eucl_dist θ1 θ2 < ε
   → rngl_dist (rngl_cos θ1) (rngl_cos θ2) < ε
