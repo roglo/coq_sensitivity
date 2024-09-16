@@ -5701,8 +5701,17 @@ destruct (rngl_lt_dec Hor 2 ε) as [H2e| H2e]. {
 }
 apply (rngl_nlt_ge Hor) in H2e.
 (*4*)
-progress unfold is_Cauchy_sequence in Hcs.
+(*5*)
+destruct (rngl_le_dec Hor 1 ε) as [H1e| H1e]. {
 ...
+specialize (Hcs √(2 * (1 - ε)))%L.
+assert (H : (0 < √(2 * (1 - ε)))%L). {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_mul_pos_pos Hop Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_0_sub Hop Hor).
+...5
 (* mmm... ce √(2ε) n'a pas l'air de convenir, comme ε
    il faudrait plutôt que ça contienne un 1-ε, comme avant *)
 specialize (Hcs (√(2 * ε)))%L.
