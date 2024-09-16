@@ -5755,6 +5755,41 @@ specialize (Hcs √(2 * rngl_max 1 (1 - ε)))%L.
 specialize (Hcs √(2))%L.
 (* oui, mais si ça dépend pas de ε, c'est nul *)
 (* pfff... chais pas *)
+Theorem rngl_cos_diff_le_eucl_dist :
+  ∀ θ1 θ2, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros.
+destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos θ2)) as [Hc12| Hc12]. {
+  apply (rngl_le_trans Hor _ 0); [ now apply (rngl_le_sub_0 Hop Hor) | ].
+  apply angle_eucl_dist_nonneg.
+}
+apply (rngl_nle_gt Hor) in Hc12.
+rewrite angle_eucl_dist_is_sqrt.
+rewrite <- (rngl_abs_nonneg_eq  Hop Hor (_ - _)). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_lt_le_incl Hor) in Hc12.
+}
+rewrite <- (rl_sqrt_squ Hon Hop Hor).
+apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+  apply (rngl_squ_nonneg Hop Hor).
+}
+Search ((rngl_cos _ - rngl_cos _)²)%L.
+Search (_ ≤ _ * (1 - _))%L.
+(* possible, mais pas gagné *)
+...
+progress unfold angle_eucl_dist.
+...
+Search (_ ≤ angle_eucl_dist _ _)%L.
+angle_eucl_dist_le_cos_le:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T}
+    {rl : real_like_prop T},
+    angle_ctx T
+    → ∀ θ1 θ2 θ3 θ4 : angle T,
+        (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ3 θ4)%L
+        ↔ (rngl_cos (θ4 - θ3) ≤ rngl_cos (θ2 - θ1))%L
+Search (_ < angle_eucl_dist _ _)%L.
 ...
 assert (H : (0 < √(2 * rngl_max 1 (1 - ε)))%L). {
   apply (rl_sqrt_pos Hon Hos Hor).
