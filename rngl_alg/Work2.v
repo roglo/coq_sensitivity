@@ -5764,8 +5764,8 @@ specialize (Hco (λ i, rngl_cos (u i))) as H1.
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in Hcs.
 specialize (H1 Hcs).
 destruct H1 as (c, Hc).
-generalize Hc; intros H.
-apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in H. 2: {
+generalize Hc; intros Hci.
+apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
   intros; apply rngl_cos_bound.
 }
 exists (rngl_acos c).
@@ -5776,29 +5776,27 @@ exists N.
 intros n Hn.
 specialize (HN n Hn).
 progress unfold angle_eucl_dist.
+(*
 rewrite rngl_cos_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
+*)
+remember (rngl_acos c) as θ eqn:Hθ.
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_le_0_sub Hop Hor).
-  now apply (rngl_squ_le_1 Hon Hop Hor).
-}
 rewrite rngl_add_assoc.
-do 2 rewrite (rngl_add_sub_assoc Hop).
-do 2 rewrite <- (rngl_sub_sub_distr Hop c²)%L.
-rewrite (rngl_sub_sub_swap Hop c²)%L.
-rewrite (rngl_sub_diag Hos).
-rewrite (rngl_sub_0_l Hop).
-rewrite (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_sub_distr Hop).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite <- rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_assoc _ (rngl_cos _)²)%L.
 rewrite cos2_sin2_1.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_add_swap.
 rewrite <- (rngl_add_sub_swap Hop).
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
 do 2 rewrite <- rngl_mul_assoc.
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
-(* mouais, chais pas *)
+rewrite <- (rngl_sub_add_distr Hos).
+rewrite <- rngl_cos_sub.
+(* mouais, faut voir *)
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
 }
