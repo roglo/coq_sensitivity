@@ -22,7 +22,7 @@ Definition angle_ring_like_op : ring_like_op (angle T) :=
      rngl_opt_opp_or_subt := Some (inl angle_opp);
      rngl_opt_inv_or_quot := None;
      rngl_opt_eq_dec := Some (angle_eq_dec);
-     rngl_opt_leb := None (* fails on add_le_compat *) |}.
+     rngl_opt_leb := None (* no order: fails on add_le_compat *) |}.
 
 (*
 Canonical Structure angle_ring_like_op.
