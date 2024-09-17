@@ -5756,6 +5756,16 @@ Theorem rngl_is_complete_angle_is_complete :
   → is_complete (angle T) angle_eucl_dist.
 Proof.
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros Hco u Hu.
+  exists 0%A.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros Hco.
 progress unfold is_complete in Hco.
 progress unfold is_complete.
@@ -5781,6 +5791,9 @@ rewrite rngl_cos_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
 *)
 remember (rngl_acos c) as θ eqn:Hθ.
+specialize rngl_cos_diff_le_eucl_dist as H1.
+specialize (H1 θ (u n)).
+rewrite angle_eucl_dist_is_sqrt in H1.
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
@@ -5796,6 +5809,40 @@ rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite <- (rngl_sub_add_distr Hos).
 rewrite <- rngl_cos_sub.
+progress unfold rngl_dist in HN.
+rewrite <- (rngl_cos_acos c) in HN; [ | easy ].
+rewrite <- Hθ in HN.
+eapply (rngl_lt_trans Hor); [ | apply HN ].
+rewrite rngl_cos_sub_comm.
+rewrite (rngl_abs_sub_comm Hop Hor).
+(* grave ! le truc est à l'envers *)
+...
+destruct (angle_eq_dec θ (u n)) as [Htu| Htu]. {
+  rewrite Htu, angle_sub_diag, (rngl_sub_diag Hos).
+  rewrite (rngl_mul_0_r Hos).
+  now rewrite (rl_sqrt_0 Hon Hop Hic Hor Hid).
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+progress unfold rngl_dist in HN.
+specialize rngl_cos_diff_le_eucl_dist as H1.
+specialize (H1 θ (u n)).
+rewrite angle_eucl_dist_is_sqrt in H1.
+...
+rngl_cos_diff_le_eucl_dist : ∀ θ1 θ2 : angle T, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L
 (* mouais, faut voir *)
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
