@@ -6177,6 +6177,61 @@ apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H2; [ easy | ].
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem rngl_limit_interv :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ u a b c,
+  (∀ i, (a ≤ u i ≤ b)%L)
+  → is_limit_when_tending_to_inf rngl_dist u c
+  → (a ≤ c ≤ b)%L.
+Proof.
+intros Hop Hor.
+intros * Hi Hlim.
+progress unfold is_limit_when_tending_to_inf in Hlim.
+split. {
+  apply (rngl_nlt_ge Hor).
+  intros Hca.
+  specialize (Hlim (a - c))%L.
+  assert (H : (0 < a - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  specialize (Hi N).
+  specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
+  specialize (H1 (u N) a c).
+  progress unfold rngl_dist in HN.
+  progress unfold rngl_dist in H1.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_le_trans Hor _ a); [ | apply Hi ].
+    now apply (rngl_lt_le_incl Hor) in Hca.
+  }
+  apply (rngl_sub_lt_mono_r Hop Hor) in HN.
+  now apply (rngl_nle_gt Hor) in HN.
+} {
+  apply (rngl_nlt_ge Hor).
+  intros Hbc.
+  specialize (Hlim (c - b))%L.
+  assert (H : (0 < c - b)%L) by now apply (rngl_lt_0_sub Hop Hor).
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  specialize (Hi N).
+  specialize (is_dist_triangular _ (rngl_dist_is_dist Hop Hor)) as H1.
+  specialize (H1 (u N) b c).
+  progress unfold rngl_dist in HN.
+  progress unfold rngl_dist in H1.
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
+    apply (rngl_le_sub_0 Hop Hor).
+    apply (rngl_le_trans Hor _ b); [ apply Hi | ].
+    now apply (rngl_lt_le_incl Hor) in Hbc.
+  }
+  rewrite (rngl_opp_sub_distr Hop) in HN.
+  apply (rngl_sub_lt_mono_l Hop Hor) in HN.
+  now apply (rngl_nle_gt Hor) in HN.
+}
+Qed.
+
 Theorem limit_unique :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
