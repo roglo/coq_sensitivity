@@ -5778,7 +5778,27 @@ specialize (HN n Hn).
 progress unfold angle_eucl_dist.
 rewrite rngl_cos_acos; [ | easy ].
 rewrite rngl_sin_acos; [ | easy ].
-(* bon, bin, faut développer le truc, hein *)
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  now apply (rngl_squ_le_1 Hon Hop Hor).
+}
+rewrite rngl_add_assoc.
+do 2 rewrite (rngl_add_sub_assoc Hop).
+do 2 rewrite <- (rngl_sub_sub_distr Hop c²)%L.
+rewrite (rngl_sub_sub_swap Hop c²)%L.
+rewrite (rngl_sub_diag Hos).
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop).
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+(* mouais, chais pas *)
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
 }
