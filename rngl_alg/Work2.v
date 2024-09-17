@@ -5779,15 +5779,18 @@ progress unfold is_limit_when_tending_to_inf in Hlim.
 split. {
   apply (rngl_nlt_ge Hor).
   intros Hca.
-  specialize (Hlim (a - c))%L.
-  assert (H : (0 < a - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
+...
+  specialize (Hlim (dist a c)).
+  assert (H : (0 < dist a c)%L) by ...
   specialize (Hlim H); clear H.
   destruct Hlim as (N, HN).
   specialize (HN N (Nat.le_refl _)).
   apply (rngl_nle_gt Hor) in HN.
   apply HN; clear HN.
-  apply (rngl_le_sub_le_add_l Hop Hor).
-(* ah, putain merde, ça marche pas *)
+  specialize (is_dist_triangular dist Hd) as H1.
+  eapply (rngl_le_trans Hor). {
+    apply (H1 _ (u N)).
+  }
 ... ...
 generalize Hc; intros H.
 apply (limit_interv _ _ (-1) 1)%L in H.
