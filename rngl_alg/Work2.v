@@ -5780,6 +5780,7 @@ apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
 }
 exists (rngl_acos c).
 intros ε Hε.
+...
 specialize (Hc ε Hε).
 destruct Hc as (N, HN).
 exists N.
