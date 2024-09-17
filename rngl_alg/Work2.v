@@ -5739,6 +5739,84 @@ destruct (rngl_le_dec Hor (rngl_cos (θ q)) (rngl_cos (θ p))) as [Hpq| Hpq]. {
 }
 Qed.
 
+(* essai de faire une espèce d'anneau des angles, en définissant une
+   multiplication bidon qui renvoie toujours 0 *)
+(* to be completed
+
+Definition angle_phony_mul (θ1 θ2 : angle T) := 0%A.
+
+Definition angle_ring_like_op : ring_like_op (angle T) :=
+  {| rngl_zero := 0%A;
+     rngl_add := angle_add;
+     rngl_mul := angle_phony_mul;
+     rngl_opt_one := None;
+     rngl_opt_opp_or_subt := Some (inl angle_opp);
+     rngl_opt_inv_or_quot := None;
+     rngl_opt_eq_dec := Some (angle_eq_dec);
+     rngl_opt_leb := None |}.
+
+(*
+Canonical Structure angle_ring_like_op.
+*)
+
+Theorem rngl_angle_add_comm :
+  let rom := angle_ring_like_op in
+  ∀ (θ1 θ2 : angle T), (θ1 + θ2)%L = (θ2 + θ1)%L.
+Proof.
+apply angle_add_comm.
+Qed.
+
+Theorem angle_opt_le_dec : True. easy. Qed.
+Theorem angle_opt_integral : True. easy. Qed.
+Theorem angle_opt_characteristic_prop : True. easy. Qed.
+Theorem angle_opt_le_refl : True. easy. Qed.
+Theorem angle_opt_le_antisymm : True. easy. Qed.
+Theorem angle_opt_le_trans : True. easy. Qed.
+Theorem angle_opt_add_le_compat : True. easy. Qed.
+Theorem angle_opt_mul_le_compat_nonneg : True. easy. Qed.
+Theorem angle_opt_mul_le_compat_nonpos : True. easy. Qed.
+Theorem angle_opt_not_le : True. easy. Qed.
+Theorem angle_opt_archimedean : True. easy. Qed.
+
+Definition angle_ring_like_prop :
+  let rom := angle_ring_like_op in
+  ring_like_prop (angle T) :=
+  {| rngl_mul_is_comm := true;
+     rngl_is_integral_domain := true;
+     rngl_is_archimedean := true;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := 0;
+     rngl_add_comm := rngl_angle_add_comm;
+     rngl_add_assoc := ...
+     rngl_add_0_l := Z.add_0_l;
+     rngl_mul_assoc := Z.mul_assoc;
+     rngl_opt_mul_1_l := Z.mul_1_l;
+     rngl_mul_add_distr_l := Z.mul_add_distr_l;
+     rngl_opt_mul_comm := Z.mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_diag_l := Z.add_opp_diag_l;
+     rngl_opt_add_sub := NA;
+     rngl_opt_sub_add_distr := NA;
+     rngl_opt_mul_inv_diag_l := NA;
+     rngl_opt_mul_inv_diag_r := NA;
+     rngl_opt_mul_div := Z.quot_mul;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_le_dec := angle_opt_le_dec;
+     rngl_opt_integral := angle_opt_integral;
+     rngl_opt_alg_closed := NA;
+     rngl_opt_characteristic_prop := angle_opt_characteristic_prop;
+     rngl_opt_le_refl := angle_opt_le_refl;
+     rngl_opt_le_antisymm := angle_opt_le_antisymm;
+     rngl_opt_le_trans := angle_opt_le_trans;
+     rngl_opt_add_le_compat := angle_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := angle_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := angle_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat_non_opp := NA;
+     rngl_opt_not_le := angle_opt_not_le;
+     rngl_opt_archimedean := angle_opt_archimedean |}.
+*)
+
 (* to be completed
 Theorem glop :
   rngl_is_archimedean T = true →
