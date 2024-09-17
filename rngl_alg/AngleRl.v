@@ -1,5 +1,4 @@
-(* RingLike on angles by defining a phony multiplication always
-   returning 0 *)
+(* RingLike on angles *)
 
 Require Import Utf8.
 Require Import Main.RingLike.
@@ -11,6 +10,9 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
+
+(* RingLike on angles by defining a phony multiplication always
+   returning 0; no order because not compatible with addition *)
 
 Definition angle_phony_mul (θ1 θ2 : angle T) := 0%A.
 
