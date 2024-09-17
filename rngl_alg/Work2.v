@@ -5780,6 +5780,65 @@ apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
 }
 exists (rngl_acos c).
 intros ε Hε.
+specialize (Hc (rngl_min 1 ε)).
+assert (H : (0 < rngl_min 1 ε)%L) by admit.
+specialize (Hc H); clear H.
+destruct Hc as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+rewrite angle_eucl_dist_is_sqrt.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε). 2: {
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+apply (rngl_lt_sub_lt_add_l Hop Hor).
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+(**)
+rewrite <- (rngl_cos_acos c) in HN; [ | easy ].
+remember (rngl_acos c) as θ eqn:Hθ.
+...
+(* je pense que rngl_cos_diff_le_eucl_dist ne
+   sert à rien
+specialize rngl_cos_diff_le_eucl_dist as H1.
+specialize (H1 θ (u n)).
+rewrite angle_eucl_dist_is_sqrt in H1.
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold rngl_dist in H1.
+specialize (H1 (ε² / 2))%L.
+...
+*)
+do 2 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite rngl_add_assoc.
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_assoc _ (rngl_cos _)²)%L.
+rewrite cos2_sin2_1.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+rewrite <- rngl_cos_sub.
+progress unfold rngl_dist in HN.
+rewrite <- (rngl_cos_acos c) in HN; [ | easy ].
+rewrite <- Hθ in HN.
+eapply (rngl_lt_trans Hor); [ | apply HN ].
+rewrite rngl_cos_sub_comm.
+rewrite (rngl_abs_sub_comm Hop Hor).
 ...
 specialize (Hc ε Hε).
 destruct Hc as (N, HN).
