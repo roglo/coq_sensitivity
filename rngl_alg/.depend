@@ -1,64 +1,33 @@
-AngleAddLeMonoL.vio: AngleAddLeMonoL.v ../main/RingLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleLeSubAdd.vio AngleAddOverflowLe.vio TacChangeAngle.vio AngleAddOverflowEquiv3.vio
 AngleAddLeMonoL.vo AngleAddLeMonoL.glob AngleAddLeMonoL.v.beautified AngleAddLeMonoL.required_vo: AngleAddLeMonoL.v ../main/RingLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleLeSubAdd.vo AngleAddOverflowLe.vo TacChangeAngle.vo AngleAddOverflowEquiv3.vo
-AngleAddOverflowEquiv.vio: AngleAddOverflowEquiv.v ../main/RingLike.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddOverflowLe.vio AngleAddLeMonoL.vio AngleLeSubAdd.vio AngleDiv2Add.vio TacChangeAngle.vio
 AngleAddOverflowEquiv.vo AngleAddOverflowEquiv.glob AngleAddOverflowEquiv.v.beautified AngleAddOverflowEquiv.required_vo: AngleAddOverflowEquiv.v ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleLeSubAdd.vo AngleDiv2Add.vo TacChangeAngle.vo
-AngleAddOverflowEquiv3.vio: AngleAddOverflowEquiv3.v ../main/RingLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleLeSubAdd.vio TacChangeAngle.vio
 AngleAddOverflowEquiv3.vo AngleAddOverflowEquiv3.glob AngleAddOverflowEquiv3.v.beautified AngleAddOverflowEquiv3.required_vo: AngleAddOverflowEquiv3.v ../main/RingLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleLeSubAdd.vo TacChangeAngle.vo
-AngleAddOverflowLe.vio: AngleAddOverflowLe.v ../main/RingLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleLeSubAdd.vio AngleAddOverflowEquiv3.vio TacChangeAngle.vio
 AngleAddOverflowLe.vo AngleAddOverflowLe.glob AngleAddOverflowLe.v.beautified AngleAddOverflowLe.required_vo: AngleAddOverflowLe.v ../main/RingLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleLeSubAdd.vo AngleAddOverflowEquiv3.vo TacChangeAngle.vo
-AngleDiv2Add.vio: AngleDiv2Add.v ../main/RingLike.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddOverflowLe.vio TacChangeAngle.vio
 AngleDiv2Add.vo AngleDiv2Add.glob AngleDiv2Add.v.beautified AngleDiv2Add.required_vo: AngleDiv2Add.v ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo TacChangeAngle.vo
-AngleEuclDistLtAngleLtLt.vio: AngleEuclDistLtAngleLtLt.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddLeMonoL.vio AngleAddOverflowLe.vio AngleDiv2Add.vio Complex.vio TacChangeAngle.vio
 AngleEuclDistLtAngleLtLt.vo AngleEuclDistLtAngleLtLt.glob AngleEuclDistLtAngleLtLt.v.beautified AngleEuclDistLtAngleLtLt.required_vo: AngleEuclDistLtAngleLtLt.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddLeMonoL.vo AngleAddOverflowLe.vo AngleDiv2Add.vo Complex.vo TacChangeAngle.vo
-AngleLeSubAdd.vio: AngleLeSubAdd.v ../main/RingLike.vio TrigoWithoutPi.vio TacChangeAngle.vio
 AngleLeSubAdd.vo AngleLeSubAdd.glob AngleLeSubAdd.v.beautified AngleLeSubAdd.required_vo: AngleLeSubAdd.v ../main/RingLike.vo TrigoWithoutPi.vo TacChangeAngle.vo
-Complex.vio: Complex.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio Misc.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddOverflowLe.vio AngleAddLeMonoL.vio AngleDiv2Add.vio TacChangeAngle.vio
+AngleRl.vo AngleRl.glob AngleRl.v.beautified AngleRl.required_vo: AngleRl.v ../main/RingLike.vo TrigoWithoutPi.vo
 Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleDiv2Add.vo TacChangeAngle.vo
-FermatLittle.vio: FermatLittle.v ../main/Misc.vio ../main/PermutationFun.vio Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
-GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
-GaussIntRl.vio: GaussIntRl.v ../main/RingLike.vio
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v ../main/RingLike.vo
-Ideal.vio: Ideal.v ../main/Misc.vio ../main/RingLike.vio
 Ideal.vo Ideal.glob Ideal.v.beautified Ideal.required_vo: Ideal.v ../main/Misc.vo ../main/RingLike.vo
-IntermVal.vio: IntermVal.v ../main/Misc.vio ../main/RingLike.vio
 IntermVal.vo IntermVal.glob IntermVal.v.beautified IntermVal.required_vo: IntermVal.v ../main/Misc.vo ../main/RingLike.vo
-MatRl.vio: MatRl.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio ../main/Matrix.vio
 MatRl.vo MatRl.glob MatRl.v.beautified MatRl.required_vo: MatRl.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/Matrix.vo
-Misc.vio: Misc.v ../main/Misc.vio ../main/PermutationFun.vio
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v ../main/Misc.vo ../main/PermutationFun.vo
-Nat_ggcd.vio: Nat_ggcd.v ../main/Misc.vio Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../main/Misc.vo Misc.vo
-NewtonBinomial.vio: NewtonBinomial.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio Misc.vio
 NewtonBinomial.vo NewtonBinomial.glob NewtonBinomial.v.beautified NewtonBinomial.required_vo: NewtonBinomial.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo
-Nrl.vio: Nrl.v ../main/Misc.vio Misc.vio FermatLittle.vio ../main/RingLike.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo Misc.vo FermatLittle.vo ../main/RingLike.vo
-PQ.vio: PQ.v ../main/Misc.vio Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../main/Misc.vo Misc.vo Nat_ggcd.vo
-QG.vio: QG.v ../main/Misc.vio ../main/RingLike.vio
 QG.vo QG.glob QG.v.beautified QG.required_vo: QG.v ../main/Misc.vo ../main/RingLike.vo
-Qrl.vio: Qrl.v ../main/RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v ../main/RingLike.vo Rational.vo
-QuadIntRl.vio: QuadIntRl.v ../main/Misc.vio ../main/RingLike.vio Misc.vio
 QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v ../main/Misc.vo ../main/RingLike.vo Misc.vo
-Quaternion.vio: Quaternion.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio ../main/MyVector.vio Zrl.vio
 Quaternion.vo Quaternion.glob Quaternion.v.beautified Quaternion.required_vo: Quaternion.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo ../main/MyVector.vo Zrl.vo
-Rational.vio: Rational.v ../main/Misc.vio Misc.vio GQ.vio
 Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v ../main/Misc.vo Misc.vo GQ.vo
-RealLike.vio: RealLike.v ../main/RingLike.vio
 RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v ../main/RingLike.vo
-Rrl.vio: Rrl.v ../main/RingLike.vio
 Rrl.vo Rrl.glob Rrl.v.beautified Rrl.required_vo: Rrl.v ../main/RingLike.vo
-TacChangeAngle.vio: TacChangeAngle.v ../main/RingLike.vio TrigoWithoutPi.vio
 TacChangeAngle.vo TacChangeAngle.glob TacChangeAngle.v.beautified TacChangeAngle.required_vo: TacChangeAngle.v ../main/RingLike.vo TrigoWithoutPi.vo
-TrigoWithoutPi.vio: TrigoWithoutPi.v ../main/Misc.vio ../main/RingLike.vio RealLike.vio
 TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo
-TrigoWithoutPiExt.vio: TrigoWithoutPiExt.v ../main/RingLike.vio TrigoWithoutPi.vio AngleLeSubAdd.vio RealLike.vio TacChangeAngle.vio
 TrigoWithoutPiExt.vo TrigoWithoutPiExt.glob TrigoWithoutPiExt.v.beautified TrigoWithoutPiExt.required_vo: TrigoWithoutPiExt.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo RealLike.vo TacChangeAngle.vo
-Work.vio: Work.v ../main/Misc.vio ../main/RingLike.vio ../main/IterAdd.vio Misc.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddOverflowLe.vio AngleAddLeMonoL.vio AngleLeSubAdd.vio AngleDiv2Add.vio TacChangeAngle.vio Complex.vio NewtonBinomial.vio AngleAddOverflowEquiv.vio AngleAddOverflowEquiv3.vio
 Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleLeSubAdd.vo AngleDiv2Add.vo TacChangeAngle.vo Complex.vo NewtonBinomial.vo AngleAddOverflowEquiv.vo AngleAddOverflowEquiv3.vo
-Work2.vio: Work2.v ../main/Misc.vio ../main/RingLike.vio Misc.vio RealLike.vio TrigoWithoutPi.vio TrigoWithoutPiExt.vio AngleAddLeMonoL.vio AngleAddOverflowLe.vio AngleDiv2Add.vio AngleEuclDistLtAngleLtLt.vio AngleAddOverflowEquiv3.vio Complex.vio Work.vio TacChangeAngle.vio
 Work2.vo Work2.glob Work2.v.beautified Work2.required_vo: Work2.v ../main/Misc.vo ../main/RingLike.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddLeMonoL.vo AngleAddOverflowLe.vo AngleDiv2Add.vo AngleEuclDistLtAngleLtLt.vo AngleAddOverflowEquiv3.vo Complex.vo Work.vo TacChangeAngle.vo
-Zrl.vio: Zrl.v ../main/RingLike.vio
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v ../main/RingLike.vo
