@@ -3923,6 +3923,7 @@ Theorem rngl_is_complete_angle_is_complete :
   → is_complete (angle T) angle_eucl_dist.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -3938,31 +3939,95 @@ progress unfold is_complete in Hco.
 progress unfold is_complete.
 intros u Hcs.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
-specialize (Hco (λ i, rngl_sin (u i))) as H2.
 generalize Hcs; intros H.
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in H.
 specialize (H1 H); clear H.
-generalize Hcs; intros H.
-apply rngl_is_Cauchy_angle_is_Cauchy_sin in H.
-specialize (H2 H); clear H.
 destruct H1 as (c, Hc).
-destruct H2 as (s, Hs).
-move s before c.
 generalize Hc; intros Hci.
 apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
   intros; apply rngl_cos_bound.
 }
+rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
+remember (rngl_acos c) as θ eqn:Hθ.
+Theorem limit_cos_cos_limit_sin_sin :
+  ∀ θ θ',
+  is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (θ i)) (rngl_cos θ')
+  → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (θ i))
+      (rngl_sin θ').
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros * Hc.
+intros ε Hε.
+specialize (Hc ε Hε).
+destruct Hc as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+(*
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε) in HN. 2: {
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in HN.
+rewrite (rngl_squ_sub Hop Hic Hon) in HN.
+specialize (cos2_sin2_1 (θ n)) as H.
+apply (rngl_add_move_r Hop) in H.
+rewrite H in HN; clear H.
+specialize (cos2_sin2_1 θ') as H.
+apply (rngl_add_move_r Hop) in H.
+rewrite H in HN; clear H.
+*)
+Search (rngl_sin _ - rngl_sin _)%L.
+(* pfff... j'en sais rien, chais pas si c'est mieux *)
+...
+rngl_cos_sub_rngl_cos:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
+    {rl : real_like_prop T} {ac : angle_ctx T} (p q : angle T),
+    (rngl_cos p - rngl_cos q)%L =
+    (- (2 * rngl_sin (p /₂ + q /₂) * rngl_sin (p /₂ - q /₂)))%L
+rngl_sin_sub_rngl_sin:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
+    {rl : real_like_prop T} {ac : angle_ctx T} (p q : angle T),
+    (rngl_sin p - rngl_sin q)%L =
+    (2 * rngl_cos (p /₂ + q /₂) * rngl_sin (p /₂ - q /₂))%L
+...
+apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+rewrite (rngl_squ_sub Hop Hic Hon).
+...
+generalize Hc; intros Hs.
+move Hs before Hc.
+apply limit_cos_cos_limit_sin_sin in Hs.
+...
+specialize (Hco (λ i, rngl_sin (u i))) as H2.
+generalize Hcs; intros H.
+apply rngl_is_Cauchy_angle_is_Cauchy_sin in H.
+specialize (H2 H); clear H.
+destruct H2 as (s, Hs).
+move s before c.
 generalize Hs; intros Hsi.
 apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hsi. 2: {
   intros; apply rngl_sin_bound.
 }
 exists (rngl_acos c).
-rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
-remember (rngl_acos c) as θ eqn:Hθ.
+replace s with (rngl_sin θ) in Hc. 2: {
+  rewrite Hθ.
+  rewrite rngl_sin_acos.
+...
 intros ε Hε.
 (**)
-specialize (Hc ε Hε).
-specialize (Hs ε Hε).
+specialize (Hc (ε * √2))%L.
+specialize (Hs (ε * √2))%L.
+assert (H : (0 < ε * √2)%L). {
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+specialize (Hc H).
+specialize (Hs H).
 destruct Hc as (Nc, Hnc).
 destruct Hs as (Ns, Hns).
 exists (max Nc Ns).
