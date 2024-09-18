@@ -3960,6 +3960,14 @@ exists (rngl_acos c).
 rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
 remember (rngl_acos c) as θ eqn:Hθ.
 intros ε Hε.
+(**)
+specialize (Hc ε Hε).
+specialize (Hs ε Hε).
+destruct Hc as (Nc, Hnc).
+destruct Hs as (Ns, Hns).
+exists (max Nc Ns).
+intros n Hn.
+progress unfold angle_eucl_dist.
 ...
 progress unfold is_limit_when_tending_to_inf in Hc.
 specialize (Hc (rngl_min 1 ε)).
