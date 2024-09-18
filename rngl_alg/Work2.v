@@ -3955,6 +3955,38 @@ Theorem limit_cos_cos_limit_sin_sin :
   → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (θ i))
       (rngl_sin θ').
 Proof.
+(**)
+intros * Hc.
+Theorem rngl_limit_limit_squ :
+  rngl_has_opp T = true →
+  rngl_mul_is_comm T = true →
+  rngl_is_ordered T = true →
+  ∀ u l,
+  is_limit_when_tending_to_inf rngl_dist u l
+  → is_limit_when_tending_to_inf rngl_dist (λ i, (u i)²)%L l²%L.
+Proof.
+intros Hop Hic Hor.
+intros * Hu.
+intros ε Hε.
+specialize (Hu ε Hε).
+destruct Hu as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+destruct (rngl_le_dec Hor (u n) l) as [Hul| Hul]. {
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
+    now apply (rngl_le_sub_0 Hop Hor).
+  }
+  rewrite (rngl_opp_sub_distr Hop) in HN.
+(* ah, fait chier, faut encore réfléchir *)
+...
+rewrite (rngl_squ_sub_squ Hop Hic).
+...
+generalize Hc; intros Hc2.
+apply rngl_limit_limit_squ in Hc2.
+...
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
