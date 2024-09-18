@@ -4121,8 +4121,8 @@ Theorem limit_cos_cos_limit_sin_sin :
   → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (θ i))
       (rngl_sin θ').
 Proof.
-(**)
 destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hc.
 specialize (rngl_limit_limit_squ Hon Hop Hic Hiv Hor _ _ Hc) as H1.
 cbn in H1.
@@ -4136,7 +4136,39 @@ specialize (cos2_sin2_1 θ') as H2.
 apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
-Check rngl_limit_limit_squ.
+intros ε Hε.
+specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
+assert (H : (0 < 2 * ε)%L) by admit.
+specialize (H1 H); clear H.
+destruct H1 as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+rewrite (rngl_squ_sub_squ Hop Hic) in HN.
+rewrite (rngl_abs_mul Hop Hi1 Hor) in HN.
+Search (_ * _ < _ * _)%L.
+eapply (rngl_lt_le_trans Hor). 2: {
+  specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+  remember (rngl_abs (rngl_sin (θ n) - rngl_sin θ')) as a eqn:Ha.
+Search (_ * _ ≤ _ * _)%L.
+Check rngl_mul_le_mono_pos_l.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ a)%L.
+  admit.
+  rewrite (rngl_mul_comm Hic).
+  eapply (rngl_le_trans Hor).
+  apply (rngl_lt_le_incl Hor) in HN.
+  apply HN.
+(* bon, c'est la merde, il faut que je réfléchisse *)
+...
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). 2: {
+
+...
+  apply (rngl_le_refl Hor).
+}
+Check rngl_mul_lt_mono_pos_l.
+  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii a).
 ...
 easy.
 remember (u n + l ≤? 0)%L as ul eqn:Hul.
