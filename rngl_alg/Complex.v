@@ -216,9 +216,23 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_add_le_sub_r Hop Hor).
   now rewrite rngl_add_0_l.
 }
-rewrite (rngl_add_sub_assoc Hop).
 rewrite rngl_add_comm.
-apply (rngl_add_sub Hos).
+apply (rngl_sub_add Hop).
+Qed.
+
+Theorem rngl_asin_prop :
+  ∀ x, (x² ≤ 1)%L → cos2_sin2_prop √(1 - x²)%L x.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold cos2_sin2_prop.
+rewrite Hon, Hop, Hic, Hed; cbn.
+apply (rngl_eqb_eq Hed).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  now rewrite rngl_add_0_l.
+}
+apply (rngl_sub_add Hop).
 Qed.
 
 Definition rngl_acos (x : T) :=
@@ -230,7 +244,17 @@ Definition rngl_acos (x : T) :=
       angle_zero
   end.
 
+Definition rngl_asin (x : T) :=
+  match (rngl_le_dec ac_or x² 1)%L with
+  | left Hx1 =>
+      {| rngl_cos := √(1 - x²)%L; rngl_sin := x;
+         rngl_cos2_sin2 := rngl_asin_prop x Hx1 |}
+  | _ =>
+      angle_zero
+  end.
+
 Arguments rngl_acos x%_L.
+Arguments rngl_asin x%_L.
 
 Theorem rngl_squ_le_1 :
   rngl_has_1 T = true →

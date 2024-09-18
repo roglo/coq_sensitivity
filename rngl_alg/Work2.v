@@ -4137,6 +4137,24 @@ apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 intros ε Hε.
+(* conseil de chatgpt : il faut utiliser la continuité de la
+   fonction sinus ; ah bon. Bon, je vais essayer de la prouver,
+   tiens, à titre d'exercice *)
+
+Definition rngl_continuity_at_point {A} dist (f : A → T) (a : A) :=
+  ∀ ε, (0 < ε)%L →
+  ∃ η, (0 < η → ∀ x, dist x a < η → rngl_dist (f x) (f a) < ε)%L.
+
+Definition rngl_continuity {A} dist (f : A → T) :=
+  ∀ a, rngl_continuity_at_point dist f a.
+
+Theorem rngl_sin_is_continuous : rngl_continuity angle_eucl_dist rngl_sin.
+Proof.
+intros a ε Hε.
+Check rngl_acos.
+About rngl_acos.
+exists (rngl_asin ε).
+intros _ x Hxa.
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...
