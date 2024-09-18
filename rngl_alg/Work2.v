@@ -3964,6 +3964,26 @@ destruct ul. {
 now apply (rngl_le_sub_le_add_l Hop Hor) in HN.
 Qed.
 
+Theorem rngl_converging_seq_add_limit_bounded :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ u k,
+  is_limit_when_tending_to_inf rngl_dist u k
+  → ∃ N, ∀ n, N ≤ n → (u n + k ≤ 2 * k + 1)%L.
+Proof.
+intros Hon Hop Hor.
+intros * Hlim.
+apply (rngl_converging_seq_bounded Hon Hop Hor) in Hlim.
+destruct Hlim as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+rewrite <- (rngl_add_diag Hon).
+rewrite rngl_add_comm, <- rngl_add_assoc.
+now apply (rngl_add_le_mono_l Hop Hor).
+Qed.
+
 (* to be completed
 Theorem glop :
   rngl_is_archimedean T = true →
@@ -4019,14 +4039,16 @@ Theorem rngl_limit_limit_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
-  rngl_has_inv_and_1_or_quot T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist u l
   → is_limit_when_tending_to_inf rngl_dist (λ i, (u i)²)%L l²%L.
 Proof.
-intros Hon Hop Hic Hiq Hor.
+intros Hon Hop Hic Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hu.
@@ -4035,28 +4057,80 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hu.
+(*
 specialize (rngl_dist_to_limit_bounded Hon Hop Hor _ _ Hu) as H1.
+*)
+specialize (rngl_converging_seq_add_limit_bounded Hon Hop Hor _ _ Hu) as H2.
+(*
 progress unfold rngl_dist in H1.
+*)
 intros ε Hε.
-specialize (Hu ε Hε).
-destruct Hu as (N, HN).
-exists N.
+specialize (Hu (ε / (2 * rngl_abs l + 1)))%L.
+assert (H : (0 < ε / (2 * rngl_abs l + 1))%L) by admit.
+specialize (Hu H); clear H.
+progress unfold rngl_dist in Hu.
+destruct Hu as (N1, HN1).
+destruct H2 as (N2, HN2).
+exists (max N1 N2).
 intros n Hn.
-specialize (HN n Hn).
-progress unfold rngl_dist in HN.
+assert (H : N1 ≤ n). {
+  eapply Nat.le_trans; [ | apply Hn ].
+  apply Nat.le_max_l.
+}
+specialize (HN1 _ H); clear H.
+assert (H : N2 ≤ n). {
+  eapply Nat.le_trans; [ | apply Hn ].
+  apply Nat.le_max_r.
+}
+specialize (HN2 _ H); clear H.
 progress unfold rngl_dist.
 rewrite (rngl_squ_sub_squ Hop Hic).
-rewrite (rngl_abs_mul Hop Hiq Hor).
+rewrite (rngl_abs_mul Hop Hi1 Hor).
+eapply (rngl_le_lt_trans Hor). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  apply (rngl_lt_le_incl Hor) in HN1.
+  apply HN1.
+}
+rewrite (rngl_mul_div_assoc Hiv).
+apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+  apply (rngl_lt_le_trans Hor _ 1). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_add_l Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+}
+rewrite (rngl_mul_comm Hic).
+apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+remember (u n + l ≤? 0)%L as ul eqn:Hul.
+symmetry in Hul.
+destruct ul. {
+  apply rngl_leb_le in Hul.
+(* bon, fait chier *)
+...
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  apply (rngl_le_lt_trans Hor _ 0). {
+    apply (rngl_opp_nonpos_nonneg Hop Hor).
+    apply rngl_
+Search (- _ ≤ 0)%L.
+eapply (rngl_le_lt_trans Hor). {
+
+...
+apply (rngl_le_lt_trans Hor _ ((2 * l + 1) * rngl_abs (u n - l)))%L.
+). {
+eapply (rngl_le_lt_trans Hor). {
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  apply (rngl_lt_le_incl Hor) in HN1.
+  apply HN1.
+}
+..
 apply (rngl_le_lt_trans Hor _ (rngl_abs (u n - l))); [ | easy ].
 rewrite <- (rngl_mul_1_l Hon).
-Inspect 1.
-Theorem rngl_converging_seq_add_limit_bounded :
-  ∀ u k,
-  is_limit_when_tending_to_inf rngl_dist u k
-  → ∃ N, ∀ n, N ≤ n → (u n + k ≤ 2 * k + 1)%L.
-Proof.
-intros * Hlim.
-apply (rngl_converging_seq_bounded) in Hlim.
 ...
 generalize Hc; intros Hc2.
 apply rngl_limit_limit_squ in Hc2.
