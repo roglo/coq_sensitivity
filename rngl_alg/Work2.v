@@ -3910,49 +3910,37 @@ Theorem rngl_dist_to_limit_bounded :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist u l
-  → ∃ N, ∀ n, N ≤ n → (rngl_dist (u n) l ≤ 1)%L.
+  → ∃ N, ∀ n, N ≤ n → (rngl_dist (u n) l < 1)%L.
 Proof.
-intros Hon Hop Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlim.
-  exists 0.
-  intros n _.
-  rewrite (H1 (rngl_dist _ _)), (H1 1)%L.
-  now apply (rngl_le_refl Hor).
-}
+intros Hon Hop Hor Hc1.
 intros * Hlim.
 specialize (Hlim 1)%L.
 specialize (rngl_0_lt_1 Hon Hop Hc1 Hor) as H.
-specialize (Hlim H); clear H.
-destruct Hlim as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-now apply (rngl_lt_le_incl Hor) in HN.
+now apply Hlim.
 Qed.
 
 Theorem rngl_converging_seq_bounded :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist u l
-  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) ≤ rngl_abs l + 1)%L.
+  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) < rngl_abs l + 1)%L.
 Proof.
-intros Hon Hop Hor.
+intros Hon Hop Hor Hc1.
 intros * Hlim.
-apply (rngl_dist_to_limit_bounded Hon Hop Hor) in Hlim.
+apply (rngl_dist_to_limit_bounded Hon Hop Hor Hc1) in Hlim.
 destruct Hlim as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
 progress unfold rngl_dist in HN.
-eapply (rngl_le_trans Hor). 2: {
-  apply (rngl_add_le_mono_l Hop Hor), HN.
+eapply (rngl_le_lt_trans Hor). 2: {
+  apply (rngl_add_lt_mono_l Hop Hor), HN.
 }
 eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
 rewrite rngl_add_comm, (rngl_sub_add Hop).
@@ -3963,21 +3951,22 @@ Theorem rngl_converging_seq_add_limit_bounded :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
+  rngl_characteristic T ≠ 1 →
   ∀ u k,
   is_limit_when_tending_to_inf rngl_dist u k
-  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) ≤ 2 * rngl_abs k + 1)%L.
+  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) < 2 * rngl_abs k + 1)%L.
 Proof.
-intros Hon Hop Hor.
+intros Hon Hop Hor Hc1.
 intros * Hlim.
-apply (rngl_converging_seq_bounded Hon Hop Hor) in Hlim.
+apply (rngl_converging_seq_bounded Hon Hop Hor Hc1) in Hlim.
 destruct Hlim as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
 rewrite <- (rngl_add_diag Hon).
 rewrite <- rngl_add_assoc.
-eapply (rngl_le_trans Hor). 2: {
-  apply (rngl_add_le_mono_l Hop Hor), HN.
+eapply (rngl_le_lt_trans Hor). 2: {
+  apply (rngl_add_lt_mono_l Hop Hor), HN.
 }
 rewrite rngl_add_comm.
 apply (rngl_abs_triangle Hop Hor).
@@ -4056,16 +4045,12 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hu.
-(*
-specialize (rngl_dist_to_limit_bounded Hon Hop Hor _ _ Hu) as H1.
-*)
-specialize (rngl_converging_seq_add_limit_bounded Hon Hop Hor _ _ Hu) as H2.
-(*
-progress unfold rngl_dist in H1.
-*)
+specialize (rngl_converging_seq_add_limit_bounded Hon Hop Hor Hc1) as H2.
+specialize (H2 _ _ Hu).
 intros ε Hε.
 specialize (Hu (ε / (2 * rngl_abs l + 1)))%L.
-assert (H : (0 < ε / (2 * rngl_abs l + 1))%L) by admit.
+assert (H : (0 < ε / (2 * rngl_abs l + 1))%L). {
+... ...
 specialize (Hu H); clear H.
 progress unfold rngl_dist in Hu.
 destruct Hu as (N1, HN1).
@@ -4103,7 +4088,7 @@ apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   apply (rngl_abs_nonneg Hop Hor).
 }
 rewrite (rngl_mul_comm Hic).
-apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+now apply (rngl_mul_lt_mono_pos_l Hop Hor Hii).
 ...
 easy.
 remember (u n + l ≤? 0)%L as ul eqn:Hul.
