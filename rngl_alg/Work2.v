@@ -4137,8 +4137,9 @@ apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 intros ε Hε.
+...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
-assert (H : (0 < 2 * ε)%L) by admit.
+assert (H : (0 < 2 * ε)%L) by ...
 specialize (H1 H); clear H.
 destruct H1 as (N, HN).
 exists N.
@@ -4155,7 +4156,7 @@ eapply (rngl_lt_le_trans Hor). 2: {
 Search (_ * _ ≤ _ * _)%L.
 Check rngl_mul_le_mono_pos_l.
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii _ _ a)%L.
-  admit.
+...
   rewrite (rngl_mul_comm Hic).
   eapply (rngl_le_trans Hor).
   apply (rngl_lt_le_incl Hor) in HN.
