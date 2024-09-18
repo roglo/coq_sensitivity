@@ -3941,7 +3941,7 @@ Theorem rngl_converging_seq_bounded :
   rngl_is_ordered T = true →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist u l
-  → ∃ N, ∀ n, N ≤ n → (u n ≤ l + 1)%L.
+  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n) ≤ rngl_abs l + 1)%L.
 Proof.
 intros Hon Hop Hor.
 intros * Hlim.
@@ -3951,17 +3951,12 @@ exists N.
 intros n Hn.
 specialize (HN n Hn).
 progress unfold rngl_dist in HN.
-progress unfold rngl_abs in HN.
-rewrite (rngl_leb_sub_0 Hop Hor) in HN.
-remember (u n ≤? l)%L as ul eqn:Hul.
-symmetry in Hul.
-destruct ul. {
-  apply rngl_leb_le in Hul.
-  apply (rngl_le_trans Hor _ l); [ easy | ].
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_add_le_mono_l Hop Hor), HN.
 }
-now apply (rngl_le_sub_le_add_l Hop Hor) in HN.
+eapply (rngl_le_trans Hor); [ | apply (rngl_abs_triangle Hop Hor) ].
+rewrite rngl_add_comm, (rngl_sub_add Hop).
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem rngl_converging_seq_add_limit_bounded :
@@ -3970,7 +3965,7 @@ Theorem rngl_converging_seq_add_limit_bounded :
   rngl_is_ordered T = true →
   ∀ u k,
   is_limit_when_tending_to_inf rngl_dist u k
-  → ∃ N, ∀ n, N ≤ n → (u n + k ≤ 2 * k + 1)%L.
+  → ∃ N, ∀ n, N ≤ n → (rngl_abs (u n + k) ≤ 2 * rngl_abs k + 1)%L.
 Proof.
 intros Hon Hop Hor.
 intros * Hlim.
@@ -3980,8 +3975,12 @@ exists N.
 intros n Hn.
 specialize (HN n Hn).
 rewrite <- (rngl_add_diag Hon).
-rewrite rngl_add_comm, <- rngl_add_assoc.
-now apply (rngl_add_le_mono_l Hop Hor).
+rewrite <- rngl_add_assoc.
+eapply (rngl_le_trans Hor). 2: {
+  apply (rngl_add_le_mono_l Hop Hor), HN.
+}
+rewrite rngl_add_comm.
+apply (rngl_abs_triangle Hop Hor).
 Qed.
 
 (* to be completed
@@ -4105,6 +4104,8 @@ apply (rngl_lt_div_l Hon Hop Hiv Hor). {
 }
 rewrite (rngl_mul_comm Hic).
 apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
+...
+easy.
 remember (u n + l ≤? 0)%L as ul eqn:Hul.
 symmetry in Hul.
 destruct ul. {
