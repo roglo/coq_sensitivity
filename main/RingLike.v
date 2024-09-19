@@ -6097,27 +6097,27 @@ Definition is_Cauchy_sequence {A} (dist : A → A → T) (u : nat → A) :=
   ∀ ε : T, (0 < ε)%L →
   ∃ N : nat, ∀ p q : nat, N ≤ p → N ≤ q → (dist (u p) (u q) < ε)%L.
 
-Definition is_limit_when_tending_to {A} (dist : A → A → T) f a l :=
+Definition is_limit_when_tending_to {A B} da db (f : A → B) (a : A) (l : B) :=
   (∀ ε, 0 < ε → ∃ η, 0 < η ∧
-   ∀ x, rngl_abs (x - a) < η → dist (f x) l < ε)%L.
+   ∀ x : A, da x a < η → db (f x) l < ε)%L.
 
-Definition is_limit_when_tending_to_inf {A} (dist : A → A → T) f l :=
+Definition is_limit_when_tending_to_inf {A} dist (f : nat → A) (l : A) :=
   ∀ ε, (0 < ε)%L → ∃ N, ∀ n, N ≤ n → (dist (f n) l < ε)%L.
 
 Definition is_complete A (dist : A → A → T) :=
   ∀ u, is_Cauchy_sequence dist u
   → ∃ c, is_limit_when_tending_to_inf dist u c.
 
-Definition is_derivative (dist : T → T → T) f f' :=
+Definition is_derivative {A} (da : A → A → T) dist f f' :=
   ∀ a,
-  is_limit_when_tending_to dist (λ x, dist (f x) (f a) / dist x a)%L
+  is_limit_when_tending_to da dist (λ x, dist (f x) (f a) / da x a)%L
     a (f' a).
 
-Definition continuous_at {A} (dist : A → A → T) f a :=
-  is_limit_when_tending_to dist f a (f a).
+Definition continuous_at {A B} da db (f : A → B) a :=
+  is_limit_when_tending_to da db f a (f a).
 
-Definition continuous {A} (dist : A → A → T) f :=
-  ∀ a, continuous_at dist f a.
+Definition continuous {A B} da db (f : A → B) :=
+  ∀ a, continuous_at da db f a.
 
 (* limit with ring-like distance *)
 
@@ -6125,7 +6125,7 @@ Definition rngl_is_Cauchy_sequence :=
   is_Cauchy_sequence rngl_dist.
 
 Definition rngl_is_limit_when_tending_to :=
-  is_limit_when_tending_to rngl_dist.
+  is_limit_when_tending_to rngl_dist rngl_dist.
 
 Definition rngl_is_limit_when_tending_to_inf :=
   is_limit_when_tending_to_inf rngl_dist.
@@ -6137,10 +6137,10 @@ Definition rngl_is_complete :=
   is_complete T rngl_dist.
 
 Definition rngl_continuous_at :=
-  continuous_at rngl_dist.
+  continuous_at rngl_dist rngl_dist.
 
 Definition rngl_continuous :=
-  continuous rngl_dist.
+  continuous rngl_dist rngl_dist.
 
 (* properties of distances and limits *)
 
@@ -6308,15 +6308,6 @@ apply (rngl_lt_le_incl Hor).
 eapply (rngl_le_lt_trans Hor); [ | apply Hu ].
 apply (rngl_le_refl Hor).
 Qed.
-
-(* continuity *)
-
-Definition rngl_continuity_at_point {A} dist (f : A → T) (a : A) :=
-  ∀ ε, (0 < ε)%L →
-  ∃ δ, (0 < δ → ∀ x, dist x a < δ → rngl_dist (f x) (f a) < ε)%L.
-
-Definition rngl_continuity {A} dist (f : A → T) :=
-  ∀ a, rngl_continuity_at_point dist f a.
 
 (* archimedianity *)
 

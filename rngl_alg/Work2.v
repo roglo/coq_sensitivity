@@ -4072,12 +4072,14 @@ rewrite rngl_add_0_l in HN.
 now rewrite (rngl_abs_sub_comm Hop Hor) in HN.
 Qed.
 
-Theorem rngl_sin_is_continuous : rngl_continuity angle_eucl_dist rngl_sin.
+Theorem rngl_sin_is_continuous :
+  continuous angle_eucl_dist rngl_dist rngl_sin.
 Proof.
 destruct_ac.
 intros a ε Hε.
 exists ε.
-intros _ x Hxa.
+split; [ easy | ].
+intros x Hxa.
 progress unfold rngl_dist.
 eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
 apply -> (rngl_abs_le Hop Hor).
@@ -4158,7 +4160,8 @@ apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 intros ε Hε.
 (* conseil de chatgpt : il faut utiliser la continuité de la
    fonction sinus *)
-Check rngl_sin_is_continuous.
+specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
+destruct H2 as (δ & Hδ & H2).
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...
