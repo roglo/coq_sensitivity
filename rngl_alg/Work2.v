@@ -4144,6 +4144,13 @@ Theorem limit_cos_cos_limit_sin_sin :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hc.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hc.
 specialize (rngl_limit_limit_squ Hon Hop Hic Hiv Hor _ _ Hc) as H1.
 cbn in H1.
@@ -4162,40 +4169,76 @@ intros ε Hε.
    sinus function *)
 specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
 destruct H2 as (δ & Hδ & H2).
+move δ before ε.
 (**)
 destruct (rngl_eq_dec Hed (rngl_sin θ') 0) as [Htz| Hzt]. {
+  apply eq_rngl_sin_0 in Htz.
+  destruct Htz; subst θ'. {
+    cbn in H1, Hc, H2 |-*.
+    rewrite (rngl_squ_0 Hos) in H1.
+    specialize (Hc (√(1 - ε²)))%L.
+    assert (H : (0 < √(1 - ε²))%L) by admit. (* en fait, à voir... *)
+    specialize (Hc H).
+    destruct Hc as (N, HN).
+    exists N.
+    intros n Hn.
+    specialize (HN n Hn).
+    progress unfold rngl_dist in HN.
+    progress unfold rngl_dist.
+(* pfff... non, c'est pas ça, faut réfléchir... *)
+...
   rewrite Htz in H1, H2 |-*.
   rewrite (rngl_squ_0 Hos) in H1.
   progress unfold is_limit_when_tending_to_inf in H1.
-  specialize (H1 δ Hδ).
+  specialize (H1 (δ² / 2))%L.
+  assert (H : (0 < δ² / 2)%L) by ...
+  specialize (H1 H); clear H.
   destruct H1 as (N, HN).
   exists N.
   intros n Hn.
   specialize (HN n Hn).
   progress unfold rngl_dist in HN.
-  apply H2.
-(*
-apply eq_rngl_sin_0 in Htz.
-destruct Htz; subst θ'. {
-  progress unfold angle_eucl_dist.
-  cbn.
-  rewrite (rngl_sub_0_l Hop).
-  rewrite (rngl_squ_opp Hop).
+  apply eq_rngl_sin_0 in Htz.
+  destruct Htz; subst θ'. {
+    rewrite angle_eucl_dist_is_sqrt.
+    rewrite rngl_cos_sub.
+    rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+    cbn.
+    rewrite (rngl_mul_1_l Hon).
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor δ). 2: {
+      now apply (rngl_lt_le_incl Hor) in Hδ.
+    }
+    rewrite <- (rl_sqrt_squ Hon Hop Hor).
+    apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+      apply (rngl_mul_nonneg_nonneg Hop Hor).
+      apply (rngl_0_le_2 Hon Hop Hor).
+      apply (rngl_le_0_sub Hop Hor).
+      apply rngl_cos_bound.
+    }
+    rewrite (rngl_mul_comm Hic).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_sub_lt_add_r Hop Hor).
+    rewrite (rngl_sub_0_r Hos) in HN.
+    rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+      apply (rngl_squ_nonneg Hop Hor).
+    }
+    specialize (cos2_sin2_1 (θ n)) as H1.
+    apply (rngl_add_move_l Hop) in H1.
+    rewrite H1 in HN; clear H1.
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+    apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+    eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+    apply (rngl_squ_le_diag Hon Hop Hor).
 ...
-*)
-  rewrite angle_eucl_dist_is_sqrt.
-  rewrite rngl_cos_sub.
-  rewrite Htz, (rngl_mul_0_l Hos), rngl_add_0_r.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor δ). 2: {
-    now apply (rngl_lt_le_incl Hor) in Hδ.
-  }
-  rewrite <- (rl_sqrt_squ Hon Hop Hor).
-  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_0_le_2 Hon Hop Hor).
-    apply (rngl_le_0_sub Hop Hor).
-    rewrite <- (rngl_mul_1_r Hon 1).
-    apply (rngl_mul_le_compat_nonneg Hop Hor).
+2: {
+Search (rngl_abs _²)%L.
+    rewrite <- (rngl_squ_sqrt Hon δ) in HN.
+Search (_² < _²)%L.
+  specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+apply (rngl_squ_lt_abs_lt Hop Hor Hii) in HN.
+Search ((√_)²)%L.
 ... ...
 apply eq_rngl_sin_0 in Htz.
 destruct Htz; subst θ'. {
