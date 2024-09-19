@@ -6,8 +6,7 @@ Work in progress... (13th Dec 2021)
 
 # DIRECTORIES
 
-main: files for the proof
-
+main: files for the proof<br/>
 rngl_alg: examples of algebras of the theory RingLike
 
 # AUTHOR
