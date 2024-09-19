@@ -4158,11 +4158,48 @@ apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 intros ε Hε.
-(* conseil de chatgpt : il faut utiliser la continuité de la
-   fonction sinus *)
+(* advice of chatgpt: we must use the continuity of the
+   sinus function *)
 specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
 destruct H2 as (δ & Hδ & H2).
+(**)
+destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzt| Hzt]. {
+  admit.
+}
+destruct (rngl_lt_dec Hor (rngl_sin θ') 0) as [Htz| Htz]. {
+  admit.
+}
+(* rngl_sin θ' = 0 *)
+apply (rngl_nlt_ge Hor) in Hzt, Htz.
+apply (rngl_le_antisymm Hor) in Htz; [ clear Hzt | easy ].
+rewrite Htz in H1, H2 |-*.
+rewrite (rngl_squ_0 Hos) in H1.
 progress unfold is_limit_when_tending_to_inf in H1.
+specialize (H1 δ Hδ).
+destruct H1 as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+apply H2.
+(*
+apply eq_rngl_sin_0 in Htz.
+destruct Htz; subst θ'. {
+  progress unfold angle_eucl_dist.
+  cbn.
+  rewrite (rngl_sub_0_l Hop).
+  rewrite (rngl_squ_opp Hop).
+...
+*)
+rewrite angle_eucl_dist_is_sqrt.
+rewrite rngl_cos_sub.
+rewrite Htz, (rngl_mul_0_l Hos), rngl_add_0_r.
+apply eq_rngl_sin_0 in Htz.
+destruct Htz; subst θ'. {
+  cbn.
+  rewrite (rngl_mul_1_l Hon).
+  cbn in Hc.
+  specialize (Hc (δ / √2))%L.
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...
