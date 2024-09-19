@@ -1,5 +1,5 @@
 # OVERVIEW
-Sensitivity Conjecture in Coq
+Sensitivity Conjecture in Coq<br/>
 Proved by Hao Huang
 
 Work in progress... (13th Dec 2021)
@@ -14,6 +14,6 @@ rngl_alg: examples of algebras of the theory RingLike
 Daniel de Rauglaudre
 
 # COQ VERSION
-  $ coqtop -v
-  The Coq Proof Assistant, version 8.20.0
+  $ coqtop -v<br/>
+  The Coq Proof Assistant, version 8.20.0<br/>
   compiled with OCaml 4.14.1
