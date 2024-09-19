@@ -4072,6 +4072,25 @@ rewrite rngl_add_0_l in HN.
 now rewrite (rngl_abs_sub_comm Hop Hor) in HN.
 Qed.
 
+Theorem rngl_sin_is_continuous : rngl_continuity angle_eucl_dist rngl_sin.
+Proof.
+destruct_ac.
+intros a ε Hε.
+exists ε.
+intros _ x Hxa.
+progress unfold rngl_dist.
+eapply (rngl_le_lt_trans Hor); [ | apply Hxa ].
+apply -> (rngl_abs_le Hop Hor).
+split. {
+  rewrite <- (rngl_opp_sub_distr Hop).
+  apply -> (rngl_opp_le_compat Hop Hor).
+  rewrite angle_eucl_dist_symmetry.
+  apply rngl_sin_diff_le_eucl_dist.
+} {
+  apply rngl_sin_diff_le_eucl_dist.
+}
+Qed.
+
 (* to be completed
 Theorem glop :
   rngl_is_archimedean T = true →
@@ -4138,23 +4157,8 @@ rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 intros ε Hε.
 (* conseil de chatgpt : il faut utiliser la continuité de la
-   fonction sinus ; ah bon. Bon, je vais essayer de la prouver,
-   tiens, à titre d'exercice *)
-
-Definition rngl_continuity_at_point {A} dist (f : A → T) (a : A) :=
-  ∀ ε, (0 < ε)%L →
-  ∃ η, (0 < η → ∀ x, dist x a < η → rngl_dist (f x) (f a) < ε)%L.
-
-Definition rngl_continuity {A} dist (f : A → T) :=
-  ∀ a, rngl_continuity_at_point dist f a.
-
-Theorem rngl_sin_is_continuous : rngl_continuity angle_eucl_dist rngl_sin.
-Proof.
-intros a ε Hε.
-Check rngl_acos.
-About rngl_acos.
-exists (rngl_asin ε).
-intros _ x Hxa.
+   fonction sinus *)
+Check rngl_sin_is_continuous.
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...

@@ -6309,6 +6309,15 @@ eapply (rngl_le_lt_trans Hor); [ | apply Hu ].
 apply (rngl_le_refl Hor).
 Qed.
 
+(* continuity *)
+
+Definition rngl_continuity_at_point {A} dist (f : A → T) (a : A) :=
+  ∀ ε, (0 < ε)%L →
+  ∃ δ, (0 < δ → ∀ x, dist x a < δ → rngl_dist (f x) (f a) < ε)%L.
+
+Definition rngl_continuity {A} dist (f : A → T) :=
+  ∀ a, rngl_continuity_at_point dist f a.
+
 (* archimedianity *)
 
 Theorem rngl_archimedean :
