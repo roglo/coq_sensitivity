@@ -4162,6 +4162,7 @@ intros ε Hε.
    fonction sinus *)
 specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
 destruct H2 as (δ & Hδ & H2).
+progress unfold is_limit_when_tending_to_inf in H1.
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...
