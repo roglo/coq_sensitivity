@@ -1,5 +1,5 @@
 # OVERVIEW
-Sensitivity Conjecture in Coq
+Sensitivity Conjecture in Coq<br/>
 Proved by Hao Huang
 
 Work in progress... (13th Dec 2021)
