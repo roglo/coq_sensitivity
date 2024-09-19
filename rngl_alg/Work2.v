@@ -4163,25 +4163,17 @@ intros ε Hε.
 specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
 destruct H2 as (δ & Hδ & H2).
 (**)
-destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzt| Hzt]. {
-  admit.
-}
-destruct (rngl_lt_dec Hor (rngl_sin θ') 0) as [Htz| Htz]. {
-  admit.
-}
-(* rngl_sin θ' = 0 *)
-apply (rngl_nlt_ge Hor) in Hzt, Htz.
-apply (rngl_le_antisymm Hor) in Htz; [ clear Hzt | easy ].
-rewrite Htz in H1, H2 |-*.
-rewrite (rngl_squ_0 Hos) in H1.
-progress unfold is_limit_when_tending_to_inf in H1.
-specialize (H1 δ Hδ).
-destruct H1 as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-progress unfold rngl_dist in HN.
-apply H2.
+destruct (rngl_eq_dec Hed (rngl_sin θ') 0) as [Htz| Hzt]. {
+  rewrite Htz in H1, H2 |-*.
+  rewrite (rngl_squ_0 Hos) in H1.
+  progress unfold is_limit_when_tending_to_inf in H1.
+  specialize (H1 δ Hδ).
+  destruct H1 as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  progress unfold rngl_dist in HN.
+  apply H2.
 (*
 apply eq_rngl_sin_0 in Htz.
 destruct Htz; subst θ'. {
@@ -4191,15 +4183,33 @@ destruct Htz; subst θ'. {
   rewrite (rngl_squ_opp Hop).
 ...
 *)
-rewrite angle_eucl_dist_is_sqrt.
-rewrite rngl_cos_sub.
-rewrite Htz, (rngl_mul_0_l Hos), rngl_add_0_r.
+  rewrite angle_eucl_dist_is_sqrt.
+  rewrite rngl_cos_sub.
+  rewrite Htz, (rngl_mul_0_l Hos), rngl_add_0_r.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor δ). 2: {
+    now apply (rngl_lt_le_incl Hor) in Hδ.
+  }
+  rewrite <- (rl_sqrt_squ Hon Hop Hor).
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    rewrite <- (rngl_mul_1_r Hon 1).
+    apply (rngl_mul_le_compat_nonneg Hop Hor).
+... ...
 apply eq_rngl_sin_0 in Htz.
 destruct Htz; subst θ'. {
   cbn.
   rewrite (rngl_mul_1_l Hon).
   cbn in Hc.
   specialize (Hc (δ / √2))%L.
+...
+destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzt| Hzt]. {
+  ...
+}
+destruct (rngl_lt_dec Hor (rngl_sin θ') 0) as [Htz| Htz]. {
+  ...
+}
 ...
 specialize (H1 (2 * ε))%L. (* au pif, pour l'instant *)
 assert (H : (0 < 2 * ε)%L) by ...
@@ -4346,7 +4356,7 @@ progress unfold angle_eucl_dist.
 ...
 progress unfold is_limit_when_tending_to_inf in Hc.
 specialize (Hc (rngl_min 1 ε)).
-assert (H : (0 < rngl_min 1 ε)%L) by admit.
+assert (H : (0 < rngl_min 1 ε)%L) by ...
 specialize (Hc H); clear H.
 destruct Hc as (N, HN).
 exists N.
