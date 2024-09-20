@@ -8,9 +8,9 @@ Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike.
 Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
+Require Import AngleDiv2Add.
 Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
-Require Import AngleDiv2Add.
 Require Import AngleEuclDistLtAngleLtLt.
 Require Import AngleAddOverflowEquiv3.
 Require Import Complex.
