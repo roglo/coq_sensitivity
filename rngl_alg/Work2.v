@@ -4164,6 +4164,12 @@ specialize (cos2_sin2_1 θ') as H2.
 apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
+destruct (rngl_eq_dec Hed (rngl_sin θ') 0) as [Htz| Hzt]. {
+  apply eq_rngl_sin_0 in Htz.
+  destruct Htz; subst θ'. {
+    cbn in H1, Hc |-*.
+    rewrite (rngl_squ_0 Hos) in H1.
+...
 intros ε Hε.
 (* advice of chatgpt: we must use the continuity of the
    sinus function *)
@@ -4171,11 +4177,11 @@ specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
 destruct H2 as (δ & Hδ & H2).
 move δ before ε.
 (**)
-destruct (rngl_eq_dec Hed (rngl_sin θ') 0) as [Htz| Hzt]. {
   apply eq_rngl_sin_0 in Htz.
   destruct Htz; subst θ'. {
     cbn in H1, Hc, H2 |-*.
     rewrite (rngl_squ_0 Hos) in H1.
+...
     specialize (Hc (√(1 - ε²)))%L.
     assert (H : (0 < √(1 - ε²))%L) by admit. (* en fait, à voir... *)
     specialize (Hc H).
