@@ -4186,6 +4186,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hlim.
+destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
 ...
 intros ε Hε.
 (**)
