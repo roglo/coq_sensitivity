@@ -4164,6 +4164,60 @@ specialize (cos2_sin2_1 θ') as H2.
 apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
+Search is_limit_when_tending_to_inf.
+Theorem rngl_limit_squ_limit :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ u l,
+  is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) l²%L
+  → is_limit_when_tending_to_inf rngl_dist u l.
+Proof.
+intros Hop Hor.
+intros * Hlim.
+intros ε Hε.
+specialize (Hlim ε Hε).
+destruct Hlim as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+progress unfold rngl_abs in HN.
+progress unfold rngl_abs.
+rewrite (rngl_leb_sub_0 Hop Hor) in HN.
+rewrite (rngl_leb_sub_0 Hop Hor).
+remember (u n ≤? l)%L as ul eqn:Hul.
+remember ((u n)² ≤? l²)%L as ul2 eqn:Hul2.
+symmetry in Hul, Hul2.
+destruct ul. {
+  apply rngl_leb_le in Hul.
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct ul2. {
+    apply rngl_leb_le in Hul2.
+    rewrite (rngl_opp_sub_distr Hop) in HN.
+...
+eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+do 2 rewrite (rngl_leb_sub_0 Hop Hor).
+remember (u n ≤? l)%L as ul eqn:Hul.
+remember ((u n)² ≤? l²)%L as ul2 eqn:Hul2.
+symmetry in Hul, Hul2.
+destruct ul. {
+  apply rngl_leb_le in Hul.
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct ul2. {
+    apply rngl_leb_le in Hul2.
+    rewrite (rngl_opp_sub_distr Hop).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    rewrite (rngl_add_sub_assoc Hop).
+    rewrite rngl_add_comm.
+    rewrite <- (rngl_add_sub_assoc Hop).
+    apply (rngl_le_sub_le_add_l Hop Hor).
+    apply (rngl_sub_le_compat Hop Hor); [ | easy ].
+    (* ah, merde, ça marche pas *)
+    (* faut pas faire de le_lt_trans *)
+... ...
+now apply rngl_limit_squ_limit.
+...
 destruct (rngl_eq_dec Hed (rngl_sin θ') 0) as [Htz| Hzt]. {
   apply eq_rngl_sin_0 in Htz.
   destruct Htz; subst θ'. {
