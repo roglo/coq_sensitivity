@@ -4172,18 +4172,21 @@ Theorem rngl_limit_squ_limit :
   rngl_is_ordered T = true →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) l²%L
-  → is_limit_when_tending_to_inf rngl_dist u l.
+  → is_limit_when_tending_to_inf rngl_dist u l ∨
+    is_limit_when_tending_to_inf rngl_dist u (- l)%L.
 Proof.
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hlim ε Hε.
+  intros * Hlim.
+  left; intros ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hlim.
+...
 intros ε Hε.
 (**)
 specialize (Hlim (ε * (2 * rngl_abs l + 1)))%L.
