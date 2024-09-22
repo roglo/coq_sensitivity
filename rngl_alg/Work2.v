@@ -4166,15 +4166,67 @@ rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 Search is_limit_when_tending_to_inf.
 Theorem rngl_limit_squ_limit :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
   is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) l²%L
   → is_limit_when_tending_to_inf rngl_dist u l.
 Proof.
-intros Hop Hor.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hlim ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros * Hlim.
 intros ε Hε.
+(**)
+specialize (Hlim (ε / (2 * rngl_abs l + 1)))%L.
+assert (H : (0 < ε / (2 * rngl_abs l + 1))%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_add_nonneg_pos Hor). 2: {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  apply (rngl_abs_nonneg Hop Hor).
+}
+specialize (Hlim H); clear H.
+destruct Hlim as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+progress unfold rngl_abs in HN.
+progress unfold rngl_abs.
+rewrite (rngl_leb_sub_0 Hop Hor) in HN.
+rewrite (rngl_leb_sub_0 Hop Hor).
+remember (u n ≤? l)%L as ul eqn:Hul.
+remember ((u n)² ≤? l²)%L as ul2 eqn:Hul2.
+remember (l ≤? 0)%L as lz eqn:Hlz.
+symmetry in Hul, Hul2, Hlz.
+destruct ul. {
+  apply rngl_leb_le in Hul.
+  rewrite (rngl_opp_sub_distr Hop).
+  destruct ul2. {
+    apply rngl_leb_le in Hul2.
+    rewrite (rngl_opp_sub_distr Hop) in HN.
+    destruct lz. {
+      apply rngl_leb_le in Hlz.
+...
+    apply (rngl_le_lt_trans Hor _ (0 - u n))%L. {
+      now apply (rngl_sub_le_mono_r Hop Hor).
+    }
+...
+    rewrite (rngl_sub_0_l Hop).
+    apply (rngl_le_lt_trans Hor _ 0); [ | easy ].
+...
 specialize (Hlim ε Hε).
 destruct Hlim as (N, HN).
 exists N.
