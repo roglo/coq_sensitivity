@@ -4176,6 +4176,7 @@ Theorem rngl_limit_squ_limit :
 Proof.
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hlim ε Hε.
@@ -4185,9 +4186,9 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hlim.
 intros ε Hε.
 (**)
-specialize (Hlim (ε / (2 * rngl_abs l + 1)))%L.
-assert (H : (0 < ε / (2 * rngl_abs l + 1))%L). {
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+specialize (Hlim (ε * (2 * rngl_abs l + 1)))%L.
+assert (H : (0 < ε * (2 * rngl_abs l + 1))%L). {
+  apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
   apply (rngl_add_nonneg_pos Hor). 2: {
     apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
