@@ -142,7 +142,8 @@ Qed.
 Definition nat_ring_like_ord :=
   let _ := nat_ring_like_op in
   {| rngl_ord_le_dec := Nat_opt_le_dec;
-     rngl_ord_le_refl := Nat.leb_refl |}.
+     rngl_ord_le_refl := Nat.leb_refl;
+     rngl_ord_le_antisymm := Nat_le_antisymm |}.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
@@ -170,7 +171,6 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := nat_opt_characteristic_prop;
      rngl_opt_ord := nat_ring_like_ord;
-     rngl_opt_le_antisymm := Nat_le_antisymm;
      rngl_opt_le_trans := Nat_le_trans;
      rngl_opt_add_le_compat := Nat_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := NA;

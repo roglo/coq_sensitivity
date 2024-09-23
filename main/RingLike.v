@@ -301,7 +301,8 @@ Definition rngl_of_nat {T} {ro : ring_like_op T} a := rngl_mul_nat 1%L a.
 
 Class ring_like_ord T {ro : ring_like_op T} :=
   { rngl_ord_le_dec : ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L;
-    rngl_ord_le_refl : ∀ a, (a ≤ a)%L }.
+    rngl_ord_le_refl : ∀ a, (a ≤ a)%L;
+    rngl_ord_le_antisymm : ∀ a b, (a ≤ b → b ≤ a → a = b)%L }.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
@@ -379,9 +380,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when ordered *)
     rngl_opt_ord :
       if rngl_is_ordered T then ring_like_ord T
-      else not_applicable;
-    rngl_opt_le_antisymm :
-      if rngl_is_ordered T then ∀ a b, (a ≤ b → b ≤ a → a = b)%L
       else not_applicable;
     rngl_opt_le_trans :
       if rngl_is_ordered T then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%L
@@ -716,7 +714,7 @@ Theorem rngl_le_antisymm :
   ∀ a b, (a ≤ b → b ≤ a → a = b)%L.
 Proof.
 intros Hor *.
-specialize rngl_opt_le_antisymm as H.
+specialize rngl_opt_ord as H.
 rewrite Hor in H.
 apply H.
 Qed.

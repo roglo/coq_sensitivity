@@ -252,7 +252,8 @@ Qed.
 Definition Z_ring_like_ord :=
   let _ := Z_ring_like_op in
   {| rngl_ord_le_dec := Z_opt_le_dec;
-     rngl_ord_le_refl := Z_le_refl |}.
+     rngl_ord_le_refl := Z_le_refl;
+     rngl_ord_le_antisymm := Z_le_antisymm |}.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
@@ -280,7 +281,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Z_characteristic_prop;
      rngl_opt_ord := Z_ring_like_ord;
-     rngl_opt_le_antisymm := Z_le_antisymm;
      rngl_opt_le_trans := Z_le_trans;
      rngl_opt_add_le_compat := Z_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := Z_mul_le_compat_nonneg;
