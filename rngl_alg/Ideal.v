@@ -376,7 +376,6 @@ Theorem I_ord_le_refl :
 Proof.
 intros.
 ...
-*)
 
 Theorem I_opt_le_dec : let roi := I_ring_like_op in
   if rngl_is_ordered (ideal P) then
@@ -407,6 +406,7 @@ destruct H1 as [H1| H1]; [ left | right ]. {
   now destruct rngl_opt_leb.
 }
 Qed.
+*)
 
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
   if rngl_has_eq_dec (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
@@ -753,7 +753,7 @@ Theorem _opt_le_antisymm : let roi := I_ring_like_op in
   else not_applicable.
 *)
 
-(* to be completed
+(*
 Definition I_ring_like_ord :=
   let _ := I_ring_like_op in
   {| rngl_ord_le_dec := I_ord_le_dec;
@@ -781,6 +781,12 @@ Theorem I_ring_like_ord :
   else not_applicable.
 Proof.
 intros.
+remember (rngl_is_ordered (ideal P)) as or eqn:Hor.
+symmetry in Hor.
+destruct or; [ | easy ].
+split.
+...
+About rngl_opt_not_le.
 specialize rngl_opt_not_le as H1.
 progress unfold rngl_is_ordered, rngl_has_opp in H1.
 progress unfold rngl_is_ordered, rngl_has_opp.
@@ -799,12 +805,13 @@ split. {
   symmetry in Hx.
   destruct x. {
     left.
-Set Printing All.
+(*
 ...
 intros * Hab.
 specialize (H1 (i_val a) (i_val b) Hab).
 destruct H1 as (H1, H2).
 ...
+*)
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
