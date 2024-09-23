@@ -2297,6 +2297,11 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_eq_dec := Some QG_eq_dec;
      rngl_opt_leb := Some QG_leb |}.
 
+Definition QG_ring_like_ord :=
+  let _ := QG_ring_like_op in
+  {| rngl_ord_le_dec := QG_le_dec;
+     rngl_ord_le_refl := QG_le_refl |}.
+
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -2322,8 +2327,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := QG_characteristic_prop;
-     rngl_opt_le_dec := QG_le_dec;
-     rngl_opt_le_refl := QG_le_refl;
+     rngl_opt_ord := QG_ring_like_ord;
      rngl_opt_le_antisymm := QG_le_antisymm;
      rngl_opt_le_trans := QG_le_trans;
      rngl_opt_add_le_compat := QG_add_le_compat;

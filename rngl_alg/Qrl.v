@@ -168,6 +168,11 @@ exfalso; apply H3.
 now apply Q.add_le_mono.
 Qed.
 
+Definition Q_ring_like_ord :=
+  let _ := Q_ring_like_op in
+  {| rngl_ord_le_dec := Q_le_dec;
+     rngl_ord_le_refl := Q_le_refl |}.
+
 Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
@@ -193,8 +198,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Q_characteristic_prop;
-     rngl_opt_le_dec := Q_le_dec;
-     rngl_opt_le_refl := Q_le_refl;
+     rngl_opt_ord := Q_ring_like_ord;
      rngl_opt_le_antisymm := Q_le_antisymm;
      rngl_opt_le_trans := Q_le_trans;
      rngl_opt_add_le_compat := Q_add_le_compat;

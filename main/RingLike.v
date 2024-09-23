@@ -299,6 +299,10 @@ Definition rngl_mul_nat {T} {ro : ring_like_op T} :=
 
 Definition rngl_of_nat {T} {ro : ring_like_op T} a := rngl_mul_nat 1%L a.
 
+Class ring_like_ord T {ro : ring_like_op T} :=
+  { rngl_ord_le_dec : ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L;
+    rngl_ord_le_refl : ∀ a, (a ≤ a)%L }.
+
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_is_integral_domain : bool;
@@ -373,11 +377,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else
         not_applicable;
     (* when ordered *)
-    rngl_opt_le_dec :
-      if rngl_is_ordered T then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
+    rngl_opt_ord :
+      if rngl_is_ordered T then ring_like_ord T
       else not_applicable;
-    rngl_opt_le_refl :
-      if rngl_is_ordered T then ∀ a, (a ≤ a)%L else not_applicable;
     rngl_opt_le_antisymm :
       if rngl_is_ordered T then ∀ a b, (a ≤ b → b ≤ a → a = b)%L
       else not_applicable;
@@ -680,33 +682,33 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_le_dec :
+  rngl_is_ordered T = true →
+  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_ord as H.
+rewrite Hor in H.
+apply H.
+Qed.
+
+Theorem rngl_le_refl :
+  rngl_is_ordered T = true →
+  ∀ a, (a ≤ a)%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_ord as H.
+rewrite Hor in H.
+apply H.
+Qed.
+
 Theorem rngl_leb_refl :
   rngl_is_ordered T = true →
   ∀ a, (a ≤? a)%L = true.
 Proof.
 intros Hor *.
 apply rngl_leb_le.
-specialize rngl_opt_le_refl as H1.
-rewrite Hor in H1.
-apply H1.
-Qed.
-
-Theorem rngl_le_dec :
-  rngl_is_ordered T = true →
-  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
-Proof.
-intros Hor *.
-specialize rngl_opt_le_dec as H.
-rewrite Hor in H.
-apply H.
-Qed.
-
-Theorem rngl_le_refl : rngl_is_ordered T = true → ∀ a, (a ≤ a)%L.
-Proof.
-intros Hor *.
-specialize rngl_opt_le_refl as H.
-rewrite Hor in H.
-apply H.
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem rngl_le_antisymm :
@@ -812,8 +814,10 @@ Theorem rngl_lt_dec :
   ∀ a b : T, ({a < b} + {¬ a < b})%L.
 Proof.
 intros Hor *.
-specialize rngl_opt_le_dec as H1.
-rewrite Hor in H1.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize (rngl_ord_le_dec) as H1.
 destruct (H1 b a) as [H2| H2]; [ right | left ]. {
   intros H3.
   apply (rngl_lt_iff Hor) in H3.

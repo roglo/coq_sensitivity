@@ -1076,8 +1076,7 @@ Definition gc_ring_like_prop_not_alg_closed
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := gc_characteristic_prop;
-     rngl_opt_le_dec := NA;
-     rngl_opt_le_refl := NA;
+     rngl_opt_ord := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
      rngl_opt_add_le_compat := NA;
