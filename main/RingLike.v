@@ -28,7 +28,6 @@
      - with some characteristic
      - finite or infinite
      - ordered or not
-     - totally ordered or not
      - valuated or not
      - principal or not
      - factorial or not
@@ -352,10 +351,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_quot T && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%L → (b * a / b)%L = a
       else not_applicable;
-    (* when le comparison is decidable *)
-    rngl_opt_le_dec :
-      if rngl_is_ordered T then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
-      else not_applicable;
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral_domain then
@@ -378,6 +373,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else
         not_applicable;
     (* when ordered *)
+    rngl_opt_le_dec :
+      if rngl_is_ordered T then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
+      else not_applicable;
     rngl_opt_le_refl :
       if rngl_is_ordered T then ∀ a, (a ≤ a)%L else not_applicable;
     rngl_opt_le_antisymm :
