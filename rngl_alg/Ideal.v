@@ -437,6 +437,67 @@ specialize (H1 Hab Hba).
 now apply eq_ideal_eq in H1.
 Qed.
 
+Theorem I_opt_le_trans : let roi := I_ring_like_op in
+  if rngl_is_ordered (ideal P) then
+    ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
+  else not_applicable.
+Proof.
+intros.
+remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
+intros a b c Hab Hba.
+specialize rngl_opt_ord as H1.
+progress unfold rngl_is_ordered in Hde; cbn in Hde.
+progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in H1.
+destruct rngl_opt_leb; [ cbn in H1 | easy ].
+specialize (rngl_ord_le_trans (i_val a) (i_val b) (i_val c)) as H2.
+rename H1 into rr; rename H2 into H1.
+progress unfold rngl_le in Hab, Hba.
+progress unfold rngl_le in H1.
+progress unfold roi in Hab, Hba.
+progress unfold I_ring_like_op in Hab, Hba.
+progress unfold rngl_le.
+progress unfold roi.
+progress unfold I_ring_like_op.
+cbn in Hab, Hba |-*.
+progress unfold I_opt_leb in Hab, Hba.
+progress unfold I_opt_leb.
+destruct rngl_opt_leb as [le| ]; [ | easy ].
+now apply H1.
+Qed.
+
+Theorem I_opt_add_le_compat : let roi := I_ring_like_op in
+  if rngl_is_ordered (ideal P) then
+    ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L
+  else not_applicable.
+Proof.
+intros.
+remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
+destruct de; [ | easy ].
+intros a b c d Hab Hba.
+specialize rngl_opt_ord as H1.
+progress unfold rngl_is_ordered in Hde; cbn in Hde.
+progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in H1.
+destruct rngl_opt_leb; [ cbn in H1 | easy ].
+specialize (rngl_ord_add_le_compat (i_val a) (i_val b)) as H2.
+specialize (H2 (i_val c) (i_val d)).
+rename H1 into rr; rename H2 into H1.
+progress unfold rngl_le in Hab, Hba.
+progress unfold rngl_le in H1.
+progress unfold roi in Hab, Hba.
+progress unfold I_ring_like_op in Hab, Hba.
+progress unfold rngl_le.
+progress unfold roi.
+progress unfold I_ring_like_op.
+cbn in Hab, Hba |-*.
+progress unfold I_opt_leb in Hab, Hba.
+progress unfold I_opt_leb.
+destruct rngl_opt_leb as [le| ]; [ | easy ].
+now apply H1.
+Qed.
+
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
   if rngl_has_eq_dec (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
   else not_applicable.
@@ -563,44 +624,6 @@ induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
 
-Theorem I_opt_le_trans : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
-  else not_applicable.
-Proof.
-intros.
-specialize rngl_opt_le_trans as H1.
-progress unfold rngl_is_ordered in H1.
-progress unfold rngl_is_ordered.
-progress unfold roi; cbn.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-progress unfold rngl_le in H1.
-destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
-cbn in H1.
-intros * Hab Hbc.
-now apply (H1 _ (i_val b)).
-Qed.
-
-Theorem I_opt_add_le_compat : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L
-  else not_applicable.
-Proof.
-intros.
-specialize rngl_opt_add_le_compat as H1.
-progress unfold rngl_is_ordered in H1.
-progress unfold rngl_is_ordered.
-progress unfold roi; cbn.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-progress unfold rngl_le in H1.
-destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
-cbn in H1.
-intros * Hab Hbc.
-now apply (H1 _ (i_val b)).
-Qed.
-
 Theorem I_opt_mul_le_compat_nonneg : let roi := I_ring_like_op in
   if (rngl_is_ordered (ideal P) && rngl_has_opp (ideal P))%bool then
     ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
@@ -720,6 +743,20 @@ split. {
   progress unfold roi in Hor.
   rewrite Hor in H1.
   apply H1.
+} {
+  intros a b c Hab Hbc.
+  specialize I_opt_le_trans as H1.
+  cbn in H1.
+  progress unfold roi in Hor.
+  rewrite Hor in H1.
+  now apply (H1 _ b).
+} {
+  intros a b c d Hab Hcd.
+  specialize I_opt_add_le_compat as H1.
+  cbn in H1.
+  progress unfold roi in Hor.
+  rewrite Hor in H1.
+  now apply H1.
 }
 Qed.
 
@@ -749,8 +786,6 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := I_characteristic_prop;
      rngl_opt_ord := I_ring_like_ord;
-     rngl_opt_le_trans := I_opt_le_trans;
-     rngl_opt_add_le_compat := I_opt_add_le_compat;
      rngl_opt_mul_le_compat_nonneg := I_opt_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat_non_opp := I_opt_mul_le_compat;

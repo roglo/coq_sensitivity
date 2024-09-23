@@ -97,8 +97,6 @@ Definition angle_ring_like_prop :
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := NA;
      rngl_opt_ord := NA;
-     rngl_opt_le_trans := NA;
-     rngl_opt_add_le_compat := NA;
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat_non_opp := NA;
