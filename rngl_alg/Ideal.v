@@ -359,102 +359,87 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
-Theorem I_opt_le_dec : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
-  else not_applicable.
+Theorem I_opt_le_dec :
+  let roi := I_ring_like_op : ring_like_op (ideal P) in
+  rngl_is_ordered (ideal P) = true →
+  ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
 Proof.
-intros.
-remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros.
+intros roi Hor *.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
 specialize (rngl_ord_le_dec (i_val a) (i_val b)) as H2.
-rename H1 into rr; rename H2 into H1.
-destruct H1 as [H1| H1]; [ left | right ]. {
+destruct H2 as [H2| H2]; [ left | right ]. {
   progress unfold rngl_le; cbn.
   progress unfold I_opt_leb.
-  progress unfold rngl_le in H1.
+  progress unfold rngl_le in H2.
   now destruct rngl_opt_leb.
 } {
-  intros H; apply H1; clear H1; rename H into H1.
-  progress unfold rngl_le in H1;   cbn in H1.
-  progress unfold I_opt_leb in H1.
+  intros H; apply H2; clear H2; rename H into H2.
+  progress unfold rngl_le in H2; cbn in H2.
+  progress unfold I_opt_leb in H2.
   progress unfold rngl_le.
   now destruct rngl_opt_leb.
 }
 Qed.
 
-Theorem I_opt_le_refl : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then ∀ a : ideal P, (a ≤ a)%L
-  else not_applicable.
+Theorem I_opt_le_refl :
+  let roi := I_ring_like_op : ring_like_op (ideal P) in
+  rngl_is_ordered (ideal P) = true →
+  ∀ a : ideal P, (a ≤ a)%L.
 Proof.
-intros.
-remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros.
+intros roi Hor *.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
 specialize (rngl_ord_le_refl (i_val a)) as H2.
-rename H1 into rr; rename H2 into H1.
 progress unfold rngl_le; cbn.
 progress unfold I_opt_leb.
-progress unfold rngl_le in H1.
+progress unfold rngl_le in H2.
 now destruct rngl_opt_leb.
 Qed.
 
-Theorem I_opt_le_antisymm : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b
-  else not_applicable.
+Theorem I_opt_le_antisymm :
+  let roi := I_ring_like_op in
+  rngl_is_ordered (ideal P) = true →
+  ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b.
 Proof.
-intros.
-remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros a b Hab Hba.
+intros roi Hor a b Hab Hba.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
 specialize (rngl_ord_le_antisymm (i_val a) (i_val b)) as H2.
-rename H1 into rr; rename H2 into H1.
 progress unfold rngl_le in Hab, Hba.
-progress unfold rngl_le in H1.
+progress unfold rngl_le in H2.
 progress unfold roi in Hab, Hba.
 progress unfold I_ring_like_op in Hab, Hba.
 cbn in Hab, Hba.
 progress unfold I_opt_leb in Hab, Hba.
 destruct rngl_opt_leb as [le| ]; [ | easy ].
-specialize (H1 Hab Hba).
-now apply eq_ideal_eq in H1.
+apply eq_ideal_eq.
+apply (H2 Hab Hba).
 Qed.
 
-Theorem I_opt_le_trans : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L
-  else not_applicable.
+Theorem I_opt_le_trans :
+  let roi := I_ring_like_op in
+  rngl_is_ordered (ideal P) = true →
+  ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L.
 Proof.
-intros.
-remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros a b c Hab Hba.
+intros roi Hor * Hab Hba.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
 specialize (rngl_ord_le_trans (i_val a) (i_val b) (i_val c)) as H2.
-rename H1 into rr; rename H2 into H1.
 progress unfold rngl_le in Hab, Hba.
-progress unfold rngl_le in H1.
+progress unfold rngl_le in H2.
 progress unfold roi in Hab, Hba.
 progress unfold I_ring_like_op in Hab, Hba.
 progress unfold rngl_le.
@@ -464,40 +449,38 @@ cbn in Hab, Hba |-*.
 progress unfold I_opt_leb in Hab, Hba.
 progress unfold I_opt_leb.
 destruct rngl_opt_leb as [le| ]; [ | easy ].
-now apply H1.
+apply (H2 Hab Hba).
 Qed.
 
-Theorem I_opt_add_le_compat : let roi := I_ring_like_op in
-  if rngl_is_ordered (ideal P) then
-    ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L
-  else not_applicable.
+Theorem I_opt_add_le_compat :
+  let roi := I_ring_like_op in
+  rngl_is_ordered (ideal P) = true →
+  ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L.
 Proof.
-intros.
-remember (rngl_is_ordered _) as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros a b c d Hab Hba.
+intros roi Hor.
+intros * Hab Hcd.
 specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hde; cbn in Hde.
-progress unfold I_opt_leb in Hde.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
 progress unfold rngl_is_ordered in H1.
 destruct rngl_opt_leb; [ cbn in H1 | easy ].
-specialize (rngl_ord_add_le_compat (i_val a) (i_val b)) as H2.
-specialize (H2 (i_val c) (i_val d)).
-rename H1 into rr; rename H2 into H1.
-progress unfold rngl_le in Hab, Hba.
-progress unfold rngl_le in H1.
-progress unfold roi in Hab, Hba.
-progress unfold I_ring_like_op in Hab, Hba.
+specialize rngl_ord_add_le_compat as H2.
+specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
+progress unfold rngl_le in Hab, Hcd.
+progress unfold rngl_le in H2.
+progress unfold roi in Hab, Hcd.
+progress unfold I_ring_like_op in Hab, Hcd.
 progress unfold rngl_le.
 progress unfold roi.
 progress unfold I_ring_like_op.
-cbn in Hab, Hba |-*.
-progress unfold I_opt_leb in Hab, Hba.
+cbn in Hab, Hcd |-*.
+progress unfold I_opt_leb in Hab, Hcd.
 progress unfold I_opt_leb.
 destruct rngl_opt_leb as [le| ]; [ | easy ].
-now apply H1.
+apply (H2 Hab Hcd).
 Qed.
 
+(*
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
   if rngl_has_eq_dec (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
   else not_applicable.
@@ -522,6 +505,7 @@ split; intros Hab. {
   now apply eq_ideal_eq in Hab.
 }
 Qed.
+*)
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
   if rngl_is_integral_domain T then
@@ -723,40 +707,15 @@ remember (rngl_is_ordered (ideal P)) as or eqn:Hor.
 symmetry in Hor.
 destruct or; [ | easy ].
 split. {
-  intros a b.
-  specialize I_opt_le_dec as H1.
-  cbn in H1.
-  progress unfold roi in Hor.
-  rewrite Hor in H1.
-  apply H1.
+  apply (I_opt_le_dec Hor).
 } {
-  intros a.
-  specialize I_opt_le_refl as H1.
-  cbn in H1.
-  progress unfold roi in Hor.
-  rewrite Hor in H1.
-  apply H1.
+  apply (I_opt_le_refl Hor).
 } {
-  intros a.
-  specialize I_opt_le_antisymm as H1.
-  cbn in H1.
-  progress unfold roi in Hor.
-  rewrite Hor in H1.
-  apply H1.
+  apply (I_opt_le_antisymm Hor).
 } {
-  intros a b c Hab Hbc.
-  specialize I_opt_le_trans as H1.
-  cbn in H1.
-  progress unfold roi in Hor.
-  rewrite Hor in H1.
-  now apply (H1 _ b).
+  apply (I_opt_le_trans Hor).
 } {
-  intros a b c d Hab Hcd.
-  specialize I_opt_add_le_compat as H1.
-  cbn in H1.
-  progress unfold roi in Hor.
-  rewrite Hor in H1.
-  now apply H1.
+  apply (I_opt_add_le_compat Hor).
 }
 Qed.
 
