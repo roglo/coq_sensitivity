@@ -775,6 +775,37 @@ Definition I_ring_like_ord {P} (I : ideal P) :=
 *)
 
 (* to be completed
+Theorem I_ring_like_ord :
+  let roi := I_ring_like_op in
+  if rngl_is_ordered (ideal P) then ring_like_ord (ideal P)
+  else not_applicable.
+Proof.
+intros.
+specialize rngl_opt_not_le as H1.
+progress unfold rngl_is_ordered, rngl_has_opp in H1.
+progress unfold rngl_is_ordered, rngl_has_opp.
+progress unfold roi; cbn.
+(*
+progress unfold rngl_le; cbn.
+*)
+progress unfold I_opt_leb.
+progress unfold rngl_le in H1.
+destruct rngl_opt_leb as [le| ]; [ | easy ].
+cbn in H1 |-*.
+split. {
+  intros.
+  specialize (H1 (i_val a) (i_val b)).
+  remember (le (i_val a) (i_val b)) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x. {
+    left.
+Set Printing All.
+...
+intros * Hab.
+specialize (H1 (i_val a) (i_val b) Hab).
+destruct H1 as (H1, H2).
+...
+
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
      rngl_is_integral_domain := rngl_is_integral_domain T;
@@ -800,12 +831,7 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_integral := I_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := I_characteristic_prop;
-     rngl_opt_ord := 
-       if rngl_is_ordered (ideal P) then
-         if rngl_is_ordered (ideal P) then
-            I_ring_like_ord
-         else NA
-       else NA;
+     rngl_opt_ord := I_ring_like_ord;
      rngl_opt_le_antisymm := I_opt_le_antisymm;
      rngl_opt_le_trans := I_opt_le_trans;
      rngl_opt_add_le_compat := I_opt_add_le_compat;
