@@ -4294,7 +4294,7 @@ move δ before ε.
     rewrite (rngl_squ_0 Hos) in H1.
 ...
     specialize (Hc (√(1 - ε²)))%L.
-    assert (H : (0 < √(1 - ε²))%L) by admit. (* en fait, à voir... *)
+    assert (H : (0 < √(1 - ε²))%L) by ... (* à voir... *)
     specialize (Hc H).
     destruct Hc as (N, HN).
     exists N.

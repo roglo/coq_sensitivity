@@ -587,29 +587,38 @@ destruct (rngl_opt_opp_or_subt T) as [[os| os]| ]; [ easy | | ]. {
 }
 Qed.
 
-(* to be completed
 Theorem I_opt_not_le :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   ∀ a b : ideal P, ¬ (a ≤ b)%L → a ≠ b ∧ (b ≤ a)%L.
 Proof.
-intros.
-...
-specialize rngl_opt_not_le as H1.
-progress unfold rngl_is_ordered, rngl_has_opp in H1.
-progress unfold rngl_is_ordered, rngl_has_opp.
-progress unfold roi; cbn.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-progress unfold rngl_le in H1.
-destruct rngl_opt_leb as [le| ]; [ cbn | easy ].
-cbn in H1 |-*.
+intros roi Hor.
 intros * Hab.
-specialize (H1 (i_val a) (i_val b) Hab).
-destruct H1 as (H1, H2).
-now apply neq_ideal_neq in H1.
+specialize rngl_opt_ord as H1.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
+progress unfold rngl_is_ordered in H1.
+destruct rngl_opt_leb; [ cbn in H1 | easy ].
+specialize rngl_ord_not_le as H2.
+specialize (H2 (i_val a) (i_val b)).
+progress unfold rngl_le in Hab.
+progress unfold rngl_le in H2.
+progress unfold roi in Hab.
+progress unfold I_ring_like_op in Hab.
+progress unfold rngl_le.
+progress unfold roi.
+progress unfold I_ring_like_op.
+cbn in Hab |-*.
+progress unfold I_opt_leb in Hab.
+progress unfold I_opt_leb.
+destruct rngl_opt_leb as [le| ]. {
+  specialize (H2 Hab).
+  split; [ | easy ].
+  intros H; subst b.
+  now apply Hab; clear Hab.
+}
+now specialize (H2 Hab).
 Qed.
-*)
 
 (*
 Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
@@ -739,7 +748,6 @@ induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
 
-(* to be completed
 Theorem I_ring_like_ord :
   let roi := I_ring_like_op in
   if rngl_is_ordered (ideal P) then ring_like_ord (ideal P)
@@ -760,12 +768,11 @@ split. {
 } {
   apply (I_opt_add_le_compat Hor).
 } {
-...
   apply (I_opt_mul_le_compat_nonneg Hor).
 } {
   apply (I_opt_mul_le_compat_nonpos Hor).
 } {
-  apply (I_opt_mul_le_compat Hor).
+  apply (I_opt_mul_le_compat_non_opp Hor).
 } {
   apply (I_opt_not_le Hor).
 }
@@ -798,6 +805,5 @@ Definition I_ring_like_prop : ring_like_prop (ideal P) :=
      rngl_opt_characteristic_prop := I_characteristic_prop;
      rngl_opt_ord := I_ring_like_ord;
      rngl_opt_archimedean := NA |}.
-*)
 
 End a.

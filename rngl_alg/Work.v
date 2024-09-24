@@ -2756,7 +2756,7 @@ Theorem glop :
   → fst (rank_fst_loop (2 * (m + n)) 1 1 (2 * (m + n))) =
     S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
 Proof.
-Admitted.
+...
 now apply (glop 2).
 ...
 *)
@@ -2790,7 +2790,7 @@ Theorem glop :
   → fst (rank_fst_loop (2 * (m + n)) 1 1 (2 * (m + n))) =
     S m + fst (rank_fst_loop n 1 (2 ^ m) (m + n)).
 Proof.
-Admitted.
+...
 now apply (glop 3).
 ...
 *)

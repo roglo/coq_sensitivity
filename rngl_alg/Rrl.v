@@ -4,10 +4,6 @@ Set Nested Proofs Allowed.
 Require Import Utf8.
 Require Import Reals.Cauchy.ConstructiveCauchyReals.
 Require Import Reals.Cauchy.ConstructiveCauchyRealsMult.
-(*
-Require Import Reals.Cauchy.ConstructiveCauchyAbs.
-Require Import Reals.Cauchy.ConstructiveRcomplete.
-*)
 Require Import QArith.
 Require Import Main.RingLike.
 

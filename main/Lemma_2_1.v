@@ -1153,7 +1153,7 @@ assert
    - and then U and D are the result of this diagonalization
 *)
 ...
-  assert (Hdc : mat_ncols D = n) by _admit.
+  assert (Hdc : mat_ncols D = n) by _admi.
   assert (H1 : mat_nrows (U⁺ * D) = n). {
     rewrite mat_mul_nrows, mat_transp_nrows.
     congruence.
@@ -1164,8 +1164,8 @@ assert
     rewrite squ_mat_ncols; [ | easy ].
     congruence.
   }
-  assert (Huu1 : (U * U⁺ = mI n)%M) by _admit.
-  assert (Huu2 : (U⁺ * U = mI n)%M) by _admit.
+  assert (Huu1 : (U * U⁺ = mI n)%M) by _admi.
+  assert (Huu2 : (U⁺ * U = mI n)%M) by _admi.
   assert (Hdm : D = (U * M * U⁺)%M). {
     rewrite Hmin.
     rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
@@ -1173,34 +1173,34 @@ assert
     rewrite Huu1.
     rewrite mat_mul_1_l; [ | easy | | ]. 2: {
 ...
-    rewrite mat_mul_1_l; [ | easy | _admit | _admit ].
-    rewrite <- mat_mul_assoc; [ | easy | _admit | _admit | _admit ].
+    rewrite mat_mul_1_l; [ | easy | _admi | _admi ].
+    rewrite <- mat_mul_assoc; [ | easy | _admi | _admi | _admi ].
     rewrite Huu1.
-    symmetry; apply mat_mul_1_r; [ easy | _admit | _admit ].
+    symmetry; apply mat_mul_1_r; [ easy | _admi | _admi ].
   }
   assert (Hdd : D⁺%M = D). {
     rewrite Hdm.
-    rewrite mat_transp_mul; [ | easy | _admit | _admit | _admit | _admit | _admit ].
-    rewrite mat_transp_involutive; [ | _admit ].
-    rewrite mat_transp_mul; [ | easy | _admit | _admit | _admit | _admit | _admit ].
+    rewrite mat_transp_mul; [ | easy | _admi | _admi | _admi | _admi | _admi ].
+    rewrite mat_transp_involutive; [ | _admi ].
+    rewrite mat_transp_mul; [ | easy | _admi | _admi | _admi | _admi | _admi ].
     rewrite <- Htm.
-    rewrite mat_mul_assoc; [ | easy | _admit | _admit | _admit ].
+    rewrite mat_mul_assoc; [ | easy | _admi | _admi | _admi ].
     easy.
   }
   f_equal. 2: {
-    rewrite mat_mul_vect_dot_vect; [ | easy | easy | easy | _admit | _admit ].
-    rewrite mat_vect_mul_assoc; [ | easy | _admit | _admit | _admit | _admit ].
+    rewrite mat_mul_vect_dot_vect; [ | easy | easy | easy | _admi | _admi ].
+    rewrite mat_vect_mul_assoc; [ | easy | _admi | _admi | _admi | _admi ].
     rewrite Huu2.
     now rewrite mat_vect_mul_1_l.
   }
   rewrite Htm.
   rewrite <- mat_mul_vect_dot_vect; try easy; try congruence.
   rewrite Hmin.
-  rewrite <- mat_vect_mul_assoc; [ | easy | _admit | _admit | _admit | _admit ].
-  rewrite mat_mul_vect_dot_vect; [ | easy | _admit | _admit | _admit | _admit ].
-  rewrite mat_transp_mul; [ | easy | _admit | _admit | _admit | _admit | _admit ].
-  rewrite mat_transp_involutive; [ | _admit ].
-  rewrite <- mat_vect_mul_assoc; [ | easy | _admit | _admit | _admit | _admit ].
+  rewrite <- mat_vect_mul_assoc; [ | easy | _admi | _admi | _admi | _admi ].
+  rewrite mat_mul_vect_dot_vect; [ | easy | _admi | _admi | _admi | _admi ].
+  rewrite mat_transp_mul; [ | easy | _admi | _admi | _admi | _admi | _admi ].
+  rewrite mat_transp_involutive; [ | _admi ].
+  rewrite <- mat_vect_mul_assoc; [ | easy | _admi | _admi | _admi | _admi ].
   now rewrite Hdd.
 }
 (* bon, il faut que je prouve que, si M est symétrique, alors
