@@ -360,7 +360,7 @@ unfold I_subt, I_add; cbn.
 apply H1.
 Qed.
 
-Theorem I_opt_le_dec :
+Theorem I_ord_le_dec :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
   rngl_is_ordered (ideal P) = true →
   ∀ a b : ideal P, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
@@ -386,7 +386,7 @@ destruct H2 as [H2| H2]; [ left | right ]. {
 }
 Qed.
 
-Theorem I_opt_le_refl :
+Theorem I_ord_le_refl :
   let roi := I_ring_like_op : ring_like_op (ideal P) in
   rngl_is_ordered (ideal P) = true →
   ∀ a : ideal P, (a ≤ a)%L.
@@ -404,7 +404,7 @@ progress unfold rngl_le in H2.
 now destruct rngl_opt_leb.
 Qed.
 
-Theorem I_opt_le_antisymm :
+Theorem I_ord_le_antisymm :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   ∀ a b : ideal P, (a ≤ b)%L → (b ≤ a)%L → a = b.
@@ -427,7 +427,7 @@ apply eq_ideal_eq.
 apply (H2 Hab Hba).
 Qed.
 
-Theorem I_opt_le_trans :
+Theorem I_ord_le_trans :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   ∀ a b c : ideal P, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L.
@@ -453,7 +453,7 @@ destruct rngl_opt_leb as [le| ]; [ | easy ].
 apply (H2 Hab Hba).
 Qed.
 
-Theorem I_opt_add_le_compat :
+Theorem I_ord_add_le_compat :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   ∀ a b c d : ideal P, (a ≤ b)%L → (c ≤ d)%L → (a + c ≤ b + d)%L.
@@ -481,7 +481,7 @@ destruct rngl_opt_leb as [le| ]; [ | easy ].
 apply (H2 Hab Hcd).
 Qed.
 
-Theorem I_opt_mul_le_compat_nonneg :
+Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   if rngl_has_opp (ideal P) then
@@ -517,7 +517,7 @@ destruct rngl_opt_leb as [le| ]; [ | easy ].
 now apply H1.
 Qed.
 
-Theorem I_opt_mul_le_compat_nonpos :
+Theorem I_ord_mul_le_compat_nonpos :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   if rngl_has_opp (ideal P) then
@@ -551,7 +551,7 @@ destruct rngl_opt_leb; [ cbn in H1 | easy ].
 now apply H2.
 Qed.
 
-Theorem I_opt_mul_le_compat_non_opp :
+Theorem I_ord_mul_le_compat_non_opp :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   if negb (rngl_has_opp (ideal P)) then
@@ -587,7 +587,7 @@ destruct (rngl_opt_opp_or_subt T) as [[os| os]| ]; [ easy | | ]. {
 }
 Qed.
 
-Theorem I_opt_not_le :
+Theorem I_ord_not_le :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
   ∀ a b : ideal P, ¬ (a ≤ b)%L → a ≠ b ∧ (b ≤ a)%L.
@@ -749,15 +749,15 @@ now f_equal.
 Qed.
 
 Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
-  {| rngl_ord_le_dec := I_opt_le_dec Hor;
-     rngl_ord_le_refl := I_opt_le_refl Hor;
-     rngl_ord_le_antisymm := I_opt_le_antisymm Hor;
-     rngl_ord_le_trans := I_opt_le_trans Hor;
-     rngl_ord_add_le_compat := I_opt_add_le_compat Hor;
-     rngl_ord_mul_le_compat_nonneg := I_opt_mul_le_compat_nonneg Hor;
-     rngl_ord_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos Hor;
-     rngl_ord_mul_le_compat_non_opp := I_opt_mul_le_compat_non_opp Hor;
-     rngl_ord_not_le := I_opt_not_le Hor |}.
+  {| rngl_ord_le_dec := I_ord_le_dec Hor;
+     rngl_ord_le_refl := I_ord_le_refl Hor;
+     rngl_ord_le_antisymm := I_ord_le_antisymm Hor;
+     rngl_ord_le_trans := I_ord_le_trans Hor;
+     rngl_ord_add_le_compat := I_ord_add_le_compat Hor;
+     rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor;
+     rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
+     rngl_ord_mul_le_compat_non_opp := I_ord_mul_le_compat_non_opp Hor;
+     rngl_ord_not_le := I_ord_not_le Hor |}.
 
 Theorem I_ring_like_ord :
   let roi := I_ring_like_op in
