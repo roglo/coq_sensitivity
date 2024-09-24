@@ -481,7 +481,6 @@ destruct rngl_opt_leb as [le| ]; [ | easy ].
 apply (H2 Hab Hcd).
 Qed.
 
-(* to be completed
 Theorem I_opt_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -500,52 +499,25 @@ progress unfold rngl_has_opp in Hop.
 cbn in Hop.
 destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
 destruct os; [ clear Hop | easy ].
-(*
-progress unfold rngl_has_opp in H1.
-*)
 progress unfold rngl_is_ordered in Hor; cbn in Hor.
 progress unfold I_opt_leb in Hor.
 progress unfold rngl_le.
 progress unfold rngl_le in Hac.
 progress unfold rngl_le in Hbd.
 progress unfold rngl_le in H1.
-(*
-...
-remember (rngl_opt_opp_or_subt) as os eqn:Hos.
-symmetry in Hos.
-destruct os as [os| ]. {
-  destruct os. {
-specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
-progress unfold rngl_le in H2.
-*)
-destruct rngl_opt_leb; [ | easy ].
-destruct rngl_opt_leb; [ | easy ].
-cbn in Hac, Hbd |-*.
-...
+progress unfold rngl_opt_leb in Hac.
+progress unfold rngl_opt_leb in Hbd.
+cbn in Hac, Hbd.
+progress unfold rngl_opt_leb.
+cbn.
 progress unfold I_opt_leb in Hac.
 progress unfold I_opt_leb in Hbd.
 progress unfold I_opt_leb.
-destruct rngl_opt_leb; [ | easy ].
-cbn in Hac, Hbd |-*.
-(*
-...
-specialize rngl_ord_mul_le_compat_nonneg as H2.
-progress unfold rngl_is_ordered, rngl_has_opp in H2.
-progress unfold rngl_is_ordered, rngl_has_opp.
-progress unfold roi; cbn.
-progress unfold rngl_le; cbn.
-progress unfold I_opt_leb.
-progress unfold rngl_le in H2.
-*)
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct rngl_opt_leb; [ cbn in H1 | ].
-...
-destruct os as [opp| subt]; [ | easy ].
-cbn in H2 |-*.
-intros * Hab Hbc.
-apply H2.
+destruct rngl_opt_leb as [le| ]; [ | easy ].
+now apply H1.
 Qed.
 
+(* to be completed
 Theorem I_opt_mul_le_compat_nonpos :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
