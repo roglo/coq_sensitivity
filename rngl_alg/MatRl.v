@@ -776,10 +776,6 @@ Definition mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := @squ_mat_characteristic_prop eq_dec n;
      rngl_opt_ord := NA;
-     rngl_opt_mul_le_compat_nonneg := NA;
-     rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat_non_opp := NA;
-     rngl_opt_not_le := NA;
      rngl_opt_archimedean := NA |}.
 
 End a.

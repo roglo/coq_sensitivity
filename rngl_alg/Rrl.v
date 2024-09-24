@@ -305,10 +305,6 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := CReal_characteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_mul_le_compat_nonneg := NA; (*CReal_mul_le_compat_nonneg;*)
-     rngl_opt_mul_le_compat_nonpos := NA; (*CReal_mul_le_compat_nonpos;*)
-     rngl_opt_mul_le_compat_non_opp := NA;
-     rngl_opt_not_le := NA (*CReal_not_le*);
      rngl_opt_archimedean := NA |}.
 
 (*
@@ -493,10 +489,6 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Rcharacteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_mul_le_compat_nonneg := NA; (*Ropt_mul_le_compat_nonneg;*)
-     rngl_opt_mul_le_compat_nonpos := NA; (*Ropt_mul_le_compat_nonpos;*)
-     rngl_opt_mul_le_compat_non_opp := NA;
-     rngl_opt_not_le := NA (*Ropt_not_le*);
      rngl_opt_archimedean := NA |}.
 
 (* complex numbers *)

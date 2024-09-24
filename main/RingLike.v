@@ -304,7 +304,20 @@ Class ring_like_ord T {ro : ring_like_op T} :=
     rngl_ord_le_refl : ∀ a, (a ≤ a)%L;
     rngl_ord_le_antisymm : ∀ a b, (a ≤ b → b ≤ a → a = b)%L;
     rngl_ord_le_trans : ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%L;
-    rngl_ord_add_le_compat : ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L }.
+    rngl_ord_add_le_compat : ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L;
+    rngl_ord_mul_le_compat_nonneg :
+      if rngl_has_opp T then
+        ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
+      else not_applicable;
+    rngl_ord_mul_le_compat_nonpos :
+      if rngl_has_opp T then
+        ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
+      else not_applicable;
+    rngl_ord_mul_le_compat_non_opp :
+      if negb (rngl_has_opp T) then
+        ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
+      else not_applicable;
+    rngl_ord_not_le : ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L }.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
@@ -382,22 +395,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when ordered *)
     rngl_opt_ord :
       if rngl_is_ordered T then ring_like_ord T
-      else not_applicable;
-    rngl_opt_mul_le_compat_nonneg :
-      if (rngl_is_ordered T && rngl_has_opp T)%bool then
-        ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_opt_mul_le_compat_nonpos :
-      if (rngl_is_ordered T && rngl_has_opp T)%bool then
-        ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_opt_mul_le_compat_non_opp :
-      if (rngl_is_ordered T && negb (rngl_has_opp T))%bool then
-        ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_opt_not_le :
-      if rngl_is_ordered T then
-        ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L
       else not_applicable;
     (* archimedean *)
     rngl_opt_archimedean :
@@ -765,9 +762,11 @@ Proof.
 intros * Hor a b.
 progress unfold rngl_lt.
 progress unfold rngl_le.
-specialize rngl_opt_not_le as H1.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_not_le as H1.
 specialize (rngl_le_antisymm Hor) as H2.
-rewrite Hor in H1.
 progress unfold rngl_le in H1.
 progress unfold rngl_le in H2.
 destruct rngl_opt_leb as [rngl_leb| ]; [ | easy ].
@@ -793,10 +792,12 @@ Proof.
 intros Hor *.
 progress unfold rngl_lt.
 progress unfold rngl_le.
-specialize rngl_opt_not_le as H1.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_not_le as H1.
 specialize (rngl_le_antisymm Hor) as H2.
 specialize (rngl_le_refl Hor) as H3.
-rewrite Hor in H1.
 progress unfold rngl_le in H1.
 progress unfold rngl_le in H2.
 progress unfold rngl_le in H3.
@@ -821,15 +822,14 @@ intros Hor *.
 specialize rngl_opt_ord as rr.
 rewrite Hor in rr.
 move rr after rp.
-specialize (rngl_ord_le_dec) as H1.
+specialize rngl_ord_le_dec as H1.
 destruct (H1 b a) as [H2| H2]; [ right | left ]. {
   intros H3.
   apply (rngl_lt_iff Hor) in H3.
   destruct H3 as (H3, H4).
   now apply (rngl_le_antisymm Hor) in H2.
 } {
-  specialize rngl_opt_not_le as H3.
-  rewrite Hor in H3.
+  specialize rngl_ord_not_le as H3.
   apply H3 in H2.
   apply (rngl_lt_iff Hor).
   split; [ easy | ].
@@ -865,8 +865,11 @@ Theorem rngl_mul_le_compat_nonneg :
   ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hop Hor *.
-specialize rngl_opt_mul_le_compat_nonneg as H.
-rewrite Hor, Hop in H.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_mul_le_compat_nonneg as H.
+rewrite Hop in H.
 apply H.
 Qed.
 
@@ -876,8 +879,11 @@ Theorem rngl_mul_le_compat_nonpos :
   ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hop Hor *.
-specialize rngl_opt_mul_le_compat_nonpos as H.
-rewrite Hor, Hop in H.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_mul_le_compat_nonpos as H.
+rewrite Hop in H.
 apply H.
 Qed.
 
@@ -887,8 +893,12 @@ Theorem rngl_mul_le_compat_non_opp :
   ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hop Hor * Hac Hbd.
-specialize rngl_opt_mul_le_compat_non_opp as H.
-rewrite Hor, Hop in H.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_mul_le_compat_non_opp as H.
+rewrite Hop in H.
+cbn in H.
 now apply H.
 Qed.
 
@@ -897,8 +907,10 @@ Theorem rngl_not_le :
   ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L.
 Proof.
 intros Hor *.
-specialize rngl_opt_not_le as H.
-rewrite Hor in H.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_not_le as H.
 apply H.
 Qed.
 

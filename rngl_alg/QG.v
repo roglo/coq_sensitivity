@@ -2303,7 +2303,11 @@ Definition QG_ring_like_ord :=
      rngl_ord_le_refl := QG_le_refl;
      rngl_ord_le_antisymm := QG_le_antisymm;
      rngl_ord_le_trans := QG_le_trans;
-     rngl_ord_add_le_compat := QG_add_le_compat |}.
+     rngl_ord_add_le_compat := QG_add_le_compat;
+     rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
+     rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
+     rngl_ord_mul_le_compat_non_opp := NA;
+     rngl_ord_not_le := QG_not_le |}.
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
@@ -2331,8 +2335,4 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := QG_characteristic_prop;
      rngl_opt_ord := QG_ring_like_ord;
-     rngl_opt_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat_non_opp := NA;
-     rngl_opt_not_le := QG_not_le;
      rngl_opt_archimedean := QG_archimedean |}.

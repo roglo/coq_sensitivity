@@ -145,7 +145,11 @@ Definition nat_ring_like_ord :=
      rngl_ord_le_refl := Nat.leb_refl;
      rngl_ord_le_antisymm := Nat_le_antisymm;
      rngl_ord_le_trans := Nat_le_trans;
-     rngl_ord_add_le_compat := Nat_add_le_compat |}.
+     rngl_ord_add_le_compat := Nat_add_le_compat;
+     rngl_ord_mul_le_compat_nonneg := NA;
+     rngl_ord_mul_le_compat_nonpos := NA;
+     rngl_ord_mul_le_compat_non_opp := Nat_mul_le_compat_non_opp;
+     rngl_ord_not_le := Nat_not_le |}.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_mul_is_comm := true;
@@ -173,10 +177,6 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := nat_opt_characteristic_prop;
      rngl_opt_ord := nat_ring_like_ord;
-     rngl_opt_mul_le_compat_nonneg := NA;
-     rngl_opt_mul_le_compat_nonpos := NA;
-     rngl_opt_mul_le_compat_non_opp := Nat_mul_le_compat_non_opp;
-     rngl_opt_not_le := Nat_not_le;
      rngl_opt_archimedean := nat_archimedean |}.
 
 (*
