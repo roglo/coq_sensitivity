@@ -491,26 +491,37 @@ Theorem I_opt_mul_le_compat_nonneg :
 Proof.
 intros roi Hor.
 remember (rngl_has_opp (ideal P)) as op eqn:Hop.
+specialize rngl_ord_mul_le_compat_nonneg as H1.
 symmetry in Hop.
 destruct op; [ | easy ].
 intros * Hac Hbd.
-specialize rngl_ord_mul_le_compat_nonneg as H1.
 progress unfold rngl_has_opp in H1.
+progress unfold rngl_has_opp in Hop.
+cbn in Hop.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+destruct os; [ clear Hop | easy ].
+(*
+progress unfold rngl_has_opp in H1.
+*)
 progress unfold rngl_is_ordered in Hor; cbn in Hor.
 progress unfold I_opt_leb in Hor.
 progress unfold rngl_le.
 progress unfold rngl_le in Hac.
 progress unfold rngl_le in Hbd.
+progress unfold rngl_le in H1.
+(*
+...
 remember (rngl_opt_opp_or_subt) as os eqn:Hos.
 symmetry in Hos.
 destruct os as [os| ]. {
   destruct os. {
-(*
 specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
 progress unfold rngl_le in H2.
 *)
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
+destruct rngl_opt_leb; [ | easy ].
+destruct rngl_opt_leb; [ | easy ].
 cbn in Hac, Hbd |-*.
+...
 progress unfold I_opt_leb in Hac.
 progress unfold I_opt_leb in Hbd.
 progress unfold I_opt_leb.
