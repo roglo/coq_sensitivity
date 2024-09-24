@@ -748,6 +748,17 @@ induction l as [| a la]; [ easy | cbn ].
 now f_equal.
 Qed.
 
+Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
+  {| rngl_ord_le_dec := I_opt_le_dec Hor;
+     rngl_ord_le_refl := I_opt_le_refl Hor;
+     rngl_ord_le_antisymm := I_opt_le_antisymm Hor;
+     rngl_ord_le_trans := I_opt_le_trans Hor;
+     rngl_ord_add_le_compat := I_opt_add_le_compat Hor;
+     rngl_ord_mul_le_compat_nonneg := I_opt_mul_le_compat_nonneg Hor;
+     rngl_ord_mul_le_compat_nonpos := I_opt_mul_le_compat_nonpos Hor;
+     rngl_ord_mul_le_compat_non_opp := I_opt_mul_le_compat_non_opp Hor;
+     rngl_ord_not_le := I_opt_not_le Hor |}.
+
 Theorem I_ring_like_ord :
   let roi := I_ring_like_op in
   if rngl_is_ordered (ideal P) then ring_like_ord (ideal P)
@@ -757,25 +768,7 @@ intros.
 remember (rngl_is_ordered (ideal P)) as or eqn:Hor.
 symmetry in Hor.
 destruct or; [ | easy ].
-split. {
-  apply (I_opt_le_dec Hor).
-} {
-  apply (I_opt_le_refl Hor).
-} {
-  apply (I_opt_le_antisymm Hor).
-} {
-  apply (I_opt_le_trans Hor).
-} {
-  apply (I_opt_add_le_compat Hor).
-} {
-  apply (I_opt_mul_le_compat_nonneg Hor).
-} {
-  apply (I_opt_mul_le_compat_nonpos Hor).
-} {
-  apply (I_opt_mul_le_compat_non_opp Hor).
-} {
-  apply (I_opt_not_le Hor).
-}
+apply (I_ring_like_when_ord Hor).
 Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
