@@ -91,7 +91,7 @@ Definition gc_mul (ca cb : GComplex T) :=
 
 Definition gc_opt_opp_or_subt :
   option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inl opp) =>
       Some (inl (λ c, mk_gc (opp (gre c)) (opp (gim c))))
   | Some (inr subt) =>

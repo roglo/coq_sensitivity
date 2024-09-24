@@ -2218,7 +2218,7 @@ Definition polyn_x_power n := polyn_of_norm_lap (lap_x_power n).
 
 Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inl _) => Some (inl polyn_opp)
   | Some (inr _) => Some (inr polyn_subt)
   | None => None
@@ -2234,7 +2234,7 @@ Definition polyn_opt_inv_or_quot :
       | left Hop =>
           match Sumbool.sumbool_of_bool (rngl_has_inv T) with
          | left Hiv =>
-             match rngl_opt_inv_or_quot with
+             match rngl_opt_inv_or_quot T with
              | Some _ => Some (inr polyn_quot)
              | None => None
              end
@@ -2598,19 +2598,19 @@ Theorem polyn_opt_mul_div :
   else not_applicable.
 Proof.
 intros rop; subst rop.
-unfold rngl_has_quot; cbn.
-unfold polyn_opt_inv_or_quot.
+progress unfold rngl_has_quot; cbn.
+progress unfold polyn_opt_inv_or_quot.
 destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hco| ]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| ]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)) as [Hiv| ]; [ | easy ].
-remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [inv| ]; [ | easy ].
 intros a b Hbz.
-unfold rngl_div, rngl_has_inv; cbn.
-unfold polyn_opt_inv_or_quot.
-unfold rngl_has_quot, polyn_opt_inv_or_quot; cbn.
-unfold rngl_quot; cbn.
-unfold polyn_opt_inv_or_quot.
+progress unfold rngl_div, rngl_has_inv; cbn.
+progress unfold polyn_opt_inv_or_quot.
+progress unfold rngl_has_quot, polyn_opt_inv_or_quot; cbn.
+progress unfold rngl_quot; cbn.
+progress unfold polyn_opt_inv_or_quot.
 rewrite Hco, Hop, Hiv, Hiq.
 destruct (Sumbool.sumbool_of_bool true); [ | easy ].
 now apply polyn_mul_div.
@@ -2919,7 +2919,7 @@ induction la as [| a]; intros; cbn. {
     specialize (rngl_add_sub Hos 0 0) as H1.
     rewrite rngl_add_0_r in H1.
     unfold rngl_sub, rngl_has_opp, rngl_has_subt, rngl_subt in H1.
-    remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+    remember (rngl_opt_opp_or_subt T) as os eqn:Hos'; symmetry in Hos'.
     destruct os as [os| ]; [ | easy ].
     now destruct os.
   }
@@ -3083,7 +3083,7 @@ unfold rngl_sub.
 rewrite Hopp, Hsup.
 unfold rngl_subt; cbn.
 unfold polyn_opt_opp_or_subt.
-remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+remember (rngl_opt_opp_or_subt T) as os eqn:Hos'; symmetry in Hos'.
 destruct os as [os| ]. 2: {
   unfold rngl_has_opp_or_subt in Hos.
   clear - Hos Hos'.
@@ -3132,7 +3132,7 @@ unfold rngl_sub.
 rewrite Hopp, Hsup.
 unfold rngl_subt; cbn.
 unfold polyn_opt_opp_or_subt.
-remember rngl_opt_opp_or_subt as os eqn:Hos'; symmetry in Hos'.
+remember (rngl_opt_opp_or_subt T) as os eqn:Hos'; symmetry in Hos'.
 destruct os as [os| ]. 2: {
   unfold rngl_has_opp_or_subt in Hos.
   clear - Hos Hos'.

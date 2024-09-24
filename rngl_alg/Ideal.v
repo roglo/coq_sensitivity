@@ -18,7 +18,7 @@ Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
   { ip_zero : P rngl_zero = true;
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
     ip_opp_or_subt :
-      match rngl_opt_opp_or_subt with
+      match rngl_opt_opp_or_subt T with
       | Some (inl opp) => ∀ a, P a = true → P (opp a)%L = true
       | Some (inr subt) => ∀ a b, P a = true → P b = true → P (subt a b) = true
       | None => not_applicable
@@ -151,7 +151,7 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
      rngl_mul := I_mul;
      rngl_opt_one := I_opt_one;
      rngl_opt_opp_or_subt :=
-       match rngl_opt_opp_or_subt with
+       match rngl_opt_opp_or_subt T with
        | Some (inl _) => Some (inl I_opp)
        | Some (inr _) => Some (inr I_subt)
        | None => None
@@ -525,6 +525,42 @@ Theorem I_opt_mul_le_compat_nonpos :
     ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
   else not_applicable.
 Proof.
+intros roi Hor.
+remember (rngl_has_opp (ideal P)) as op eqn:Hop.
+symmetry in Hop.
+destruct op; [ | easy ].
+intros * Hca Hdb.
+specialize rngl_ord_mul_le_compat_nonpos as H2.
+progress unfold rngl_has_opp in Hop.
+About rngl_opt_opp_or_subt.
+...
+progress unfold rngl_le in Hca.
+progress unfold rngl_le in Hdb.
+progress unfold rngl_le.
+cbn in Hca, Hdb |-*.
+progress unfold I_opt_leb in Hca.
+progress unfold I_opt_leb in Hdb.
+progress unfold I_opt_leb.
+specialize rngl_opt_ord as H1.
+progress unfold rngl_is_ordered in Hor; cbn in Hor.
+progress unfold I_opt_leb in Hor.
+progress unfold rngl_is_ordered in H1.
+destruct rngl_opt_leb; [ cbn in H1 | easy ].
+...
+specialize (H2 (i_val a) (i_val b) (i_val c) (i_val d)).
+progress unfold rngl_le in Hab, Hcd.
+progress unfold rngl_le in H2.
+progress unfold roi in Hab, Hcd.
+progress unfold I_ring_like_op in Hab, Hcd.
+progress unfold rngl_le.
+progress unfold roi.
+progress unfold I_ring_like_op.
+cbn in Hab, Hcd |-*.
+progress unfold I_opt_leb in Hab, Hcd.
+progress unfold I_opt_leb.
+destruct rngl_opt_leb as [le| ]; [ | easy ].
+apply (H2 Hab Hcd).
+...
 intros.
 ...
 specialize rngl_opt_mul_le_compat_nonpos as H1.

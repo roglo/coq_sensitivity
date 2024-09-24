@@ -61,6 +61,9 @@ Class ring_like_op T :=
     rngl_opt_eq_dec : option (∀ a b : T, {a = b} + {a ≠ b});
     rngl_opt_leb : option (T → T → bool) }.
 
+Arguments rngl_opt_opp_or_subt T {ring_like_op}.
+Arguments rngl_opt_inv_or_quot T {ring_like_op}.
+
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with L.
 
@@ -68,62 +71,62 @@ Definition rngl_has_1 T {ro : ring_like_op T} :=
   bool_of_option rngl_opt_one.
 
 Definition rngl_has_opp_or_subt T {R : ring_like_op T} :=
-  bool_of_option rngl_opt_opp_or_subt.
+  bool_of_option (rngl_opt_opp_or_subt T).
 
 Definition rngl_has_inv_or_quot T {R : ring_like_op T} :=
-  bool_of_option rngl_opt_inv_or_quot.
+  bool_of_option (rngl_opt_inv_or_quot T).
 
 Definition rngl_has_inv_and_1_or_quot T {R : ring_like_op T} :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inl _) => rngl_has_1 T
   | Some (inr _) => true
   | None => false
   end.
 
 Definition rngl_has_opp T {R : ring_like_op T} :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inl _) => true
   | _ => false
   end.
 
 Definition rngl_has_subt T {R : ring_like_op T} :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inr _) => true
   | _ => false
   end.
 
 Definition rngl_has_inv T {R : ring_like_op T} :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inl _) => true
   | _ => false
   end.
 
 Definition rngl_has_quot T {R : ring_like_op T} :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inr _) => true
   | _ => false
   end.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inl rngl_opp) => rngl_opp a
   | _ => rngl_zero
   end.
 
 Definition rngl_subt {T} {ro : ring_like_op T} a b :=
-  match rngl_opt_opp_or_subt with
+  match rngl_opt_opp_or_subt T with
   | Some (inr rngl_subt) => rngl_subt a b
   | _ => rngl_zero
   end.
 
 Definition rngl_inv {T} {R : ring_like_op T} a :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inl rngl_inv) => rngl_inv a
   | _ => rngl_zero
   end.
 
 Definition rngl_quot {T} {R : ring_like_op T} a b :=
-  match rngl_opt_inv_or_quot with
+  match rngl_opt_inv_or_quot T with
   | Some (inr rngl_quot) => rngl_quot a b
   | _ => rngl_zero
   end.
