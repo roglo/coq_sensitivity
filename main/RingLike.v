@@ -44,3 +44,4 @@
 
 Require Export RingLike_structures.
 Require Export RingLike_properties.
+Require Export RingLike_distances.
