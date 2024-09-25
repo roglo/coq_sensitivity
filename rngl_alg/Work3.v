@@ -87,7 +87,6 @@ specialize (cos2_sin2_1 θ') as H2.
 apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
-Search is_limit_when_tending_to_inf.
 Theorem rngl_limit_squ_limit :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -109,6 +108,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hlim.
+Search ({_ = _} + {_ ≠ _})%L.
+...
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
 ...
 intros ε Hε.

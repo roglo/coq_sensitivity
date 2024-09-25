@@ -615,6 +615,39 @@ progress unfold rngl_max.
 now destruct (a ≤? b)%L.
 Qed.
 
+Theorem rngl_eq_dec :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+apply rngl_eq_dec.
+Qed.
+
+(* to be completed
+   and replace rngl_eq_dec
+Theorem rngl_eq_dec' :
+  (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true →
+  ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Heo *.
+remember (rngl_has_eq_dec T) as ed eqn:Hed.
+symmetry in Hed.
+destruct ed. {
+  progress unfold rngl_has_eq_dec in Hed.
+  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+  apply rngl_eq_dec.
+}
+cbn in Heo.
+rename Heo into Hop.
+destruct (rngl_le_dec Hop a b) as [Hab| Hab]. {
+  destruct (rngl_le_dec Hop b a) as [Hba| Hba]. {
+    left.
+...
+Qed.
+*)
+
 (* comparison *)
 
 Definition rngl_compare a b :=
