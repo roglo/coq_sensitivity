@@ -3141,6 +3141,14 @@ easy.
 Qed.
 *)
 
+Record charac_0_field :=
+  { cf_has_1 : rngl_has_1 T = true;
+    cf_mul_is_comm : rngl_mul_is_comm T = true;
+    cf_has_opp : rngl_has_opp T = true;
+    cf_has_inv : rngl_has_inv T = true;
+    cf_has_eq_dec : rngl_has_eq_dec T = true;
+    cf_characteristic : rngl_characteristic T = 0 }.
+
 End a.
 
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%_L.
@@ -3152,3 +3160,5 @@ Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%_L.
 Arguments rngl_mul_0_r {T ro rp} Hom a%_L.
 Arguments rngl_mul_1_r {T ro rp} Hon a%_L.
 Arguments rngl_pow_squ {T ro rp} Hic Hon a%_L n%_nat.
+
+Arguments charac_0_field T%_type {ro rp}.

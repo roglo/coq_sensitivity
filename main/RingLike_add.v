@@ -1807,6 +1807,16 @@ apply (rngl_nle_gt Hor) in Hba.
 now apply IHm.
 Qed.
 
+Theorem rngl_archimedean :
+  rngl_is_archimedean T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (0 < a)%L → ∃ n, (b < rngl_mul_nat a n)%L.
+Proof.
+intros Har Hor.
+specialize rngl_opt_archimedean as H1.
+now rewrite Har, Hor in H1.
+Qed.
+
 Theorem rngl_add_opp_diag_r :
   rngl_has_opp T = true →
   ∀ x : T, (x + - x)%L = 0%L.
@@ -1841,6 +1851,18 @@ Theorem rngl_characteristic_0 :
 Proof.
 intros Hon Hcz.
 specialize (rngl_opt_characteristic_prop) as H1.
+now rewrite Hon, Hcz in H1.
+Qed.
+
+Theorem rngl_characteristic_non_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T ≠ 0 →
+  (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
+  rngl_of_nat (rngl_characteristic T) = 0%L.
+Proof.
+intros Hon Hcz.
+specialize (rngl_opt_characteristic_prop) as H1.
+apply Nat.eqb_neq in Hcz.
 now rewrite Hon, Hcz in H1.
 Qed.
 
