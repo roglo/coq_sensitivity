@@ -279,17 +279,19 @@ Theorem rngl_sin_angle_div_2_add_not_overflow :
   → rngl_sin (angle_div_2 (θ1 + θ2)) =
      rngl_sin (angle_div_2 θ1 + angle_div_2 θ2).
 Proof.
-intros * Haov.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Haov.
   rewrite H1; apply H1.
 }
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 specialize (rngl_2_neq_0 Hon Hop Hc1 Hor) as H20.
+intros * Haov.
 assert (Hze2 : (0 ≤ 2)%L) by now apply (rngl_lt_le_incl Hor).
 assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cos θ)%L). {
   intros.
@@ -456,7 +458,7 @@ destruct zs1. {
   exfalso. (* because goal is nonneg=nonpos *)
   clear Haov'.
   apply (rngl_leb_gt Hor) in Hzs2.
-  destruct (rngl_eq_dec Hed (rngl_cos θ1) 0) as [Hc1ez| Hc1ez]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ1) 0) as [Hc1ez| Hc1ez]. {
     apply (eq_rngl_cos_0) in Hc1ez.
     destruct Hc1ez; subst θ1. {
       cbn in Haov.
@@ -759,6 +761,7 @@ Theorem rngl_sin_angle_div_2_add_overflow :
   → rngl_sin ((θ1 + θ2) /₂) = rngl_sin (θ1 /₂ + θ2 /₂ + angle_straight).
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -844,7 +847,7 @@ destruct zs12. {
     progress sin_cos_add_sub_straight_hyp T Hzs12.
     progress sin_cos_add_sub_straight_goal T.
     do 2 rewrite (rngl_sub_opp_r Hop).
-    destruct (rngl_eq_dec Hed (rngl_sin (θ1 + θ2)) 0) as [Hs12| Hs12]. {
+    destruct (rngl_eq_dec Heo (rngl_sin (θ1 + θ2)) 0) as [Hs12| Hs12]. {
       apply eq_rngl_sin_0 in Hs12.
       destruct Hs12 as [Hs12| Hs12]. {
         exfalso.
@@ -898,7 +901,7 @@ destruct zs12. {
     progress sin_cos_add_sub_straight_hyp T Hzs1.
     progress sin_cos_add_sub_straight_goal T.
     do 2 rewrite (rngl_sub_opp_r Hop).
-    destruct (rngl_eq_dec Hed (rngl_sin (θ1 + θ2)) 0) as [Hs12| Hs12]. {
+    destruct (rngl_eq_dec Heo (rngl_sin (θ1 + θ2)) 0) as [Hs12| Hs12]. {
       apply eq_rngl_sin_0 in Hs12.
       destruct Hs12 as [Hs12| Hs12]. {
         rewrite Hs12.

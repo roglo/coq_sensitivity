@@ -1323,7 +1323,6 @@ Theorem intermediate_value_le :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
@@ -1332,20 +1331,21 @@ Theorem intermediate_value_le :
   → (f a ≤ u ≤ f b)%L
   → ∃ c : T, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros Hon Hop Hiv Heb Hor Har Hco * Hfc * Hab Hfab.
+intros Hon Hop Hiv Hor Har Hco * Hfc * Hab Hfab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   exists a.
   rewrite (H1 (f a)), (H1 a), (H1 b), (H1 u).
   split; [ split; apply (rngl_le_refl Hor) | easy ].
 }
-destruct (rngl_eq_dec Heb (f a) u) as [Hau| Hau]. {
+destruct (rngl_eq_dec Heo (f a) u) as [Hau| Hau]. {
   exists a.
   split; [ | easy ].
   split; [ apply (rngl_le_refl Hor) | easy ].
 }
-destruct (rngl_eq_dec Heb (f b) u) as [Hbu| Hbu]. {
+destruct (rngl_eq_dec Heo (f b) u) as [Hbu| Hbu]. {
   exists b.
   split; [ | easy ].
   split; [ easy | apply (rngl_le_refl Hor) ].
@@ -1386,7 +1386,7 @@ specialize (exists_supremum Hon Hop Hiv Hor Har Hco P) as H1.
 specialize (H1 a b Ha).
 assert (H : (∀ x, P x → (x < b)%L)). {
   intros y ((Hay & Hyb) & Hy).
-  destruct (rngl_eq_dec Heb y b) as [Hby| Hby]. {
+  destruct (rngl_eq_dec Heo y b) as [Hby| Hby]. {
     subst y.
     now apply (rngl_lt_asymm Hor) in Hy.
   }
@@ -1626,7 +1626,6 @@ Theorem intermediate_value :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
   rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
@@ -1635,11 +1634,12 @@ Theorem intermediate_value :
   → (rngl_min (f a) (f b) ≤ u ≤ rngl_max (f a) (f b))%L
   → ∃ c, (a ≤ c ≤ b)%L ∧ f c = u.
 Proof.
-intros Hon Hop Hiv Hed Hor Har Hco * Hfc * Hab Hfab.
+intros Hon Hop Hiv Hor Har Hco.
+intros * Hfc * Hab Hfab.
 progress unfold rngl_min in Hfab.
 progress unfold rngl_max in Hfab.
 remember (f a ≤? f b)%L as ab eqn:Hlab; symmetry in Hlab.
-specialize (intermediate_value_le Hon Hop Hiv Hed Hor Har Hco) as H1.
+specialize (intermediate_value_le Hon Hop Hiv Hor Har Hco) as H1.
 destruct ab; [ now apply (H1 _ Hfc) | ].
 specialize (H1 (λ x, (- f x))%L).
 cbn in H1.

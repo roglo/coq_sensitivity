@@ -1941,7 +1941,6 @@ Arguments rngl_abs_nonneg_eq {T ro rp} Hop Hor a%_L.
 Arguments rngl_add {T ring_like_op} (a b)%_L.
 Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
 Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
-Arguments rngl_eq_dec {T ro} Hed (a b)%_L.
 Arguments rngl_le_add_r {T ro rp} Hor (a b)%_L Hb.
 Arguments rngl_le_dec {T ro rp} Hor (a b)%_L.
 Arguments rngl_le_trans {T ro rp} Hor (a b c)%_L.

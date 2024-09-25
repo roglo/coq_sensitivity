@@ -98,6 +98,7 @@ Theorem rngl_limit_squ_limit :
     is_limit_when_tending_to_inf rngl_dist u (- l)%L.
 Proof.
 intros Hon Hop Hiv Hor.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -108,7 +109,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hlim.
-Search ({_ = _} + {_ ≠ _})%L.
+destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
 ...
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
 ...

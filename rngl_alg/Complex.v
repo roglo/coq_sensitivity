@@ -37,6 +37,7 @@ Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
 Theorem eq_gc_eq :
   ∀ a b : GComplex T, gre a = gre b ∧ gim a = gim b ↔ a = b.
@@ -59,10 +60,12 @@ Theorem neq_neq_GComplex :
   rngl_has_eq_dec T = true →
   ∀ a b : GComplex T, a ≠ b → gre a ≠ gre b ∨ gim a ≠ gim b.
 Proof.
-intros Heb * Hab.
+intros Hed.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
+intros * Hab.
 destruct a as (ra, ia).
 destruct b as (rb, ib); cbn.
-destruct (rngl_eq_dec Heb ra rb) as [Hrab| Hrab]. {
+destruct (rngl_eq_dec Heo ra rb) as [Hrab| Hrab]. {
   subst rb; right.
   now intros Hiab; apply Hab; clear Hab; subst ib.
 } {
@@ -142,11 +145,13 @@ Theorem gc_eq_dec :
   rngl_has_eq_dec T = true →
   ∀ a b : GComplex T, {a = b} + {a ≠ b}.
 Proof.
-intros Hed *.
+intros Hed.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
+intros.
 destruct a as (ra, ia).
 destruct b as (rb, ib).
-specialize (rngl_eq_dec Hed ra rb) as H1.
-specialize (rngl_eq_dec Hed ia ib) as H2.
+specialize (rngl_eq_dec Heo ra rb) as H1.
+specialize (rngl_eq_dec Heo ia ib) as H2.
 destruct H1 as [H1| H1]. {
   subst rb.
   destruct H2 as [H2| H2]; [ now subst ib; left | right ].
@@ -336,6 +341,7 @@ Theorem angle_mul_2_div_2 :
     if angle_ltb a angle_straight then a else angle_add a angle_straight.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -409,7 +415,7 @@ destruct ap. {
     do 2 rewrite rngl_mul_assoc in Hzsc.
     rewrite (rngl_mul_inv_diag_l Hon Hiv) in Hzsc; [ | easy ].
     rewrite (rngl_mul_1_l Hon) in Hzsc.
-    destruct (rngl_eq_dec Hed sa 0) as [Hsz| Hsz]. {
+    destruct (rngl_eq_dec Heo sa 0) as [Hsz| Hsz]. {
       subst sa.
       rewrite (rngl_squ_0 Hos) in Ha.
       rewrite (rngl_sub_0_r Hos) in Ha.
@@ -2977,9 +2983,10 @@ Theorem rngl_cos_div_pow_2_incr :
   → (rngl_cos_div_pow_2 (θ /₂) n < rngl_cos_div_pow_2 (θ /₂) (S n))%L.
 Proof.
 destruct_ac; intros Hc1.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Htz.
-destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
+destruct (rngl_eq_dec Heo (rngl_cos θ) (-1)%L) as [Ht1| Ht1]. {
   apply (eq_rngl_cos_opp_1) in Ht1.
   subst θ.
   rewrite angle_straight_div_2.
@@ -4280,6 +4287,7 @@ Theorem angle_mul_2_div_2_pow :
   → ((2 * θ) /₂^i = 2 * (θ /₂^i) - two_straight_div_2_pow i)%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -4465,7 +4473,7 @@ destruct zs2. {
   }
   destruct i. {
     cbn in Hzs2 |-*.
-    destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)) as [Hco1| Hco1]. {
+    destruct (rngl_eq_dec Heo (rngl_cos θ) (-1)) as [Hco1| Hco1]. {
       apply eq_rngl_cos_opp_1 in Hco1.
       subst θ.
       apply (rngl_le_refl Hor).
@@ -4490,7 +4498,7 @@ destruct zs2. {
   apply rngl_leb_le in Hzs.
   remember (0 ≤? rngl_sin (θ + θ))%L as zss eqn:Hzss.
   symmetry in Hzss.
-  destruct (rngl_eq_dec Hed (rngl_cos θ) (-1)) as [Hco1| Hco1]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ) (-1)) as [Hco1| Hco1]. {
     apply eq_rngl_cos_opp_1 in Hco1.
     subst θ.
     apply (rngl_le_refl Hor).

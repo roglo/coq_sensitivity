@@ -23,6 +23,7 @@ Theorem rngl_cos_add_le_cos :
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * H12 Hzs1 Hzs2 Hzs12.
@@ -80,7 +81,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
 }
 destruct H12 as [H12| H12]; [ easy | ].
 apply (rngl_nle_gt Hor) in Hc2z.
-destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
+destruct (rngl_eq_dec Heo (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
   apply eq_rngl_sin_0 in Hs1z.
   destruct Hs1z; subst θ1. {
     rewrite angle_add_0_l.
@@ -121,6 +122,7 @@ Theorem quadrant_1_sin_sub_nonneg_cos_le :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -128,7 +130,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 intros * Hsz1 Hzs2 Hzc1 Hzc2 Hzs12.
-destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [Hs2z| Hs2z]. {
+destruct (rngl_eq_dec Heo (rngl_sin θ2) 0) as [Hs2z| Hs2z]. {
   apply eq_rngl_sin_0 in Hs2z.
   destruct Hs2z; subst θ2. {
     apply rngl_cos_bound.
@@ -316,6 +318,7 @@ Theorem angle_add_overflow_le_lemma_5 :
   → False.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hc11 Hzs1 Hzs2 Hzc1 Hzs12 H12.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
@@ -327,7 +330,7 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   apply (rngl_nlt_ge Hor) in H12.
   apply H12; clear H12.
   rewrite rngl_cos_sub_comm.
-  destruct (rngl_eq_dec Hed (rngl_cos θ1) (rngl_cos θ2)) as [Hc1c2| Hc1c2]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ1) (rngl_cos θ2)) as [Hc1c2| Hc1c2]. {
     apply rngl_cos_eq in Hc1c2.
     destruct Hc1c2; subst θ1. {
       rewrite angle_sub_diag; cbn.
@@ -380,6 +383,7 @@ Theorem angle_add_overflow_le_lemma_6 :
   → False.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hzs1 Hzs2 Hzs12 H12.
@@ -388,7 +392,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hzs1 Hzs2 Hzs12 H12.
 destruct (rngl_lt_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
-  destruct (rngl_eq_dec Hed (rngl_cos θ1) 1) as [H| H]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ1) 1) as [H| H]. {
     apply eq_rngl_cos_1 in H.
     subst θ1.
     rewrite angle_add_0_l in Hzs12.
@@ -416,12 +420,12 @@ destruct (rngl_lt_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     eapply (rngl_lt_le_trans Hor); [ apply Hs12z | easy ].
   }
   apply (rngl_nlt_ge Hor) in Hzs12.
-  destruct (rngl_eq_dec Hed (rngl_cos θ2) 1) as [Hc21| Hc21]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ2) 1) as [Hc21| Hc21]. {
     apply eq_rngl_cos_1 in Hc21.
     subst θ2.
     now apply (rngl_lt_irrefl Hor) in Hzs2.
   }
-  destruct (rngl_eq_dec Hed (rngl_cos θ1) 0) as [Hc1z| Hc1z]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ1) 0) as [Hc1z| Hc1z]. {
     apply eq_rngl_cos_0 in Hc1z.
     destruct Hc1z; subst θ1. {
       rewrite rngl_sin_sub_right_l.
@@ -446,7 +450,7 @@ progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_hyp T H12.
 apply (rngl_nlt_ge Hor) in H12.
 apply H12; clear H12.
-destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
+destruct (rngl_eq_dec Heo (rngl_sin θ1) 0) as [Hs1z| Hs1z]. {
   apply eq_rngl_sin_0 in Hs1z.
   destruct Hs1z; subst θ1. {
     rewrite angle_add_0_l; cbn.
@@ -480,6 +484,7 @@ Theorem angle_add_not_overflow_comm :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Haov.
@@ -516,7 +521,7 @@ destruct zs2. {
     now rewrite angle_add_comm.
   }
   apply (rngl_nle_gt Hor) in Hc2z.
-  destruct (rngl_eq_dec Hed (rngl_cos θ2) (- 1)) as [Hc2o1| Ho1c2]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ2) (- 1)) as [Hc2o1| Ho1c2]. {
     apply (eq_rngl_cos_opp_1) in Hc2o1.
     subst θ2.
     rewrite rngl_sin_add_straight_r in Hzs12.

@@ -60,6 +60,7 @@ Proof.
 (* thanks Geoffroy *)
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -122,7 +123,7 @@ progress sin_cos_add_sub_right_hyp T Hzs12.
 progress sin_cos_add_sub_right_hyp T Hc123.
 progress sin_cos_add_sub_right_hyp T Hc1z.
 progress sin_cos_add_sub_right_goal T.
-destruct (rngl_eq_dec Hed (rngl_cos θ2) 0) as [Hc2z| Hc2z]. {
+destruct (rngl_eq_dec Heo (rngl_cos θ2) 0) as [Hc2z| Hc2z]. {
   exfalso.
   cbn in Hc123.
   rewrite (rngl_mul_opp_r Hop) in Hc123.

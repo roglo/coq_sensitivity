@@ -2372,14 +2372,14 @@ Qed.
 Theorem rngl_mul_min_distr_l :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  rngl_has_eq_dec T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b c, (0 ≤ a)%L → rngl_min (a * b)%L (a * c)%L = (a * rngl_min b c)%L.
 Proof.
-intros Hop Hor Hed Hii.
+intros Hop Hor Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hza.
-destruct (rngl_eq_dec Hed a 0%L) as [Haz| Haz]. {
+destruct (rngl_eq_dec Heo a 0%L) as [Haz| Haz]. {
   subst a.
   do 3 rewrite (rngl_mul_0_l Hos).
   apply (rngl_min_id Hor).

@@ -493,7 +493,7 @@ rewrite rl_sqrt_mul in Hd12; [ | easy | ]. 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
-rewrite (rngl_mul_min_distr_l Hop Hor Hed Hii) in Hd12. 2: {
+rewrite (rngl_mul_min_distr_l Hop Hor Hii) in Hd12. 2: {
   now apply rl_sqrt_nonneg.
 }
 apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in Hd12. 2: {

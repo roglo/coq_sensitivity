@@ -1199,10 +1199,11 @@ Theorem rngl_cos_eq :
   ∀ θ1 θ2, rngl_cos θ1 = rngl_cos θ2 → θ1 = θ2 ∨ θ1 = (- θ2)%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * Hcc.
-destruct (rngl_eq_dec Hed (rngl_sin θ1) (rngl_sin θ2)) as [Hss| Hss]. {
+destruct (rngl_eq_dec Heo (rngl_sin θ1) (rngl_sin θ2)) as [Hss| Hss]. {
   left.
   apply eq_angle_eq.
   now rewrite Hcc, Hss.
@@ -1231,10 +1232,11 @@ Theorem rngl_sin_eq :
   ∀ θ1 θ2, rngl_sin θ1 = rngl_sin θ2 → θ1 = θ2 ∨ θ1 = (angle_straight - θ2)%A.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * Hss.
-destruct (rngl_eq_dec Hed (rngl_cos θ1) (rngl_cos θ2)) as [Hcc| Hcc]. {
+destruct (rngl_eq_dec Heo (rngl_cos θ1) (rngl_cos θ2)) as [Hcc| Hcc]. {
   left.
   apply eq_angle_eq.
   now rewrite Hcc, Hss.
@@ -1408,6 +1410,7 @@ Theorem rngl_add_cos_nonneg_when_sin_nonneg :
 Proof.
 destruct_ac.
 intros * Hzs1 Hzs2 Hzs3 Hzc1.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -1431,9 +1434,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
   apply Hzs3; clear Hzs3.
   subst θ3; cbn.
   (* special case for sin θ2 = 0 *)
-  destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [H2z| H2z]. {
+  destruct (rngl_eq_dec Heo (rngl_sin θ2) 0) as [H2z| H2z]. {
     rewrite H2z, (rngl_mul_0_r Hos), rngl_add_0_r.
-    destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [H1z| H1z]. {
+    destruct (rngl_eq_dec Heo (rngl_sin θ1) 0) as [H1z| H1z]. {
       apply (eq_rngl_sin_0) in H2z, H1z.
       destruct H2z as [H2z| H2z]. {
         subst θ2.
@@ -1690,6 +1693,7 @@ apply rngl_sin_nonneg_sin_nonneg_add_cos_nonneg; try easy.
 ...
 *)
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * H12ns Hzs1 Hzs2 Hzs3.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1796,9 +1800,9 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
   apply Hzs3; clear Hzs3.
   cbn.
   (* special case for sin θ2 = 0 *)
-  destruct (rngl_eq_dec Hed (rngl_sin θ2) 0) as [H2z| H2z]. {
+  destruct (rngl_eq_dec Heo (rngl_sin θ2) 0) as [H2z| H2z]. {
     rewrite H2z, (rngl_mul_0_r Hos), rngl_add_0_r.
-    destruct (rngl_eq_dec Hed (rngl_sin θ1) 0) as [H1z| H1z]. {
+    destruct (rngl_eq_dec Heo (rngl_sin θ1) 0) as [H1z| H1z]. {
       apply (eq_rngl_sin_0) in H2z, H1z.
       destruct H2z as [H2z| H2z]. {
         subst θ2.
@@ -3121,8 +3125,9 @@ Theorem rngl_cos_lt_rngl_cos_sub :
   → (rngl_cos θ1 ≤ rngl_cos θ2)%L
   → (rngl_cos θ1 < rngl_cos (θ2 - θ1))%L.
 Proof.
-intros * Hzs1 Hzs2 Hc12z.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros * Hzs1 Hzs2 Hc12z.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
@@ -3145,7 +3150,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   now apply (rngl_mul_nonneg_nonneg Hop Hor).
 }
 destruct (rngl_lt_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
-  destruct (rngl_eq_dec Hed (rngl_cos θ2) 1) as [Hc21| Hc21]. {
+  destruct (rngl_eq_dec Heo (rngl_cos θ2) 1) as [Hc21| Hc21]. {
     apply eq_rngl_cos_1 in Hc21.
     subst θ2.
     now apply (rngl_lt_irrefl Hor) in Hzs2.

@@ -1811,6 +1811,7 @@ Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
   → (rngl_cos (θ1 + θ2) ≤ rngl_cos θ1)%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hs1 Hs2 Hs12.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply (rngl_lt_le_incl Hor) in Hs1.
@@ -1827,7 +1828,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply rngl_sin_add_nonneg; try easy.
 }
 apply (rngl_nle_gt Hor) in Hzc1.
-destruct (rngl_eq_dec Hed (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
+destruct (rngl_eq_dec Heo (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
   generalize Hzc1; intros H.
   apply (rngl_lt_le_incl Hor) in H.
   apply (rngl_lt_le_incl Hor) in Hs1.

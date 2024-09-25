@@ -453,6 +453,24 @@ destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
 now destruct iq.
 Qed.
 
+Theorem rngl_has_eq_dec_or_is_ordered_l :
+  rngl_has_eq_dec T = true
+  → (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true.
+Proof.
+intros Hor.
+rewrite Hor.
+apply Bool.orb_true_l.
+Qed.
+
+Theorem rngl_has_eq_dec_or_is_ordered_r :
+  rngl_is_ordered T = true
+  → (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true.
+Proof.
+intros Hor.
+rewrite Hor.
+apply Bool.orb_true_r.
+Qed.
+
 End a.
 
 Section a.

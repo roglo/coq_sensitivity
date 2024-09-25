@@ -615,6 +615,7 @@ progress unfold rngl_max.
 now destruct (a ≤? b)%L.
 Qed.
 
+(*
 Theorem rngl_eq_dec :
   rngl_has_eq_dec T = true →
   ∀ a b : T, {a = b} + {a ≠ b}.
@@ -624,8 +625,9 @@ progress unfold rngl_has_eq_dec in Hed.
 destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 apply rngl_eq_dec.
 Qed.
+*)
 
-Theorem rngl_eq_dec' :
+Theorem rngl_eq_dec :
   (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true →
   ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
@@ -753,3 +755,5 @@ Qed.
 Notation "x ?= y" := (rngl_compare x y) : ring_like_scope.
 
 End a.
+
+Arguments rngl_eq_dec {T ro rp} Heo (a b)%_L.
