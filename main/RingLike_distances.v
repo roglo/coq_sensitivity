@@ -2,6 +2,7 @@
 
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
+Require Import RingLike_order.
 Require Import RingLike_properties.
 
 Section a.

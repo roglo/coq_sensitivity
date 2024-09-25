@@ -17,8 +17,9 @@ PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo RingLike.vo IterAdd.vo IterAnd.vo PermutationFun.vo SortingFun.vo LapPolyn.vo
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v RingLike_structures.vo RingLike_properties.vo RingLike_distances.vo
-RingLike_distances.vo RingLike_distances.glob RingLike_distances.v.beautified RingLike_distances.required_vo: RingLike_distances.v RingLike_structures.vo RingLike_properties.vo
-RingLike_properties.vo RingLike_properties.glob RingLike_properties.v.beautified RingLike_properties.required_vo: RingLike_properties.v RingLike_structures.vo
+RingLike_distances.vo RingLike_distances.glob RingLike_distances.v.beautified RingLike_distances.required_vo: RingLike_distances.v RingLike_structures.vo RingLike_order.vo RingLike_properties.vo
+RingLike_order.vo RingLike_order.glob RingLike_order.v.beautified RingLike_order.required_vo: RingLike_order.v RingLike_structures.vo
+RingLike_properties.vo RingLike_properties.glob RingLike_properties.v.beautified RingLike_properties.required_vo: RingLike_properties.v RingLike_structures.vo RingLike_order.vo
 RingLike_structures.vo RingLike_structures.glob RingLike_structures.v.beautified RingLike_structures.required_vo: RingLike_structures.v 
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo NatRingLike.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo RingLike.vo SortingFun.vo SortRank.vo PermutationFun.vo IterMul.vo PermutSeq.vo
