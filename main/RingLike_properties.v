@@ -97,6 +97,50 @@ apply rngl_has_inv_and_1_or_quot_iff; left.
 now rewrite Hiv, Hon.
 Qed.
 
+Theorem rngl_has_subt_has_no_opp :
+  rngl_has_subt T = true
+  → rngl_has_opp T = false.
+Proof.
+intros * Hsu.
+unfold rngl_has_subt in Hsu.
+unfold rngl_has_opp.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem rngl_has_opp_has_no_subt :
+  rngl_has_opp T = true
+  → rngl_has_subt T = false.
+Proof.
+intros * Hop.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem rngl_has_quot_has_no_inv :
+  rngl_has_quot T = true
+  → rngl_has_inv T = false.
+Proof.
+intros * Hqu.
+progress unfold rngl_has_quot in Hqu.
+progress unfold rngl_has_inv.
+destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+now destruct iq.
+Qed.
+
+Theorem rngl_has_inv_has_no_quot :
+  rngl_has_inv T = true
+  → rngl_has_quot T = false.
+Proof.
+intros * Hiv.
+progress unfold rngl_has_inv in Hiv.
+progress unfold rngl_has_quot.
+destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+now destruct iq.
+Qed.
+
 End a.
 
 Section a.
@@ -565,52 +609,6 @@ rewrite Hor in rr.
 move rr after rp.
 specialize rngl_ord_not_le as H.
 apply H.
-Qed.
-
-(* *)
-
-Theorem rngl_has_subt_has_no_opp :
-  rngl_has_subt T = true
-  → rngl_has_opp T = false.
-Proof.
-intros * Hsu.
-unfold rngl_has_subt in Hsu.
-unfold rngl_has_opp.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem rngl_has_opp_has_no_subt :
-  rngl_has_opp T = true
-  → rngl_has_subt T = false.
-Proof.
-intros * Hop.
-unfold rngl_has_opp in Hop.
-unfold rngl_has_subt.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-now destruct os.
-Qed.
-
-Theorem rngl_has_quot_has_no_inv :
-  rngl_has_quot T = true
-  → rngl_has_inv T = false.
-Proof.
-intros * Hqu.
-progress unfold rngl_has_quot in Hqu.
-progress unfold rngl_has_inv.
-destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
-now destruct iq.
-Qed.
-
-Theorem rngl_has_inv_has_no_quot :
-  rngl_has_inv T = true
-  → rngl_has_quot T = false.
-Proof.
-intros * Hiv.
-progress unfold rngl_has_inv in Hiv.
-progress unfold rngl_has_quot.
-destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
-now destruct iq.
 Qed.
 
 (* *)
