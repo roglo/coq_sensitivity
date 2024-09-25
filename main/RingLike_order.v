@@ -241,4 +241,131 @@ destruct Hba as (Hba, _).
 now apply Hnab, (rngl_le_antisymm Hor).
 Qed.
 
+Theorem rngl_not_le :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_ord as rr.
+rewrite Hor in rr.
+move rr after rp.
+specialize rngl_ord_not_le as H.
+apply H.
+Qed.
+
+Theorem rngl_lt_le_incl :
+  rngl_is_ordered T = true →
+  ∀ a b, (a < b → a ≤ b)%L.
+Proof.
+intros Hor * Hab.
+now apply (rngl_lt_iff Hor) in Hab.
+Qed.
+
+Theorem rngl_nle_gt :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply (rngl_not_le Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  intros H1.
+  apply (rngl_lt_iff Hor) in Hab.
+  destruct Hab as (H2, H3).
+  now apply H3, (rngl_le_antisymm Hor).
+}
+Qed.
+
+Theorem rngl_nlt_ge :
+  rngl_is_ordered T = true →
+  ∀ a b, (¬ (a < b) ↔ b ≤ a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  destruct (rngl_le_dec Hor b a) as [H1| H1]; [ easy | ].
+  exfalso; apply Hab.
+  now apply (rngl_nle_gt Hor).
+} {
+  intros H1.
+  apply (rngl_lt_iff Hor) in H1.
+  destruct H1 as (H2, H3).
+  now apply H3, (rngl_le_antisymm Hor).
+}
+Qed.
+
+Theorem rngl_lt_le_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a < b)%L → (b ≤ c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_le_trans Hor _ b); [ | easy ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  intros H; subst c.
+  now apply (rngl_nle_gt Hor) in Hab.
+}
+Qed.
+
+Theorem rngl_le_lt_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a ≤ b)%L → (b < c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+apply (rngl_lt_iff Hor).
+split. {
+  apply (rngl_le_trans Hor _ b); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+} {
+  intros H; subst c.
+  now apply (rngl_nle_gt Hor) in Hbc.
+}
+Qed.
+
+Theorem rngl_lt_trans :
+  rngl_is_ordered T = true →
+   ∀ a b c : T, (a < b)%L → (b < c)%L → (a < c)%L.
+Proof.
+intros Hor * Hab Hbc.
+apply (rngl_le_lt_trans Hor _ b); [ | easy ].
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem rngl_leb_gt :
+  rngl_is_ordered T = true →
+  ∀ a b, ((a ≤? b) = false ↔ b < a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply rngl_leb_nle in Hab.
+  apply (rngl_not_le Hor) in Hab.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  now apply not_eq_sym.
+} {
+  apply rngl_leb_nle.
+  intros H1.
+  now apply (rngl_nle_gt Hor) in Hab.
+}
+Qed.
+
+Theorem rngl_ltb_ge :
+  rngl_is_ordered T = true →
+  ∀ a b, ((a <? b) = false ↔ b ≤ a)%L.
+Proof.
+intros Hor *.
+split; intros Hab. {
+  apply rngl_ltb_nlt in Hab.
+  now apply (rngl_nlt_ge Hor) in Hab.
+} {
+  apply rngl_ltb_nlt.
+  intros H1.
+  now apply (rngl_nlt_ge Hor) in Hab.
+}
+Qed.
+
 End a.
