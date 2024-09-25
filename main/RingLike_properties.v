@@ -1,7 +1,6 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
-Require Import RingLike_order.
 
 Section a.
 
