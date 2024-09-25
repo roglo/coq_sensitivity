@@ -1655,6 +1655,168 @@ rewrite <- (rngl_add_0_l 0%L).
 now apply (rngl_add_le_compat Hor).
 Qed.
 
+Theorem rngl_add_neg_nonpos :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a < 0)%L → (b ≤ 0)%L → (a + b < 0)%L.
+Proof.
+intros Hop Hor * Haz Hbz.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+eapply (rngl_lt_le_trans Hor); [ | apply Hbz ].
+apply (rngl_lt_add_lt_sub_r Hop Hor).
+now rewrite (rngl_sub_diag Hos).
+Qed.
+
+Theorem rngl_add_nonpos_neg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤ 0)%L → (b < 0)%L → (a + b < 0)%L.
+Proof.
+intros Hop Hor * Haz Hbz.
+rewrite rngl_add_comm.
+now apply (rngl_add_neg_nonpos Hop Hor).
+Qed.
+
+Theorem rngl_leb_opp_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (-a ≤? b)%L = (-b ≤? a)%L.
+Proof.
+intros Hop Hor *.
+remember (-a ≤? b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  apply rngl_leb_le.
+  apply (rngl_le_opp_l Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_le_opp_l Hop Hor) in Hab.
+} {
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_leb_gt Hor).
+  apply (rngl_lt_opp_r Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_lt_opp_r Hop Hor).
+}
+Qed.
+
+Theorem rngl_leb_opp_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a ≤? -b)%L = (b ≤? -a)%L.
+Proof.
+intros Hop Hor *.
+remember (a ≤? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  apply rngl_leb_le.
+  apply (rngl_le_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_le_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_leb_gt Hor).
+  apply (rngl_lt_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_lt_opp_l Hop Hor).
+}
+Qed.
+
+Theorem rngl_leb_0_opp :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤? - a)%L = (a ≤? 0)%L.
+Proof.
+intros Hop Hor *.
+rewrite (rngl_leb_opp_r Hop Hor).
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
+Theorem rngl_ltb_opp_l :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (-a <? b)%L = (-b <? a)%L.
+Proof.
+intros Hop Hor *.
+remember (-a <? b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_ltb_lt in Hab.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_opp_l Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_lt_opp_l Hop Hor) in Hab.
+} {
+  apply (rngl_ltb_ge Hor) in Hab.
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_opp_r Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_le_opp_r Hop Hor).
+}
+Qed.
+
+Theorem rngl_ltb_opp_r :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (a <? -b)%L = (b <? -a)%L.
+Proof.
+intros Hop Hor *.
+remember (a <? -b)%L as ab eqn:Hab.
+symmetry in Hab.
+symmetry.
+destruct ab. {
+  apply rngl_ltb_lt in Hab.
+  apply rngl_ltb_lt.
+  apply (rngl_lt_opp_r Hop Hor) in Hab.
+  rewrite rngl_add_comm in Hab.
+  now apply (rngl_lt_opp_r Hop Hor) in Hab.
+} {
+  apply (rngl_ltb_ge Hor) in Hab.
+  apply (rngl_ltb_ge Hor).
+  apply (rngl_le_opp_l Hop Hor).
+  rewrite rngl_add_comm.
+  now apply (rngl_le_opp_l Hop Hor).
+}
+Qed.
+
+Theorem rngl_archimedean_ub :
+  rngl_is_archimedean T = true →
+  rngl_is_ordered T = true →
+  ∀ a b : T, (0 < a < b)%L →
+  ∃ n : nat, (rngl_mul_nat a n ≤ b < rngl_mul_nat a (n + 1))%L.
+Proof.
+intros Har Hor * (Ha, Hab).
+specialize rngl_opt_archimedean as H1.
+rewrite Har, Hor in H1; cbn in H1.
+specialize (H1 a b Ha).
+destruct H1 as (m, Hm).
+induction m. {
+  exfalso; cbn in Hm.
+  apply (rngl_nle_gt Hor) in Hm.
+  apply Hm; clear Hm.
+  now apply (rngl_le_trans Hor _ a); apply (rngl_lt_le_incl Hor).
+}
+destruct (rngl_le_dec Hor (rngl_mul_nat a m) b) as [Hba| Hba]. {
+  now exists m; rewrite Nat.add_1_r.
+}
+apply (rngl_nle_gt Hor) in Hba.
+now apply IHm.
+Qed.
+
+Theorem rngl_add_opp_diag_r :
+  rngl_has_opp T = true →
+  ∀ x : T, (x + - x)%L = 0%L.
+Proof.
+intros Hop *.
+rewrite (rngl_add_opp_r Hop).
+apply rngl_sub_diag.
+now apply rngl_has_opp_or_subt_iff; left.
+Qed.
+
 End a.
 
 Section b.

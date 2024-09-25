@@ -485,4 +485,12 @@ clear Hed.
 now destruct (rngl_eq_dec a b).
 Qed.
 
+Theorem rngl_eq_dec : rngl_has_eq_dec T = true → ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+apply rngl_eq_dec.
+Qed.
+
 End a.

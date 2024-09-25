@@ -368,4 +368,13 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_min_id :
+  rngl_is_ordered T = true →
+  ∀ a, rngl_min a a = a.
+Proof.
+intros Hor *.
+progress unfold rngl_min.
+now rewrite (rngl_leb_refl Hor).
+Qed.
+
 End a.
