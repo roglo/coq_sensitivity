@@ -2,7 +2,13 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
 
-Theorem rngl_has_opp_or_subt_iff {T} {R : ring_like_op T} :
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+Theorem rngl_has_opp_or_subt_iff :
   rngl_has_opp_or_subt T = true
   ↔ rngl_has_opp T = true ∨ rngl_has_subt T = true.
 Proof.
@@ -16,7 +22,7 @@ split; [ intros _ | easy ].
 now destruct opp_subt; [ left | right ].
 Qed.
 
-Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
+Theorem rngl_has_inv_or_quot_iff :
   rngl_has_inv_or_quot T = true
   ↔ rngl_has_inv T = true ∨ rngl_has_quot T = true.
 Proof.
@@ -30,7 +36,7 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
-Theorem rngl_has_inv_and_1_or_quot_iff {T} {R : ring_like_op T} :
+Theorem rngl_has_inv_and_1_or_quot_iff :
   rngl_has_inv_and_1_or_quot T = true
   ↔ rngl_has_inv T = true ∧ rngl_has_1 T = true ∨ rngl_has_quot T = true.
 Proof.
@@ -44,14 +50,14 @@ split; [ | now intros H; destruct H, inv_quot ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
-Theorem rngl_has_opp_has_opp_or_subt : ∀ {T} {ro : ring_like_op T},
+Theorem rngl_has_opp_has_opp_or_subt :
   rngl_has_opp T = true → rngl_has_opp_or_subt T = true.
 Proof.
-intros * Hop.
+intros Hop.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
-Theorem rngl_has_inv_has_inv_or_quot : ∀ {T} {ro : ring_like_op T},
+Theorem rngl_has_inv_has_inv_or_quot :
   rngl_has_inv T = true → rngl_has_inv_or_quot T = true.
 Proof.
 intros * Hop.
@@ -59,7 +65,6 @@ now apply rngl_has_inv_or_quot_iff; left.
 Qed.
 
 Theorem rngl_has_inv_and_1_has_inv_and_1_or_quot :
-  ∀ {T} {ro : ring_like_op T},
   rngl_has_1 T = true →
   rngl_has_inv T = true →
   rngl_has_inv_and_1_or_quot T = true.
@@ -69,21 +74,13 @@ apply rngl_has_inv_and_1_or_quot_iff.
 now rewrite Hiv, Hon; left.
 Qed.
 
-Section a.
-
-Context {T : Type}.
-Context {ro : ring_like_op T}.
-Context {rp : ring_like_prop T}.
-
-(* theorems *)
-
 Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
   rngl_has_inv_and_1_or_quot T = true →
   rngl_has_eq_dec T = true →
   (rngl_is_integral_domain T ||
      rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
 Proof.
-intros Hi1 Hed.
+intros * Hi1 Hed.
 apply Bool.orb_true_iff; right.
 now rewrite Hi1, Hed.
 Qed.
@@ -94,11 +91,21 @@ Theorem rngl_int_dom_or_inv_1_quo :
   (rngl_is_integral_domain T ||
    rngl_has_inv_and_1_or_quot T)%bool = true.
 Proof.
-intros Hiv Hon.
+intros * Hiv Hon.
 apply Bool.orb_true_iff; right.
 apply rngl_has_inv_and_1_or_quot_iff; left.
 now rewrite Hiv, Hon.
 Qed.
+
+End a.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+(* theorems *)
 
 Theorem fold_rngl_squ : ∀ a : T, (a * a)%L = rngl_squ a.
 Proof. easy. Qed.
