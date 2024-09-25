@@ -3094,3 +3094,61 @@ Qed.
 (* end (-1) ^ n *)
 
 End a.
+
+(* to be able to use tactic "ring" *)
+
+Require Import Ring_theory.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context (Hic : @rngl_mul_is_comm T ro rp = true).
+Context (Hop : @rngl_has_opp T ro = true).
+Context (Hon : @rngl_has_1 T ro = true).
+
+Definition rngl_ring_theory
+    : ring_theory 0%L 1%L rngl_add rngl_mul rngl_sub rngl_opp eq :=
+  {| Radd_0_l := rngl_add_0_l;
+     Radd_comm := rngl_add_comm;
+     Radd_assoc := rngl_add_assoc;
+     Rmul_1_l := rngl_mul_1_l Hon;
+     Rmul_comm := rngl_mul_comm Hic;
+     Rmul_assoc := rngl_mul_assoc;
+     Rdistr_l := rngl_mul_add_distr_r;
+     Rsub_def x y := eq_sym (rngl_add_opp_r Hop x y);
+     Ropp_def := rngl_add_opp_diag_r Hop |}.
+
+(* code to be added to be able to use the Coq tactic "ring"
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {Hic : @rngl_mul_is_comm T ro rp = true}.
+Context {Hop : @rngl_has_opp T T ro = true}.
+
+Require Import Ring.
+Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
+
+(* example *)
+
+Example a2_b2 : ∀ a b, ((a + b) * (a - b) = a * a - b * b)%L.
+Proof.
+intros.
+ring_simplify. (* just to see what happens *)
+easy.
+Qed.
+*)
+
+End a.
+
+Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%_L.
+Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
+Arguments rngl_div_le_mono_pos_r {T ro rp} Hon Hop Hiv Hor Hii (a b c)%_L.
+Arguments rngl_mul_comm {T ro rp} Hic (a b)%_L.
+Arguments rngl_mul_le_mono_pos_l {T ro rp} Hop Hor Hii (a b c)%_L.
+Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%_L.
+Arguments rngl_mul_0_r {T ro rp} Hom a%_L.
+Arguments rngl_mul_1_r {T ro rp} Hon a%_L.
+Arguments rngl_pow_squ {T ro rp} Hic Hon a%_L n%_nat.

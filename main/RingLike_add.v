@@ -1817,6 +1817,15 @@ apply rngl_sub_diag.
 now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
+Arguments rngl_mul_nat {T ro} a%_L n%_nat.
+
+Theorem rngl_of_nat_0 : rngl_of_nat 0 = 0%L.
+Proof. easy. Qed.
+
+Theorem fold_rngl_mul_nat :
+  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
+Proof. easy. Qed.
+
 End a.
 
 Section b.
@@ -1904,3 +1913,23 @@ now apply IHj.
 Qed.
 
 End b.
+
+Arguments rngl_abs {T ro} a%_L.
+Arguments rngl_abs_nonneg_eq {T ro rp} Hop Hor a%_L.
+Arguments rngl_add {T ring_like_op} (a b)%_L.
+Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
+Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
+Arguments rngl_eq_dec {T ro} Hed (a b)%_L.
+Arguments rngl_le_add_r {T ro rp} Hor (a b)%_L Hb.
+Arguments rngl_le_dec {T ro rp} Hor (a b)%_L.
+Arguments rngl_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_le_lt_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_dec {T ro rp} Hor (a b)%_L.
+Arguments rngl_min {T ro} (a b)%_L.
+Arguments rngl_mul {T ring_like_op} (a b)%_L.
+Arguments rngl_mul_nat {T ro} a%_L n%_nat.
+Arguments rngl_squ {T ro} x%_L.
+Arguments rngl_sub {T ro} (a b)%_L.
+Arguments rngl_subt {T ro} (a b)%_L.
