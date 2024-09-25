@@ -313,3 +313,176 @@ Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_archimedean T {ro ring_like_prop}.
 Arguments rngl_is_integral_domain T {ro ring_like_prop}.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+Theorem rngl_has_opp_or_subt_iff :
+  rngl_has_opp_or_subt T = true
+  ↔ rngl_has_opp T = true ∨ rngl_has_subt T = true.
+Proof.
+unfold rngl_has_opp_or_subt, bool_of_option.
+unfold rngl_has_opp, rngl_has_subt.
+destruct rngl_opt_opp_or_subt as [opp_subt| ]. 2: {
+  split; [ now left | ].
+  now intros [|].
+}
+split; [ intros _ | easy ].
+now destruct opp_subt; [ left | right ].
+Qed.
+
+Theorem rngl_has_inv_or_quot_iff :
+  rngl_has_inv_or_quot T = true
+  ↔ rngl_has_inv T = true ∨ rngl_has_quot T = true.
+Proof.
+unfold rngl_has_inv_or_quot, bool_of_option.
+unfold rngl_has_inv, rngl_has_quot.
+destruct rngl_opt_inv_or_quot as [inv_quot| ]. 2: {
+  split; [ now left | ].
+  now intros [|].
+}
+split; [ intros _ | easy ].
+now destruct inv_quot; [ left | right ].
+Qed.
+
+Theorem rngl_has_inv_and_1_or_quot_iff :
+  rngl_has_inv_and_1_or_quot T = true
+  ↔ rngl_has_inv T = true ∧ rngl_has_1 T = true ∨ rngl_has_quot T = true.
+Proof.
+progress unfold rngl_has_inv_and_1_or_quot, bool_of_option.
+progress unfold rngl_has_inv, rngl_has_quot.
+destruct rngl_opt_inv_or_quot as [inv_quot| ]. 2: {
+  split; [ now left | ].
+  now intros [|].
+}
+split; [ | now intros H; destruct H, inv_quot ].
+now destruct inv_quot; [ left | right ].
+Qed.
+
+Theorem rngl_has_opp_has_opp_or_subt :
+  rngl_has_opp T = true → rngl_has_opp_or_subt T = true.
+Proof.
+intros Hop.
+now apply rngl_has_opp_or_subt_iff; left.
+Qed.
+
+Theorem rngl_has_inv_has_inv_or_quot :
+  rngl_has_inv T = true → rngl_has_inv_or_quot T = true.
+Proof.
+intros * Hop.
+now apply rngl_has_inv_or_quot_iff; left.
+Qed.
+
+Theorem rngl_has_inv_and_1_has_inv_and_1_or_quot :
+  rngl_has_1 T = true →
+  rngl_has_inv T = true →
+  rngl_has_inv_and_1_or_quot T = true.
+Proof.
+intros * Hon Hiv.
+apply rngl_has_inv_and_1_or_quot_iff.
+now rewrite Hiv, Hon; left.
+Qed.
+
+Theorem rngl_int_dom_or_inv_1_quo_and_eq_dec :
+  rngl_has_inv_and_1_or_quot T = true →
+  rngl_has_eq_dec T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true.
+Proof.
+intros * Hi1 Hed.
+apply Bool.orb_true_iff; right.
+now rewrite Hi1, Hed.
+Qed.
+
+Theorem rngl_int_dom_or_inv_1_quo :
+  rngl_has_inv T = true →
+  rngl_has_1 T = true →
+  (rngl_is_integral_domain T ||
+   rngl_has_inv_and_1_or_quot T)%bool = true.
+Proof.
+intros * Hiv Hon.
+apply Bool.orb_true_iff; right.
+apply rngl_has_inv_and_1_or_quot_iff; left.
+now rewrite Hiv, Hon.
+Qed.
+
+Theorem rngl_has_subt_has_no_opp :
+  rngl_has_subt T = true
+  → rngl_has_opp T = false.
+Proof.
+intros * Hsu.
+unfold rngl_has_subt in Hsu.
+unfold rngl_has_opp.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem rngl_has_opp_has_no_subt :
+  rngl_has_opp T = true
+  → rngl_has_subt T = false.
+Proof.
+intros * Hop.
+unfold rngl_has_opp in Hop.
+unfold rngl_has_subt.
+destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Theorem rngl_has_quot_has_no_inv :
+  rngl_has_quot T = true
+  → rngl_has_inv T = false.
+Proof.
+intros * Hqu.
+progress unfold rngl_has_quot in Hqu.
+progress unfold rngl_has_inv.
+destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+now destruct iq.
+Qed.
+
+Theorem rngl_has_inv_has_no_quot :
+  rngl_has_inv T = true
+  → rngl_has_quot T = false.
+Proof.
+intros * Hiv.
+progress unfold rngl_has_inv in Hiv.
+progress unfold rngl_has_quot.
+destruct rngl_opt_inv_or_quot as [iq| ]; [ | easy ].
+now destruct iq.
+Qed.
+
+End a.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+
+Theorem rngl_eqb_eq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = true ↔ a = b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_eqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = false ↔ a ≠ b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+End a.
