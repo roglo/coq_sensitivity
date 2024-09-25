@@ -21,7 +21,6 @@ RingLike_add.vo RingLike_add.glob RingLike_add.v.beautified RingLike_add.require
 RingLike_distances.vo RingLike_distances.glob RingLike_distances.v.beautified RingLike_distances.required_vo: RingLike_distances.v RingLike_structures.vo RingLike_order.vo RingLike_add.vo RingLike_mul.vo
 RingLike_mul.vo RingLike_mul.glob RingLike_mul.v.beautified RingLike_mul.required_vo: RingLike_mul.v RingLike_structures.vo RingLike_order.vo RingLike_add.vo
 RingLike_order.vo RingLike_order.glob RingLike_order.v.beautified RingLike_order.required_vo: RingLike_order.v RingLike_structures.vo
-RingLike_properties.vo RingLike_properties.glob RingLike_properties.v.beautified RingLike_properties.required_vo: RingLike_properties.v 
 RingLike_structures.vo RingLike_structures.glob RingLike_structures.v.beautified RingLike_structures.required_vo: RingLike_structures.v 
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo NatRingLike.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo RingLike.vo SortingFun.vo SortRank.vo PermutationFun.vo IterMul.vo PermutSeq.vo
