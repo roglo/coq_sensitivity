@@ -1633,7 +1633,8 @@ Qed.
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
-Theorem mat_mul_inv_diag_r : in_charac_0_field →
+Theorem mat_mul_inv_diag_r :
+  charac_0_field T →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
@@ -1669,7 +1670,8 @@ rewrite rngl_mul_inv_diag_l; [ | easy | easy | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
-Theorem mat_mul_inv_diag_l : in_charac_0_field →
+Theorem mat_mul_inv_diag_l :
+  charac_0_field T →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M ≠ 0%L
@@ -1715,7 +1717,8 @@ apply mat_transp_is_corr.
 now apply comatrix_is_correct.
 Qed.
 
-Theorem mat_inv_det_comm : in_charac_0_field →
+Theorem mat_inv_det_comm :
+  charac_0_field T →
   ∀ M,
   is_square_matrix M = true
   → det M ≠ 0%L

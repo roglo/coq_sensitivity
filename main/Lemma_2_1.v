@@ -946,7 +946,8 @@ Qed.
    are eigenvalues μ_i such that
       M = U . D . U^t *)
 
-Theorem diagonalized_matrix_prop : in_charac_0_field →
+Theorem diagonalized_matrix_prop :
+  charac_0_field T →
   ∀ n (M : matrix T) ev eV,
   mat_nrows M = n
   → length eV = n

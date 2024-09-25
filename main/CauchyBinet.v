@@ -2041,7 +2041,8 @@ intros j Hj.
 now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
 Qed.
 
-Theorem Cauchy_Binet_formula : in_charac_0_field →
+Theorem Cauchy_Binet_formula :
+  charac_0_field T →
   ∀ m n A B,
   is_correct_matrix A = true
   → is_correct_matrix B = true
@@ -2159,7 +2160,8 @@ Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 *)
 
-Corollary determinant_mul : in_charac_0_field →
+Corollary determinant_mul :
+  charac_0_field T →
   ∀ [A B],
   is_square_matrix A = true
   → is_square_matrix B = true

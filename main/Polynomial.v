@@ -22,7 +22,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eq_dec T = true).
+Context (Hed : rngl_has_eq_dec T = true).
 
 Theorem eq_strip_0s_nil : ∀ d la,
   strip_0s la = [] ↔ ∀ i, i < length la → nth i la d = 0%L.
@@ -35,7 +35,7 @@ split. {
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz.
+  apply (rngl_eqb_eq Hed) in Haz.
   destruct i; [ easy | cbn in Hil ].
   apply Nat.succ_lt_mono in Hil.
   now apply IHla.
@@ -49,7 +49,7 @@ split. {
     apply Nat.succ_le_mono in Hil.
     apply (Hla (S i) Hil).
   }
-  apply (rngl_eqb_neq Heb) in Haz.
+  apply (rngl_eqb_neq Hed) in Haz.
   now specialize (Hla 0 (Nat.lt_0_succ _)).
 }
 Qed.
@@ -67,7 +67,7 @@ induction la as [| a]; [ easy | ].
 cbn in Hab.
 rewrite if_bool_if_dec in Hab.
 destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
   specialize (IHla Hab).
   destruct IHla as (Hbz & i & Hil & Hbef & Hi).
   split; [ easy | ].
@@ -81,7 +81,7 @@ destruct (Sumbool.sumbool_of_bool (a =? 0)%L) as [Haz| Haz]. {
   now apply Hbef.
 }
 injection Hab; clear Hab; intros; subst b lb.
-apply (rngl_eqb_neq Heb) in Haz.
+apply (rngl_eqb_neq Hed) in Haz.
 split; [ easy | ].
 exists 0.
 now cbn.
@@ -130,12 +130,12 @@ split; intros Hla. {
     cbn.
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [H1| H1]; [ easy | exfalso ].
-    apply (rngl_eqb_neq Heb) in H1.
+    apply (rngl_eqb_neq Hed) in H1.
     now specialize (Hla 0); cbn in Hla.
   }
   exfalso.
   assert (H : strip_0s (rev la) = []). {
-    clear - rp Heb Hla.
+    clear - rp Hed Hla.
     apply (eq_strip_0s_nil 0%L).
     intros i Hil.
     rewrite length_rev in Hil.
@@ -174,7 +174,7 @@ destruct lb as [| b]. {
   cbn.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-    apply (rngl_eqb_eq Heb) in Haz.
+    apply (rngl_eqb_eq Hed) in Haz.
     cbn; subst a; f_equal.
     assert (H : lap_norm la = []). {
       apply all_0_lap_norm_nil.
@@ -339,26 +339,26 @@ apply (rlap_quot_prop Hon Hiv) in Hqr; cycle 1. {
   destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
   destruct la as [| a] using rev_ind. {
     cbn in Ha.
-    now rewrite (rngl_eqb_refl Heb) in Ha.
+    now rewrite (rngl_eqb_refl Hed) in Ha.
   }
   rewrite last_last in Ha.
   rewrite rev_app_distr; cbn.
-  now apply (rngl_neqb_neq Heb) in Ha.
+  now apply (rngl_neqb_neq Hed) in Ha.
 } {
   unfold has_polyn_prop in Hb.
   apply Bool.orb_true_iff in Hb.
   destruct Hb as [Hb| Hb]; [ now left; destruct lb | right ].
   destruct lb as [| b] using rev_ind. {
     cbn in Hb.
-    now rewrite (rngl_eqb_refl Heb) in Hb.
+    now rewrite (rngl_eqb_refl Hed) in Hb.
   }
   rewrite last_last in Hb.
   rewrite rev_app_distr; cbn.
-  now apply (rngl_neqb_neq Heb) in Hb.
+  now apply (rngl_neqb_neq Hed) in Hb.
 }
 destruct Hqr as [Hqr| Hqr]; [ easy | ].
 cbn in Hqr.
-now apply (rngl_neqb_neq Heb).
+now apply (rngl_neqb_neq Hed).
 Qed.
 
 Theorem lap_rem_is_norm : ∀ la lb,
@@ -380,7 +380,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hrz| Hrz]. {
   remember (strip_0s rlr) as rl eqn:Hrl;symmetry in Hrl.
   destruct rl as [| a]; [ now left | right; cbn ].
   apply eq_strip_0s_cons in Hrl.
-  now apply (rngl_neqb_neq Heb).
+  now apply (rngl_neqb_neq Hed).
 }
 right; cbn; rewrite last_last.
 now rewrite Hrz.
@@ -399,7 +399,7 @@ Theorem lap_add_norm_idemp_r : ∀ la lb,
 Proof.
 intros.
 rewrite lap_add_comm.
-rewrite (lap_add_norm_idemp_l Heb).
+rewrite (lap_add_norm_idemp_l Hed).
 f_equal; apply lap_add_comm.
 Qed.
 
@@ -413,13 +413,13 @@ intros * lapr.
 unfold has_polyn_prop in lapr.
 apply Bool.orb_true_iff in lapr.
 destruct lapr as [lapr| lapr]; [ now destruct la | ].
-apply (rngl_neqb_neq Heb) in lapr.
+apply (rngl_neqb_neq Hed) in lapr.
 destruct la as [| a] using rev_ind; [ easy | cbn ].
 clear IHla.
 rewrite last_last in lapr.
 unfold lap_norm.
 rewrite rev_app_distr; cbn.
-apply (rngl_eqb_neq Heb) in lapr.
+apply (rngl_eqb_neq Hed) in lapr.
 rewrite lapr; cbn.
 now rewrite rev_involutive.
 Qed.
@@ -633,7 +633,7 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     cbn.
-    apply (rngl_eqb_eq Heb) in Haz.
+    apply (rngl_eqb_eq Hed) in Haz.
     destruct lb as [| b]; [ easy | cbn ].
     rewrite lap_convol_mul_0_l; [ easy | ].
     intros i; cbn.
@@ -678,7 +678,7 @@ destruct lc as [| c]. {
     now rewrite nth_overflow.
   }
   rewrite Nat.add_comm.
-  apply (lap_convol_mul_more Heb Hos); cbn.
+  apply (lap_convol_mul_more Hed Hos); cbn.
   now rewrite Nat.sub_0_r.
 }
 rewrite rev_app_distr; cbn.
@@ -691,7 +691,7 @@ rewrite fold_lap_norm.
 do 2 rewrite Nat.sub_0_r.
 clear c lc b lb Hlc Hd.
 rename d into lb.
-rewrite (lap_convol_mul_more Heb Hos (length la - length (lap_norm la))). 2: {
+rewrite (lap_convol_mul_more Hed Hos (length la - length (lap_norm la))). 2: {
   now cbn; rewrite Nat.sub_0_r.
 }
 rewrite (Nat.add_comm _ (length lb)).
@@ -790,7 +790,7 @@ destruct lc as [| c]. {
 }
 cbn.
 rewrite fold_lap_norm.
-rewrite (lap_convol_mul_more Heb Hos (length lb - S (length lc))). 2: {
+rewrite (lap_convol_mul_more Hed Hos (length lb - S (length lc))). 2: {
   now cbn; rewrite Nat.sub_0_r.
 }
 rewrite <- Nat.add_assoc.
@@ -983,7 +983,7 @@ intros.
 unfold lap_norm.
 rewrite List_rev_repeat.
 induction n; [ easy | cbn ].
-now rewrite (rngl_eqb_refl Heb).
+now rewrite (rngl_eqb_refl Hed).
 Qed.
 
 Theorem lap_norm_add_opp_diag_l :
@@ -1401,7 +1401,7 @@ remember (a / b)%L as cq eqn:Hcq.
 move b before a.
 cbn; rewrite List_rev_repeat.
 rewrite (lap_repeat_0_app_is_mul_power_l Hon); [ | easy ].
-rewrite (lap_mul_assoc Heb Hos); cbn.
+rewrite (lap_mul_assoc Hed Hos); cbn.
 rewrite <- (lap_repeat_0_app_is_mul_power_r Hon). 2: {
   now intros H; apply app_eq_nil in H.
 }
@@ -1577,7 +1577,7 @@ rewrite Hqrlr', Hqr.
 rewrite lap_add_assoc.
 f_equal; cbn.
 rewrite List_rev_repeat.
-rewrite <- (lap_mul_add_distr_l Heb Hos).
+rewrite <- (lap_mul_add_distr_l Hed Hos).
 f_equal.
 rewrite lap_add_comm.
 rewrite lap_add_app_r; cycle 1. {
@@ -1617,7 +1617,7 @@ destruct lb as [| b]. {
   clear Hlb IHla.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
-    apply (rngl_eqb_eq Heb) in Hcz; subst c; cbn.
+    apply (rngl_eqb_eq Hed) in Hcz; subst c; cbn.
     rewrite app_nil_r; f_equal.
     rewrite map2_rngl_add_0_r.
     rewrite fold_lap_add; symmetry.
@@ -1684,7 +1684,7 @@ assert (Hrb : length lr < length lb). {
     now intros H; subst lb.
   } {
     unfold has_polyn_prop.
-    apply (rngl_eqb_neq Heb) in Hb.
+    apply (rngl_eqb_neq Hed) in Hb.
     now rewrite Hb, Bool.orb_true_r.
   }
 }
@@ -1717,7 +1717,7 @@ destruct Hr as [Hr| Hr]. {
       now left.
     }
     right.
-    apply (rngl_neqb_neq Heb) in Ha.
+    apply (rngl_neqb_neq Hed) in Ha.
     now rewrite <- List_last_rev, rev_involutive.
   } {
     right.
@@ -1753,7 +1753,7 @@ destruct Hr as [Hr| Hr]. {
     split; [ easy | ].
     apply Bool.orb_true_iff; right.
     rewrite List_last_rev.
-    now apply (rngl_neqb_neq Heb).
+    now apply (rngl_neqb_neq Hed).
   }
   rewrite lap_mul_length.
   destruct lb as [| b]; [ easy | ].
@@ -1788,7 +1788,7 @@ destruct lq as [| q]. {
   cbn in Hr |-*.
   rewrite if_bool_if_dec in Hr |-*.
   destruct (Sumbool.sumbool_of_bool _) as [Hrz| Hrz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Hrz.
+  apply (rngl_eqb_eq Hed) in Hrz.
   subst r.
   cbn in H1.
   apply Bool.orb_true_iff in Ha.
@@ -1804,7 +1804,7 @@ rewrite lap_add_rev_strip. {
   split; [ easy | ].
   apply Bool.orb_true_iff; right.
   rewrite <- Hlq, List_last_rev.
-  apply (rngl_neqb_neq Heb).
+  apply (rngl_neqb_neq Hed).
   apply (rlap_quot_prop Hon Hiv) in Hqr; [ | | now right ]. 2: {
     apply Bool.orb_true_iff in Ha.
     destruct Ha as [Ha| Ha]. {
@@ -1813,7 +1813,7 @@ rewrite lap_add_rev_strip. {
     }
     right.
     rewrite <- List_last_rev, rev_involutive.
-    now apply (rngl_neqb_neq Heb) in Ha.
+    now apply (rngl_neqb_neq Hed) in Ha.
   }
   destruct Hqr as [Hqr| Hqr]; [ now subst rlq | easy ].
 }
@@ -1919,8 +1919,8 @@ destruct Hb as [Hb| Hb]. {
   now left.
 }
 right.
-apply (rngl_neqb_neq Heb) in Ha, Hb.
-apply (rngl_neqb_neq Heb).
+apply (rngl_neqb_neq Hed) in Ha, Hb.
+apply (rngl_neqb_neq Hed).
 rewrite (last_lap_mul Hos).
 intros Hab.
 apply (rngl_eq_mul_0_r Hos) in Hab; [ easy | |  easy].
@@ -1961,7 +1961,7 @@ specialize (lap_quot_rem_prop Hon Hco Hop Hiv) as H1.
 specialize (H1 (la * lb)%lap lb lq lr).
 specialize (H1 (lap_mul_has_polyn_prop Hon Hiv la lb pa pb)).
 assert (H : last lb 0%L ≠ 0%L). {
-  apply (rngl_neqb_neq Heb).
+  apply (rngl_neqb_neq Hed).
   apply Bool.orb_true_iff in pb.
   destruct pb as [pb| ]; [ | easy ].
   now apply is_empty_list_empty in pb.
@@ -1988,9 +1988,9 @@ symmetry in Hab1.
 apply lap_add_move_l in Hab1.
 symmetry in Hab1.
 rewrite (lap_mul_comm Hco) in Hab1.
-rewrite <- (lap_mul_sub_distr_l Heb Hop) in Hab1.
+rewrite <- (lap_mul_sub_distr_l Hed Hop) in Hab1.
 apply (f_equal lap_norm) in Hab1.
-rewrite (lap_norm_app_0_r Heb) in Hab1 by apply nth_repeat.
+rewrite (lap_norm_app_0_r Hed) in Hab1 by apply nth_repeat.
 rewrite (has_polyn_prop_lap_norm lr pr) in Hab1.
 rewrite <- lap_mul_norm_idemp_r in Hab1.
 rewrite (lap_norm_mul Hon Hiv) in Hab1; [ | easy | apply polyn_norm_prop ].
@@ -2014,7 +2014,7 @@ injection Hqr; clear Hqr; intros Hr Hq; rewrite Hq.
 specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H1.
 rewrite <- (has_polyn_prop_lap_norm la pa).
 rewrite <- (has_polyn_prop_lap_norm lq pq).
-apply (list_nth_lap_eq Heb).
+apply (list_nth_lap_eq Hed).
 intros i.
 specialize (H1 i).
 rewrite (list_nth_lap_sub Hop) in H1.
@@ -2107,7 +2107,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 Context (Hos : rngl_has_opp_or_subt T = true).
-Context (Heb : rngl_has_eq_dec T = true).
+Context (Hed : rngl_has_eq_dec T = true).
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -2131,7 +2131,7 @@ Qed.
 Theorem polyn_eq_dec : ∀ P Q : polyn T, {P = Q} + {P ≠ Q}.
 Proof.
 intros.
-unfold rngl_has_eq_dec in Heb.
+unfold rngl_has_eq_dec in Hed.
 destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 specialize (list_eq_dec rngl_eq_dec (lap P) (lap Q)) as H1.
 destruct H1 as [H1| H1]. {
@@ -2195,7 +2195,7 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
       | left Hiv =>
           let lq := lap_quot (lap pa) (lap pb) in
           mk_polyn lq
-            (lap_quot_is_norm Hos Heb Hon Hiv (lap pa) (lap pb) (lap_prop pa)
+            (lap_quot_is_norm Hos Hed Hon Hiv (lap pa) (lap pb) (lap_prop pa)
                (lap_prop pb))
       | right _ =>
           polyn_zero
@@ -2207,7 +2207,7 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lq := lap_rem (lap pa) (lap pb) in
   mk_polyn lq
-    (lap_rem_is_norm Heb (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
+    (lap_rem_is_norm Hed (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
@@ -2304,8 +2304,8 @@ intros (la, lapr) (lb, lbpr) (lc, lcpr).
 apply eq_polyn_eq.
 cbn - [ lap_norm ].
 do 4 rewrite fold_lap_add.
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite (lap_add_norm_idemp_r Heb).
+rewrite (lap_add_norm_idemp_l Hed).
+rewrite (lap_add_norm_idemp_r Hed).
 now rewrite lap_add_assoc.
 Qed.
 
@@ -2331,8 +2331,8 @@ clear p2 Heqlb.
 clear p3 Heqlc.
 unfold polyn_norm at 1 3.
 apply eq_polyn_eq; cbn.
-rewrite (lap_mul_norm_idemp_l Hos Heb).
-rewrite (lap_mul_norm_idemp_r Hos Heb).
+rewrite (lap_mul_norm_idemp_l Hos Hed).
+rewrite (lap_mul_norm_idemp_r Hos Hed).
 now rewrite lap_mul_assoc.
 Qed.
 
@@ -2343,17 +2343,17 @@ unfold "*"%pol.
 unfold polyn_one.
 apply eq_polyn_eq; cbn.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
-  rewrite (rngl_characteristic_1 Hon Hos Hch 1), (rngl_eqb_refl Heb); cbn.
+  rewrite (rngl_characteristic_1 Hon Hos Hch 1), (rngl_eqb_refl Hed); cbn.
   apply Bool.orb_true_iff in lapr.
   destruct lapr as [lapr| lapr]; [ now apply is_empty_list_empty in lapr | ].
-  apply (rngl_neqb_neq Heb) in lapr.
+  apply (rngl_neqb_neq Hed) in lapr.
   exfalso; apply lapr.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Heb) in Hch; rewrite Hch.
+apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Hed) in Hch; rewrite Hch.
 cbn - [ lap_mul ].
 rewrite (lap_mul_1_l Hon Hos).
-now apply (has_polyn_prop_lap_norm Heb).
+now apply (has_polyn_prop_lap_norm Hed).
 Qed.
 
 Theorem polyn_mul_add_distr_l : ∀ pa pb pc,
@@ -2362,9 +2362,9 @@ Proof.
 intros.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm, fold_lap_add.
-rewrite (lap_mul_norm_idemp_r Hos Heb).
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite (lap_add_norm_idemp_r Heb).
+rewrite (lap_mul_norm_idemp_r Hos Hed).
+rewrite (lap_add_norm_idemp_l Hed).
+rewrite (lap_add_norm_idemp_r Hed).
 f_equal.
 now rewrite lap_mul_add_distr_l.
 Qed.
@@ -2375,9 +2375,9 @@ Proof.
 intros.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm, fold_lap_add.
-rewrite (lap_mul_norm_idemp_l Hos Heb).
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite (lap_add_norm_idemp_r Heb).
+rewrite (lap_mul_norm_idemp_l Hos Hed).
+rewrite (lap_add_norm_idemp_l Hed).
+rewrite (lap_add_norm_idemp_r Hed).
 f_equal.
 now rewrite lap_mul_add_distr_r.
 Qed.
@@ -2417,14 +2417,14 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hch| Hch]. {
   destruct pa as [pa| pa]. {
     now apply is_empty_list_empty in pa; subst la.
   }
-  apply (rngl_neqb_neq Heb) in pa.
+  apply (rngl_neqb_neq Hed) in pa.
   exfalso; apply pa.
   apply (rngl_characteristic_1 Hon Hos Hch).
 }
-apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Heb) in Hch; rewrite Hch.
+apply (rngl_1_neq_0_iff Hon), (rngl_eqb_neq Hed) in Hch; rewrite Hch.
 cbn - [ lap_mul ].
 rewrite (lap_mul_1_r Hon Hos).
-apply (has_polyn_prop_lap_norm Heb).
+apply (has_polyn_prop_lap_norm Hed).
 now destruct a.
 Qed.
 
@@ -2455,7 +2455,7 @@ apply eq_polyn_eq.
 destruct a as (la, Ha); cbn.
 rewrite fold_lap_add.
 do 2 rewrite fold_lap_norm.
-rewrite (lap_add_norm_idemp_l Heb).
+rewrite (lap_add_norm_idemp_l Hed).
 now apply lap_norm_add_opp_diag_l.
 Qed.
 
@@ -2523,10 +2523,10 @@ destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
 destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
-specialize (lap_quot_rem_prop Hos Heb Hon Hic Hop Hiv la lb) as H1.
+specialize (lap_quot_rem_prop Hos Hed Hon Hic Hop Hiv la lb) as H1.
 specialize (H1 lq lr Hpa).
 assert (H : (last lb 0 ≠ 0)%L). {
-  apply (rngl_neqb_neq Heb).
+  apply (rngl_neqb_neq Hed).
   destruct lb; [ | easy ].
   exfalso; apply Hbz.
   now apply eq_polyn_eq.
@@ -2551,7 +2551,7 @@ destruct H1 as (H1, H2).
 split; [ | easy ].
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm, fold_lap_add.
-rewrite (lap_add_norm_idemp_l Heb).
+rewrite (lap_add_norm_idemp_l Hed).
 rewrite <- H1; symmetry.
 now apply has_polyn_prop_lap_norm.
 Qed.
@@ -2584,7 +2584,7 @@ unfold polyn_norm; cbn.
 unfold polyn_quot; cbn.
 destruct (Sumbool.sumbool_of_bool _) as [Hon2| Hon2]. {
   destruct (Sumbool.sumbool_of_bool _) as [Hiv2| Hiv2]. {
-    cbn; rewrite (lap_norm_mul Hos Heb Hon Hiv _ _ pa pb).
+    cbn; rewrite (lap_norm_mul Hos Hed Hon Hiv _ _ pa pb).
     now apply lap_mul_div.
   }
   congruence.
@@ -2652,7 +2652,7 @@ intros * Hab.
 cbn in Hab.
 apply (f_equal lap) in Hab.
 cbn in Hab.
-specialize (proj2 (all_0_lap_norm_nil Heb _) Hab) as H1.
+specialize (proj2 (all_0_lap_norm_nil Hed _) Hab) as H1.
 destruct a as (la, pa).
 destruct b as (lb, pb).
 cbn in Hab, H1 |-*.
@@ -2677,7 +2677,7 @@ do 2 rewrite last_last in H2.
 rewrite List_last_nth in H2.
 rewrite H1 in H2.
 symmetry in H2.
-apply (rngl_neqb_neq Heb) in pa, pb.
+apply (rngl_neqb_neq Hed) in pa, pb.
 apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
 now destruct H2.
 Qed.
@@ -2695,14 +2695,14 @@ progress unfold mul_nat; cbn.
 induction i; [ easy | clear Hiz; cbn ].
 assert (H : rngl_characteristic T ≠ 1) by now rewrite Hch.
 specialize (proj1 (rngl_1_neq_0_iff Hon) H) as H1; clear H.
-apply (rngl_eqb_neq Heb) in H1; rewrite H1.
+apply (rngl_eqb_neq Hed) in H1; rewrite H1.
 cbn - [ lap_add ].
 destruct i; [ now cbn; rewrite rngl_add_0_r, H1 | ].
 rewrite IHi; [ cbn | easy ].
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
 clear IHi; exfalso.
-apply (rngl_eqb_eq Heb) in H11.
+apply (rngl_eqb_eq Hed) in H11.
 specialize (rngl_characteristic_0 Hon Hch) as H2.
 now specialize (H2 (S i)).
 Qed.
@@ -2733,7 +2733,7 @@ induction i; [ easy | cbn ].
 cbn in IHi.
 remember (lap (fold_right polyn_add 0%pol (repeat 1%pol i))) as la eqn:Hla.
 symmetry in Hla.
-apply (rngl_eqb_neq Heb) in H11; rewrite H11.
+apply (rngl_eqb_neq Hed) in H11; rewrite H11.
 cbn - [ lap_add rngl_mul_nat ].
 destruct la as [| a]. {
   cbn.
@@ -2752,7 +2752,7 @@ destruct lb as [| b]. {
   cbn.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [H12| H12]. {
-    exfalso; apply (rngl_eqb_eq Heb) in H12.
+    exfalso; apply (rngl_eqb_eq Hed) in H12.
     destruct i; [ easy | ].
     assert (H : 0 < S i < rngl_characteristic T) by flia Hi.
     specialize (IHi H); clear H.
@@ -2815,18 +2815,18 @@ progress unfold rngl_one in H1.
 destruct rngl_opt_one as [one| ]; [ cbn; clear H | easy ].
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
-  rewrite (H2 one), (rngl_eqb_refl Heb); cbn.
+  rewrite (H2 one), (rngl_eqb_refl Hed); cbn.
   rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   rewrite fold_lap_norm.
   destruct la as [| a]. {
-    now cbn; rewrite rngl_add_0_l, (rngl_eqb_refl Heb).
+    now cbn; rewrite rngl_add_0_l, (rngl_eqb_refl Hed).
   }
   cbn; rewrite rev_involutive.
   rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
 specialize (H1 Hc1).
-apply (rngl_eqb_neq Heb) in H1; rewrite H1; cbn.
+apply (rngl_eqb_neq Hed) in H1; rewrite H1; cbn.
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app.
 cbn.
@@ -2837,7 +2837,7 @@ destruct lb as [| b]. {
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ cbn | ]. 2: {
     now rewrite Hlb.
   }
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
   now rewrite rngl_add_0_r, H1, Hlb.
 }
 cbn; rewrite rev_app_distr; cbn.
@@ -2848,7 +2848,7 @@ rewrite if_bool_if_dec.
 rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
 rewrite Hlb.
 destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
-apply (rngl_eqb_eq Heb) in Hbz; subst b.
+apply (rngl_eqb_eq Hed) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
@@ -2893,7 +2893,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hcz| Hcz]. {
   rewrite (lap_rngl_of_nat Honl).
   destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
-  now rewrite (rngl_eqb_refl Heb).
+  now rewrite (rngl_eqb_refl Hed).
 }
 Qed.
 
@@ -3007,14 +3007,14 @@ assert (Hop : rngl_has_opp T = false). {
   now destruct os.
 }
 move Hop after Hsu.
-specialize (lap_subt_norm_idemp_l Heb Hsu) as H1.
+specialize (lap_subt_norm_idemp_l Hed Hsu) as H1.
 specialize (H1 (la + lb)%lap lb).
-apply (eq_lap_norm_eq_length Heb) in H1. 2: {
+apply (eq_lap_norm_eq_length Hed) in H1. 2: {
   do 2 rewrite lap_subt_length.
   rewrite lap_add_length.
   rewrite <- Hab, Nat.max_id, Nat.max_id.
   apply Nat.max_r.
-  etransitivity; [ apply (lap_norm_length_le Heb) | ].
+  etransitivity; [ apply (lap_norm_length_le Hed) | ].
   rewrite lap_add_length.
   now rewrite Hab, Nat.max_id.
 }
@@ -3100,13 +3100,13 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add lap_subt ].
-rewrite (lap_subt_norm_idemp_l Heb Hsu).
+rewrite (lap_subt_norm_idemp_l Hed Hsu).
 specialize (lap_opt_add_sub Hsu) as H2.
 unfold lap_sub in H2.
 rewrite Hop, Hsu in H2.
 rewrite H2.
-rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
-now apply (has_polyn_prop_lap_norm Heb).
+rewrite (lap_norm_app_0_r Hed); [ | intros; apply nth_repeat ].
+now apply (has_polyn_prop_lap_norm Hed).
 Qed.
 (**)
 
@@ -3150,8 +3150,8 @@ destruct b as (lb, pb).
 destruct c as (lc, pc).
 move lb before la; move lc before lb.
 cbn - [ lap_norm lap_add lap_subt ].
-rewrite (lap_subt_norm_idemp_l Heb Hsu).
-rewrite (lap_subt_norm_idemp_r Heb Hsu).
+rewrite (lap_subt_norm_idemp_l Hed Hsu).
+rewrite (lap_subt_norm_idemp_r Hed Hsu).
 specialize (lap_opt_sub_add_distr Hsu) as H1.
 unfold lap_sub in H1.
 rewrite Hop, Hsu in H1.
@@ -3196,9 +3196,9 @@ destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
 cbn - [ lap_norm lap_add lap_subt ].
-rewrite (lap_subt_norm_idemp_l Heb Hsu).
-rewrite (lap_subt_norm_idemp_r Heb Hsu).
-rewrite (lap_mul_norm_idemp_r Hos Heb).
+rewrite (lap_subt_norm_idemp_l Hed Hsu).
+rewrite (lap_subt_norm_idemp_r Hed Hsu).
+rewrite (lap_mul_norm_idemp_r Hos Hed).
 ... ...
 f_equal.
 apply (lap_mul_subt_distr_l Hsu).
@@ -3207,8 +3207,8 @@ specialize (lap_opt_mul_subt_distr_l Hsu) as H2.
 unfold lap_sub in H2.
 rewrite Hop, Hsu in H2.
 rewrite H2.
-rewrite (lap_norm_app_0_r Heb); [ | intros; apply nth_repeat ].
-now apply (has_polyn_prop_lap_norm Heb).
+rewrite (lap_norm_app_0_r Hed); [ | intros; apply nth_repeat ].
+now apply (has_polyn_prop_lap_norm Hed).
 ...
 *)
 
@@ -3267,7 +3267,7 @@ Definition monom (p : polyn T) i :=
 Theorem lap_norm_lap : ∀ p, lap_norm (lap p) = lap p.
 Proof.
 intros p.
-apply (has_polyn_prop_lap_norm Heb).
+apply (has_polyn_prop_lap_norm Hed).
 apply lap_prop.
 Qed.
 
@@ -3287,9 +3287,9 @@ induction n; intros; [ easy | ].
 rewrite seq_S; cbn.
 do 2 rewrite fold_left_app.
 cbn - [ lap_norm ].
-rewrite <- (lap_add_norm_idemp_l Heb).
+rewrite <- (lap_add_norm_idemp_l Hed).
 rewrite IHn.
-rewrite (lap_add_norm_idemp_l Heb).
+rewrite (lap_add_norm_idemp_l Hed).
 apply lap_norm_idemp.
 Qed.
 
@@ -3307,10 +3307,10 @@ induction n; intros; [ easy | ].
 rewrite seq_S.
 do 2 rewrite fold_left_app.
 cbn - [ lap_norm ].
-rewrite <- (lap_add_norm_idemp_l Heb).
+rewrite <- (lap_add_norm_idemp_l Hed).
 rewrite IHn.
-rewrite (lap_add_norm_idemp_l Heb).
-rewrite (lap_add_norm_idemp_r Heb).
+rewrite (lap_add_norm_idemp_l Hed).
+rewrite (lap_add_norm_idemp_r Hed).
 easy.
 Qed.
 

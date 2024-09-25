@@ -5926,9 +5926,11 @@ intros Hed *.
 now apply (rngl_compare_eq_iff Hed).
 Qed.
 
+Notation "x ?= y" := (rngl_compare x y) : ring_like_scope.
+
 (* *)
 
-Record in_charac_0_field :=
+Record charac_0_field :=
   { cf_has_1 : rngl_has_1 T = true;
     cf_mul_is_comm : rngl_mul_is_comm T = true;
     cf_has_opp : rngl_has_opp T = true;
@@ -5937,8 +5939,6 @@ Record in_charac_0_field :=
     cf_characteristic : rngl_characteristic T = 0 }.
 
 End a.
-
-Notation "x ?= y" := (rngl_compare x y) : ring_like_scope.
 
 (* to be able to use tactic "ring" *)
 
@@ -6024,3 +6024,5 @@ Arguments rngl_pow_squ {T ro rp} Hic Hon a%_L n%_nat.
 Arguments rngl_squ {T ro} x%_L.
 Arguments rngl_sub {T ro} (a b)%_L.
 Arguments rngl_subt {T ro} (a b)%_L.
+
+Arguments charac_0_field T%_type {ro rp}.
