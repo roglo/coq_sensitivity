@@ -625,8 +625,6 @@ destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 apply rngl_eq_dec.
 Qed.
 
-(* to be completed
-   and replace rngl_eq_dec
 Theorem rngl_eq_dec' :
   (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true →
   ∀ a b : T, {a = b} + {a ≠ b}.
@@ -640,13 +638,22 @@ destruct ed. {
   apply rngl_eq_dec.
 }
 cbn in Heo.
-rename Heo into Hop.
-destruct (rngl_le_dec Hop a b) as [Hab| Hab]. {
-  destruct (rngl_le_dec Hop b a) as [Hba| Hba]. {
+rename Heo into Hor.
+destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
+  destruct (rngl_le_dec Hor b a) as [Hba| Hba]. {
     left.
-...
+    now apply (rngl_le_antisymm Hor).
+  }
+  apply (rngl_nle_gt Hor) in Hba.
+  right.
+  intros H; subst b.
+  now apply (rngl_lt_irrefl Hor) in Hba.
+}
+apply (rngl_nle_gt Hor) in Hab.
+right.
+intros H; subst b.
+now apply (rngl_lt_irrefl Hor) in Hab.
 Qed.
-*)
 
 (* comparison *)
 
