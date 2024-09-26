@@ -46,4 +46,5 @@ Require Export RingLike_structures.
 Require Export RingLike_order.
 Require Export RingLike_add.
 Require Export RingLike_mul.
+Require Export RingLike_mul_with_order.
 Require Export RingLike_distances.

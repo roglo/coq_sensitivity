@@ -479,4 +479,113 @@ Qed.
 Theorem fold_rngl_squ : ∀ a : T, (a * a)%L = rngl_squ a.
 Proof. easy. Qed.
 
+Theorem rngl_eqb_eq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = true ↔ a = b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+(*
+Theorem rngl_eqb_eq' :
+  rngl_has_eq_dec_or_order T = true →
+  ∀ a b : T, (a =? b)%L = true ↔ a = b.
+Proof.
+intros Heo *.
+progress unfold rngl_has_eq_dec_or_order in Heo.
+remember (rngl_has_eq_dec T) as ed eqn:Hed.
+symmetry in Hed.
+destruct ed. {
+  progress unfold rngl_has_eq_dec in Hed.
+  progress unfold rngl_eqb.
+  destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+  now destruct (rngl_eq_dec a b).
+}
+cbn in Heo.
+rename Heo into Hor.
+destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
+  destruct (rngl_le_dec Hor b a) as [Hba| Hba]. {
+    apply (rngl_le_antisymm Hor) in Hab; [ subst b | easy ].
+    split; [ easy | intros _ ].
+Search ((_ =? _)%L).
+(* tiens ? ça marche pas *)
+(* pour qu'on puisse considérer "a =? b", il faut
+   que rngl_has_eq_dec *)
+...
+Check rngl_leb_le.
+...
+intros Heo *.
+...
+  }
+  apply (rngl_nle_gt Hor) in Hba.
+  right.
+  intros H; subst b.
+  now apply (rngl_lt_irrefl Hor) in Hba.
+}
+apply (rngl_nle_gt Hor) in Hab.
+right.
+intros H; subst b.
+now apply (rngl_lt_irrefl Hor) in Hab.
+Qed.
+...
+*)
+
+Theorem rngl_eqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = false ↔ a ≠ b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_neqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a ≠? b)%L = true ↔ a ≠ b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_eqb_refl :
+  rngl_has_eq_dec T = true →
+  ∀ a, (a =? a)%L = true.
+Proof.
+intros Heqb *.
+now apply (rngl_eqb_eq Heqb).
+Qed.
+
+Theorem rngl_eqb_sym :
+  rngl_has_eq_dec T = true →
+  ∀ a b, ((a =? b) = (b =? a))%L.
+Proof.
+intros Hed *.
+remember (a =? b)%L as ab eqn:Hab.
+remember (b =? a)%L as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab. {
+  destruct ba; [ easy | ].
+  apply (rngl_eqb_eq Hed) in Hab.
+  apply (rngl_eqb_neq Hed) in Hba.
+  now symmetry in Hab.
+} {
+  destruct ba; [ | easy ].
+  apply (rngl_eqb_neq Hed) in Hab.
+  apply (rngl_eqb_eq Hed) in Hba.
+  now symmetry in Hba.
+}
+Qed.
+
 End a.
