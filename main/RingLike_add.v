@@ -639,6 +639,96 @@ Theorem fold_rngl_mul_nat :
   ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
 Proof. easy. Qed.
 
+Theorem rngl_characteristic_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T = 0 →
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+Proof.
+intros Hon Hcz.
+specialize (rngl_opt_characteristic_prop) as H1.
+now rewrite Hon, Hcz in H1.
+Qed.
+
+Theorem rngl_characteristic_non_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T ≠ 0 →
+  (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
+  rngl_of_nat (rngl_characteristic T) = 0%L.
+Proof.
+intros Hon Hcz.
+specialize (rngl_opt_characteristic_prop) as H1.
+apply Nat.eqb_neq in Hcz.
+now rewrite Hon, Hcz in H1.
+Qed.
+
+Theorem rngl_1_neq_0_iff :
+  rngl_has_1 T = true → rngl_characteristic T ≠ 1 ↔ (1 ≠ 0)%L.
+Proof.
+intros Hon.
+specialize rngl_opt_characteristic_prop as H1.
+rewrite Hon in H1.
+split. {
+  intros Hc.
+  remember (Nat.eqb (rngl_characteristic T) 0) as cz eqn:Hcz; symmetry in Hcz.
+  destruct cz. {
+    specialize (H1 0); cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+  }
+  destruct H1 as (Hbef, H1).
+  destruct rngl_characteristic as [| n]; [ easy | ].
+  destruct n; [ easy | ].
+  specialize (Hbef 1).
+  cbn in Hbef.
+  rewrite rngl_add_0_r in Hbef.
+  apply Hbef.
+  unfold lt.
+  split; [ easy | ].
+  do 2 apply le_n_S.
+  destruct n; [ easy | apply le_0_n ].
+} {
+  intros H10 Hc.
+  rewrite Hc in H1; cbn in H1.
+  now rewrite rngl_add_0_r in H1.
+}
+Qed.
+
+Theorem eq_rngl_of_nat_0 :
+  rngl_has_1 T = true →
+  rngl_characteristic T = 0 →
+  ∀ i, rngl_of_nat i = 0%L → i = 0.
+Proof.
+intros Hon Hch * Hi.
+destruct i; [ easy | exfalso ].
+cbn in Hi.
+specialize (rngl_characteristic_0 Hon Hch) as H1.
+now specialize (H1 i) as H.
+Qed.
+
+Theorem rngl_of_nat_inj :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_characteristic T = 0 →
+  ∀ i j,
+  rngl_of_nat i = rngl_of_nat j
+  → i = j.
+Proof.
+intros Hon Hom Hch * Hij.
+revert i Hij.
+induction j; intros. {
+  cbn in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
+}
+destruct i. {
+  exfalso.
+  symmetry in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
+}
+f_equal.
+cbn in Hij.
+apply rngl_add_cancel_l in Hij; [ | easy ].
+now apply IHj.
+Qed.
+
 (* when ordered *)
 
 Theorem rngl_add_le_compat :
@@ -1839,104 +1929,6 @@ now rewrite Har, Hor in H1.
 Qed.
 
 End a.
-
-Section b.
-
-Context {T : Type}.
-Context {ro : ring_like_op T}.
-Context {rp : ring_like_prop T}.
-
-Theorem rngl_characteristic_0 :
-  rngl_has_1 T = true →
-  rngl_characteristic T = 0 →
-  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
-Proof.
-intros Hon Hcz.
-specialize (rngl_opt_characteristic_prop) as H1.
-now rewrite Hon, Hcz in H1.
-Qed.
-
-Theorem rngl_characteristic_non_0 :
-  rngl_has_1 T = true →
-  rngl_characteristic T ≠ 0 →
-  (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
-  rngl_of_nat (rngl_characteristic T) = 0%L.
-Proof.
-intros Hon Hcz.
-specialize (rngl_opt_characteristic_prop) as H1.
-apply Nat.eqb_neq in Hcz.
-now rewrite Hon, Hcz in H1.
-Qed.
-
-Theorem rngl_1_neq_0_iff :
-  rngl_has_1 T = true → rngl_characteristic T ≠ 1 ↔ (1 ≠ 0)%L.
-Proof.
-intros Hon.
-specialize rngl_opt_characteristic_prop as H1.
-rewrite Hon in H1.
-split. {
-  intros Hc.
-  remember (Nat.eqb (rngl_characteristic T) 0) as cz eqn:Hcz; symmetry in Hcz.
-  destruct cz. {
-    specialize (H1 0); cbn in H1.
-    now rewrite rngl_add_0_r in H1.
-  }
-  destruct H1 as (Hbef, H1).
-  destruct rngl_characteristic as [| n]; [ easy | ].
-  destruct n; [ easy | ].
-  specialize (Hbef 1).
-  cbn in Hbef.
-  rewrite rngl_add_0_r in Hbef.
-  apply Hbef.
-  unfold lt.
-  split; [ easy | ].
-  do 2 apply le_n_S.
-  destruct n; [ easy | apply le_0_n ].
-} {
-  intros H10 Hc.
-  rewrite Hc in H1; cbn in H1.
-  now rewrite rngl_add_0_r in H1.
-}
-Qed.
-
-Theorem eq_rngl_of_nat_0 :
-  rngl_has_1 T = true →
-  rngl_characteristic T = 0 →
-  ∀ i, rngl_of_nat i = 0%L → i = 0.
-Proof.
-intros Hon Hch * Hi.
-destruct i; [ easy | exfalso ].
-cbn in Hi.
-specialize (rngl_characteristic_0 Hon Hch) as H1.
-now specialize (H1 i) as H.
-Qed.
-
-Theorem rngl_of_nat_inj :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
-  rngl_characteristic T = 0 →
-  ∀ i j,
-  rngl_of_nat i = rngl_of_nat j
-  → i = j.
-Proof.
-intros Hon Hom Hch * Hij.
-revert i Hij.
-induction j; intros. {
-  cbn in Hij.
-  now apply eq_rngl_of_nat_0 in Hij.
-}
-destruct i. {
-  exfalso.
-  symmetry in Hij.
-  now apply eq_rngl_of_nat_0 in Hij.
-}
-f_equal.
-cbn in Hij.
-apply rngl_add_cancel_l in Hij; [ | easy ].
-now apply IHj.
-Qed.
-
-End b.
 
 Arguments rngl_abs {T ro} a%_L.
 Arguments rngl_abs_nonneg_eq {T ro rp} Hop Hor a%_L.
