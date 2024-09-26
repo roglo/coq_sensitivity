@@ -760,3 +760,10 @@ Notation "x ?= y" := (rngl_compare x y) : ring_like_scope.
 End a.
 
 Arguments rngl_eq_dec {T ro rp} Heo (a b)%_L.
+
+Arguments rngl_le_dec {T ro rp} Hor (a b)%_L.
+Arguments rngl_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_le_lt_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_le_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_trans {T ro rp} Hor (a b c)%_L.
+Arguments rngl_lt_dec {T ro rp} Hor (a b)%_L.
