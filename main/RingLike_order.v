@@ -615,6 +615,8 @@ progress unfold rngl_max.
 now destruct (a ≤? b)%L.
 Qed.
 
+(* equality *)
+
 (*
 Theorem rngl_eq_dec :
   rngl_has_eq_dec T = true →
@@ -626,6 +628,71 @@ destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
 apply rngl_eq_dec.
 Qed.
 *)
+
+Theorem rngl_eqb_eq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = true ↔ a = b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_eqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a =? b)%L = false ↔ a ≠ b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_neqb_neq :
+  rngl_has_eq_dec T = true →
+  ∀ a b : T, (a ≠? b)%L = true ↔ a ≠ b.
+Proof.
+intros Hed *.
+progress unfold rngl_has_eq_dec in Hed.
+progress unfold rngl_eqb.
+destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
+clear Hed.
+now destruct (rngl_eq_dec a b).
+Qed.
+
+Theorem rngl_eqb_refl :
+  rngl_has_eq_dec T = true →
+  ∀ a, (a =? a)%L = true.
+Proof.
+intros Heqb *.
+now apply (rngl_eqb_eq Heqb).
+Qed.
+
+Theorem rngl_eqb_sym :
+  rngl_has_eq_dec T = true →
+  ∀ a b, ((a =? b) = (b =? a))%L.
+Proof.
+intros Hed *.
+remember (a =? b)%L as ab eqn:Hab.
+remember (b =? a)%L as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab. {
+  destruct ba; [ easy | ].
+  apply (rngl_eqb_eq Hed) in Hab.
+  apply (rngl_eqb_neq Hed) in Hba.
+  now symmetry in Hab.
+} {
+  destruct ba; [ | easy ].
+  apply (rngl_eqb_neq Hed) in Hab.
+  apply (rngl_eqb_eq Hed) in Hba.
+  now symmetry in Hba.
+}
+Qed.
 
 Theorem rngl_eq_dec :
   rngl_has_eq_dec_or_order T = true →
