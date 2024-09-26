@@ -628,10 +628,11 @@ Qed.
 *)
 
 Theorem rngl_eq_dec :
-  (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true →
+  rngl_has_eq_dec_or_order T = true →
   ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
 intros Heo *.
+progress unfold rngl_has_eq_dec_or_order in Heo.
 remember (rngl_has_eq_dec T) as ed eqn:Hed.
 symmetry in Hed.
 destruct ed. {

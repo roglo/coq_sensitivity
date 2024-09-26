@@ -309,6 +309,9 @@ Definition rngl_min {T} {ro : ring_like_op T} (a b : T) :=
 Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
   if (a ≤? b)%L then b else a.
 
+Definition rngl_has_eq_dec_or_order T {ro : ring_like_op T} :=
+  (rngl_has_eq_dec T || rngl_is_ordered T)%bool.
+
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_archimedean T {ro ring_like_prop}.
@@ -455,18 +458,20 @@ Qed.
 
 Theorem rngl_has_eq_dec_or_is_ordered_l :
   rngl_has_eq_dec T = true
-  → (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true.
+  → rngl_has_eq_dec_or_order T = true.
 Proof.
 intros Hor.
+progress unfold rngl_has_eq_dec_or_order.
 rewrite Hor.
 apply Bool.orb_true_l.
 Qed.
 
 Theorem rngl_has_eq_dec_or_is_ordered_r :
   rngl_is_ordered T = true
-  → (rngl_has_eq_dec T || rngl_is_ordered T)%bool = true.
+  → rngl_has_eq_dec_or_order T = true.
 Proof.
 intros Hor.
+progress unfold rngl_has_eq_dec_or_order.
 rewrite Hor.
 apply Bool.orb_true_r.
 Qed.
