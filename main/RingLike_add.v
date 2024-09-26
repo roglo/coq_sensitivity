@@ -498,36 +498,6 @@ rewrite H.
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_add_le_compat :
-  rngl_is_ordered T = true →
-  ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L.
-Proof.
-intros Hor *.
-specialize rngl_opt_ord as H.
-rewrite Hor in H.
-apply H.
-Qed.
-
-Theorem rngl_eq_add_0 :
-  rngl_is_ordered T = true →
-  ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%L.
-Proof.
-intros Hor * Haz Hbz Hab.
-split. {
-  apply (rngl_le_antisymm Hor) in Haz; [ easy | ].
-  rewrite <- Hab.
-  remember (a + b)%L as ab.
-  rewrite <- (rngl_add_0_r a); subst ab.
-  apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
-} {
-  apply (rngl_le_antisymm Hor) in Hbz; [ easy | ].
-  rewrite <- Hab.
-  remember (a + b)%L as ab.
-  rewrite <- (rngl_add_0_l b); subst ab.
-  apply rngl_add_le_compat; [ easy | easy | now apply rngl_le_refl ].
-}
-Qed.
-
 Theorem rngl_opp_sub_distr :
   rngl_has_opp T = true →
   ∀ a b, (- (a - b) = b - a)%L.
@@ -575,6 +545,130 @@ rewrite (rngl_opp_involutive Hop).
 unfold rngl_sub; rewrite Hop.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
+Qed.
+
+Theorem rngl_mul_nat_add_r : ∀ a m n,
+  rngl_mul_nat a (m + n) = (rngl_mul_nat a m + rngl_mul_nat a n)%L.
+Proof.
+intros.
+unfold rngl_mul_nat, mul_nat.
+induction m; cbn; [ now rewrite rngl_add_0_l | ].
+rewrite <- rngl_add_assoc; f_equal.
+apply IHm.
+Qed.
+
+Theorem rngl_of_nat_add : ∀ m n,
+  rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
+Proof.
+intros.
+apply rngl_mul_nat_add_r.
+Qed.
+
+Theorem rngl_of_nat_sub :
+  rngl_has_opp_or_subt T = true →
+  ∀ m n : nat, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
+Proof.
+intros Hos * Hnm.
+replace m with (n + (m - n)) at 2. 2: {
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm.
+  apply Nat.add_sub.
+}
+rewrite rngl_of_nat_add.
+symmetry.
+rewrite rngl_add_comm.
+apply (rngl_add_sub Hos).
+Qed.
+
+Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
+Proof. apply rngl_add_0_r. Qed.
+
+Theorem rngl_of_nat_2 : rngl_of_nat 2 = 2%L.
+Proof. now cbn; rewrite rngl_add_0_r. Qed.
+
+Theorem rngl_mul_nat_succ :
+  ∀ a n, rngl_mul_nat a (S n) = (a + rngl_mul_nat a n)%L.
+Proof.
+intros.
+rewrite <- Nat.add_1_l.
+rewrite rngl_mul_nat_add_r.
+now cbn; rewrite rngl_add_0_r.
+Qed.
+
+Theorem rngl_of_nat_succ :
+  ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
+Proof. easy. Qed.
+
+Theorem rngl_abs_0 :
+  rngl_has_opp T = true →
+  rngl_abs 0%L = 0%L.
+Proof.
+intros Hop.
+progress unfold rngl_abs.
+rewrite (rngl_opp_0 Hop).
+now destruct (0 ≤? 0)%L.
+Qed.
+
+Theorem eq_rngl_abs_0 :
+  rngl_has_opp T = true →
+  ∀ a, rngl_abs a = 0%L → a = 0%L.
+Proof.
+intros Hop * Ha.
+progress unfold rngl_abs in Ha.
+destruct (a ≤? 0)%L; [ | easy ].
+rewrite <- (rngl_opp_0 Hop) in Ha.
+now apply (rngl_opp_inj Hop) in Ha.
+Qed.
+
+Theorem rngl_add_opp_diag_r :
+  rngl_has_opp T = true →
+  ∀ x : T, (x + - x)%L = 0%L.
+Proof.
+intros Hop *.
+rewrite (rngl_add_opp_r Hop).
+apply rngl_sub_diag.
+now apply rngl_has_opp_or_subt_iff; left.
+Qed.
+
+Arguments rngl_mul_nat {T ro} a%_L n%_nat.
+
+Theorem rngl_of_nat_0 : rngl_of_nat 0 = 0%L.
+Proof. easy. Qed.
+
+Theorem fold_rngl_mul_nat :
+  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
+Proof. easy. Qed.
+
+(* when ordered *)
+
+Theorem rngl_add_le_compat :
+  rngl_is_ordered T = true →
+  ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L.
+Proof.
+intros Hor *.
+specialize rngl_opt_ord as H.
+rewrite Hor in H.
+apply H.
+Qed.
+
+Theorem rngl_eq_add_0 :
+  rngl_is_ordered T = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%L.
+Proof.
+intros Hor * Haz Hbz Hab.
+split. {
+  apply (rngl_le_antisymm Hor) in Haz; [ easy | ].
+  rewrite <- Hab.
+  remember (a + b)%L as ab.
+  rewrite <- (rngl_add_0_r a); subst ab.
+  apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
+} {
+  apply (rngl_le_antisymm Hor) in Hbz; [ easy | ].
+  rewrite <- Hab.
+  remember (a + b)%L as ab.
+  rewrite <- (rngl_add_0_l b); subst ab.
+  apply rngl_add_le_compat; [ easy | easy | now apply rngl_le_refl ].
+}
 Qed.
 
 Theorem rngl_le_0_sub :
@@ -762,58 +856,6 @@ split; intros Ha. {
   now rewrite (rngl_opp_0 Hop) in Ha.
 }
 Qed.
-
-Theorem rngl_mul_nat_add_r : ∀ a m n,
-  rngl_mul_nat a (m + n) = (rngl_mul_nat a m + rngl_mul_nat a n)%L.
-Proof.
-intros.
-unfold rngl_mul_nat, mul_nat.
-induction m; cbn; [ now rewrite rngl_add_0_l | ].
-rewrite <- rngl_add_assoc; f_equal.
-apply IHm.
-Qed.
-
-Theorem rngl_of_nat_add : ∀ m n,
-  rngl_of_nat (m + n) = (rngl_of_nat m + rngl_of_nat n)%L.
-Proof.
-intros.
-apply rngl_mul_nat_add_r.
-Qed.
-
-Theorem rngl_of_nat_sub :
-  rngl_has_opp_or_subt T = true →
-  ∀ m n : nat, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
-Proof.
-intros Hos * Hnm.
-replace m with (n + (m - n)) at 2. 2: {
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat.add_comm.
-  apply Nat.add_sub.
-}
-rewrite rngl_of_nat_add.
-symmetry.
-rewrite rngl_add_comm.
-apply (rngl_add_sub Hos).
-Qed.
-
-Theorem rngl_of_nat_1 : rngl_of_nat 1 = 1%L.
-Proof. apply rngl_add_0_r. Qed.
-
-Theorem rngl_of_nat_2 : rngl_of_nat 2 = 2%L.
-Proof. now cbn; rewrite rngl_add_0_r. Qed.
-
-Theorem rngl_mul_nat_succ :
-  ∀ a n, rngl_mul_nat a (S n) = (a + rngl_mul_nat a n)%L.
-Proof.
-intros.
-rewrite <- Nat.add_1_l.
-rewrite rngl_mul_nat_add_r.
-now cbn; rewrite rngl_add_0_r.
-Qed.
-
-Theorem rngl_of_nat_succ :
-  ∀ n, rngl_of_nat (S n) = (1 + rngl_of_nat n)%L.
-Proof. easy. Qed.
 
 Theorem rngl_add_lt_mono :
   rngl_has_opp_or_subt T = true →
@@ -1361,27 +1403,6 @@ split; intros Hij. {
 }
 Qed.
 
-Theorem rngl_abs_0 :
-  rngl_has_opp T = true →
-  rngl_abs 0%L = 0%L.
-Proof.
-intros Hop.
-progress unfold rngl_abs.
-rewrite (rngl_opp_0 Hop).
-now destruct (0 ≤? 0)%L.
-Qed.
-
-Theorem eq_rngl_abs_0 :
-  rngl_has_opp T = true →
-  ∀ a, rngl_abs a = 0%L → a = 0%L.
-Proof.
-intros Hop * Ha.
-progress unfold rngl_abs in Ha.
-destruct (a ≤? 0)%L; [ | easy ].
-rewrite <- (rngl_opp_0 Hop) in Ha.
-now apply (rngl_opp_inj Hop) in Ha.
-Qed.
-
 Theorem rngl_abs_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -1816,25 +1837,6 @@ intros Har Hor.
 specialize rngl_opt_archimedean as H1.
 now rewrite Har, Hor in H1.
 Qed.
-
-Theorem rngl_add_opp_diag_r :
-  rngl_has_opp T = true →
-  ∀ x : T, (x + - x)%L = 0%L.
-Proof.
-intros Hop *.
-rewrite (rngl_add_opp_r Hop).
-apply rngl_sub_diag.
-now apply rngl_has_opp_or_subt_iff; left.
-Qed.
-
-Arguments rngl_mul_nat {T ro} a%_L n%_nat.
-
-Theorem rngl_of_nat_0 : rngl_of_nat 0 = 0%L.
-Proof. easy. Qed.
-
-Theorem fold_rngl_mul_nat :
-  ∀ a n, List.fold_right rngl_add 0%L (List.repeat a n)%L = rngl_mul_nat a n.
-Proof. easy. Qed.
 
 End a.
 
