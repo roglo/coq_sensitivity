@@ -239,7 +239,8 @@ now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
 Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
-  ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%L.
+  ((if x then a else b) * (if x then c else d) =
+    if x then a * c else b * d)%L.
 Proof. now destruct x. Qed.
 
 Theorem rngl_characteristic_1 :

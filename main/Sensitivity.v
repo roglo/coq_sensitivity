@@ -1,6 +1,7 @@
 (* Sensitivity Theorem proved by Hao Huang.
    https://arxiv.org/pdf/1907.00847.pdf
-   https://eccc.weizmann.ac.il/report/2020/002/?fbclid=IwAR19mpxfIuoSaWq3HO8MdV8i8x_xlvwMKHjfElzBUK0GditlyaLeJiC8gJY *)
+   https://eccc.weizmann.ac.il/report/2020/002/
+     ?fbclid=IwAR19mpxfIuoSaWq3HO8MdV8i8x_xlvwMKHjfElzBUK0GditlyaLeJiC8gJY *)
 
 Set Nested Proofs Allowed.
 
@@ -27,7 +28,10 @@ Definition are_adjacent_vertices a b :=
   are_adj_vert_loop (max a b) a b.
 
 (*
-Compute (let n := 3 in map (λ a, (a, filter (are_adjacent_vertices a) (seq 0 (2^n)))) (seq 0 (2^n))).
+Compute
+  (let n := 3 in
+   map (λ a, (a, filter (are_adjacent_vertices a) (seq 0 (2^n))))
+     (seq 0 (2^n))).
 *)
 
 (* subgraph of the n-dimensional cube graph *)
@@ -266,7 +270,9 @@ Definition all_partitions n :=
 
 (*
 Compute (map (isort list_nat_le) (pre_partitions 4)).
-Compute (nodup (list_eq_dec (list_eq_dec Nat.eq_dec)) (map (isort list_nat_le) (pre_partitions 4))).
+Compute
+  (nodup (list_eq_dec (list_eq_dec Nat.eq_dec))
+     (map (isort list_nat_le) (pre_partitions 4))).
 Compute (all_partitions 4).
 *)
 
@@ -938,8 +944,10 @@ Definition pre_partition_in n j k i :=
 
 (* example: all pre-partitions that have the j in k-th set *)
 (*
-Compute (let n := 3 in let j := 1 in let k := 2 in map (λ i, (i, dispatch n i))
-(filter (pre_partition_in n j k) (seq 0 (n ^ n)))).
+Compute
+  (let n := 3 in let j := 1 in let k := 2 in
+   map (λ i, (i, dispatch n i))
+    (filter (pre_partition_in n j k) (seq 0 (n ^ n)))).
 *)
 
 Theorem nth_find_all_loop_app : ∀ A f (l1 l2 : list A) i,
@@ -1726,7 +1734,10 @@ Compute (Nat.sqrt 5).
 Compute (let n := 5 in 2 ^ (n - 1) + 1).
 Compute (length [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30]).
 Compute (edges [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30]).
-Compute (map (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30; i]) (seq 0 32)).
+Compute
+   (map
+     (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30; i])
+     (seq 0 32)).
 
 Compute (Nat.sqrt 4).
 Compute (let n := 4 in 2 ^ (n - 1) + 1). (* 9 *)
