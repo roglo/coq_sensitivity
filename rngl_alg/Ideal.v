@@ -19,9 +19,12 @@ Class ideal_prop {T} {ro : ring_like_op T} (P : T → bool) := mk_ip
     ip_add : ∀ a b, P a = true → P b = true → P (a + b)%L = true;
     ip_opp_or_subt :
       match rngl_opt_opp_or_subt T with
-      | Some (inl opp) => ∀ a, P a = true → P (opp a)%L = true
-      | Some (inr subt) => ∀ a b, P a = true → P b = true → P (subt a b) = true
-      | None => not_applicable
+      | Some (inl opp) =>
+          ∀ a, P a = true → P (opp a)%L = true
+      | Some (inr subt) =>
+          ∀ a b, P a = true → P b = true → P (subt a b) = true
+      | None =>
+          not_applicable
       end;
     ip_mul_l : ∀ a b, P b = true → P (a * b)%L = true;
     ip_mul_r : ∀ a b, P a = true → P (a * b)%L = true }.

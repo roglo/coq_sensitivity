@@ -939,7 +939,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   }
 }
 (* Proof in
-   https://en.wikipedia.org/wiki/Least-upper-bound_property#Proof_using_Cauchy_sequences *)
+   https://en.wikipedia.org/wiki/Least-upper-bound_property#
+     Proof_using_Cauchy_sequences *)
 unfold is_supremum.
 set (u := λ n, fst (AnBn P a b n)).
 set (v := λ n, snd (AnBn P a b n)).

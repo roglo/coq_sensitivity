@@ -709,7 +709,8 @@ rewrite <- GQsub_add_distr; [ | now rewrite GQadd_comm ].
 now rewrite GQadd_comm.
 Qed.
 
-Theorem GQsub_lt_mono_l : ∀ x y z, (x < y)%GQ → (y < z)%GQ → (z - y < z - x)%GQ.
+Theorem GQsub_lt_mono_l :
+  ∀ x y z, (x < y)%GQ → (y < z)%GQ → (z - y < z - x)%GQ.
 Proof.
 intros * Hxy Hyz.
 apply (GQadd_lt_mono_r _ _ y).
@@ -724,7 +725,8 @@ apply (GQlt_trans _ y); [ easy | ].
 apply GQlt_add_r.
 Qed.
 
-Theorem GQsub_lt_mono_r : ∀ x y z, (x < y)%GQ → (z < x)%GQ → (x - z < y - z)%GQ.
+Theorem GQsub_lt_mono_r :
+  ∀ x y z, (x < y)%GQ → (z < x)%GQ → (x - z < y - z)%GQ.
 Proof.
 intros * Hxy Hyz.
 apply (GQadd_lt_mono_r _ _ z).
@@ -1158,7 +1160,8 @@ rewrite GQmul_pair; [ | easy | easy | easy | easy ].
 now rewrite Nat.mul_1_r.
 Qed.
 
-Theorem GQmul_sub_distr_l : ∀ x y z, (z < y)%GQ → (x * (y - z) = x * y - x * z)%GQ.
+Theorem GQmul_sub_distr_l :
+  ∀ x y z, (z < y)%GQ → (x * (y - z) = x * y - x * z)%GQ.
 Proof.
 intros.
 unfold "<"%GQ in H.
@@ -1393,7 +1396,8 @@ destruct a.
 Qed.
 
 Theorem GQden_pair : ∀ a b,
-  GQden (a // b) = if zerop a ∨∨ zerop b then Nat.max 1 b else b / Nat.gcd a b.
+  GQden (a // b) =
+    if zerop a ∨∨ zerop b then Nat.max 1 b else b / Nat.gcd a b.
 Proof.
 intros.
 unfold GQden; cbn.
