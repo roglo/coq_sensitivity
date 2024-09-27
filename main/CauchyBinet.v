@@ -941,7 +941,8 @@ apply NoDup_permutation. {
   specialize (ext_in_map Hij) as H1.
   assert
     (H : ∀ k, k < n →
-     nth k (nth i (cart_prod_rep_seq n) []) 0 = nth k (nth j (cart_prod_rep_seq n) []) 0). {
+     nth k (nth i (cart_prod_rep_seq n) []) 0 =
+       nth k (nth j (cart_prod_rep_seq n) []) 0). {
     intros k Hk.
     apply H1.
     apply (permutation_in_iff Nat.eqb_eq) with (la := seq 0 n). 2: {
@@ -1345,7 +1346,9 @@ pas claire, mon histoire...
 fix canon_sym_gr_list (n k : nat) {struct n} : list nat :=
   match n with
   | 0 => []
-  | S n' => k / n'! :: map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  | S n' =>
+      k / n'! ::
+        map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
   end
 
 canon_sym_gr_list_list = λ n : nat, map (canon_sym_gr_list n) (seq 0 n!)
