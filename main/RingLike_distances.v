@@ -8,6 +8,7 @@ Require Import RingLike_mul.
 Require Import RingLike_div.
 Require Import RingLike_add_with_order.
 Require Import RingLike_mul_with_order.
+Require Import RingLike_div_with_order.
 
 Section a.
 

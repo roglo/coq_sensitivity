@@ -49,4 +49,5 @@ Require Export RingLike_mul.
 Require Export RingLike_div.
 Require Export RingLike_add_with_order.
 Require Export RingLike_mul_with_order.
+Require Export RingLike_div_with_order.
 Require Export RingLike_distances.
