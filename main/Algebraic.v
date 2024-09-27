@@ -552,7 +552,8 @@ apply rngl_summation_eq_compat.
 intros i Hi.
 assert
   (Hi1 :
-    (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true). {
+    (rngl_is_integral_domain T ||
+       rngl_has_inv_and_1_or_quot T)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii | Hii]; [ now left | right ].
@@ -1010,7 +1011,8 @@ assert (H : (sm • u)%V = v). {
     specialize (H1 [0; 1]%L (seq 1 (length la))).
     rewrite length_seq in H1.
     set (rol := lap_ring_like_op).
-    specialize (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0]))%L).
+    specialize
+      (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0]))%L).
     rewrite if_bool_if_dec in H1.
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
       apply Nat.eqb_eq, length_zero_iff_nil in Haz; subst la.
@@ -1325,7 +1327,8 @@ Theorem algeb_add_cancelling :
   → eval_lap (algeb_add p q) (α + β)%L = 0%L.
 Proof.
 intros * Hp Hq.
-remember (bezout_resultant_coeff (map (λ i, [i]) p) (lap_compose_y_minus_x q))
+remember
+  (bezout_resultant_coeff (map (λ i, [i]) p) (lap_compose_y_minus_x q))
   as UV eqn:HUV.
 symmetry in HUV.
 destruct UV as (U, V).
@@ -1993,7 +1996,8 @@ apply IHlb.
 ...
 last_fold_left_lap_mul_add:
   ∀ (la : list T) (b c : T),
-    last (fold_left (λ (accu : list T) (a : T), (accu * [b] + [a])%lap) la [c])
+    last
+      (fold_left (λ (accu : list T) (a : T), (accu * [b] + [a])%lap) la [c])
       0%L = fold_left (λ x y : T, (x * b + y)%L) la c
 ...
 ...
@@ -2323,15 +2327,18 @@ Compute
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl). (* x²+1 = p *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl).
+    (* x²+1 = p *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²-2 = q *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl).
+     (* x²-2 = q *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [polyn_zero; mk_polyn [1] eq_refl] eq_refl). (* z *)
+   @mk_polyn (polyn Q) roqp [polyn_zero; mk_polyn [1] eq_refl] eq_refl).
+     (* z *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
@@ -2339,16 +2346,19 @@ Compute
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl). (* z-x *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl]
+     eq_refl). (* z-x *)
 
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²-2 = q *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl).
+     (* x²-2 = q *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl). (* z-x *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl]
+     eq_refl). (* z-x *)
 
 Check @polyn_compose.
 Check
@@ -2448,7 +2458,8 @@ Qed.
 Theorem Q_has_eqb : @rngl_has_eq_dec Q Q_ring_like_op = true.
 Proof. easy. Qed.
 
-Theorem Q_polyn_has_eqb : @rngl_has_eq_dec (polyn Q) Q_polyn_ring_like_op = true.
+Theorem Q_polyn_has_eqb :
+  @rngl_has_eq_dec (polyn Q) Q_polyn_ring_like_op = true.
 Proof. easy. Qed.
 
 Time Compute (
@@ -2682,7 +2693,8 @@ Proof. easy. Show Proof.
 
 Check (polyn_ring_like_op Q_ring_like_prop (n_Sn _)).
 Check
-  (@polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl (n_Sn _)).
+  (@polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl
+     (n_Sn _)).
 Search rngl_characteristic.
 
 Check mk_polyn.
@@ -2690,19 +2702,31 @@ Search has_polyn_prop.
 *)
 
 (*
-Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl)).
-Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
-Time Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
+  (mk_polyn (rev [6;7;8;9]) eq_refl)).
+Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
+  (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Time Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4]) eq_refl)
+  (mk_polyn (rev [6;7;8;9]) eq_refl))).
 ...
-Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
+  (mk_polyn (rev [6;7;8;9]) eq_refl))).
 ...
 Compute (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9]).
 Compute (mat_nrows (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
 Compute (mat_ncols (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
 Compute (is_square_matrix (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
-Compute (let m := rlap_sylvester_mat [1;2;3;4] [6;7;8] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
-Compute (let m := rlap_sylvester_mat [1;2;3] [6;7] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
-Compute (let m := rlap_sylvester_mat [2] [6;7] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
-Compute (let m := rlap_sylvester_mat [2;3] [6] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
+Compute
+  (let m := rlap_sylvester_mat [1;2;3;4] [6;7;8] in
+   (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
+Compute
+  (let m := rlap_sylvester_mat [1;2;3] [6;7] in
+   (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
+Compute
+  (let m := rlap_sylvester_mat [2] [6;7] in
+   (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
+Compute
+  (let m := rlap_sylvester_mat [2;3] [6] in
+   (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
 *)
 *)

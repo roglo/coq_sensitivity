@@ -565,7 +565,7 @@ Qed.
 
 Theorem rngl_of_nat_sub :
   rngl_has_opp_or_subt T = true →
-  ∀ m n : nat, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
+  ∀ m n, n ≤ m → rngl_of_nat (m - n) = (rngl_of_nat m - rngl_of_nat n)%L.
 Proof.
 intros Hos * Hnm.
 replace m with (n + (m - n)) at 2. 2: {
