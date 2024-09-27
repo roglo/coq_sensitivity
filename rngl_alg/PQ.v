@@ -1001,7 +1001,8 @@ repeat PQtac2; [ | simpl; flia | flia Hzy ].
 PQtac3.
 f_equal; f_equal.
 rewrite Nat.add_sub_assoc.
--f_equal; f_equal; [ f_equal; apply Nat.mul_shuffle0 | apply Nat.mul_shuffle0 ].
+-f_equal; f_equal; [ f_equal; apply Nat.mul_shuffle0 | ].
+ apply Nat.mul_shuffle0.
 -now apply Nat.mul_le_mono_r, Nat.lt_le_incl.
 Qed.
 
@@ -1390,7 +1391,8 @@ apply Nat.mul_cancel_l in H.
  now rewrite Nat.add_1_r in H1.
 Qed.
 
-Theorem PQred_add_mul_one_l : ∀ x y a, PQred (x + y) = PQred (PQmake a a * x + y).
+Theorem PQred_add_mul_one_l :
+  ∀ x y a, PQred (x + y) = PQred (PQmake a a * x + y).
 Proof.
 intros (xn, xd) (yn, yd) a.
 progress unfold PQred; simpl.
@@ -1471,7 +1473,8 @@ PQtac2.
  destruct u; [ easy | cbn; flia ].
 Qed.
 
-Theorem PQred_mul_mul_one_l : ∀ x y a, PQred (x * y) = PQred (PQmake a a * x * y).
+Theorem PQred_mul_mul_one_l :
+  ∀ x y a, PQred (x * y) = PQred (PQmake a a * x * y).
 Proof.
 intros (xn, xd) (yn, yd) a.
 progress unfold PQred; simpl.

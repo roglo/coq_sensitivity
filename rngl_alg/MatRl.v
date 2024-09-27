@@ -139,7 +139,8 @@ Warning: Projection value has no head constant:
 match rngl_opt_eqb with
 | Some eqb => Some (square_matrix_eqb eqb)
 | None => None
-end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it. [projection-no-head-constant,typechecker]
+end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it.
+ [projection-no-head-constant,typechecker]
 *)
 
 (*
@@ -580,11 +581,17 @@ Qed.
 
 (*
 Theorem mat_opt_eqb_eq : ∀ eq_dec n,
-  match @rngl_has_eq_dec (square_matrix n T) (@mat_ring_like_op eq_dec n) return Prop with
+  match
+    @rngl_has_eq_dec (square_matrix n T) (@mat_ring_like_op eq_dec n)
+    return Prop
+  with
   | true =>
       forall a b : square_matrix n T,
-      iff (@eq bool (@rngl_eqb (square_matrix n T) (@mat_ring_like_op eq_dec n) a b) true)
-        (@eq (square_matrix n T) a b)
+      iff
+        (@eq bool
+           (@rngl_eqb (square_matrix n T) (@mat_ring_like_op eq_dec n) a b)
+              true)
+           (@eq (square_matrix n T) a b)
   | false => not_applicable
   end.
 (*

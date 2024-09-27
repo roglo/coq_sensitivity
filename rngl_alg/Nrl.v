@@ -416,7 +416,8 @@ progress unfold Zn_opt_inv_or_quot.
 now destruct (is_prime n).
 Qed.
 
-Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) : ring_like_prop (Zn n) :=
+Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :
+    ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
      rngl_is_archimedean := true;
@@ -448,7 +449,8 @@ End a.
 
 (* Semiring by Mohammed Abu Shamia in his PhD
    "On Some Types Of Ideals In Semirings", Aug 2008,
-   https://iugspace.iugaza.edu.ps/bitstream/handle/20.500.12358/21352/file_1.pdf
+   https://iugspace.iugaza.edu.ps/bitstream/handle/20.500.12358/21352/
+     file_1.pdf
    Example 1.15
    This "almost" semiring is special because:
    1/ 1=0, but not a trivial set
@@ -493,7 +495,7 @@ Qed.
 Theorem lcm_characteristic_prop :
   let rol := lcm_ring_like_op in
   if 1 =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
-  else (∀ i : nat, 0 < i < 1 → rngl_mul_nat 1 i ≠ 0%L) ∧ rngl_mul_nat 1 1 = 0%L.
+  else (∀ i, 0 < i < 1 → rngl_mul_nat 1 i ≠ 0%L) ∧ rngl_mul_nat 1 1 = 0%L.
 Proof.
 split; [ intros * Hi; flia Hi | easy ].
 Qed.
