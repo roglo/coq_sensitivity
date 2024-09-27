@@ -1710,7 +1710,7 @@ rewrite <- Heqlabc.
 symmetry.
 rewrite Heqlab.
 rewrite <- lap_add_norm_idemp_l.
-rewrite (lap_convol_mul_more Hos) with (n := (labc + lbc)%nat); [ | now subst lac ].
+rewrite (lap_convol_mul_more Hos (labc + lbc)); [ | now subst lac ].
 rewrite <- Heqlab.
 rewrite lap_add_norm_idemp_l.
 rewrite lap_add_comm.

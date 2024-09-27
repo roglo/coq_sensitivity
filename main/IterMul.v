@@ -630,4 +630,5 @@ Qed.
 
 End a.
 
-Arguments rngl_product_list_permut {T ro rp} Hon {A eqb} Heb Hic (la lb)%_list.
+Arguments rngl_product_list_permut {T ro rp} Hon {A eqb} Heb Hic
+  (la lb)%_list.
