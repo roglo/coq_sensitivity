@@ -93,7 +93,8 @@ Definition gc_mul (ca cb : GComplex T) :=
      gim := (gim ca * gre cb + gre ca * gim cb)%L |}.
 
 Definition gc_opt_opp_or_subt :
-  option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
+  option
+    ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_opp_or_subt T with
   | Some (inl opp) =>
       Some (inl (λ c, mk_gc (opp (gre c)) (opp (gim c))))
@@ -119,7 +120,8 @@ Context {rl : real_like_prop T}.
 Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
 
 Definition gc_opt_inv_or_quot :
-  option ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
+  option
+    ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_inv_or_quot T with
   | Some (inl inv) =>
       if rngl_mul_is_comm T then
@@ -3574,7 +3576,7 @@ enough (H : angle_lim (λ i, (n * angle_div_2_pow θ i))%A 0%A). {
   rewrite rl_sqrt_mul; [ | easy | easy ].
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ now apply rl_sqrt_nonneg | ].
   rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | now apply rl_sqrt_nonneg ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L; [ | now apply rl_sqrt_nonneg ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor √_); [ | now apply rl_sqrt_nonneg ].
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   rewrite (rngl_squ_sqrt Hon); [ | easy ].
   rewrite (rngl_squ_sqrt Hon); [ | easy ].

@@ -217,7 +217,8 @@ assert
          → NoDup (map f (seq start len))). {
       clear; intros * Hij.
       remember (seq start len) as l eqn:Hl; symmetry in Hl.
-      revert start len Hij Hl; induction l as [| i l]; intros; [ constructor | ].
+      revert start len Hij Hl.
+      induction l as [| i l]; intros; [ constructor | ].
       rewrite map_cons; constructor. {
         intros H1.
         apply in_map_iff in H1.
