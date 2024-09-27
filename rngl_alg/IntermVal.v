@@ -628,7 +628,7 @@ eapply (rngl_le_lt_trans Hor); [ apply (rngl_abs_triangle Hop Hor) | ].
 apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
   now apply (rngl_add_lt_compat Hop Hor).
 }
-rewrite (rngl_add_diag2 Hon).
+rewrite <- (rngl_mul_2_r Hon).
 rewrite (rngl_div_mul Hon Hiv).
 apply (rngl_le_refl Hor).
 apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
@@ -1191,7 +1191,7 @@ assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
     apply (rngl_lt_div_r Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    rewrite <- (rngl_add_diag2 Hon).
+    rewrite (rngl_mul_2_r Hon).
     apply (rngl_add_lt_mono_l Hop Hor).
     apply (rngl_min_glb_lt); [ | easy ].
     now apply (rngl_lt_add_r Hos Hor).
@@ -1199,7 +1199,7 @@ assert (Haηb : (a < (a + rngl_min (a + η) b) / 2 ≤ b)%L). {
     apply (rngl_le_div_l Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    rewrite <- (rngl_add_diag2 Hon).
+    rewrite (rngl_mul_2_r Hon).
     apply (rngl_add_le_compat Hor). {
       now apply (rngl_lt_le_incl Hor).
     }
@@ -1218,7 +1218,7 @@ assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
   apply (rngl_lt_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
-  rewrite <- (rngl_add_diag2 Hon).
+  rewrite (rngl_mul_2_r Hon).
   apply (rngl_add_lt_mono_r Hop Hor).
   apply (rngl_min_glb_lt); [ | easy ].
   now apply (rngl_lt_add_r Hos Hor).
@@ -1297,7 +1297,7 @@ destruct (is_upper_bound P x) as [Hux| Hux]. 2: {
     apply (rngl_le_div_r Hon Hop Hiv Hor). {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }
-    rewrite <- (rngl_add_diag2 Hon).
+    rewrite (rngl_mul_2_r Hon).
     apply (rngl_add_le_mono_l Hop Hor).
     apply rngl_max_lub; [ now apply (rngl_lt_le_incl Hor)| ].
     apply (rngl_le_sub_nonneg Hop Hor).
@@ -1311,7 +1311,7 @@ progress unfold x.
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
-rewrite <- (rngl_add_diag2 Hon).
+rewrite (rngl_mul_2_r Hon).
 apply (rngl_add_lt_mono_r Hop Hor).
 apply rngl_max_lub_lt; [ easy | ].
 apply (rngl_lt_sub_lt_add_l Hop Hor).
@@ -1472,7 +1472,7 @@ assert
         apply (rngl_le_div_l Hon Hop Hiv Hor). {
           apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
         }
-        rewrite <- (rngl_add_diag2 Hon).
+        rewrite (rngl_mul_2_r Hon).
         apply (rngl_le_add_l Hor).
         now apply (rngl_lt_le_incl Hor).
       } {
@@ -1524,7 +1524,7 @@ assert
       apply (rngl_lt_div_l Hon Hop Hiv Hor). {
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
       }
-      rewrite <- (rngl_add_diag2 Hon).
+      rewrite (rngl_mul_2_r Hon).
       now apply (rngl_lt_add_l Hos Hor).
     }
     specialize (H3 H); clear H.

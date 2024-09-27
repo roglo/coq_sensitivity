@@ -687,7 +687,7 @@ Theorem eq_rngl_add_same_0 :
   → a = 0%L.
 Proof.
 intros Hon Hos Hii Hch * Haa.
-rewrite (rngl_add_diag Hon) in Haa.
+rewrite <- (rngl_mul_2_l Hon) in Haa.
 specialize (rngl_characteristic_0 Hon Hch 1) as H1.
 cbn in H1.
 rewrite rngl_add_0_r in H1.

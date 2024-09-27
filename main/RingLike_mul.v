@@ -1,9 +1,6 @@
 (* RingLike_mul.v
-   This file serves as the main interface for multiplication properties
-   in ring-like structures. It imports both theorems that do not require 
-   an order relation and those that do. By importing this file, all 
-   multiplication-related theorems become available, regardless of whether 
-   an order relation is assumed or not. *)
+   This file deals with multiplication properties in ring-like structures.
+   It defines theorems that do not require an order relation. *)
 
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
@@ -85,18 +82,18 @@ destruct ic; [ | easy ].
 now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
 
-Theorem rngl_add_diag :
+Theorem rngl_mul_2_l :
   rngl_has_1 T = true →
-  ∀ a, (a + a = 2 * a)%L.
+  ∀ a, (2 * a = a + a)%L.
 Proof.
 intros Hon *.
 rewrite rngl_mul_add_distr_r.
 now rewrite (rngl_mul_1_l Hon).
 Qed.
 
-Theorem rngl_add_diag2 :
+Theorem rngl_mul_2_r :
   rngl_has_1 T = true →
-  ∀ a, (a + a = a * 2)%L.
+  ∀ a, (a * 2 = a + a)%L.
 Proof.
 intros Hon *.
 rewrite rngl_mul_add_distr_l.
@@ -420,7 +417,7 @@ do 2 rewrite rngl_mul_add_distr_r.
 rewrite rngl_add_assoc; f_equal.
 rewrite <- rngl_add_assoc; f_equal.
 rewrite <- rngl_mul_assoc.
-rewrite <- (rngl_add_diag Hon); f_equal.
+rewrite (rngl_mul_2_l Hon); f_equal.
 apply (rngl_mul_comm Hic).
 Qed.
 

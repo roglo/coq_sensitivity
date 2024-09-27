@@ -596,8 +596,8 @@ rewrite rngl_add_assoc.
 rewrite rngl_add_add_swap.
 rewrite rngl_add_assoc.
 rewrite <- rngl_add_assoc.
-rewrite (rngl_add_diag Hon).
-rewrite (rngl_add_diag Hon (rngl_cos θ2)).
+rewrite <- (rngl_mul_2_l Hon).
+rewrite <- (rngl_mul_2_l Hon (rngl_cos θ2)).
 rewrite <- rngl_mul_add_distr_l.
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 apply (rngl_lt_le_incl Hor).
@@ -1595,7 +1595,7 @@ rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- rngl_add_assoc.
-rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
+rewrite <- (rngl_mul_2_l Hon (rngl_cos θ1 * _)%L).
 rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite (rngl_mul_comm Hic).
@@ -2643,7 +2643,7 @@ rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- (rngl_add_assoc 2)%L.
-rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
+rewrite <- (rngl_mul_2_l Hon (rngl_cos θ1 * _)%L).
 rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- rngl_mul_add_distr_l.
 rewrite (rngl_mul_comm Hic).
@@ -2952,7 +2952,7 @@ rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_sub_swap Hop _ _ (rngl_cos θ2)).
 rewrite (rngl_add_sub Hos).
 rewrite <- (rngl_add_assoc 2)%L.
-rewrite (rngl_add_diag Hon (rngl_cos θ1 * _)%L).
+rewrite <- (rngl_mul_2_l Hon (rngl_cos θ1 * _)%L).
 rewrite (rngl_add_mul_r_diag_l Hon).
 rewrite <- (rngl_mul_sub_distr_l Hop).
 rewrite (rngl_mul_comm Hic).
@@ -3223,7 +3223,7 @@ apply (rngl_le_lt_trans Hor _ (2 * rngl_cos θ2))%L. {
   }
   now apply rngl_cos_bound.
 }
-rewrite <- (rngl_add_diag Hon).
+rewrite (rngl_mul_2_l Hon).
 apply (rngl_add_lt_mono_r Hop Hor).
 apply (rngl_lt_iff Hor).
 split; [ now apply rngl_cos_bound | ].
@@ -3401,8 +3401,8 @@ apply (rngl_add_sub_eq_l Hos) in H1.
 rewrite <- H1.
 rewrite (rngl_sub_sub_distr Hop).
 rewrite <- (rngl_add_sub_swap Hop).
-f_equal.
-apply (rngl_add_diag Hon).
+f_equal; symmetry.
+apply (rngl_mul_2_l Hon).
 Qed.
 
 Theorem rngl_sin_mul_2_l :
@@ -3415,8 +3415,8 @@ do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_0_r Hos).
 rewrite rngl_add_0_r.
 rewrite (rngl_mul_comm Hic (rngl_cos θ)).
-rewrite <- rngl_mul_assoc.
-apply (rngl_add_diag Hon).
+rewrite <- rngl_mul_assoc; symmetry.
+apply (rngl_mul_2_l Hon).
 Qed.
 
 Theorem angle_mul_add_distr_r :
@@ -3522,14 +3522,14 @@ rewrite <- (rngl_mul_sub_distr_r Hop).
 rewrite (rngl_sub_sub_distr Hop).
 rewrite (rngl_add_comm 1%L) at 1.
 rewrite (rngl_add_sub Hos).
-rewrite (rngl_add_diag2 Hon).
+rewrite <- (rngl_mul_2_r Hon).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
 rewrite rngl_add_comm.
 rewrite (rngl_mul_comm Hic).
-rewrite (rngl_add_diag2 Hon).
+rewrite <- (rngl_mul_2_r Hon).
 rewrite (rngl_mul_comm Hic ε).
 rewrite rngl_mul_assoc.
 rewrite <- rl_nth_root_mul; cycle 1. {

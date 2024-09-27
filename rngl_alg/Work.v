@@ -878,7 +878,7 @@ destruct Hv as (N, HN).
 exists (max M N).
 intros n Hn.
 specialize (rngl_div_add_distr_r Hiv ε ε 2) as H2.
-rewrite (rngl_add_diag2 Hon) in H2.
+rewrite <- (rngl_mul_2_r Hon) in H2.
 rewrite (rngl_mul_div Hi1) in H2. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }

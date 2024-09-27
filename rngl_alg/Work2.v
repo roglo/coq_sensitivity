@@ -3102,7 +3102,7 @@ assert (Hzε2 : (0 ≤ ε² / 2)%L). {
 }
 rewrite (rngl_squ_sqrt Hon) in Hcc, Hcs; [ | easy | easy ].
 specialize (rngl_div_add_distr_r Hiv ε² ε² 2)%L as H1.
-rewrite (rngl_add_diag2 Hon) in H1.
+rewrite <- (rngl_mul_2_r Hon) in H1.
 rewrite (rngl_mul_div Hi1) in H1. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
@@ -3964,7 +3964,7 @@ destruct Hlim as (N, HN).
 exists N.
 intros n Hn.
 specialize (HN n Hn).
-rewrite <- (rngl_add_diag Hon).
+rewrite (rngl_mul_2_l Hon).
 rewrite <- rngl_add_assoc.
 eapply (rngl_le_lt_trans Hor). 2: {
   apply (rngl_add_lt_mono_l Hop Hor), HN.

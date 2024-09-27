@@ -1,7 +1,7 @@
 (* RingLike_mul_with_order.v
-   This file deals with multiplication properties in rings that have an
-   order relation. The theorems here assume that this order relation is
-   defined. *)
+   This file deals with multiplication properties in ring-like structures
+   that have an order relation. The theorems here assume that this order
+   relation is defined. *)
 
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
