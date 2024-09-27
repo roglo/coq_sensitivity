@@ -124,8 +124,10 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
+Compute
+  (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
+Compute
+  (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 Compute (let M := mk_mat [] in det M).
 Compute (let M := mk_mat [] in det' M).
 Compute (let M := mk_mat [] in det'' M).
@@ -213,7 +215,8 @@ intros l1 Hl1.
 now apply Hll; right.
 Qed.
 
-Theorem cart_prod_rep_length_seq : ∀ n, n ≠ 0 → length (cart_prod_rep_seq n) = n ^ n.
+Theorem cart_prod_rep_length_seq :
+  ∀ n, n ≠ 0 → length (cart_prod_rep_seq n) = n ^ n.
 Proof.
 intros * Hnz.
 unfold cart_prod_rep_seq.
@@ -238,12 +241,14 @@ Fixpoint old_cart_prod_rep_seq_inv_loop n l :=
   | a :: l' => pred a + n * old_cart_prod_rep_seq_inv_loop n l'
   end.
 
-Definition old_cart_prod_rep_seq_inv n l := old_cart_prod_rep_seq_inv_loop n (rev l).
+Definition old_cart_prod_rep_seq_inv n l :=
+  old_cart_prod_rep_seq_inv_loop n (rev l).
 
 (*
 Compute (
   let n := 3 in
-  map (λ l, (cart_prod_rep_seq_inv n l, old_cart_prod_rep_seq_inv n l)) (cart_prod_rep_seq n)
+  map (λ l, (cart_prod_rep_seq_inv n l, old_cart_prod_rep_seq_inv n l))
+   (cart_prod_rep_seq n)
 ).
 *)
 
@@ -536,7 +541,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (cart_prod_rep_seq n)). {
+assert
+  (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (cart_prod_rep_seq n)). {
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
@@ -567,7 +573,8 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (cart_prod_rep_seq n
   now apply canon_sym_gr_list_ub.
 }
 symmetry.
-replace (cart_prod_rep_seq n) with (map (λ l, map S (map pred l)) (cart_prod_rep_seq n)). 2: {
+replace (cart_prod_rep_seq n) with
+    (map (λ l, map S (map pred l)) (cart_prod_rep_seq n)). 2: {
   erewrite map_ext_in. 2: {
     intros l Hl.
     rewrite map_map.
@@ -1187,8 +1194,8 @@ erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     replace (mat_el _ _ _) with
       (mat_el M (i + 1)
-         (nth (transposition (p - 1) (q - 1) i) (canon_sym_gr_list n k) 0 + 1)).
-    2: {
+        (nth (transposition (p - 1) (q - 1) i)
+           (canon_sym_gr_list n k) 0 + 1)). 2: {
       cbn.
       unfold mat_el; f_equal.
       unfold list_swap_elem.
@@ -2344,7 +2351,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now rewrite Hr, Hnz.
 }
 specialize (mat_transp_is_square M Hsm) as Hts.
-assert (Hs : permut_seq_with_len n (seq 0 n)) by apply seq_permut_seq_with_len.
+assert (Hs : permut_seq_with_len n (seq 0 n)) by
+  apply seq_permut_seq_with_len.
 assert (Hr' : mat_nrows M⁺ = n). {
   now rewrite mat_transp_nrows, squ_mat_ncols.
 }

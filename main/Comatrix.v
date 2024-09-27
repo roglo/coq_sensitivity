@@ -115,7 +115,8 @@ unfold transposition.
 do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
 destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
-destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | ].
+clear H.
 destruct (Nat.eq_dec (i + 1) (q - 1)) as [H| H]; [ flia Hq Hir H | clear H ].
 rewrite map_butn.
 rewrite nth_butn_before; [ | easy ].
@@ -989,8 +990,8 @@ now apply squ_mat_is_corr.
 Qed.
 
 (*
-The following two theorems, "determinant_with_row" and determinant_with_bad_row
-have some similitudes.
+The following two theorems, "determinant_with_row" and
+determinant_with_bad_row have some similitudes.
   The theorem "determinant_with_row" says that we can compute the determinant
 by going through any row (not necessarily the 0th one). Here, row "i".
   The theorem "determinant_with_bad_row" says that if we go through another
@@ -1034,7 +1035,8 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   now cbn; rewrite Nat.sub_0_r.
 }
 apply rngl_opp_inj; [ easy | ].
-rewrite <- (determinant_alternating Hon Hic Hop M Hi1); [ | easy | flia Hir | easy ].
+rewrite <- (determinant_alternating Hon Hic Hop M Hi1);
+  [ | easy | flia Hir | easy ].
 unfold det at 1.
 rewrite mat_swap_rows_nrows.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
@@ -1138,7 +1140,8 @@ assert (H1 : det A = 0%L). {
   apply Nat.neq_sym, Nat.eqb_neq in Hik.
   now rewrite Hik.
 }
-rewrite (determinant_with_row Hon Hop Hic) with (i := i) in H1; [ | easy | ]. 2: {
+rewrite (determinant_with_row Hon Hop Hic) with (i := i) in H1;
+  [ | easy | ]. 2: {
   now rewrite Hira.
 }
 rewrite <- H1 at 2.
@@ -2065,9 +2068,19 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute 3.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (det M, mat_inv M)).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (M * mat_inv M)%M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (mat_inv M * M)%M).
-Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, com M)).
-Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (M * com M)%M, (com M * M)%M)).
+Compute
+  (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in
+   (det M, mat_inv M)).
+Compute
+  (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in
+   (M * mat_inv M)%M).
+Compute
+  (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in
+   (mat_inv M * M)%M).
+Compute
+  (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in
+   (det M, com M)).
+Compute
+  (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in
+   (det M, (M * com M)%M, (com M * M)%M)).
 *)
