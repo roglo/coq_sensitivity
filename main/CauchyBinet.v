@@ -1357,7 +1357,9 @@ all_permut =
 λ (A : Type) (l : list A),
   match l with
   | [] => [[]]
-  | d :: _ => map (λ p : list nat, map (λ i : nat, nth i l d) p) (canon_sym_gr_list_list (length l))
+  | d :: _ =>
+      map (λ p : list nat, map (λ i : nat, nth i l d) p)
+        (canon_sym_gr_list_list (length l))
   end
 ...
 *)
@@ -1708,7 +1710,8 @@ Lemma Cauchy_Binet_formula_step_3 :
   → mat_ncols B = m
   → ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl *
-      (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+      (∑ (l ∈ cart_prod_rep_seq m),
+         ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
     ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B).
 Proof.
