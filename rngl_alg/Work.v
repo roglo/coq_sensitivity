@@ -2652,7 +2652,8 @@ Compute (
   let a := 1 in
 map (λ b,
   let it := b - 1 in
-  fst (rank_fst_loop it 1 (2 * a) b) = S (fst (rank_fst_loop it 1 (2 * (2 * a)) b))
+  fst (rank_fst_loop it 1 (2 * a) b) =
+    S (fst (rank_fst_loop it 1 (2 * (2 * a)) b))
 ) (seq (4 * a + 1) 80)).
 (* bin oui, pourtant ça marche *)
 *)
@@ -2661,7 +2662,8 @@ map (λ b,
 Compute (
 let a := 1 in
 map (λ it,
-  fst (rank_fst_loop it 1 (2 * a) (S it)) = S (fst (rank_fst_loop it 1 (2 * (2 * a)) (S it)))
+  fst (rank_fst_loop it 1 (2 * a) (S it)) =
+     S (fst (rank_fst_loop it 1 (2 * (2 * a)) (S it)))
 ) (seq 4 20)).
 (* ah zut, hein *)
 ...

@@ -2881,7 +2881,8 @@ Search (angle_eucl_dist (_ + _)).
     apply (angle_eucl_dist_lt_angle_lt_lt angle_straight (θ N) θ').
     apply (angle_eucl_dist_lt_angle_lt_lt2 angle_straight (θ N) (θ N)).
 Check angle_eucl_dist_lt_angle_lt_lt.
-    specialize (angle_eucl_dist_lt_angle_lt_lt2 angle_straight (θ N) θ') as H1.
+    specialize (angle_eucl_dist_lt_angle_lt_lt2 angle_straight (θ N) θ')
+      as H1.
 ...
     specialize (angle_eucl_dist_lt_angle_lt_lt (θ N) θ') as H1.
 ...

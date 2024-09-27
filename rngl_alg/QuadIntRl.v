@@ -95,8 +95,10 @@ iquorem(-6+17*i,7+i)
 et on obtient : [-1+3*i,4-3*i]
 *)
 (*
-Compute let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_quot a b).
-Compute let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_quot a b).
+Compute
+  let '(a, b) := (mk_qi (-1) (-6) 17, mk_qi (-1) 7 1) in (a, b, qi_quot a b).
+Compute
+  let '(a, b) := (mk_qi (-1) 7 1, mk_qi (-1) 4 (-3)) in (a, b, qi_quot a b).
 
 Print Z.quot.
 *)

@@ -3081,7 +3081,9 @@ destruct zc2. {
   apply (rngl_opp_lt_compat Hop Hor) in Hc12.
   rewrite <- (rngl_abs_nonpos_eq Hop Hor) in Hc12; [ | easy ].
   rewrite <- (rngl_abs_nonpos_eq Hop Hor) in Hc12; [ | easy ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
   specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
   apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hc12.

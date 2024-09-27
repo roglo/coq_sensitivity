@@ -559,7 +559,8 @@ specialize rngl_cos_diff_le_eucl_dist as H1.
 specialize (H1 θ (u n)).
 rewrite angle_eucl_dist_is_sqrt in H1.
 ...
-rngl_cos_diff_le_eucl_dist : ∀ θ1 θ2 : angle T, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L
+rngl_cos_diff_le_eucl_dist :
+  ∀ θ1 θ2 : angle T, (rngl_cos θ1 - rngl_cos θ2 ≤ angle_eucl_dist θ1 θ2)%L
 (* mouais, faut voir *)
 ... ...
 apply rngl_is_complete_angle_is_complete in Hco.
@@ -2382,7 +2383,8 @@ Search (rngl_cos (_ * _)).
 (* faire un Fixpoint, comme pour rngl_cos_div_pow_2 *)
 ...
 Search rngl_cos_div_pow_2.
-rngl_cos_div_pow_2_eq: ∀ (θ : angle T) (n : nat), rngl_cos (θ /₂^S n) = rngl_cos_div_pow_2 (θ /₂) n
+rngl_cos_div_pow_2_eq:
+  ∀ (θ : angle T) (n : nat), rngl_cos (θ /₂^S n) = rngl_cos_div_pow_2 (θ /₂) n
 ...
 Search (_ * _)%A.
 rewrite rngl
