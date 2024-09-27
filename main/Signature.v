@@ -1519,7 +1519,8 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
-Theorem collapse_permut_seq_with_len : ∀ l, permut_seq_with_len (length l) (collapse l).
+Theorem collapse_permut_seq_with_len :
+  ∀ l, permut_seq_with_len (length l) (collapse l).
 Proof.
 intros.
 apply isort_rank_permut_seq_with_len.

@@ -419,7 +419,8 @@ Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
       end
   end.
 
-Definition bsort {A} (rel : A → _) l := bsort_loop rel (length l * length l) l.
+Definition bsort {A} (rel : A → _) l :=
+  bsort_loop rel (length l * length l) l.
 
 (* merge sort *)
 
@@ -2199,8 +2200,9 @@ intros * Heqb * Hll.
 now apply permutation_split_list_merge_loop.
 Qed.
 
-Theorem permutation_app_split_list_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
-  ∀ la lb, permutation eqb (la ++ lb) (split_list_inv la lb).
+Theorem permutation_app_split_list_inv :
+  ∀ A (eqb : A → _) (Heqb : equality eqb) la lb,
+  permutation eqb (la ++ lb) (split_list_inv la lb).
 Proof.
 intros * Heqb *.
 revert lb.
@@ -2255,7 +2257,9 @@ apply in_split in Hc, Hd.
 destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
-eapply (permutation_trans Heqb); [ | now apply permutation_app_split_list_inv ].
+eapply (permutation_trans Heqb). 2: {
+  now apply permutation_app_split_list_inv.
+}
 specialize (permutation_app_inv Heqb [] la lc1 lc2 a Hac) as H1.
 specialize (permutation_app_inv Heqb [] lb ld1 ld2 b Hbd) as H2.
 cbn in H1, H2; clear Hac Hbd.
@@ -2274,7 +2278,9 @@ rewrite <- app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
 do 2 rewrite <- app_assoc.
 rewrite app_assoc.
-eapply (permutation_trans Heqb); [ now apply permutation_app_split_list_inv | ].
+eapply (permutation_trans Heqb). {
+  now apply permutation_app_split_list_inv.
+}
 apply (permutation_sym Heqb).
 now apply IHla.
 Qed.
@@ -2640,7 +2646,8 @@ destruct (Nat.eq_dec i (length bef)) as [Hib'| Hib']. {
 }
 replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
 cbn.
-replace (nth (i - S (length bef)) aft d) with (nth i (bef ++ b :: aft) d). 2: {
+replace (nth (i - S (length bef)) aft d) with
+    (nth i (bef ++ b :: aft) d). 2: {
   rewrite app_nth2; [ | easy ].
   now replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
 }
