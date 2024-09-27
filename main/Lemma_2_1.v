@@ -391,7 +391,8 @@ Qed.
 Theorem mat_with_vect_el : ∀ n lv i j,
   1 ≤ i ≤ n
   → 1 ≤ j ≤ n
-  → mat_el (mat_with_vect n lv) i j = vect_el (nth (j - 1) lv (vect_zero n)) i.
+  → mat_el (mat_with_vect n lv) i j =
+      vect_el (nth (j - 1) lv (vect_zero n)) i.
 Proof.
 intros * Hin Hjn; cbn.
 rewrite (List_map_nth' 0); [ | rewrite length_seq; flia Hin ].
@@ -497,7 +498,8 @@ rewrite Nat.add_comm, Nat.add_sub.
 easy.
 Qed.
 
-(* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
+(* https://math.stackexchange.com/questions/82467/
+     eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_has_1 T = true →
@@ -1181,9 +1183,11 @@ assert
   }
   assert (Hdd : D⁺%M = D). {
     rewrite Hdm.
-    rewrite mat_transp_mul; [ | easy | _admi | _admi | _admi | _admi | _admi ].
+    rewrite mat_transp_mul;
+      [ | easy | _admi | _admi | _admi | _admi | _admi ].
     rewrite mat_transp_involutive; [ | _admi ].
-    rewrite mat_transp_mul; [ | easy | _admi | _admi | _admi | _admi | _admi ].
+    rewrite mat_transp_mul;
+      [ | easy | _admi | _admi | _admi | _admi | _admi ].
     rewrite <- Htm.
     rewrite mat_mul_assoc; [ | easy | _admi | _admi | _admi ].
     easy.
@@ -1532,7 +1536,9 @@ f_equal. 2: {
     rewrite Hsy.
     apply is_scm_mat_iff in Hsmu.
     destruct Hsmu as (Hcru, Hclu).
-    rewrite Hclu; [ | apply nth_In; rewrite fold_mat_nrows, Hru; flia Hi Hnz ].
+    rewrite Hclu. 2: {
+      apply nth_In; rewrite fold_mat_nrows, Hru; flia Hi Hnz.
+    }
     rewrite Hru, Nat.min_id.
     erewrite rngl_summation_eq_compat. 2: {
       intros j (_, Hj).
@@ -1670,7 +1676,8 @@ intros * Hev Hsev Hmin Hmax.
 ...
 *)
 
-(* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
+(* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max
+   principle *)
 
 (* Lemma 2.1 *)
 

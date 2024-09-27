@@ -287,7 +287,8 @@ unfold mat_nrows in Hr.
 now apply length_zero_iff_nil in Hr.
 Qed.
 
-Theorem fold_left_mat_fold_left_list_list : ∀ T A (M : matrix T) (l : list A) f,
+Theorem fold_left_mat_fold_left_list_list :
+  ∀ T A (M : matrix T) (l : list A) f,
   fold_left f l M =
   mk_mat
     (fold_left (λ ll k, mat_list_list (f (mk_mat ll) k)) l (mat_list_list M)).
@@ -614,7 +615,8 @@ Definition mZ m n : matrix T :=
 (* identity square matrix of dimension n *)
 
 Definition δ i j := if i =? j then 1%L else 0%L.
-Definition mI n : matrix T := mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
+Definition mI n : matrix T :=
+  mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
 
 Theorem δ_diag : ∀ i, δ i i = 1%L.
 Proof.
