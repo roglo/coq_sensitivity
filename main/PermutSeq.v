@@ -628,7 +628,8 @@ do 2 rewrite if_eqb_eq_dec.
 now destruct (Nat.eq_dec j i).
 Qed.
 
-Theorem transposition_comm : ∀ i j k, transposition i j k = transposition j i k.
+Theorem transposition_comm :
+  ∀ i j k, transposition i j k = transposition j i k.
 Proof.
 intros.
 unfold transposition.
@@ -1814,8 +1815,10 @@ Compute (
 let la := [3;9;7;9;5;5;2] in
 let rel := Nat.ltb in
 map (λ i,
-  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0) (isort_rank rel la) 0 =
-  nth i (isort_rank Nat.ltb (seq 0 (length la))) 0) (seq 0 (length la))
+  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0)
+    (isort_rank rel la) 0 =
+  nth i (isort_rank Nat.ltb (seq 0 (length la))) 0)
+    (seq 0 (length la))
 ).
 (**)
 rewrite isort_rank_ltb_seq.
@@ -1824,7 +1827,8 @@ Compute (
 let la := [3;9;7;9;5;5;2] in
 let rel := λ i j, false in
 map (λ i,
-  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0) (isort_rank rel la) 0 = 0 + i
+  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0)
+    (isort_rank rel la) 0 = 0 + i
 ) (seq 0 (length la))
 ).
 remember (isort_rank rel la) as lb eqn:Hlb.

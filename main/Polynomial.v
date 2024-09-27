@@ -2429,7 +2429,8 @@ now destruct a.
 Qed.
 
 Theorem polyn_opt_mul_1_r :
-  if rngl_mul_is_comm T then not_applicable else ∀ a : polyn T, (a * 1)%pol = a.
+  if rngl_mul_is_comm T then not_applicable
+  else ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 now apply polyn_mul_1_r.
@@ -2488,7 +2489,8 @@ Proof.
 intros.
 progress unfold rngl_has_inv; cbn.
 progress unfold polyn_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hic| Hic]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hic| Hic];
+  [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| Hop]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
@@ -2600,7 +2602,8 @@ Proof.
 intros rop; subst rop.
 progress unfold rngl_has_quot; cbn.
 progress unfold polyn_opt_inv_or_quot.
-destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hco| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool (rngl_mul_is_comm T)) as [Hco| ];
+  [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_opp T)) as [Hop| ]; [ | easy ].
 destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)) as [Hiv| ]; [ | easy ].
 remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
