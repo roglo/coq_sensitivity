@@ -1056,7 +1056,8 @@ Proof. now intros; destruct n. Qed.
 Theorem butn_0_cons : ∀ A (a : A) la, butn 0 (a :: la) = la.
 Proof. easy. Qed.
 
-Theorem butn_succ_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
+Theorem butn_succ_cons :
+  ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
 Proof.
 intros.
 progress unfold butn.
@@ -1843,7 +1844,8 @@ now apply app_eq_nil in Hl.
 Qed.
 
 Theorem List_map_rev_seq : ∀ A (f : _ → A) sta len,
-  map f (rev (seq sta len)) = map (λ i, f (2 * sta + len - 1 - i)) (seq sta len).
+  map f (rev (seq sta len)) =
+    map (λ i, f (2 * sta + len - 1 - i)) (seq sta len).
 Proof.
 intros.
 revert sta.
