@@ -110,7 +110,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 intros * Hlim.
-destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
+destruct (rngl_eq_dec Heo l 0) as [Hlz| Hlz]. {
   subst l; left.
   rewrite (rngl_squ_0 Hos) in Hlim.
   intros ε Hε.
@@ -132,16 +132,16 @@ destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
   exists N.
   intros n Hn.
   specialize (HN n Hn).
-About rngl_dist.
-...
-Search (rngl_dist _²).
-About rngl_dist.
-...
-(* voir si on peut pas remplacer "Hed" par un "Heo" ci-dessous : faut
-   remonter les théorèmes... *)
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-apply (eq_rngl_squ_0 Hos Hid) in H.
-...
+  progress unfold rngl_dist in HN.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_0_r Hos) in HN |-*.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii) in HN.
+  rewrite (rngl_abs_nonneg_eq Hop Hor ε) in HN; [ easy | ].
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
 ...
 intros ε Hε.
