@@ -105,7 +105,9 @@ Theorem limit_cos_cos_limit_sin_sin :
   ∀ θ θ',
   is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (θ i)) (rngl_cos θ')
   → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (θ i))
-      (rngl_sin θ').
+      (rngl_sin θ') ∨
+    is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (θ i))
+      (- rngl_sin θ')%L.
 Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -113,6 +115,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hc.
+  left.
   intros ε Hε.
   rewrite (H1 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
@@ -131,14 +134,40 @@ apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
 destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
+  left.
   rewrite Hsz in H1 |-*.
   rewrite (rngl_squ_0 Hos) in H1.
   apply (rngl_limit_squ_0_limit_0 Hor Hop); [ | easy ].
   rewrite Hi1.
   apply Bool.orb_true_r.
 }
+destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
+  left.
+  intros ε Hε.
 (*
+  specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
+  destruct H2 as (δ & Hδ & H2).
+  move δ before ε.
 *)
+  specialize (H1 ε Hε).
+  cbn in H1.
+  destruct H1 as (N, HN).
+  exists N.
+  intros n Hn.
+...
+  apply H2.
+...
+Theorem rngl_limit_squ_pos_limit :
+  ∀ u l,
+  (0 < l)%L
+  → is_limit_when_tending_to_inf rngl_dist (λ i, (u i)²%L) l²%L
+  → is_limit_when_tending_to_inf rngl_dist u l.
+Proof.
+intros * Hzl Hlim.
+(* non, faux *)
+... ...
+  apply (rngl_limit_squ_pos_limit _ _ H1 Hzs).
+...
 Theorem rngl_limit_squ_limit :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -150,8 +179,6 @@ Theorem rngl_limit_squ_limit :
   → is_limit_when_tending_to_inf rngl_dist u l ∨
     is_limit_when_tending_to_inf rngl_dist u (- l)%L.
 Proof.
-Admitted.
-destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
 ...
   apply (rngl_limit_squ_limit Hon Hop Hiv Hor _ _ Hsz) in H1.
   destruct H1 as [H1| H1]; [ easy | ].
