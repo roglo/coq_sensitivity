@@ -137,18 +137,25 @@ destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
   rewrite Hi1.
   apply Bool.orb_true_r.
 }
-(* cf chatgpt mon fil "trucs rigolos" *)
-...
+(*
+*)
 Theorem rngl_limit_squ_limit :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ u l,
-  is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) l²%L
+  l ≠ 0%L
+  → is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) l²%L
   → is_limit_when_tending_to_inf rngl_dist u l ∨
     is_limit_when_tending_to_inf rngl_dist u (- l)%L.
 Proof.
+Admitted.
+destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
+...
+  apply (rngl_limit_squ_limit Hon Hop Hiv Hor _ _ Hsz) in H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+...
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -190,13 +197,6 @@ destruct (rngl_eq_dec Heo l 0) as [Hlz| Hlz]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
     apply (rngl_squ_nonneg Hop Hor).
   }
-  apply (rngl_squ_lt_abs_lt Hop Hor Hii) in HN.
-  rewrite (rngl_abs_nonneg_eq Hop Hor ε) in HN; [ easy | ].
-  now apply (rngl_lt_le_incl Hor) in Hε.
-}
-destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
-(* mais en fait ça, c'est faux. Si "u i = (-1)^i l", (u i)²
-   converge bien vers l², mais "u" ne converge pas *)
 ...
 intros ε Hε.
 (**)
