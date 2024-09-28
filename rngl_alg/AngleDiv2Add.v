@@ -632,8 +632,12 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
-      rewrite (rl_sqrt_0 Hon Hop Hic Hor Hid).
+      rewrite (rl_sqrt_1 Hic Hon Hop Hor). 2: {
+        now rewrite Bool.orb_true_iff; right.
+      }
+      rewrite (rl_sqrt_0 Hon Hop Hic Hor). 2: {
+        now rewrite Bool.orb_true_iff; right.
+      }
       rewrite (rngl_mul_0_l Hos).
       rewrite (rngl_sub_0_r Hos).
       symmetry.
@@ -826,8 +830,12 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      rewrite (rl_sqrt_1 Hic Hon Hop Hor Hid).
-      rewrite (rl_sqrt_0 Hon Hop Hic Hor Hid).
+      rewrite (rl_sqrt_1 Hic Hon Hop Hor). 2: {
+        now rewrite Bool.orb_true_iff; right.
+      }
+      rewrite (rl_sqrt_0 Hon Hop Hic Hor). 2: {
+        now rewrite Bool.orb_true_iff; right.
+      }
       rewrite (rngl_mul_0_l Hos).
       rewrite (rngl_mul_0_r Hos).
       rewrite (rngl_sub_0_r Hos).
@@ -869,7 +877,8 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hon Hop Hic Hor Hid).
+      apply (rl_sqrt_0 Hon Hop Hic Hor).
+      now rewrite Bool.orb_true_iff; right.
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
       now apply (rngl_lt_le_incl Hor).
@@ -924,7 +933,8 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hon Hop Hic Hor Hid).
+      apply (rl_sqrt_0 Hon Hop Hic Hor).
+      now rewrite Bool.orb_true_iff; right.
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
       now apply (rngl_lt_le_incl Hor).

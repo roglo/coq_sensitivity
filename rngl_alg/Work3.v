@@ -120,11 +120,11 @@ destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
     intros H; symmetry in H.
 Search (_² = 0)%L.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+About eq_rngl_squ_0.
+...
 (* voir si on peut pas remplacer "Hed" par un "Heo" ci-dessous : faut
    remonter les théorèmes... *)
-...
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-About eq_rngl_squ_0.
 apply (eq_rngl_squ_0 Hos Hid) in H.
 ...
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {

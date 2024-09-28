@@ -522,7 +522,9 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd12. 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd12.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor) in Hd12. 2: {
+  now rewrite Bool.orb_true_iff; right.
+}
 rewrite (rngl_squ_sqrt Hon) in Hd12. 2: {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.

@@ -102,7 +102,11 @@ apply (rngl_nlt_ge Hor) in Hzs12.
 apply Hzs12; clear Hzs12.
 cbn.
 apply (rngl_add_neg_nonpos Hop Hor). {
-  apply (rngl_mul_pos_neg Hop Hor Hid); [ | easy ].
+  apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
+    rewrite Bool.orb_true_iff; right.
+    rewrite Hi1; cbn.
+    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+  }
   apply not_eq_sym in Hs1z.
   now apply (rngl_lt_iff Hor).
 } {
@@ -1213,7 +1217,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 do 2 rewrite angle_eucl_dist_is_sqrt.
 split; intros H1234. {
-  apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor Hed) in H1234; cycle 1. {
+  apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor) in H1234; cycle 1. {
     apply (rngl_mul_nonneg_nonneg Hop Hor).
     apply (rngl_0_le_2 Hon Hop Hor).
     apply (rngl_le_0_sub Hop Hor).

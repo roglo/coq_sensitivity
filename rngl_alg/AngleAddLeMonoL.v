@@ -1597,7 +1597,11 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
     rewrite <- rngl_mul_add_distr_r.
     rewrite (rngl_add_opp_l Hop).
     rewrite (rngl_mul_comm Hic).
-    apply (rngl_mul_pos_neg Hop Hor Hid); [ easy | ].
+    apply (rngl_mul_pos_neg Hop Hor); [ | easy | ]. {
+      rewrite Bool.orb_true_iff; right.
+      rewrite Hi1; cbn.
+      apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+    }
     apply (rngl_lt_sub_0 Hop Hor).
     apply (rngl_lt_iff Hor).
     split; [ | easy ].

@@ -124,8 +124,7 @@ Definition in_ordered_field :=
 
 Theorem eq_vect_squ_0 :
   rngl_has_opp T = true →
-  (rngl_is_integral_domain T ||
-   rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   rngl_is_ordered T = true →
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
@@ -169,8 +168,12 @@ destruct i. {
 }
 rewrite Nat_sub_succ_1.
 destruct i. {
-  apply rngl_integral in Haz; [ | easy | easy ].
-  now destruct Haz.
+  apply rngl_integral in Haz; [ now destruct Haz | easy | ].
+  apply Bool.orb_true_iff in Hdo.
+  apply Bool.orb_true_iff.
+  destruct Hdo as [Hdo| Hdo]; [ now left | right ].
+  rewrite Hdo.
+  apply (rngl_has_eq_dec_or_is_ordered_r Hor).
 }
 cbn.
 replace i with (S i - 1) by flia Hi.
@@ -265,7 +268,6 @@ rewrite (rngl_inv_mul_distr Hon Hos Hin); cycle 1. {
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | | easy ]. 2: {
     apply Bool.orb_true_iff; right.
-    rewrite Heq, Bool.andb_true_iff; split; [ | easy ].
     now apply rngl_has_inv_and_1_or_quot_iff; left.
   }
   now rewrite Hsr in H.
@@ -307,9 +309,7 @@ intros H.
 apply eq_vect_squ_0 in H; [ easy | easy | | easy ].
 apply Bool.orb_true_iff in Hii.
 apply Bool.orb_true_iff.
-destruct Hii as [Hii| Hii]; [ now left | right ].
-rewrite Hii, Bool.andb_true_r.
-now apply rngl_has_inv_and_1_or_quot_iff; left.
+now right.
 Qed.
 
 Definition is_orthogonal_matrix (M : matrix T) :=

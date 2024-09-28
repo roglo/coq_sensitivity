@@ -311,54 +311,6 @@ rewrite Hiv, Hqu in Hii.
 now destruct Hii.
 Qed.
 
-Theorem rngl_integral :
-  rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain T ||
-   rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
-  ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
-Proof.
-intros Hmo Hdo * Hab.
-specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral_domain; [ now apply rngl_integral | cbn in Hdo ].
-remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
-destruct iv. {
-  assert (Hon : rngl_has_1 T = true). {
-    remember (rngl_has_inv_and_1_or_quot T) as iq eqn:Hiq.
-    symmetry in Hiq.
-    destruct iq; [ cbn in Hdo | easy ].
-    apply rngl_has_inv_and_1_or_quot_iff in Hiq.
-    destruct Hiq as [| Hiq]; [ easy | ].
-    apply rngl_has_quot_has_no_inv in Hiq.
-    congruence.
-  }
-  remember (rngl_has_eq_dec T) as de eqn:Hde; symmetry in Hde.
-  destruct de; [ | now destruct rngl_has_inv_and_1_or_quot ].
-  cbn; clear rngl_integral.
-  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%L). {
-    now rewrite <- rngl_mul_assoc, Hab.
-  }
-  remember (rngl_eqb a 0%L) as az eqn:Haz; symmetry in Haz.
-  destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
-  apply (rngl_eqb_neq Hde) in Haz; right.
-  rewrite rngl_mul_inv_diag_l in H; [ | easy | easy | easy ].
-  rewrite (rngl_mul_1_l Hon) in H; rewrite H.
-  apply (rngl_mul_0_r Hmo).
-} {
-  apply andb_prop in Hdo.
-  destruct Hdo as (Hdi, Hde).
-  specialize rngl_mul_div as H1.
-  rewrite Hdi in H1.
-  specialize (H1 eq_refl).
-  remember (rngl_eqb b 0%L) as bz eqn:Hbz; symmetry in Hbz.
-  destruct bz; [ now right; apply (rngl_eqb_eq Hde) | left ].
-  apply (rngl_eqb_neq Hde) in Hbz.
-  specialize (H1 a b Hbz) as H4.
-  rewrite Hab in H4.
-  rewrite <- H4.
-  now apply rngl_div_0_l.
-}
-Qed.
-
 Theorem rngl_mul_cancel_r :
   rngl_has_inv_and_1_or_quot T = true →
   ∀ a b c, c ≠ 0%L
@@ -735,39 +687,6 @@ progress unfold rngl_div.
 rewrite Hiv.
 rewrite <- (rngl_squ_inv Hon Hos Hiv); [ | easy ].
 apply (rngl_squ_mul Hic).
-Qed.
-
-Theorem eq_rngl_squ_0 :
-  rngl_has_opp_or_subt T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
-  ∀ a, (a² = 0 → a = 0)%L.
-Proof.
-intros Hos Hid * Ha.
-apply (rngl_integral Hos Hid) in Ha.
-now destruct Ha.
-Qed.
-
-Theorem rngl_squ_eq_cases :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_has_eq_dec T = true →
-  ∀ a b, (a² = b² → a = b ∨ a = -b)%L.
-Proof.
-intros Hic Hon Hop Hiv Hed * Hab.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
-apply (rngl_sub_move_0_r Hop) in Hab.
-rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
-apply (rngl_integral Hos Hid) in Hab.
-destruct Hab as [Hab| Hab]; [ right | left ]. {
-  now apply (rngl_add_move_0_r Hop) in Hab.
-} {
-  now apply -> (rngl_sub_move_0_r Hop) in Hab.
-}
 Qed.
 
 End a.

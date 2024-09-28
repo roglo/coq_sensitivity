@@ -1271,8 +1271,7 @@ Theorem rngl_squ_lt_squ_nonneg :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b,
   (0 ≤ a → a < b → a² < b²)%L.
 Proof.
@@ -1400,7 +1399,7 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 apply (rngl_lt_sub_lt_add_r Hop Hor).
-apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in Hd. 2: {
+apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hii) in Hd. 2: {
   apply rl_sqrt_nonneg.
   rewrite <- one_sub_squ_cos_add_squ_sin.
   apply (rngl_add_squ_nonneg Hop Hor).
@@ -3093,7 +3092,7 @@ apply (rngl_squ_lt_squ_nonneg Hic Hop Hor Hid) in Hcs. 2: {
 }
 *)
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L in Hcc, Hcs; [ | easy | easy ].
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hcc, Hcs.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hcc, Hcs.
 (**)
 assert (Hzε2 : (0 ≤ ε² / 2)%L). {
   apply (rngl_le_div_r Hon Hop Hiv Hor).
@@ -3146,7 +3145,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor √_) in Hd. 2: {
   apply rngl_cos_bound.
 }
 rewrite <- (rngl_abs_nonneg_eq Hop Hor a) in Hd; [ | easy ].
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hd.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hd.
 rewrite (rngl_squ_sqrt Hon) in Hd. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply (rngl_0_le_2 Hon Hop Hor).
@@ -3768,7 +3767,11 @@ assert (Hε2 : (0 < ε² / 2)%L). {
   split; [ apply (rngl_squ_nonneg Hop Hor) | ].
   apply not_eq_sym.
   intros H.
-  apply (eq_rngl_squ_0 Hos Hid) in H.
+  apply (eq_rngl_squ_0 Hos) in H. 2: {
+    rewrite Bool.orb_true_iff; right.
+    rewrite Hi1; cbn.
+    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+  }
   now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
 }
 specialize (H1 Hε2); clear Hε2.

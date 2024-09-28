@@ -722,7 +722,11 @@ split; intros H12. {
       rewrite Hiv.
       (* lemma *)
       rewrite (rngl_mul_comm Hic).
-      apply (rngl_mul_pos_neg Hop Hor Hid). {
+      apply (rngl_mul_pos_neg Hop Hor). {
+        rewrite Bool.orb_true_iff; right.
+        rewrite Hi1; cbn.
+        apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+      } {
         apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
         apply (rl_sqrt_pos Hon Hos Hor).
         apply (rngl_0_lt_2 Hon Hop Hc1 Hor).

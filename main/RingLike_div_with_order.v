@@ -119,6 +119,50 @@ rewrite (rngl_mul_1_l Hon).
 apply (rngl_add_sub Hos).
 Qed.
 
+Theorem rngl_integral :
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain T ||
+   rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool = true →
+  ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
+Proof.
+intros Hmo Hdo * Hab.
+specialize rngl_opt_integral as rngl_integral.
+destruct rngl_is_integral_domain; [ now apply rngl_integral | cbn in Hdo ].
+remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
+destruct iv. {
+  assert (Hon : rngl_has_1 T = true). {
+    remember (rngl_has_inv_and_1_or_quot T) as iq eqn:Hiq.
+    symmetry in Hiq.
+    destruct iq; [ cbn in Hdo | easy ].
+    apply rngl_has_inv_and_1_or_quot_iff in Hiq.
+    destruct Hiq as [| Hiq]; [ easy | ].
+    apply rngl_has_quot_has_no_inv in Hiq.
+    congruence.
+  }
+  apply Bool.andb_true_iff in Hdo.
+  destruct Hdo as (Hiq, Heo).
+  cbn; clear rngl_integral.
+  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%L). {
+    now rewrite <- rngl_mul_assoc, Hab.
+  }
+  destruct (rngl_eq_dec Heo a 0) as [Haz| Haz]; [ now left | right ].
+  rewrite rngl_mul_inv_diag_l in H; [ | easy | easy | easy ].
+  rewrite (rngl_mul_1_l Hon) in H; rewrite H.
+  apply (rngl_mul_0_r Hmo).
+} {
+  apply andb_prop in Hdo.
+  destruct Hdo as (Hdi, Heo).
+  specialize rngl_mul_div as H1.
+  rewrite Hdi in H1.
+  specialize (H1 eq_refl).
+  destruct (rngl_eq_dec Heo b 0) as [Hbz| Hbz]; [ now right | left ].
+  specialize (H1 a b Hbz) as H4.
+  rewrite Hab in H4.
+  rewrite <- H4.
+  now apply rngl_div_0_l.
+}
+Qed.
+
 Theorem rngl_abs_div :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
@@ -128,6 +172,7 @@ Theorem rngl_abs_div :
   ∀ x y, y ≠ 0%L → rngl_abs (x / y)%L = (rngl_abs x / rngl_abs y)%L.
 Proof.
 intros * Hon Hop Hiv Heb Hor * Hyz.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 progress unfold rngl_abs.
@@ -169,7 +214,7 @@ destruct xz. {
       rewrite (rngl_mul_0_l Hos) in H1.
       specialize (rngl_le_antisymm Hor _ _ Hxy H1) as H2.
       apply (rngl_integral Hos) in H2. 2: {
-        rewrite Hi1, Heb; cbn.
+        rewrite Hi1, Heo; cbn.
         now destruct rngl_is_integral_domain.
       }
       destruct H2 as [H2| H2]. {
@@ -259,7 +304,7 @@ apply (rngl_lt_le_incl Hor) in Hx'.
 specialize (rngl_mul_nonneg_nonneg Hop Hor _ _ Hx' Hy') as H1.
 specialize (rngl_le_antisymm Hor _ _ Hxy H1) as H2.
 apply (rngl_integral Hos) in H2. 2: {
-  rewrite Hi1, Heb.
+  rewrite Hi1, Heo.
   now destruct rngl_is_integral_domain.
 }
 destruct H2 as [H2| H2]. {
@@ -757,7 +802,8 @@ Theorem rngl_mul_pos_neg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true →
   ∀ a b, (0 < a → b < 0 → a * b < 0)%L.
 Proof.
 intros Hop Hor Hid * Hza Hbz.
@@ -785,7 +831,7 @@ Theorem eq_rngl_add_square_0 :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool =
+     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool =
     true →
   ∀ a b : T, (a * a + b * b = 0)%L → a = 0%L ∧ b = 0%L.
 Proof.
@@ -878,15 +924,23 @@ Theorem eq_rngl_squ_rngl_abs :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b, rngl_squ a = rngl_squ b → rngl_abs a = rngl_abs b.
 Proof.
 intros Hop Hic Hor Hii * Hab.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 apply (rngl_sub_move_0_r Hop) in Hab.
 rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
-apply (rngl_integral Hos Hii) in Hab.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+   rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff in Hii.
+  apply Bool.orb_true_iff.
+  destruct Hii as [Hii| Hii]; [ now left | right ].
+  rewrite Hii.
+  now apply (rngl_has_eq_dec_or_is_ordered_r).
+}
+apply (rngl_integral Hos Hio) in Hab.
 destruct Hab as [Hab| Hab]. {
   apply (rngl_add_move_0_r Hop) in Hab.
   subst a.
@@ -1038,8 +1092,7 @@ Theorem rngl_abs_lt_squ_lt :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b : T, (rngl_abs a < rngl_abs b)%L → (a² < b²)%L.
 Proof.
 intros Hic Hop Hor Hii * Hab.
@@ -1115,6 +1168,46 @@ apply (f_equal rngl_squ) in H.
 do 2 rewrite (rngl_squ_abs Hop) in H.
 rewrite H in Hab.
 now apply (rngl_lt_irrefl Hor) in Hab.
+Qed.
+
+Theorem eq_rngl_squ_0 :
+  rngl_has_opp_or_subt T = true →
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true →
+  ∀ a, (a² = 0 → a = 0)%L.
+Proof.
+intros Hos Hio * Ha.
+apply (rngl_integral Hos Hio) in Ha.
+now destruct Ha.
+Qed.
+
+Theorem rngl_squ_eq_cases :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_has_eq_dec_or_order T = true →
+  ∀ a b, (a² = b² → a = b ∨ a = -b)%L.
+Proof.
+intros Hic Hon Hop Hiv Heo * Hab.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  now rewrite Hi1.
+}
+apply (rngl_sub_move_0_r Hop) in Hab.
+rewrite (rngl_squ_sub_squ Hop Hic) in Hab.
+apply (rngl_integral Hos Hio) in Hab.
+destruct Hab as [Hab| Hab]; [ right | left ]. {
+  now apply (rngl_add_move_0_r Hop) in Hab.
+} {
+  now apply -> (rngl_sub_move_0_r Hop) in Hab.
+}
 Qed.
 
 End a.

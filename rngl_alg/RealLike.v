@@ -74,16 +74,16 @@ Theorem rl_sqrt_lt_sqrt :
   rngl_has_inv T = true →
   rngl_has_1 T = true →
   rngl_is_ordered T = true →
-  rngl_has_eq_dec T = true →
   ∀ a b, (0 ≤ a → 0 ≤ b → √a < √b → a < b)%L.
 Proof.
-intros Hic Hop Hiv Hon Hor Hed.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros Hic Hop Hiv Hon Hor.
 intros * Hza Hzb Hab.
 rewrite <- (rngl_abs_sqrt Hop Hor _ Hza) in Hab.
 rewrite <- (rngl_abs_sqrt Hop Hor _ Hzb) in Hab.
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid) in Hab.
+apply (rngl_abs_lt_squ_lt Hic Hop Hor) in Hab. 2: {
+  apply Bool.orb_true_iff; right.
+  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+}
 rewrite (rngl_squ_sqrt Hon) in Hab; [ | easy ].
 rewrite (rngl_squ_sqrt Hon) in Hab; [ | easy ].
 easy.
@@ -152,8 +152,7 @@ Theorem rl_sqrt_0 :
   rngl_has_opp T = true →
   rngl_mul_is_comm T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   rl_sqrt 0%L = 0%L.
 Proof.
 intros Hon Hop Hic Hor Hii.
@@ -381,8 +380,7 @@ Theorem rl_sqrt_1 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   rl_sqrt 1%L = 1%L.
 Proof.
 intros Hic Hon Hop Hor Hii.
