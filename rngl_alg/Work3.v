@@ -16,6 +16,48 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem rngl_limit_squ_0_limit_0 :
+  rngl_is_ordered T = true →
+  rngl_has_opp T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ u,
+  is_limit_when_tending_to_inf rngl_dist (λ i : nat, (u i)²%L) 0%L
+  → is_limit_when_tending_to_inf rngl_dist u 0%L.
+Proof.
+intros Hor Hop Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hlim.
+intros ε Hε.
+specialize (Hlim ε²)%L.
+assert (H : (0 < ε²)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hop Hor) | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_squ_0 Hos) in H. 2: {
+    rewrite Bool.orb_true_iff in Hii.
+    destruct Hii as [Hii| Hii]; rewrite Hii; [ easy | ].
+    rewrite Bool.orb_true_iff; right; cbn.
+    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+  }
+  subst ε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (Hlim H); clear H.
+destruct Hlim as (N, HN).
+exists N.
+intros n Hn.
+specialize (HN n Hn).
+progress unfold rngl_dist in HN.
+progress unfold rngl_dist.
+rewrite (rngl_sub_0_r Hos) in HN |-*.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+  apply (rngl_squ_nonneg Hop Hor).
+}
+apply (rngl_squ_lt_abs_lt Hop Hor Hii) in HN.
+rewrite (rngl_abs_nonneg_eq Hop Hor ε) in HN; [ easy | ].
+now apply (rngl_lt_le_incl Hor) in Hε.
+Qed.
+
 (* to be completed
 Theorem glop :
   rngl_is_archimedean T = true →
@@ -66,6 +108,7 @@ Theorem limit_cos_cos_limit_sin_sin :
       (rngl_sin θ').
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -87,6 +130,15 @@ specialize (cos2_sin2_1 θ') as H2.
 apply (rngl_add_move_r Hop) in H2.
 rewrite H2 in H1; clear H2.
 apply (rngl_limit_sub_l_limit Hop Hor) in H1.
+destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
+  rewrite Hsz in H1 |-*.
+  rewrite (rngl_squ_0 Hos) in H1.
+  apply (rngl_limit_squ_0_limit_0 Hor Hop); [ | easy ].
+  rewrite Hi1.
+  apply Bool.orb_true_r.
+}
+(* cf chatgpt mon fil "trucs rigolos" *)
+...
 Theorem rngl_limit_squ_limit :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
