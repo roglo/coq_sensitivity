@@ -743,8 +743,8 @@ Theorem eq_rngl_squ_0 :
      rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec T)%bool = true →
   ∀ a, (a² = 0 → a = 0)%L.
 Proof.
-intros Hos Hii * Ha.
-apply (rngl_integral Hos Hii) in Ha.
+intros Hos Hid * Ha.
+apply (rngl_integral Hos Hid) in Ha.
 now destruct Ha.
 Qed.
 
