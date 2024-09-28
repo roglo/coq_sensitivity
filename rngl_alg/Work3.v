@@ -110,6 +110,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * Hlim.
 destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
+  subst l; left.
+  rewrite (rngl_squ_0 Hos) in Hlim.
 ...
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
 ...
