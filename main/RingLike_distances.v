@@ -275,4 +275,5 @@ Qed.
 
 End a.
 
+Arguments rngl_dist {T ro} (a b)%_L.
 Arguments rngl_is_complete T {ro}.

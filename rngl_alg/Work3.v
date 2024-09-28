@@ -101,6 +101,7 @@ intros Hon Hop Hiv Hor.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hlim.
@@ -118,9 +119,23 @@ destruct (rngl_eq_dec Heo 0 l) as [Hzl| Hzl]. {
     apply (rngl_lt_iff Hor).
     split; [ apply (rngl_squ_nonneg Hop Hor) | ].
     intros H; symmetry in H.
-Search (_² = 0)%L.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-About eq_rngl_squ_0.
+    apply (eq_rngl_squ_0 Hos) in H. 2: {
+      rewrite Bool.orb_true_iff; right.
+      rewrite Hi1; cbn.
+      apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+    }
+    subst ε.
+    now apply (rngl_lt_irrefl Hor) in Hε.
+  }
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+About rngl_dist.
+...
+Search (rngl_dist _²).
+About rngl_dist.
 ...
 (* voir si on peut pas remplacer "Hed" par un "Heo" ci-dessous : faut
    remonter les théorèmes... *)
