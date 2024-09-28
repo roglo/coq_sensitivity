@@ -143,6 +143,8 @@ destruct (rngl_eq_dec Heo l 0) as [Hlz| Hlz]. {
   now apply (rngl_lt_le_incl Hor) in Hε.
 }
 destruct (rngl_lt_dec Hor 0 l) as [Hzl| Hzl]. {
+(* mais en fait ça, c'est faux. Si "u i = (-1)^i l", (u i)²
+   converge bien vers l², mais "u" ne converge pas *)
 ...
 intros ε Hε.
 (**)
