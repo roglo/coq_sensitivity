@@ -145,6 +145,30 @@ destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
 destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
   left.
   intros ε Hε.
+specialize (rngl_sin_is_continuous θ' (rngl_sin θ') Hzs) as H2.
+destruct H2 as (δ & Hδ & H2).
+move δ before ε.
+assert (H3 : ∀ x, (angle_eucl_dist x θ' < δ)%L → (0 < rngl_sin x)%L). {
+  intros * Hx.
+  specialize (H2 _ Hx).
+  progress unfold rngl_dist in H2.
+  progress unfold rngl_abs in H2.
+  rewrite (rngl_leb_sub_0 Hop Hor) in H2.
+  remember (rngl_sin x ≤? rngl_sin θ')%L as xt eqn:Hxt.
+  symmetry in Hxt.
+  destruct xt. {
+    apply rngl_leb_le in Hxt.
+    rewrite (rngl_opp_sub_distr Hop) in H2.
+    apply (rngl_lt_sub_lt_add_l Hop Hor) in H2.
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in H2.
+    now rewrite (rngl_sub_diag Hos) in H2.
+  } {
+    apply (rngl_leb_gt Hor) in Hxt.
+    now apply (rngl_lt_trans Hor _ (rngl_sin θ')).
+  }
+}
+clear H2; rename H3 into H2.
+...
   specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
   destruct H2 as (δ & Hδ & H2).
   move δ before ε.
