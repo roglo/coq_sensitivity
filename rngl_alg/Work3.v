@@ -112,6 +112,7 @@ Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hc.
@@ -144,6 +145,50 @@ destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
 destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
   left.
   intros ε Hε.
+  specialize (H1 (ε * (2 * rngl_abs (rngl_sin θ') + 1)))%L.
+  assert (H : (0 < ε * (2 * rngl_abs (rngl_sin θ') + 1))%L). {
+    apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
+    apply (rngl_add_nonneg_pos Hor). 2: {
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hop Hor). {
+      apply (rngl_0_le_2 Hon Hop Hor).
+    }
+    apply (rngl_abs_nonneg Hop Hor).
+  }
+  specialize (H1 H); clear H.
+  destruct H1 as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  progress unfold rngl_dist in HN.
+  progress unfold rngl_dist.
+  progress unfold rngl_abs in HN.
+  progress unfold rngl_abs.
+  rewrite (rngl_leb_sub_0 Hop Hor) in HN.
+  rewrite (rngl_leb_sub_0 Hop Hor).
+  remember (rngl_sin (θ n) ≤? rngl_sin θ')%L as ul eqn:Hul.
+  remember ((rngl_sin (θ n))² ≤? (rngl_sin θ')²)%L as ul2 eqn:Hul2.
+  generalize Hzs; intros H.
+  apply (rngl_leb_gt Hor) in H.
+  rewrite H in HN; clear H.
+  symmetry in Hul, Hul2.
+  destruct ul. {
+    apply rngl_leb_le in Hul.
+    rewrite (rngl_opp_sub_distr Hop).
+    destruct ul2. {
+      apply rngl_leb_le in Hul2.
+      rewrite (rngl_opp_sub_distr Hop) in HN.
+...
+    destruct lz. {
+      apply rngl_leb_le in Hlz.
+...
+ε' = (ε / (2 * rngl_abs l + 1)))%L.
+ε = ε' * (2 * rngl_abs l + 1)
+  specialize (Hlim (ε * (2 * rngl_abs l + 1)))%L.
+Check rngl_limit_limit_squ.
+...
+  intros ε Hε.
 (*
   specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
   destruct H2 as (δ & Hδ & H2).
@@ -154,6 +199,10 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
   destruct H1 as (N, HN).
   exists N.
   intros n Hn.
+  progress unfold rngl_dist in HN.
+  progress unfold rngl_dist.
+  specialize (HN n Hn).
+Search is_limit_when_tending_to_inf.
 ...
   apply H2.
 ...
