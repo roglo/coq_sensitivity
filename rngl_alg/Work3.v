@@ -145,6 +145,13 @@ destruct (rngl_eq_dec Heo (rngl_sin θ') 0) as [Hsz| Hsz]. {
 destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
   left.
   intros ε Hε.
+  specialize (rngl_sin_is_continuous θ' ε Hε) as H2.
+  destruct H2 as (δ & Hδ & H2).
+  move δ before ε.
+(* faut trouver un N tel que ∀ n ≥ N, sin (θ n) ≥ 0 *)
+(* ou faut que ça dépende de δ, chais pas *)
+(* bref c'est pas clair dans ma tête *)
+...
   specialize (H1 (ε * (2 * rngl_abs (rngl_sin θ') + 1)))%L.
   assert (H : (0 < ε * (2 * rngl_abs (rngl_sin θ') + 1))%L). {
     apply (rngl_mul_pos_pos Hop Hor Hii); [ easy | ].
@@ -179,9 +186,17 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
     destruct ul2. {
       apply rngl_leb_le in Hul2.
       rewrite (rngl_opp_sub_distr Hop) in HN.
+      destruct (rngl_eq_dec Heo (rngl_sin θ')² (rngl_sin (θ n))²)
+          as [Htt| Htt]. {
+...
       remember (rngl_sin θ' + rngl_sin (θ n))%L as x.
       destruct (rngl_le_dec Hor x 0) as [Hxz| Hxz]. {
+(*
+        apply (rngl_le_0_sub Hop Hor) in Hul2.
+        rewrite (rngl_squ_sub_squ Hop Hic) in Hul2.
+        exfalso.
 ...
+*)
         subst x.
         exfalso.
         apply (rngl_nlt_ge Hor) in Hul2.
