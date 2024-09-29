@@ -179,6 +179,45 @@ destruct (rngl_lt_dec Hor 0 (rngl_sin θ')) as [Hzs| Hzs]. {
     destruct ul2. {
       apply rngl_leb_le in Hul2.
       rewrite (rngl_opp_sub_distr Hop) in HN.
+      remember (rngl_sin θ' + rngl_sin (θ n))%L as x.
+      destruct (rngl_le_dec Hor x 0) as [Hxz| Hxz]. {
+...
+        subst x.
+        exfalso.
+        apply (rngl_nlt_ge Hor) in Hul2.
+        apply Hul2; clear Hul2.
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply (rngl_le_0_sub Hop Hor).
+          rewrite (rngl_squ_sub_squ Hop Hic).
+          rewrite <- (rngl_opp_sub_distr Hop).
+          rewrite (rngl_mul_opp_r Hop).
+          rewrite (rngl_mul_comm Hic).
+          rewrite rngl_add_comm.
+          apply (rngl_opp_nonneg_nonpos Hop Hor).
+          apply (rngl_mul_nonneg_nonpos Hop Hor); [ | easy ].
+          now apply (rngl_le_0_sub Hop Hor).
+        }
+        intros H.
+        apply (rngl_squ_eq_cases Hic Hon Hop Hiv Heo) in H.
+        destruct H as [H| H]. {
+          rewrite <- H in Hxz.
+          rewrite <- (rngl_mul_2_l Hon) in Hxz.
+          apply (rngl_nlt_ge Hor) in Hxz.
+          apply Hxz; clear Hxz.
+          apply (rngl_mul_pos_pos Hop Hor Hii); [ | easy ].
+          apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+        }
+Search (0 < _ * _)%L.
+Search (_² = _²)%L.
+...
+About rngl_mul_pos_neg.
+Search (_ * _ < 0)%L.
+...
+      apply (rngl_mul_lt_mono_pos_l Hop Hor Hii x); subst x. {
+        apply (rngl_lt_le_trans Hor _ (rngl_sin θ')); [ easy | ].
+        apply (rngl_le_add_r Hor).
+
 ...
     destruct lz. {
       apply rngl_leb_le in Hlz.
