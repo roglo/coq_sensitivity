@@ -6,6 +6,7 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi.
 Require Import Complex.
+Require Import IntermVal.
 Require Import Work2.
 
 Section a.
@@ -109,9 +110,44 @@ generalize Hs; intros Hsi.
 apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hsi. 2: {
   intros; apply rngl_sin_bound.
 }
+assert (Hcs1 : (c² + s² = 1)%L). {
+  generalize Hc; intros H1.
+  generalize Hs; intros H2.
+  apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H1.
+  apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H2.
+  specialize (limit_add Hon Hop Hiv Hor _ _ _ _ H1 H2) as H.
+  cbn in H.
+  progress unfold rngl_is_limit_when_tending_to_inf in H.
+Search is_limit_when_tending_to_inf.
+Search rngl_is_limit_when_tending_to_inf.
+...
+Search (is_limit_when_tending_to_inf _ _ _ → _ = _).
+Check limit_of_const.
+About rngl_limit_limit_squ.
+Search is_limit_when_tending_to_inf.
+appl
+Check limit_add.
 ...
 rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
 remember (rngl_acos c) as θ eqn:Hθ.
+assert (Hts : s = rngl_sin θ ∨ s = (- rngl_sin θ)%L). {
+  rewrite Hθ.
+  rewrite rngl_sin_acos; [ | easy ].
+  destruct (rngl_le_dec Hor 0 s) as [Hzs| Hzs]; [ left | right ]. {
+    rewrite <- (rngl_abs_sqrt Hop Hor). 2: {
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_squ_le_1 Hon Hop Hor).
+    }
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor s Hzs).
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii).
+    rewrite (rngl_squ_sqrt Hon). 2: {
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_squ_le_1 Hon Hop Hor).
+    }
+    apply (rngl_add_move_l Hop).
+...
+Search (is_limit_when_tending_to_inf _ (rngl_cos _)).
+Search (is_limit_when_tending_to_inf (λ _, rngl_sin _)).
 ...
 Theorem limit_cos_cos_limit_sin_sin :
   ∀ θ θ',
