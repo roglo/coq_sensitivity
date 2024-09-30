@@ -143,10 +143,92 @@ assert (Hts : s = rngl_sin θ ∨ s = (- rngl_sin θ)%L). {
     now apply (rngl_add_move_l Hop).
   } {
     apply (rngl_nle_gt Hor) in Hzs.
-(* bon, ça devrait le faire *)
-...
-Search (is_limit_when_tending_to_inf _ (rngl_cos _)).
-Search (is_limit_when_tending_to_inf (λ _, rngl_sin _)).
+    remember (- s)%L as s' eqn:H.
+    apply (f_equal rngl_opp) in H.
+    rewrite (rngl_opp_involutive Hop) in H.
+    subst s; rename s' into s.
+    rewrite (rngl_squ_opp Hop) in Hcs1.
+    apply (rngl_opp_neg_pos Hop Hor) in Hzs.
+    f_equal.
+    rewrite <- (rngl_abs_sqrt Hop Hor). 2: {
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_squ_le_1 Hon Hop Hor).
+    }
+    apply (rngl_lt_le_incl Hor) in Hzs.
+    rewrite <- (rngl_abs_nonneg_eq Hop Hor s Hzs).
+    apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii).
+    rewrite (rngl_squ_sqrt Hon). 2: {
+      apply (rngl_le_0_sub Hop Hor).
+      now apply (rngl_squ_le_1 Hon Hop Hor).
+    }
+    now apply (rngl_add_move_l Hop).
+  }
+}
+apply (f_equal rngl_cos) in Hθ.
+rewrite (rngl_cos_acos _ Hci) in Hθ.
+symmetry in Hθ; rename Hθ into Htc.
+destruct Hts as [Hts| Hts]. {
+  move Hts before Hcs.
+  rewrite Hts in Hs.
+  exists θ.
+  intros ε Hε.
+  assert (H : (0 < √(ε² / 2))%L). {
+    apply (rl_sqrt_pos Hon Hos Hor).
+    apply (rngl_lt_div_r Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    rewrite (rngl_mul_0_l Hos).
+    progress unfold rngl_squ.
+    now apply (rngl_mul_pos_pos Hop Hor Hii).
+  }
+  specialize (Hc _ H).
+  specialize (Hs _ H).
+  clear H.
+  destruct Hc as (nc, Hnc).
+  destruct Hs as (ns, Hns).
+  move ns before nc.
+  exists (Nat.max nc ns).
+  intros n Hn.
+  progress unfold angle_eucl_dist.
+  specialize (Hnc n).
+  assert (H : nc ≤ n). {
+    apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
+    apply Nat.le_max_l.
+  }
+  specialize (Hnc H); clear H.
+  specialize (Hns n).
+  assert (H : ns ≤ n). {
+    apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
+    apply Nat.le_max_r.
+  }
+  specialize (Hns H); clear H.
+  progress unfold rngl_dist in Hnc.
+  progress unfold rngl_dist in Hns.
+  assert (H : (0 ≤ ε² / 2)%L). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_squ_nonneg Hop Hor).
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_abs_sqrt Hop Hor) in Hnc; [ | easy ].
+  rewrite <- (rngl_abs_sqrt Hop Hor) in Hns; [ | easy ].
+  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hnc, Hns.
+  rewrite (rngl_squ_sqrt Hon _ H) in Hnc, Hns.
+  clear H.
+  generalize Hε; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor ε H).
+  rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
+  rewrite <- (rngl_mul_div Hi1 ε² 2)%L.
+  rewrite (rngl_mul_2_r Hon ε²)%L. 2: {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_div_add_distr_r Hiv).
+  rewrite (rngl_squ_sub_comm Hop (rngl_cos _))%L.
+  rewrite (rngl_squ_sub_comm Hop (rngl_sin _))%L.
+  now apply (rngl_add_lt_compat Hop Hor).
+}
 ...
 Theorem limit_cos_cos_limit_sin_sin :
   ∀ θ θ',
