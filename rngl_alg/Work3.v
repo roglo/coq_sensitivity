@@ -91,16 +91,28 @@ progress unfold is_complete in Hco.
 progress unfold is_complete.
 intros u Hcs.
 specialize (Hco (λ i, rngl_cos (u i))) as H1.
+specialize (Hco (λ i, rngl_sin (u i))) as H2.
 generalize Hcs; intros H.
 apply rngl_is_Cauchy_angle_is_Cauchy_cos in H.
 specialize (H1 H); clear H.
 destruct H1 as (c, Hc).
+generalize Hcs; intros H.
+apply rngl_is_Cauchy_angle_is_Cauchy_sin in H.
+specialize (H2 H); clear H.
+destruct H2 as (s, Hs).
+move s before c.
 generalize Hc; intros Hci.
 apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hci. 2: {
   intros; apply rngl_cos_bound.
 }
+generalize Hs; intros Hsi.
+apply (rngl_limit_interv Hop Hor _ (-1) 1)%L in Hsi. 2: {
+  intros; apply rngl_sin_bound.
+}
+...
 rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
 remember (rngl_acos c) as θ eqn:Hθ.
+...
 Theorem limit_cos_cos_limit_sin_sin :
   ∀ θ θ',
   is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (θ i)) (rngl_cos θ')
