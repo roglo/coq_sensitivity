@@ -273,6 +273,41 @@ specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
 destruct H1 as (θ', Hlim).
 exists θ'.
 specialize (angle_lim_angle_lim_mul_mul n _ _ Hlim) as H1.
+progress unfold seq_angle_to_div_nat in H1.
+eapply (angle_lim_eq_compat 0 0) in H1. 2: {
+  intros i.
+  rewrite Nat.add_0_r.
+  rewrite angle_mul_nat_assoc.
+  easy.
+}
+Search (angle_lim (λ _, (_ * _))%A _).
+...
+About angle_lim_mul.
+About angle_lim_angle_lim_mul_mul.
+(* seem to be the same theorem... *)
+...
+angle_lim_mul :
+∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T},
+  angle_ctx T
+  → ∀ (k : nat) (u : nat → angle T) (θ : angle T),
+      angle_lim u θ → angle_lim (λ i : nat, (k * u i)%A) (k * θ)
+
+angle_lim_mul is not universe polymorphic
+Arguments angle_lim_mul {T}%type_scope {ro rp rl ac} k%nat_scope u%function_scope θ%angle_scope _ ε _
+angle_lim_mul is opaque
+Expands to: Constant RnglAlg.Complex.angle_lim_mul
+...
+angle_lim_angle_lim_mul_mul :
+∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T},
+  angle_ctx T
+  → ∀ (n : nat) (θ : nat → angle T) (θ' : angle T),
+      angle_lim θ θ' → angle_lim (λ i : nat, (n * θ i)%A) (n * θ')
+
+angle_lim_angle_lim_mul_mul is not universe polymorphic
+Arguments angle_lim_angle_lim_mul_mul {T}%type_scope {ro rp rl ac} n%nat_scope 
+  θ%function_scope θ'%angle_scope _ ε _
+angle_lim_angle_lim_mul_mul is opaque
+Expands to: Constant RnglAlg.Work2.angle_lim_angle_lim_mul_mul
 ...
 Search angle_lim
 progress unfold angle_lim in Hlim.
