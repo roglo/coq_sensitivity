@@ -117,17 +117,13 @@ assert (Hcs1 : (c² + s² = 1)%L). {
   apply (rngl_limit_limit_squ Hon Hop Hic Hiv Hor) in H2.
   specialize (limit_add Hon Hop Hiv Hor _ _ _ _ H1 H2) as H.
   cbn in H.
-  progress unfold rngl_is_limit_when_tending_to_inf in H.
-Search is_limit_when_tending_to_inf.
-Search rngl_is_limit_when_tending_to_inf.
-...
-Search (is_limit_when_tending_to_inf _ _ _ → _ = _).
-Check limit_of_const.
-About rngl_limit_limit_squ.
-Search is_limit_when_tending_to_inf.
-appl
-Check limit_add.
-...
+  eapply (is_limit_when_tending_to_inf_eq_compat _ _ 0 0) in H. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    now rewrite cos2_sin2_1.
+  }
+  now apply (limit_const Hop Hor) in H.
+}
 rewrite <- (rngl_cos_acos c) in Hc; [ | easy ].
 remember (rngl_acos c) as θ eqn:Hθ.
 assert (Hts : s = rngl_sin θ ∨ s = (- rngl_sin θ)%L). {
@@ -144,7 +140,10 @@ assert (Hts : s = rngl_sin θ ∨ s = (- rngl_sin θ)%L). {
       apply (rngl_le_0_sub Hop Hor).
       now apply (rngl_squ_le_1 Hon Hop Hor).
     }
-    apply (rngl_add_move_l Hop).
+    now apply (rngl_add_move_l Hop).
+  } {
+    apply (rngl_nle_gt Hor) in Hzs.
+(* bon, ça devrait le faire *)
 ...
 Search (is_limit_when_tending_to_inf _ (rngl_cos _)).
 Search (is_limit_when_tending_to_inf (λ _, rngl_sin _)).

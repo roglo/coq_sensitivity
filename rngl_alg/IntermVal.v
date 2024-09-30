@@ -562,6 +562,45 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
 apply (rngl_le_refl Hor).
 Qed.
 
+Theorem limit_const :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ c lim,
+  rngl_is_limit_when_tending_to_inf (λ _, c) lim
+  → lim = c.
+Proof.
+intros Hop Hor * Hlim.
+destruct (rngl_lt_dec Hor lim c) as [Hlc| Hcl]. {
+  exfalso.
+  specialize (Hlim (c - lim)%L).
+  apply (rngl_lt_0_sub Hop Hor) in Hlc.
+  specialize (Hlim Hlc).
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  progress unfold rngl_dist in HN.
+  apply (rngl_lt_le_incl Hor) in Hlc.
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in HN; [ | easy ].
+  now apply (rngl_lt_irrefl Hor) in HN.
+}
+apply (rngl_nlt_ge Hor) in Hcl.
+destruct (rngl_lt_dec Hor c lim) as [Hlc| Hlc]. {
+  exfalso.
+  specialize (Hlim (lim - c)%L).
+  generalize Hlc; intros H.
+  apply (rngl_lt_0_sub Hop Hor) in H.
+  specialize (Hlim H); clear H.
+  destruct Hlim as (N, HN).
+  specialize (HN N (Nat.le_refl _)).
+  progress unfold rngl_dist in HN.
+  apply (rngl_le_sub_0 Hop Hor) in Hcl.
+  rewrite (rngl_abs_nonpos_eq Hop Hor) in HN; [ | easy ].
+  rewrite (rngl_opp_sub_distr Hop) in HN.
+  now apply (rngl_lt_irrefl Hor) in HN.
+}
+apply (rngl_nlt_ge Hor) in Hlc.
+apply (rngl_le_antisymm Hor _ _ Hlc Hcl).
+Qed.
+
 Theorem limit_opp :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
