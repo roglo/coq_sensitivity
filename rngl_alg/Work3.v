@@ -4,7 +4,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
-Require Import RealLike TrigoWithoutPi.
+Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
 Require Import IntermVal.
 Require Import Work2.
@@ -262,6 +262,30 @@ apply (Haco _ H1).
 Qed.
 
 (* to be completed
+Theorem glop :
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  ∀ n θ, n ≠ 0 →
+  ∃ θ', (n * θ')%A = θ.
+Proof.
+intros Har Hco * Hnz.
+specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
+destruct H1 as (θ', Hlim).
+exists θ'.
+specialize (angle_lim_angle_lim_mul_mul n _ _ Hlim) as H1.
+...
+Search angle_lim
+progress unfold angle_lim in Hlim.
+Search (_ → (_ * _ = _)%A).
+...
+specialize (seq_angle_mul_nat_not_overflow n θ) as H2.
+specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
+specialize (Hlim' Har Hch n θ' Hiz).
+..
+angle_lim (seq_angle_to_div_nat θ n) θ'
+Search (angle_lim _ _ → _).
+...
+Check angle_div_nat_is_inf_sum_of_angle_div_2_pow.
 ...
 About angle_lim_seq_angle_le.
 Search (angle_lim _ _ → _).

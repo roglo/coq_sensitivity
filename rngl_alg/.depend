@@ -30,5 +30,5 @@ TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi
 TrigoWithoutPiExt.vo TrigoWithoutPiExt.glob TrigoWithoutPiExt.v.beautified TrigoWithoutPiExt.required_vo: TrigoWithoutPiExt.v ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo RealLike.vo TacChangeAngle.vo
 Work.vo Work.glob Work.v.beautified Work.required_vo: Work.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleLeSubAdd.vo AngleDiv2Add.vo TacChangeAngle.vo Complex.vo NewtonBinomial.vo AngleAddOverflowEquiv.vo AngleAddOverflowEquiv3.vo
 Work2.vo Work2.glob Work2.v.beautified Work2.required_vo: Work2.v ../main/Misc.vo ../main/RingLike.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleDiv2Add.vo AngleAddLeMonoL.vo AngleAddOverflowLe.vo AngleEuclDistLtAngleLtLt.vo AngleAddOverflowEquiv3.vo Complex.vo Work.vo TacChangeAngle.vo
-Work3.vo Work3.glob Work3.v.beautified Work3.required_vo: Work3.v ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo Complex.vo IntermVal.vo Work2.vo
+Work3.vo Work3.glob Work3.v.beautified Work3.required_vo: Work3.v ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo Complex.vo IntermVal.vo Work2.vo
 Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v ../main/RingLike.vo
