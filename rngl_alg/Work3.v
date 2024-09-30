@@ -249,8 +249,7 @@ destruct Hts as [Hts| Hts]. {
 }
 Qed.
 
-(* to be completed
-Theorem glop :
+Theorem seq_angle_to_div_nat_has_limit :
   rngl_is_archimedean T = true →
   rngl_is_complete T →
   ∀ n θ,
@@ -258,6 +257,12 @@ Theorem glop :
 Proof.
 intros Har Hco *.
 specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
+specialize (rngl_is_complete_angle_is_complete Hco) as Haco.
+apply (Haco _ H1).
+Qed.
+
+(* to be completed or deleted
+...
 assert (H2 : is_complete _ angle_eucl_dist). {
   intros u Hu.
 Check rngl_is_complete_angle_is_complete.
