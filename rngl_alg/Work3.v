@@ -261,6 +261,12 @@ specialize (rngl_is_complete_angle_is_complete Hco) as Haco.
 apply (Haco _ H1).
 Qed.
 
+(* to be completed
+...
+About angle_lim_seq_angle_le.
+Search (angle_lim _ _ → _).
+*)
+
 (* to be completed or deleted
 ...
 assert (H2 : is_complete _ angle_eucl_dist). {
