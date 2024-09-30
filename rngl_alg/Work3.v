@@ -59,18 +59,81 @@ rewrite (rngl_abs_nonneg_eq Hop Hor ε) in HN; [ easy | ].
 now apply (rngl_lt_le_incl Hor) in Hε.
 Qed.
 
-(* to be completed
-Theorem glop :
-  rngl_is_archimedean T = true →
-  rngl_is_complete T →
-  ∀ n θ,
-  ∃ θ', angle_lim (seq_angle_to_div_nat θ n) θ'.
+Theorem limit_cos_cos_sin_sin :
+  ∀ u θ,
+  is_limit_when_tending_to_inf rngl_dist (λ i, rngl_cos (u i)) (rngl_cos θ)
+  → is_limit_when_tending_to_inf rngl_dist (λ i, rngl_sin (u i)) (rngl_sin θ)
+  → is_limit_when_tending_to_inf angle_eucl_dist u θ.
 Proof.
-intros Har Hco *.
-specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
-assert (H2 : is_complete _ angle_eucl_dist). {
-  intros u Hu.
-  progress unfold rngl_is_complete in Hco.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hc Hs ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hc Hs.
+intros ε Hε.
+assert (H : (0 < √(ε² / 2))%L). {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  rewrite (rngl_mul_0_l Hos).
+  progress unfold rngl_squ.
+  now apply (rngl_mul_pos_pos Hop Hor Hii).
+}
+specialize (Hc _ H).
+specialize (Hs _ H).
+clear H.
+destruct Hc as (nc, Hnc).
+destruct Hs as (ns, Hns).
+move ns before nc.
+exists (Nat.max nc ns).
+intros n Hn.
+progress unfold angle_eucl_dist.
+specialize (Hnc n).
+assert (H : nc ≤ n). {
+  apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
+  apply Nat.le_max_l.
+}
+specialize (Hnc H); clear H.
+specialize (Hns n).
+assert (H : ns ≤ n). {
+  apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
+  apply Nat.le_max_r.
+}
+specialize (Hns H); clear H.
+progress unfold rngl_dist in Hnc.
+progress unfold rngl_dist in Hns.
+assert (H : (0 ≤ ε² / 2)%L). {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  apply (rngl_squ_nonneg Hop Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_abs_sqrt Hop Hor) in Hnc; [ | easy ].
+rewrite <- (rngl_abs_sqrt Hop Hor) in Hns; [ | easy ].
+apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hnc, Hns.
+rewrite (rngl_squ_sqrt Hon _ H) in Hnc, Hns.
+clear H.
+generalize Hε; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor ε H).
+rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
+apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+  apply (rngl_add_squ_nonneg Hop Hor).
+}
+rewrite <- (rngl_mul_div Hi1 ε² 2)%L.
+rewrite (rngl_mul_2_r Hon ε²)%L. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_div_add_distr_r Hiv).
+rewrite (rngl_squ_sub_comm Hop (rngl_cos _))%L.
+rewrite (rngl_squ_sub_comm Hop (rngl_sin _))%L.
+now apply (rngl_add_lt_compat Hop Hor).
+Qed.
+
 Theorem rngl_is_complete_angle_is_complete :
   is_complete T rngl_dist
   → is_complete (angle T) angle_eucl_dist.
@@ -167,68 +230,39 @@ assert (Hts : s = rngl_sin θ ∨ s = (- rngl_sin θ)%L). {
 apply (f_equal rngl_cos) in Hθ.
 rewrite (rngl_cos_acos _ Hci) in Hθ.
 symmetry in Hθ; rename Hθ into Htc.
+move Hts before Htc.
 destruct Hts as [Hts| Hts]. {
-  move Hts before Hcs.
   rewrite Hts in Hs.
   exists θ.
-  intros ε Hε.
-  assert (H : (0 < √(ε² / 2))%L). {
-    apply (rl_sqrt_pos Hon Hos Hor).
-    apply (rngl_lt_div_r Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    rewrite (rngl_mul_0_l Hos).
-    progress unfold rngl_squ.
-    now apply (rngl_mul_pos_pos Hop Hor Hii).
-  }
-  specialize (Hc _ H).
-  specialize (Hs _ H).
-  clear H.
-  destruct Hc as (nc, Hnc).
-  destruct Hs as (ns, Hns).
-  move ns before nc.
-  exists (Nat.max nc ns).
-  intros n Hn.
-  progress unfold angle_eucl_dist.
-  specialize (Hnc n).
-  assert (H : nc ≤ n). {
-    apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
-    apply Nat.le_max_l.
-  }
-  specialize (Hnc H); clear H.
-  specialize (Hns n).
-  assert (H : ns ≤ n). {
-    apply (Nat.le_trans _ (Nat.max nc ns)); [ | easy ].
-    apply Nat.le_max_r.
-  }
-  specialize (Hns H); clear H.
-  progress unfold rngl_dist in Hnc.
-  progress unfold rngl_dist in Hns.
-  assert (H : (0 ≤ ε² / 2)%L). {
-    apply (rngl_div_nonneg Hon Hop Hiv Hor).
-    apply (rngl_squ_nonneg Hop Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite <- (rngl_abs_sqrt Hop Hor) in Hnc; [ | easy ].
-  rewrite <- (rngl_abs_sqrt Hop Hor) in Hns; [ | easy ].
-  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hnc, Hns.
-  rewrite (rngl_squ_sqrt Hon _ H) in Hnc, Hns.
-  clear H.
-  generalize Hε; intros H.
-  apply (rngl_lt_le_incl Hor) in H.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor ε H).
-  rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
-  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
-    apply (rngl_add_squ_nonneg Hop Hor).
-  }
-  rewrite <- (rngl_mul_div Hi1 ε² 2)%L.
-  rewrite (rngl_mul_2_r Hon ε²)%L. 2: {
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_div_add_distr_r Hiv).
-  rewrite (rngl_squ_sub_comm Hop (rngl_cos _))%L.
-  rewrite (rngl_squ_sub_comm Hop (rngl_sin _))%L.
-  now apply (rngl_add_lt_compat Hop Hor).
+  now apply limit_cos_cos_sin_sin.
+} {
+  remember (- θ)%A as t eqn:Ht.
+  apply (f_equal angle_opp) in Ht.
+  rewrite angle_opp_involutive in Ht.
+  subst θ; rename t into θ.
+  rewrite rngl_cos_opp in Htc, Hc.
+  rewrite rngl_sin_opp in Hts.
+  rewrite Hts in Hs.
+  rewrite (rngl_opp_involutive Hop) in Hts, Hs.
+  exists θ.
+  now apply limit_cos_cos_sin_sin.
 }
+Qed.
+
+(* to be completed
+Theorem glop :
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  ∀ n θ,
+  ∃ θ', angle_lim (seq_angle_to_div_nat θ n) θ'.
+Proof.
+intros Har Hco *.
+specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
+assert (H2 : is_complete _ angle_eucl_dist). {
+  intros u Hu.
+Check rngl_is_complete_angle_is_complete.
+...
+  progress unfold rngl_is_complete in Hco.
 ...
 Theorem limit_cos_cos_limit_sin_sin :
   ∀ θ θ',
