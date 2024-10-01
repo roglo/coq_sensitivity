@@ -279,6 +279,43 @@ specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
   specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H3.
+  clear - Hlim Hnz Hn1.
+  destruct_ac.
+  destruct n; [ easy | clear Hnz ].
+  destruct n; [ easy | clear Hn1 ].
+  apply angle_lt_iff.
+  split. {
+    apply angle_nlt_ge.
+    intros Hst.
+    set (ε := angle_eucl_dist θ' angle_straight).
+    specialize (Hlim ε).
+    assert (H : (0 < ε)%L). {
+      subst ε.
+      rewrite angle_eucl_dist_is_sqrt.
+      apply (rl_sqrt_pos Hon Hos Hor).
+      apply (rngl_mul_pos_pos Hop ...).
+...
+      progress unfold angle_ltb in Hst.
+      cbn in Hst.
+      rewrite (rngl_leb_refl Hor) in Hst.
+      remember (0 ≤? rngl_sin θ')%L as zt eqn:Hzt.
+      symmetry in Hzt.
+      destruct zt. {
+        exfalso.
+        apply rngl_ltb_lt in Hst.
+        apply (rngl_nle_gt Hor) in Hst.
+        apply Hst, rngl_cos_bound.
+      }
+      clear Hst.
+      apply (rngl_leb_gt Hor) in Hzt.
+      progress unfold angle_eucl_dist.
+...
+  2: {
+    intros ts; subst θ'.
+    progress unfold angle_lim in Hlim.
+    progress unfold seq_angle_to_div_nat in Hlim.
+    progress unfold is_limit_when_tending_to_inf in Hlim.
+...
 Theorem glop :
   ∀ u a b,
   angle_lim u a
