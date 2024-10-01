@@ -6,7 +6,7 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
-Require Import Work2.
+Require Import Work Work2.
 Require Import AngleTypeIsComplete.
 
 Section a.
@@ -126,6 +126,10 @@ specialize angle_seq_not_overflow_has_not_overflow_limit as H2.
 specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
+  specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H3.
+...
+Search angle_lim.
+About angle_lim_le.
 ...
 Search (angle_mul_nat_overflow _ (seq_angle_to_div_nat _ _)).
 assert
