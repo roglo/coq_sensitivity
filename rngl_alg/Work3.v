@@ -279,8 +279,13 @@ specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
   specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H3.
-  clear - Hlim Hnz Hn1.
+  clear - Hlim Hnz Hn1 Hcz.
+  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+    now rewrite Hc1 in Hcz.
+  }
+  clear Hcz.
   destruct_ac.
+  specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
   destruct n; [ easy | clear Hnz ].
   destruct n; [ easy | clear Hn1 ].
   apply angle_lt_iff.
@@ -293,7 +298,21 @@ assert (H : (θ' < angle_straight)%A). {
       subst ε.
       rewrite angle_eucl_dist_is_sqrt.
       apply (rl_sqrt_pos Hon Hos Hor).
-      apply (rngl_mul_pos_pos Hop ...).
+      apply (rngl_mul_pos_pos Hop Hor Hii). {
+        apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      }
+      apply (rngl_lt_0_sub Hop Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H.
+      apply eq_rngl_cos_1 in H.
+      apply -> angle_sub_move_0_r in H.
+      rewrite H in Hst.
+      now apply angle_lt_irrefl in Hst.
+    }
+    specialize (Hlim H); clear H.
+    destruct Hlim as (N, HN).
+    specialize (HN _ (Nat.le_refl _)).
 ...
       progress unfold angle_ltb in Hst.
       cbn in Hst.
