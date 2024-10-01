@@ -6,8 +6,6 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
-Require Import IntermVal.
-Require Import Work.
 Require Import Work2.
 Require Import AngleTypeIsComplete.
 
