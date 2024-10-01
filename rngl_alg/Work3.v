@@ -272,13 +272,29 @@ Theorem glop :
 Proof.
 intros Hcz Har Hco.
 intros * Hnz.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  exists θ; subst n.
+  apply angle_mul_1_l.
+}
 specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
 destruct H1 as (θ', Hlim).
 exists θ'.
-...
 specialize (angle_lim_mul n _ _ Hlim) as H1.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hcz n θ' Hnz).
+specialize angle_seq_not_overflow_has_not_overflow_limit as H2.
+specialize (H2 n (seq_angle_to_div_nat θ n)).
+specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
+assert (H : (θ' < angle_straight)%A). {
+...
+Search (angle_mul_nat_overflow _ (seq_angle_to_div_nat _ _)).
+assert
+  (H : ∀ i, angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false). {
+  intros i.
+Search (angle_mul_nat_overflow _ (seq_angle_to_div_nat _ _ _)).
+...
+Search (_ → angle_mul_nat_overflow _ _ = false).
+...
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
 destruct ao. 2: {
