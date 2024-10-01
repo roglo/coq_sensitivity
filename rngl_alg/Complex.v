@@ -4035,7 +4035,6 @@ Theorem angle_lim_mul :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 intros * Hu.
 induction k. {
   intros ε Hε.
@@ -4047,7 +4046,8 @@ induction k. {
   rewrite (rngl_squ_0 Hos).
   rewrite rngl_add_0_l.
   rewrite (rl_sqrt_0 Hon Hop Hic Hor); [ easy | ].
-  now rewrite Bool.orb_true_iff; right.
+  rewrite Hi1.
+  apply Bool.orb_true_r.
 }
 cbn.
 now apply angle_lim_add_add.
