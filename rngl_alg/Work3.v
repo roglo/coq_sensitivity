@@ -279,8 +279,36 @@ specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
   specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H3.
-  assert (H : (θ' ≤ angle_straight /₂^(Nat.log2 n - 1))%A). {
+Theorem glop :
+  ∀ u a b,
+  angle_lim u a
+  → (∀ i, u i ≤ b)%A
+  → (a ≤ b)%A.
+Proof.
+destruct_ac.
+intros * Hlim Hu.
+specialize (Hlim (angle_eucl_dist a b)).
+apply angle_nlt_ge.
+intros Hba.
+assert (H : (0 < angle_eucl_dist a b)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  subst b.
+  now apply angle_lt_irrefl in Hba.
+}
+specialize (Hlim H); clear H.
+destruct Hlim as (N, HN).
+apply angle_nle_gt in Hba.
+apply Hba; clear Hba.
+... ...
+  apply angle_lt_iff.
+  split. {
+    apply (glop (seq_angle_to_div_nat θ n) θ' _ Hlim).
+    intros i.
 ...
+  assert (H : (θ' ≤ angle_straight /₂^(Nat.log2 n - 1))%A). {
 Search (angle_mul_nat_overflow _ (seq_angle_to_div_nat _ _)).
 assert
   (H : ∀ i, angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false). {
