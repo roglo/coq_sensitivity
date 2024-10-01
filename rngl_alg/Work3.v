@@ -7,6 +7,7 @@ Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
 Require Import IntermVal.
+Require Import Work.
 Require Import Work2.
 
 Section a.
@@ -274,13 +275,12 @@ intros * Hnz.
 specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
 destruct H1 as (θ', Hlim).
 exists θ'.
+...
 specialize (angle_lim_mul n _ _ Hlim) as H1.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hcz n θ' Hnz).
-...
 remember (angle_mul_nat_overflow n θ') as ao eqn:Hao.
 symmetry in Hao.
-move Hlim before Hlim'.
 destruct ao. 2: {
   specialize (Hlim' eq_refl).
   progress unfold seq_angle_to_div_nat in Hlim.
@@ -292,6 +292,7 @@ destruct ao. 2: {
     rewrite angle_mul_nat_assoc.
     easy.
   }
+...
   induction n as (n, IHn) using lt_wf_rec; intros.
   destruct n; [ easy | clear Hnz ].
 ...
