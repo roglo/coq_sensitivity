@@ -7,6 +7,7 @@ Require Import Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
 Require Import Work Work2.
+Require Import SeqAngleIsCauchy.
 Require Import AngleTypeIsComplete.
 
 Section a.
