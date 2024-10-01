@@ -561,6 +561,9 @@ rewrite angle_div_2_pow_mul_2_pow.
 apply angle_add_overflow_div_2_div_2.
 Qed.
 
+Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
+Proof. easy. Qed.
+
 Theorem angle_add_overflow_mul_by_lt_3 :
   ∀ i θ θ',
   3 ≤ 2 ^ i
@@ -2196,8 +2199,6 @@ apply angle_nlt_ge.
 apply angle_nonneg.
 Qed.
 
-Definition rngl_min3 a b c := rngl_min (rngl_min a b) c.
-
 Theorem angle_eucl_dist_lt_angle_lt_le_lt :
   ∀ θ1 θ2 θ3 θ4 ε1 ε2 ε3,
   ε1 = angle_eucl_dist θ1 0
@@ -2421,157 +2422,6 @@ assert (H143 : (θ1 /₂ + θ4 /₂ < θ3)%A). {
   now apply angle_div_2_lt_compat.
 }
 eapply angle_lt_trans; [ apply H214 | apply H143 ].
-Qed.
-
-(* if a sequence of angles θi has a limit θ',
-   and if ∀ i, n*θi does not overflow,
-   then n*θ' does not overflow either *)
-Theorem angle_seq_not_overflow_has_not_overflow_limit :
-  ∀ n θ θ',
-  (∀ i, angle_mul_nat_overflow n (θ i) = false)
-  → angle_lim θ θ'
-  → (θ' < angle_straight)%A
-  → (∀ m, 0 < m ≤ n → (m * θ' ≠ 0)%A)
-  → angle_mul_nat_overflow n θ' = false.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros.
-  rewrite (H1 θ').
-  apply angle_mul_nat_overflow_0_r.
-}
-intros * Hi Hlim Hts Hnt.
-destruct (angle_eq_dec θ' 0) as [Htz| Htz]. {
-  subst θ'.
-  apply angle_mul_nat_overflow_0_r.
-}
-apply angle_all_add_not_overflow.
-intros * Hmn.
-assert (H : ∀ k, angle_lim (λ i, (k * θ i)%A) (k * θ')). {
-  intros k.
-  now apply angle_lim_mul.
-}
-move H before Hlim; clear Hlim; rename H into Hlim.
-assert (H :
-  ∀ m ε,
-  (0 < ε)%L
-  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (m * θ i) (m * θ') < ε)%L)
-by apply Hlim.
-move H before Hlim; clear Hlim; rename H into Hlim.
-progress unfold angle_add_overflow.
-apply Bool.not_true_iff_false.
-apply angle_nlt_ge.
-rewrite angle_add_mul_r_diag_r.
-assert (H : ∀ i m, m < n → (θ i ≤ S m * θ i)%A). {
-  clear m Hmn.
-  intros * Hmn.
-  specialize (Hi i).
-  specialize (proj2 (angle_all_add_not_overflow _ _) Hi m Hmn) as H.
-  progress unfold angle_add_overflow in H.
-  apply Bool.not_true_iff_false in H.
-  apply angle_nlt_ge in H.
-  now rewrite angle_add_mul_r_diag_r in H.
-}
-move H before Hi; clear Hi; rename H into Hi.
-assert (H : ∀ i m, 0 < m ≤ n → (θ i ≤ m * θ i)%A). {
-  clear m Hmn.
-  intros * (Hmz, Hmn).
-  specialize (Hi i (m - 1)).
-  rewrite <- Nat_succ_sub_succ_r in Hi; [ | easy ].
-  rewrite Nat.sub_0_r in Hi.
-  apply Hi.
-  flia Hmz Hmn.
-}
-move H before Hi; clear Hi; rename H into Hni.
-progress unfold lt in Hmn.
-remember (S m) as p.
-assert (H : 0 < p ≤ n) by flia Heqp Hmn.
-clear m Heqp.
-clear Hmn; rename H into Hmn; rename p into m.
-move m before n.
-assert (Hlim' :
-  ∀ m ε,
-  (0 < ε)%L
-  → ∃ N : nat, ∀ i, N ≤ i → (angle_eucl_dist (m * (θ i - θ')) 0 < ε)%L). {
-  intros p ε Hε.
-  specialize (Hlim p ε Hε).
-  destruct Hlim as (N, HN).
-  exists N; intros j Hj.
-  specialize (HN j Hj).
-  rewrite angle_eucl_dist_move_0_r in HN.
-  now rewrite <- angle_mul_sub_distr_l in HN.
-}
-(*3*)
-generalize Hts; intros Hts_v.
-apply angle_nlt_ge.
-intros Hmt.
-specialize (Hnt _ Hmn) as Hmtz.
-set (ε1 := angle_eucl_dist (m * θ') 0).
-set (ε2 := angle_eucl_dist (m * θ') θ').
-set (ε3 := angle_eucl_dist θ' (m * θ' + angle_straight)).
-specialize (Hlim 1 (rngl_min3 ε1 (ε2 / 2) ε3)%L) as H1.
-specialize (Hlim m (rngl_min3 ε1 (ε2 / 2) ε3)%L) as H2.
-assert (Hε : (0 < rngl_min3 ε1 (ε2 / 2) ε3)%L). {
-  apply rngl_min_glb_lt. {
-    apply rngl_min_glb_lt. {
-      progress unfold ε1.
-      apply (rngl_lt_iff Hor).
-      split; [ apply angle_eucl_dist_nonneg | ].
-      apply not_eq_sym.
-      intros H.
-      now apply angle_eucl_dist_separation in H.
-    }
-    progress unfold ε2.
-    apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    apply (rngl_lt_iff Hor).
-    split; [ apply angle_eucl_dist_nonneg | ].
-    apply not_eq_sym.
-    intros H.
-    apply angle_eucl_dist_separation in H.
-    rewrite H in Hmt.
-    now apply angle_lt_irrefl in Hmt.
-  }
-  progress unfold ε3.
-  apply (rngl_lt_iff Hor).
-  split; [ apply angle_eucl_dist_nonneg | ].
-  apply not_eq_sym.
-  intros H.
-  apply angle_eucl_dist_separation in H.
-  apply angle_nle_gt in Hts.
-  apply Hts; clear Hts.
-  rewrite H.
-  (* lemma to do *)
-  rewrite angle_add_comm.
-  apply angle_le_add_r.
-  apply (angle_add_overflow_le_lt angle_straight).
-  apply angle_le_refl.
-  rewrite angle_opp_straight.
-  now apply (angle_lt_trans _ θ').
-}
-clear Hts_v.
-specialize (H1 Hε).
-specialize (H2 Hε).
-destruct H1 as (N1, HN1).
-destruct H2 as (N2, HN2).
-set (i := max N1 N2).
-specialize (HN1 i (Nat.le_max_l _ _)).
-specialize (HN2 i (Nat.le_max_r _ _)).
-do 2 rewrite angle_mul_1_l in HN1.
-specialize angle_eucl_dist_lt_angle_lt_le_lt as H1.
-specialize (H1 (m * θ') (m * θ i) (θ i) θ')%A.
-specialize (H1 _ _ _ eq_refl eq_refl eq_refl).
-progress fold ε1 in H1.
-progress fold ε2 in H1.
-progress fold ε3 in H1.
-generalize Hts; intros H.
-apply angle_lt_le_incl in H.
-specialize (H1 HN1 HN2 (conj Hmt H)); clear H.
-apply angle_nle_gt in H1.
-now apply H1, Hni.
 Qed.
 
 Theorem Cauchy_sin_cos_Cauchy_angle :

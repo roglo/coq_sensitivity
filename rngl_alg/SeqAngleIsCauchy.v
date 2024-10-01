@@ -389,8 +389,7 @@ Qed.
 Theorem seq_angle_to_div_nat_is_Cauchy :
   rngl_is_archimedean T = true →
   ∀ n θ,
-  is_Cauchy_sequence angle_eucl_dist
-    (seq_angle_to_div_nat θ n).
+  is_Cauchy_sequence angle_eucl_dist (seq_angle_to_div_nat θ n).
 Proof.
 intros Har *.
 destruct_ac.

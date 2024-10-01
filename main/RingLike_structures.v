@@ -309,6 +309,9 @@ Definition rngl_min {T} {ro : ring_like_op T} (a b : T) :=
 Definition rngl_max {T} {ro : ring_like_op T} (a b : T) :=
   if (a ≤? b)%L then b else a.
 
+Definition rngl_min3 {T} {ro : ring_like_op T} a b c :=
+  rngl_min (rngl_min a b) c.
+
 Definition rngl_has_eq_dec_or_order T {ro : ring_like_op T} :=
   (rngl_has_eq_dec T || rngl_is_ordered T)%bool.
 

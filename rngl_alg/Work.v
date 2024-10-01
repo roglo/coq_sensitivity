@@ -805,9 +805,6 @@ Qed.
 Theorem Nat_add_mul_r_diag_r : ∀ a b, a + b * a = (1 + b) * a.
 Proof. easy. Qed.
 
-Theorem angle_add_mul_r_diag_r : ∀ n θ, (θ + n * θ)%A = (S n * θ)%A.
-Proof. easy. Qed.
-
 Theorem angle_right_div_2_lt :
   ∀ θ,
   (rngl_cos θ < rngl_sin θ)%L
@@ -1607,17 +1604,6 @@ destruct (rngl_le_dec Hor (rngl_sin θ) 0) as [Hzt| Hzt]. {
   apply rngl_cos_bound.
 }
 now apply (rngl_lt_le_incl Hor) in Htz.
-Qed.
-
-Theorem angle_le_add_r :
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = false
-  → (θ1 ≤ θ1 + θ2)%A.
-Proof.
-intros * Haov.
-progress unfold angle_add_overflow in Haov.
-apply Bool.not_true_iff_false in Haov.
-now apply angle_nlt_ge in Haov.
 Qed.
 
 Theorem angle_add_overflow_pow2_div_mul_pow2_mul_when_lt_straight :

@@ -1339,4 +1339,15 @@ apply (rngl_leb_gt Hor) in H.
 now rewrite H in Hts.
 Qed.
 
+Theorem angle_le_add_r :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → (θ1 ≤ θ1 + θ2)%A.
+Proof.
+intros * Haov.
+progress unfold angle_add_overflow in Haov.
+apply Bool.not_true_iff_false in Haov.
+now apply angle_nlt_ge in Haov.
+Qed.
+
 End a.
