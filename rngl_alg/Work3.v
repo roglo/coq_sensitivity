@@ -275,7 +275,6 @@ specialize (angle_lim_mul n _ _ Hlim) as H1.
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hcz n θ' Hnz).
 specialize angle_seq_not_overflow_has_not_overflow_limit as H2.
-...
 specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
