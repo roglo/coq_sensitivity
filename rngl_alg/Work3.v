@@ -279,9 +279,7 @@ specialize (H2 n (seq_angle_to_div_nat θ n)).
 specialize (H2 θ' (seq_angle_mul_nat_not_overflow n θ) Hlim).
 assert (H : (θ' < angle_straight)%A). {
   specialize seq_angle_to_div_nat_le_straight_div_pow2_log2_pred as H3.
-...
-Search angle_lim.
-About angle_lim_le.
+  assert (H : (θ' ≤ angle_straight /₂^(Nat.log2 n - 1))%A). {
 ...
 Search (angle_mul_nat_overflow _ (seq_angle_to_div_nat _ _)).
 assert
