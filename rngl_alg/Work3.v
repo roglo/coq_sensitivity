@@ -299,9 +299,9 @@ eapply (angle_lim_eq_compat 0 0). {
   easy.
 }
 intros ε Hε.
-specialize (int_part Hon Hop Hc1 Hor Har (1 / ε))%L as H1.
-destruct H1 as (e, He).
-exists (Nat.log2_up (n * e)).
+specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / ε))%L as H1.
+destruct H1 as (en, Hen).
+exists (Nat.log2_up en).
 intros m Hm.
 ...
 eapply (angle_lim_eq_compat 0 0). {
