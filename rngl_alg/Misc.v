@@ -96,6 +96,92 @@ rewrite <- Nat.mul_sub_distr_l, Nat.mul_comm.
 apply Nat.Div0.mod_mul.
 Qed.
 
+Theorem Nat_eq_div_1 : ∀ a b, a / b = 1 ↔ b ≤ a < 2 * b.
+Proof.
+intros.
+split; intros Hab. {
+  destruct (Nat.eq_dec b 0) as [Hbz| Hbz]; [ now subst b | ].
+  apply Nat_div_less_small_iff in Hab; [ | easy ].
+  now rewrite Nat.mul_1_l in Hab.
+} {
+  apply Nat_div_less_small.
+  now rewrite Nat.mul_1_l.
+}
+Qed.
+
+Theorem Nat_pow2_log2_up_succ :
+  ∀ n, Nat.log2_up (S n) = S (Nat.log2_up n) ↔ 2 ^ Nat.log2_up n = n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+destruct (Nat.eq_dec n 1) as [H| H]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+assert (Hn1 : 1 < n). {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
+}
+clear H.
+split; intros Hn. {
+  rewrite Nat.log2_up_eqn in Hn; [ | now apply -> Nat.succ_lt_mono ].
+  apply Nat.succ_inj in Hn.
+  cbn in Hn.
+  apply Nat.log2_log2_up_exact in Hn; [ | easy ].
+  destruct Hn as (m, Hm); subst n.
+  now rewrite Nat.log2_up_pow2.
+} {
+  specialize (Nat.log2_up_succ_or n) as H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+  exfalso.
+  rewrite <- Hn in H1 at 1.
+  rewrite Nat.log2_up_succ_pow2 in H1; [ | easy ].
+  specialize (Nat.log2_up_eqn n Hn1) as H2.
+  rewrite <- H1 in H2.
+  apply Nat.succ_inj in H2.
+  rewrite <- Hn in H2 at 2.
+  rewrite Nat.log2_pred_pow2 in H2; [ | now apply Nat.log2_up_pos ].
+  destruct (Nat.log2_up n); [ now cbn in Hn; subst n | ].
+  cbn in H2.
+  now apply Nat.neq_succ_diag_l in H2.
+}
+Qed.
+
+Theorem Nat_log2_up_lt_twice : ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n < 2 * n.
+Proof.
+intros * Hnz.
+destruct n; [ easy | clear Hnz ].
+specialize (Nat.log2_up_succ_or n) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite H1.
+  rewrite Nat.pow_succ_r'.
+  apply Nat.mul_lt_mono_pos_l; [ easy | ].
+  apply Nat_pow2_log2_up_succ in H1.
+  now rewrite H1.
+}
+rewrite H1.
+destruct n; [ now cbn | ].
+specialize (Nat.log2_up_spec (S (S n))) as H2.
+assert (H : 1 < S (S n)) by flia.
+specialize (H2 H); clear H.
+destruct H2 as (H2, H3).
+rewrite <- Nat.sub_1_r in H2.
+rewrite H1 in H2.
+rewrite Nat.pow_sub_r in H2; [ | easy | ]. 2: {
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.log2_up_null in H.
+  apply Nat.succ_le_mono in H.
+  now apply Nat.le_0_r in H; subst n.
+}
+rewrite Nat.pow_1_r in H2.
+apply Nat.nle_gt.
+intros H4.
+apply Nat.nle_gt in H2.
+apply H2; clear H2.
+apply Nat.div_le_lower_bound; [ easy | ].
+now rewrite H1 in H3.
+Qed.
+
 Theorem Nat_bezout_mul : ∀ a b c,
   Nat.Bezout a c 1
   → Nat.Bezout b c 1
@@ -353,4 +439,18 @@ symmetry.
 rewrite fold_left_app; cbn.
 rewrite List_fold_left_mul_assoc.
 now rewrite fold_left_app.
+Qed.
+
+Theorem Nat_pow2_log2_up_div_diag :
+  ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n / n = 1.
+Proof.
+intros * Hnz.
+apply Nat_eq_div_1.
+split. {
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  apply Nat.log2_up_spec.
+  now apply -> Nat.succ_lt_mono.
+}
+now apply Nat_log2_up_lt_twice.
 Qed.

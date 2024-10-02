@@ -4,6 +4,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc Main.RingLike.
+Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
 Require Import Work2.
@@ -294,16 +295,52 @@ eapply (angle_lim_eq_compat 0 0). {
   easy.
 }
 (*2*)
+...
 eapply (angle_lim_eq_compat 0 (Nat.log2_up n)). {
+(*
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  rewrite Nat.add_comm at 1.
+  rewrite angle_div_2_pow_add_r.
+  rewrite angle_mul_nat_assoc.
+  specialize (Nat.div_mod (2 ^ (i + Nat.log2_up n)) n Hnz) as H1.
+  rewrite H1.
+  rewrite Nat.mul_add_distr_l.
+...
+*)
   intros i.
   rewrite Nat.add_0_r; symmetry.
   rewrite Nat.add_comm at 1.
   rewrite angle_div_2_pow_add_r.
   rewrite angle_mul_nat_assoc.
   rewrite Nat.pow_add_r.
+enough (H : ∃ m, m < n ∧ 2 ^ Nat.log2_up n = n + m).
+destruct H as (m & Hmn & H).
+rewrite H.
+rewrite Nat.mul_add_distr_l.
+rewrite Nat.div_add_l; [ | easy ].
+rewrite Nat.mul_add_distr_r.
+Search ((_ + _) * _)%A.
+rewrite angle_mul_add_distr_r.
+rewrite Nat.mul_comm.
+rewrite <- angle_mul_nat_assoc.
+Search (2 ^ _ * _)%A.
+rewrite angle_div_2_pow_mul_2_pow.
+...
   easy.
 }
 remember (θ /₂^Nat.log2_up n)%A as θ' eqn:Hθ'.
+...
+intros * Hnz.
+specialize (Nat.log2_up_spec n) as H1.
+destruct n; [ easy | ].
+destruct n; [ easy | ].
+assert (H : 1 < S (S n)) by now apply -> Nat.succ_lt_mono.
+specialize (H1 H); clear H.
+apply Work.Nat_eq_div_1.
+split; [ easy | ].
+apply (Nat.le_lt_trans _ (S (S n))); [ | ].
+Search (2 ^ Nat.log2_up _).
 ...2
 remember (θ /₂^Nat.log2_up n)%A as θ' eqn:Hθ'.
 enough (H : angle_mul_nat_overflow n θ' = false). {
