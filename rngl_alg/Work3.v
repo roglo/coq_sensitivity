@@ -309,6 +309,29 @@ rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_r. 2: {
   apply Nat.Div0.mul_div_le.
 }
+specialize (Nat.div_mod (2 ^ m) n Hnz) as H1.
+symmetry in H1.
+apply Nat.add_sub_eq_l in H1.
+rewrite H1; clear H1.
+Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+Search (angle_eucl_dist _ 0 < _)%L.
+rewrite angle_eucl_dist_symmetry.
+apply (rngl_lt_le_trans Hor _ (angle_eucl_dist 0 (θ /₂^ m))). {
+  do 2 rewrite (angle_eucl_dist_symmetry 0).
+  apply angle_eucl_dist_div_2_pow_0_lt.
+...
+angle_eucl_dist_div_2_pow_0_lt:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
+    {rl : real_like_prop T} {ac : angle_ctx T} (n : nat) 
+    (a b : T) (θ : angle T),
+    (0 ≤ a ≤ b * 2 ^ n)%L
+    → ((a * 2 ^ n)² + (1 - b² / 2)² ≤ 1)%L
+      → ((a * 2 ^ n)² ≤ rngl_of_nat 3)%L
+        → (0 ≤ rngl_sin θ)%L
+          → (angle_eucl_dist θ 0 < a)%L → (angle_eucl_dist (θ /₂^n) 0 < b)%L
+...
+Check angle_dist_lt_r.
+2: {
 ...
 apply rngl_cos_lt_angle_eucl_dist_lt. {
   now apply (rngl_lt_le_incl Hor) in Hε.
