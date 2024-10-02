@@ -293,6 +293,18 @@ eapply (angle_lim_eq_compat 0 0). {
   rewrite <- angle_mul_nat_assoc.
   easy.
 }
+(*2*)
+eapply (angle_lim_eq_compat 0 (Nat.log2_up n)). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  rewrite Nat.add_comm at 1.
+  rewrite angle_div_2_pow_add_r.
+  rewrite angle_mul_nat_assoc.
+  rewrite Nat.pow_add_r.
+  easy.
+}
+remember (θ /₂^Nat.log2_up n)%A as θ' eqn:Hθ'.
+...2
 remember (θ /₂^Nat.log2_up n)%A as θ' eqn:Hθ'.
 enough (H : angle_mul_nat_overflow n θ' = false). {
   eapply (angle_lim_eq_compat 0 (Nat.log2_up n)). {
