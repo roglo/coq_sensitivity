@@ -298,11 +298,13 @@ eapply (angle_lim_eq_compat 0 0). {
   rewrite angle_mul_nat_assoc.
   easy.
 }
+...
 intros ε Hε.
 specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / ε))%L as H1.
 destruct H1 as (en, Hen).
 exists (Nat.log2_up en).
 intros m Hm.
+...
 apply rngl_cos_lt_angle_eucl_dist_lt. {
   now apply (rngl_lt_le_incl Hor) in Hε.
 }
