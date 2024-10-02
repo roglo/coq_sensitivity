@@ -256,7 +256,7 @@ now apply H1, Hni.
 Qed.
 
 (* to be completed
-Theorem glop :
+Theorem angle_div_nat_exists :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
@@ -313,25 +313,18 @@ specialize (Nat.div_mod (2 ^ m) n Hnz) as H1.
 symmetry in H1.
 apply Nat.add_sub_eq_l in H1.
 rewrite H1; clear H1.
-Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
-Search (angle_eucl_dist _ 0 < _)%L.
 rewrite angle_eucl_dist_symmetry.
 apply (rngl_lt_le_trans Hor _ (angle_eucl_dist 0 (θ /₂^ m))). {
+  apply angle_eucl_dist_lt_cos_lt.
+  do 2 rewrite angle_sub_0_r.
+...
+Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
+Search (angle_eucl_dist _ 0 < _)%L.
+Search (angle_eucl_dist _ _ < angle_eucl_dist _ _)%L.
+...
   do 2 rewrite (angle_eucl_dist_symmetry 0).
+  apply angle_dist_lt_r.
   apply angle_eucl_dist_div_2_pow_0_lt.
-...
-angle_eucl_dist_div_2_pow_0_lt:
-  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
-    {rl : real_like_prop T} {ac : angle_ctx T} (n : nat) 
-    (a b : T) (θ : angle T),
-    (0 ≤ a ≤ b * 2 ^ n)%L
-    → ((a * 2 ^ n)² + (1 - b² / 2)² ≤ 1)%L
-      → ((a * 2 ^ n)² ≤ rngl_of_nat 3)%L
-        → (0 ≤ rngl_sin θ)%L
-          → (angle_eucl_dist θ 0 < a)%L → (angle_eucl_dist (θ /₂^n) 0 < b)%L
-...
-Check angle_dist_lt_r.
-2: {
 ...
 apply rngl_cos_lt_angle_eucl_dist_lt. {
   now apply (rngl_lt_le_incl Hor) in Hε.
