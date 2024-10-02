@@ -262,6 +262,7 @@ Theorem glop :
   ∀ n θ, n ≠ 0 →
   ∃ θ', (n * θ')%A = θ.
 Proof.
+destruct_ac.
 intros Hcz Har Hco.
 intros * Hnz.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
@@ -272,6 +273,61 @@ specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
 destruct H1 as (θ', Hlim).
 exists θ'.
 specialize (angle_lim_mul n _ _ Hlim) as H1.
+(*1*)
+enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
+  apply (limit_unique Hon Hop Hiv Hor) with (lim1 := (n * θ')%A) in H2. {
+    easy.
+  } {
+    apply angle_eucl_dist_is_dist.
+  } {
+    easy.
+  }
+}
+clear θ' Hlim H1.
+eapply (angle_lim_eq_compat 0 0). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  progress unfold seq_angle_to_div_nat.
+  rewrite angle_mul_nat_assoc.
+  rewrite Nat.mul_comm.
+  rewrite <- angle_mul_nat_assoc.
+  easy.
+}
+remember (θ /₂^Nat.log2_up n)%A as θ' eqn:Hθ'.
+enough (H : angle_mul_nat_overflow n θ' = false). {
+  eapply (angle_lim_eq_compat 0 (Nat.log2_up n)). {
+    intros i.
+    rewrite Nat.add_0_r; symmetry.
+    rewrite Nat.add_comm at 1.
+    rewrite angle_div_2_pow_add_r.
+    rewrite <- Hθ'.
+    rewrite <- angle_div_2_pow_mul; [ | easy ].
+    rewrite Nat.pow_add_r.
+    rewrite angle_div_2_pow_mul; [ | easy ].
+    rewrite angle_mul_nat_assoc.
+    rewrite Nat.mul_comm.
+    easy.
+  }
+Print seq_angle_to_div_nat.
+Search (_ * _ / _).
+Search (_ / _ / _).
+Search (2 ^ Nat.log2_up _).
+...
+remember (angle_mul_nat_overflow n θ) as nt eqn:Hnt.
+symmetry in Hnt.
+destruct nt. 2: {
+  eapply (angle_lim_eq_compat 0 0). {
+    intros i.
+    rewrite Nat.add_0_r; symmetry.
+    rewrite <- angle_div_2_pow_mul; [ | easy ].
+    rewrite fold_seq_angle_to_div_nat.
+    easy.
+  }
+  apply (angle_div_nat_is_inf_sum_of_angle_div_2_pow Har Hcz _ _ Hnz Hnt).
+}
+...
+Check angle_div_nat_is_inf_sum_of_angle_div_2_pow.
+...1
 specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as Hlim'.
 specialize (Hlim' Har Hcz n θ' Hnz).
 specialize angle_seq_not_overflow_has_not_overflow_limit as H2.
