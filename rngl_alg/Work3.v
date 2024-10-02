@@ -285,6 +285,25 @@ enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
   }
 }
 clear θ' Hlim H1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros ε Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+eapply (angle_lim_eq_compat 0 0). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  progress unfold seq_angle_to_div_nat.
+  rewrite angle_mul_nat_assoc.
+  easy.
+}
+intros ε Hε.
+specialize (int_part Hon Hop Hc1 Hor Har (1 / ε))%L as H1.
+destruct H1 as (e, He).
+exists (Nat.log2_up (n * e)).
+intros m Hm.
+...
 eapply (angle_lim_eq_compat 0 0). {
   intros i.
   rewrite Nat.add_0_r; symmetry.
