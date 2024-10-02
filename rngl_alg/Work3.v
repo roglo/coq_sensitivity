@@ -8,9 +8,10 @@ Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
 Require Import Work2.
+Require Import AngleAddLeMonoL.
 Require Import AngleAddOverflowLe.
-Require Import SeqAngleIsCauchy.
 Require Import AngleTypeIsComplete.
+Require Import SeqAngleIsCauchy.
 
 Section a.
 
@@ -314,11 +315,22 @@ symmetry in H1.
 apply Nat.add_sub_eq_l in H1.
 rewrite H1; clear H1.
 rewrite angle_eucl_dist_symmetry.
-apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (θ /₂^ m))). {
+apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
   apply angle_eucl_dist_le_cos_le.
   do 2 rewrite angle_sub_0_r.
   apply rngl_cos_decr.
-(* ouais, je pense que ça devrait le faire *)
+  split. {
+    apply angle_mul_le_mono_r. 2: {
+      apply Nat.lt_le_incl, (Nat.mod_upper_bound _ _ Hnz).
+    }
+    apply angle_mul_nat_overflow_div_pow2.
+    apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+    eapply Nat.le_trans; [ | apply Hm ].
+(*
+en ≤ n/ε
+*)
+Search (_ ^ _ ≤ _ ^ _).
+Search (_ → angle_mul_nat_overflow _ (_ /₂^ _) = false).
 ...
 Search (rngl_cos _ < rngl_cos _)%L.
 apply AngleEuclDistLtAngleLtLt.quadrant_1_sin_sub_nonneg_cos_lt.
