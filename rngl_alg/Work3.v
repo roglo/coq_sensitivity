@@ -314,9 +314,14 @@ symmetry in H1.
 apply Nat.add_sub_eq_l in H1.
 rewrite H1; clear H1.
 rewrite angle_eucl_dist_symmetry.
-apply (rngl_lt_le_trans Hor _ (angle_eucl_dist 0 (θ /₂^ m))). {
-  apply angle_eucl_dist_lt_cos_lt.
+apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (θ /₂^ m))). {
+  apply angle_eucl_dist_le_cos_le.
   do 2 rewrite angle_sub_0_r.
+  apply rngl_cos_decr.
+(* ouais, je pense que ça devrait le faire *)
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+apply AngleEuclDistLtAngleLtLt.quadrant_1_sin_sub_nonneg_cos_lt.
 ...
 Search (angle_eucl_dist _ _ = angle_eucl_dist _ _).
 Search (angle_eucl_dist _ 0 < _)%L.
