@@ -256,26 +256,25 @@ apply angle_nle_gt in H1.
 now apply H1, Hni.
 Qed.
 
+Definition angle_div_nat θ n θ' :=
+  angle_lim (seq_angle_to_div_nat θ n) θ'.
+
 (* to be completed
-Theorem angle_div_nat_exists :
+Theorem angle_div_nat_spec :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
-  ∀ n θ, n ≠ 0 →
-  ∃ θ', (n * θ')%A = θ.
+  ∀ θ n θ',
+  n ≠ 0
+  → angle_div_nat θ n θ'
+  → (n * θ')%A = θ.
 Proof.
 destruct_ac.
 intros Hcz Har Hco.
-intros * Hnz.
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-  exists θ; subst n.
-  apply angle_mul_1_l.
-}
-specialize (seq_angle_to_div_nat_has_limit Har Hco n θ) as H1.
-destruct H1 as (θ', Hlim).
-exists θ'.
+intros * Hnz Hdn.
+progress unfold angle_div_nat in Hdn.
+rename Hdn into Hlim.
 specialize (angle_lim_mul n _ _ Hlim) as H1.
-(*1*)
 enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
   apply (limit_unique Hon Hop Hiv Hor) with (lim1 := (n * θ')%A) in H2. {
     easy.
@@ -326,6 +325,7 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     apply angle_mul_nat_overflow_div_pow2.
     apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
     eapply Nat.le_trans; [ | apply Hm ].
+...
 (*
 en ≤ n/ε
 *)
