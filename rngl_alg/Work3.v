@@ -265,13 +265,20 @@ Theorem angle_div_nat_spec :
   rngl_is_archimedean T = true →
   rngl_is_complete T →
   ∀ θ n θ',
-  n ≠ 0
-  → angle_div_nat θ n θ'
-  → (n * θ')%A = θ.
+  angle_div_nat θ n θ'
+  → (n = 0 ∧ θ' = 0%A) ∨ (n * θ')%A = θ.
 Proof.
 destruct_ac.
 intros Hcz Har Hco.
-intros * Hnz Hdn.
+intros * Hdn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  left; split; [ easy | subst n ].
+  progress unfold angle_div_nat in Hdn.
+  progress unfold seq_angle_to_div_nat in Hdn.
+  cbn in Hdn.
+  now apply angle_lim_const in Hdn.
+}
+right.
 progress unfold angle_div_nat in Hdn.
 rename Hdn into Hlim.
 specialize (angle_lim_mul n _ _ Hlim) as H1.
@@ -286,9 +293,9 @@ enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
 }
 clear θ' Hlim H1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
   intros ε Hε.
-  rewrite (H1 ε) in Hε.
+  rewrite (H2 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
 eapply (angle_lim_eq_compat 0 0). {
@@ -299,8 +306,12 @@ eapply (angle_lim_eq_compat 0 0). {
   easy.
 }
 intros ε Hε.
-specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / ε))%L as H1.
-destruct H1 as (en, Hen).
+specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / ε))%L as H2.
+destruct H2 as (en, Hen).
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hen. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
 exists (Nat.log2_up en).
 intros m Hm.
 rewrite <- (angle_div_2_pow_mul_2_pow m θ) at 2.
@@ -309,10 +320,10 @@ rewrite angle_eucl_dist_move_0_r.
 rewrite <- angle_mul_sub_distr_r. 2: {
   apply Nat.Div0.mul_div_le.
 }
-specialize (Nat.div_mod (2 ^ m) n Hnz) as H1.
-symmetry in H1.
-apply Nat.add_sub_eq_l in H1.
-rewrite H1; clear H1.
+specialize (Nat.div_mod (2 ^ m) n Hnz) as H2.
+symmetry in H2.
+apply Nat.add_sub_eq_l in H2.
+rewrite H2; clear H2.
 rewrite angle_eucl_dist_symmetry.
 apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
   apply angle_eucl_dist_le_cos_le.
@@ -323,10 +334,29 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
       apply Nat.lt_le_incl, (Nat.mod_upper_bound _ _ Hnz).
     }
     apply angle_mul_nat_overflow_div_pow2.
-    apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
-    eapply Nat.le_trans; [ | apply Hm ].
+    eapply Nat.le_trans. 2: {
+      apply (Nat.pow_le_mono_r 2) in Hm; [ apply Hm | easy ].
+    }
+    apply (Nat.le_trans _ en). 2: {
+      apply Nat.log2_up_spec.
+      destruct en. {
+        cbn in Hen.
+        rewrite rngl_add_0_r in Hen.
+        destruct Hen as (_, Hen).
+        apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hen; [ | easy ].
+        rewrite (rngl_mul_1_l Hon) in Hen.
+...
+      }
+      destruct en; [ exfalso | flia ].
+...
+Search (_ → _ ≤ _ ^ _).
+Search (_ ≤ 2 ^ Nat.log2_up _).
 ...
 (*
+en = n/ε
+n = ε.en
+
+2 ^ en ≤ 2 ^ (n/ε) < 2 ^ (en + 1)
 en ≤ n/ε
 *)
 Search (_ ^ _ ≤ _ ^ _).
