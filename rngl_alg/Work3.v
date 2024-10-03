@@ -340,6 +340,48 @@ symmetry in H2.
 apply Nat.add_sub_eq_l in H2.
 rewrite H2; clear H2.
 rewrite angle_eucl_dist_symmetry.
+destruct (le_dec en 1) as [Hen1| Hen1]. {
+  destruct en. {
+    cbn in Hen.
+    rewrite rngl_add_0_r in Hen.
+    destruct Hen as (_, Hen).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hen. 2: {
+      apply rngl_min_glb_lt; [ | easy ].
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_1_l Hon) in Hen.
+    apply (rngl_min_glb_lt_iff Hor) in Hen.
+    destruct Hen as (H, _).
+    rewrite <- rngl_of_nat_1 in H.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
+    now apply Nat.lt_1_r in H.
+  }
+  destruct en; [ | now do 3 apply Nat.succ_le_mono in Hen1 ].
+  cbn in Hen.
+  rewrite rngl_add_0_r in Hen.
+  destruct Hen as (H1n, Hn2).
+  apply (rngl_le_div_r Hon Hop Hiv Hor) in H1n. 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_1_l Hon) in H1n.
+  apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hn2. 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hn2. 2: {
+    apply (rngl_0_le_2 Hon Hop Hor).
+  }
+  rewrite (rngl_mul_1_r Hon) in Hn2.
+  apply (rngl_min_glb_lt_iff Hor) in Hn2.
+  destruct Hn2 as (H, _).
+  rewrite <- rngl_of_nat_2 in H.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now do 2 apply Nat.succ_lt_mono in H.
+}
+apply Nat.nle_gt in Hen1.
 apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
   apply angle_eucl_dist_le_cos_le.
   do 2 rewrite angle_sub_0_r.
@@ -352,48 +394,7 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     eapply Nat.le_trans. 2: {
       apply (Nat.pow_le_mono_r 2) in Hm; [ apply Hm | easy ].
     }
-    apply (Nat.le_trans _ en). 2: {
-      apply Nat.log2_up_spec.
-      destruct en. {
-        cbn in Hen.
-        rewrite rngl_add_0_r in Hen.
-        destruct Hen as (_, Hen).
-        apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hen. 2: {
-          apply rngl_min_glb_lt; [ | easy ].
-          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-        }
-        rewrite (rngl_mul_1_l Hon) in Hen.
-        apply (rngl_min_glb_lt_iff Hor) in Hen.
-        destruct Hen as (H, _).
-        rewrite <- rngl_of_nat_1 in H.
-        apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
-        now apply Nat.lt_1_r in H.
-      }
-      destruct en; [ exfalso | flia ].
-      cbn in Hen.
-      rewrite rngl_add_0_r in Hen.
-      destruct Hen as (H1n, Hn2).
-      apply (rngl_le_div_r Hon Hop Hiv Hor) in H1n. 2: {
-        apply rngl_min_glb_lt; [ | easy ].
-        apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-      }
-      rewrite (rngl_mul_1_l Hon) in H1n.
-      apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hn2. 2: {
-        apply rngl_min_glb_lt; [ | easy ].
-        apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
-      }
-      rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hn2. 2: {
-        apply (rngl_0_le_2 Hon Hop Hor).
-      }
-      rewrite (rngl_mul_1_r Hon) in Hn2.
-      apply (rngl_min_glb_lt_iff Hor) in Hn2.
-      destruct Hn2 as (H, _).
-      rewrite <- rngl_of_nat_2 in H.
-      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
-      destruct n; [ easy | ].
-      destruct n; [ easy | ].
-      now do 2 apply Nat.succ_lt_mono in H.
-    }
+    apply (Nat.le_trans _ en); [ | now apply Nat.log2_up_spec ].
     destruct Hen as (Hen, Hne).
     apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hne. 2: {
       apply rngl_min_glb_lt; [ | easy ].
@@ -410,6 +411,13 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     now apply -> Nat.lt_succ_r in Hne.
   }
   apply angle_mul_div_pow2_le_straight.
+  apply (Nat.le_trans _ (2 ^ Nat.log2_up en)). 2: {
+    now apply Nat.pow_le_mono.
+  }
+  eapply (Nat.le_trans _ en). 2: {
+    apply Nat.log2_log2_up_spec.
+    now destruct en.
+  }
 ...
 (*
 en = n/ε
