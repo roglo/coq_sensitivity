@@ -279,6 +279,19 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply angle_lim_const in Hdn.
 }
 right.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  subst n; rewrite angle_mul_1_l.
+  progress unfold angle_div_nat in Hdn.
+  progress unfold seq_angle_to_div_nat in Hdn.
+  eapply (angle_lim_eq_compat 0 0) in Hdn. 2: {
+    intros i.
+    rewrite Nat.add_0_r.
+    rewrite Nat.div_1_r.
+    rewrite angle_div_2_pow_mul_2_pow.
+    easy.
+  }
+  now apply angle_lim_const in Hdn.
+}
 progress unfold angle_div_nat in Hdn.
 rename Hdn into Hlim.
 specialize (angle_lim_mul n _ _ Hlim) as H1.
@@ -292,6 +305,7 @@ enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
   }
 }
 clear θ' Hlim H1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
   intros ε Hε.
@@ -306,10 +320,13 @@ eapply (angle_lim_eq_compat 0 0). {
   easy.
 }
 intros ε Hε.
-specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / ε))%L as H2.
+specialize (int_part Hon Hop Hc1 Hor Har (rngl_of_nat n / rngl_min 1 ε))%L as H2.
 destruct H2 as (en, Hen).
 rewrite (rngl_abs_nonneg_eq Hop Hor) in Hen. 2: {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ | easy ].
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
   apply (rngl_of_nat_nonneg Hon Hop Hor).
 }
 exists (Nat.log2_up en).
@@ -317,9 +334,7 @@ intros m Hm.
 rewrite <- (angle_div_2_pow_mul_2_pow m θ) at 2.
 rewrite angle_eucl_dist_symmetry.
 rewrite angle_eucl_dist_move_0_r.
-rewrite <- angle_mul_sub_distr_r. 2: {
-  apply Nat.Div0.mul_div_le.
-}
+rewrite <- angle_mul_sub_distr_r; [ | apply Nat.Div0.mul_div_le ].
 specialize (Nat.div_mod (2 ^ m) n Hnz) as H2.
 symmetry in H2.
 apply Nat.add_sub_eq_l in H2.
@@ -343,14 +358,58 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
         cbn in Hen.
         rewrite rngl_add_0_r in Hen.
         destruct Hen as (_, Hen).
-        apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hen; [ | easy ].
+        apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hen. 2: {
+          apply rngl_min_glb_lt; [ | easy ].
+          apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+        }
         rewrite (rngl_mul_1_l Hon) in Hen.
-...
+        apply (rngl_min_glb_lt_iff Hor) in Hen.
+        destruct Hen as (H, _).
+        rewrite <- rngl_of_nat_1 in H.
+        apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
+        now apply Nat.lt_1_r in H.
       }
       destruct en; [ exfalso | flia ].
-...
-Search (_ → _ ≤ _ ^ _).
-Search (_ ≤ 2 ^ Nat.log2_up _).
+      cbn in Hen.
+      rewrite rngl_add_0_r in Hen.
+      destruct Hen as (H1n, Hn2).
+      apply (rngl_le_div_r Hon Hop Hiv Hor) in H1n. 2: {
+        apply rngl_min_glb_lt; [ | easy ].
+        apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+      }
+      rewrite (rngl_mul_1_l Hon) in H1n.
+      apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hn2. 2: {
+        apply rngl_min_glb_lt; [ | easy ].
+        apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+      }
+      rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hn2. 2: {
+        apply (rngl_0_le_2 Hon Hop Hor).
+      }
+      rewrite (rngl_mul_1_r Hon) in Hn2.
+      apply (rngl_min_glb_lt_iff Hor) in Hn2.
+      destruct Hn2 as (H, _).
+      rewrite <- rngl_of_nat_2 in H.
+      apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
+      destruct n; [ easy | ].
+      destruct n; [ easy | ].
+      now do 2 apply Nat.succ_lt_mono in H.
+    }
+    destruct Hen as (Hen, Hne).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hne. 2: {
+      apply rngl_min_glb_lt; [ | easy ].
+      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+    }
+    rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hne. 2: {
+      apply (rngl_of_nat_nonneg Hon Hop Hor).
+    }
+    rewrite (rngl_mul_1_r Hon) in Hne.
+    apply (rngl_min_glb_lt_iff Hor) in Hne.
+    destruct Hne as (Hne, Hnee).
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
+    rewrite Nat.add_1_r in Hne.
+    now apply -> Nat.lt_succ_r in Hne.
+  }
+  apply angle_mul_div_pow2_le_straight.
 ...
 (*
 en = n/ε
