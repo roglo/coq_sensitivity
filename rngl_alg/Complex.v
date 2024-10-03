@@ -5259,9 +5259,7 @@ apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
   apply angle_mul_nat_overflow_pow_div.
 }
 apply Nat.Div0.div_le_upper_bound.
-rewrite Nat.mul_comm.
-apply Nat_mul_le_pos_r.
-now apply -> Nat.succ_le_mono.
+now apply Nat.le_mul_l.
 Qed.
 
 Theorem angle_lim_seq_angle_le :

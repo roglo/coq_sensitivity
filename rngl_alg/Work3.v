@@ -355,7 +355,9 @@ destruct (le_dec en 1) as [Hen1| Hen1]. {
     destruct Hen as (H, _).
     rewrite <- rngl_of_nat_1 in H.
     apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H.
-    flia H Hnz.
+    destruct n; [ easy | ].
+    cbn in H.
+    now apply Nat.succ_lt_mono in H.
   }
   apply Nat.succ_le_mono in Hen1.
   apply Nat.le_0_r in Hen1.
@@ -411,7 +413,10 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     apply (rngl_min_glb_lt_iff Hor) in Hne.
     destruct Hne as (Hne, Hnee).
     apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
-    flia Hne.
+    rewrite Nat.add_1_r in Hne.
+    apply -> Nat.lt_succ_r in Hne.
+    apply (Nat.le_trans _ (2 * n)); [ | apply Hne ].
+    now apply Nat.le_mul_l.
   }
   apply angle_mul_div_pow2_le_straight.
   apply (Nat.le_trans _ (2 ^ Nat.log2_up en)). 2: {

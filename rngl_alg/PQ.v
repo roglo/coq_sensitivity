@@ -229,9 +229,11 @@ Global Instance PQif_PQeq_morph {P Q : Prop} :
 Proof.
 intros x1 x2 Hx y1 y2 Hy.
 move y1 before x2; move y2 before y1.
-destruct (PQeq_dec x1 y1) as [H1| H1]; rewrite Hx, Hy in H1.
--now destruct (PQeq_dec x2 y2).
--now destruct (PQeq_dec x2 y2).
+destruct (PQeq_dec x1 y1) as [H1| H1]; rewrite Hx, Hy in H1. {
+  now destruct (PQeq_dec x2 y2).
+} {
+  now destruct (PQeq_dec x2 y2).
+}
 Qed.
 
 (* inequality *)
@@ -269,9 +271,11 @@ Proof.
 intros (xn, xd) (yn, yd).
 progress unfold PQlt, PQle, nd; simpl.
 destruct (lt_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
-  as [H1| H1].
--now left.
--now right; apply Nat.nlt_ge.
+  as [H1| H1]. {
+  now left.
+} {
+  now right; apply Nat.nlt_ge.
+}
 Qed.
 
 Theorem PQle_lt_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {(y < x)%PQ}.
@@ -279,9 +283,11 @@ Proof.
 intros (xn, xd) (yn, yd).
 progress unfold PQlt, PQle, nd; simpl.
 destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
-  as [H1| H1].
--now left.
--now right; apply Nat.nle_gt.
+  as [H1| H1]. {
+  now left.
+} {
+  now right; apply Nat.nle_gt.
+}
 Qed.
 
 Theorem PQle_dec : ∀ x y : PQ, {(x ≤ y)%PQ} + {¬ (x ≤ y)%PQ}.
@@ -289,9 +295,11 @@ Proof.
 intros (xn, xd) (yn, yd).
 progress unfold PQlt, PQle, nd; simpl.
 destruct (le_dec ((nn xn + 1) * (nn yd + 1)) ((nn yn + 1) * (nn xd + 1)))
-  as [H1| H1].
--now left.
--now right.
+  as [H1| H1]. {
+  now left.
+} {
+  now right.
+}
 Qed.
 
 Ltac split_var x :=
@@ -377,10 +385,12 @@ assert (H : ∀ x1 x2 y1 y2,
 }
 intros x1 x2 Hx y1 y2 Hy.
 move y1 before x2; move y2 before y1.
-split; intros Hxy.
--now apply (H x1 x2 y1 y2).
--symmetry in Hx, Hy.
- now apply (H x2 x1 y2 y1).
+split; intros Hxy. {
+  now apply (H x1 x2 y1 y2).
+} {
+  symmetry in Hx, Hy.
+  now apply (H x2 x1 y2 y1).
+}
 Qed.
 
 Global Instance PQge_morph : Proper (PQeq ==> PQeq ==> iff) PQge.
@@ -410,11 +420,13 @@ rewrite Nat.sub_add; [ | do 2 rewrite Nat.add_1_r; simpl; flia ].
 split_var x1q; split_var x2q; split_var y1q; split_var y2q.
 move Hx before Hy.
 ring_simplify.
-rewrite Nat.add_comm; f_equal.
--replace (y1q0 * x1q1 * x2q1 * y2q1) with (y1q0 * y2q1 * x1q1 * x2q1) by flia.
- rewrite Hy; flia.
--replace (x1q0 * y1q1 * x2q1) with (x1q0 * x2q1 * y1q1) by flia.
- rewrite Hx; flia.
+rewrite Nat.add_comm; f_equal. {
+  replace (y1q0 * x1q1 * x2q1 * y2q1) with (y1q0 * y2q1 * x1q1 * x2q1) by flia.
+  rewrite Hy; flia.
+} {
+  replace (x1q0 * y1q1 * x2q1) with (x1q0 * x2q1 * y1q1) by flia.
+  rewrite Hx; flia.
+}
 Qed.
 
 Theorem PQsub_morph : ∀ x1 x2 y1 y2,
@@ -1741,7 +1753,7 @@ destruct a.
  +rewrite Nat.sub_add.
   *rewrite Nat.sub_add; [ | easy ].
    do 2 rewrite Nat.add_1_r.
-   eapply Nat.le_trans; [ | apply Nat_mul_le_pos_r; flia ].
+   eapply Nat.le_trans; [ | now apply Nat.le_mul_r ].
    do 2 rewrite Nat.add_1_r in Ha.
    rewrite <- Nat.Lcm0.divide_div_mul_exact.
   --rewrite Nat.mul_comm, Nat.div_mul; [ flia | easy ].

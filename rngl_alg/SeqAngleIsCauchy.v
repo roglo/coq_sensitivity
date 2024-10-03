@@ -50,11 +50,7 @@ intros * Hnz.
 progress unfold seq_angle_to_div_nat.
 assert (Hin : 2 ^ i / n ≤ 2 ^ i). {
   apply Nat.Div0.div_le_upper_bound.
-  (* lemma *)
-  rewrite Nat.mul_comm.
-  apply Nat_mul_le_pos_r.
-  destruct n; [ easy | ].
-  now apply -> Nat.succ_le_mono.
+  now apply Nat.le_mul_l.
 }
 rewrite <- angle_mul_nat_div_2. 2: {
   apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)); [ easy | ].
@@ -379,8 +375,7 @@ apply Nat.mul_le_mono_pos_l in Hni; [ | easy ].
 rewrite angle_mul_nat_div_2. 2: {
   apply angle_mul_nat_overflow_div_pow2.
   apply (Nat.le_trans _ (2 * n)); [ | easy ].
-  apply Nat_mul_le_pos_l.
-  now apply -> Nat.succ_le_mono.
+  now apply Nat.le_mul_l.
 }
 apply angle_div_2_le_compat.
 now apply angle_mul_div_pow2_le_straight.
@@ -538,8 +533,7 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   destruct p; [ flia Hpq | ].
   do 2 rewrite Nat.pow_succ_r'.
   rewrite Nat.mul_assoc.
-  apply Nat_mul_le_pos_r.
-  apply Nat.neq_0_lt_0.
+  apply Nat.le_mul_r.
   now apply Nat.pow_nonzero.
 }
 apply (rngl_nlt_ge Hor) in Hze.

@@ -288,20 +288,6 @@ rewrite IHc; [ | easy ].
 now rewrite Nat.Div0.mul_mod_idemp_r.
 Qed.
 
-Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ b → a ≤ b * a.
-Proof.
-intros * Ha.
-rewrite <- (Nat.mul_1_l a) at 1.
-now apply Nat.mul_le_mono_nonneg_r.
-Qed.
-
-Theorem Nat_mul_le_pos_r : ∀ a b, 1 ≤ b → a ≤ a * b.
-Proof.
-intros * Ha.
-replace a with (a * 1) at 1 by apply Nat.mul_1_r.
-now apply Nat.mul_le_mono_nonneg_l.
-Qed.
-
 Theorem Nat_mul_mod_cancel_r : ∀ a b c n,
   Nat.gcd c n = 1
   → a * c ≡ (b * c) mod n

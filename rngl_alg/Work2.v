@@ -590,8 +590,7 @@ apply angle_mul_le_mono_r. {
   apply Nat.Div0.div_le_upper_bound.
   now apply Nat.mul_le_mono_r.
 }
-apply Nat_mul_le_pos_l.
-now apply -> Nat.succ_le_mono.
+now apply Nat.le_mul_l.
 Qed.
 
 Theorem angle_add_overflow_mul_by_lt_4 :
@@ -623,8 +622,7 @@ apply angle_mul_le_mono_r. {
   rewrite Nat.mul_comm.
   now apply Nat.mul_le_mono_l.
 }
-apply Nat_mul_le_pos_l.
-now apply -> Nat.succ_le_mono.
+now apply Nat.le_mul_l.
 Qed.
 
 Theorem angle_add_overflow_mul_by_lt_5 :
