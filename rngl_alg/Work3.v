@@ -411,6 +411,7 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     now apply -> Nat.lt_succ_r in Hne.
   }
   apply angle_mul_div_pow2_le_straight.
+(**)
   apply (Nat.le_trans _ (2 ^ Nat.log2_up en)). 2: {
     now apply Nat.pow_le_mono.
   }
@@ -418,6 +419,20 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
     apply Nat.log2_log2_up_spec.
     now destruct en.
   }
+  destruct Hen as (Hen, Hne).
+  apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hne. 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hne. 2: {
+    apply (rngl_of_nat_nonneg Hon Hop Hor).
+  }
+  rewrite (rngl_mul_1_r Hon) in Hne.
+  apply (rngl_min_glb_lt_iff Hor) in Hne.
+  destruct Hne as (Hne, Hnee).
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
+  rewrite Nat.add_1_r in Hne.
+  apply -> Nat.lt_succ_r in Hne.
 ...
 (*
 en = n/ε
