@@ -413,7 +413,14 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 ((n - 1) * (θ /₂^ m)))). {
     apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
     now apply Nat.lt_le_incl in Hne.
   }
+...
   apply angle_mul_div_pow2_le_straight.
+(*
+  en = n/min(1,ε)
+  n = en * min(1,ε)
+  n ≤ en
+  2 ^ lnu(en) ≤ 2 ^ n
+ *)
 (**)
   apply (Nat.le_trans _ (2 ^ Nat.log2_up en)). 2: {
     now apply Nat.pow_le_mono.
