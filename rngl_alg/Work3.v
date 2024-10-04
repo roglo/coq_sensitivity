@@ -403,6 +403,43 @@ assert (Hnm : 2 * n ≤ 2 ^ m). {
   apply Nat.log2_log2_up_spec.
   now destruct en.
 }
+eapply (rngl_le_lt_trans Hor); [ apply angle_eucl_dist_mul_le | ].
+rewrite (rngl_mul_comm Hic).
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+apply rngl_cos_lt_angle_eucl_dist_lt. {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    rewrite <- rngl_of_nat_0.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    now apply Nat.neq_0_lt_0.
+  }
+  rewrite (rngl_mul_0_l Hos).
+  now apply (rngl_lt_le_incl Hor) in Hε.
+}
+rewrite angle_sub_0_l; cbn.
+...
+Search (_ - _ < rngl_cos _)%L.
+Search (_ < rngl_cos (_ /₂^ _))%L.
+Search (1 - _ < rngl_cos _)%L.
+...
+Search (angle_eucl_dist _ _ < _)%L.
+...
+Check angle_eucl_dist_div_2_pow_0_lt.
+...
+Search ( * _ < _)%L.
+Search (_ < _ / _)%L.
+
+Search (angle_eucl_dist (_ * _) _ < _)%L.
+Search (angle_eucl_dist (_ * _) _)%L.
+angle_eucl_dist_mul_le:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T},
+    angle_ctx T
+    → ∀ (n : nat) (θ : angle T), (angle_eucl_dist (n * θ) 0 ≤ rngl_of_nat n * angle_eucl_dist θ 0)%L
+Search (angle_eucl_dist (_ /₂^ _) _ < _)%L.
+About angle_eucl_dist_div_2_pow_0_lt.
 ...
 (*
  en = 2n/ε
