@@ -352,7 +352,134 @@ eapply (angle_lim_eq_compat 0 0). {
 }
 rewrite <- angle_opp_0.
 apply angle_lim_opp.
+enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
+  intros ε Hε.
+  specialize (H ε Hε).
+  destruct H as (N, HN).
+  exists (Nat.max N (Nat.log2_up (2 * n))).
+  intros m Hm.
+  specialize (HN m).
+  assert (H : N ≤ m). {
+    eapply Nat.le_trans; [ | apply Hm ].
+    apply Nat.le_max_l.
+  }
+  specialize (HN H); clear H.
+  eapply (rngl_le_lt_trans Hor); [ | apply HN ].
+  assert (Hnm : Nat.log2_up (2 * n) ≤ m). {
+    eapply Nat.le_trans; [ | apply Hm ].
+    apply Nat.le_max_r.
+  }
+  apply (Nat.pow_le_mono_r 2) in Hnm; [ | easy ].
+  apply angle_le_angle_eucl_dist_le. {
+    eapply angle_le_trans. {
+      apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        apply Nat.mod_upper_bound.
+        apply Hnz.
+      }
+      apply angle_mul_nat_overflow_div_pow2.
+      eapply Nat.le_trans; [ | apply Hnm ].
+      apply (Nat.le_trans _ (2 * n)). {
+        flia Hnz Hn1.
+      }
+      apply Nat.log2_log2_up_spec.
+      apply Nat.neq_0_lt_0.
+      flia Hnz Hn1.
+    }
+    apply angle_mul_div_pow2_le_straight.
+    eapply Nat.le_trans; [ | apply Hnm ].
+    apply Nat.log2_log2_up_spec.
+    apply Nat.neq_0_lt_0.
+    flia Hnz Hn1.
+  } {
+    apply angle_mul_div_pow2_le_straight.
+    eapply Nat.le_trans; [ | apply Hnm ].
+    apply Nat.log2_log2_up_spec.
+    apply Nat.neq_0_lt_0.
+    flia Hnz Hn1.
+  }
+  apply angle_mul_le_mono_r. 2: {
+    apply Nat.lt_le_incl.
+    now apply Nat.mod_upper_bound.
+  }
+  apply angle_mul_nat_overflow_div_pow2.
+  eapply Nat.le_trans; [ | apply Hnm ].
+  apply (Nat.le_trans _ (2 * n)). {
+    flia Hnz Hn1.
+  }
+  apply Nat.log2_log2_up_spec.
+  apply Nat.neq_0_lt_0.
+  flia Hnz Hn1.
+}
+intros ε Hε.
+exists (Nat.log2_up n).
+intros m Hm.
+apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+...
+Search (_ * _ ≤ angle_straight)%A.
+...
+      specialize (Nat.le_max_r N (Nat.log2_up n)) as H1.
+...
+Search (angle_mul_nat_overflow _ (_ /₂^ _) = false).
+...
+apply angle_mul_le_mono_r.
+
+Search (angle_eucl_dist _ _ ≤ angle_eucl_dist _ _)%L.
+  apply rngl_cos_le_iff_angle_eucl_le.
+...
+eapply Work.angle_lim_0_le_if.
+  intros i.
+  split. {
+...
+    apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        apply Nat.mod_upper_bound.
+        apply Hnz.
+      }
+...
+apply (angle_lim_eq_compat 0 n) with (f := λ i, (n * (θ /₂^ i))%A). {
+  intros i.
+  rewrite Nat.add_0_r.
+...
 destruct (angle_le_dec θ angle_straight) as [Hts| Hts]. {
+  eapply Work.angle_lim_0_le_if. {
+    intros i.
+    split. {
+      apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        apply Nat.mod_upper_bound.
+        apply Hnz.
+      }
+n ≤ 2 ^ i
+...
+Search (angle_lim _ 0).
+...
+  apply (angle_lim_eq_compat 0 n) with (f := λ i, (n * (θ /₂^ i))%A). {
+    intros i.
+    rewrite Nat.add_0_r.
+...
+  eapply Work.angle_lim_0_le_if. {
+    intros i.
+    split. {
+      apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        apply Nat.mod_upper_bound.
+        apply Hnz.
+      }
+...
+  eapply (angle_lim_eq_compat 0 n). {
+    intros i.
+    rewrite Nat.add_0_r; symmetry.
+    easy
+...
+  eapply Work.angle_lim_0_le_if. {
+    intros i.
+    split. {
+      apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        now apply Nat.mod_upper_bound.
+      }
+...
   eapply (angle_lim_eq_compat 0 n). {
     intros i.
     rewrite Nat.add_0_r; symmetry.
