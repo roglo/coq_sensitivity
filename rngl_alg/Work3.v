@@ -356,6 +356,20 @@ destruct Hne as (Hne, Hnee).
 apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
 rewrite Nat.add_1_r in Hne.
 apply -> Nat.lt_succ_r in Hne.
+rewrite (rngl_of_nat_mul Hon Hos) in Hnee.
+rewrite rngl_of_nat_2 in Hnee.
+apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hnee. 2: {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now apply Nat.neq_0_lt_0.
+}
+rewrite <- (rngl_mul_div_assoc Hiv) in Hnee.
+rewrite (rngl_mul_comm Hic) in Hnee.
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hnee. 2: {
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now rewrite Nat.add_1_r.
+}
 destruct (le_dec en 3) as [Hen3| Hen3]. {
   exfalso; apply Nat.nlt_ge in Hen3.
   apply Hen3; clear Hen3.
@@ -410,16 +424,27 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
   apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
   now apply Nat.neq_0_lt_0.
 }
-apply rngl_cos_lt_angle_eucl_dist_lt. {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    rewrite <- rngl_of_nat_0.
-    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-    now apply Nat.neq_0_lt_0.
-  }
-  rewrite (rngl_mul_0_l Hos).
-  now apply (rngl_lt_le_incl Hor) in Hε.
+eapply (rngl_le_lt_trans Hor); [ | now apply Hnee ].
+eapply (rngl_le_trans Hor). {
+  apply angle_eucl_dist_le_twice_twice_div_2_div_2.
 }
-rewrite angle_sub_0_l; cbn.
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+rewrite angle_0_div_2.
+rewrite <- angle_div_2_pow_succ_r_1.
+...
+apply (rngl_lt_le_incl Hor).
+apply rngl_cos_lt_angle_eucl_dist_lt. {
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now rewrite Nat.add_1_r.
+}
+rewrite angle_sub_0_l; cbn - [ angle_div_2_pow ].
 ...
 Search (_ - _ < rngl_cos _)%L.
 Search (_ < rngl_cos (_ /₂^ _))%L.
