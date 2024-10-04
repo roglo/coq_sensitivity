@@ -692,21 +692,6 @@ intros.
 apply rngl_cos_sin_nx.
 Qed.
 
-Theorem angle_lim_move_0_r :
-  ∀ f θ, angle_lim f θ → angle_lim (λ i, (f i - θ)%A) 0%A.
-Proof.
-intros * Hlim.
-progress unfold angle_lim in Hlim.
-progress unfold angle_lim.
-intros ε Hε.
-specialize (Hlim ε Hε).
-destruct Hlim as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-now rewrite angle_eucl_dist_move_0_r in HN.
-Qed.
-
 Theorem angle_lim_0_le_if :
   ∀ f g,
   (∀ i, (f i ≤ g i ≤ angle_straight)%A)
@@ -736,19 +721,6 @@ intros * H12.
 rewrite (angle_eucl_dist_symmetry θ2).
 apply angle_dist_le_r; [ easy | ].
 split; [ apply angle_nonneg | easy ].
-Qed.
-
-Theorem angle_lim_opp :
-  ∀ f θ, angle_lim f θ → angle_lim (λ i, (- f i)%A) (- θ).
-Proof.
-intros * Hft.
-intros ε Hε.
-specialize (Hft ε Hε).
-destruct Hft as (N, HN).
-exists N.
-intros n Hn.
-rewrite angle_eucl_dist_opp_opp.
-now apply HN.
 Qed.
 
 Theorem angle_same_lim_sub :
@@ -1146,6 +1118,7 @@ apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
   now apply (rngl_lt_le_incl Hor) in Hc.
 } {
   now rewrite rngl_cos_right_div_2.
+
 } {
   cbn - [ angle_div_2 ].
   rewrite rngl_sin_right_div_2.

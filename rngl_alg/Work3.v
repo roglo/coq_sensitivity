@@ -31,6 +31,19 @@ intros * Hfg Hf.
 eapply is_limit_when_tending_to_inf_eq_compat; [ apply Hfg | easy ].
 Qed.
 
+Theorem angle_lim_opp :
+  ∀ f θ, angle_lim f θ → angle_lim (λ i, (- f i)%A) (- θ).
+Proof.
+intros * Hft.
+intros ε Hε.
+specialize (Hft ε Hε).
+destruct Hft as (N, HN).
+exists N.
+intros n Hn.
+rewrite angle_eucl_dist_opp_opp.
+now apply HN.
+Qed.
+
 Theorem rngl_sin_is_continuous :
   continuous angle_eucl_dist rngl_dist rngl_sin.
 Proof.
@@ -312,13 +325,70 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H2 ε) in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
+move Hc1 before Hcz.
+move Hii before Hco.
 eapply (angle_lim_eq_compat 0 0). {
   intros i.
   rewrite Nat.add_0_r; symmetry.
   progress unfold seq_angle_to_div_nat.
   rewrite angle_mul_nat_assoc.
+  specialize (Nat.div_mod (2 ^ i) n Hnz) as H1.
+  symmetry in H1.
+  apply Nat.add_sub_eq_r in H1.
+  rewrite <- H1.
+  rewrite angle_mul_sub_distr_r; [ | now apply Nat.Div0.mod_le ].
+  rewrite angle_div_2_pow_mul_2_pow.
   easy.
 }
+(**)
+apply angle_lim_move_0_r.
+eapply (angle_lim_eq_compat 0 0). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  rewrite angle_sub_sub_swap.
+  rewrite angle_sub_diag.
+  rewrite angle_sub_0_l.
+  easy.
+}
+rewrite <- angle_opp_0.
+apply angle_lim_opp.
+destruct (angle_le_dec θ angle_straight) as [Hts| Hts]. {
+  eapply (angle_lim_eq_compat 0 n). {
+    intros i.
+    rewrite Nat.add_0_r; symmetry.
+(* ah, puis zut. Bon, j'y arriverai peut-être tout à l'heure *)
+...
+  eapply Work.angle_lim_0_le_if. {
+    intros i.
+    split. {
+      apply angle_mul_le_mono_r. 2: {
+        apply Nat.lt_le_incl.
+        now apply Nat.mod_upper_bound.
+      }
+...
+      apply angle_mul_le_mono_r; [ | apply Nat.Div0.mod_le ].
+      apply angle_mul_nat_overflow_pow_div.
+    }
+    cbn.
+    now rewrite angle_div_2_pow_mul_2_pow.
+  }
+...
+Search (angle_lim _ 0 → angle_lim _ _).
+...
+eapply (angle_lim_eq_compat 0 0). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+  rewrite <- (angle_div_2_pow_mul_2_pow i θ) at 1.
+  rewrite <- angle_mul_sub_distr_r. 2: {
+    apply Nat.Div0.mul_div_le.
+  }
+  easy.
+}
+...
+eapply (angle_lim_eq_compat 0 0). {
+  intros i.
+  rewrite Nat.add_0_r; symmetry.
+...
 intros ε Hε.
 specialize (int_part Hon Hop Hc1 Hor Har) as H2.
 specialize (H2 (rngl_of_nat (2 * n) / rngl_min 1 ε))%L.
@@ -380,6 +450,13 @@ destruct (le_dec en 3) as [Hen3| Hen3]. {
   now do 3 apply -> Nat.succ_lt_mono.
 }
 apply Nat.nle_gt in Hen3.
+assert (Hnm : 2 * n ≤ 2 ^ m). {
+  apply (Nat.le_trans _ en); [ easy | ].
+  apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+  apply (Nat.le_trans _ (2 ^ Nat.log2_up en)); [ | easy ].
+  apply Nat.log2_log2_up_spec.
+  now destruct en.
+}
 apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
   apply angle_eucl_dist_le_cos_le.
   do 2 rewrite angle_sub_0_r.
@@ -410,13 +487,6 @@ apply (rngl_le_lt_trans Hor _ (angle_eucl_dist 0 (n * (θ /₂^ m)))). {
   now destruct en.
 }
 rewrite angle_eucl_dist_symmetry.
-assert (Hnm : 2 * n ≤ 2 ^ m). {
-  apply (Nat.le_trans _ en); [ easy | ].
-  apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
-  apply (Nat.le_trans _ (2 ^ Nat.log2_up en)); [ | easy ].
-  apply Nat.log2_log2_up_spec.
-  now destruct en.
-}
 eapply (rngl_le_lt_trans Hor); [ apply angle_eucl_dist_mul_le | ].
 rewrite (rngl_mul_comm Hic).
 apply (rngl_lt_div_r Hon Hop Hiv Hor). {

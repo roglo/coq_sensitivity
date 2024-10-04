@@ -2791,4 +2791,27 @@ rewrite rngl_add_0_l in HN.
 now rewrite (rngl_abs_sub_comm Hop Hor) in HN.
 Qed.
 
+Theorem angle_lim_move_0_r :
+  ∀ f θ, angle_lim f θ ↔ angle_lim (λ i, (f i - θ)%A) 0%A.
+Proof.
+intros.
+split; intros Hlim. {
+  intros ε Hε.
+  specialize (Hlim ε Hε).
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  now rewrite angle_eucl_dist_move_0_r in HN.
+} {
+  intros ε Hε.
+  specialize (Hlim ε Hε).
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  now rewrite angle_eucl_dist_move_0_r.
+}
+Qed.
+
 End a.
