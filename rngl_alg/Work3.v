@@ -318,6 +318,21 @@ enough (H2 : angle_lim (λ i, (n * seq_angle_to_div_nat θ n i)%A) θ). {
   }
 }
 clear θ' Hlim H1.
+destruct (angle_eq_dec θ 0) as [Htz| Htz]. {
+  subst θ.
+  eapply (angle_lim_eq_compat 0 0). {
+    intros i.
+    rewrite Nat.add_0_r; symmetry.
+    progress unfold seq_angle_to_div_nat.
+    rewrite angle_0_div_2_pow.
+    do 2 rewrite angle_mul_0_r.
+    easy.
+  }
+  intros ε Hε.
+  exists 0.
+  intros m _.
+  now rewrite angle_eucl_dist_diag.
+}
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
@@ -412,9 +427,43 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   flia Hnz Hn1.
 }
 intros ε Hε.
-exists (Nat.log2_up n).
+exists (Nat.log2_up n + 1).
 intros m Hm.
-apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+assert (Hnm : n < 2 ^ m). {
+  apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
+  eapply Nat.le_lt_trans. {
+    apply Nat.log2_log2_up_spec.
+    now apply Nat.neq_0_lt_0.
+  }
+  eapply Nat.lt_le_trans; [ | apply Hm ].
+  rewrite <- (Nat.mul_1_r (2 ^ Nat.log2_up n)).
+  rewrite Nat.pow_add_r.
+  apply Nat.mul_lt_mono_pos_l; [ | easy ].
+  apply Nat.neq_0_lt_0.
+  intros H.
+  apply Nat.pow_eq_0 in H; [ easy | ].
+  intros H1.
+  apply Nat.log2_up_null in H1.
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply Nat.succ_le_mono in H1.
+}
+eapply (rngl_le_lt_trans Hor). {
+  apply angle_eucl_dist_mul_le.
+}
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  now apply eq_angle_div_2_pow_0 in H.
+}
+...
+Search (Nat.log2_up _ = 0).
+Search (_ ^ _ = 0).
+Search (_ → _ < _ * _).
+apply Nat.
+Search (
 ...
 Search (_ * _ ≤ angle_straight)%A.
 ...
