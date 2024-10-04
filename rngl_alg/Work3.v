@@ -434,7 +434,55 @@ apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 rewrite angle_0_div_2.
+rewrite <- (rngl_div_1_l Hon Hiv).
+...
+apply (rngl_lt_le_incl Hor).
+eapply (angle_eucl_dist_div_2_0_lt (ε / rngl_of_nat n))%L. {
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor). 2: {
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite <- rngl_of_nat_0.
+  apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+  now rewrite Nat.add_1_r.
+}
+2: {
+  apply rngl_sin_div_2_pow_nat_nonneg.
+  intros H; subst m.
+  cbn in Hnm.
+  flia Hnz Hn1 Hnm.
+}
+{
+  rewrite (rngl_squ_sub Hop Hic Hon).
+  rewrite (rngl_squ_1 Hon).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_comm Hic 2).
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+  }
+  rewrite rngl_add_assoc.
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_add_comm _ 1).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite <- rngl_add_assoc.
+  rewrite <- (rngl_sub_sub_distr Hop).
+  remember (1 / rngl_of_nat (en + 1))²%L as x.
+  apply (rngl_le_sub_nonneg Hop Hor).
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_sub_swap Hop).
+  apply (rngl_le_0_sub Hop Hor).
+(* mouais, chais pas *)
+...
+2: {
+  rewrite <- (rngl_add_sub_assoc Hop).
+  rewrite - rngl_add
+2: {
+...
+
 rewrite <- angle_div_2_pow_succ_r_1.
+rewrite angle_div_2_pow_succ_r_2.
+Search (_ * angle_eucl_dist _ _)%L.
 ...
 apply (rngl_lt_le_incl Hor).
 apply rngl_cos_lt_angle_eucl_dist_lt. {
