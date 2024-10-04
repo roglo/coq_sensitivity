@@ -426,6 +426,7 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   apply Nat.neq_0_lt_0.
   flia Hnz Hn1.
 }
+...
 intros ε Hε.
 specialize (int_part Hon Hop Hc1 Hor Har) as H2.
 specialize (H2 (rngl_of_nat n / rngl_min 1 ε))%L.
