@@ -427,27 +427,34 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   flia Hnz Hn1.
 }
 intros ε Hε.
-exists (Nat.log2_up n + 1).
-intros m Hm.
-assert (Hnm : n < 2 ^ m). {
-  apply (Nat.pow_le_mono_r 2) in Hm; [ | easy ].
-  eapply Nat.le_lt_trans. {
-    apply Nat.log2_log2_up_spec.
-    now apply Nat.neq_0_lt_0.
+specialize (int_part Hon Hop Hc1 Hor Har) as H2.
+specialize (H2 (rngl_of_nat n / rngl_min 1 ε))%L.
+destruct H2 as (en, Hen).
+move en before n.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hen. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
-  eapply Nat.lt_le_trans; [ | apply Hm ].
-  rewrite <- (Nat.mul_1_r (2 ^ Nat.log2_up n)).
-  rewrite Nat.pow_add_r.
-  apply Nat.mul_lt_mono_pos_l; [ | easy ].
-  apply Nat.neq_0_lt_0.
-  intros H.
-  apply Nat.pow_eq_0 in H; [ easy | ].
-  intros H1.
-  apply Nat.log2_up_null in H1.
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  now apply Nat.succ_le_mono in H1.
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
 }
+exists (Nat.log2_up en).
+intros m Hm.
+destruct Hen as (Hen, Hne).
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hne. 2: {
+  apply rngl_min_glb_lt; [ | easy ].
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hne. 2: {
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+rewrite (rngl_mul_1_r Hon) in Hne.
+apply (rngl_min_glb_lt_iff Hor) in Hne.
+destruct Hne as (Hne, Hnee).
+apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
+rewrite Nat.add_1_r in Hne.
+apply -> Nat.lt_succ_r in Hne.
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hnee; [ | easy ].
 eapply (rngl_le_lt_trans Hor). {
   apply angle_eucl_dist_mul_le.
 }
@@ -458,6 +465,7 @@ apply (rngl_lt_div_r Hon Hop Hiv Hor). {
   apply angle_eucl_dist_separation in H.
   now apply eq_angle_div_2_pow_0 in H.
 }
+apply (rngl_lt_div_r Hon Hop Hiv Hor).
 ...
 Search (Nat.log2_up _ = 0).
 Search (_ ^ _ = 0).
