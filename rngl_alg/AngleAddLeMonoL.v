@@ -3775,4 +3775,25 @@ specialize (IHb H1 _ Hab).
 now apply angle_add_le_mono_l.
 Qed.
 
+Theorem angle_mul_nat_not_overflow_le_l :
+  ∀ m n,
+  m ≤ n
+  → ∀ θ, angle_mul_nat_overflow n θ = false
+  → angle_mul_nat_overflow m θ = false.
+Proof.
+destruct_ac.
+intros * Hmn * Hn.
+revert θ m Hmn Hn.
+induction n; intros. {
+  now apply Nat.le_0_r in Hmn; subst m.
+}
+apply angle_mul_nat_overflow_succ_l_false in Hn.
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hmn.
+apply angle_mul_nat_overflow_succ_l_false.
+split; [ now apply IHn | ].
+apply (angle_add_overflow_le _ (n * θ)); [ | easy ].
+now apply angle_mul_le_mono_r.
+Qed.
+
 End a.
