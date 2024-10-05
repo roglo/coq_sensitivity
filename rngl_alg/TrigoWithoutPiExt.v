@@ -1357,4 +1357,221 @@ Definition angle_lim :=
 Definition seq_angle_to_div_nat θ (n i : nat) :=
   ((2 ^ i / n) * angle_div_2_pow θ i)%A.
 
+Theorem angle_eucl_dist_opp_opp :
+  ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+cbn.
+f_equal.
+f_equal.
+rewrite (rngl_sub_opp_r Hop).
+rewrite rngl_add_comm.
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_opp_sub_distr Hop).
+apply (rngl_squ_opp Hop).
+Qed.
+
+Theorem angle_eucl_dist_sub_l_diag :
+  ∀ θ Δθ, angle_eucl_dist (θ - Δθ) θ = angle_eucl_dist Δθ 0.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_eucl_dist.
+remember (θ - Δθ)%A as x; cbn; subst x.
+do 4 rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_squ_0 Hos).
+rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+rewrite rngl_add_add_swap.
+rewrite <- (rngl_add_sub_swap Hop (rngl_cos θ)²)%L.
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_add_assoc.
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop 1)%L.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+remember (θ - Δθ)%A as x.
+replace (_ * _ + _ * _)%L with (rngl_cos (θ - x))%A. 2: {
+  cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  now rewrite rngl_sub_opp_r.
+}
+subst x.
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag.
+rewrite angle_add_0_l.
+rewrite <- rngl_add_assoc.
+rewrite cos2_sin2_1.
+rewrite <- (rngl_add_sub_swap Hop).
+now rewrite (rngl_sub_mul_r_diag_l Hon Hop).
+Qed.
+
+Theorem angle_eucl_dist_move_0_l :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ2 - θ1) 0.
+Proof.
+destruct_ac.
+intros.
+replace θ1 with (θ2 - (θ2 - θ1))%A. 2: {
+  rewrite angle_sub_sub_distr.
+  rewrite angle_sub_diag.
+  apply angle_add_0_l.
+}
+rewrite angle_eucl_dist_sub_l_diag.
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag.
+f_equal; symmetry.
+apply angle_add_0_l.
+Qed.
+
+Theorem angle_eucl_dist_move_0_r :
+  ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist (θ1 - θ2) 0.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_eucl_dist_move_0_l.
+rewrite <- angle_eucl_dist_opp_opp.
+rewrite angle_opp_0.
+f_equal.
+apply angle_opp_sub_distr.
+Qed.
+
+Theorem angle_eucl_dist_cos_sin :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ θ, ((angle_eucl_dist θ 0)² = (1 - rngl_cos θ)² + (rngl_sin θ)²)%L.
+Proof.
+intros Hon Hop Hor *.
+progress unfold angle_eucl_dist; cbn.
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_squ_opp Hop).
+apply (rngl_squ_sqrt Hon).
+apply (rngl_add_nonneg_nonneg Hor);
+apply (rngl_squ_nonneg Hop Hor).
+Qed.
+
+Theorem rngl_cos_angle_eucl_dist :
+  ∀ θ, (rngl_cos θ = 1 - (angle_eucl_dist θ 0)² / 2)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
+intros.
+specialize (angle_eucl_dist_cos_sin Hon Hop Hor θ) as H1.
+rewrite (rngl_squ_sub Hop Hic Hon) in H1.
+rewrite (rngl_squ_1 Hon) in H1.
+rewrite (rngl_mul_1_r Hon) in H1.
+rewrite <- rngl_add_assoc in H1.
+rewrite cos2_sin2_1 in H1.
+rewrite <- (rngl_add_sub_swap Hop) in H1.
+rewrite (rngl_sub_mul_r_diag_l Hon Hop) in H1.
+symmetry in H1.
+apply (rngl_mul_move_l Hic Hi1) in H1. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+now apply (rngl_sub_move_l Hop) in H1.
+Qed.
+
+Theorem rngl_cos_le_iff_angle_eucl_le :
+  ∀ θ θ',
+  (rngl_cos θ ≤ rngl_cos θ' ↔ angle_eucl_dist θ' 0 ≤ angle_eucl_dist θ 0)%L.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  split; intros. {
+    rewrite H1, (H1 (angle_eucl_dist _ _)).
+    apply (rngl_le_refl Hor).
+  } {
+    rewrite H1, (H1 (rngl_cos _)).
+    apply (rngl_le_refl Hor).
+  }
+}
+intros.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist _ _)). 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+  apply angle_eucl_dist_is_dist.
+}
+rewrite <- (rngl_abs_nonneg_eq Hop Hor (angle_eucl_dist θ _)). 2: {
+  apply (dist_nonneg Hon Hop Hiv Hor).
+  apply angle_eucl_dist_is_dist.
+}
+do 2 rewrite rngl_cos_angle_eucl_dist.
+split; intros H1. {
+  apply (rngl_sub_le_mono_l Hop Hor) in H1.
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii) in H1. 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_squ_le_abs_le Hop Hor Hii) in H1.
+} {
+  apply (rngl_sub_le_mono_l Hop Hor).
+  apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor Hii). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  now apply (rngl_abs_le_squ_le Hop Hor).
+}
+Qed.
+
+Theorem angle_eucl_dist_nonneg : ∀ θ1 θ2, (0 ≤ angle_eucl_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+intros.
+apply (dist_nonneg Hon Hop Hiv Hor).
+apply angle_eucl_dist_is_dist.
+Qed.
+
+Theorem angle_lim_const :
+  ∀ θ1 θ2, angle_lim (λ _, θ1) θ2 → θ2 = θ1.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  rewrite (H1 θ1); apply H1.
+}
+intros * H1.
+progress unfold angle_lim in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+apply angle_eucl_dist_separation.
+rewrite angle_eucl_dist_symmetry.
+specialize (angle_eucl_dist_nonneg θ1 θ2) as Hzx.
+remember (angle_eucl_dist θ1 θ2) as x eqn:Hx.
+clear θ1 θ2 Hx.
+specialize (proj1 (rngl_lt_eq_cases Hor _ x) Hzx) as H3.
+destruct H3 as [H3| H3]; [ | easy ].
+clear Hzx; exfalso.
+specialize (H1 (x / 2)%L).
+assert (H : (0 < x / 2)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+}
+specialize (H1 H); clear H.
+destruct H1 as (N, HN).
+specialize (HN N (Nat.le_refl _)).
+apply (rngl_nle_gt Hor) in HN.
+apply HN; clear HN.
+apply (rngl_le_div_l Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+rewrite (rngl_mul_2_r Hon).
+apply (rngl_le_add_l Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 End a.
