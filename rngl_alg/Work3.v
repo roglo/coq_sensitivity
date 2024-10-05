@@ -367,81 +367,6 @@ eapply (angle_lim_eq_compat 0 0). {
 }
 rewrite <- angle_opp_0.
 apply angle_lim_opp.
-(*
-Theorem angle_lim_mul_const_is_0 :
-  ∀ n f θ,
-  (∀ i, f i < n)
-  → (∀ i, angle_mul_nat_overflow n (θ i) = false)
-  → angle_lim θ 0
-  → angle_lim (λ i, (f i * θ i)%A) 0.
-Proof.
-destruct_ac.
-intros * Hf Ht Hlim.
-intros ε Hε.
-specialize (Hlim ε Hε).
-destruct Hlim as (N, HN).
-exists (Nat.max N (Nat.log2_up (2 * n))).
-intros m Hm.
-specialize (HN m).
-assert (H : N ≤ m). {
-  eapply Nat.le_trans; [ | apply Hm ].
-  apply Nat.le_max_l.
-}
-specialize (HN H); clear H.
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
-assert (Hnm : Nat.log2_up (2 * n) ≤ m). {
-  eapply Nat.le_trans; [ | apply Hm ].
-  apply Nat.le_max_r.
-}
-apply (Nat.pow_le_mono_r 2) in Hnm; [ | easy ].
-apply angle_le_angle_eucl_dist_le. {
-  eapply angle_le_trans. {
-    apply angle_mul_le_mono_r. 2: {
-      apply Nat.lt_le_incl.
-      apply Hf.
-    }
-    apply Ht.
-  }
-Check angle_mul_nat_overflow_div_pow2.
-  eapply Nat.le_trans; [ | apply Hnm ].
-      apply (Nat.le_trans _ (2 * n)). {
-        flia Hnz Hn1.
-      }
-      apply Nat.log2_log2_up_spec.
-      apply Nat.neq_0_lt_0.
-      flia Hnz Hn1.
-    }
-    apply angle_mul_div_pow2_le_straight.
-    eapply Nat.le_trans; [ | apply Hnm ].
-    apply Nat.log2_log2_up_spec.
-    apply Nat.neq_0_lt_0.
-    flia Hnz Hn1.
-  } {
-    apply angle_mul_div_pow2_le_straight.
-    eapply Nat.le_trans; [ | apply Hnm ].
-    apply Nat.log2_log2_up_spec.
-    apply Nat.neq_0_lt_0.
-    flia Hnz Hn1.
-  }
-  apply angle_mul_le_mono_r. 2: {
-    apply Nat.lt_le_incl.
-    now apply Nat.mod_upper_bound.
-  }
-  apply angle_mul_nat_overflow_div_pow2.
-  eapply Nat.le_trans; [ | apply Hnm ].
-  apply (Nat.le_trans _ (2 * n)). {
-    flia Hnz Hn1.
-  }
-  apply Nat.log2_log2_up_spec.
-  apply Nat.neq_0_lt_0.
-  flia Hnz Hn1.
-...
-apply (angle_lim_mul_const_is_0 n). {
-  intros i.
-  now apply Nat.mod_upper_bound.
-}
-...
-*)
 enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   intros ε Hε.
   specialize (H ε Hε).
@@ -504,7 +429,17 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
 (**)
 rewrite <- (angle_mul_0_r n).
 apply angle_lim_mul.
-Search (angle_lim _ 0).
+intros ε Hε.
+enough (H : ∃ N, ∀ m, N ≤ m → (1 - ε² / 2 < rngl_cos (θ /₂^m))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros m Hm.
+  specialize (HN m Hm).
+  apply rngl_cos_lt_angle_eucl_dist_lt. {
+    now apply (rngl_lt_le_incl Hor) in Hε.
+  }
+  now rewrite angle_sub_0_l.
+}
 ...
 intros ε Hε.
 specialize (int_part Hon Hop Hc1 Hor Har) as H2.
