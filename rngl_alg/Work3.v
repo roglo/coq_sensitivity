@@ -426,6 +426,59 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   apply Nat.neq_0_lt_0.
   flia Hnz Hn1.
 }
+(**)
+rewrite <- (angle_mul_0_r n).
+apply angle_lim_mul.
+intros ε Hε.
+specialize (int_part Hon Hop Hc1 Hor Har) as H2.
+specialize (H2 (rngl_of_nat n / rngl_min 1 ε))%L.
+destruct H2 as (en, Hen).
+move en before n.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hen. 2: {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply rngl_min_glb_lt; [ | easy ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+exists (Nat.log2_up en).
+intros m Hm.
+destruct Hen as (Hen, Hne).
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hne. 2: {
+  apply rngl_min_glb_lt; [ | easy ].
+  apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+}
+rewrite <- (rngl_mul_min_distr_l Hop Hor Hii) in Hne. 2: {
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+}
+rewrite (rngl_mul_1_r Hon) in Hne.
+apply (rngl_min_glb_lt_iff Hor) in Hne.
+destruct Hne as (Hne, Hnee).
+apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in Hne.
+rewrite Nat.add_1_r in Hne.
+apply -> Nat.lt_succ_r in Hne.
+apply (rngl_lt_div_l Hon Hop Hiv Hor) in Hnee; [ | easy ].
+apply (angle_eucl_dist_div_2_pow_0_lt _ ε).
+...
+eapply (rngl_le_lt_trans Hor). {
+  apply angle_eucl_dist_mul_le.
+}
+apply (rngl_lt_div_r Hon Hop Hiv Hor). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply angle_eucl_dist_nonneg | ].
+  intros H; symmetry in H.
+  apply angle_eucl_dist_separation in H.
+  now apply eq_angle_div_2_pow_0 in H.
+}
+apply (rngl_lt_div_r Hon Hop Hiv Hor).
+...
+...
+Search (angle_lim (angle_div_2_pow _)).
+Search (angle_lim (λ _, (_ /₂^ _)%A) _).
+progress unfold angle_lim.
+Search (is_limit_when_tending_to_inf angle_eucl_dist _ 0%A).
+intros ε Hε.
+...
 intros ε Hε.
 enough (H :
   ∃ N, ∀ m, N ≤ m →  (1 - ε² / 2 < rngl_cos (n * (θ /₂^m)))%L). {
