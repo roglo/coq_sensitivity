@@ -1697,4 +1697,14 @@ rewrite (rngl_sub_0_r Hos).
 now rewrite rngl_add_0_l.
 Qed.
 
+Theorem angle_div_2_pow_le :
+  ∀ n θ1 θ2, (θ1 ≤ θ2)%A → (θ1 /₂^n ≤ θ2 /₂^n)%A.
+Proof.
+intros * H12.
+revert θ1 θ2 H12.
+induction n; intros; [ easy | cbn ].
+apply angle_div_2_le_compat.
+now apply IHn.
+Qed.
+
 End a.

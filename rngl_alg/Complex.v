@@ -1603,18 +1603,6 @@ apply iff_sym.
 apply rngl_leb_le.
 Qed.
 
-Theorem angle_div_2_pow_le :
-  ∀ n θ1 θ2,
-  (θ1 ≤ θ2)%A
-  → (angle_div_2_pow θ1 n ≤ angle_div_2_pow θ2 n)%A.
-Proof.
-intros * H12.
-revert θ1 θ2 H12.
-induction n; intros; [ easy | cbn ].
-apply angle_div_2_le_compat.
-now apply IHn.
-Qed.
-
 Theorem angle_mul_nat_overflow_succ_l_true :
   ∀ θ n,
   angle_mul_nat_overflow (S n) θ = true
@@ -3346,22 +3334,6 @@ rewrite (rngl_abs_nonpos_eq Hop Hor) in HN. 2: {
 rewrite (rngl_opp_sub_distr Hop) in HN.
 apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
 now apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-Qed.
-
-Theorem angle_mul_nat_div_2 :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = false
-  → (n * (θ /₂) = (n * θ) /₂)%A.
-Proof.
-destruct_ac.
-intros * Haov.
-induction n; cbn. {
-  symmetry; apply angle_0_div_2.
-}
-apply angle_mul_nat_overflow_succ_l_false in Haov.
-rewrite IHn; [ | easy ].
-symmetry.
-now apply angle_div_2_add_not_overflow.
 Qed.
 
 Theorem angle_mul_nat_div_2_pow :
