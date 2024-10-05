@@ -439,8 +439,7 @@ enough (H :
   now rewrite angle_sub_0_l.
 }
 About rngl_cos_angle_div_2_pow_tending_to_1.
-Search rngl_is_limit_when_tending_to_inf.
-Check rngl_cos_angle_mul_div_2_pow_tending_to_1.
+(* induction to n, perhaps? but I have doubts... *)
 ...
 specialize rngl_cos_angle_mul_div_2_pow_tending_to_1 as H1.
 specialize (H1 Hc1 Har n θ).
