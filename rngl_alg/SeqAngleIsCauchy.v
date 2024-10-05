@@ -381,6 +381,56 @@ apply angle_div_2_le_compat.
 now apply angle_mul_div_pow2_le_straight.
 Qed.
 
+Theorem exists_nat_such_that_rngl_cos_close_to_1 :
+  rngl_is_archimedean T = true →
+  ∀ θ ε, (0 < ε)%L →
+  ∃ N, ∀ p, N ≤ p → (1 - ε² / 2 < rngl_cos (θ /₂^p))%L.
+Proof.
+destruct_ac.
+intros Har.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hε.
+  rewrite (H1 ε) in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
+intros * Hε.
+specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
+specialize (H1 Hc1 Har θ).
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold rngl_dist in H1.
+specialize (H1 (ε² / 2))%L.
+assert (Hε2 : (0 < ε² / 2)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hop Hor) | ].
+  apply not_eq_sym.
+  intros H.
+  apply (eq_rngl_squ_0 Hos) in H. 2: {
+    rewrite Bool.orb_true_iff; right.
+    rewrite Hi1; cbn.
+    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+  }
+  now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (H1 Hε2); clear Hε2.
+destruct H1 as (N, HN).
+exists N.
+intros p Hp.
+specialize (HN p Hp).
+rewrite (rngl_abs_sub_comm Hop Hor) in HN.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+easy.
+Qed.
+
 Theorem seq_angle_to_div_nat_is_Cauchy :
   rngl_is_archimedean T = true →
   ∀ n θ,
@@ -581,39 +631,7 @@ enough (H :
   rewrite angle_div_2_pow_mul_2_pow.
   apply HN; flia Hpq.
 }
-specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
-specialize (H1 Hc1 Har θ).
-progress unfold rngl_is_limit_when_tending_to_inf in H1.
-progress unfold is_limit_when_tending_to_inf in H1.
-progress unfold rngl_dist in H1.
-specialize (H1 (ε² / 2))%L.
-assert (Hε2 : (0 < ε² / 2)%L). {
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_lt_iff Hor).
-  split; [ apply (rngl_squ_nonneg Hop Hor) | ].
-  apply not_eq_sym.
-  intros H.
-  apply (eq_rngl_squ_0 Hos) in H. 2: {
-    rewrite Bool.orb_true_iff; right.
-    rewrite Hi1; cbn.
-    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
-  }
-  now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
-}
-specialize (H1 Hε2); clear Hε2.
-destruct H1 as (N, HN).
-exists N.
-intros p Hp.
-specialize (HN p Hp).
-rewrite (rngl_abs_sub_comm Hop Hor) in HN.
-rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
-  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
-}
-apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
-apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
-easy.
+now apply (exists_nat_such_that_rngl_cos_close_to_1 Har).
 Qed.
 
 End a.
