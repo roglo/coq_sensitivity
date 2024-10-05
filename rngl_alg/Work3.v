@@ -274,7 +274,7 @@ Qed.
 (* if working => replace this version in Complex.v since
    the version in Complex.v is a special case of this when
    n = 1 *)
-Theorem rngl_cos_angle_div_2_pow_tending_to_1 :
+Theorem rngl_cos_angle_mul_div_2_pow_tending_to_1 :
   rngl_characteristic T ≠ 1 →
   rngl_is_archimedean T = true →
   ∀ n θ, rngl_is_limit_when_tending_to_inf (λ i, rngl_cos (n * (θ /₂^i))) 1%L.
