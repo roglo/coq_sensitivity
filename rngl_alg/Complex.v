@@ -1610,10 +1610,6 @@ Compute (
 ...
 *)
 
-(* θ / 2^i * (2^i / n) *)
-Definition seq_angle_to_div_nat θ (n i : nat) :=
-  ((2 ^ i / n) * angle_div_2_pow θ i)%A.
-
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
 Theorem rngl_cos_le_anticompat_when_sin_nonneg :
