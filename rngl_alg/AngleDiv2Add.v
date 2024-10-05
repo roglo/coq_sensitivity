@@ -4,6 +4,7 @@ Require Import Main.RingLike.
 Require Import RealLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
+Require Import AngleAddLeMonoL.
 Require Import TacChangeAngle.
 
 Section a.
@@ -1061,6 +1062,144 @@ Proof.
 intros * Haov.
 rewrite angle_div_2_add.
 now rewrite Haov.
+Qed.
+
+Theorem angle_div_2_lt_straight :
+  rngl_characteristic T ≠ 1 →
+  ∀ θ, (θ /₂ < angle_straight)%A.
+Proof.
+destruct_ac.
+intros Hc1.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros.
+progress unfold angle_ltb.
+specialize (rngl_sin_div_2_nonneg θ) as H1.
+apply rngl_leb_le in H1.
+rewrite H1; clear H1.
+cbn.
+rewrite (rngl_leb_refl Hor).
+apply rngl_ltb_lt.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_lt_le_trans Hor _ 0). {
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  }
+  apply rl_sqrt_nonneg.
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_opp_l Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_leb_gt Hor) in Hzs.
+  rewrite (rngl_mul_opp_l Hop).
+  apply -> (rngl_opp_lt_compat Hop Hor).
+  rewrite (rngl_mul_1_l Hon).
+  rewrite <- (rl_sqrt_1 Hic Hon Hop Hor) at 4. 2: {
+    now rewrite Bool.orb_true_iff; right.
+  }
+  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
+  } {
+    apply (rngl_lt_div_l Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    }
+    rewrite (rngl_mul_1_l Hon).
+    apply (rngl_add_lt_mono_l Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply rngl_cos_bound | ].
+    intros H.
+    apply eq_rngl_cos_1 in H.
+    subst θ.
+    now apply (rngl_lt_irrefl Hor) in Hzs.
+  }
+}
+Qed.
+
+Theorem angle_add_overflow_div_2_div_2 :
+  ∀ θ1 θ2, angle_add_overflow (θ1 /₂) (θ2 /₂) = false.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  rewrite (rngl_characteristic_1_angle_0 Hc1 (θ1 /₂)%A).
+  rewrite (rngl_characteristic_1_angle_0 Hc1 (θ2 /₂)%A).
+  apply angle_add_overflow_0_l.
+}
+intros.
+apply angle_add_overflow_lt_straight_le_straight.
+apply (angle_div_2_lt_straight Hc1).
+apply angle_div_2_le_straight.
+Qed.
+
+Theorem angle_div_2_le : ∀ θ, (θ /₂ ≤ θ)%A.
+Proof.
+intros.
+remember (θ /₂)%A as x.
+rewrite <- (angle_div_2_mul_2 θ).
+rewrite <- angle_mul_1_l in Heqx.
+subst x.
+apply angle_mul_le_mono_r; [ | now apply -> Nat.succ_le_mono ].
+cbn.
+apply Bool.orb_false_iff.
+split; [ | easy ].
+rewrite angle_add_0_r.
+apply angle_add_overflow_div_2_div_2.
+Qed.
+
+Theorem angle_div_2_pow_le_diag : ∀ n θ, (θ /₂^n ≤ θ)%A.
+Proof.
+intros.
+induction n; [ apply angle_le_refl | cbn ].
+apply (angle_le_trans _ (θ /₂)). {
+  now apply angle_div_2_le_compat.
+}
+apply angle_div_2_le.
+Qed.
+
+Theorem angle_div_2_pow_add :
+  ∀ n θ1 θ2,
+  angle_add_overflow θ1 θ2 = false
+  → ((θ1 + θ2) /₂^n = θ1 /₂^n + θ2 /₂^n)%A.
+Proof.
+intros * Haov.
+induction n; [ easy | cbn ].
+rewrite IHn.
+apply angle_div_2_add_not_overflow.
+apply angle_add_overflow_le with (θ2 := θ2). {
+  apply angle_div_2_pow_le_diag.
+}
+apply angle_add_not_overflow_comm.
+apply angle_add_overflow_le with (θ2 := θ1). {
+  apply angle_div_2_pow_le_diag.
+}
+now apply angle_add_not_overflow_comm.
+Qed.
+
+Theorem angle_div_2_pow_mul :
+  ∀ n m θ,
+  angle_mul_nat_overflow m θ = false
+  →  ((m * θ) /₂^n)%A = (m * (θ /₂^n))%A.
+Proof.
+intros * Haov.
+induction m; [ apply angle_0_div_2_pow | cbn ].
+cbn in Haov.
+destruct m. {
+  cbn.
+  rewrite angle_add_0_r.
+  symmetry; apply angle_add_0_r.
+}
+apply Bool.orb_false_iff in Haov.
+rewrite angle_div_2_pow_add; [ | easy ].
+f_equal.
+now apply IHm.
 Qed.
 
 End a.
