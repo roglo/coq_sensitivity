@@ -438,6 +438,10 @@ enough (H :
   }
   now rewrite angle_sub_0_l.
 }
+exists (Nat.log2_up n). (* pour que 2^n ≤ m *)
+(* mais c'est probablement pas suffisant pour satisfaire ε *)
+intros m Hm.
+...
 About rngl_cos_angle_div_2_pow_tending_to_1.
 (* induction to n, perhaps? but I have doubts... *)
 ...
