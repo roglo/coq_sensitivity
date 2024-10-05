@@ -426,8 +426,60 @@ enough (H : angle_lim (λ i, (n * (θ /₂^i))%A) 0). {
   apply Nat.neq_0_lt_0.
   flia Hnz Hn1.
 }
-...
 intros ε Hε.
+enough (H :
+  ∃ N, ∀ m, N ≤ m →  (1 - ε² / 2 < rngl_cos (n * (θ /₂^m)))%L). {
+  destruct H as (N, HN).
+  exists N.
+  intros m Hm.
+  specialize (HN m Hm).
+  apply rngl_cos_lt_angle_eucl_dist_lt. {
+    now apply (rngl_lt_le_incl Hor) in Hε.
+  }
+  now rewrite angle_sub_0_l.
+}
+About rngl_cos_angle_div_2_pow_tending_to_1.
+Search rngl_is_limit_when_tending_to_inf.
+...
+specialize rngl_cos_angle_div_2_pow_tending_to_1 as H1.
+specialize (H1 Hc1 Har θ).
+progress unfold rngl_is_limit_when_tending_to_inf in H1.
+progress unfold is_limit_when_tending_to_inf in H1.
+progress unfold rngl_dist in H1.
+specialize (H1 (ε² / 2))%L.
+assert (Hε2 : (0 < ε² / 2)%L). {
+  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_squ_nonneg Hop Hor) | ].
+  apply not_eq_sym.
+  intros H.
+  apply (eq_rngl_squ_0 Hos) in H. 2: {
+    rewrite Bool.orb_true_iff in Hii.
+    destruct Hii as [Hii| Hii]; rewrite Hii; [ easy | ].
+    rewrite Bool.orb_true_iff; right; cbn.
+    apply (rngl_has_eq_dec_or_is_ordered_r Hor).
+  }
+  now subst ε; apply (rngl_lt_irrefl Hor) in Hε.
+}
+specialize (H1 Hε2); clear Hε2.
+destruct H1 as (N, HN).
+exists N.
+intros p Hp.
+specialize (HN p Hp).
+rewrite (rngl_abs_sub_comm Hop Hor) in HN.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in HN. 2: {
+  apply (rngl_le_0_sub Hop Hor), rngl_cos_bound.
+}
+apply (rngl_lt_sub_lt_add_r Hop Hor) in HN.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in HN.
+eapply (rngl_lt_le_trans Hor); [ apply HN | ].
+(* c'est le contraire *)
+...
+Search (√(_ * (_ - _)))%L.
+Search (√(_ * _))%L.
+...
 specialize (int_part Hon Hop Hc1 Hor Har) as H2.
 specialize (H2 (rngl_of_nat n / rngl_min 1 ε))%L.
 destruct H2 as (en, Hen).
