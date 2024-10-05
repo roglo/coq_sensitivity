@@ -246,13 +246,6 @@ destruct H1 as (c, Hc); rewrite Hc at 2.
 destruct c; [ easy | flia ].
 Qed.
 
-Theorem Nat_le_add_l : ∀ a b, b ≤ a + b.
-Proof.
-intros.
-replace b with (0 + b) at 1 by easy.
-now apply Nat.add_le_mono_r.
-Qed.
-
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
   λ x y Hxy Hnxy,
   match le_lt_eq_dec x y Hxy with
@@ -353,7 +346,7 @@ assert (H1 : a = (c + d) / b). {
 }
 rewrite H1.
 apply Nat.Div0.div_le_mono.
-apply Nat_le_add_l.
+apply Nat.le_add_l.
 Qed.
 
 Theorem Nat_pow_mod_is_pow_mod : ∀ a b c,

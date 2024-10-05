@@ -1,6 +1,6 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Main.RingLike.
+Require Import Main.Misc Main.RingLike.
 Require Import RealLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
@@ -1216,6 +1216,81 @@ apply angle_mul_nat_overflow_succ_l_false in Haov.
 rewrite IHn; [ | easy ].
 symmetry.
 now apply angle_div_2_add_not_overflow.
+Qed.
+
+Theorem angle_mul_nat_overflow_mul_2_div_2 :
+  ∀ n θ,
+  angle_mul_nat_overflow n θ = false
+  → angle_mul_nat_overflow (2 * n) (θ /₂) = false.
+Proof.
+destruct_ac.
+intros * Hn.
+revert θ Hn.
+induction n; intros; [ easy | ].
+apply angle_mul_nat_overflow_succ_l_false in Hn.
+destruct Hn as (Hmn, Han).
+cbn - [ angle_mul_nat_overflow ].
+rewrite Nat.add_0_r.
+rewrite Nat.add_succ_r.
+rewrite Nat_add_diag.
+apply <- angle_mul_nat_overflow_succ_l_false.
+split. {
+  apply <- angle_mul_nat_overflow_succ_l_false.
+  split; [ now apply IHn | ].
+  rewrite Nat.mul_comm.
+  rewrite <- angle_mul_nat_assoc.
+  rewrite angle_div_2_mul_2.
+  apply angle_add_not_overflow_comm in Han.
+  apply angle_add_not_overflow_comm.
+  apply (angle_add_overflow_le _ θ); [ | easy ].
+  apply angle_div_2_le.
+}
+rewrite <- Nat.add_1_r.
+rewrite angle_mul_add_distr_r.
+rewrite angle_mul_1_l.
+apply angle_add_not_overflow_move_add. {
+  apply angle_add_overflow_div_2_div_2.
+}
+rewrite angle_add_diag.
+rewrite angle_div_2_mul_2.
+rewrite Nat.mul_comm.
+rewrite <- angle_mul_nat_assoc.
+now rewrite angle_div_2_mul_2.
+Qed.
+
+Theorem angle_mul_nat_overflow_pow_div :
+  ∀ n θ,
+  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow θ n) = false.
+Proof.
+destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  rewrite (rngl_characteristic_1_angle_0 Hc1 (angle_div_2_pow _ _)).
+  apply angle_mul_nat_overflow_0_r.
+}
+assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+intros.
+revert θ.
+induction n; intros; [ easy | cbn ].
+destruct n. {
+  cbn.
+  apply Bool.orb_false_iff.
+  split; [ | easy ].
+  rewrite angle_add_0_r.
+  apply angle_add_overflow_div_2_div_2.
+}
+cbn.
+do 2 rewrite Nat.add_0_r.
+rewrite Nat.add_assoc.
+cbn in IHn.
+rewrite Nat.add_0_r in IHn.
+specialize (IHn θ) as H1.
+apply angle_mul_nat_overflow_mul_2_div_2 in H1.
+cbn in H1.
+rewrite Nat.add_0_r in H1.
+now rewrite Nat.add_assoc in H1.
 Qed.
 
 End a.

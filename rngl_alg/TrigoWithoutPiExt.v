@@ -1707,4 +1707,86 @@ apply angle_div_2_le_compat.
 now apply IHn.
 Qed.
 
+Theorem angle_mul_nat_overflow_0_r :
+  ∀ n, angle_mul_nat_overflow n 0 = false.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+destruct n; [ easy | ].
+rewrite angle_add_overflow_0_l.
+now apply Bool.orb_false_iff.
+Qed.
+
+Theorem angle_add_not_overflow_move_add :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ1 θ3 = false
+  → angle_add_overflow (θ1 + θ3) θ2 = false
+  → angle_add_overflow θ1 (θ2 + θ3) = false.
+Proof.
+destruct_ac.
+intros * H13 H132.
+progress unfold angle_add_overflow in H132.
+progress unfold angle_add_overflow.
+apply Bool.not_true_iff_false in H132.
+apply angle_nlt_ge in H132.
+apply Bool.not_true_iff_false.
+apply angle_nlt_ge.
+rewrite angle_add_add_swap in H132.
+rewrite <- angle_add_assoc in H132.
+apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
+progress unfold angle_add_overflow in H13.
+apply Bool.not_true_iff_false in H13.
+now apply angle_nlt_ge in H13.
+Qed.
+
+Theorem angle_add_diag : ∀ θ, (θ + θ = 2 * θ)%A.
+Proof.
+intros; cbn.
+now rewrite angle_add_0_r.
+Qed.
+
+Theorem angle_mul_nat_overflow_succ_l_true :
+  ∀ θ n,
+  angle_mul_nat_overflow (S n) θ = true
+  ↔ angle_mul_nat_overflow n θ = true ∨
+    angle_add_overflow θ (n * θ) = true.
+Proof.
+intros.
+split; intros Hn. {
+  apply Bool.not_false_iff_true in Hn.
+  remember (angle_mul_nat_overflow n θ) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x; [ now left | right ].
+  apply Bool.not_false_iff_true.
+  intros Hy.
+  apply Hn.
+  now apply angle_mul_nat_overflow_succ_l_false.
+} {
+  apply Bool.not_false_iff_true.
+  intros Hx.
+  apply angle_mul_nat_overflow_succ_l_false in Hx.
+  destruct Hx as (Hx, Hy).
+  rewrite Hx in Hn.
+  rewrite Hy in Hn.
+  now destruct Hn.
+}
+Qed.
+
+Theorem angle_mul_nat_overflow_succ_l :
+  ∀ θ n,
+  angle_mul_nat_overflow (S n) θ =
+    (angle_mul_nat_overflow n θ || angle_add_overflow θ (n * θ))%bool.
+Proof.
+intros.
+remember (_ || _)%bool as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Bool.orb_true_iff in Hb.
+  now apply angle_mul_nat_overflow_succ_l_true.
+} {
+  apply Bool.orb_false_iff in Hb.
+  now apply angle_mul_nat_overflow_succ_l_false.
+}
+Qed.
+
 End a.

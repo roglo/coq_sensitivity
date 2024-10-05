@@ -1603,50 +1603,6 @@ apply iff_sym.
 apply rngl_leb_le.
 Qed.
 
-Theorem angle_mul_nat_overflow_succ_l_true :
-  ∀ θ n,
-  angle_mul_nat_overflow (S n) θ = true
-  ↔ angle_mul_nat_overflow n θ = true ∨
-    angle_add_overflow θ (n * θ) = true.
-Proof.
-intros.
-split; intros Hn. {
-  apply Bool.not_false_iff_true in Hn.
-  remember (angle_mul_nat_overflow n θ) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x; [ now left | right ].
-  apply Bool.not_false_iff_true.
-  intros Hy.
-  apply Hn.
-  now apply angle_mul_nat_overflow_succ_l_false.
-} {
-  apply Bool.not_false_iff_true.
-  intros Hx.
-  apply angle_mul_nat_overflow_succ_l_false in Hx.
-  destruct Hx as (Hx, Hy).
-  rewrite Hx in Hn.
-  rewrite Hy in Hn.
-  now destruct Hn.
-}
-Qed.
-
-Theorem angle_mul_nat_overflow_succ_l :
-  ∀ θ n,
-  angle_mul_nat_overflow (S n) θ =
-    (angle_mul_nat_overflow n θ || angle_add_overflow θ (n * θ))%bool.
-Proof.
-intros.
-remember (_ || _)%bool as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  apply Bool.orb_true_iff in Hb.
-  now apply angle_mul_nat_overflow_succ_l_true.
-} {
-  apply Bool.orb_false_iff in Hb.
-  now apply angle_mul_nat_overflow_succ_l_false.
-}
-Qed.
-
 Theorem angle_mul_lt_mono_r :
   ∀ a b θ,
   angle_mul_nat_overflow b θ = false
@@ -2163,38 +2119,6 @@ intros * Ha.
 now apply rl_sqrt_nonneg.
 Qed.
 
-Theorem angle_mul_nat_overflow_0_r :
-  ∀ n, angle_mul_nat_overflow n 0 = false.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-destruct n; [ easy | ].
-rewrite angle_add_overflow_0_l.
-now apply Bool.orb_false_iff.
-Qed.
-
-Theorem angle_add_not_overflow_move_add :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
-  → angle_add_overflow (θ1 + θ3) θ2 = false
-  → angle_add_overflow θ1 (θ2 + θ3) = false.
-Proof.
-destruct_ac.
-intros * H13 H132.
-progress unfold angle_add_overflow in H132.
-progress unfold angle_add_overflow.
-apply Bool.not_true_iff_false in H132.
-apply angle_nlt_ge in H132.
-apply Bool.not_true_iff_false.
-apply angle_nlt_ge.
-rewrite angle_add_add_swap in H132.
-rewrite <- angle_add_assoc in H132.
-apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
-progress unfold angle_add_overflow in H13.
-apply Bool.not_true_iff_false in H13.
-now apply angle_nlt_ge in H13.
-Qed.
-
 Theorem angle_add_overflow_move_add :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ2 θ3 = false
@@ -2211,52 +2135,6 @@ apply angle_add_not_overflow_move_add.
 now apply angle_add_not_overflow_comm.
 rewrite angle_add_comm.
 now apply angle_add_not_overflow_comm.
-Qed.
-
-Theorem angle_add_diag : ∀ θ, (θ + θ = 2 * θ)%A.
-Proof.
-intros; cbn.
-now rewrite angle_add_0_r.
-Qed.
-
-Theorem angle_mul_nat_overflow_mul_2_div_2 :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = false
-  → angle_mul_nat_overflow (2 * n) (θ /₂) = false.
-Proof.
-destruct_ac.
-intros * Hn.
-revert θ Hn.
-induction n; intros; [ easy | ].
-apply angle_mul_nat_overflow_succ_l_false in Hn.
-destruct Hn as (Hmn, Han).
-cbn - [ angle_mul_nat_overflow ].
-rewrite Nat.add_0_r.
-rewrite Nat.add_succ_r.
-rewrite Nat_add_diag.
-apply <- angle_mul_nat_overflow_succ_l_false.
-split. {
-  apply <- angle_mul_nat_overflow_succ_l_false.
-  split; [ now apply IHn | ].
-  rewrite Nat.mul_comm.
-  rewrite <- angle_mul_nat_assoc.
-  rewrite angle_div_2_mul_2.
-  apply angle_add_not_overflow_comm in Han.
-  apply angle_add_not_overflow_comm.
-  apply (angle_add_overflow_le _ θ); [ | easy ].
-  apply angle_div_2_le.
-}
-rewrite <- Nat.add_1_r.
-rewrite angle_mul_add_distr_r.
-rewrite angle_mul_1_l.
-apply angle_add_not_overflow_move_add. {
-  apply angle_add_overflow_div_2_div_2.
-}
-rewrite angle_add_diag.
-rewrite angle_div_2_mul_2.
-rewrite Nat.mul_comm.
-rewrite <- angle_mul_nat_assoc.
-now rewrite angle_div_2_mul_2.
 Qed.
 
 Theorem angle_div_2_pow_div_2_distr :
@@ -2286,41 +2164,6 @@ cbn in Hnm.
 eapply angle_mul_nat_overflow_le_r; [ | apply Hnm ].
 rewrite <- angle_div_2_pow_succ_r_2.
 apply angle_le_refl.
-Qed.
-
-Theorem angle_mul_nat_overflow_pow_div :
-  ∀ n θ,
-  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow θ n) = false.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  intros.
-  rewrite (rngl_characteristic_1_angle_0 Hc1 (angle_div_2_pow _ _)).
-  apply angle_mul_nat_overflow_0_r.
-}
-assert (H2z : (2 ≠ 0)%L) by apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-intros.
-revert θ.
-induction n; intros; [ easy | cbn ].
-destruct n. {
-  cbn.
-  apply Bool.orb_false_iff.
-  split; [ | easy ].
-  rewrite angle_add_0_r.
-  apply angle_add_overflow_div_2_div_2.
-}
-cbn.
-do 2 rewrite Nat.add_0_r.
-rewrite Nat.add_assoc.
-cbn in IHn.
-rewrite Nat.add_0_r in IHn.
-specialize (IHn θ) as H1.
-apply angle_mul_nat_overflow_mul_2_div_2 in H1.
-cbn in H1.
-rewrite Nat.add_0_r in H1.
-now rewrite Nat.add_assoc in H1.
 Qed.
 
 Theorem rngl_sin_div_2_pow_nat_nonneg :
@@ -3102,19 +2945,6 @@ rewrite H1 in H3.
 rewrite <- H2 in H3.
 destruct H3 as (H3, H4).
 now apply Nat.lt_irrefl in H4.
-Qed.
-
-Theorem angle_mul_nat_overflow_le_l :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = true
-  → ∀ m, n ≤ m → angle_mul_nat_overflow m θ = true.
-Proof.
-destruct_ac.
-intros * Hn * Hnm.
-apply Bool.not_false_iff_true in Hn.
-apply Bool.not_false_iff_true.
-intros H; apply Hn.
-now apply (angle_mul_nat_not_overflow_le_l _ m).
 Qed.
 
 Theorem angle_div_nat_is_inf_sum_of_angle_div_2_pow :
@@ -4878,55 +4708,6 @@ apply rngl_leb_le in Hx.
 apply (rngl_nlt_ge Hor) in Hx.
 apply Hx; clear Hx.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-Qed.
-
-Theorem angle_mul_nat_overflow_distr_add_overflow :
-  ∀ m n θ,
-  angle_mul_nat_overflow (m + n) θ = false
-  → angle_add_overflow (m * θ) (n * θ) = false.
-Proof.
-destruct_ac.
-intros * Hmov.
-revert n Hmov.
-induction m; intros; [ apply angle_add_overflow_0_l | ].
-rewrite Nat.add_succ_l in Hmov.
-rewrite angle_mul_nat_overflow_succ_l in Hmov.
-apply Bool.orb_false_iff in Hmov.
-destruct Hmov as (Hmov, Hov).
-specialize (IHm _ Hmov) as Hov'.
-cbn.
-apply angle_add_not_overflow_comm.
-apply angle_add_not_overflow_move_add. 2: {
-  rewrite <- angle_mul_add_distr_r.
-  rewrite Nat.add_comm.
-  now apply angle_add_not_overflow_comm.
-}
-now apply angle_add_not_overflow_comm.
-Qed.
-
-Theorem angle_mul_nat_overflow_true_assoc :
-  ∀ m n θ,
-  angle_mul_nat_overflow m (n * θ) = true
-  → angle_mul_nat_overflow (m * n) θ = true.
-Proof.
-intros * Hmn.
-revert n θ Hmn.
-induction m; intros; [ easy | ].
-rewrite angle_mul_nat_overflow_succ_l in Hmn.
-apply Bool.orb_true_iff in Hmn.
-destruct Hmn as [Hmn| Hmn]. {
-  apply (angle_mul_nat_overflow_le_l (m * n)); [ now apply IHm | ].
-  apply Nat_le_add_l.
-}
-destruct n. {
-  cbn in Hmn.
-  now rewrite angle_add_overflow_0_l in Hmn.
-}
-apply Bool.not_false_iff_true in Hmn.
-apply Bool.not_false_iff_true.
-intros H1; apply Hmn; clear Hmn.
-rewrite angle_mul_nat_assoc.
-now apply angle_mul_nat_overflow_distr_add_overflow.
 Qed.
 
 End a.
