@@ -1713,40 +1713,6 @@ apply (rngl_lt_le_incl Hor) in Hzs22.
 now apply (rngl_le_trans Hor _ 0).
 Qed.
 
-Theorem angle_le_angle_eucl_dist_le :
-  ∀ θ1 θ2,
-  (θ1 ≤ angle_straight)%A
-  → (θ2 ≤ angle_straight)%A
-  → (θ1 ≤ θ2)%A ↔ (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L.
-Proof.
-(*
-intros * Ht1 Ht2.
-split; intros H12. {
-  apply angle_eucl_dist_le_cos_le.
-  do 2 rewrite angle_sub_0_l.
-  cbn.
-  now apply rngl_cos_decr.
-} {
-  apply angle_eucl_dist_le_cos_le in H12.
-  do 2 rewrite angle_sub_0_l in H12.
-  cbn in H12.
-Check rngl_cos_decr.
-  apply rngl_cos_decr in H12.
-*)
-intros * Ht1 Ht2.
-progress unfold angle_leb.
-apply rngl_sin_nonneg_angle_le_straight in Ht1, Ht2.
-apply rngl_leb_le in Ht1, Ht2.
-rewrite Ht1, Ht2.
-split; intros H12. {
-  apply rngl_leb_le in H12.
-  now apply rngl_cos_le_iff_angle_eucl_le.
-} {
-  apply rngl_leb_le.
-  now apply rngl_cos_le_iff_angle_eucl_le in H12.
-}
-Qed.
-
 Theorem quadrant_1_2_rngl_cos_add_l_le_rngl_cos :
   ∀ θ1 θ2 : angle T,
   (0 < rngl_sin θ1)%L
@@ -2789,29 +2755,6 @@ rewrite (rngl_sub_sub_distr Hop) in HN.
 rewrite (rngl_sub_diag Hos) in HN.
 rewrite rngl_add_0_l in HN.
 now rewrite (rngl_abs_sub_comm Hop Hor) in HN.
-Qed.
-
-Theorem angle_lim_move_0_r :
-  ∀ f θ, angle_lim f θ ↔ angle_lim (λ i, (f i - θ)%A) 0%A.
-Proof.
-intros.
-split; intros Hlim. {
-  intros ε Hε.
-  specialize (Hlim ε Hε).
-  destruct Hlim as (N, HN).
-  exists N.
-  intros n Hn.
-  specialize (HN n Hn).
-  now rewrite angle_eucl_dist_move_0_r in HN.
-} {
-  intros ε Hε.
-  specialize (Hlim ε Hε).
-  destruct Hlim as (N, HN).
-  exists N.
-  intros n Hn.
-  specialize (HN n Hn).
-  now rewrite angle_eucl_dist_move_0_r.
-}
 Qed.
 
 End a.

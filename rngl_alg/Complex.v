@@ -1616,9 +1616,6 @@ Definition seq_angle_to_div_nat θ (n i : nat) :=
 
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
-Definition angle_lim :=
-  is_limit_when_tending_to_inf angle_eucl_dist.
-
 Theorem rngl_cos_le_anticompat_when_sin_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L

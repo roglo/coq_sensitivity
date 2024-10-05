@@ -3,7 +3,6 @@ Require Import Utf8 Arith.
 Require Import Main.Misc Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import Complex.
-Require Import Work2.
 Require Import AngleAddLeMonoL.
 Require Import AngleTypeIsComplete.
 Require Import SeqAngleIsCauchy.
@@ -40,6 +39,49 @@ exists N.
 intros n Hn.
 rewrite angle_eucl_dist_opp_opp.
 now apply HN.
+Qed.
+
+Theorem angle_lim_move_0_r :
+  ∀ f θ, angle_lim f θ ↔ angle_lim (λ i, (f i - θ)%A) 0%A.
+Proof.
+intros.
+split; intros Hlim. {
+  intros ε Hε.
+  specialize (Hlim ε Hε).
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  now rewrite angle_eucl_dist_move_0_r in HN.
+} {
+  intros ε Hε.
+  specialize (Hlim ε Hε).
+  destruct Hlim as (N, HN).
+  exists N.
+  intros n Hn.
+  specialize (HN n Hn).
+  now rewrite angle_eucl_dist_move_0_r.
+}
+Qed.
+
+Theorem angle_le_angle_eucl_dist_le :
+  ∀ θ1 θ2,
+  (θ1 ≤ angle_straight)%A
+  → (θ2 ≤ angle_straight)%A
+  → (θ1 ≤ θ2)%A ↔ (angle_eucl_dist θ1 0 ≤ angle_eucl_dist θ2 0)%L.
+Proof.
+intros * Ht1 Ht2.
+progress unfold angle_leb.
+apply rngl_sin_nonneg_angle_le_straight in Ht1, Ht2.
+apply rngl_leb_le in Ht1, Ht2.
+rewrite Ht1, Ht2.
+split; intros H12. {
+  apply rngl_leb_le in H12.
+  now apply rngl_cos_le_iff_angle_eucl_le.
+} {
+  apply rngl_leb_le.
+  now apply rngl_cos_le_iff_angle_eucl_le in H12.
+}
 Qed.
 
 Theorem angle_div_nat_spec :

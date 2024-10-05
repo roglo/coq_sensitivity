@@ -1350,4 +1350,7 @@ apply Bool.not_true_iff_false in Haov.
 now apply angle_nlt_ge in Haov.
 Qed.
 
+Definition angle_lim :=
+  is_limit_when_tending_to_inf angle_eucl_dist.
+
 End a.
