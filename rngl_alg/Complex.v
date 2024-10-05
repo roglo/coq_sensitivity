@@ -2876,8 +2876,7 @@ Fixpoint squ_rngl_cos_div_pow_2 θ n :=
   end.
 
 Theorem rngl_cos_div_pow_2_eq :
-  ∀ θ n,
-  rngl_cos (angle_div_2_pow θ (S n)) = rngl_cos_div_pow_2 (θ /₂) n.
+  ∀ θ n, rngl_cos (θ /₂^S n) = rngl_cos_div_pow_2 (θ /₂) n.
 Proof.
 destruct_ac.
 intros.
