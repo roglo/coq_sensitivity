@@ -4,10 +4,12 @@ Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Misc.
-Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
-Require Import AngleAddOverflowLe AngleAddLeMonoL.
-Require Import AngleDiv2Add.
-Require Import TacChangeAngle.
+Require Import Trigo.RealLike.
+Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.AngleAddLeMonoL.
+Require Import Trigo.AngleDiv2Add.
+Require Import Trigo.TacChangeAngle.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 

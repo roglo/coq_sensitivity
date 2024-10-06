@@ -2,10 +2,13 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
 Require Import Main.RingLike.
-Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
-Require Import AngleAddOverflowLe AngleAddLeMonoL.
-Require Import AngleLeSubAdd AngleDiv2Add.
-Require Import TacChangeAngle.
+Require Import Trigo.RealLike.
+Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.AngleAddLeMonoL.
+Require Import Trigo.AngleLeSubAdd.
+Require Import Trigo.AngleDiv2Add.
+Require Import Trigo.TacChangeAngle.
 
 Section a.
 

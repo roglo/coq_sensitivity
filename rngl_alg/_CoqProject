@@ -1,1 +1,1 @@
--R . RnglAlg -Q ../main Main
+-R . RnglAlg -Q ../main Main -Q ../trigo_without_pi Trigo

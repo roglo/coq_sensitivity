@@ -2,7 +2,7 @@
 
 Require Import Utf8.
 Require Import Main.RingLike.
-Require Import TrigoWithoutPi.
+Require Import Trigo.TrigoWithoutPi.
 
 Section a.
 

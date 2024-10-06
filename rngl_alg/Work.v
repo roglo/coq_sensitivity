@@ -6,16 +6,19 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
+Require Import Trigo.TacChangeAngle.
+Require Import Trigo.RealLike.
+Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.SeqAngleIsCauchy.
+Require Import Trigo.AngleAddOverflowEquiv3.
+Require Import Trigo.AngleDiv2Add.
+Require Import Trigo.AngleLeSubAdd.
+Require Import Trigo.AngleAddLeMonoL.
+Require Import Trigo.AngleAddOverflowLe.
 Require Import Misc.
-Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
-Require Import AngleAddOverflowLe AngleAddLeMonoL.
-Require Import AngleLeSubAdd AngleDiv2Add.
-Require Import TacChangeAngle.
 Require Import Complex.
 Require Import NewtonBinomial.
 Require Import AngleAddOverflowEquiv.
-Require Import AngleAddOverflowEquiv3.
-Require Import SeqAngleIsCauchy.
 
 Section a.
 

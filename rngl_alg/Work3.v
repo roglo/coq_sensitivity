@@ -5,13 +5,14 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc Main.RingLike.
 Require Import Misc.
-Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
+Require Import Trigo.RealLike.
+Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.AngleAddLeMonoL.
+Require Import Trigo.AngleAddOverflowLe.
+Require Import Trigo.AngleTypeIsComplete.
+Require Import Trigo.SeqAngleIsCauchy.
 Require Import Complex.
 Require Import Work2.
-Require Import AngleAddLeMonoL.
-Require Import AngleAddOverflowLe.
-Require Import AngleTypeIsComplete.
-Require Import SeqAngleIsCauchy.
 
 Section a.
 
