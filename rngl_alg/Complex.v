@@ -1269,6 +1269,16 @@ Qed.
 Notation "⌊ a / b ⌋" := (div a b).
 *)
 
+Theorem angle_div_2_add_overflow :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = true
+  → ((θ1 + θ2) /₂)%A = (θ1 /₂ + θ2 /₂ + angle_straight)%A.
+Proof.
+intros * Haov.
+rewrite angle_div_2_add.
+now rewrite Haov.
+Qed.
+
 Theorem angle_div_2_pow_add' :
   ∀ n θ1 θ2,
   ((θ1 + θ2) /₂^n)%A =
