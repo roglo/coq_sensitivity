@@ -3679,18 +3679,6 @@ rewrite Hzs2, Hzs3.
 now apply rngl_leb_le.
 Qed.
 
-Theorem angle_add_le_mono_r :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ2 θ3 = false
-  → (θ1 ≤ θ2)%A
-  → (θ1 + θ3 ≤ θ2 + θ3)%A.
-Proof.
-intros * H23 H12.
-do 2 rewrite (angle_add_comm _ θ3).
-apply angle_add_not_overflow_comm in H23.
-now apply angle_add_le_mono_l.
-Qed.
-
 Theorem angle_mul_le_mono_l :
   ∀ θ1 θ2,
   (θ1 ≤ θ2)%A

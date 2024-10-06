@@ -168,6 +168,18 @@ apply (rngl_le_0_sub Hop Hor).
 now apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff.
 Qed.
 
+Theorem angle_add_le_mono_r :
+  ∀ θ1 θ2 θ3,
+  angle_add_overflow θ2 θ3 = false
+  → (θ1 ≤ θ2)%A
+  → (θ1 + θ3 ≤ θ2 + θ3)%A.
+Proof.
+intros * H23 H12.
+do 2 rewrite (angle_add_comm _ θ3).
+apply angle_add_not_overflow_comm in H23.
+now apply angle_add_le_mono_l.
+Qed.
+
 Theorem quadrant_1_rngl_add_cos_add_cos_sub :
   ∀ θ1 θ2 θ3,
   (0 ≤ rngl_sin θ1)%L
