@@ -1381,18 +1381,6 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
 
-Theorem angle_mul_mul_div_2 :
-  ∀ m n θ,
-  angle_mul_nat_overflow n θ = false
-  → (m * ((n * θ) /₂))%A = (m * n * (θ /₂))%A.
-Proof.
-intros * Haov.
-rewrite <- angle_mul_nat_assoc.
-f_equal.
-symmetry.
-now apply angle_mul_nat_div_2.
-Qed.
-
 Theorem rngl_cos_div_pow2_2_pos :
   rngl_characteristic T ≠ 1 →
   ∀ θ, (0 < rngl_cos (θ /₂^2))%L.
