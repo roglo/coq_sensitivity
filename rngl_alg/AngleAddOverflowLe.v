@@ -815,19 +815,10 @@ destruct z1. {
 }
 Qed.
 
-Theorem angle_add_overflow_lt_le :
-  ∀ θ θ1 θ2,
-  (θ1 < θ)%A
-  → (θ2 ≤ -θ)%A
-  → angle_add_overflow θ1 θ2 = false.
+Theorem angle_le_opp_r : ∀ θ θ2, (θ2 ≤ - θ)%A → θ2 ≠ 0%A → (θ ≤ - θ2)%A.
 Proof.
 destruct_ac.
-intros * H1 H2.
-apply angle_add_not_overflow_equiv3.
-progress unfold angle_add_not_overflow3.
-destruct (angle_eq_dec θ2 0) as [H2z| H2z]; [ now left | right ].
-apply (angle_lt_le_trans _ θ); [ easy | ].
-(* lemma? *)
+intros * H2 H2z.
 progress unfold angle_leb in H2.
 progress unfold angle_leb.
 cbn in H2 |-*.
@@ -884,6 +875,21 @@ destruct sz2. {
 }
 apply (rngl_leb_gt Hor) in Hsz.
 now apply (rngl_lt_asymm Hor) in Hzs.
+Qed.
+
+Theorem angle_add_overflow_lt_le :
+  ∀ θ θ1 θ2,
+  (θ1 < θ)%A
+  → (θ2 ≤ -θ)%A
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+destruct_ac.
+intros * H1 H2.
+apply angle_add_not_overflow_equiv3.
+progress unfold angle_add_not_overflow3.
+destruct (angle_eq_dec θ2 0) as [H2z| H2z]; [ now left | right ].
+apply (angle_lt_le_trans _ θ); [ easy | ].
+now apply angle_le_opp_r.
 Qed.
 
 Theorem angle_add_overflow_le_lt :
