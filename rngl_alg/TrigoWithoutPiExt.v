@@ -1237,52 +1237,6 @@ apply (rngl_mul_cancel_l Hi1) in H1234. 2: {
 now apply (rngl_sub_cancel_l Hop) in H1234.
 Qed.
 
-Theorem angle_eucl_dist_lt_cos_lt :
-  ∀ θ1 θ2 θ3 θ4,
-  (angle_eucl_dist θ1 θ2 < angle_eucl_dist θ3 θ4)%L
-  ↔ (rngl_cos (θ4 - θ3) < rngl_cos (θ2 - θ1))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  do 2 rewrite (H1 (angle_eucl_dist _ _)).
-  do 2 rewrite (H1 (rngl_cos _)).
-  easy.
-}
-intros.
-do 2 rewrite angle_eucl_dist_is_sqrt.
-split; intros H1234. {
-  apply (rl_sqrt_lt_sqrt Hic Hop Hiv Hon Hor) in H1234; cycle 1. {
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_0_le_2 Hon Hop Hor).
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  } {
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_0_le_2 Hon Hop Hor).
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii) in H1234. 2: {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  now apply (rngl_sub_lt_mono_l Hop Hor) in H1234.
-} {
-  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
-    apply (rngl_mul_nonneg_nonneg Hop Hor).
-    apply (rngl_0_le_2 Hon Hop Hor).
-    apply (rngl_le_0_sub Hop Hor).
-    apply rngl_cos_bound.
-  }
-  apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  now apply (rngl_sub_lt_mono_l Hop Hor).
-}
-Qed.
-
 Theorem rngl_sin_pos_lt_straight :
   ∀ θ,
   (0 < rngl_sin θ)%L
@@ -1303,62 +1257,6 @@ intros H; symmetry in H.
 apply eq_rngl_cos_opp_1 in H.
 subst θ.
 now apply (rngl_lt_irrefl Hor) in Hzs.
-Qed.
-
-Theorem angle_add_straight_r_not_overflow :
-  ∀ θ, (θ < angle_straight)%A → angle_add_overflow θ angle_straight = false.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * Hts.
-  rewrite (H1 θ), (H1 angle_straight) in Hts.
-  now apply angle_lt_irrefl in Hts.
-}
-intros * Hts.
-progress unfold angle_ltb in Hts.
-cbn in Hts.
-rewrite (rngl_leb_refl Hor) in Hts.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-rewrite rngl_sin_add_straight_r.
-rewrite rngl_cos_add_straight_r.
-rewrite (rngl_leb_0_opp Hop Hor).
-destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hzs| Hsz]. {
-  generalize Hzs; intros H.
-  apply rngl_leb_le in H.
-  rewrite H in Hts |-*; clear H.
-  apply rngl_ltb_lt in Hts.
-  destruct (rngl_le_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
-    apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
-    apply eq_rngl_sin_0 in Hzs.
-    destruct Hzs; subst θ; cbn; rewrite (rngl_leb_refl Hor). {
-      apply (rngl_ltb_ge Hor).
-      apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
-    }
-    exfalso.
-    now apply (rngl_lt_irrefl Hor) in Hts.
-  }
-  apply (rngl_nle_gt Hor) in Hsz.
-  generalize Hsz; intros H.
-  apply (rngl_leb_gt Hor) in H.
-  now rewrite H; clear H.
-}
-apply (rngl_nle_gt Hor) in Hsz.
-generalize Hsz; intros H.
-apply (rngl_leb_gt Hor) in H.
-now rewrite H in Hts.
-Qed.
-
-Theorem angle_le_add_r :
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = false
-  → (θ1 ≤ θ1 + θ2)%A.
-Proof.
-intros * Haov.
-progress unfold angle_add_overflow in Haov.
-apply Bool.not_true_iff_false in Haov.
-now apply angle_nlt_ge in Haov.
 Qed.
 
 Definition angle_lim :=

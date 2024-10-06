@@ -138,64 +138,6 @@ subst θ3.
 now apply angle_lt_irrefl in H23.
 Qed.
 
-Theorem angle_add_lt_mono_r :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ2 θ3 = false
-  → (θ1 < θ2)%A → (θ1 + θ3 < θ2 + θ3)%A.
-Proof.
-intros * H23 H12.
-do 2 rewrite (angle_add_comm _ θ3).
-apply angle_add_not_overflow_comm in H23.
-now apply angle_add_lt_mono_l.
-Qed.
-
-Theorem angle_div_2_pow_mul_lt_angle :
-  ∀ n i θ, θ ≠ 0%A → n < 2 ^ i → (n * (θ /₂^i) < θ)%A.
-Proof.
-intros * Htz Hni.
-revert n θ Hni Htz.
-induction i; intros. {
-  cbn in Hni.
-  apply Nat.lt_1_r in Hni; subst n; cbn.
-  apply angle_lt_iff.
-  split; [ apply angle_nonneg | ].
-  now intros H; apply Htz; symmetry.
-}
-destruct (lt_dec n (2 ^ i)) as [Hin| Hin]. {
-  rewrite angle_div_2_pow_succ_r_2.
-  apply (angle_lt_le_trans _ (θ /₂)). {
-    apply IHi; [ easy | ].
-    intros H.
-    now apply eq_angle_div_2_0 in H.
-  }
-  apply angle_div_2_le.
-}
-apply Nat.nlt_ge in Hin.
-assert (H1 : n = 2 ^ i + n mod 2 ^ i). {
-  specialize (Nat.div_mod n (2 ^ i)) as H1.
-  assert (H : 2 ^ i ≠ 0) by now apply Nat.pow_nonzero.
-  specialize (H1 H); clear H.
-  rewrite (Nat_div_less_small 1) in H1; [ now rewrite Nat.mul_1_r in H1 | ].
-  now rewrite Nat.mul_1_l.
-}
-rewrite H1.
-rewrite angle_mul_add_distr_r.
-rewrite angle_div_2_pow_succ_r_2 at 1.
-rewrite angle_div_2_pow_mul_2_pow.
-apply angle_lt_le_trans with (θ2 := (θ /₂ + θ /₂)%A). {
-  apply angle_add_lt_mono_l; [ apply angle_add_overflow_div_2_div_2 | ].
-  rewrite angle_div_2_pow_succ_r_2.
-  apply IHi. {
-    apply Nat.mod_upper_bound.
-    now apply Nat.pow_nonzero.
-  }
-  intros H.
-  now apply eq_angle_div_2_0 in H.
-}
-rewrite angle_add_div_2_diag.
-apply angle_le_refl.
-Qed.
-
 Theorem angle_add_overflow_pow2_div_mul_pow2_diag :
   ∀ n i θ,
   1 < n ≤ 2 ^ i
