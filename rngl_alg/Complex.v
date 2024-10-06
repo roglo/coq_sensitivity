@@ -2098,13 +2098,6 @@ f_equal.
 apply IHn.
 Qed.
 
-Theorem angle_add_div_2_pow_diag :
-  ∀ n θ, (θ /₂^S n + θ /₂^S n = θ /₂^n)%A.
-Proof.
-intros; cbn.
-now rewrite angle_add_div_2_diag.
-Qed.
-
 Theorem sequence_false_min :
   ∀ n u,
   u 0 = false
@@ -2280,123 +2273,6 @@ Definition two_straight_div_2_pow i :=
   | 0 => 0%A
   | S i' => (angle_straight /₂^i')%A
   end.
-
-Theorem angle_add_diag_not_overflow :
-  rngl_characteristic T ≠ 1 →
-  ∀ θ,
-  (θ < angle_straight)%A
-  ↔ angle_add_overflow θ θ = false.
-Proof.
-intros Hc1.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros.
-split; intros Hθ. {
-  progress unfold angle_ltb in Hθ.
-  progress unfold angle_add_overflow.
-  progress unfold angle_ltb.
-  cbn in Hθ.
-  rewrite (rngl_leb_refl Hor) in Hθ.
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs; [ | easy ].
-  apply rngl_leb_le in Hzs.
-  apply rngl_ltb_lt in Hθ.
-  remember (0 ≤? rngl_sin (θ + θ))%L as zst eqn:Hzst.
-  symmetry in Hzst.
-  destruct zst; [ | easy ].
-  apply (rngl_ltb_ge Hor).
-  apply rngl_leb_le in Hzst.
-  cbn.
-  apply (rngl_le_trans Hor _ (rngl_cos θ * rngl_cos θ)). {
-    apply (rngl_le_sub_nonneg Hop Hor).
-    apply (rngl_mul_diag_nonneg Hop Hor).
-  }
-  (* TODO: lemma *)
-  remember (_ * _)%L as x.
-  rewrite <- (rngl_mul_1_r Hon (rngl_cos _)).
-  subst x.
-  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply rngl_cos_bound ].
-  cbn in Hzst.
-  rewrite (rngl_mul_comm Hic (rngl_cos θ)) in Hzst.
-  rewrite <- (rngl_mul_2_l Hon) in Hzst.
-  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
-  destruct Hzst as [(_, Hzst)| (H, _)]. 2: {
-    apply (rngl_nlt_ge Hor) in H.
-    exfalso; apply H; clear H.
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzst.
-  destruct Hzst as [Hzst| (Hs, Hc)]; [ easy | ].
-  apply (rngl_le_antisymm Hor) in Hs; [ | easy ].
-  symmetry in Hs.
-  apply eq_rngl_sin_0 in Hs.
-  destruct Hs; subst θ. {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
-  now apply (rngl_lt_irrefl Hor) in Hθ.
-} {
-  progress unfold angle_add_overflow in Hθ.
-  progress unfold angle_ltb in Hθ.
-  progress unfold angle_ltb.
-  cbn.
-  rewrite (rngl_leb_refl Hor).
-  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-  symmetry in Hzs.
-  destruct zs. {
-    apply rngl_leb_le in Hzs.
-    apply rngl_ltb_lt.
-    apply (rngl_lt_iff Hor).
-    split; [ apply rngl_cos_bound | ].
-    intros H; symmetry in H.
-    apply eq_rngl_cos_opp_1 in H.
-    subst θ.
-    rewrite angle_straight_add_straight in Hθ.
-    cbn in Hθ.
-    rewrite (rngl_leb_refl Hor) in Hθ.
-    apply Bool.not_true_iff_false in Hθ.
-    apply Hθ.
-    apply rngl_ltb_lt.
-    apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-  }
-  exfalso.
-  apply (rngl_leb_gt Hor) in Hzs.
-  remember (0 ≤? rngl_sin (θ + θ))%L as zst eqn:Hzst.
-  symmetry in Hzst.
-  destruct zst; [ easy | ].
-  apply (rngl_ltb_ge Hor) in Hθ.
-  apply (rngl_leb_gt Hor) in Hzst.
-  rewrite angle_add_diag in Hzst.
-  rewrite rngl_sin_mul_2_l in Hzst.
-  rewrite <- rngl_mul_assoc in Hzst.
-  apply (rngl_nle_gt Hor) in Hzst.
-  apply Hzst; clear Hzst.
-  apply (rngl_mul_nonneg_nonneg Hop Hor). {
-    apply (rngl_0_le_2 Hon Hop Hor).
-  }
-  apply (rngl_mul_nonpos_nonpos Hop Hor). {
-    now apply (rngl_lt_le_incl Hor).
-  }
-  apply (rngl_nlt_ge Hor).
-  intros Hzc.
-  apply (rngl_nlt_ge Hor) in Hθ.
-  apply Hθ; clear Hθ.
-  rewrite angle_add_diag.
-  rewrite rngl_cos_mul_2_l.
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
-  apply (rngl_le_lt_trans Hor _ (rngl_cos θ)). {
-    progress unfold rngl_squ.
-    remember (_ * _)%L as x.
-    rewrite <- (rngl_mul_1_r Hon (rngl_cos _)).
-    subst x.
-    apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | apply rngl_cos_bound ].
-    now apply (rngl_lt_le_incl Hor).
-  }
-  apply (rngl_lt_add_r Hos Hor).
-  progress unfold rngl_squ.
-  now apply (rngl_mul_neg_neg Hop Hor Hii).
-}
-Qed.
 
 Theorem angle_mul_succ_l : ∀ n θ, (S n * θ = θ + n * θ)%A.
 Proof. easy. Qed.
