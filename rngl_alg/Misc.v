@@ -54,14 +54,6 @@ split; intros Hab. {
 }
 Qed.
 
-Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
-Proof.
-intros * Ha.
-replace a with (1 * a) at 1 by apply Nat.mul_1_l.
-rewrite Nat.add_comm.
-rewrite Nat.div_add; [ apply Nat.add_comm | easy ].
-Qed.
-
 Theorem Nat_eq_mod_sub_0 : ∀ a b c,
   a mod c = b mod c → (a - b) mod c = 0.
 Proof.
@@ -361,26 +353,6 @@ induction b; intros.
  now rewrite Nat.sub_succ.
 Qed.
 
-Theorem Nat_div_sub : ∀ a b c, c ≠ 0 → (a - b * c) / c = a / c - b.
-Proof.
-intros * Hcz.
-destruct (le_dec a (b * c)) as [Hbca| Hbca]. {
-  rewrite (proj2 (Nat.sub_0_le a (b * c))); [ | easy ].
-  rewrite Nat.div_small; [ | now apply Nat.neq_0_lt_0 ].
-  symmetry.
-  apply Nat.sub_0_le.
-  rewrite Nat.mul_comm in Hbca.
-  now apply Nat.Div0.div_le_upper_bound.
-}
-apply Nat.nle_gt in Hbca.
-symmetry.
-apply Nat.add_sub_eq_r.
-rewrite <- (Nat.div_add _ _ _ Hcz).
-f_equal.
-apply Nat.lt_le_incl in Hbca.
-apply (Nat.sub_add _ _ Hbca).
-Qed.
-
 Theorem permutation_fold_mul : ∀ la lb d,
   permutation Nat.eqb la lb → fold_left Nat.mul la d = fold_left Nat.mul lb d.
 Proof.
@@ -401,18 +373,4 @@ symmetry.
 rewrite fold_left_app; cbn.
 rewrite List_fold_left_mul_assoc.
 now rewrite fold_left_app.
-Qed.
-
-Theorem Nat_pow2_log2_up_div_diag :
-  ∀ n, n ≠ 0 → 2 ^ Nat.log2_up n / n = 1.
-Proof.
-intros * Hnz.
-apply Nat_eq_div_1.
-split. {
-  destruct n; [ easy | ].
-  destruct n; [ easy | ].
-  apply Nat.log2_up_spec.
-  now apply -> Nat.succ_lt_mono.
-}
-now apply Nat_log2_up_lt_twice.
 Qed.

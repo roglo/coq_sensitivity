@@ -743,14 +743,6 @@ Fixpoint List_map {A B} (f : A → B) l :=
   | (a :: t)%list => (f a :: List_map f t)%list
   end.
 
-Theorem List_map_length : ∀ {A B} (f : A → B) l,
-  length (List_map f l) = length l.
-Proof.
-intros.
-induction l as [| a la]; [ easy | cbn ].
-now f_equal.
-Qed.
-
 Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
   {| rngl_ord_le_dec := I_ord_le_dec Hor;
      rngl_ord_le_refl := I_ord_le_refl Hor;

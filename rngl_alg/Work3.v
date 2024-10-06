@@ -219,7 +219,8 @@ Definition gc_ring_like_prop T
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
      rngl_opt_integral := NA;
-     rngl_opt_alg_closed := gc_opt_alg_closed;
+     rngl_opt_alg_closed := (*gc_opt_alg_closed;*)NA;
+(*
      rngl_characteristic_prop := gc_characteristic_prop;
      rngl_opt_le_dec := NA;
      rngl_opt_le_refl := NA;
@@ -230,5 +231,6 @@ Definition gc_ring_like_prop T
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat_non_opp := NA;
      rngl_opt_not_le := NA;
+*)
      rngl_opt_archimedean := NA |}.
 *)

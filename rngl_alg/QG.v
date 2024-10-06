@@ -241,30 +241,6 @@ apply eq_QG_eq; cbn.
 now rewrite (Z.div_same (Z.pos d)).
 Qed.
 
-Theorem Nat_gcd_iff :
-  ∀ a b c, c ≠ 0%nat →
-  Nat.gcd a b = c ↔
-  Nat.divide c a ∧ Nat.divide c b ∧ Nat.gcd (a / c) (b / c) = 1%nat.
-Proof.
-intros * Hcz.
-split; intros Habc. {
-  subst c.
-  split; [ apply Nat.gcd_divide_l | ].
-  split; [ apply Nat.gcd_divide_r | ].
-  now apply Nat.gcd_div_gcd.
-} {
-  destruct Habc as (Hca & Hcb & Habc).
-  destruct Hca as (ca, Hca).
-  destruct Hcb as (cb, Hcb).
-  subst a b.
-  rewrite Nat.gcd_mul_mono_r.
-  rewrite Nat.div_mul in Habc; [ | easy ].
-  rewrite Nat.div_mul in Habc; [ | easy ].
-  rewrite Habc.
-  apply Nat.mul_1_l.
-}
-Qed.
-
 Theorem Nat_Bezout_mul :
   ∀ a b c,
   Nat.Bezout a b 1
@@ -440,66 +416,6 @@ rewrite Nat.mul_assoc.
 rewrite Nat.gcd_mul_mono_r.
 rewrite H2.
 apply Nat.mul_1_l.
-Qed.
-
-Theorem Nat_div_gcd_1 : ∀ a b c d,
-  (a * d = b * c → Nat.gcd a b = 1 → Nat.gcd c d = 1 → a = c)%nat.
-Proof.
-intros * Hadbc Hab Hcd.
-specialize (Nat.gauss a b c) as H1.
-rewrite <- Hadbc in H1.
-assert (H : Nat.divide a (a * d)) by (exists d; apply Nat.mul_comm).
-specialize (H1 H Hab); clear H.
-specialize (Nat.gauss c d a) as H2.
-rewrite Nat.mul_comm, Hadbc in H2.
-assert (H : Nat.divide c (b * c)) by now exists b.
-specialize (H2 H Hcd); clear H.
-now apply Nat.divide_antisym.
-Qed.
-
-Theorem Nat_div_gcd : ∀ a b c d,
-  (a * b * c * d ≠ 0 → a * d = b * c → a / Nat.gcd a b = c / Nat.gcd c d)%nat.
-Proof.
-intros * Habcdz Hadbc.
-remember (Nat.gcd a b) as gab eqn:Hgab.
-remember (Nat.gcd c d) as gcd eqn:Hgcd.
-assert (Hgabz : gab ≠ 0%nat). {
-  intros H; subst gab.
-  apply Nat.gcd_eq_0 in H.
-  now destruct H; subst a; rewrite Nat.mul_0_l in Habcdz.
-}
-assert (Hgcdz : gcd ≠ 0%nat). {
-  intros H; subst gcd.
-  apply Nat.gcd_eq_0 in H.
-  now destruct H; subst d; rewrite Nat.mul_0_r in Habcdz.
-}
-apply Nat_div_gcd_1 with (b := (b / gab)%nat) (d := (d / gcd)%nat); cycle 1. {
-  now apply Nat.gcd_div_gcd.
-} {
-  now apply Nat.gcd_div_gcd.
-}
-rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
-  rewrite Hgcd.
-  apply Nat.gcd_divide_r.
-}
-rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
-  rewrite Hgcd.
-  apply Nat.gcd_divide_l.
-}
-f_equal.
-rewrite Nat.mul_comm.
-rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
-  rewrite Hgab.
-  apply Nat.gcd_divide_l.
-}
-rewrite (Nat.mul_comm _ c).
-rewrite <- Nat.Lcm0.divide_div_mul_exact. 2: {
-  rewrite Hgab.
-  apply Nat.gcd_divide_r.
-}
-f_equal.
-rewrite Nat.mul_comm, Hadbc.
-apply Nat.mul_comm.
 Qed.
 
 (* should be added in coq library ZArith *)

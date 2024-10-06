@@ -773,9 +773,6 @@ rewrite angle_mul_sub_distr_r. 2: {
 now rewrite angle_mul_1_l.
 Qed.
 
-Theorem Nat_add_mul_r_diag_r : ∀ a b, a + b * a = (1 + b) * a.
-Proof. easy. Qed.
-
 Theorem angle_right_div_2_lt :
   ∀ θ,
   (rngl_cos θ < rngl_sin θ)%L
@@ -1732,41 +1729,6 @@ rewrite angle_div_2_pow_succ_r_1.
 apply rngl_sin_div_2_nonneg.
 Qed.
 
-Theorem Nat_pow2_log2_diag_pow2_up_log2_diag :
-  ∀ n, 2 ^ Nat.log2 n = n ↔ 2 ^ Nat.log2_up n = n.
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-split; intros Hn. {
-  rewrite <- Hn at 2; symmetry; f_equal.
-  apply Nat.log2_log2_up_exact; [ easy | ].
-  now exists (Nat.log2 n).
-} {
-  rewrite <- Hn at 2; f_equal.
-  apply Nat.log2_log2_up_exact; [ easy | ].
-  now exists (Nat.log2_up n).
-}
-Qed.
-
-Theorem Nat_pow2_log2_succ :
-  ∀ n, Nat.log2 (S n) = S (Nat.log2 n) ↔ n ≠ 0 ∧ 2 ^ Nat.log2 (S n) = S n.
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-split; intros Hn. {
-  split; [ now intros H; subst n | ].
-  apply Nat.log2_eq_succ_iff_pow2 in Hn; [ | easy ].
-  destruct Hn as (m, Hm); rewrite Hm.
-  now rewrite Nat.log2_pow2.
-} {
-  destruct Hn as (_, Hn).
-  apply Nat.log2_eq_succ_iff_pow2; [ easy | ].
-  now exists (Nat.log2 (S n)).
-}
-Qed.
-
 Theorem angle_div_2_pow_mul_pow_sub :
   ∀ i j θ, j ≤ i → (2 ^ (i - j) * (θ /₂^i) = θ /₂^j)%A.
 Proof.
@@ -2219,109 +2181,11 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add.
 Qed.
 
-Theorem Nat_lt_sub_lt_add_r_iff : ∀ n m p, p ≤ n → n - p < m ↔ n < m + p.
-Proof.
-intros * Hpm.
-split; intros Hn; [ apply Nat.lt_sub_lt_add_r, Hn | ].
-apply Nat.add_lt_mono_r with (p := p).
-now rewrite Nat.sub_add.
-Qed.
-
 Theorem Nat_pow2_log2 :
   ∀ n, n ≠ 0 → 2 ^ S (Nat.log2 n) = 2 ^ Nat.log2_up (S n).
 Proof.
 intros * Hnz.
 now destruct n.
-Qed.
-
-(* to be cleaned *)
-Theorem Nat_log2_up_pow2_sub_1 :
-  ∀ n, n ≠ 1 → Nat.log2_up (2 ^ n - 1) = n.
-Proof.
-intros * Hn1.
-specialize (Nat.log2_up_succ_or (2 ^ n - 1)) as H1.
-destruct H1 as [H1| H1]. 2: {
-  rewrite <- Nat.sub_succ_l in H1. 2: {
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite Nat_sub_succ_1 in H1.
-  rewrite <- H1.
-  now apply Nat.log2_up_pow2.
-}
-rewrite <- Nat.sub_succ_l in H1. 2: {
-  apply Nat.neq_0_lt_0.
-  now apply Nat.pow_nonzero.
-}
-rewrite Nat_sub_succ_1 in H1.
-rewrite Nat.log2_up_pow2 in H1; [ | easy ].
-symmetry in H1.
-destruct n; [ easy | ].
-apply Nat.succ_inj in H1.
-apply Nat_eq_log2_up in H1. {
-  rewrite Nat.pow_succ_r' in H1.
-  destruct H1 as (H1, H2).
-  specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
-  remember (2 ^ n) as m eqn:Hm.
-  destruct m; [ easy | ].
-  exfalso.
-  apply Nat.nlt_ge in H2.
-  apply H2; clear H2.
-  apply Nat.lt_add_lt_sub_r.
-  rewrite Nat_mul_2_l.
-  apply Nat.add_lt_mono_l.
-  destruct m; [ | flia ].
-  cbn in H1.
-  symmetry in Hm.
-  destruct n; [ easy | ].
-  rewrite Nat.pow_succ_r' in Hm.
-  flia Hm.
-}
-rewrite Nat.pow_succ_r'.
-specialize (Nat.pow_nonzero 2 n (Nat.neq_succ_0 _)) as H3.
-flia H3.
-Qed.
-
-Theorem Nat_eq_pow_1 : ∀ a b, a ^ b = 1 → a = 1 ∨ b = 0.
-Proof.
-intros * Hab.
-destruct b; [ now right | left ].
-cbn in Hab.
-now apply Nat.eq_mul_1 in Hab.
-Qed.
-
-Theorem Geoffroy_1 :
-  ∀ a b na nb,
-  1 < a
-  → 1 < b
-  → na = Nat.log2_up a
-  → nb = Nat.log2_up b
-  → 2 ^ (na + nb - 2) < a * b ≤ 2 ^ (na + nb).
-Proof.
-intros * H1a H1b Hna Hnb.
-specialize (Nat.log2_up_spec _ H1a) as Ha.
-specialize (Nat.log2_up_spec _ H1b) as Hb.
-rewrite <- Hna in Ha.
-rewrite <- Hnb in Hb.
-rewrite PeanoNat.pred_of_minus in Ha, Hb.
-split. {
-  replace 2 with (1 + 1) at 2 by easy.
-  rewrite Nat.sub_add_distr.
-  rewrite Nat.add_sub_swap. 2: {
-    rewrite Hna.
-    replace 1 with (Nat.log2_up 2) by easy.
-    now apply Nat.log2_up_le_mono.
-  }
-  rewrite <- Nat.add_sub_assoc. 2: {
-    rewrite Hnb.
-    replace 1 with (Nat.log2_up 2) by easy.
-    now apply Nat.log2_up_le_mono.
-  }
-  rewrite Nat.pow_add_r.
-  now apply Nat.mul_lt_mono.
-}
-rewrite Nat.pow_add_r.
-now apply Nat.mul_le_mono.
 Qed.
 
 (* find k and m such n = 2^k * m where m is odd *)
@@ -2400,19 +2264,6 @@ rewrite IHit1 with (it2 := it2); [ easy | | | ]. {
   flia Hit1 Hc.
 } {
   flia Hit2 Hc.
-}
-Qed.
-
-Theorem Nat_div_not_small_iff :
-  ∀ a b, b ≠ 0 → a / b ≠ 0 ↔ b ≤ a.
-Proof.
-intros * Hbz.
-split; intros H1. {
-  apply Nat.nlt_ge; intros H; apply H1.
-  now apply Nat.div_small_iff.
-} {
-  apply Nat.nlt_ge in H1; intros H; apply H1.
-  now apply Nat.div_small_iff.
 }
 Qed.
 
