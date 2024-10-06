@@ -93,11 +93,6 @@ Definition Zn_opp n (a : Zn n) : Zn n :=
 Definition Zn_inv n (a : Zn n) : Zn n :=
   let r := inv_mod (proj1_sig a) n in
   exist _ (r mod at_least_1 n) (Zn_op_prop n r).
-Definition Zn_div n (a b : Zn n) : Zn n :=
-  if is_prime n then Zn_mul n a (Zn_inv n b)
-  else a.
-Definition Zn_eqb n (a b : Zn n) : bool :=
-  proj1_sig a =? proj1_sig b.
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
@@ -201,23 +196,6 @@ rewrite Nat.sub_add. 2: {
   now apply Nat.lt_le_incl.
 }
 apply Nat.Div0.mod_same.
-Qed.
-
-Theorem Zn_eqb_eq :
-  ∀ n (a b : Zn n), Zn_eqb n a b = true ↔ a = b.
-Proof.
-intros n (a, Ha) (b, Hb); cbn.
-split. {
-  intros Hab.
-  apply Nat.eqb_eq in Hab; subst b.
-  apply eq_exist_uncurried.
-  exists eq_refl.
-  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
-} {
-  intros Hab.
-  apply Nat.eqb_eq.
-  now injection Hab.
-}
 Qed.
 
 Theorem Zn_eq_dec : ∀ n (a b : Zn n), {a = b} + {a ≠ b}.
@@ -401,19 +379,6 @@ rewrite proj1_sig_Zn_of_nat.
 rewrite Nat.Div0.mod_same.
 cbn; symmetry.
 apply Nat.sub_diag.
-Qed.
-
-Theorem Zn_opt_quot_mul :
-  let roz := Zn_ring_like_op in
-  if rngl_has_quot (Zn n) then
-    ∀ a b c : Zn n, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
-  else not_applicable.
-Proof.
-intros.
-progress unfold rngl_has_quot.
-progress unfold roz; cbn.
-progress unfold Zn_opt_inv_or_quot.
-now destruct (is_prime n).
 Qed.
 
 Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :

@@ -1979,24 +1979,6 @@ intros * Ha.
 now apply rl_sqrt_nonneg.
 Qed.
 
-Theorem angle_add_overflow_move_add :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ2 θ3 = false
-  → angle_add_overflow (θ1 + θ2) θ3 = true
-  → angle_add_overflow θ1 (θ2 + θ3) = true.
-Proof.
-destruct_ac.
-intros * H23 H123.
-apply Bool.not_false_iff_true in H123.
-apply Bool.not_false_iff_true.
-intros H; apply H123.
-apply angle_add_not_overflow_comm.
-apply angle_add_not_overflow_move_add.
-now apply angle_add_not_overflow_comm.
-rewrite angle_add_comm.
-now apply angle_add_not_overflow_comm.
-Qed.
-
 Theorem angle_div_2_pow_div_2_distr :
   ∀ n θ, angle_div_2_pow (θ /₂) n = (angle_div_2_pow θ n /₂)%A.
 Proof.

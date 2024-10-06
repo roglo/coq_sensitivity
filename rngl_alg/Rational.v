@@ -1132,13 +1132,6 @@ destruct (eq_dec x y) as [H1| H1].
    now intros H; apply H1, le_antisymm.
 Qed.
 
-Theorem add_lt_le_mono : ∀ x y z t, (x < y → z ≤ t → x + z < y + t)%Q.
-Proof.
-intros * Hxy Hzt.
-setoid_rewrite add_comm.
-now apply add_le_lt_mono.
-Qed.
-
 Theorem add_lt_mono : ∀ x y z t, (x < y → z < t → x + z < y + t)%Q.
 Proof.
 intros.
@@ -1208,15 +1201,6 @@ Theorem lt_add_lt_sub_r : ∀ x y z, (x + y < z)%Q ↔ (x < z - y)%Q.
 Proof.
 intros.
 rewrite add_comm; apply lt_add_lt_sub_l.
-Qed.
-
-Theorem add_le_r : ∀ x y z, (x + z ≤ y + z ↔ x ≤ y)%Q.
-Proof.
-intros.
-split; intros H.
--apply (add_le_mono _ _ (- z) (- z)) in H; [ | apply le_refl ].
- now do 2 rewrite add_opp_r, add_sub in H.
--apply add_le_mono; [ easy | apply le_refl ].
 Qed.
 
 Theorem opp_lt_mono : ∀ x y, (x < y)%Q ↔ (- y < - x)%Q.
@@ -1486,13 +1470,6 @@ split; intros Hxy.
  now rewrite add_comm, add_sub in Hxy.
 -apply (add_cancel_r _ _ x) in Hxy.
  now rewrite sub_add, add_comm in Hxy.
-Qed.
-
-Theorem add_move_r : ∀ x y z, (x + y)%Q = z ↔ x = (z - y)%Q.
-Proof.
-intros.
-rewrite add_comm.
-apply add_move_l.
 Qed.
 
 Theorem add_move_0_l : ∀ x y, (x + y)%Q = 0%Q ↔ y = (- x)%Q.

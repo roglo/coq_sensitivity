@@ -84,17 +84,6 @@ split; [ now intros H; subst b; apply Z.lt_irrefl in Hab | ].
 now apply Z.leb_le, Z.lt_le_incl.
 Qed.
 
-Theorem Z_opt_quot_mul :
-  let roz := Z_ring_like_op in
-  if rngl_has_quot Z then
-    ∀ a b c : Z, b ≠ 0%L → c ≠ 0%L → (a / (b * c))%L = (a / b / c)%L
-  else not_applicable.
-Proof.
-intros; cbn.
-intros * Hbz Hcz.
-now symmetry; apply Z.quot_quot.
-Qed.
-
 Theorem Z_opt_le_dec : ∀ a b : Z, {(a <=? b)%Z = true} + {(a <=? b)%Z ≠ true}.
 Proof.
 intros.

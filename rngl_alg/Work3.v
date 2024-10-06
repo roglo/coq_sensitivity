@@ -22,61 +22,6 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
 (* to be completed or deleted
-Theorem all_gc_has_nth_root :
-  rngl_is_archimedean T = true →
-  rngl_characteristic T = 0 →
-  rl_has_integral_modulus T = true →
-  ∀ n, n ≠ 0 → ∀ z : GComplex T, ∃ x : GComplex T, gc_power_nat x n = z.
-Proof.
-destruct_ac.
-intros Har Hch Him * Hnz *.
-specialize (polar Him z) as H1.
-set (ρ := √((gre z)² + (gim z)²)%L).
-set
-  (θ :=
-     (if (0 ≤? gim z)%L then rngl_acos Hor (gre z / ρ)%L
-      else angle_opp (rngl_acos Hor (gre z / ρ)%L))).
-specialize (H1 ρ θ eq_refl eq_refl).
-set (ρ' := rl_nth_root n ρ).
-specialize angle_div_nat_is_inf_sum_of_angle_div_2_pow as H2.
-specialize (H2 Har Hch).
-remember (seq_angle_to_div_nat θ n) as θi eqn:Hθi.
-progress unfold seq_angle_to_div_nat in Hθi.
-...
-set (θ' := angle_div_nat θ n).
-exists (mk_gc (ρ' * cos θ') (ρ' * sin θ')).
-...
-assert (Hre : (-1 ≤ gre z / ρ ≤ 1)%L). {
-  subst ρ.
-... ...
-apply rl_sqrt_div_squ_squ.
-}
-...
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool _) as [Hiz| Hiz]. {
-  rewrite (rngl_cos_acos Htr).
-...
-  rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
-    subst ρ.
-    progress unfold rl_sqrt.
-    progress unfold rl_pow.
-    rewrite if_bool_if_dec.
-    destruct (Sumbool.sumbool_of_bool _) as [H2| H2]. {
-      apply (rngl_eqb_eq Heb) in H2.
-      generalize Hmi; intros H.
-      progress unfold rl_has_integral_modulus in H.
-      remember (rl_opt_mod_intgl_prop T) as mi eqn:Hmi1.
-      symmetry in Hmi1.
-      destruct mi as [mi| ]; [ clear H | easy ].
-      apply mi in H2.
-      apply (neq_neq_GComplex Heb) in Hz.
-      cbn in Hz.
-      now destruct Hz.
-    }
-    apply (rngl_eqb_neq Heb) in H2.
-    apply (rl_exp_neq_0 Hon Hop Hiv H10 Htr).
-  }
-...
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
   {rl : real_like_prop T} :
   rngl_has_1 T = true →

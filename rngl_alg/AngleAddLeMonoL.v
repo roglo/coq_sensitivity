@@ -315,30 +315,6 @@ apply (rngl_sub_le_compat Hop Hor). {
 now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_1' :
-  ∀ θ1 θ2 θ3,
-  (θ3 < - θ1)%A ∨ (angle_straight - θ1 < θ3)%A
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (0 ≤ rngl_sin (θ1 + θ3))%L
-  → (rngl_cos θ3 ≤ rngl_cos θ2)%L
-  → (rngl_cos (θ1 + θ3) ≤ rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Haov13 Hzs2 Hzs3 Hzc1 Hzs12 Hzs13 H23.
-generalize Hzs13; intros Hzs1.
-apply angle_lt_rngl_sin_add_nonneg_sin_nonneg in Hzs1; [ | easy ].
-apply angle_le_sub_le_add_l_lemma_1; try easy. {
-  rewrite angle_add_comm.
-  now rewrite angle_add_sub.
-} {
-  rewrite angle_add_comm.
-  now rewrite angle_add_sub.
-}
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_1 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
