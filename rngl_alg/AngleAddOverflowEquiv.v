@@ -15,21 +15,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-Definition angle_add_not_overflow2 (θ1 θ2 : angle T) :=
-  (θ1 /₂ + θ2 /₂ ≤ angle_straight)%A ∧ (θ1 = 0 ∨ θ1 + θ2 ≠ 0)%A.
-
-Theorem angle_add_overflow_opp :
-  ∀ θ, θ ≠ 0%A → angle_add_overflow θ (- θ) = true.
-Proof.
-intros * Hz.
-progress unfold angle_add_overflow.
-rewrite angle_add_opp_r.
-rewrite angle_sub_diag.
-apply angle_lt_iff.
-split; [ apply angle_nonneg | ].
-now intros H; symmetry in H.
-Qed.
-
 Theorem rngl_sin_sub_div_2_div_2_pos :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
