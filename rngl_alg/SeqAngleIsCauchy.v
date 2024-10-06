@@ -5,7 +5,6 @@ Require Import Misc.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleDiv2Add.
 Require Import AngleAddLeMonoL.
-Require Import Complex.
 
 Section a.
 

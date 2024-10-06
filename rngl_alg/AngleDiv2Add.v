@@ -1232,7 +1232,7 @@ destruct Hn as (Hmn, Han).
 cbn - [ angle_mul_nat_overflow ].
 rewrite Nat.add_0_r.
 rewrite Nat.add_succ_r.
-rewrite Nat_add_diag.
+rewrite <- Nat_mul_2_l.
 apply <- angle_mul_nat_overflow_succ_l_false.
 split. {
   apply <- angle_mul_nat_overflow_succ_l_false.

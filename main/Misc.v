@@ -239,7 +239,7 @@ Qed.
 
 (* *)
 
-Theorem Nat_add_diag : ∀ n, n + n = 2 * n.
+Theorem Nat_mul_2_l : ∀ n, 2 * n = n + n.
 Proof.
 intros; cbn.
 now rewrite Nat.add_0_r.

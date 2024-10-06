@@ -1645,7 +1645,7 @@ Proof.
 intros Hc1 * Hni.
 apply (angle_add_diag_not_overflow Hc1).
 apply angle_mul_nat_overflow_distr_add_overflow.
-rewrite Nat_add_diag.
+rewrite <- Nat_mul_2_l.
 rewrite angle_div_2_pow_succ_r_1.
 apply angle_mul_nat_overflow_mul_2_div_2.
 now apply angle_mul_nat_overflow_div_pow2.
@@ -2269,7 +2269,7 @@ apply Nat_eq_log2_up in H1. {
   apply Nat.nlt_ge in H2.
   apply H2; clear H2.
   apply Nat.lt_add_lt_sub_r.
-  rewrite <- Nat_add_diag.
+  rewrite Nat_mul_2_l.
   apply Nat.add_lt_mono_l.
   destruct m; [ | flia ].
   cbn in H1.

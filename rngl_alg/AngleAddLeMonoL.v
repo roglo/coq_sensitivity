@@ -3858,4 +3858,32 @@ rewrite angle_mul_nat_assoc.
 now apply angle_mul_nat_overflow_distr_add_overflow.
 Qed.
 
+Theorem angle_mul_nat_overflow_le_r :
+  ∀ θ1 θ2,
+  (θ1 ≤ θ2)%A
+  → ∀ n,
+  angle_mul_nat_overflow n θ2 = false
+  → angle_mul_nat_overflow n θ1 = false.
+Proof.
+destruct_ac.
+intros * H12 * H2.
+revert θ1 θ2 H12 H2.
+induction n; intros; [ easy | ].
+generalize H2; intros H.
+apply angle_mul_nat_overflow_succ_l_false in H.
+destruct H as (Hn2, H2n2).
+cbn.
+destruct n; [ easy | ].
+apply Bool.orb_false_iff.
+split; [ | now apply (IHn _ θ2) ].
+remember (S n) as m eqn:Hm.
+clear n Hm; rename m into n.
+clear H2 IHn.
+apply angle_add_not_overflow_comm.
+eapply angle_add_overflow_le; [ apply H12 | ].
+apply angle_add_not_overflow_comm.
+eapply angle_add_overflow_le; [ | apply H2n2 ].
+now apply angle_mul_le_mono_l.
+Qed.
+
 End a.
