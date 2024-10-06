@@ -776,6 +776,58 @@ Qed.
 
 Context {rl : real_like_prop T}.
 
+Theorem rngl_acos_prop :
+  ∀ x, (x² ≤ 1)%L → cos2_sin2_prop x √(1 - x²)%L.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold cos2_sin2_prop.
+rewrite Hon, Hop, Hic, Hed; cbn.
+apply (rngl_eqb_eq Hed).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  now rewrite rngl_add_0_l.
+}
+rewrite rngl_add_comm.
+apply (rngl_sub_add Hop).
+Qed.
+
+Theorem rngl_asin_prop :
+  ∀ x, (x² ≤ 1)%L → cos2_sin2_prop √(1 - x²)%L x.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold cos2_sin2_prop.
+rewrite Hon, Hop, Hic, Hed; cbn.
+apply (rngl_eqb_eq Hed).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  now rewrite rngl_add_0_l.
+}
+apply (rngl_sub_add Hop).
+Qed.
+
+Definition rngl_acos (x : T) :=
+  match (rngl_le_dec ac_or x² 1)%L with
+  | left Hx1 =>
+      {| rngl_cos := x; rngl_sin := √(1 - x²)%L;
+         rngl_cos2_sin2 := rngl_acos_prop x Hx1 |}
+  | _ =>
+      angle_zero
+  end.
+
+Definition rngl_asin (x : T) :=
+  match (rngl_le_dec ac_or x² 1)%L with
+  | left Hx1 =>
+      {| rngl_cos := √(1 - x²)%L; rngl_sin := x;
+         rngl_cos2_sin2 := rngl_asin_prop x Hx1 |}
+  | _ =>
+      angle_zero
+  end.
+
+Arguments rngl_acos x%_L.
+Arguments rngl_asin x%_L.
+
 Fixpoint angle_div_2_pow θ i :=
   match i with
   | 0 => θ
@@ -2206,4 +2258,28 @@ destruct (0 ≤? rngl_sin θ1)%L; [ | easy ].
 now apply rngl_leb_le in H12.
 Qed.
 
+Theorem rngl_cos_acos :
+  ∀ x, (-1 ≤ x ≤ 1)%L → rngl_cos (rngl_acos x) = x.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold rngl_acos.
+destruct (rngl_le_dec ac_or x² 1) as [| H]; [ easy | ].
+exfalso; apply H; clear H.
+now apply (rngl_squ_le_1 Hon Hop Hor).
+Qed.
+
+Theorem rngl_sin_acos :
+  ∀ x, (-1 ≤ x ≤ 1)%L → rngl_sin (rngl_acos x) = √(1 - x²)%L.
+Proof.
+destruct_ac.
+intros * Hx1.
+progress unfold rngl_acos.
+destruct (rngl_le_dec ac_or x² 1) as [| H]; [ easy | ].
+exfalso; apply H; clear H.
+now apply (rngl_squ_le_1 Hon Hop Hor).
+Qed.
+
 End a.
+
+Arguments rngl_acos {T ro rp ac rl} x%_L.

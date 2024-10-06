@@ -396,4 +396,18 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
 now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
 Qed.
 
+Theorem rngl_squ_le_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (-1 ≤ a ≤ 1)%L → (a² ≤ 1)%L.
+Proof.
+intros Hon Hop Hor.
+intros * Ha.
+rewrite <- (rngl_squ_1 Hon).
+apply (rngl_abs_le_squ_le Hop Hor).
+rewrite (rngl_abs_1 Hon Hop Hor).
+now apply -> (rngl_abs_le Hop Hor).
+Qed.
+
 End a.
