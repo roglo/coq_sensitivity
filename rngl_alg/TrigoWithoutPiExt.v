@@ -780,21 +780,6 @@ rewrite rngl_add_comm.
 apply (rngl_sub_add Hop).
 Qed.
 
-Theorem rngl_asin_prop :
-  ∀ x, (x² ≤ 1)%L → cos2_sin2_prop √(1 - x²)%L x.
-Proof.
-destruct_ac.
-intros * Hx1.
-progress unfold cos2_sin2_prop.
-rewrite Hon, Hop, Hic, Hed; cbn.
-apply (rngl_eqb_eq Hed).
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  now rewrite rngl_add_0_l.
-}
-apply (rngl_sub_add Hop).
-Qed.
-
 Definition rngl_acos (x : T) :=
   match (rngl_le_dec ac_or x² 1)%L with
   | left Hx1 =>
@@ -1112,28 +1097,6 @@ rewrite <- (angle_sub_add θ1 θ2) at 2.
 apply rngl_cos_le_cos_add; [ | easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzs12.
 now rewrite angle_sub_add.
-Qed.
-
-Theorem rngl_sin_pos_lt_straight :
-  ∀ θ,
-  (0 < rngl_sin θ)%L
-  → (θ < angle_straight)%A.
-Proof.
-destruct_ac.
-intros * Hzs.
-progress unfold angle_ltb.
-rewrite (rngl_leb_refl Hor).
-generalize Hzs; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-apply rngl_ltb_lt; cbn.
-apply (rngl_lt_iff Hor).
-split; [ apply rngl_cos_bound | ].
-intros H; symmetry in H.
-apply eq_rngl_cos_opp_1 in H.
-subst θ.
-now apply (rngl_lt_irrefl Hor) in Hzs.
 Qed.
 
 Definition angle_lim :=
