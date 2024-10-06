@@ -956,15 +956,6 @@ destruct z1. {
 }
 Qed.
 
-Theorem angle_lt_trans :
-  ∀ θ1 θ2 θ3,
-  (θ1 < θ2 → θ2 < θ3 → θ1 < θ3)%A.
-Proof.
-intros * H12 H23.
-apply (angle_le_lt_trans _ θ2); [ | easy ].
-now apply angle_lt_le_incl in H12.
-Qed.
-
 Theorem quadrant_1_rngl_cos_add_le_cos_l :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -1163,78 +1154,6 @@ rewrite <- (angle_sub_add θ1 θ2) at 2.
 apply rngl_cos_le_cos_add; [ | easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzs12.
 now rewrite angle_sub_add.
-Qed.
-
-Theorem angle_lt_sub_diag :
-  ∀ θ1 θ2, (0 < θ2 < θ1)%A → (θ1 - θ2 < θ1)%A.
-Proof.
-intros * (Hz2, H21).
-apply angle_lt_iff.
-split. {
-  apply angle_le_sub_diag.
-  now apply angle_lt_le_incl in H21.
-}
-intros H.
-apply angle_sub_move_l in H.
-rewrite angle_sub_diag in H.
-rewrite H in Hz2.
-now apply angle_lt_irrefl in Hz2.
-Qed.
-
-Theorem angle_lt_eq_cases :
-  ∀ θ1 θ2, (θ1 ≤ θ2)%A ↔ (θ1 < θ2)%A ∨ θ1 = θ2.
-Proof.
-intros.
-split; intros H12. {
-  remember (θ1 =? θ2)%A as e12 eqn:He12.
-  symmetry in He12.
-  destruct e12. {
-    apply angle_eqb_eq in He12.
-    now right.
-  }
-  left.
-  apply angle_eqb_neq in He12.
-  now apply angle_lt_iff.
-}
-destruct H12 as [H12| H12]; [ now apply angle_lt_le_incl | ].
-subst θ2.
-apply angle_le_refl.
-Qed.
-
-Theorem angle_eucl_dist_eq_cos_eq :
-  ∀ θ1 θ2 θ3 θ4,
-  (angle_eucl_dist θ1 θ2 = angle_eucl_dist θ3 θ4)%L ↔
-  (rngl_cos (θ4 - θ3) = rngl_cos (θ2 - θ1))%L.
-Proof.
-destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  do 2 rewrite (H1 (angle_eucl_dist _ _)).
-  do 2 rewrite (H1 (rngl_cos _)).
-  easy.
-}
-intros.
-do 2 rewrite angle_eucl_dist_is_sqrt.
-split; intros H1234; [ | now rewrite H1234 ].
-apply (f_equal rngl_squ) in H1234.
-rewrite (rngl_squ_sqrt Hon) in H1234. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-rewrite (rngl_squ_sqrt Hon) in H1234. 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor).
-  apply (rngl_0_le_2 Hon Hop Hor).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cos_bound.
-}
-apply (rngl_mul_cancel_l Hi1) in H1234. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-now apply (rngl_sub_cancel_l Hop) in H1234.
 Qed.
 
 Theorem rngl_sin_pos_lt_straight :
