@@ -2342,6 +2342,18 @@ apply (rngl_leb_gt Hor) in Hsz.
 now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
 
+Theorem angle_add_cancel_l :
+  ∀ θ1 θ2 θ3, (θ1 + θ2)%A = (θ1 + θ3)%A ↔ θ2 = θ3.
+Proof.
+intros.
+split; intros H1; [ | now subst θ2 ].
+rewrite angle_add_comm in H1.
+apply angle_add_move_r in H1.
+rewrite angle_add_comm in H1.
+rewrite angle_add_sub in H1.
+easy.
+Qed.
+
 End a.
 
 Arguments rngl_acos {T ro rp ac rl} x%_L.

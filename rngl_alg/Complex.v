@@ -1543,11 +1543,7 @@ destruct a. {
 apply Nat.succ_lt_mono in Hab.
 specialize (IHb a Hab).
 cbn in Habt.
-(* lemma to do *)
-rewrite angle_add_comm in Habt.
-apply angle_add_move_r in Habt.
-rewrite angle_add_comm in Habt.
-rewrite angle_add_sub in Habt.
+apply angle_add_cancel_l in Habt.
 easy.
 Qed.
 
