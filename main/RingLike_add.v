@@ -126,9 +126,10 @@ Qed.
 
 Theorem rngl_add_cancel_l :
   rngl_has_opp_or_subt T = true →
-  ∀ a b c, (a + b = a + c)%L → (b = c)%L.
+  ∀ a b c, (a + b = a + c)%L ↔ (b = c)%L.
 Proof.
-intros Hom * Habc.
+intros Hom *.
+split; intros Habc; [ | now subst b ].
 remember (rngl_has_opp T) as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
@@ -495,6 +496,19 @@ intros Hro * H.
 rewrite <- (rngl_opp_involutive Hro a).
 rewrite H.
 now apply rngl_opp_involutive.
+Qed.
+
+Theorem rngl_sub_cancel_l :
+  rngl_has_opp T = true →
+  ∀ a b c, (a - b)%L = (a - c)%L ↔ b = c.
+Proof.
+intros Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+split; intros H1; [ | now subst b ].
+do 2 rewrite <- (rngl_add_opp_r Hop) in H1.
+apply (rngl_add_cancel_l Hos) in H1.
+now apply (rngl_opp_inj Hop) in H1.
 Qed.
 
 Theorem rngl_opp_sub_distr :

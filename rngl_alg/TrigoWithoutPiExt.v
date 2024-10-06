@@ -1246,10 +1246,7 @@ rewrite (rngl_squ_sqrt Hon) in H1234. 2: {
 apply (rngl_mul_cancel_l Hi1) in H1234. 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
-(* lemma to do *)
-do 2 rewrite <- (rngl_add_opp_r Hop) in H1234.
-apply (rngl_add_cancel_l Hos) in H1234.
-now apply (rngl_opp_inj Hop) in H1234.
+now apply (rngl_sub_cancel_l Hop) in H1234.
 Qed.
 
 Theorem angle_eucl_dist_lt_cos_lt :

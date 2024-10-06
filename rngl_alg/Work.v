@@ -61,7 +61,6 @@ Theorem angle_mul_nat_overflow_pow2_div_angle_mul :
 Proof.
 destruct_ac.
 intros.
-(* lemma to do *)
 apply Bool.not_true_iff_false.
 intros H1.
 apply angle_mul_nat_overflow_true_assoc in H1.
