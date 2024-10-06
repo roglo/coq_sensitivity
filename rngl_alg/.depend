@@ -7,7 +7,7 @@ AngleDivNat.vo AngleDivNat.glob AngleDivNat.v.beautified AngleDivNat.required_vo
 AngleEuclDistLtAngleLtLt.vo AngleEuclDistLtAngleLtLt.glob AngleEuclDistLtAngleLtLt.v.beautified AngleEuclDistLtAngleLtLt.required_vo: AngleEuclDistLtAngleLtLt.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddLeMonoL.vo AngleAddOverflowLe.vo AngleDiv2Add.vo Complex.vo TacChangeAngle.vo
 AngleLeSubAdd.vo AngleLeSubAdd.glob AngleLeSubAdd.v.beautified AngleLeSubAdd.required_vo: AngleLeSubAdd.v ../main/RingLike.vo TrigoWithoutPi.vo TacChangeAngle.vo
 AngleRl.vo AngleRl.glob AngleRl.v.beautified AngleRl.required_vo: AngleRl.v ../main/RingLike.vo TrigoWithoutPi.vo
-AngleTypeIsComplete.vo AngleTypeIsComplete.glob AngleTypeIsComplete.v.beautified AngleTypeIsComplete.required_vo: AngleTypeIsComplete.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo IntermVal.vo
+AngleTypeIsComplete.vo AngleTypeIsComplete.glob AngleTypeIsComplete.v.beautified AngleTypeIsComplete.required_vo: AngleTypeIsComplete.v ../main/Misc.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo
 Complex.vo Complex.glob Complex.v.beautified Complex.required_vo: Complex.v ../main/Misc.vo ../main/RingLike.vo ../main/IterAdd.vo Misc.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleAddOverflowLe.vo AngleAddLeMonoL.vo AngleDiv2Add.vo TacChangeAngle.vo
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
