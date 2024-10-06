@@ -83,7 +83,7 @@ split; intros H12. {
 }
 Qed.
 
-Theorem angle_div_nat_spec :
+Theorem angle_div_nat_prop :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
@@ -250,6 +250,27 @@ enough (H : ∃ N, ∀ m, N ≤ m → (1 - ε² / 2 < rngl_cos (θ /₂^m))%L). 
   now rewrite angle_sub_0_l.
 }
 now apply (exists_nat_such_that_rngl_cos_close_to_1 Har).
+Qed.
+
+Theorem angle_div_nat_spec :
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  ∀ θ n,
+  n ≠ 0
+  → ∃ θ', angle_div_nat θ n θ' ∧ (n * θ')%A = θ.
+Proof.
+destruct_ac.
+intros Hcz Har Hco * Hnz.
+specialize (seq_angle_to_div_nat_is_Cauchy Har n θ) as H1.
+specialize (rngl_is_complete_angle_is_complete Hco) as H2.
+specialize (H2 _ H1).
+destruct H2 as (θ', Ht).
+exists θ'.
+progress unfold angle_div_nat.
+split; [ easy | ].
+specialize (angle_div_nat_prop Hcz Har Hco _ _ _ Ht) as H2.
+now destruct H2.
 Qed.
 
 End a.

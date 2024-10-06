@@ -68,27 +68,6 @@ rewrite Haz.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem rl_sqrt_lt_sqrt :
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_has_1 T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (0 ≤ a → 0 ≤ b → √a < √b → a < b)%L.
-Proof.
-intros Hic Hop Hiv Hon Hor.
-intros * Hza Hzb Hab.
-rewrite <- (rngl_abs_sqrt Hop Hor _ Hza) in Hab.
-rewrite <- (rngl_abs_sqrt Hop Hor _ Hzb) in Hab.
-apply (rngl_abs_lt_squ_lt Hic Hop Hor) in Hab. 2: {
-  apply Bool.orb_true_iff; right.
-  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
-}
-rewrite (rngl_squ_sqrt Hon) in Hab; [ | easy ].
-rewrite (rngl_squ_sqrt Hon) in Hab; [ | easy ].
-easy.
-Qed.
-
 Theorem rl_sqrt_mul :
   ∀ a b,
   (0 ≤ a)%L

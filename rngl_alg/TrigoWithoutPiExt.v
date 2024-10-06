@@ -804,17 +804,7 @@ Definition rngl_acos (x : T) :=
       angle_zero
   end.
 
-Definition rngl_asin (x : T) :=
-  match (rngl_le_dec ac_or x² 1)%L with
-  | left Hx1 =>
-      {| rngl_cos := √(1 - x²)%L; rngl_sin := x;
-         rngl_cos2_sin2 := rngl_asin_prop x Hx1 |}
-  | _ =>
-      angle_zero
-  end.
-
 Arguments rngl_acos x%_L.
-Arguments rngl_asin x%_L.
 
 Fixpoint angle_div_2_pow θ i :=
   match i with

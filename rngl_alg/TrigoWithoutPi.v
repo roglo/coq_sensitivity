@@ -3900,19 +3900,6 @@ destruct zs. {
 }
 Qed.
 
-Theorem angle_opp_div_2' :
-  ∀ θ, (- (θ /₂) = (- θ) /₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
-Proof.
-intros.
-rewrite angle_opp_div_2.
-remember (θ =? 0)%A as tz eqn:Htz.
-symmetry in Htz.
-destruct tz; [ now do 2 rewrite angle_add_0_r | ].
-rewrite <- angle_add_assoc.
-rewrite angle_straight_add_straight.
-symmetry; apply angle_add_0_r.
-Qed.
-
 Theorem angle_straight_div_2 : (angle_straight /₂ = angle_right)%A.
 Proof.
 destruct_ac.
@@ -4093,21 +4080,6 @@ Proof.
 intros * H12.
 apply (f_equal (λ θ, (2 * θ)%A)) in H12.
 now do 2 rewrite angle_div_2_mul_2 in H12.
-Qed.
-
-Theorem angle_div_2_lt_compat :
-  ∀ θ1 θ2, (θ1 < θ2 → θ1 /₂ < θ2 /₂)%A.
-Proof.
-intros * H12.
-apply angle_lt_iff.
-split. {
-  apply angle_lt_le_incl in H12.
-  now apply angle_div_2_le_compat.
-}
-intros H.
-apply angle_div_2_eq_compat in H.
-subst θ2.
-now apply angle_lt_irrefl in H12.
 Qed.
 
 Theorem eq_angle_div_2_0 : ∀ θ, (θ /₂ = 0 → θ = 0)%A.

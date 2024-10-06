@@ -339,20 +339,6 @@ apply angle_le_sub_le_add_l_lemma_1; try easy. {
 }
 Qed.
 
-Theorem angle_straight_neq_0 :
-  rngl_characteristic T ≠ 1
-  → angle_straight ≠ 0%A.
-Proof.
-destruct_ac.
-intros Hc1 Hs2z.
-apply eq_angle_eq in Hs2z.
-cbn in Hs2z.
-injection Hs2z; clear Hs2z; intros H1.
-exfalso; revert H1.
-apply (rngl_lt_iff Hor).
-apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_2 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
