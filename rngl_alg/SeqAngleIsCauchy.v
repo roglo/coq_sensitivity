@@ -40,6 +40,24 @@ apply angle_mul_le_mono_r; [ easy | ].
 now apply Nat.log2_spec.
 Qed.
 
+Theorem seq_angle_to_div_nat_not_overflow :
+  ∀ θ n i,
+  n ≠ 0
+  → 2 ^ i / n ≤ 2 ^ i
+  → angle_mul_nat_overflow n (seq_angle_to_div_nat θ n i) = false.
+Proof.
+intros * Hnz Hin.
+apply Bool.not_true_iff_false.
+intros H.
+apply angle_mul_nat_overflow_true_assoc in H.
+apply Bool.not_false_iff_true in H.
+apply H; clear H.
+apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
+  apply angle_mul_nat_overflow_pow_div.
+}
+now apply Nat.Div0.mul_div_le.
+Qed.
+
 Theorem seq_angle_to_div_nat_div_2_le_straight_div_pow2_log2 :
   ∀ n i θ,
   n ≠ 0
@@ -74,16 +92,7 @@ rewrite angle_mul_nat_div_2. 2: {
   apply angle_mul_nat_overflow_pow_div.
 }
 rewrite angle_mul_nat_div_2; [ apply angle_div_2_le_straight | ].
-(* lemma *)
-apply Bool.not_true_iff_false.
-intros H.
-apply angle_mul_nat_overflow_true_assoc in H.
-apply Bool.not_false_iff_true in H.
-apply H; clear H.
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). 2: {
-  apply angle_mul_nat_overflow_pow_div.
-}
-now apply Nat.Div0.mul_div_le.
+now apply seq_angle_to_div_nat_not_overflow.
 Qed.
 
 Theorem angle_le_pow2_pred :
