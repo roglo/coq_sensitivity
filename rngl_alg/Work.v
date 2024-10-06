@@ -691,37 +691,6 @@ intros.
 apply rngl_cos_sin_nx.
 Qed.
 
-Theorem angle_lim_0_le_if :
-  ∀ f g,
-  (∀ i, (f i ≤ g i ≤ angle_straight)%A)
-  → angle_lim g 0
-  → angle_lim f 0.
-Proof.
-destruct_ac.
-intros * Hfg Hg.
-intros ε Hε.
-specialize (Hg ε Hε).
-destruct Hg as (N, HN).
-exists N.
-intros n Hn.
-specialize (HN n Hn).
-eapply (rngl_le_lt_trans Hor); [ | apply HN ].
-apply (rngl_cos_le_iff_angle_eucl_le (g n)).
-apply rngl_cos_decr.
-apply Hfg.
-Qed.
-
-Theorem angle_le_eucl_dist_le :
-  ∀ θ1 θ2,
-  (θ1 ≤ θ2 ≤ angle_straight)%A
-  → (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ2 0)%L.
-Proof.
-intros * H12.
-rewrite (angle_eucl_dist_symmetry θ2).
-apply angle_dist_le_r; [ easy | ].
-split; [ apply angle_nonneg | easy ].
-Qed.
-
 Theorem angle_same_lim_sub :
   ∀ u v θ, angle_lim u θ → angle_lim v θ → angle_lim (λ i, (u i - v i)%A) 0.
 Proof.
@@ -1470,52 +1439,6 @@ subst θ.
 now apply (rngl_lt_irrefl Hor) in Hz2s.
 Qed.
 
-Theorem angle_div_2_pow_mul_neq_0 :
-  ∀ n i θ,
-  θ ≠ 0%A
-  → 0 < n < 2 ^ i
-  → (n * (θ /₂^i) ≠ 0)%A.
-Proof.
-intros * Htz Hni.
-revert θ n Htz Hni.
-induction i; intros. {
-  cbn in Hni.
-  flia Hni.
-}
-destruct (lt_dec n (2 ^ i)) as [Hn2i| Hn2i]. {
-  rewrite angle_div_2_pow_succ_r_2.
-  apply IHi; [ | flia Hni Hn2i ].
-  intros H.
-  now apply eq_angle_div_2_0 in H.
-}
-apply Nat.nlt_ge in Hn2i.
-replace n with ((n - 2 ^ i) + 2 ^ i) by flia Hn2i.
-rewrite angle_mul_add_distr_r.
-rewrite angle_div_2_pow_succ_r_2 at 2.
-rewrite angle_div_2_pow_mul_2_pow.
-rewrite angle_div_2_pow_succ_r_1.
-rewrite angle_mul_nat_div_2. 2: {
-  apply angle_mul_nat_overflow_div_pow2.
-  cbn in Hni.
-  flia Hni.
-}
-assert (Hnii : n - 2 ^ i < 2 ^ i) by (cbn in Hni; flia Hni).
-intros H.
-remember ((n - 2 ^ i) * (θ /₂^i))%A as θ' eqn:Hθ'.
-assert (Htt : (θ' /₂ < θ /₂)%A). {
-  apply angle_div_2_lt_compat.
-  rewrite Hθ'.
-  now apply angle_div_2_pow_mul_lt_angle.
-}
-apply (angle_add_lt_mono_l (θ' /₂)) in Htt. 2: {
-  apply angle_add_overflow_div_2_div_2.
-}
-rewrite H in Htt.
-apply angle_nle_gt in Htt.
-apply Htt; clear Htt.
-apply angle_nonneg.
-Qed.
-
 Theorem angle_mul_mul_div_2 :
   ∀ m n θ,
   angle_mul_nat_overflow n θ = false
@@ -1526,68 +1449,6 @@ rewrite <- angle_mul_nat_assoc.
 f_equal.
 symmetry.
 now apply angle_mul_nat_div_2.
-Qed.
-
-Theorem angle_add_straight_r_le_straight :
-  ∀ θ,
-  (angle_straight ≤ θ)%A
-  → (θ + angle_straight ≤ angle_straight)%A.
-Proof.
-destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * Hst.
-  rewrite (H1 (_ + _)%A).
-  apply angle_nonneg.
-}
-intros * Hst.
-progress unfold angle_leb in Hst.
-progress unfold angle_leb.
-cbn in Hst.
-rewrite (rngl_leb_refl Hor) in Hst.
-rewrite rngl_sin_add_straight_r.
-rewrite rngl_cos_add_straight_r.
-cbn.
-rewrite (rngl_leb_refl Hor).
-rewrite (rngl_leb_0_opp Hop Hor).
-destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hzt| Htz]. {
-  generalize Hzt; intros H.
-  apply rngl_leb_le in H.
-  rewrite H in Hst; clear H.
-  apply rngl_leb_le in Hst.
-  specialize (proj1 (rngl_cos_bound θ)) as H1.
-  apply (rngl_le_antisymm Hor) in H1; [ | easy ].
-  apply eq_rngl_cos_opp_1 in H1; subst θ; cbn.
-  rewrite (rngl_leb_refl Hor).
-  apply rngl_leb_le.
-  rewrite (rngl_opp_involutive Hop).
-  apply (rngl_opp_1_le_1 Hon Hop Hor Hc1).
-}
-apply (rngl_nle_gt Hor) in Htz.
-destruct (rngl_le_dec Hor (rngl_sin θ) 0) as [Hzt| Hzt]. {
-  generalize Hzt; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  apply rngl_leb_le.
-  apply -> (rngl_opp_le_compat Hop Hor).
-  apply rngl_cos_bound.
-}
-now apply (rngl_lt_le_incl Hor) in Htz.
-Qed.
-
-Theorem angle_div_2_pow_succ_mul_lt_straight :
-  rngl_characteristic T ≠ 1 →
-  ∀ n i θ,
-  n ≤ 2 ^ i
-  → (n * (θ /₂^S i) < angle_straight)%A.
-Proof.
-intros Hc1 * Hni.
-apply (angle_add_diag_not_overflow Hc1).
-apply angle_mul_nat_overflow_distr_add_overflow.
-rewrite <- Nat_mul_2_l.
-rewrite angle_div_2_pow_succ_r_1.
-apply angle_mul_nat_overflow_mul_2_div_2.
-now apply angle_mul_nat_overflow_div_pow2.
 Qed.
 
 Theorem rngl_cos_div_pow2_2_pos :

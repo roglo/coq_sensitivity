@@ -4196,23 +4196,6 @@ Definition angle_eucl_dist θ1 θ2 :=
     ((rngl_cos θ2 - rngl_cos θ1)² +
      (rngl_sin θ2 - rngl_sin θ1)²)%L.
 
-(* trying to make a new version of angle_eucl_dist where, this time,
-   if the angles are one above the x axis and the other below it, we
-   count the distances to the straight angle *)
-(* it is possible to simplify this, and a √2 appears which could be
-   removed *)
-(* but I have a doubt: with this definition, if a sequence of angles
-   approaches 0 by being always below 0, it cannot converge to 0 since
-   the distance to 0 is big; my initial definition si probably better *)
-Definition angle_eucl_dist' θ1 θ2 :=
-  if (0 ≤? rngl_sin θ1 * rngl_sin θ2)%L then
-    rl_sqrt
-      ((rngl_cos θ2 - rngl_cos θ1)² +
-       (rngl_sin θ2 - rngl_sin θ1)²)%L
-  else
-    (rl_sqrt ((1 + rngl_cos θ2)² + (rngl_sin θ2)²) +
-     rl_sqrt ((1 + rngl_cos θ1)² + (rngl_sin θ1)²))%L.
-
 Theorem angle_eucl_dist_is_sqrt :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cos (θ2 - θ1)))%L.
 Proof.

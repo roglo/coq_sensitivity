@@ -328,49 +328,6 @@ symmetry in H3; rewrite Nat.add_comm in H3.
 easy.
 Qed.
 
-Theorem Nat_gcd_mul_r_1 :
-  ∀ a b c,
-  Nat.gcd a b = 1%nat → Nat.gcd a c = 1%nat → Nat.gcd a (b * c) = 1%nat.
-Proof.
-intros * Hab Hac.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
-  now subst a; cbn in *; subst.
-}
-specialize (Nat.gcd_bezout a b) as H1.
-specialize (Nat.gcd_bezout a c) as H2.
-rewrite Hab in H1.
-rewrite Hac in H2.
-apply Nat_Bezout_mul. {
-  destruct H1 as [H1| H1]; [ easy | ].
-  now apply Nat.bezout_comm.
-} {
-  destruct H2 as [H2| H2]; [ easy | ].
-  now apply Nat.bezout_comm.
-}
-Qed.
-
-Theorem Nat_eq_gcd_mul_1 :
-  ∀ a b c, Nat.gcd (a * b) c = 1%nat → Nat.gcd a c = 1%nat.
-Proof.
-intros * Habc.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
-apply Nat.bezout_1_gcd.
-specialize (Nat.gcd_bezout (a * b) c) as H1.
-rewrite Habc in H1.
-destruct H1 as [H1| H1]. {
-  destruct H1 as (u & v & Huv).
-  exists (u * b)%nat, v.
-  rewrite <- Huv.
-  now rewrite Nat.mul_shuffle0, Nat.mul_assoc.
-} {
-  destruct H1 as (u & v & Huv).
-  apply (Nat.bezout_comm _ _ _ Haz).
-  exists u, (v * b)%nat.
-  rewrite Huv.
-  now rewrite Nat.mul_shuffle0, Nat.mul_assoc.
-}
-Qed.
-
 (* should be added in coq library ZArith *)
 
 Theorem fold_Z_sub : ∀ a b, (a + - b = a - b)%Z.

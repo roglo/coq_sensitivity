@@ -1283,32 +1283,6 @@ split; intros H1234. {
 }
 Qed.
 
-Theorem angle_eucl_dist_le_cos_le :
-  ∀ θ1 θ2 θ3 θ4,
-  (angle_eucl_dist θ1 θ2 ≤ angle_eucl_dist θ3 θ4)%L
-  ↔ (rngl_cos (θ4 - θ3) ≤ rngl_cos (θ2 - θ1))%L.
-Proof.
-destruct_ac.
-intros.
-split; intros H1234. {
-  apply (rngl_lt_eq_cases Hor) in H1234.
-  apply (rngl_lt_eq_cases Hor).
-  destruct H1234 as [H| H]. {
-    now apply angle_eucl_dist_lt_cos_lt in H; left.
-  } {
-    now apply angle_eucl_dist_eq_cos_eq in H; right.
-  }
-} {
-  apply (rngl_lt_eq_cases Hor) in H1234.
-  apply (rngl_lt_eq_cases Hor).
-  destruct H1234 as [H| H]. {
-    now left; apply angle_eucl_dist_lt_cos_lt.
-  } {
-    now right; apply angle_eucl_dist_eq_cos_eq in H.
-  }
-}
-Qed.
-
 Theorem rngl_sin_pos_lt_straight :
   ∀ θ,
   (0 < rngl_sin θ)%L
