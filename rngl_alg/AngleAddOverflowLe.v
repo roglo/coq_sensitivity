@@ -815,68 +815,6 @@ destruct z1. {
 }
 Qed.
 
-Theorem angle_le_opp_r : ∀ θ θ2, (θ2 ≤ - θ)%A → θ2 ≠ 0%A → (θ ≤ - θ2)%A.
-Proof.
-destruct_ac.
-intros * H2 H2z.
-progress unfold angle_leb in H2.
-progress unfold angle_leb.
-cbn in H2 |-*.
-rewrite (rngl_leb_0_opp Hop Hor) in H2.
-rewrite (rngl_leb_opp_r Hop Hor).
-rewrite (rngl_opp_0 Hop).
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-remember (rngl_sin θ2 ≤? 0)%L as sz2 eqn:Hsz2.
-remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
-symmetry in Hzs2, Hzs, Hsz2, Hsz.
-destruct zs. {
-  destruct sz2; [ | easy ].
-  destruct zs2; [ | now destruct sz ].
-  apply rngl_leb_le in Hzs2, Hzs, Hsz2.
-  apply rngl_leb_le.
-  apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-  apply eq_rngl_sin_0 in Hzs2.
-  destruct Hzs2; [ easy | subst θ2 ].
-  apply rngl_cos_bound.
-}
-destruct zs2. 2: {
-  destruct sz; [ easy | ].
-  apply (rngl_leb_gt Hor) in Hzs2, Hsz, Hzs.
-  now apply (rngl_lt_asymm Hor) in Hzs.
-}
-apply rngl_leb_le in Hzs2.
-apply (rngl_leb_gt Hor) in Hzs.
-destruct sz. {
-  destruct sz2; [ exfalso | easy ].
-  apply rngl_leb_le in Hsz, H2, Hsz2.
-  apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-  apply eq_rngl_sin_0 in Hzs2.
-  destruct Hzs2; [ easy | subst θ2 ].
-  apply (rngl_nlt_ge Hor) in H2.
-  apply H2; clear H2.
-  apply (rngl_lt_iff Hor).
-  split; [ apply rngl_cos_bound | ].
-  cbn; intros Hcc.
-  symmetry in Hcc.
-  apply eq_rngl_cos_opp_1 in Hcc.
-  subst θ.
-  now apply (rngl_lt_irrefl Hor) in Hzs.
-}
-clear H2.
-destruct sz2. {
-  exfalso.
-  apply rngl_leb_le in Hsz2.
-  apply (rngl_le_antisymm Hor) in Hzs2; [ | easy ].
-  apply eq_rngl_sin_0 in Hzs2.
-  destruct Hzs2; [ easy | subst θ2 ].
-  apply (rngl_leb_gt Hor) in Hsz.
-  now apply (rngl_lt_asymm Hor) in Hzs.
-}
-apply (rngl_leb_gt Hor) in Hsz.
-now apply (rngl_lt_asymm Hor) in Hzs.
-Qed.
-
 Theorem angle_add_overflow_lt_le :
   ∀ θ θ1 θ2,
   (θ1 < θ)%A
