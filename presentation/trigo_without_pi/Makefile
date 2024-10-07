@@ -1,5 +1,5 @@
 all:
-	latexmk -pdf main.tex
+	latexmk -pdf -halt-on-error main.tex
 
 display:
 	atril main.pdf 2>/dev/null

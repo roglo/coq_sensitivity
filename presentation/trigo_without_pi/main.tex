@@ -1,6 +1,7 @@
 \documentclass{beamer}
 \usepackage{tikz}
 \usepackage{pgfpages} % Package to improve the compatibility of watermarks
+\usepackage{amsmath}
 
 \title{Trigonometry Without $\pi$}
 \author{Daniel de Rauglaudre}
@@ -60,7 +61,14 @@
 \end{frame}
 
 \begin{frame}{}
-  $\sqrt[n]{x + i y}$
+%  \only<1>{\phantom{$\sqrt[n]{}$}$x + i y$}
+  \only<2>{\hspace{2.1mm} $x + i y$}
+  \only<3->{$\sqrt[n]{x + i y}$}
+\end{frame}
+
+\begin{frame}{caca boudin}
+  \only<1>{$x + i y$}
+  \only<2->{$\sqrt[n]{x + i y}$}
 \end{frame}
 
 % Première diapositive d'introduction
