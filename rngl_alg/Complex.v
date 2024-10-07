@@ -3,13 +3,13 @@ Require Import Utf8 ZArith.
 Require Import Init.Nat.
 Import List List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
-Require Import Misc.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
 Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleDiv2Add.
+Require Import Misc.
 
 Notation "x ≤ y" := (Z.le x y) : Z_scope.
 
@@ -1764,6 +1764,32 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
 apply rngl_cos_bound.
 Qed.
 
+Theorem eq_angle_div_2_0 : ∀ θ, (θ /₂ = 0 → θ = 0)%A.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros.
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  apply H1.
+}
+intros * Htz.
+apply eq_angle_eq in Htz.
+apply eq_angle_eq; cbn.
+injection Htz; clear Htz; intros Hc Hs.
+apply (eq_rl_sqrt_0 Hon Hos) in Hc. 2: {
+  apply rngl_1_sub_cos_div_2_nonneg.
+}
+apply (f_equal (λ x, rngl_mul x 2)) in Hc.
+rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
+  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+}
+rewrite (rngl_mul_0_l Hos) in Hc.
+apply -> (rngl_sub_move_0_r Hop) in Hc.
+symmetry in Hc.
+apply eq_rngl_cos_1 in Hc.
+now subst θ.
+Qed.
+
 Theorem eq_angle_div_2_pow_0 :
   ∀ n θ, (angle_div_2_pow θ n = 0 → θ = 0)%A.
 Proof.
@@ -2082,6 +2108,20 @@ rewrite (rngl_mul_2_l Hon).
 apply (rngl_add_lt_mono_r Hop Hor).
 subst a.
 now apply (squ_rngl_cos_non_0_div_pow_2_bound Hc1).
+Qed.
+
+Theorem rngl_sin_mul_2_l :
+  ∀ θ, rngl_sin (2 * θ) = (2 * rngl_sin θ * rngl_cos θ)%L.
+Proof.
+destruct_ac.
+intros; cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_mul_comm Hic (rngl_cos θ)).
+rewrite <- rngl_mul_assoc; symmetry.
+apply (rngl_mul_2_l Hon).
 Qed.
 
 Theorem angle_add_div_2_diag : ∀ θ, (θ /₂ + θ /₂)%A = θ.

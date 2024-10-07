@@ -2,13 +2,13 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
 Require Import Main.RingLike.
+Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
 Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleLeSubAdd.
 Require Import Trigo.AngleDiv2Add.
-Require Import Trigo.TacChangeAngle.
 
 Section a.
 
@@ -269,6 +269,77 @@ apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+Qed.
+
+Theorem rngl_sin_nonneg_cos_lt_sin_lt :
+  ∀ θ1 θ2,
+  (0 < rngl_sin θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (rngl_cos θ1 < rngl_cos θ2)%L
+  → if (0 <? rngl_cos θ1)%L then (rngl_sin θ2 < rngl_sin θ1)%L
+    else if (0 <? rngl_cos θ2)%L then (0 < rngl_sin (θ1 - θ2))%L
+    else (rngl_sin θ1 < rngl_sin θ2)%L.
+Proof.
+intros * Hzs1 Hzs2 Hc12.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+remember (0 <? rngl_cos θ1)%L as zc1 eqn:Hzc1.
+symmetry in Hzc1.
+destruct zc1. {
+  apply rngl_ltb_lt in Hzc1.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hc12. 2: {
+    eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hzc1 | ].
+    now apply (rngl_lt_le_incl Hor).
+  }
+  specialize (rngl_lt_le_incl Hor _ _ Hzc1) as H.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H) in Hc12; clear H.
+  specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
+  specialize (rngl_lt_le_incl Hor _ _ Hzs2) as H.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
+  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hc12.
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  specialize (cos2_sin2_1 θ1) as Hcs1.
+  specialize (cos2_sin2_1 θ2) as Hcs2.
+  apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
+  rewrite <- Hcs1, <- Hcs2 in Hc12.
+  now apply (rngl_sub_lt_mono_l Hop Hor) in Hc12.
+}
+apply (rngl_ltb_ge Hor) in Hzc1.
+remember (0 <? rngl_cos θ2)%L as zc2 eqn:Hzc2.
+symmetry in Hzc2.
+destruct zc2. {
+  apply rngl_ltb_lt in Hzc2; cbn.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite rngl_add_comm.
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_lt_0_sub Hop Hor).
+  apply (rngl_le_lt_trans Hor _ 0)%L. {
+    apply (rngl_mul_nonpos_nonneg Hop Hor); [ easy | ].
+    now apply (rngl_lt_le_incl Hor).
+  } {
+    now apply (rngl_mul_pos_pos Hop Hor).
+  }
+} {
+  apply (rngl_ltb_ge Hor) in Hzc2.
+  apply (rngl_opp_lt_compat Hop Hor) in Hc12.
+  rewrite <- (rngl_abs_nonpos_eq Hop Hor) in Hc12; [ | easy ].
+  rewrite <- (rngl_abs_nonpos_eq Hop Hor) in Hc12; [ | easy ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
+    now apply (rngl_lt_le_incl Hor).
+  }
+  specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
+  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hc12.
+  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  specialize (cos2_sin2_1 θ1) as Hcs1.
+  specialize (cos2_sin2_1 θ2) as Hcs2.
+  apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
+  rewrite <- Hcs1, <- Hcs2 in Hc12.
+  now apply (rngl_sub_lt_mono_l Hop Hor) in Hc12.
+}
 Qed.
 
 Theorem rngl_cos_lt_sin_diag :

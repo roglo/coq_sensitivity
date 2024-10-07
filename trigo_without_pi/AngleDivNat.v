@@ -271,6 +271,6 @@ specialize (angle_div_nat_prop Hcz Har Hco _ _ _ Ht) as H2.
 now destruct H2.
 Qed.
 
-Check exists_angle_div_nat.
+Inspect 1.
 
 End a.
