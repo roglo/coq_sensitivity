@@ -1,4 +1,7 @@
 all:
+	./latex_compile.sh main.tex
+
+old_all:
 	latexmk -pdf -halt-on-error main.tex
 
 display:
