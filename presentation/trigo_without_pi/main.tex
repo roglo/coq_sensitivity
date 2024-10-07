@@ -1,14 +1,35 @@
 \documentclass{beamer}
+\usepackage{tikz}
+\usepackage{pgfpages} % Package to improve the compatibility of watermarks
 
 \title{Trigonometry Without $\pi$}
-\author{Votre Nom}
+\author{Daniel de Rauglaudre}
 \date{\today}
+
+% Custom footer to include the slide number in the bottom right in the
+% format 1/5, 2/5, ...
+\setbeamertemplate{footline}{
+   \hfill % Fill space to the left to push the text to the right
+   \insertframenumber{} / \inserttotalframenumber
+   \hspace{1em} % Shifts the footer text slightly to the right
+}
+\setbeamertemplate{navigation symbols}{} % Delete navigation icons
 
 \begin{document}
 
-% Page de titre
+% Title slide
 \begin{frame}
     \titlepage
+\end{frame}
+
+% Second slide with "DISCLAIMER" in the background, adjusted size and
+% bold
+\begin{frame}{}
+    \begin{tikzpicture}[remember picture, overlay]
+        \node[opacity=0.4, rotate=45, scale=4.5] at (current page.center) {
+            \textcolor{gray}{\textbf{DISCLAIMER}}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 % Première diapositive d'introduction

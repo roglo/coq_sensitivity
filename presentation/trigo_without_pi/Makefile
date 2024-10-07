@@ -1,9 +1,9 @@
 all:
-	latex main.tex
+	pdflatex main.tex
 
 display:
-	atril main.dvi
+	atril main.pdf 2>/dev/null
 
 clean:
 	rm -f *.aux *.log *.out
-	rm -f *.dvi *.nav *.snm *.toc
+	rm -f *.dvi *.ps *.pdf *.nav *.snm *.toc
