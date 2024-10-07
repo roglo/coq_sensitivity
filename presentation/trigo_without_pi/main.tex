@@ -9,9 +9,13 @@
 % Custom footer to include the slide number in the bottom right in the
 % format 1/5, 2/5, ...
 \setbeamertemplate{footline}{
-   \hfill % Fill space to the left to push the text to the right
-   \raisebox{3ex}{\insertframenumber{} / \inserttotalframenumber}
-   \hspace{1em} % Shifts the footer text slightly to the right
+  \ifnum\value{framenumber}>2
+  \hspace{2em}
+  \raisebox{3ex}{trigonometry without $\pi$}
+  \fi
+  \hfill % Fill space to the left to push the text to the right
+  \raisebox{3ex}{\insertframenumber{} / \inserttotalframenumber}
+  \hspace{1em} % Shifts the footer text slightly to the right
 }
 \setbeamertemplate{navigation symbols}{} % Delete navigation icons
 
@@ -32,7 +36,7 @@
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Context of ``Trigonometry Without $\pi$''}
+\begin{frame}{Context}
   \begin{itemize}
     \item close to ``rational trigonometry'':  Norman Wildberger
       \begin{itemize}
@@ -44,6 +48,13 @@
       \begin{itemize}
       \item no use of ``mathematical component''
       \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Why Trigonometry?}
+  \begin{itemize}
+  \item not a specific interest of that topic...
+  \item wanted to resolve a problem involving trigonometry
   \end{itemize}
 \end{frame}
 
