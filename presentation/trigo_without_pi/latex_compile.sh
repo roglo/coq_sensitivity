@@ -3,8 +3,8 @@
 latexmk -pdf -halt-on-error "$1" > latex.log 2>&1
 
 if [ $? -ne 0 ]; then
-    grep -A 10 "Runaway argument?" latex.log
-    make clean >/dev/null 2>&1
+    sed -n -e '/^!/,/Transcript written/p' latex.log
+    rm -f *.fdb_latexmk
     exit 1
 else
     exit 0
