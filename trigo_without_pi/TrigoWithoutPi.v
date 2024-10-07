@@ -3879,51 +3879,6 @@ apply eq_rngl_cos_1 in Hc.
 now subst θ.
 Qed.
 
-Theorem angle_div_2_not_straight :
-  rngl_characteristic T ≠ 1 →
-  ∀ θ, (θ /₂)%A ≠ angle_straight.
-Proof.
-destruct_ac.
-intros Hc1.
-intros * H.
-apply eq_angle_eq in H.
-injection H; clear H; intros Hs Hc.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  rewrite (rngl_mul_1_l Hon) in Hc.
-  remember √((1 + rngl_cos θ) / 2)%L as a eqn:Ha.
-  assert (H1 : (a < 0)%L). {
-    rewrite Hc.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  apply (rngl_nle_gt Hor) in H1.
-  apply H1; clear H1.
-  rewrite Ha.
-  apply rl_sqrt_nonneg.
-  apply rngl_1_add_cos_div_2_nonneg.
-}
-apply (rngl_leb_gt Hor) in Hzs.
-rewrite (rngl_mul_opp_l Hop) in Hc.
-rewrite (rngl_mul_1_l Hon) in Hc.
-apply (rngl_opp_inj Hop) in Hc.
-apply (f_equal rngl_squ) in Hc.
-rewrite (rngl_squ_sqrt Hon) in Hc. 2: {
-  apply rngl_1_add_cos_div_2_nonneg.
-}
-rewrite (rngl_squ_1 Hon) in Hc.
-apply (f_equal (λ x, (x * 2)%L)) in Hc.
-rewrite (rngl_div_mul Hon Hiv) in Hc. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_mul_1_l Hon) in Hc.
-apply (rngl_add_cancel_l Hos) in Hc.
-apply (eq_rngl_cos_1) in Hc.
-rewrite Hc in Hzs.
-cbn in Hzs.
-now apply (rngl_lt_irrefl Hor) in Hzs.
-Qed.
-
 (* euclidean distance *)
 
 Definition angle_eucl_dist θ1 θ2 :=
