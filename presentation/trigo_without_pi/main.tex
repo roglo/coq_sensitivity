@@ -119,11 +119,28 @@
 \end{frame}
 
 \begin{frame}{Sum of Angles}
-  $
-  \underbrace{\hstrut{2mm} (x, y)}_{\text{angle}} +
-  \underbrace{\hstrut{2mm} (x', y')}_{\text{angle}} ::=
-  \underbrace{\hstrut{2mm} (x'', y'')}_{\text{angle}}
-  $
+  \begin{textblock}{7}(1,3)
+    $
+    \underbrace{\hstrut{2mm} (x, y)}_{\text{angle}} +
+    \underbrace{\hstrut{2mm} (x', y')}_{\text{angle}} ::=
+    \underbrace{\hstrut{2mm} (x'', y'')}_{\text{angle}}
+    $
+    \only<2->{
+      \vspace{5mm}
+      \begin{itemize}
+      \item $cos (a \mathord{+} b) = cos \; a \; cos \; b - sin \; a
+        \; sin \; b$
+      \item $sin (a \mathord{+} b) = sin \; a \; cos \; b + cos \; a
+        \; sin \; b$
+      \end{itemize}
+    }
+    \only<3->{
+      \vspace{4mm}
+      $
+      (x, y) + (x', y') ::= (x x' - y y', x y' + x' y)
+      $
+    }
+  \end{textblock}
 \end{frame}
 
 % Une diapositive de conclusion
