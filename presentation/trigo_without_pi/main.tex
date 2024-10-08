@@ -7,6 +7,7 @@
 
 \setlength{\TPHorizModule}{1cm} % Définir les unités horizontales
 \setlength{\TPVertModule}{1cm}  % Définir les unités verticales
+\newcommand*\hstrut[1]{\vrule width0pt height0pt depth#1\relax}
 
 \newcommand{\crossedout}[1]{%
   \tikz[baseline=(X.base)]{
@@ -119,9 +120,9 @@
 
 \begin{frame}{Sum of Angles}
   $
-  \underbrace{\strut (x, y)}_{\text{angle}} +
-  \underbrace{\strut (x', y')}_{\text{angle}} =
-  \underbrace{\strut (x'', y'')}_{\text{angle}}
+  \underbrace{\hstrut{2mm} (x, y)}_{\text{angle}} +
+  \underbrace{\hstrut{2mm} (x', y')}_{\text{angle}} ::=
+  \underbrace{\hstrut{2mm} (x'', y'')}_{\text{angle}}
   $
 \end{frame}
 
