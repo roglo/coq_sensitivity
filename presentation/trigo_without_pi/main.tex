@@ -194,7 +194,8 @@
     computing $1$ divided by $n$ in binary \\
     \hspace{1cm}
     $1 / n = 0.a_1a_2a_3...$
-    \hspace{2cm}$a_i = 0 \; or \; 1$
+    \hspace{2cm}$a_i = \left\lfloor \frac{2^i}{n} \right\rfloor
+           {\scriptstyle mod \; 2}$
     \only<2->{
       \\
       \vspace{3mm}
@@ -221,6 +222,26 @@
   \begin{textblock}{10}(1,2)
     $\displaystyle \frac{\theta}{n} ::= \sum_{i=1}^\infty{\; \frac{a_i
         \; \theta}{2^i}}$
+    \hspace{1cm}$a_i = \left\lfloor \frac{2^i}{n} \right\rfloor
+           {\scriptstyle mod \; 2}$
+    \only<2->{
+      \\
+      \vspace{5mm}
+      $\displaystyle \theta_m ::= \left\lfloor \frac{2^m}{n} \right\rfloor
+      \frac{\theta}{2^m}$
+    }
+    \only<3->{
+      \\
+      \vspace{5mm}
+      Things to prove, and indeed proven in Coq:
+      \vspace{3mm}
+      \begin{itemize}
+      \item $(\theta_m)$ is a Cauchy sequence
+      \item the set of Angles is complete
+      \item if $\displaystyle \lim_{m \rightarrow \infty}{\theta_m} = \theta'$ then
+        $n \; \theta' = \theta$
+      \end{itemize}
+    }
   \end{textblock}
 \end{frame}
 
