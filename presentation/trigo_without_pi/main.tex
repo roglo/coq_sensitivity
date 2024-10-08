@@ -3,6 +3,10 @@
 \usepackage{pgfpages} % Package to improve the compatibility of watermarks
 \usepackage{amsmath}
 \usepackage{tikz}
+\usepackage[absolute,overlay]{textpos}
+
+\setlength{\TPHorizModule}{1cm} % Définir les unités horizontales
+\setlength{\TPVertModule}{1cm}  % Définir les unités verticales
 
 \newcommand{\crossedout}[1]{%
   \tikz[baseline=(X.base)]{
@@ -79,29 +83,32 @@
 \end{frame}
 
 \begin{frame}{}
-  \only<1>{
-    $Angle ::= \mathbb{R}$ \\
-  }
-  \only<2>{
-    \crossedout{$Angle ::= \mathbb{R}$} \\
-    \vspace{5mm}
-    $Angle := \{ \; (x, y) \; | \; x^2+y^2=1 \; \}$
-  }
-  \only<3>{
-    \crossedout{$Angle ::= \mathbb{R}$} \\
-    \vspace{5mm}
-    $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$
-  }
-  \only<4->{
-    \crossedout{$Angle ::= \mathbb{R}$} \\
-    \vspace{5mm}
-    $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$ \\
-    \vspace{2mm}
-    \begin{itemize}
-    \item $cos (x, y) = x$
-    \item $sin (x, y) = y$
-    \end{itemize}
-  }
+  \begin{textblock}{7}(1,3)
+    % "1,3" représente (x, y) en cm, et "7" est la largeur du bloc texte
+    \only<1>{
+      $Angle ::= \mathbb{R}$ \\
+    }
+    \only<2>{
+      \crossedout{$Angle ::= \mathbb{R}$} \\
+      \vspace{5mm}
+      $Angle := \{ \; (x, y) \; | \; x^2+y^2=1 \; \}$
+    }
+    \only<3>{
+      \crossedout{$Angle ::= \mathbb{R}$} \\
+      \vspace{5mm}
+      $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$
+    }
+    \only<4->{
+      \crossedout{$Angle ::= \mathbb{R}$} \\
+      \vspace{5mm}
+      $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$ \\
+      \vspace{2mm}
+      \begin{itemize}
+      \item $cos (x, y) = x$
+      \item $sin (x, y) = y$
+      \end{itemize}
+    }
+  \end{textblock}
 \end{frame}
 
 % Première diapositive d'introduction
