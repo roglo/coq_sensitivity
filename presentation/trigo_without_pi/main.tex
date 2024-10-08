@@ -2,7 +2,15 @@
 \usepackage{tikz}
 \usepackage{pgfpages} % Package to improve the compatibility of watermarks
 \usepackage{amsmath}
+\usepackage{tikz}
 
+\newcommand{\crossedout}[1]{%
+  \tikz[baseline=(X.base)]{
+    \node[inner sep=0pt,outer sep=0pt] (X) {#1};
+    \draw[red, thick] (X.south west) -- (X.north east);
+    \draw[red, thick] (X.north west) -- (X.south east);
+  }%
+}
 \title{Trigonometry Without $\pi$}
 \author{Daniel de Rauglaudre}
 \date{\today}
@@ -64,8 +72,32 @@
   \only<1>{\hspace{2.1mm} $x + i y$}
   \only<2>{$\sqrt[n]{x + i y} \hspace{5mm}...$}
   \only<3>{\hspace{2.1mm} $x + i y = \rho \hspace{1mm} e^{i \theta}$}
-  \only<4->{$\sqrt[n]{x + i y} = \sqrt[n]\rho \hspace{1mm}
+  \only<4>{$\sqrt[n]{x + i y} = \sqrt[n]\rho \hspace{1mm}
     e^{\frac{i\theta}{n}}$}
+  \only<5->{$\sqrt[n]{x + i y} = \sqrt[n]\rho \hspace{1mm}
+    \left(cos \; \frac{\theta}{n} + i \; sin \; \frac{\theta}{n}\right)$}
+\end{frame}
+
+\begin{frame}{}
+  \only<1>{
+    $Angle ::= \mathbb{R}$}
+  \only<2>{
+    \crossedout{$Angle ::= \mathbb{R}$} \\
+    \vspace{5mm}
+    $Angle := \{ \; (x, y) \; | \; x^2+y^2=1 \; \}$}
+  \only<3>{
+    \crossedout{$Angle ::= \mathbb{R}$} \\
+    \vspace{5mm}
+    $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$}
+  \only<4->{
+    \crossedout{$Angle ::= \mathbb{R}$} \\
+    \vspace{5mm}
+    $Angle := (x, y, x^2 \mathord{+} y^2 \mathord{=} \; 1 )$ \\
+    \vspace{2mm}
+    \begin{itemize}
+    \item $cos (x, y) = x$
+    \item $sin (x, y) = y$
+    \end{itemize}}
 \end{frame}
 
 % Première diapositive d'introduction
