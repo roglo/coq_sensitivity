@@ -1,9 +1,8 @@
 \documentclass{beamer}
-\usepackage{tikz}
-\usepackage{pgfpages} % Package to improve the compatibility of watermarks
 \usepackage{amsmath}
-\usepackage{tikz}
+\usepackage{pgfpages} % Package to improve the compatibility of watermarks
 \usepackage[absolute,overlay]{textpos}
+\usepackage{tikz}
 
 \setlength{\TPHorizModule}{1cm} % Définir les unités horizontales
 \setlength{\TPVertModule}{1cm}  % Définir les unités verticales
@@ -163,16 +162,28 @@
 \end{frame}
 
 \begin{frame}{Division by a natural}
-  De Moivre's formula \\
-  \hspace{5mm} $(cos \; \theta + i \; sin \; \theta)^n = cos (n
-  \theta) + i \; sin (n \theta)$ \\
-  \ \\
-  Trying to define a division by a natural \\
-  \hspace{5mm} $(cos (\frac{\theta}{n}) + i \; sin
-  (\frac{\theta}{n}))^n = cos \; \theta + i \; sin \; \theta$ \\
-  \ \\
-  Equation to resolve \\
-  \hspace{5mm} $(x + i \; y)^n = u + i \; v$
+  \begin{textblock}{7}(1,2)
+    De Moivre's formula \\
+    \hspace{5mm} $(cos \; \theta + i \; sin \; \theta)^n = cos (n
+    \theta) + i \; sin (n \theta)$ \\
+    \ \\
+    \only<2->{
+      Trying to define a division by a natural \\
+      \hspace{5mm} $(cos (\frac{\theta}{n}) + i \; sin
+      (\frac{\theta}{n}))^n = cos \; \theta + i \; sin \; \theta$ \\
+      \ \\
+    }
+    \only<3->{
+      Equation to resolve \\
+      \hspace{5mm} $(x + i \; y)^n = u + i \; v$
+    }
+  \end{textblock}
+\end{frame}
+
+\begin{frame}{Division by 2}
+  $\displaystyle \frac{(x, \; y)}{2} ::=
+  \left( \epsilon (y) \sqrt{\frac{1 + x}{2}}, \; \sqrt{\frac{1 -
+      x}{2}} \; \right)$
 \end{frame}
 
 % Une diapositive de conclusion
