@@ -24,6 +24,18 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem gc_mul_0_l :
+  rngl_has_opp_or_subt T = true →
+  ∀ z : GComplex T, (0 * z = 0)%C.
+Proof.
+intros Hos *.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+easy.
+Qed.
+
 (* to be completed
 Theorem gc_has_nth_root :
   rngl_characteristic T = 0 →
@@ -56,20 +68,16 @@ Proof.
 intros Hos *.
 progress unfold gc_pow_nat.
 induction n. {
+  symmetry.
   specialize (gc_opt_mul_1_l Hos) as H1.
   progress unfold rngl_has_1 in H1.
-  cbn in H1.
-  cbn.
+  cbn in H1 |-*.
+  progress unfold rngl_one in H1.
   progress unfold rngl_one.
-  cbn.
-About gc_opt_one.
-...
-  cbn in H1.
-
-  cbn; progress unfold rngl_one.
-cbn.
-  cbn; progress unfold gc_opt_one.
-  destruct (rngl_opt_one T) as [one| ].
+  cbn in H1 |-*.
+  destruct (gc_opt_one T); [ apply H1 | ].
+  apply (gc_mul_0_l Hos).
+}
 ...
 }
 rewrite rngl_pow_succ_r; cbn.

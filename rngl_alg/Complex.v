@@ -191,6 +191,8 @@ Definition gc_pow_nat {T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
 
+Notation "0" := (gc_zero) : gc_scope.
+Notation "1" := (gc_one) : gc_scope.
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
