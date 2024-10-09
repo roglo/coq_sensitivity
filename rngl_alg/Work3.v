@@ -11,6 +11,7 @@ Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.SeqAngleIsCauchy.
+Require Import Trigo.AngleDivNat.
 Require Import Complex.
 Require Import Work2.
 
@@ -21,6 +22,32 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+
+(* to be completed
+Theorem gc_has_nth_root :
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
+  rngl_is_complete T →
+  rl_has_integral_modulus T = true →
+  ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
+Proof.
+intros Hcz Har Hco Him.
+intros * Hnz.
+specialize (polar Him z _ _ (eq_refl _) (eq_refl)) as H1.
+set (ρ := √((gre z)² + (gim z)²)%L) in H1.
+set
+  (θ :=
+     (if (0 ≤? gim z)%L then rngl_acos (gre z / ρ)
+      else (- rngl_acos (gre z / ρ))%A)) in H1.
+rewrite H1.
+specialize (exists_angle_div_nat Hcz Har Hco) as H2.
+specialize (H2 θ n Hnz).
+destruct H2 as (θ', Ht).
+rewrite <- Ht.
+specialize (gc_cos_sin_pow θ' n) as H3.
+exists (ρ * rngl_cos θ' +ℹ ρ * rngl_sin θ')%C.
+...
+*)
 
 (* to be completed or deleted
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
