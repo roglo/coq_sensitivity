@@ -2475,9 +2475,12 @@ apply rngl_cos_mul_sin_mul.
 Qed.
 
 Theorem rngl_2_x2_sub_1_le_x :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   ∀ x, (0 ≤ x ≤ 1)%L → (2 * x² - 1 ≤ x)%L.
 Proof.
-destruct_ac.
+intros Hon Hop Hor.
 intros * Hx.
 apply (rngl_le_sub_le_add_l Hop Hor).
 apply (rngl_le_sub_le_add_r Hop Hor).

@@ -356,7 +356,7 @@ destruct zs. {
     now rewrite rngl_mul_0_r.
   }
   (* variation of the curve y=2x²-x-1 in interval [-1,1] *)
-  apply rngl_2_x2_sub_1_le_x.
+  apply (rngl_2_x2_sub_1_le_x Hon Hop Hor).
   rewrite <- Hx in Hzsm.
   split; [ easy | ].
   subst x; apply rngl_cos_bound.
