@@ -1014,12 +1014,10 @@ apply angle_opp_sub_distr.
 Qed.
 
 Theorem angle_eucl_dist_cos_sin :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
   ∀ θ, ((angle_eucl_dist θ 0)² = (1 - rngl_cos θ)² + (rngl_sin θ)²)%L.
 Proof.
-intros Hon Hop Hor *.
+destruct_ac.
+intros.
 progress unfold angle_eucl_dist; cbn.
 rewrite (rngl_sub_0_l Hop).
 rewrite (rngl_squ_opp Hop).
@@ -1039,7 +1037,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1; apply H1.
 }
 intros.
-specialize (angle_eucl_dist_cos_sin Hon Hop Hor θ) as H1.
+specialize (angle_eucl_dist_cos_sin θ) as H1.
 rewrite (rngl_squ_sub Hop Hic Hon) in H1.
 rewrite (rngl_squ_1 Hon) in H1.
 rewrite (rngl_mul_1_r Hon) in H1.
