@@ -131,13 +131,13 @@ Definition gc_opt_inv_or_quot :
   end.
 
 Theorem rl_integral_modulus_prop :
-  rl_has_integral_modulus T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
-intros Him * Hab.
-specialize rl_opt_integral_modulus_prop as Hmi.
-rewrite Him in Hmi.
-now apply Hmi.
+intros Hop Hor Hii * Hab.
+now apply (eq_rngl_add_square_0 Hop Hor Hii) in Hab.
 Qed.
 
 Theorem gc_eq_dec :
@@ -512,6 +512,7 @@ Theorem gc_opt_mul_inv_diag_l :
   else not_applicable.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 remember (rl_has_integral_modulus T) as hrl eqn:Hrl; symmetry in Hrl.
 destruct hrl. 2: {
   progress unfold rngl_inv; cbn.
@@ -552,7 +553,7 @@ split. {
   rewrite H1; [ easy | ].
   intros H2.
   generalize Hrl; intros H.
-  apply (rl_integral_modulus_prop H) in H2.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H2.
   apply Haz.
   apply eq_gc_eq; cbn.
   now f_equal.
@@ -773,8 +774,10 @@ Theorem rl_sqrt_div_squ_squ :
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros Hmi * Hxyz.
+intros Hmi.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hxyz.
 assert (Hxy : (0 ≤ x² + y²)%L). {
   apply (rngl_add_nonneg_nonneg Hor);
   apply (rngl_squ_nonneg Hop Hor).
@@ -793,7 +796,7 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite (rngl_squ_sqrt Hon) in H3; [ | easy ].
       move H3 at top; subst a.
-      apply (rl_integral_modulus_prop Hmi) in Ha.
+      apply (rl_integral_modulus_prop Hop Hor Hii) in Ha.
       now destruct Hxyz.
     }
   }
@@ -829,7 +832,7 @@ split. {
       rewrite (rngl_mul_0_l Hos) in H3.
       rewrite (rngl_squ_sqrt Hon) in H3; [ | easy ].
       move H3 at top; subst a.
-      apply (rl_integral_modulus_prop Hmi) in Ha.
+      apply (rl_integral_modulus_prop Hop Hor Hii) in Ha.
       now destruct Hxyz.
     }
   }
@@ -892,7 +895,7 @@ assert (Hρz : ρ ≠ 0%L). {
     apply (rngl_add_nonneg_nonneg Hor);
     apply (rngl_squ_nonneg Hop Hor).
   }
-  apply (rl_integral_modulus_prop Hmi) in H.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
   now destruct H; subst zr zi.
 }
 assert (Hzρ : (0 < ρ)%L). {
@@ -950,7 +953,7 @@ assert (Hri : ((zr / ρ)² + (zi / ρ)² = 1)%L). {
   }
   apply (rngl_div_diag Hon Hiq).
   intros H.
-  apply (rl_integral_modulus_prop Hmi) in H.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
   now move H at top; destruct H; subst zr zi.
 }
 assert (Hzρ21 : ((zr / ρ)² ≤ 1)%L). {
