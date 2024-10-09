@@ -114,20 +114,13 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
-
 Definition gc_opt_inv_or_quot :
   option
     ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
   match rngl_opt_inv_or_quot T with
-  | Some (inl inv) =>
-      if rngl_mul_is_comm T then
-        if rl_has_integral_modulus T then Some (inl gc_inv) else None
-      else None
-  | Some (inr quot) =>
-      None (* à voir *)
-  | None =>
-      None
+  | Some (inl inv) => if rngl_mul_is_comm T then Some (inl gc_inv) else None
+  | Some (inr quot) => None (* à voir *)
+  | None => None
   end.
 
 Theorem rl_integral_modulus_prop :
@@ -170,9 +163,6 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   end.
 
 End a.
-
-Arguments rl_has_integral_modulus T {ro rp real_like_prop}.
-Arguments rl_opt_integral_modulus_prop T {ro rp real_like_prop}.
 
 Definition gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
@@ -469,18 +459,16 @@ Qed.
 
 Theorem gc_inv_re :
   let roc := gc_ring_like_op T in
-  rl_has_integral_modulus T = true →
   ∀ a : GComplex T, a ≠ 0%L →
   gre a⁻¹ = (gre a / (gre a * gre a + gim a * gim a))%L.
 Proof.
-intros * Hrl * Haz.
 destruct_ac.
+intros * Haz.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hrl.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
 destruct iq; [ | easy ].
 now rewrite Hic.
@@ -488,18 +476,16 @@ Qed.
 
 Theorem gc_inv_im :
   let roc := gc_ring_like_op T in
-  rl_has_integral_modulus T = true →
   ∀ a : GComplex T, a ≠ 0%L →
   gim a⁻¹ = (- gim a / (gre a * gre a + gim a * gim a))%L.
 Proof.
-intros * Hrl * Haz.
 destruct_ac.
+intros * Haz.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 progress unfold rngl_inv; cbn.
 progress unfold gc_opt_inv_or_quot.
 progress unfold rngl_has_inv_or_quot in Hiq.
 progress unfold rngl_has_inv in Hiv.
-rewrite Hrl.
 destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
 destruct iq; [ | easy ].
 now rewrite Hic.
@@ -513,18 +499,7 @@ Theorem gc_opt_mul_inv_diag_l :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-remember (rl_has_integral_modulus T) as hrl eqn:Hrl; symmetry in Hrl.
-destruct hrl. 2: {
-  progress unfold rngl_inv; cbn.
-  progress unfold gc_opt_inv_or_quot; cbn.
-  progress unfold rngl_has_inv; cbn.
-  progress unfold gc_opt_inv_or_quot; cbn.
-  rewrite Hrl.
-  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-  destruct iq as [inv| quot]; [ | easy ].
-  now rewrite Hic.
-}
-intros.
+cbn.
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
@@ -532,8 +507,8 @@ destruct onc; [ cbn | easy ].
 intros * Haz.
 apply eq_gc_eq; cbn.
 specialize (rngl_mul_inv_diag_l Hon Hiv) as H1.
-rewrite (gc_inv_re Hrl); [ | now intros H; subst a ].
-rewrite (gc_inv_im Hrl); [ | now intros H; subst a ].
+rewrite gc_inv_re; [ | now intros H; subst a ].
+rewrite gc_inv_im ; [ | now intros H; subst a ].
 progress unfold rngl_sub.
 progress unfold rngl_div.
 rewrite Hop, Hiv.
@@ -552,8 +527,7 @@ split. {
   destruct x as [one| ]; [ cbn | easy ].
   rewrite H1; [ easy | ].
   intros H2.
-  generalize Hrl; intros H.
-  apply (rl_integral_modulus_prop Hop Hor Hii) in H2.
+  apply (eq_rngl_add_square_0 Hop Hor Hii) in H2.
   apply Haz.
   apply eq_gc_eq; cbn.
   now f_equal.
@@ -581,15 +555,6 @@ Theorem gc_opt_mul_inv_diag_r :
   else not_applicable.
 Proof.
 cbn.
-remember (rl_has_integral_modulus T) as hrl eqn:Hrl; symmetry in Hrl.
-destruct hrl. 2: {
-  progress unfold rngl_has_inv; cbn.
-  progress unfold gc_opt_inv_or_quot; cbn.
-  rewrite Hrl.
-  destruct (rngl_opt_inv_or_quot T) as [iq| ]; [ | easy ].
-  destruct iq as [inv| quot]; [ | easy ].
-  now destruct (rngl_mul_is_comm T).
-}
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ now rewrite Bool.andb_false_r | ].
 rewrite Bool.andb_true_r.
@@ -614,8 +579,7 @@ remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [iq| ]; [ | easy ].
 destruct iq as [inv| quot]; [ | easy ].
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ | easy ].
-now destruct (rl_has_integral_modulus T).
+now destruct ic.
 Qed.
 
 Theorem gc_opt_mul_quot_r :
@@ -630,8 +594,7 @@ remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [iq| ]; [ | easy ].
 destruct iq as [inv| quot]; [ | easy ].
 remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ | easy ].
-now destruct (rl_has_integral_modulus T).
+now destruct ic.
 Qed.
 
 Theorem gc_characteristic_prop :
@@ -770,11 +733,9 @@ now apply (rngl_le_add_r Hor).
 Qed.
 
 Theorem rl_sqrt_div_squ_squ :
-  rl_has_integral_modulus T = true →
   ∀ x y, (x ≠ 0 ∨ y ≠ 0)%L →
   (-1 ≤ x / rl_sqrt (rngl_squ x + rngl_squ y) ≤ 1)%L.
 Proof.
-intros Hmi.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hxyz.
@@ -853,7 +814,6 @@ Qed.
 Arguments rl_sqrt_squ {T ro rp rl} Hor Hop a%_L.
 
 Theorem polar :
-  rl_has_integral_modulus T = true →
   ∀ (z : GComplex T) ρ θ,
   ρ = √((gre z)² + (gim z)²)%L
   → θ =
@@ -862,7 +822,7 @@ Theorem polar :
   → z = mk_gc (ρ * rngl_cos θ) (ρ * rngl_sin θ).
 Proof.
 destruct_ac.
-intros Hmi * Hρ Hθ.
+intros * Hρ Hθ.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.

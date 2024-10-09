@@ -72,13 +72,12 @@ Theorem gc_has_nth_root :
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
-  rl_has_integral_modulus T = true →
   ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
 Proof.
-intros Hic Hop Hor Hcz Har Hco Him.
+intros Hic Hop Hor Hcz Har Hco.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hnz.
-specialize (polar Him z _ _ (eq_refl _) (eq_refl)) as H1.
+specialize (polar z _ _ (eq_refl _) (eq_refl)) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L) in H1.
 set
   (θ :=
