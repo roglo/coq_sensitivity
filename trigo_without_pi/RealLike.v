@@ -3,12 +3,7 @@ Require Import Utf8.
 Require Import Main.RingLike.
 
 Class real_like_prop T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { rl_has_integral_modulus : bool;
-    rl_nth_root : nat → T → T;
-    rl_opt_integral_modulus_prop :
-      if rl_has_integral_modulus then
-        ∀ a b : T, (rngl_squ a + rngl_squ b = 0 → a = 0 ∧ b = 0)%L
-      else not_applicable;
+  { rl_nth_root : nat → T → T;
     rl_nth_root_pow : ∀ n a, (0 ≤ a → rl_nth_root n a ^ n = a)%L;
     rl_nth_root_mul :
       ∀ n a b, (0 ≤ a)%L → (0 ≤ b)%L →

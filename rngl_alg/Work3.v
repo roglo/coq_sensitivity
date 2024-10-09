@@ -143,7 +143,6 @@ rewrite (rngl_mul_div_r Hon Hic Hiv). 2: {
   destruct (Sumbool.sumbool_of_bool _) as [H2| H2]. {
     apply (rngl_eqb_eq Heb) in H2.
     generalize Hmi; intros H.
-    progress unfold rl_has_integral_modulus in H.
     remember (rl_opt_mod_intgl_prop T) as mi eqn:Hmi1.
     symmetry in Hmi1.
     destruct mi as [mi| ]; [ clear H | easy ].
