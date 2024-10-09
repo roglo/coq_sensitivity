@@ -406,12 +406,14 @@ Theorem binomial_succ_l :
 Proof. easy. Qed.
 
 Theorem gre_summation :
+  rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   let roc := gc_ring_like_op T in
   ∀ b e (f : nat → GComplex T),
   gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
 Proof.
-intros Hop.
+intros Hon Hic Hop.
 intros.
 progress unfold iter_seq.
 progress unfold iter_list.
@@ -426,7 +428,7 @@ rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
 apply gc_add_0_l.
 intros; cbn.
-set (rop := gc_ring_like_prop_not_alg_closed Hop).
+set (rop := gc_ring_like_prop_not_alg_closed Hon Hic Hop).
 specialize gc_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
 apply gc_add_0_l.
@@ -437,12 +439,14 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem gim_summation :
+  rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   let roc := gc_ring_like_op T in
   ∀ b e (f : nat → GComplex T),
   gim (∑ (i = b, e), f i)%L = (∑ (i = b, e), gim (f i))%L.
 Proof.
-intros Hop.
+intros Hon Hic Hop.
 intros.
 progress unfold iter_seq.
 progress unfold iter_list.
@@ -457,7 +461,7 @@ rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
 apply gc_add_0_l.
 intros; cbn.
-set (rop := gc_ring_like_prop_not_alg_closed Hop).
+set (rop := gc_ring_like_prop_not_alg_closed Hon Hic Hop).
 specialize gc_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
 apply gc_add_0_l.
@@ -625,12 +629,13 @@ specialize (@newton_binomial) as H1.
 set (gro := gc_ring_like_op T).
 specialize (H1 (GComplex T)).
 specialize (H1 gro).
-specialize (H1 (gc_ring_like_prop_not_alg_closed Hop)).
+specialize (H1 (gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor)).
 assert (Honc : rngl_has_1 (GComplex T) = true). {
   progress unfold rngl_has_1 in Hon.
   progress unfold rngl_has_1.
   cbn.
   progress unfold gc_opt_one.
+  clear H1.
   now destruct (rngl_opt_one T).
 }
 assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
@@ -657,8 +662,8 @@ progress unfold gc_pow_nat in H2.
 rewrite H2 in H1; clear H2.
 apply eq_gc_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
-rewrite (gre_summation Hop) in H1.
-rewrite (gim_summation Hop) in H1.
+rewrite (gre_summation Hon Hic Hop) in H1.
+rewrite (gim_summation Hon Hic Hop) in H1.
 destruct H1 as (Hc, Hs).
 split. {
   rewrite Hc.
