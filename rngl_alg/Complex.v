@@ -1074,6 +1074,11 @@ Qed.
      [0; 0; 1; 1; 0; 0; 1; 1; 0; 0]
 *)
 Theorem rat_is_inf_sum_of_inv_rad_pow :
+  rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
   rngl_is_archimedean T = true →
   ∀ rad a b,
   2 ≤ rad
@@ -1081,8 +1086,9 @@ Theorem rat_is_inf_sum_of_inv_rad_pow :
   → rngl_is_limit_when_tending_to_inf (seq_converging_to_rat rad a b)
        (rngl_of_nat a / rngl_of_nat b)%L.
 Proof.
-destruct_ac.
-intros Har * H2r Hbz.
+intros Hon Hic Hop Hiv Hor Har.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * H2r Hbz.
 intros ε Hε.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
@@ -1221,8 +1227,8 @@ Theorem rat_is_inf_sum_of_inv_rad_pow' :
 Proof.
 destruct_ac.
 intros Har * H2r Hbz Hlim.
-specialize (rat_is_inf_sum_of_inv_rad_pow Har _ a i H2r) as H1.
-specialize (H1 Hbz).
+specialize (rat_is_inf_sum_of_inv_rad_pow Hon Hic Hop Hiv Hor Har) as H1.
+specialize (H1 _ a i H2r Hbz).
 progress unfold rngl_is_limit_when_tending_to_inf in Hlim.
 progress unfold rngl_is_limit_when_tending_to_inf in H1.
 specialize (limit_unique Hon Hop Hiv Hor _ rngl_dist) as H2.
