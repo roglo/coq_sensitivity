@@ -13,6 +13,7 @@ Require Import Trigo.AngleTypeIsComplete.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleDivNat.
 Require Import Complex.
+Require Import Work.
 Require Import Work2.
 
 Section a.
@@ -45,8 +46,43 @@ specialize (H2 θ n Hnz).
 destruct H2 as (θ', Ht).
 rewrite <- Ht.
 specialize (gc_cos_sin_pow θ' n) as H3.
-exists ((ρ +ℹ 0) * (rngl_cos θ' +ℹ rngl_sin θ'))%C.
+exists ((rl_nth_root n ρ +ℹ 0) * (rngl_cos θ' +ℹ rngl_sin θ'))%C.
 Search ((_ * _) ^ _)%C.
+Search gc_pow_nat.
+Theorem gc_mul_pow_nat :
+  rngl_has_opp_or_subt T = true →
+  ∀ z1 z2 n, ((z1 * z2) ^ n = (z1 ^ n) * (z2 ^ n))%C.
+Proof.
+intros Hos *.
+progress unfold gc_pow_nat.
+induction n. {
+  specialize (gc_opt_mul_1_l Hos) as H1.
+  progress unfold rngl_has_1 in H1.
+  cbn in H1.
+  cbn.
+  progress unfold rngl_one.
+  cbn.
+About gc_opt_one.
+...
+  cbn in H1.
+
+  cbn; progress unfold rngl_one.
+cbn.
+  cbn; progress unfold gc_opt_one.
+  destruct (rngl_opt_one T) as [one| ].
+...
+}
+rewrite rngl_pow_succ_r; cbn.
+rewrite IHn.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+now rewrite (rngl_mul_0_l Hos).
+...
+rewrite gc_mul_pow_nat.
+Search gc_power_nat.
+rewrite gc_power_im_0.
+rewrite H3.
 ...
 rewrite H3.
 ...

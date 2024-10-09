@@ -27,12 +27,12 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Theorem gc_power_im_0 :
+Theorem gc_pow_im_0 :
   rngl_has_opp_or_subt T = true →
   ∀ n x, (mk_gc x 0%L ^ n)%C = (mk_gc (x ^ n) 0)%C.
 Proof.
 intros Hos *.
-progress unfold gc_power_nat.
+progress unfold gc_pow_nat.
 induction n. {
   cbn; progress unfold rngl_one.
   cbn; progress unfold gc_opt_one.
@@ -487,7 +487,7 @@ cbn; progress unfold gc_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
-Theorem gc_power_re_0 :
+Theorem gc_pow_re_0 :
   ∀ n y,
   (mk_gc 0 y ^ n =
      if Nat.even n then
@@ -503,7 +503,7 @@ destruct b. {
   destruct Hb as (m, Hm).
   subst n.
   rewrite Nat.mul_comm, Nat.div_mul; [ | easy ].
-  progress unfold gc_power_nat.
+  progress unfold gc_pow_nat.
   induction m; cbn. {
     rewrite (rngl_mul_1_l Hon).
     apply eq_gc_eq.
@@ -543,7 +543,7 @@ destruct b. {
   rewrite Nat.mul_comm, Nat.div_add_l; [ | easy ].
   rewrite Nat.div_small; [ | easy ].
   rewrite Nat.add_0_r.
-  progress unfold gc_power_nat.
+  progress unfold gc_pow_nat.
   induction m; cbn. {
     rewrite (rngl_mul_1_l Hon).
     rewrite (rngl_mul_1_r Hon).
@@ -653,7 +653,7 @@ rewrite rngl_add_0_r in H1.
 rewrite rngl_add_0_l in H1.
 progress unfold gro in H1.
 specialize (gc_cos_sin_pow θ n) as H2.
-progress unfold gc_power_nat in H2.
+progress unfold gc_pow_nat in H2.
 rewrite H2 in H1; clear H2.
 apply eq_gc_eq in H1.
 cbn - [ rngl_add rngl_zero ] in H1.
@@ -664,11 +664,11 @@ split. {
   rewrite Hc.
   apply rngl_summation_eq_compat.
   intros * (_, Hi).
-  specialize (gc_power_im_0 Hos) as H1.
-  progress unfold gc_power_nat in H1.
+  specialize (gc_pow_im_0 Hos) as H1.
+  progress unfold gc_pow_nat in H1.
   rewrite H1.
-  specialize gc_power_re_0 as H2.
-  progress unfold gc_power_nat in H2.
+  specialize gc_pow_re_0 as H2.
+  progress unfold gc_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
   do 2 rewrite (rngl_mul_0_r Hos).
@@ -700,11 +700,11 @@ split. {
   do 2 rewrite (rngl_mul_0_l Hos).
   rewrite (rngl_sub_0_r Hos).
   rewrite rngl_add_0_l.
-  specialize (gc_power_im_0 Hos) as H1.
-  progress unfold gc_power_nat in H1.
+  specialize (gc_pow_im_0 Hos) as H1.
+  progress unfold gc_pow_nat in H1.
   rewrite H1.
-  specialize gc_power_re_0 as H2.
-  progress unfold gc_power_nat in H2.
+  specialize gc_pow_re_0 as H2.
+  progress unfold gc_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
   rewrite (rngl_mul_0_r Hos).

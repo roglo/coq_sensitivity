@@ -186,7 +186,7 @@ Definition gc_ring_like_op T
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
-Definition gc_power_nat {T}
+Definition gc_pow_nat {T}
     {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
@@ -195,10 +195,7 @@ Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 Notation "x +ℹ y" := (mk_gc x y) (at level 50) : gc_scope.
-(*
-Notation "x + 'ℹ' * y" := (mk_gc x y) (at level 50) : gc_scope.
-*)
-Notation "z ^ n" := (gc_power_nat z n) : gc_scope.
+Notation "z ^ n" := (gc_pow_nat z n) : gc_scope.
 
 Section a.
 
@@ -1019,7 +1016,7 @@ Theorem gc_cos_sin_pow :
   (rngl_cos (n * a) +ℹ rngl_sin (n * a))%C.
 Proof.
 intros.
-progress unfold gc_power_nat.
+progress unfold gc_pow_nat.
 induction n. {
   cbn; progress unfold rngl_one.
   cbn; progress unfold gc_opt_one.
@@ -2508,3 +2505,5 @@ apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
 End a.
+
+Arguments gc_opt_one T {ro}.
