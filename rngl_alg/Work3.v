@@ -45,7 +45,10 @@ specialize (H2 θ n Hnz).
 destruct H2 as (θ', Ht).
 rewrite <- Ht.
 specialize (gc_cos_sin_pow θ' n) as H3.
-exists (ρ * rngl_cos θ' +ℹ ρ * rngl_sin θ')%C.
+exists ((ρ +ℹ 0) * (rngl_cos θ' +ℹ rngl_sin θ'))%C.
+Search ((_ * _) ^ _)%C.
+...
+rewrite H3.
 ...
 *)
 
