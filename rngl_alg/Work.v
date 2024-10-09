@@ -492,6 +492,9 @@ now destruct (rngl_opt_one T).
 Qed.
 
 Theorem gc_pow_re_0 :
+  rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
   ∀ n y,
   (mk_gc 0 y ^ n =
      if Nat.even n then
@@ -499,7 +502,8 @@ Theorem gc_pow_re_0 :
      else
        mk_gc 0 ((minus_one_pow (n / 2)) * (y ^ n))%L)%C.
 Proof.
-destruct_ac.
+intros Hon Hic Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 remember (Nat.even n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
@@ -672,7 +676,7 @@ split. {
   specialize (gc_pow_im_0 Hos) as H1.
   progress unfold gc_pow_nat in H1.
   rewrite H1.
-  specialize gc_pow_re_0 as H2.
+  specialize (gc_pow_re_0 Hon Hic Hop) as H2.
   progress unfold gc_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
@@ -708,7 +712,7 @@ split. {
   specialize (gc_pow_im_0 Hos) as H1.
   progress unfold gc_pow_nat in H1.
   rewrite H1.
-  specialize gc_pow_re_0 as H2.
+  specialize (gc_pow_re_0 Hon Hic Hop) as H2.
   progress unfold gc_pow_nat in H2.
   rewrite H2.
   cbn - [ "/" ].
