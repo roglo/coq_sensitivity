@@ -112,7 +112,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {rl : real_like_prop T}.
 
 Definition gc_opt_inv_or_quot :
   option
@@ -195,9 +194,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-(**)
 Context {ac : angle_ctx T}.
-(**)
 
 Theorem rngl_between_opp_1_and_1 :
   rngl_has_1 T = true →
