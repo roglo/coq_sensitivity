@@ -251,9 +251,8 @@ now apply eq_gc_eq.
 Qed.
 
 Theorem gc_mul_assoc :
-  let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
-  ∀ a b c : GComplex T, (a * (b * c))%L = (a * b * c)%L.
+  ∀ a b c : GComplex T, (a * (b * c))%C = (a * b * c)%C.
 Proof.
 intros * Hop *; cbn.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -344,6 +343,15 @@ do 2 rewrite (rngl_mul_comm Hic (gre b)).
 do 2 rewrite (rngl_mul_comm Hic (gim b)).
 split; [ easy | ].
 apply rngl_add_comm.
+Qed.
+
+Theorem gc_mul_comm :
+  rngl_mul_is_comm T = true →
+  ∀ a b, (a * b = b * a)%C.
+Proof.
+intros Hic.
+specialize gc_opt_mul_comm as H1.
+now rewrite Hic in H1.
 Qed.
 
 Theorem gc_opt_mul_1_r :

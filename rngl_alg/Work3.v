@@ -36,15 +36,47 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
-(* to be completed
+Theorem gc_pow_mul_l :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  ∀ z1 z2 n, ((z1 * z2) ^ n = (z1 ^ n) * (z2 ^ n))%C.
+Proof.
+intros Hic Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+progress unfold gc_pow_nat.
+induction n. {
+  symmetry.
+  specialize (gc_opt_mul_1_l Hos) as H1.
+  progress unfold rngl_has_1 in H1.
+  cbn in H1 |-*.
+  progress unfold rngl_one in H1.
+  progress unfold rngl_one.
+  cbn in H1 |-*.
+  destruct (gc_opt_one T); [ apply H1 | ].
+  apply (gc_mul_0_l Hos).
+}
+cbn.
+rewrite IHn.
+do 2 rewrite (gc_mul_assoc Hop).
+f_equal.
+do 2 rewrite <- (gc_mul_assoc Hop).
+f_equal.
+apply (gc_mul_comm Hic).
+Qed.
+
 Theorem gc_has_nth_root :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   rngl_characteristic T = 0 →
   rngl_is_archimedean T = true →
   rngl_is_complete T →
   rl_has_integral_modulus T = true →
   ∀ z : GComplex T, ∀ n, n ≠ 0 → ∃ z', (z' ^ n)%C = z.
 Proof.
-intros Hcz Har Hco Him.
+intros Hic Hop Hor Hcz Har Hco Him.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hnz.
 specialize (polar Him z _ _ (eq_refl _) (eq_refl)) as H1.
 set (ρ := √((gre z)² + (gim z)²)%L) in H1.
@@ -59,42 +91,21 @@ destruct H2 as (θ', Ht).
 rewrite <- Ht.
 specialize (gc_cos_sin_pow θ' n) as H3.
 exists ((rl_nth_root n ρ +ℹ 0) * (rngl_cos θ' +ℹ rngl_sin θ'))%C.
-Search ((_ * _) ^ _)%C.
-Search gc_pow_nat.
-Theorem gc_mul_pow_nat :
-  rngl_has_opp_or_subt T = true →
-  ∀ z1 z2 n, ((z1 * z2) ^ n = (z1 ^ n) * (z2 ^ n))%C.
-Proof.
-intros Hos *.
-progress unfold gc_pow_nat.
-induction n. {
-  symmetry.
-  specialize (gc_opt_mul_1_l Hos) as H1.
-  progress unfold rngl_has_1 in H1.
-  cbn in H1 |-*.
-  progress unfold rngl_one in H1.
-  progress unfold rngl_one.
-  cbn in H1 |-*.
-  destruct (gc_opt_one T); [ apply H1 | ].
-  apply (gc_mul_0_l Hos).
+rewrite (gc_pow_mul_l Hic Hop).
+rewrite (gc_pow_im_0 Hos).
+rewrite gc_cos_sin_pow.
+rewrite rl_nth_root_pow. 2: {
+  progress unfold ρ.
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_squ_nonneg Hop Hor).
 }
-...
-}
-rewrite rngl_pow_succ_r; cbn.
-rewrite IHn.
-apply eq_gc_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
-now rewrite (rngl_mul_0_l Hos).
-...
-rewrite gc_mul_pow_nat.
-Search gc_power_nat.
-rewrite gc_power_im_0.
-rewrite H3.
-...
-rewrite H3.
-...
-*)
+progress unfold gc_mul.
+cbn.
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+easy.
+Qed.
 
 (* to be completed or deleted
 Theorem rl_sin_acos {T} {ro : ring_like_op T} {rp : ring_like_prop T}
