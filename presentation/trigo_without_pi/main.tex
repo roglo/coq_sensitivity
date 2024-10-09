@@ -51,10 +51,10 @@
 
 \begin{frame}{Context}
   \begin{itemize}
-    \item close to ``rational trigonometry'':  Norman Wildberger
+    \item close to ``rational trigonometry'':  Norman Wildberger,\\ but:
       \begin{itemize}
-      \item indeed, redefinition of ``angles''
-      \item but I use ``square roots''
+      \item redefinition of ``angles''
+      \item using ``square roots''
       \item different goals
       \end{itemize}
     \uncover<2->{
@@ -181,12 +181,16 @@
 \end{frame}
 
 \begin{frame}{Division by 2}
-  $\displaystyle \frac{(x, \; y)}{2} ::=
-  \left( \epsilon (y) \sqrt{\frac{1 + x}{2}}, \; \sqrt{\frac{1 -
-      x}{2}} \; \right)$
-  \\
-  \vspace{1cm}
-  ... but how to divide by any other natural number?
+  \begin{textblock}{8}(1,2)
+    $\displaystyle \frac{(x, \; y)}{2} ::=
+    \left( \epsilon (y) \sqrt{\frac{1 + x}{2}}, \; \sqrt{\frac{1 -
+        x}{2}} \; \right)$
+    \\
+    \only<2->{
+      \vspace{1cm}
+      ... but how to divide by any natural number?
+    }
+  \end{textblock}
 \end{frame}
 
 \begin{frame}{Division by a natural}
@@ -249,14 +253,14 @@
   \begin{textblock}{10}(1,2)
     Had to prove
     \only<2->{\\
-      \vspace{2mm}
-      \hspace{1cm}
+      \vspace{3mm}
+      \hspace{5mm}
       $\displaystyle \frac{\theta_1 + \theta_2}{2} =
         \frac{\theta_1}{2} + \frac{\theta_2}{2}$
     }
     \only<3->{\\
-      \vspace{2mm}
-      \hspace{1cm}
+      \vspace{3mm}
+      \hspace{5mm}
       if $\displaystyle \theta_1 + \theta_3 \le \theta_2 + \theta_3$ then
       $\theta_2 \le \theta_3$ \\
     }
@@ -264,19 +268,17 @@
 \end{frame}
 
 \begin{frame}{Source code}
-  github \; : \; roglo/coq\_sensitivity \\
+  github : roglo/coq\_sensitivity \\
   \begin{itemize}
   \item compilable by the latest version of Coq (8.20.0)
   \item work in progress...
   \end{itemize}
 \end{frame}
 
-% Une diapositive de conclusion
 \begin{frame}{Conclusion}
     \begin{itemize}
-        \item Summary of the results.
-        \item Implications of this new approach.
-        \item Future directions for research.
+    \item $Angle ::= \{ \; (x, y) \; | \; x^2+y^2=1 \; \}$
+    \item angles can be divided by naturals
     \end{itemize}
 \end{frame}
 
