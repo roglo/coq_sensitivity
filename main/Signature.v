@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith Init.Nat.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Misc RingLike.
 Require Import SortingFun SortRank PermutationFun.
@@ -159,7 +159,7 @@ Qed.
 
 Theorem butn_permut_seq_with_len : ∀ n i l,
   permut_seq_with_len (S n) l
-  → n = nth i l 0
+  → n = List.nth i l 0
   → i < length l
   → permut_seq_with_len n (List_butn i l).
 Proof.
@@ -183,7 +183,7 @@ split. {
     subst j; clear Hjl; exfalso.
     assert (Hnni : n ≠ i). {
       intros H; move H at top; subst i.
-      apply (In_nth _ _ 0) in Hj.
+      apply (List.In_nth _ _ 0) in Hj.
       rewrite List_length_butn, Hl in Hj.
       replace (n <? S n) with true in Hj by now symmetry; apply Nat.ltb_lt.
       rewrite Nat_sub_succ_1 in Hj.
@@ -195,18 +195,18 @@ split. {
       specialize (NoDup_nat _ Hpi j n) as H2.
       assert (H : j < length l) by now rewrite Hl; flia Hjn.
       specialize (H2 H Hil); clear H.
-      assert (H : nth j l 0 = nth n l 0) by now rewrite <- Hni.
+      assert (H : List.nth j l 0 = List.nth n l 0) by now rewrite <- Hni.
       specialize (H2 H).
       now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
     }
     unfold List_butn in Hj.
-    apply in_app_or in Hj.
+    apply List.in_app_or in Hj.
     destruct Hj as [Hini| Hini]. {
-      apply (In_nth _ _ 0) in Hini.
+      apply (List.In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
-      rewrite length_firstn, min_l in Hjl; [ | flia Hil ].
+      rewrite List.length_firstn, min_l in Hjl; [ | flia Hil ].
       specialize (NoDup_nat _ Hpi i j Hil) as H2.
-      assert (H : j < length l) by flia Hjl Hil.
+      assert (H : j < List.length l) by flia Hjl Hil.
       specialize (H2 H); clear H.
       rewrite <- Hni in H2.
       rewrite List_nth_firstn in Hjn; [ | easy ].
@@ -215,12 +215,12 @@ split. {
       rewrite <- H2 in Hjl.
       now apply Nat.lt_irrefl in Hjl.
     } {
-      apply (In_nth _ _ 0) in Hini.
+      apply (List.In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
-      rewrite length_skipn in Hjl.
+      rewrite List.length_skipn in Hjl.
       rewrite List_nth_skipn in Hjn.
       specialize (NoDup_nat _ Hpi i (j + S i) Hil) as H2.
-      assert (H : j + S i < length l) by flia Hjl.
+      assert (H : j + S i < List.length l) by flia Hjl.
       specialize (H2 H); clear H.
       rewrite <- Hni in H2.
       rewrite Hjn in H2.
@@ -267,17 +267,19 @@ Qed.
 
 Theorem permut_without_highest : ∀ {n l},
   permut_seq_with_len (S n) l
-  → ∃ i, i < length l ∧ nth i l 0 = n ∧ permut_seq_with_len n (List_butn i l).
+  → ∃ i,
+    i < List.length l ∧ List.nth i l 0 = n ∧
+    permut_seq_with_len n (List_butn i l).
 Proof.
 intros * Hl.
-exists (nth n (isort_rank Nat.leb l) 0).
+exists (List.nth n (isort_rank Nat.leb l) 0).
 split. {
   rewrite <- (isort_rank_length Nat.leb).
   destruct Hl as (Hp, Hl).
   specialize (isort_rank_permut_seq_with_len Nat.leb _ Hl) as Hil.
   destruct Hil as (Hil, Hil').
   apply permut_seq_iff in Hil.
-  apply Hil, nth_In.
+  apply Hil, List.nth_In.
   rewrite isort_rank_length.
   now rewrite Hl.
 }
@@ -294,12 +296,13 @@ apply butn_permut_seq_with_len; [ easy | | ]. {
   apply permut_seq_iff in H1.
   destruct H1 as (H4, H5).
   rewrite isort_rank_length in H4.
-  apply H4, nth_In.
+  apply H4, List.nth_In.
   now rewrite isort_rank_length, H3.
 }
 Qed.
 
-Theorem fold_comp_list : ∀ la lb, map (λ i, nth i la 0) lb = la ° lb.
+Theorem fold_comp_list :
+   ∀ la lb, List.map (λ i, List.nth i la 0) lb = la ° lb.
 Proof. easy. Qed.
 
 Theorem fold_ε_cons : ∀ i q, (ε_aux i q * ε q)%L = ε (i :: q).
@@ -687,7 +690,7 @@ Qed.
 
 Theorem ε_cons_from_ε_app :
   rngl_has_opp T = true →
-  ∀ a la, ε (a :: la) = (minus_one_pow (length la) * ε (la ++ [a]))%L.
+  ∀ a la, ε (a :: la) = (minus_one_pow (List.length la) * ε (la ++ [a]))%L.
 Proof.
 intros Hop *; cbn.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
@@ -756,7 +759,8 @@ Qed.
 Theorem ε_app_cons2 :
   rngl_has_opp T = true →
   ∀ la lb a,
-  ε (la ++ a :: lb) = (minus_one_pow (length lb) * ε (la ++ lb ++ [a]))%L.
+  ε (la ++ a :: lb) =
+    (minus_one_pow (List.length lb) * ε (la ++ lb ++ [a]))%L.
 Proof.
 intros Hop *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
@@ -840,22 +844,22 @@ Qed.
 Theorem sign_comp :
   rngl_has_opp T = true →
   ∀ la lb,
-  permut_seq_with_len (length la) lb
+  permut_seq_with_len (List.length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
 intros Hop * Hbp.
-remember (length la) as n eqn:Hla; symmetry in Hla.
+remember (List.length la) as n eqn:Hla; symmetry in Hla.
 revert lb Hbp la Hla.
 induction n; intros; cbn. {
   destruct Hbp as (Hb, Hbl).
-  apply length_zero_iff_nil in Hla, Hbl; subst la lb.
+  apply List.length_zero_iff_nil in Hla, Hbl; subst la lb.
   symmetry; apply (rngl_mul_1_l Hon).
 }
 (* removing the highest value, "n" in "lb", permutation of {0..n} *)
 specialize (permut_without_highest Hbp) as H1.
 destruct H1 as (i & Hi & Hin & H1).
 (* taking lb1 and lb2 such that lb=lb1++n::lb2 *)
-specialize nth_split as H2.
+specialize List.nth_split as H2.
 specialize (H2 _ i lb 0 Hi).
 destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
 rewrite Hin in Hlb.
@@ -876,14 +880,14 @@ rewrite (ε_app_cons Hop lb1). 2: {
   destruct H1 as (H11, H12).
   generalize H11; intros H13.
   apply permut_seq_NoDup in H13.
-  apply (In_nth _ _ 0) in Hj.
+  apply (List.In_nth _ _ 0) in Hj.
   destruct Hj as (k & Hnk & Hk).
   subst j.
   apply permut_seq_ub in H11.
-  specialize (H11 (nth k (lb1 ++ lb2) 0)).
+  specialize (H11 (List.nth k (lb1 ++ lb2) 0)).
   rewrite H12 in H11.
   apply H11.
-  now apply nth_In.
+  now apply List.nth_In.
 }
 do 2 rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
@@ -891,38 +895,38 @@ rewrite rngl_mul_assoc.
 f_equal.
 (* this operation makes the last (n-th) element of "la" appear appended
    to "la°(lb1++lb2)" *)
-rewrite app_assoc.
+rewrite List.app_assoc.
 rewrite <- comp_list_app_distr_l.
-specialize (@app_removelast_last _ la 0) as H4.
+specialize (@List.app_removelast_last _ la 0) as H4.
 assert (H : la ≠ []) by now intros H; rewrite H in Hla.
 specialize (H4 H); clear H.
-replace n with (length la - 1) by flia Hla.
+replace n with (List.length la - 1) by flia Hla.
 rewrite <- List_last_nth.
 (* we know that "la" without its last element (its n-th element) has
-   length "n"... *)
-assert (Hra : length (removelast la) = n). {
-  apply (f_equal (λ l, length l)) in H4.
-  rewrite length_app, Nat.add_1_r in H4.
+   List.length "n"... *)
+assert (Hra : List.length (List.removelast la) = n). {
+  apply (f_equal (λ l, List.length l)) in H4.
+  rewrite List.length_app, Nat.add_1_r in H4.
   rewrite Hla in H4.
   now apply Nat.succ_inj in H4.
 }
-(* and that "lb1++lb2" also has length "n" *)
-assert (Hbbl : length (lb1 ++ lb2) = n). {
-  apply (f_equal (λ l, length l)) in Hlb.
-  rewrite length_app in Hlb; cbn in Hlb.
-  rewrite Nat.add_succ_r, <- length_app in Hlb.
+(* and that "lb1++lb2" also has List.length "n" *)
+assert (Hbbl : List.length (lb1 ++ lb2) = n). {
+  apply (f_equal (λ l, List.length l)) in Hlb.
+  rewrite List.length_app in Hlb; cbn in Hlb.
+  rewrite Nat.add_succ_r, <- List.length_app in Hlb.
   destruct Hbp as (Hbp1, Hbp2).
   rewrite Hbp2 in Hlb.
   now apply Nat.succ_inj in Hlb.
 }
 (* since "lb1++lb2" does not contain "n", the expression "la°(lb1++lb2)"
    can be replaced by "(la without its last)°(lb1++lb2)" *)
-replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
+replace (la ° (lb1 ++ lb2)) with (List.removelast la ° (lb1 ++ lb2)). 2: {
   rewrite H4 at 2.
   unfold "°".
-  apply map_ext_in.
+  apply List.map_ext_in.
   intros j Hj.
-  rewrite app_nth1; [ easy | ].
+  rewrite List.app_nth1; [ easy | ].
   rewrite Hra.
   destruct H1 as (H11, H12).
   apply permut_seq_iff in H11.
@@ -933,8 +937,8 @@ replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
 }
 (* we can make "(-1)^n" appear in the lhs... *)
 specialize (ε_app_cons2 Hop) as H5.
-specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (last la 0)).
-do 2 rewrite app_nil_l in H5.
+specialize (H5 [] (List.removelast la ° (lb1 ++ lb2)) (List.last la 0)).
+do 2 rewrite List.app_nil_l in H5.
 rewrite comp_length in H5.
 rewrite Hbbl in H5.
 apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
@@ -943,33 +947,34 @@ rewrite (minus_one_pow_mul_same Hop) in H5.
 rewrite (rngl_mul_1_l Hon) in H5.
 rewrite <- H5; cbn; clear H5.
 (* ... and the right factor of the lhs, being
-   "ε((la without last)°(lb1++lb2)", can be replaced using
+   "ε((la without List.last)°(lb1++lb2)", can be replaced using
    the induction hypothesis *)
 rewrite (IHn (lb1 ++ lb2) H1 _ Hra).
 do 2 rewrite rngl_mul_assoc.
 (* these operation make "ε(lb1++lb2)" appear as factors in both sides
    of the goal, we can remove them *)
 f_equal.
-(* the lhs, "ε(la)", is "(-1)^n" times "ε(last la++all but last la)" *)
+(* the lhs, "ε(la)", is "(-1)^n" times
+   "ε(List.last la++all but List.last la)" *)
 symmetry.
-specialize (ε_app_cons2 Hop [] (removelast la) (last la 0)) as H5.
+specialize (ε_app_cons2 Hop [] (List.removelast la) (List.last la 0)) as H5.
 cbn - [ ε ] in H5.
 rewrite Hra in H5.
-rewrite <- app_removelast_last in H5; [ | now intros H; subst la ].
+rewrite <- List.app_removelast_last in H5; [ | now intros H; subst la ].
 apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
 rewrite rngl_mul_assoc in H5.
 rewrite (minus_one_pow_mul_same Hop) in H5.
 rewrite (rngl_mul_1_l Hon) in H5.
 rewrite <- H5; cbn.
-(* both sides now contain "(-1)^" and "ε(la without last)" that we can
+(* both sides now contain "(-1)^" and "ε(la without List.last)" that we can
    eliminate *)
 rewrite <- rngl_mul_assoc; f_equal; cbn; f_equal.
-(* the goal now contain equality between two "ε_aux (last la)" which
+(* the goal now contain equality between two "ε_aux (List.last la)" which
    can be proven saying when their second arguments are permutations
    the one to the other *)
 apply (ε_aux_permut Hop).
 unfold "°".
-rewrite (List_map_nth_seq 0 (removelast la)) at 1.
+rewrite (List_map_nth_seq 0 (List.removelast la)) at 1.
 rewrite Hra.
 apply permutation_map with (eqba := Nat.eqb). {
   unfold equality; apply Nat.eqb_eq.
@@ -985,7 +990,7 @@ Qed.
 Theorem ε_nil : ε [] = 1%L.
 Proof. easy. Qed.
 
-Theorem ε_aux_map_S : ∀ i l,  ε_aux (S i) (map S l) = ε_aux i l.
+Theorem ε_aux_map_S : ∀ i l,  ε_aux (S i) (List.map S l) = ε_aux i l.
 Proof.
 intros.
 revert i.
@@ -993,7 +998,7 @@ induction l as [| j]; intros; [ easy | cbn ].
 now rewrite IHl.
 Qed.
 
-Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
+Theorem ε_map_S : ∀ l, ε (List.map S l) = ε l.
 Proof.
 intros.
 induction l as [| i]; [ easy | cbn ].
@@ -1003,7 +1008,9 @@ apply ε_aux_map_S.
 Qed.
 
 Theorem transposition_permut_seq_with_len : ∀ p q n,
-  p < n → q < n → permut_seq_with_len n (map (transposition p q) (seq 0 n)).
+  p < n
+  → q < n
+  → permut_seq_with_len n (List.map (transposition p q) (List.seq 0 n)).
 Proof.
 intros * Hp Hq.
 split. {
@@ -1011,10 +1018,10 @@ split. {
   split. {
     intros i Hi.
     unfold transposition.
-    rewrite length_map, length_seq.
-    apply in_map_iff in Hi.
+    rewrite List.length_map, List.length_seq.
+    apply List.in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
-    apply in_seq in Hj.
+    apply List.in_seq in Hj.
     rewrite <- Hji.
     now apply transposition_lt.
   } {
@@ -1022,10 +1029,10 @@ split. {
     rewrite List_length_map_seq.
     intros i j Hi Hj Hs.
     unfold transposition in Hs.
-    rewrite (List_map_nth' 0) in Hs; [ | now rewrite length_seq ].
-    rewrite (List_map_nth' 0) in Hs; [ | now rewrite length_seq ].
-    rewrite seq_nth in Hs; [ | easy ].
-    rewrite seq_nth in Hs; [ | easy ].
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite List.length_seq ].
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite List.length_seq ].
+    rewrite List.seq_nth in Hs; [ | easy ].
+    rewrite List.seq_nth in Hs; [ | easy ].
     do 4 rewrite if_eqb_eq_dec in Hs.
     do 2 rewrite Nat.add_0_l in Hs.
     destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -1041,7 +1048,7 @@ split. {
     easy.
   }
 }
-now rewrite length_map, length_seq.
+now rewrite List.length_map, List.length_seq.
 Qed.
 
 Theorem ε_aux_app : ∀ i p q,
@@ -1100,7 +1107,7 @@ Theorem ε_aux_app2 :
   rngl_has_opp T = true →
   ∀ i p q,
   (∀ j k, j ∈ i :: p → k ∈ q → k < j)
-  → ε_aux i (p ++ q) = (minus_one_pow (length q) * ε_aux i p)%L.
+  → ε_aux i (p ++ q) = (minus_one_pow (List.length q) * ε_aux i p)%L.
 Proof.
 intros Hop * Hpq.
 revert i q Hpq.
@@ -1143,7 +1150,8 @@ Theorem ε_app2 :
   rngl_has_opp T = true →
   ∀ p q,
   (∀ i j, i ∈ p → j ∈ q → j < i)
-  → ε (p ++ q) = (minus_one_pow (length p * length q) * ε p * ε q)%L.
+  → ε (p ++ q) =
+    (minus_one_pow (List.length p * List.length q) * ε p * ε q)%L.
 Proof.
 intros Hop * Hpq.
 revert q Hpq.
@@ -1164,15 +1172,15 @@ rewrite <- rngl_mul_assoc; f_equal.
 now apply ε_aux_app2.
 Qed.
 
-Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%L.
+Theorem ε_seq : ∀ sta len, ε (List.seq sta len) = 1%L.
 Proof.
 intros.
 revert sta.
 induction len; intros; [ easy | ].
-rewrite seq_S.
+rewrite List.seq_S.
 rewrite ε_app. 2: {
   intros * Hi Hj.
-  apply in_seq in Hi.
+  apply List.in_seq in Hi.
   destruct Hj as [Hj| ]; [ now subst j | easy ].
 }
 cbn.
@@ -1185,22 +1193,22 @@ Theorem transposition_signature_lt :
   ∀ {n p q},
   p < q
   → q < n
-  → ε (map (transposition p q) (seq 0 n)) = (-1)%L.
+  → ε (List.map (transposition p q) (List.seq 0 n)) = (-1)%L.
 Proof.
 intros Hop * Hpq Hq.
 unfold transposition.
 rewrite (List_seq_cut3 p). 2: {
-  apply in_seq.
+  apply List.in_seq.
   split; [ easy | cbn ].
   now transitivity q.
 }
 rewrite (List_seq_cut3 q (S p)). 2: {
-  apply in_seq; cbn.
+  apply List.in_seq; cbn.
   split; [ easy | flia Hq ].
 }
 rewrite Nat.sub_0_r, Nat.add_0_l.
 replace (S p + (n - S p) - S q) with (n - S q) by flia Hpq.
-do 4 rewrite map_app.
+do 4 rewrite List.map_app.
 cbn.
 do 2 rewrite Nat.eqb_refl.
 replace (q =? p) with false. 2: {
@@ -1208,9 +1216,9 @@ replace (q =? p) with false. 2: {
   intros H; subst q.
   now apply Nat.lt_irrefl in Hpq.
 }
-erewrite map_ext_in. 2: {
+erewrite List.map_ext_in. 2: {
   intros i Hi.
-  apply in_seq in Hi; cbn in Hi.
+  apply List.in_seq in Hi; cbn in Hi.
   destruct Hi as (_, Hi).
   replace (i =? q) with false. 2: {
     symmetry; apply Nat.eqb_neq; flia Hpq Hi.
@@ -1219,10 +1227,10 @@ erewrite map_ext_in. 2: {
   apply Nat.eqb_neq in Hi; rewrite Hi.
   easy.
 }
-rewrite map_id.
-erewrite map_ext_in. 2: {
+rewrite List.map_id.
+erewrite List.map_ext_in. 2: {
   intros i Hi.
-  apply in_seq in Hi; cbn in Hi.
+  apply List.in_seq in Hi; cbn in Hi.
   replace (S (p + (q - S p))) with q in Hi by flia Hpq.
   replace (i =? p) with false. 2: {
     symmetry; apply Nat.eqb_neq; flia Hi.
@@ -1232,10 +1240,10 @@ erewrite map_ext_in. 2: {
   }
   easy.
 }
-rewrite map_id.
-erewrite map_ext_in. 2: {
+rewrite List.map_id.
+erewrite List.map_ext_in. 2: {
   intros i Hi.
-  apply in_seq in Hi; cbn in Hi.
+  apply List.in_seq in Hi; cbn in Hi.
   replace (S (q + _)) with n in Hi by flia Hpq Hq.
   replace (i =? p) with false. 2: {
     symmetry; apply Nat.eqb_neq; flia Hpq Hi.
@@ -1245,31 +1253,31 @@ erewrite map_ext_in. 2: {
   }
   easy.
 }
-rewrite map_id.
+rewrite List.map_id.
 rewrite ε_app. 2: {
   intros * Hi Hj.
-  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+  apply List.in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
   destruct Hj as [Hj| Hj]; [ now subst j; transitivity p | ].
-  apply in_app_iff in Hj.
-  destruct Hj as [Hj| Hj]; [ apply in_seq in Hj; flia Hi Hj | ].
+  apply List.in_app_iff in Hj.
+  destruct Hj as [Hj| Hj]; [ apply List.in_seq in Hj; flia Hi Hj | ].
   destruct Hj as [Hj| Hj]; [ now subst j | ].
-  apply in_seq in Hj; flia Hi Hpq Hj.
+  apply List.in_seq in Hj; flia Hi Hpq Hj.
 }
 rewrite ε_seq, (rngl_mul_1_l Hon).
 rewrite List_cons_is_app.
 rewrite (List_cons_is_app p).
-do 2 rewrite app_assoc.
+do 2 rewrite List.app_assoc.
 rewrite ε_app. 2: {
   intros i j Hi Hj.
-  apply in_seq in Hj.
+  apply List.in_seq in Hj.
   rewrite Nat.add_comm, Nat.sub_add in Hj; [ | easy ].
-  apply in_app_iff in Hi.
+  apply List.in_app_iff in Hi.
   destruct Hi as [Hi| Hi]. {
-    apply in_app_iff in Hi.
+    apply List.in_app_iff in Hi.
     destruct Hi as [Hi| Hi]. {
       destruct Hi; [ now subst i | easy ].
     }
-    apply in_seq in Hi.
+    apply List.in_seq in Hi.
     rewrite Nat.add_comm, Nat.sub_add in Hi; [ | easy ].
     now transitivity q.
   }
@@ -1281,13 +1289,13 @@ clear n Hq.
 rewrite (ε_app2 Hop). 2: {
   intros i j Hi Hj.
   destruct Hj; [ subst j | easy ].
-  apply in_app_iff in Hi.
+  apply List.in_app_iff in Hi.
   destruct Hi as [Hi| Hi]. {
     destruct Hi; [ now subst i | easy ].
   }
-  now apply in_seq in Hi.
+  now apply List.in_seq in Hi.
 }
-rewrite length_app, length_seq.
+rewrite List.length_app, List.length_seq.
 cbn - [ ε ].
 rewrite Nat.mul_1_r.
 replace (ε [p]) with 1%L by now cbn; rewrite (rngl_mul_1_l Hon).
@@ -1298,11 +1306,11 @@ rewrite List_cons_is_app.
 rewrite (ε_app2 Hop). 2: {
   intros i j Hi Hj.
   destruct Hi; [ subst i | easy ].
-  apply in_seq in Hj.
+  apply List.in_seq in Hj.
   now rewrite Nat.add_comm, Nat.sub_add in Hj.
 }
 rewrite ε_seq, (rngl_mul_1_r Hon).
-rewrite length_seq; cbn.
+rewrite List.length_seq; cbn.
 rewrite Nat.add_0_r.
 do 2 rewrite (rngl_mul_1_r Hon).
 now apply minus_one_pow_mul_same.
@@ -1314,7 +1322,7 @@ Theorem transposition_signature :
   p ≠ q
   → p < n
   → q < n
-  → ε (map (transposition p q) (seq 0 n)) = (-1)%L.
+  → ε (List.map (transposition p q) (List.seq 0 n)) = (-1)%L.
 Proof.
 intros Hop * Hpq Hp Hq.
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
@@ -1324,7 +1332,7 @@ apply Nat.nlt_ge in Hpq'.
 assert (H : q < p) by flia Hpq Hpq'.
 rewrite <- (transposition_signature_lt Hop H Hp).
 f_equal.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 apply transposition_comm.
 Qed.
@@ -1339,20 +1347,20 @@ apply permut_seq_iff.
 split. {
   intros i Hi.
   unfold comp_list in Hi |-*.
-  rewrite length_map.
-  apply in_map_iff in Hi.
+  rewrite List.length_map.
+  apply List.in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
   subst i.
   rewrite Hp22, <- Hp12.
   apply permut_seq_ub; [ easy | ].
-  apply nth_In.
+  apply List.nth_In.
   apply permut_seq_iff in Hp21.
   apply Hp21 in Hj.
   congruence.
 } {
   unfold comp_list.
   apply nat_NoDup.
-  rewrite length_map.
+  rewrite List.length_map.
   intros i j Hi Hj.
   rewrite (List_map_nth' 0); [ | easy ].
   rewrite (List_map_nth' 0); [ | easy ].
@@ -1362,10 +1370,10 @@ split. {
   destruct Hp11 as (_, Hp11).
   apply (NoDup_nat _ Hp11) in Hij; cycle 1. {
     rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
+    now apply Hp21, List.nth_In.
   } {
     rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
+    now apply Hp21, List.nth_In.
   }
   destruct Hp21 as (_, Hp21).
   now apply (NoDup_nat _ Hp21) in Hij.
@@ -1380,13 +1388,13 @@ Proof.
 intros * Hp1 Hp2.
 split; [ now apply (comp_permut_seq n) | ].
 unfold "°".
-rewrite length_map.
+rewrite List.length_map.
 now destruct Hp2.
 Qed.
 
 Theorem permut_comp_cancel_l : ∀ n la lb lc,
-  NoDup la
-  → length la = n
+  List.NoDup la
+  → List.length la = n
   → permut_seq_with_len n lb
   → permut_seq_with_len n lc
   → la ° lb = la ° lc ↔ lb = lc.
@@ -1398,7 +1406,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   destruct Hb as (_, Hb).
   destruct Hc as (_, Hc).
-  apply length_zero_iff_nil in Hb, Hc.
+  apply List.length_zero_iff_nil in Hb, Hc.
   congruence.
 }
 apply List_eq_iff in Hbc.
@@ -1407,12 +1415,15 @@ apply List_eq_iff.
 split; [ destruct Hb, Hc; congruence | ].
 intros d i.
 unfold "°" in Hbc.
-assert (H : ∀ i, nth (nth i lb 0) la 0 = nth (nth i lc 0) la 0). {
+assert
+    (H :
+       ∀ i,
+       List.nth (List.nth i lb 0) la 0 = List.nth (List.nth i lc 0) la 0). {
   intros j.
   destruct (lt_dec j n) as [Hjn| Hjn]. 2: {
     apply Nat.nlt_ge in Hjn.
-    rewrite (nth_overflow lb); [ | destruct Hb; congruence ].
-    rewrite (nth_overflow lc); [ | destruct Hc; congruence ].
+    rewrite (List.nth_overflow lb); [ | destruct Hb; congruence ].
+    rewrite (List.nth_overflow lc); [ | destruct Hc; congruence ].
     easy.
   }
   specialize (Hbc 0 j).
@@ -1423,8 +1434,8 @@ assert (H : ∀ i, nth (nth i lb 0) la 0 = nth (nth i lc 0) la 0). {
 clear Hbc; rename H into Hbc.
 destruct (lt_dec i n) as [Hin| Hin]. 2: {
   apply Nat.nlt_ge in Hin.
-  rewrite nth_overflow; [ | destruct Hb; congruence ].
-  rewrite nth_overflow; [ | destruct Hc; congruence ].
+  rewrite List.nth_overflow; [ | destruct Hb; congruence ].
+  rewrite List.nth_overflow; [ | destruct Hc; congruence ].
   easy.
 }
 specialize (Hbc i).
@@ -1432,24 +1443,24 @@ apply (NoDup_nat _ Ha) in Hbc; cycle 1. {
   destruct Hb as (Hbp, Hbl).
   rewrite Hal, <- Hbl.
   apply permut_seq_iff in Hbp.
-  apply Hbp, nth_In.
+  apply Hbp, List.nth_In.
   congruence.
 } {
   destruct Hc as (Hcp, Hcl).
   rewrite Hal, <- Hcl.
   apply permut_seq_iff in Hcp.
-  apply Hcp, nth_In.
+  apply Hcp, List.nth_In.
   congruence.
 }
-rewrite nth_indep with (d' := 0); [ | destruct Hb; congruence ].
+rewrite List.nth_indep with (d' := 0); [ | destruct Hb; congruence ].
 symmetry.
-rewrite nth_indep with (d' := 0); [ | destruct Hc; congruence ].
+rewrite List.nth_indep with (d' := 0); [ | destruct Hc; congruence ].
 now symmetry.
 Qed.
 
 Theorem permut_comp_cancel_r : ∀ n la lb lc,
-  length la = n
-  → length lb = n
+  List.length la = n
+  → List.length lb = n
   → permut_seq_with_len n lc
   → la ° lc = lb ° lc ↔ la = lb.
 Proof.
@@ -1458,7 +1469,7 @@ split; [ | now intros; subst la ].
 intros Hab.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
-  apply length_zero_iff_nil in Hal, Hbl.
+  apply List.length_zero_iff_nil in Hal, Hbl.
   congruence.
 }
 apply List_eq_iff in Hab.
@@ -1466,7 +1477,7 @@ destruct Hab as (_, Hab).
 apply List_eq_iff.
 split; [ congruence | ].
 intros d i.
-specialize (Hab d (nth i (isort_rank Nat.leb lc) 0)).
+specialize (Hab d (List.nth i (isort_rank Nat.leb lc) 0)).
 unfold "°" in Hab.
 rewrite (List_map_nth' 0) in Hab. 2: {
   apply isort_rank_ub.
@@ -1483,34 +1494,34 @@ rewrite (List_map_nth' 0) in Hab. 2: {
 destruct Hc as (Hcp, Hcl).
 destruct (lt_dec i n) as [Hin| Hin]. 2: {
   apply Nat.nlt_ge in Hin.
-  rewrite nth_overflow; [ | now rewrite Hal ].
-  rewrite nth_overflow; [ | now rewrite Hbl ].
+  rewrite List.nth_overflow; [ | now rewrite Hal ].
+  rewrite List.nth_overflow; [ | now rewrite Hbl ].
   easy.
 }
 rewrite <- Hcl in Hin.
 rewrite permut_permut_isort in Hab; [ | easy | easy ].
 rewrite Hcl, <- Hal in Hin.
-rewrite nth_indep with (d' := 0); [ symmetry | easy ].
+rewrite List.nth_indep with (d' := 0); [ symmetry | easy ].
 rewrite Hal, <- Hbl in Hin.
-rewrite nth_indep with (d' := 0); [ symmetry | easy ].
+rewrite List.nth_indep with (d' := 0); [ symmetry | easy ].
 easy.
 Qed.
 
-Theorem comp_1_l : ∀ n l, AllLt l n → seq 0 n ° l = l.
+Theorem comp_1_l : ∀ n l, AllLt l n → List.seq 0 n ° l = l.
 Proof.
 intros * Hp.
 unfold "°".
-erewrite map_ext_in. 2: {
+erewrite List.map_ext_in. 2: {
   intros i Hi.
-  rewrite seq_nth; [ | now apply Hp ].
+  rewrite List.seq_nth; [ | now apply Hp ].
   now apply Nat.add_0_l.
 }
-apply map_id.
+apply List.map_id.
 Qed.
 
 Theorem comp_1_r : ∀ n {la},
-  length la = n
-  → la ° seq 0 n = la.
+  List.length la = n
+  → la ° List.seq 0 n = la.
 Proof.
 intros * Hl.
 subst n.
@@ -1520,7 +1531,7 @@ apply List_map_nth_seq.
 Qed.
 
 Theorem collapse_permut_seq_with_len :
-  ∀ l, permut_seq_with_len (length l) (collapse l).
+  ∀ l, permut_seq_with_len (List.length l) (collapse l).
 Proof.
 intros.
 apply isort_rank_permut_seq_with_len.
@@ -1533,7 +1544,7 @@ Theorem permut_isort_rank_involutive : ∀ {la},
 Proof.
 intros * Hp.
 remember (isort_rank Nat.leb la) as lb eqn:Hlb.
-apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
+apply (@permut_comp_cancel_r (List.length lb)) with (lc := lb). {
   now apply isort_rank_permut_seq_with_len.
 } {
   now rewrite Hlb, isort_rank_length.
@@ -1549,16 +1560,17 @@ now apply permut_isort_leb.
 Qed.
 
 Theorem collapse_lt_compat : ∀ l i j,
-  i < length l
-  → j < length l
-  → nth i l 0 < nth j l 0
-  → nth i (collapse l) 0 < nth j (collapse l) 0.
+  i < List.length l
+  → j < List.length l
+  → List.nth i l 0 < List.nth j l 0
+  → List.nth i (collapse l) 0 < List.nth j (collapse l) 0.
 Proof.
 intros l j i Hj Hi Hc2.
 specialize (collapse_permut_seq_with_len l) as Hc.
-specialize (isort_rank_permut_seq_with_len Nat.leb (length l) eq_refl) as Hr.
+specialize (isort_rank_permut_seq_with_len Nat.leb (List.length l)) as Hr.
+specialize (Hr _ eq_refl).
 apply Nat.nle_gt; intros Hc1.
-destruct (Nat.eq_dec (nth i (collapse l) 0) (nth j (collapse l) 0))
+destruct (Nat.eq_dec (List.nth i (collapse l) 0) (List.nth j (collapse l) 0))
   as [H| H]. {
   destruct Hc as (Hca, Hcl).
   apply permut_seq_iff in Hca.
@@ -1570,12 +1582,13 @@ destruct (Nat.eq_dec (nth i (collapse l) 0) (nth j (collapse l) 0))
   }
   now subst j; apply Nat.lt_irrefl in Hc2.
 }
-assert (H' : nth i (collapse l) 0 < nth j (collapse l) 0) by flia Hc1 H.
+assert (H' : List.nth i (collapse l) 0 < List.nth j (collapse l) 0)
+  by flia Hc1 H.
 clear Hc1 H; rename H' into Hc1.
 unfold collapse in Hc1.
 remember (isort_rank Nat.leb l) as lrank eqn:Hlr.
-remember (nth i (collapse l) 0) as i' eqn:Hi'.
-assert (Hii' : i = nth i' lrank 0). {
+remember (List.nth i (collapse l) 0) as i' eqn:Hi'.
+assert (Hii' : i = List.nth i' lrank 0). {
   subst i'; unfold collapse.
   rewrite <- Hlr; symmetry.
   destruct Hr as (Hrp, Hrl).
@@ -1589,11 +1602,11 @@ rewrite permut_isort_permut in Hc1; [ | now destruct Hr | ]. 2: {
   destruct Hca as (Hca, Hcn).
   rewrite Hcl in Hca.
   rewrite Hlr, isort_rank_length.
-  apply Hca, nth_In.
+  apply Hca, List.nth_In.
   now rewrite Hcl.
 }
-remember (nth j (collapse l) 0) as j' eqn:Hj'.
-assert (Hjj' : j = nth j' lrank 0). {
+remember (List.nth j (collapse l) 0) as j' eqn:Hj'.
+assert (Hjj' : j = List.nth j' lrank 0). {
   subst j'; unfold collapse.
   rewrite <- Hlr; symmetry.
   destruct Hr as (Hrp, Hrl).
@@ -1607,27 +1620,27 @@ rewrite permut_isort_permut in Hc1; [ | now destruct Hr | ]. 2: {
   destruct Hca as (Hca, Hcn).
   rewrite Hcl in Hca.
   rewrite Hlr, isort_rank_length.
-  apply Hca, nth_In.
+  apply Hca, List.nth_In.
   now rewrite Hcl.
 }
 rewrite Hii', Hjj' in Hc2.
 rewrite Hlr in Hc2.
-assert (Hi'l : i' < length l). {
+assert (Hi'l : i' < List.length l). {
   rewrite Hi'.
   destruct Hc as (Hca, Hcl).
   apply permut_seq_iff in Hca.
   destruct Hca as (Hca, Hcn).
   rewrite Hcl in Hca.
-  apply Hca, nth_In.
+  apply Hca, List.nth_In.
   now rewrite collapse_length.
 }
-assert (Hj'l : j' < length l). {
+assert (Hj'l : j' < List.length l). {
   rewrite Hj'.
   destruct Hc as (Hca, Hcl).
   apply permut_seq_iff in Hca.
   destruct Hca as (Hca, Hcn).
   rewrite Hcl in Hca.
-  apply Hca, nth_In.
+  apply Hca, List.nth_In.
   now rewrite collapse_length.
 }
 rewrite nth_nth_isort_rank in Hc2; [ | easy ].
@@ -1639,7 +1652,7 @@ specialize sorted_strongly_sorted as H1.
 specialize (H1 _ _ Nat_leb_trans _ Hsl).
 specialize strongly_sorted_if as H2.
 specialize (H2 _ _ Nat_leb_trans _ H1 0).
-rewrite length_map, Hlr, isort_rank_length in H2.
+rewrite List.length_map, Hlr, isort_rank_length in H2.
 specialize (H2 i' j' Hi'l Hj'l Hc1).
 apply Nat.leb_le in H2.
 rewrite <- Hlr in H2.
@@ -1649,16 +1662,18 @@ now apply Nat.nle_gt in Hc2.
 Qed.
 
 Theorem collapse_keeps_order : ∀ {l},
-  NoDup l
-  → ∀ i j,  i < length l → j < length l
-  → (nth i (collapse l) 0 ?= nth j (collapse l) 0) =
-    (nth i l 0 ?= nth j l 0).
+  List.NoDup l
+  → ∀ i j,  i < List.length l → j < List.length l
+  → (List.nth i (collapse l) 0 ?= List.nth j (collapse l) 0) =
+    (List.nth i l 0 ?= List.nth j l 0).
 Proof.
 intros * Hnd * Hi Hj.
-remember (nth i (collapse l) 0 ?= nth j (collapse l) 0) as c1 eqn:Hc1.
-remember (nth i l 0 ?= nth j l 0) as c2 eqn:Hc2.
+remember (List.nth i (collapse l) 0 ?= List.nth j (collapse l) 0)
+  as c1 eqn:Hc1.
+remember (List.nth i l 0 ?= List.nth j l 0) as c2 eqn:Hc2.
 specialize (collapse_permut_seq_with_len l) as Hc.
-specialize (isort_rank_permut_seq_with_len Nat.leb (length l) eq_refl) as Hr.
+specialize (isort_rank_permut_seq_with_len Nat.leb (List.length l)) as Hr.
+specialize (Hr _ eq_refl).
 move c2 before c1.
 symmetry in Hc1, Hc2.
 destruct c1. {
@@ -1699,17 +1714,17 @@ destruct c1. {
 Qed.
 
 Definition keep_order la lb :=
-  ∀ i j,  i < length la → j < length la →
-  (nth i la 0 ?= nth j la 0) = (nth i lb 0 ?= nth j lb 0).
+  ∀ i j,  i < List.length la → j < List.length la →
+  (List.nth i la 0 ?= List.nth j la 0) = (List.nth i lb 0 ?= List.nth j lb 0).
 
 Theorem ε_keep_order :
-  ∀ la lb, keep_order la lb → length la = length lb → ε la = ε lb.
+  ∀ la lb, keep_order la lb → List.length la = List.length lb → ε la = ε lb.
 Proof.
 intros * Hko Hab.
 revert lb Hko Hab.
 induction la as [| a]; intros. {
   symmetry in Hab.
-  now apply length_zero_iff_nil in Hab; subst lb.
+  now apply List.length_zero_iff_nil in Hab; subst lb.
 }
 destruct lb as [| b]; [ easy | ].
 cbn in Hab; apply Nat.succ_inj in Hab.
@@ -1723,7 +1738,7 @@ move b before a.
 revert a b lb Hko Hab.
 induction la as [| a']; intros. {
   symmetry in Hab.
-  now apply length_zero_iff_nil in Hab; subst lb.
+  now apply List.length_zero_iff_nil in Hab; subst lb.
 }
 destruct lb as [| b']; [ easy | ].
 cbn in Hab; apply Nat.succ_inj in Hab.
@@ -1748,7 +1763,7 @@ assert (H : ε_aux a la = ε_aux b lb). {
 destruct c; [ easy | easy | now f_equal ].
 Qed.
 
-Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
+Theorem ε_collapse_ε : ∀ l, List.NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
 apply ε_keep_order; [ | apply collapse_length ].
@@ -1770,7 +1785,7 @@ intros * Hant Htr Htot * Hp Hq.
 apply (isort_when_permuted Nat.eqb_eq); [ easy | easy | easy | ].
 unfold "°".
 apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
-apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
+apply (permutation_trans Nat.eqb_eq) with (lb := List.seq 0 n). {
   now destruct Hp as (Hp1, Hp2); rewrite <- Hp2.
 } {
   destruct Hq as (Hq1, Hq2); rewrite <- Hq2.
@@ -1779,21 +1794,21 @@ apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
 Qed.
 
 Theorem isort_comp_permut_r : ∀ l p,
-  permut_seq_with_len (length l) p
+  permut_seq_with_len (List.length l) p
   → isort Nat.leb (l ° p) = isort Nat.leb l.
 Proof.
 intros * Hp.
 symmetry.
-rewrite <- (comp_1_r (length l) eq_refl) at 1.
+rewrite <- (comp_1_r (List.length l) eq_refl) at 1.
 specialize (permut_isort Nat_leb_antisym Nat_leb_trans) as H1.
 specialize (H1 Nat_leb_total_relation).
-apply (H1 (length l)); [ | easy ].
+apply (H1 (List.length l)); [ | easy ].
 apply seq_permut_seq_with_len.
 Qed.
 
 Theorem permut_isort_rank_comp : ∀ n la lb,
-  NoDup la
-  → length la = n
+  List.NoDup la
+  → List.length la = n
   → permut_seq_with_len n lb
   → isort_rank Nat.leb (la ° lb) =
     isort_rank Nat.leb lb ° isort_rank Nat.leb la.
@@ -1808,10 +1823,10 @@ apply permut_comp_cancel_l with (n := n) (la := la ° lb). {
   intros i j Hi Hj Hij.
   apply (NoDup_nat _ Ha) in Hij; cycle 1. {
     rewrite Hal, <- Hbl.
-    now apply Hba, nth_In.
+    now apply Hba, List.nth_In.
   } {
     rewrite Hal, <- Hbl.
-    now apply Hba, nth_In.
+    now apply Hba, List.nth_In.
   }
   now apply (NoDup_nat _ Hbn) in Hij.
 } {
@@ -1872,17 +1887,17 @@ now apply permut_isort_rank_involutive.
 Qed.
 
 Theorem collapse_comp : ∀ la lb,
-  NoDup la
+  List.NoDup la
   → permut_seq lb
-  → length la = length lb
+  → List.length la = List.length lb
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Ha Hb Hab.
 unfold collapse.
 symmetry.
 rewrite <- (permut_isort_rank_involutive Hb) at 1.
-rewrite (permut_isort_rank_comp (length lb)); [ | easy | easy | easy ].
-rewrite (permut_isort_rank_comp (length lb)); [ easy | | | ]. {
+rewrite (permut_isort_rank_comp (List.length lb)); [ | easy | easy | easy ].
+rewrite (permut_isort_rank_comp (List.length lb)); [ easy | | | ]. {
   apply NoDup_isort_rank.
 } {
   apply isort_rank_length.
@@ -1900,16 +1915,18 @@ rewrite comp_length, collapse_length.
 split; [ easy | ].
 intros d i.
 unfold comp_list.
-destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+destruct (lt_dec i (List.length la)) as [Hila| Hila]. 2: {
   apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ | now rewrite length_map, collapse_length ].
-  now rewrite nth_overflow.
+  rewrite List.nth_overflow. 2: {
+    now rewrite List.length_map, collapse_length.
+  }
+  now rewrite List.nth_overflow.
 }
-rewrite nth_indep with (d' := 0). 2: {
-  now rewrite length_map, collapse_length.
+rewrite List.nth_indep with (d' := 0). 2: {
+  now rewrite List.length_map, collapse_length.
 }
 symmetry.
-rewrite nth_indep with (d' := 0); [ | easy ].
+rewrite List.nth_indep with (d' := 0); [ | easy ].
 symmetry.
 clear d.
 rewrite (isort_isort_rank _ 0).
@@ -1955,9 +1972,9 @@ apply isort_comp_collapse.
 Qed.
 
 Theorem NoDup_comp_iff : ∀ la lb,
-  permut_seq_with_len (length la) lb
-  → NoDup la
-  ↔ NoDup (la ° lb).
+  permut_seq_with_len (List.length la) lb
+  → List.NoDup la
+  ↔ List.NoDup (la ° lb).
 Proof.
 intros * Hbp.
 split. {
@@ -1969,11 +1986,11 @@ split. {
   apply (NoDup_nat _ Haa) in Hij; cycle 1. {
     rewrite <- Hbl.
     apply permut_seq_iff in Hbp.
-    now apply Hbp, nth_In.
+    now apply Hbp, List.nth_In.
   } {
     rewrite <- Hbl.
     apply permut_seq_iff in Hbp.
-    now apply Hbp, nth_In.
+    now apply Hbp, List.nth_In.
   }
   apply permut_seq_iff in Hbp.
   destruct Hbp as (Hba, Hbn).
@@ -1986,22 +2003,22 @@ split. {
   rewrite comp_length in H1.
   destruct Hbp as (Hbp, Hbl).
   rewrite <- Hbl in Hi, Hj.
-  remember (nth i (isort_rank Nat.leb lb) 0) as i' eqn:Hi'.
-  remember (nth j (isort_rank Nat.leb lb) 0) as j' eqn:Hj'.
+  remember (List.nth i (isort_rank Nat.leb lb) 0) as i' eqn:Hi'.
+  remember (List.nth j (isort_rank Nat.leb lb) 0) as j' eqn:Hj'.
   specialize (H1 i' j').
-  assert (H : i' < length lb). {
+  assert (H : i' < List.length lb). {
     rewrite Hi'.
     apply isort_rank_ub.
     now intros H; rewrite H in Hi.
   }
   specialize (H1 H); clear H.
-  assert (H : j' < length lb). {
+  assert (H : j' < List.length lb). {
     rewrite Hj'.
     apply isort_rank_ub.
     now intros H; rewrite H in Hi.
   }
   specialize (H1 H); clear H.
-  assert (H : nth i' (la ° lb) 0 = nth j' (la ° lb) 0). {
+  assert (H : List.nth i' (la ° lb) 0 = List.nth j' (la ° lb) 0). {
     rewrite Hi', Hj'.
     unfold "°".
     rewrite (List_map_nth' 0). 2: {
@@ -2041,7 +2058,7 @@ specialize (Hos (or_introl Hop)).
 move Hos after Hop.
 revert i l2 l3.
 induction l1 as [| j]; intros. {
-  rewrite app_nil_l; cbn.
+  rewrite List.app_nil_l; cbn.
   rewrite (ε_aux_dup Hop).
   apply (rngl_mul_0_l Hos).
 }
@@ -2053,7 +2070,7 @@ Qed.
 Theorem ε_when_dup :
   rngl_has_opp T = true →
   ∀ la,
-  ¬ NoDup la
+  ¬ List.NoDup la
   → ε la = 0%L.
 Proof.
 intros Hop * Haa.
@@ -2076,12 +2093,12 @@ Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
   σ = canon_sym_gr_list (S n) k
   → σ' = canon_sym_gr_list n (k mod n!)
   → ∀ i,
-    nth i σ 0 =
+    List.nth i σ 0 =
     match i with
     | 0 => k / n!
     | S i' =>
         if ((k <? n!) && (n <=? i'))%bool then 0
-        else succ_when_ge (k / n!) (nth i' σ' 0)
+        else succ_when_ge (k / n!) (List.nth i' σ' 0)
     end.
 Proof.
 intros * Hσ Hσ' i.
@@ -2094,8 +2111,8 @@ destruct b. {
   destruct Hb as (Hkn, Hni).
   apply Nat.ltb_lt in Hkn.
   apply Nat.leb_le in Hni.
-  rewrite nth_overflow; [ easy | ].
-  rewrite length_map.
+  rewrite List.nth_overflow; [ easy | ].
+  rewrite List.length_map.
   now rewrite canon_sym_gr_list_length.
 }
 apply Bool.andb_false_iff in Hb.
@@ -2106,12 +2123,12 @@ destruct Hb as [Hb| Hb]. {
     now rewrite Hσ'.
   } {
     apply Nat.nlt_ge in Hin.
-    rewrite nth_overflow. 2: {
-      now rewrite length_map, canon_sym_gr_list_length.
+    rewrite List.nth_overflow. 2: {
+      now rewrite List.length_map, canon_sym_gr_list_length.
     }
     unfold succ_when_ge.
     rewrite Hσ'.
-    rewrite nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
+    rewrite List.nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
     unfold Nat.b2n; rewrite if_leb_le_dec.
     destruct (le_dec (k / n!) 0) as [H1| H1]; [ | easy ].
     apply Nat.le_0_r in H1.
@@ -2129,7 +2146,7 @@ Theorem ε_aux_ext_in :
   rngl_has_opp T = true →
   ∀ i f la lb,
   permutation Nat.eqb la lb
-  → ε_aux i (map f la) = ε_aux i (map f lb).
+  → ε_aux i (List.map f la) = ε_aux i (List.map f lb).
 Proof.
 intros Hop * Hpab.
 revert lb Hpab.
@@ -2145,7 +2162,7 @@ apply Nat.eqb_eq in Hx; subst x.
 specialize (IHla (bef ++ aft) Hpab) as H1.
 rewrite H1, Haft.
 remember (i ?= f a) as ifa eqn:Hifa; symmetry in Hifa.
-do 2 rewrite map_app; cbn; symmetry.
+do 2 rewrite List.map_app; cbn; symmetry.
 destruct ifa. {
   apply Nat.compare_eq_iff in Hifa; subst i.
   apply (ε_aux_dup Hop).
@@ -2162,7 +2179,7 @@ Theorem ε_aux_seq_out :
   rngl_has_opp T = true →
   ∀ sta len i,
   sta + len ≤ i
-  → ε_aux i (seq sta len) = minus_one_pow len.
+  → ε_aux i (List.seq sta len) = minus_one_pow len.
 Proof.
 intros Hop * Hi.
 revert i sta Hi.
@@ -2184,7 +2201,7 @@ Theorem ε_aux_app_all_gt_l :
   rngl_has_opp T = true →
   ∀ i la lb,
   (∀ j, j ∈ la → j < i)
-  → ε_aux i (la ++ lb) = (minus_one_pow (length la) * ε_aux i lb)%L.
+  → ε_aux i (la ++ lb) = (minus_one_pow (List.length la) * ε_aux i lb)%L.
 Proof.
 intros Hop * Hla.
 revert lb.
@@ -2246,10 +2263,12 @@ Theorem ε_aux_map_succ_when_ge_canon_sym_gr_list :
   ∀ n i j,
   i ≤ n
   → j < n!
-  → ε_aux i (map (succ_when_ge i) (canon_sym_gr_list n j)) = minus_one_pow i.
+  → ε_aux i (List.map (succ_when_ge i) (canon_sym_gr_list n j)) =
+    minus_one_pow i.
 Proof.
 intros Hop * Hin Hjn.
-rewrite (ε_aux_permut Hop) with (lb := map (succ_when_ge i) (seq 0 n)). 2: {
+rewrite (ε_aux_permut Hop _ _ (List.map (succ_when_ge i) (List.seq 0 n))).
+2: {
   apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
   apply permut_seq_permutation with (n := n). {
     now apply canon_sym_gr_list_permut_seq_with_len.
@@ -2260,60 +2279,60 @@ rewrite (ε_aux_permut Hop) with (lb := map (succ_when_ge i) (seq 0 n)). 2: {
 clear j Hjn.
 destruct (Nat.eq_dec i n) as [Hien| Hien]. {
   subst i; clear Hin.
-  erewrite map_ext_in. 2: {
+  erewrite List.map_ext_in. 2: {
     intros j Hj.
-    apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+    apply List.in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
     unfold succ_when_ge.
     now apply Nat.leb_gt in Hj; rewrite Hj, Nat.add_0_r.
   }
-  rewrite map_id.
+  rewrite List.map_id.
   now apply (ε_aux_seq_out Hop).
 }
 assert (H : i < n) by flia Hin Hien.
 clear Hin Hien; rename H into Hin.
-rewrite (List_seq_cut i); [ | now apply in_seq ].
+rewrite (List_seq_cut i); [ | now apply List.in_seq ].
 rewrite Nat.sub_0_r, Nat.add_0_l.
-rewrite map_app.
-erewrite map_ext_in. 2: {
+rewrite List.map_app.
+erewrite List.map_ext_in. 2: {
   intros j Hj.
-  apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+  apply List.in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
   unfold succ_when_ge, Nat.b2n.
   now apply Nat.leb_gt in Hj; rewrite Hj, Nat.add_0_r.
 }
-rewrite map_id.
+rewrite List.map_id.
 rewrite (ε_aux_app_all_gt_l Hop). 2: {
   intros j Hj.
-  now apply in_seq in Hj.
+  now apply List.in_seq in Hj.
 }
-rewrite length_seq, <- (rngl_mul_1_r Hon); f_equal.
-erewrite map_ext_in. 2: {
+rewrite List.length_seq, <- (rngl_mul_1_r Hon); f_equal.
+erewrite List.map_ext_in. 2: {
   intros j Hj.
-  apply in_seq in Hj; destruct Hj as (Hij, Hjn).
+  apply List.in_seq in Hj; destruct Hj as (Hij, Hjn).
   rewrite Nat.add_comm, Nat.sub_add in Hjn; [ | now apply Nat.lt_le_incl ].
   unfold succ_when_ge.
   now apply Nat.leb_le in Hij; rewrite Hij, Nat.add_1_r; cbn.
 }
-rewrite seq_shift.
+rewrite List.seq_shift.
 apply ε_aux_all_gt.
 intros j Hj.
-apply in_seq in Hj.
+apply List.in_seq in Hj.
 flia Hj.
 Qed.
 
 Theorem ε_map_succ_when_ge :
    ∀ i la,
-  NoDup la
-  → ε (map (succ_when_ge i) la) = ε la.
+  List.NoDup la
+  → ε (List.map (succ_when_ge i) la) = ε la.
 Proof.
 intros * Ha.
 induction la as [| a]; [ easy | cbn ].
-apply NoDup_cons_iff in Ha.
+apply List.NoDup_cons_iff in Ha.
 destruct Ha as (Ha, Hla).
 specialize (IHla Hla).
 rewrite IHla; f_equal.
 clear Ha IHla.
 induction la as [| b]; [ easy | cbn ].
-apply NoDup_cons_iff in Hla.
+apply List.NoDup_cons_iff in Hla.
 destruct Hla as (Hb, Hla).
 specialize (IHla Hla).
 rewrite IHla.
@@ -2370,30 +2389,30 @@ Qed.
 Theorem canon_sym_gr_surjective : ∀ {n k j},
   k < fact n
   → j < n
-  → ∃ i : nat, i < n ∧ nth i (canon_sym_gr_list n k) 0 = j.
+  → ∃ i : nat, i < n ∧ List.nth i (canon_sym_gr_list n k) 0 = j.
 Proof.
 intros * Hkn Hjn.
-exists (nth j (canon_sym_gr_inv_list n k) 0).
+exists (List.nth j (canon_sym_gr_inv_list n k) 0).
 split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
 Theorem NoDup_ε_1_opp_1 :
   rngl_has_opp T = true →
-  ∀ σ, NoDup σ → ε σ = 1%L ∨ ε σ = (-1)%L.
+  ∀ σ, List.NoDup σ → ε σ = 1%L ∨ ε σ = (-1)%L.
 Proof.
 intros Hop * Hσ.
 induction σ as [| a la]; [ now left | cbn ].
-apply NoDup_cons_iff in Hσ.
+apply List.NoDup_cons_iff in Hσ.
 destruct Hσ as (Ha, Hnd).
 specialize (IHla Hnd).
 destruct IHla as [Hla| Hla]; rewrite Hla. {
   rewrite (rngl_mul_1_r Hon).
   clear Hla.
   induction la as [| b]; intros; [ now left | cbn ].
-  apply not_in_cons in Ha.
+  apply List.not_in_cons in Ha.
   destruct Ha as (Hab, Ha).
-  apply NoDup_cons_iff in Hnd.
+  apply List.NoDup_cons_iff in Hnd.
   destruct Hnd as (Hb, Hnd).
   specialize (IHla Ha Hnd).
   remember (a ?= b) as ab eqn:Hc; symmetry in Hc.
@@ -2404,9 +2423,9 @@ destruct IHla as [Hla| Hla]; rewrite Hla. {
   clear Hla.
   rewrite (rngl_mul_opp_r Hop), (rngl_mul_1_r Hon).
   induction la as [| b]; intros; [ now right | cbn ].
-  apply not_in_cons in Ha.
+  apply List.not_in_cons in Ha.
   destruct Ha as (Hab, Ha).
-  apply NoDup_cons_iff in Hnd.
+  apply List.NoDup_cons_iff in Hnd.
   destruct Hnd as (Hb, Hnd).
   specialize (IHla Ha Hnd).
   remember (a ?= b) as ab eqn:Hc; symmetry in Hc.
@@ -2419,7 +2438,7 @@ Qed.
 Theorem ε_1_opp_1_NoDup :
   rngl_has_opp T = true →
   rngl_characteristic T ≠ 1 →
-  ∀ σ, ε σ = 1%L ∨ ε σ = (-1)%L → NoDup σ.
+  ∀ σ, ε σ = 1%L ∨ ε σ = (-1)%L → List.NoDup σ.
 Proof.
 intros Hop H10 * Hσ.
 destruct (ListDec.NoDup_dec Nat.eq_dec σ) as [H1| H1]; [ easy | ].
@@ -2437,7 +2456,7 @@ Qed.
 
 Theorem NoDup_ε_square :
   rngl_has_opp T = true →
-  ∀ σ, NoDup σ → (ε σ * ε σ = 1)%L.
+  ∀ σ, List.NoDup σ → (ε σ * ε σ = 1)%L.
 Proof.
 intros Hop * Hσ.
 specialize (NoDup_ε_1_opp_1) as H1.
