@@ -397,6 +397,26 @@ destruct ab. {
 }
 Qed.
 
+Theorem rngl_max_comm :
+  rngl_is_ordered T = true →
+  ∀ a b, rngl_max a b = rngl_max b a.
+Proof.
+intros Hor *.
+progress unfold rngl_max.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (b ≤? a)%L as ba eqn:Hba.
+symmetry in Hab, Hba.
+destruct ab. {
+  destruct ba; [ | easy ].
+  apply rngl_leb_le in Hab, Hba.
+  now apply (rngl_le_antisymm Hor).
+} {
+  destruct ba; [ easy | ].
+  apply (rngl_leb_gt Hor) in Hab, Hba.
+  now apply (rngl_lt_asymm Hor) in Hba.
+}
+Qed.
+
 Theorem rngl_min_assoc :
   rngl_is_ordered T = true →
   ∀ a b c,
@@ -417,6 +437,33 @@ destruct ab. {
 }
 rewrite Hbc.
 destruct bc; [ now rewrite Hab | ].
+apply (rngl_leb_gt Hor) in Hab, Hbc.
+apply (rngl_lt_le_incl Hor) in Hbc.
+apply (rngl_le_lt_trans Hor c) in Hab; [ | easy ].
+apply (rngl_leb_gt Hor) in Hab.
+now rewrite Hab.
+Qed.
+
+Theorem rngl_max_assoc :
+  rngl_is_ordered T = true →
+  ∀ a b c,
+  rngl_max a (rngl_max b c) = rngl_max (rngl_max a b) c.
+Proof.
+intros Hor *.
+progress unfold rngl_max.
+remember (a ≤? b)%L as ab eqn:Hab.
+remember (b ≤? c)%L as bc eqn:Hbc.
+symmetry in Hab, Hbc.
+destruct ab. {
+  destruct bc; [ | now rewrite Hab, Hbc ].
+  rewrite Hbc.
+  apply rngl_leb_le in Hab, Hbc.
+  apply (rngl_le_trans Hor a) in Hbc; [ | easy ].
+  apply rngl_leb_le in Hbc.
+  now rewrite Hbc.
+}
+destruct bc; [ easy | ].
+rewrite Hab.
 apply (rngl_leb_gt Hor) in Hab, Hbc.
 apply (rngl_lt_le_incl Hor) in Hbc.
 apply (rngl_le_lt_trans Hor c) in Hab; [ | easy ].
