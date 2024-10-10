@@ -1667,7 +1667,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
 rewrite Hjll.
 rewrite <- loc_length_loc_bl_sens_list.
 unfold "≥".
-etransitivity; [ | apply fold_right_max_ge ].
+etransitivity; [ | apply List_fold_right_max_ge ].
 apply Nat.le_max_l.
 Qed.
 

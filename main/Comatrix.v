@@ -59,7 +59,7 @@ intros * (Hpq, Hq).
 destruct M as (ll); cbn.
 unfold subm, mat_swap_rows; cbn; f_equal.
 rewrite length_map.
-rewrite butn_length.
+rewrite List_length_butn.
 rewrite <- List_map_butn, map_map.
 rewrite List_map_butn_seq.
 rewrite Nat.add_0_l.
@@ -74,17 +74,18 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
     subst i; clear Hir.
     rewrite transposition_1.
-    destruct (lt_dec (q - 1) (length (butn (r - 1) ll))) as [Hqrl| Hqrl]. {
+    destruct (lt_dec (q - 1) (length (List_butn (r - 1) ll)))
+        as [Hqrl| Hqrl]. {
       rewrite (List_map_nth' []); [ | easy ].
-      rewrite nth_butn_after; [ easy | flia Hpq Hq ].
+      rewrite List_nth_butn_after; [ easy | flia Hpq Hq ].
     }
     apply Nat.nlt_ge in Hqrl.
     symmetry.
     rewrite nth_overflow; [ | now rewrite length_map ].
-    rewrite butn_length in Hqrl.
+    rewrite List_length_butn in Hqrl.
     destruct (le_dec (length ll) (q - 1)) as [Hlq| Hlq]. {
       rewrite nth_overflow; [ | easy ].
-      now rewrite butn_nil.
+      now rewrite List_butn_nil.
     }
     apply Nat.nle_gt in Hlq.
     unfold Nat.b2n in Hi, Hqrl.
@@ -95,12 +96,13 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
     subst i; clear Hir.
     rewrite transposition_2.
-    destruct (lt_dec (p - 1) (length (butn (r - 1) ll))) as [Hprl| Hprl]. {
+    destruct (lt_dec (p - 1) (length (List_butn (r - 1) ll)))
+        as [Hprl| Hprl]. {
       rewrite (List_map_nth' []); [ | easy ].
-      rewrite nth_butn_after; [ easy | flia Hpq Hq ].
+      rewrite List_nth_butn_after; [ easy | flia Hpq Hq ].
     }
     apply Nat.nlt_ge in Hprl.
-    rewrite butn_length in Hprl.
+    rewrite List_length_butn in Hprl.
     flia Hpq Hi Hprl.
   }
   unfold transposition.
@@ -108,7 +110,7 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ easy | clear H ].
   destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ easy | clear H ].
   rewrite List_map_butn.
-  rewrite nth_butn_after; [ | easy ].
+  rewrite List_nth_butn_after; [ | easy ].
   rewrite (List_map_nth' []); [ easy | flia Hi ].
 }
 unfold transposition.
@@ -119,7 +121,7 @@ destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | ].
 clear H.
 destruct (Nat.eq_dec (i + 1) (q - 1)) as [H| H]; [ flia Hq Hir H | clear H ].
 rewrite List_map_butn.
-rewrite nth_butn_before; [ | easy ].
+rewrite List_nth_butn_before; [ | easy ].
 rewrite (List_map_nth' []); [ easy | ].
 unfold Nat.b2n in Hi.
 rewrite if_ltb_lt_dec in Hi.
@@ -427,14 +429,14 @@ Proof.
 intros * Hp.
 destruct M as (ll); cbn in Hp |-*.
 unfold subm; f_equal.
-cbn - [ butn ].
+cbn - [ List_butn ].
 f_equal; clear q.
 rewrite fold_left_mat_fold_left_list_list.
-cbn - [ butn ].
+cbn - [ List_butn ].
 rewrite List_map_nth_seq with (d := []); symmetry.
 rewrite List_map_nth_seq with (d := []); symmetry.
-rewrite butn_length, length_map, length_seq.
-rewrite butn_length.
+rewrite List_length_butn, length_map, length_seq.
+rewrite List_length_butn.
 rewrite length_fold_left_map_transp.
 unfold Nat.b2n.
 do 2 rewrite if_ltb_lt_dec.
@@ -445,12 +447,12 @@ intros i Hi; apply in_seq in Hi.
 cbn in Hi.
 rewrite <- List_map_butn.
 rewrite (List_map_nth' 0). 2: {
-  rewrite butn_length, length_seq.
+  rewrite List_length_butn, length_seq.
   unfold Nat.b2n.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec 0 (length ll)) as [H| H]; [ easy | flia Hp H ].
 }
-rewrite nth_butn_before; [ | flia ].
+rewrite List_nth_butn_before; [ | flia ].
 rewrite seq_nth; [ cbn | flia Hi ].
 erewrite List_fold_left_ext_in. 2: {
   intros j ll' Hj.
@@ -462,7 +464,7 @@ erewrite List_fold_left_ext_in. 2: {
 }
 destruct (le_dec (p - 1) i) as [Hpi| Hpi]. 2: {
   apply Nat.nle_gt in Hpi.
-  rewrite nth_butn_after; [ | easy ].
+  rewrite List_nth_butn_after; [ | easy ].
   rewrite nth_fold_left_map_transp; cbn.
   rewrite Nat.sub_0_r.
   destruct (le_dec (length ll) i) as [H| H]; [ flia Hi H | clear H ].
@@ -484,7 +486,7 @@ destruct (le_dec (p - 1) i) as [Hpi| Hpi]. 2: {
   now rewrite Nat.add_1_r.
 }
 rewrite transposition_out; [ | flia | flia Hpi ].
-rewrite nth_butn_before; [ | easy ].
+rewrite List_nth_butn_before; [ | easy ].
 symmetry.
 rewrite nth_fold_left_map_transp; cbn; rewrite Nat.sub_0_r.
 destruct (le_dec (length ll) (i + 1)) as [H| H]; [ flia Hi H | clear H ].
@@ -708,7 +710,7 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   symmetry.
   unfold det.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   apply rngl_summation_eq_compat.
   intros j Hj.
   rewrite rngl_mul_comm; [ | easy ].
@@ -716,11 +718,11 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   rewrite (List_map_nth' 0); [ | rewrite length_seq, Hc; flia Hj Hnz ].
   rewrite seq_nth; [ | rewrite Hc; flia Hj Hnz ].
   rewrite length_map.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
   f_equal; f_equal.
-  rewrite butn_length, fold_mat_nrows.
+  rewrite List_length_butn, fold_mat_nrows.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
   now rewrite Hnz.
 }
@@ -747,7 +749,7 @@ rename i into p.
 remember (mat_swap_rows 1 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite length_map, butn_length, fold_mat_nrows.
+  rewrite length_map, List_length_butn, fold_mat_nrows.
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite Nat.add_comm.
   rewrite (minus_one_pow_add Hon Hop).
@@ -756,10 +758,10 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_mul_assoc.
   specialize (determinant_subm_mat_swap_rows_0_i Hon Hic Hop) as H1.
   specialize (H1 M p j Hsm).
-  cbn - [ butn ] in H1.
-  rewrite length_map, List_map_butn, butn_length in H1.
+  cbn - [ List_butn ] in H1.
+  rewrite length_map, List_map_butn, List_length_butn in H1.
   rewrite list_swap_elem_length, fold_mat_nrows in H1.
-  rewrite butn_length, length_map, fold_mat_nrows in H1.
+  rewrite List_length_butn, length_map, fold_mat_nrows in H1.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
   rewrite Hnz in H1; cbn - [ "<?" ] in H1.
   apply Nat.ltb_lt in Hnz.
@@ -1162,7 +1164,7 @@ f_equal; f_equal. {
 (* oops... complicated from now! doing a lemma, perhaps? *)
 unfold subm; cbn.
 do 2 rewrite length_map.
-do 2 rewrite butn_length.
+do 2 rewrite List_length_butn.
 do 2 rewrite fold_mat_nrows.
 rewrite Hira.
 f_equal; f_equal; f_equal.
@@ -1193,7 +1195,7 @@ rewrite List_seq_cut3 with (i := i - 1); [ | apply in_seq; flia Hir ].
 rewrite <- Nat.sub_succ_l; [ | easy ].
 rewrite Nat_sub_succ_1, Nat.add_0_l, Nat.sub_0_r.
 do 2 rewrite map_app.
-do 3 rewrite butn_app.
+do 3 rewrite List_butn_app.
 do 2 rewrite List_length_map_seq.
 rewrite Nat.ltb_irrefl.
 rewrite Nat.sub_diag.
@@ -1201,7 +1203,7 @@ rewrite length_map.
 replace (0 <? length [i - 1]) with true by easy.
 rewrite <- List_map_butn.
 rewrite app_nil_l.
-remember (butn 0 _) as x; cbn in Heqx; subst x.
+remember (List_butn 0 _) as x; cbn in Heqx; subst x.
 f_equal. {
   rewrite <- (seq_shift (i - 1)), map_map.
   apply map_ext_in.
@@ -1832,16 +1834,17 @@ apply IHla.
 Qed.
 *)
 
-Theorem butn_map2 : ∀ A B C (f : A → B → C) la lb i,
-  butn i (List_map2 f la lb) = List_map2 f (butn i la) (butn i lb).
+Theorem List_butn_map2 : ∀ A B C (f : A → B → C) la lb i,
+  List_butn i (List_map2 f la lb) =
+    List_map2 f (List_butn i la) (List_butn i lb).
 Proof.
 intros.
 revert i lb.
 induction la as [| a]; intros; cbn. {
-  now do 2 rewrite butn_nil.
+  now do 2 rewrite List_butn_nil.
 }
 destruct lb as [| b]. {
-  do 2 rewrite butn_nil.
+  do 2 rewrite List_butn_nil.
   now rewrite List_map2_nil_r.
 }
 destruct i; [ easy | cbn; f_equal ].
@@ -1957,14 +1960,14 @@ erewrite map_ext_in. 2: {
   intros j Hj.
   apply in_seq in Hj.
   unfold replace_at.
-  rewrite butn_app.
+  rewrite List_butn_app.
   rewrite length_firstn.
   rewrite fold_corr_mat_ncols; [ | easy | easy ].
   rewrite min_l; [ | flia Hk ].
   rewrite Nat.ltb_irrefl.
   rewrite Nat.sub_diag.
-  rewrite butn_0_cons.
-  now rewrite fold_butn.
+  rewrite List_butn_0_cons.
+  now rewrite List_fold_butn.
 }
 unfold mat_nrows.
 now rewrite <- List_map_map_seq.

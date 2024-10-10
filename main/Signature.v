@@ -161,14 +161,14 @@ Theorem butn_permut_seq_with_len : ∀ n i l,
   permut_seq_with_len (S n) l
   → n = nth i l 0
   → i < length l
-  → permut_seq_with_len n (butn i l).
+  → permut_seq_with_len n (List_butn i l).
 Proof.
 intros * Hp Hni Hil.
 split. {
   apply permut_seq_iff.
   split. {
     intros j Hj.
-    rewrite butn_length.
+    rewrite List_length_butn.
     destruct Hp as (Hp, Hl).
     apply Nat.ltb_lt in Hil; rewrite Hil.
     apply Nat.ltb_lt in Hil.
@@ -176,7 +176,7 @@ split. {
     apply permut_seq_iff in Hp.
     destruct Hp as (Hpl, Hpi).
     specialize (Hpl j) as Hjl.
-    assert (H : j ∈ l) by now apply in_butn in Hj.
+    assert (H : j ∈ l) by now apply List_in_butn in Hj.
     specialize (Hjl H); clear H.
     rewrite Hl in Hjl.
     destruct (Nat.eq_dec j n) as [H| H]; [ | flia H Hjl ].
@@ -184,11 +184,11 @@ split. {
     assert (Hnni : n ≠ i). {
       intros H; move H at top; subst i.
       apply (In_nth _ _ 0) in Hj.
-      rewrite butn_length, Hl in Hj.
+      rewrite List_length_butn, Hl in Hj.
       replace (n <? S n) with true in Hj by now symmetry; apply Nat.ltb_lt.
       rewrite Nat_sub_succ_1 in Hj.
       destruct Hj as (j & Hjn & Hnj); symmetry in Hnj.
-      rewrite nth_butn in Hnj.
+      rewrite List_nth_butn in Hnj.
       apply Nat.leb_gt in Hjn.
       rewrite Hjn, Nat.add_0_r in Hnj.
       apply Nat.leb_gt in Hjn.
@@ -199,7 +199,7 @@ split. {
       specialize (H2 H).
       now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
     }
-    unfold butn in Hj.
+    unfold List_butn in Hj.
     apply in_app_or in Hj.
     destruct Hj as [Hini| Hini]. {
       apply (In_nth _ _ 0) in Hini.
@@ -229,7 +229,7 @@ split. {
     }
   } {
     apply nat_NoDup.
-    rewrite butn_length.
+    rewrite List_length_butn.
     apply Nat.ltb_lt in Hil; rewrite Hil.
     apply Nat.ltb_lt in Hil.
     destruct Hp as (Hpp, Hpl).
@@ -237,7 +237,7 @@ split. {
     intros j k Hj Hk Hjk.
     apply permut_seq_iff in Hpp.
     destruct Hpp as (Hp, Hpi).
-    do 2 rewrite nth_butn in Hjk.
+    do 2 rewrite List_nth_butn in Hjk.
     apply (NoDup_nat _ Hpi) in Hjk; cycle 1. {
       rewrite Hpl, <- Nat.add_1_r.
       apply Nat.add_lt_le_mono; [ easy | ].
@@ -258,7 +258,7 @@ split. {
     }
   }
 } {
-  rewrite butn_length.
+  rewrite List_length_butn.
   apply Nat.ltb_lt in Hil.
   destruct Hp as (Hpp, Hpl).
   now rewrite Hil, Hpl, Nat_sub_succ_1.
@@ -267,7 +267,7 @@ Qed.
 
 Theorem permut_without_highest : ∀ {n l},
   permut_seq_with_len (S n) l
-  → ∃ i, i < length l ∧ nth i l 0 = n ∧ permut_seq_with_len n (butn i l).
+  → ∃ i, i < length l ∧ nth i l 0 = n ∧ permut_seq_with_len n (List_butn i l).
 Proof.
 intros * Hl.
 exists (nth n (isort_rank Nat.leb l) 0).
@@ -861,7 +861,7 @@ destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
 rewrite Hin in Hlb.
 (* proving that "lb1++lb2" is a permuation of {0..n-1} *)
 rewrite Hlb in H1.
-rewrite butn_app_cons in H1; [ | easy ].
+rewrite List_butn_app_cons in H1; [ | easy ].
 (* replacing lb with lb1++n::lb2 in the goal... *)
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.

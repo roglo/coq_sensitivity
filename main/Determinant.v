@@ -466,25 +466,25 @@ f_equal. {
   rewrite (List_map_nth' 0). 2: {
     rewrite canon_sym_gr_list_length; flia Hi Hnz.
   }
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   rewrite (List_map_nth' []). 2: {
     apply is_scm_mat_iff in Hm.
     destruct Hm as (Hcr & Hc).
-    rewrite butn_length, fold_mat_nrows, Hr.
+    rewrite List_length_butn, fold_mat_nrows, Hr.
     unfold "<?"; cbn; flia Hi Hnz.
   }
   rewrite Nat.sub_0_r.
   unfold succ_when_ge, Nat.b2n.
   rewrite if_leb_le_dec.
   destruct (le_dec (k / n!) _) as [H1| H1]. {
-    rewrite nth_butn_before; [ | easy ].
-    rewrite nth_butn_before; [ | easy ].
+    rewrite List_nth_butn_before; [ | easy ].
+    rewrite List_nth_butn_before; [ | easy ].
     now rewrite (Nat.add_1_r i).
   } {
     apply Nat.nle_gt in H1.
     rewrite Nat.add_0_r.
-    rewrite nth_butn_after; [ | easy ].
-    rewrite nth_butn_before; [ | easy ].
+    rewrite List_nth_butn_after; [ | easy ].
+    rewrite List_nth_butn_before; [ | easy ].
     now rewrite Nat.add_1_r.
   }
   (* end proof equality of the two "∏" *)
@@ -1619,7 +1619,7 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
   destruct B as (llb).
   cbn in *.
   unfold subm; f_equal.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   rewrite (List_map_nth_seq [] lla).
   rewrite (List_map_nth_seq [] llb).
   rewrite Hra, Hrb.
@@ -1635,7 +1635,7 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
   rewrite (List_map_nth_seq 0%L (nth u llb [])).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
-  apply in_butn, in_seq in Hu.
+  apply List_in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.
@@ -1661,7 +1661,7 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
   destruct C as (llc).
   cbn in *.
   unfold subm; f_equal.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   rewrite (List_map_nth_seq [] lla).
   rewrite (List_map_nth_seq [] llc).
   rewrite Hra, Hrc.
@@ -1677,7 +1677,7 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
   rewrite (List_map_nth_seq 0%L (nth u llc [])).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
-  apply in_butn, in_seq in Hu.
+  apply List_in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.

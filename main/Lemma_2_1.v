@@ -51,7 +51,7 @@ Theorem subm_z : ∀ i j, subm i j (mk_mat []) = mZ 0 0.
 Proof.
 intros.
 unfold subm, mZ; cbn.
-now rewrite butn_nil.
+now rewrite List_butn_nil.
 Qed.
 
 (* to be completed

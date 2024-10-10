@@ -2212,7 +2212,7 @@ Qed.
 (* matrix without row i and column j *)
 
 Definition subm i j (M : matrix T) :=
-  mk_mat (map (butn (j - 1)) (butn (i - 1) (mat_list_list M))).
+  mk_mat (map (List_butn (j - 1)) (List_butn (i - 1) (mat_list_list M))).
 
 (* combinations of submatrix and other operations *)
 
@@ -2221,7 +2221,7 @@ Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
 Proof.
 intros.
 destruct M as (ll); cbn - [ "<?" ].
-rewrite length_map, butn_length.
+rewrite length_map, List_length_butn.
 unfold Nat.b2n.
 rewrite if_ltb_lt_dec, if_leb_le_dec.
 destruct (lt_dec _ _) as [H1| H1]. {
@@ -2264,12 +2264,12 @@ destruct ll as [| lb]. {
 }
 cbn in Hi |-*.
 destruct i. {
-  cbn; rewrite butn_length.
+  cbn; rewrite List_length_butn.
   rewrite Hcl; [ | now left ].
   now apply Nat.ltb_lt in Hj; rewrite Hj.
 }
 apply Nat.succ_le_mono in Hi.
-cbn; rewrite butn_length.
+cbn; rewrite List_length_butn.
 now apply Nat.ltb_lt in Hj; rewrite Hj.
 Qed.
 
@@ -2310,13 +2310,13 @@ split. {
   apply Nat.leb_le in H; rewrite H; clear H; cbn.
   destruct M as (ll).
   cbn in Hc, Hi, Hj |-*.
-  cbn - [ butn ] in Hl.
+  cbn - [ List_butn ] in Hl.
   rewrite List_map_butn in Hl.
-  apply in_butn in Hl.
+  apply List_in_butn in Hl.
   apply in_map_iff in Hl.
   destruct Hl as (l' & Hjl & Hl).
   rewrite <- Hjl.
-  rewrite butn_length.
+  rewrite List_length_butn.
   unfold Nat.b2n.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec _ (length l')) as [Hljl| Hljl]. {
@@ -2324,7 +2324,7 @@ split. {
     now apply Hc.
   }
   apply Nat.nlt_ge in Hljl.
-  rewrite butn_out in Hjl; [ | easy ].
+  rewrite List_butn_out in Hjl; [ | easy ].
   subst l'.
   rewrite Hc in Hljl; [ | easy ].
   flia Hj Hljl.
@@ -2355,7 +2355,7 @@ split. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hr1| Hr1]. {
     destruct A as (ll).
-    cbn - [ butn ] in *.
+    cbn - [ List_butn ] in *.
     destruct ll as [| lb]; [ easy | ].
     destruct ll; [ | easy ].
     cbn in Hi.
@@ -2366,12 +2366,12 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (la & Hl & Hla).
   subst l.
-  rewrite butn_length.
+  rewrite List_length_butn.
   unfold Nat.b2n.
   rewrite if_ltb_lt_dec.
   apply is_scm_mat_iff in Ha.
   destruct Ha as (_, Hcl).
-  apply in_butn in Hla.
+  apply List_in_butn in Hla.
   specialize (Hcl _ Hla).
   destruct (lt_dec _ _) as [Hja| Hja]; [ now rewrite Hcl | ].
   rewrite Nat.nlt_ge in Hja.
@@ -2823,12 +2823,12 @@ destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   clear i j Hi Hj.
   unfold subm, mat_transp.
   rewrite Nat.sub_diag.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   f_equal.
   rewrite length_map.
-  rewrite butn_length.
+  rewrite List_length_butn.
   rewrite fold_mat_nrows, <- Hcr, Hc1.
-  cbn - [ butn ].
+  cbn - [ List_butn ].
   destruct M as (ll); cbn.
   destruct ll as [| l]; [ easy | ].
   cbn in Hc1.
@@ -2890,7 +2890,7 @@ intros u v Hu Hv.
 rewrite mat_transp_el; [ | now apply subm_is_corr_mat | flia Hu | flia Hv ].
 unfold mat_transp; cbn.
 rewrite (List_map_nth' []). 2: {
-  rewrite butn_length.
+  rewrite List_length_butn.
   rewrite fold_mat_nrows.
   rewrite mat_ncols_subm in Hv; [ | easy | easy | easy ].
   rewrite mat_transp_nrows in Hv.
@@ -2911,7 +2911,7 @@ rewrite (List_map_nth' []). 2: {
   flia Hv.
 }
 rewrite (List_map_nth' []). 2: {
-  rewrite butn_length.
+  rewrite List_length_butn.
   rewrite List_length_map_seq.
   rewrite mat_transp_nrows in Hu.
   rewrite mat_ncols_subm in Hu; [ | easy | easy | easy ].
@@ -2929,7 +2929,7 @@ rewrite (List_map_nth' []). 2: {
   apply Nat.eqb_neq in H; rewrite H in Hu; clear H.
   flia Hu.
 }
-do 4 rewrite nth_butn.
+do 4 rewrite List_nth_butn.
 rewrite mat_transp_nrows in Hu.
 rewrite mat_ncols_subm in Hu; [ | easy | easy | easy ].
 rewrite mat_ncols_subm in Hv; [ | easy | easy | easy ].

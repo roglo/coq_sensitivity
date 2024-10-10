@@ -2066,7 +2066,7 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     symmetry.
     apply List_map2_ext_in.
     intros (i, j) Hi; cbn.
-    assert (H : i = j) by now apply in_combine_same in Hi.
+    assert (H : i = j) by now apply List_in_combine_same in Hi.
     subst j.
     apply in_combine_l in Hi.
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2131,7 +2131,7 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     symmetry.
     apply List_map2_ext_in.
     intros (i, j) Hi; cbn.
-    assert (H : i = j) by now apply in_combine_same in Hi.
+    assert (H : i = j) by now apply List_in_combine_same in Hi.
     subst j.
     apply in_combine_l in Hi.
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2190,7 +2190,7 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   symmetry.
   apply List_map2_ext_in.
   intros (i, j) Hi; cbn.
-  assert (H : i = j) by now apply in_combine_same in Hi.
+  assert (H : i = j) by now apply List_in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2261,7 +2261,7 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   symmetry.
   apply List_map2_ext_in.
   intros (i, j) Hi; cbn.
-  assert (H : i = j) by now apply in_combine_same in Hi.
+  assert (H : i = j) by now apply List_in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
@@ -2313,7 +2313,7 @@ rewrite Nat.add_comm, Nat.add_sub.
 symmetry.
 apply List_map2_ext_in.
 intros (i, j) Hi; cbn.
-assert (H : i = j) by now apply in_combine_same in Hi.
+assert (H : i = j) by now apply List_in_combine_same in Hi.
 subst j.
 apply in_combine_l in Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.

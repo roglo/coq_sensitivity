@@ -2205,9 +2205,9 @@ erewrite map_ext_in in Hlb. 2: {
 rewrite map_map in Hlb.
 erewrite map_ext_in in Hlb. 2: {
   intros j Hj.
-  replace (nth _ _ _) with (nth j (b :: butn i lb) 0). 2: {
+  replace (nth _ _ _) with (nth j (b :: List_butn i lb) 0). 2: {
     destruct j; [ easy | cbn ].
-    now rewrite nth_butn.
+    now rewrite List_nth_butn.
   }
   easy.
 }
@@ -2231,11 +2231,11 @@ eapply (permutation_trans Nat.eqb_eq). 2: {
 }
 apply permutation_skip; [ now intros a; apply Nat.eqb_eq | ].
 cbn - [ nth skipn ].
-rewrite fold_butn.
+rewrite List_fold_butn.
 rewrite List_map_nth_seq with (d := 0).
 apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
 cbn - [ seq ].
-rewrite butn_length.
+rewrite List_length_butn.
 generalize Hin; intros H.
 apply Nat.ltb_lt in H.
 rewrite Hn in H; rewrite H; clear H.
