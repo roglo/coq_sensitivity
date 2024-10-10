@@ -1,7 +1,8 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
 Require Import Init.Nat.
-Import List List.ListNotations.
+Import List.ListNotations.
+
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
