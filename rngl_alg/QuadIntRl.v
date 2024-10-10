@@ -15,7 +15,7 @@
 Set Implicit Arguments.
 
 Require Import Utf8 ZArith.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Main.Misc Main.RingLike Misc.
 Open Scope Z_scope.
@@ -448,7 +448,8 @@ End a.
 Close Scope Z_scope.
 
 Definition bnat_square_free n :=
-  ((n ≠? 0) && forallb (λ d : nat, n mod (d * d) ≠? 0) (seq 2 (n - 2)))%bool.
+  ((n ≠? 0) &&
+  List.forallb (λ d : nat, n mod (d * d) ≠? 0) (List.seq 2 (n - 2)))%bool.
 
 Definition nat_square_free n :=
   n ≠ 0 ∧ ∀ d, 2 ≤ d < n → n mod (d * d) ≠ 0.
@@ -458,9 +459,9 @@ Definition square_free z := nat_square_free (Z.abs_nat z).
 
 (*
 Open Scope Z_scope.
-Compute filter bsquare_free (map (λ n, Z.of_nat n -  60) (seq 1 120)).
+Compute filter bsquare_free (map (λ n, Z.of_nat n -  60) (List.seq 1 120)).
 Close Scope Z_scope.
-Compute filter bnat_square_free (seq 1 120).
+Compute filter bnat_square_free (List.seq 1 120).
 *)
 
 Theorem nat_square_free_bnat_square_free : ∀ n,
@@ -476,12 +477,12 @@ split; intros Hn. {
     apply Bool.negb_true_iff.
     now apply Nat.eqb_neq.
   }
-  apply forallb_forall.
+  apply List.forallb_forall.
   intros d Hd.
   apply Bool.negb_true_iff.
   apply Nat.eqb_neq.
   apply Hn.
-  apply in_seq in Hd.
+  apply List.in_seq in Hd.
   flia Hd.
 } {
   apply Bool.andb_true_iff in Hn.
@@ -490,8 +491,8 @@ split; intros Hn. {
   apply Nat.eqb_neq in Hnz.
   split; [ easy | ].
   intros d Hd.
-  specialize (proj1 (forallb_forall _ _) Hn d) as H1.
-  assert (H : d ∈ seq 2 (n - 2)) by (apply in_seq; flia Hd).
+  specialize (proj1 (List.forallb_forall _ _) Hn d) as H1.
+  assert (H : d ∈ List.seq 2 (n - 2)) by (apply List.in_seq; flia Hd).
   specialize (H1 H); clear H; cbn in H1.
   apply Bool.negb_true_iff in H1.
   now apply Nat.eqb_neq in H1.
@@ -809,7 +810,7 @@ intros * Hi; cbn in Hi.
 progress unfold qi_add, qi_zero in Hi.
 remember 1%QI as one eqn:Hone.
 injection Hi; clear Hi; intros H1 H2.
-remember (qi_re (fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
+remember (qi_re (List.fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
 destruct z as [| p| p]; [ now subst one | | ]. {
   rewrite Z.add_comm in H2.
   subst one; cbn in H2.
@@ -822,7 +823,7 @@ destruct z as [| p| p]; [ now subst one | | ]. {
   apply Z.nle_gt in H3; apply H3; clear H3.
   clear H1 Hz H2 p.
   induction i; [ easy | cbn ].
-  remember (qi_re (fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
+  remember (qi_re (List.fold_right _ _ _)) as z eqn:Hz; symmetry in Hz.
   destruct z as [| p| p]; [ easy | | ]. {
     apply Pos2Z.is_nonneg.
   } {
