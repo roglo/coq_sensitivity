@@ -917,12 +917,9 @@ now apply (rngl_mul_nonneg_nonneg Hop Hor).
 now apply (rngl_mul_nonneg_nonneg Hop Hor).
 Qed.
 
-Definition angle_lim :=
-  is_limit_when_tending_to_inf angle_eucl_dist.
+Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_dist.
 
-(* (2^i / n) * θ / 2^i *)
-Definition seq_angle_to_div_nat θ (n i : nat) :=
-  ((2 ^ i / n) * angle_div_2_pow θ i)%A.
+Definition seq_angle_to_div_nat θ (n i : nat) := (2 ^ i / n * (θ /₂^i))%A.
 
 Theorem angle_eucl_dist_opp_opp :
   ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
