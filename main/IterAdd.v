@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Misc RingLike PermutationFun.
 
@@ -27,8 +27,8 @@ Context {rp : ring_like_prop T}.
 Context (Hom : rngl_has_opp_or_subt T = true).
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
-  (fold_left (λ c i, c + f i) l a =
-   a + fold_left (λ c i, c + f i) l 0)%L.
+  (List.fold_left (λ c i, c + f i) l a =
+   a + List.fold_left (λ c i, c + f i) l 0)%L.
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
@@ -70,7 +70,7 @@ Qed.
 
 Theorem rngl_summation_list_split_first : ∀ A (l : list A) d f,
   l ≠ []
-  → ∑ (i ∈ l), f i = (f (hd d l) + ∑ (i ∈ tl l), f i)%L.
+  → ∑ (i ∈ l), f i = (f (List.hd d l) + ∑ (i ∈ List.tl l), f i)%L.
 Proof.
 intros * Hlz.
 apply iter_list_split_first; [ | | | easy ]. {
@@ -84,19 +84,20 @@ Qed.
 
 Theorem rngl_summation_list_split_last : ∀ A (l : list A) d f,
   l ≠ []
-  → ∑ (i ∈ l), f i = (∑ (i ∈ removelast l), f i + f (last l d))%L.
+  → ∑ (i ∈ l), f i = (∑ (i ∈ List.removelast l), f i + f (List.last l d))%L.
 Proof.
 intros * Hlz.
 now apply iter_list_split_last.
 Qed.
 
 Theorem rngl_summation_list_split : ∀ A (l : list A) f n,
-  ∑ (i ∈ l), f i = (∑ (i ∈ firstn n l), f i + ∑ (i ∈ skipn n l), f i)%L.
+  ∑ (i ∈ l), f i =
+    (∑ (i ∈ List.firstn n l), f i + ∑ (i ∈ List.skipn n l), f i)%L.
 Proof.
 intros.
-rewrite <- firstn_skipn with (n := n) (l := l) at 1.
+rewrite <- List.firstn_skipn with (n := n) (l := l) at 1.
 unfold iter_list.
-rewrite fold_left_app.
+rewrite List.fold_left_app.
 now rewrite fold_left_rngl_add_fun_from_0.
 Qed.
 
@@ -305,7 +306,7 @@ intros.
 clear Hom.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-  now apply Nat.eqb_eq, length_zero_iff_nil in Haz; subst la.
+  now apply Nat.eqb_eq, List.length_zero_iff_nil in Haz; subst la.
 }
 apply Nat.eqb_neq in Haz.
 unfold iter_list.
@@ -422,7 +423,7 @@ apply fold_left_rngl_add_fun_from_0.
 Qed.
 
 Theorem rngl_summation_list_concat : ∀ A (ll : list (list A)) (f : A → T),
-  ∑ (a ∈ concat ll), f a = ∑ (l ∈ ll), ∑ (a ∈ l), f a.
+  ∑ (a ∈ List.concat ll), f a = ∑ (l ∈ ll), ∑ (a ∈ l), f a.
 Proof.
 intros.
 induction ll as [| l]; cbn. {
@@ -436,7 +437,7 @@ apply IHll.
 Qed.
 
 Theorem rngl_summation_summation_list_flat_map : ∀ A B la (f : A → list B) g,
-  (∑ (a ∈ la), ∑ (b ∈ f a), g b) = ∑ (b ∈ flat_map f la), g b.
+  (∑ (a ∈ la), ∑ (b ∈ f a), g b) = ∑ (b ∈ List.flat_map f la), g b.
 Proof.
 intros.
 induction la as [| a]; cbn. {
@@ -518,10 +519,10 @@ now rewrite Nat_sub_succ_1.
 Qed.
 
 Theorem fold_left_add_seq_add : ∀ b len i g,
-  fold_left (λ (c : T) (j : nat), (c + g i j)%L)
-    (seq (b + i) len) 0%L =
-  fold_left (λ (c : T) (j : nat), (c + g i (i + j)%nat)%L)
-    (seq b len) 0%L.
+  List.fold_left (λ (c : T) (j : nat), (c + g i j)%L)
+    (List.seq (b + i) len) 0%L =
+  List.fold_left (λ (c : T) (j : nat), (c + g i (i + j)%nat)%L)
+    (List.seq b len) 0%L.
 Proof.
 intros.
 revert b i.
@@ -649,7 +650,7 @@ Qed.
 
 Theorem rngl_summation_seq_summation : ∀ b len f,
   len ≠ 0
-  → (∑ (i ∈ seq b len), f i = ∑ (i = b, b + len - 1), f i)%L.
+  → (∑ (i ∈ List.seq b len), f i = ∑ (i = b, b + len - 1), f i)%L.
 Proof.
 intros * Hlen.
 now apply iter_list_seq.
@@ -682,7 +683,7 @@ Qed.
 
 Theorem rngl_summation_list_map :
   ∀ A B (f : A → B) (g : B → _) l,
-  ∑ (j ∈ map f l), g j = ∑ (i ∈ l), g (f i).
+  ∑ (j ∈ List.map f l), g j = ∑ (i ∈ l), g (f i).
 Proof.
 intros.
 unfold iter_list.
@@ -692,7 +693,7 @@ Qed.
 
 Theorem rngl_summation_list_change_var : ∀ A B (l : list A) f g (h : _ → B),
   (∀ i, i ∈ l → g (h i) = i)
-  → ∑ (i ∈ l), f i = ∑ (i ∈ map h l), f (g i).
+  → ∑ (i ∈ l), f i = ∑ (i ∈ List.map h l), f (g i).
 Proof.
 intros * Hgh.
 rewrite rngl_summation_list_map.
@@ -703,12 +704,12 @@ Qed.
 
 Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → ∑ (i = b, e), f i = ∑ (i ∈ map h (seq b (S e - b))), f (g i).
+  → ∑ (i = b, e), f i = ∑ (i ∈ List.map h (List.seq b (S e - b))), f (g i).
 Proof.
 intros * Hgh.
 apply rngl_summation_list_change_var.
 intros i Hi.
-apply in_seq in Hi.
+apply List.in_seq in Hi.
 apply Hgh.
 flia Hi.
 Qed.
@@ -737,7 +738,7 @@ apply Hgh; flia Hbie.
 Qed.
 
 Theorem rngl_summation_filter : ∀ A l f (g : A → T),
-  ∑ (a ∈ filter f l), g a = ∑ (a ∈ l), if f a then g a else 0%L.
+  ∑ (a ∈ List.filter f l), g a = ∑ (a ∈ l), if f a then g a else 0%L.
 Proof.
 intros.
 induction l as [| b]; [ easy | cbn ].

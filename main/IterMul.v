@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Misc RingLike PermutationFun.
 
@@ -27,8 +27,8 @@ Context {rp : ring_like_prop T}.
 Context (Hon : rngl_has_1 T = true).
 
 Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
-  (fold_left (λ c i, c * f i) l a =
-   a * fold_left (λ c i, c * f i) l 1)%L.
+  (List.fold_left (λ c i, c * f i) l a =
+   a * List.fold_left (λ c i, c * f i) l 1)%L.
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
@@ -296,7 +296,7 @@ Proof.
 intros Hom Hio H10 * Hz.
 apply rngl_product_list_integral in Hz; [ | easy | easy | easy ].
 destruct Hz as (i & His & Hfi).
-apply in_seq in His.
+apply List.in_seq in His.
 exists i.
 split; [ flia His | easy ].
 Qed.
@@ -322,7 +322,8 @@ Qed.
 
 Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%L.
+  → (∏ (i = b, e), f i =
+      ∏ (i ∈ List.map h (List.seq b (S e - b))), f (g i))%L.
 Proof.
 intros * Hgh.
 unfold iter_seq, iter_list.
@@ -331,7 +332,7 @@ apply List_fold_left_ext_in.
 intros i c Hi.
 f_equal; f_equal; symmetry.
 apply Hgh.
-apply in_seq in Hi.
+apply List.in_seq in Hi.
 flia Hi.
 Qed.
 
@@ -342,7 +343,7 @@ Theorem rngl_inv_product_list :
   (rngl_is_integral_domain T || rngl_has_eq_dec_or_order T)%bool = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%L)
-  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%L.
+  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ List.rev l), ((f i)⁻¹))%L.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
 unfold iter_list.
@@ -381,7 +382,7 @@ rewrite IHl. 2: {
   now apply Hnz; right.
 }
 symmetry.
-apply fold_left_app.
+apply List.fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
@@ -397,7 +398,7 @@ intros Hom Hin H10 Hit * Hnz.
 unfold iter_seq.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   intros i Hi.
-  apply in_seq in Hi.
+  apply List.in_seq in Hi.
   apply Hnz; flia Hi.
 }
 unfold iter_list.
@@ -412,11 +413,11 @@ induction len; intros. {
   now rewrite Nat.add_0_r, Nat.add_sub.
 }
 symmetry.
-rewrite seq_S at 1.
+rewrite List.seq_S at 1.
 symmetry.
 remember (S len) as sl; cbn; subst sl.
-rewrite fold_left_app.
-rewrite fold_left_app.
+rewrite List.fold_left_app.
+rewrite List.fold_left_app.
 rewrite IHlen. 2: {
   intros i Hi.
   apply Hnz; flia Hi.
@@ -427,7 +428,7 @@ replace (b + (b + S len) - (b + S len)) with b by flia.
 f_equal.
 replace (S (b + S (b + len)) - S b) with (S (b + len)) by flia.
 replace (b + (b + S len) - b) with (S (b + len)) by flia.
-rewrite <- seq_shift.
+rewrite <- List.seq_shift.
 rewrite List_fold_left_map; cbn.
 apply List_fold_left_ext_in.
 intros c d Hc.
@@ -465,7 +466,7 @@ Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
 apply (rngl_inv_product_list_comm _ _ Nat.eqb_eq); try easy.
 intros i Hi.
-apply in_seq in Hi.
+apply List.in_seq in Hi.
 apply Hnz; flia Hi.
 Qed.
 
@@ -490,7 +491,7 @@ Qed.
 
 Theorem rngl_product_seq_product : ∀ b len f,
   len ≠ 0
-  → (∏ (i ∈ seq b len), f i = ∏ (i = b, b + len - 1), f i)%L.
+  → (∏ (i ∈ List.seq b len), f i = ∏ (i = b, b + len - 1), f i)%L.
 Proof.
 intros * Hlen.
 now apply iter_list_seq.
@@ -576,26 +577,26 @@ Theorem rngl_product_summation_distr_cart_prod :
   ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-    ∑ (l ∈ cart_prod (repeat (seq 1 n) m)),
-      ∏ (i = 1, m), f i (nth (i - 1) l 0%nat).
+    ∑ (l ∈ cart_prod (List.repeat (List.seq 1 n) m)),
+      ∏ (i = 1, m), f i (List.nth (i - 1) l 0%nat).
 Proof.
 intros Hop * Hmz.
 revert n f.
 induction m; intros; [ easy | clear Hmz; cbn ].
-remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
-rewrite flat_map_concat_map.
+remember (List.repeat (List.seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
+rewrite List.flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_summation_list_map.
 }
-cbn - [ nth ].
+cbn - [ List.nth ].
 destruct m. {
   cbn in Hll; subst ll.
   rewrite (rngl_product_only_one Hon).
   rewrite fold_iter_seq'.
-  cbn - [ nth ].
+  cbn - [ List.nth ].
   rewrite Nat.sub_0_r.
   apply rngl_summation_eq_compat.
   intros i Hi.
