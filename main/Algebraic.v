@@ -587,7 +587,7 @@ unfold subm; cbn.
 rewrite map_map.
 erewrite map_ext_in. 2: {
   intros lb Hlb.
-  now rewrite <- map_butn.
+  now rewrite <- List_map_butn.
 }
 rewrite <- map_map.
 rewrite IHlen; [ easy | now rewrite length_map ].
@@ -602,11 +602,11 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
   let s := rlap_sylvester_list_list (rev P) (rev Q) in
   (∑ (i = 0, m - 1),
      let j := (m - 1 - i)%nat in
-     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (List_butn i s)) in
      (minus_one_pow (m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap,
    ∑ (i = m, m + n - 1),
      let j := (m + n - 1 - i)%nat in
-     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (List_butn i s)) in
      (minus_one_pow (m + n + i + 1) * (repeat 0%L j ++ [det s']))%lap).
 
 Theorem lap_bezout_is_resultant :
@@ -788,7 +788,7 @@ assert (H : (sm • u)%V = v). {
       map
         (λ i,
            ∑ (t ∈
-              map2 polyn_mul
+              List_map2 polyn_mul
                 (map polyn_of_const
                    (repeat 0%L i ++ rev P ++ repeat 0%L (m - 1 - i)))
                 (map polyn_x_power (rev (seq 0 (n + m))))),
@@ -804,10 +804,10 @@ assert (H : (sm • u)%V = v). {
       do 2 rewrite repeat_length.
       rewrite length_rev.
       replace (i + (length P + (m - 1 - i))) with (n + m) by flia Hi H2p Hn.
-      rewrite map2_map_l.
-      rewrite map2_map_r.
-      rewrite map2_rev_seq_r.
-      rewrite map2_diag.
+      rewrite List_map2_map_l.
+      rewrite List_map2_map_r.
+      rewrite List_map2_rev_seq_r.
+      rewrite List_map2_diag.
       cbn - [ rngl_add rngl_zero ].
       rewrite rngl_summation_list_map.
       rewrite rngl_summation_seq_summation; [ | flia H2p H2q Hn ].
