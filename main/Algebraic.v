@@ -22,8 +22,10 @@ Context {rp : ring_like_prop T}.
 Definition rlap_sylvester_list_list (rla rlb : list T) : list (list T) :=
   let m := length rla - 1 in
   let n := length rlb - 1 in
-  map (λ i, repeat 0%L i ++ rla ++ repeat 0%L (n - 1 - i)) (seq 0 n) ++
-  map (λ i, repeat 0%L i ++ rlb ++ repeat 0%L (m - 1 - i)) (seq 0 m).
+  List.map (λ i, List.repeat 0%L i ++ rla ++ List.repeat 0%L (n - 1 - i))
+    (List.seq 0 n) ++
+  List.map (λ i, List.repeat 0%L i ++ rlb ++ List.repeat 0%L (m - 1 - i))
+    (List.seq 0 m).
 (* it is possible to define it as the transposition of the above
    definition; avoiding a transposition to express its properties,
    they say *)
@@ -32,10 +34,10 @@ Definition rlap_sylvester_mat (rla rlb : list T) : matrix T :=
   mk_mat (rlap_sylvester_list_list rla rlb).
 
 Definition lap_resultant (p q : list T) :=
-  det (rlap_sylvester_mat (rev p) (rev q)).
+  det (rlap_sylvester_mat (List.rev p) (List.rev q)).
 
 Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
-  mk_mat (rlap_sylvester_list_list (rev (lap p)) (rev (lap q))).
+  mk_mat (rlap_sylvester_list_list (List.rev (lap p)) (List.rev (lap q))).
 
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
@@ -45,22 +47,22 @@ Definition rlap_sylvester_list_list' (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let s := rlap_sylvester_list_list rla rlb in
-  map
+  List.map
     (λ i,
-       let a := repeat 0%L (m - 1 - i) ++ rev rla in
-       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
-    (seq 0 m) ++
-  map
+       let a := List.repeat 0%L (m - 1 - i) ++ List.rev rla in
+       List.map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
+    (List.seq 0 m) ++
+  List.map
     (λ i,
-       let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
-       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
-    (seq m n).
+       let a := List.repeat 0%L (m + n - 1 - i) ++ List.rev rlb in
+       List.map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
+    (List.seq m n).
 
 Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
   mk_mat (rlap_sylvester_list_list' rla rlb).
 
 Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
-  rev (det (rlap_sylvester_mat' (rev p) (rev q))).
+  List.rev (det (rlap_sylvester_mat' (List.rev p) (List.rev q))).
 *)
 
 Theorem rlap_sylvester_list_list_length :
@@ -69,7 +71,7 @@ Theorem rlap_sylvester_list_list_length :
     (length rla - 1) + (length rlb - 1).
 intros.
 unfold rlap_sylvester_list_list.
-rewrite length_app.
+rewrite List.length_app.
 do 2 rewrite List.length_map, List.length_seq.
 apply Nat.add_comm.
 Qed.
@@ -82,27 +84,27 @@ Theorem lap_x_power_add :
 Proof.
 intros Hon Hos Hed *.
 unfold lap_x_power.
-rewrite repeat_app.
-rewrite <- app_assoc.
-remember (repeat 0%L b ++ [1%L]) as la eqn:Hla.
+rewrite List.repeat_app.
+rewrite <- List.app_assoc.
+remember (List.repeat 0%L b ++ [1%L]) as la eqn:Hla.
 assert (Ha : la ≠ []). {
   intros H; subst la.
-  now apply app_eq_nil in H.
+  now apply List.app_eq_nil in H.
 }
 clear Hla b.
 revert la Ha.
 induction a; intros; cbn - [ lap_mul ]. {
   rewrite (lap_mul_const_l Hos).
-  erewrite map_ext_in; [ | intros; apply (rngl_mul_1_l Hon) ].
-  now rewrite map_id.
+  erewrite List.map_ext_in; [ | intros; apply (rngl_mul_1_l Hon) ].
+  now rewrite List.map_id.
 }
 rewrite IHa; [ | easy ].
 rename la into lb.
 rename Ha into Hb.
-remember (repeat 0%L a ++ [1%L]) as la eqn:Hla.
+remember (List.repeat 0%L a ++ [1%L]) as la eqn:Hla.
 assert (Ha : la ≠ []). {
   intros H; subst la.
-  now apply app_eq_nil in H.
+  now apply List.app_eq_nil in H.
 }
 clear a Hla IHa.
 move Hb after Ha.
@@ -130,10 +132,10 @@ destruct n; cbn. {
   apply (rngl_neqb_neq Hed).
   now apply rngl_1_neq_0_iff.
 }
-rewrite last_last.
-remember (repeat 0%L n ++ [1%L]) as la eqn:Hla; symmetry in Hla.
+rewrite List.last_last.
+remember (List.repeat 0%L n ++ [1%L]) as la eqn:Hla; symmetry in Hla.
 destruct la as [| a]. {
-  now apply app_eq_nil in Hla.
+  now apply List.app_eq_nil in Hla.
 }
 apply (rngl_neqb_neq Hed).
 now apply rngl_1_neq_0_iff.
@@ -298,7 +300,7 @@ induction n; intros. {
   apply eq_polyn_eq; cbn.
   now rewrite (rngl_eqb_refl Hed).
 }
-rewrite seq_S.
+rewrite List.seq_S.
 rewrite rngl_summation_list_app.
 set (rpp := polyn_ring_like_prop T Hon Hos Hed).
 rewrite rngl_summation_list_app.
@@ -360,9 +362,9 @@ Theorem lap_norm_opp :
 Proof.
 intros Hop Hed *.
 unfold lap_norm, lap_opp.
-rewrite map_rev; f_equal.
-rewrite <- map_rev.
-remember (rev la) as lb eqn:Hlb.
+rewrite List.map_rev; f_equal.
+rewrite <- List.map_rev.
+remember (List.rev la) as lb eqn:Hlb.
 clear la Hlb; rename lb into la.
 induction la as [| a]; [ easy | cbn ].
 rewrite if_bool_if_dec.
@@ -518,7 +520,7 @@ Theorem det_polyn_of_const :
   ∀ (Hed : rngl_has_eq_dec T = true),
   ∀ (rop := polyn_ring_like_op T (rngl_has_opp_has_opp_or_subt Hop) Hed),
   ∀ (ll : list (list T)),
-  det {| mat_list_list := map (λ l, map polyn_of_const l) ll |} =
+  det {| mat_list_list := List.map (λ l, List.map polyn_of_const l) ll |} =
   polyn_of_const (det {| mat_list_list := ll |}).
 Proof.
 intros Hon Hii Hch *; cbn.
@@ -542,8 +544,8 @@ assert (Hosp : rngl_has_opp_or_subt (polyn T) = true). {
   destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
   now destruct os.
 }
-rewrite length_map.
-remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+rewrite List.length_map.
+remember (List.length ll) as len eqn:Hlen; symmetry in Hlen.
 revert ll Hlen.
 induction len; intros; [ easy | ].
 cbn - [ rngl_zero rngl_add ].
@@ -571,12 +573,12 @@ f_equal. {
   apply (polyn_of_const_minus_one_pow Hon Hop Hed).
 }
 f_equal. {
-  destruct (lt_dec (i - 1) (length (hd [] ll))) as [Hil| Hil]. {
+  destruct (lt_dec (i - 1) (List.length (List.hd [] ll))) as [Hil| Hil]. {
     now rewrite (List_map_nth' 0%L).
   }
   apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite length_map ].
-  rewrite nth_overflow; [ | easy ].
+  rewrite List.nth_overflow; [ | now rewrite List.length_map ].
+  rewrite List.nth_overflow; [ | easy ].
   symmetry.
   apply eq_polyn_eq; cbn.
   now rewrite (rngl_eqb_refl Hed).
@@ -584,36 +586,42 @@ f_equal. {
 destruct ll as [| la]; [ easy | cbn ].
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 unfold subm; cbn.
-rewrite map_map.
-erewrite map_ext_in. 2: {
+rewrite List.map_map.
+erewrite List.map_ext_in. 2: {
   intros lb Hlb.
   now rewrite <- List_map_butn.
 }
-rewrite <- map_map.
-rewrite IHlen; [ easy | now rewrite length_map ].
+rewrite <- List.map_map.
+rewrite IHlen; [ easy | now rewrite List.length_map ].
 Qed.
 
 (* U and V such that PU+QV=res(P,Q) *)
 (* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
   let rol := lap_ring_like_op in
-  let n := length P - 1 in
-  let m := length Q - 1 in
-  let s := rlap_sylvester_list_list (rev P) (rev Q) in
+  let n := List.length P - 1 in
+  let m := List.length Q - 1 in
+  let s := rlap_sylvester_list_list (List.rev P) (List.rev Q) in
   (∑ (i = 0, m - 1),
      let j := (m - 1 - i)%nat in
-     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (List_butn i s)) in
-     (minus_one_pow (m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap,
+     let s' :=
+       mk_mat
+         (List.map (λ l, List.firstn (List.length l - 1) l) (List_butn i s))
+     in
+     (minus_one_pow (m + n - i + 1) * (List.repeat 0%L j ++ [det s']))%lap,
    ∑ (i = m, m + n - 1),
      let j := (m + n - 1 - i)%nat in
-     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (List_butn i s)) in
-     (minus_one_pow (m + n + i + 1) * (repeat 0%L j ++ [det s']))%lap).
+     let s' :=
+       mk_mat
+         (List.map (λ l, List.firstn (List.length l - 1) l) (List_butn i s))
+     in
+     (minus_one_pow (m + n + i + 1) * (List.repeat 0%L j ++ [det s']))%lap).
 
 Theorem lap_bezout_is_resultant :
   charac_0_field T →
   ∀ (P Q U V : list T),
-  2 ≤ length P
-  → 2 ≤ length Q
+  2 ≤ List.length P
+  → 2 ≤ List.length Q
   → lap_bezout_resultant_coeff P Q = (U, V)
   → lap_norm (U * P + V * Q)%lap = lap_norm [lap_resultant P Q].
 Proof.
@@ -623,9 +631,9 @@ remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
 symmetry in HU, HV.
 subst rol.
-remember (length P - 1) as n eqn:Hn.
-remember (length Q - 1) as m eqn:Hm.
-remember (rlap_sylvester_list_list (rev P) (rev Q)) as ll eqn:Hll.
+remember (List.length P - 1) as n eqn:Hn.
+remember (List.length Q - 1) as m eqn:Hm.
+remember (rlap_sylvester_list_list (List.rev P) (List.rev Q)) as ll eqn:Hll.
 move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
@@ -672,17 +680,21 @@ assert
   now apply eq_polyn_eq in H.
 }
 apply H; clear H.
-remember (mk_mat (map (λ l, map polyn_of_const l) ll)) as sm eqn:Hsm.
+remember (mk_mat (List.map (λ l, List.map polyn_of_const l) ll))
+  as sm eqn:Hsm.
 specialize (Hcr sm).
 (* u is the vector [X^(n+m-1) X^(n+m-2) ... X 1] *)
-remember (mk_vect (map (@polyn_x_power _ ro) (rev (seq 0 (n + m)))))
+remember
+  (mk_vect (List.map (@polyn_x_power _ ro) (List.rev (List.seq 0 (n + m)))))
   as u eqn:Hu.
 specialize (Hcr u).
 (* v is the vector [X^(m-1)P X^(m-2)P ... XP P X^(n-1)Q X^(n-2)Q ... XQ Q] *)
 remember
   (mk_vect
-     (map (λ i, polyn_of_norm_lap (lap_x_power i * P)%lap) (rev (seq 0 m)) ++
-     (map (λ i, polyn_of_norm_lap (lap_x_power i * Q)%lap) (rev (seq 0 n)))))
+     (List.map (λ i, polyn_of_norm_lap (lap_x_power i * P)%lap)
+        (List.rev (List.seq 0 m)) ++
+     (List.map (λ i, polyn_of_norm_lap (lap_x_power i * Q)%lap)
+        (List.rev (List.seq 0 n)))))
   as v eqn:Hv.
 specialize (Hcr v).
 assert (H : is_square_matrix sm = true). {
@@ -692,15 +704,16 @@ assert (H : is_square_matrix sm = true). {
   split. {
     apply Bool.orb_true_iff.
     unfold mat_nrows, mat_ncols; cbn.
-    rewrite length_map.
-    destruct (Nat.eq_dec (length ll) 0) as [Hllz| Hllz]; [ right | left ]. {
-      now rewrite Hllz.
+    rewrite List.length_map.
+    destruct (Nat.eq_dec (List.length ll) 0) as [Hllz| Hllz]. {
+      now right; rewrite Hllz.
     }
+    left.
     destruct ll as [| la]; [ easy | clear Hllz; cbn ].
-    rewrite length_map.
+    rewrite List.length_map.
     apply Bool.negb_true_iff.
     apply Nat.eqb_neq.
-    intros H; apply length_zero_iff_nil in H; subst la.
+    intros H; apply List.length_zero_iff_nil in H; subst la.
     move Hll at bottom.
     destruct P as [| a1]; [ easy | ].
     cbn in H2p; apply Nat.succ_le_mono in H2p.
@@ -709,22 +722,22 @@ assert (H : is_square_matrix sm = true). {
     cbn in H2q; apply Nat.succ_le_mono in H2q.
     destruct Q as [| b2]; [ easy | clear H2q ].
     cbn in Hll.
-    do 4 rewrite length_app in Hll.
-    do 2 rewrite length_rev in Hll.
+    do 4 rewrite List.length_app in Hll.
+    do 2 rewrite List.length_rev in Hll.
     cbn in Hll.
     do 4 rewrite Nat.add_sub in Hll.
     do 2 rewrite Nat.add_1_r in Hll.
     cbn in Hll.
     injection Hll; clear Hll; intros H1 H2.
-    now destruct (rev P).
+    now destruct (List.rev P).
   } {
     move Hll at bottom.
-    cbn; rewrite length_map.
+    cbn; rewrite List.length_map.
     unfold iter_list.
     rewrite List_fold_left_map.
     specialize iter_list_eq_compat as H1.
     unfold iter_list in H1.
-    erewrite H1; [ | now intros; rewrite length_map ].
+    erewrite H1; [ | now intros; rewrite List.length_map ].
     clear H1.
     rewrite fold_iter_list.
     apply all_true_and_list_true_iff.
@@ -732,24 +745,24 @@ assert (H : is_square_matrix sm = true). {
     apply Nat.eqb_eq.
     rewrite Hll in Hla |-*.
     rewrite rlap_sylvester_list_list_length.
-    do 2 rewrite length_rev.
-    apply in_app_or in Hla.
-    do 2 rewrite length_rev in Hla.
+    do 2 rewrite List.length_rev.
+    apply List.in_app_or in Hla.
+    do 2 rewrite List.length_rev in Hla.
     destruct Hla as [Hla| Hla]. {
-      apply in_map_iff in Hla.
+      apply List.in_map_iff in Hla.
       destruct Hla as (i & Hi & His); subst la.
-      do 2 rewrite length_app.
-      rewrite length_rev.
-      do 2 rewrite repeat_length.
-      apply in_seq in His.
+      do 2 rewrite List.length_app.
+      rewrite List.length_rev.
+      do 2 rewrite List.repeat_length.
+      apply List.in_seq in His.
       flia H2p His.
     } {
-      apply in_map_iff in Hla.
+      apply List.in_map_iff in Hla.
       destruct Hla as (i & Hi & His); subst la.
-      do 2 rewrite length_app.
-      rewrite length_rev.
-      do 2 rewrite repeat_length.
-      apply in_seq in His.
+      do 2 rewrite List.length_app.
+      rewrite List.length_rev.
+      do 2 rewrite List.repeat_length.
+      apply List.in_seq in His.
       flia H2q His.
     }
   }
@@ -757,53 +770,56 @@ assert (H : is_square_matrix sm = true). {
 specialize (Hcr H); clear H.
 assert (H : vect_size u = mat_nrows sm). {
   rewrite Hu, Hsm; cbn.
-  do 2 rewrite length_map.
-  rewrite length_rev, length_seq.
+  do 2 rewrite List.length_map.
+  rewrite List.length_rev, List.length_seq.
   symmetry.
   rewrite Hll.
   rewrite rlap_sylvester_list_list_length.
   rewrite Hn, Hm.
-  now do 2 rewrite length_rev.
+  now do 2 rewrite List.length_rev.
 }
 specialize (Hcr H); clear H.
 assert (H : (sm • u)%V = v). {
   clear - rpp Hsm Hu Hv Hll Hn Hm H2p H2q Hic Hed Hop.
   rewrite Hsm, Hu, Hv.
   unfold mat_mul_vect_r; f_equal; cbn.
-  rewrite map_map.
+  rewrite List.map_map.
   unfold vect_dot_mul.
   cbn - [ rngl_add rngl_zero ].
   rewrite Hll.
   unfold rlap_sylvester_list_list.
-  rewrite map_app.
-  do 2 rewrite map_map.
-  do 2 rewrite length_rev.
+  rewrite List.map_app.
+  do 2 rewrite List.map_map.
+  do 2 rewrite List.length_rev.
   rewrite <- Hn, <- Hm.
   assert (H :
     ∀ (P Q : list T) n m,
-    2 ≤ length P
-    → 2 ≤ length Q
-    → n = length P - 1
-    → m = length Q - 1 →
-      map
+    2 ≤ List.length P
+    → 2 ≤ List.length Q
+    → n = List.length P - 1
+    → m = List.length Q - 1 →
+      List.map
         (λ i,
            ∑ (t ∈
               List_map2 polyn_mul
-                (map polyn_of_const
-                   (repeat 0%L i ++ rev P ++ repeat 0%L (m - 1 - i)))
-                (map polyn_x_power (rev (seq 0 (n + m))))),
-             t) (seq 0 m) =
-      map (λ i, polyn_of_norm_lap (lap_x_power i * P)) (rev (seq 0 m))). {
+                (List.map polyn_of_const
+                   (List.repeat 0%L i ++ List.rev P ++
+                      List.repeat 0%L (m - 1 - i)))
+                (List.map polyn_x_power (List.rev (List.seq 0 (n + m))))),
+             t) (List.seq 0 m) =
+      List.map (λ i, polyn_of_norm_lap (lap_x_power i * P))
+        (List.rev (List.seq 0 m))). {
     clear P Q n m H2p H2q Hn Hm Hll Hv (*HU HV*) Hu.
     intros * H2p H2q Hn Hm.
-    erewrite map_ext_in. 2: {
+    erewrite List.map_ext_in. 2: {
       intros i Hi.
-      apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+      apply List.in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
       erewrite List_map_map_seq with (d := 0%L).
-      do 2 rewrite length_app.
-      do 2 rewrite repeat_length.
-      rewrite length_rev.
-      replace (i + (length P + (m - 1 - i))) with (n + m) by flia Hi H2p Hn.
+      do 2 rewrite List.length_app.
+      do 2 rewrite List.repeat_length.
+      rewrite List.length_rev.
+      replace (i + (List.length P + (m - 1 - i))) with (n + m) by
+        flia Hi H2p Hn.
       rewrite List_map2_map_l.
       rewrite List_map2_map_r.
       rewrite List_map2_rev_seq_r.
@@ -824,16 +840,16 @@ assert (H : (sm • u)%V = v). {
       easy.
     }
     rewrite List_map_rev_seq.
-    apply map_ext_in.
+    apply List.map_ext_in.
     intros i Hi.
-    apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+    apply List.in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     rewrite Nat.mul_0_r, Nat.add_0_l.
     unfold polyn_of_norm_lap.
     rewrite rngl_summation_split with (j := i); [ | flia Hi ].
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
-      rewrite app_nth1; [ | rewrite repeat_length; flia Hj ].
-      rewrite nth_repeat; cbn.
+      rewrite List.app_nth1; [ | rewrite List.repeat_length; flia Hj ].
+      rewrite List.nth_repeat; cbn.
       unfold polyn_of_const; cbn.
       unfold polyn_of_norm_lap; cbn.
       apply eq_polyn_eq; cbn.
@@ -844,19 +860,19 @@ assert (H : (sm • u)%V = v). {
     rewrite Nat.add_comm, Nat.add_sub.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
-      rewrite app_nth2; [ | rewrite repeat_length; flia Hj ].
-      rewrite repeat_length.
+      rewrite List.app_nth2; [ | rewrite List.repeat_length; flia Hj ].
+      rewrite List.repeat_length.
       rewrite Nat_sub_sub_swap, Nat.add_comm, Nat.add_sub.
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
-    rewrite rngl_summation_split with (j := length P). 2: {
+    rewrite rngl_summation_split with (j := List.length P). 2: {
       rewrite Hn; flia Hi.
     }
-    rewrite all_0_rngl_summation_0 with (b := length P + 1). 2: {
+    rewrite all_0_rngl_summation_0 with (b := List.length P + 1). 2: {
       intros j Hj.
-      rewrite app_nth2; [ | rewrite length_rev; flia Hj ].
-      rewrite nth_repeat; cbn.
+      rewrite List.app_nth2; [ | rewrite List.length_rev; flia Hj ].
+      rewrite List.nth_repeat; cbn.
       unfold polyn_of_const; cbn.
       unfold polyn_of_norm_lap; cbn.
       apply eq_polyn_eq; cbn.
@@ -866,13 +882,13 @@ assert (H : (sm • u)%V = v). {
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
-      rewrite app_nth1; [ | rewrite length_rev; flia Hj ].
+      rewrite List.app_nth1; [ | rewrite List.length_rev; flia Hj ].
       easy.
     }
     remember (∑ (j = _, _), _) as x in |-*; subst x.
     rewrite Hn, Hm.
-    remember (length P) as n' eqn:Hn'.
-    remember (length Q) as m' eqn:Hm'.
+    remember (List.length P) as n' eqn:Hn'.
+    remember (List.length Q) as m' eqn:Hm'.
     move m' before n'; move n before m'; move m before n.
     subst n m.
     rename n' into n; rename m' into m.
@@ -890,7 +906,7 @@ assert (H : (sm • u)%V = v). {
       intros j Hj.
       rewrite Nat_sub_sub_swap, Nat.add_sub.
       replace (n - (n + 1 - j)) with (j - 1) by flia Hj.
-      rewrite rev_nth; [ | rewrite <- Hn'; flia Hj ].
+      rewrite List.rev_nth; [ | rewrite <- Hn'; flia Hj ].
       rewrite <- Hn'.
       replace (n - S (n - j)) with (j - 1) by flia Hj.
       rewrite (polyn_mul_comm Hic).
@@ -931,15 +947,16 @@ assert (H : (sm • u)%V = v). {
     set
       (f :=
          λ (P : list T) i,
-         (polyn_x_power (i - 1) * polyn_of_const (nth (i - 1) P 0%L))%pol).
+         (polyn_x_power (i - 1) *
+            polyn_of_const (List.nth (i - 1) P 0%L))%pol).
     erewrite rngl_summation_eq_compat. 2: {
       intros i Hi.
       fold (f P i).
       easy.
     }
     specialize (lap_norm_lap_rngl_summation Hos Hed) as H1.
-    specialize (H1 1 (length P) (f P)).
-    remember (@lap T ro (∑ (i = 1, @length T P), f P i)) as x eqn:Hx.
+    specialize (H1 1 (List.length P) (f P)).
+    remember (@lap T ro (∑ (i = 1, @List.length T P), f P i)) as x eqn:Hx.
     rewrite H1; subst x; clear H1.
     subst f.
     cbn - [ rngl_zero rngl_add polyn_of_const ].
@@ -962,7 +979,7 @@ assert (H : (sm • u)%V = v). {
 (**)
     clear - rp Hon Hos Hed.
     induction P as [| a la ]; [ easy | ].
-    cbn - [ rngl_zero rngl_add lap_norm nth ].
+    cbn - [ rngl_zero rngl_add lap_norm List.nth ].
     rewrite rngl_summation_shift with (s := 1); [ | cbn; flia ].
     rewrite Nat.sub_diag, Nat_sub_succ_1.
     (* it is so sad that I cannot apply rngl_summation_split_first
@@ -985,15 +1002,15 @@ assert (H : (sm • u)%V = v). {
       rewrite List_nth_succ_cons.
       rewrite (lap_x_power_add Hon Hos Hed).
       unfold lap_x_power at 1.
-      cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
+      cbn - [ rngl_zero rngl_add lap_norm List.nth lap_mul ].
       rewrite <- (lap_mul_assoc Hed Hos).
       easy.
     }
     remember (λ j, _) as x in |-*; subst x.
-    cbn - [ rngl_zero rngl_add lap_norm nth lap_mul ].
+    cbn - [ rngl_zero rngl_add lap_norm List.nth lap_mul ].
     rewrite (lap_mul_const_l Hos).
-    erewrite map_ext_in; [ | now intros; rewrite (rngl_mul_1_l Hon) ].
-    rewrite map_id.
+    erewrite List.map_ext_in; [ | now intros; rewrite (rngl_mul_1_l Hon) ].
+    rewrite List.map_id.
     (* cannot apply rngl_mul_summation_list_distr because it requires
        rngl_has_opp_or_subt, which is false on laps *)
     (* mul_iter_list_distr_l_test is more general, does not requires
@@ -1008,21 +1025,23 @@ assert (H : (sm • u)%V = v). {
     specialize (H1 (@rngl_add _ lap_ring_like_op)).
     specialize (H1 (@rngl_mul _ lap_ring_like_op)).
     specialize (H1 lap_add_0_l (lap_mul_add_distr_l Hed Hos)).
-    specialize (H1 [0; 1]%L (seq 1 (length la))).
-    rewrite length_seq in H1.
+    specialize (H1 [0; 1]%L (List.seq 1 (List.length la))).
+    rewrite List.length_seq in H1.
     set (rol := lap_ring_like_op).
     specialize
-      (H1 (λ i, (lap_x_power (i - 1) * lap_norm [nth (i - 1) la 0]))%L).
+      (H1 (λ i, (lap_x_power (i - 1) * lap_norm [List.nth (i - 1) la 0]))%L).
     rewrite if_bool_if_dec in H1.
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-      apply Nat.eqb_eq, length_zero_iff_nil in Haz; subst la.
+      apply Nat.eqb_eq, List.length_zero_iff_nil in Haz; subst la.
       unfold iter_seq, iter_list; cbn - [ lap_norm ].
       rewrite lap_add_0_r.
       symmetry; apply lap_norm_idemp.
     }
     apply Nat.eqb_neq in Haz.
-    rewrite (rngl_summation_seq_summation 1 (length la)) in H1; [ | easy ].
-    rewrite (rngl_summation_seq_summation 1 (length la)) in H1; [ | easy ].
+    rewrite (rngl_summation_seq_summation 1 (List.length la)) in H1;
+      [ | easy ].
+    rewrite (rngl_summation_seq_summation 1 (List.length la)) in H1;
+      [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub in H1.
     fold rol rpl in H1.
     rewrite <- H1; clear H1.
@@ -1053,9 +1072,9 @@ specialize (Hcr H); clear H.
 move Hcr at bottom.
 replace (mat_nrows sm) with (n + m) in Hcr. 2: {
   rewrite Hsm, Hll; cbn.
-  rewrite length_map.
+  rewrite List.length_map.
   rewrite rlap_sylvester_list_list_length.
-  do 2 rewrite length_rev.
+  do 2 rewrite List.length_rev.
   now rewrite <- Hn, <- Hm.
 }
 subst u.
@@ -1067,7 +1086,7 @@ assert
   intros i Hi.
   rewrite <- Hcr; [ | easy ]; f_equal.
   rewrite (List_map_nth' 0). 2: {
-    rewrite length_rev, length_seq.
+    rewrite List.length_rev, List.length_seq.
     flia Hi.
   }
   unfold polyn_x_power.
@@ -1128,16 +1147,16 @@ destruct (Sumbool.sumbool_of_bool _) as [Hdz| Hdz]. {
 ...
 }
 ... ...
-apply (f_equal (λ l, rev l)) in H.
-rewrite rev_involutive in H.
+apply (f_equal (λ l, List.rev l)) in H.
+rewrite List.rev_involutive in H.
 rewrite <- H.
 cbn.
 ...
 Search polyn_of_const.
 ...
 (*
-destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
-  apply length_zero_iff_nil in Hlz; subst ll.
+destruct (Nat.eq_dec (List.length ll) 0) as [Hlz| Hlz]. {
+  apply List.length_zero_iff_nil in Hlz; subst ll.
   do 2 rewrite List_nth_nil.
   cbn.
   replace (@polyn_zero T ro) with (@rngl_zero _ rop) by easy.
@@ -1183,7 +1202,7 @@ rewrite rngl_mul_0_r.
     unfold polyn_of_const.
     unfold polyn_of_norm_lap.
 ...
-remember (nth 0 (map _ _) _) as x eqn:Hx.
+remember (List.nth 0 (List.map _ _) _) as x eqn:Hx.
 rewrite (List_map_nth' []) in Hx.
   cbn.
   rewrite (List_map_nth' []).
@@ -1196,7 +1215,7 @@ induction ll as [| la]. {
   now apply rngl_1_neq_0_iff in Hch.
 }
 cbn.
-rewrite length_map.
+rewrite List.length_map.
 ... ...
 apply det_polyn_of_const.
 ...
@@ -1211,24 +1230,27 @@ Import Q.Notations.
 Open Scope Q_scope.
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
     {rol : ring_like_op _} (l : list A) :=
-  lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
+  lap_compose (List.map (λ i, [i]) l) [[0; 1]; [-1]]%L.
 Definition lap_compose_y_div_x A {ro : ring_like_op A} (l : list A) :=
-  map (λ i, repeat 0%L (length l - 1 - i) ++ [nth (length l - 1 - i) l 0%L])
-    (seq 0 (length l)).
+  List.map
+    (λ i,
+      List.repeat 0%L (List.length l - 1 - i) ++
+        [List.nth (List.length l - 1 - i) l 0%L])
+    (List.seq 0 (List.length l)).
 Compute (
   let qro := Q_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let (U, V) := lap_bezout_resultant_coeff (rev rla) (rev rlb) in
-  ((U * rev rla + V * rev rlb)%lap, lap_resultant rla rlb)).
+  let (U, V) := lap_bezout_resultant_coeff (List.rev rla) (List.rev rlb) in
+  ((U * List.rev rla + V * List.rev rlb)%lap, lap_resultant rla rlb)).
 (* oui *)
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_minus_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui !!! *)
@@ -1237,8 +1259,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_div_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 Compute (
@@ -1246,8 +1268,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_minus_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -1256,8 +1278,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_div_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 Compute (
@@ -1265,8 +1287,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;-4] in
   let rlb := [1;0;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_minus_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -1275,8 +1297,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;-4] in
   let rlb := [1;0;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_div_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_div_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 Compute (
@@ -1284,8 +1306,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;-2] in
   let rlb := [1;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_minus_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -1294,8 +1316,8 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;0;-2] in
   let rlb := [1;0;0;-3] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose_y_minus_x (List.rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -1313,11 +1335,11 @@ Compute (
 (* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
    a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
 Definition algeb_add A {ro : ring_like_op A} {rol : ring_like_op _} p q :=
-  lap_resultant (map (λ i, [i]) p) (lap_compose_y_minus_x q).
+  lap_resultant (List.map (λ i, [i]) p) (lap_compose_y_minus_x q).
 
 (* polynomial cancelling the product of zeros of two polynomials p and q *)
 Definition algeb_mul A {ro : ring_like_op A} {rol : ring_like_op _} p q :=
-  lap_resultant (map (λ i, [i]) p) (lap_compose_y_div_x q).
+  lap_resultant (List.map (λ i, [i]) p) (lap_compose_y_div_x q).
 
 (*
 Theorem algeb_add_cancelling :
@@ -1328,7 +1350,7 @@ Theorem algeb_add_cancelling :
 Proof.
 intros * Hp Hq.
 remember
-  (bezout_resultant_coeff (map (λ i, [i]) p) (lap_compose_y_minus_x q))
+  (bezout_resultant_coeff (List.map (λ i, [i]) p) (lap_compose_y_minus_x q))
   as UV eqn:HUV.
 symmetry in HUV.
 destruct UV as (U, V).
@@ -1336,30 +1358,30 @@ destruct UV as (U, V).
 intros * Hp Hq.
 unfold lap_resultant.
 unfold eval_lap in Hp, Hq.
-rewrite <- map_rev.
+rewrite <- List.map_rev.
 unfold lap_compose.
-rewrite <- map_rev.
+rewrite <- List.map_rev.
 cbn - [ det ].
-remember (rev p) as rp eqn:Hrp.
-remember (rev q) as rq eqn:Hrq.
+remember (List.rev p) as rp eqn:Hrp.
+remember (List.rev q) as rq eqn:Hrq.
 clear p q Hrp Hrq.
 move rq before rp.
 ...
 unfold rlap_sylvester_mat.
 unfold rlap_sylvester_list_list.
-rewrite length_rev.
-rewrite length_map.
+rewrite List.length_rev.
+rewrite List.length_map.
 ...
 *)
 
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=
-  rev (algeb_add (rev rp) (rev rq)).
+  List.rev (algeb_add (List.rev rp) (List.rev rq)).
 
 Definition r_algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=
-  rev (algeb_mul (rev rp) (rev rq)).
+  List.rev (algeb_mul (List.rev rp) (List.rev rq)).
 
 (* from Cyril Cohen's Phd thesis :
 Since R is in the ideal generated by P(X+Y) and Q(X), there exist
@@ -1423,9 +1445,9 @@ Compute (
   let lro := lap_ring_like_op in
   let p := [1; 0; 1] in
   let q := [-2; 0; 1] in
-  let p' := map (λ i, [i]) p in
-  let q' := map (λ i, [i]) q in
-  rev
+  let p' := List.map (λ i, [i]) p in
+  let q' := List.map (λ i, [i]) q in
+  List.rev
     (lap_resultant
        (lap_compose p' [[0; 1]; [1]])%L
        q')).
@@ -1527,17 +1549,17 @@ Compute
 
 Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
-  let p' := map (λ i, [i]) p in
-  let q' := map (λ i, [i]) q in
+  let p' := List.map (λ i, [i]) p in
+  let q' := List.map (λ i, [i]) q in
   lap_resultant
     (lap_compose p' [[0; 1]; [1]])%L
     (lap_compose q' [[0; 1]; [1]])%L.
 Definition glip A (ro : ring_like_op A) (rol : ring_like_op (list A)) p :=
-  let p' := map (λ i, [i]) p in
+  let p' := List.map (λ i, [i]) p in
   @lap_compose (list A) rol p' [[0; 1]; [1]]%L.
 Definition r_glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=
-  rev (glop_add ro rol (rev rp) (rev rq)).
+  List.rev (glop_add ro rol (List.rev rp) (List.rev rq)).
 Definition Q_r_glop_add :=
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -1550,7 +1572,7 @@ Compute (
   let lro := lap_ring_like_op in
   let rp := [[1]; [0; 2]; [1;0;1]] in
   let rq := [[1]; [0; 2]; [-2;0;1]] in
-  rev (lap_resultant (rev rp) (rev rq))).
+  List.rev (lap_resultant (List.rev rp) (List.rev rq))).
 (* From Cyril Cohen's Phd Thesis, page 27
   properties of the resultant
     ResX(P(X,Y), Q(X,Y)) ∈ R[Y]
@@ -1565,7 +1587,7 @@ Compute (
   let lro := lap_ring_like_op in
   let rp := [[1]; [0; 2]; [1;0;1]] in
   let rq := [[1]; []; [-2]] in
-  rev (lap_resultant (rev rp) (rev rq))).
+  List.rev (lap_resultant (List.rev rp) (List.rev rq))).
 (* example in video https://www.youtube.com/watch?v=WvbAfhOH4ik *)
 Compute (
   let qro := Q_ring_like_op in
@@ -1607,9 +1629,9 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  rev (lap_resultant p q)).
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose (List.map (λ i, [i]) (List.rev rlb)) [[0; 1]; [-1]] in
+  List.rev (lap_resultant p q)).
 (*
 Compute (
   let qro := Q_ring_like_op in
@@ -1618,9 +1640,9 @@ Compute (
   let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  lap_norm (rev (map (λ i, rev i) (rlap_resultant' _ p q)))).
+  let p := List.map (λ i, [i]) (List.rev rla) in
+  let q := lap_compose (List.map (λ i, [i]) (List.rev rlb)) [[0; 1]; [-1]] in
+  lap_norm (List.rev (List.map (λ i, List.rev i) (rlap_resultant' _ p q)))).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -1645,7 +1667,7 @@ Compute (
   let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  lap_resultant (rev rla) (rev rlb)).
+  lap_resultant (List.rev rla) (List.rev rlb)).
 (*
   x²+1            -2yx+3y²+3
      x²-2yx+y²-2             2y+y²-3
@@ -1661,7 +1683,7 @@ Time Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
-  lap_resultant (rev [5;0;0;-7;5;-3]) (rev [1;0;0;0;-4;0;0;6])).
+  lap_resultant (List.rev [5;0;0;-7;5;-3]) (List.rev [1;0;0;0;-4;0;0;6])).
 ...
 *)
 
@@ -1694,8 +1716,8 @@ Compute (Q_r_algeb_add [1;0;0;-2] [1;0;1]).
 *)
 
 (*
-Theorem last_fold_left_lap_mul_const_add_const : ∀ la b c,
-  last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
+Theorem List.last_fold_left_lap_mul_const_add_const : ∀ la b c,
+  List.last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
   fold_left (λ x y, (x * b + y)%L) la c.
 Proof.
 intros.
@@ -1705,11 +1727,11 @@ rewrite rngl_summation_only_one.
 apply IHla.
 Qed.
 
-Theorem last_lap_add : ∀ la lb,
-  last (la + lb)%lap 0%L =
-    if length la <? length lb then last lb 0%L
-    else if length lb <? length la then last la 0%L
-    else (last la 0 + last lb 0)%L.
+Theorem List.last_lap_add : ∀ la lb,
+  List.last (la + lb)%lap 0%L =
+    if List.length la <? List.length lb then List.last lb 0%L
+    else if List.length lb <? List.length la then List.last la 0%L
+    else (List.last la 0 + List.last lb 0)%L.
 Proof.
 intros.
 rewrite if_bool_if_dec.
@@ -1724,7 +1746,7 @@ destruct (bool_dec _) as [Hab| Hab]. {
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
   destruct la as [| a1]; [ | easy ].
-  cbn - [ last ].
+  cbn - [ List.last ].
   now rewrite List_last_cons_cons.
 }
 rewrite if_bool_if_dec.
@@ -1740,56 +1762,56 @@ destruct (bool_dec _) as [Hba| Hba]. {
   destruct la as [| a1]; [ easy | ].
   rewrite List_last_cons_cons.
   destruct lb as [| b1]; [ | easy ].
-  cbn - [ last ].
+  cbn - [ List.last ].
   now rewrite List_last_cons_cons.
 }
 apply Nat.ltb_ge in Hab, Hba.
 apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
-remember (length la) as len eqn:Ha.
+remember (List.length la) as len eqn:Ha.
 rename Hab into Hb.
 symmetry in Ha, Hb.
 revert la lb Ha Hb.
 induction len; intros; cbn. {
-  apply length_zero_iff_nil in Ha, Hb; subst la lb.
+  apply List.length_zero_iff_nil in Ha, Hb; subst la lb.
   cbn; symmetry; apply rngl_add_0_l.
 }
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]; [ easy | ].
 cbn in Ha, Hb.
 apply Nat.succ_inj in Ha, Hb.
-cbn - [ last ].
+cbn - [ List.last ].
 destruct la as [| a1]. {
   subst len.
-  now apply length_zero_iff_nil in Hb; subst lb.
+  now apply List.length_zero_iff_nil in Hb; subst lb.
 }
 destruct lb as [| b1]; [ now rewrite <- Hb in Ha | ].
-cbn - [ last ].
+cbn - [ List.last ].
 do 3 rewrite List_last_cons_cons.
 now rewrite <- IHlen.
 Qed.
 *)
 
 Theorem List_last_map : ∀ A B a b (f : A → B) la,
-  f a = b → last (map f la) b = f (last la a).
+  f a = b → List.last (List.map f la) b = f (List.last la a).
 Proof.
 intros * Hab.
 induction la as [| a1]; [ easy | ].
-cbn - [ last ].
+cbn - [ List.last ].
 destruct la as [| a2]; [ easy | ].
-cbn - [ last ].
+cbn - [ List.last ].
 do 2 rewrite List_last_cons_cons.
 apply IHla.
 Qed.
 
 (*
-Theorem last_lap_mul_const_l_add_const_r :
+Theorem List.last_lap_mul_const_l_add_const_r :
   rngl_has_opp_or_subt T = true →
   ∀ a b la,
-  last ([a] * la + [b])%lap 0%L =
-    match length la with
+  List.last ([a] * la + [b])%lap 0%L =
+    match List.length la with
     | 0 => b
-    | 1 => (a * hd 0 la + b)%L
-    | _ => last (map (λ b, (a * b)%L) (tl la)) 0%L
+    | 1 => (a * List.hd 0 la + b)%L
+    | _ => List.last (List.map (λ b, (a * b)%L) (tl la)) 0%L
     end.
 Proof.
 intros Hos *.
@@ -1799,18 +1821,18 @@ destruct la as [| a1]. {
   now rewrite rngl_add_0_l.
 }
 cbn - [ lap_mul ].
-rewrite last_lap_add.
-cbn - [ last lap_mul ].
+rewrite List.last_lap_add.
+cbn - [ List.last lap_mul ].
 rewrite lap_mul_length.
-rewrite length_app.
-cbn - [ last lap_mul ].
+rewrite List.length_app.
+cbn - [ List.last lap_mul ].
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [H| H]; [ apply Nat.leb_le in H; flia H | clear H ].
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [H| H]; [ clear H | apply Nat.ltb_ge in H; flia H ].
-cbn - [ last lap_mul ] in IHla.
-rewrite last_lap_add in IHla.
-cbn - [ last lap_mul ] in IHla.
+cbn - [ List.last lap_mul ] in IHla.
+rewrite List.last_lap_add in IHla.
+cbn - [ List.last lap_mul ] in IHla.
 rewrite if_bool_if_dec in IHla.
 destruct (bool_dec _) as [H| H]. {
   cbn in H; apply Nat.leb_le in H; flia H.
@@ -1821,7 +1843,7 @@ destruct (bool_dec _) as [H| H]. 2: {
   cbn in H; apply Nat.leb_gt in H.
   rewrite lap_convol_mul_length in H.
   apply Nat.succ_lt_mono, Nat.lt_1_r in H.
-  apply length_zero_iff_nil in H; subst la.
+  apply List.length_zero_iff_nil in H; subst la.
   cbn; unfold iter_seq, iter_list; cbn.
   now rewrite rngl_add_0_l, (rngl_mul_0_l Hos), rngl_add_0_r.
 }
@@ -1859,14 +1881,14 @@ destruct pb as [pb| pb]. {
 }
 right.
 apply (rngl_neqb_neq Hed) in pa, pb.
-Theorem last_lap_compose :
+Theorem List.last_lap_compose :
   rngl_has_opp_or_subt T = true →
   ∀ la lb,
-  last (la ° lb)%lap 0%L =
-    match length lb with
-    | 0 => hd 0%L la
-    | 1 => eval_lap la (hd 0%L lb)
-    | _ => (last la 0 * last lb 0 ^ (length la - 1))%L
+  List.last (la ° lb)%lap 0%L =
+    match List.length lb with
+    | 0 => List.hd 0%L la
+    | 1 => eval_lap la (List.hd 0%L lb)
+    | _ => (List.last la 0 * List.last lb 0 ^ (List.length la - 1))%L
     end.
 Proof.
 intros Hos *.
@@ -1880,9 +1902,9 @@ destruct lb as [| b0]. {
     now rewrite lap_mul_0_r, lap_add_0_l.
   }
   destruct la as [| a]; [ easy | cbn ].
-  now rewrite map_app, fold_left_app.
+  now rewrite List.map_app, fold_left_app.
 }
-cbn - [ last ].
+cbn - [ List.last ].
 destruct lb as [| b1]. {
   cbn; unfold lap_compose, rlap_compose; cbn.
   unfold rlap_horner, iter_list; cbn.
@@ -1892,22 +1914,22 @@ destruct lb as [| b1]. {
     easy.
   }
   destruct la as [| a]; [ easy | cbn ].
-  rewrite map_app, fold_left_app; cbn.
-  rewrite last_lap_add.
-  rewrite length_map.
+  rewrite List.map_app, fold_left_app; cbn.
+  rewrite List.last_lap_add.
+  rewrite List.length_map.
   remember (fold_left _ _ _) as lb eqn:Hlb.
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H1| H1]. {
     subst lb.
     apply Nat.ltb_lt in H1; cbn in H1 |-*.
-    apply Nat.lt_1_r, length_zero_iff_nil in H1.
+    apply Nat.lt_1_r, List.length_zero_iff_nil in H1.
     unfold eval_lap, eval_rlap, rlap_horner, iter_list; cbn.
     rewrite fold_left_app; cbn.
     destruct la as [| a0]; cbn. {
       now rewrite rngl_mul_0_l, rngl_add_0_l.
     }
     cbn in H1.
-    rewrite map_app in H1; cbn in H1.
+    rewrite List.map_app in H1; cbn in H1.
     rewrite fold_left_app in H1; cbn in H1.
     now apply eq_lap_add_nil in H1.
   }
@@ -1931,39 +1953,39 @@ destruct lb as [| b1]. {
     cbn in Hlb.
 ...
 }
-cbn - [ last ].
+cbn - [ List.last ].
 ...
 unfold lap_compose.
-remember (length lb) as blen eqn:Hbl; symmetry in Hbl.
+remember (List.length lb) as blen eqn:Hbl; symmetry in Hbl.
 destruct blen. {
-  apply length_zero_iff_nil in Hbl; subst lb.
+  apply List.length_zero_iff_nil in Hbl; subst lb.
   unfold rlap_compose, rlap_horner, iter_list; cbn.
   erewrite List_fold_left_ext_in. 2: {
     intros b lb Hb.
     now rewrite lap_mul_0_r, lap_add_0_l.
   }
   destruct la as [| a]; [ easy | cbn ].
-  now rewrite map_app, fold_left_app.
+  now rewrite List.map_app, fold_left_app.
 }
 destruct blen. {
   unfold eval_lap, eval_rlap, rlap_horner, iter_list.
-  remember (rev la) as rla; clear la Heqrla.
+  remember (List.rev la) as rla; clear la Heqrla.
   destruct lb as [| b]; [ easy | ].
   destruct lb; [ cbn; clear Hbl | easy ].
   destruct rla as [| a2]; intros; [ easy | cbn ].
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
   unfold rlap_compose, rlap_horner, iter_list; cbn.
   rewrite List_fold_left_map.
-  apply last_fold_left_lap_mul_const_add_const.
+  apply List.last_fold_left_lap_mul_const_add_const.
 }
 unfold rlap_compose, rlap_horner, iter_list.
-rewrite rev_involutive.
+rewrite List.rev_involutive.
 rewrite List_fold_left_map.
-remember (rev la) as rla eqn:Hrla.
-rewrite <- (rev_involutive la).
+remember (List.rev la) as rla eqn:Hrla.
+rewrite <- (List.rev_involutive la).
 rewrite <- Hrla.
 rewrite List_last_rev.
-rewrite length_rev.
+rewrite List.length_rev.
 clear la Hrla.
 destruct lb as [| b0]; [ easy | ].
 cbn in Hbl.
@@ -1973,30 +1995,30 @@ cbn in Hbl; apply Nat.succ_inj in Hbl.
 destruct rla as [| a]. {
   now cbn; rewrite (rngl_mul_0_l Hos).
 }
-cbn - [ last ].
-Theorem last_fold_left_lap_mul_cons_cons_add_const :
+cbn - [ List.last ].
+Theorem List.last_fold_left_lap_mul_cons_cons_add_const :
   ∀ (la lb lc : list T) (b0 b1 : T),
-  last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la lc)
+  List.last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la lc)
     0%L =
-  last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la lc) 0%L.
+  List.last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la lc) 0%L.
 ...
-rewrite last_fold_left_lap_mul_cons_cons_add_const.
+rewrite List.last_fold_left_lap_mul_cons_cons_add_const.
 rewrite List_last_cons_cons.
 clear b0 blen Hbl.
 rewrite Nat.sub_0_r.
 revert b1.
 induction lb as [| b2]; intros. {
   cbn.
-  rewrite last_fold_left_lap_mul_const_add_const.
+  rewrite List.last_fold_left_lap_mul_const_add_const.
   (* bin non *)
 ...
 }
-rewrite last_fold_left_lap_mul_cons_cons_add_const.
+rewrite List.last_fold_left_lap_mul_cons_cons_add_const.
 apply IHlb.
 ...
-last_fold_left_lap_mul_add:
+List.last_fold_left_lap_mul_add:
   ∀ (la : list T) (b c : T),
-    last
+    List.last
       (fold_left (λ (accu : list T) (a : T), (accu * [b] + [a])%lap) la [c])
       0%L = fold_left (λ x y : T, (x * b + y)%L) la c
 ...
@@ -2010,52 +2032,52 @@ destruct la as [| a1]; [ now cbn; rewrite rngl_mul_1_r | cbn ].
 rewrite List_cons_length in IHla.
 rewrite Nat_sub_succ_1 in IHla.
 destruct la as [| a2]. {
-  rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
+  rewrite List.app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
   cbn - [ lap_mul ].
   rewrite lap_mul_0_l, lap_add_0_l.
-  rewrite (last_lap_mul_const_l_add_const_r Hos).
+  rewrite (List.last_lap_mul_const_l_add_const_r Hos).
   destruct lb as [| b0]; [ easy | ].
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
-  cbn - [ last ].
+  cbn - [ List.last ].
   clear Hbl.
   revert b1.
   induction lb as [| b2]; intros; [ easy | ].
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   apply IHlb.
 }
 specialize (IHla _ Hbl) as H1.
 rewrite List_last_cons_cons in H1.
-rewrite last_lap_add.
-cbn - [ last ].
+rewrite List.last_lap_add.
+cbn - [ List.last ].
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [H2| H2]. {
-  apply Nat.ltb_lt, Nat.lt_1_r, length_zero_iff_nil in H2.
+  apply Nat.ltb_lt, Nat.lt_1_r, List.length_zero_iff_nil in H2.
   rewrite fold_left_app in H2.
   rewrite fold_left_app in H2.
   cbn in H2.
 ...
-remember (a2 :: la) as l; cbn - [ last ] in H1; subst l.
+remember (a2 :: la) as l; cbn - [ List.last ] in H1; subst l.
 ...
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l.
 ...
   rewrite lap_mul_const_l; [ | easy | easy ].
   rewrite lap_add_const_r; [ | easy ].
   rewrite List_map_tl.
 ...
-rewrite map_tl.
+rewrite List.map_tl.
 Search ((_ + [_])%lap).
 Search ((_ * [_])%lap).
 ...
 Theorem List_last_map : ∀ A B (f : A → B) l d e,
-  f e = d → last (map f l) d = f (last l e).
+  f e = d → List.last (List.map f l) d = f (List.last l e).
 ...
 rewrite List_last_map.
 ...
@@ -2066,12 +2088,12 @@ rewrite List_last_map.
   cbn in Hbl; apply Nat.succ_inj in Hbl.
   rewrite Nat.sub_0_r, rngl_mul_1_r.
   rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   clear Hbl.
   revert b1.
   induction lb as [| b2]; intros; [ easy | ].
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   apply IHlb.
 }
@@ -2079,7 +2101,7 @@ rewrite fold_left_app; cbn.
 rewrite List_last_cons_cons in IHla.
 rewrite List_cons_length in IHla.
 destruct la as [| a3]. {
-  rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
+  rewrite List.app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
   cbn - [ lap_mul ].
   rewrite lap_mul_0_l, lap_add_0_l.
 ...
@@ -2093,31 +2115,31 @@ destruct la as [| a3]. {
   do 2 rewrite List_cons_length.
   rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
   rewrite skipn_O.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite Nat.add_succ_r.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite List_last_cons_cons.
   rewrite Nat.add_succ_r.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
-  rewrite rngl_add_0_l, length_map.
+  cbn - [ List.last ].
+  rewrite rngl_add_0_l, List.length_map.
   destruct lb as [| b2]. {
     cbn.
     rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
     rewrite rngl_add_0_l, rngl_add_0_r.
     symmetry; apply rngl_mul_assoc.
   }
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l, Nat.add_succ_r.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l.
   destruct lb as [| b3]. {
     cbn.
@@ -2127,10 +2149,10 @@ destruct la as [| a3]. {
     rewrite rngl_add_0_l, rngl_add_0_r.
     symmetry; apply rngl_mul_assoc.
   }
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l.
   destruct lb as [| b4]. {
     cbn.
@@ -2144,10 +2166,10 @@ destruct la as [| a3]. {
     rewrite rngl_add_0_l.
     symmetry; apply rngl_mul_assoc.
   }
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l.
   destruct lb as [| b5]. {
     cbn.
@@ -2163,36 +2185,36 @@ destruct la as [| a3]. {
     rewrite rngl_add_0_l.
     symmetry; apply rngl_mul_assoc.
   }
-  cbn - [ last ].
+  cbn - [ List.last ].
   do 2 rewrite List_last_cons_cons.
   unfold iter_seq, iter_list.
-  cbn - [ last ].
+  cbn - [ List.last ].
   rewrite rngl_add_0_l.
-  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
-  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
-  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list; cbn - [ last ].
+  rewrite Nat.add_succ_r; cbn - [ List.last ]; rewrite List_last_cons_cons.
+  rewrite Nat.add_succ_r; cbn - [ List.last ]; rewrite List_last_cons_cons.
+  rewrite Nat.add_succ_r; cbn - [ List.last ]; rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list; cbn - [ List.last ].
 ...
   ============================
-  last
-    ((0 + (a2 * b0 + a1) * nth 4 lb 0 + a2 * b1 * nth 3 lb 0 +
-      a2 * b2 * nth 2 lb 0 + a2 * b3 * nth 1 lb 0 + 
-      a2 * b4 * nth 0 lb 0 + a2 * b5 * b5 +
-      nth 0 (map (λ b : A, a2 * b) lb) 0 * b4 +
-      nth 1 (map (λ b : A, a2 * b) lb) 0 * b3 +
-      nth 2 (map (λ b : A, a2 * b) lb) 0 * b2 +
-      nth 3 (map (λ b : A, a2 * b) lb) 0 * b1 +
-      nth 4 (map (λ b : A, a2 * b) lb) 0 * b0)%L
+  List.last
+    ((0 + (a2 * b0 + a1) * List.nth 4 lb 0 + a2 * b1 * List.nth 3 lb 0 +
+      a2 * b2 * List.nth 2 lb 0 + a2 * b3 * List.nth 1 lb 0 + 
+      a2 * b4 * List.nth 0 lb 0 + a2 * b5 * b5 +
+      List.nth 0 (List.map (λ b : A, a2 * b) lb) 0 * b4 +
+      List.nth 1 (List.map (λ b : A, a2 * b) lb) 0 * b3 +
+      List.nth 2 (List.map (λ b : A, a2 * b) lb) 0 * b2 +
+      List.nth 3 (List.map (λ b : A, a2 * b) lb) 0 * b1 +
+      List.nth 4 (List.map (λ b : A, a2 * b) lb) 0 * b0)%L
      :: lap_convol_mul
           ((a2 * b0 + a1)%L
            :: (a2 * b1)%L
               :: (a2 * b2)%L
                  :: (a2 * b3)%L
                     :: (a2 * b4)%L
-                       :: (a2 * b5)%L :: map (λ b : A, (a2 * b)%L) lb)
+                       :: (a2 * b5)%L :: List.map (λ b : A, (a2 * b)%L) lb)
           (b0 :: b1 :: b2 :: b3 :: b4 :: b5 :: lb) 11 
-          (length lb + length lb)) 0%L =
-  (a2 * (last (b5 :: lb) 0 * last (b5 :: lb) 0))%L
+          (List.length lb + List.length lb)) 0%L =
+  (a2 * (List.last (b5 :: lb) 0 * List.last (b5 :: lb) 0))%L
 ...
 *)
 
@@ -2205,7 +2227,7 @@ Time Compute (
   let _ := Q_ring_like_op in
   let la := [7;5;3;2] in
   let lb := [11;13] in
-  last (lap_compose la lb) 0).
+  List.last (lap_compose la lb) 0).
 (*
 2*13³
 (2.5 s)
@@ -2285,16 +2307,16 @@ Theorem has_polyn_prop_map_polyn_of_Q_const :
   let roqp := Q_polyn_ring_like_op in
   ∀ la,
   has_polyn_prop la = true
-  → has_polyn_prop (map polyn_of_Q_const la) = true.
+  → has_polyn_prop (List.map polyn_of_Q_const la) = true.
 Proof.
 intros * Hla.
-destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+destruct la as [| a] using List.rev_ind; [ easy | clear IHla ].
 apply Bool.orb_true_iff in Hla.
 destruct Hla as [Hla| Hla]; [ now destruct la | ].
-rewrite last_last in Hla.
-rewrite map_app; cbn.
+rewrite List.last_last in Hla.
+rewrite List.map_app; cbn.
 apply Bool.orb_true_iff; right.
-rewrite last_last; cbn.
+rewrite List.last_last; cbn.
 unfold polyn_eqb; cbn.
 unfold polyn_of_Q_const.
 destruct (Q.eq_dec a 0) as [Haz| Haz]; [ now subst a | easy ].
@@ -2309,21 +2331,21 @@ Compute
    let rpqp := Q_polyn_ring_like_prop in
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
-   map polyn_of_Q_const [1;0;1]).
+   List.map polyn_of_Q_const [1;0;1]).
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    let la := [1;0;1] in
-   mk_polyn (map polyn_of_Q_const la)
+   mk_polyn (List.map polyn_of_Q_const la)
      (has_polyn_prop_map_polyn_of_Q_const la eq_refl)).
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
-   map polyn_of_Q_const [-2;0;1]).
+   List.map polyn_of_Q_const [-2;0;1]).
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
@@ -2438,20 +2460,20 @@ intros.
 unfold has_polyn_prop, lap_norm.
 induction la as [| a]; [ easy | cbn ].
 rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+remember (strip_0s (List.rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; cbn. {
   rewrite if_bool_if_dec.
   destruct (Bool.bool_dec _) as [Haz| Haz]; [ easy | cbn ].
   now apply Bool.negb_true_iff.
 }
 cbn in IHla.
-rewrite last_last in IHla.
+rewrite List.last_last in IHla.
 apply Bool.orb_true_iff in IHla.
 apply Bool.orb_true_iff; right.
-rewrite last_last.
+rewrite List.last_last.
 destruct IHla as [H1| H1]; [ | easy ].
 apply is_empty_list_empty in H1.
-now apply app_eq_nil in H1.
+now apply List.app_eq_nil in H1.
 Qed.
 *)
 
@@ -2489,9 +2511,9 @@ ok
 
 Definition r_algeb_sum_cancel_lap T
     (ro : ring_like_op T) (rol : ring_like_op (list T)) rp rq :=
-  let p' := map (λ i, [i]) (rev rp) in
-  let q' := map (λ i, [i]) (rev rq) in
-  rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
+  let p' := List.map (λ i, [i]) (List.rev rp) in
+  let q' := List.map (λ i, [i]) (List.rev rq) in
+  List.rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
 
 Definition Q_r_algeb_sum_cancel_lap :=
   let qro := Q_ring_like_op in
@@ -2565,7 +2587,8 @@ Check polyn_norm_prop.
 Theorem toto :
   let roqp := Q_polyn_ring_like_op in
   ∀ la,
-  has_polyn_prop (map (polyn_of_const Q_ring_like_prop Q_has_eqb) la) = true.
+  has_polyn_prop (List.map (polyn_of_const Q_ring_like_prop Q_has_eqb) la) =
+    true.
 Proof.
 intros.
 apply Bool.orb_true_iff.
@@ -2619,7 +2642,7 @@ Time Compute (
     let rpqp := Q_polyn_ring_like_prop in
     let roq := Q_ring_like_op in
     let rpq := Q_ring_like_prop in
-    let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
+    let p := List.map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
 p
 in p).
 *)
@@ -2650,8 +2673,8 @@ in p).
  *)
 Print fold_right.
 (*
-Theorem last_list_fold_right : ∀ A B (f : B → list A → list A) a l,
-  last (fold_right f a l) = a.
+Theorem List.last_list_fold_right : ∀ A B (f : B → list A → list A) a l,
+  List.last (fold_right f a l) = a.
 ...
 erewrite List_fold_right_ext_in. 2: {
   intros c lc Hc.
@@ -2659,9 +2682,9 @@ erewrite List_fold_right_ext_in. 2: {
   easy.
 }
 ...
-  destruct la as [| a] using rev_ind; [ now left | right; cbn ].
+  destruct la as [| a] using List.rev_ind; [ now left | right; cbn ].
   rewrite fold_right_app; cbn.
-  rewrite last_last in pa.
+  rewrite List.last_last in pa.
   cbn.
 ...
 }
@@ -2702,15 +2725,17 @@ Search has_polyn_prop.
 *)
 
 (*
-Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
-  (mk_polyn (rev [6;7;8;9]) eq_refl)).
-Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
-  (mk_polyn (rev [6;7;8;9]) eq_refl))).
-Time Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4]) eq_refl)
-  (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Compute (polyn_sylvester_mat (mk_polyn (List.rev [1;2;3;4;5]) eq_refl)
+  (mk_polyn (List.rev [6;7;8;9]) eq_refl)).
+Compute
+  (mat_nrows (polyn_sylvester_mat (mk_polyn (List.rev [1;2;3;4;5])
+     eq_refl)
+  (mk_polyn (List.rev [6;7;8;9]) eq_refl))).
+Time Compute (det (polyn_sylvester_mat (mk_polyn (List.rev [1;2;3;4]) eq_refl)
+  (mk_polyn (List.rev [6;7;8;9]) eq_refl))).
 ...
-Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl)
-  (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Compute (det (polyn_sylvester_mat (mk_polyn (List.rev [1;2;3;4;5]) eq_refl)
+  (mk_polyn (List.rev [6;7;8;9]) eq_refl))).
 ...
 Compute (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9]).
 Compute (mat_nrows (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
