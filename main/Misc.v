@@ -87,7 +87,11 @@ Definition iter_seq {T} b e f (d : T) := iter_list (seq b (S e - b)) f d.
 Arguments iter_seq : simpl never.
 Arguments iter_list : simpl never.
 
+(*
 (* maximum of several values *)
+
+(* commented because Max could apply only on nat because it needs
+   a minimum, which is 0 in nat, but not in all ring-like types *)
 
 Notation "'Max' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, max c (g)) 0)
@@ -96,6 +100,7 @@ Notation "'Max' ( i = b , e ) , g" :=
 Notation "'Max' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, max c (g)) 0)
   (at level 45, i at level 0, l at level 60) : nat_scope.
+*)
 
 Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
   fold_left f l d = iter_list l f d.
@@ -2537,6 +2542,7 @@ Qed.
 
 (* *)
 
+(*
 Theorem fold_left_max_from_0 : ∀ A a l (f : A → _),
   fold_left (λ c i, max c (f i)) l a =
   max a (fold_left (λ c i, max c (f i)) l 0).
@@ -2572,6 +2578,7 @@ apply iter_list_cons. {
   apply Nat.max_assoc.
 }
 Qed.
+*)
 
 Theorem List_flat_length_map : ∀ A B (f : A → list B) l,
   length (flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
