@@ -60,8 +60,8 @@ destruct M as (ll); cbn.
 unfold subm, mat_swap_rows; cbn; f_equal.
 rewrite length_map.
 rewrite butn_length.
-rewrite <- map_butn, map_map.
-rewrite map_butn_seq.
+rewrite <- List_map_butn, map_map.
+rewrite List_map_butn_seq.
 rewrite Nat.add_0_l.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
@@ -107,7 +107,7 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ easy | clear H ].
   destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ easy | clear H ].
-  rewrite map_butn.
+  rewrite List_map_butn.
   rewrite nth_butn_after; [ | easy ].
   rewrite (List_map_nth' []); [ easy | flia Hi ].
 }
@@ -118,7 +118,7 @@ destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
 destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | ].
 clear H.
 destruct (Nat.eq_dec (i + 1) (q - 1)) as [H| H]; [ flia Hq Hir H | clear H ].
-rewrite map_butn.
+rewrite List_map_butn.
 rewrite nth_butn_before; [ | easy ].
 rewrite (List_map_nth' []); [ easy | ].
 unfold Nat.b2n in Hi.
@@ -320,7 +320,7 @@ destruct (le_dec (length la) sta) as [Hsla| Hsla]. {
   rewrite <- List_fold_left_map_nth_len.
   rewrite List_fold_left_nop_r.
   rewrite length_seq.
-  rewrite repeat_apply_id. 2: {
+  rewrite List_repeat_apply_id. 2: {
     intros u.
     symmetry; apply List_map_nth_seq.
   }
@@ -347,7 +347,7 @@ destruct (le_dec (length la) (sta + len)) as [Hsl| Hsl]. {
   rewrite <- List_fold_left_map_nth_len.
   rewrite List_fold_left_nop_r.
   rewrite length_seq.
-  rewrite repeat_apply_id. 2: {
+  rewrite List_repeat_apply_id. 2: {
     intros u.
     symmetry; apply List_map_nth_seq.
   }
@@ -443,7 +443,7 @@ destruct (lt_dec (p - 1) (length ll)) as [H| H]; [ clear H | flia H Hp ].
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 cbn in Hi.
-rewrite <- map_butn.
+rewrite <- List_map_butn.
 rewrite (List_map_nth' 0). 2: {
   rewrite butn_length, length_seq.
   unfold Nat.b2n.
@@ -757,7 +757,7 @@ erewrite rngl_summation_eq_compat. 2: {
   specialize (determinant_subm_mat_swap_rows_0_i Hon Hic Hop) as H1.
   specialize (H1 M p j Hsm).
   cbn - [ butn ] in H1.
-  rewrite length_map, map_butn, butn_length in H1.
+  rewrite length_map, List_map_butn, butn_length in H1.
   rewrite list_swap_elem_length, fold_mat_nrows in H1.
   rewrite butn_length, length_map, fold_mat_nrows in H1.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
@@ -1199,7 +1199,7 @@ rewrite Nat.ltb_irrefl.
 rewrite Nat.sub_diag.
 rewrite length_map.
 replace (0 <? length [i - 1]) with true by easy.
-rewrite <- map_butn.
+rewrite <- List_map_butn.
 rewrite app_nil_l.
 remember (butn 0 _) as x; cbn in Heqx; subst x.
 f_equal. {
@@ -1833,7 +1833,7 @@ Qed.
 *)
 
 Theorem butn_map2 : ∀ A B C (f : A → B → C) la lb i,
-  butn i (map2 f la lb) = map2 f (butn i la) (butn i lb).
+  butn i (List_map2 f la lb) = List_map2 f (butn i la) (butn i lb).
 Proof.
 intros.
 revert i lb.
@@ -1842,7 +1842,7 @@ induction la as [| a]; intros; cbn. {
 }
 destruct lb as [| b]. {
   do 2 rewrite butn_nil.
-  now rewrite map2_nil_r.
+  now rewrite List_map2_nil_r.
 }
 destruct i; [ easy | cbn; f_equal ].
 apply IHla.
@@ -1883,13 +1883,13 @@ rewrite (List_map_nth' []); [ | now rewrite List_length_map_seq ].
 unfold vect_dot_mul.
 cbn - [ mat_el com ].
 rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
-rewrite map2_map_l.
-rewrite map2_map2_seq_l with (d := 0).
-rewrite map2_map2_seq_r with (d := 0%L).
+rewrite List_map2_map_l.
+rewrite List_map2_map2_seq_l with (d := 0).
+rewrite List_map2_map2_seq_r with (d := 0%L).
 rewrite length_seq.
 rewrite fold_vect_size, Hvm.
 rewrite comatrix_nrows.
-rewrite map2_diag.
+rewrite List_map2_diag.
 rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation. 2: {
   rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
@@ -1920,12 +1920,12 @@ rewrite (seq_nth _ _ Hi').
 rewrite (List_map_nth' 0); [ | now rewrite length_seq ].
 rewrite (seq_nth _ _ Hk').
 rewrite (List_map_nth' 0). 2: {
-  rewrite length_seq, length_map2.
+  rewrite length_seq, List_length_map2.
   rewrite fold_mat_nrows, fold_vect_size, Hvm.
   now rewrite Nat.min_id.
 }
 rewrite seq_nth. 2: {
-  rewrite length_map2.
+  rewrite List_length_map2.
   rewrite fold_mat_nrows, fold_vect_size, Hvm.
   now rewrite Nat.min_id.
 }
@@ -1943,15 +1943,15 @@ rewrite (Nat.add_comm _ (k - 1)), Nat.sub_add; [ | easy ].
 unfold mat_repl_vect.
 unfold subm.
 cbn - [ det ].
-rewrite map_butn.
-rewrite map_butn.
-rewrite map_map2.
-rewrite map2_map2_seq_l with (d := []).
-rewrite map2_map2_seq_r with (d := 0%L).
+rewrite List_map_butn.
+rewrite List_map_butn.
+rewrite List_map_map2.
+rewrite List_map2_map2_seq_l with (d := []).
+rewrite List_map2_map2_seq_r with (d := 0%L).
 rewrite fold_mat_nrows.
 rewrite fold_vect_size.
 rewrite Hvm.
-rewrite map2_diag.
+rewrite List_map2_diag.
 symmetry.
 erewrite map_ext_in. 2: {
   intros j Hj.

@@ -191,10 +191,10 @@ intros Hop *.
 unfold Rayleigh_quotient.
 unfold vect_dot_mul; cbn.
 unfold vect_dot_mul; cbn.
-do 3 rewrite map2_map_r.
-do 2 rewrite map2_map_l.
+do 3 rewrite List_map2_map_r.
+do 2 rewrite List_map2_map_l.
 f_equal. {
-  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
+  rewrite List_map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros (i, j) Hi; cbn.
     apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
@@ -202,7 +202,7 @@ f_equal. {
     now apply rngl_mul_0_l.
   }
   symmetry.
-  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
+  rewrite List_map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros (i, j) Hi.
     apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
@@ -210,7 +210,7 @@ f_equal. {
   }
   easy.
 } {
-  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
+  rewrite List_map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros (i, j) Hi; cbn.
     apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.
@@ -218,7 +218,7 @@ f_equal. {
     now apply rngl_mul_0_l.
   }
   symmetry.
-  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
+  rewrite List_map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros (i, j) Hi; cbn.
     apply in_combine_l in Hi.
     apply repeat_spec in Hi; subst i.

@@ -726,7 +726,7 @@ specialize (squ_mat_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
 rewrite det_is_det'; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
-  rewrite length_map2.
+  rewrite List_length_map2.
   do 2 rewrite length_map, fold_vect_size.
   rewrite Hu, Hv.
   now rewrite Nat.min_id.
@@ -742,7 +742,7 @@ unfold det'.
 remember (a × U + b × V)%V as UV eqn:HUV.
 assert (Hvm : vect_size UV = mat_nrows M). {
   rewrite Hr, HUV; cbn.
-  rewrite length_map2.
+  rewrite List_length_map2.
   do 2 rewrite length_map.
   do 2 rewrite fold_vect_size.
   rewrite Hu, Hv.
@@ -765,7 +765,7 @@ erewrite rngl_summation_eq_compat. 2: {
       now apply squ_mat_is_corr.
     } {
       subst UV; cbn.
-      rewrite length_map2.
+      rewrite List_length_map2.
       do 2 rewrite length_map.
       do 2 rewrite fold_vect_size.
       rewrite Hu, Hv, Nat.min_id.
@@ -919,7 +919,7 @@ destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 subst UV.
 cbn - [ mat_el ].
-rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
+rewrite List_map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   now rewrite length_map, fold_vect_size, Hu.
 } {
   now rewrite length_map, fold_vect_size, Hv.
@@ -1623,7 +1623,7 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
   rewrite (List_map_nth_seq [] lla).
   rewrite (List_map_nth_seq [] llb).
   rewrite Hra, Hrb.
-  do 2 rewrite <- map_butn.
+  do 2 rewrite <- List_map_butn.
   do 2 rewrite map_map.
   apply map_ext_in.
   intros u Hu.
@@ -1665,7 +1665,7 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
   rewrite (List_map_nth_seq [] lla).
   rewrite (List_map_nth_seq [] llc).
   rewrite Hra, Hrc.
-  do 2 rewrite <- map_butn.
+  do 2 rewrite <- List_map_butn.
   do 2 rewrite map_map.
   apply map_ext_in.
   intros u Hu.

@@ -856,7 +856,7 @@ intros.
 destruct la as [| b]; [ easy | ].
 cbn; f_equal.
 rewrite Nat.sub_0_r, app_nil_r.
-apply map2_rngl_add_0_l.
+apply List_map2_rngl_add_0_l.
 Qed.
 
 Theorem lap_add_const_r : ∀ a la, (la + [a])%lap = (hd 0 la + a)%L :: tl la.
@@ -865,7 +865,7 @@ intros.
 destruct la as [| b]; [ easy | ].
 cbn; f_equal.
 rewrite Nat.sub_0_r, app_nil_r.
-apply map2_rngl_add_0_r.
+apply List_map2_rngl_add_0_r.
 Qed.
 
 Theorem lap_convol_mul_x_l :
@@ -1115,11 +1115,11 @@ induction la as [| a]; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hca; subst lc.
   cbn.
   rewrite app_nil_r, Nat.sub_0_r.
-  apply map2_rngl_add_0_r.
+  apply List_map2_rngl_add_0_r.
 }
 destruct lc as [| c]. {
   cbn.
-  now do 2 rewrite app_nil_r, map2_rngl_add_0_r.
+  now do 2 rewrite app_nil_r, List_map2_rngl_add_0_r.
 }
 cbn.
 cbn in Hca |-*; f_equal.
@@ -1292,14 +1292,14 @@ revert lb.
 induction la as [| a]; intros. {
   cbn; rewrite Nat.sub_0_r, app_nil_r.
   rewrite fold_lap_add.
-  rewrite map2_rngl_add_0_l.
+  rewrite List_map2_rngl_add_0_l.
   now symmetry; apply lap_add_repeat_0_l.
 }
 cbn.
 destruct lb as [| b]. {
   cbn; rewrite app_nil_r, rngl_add_0_r; f_equal.
   rewrite fold_lap_add.
-  rewrite map2_rngl_add_0_r.
+  rewrite List_map2_rngl_add_0_r.
   now symmetry; apply lap_add_repeat_0_r.
 }
 cbn; f_equal.
@@ -1369,7 +1369,7 @@ induction la as [| a]; intros; cbn. {
 destruct lb as [| b]. {
   rewrite app_nil_l, repeat_length; cbn.
   rewrite rngl_add_0_r, app_nil_r.
-  now rewrite map2_rngl_add_0_r.
+  now rewrite List_map2_rngl_add_0_r.
 }
 cbn in Hba |-*; apply Nat.succ_le_mono in Hba.
 rewrite rngl_add_0_r; f_equal.
@@ -1619,7 +1619,7 @@ destruct lb as [| b]. {
   destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
     apply (rngl_eqb_eq Hed) in Hcz; subst c; cbn.
     rewrite app_nil_r; f_equal.
-    rewrite map2_rngl_add_0_r.
+    rewrite List_map2_rngl_add_0_r.
     rewrite fold_lap_add; symmetry.
     clear a.
     revert la Hba.
@@ -1637,7 +1637,7 @@ destruct lb as [| b]. {
   } {
     cbn; f_equal; clear c Hcz.
     rewrite app_nil_r, Nat.sub_0_r.
-    rewrite map2_rngl_add_0_r, fold_lap_add.
+    rewrite List_map2_rngl_add_0_r, fold_lap_add.
     symmetry.
     clear a.
     revert la Hba.
@@ -1871,7 +1871,7 @@ destruct su. {
   destruct lb as [| b]. {
     cbn - [ lap_subt ].
     rewrite rngl_add_0_r, app_nil_r.
-    rewrite map2_rngl_add_0_r.
+    rewrite List_map2_rngl_add_0_r.
     apply (lap_subt_0_r Hsu).
   }
   cbn.
@@ -2053,7 +2053,7 @@ Proof.
 intros * Hab.
 destruct la as [| a]; cbn in Hab. {
   rewrite Nat.sub_0_r, app_nil_r in Hab.
-  now rewrite map2_rngl_add_0_l in Hab.
+  now rewrite List_map2_rngl_add_0_l in Hab.
 }
 now destruct lb.
 Qed.
@@ -2314,7 +2314,7 @@ Proof.
 intros (la, lapr).
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r.
-rewrite map2_rngl_add_0_l.
+rewrite List_map2_rngl_add_0_l.
 now apply has_polyn_prop_lap_norm.
 Qed.
 
@@ -2778,7 +2778,7 @@ destruct lb as [| b]. {
     }
     now specialize (Hbef (S (S i)) Hi) as H1.
   }
-  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l, Hlb.
+  rewrite Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l, Hlb.
   f_equal.
   apply rngl_add_compat_l; symmetry.
   destruct i; [ easy | ].
@@ -2819,13 +2819,13 @@ destruct rngl_opt_one as [one| ]; [ cbn; clear H | easy ].
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H2.
   rewrite (H2 one), (rngl_eqb_refl Hed); cbn.
-  rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  rewrite fold_lap_norm, Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l.
   rewrite fold_lap_norm.
   destruct la as [| a]. {
     now cbn; rewrite rngl_add_0_l, (rngl_eqb_refl Hed).
   }
   cbn; rewrite rev_involutive.
-  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  rewrite Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l.
   now rewrite strip_0s_idemp, rngl_add_0_l.
 }
 specialize (H1 Hc1).
@@ -2836,7 +2836,7 @@ cbn.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   rewrite if_bool_if_dec.
-  rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+  rewrite Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ cbn | ]. 2: {
     now rewrite Hlb.
   }
@@ -2844,11 +2844,11 @@ destruct lb as [| b]. {
   now rewrite rngl_add_0_r, H1, Hlb.
 }
 cbn; rewrite rev_app_distr; cbn.
-rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+rewrite Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l.
 rewrite rev_app_distr; cbn.
 rewrite rev_involutive.
 rewrite if_bool_if_dec.
-rewrite Nat.sub_0_r, app_nil_r, map2_rngl_add_0_l.
+rewrite Nat.sub_0_r, app_nil_r, List_map2_rngl_add_0_l.
 rewrite Hlb.
 destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
 apply (rngl_eqb_eq Hed) in Hbz; subst b.
@@ -2913,7 +2913,7 @@ revert i lb Hab.
 induction la as [| a]; intros; cbn. {
   rewrite Nat.sub_0_r, app_nil_r.
   destruct (lt_dec i (length lb)) as [Hil| Hil]. {
-    rewrite (map2_nth 0%L 0%L); [ | now rewrite repeat_length | easy ].
+    rewrite (List_map2_nth 0%L 0%L); [ | now rewrite repeat_length | easy ].
     rewrite <- Hab, List_nth_nil.
     rewrite List_nth_repeat.
     destruct (lt_dec _ _) as [H| H]; [ clear H | easy ].
@@ -2928,12 +2928,12 @@ induction la as [| a]; intros; cbn. {
   }
   apply Nat.nlt_ge in Hil.
   apply nth_overflow.
-  now rewrite length_map2, repeat_length, Nat.min_id.
+  now rewrite List_length_map2, repeat_length, Nat.min_id.
 }
 destruct lb as [| b]. {
   cbn - [ nth ].
   rewrite app_nil_r, (rngl_subt_0_r Hsu).
-  rewrite (map2_rngl_subt_0_r Hsu); [ | easy ].
+  rewrite (List_map2_rngl_subt_0_r Hsu); [ | easy ].
   now rewrite Hab, List_nth_nil.
 }
 destruct i; cbn. {
@@ -2978,9 +2978,9 @@ induction la as [| a]; intros. {
   do 2 rewrite app_nil_r, Nat.sub_0_r.
   rewrite length_app.
   rewrite repeat_app.
-  rewrite map2_app_app; [ | apply repeat_length ].
+  rewrite List_map2_app_app; [ | apply repeat_length ].
   f_equal.
-  rewrite (map2_map_min 0%L 0%L).
+  rewrite (List_map2_map_min 0%L 0%L).
   rewrite repeat_length, Nat.min_id.
   symmetry.
   rewrite (List_map_map_seq 0%L).
@@ -3328,7 +3328,7 @@ do 3 rewrite rngl_add_0_l.
 rewrite app_nil_r.
 f_equal; f_equal.
 rewrite (lap_convol_mul_l_succ_l Hos).
-rewrite map2_rngl_add_0_l.
+rewrite List_map2_rngl_add_0_l.
 now symmetry; apply (lap_convol_mul_1_l Hos).
 Qed.
 

@@ -60,12 +60,12 @@ Definition lap_one : list T := [1%L].
 (* addition *)
 
 Definition lap_add la lb :=
-  map2 rngl_add
+  List_map2 rngl_add
     (la ++ repeat 0%L (length lb - length la))
     (lb ++ repeat 0%L (length la - length lb)).
 
 Definition lap_subt la lb :=
-  map2 rngl_subt
+  List_map2 rngl_subt
     (la ++ repeat 0%L (length lb - length la))
     (lb ++ repeat 0%L (length la - length lb)).
 
@@ -79,14 +79,14 @@ Definition lap_sub la lb :=
 
 Theorem fold_lap_add :
   ∀ la lb,
-  map2 rngl_add (la ++ repeat 0%L (length lb - length la))
+  List_map2 rngl_add (la ++ repeat 0%L (length lb - length la))
     (lb ++ repeat 0%L (length la - length lb)) =
   lap_add la lb.
 Proof. easy. Qed.
 
 Theorem fold_lap_subt :
   ∀ la lb,
-  map2 rngl_subt (la ++ repeat 0%L (length lb - length la))
+  List_map2 rngl_subt (la ++ repeat 0%L (length lb - length la))
     (lb ++ repeat 0%L (length la - length lb)) =
   lap_subt la lb.
 Proof. easy. Qed.
@@ -314,11 +314,11 @@ Qed.
 
 (**)
 
-Theorem map2_rngl_subt_0_r :
+Theorem List_map2_rngl_subt_0_r :
   rngl_has_subt T = true →
   ∀ n la,
   n = length la
-  → map2 rngl_subt la (repeat 0%L n) = la.
+  → List_map2 rngl_subt la (repeat 0%L n) = la.
 Proof.
 intros Hsu * Hn; subst n.
 induction la as [| la]; [ easy | cbn ].
@@ -345,7 +345,7 @@ intros Hsu *.
 unfold lap_subt.
 rewrite Nat.sub_0_r; cbn.
 rewrite app_nil_r.
-now apply (map2_rngl_subt_0_r Hsu).
+now apply (List_map2_rngl_subt_0_r Hsu).
 Qed.
 
 (**)
@@ -363,7 +363,7 @@ Theorem lap_add_length : ∀ la lb,
 Proof.
 intros.
 unfold lap_add.
-rewrite length_map2.
+rewrite List_length_map2.
 do 2 rewrite length_app, repeat_length.
 apply min_add_sub_max.
 Qed.
@@ -373,7 +373,7 @@ Theorem lap_subt_length : ∀ la lb,
 Proof.
 intros.
 unfold lap_subt.
-rewrite length_map2.
+rewrite List_length_map2.
 do 2 rewrite length_app, repeat_length.
 apply min_add_sub_max.
 Qed.
@@ -539,24 +539,24 @@ Theorem lap_add_comm : ∀ al1 al2,
 Proof.
 intros al1 al2.
 unfold lap_add.
-rewrite map2_swap.
-apply map2_ext_in.
+rewrite List_map2_swap.
+apply List_map2_ext_in.
 intros (a, b) Hab; cbn.
 apply rngl_add_comm.
 Qed.
 
 (* associativity of addition *)
 
-Theorem map2_rngl_add_0_l :
-  ∀ la, map2 rngl_add (repeat 0%L (length la)) la = la.
+Theorem List_map2_rngl_add_0_l :
+  ∀ la, List_map2 rngl_add (repeat 0%L (length la)) la = la.
 Proof.
 intros.
 induction la as [| la]; [ easy | cbn ].
 now rewrite rngl_add_0_l; f_equal.
 Qed.
 
-Theorem map2_rngl_add_0_r :
-  ∀ la, map2 rngl_add la (repeat 0%L (length la)) = la.
+Theorem List_map2_rngl_add_0_r :
+  ∀ la, List_map2 rngl_add la (repeat 0%L (length la)) = la.
 Proof.
 intros.
 induction la as [| la]; [ easy | cbn ].
@@ -573,31 +573,31 @@ cbn.
 destruct al2. {
   cbn.
   rewrite Nat.sub_0_r, app_nil_r.
-  rewrite length_map2, repeat_length, Nat.min_id.
-  rewrite length_map2, app_nil_r, repeat_length.
+  rewrite List_length_map2, repeat_length, Nat.min_id.
+  rewrite List_length_map2, app_nil_r, repeat_length.
   rewrite Nat.min_id.
-  rewrite map2_rngl_add_0_l.
+  rewrite List_map2_rngl_add_0_l.
   rewrite rngl_add_0_r.
   remember (al3 ++ _) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]; [ easy | ].
   f_equal.
-  now rewrite map2_rngl_add_0_r.
+  now rewrite List_map2_rngl_add_0_r.
 }
 destruct al3. {
   cbn.
   rewrite rngl_add_assoc; f_equal.
-  do 2 rewrite length_map2.
+  do 2 rewrite List_length_map2.
   rewrite app_nil_r, repeat_length, Nat.min_id.
-  rewrite map2_rngl_add_0_r, app_nil_r.
+  rewrite List_map2_rngl_add_0_r, app_nil_r.
   do 2 rewrite length_app, repeat_length.
   rewrite fold_lap_add.
   rewrite min_add_sub_max.
   rewrite <- lap_add_length.
-  now rewrite map2_rngl_add_0_r.
+  now rewrite List_map2_rngl_add_0_r.
 }
 cbn.
 rewrite rngl_add_assoc; f_equal.
-do 2 rewrite length_map2.
+do 2 rewrite List_length_map2.
 do 4 rewrite length_app, repeat_length.
 do 2 rewrite min_add_sub_max.
 do 2 rewrite fold_lap_add.
@@ -1233,15 +1233,15 @@ Qed.
 
 (* *)
 
-Theorem lap_norm_map2_app_app_idemp_l :
+Theorem lap_norm_List_map2_app_app_idemp_l :
   ∀ f, (∀ a, f a 0%L = a) →
   ∀ la lb,
   lap_norm
-    (map2 f
+    (List_map2 f
        (lap_norm la ++ repeat 0%L (length lb - length (lap_norm la)))
        (lb ++ repeat 0%L (length (lap_norm la) - length lb))) =
   lap_norm
-    (map2 f (la ++ repeat 0%L (length lb - length la))
+    (List_map2 f (la ++ repeat 0%L (length lb - length la))
        (lb ++ repeat 0%L (length la - length lb))).
 Proof.
 intros * Hf *.
@@ -1250,11 +1250,11 @@ revert la.
 induction lb as [| b]; intros. {
   cbn.
   do 2 rewrite app_nil_r, Nat.sub_0_r.
-  rewrite rev_map2. 2: {
+  rewrite List_rev_map2. 2: {
     unfold lap_norm.
     now rewrite repeat_length, length_rev.
   }
-  rewrite rev_map2; [ | symmetry; apply repeat_length ].
+  rewrite List_rev_map2; [ | symmetry; apply repeat_length ].
   do 2 rewrite List_rev_repeat.
   unfold lap_norm.
   rewrite rev_involutive, length_rev.
@@ -1291,14 +1291,14 @@ rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
 
-Theorem lap_norm_map2_app_app_idemp_r :
+Theorem lap_norm_List_map2_app_app_idemp_r :
   ∀ f, (∀ a, f a 0%L = a) →
   ∀ la lb,
   lap_norm
-    (map2 f (la ++ repeat 0%L (length (lap_norm lb) - length la))
+    (List_map2 f (la ++ repeat 0%L (length (lap_norm lb) - length la))
        (lap_norm lb ++ repeat 0%L (length la - length (lap_norm lb)))) =
   lap_norm
-    (map2 f (la ++ repeat 0%L (length lb - length la))
+    (List_map2 f (la ++ repeat 0%L (length lb - length la))
        (lb ++ repeat 0%L (length la - length lb))).
 Proof.
 intros * Hf *.
@@ -1309,11 +1309,11 @@ induction la as [| a]; intros. {
   do 2 rewrite app_nil_r, Nat.sub_0_r.
   rewrite length_rev.
   rewrite fold_lap_norm.
-  rewrite rev_map2. 2: {
+  rewrite List_rev_map2. 2: {
     unfold lap_norm.
     now rewrite repeat_length, length_rev.
   }
-  rewrite rev_map2; [ | apply repeat_length ].
+  rewrite List_rev_map2; [ | apply repeat_length ].
   do 2 rewrite List_rev_repeat.
   unfold lap_norm.
   rewrite rev_involutive.
@@ -1340,7 +1340,7 @@ destruct lc as [| c]. {
     apply (rngl_eqb_eq Heb) in Hbz.
     subst b; cbn.
     rewrite app_nil_r, Hf, Nat.sub_0_r.
-    rewrite rev_map2; [ | symmetry; apply repeat_length ].
+    rewrite List_rev_map2; [ | symmetry; apply repeat_length ].
     rewrite List_rev_repeat.
     now rewrite strip_0s_app.
   }
@@ -1358,7 +1358,7 @@ Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
 intros.
-apply lap_norm_map2_app_app_idemp_l.
+apply lap_norm_List_map2_app_app_idemp_l.
 apply rngl_add_0_r.
 Qed.
 
@@ -1368,7 +1368,7 @@ Theorem lap_subt_norm_idemp_l :
   lap_norm (lap_subt (lap_norm la) lb) = lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
-apply lap_norm_map2_app_app_idemp_l.
+apply lap_norm_List_map2_app_app_idemp_l.
 apply (rngl_subt_0_r Hsu).
 Qed.
 
@@ -1378,7 +1378,7 @@ Theorem lap_subt_norm_idemp_r :
   lap_norm (lap_subt la (lap_norm lb)) = lap_norm (lap_subt la lb).
 Proof.
 intros Hsu *.
-apply lap_norm_map2_app_app_idemp_r.
+apply lap_norm_List_map2_app_app_idemp_r.
 apply (rngl_subt_0_r Hsu).
 Qed.
 
@@ -1394,7 +1394,7 @@ induction k; intros. {
   destruct la as [| a]; cbn. {
     rewrite rngl_add_0_l, Nat.sub_0_r, app_nil_r.
     f_equal.
-    apply map2_rngl_add_0_l.
+    apply List_map2_rngl_add_0_l.
   }
   destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
   easy.
@@ -1402,12 +1402,12 @@ induction k; intros. {
   destruct la as [| a]; cbn. {
     rewrite rngl_add_0_l, Nat.sub_0_r, app_nil_r.
     f_equal.
-    apply map2_rngl_add_0_l.
+    apply List_map2_rngl_add_0_l.
   }
   destruct lb as [| b]; cbn. {
     rewrite app_nil_r, rngl_add_0_r.
     f_equal.
-    apply map2_rngl_add_0_r.
+    apply List_map2_rngl_add_0_r.
   }
   apply IHk.
 }
@@ -1451,7 +1451,7 @@ destruct lc as [| c]. {
   rewrite rngl_add_0_r.
   do 2 rewrite app_nil_r.
   do 3 rewrite Nat.sub_0_r.
-  now do 2 rewrite map2_rngl_add_0_r.
+  now do 2 rewrite List_map2_rngl_add_0_r.
 }
 move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
@@ -1510,7 +1510,7 @@ apply eq_lap_norm_eq_length. 2: {
   cbn.
   do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
   do 2 rewrite lap_convol_mul_length.
-  do 2 rewrite length_map2.
+  do 2 rewrite List_length_map2.
   do 4 rewrite length_app.
   do 2 rewrite lap_convol_mul_length.
   do 4 rewrite repeat_length.
@@ -1686,9 +1686,9 @@ destruct lb as [| b]. {
   cbn.
   destruct lc as [| c]; [ easy | ].
   cbn; rewrite Nat.sub_0_r.
-  rewrite rngl_add_0_r, app_nil_r, length_map2, repeat_length.
+  rewrite rngl_add_0_r, app_nil_r, List_length_map2, repeat_length.
   rewrite Nat.min_id, Nat.sub_0_r, lap_add_0_r.
-  now rewrite map2_rngl_add_0_r.
+  now rewrite List_map2_rngl_add_0_r.
 }
 destruct lc as [| c]; [ easy | ].
 move b before a; move c before b.
@@ -1746,7 +1746,7 @@ apply eq_lap_norm_eq_length. 2: {
   cbn; do 3 rewrite Nat.sub_0_r.
   do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
   rewrite lap_convol_mul_length.
-  do 2 rewrite length_map2.
+  do 2 rewrite List_length_map2.
   do 4 rewrite length_app, repeat_length.
   do 2 rewrite lap_convol_mul_length.
   do 2 rewrite min_add_sub_max.
@@ -1915,8 +1915,8 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   destruct j; [ easy | ].
   remember [one] as x; cbn in H3; subst x.
   unfold lap_add in H3.
-  cbn - [ map2 "-" ] in H3.
-  apply eq_map2_nil in H3.
+  cbn - [ List_map2 "-" ] in H3.
+  apply eq_List_map2_nil in H3.
   destruct H3 as [H3| H3]; [ easy | ].
   apply app_eq_nil in H3.
   destruct H3 as (H2, H3).
@@ -1930,9 +1930,9 @@ Qed.
 
 (* *)
 
-Theorem map2_rngl_subt_diag :
+Theorem List_map2_rngl_subt_diag :
   rngl_has_opp_or_subt T = true →
-  ∀ la, map2 rngl_subt la la = repeat 0%L (length la).
+  ∀ la, List_map2 rngl_subt la la = repeat 0%L (length la).
 Proof.
 intros Hos *.
 induction la as [| a]; [ easy | cbn ].
@@ -1962,7 +1962,7 @@ move Hos after Heb.
 unfold lap_sub.
 rewrite Hop, Hsu.
 unfold lap_add, lap_subt.
-rewrite length_map2.
+rewrite List_length_map2.
 do 2 rewrite length_app, repeat_length.
 rewrite min_add_sub_max.
 rewrite <- Nat.sub_min_distr_l.
@@ -1975,8 +1975,8 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   revert lb Hab.
   induction la as [| a]; intros; cbn. {
     rewrite Nat.sub_0_r.
-    rewrite map2_rngl_add_0_l.
-    now apply map2_rngl_subt_diag.
+    rewrite List_map2_rngl_add_0_l.
+    now apply List_map2_rngl_subt_diag.
   }
   destruct lb as [| b]; [ easy | cbn ].
   cbn in Hab.
@@ -1995,8 +1995,8 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   destruct lb as [| b]; cbn. {
     rewrite rngl_add_0_r.
     rewrite (rngl_subt_0_r Hsu); f_equal.
-    rewrite map2_rngl_add_0_r.
-    now apply (map2_rngl_subt_0_r Hsu).
+    rewrite List_map2_rngl_add_0_r.
+    now apply (List_map2_rngl_subt_0_r Hsu).
   }
   cbn in Hab.
   apply Nat.succ_le_mono in Hab.
@@ -2027,7 +2027,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 }
 move Hos after Heb.
 unfold lap_subt, lap_add.
-do 2 rewrite length_map2.
+do 2 rewrite List_length_map2.
 do 4 rewrite length_app, repeat_length.
 do 2 rewrite <- Nat.sub_min_distr_r.
 destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
@@ -2046,39 +2046,39 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     assert (Hac : length la ≤ length lc) by now transitivity (length lb).
     rewrite (proj2 (Nat.sub_0_le _ _) Hac).
     do 2 rewrite app_nil_r.
-    rewrite (map2_map2_seq_r 0%L).
-    rewrite length_map2, length_app, repeat_length.
+    rewrite (List_map2_map2_seq_r 0%L).
+    rewrite List_length_map2, length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-    rewrite (map2_map2_seq_l 0%L).
+    rewrite (List_map2_map2_seq_l 0%L).
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     symmetry.
-    rewrite (map2_map2_seq_r 0%L).
-    rewrite (map2_map2_seq_l 0%L).
+    rewrite (List_map2_map2_seq_r 0%L).
+    rewrite (List_map2_map2_seq_l 0%L).
     rewrite length_app, repeat_length.
-    rewrite length_map2, length_app, repeat_length.
+    rewrite List_length_map2, length_app, repeat_length.
     rewrite (Nat.add_sub_assoc (length la)); [ | easy ].
     rewrite (Nat.add_comm (length la)), Nat.add_sub, Nat.min_id.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     symmetry.
-    apply map2_ext_in.
+    apply List_map2_ext_in.
     intros (i, j) Hi; cbn.
     assert (H : i = j) by now apply in_combine_same in Hi.
     subst j.
     apply in_combine_l in Hi.
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     do 2 rewrite List_nth_app_repeat_r.
-    rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+    rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
       rewrite length_app, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub.
     }
     rewrite List_nth_app_repeat_r.
     destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-      rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+      rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
         rewrite length_app, repeat_length.
         rewrite Nat.add_sub_assoc; [ | easy ].
         now rewrite Nat.add_comm, Nat.add_sub.
@@ -2094,8 +2094,8 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     rewrite nth_overflow; [ | easy ].
     rewrite nth_overflow; [ | easy ].
     rewrite rngl_add_0_l.
-    rewrite (nth_overflow (map2 _ _ _)). 2: {
-      rewrite length_map2, length_app, repeat_length.
+    rewrite (nth_overflow (List_map2 _ _ _)). 2: {
+      rewrite List_length_map2, length_app, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
     }
@@ -2111,39 +2111,39 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   destruct (le_dec (length la) (length lc)) as [Hac| Hac]. {
     rewrite (proj2 (Nat.sub_0_le _ _) Hac).
     do 2 rewrite app_nil_r.
-    rewrite (map2_map2_seq_r 0%L).
-    rewrite length_map2, length_app, repeat_length.
+    rewrite (List_map2_map2_seq_r 0%L).
+    rewrite List_length_map2, length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-    rewrite (map2_map2_seq_l 0%L).
+    rewrite (List_map2_map2_seq_l 0%L).
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     symmetry.
-    rewrite (map2_map2_seq_r 0%L).
-    rewrite (map2_map2_seq_l 0%L).
+    rewrite (List_map2_map2_seq_r 0%L).
+    rewrite (List_map2_map2_seq_l 0%L).
     rewrite length_app, repeat_length.
-    rewrite length_map2, length_app, repeat_length.
+    rewrite List_length_map2, length_app, repeat_length.
     rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
     rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
     rewrite Nat.add_sub_assoc; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     symmetry.
-    apply map2_ext_in.
+    apply List_map2_ext_in.
     intros (i, j) Hi; cbn.
     assert (H : i = j) by now apply in_combine_same in Hi.
     subst j.
     apply in_combine_l in Hi.
     apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
     do 2 rewrite List_nth_app_repeat_r.
-    rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+    rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
       rewrite length_app, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub.
     }
     rewrite List_nth_app_repeat_r.
     destruct (lt_dec i (length la)) as [Hila| Hila]. {
-      rewrite (map2_nth 0%L 0%L); [ | easy | ]. 2: {
+      rewrite (List_map2_nth 0%L 0%L); [ | easy | ]. 2: {
         rewrite length_app, repeat_length.
         rewrite Nat.add_sub_assoc; [ | easy ].
         now rewrite Nat.add_comm, Nat.add_sub.
@@ -2159,8 +2159,8 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
     rewrite nth_overflow; [ | easy ].
     rewrite nth_overflow; [ | easy ].
     rewrite rngl_add_0_l.
-    rewrite (nth_overflow (map2 _ _ _)). 2: {
-      rewrite length_map2, length_app, repeat_length.
+    rewrite (nth_overflow (List_map2 _ _ _)). 2: {
+      rewrite List_length_map2, length_app, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
     }
@@ -2170,39 +2170,39 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   apply Nat.lt_le_incl in Hac.
   rewrite (proj2 (Nat.sub_0_le _ _) Hac).
   do 2 rewrite app_nil_r.
-  rewrite (map2_map2_seq_r 0%L).
-  rewrite length_app, length_map2, length_app.
+  rewrite (List_map2_map2_seq_r 0%L).
+  rewrite length_app, List_length_map2, length_app.
   do 2 rewrite repeat_length.
   rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
   rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
-  rewrite (map2_map2_seq_l 0%L).
+  rewrite (List_map2_map2_seq_l 0%L).
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   symmetry.
-  rewrite (map2_map2_seq_r 0%L).
-  rewrite (map2_map2_seq_l 0%L).
+  rewrite (List_map2_map2_seq_r 0%L).
+  rewrite (List_map2_map2_seq_l 0%L).
   rewrite length_app, repeat_length.
-  rewrite length_map2, length_app, repeat_length.
+  rewrite List_length_map2, length_app, repeat_length.
   rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
   rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   symmetry.
-  apply map2_ext_in.
+  apply List_map2_ext_in.
   intros (i, j) Hi; cbn.
   assert (H : i = j) by now apply in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
   do 2 rewrite List_nth_app_repeat_r.
-  rewrite (map2_nth 0%L 0%L _ _ la); [ | easy | ]. 2: {
+  rewrite (List_map2_nth 0%L 0%L _ _ la); [ | easy | ]. 2: {
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   rewrite List_nth_app_repeat_r.
   destruct (lt_dec i (length lc)) as [Hilc| Hilc]. {
-    rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+    rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
       rewrite length_app, repeat_length.
       rewrite Nat.add_sub_assoc; [ | easy ].
       now rewrite Nat.add_comm, Nat.add_sub.
@@ -2218,8 +2218,8 @@ destruct (le_dec (length lb) (length lc)) as [Hbc| Hbc]. {
   rewrite (nth_overflow lc); [ | easy ].
   rewrite (nth_overflow lb); [ | easy ].
   do 2 rewrite (rngl_subt_0_r Hsu).
-  rewrite (nth_overflow (map2 _ _ _)). 2: {
-    rewrite length_map2, length_app, repeat_length.
+  rewrite (nth_overflow (List_map2 _ _ _)). 2: {
+    rewrite List_length_map2, length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     now rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
   }
@@ -2241,38 +2241,38 @@ destruct (le_dec (length la) (length lb)) as [Hab| Hab]. {
   do 2 rewrite Nat.min_id.
   rewrite (proj2 (Nat.sub_0_le _ _) Hbc).
   do 2 rewrite app_nil_r.
-  rewrite (map2_map2_seq_r 0%L).
-  rewrite length_map2, length_app, repeat_length.
+  rewrite (List_map2_map2_seq_r 0%L).
+  rewrite List_length_map2, length_app, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
-  rewrite (map2_map2_seq_l 0%L).
+  rewrite (List_map2_map2_seq_l 0%L).
   rewrite length_app, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   symmetry.
-  rewrite (map2_map2_seq_r 0%L).
-  rewrite (map2_map2_seq_l 0%L).
+  rewrite (List_map2_map2_seq_r 0%L).
+  rewrite (List_map2_map2_seq_l 0%L).
   rewrite length_app, repeat_length.
-  rewrite length_map2, length_app, repeat_length.
+  rewrite List_length_map2, length_app, repeat_length.
   rewrite (Nat.add_sub_assoc (length la)); [ | easy ].
   rewrite (Nat.add_comm (length la)), Nat.add_sub, Nat.min_id.
   rewrite (Nat.add_sub_assoc (length lc)); [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   symmetry.
-  apply map2_ext_in.
+  apply List_map2_ext_in.
   intros (i, j) Hi; cbn.
   assert (H : i = j) by now apply in_combine_same in Hi.
   subst j.
   apply in_combine_l in Hi.
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
   do 2 rewrite List_nth_app_repeat_r.
-  rewrite (map2_nth 0%L 0%L); [ | easy | ]. 2: {
+  rewrite (List_map2_nth 0%L 0%L); [ | easy | ]. 2: {
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     now rewrite Nat.add_comm, Nat.add_sub.
   }
   rewrite List_nth_app_repeat_r.
-  rewrite (map2_nth 0%L 0%L); [ | | easy ]. 2: {
+  rewrite (List_map2_nth 0%L 0%L); [ | | easy ]. 2: {
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     now rewrite Nat.add_comm, Nat.add_sub.
@@ -2292,40 +2292,40 @@ rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
 rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
 rewrite (proj2 (Nat.sub_0_le _ _) Hca).
 rewrite app_nil_r, Nat.min_id.
-rewrite (map2_map2_seq_l 0%L).
-rewrite (map2_map2_seq_r 0%L).
+rewrite (List_map2_map2_seq_l 0%L).
+rewrite (List_map2_map2_seq_r 0%L).
 rewrite length_app, repeat_length.
-rewrite length_map2.
+rewrite List_length_map2.
 rewrite length_app, repeat_length.
 rewrite (Nat.add_sub_assoc (length lc)); [ | easy ].
 rewrite (Nat.add_comm (length lc)), Nat.add_sub, Nat.min_id.
 rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
 rewrite (Nat.add_comm (length lb)), Nat.add_sub.
 symmetry.
-rewrite (map2_map2_seq_r 0%L).
-rewrite (map2_map2_seq_l 0%L).
+rewrite (List_map2_map2_seq_r 0%L).
+rewrite (List_map2_map2_seq_l 0%L).
 rewrite length_app, repeat_length.
-rewrite length_map2, length_app, repeat_length.
+rewrite List_length_map2, length_app, repeat_length.
 rewrite (Nat.add_sub_assoc (length lb)); [ | easy ].
 rewrite (Nat.add_comm (length lb)), Nat.add_sub, Nat.min_id.
 rewrite Nat.add_sub_assoc; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
 symmetry.
-apply map2_ext_in.
+apply List_map2_ext_in.
 intros (i, j) Hi; cbn.
 assert (H : i = j) by now apply in_combine_same in Hi.
 subst j.
 apply in_combine_l in Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 do 2 rewrite List_nth_app_repeat_r.
-rewrite (map2_nth 0%L 0%L _ _ la); [ | easy | ]. 2: {
+rewrite (List_map2_nth 0%L 0%L _ _ la); [ | easy | ]. 2: {
   rewrite length_app, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 rewrite List_nth_app_repeat_r.
 destruct (lt_dec i (length lb)) as [Hilb| Hilb]. {
-  rewrite (map2_nth 0%L 0%L); [ | easy | ]. 2: {
+  rewrite (List_map2_nth 0%L 0%L); [ | easy | ]. 2: {
     rewrite length_app, repeat_length.
     rewrite Nat.add_sub_assoc; [ | easy ].
     now rewrite Nat.add_comm, Nat.add_sub.
@@ -2341,8 +2341,8 @@ assert (Hilc : length lc ≤ i) by now transitivity (length lb).
 rewrite (nth_overflow lc); [ | easy ].
 rewrite (nth_overflow lb); [ | easy ].
 do 2 rewrite (rngl_subt_0_r Hsu).
-rewrite (nth_overflow (map2 _ _ _)). 2: {
-  rewrite length_map2, length_app, repeat_length.
+rewrite (nth_overflow (List_map2 _ _ _)). 2: {
+  rewrite List_length_map2, length_app, repeat_length.
   rewrite Nat.add_sub_assoc; [ | easy ].
   now rewrite Nat.add_comm, Nat.add_sub, Nat.min_id.
 }
@@ -2632,7 +2632,7 @@ destruct lc as [| c]. {
   rewrite rngl_add_0_r.
   do 2 rewrite app_nil_r.
   do 3 rewrite Nat.sub_0_r.
-  now do 2 rewrite map2_rngl_add_0_r.
+  now do 2 rewrite List_map2_rngl_add_0_r.
 }
 move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
@@ -2722,12 +2722,12 @@ destruct lb as [| b]. {
   move c before a.
   remember (lap_convol_mul _ _ _ _) as x.
   cbn; subst x.
-  rewrite length_map2, repeat_length, Nat.min_id.
-  cbn - [ map2 repeat ].
+  rewrite List_length_map2, repeat_length, Nat.min_id.
+  cbn - [ List_map2 repeat ].
   rewrite lap_convol_mul_length.
   remember (length la + S (length lc)) as n eqn:Hn.
-  rewrite (map2_rngl_subt_0_l Hsu); [ | easy ].
-  rewrite (map2_rngl_subt_0_l Hsu). 2: {
+  rewrite (List_map2_rngl_subt_0_l Hsu); [ | easy ].
+  rewrite (List_map2_rngl_subt_0_l Hsu). 2: {
     symmetry; apply lap_convol_mul_length.
   }
   apply (lap_convol_mul_map_r Hos). {
@@ -2741,20 +2741,20 @@ destruct lb as [| b]. {
 }
 move b before a.
 destruct lc as [| c]. {
-  cbn - [ map2 repeat ].
+  cbn - [ List_map2 repeat ].
   do 3 rewrite Nat.sub_0_r.
   do 2 rewrite app_nil_r.
-  rewrite length_map2, repeat_length, Nat.min_id.
+  rewrite List_length_map2, repeat_length, Nat.min_id.
   rewrite lap_convol_mul_length.
   remember (lap_convol_mul _ _ _ _) as x.
   cbn; subst x.
-  rewrite (map2_rngl_subt_0_r Hsu); [ | easy ].
-  rewrite (map2_rngl_subt_0_r Hsu); [ easy | ].
+  rewrite (List_map2_rngl_subt_0_r Hsu); [ | easy ].
+  rewrite (List_map2_rngl_subt_0_r Hsu); [ easy | ].
   symmetry; apply lap_convol_mul_length.
 }
 remember (lap_convol_mul _ _ _ _) as x; cbn; subst x.
 do 2 rewrite lap_convol_mul_length.
-rewrite length_map2.
+rewrite List_length_map2.
 do 3 rewrite Nat.sub_0_r.
 do 2 rewrite length_app.
 do 2 rewrite repeat_length.
@@ -2764,7 +2764,7 @@ rewrite (Nat.add_comm _ (length la)).
 rewrite (Nat.add_comm (length la) (S (length lb))).
 rewrite Nat.sub_add_distr, Nat.add_sub, Nat.sub_succ.
 rewrite (Nat.add_comm _ (length la)).
-cbn - [ map2 ].
+cbn - [ List_map2 ].
 ...
 Theorem lap_convol_mul_map2 :
   rngl_has_opp_or_subt T = true
@@ -2773,8 +2773,8 @@ Theorem lap_convol_mul_map2 :
     → (∀ a b c, f a (b + c)%L = f a (f b c))
     → ∀ (la lb lc : list T) (i len : nat),
       length lb = length lc
-      → lap_convol_mul la (map2 f lb lc) i len =
-        map2 f
+      → lap_convol_mul la (List_map2 f lb lc) i len =
+        List_map2 f
           (lap_convol_mul la lb i len)
           (lap_convol_mul la lc i len).
 Proof.
@@ -2798,7 +2798,7 @@ induction i; intros. {
     apply length_zero_iff_nil in Hbc; subst lc; cbn.
     now rewrite (rngl_mul_0_r Hos).
   }
-  rewrite (map2_nth 0%L 0%L); [ | easy | congruence ].
+  rewrite (List_map2_nth 0%L 0%L); [ | easy | congruence ].
   apply Hfm.
 }
 destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]. {
@@ -2862,7 +2862,7 @@ rewrite (lap_convol_mul_map2 Hos).
 Search (rngl_subt (_ + _)%L _).
 Check rngl_add_sub.
 ...
-rewrite (map2_map_min 0%L 0%L (lap_convol_mul _ _ _ _ ++ _)).
+rewrite (List_map2_map_min 0%L 0%L (lap_convol_mul _ _ _ _ ++ _)).
 ...
 intros Hsu *.
 apply eq_lap_norm_eq_length. 2: {
@@ -2872,23 +2872,23 @@ apply eq_lap_norm_eq_length. 2: {
     rewrite lap_mul_0_r.
     cbn - [ lap_mul ].
     do 2 rewrite Nat.sub_0_r, app_nil_r.
-    rewrite length_map2, repeat_length, Nat.min_id.
+    rewrite List_length_map2, repeat_length, Nat.min_id.
     do 2 rewrite lap_mul_length.
-    now cbn; rewrite length_map2, repeat_length, Nat.min_id.
+    now cbn; rewrite List_length_map2, repeat_length, Nat.min_id.
   }
   destruct lc as [| c]. {
     rewrite lap_mul_0_r.
     cbn - [ lap_mul ].
     rewrite Nat.sub_0_r.
     do 2 rewrite app_nil_r.
-    rewrite length_map2, repeat_length, Nat.min_id.
+    rewrite List_length_map2, repeat_length, Nat.min_id.
     do 2 rewrite lap_mul_length.
-    now cbn; rewrite length_map2, repeat_length, Nat.min_id.
+    now cbn; rewrite List_length_map2, repeat_length, Nat.min_id.
   }
   cbn.
   do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
   do 2 rewrite lap_convol_mul_length.
-  do 2 rewrite length_map2.
+  do 2 rewrite List_length_map2.
   do 4 rewrite length_app.
   do 2 rewrite lap_convol_mul_length.
   do 4 rewrite repeat_length.

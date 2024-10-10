@@ -3,7 +3,8 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith Psatz.
-Import List List.ListNotations Init.Nat.
+Import List.ListNotations Init.Nat.
+Open Scope list.
 
 Global Hint Resolve Nat.le_0_l : core.
 Global Hint Resolve Nat.lt_0_succ : core.
@@ -16,9 +17,9 @@ Notation "n !" := (fact n) (at level 1, format "n !").
 
 Notation "x '∈' l" := (List.In x l) (at level 70).
 Notation "x '∉' l" := (¬ List.In x l) (at level 70).
-Notation "E ⊂ F" := (incl E F) (at level 70).
+Notation "E ⊂ F" := (List.incl E F) (at level 70).
 
-Notation "l .( i )" := (nth (i - 1) l 0) (at level 1, format "l .( i )").
+Notation "l .( i )" := (List.nth (i - 1) l 0) (at level 1, format "l .( i )").
 
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%nat (at level 70, y at next level) :
                           nat_scope.
@@ -44,13 +45,13 @@ Proof. now intros; destruct a. Qed.
 
 Theorem eq_list_eq : ∀ {A} d (la lb : list A),
   length la = length lb
-  → (∀ i, i < length la → nth i la d = nth i lb d)
+  → (∀ i, i < length la → List.nth i la d = List.nth i lb d)
   → la = lb.
 Proof.
 intros * Hlab Hab.
 revert lb Hlab Hab.
 induction la as [| a]; intros. {
-  now symmetry in Hlab; apply length_zero_iff_nil in Hlab.
+  now symmetry in Hlab; apply List.length_zero_iff_nil in Hlab.
 }
 destruct lb as [| b]; [ easy | ].
 cbn in Hlab; apply Nat.succ_inj in Hlab.
@@ -63,7 +64,7 @@ Qed.
 
 Theorem List_fold_left_map :
   ∀ A B C (f : A → B → A) (g : C → B) (l : list C) a,
-  fold_left f (map g l) a = fold_left (λ c b, f c (g b)) l a.
+  List.fold_left f (List.map g l) a = List.fold_left (λ c b, f c (g b)) l a.
 Proof.
 intros.
 revert a.
@@ -76,13 +77,13 @@ Definition AllLt l u := ∀ i, i ∈ l → i < u.
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
 
-Definition iter_list {A B} (l : list B) f (d : A) := fold_left f l d.
+Definition iter_list {A B} (l : list B) f (d : A) := List.fold_left f l d.
 
 (* iterations in indexed sequences
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i = b, e), f i", "Π (i = b, e), f i" *)
 
-Definition iter_seq {T} b e f (d : T) := iter_list (seq b (S e - b)) f d.
+Definition iter_seq {T} b e f (d : T) := iter_list (List.seq b (S e - b)) f d.
 
 Arguments iter_seq : simpl never.
 Arguments iter_list : simpl never.
@@ -103,15 +104,15 @@ Notation "'Max' ( i ∈ l ) , g" :=
 *)
 
 Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
-  fold_left f l d = iter_list l f d.
+  List.fold_left f l d = iter_list l f d.
 Proof. easy. Qed.
 
 Theorem fold_iter_seq : ∀ A b e f (d : A),
-  iter_list (seq b (S e - b)) f d = iter_seq b e f d.
+  iter_list (List.seq b (S e - b)) f d = iter_seq b e f d.
 Proof. easy. Qed.
 
 Theorem fold_iter_seq' : ∀ A b len f (d : A),
-  iter_list (seq b len) f d =
+  iter_list (List.seq b len) f d =
     if b + len =? 0 then d
     else iter_seq b (b + len - 1) f d.
 Proof.
@@ -135,7 +136,7 @@ flia.
 Qed.
 
 Theorem List_seq_shift' : ∀ i sta len,
-  map (Nat.add i) (seq sta len) = seq (i + sta) len.
+  List.map (Nat.add i) (List.seq sta len) = List.seq (i + sta) len.
 Proof.
 intros.
 revert i sta.
@@ -146,13 +147,13 @@ now rewrite <- Nat.add_succ_comm.
 Qed.
 
 Theorem List_seq_cut : ∀ i sta len,
-  i ∈ seq sta len
-  → seq sta len = seq sta (i - sta) ++ seq i (sta + len - i).
+  i ∈ List.seq sta len
+  → List.seq sta len = List.seq sta (i - sta) ++ List.seq i (sta + len - i).
 Proof.
 intros * His.
-apply in_seq in His.
+apply List.in_seq in His.
 replace len with (i - sta + (len - (i - sta))) at 1 by flia His.
-rewrite seq_app.
+rewrite List.seq_app.
 f_equal.
 replace (sta + (i - sta)) with i by flia His.
 f_equal.
@@ -160,17 +161,18 @@ flia His.
 Qed.
 
 Theorem List_seq_cut3 : ∀ i sta len,
-  i ∈ seq sta len
-  → seq sta len = seq sta (i - sta) ++ [i] ++ seq (S i) (sta + len - S i).
+  i ∈ List.seq sta len
+  → List.seq sta len =
+      List.seq sta (i - sta) ++ [i] ++ List.seq (S i) (sta + len - S i).
 Proof.
 intros * His.
-apply in_seq in His.
+apply List.in_seq in His.
 replace len with (i - sta + (len - (i - sta))) at 1 by flia His.
-rewrite seq_app.
+rewrite List.seq_app.
 f_equal.
 replace (sta + (i - sta)) with i by flia His.
 replace (len - (i - sta)) with (1 + (sta + len - S i)) by flia His.
-rewrite seq_app; cbn.
+rewrite List.seq_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
@@ -187,14 +189,14 @@ remember (S k - b)%nat as len; clear Heqlen.
 clear k Hbk.
 revert b d Hsb.
 induction len; intros; [ easy | ].
-rewrite seq_S; symmetry.
-rewrite seq_S; symmetry.
-do 2 rewrite fold_left_app; cbn.
+rewrite List.seq_S; symmetry.
+rewrite List.seq_S; symmetry.
+do 2 rewrite List.fold_left_app; cbn.
 rewrite IHlen; [ | easy ].
 now replace (s + (b - s + len)) with (b + len) by flia Hsb.
 Qed.
 
-Theorem fold_right_max_ge : ∀ m l, m ≤ fold_right max m l.
+Theorem fold_right_max_ge : ∀ m l, m ≤ List.fold_right max m l.
 Proof.
 intros.
 induction l as [| a]; [ easy | cbn ].
@@ -358,20 +360,20 @@ Proof. easy. Qed.
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
 
-Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
+Theorem List_hd_nth_0 {A} : ∀ l (d : A), List.hd d l = List.nth 0 l d.
 Proof. intros; now destruct l. Qed.
 
-Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → hd d l ∈ l.
+Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → List.hd d l ∈ l.
 Proof.
 intros.
 rewrite List_hd_nth_0.
-now apply nth_In.
+now apply List.nth_In.
 Qed.
 
 Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
   length l = length l'
-  → (∀ i, i < length l → f (nth i l d) = g (nth i l' d))
-  → map f l = map g l'.
+  → (∀ i, i < length l → f (List.nth i l d) = g (List.nth i l' d))
+  → List.map f l = List.map g l'.
 Proof.
 intros * Hlen Hf.
 revert l' Hlen Hf.
@@ -386,18 +388,18 @@ apply Hf with (i := S i); cbn.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
-Theorem List_nth_nil : ∀ A i (d : A), nth i [] d = d.
+Theorem List_nth_nil : ∀ A i (d : A), List.nth i [] d = d.
 Proof. now intros; destruct i. Qed.
 
-Theorem List_nth_0_cons : ∀ A (a : A) la d, nth 0 (a :: la) d = a.
+Theorem List_nth_0_cons : ∀ A (a : A) la d, List.nth 0 (a :: la) d = a.
 Proof. easy. Qed.
 
 Theorem List_nth_succ_cons : ∀ {A} (a : A) la i,
-  nth (S i) (a :: la) = nth i la.
+  List.nth (S i) (a :: la) = List.nth i la.
 Proof. easy. Qed.
 
 Theorem List_map_nth' : ∀ {A B} a b (f : A → B) l n,
-  n < length l → nth n (map f l) b = f (nth n l a).
+  n < length l → List.nth n (List.map f l) b = f (List.nth n l a).
 Proof.
 intros * Hnl.
 revert n Hnl.
@@ -409,7 +411,7 @@ now apply IHl.
 Qed.
 
 Theorem List_map_hd : ∀ {A B} a b (f : A → B) l,
-  0 < length l → hd b (map f l) = f (hd a l).
+  0 < length l → List.hd b (List.map f l) = f (List.hd a l).
 Proof.
 intros.
 do 2 rewrite List_hd_nth_0.
@@ -417,45 +419,46 @@ now apply List_map_nth'.
 Qed.
 
 Theorem List_map_tl : ∀ A B (f : A → B) l,
-  tl (map f l) = map f (tl l).
+  List.tl (List.map f l) = List.map f (List.tl l).
 Proof. now intros; destruct l. Qed.
 
 Theorem List_app_cons : ∀ A la lb (b : A), la ++ b :: lb = la ++ [b] ++ lb.
 Proof. easy. Qed.
 
 Theorem List_app_hd1 : ∀ A (l l' : list A) d,
-  0 < length l → hd d (l ++ l') = hd d l.
+  0 < length l → List.hd d (l ++ l') = List.hd d l.
 Proof.
 intros.
 do 2 rewrite List_hd_nth_0.
-now apply app_nth1.
+now apply List.app_nth1.
 Qed.
 
 Theorem List_app_hd2 : ∀ A (l l' : list A) d,
-  length l = 0 → hd d (l ++ l') = hd d l'.
+  length l = 0 → List.hd d (l ++ l') = List.hd d l'.
 Proof.
 intros.
 do 2 rewrite List_hd_nth_0.
-rewrite app_nth2; [ easy | ].
+rewrite List.app_nth2; [ easy | ].
 now apply Nat.le_0_r.
 Qed.
 
-Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
+Theorem List_seq_eq_nil : ∀ b len, List.seq b len = [] → len = 0.
 Proof.
 intros * Hb.
 now induction len.
 Qed.
 
-Theorem List_seq_hd : ∀ len start d, 0 < len → hd d (seq start len) = start.
+Theorem List_seq_hd :
+  ∀ len start d, 0 < len → List.hd d (List.seq start len) = start.
 Proof.
 intros.
 rewrite List_hd_nth_0.
-rewrite seq_nth; [ | easy ].
+rewrite List.seq_nth; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
 Theorem List_filter_nil_iff {A} : ∀ f (l : list A),
-  filter f l = [] ↔ (∀ a, a ∈ l → f a = false).
+  List.filter f l = [] ↔ (∀ a, a ∈ l → f a = false).
 Proof.
 intros.
 split. {
@@ -483,49 +486,49 @@ Theorem List_cons_is_app : ∀ {A} (a : A) la, a :: la = [a] ++ la.
 Proof. easy. Qed.
 
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
-  map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
+  List.map f (List.seq sta len) = List.map (λ i, f (sta + i)) (List.seq 0 len).
 Proof.
 intros.
 revert sta.
 induction len; intros; [ easy | cbn ].
 symmetry.
-rewrite <- seq_shift, map_map.
+rewrite <- List.seq_shift, List.map_map.
 rewrite Nat.add_0_r; f_equal.
 symmetry.
 rewrite IHlen.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 now rewrite Nat.add_succ_comm.
 Qed.
 
-(* map2: map with two lists *)
+(* List_map2: map with two lists *)
 
-Fixpoint map2 {A B C} (f : A → B → C) la lb :=
+Fixpoint List_map2 {A B C} (f : A → B → C) la lb :=
   match la with
   | [] => []
   | a :: la' =>
       match lb with
       | [] => []
-      | b :: lb' => f a b :: map2 f la' lb'
+      | b :: lb' => f a b :: List_map2 f la' lb'
       end
   end.
 
-Theorem map2_nil_l : ∀ A B C (f : A → B → C) la, map2 f [] la = [].
+Theorem List_map2_nil_l : ∀ A B C (f : A → B → C) la, List_map2 f [] la = [].
 Proof.
 intros.
 now destruct la.
 Qed.
 
-Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].
+Theorem List_map2_nil_r : ∀ A B C (f : A → B → C) la, List_map2 f la [] = [].
 Proof.
 intros.
 now destruct la.
 Qed.
 
-Theorem map2_nth : ∀ {A B C} a b c (f : A → B → C) la lb n,
+Theorem List_map2_nth : ∀ {A B C} a b c (f : A → B → C) la lb n,
   n < length la
   → n < length lb
-  → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
+  → List.nth n (List_map2 f la lb) c = f (List.nth n la a) (List.nth n lb b).
 Proof.
 intros * Hla Hlb.
 revert n lb Hla Hlb.
@@ -539,15 +542,15 @@ destruct n; [ now apply IHla | ].
 now apply IHla.
 Qed.
 
-Theorem map2_nth2 : ∀ A B C a b c (f : A → B → C) la lb n,
+Theorem List_map2_nth2 : ∀ A B C a b c (f : A → B → C) la lb n,
   (∀ b, f a b = c)
   → (∀ a, f a b = c)
-  → nth n (map2 f la lb) c = f (nth n la a) (nth n lb b).
+  → List.nth n (List_map2 f la lb) c = f (List.nth n la a) (List.nth n lb b).
 Proof.
 intros * Hac Hbc.
 destruct (lt_dec n (length la)) as [Hla| Hla]. 2: {
   apply Nat.nlt_ge in Hla.
-  rewrite (nth_overflow la); [ | easy ].
+  rewrite (List.nth_overflow la); [ | easy ].
   rewrite Hac.
   revert n lb Hla.
   induction la as [| a']; intros; [ now destruct n | cbn ].
@@ -558,12 +561,12 @@ destruct (lt_dec n (length la)) as [Hla| Hla]. 2: {
 }
 destruct (lt_dec n (length lb)) as [Hlb| Hlb]. 2: {
   apply Nat.nlt_ge in Hlb.
-  rewrite (nth_overflow lb); [ | easy ].
+  rewrite (List.nth_overflow lb); [ | easy ].
   rewrite Hbc.
   clear Hla.
   revert n la Hlb.
   induction lb as [| b']; intros. {
-    rewrite map2_nil_r.
+    rewrite List_map2_nil_r.
     now destruct n.
   }
   destruct n; [ easy | ].
@@ -582,8 +585,8 @@ destruct n; [ now apply IHla | ].
 now apply IHla.
 Qed.
 
-Theorem map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
-  map2 f (map g la) lb = map2 (λ a b, f (g a) b) la lb.
+Theorem List_map2_map_l : ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
+  List_map2 f (List.map g la) lb = List_map2 (λ a b, f (g a) b) la lb.
 Proof.
 intros.
 revert lb.
@@ -593,8 +596,8 @@ f_equal.
 apply IHla.
 Qed.
 
-Theorem map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
-  map2 f la (map g lb) = map2 (λ a b, f a (g b)) la lb.
+Theorem List_map2_map_r : ∀ A B C D (f : A → C → D) g (la : list A) (lb : list B),
+  List_map2 f la (List.map g lb) = List_map2 (λ a b, f a (g b)) la lb.
 Proof.
 intros.
 revert lb.
@@ -604,8 +607,8 @@ f_equal.
 apply IHla.
 Qed.
 
-Theorem map_map2 : ∀ A B C D (f : A → B) (g : C → D → A) la lb,
-  map f (map2 g la lb) = map2 (λ a b, f (g a b)) la lb.
+Theorem List_map_map2 : ∀ A B C D (f : A → B) (g : C → D → A) la lb,
+  List.map f (List_map2 g la lb) = List_map2 (λ a b, f (g a b)) la lb.
 Proof.
 intros.
 revert lb.
@@ -614,10 +617,10 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem List_fold_left_map2 :
+Theorem List_fold_left_List_map2 :
   ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
-  fold_left f (map2 g lc ld) a =
-  fold_left (λ b c, f b (g (fst c) (snd c))) (combine lc ld) a.
+  List.fold_left f (List_map2 g lc ld) a =
+  List.fold_left (λ b c, f b (g (fst c) (snd c))) (List.combine lc ld) a.
 Proof.
 intros.
 revert ld a.
@@ -626,8 +629,8 @@ destruct ld as [| d]; [ easy | cbn ].
 apply IHlc.
 Qed.
 
-Theorem length_map2 : ∀ A B C (f : A → B → C) la lb,
-  length (map2 f la lb) = min (length la) (length lb).
+Theorem List_length_map2 : ∀ A B C (f : A → B → C) la lb,
+  length (List_map2 f la lb) = min (length la) (length lb).
 Proof.
 intros.
 revert lb.
@@ -636,10 +639,10 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
-  c ∈ map2 f la lb ↔
+Theorem List_in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
+  c ∈ List_map2 f la lb ↔
   ∃ i,
-  i < min (length la) (length lb) ∧ ∃ a b, f (nth i la a) (nth i lb b) = c.
+  i < min (length la) (length lb) ∧ ∃ a b, f (List.nth i la a) (List.nth i lb b) = c.
 Proof.
 intros.
 split. {
@@ -669,9 +672,9 @@ split. {
 }
 Qed.
 
-Theorem map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
-  (∀ ab, ab ∈ combine la lb → f (fst ab) (snd ab) = g (fst ab) (snd ab))
-  → map2 f la lb = map2 g la lb.
+Theorem List_map2_ext_in : ∀ A B C (f g : A → B → C) la lb,
+  (∀ ab, ab ∈ List.combine la lb → f (fst ab) (snd ab) = g (fst ab) (snd ab))
+  → List_map2 f la lb = List_map2 g la lb.
 Proof.
 intros * Hab.
 revert lb Hab.
@@ -686,7 +689,7 @@ now apply Hab; right.
 Qed.
 
 Theorem in_combine_same :
-  ∀ A (i j : A) l, (i, j) ∈ combine l l → i = j.
+  ∀ A (i j : A) l, (i, j) ∈ List.combine l l → i = j.
 Proof.
 intros * Hij.
 induction l as [| a la]; [ easy | cbn in Hij ].
@@ -694,176 +697,176 @@ destruct Hij as [Hij| Hij]; [ now injection Hij; intros; subst i j | ].
 now apply IHla.
 Qed.
 
-Theorem map2_diag : ∀ A B (f : A → A → B) la,
-  map2 f la la = map (λ i, f i i) la.
+Theorem List_map2_diag : ∀ A B (f : A → A → B) la,
+  List_map2 f la la = List.map (λ i, f i i) la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem map2_map2_seq_l : ∀ {A B C} d (f : A → B → C) la lb,
-  map2 f la lb = map2 (λ i b, f (nth i la d) b) (seq 0 (length la)) lb.
+Theorem List_map2_map2_seq_l : ∀ {A B C} d (f : A → B → C) la lb,
+  List_map2 f la lb = List_map2 (λ i b, f (List.nth i la d) b) (List.seq 0 (length la)) lb.
 Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | ].
 f_equal.
-rewrite <- seq_shift.
-rewrite map2_map_l.
+rewrite <- List.seq_shift.
+rewrite List_map2_map_l.
 apply IHla.
 Qed.
 
-Theorem map2_map2_seq_r : ∀ {A B C} d (f : A → B → C) la lb,
-  map2 f la lb = map2 (λ a i, f a (nth i lb d)) la (seq 0 (length lb)).
+Theorem List_map2_map2_seq_r : ∀ {A B C} d (f : A → B → C) la lb,
+  List_map2 f la lb = List_map2 (λ a i, f a (List.nth i lb d)) la (List.seq 0 (length lb)).
 Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal.
-rewrite <- seq_shift.
-rewrite map2_map_r.
+rewrite <- List.seq_shift.
+rewrite List_map2_map_r.
 apply IHla.
 Qed.
 
-Theorem map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
-  map2 f (l1 ++ l2) l =
-  map2 f l1 (firstn (length l1) l) ++ map2 f l2 (skipn (length l1) l).
+Theorem List_map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
+  List_map2 f (l1 ++ l2) l =
+  List_map2 f l1 (List.firstn (length l1) l) ++ List_map2 f l2 (List.skipn (length l1) l).
 Proof.
 intros.
 revert l2 l.
 induction l1 as [| a1]; intros; [ easy | cbn ].
-destruct l as [| a]; [ now rewrite map2_nil_r | cbn ].
+destruct l as [| a]; [ now rewrite List_map2_nil_r | cbn ].
 f_equal.
 apply IHl1.
 Qed.
 
-Theorem map2_app_r :
+Theorem List_map2_app_r :
   ∀ (A B C : Type) (l1 l2 : list B) (l : list A) (f : A → B → C),
-    map2 f l (l1 ++ l2) =
-    map2 f (firstn (length l1) l) l1 ++ map2 f (skipn (length l1) l) l2.
+    List_map2 f l (l1 ++ l2) =
+    List_map2 f (List.firstn (length l1) l) l1 ++ List_map2 f (List.skipn (length l1) l) l2.
 Proof.
 intros.
 revert l2 l.
 induction l1 as [| a1]; intros; [ easy | cbn ].
-destruct l as [| a]; [ now rewrite map2_nil_l | cbn ].
+destruct l as [| a]; [ now rewrite List_map2_nil_l | cbn ].
 f_equal.
 apply IHl1.
 Qed.
 
-Theorem map2_swap : ∀ A B C (f : A → B → C) la lb,
-  map2 f la lb = map2 (λ a b, f b a) lb la.
+Theorem List_map2_swap : ∀ A B C (f : A → B → C) la lb,
+  List_map2 f la lb = List_map2 (λ a b, f b a) lb la.
 Proof.
 intros.
 revert lb.
-induction la as [| a]; intros; cbn; [ symmetry; apply map2_nil_r | ].
+induction la as [| a]; intros; cbn; [ symmetry; apply List_map2_nil_r | ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal.
 apply IHla.
 Qed.
 
-Theorem repeat_app_map2 : ∀ A (la lb : list A) n,
-  repeat (la ++ lb) n = map2 (λ x y, app x y) (repeat la n) (repeat lb n).
+Theorem repeat_app_List_map2 : ∀ A (la lb : list A) n,
+  List.repeat (la ++ lb) n = List_map2 (λ x y, app x y) (List.repeat la n) (List.repeat lb n).
 Proof.
 intros.
 induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
-Theorem map2_rev_seq_r : ∀ A B (f : A → _ → B) la sta len,
-  map2 f la (rev (seq sta len)) =
-  map2 (λ a i, f a (2 * sta + len - 1 - i)) la (seq sta len).
+Theorem List_map2_rev_seq_r : ∀ A B (f : A → _ → B) la sta len,
+  List_map2 f la (List.rev (List.seq sta len)) =
+  List_map2 (λ a i, f a (2 * sta + len - 1 - i)) la (List.seq sta len).
 Proof.
 intros.
-rewrite map2_swap; symmetry.
-rewrite map2_swap; symmetry.
+rewrite List_map2_swap; symmetry.
+rewrite List_map2_swap; symmetry.
 revert la sta.
 induction len; intros; [ easy | ].
 replace (2 * sta + S len - 1) with (2 * sta + len) by flia.
-rewrite seq_S at 1.
-cbn - [ map2 ].
+rewrite List.seq_S at 1.
+cbn - [ List_map2 ].
 rewrite Nat.add_0_r.
-rewrite rev_app_distr.
-cbn - [ map2 ].
+rewrite List.rev_app_distr.
+cbn - [ List_map2 ].
 cbn.
 destruct la as [| a]; [ easy | ].
 rewrite Nat.add_shuffle0, Nat.add_sub; f_equal.
 rewrite IHlen.
-rewrite <- seq_shift.
-rewrite map2_map_l.
+rewrite <- List.seq_shift.
+rewrite List_map2_map_l.
 clear a.
-apply map2_ext_in.
+apply List_map2_ext_in.
 intros (i, a) Hia; cbn.
 f_equal; flia.
 Qed.
 
-Theorem map2_map_min :
+Theorem List_map2_map_min :
   ∀ {A B C} ad bd la lb (f : A → B → C),
-  map2 f la lb =
-    map (λ i, f (nth i la ad) (nth i lb bd))
-      (seq 0 (min (length la) (length lb))).
+  List_map2 f la lb =
+    List.map (λ i, f (List.nth i la ad) (List.nth i lb bd))
+      (List.seq 0 (min (length la) (length lb))).
 Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | ].
 destruct lb as [| b]; [ easy | ].
-cbn - [ nth ].
+cbn - [ List.nth ].
 do 2 rewrite List_nth_0_cons.
 f_equal.
 rewrite List_map_seq.
 rewrite IHla.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 do 2 rewrite List_nth_succ_cons.
 easy.
 Qed.
 
-Theorem map2_app_app :
+Theorem List_map2_app_app :
   ∀ A B C la lb lc ld (f : A → B → C),
   length la = length lb
-  → map2 f (la ++ lc) (lb ++ ld) =
-    map2 f la lb ++ map2 f lc ld.
+  → List_map2 f (la ++ lc) (lb ++ ld) =
+    List_map2 f la lb ++ List_map2 f lc ld.
 Proof.
 intros * Hab.
 revert lb lc ld Hab.
 induction la as [| a]; intros; cbn. {
-  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+  now symmetry in Hab; apply List.length_zero_iff_nil in Hab; subst lb.
 }
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hab; apply Nat.succ_inj in Hab; f_equal.
 now apply IHla.
 Qed.
 
-Theorem rev_map2 : ∀ A B C (f : A → B → C) la lb,
+Theorem List_rev_map2 : ∀ A B C (f : A → B → C) la lb,
   length la = length lb
-  → rev (map2 f la lb) = map2 f (rev la) (rev lb).
+  → List.rev (List_map2 f la lb) = List_map2 f (List.rev la) (List.rev lb).
 Proof.
 intros * Hab.
 revert lb Hab.
 induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; cbn; [ symmetry; apply map2_nil_r | ].
+destruct lb as [| b]; cbn; [ symmetry; apply List_map2_nil_r | ].
 cbn in Hab; apply Nat.succ_inj in Hab.
 rewrite (IHla _ Hab).
-rewrite map2_app_l.
-rewrite firstn_app.
-do 2 rewrite length_rev.
+rewrite List_map2_app_l.
+rewrite List.firstn_app.
+do 2 rewrite List.length_rev.
 rewrite Hab, Nat.sub_diag; cbn.
-rewrite app_nil_r.
-rewrite <- (length_rev lb).
-rewrite firstn_all.
+rewrite List.app_nil_r.
+rewrite <- (List.length_rev lb).
+rewrite List.firstn_all.
 f_equal.
-rewrite length_rev.
-rewrite skipn_app.
-rewrite length_rev, Nat.sub_diag; cbn.
-rewrite <- (length_rev lb).
-rewrite skipn_all.
+rewrite List.length_rev.
+rewrite List.skipn_app.
+rewrite List.length_rev, Nat.sub_diag; cbn.
+rewrite <- (List.length_rev lb).
+rewrite List.skipn_all.
 easy.
 Qed.
 
-Theorem eq_map2_nil : ∀ A B C (f : A → B → C) la lb,
-  map2 f la lb = [] → la = [] ∨ lb = [].
+Theorem eq_List_map2_nil : ∀ A B C (f : A → B → C) la lb,
+  List_map2 f la lb = [] → la = [] ∨ lb = [].
 Proof.
 intros * Hab.
 revert lb Hab.
@@ -872,7 +875,7 @@ cbn in Hab.
 now destruct lb.
 Qed.
 
-(* end map2 *)
+(* end List_map2 *)
 
 Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.
 Proof.
@@ -920,8 +923,8 @@ Qed.
 
 Theorem List_rank_loop_if : ∀ A d f (l : list A) i j,
   List_rank_loop i f l = j
-  → (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
-    (j < i + length l ∧ f (nth (j - i) l d) = true ∨
+  → (∀ k, i ≤ k < j → f (List.nth (k - i) l d) = false) ∧
+    (j < i + length l ∧ f (List.nth (j - i) l d) = true ∨
      j = i + length l).
 Proof.
 intros * Hi.
@@ -974,8 +977,8 @@ Qed.
 
 Theorem List_rank_if : ∀ {A} d f (l : list A) {i},
   List_rank f l = i
-  → (∀ j, j < i → f (nth j l d) = false) ∧
-    (i < length l ∧ f (nth i l d) = true ∨ i = length l).
+  → (∀ j, j < i → f (List.nth j l d) = false) ∧
+    (i < length l ∧ f (List.nth i l d) = true ∨ i = length l).
 Proof.
 intros * Hi.
 apply List_rank_loop_if with (d := d) in Hi.
@@ -1002,23 +1005,23 @@ apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
 
 Theorem List_skipn_skipn : ∀ A i j (la : list A),
-  skipn i (skipn j la) = skipn (i + j) la.
+  List.skipn i (List.skipn j la) = List.skipn (i + j) la.
 Proof.
 intros.
 revert j.
 induction la as [| a]; intros; cbn. {
-  now do 3 rewrite skipn_nil.
+  now do 3 rewrite List.skipn_nil.
 }
 destruct j; [ now rewrite Nat.add_0_r | ].
-rewrite skipn_cons.
+rewrite List.skipn_cons.
 rewrite <- Nat.add_succ_comm, Nat.add_succ_l.
-rewrite skipn_cons.
+rewrite List.skipn_cons.
 apply IHla.
 Qed.
 
 Theorem List_skipn_is_cons : ∀ {A} (d : A) la n,
   n < length la
-  → skipn n la = nth n la d :: skipn (S n) la.
+  → List.skipn n la = List.nth n la d :: List.skipn (S n) la.
 Proof.
 intros * Hn.
 revert n Hn.
@@ -1026,7 +1029,7 @@ induction la as [| a]; intros; [ easy | ].
 destruct n; [ easy | ].
 cbn in Hn; apply Nat.succ_lt_mono in Hn.
 rewrite List_nth_succ_cons.
-do 2 rewrite skipn_cons.
+do 2 rewrite List.skipn_cons.
 now apply IHla.
 Qed.
 
@@ -1066,10 +1069,10 @@ Qed.
 (* butn: list without its nth element *)
 
 Definition butn {A} n (l : list A) :=
-  firstn n l ++ skipn (S n) l.
+  List.firstn n l ++ List.skipn (S n) l.
 
 Theorem fold_butn : ∀ A n (l : list A),
-  firstn n l ++ skipn (S n) l = butn n l.
+  List.firstn n l ++ List.skipn (S n) l = butn n l.
 Proof. easy. Qed.
 
 Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
@@ -1083,11 +1086,11 @@ Theorem butn_succ_cons :
 Proof.
 intros.
 progress unfold butn.
-now rewrite firstn_cons, skipn_cons.
+now rewrite List.firstn_cons, List.skipn_cons.
 Qed.
 
-Theorem map_butn : ∀ A B (f : A → B) la n,
-  map f (butn n la) = butn n (map f la).
+Theorem List_map_butn : ∀ A B (f : A → B) la n,
+  List.map f (butn n la) = butn n (List.map f la).
 Proof.
 intros.
 revert n.
@@ -1133,7 +1136,7 @@ Qed.
 
 Theorem nth_butn_before : ∀ A (l : list A) i j d,
   j ≤ i
-  → nth i (butn j l) d = nth (i + 1) l d.
+  → List.nth i (butn j l) d = List.nth (i + 1) l d.
 Proof.
 intros * Hji.
 revert i j Hji.
@@ -1150,7 +1153,7 @@ Qed.
 
 Theorem nth_butn_after : ∀ A (l : list A) i j d,
   i < j
-  → nth i (butn j l) d = nth i l d.
+  → List.nth i (butn j l) d = List.nth i l d.
 Proof.
 intros * Hij.
 revert i j Hij.
@@ -1166,7 +1169,7 @@ now apply IHl.
 Qed.
 
 Theorem nth_butn : ∀ A (l : list A) i j d,
-  nth i (butn j l) d = nth (i + Nat.b2n (j <=? i)) l d.
+  List.nth i (butn j l) d = List.nth (i + Nat.b2n (j <=? i)) l d.
 Proof.
 intros.
 remember (j <=? i) as b eqn:Hb; symmetry in Hb.
@@ -1193,21 +1196,21 @@ destruct Ha as [Ha| Ha]; [ now left | right ].
 now apply IHl in Ha.
 Qed.
 
-Theorem map_butn_seq : ∀ A (f : _ → A) n sta len,
-  map f (butn n (seq sta len)) =
-  map (λ i, f (i + Nat.b2n (sta + n <=? i)))
-    (seq sta (len - Nat.b2n (n <? len))).
+Theorem List_map_butn_seq : ∀ A (f : _ → A) n sta len,
+  List.map f (butn n (List.seq sta len)) =
+  List.map (λ i, f (i + Nat.b2n (sta + n <=? i)))
+    (List.seq sta (len - Nat.b2n (n <? len))).
 Proof.
 intros.
 revert n sta.
 induction len; intros; [ now rewrite butn_nil | ].
 destruct n. {
   cbn; rewrite Nat.sub_0_r, Nat.add_0_r.
-  rewrite <- seq_shift.
-  rewrite map_map.
-  apply map_ext_in.
+  rewrite <- List.seq_shift.
+  rewrite List.map_map.
+  apply List.map_ext_in.
   intros i Hi.
-  apply in_seq in Hi.
+  apply List.in_seq in Hi.
   rewrite <- Nat.add_1_r.
   destruct (le_dec sta i) as [H| H]; [ | easy ].
   now apply Nat.leb_le in H; rewrite H.
@@ -1230,16 +1233,16 @@ destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
     destruct (le_dec (sta + S n) sta) as [H| H]; [ flia H | clear H ].
     now rewrite Nat.add_0_r.
   }
-  apply map_ext_in.
+  apply List.map_ext_in.
   intros i Hi.
   now rewrite (Nat.add_succ_r sta).
 } {
   apply Nat.ltb_ge in Hn.
   rewrite Nat.sub_0_r.
-  rewrite butn_out; [ | now rewrite length_seq ].
-  apply map_ext_in.
+  rewrite butn_out; [ | now rewrite List.length_seq ].
+  apply List.map_ext_in.
   intros i Hi.
-  apply in_seq in Hi.
+  apply List.in_seq in Hi.
   rewrite if_leb_le_dec.
   destruct (le_dec (sta + S n) i) as [H| H]; [ flia Hn Hi H | ].
   now rewrite Nat.add_0_r.
@@ -1254,21 +1257,21 @@ Proof.
 intros.
 rewrite if_ltb_lt_dec.
 progress unfold butn.
-rewrite firstn_app, skipn_app.
+rewrite List.firstn_app, List.skipn_app.
 destruct (lt_dec i (length l1)) as [Hil| Hil]. {
   rewrite (proj2 (Nat.sub_0_le i _)); [ | now apply Nat.lt_le_incl ].
   rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-  rewrite firstn_O, skipn_O, app_nil_r.
-  apply app_assoc.
+  rewrite List.firstn_O, List.skipn_O, List.app_nil_r.
+  apply List.app_assoc.
 } {
   apply Nat.nlt_ge in Hil.
-  rewrite firstn_all2; [ | easy ].
-  rewrite skipn_all2. 2: {
+  rewrite List.firstn_all2; [ | easy ].
+  rewrite List.skipn_all2. 2: {
     now apply Nat.lt_le_incl; apply -> Nat.succ_le_mono.
   }
-  rewrite app_nil_l.
+  rewrite List.app_nil_l.
   rewrite Nat.sub_succ_l; [ | easy ].
-  symmetry; apply app_assoc.
+  symmetry; apply List.app_assoc.
 }
 Qed.
 
@@ -1279,28 +1282,28 @@ Theorem butn_app_cons :
 Proof.
 intros * Hia.
 progress unfold butn.
-rewrite firstn_app.
-rewrite Hia, Nat.sub_diag, firstn_O, app_nil_r.
-rewrite firstn_all2; [ | easy ].
-rewrite skipn_app.
+rewrite List.firstn_app.
+rewrite Hia, Nat.sub_diag, List.firstn_O, List.app_nil_r.
+rewrite List.firstn_all2; [ | easy ].
+rewrite List.skipn_app.
 rewrite Nat.sub_succ_l, Nat.sub_diag; [ | easy ].
-rewrite skipn_all2; [ | flia ].
-now rewrite skipn_cons, skipn_O.
+rewrite List.skipn_all2; [ | flia ].
+now rewrite List.skipn_cons, List.skipn_O.
 Qed.
 
 (* end butn *)
 
-(* insert in a list (reverse of butn) *)
+(* insert in a list (List.reverse of butn) *)
 
 Definition insert_at A k (la : list A) e :=
-  firstn k la ++ e :: skipn k la.
+  List.firstn k la ++ e :: List.skipn k la.
 
 (* end insert_at *)
 
 (* replace in a list *)
 
 Definition replace_at {A} k (la : list A) e :=
-  firstn k la ++ e :: skipn (S k) la.
+  List.firstn k la ++ e :: List.skipn (S k) la.
 
 Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
   replace_at (S i) (a :: l) b = a :: replace_at i l b.
@@ -1308,16 +1311,16 @@ Proof. easy. Qed.
 
 (* end replace_at *)
 
-(* repeat_apply: applying a function n times *)
+(* List_repeat_apply: applying a function n times *)
 
-Fixpoint repeat_apply {A} n (f : A → A) a :=
+Fixpoint List_repeat_apply {A} n (f : A → A) a :=
   match n with
   | 0 => a
-  | S n' => repeat_apply n' f (f a)
+  | S n' => List_repeat_apply n' f (f a)
   end.
 
 Theorem List_fold_left_nop_r : ∀ A B (a : A) (lb : list B) (f : A → _),
-  fold_left (λ c _, f c) lb a = repeat_apply (length lb) f a.
+  List.fold_left (λ c _, f c) lb a = List_repeat_apply (length lb) f a.
 Proof.
 intros.
 revert a.
@@ -1325,9 +1328,9 @@ induction lb as [| b]; intros; [ easy | cbn ].
 apply IHlb.
 Qed.
 
-Theorem repeat_apply_id : ∀ A len f (a : A),
+Theorem List_repeat_apply_id : ∀ A len f (a : A),
   (∀ a, f a = a)
-  → repeat_apply len f a = a.
+  → List_repeat_apply len f a = a.
 Proof.
 intros * Hid.
 revert a.
@@ -1336,7 +1339,7 @@ rewrite IHlen.
 apply Hid.
 Qed.
 
-(* end repeat_apply *)
+(* end List.repeat_apply *)
 
 (* equivalence & equality *)
 
@@ -1717,12 +1720,12 @@ Fixpoint no_dup {A} (eqb : A → A → bool) la :=
 
 Theorem no_dup_NoDup : ∀ {A} {eqb : A → _},
   equality eqb →
-  ∀ la, no_dup eqb la = true ↔ NoDup la.
+  ∀ la, no_dup eqb la = true ↔ List.NoDup la.
 Proof.
 intros * Heqb *.
 split; intros Hla. {
   induction la as [| a]; [ constructor | ].
-  apply NoDup_cons_iff.
+  apply List.NoDup_cons_iff.
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
   destruct (Sumbool.sumbool_of_bool _) as [Hal| Hal]; [ easy | ].
@@ -1732,13 +1735,13 @@ split; intros Hla. {
 } {
   induction la as [| a]; [ easy | cbn ].
   rewrite if_bool_if_dec.
-  apply NoDup_cons_iff in Hla.
+  apply List.NoDup_cons_iff in Hla.
   destruct (Sumbool.sumbool_of_bool _) as [Hal| Hal]; [ | now apply IHla ].
   apply (member_true_iff Heqb) in Hal.
   destruct Hla as (Hala & Hnd).
   destruct Hal as (l1 & l2 & H); subst la.
   exfalso; apply Hala.
-  now apply in_or_app; right; left.
+  now apply List.in_or_app; right; left.
 }
 Qed.
 
@@ -1768,7 +1771,7 @@ split. {
     remember (member eqb a (l2 ++ a :: l3)) as mal eqn:Hmal; symmetry in Hmal.
     destruct mal; [ easy | ].
     specialize (proj1 (member_false_iff Heqb _ _) Hmal a) as H1.
-    assert (H : a ∈ l2 ++ a :: l3) by now apply in_or_app; right; left.
+    assert (H : a ∈ l2 ++ a :: l3) by now apply List.in_or_app; right; left.
     now specialize (H1 H).
   }
   remember (member eqb b _) as mbl eqn:Hmbl; symmetry in Hmbl.
@@ -1779,25 +1782,25 @@ Qed.
 (* end no_dup *)
 
 Theorem NoDup_app_comm {A} : ∀ l l' : list A,
-  NoDup (l ++ l') → NoDup (l' ++ l).
+  List.NoDup (l ++ l') → List.NoDup (l' ++ l).
 Proof.
 intros * Hll.
 revert l Hll.
-induction l' as [| a l']; intros; [ now rewrite app_nil_r in Hll | ].
+induction l' as [| a l']; intros; [ now rewrite List.app_nil_r in Hll | ].
 cbn; constructor. {
   intros Ha.
-  apply NoDup_remove_2 in Hll; apply Hll.
-  apply in_app_or in Ha.
-  apply in_or_app.
+  apply List.NoDup_remove_2 in Hll; apply Hll.
+  apply List.in_app_or in Ha.
+  apply List.in_or_app.
   now destruct Ha; [ right | left ].
 }
 apply IHl'.
-now apply NoDup_remove_1 in Hll.
+now apply List.NoDup_remove_1 in Hll.
 Qed.
 
 Theorem List_fold_left_ext_in : ∀ A B (f g : A → B → A) l a,
   (∀ b c, b ∈ l → f c b = g c b)
-  → fold_left f l a = fold_left g l a.
+  → List.fold_left f l a = List.fold_left g l a.
 Proof.
 intros * Hfg.
 revert a.
@@ -1811,7 +1814,7 @@ Qed.
 
 Theorem List_fold_right_ext_in : ∀ A B (f g : B → A → A) l a,
   (∀ b c, b ∈ l → f b c = g b c)
-  → fold_right f a l = fold_right g a l.
+  → List.fold_right f a l = List.fold_right g a l.
 Proof.
 intros * Hfg.
 revert a.
@@ -1824,22 +1827,22 @@ now right.
 Qed.
 
 Theorem List_fold_left_map_nth_len : ∀ A (la : list A) sta len f d,
-  fold_left (λ lb k, map (λ i, nth (f k i) lb d) (seq 0 (length lb)))
-    (seq sta len) la =
-  fold_left (λ lb k, map (λ i, nth (f k i) lb d) (seq 0 (length la)))
-    (seq sta len) la.
+  List.fold_left (λ lb k, List.map (λ i, List.nth (f k i) lb d) (List.seq 0 (length lb)))
+    (List.seq sta len) la =
+  List.fold_left (λ lb k, List.map (λ i, List.nth (f k i) lb d) (List.seq 0 (length la)))
+    (List.seq sta len) la.
 Proof.
 intros.
 revert sta la.
 induction len; intros; [ easy | cbn ].
 rewrite IHlen.
 apply List_fold_left_ext_in.
-intros i lb Hi; apply in_seq in Hi.
-now rewrite length_map, length_seq.
+intros i lb Hi; apply List.in_seq in Hi.
+now rewrite List.length_map, List.length_seq.
 Qed.
 
 Theorem List_eq_firstn_nil : ∀ A n (l : list A),
-  firstn n l = [] → n = 0 ∨ l = [].
+  List.firstn n l = [] → n = 0 ∨ l = [].
 Proof.
 intros * Hnl.
 revert l Hnl.
@@ -1847,7 +1850,7 @@ induction n; intros; [ now left | right ].
 destruct l as [| x]; [ easy | easy ].
 Qed.
 
-Theorem List_eq_skipn_nil: ∀ A n (l : list A), skipn n l = [] → length l ≤ n.
+Theorem List_eq_skipn_nil: ∀ A n (l : list A), List.skipn n l = [] → length l ≤ n.
 Proof.
 intros * Hnl.
 revert l Hnl.
@@ -1858,22 +1861,22 @@ apply -> Nat.succ_le_mono.
 now apply IHn.
 Qed.
 
-Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
+Theorem List_eq_rev_nil {A} : ∀ (l : list A), List.rev l = [] → l = [].
 Proof.
 intros * Hl.
 destruct l as [| a]; [ easy | cbn in Hl ].
-now apply app_eq_nil in Hl.
+now apply List.app_eq_nil in Hl.
 Qed.
 
 Theorem List_map_rev_seq : ∀ A (f : _ → A) sta len,
-  map f (rev (seq sta len)) =
-    map (λ i, f (2 * sta + len - 1 - i)) (seq sta len).
+  List.map f (List.rev (List.seq sta len)) =
+    List.map (λ i, f (2 * sta + len - 1 - i)) (List.seq sta len).
 Proof.
 intros.
 revert sta.
 induction len; intros; [ easy | ].
-rewrite seq_S at 1.
-rewrite rev_app_distr.
+rewrite List.seq_S at 1.
+rewrite List.rev_app_distr.
 cbn.
 rewrite Nat.add_0_r.
 rewrite Nat.add_succ_r.
@@ -1881,42 +1884,42 @@ rewrite Nat_sub_succ_1.
 rewrite Nat.add_shuffle0, Nat.add_sub.
 f_equal.
 rewrite IHlen.
-rewrite <- seq_shift.
-rewrite map_map.
-apply map_ext_in.
+rewrite <- List.seq_shift.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros; f_equal; flia.
 Qed.
 
 Theorem List_length_map_seq : ∀ A (f : _ → A) a len,
-  length (map f (seq a len)) = len.
+  length (List.map f (List.seq a len)) = len.
 Proof.
 intros.
-now rewrite length_map, length_seq.
+now rewrite List.length_map, List.length_seq.
 Qed.
 
 Theorem List_map_map_seq : ∀ {A B} d (f : A → B) la,
-  map f la = map (λ i, f (nth i la d)) (seq 0 (length la)).
+  List.map f la = List.map (λ i, f (List.nth i la d)) (List.seq 0 (length la)).
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
 f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
+rewrite <- List.seq_shift.
+now rewrite List.map_map.
 Qed.
 
 Theorem List_map_nth_seq : ∀ {A} d (la : list A),
-  la = map (λ i, nth i la d) (seq 0 (length la)).
+  la = List.map (λ i, List.nth i la d) (List.seq 0 (length la)).
 Proof.
 intros.
 induction la as [| a]; [ easy | ].
 cbn; f_equal.
-rewrite <- seq_shift.
-now rewrite map_map.
+rewrite <- List.seq_shift.
+now rewrite List.map_map.
 Qed.
 
 Theorem List_map_nth_seq' : ∀ A d (la : list A) n,
   n = length la
-  → la = map (λ i, nth i la d) (seq 0 n).
+  → la = List.map (λ i, List.nth i la d) (List.seq 0 n).
 Proof.
 intros * Hn.
 subst n.
@@ -1924,37 +1927,37 @@ apply List_map_nth_seq.
 Qed.
 
 Theorem List_map_repeat : ∀ A B x n (f : A → B),
-  map f (repeat x n) = repeat (f x) n.
+  List.map f (List.repeat x n) = List.repeat (f x) n.
 Proof.
 intros.
 induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
-Theorem List_rev_rev : ∀ A (la lb : list A), rev la = rev lb → la = lb.
+Theorem List_rev_rev : ∀ A (la lb : list A), List.rev la = List.rev lb → la = lb.
 Proof.
 intros * Hab.
-apply (f_equal (λ l, rev l)) in Hab.
-now do 2 rewrite rev_involutive in Hab.
+apply (f_equal (λ l, List.rev l)) in Hab.
+now do 2 rewrite List.rev_involutive in Hab.
 Qed.
 
-Theorem List_rev_symm : ∀ A (la lb : list A), rev la = lb → la = rev lb.
+Theorem List_rev_symm : ∀ A (la lb : list A), List.rev la = lb → la = List.rev lb.
 Proof.
 intros * Hab.
-now subst lb; rewrite rev_involutive.
+now subst lb; rewrite List.rev_involutive.
 Qed.
 
 Theorem List_rev_repeat : ∀ {A} (x : A) n,
-  rev (repeat x n) = repeat x n.
+  List.rev (List.repeat x n) = List.repeat x n.
 Proof.
 intros.
 induction n; [ easy | cbn ].
-rewrite repeat_cons; f_equal.
+rewrite List.repeat_cons; f_equal.
 apply IHn.
 Qed.
 
 Theorem List_rev_seq_nth :
-  ∀ len sta n d, n < len → nth n (rev (seq sta len)) d = sta + len - S n.
+  ∀ len sta n d, n < len → List.nth n (List.rev (List.seq sta len)) d = sta + len - S n.
 Proof.
 intros * Hn.
 revert sta.
@@ -1962,21 +1965,21 @@ induction len; intros; [ easy | ].
 cbn.
 destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
   subst n.
-  rewrite app_nth2. 2: {
-    now rewrite length_rev, length_seq; progress unfold ge.
+  rewrite List.app_nth2. 2: {
+    now rewrite List.length_rev, List.length_seq; progress unfold ge.
   }
-  rewrite length_rev, length_seq, Nat.sub_diag; cbn.
+  rewrite List.length_rev, List.length_seq, Nat.sub_diag; cbn.
   now rewrite Nat.add_sub.
 }
 assert (H : n < len) by flia Hn Hnl.
 specialize (IHlen H).
-rewrite app_nth1; [ | now rewrite length_rev, length_seq ].
+rewrite List.app_nth1; [ | now rewrite List.length_rev, List.length_seq ].
 rewrite IHlen.
 now rewrite Nat.add_succ_r.
 Qed.
 
 Theorem List_nth_repeat : ∀ A (a d : A) i n,
-  nth i (repeat a n) d = if lt_dec i n then a else d.
+  List.nth i (List.repeat a n) d = if lt_dec i n then a else d.
 Proof.
 intros A *.
 destruct (lt_dec i n) as [Hin| Hin]. {
@@ -1987,31 +1990,31 @@ destruct (lt_dec i n) as [Hin| Hin]. {
   now apply IHn.
 }
 apply Nat.nlt_ge in Hin.
-apply nth_overflow.
-now rewrite repeat_length.
+apply List.nth_overflow.
+now rewrite List.repeat_length.
 Qed.
 
 Theorem List_nth_firstn : ∀ A (l : list A) i j d,
   i < j
-  → nth i (firstn j l) d = nth i l d.
+  → List.nth i (List.firstn j l) d = List.nth i l d.
 Proof.
 intros * Hij.
 revert i j Hij.
-induction l as [| a la]; intros; [ now rewrite firstn_nil | ].
+induction l as [| a la]; intros; [ now rewrite List.firstn_nil | ].
 destruct j; [ easy | ].
-rewrite firstn_cons.
+rewrite List.firstn_cons.
 destruct i; [ easy | cbn ].
 apply IHla.
 now apply Nat.succ_lt_mono.
 Qed.
 
 Theorem List_nth_skipn : ∀ A (l : list A) i j d,
-  nth i (skipn j l) d = nth (i + j) l d.
+  List.nth i (List.skipn j l) d = List.nth (i + j) l d.
 Proof.
 intros.
 revert i j.
 induction l as [| a la]; intros. {
-  rewrite skipn_nil; cbn.
+  rewrite List.skipn_nil; cbn.
   now destruct i, j.
 }
 destruct j; [ now rewrite Nat.add_0_r | ].
@@ -2021,13 +2024,13 @@ Qed.
 
 Theorem List_nth_app_repeat_r :
   ∀ A (d : A) i n la,
-  nth i (la ++ repeat d n) d = nth i la d.
+  List.nth i (la ++ List.repeat d n) d = List.nth i la d.
 Proof.
 intros.
-destruct (lt_dec i (length la)) as [Hila| Hila]; [ now apply app_nth1 | ].
+destruct (lt_dec i (length la)) as [Hila| Hila]; [ now apply List.app_nth1 | ].
 apply Nat.nlt_ge in Hila.
-rewrite app_nth2; [ | easy ].
-now rewrite nth_repeat, nth_overflow.
+rewrite List.app_nth2; [ | easy ].
+now rewrite List.nth_repeat, List.nth_overflow.
 Qed.
 
 Theorem List_app_eq_app' :
@@ -2040,7 +2043,7 @@ intros * Hxy Haa.
 revert x2 y1 y2 Hxy Haa.
 induction x1 as [| a1]; intros; cbn. {
   cbn in Hxy, Haa.
-  symmetry in Hxy; apply length_zero_iff_nil in Hxy.
+  symmetry in Hxy; apply List.length_zero_iff_nil in Hxy.
   now subst x2 y1.
 }
 destruct y1 as [| b1]; [ easy | ].
@@ -2052,16 +2055,16 @@ now destruct IHx1; subst y1 y2.
 Qed.
 
 Theorem List_last_cons_cons : ∀ A l (x y d : A),
-  last (x :: y :: l) d = last (y :: l) d.
+  List.last (x :: y :: l) d = List.last (y :: l) d.
 Proof. easy. Qed.
 
 Theorem List_firstn_seq : ∀ n start len,
-  firstn n (seq start len) = seq start (min n len).
+  List.firstn n (List.seq start len) = List.seq start (min n len).
 Proof.
 intros.
 revert start len.
 induction n; intros; [ easy | cbn ].
-remember (seq start len) as l eqn:Hl; symmetry in Hl.
+remember (List.seq start len) as l eqn:Hl; symmetry in Hl.
 destruct l as [| a l]; [ now destruct len | ].
 destruct len; [ easy | cbn in Hl; cbn ].
 injection Hl; clear Hl; intros Hl Ha.
@@ -2070,11 +2073,11 @@ rewrite <- Hl; apply IHn.
 Qed.
 
 Theorem List_skipn_seq : ∀ n start len,
-  n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).
+  n ≤ len → List.skipn n (List.seq start len) = List.seq (start + n) (len - n).
 Proof.
 intros * Hnlen.
 revert n start Hnlen.
-induction len; intros; [ now rewrite skipn_nil | cbn ].
+induction len; intros; [ now rewrite List.skipn_nil | cbn ].
 destruct n; [ now cbn; rewrite Nat.add_0_r | cbn ].
 rewrite <- Nat.add_succ_comm.
 apply Nat.succ_le_mono in Hnlen.
@@ -2082,14 +2085,14 @@ now apply IHlen.
 Qed.
 
 Theorem List_eq_iff : ∀ A (l1 l2 : list A),
-  l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, nth i l1 d = nth i l2 d).
+  l1 = l2 ↔ (length l1 = length l2 ∧ ∀ d i, List.nth i l1 d = List.nth i l2 d).
 Proof.
 split; [ now intros; subst l2 | ].
 intros (Hlen & Hll).
 revert l2 Hlen Hll.
 induction l1 as [| a1]; intros. {
   symmetry in Hlen.
-  now apply length_zero_iff_nil in Hlen.
+  now apply List.length_zero_iff_nil in Hlen.
 }
 destruct l2 as [| a2]; [ easy | ].
 cbn in Hlen.
@@ -2101,19 +2104,19 @@ now specialize (Hll d (S i)).
 Qed.
 
 Theorem List_last_rev : ∀ A (l : list A) d,
-  last (rev l) d = hd d l.
+  List.last (List.rev l) d = List.hd d l.
 Proof.
 intros.
-destruct l as [| a]; [ easy | apply last_last ].
+destruct l as [| a]; [ easy | apply List.last_last ].
 Qed.
 
 Theorem List_last_nth : ∀ A (la : list A) d,
-  last la d = nth (length la - 1) la d.
+  List.last la d = List.nth (length la - 1) la d.
 Proof.
 intros.
-destruct la as [| a] using rev_ind; [ easy | cbn ].
-rewrite last_last, length_app, Nat.add_sub.
-rewrite app_nth2; [ | now progress unfold ge ].
+destruct la as [| a] using List.rev_ind; [ easy | cbn ].
+rewrite List.last_last, List.length_app, Nat.add_sub.
+rewrite List.app_nth2; [ | now progress unfold ge ].
 now rewrite Nat.sub_diag.
 Qed.
 
@@ -2121,7 +2124,7 @@ Qed.
 
 Theorem iter_list_seq : ∀ T d (op : T → T → T) b len f,
   len ≠ 0
-  → iter_list (seq b len) (λ c i, op c (f i)) d =
+  → iter_list (List.seq b len) (λ c i, op c (f i)) d =
     iter_seq b (b + len - 1) (λ c i, op c (f i)) d.
 Proof.
 intros * Hlen.
@@ -2134,8 +2137,8 @@ Theorem fold_left_op_fun_from_d : ∀ {T A} d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
-  fold_left (λ (c : T) i, op c (f i)) l a =
-  op a (fold_left (λ (c : T) i, op c (f i)) l d).
+  List.fold_left (λ (c : T) i, op c (f i)) l a =
+  op a (List.fold_left (λ (c : T) i, op c (f i)) l d).
 Proof.
 intros.
 revert a.
@@ -2191,7 +2194,7 @@ Proof.
 intros * op_d_l od_d_r op_assoc Hz.
 apply iter_list_all_d; [ easy | easy | easy | ].
 intros i Hi.
-apply in_seq in Hi.
+apply List.in_seq in Hi.
 apply Hz; flia Hi.
 Qed.
 
@@ -2201,7 +2204,7 @@ Theorem iter_list_split_first : ∀ T A d op l z f
   (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
   l ≠ []
   → iter_list l (λ (c : T) (i : A), op c (f i)) d =
-    op (f (hd z l)) (iter_list (tl l) (λ (c : T) (i : A), op c (f i)) d).
+    op (f (List.hd z l)) (iter_list (List.tl l) (λ (c : T) (i : A), op c (f i)) d).
 Proof.
 intros * op_d_l op_d_r op_assoc Hl.
 progress unfold iter_list.
@@ -2239,14 +2242,14 @@ Qed.
 Theorem iter_list_split_last : ∀ T A d (op : T → T → T) l (g : A → T) z,
   l ≠ []
   → iter_list l (λ c i, op c (g i)) d =
-    op (iter_list (removelast l) (λ c i, op c (g i)) d) (g (last l z)).
+    op (iter_list (List.removelast l) (λ c i, op c (g i)) d) (g (List.last l z)).
 Proof.
 intros * Hlz.
 progress unfold iter_list.
-induction l as [| a] using rev_ind; [ easy | clear IHl Hlz ].
-rewrite removelast_last.
-rewrite last_last.
-now rewrite fold_left_app.
+induction l as [| a] using List.rev_ind; [ easy | clear IHl Hlz ].
+rewrite List.removelast_last.
+rewrite List.last_last.
+now rewrite List.fold_left_app.
 Qed.
 
 Theorem iter_seq_split_last : ∀ T d (op : T → T → T) b k g,
@@ -2260,10 +2263,10 @@ remember (S k - S b) as len eqn:Hlen.
 rewrite Nat.sub_succ in Hlen.
 replace (S k - b) with (S len) by flia Hbk Hlen.
 replace k with (b + len) by flia Hbk Hlen.
-rewrite <- seq_shift.
+rewrite <- List.seq_shift.
 rewrite List_fold_left_map.
-rewrite seq_S.
-rewrite fold_left_app.
+rewrite List.seq_S.
+rewrite List.fold_left_app.
 cbn; f_equal.
 apply List_fold_left_ext_in.
 intros i c Hi.
@@ -2300,7 +2303,7 @@ rewrite (fold_left_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
 rewrite (fold_left_op_fun_from_d d _ (g b)); [ | easy | easy | easy ].
 rewrite <- op_assoc; f_equal.
 replace len2 with (len1 + (len2 - len1)) at 1 by flia Hll.
-rewrite seq_app, fold_left_app.
+rewrite List.seq_app, List.fold_left_app.
 rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
@@ -2324,7 +2327,7 @@ Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
 Proof.
 intros.
 progress unfold iter_list.
-now rewrite fold_left_app.
+now rewrite List.fold_left_app.
 Qed.
 
 Theorem iter_list_cons : ∀ A B d op (a : B) la f
@@ -2365,7 +2368,7 @@ intros * Hgh.
 apply iter_list_eq_compat.
 intros i Hi.
 apply Hgh.
-apply in_seq in Hi.
+apply List.in_seq in Hi.
 flia Hi.
 Qed.
 
@@ -2377,7 +2380,7 @@ intros.
 progress unfold iter_seq, iter_list.
 rewrite Nat.sub_succ.
 remember (S k - b)%nat as len; clear Heqlen.
-rewrite <- seq_shift.
+rewrite <- List.seq_shift.
 now rewrite List_fold_left_map.
 Qed.
 
@@ -2388,7 +2391,7 @@ Proof.
 intros.
 progress unfold iter_seq, iter_list.
 rewrite Nat.sub_succ.
-rewrite <- seq_shift.
+rewrite <- List.seq_shift.
 rewrite List_fold_left_map.
 apply List_fold_left_ext_in.
 intros j i Hj.
@@ -2525,18 +2528,18 @@ replace k with (b + len - 1) by flia Hkb Hlen.
 clear Hlen Hkb.
 revert b.
 induction len; intros; [ easy | ].
-rewrite seq_S at 1; cbn.
-rewrite fold_left_app; cbn.
+rewrite List.seq_S at 1; cbn.
+rewrite List.fold_left_app; cbn.
 symmetry.
 rewrite fold_left_op_fun_from_d with (d := d); [ | easy | easy | easy ].
 rewrite op_comm.
 f_equal; [ | rewrite op_d_l; f_equal; flia ].
 rewrite IHlen.
-rewrite <- seq_shift.
+rewrite <- List.seq_shift.
 rewrite List_fold_left_map.
 apply List_fold_left_ext_in.
 intros j c Hj.
-apply in_seq in Hj.
+apply List.in_seq in Hj.
 f_equal; f_equal; flia.
 Qed.
 
@@ -2545,7 +2548,7 @@ Qed.
 (*
 Theorem fold_left_max_from_0 : ∀ A a l (f : A → _),
   fold_left (λ c i, max c (f i)) l a =
-  max a (fold_left (λ c i, max c (f i)) l 0).
+  max a (List.fold_left (λ c i, max c (f i)) l 0).
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
@@ -2581,11 +2584,11 @@ Qed.
 *)
 
 Theorem List_flat_length_map : ∀ A B (f : A → list B) l,
-  length (flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
+  length (List.flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
 Proof.
 intros.
 induction l as [| a]; [ now rewrite iter_list_empty | cbn ].
-rewrite length_app.
+rewrite List.length_app.
 rewrite iter_list_cons; cycle 1. {
   apply Nat.add_0_l.
 } {
@@ -2610,8 +2613,8 @@ Theorem App_list_cons : ∀ A B (a : A) la (f : A → list B),
   App (i ∈ a :: la), f i = f a ++ App (i ∈ la), f i.
 Proof.
 intros.
-apply iter_list_cons; [ easy | apply app_nil_r | ].
-apply app_assoc.
+apply iter_list_cons; [ easy | apply List.app_nil_r | ].
+apply List.app_assoc.
 Qed.
 
 Theorem App_list_all_nil : ∀ A B l (f : A → list B),
@@ -2619,8 +2622,8 @@ Theorem App_list_all_nil : ∀ A B l (f : A → list B),
   → App (a ∈ l), f a = [].
 Proof.
 intros * Hl.
-apply iter_list_all_d; [ easy | apply app_nil_r | | easy ].
-apply app_assoc.
+apply iter_list_all_d; [ easy | apply List.app_nil_r | | easy ].
+apply List.app_assoc.
 Qed.
 
 Theorem App_list_eq_nil : ∀ A B (l : list A) (f : A → list B),
@@ -2629,13 +2632,13 @@ Proof.
 intros * Happ * Hl.
 induction l as [| b]; [ easy | ].
 rewrite App_list_cons in Happ.
-apply app_eq_nil in Happ.
+apply List.app_eq_nil in Happ.
 destruct Hl as [Hl| Hl]; [ now subst a | ].
 now apply IHl.
 Qed.
 
 Theorem App_list_concat_map : ∀ A B (l : list A) (f : A → list B),
-  App (a ∈ l), f a = concat (map f l).
+  App (a ∈ l), f a = List.concat (List.map f l).
 Proof.
 intros.
 induction l as [| a]; [ easy | cbn ].
@@ -2648,8 +2651,8 @@ Theorem in_App_list : ∀ A B (f : A → list B) l y,
 Proof.
 intros.
 rewrite App_list_concat_map.
-rewrite <- flat_map_concat_map.
-apply in_flat_map.
+rewrite <- List.flat_map_concat_map.
+apply List.in_flat_map.
 Qed.
 
 Theorem App_split : ∀ A j (g : nat → list A) b k,
@@ -2658,9 +2661,9 @@ Theorem App_split : ∀ A j (g : nat → list A) b k,
 Proof.
 intros * Hbjk.
 apply iter_seq_split; [ easy | | | easy ]. {
-  apply app_nil_r.
+  apply List.app_nil_r.
 } {
-  apply app_assoc.
+  apply List.app_assoc.
 }
 Qed.
 
@@ -2671,9 +2674,9 @@ intros.
 rewrite iter_list_app.
 progress unfold iter_list.
 rewrite fold_left_op_fun_from_d with (d := []); [ easy | easy | | ]. {
-  apply app_nil_r.
+  apply List.app_nil_r.
 } {
-  apply app_assoc.
+  apply List.app_assoc.
 }
 Qed.
 
@@ -2688,7 +2691,7 @@ Qed.
 Fixpoint cart_prod {A} (ll : list (list A)) :=
   match ll with
   | [] => [[]]
-  | l :: ll' => flat_map (λ a, map (cons a) (cart_prod ll')) l
+  | l :: ll' => List.flat_map (λ a, List.map (cons a) (cart_prod ll')) l
   end.
 
 Theorem cart_prod_length : ∀ A (ll : list (list A)),
@@ -2708,7 +2711,7 @@ rewrite iter_list_cons; cycle 1. {
 rewrite List_flat_length_map.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
-  now rewrite length_map.
+  now rewrite List.length_map.
 }
 cbn.
 destruct ll as [| l2]. {
@@ -2740,9 +2743,9 @@ induction ll as [| l1]; intros. {
   destruct Hl as [Hl| Hl]; [ now subst l | easy ].
 }
 cbn in Hl.
-apply in_flat_map in Hl.
+apply List.in_flat_map in Hl.
 destruct Hl as (a & Hl1 & Ha).
-apply in_map_iff in Ha.
+apply List.in_map_iff in Ha.
 destruct Ha as (l3 & Hl & Hl3).
 subst l; cbn; f_equal.
 now apply IHll.
@@ -2751,7 +2754,7 @@ Qed.
 Theorem nth_in_cart_prod : ∀ A (d : A) ll l i,
   i < length ll
   → l ∈ cart_prod ll
-  → nth i l d ∈ nth i ll [].
+  → List.nth i l d ∈ List.nth i ll [].
 Proof.
 intros * Hi Hll.
 revert l i Hi Hll.
@@ -2759,21 +2762,21 @@ induction ll as [| l1]; intros; [ easy | ].
 cbn in Hll |-*.
 destruct i. {
   destruct ll as [| l2]. {
-    apply in_flat_map in Hll.
+    apply List.in_flat_map in Hll.
     destruct Hll as (a & Ha & Hla).
-    apply in_map_iff in Hla.
+    apply List.in_map_iff in Hla.
     now destruct Hla as (l2 & H & Hl2); subst l.
   }
-  apply in_flat_map in Hll.
+  apply List.in_flat_map in Hll.
   destruct Hll as (a & Hl1 & Hl).
-  apply in_map_iff in Hl.
+  apply List.in_map_iff in Hl.
   now destruct Hl as (l3 & H & Hl3); subst l.
 }
 cbn in Hi; apply Nat.succ_lt_mono in Hi.
 destruct ll as [| l2]; [ easy | ].
-apply in_flat_map in Hll.
+apply List.in_flat_map in Hll.
 destruct Hll as (a & Ha & Hl).
-apply in_map_iff in Hl.
+apply List.in_map_iff in Hl.
 destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
@@ -2781,7 +2784,7 @@ Qed.
 
 Theorem in_cart_prod_iff : ∀ {A} (d : A) ll la,
   la ∈ cart_prod ll
-  ↔ length la = length ll ∧ ∀ i, i < length la → nth i la d ∈ nth i ll [].
+  ↔ length la = length ll ∧ ∀ i, i < length la → List.nth i la d ∈ List.nth i ll [].
 Proof.
 intros.
 split. {
@@ -2795,16 +2798,16 @@ split. {
   intros (Hla & Hnth).
   revert la Hla Hnth.
   induction ll as [| lb]; intros. {
-    now apply length_zero_iff_nil in Hla; subst la; left.
+    now apply List.length_zero_iff_nil in Hla; subst la; left.
   }
   cbn.
   destruct la as [| a]; [ easy | ].
   cbn in Hla; apply Nat.succ_inj in Hla.
-  apply in_flat_map.
+  apply List.in_flat_map.
   exists a.
   specialize (Hnth 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
   split; [ easy | ].
-  apply in_map_iff.
+  apply List.in_map_iff.
   exists la.
   split; [ easy | ].
   apply IHll; [ easy | ].
@@ -2866,25 +2869,25 @@ Qed.
 
 (* end binomial *)
 
-Theorem NoDup_filter {A} : ∀ (f : A → _) {l}, NoDup l → NoDup (filter f l).
+Theorem NoDup_filter {A} : ∀ (f : A → _) {l}, List.NoDup l → List.NoDup (List.filter f l).
 Proof.
 intros * Hnd.
 induction l as [| a l]; [ easy | cbn ].
 remember (f a) as b eqn:Hb; symmetry in Hb.
-apply NoDup_cons_iff in Hnd.
+apply List.NoDup_cons_iff in Hnd.
 destruct Hnd as (Hal, Hl).
 destruct b. {
   constructor; [ | now apply IHl ].
   intros H; apply Hal.
-  now apply filter_In in H.
+  now apply List.filter_In in H.
 }
 now apply IHl.
 Qed.
 
 Theorem NoDup_map_iff {A B} : ∀ d l (f : A → B),
-  NoDup (map f l)
+  List.NoDup (List.map f l)
   ↔ (∀ i j,
-      i < length l → j < length l → f (nth i l d) = f (nth j l d) → i = j).
+      i < length l → j < length l → f (List.nth i l d) = f (List.nth j l d) → i = j).
 Proof.
 intros.
 split. {
@@ -2892,7 +2895,7 @@ split. {
   revert i j Hi Hj Hij.
   induction l as [| a l]; intros; [ easy | ].
   cbn in Hnd.
-  apply NoDup_cons_iff in Hnd.
+  apply List.NoDup_cons_iff in Hnd.
   destruct Hnd as (Hnin, Hnd).
   specialize (IHl Hnd).
   destruct i. {
@@ -2900,14 +2903,14 @@ split. {
     cbn in Hij, Hj; clear Hi.
     apply Nat.succ_lt_mono in Hj.
     rewrite Hij in Hnin; apply Hnin; clear Hnin.
-    now apply in_map, nth_In.
+    now apply List.in_map, List.nth_In.
   }
   cbn in Hi, Hj.
   destruct j; [ exfalso | ]. {
     cbn in Hij, Hj; clear Hj.
     apply Nat.succ_lt_mono in Hi.
     rewrite <- Hij in Hnin; apply Hnin; clear Hnin.
-    now apply in_map, nth_In.
+    now apply List.in_map, List.nth_In.
   }
   apply Nat.succ_lt_mono in Hi.
   apply Nat.succ_lt_mono in Hj.
@@ -2917,12 +2920,12 @@ split. {
 } {
   intros Hinj.
   induction l as [| a l]; [ constructor | cbn ].
-  apply NoDup_cons. {
+  apply List.NoDup_cons. {
     intros Hcon.
-    apply in_map_iff in Hcon.
+    apply List.in_map_iff in Hcon.
     destruct Hcon as (b & Hba & Hb).
     symmetry in Hba.
-    apply (In_nth _ _ d) in Hb.
+    apply (List.In_nth _ _ d) in Hb.
     destruct Hb as (n & Hlen & Hnth).
     specialize (Hinj 0 (S n)) as H1.
     cbn in H1; rewrite Hnth in H1.
@@ -2938,21 +2941,21 @@ split. {
 }
 Qed.
 
-Theorem NoDup_app_remove_l : ∀ A (l l' : list A), NoDup (l ++ l') → NoDup l'.
+Theorem NoDup_app_remove_l : ∀ A (l l' : list A), List.NoDup (l ++ l') → List.NoDup l'.
 Proof.
 intros * Hnd.
 apply NoDup_app_comm in Hnd.
 revert l Hnd.
 induction l' as [| b]; intros; [ constructor | ].
 cbn in Hnd.
-apply NoDup_cons_iff in Hnd.
+apply List.NoDup_cons_iff in Hnd.
 destruct Hnd as (H1, H2).
 constructor; [ | now apply IHl' in H2 ].
 intros H; apply H1.
-now apply in_or_app; left.
+now apply List.in_or_app; left.
 Qed.
 
-Theorem NoDup_app_remove_r : ∀ A (l l' : list A), NoDup (l ++ l') → NoDup l.
+Theorem NoDup_app_remove_r : ∀ A (l l' : list A), List.NoDup (l ++ l') → List.NoDup l.
 Proof.
 intros * Hnd.
 apply NoDup_app_comm in Hnd.
@@ -2960,8 +2963,8 @@ now apply NoDup_app_remove_l in Hnd.
 Qed.
 
 Theorem NoDup_app_iff : ∀ A (l l' : list A),
-  NoDup (l ++ l') ↔
-    NoDup l ∧ NoDup l' ∧ (∀ a, a ∈ l → a ∉ l').
+  List.NoDup (l ++ l') ↔
+    List.NoDup l ∧ List.NoDup l' ∧ (∀ a, a ∈ l → a ∉ l').
 Proof.
 intros.
 split. {
@@ -2974,27 +2977,27 @@ split. {
   destruct Ha as [Ha| Ha]. {
     subst b.
     apply NoDup_app_comm in Hnd.
-    apply NoDup_remove_2 in Hnd.
+    apply List.NoDup_remove_2 in Hnd.
     apply Hnd.
-    now apply in_app_iff; left.
+    now apply List.in_app_iff; left.
   }
   apply (IHl Ha l'); [ | easy ].
   cbn in Hnd.
-  now apply NoDup_cons_iff in Hnd.
+  now apply List.NoDup_cons_iff in Hnd.
 } {
   intros * (Hnl & Hnl' & Hll).
   revert l' Hnl' Hll.
   induction l as [| b l]; intros; [ easy | cbn ].
   constructor. {
     intros Hb.
-    apply in_app_or in Hb.
+    apply List.in_app_or in Hb.
     destruct Hb as [Hb| Hb]. {
-      now apply NoDup_cons_iff in Hnl.
+      now apply List.NoDup_cons_iff in Hnl.
     } {
       now specialize (Hll b (or_introl eq_refl)) as H1.
     }
   } {
-    apply NoDup_cons_iff in Hnl.
+    apply List.NoDup_cons_iff in Hnl.
     apply IHl; [ easy | easy | ].
     intros a Ha.
     now apply Hll; right.
@@ -3002,20 +3005,20 @@ split. {
 }
 Qed.
 
-Theorem NoDup_butn : ∀ A k (la : list A), NoDup la → NoDup (butn k la).
+Theorem NoDup_butn : ∀ A k (la : list A), List.NoDup la → List.NoDup (butn k la).
 Proof.
 intros * Hnd.
 apply NoDup_app_iff.
 split. {
-  rewrite <- (firstn_skipn k) in Hnd.
+  rewrite <- (List.firstn_skipn k) in Hnd.
   now apply NoDup_app_iff in Hnd.
 }
 split. {
-  rewrite <- (firstn_skipn (S k)) in Hnd.
+  rewrite <- (List.firstn_skipn (S k)) in Hnd.
   now apply NoDup_app_iff in Hnd.
 }
 intros i Hif.
-rewrite <- (firstn_skipn (S k)) in Hnd.
+rewrite <- (List.firstn_skipn (S k)) in Hnd.
 apply NoDup_app_iff in Hnd.
 destruct Hnd as (H1 & H2 & H3).
 apply H3.
@@ -3023,15 +3026,15 @@ clear - Hif.
 revert la Hif.
 induction k; intros; [ easy | ].
 destruct la as [| a]; [ easy | ].
-rewrite firstn_cons in Hif |-*.
+rewrite List.firstn_cons in Hif |-*.
 destruct Hif as [Hif| Hif]; [ now left | right ].
 now apply IHk.
 Qed.
 
 Theorem NoDup_concat_if : ∀ A (ll : list (list A)),
-  (∀ l, l ∈ ll → NoDup l)
-  → (∀ i j, i ≠ j → ∀ a, a ∈ nth i ll [] → a ∉ nth j ll [])
-  → NoDup (concat ll).
+  (∀ l, l ∈ ll → List.NoDup l)
+  → (∀ i j, i ≠ j → ∀ a, a ∈ List.nth i ll [] → a ∉ List.nth j ll [])
+  → List.NoDup (List.concat ll).
 Proof.
 intros * Hnd Hll.
 induction ll as [| l]; [ constructor | cbn ].
@@ -3051,7 +3054,7 @@ intros i Hi Hll'.
 revert i l Hnd Hi Hll Hll'.
 induction ll as [| l1]; intros; [ easy | ].
 cbn in Hll'.
-apply in_app_or in Hll'.
+apply List.in_app_or in Hll'.
 destruct Hll' as [Hll'| Hll']. 2: {
   apply IHll with (i := i) (l := l); [ | easy | | easy ]. {
     intros l2 Hl2.
@@ -3080,7 +3083,7 @@ destruct Hll' as [Hll'| Hll']. 2: {
 now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
 Qed.
 
-(* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
+(* "to_radix_loop u r i" is the last u digits of i in base r (in List.reverse) *)
 Fixpoint to_radix_loop it r i :=
   match it with
   | 0 => []
@@ -3092,7 +3095,7 @@ Fixpoint to_radix_loop it r i :=
    7; 3; 0 ... (eight 0s) *)
 Definition to_radix r i := to_radix_loop r r i.
 
-Definition to_radix_list r := map (to_radix r) (seq 0 (r ^ r)).
+Definition to_radix_list r := List.map (to_radix r) (List.seq 0 (r ^ r)).
 
 Fixpoint to_radix_inv r l :=
   match l with
@@ -3101,7 +3104,7 @@ Fixpoint to_radix_inv r l :=
   end.
 
 Theorem to_radix_loop_ub : ∀ it n k i,
-  n ≠ 0 → nth i (to_radix_loop it n k) 0 < n.
+  n ≠ 0 → List.nth i (to_radix_loop it n k) 0 < n.
 Proof.
 intros * Hnz.
 revert n k i Hnz.
@@ -3110,7 +3113,7 @@ destruct i; [ now apply Nat.mod_upper_bound | ].
 now apply IHit.
 Qed.
 
-Theorem to_radix_ub : ∀ n k i, n ≠ 0 → nth i (to_radix n k) 0 < n.
+Theorem to_radix_ub : ∀ n k i, n ≠ 0 → List.nth i (to_radix n k) 0 < n.
 Proof.
 intros * Hnz.
 now apply to_radix_loop_ub.
@@ -3131,7 +3134,7 @@ Theorem to_radix_loop_to_radix_inv : ∀ l d n it,
   length l + d = n
   → (∀ i, i ∈ l → i < n)
   → n ≤ it + d
-  → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it + d - n).
+  → to_radix_loop it n (to_radix_inv n l) = l ++ List.repeat 0 (it + d - n).
 Proof.
 intros * Hlen Hl Hit.
 revert d n it Hlen Hl Hit.
@@ -3188,7 +3191,7 @@ specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
 do 2 rewrite Nat.add_0_r in H1.
 specialize (H1 Hlen Hl (Nat.le_refl _)).
-now rewrite Nat.sub_diag, app_nil_r in H1.
+now rewrite Nat.sub_diag, List.app_nil_r in H1.
 Qed.
 
 Theorem to_radix_loop_length : ∀ n l it, length (to_radix_loop it n l) = it.
@@ -3207,7 +3210,7 @@ Qed.
 
 Theorem to_radix_inv_ub : ∀ n l,
   n ≠ 0
-  → (∀ i, i < length l → nth i l 0 < n)
+  → (∀ i, i < length l → List.nth i l 0 < n)
   → to_radix_inv n l < n ^ length l.
 Proof.
 intros * Hnz Hl.
@@ -3217,7 +3220,7 @@ apply Nat.neq_0_lt_0 in Hnz.
 specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
 apply Nat.neq_0_lt_0 in Hnz.
 specialize (IHl n Hnz) as H2.
-assert (H : ∀ i, i < length l → nth i l 0 < n). {
+assert (H : ∀ i, i < length l → List.nth i l 0 < n). {
   intros i Hi.
   apply (Hl (S i)); cbn.
   now apply -> Nat.succ_lt_mono.

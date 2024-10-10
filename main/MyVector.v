@@ -64,7 +64,7 @@ Definition vect_zero n : vector T := mk_vect (repeat 0%L n).
 (* addition, subtraction of vector *)
 
 Definition vect_add (U V : vector T) :=
-  mk_vect (map2 rngl_add (vect_list U) (vect_list V)).
+  mk_vect (List_map2 rngl_add (vect_list U) (vect_list V)).
 
 Definition vect_opp (V : vector T) :=
   mk_vect (map rngl_opp (vect_list V)).
@@ -79,7 +79,7 @@ Definition vect_mul_scal_l s (V : vector T) :=
 (* dot product *)
 
 Definition vect_dot_mul (U V : vector T) :=
-  ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
+  ∑ (t ∈ List_map2 rngl_mul (vect_list U) (vect_list V)), t.
 Definition vect_dot_mul' (U V : vector T) :=
   ∑ (i = 1, min (vect_size U) (vect_size V)),
   vect_el U i * vect_el V i.
@@ -115,14 +115,14 @@ destruct (Nat.eq_dec (length lu) 0) as [Huz| Huz]. {
   rewrite Huz; cbn - [ nth ].
   apply length_zero_iff_nil in Huz; subst lu.
   rewrite rngl_summation_empty; [ | easy ].
-  now rewrite map2_nil_l; unfold iter_list.
+  now rewrite List_map2_nil_l; unfold iter_list.
 }
 destruct (Nat.eq_dec (length lv) 0) as [Hvz| Hvz]. {
   rewrite Hvz; cbn - [ nth ].
   apply length_zero_iff_nil in Hvz; subst lv.
   rewrite Nat.min_r; [ | easy ].
   rewrite rngl_summation_empty; [ | easy ].
-  now rewrite map2_nil_r; unfold iter_list.
+  now rewrite List_map2_nil_r; unfold iter_list.
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -205,9 +205,9 @@ unfold vect_dot_mul.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
-rewrite map2_map_r.
-rewrite List_fold_left_map2.
-rewrite List_fold_left_map2.
+rewrite List_map2_map_r.
+rewrite List_fold_left_List_map2.
+rewrite List_fold_left_List_map2.
 apply List_fold_left_ext_in.
 intros * Hb.
 f_equal.
@@ -226,9 +226,9 @@ unfold vect_dot_mul; cbn.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
-rewrite map2_map_l.
-rewrite List_fold_left_map2.
-rewrite List_fold_left_map2.
+rewrite List_map2_map_l.
+rewrite List_fold_left_List_map2.
+rewrite List_fold_left_List_map2.
 apply List_fold_left_ext_in.
 intros * Hb.
 f_equal; symmetry.
@@ -280,7 +280,7 @@ unfold vect_add; f_equal.
 destruct u as (la).
 destruct v as (lb); cbn.
 revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
+induction la as [| a]; intros; cbn; [ now rewrite List_map2_nil_r | ].
 destruct lb as [| b]; [ easy | cbn ].
 rewrite rngl_add_comm; f_equal.
 apply IHla.
@@ -295,7 +295,7 @@ unfold vect_dot_mul.
 destruct u as (la).
 destruct v as (lb); cbn.
 revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite map2_nil_r | ].
+induction la as [| a]; intros; cbn; [ now rewrite List_map2_nil_r | ].
 destruct lb as [| b]; [ easy | cbn ].
 do 2 rewrite rngl_summation_list_cons.
 rewrite (rngl_mul_comm Hic); f_equal.
@@ -312,7 +312,7 @@ Proof.
 intros n (la) (lb) (lc) Ha Hb Hc.
 cbn in Ha, Hb, Hc.
 unfold vect_dot_mul; cbn.
-do 4 rewrite (map2_map_min 0%L 0%L).
+do 4 rewrite (List_map2_map_min 0%L 0%L).
 rewrite List_length_map_seq.
 rewrite Ha, Hb, Hc.
 do 2 rewrite Nat.min_id.
@@ -336,7 +336,7 @@ Proof.
 intros n (la) (lb) (lc) Ha Hb Hc.
 cbn in Ha, Hb, Hc.
 unfold vect_dot_mul; cbn.
-do 4 rewrite (map2_map_min 0%L 0%L).
+do 4 rewrite (List_map2_map_min 0%L 0%L).
 rewrite List_length_map_seq.
 rewrite Ha, Hb, Hc.
 do 2 rewrite Nat.min_id.
@@ -376,7 +376,7 @@ Theorem vect_add_size :
 Proof.
 intros.
 unfold vect_size; cbn.
-apply length_map2.
+apply List_length_map2.
 Qed.
 
 Theorem vect_mul_scal_l_add_distr_r :
@@ -384,7 +384,7 @@ Theorem vect_mul_scal_l_add_distr_r :
 Proof.
 intros.
 unfold "×", vect_add; cbn; f_equal.
-rewrite (map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
 do 2 rewrite length_map.
 rewrite Nat.min_id.
 rewrite List_map_map_seq with (d := 0%L).
@@ -407,7 +407,7 @@ assert (Hos : rngl_has_opp_or_subt T = true). {
 }
 move Hos before Hop.
 unfold "×", vect_sub, vect_add; cbn; f_equal.
-rewrite (map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
 do 3 rewrite length_map.
 rewrite Nat.min_id.
 rewrite List_map_map_seq with (d := 0%L).
@@ -428,8 +428,8 @@ Theorem vect_mul_scal_l_add_distr_l :
 Proof.
 intros.
 unfold "×", vect_add; f_equal; cbn.
-rewrite (map2_map_min 0%L 0%L).
-rewrite (map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
 do 2 rewrite length_map.
 do 2 rewrite fold_vect_size.
 rewrite map_map.
@@ -452,7 +452,7 @@ Theorem vect_add_assoc :
 Proof.
 intros.
 unfold vect_add; f_equal; cbn.
-do 4 rewrite (map2_map_min 0%L 0%L).
+do 4 rewrite (List_map2_map_min 0%L 0%L).
 do 2 rewrite List_length_map_seq.
 do 3 rewrite fold_vect_size.
 rewrite Nat.min_assoc.
@@ -486,8 +486,8 @@ Proof.
 intros Hop *.
 unfold vect_dot_mul.
 rewrite (rngl_opp_summation_list Hop).
-rewrite (map2_map_min 0%L 0%L).
-rewrite (map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
+rewrite (List_map2_map_min 0%L 0%L).
 do 3 rewrite fold_vect_size.
 rewrite vect_opp_size.
 do 2 rewrite rngl_summation_list_map.
