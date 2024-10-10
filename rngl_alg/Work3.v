@@ -108,7 +108,6 @@ easy.
 Qed.
 
 Notation "‖ x ‖" := (gc_modl x) (at level 60) : ring_like_scope.
-Notation "l .[ i ]" := (List.nth i l 0%L) (at level 1, format "l .[ i ]").
 
 (* to be completed
 Theorem gc_opt_alg_closed :

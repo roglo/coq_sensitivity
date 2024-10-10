@@ -197,6 +197,8 @@ Notation "a ≠? b" := (negb (rngl_eqb a b)) (at level 70) : ring_like_scope.
 Notation "a ≤? b" := (rngl_leb a b) (at level 70) : ring_like_scope.
 Notation "a <? b" := (rngl_ltb a b) (at level 70) : ring_like_scope.
 
+Notation "l .[ i ]" := (List.nth i l 0%L) (at level 1, format "l .[ i ]").
+
 Inductive not_applicable := NA.
 
 Class ring_like_ord T {ro : ring_like_op T} :=
