@@ -717,8 +717,11 @@ Definition gc_ring_like_prop_not_alg_closed
 
 (* algebraically closed *)
 
-Definition gc_modl (z : GComplex T) :=
+Definition gc_squ_modl (z : GComplex T) :=
   (gre z * gre z + gim z * gim z)%L.
+
+Definition gc_modl (z : GComplex T) :=
+  √(gc_squ_modl z)%L.
 
 Theorem le_rl_sqrt_add :
   rngl_has_1 T = true →

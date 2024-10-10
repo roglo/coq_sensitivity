@@ -106,6 +106,8 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
+Notation "‖ x ‖" := (gc_modl x) (at level 60) : ring_like_scope.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let ro := gc_ring_like_op T in
@@ -124,6 +126,17 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
+Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
+  let gro := gc_ring_like_op T in
+  ∀ P : list (GComplex T),
+  ∀ M, (0 < M)%L →
+  ∃ R₀, (0 < R₀)%L ∧
+  ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
+Proof.
+intros * HM.
+(* must take
+   R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
+ *)
 ...
 *)
 
