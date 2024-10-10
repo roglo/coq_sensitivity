@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import List.ListNotations.
 Import Init.Nat.
 
 Require Import Main.Misc Main.RingLike.
@@ -14,7 +14,7 @@ Fixpoint comb_elem_rest A (la : list A) :=
   match la with
   | [] => []
   | a :: lb =>
-      (a, lb) :: map (λ al, (fst al, a :: snd al)) (comb_elem_rest lb)
+      (a, lb) :: List.map (λ al, (fst al, a :: snd al)) (comb_elem_rest lb)
   end.
 
 Fixpoint pair_comb_loop A it (la : list A) : list (list (A * A)) :=
@@ -24,11 +24,11 @@ Fixpoint pair_comb_loop A it (la : list A) : list (list (A * A)) :=
       match la with
       | [] => []
       | a :: lb =>
-          flat_map
+          List.flat_map
             (λ bl,
               match pair_comb_loop it' (snd bl) with
               | [] => [[(a, fst bl)]]
-              | ll' => map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
+              | ll' => List.map (λ (l : list (A * A)), (a, fst bl) :: l) ll'
               end)
             (comb_elem_rest lb)
       end
@@ -58,11 +58,11 @@ Fixpoint has_no_dup (la : list nat) :=
   end.
 
 Compute (pair_comb [1;2;3;4;5;6]).
-Compute (map glip (pair_comb [1;2;3;4;5;6])).
-Compute (map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
+Compute (List.map glip (pair_comb [1;2;3;4;5;6])).
+Compute (List.map (λ i, (i, glip i)) (pair_comb [1;2;3;4;5;6])).
 Compute
-  (filter (λ ij, has_no_dup (snd ij))
-     (map (λ i, (i, glip i)) (pair_comb (seq 1 6)))).
+  (List.filter (λ ij, has_no_dup (snd ij))
+     (List.map (λ i, (i, glip i)) (pair_comb (List.seq 1 6)))).
 ...
 
 ([(1, 4); (2, 6); (3, 5)], [3; 4; 2]);
@@ -100,7 +100,7 @@ Arguments vect_comm {T ro} (u v)%V (i j)%nat.
 Definition vect_cross_mul {T} {ro : ring_like_op T} (u v : vector T) :=
   let n := vect_size u in
   let f i := ∑ (j = 1, n / 2), vect_comm u v (i + j) (i + n - j) in
-  mk_vect (map f (seq 1 n)).
+  mk_vect (List.map f (seq 1 n)).
 
 Notation "U * V" := (vect_cross_mul U V) : V_scope.
 
@@ -167,7 +167,7 @@ Compute (
   let i := mk_nion 0 (mk_vect [1;0;0]) in
   let j := mk_nion 0 (mk_vect [0;1;0]) in
   let k := mk_nion 0 (mk_vect [0;0;1]) in
-  map (λ e, (k*e)%H) [i;j;k]).
+  List.map (λ e, (k*e)%H) [i;j;k]).
 
 (* i*i=-1 i*j=k i*k=-j
    j*i=-k j*j=-1 j*k=i
@@ -193,7 +193,7 @@ Compute (
   let e3 := mk_nion 0 (mk_vect [0;0;1;0;0]) in
   let e4 := mk_nion 0 (mk_vect [0;0;0;1;0]) in
   let e5 := mk_nion 0 (mk_vect [0;0;0;0;1]) in
-  map (λ e, (e5*e)%H) [e1;e2;e3;e4;e5]).
+  List.map (λ e, (e5*e)%H) [e1;e2;e3;e4;e5]).
 
 (* e1*e1=-1 e1*e2=e4 e1*e3=-e2 e1*e4=e5 e1*e5=-e3
    e2*e1=-e4 e2*e2=-1 e2*e3=e5 e2*e4=-e3 e2*e5=e1
@@ -211,7 +211,7 @@ Compute (
   let e4 := mk_nion 0 (mk_vect [0;0;0;1;0;0]) in
   let e5 := mk_nion 0 (mk_vect [0;0;0;0;1;0]) in
   let e6 := mk_nion 0 (mk_vect [0;0;0;0;0;1]) in
-  map (λ e, (e3*e)%H) [e1;e2;e3;e4;e5;e6]).
+  List.map (λ e, (e3*e)%H) [e1;e2;e3;e4;e5;e6]).
 
 (* e1*e1=-1 e1*e2=0 e1*e3=-e2+e5 e1*e4=0 e1*e5=-e3+e6 e1*e6=0
    e2*e1=0 e2*e2=-1 e2*e3=0 e2*e4=-e3+e6 e2*e5=0 e2*e6=e1-e4
@@ -275,13 +275,13 @@ progress unfold "*"%V; f_equal.
 destruct u as (la).
 destruct v as (lb); cbn - [ "/" ].
 cbn in Huv.
-rewrite map_length.
+rewrite List.map_length.
 rewrite <- Huv.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 progress unfold vect_comm.
 cbn - [ "/" ].
-rewrite map_length.
+rewrite List.map_length.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   apply in_seq in Hi.
@@ -335,7 +335,7 @@ progress unfold vect_cross_mul.
 rewrite vect_opp_size.
 rewrite Hv.
 f_equal; f_equal; f_equal.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 (*
@@ -523,10 +523,10 @@ do 2 rewrite (map2_map_min 0%L 0%L).
 do 2 rewrite List_map_seq_length.
 rewrite Nat.min_id.
 rewrite <- seq_shift.
-rewrite map_map.
+rewrite List.map_map.
 do 2 rewrite fold_vect_size.
 rewrite Hu, Hv, Hw, Nat.min_id.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 rewrite (List_map_nth' 0). 2: {
@@ -606,8 +606,8 @@ do 2 rewrite (map2_map_min 0%L 0%L).
 do 2 rewrite List_map_seq_length.
 rewrite Nat.min_id.
 rewrite <- seq_shift.
-rewrite map_map.
-apply map_ext_in.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 do 2 rewrite fold_vect_size.
@@ -681,17 +681,17 @@ Proof.
 intros Hos *.
 progress unfold "×", "*"%V.
 f_equal; cbn - [ "/" ].
-rewrite map_length.
+rewrite List.map_length.
 rewrite fold_vect_size.
-rewrite map_map.
-apply map_ext_in.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 rewrite (rngl_mul_summation_distr_l Hos).
 apply rngl_summation_eq_compat.
 intros j Hj.
 progress unfold vect_comm; cbn.
-rewrite map_length.
+rewrite List.map_length.
 do 2 rewrite Nat.add_sub.
 rewrite fold_vect_size.
 assert (Hsz : vect_size u ≠ 0) by flia Hi.
@@ -716,8 +716,8 @@ intros Hos Hic * Huv.
 progress unfold "*"%V, "×"%V.
 f_equal.
 cbn - [ "/" ].
-rewrite map_map.
-apply map_ext_in.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi.
 rewrite (rngl_mul_summation_distr_l Hos).
@@ -764,15 +764,15 @@ progress unfold "*"%V, vect_dot_mul, "×"%V, vect_sub, vect_add.
 rewrite Hu, Hv.
 cbn - [ "/" ].
 f_equal.
-rewrite map_map.
+rewrite List.map_map.
 rewrite (map2_map_min 0%L 0%L).
-do 2 rewrite map_length.
+do 2 rewrite List.map_length.
 do 2 rewrite fold_vect_size.
 rewrite Hv, Hw.
 rewrite Nat.min_id.
 rewrite <- seq_shift.
-rewrite map_map.
-apply map_ext_in.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros i Hi.
 apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
 rewrite (List_map_nth' 0%L); [ | now rewrite fold_vect_size, Hv ].
@@ -990,7 +990,7 @@ f_equal. {
   rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
     progress unfold vect_size; cbn.
     rewrite map2_length.
-    do 2 rewrite map_length.
+    do 2 rewrite List.map_length.
     do 2 rewrite fold_vect_size.
     rewrite Hv, Hu.
     apply Nat.min_id.
@@ -1131,7 +1131,7 @@ f_equal. {
   rewrite (vect_dot_mul_add_l n); [ | | | easy ]; cycle 1. {
     progress unfold vect_size; cbn.
     rewrite map2_length.
-    do 2 rewrite map_length.
+    do 2 rewrite List.map_length.
     do 2 rewrite fold_vect_size.
     rewrite Hv, Hu.
     apply Nat.min_id.
