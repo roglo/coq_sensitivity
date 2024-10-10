@@ -4,6 +4,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc Main.RingLike.
+Require Import Main.IterMax.
 Require Import Misc.
 Require Import Trigo.RealLike.
 Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
@@ -138,14 +139,7 @@ intros * HM.
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
-Check List.nth.
-Search (list (GComplex _)).
 exists (Max (i = 1, n), (‖ List.nth i P 0 ‖ / ‖ List.nth 0 P 0 ‖)%L).
-(* y a pas vraiment de Max, sauf pour les nat et encore !
-   je les ai commentés parce que, justement, ça ne s'applique
-   qu'aux nat, et pas à n'importe quel ring-like, ce qui est
-   un inconvénient, mais en fait, ça ne marche qu'avec les nat
-   parce que les nat ont un minimum qui est 0 *)
 ...
 *)
 
