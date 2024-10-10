@@ -6,7 +6,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require FinFun.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Misc.
 
@@ -14,14 +14,14 @@ Fixpoint find_dup f (la : list nat) :=
   match la with
   | [] => None
   | n :: la' =>
-      match find (λ n', f n' =? f n) la' with
+      match List.find (λ n', f n' =? f n) la' with
       | None => find_dup f la'
       | Some n' => Some (n, n')
       end
   end.
 
 Definition pigeonhole_fun a (f : nat → nat) :=
-  match find_dup f (seq 0 a) with
+  match find_dup f (List.seq 0 a) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
   end.
@@ -53,7 +53,8 @@ Qed.
 Theorem List_eq_dec_In_nth :
   ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) (l : list A) (x d : A),
   x ∈ l →
-  ∃ n : nat, n < length l ∧ nth n l d = x ∧ ∀ m, m < n → nth m l d ≠ x.
+  ∃ n : nat,
+  n < length l ∧ List.nth n l d = x ∧ ∀ m, m < n → List.nth m l d ≠ x.
 Proof.
 intros * eq_dec * Hxl.
 revert x Hxl.
@@ -84,12 +85,12 @@ Qed.
 
 Theorem List_find_some_if :
   ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) f d (l : list A) x,
-  find f l = Some x →
-  ∃ i, i < length l ∧ x = nth i l d ∧ f x = true ∧
-  ∀ j, j < i → f (nth j l d) = false.
+  List.find f l = Some x →
+  ∃ i, i < length l ∧ x = List.nth i l d ∧ f x = true ∧
+  ∀ j, j < i → f (List.nth j l d) = false.
 Proof.
 intros * eq_dec * Hf.
-specialize (find_some _ _ Hf) as H1.
+specialize (List.find_some _ _ Hf) as H1.
 destruct H1 as (Hx, Hfx).
 apply (List_eq_dec_In_nth A eq_dec l x d) in Hx.
 destruct Hx as (i & Hi & Hix & Hx).
@@ -129,7 +130,7 @@ Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
 cbn in Hfd.
-remember (find (λ x', f x' =? f a) la) as r eqn:Hr.
+remember (List.find (λ x', f x' =? f a) la) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [n'| ]. {
   injection Hfd; clear Hfd; intros; subst x x'.
@@ -138,7 +139,7 @@ destruct r as [n'| ]. {
   apply Nat.eqb_eq in Heq.
   split; [ easy | ].
   exists []; cbn.
-  assert (Hx'la : n' ∈ la) by now rewrite Hn'i; apply nth_In.
+  assert (Hx'la : n' ∈ la) by now rewrite Hn'i; apply List.nth_In.
   apply (List_in_split' _ Nat.eq_dec) in Hx'la.
   destruct Hx'la as (l1 & l2 & Hla & Hn').
   exists l1, l2.
@@ -149,17 +150,17 @@ destruct r as [n'| ]. {
   assert (Hil : i = length l1). {
     rewrite Hla in Hn'i.
     destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
-      rewrite app_nth1 in Hn'i; [ | easy ].
+      rewrite List.app_nth1 in Hn'i; [ | easy ].
       exfalso; apply Hn'; clear Hn'.
-      now subst n'; apply nth_In.
+      now subst n'; apply List.nth_In.
     } {
       easy.
     } {
-      rewrite app_nth2 in Hn'i; [ | flia Hil ].
+      rewrite List.app_nth2 in Hn'i; [ | flia Hil ].
       specialize (Hbef (length l1) Hil) as H1.
       apply Nat.eqb_neq in H1.
       rewrite Hla in H1.
-      rewrite app_nth2 in H1; [ | now unfold ge ].
+      rewrite List.app_nth2 in H1; [ | now unfold ge ].
       now rewrite Nat.sub_diag in H1; cbn in H1.
     }
   }
@@ -169,7 +170,7 @@ destruct r as [n'| ]. {
   specialize (Hbef _ Hj) as H1.
   apply Nat.eqb_neq in H1.
   rewrite Hla in H1.
-  rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
+  rewrite List.app_nth1 in H1; [ | now rewrite Hil in Hj ].
   now rewrite Hjn in H1.
 } {
   specialize (IHla Hfd).
@@ -183,14 +184,14 @@ destruct r as [n'| ]. {
     destruct Hy as [Hy| Hy]. {
       subst y.
       destruct Hy' as [Hy'| Hy']; [ easy | ].
-      specialize (find_none _ _ Hr y' Hy') as H1; cbn in H1.
+      specialize (List.find_none _ _ Hr y' Hy') as H1; cbn in H1.
       apply Nat.eqb_neq in H1.
       now symmetry in Hyy.
     }
     destruct Hy' as [Hy'| Hy']. {
       subst y'.
-      specialize (find_none _ _ Hr y) as H1.
-      assert (H : y ∈ la) by now rewrite Hll; apply in_or_app; left.
+      specialize (List.find_none _ _ Hr y) as H1.
+      assert (H : y ∈ la) by now rewrite Hll; apply List.in_or_app; left.
       specialize (H1 H); clear H.
       now apply Nat.eqb_neq in H1.
     }
@@ -199,10 +200,10 @@ destruct r as [n'| ]. {
   intros x'' Hx''.
   destruct Hx'' as [Hx''| Hx'']. {
     subst x''.
-    specialize (find_none _ _ Hr x) as H1.
+    specialize (List.find_none _ _ Hr x) as H1.
     assert (H : x ∈ la). {
       rewrite Hll.
-      now apply in_or_app; right; left.
+      now apply List.in_or_app; right; left.
     }
     specialize (H1 H); clear H.
     apply Nat.eqb_neq in H1.
@@ -213,15 +214,15 @@ destruct r as [n'| ]. {
 Qed.
 
 Theorem find_dup_none : ∀ f la,
-  find_dup f la = None → NoDup (map f la).
+  find_dup f la = None → List.NoDup (List.map f la).
 Proof.
 intros * Hnd.
 induction la as [| a]; [ constructor | cbn ].
 constructor. {
   cbn in Hnd.
-  remember (find _ _) as b eqn:Hb; symmetry in Hb.
+  remember (List.find _ _) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | ].
-  specialize (find_none _ _ Hb) as H1; cbn in H1; cbn.
+  specialize (List.find_none _ _ Hb) as H1; cbn in H1; cbn.
   intros Ha.
   specialize (IHla Hnd).
   clear - IHla H1 Ha.
@@ -232,7 +233,7 @@ constructor. {
     specialize (H1 b (or_introl eq_refl)).
     now apply Nat.eqb_neq in H1.
   } {
-    apply NoDup_cons_iff in IHla.
+    apply List.NoDup_cons_iff in IHla.
     destruct IHla as (Hn, Hnd).
     specialize (IHla0 Hnd).
     apply IHla0; [ | easy ].
@@ -242,7 +243,7 @@ constructor. {
 } {
   apply IHla.
   cbn in Hnd.
-  remember (find _ _) as b eqn:Hb; symmetry in Hb.
+  remember (List.find _ _) as b eqn:Hb; symmetry in Hb.
   now destruct b.
 }
 Qed.
@@ -250,7 +251,7 @@ Qed.
 Theorem not_NoDup_map_f_seq : ∀ a b f,
   b < a
   → (∀ x, x < a → f x < b)
-  → NoDup (map f (seq 0 a))
+  → List.NoDup (List.map f (List.seq 0 a))
   → False.
 Proof.
 intros * Hba Hf Hfd.
@@ -258,15 +259,15 @@ revert a f Hba Hf Hfd.
 induction b; intros; [ now specialize (Hf _ Hba) | ].
 destruct a; [ flia Hba | ].
 apply Nat.succ_lt_mono in Hba.
-remember (filter (λ i, f i =? b) (seq 0 (S a))) as la eqn:Hla.
+remember (List.filter (λ i, f i =? b) (List.seq 0 (S a))) as la eqn:Hla.
 symmetry in Hla.
 destruct la as [| x1]. {
   assert (H : ∀ x, x < a → f x < b). {
     intros x Hx.
     destruct (Nat.eq_dec (f x) b) as [Hfxb| Hfxb]. {
       specialize (proj1 (List_filter_nil_iff _ _) Hla x) as H1.
-      assert (H : x ∈ seq 0 (S a)). {
-        apply in_seq.
+      assert (H : x ∈ List.seq 0 (S a)). {
+        apply List.in_seq.
         flia Hx.
       }
       specialize (H1 H); clear H; cbn in H1.
@@ -278,10 +279,10 @@ destruct la as [| x1]. {
   }
   specialize (IHb a f Hba H); clear H.
   rewrite <- Nat.add_1_r in Hfd.
-  rewrite seq_app in Hfd; cbn in Hfd.
-  rewrite map_app in Hfd; cbn in Hfd.
-  specialize (NoDup_remove_1 _ _ _ Hfd) as H1.
-  now rewrite app_nil_r in H1.
+  rewrite List.seq_app in Hfd; cbn in Hfd.
+  rewrite List.map_app in Hfd; cbn in Hfd.
+  specialize (List.NoDup_remove_1 _ _ _ Hfd) as H1.
+  now rewrite List.app_nil_r in H1.
 }
 destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
   subst b.
@@ -293,13 +294,13 @@ destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
   apply Nat.lt_1_r in H1.
   apply Nat.lt_1_r in H2.
   do 2 rewrite <- Nat.add_1_r in Hfd.
-  do 2 rewrite seq_app in Hfd; cbn in Hfd.
-  rewrite <- app_assoc in Hfd.
-  do 2 rewrite map_app in Hfd.
+  do 2 rewrite List.seq_app in Hfd; cbn in Hfd.
+  rewrite <- List.app_assoc in Hfd.
+  do 2 rewrite List.map_app in Hfd.
   cbn in Hfd.
-  apply NoDup_remove_2 in Hfd.
+  apply List.NoDup_remove_2 in Hfd.
   apply Hfd.
-  apply in_app_iff; right.
+  apply List.in_app_iff; right.
   now rewrite H1, Nat.add_1_r, H2; left.
 }
 destruct la as [| x2]. {
@@ -310,9 +311,9 @@ destruct la as [| x2]. {
     destruct (lt_dec x x1) as [Hxx| Hxx]. {
       assert (Hxb : f x ≠ b). {
         intros Hxb.
-        assert (H : x ∈ filter (λ i, f i =? b) (seq 0 (S a))). {
-          apply filter_In.
-          split; [ apply in_seq; cbn; flia Hx | ].
+        assert (H : x ∈ List.filter (λ i, f i =? b) (List.seq 0 (S a))). {
+          apply List.filter_In.
+          split; [ apply List.in_seq; cbn; flia Hx | ].
           now apply Nat.eqb_eq.
         }
         rewrite Hla in H.
@@ -329,9 +330,9 @@ destruct la as [| x2]. {
     specialize (Hf H); clear H.
     assert (Hxb : f (x + 1) ≠ b). {
       intros Hxb.
-      assert (H : x + 1 ∈ filter (λ i, f i =? b) (seq 0 (S a))). {
-        apply filter_In.
-        split; [ apply in_seq; cbn; flia Hx | ].
+      assert (H : x + 1 ∈ List.filter (λ i, f i =? b) (List.seq 0 (S a))). {
+        apply List.filter_In.
+        split; [ apply List.in_seq; cbn; flia Hx | ].
         now apply Nat.eqb_eq.
       }
       rewrite Hla in H.
@@ -344,21 +345,21 @@ destruct la as [| x2]. {
   specialize (proj1 (NoDup_map_iff 0 _ _) Hfd) as H1.
   apply (NoDup_map_iff 0).
   intros x x' Hx Hx' Hxx.
-  rewrite length_seq in Hx, Hx', H1.
-  rewrite seq_nth in Hxx; [ | easy ].
-  rewrite seq_nth in Hxx; [ cbn | easy ].
+  rewrite List.length_seq in Hx, Hx', H1.
+  rewrite List.seq_nth in Hxx; [ | easy ].
+  rewrite List.seq_nth in Hxx; [ cbn | easy ].
   cbn in Hxx.
   destruct (lt_dec x x1) as [Hxx1| Hxx1]. {
     destruct (lt_dec x' x1) as [Hx'x1| Hx'x1]. {
       apply H1; [ flia Hx | flia Hx' | ].
-      rewrite seq_nth; [ | flia Hx ].
-      rewrite seq_nth; [ easy | flia Hx' ].
+      rewrite List.seq_nth; [ | flia Hx ].
+      rewrite List.seq_nth; [ easy | flia Hx' ].
     } {
       apply Nat.nlt_ge in Hx'x1.
       assert (H : x = x' + 1). {
         apply H1; [ flia Hx | flia Hx' | ].
-        rewrite seq_nth; [ | flia Hx ].
-        rewrite seq_nth; [ easy | flia Hx' ].
+        rewrite List.seq_nth; [ | flia Hx ].
+        rewrite List.seq_nth; [ easy | flia Hx' ].
       }
       flia Hxx1 Hx'x1 H.
     }
@@ -367,24 +368,24 @@ destruct la as [| x2]. {
   destruct (lt_dec x' x1) as [Hx'x1| Hx'x1]. {
     assert (H : x + 1 = x'). {
       apply H1; [ flia Hx | flia Hx' | ].
-      rewrite seq_nth; [ | flia Hx ].
-      rewrite seq_nth; [ easy | flia Hx' ].
+      rewrite List.seq_nth; [ | flia Hx ].
+      rewrite List.seq_nth; [ easy | flia Hx' ].
     }
     flia Hxx1 Hx'x1 H.
   } {
     apply Nat.nlt_ge in Hx'x1.
     apply (Nat.add_cancel_r _ _ 1).
     apply H1; [ flia Hx | flia Hx' | ].
-    rewrite seq_nth; [ | flia Hx ].
-    rewrite seq_nth; [ easy | flia Hx' ].
+    rewrite List.seq_nth; [ | flia Hx ].
+    rewrite List.seq_nth; [ easy | flia Hx' ].
   }
 }
 assert (Hx1 : x1 ∈ x1 :: x2 :: la) by now left.
 assert (Hx2 : x2 ∈ x1 :: x2 :: la) by now right; left.
 rewrite <- Hla in Hx1.
 rewrite <- Hla in Hx2.
-apply filter_In in Hx1.
-apply filter_In in Hx2.
+apply List.filter_In in Hx1.
+apply List.filter_In in Hx2.
 destruct Hx1 as (Hx1, Hfx1).
 destruct Hx2 as (Hx2, Hfx2).
 apply Nat.eqb_eq in Hfx1.
@@ -392,20 +393,20 @@ apply Nat.eqb_eq in Hfx2.
 assert (H : x1 ≠ x2). {
   intros H; subst x2.
   clear - Hla.
-  specialize (seq_NoDup (S a) 0) as H1.
-  specialize (NoDup_filter (λ i, f i =? b) H1) as H2.
+  specialize (List.seq_NoDup (S a) 0) as H1.
+  specialize (List.NoDup_filter (λ i, f i =? b) H1) as H2.
   rewrite Hla in H2.
-  apply NoDup_cons_iff in H2.
+  apply List.NoDup_cons_iff in H2.
   destruct H2 as (H2, _); apply H2.
   now left.
 }
 clear - Hfd Hx1 Hx2 H Hfx1 Hfx2.
-remember (seq 0 (S a)) as l; clear a Heql.
+remember (List.seq 0 (S a)) as l; clear a Heql.
 apply H; clear H.
 specialize (proj1 (NoDup_map_iff 0 l (λ x, f x)) Hfd) as H1.
 cbn in H1.
-apply (In_nth _ _ 0) in Hx1.
-apply (In_nth _ _ 0) in Hx2.
+apply (List.In_nth _ _ 0) in Hx1.
+apply (List.In_nth _ _ 0) in Hx2.
 destruct Hx1 as (n1 & Hn1 & Hx1).
 destruct Hx2 as (n2 & Hn2 & Hx2).
 specialize (H1 _ _ Hn1 Hn2) as H2.
@@ -429,28 +430,28 @@ destruct fd as [(n, n') |]. {
   injection Hpf; clear Hpf; intros; subst n n'.
   specialize (find_dup_some f _ _ _ Hfd) as H.
   destruct H as (Hfxx & la1 & la2 & la3 & Hll & Hbef).
-  assert (Hxy : x ∈ seq 0 a). {
+  assert (Hxy : x ∈ List.seq 0 a). {
     rewrite Hll.
-    apply in_app_iff.
+    apply List.in_app_iff.
     now right; left.
   }
-  apply in_seq in Hxy; cbn in Hxy.
+  apply List.in_seq in Hxy; cbn in Hxy.
   destruct Hxy as (_, Hxa).
-  assert (Hx' : x' ∈ seq 0 a). {
+  assert (Hx' : x' ∈ List.seq 0 a). {
     rewrite Hll.
-    apply in_app_iff; right; right.
-    now apply in_app_iff; right; left.
+    apply List.in_app_iff; right; right.
+    now apply List.in_app_iff; right; left.
   }
-  apply in_seq in Hx'.
+  apply List.in_seq in Hx'.
   split; [ easy | ].
   split; [ easy | ].
   split; [ | easy ].
-  specialize (seq_NoDup a 0) as H.
+  specialize (List.seq_NoDup a 0) as H.
   rewrite Hll in H.
-  apply NoDup_remove_2 in H.
+  apply List.NoDup_remove_2 in H.
   intros Hxx; apply H; subst x'.
-  apply in_app_iff; right.
-  now apply in_app_iff; right; left.
+  apply List.in_app_iff; right.
+  now apply List.in_app_iff; right; left.
 } {
   apply find_dup_none in Hfd.
   exfalso.
@@ -470,19 +471,19 @@ Fixpoint search_double_loop {A} eqb i (l : list A) :=
   end.
 
 Definition pigeonhole_comp_list l :=
-  match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
+  match find_dup (λ i, List.nth i l 0) (List.seq 0 (length l)) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
   end.
 
 Theorem seq_app_cons_app_cons : ∀ sta len x y la1 la2 la3,
-  seq sta len = la1 ++ x :: la2 ++ y :: la3
+  List.seq sta len = la1 ++ x :: la2 ++ y :: la3
   ↔ len = length la1 + length la2 + length la3 + 2 ∧
     x = sta + length la1 ∧
     y = S x + length la2 ∧
-    la1 = seq sta (length la1) ∧
-    la2 = seq (S x) (length la2) ∧
-    la3 = seq (S y) (sta + len - S y).
+    la1 = List.seq sta (length la1) ∧
+    la2 = List.seq (S x) (length la2) ∧
+    la3 = List.seq (S y) (sta + len - S y).
 Proof.
 intros.
 split. {
@@ -490,13 +491,13 @@ split. {
   generalize Hs; intros Hsv.
   move Hsv after Hs.
   rewrite (List_seq_cut3 (sta + length la1)) in Hs. 2: {
-    apply in_seq.
+    apply List.in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
     clear Hsv.
     revert sta la1 Hs.
     induction len; intros; cbn. {
-      now symmetry in Hs; apply app_eq_nil in Hs.
+      now symmetry in Hs; apply List.app_eq_nil in Hs.
     }
     destruct la1 as [| a]; cbn; [ flia | ].
     apply -> Nat.succ_lt_mono.
@@ -505,7 +506,7 @@ split. {
     now apply IHlen in Hs.
   }
   apply List_app_eq_app' in Hs. 2: {
-    rewrite length_seq, Nat.add_comm.
+    rewrite List.length_seq, Nat.add_comm.
     apply Nat.add_sub.
   }
   destruct Hs as (Hla1 & Hs); symmetry in Hla1.
@@ -515,24 +516,24 @@ split. {
   move Hx after Hla1.
   split. {
     apply (f_equal (λ l, length l)) in Hsv.
-    rewrite length_seq in Hsv.
-    rewrite length_app in Hsv; cbn in Hsv.
-    rewrite length_app in Hsv; cbn in Hsv.
+    rewrite List.length_seq in Hsv.
+    rewrite List.length_app in Hsv; cbn in Hsv.
+    rewrite List.length_app in Hsv; cbn in Hsv.
     flia Hsv.
   }
   split; [ easy | ].
   rewrite <- Hx in Hs.
-  rewrite (List_seq_cut3 (S x + length la2)) in Hs. 2: {
-    apply in_seq.
+  rewrite (List_seq_cut3 (S x + List.length la2)) in Hs. 2: {
+    apply List.in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
-    apply (f_equal (λ l, length l)) in Hs.
-    rewrite length_seq in Hs.
-    rewrite length_app in Hs.
+    apply (f_equal (λ l, List.length l)) in Hs.
+    rewrite List.length_seq in Hs.
+    rewrite List.length_app in Hs.
     cbn in Hs; flia Hs.
   }
   rewrite Nat.add_comm, Nat.add_sub in Hs.
-  apply List_app_eq_app' in Hs; [ | now rewrite length_seq ].
+  apply List_app_eq_app' in Hs; [ | now rewrite List.length_seq ].
   destruct Hs as (Hla2, Hs); symmetry in Hla2; cbn in Hs.
   injection Hs; clear Hs; intros Hla3 Hy.
   move Hy before Hx; symmetry in Hy.
@@ -540,8 +541,8 @@ split. {
   rewrite Nat.add_sub_assoc in Hla3. 2: {
     rewrite Hx, <- Nat.add_succ_r.
     apply Nat.add_le_mono_l.
-    apply (f_equal (λ l, length l)) in Hsv.
-    rewrite length_seq, length_app in Hsv; cbn in Hsv.
+    apply (f_equal (λ l, List.length l)) in Hsv.
+    rewrite List.length_seq, List.length_app in Hsv; cbn in Hsv.
     flia Hsv.
   }
   rewrite Nat.add_comm in Hla3.
@@ -552,7 +553,7 @@ split. {
 } {
   intros (Hlen & Hx & Hy & Hla1 & Hla2 & Hla3).
   rewrite (List_seq_cut3 x). 2: {
-    apply in_seq; rewrite Hx.
+    apply List.in_seq; rewrite Hx.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
     flia Hlen.
@@ -561,19 +562,20 @@ split. {
   rewrite Nat.add_comm, Nat.add_sub, <- Hla1, Hla2.
   f_equal; f_equal.
   rewrite Hla3.
-  rewrite cons_seq.
+  rewrite List.cons_seq.
   rewrite Hy at 1.
-  rewrite <- seq_app.
+  rewrite <- List.seq_app.
   f_equal.
   flia Hx Hy Hlen.
 }
 Qed.
 
 Theorem pigeonhole_list : ∀ a l,
-  a < length l
+  a < List.length l
   → (∀ x, x ∈ l → x < a)
   → ∀ x x', pigeonhole_comp_list l = (x, x')
-  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+  → x < List.length l ∧ x' < List.length l ∧ x ≠ x' ∧
+    List.nth x l 0 = List.nth x' l 0.
 Proof.
 intros * Hal Hla * Hpcl.
 unfold pigeonhole_comp_list in Hpcl.
@@ -583,35 +585,35 @@ destruct fd as [(n, n') |]. {
   injection Hpcl; clear Hpcl; intros; subst n n'.
   apply find_dup_some in Hfd.
   destruct Hfd as (Hxx & la1 & la2 & la3 & Hll & H1stx & H1stx').
-  assert (Hxy : x ∈ seq 0 (length l)). {
+  assert (Hxy : x ∈ List.seq 0 (List.length l)). {
     rewrite Hll.
-    apply in_app_iff.
+    apply List.in_app_iff.
     now right; left.
   }
-  apply in_seq in Hxy; cbn in Hxy.
+  apply List.in_seq in Hxy; cbn in Hxy.
   destruct Hxy as (_, Hxa).
-  assert (Hx' : x' ∈ seq 0 (length l)). {
+  assert (Hx' : x' ∈ List.seq 0 (List.length l)). {
     rewrite Hll.
-    apply in_app_iff; right; right.
-    now apply in_app_iff; right; left.
+    apply List.in_app_iff; right; right.
+    now apply List.in_app_iff; right; left.
   }
-  apply in_seq in Hx'.
+  apply List.in_seq in Hx'.
   split; [ easy | ].
   split; [ easy | ].
   split; [ | easy ].
-  specialize (seq_NoDup (length l) 0) as H.
+  specialize (List.seq_NoDup (List.length l) 0) as H.
   rewrite Hll in H.
-  apply NoDup_remove_2 in H.
+  apply List.NoDup_remove_2 in H.
   intros Hxix; apply H; subst x'.
-  apply in_app_iff; right.
-  now apply in_app_iff; right; left.
+  apply List.in_app_iff; right.
+  now apply List.in_app_iff; right; left.
 } {
   apply find_dup_none in Hfd.
   exfalso; clear Hpcl.
   apply not_NoDup_map_f_seq with (b := a) in Hfd; [ easy | easy | ].
   intros y Hy.
   apply Hla.
-  now apply nth_In.
+  now apply List.nth_In.
 }
 Qed.
 
@@ -643,7 +645,7 @@ assert (H : ∀ x, x < n → f' x < m). {
 }
 specialize (H1 H); clear H.
 unfold pigeonhole_fun in H1.
-remember (find_dup f' (seq 0 n)) as x eqn:Hx; symmetry in Hx.
+remember (find_dup f' (List.seq 0 n)) as x eqn:Hx; symmetry in Hx.
 destruct x as [(n1, n2)| ]; [ | now apply (H1 0 0 eq_refl) ].
 specialize (H1 n1 n2 eq_refl).
 destruct H1 as (Hn1n & Hn2n & Hnn & Hfnn).
