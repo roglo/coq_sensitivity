@@ -386,7 +386,8 @@ Context {rp : ring_like_prop T}.
 (* addition *)
 
 Definition mat_add (MA MB : matrix T) : matrix T :=
-  mk_mat (List_map2 (List_map2 rngl_add) (mat_list_list MA) (mat_list_list MB)).
+  mk_mat
+    (List_map2 (List_map2 rngl_add) (mat_list_list MA) (mat_list_list MB)).
 
 (* multiplication *)
 

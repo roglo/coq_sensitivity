@@ -421,7 +421,8 @@ split_var x1q; split_var x2q; split_var y1q; split_var y2q.
 move Hx before Hy.
 ring_simplify.
 rewrite Nat.add_comm; f_equal. {
-  replace (y1q0 * x1q1 * x2q1 * y2q1) with (y1q0 * y2q1 * x1q1 * x2q1) by flia.
+  replace (y1q0 * x1q1 * x2q1 * y2q1) with
+    (y1q0 * y2q1 * x1q1 * x2q1) by flia.
   rewrite Hy; flia.
 } {
   replace (x1q0 * y1q1 * x2q1) with (x1q0 * x2q1 * y1q1) by flia.

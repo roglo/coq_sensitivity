@@ -1916,7 +1916,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
   remember [one] as x; cbn in H3; subst x.
   unfold lap_add in H3.
   cbn - [ List_map2 "-" ] in H3.
-  apply eq_List_map2_nil in H3.
+  apply List_eq_map2_nil in H3.
   destruct H3 as [H3| H3]; [ easy | ].
   apply app_eq_nil in H3.
   destruct H3 as (H2, H3).

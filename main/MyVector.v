@@ -206,8 +206,8 @@ rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
 rewrite List_map2_map_r.
-rewrite List_fold_left_List_map2.
-rewrite List_fold_left_List_map2.
+rewrite List_fold_left_map2.
+rewrite List_fold_left_map2.
 apply List_fold_left_ext_in.
 intros * Hb.
 f_equal.
@@ -227,8 +227,8 @@ rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
 rewrite List_map2_map_l.
-rewrite List_fold_left_List_map2.
-rewrite List_fold_left_List_map2.
+rewrite List_fold_left_map2.
+rewrite List_fold_left_map2.
 apply List_fold_left_ext_in.
 intros * Hb.
 f_equal; symmetry.

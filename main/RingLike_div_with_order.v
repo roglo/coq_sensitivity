@@ -836,7 +836,8 @@ Proof.
 intros * Hop Hor Hii.
 assert (Hio :
   (rngl_is_integral_domain T ||
-    rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool = true). {
+    rngl_has_inv_and_1_or_quot T &&
+      rngl_has_eq_dec_or_order T)%bool = true). {
   apply Bool.orb_true_iff in Hii.
   apply Bool.orb_true_iff.
   destruct Hii as [Hii| Hii]; [ now left | right ].
