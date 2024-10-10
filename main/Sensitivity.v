@@ -6,7 +6,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import List.ListNotations.
 Require Import Init.Nat.
 Require Import Misc SortingFun IterAdd.
 Require Import NatRingLike.
@@ -39,14 +39,14 @@ Compute
 Record subgraph := mksg { sg_vert : list nat }.
 
 Definition edges vl :=
-  fold_right
+  List.fold_right
     (λ a l,
-     fold_right
+     List.fold_right
        (λ b l,
         if lt_dec a b then
           if are_adjacent_vertices a b then (a, b) :: l else l
         else l) l vl)
-    [] (nodup Nat.eq_dec vl).
+    [] (List.nodup Nat.eq_dec vl).
 
 (*
 Compute (edges [1; 2; 7; 4]).
@@ -56,7 +56,7 @@ Definition sg_edges sg := edges (sg_vert sg).
 
 (* Example *)
 
-Definition cube_vert := seq 0 (2 ^ 3).
+Definition cube_vert := List.seq 0 (2 ^ 3).
 Definition full_cube := mksg cube_vert.
 
 (* edges and vertices count *)
@@ -71,8 +71,8 @@ Compute (number_of_vertices full_cube).
 (* degree of a vertex = number of edges adjacents to the vertex *)
 
 Definition vdeg el v :=
-  count_occ Bool.bool_dec (map (λ '(a, b), Nat.eqb a v) el) true +
-  count_occ Bool.bool_dec (map (λ '(a, b), Nat.eqb v b) el) true.
+  List.count_occ Bool.bool_dec (List.map (λ '(a, b), Nat.eqb a v) el) true +
+  List.count_occ Bool.bool_dec (List.map (λ '(a, b), Nat.eqb v b) el) true.
 
 Definition deg sg v := vdeg (sg_edges sg) v.
 
@@ -80,7 +80,7 @@ Definition deg sg v := vdeg (sg_edges sg) v.
 
 Definition vΔ vl :=
   let el := edges vl in
-  fold_left (λ m v, max m (vdeg el v)) vl 0.
+  List.fold_left (λ m v, max m (vdeg el v)) vl 0.
 
 (*
 Compute (vΔ [0; 1; 0]).
@@ -97,18 +97,19 @@ Definition Δ sg := vΔ (sg_vert sg).
 Definition Nat_togglebit x i :=
   if Nat.testbit x i then Nat.clearbit x i else Nat.setbit x i.
 
-Definition flip x S := fold_right Nat_togglebit x S.
+Definition flip x S := List.fold_right Nat_togglebit x S.
 
 Notation "x ^^ S" := (flip x S) (at level 30).
 
 Definition loc_sens_list n (f : nat → bool) x :=
-  filter (λ i, negb (Bool.eqb (f x) (f (x ^^ [i])))) (seq 0 n).
+  List.filter (λ i, negb (Bool.eqb (f x) (f (x ^^ [i])))) (List.seq 0 n).
 
 Definition local_sensitivity (n : nat) (f : nat → bool) (x : nat) :=
   length (loc_sens_list n f x).
 
 Definition sensitivity n f :=
-  fold_right max 0 (map (local_sensitivity n f) (seq 0 (2 ^ n))).
+  List.fold_right max 0
+    (List.map (local_sensitivity n f) (List.seq 0 (2 ^ n))).
 
 (* Hamming distance *)
 
@@ -159,14 +160,14 @@ Fixpoint count_in_radix n start len :=
   end.
 
 Definition count_upto_n_to_n n :=
-  map (@rev nat) (count_in_radix n (repeat 0 n) (n ^ n)).
+  List.map (@List.rev nat) (count_in_radix n (List.repeat 0 n) (n ^ n)).
 
 (*
 Compute (count_upto_n_to_n 3).
 *)
 
 Definition cons_nth {A} i (a : A) ll :=
-  firstn i ll ++  (a :: nth i ll []) :: skipn (i + 1) ll.
+  List.firstn i ll ++  (a :: List.nth i ll []) :: List.skipn (i + 1) ll.
 
 Definition is_nil {A} (l : list A) :=
   match l with
@@ -227,11 +228,11 @@ Qed.
 (**)
 
 Definition dispatch_list l :=
-  map (λ j, nth_find_all (Nat.eqb j) l) (seq 0 (length l)).
+  List.map (λ j, nth_find_all (Nat.eqb j) l) (List.seq 0 (length l)).
 
-Definition dispatch n i := dispatch_list (rev (to_radix n i)).
+Definition dispatch n i := dispatch_list (List.rev (to_radix n i)).
 
-Definition pre_partitions n := map (dispatch n) (seq 0 (n ^ n)).
+Definition pre_partitions n := List.map (dispatch n) (List.seq 0 (n ^ n)).
 
 (*
 Compute (let l := [3; 2; 1; 1] in dispatch_list l).
@@ -264,29 +265,31 @@ Fixpoint list_list_nat_leb lla llb :=
 
 Definition all_partitions n :=
   isort list_list_nat_leb
-    (nodup (list_eq_dec (list_eq_dec Nat.eq_dec))
-       (map (isort list_nat_le)
-          (map (filter (λ s, negb (is_nil s))) (pre_partitions n)))).
+    (List.nodup (List.list_eq_dec (List.list_eq_dec Nat.eq_dec))
+       (List.map (isort list_nat_le)
+          (List.map (List.filter (λ s, negb (is_nil s)))
+             (pre_partitions n)))).
 
 (*
-Compute (map (isort list_nat_le) (pre_partitions 4)).
+Compute (List.map (isort list_nat_le) (pre_partitions 4)).
 Compute
-  (nodup (list_eq_dec (list_eq_dec Nat.eq_dec))
-     (map (isort list_nat_le) (pre_partitions 4))).
+  (List.nodup (List.list_eq_dec (List.list_eq_dec Nat.eq_dec))
+     (List.map (isort list_nat_le) (pre_partitions 4))).
 Compute (all_partitions 4).
 *)
 
 (* Local block sensitivity *)
 
 Definition loc_bl_sens_list Bl f x :=
-  filter (λ Bi, negb (Bool.eqb (f x) (f (x ^^ Bi)))) Bl.
+  List.filter (λ Bi, negb (Bool.eqb (f x) (f (x ^^ Bi)))) Bl.
 
 Definition local_block_sensitivity n f x :=
-  fold_right max 0
-    (map (λ Bl, length (loc_bl_sens_list Bl f x)) (pre_partitions n)).
+  List.fold_right max 0
+    (List.map (λ Bl, length (loc_bl_sens_list Bl f x)) (pre_partitions n)).
 
 Definition block_sensitivity n f :=
-  fold_right max 0 (map (local_block_sensitivity n f) (seq 0 (2 ^ n))).
+  List.fold_right max 0
+    (List.map (local_block_sensitivity n f) (List.seq 0 (2 ^ n))).
 
 (* Proving Theorem: bs(f) ≥ s(f) *)
 
@@ -297,7 +300,7 @@ Require Import Sorting.
 Definition is_pre_partition ll :=
   (∀ l, l ∈ ll → ∀ i, i ∈ l → i < length ll) ∧
   (∀ i, i < length ll → ∃ l, l ∈ ll ∧ i ∈ l) ∧
-  NoDup (concat ll) ∧
+  List.NoDup (List.concat ll) ∧
   (∀ l, l ∈ ll → Sorted lt l).
 
 (* locate: inverse of "dispatch" *)
@@ -309,10 +312,10 @@ Fixpoint nat_in_list i l :=
   end.
 
 Definition locate_list ll :=
-  map (λ i, nth_find (nat_in_list i) ll) (seq 0 (length ll)).
+  List.map (λ i, nth_find (nat_in_list i) ll) (List.seq 0 (length ll)).
 
 Definition locate ll :=
-  fold_left (λ a i, a * length ll + i) (locate_list ll) 0.
+  List.fold_left (λ a i, a * length ll + i) (locate_list ll) 0.
 
 (*
 Compute (locate [[2]; []; [0; 1]]).
@@ -324,10 +327,10 @@ Compute (locate [[0]; [1; 2]; []; [3]]).
 *)
 
 Definition sub_list {A} (l : list A) start len :=
-  firstn len (skipn start l).
+  List.firstn len (List.skipn start l).
 
 Theorem seq_app_last : ∀ start len,
-  seq start len ++ [start + len] = start :: seq (start + 1) len.
+  List.seq start len ++ [start + len] = start :: List.seq (start + 1) len.
 Proof.
 intros.
 revert start.
@@ -396,7 +399,7 @@ Qed.
 Theorem in_nth_find_all_loop_eqb : ∀ l i k b,
   b ∈ nth_find_all_loop (Nat.eqb i) l k
   → k ≤ b
-  → nth (b - k) l 0 = i.
+  → List.nth (b - k) l 0 = i.
 Proof.
 intros * Hb1 Hbk.
 revert i k b Hb1 Hbk.
@@ -430,14 +433,14 @@ Qed.
 
 Theorem in_nth_find_all_loop_eqb_if : ∀ {a} l d,
   a < length l
-  → a + d ∈ nth_find_all_loop (Nat.eqb (nth a l 0)) l d.
+  → a + d ∈ nth_find_all_loop (Nat.eqb (List.nth a l 0)) l d.
 Proof.
 intros * Hal.
 revert d a Hal.
 induction l as [| b]; intros; [ easy | ].
 cbn.
 destruct a; [ now rewrite Nat.eqb_refl; left | ].
-remember (nth a l 0 =? b) as c eqn:Hc; symmetry in Hc.
+remember (List.nth a l 0 =? b) as c eqn:Hc; symmetry in Hc.
 destruct c. {
   right.
   rewrite Nat.add_succ_comm, Nat.add_1_r.
@@ -452,28 +455,30 @@ now apply IHl.
 Qed.
 
 Theorem in_flat_map_nth_find_all_loop_eq : ∀ l j k len b,
-  b ∈ flat_map (λ i, nth_find_all_loop (Nat.eqb i) l k) (seq j len)
+  b ∈ List.flat_map (λ i, nth_find_all_loop (Nat.eqb i) l k) (List.seq j len)
   → k ≤ b
-  → j ≤ nth (b - k) l 0 < j + len.
+  → j ≤ List.nth (b - k) l 0 < j + len.
 Proof.
 intros * Hbf Hkb.
-apply in_flat_map in Hbf.
+apply List.in_flat_map in Hbf.
 destruct Hbf as (i & Hi & Hik).
 apply in_nth_find_all_loop_eqb in Hik; [ | easy ].
 rewrite Hik.
-now apply in_seq in Hi.
+now apply List.in_seq in Hi.
 Qed.
 
 Theorem flat_map_nth_find_all_loop_cons : ∀ a l k i len,
   a < i ∨ i + len ≤ a
-  → flat_map (λ j, nth_find_all_loop (Nat.eqb j) (a :: l) k) (seq i len) =
-    flat_map (λ j, nth_find_all_loop (Nat.eqb j) l (k + 1)) (seq i len).
+  → List.flat_map (λ j, nth_find_all_loop (Nat.eqb j) (a :: l) k)
+       (List.seq i len) =
+    List.flat_map (λ j, nth_find_all_loop (Nat.eqb j) l (k + 1))
+      (List.seq i len).
 Proof.
 intros * Hai.
-do 2 rewrite flat_map_concat_map; f_equal; cbn.
-apply map_ext_in_iff.
+do 2 rewrite List.flat_map_concat_map; f_equal; cbn.
+apply List.map_ext_in_iff.
 intros b Hb.
-apply in_seq in Hb.
+apply List.in_seq in Hb.
 remember (b =? a) as c eqn:Hc; symmetry in Hc.
 destruct c; [ | easy ].
 apply Nat.eqb_eq in Hc; subst b.
@@ -484,11 +489,11 @@ Theorem dispatch_list_length : ∀ l, length (dispatch_list l) = length l.
 Proof.
 intros.
 unfold dispatch_list.
-now rewrite length_map, length_seq.
+now rewrite List.length_map, List.length_seq.
 Qed.
 
 Theorem dispatch_list_is_pre_partition : ∀ l,
-  (∀ a, a ∈ l → a < length l)
+  (∀ a, a ∈ l → a < List.length l)
   → is_pre_partition (dispatch_list l).
 Proof.
 intros * Hl.
@@ -497,14 +502,14 @@ split. {
   unfold dispatch_list in Hl1.
   move i at top.
   move l1 before l.
-  apply in_map_iff in Hl1.
+  apply List.in_map_iff in Hl1.
   destruct Hl1 as (b & Hb & Hbs).
   subst l1; move b before i.
   unfold nth_find_all in Hi.
   assert
     (H : ∀ A f (l : list A) i j,
-     j < length (nth_find_all_loop f l i)
-     → nth j (nth_find_all_loop f l i) 0 < i + length l). {
+     j < List.length (nth_find_all_loop f l i)
+     → List.nth j (nth_find_all_loop f l i) 0 < i + List.length l). {
     clear.
     intros * Hj.
     revert i j Hj.
@@ -525,47 +530,49 @@ split. {
       now apply IHl.
     }
   }
-  apply in_split in Hi.
+  apply List.in_split in Hi.
   destruct Hi as (l1 & l2 & Hi).
-  specialize (H nat (Nat.eqb b) l 0 (length l1)) as H1.
+  specialize (H nat (Nat.eqb b) l 0 (List.length l1)) as H1.
   rewrite Hi in H1.
-  rewrite app_nth2 in H1; [ | now unfold "≥" ].
+  rewrite List.app_nth2 in H1; [ | now unfold "≥" ].
   rewrite Nat.sub_diag in H1; cbn in H1.
   rewrite dispatch_list_length.
   apply H1.
-  rewrite length_app; cbn; flia.
+  rewrite List.length_app; cbn; flia.
 }
 split. {
   intros i Hi.
   rewrite dispatch_list_length in Hi.
-  exists (nth (nth i l 0) (dispatch_list l) []).
+  exists (List.nth (List.nth i l 0) (dispatch_list l) []).
   split. {
-    apply nth_In.
+    apply List.nth_In.
     unfold dispatch_list.
-    rewrite length_map.
-    rewrite length_seq.
+    rewrite List.length_map.
+    rewrite List.length_seq.
     apply Hl.
-    now apply nth_In.
+    now apply List.nth_In.
   }
   unfold dispatch_list.
   rewrite (List_map_nth' 0). 2: {
-    rewrite length_seq.
+    rewrite List.length_seq.
     apply Hl.
-    now apply nth_In.
+    now apply List.nth_In.
   }
-  rewrite seq_nth. 2: {
+  rewrite List.seq_nth. 2: {
     apply Hl.
-    now apply nth_In.
+    now apply List.nth_In.
   }
   cbn.
   unfold nth_find_all.
-  assert (H : ∀ d, i + d ∈ nth_find_all_loop (Nat.eqb (nth i l 0)) l d). {
+  assert
+      (H : ∀ d, i + d ∈ nth_find_all_loop (Nat.eqb (List.nth i l 0)) l d). {
     revert i Hi.
     clear Hl.
     induction l as [| a]; intros; [ easy | ].
     destruct i; [ now cbn; rewrite Nat.eqb_refl; left | cbn ].
-    enough (S i + d ∈ nth_find_all_loop (Nat.eqb (nth i l 0)) l (d + 1)). {
-      destruct (nth i l 0 =? a); [ now right | easy ].
+    enough
+        (S i + d ∈ nth_find_all_loop (Nat.eqb (List.nth i l 0)) l (d + 1)). {
+      destruct (List.nth i l 0 =? a); [ now right | easy ].
     }
     cbn in Hi; apply Nat.succ_lt_mono in Hi.
     rewrite Nat.add_succ_comm, Nat.add_1_r.
@@ -576,8 +583,8 @@ split. {
 }
 split. {
   unfold dispatch_list.
-  rewrite <- flat_map_concat_map.
-  assert (Hnd : ∀ l i j, NoDup (nth_find_all_loop (Nat.eqb i) l j)). {
+  rewrite <- List.flat_map_concat_map.
+  assert (Hnd : ∀ l i j, List.NoDup (nth_find_all_loop (Nat.eqb i) l j)). {
     clear.
     intros.
     revert i j.
@@ -592,9 +599,9 @@ split. {
   }
   assert
   (H : ∀ i k len,
-      NoDup
-        (flat_map (λ j, nth_find_all_loop (Nat.eqb j) l k)
-                  (seq i len))). {
+      List.NoDup
+        (List.flat_map (λ j, nth_find_all_loop (Nat.eqb j) l k)
+                  (List.seq i len))). {
     clear Hl.
     induction l as [| a]; intros. {
       cbn; clear.
@@ -611,23 +618,23 @@ split. {
       apply IHl.
     }
     apply Nat.nle_gt in Hila.
-    rewrite flat_map_concat_map.
+    rewrite List.flat_map_concat_map.
     replace len with (a - i + (len - (a - i))) by flia Hila.
-    rewrite seq_app.
-    rewrite map_app.
-    rewrite concat_app.
-    do 2 rewrite <- flat_map_concat_map.
+    rewrite List.seq_app.
+    rewrite List.map_app.
+    rewrite List.concat_app.
+    do 2 rewrite <- List.flat_map_concat_map.
     rewrite flat_map_nth_find_all_loop_cons; [ | right; flia Hai ].
     rewrite (Nat.add_comm i), Nat.sub_add; [ | easy ].
     replace (len - (a - i)) with (1 + (len - (a - i) - 1)) by flia Hai Hila.
-    rewrite seq_app.
-    do 2 rewrite flat_map_concat_map.
-    rewrite map_app, concat_app.
-    unfold seq at 2, map at 2, concat at 2.
-    rewrite app_nil_r.
+    rewrite List.seq_app.
+    do 2 rewrite List.flat_map_concat_map.
+    rewrite List.map_app, List.concat_app.
+    unfold List.seq at 2, List.map at 2, List.concat at 2.
+    rewrite List.app_nil_r.
     remember (nth_find_all_loop (Nat.eqb a) _ _) as x; cbn in Heqx; subst x.
     rewrite Nat.eqb_refl.
-    do 2 rewrite <- flat_map_concat_map.
+    do 2 rewrite <- List.flat_map_concat_map.
     apply NoDup_app_iff.
     split; [ apply IHl | ].
     split. {
@@ -660,12 +667,12 @@ split. {
     intros b Hb1 Hb2.
     destruct Hb2 as [Hb2| Hb2]. {
       subst k.
-      apply in_flat_map in Hb1.
+      apply List.in_flat_map in Hb1.
       destruct Hb1 as (j & Hj & Hjb).
       revert Hjb.
       apply not_in_nth_find_all_loop; flia.
     }
-    apply in_app_iff in Hb2.
+    apply List.in_app_iff in Hb2.
     destruct Hb2 as [Hb2| Hb2]. {
       destruct (le_dec (k + 1) b) as [Hkb| Hkb]. {
         apply in_flat_map_nth_find_all_loop_eq in Hb1; [ | easy ].
@@ -684,7 +691,7 @@ split. {
       flia Hb1 Hb2.
     }
     apply Nat.nle_gt in Hkb.
-    apply in_flat_map in Hb1.
+    apply List.in_flat_map in Hb1.
     destruct Hb1 as (x & Hx & Hxl).
     revert Hxl.
     now apply not_in_nth_find_all_loop.
@@ -693,9 +700,9 @@ split. {
 } {
   intros l1 Hl1.
   unfold dispatch_list in Hl1.
-  apply in_map_iff in Hl1.
+  apply List.in_map_iff in Hl1.
   destruct Hl1 as (i & Hill & Hil); subst l1.
-  apply in_seq in Hil; destruct Hil as (_, Hil); cbn in Hil.
+  apply List.in_seq in Hil; destruct Hil as (_, Hil); cbn in Hil.
   unfold nth_find_all.
   remember 0 as j; clear Heqj.
   clear Hl Hil.
@@ -720,7 +727,7 @@ split. {
 Qed.
 
 Theorem nth_find_loop_map : ∀ A B f (g : A → B) i l,
-  nth_find_loop f (map g l) i =
+  nth_find_loop f (List.map g l) i =
   nth_find_loop (λ a, f (g a)) l i.
 Proof.
 intros.
@@ -731,7 +738,7 @@ apply IHl.
 Qed.
 
 Theorem nth_find_all_loop_map : ∀ A B (f : B → bool) g i (l : list A),
-    nth_find_all_loop f (map g l) i = nth_find_all_loop (λ a, f (g a)) l i.
+  nth_find_all_loop f (List.map g l) i = nth_find_all_loop (λ a, f (g a)) l i.
 Proof.
 intros.
 revert i.
@@ -741,7 +748,7 @@ apply IHl.
 Qed.
 
 Theorem nth_find_all_map : ∀ A B (f : B → bool) g (l : list A),
-    nth_find_all f (map g l) = nth_find_all (λ a, f (g a)) l.
+  nth_find_all f (List.map g l) = nth_find_all (λ a, f (g a)) l.
 Proof.
 intros.
 apply nth_find_all_loop_map.
@@ -791,7 +798,7 @@ split. {
 Qed.
 
 Theorem locate_dispatch_list : ∀ l,
-  (∀ a : nat, a ∈ l → a < length l)
+  (∀ a : nat, a ∈ l → a < List.length l)
   → locate_list (dispatch_list l) = l.
 Proof.
 intros * Hl.
@@ -802,46 +809,48 @@ remember (dispatch_list l) as ll.
 unfold dispatch_list in Heqll.
 rewrite Heqll.
 unfold locate_list.
-rewrite length_map, length_seq.
-replace l with (map (λ i, nth i l 0) (seq 0 (length l))) at 2. 2: {
+rewrite List.length_map, List.length_seq.
+replace l with
+    (List.map (λ i, List.nth i l 0) (List.seq 0 (List.length l))) at 2. 2: {
   clear.
   induction l as [| a]; [ easy | ].
   f_equal; cbn; f_equal.
-  rewrite <- seq_shift.
-  now rewrite map_map.
+  rewrite <- List.seq_shift.
+  now rewrite List.map_map.
 }
-apply map_ext_in_iff.
+apply List.map_ext_in_iff.
 intros a Ha.
 unfold nth_find.
 unfold nth_find_all.
-replace (length l) with (nth a l 0 + 1 + (length l - (nth a l 0 + 1))). 2: {
-  apply in_seq in Ha; cbn in Ha.
+replace (List.length l) with
+    (List.nth a l 0 + 1 + (List.length l - (List.nth a l 0 + 1))). 2: {
+  apply List.in_seq in Ha; cbn in Ha.
   destruct Ha as (_, Ha).
-  specialize (Hl (nth a l 0) (nth_In l 0 Ha)) as H1.
+  specialize (Hl (List.nth a l 0) (List.nth_In l 0 Ha)) as H1.
   flia H1.
 }
-do 2 rewrite seq_app.
+do 2 rewrite List.seq_app.
 do 2 rewrite Nat.add_0_l.
-replace (seq _ 1) with [nth a l 0] by easy.
-do 2 rewrite map_app.
-rewrite <- app_assoc.
+replace (List.seq _ 1) with [List.nth a l 0] by easy.
+do 2 rewrite List.map_app.
+rewrite <- List.app_assoc.
 rewrite nth_find_loop_app_2. 2: {
   intros l1 Hl1.
   apply nat_in_list_false_iff.
   intros j Hj Haj; subst j.
-  apply in_map_iff in Hl1.
+  apply List.in_map_iff in Hl1.
   destruct Hl1 as (k & Hkl & Hka); subst l1.
-  apply in_seq in Hka; destruct Hka as (_, Hka); cbn in Hka.
+  apply List.in_seq in Hka; destruct Hka as (_, Hka); cbn in Hka.
   apply in_nth_find_all_loop_eqb in Hj; [ | flia ].
   rewrite Nat.sub_0_r in Hj; subst k.
   flia Hka.
 }
-rewrite length_map, length_seq, Nat.add_0_l; cbn.
+rewrite List.length_map, List.length_seq, Nat.add_0_l; cbn.
 remember (nat_in_list a _) as b eqn:Hb; symmetry in Hb.
 destruct b; [ easy | ].
 specialize ((proj1 (nat_in_list_false_iff _ _)) Hb a) as H1.
 exfalso; apply H1; clear H1; [ | easy ].
-apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
+apply List.in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
 specialize (in_nth_find_all_loop_eqb_if l 0 Ha) as H1.
 now rewrite Nat.add_0_r in H1.
 Qed.
@@ -864,19 +873,20 @@ Qed.
 
 Theorem fold_left_to_radix : ∀ n i,
   i < n ^ n
-  → fold_left (λ a j : nat, a * n + j) (rev (to_radix n i)) 0 = i.
+  → List.fold_left (λ a j : nat, a * n + j) (List.rev (to_radix n i)) 0 = i.
 Proof.
 intros * Hin.
 assert
   (H : ∀ it n i,
    i < n ^ it
-   → fold_left (λ a j, a * n + j) (rev (to_radix_loop it n i)) 0 = i). {
+   → List.fold_left (λ a j, a * n + j)
+       (List.rev (to_radix_loop it n i)) 0 = i). {
   clear.
   intros * Hin.
   revert n i Hin.
   induction it; intros; [ now apply Nat.lt_1_r in Hin; subst i | ].
   cbn.
-  rewrite fold_left_app; cbn.
+  rewrite List.fold_left_app; cbn.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
   specialize (Nat.div_mod i n Hnz) as H1.
   rewrite H1 at 3; f_equal.
@@ -901,19 +911,19 @@ intros * Hin.
 unfold locate, dispatch.
 rewrite locate_dispatch_list. 2: {
   intros a Ha.
-  apply in_rev in Ha.
-  rewrite length_rev.
+  apply List.in_rev in Ha.
+  rewrite List.length_rev.
   unfold to_radix in Ha |-*.
   rewrite to_radix_loop_length.
   apply in_to_radix_loop in Ha; [ easy | ].
   now intros H; subst n.
 }
 rewrite dispatch_list_length.
-rewrite length_rev.
+rewrite List.length_rev.
 assert
   (H : ∀ i b l,
-   fold_left (λ a j, a * length (to_radix n i) + j) l b =
-   fold_left (λ a j, a * n + j) l b). {
+   List.fold_left (λ a j, a * List.length (to_radix n i) + j) l b =
+   List.fold_left (λ a j, a * n + j) l b). {
   clear.
   intros.
   unfold to_radix.
@@ -946,13 +956,13 @@ Definition pre_partition_in n j k i :=
 (*
 Compute
   (let n := 3 in let j := 1 in let k := 2 in
-   map (λ i, (i, dispatch n i))
-    (filter (pre_partition_in n j k) (seq 0 (n ^ n)))).
+   List.map (λ i, (i, dispatch n i))
+    (List.filter (pre_partition_in n j k) (List.seq 0 (n ^ n)))).
 *)
 
 Theorem nth_find_all_loop_app : ∀ A f (l1 l2 : list A) i,
   nth_find_all_loop f (l1 ++ l2) i =
-  nth_find_all_loop f l1 i ++ nth_find_all_loop f l2 (i + length l1).
+  nth_find_all_loop f l1 i ++ nth_find_all_loop f l2 (i + List.length l1).
 Proof.
 intros.
 revert i l2.
@@ -962,22 +972,22 @@ induction l1 as [| a1]; intros. {
 cbn.
 destruct (f a1). {
   cbn; f_equal.
-  rewrite <- (Nat.add_succ_comm _ (length l1)).
+  rewrite <- (Nat.add_succ_comm _ (List.length l1)).
   rewrite Nat.add_1_r.
   apply IHl1.
 }
-rewrite <- (Nat.add_succ_comm _ (length l1)).
+rewrite <- (Nat.add_succ_comm _ (List.length l1)).
 rewrite Nat.add_1_r.
 apply IHl1.
 Qed.
 
 Theorem fold_left_mul_add_mod : ∀ n j l,
-  fold_left (λ a i, a * n + i) l j mod n = last (j :: l) 0 mod n.
+  List.fold_left (λ a i, a * n + i) l j mod n = List.last (j :: l) 0 mod n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
-  cbn - [ last ].
+  cbn - [ List.last ].
   erewrite List_fold_left_ext_in. 2: {
     intros * Hb.
     now rewrite Nat.mul_0_r, Nat.add_0_l.
@@ -989,9 +999,9 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 revert n j Hnz.
 induction l as [| b]; intros; [ easy | ].
-cbn - [ last ].
+cbn - [ List.last ].
 remember (b :: l) as l'; cbn; subst l'.
-transitivity (fold_left (λ a i : nat, a * n + i) l b mod n). 2: {
+transitivity (List.fold_left (λ a i : nat, a * n + i) l b mod n). 2: {
   now apply IHl.
 }
 clear - Hnz.
@@ -1004,12 +1014,12 @@ Qed.
 Theorem fold_left_mul_add_div : ∀ n j l,
   (∀ i, i ∈ l → i < n)
   → l ≠ []
-  → fold_left (λ a i, a * n + i) l j / n =
-     fold_left (λ a i, a * n + i) (removelast l) j.
+  → List.fold_left (λ a i, a * n + i) l j / n =
+     List.fold_left (λ a i, a * n + i) (List.removelast l) j.
 Proof.
 intros * Hin Hln.
 destruct l as [| b]; [ easy | clear Hln ].
-cbn - [ removelast ].
+cbn - [ List.removelast ].
 revert n j b Hin.
 induction l as [| a]; intros. {
   cbn.
@@ -1020,18 +1030,19 @@ induction l as [| a]; intros. {
   rewrite Nat.div_small; [ | now apply Hin; left ].
   now rewrite Nat.add_0_r.
 }
-cbn - [ removelast ].
+cbn - [ List.removelast ].
 remember (a :: l) as l'; cbn; subst l'.
 rewrite IHl; [ easy | ].
 intros i Hl.
 now apply Hin; right.
 Qed.
 
-Theorem locate_list_length : ∀ ll, length (locate_list ll) = length ll.
+Theorem locate_list_length :
+  ∀ ll, List.length (locate_list ll) = List.length ll.
 Proof.
 intros.
 unfold locate_list.
-now rewrite length_map, length_seq.
+now rewrite List.length_map, List.length_seq.
 Qed.
 
 Theorem eq_nth_find_all_loop_nil : ∀ A f (l : list A) i,
@@ -1068,10 +1079,10 @@ Proof. intros; apply eq_nth_find_all_loop_nil. Qed.
 
 Theorem eq_nth_find_all_loop_cons : ∀ {A} f j (d : A) l l' i,
   nth_find_all_loop f l i = j :: l' ↔
-    i ≤ j < i + length l ∧
-    (∀ k, i + k < j → f (nth k l d) = false) ∧
-    f (nth (j - i) l d) = true ∧
-    nth_find_all_loop f (skipn (j + 1 - i) l) (j + 1) = l'.
+    i ≤ j < i + List.length l ∧
+    (∀ k, i + k < j → f (List.nth k l d) = false) ∧
+    f (List.nth (j - i) l d) = true ∧
+    nth_find_all_loop f (List.skipn (j + 1 - i) l) (j + 1) = l'.
 Proof.
 intros.
 split. {
@@ -1145,7 +1156,7 @@ split. {
     }
     replace (j + 1 - (i + 1)) with (j - i) in IHl by flia Hij.
     replace (j + 1 - i) with (S (j - i)) by flia Hij.
-    now rewrite skipn_cons.
+    now rewrite List.skipn_cons.
   }
 } {
   intros ((Hij, Hjil) & Hikj & Hfji & Hsk).
@@ -1176,7 +1187,7 @@ split. {
     now rewrite Hikj in Hb1.
   }
   replace (j + 1 - i) with (S (j - i)) by flia Hij.
-  rewrite skipn_cons.
+  rewrite List.skipn_cons.
   destruct (Nat.eq_dec i j) as [Hiej| Hiej]. {
     subst j; rewrite Nat.sub_diag in Hfji; cbn in Hfji.
     now rewrite Hfji in Hb1.
@@ -1194,10 +1205,10 @@ Qed.
 
 Theorem eq_nth_find_all_cons : ∀ A f j (d : A) l l',
   nth_find_all f l = j :: l' ↔
-    j < length l ∧
-    (∀ k : nat, k < j → f (nth k l d) = false) ∧
-    f (nth j l d) = true ∧
-    nth_find_all_loop f (skipn (j + 1) l) (j + 1) = l'.
+    j < List.length l ∧
+    (∀ k : nat, k < j → f (List.nth k l d) = false) ∧
+    f (List.nth j l d) = true ∧
+    nth_find_all_loop f (List.skipn (j + 1) l) (j + 1) = l'.
 Proof.
 intros.
 specialize (eq_nth_find_all_loop_cons f j d l l' 0) as H1.
@@ -1218,9 +1229,9 @@ split. {
 Qed.
 
 Theorem in_nth_nth_find_loop : ∀ ll {i} d,
-  (∀ i, i < length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
-  → i < length ll
-  → i ∈ nth (nth_find_loop (nat_in_list i) ll d - d) ll [].
+  (∀ i, i < List.length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
+  → i < List.length ll
+  → i ∈ List.nth (nth_find_loop (nat_in_list i) ll d - d) ll [].
 Proof.
 intros * Huni Hi.
 specialize (Huni _ Hi).
@@ -1228,7 +1239,7 @@ destruct Huni as (l & Hlll & Hil).
 clear - Hlll Hil.
 revert d l Hlll Hil.
 induction ll as [| l1]; intros; [ easy | ].
-cbn - [ nth ].
+cbn - [ List.nth ].
 remember (nat_in_list i l1) as b eqn:Hb; symmetry in Hb.
 destruct b. {
   rewrite Nat.sub_diag; cbn.
@@ -1260,9 +1271,9 @@ now rewrite Nat_sub_succ_1 in IHll.
 Qed.
 
 Theorem in_nth_nth_find : ∀ ll j,
-  (∀ i, i < length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
-  → j < length ll
-  → j ∈ nth (nth_find (nat_in_list j) ll) ll [].
+  (∀ i, i < List.length ll → ∃ l : list nat, l ∈ ll ∧ i ∈ l)
+  → j < List.length ll
+  → j ∈ List.nth (nth_find (nat_in_list j) ll) ll [].
 Proof.
 intros * Huni Hi.
 specialize (in_nth_nth_find_loop ll 0 Huni Hi) as H1.
@@ -1274,10 +1285,10 @@ Theorem eq_nth_find_all_loop_iff : ∀ A f (d : A) l l1 i,
     match l1 with
     | [] => (∀ j, j ∈ l → f j = false)
     | j :: l2 =>
-        i ≤ j < i + length l ∧
-        (∀ k, i + k < j → f (nth k l d) = false) ∧
-        f (nth (j - i) l d) = true ∧
-        nth_find_all_loop f (skipn (j + 1 - i) l) (j + 1) = l2
+        i ≤ j < i + List.length l ∧
+        (∀ k, i + k < j → f (List.nth k l d) = false) ∧
+        f (List.nth (j - i) l d) = true ∧
+        nth_find_all_loop f (List.skipn (j + 1 - i) l) (j + 1) = l2
 end.
 Proof.
 intros.
@@ -1286,8 +1297,8 @@ apply eq_nth_find_all_loop_cons.
 Qed.
 
 Theorem length_loc_loc_bl_sens_list : ∀ n f x,
-  length (loc_sens_list n f x) =
-  length (loc_bl_sens_list (map (λ i, [i]) (seq 0 n)) f x).
+  List.length (loc_sens_list n f x) =
+  List.length (loc_bl_sens_list (List.map (λ i, [i]) (List.seq 0 n)) f x).
 Proof.
 intros.
 unfold loc_sens_list.
@@ -1303,15 +1314,19 @@ Qed.
 
 Theorem loc_length_loc_bl_sens_list : ∀ n f x,
   local_sensitivity n f x =
-  length (loc_bl_sens_list (map (λ i, [i]) (seq 0 n)) f x).
+  List.length (loc_bl_sens_list (List.map (λ i, [i]) (List.seq 0 n)) f x).
 Proof.
 intros.
 apply length_loc_loc_bl_sens_list.
 Qed.
 
 Theorem map_loc_sens : ∀ n f l,
-  map (local_sensitivity n f) l =
-  map (λ x, length (loc_bl_sens_list (map (λ i, [i]) (seq 0 n)) f x)) l.
+  List.map (local_sensitivity n f) l =
+  List.map
+    (λ x,
+       List.length
+         (loc_bl_sens_list (List.map (λ i, [i]) (List.seq 0 n)) f x))
+    l.
 Proof.
 intros.
 induction l; cbn; [ easy | ].
@@ -1359,17 +1374,17 @@ Qed.
 Theorem fold_left_horner_eval_sum :
   let ro := nat_ring_like_op in
   ∀ k n a x,
-  fold_left (λ acc i : nat, acc * x + a (n + k - i))
-    (seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ i) =
-  fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
-    (seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ (n + i)).
+  List.fold_left (λ acc i : nat, acc * x + a (n + k - i))
+    (List.seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ i) =
+  List.fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
+    (List.seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ (n + i)).
 Proof.
 intros.
 revert k.
 induction n; intros; [ easy | ].
 specialize (IHn (S k)).
 replace (n + S k) with (S n + k) in IHn by flia.
-replace (seq (S k) (S n)) with (S k :: seq (S (S k)) n) by easy.
+replace (List.seq (S k) (S n)) with (S k :: List.seq (S (S k)) n) by easy.
 cbn - [ "-" "+" ].
 replace (S n + k - S k) with n by flia.
 rewrite iter_seq_split_first in IHn; [ | easy | | | easy ]; cycle 1. {
@@ -1390,11 +1405,11 @@ remember (∑ (i = 0, k), a (S n + i) * x ^ i * x) as y.
 unfold iter_seq in Heqy.
 rewrite Nat.sub_0_r in Heqy.
 specialize mul_iter_list_distr_r as H1.
-specialize (H1 nat nat x (seq 0 (S k))).
+specialize (H1 nat nat x (List.seq 0 (S k))).
 specialize (H1 (λ i, a (S n + i) * x ^ i)).
 specialize (H1 Nat.add Nat.mul 0).
-cbn - [ seq "+" ] in H1.
-cbn - [ seq "+" ] in Heqy.
+cbn - [ List.seq "+" ] in H1.
+cbn - [ List.seq "+" ] in Heqy.
 rewrite <- H1 in Heqy. 2: {
   intros; apply Nat.mul_add_distr_r.
 }
@@ -1420,7 +1435,7 @@ Theorem horner_is_eval_polyn :
   let ro := nat_ring_like_op in
   let rp := nat_ring_like_prop in
   ∀ n a x,
-  fold_left (λ acc i, acc * x + a (n - i)) (seq 0 (S n)) 0 =
+  List.fold_left (λ acc i, acc * x + a (n - i)) (List.seq 0 (S n)) 0 =
   ∑ (i = 0, n), a i * x ^ i.
 Proof.
 intros.
@@ -1438,39 +1453,41 @@ Qed.
 Theorem horner_is_eval_polyn2 :
   let ro := nat_ring_like_op in
   ∀ n a x,
-  fold_left (λ acc i, acc * x + a i) (seq 0 (S n)) 0 =
+  List.fold_left (λ acc i, acc * x + a i) (List.seq 0 (S n)) 0 =
   ∑ (i = 0, n), a (n - i) * x ^ i.
 Proof.
 intros.
 specialize (horner_is_eval_polyn n (λ i, a (n - i)) x) as H1.
-cbn - [ "-" fold_left seq ] in H1.
+cbn - [ "-" List.fold_left List.seq ] in H1.
 cbn.
 rewrite <- H1; cbn.
 rewrite Nat.sub_0_r, Nat.sub_diag.
 apply List_fold_left_ext_in.
 intros b c Hb; f_equal; f_equal.
-apply in_seq in Hb.
+apply List.in_seq in Hb.
 flia Hb.
 Qed.
 
 Theorem to_radix_fold_left : ∀ n,
-  to_radix n (fold_left (λ a i, a * n + i) (seq 0 n) 0) = rev (seq 0 n).
+  to_radix n (List.fold_left (λ a i, a * n + i) (List.seq 0 n) 0) =
+  List.rev (List.seq 0 n).
 Proof.
 intros.
 assert
   (Hft : ∀ it n l d,
-   n = length l
+   n = List.length l
    → n ≤ it
    → (∀ i, i ∈ l → i < n + d)
-   → firstn n
-        (to_radix_loop it (n + d) (fold_left (λ a j, a * (n + d) + j) l 0)) =
-        rev l). {
+   → List.firstn n
+        (to_radix_loop it (n + d)
+           (List.fold_left (λ a j, a * (n + d) + j) l 0)) =
+        List.rev l). {
   clear.
   intros * Hnl Hit Hil.
   revert n d l Hnl Hit Hil.
   induction it; intros. {
     apply Nat.le_0_r in Hit; subst n.
-    apply length_zero_iff_nil in Hit.
+    apply List.length_zero_iff_nil in Hit.
     now subst l.
   }
   cbn.
@@ -1486,36 +1503,36 @@ assert
   rename l' into l.
   destruct n. {
     symmetry in Hnl.
-    now apply length_zero_iff_nil in Hnl; subst l.
+    now apply List.length_zero_iff_nil in Hnl; subst l.
   }
-  cbn - [ last "mod" ].
-  remember (rev l) as rl eqn:Hrl; symmetry in Hrl.
+  cbn - [ List.last "mod" ].
+  remember (List.rev l) as rl eqn:Hrl; symmetry in Hrl.
   destruct rl as [| a]. {
     now apply List_eq_rev_nil in Hrl; subst l.
   }
-  assert (Hlr : l = rev (a :: rl)). {
-    rewrite <- Hrl; symmetry; apply rev_involutive.
+  assert (Hlr : l = List.rev (a :: rl)). {
+    rewrite <- Hrl; symmetry; apply List.rev_involutive.
   }
   rewrite Hlr.
-  cbn - [ last "mod" ].
-  rewrite app_comm_cons, last_last.
+  cbn - [ List.last "mod" ].
+  rewrite List.app_comm_cons, List.last_last.
   rewrite Nat.mod_small. 2: {
     apply Hil; rewrite Hlr; cbn.
-    now apply in_or_app; right; left.
+    now apply List.in_or_app; right; left.
   }
   f_equal.
-  rewrite removelast_app; [ | easy ].
-  rewrite app_nil_r.
-  replace rl with (tl (rev l)) by now rewrite Hrl.
+  rewrite List.removelast_app; [ | easy ].
+  rewrite List.app_nil_r.
+  replace rl with (List.tl (List.rev l)) by now rewrite Hrl.
   cbn in Hil.
   replace (S (n + d)) with (n + S d) in Hil |-* by flia.
   apply Nat.succ_le_mono in Hit.
-  rewrite IHit; [ apply rev_involutive | | easy | ]. 2: {
+  rewrite IHit; [ apply List.rev_involutive | | easy | ]. 2: {
     intros i Hi.
     apply Hil.
-    apply in_rev in Hi.
-    apply in_rev.
-    remember (rev l) as l'.
+    apply List.in_rev in Hi.
+    apply List.in_rev.
+    remember (List.rev l) as l'.
     clear - Hi; rename l' into l.
     induction l as [| a]; [ easy | ].
     cbn in Hi.
@@ -1526,32 +1543,32 @@ assert
     }
     now right; apply IHl.
   }
-  rewrite length_rev.
+  rewrite List.length_rev.
   apply Nat.succ_inj.
   rewrite Hnl, Hrl; cbn.
   rewrite Hlr.
-  now rewrite length_rev.
+  now rewrite List.length_rev.
 }
-specialize (Hft n n (seq 0 n) 0) as H1.
-rewrite length_seq in H1.
+specialize (Hft n n (List.seq 0 n) 0) as H1.
+rewrite List.length_seq in H1.
 specialize (H1 eq_refl (Nat.le_refl _)).
 rewrite Nat.add_0_r in H1.
-assert (H : ∀ i, i ∈ seq 0 n → i < n). {
-  now intros i Hi; apply in_seq in Hi.
+assert (H : ∀ i, i ∈ List.seq 0 n → i < n). {
+  now intros i Hi; apply List.in_seq in Hi.
 }
 specialize (H1 H); clear H.
 unfold to_radix.
 remember (to_radix_loop _ _ _) as l.
 rewrite <- H1; symmetry.
-replace n with (length l). 2: {
+replace n with (List.length l). 2: {
   rewrite Heql.
   apply to_radix_loop_length.
 }
-apply firstn_all.
+apply List.firstn_all.
 Qed.
 
 Theorem fold_left_mul_seq_lt : ∀ n,
-  fold_left (λ a i, a * n + i) (seq 0 n) 0 < n ^ n.
+  List.fold_left (λ a i, a * n + i) (List.seq 0 n) 0 < n ^ n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ subst n; cbn; flia | ].
@@ -1564,13 +1581,13 @@ rewrite Nat.add_1_r.
 apply Nat.lt_succ_r.
 unfold iter_seq.
 rewrite mul_iter_list_distr_l; [ | apply Nat.mul_add_distr_l ].
-cbn - [ seq ].
+cbn - [ List.seq ].
 specialize (horner_is_eval_polyn (n - 1)) as H2.
 specialize (H2 (λ i, n - 1 - i) n).
-cbn - [ "-" fold_left seq ] in H2.
+cbn - [ "-" List.fold_left List.seq ] in H2.
 rewrite List_fold_left_ext_in with (g := λ acc i, acc * n + i) in H2. 2: {
   intros acc i Hacc.
-  apply in_seq in Hacc.
+  apply List.in_seq in Hacc.
   flia Hacc.
 }
 replace (S (n - 1)) with n in H2 at 1 by flia Hnz.
@@ -1596,19 +1613,19 @@ intros.
 rewrite loc_length_loc_bl_sens_list.
 unfold local_block_sensitivity.
 remember (pre_partitions n) as ll eqn:Hll.
-remember (locate (dispatch_list (seq 0 n))) as j eqn:Hj.
-specialize (@nth_split _ j ll []) as H1.
-assert (H : j < length ll). {
+remember (locate (dispatch_list (List.seq 0 n))) as j eqn:Hj.
+specialize (@List.nth_split _ j ll []) as H1.
+assert (H : j < List.length ll). {
   rewrite Hj, Hll.
   unfold pre_partitions.
-  rewrite length_map, length_seq.
+  rewrite List.length_map, List.length_seq.
   unfold locate.
   rewrite locate_dispatch_list. 2: {
     intros a Ha.
-    rewrite length_seq.
-    now apply in_seq in Ha.
+    rewrite List.length_seq.
+    now apply List.in_seq in Ha.
   }
-  rewrite dispatch_list_length, length_seq.
+  rewrite dispatch_list_length, List.length_seq.
   apply fold_left_mul_seq_lt.
 }
 specialize (H1 H); clear H.
@@ -1616,41 +1633,41 @@ destruct H1 as (l1 & l2 & Hll12 & Hl1).
 unfold locate in Hj.
 rewrite locate_dispatch_list in Hj. 2: {
   intros a Ha.
-  apply in_seq in Ha.
-  now rewrite length_seq.
+  apply List.in_seq in Ha.
+  now rewrite List.length_seq.
 }
 rewrite dispatch_list_length in Hj.
-rewrite length_seq in Hj.
+rewrite List.length_seq in Hj.
 rewrite Hll12.
-rewrite map_app.
-rewrite fold_right_app; cbn.
-assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
+rewrite List.map_app.
+rewrite List.fold_right_app; cbn.
+assert (Hjll : List.nth j ll [] = List.map (λ i, [i]) (List.seq 0 n)). {
   rewrite Hll.
   unfold pre_partitions.
   assert (Hjnn : j < n ^ n). {
     rewrite Hj.
     apply fold_left_mul_seq_lt.
   }
-  rewrite (List_map_nth' 0) by now rewrite length_seq.
-  rewrite seq_nth; [ cbn | easy ].
+  rewrite (List_map_nth' 0) by now rewrite List.length_seq.
+  rewrite List.seq_nth; [ cbn | easy ].
   unfold dispatch.
   rewrite Hj.
   rewrite to_radix_fold_left.
-  rewrite rev_involutive.
+  rewrite List.rev_involutive.
   clear.
   unfold dispatch_list.
-  rewrite length_seq.
-  apply map_ext_in_iff.
+  rewrite List.length_seq.
+  apply List.map_ext_in_iff.
   intros a Ha.
   unfold nth_find_all.
   apply (eq_nth_find_all_loop_cons _ _ 0).
-  rewrite length_seq, Nat.sub_0_r, Nat.sub_0_r; cbn.
-  apply in_seq in Ha.
+  rewrite List.length_seq, Nat.sub_0_r, Nat.sub_0_r; cbn.
+  apply List.in_seq in Ha.
   split; [ easy | ]; destruct Ha as (_, Ha); cbn in Ha.
-  rewrite seq_nth; [ | easy ].
+  rewrite List.seq_nth; [ | easy ].
   split. {
     intros k Hk.
-    rewrite seq_nth; [ | flia Ha Hk ].
+    rewrite List.seq_nth; [ | flia Ha Hk ].
     apply Bool.not_true_iff_false; intros Hak.
     apply Nat.eqb_eq in Hak.
     rewrite Hak in Hk; flia Hk.
@@ -1662,7 +1679,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
   apply Nat.eqb_eq in Haj; subst j.
   rewrite List_skipn_seq in Hj; [ | flia Ha ].
   cbn in Hj.
-  apply in_seq in Hj; flia Hj.
+  apply List.in_seq in Hj; flia Hj.
 }
 rewrite Hjll.
 rewrite <- loc_length_loc_bl_sens_list.
@@ -1678,7 +1695,7 @@ Proof.
 intros.
 unfold block_sensitivity, sensitivity.
 unfold "≥".
-remember (seq 0 (2 ^ n)) as l; clear Heql.
+remember (List.seq 0 (2 ^ n)) as l; clear Heql.
 induction l as [| a]; [ easy | cbn ].
 etransitivity. {
   apply Nat.max_le_compat_l.
@@ -1705,11 +1722,11 @@ Qed.
 Compute (Δ full_cube, Nat.sqrt 3).
 Compute (2 ^ (3 - 1) + 1).
 
-Compute (length (sg_edges full_cube)).
+Compute (List.length (sg_edges full_cube)).
 Compute (vdeg (edges cube_vert) 0).
 
 Compute (edges [1; 2; 4; 7]).
-Compute (length (edges [1; 2; 4; 7])).
+Compute (List.length (edges [1; 2; 4; 7])).
 Compute (2 ^ (3 - 1) + 1).
 
 Compute (vΔ [0; 1; 4; 5; 7]).
@@ -1720,10 +1737,10 @@ Compute (vΔ [0; 3; 5; 6; 9; 10; 12; 15]).
 Compute (2 ^ (4 - 1) + 1).
 Compute (Nat.sqrt 4).
 Compute (let n := 4 in 2 ^ (n - 1) + 1).
-Compute (map (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; i]) (seq 0 16)).
+Compute (List.map (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; i]) (List.seq 0 16)).
 Compute (let n := 4 in Nat.sqrt n).
 Compute (let n := 3 in 2 ^ (n - 1) + 1).
-Compute (map (λ i, (i, vΔ [0; 3; 5; 6; i])) (seq 0 8)).
+Compute (List.map (λ i, (i, vΔ [0; 3; 5; 6; i])) (List.seq 0 8)).
 Compute (let n := 3 in Nat.sqrt n).
 
 Compute (edges [0; 3; 5; 6]).
@@ -1732,34 +1749,33 @@ Compute (vdeg (edges [0; 3; 5; 6; 1])) 1.
 
 Compute (Nat.sqrt 5).
 Compute (let n := 5 in 2 ^ (n - 1) + 1).
-Compute (length [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30]).
 Compute (edges [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30]).
 Compute
-   (map
+   (List.map
      (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; 17; 18; 20; 23; 24; 27; 29; 30; i])
-     (seq 0 32)).
+     (List.seq 0 32)).
 
 Compute (Nat.sqrt 4).
 Compute (let n := 4 in 2 ^ (n - 1) + 1). (* 9 *)
-Compute (length [0; 3; 5; 6; 9; 10; 12; 15]).
+Compute (List.length [0; 3; 5; 6; 9; 10; 12; 15]).
 Compute (edges [0; 3; 5; 6; 9; 10; 12; 15]).
-Compute (map (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; i]) (seq 0 16)).
+Compute (List.map (λ i, vΔ [0; 3; 5; 6; 9; 10; 12; 15; i]) (List.seq 0 16)).
 
 Compute (vΔ [0; 1; 6; 7; 10; 11; 12; 13]).
-Compute (map (λ i, vΔ [0; 1; 6; 7; 10; 11; 12; 13; i]) (seq 0 16)).
+Compute (List.map (λ i, vΔ [0; 1; 6; 7; 10; 11; 12; 13; i]) (List.seq 0 16)).
 
 Compute (Nat.sqrt 2).
 Compute (let n := 2 in 2 ^ (n - 1) + 1).
-Compute (length [0; 3]).
+Compute (List.length [0; 3]).
 
 Compute (Nat.sqrt 3).
 Compute (let n := 3 in 2 ^ (n - 1) + 1).
-Compute (length [0; 3; 5; 6]).
+Compute (List.length [0; 3; 5; 6]).
 Compute (edges [0; 3; 5; 6]).
-Compute (map (λ i, vΔ [0; 3; 5; 6; i]) (seq 0 8)).
-Compute (map (λ i, vΔ [0; 1; 2; 4; i]) (seq 0 8)).
+Compute (List.map (λ i, vΔ [0; 3; 5; 6; i]) (List.seq 0 8)).
+Compute (List.map (λ i, vΔ [0; 1; 2; 4; i]) (List.seq 0 8)).
 
-Compute (map (λ i, vΔ [0; 1; 6; 7; i]) (seq 0 8)).
+Compute (List.map (λ i, vΔ [0; 1; 6; 7; i]) (List.seq 0 8)).
 Compute (vΔ [0; 1; 6; 7]).
 Compute (edges [0; 1; 2; 4]).
 *)
