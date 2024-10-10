@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import List.ListNotations.
 Import Init.Nat.
 
 Require Import Misc PermutationFun.
@@ -159,7 +159,7 @@ Qed.
 Theorem sorted_rel : ∀ A (d : A) rel l,
   sorted rel l
   → ∀ i, S i < length l
-  → rel (nth i l d) (nth (S i) l d) = true.
+  → rel (List.nth i l d) (List.nth (S i) l d) = true.
 Proof.
 intros * Hs i Hi.
 revert i Hi.
@@ -181,7 +181,7 @@ Theorem strongly_sorted_if : ∀ A rel,
     i < length l
     → j < length l
     → i < j
-    → rel (nth i l d) (nth j l d) = true.
+    → rel (List.nth i l d) (List.nth j l d) = true.
 Proof.
 intros * Htr * Hso * Hi Hj Hij.
 remember (j - i) as n eqn:Hn.
@@ -196,7 +196,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply sorted_rel; [ | easy ].
   now apply strongly_sorted_sorted.
 }
-apply Htr with (b := nth (S i) l d). 2: {
+apply Htr with (b := List.nth (S i) l d). 2: {
   rewrite <- Nat.add_succ_comm in Hj.
   rewrite <- Nat.add_succ_comm.
   now apply IHn.
@@ -235,7 +235,7 @@ Qed.
 Theorem sorted_NoDup : ∀ {A} {rel : A → _},
   irreflexive rel →
   transitive rel →
-  ∀ l, sorted rel l → NoDup l.
+  ∀ l, sorted rel l → List.NoDup l.
 Proof.
 intros * Hirr Htra * Hsort.
 induction l as [| a]; [ constructor | ].
@@ -292,7 +292,7 @@ split. {
     subst a1.
     cbn in Hab.
     apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
-    now apply in_or_app; right.
+    now apply List.in_or_app; right.
   }
 } {
   intros (Hla & Hlb & Hab).
@@ -329,7 +329,7 @@ induction la as [| c]; intros. {
   now apply Bool.andb_true_iff in Hs.
 }
 remember (c :: la) as lb; cbn in Hs; subst lb.
-rewrite <- app_comm_cons in Hs.
+rewrite <- List.app_comm_cons in Hs.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hac, Hs).
 specialize (IHla _ _ Hs) as H1.
@@ -341,13 +341,13 @@ Theorem sorted_repeat : ∀ A (rel : A → _),
   transitive rel →
   ∀ a la,
   sorted rel (a :: la ++ [a])
-  → la = repeat a (length la).
+  → la = List.repeat a (length la).
 Proof.
 intros * Hant Htra * Hs.
 revert a Hs.
 induction la as [| b]; intros; [ easy | cbn ].
 remember (b :: la) as lb; cbn in Hs; subst lb.
-rewrite <- app_comm_cons in Hs.
+rewrite <- List.app_comm_cons in Hs.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
 specialize (sorted_trans Htra Hs) as Hba.
@@ -513,7 +513,7 @@ cbn.
 destruct lb as [| b]. {
   destruct Hlen as [Hlen| Hlen]; [ easy | ].
   cbn in Hlen; apply Nat.succ_inj in Hlen.
-  now apply length_zero_iff_nil in Hlen; subst la; cbn.
+  now apply List.length_zero_iff_nil in Hlen; subst la; cbn.
 }
 cbn.
 rewrite (IHla lb); [ easy | ].
@@ -528,23 +528,23 @@ Proof.
 intros * Hit.
 revert la lb Hit.
 induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit.
+  apply Nat.le_0_r, List.length_zero_iff_nil in Hit.
   now rewrite Hit.
 }
 destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ now cbn; rewrite app_nil_r | ].
+destruct lb as [| b]; [ now cbn; rewrite List.app_nil_r | ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; cbn; f_equal. {
   apply IHit; cbn in Hit.
   now apply Nat.succ_le_mono in Hit.
 }
 rewrite IHit; cbn. {
-  do 2 rewrite length_app; cbn.
+  do 2 rewrite List.length_app; cbn.
   symmetry; apply Nat.add_succ_r.
 } {
-  rewrite length_app in Hit; cbn in Hit.
+  rewrite List.length_app in Hit; cbn in Hit.
   apply Nat.succ_le_mono in Hit.
-  now rewrite Nat.add_succ_r, <- length_app in Hit.
+  now rewrite Nat.add_succ_r, <- List.length_app in Hit.
 }
 Qed.
 
@@ -554,7 +554,7 @@ Proof.
 intros.
 unfold merge.
 apply merge_loop_length.
-now rewrite length_app.
+now rewrite List.length_app.
 Qed.
 
 Theorem split_list_length : ∀ A la (lb lc : list A),
@@ -622,7 +622,7 @@ induction it; intros; [ easy | cbn ].
 remember (split_list la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (lb, lc).
 rewrite merge_length.
-rewrite length_app.
+rewrite List.length_app.
 do 2 rewrite IHit.
 now symmetry; apply split_list_length.
 Qed.
@@ -679,13 +679,13 @@ remember (length l) as len eqn:Hlen; symmetry in Hlen.
 revert a b l la lb Hs Hla Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len. {
-  apply length_zero_iff_nil in Hlen; subst l.
+  apply List.length_zero_iff_nil in Hlen; subst l.
   now injection Hla; clear Hla; intros; subst la lb.
 }
 destruct l as [| c]; [ easy | ].
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 destruct len. {
-  apply length_zero_iff_nil in Hlen; subst l.
+  apply List.length_zero_iff_nil in Hlen; subst l.
   injection Hla; clear Hla; intros; subst la lb.
   unfold sorted in Hs |-*.
   cbn in Hs |-*.
@@ -761,15 +761,15 @@ Theorem sorted_merge_loop_cons_cons_r_aux : ∀ {A} {rel : A → _},
   antisymmetric rel →
   transitive rel →
   ∀ n it l la lb a b,
-  length (repeat a (n + n) ++ a :: b :: l) ≤ n + it
+  length (List.repeat a (n + n) ++ a :: b :: l) ≤ n + it
   → rel a a = true
   → sorted rel (a :: b :: l)
   → split_list l = (la, lb)
-  → merge_loop rel it la (repeat a n ++ a :: b :: lb) =
-    merge_loop rel it (a :: la) (repeat a n ++ b :: lb).
+  → merge_loop rel it la (List.repeat a n ++ a :: b :: lb) =
+    merge_loop rel it (a :: la) (List.repeat a n ++ b :: lb).
 Proof.
 intros * Hant Htra * Hit Haa Hs Hla.
-rewrite length_app, repeat_length in Hit; cbn in Hit.
+rewrite List.length_app, List.repeat_length in Hit; cbn in Hit.
 rewrite <- Nat.add_assoc in Hit.
 apply Nat.add_le_mono_l in Hit.
 do 2 rewrite Nat.add_succ_r in Hit.
@@ -878,12 +878,12 @@ destruct ca. {
   specialize (Hant a c Hac Hca) as H; subst c.
   specialize (Hant a b Hab Hbc) as H; subst b.
   f_equal.
-  rewrite List_app_cons, app_assoc.
-  rewrite <- repeat_cons; symmetry.
-  rewrite List_app_cons, app_assoc.
-  rewrite <- repeat_cons; symmetry.
-  do 2 rewrite app_comm_cons.
-  replace (a :: a :: repeat a n) with (repeat a (S (S n))) by easy.
+  rewrite List_app_cons, List.app_assoc.
+  rewrite <- List.repeat_cons; symmetry.
+  rewrite List_app_cons, List.app_assoc.
+  rewrite <- List.repeat_cons; symmetry.
+  do 2 rewrite List.app_comm_cons.
+  replace (a :: a :: List.repeat a n) with (List.repeat a (S (S n))) by easy.
   cbn in Hit.
   apply IHit with (l := l); [ flia Hit | easy | | easy ].
   remember (d :: l) as l'; cbn; subst l'.
@@ -1090,7 +1090,7 @@ Proof.
 intros * Htot * Hit.
 revert l Hit.
 induction it; intros; cbn. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  now apply Nat.le_0_r, List.length_zero_iff_nil in Hit; subst l.
 }
 remember (split_list l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
@@ -1535,7 +1535,7 @@ Proof.
 intros * Heqb * Hlen.
 revert la Hlen.
 induction len; intros. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
+  now apply Nat.le_0_r, List.length_zero_iff_nil in Hlen; subst la.
 }
 destruct la as [| a]; [ easy | ].
 cbn in Hlen; apply Nat.succ_le_mono in Hlen; cbn.
@@ -1672,7 +1672,7 @@ intros * Htr Htot * Hlen.
 unfold sorted.
 revert l Hlen.
 induction len; intros; cbn. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
+  now apply Nat.le_0_r, List.length_zero_iff_nil in Hlen; subst l.
 }
 destruct l as [| a la]; [ easy | cbn ].
 cbn in Hlen; apply Nat.succ_le_mono in Hlen.
@@ -2082,15 +2082,15 @@ induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it. {
   apply Nat.le_0_r, Nat.eq_add_0 in Hit.
   destruct Hit as (H1, H2).
-  apply length_zero_iff_nil in H1, H2; subst la lc.
-  cbn; rewrite app_nil_r; cbn.
+  apply List.length_zero_iff_nil in H1, H2; subst la lc.
+  cbn; rewrite List.app_nil_r; cbn.
   now apply permutation_refl.
 }
 destruct la as [| a]; [ now apply permutation_refl | ].
 cbn in Hit; apply Nat.succ_le_mono in Hit; cbn.
 destruct lc as [| b]. {
-  rewrite app_nil_r.
-  rewrite app_comm_cons.
+  rewrite List.app_nil_r.
+  rewrite List.app_comm_cons.
   apply (permutation_app_comm Heqb).
 }
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
@@ -2110,7 +2110,7 @@ eapply (permutation_trans Heqb). 2: {
 }
 cbn.
 rewrite List_cons_is_app.
-do 2 rewrite app_assoc.
+do 2 rewrite List.app_assoc.
 eapply (permutation_trans Heqb). {
   apply (permutation_app_comm Heqb).
 }
@@ -2124,8 +2124,8 @@ eapply (permutation_trans Heqb). {
   apply (permutation_app_comm Heqb).
 }
 cbn.
-do 2 rewrite app_comm_cons.
-rewrite <- app_assoc.
+do 2 rewrite List.app_comm_cons.
+rewrite <- List.app_assoc.
 cbn in Hit.
 rewrite Nat.add_succ_r in Hit.
 now apply IHit.
@@ -2156,7 +2156,7 @@ destruct l as [| a]. {
 }
 destruct l as [| b]. {
   injection Hll; clear Hll; intros; subst la lb.
-  rewrite app_nil_r.
+  rewrite List.app_nil_r.
   now apply permutation_refl.
 }
 destruct len; [ easy | ].
@@ -2211,12 +2211,12 @@ induction la as [| a]; intros; cbn. {
   apply (permutation_refl Heqb).
 }
 destruct lb as [| b]. {
-  rewrite app_nil_r.
+  rewrite List.app_nil_r.
   apply (permutation_refl Heqb).
 }
 apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 apply (permutation_trans Heqb) with (lb := (b :: (la ++ lb))). {
-  rewrite List_app_cons, app_assoc, app_comm_cons.
+  rewrite List_app_cons, List.app_assoc, List.app_comm_cons.
   apply (permutation_app_tail Heqb).
   apply (permutation_sym Heqb).
   apply (permutation_cons_append Heqb).
@@ -2253,7 +2253,7 @@ specialize (permutation_in_iff Heqb) as H1.
 specialize (proj1 (H1 _ _ Hac _) (or_introl eq_refl)) as Hc.
 specialize (proj1 (H1 _ _ Hbd _) (or_introl eq_refl)) as Hd.
 clear H1.
-apply in_split in Hc, Hd.
+apply List.in_split in Hc, Hd.
 destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
@@ -2266,18 +2266,18 @@ cbn in H1, H2; clear Hac Hbd.
 apply (permutation_sym Heqb).
 rewrite (List_cons_is_app a).
 rewrite (List_cons_is_app b).
-rewrite <- app_assoc.
+rewrite <- List.app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
 apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 rewrite (List_cons_is_app b).
-do 3 rewrite <- app_assoc.
-rewrite app_assoc.
+do 3 rewrite <- List.app_assoc.
+rewrite List.app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
 apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
-rewrite <- app_assoc.
+rewrite <- List.app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
-do 2 rewrite <- app_assoc.
-rewrite app_assoc.
+do 2 rewrite <- List.app_assoc.
+rewrite List.app_assoc.
 eapply (permutation_trans Heqb). {
   now apply permutation_app_split_list_inv.
 }
@@ -2326,12 +2326,12 @@ Proof.
 intros * Htra * Hsort.
 rewrite (List_cons_is_app a) in Hsort.
 rewrite (List_cons_is_app b) in Hsort.
-rewrite app_assoc in Hsort.
+rewrite List.app_assoc in Hsort.
 apply (sorted_app_iff Htra) in Hsort.
 destruct Hsort as (Hla & Hsort & H1).
-apply H1; [ now apply in_or_app; right; left | ].
-apply in_or_app; right.
-now apply in_or_app; left; left.
+apply H1; [ now apply List.in_or_app; right; left | ].
+apply List.in_or_app; right.
+now apply List.in_or_app; left; left.
 Qed.
 
 Theorem sorted_any : ∀ A (rel : A → A → bool),
@@ -2340,27 +2340,27 @@ Theorem sorted_any : ∀ A (rel : A → A → bool),
   ∀ i j d,
   i < j
   → j < length l
-  → rel (nth i l d) (nth j l d) = true.
+  → rel (List.nth i l d) (List.nth j l d) = true.
 Proof.
 intros * Htrans * Hsort * Hij Hj.
 assert (Hi : i < length l) by now transitivity j.
-specialize nth_split as H1.
+specialize List.nth_split as H1.
 specialize (H1 A i l d Hi).
 destruct H1 as (la & lb & Hl & Hla).
-remember (nth i l d) as a eqn:Ha; clear Ha.
+remember (List.nth i l d) as a eqn:Ha; clear Ha.
 subst l i.
-rewrite List_app_cons, app_assoc.
-rewrite app_nth2; rewrite length_app, Nat.add_comm; cbn; [ | easy ].
+rewrite List_app_cons, List.app_assoc.
+rewrite List.app_nth2; rewrite List.length_app, Nat.add_comm; cbn; [ | easy ].
 remember (j - S (length la)) as k eqn:Hkj.
 assert (Hk : k < length lb). {
   subst k.
-  rewrite length_app in Hj; cbn in Hj.
+  rewrite List.length_app in Hj; cbn in Hj.
   flia Hj Hij.
 }
-specialize nth_split as H1.
+specialize List.nth_split as H1.
 specialize (H1 A k lb d Hk).
 destruct H1 as (lc & ld & Hl & Hlc).
-remember (nth k lb d) as b eqn:Hb.
+remember (List.nth k lb d) as b eqn:Hb.
 subst lb.
 clear j k Hb Hij Hj Hkj Hk Hlc Hi.
 rename lc into lb; rename ld into lc.
@@ -2390,7 +2390,7 @@ Theorem sorted_sorted_permuted_not_antisym_1 : ∀ {A} {eqb leb : A → _},
   sorted leb la
   → sorted leb lb
   → permutation eqb la lb
-  → ∀ i, leb (nth i la d) (nth i lb d) = true.
+  → ∀ i, leb (List.nth i la d) (List.nth i lb d) = true.
 Proof.
 intros * Heqb Href Htra * Hsa Hsb Hpab i.
 revert lb Hpab Hsb i.
@@ -2407,8 +2407,8 @@ assert (Hlenb : length lb = len). {
 }
 destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   apply Nat.nlt_ge in Hilen.
-  rewrite nth_overflow; [ | now rewrite Hlena ].
-  rewrite nth_overflow; [ | now rewrite Hlenb ].
+  rewrite List.nth_overflow; [ | now rewrite Hlena ].
+  rewrite List.nth_overflow; [ | now rewrite Hlenb ].
   apply Href.
 }
 remember (List_rank (λ b, negb (eqb a b)) la) as n eqn:Hn.
@@ -2436,11 +2436,11 @@ destruct (Nat.eq_dec n (length la)) as [Hnla| Hnla]. {
     }
     cbn in Haft.
     injection Haft; clear Haft; intros Hb H; subst c lb.
-    cbn - [ nth ] in Hn.
+    cbn - [ List.nth ] in Hn.
     apply (permutation_in_iff Heqb) with (a := b) in Hpab.
-    cbn - [ In ] in Hpab.
+    cbn - [ List.In ] in Hpab.
     specialize (proj2 Hpab (or_introl eq_refl)) as H1.
-    apply (In_nth _ _ d) in H1; cbn - [ nth ] in H1.
+    apply (List.In_nth _ _ d) in H1; cbn - [ List.nth ] in H1.
     destruct H1 as (j & Hjl & Hj).
     specialize (Hn _ Hjl).
     rewrite Hj in Hn.
@@ -2463,32 +2463,32 @@ destruct (Nat.eq_dec n (length la)) as [Hnla| Hnla]. {
   apply Bool.negb_false_iff, Heqb in H1.
   rewrite <- H1.
   destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
-    rewrite app_nth2; [ | now unfold ge; rewrite Hib ].
+    rewrite List.app_nth2; [ | now unfold ge; rewrite Hib ].
     rewrite Hib, Nat.sub_diag; cbn.
     apply Href.
   }
-  assert (H : nth i (bef ++ a :: aft) d ∈ la). {
+  assert (H : List.nth i (bef ++ a :: aft) d ∈ la). {
     cbn in Hpab.
     specialize (permutation_in_iff Heqb) as H2.
     apply H2 with (la := c :: bef ++ aft). {
       now apply (permutation_sym Heqb).
     }
     destruct (lt_dec i (length bef)) as [Hib1| Hib1]. {
-      rewrite app_nth1; [ | easy ].
-      right; apply in_or_app; left.
-      now apply nth_In.
+      rewrite List.app_nth1; [ | easy ].
+      right; apply List.in_or_app; left.
+      now apply List.nth_In.
     }
     apply Nat.nlt_ge in Hib1.
-    rewrite app_nth2; [ | easy ].
+    rewrite List.app_nth2; [ | easy ].
     replace (i - length bef) with (S (i - S (length bef))) by flia Hib1 Hib.
-    cbn - [ In ].
-    right; apply in_or_app; right.
-    apply nth_In.
+    cbn - [ List.In ].
+    right; apply List.in_or_app; right.
+    apply List.nth_In.
     cbn in Hlenb.
-    rewrite length_app in Hlenb; cbn in Hlenb.
+    rewrite List.length_app in Hlenb; cbn in Hlenb.
     flia Hlena Hlenb Hilen Hib Hib1.
   }
-  apply (In_nth _ _ d) in H.
+  apply (List.In_nth _ _ d) in H.
   destruct H as (j & Hjl & Hj).
   specialize (Hn _ Hjl) as H2.
   rewrite Hj in H2.
@@ -2551,7 +2551,7 @@ destruct i. {
     now rewrite (equality_refl Heqb) in Hab.
   }
   rewrite Haft.
-  now apply in_or_app; right; left.
+  now apply List.in_or_app; right; left.
 }
 destruct lb as [| b]; [ cbn in Hlena, Hlenb; congruence | cbn ].
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
@@ -2574,7 +2574,7 @@ cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
 cbn in Hpab.
 specialize (permutation_in_iff Heqb Hpab) as H1.
 specialize (proj2 (H1 b) (or_introl eq_refl)) as H2.
-apply (In_nth _ _ d) in H2.
+apply (List.In_nth _ _ d) in H2.
 destruct H2 as (j & Hj & Hb).
 assert (Hjn : n ≤ j). {
   apply Nat.nlt_ge; intros H.
@@ -2585,14 +2585,14 @@ assert (Hjn : n ≤ j). {
 apply (sorted_cons_iff Htra) in Hsb.
 destruct Hsb as (Hsb & Hbaa).
 specialize (Hbaa a) as H2.
-assert (H : a ∈ bef ++ a :: aft) by now apply in_or_app; right; left.
+assert (H : a ∈ bef ++ a :: aft) by now apply List.in_or_app; right; left.
 specialize (H2 H); clear H.
 move Hsa at bottom.
 move Hsb at bottom.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
   rewrite Hb.
-  apply Hbaa, nth_In.
+  apply Hbaa, List.nth_In.
   cbn in Hlenb.
   rewrite <- Hlenb in Hilen.
   now apply Nat.succ_lt_mono in Hilen.
@@ -2608,7 +2608,7 @@ assert (Hbba : sorted leb (bef ++ b :: aft)). {
     apply (sorted_cons_iff Htra).
     split; [ easy | ].
     intros c Hc.
-    now apply Hbaa, in_or_app; right; right.
+    now apply Hbaa, List.in_or_app; right; right.
   }
   intros x y Hx Hy.
   destruct Hy as [Hy| Hy]. 2: {
@@ -2625,19 +2625,19 @@ assert (Hbba : sorted leb (bef ++ b :: aft)). {
   now apply H1; left.
 }
 destruct (lt_dec i (length bef)) as [Hib| Hib]. {
-  rewrite app_nth1; [ | easy ].
-  rewrite <- app_nth1 with (l := bef) (l' := b :: aft); [ | easy ].
+  rewrite List.app_nth1; [ | easy ].
+  rewrite <- List.app_nth1 with (l := bef) (l' := b :: aft); [ | easy ].
   apply IHla; [ | easy ].
   eapply (permutation_trans Heqb); [ apply Hpab | ].
   apply (permutation_middle Heqb).
 }
 apply Nat.nlt_ge in Hib.
-rewrite app_nth2; [ | easy ].
+rewrite List.app_nth2; [ | easy ].
 destruct (Nat.eq_dec i (length bef)) as [Hib'| Hib']. {
   rewrite <- Hib', Nat.sub_diag; cbn.
   apply (Htra _ b _); [ | easy ].
-  replace b with (nth i (bef ++ b :: aft) d). 2: {
-    rewrite app_nth2; [ | easy ].
+  replace b with (List.nth i (bef ++ b :: aft) d). 2: {
+    rewrite List.app_nth2; [ | easy ].
     now rewrite Hib', Nat.sub_diag; cbn.
   }
   apply IHla; [ | easy ].
@@ -2646,9 +2646,9 @@ destruct (Nat.eq_dec i (length bef)) as [Hib'| Hib']. {
 }
 replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
 cbn.
-replace (nth (i - S (length bef)) aft d) with
-    (nth i (bef ++ b :: aft) d). 2: {
-  rewrite app_nth2; [ | easy ].
+replace (List.nth (i - S (length bef)) aft d) with
+    (List.nth i (bef ++ b :: aft) d). 2: {
+  rewrite List.app_nth2; [ | easy ].
   now replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
 }
 apply IHla; [ | easy ].
@@ -2665,8 +2665,8 @@ Theorem sorted_sorted_permuted_not_antisym : ∀ A (eqb leb : A → A → bool),
   → sorted leb lb
   → permutation eqb la lb
   → ∀ i,
-    leb (nth i la d) (nth i lb d) = true ∧
-    leb (nth i lb d) (nth i la d) = true.
+    leb (List.nth i la d) (List.nth i lb d) = true ∧
+    leb (List.nth i lb d) (List.nth i la d) = true.
 Proof.
 intros * Heqb Href Htra * Hsa Hsb Hpab i.
 split. {
@@ -2738,11 +2738,11 @@ Proof.
 intros * Ha Hb.
 revert la itb Ha Hb.
 induction ita; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Ha; subst la.
+  apply Nat.le_0_r, List.length_zero_iff_nil in Ha; subst la.
   symmetry; apply msort_loop_nil.
 }
 destruct itb; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hb; subst la; cbn.
+  apply Nat.le_0_r, List.length_zero_iff_nil in Hb; subst la; cbn.
   now rewrite msort_loop_nil.
 }
 remember (split_list la) as ll eqn:Hll; symmetry in Hll.
@@ -3189,7 +3189,7 @@ Qed.
 
 (* *)
 
-Theorem sorted_seq : ∀ sta len, sorted Nat.ltb (seq sta len).
+Theorem sorted_seq : ∀ sta len, sorted Nat.ltb (List.seq sta len).
 Proof.
 intros.
 revert sta.
@@ -3197,7 +3197,7 @@ induction len; intros; [ easy | cbn ].
 apply sorted_cons_iff; [ apply Nat_ltb_trans | ].
 split; [ apply IHlen | ].
 intros a Ha.
-apply in_seq in Ha.
+apply List.in_seq in Ha.
 now apply Nat.ltb_lt.
 Qed.
 
@@ -3321,7 +3321,7 @@ Theorem sorted_sorted_map_cons : ∀ A (ltb : A → _),
   transitive ltb →
   connected_relation ltb →
   ∀ ll a,
-  sorted (list_ltb ltb) ll → sorted (list_ltb ltb) (map (cons a) ll).
+  sorted (list_ltb ltb) ll → sorted (list_ltb ltb) (List.map (cons a) ll).
 Proof.
 intros * Hant Htra Hcon * Hs.
 induction ll as [| la]; [ easy | cbn ].
@@ -3340,7 +3340,7 @@ destruct lb as [| b]. {
 remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ easy | ].
 remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
-apply in_map_iff in Hlb.
+apply List.in_map_iff in Hlb.
 destruct Hlb as (lc & Hll & Hlb).
 injection Hll; clear Hll; intros; subst b lc.
 destruct ba; [ congruence | ].
@@ -3352,10 +3352,10 @@ Qed.
 Theorem sorted_concat_iff : ∀ A (rel : A → _),
   transitive rel →
   ∀ ll,
-  sorted rel (concat ll) ↔
+  sorted rel (List.concat ll) ↔
     (∀ l, l ∈ ll → sorted rel l) ∧
     (∀ i j, i < j < length ll →
-     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → rel a b = true).
+     ∀ a b, a ∈ List.nth i ll [] → b ∈ List.nth j ll [] → rel a b = true).
 Proof.
 intros * Htra *.
 split. {
@@ -3371,7 +3371,7 @@ split. {
   intros i j Hij a b Ha Hb.
   revert i j a b Hij Ha Hb.
   induction ll as [| la]; intros; [ easy | ].
-  assert (H : sorted rel (concat ll)). {
+  assert (H : sorted rel (List.concat ll)). {
     now cbn in Hs; apply sorted_app_iff in Hs; [ | easy ].
   }
   specialize (IHll H); clear H.
@@ -3382,10 +3382,10 @@ split. {
     apply sorted_app_iff in Hs; [ | easy ].
     destruct Hs as (Hla & Hs & Hab).
     apply Hab; [ easy | ].
-    apply in_concat.
-    exists (nth j ll []).
+    apply List.in_concat.
+    exists (List.nth j ll []).
     split; [ | easy ].
-    apply nth_In.
+    apply List.nth_In.
     destruct Hij as (_, Hj); cbn in Hj.
     now apply Nat.succ_lt_mono in Hj.
   }
@@ -3407,9 +3407,9 @@ split. {
   }
 }
 intros a b Ha Hb.
-apply in_concat in Hb.
+apply List.in_concat in Hb.
 destruct Hb as (lb & Hlb & Hb).
-apply (In_nth _ _ []) in Hlb.
+apply (List.In_nth _ _ []) in Hlb.
 destruct Hlb as (j & Hjl & Hlb).
 apply (Hleb 0 (S j)); [ | easy | now cbn; rewrite Hlb ].
 split; [ easy | cbn ].
@@ -3417,12 +3417,12 @@ now apply -> Nat.succ_lt_mono.
 Qed.
 
 Theorem cart_prod_repeat_seq_ltb_sorted : ∀ i n m,
-  sorted (list_ltb Nat.ltb) (cart_prod (repeat (seq i n) m)).
+  sorted (list_ltb Nat.ltb) (cart_prod (List.repeat (List.seq i n) m)).
 Proof.
 intros.
 revert i n.
 induction m; intros; [ easy | cbn ].
-rewrite flat_map_concat_map.
+rewrite List.flat_map_concat_map.
 specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_trans as Htra.
@@ -3430,24 +3430,24 @@ apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
 rewrite List_length_map_seq.
 split. {
   intros ll Hll.
-  apply in_map_iff in Hll.
+  apply List.in_map_iff in Hll.
   destruct Hll as (a & Hll & Ha); subst ll.
   apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
 }
 intros j k Hjk la lb Ha Hb.
-rewrite (List_map_nth' 0) in Ha; [ | rewrite length_seq; flia Hjk ].
-rewrite (List_map_nth' 0) in Hb; [ | rewrite length_seq; easy ].
-apply in_map_iff in Ha, Hb.
+rewrite (List_map_nth' 0) in Ha; [ | rewrite List.length_seq; flia Hjk ].
+rewrite (List_map_nth' 0) in Hb; [ | rewrite List.length_seq; easy ].
+apply List.in_map_iff in Ha, Hb.
 destruct Ha as (lc & Hc & Hlc).
 destruct Hb as (ld & Hd & Hld).
 move ld before lc.
 subst la lb; cbn.
 unfold "<?"; cbn.
 rename lc into la; rename ld into lb.
-remember (nth k (seq i n) 0) as a eqn:Ha; symmetry in Ha.
-remember (nth j (seq i n) 0) as b eqn:Hb; symmetry in Hb.
-rewrite seq_nth in Ha; [ | easy ].
-rewrite seq_nth in Hb; [ | flia Hjk ].
+remember (List.nth k (List.seq i n) 0) as a eqn:Ha; symmetry in Ha.
+remember (List.nth j (List.seq i n) 0) as b eqn:Hb; symmetry in Hb.
+rewrite List.seq_nth in Ha; [ | easy ].
+rewrite List.seq_nth in Hb; [ | flia Hjk ].
 subst a b.
 destruct k; [ easy | ].
 rewrite Nat.add_comm; cbn.
@@ -3512,11 +3512,11 @@ now apply Hab.
 Qed.
 
 Theorem NoDup_sorted_nat_leb_ltb : ∀ l,
-  NoDup l → sorted Nat.leb l → sorted Nat.ltb l.
+  List.NoDup l → sorted Nat.leb l → sorted Nat.ltb l.
 Proof.
 intros * Hns Hs.
 induction l as [| a]; [ easy | cbn ].
-assert (H : NoDup l) by now apply NoDup_cons_iff in Hns.
+assert (H : List.NoDup l) by now apply List.NoDup_cons_iff in Hns.
 specialize (IHl H); clear H.
 assert (H : sorted Nat.leb l). {
   apply sorted_cons_iff in Hs; [ easy | apply Nat_leb_trans ].
@@ -3526,7 +3526,7 @@ apply sorted_cons_iff; [ apply Nat_ltb_trans | ].
 split; [ easy | ].
 intros b Hb.
 apply Nat.ltb_lt.
-apply NoDup_cons_iff in Hns.
+apply List.NoDup_cons_iff in Hns.
 destruct Hns as (Hal, Hnd).
 apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
 destruct Hs as (Hs & Hab).
@@ -3642,8 +3642,8 @@ Theorem eq_isort_insert_cons_iff : ∀ {A} {rel : A → _},
   reflexive rel →
   ∀ a b la lb,
   isort_insert rel a la = b :: lb
-  ↔ a = b ∧ la = lb ∧ rel a (hd a la) = true ∨
-    rel a b = false ∧ hd a la = b ∧ isort_insert rel a (tl la) = lb.
+  ↔ a = b ∧ la = lb ∧ rel a (List.hd a la) = true ∨
+    rel a b = false ∧ List.hd a la = b ∧ isort_insert rel a (List.tl la) = lb.
 Proof.
 intros * Href *.
 split; intros Hs. {
@@ -3684,11 +3684,12 @@ Theorem eq_isort_cons_iff : ∀ A (rel : A → _),
   ∀ a la lb,
   isort rel la = a :: lb
   ↔ la ≠ [] ∧
-    (hd a la = a ∧ isort rel (tl la) = lb ∧
-       rel (hd a la) (hd a lb) = true ∨
-     rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
-       isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb ∧
-       tl la ≠ []).
+    (List.hd a la = a ∧ isort rel (List.tl la) = lb ∧
+       rel (List.hd a la) (List.hd a lb) = true ∨
+     rel (List.hd a la) a = false ∧ List.hd a (isort rel (List.tl la)) = a ∧
+       isort_insert rel (List.hd a la) (List.tl (isort rel (List.tl la))) =
+         lb ∧
+       List.tl la ≠ []).
 Proof.
 intros * Href *.
 split; intros Hs. {
@@ -3741,7 +3742,7 @@ Qed.
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
   ∀ l f,
-  sorted rel l → sorted rel (filter f l).
+  sorted rel l → sorted rel (List.filter f l).
 Proof.
 intros * Htra * Hs.
 induction l as [| a]; [ easy | cbn ].
@@ -3752,7 +3753,7 @@ destruct fa. {
   destruct Hs as (Hs & Hr).
   split; [ now apply IHl | ].
   intros b Hb.
-  apply filter_In in Hb.
+  apply List.filter_In in Hb.
   now apply Hr.
 }
 apply sorted_cons in Hs.
@@ -3763,9 +3764,9 @@ Theorem sorted_isort_insert_filter : ∀ {A} {rel : A → _},
   transitive rel →
   ∀ f a la,
   sorted rel la
-  → filter f (isort_insert rel a la) =
-     if f a then isort_insert rel a (filter f la)
-     else filter f la.
+  → List.filter f (isort_insert rel a la) =
+     if f a then isort_insert rel a (List.filter f la)
+     else List.filter f la.
 Proof.
 intros * Htra * Hla.
 revert a.
@@ -3812,7 +3813,7 @@ Qed.
 Theorem sorted_isort_filter : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
-  ∀ f la, isort rel (filter f la) = filter f (isort rel la).
+  ∀ f la, isort rel (List.filter f la) = List.filter f (isort rel la).
 Proof.
 intros * Htra Htot *.
 induction la as [| a]; [ easy | cbn ].
@@ -3830,7 +3831,7 @@ Qed.
 Theorem sorted_map : ∀ A B (rel : A → _),
   transitive rel →
   ∀ la (f : B → A),
-  sorted (λ a b, rel (f a) (f b)) la → sorted rel (map f la).
+  sorted (λ a b, rel (f a) (f b)) la → sorted rel (List.map f la).
 Proof.
 intros * Htra * Hs.
 induction la as [| a]; [ easy | cbn ].
@@ -3842,7 +3843,7 @@ split. {
   now apply (Htra (f x) (f y) (f z)).
 }
 intros b Hb.
-apply in_map_iff in Hb.
+apply List.in_map_iff in Hb.
 destruct Hb as (c & Hb & Hc); subst b.
 apply sorted_cons_iff in Hs. 2: {
   intros x y z Hxy Hyz.
@@ -3962,7 +3963,7 @@ Proof.
 intros * Heqb *.
 revert la.
 induction lb as [| b]; intros. {
-  rewrite app_nil_r, merge_nil_r.
+  rewrite List.app_nil_r, merge_nil_r.
   apply (permutation_refl Heqb).
 }
 induction la as [| a]. {
@@ -3974,7 +3975,7 @@ destruct (rel a b). {
   apply permutation_skip; [ now intros x; apply Heqb | easy ].
 }
 rewrite (List_cons_is_app a (la ++ b :: lb)).
-rewrite app_assoc.
+rewrite List.app_assoc.
 apply (permutation_sym Heqb).
 apply (permutation_cons_app Heqb).
 apply (permutation_sym Heqb).
