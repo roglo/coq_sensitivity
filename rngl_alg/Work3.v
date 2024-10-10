@@ -108,6 +108,7 @@ easy.
 Qed.
 
 Notation "‖ x ‖" := (gc_modl x) (at level 60) : ring_like_scope.
+Notation "l .[ i ]" := (List.nth i l 0%L) (at level 1, format "l .[ i ]").
 
 (* to be completed
 Theorem gc_opt_alg_closed :
@@ -139,7 +140,7 @@ intros * HM.
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
-exists (Max (i = 1, n), (‖ List.nth i P 0 ‖ / ‖ List.nth 0 P 0 ‖)%L).
+exists (1 + Max (i = 1, n), (‖ List.nth i P 0 ‖ / ‖ List.nth 0 P 0 ‖))%L.
 ...
 *)
 
