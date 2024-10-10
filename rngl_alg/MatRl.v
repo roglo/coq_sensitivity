@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith Bool.
-Import List List.ListNotations.
+Import List.ListNotations.
 
 Require Import Main.Misc.
 Require Import Main.RingLike Main.IterAdd.
@@ -24,7 +24,7 @@ Proof.
 intros.
 apply Bool.andb_true_iff.
 split. {
-  cbn; rewrite repeat_length.
+  cbn; rewrite List.repeat_length.
   apply Nat.eqb_refl.
 }
 apply is_scm_mat_iff.
@@ -32,8 +32,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; cbn | ].
 split; [ now rewrite mZ_nrows, mZ_ncols | ].
 intros la Hla.
 cbn in Hla.
-apply repeat_spec in Hla; subst la.
-now cbn; do 2 rewrite repeat_length.
+apply List.repeat_spec in Hla; subst la.
+now cbn; do 2 rewrite List.repeat_length.
 Qed.
 
 Theorem mI_square_matrix_prop : ∀ n,
@@ -79,7 +79,7 @@ intros.
 apply Bool.andb_true_iff.
 split; [ | apply square_matrix_opp_is_square ].
 apply Nat.eqb_eq; cbn.
-rewrite length_map.
+rewrite List.length_map.
 apply smat_nrows.
 Qed.
 
@@ -179,13 +179,13 @@ specialize (proj2 rngl_has_opp_or_subt_iff (or_introl Hop)) as Hos.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
-  rewrite map_map.
+  rewrite List.map_map.
   rewrite List_repeat_as_map.
-  apply map_ext_in.
+  apply List.map_ext_in.
   intros i Hi.
   rewrite List_repeat_as_map.
-  rewrite map_map.
-  apply map_ext_in.
+  rewrite List.map_map.
+  apply List.map_ext_in.
   intros j Hj.
   now symmetry; apply rngl_mul_0_l.
 }
@@ -210,13 +210,13 @@ assert (Hi' : i - 1 < n) by flia Hin.
 specialize sm_mat_of_nat as H1.
 progress unfold rngl_of_nat in H1; cbn in H1.
 rewrite H1; clear H1; cbn.
-rewrite map_map.
-rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
+rewrite List.map_map.
+rewrite List_map_nth' with (a := 0); [ | now rewrite List.length_seq ].
 rewrite List_map_nth' with (a := 0%L). 2: {
   now rewrite List_length_map_seq.
 }
-rewrite List_map_nth' with (a := 0); [ | now rewrite length_seq ].
-rewrite seq_nth; [ cbn | easy ].
+rewrite List_map_nth' with (a := 0); [ | now rewrite List.length_seq ].
+rewrite List.seq_nth; [ cbn | easy ].
 unfold δ.
 now rewrite Nat.eqb_refl, rngl_mul_1_r.
 Qed.
@@ -240,11 +240,11 @@ split. {
   }
   unfold mat_ncols in Hc.
   unfold mat_nrows.
-  apply length_zero_iff_nil in Hc.
-  apply length_zero_iff_nil.
+  apply List.length_zero_iff_nil in Hc.
+  apply List.length_zero_iff_nil.
   remember (mat_list_list _) as lla eqn:Hlla.
   symmetry in Hlla.
-  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%L)) in Hlla.
+  apply (f_equal (λ ll, List.nth 0 (List.nth 0 ll []) 0%L)) in Hlla.
   rewrite fold_mat_el in Hlla.
   rewrite List_hd_nth_0 in Hc.
   rewrite Hc in Hlla; cbn in Hlla.
@@ -559,7 +559,7 @@ destruct Hs as (Hcr & Hc).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n; cbn.
   unfold mat_opp, "+"%M, mZ; cbn.
-  apply length_zero_iff_nil in Hr.
+  apply List.length_zero_iff_nil in Hr.
   now rewrite Hr.
 }
 apply mat_add_opp_diag_l; [ easy | | easy | ]. 2: {
@@ -649,11 +649,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
   destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
   rewrite List_map2_map_l in Hi.
   rewrite List_map2_nth with (a := 0) (b := []) in Hi; cycle 1. {
-    now rewrite length_seq.
+    now rewrite List.length_seq.
   } {
     rewrite fold_mat_nrows.
     clear Hi.
-    induction i; cbn; [ now rewrite repeat_length | ].
+    induction i; cbn; [ now rewrite List.repeat_length | ].
     rewrite List_length_map2, List_length_map_seq.
     rewrite fold_mat_nrows.
     flia Hnz IHi.
@@ -669,10 +669,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hcn]. {
     progress unfold mul_nat in H2; cbn in H2.
     now rewrite H2.
   }
-  rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite length_seq ].
-  rewrite seq_nth in Hi; [ cbn in Hi | easy ].
+  rewrite (List_map_nth' 0) in Hi; [ | now rewrite List.length_seq ].
+  rewrite List.seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (fold_right _ _ _)) 1 1) with
+  replace (mat_el (sm_mat (List.fold_right _ _ _)) 1 1) with
     (@rngl_mul_nat T ro 1 i) in Hi. 2: {
     symmetry.
     clear Hi.
@@ -732,24 +732,24 @@ destruct n; [ flia Hnz | clear Hnz ].
 cbn.
 f_equal. {
   f_equal; [ now apply rngl_mul_0_l | ].
-  rewrite <- seq_shift.
-  rewrite map_map, map_map.
+  rewrite <- List.seq_shift.
+  rewrite List.map_map, List.map_map.
   rewrite List_repeat_as_map.
-  apply map_ext_in.
+  apply List.map_ext_in.
   intros i Hi.
   now apply rngl_mul_0_l.
 }
-rewrite <- seq_shift.
-rewrite map_map, map_map.
+rewrite <- List.seq_shift.
+rewrite List.map_map, List.map_map.
 rewrite List_repeat_as_map.
-apply map_ext_in.
+apply List.map_ext_in.
 intros i Hi.
-rewrite map_map; cbn.
+rewrite List.map_map; cbn.
 rewrite rngl_mul_0_l; [ | easy ].
 f_equal.
 rewrite List_repeat_as_map.
-rewrite map_map.
-apply map_ext_in.
+rewrite List.map_map.
+apply List.map_ext_in.
 intros j Hj.
 now apply rngl_mul_0_l.
 Qed.

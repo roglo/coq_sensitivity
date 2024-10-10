@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith SetoidList.
 Require Import Main.Misc Main.PermutationFun Misc.
-Import List ListNotations.
+Import ListNotations.
 
 Fixpoint prime_test cnt n d :=
   match cnt with
