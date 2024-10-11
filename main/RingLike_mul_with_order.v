@@ -593,6 +593,28 @@ destruct az. {
 }
 Qed.
 
+(*
+Fixpoint rngl_int_part it a :=
+  match it with
+  | 0 => 0
+  | S it' =>
+      if (a <? 1)%L then 0
+      else S (rngl_int_part it' (a - 1)%L)
+  end.
+
+Theorem int_part_is_rngl_int_part :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  rngl_is_archimedean T = true →
+  ∀ a n,
+  (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L
+  → n = rngl_int_part n (rngl_abs a).
+Proof.
+...
+*)
+
 Theorem int_part :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
