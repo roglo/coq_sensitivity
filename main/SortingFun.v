@@ -7,6 +7,7 @@ Import List.ListNotations.
 Import Init.Nat.
 
 Require Import Misc PermutationFun.
+Require Export SortingFun_isort.
 
 (* relation properties *)
 
@@ -355,20 +356,6 @@ specialize (Hant a b Hab Hba) as H1; subst b.
 f_equal.
 now apply IHla.
 Qed.
-
-(* isort: sort by insertion *)
-
-Fixpoint isort_insert {A} (rel : A → A → bool) a lsorted :=
-  match lsorted with
-  | [] => [a]
-  | b :: l => if rel a b then a :: lsorted else b :: isort_insert rel a l
-  end.
-
-Fixpoint isort {A} (rel : A → A → bool) l :=
-  match l with
-  | [] => []
-  | a :: l' => isort_insert rel a (isort rel l')
-  end.
 
 (* ssort: sort by selection *)
 
