@@ -1279,31 +1279,6 @@ do 2 apply sorted_cons in Hs.
 now apply merge_when_sorted.
 Qed.
 
-(* *)
-
-Theorem fold_isort : ∀ A (rel : A → _) a l,
-  isort_insert rel a (isort rel l) = isort rel (a :: l).
-Proof. easy. Qed.
-
-(* isort length *)
-
-Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
-  length (isort_insert rel a lsorted) = S (length lsorted).
-Proof.
-intros.
-induction lsorted as [| b]; intros; [ easy | cbn ].
-destruct (rel a b); [ easy | ].
-now cbn; f_equal.
-Qed.
-
-Theorem isort_length : ∀ A rel (l : list A), length (isort rel l) = length l.
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-rewrite <- IHl.
-apply isort_insert_length.
-Qed.
-
 (* ssort length *)
 
 Theorem select_first_length : ∀ A rel (a : A) la b lb,
