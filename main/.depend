@@ -30,9 +30,10 @@ RingLike_structures.vo RingLike_structures.glob RingLike_structures.v.beautified
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo NatRingLike.vo
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo RingLike.vo SortingFun.vo SortRank.vo PermutationFun.vo IterMul.vo PermutSeq.vo
 SortRank.vo SortRank.glob SortRank.v.beautified SortRank.required_vo: SortRank.v Misc.vo SortingFun.vo
-SortingFun.vo SortingFun.glob SortingFun.v.beautified SortingFun.required_vo: SortingFun.v Misc.vo PermutationFun.vo SortingFun_common.vo SortingFun_isort.vo SortingFun_ssort.vo SortingFun_bsort.vo SortingFun_msort.vo
+SortingFun.vo SortingFun.glob SortingFun.v.beautified SortingFun.required_vo: SortingFun.v Misc.vo PermutationFun.vo SortingFun_common.vo SortingFun_misc.vo SortingFun_isort.vo SortingFun_ssort.vo SortingFun_bsort.vo SortingFun_msort.vo
 SortingFun_bsort.vo SortingFun_bsort.glob SortingFun_bsort.v.beautified SortingFun_bsort.required_vo: SortingFun_bsort.v Misc.vo PermutationFun.vo SortingFun_common.vo
 SortingFun_common.vo SortingFun_common.glob SortingFun_common.v.beautified SortingFun_common.required_vo: SortingFun_common.v Misc.vo PermutationFun.vo
 SortingFun_isort.vo SortingFun_isort.glob SortingFun_isort.v.beautified SortingFun_isort.required_vo: SortingFun_isort.v Misc.vo PermutationFun.vo SortingFun_common.vo
+SortingFun_misc.vo SortingFun_misc.glob SortingFun_misc.v.beautified SortingFun_misc.required_vo: SortingFun_misc.v Misc.vo PermutationFun.vo SortingFun_common.vo
 SortingFun_msort.vo SortingFun_msort.glob SortingFun_msort.v.beautified SortingFun_msort.required_vo: SortingFun_msort.v Misc.vo PermutationFun.vo SortingFun_common.vo
 SortingFun_ssort.vo SortingFun_ssort.glob SortingFun_ssort.v.beautified SortingFun_ssort.required_vo: SortingFun_ssort.v Misc.vo PermutationFun.vo SortingFun_common.vo

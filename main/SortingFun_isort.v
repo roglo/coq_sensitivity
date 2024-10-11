@@ -4,9 +4,6 @@ Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith.
 Import List.ListNotations.
-(*
-Import Init.Nat.
-*)
 
 Require Import Misc PermutationFun.
 Require Import SortingFun_common.
