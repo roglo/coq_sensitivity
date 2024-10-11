@@ -10,6 +10,7 @@ Require Import Misc PermutationFun.
 Require Export SortingFun_common.
 Require Export SortingFun_isort.
 Require Export SortingFun_ssort.
+Require Export SortingFun_bsort.
 
 Theorem fold_sorted : ∀ A f (l : list A), (is_sorted f l = true) = sorted f l.
 Proof. easy. Qed.
@@ -135,34 +136,6 @@ specialize (Hant a b Hab Hba) as H1; subst b.
 f_equal.
 now apply IHla.
 Qed.
-
-(* bsort: bubble sort *)
-
-Fixpoint bsort_swap {A} (rel : A → A → bool) l :=
-  match l with
-  | [] | [_] => None
-  | a :: (b :: l'') as l' =>
-      if rel a b then
-        match bsort_swap rel l' with
-        | Some l''' => Some (a :: l''')
-        | None => None
-        end
-      else
-        Some (b :: a :: l'')
-  end.
-
-Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
-  match it with
-  | 0 => l
-  | S it' =>
-      match bsort_swap rel l with
-      | Some l' => bsort_loop rel it' l'
-      | None => l
-      end
-  end.
-
-Definition bsort {A} (rel : A → _) l :=
-  bsort_loop rel (length l * length l) l.
 
 (* merge sort *)
 
