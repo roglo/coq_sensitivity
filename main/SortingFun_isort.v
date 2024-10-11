@@ -9,6 +9,7 @@ Import Init.Nat.
 *)
 
 Require Import Misc PermutationFun.
+Require Import SortingFun_common.
 
 Fixpoint isort_insert {A} (rel : A → A → bool) a lsorted :=
   match lsorted with
@@ -167,4 +168,40 @@ induction l as [| b]; intros; [ easy | ].
 cbn in Ha.
 apply in_isort_insert in Ha.
 destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
+Qed.
+
+(* isort is sorted *)
+
+Theorem sorted_isort_insert : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ a lsorted,
+  sorted rel lsorted
+  → sorted rel (isort_insert rel a lsorted).
+Proof.
+intros * Htot * Hs.
+unfold sorted in Hs |-*.
+revert a Hs.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (b :: lsorted) as l; cbn; subst l.
+  now rewrite Hs, Hab.
+} {
+  cbn in Hs |-*.
+  destruct lsorted as [| c]. {
+    cbn; rewrite Bool.andb_true_r.
+    specialize (Htot a b) as Hba.
+    now rewrite Hab in Hba.
+  }
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs); cbn.
+  specialize (IHlsorted a Hs) as H1.
+  cbn in H1.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  rewrite H1.
+  destruct ac; [ | now rewrite Hbc ].
+  rewrite Bool.andb_true_r.
+  specialize (Htot a b) as Hba.
+  now rewrite Hab in Hba.
+}
 Qed.

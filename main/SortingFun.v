@@ -7,60 +7,8 @@ Import List.ListNotations.
 Import Init.Nat.
 
 Require Import Misc PermutationFun.
+Require Export SortingFun_common.
 Require Export SortingFun_isort.
-
-(* relation properties *)
-
-Definition irreflexive {A} (rel : A → A → bool) :=
-  ∀ a, rel a a = false.
-
-Definition antisymmetric {A} (rel : A → A → bool) :=
-  ∀ a b, rel a b = true → rel b a = true → a = b.
-
-(* https://ncatlab.org/nlab/show/connected+relation *)
-Definition connected_relation {A} (rel : A → A → bool) :=
-  ∀ a b, rel a b = false → rel b a = false → a = b.
-
-Definition transitive {A} (rel : A → A → bool) :=
-  ∀ a b c, rel a b = true → rel b c = true → rel a c = true.
-
-Definition total_relation {A} (rel : A → _) := ∀ a b,
-  (rel a b || rel b a)%bool = true.
-
-Theorem total_relation_is_reflexive : ∀ {A} {rel : A → _},
-  total_relation rel → reflexive rel.
-Proof.
-intros * Htot a.
-specialize (Htot a a) as H1.
-apply Bool.orb_true_iff in H1.
-now destruct H1.
-Qed.
-
-(* compute if a list is sorted *)
-
-Fixpoint is_sorted {A} (rel : A → A → bool) l :=
-  match l with
-  | [] => true
-  | [a] => true
-  | a :: (b :: _) as la => (rel a b && is_sorted rel la)%bool
-  end.
-
-Fixpoint all_sorted {A} (rel : A → A → bool) a l :=
-  match l with
-  | [] => true
-  | b :: l' => (rel a b && all_sorted rel a l')%bool
-  end.
-
-Fixpoint is_strongly_sorted {A} (rel : A → A → bool) l :=
-  match l with
-  | [] => true
-  | a :: l' => (all_sorted rel a l' && is_strongly_sorted rel l')%bool
-  end.
-
-Definition sorted {A} (rel : A → _) l :=
-  is_sorted rel l = true.
-Definition strongly_sorted {A} (rel : A → _) l :=
-  is_strongly_sorted rel l = true.
 
 Theorem fold_sorted : ∀ A f (l : list A), (is_sorted f l = true) = sorted f l.
 Proof. easy. Qed.
@@ -1535,42 +1483,6 @@ specialize (H2 c).
 assert (H : c ∈ lb) by now apply ssort_loop_in in Hlc.
 specialize (H2 H); clear H.
 now rewrite H2 in Hbc.
-Qed.
-
-(* isort is sorted *)
-
-Theorem sorted_isort_insert : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ a lsorted,
-  sorted rel lsorted
-  → sorted rel (isort_insert rel a lsorted).
-Proof.
-intros * Htot * Hs.
-unfold sorted in Hs |-*.
-revert a Hs.
-induction lsorted as [| b]; intros; [ easy | cbn ].
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (b :: lsorted) as l; cbn; subst l.
-  now rewrite Hs, Hab.
-} {
-  cbn in Hs |-*.
-  destruct lsorted as [| c]. {
-    cbn; rewrite Bool.andb_true_r.
-    specialize (Htot a b) as Hba.
-    now rewrite Hab in Hba.
-  }
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbc, Hs); cbn.
-  specialize (IHlsorted a Hs) as H1.
-  cbn in H1.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  rewrite H1.
-  destruct ac; [ | now rewrite Hbc ].
-  rewrite Bool.andb_true_r.
-  specialize (Htot a b) as Hba.
-  now rewrite Hab in Hba.
-}
 Qed.
 
 Theorem select_first_sorted : ∀ {A rel},
