@@ -128,18 +128,40 @@ remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
   let gro := gc_ring_like_op T in
   ∀ P : list (GComplex T),
   ∀ M, (0 < M)%L →
   ∃ R₀, (0 < R₀)%L ∧
   ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
+intros Hon Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite H1 in H.
+  now apply (rngl_lt_irrefl Hor) in H.
+}
 intros * HM.
 (* must take
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
 exists (1 + Max (i = 0, n - 1), (‖ P.[i] ‖ / ‖ P.[n] ‖))%L.
+split. {
+  apply (rngl_lt_le_trans Hor _ 1). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  apply (rngl_le_add_r Hor).
+  clear Hn.
+  induction n; cbn.
+  rewrite iter_seq_only_one.
+Search (0 ≤ Max (_ = _, _), _)%L.
+Require Import Main.IterAdd.
+Search (0 ≤ ∑ (_ = _, _), _)%L.
 ...
 *)
 
