@@ -921,6 +921,11 @@ Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_dist.
 
 Definition seq_angle_to_div_nat θ (n i : nat) := (2 ^ i / n * (θ /₂^i))%A.
 
+(*
+Definition seq_angle_to_mul θ (x : T) (i : nat) :=
+  (x * rngl_of_nat (2 ^ i) * (θ /₂^i))%A.
+*)
+
 Theorem angle_eucl_dist_opp_opp :
   ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
 Proof.

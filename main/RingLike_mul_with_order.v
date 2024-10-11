@@ -3,6 +3,8 @@
    that have an order relation. The theorems here assume that this order
    relation is defined. *)
 
+Set Nested Proofs Allowed.
+
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
 Require Import RingLike_order.
@@ -599,37 +601,40 @@ Theorem int_part :
   rngl_is_archimedean T = true →
   ∀ a, ∃ n, (rngl_of_nat n ≤ rngl_abs a < rngl_of_nat (n + 1))%L.
 Proof.
-intros Hon Hop Hc1 Hor Har *.
+intros Hon Hop Hc1 Hor Har.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_archimedean_ub Har Hor) as H1.
-destruct (rngl_lt_dec Hor (rngl_abs a) 1)%L as [H1x| H1x]. {
-  exists 0; cbn.
-  rewrite rngl_add_0_r.
-  split; [ | easy ].
-  apply (rngl_abs_nonneg Hop Hor).
+assert (Heo : rngl_has_eq_dec_or_order T = true). {
+  progress unfold rngl_has_eq_dec_or_order.
+  rewrite Hor.
+  apply Bool.orb_true_r.
 }
-destruct (rngl_lt_dec Hor 1 (rngl_abs a))%L as [Hx1| Hx1]. 2: {
-  apply (rngl_nlt_ge Hor) in H1x, Hx1.
-  apply (rngl_le_antisymm Hor) in H1x; [ | easy ].
-  rewrite H1x.
-  exists 1; cbn.
+intros a.
+destruct (rngl_lt_dec Hor 1 (rngl_abs a))%L as [Hx1| Hx1]. {
+  apply (rngl_archimedean_ub Har Hor).
+  split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
+}
+apply (rngl_nlt_ge Hor) in Hx1.
+destruct (rngl_eq_dec Heo (rngl_abs a) 1) as [Ha1| Ha1]. {
+  exists 1.
+  rewrite Ha1; cbn.
   rewrite rngl_add_0_r.
   split; [ apply (rngl_le_refl Hor) | ].
   apply (rngl_lt_iff Hor).
-  split. 2: {
-    intros H12.
-    apply (f_equal (λ b, rngl_sub b 1))%L in H12.
-    rewrite (rngl_sub_diag Hos) in H12.
-    rewrite (rngl_add_sub Hos) in H12.
-    symmetry in H12; revert H12.
-    apply (rngl_1_neq_0_iff Hon), Hc1.
+  split. {
+    apply (rngl_le_add_r Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
   }
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
+  intros H12.
+  apply (f_equal (λ b, rngl_sub b 1))%L in H12.
+  rewrite (rngl_sub_diag Hos) in H12.
+  rewrite (rngl_add_sub Hos) in H12.
+  symmetry in H12; revert H12.
+  apply (rngl_1_neq_0_iff Hon), Hc1.
 }
-clear H1x.
-apply (H1 1 (rngl_abs a))%L.
-split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
+exists 0; cbn.
+rewrite rngl_add_0_r.
+split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+now apply (rngl_lt_iff Hor).
 Qed.
 
 End a.
