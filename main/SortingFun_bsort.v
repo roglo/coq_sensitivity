@@ -307,3 +307,71 @@ subst la lb.
 apply (permutation_app_head Heqb).
 apply (permutation_swap Heqb).
 Qed.
+
+(* main *)
+
+Theorem bsort_when_sorted : ∀ A (rel : A → _),
+  ∀ l,
+  sorted rel l
+  → bsort rel l = l.
+Proof.
+intros * Hs.
+now apply bsort_loop_when_sorted.
+Qed.
+
+(* *)
+
+Theorem sorted_bsort : ∀ [A] {rel : A → _},
+  total_relation rel →
+  ∀ l, sorted rel (bsort rel l).
+Proof.
+intros * Htot *.
+now apply sorted_bsort_loop.
+Qed.
+
+(* *)
+
+Theorem sorted_bsort_iff : ∀ A (rel : A → A → bool),
+  total_relation rel →
+  ∀ l, sorted rel l ↔ bsort rel l = l.
+Proof.
+intros * Htot *.
+split; [ now apply bsort_when_sorted | ].
+intros Hs.
+specialize sorted_bsort as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+(* *)
+
+Theorem permuted_bsort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ l, permutation eqb l (bsort rel l).
+Proof.
+intros.
+now apply permuted_bsort_loop.
+Qed.
+
+(* *)
+
+Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb,
+  permutation eqb la lb
+  → bsort rel la = bsort rel lb.
+Proof.
+intros * Heqb Hant Htra Htot * Hpab.
+specialize (sorted_bsort Htot la) as Hsa.
+specialize (sorted_bsort Htot lb) as Hsb.
+specialize (permuted_bsort rel Heqb la) as Hpa.
+specialize (permuted_bsort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (bsort rel la) (bsort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permuted Heqb Hant Htra).
+Qed.
