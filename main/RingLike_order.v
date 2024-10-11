@@ -402,19 +402,10 @@ Theorem rngl_max_comm :
   ∀ a b, rngl_max a b = rngl_max b a.
 Proof.
 intros Hor *.
+specialize (rngl_min_comm Hor a b) as H1.
+progress unfold rngl_min in H1.
 progress unfold rngl_max.
-remember (a ≤? b)%L as ab eqn:Hab.
-remember (b ≤? a)%L as ba eqn:Hba.
-symmetry in Hab, Hba.
-destruct ab. {
-  destruct ba; [ | easy ].
-  apply rngl_leb_le in Hab, Hba.
-  now apply (rngl_le_antisymm Hor).
-} {
-  destruct ba; [ easy | ].
-  apply (rngl_leb_gt Hor) in Hab, Hba.
-  now apply (rngl_lt_asymm Hor) in Hba.
-}
+now destruct (a ≤? b)%L, (b ≤? a)%L.
 Qed.
 
 Theorem rngl_min_assoc :
@@ -450,25 +441,23 @@ Theorem rngl_max_assoc :
   rngl_max a (rngl_max b c) = rngl_max (rngl_max a b) c.
 Proof.
 intros Hor *.
+specialize (rngl_min_assoc Hor a b c) as H1.
+progress unfold rngl_min in H1.
 progress unfold rngl_max.
 remember (a ≤? b)%L as ab eqn:Hab.
+remember (a ≤? c)%L as ac eqn:Hac.
 remember (b ≤? c)%L as bc eqn:Hbc.
-symmetry in Hab, Hbc.
+symmetry in Hab, Hac, Hbc.
 destruct ab. {
   destruct bc; [ | now rewrite Hab, Hbc ].
-  rewrite Hbc.
-  apply rngl_leb_le in Hab, Hbc.
-  apply (rngl_le_trans Hor a) in Hbc; [ | easy ].
-  apply rngl_leb_le in Hbc.
-  now rewrite Hbc.
+  rewrite Hab, Hac in H1.
+  rewrite Hbc, Hac.
+  now destruct ac.
 }
 destruct bc; [ easy | ].
-rewrite Hab.
-apply (rngl_leb_gt Hor) in Hab, Hbc.
-apply (rngl_lt_le_incl Hor) in Hbc.
-apply (rngl_le_lt_trans Hor c) in Hab; [ | easy ].
-apply (rngl_leb_gt Hor) in Hab.
-now rewrite Hab.
+rewrite Hbc, Hac in H1.
+rewrite Hab, Hac.
+now destruct ac.
 Qed.
 
 Theorem rngl_min_l_iff :
@@ -500,6 +489,37 @@ Proof.
 intros Hor *.
 rewrite (rngl_min_comm Hor).
 apply (rngl_min_l_iff Hor).
+Qed.
+
+Theorem rngl_max_l_iff :
+  rngl_is_ordered T = true →
+  ∀ a b, rngl_max a b = a ↔ (b ≤ a)%L.
+Proof.
+intros Hor *.
+specialize (rngl_min_l_iff Hor a b) as H1.
+progress unfold rngl_min in H1.
+progress unfold rngl_max.
+remember (a ≤? b)%L as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  apply rngl_leb_le in Hab.
+  split; [ now intros; subst b | ].
+  intros Hba.
+  apply (rngl_le_antisymm Hor _ _ Hba Hab).
+} {
+  apply (rngl_leb_gt Hor) in Hab.
+  apply (rngl_lt_le_incl Hor) in Hab.
+  easy.
+}
+Qed.
+
+Theorem rngl_max_r_iff :
+  rngl_is_ordered T = true →
+  ∀ a b, rngl_max a b = b ↔ (a ≤ b)%L.
+Proof.
+intros Hor *.
+rewrite (rngl_max_comm Hor).
+apply (rngl_max_l_iff Hor).
 Qed.
 
 Theorem rngl_min_glb_lt_iff :
