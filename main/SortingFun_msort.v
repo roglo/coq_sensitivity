@@ -790,3 +790,425 @@ f_equal; f_equal.
 do 2 apply sorted_cons in Hs.
 now apply merge_when_sorted.
 Qed.
+
+(* *)
+
+Theorem permutation_merge_loop_aux :
+  ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ {it} la lb lc,
+  length la + length lc ≤ it
+  → permutation eqb (la ++ lb ++ lc) (lb ++ merge_loop rel it la lc).
+Proof.
+intros * Heqb * Hit.
+revert la lb lc Hit.
+induction it as (it, IHit) using lt_wf_rec; intros.
+destruct it. {
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  apply List.length_zero_iff_nil in H1, H2; subst la lc.
+  cbn; rewrite List.app_nil_r; cbn.
+  now apply permutation_refl.
+}
+destruct la as [| a]; [ now apply permutation_refl | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit; cbn.
+destruct lc as [| b]. {
+  rewrite List.app_nil_r.
+  rewrite List.app_comm_cons.
+  apply (permutation_app_comm Heqb).
+}
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  eapply (permutation_trans Heqb). 2: {
+    apply (permutation_app_comm Heqb).
+  }
+  cbn.
+  apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+  eapply (permutation_trans Heqb). {
+    apply IHit; [ | apply Hit ]; easy.
+  }
+  apply (permutation_app_comm Heqb).
+}
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+rewrite List_cons_is_app.
+do 2 rewrite List.app_assoc.
+eapply (permutation_trans Heqb). {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+rewrite List_app_cons.
+eapply (permutation_trans Heqb). {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+do 2 rewrite List.app_comm_cons.
+rewrite <- List.app_assoc.
+cbn in Hit.
+rewrite Nat.add_succ_r in Hit.
+now apply IHit.
+Qed.
+
+Theorem permutation_merge_loop :
+  ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ it la lb,
+  length la + length lb ≤ it
+  → permutation eqb (la ++ lb) (merge_loop rel it la lb).
+Proof.
+intros * Heqb * Hit.
+apply (permutation_merge_loop_aux rel Heqb la [] lb Hit).
+Qed.
+
+Theorem split_list_permutation : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ l la lb,
+  split_list l = (la, lb)
+  → permutation eqb l (la ++ lb).
+Proof.
+intros * Heqb * Hll.
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert l la lb Hlen Hll.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb.
+  apply permutation_nil_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb.
+  rewrite List.app_nil_r.
+  now apply permutation_refl.
+}
+destruct len; [ easy | ].
+destruct len; [ easy | ].
+cbn in Hlen, Hll.
+do 2 apply Nat.succ_inj in Hlen.
+remember (split_list l) as ll eqn:Hll'; symmetry in Hll'.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb; cbn.
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+apply (IHlen len); [ | easy | easy ].
+now transitivity (S len).
+Qed.
+
+Theorem permutation_split_list_merge_loop :
+  ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ it l la lb,
+  length la + length lb ≤ it
+  → split_list l = (la, lb)
+  → permutation eqb l (merge_loop rel it la lb).
+Proof.
+intros * Heqb * Hit Hll.
+eapply (permutation_trans Heqb); [ | now apply permutation_merge_loop ].
+now apply split_list_permutation.
+Qed.
+
+Theorem permutation_merge : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ l la lb,
+  split_list l = (la, lb)
+  → permutation eqb l (merge rel la lb).
+Proof.
+intros * Heqb * Hll.
+now apply permutation_split_list_merge_loop.
+Qed.
+
+Fixpoint split_list_inv {A} (la lb : list A) :=
+  match la, lb with
+  | _, [] => la
+  | [], _ => lb
+  | a :: la', b :: lb' => a :: b :: split_list_inv la' lb'
+  end.
+
+Theorem split_list_split_list_inv : ∀ A (la lb : list A),
+  (length la = length lb ∨ length la = S (length lb))
+  → split_list (split_list_inv la lb) = (la, lb).
+Proof.
+intros * Hlen.
+revert lb Hlen.
+induction la as [| a]; intros. {
+  destruct Hlen as [Hlen| Hlen]; [ | easy ].
+  now destruct lb.
+}
+cbn.
+destruct lb as [| b]. {
+  destruct Hlen as [Hlen| Hlen]; [ easy | ].
+  cbn in Hlen; apply Nat.succ_inj in Hlen.
+  now apply List.length_zero_iff_nil in Hlen; subst la; cbn.
+}
+cbn.
+rewrite (IHla lb); [ easy | ].
+cbn in Hlen.
+now destruct Hlen as [H| H]; [ left | right ]; now apply Nat.succ_inj in H.
+Qed.
+
+Theorem permutation_app_split_list_inv :
+  ∀ A (eqb : A → _) (Heqb : equality eqb) la lb,
+  permutation eqb (la ++ lb) (split_list_inv la lb).
+Proof.
+intros * Heqb *.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  destruct lb as [| b]; [ apply permutation_nil_nil | ].
+  apply (permutation_refl Heqb).
+}
+destruct lb as [| b]. {
+  rewrite List.app_nil_r.
+  apply (permutation_refl Heqb).
+}
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+apply (permutation_trans Heqb) with (lb := (b :: (la ++ lb))). {
+  rewrite List_app_cons, List.app_assoc, List.app_comm_cons.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_sym Heqb).
+  apply (permutation_cons_append Heqb).
+}
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+apply IHla.
+Qed.
+
+Theorem split_list_inv_nil_r : ∀ A (la : list A), split_list_inv la [] = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem permutation_split_list_inv_split_list_inv :
+  ∀ {A} {eqb : A → _} (Heqb : equality eqb),
+  ∀ la lb lc ld,
+  permutation eqb la lc
+  → permutation eqb lb ld
+  → permutation eqb (split_list_inv la lb) (split_list_inv lc ld).
+Proof.
+intros * Heqb * Hac Hbd.
+revert lb lc ld Hac Hbd.
+induction la as [| a]; intros; cbn. {
+  apply permutation_nil_l in Hac; subst lc; cbn.
+  destruct lb as [| b]; [ | now destruct ld ].
+  apply permutation_nil_l in Hbd; subst ld.
+  apply permutation_nil_nil.
+}
+destruct lb as [| b]. {
+  apply permutation_nil_l in Hbd; subst ld.
+  now rewrite split_list_inv_nil_r.
+}
+move b before a.
+move lb before la; move lc before lb; move ld before lc.
+specialize (permutation_in_iff Heqb) as H1.
+specialize (proj1 (H1 _ _ Hac _) (or_introl eq_refl)) as Hc.
+specialize (proj1 (H1 _ _ Hbd _) (or_introl eq_refl)) as Hd.
+clear H1.
+apply List.in_split in Hc, Hd.
+destruct Hc as (lc1 & lc2 & Hc).
+destruct Hd as (ld1 & ld2 & Hd).
+subst lc ld.
+eapply (permutation_trans Heqb). 2: {
+  now apply permutation_app_split_list_inv.
+}
+specialize (permutation_app_inv Heqb [] la lc1 lc2 a Hac) as H1.
+specialize (permutation_app_inv Heqb [] lb ld1 ld2 b Hbd) as H2.
+cbn in H1, H2; clear Hac Hbd.
+apply (permutation_sym Heqb).
+rewrite (List_cons_is_app a).
+rewrite (List_cons_is_app b).
+rewrite <- List.app_assoc.
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+rewrite (List_cons_is_app b).
+do 3 rewrite <- List.app_assoc.
+rewrite List.app_assoc.
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
+rewrite <- List.app_assoc.
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
+do 2 rewrite <- List.app_assoc.
+rewrite List.app_assoc.
+eapply (permutation_trans Heqb). {
+  now apply permutation_app_split_list_inv.
+}
+apply (permutation_sym Heqb).
+now apply IHla.
+Qed.
+
+Theorem permuted_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ it l, permutation eqb l (msort_loop rel it l).
+Proof.
+intros * Heqb *.
+revert l.
+induction it; intros; [ now apply permutation_refl | cbn ].
+remember (split_list l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+remember (msort_loop rel it la) as lc eqn:Hlc.
+remember (msort_loop rel it lb) as ld eqn:Hld.
+remember (split_list_inv lc ld) as l' eqn:Hl'.
+apply (permutation_trans Heqb) with (lb := l'). 2: {
+  apply (permutation_merge rel Heqb).
+  subst l'.
+  rewrite split_list_split_list_inv; [ easy | ].
+  apply split_list_lengths in Hla.
+  apply (f_equal (λ l, length l)) in Hlc, Hld.
+  rewrite msort_loop_length in Hlc, Hld.
+  now rewrite Hlc, Hld.
+}
+subst l' lc ld.
+apply (permutation_trans Heqb) with (lb := la ++ lb). {
+  now apply split_list_permutation.
+}
+apply (permutation_trans Heqb) with (lb := split_list_inv la lb). {
+  now apply permutation_app_split_list_inv.
+}
+apply (permutation_split_list_inv_split_list_inv Heqb); apply IHit.
+Qed.
+
+(* *)
+
+Theorem merge_nil_l : ∀ A (rel : A → _) la, merge rel [] la = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem merge_nil_r : ∀ A (rel : A → _) la, merge rel la [] = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem merge_cons_cons : ∀ A (rel : A → _) a b la lb,
+  merge rel (a :: la) (b :: lb) =
+    if rel a b then a :: merge rel la (b :: lb)
+    else b :: merge rel (a :: la) lb.
+Proof.
+intros; cbn.
+replace (S (length lb)) with (length (b :: lb)) at 1 by easy.
+rewrite <- Nat.add_succ_comm.
+replace (S (length la)) with (length (a :: la)) at 1 by easy.
+now destruct (rel a b).
+Qed.
+
+Theorem merge_in_iff : ∀ A (rel : A → _) a la lb,
+  a ∈ merge rel la lb ↔ a ∈ la ∨ a ∈ lb.
+Proof.
+intros.
+split; intros Ha. {
+  revert lb Ha.
+  induction la as [| a']; intros. {
+    now rewrite merge_nil_l in Ha; right.
+  }
+  destruct lb as [| b]; [ now left | ].
+  rewrite merge_cons_cons in Ha.
+  destruct (rel a' b). {
+    destruct Ha as [Ha| Ha]; [ now left; left | ].
+    apply IHla in Ha.
+    destruct Ha as [Ha| Ha]; [ now left; right | now right ].
+  } {
+    destruct Ha as [Ha| Ha]; [ now right; left | ].
+    revert lb Ha.
+    induction lb as [| b']; intros; [ now left | ].
+    rewrite merge_cons_cons in Ha.
+    destruct (rel a' b'). {
+      destruct Ha as [Ha| Ha]; [ now left; left | ].
+      apply IHla in Ha.
+      destruct Ha as [Ha| Ha]; [ now left; right | now right; right ].
+    } {
+      destruct Ha as [Ha| Ha]; [ now right; right; left | ].
+      specialize (IHlb Ha).
+      destruct IHlb as [Hb| Hb]; [ now left | right ].
+      destruct Hb as [Hb| Hb]; [ now left | now right; right ].
+    }
+  }
+}
+destruct Ha as [Ha| Ha]. {
+  revert lb.
+  induction la as [| a']; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst a'; clear IHla.
+    induction lb as [| b]; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a b); [ now left | right; apply IHlb ].
+  } {
+    specialize (IHla Ha).
+    induction lb as [| b]; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ | right; apply IHlb ].
+    right; apply IHla.
+  }
+} {
+  revert la.
+  induction lb as [| b]; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
+    induction la as [| a']; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' a); [ right; apply IHla | now left ].
+  } {
+    specialize (IHlb Ha).
+    induction la as [| a']; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ right; apply IHla | ].
+    right; apply IHlb.
+  }
+}
+Qed.
+
+Theorem merge_cons_l : ∀ A (rel : A → _) a la lb,
+  merge rel (a :: la) lb =
+    match lb with
+    | [] => a :: la
+    | b :: lb' =>
+        if rel a b then a :: merge rel la lb else b :: merge rel (a :: la) lb'
+    end.
+Proof.
+intros.
+unfold merge at 1.
+cbn - [ merge ].
+destruct lb as [| b]; [ easy | ].
+destruct (rel a b); [ easy | ].
+cbn - [ merge_loop ].
+rewrite <- Nat.add_succ_comm.
+now replace (S (length la)) with (length (a :: la)).
+Qed.
+
+Theorem permutation_app_merge : ∀ {A} {eqb : A → _} rel,
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (la ++ lb) (merge rel la lb).
+Proof.
+intros * Heqb *.
+revert la.
+induction lb as [| b]; intros. {
+  rewrite List.app_nil_r, merge_nil_r.
+  apply (permutation_refl Heqb).
+}
+induction la as [| a]. {
+  apply (permutation_refl Heqb).
+}
+cbn - [ merge ].
+rewrite merge_cons_cons.
+destruct (rel a b). {
+  apply permutation_skip; [ now intros x; apply Heqb | easy ].
+}
+rewrite (List_cons_is_app a (la ++ b :: lb)).
+rewrite List.app_assoc.
+apply (permutation_sym Heqb).
+apply (permutation_cons_app Heqb).
+apply (permutation_sym Heqb).
+apply IHlb.
+Qed.
+
+Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (merge rel la lb) (merge rel lb la).
+Proof.
+intros * Heqb *.
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_merge _ Heqb).
+}
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+apply (permutation_sym Heqb).
+apply (permutation_app_merge _ Heqb).
+Qed.
