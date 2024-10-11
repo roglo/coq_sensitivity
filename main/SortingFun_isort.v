@@ -205,3 +205,289 @@ destruct ab. {
   now rewrite Hab in Hba.
 }
 Qed.
+
+(* main *)
+
+Theorem isort_when_sorted : ∀ A (rel : A → _),
+  ∀ l, sorted rel l → isort rel l = l.
+Proof.
+intros * Hs.
+induction l as [| a]; [ easy | cbn ].
+assert (H : sorted rel l) by now apply sorted_cons in Hs.
+specialize (IHl H); clear H.
+rewrite IHl; clear IHl.
+unfold sorted in Hs; cbn in Hs.
+destruct l as [| b]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+now cbn; rewrite Hab.
+Qed.
+
+Theorem sorted_isort : ∀ [A] {rel : A → _},
+  total_relation rel
+  → ∀ l, sorted rel (isort rel l).
+Proof.
+intros * Hto *.
+induction l as [| a]; [ easy | cbn ].
+now apply sorted_isort_insert.
+Qed.
+
+Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
+  transitive rel →
+  total_relation rel →
+  ∀ l, sorted rel l ↔ isort rel l = l.
+Proof.
+intros * Htra Htot *.
+split; [ now apply isort_when_sorted | ].
+intros Hs.
+specialize sorted_isort as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+Theorem permuted_isort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ l, permutation eqb l (isort rel l).
+Proof.
+intros.
+induction l as [| a]; [ apply (permutation_refl Heqb) | cbn ].
+now apply permutation_cons_isort_insert.
+Qed.
+
+Theorem isort_when_permuted : ∀ {A} [eqb rel : A → _],
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb,
+  permutation eqb la lb
+  → isort rel la = isort rel lb.
+Proof.
+intros * Heqb Hant Htra Htot * Hpab.
+specialize (sorted_isort Htot la) as Hsa.
+specialize (sorted_isort Htot lb) as Hsb.
+specialize (permuted_isort rel Heqb la) as Hpa.
+specialize (permuted_isort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (isort rel la) (isort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permuted Heqb Hant Htra).
+Qed.
+
+Theorem permut_if_isort : ∀ {A} {eqb : A → _} rel,
+  equality eqb →
+  ∀ la lb,
+  isort rel la = isort rel lb
+  → permutation eqb la lb.
+Proof.
+intros * Heqb * Hab.
+specialize (permuted_isort rel Heqb la) as H1.
+specialize (permuted_isort rel Heqb lb) as H2.
+apply (permutation_trans Heqb) with (lb := isort rel la); [ easy | ].
+rewrite Hab.
+now apply permutation_sym.
+Qed.
+
+Theorem sorted_cons_isort_insert : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a lsorted,
+  sorted rel (a :: lsorted)
+  → isort_insert rel a lsorted = a :: lsorted.
+Proof.
+intros * Htran * Hs.
+revert a Hs.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+apply sorted_cons_iff in Hs; [ | easy ].
+destruct Hs as (Hs & Habs).
+specialize (Habs _ (or_introl eq_refl)).
+congruence.
+Qed.
+
+Theorem isort_insert_sorted_cons : ∀ A (rel : A → _),
+  transitive rel
+  → ∀ a la lb,
+  sorted rel la
+  → isort_insert rel a la = a :: lb
+  → la = lb.
+Proof.
+intros * Htra * Hs His.
+destruct la as [| b]. {
+  injection His; clear His; intros; subst lb.
+  easy.
+}
+cbn in His.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  now injection His; clear His; intros; subst lb.
+} {
+  injection His; clear His; intros; subst b lb.
+  now symmetry; apply sorted_cons_isort_insert.
+}
+Qed.
+
+Theorem isort_insert_sorted_cons2 : ∀ A (rel : A → _),
+  transitive rel
+  → ∀ a b la lb,
+  sorted rel la
+  → isort_insert rel a la = b :: a :: lb
+  → la = b :: lb.
+Proof.
+intros * Htra * Hs His.
+destruct la as [| c]; [ easy | ].
+cbn in His.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  now injection His; clear His; intros; subst b c lb.
+} {
+  injection His; clear His; intros His H; subst c.
+  f_equal.
+  apply sorted_cons in Hs.
+  now apply isort_insert_sorted_cons in His.
+}
+Qed.
+
+Theorem neq_isort_insert_nil : ∀ A rel a (la : list A),
+  isort_insert rel a la ≠ [].
+Proof.
+intros.
+destruct la as [| b]; [ easy | cbn ].
+now destruct (rel a b).
+Qed.
+
+Theorem eq_isort_nil : ∀ A rel (la : list A), isort rel la = [] → la = [].
+Proof.
+intros * Hla.
+destruct la as [| a]; [ easy | exfalso ].
+cbn in Hla; revert Hla.
+apply neq_isort_insert_nil.
+Qed.
+
+Theorem eq_isort_insert_unit : ∀ A rel a b (la : list A),
+  isort_insert rel a la = [b] → a = b ∧ la = [].
+Proof.
+intros * Hab.
+destruct la as [| c]; cbn. {
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst b.
+}
+cbn in Hab.
+destruct (rel a c); [ easy | ].
+injection Hab; clear Hab; intros Hab H; subst c.
+exfalso; revert Hab.
+apply neq_isort_insert_nil.
+Qed.
+
+Theorem eq_isort_unit : ∀ A rel a (la : list A),
+  isort rel la = [a] → la = [a].
+Proof.
+intros * Hla.
+destruct la as [| b]; [ easy | ].
+cbn in Hla.
+apply eq_isort_insert_unit in Hla.
+destruct Hla as (Hab, Hla); subst b.
+now apply eq_isort_nil in Hla; subst la.
+Qed.
+
+Theorem eq_isort_insert_cons_iff : ∀ {A} {rel : A → _},
+  reflexive rel →
+  ∀ a b la lb,
+  isort_insert rel a la = b :: lb
+  ↔ a = b ∧ la = lb ∧ rel a (List.hd a la) = true ∨
+    rel a b = false ∧ List.hd a la = b ∧ isort_insert rel a (List.tl la) = lb.
+Proof.
+intros * Href *.
+split; intros Hs. {
+  destruct la as [| c]. {
+    cbn in Hs.
+    injection Hs; clear Hs; intros; subst b lb; left.
+    split; [ easy | ].
+    split; [ easy | ].
+    apply Href.
+  }
+  cbn in Hs.
+  rewrite if_bool_if_dec in Hs.
+  destruct (Sumbool.sumbool_of_bool (rel a c)) as [Hac| Hac]. {
+    injection Hs; clear Hs; intros; subst b lb; left.
+    split; [ easy | ].
+    split; [ easy | ].
+    now cbn; rewrite Hac.
+  }
+  now injection Hs; clear Hs; intros; subst c; right.
+} {
+  destruct Hs as [(Hab & Hlab & Hs)| (Hab & Hla & Hs)]. {
+    subst b lb.
+    destruct la as [| b]; [ easy | ].
+    cbn in Hs |-*.
+    now rewrite Hs.
+  }
+  destruct la as [| c]. {
+    cbn in Hla; subst b.
+    now rewrite Href in Hab.
+  }
+  cbn in Hla, Hs |-*; subst c.
+  now rewrite Hab; subst lb.
+}
+Qed.
+
+Theorem eq_isort_cons_iff : ∀ A (rel : A → _),
+  reflexive rel →
+  ∀ a la lb,
+  isort rel la = a :: lb
+  ↔ la ≠ [] ∧
+    (List.hd a la = a ∧ isort rel (List.tl la) = lb ∧
+       rel (List.hd a la) (List.hd a lb) = true ∨
+     rel (List.hd a la) a = false ∧ List.hd a (isort rel (List.tl la)) = a ∧
+       isort_insert rel (List.hd a la) (List.tl (isort rel (List.tl la))) =
+         lb ∧
+       List.tl la ≠ []).
+Proof.
+intros * Href *.
+split; intros Hs. {
+  destruct la as [| b]; [ easy | cbn ].
+  split; [ easy | ].
+  cbn in Hs.
+  apply (eq_isort_insert_cons_iff Href) in Hs.
+  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+    left; subst b.
+    split; [ easy | ].
+    split; [ easy | ].
+    now rewrite H2 in H3.
+  } {
+    right.
+    split; [ easy | ].
+    split; [ now destruct (isort rel la) | ].
+    split; [ easy | ].
+    destruct la as [| c]; [ | easy ].
+    cbn in H2; subst b.
+    now rewrite Href in H1.
+  }
+} {
+  destruct Hs as (Hlaz, Hs).
+  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3 & H4)]. {
+    destruct la as [| b]; [ easy | clear Hlaz ].
+    cbn in H1, H2, H3 |-*; subst b.
+    rewrite H2.
+    destruct lb as [| b]; [ easy | ].
+    cbn in H3 |-*.
+    now rewrite H3.
+  } {
+    destruct la as [| b]; [ easy | clear Hlaz ].
+    cbn in H1, H2, H3, H4 |-*.
+    apply (eq_isort_insert_cons_iff Href).
+    right.
+    split; [ easy | ].
+    split; [ | easy ].
+    destruct la as [| c]; [ easy | clear H4 ].
+    cbn in H2, H3 |-*.
+    remember (isort_insert rel c (isort rel la)) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| d]. {
+      now apply neq_isort_insert_nil in Hlc.
+    }
+    now cbn in H2 |-*.
+  }
+}
+Qed.
