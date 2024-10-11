@@ -1212,3 +1212,174 @@ eapply (permutation_trans Heqb). 2: {
 apply (permutation_sym Heqb).
 apply (permutation_app_merge _ Heqb).
 Qed.
+
+Theorem split_list_nil_l : ∀ A (la lb : list A),
+  split_list la = ([], lb) → la = [] ∧ lb = [].
+Proof.
+intros * Hab.
+destruct la as [| a]; cbn in Hab |-*. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+exfalso.
+destruct la as [| b]; [ easy | ].
+now destruct (split_list la).
+Qed.
+
+Theorem split_list_nil_r : ∀ A (la lb : list A),
+  split_list la = (lb, []) → la = lb ∧ length la ≤ 1.
+Proof.
+intros * Hab.
+destruct la as [| a]; cbn in Hab |-*. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+destruct la as [| b]. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+now destruct (split_list la).
+Qed.
+
+Theorem split_list_cons_cons : ∀ A (l la lb : list A) a b,
+  split_list l = (a :: la, b :: lb)
+  → ∃ l', split_list l' = (la, lb) ∧ l = a :: b :: l'.
+Proof.
+intros * Hs.
+destruct l as [| c]; [ easy | ].
+destruct l as [| d]; [ easy | ].
+cbn in Hs.
+remember (split_list l) as l' eqn:Hl'; symmetry in Hl'.
+destruct l' as (lc, ld).
+injection Hs; clear Hs; intros; subst lc ld c d.
+now exists l.
+Qed.
+
+Theorem sorted_split_list : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ la lb l,
+  sorted rel l
+  → split_list l = (la, lb)
+  → sorted rel la ∧ sorted rel lb.
+Proof.
+intros * Htra * Hs Hla.
+destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+destruct l as [| b]; [ now injection Hla; intros; subst la lb | ].
+cbn in Hla.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+now apply sorted_cons_cons_split_list' with (l := l).
+Qed.
+
+Theorem msort_loop_enough_iter : ∀ A (rel : A → _) la ita itb,
+  length la ≤ ita
+  → length la ≤ itb
+  → msort_loop rel ita la = msort_loop rel itb la.
+Proof.
+intros * Ha Hb.
+revert la itb Ha Hb.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, List.length_zero_iff_nil in Ha; subst la.
+  symmetry; apply msort_loop_nil.
+}
+destruct itb; cbn. {
+  apply Nat.le_0_r, List.length_zero_iff_nil in Hb; subst la; cbn.
+  now rewrite msort_loop_nil.
+}
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+destruct la as [| a]. {
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_nil.
+}
+cbn in Ha, Hb.
+apply Nat.succ_le_mono in Ha, Hb.
+destruct la as [| b]. {
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_unit, msort_loop_nil.
+}
+cbn in Ha, Hb.
+cbn in Hll.
+remember (split_list la) as ll eqn:H; symmetry in H.
+destruct ll as (le, lf).
+injection Hll; clear Hll; intros; subst lc ld.
+rename le into lc; rename lf into ld; rename H into Hll.
+apply split_list_length in Hll.
+rewrite IHita with (itb := itb); cbn; [ | flia Ha Hll | flia Hb Hll ].
+rewrite IHita with (itb := itb); cbn; [ | flia Ha Hll | flia Hb Hll ].
+easy.
+Qed.
+
+(* main *)
+
+Theorem msort_when_sorted : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l,
+  sorted rel l
+  → msort rel l = l.
+Proof.
+intros * Hant Htra Htot * Hs.
+unfold msort.
+now apply msort_loop_when_sorted.
+Qed.
+
+(* *)
+
+Theorem sorted_msort : ∀ [A] {rel : A → _},
+  total_relation rel →
+  ∀ l, sorted rel (msort rel l).
+Proof.
+intros * Htot *.
+now apply sorted_msort_loop.
+Qed.
+
+(* *)
+
+Theorem sorted_msort_iff : ∀ A (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, sorted rel l ↔ msort rel l = l.
+Proof.
+intros * Hant Htra Htot *.
+split; [ now apply msort_when_sorted | ].
+intros Hs.
+specialize sorted_msort as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+(* *)
+
+Theorem permuted_msort : ∀ {A} {eqb : A → _} rel (Heqb : equality eqb),
+  ∀ l, permutation eqb l (msort rel l).
+Proof.
+intros.
+now apply permuted_msort_loop.
+Qed.
+
+(* *)
+
+Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb,
+  permutation eqb la lb
+  → msort rel la = msort rel lb.
+Proof.
+intros * Heqb Hant Htra Htot * Hpab.
+specialize (sorted_msort Htot la) as Hsa.
+specialize (sorted_msort Htot lb) as Hsb.
+specialize (permuted_msort rel Heqb la) as Hpa.
+specialize (permuted_msort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (msort rel la) (msort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permuted Heqb Hant Htra).
+Qed.
+
+(* *)
