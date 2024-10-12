@@ -277,9 +277,6 @@ Proof. easy. Qed.
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
 
-Theorem List_hd_nth_0 {A} : ∀ l (d : A), List.hd d l = List.nth 0 l d.
-Proof. intros; now destruct l. Qed.
-
 Theorem List_nth_succ_cons : ∀ {A} (a : A) la i,
   List.nth (S i) (a :: la) = List.nth i la.
 Proof. easy. Qed.
@@ -300,19 +297,6 @@ Theorem List_map2_nil_r : ∀ A B C (f : A → B → C) la, List_map2 f la [] = 
 Proof.
 intros.
 now destruct la.
-Qed.
-
-Theorem List_map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
-  List_map2 f (l1 ++ l2) l =
-    List_map2 f l1 (List.firstn (length l1) l) ++
-    List_map2 f l2 (List.skipn (length l1) l).
-Proof.
-intros.
-revert l2 l.
-induction l1 as [| a1]; intros; [ easy | cbn ].
-destruct l as [| a]; [ now rewrite List_map2_nil_r | cbn ].
-f_equal.
-apply IHl1.
 Qed.
 
 (* end List_map2 *)
@@ -346,21 +330,6 @@ end.
 
 Definition List_rank [A] := @List_rank_loop 0 A.
 
-Theorem List_rank_loop_interv : ∀ {A} f (l : list A) i,
-  i ≤ List_rank_loop i f l ≤ i + length l.
-Proof.
-intros.
-revert i.
-induction l as [| a]; intros; cbn; [ now rewrite Nat.add_0_r | ].
-destruct (f a). {
-  split; [ easy | ].
-  apply Nat.le_add_r.
-}
-specialize (IHl (S i)).
-rewrite Nat.add_succ_comm in IHl.
-split; [ flia IHl | easy ].
-Qed.
-
 (* end List_rank *)
 
 Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
@@ -390,17 +359,6 @@ Qed.
 
 Definition List_butn {A} n (l : list A) :=
   List.firstn n l ++ List.skipn (S n) l.
-
-Theorem List_butn_nil : ∀ A n, List_butn n ([] : list A) = [].
-Proof. now intros; destruct n. Qed.
-
-Theorem List_butn_succ_cons :
-  ∀ A (a : A) la n, List_butn (S n) (a :: la) = a :: List_butn n la.
-Proof.
-intros.
-progress unfold List_butn.
-now rewrite List.firstn_cons, List.skipn_cons.
-Qed.
 
 (* end butn *)
 

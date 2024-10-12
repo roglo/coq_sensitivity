@@ -36,6 +36,9 @@ specialize (IHx1 x2 y1 y2 Hxy H1).
 now destruct IHx1; subst y1 y2.
 Qed.
 
+Theorem List_hd_nth_0 {A} : ∀ l (d : A), List.hd d l = List.nth 0 l d.
+Proof. intros; now destruct l. Qed.
+
 Theorem List_app_hd1 : ∀ A (l l' : list A) d,
   0 < length l → List.hd d (l ++ l') = List.hd d l.
 Proof.
@@ -218,6 +221,17 @@ Proof.
 intros.
 rewrite List_hd_nth_0.
 now apply List.nth_In.
+Qed.
+
+Theorem List_butn_nil : ∀ A n, List_butn n ([] : list A) = [].
+Proof. now intros; destruct n. Qed.
+
+Theorem List_butn_succ_cons :
+  ∀ A (a : A) la n, List_butn (S n) (a :: la) = a :: List_butn n la.
+Proof.
+intros.
+progress unfold List_butn.
+now rewrite List.firstn_cons, List.skipn_cons.
 Qed.
 
 Theorem List_in_butn : ∀ A (l : list A) i a, a ∈ List_butn i l → a ∈ l.
@@ -819,6 +833,21 @@ rewrite Nat.add_succ_r; cbn.
 apply IHla.
 Qed.
 
+Theorem List_rank_loop_interv : ∀ {A} f (l : list A) i,
+  i ≤ List_rank_loop i f l ≤ i + length l.
+Proof.
+intros.
+revert i.
+induction l as [| a]; intros; cbn; [ now rewrite Nat.add_0_r | ].
+destruct (f a). {
+  split; [ easy | ].
+  apply Nat.le_add_r.
+}
+specialize (IHl (S i)).
+rewrite Nat.add_succ_comm in IHl.
+split; [ flia IHl | easy ].
+Qed.
+
 Theorem List_rank_loop_if : ∀ A d f (l : list A) i j,
   List_rank_loop i f l = j
   → (∀ k, i ≤ k < j → f (List.nth (k - i) l d) = false) ∧
@@ -898,6 +927,19 @@ revert a.
 induction len; intros; [ easy | cbn ].
 rewrite IHlen.
 apply Hid.
+Qed.
+
+Theorem List_map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
+  List_map2 f (l1 ++ l2) l =
+    List_map2 f l1 (List.firstn (length l1) l) ++
+    List_map2 f l2 (List.skipn (length l1) l).
+Proof.
+intros.
+revert l2 l.
+induction l1 as [| a1]; intros; [ easy | cbn ].
+destruct l as [| a]; [ now rewrite List_map2_nil_r | cbn ].
+f_equal.
+apply IHl1.
 Qed.
 
 Theorem List_rev_map2 : ∀ A B C (f : A → B → C) la lb,
