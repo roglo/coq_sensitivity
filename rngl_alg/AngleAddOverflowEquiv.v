@@ -91,18 +91,6 @@ apply (rngl_mul_lt_mono_pos_l Hop Hor Hii). {
 easy.
 Qed.
 
-Theorem angle_sub_straight_eq_add_straight :
-  ∀ θ, (θ - angle_straight = θ + angle_straight)%A.
-Proof.
-destruct_ac.
-intros.
-apply angle_sub_move_r.
-rewrite <- angle_add_assoc.
-rewrite angle_straight_add_straight.
-symmetry.
-apply angle_add_0_r.
-Qed.
-
 Theorem rngl_cos_add_right_div_2_r :
   ∀ θ,
   rngl_cos (θ + angle_right /₂) = ((rngl_cos θ - rngl_sin θ) / √2)%L.

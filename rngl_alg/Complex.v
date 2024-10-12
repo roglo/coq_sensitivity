@@ -2361,24 +2361,6 @@ apply (rngl_lt_le_incl Hor) in H2cz.
 now apply (rngl_mul_nonpos_nonneg Hop Hor).
 Qed.
 
-Theorem angle_straight_lt_opp_right :
-  rngl_characteristic T ≠ 1
-  → (angle_straight < - angle_right)%A.
-Proof.
-destruct_ac.
-intros Hc1.
-progress unfold angle_ltb.
-cbn.
-rewrite (rngl_leb_refl Hor).
-remember (0 ≤? -1)%L as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ exfalso | easy ].
-apply rngl_leb_le in Hx.
-apply (rngl_nlt_ge Hor) in Hx.
-apply Hx; clear Hx.
-apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-Qed.
-
 End a.
 
 Arguments gc_opt_one T {ro}.

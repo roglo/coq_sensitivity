@@ -850,30 +850,6 @@ apply (rngl_lt_cos_lt_cos_div2 (1 - a)%L); [ | easy | ]. {
 }
 Qed.
 
-Theorem angle_sub_le_mono_l :
-  ∀ θ2 θ3 θ1,
-  angle_add_overflow θ3 (- θ1) = false
-  → θ1 ≠ 0%A
-  → (θ1 ≤ θ2)%A
-  → (θ3 - θ2 ≤ θ3 - θ1)%A.
-Proof.
-intros * Hov H1z H12.
-apply angle_add_le_mono_l; [ easy | ].
-now apply angle_opp_le_compat_if.
-Qed.
-
-Theorem angle_sub_lt_mono_l :
-  ∀ θ2 θ3 θ1,
-  angle_add_overflow θ3 (- θ1) = false
-  → θ1 ≠ 0%A
-  → (θ1 < θ2)%A
-  → (θ3 - θ2 < θ3 - θ1)%A.
-Proof.
-intros * Hov H1z H12.
-apply angle_add_lt_mono_l; [ easy | ].
-now apply angle_opp_lt_compat_if.
-Qed.
-
 Theorem rngl_cos_sin_twice_lemma_1 :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
@@ -1447,25 +1423,6 @@ rewrite <- (angle_sub_add θ1 θ2) at 2.
 apply rngl_cos_le_cos_add; [ | easy | ].
 now apply (rngl_lt_le_incl Hor) in Hzs12.
 now rewrite angle_sub_add.
-Qed.
-
-Theorem angle_sub_mul_div_2_pow :
-  ∀ a b n θ1 θ2,
-  (b * θ2 ≤ a * θ1)%A
-  → angle_mul_nat_overflow a θ1 = false
-  → angle_mul_nat_overflow b θ2 = false
-  → (a * (θ1 /₂^n) - b * (θ2 /₂^n) = (a * θ1 - b * θ2) /₂^n)%A.
-Proof.
-intros * Hba Ha1 Hb2.
-apply angle_sub_move_r.
-rewrite <- angle_div_2_pow_mul; [ | easy ].
-rewrite <- angle_div_2_pow_mul; [ | easy ].
-rewrite <- angle_div_2_pow_add; [ now rewrite angle_sub_add | ].
-progress unfold angle_add_overflow.
-apply Bool.not_true_iff_false.
-apply angle_nlt_ge.
-rewrite angle_sub_add.
-now apply angle_le_sub_diag.
 Qed.
 
 Theorem rngl_squ_le_diag :

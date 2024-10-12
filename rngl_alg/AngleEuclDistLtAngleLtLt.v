@@ -322,29 +322,6 @@ now apply (rngl_lt_le_incl Hor).
 now do 2 rewrite angle_add_comm, angle_sub_add.
 Qed.
 
-Theorem angle_sub_lt_straight_l :
-  ∀ θ1 θ2,
-  (θ1 ≤ angle_straight)%A
-  → (angle_straight - θ2 < angle_straight - θ1)%A
-  → (θ1 < θ2)%A.
-Proof.
-destruct_ac.
-intros * H1s H21.
-progress unfold angle_ltb in H21.
-progress unfold angle_ltb.
-do 2 rewrite rngl_sin_sub_straight_l in H21.
-do 2 rewrite rngl_cos_sub_straight_l in H21.
-apply rngl_sin_nonneg_angle_le_straight in H1s.
-apply rngl_leb_le in H1s.
-rewrite H1s in H21 |-*.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs2.
-destruct zs2; [ | easy ].
-apply rngl_ltb_lt in H21.
-apply rngl_ltb_lt.
-now apply (rngl_opp_lt_compat Hop Hor) in H21.
-Qed.
-
 Theorem quadrant_1_sin_sub_nonneg_cos_lt :
   ∀ θ1 θ2,
   θ1 ≠ θ2

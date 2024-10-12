@@ -743,57 +743,6 @@ intros.
 apply rngl_cos_sin_nx.
 Qed.
 
-Theorem angle_same_lim_sub :
-  ∀ u v θ, angle_lim u θ → angle_lim v θ → angle_lim (λ i, (u i - v i)%A) 0.
-Proof.
-destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hu Hv ε Hε.
-  rewrite (H1 ε) in Hε.
-  now apply (rngl_lt_irrefl Hor) in Hε.
-}
-intros * Hu Hv.
-intros ε Hε.
-assert (Hε2 : (0 < ε / 2)%L). {
-  apply (rngl_lt_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  now rewrite (rngl_mul_0_l Hos).
-}
-specialize (Hu _ Hε2)%L.
-specialize (Hv _ Hε2)%L.
-destruct Hu as (M, HM).
-destruct Hv as (N, HN).
-exists (max M N).
-intros n Hn.
-specialize (rngl_div_add_distr_r Hiv ε ε 2) as H2.
-rewrite <- (rngl_mul_2_r Hon) in H2.
-rewrite (rngl_mul_div Hi1) in H2. 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite H2.
-rewrite <- angle_eucl_dist_move_0_r.
-eapply (rngl_le_lt_trans Hor). {
-  apply (angle_eucl_dist_triangular _ θ).
-}
-rewrite (angle_eucl_dist_symmetry θ).
-specialize (HM _ (Nat.max_lub_l _ _ _ Hn)).
-specialize (HN _ (Nat.max_lub_r _ _ _ Hn)).
-now apply (rngl_add_lt_compat Hop Hor).
-Qed.
-
-Theorem angle_sub_mul_l_diag_r :
-  ∀ n θ, n ≠ 0 → (n * θ - θ)%A = ((n - 1) * θ)%A.
-Proof.
-intros * Hnz.
-rewrite angle_mul_sub_distr_r. 2: {
-  apply Nat.le_succ_l.
-  now apply Nat.neq_0_lt_0.
-}
-now rewrite angle_mul_1_l.
-Qed.
-
 Theorem angle_right_div_2_lt :
   ∀ θ,
   (rngl_cos θ < rngl_sin θ)%L
