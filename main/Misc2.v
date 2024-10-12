@@ -56,9 +56,6 @@ rewrite List.app_nth2; [ easy | ].
 now apply Nat.le_0_r.
 Qed.
 
-Theorem List_butn_0_cons : ∀ A (a : A) la, List_butn 0 (a :: la) = la.
-Proof. easy. Qed.
-
 Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
   (if i <? j then a else b) = (if lt_dec i j then a else b).
 Proof.
@@ -68,6 +65,33 @@ destruct (lt_dec i j) as [H1| H1]. {
 }
 now apply Nat.ltb_nlt in H1; rewrite H1.
 Qed.
+
+Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
+  (if b then x else y) =
+  if Sumbool.sumbool_of_bool b then x else y.
+Proof.
+intros.
+now destruct (Sumbool.sumbool_of_bool b); subst b.
+Qed.
+
+Theorem if_leb_le_dec : ∀ A i j (a b : A),
+  (if i <=? j then a else b) = (if le_dec i j then a else b).
+Proof.
+intros.
+destruct (le_dec i j) as [H1| H1]. {
+  now apply Nat.leb_le in H1; rewrite H1.
+}
+now apply Nat.leb_nle in H1; rewrite H1.
+Qed.
+
+
+(* butn: list without its nth element *)
+
+Definition List_butn {A} n (l : list A) :=
+  List.firstn n l ++ List.skipn (S n) l.
+
+Theorem List_butn_0_cons : ∀ A (a : A) la, List_butn 0 (a :: la) = la.
+Proof. easy. Qed.
 
 Theorem List_butn_app : ∀ A (l1 l2 : list A) i,
   List_butn i (l1 ++ l2) =
@@ -110,6 +134,183 @@ rewrite Nat.sub_succ_l, Nat.sub_diag; [ | easy ].
 rewrite List.skipn_all2; [ | flia ].
 now rewrite List.skipn_cons, List.skipn_O.
 Qed.
+
+Theorem List_fold_butn : ∀ A n (l : list A),
+  List.firstn n l ++ List.skipn (S n) l = List_butn n l.
+Proof. easy. Qed.
+
+Theorem List_butn_nil : ∀ A n, List_butn n ([] : list A) = [].
+Proof. now intros; destruct n. Qed.
+
+Theorem List_butn_succ_cons :
+  ∀ A (a : A) la n, List_butn (S n) (a :: la) = a :: List_butn n la.
+Proof.
+intros.
+progress unfold List_butn.
+now rewrite List.firstn_cons, List.skipn_cons.
+Qed.
+
+Theorem List_in_butn : ∀ A (l : list A) i a, a ∈ List_butn i l → a ∈ l.
+Proof.
+intros * Ha.
+revert i Ha.
+induction l as [| b]; intros. {
+  now rewrite List_butn_nil in Ha.
+}
+destruct i; [ now right | ].
+rewrite List_butn_succ_cons in Ha.
+destruct Ha as [Ha| Ha]; [ now left | right ].
+now apply IHl in Ha.
+Qed.
+
+Theorem List_butn_out : ∀ A (l : list A) i, length l ≤ i → List_butn i l = l.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ apply List_butn_nil | ].
+destruct i; [ easy | ].
+cbn in Hi; apply Nat.succ_le_mono in Hi.
+rewrite List_butn_succ_cons.
+now rewrite IHl.
+Qed.
+
+Theorem List_length_butn : ∀ A n (l : list A),
+  length (List_butn n l) = length l - Nat.b2n (n <? length l).
+Proof.
+intros.
+progress unfold Nat.b2n; rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool (n <? length l)) as [Hnl| Hnl]. 2: {
+  apply Nat.ltb_ge in Hnl; rewrite Nat.sub_0_r.
+  now rewrite List_butn_out.
+}
+apply Nat.ltb_lt in Hnl.
+revert n Hnl.
+induction l as [| a]; intros; [ easy | ].
+cbn; rewrite Nat.sub_0_r.
+destruct n; [ easy | ].
+rewrite List_butn_succ_cons; cbn.
+cbn in Hnl.
+apply Nat.succ_lt_mono in Hnl.
+rewrite IHl; [ | easy ].
+destruct (length l); [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+
+Theorem List_map_butn : ∀ A B (f : A → B) la n,
+  List.map f (List_butn n la) = List_butn n (List.map f la).
+Proof.
+intros.
+revert n.
+induction la as [| a]; intros; cbn; [ now do 2 rewrite List_butn_nil | ].
+destruct n; [ easy | ].
+do 2 rewrite List_butn_succ_cons.
+cbn; f_equal.
+apply IHla.
+Qed.
+
+Theorem List_map_butn_seq : ∀ A (f : _ → A) n sta len,
+  List.map f (List_butn n (List.seq sta len)) =
+  List.map (λ i, f (i + Nat.b2n (sta + n <=? i)))
+    (List.seq sta (len - Nat.b2n (n <? len))).
+Proof.
+intros.
+revert n sta.
+induction len; intros; [ now rewrite List_butn_nil | ].
+destruct n. {
+  cbn; rewrite Nat.sub_0_r, Nat.add_0_r.
+  rewrite <- List.seq_shift.
+  rewrite List.map_map.
+  apply List.map_ext_in.
+  intros i Hi.
+  apply List.in_seq in Hi.
+  rewrite <- Nat.add_1_r.
+  destruct (le_dec sta i) as [H| H]; [ | easy ].
+  now apply Nat.leb_le in H; rewrite H.
+}
+progress unfold Nat.b2n.
+rewrite if_bool_if_dec.
+destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
+  apply Nat.ltb_lt in Hn.
+  cbn - [ List_butn ].
+  rewrite Nat.sub_0_r, List_butn_succ_cons; cbn.
+  apply Nat.succ_lt_mono in Hn.
+  rewrite IHlen.
+  destruct len; [ easy | ].
+  progress unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec n (S len)) as [H| H]; [ clear H | easy ].
+  rewrite Nat_sub_succ_1; cbn - [ "<=?" ].
+  f_equal. {
+    rewrite if_leb_le_dec.
+    destruct (le_dec (sta + S n) sta) as [H| H]; [ flia H | clear H ].
+    now rewrite Nat.add_0_r.
+  }
+  apply List.map_ext_in.
+  intros i Hi.
+  now rewrite (Nat.add_succ_r sta).
+} {
+  apply Nat.ltb_ge in Hn.
+  rewrite Nat.sub_0_r.
+  rewrite List_butn_out; [ | now rewrite List.length_seq ].
+  apply List.map_ext_in.
+  intros i Hi.
+  apply List.in_seq in Hi.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (sta + S n) i) as [H| H]; [ flia Hn Hi H | ].
+  now rewrite Nat.add_0_r.
+}
+Qed.
+
+Theorem List_nth_butn_before : ∀ A (l : list A) i j d,
+  j ≤ i
+  → List.nth i (List_butn j l) d = List.nth (i + 1) l d.
+Proof.
+intros * Hji.
+revert i j Hji.
+induction l as [| a]; intros; cbn. {
+  rewrite List_butn_nil.
+  now destruct i.
+}
+destruct j; [ now rewrite Nat.add_1_r | ].
+destruct i; [ easy | ].
+apply Nat.succ_le_mono in Hji.
+rewrite List_butn_succ_cons; cbn.
+now apply IHl.
+Qed.
+
+Theorem List_nth_butn_after : ∀ A (l : list A) i j d,
+  i < j
+  → List.nth i (List_butn j l) d = List.nth i l d.
+Proof.
+intros * Hij.
+revert i j Hij.
+induction l as [| a]; intros; cbn. {
+  rewrite List_butn_nil.
+  now destruct i.
+}
+destruct j; [ easy | ].
+destruct i; [ easy | ].
+apply Nat.succ_lt_mono in Hij.
+rewrite List_butn_succ_cons; cbn.
+now apply IHl.
+Qed.
+
+Theorem List_nth_butn : ∀ A (l : list A) i j d,
+  List.nth i (List_butn j l) d = List.nth (i + Nat.b2n (j <=? i)) l d.
+Proof.
+intros.
+remember (j <=? i) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  apply Nat.leb_le in Hb.
+  now rewrite List_nth_butn_before.
+} {
+  apply Nat.leb_gt in Hb.
+  rewrite List_nth_butn_after; [ | easy ].
+  now rewrite Nat.add_0_r.
+}
+Qed.
+
+(* end butn *)
 
 Theorem List_cons_is_app : ∀ {A} (a : A) la, a :: la = [a] ++ la.
 Proof. easy. Qed.
@@ -175,10 +376,6 @@ split. {
   now apply Hf; right.
 }
 Qed.
-
-Theorem List_fold_butn : ∀ A n (l : list A),
-  List.firstn n l ++ List.skipn (S n) l = List_butn n l.
-Proof. easy. Qed.
 
 Theorem List_fold_left_map2 :
   ∀ A B C D (f : A → B → A) (g : C → D → B) lc ld (a : A),
@@ -247,30 +444,6 @@ rewrite List_hd_nth_0.
 now apply List.nth_In.
 Qed.
 
-Theorem List_butn_nil : ∀ A n, List_butn n ([] : list A) = [].
-Proof. now intros; destruct n. Qed.
-
-Theorem List_butn_succ_cons :
-  ∀ A (a : A) la n, List_butn (S n) (a :: la) = a :: List_butn n la.
-Proof.
-intros.
-progress unfold List_butn.
-now rewrite List.firstn_cons, List.skipn_cons.
-Qed.
-
-Theorem List_in_butn : ∀ A (l : list A) i a, a ∈ List_butn i l → a ∈ l.
-Proof.
-intros * Ha.
-revert i Ha.
-induction l as [| b]; intros. {
-  now rewrite List_butn_nil in Ha.
-}
-destruct i; [ now right | ].
-rewrite List_butn_succ_cons in Ha.
-destruct Ha as [Ha| Ha]; [ now left | right ].
-now apply IHl in Ha.
-Qed.
-
 Theorem List_in_combine_same :
   ∀ A (i j : A) l, (i, j) ∈ List.combine l l → i = j.
 Proof.
@@ -329,47 +502,6 @@ Theorem List_last_rev : ∀ A (l : list A) d,
 Proof.
 intros.
 destruct l as [| a]; [ easy | apply List.last_last ].
-Qed.
-
-Theorem List_butn_out : ∀ A (l : list A) i, length l ≤ i → List_butn i l = l.
-Proof.
-intros * Hi.
-revert i Hi.
-induction l as [| a]; intros; [ apply List_butn_nil | ].
-destruct i; [ easy | ].
-cbn in Hi; apply Nat.succ_le_mono in Hi.
-rewrite List_butn_succ_cons.
-now rewrite IHl.
-Qed.
-
-Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
-  (if b then x else y) =
-  if Sumbool.sumbool_of_bool b then x else y.
-Proof.
-intros.
-now destruct (Sumbool.sumbool_of_bool b); subst b.
-Qed.
-
-Theorem List_length_butn : ∀ A n (l : list A),
-  length (List_butn n l) = length l - Nat.b2n (n <? length l).
-Proof.
-intros.
-progress unfold Nat.b2n; rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool (n <? length l)) as [Hnl| Hnl]. 2: {
-  apply Nat.ltb_ge in Hnl; rewrite Nat.sub_0_r.
-  now rewrite List_butn_out.
-}
-apply Nat.ltb_lt in Hnl.
-revert n Hnl.
-induction l as [| a]; intros; [ easy | ].
-cbn; rewrite Nat.sub_0_r.
-destruct n; [ easy | ].
-rewrite List_butn_succ_cons; cbn.
-cbn in Hnl.
-apply Nat.succ_lt_mono in Hnl.
-rewrite IHl; [ | easy ].
-destruct (length l); [ easy | ].
-now cbn; rewrite Nat.sub_0_r.
 Qed.
 
 Theorem List_length_map2 : ∀ A B C (f : A → B → C) la lb,
@@ -593,81 +725,6 @@ intros (i, a) Hia; cbn.
 f_equal; flia.
 Qed.
 
-Theorem List_map_butn : ∀ A B (f : A → B) la n,
-  List.map f (List_butn n la) = List_butn n (List.map f la).
-Proof.
-intros.
-revert n.
-induction la as [| a]; intros; cbn; [ now do 2 rewrite List_butn_nil | ].
-destruct n; [ easy | ].
-do 2 rewrite List_butn_succ_cons.
-cbn; f_equal.
-apply IHla.
-Qed.
-
-Theorem if_leb_le_dec : ∀ A i j (a b : A),
-  (if i <=? j then a else b) = (if le_dec i j then a else b).
-Proof.
-intros.
-destruct (le_dec i j) as [H1| H1]. {
-  now apply Nat.leb_le in H1; rewrite H1.
-}
-now apply Nat.leb_nle in H1; rewrite H1.
-Qed.
-
-Theorem List_map_butn_seq : ∀ A (f : _ → A) n sta len,
-  List.map f (List_butn n (List.seq sta len)) =
-  List.map (λ i, f (i + Nat.b2n (sta + n <=? i)))
-    (List.seq sta (len - Nat.b2n (n <? len))).
-Proof.
-intros.
-revert n sta.
-induction len; intros; [ now rewrite List_butn_nil | ].
-destruct n. {
-  cbn; rewrite Nat.sub_0_r, Nat.add_0_r.
-  rewrite <- List.seq_shift.
-  rewrite List.map_map.
-  apply List.map_ext_in.
-  intros i Hi.
-  apply List.in_seq in Hi.
-  rewrite <- Nat.add_1_r.
-  destruct (le_dec sta i) as [H| H]; [ | easy ].
-  now apply Nat.leb_le in H; rewrite H.
-}
-progress unfold Nat.b2n.
-rewrite if_bool_if_dec.
-destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
-  apply Nat.ltb_lt in Hn.
-  cbn - [ List_butn ].
-  rewrite Nat.sub_0_r, List_butn_succ_cons; cbn.
-  apply Nat.succ_lt_mono in Hn.
-  rewrite IHlen.
-  destruct len; [ easy | ].
-  progress unfold Nat.b2n.
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec n (S len)) as [H| H]; [ clear H | easy ].
-  rewrite Nat_sub_succ_1; cbn - [ "<=?" ].
-  f_equal. {
-    rewrite if_leb_le_dec.
-    destruct (le_dec (sta + S n) sta) as [H| H]; [ flia H | clear H ].
-    now rewrite Nat.add_0_r.
-  }
-  apply List.map_ext_in.
-  intros i Hi.
-  now rewrite (Nat.add_succ_r sta).
-} {
-  apply Nat.ltb_ge in Hn.
-  rewrite Nat.sub_0_r.
-  rewrite List_butn_out; [ | now rewrite List.length_seq ].
-  apply List.map_ext_in.
-  intros i Hi.
-  apply List.in_seq in Hi.
-  rewrite if_leb_le_dec.
-  destruct (le_dec (sta + S n) i) as [H| H]; [ flia Hn Hi H | ].
-  now rewrite Nat.add_0_r.
-}
-Qed.
-
 Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
   length l = length l'
   → (∀ i, i < length l → f (List.nth i l d) = g (List.nth i l' d))
@@ -787,55 +844,6 @@ destruct (lt_dec i (length la)) as [Hila| Hila]. {
 apply Nat.nlt_ge in Hila.
 rewrite List.app_nth2; [ | easy ].
 now rewrite List.nth_repeat, List.nth_overflow.
-Qed.
-
-Theorem List_nth_butn_before : ∀ A (l : list A) i j d,
-  j ≤ i
-  → List.nth i (List_butn j l) d = List.nth (i + 1) l d.
-Proof.
-intros * Hji.
-revert i j Hji.
-induction l as [| a]; intros; cbn. {
-  rewrite List_butn_nil.
-  now destruct i.
-}
-destruct j; [ now rewrite Nat.add_1_r | ].
-destruct i; [ easy | ].
-apply Nat.succ_le_mono in Hji.
-rewrite List_butn_succ_cons; cbn.
-now apply IHl.
-Qed.
-
-Theorem List_nth_butn_after : ∀ A (l : list A) i j d,
-  i < j
-  → List.nth i (List_butn j l) d = List.nth i l d.
-Proof.
-intros * Hij.
-revert i j Hij.
-induction l as [| a]; intros; cbn. {
-  rewrite List_butn_nil.
-  now destruct i.
-}
-destruct j; [ easy | ].
-destruct i; [ easy | ].
-apply Nat.succ_lt_mono in Hij.
-rewrite List_butn_succ_cons; cbn.
-now apply IHl.
-Qed.
-
-Theorem List_nth_butn : ∀ A (l : list A) i j d,
-  List.nth i (List_butn j l) d = List.nth (i + Nat.b2n (j <=? i)) l d.
-Proof.
-intros.
-remember (j <=? i) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  apply Nat.leb_le in Hb.
-  now rewrite List_nth_butn_before.
-} {
-  apply Nat.leb_gt in Hb.
-  rewrite List_nth_butn_after; [ | easy ].
-  now rewrite Nat.add_0_r.
-}
 Qed.
 
 Theorem List_nth_firstn : ∀ A (l : list A) i j d,

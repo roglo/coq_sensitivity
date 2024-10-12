@@ -132,13 +132,6 @@ rewrite Nat.add_comm in Hab; cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
-(* butn: list without its nth element *)
-
-Definition List_butn {A} n (l : list A) :=
-  List.firstn n l ++ List.skipn (S n) l.
-
-(* end butn *)
-
 (* insert in a list (List.reverse of List_butn) *)
 
 Definition insert_at A k (la : list A) e :=
