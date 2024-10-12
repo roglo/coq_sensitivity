@@ -1289,41 +1289,6 @@ rewrite angle_div_2_add.
 now rewrite Haov.
 Qed.
 
-Theorem angle_div_2_pow_add' :
-  ∀ n θ1 θ2,
-  ((θ1 + θ2) /₂^n)%A =
-     if angle_add_overflow θ1 θ2 then
-       match n with
-       | 0 => (θ1 + θ2)%A
-       | S n' => ((θ1 /₂ + θ2 /₂ + angle_straight) /₂^n')%A
-       end
-     else
-       (θ1 /₂^n + θ2 /₂^n)%A.
-Proof.
-destruct_ac.
-intros.
-remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. 2: {
-  induction n; [ easy | cbn ].
-  rewrite IHn.
-  apply angle_div_2_add_not_overflow.
-  apply angle_add_overflow_le with (θ2 := θ2). {
-    apply angle_div_2_pow_le_diag.
-  }
-  apply angle_add_not_overflow_comm.
-  apply angle_add_overflow_le with (θ2 := θ1). {
-    apply angle_div_2_pow_le_diag.
-  }
-  now apply angle_add_not_overflow_comm.
-} {
-  destruct n; [ easy | ].
-  rewrite angle_div_2_pow_succ_r_2.
-  f_equal.
-  now apply angle_div_2_add_overflow.
-}
-Qed.
-
 Theorem one_sub_squ_cos_add_squ_sin :
   ∀ θ, ((1 - rngl_cos θ)² + (rngl_sin θ)² = 2 * (1 - rngl_cos θ))%L.
 Proof.

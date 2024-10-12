@@ -2966,26 +2966,6 @@ intros j.
 now specialize (Hab (S j)).
 Qed.
 
-Theorem all_same_repeat :
-  ∀ A (d a : A) la,
-  (∀ i, i < List.length la → List.nth i la d = a) ↔
-    la = List.repeat a (List.length la).
-Proof.
-intros.
-split; intros Ha. {
-  apply (eq_list_eq d); [ symmetry; apply List.repeat_length | ].
-  intros i Hi.
-  rewrite List_nth_repeat.
-  destruct (lt_dec i (List.length la)) as [H| H]; [ clear H | easy ].
-  now apply Ha.
-} {
-  intros i Hi.
-  apply (f_equal (λ l, List.nth i l d)) in Ha.
-  rewrite List_nth_repeat in Ha.
-  now destruct (lt_dec i (List.length la)).
-}
-Qed.
-
 (**)
 
 Theorem lap_subt_app_r :

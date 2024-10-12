@@ -1328,52 +1328,6 @@ Compute (
   let qlro := Q_list_ring_like_op in
   ([[1];[];[1]] * [[3;0;3];[0;-2]] +
      [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
-...
-
-(*
-(* polynomial cancelling the sum of zeros of two polynomials p and q *)
-(* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
-   a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
-Definition algeb_add A {ro : ring_like_op A} {rol : ring_like_op _} p q :=
-  lap_resultant (List.map (λ i, [i]) p) (lap_compose_y_minus_x q).
-
-(* polynomial cancelling the product of zeros of two polynomials p and q *)
-Definition algeb_mul A {ro : ring_like_op A} {rol : ring_like_op _} p q :=
-  lap_resultant (List.map (λ i, [i]) p) (lap_compose_y_div_x q).
-
-(*
-Theorem algeb_add_cancelling :
-  ∀ A (ro : ring_like_op A) (rol : ring_like_op (list A)) p q α β,
-  eval_lap p α = 0%L
-  → eval_lap q β = 0%L
-  → eval_lap (algeb_add p q) (α + β)%L = 0%L.
-Proof.
-intros * Hp Hq.
-remember
-  (bezout_resultant_coeff (List.map (λ i, [i]) p) (lap_compose_y_minus_x q))
-  as UV eqn:HUV.
-symmetry in HUV.
-destruct UV as (U, V).
-...
-intros * Hp Hq.
-unfold lap_resultant.
-unfold eval_lap in Hp, Hq.
-rewrite <- List.map_rev.
-unfold lap_compose.
-rewrite <- List.map_rev.
-cbn - [ det ].
-remember (List.rev p) as rp eqn:Hrp.
-remember (List.rev q) as rq eqn:Hrq.
-clear p q Hrp Hrq.
-move rq before rp.
-...
-unfold rlap_sylvester_mat.
-unfold rlap_sylvester_list_list.
-rewrite List.length_rev.
-rewrite List.length_map.
-...
-*)
-
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=

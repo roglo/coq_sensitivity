@@ -54,20 +54,6 @@ apply iter_seq_all_d; [ | | | easy ]. {
 }
 Qed.
 
-Theorem all_1_rngl_product_list_1 : ∀ A (l : list A) f,
-  (∀ i, i ∈ l → f i = 1%L)
-  → ∏ (i ∈ l), f i = 1%L.
-Proof.
-intros * Hz.
-apply iter_list_all_d; [ | | | easy ]. {
-  apply (rngl_mul_1_l Hon).
-} {
-  apply (rngl_mul_1_r Hon).
-} {
-  apply rngl_mul_assoc.
-}
-Qed.
-
 Theorem rngl_product_split_first : ∀ b k g,
   b ≤ k
   → ∏ (i = b, k), g i = (g b * ∏ (i = S b, k), g i)%L.

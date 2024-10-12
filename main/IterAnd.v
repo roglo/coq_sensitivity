@@ -41,24 +41,6 @@ split. {
 }
 Qed.
 
-Theorem all_true_and_seq_true_iff : ∀ b e f,
-  (∀ i, b ≤ i ≤ e → f i = true)
-  ↔ ⋀ (i = b, e), f i = true.
-Proof.
-intros.
-specialize (all_true_and_list_true_iff nat (seq b (S e - b))) as H1.
-split. {
-  intros Hb.
-  apply H1.
-  intros i Hi; apply in_seq in Hi.
-  apply Hb; flia Hi.
-} {
-  intros Hb i Hi.
-  apply H1; [ easy | ].
-  apply in_seq; flia Hi.
-}
-Qed.
-
 Theorem and_list_cons : ∀ A (a : A) la f,
   ⋀ (i ∈ a :: la), f i = (f a && ⋀ (i ∈ la), f i)%bool.
 Proof.
