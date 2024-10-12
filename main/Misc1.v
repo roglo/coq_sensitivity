@@ -41,10 +41,6 @@ Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 Theorem fold_not : ∀ (P : Prop), not P → P → False.
 Proof. easy. Qed.
 
-Theorem Tauto_match_nat_same : ∀ A a (b : A),
-  match a with 0 => b | S _ => b end = b.
-Proof. now intros; destruct a. Qed.
-
 Theorem eq_list_eq : ∀ {A} d (la lb : list A),
   length la = length lb
   → (∀ i, i < length la → List.nth i la d = List.nth i lb d)
@@ -203,56 +199,8 @@ intros; cbn.
 now rewrite Nat.add_0_r.
 Qed.
 
-Theorem Nat_leb_add_mono_l : ∀ a b c, (a + b <=? a + c) = (b <=? c).
-Proof.
-intros.
-remember (b <=? c) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Nat.leb_le in Hx.
-  now apply Nat.leb_le, Nat.add_le_mono_l.
-}
-apply Nat.leb_gt in Hx.
-apply Nat.leb_gt.
-now apply Nat.add_lt_mono_l.
-Qed.
-
-Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
-Proof.
-intros.
-rewrite <- Nat.sub_add_distr.
-rewrite Nat.add_comm.
-now rewrite Nat.sub_add_distr.
-Qed.
-
-Theorem Nat_sub_sub_distr : ∀ n m p, p ≤ m → n - (m - p) = n + p - m.
-Proof.
-intros n m p Hpm.
-rewrite Nat.add_comm.
-revert n m Hpm.
-induction p; intros. {
-  now rewrite Nat.sub_0_r, Nat.add_0_l.
-}
-destruct m as [| m]. {
-  exfalso; revert Hpm; apply Nat.nle_succ_0.
-}
-rewrite Nat.sub_succ; cbn.
-apply Nat.succ_le_mono in Hpm.
-now apply IHp.
-Qed.
-
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
-
-Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
-Proof. intros * Hba; flia Hba. Qed.
-
-Theorem Nat_mod_add_l_mul_r : ∀ a b c,
-  (c * b + a) mod b = a mod b.
-Proof.
-intros.
-rewrite Nat.add_comm.
-apply Nat.Div0.mod_add.
-Qed.
 
 Theorem Nat_lt_lt_add_mul : ∀ a b c n, a < b → c < n → c + n * a < n * b.
 Proof.
@@ -270,9 +218,6 @@ rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm.
 apply Nat.add_lt_le_mono; [ easy | ].
 apply IHn.
 Qed.
-
-Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
-Proof. easy. Qed.
 
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
@@ -399,21 +344,6 @@ intros * Heqb *.
 now apply Heqb.
 Qed.
 
-Theorem equality_in_dec :
-  ∀ {A} {eqb : A → _} (Heqb : equality eqb) (a : A) la,
-  { a ∈ la } + { a ∉ la }.
-Proof.
-intros.
-induction la as [| b]; [ now right | ].
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
-destruct IHla as [H1| H1]; [ now left; right | right ].
-intros H2; apply H1; clear H1.
-destruct H2 as [H2| H2]; [ | easy ].
-subst b.
-now rewrite (equality_refl Heqb) in Hab.
-Qed.
-
 (* *)
 
 Theorem option_eq_dec : ∀ A : Type,
@@ -495,33 +425,6 @@ intros * Heqb * Hab H; subst lb.
 induction la as [| a]; [ easy | cbn in Hab ].
 rewrite (equality_refl Heqb) in Hab.
 congruence.
-Qed.
-
-Theorem equality_list_eqv : ∀ A (eqb : A → _),
-  equality eqb ↔ equality (list_eqv eqb).
-Proof.
-intros.
-split. {
-  intros Heqb la lb.
-  now apply list_eqb_eq.
-} {
-  intros Heqb a b.
-  progress unfold equality in Heqb.
-  split. {
-    intros Hab.
-    specialize (Heqb [a] [b]).
-    cbn in Heqb.
-    rewrite Hab in Heqb.
-    specialize (proj1 Heqb eq_refl) as H1.
-    now injection H1.
-  } {
-    intros Hab; subst b.
-    specialize (Heqb [a] [a]).
-    cbn in Heqb.
-    specialize (proj2 Heqb eq_refl) as H1.
-    now destruct (eqb a a).
-  }
-}
 Qed.
 
 (* end list_eqv *)
@@ -655,30 +558,6 @@ split. {
   rewrite Hbef; [ | now left ].
   rewrite IHbef; [ easy | | easy ].
   now intros c Hc; apply Hbef; right.
-}
-Qed.
-
-Theorem extract_None_iff : ∀ {A} (f : A → _) l,
-  extract f l = None ↔ ∀ a, a ∈ l → f a = false.
-Proof.
-intros.
-split. {
-  intros He * Ha.
-  revert a Ha.
-  induction l as [| b]; intros; [ easy | ].
-  cbn in He.
-  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-  destruct fb; [ easy | ].
-  destruct Ha as [Ha| Ha]; [ now subst b | ].
-  apply IHl; [ | easy ].
-  now destruct (extract f l) as [((bef, x), aft)| ].
-} {
-  intros Hf.
-  induction l as [| a]; [ easy | cbn ].
-  rewrite Hf; [ | now left ].
-  rewrite IHl; [ easy | ].
-  intros c Hc.
-  now apply Hf; right.
 }
 Qed.
 
@@ -1377,45 +1256,6 @@ Fixpoint cart_prod {A} (ll : list (list A)) :=
   | l :: ll' => List.flat_map (λ a, List.map (cons a) (cart_prod ll')) l
   end.
 
-Theorem cart_prod_length : ∀ A (ll : list (list A)),
-  ll ≠ []
-  → length (cart_prod ll) = iter_list ll (fun c l => c * length l) 1.
-Proof.
-intros * Hll.
-revert Hll.
-induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
-rewrite iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-rewrite List_flat_length_map.
-erewrite iter_list_eq_compat. 2: {
-  intros i Hi.
-  now rewrite List.length_map.
-}
-cbn.
-destruct ll as [| l2]. {
-  rewrite iter_list_empty with (l := []); [ | easy ].
-  rewrite Nat.mul_1_r; cbn.
-  induction l1 as [| a]; [ easy | ].
-  rewrite iter_list_cons; cycle 1.
-    apply Nat.add_0_l.
-    apply Nat.add_0_r.
-    apply Nat.add_assoc.
-  now cbn; rewrite IHl1.
-}
-rewrite IHll; [ | easy ].
-induction l1 as [| a]; [ easy | ].
-rewrite iter_list_cons; cycle 1.
-  apply Nat.add_0_l.
-  apply Nat.add_0_r.
-  apply Nat.add_assoc.
-now cbn; rewrite IHl1.
-Qed.
-
 Theorem in_cart_prod_length : ∀ A (ll : list (list A)) l,
   l ∈ cart_prod ll → length l = length ll.
 Proof.
@@ -1518,10 +1358,6 @@ Fixpoint binomial n k :=
      end
   end.
 
-Theorem binomial_succ_succ : ∀ n k,
-  binomial (S n) (S k) = binomial n k + binomial n (S k).
-Proof. easy. Qed.
-
 Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
 Proof.
 intros * Hnk.
@@ -1534,88 +1370,7 @@ rewrite Nat.add_0_l.
 apply IHn; flia Hnk.
 Qed.
 
-Theorem binomial_succ_diag_r : ∀ n, binomial n (S n) = 0.
-Proof.
-intros.
-apply binomial_lt; flia.
-Qed.
-
 (* end binomial *)
-
-Theorem NoDup_filter {A} :
-  ∀ (f : A → _) {l}, List.NoDup l → List.NoDup (List.filter f l).
-Proof.
-intros * Hnd.
-induction l as [| a l]; [ easy | cbn ].
-remember (f a) as b eqn:Hb; symmetry in Hb.
-apply List.NoDup_cons_iff in Hnd.
-destruct Hnd as (Hal, Hl).
-destruct b. {
-  constructor; [ | now apply IHl ].
-  intros H; apply Hal.
-  now apply List.filter_In in H.
-}
-now apply IHl.
-Qed.
-
-Theorem NoDup_map_iff {A B} : ∀ d l (f : A → B),
-  List.NoDup (List.map f l)
-  ↔ (∀ i j,
-      i < length l
-      → j < length l
-      → f (List.nth i l d) = f (List.nth j l d) → i = j).
-Proof.
-intros.
-split. {
-  intros Hnd i j Hi Hj Hij.
-  revert i j Hi Hj Hij.
-  induction l as [| a l]; intros; [ easy | ].
-  cbn in Hnd.
-  apply List.NoDup_cons_iff in Hnd.
-  destruct Hnd as (Hnin, Hnd).
-  specialize (IHl Hnd).
-  destruct i. {
-    destruct j; [ easy | exfalso ].
-    cbn in Hij, Hj; clear Hi.
-    apply Nat.succ_lt_mono in Hj.
-    rewrite Hij in Hnin; apply Hnin; clear Hnin.
-    now apply List.in_map, List.nth_In.
-  }
-  cbn in Hi, Hj.
-  destruct j; [ exfalso | ]. {
-    cbn in Hij, Hj; clear Hj.
-    apply Nat.succ_lt_mono in Hi.
-    rewrite <- Hij in Hnin; apply Hnin; clear Hnin.
-    now apply List.in_map, List.nth_In.
-  }
-  apply Nat.succ_lt_mono in Hi.
-  apply Nat.succ_lt_mono in Hj.
-  cbn in Hij.
-  f_equal.
-  now apply IHl.
-} {
-  intros Hinj.
-  induction l as [| a l]; [ constructor | cbn ].
-  apply List.NoDup_cons. {
-    intros Hcon.
-    apply List.in_map_iff in Hcon.
-    destruct Hcon as (b & Hba & Hb).
-    symmetry in Hba.
-    apply (List.In_nth _ _ d) in Hb.
-    destruct Hb as (n & Hlen & Hnth).
-    specialize (Hinj 0 (S n)) as H1.
-    cbn in H1; rewrite Hnth in H1.
-    apply Nat.succ_lt_mono in Hlen.
-    now specialize (H1 (Nat.lt_0_succ _) Hlen Hba).
-  }
-  apply IHl.
-  intros i j Hi Hj Hij.
-  apply Nat.succ_lt_mono in Hi.
-  apply Nat.succ_lt_mono in Hj.
-  specialize (Hinj (S i) (S j) Hi Hj Hij) as H1.
-  now apply Nat.succ_inj in H1.
-}
-Qed.
 
 Theorem NoDup_app_remove_l :
   ∀ A (l l' : list A), List.NoDup (l ++ l') → List.NoDup l'.
@@ -1681,58 +1436,6 @@ split. {
     now apply Hll; right.
   }
 }
-Qed.
-
-Theorem NoDup_concat_if : ∀ A (ll : list (list A)),
-  (∀ l, l ∈ ll → List.NoDup l)
-  → (∀ i j, i ≠ j → ∀ a, a ∈ List.nth i ll [] → a ∉ List.nth j ll [])
-  → List.NoDup (List.concat ll).
-Proof.
-intros * Hnd Hll.
-induction ll as [| l]; [ constructor | cbn ].
-apply NoDup_app_iff.
-split; [ now apply Hnd; left | ].
-split. {
-  apply IHll. {
-    intros l1 Hl1.
-    now apply Hnd; right.
-  }
-  intros i j Hij a Ha.
-  specialize (Hll (S i) (S j)).
-  apply Hll; [ now intros H; injection H | easy ].
-}
-clear - Hnd Hll.
-intros i Hi Hll'.
-revert i l Hnd Hi Hll Hll'.
-induction ll as [| l1]; intros; [ easy | ].
-cbn in Hll'.
-apply List.in_app_or in Hll'.
-destruct Hll' as [Hll'| Hll']. 2: {
-  apply IHll with (i := i) (l := l); [ | easy | | easy ]. {
-    intros l2 Hl2.
-    apply Hnd.
-    destruct Hl2 as [Hl2| Hl2]; [ now left | now right; right ].
-  }
-  intros u v Huv a Ha.
-  destruct u. {
-    cbn in Ha.
-    destruct v; [ easy | cbn ].
-    specialize (Hll 0 (S (S v))) as H1.
-    assert (H : 0 ≠ S (S v)) by easy.
-    now specialize (H1 H a Ha).
-  }
-  cbn in Ha.
-  destruct v. {
-    specialize (Hll (S (S u)) 0) as H1.
-    assert (H : S (S u) ≠ 0) by easy.
-    now specialize (H1 H a Ha).
-  }
-  cbn.
-  apply Nat.succ_inj_wd_neg in Huv.
-  specialize (Hll _ _ Huv).
-  now apply Hll.
-}
-now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
 Qed.
 
 (* "to_radix_loop u r i" is the last u digits of i in base r
