@@ -2146,19 +2146,6 @@ Theorem rngl_sin_div_2 :
   ∀ θ, rngl_sin (θ /₂) = √((1 - rngl_cos θ) / 2)%L.
 Proof. easy. Qed.
 
-Theorem angle_mul_sub_distr_l :
-  ∀ n θ1 θ2, (n * (θ1 - θ2) = n * θ1 - n * θ2)%A.
-Proof.
-intros.
-revert θ1 θ2.
-induction n; intros; cbn; [ symmetry; apply angle_sub_diag | ].
-rewrite angle_sub_add_distr.
-rewrite angle_add_sub_swap.
-rewrite <- angle_add_sub_assoc.
-f_equal.
-apply IHn.
-Qed.
-
 Theorem sequence_false_min :
   ∀ n u,
   u 0 = false
@@ -2205,41 +2192,6 @@ destruct (Nat.eq_dec (S m) n) as [Hsmn| Hsmn]. 2: {
 subst n.
 apply angle_mul_nat_overflow_succ_l_true.
 now right.
-Qed.
-
-Theorem angle_mul_nat_overflow_exist :
-  ∀ n θ,
-  angle_mul_nat_overflow n θ = true
-  → ∃ m,
-  m < n ∧
-  (∀ p, p ≤ m → angle_add_overflow θ (p * θ) = false) ∧
-  angle_add_overflow θ (S m * θ) = true.
-Proof.
-destruct_ac.
-intros * Hn.
-specialize (sequence_false_min n (λ i, angle_mul_nat_overflow i θ)) as H1.
-specialize (H1 eq_refl Hn).
-destruct H1 as (i & Hi & Hsi).
-destruct i; [ easy | ].
-rewrite angle_mul_nat_overflow_succ_l_false in Hi.
-destruct Hi as (Hi, Hit).
-exists i.
-split. {
-  apply Nat.nle_gt.
-  intros Hni.
-  apply (angle_mul_nat_overflow_true_after _ i) in Hn; [ | easy ].
-  now rewrite Hn in Hi.
-}
-split. {
-  intros p Hpi.
-  apply angle_add_overflow_le with (θ2 := (i * θ)%A); [ | easy ].
-  now apply angle_mul_le_mono_r.
-}
-rewrite angle_mul_nat_overflow_succ_l_true in Hsi.
-destruct Hsi as [Hsi| Hsi]; [ | easy ].
-rewrite angle_mul_nat_overflow_succ_l_true in Hsi.
-destruct Hsi as [Hsi| Hsi]; [ now rewrite Hi in Hsi | ].
-now rewrite Hit in Hsi.
 Qed.
 
 Theorem angle_all_add_not_overflow :

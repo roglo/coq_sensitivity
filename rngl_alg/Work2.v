@@ -874,15 +874,6 @@ apply angle_add_lt_mono_l; [ easy | ].
 now apply angle_opp_lt_compat_if.
 Qed.
 
-Theorem angle_mul_opp : ∀ n θ, (- (n * θ) = n * (- θ))%A.
-Proof.
-intros.
-induction n; cbn; [ apply angle_opp_0 | ].
-rewrite angle_opp_add_distr.
-rewrite IHn.
-apply angle_add_comm.
-Qed.
-
 Theorem rngl_cos_sin_twice_lemma_1 :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L

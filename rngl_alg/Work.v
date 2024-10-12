@@ -59,25 +59,6 @@ Context {ac : angle_ctx T}.
 
 (* *)
 
-Theorem angle_mul_nat_overflow_pow2_div_angle_mul :
-  ∀ n i θ,
-  angle_mul_nat_overflow (2 ^ i / n) (n * (θ /₂^i)) = false.
-Proof.
-destruct_ac.
-intros.
-apply Bool.not_true_iff_false.
-intros H1.
-apply angle_mul_nat_overflow_true_assoc in H1.
-apply Bool.not_false_iff_true in H1.
-apply H1; clear H1.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply (angle_mul_nat_not_overflow_le_l _ (2 ^ i)). {
-  rewrite Nat.mul_comm.
-  apply Nat.Div0.mul_div_le.
-}
-apply angle_mul_nat_overflow_pow_div.
-Qed.
-
 Theorem angle_div_2_pow_mul_le_angle :
   ∀ n i θ, n ≤ 2 ^ i → (n * (θ /₂^i) ≤ θ)%A.
 Proof.
