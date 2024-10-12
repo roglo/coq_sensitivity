@@ -334,15 +334,6 @@ intros * Ht Hf.
 now destruct u; [ apply Ht | apply Hf ].
 Qed.
 
-Theorem binomial_succ_l :
-  ∀ n k,
-  binomial (S n) k =
-    match k with
-    | 0 => 1
-    | S k' => binomial n k' + binomial n k
-    end.
-Proof. easy. Qed.
-
 Theorem gre_summation :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →

@@ -10,7 +10,9 @@ LapPolyn.vo LapPolyn.glob LapPolyn.v.beautified LapPolyn.required_vo: LapPolyn.v
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo MyVector.vo Matrix.vo Signature.vo Determinant.vo Comatrix.vo CauchyBinet.vo
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo MyVector.vo Matrix.vo IterAdd.vo
 Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo MyVector.vo Signature.vo
-Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
+Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v Misc1.vo Misc2.vo
+Misc1.vo Misc1.glob Misc1.v.beautified Misc1.required_vo: Misc1.v 
+Misc2.vo Misc2.glob Misc2.v.beautified Misc2.required_vo: Misc2.v Misc1.vo
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo IterAdd.vo
 NatRingLike.vo NatRingLike.glob NatRingLike.v.beautified NatRingLike.required_vo: NatRingLike.v Misc.vo RingLike.vo
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo PermutationFun.vo SortingFun.vo SortRank.vo IterAnd.vo Pigeonhole.vo

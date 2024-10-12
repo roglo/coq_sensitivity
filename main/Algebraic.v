@@ -617,6 +617,7 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
      in
      (minus_one_pow (m + n + i + 1) * (List.repeat 0%L j ++ [det s']))%lap).
 
+(* to be completed
 Theorem lap_bezout_is_resultant :
   charac_0_field T →
   ∀ (P Q U V : list T),
