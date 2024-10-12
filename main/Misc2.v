@@ -962,6 +962,8 @@ apply IHk in Hi; cbn.
 now do 2 rewrite <- Nat.add_succ_comm.
 Qed.
 
+Definition List_rank [A] := @List_rank_loop 0 A.
+
 Theorem List_rank_if : ∀ {A} d f (l : list A) {i},
   List_rank f l = i
   → (∀ j, j < i → f (List.nth j l d) = false) ∧
@@ -2435,6 +2437,11 @@ destruct x as [x| ]. {
 destruct y as [y| ]; [ now right | now left ].
 Qed.
 
+(* pair_eqb *)
+
+Definition pair_eqb {A B} (eqba : A → A → bool) (eqbb : B → B → bool) ab cd :=
+  (eqba (fst ab) (fst cd) && eqbb (snd ab) (snd cd))%bool.
+
 Theorem pair_eqb_eq : ∀ A B (eqba : A → _) (eqbb : B → _),
   equality eqba →
   equality eqbb →
@@ -2464,9 +2471,34 @@ split; intros Hab. {
 }
 Qed.
 
+(* end pair_eqb *)
+
+(* replace in a list *)
+
+Definition replace_at {A} k (la : list A) e :=
+  List.firstn k la ++ e :: List.skipn (S k) la.
+
 Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
   replace_at (S i) (a :: l) b = a :: replace_at i l b.
 Proof. easy. Qed.
+
+(* end replace_at *)
+
+(* conversion natural into radix r as a list of digits; i must be
+   less than r^r; always return r digits; e.g. radix 10 37 =
+   7; 3; 0 ... (eight 0s) *)
+Definition to_radix r i := to_radix_loop r r i.
+
+Theorem to_radix_inv_to_radix_loop : ∀ it n k,
+  to_radix_inv n (to_radix_loop it n k) = k mod (n ^ it).
+Proof.
+intros.
+revert k.
+induction it; intros; [ easy | cbn ].
+rewrite IHit.
+symmetry.
+apply Nat.Div0.mod_mul_r.
+Qed.
 
 Theorem to_radix_inv_to_radix : ∀ n k,
   k < n ^ n → to_radix_inv n (to_radix n k) = k.
@@ -2618,5 +2650,17 @@ Definition unsome {A} (d : A) o :=
   | Some x => x
   | None => d
   end.
+
+Definition equivalence {A} (eqv : A → A → bool) :=
+  (∀ a, eqv a a = true) ∧
+  (∀ a b, eqv a b = true → eqv b a = true) ∧
+  (∀ a b c, eqv a b = true → eqv b c = true → eqv a c = true).
+
+(* insert in a list (List.reverse of List_butn) *)
+
+Definition insert_at A k (la : list A) e :=
+  List.firstn k la ++ e :: List.skipn k la.
+
+(* end insert_at *)
 
 Arguments "<?" : simpl never.

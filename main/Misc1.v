@@ -105,8 +105,6 @@ Fixpoint List_rank_loop i [A] (f : A → bool) (l : list A) : nat :=
   | x :: tl => if f x then i else List_rank_loop (S i) f tl
 end.
 
-Definition List_rank [A] := @List_rank_loop 0 A.
-
 (* end List_rank *)
 
 Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
@@ -132,20 +130,6 @@ rewrite Nat.add_comm in Hab; cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
-(* insert in a list (List.reverse of List_butn) *)
-
-Definition insert_at A k (la : list A) e :=
-  List.firstn k la ++ e :: List.skipn k la.
-
-(* end insert_at *)
-
-(* replace in a list *)
-
-Definition replace_at {A} k (la : list A) e :=
-  List.firstn k la ++ e :: List.skipn (S k) la.
-
-(* end replace_at *)
-
 (* List_repeat_apply: applying a function n times *)
 
 Fixpoint List_repeat_apply {A} n (f : A → A) a :=
@@ -156,12 +140,7 @@ Fixpoint List_repeat_apply {A} n (f : A → A) a :=
 
 (* end List.repeat_apply *)
 
-(* equivalence & equality *)
-
-Definition equivalence {A} (eqv : A → A → bool) :=
-  (∀ a, eqv a a = true) ∧
-  (∀ a b, eqv a b = true → eqv b a = true) ∧
-  (∀ a b c, eqv a b = true → eqv b c = true → eqv a c = true).
+(* equality *)
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 
@@ -237,13 +216,6 @@ Fixpoint list_ltb {A} (ltb : A → A → bool) la lb :=
   end.
 
 (* end list_ltb *)
-
-(* pair_eqb *)
-
-Definition pair_eqb {A B} (eqba : A → A → bool) (eqbb : B → B → bool) ab cd :=
-  (eqba (fst ab) (fst cd) && eqbb (snd ab) (snd cd))%bool.
-
-(* end pair_eqb *)
 
 (* extract: like "find" but returning all details:
    - what is before
@@ -325,27 +297,11 @@ Fixpoint to_radix_loop it r i :=
   | S it' => i mod r :: to_radix_loop it' r (i / r)
   end.
 
-(* conversion natural into radix r as a list of digits; i must be
-   less than r^r; always return r digits; e.g. radix 10 37 =
-   7; 3; 0 ... (eight 0s) *)
-Definition to_radix r i := to_radix_loop r r i.
-
 Fixpoint to_radix_inv r l :=
   match l with
   | [] => 0
   | d :: l' => d + r * to_radix_inv r l'
   end.
-
-Theorem to_radix_inv_to_radix_loop : ∀ it n k,
-  to_radix_inv n (to_radix_loop it n k) = k mod (n ^ it).
-Proof.
-intros.
-revert k.
-induction it; intros; [ easy | cbn ].
-rewrite IHit.
-symmetry.
-apply Nat.Div0.mod_mul_r.
-Qed.
 
 (* *)
 
