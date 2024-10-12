@@ -12,7 +12,7 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Import List.ListNotations.
-Require Import Main.Misc Main.RingLike.
+Require Import Main.Misc1 Main.RingLike.
 Require Import RealLike.
 
 Section a.
