@@ -2640,26 +2640,6 @@ apply iter_list_cons; [ easy | apply List.app_nil_r | ].
 apply List.app_assoc.
 Qed.
 
-Theorem App_list_all_nil : ∀ A B l (f : A → list B),
-  (∀ a, a ∈ l → f a = [])
-  → App (a ∈ l), f a = [].
-Proof.
-intros * Hl.
-apply iter_list_all_d; [ easy | apply List.app_nil_r | | easy ].
-apply List.app_assoc.
-Qed.
-
-Theorem App_list_eq_nil : ∀ A B (l : list A) (f : A → list B),
-  App (a ∈ l), f a = [] → ∀ a, a ∈ l → f a = [].
-Proof.
-intros * Happ * Hl.
-induction l as [| b]; [ easy | ].
-rewrite App_list_cons in Happ.
-apply List.app_eq_nil in Happ.
-destruct Hl as [Hl| Hl]; [ now subst a | ].
-now apply IHl.
-Qed.
-
 Theorem App_list_concat_map : ∀ A B (l : list A) (f : A → list B),
   App (a ∈ l), f a = List.concat (List.map f l).
 Proof.
@@ -2676,37 +2656,6 @@ intros.
 rewrite App_list_concat_map.
 rewrite <- List.flat_map_concat_map.
 apply List.in_flat_map.
-Qed.
-
-Theorem App_split : ∀ A j (g : nat → list A) b k,
-  b ≤ S j ≤ S k
-  → App (i = b, k), g i = App (i = b, j), g i ++ App (i = j+1, k), g i.
-Proof.
-intros * Hbjk.
-apply iter_seq_split; [ easy | | | easy ]. {
-  apply List.app_nil_r.
-} {
-  apply List.app_assoc.
-}
-Qed.
-
-Theorem App_list_app : ∀ A B (la lb : list A) (f : A → list B),
-  App (i ∈ la ++ lb), f i = App (i ∈ la), f i ++ App (i ∈ lb), f i.
-Proof.
-intros.
-rewrite iter_list_app.
-progress unfold iter_list.
-rewrite fold_left_op_fun_from_d with (d := []); [ easy | easy | | ]. {
-  apply List.app_nil_r.
-} {
-  apply List.app_assoc.
-}
-Qed.
-
-Theorem App_only_one : ∀ A (g : _ → list A) n, App (i = n, n), g i = g n.
-Proof.
-intros.
-now apply iter_seq_only_one.
 Qed.
 
 (* cart_prod: cartesian product of several lists *)

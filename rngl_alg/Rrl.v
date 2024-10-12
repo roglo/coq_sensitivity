@@ -29,12 +29,6 @@ intros * H1.
 now destruct H1 as [H1| H1]; apply CRealLt_irrefl in H1.
 Qed.
 
-Theorem CReal_appart_sym : ∀ x y, (x # y)%CReal → (y # x)%CReal.
-Proof.
-intros * Hxy.
-now destruct Hxy; [ right | left ].
-Qed.
-
 Theorem eq_CReal_eq : ∀ x y, ((x # y)%CReal → False) ↔ x = y.
 Proof.
 intros.
@@ -172,31 +166,6 @@ rewrite CReal_inv_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
-Theorem CReal_eqb_eq : ∀ x y, CReal_eqb x y = true ↔ x = y.
-Proof.
-intros.
-split; intros Hxy; [ | subst y; apply CReal_eqb_refl ].
-unfold CReal_eqb in Hxy.
-now destruct (CReal_appart_or_eq x y).
-Qed.
-
-(*
-Theorem CReal_le_dec : let ro := CReal_ring_like_op in
-  ∀ a b : CReal, {(a ≤ b)%L} + {¬ (a ≤ b)%L}.
-Proof.
-cbn; intros.
-destruct (CReal_appart_or_eq a b) as [Hab| Hab]. {
-  destruct Hab as [Hab| Hba]. {
-    now left; apply CRealLt_asym.
-  } {
-    now right.
-  }
-}
-subst b; left.
-apply CRealLe_refl.
-Qed.
-*)
-
 Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
   ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
 Proof.
@@ -216,64 +185,6 @@ apply CReal_lt_trans with (y := 1%CReal). {
 apply CReal_plus_lt_compat_l with (x := 1%CReal) in IHi.
 now rewrite CReal_plus_0_r in IHi.
 Qed.
-
-Theorem CReal_le_antisymm : let ro := CReal_ring_like_op in
-  ∀ a b : CReal, (a ≤ b)%L → (b ≤ a)%L → a = b.
-Proof.
-cbn; intros * Hab Hba.
-apply eq_CReal_eq.
-intros H1.
-now destruct H1.
-Qed.
-
-(*
-Theorem CReal_mul_le_compat_nonneg : let ro := CReal_ring_like_op in
-  ∀ a b c d : CReal, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
-Proof.
-cbn; intros * Hac Hbd.
-apply CReal_le_trans with (y := (a * d)%CReal). {
-  now apply CReal_mult_le_compat_l.
-} {
-  apply CReal_mult_le_compat_r; [ | easy ].
-  now apply CReal_le_trans with (y := b).
-}
-Qed.
-*)
-
-(*
-Theorem CReal_mul_le_compat_nonpos : let ro := CReal_ring_like_op in
-  ∀ a b c d : CReal, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
-Proof.
-cbn; intros * Hac Hbd.
-rewrite <- CReal_opp_involutive.
-rewrite <- (CReal_opp_involutive (c * d)).
-rewrite CReal_opp_mult_distr_l.
-rewrite CReal_opp_mult_distr_r.
-rewrite CReal_opp_mult_distr_l.
-rewrite CReal_opp_mult_distr_r.
-destruct Hac as (Hca, Haz).
-destruct Hbd as (Hdb, Hbz).
-apply CReal_opp_ge_le_contravar in Hca, Haz, Hdb, Hbz.
-rewrite <- opp_inject_Q in Haz, Hbz.
-apply CReal_le_trans with (y := (- a * - d)%CReal). {
-  now apply CReal_mult_le_compat_l.
-} {
-  apply CReal_mult_le_compat_r; [ | easy ].
-  now apply CReal_le_trans with (y := (- b)%CReal).
-}
-Qed.
-*)
-
-(*
-Theorem CReal_not_le : let ro := CReal_ring_like_op in
-  ∀ a b : CReal, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L.
-Proof.
-cbn; intros * Hab.
-destruct (CReal_appart_or_eq a b) as [Haeb| Haeb]; [ | now left ].
-right.
-now destruct Haeb as [H1| H1]; apply CRealLt_asym in H1.
-Qed.
-*)
 
 Definition CReal_ring_like_prop : ring_like_prop CReal :=
   {| rngl_mul_is_comm := true;
