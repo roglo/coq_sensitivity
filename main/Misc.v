@@ -418,10 +418,6 @@ do 2 rewrite List_hd_nth_0.
 now apply List_map_nth'.
 Qed.
 
-Theorem List_map_tl : ∀ A B (f : A → B) l,
-  List.tl (List.map f l) = List.map f (List.tl l).
-Proof. now intros; destruct l. Qed.
-
 Theorem List_app_cons : ∀ A la lb (b : A), la ++ b :: lb = la ++ [b] ++ lb.
 Proof. easy. Qed.
 
@@ -1740,20 +1736,6 @@ apply Hfg.
 now right.
 Qed.
 
-Theorem List_fold_right_ext_in : ∀ A B (f g : B → A → A) l a,
-  (∀ b c, b ∈ l → f b c = g b c)
-  → List.fold_right f a l = List.fold_right g a l.
-Proof.
-intros * Hfg.
-revert a.
-induction l as [| d]; intros; [ easy | cbn ].
-rewrite (Hfg d); [ | now left ].
-rewrite IHl; [ easy | ].
-intros b c Hb.
-apply Hfg.
-now right.
-Qed.
-
 Theorem List_fold_left_map_nth_len : ∀ A (la : list A) sta len f d,
   List.fold_left
     (λ lb k, List.map (λ i, List.nth (f k i) lb d) (List.seq 0 (length lb)))
@@ -1969,10 +1951,6 @@ apply Nat.succ_inj in Hxy.
 specialize (IHx1 x2 y1 y2 Hxy H1).
 now destruct IHx1; subst y1 y2.
 Qed.
-
-Theorem List_last_cons_cons : ∀ A l (x y d : A),
-  List.last (x :: y :: l) d = List.last (y :: l) d.
-Proof. easy. Qed.
 
 Theorem List_skipn_seq :
   ∀ n start len,
