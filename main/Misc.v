@@ -265,24 +265,6 @@ apply Nat.leb_gt.
 now apply Nat.add_lt_mono_l.
 Qed.
 
-Theorem Nat_sub_add_eq_l :
-  ∀ n m p, m ≤ n → n - m = p → m + p = n.
-Proof.
-intros * Hmn Hnmp.
-subst p.
-rewrite Nat.add_sub_assoc; [ | easy ].
-rewrite Nat.add_comm.
-apply Nat.add_sub.
-Qed.
-
-Theorem Nat_sub_add_eq_r :
-  ∀ n m p, p ≤ n → n - p = m → m + p = n.
-Proof.
-intros * Hpn Hnpm.
-rewrite Nat.add_comm.
-now apply Nat_sub_add_eq_l.
-Qed.
-
 Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
 Proof.
 intros.
@@ -327,14 +309,6 @@ Proof.
 intros.
 rewrite Nat.add_comm.
 apply Nat.Div0.mod_add.
-Qed.
-
-Theorem Nat_pow_nonneg: ∀ a b, 0 ≤ a ^ b.
-Proof.
-intros.
-induction b; [ easy | cbn ].
-rewrite <- (Nat.mul_0_r a).
-now apply Nat.mul_le_mono_l.
 Qed.
 
 Theorem Nat_lt_lt_add_mul : ∀ a b c n, a < b → c < n → c + n * a < n * b.
@@ -955,22 +929,6 @@ cbn in Hn; apply Nat.succ_lt_mono in Hn.
 rewrite List_nth_succ_cons.
 do 2 rewrite List.skipn_cons.
 now apply IHla.
-Qed.
-
-Theorem Nat_lt_lt_sum_mul_lt_sum_mul : ∀ a b c d,
-  a < b
-  → c < d
-  → a * d + b * c < a * c + b * d.
-Proof.
-intros * Hab Hcd.
-rewrite Nat.add_comm.
-apply Nat.lt_add_lt_sub_r.
-rewrite <- Nat.add_sub_assoc; [ | apply Nat.mul_le_mono_r; flia Hab ].
-rewrite <- Nat.mul_sub_distr_r.
-apply Nat.lt_sub_lt_add_l.
-rewrite <- Nat.mul_sub_distr_r.
-apply Nat.mul_lt_mono_pos_l; [ | easy ].
-flia Hab.
 Qed.
 
 Theorem Nat_div_less_small : ∀ n a b,
@@ -2843,33 +2801,6 @@ split. {
     now apply Hll; right.
   }
 }
-Qed.
-
-Theorem NoDup_butn :
-  ∀ A k (la : list A), List.NoDup la → List.NoDup (List_butn k la).
-Proof.
-intros * Hnd.
-apply NoDup_app_iff.
-split. {
-  rewrite <- (List.firstn_skipn k) in Hnd.
-  now apply NoDup_app_iff in Hnd.
-}
-split. {
-  rewrite <- (List.firstn_skipn (S k)) in Hnd.
-  now apply NoDup_app_iff in Hnd.
-}
-intros i Hif.
-rewrite <- (List.firstn_skipn (S k)) in Hnd.
-apply NoDup_app_iff in Hnd.
-destruct Hnd as (H1 & H2 & H3).
-apply H3.
-clear - Hif.
-revert la Hif.
-induction k; intros; [ easy | ].
-destruct la as [| a]; [ easy | ].
-rewrite List.firstn_cons in Hif |-*.
-destruct Hif as [Hif| Hif]; [ now left | right ].
-now apply IHk.
 Qed.
 
 Theorem NoDup_concat_if : ∀ A (ll : list (list A)),

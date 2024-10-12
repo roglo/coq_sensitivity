@@ -1196,20 +1196,6 @@ unfold canon_sym_gr_inv_list.
 apply List_length_map_seq.
 Qed.
 
-Theorem NoDup_canon_sym_gr_inv_list : ∀ n i,
-  i < n!
-  → List.NoDup (canon_sym_gr_inv_list n i).
-Proof.
-intros * Hi.
-apply nat_NoDup.
-rewrite canon_sym_gr_inv_list_length.
-intros j k Hj Hk Hjk.
-apply (f_equal (λ m, List.nth m (canon_sym_gr_list n i) 0)) in Hjk.
-rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
-rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
-easy.
-Qed.
-
 Theorem in_canon_sym_gr_list : ∀ n k i,
   k < n! → i ∈ canon_sym_gr_list n k → i < n.
 Proof.

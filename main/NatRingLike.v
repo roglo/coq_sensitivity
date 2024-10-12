@@ -60,24 +60,6 @@ apply Nat.leb_le.
 now apply Nat.lt_le_incl.
 Qed.
 
-Theorem Nat_mul_sub_distr_l :
-  let ro := nat_ring_like_op in
-  ∀ a b c, (a * (b - c))%L = (a * b - a * c)%L.
-Proof.
-intros.
-apply Nat.mul_sub_distr_l.
-Qed.
-
-Theorem Nat_opt_quot_mul :
-  let ro := nat_ring_like_op in
-  if rngl_has_quot _ then ∀ a b c : nat, (a / (b * c))%L = (a / b / c)%L
-  else not_applicable.
-Proof.
-intros; cbn.
-intros.
-symmetry; apply Nat.Div0.div_div.
-Qed.
-
 Theorem Nat_opt_le_dec :
   ∀ a b : nat, {(a <=? b) = true} + {(a <=? b) ≠ true}.
 Proof.
