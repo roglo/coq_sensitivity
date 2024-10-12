@@ -217,14 +217,6 @@ apply Nat.add_cancel_r in Hxy.
 now subst yn.
 Qed.
 
-Theorem GQ_of_PQred : ∀ x, GQ_of_PQ (PQred x) = GQ_of_PQ x.
-Proof.
-intros.
-unfold GQ_of_PQ.
-apply GQeq_eq; simpl.
-now rewrite PQred_idemp.
-Qed.
-
 Theorem PQred_of_GQ : ∀ x, PQred (PQ_of_GQ x) = PQ_of_GQ x.
 Proof.
 intros (xp, Hxp); simpl.
@@ -383,13 +375,6 @@ tac_to_PQ.
 now rewrite PQmul_comm.
 Qed.
 
-Theorem GQmul_assoc : ∀ x y z, (x * (y * z) = (x * y) * z)%GQ.
-Proof.
-intros.
-tac_to_PQ.
-now rewrite PQmul_assoc.
-Qed.
-
 Theorem GQmul_add_distr_l : ∀ x y z, (x * (y + z) = x * y + x * z)%GQ.
 Proof.
 intros.
@@ -523,29 +508,6 @@ setoid_rewrite GQadd_comm.
 apply GQadd_le_mono_r.
 Qed.
 
-Theorem GQadd_le_mono : ∀ x y z t,
-   (x ≤ y)%GQ → (z ≤ t)%GQ → (x + z ≤ y + t)%GQ.
-Proof.
-intros * Hxy Hzt.
-apply (GQle_trans _ (y + z)).
--now apply GQadd_le_mono_r.
--now apply GQadd_le_mono_l.
-Qed.
-
-Theorem GQsub_le_mono_r : ∀ x y z,
-  (z < x)%GQ → (z < y)%GQ → (x ≤ y)%GQ ↔ (x - z ≤ y - z)%GQ.
-Proof.
-intros *.
-unfold "-"%GQ, "≤"%GQ, "<"%GQ.
-intros Hzx Hzy.
-rewrite GQ_of_PQ_subtractive; [ | easy ].
-rewrite GQ_of_PQ_subtractive; [ | easy ].
-do 3 rewrite GQ_o_PQ.
-rewrite PQ_of_GQ_subtractive; [ | easy ].
-rewrite PQ_of_GQ_subtractive; [ | easy ].
-now apply PQsub_le_mono_r.
-Qed.
-
 Theorem GQsub_le_mono_l : ∀ x y z,
   (x < z)%GQ → (y < z)%GQ → (y ≤ x)%GQ ↔ (z - x ≤ z - y)%GQ.
 Proof.
@@ -558,17 +520,6 @@ do 3 rewrite GQ_o_PQ.
 rewrite PQ_of_GQ_subtractive; [ | easy ].
 rewrite PQ_of_GQ_subtractive; [ | easy ].
 now apply PQsub_le_mono_l.
-Qed.
-
-Theorem GQsub_le_mono : ∀ x y z t,
-  (y < x)%GQ → (t < z)%GQ → (x ≤ z)%GQ → (t ≤ y)%GQ → (x - y ≤ z - t)%GQ.
-Proof.
-intros * Hyx Htz Hxz Hty.
-apply (GQle_trans _ (z - y)).
--apply GQsub_le_mono_r; [ easy | | easy ].
- eapply GQlt_le_trans; [ apply Hyx | apply Hxz ].
--apply GQsub_le_mono_l; [ | easy | easy ].
- eapply GQlt_le_trans; [ apply Hyx | apply Hxz ].
 Qed.
 
 Theorem GQadd_sub : ∀ x y, (x + y - y)%GQ = x.
@@ -981,9 +932,6 @@ do 2 rewrite PQ_o_GQ.
 apply PQcompare_mul_cancel_l.
 Qed.
 
-Theorem GQle_PQle : ∀ x y, (x ≤ y)%GQ ↔ (PQ_of_GQ x ≤ PQ_of_GQ y)%PQ.
-Proof. easy. Qed.
-
 Theorem GQeq_pair : ∀ x y z t,
   x ≠ 0 → y ≠ 0 → z ≠ 0 → t ≠ 0
   → GQ_of_pair x y = GQ_of_pair z t ↔ x * t = y * z.
@@ -1191,13 +1139,6 @@ do 2 rewrite Nat_sub_succ_1.
 now destruct a, PQnum1, PQden1.
 Qed.
 
-Theorem GQmul_1_r : ∀ a, (a * 1)%GQ = a.
-Proof.
-intros.
-rewrite GQmul_comm.
-apply GQmul_1_l.
-Qed.
-
 Theorem GQmul_le_mono : ∀ x y z t,
   (x ≤ y)%GQ → (z ≤ t)%GQ → (x * z ≤ y * t)%GQ.
 Proof.
@@ -1226,31 +1167,8 @@ split; intros H.
 -now apply PQmul_lt_cancel_l in H.
 Qed.
 
-Theorem GQmul_lt_mono_r : ∀ x y z, (x < y)%GQ ↔ (x * z < y * z)%GQ.
-Proof.
-setoid_rewrite GQmul_comm.
-apply GQmul_lt_mono_l.
-Qed.
-
-Theorem GQmul_lt_mono : ∀ x y z t,
-  (x < y)%GQ → (z < t)%GQ → (x * z < y * t)%GQ.
-Proof.
-intros * Hxy Hzt.
-apply (GQlt_trans _ (x * t)).
--now apply GQmul_lt_mono_l.
--now apply GQmul_lt_mono_r.
-Qed.
-
 Definition GQnum x := nn (PQnum1 (PQ_of_GQ x)) + 1.
 Definition GQden x := nn (PQden1 (PQ_of_GQ x)) + 1.
-
-(* co-fractional part = 1 - fractional part
-   defined instead of fractional part because fractional part does not
-   exist for integer values (would be 0 but 0 ∉ GQ) *)
-Definition GQcfrac x := ((GQden x - GQnum x mod GQden x) // GQden x)%GQ.
-(*
-Definition GQintg x := PQintg (PQ_of_GQ x).
-*)
 
 Theorem GQnum_neq_0 : ∀ x, GQnum x ≠ 0.
 Proof.
@@ -1294,57 +1212,6 @@ subst aa bb.
 do 2 rewrite Nat.add_sub.
 rewrite Hg.
 now do 2 rewrite Nat.add_sub.
-Qed.
-
-Theorem GQnum_mult_GQden : ∀ a b n,
-  b ≠ 0
-  → GQnum (a // b)%GQ = GQden (a // b)%GQ * n
-  → a mod b = 0.
-Proof.
-intros * Hbz Hnd.
-unfold GQnum, GQden in Hnd.
-unfold GQ_of_PQ in Hnd; cbn in Hnd.
-unfold PQred in Hnd.
-remember ggcd as f; cbn in Hnd; subst f.
-destruct b; [ easy | clear Hbz ].
-destruct a; [ apply Nat.Div0.mod_0_l | ].
-rewrite Nat.sub_add in Hnd; [ | flia ].
-rewrite Nat.sub_add in Hnd; [ | flia ].
-remember (ggcd (S a) (S b)) as g eqn:Hg.
-symmetry in Hg.
-destruct g as (g, (aa, bb)).
-cbn in Hnd.
-specialize (ggcd_correct_divisors (S a) (S b)) as H1.
-rewrite Hg in H1.
-destruct H1 as (Ha, Hb).
-destruct aa; [ now rewrite Nat.mul_comm in Ha | ].
-destruct bb; [ now rewrite Nat.mul_comm in Hb | ].
-rewrite Nat_sub_succ_1, Nat.add_1_r in Hnd.
-rewrite Nat_sub_succ_1, Nat.add_1_r in Hnd.
-rewrite Ha, Hb, Hnd.
-replace (g * S bb) with (g * S bb * 1) by flia.
-rewrite Nat.mul_assoc.
-rewrite Nat.Div0.mul_mod_distr_l.
-now rewrite Nat.mod_1_r, Nat.mul_comm.
-Qed.
-
-Theorem GQnum_pair_0_r : ∀ a, a ≠ 0 → GQnum (a // 0)%GQ = a.
-Proof.
-intros * Ha.
-unfold GQnum; cbn.
-unfold PQred.
-remember ggcd as f; cbn; subst f.
-rewrite ggcd_1_r; cbn.
-destruct a; [ easy | flia ].
-Qed.
-
-Theorem GQden_pair_0_r : ∀ a, GQden (a // 0)%GQ = 1.
-Proof.
-intros.
-unfold GQden; cbn.
-unfold PQred.
-remember ggcd as f; cbn; subst f.
-now rewrite ggcd_1_r; cbn.
 Qed.
 
 Theorem GQnum_pair_1_r : ∀ a, a ≠ 0 → GQnum (a // 1)%GQ = a.
@@ -1436,21 +1303,6 @@ rewrite GQpair_diag; [ | easy ].
 now rewrite GQmul_1_l.
 Qed.
 
-Theorem GQpair_sub_l : ∀ a b c,
-  b < a → b ≠ 0 → c ≠ 0 → ((a - b) // c = a // c - b // c)%GQ.
-Proof.
-intros * Hba Hb Hc.
-apply GQeq_eq.
-rewrite GQsub_pair; [ | flia Hba | easy | easy | easy | ]; cycle 1. {
-  rewrite Nat.mul_comm.
-  apply Nat.mul_lt_mono_pos_r; [ flia Hc | easy ].
-}
-rewrite Nat.mul_comm, <- Nat.mul_sub_distr_l.
-rewrite <- GQmul_pair; [ | easy | easy | flia Hba | easy ].
-rewrite GQpair_diag; [ | easy ].
-now rewrite GQmul_1_l.
-Qed.
-
 Theorem GQadd_cancel_l : ∀ x y z, (x + y)%GQ = (x + z)%GQ ↔ y = z.
 Proof.
 intros.
@@ -1490,13 +1342,6 @@ rewrite <- PQred_eq; symmetry.
 now rewrite Hyz.
 Qed.
 
-Theorem GQmul_cancel_r : ∀ x y z, (x * z)%GQ = (y * z)%GQ ↔ x = y.
-Proof.
-intros.
-setoid_rewrite GQmul_comm.
-apply GQmul_cancel_l.
-Qed.
-
 Theorem GQmul_inv_diag_r : ∀ x, (x * ¹/ x = 1)%GQ.
 Proof.
 intros.
@@ -1507,27 +1352,6 @@ unfold "*"%PQ, PQinv.
 unfold PQmul_num1, PQmul_den1; cbn.
 rewrite Nat.mul_comm.
 apply PQred_diag.
-Qed.
-
-Theorem GQmul_inv_diag_l : ∀ x, (¹/ x * x = 1)%GQ.
-Proof.
-intros; rewrite GQmul_comm.
-apply GQmul_inv_diag_r.
-Qed.
-
-Theorem GQpair_lt_nat_l : ∀ a b c, a ≠ 0 → b ≠ 0 → c ≠ 0 →
-  (a // 1 < b // c)%GQ → a * c < b.
-Proof.
-intros * Ha Hb Hc Habc.
-unfold "<"%GQ in Habc; cbn in Habc.
-apply PQred_lt in Habc.
-unfold "<"%PQ, nd in Habc; cbn in Habc.
-rewrite Nat.mul_1_r in Habc.
-destruct a; [ easy | ].
-destruct b; [ easy | ].
-destruct c; [ easy | ].
-do 3 rewrite Nat_sub_succ_1 in Habc.
-now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 
 Theorem GQpair_lt_nat_r : ∀ a b c, a ≠ 0 → b ≠ 0 → c ≠ 0 →
@@ -1545,14 +1369,6 @@ do 3 rewrite Nat_sub_succ_1 in Habc.
 now do 3 rewrite Nat.add_1_r in Habc.
 Qed.
 
-(*
-Theorem glop : ∀ a b, a ≠ 0 → b ≠ 0 →
-  (a // b < 1)%GQ → a < b.
-Proof.
-intros * Ha Hb Hab.
-apply (GQpair_lt_nat_r _ _ 1) in Hab.
-*)
-
 Theorem GQpair_le_nat_l : ∀ a b c, a ≠ 0 → b ≠ 0 → c ≠ 0 →
   (a // 1 ≤ b // c)%GQ → a * c ≤ b.
 Proof.
@@ -1561,21 +1377,6 @@ unfold "<"%GQ in Habc; cbn in Habc.
 apply PQred_le in Habc.
 unfold "≤"%PQ, nd in Habc; cbn in Habc.
 rewrite Nat.mul_1_r in Habc.
-destruct a; [ easy | ].
-destruct b; [ easy | ].
-destruct c; [ easy | ].
-do 3 rewrite Nat_sub_succ_1 in Habc.
-now do 3 rewrite Nat.add_1_r in Habc.
-Qed.
-
-Theorem GQpair_le_nat_r : ∀ a b c, a ≠ 0 → b ≠ 0 → c ≠ 0 →
-  (a // b ≤ c // 1)%GQ → a ≤ b * c.
-Proof.
-intros * Ha Hb Hc Habc.
-unfold "≤"%GQ in Habc; cbn in Habc.
-apply PQred_le in Habc.
-unfold "≤"%PQ, nd in Habc; cbn in Habc.
-rewrite Nat.mul_1_r, Nat.mul_comm in Habc.
 destruct a; [ easy | ].
 destruct b; [ easy | ].
 destruct c; [ easy | ].

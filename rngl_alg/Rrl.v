@@ -9,20 +9,6 @@ Require Import Main.RingLike.
 
 Axiom CReal_appart_or_eq : ∀ x y, (x # y)%CReal + (x = y).
 
-Definition CReal_eqb x y :=
-  match CReal_appart_or_eq x y with
-  | inl _ => false
-  | inr _ => true
-  end.
-
-Theorem CReal_eqb_refl : ∀ x, CReal_eqb x x = true.
-Proof.
-intros.
-unfold CReal_eqb.
-destruct (CReal_appart_or_eq x x) as [Hxx| Hxx]; [ exfalso | easy ].
-now destruct Hxx; apply (CRealLt_irrefl x).
-Qed.
-
 Theorem CReal_appart_irrefl : ∀ x, (x # x)%CReal → False.
 Proof.
 intros * H1.
