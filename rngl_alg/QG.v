@@ -840,6 +840,27 @@ rewrite QG_of_Q_add_idemp_r.
 now rewrite Qmult_plus_distr_r.
 Qed.
 
+Theorem QG_mul_add_distr_r :  ∀ a b c, ((a + b) * c)%QG = (a * c + b * c)%QG.
+Proof.
+intros.
+do 3 rewrite (QG_mul_comm _ c).
+apply QG_mul_add_distr_l.
+Qed.
+
+Theorem QG_eqb_eq : ∀ a b : QG, (a =? b)%QG = true ↔ a = b.
+Proof.
+intros.
+split; intros Hab. {
+  apply Qeq_bool_iff in Hab.
+  rewrite <- (QG_of_Q_qg_q a).
+  rewrite <- (QG_of_Q_qg_q b).
+  now rewrite Hab.
+} {
+  subst b.
+  now apply Qeq_bool_iff.
+}
+Qed.
+
 Theorem QG_le_dec : ∀ a b : QG, {(a ≤ b)%QG} + {¬ (a ≤ b)%QG}.
 Proof.
 intros.
@@ -907,6 +928,18 @@ split. {
 }
 Qed.
 
+Theorem QG_lt_trans : ∀ x y z : QG, (x < y → y < z → x < z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply QG_lt_iff in Hxy, Hyz.
+apply QG_lt_iff.
+destruct Hxy as (Hxy, Hnxy).
+destruct Hyz as (Hyz, Hnyz).
+split; [ apply (QG_le_trans Hxy Hyz) | ].
+intros H; subst z.
+now apply QG_le_antisymm in Hyz.
+Qed.
+
 Theorem QG_le_lt_trans : ∀ x y z : QG, (x ≤ y → y < z → x < z)%QG.
 Proof.
 intros * Hxy Hyz.
@@ -916,6 +949,17 @@ destruct Hyz as (Hyz, Hnyz).
 split; [ apply (QG_le_trans Hxy Hyz) | ].
 intros H; subst z.
 apply not_eq_sym in Hnyz.
+now apply QG_le_antisymm in Hyz.
+Qed.
+
+Theorem QG_lt_le_trans : ∀ x y z : QG, (x < y → y ≤ z → x < z)%QG.
+Proof.
+intros * Hxy Hyz.
+apply QG_lt_iff in Hxy.
+apply QG_lt_iff.
+destruct Hxy as (Hxy, Hnxy).
+split; [ apply (QG_le_trans Hxy Hyz) | ].
+intros H; subst z.
 now apply QG_le_antisymm in Hyz.
 Qed.
 
