@@ -79,40 +79,6 @@ Qed.
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 
-Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
-Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
-
-(* List_map2: map with two lists *)
-
-Fixpoint List_map2 {A B C} (f : A → B → C) la lb :=
-  match la with
-  | [] => []
-  | a :: la' =>
-      match lb with
-      | [] => []
-      | b :: lb' => f a b :: List_map2 f la' lb'
-      end
-  end.
-
-(* end List_map2 *)
-
-(* rank: rank of the first element satisfying a predicate *)
-(* like "find" but returning the rank, not the element itself *)
-
-Fixpoint List_rank_loop i [A] (f : A → bool) (l : list A) : nat :=
-  match l with
-  | [] => i
-  | x :: tl => if f x then i else List_rank_loop (S i) f tl
-end.
-
-(* end List_rank *)
-
-Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
-Proof.
-intros.
-apply Nat.mod_upper_bound, fact_neq_0.
-Qed.
-
 Theorem Nat_div_less_small : ∀ n a b,
   n * b ≤ a < (n + 1) * b
   → a / b = n.
@@ -130,15 +96,8 @@ rewrite Nat.add_comm in Hab; cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
-(* List_repeat_apply: applying a function n times *)
-
-Fixpoint List_repeat_apply {A} n (f : A → A) a :=
-  match n with
-  | 0 => a
-  | S n' => List_repeat_apply n' f (f a)
-  end.
-
-(* end List.repeat_apply *)
+Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
+Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
 
 (* equality *)
 
@@ -319,5 +278,3 @@ Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
 
 Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
-
-Global Hint Resolve Nat_mod_fact_upper_bound : core.
