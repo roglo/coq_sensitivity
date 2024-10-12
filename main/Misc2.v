@@ -2454,4 +2454,73 @@ Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
   replace_at (S i) (a :: l) b = a :: replace_at i l b.
 Proof. easy. Qed.
 
+Theorem to_radix_inj : ∀ n i j,
+  i < n ^ n
+  → j < n ^ n
+  → to_radix n i = to_radix n j
+  → i = j.
+Proof.
+intros * Hi Hj Hij.
+apply (f_equal (to_radix_inv n)) in Hij.
+rewrite to_radix_inv_to_radix in Hij; [ | easy ].
+rewrite to_radix_inv_to_radix in Hij; [ | easy ].
+easy.
+Qed.
+
+Theorem to_radix_inv_ub : ∀ n l,
+  n ≠ 0
+  → (∀ i, i < length l → List.nth i l 0 < n)
+  → to_radix_inv n l < n ^ length l.
+Proof.
+intros * Hnz Hl.
+revert n Hnz Hl.
+induction l as [| a]; intros; cbn; [ easy | ].
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (IHl n Hnz) as H2.
+assert (H : ∀ i, i < length l → List.nth i l 0 < n). {
+  intros i Hi.
+  apply (Hl (S i)); cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+specialize (H2 H); clear H.
+now apply Nat_lt_lt_add_mul.
+Qed.
+
+Theorem to_radix_length : ∀ n l, length (to_radix n l) = n.
+Proof.
+intros.
+progress unfold to_radix.
+apply to_radix_loop_length.
+Qed.
+
+Definition to_radix_list r := List.map (to_radix r) (List.seq 0 (r ^ r)).
+
+Theorem to_radix_to_radix_inv : ∀ n l,
+  length l = n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix n (to_radix_inv n l) = l.
+Proof.
+intros * Hlen Hl.
+progress unfold to_radix.
+specialize to_radix_loop_to_radix_inv as H1.
+specialize (H1 l 0 n n).
+do 2 rewrite Nat.add_0_r in H1.
+specialize (H1 Hlen Hl (Nat.le_refl _)).
+now rewrite Nat.sub_diag, List.app_nil_r in H1.
+Qed.
+
+Theorem to_radix_ub : ∀ n k i, n ≠ 0 → List.nth i (to_radix n k) 0 < n.
+Proof.
+intros * Hnz.
+now apply to_radix_loop_ub.
+Qed.
+
+Definition unsome {A} (d : A) o :=
+  match o with
+  | Some x => x
+  | None => d
+  end.
+
 Arguments "<?" : simpl never.
