@@ -192,6 +192,20 @@ destruct ld as [| d]; [ easy | cbn ].
 apply IHlc.
 Qed.
 
+Theorem List_fold_left_ext_in : ∀ A B (f g : A → B → A) l a,
+  (∀ b c, b ∈ l → f c b = g c b)
+  → List.fold_left f l a = List.fold_left g l a.
+Proof.
+intros * Hfg.
+revert a.
+induction l as [| d]; intros; [ easy | cbn ].
+rewrite (Hfg d a); [ | now left ].
+apply IHl.
+intros b c Hb.
+apply Hfg.
+now right.
+Qed.
+
 Theorem List_fold_left_map_nth_len : ∀ A (la : list A) sta len f d,
   List.fold_left
     (λ lb k, List.map (λ i, List.nth (f k i) lb d) (List.seq 0 (length lb)))
@@ -326,6 +340,14 @@ destruct i; [ easy | ].
 cbn in Hi; apply Nat.succ_le_mono in Hi.
 rewrite List_butn_succ_cons.
 now rewrite IHl.
+Qed.
+
+Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
+  (if b then x else y) =
+  if Sumbool.sumbool_of_bool b then x else y.
+Proof.
+intros.
+now destruct (Sumbool.sumbool_of_bool b); subst b.
 Qed.
 
 Theorem List_length_butn : ∀ A n (l : list A),
@@ -1132,6 +1154,19 @@ Proof.
 now intros * Hl; subst l.
 Qed.
 
+Theorem iter_list_cons : ∀ A B d op (a : B) la f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_list (a :: la) (λ (c : A) i, op c (f i)) d =
+  op (f a) (iter_list la (λ (c : A) i, op c (f i)) d).
+Proof.
+intros.
+progress unfold iter_list; cbn.
+rewrite op_d_l.
+now apply (fold_left_op_fun_from_d d).
+Qed.
+
 Theorem List_flat_length_map : ∀ A B (f : A → list B) l,
   length (List.flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
 Proof.
@@ -1211,6 +1246,23 @@ Qed.
 
 Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
 Proof. intros * Hba; flia Hba. Qed.
+
+Theorem NoDup_app_comm {A} : ∀ l l' : list A,
+  List.NoDup (l ++ l') → List.NoDup (l' ++ l).
+Proof.
+intros * Hll.
+revert l Hll.
+induction l' as [| a l']; intros; [ now rewrite List.app_nil_r in Hll | ].
+cbn; constructor. {
+  intros Ha.
+  apply List.NoDup_remove_2 in Hll; apply Hll.
+  apply List.in_app_or in Ha.
+  apply List.in_or_app.
+  now destruct Ha; [ right | left ].
+}
+apply IHl'.
+now apply List.NoDup_remove_1 in Hll.
+Qed.
 
 Theorem NoDup_app_remove_l :
   ∀ A (l l' : list A), List.NoDup (l ++ l') → List.NoDup l'.
@@ -1725,6 +1777,37 @@ subst l; cbn; f_equal.
 now apply IHll.
 Qed.
 
+Theorem nth_in_cart_prod : ∀ A (d : A) ll l i,
+  i < length ll
+  → l ∈ cart_prod ll
+  → List.nth i l d ∈ List.nth i ll [].
+Proof.
+intros * Hi Hll.
+revert l i Hi Hll.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hll |-*.
+destruct i. {
+  destruct ll as [| l2]. {
+    apply List.in_flat_map in Hll.
+    destruct Hll as (a & Ha & Hla).
+    apply List.in_map_iff in Hla.
+    now destruct Hla as (l2 & H & Hl2); subst l.
+  }
+  apply List.in_flat_map in Hll.
+  destruct Hll as (a & Hl1 & Hl).
+  apply List.in_map_iff in Hl.
+  now destruct Hl as (l3 & H & Hl3); subst l.
+}
+cbn in Hi; apply Nat.succ_lt_mono in Hi.
+destruct ll as [| l2]; [ easy | ].
+apply List.in_flat_map in Hll.
+destruct Hll as (a & Ha & Hl).
+apply List.in_map_iff in Hl.
+destruct Hl as (l3 & H & Hl3); subst l.
+rewrite List_nth_succ_cons.
+now apply IHll.
+Qed.
+
 Theorem in_cart_prod_iff : ∀ {A} (d : A) ll la,
   la ∈ cart_prod ll
   ↔ length la = length ll ∧
@@ -1862,6 +1945,10 @@ apply List.in_seq in Hi.
 apply Hz; flia Hi.
 Qed.
 
+Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
+  List.fold_left f l d = iter_list l f d.
+Proof. easy. Qed.
+
 Theorem iter_list_distr : ∀ T A d op g h (l : list A)
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
@@ -1973,6 +2060,15 @@ progress unfold iter_seq.
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite Nat.sub_diag.
 now apply iter_list_only_one.
+Qed.
+
+Theorem List_fold_left_map :
+  ∀ A B C (f : A → B → A) (g : C → B) (l : list C) a,
+  List.fold_left f (List.map g l) a = List.fold_left (λ c b, f c (g b)) l a.
+Proof.
+intros.
+revert a.
+induction l as [| c]; intros; [ easy | apply IHl ].
 Qed.
 
 Theorem iter_seq_rtl : ∀ T d op b k f
@@ -2199,5 +2295,86 @@ split; intros Hla. {
   now apply List.in_or_app; right; left.
 }
 Qed.
+
+Theorem no_dup_false_iff : ∀ {A} {eqb : A → _},
+  equality eqb →
+  ∀ la, no_dup eqb la = false ↔
+  ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
+Proof.
+intros * Heqb *.
+split. {
+  intros Had.
+  induction la as [| a]; [ easy | cbn in Had ].
+  remember (member eqb a la) as mal eqn:Hmal; symmetry in Hmal.
+  destruct mal. 2: {
+    specialize (IHla Had).
+    destruct IHla as (l1 & l2 & l3 & b & Hlb).
+    exists (a :: l1), l2, l3, b.
+    now subst la.
+  }
+  clear Had.
+  apply member_true_iff in Hmal; [ | easy ].
+  destruct Hmal as (l1 & l2 & Hla); subst la.
+  now exists [], l1, l2, a.
+} {
+  intros (l1 & l2 & l3 & a & Hla); subst la.
+  induction l1 as [| b]; cbn. {
+    remember (member eqb a (l2 ++ a :: l3)) as mal eqn:Hmal; symmetry in Hmal.
+    destruct mal; [ easy | ].
+    specialize (proj1 (member_false_iff Heqb _ _) Hmal a) as H1.
+    assert (H : a ∈ l2 ++ a :: l3) by now apply List.in_or_app; right; left.
+    now specialize (H1 H).
+  }
+  remember (member eqb b _) as mbl eqn:Hmbl; symmetry in Hmbl.
+  now destruct mbl.
+}
+Qed.
+
+Theorem option_eq_dec : ∀ A : Type,
+  (∀ x y : A, {x = y} + {x ≠ y})
+  → (∀ x y : option A, {x = y} + {x ≠ y}).
+Proof.
+intros * Hed *.
+destruct x as [x| ]. {
+  destruct y as [y| ]; [ | now right ].
+  destruct (Hed x y) as [H1| H1]; [ now left; subst y | right ].
+  intros H; apply H1.
+  now injection H.
+}
+destruct y as [y| ]; [ now right | now left ].
+Qed.
+
+Theorem pair_eqb_eq : ∀ A B (eqba : A → _) (eqbb : B → _),
+  equality eqba →
+  equality eqbb →
+  ∀ a b, pair_eqb eqba eqbb a b = true ↔ a = b.
+Proof.
+intros * Heqba Heqbb *.
+split; intros Hab. {
+  progress unfold pair_eqb in Hab.
+  destruct a as (a1, a2).
+  destruct b as (b1, b2).
+  cbn in Hab.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Ha, Hb).
+  apply Heqba in Ha.
+  apply Heqbb in Hb.
+  congruence.
+} {
+  subst b.
+  progress unfold pair_eqb.
+  destruct a as (a1, a2); cbn.
+  apply Bool.andb_true_iff.
+  split. {
+    apply (equality_refl Heqba).
+  } {
+    apply (equality_refl Heqbb).
+  }
+}
+Qed.
+
+Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
+  replace_at (S i) (a :: l) b = a :: replace_at i l b.
+Proof. easy. Qed.
 
 Arguments "<?" : simpl never.
