@@ -1196,6 +1196,23 @@ apply Nat.succ_le_mono in Hnlen.
 now apply IHlen.
 Qed.
 
+(* iterations in a list
+   in order to later define syntaxes : Max, Σ, Π, ...
+   e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
+
+Definition iter_list {A B} (l : list B) f (d : A) := List.fold_left f l d.
+
+(* iterations in indexed sequences
+   in order to later define syntaxes : Max, Σ, Π, ...
+   e.g. "Σ (i = b, e), f i", "Π (i = b, e), f i" *)
+
+Definition iter_seq {T} b e f (d : T) := iter_list (List.seq b (S e - b)) f d.
+
+Arguments iter_seq : simpl never.
+Arguments iter_list : simpl never.
+
+(* *)
+
 Theorem iter_list_empty : ∀ T A d (op : T → T → T) (l : list A) g,
   l = []
   → iter_list l (λ c i, op c (g i)) d = d.
@@ -1525,6 +1542,19 @@ Theorem Tauto_match_nat_same : ∀ A a (b : A),
   match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
 
+(* binomial *)
+(* code borrowed from my work "coq_euler_prod_form" *)
+
+Fixpoint binomial n k :=
+  match k with
+  | 0 => 1
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' => binomial n' k' + binomial n' k
+     end
+  end.
+
 Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
 Proof.
 intros * Hnk.
@@ -1547,6 +1577,8 @@ Theorem binomial_succ_succ : ∀ n k,
   binomial (S n) (S k) = binomial n k + binomial n (S k).
 Proof. easy. Qed.
 
+(* end binomial *)
+
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ c i, op c (g i)) d =
@@ -1562,6 +1594,14 @@ intros i Hi.
 apply Hgh.
 now right.
 Qed.
+
+(* cart_prod: cartesian product of several lists *)
+
+Fixpoint cart_prod {A} (ll : list (list A)) :=
+  match ll with
+  | [] => [[]]
+  | l :: ll' => List.flat_map (λ a, List.map (cons a) (cart_prod ll')) l
+  end.
 
 Theorem cart_prod_length : ∀ A (ll : list (list A)),
   ll ≠ []
@@ -1600,233 +1640,6 @@ rewrite iter_list_cons; cycle 1.
   apply Nat.add_0_r.
   apply Nat.add_assoc.
 now cbn; rewrite IHl1.
-Qed.
-
-Theorem equality_refl {A} {eqb : A → _} : equality eqb → ∀ a, eqb a a = true.
-Proof.
-intros * Heqb *.
-now apply Heqb.
-Qed.
-
-Theorem equality_in_dec :
-  ∀ {A} {eqb : A → _} (Heqb : equality eqb) (a : A) la,
-  { a ∈ la } + { a ∉ la }.
-Proof.
-intros.
-induction la as [| b]; [ now right | ].
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
-destruct IHla as [H1| H1]; [ now left; right | right ].
-intros H2; apply H1; clear H1.
-destruct H2 as [H2| H2]; [ | easy ].
-subst b.
-now rewrite (equality_refl Heqb) in Hab.
-Qed.
-
-Theorem list_eqb_eq : ∀ {A} {eqb : A → _},
-  equality eqb →
-  ∀ la lb, list_eqv eqb la lb = true ↔ la = lb.
-Proof.
-intros * Heqb *.
-split; intros Hlab. {
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn in Hlab ].
-  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  apply Heqb in Hab; subst b; f_equal.
-  now apply IHla.
-} {
-  subst lb.
-  induction la as [| a]; [ easy | cbn ].
-  now rewrite (equality_refl Heqb).
-}
-Qed.
-
-Theorem list_eqb_neq : ∀ {A} {eqb : A → _},
-  equality eqb →
-  ∀ la lb, list_eqv eqb la lb = false → la ≠ lb.
-Proof.
-intros * Heqb * Hab H; subst lb.
-induction la as [| a]; [ easy | cbn in Hab ].
-rewrite (equality_refl Heqb) in Hab.
-congruence.
-Qed.
-
-Theorem equality_list_eqv : ∀ A (eqb : A → _),
-  equality eqb ↔ equality (list_eqv eqb).
-Proof.
-intros.
-split. {
-  intros Heqb la lb.
-  now apply list_eqb_eq.
-} {
-  intros Heqb a b.
-  progress unfold equality in Heqb.
-  split. {
-    intros Hab.
-    specialize (Heqb [a] [b]).
-    cbn in Heqb.
-    rewrite Hab in Heqb.
-    specialize (proj1 Heqb eq_refl) as H1.
-    now injection H1.
-  } {
-    intros Hab; subst b.
-    specialize (Heqb [a] [a]).
-    cbn in Heqb.
-    specialize (proj2 Heqb eq_refl) as H1.
-    now destruct (eqb a a).
-  }
-}
-Qed.
-
-Theorem extract_None_iff : ∀ {A} (f : A → _) l,
-  extract f l = None ↔ ∀ a, a ∈ l → f a = false.
-Proof.
-intros.
-split. {
-  intros He * Ha.
-  revert a Ha.
-  induction l as [| b]; intros; [ easy | ].
-  cbn in He.
-  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-  destruct fb; [ easy | ].
-  destruct Ha as [Ha| Ha]; [ now subst b | ].
-  apply IHl; [ | easy ].
-  now destruct (extract f l) as [((bef, x), aft)| ].
-} {
-  intros Hf.
-  induction l as [| a]; [ easy | cbn ].
-  rewrite Hf; [ | now left ].
-  rewrite IHl; [ easy | ].
-  intros c Hc.
-  now apply Hf; right.
-}
-Qed.
-
-Theorem eq_list_eq : ∀ {A} d (la lb : list A),
-  length la = length lb
-  → (∀ i, i < length la → List.nth i la d = List.nth i lb d)
-  → la = lb.
-Proof.
-intros * Hlab Hab.
-revert lb Hlab Hab.
-induction la as [| a]; intros. {
-  now symmetry in Hlab; apply List.length_zero_iff_nil in Hlab.
-}
-destruct lb as [| b]; [ easy | ].
-cbn in Hlab; apply Nat.succ_inj in Hlab.
-f_equal; [ now specialize (Hab 0 (Nat.lt_0_succ _)) | ].
-apply (IHla _ Hlab).
-intros i Hi.
-apply (Hab (S i)); cbn.
-now apply Nat.succ_lt_mono in Hi.
-Qed.
-
-Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
-  extract f l = Some (bef, a, aft)
-  ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
-Proof.
-intros.
-split. {
-  intros He.
-  revert a bef aft He.
-  induction l as [| b]; intros; [ easy | cbn ].
-  cbn in He.
-  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-  destruct fb. {
-    now injection He; clear He; intros; subst bef b aft.
-  }
-  remember (extract f l) as lal eqn:Hlal; symmetry in Hlal.
-  destruct lal as [((bef', x), aft') | ]; [ | easy ].
-  injection He; clear He; intros; subst bef x aft'.
-  rename bef' into bef.
-  specialize (IHl _ _ _ eq_refl) as H1.
-  destruct H1 as (H1 & H2 & H3).
-  split. {
-    intros c Hc.
-    destruct Hc as [Hc| Hc]; [ now subst c | ].
-    now apply H1.
-  }
-  split; [ easy | ].
-  now cbn; f_equal.
-} {
-  intros He.
-  destruct He as (Hbef & Hf & Hl).
-  subst l.
-  revert a aft Hf.
-  induction bef as [| b]; intros; cbn; [ now rewrite Hf | ].
-  rewrite Hbef; [ | now left ].
-  rewrite IHbef; [ easy | | easy ].
-  now intros c Hc; apply Hbef; right.
-}
-Qed.
-
-Theorem fold_iter_seq : ∀ A b e f (d : A),
-  iter_list (List.seq b (S e - b)) f d = iter_seq b e f d.
-Proof. easy. Qed.
-
-Theorem fold_iter_seq' : ∀ A b len f (d : A),
-  iter_list (List.seq b len) f d =
-    if b + len =? 0 then d
-    else iter_seq b (b + len - 1) f d.
-Proof.
-intros.
-progress unfold iter_seq.
-f_equal; f_equal.
-remember (b + len =? 0) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Nat.eqb_eq in Hx.
-  now apply Nat.eq_add_0 in Hx; destruct Hx; subst b len.
-}
-apply Nat.eqb_neq in Hx.
-destruct len. {
-  rewrite Nat.add_0_r in Hx.
-  destruct b; [ easy | cbn ].
-  now rewrite Nat.add_sub, Nat.sub_diag.
-}
-rewrite Nat.sub_succ_l; [ cbn | flia ].
-f_equal; f_equal; f_equal.
-flia.
-Qed.
-
-Theorem fold_not : ∀ (P : Prop), not P → P → False.
-Proof. easy. Qed.
-
-Theorem if_eqb_eq_dec : ∀ {A} i j (a b : A),
-  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
-Proof.
-intros.
-destruct (Nat.eq_dec i j) as [H1| H1]. {
-  now apply Nat.eqb_eq in H1; rewrite H1.
-}
-now apply Nat.eqb_neq in H1; rewrite H1.
-Qed.
-
-Theorem App_list_cons : ∀ A B (a : A) la (f : A → list B),
-  App (i ∈ a :: la), f i = f a ++ App (i ∈ la), f i.
-Proof.
-intros.
-apply iter_list_cons; [ easy | apply List.app_nil_r | ].
-apply List.app_assoc.
-Qed.
-
-Theorem App_list_concat_map : ∀ A B (l : list A) (f : A → list B),
-  App (a ∈ l), f a = List.concat (List.map f l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-rewrite App_list_cons.
-now rewrite IHl.
-Qed.
-
-Theorem in_App_list : ∀ A B (f : A → list B) l y,
-  y ∈ App (i ∈ l), f i ↔ (∃ x : A, x ∈ l ∧ y ∈ f x).
-Proof.
-intros.
-rewrite App_list_concat_map.
-rewrite <- List.flat_map_concat_map.
-apply List.in_flat_map.
 Qed.
 
 Theorem in_cart_prod_length : ∀ A (ll : list (list A)) l,
@@ -1915,6 +1728,290 @@ split. {
   now specialize (H2 Hi).
 }
 Qed.
+
+(* end cart_prod *)
+
+(* list_eqv *)
+
+Fixpoint list_eqv {A} (eqv : A → A → bool) la lb :=
+  match la with
+  | [] =>
+      match lb with
+      | [] => true
+      | b :: lb' => false
+      end
+  | a :: la' =>
+      match lb with
+      | [] => false
+      | b :: lb' => if eqv a b then list_eqv eqv la' lb' else false
+      end
+  end.
+
+(* end list_eqv *)
+
+(* equality *)
+
+Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
+
+Theorem equality_refl {A} {eqb : A → _} : equality eqb → ∀ a, eqb a a = true.
+Proof.
+intros * Heqb *.
+now apply Heqb.
+Qed.
+
+Theorem equality_in_dec :
+  ∀ {A} {eqb : A → _} (Heqb : equality eqb) (a : A) la,
+  { a ∈ la } + { a ∉ la }.
+Proof.
+intros.
+induction la as [| b]; [ now right | ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
+destruct IHla as [H1| H1]; [ now left; right | right ].
+intros H2; apply H1; clear H1.
+destruct H2 as [H2| H2]; [ | easy ].
+subst b.
+now rewrite (equality_refl Heqb) in Hab.
+Qed.
+
+Theorem list_eqb_eq : ∀ {A} {eqb : A → _},
+  equality eqb →
+  ∀ la lb, list_eqv eqb la lb = true ↔ la = lb.
+Proof.
+intros * Heqb *.
+split; intros Hlab. {
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | cbn ].
+  destruct lb as [| b]; [ easy | cbn in Hlab ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  apply Heqb in Hab; subst b; f_equal.
+  now apply IHla.
+} {
+  subst lb.
+  induction la as [| a]; [ easy | cbn ].
+  now rewrite (equality_refl Heqb).
+}
+Qed.
+
+Theorem list_eqb_neq : ∀ {A} {eqb : A → _},
+  equality eqb →
+  ∀ la lb, list_eqv eqb la lb = false → la ≠ lb.
+Proof.
+intros * Heqb * Hab H; subst lb.
+induction la as [| a]; [ easy | cbn in Hab ].
+rewrite (equality_refl Heqb) in Hab.
+congruence.
+Qed.
+
+Theorem equality_list_eqv : ∀ A (eqb : A → _),
+  equality eqb ↔ equality (list_eqv eqb).
+Proof.
+intros.
+split. {
+  intros Heqb la lb.
+  now apply list_eqb_eq.
+} {
+  intros Heqb a b.
+  progress unfold equality in Heqb.
+  split. {
+    intros Hab.
+    specialize (Heqb [a] [b]).
+    cbn in Heqb.
+    rewrite Hab in Heqb.
+    specialize (proj1 Heqb eq_refl) as H1.
+    now injection H1.
+  } {
+    intros Hab; subst b.
+    specialize (Heqb [a] [a]).
+    cbn in Heqb.
+    specialize (proj2 Heqb eq_refl) as H1.
+    now destruct (eqb a a).
+  }
+}
+Qed.
+
+(* end equality *)
+
+(* extract: like "find" but returning all details:
+   - what is before
+   - the value found
+   - what is after *)
+
+Fixpoint extract {A} (f : A → bool) l :=
+  match l with
+  | [] => None
+  | a :: la =>
+      if f a then Some ([], a, la)
+      else
+        match extract f la with
+        | None => None
+        | Some (bef, b, aft) => Some (a :: bef, b, aft)
+        end
+  end.
+
+Theorem extract_None_iff : ∀ {A} (f : A → _) l,
+  extract f l = None ↔ ∀ a, a ∈ l → f a = false.
+Proof.
+intros.
+split. {
+  intros He * Ha.
+  revert a Ha.
+  induction l as [| b]; intros; [ easy | ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb; [ easy | ].
+  destruct Ha as [Ha| Ha]; [ now subst b | ].
+  apply IHl; [ | easy ].
+  now destruct (extract f l) as [((bef, x), aft)| ].
+} {
+  intros Hf.
+  induction l as [| a]; [ easy | cbn ].
+  rewrite Hf; [ | now left ].
+  rewrite IHl; [ easy | ].
+  intros c Hc.
+  now apply Hf; right.
+}
+Qed.
+
+Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
+  extract f l = Some (bef, a, aft)
+  ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
+Proof.
+intros.
+split. {
+  intros He.
+  revert a bef aft He.
+  induction l as [| b]; intros; [ easy | cbn ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb. {
+    now injection He; clear He; intros; subst bef b aft.
+  }
+  remember (extract f l) as lal eqn:Hlal; symmetry in Hlal.
+  destruct lal as [((bef', x), aft') | ]; [ | easy ].
+  injection He; clear He; intros; subst bef x aft'.
+  rename bef' into bef.
+  specialize (IHl _ _ _ eq_refl) as H1.
+  destruct H1 as (H1 & H2 & H3).
+  split. {
+    intros c Hc.
+    destruct Hc as [Hc| Hc]; [ now subst c | ].
+    now apply H1.
+  }
+  split; [ easy | ].
+  now cbn; f_equal.
+} {
+  intros He.
+  destruct He as (Hbef & Hf & Hl).
+  subst l.
+  revert a aft Hf.
+  induction bef as [| b]; intros; cbn; [ now rewrite Hf | ].
+  rewrite Hbef; [ | now left ].
+  rewrite IHbef; [ easy | | easy ].
+  now intros c Hc; apply Hbef; right.
+}
+Qed.
+
+(* end extract *)
+
+Theorem eq_list_eq : ∀ {A} d (la lb : list A),
+  length la = length lb
+  → (∀ i, i < length la → List.nth i la d = List.nth i lb d)
+  → la = lb.
+Proof.
+intros * Hlab Hab.
+revert lb Hlab Hab.
+induction la as [| a]; intros. {
+  now symmetry in Hlab; apply List.length_zero_iff_nil in Hlab.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab; apply Nat.succ_inj in Hlab.
+f_equal; [ now specialize (Hab 0 (Nat.lt_0_succ _)) | ].
+apply (IHla _ Hlab).
+intros i Hi.
+apply (Hab (S i)); cbn.
+now apply Nat.succ_lt_mono in Hi.
+Qed.
+
+Theorem fold_iter_seq : ∀ A b e f (d : A),
+  iter_list (List.seq b (S e - b)) f d = iter_seq b e f d.
+Proof. easy. Qed.
+
+Theorem fold_iter_seq' : ∀ A b len f (d : A),
+  iter_list (List.seq b len) f d =
+    if b + len =? 0 then d
+    else iter_seq b (b + len - 1) f d.
+Proof.
+intros.
+progress unfold iter_seq.
+f_equal; f_equal.
+remember (b + len =? 0) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Nat.eqb_eq in Hx.
+  now apply Nat.eq_add_0 in Hx; destruct Hx; subst b len.
+}
+apply Nat.eqb_neq in Hx.
+destruct len. {
+  rewrite Nat.add_0_r in Hx.
+  destruct b; [ easy | cbn ].
+  now rewrite Nat.add_sub, Nat.sub_diag.
+}
+rewrite Nat.sub_succ_l; [ cbn | flia ].
+f_equal; f_equal; f_equal.
+flia.
+Qed.
+
+Theorem fold_not : ∀ (P : Prop), not P → P → False.
+Proof. easy. Qed.
+
+Theorem if_eqb_eq_dec : ∀ {A} i j (a b : A),
+  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
+Proof.
+intros.
+destruct (Nat.eq_dec i j) as [H1| H1]. {
+  now apply Nat.eqb_eq in H1; rewrite H1.
+}
+now apply Nat.eqb_neq in H1; rewrite H1.
+Qed.
+
+(* App : a notation for iterating concatenation of a list of lists *)
+
+Notation "'App' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, c ++ g) [])
+  (at level 45, i at level 0, b at level 60, e at level 60).
+
+Notation "'App' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ++ g) [])
+  (at level 45, i at level 0, l at level 60).
+
+Theorem App_list_cons : ∀ A B (a : A) la (f : A → list B),
+  App (i ∈ a :: la), f i = f a ++ App (i ∈ la), f i.
+Proof.
+intros.
+apply iter_list_cons; [ easy | apply List.app_nil_r | ].
+apply List.app_assoc.
+Qed.
+
+Theorem App_list_concat_map : ∀ A B (l : list A) (f : A → list B),
+  App (a ∈ l), f a = List.concat (List.map f l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite App_list_cons.
+now rewrite IHl.
+Qed.
+
+Theorem in_App_list : ∀ A B (f : A → list B) l y,
+  y ∈ App (i ∈ l), f i ↔ (∃ x : A, x ∈ l ∧ y ∈ f x).
+Proof.
+intros.
+rewrite App_list_concat_map.
+rewrite <- List.flat_map_concat_map.
+apply List.in_flat_map.
+Qed.
+
+(* *)
 
 Theorem iter_list_op_fun_from_d : ∀ T A d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)
@@ -2339,6 +2436,14 @@ destruct (le_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
+(* member: a computable "In" *)
+
+Fixpoint member {A} (eqb : A → A → bool) a la :=
+  match la with
+  | [] => false
+  | b :: lb => if eqb a b then true else member eqb a lb
+  end.
+
 Theorem member_false_iff : ∀ {A} {eqb : A → _},
   equality eqb →
   ∀ a la, member eqb a la = false ↔ ∀ b, b ∈ la → a ≠ b.
@@ -2396,6 +2501,16 @@ split. {
   now destruct (eqb a b).
 }
 Qed.
+
+(* end member *)
+
+(* no_dup: a computable "NoDup" *)
+
+Fixpoint no_dup {A} (eqb : A → A → bool) la :=
+  match la with
+  | [] => true
+  | a :: la' => if member eqb a la' then false else no_dup eqb la'
+  end.
 
 Theorem no_dup_NoDup : ∀ {A} {eqb : A → _},
   equality eqb →
@@ -2458,6 +2573,8 @@ split. {
 }
 Qed.
 
+(* end no_dup *)
+
 Theorem option_eq_dec : ∀ A : Type,
   (∀ x y : A, {x = y} + {x ≠ y})
   → (∀ x y : option A, {x = y} + {x ≠ y}).
@@ -2518,6 +2635,20 @@ Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
 Proof. easy. Qed.
 
 (* end replace_at *)
+
+(* "to_radix_loop u r i" is the last u digits of i in base r
+   (in List.reverse) *)
+Fixpoint to_radix_loop it r i :=
+  match it with
+  | 0 => []
+  | S it' => i mod r :: to_radix_loop it' r (i / r)
+  end.
+
+Fixpoint to_radix_inv r l :=
+  match l with
+  | [] => 0
+  | d :: l' => d + r * to_radix_inv r l'
+  end.
 
 (* conversion natural into radix r as a list of digits; i must be
    less than r^r; always return r digits; e.g. radix 10 37 =
@@ -2698,11 +2829,83 @@ Definition insert_at A k (la : list A) e :=
 
 (* end insert_at *)
 
+Fixpoint list_compare {A} (compare : A → A → comparison) la lb :=
+  match la with
+  | [] =>
+      match lb with
+      | [] => Eq
+      | b :: lb' => Lt
+      end
+  | a :: la' =>
+      match lb with
+      | [] => Gt
+      | b :: lb' =>
+          match compare a b with
+          | Eq => list_compare compare la' lb'
+          | Lt => Lt
+          | Gt => Gt
+          end
+      end
+  end.
+
+(* list_leb *)
+
+Fixpoint list_leb {A} (leb : A → A → bool) la lb :=
+  match la with
+  | [] => true
+  | a :: la' =>
+      match lb with
+      | [] => false
+      | b :: lb' =>
+          if leb a b then
+            if leb b a then list_leb leb la' lb' else true
+          else false
+      end
+  end.
+
+(* end list_leb *)
+
+(* list_ltb *)
+
+Fixpoint list_ltb {A} (ltb : A → A → bool) la lb :=
+  match lb with
+  | [] => false
+  | b :: lb' =>
+      match la with
+      | [] => true
+      | a :: la' =>
+          if ltb a b then true
+          else if ltb b a then false
+          else list_ltb ltb la' lb'
+      end
+  end.
+
+(* end list_ltb *)
+
 Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
 Proof.
 intros.
 apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
+
+(* *)
+
+Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
+  match P with
+  | left _ _ => true
+  | right _ _ => false
+  end.
+
+Definition sumbool_or {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
+  orb (bool_of_sumbool P) (bool_of_sumbool Q).
+
+Definition sumbool_and {A B C D : Prop} (P : sumbool A B) (Q : sumbool C D) :=
+  andb (bool_of_sumbool P) (bool_of_sumbool Q).
+
+Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
+Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
+
+(* *)
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
 
