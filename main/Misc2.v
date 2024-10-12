@@ -2,13 +2,14 @@
 (* Theorems of general usage, which could be (or not) in Coq library *)
 (* Second file not used in ../trigo_without_pi *)
 
-Require Import Utf8 Arith (*Psatz*).
-Import List.ListNotations (*Init.Nat*).
-(*
+Require Import Utf8 Arith.
+Import List.ListNotations.
 Open Scope list.
-*)
 
 Require Import Misc1.
+
+Notation "x '∈' l" := (List.In x l) (at level 70).
+Notation "x '∉' l" := (¬ List.In x l) (at level 70).
 
 Definition AllLt l u := ∀ i, i ∈ l → i < u.
 
@@ -2882,6 +2883,8 @@ Fixpoint list_ltb {A} (ltb : A → A → bool) la lb :=
 
 (* end list_ltb *)
 
+Notation "n !" := (fact n) (at level 1, format "n !").
+
 Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
 Proof.
 intros.
@@ -2907,6 +2910,23 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 (* *)
 
+Notation "∃! x .. y , p" :=
+  (ex (unique (λ x, .. (ex (unique (λ y, p))) ..)))
+    (at level 200, x binder, right associativity)
+  : type_scope.
+
+Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
+
+Notation "E ⊂ F" := (List.incl E F) (at level 70).
+
+Notation "l .( i )" := (List.nth (i - 1) l 0) (at level 1, format "l .( i )").
+
+Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
+Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
+
+(* *)
+
+Global Hint Resolve Nat.lt_succ_diag_r : core.
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
 
 Arguments "<?" : simpl never.
