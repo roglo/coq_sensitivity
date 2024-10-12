@@ -543,49 +543,6 @@ destruct n; [ now apply IHla | ].
 now apply IHla.
 Qed.
 
-Theorem List_map2_nth2 : ∀ A B C a b c (f : A → B → C) la lb n,
-  (∀ b, f a b = c)
-  → (∀ a, f a b = c)
-  → List.nth n (List_map2 f la lb) c = f (List.nth n la a) (List.nth n lb b).
-Proof.
-intros * Hac Hbc.
-destruct (lt_dec n (length la)) as [Hla| Hla]. 2: {
-  apply Nat.nlt_ge in Hla.
-  rewrite (List.nth_overflow la); [ | easy ].
-  rewrite Hac.
-  revert n lb Hla.
-  induction la as [| a']; intros; [ now destruct n | cbn ].
-  destruct n; [ easy | ].
-  cbn in Hla; apply Nat.succ_le_mono in Hla.
-  destruct lb as [| b']; [ easy | cbn ].
-  now apply IHla.
-}
-destruct (lt_dec n (length lb)) as [Hlb| Hlb]. 2: {
-  apply Nat.nlt_ge in Hlb.
-  rewrite (List.nth_overflow lb); [ | easy ].
-  rewrite Hbc.
-  clear Hla.
-  revert n la Hlb.
-  induction lb as [| b']; intros. {
-    rewrite List_map2_nil_r.
-    now destruct n.
-  }
-  destruct n; [ easy | ].
-  cbn in Hlb; apply Nat.succ_le_mono in Hlb.
-  destruct la as [| a']; [ easy | cbn ].
-  now apply IHlb.
-}
-revert n lb Hla Hlb.
-induction la as [| a']; intros; [ easy | cbn ].
-destruct lb as [| b']; [ easy | cbn ].
-destruct n; [ easy | cbn ].
-cbn in Hla, Hlb.
-apply Nat.succ_lt_mono in Hla.
-apply Nat.succ_lt_mono in Hlb.
-destruct n; [ now apply IHla | ].
-now apply IHla.
-Qed.
-
 Theorem List_map2_map_l :
   ∀ A B C D (f : C → B → D) g (la : list A) (lb : list B),
   List_map2 f (List.map g la) lb = List_map2 (λ a b, f (g a) b) la lb.
@@ -750,20 +707,6 @@ f_equal.
 apply IHl1.
 Qed.
 
-Theorem List_map2_app_r :
-  ∀ (A B C : Type) (l1 l2 : list B) (l : list A) (f : A → B → C),
-    List_map2 f l (l1 ++ l2) =
-    List_map2 f (List.firstn (length l1) l) l1 ++
-      List_map2 f (List.skipn (length l1) l) l2.
-Proof.
-intros.
-revert l2 l.
-induction l1 as [| a1]; intros; [ easy | cbn ].
-destruct l as [| a]; [ now rewrite List_map2_nil_l | cbn ].
-f_equal.
-apply IHl1.
-Qed.
-
 Theorem List_map2_swap : ∀ A B C (f : A → B → C) la lb,
   List_map2 f la lb = List_map2 (λ a b, f b a) lb la.
 Proof.
@@ -773,15 +716,6 @@ induction la as [| a]; intros; cbn; [ symmetry; apply List_map2_nil_r | ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal.
 apply IHla.
-Qed.
-
-Theorem List_repeat_app_map2 : ∀ A (la lb : list A) n,
-  List.repeat (la ++ lb) n =
-    List_map2 (λ x y, app x y) (List.repeat la n) (List.repeat lb n).
-Proof.
-intros.
-induction n; [ easy | cbn ].
-f_equal; apply IHn.
 Qed.
 
 Theorem List_map2_rev_seq_r : ∀ A B (f : A → _ → B) la sta len,
@@ -1011,21 +945,6 @@ Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
 Proof.
 intros.
 apply Nat.mod_upper_bound, fact_neq_0.
-Qed.
-
-Theorem List_skipn_skipn : ∀ A i j (la : list A),
-  List.skipn i (List.skipn j la) = List.skipn (i + j) la.
-Proof.
-intros.
-revert j.
-induction la as [| a]; intros; cbn. {
-  now do 3 rewrite List.skipn_nil.
-}
-destruct j; [ now rewrite Nat.add_0_r | ].
-rewrite List.skipn_cons.
-rewrite <- Nat.add_succ_comm, Nat.add_succ_l.
-rewrite List.skipn_cons.
-apply IHla.
 Qed.
 
 Theorem List_skipn_is_cons : ∀ {A} (d : A) la n,
@@ -1852,27 +1771,6 @@ intros i lb Hi; apply List.in_seq in Hi.
 now rewrite List.length_map, List.length_seq.
 Qed.
 
-Theorem List_eq_firstn_nil : ∀ A n (l : list A),
-  List.firstn n l = [] → n = 0 ∨ l = [].
-Proof.
-intros * Hnl.
-revert l Hnl.
-induction n; intros; [ now left | right ].
-destruct l as [| x]; [ easy | easy ].
-Qed.
-
-Theorem List_eq_skipn_nil:
-  ∀ A n (l : list A), List.skipn n l = [] → length l ≤ n.
-Proof.
-intros * Hnl.
-revert l Hnl.
-induction n; intros; [ now cbn in Hnl; subst l | ].
-destruct l as [| x]; [ easy | ].
-cbn in Hnl |-*.
-apply -> Nat.succ_le_mono.
-now apply IHn.
-Qed.
-
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), List.rev l = [] → l = [].
 Proof.
 intros * Hl.
@@ -2075,20 +1973,6 @@ Qed.
 Theorem List_last_cons_cons : ∀ A l (x y d : A),
   List.last (x :: y :: l) d = List.last (y :: l) d.
 Proof. easy. Qed.
-
-Theorem List_firstn_seq : ∀ n start len,
-  List.firstn n (List.seq start len) = List.seq start (min n len).
-Proof.
-intros.
-revert start len.
-induction n; intros; [ easy | cbn ].
-remember (List.seq start len) as l eqn:Hl; symmetry in Hl.
-destruct l as [| a l]; [ now destruct len | ].
-destruct len; [ easy | cbn in Hl; cbn ].
-injection Hl; clear Hl; intros Hl Ha.
-subst start; f_equal.
-rewrite <- Hl; apply IHn.
-Qed.
 
 Theorem List_skipn_seq :
   ∀ n start len,

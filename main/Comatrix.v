@@ -1819,41 +1819,6 @@ intros; cbn.
 now rewrite List.length_map.
 Qed.
 
-(*
-Theorem firstn_map2 : ∀ A B C (f : A → B → C) la lb i,
-  firstn i (List.map2 f la lb) = map2 f (firstn i la) (firstn i lb).
-Proof.
-intros.
-revert i lb.
-induction la as [| a]; intros; cbn. {
-  now do 2 rewrite firstn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite firstn_nil.
-  now rewrite map2_nil_r.
-}
-destruct i; [ easy | cbn; f_equal ].
-apply IHla.
-Qed.
-*)
-
-Theorem List_butn_map2 : ∀ A B C (f : A → B → C) la lb i,
-  List_butn i (List_map2 f la lb) =
-    List_map2 f (List_butn i la) (List_butn i lb).
-Proof.
-intros.
-revert i lb.
-induction la as [| a]; intros; cbn. {
-  now do 2 rewrite List_butn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite List_butn_nil.
-  now rewrite List_map2_nil_r.
-}
-destruct i; [ easy | cbn; f_equal ].
-apply IHla.
-Qed.
-
 Theorem det_mat_repl_vect :
   rngl_has_1 T = true →
   rngl_has_opp T = true →

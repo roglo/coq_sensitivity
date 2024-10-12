@@ -92,11 +92,6 @@ Qed.
 Definition I_subt (a b : ideal P) : ideal P :=
   mk_I (rngl_subt (i_val a) (i_val b)) (I_subt_prop a b).
 
-(* computable equality eqb *)
-
-Definition I_eqb (eqb : T → T → bool) (a b : ideal P) : bool :=
-  eqb (i_val a) (i_val b).
-
 (* less equal *)
 
 Definition I_opt_leb : option (ideal P → ideal P → bool) :=
@@ -622,33 +617,6 @@ destruct rngl_opt_leb as [le| ]. {
 }
 now specialize (H2 Hab).
 Qed.
-
-(*
-Theorem I_opt_eqb_eq : let roi := I_ring_like_op in
-  if rngl_has_eq_dec (ideal P) then ∀ a b : ideal P, (a =? b)%L = true ↔ a = b
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_has_eq_dec (ideal P)) as ebi eqn:Hebi; symmetry in Hebi.
-destruct ebi; [ | easy ].
-intros.
-split; intros Hab. {
-  apply eq_ideal_eq.
-  progress unfold rngl_eqb in Hab.
-  cbn in Hab.
-  destruct I_opt_eq_dec as [I_eq_dec| ]; [ | easy ].
-  destruct (I_eq_dec a b); [ now subst b | easy ].
-} {
-  apply eq_ideal_eq in Hab.
-  progress unfold rngl_eqb.
-  progress unfold rngl_has_eq_dec in Hebi; cbn in Hebi.
-  progress unfold roi; cbn.
-  destruct I_opt_eq_dec as [I_eq_dec| ]; [ | easy ].
-  destruct (I_eq_dec a b) as [H1| H1]; [ easy | ].
-  now apply eq_ideal_eq in Hab.
-}
-Qed.
-*)
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
   if rngl_is_integral_domain T then
