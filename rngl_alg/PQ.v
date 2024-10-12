@@ -96,21 +96,6 @@ Definition PQ_of_decimal_int (n : Decimal.int) : option PQ :=
   | Decimal.Neg ui => None
   end.
 
-Definition PQ_to_decimal_uint (pq : PQ) : option Decimal.uint :=
-  match nn (PQden1 pq) with
-  | 0 => Some (Nat.to_uint (nn (PQnum1 pq) + 1))
-  | _ => None
-  end.
-
-Definition PQ_to_decimal_int (pq : PQ) : option Decimal.int :=
-  option_map Decimal.Pos (PQ_to_decimal_uint pq).
-
-(* deprecated since 8.12
-Numeral Notation PQ PQ_of_decimal_int PQ_to_decimal_uint : PQ_scope.
-*)
-
-(* since 8.12 *)
-
 Definition PQ_of_numeral_int (n : Number.int) : option PQ :=
   match n with
   | Number.IntDecimal n => PQ_of_decimal_int n
@@ -124,8 +109,6 @@ Definition PQ_to_numeral_uint (pq : PQ) : option Number.uint :=
   end.
 
 Number Notation PQ PQ_of_numeral_int PQ_to_numeral_uint : PQ_scope.
-
-(* end 8.12 *)
 
 (* *)
 
@@ -533,24 +516,6 @@ PQtac1; repeat PQtac2; PQtac3.
 apply Nat.mul_shuffle0.
 Qed.
 
-Theorem PQle_antisymm_eq : ∀ x y,
-  (x ≤ y)%PQ → (y ≤ x)%PQ → (x * PQone y = y * PQone x)%PQ.
-Proof.
-intros x y Hxy Hyx.
-progress unfold PQone, "*"%PQ; simpl.
-progress unfold PQmul_num1, PQmul_den1; simpl.
-specialize (Nat.le_antisymm _ _ Hxy Hyx) as H.
-progress unfold nd in H; rewrite H.
-f_equal.
-now rewrite Nat.mul_comm.
-Qed.
-
-Theorem PQle_antisymm : ∀ x y, (x ≤ y)%PQ → (y ≤ x)%PQ → (x == y)%PQ.
-Proof.
-intros * Hxy Hyx.
-apply (Nat.le_antisymm _ _ Hxy Hyx).
-Qed.
-
 Theorem PQadd_comm : ∀ x y, (x + y)%PQ = (y + x)%PQ.
 Proof.
 intros.
@@ -745,15 +710,6 @@ setoid_rewrite PQadd_comm.
 apply PQadd_le_mono_r.
 Qed.
 
-Theorem PQadd_le_mono : ∀ x y z t,
-  (x ≤ y)%PQ → (z ≤ t)%PQ → (x + z ≤ y + t)%PQ.
-Proof.
-intros * Hxy Hzt.
-apply (PQle_trans _ (y + z)%PQ).
--now apply PQadd_le_mono_r.
--now apply PQadd_le_mono_l.
-Qed.
-
 Theorem PQsub_add_eq : ∀ x y,
   (y < x)%PQ → (x - y + y = x * PQone y * PQone y)%PQ.
 Proof.
@@ -776,42 +732,6 @@ Proof.
 intros x y Hxy.
 rewrite PQsub_add_eq; [ | easy ].
 now do 2 rewrite PQmul_one_r.
-Qed.
-
-Theorem PQsub_le_mono_r : ∀ x y z,
-  (z < x)%PQ → (z < y)%PQ → (x ≤ y ↔ x - z ≤ y - z)%PQ.
-Proof.
-intros * Hzx Hzy.
-split.
--intros Hxy.
- revert Hzx Hxy Hzy.
- progress unfold "≤"%PQ, "<"%PQ, "-"%PQ, PQsub_num1, PQadd_den1, nd; simpl.
- do 10 rewrite Nat.add_1_r.
- intros.
- rewrite <- Nat.sub_succ_l; [ | flia Hzx ].
- rewrite Nat_sub_succ_1.
- rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat_sub_succ_1.
- rewrite <- Nat.sub_succ_l; [ | flia Hzy ].
- rewrite Nat_sub_succ_1.
- rewrite <- Nat.sub_succ_l; [ | simpl; flia ].
- rewrite Nat_sub_succ_1.
- remember (S (nn (PQnum1 x))) as xn eqn:Hxn.
- remember (S (nn (PQden1 x))) as xd eqn:Hxd.
- remember (S (nn (PQnum1 y))) as yn eqn:Hyn.
- remember (S (nn (PQden1 y))) as yd eqn:Hyd.
- remember (S (nn (PQnum1 z))) as zn eqn:Hzn.
- remember (S (nn (PQden1 z))) as zd eqn:Hzd.
- do 2 rewrite Nat.mul_sub_distr_r.
- replace (zn * yd * (xd * zd)) with (zn * xd * (yd * zd)) by flia.
- replace (xn * zd * (yd * zd)) with (xn * yd * (zd * zd)) by flia.
- replace (yn * zd * (xd * zd)) with (yn * xd * (zd * zd)) by flia.
- apply Nat.sub_le_mono_r.
- now apply Nat.mul_le_mono_r.
--intros Hxyz.
- apply (PQadd_le_mono_r _ _ z) in Hxyz.
- rewrite PQsub_add in Hxyz; [ | easy ].
- now rewrite PQsub_add in Hxyz.
 Qed.
 
 Theorem PQsub_le_mono_l : ∀ x y z,
@@ -851,17 +771,6 @@ split.
  rewrite PQadd_add_swap in Hxyz.
  rewrite PQsub_add in Hxyz; [ | easy ].
  now apply PQadd_le_mono_l in Hxyz.
-Qed.
-
-Theorem PQsub_le_mono : ∀ x y z t,
-  (y < x)%PQ → (t < z)%PQ → (x ≤ z)%PQ → (t ≤ y)%PQ → (x - y ≤ z - t)%PQ.
-Proof.
-intros * Hyx Htz Hxz Hty.
-eapply (PQle_trans _ (z - y)).
--apply PQsub_le_mono_r; [ easy | | easy ].
- eapply PQlt_le_trans; [ apply Hyx | apply Hxz ].
--apply PQsub_le_mono_l; [ | easy | easy ].
- eapply PQlt_le_trans; [ apply Hyx | apply Hxz ].
 Qed.
 
 Theorem PQadd_no_neutral : ∀ x y, (y + x ≠≠ x)%PQ.
@@ -977,14 +886,6 @@ revert Hyx; PQtac1; intros.
 repeat PQtac2; PQtac3; [ f_equal; f_equal; flia | flia Hyx | simpl; flia ].
 Qed.
 
-Theorem PQsub_sub_swap : ∀ x y z,
-  (y < x)%PQ → (z < x)%PQ → (x - y - z)%PQ = (x - z - y)%PQ.
-Proof.
-intros * Hyx Hzx.
-rewrite <- PQsub_add_distr; [ | easy ].
-rewrite <- PQsub_add_distr; [ now rewrite PQadd_comm | easy ].
-Qed.
-
 Theorem PQsub_sub_distr : ∀ x y z,
   (z < y)%PQ → (y - z < x)%PQ → (x - (y - z))%PQ = (x + z - y)%PQ.
 Proof.
@@ -1017,21 +918,6 @@ rewrite Nat.add_sub_assoc.
 -f_equal; f_equal; [ f_equal; apply Nat.mul_shuffle0 | ].
  apply Nat.mul_shuffle0.
 -now apply Nat.mul_le_mono_r, Nat.lt_le_incl.
-Qed.
-
-Theorem PQadd_sub_swap : ∀ x y z, (z < x)%PQ → (x + y - z = x - z + y)%PQ.
-Proof.
-intros * Hzx.
-revert Hzx; PQtac1; intros.
-repeat PQtac2; [ | flia Hzx | simpl; flia ].
-PQtac3.
-f_equal; [ f_equal | now rewrite Nat.mul_shuffle0 ].
-rewrite Nat.add_sub_swap.
--f_equal; f_equal; f_equal; apply Nat.mul_shuffle0.
--setoid_rewrite Nat.mul_shuffle0.
- rewrite Nat.mul_shuffle0.
- apply Nat.mul_le_mono_pos_r; [ apply Nat.lt_0_succ | ].
- now apply Nat.lt_le_incl.
 Qed.
 
 Theorem PQadd_cancel_l_eq : ∀ x y z,
@@ -1067,51 +953,6 @@ simpl in H2; simpl; do 2 rewrite Nat.sub_0_r in H2.
 now rewrite H2.
 Qed.
 
-(* mouais, chais pas si PQadd_cancel_l ci-dessus est très convainquant ;
-   est-ce une bonne idée de passer par PQadd_cancel_l_eq ?
-   du coup, chais pas, mais je ne le fais pas pour PQadd_cancel_r
-   ci-dessous *)
-
-Theorem PQadd_cancel_r : ∀ x y z, (x + z == y + z ↔ x == y)%PQ.
-Proof.
-intros.
-setoid_rewrite PQadd_comm.
-apply PQadd_cancel_l.
-Qed.
-
-Theorem PQsub_cancel_l : ∀ x y z,
-  (y < x)%PQ → (z < x)%PQ → (x - y == x - z)%PQ ↔ (y == z)%PQ.
-Proof.
-intros * Hyx Hzx.
-split; intros H.
--apply (PQadd_cancel_r _ _ z) in H.
- rewrite PQsub_add in H; [ | easy ].
- apply (PQadd_cancel_r _ _ (x - y)).
- setoid_rewrite PQadd_comm.
- rewrite PQsub_add; [ | easy ].
- now symmetry.
--apply (PQadd_cancel_r _ _ z).
- rewrite PQsub_add; [ | easy ].
- apply (PQadd_cancel_r _ _ (x - y)) in H.
- setoid_rewrite PQadd_comm in H.
- rewrite PQsub_add in H; [ | easy ].
- now symmetry.
-Qed.
-
-Theorem PQsub_cancel_r : ∀ x y z,
-  (z < x)%PQ → (z < y)%PQ → (x - z == y - z)%PQ ↔ (x == y)%PQ.
-Proof.
-intros * Hzx Hzy.
-split; intros H.
--apply (PQadd_cancel_l _ _ z) in H.
- setoid_rewrite PQadd_comm in H.
- rewrite PQsub_add in H; [ | easy ].
- now rewrite PQsub_add in H.
--apply (PQadd_cancel_r _ _ z).
- rewrite PQsub_add; [ | easy ].
- now rewrite PQsub_add.
-Qed.
-
 Theorem PQmul_comm : ∀ x y, (x * y = y * x)%PQ.
 Proof.
 intros.
@@ -1127,14 +968,6 @@ progress unfold "*"%PQ.
 progress unfold PQmul_num1, PQmul_den1; simpl.
 do 2 rewrite Nat.add_0_r, Nat.add_sub.
 now destruct a, PQnum2, PQden2.
-Qed.
-
-Theorem PQmul_assoc : ∀ x y z, (x * (y * z) = (x * y) * z)%PQ.
-intros.
-progress unfold "*"%PQ; simpl.
-progress unfold PQmul_num1, PQmul_den1; simpl; PQtac1; repeat PQtac2; f_equal.
--now rewrite Nat.mul_assoc.
--now rewrite Nat.mul_assoc.
 Qed.
 
 Theorem PQmul_mul_swap : ∀ x y z, (x * y * z = x * z * y)%PQ.
@@ -1180,13 +1013,6 @@ split; intros Hxy.
  do 2 rewrite <- Nat.mul_assoc in Hxy.
  apply Nat.mul_le_mono_pos_l in Hxy; [ | flia ].
  easy.
-Qed.
-
-Theorem PQmul_le_mono_r : ∀ x y z, (x ≤ y ↔ x * z ≤ y * z)%PQ.
-Proof.
-intros *.
-setoid_rewrite PQmul_comm.
-now apply PQmul_le_mono_l.
 Qed.
 
 Theorem PQmul_add_distr_l_eq : ∀ x y z,
@@ -1263,9 +1089,6 @@ simpl in H2; simpl; do 2 rewrite Nat.sub_0_r in H2.
 now rewrite H2.
 Qed.
 
-Theorem PQinv_involutive : ∀ x, (¹/ ¹/ x = x)%PQ.
-Proof. intros. progress unfold PQinv; now destruct x. Qed.
-
 (* *)
 
 Ltac PQcompare_iff :=
@@ -1274,13 +1097,6 @@ Ltac PQcompare_iff :=
   | [ H : PQcompare _ _ = Lt |- _ ] => apply PQcompare_lt_iff in H
   | [ H : PQcompare _ _ = Gt |- _ ] => apply PQcompare_gt_iff in H
   end.
-
-Theorem PQcompare_refl : ∀ x, PQcompare x x = Eq.
-Proof.
-intros.
-remember (PQcompare x x) as c eqn:Hc; symmetry in Hc.
-now destruct c; [ easy | | ]; PQcompare_iff; apply PQlt_irrefl in Hc.
-Qed.
 
 Theorem PQmul_lt_cancel_l : ∀ x y z, (x * y < x * z)%PQ ↔ (y < z)%PQ.
 Proof.
@@ -1348,60 +1164,6 @@ apply (Nat.mul_cancel_l _ _ g2); [ now destruct g2 | ].
 rewrite Nat.mul_assoc, <- Hyd, Nat.mul_comm.
 rewrite Hxy, Hyn, Hxd.
 flia.
-Qed.
-
-(*
-Definition PQH x := PQmake (PQnum1 x + 1) (PQden1 x + 1).
-Definition PQF a b := PQmake (a - 1) (b - 1).
-
-Compute (PQH (PQred (PQF 16 24))).
-Compute (PQH (PQred (PQF 2 3))).
-*)
-
-Theorem PQred_idemp : ∀ x, PQred (PQred x) = PQred x.
-Proof.
-intros (xn, xd).
-progress unfold PQred; simpl.
-remember (ggcd (nn xn + 1) (nn xd + 1)) as g eqn:Hg1.
-destruct g as (g1, (aa1, bb1)); simpl.
-assert (Haa1 : aa1 ≠ 0). {
-  intros H; subst aa1.
-  specialize (ggcd_succ_l_neq_0 (nn xn) (nn xd + 1)) as H.
-  now rewrite <- Nat.add_1_r, <- Hg1 in H.
-}
-assert (Hbb1 : bb1 ≠ 0). {
-  intros H; subst bb1.
-  symmetry in Hg1.
-  apply ggcd_swap in Hg1.
-  specialize (ggcd_succ_l_neq_0 (nn xd) (nn xn + 1)) as H.
-  now rewrite <- Nat.add_1_r, Hg1 in H.
-}
-rewrite Nat.sub_add; [ | flia Haa1 ].
-rewrite Nat.sub_add; [ | flia Hbb1 ].
-specialize (ggcd_correct_divisors (nn xn + 1) (nn xd + 1)) as H1.
-rewrite <- Hg1 in H1.
-destruct H1 as (H1, H2).
-remember (ggcd aa1 bb1) as g eqn:Hg2.
-destruct g as (g2, (aa2, bb2)); simpl.
-specialize (ggcd_correct_divisors aa1 bb1) as H3.
-rewrite <- Hg2 in H3.
-destruct H3 as (H3, H4).
-move H1 before H3; move H2 before H3.
-rewrite H3, Nat.mul_assoc in H1.
-rewrite H4, Nat.mul_assoc in H2.
-rewrite H1, H2 in Hg1.
-remember (g1 * g2) as g eqn:Hg.
-specialize (ggcd_gcd (g * aa2) (g * bb2)) as H.
-rewrite <- Hg1 in H; simpl in H.
-rewrite Nat.gcd_mul_mono_l in H.
-rewrite Hg in H; symmetry in H.
-rewrite <- Nat.mul_1_r, <- Nat.mul_assoc in H.
-apply Nat.mul_cancel_l in H.
--apply Nat.eq_mul_1 in H.
- destruct H as (HH, H); subst g2.
- now rewrite Nat.mul_1_l in H3, H4; subst bb1 aa1.
--intros H5; subst g1; simpl in Hg; subst g.
- now rewrite Nat.add_1_r in H1.
 Qed.
 
 Theorem PQred_add_mul_one_l :
@@ -1530,12 +1292,6 @@ Proof. intros; now rewrite PQred_eq. Qed.
 
 Theorem PQred_lt : ∀ x y, (x < y)%PQ ↔ (PQred x < PQred y)%PQ.
 Proof. intros; now do 2 rewrite PQred_eq. Qed.
-
-Theorem PQred_le_l : ∀ x y, (x ≤ y)%PQ ↔ (PQred x ≤ y)%PQ.
-Proof. intros; now rewrite PQred_eq. Qed.
-
-Theorem PQred_le_r : ∀ x y, (x ≤ y)%PQ → (x ≤ PQred y)%PQ.
-Proof. intros; now rewrite PQred_eq. Qed.
 
 Theorem PQred_le : ∀ x y, (x ≤ y)%PQ ↔ (PQred x ≤ PQred y)%PQ.
 Proof. intros; now do 2 rewrite PQred_eq. Qed.
