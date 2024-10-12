@@ -1557,6 +1557,12 @@ rewrite iter_list_cons; cycle 1.
 now cbn; rewrite IHl1.
 Qed.
 
+Theorem equality_refl {A} {eqb : A → _} : equality eqb → ∀ a, eqb a a = true.
+Proof.
+intros * Heqb *.
+now apply Heqb.
+Qed.
+
 Theorem equality_in_dec :
   ∀ {A} {eqb : A → _} (Heqb : equality eqb) (a : A) la,
   { a ∈ la } + { a ∉ la }.
@@ -2454,6 +2460,15 @@ Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
   replace_at (S i) (a :: l) b = a :: replace_at i l b.
 Proof. easy. Qed.
 
+Theorem to_radix_inv_to_radix : ∀ n k,
+  k < n ^ n → to_radix_inv n (to_radix n k) = k.
+Proof.
+intros * Hkn.
+progress unfold to_radix.
+rewrite to_radix_inv_to_radix_loop.
+now apply Nat.mod_small.
+Qed.
+
 Theorem to_radix_inj : ∀ n i j,
   i < n ^ n
   → j < n ^ n
@@ -2465,6 +2480,23 @@ apply (f_equal (to_radix_inv n)) in Hij.
 rewrite to_radix_inv_to_radix in Hij; [ | easy ].
 rewrite to_radix_inv_to_radix in Hij; [ | easy ].
 easy.
+Qed.
+
+Theorem Nat_lt_lt_add_mul : ∀ a b c n, a < b → c < n → c + n * a < n * b.
+Proof.
+intros * Hab Hcn.
+revert a b c Hab Hcn.
+induction n; intros; [ easy | cbn ].
+destruct c. {
+  cbn.
+  apply Nat.add_lt_le_mono; [ easy | ].
+  now apply Nat.mul_le_mono_l, Nat.lt_le_incl.
+}
+apply Nat.succ_lt_mono in Hcn.
+specialize (IHn a b c Hab Hcn).
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm.
+apply Nat.add_lt_le_mono; [ easy | ].
+apply IHn.
 Qed.
 
 Theorem to_radix_inv_ub : ∀ n l,
@@ -2488,6 +2520,13 @@ specialize (H2 H); clear H.
 now apply Nat_lt_lt_add_mul.
 Qed.
 
+Theorem to_radix_loop_length : ∀ n l it, length (to_radix_loop it n l) = it.
+Proof.
+intros.
+revert n l.
+induction it; intros; cbn; [ easy | f_equal; apply IHit ].
+Qed.
+
 Theorem to_radix_length : ∀ n l, length (to_radix n l) = n.
 Proof.
 intros.
@@ -2496,6 +2535,45 @@ apply to_radix_loop_length.
 Qed.
 
 Definition to_radix_list r := List.map (to_radix r) (List.seq 0 (r ^ r)).
+
+Theorem to_radix_loop_to_radix_inv : ∀ l d n it,
+  length l + d = n
+  → (∀ i, i ∈ l → i < n)
+  → n ≤ it + d
+  → to_radix_loop it n (to_radix_inv n l) = l ++ List.repeat 0 (it + d - n).
+Proof.
+intros * Hlen Hl Hit.
+revert d n it Hlen Hl Hit.
+induction l as [| a]; intros. {
+  cbn - [ "-" ].
+  cbn in Hlen; subst d.
+  clear Hl Hit.
+  rewrite Nat.add_sub.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n; cbn.
+    induction it; cbn; [ easy | now cbn; f_equal ].
+  }
+  induction it; [ easy | cbn ].
+  rewrite Nat.mod_small; [ | flia Hnz ].
+  rewrite Nat.div_small; [ | flia Hnz ].
+  now f_equal.
+}
+cbn - [ "-" ].
+destruct it; [ cbn in Hlen; flia Hlen Hit | ].
+cbn - [ "-" ].
+f_equal. {
+  rewrite Nat.mul_comm, Nat.Div0.mod_add.
+  now apply Nat.mod_small, Hl; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
+rewrite Nat.div_small; [ | now apply Hl; left ].
+rewrite Nat.add_0_l.
+cbn in Hlen, Hit.
+rewrite <- Nat.add_succ_r in Hlen, Hit |-*.
+apply IHl; [ easy | | easy ].
+intros i Hi.
+now apply Hl; right.
+Qed.
 
 Theorem to_radix_to_radix_inv : ∀ n l,
   length l = n
@@ -2509,6 +2587,16 @@ specialize (H1 l 0 n n).
 do 2 rewrite Nat.add_0_r in H1.
 specialize (H1 Hlen Hl (Nat.le_refl _)).
 now rewrite Nat.sub_diag, List.app_nil_r in H1.
+Qed.
+
+Theorem to_radix_loop_ub : ∀ it n k i,
+  n ≠ 0 → List.nth i (to_radix_loop it n k) 0 < n.
+Proof.
+intros * Hnz.
+revert n k i Hnz.
+induction it; intros; [ destruct i; cbn; flia Hnz | cbn ].
+destruct i; [ now apply Nat.mod_upper_bound | ].
+now apply IHit.
 Qed.
 
 Theorem to_radix_ub : ∀ n k i, n ≠ 0 → List.nth i (to_radix n k) 0 < n.
