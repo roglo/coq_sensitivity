@@ -1109,13 +1109,6 @@ rewrite Hnt in H1.
 now apply angle_le_0_r in H1.
 Qed.
 
-Theorem angle_not_neg : ∀ θ, ¬ (θ < 0)%A.
-Proof.
-intros.
-apply angle_nlt_ge.
-apply angle_nonneg.
-Qed.
-
 Theorem rngl_leb_0_sqrt :
   ∀ a, (0 ≤ a)%L → (0 ≤? √a)%L = true.
 Proof.

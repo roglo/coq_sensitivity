@@ -1279,16 +1279,6 @@ Qed.
 Notation "⌊ a / b ⌋" := (div a b).
 *)
 
-Theorem angle_div_2_add_overflow :
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = true
-  → ((θ1 + θ2) /₂)%A = (θ1 /₂ + θ2 /₂ + angle_straight)%A.
-Proof.
-intros * Haov.
-rewrite angle_div_2_add.
-now rewrite Haov.
-Qed.
-
 Theorem one_sub_squ_cos_add_squ_sin :
   ∀ θ, ((1 - rngl_cos θ)² + (rngl_sin θ)² = 2 * (1 - rngl_cos θ))%L.
 Proof.
@@ -2162,38 +2152,6 @@ destruct un; [ | now exists n ].
 now apply IHn.
 Qed.
 
-Theorem angle_mul_nat_overflow_true_after :
-  ∀ m n θ,
-  m ≤ n
-  → angle_mul_nat_overflow m θ = true
-  → angle_mul_nat_overflow n θ = true.
-Proof.
-destruct_ac.
-intros * Hmn Hm.
-destruct (Nat.eq_dec m n) as [H1| H1]; [ now subst m | ].
-assert (H : m < n) by flia Hmn H1.
-clear Hmn H1; rename H into Hmn.
-revert m Hmn Hm.
-induction n; intros; [ easy | ].
-destruct m; [ easy | ].
-apply Nat.succ_le_mono in Hmn.
-apply angle_mul_nat_overflow_succ_l_true in Hm.
-apply angle_mul_nat_overflow_succ_l_true.
-destruct Hm as [Hm| Hm]. {
-  left.
-  now apply (IHn m).
-}
-left.
-destruct (Nat.eq_dec (S m) n) as [Hsmn| Hsmn]. 2: {
-  apply (IHn (S m)); [ flia Hmn Hsmn | ].
-  apply angle_mul_nat_overflow_succ_l_true.
-  now right.
-}
-subst n.
-apply angle_mul_nat_overflow_succ_l_true.
-now right.
-Qed.
-
 Theorem angle_all_add_not_overflow :
   ∀ n θ,
   (∀ m, m < n → angle_add_overflow θ (m * θ) = false)
@@ -2233,18 +2191,6 @@ rewrite Hzs.
 rewrite (rngl_mul_1_l Hon).
 apply rl_sqrt_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
-Qed.
-
-Theorem angle_right_neq_0 :
-  rngl_characteristic T ≠ 1
-  → angle_right ≠ 0%A.
-Proof.
-destruct_ac.
-intros Hc1 Hrz.
-apply eq_angle_eq in Hrz.
-cbn in Hrz.
-injection Hrz; clear Hrz; intros H1 H2.
-now apply (rngl_1_eq_0_iff Hon Hos) in H1.
 Qed.
 
 Theorem rngl_cos_div_pow_2_decr :
@@ -2316,16 +2262,6 @@ rewrite Hzs.
 apply (rngl_lt_le_incl Hor).
 rewrite (rngl_mul_1_l Hon).
 now apply (rngl_cos_lt_sqrt_1_add_cos_div_2 Hc1).
-Qed.
-
-Theorem angle_right_nonneg : (0 ≤ angle_right)%A.
-Proof.
-destruct_ac.
-intros.
-progress unfold angle_leb.
-cbn.
-rewrite (rngl_leb_refl Hor).
-now destruct (0 ≤? 1)%L.
 Qed.
 
 Theorem eq_angle_mul_0 :
