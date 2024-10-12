@@ -293,12 +293,6 @@ Fixpoint List_map2 {A B C} (f : A → B → C) la lb :=
       end
   end.
 
-Theorem List_map2_nil_r : ∀ A B C (f : A → B → C) la, List_map2 f la [] = [].
-Proof.
-intros.
-now destruct la.
-Qed.
-
 (* end List_map2 *)
 
 Theorem min_add_sub_max : ∀ a b, min (a + (b - a)) (b + (a - b)) = max a b.

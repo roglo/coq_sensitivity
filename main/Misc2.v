@@ -497,6 +497,12 @@ destruct n; [ now apply IHla | ].
 now apply IHla.
 Qed.
 
+Theorem List_map2_nil_r : ∀ A B C (f : A → B → C) la, List_map2 f la [] = [].
+Proof.
+intros.
+now destruct la.
+Qed.
+
 Theorem List_map2_swap : ∀ A B C (f : A → B → C) la lb,
   List_map2 f la lb = List_map2 (λ a b, f b a) lb la.
 Proof.
