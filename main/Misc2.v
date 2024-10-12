@@ -485,6 +485,10 @@ intros i Hi.
 now rewrite Nat.add_succ_comm.
 Qed.
 
+Theorem List_nth_succ_cons : ∀ {A} (a : A) la i,
+  List.nth (S i) (a :: la) = List.nth i la.
+Proof. easy. Qed.
+
 Theorem List_map2_map_min :
   ∀ {A B C} ad bd la lb (f : A → B → C),
   List_map2 f la lb =
@@ -1152,6 +1156,21 @@ Theorem iter_list_empty : ∀ T A d (op : T → T → T) (l : list A) g,
   → iter_list l (λ c i, op c (g i)) d = d.
 Proof.
 now intros * Hl; subst l.
+Qed.
+
+Theorem fold_left_op_fun_from_d : ∀ {T A} d op a l (f : A → _)
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  List.fold_left (λ (c : T) i, op c (f i)) l a =
+  op a (List.fold_left (λ (c : T) i, op c (f i)) l d).
+Proof.
+intros.
+revert a.
+induction l as [| x l]; intros; [ symmetry; apply op_d_r | cbn ].
+rewrite IHl; symmetry; rewrite IHl.
+rewrite op_d_l.
+apply op_assoc.
 Qed.
 
 Theorem iter_list_cons : ∀ A B d op (a : B) la f
@@ -2266,6 +2285,64 @@ destruct (le_dec a b) as [Hab| Hab]. {
   rewrite (proj2 (Nat.sub_0_le _ _) Hab).
   rewrite Nat.add_0_r, Nat.min_id; symmetry.
   now apply Nat.max_r.
+}
+Qed.
+
+Theorem member_false_iff : ∀ {A} {eqb : A → _},
+  equality eqb →
+  ∀ a la, member eqb a la = false ↔ ∀ b, b ∈ la → a ≠ b.
+Proof.
+intros * Heqb *.
+split. {
+  intros Hma * Hb Hab; subst b.
+  induction la as [| b]; [ easy | ].
+  cbn in Hma.
+  destruct Hb as [Hb| Hb]. {
+    subst b.
+    now rewrite (equality_refl Heqb) in Hma.
+  }
+  apply IHla; [ | easy ].
+  now destruct (eqb a b).
+} {
+  intros Hla.
+  induction la as [| b]; [ easy | cbn ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Heqb in Hab; subst b.
+    now specialize (Hla _ (or_introl eq_refl)).
+  }
+  apply IHla.
+  intros c Hc.
+  now apply Hla; right.
+}
+Qed.
+
+Theorem member_true_iff : ∀ {A} {eqb : A → _},
+  equality eqb →
+  ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
+Proof.
+intros * Heqb *.
+split. {
+  intros Hma.
+  induction la as [| b]; [ easy | cbn in Hma ].
+  remember (member eqb a la) as mal eqn:Hmal; symmetry in Hmal.
+  destruct mal. {
+    specialize (IHla eq_refl).
+    destruct IHla as (l1 & l2 & Hla).
+    subst la.
+    now exists (b :: l1), l2.
+  }
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  apply Heqb in Hab; subst b.
+  now exists [], la.
+} {
+  intros (l1 & l2 & Hla).
+  subst la.
+  induction l1 as [| b]; cbn. {
+    now rewrite (equality_refl Heqb).
+  }
+  now destruct (eqb a b).
 }
 Qed.
 
