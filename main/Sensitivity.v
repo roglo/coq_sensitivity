@@ -166,9 +166,6 @@ Definition count_upto_n_to_n n :=
 Compute (count_upto_n_to_n 3).
 *)
 
-Definition cons_nth {A} i (a : A) ll :=
-  List.firstn i ll ++  (a :: List.nth i ll []) :: List.skipn (i + 1) ll.
-
 Definition is_nil {A} (l : list A) :=
   match l with
   | [] => true

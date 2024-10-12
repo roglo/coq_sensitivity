@@ -334,9 +334,6 @@ intros * Ht Hf.
 now destruct u; [ apply Ht | apply Hf ].
 Qed.
 
-Theorem binomial_0_r : ∀ n, binomial n 0 = 1.
-Proof. now intros; destruct n. Qed.
-
 Theorem binomial_succ_l :
   ∀ n k,
   binomial (S n) k =

@@ -1188,14 +1188,6 @@ destruct (le_dec (j / n!) _) as [H2| H2]. {
 destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
 
-Theorem canon_sym_gr_inv_list_length : ∀ n i,
-  List.length (canon_sym_gr_inv_list n i) = n.
-Proof.
-intros.
-unfold canon_sym_gr_inv_list.
-apply List_length_map_seq.
-Qed.
-
 Theorem in_canon_sym_gr_list : ∀ n k i,
   k < n! → i ∈ canon_sym_gr_list n k → i < n.
 Proof.

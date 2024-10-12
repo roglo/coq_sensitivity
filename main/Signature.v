@@ -2089,59 +2089,6 @@ Qed.
 
 (* *)
 
-Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
-  σ = canon_sym_gr_list (S n) k
-  → σ' = canon_sym_gr_list n (k mod n!)
-  → ∀ i,
-    List.nth i σ 0 =
-    match i with
-    | 0 => k / n!
-    | S i' =>
-        if ((k <? n!) && (n <=? i'))%bool then 0
-        else succ_when_ge (k / n!) (List.nth i' σ' 0)
-    end.
-Proof.
-intros * Hσ Hσ' i.
-destruct i; [ now subst σ | ].
-subst σ; cbn - [ "<=?" ].
-remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
-symmetry in Hb.
-destruct b. {
-  apply Bool.andb_true_iff in Hb.
-  destruct Hb as (Hkn, Hni).
-  apply Nat.ltb_lt in Hkn.
-  apply Nat.leb_le in Hni.
-  rewrite List.nth_overflow; [ easy | ].
-  rewrite List.length_map.
-  now rewrite canon_sym_gr_list_length.
-}
-apply Bool.andb_false_iff in Hb.
-destruct Hb as [Hb| Hb]. {
-  apply Nat.ltb_ge in Hb.
-  destruct (lt_dec i n) as [Hin| Hin]. {
-    rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
-    now rewrite Hσ'.
-  } {
-    apply Nat.nlt_ge in Hin.
-    rewrite List.nth_overflow. 2: {
-      now rewrite List.length_map, canon_sym_gr_list_length.
-    }
-    unfold succ_when_ge.
-    rewrite Hσ'.
-    rewrite List.nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
-    unfold Nat.b2n; rewrite if_leb_le_dec.
-    destruct (le_dec (k / n!) 0) as [H1| H1]; [ | easy ].
-    apply Nat.le_0_r in H1.
-    apply Nat.div_small_iff in H1; [ | apply fact_neq_0 ].
-    now apply Nat.nle_gt in H1.
-  }
-} {
-  apply Nat.leb_gt in Hb.
-  rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
-  now rewrite Hσ'.
-}
-Qed.
-
 Theorem ε_aux_ext_in :
   rngl_has_opp T = true →
   ∀ i f la lb,

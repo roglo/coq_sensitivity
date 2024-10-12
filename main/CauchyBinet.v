@@ -1348,38 +1348,6 @@ Definition det''' (M : matrix T) :=
     use canon_sym_gr_list but with a different way, and I don't know
     how to fix it) *)
 
-(*
-Theorem det'_is_det''' : ∀ M, det' M = det''' M.
-Proof.
-intros.
-unfold det', det'''.
-remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-unfold all_permut.
-rewrite List.length_seq.
-Compute (canon_sym_gr_list_list 4, all_permut (List.seq 0 4)).
-pas claire, mon histoire...
-...
-fix canon_sym_gr_list (n k : nat) {struct n} : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-        map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end
-
-canon_sym_gr_list_list = λ n : nat, map (canon_sym_gr_list n) (List.seq 0 n!)
-
-all_permut =
-λ (A : Type) (l : list A),
-  match l with
-  | [] => [[]]
-  | d :: _ =>
-      map (λ p : list nat, map (λ i : nat, List.nth i l d) p)
-        (canon_sym_gr_list_list (length l))
-  end
-...
-*)
-
 Theorem fold_det''' : ∀ n M,
   mat_nrows M = n
   → ∑ (l ∈ all_permut (List.seq 1 n)), ε l * ∏ (i = 1, n), mat_el M i l.(i) =

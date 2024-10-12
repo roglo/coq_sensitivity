@@ -1290,9 +1290,6 @@ Fixpoint list_compare {A} (compare : A → A → comparison) la lb :=
       end
   end.
 
-Definition comparator {A} (compare : A → _) :=
-  ∀ a b, compare a b = Eq ↔ a = b.
-
 (* list_eqv *)
 
 Fixpoint list_eqv {A} (eqv : A → A → bool) la lb :=
@@ -2630,17 +2627,6 @@ Fixpoint binomial n k :=
 Theorem binomial_succ_succ : ∀ n k,
   binomial (S n) (S k) = binomial n k + binomial n (S k).
 Proof. easy. Qed.
-
-Theorem binomial_succ_r : ∀ n k,
-  binomial n (S k) =
-    match n with
-    | 0 => 0
-    | S n' => binomial n' k + binomial n' (S k)
-    end.
-Proof.
-intros.
-now destruct n.
-Qed.
 
 Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
 Proof.
