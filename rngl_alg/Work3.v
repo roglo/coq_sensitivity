@@ -111,6 +111,45 @@ Qed.
 
 Notation "‖ x ‖" := (gc_modl x) (at level 60) : ring_like_scope.
 
+Theorem gc_modl_div_nonneg :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ n d, d ≠ 0%C → (0 ≤ (‖ n ‖) / (‖ d ‖))%L.
+Proof.
+intros Hon Hop Hiv Hor * Hz.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+  apply rl_sqrt_nonneg.
+  apply (rngl_add_squ_nonneg Hop Hor).
+} {
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_add_squ_nonneg Hop Hor) | ].
+  intros H1; symmetry in H1.
+  cbn in Hz.
+  apply (rngl_eq_add_0 Hor) in H1; cycle 1. {
+    apply (rngl_squ_nonneg Hop Hor).
+  } {
+    apply (rngl_squ_nonneg Hop Hor).
+  }
+  destruct H1 as (H1, H2).
+  apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
+  apply Hz; clear Hz.
+  now apply eq_gc_eq.
+}
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let ro := gc_ring_like_op T in
@@ -173,34 +212,37 @@ split. {
   remember (P.[n - 1]) as d eqn:Hd.
   clear Hd.
   induction n; cbn. {
-    assert (H : ∀ x, (0 ≤ (‖ List.nth x P 0%C ‖) / (‖ d ‖))%L). {
-      intros x.
-      apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-        apply rl_sqrt_nonneg.
-        apply (rngl_add_squ_nonneg Hop Hor).
-      } {
-        apply (rl_sqrt_pos Hon Hos Hor).
-        apply (rngl_lt_iff Hor).
-        split; [ apply (rngl_add_squ_nonneg Hop Hor) | ].
-        intros H1; symmetry in H1.
-        cbn in Hz.
-        apply (rngl_eq_add_0 Hor) in H1; cycle 1. {
-          apply (rngl_squ_nonneg Hop Hor).
-        } {
-          apply (rngl_squ_nonneg Hop Hor).
-        }
-        destruct H1 as (H1, H2).
-        apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
-        apply Hz; clear Hz.
-        now apply eq_gc_eq.
-      }
+    rewrite iter_seq_only_one'. {
+      now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
     }
-    rewrite iter_seq_only_one'; [ apply H | ].
     intros x.
     apply (rngl_max_r_iff Hor).
-    apply H.
+    now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
   }
   replace 0%C with 0%L by easy.
+destruct n; [ easy | ].
+progress unfold iter_seq in IHn.
+progress unfold iter_seq.
+rewrite Nat.sub_0_r in IHn |-*.
+rewrite <- Nat_succ_sub_succ_r in IHn |-*; [ | | easy ].
+rewrite Nat.sub_0_r.
+cbn in IHn.
+rewrite Nat.sub_0_r in IHn.
+progress unfold iter_list.
+remember (List.seq 0 n) as l eqn:Hl.
+destruct l as [| a]. {
+  symmetry in Hl.
+  apply List_seq_eq_nil in Hl; subst n.
+  cbn.
+  apply (rngl_le_max_l Hor).
+}
+cbn.
+...
+rewrite op_d_l.
+now rewrite fold_left_op_fun_from_d with (d := d).
+...
+rewrite iter_list_split_first with (z := n).
+...
   rewrite iter_seq_split_first.
 ...
   rewrite iter_seq_split_first'.
