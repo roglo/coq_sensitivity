@@ -1,6 +1,6 @@
 (* Misc1.v *)
 (* Theorems of general usage, which could be (or not) in Coq library *)
-(* First file used in ../trigo_without_pi *)
+(* Used in ../trigo_without_pi *)
 
 Require Import Utf8 Arith Psatz.
 
