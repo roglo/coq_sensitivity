@@ -2237,6 +2237,26 @@ rewrite Nat.sub_diag.
 now apply iter_list_only_one.
 Qed.
 
+Theorem iter_list_only_one' : ∀ T A d (op : T → T → T) (g : A → T) a
+  (op_d_l : ∀ x, op d (g x) = g x),
+  iter_list [a] (λ c i, op c (g i)) d = g a.
+Proof.
+intros * op_d_l.
+progress unfold iter_list; cbn.
+apply op_d_l.
+Qed.
+
+Theorem iter_seq_only_one' : ∀ T d (op : T → T → T) g n
+  (op_d_l : ∀ x, op d (g x) = g x),
+  iter_seq n n (λ c i, op c (g i)) d = g n.
+Proof.
+intros * op_d_l.
+progress unfold iter_seq.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite Nat.sub_diag.
+now apply iter_list_only_one'.
+Qed.
+
 Theorem iter_list_distr : ∀ T A d op g h (l : list A)
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
