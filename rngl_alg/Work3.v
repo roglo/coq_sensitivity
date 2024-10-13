@@ -137,7 +137,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   let gro := gc_ring_like_op T in
   ∀ P : list (GComplex T),
   ∀ M, (0 < M)%L →
-  List.nth (length P - 1) P 0%C ≠ 0%C
+  List.nth (length P - 1) P 0%L ≠ 0%C
   → ∃ R₀, (0 < R₀)%L ∧
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
@@ -163,16 +163,17 @@ intros * HM Hz.
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
-exists (1 + Max (i = 0, n - 1), (‖ P.[i] ‖ / ‖ P.[n] ‖))%L.
+exists (1 + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L.
 split. {
   apply (rngl_lt_le_trans Hor _ 1). {
     apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
   apply (rngl_le_add_r Hor).
   clear Hn.
+  remember (P.[n - 1]) as d eqn:Hd.
+  clear Hd.
   induction n; cbn. {
-    assert
-        (H : ∀ x, (0 ≤ (‖ List.nth x P 0%C ‖) / (‖ List.nth 0 P 0%C ‖))%L). {
+    assert (H : ∀ x, (0 ≤ (‖ List.nth x P 0%C ‖) / (‖ d ‖))%L). {
       intros x.
       apply (rngl_div_nonneg Hon Hop Hiv Hor). {
         apply rl_sqrt_nonneg.
@@ -199,6 +200,10 @@ split. {
     apply (rngl_max_r_iff Hor).
     apply H.
   }
+  replace 0%C with 0%L by easy.
+  rewrite iter_seq_split_first.
+...
+  rewrite iter_seq_split_first'.
 ...
 *)
 
