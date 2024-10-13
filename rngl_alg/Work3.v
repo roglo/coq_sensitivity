@@ -132,22 +132,33 @@ intros la Hla Hl1.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
+  rngl_has_inv T = true →
   rngl_is_ordered T = true →
   let gro := gc_ring_like_op T in
   ∀ P : list (GComplex T),
   ∀ M, (0 < M)%L →
-  ∃ R₀, (0 < R₀)%L ∧
-  ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
+  List.nth (length P - 1) P 0%C ≠ 0%C
+  → ∃ R₀, (0 < R₀)%L ∧
+    ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
-intros Hon Hop Hor.
+intros Hon Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
   rewrite H1 in H.
   now apply (rngl_lt_irrefl Hor) in H.
 }
-intros * HM.
+intros * HM Hz.
 (* must take
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
@@ -159,19 +170,35 @@ split. {
   }
   apply (rngl_le_add_r Hor).
   clear Hn.
-  induction n; cbn.
-About iter_seq_only_one.
-...
-  rewrite iter_seq_only_one'. 2: {
+  induction n; cbn. {
+    assert
+        (H : ∀ x, (0 ≤ (‖ List.nth x P 0%C ‖) / (‖ List.nth 0 P 0%C ‖))%L). {
+      intros x.
+      apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+        apply rl_sqrt_nonneg.
+        apply (rngl_add_squ_nonneg Hop Hor).
+      } {
+        apply (rl_sqrt_pos Hon Hos Hor).
+        apply (rngl_lt_iff Hor).
+        split; [ apply (rngl_add_squ_nonneg Hop Hor) | ].
+        intros H1; symmetry in H1.
+        cbn in Hz.
+        apply (rngl_eq_add_0 Hor) in H1; cycle 1. {
+          apply (rngl_squ_nonneg Hop Hor).
+        } {
+          apply (rngl_squ_nonneg Hop Hor).
+        }
+        destruct H1 as (H1, H2).
+        apply (eq_rngl_squ_0 Hos Hio) in H1, H2.
+        apply Hz; clear Hz.
+        now apply eq_gc_eq.
+      }
+    }
+    rewrite iter_seq_only_one'; [ apply H | ].
     intros x.
-About iter_list_only_one.
-Search rngl_max.
-Search rngl_min.
-About rngl_min_l_iff.
-...
-Search (0 ≤ Max (_ = _, _), _)%L.
-Require Import Main.IterAdd.
-Search (0 ≤ ∑ (_ = _, _), _)%L.
+    apply (rngl_max_r_iff Hor).
+    apply H.
+  }
 ...
 *)
 
