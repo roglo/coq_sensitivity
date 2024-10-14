@@ -18,7 +18,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Theorem max_list_app :
+Theorem max_iter_list_app :
   rngl_is_ordered T = true →
   ∀ A (la lb : list A) f,
   (∀ x, rngl_max 0 x = x)
@@ -60,7 +60,7 @@ apply fold_left_op_fun_from_d'; [ easy | | ]. {
 Qed.
 *)
 
-Theorem max_list_cons :
+Theorem max_iter_list_cons :
   rngl_is_ordered T = true →
   ∀ A (a : A) la f,
   (∀ x, rngl_max 0 x = x)
