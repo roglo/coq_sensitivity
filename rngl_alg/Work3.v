@@ -265,55 +265,22 @@ assert (Hpz :
   intros i Hi.
   eapply (rngl_le_lt_trans Hor); [ | apply H1 ].
   apply (rngl_add_le_mono_l Hop Hor).
-Search (Max (_ = _, _), _)%L.
-Search (_ ≤ rngl_max _ _)%L.
-Theorem le_max_list_r :
-  rngl_is_ordered T = true →
-  ∀ A l (a : A) f,
-  (∀ x, rngl_max 0 (f x) = f x)%L
-  → a ∈ l
-  → (f a ≤ Max (i ∈ l), f i)%L.
-Proof.
-intros Hor * Hm Hal.
-revert a Hal.
-induction l as [| b]; intros; [ easy | ].
-rewrite (max_iter_list_cons Hor). 2: {
-  intros x.
-...
-rewrite (max_iter_list_cons Hor); [ | easy ].
-destruct Hal as [Hal| Hal]; [ subst b; apply (rngl_le_max_l Hor) | ].
-eapply (rngl_le_trans Hor); [ | apply (rngl_le_max_r Hor) ].
-now apply IHl.
-Qed.
-
-Theorem le_max_seq_r :
-  rngl_is_ordered T = true →
-  ∀ b e a f,
-  (∀ x, rngl_max 0 x = x)%L
-  → a ∈ List.seq b (S e - b)
-  → (f a ≤ Max (i = b, e), f i)%L.
-Proof.
-intros Hor * Hm His.
-progress unfold iter_seq.
-now apply (le_max_list_r Hor).
-Qed.
-
-eapply (rngl_le_trans Hor); [ | apply (le_max_seq_r Hor) ]. {
-  apply (rngl_le_refl Hor).
+  eapply (rngl_le_trans Hor); [ | apply (le_max_seq_r Hor) ]. {
+    apply (rngl_le_refl Hor).
+  } {
+    intros x Hx.
+    apply (rngl_max_r_iff Hor).
+    now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+  }
+  rewrite Nat.sub_0_r.
+  apply List.in_seq.
+  split; [ easy | ].
+  rewrite Nat.add_0_l.
+  rewrite <- Nat_succ_sub_succ_r; [ easy | ].
+  destruct n; [ easy | ].
+  destruct n; [ easy | ].
+  now apply -> Nat.succ_lt_mono.
 }
-(* oui mais non mais ça marche pas, ça
-      ∀ x : T, rngl_max 0 x = x
-   if faudrait que ce soit que pour x ∈ ce qu'il faut
-*)
-...
-rewrite Nat.sub_0_r.
-apply List.in_seq.
-split; [ easy | ].
-rewrite Nat.add_0_l.
-rewrite <- Nat_succ_sub_succ_r; [ easy | ].
-destruct n; [ easy | ].
-destruct n; [ easy | ].
-now apply -> Nat.succ_lt_mono.
 ...
 *)
 

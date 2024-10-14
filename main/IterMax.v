@@ -19,11 +19,10 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-(* to be completed
 Theorem max_iter_list_app :
   rngl_is_ordered T = true →
   ∀ A (la lb : list A) f,
-  (∀ x, rngl_max 0 (f x) = f x)
+  (∀ x, x ∈ lb → rngl_max 0 (f x) = f x)
   → Max (i ∈ la ++ lb), f i =
       rngl_max (Max (i ∈ la), f i) (Max (i ∈ lb), f i).
 Proof.
@@ -48,7 +47,12 @@ induction lb as [| b]; intros; cbn. {
   apply (rngl_le_trans Hor _ z); [ easy | ].
   apply (rngl_le_max_l Hor).
 }
-specialize (IHlb (la ++ [b])) as H1.
+assert (H : ∀ x, x ∈ lb → rngl_max 0 (f x) = f x). {
+  intros x Hx.
+  now apply Hm; right.
+}
+specialize (IHlb H).
+specialize (IHlb (la ++ [b])) as H1; clear H.
 rewrite List.fold_left_app in H1.
 cbn in H1.
 rewrite H1; clear H1.
@@ -59,68 +63,55 @@ specialize (IHlb [b]) as H1.
 cbn in H1.
 rewrite H1.
 f_equal.
-now rewrite Hm.
+symmetry.
+now apply Hm; left.
 Qed.
-...
-*)
-
-Theorem max_iter_list_app :
-  rngl_is_ordered T = true →
-  ∀ A (la lb : list A) f,
-  (∀ x, rngl_max 0 x = x)
-  → Max (i ∈ la ++ lb), f i =
-      rngl_max (Max (i ∈ la), f i) (Max (i ∈ lb), f i).
-Proof.
-intros Hor * Hm.
-rewrite iter_list_app.
-progress unfold iter_list.
-apply fold_left_op_fun_from_d; [ easy | | ]. {
-  intros.
-  rewrite (rngl_max_comm Hor).
-  apply Hm.
-} {
-  intros.
-  apply (rngl_max_assoc Hor).
-}
-Qed.
-
-(*
-Theorem max_list_app' :
-  rngl_is_ordered T = true →
-  ∀ A (la lb : list A) f,
-  (∀ x, x ∈ List.map f lb → rngl_max 0 x = x)
-  → Max (i ∈ la ++ lb), f i =
-      rngl_max (Max (i ∈ la), f i) (Max (i ∈ lb), f i).
-Proof.
-intros Hor * Hm.
-rewrite iter_list_app.
-progress unfold iter_list.
-apply fold_left_op_fun_from_d'; [ easy | | ]. {
-  intros.
-  rewrite (rngl_max_comm Hor).
-  apply Hm.
-...
-  intros.
-  apply (rngl_max_assoc Hor).
-}
-Qed.
-*)
 
 Theorem max_iter_list_cons :
   rngl_is_ordered T = true →
-  ∀ A (a : A) la f,
-  (∀ x, rngl_max 0 x = x)
+  ∀ A a (la : list A) f,
+  (∀ x, x ∈ a :: la → rngl_max 0 (f x) = f x)
   → Max (i ∈ a :: la), f i = rngl_max (f a) (Max (i ∈ la), f i).
 Proof.
 intros Hor * Hm.
-apply iter_list_cons; [ easy | | ]. {
-  intros.
-  rewrite (rngl_max_comm Hor).
-  apply Hm.
-} {
-  intros.
-  apply (rngl_max_assoc Hor).
+rewrite List_cons_is_app.
+rewrite (max_iter_list_app Hor _ _ _ _). {
+  progress unfold iter_list at 1.
+  cbn.
+  rewrite Hm; [ easy | now left ].
 }
+intros x Hx.
+now apply Hm; right.
+Qed.
+
+Theorem le_max_list_r :
+  rngl_is_ordered T = true →
+  ∀ A l (a : A) f,
+  (∀ x, x ∈ l → rngl_max 0 (f x) = f x)%L
+  → a ∈ l
+  → (f a ≤ Max (i ∈ l), f i)%L.
+Proof.
+intros Hor * Hm Hal.
+revert a Hal.
+induction l as [| b]; intros; [ easy | ].
+rewrite (max_iter_list_cons Hor); [ | easy ].
+destruct Hal as [Hal| Hal]; [ subst b; apply (rngl_le_max_l Hor) | ].
+eapply (rngl_le_trans Hor); [ | apply (rngl_le_max_r Hor) ].
+apply IHl; [ | easy ].
+intros x Hx.
+now apply Hm; right.
+Qed.
+
+Theorem le_max_seq_r :
+  rngl_is_ordered T = true →
+  ∀ b e a f,
+  (∀ x, x ∈ List.seq b (S e - b) → rngl_max 0 (f x) = f x)%L
+  → a ∈ List.seq b (S e - b)
+  → (f a ≤ Max (i = b, e), f i)%L.
+Proof.
+intros Hor * Hm His.
+progress unfold iter_seq.
+now apply (le_max_list_r Hor).
 Qed.
 
 End a.
