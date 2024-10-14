@@ -220,14 +220,29 @@ split. {
     now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
   }
   replace 0%C with 0%L by easy.
-destruct n; [ easy | ].
-progress unfold iter_seq in IHn.
-progress unfold iter_seq.
-rewrite Nat.sub_0_r in IHn |-*.
-rewrite <- Nat_succ_sub_succ_r in IHn |-*; [ | | easy ].
-rewrite Nat.sub_0_r.
-cbn in IHn.
-rewrite Nat.sub_0_r in IHn.
+  destruct n; [ easy | ].
+  progress unfold iter_seq in IHn.
+  progress unfold iter_seq.
+  rewrite Nat.sub_0_r in IHn |-*.
+  cbn - [ List.seq ] in IHn.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    progress unfold iter_list.
+    subst n; cbn.
+    apply (rngl_le_max_l Hor).
+  }
+  apply Nat.neq_0_lt_0 in Hnz.
+  rewrite <- Nat_succ_sub_succ_r in IHn; [ | easy ].
+  rewrite Nat.sub_0_r in IHn.
+  rewrite List.seq_S.
+  cbn.
+Check fold_left_op_fun_from_d'.
+...
+  rewrite (max_list_app Hor).
+(* chiasse de pute *)
+Check max_list_app.
+...
 progress unfold iter_list.
 remember (List.seq 0 n) as l eqn:Hl.
 destruct l as [| a]. {
@@ -236,6 +251,25 @@ destruct l as [| a]. {
   cbn.
   apply (rngl_le_max_l Hor).
 }
+rewrite List.seq_S.
+cbn.
+rewrite List.fold_left_app.
+rewrite Hl in IHn.
+progress unfold iter_list in IHn.
+remember (List.fold_left _ _ _) as x eqn:Hx in IHn.
+rewrite <- Hx.
+...
+progress unfold iter_list in IHn.
+cbn in IHn.
+rewrite (proj2 (rngl_max_r_iff Hor _ _)). 2: {
+  now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+}
+rewrite (proj2 (rngl_max_r_iff Hor _ _)) in IHn. 2: {
+  now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+}
+rewrite <- List.seq_shift.
+rewrite <- Hl.
+rewrite List_fold_left_map.
 cbn.
 ...
 rewrite op_d_l.

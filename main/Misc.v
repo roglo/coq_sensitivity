@@ -1947,6 +1947,34 @@ rewrite op_d_l.
 apply op_assoc.
 Qed.
 
+Theorem fold_left_op_fun_from_d' : ∀ {T A} d op a l (f : A → _)
+  (op_d_l : ∀ x, x ∈ List.map f l → op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  List.fold_left (λ (c : T) i, op c (f i)) l a =
+  op a (List.fold_left (λ (c : T) i, op c (f i)) l d).
+Proof.
+intros.
+revert a.
+induction l as [| x l]; intros. {
+  cbn; symmetry; apply op_d_r.
+}
+cbn.
+rewrite IHl. 2: {
+  intros y Hy.
+  apply op_d_l.
+  now right.
+}
+symmetry.
+rewrite IHl. 2: {
+  intros y Hy.
+  apply op_d_l.
+  now right.
+}
+rewrite op_d_l; [ | now left ].
+apply op_assoc.
+Qed.
+
 Theorem iter_list_op_fun_from_d : ∀ T A d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
