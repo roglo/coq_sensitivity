@@ -42,20 +42,18 @@ Qed.
 Theorem max_list_app' :
   rngl_is_ordered T = true →
   ∀ A (la lb : list A) f,
-  (∀ x, x ∈ List.map f la → rngl_max 0 x = x)
+  (∀ x, x ∈ List.map f lb → rngl_max 0 x = x)
   → Max (i ∈ la ++ lb), f i =
       rngl_max (Max (i ∈ la), f i) (Max (i ∈ lb), f i).
 Proof.
 intros Hor * Hm.
 rewrite iter_list_app.
 progress unfold iter_list.
-apply fold_left_op_fun_from_d; [ | | ]. {
-...
-apply fold_left_op_fun_from_d; [ easy | | ]. {
+apply fold_left_op_fun_from_d'; [ easy | | ]. {
   intros.
   rewrite (rngl_max_comm Hor).
   apply Hm.
-} {
+...
   intros.
   apply (rngl_max_assoc Hor).
 }
