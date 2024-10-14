@@ -109,14 +109,15 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
-Notation "‖ x ‖" := (gc_modl x) (at level 60) : ring_like_scope.
+Notation "‖ x ‖" := (gc_modl x) (at level 35, x at level 30) :
+  ring_like_scope.
 
 Theorem gc_modl_div_nonneg :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ n d, d ≠ 0%C → (0 ≤ (‖ n ‖) / (‖ d ‖))%L.
+  ∀ n d, d ≠ 0%C → (0 ≤ ‖ n ‖ / ‖ d ‖)%L.
 Proof.
 intros Hon Hop Hiv Hor * Hz.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -258,6 +259,14 @@ assert (Hr : (0 < R₀)%L). {
 exists R₀.
 split; [ easy | ].
 intros z H1.
+subst R₀.
+assert (Hpz :
+    ∀ i, i < n - 1 → (1 + M + ‖ P.[i] ‖ / ‖ P.[n - 1] ‖ < ‖ z ‖)%L). {
+  intros i Hi.
+  eapply (rngl_le_lt_trans Hor); [ | apply H1 ].
+  apply (rngl_add_le_mono_l Hop Hor).
+Search (_ ≤ Max (_ = _, _), _)%L.
+Search (Max (_ = _, _), _)%L.
 ...
 *)
 
