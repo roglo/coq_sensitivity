@@ -202,8 +202,9 @@ intros * HM Hz.
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
-exists (1 + M + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L.
-split. {
+set (R₀ := (1 + M + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L).
+assert (Hr : (0 < R₀)%L). {
+  progress unfold R₀.
   apply (rngl_lt_le_trans Hor _ 1). {
     apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
@@ -254,6 +255,8 @@ split. {
   apply (rngl_add_le_mono_l Hop Hor).
   apply (rngl_le_max_l Hor).
 }
+exists R₀.
+split; [ easy | ].
 intros z H1.
 ...
 *)
