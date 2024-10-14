@@ -202,16 +202,21 @@ intros * HM Hz.
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
 remember (List.length P) as n eqn:Hn.
-exists (1 + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L.
+exists (1 + M + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L.
 split. {
   apply (rngl_lt_le_trans Hor _ 1). {
     apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
+  rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
   clear Hn.
   remember (P.[n - 1]) as d eqn:Hd.
   clear Hd.
   induction n; cbn. {
+    apply (rngl_le_trans Hor _ M). {
+      now apply (rngl_lt_le_incl Hor) in HM.
+    }
+    apply (rngl_le_add_r Hor).
     rewrite iter_seq_only_one'. {
       now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
     }
@@ -228,6 +233,10 @@ split. {
   rewrite <- Nat_succ_sub_succ_r; [ | easy ].
   rewrite Nat.sub_0_r.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    apply (rngl_le_trans Hor _ M). {
+      now apply (rngl_lt_le_incl Hor) in HM.
+    }
+    apply (rngl_le_add_r Hor).
     progress unfold iter_list.
     subst n; cbn.
     apply (rngl_le_max_l Hor).
@@ -237,49 +246,15 @@ split. {
   rewrite Nat.sub_0_r in IHn.
   rewrite List.seq_S.
   cbn.
-Check fold_left_op_fun_from_d'.
-...
-  rewrite (max_list_app Hor).
-(* chiasse de pute *)
-Check max_list_app.
-...
-progress unfold iter_list.
-remember (List.seq 0 n) as l eqn:Hl.
-destruct l as [| a]. {
-  symmetry in Hl.
-  apply List_seq_eq_nil in Hl; subst n.
+  progress unfold iter_list in IHn.
+  progress unfold iter_list.
+  rewrite List.fold_left_app.
   cbn.
+  eapply (rngl_le_trans Hor); [ apply IHn | ].
+  apply (rngl_add_le_mono_l Hop Hor).
   apply (rngl_le_max_l Hor).
 }
-rewrite List.seq_S.
-cbn.
-rewrite List.fold_left_app.
-rewrite Hl in IHn.
-progress unfold iter_list in IHn.
-remember (List.fold_left _ _ _) as x eqn:Hx in IHn.
-rewrite <- Hx.
-...
-progress unfold iter_list in IHn.
-cbn in IHn.
-rewrite (proj2 (rngl_max_r_iff Hor _ _)). 2: {
-  now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
-}
-rewrite (proj2 (rngl_max_r_iff Hor _ _)) in IHn. 2: {
-  now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
-}
-rewrite <- List.seq_shift.
-rewrite <- Hl.
-rewrite List_fold_left_map.
-cbn.
-...
-rewrite op_d_l.
-now rewrite fold_left_op_fun_from_d with (d := d).
-...
-rewrite iter_list_split_first with (z := n).
-...
-  rewrite iter_seq_split_first.
-...
-  rewrite iter_seq_split_first'.
+intros z H1.
 ...
 *)
 
