@@ -270,13 +270,16 @@ Search (_ ≤ rngl_max _ _)%L.
 Theorem le_max_list_r :
   rngl_is_ordered T = true →
   ∀ A l (a : A) f,
-  (∀ x, rngl_max 0 x = x)%L
+  (∀ x, rngl_max 0 (f x) = f x)%L
   → a ∈ l
   → (f a ≤ Max (i ∈ l), f i)%L.
 Proof.
 intros Hor * Hm Hal.
 revert a Hal.
 induction l as [| b]; intros; [ easy | ].
+rewrite (max_iter_list_cons Hor). 2: {
+  intros x.
+...
 rewrite (max_iter_list_cons Hor); [ | easy ].
 destruct Hal as [Hal| Hal]; [ subst b; apply (rngl_le_max_l Hor) | ].
 eapply (rngl_le_trans Hor); [ | apply (rngl_le_max_r Hor) ].

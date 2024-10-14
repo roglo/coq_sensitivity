@@ -377,6 +377,15 @@ progress unfold rngl_min.
 now rewrite (rngl_leb_refl Hor).
 Qed.
 
+Theorem rngl_max_id :
+  rngl_is_ordered T = true →
+  ∀ a, rngl_max a a = a.
+Proof.
+intros Hor *.
+progress unfold rngl_max.
+now rewrite (rngl_leb_refl Hor).
+Qed.
+
 Theorem rngl_min_comm :
   rngl_is_ordered T = true →
   ∀ a b, rngl_min a b = rngl_min b a.
