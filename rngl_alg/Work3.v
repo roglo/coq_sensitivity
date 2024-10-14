@@ -151,7 +151,7 @@ apply (rngl_div_nonneg Hon Hop Hiv Hor). {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem gc_opt_alg_closed :
   let ro := gc_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
