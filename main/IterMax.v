@@ -28,10 +28,11 @@ Theorem max_iter_list_app :
 Proof.
 intros Hor * Hm.
 rewrite iter_list_app.
+rewrite (rngl_max_comm Hor).
 progress unfold iter_list.
 induction la as [| a]; intros; cbn. {
   symmetry.
-  apply (rngl_max_r_iff Hor).
+  apply (rngl_max_l_iff Hor).
   remember (List.fold_left _ _ _) as v eqn:Hv.
   remember 0%L as z in Hv.
   assert (Hz : (0 ≤ z)%L). {
