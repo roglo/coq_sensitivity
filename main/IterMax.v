@@ -2,6 +2,7 @@
 
 Require Import Utf8.
 Require Import Misc RingLike.
+Import List.ListNotations.
 Open Scope list.
 
 Notation "'Max' ( i = b , e ) , g" :=
@@ -30,9 +31,10 @@ intros Hor * Hm.
 rewrite iter_list_app.
 rewrite (rngl_max_comm Hor).
 progress unfold iter_list.
-induction la as [| a]; intros; cbn. {
+revert la.
+induction lb as [| b]; intros; cbn. {
   symmetry.
-  apply (rngl_max_l_iff Hor).
+  apply (rngl_max_r_iff Hor).
   remember (List.fold_left _ _ _) as v eqn:Hv.
   remember 0%L as z in Hv.
   assert (Hz : (0 ≤ z)%L). {
@@ -41,27 +43,24 @@ induction la as [| a]; intros; cbn. {
   }
   clear Heqz; subst v.
   revert z Hz.
-  induction lb as [| b]; intros; [ easy | cbn ].
-  apply IHlb.
+  induction la as [| a]; intros; [ easy | cbn ].
+  apply IHla.
   apply (rngl_le_trans Hor _ z); [ easy | ].
   apply (rngl_le_max_l Hor).
 }
-remember (List.fold_left _ _ (rngl_max _ _)) as v eqn:Hv.
-remember (rngl_max 0 (f a)) as z.
-assert (Hz : (0 ≤ z)%L). {
-  subst z.
-  apply (rngl_le_max_l Hor).
-}
-clear Heqz; subst v.
-...
-  induction lb as [| b]; [ apply (rngl_le_refl Hor) | ].
-  cbn.
-...
-cbn.
-Search (rngl_max _ _ = _).
-  induction lb as [| b]; intros; cbn; [ apply (rngl_max_id Hor) | ].
-...
-  rewrite IHlb.
+specialize (IHlb (la ++ [b])) as H1.
+rewrite List.fold_left_app in H1.
+cbn in H1.
+rewrite H1; clear H1.
+rewrite (rngl_max_comm Hor _ (f b)).
+rewrite (rngl_max_assoc Hor).
+f_equal.
+specialize (IHlb [b]) as H1.
+cbn in H1.
+rewrite H1.
+f_equal.
+now rewrite Hm.
+Qed.
 ...
 *)
 
