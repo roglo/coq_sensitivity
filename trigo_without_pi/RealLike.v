@@ -152,18 +152,20 @@ progress unfold rngl_squ in Ha.
 now rewrite (rngl_mul_0_l Hos) in Ha.
 Qed.
 
-Theorem rl_sqrt_sqr_le_sqrt_add_sqrt :
+Definition rl_modl x y := √(x² + y²)%L.
+
+Theorem rl_modl_add_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ a b c d,
-  (√((a + b)² + (c + d)²) ≤ √(a² + c²) + √(b² + d²))%L.
+  ∀ a b c d, (rl_modl (a + b) (c + d) ≤ rl_modl a c + rl_modl b d)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+progress unfold rl_modl.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_add_nonneg_nonneg Hor). {
     apply rl_sqrt_nonneg.
@@ -253,11 +255,12 @@ Theorem euclidean_distance_triangular :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   ∀ x1 y1 x2 y2 x3 y3,
-  (√((x3 - x1)² + (y3 - y1)²)
-   ≤ √((x2 - x1)² + (y2 - y1)²) + √((x3 - x2)² + (y3 - y2)²))%L.
+  (rl_modl (x3 - x1) (y3 - y1)
+   ≤ rl_modl (x2 - x1) (y2 - y1) + rl_modl (x3 - x2) (y3 - y2))%L.
 Proof.
 intros Hic Hon Hop Hiv Hor *.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+progress unfold rl_modl.
 rewrite (rngl_add_comm √((x2 - x1)² + (y2 - y1)²))%L.
 replace (x3 - x1)%L with ((x3 - x2) + (x2 - x1))%L. 2: {
   rewrite (rngl_add_sub_assoc Hop).
@@ -267,7 +270,7 @@ replace (y3 - y1)%L with ((y3 - y2) + (y2 - y1))%L. 2: {
   rewrite (rngl_add_sub_assoc Hop).
   now rewrite (rngl_sub_add Hop).
 }
-apply (rl_sqrt_sqr_le_sqrt_add_sqrt Hic Hon Hop Hiv Hor).
+apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
 Qed.
 
 Theorem rl_sqrt_le_rl_sqrt :
@@ -385,3 +388,5 @@ now apply -> (rngl_abs_le Hop Hor).
 Qed.
 
 End a.
+
+Arguments rl_modl {T ro rp rl} (x y)%_L.

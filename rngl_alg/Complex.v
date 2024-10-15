@@ -718,11 +718,7 @@ Definition gc_ring_like_prop_not_alg_closed
 
 (* algebraically closed *)
 
-Definition gc_squ_modl (z : GComplex T) :=
-  (gre z * gre z + gim z * gim z)%L.
-
-Definition gc_modl (z : GComplex T) :=
-  √(gc_squ_modl z)%L.
+Definition gc_modl (z : GComplex T) := rl_modl (gre z) (gim z).
 
 Theorem le_rl_sqrt_add :
   rngl_has_1 T = true →
@@ -1546,7 +1542,9 @@ Theorem angle_eucl_dist_sin_cos :
      (1 - rngl_sin θ)² + (rngl_cos θ)²)%L.
 Proof.
 intros Hon Hop Hor *.
-progress unfold angle_eucl_dist; cbn.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl.
+cbn.
 rewrite (rngl_sub_0_l Hop).
 rewrite (rngl_squ_opp Hop).
 rewrite rngl_add_comm.
@@ -1609,6 +1607,7 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_0_lt_2 Hon Hop Hc1 Hor) as Hz2.
 intros.
 progress unfold angle_eucl_dist.
+progress unfold rl_modl.
 cbn.
 do 2 rewrite (rngl_sub_0_l Hop).
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).

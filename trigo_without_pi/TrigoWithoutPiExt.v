@@ -949,6 +949,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_eucl_dist.
+progress unfold rl_modl.
 cbn.
 f_equal.
 f_equal.
@@ -965,6 +966,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_eucl_dist.
+progress unfold rl_modl.
 remember (θ - Δθ)%A as x; cbn; subst x.
 do 4 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite (rngl_squ_1 Hon).
@@ -1037,7 +1039,8 @@ Theorem angle_eucl_dist_cos_sin :
 Proof.
 destruct_ac.
 intros.
-progress unfold angle_eucl_dist; cbn.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl; cbn.
 rewrite (rngl_sub_0_l Hop).
 rewrite (rngl_squ_opp Hop).
 apply (rngl_squ_sqrt Hon).
@@ -1249,6 +1252,7 @@ induction k. {
   exists 0.
   intros n _.
   progress unfold angle_eucl_dist.
+  progress unfold rl_modl.
   cbn.
   do 2 rewrite (rngl_sub_diag Hos).
   rewrite (rngl_squ_0 Hos).

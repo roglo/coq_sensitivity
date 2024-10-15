@@ -3622,9 +3622,7 @@ Qed.
 (* euclidean distance *)
 
 Definition angle_eucl_dist θ1 θ2 :=
-  rl_sqrt
-    ((rngl_cos θ2 - rngl_cos θ1)² +
-     (rngl_sin θ2 - rngl_sin θ1)²)%L.
+  rl_modl (rngl_cos θ2 - rngl_cos θ1) (rngl_sin θ2 - rngl_sin θ1).
 
 Theorem angle_eucl_dist_is_sqrt :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cos (θ2 - θ1)))%L.
@@ -3632,6 +3630,7 @@ Proof.
 destruct_ac.
 intros.
 progress unfold angle_eucl_dist.
+progress unfold rl_modl.
 f_equal.
 do 2 rewrite (rngl_squ_sub Hop Hic Hon).
 rewrite (rngl_add_add_swap).
@@ -3668,9 +3667,10 @@ Proof.
 destruct_ac; intros *.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl.
 split; intros H12. 2: {
   subst θ2.
-  progress unfold angle_eucl_dist.
   do 2 rewrite (rngl_sub_diag Hos).
   rewrite (rngl_squ_0 Hos).
   rewrite rngl_add_0_r.
@@ -3682,8 +3682,6 @@ apply eq_angle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn in H12 |-*.
-progress unfold angle_eucl_dist in H12.
-cbn in H12.
 apply (eq_rl_sqrt_0 Hon Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
@@ -3718,7 +3716,6 @@ destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 progress unfold angle_eucl_dist.
 cbn.
-specialize (rngl_abs_triangle Hop Hor) as H1.
 apply (euclidean_distance_triangular Hic Hon Hop Hiv Hor).
 Qed.
 
