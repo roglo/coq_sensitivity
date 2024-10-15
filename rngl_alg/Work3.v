@@ -281,6 +281,7 @@ assert (Hpz :
   destruct n; [ easy | ].
   now apply -> Nat.succ_lt_mono.
 }
+clear H1.
 ...
 *)
 
