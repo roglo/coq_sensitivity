@@ -287,8 +287,9 @@ rename n into m; rename Hn into Hm.
 remember (m - 1) as n eqn:Hn.
 replace (m - 2) with (n - 1) in Hr by flia Hn.
 assert (H1 :
-  (‖ P.[n] ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
+  (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
+Check @is_dist_triangular.
 ...
 *)
 
