@@ -172,6 +172,7 @@ destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
@@ -182,7 +183,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   → ∃ R₀, (0 < R₀)%L ∧
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
-intros Hon Hop Hiv Hor.
+intros Hon Hic Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
@@ -289,8 +290,22 @@ replace (m - 2) with (n - 1) in Hr by flia Hn.
 assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
-progress unfold gc_modl.
-Check rl_modl_add_le.
+  apply (rngl_le_sub_le_add_r Hop Hor).
+  progress unfold gc_modl.
+  specialize (rl_modl_add_le Hic Hon Hop Hiv Hor) as H1.
+  remember (rngl_eval_polyn P z) as fz eqn:Hfz.
+  specialize (H1 (gre fz) (gim fz)).
+  clear Hz Hn Hr Hpz.
+  induction n. {
+    rewrite rngl_summation_only_one.
+    cbn.
+    rewrite gre_1, gim_1.
+    do 2 rewrite (rngl_mul_1_r Hon).
+    do 2 rewrite (rngl_mul_0_r Hos).
+    rewrite (rngl_sub_0_r Hos).
+    rewrite rngl_add_0_r.
+    eapply (rngl_le_trans Hor); [ | apply H1 ].
+    remember (List.nth 0 P 0%C) as a₀ eqn:Ha₀.
 ...
 *)
 

@@ -160,7 +160,7 @@ Theorem rl_modl_add_le :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ a b c d, (rl_modl (a + b) (c + d) ≤ rl_modl a c + rl_modl b d)%L.
+  ∀ a b c d, (rl_modl (a + c) (b + d) ≤ rl_modl a b + rl_modl c d)%L.
 Proof.
 intros Hic Hon Hop Hiv Hor *.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
@@ -188,8 +188,8 @@ apply (rngl_le_sub_le_add_r Hop Hor).
 apply -> (rngl_le_sub_le_add_l Hop Hor).
 do 2 rewrite (rngl_squ_add Hic Hon)%L.
 rewrite rngl_add_assoc.
-rewrite (rngl_sub_add_distr Hos _ b²)%L.
-rewrite (rngl_sub_sub_swap Hop _ b²)%L.
+rewrite (rngl_sub_add_distr Hos _ c²)%L.
+rewrite (rngl_sub_sub_swap Hop _ c²)%L.
 rewrite (rngl_add_sub Hos).
 rewrite (rngl_add_sub_swap Hop).
 rewrite (rngl_add_sub Hos).
@@ -228,17 +228,17 @@ rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
 rewrite (rngl_squ_add Hic Hon).
 do 2 rewrite (rngl_squ_mul Hic).
 rewrite rngl_mul_add_distr_l.
-rewrite (rngl_mul_add_distr_r _ _ b²)%L.
+rewrite (rngl_mul_add_distr_r _ _ c²)%L.
 rewrite (rngl_mul_add_distr_r _ _ d²)%L.
 rewrite rngl_add_assoc.
 apply (rngl_add_le_mono_r Hop Hor).
 rewrite <- rngl_add_assoc.
 apply (rngl_add_le_mono_l Hop Hor).
 rewrite (rngl_add_comm (_ * _))%L.
-rewrite (rngl_mul_comm Hic c²)%L.
+rewrite (rngl_mul_comm Hic b²)%L.
 do 2 rewrite <- (rngl_squ_mul Hic).
 do 2 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_mul_swap Hic (2 * a * b))%L.
+rewrite (rngl_mul_mul_swap Hic (2 * a * c))%L.
 rewrite (rngl_mul_mul_swap Hic (2 * a))%L.
 rewrite <- rngl_mul_assoc.
 rewrite <- (rngl_mul_assoc 2)%L.
