@@ -185,6 +185,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
 Proof.
 intros Hon Hic Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
   (rngl_is_integral_domain T ||
@@ -295,8 +296,11 @@ assert (H1 :
   specialize (rl_modl_add_le Hic Hon Hop Hiv Hor) as H1.
   remember (rngl_eval_polyn P z) as fz eqn:Hfz.
   specialize (H1 (gre fz) (gim fz)).
-  clear Hz Hn Hr Hpz.
-  induction n. {
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    move Hnz at top; subst n.
+    symmetry in Hn.
+    apply Nat.sub_0_le in Hn.
+    clear Hpz.
     rewrite rngl_summation_only_one.
     cbn.
     rewrite gre_1, gim_1.
@@ -304,8 +308,14 @@ assert (H1 :
     do 2 rewrite (rngl_mul_0_r Hos).
     rewrite (rngl_sub_0_r Hos).
     rewrite rngl_add_0_r.
-    eapply (rngl_le_trans Hor); [ | apply H1 ].
     remember (List.nth 0 P 0%C) as a₀ eqn:Ha₀.
+    apply (rngl_le_add_l Hor).
+    apply rl_sqrt_nonneg.
+    apply (rngl_add_squ_nonneg Hop Hor).
+  }
+  clear Hz Hn Hr Hpz.
+  induction n; [ easy | clear Hnz ].
+  rewrite Nat_sub_succ_1.
 ...
 *)
 
