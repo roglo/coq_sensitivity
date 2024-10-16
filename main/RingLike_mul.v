@@ -478,39 +478,36 @@ intros Hon.
 apply (rngl_mul_1_l Hon).
 Qed.
 
-(*
 Theorem rngl_squ_sub_squ :
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
-  ∀ a b, (a² - b² = (a + b) * (a - b))%L.
+  ∀ a b, (a² - b² = (a + b) * (a - b) + a * b - b * a)%L.
 Proof.
-intros Hop Hic *.
+intros Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
 progress unfold rngl_squ.
 rewrite rngl_mul_add_distr_r.
 do 2 rewrite (rngl_mul_sub_distr_l Hop).
 rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_sub_swap Hop _ (b * b))%L.
 f_equal.
-rewrite (rngl_mul_comm Hic b a).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub Hos).
 symmetry.
 apply (rngl_sub_add Hop).
 Qed.
-*)
 
-Theorem rngl_squ_sub_squ :
+Theorem rngl_squ_sub_squ' :
   rngl_has_opp T = true →
-  ∀ a b,
-  (a * b = b * a)%L
-  → (a² - b² = (a + b) * (a - b))%L.
+  ∀ a b, ((a + b) * (a - b) = a² - b² + b * a - a * b)%L.
 Proof.
-intros Hop * Hab.
-progress unfold rngl_squ.
-rewrite rngl_mul_add_distr_r.
-do 2 rewrite (rngl_mul_sub_distr_l Hop).
-rewrite (rngl_add_sub_assoc Hop).
-f_equal.
-rewrite Hab.
-symmetry.
-apply (rngl_sub_add Hop).
+intros Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_sub_add Hop).
+now rewrite (rngl_add_sub Hos).
 Qed.
 
 Theorem rngl_squ_pow_2 :

@@ -942,8 +942,8 @@ intros Hop Hor Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Habc Hab.
 apply (rngl_sub_move_0_r Hop) in Hab.
-(* *)
-rewrite (rngl_squ_sub_squ Hop _ _ Habc) in Hab.
+rewrite (rngl_squ_sub_squ Hop), Habc in Hab.
+rewrite (rngl_add_sub Hos) in Hab.
 assert (Hio :
   (rngl_is_integral_domain T ||
    rngl_has_inv_and_1_or_quot T && rngl_has_eq_dec_or_order T)%bool = true). {
@@ -1211,7 +1211,8 @@ assert (Hio :
   now rewrite Hi1.
 }
 apply (rngl_sub_move_0_r Hop) in Hab.
-rewrite (rngl_squ_sub_squ Hop _ _ Habc) in Hab.
+rewrite (rngl_squ_sub_squ Hop), Habc in Hab.
+rewrite (rngl_add_sub Hos) in Hab.
 apply (rngl_integral Hos Hio) in Hab.
 destruct Hab as [Hab| Hab]; [ right | left ]. {
   now apply (rngl_add_move_0_r Hop) in Hab.

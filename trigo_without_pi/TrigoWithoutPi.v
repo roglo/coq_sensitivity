@@ -1580,14 +1580,12 @@ rewrite <- rl_sqrt_mul; [ | easy | easy ].
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
 rewrite <- rngl_mul_assoc.
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+rewrite (rngl_add_sub Hos).
 rewrite (rngl_squ_1 Hon).
 replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
   symmetry.
@@ -2494,14 +2492,9 @@ rewrite <- rl_sqrt_mul; [ | easy | easy ].
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
 rewrite <- rngl_mul_assoc.
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
+do 2 rewrite (rngl_squ_sub_squ' Hop).
+do 2 rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_add_sub Hos).
 rewrite (rngl_squ_1 Hon).
 replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
   symmetry.
@@ -2817,14 +2810,9 @@ rewrite <- rl_sqrt_mul; [ | easy | easy ].
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_mul_swap Hic (1 + rngl_cos θ1))%L.
 rewrite <- rngl_mul_assoc.
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
+do 2 rewrite (rngl_squ_sub_squ' Hop).
+do 2 rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_add_sub Hos).
 rewrite (rngl_squ_1 Hon).
 replace (1 - (rngl_cos θ1)²)%L with (rngl_sin θ1)²%L. 2: {
   symmetry.
@@ -3043,10 +3031,9 @@ rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic _ 2)%L.
 rewrite <- (rngl_squ_1 Hon) at 4.
-rewrite (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+rewrite (rngl_add_sub Hos).
 apply (rngl_mul_lt_mono_pos_r Hop Hor Hii). {
   apply (rngl_lt_0_sub Hop Hor).
   apply (rngl_lt_iff Hor).
@@ -3289,10 +3276,9 @@ rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
 rewrite (rngl_mul_1_r Hon).
 rewrite <- rl_nth_root_mul; [ | easy | easy ].
 rewrite (rngl_mul_comm Hic (1 - _)%L).
-rewrite <- (rngl_squ_sub_squ Hop). 2: {
-  rewrite (rngl_mul_1_r Hon).
-  apply (rngl_mul_1_l Hon).
-}
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+rewrite (rngl_add_sub Hos).
 progress unfold rngl_squ at 1.
 rewrite (rngl_mul_1_r Hon).
 destruct a as (ca, sa, Ha); cbn in ε, Hz1ac, Hz1sc |-*.

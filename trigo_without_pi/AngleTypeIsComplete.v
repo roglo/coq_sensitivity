@@ -253,7 +253,9 @@ assert (H : N2 ≤ n). {
 }
 specialize (HN2 _ H); clear H.
 progress unfold rngl_dist.
-rewrite (rngl_squ_sub_squ Hop); [ | apply (rngl_mul_comm Hic) ].
+rewrite (rngl_squ_sub_squ Hop).
+rewrite (rngl_mul_comm Hic (u n)).
+rewrite (rngl_add_sub Hos).
 rewrite (rngl_abs_mul Hop Hi1 Hor).
 eapply (rngl_le_lt_trans Hor). {
   apply (rngl_mul_le_mono_nonneg_l Hop Hor). {

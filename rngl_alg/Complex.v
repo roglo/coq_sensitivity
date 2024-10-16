@@ -1332,7 +1332,9 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_sub_assoc Hop).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic (_ - _))%L.
-rewrite <- (rngl_squ_sub_squ Hop); [ | apply (rngl_mul_comm Hic) ].
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_comm Hic (_ * _)).
+rewrite (rngl_add_sub Hos).
 do 4 rewrite fold_rngl_squ.
 do 2 rewrite (rngl_squ_mul Hic).
 specialize (cos2_sin2_1 p2) as H1.
@@ -1391,7 +1393,9 @@ rewrite (rngl_sub_sub_distr Hop).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_add_comm (rngl_cos p2 * _))%L.
-rewrite <- (rngl_squ_sub_squ Hop); [ | apply (rngl_mul_comm Hic) ].
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_comm Hic (_ * _)).
+rewrite (rngl_add_sub Hos).
 do 4 rewrite fold_rngl_squ.
 do 2 rewrite (rngl_squ_mul Hic).
 specialize (cos2_sin2_1 p2) as H1.
