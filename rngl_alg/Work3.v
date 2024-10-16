@@ -317,6 +317,10 @@ assert (H1 :
     rewrite (gc_mul_0_l Hos).
     rewrite (gc_modl_0 Hon Hop Hor Hii).
     rewrite rngl_add_0_l.
+    rewrite all_0_rngl_summation_0; [ apply (rngl_le_refl Hor) | ].
+    intros i (_, Hi).
+    now destruct i; rewrite (gc_mul_0_l Hos), (gc_modl_0 Hon Hop Hor Hii).
+  }
 ...
   progress unfold gc_modl.
   specialize (rl_modl_add_le Hic Hon Hop Hiv Hor) as H1.
