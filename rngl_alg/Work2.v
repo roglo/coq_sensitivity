@@ -771,16 +771,14 @@ now apply (is_dist_separation dist Hd).
 Qed.
 
 Theorem rngl_squ_lt_squ_nonneg :
-  rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ a b,
-  (0 ≤ a → a < b → a² < b²)%L.
+  ∀ a b, (a * b = b * a → 0 ≤ a → a < b → a² < b²)%L.
 Proof.
-intros Hic Hop Hor Hid.
-intros * Hza Hab.
-apply (rngl_abs_lt_squ_lt Hic Hop Hor Hid).
+intros Hop Hor Hid.
+intros * Habc Hza Hab.
+apply (rngl_abs_lt_squ_lt Hop Hor Hid _ _ Habc).
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 apply (rngl_le_trans Hor _ a); [ easy | ].

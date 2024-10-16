@@ -633,10 +633,10 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      rewrite (rl_sqrt_1 Hic Hon Hop Hor). 2: {
+      rewrite (rl_sqrt_1 Hon Hop Hor). 2: {
         now rewrite Bool.orb_true_iff; right.
       }
-      rewrite (rl_sqrt_0 Hon Hop Hic Hor). 2: {
+      rewrite (rl_sqrt_0 Hon Hop Hor). 2: {
         now rewrite Bool.orb_true_iff; right.
       }
       rewrite (rngl_mul_0_l Hos).
@@ -831,10 +831,10 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      rewrite (rl_sqrt_1 Hic Hon Hop Hor). 2: {
+      rewrite (rl_sqrt_1 Hon Hop Hor). 2: {
         now rewrite Bool.orb_true_iff; right.
       }
-      rewrite (rl_sqrt_0 Hon Hop Hic Hor). 2: {
+      rewrite (rl_sqrt_0 Hon Hop Hor). 2: {
         now rewrite Bool.orb_true_iff; right.
       }
       rewrite (rngl_mul_0_l Hos).
@@ -878,7 +878,7 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hon Hop Hic Hor).
+      apply (rl_sqrt_0 Hon Hop Hor).
       now rewrite Bool.orb_true_iff; right.
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
@@ -934,7 +934,7 @@ destruct zs12. {
       rewrite (rngl_div_0_l Hos Hi1). 2: {
         apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
       }
-      apply (rl_sqrt_0 Hon Hop Hic Hor).
+      apply (rl_sqrt_0 Hon Hop Hor).
       now rewrite Bool.orb_true_iff; right.
     }
     apply rngl_sin_nonneg_sin_nonneg_sin_neg; try easy; cycle 1. {
@@ -1088,7 +1088,7 @@ destruct zs. {
   rewrite (rngl_mul_opp_l Hop).
   apply -> (rngl_opp_lt_compat Hop Hor).
   rewrite (rngl_mul_1_l Hon).
-  rewrite <- (rl_sqrt_1 Hic Hon Hop Hor) at 4. 2: {
+  rewrite <- (rl_sqrt_1 Hon Hop Hor) at 4. 2: {
     now rewrite Bool.orb_true_iff; right.
   }
   apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {

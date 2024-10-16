@@ -1257,7 +1257,7 @@ induction k. {
   do 2 rewrite (rngl_sub_diag Hos).
   rewrite (rngl_squ_0 Hos).
   rewrite rngl_add_0_l.
-  rewrite (rl_sqrt_0 Hon Hop Hic Hor); [ easy | ].
+  rewrite (rl_sqrt_0 Hon Hop Hor); [ easy | ].
   rewrite Hi1.
   apply Bool.orb_true_r.
 }
@@ -1430,7 +1430,7 @@ rewrite IHn.
 rewrite (rngl_div_diag Hon Hiq). 2: {
   apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 }
-apply (rl_sqrt_1 Hic Hon Hop Hor).
+apply (rl_sqrt_1 Hon Hop Hor).
 now rewrite Bool.orb_true_iff; right.
 Qed.
 

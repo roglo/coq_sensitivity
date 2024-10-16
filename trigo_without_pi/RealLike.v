@@ -124,17 +124,19 @@ Qed.
 Theorem rl_sqrt_0 :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_mul_is_comm T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   rl_sqrt 0%L = 0%L.
 Proof.
-intros Hon Hop Hic Hor Hii.
+intros Hon Hop Hor Hii.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rl_nth_root_pow 2 0%L (rngl_le_refl Hor _)) as H1.
 rewrite <- (rngl_squ_0 Hos) in H1 at 2.
 rewrite <- (rngl_squ_pow_2 Hon) in H1.
-apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H1. 2: {
+  rewrite (rngl_mul_0_l Hos).
+  apply (rngl_mul_0_r Hos).
+}
 rewrite (rngl_abs_0 Hop) in H1.
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H1; [ easy | ].
 apply rl_sqrt_nonneg, (rngl_le_refl Hor).
@@ -353,20 +355,22 @@ now apply (rngl_lt_irrefl Hor) in Ha.
 Qed.
 
 Theorem rl_sqrt_1 :
-  rngl_mul_is_comm T = true →
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
   rl_sqrt 1%L = 1%L.
 Proof.
-intros Hic Hon Hop Hor Hii.
+intros Hon Hop Hor Hii.
 specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
 progress unfold rl_sqrt.
 specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
 rewrite <- (rngl_squ_1 Hon) in H1 at 2.
 rewrite <- (rngl_squ_pow_2 Hon) in H1.
-apply (eq_rngl_squ_rngl_abs Hop Hic Hor Hii) in H1.
+apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H1. 2: {
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_mul_1_r Hon).
+}
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
   now apply rl_sqrt_nonneg.
 }

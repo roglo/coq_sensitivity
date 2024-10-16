@@ -861,7 +861,7 @@ destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
   progress unfold rngl_squ in Hρ.
   rewrite (rngl_mul_0_l Hos) in Hρ.
   rewrite rngl_add_0_l in Hρ.
-  rewrite (rl_sqrt_0 Hon Hop Hic Hor Hii) in Hρ.
+  rewrite (rl_sqrt_0 Hon Hop Hor Hii) in Hρ.
   rewrite Hρ.
   now do 2 rewrite (rngl_mul_0_l Hos).
 }
@@ -1332,7 +1332,7 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_sub_assoc Hop).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic (_ - _))%L.
-rewrite <- (rngl_squ_sub_squ Hop Hic).
+rewrite <- (rngl_squ_sub_squ Hop); [ | apply (rngl_mul_comm Hic) ].
 do 4 rewrite fold_rngl_squ.
 do 2 rewrite (rngl_squ_mul Hic).
 specialize (cos2_sin2_1 p2) as H1.
@@ -1391,7 +1391,7 @@ rewrite (rngl_sub_sub_distr Hop).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_add_comm (rngl_cos p2 * _))%L.
-rewrite <- (rngl_squ_sub_squ Hop Hic).
+rewrite <- (rngl_squ_sub_squ Hop); [ | apply (rngl_mul_comm Hic) ].
 do 4 rewrite fold_rngl_squ.
 do 2 rewrite (rngl_squ_mul Hic).
 specialize (cos2_sin2_1 p2) as H1.
@@ -1803,8 +1803,10 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_)%L. 2: {
   now apply rl_sqrt_nonneg.
 }
-apply (eq_rngl_squ_rngl_abs Hop Hic Hor). {
+apply (eq_rngl_squ_rngl_abs Hop Hor). {
   now rewrite Bool.orb_true_iff; right.
+} {
+  apply (rngl_mul_comm Hic).
 }
 rewrite (rngl_squ_sqrt Hon); [ | easy ].
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].

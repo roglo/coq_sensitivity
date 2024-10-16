@@ -152,6 +152,23 @@ apply (rngl_div_nonneg Hon Hop Hiv Hor). {
 }
 Qed.
 
+Theorem gc_modl_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  (‖ 0 ‖ = 0)%L.
+Proof.
+intros Hon Hop Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold gc_modl.
+progress unfold rl_modl.
+cbn.
+rewrite (rngl_squ_0 Hos).
+rewrite rngl_add_0_l.
+apply (rl_sqrt_0 Hon Hop Hor Hii).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let ro := gc_ring_like_op T in
@@ -292,6 +309,15 @@ assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
+(**)
+  progress unfold rngl_eval_polyn.
+  induction P as [| a] using List.rev_ind. {
+    cbn.
+    destruct n; [ easy | ].
+    rewrite (gc_mul_0_l Hos).
+    rewrite (gc_modl_0 Hon Hop Hor Hii).
+    rewrite rngl_add_0_l.
+...
   progress unfold gc_modl.
   specialize (rl_modl_add_le Hic Hon Hop Hiv Hor) as H1.
   remember (rngl_eval_polyn P z) as fz eqn:Hfz.

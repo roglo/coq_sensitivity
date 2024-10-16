@@ -390,7 +390,9 @@ destruct zc1. {
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
   specialize (rngl_lt_le_incl Hor _ _ Hzs2) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hc12.
+  apply (rngl_abs_lt_squ_lt Hop Hor Hii) in Hc12. 2: {
+    apply (rngl_mul_comm Hic).
+  }
   apply (rngl_squ_lt_abs_lt Hop Hor Hii).
   specialize (cos2_sin2_1 θ1) as Hcs1.
   specialize (cos2_sin2_1 θ2) as Hcs2.
@@ -423,7 +425,9 @@ destruct zc2. {
   }
   specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  apply (rngl_abs_lt_squ_lt Hic Hop Hor Hii) in Hc12.
+  apply (rngl_abs_lt_squ_lt Hop Hor Hii) in Hc12. 2: {
+    apply (rngl_mul_comm Hic).
+  }
   apply (rngl_squ_lt_abs_lt Hop Hor Hii).
   specialize (cos2_sin2_1 θ1) as Hcs1.
   specialize (cos2_sin2_1 θ2) as Hcs2.
@@ -631,7 +635,7 @@ destruct zs. {
       apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
     }
     symmetry.
-    rewrite (rl_sqrt_0 Hon Hop Hic Hor). 2: {
+    rewrite (rl_sqrt_0 Hon Hop Hor). 2: {
       rewrite Bool.orb_true_iff; right.
       apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
     }
