@@ -171,7 +171,7 @@ Qed.
 
 (* to be completed
 Theorem gc_opt_alg_closed :
-  let ro := gc_ring_like_op T in
+  let roc := gc_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool
   then
@@ -187,13 +187,19 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
+(* strange that to make a gc_ring_like_prop with rngl_opt_alg_closed
+   equal to Some ..., we need another gc_ring_like_prop. That one
+   with None because... we are just proving that gc is algebraically
+   close *)
+...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  let gro := gc_ring_like_op T in
+  let roc := gc_ring_like_op T in
+  let rpc := gc_ring_like_prop T in
   ∀ P : list (GComplex T),
   ∀ M, (0 < M)%L →
   List.nth (length P - 1) P 0%L ≠ 0%C
@@ -309,7 +315,16 @@ assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
-(**)
+Check rngl_eval_polyn_is_summation.
+...
+  rewrite rngl_eval_polyn_is_summation.
+...
+Require Import Main.LapPolyn.
+Search eval_lap.
+Print eval_lap.
+Print eval_rlap.
+Print rlap_horner.
+Search rngl_eval_polyn.
   progress unfold rngl_eval_polyn.
   induction P as [| a] using List.rev_ind. {
     cbn.

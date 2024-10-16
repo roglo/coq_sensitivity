@@ -753,4 +753,52 @@ destruct fb. {
 }
 Qed.
 
+Theorem rngl_eval_polyn_is_summation :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  (0 + 0 * 1)%L = 0%L →
+  ∀ (la : list T) x,
+  (rngl_eval_polyn la x = ∑ (i = 0, length la - 1), la.[i] * x ^ i)%L.
+Proof.
+intros Hon Hos glop.
+intros.
+progress unfold rngl_eval_polyn.
+induction la as [| a]. {
+  cbn; symmetry.
+  apply all_0_rngl_summation_0.
+  intros i (_, Hi).
+  apply Nat.le_0_r in Hi; subst i.
+  apply (rngl_mul_0_l Hos).
+}
+cbn.
+rewrite IHla.
+rewrite Nat.sub_0_r.
+symmetry.
+rewrite rngl_summation_split_first; [ | easy ].
+cbn.
+rewrite (rngl_mul_1_r Hon).
+rewrite rngl_add_comm.
+f_equal.
+remember (length la) as len eqn:Hlen.
+symmetry in Hlen.
+destruct len. {
+  cbn.
+  apply List.length_zero_iff_nil in Hlen.
+  subst la; cbn.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_only_one; symmetry.
+  rewrite <- rngl_mul_assoc.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite rngl_summation_succ_succ.
+rewrite Nat_sub_succ_1.
+rewrite (rngl_mul_summation_distr_r).
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+rewrite <- rngl_mul_assoc; f_equal.
+rewrite <- Nat.add_1_r.
+rewrite (rngl_pow_add_r Hon).
+now rewrite (rngl_pow_1_r Hon).
+Qed.
+
 End a.
