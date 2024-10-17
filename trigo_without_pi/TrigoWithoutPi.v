@@ -3831,11 +3831,8 @@ apply (rngl_add_le_compat Hor). {
 }
 Qed.
 
-Theorem angle_taxi_dist_is_dist :
-  rngl_has_opp T = true →
-  is_dist angle_taxi_dist.
+Theorem angle_taxi_dist_is_dist : is_dist angle_taxi_dist.
 Proof.
-intros Hop.
 split. {
   apply angle_taxi_dist_symmetry.
 } {

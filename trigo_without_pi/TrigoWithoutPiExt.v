@@ -1102,6 +1102,14 @@ apply (dist_nonneg Hon Hop Hiv Hor).
 apply angle_eucl_dist_is_dist.
 Qed.
 
+Theorem angle_taxi_dist_nonneg : ∀ θ1 θ2, (0 ≤ angle_taxi_dist θ1 θ2)%L.
+Proof.
+destruct_ac.
+intros.
+apply (dist_nonneg Hon Hop Hiv Hor).
+apply angle_taxi_dist_is_dist.
+Qed.
+
 Theorem angle_lim_const :
   ∀ θ1 θ2, angle_lim (λ _, θ1) θ2 → θ2 = θ1.
 Proof.
