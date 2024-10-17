@@ -235,7 +235,8 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_is_ordered T = true →
   let roc := gc_ring_like_op T in
   ∀ P : list (GComplex T),
-  ∀ M, (0 < M)%L →
+  1 < length P
+  → ∀ M, (0 < M)%L →
   List.nth (length P - 1) P 0%L ≠ 0%C
   → ∃ R₀, (0 < R₀)%L ∧
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
@@ -254,11 +255,11 @@ assert (Hio :
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite H1 in H.
-  now apply (rngl_lt_irrefl Hor) in H.
+  intros * Hn1 * HM Hz.
+  rewrite H1 in HM.
+  now apply (rngl_lt_irrefl Hor) in HM.
 }
-intros * HM Hz.
+intros * Hn1 * HM Hz.
 (* must take
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
@@ -271,49 +272,23 @@ assert (Hr : (0 < R₀)%L). {
   }
   rewrite <- rngl_add_assoc.
   apply (rngl_le_add_r Hor).
-  clear Hn.
-  remember (P.[n - 1]) as d eqn:Hd.
-  clear Hd.
-  induction n; cbn. {
-    apply (rngl_le_trans Hor _ M). {
-      now apply (rngl_lt_le_incl Hor) in HM.
-    }
-    apply (rngl_le_add_r Hor).
-    rewrite iter_seq_only_one'. {
-      now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
-    }
-    intros x.
-    apply (rngl_max_r_iff Hor).
-    now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    now apply (rngl_lt_le_incl Hor) in HM.
   }
-  replace 0%C with 0%L by easy.
-  destruct n; [ easy | ].
-  progress unfold iter_seq in IHn.
   progress unfold iter_seq.
-  rewrite Nat.sub_0_r in IHn |-*.
-  cbn - [ List.seq ] in IHn.
-  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
-  rewrite Nat.sub_0_r.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    apply (rngl_le_trans Hor _ M). {
-      now apply (rngl_lt_le_incl Hor) in HM.
-    }
-    apply (rngl_le_add_r Hor).
-    progress unfold iter_list.
-    subst n; cbn.
-    apply (rngl_le_max_l Hor).
-  }
-  apply Nat.neq_0_lt_0 in Hnz.
-  rewrite <- Nat_succ_sub_succ_r in IHn; [ | easy ].
-  rewrite Nat.sub_0_r in IHn.
-  rewrite List.seq_S.
-  cbn.
-  progress unfold iter_list in IHn.
   progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  remember (P.[n - 1]) as d eqn:Hd.
+  destruct n; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  clear Hd.
+  clear Hn Hn1 R₀.
+  induction n; [ apply (rngl_le_refl Hor) | ].
+  rewrite List.seq_S; cbn.
   rewrite List.fold_left_app.
   cbn.
   eapply (rngl_le_trans Hor); [ apply IHn | ].
-  apply (rngl_add_le_mono_l Hop Hor).
   apply (rngl_le_max_l Hor).
 }
 exists R₀.
@@ -344,22 +319,7 @@ assert (Hpz :
 clear H1.
 rename n into m; rename Hn into Hm.
 remember (m - 1) as n eqn:Hn.
-replace (m - 2) with (n - 1) in Hr by flia Hn.
-destruct (le_dec n 1) as [Hn1| Hn1]. {
-  destruct n. {
-    clear Hn1 Hpz.
-    symmetry in Hm.
-    destruct m. {
-      apply List.length_zero_iff_nil in Hm.
-      now subst P.
-    }
-    destruct m; [ | easy ].
-    destruct P as [| a]; [ easy | ].
-    destruct P; [ | easy ].
-    clear Hm Hn.
-    cbn in Hz |-*.
-    rewrite (gc_mul_0_l Hos).
-(* il n'y a aucune raison que ce soit vrai, ça *)
+progress replace (m - 2) with (n - 1) in Hr by flia Hn.
 ...
 assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
