@@ -345,6 +345,22 @@ clear H1.
 rename n into m; rename Hn into Hm.
 remember (m - 1) as n eqn:Hn.
 replace (m - 2) with (n - 1) in Hr by flia Hn.
+destruct (le_dec n 1) as [Hn1| Hn1]. {
+  destruct n. {
+    clear Hn1 Hpz.
+    symmetry in Hm.
+    destruct m. {
+      apply List.length_zero_iff_nil in Hm.
+      now subst P.
+    }
+    destruct m; [ | easy ].
+    destruct P as [| a]; [ easy | ].
+    destruct P; [ | easy ].
+    clear Hm Hn.
+    cbn in Hz |-*.
+    rewrite (gc_mul_0_l Hos).
+(* il n'y a aucune raison que ce soit vrai, ça *)
+...
 assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
