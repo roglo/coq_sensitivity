@@ -921,28 +921,6 @@ Definition angle_lim := is_limit_when_tending_to_inf angle_eucl_dist.
 
 Definition seq_angle_to_div_nat θ (n i : nat) := (2 ^ i / n * (θ /₂^i))%A.
 
-(*
-Definition seq_angle_to_mul (θ : angle T) (x : T) : nat → angle T.
-intros i.
-remember (rngl_has_1 T) as on eqn:Hon.
-remember (rngl_has_opp T) as op eqn:Hop.
-remember (rngl_is_ordered T) as or eqn:Hor.
-remember (rngl_is_archimedean T) as ar eqn:Har.
-remember (rngl_characteristic T) as ch eqn:Hch.
-symmetry in Hon, Hop, Hor, Har, Hch.
-destruct on; [ | apply 0%A ].
-destruct op; [ | apply 0%A ].
-destruct or; [ | apply 0%A ].
-destruct ar; [ | apply 0%A ].
-destruct (Nat.eq_dec ch 1) as [Hc1| Hc1]; [ apply 0%A | subst ch ].
-specialize (int_part Hon Hop Hc1 Hor Har) as H1.
-specialize (H1 (rngl_of_nat i * x))%L.
-(* boh, chais pas *)
-destruct H1 as (m, Hm).
-...
-  (x * rngl_of_nat (2 ^ i) * (θ /₂^i))%A.
-*)
-
 Theorem angle_eucl_dist_opp_opp :
   ∀ θ1 θ2, angle_eucl_dist (- θ1) (- θ2) = angle_eucl_dist θ1 θ2.
 Proof.
