@@ -377,6 +377,30 @@ assert (H1 :
     apply Nat.succ_le_mono in Hn1.
     apply Nat.le_0_r in Hn1; subst n.
     cbn.
+    rewrite rngl_add_0_l.
+    destruct m; [ easy | ].
+    cbn in Hn; rewrite Nat.sub_0_r in Hn.
+    subst m.
+    symmetry in Hm.
+    destruct P as [| a]; [ easy | ].
+    destruct P as [| b]; [ easy | ].
+    destruct P; [ | easy ].
+    cbn.
+    rewrite (gc_mul_0_l Hos).
+    progress unfold gc_modl.
+    specialize (rl_modl_add_le Hic Hon Hop Hiv Hor) as H1.
+    eapply (rngl_le_trans Hor); [ | apply H1 ].
+    cbn.
+    rewrite gre_1, gim_1.
+    do 4 rewrite (rngl_mul_1_r Hon).
+    do 4 rewrite (rngl_mul_0_r Hos).
+    do 2 rewrite (rngl_sub_0_r Hos).
+    do 2 rewrite rngl_add_0_l.
+    do 2 rewrite rngl_add_0_r.
+    remember (gre b * gre z - gim b * gim z)%L as x eqn:Hx.
+    remember (gim b * gre z + gre b * gim z)%L as y eqn:Hy.
+    clear Hm; cbn in Hz.
+    move y before x.
 ...
   }
   apply Nat.nle_gt in Hn1.
