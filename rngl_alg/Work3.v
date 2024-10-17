@@ -169,6 +169,46 @@ rewrite rngl_add_0_l.
 apply (rl_sqrt_0 Hon Hop Hor Hii).
 Qed.
 
+Theorem gc_mul_1_l :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ z, (1 * z)%C = z.
+Proof.
+intros Hon Hos.
+intros.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+split; apply (rngl_mul_1_l Hon).
+Qed.
+
+Theorem gc_mul_1_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ z, (z * 1)%C = z.
+Proof.
+intros Hon Hos.
+intros.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+split; apply (rngl_mul_1_r Hon).
+Qed.
+
+Theorem gc_modl_nonneg :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ z, (0 ≤ ‖ z ‖)%L.
+Proof.
+intros Hop Hor *.
+progress unfold gc_modl.
+progress unfold rl_modl.
+apply rl_sqrt_nonneg.
+apply (rngl_add_squ_nonneg Hop Hor).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -187,11 +227,6 @@ destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
-(* strange that to make a gc_ring_like_prop with rngl_opt_alg_closed
-   equal to Some ..., we need another gc_ring_like_prop. That one
-   with None because... we are just proving that gc is algebraically
-   close *)
-...
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
@@ -199,7 +234,6 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   let roc := gc_ring_like_op T in
-  let rpc := gc_ring_like_prop T in
   ∀ P : list (GComplex T),
   ∀ M, (0 < M)%L →
   List.nth (length P - 1) P 0%L ≠ 0%C
@@ -315,7 +349,38 @@ assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
-Check rngl_eval_polyn_is_summation.
+(**)
+  progress unfold rngl_eval_polyn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  destruct (le_dec n 1) as [Hn1| Hn1]. {
+    destruct n. {
+      cbn.
+      symmetry in Hn.
+      apply Nat.sub_0_le in Hn.
+      symmetry in Hm.
+      destruct m. {
+        apply List.length_zero_iff_nil in Hm.
+        now subst P.
+      }
+      apply Nat.succ_le_mono in Hn.
+      apply Nat.le_0_r in Hn.
+      subst m.
+      destruct P as [| a]; [ easy | ].
+      destruct P; [ cbn | easy ].
+      rewrite rngl_add_0_l.
+      rewrite (gc_mul_0_l Hos).
+      apply (rngl_le_add_l Hor).
+      apply (gc_modl_nonneg Hop Hor).
+    }
+    apply Nat.succ_le_mono in Hn1.
+    apply Nat.le_0_r in Hn1; subst n.
+    cbn.
+...
+  }
+  apply Nat.nle_gt in Hn1.
+  rewrite Nat_succ_sub_succ_r; [ | easy ].
 ...
   rewrite rngl_eval_polyn_is_summation.
 ...
