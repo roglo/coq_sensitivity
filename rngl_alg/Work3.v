@@ -320,8 +320,6 @@ clear H1.
 rename n into m; rename Hn into Hm.
 remember (m - 1) as n eqn:Hn.
 progress replace (m - 2) with (n - 1) in Hr by flia Hn.
-About angle_eucl_dist.
-...
 assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
@@ -331,6 +329,40 @@ assert (H1 :
   progress unfold iter_seq.
   progress unfold iter_list.
   rewrite Nat.sub_0_r.
+  assert (Hnz : 0 < n). {
+    subst n.
+    now apply Nat.lt_add_lt_sub_r.
+  }
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
+subst n.
+destruct m; [ easy | ].
+rewrite Nat_sub_succ_1 in Hz, Hnz, Hpz |-*.
+clear Hn1.
+symmetry in Hm.
+clear Hpz Hr.
+revert P Hm Hz.
+induction m; intros; [ easy | clear Hnz ].
+destruct m. {
+  clear IHm.
+  cbn.
+  rewrite rngl_add_0_l.
+  destruct P as [| a la]; [ easy | cbn ].
+  destruct la as [| b]; [ easy | ].
+  destruct la; [ | easy ].
+  cbn in Hz; clear Hm.
+...
+Search (S _ - 1).
+(*
+  rewrite <- List.fold_symmetric. 2: {
+    intros a b c.
+    f_equal.
+...
+  rewrite <- List.fold_left_rev_right.
+*)
+Search (List.rev (List.seq _ _)).
+Search (List.fold_left _ _ _ = List.fold_right _ _ _).
+...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
       cbn.
