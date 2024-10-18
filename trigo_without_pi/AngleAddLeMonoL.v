@@ -1472,7 +1472,20 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply (rngl_lt_le_incl Hor) in Hc2z, Hc3z.
     now apply rngl_cos_add_nonneg_cos_add_nonneg with (θ3 := θ3).
   } {
+    exfalso.
     apply (rngl_nle_gt Hor) in Hc1z.
+(*
+change_angle_sub_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T Hzs13.
+progress sin_cos_add_sub_right_hyp T Hc1z.
+    apply (rngl_nlt_ge Hor) in Hzs13.
+    apply Hzs13; clear Hzs13.
+Search (0 < rngl_sin (_ + _))%L.
+apply angle_add_le_mono_l_lemma_8; try easy.
+apply rngl_sin_add_pos_2; try easy.
+...
+*)
     rewrite angle_add_comm in Hzs13.
     apply angle_add_le_mono_l_lemma_10 in Hzs13; try easy.
     2: now apply (rngl_lt_le_incl Hor).
