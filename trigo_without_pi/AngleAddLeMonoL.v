@@ -1477,8 +1477,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
 (*
 clear - ac θ1 θ3 Hzs13 Hzs1 Haov13 Hc1z Hc3z Hzs3.
 (**)
-Check angle_add_le_mono_l_lemma_10.
-(* faudrait redefinir ce lemma_10 avec 0 ≤ rngl_cos θ2 en but *)
 destruct_ac.
     destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
       specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -1489,6 +1487,22 @@ destruct_ac.
     progress sin_cos_add_sub_right_hyp T Hzs1.
     progress sin_cos_add_sub_right_hyp T Hzs13.
     progress sin_cos_add_sub_right_hyp T Hc1z.
+(*
+theorem angle_add_overflow_move_add removed from git
+*)
+apply angle_add_not_overflow_move_add in Haov13.
+rewrite <- angle_add_assoc in Haov13.
+rewrite angle_right_add_right in Haov13.
+apply angle_add_not_overflow_comm in Haov13.
+rewrite angle_add_comm in Haov13.
+apply angle_add_not_overflow_move_add in Haov13.
+apply angle_add_not_overflow_comm in Haov13.
+Search (angle_add_overflow _ angle_straight).
+Search (angle_add_overflow angle_straight).
+(* bon, y aurait des trucs à faire mais chais pas lesquels *)
+...
+Check angle_add_not_overflow_move_add.
+...
     specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
     destruct (rngl_eq_dec Heo (rngl_cos θ3) 0) as [H| H]. {
       apply eq_rngl_cos_0 in H.
