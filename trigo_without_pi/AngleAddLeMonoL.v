@@ -1475,15 +1475,44 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     exfalso.
     apply (rngl_nle_gt Hor) in Hc1z.
 (*
-change_angle_sub_r θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs1.
-progress sin_cos_add_sub_right_hyp T Hzs13.
-progress sin_cos_add_sub_right_hyp T Hc1z.
+clear - ac θ1 θ3 Hzs13 Hzs1 Haov13 Hc1z Hc3z Hzs3.
+(**)
+Check angle_add_le_mono_l_lemma_10.
+(* faudrait redefinir ce lemma_10 avec 0 ≤ rngl_cos θ2 en but *)
+destruct_ac.
+    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+      specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+      rewrite (H1 (rngl_cos θ1)) in Hc1z.
+      now apply (rngl_lt_irrefl Hor) in Hc1z.
+    }
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hzs13.
+    progress sin_cos_add_sub_right_hyp T Hc1z.
+    specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+    destruct (rngl_eq_dec Heo (rngl_cos θ3) 0) as [H| H]. {
+      apply eq_rngl_cos_0 in H.
+      destruct H; subst θ3. {
+        rewrite rngl_sin_add_right_r in Hzs13.
+        apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
+        apply eq_rngl_cos_0 in Hzs1.
+        destruct Hzs1; subst θ1. {
+          rewrite angle_right_add_right in Haov13.
+          now rewrite angle_add_overflow_straight_straight in Haov13.
+        }
+        apply (rngl_nle_gt Hor) in Hc1z.
+        apply Hc1z; clear Hc1z.
+        apply (rngl_opp_1_le_0 Hon Hop Hor).
+      }
+      apply (rngl_nle_gt Hor) in Hc3z.
+      apply Hc3z; clear Hc3z.
+      apply (rngl_opp_1_le_0 Hon Hop Hor).
+    }
     apply (rngl_nlt_ge Hor) in Hzs13.
     apply Hzs13; clear Hzs13.
-Search (0 < rngl_sin (_ + _))%L.
-apply angle_add_le_mono_l_lemma_8; try easy.
-apply rngl_sin_add_pos_2; try easy.
+    apply rngl_sin_add_pos_2; try easy.
+    now apply (rngl_lt_le_incl Hor) in Hc3z.
+    now apply (rngl_lt_iff Hor).
 ...
 *)
     rewrite angle_add_comm in Hzs13.
