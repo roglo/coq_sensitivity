@@ -209,6 +209,24 @@ apply rl_sqrt_nonneg.
 apply (rngl_add_squ_nonneg Hop Hor).
 Qed.
 
+Theorem rl_modl_opp_l :
+  rngl_has_opp T = true →
+  ∀ x y, rl_modl (- x) y = rl_modl x y.
+Proof.
+intros Hop *.
+progress unfold rl_modl.
+now rewrite (rngl_squ_opp Hop).
+Qed.
+
+Theorem rl_modl_opp_r :
+  rngl_has_opp T = true →
+  ∀ x y, rl_modl x (- y) = rl_modl x y.
+Proof.
+intros Hop *.
+progress unfold rl_modl.
+now rewrite (rngl_squ_opp Hop).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -350,18 +368,28 @@ destruct m. {
   destruct P as [| a la]; [ easy | cbn ].
   destruct la as [| b]; [ easy | ].
   destruct la; [ | easy ].
-  cbn in Hz; clear Hm.
-...
-Search (S _ - 1).
-(*
-  rewrite <- List.fold_symmetric. 2: {
-    intros a b c.
-    f_equal.
-...
-  rewrite <- List.fold_left_rev_right.
-*)
-Search (List.rev (List.seq _ _)).
-Search (List.fold_left _ _ _ = List.fold_right _ _ _).
+  cbn in Hz |-*; clear Hm.
+  (* why gc_mul_1_r and rngl_mul_1_r don't work? *)
+  progress unfold gc_modl.
+  cbn.
+  rewrite gre_1, gim_1.
+  do 4 rewrite (rngl_mul_1_r Hon).
+  do 4 rewrite (rngl_mul_0_r Hos).
+  do 2 rewrite (rngl_mul_0_l Hos).
+  do 3 rewrite (rngl_sub_0_r Hos).
+  do 3 rewrite rngl_add_0_r.
+  do 2 rewrite rngl_add_0_l.
+  remember (gre b * gre z - gim b * gim z)%L as x.
+  remember (gim b * gre z + gre b * gim z)%L as y.
+  rewrite <- (rl_modl_opp_l Hop (gre a)).
+  rewrite <- (rl_modl_opp_r Hop _ (gim a)).
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
+  }
+  do 2 rewrite (rngl_add_opp_r Hop).
+  do 2 rewrite (rngl_add_sub Hos).
+  apply (rngl_le_refl Hor).
+}
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
