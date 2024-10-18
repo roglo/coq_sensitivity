@@ -369,7 +369,18 @@ destruct m. {
   destruct la as [| b]; [ easy | ].
   destruct la; [ | easy ].
   cbn in Hz |-*; clear Hm.
-  (* why gc_mul_1_r and rngl_mul_1_r don't work? *)
+  (* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
+(**)
+  replace 1%L with (@gc_one T ro). 2: {
+    apply eq_gc_eq.
+    now rewrite gre_1, gim_1.
+  }
+  do 2 rewrite (gc_mul_1_r Hon Hos).
+  rewrite (gc_mul_0_l Hos).
+...
+  rewrite gc_add_0_l.
+...
+  (* ... otherwise we do like that: *)
   progress unfold gc_modl.
   cbn.
   rewrite gre_1, gim_1.
