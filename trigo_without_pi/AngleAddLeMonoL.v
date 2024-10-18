@@ -997,28 +997,6 @@ apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_24 :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (rngl_cos θ1 ≤ 0)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (rngl_cos θ1 ≤ rngl_sin (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hc1z Hzs2.
-change_angle_sub_r θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hc1z.
-progress sin_cos_add_sub_right_hyp T Hzs1.
-progress sin_cos_add_sub_right_goal T.
-change_angle_sub_l θ2 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs2.
-progress sin_cos_add_sub_right_goal T.
-apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
-rewrite angle_sub_sub_distr.
-rewrite angle_sub_diag.
-now rewrite angle_add_0_l.
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_25 :
   ∀ θ1 θ2 θ3,
   (0 ≤ rngl_sin θ1)%L
@@ -1308,19 +1286,30 @@ clear Hc3z Hc32 Hzs3.
 rewrite rngl_sin_add_right_r.
 rewrite rngl_cos_add_right_r in Hs13z.
 apply (rngl_opp_neg_pos Hop Hor) in Hs13z.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. 2: {
-  apply (rngl_nle_gt Hor) in Hc1z.
-  apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hs13z, Hc1z.
-  apply angle_add_le_mono_l_lemma_24; try easy.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
+  apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hs13z, Hs12z.
+  change_angle_sub_l θ2 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs2.
+  progress sin_cos_add_sub_right_hyp T Hc2z.
+  progress sin_cos_add_sub_right_hyp T Hs12z.
+  progress sin_cos_add_sub_right_goal T.
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+  apply rngl_cos_sub_nonneg; try easy.
+  apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+  rewrite angle_sub_sub_distr.
+  rewrite angle_sub_diag.
+  now rewrite angle_add_0_l.
 }
-apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hs13z, Hs12z.
+apply (rngl_nle_gt Hor) in Hc1z.
+apply (rngl_lt_le_incl Hor) in Hzs2, Hc2z, Hs13z, Hc1z.
+change_angle_sub_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hc1z.
+progress sin_cos_add_sub_right_hyp T Hs12z.
+progress sin_cos_add_sub_right_hyp T Hs13z.
+progress sin_cos_add_sub_right_goal T.
 change_angle_sub_l θ2 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs2.
-progress sin_cos_add_sub_right_hyp T Hc2z.
-progress sin_cos_add_sub_right_hyp T Hs12z.
 progress sin_cos_add_sub_right_goal T.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-apply rngl_cos_sub_nonneg; try easy.
 apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
