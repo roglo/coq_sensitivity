@@ -1368,18 +1368,19 @@ Theorem angle_add_le_mono_l_lemma_10 :
   → (0 < rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_cos θ1)%L
-  → (rngl_cos θ2 ≤ 0)%L
   → (0 ≤ rngl_cos (θ1 + θ2))%L
-  → False.
+  → (0 < rngl_cos θ2)%L.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Haov12 Hc1z Hzs2 Hzs1 Hc2z Hzs12.
+  intros * Haov12 Hc1z Hzs2 Hzs1 Hzs12.
   rewrite (H1 (rngl_sin _)) in Hc1z.
   now apply (rngl_lt_irrefl Hor) in Hc1z.
 }
-intros * Haov12 Hc1z Hzs2 Hzs1 Hc2z Hzs12.
+intros * Haov12 Hc1z Hzs2 Hzs1 Hzs12.
+apply (rngl_nle_gt Hor).
+intros Hc2z.
 change_angle_sub_r θ2 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_hyp T Hzs12.
@@ -1530,9 +1531,11 @@ Check angle_add_not_overflow_move_add.
 ...
 *)
     rewrite angle_add_comm in Hzs13.
-    apply angle_add_le_mono_l_lemma_10 in Hzs13; try easy.
-    2: now apply (rngl_lt_le_incl Hor).
-    now apply angle_add_not_overflow_comm.
+    apply (rngl_nle_gt Hor) in Hc1z.
+    apply Hc1z; clear Hc1z.
+    apply (rngl_lt_le_incl Hor).
+    apply angle_add_not_overflow_comm in Haov13.
+    now apply (angle_add_le_mono_l_lemma_10 θ3).
   }
 }
 Qed.
