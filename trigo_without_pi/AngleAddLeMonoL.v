@@ -339,20 +339,92 @@ apply angle_le_sub_le_add_l_lemma_1; try easy. {
 }
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_2 :
+Theorem angle_add_le_mono_l_lemma_3 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
-  → (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin θ2)%L
   → (0 ≤ rngl_sin θ3)%L
-  → (rngl_cos θ1 < 0)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
   → (0 ≤ rngl_sin (θ1 + θ3))%L
   → (rngl_cos θ3 ≤ rngl_cos θ2)%L
   → (rngl_cos (θ1 + θ3) ≤ rngl_cos (θ1 + θ2))%L.
 Proof.
 destruct_ac.
-intros * Haov13 Hzs1 Hzs2 Hzs3 Hc1z Hzs12 Hzs13 H23.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Haov13 Hzs2 Hzs3 Hzs12 Hzs13 H23.
+destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
+  move Hzc1 before Hzs3.
+  now apply angle_add_le_mono_l_lemma_1.
+}
+apply (rngl_nle_gt Hor) in Hc1z.
+move Hc1z before Hzs3.
+destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. 2: {
+  apply (rngl_nle_gt Hor) in Hs1z.
+  move Hs1z after Hzs2.
+  change_angle_sub_r θ1 angle_straight.
+  progress sin_cos_add_sub_straight_hyp T Hs1z.
+  progress sin_cos_add_sub_straight_hyp T Hzs13.
+  progress sin_cos_add_sub_straight_hyp T Hzs12.
+  progress sin_cos_add_sub_straight_hyp T Hc1z.
+  progress sin_cos_add_sub_straight_goal T.
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
+    move Hzc2 before Hc1z.
+    exfalso.
+    apply (rngl_nlt_ge Hor) in Hzs12.
+    apply Hzs12; clear Hzs12.
+    apply (rngl_lt_le_incl Hor) in Hc1z.
+    now apply rngl_sin_add_pos_2.
+  }
+  apply (rngl_nlt_ge Hor) in Hc2z.
+  change_angle_sub_r θ2 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs2.
+  progress sin_cos_add_sub_right_hyp T Hzs12.
+  progress sin_cos_add_sub_right_hyp T Hc2z.
+  progress sin_cos_add_sub_right_hyp T H23.
+  progress sin_cos_add_sub_right_goal T.
+  destruct (rngl_lt_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
+    move Hzc3 before Hzs2.
+    exfalso.
+    apply (rngl_nlt_ge Hor) in Hzs13.
+    apply Hzs13; clear Hzs13.
+    apply (rngl_lt_le_incl Hor) in Hc1z.
+    now apply rngl_sin_add_pos_2.
+  }
+  apply (rngl_nlt_ge Hor) in Hc3z.
+  change_angle_sub_r θ3 angle_right.
+  progress sin_cos_add_sub_right_hyp T Hzs13.
+  progress sin_cos_add_sub_right_hyp T Hzs3.
+  progress sin_cos_add_sub_right_hyp T Hc3z.
+  progress sin_cos_add_sub_right_hyp T H23.
+  progress sin_cos_add_sub_right_goal T.
+  generalize H23; intros H32.
+  apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32; try easy.
+  move H32 before H23.
+  assert (Hs12z : (0 ≤ rngl_sin (θ1 + θ2))%L). {
+    apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
+    now apply rngl_sin_add_nonneg.
+  }
+  assert (Hs13z : (0 ≤ rngl_sin (θ1 + θ3))%L). {
+    apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
+    now apply rngl_sin_add_nonneg.
+  }
+  apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
+  apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
+  now apply (rngl_lt_le_incl Hor).
+  progress unfold angle_add_overflow.
+  progress unfold angle_ltb.
+  generalize Hs1z; intros H.
+  apply (rngl_lt_le_incl Hor) in H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  generalize Hs13z; intros H.
+  apply rngl_leb_le in H.
+  rewrite H; clear H.
+  apply (rngl_ltb_ge Hor).
+  apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+  now apply (rngl_lt_le_incl Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
 change_angle_sub_r θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
 progress sin_cos_add_sub_right_hyp T Hzs13.
@@ -450,96 +522,6 @@ rewrite rngl_cos_add_right_r.
 apply (rngl_lt_opp_l Hop Hor); cbn.
 apply (rngl_add_pos_nonneg Hor); [ easy | ].
 apply (rngl_0_le_1 Hon Hop Hor).
-Qed.
-
-Theorem angle_add_le_mono_l_lemma_3 :
-  ∀ θ1 θ2 θ3,
-  angle_add_overflow θ1 θ3 = false
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_sin θ3)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → (0 ≤ rngl_sin (θ1 + θ3))%L
-  → (rngl_cos θ3 ≤ rngl_cos θ2)%L
-  → (rngl_cos (θ1 + θ3) ≤ rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Haov13 Hzs2 Hzs3 Hzs12 Hzs13 H23.
-destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
-  move Hzc1 before Hzs3.
-  now apply angle_add_le_mono_l_lemma_1.
-}
-apply (rngl_nle_gt Hor) in Hc1z.
-move Hc1z before Hzs3.
-destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. {
-  move Hzs1 after Hzs2.
-  now apply angle_add_le_mono_l_lemma_2.
-}
-apply (rngl_nle_gt Hor) in Hs1z.
-move Hs1z after Hzs2.
-change_angle_sub_r θ1 angle_straight.
-progress sin_cos_add_sub_straight_hyp T Hs1z.
-progress sin_cos_add_sub_straight_hyp T Hzs13.
-progress sin_cos_add_sub_straight_hyp T Hzs12.
-progress sin_cos_add_sub_straight_hyp T Hc1z.
-progress sin_cos_add_sub_straight_goal T.
-destruct (rngl_lt_dec Hor 0 (rngl_cos θ2))%L as [Hzc2| Hc2z]. {
-  move Hzc2 before Hc1z.
-  exfalso.
-  apply (rngl_nlt_ge Hor) in Hzs12.
-  apply Hzs12; clear Hzs12.
-  apply (rngl_lt_le_incl Hor) in Hc1z.
-  now apply rngl_sin_add_pos_2.
-}
-apply (rngl_nlt_ge Hor) in Hc2z.
-change_angle_sub_r θ2 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs2.
-progress sin_cos_add_sub_right_hyp T Hzs12.
-progress sin_cos_add_sub_right_hyp T Hc2z.
-progress sin_cos_add_sub_right_hyp T H23.
-progress sin_cos_add_sub_right_goal T.
-destruct (rngl_lt_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
-  move Hzc3 before Hzs2.
-  exfalso.
-  apply (rngl_nlt_ge Hor) in Hzs13.
-  apply Hzs13; clear Hzs13.
-  apply (rngl_lt_le_incl Hor) in Hc1z.
-  now apply rngl_sin_add_pos_2.
-}
-apply (rngl_nlt_ge Hor) in Hc3z.
-change_angle_sub_r θ3 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs13.
-progress sin_cos_add_sub_right_hyp T Hzs3.
-progress sin_cos_add_sub_right_hyp T Hc3z.
-progress sin_cos_add_sub_right_hyp T H23.
-progress sin_cos_add_sub_right_goal T.
-generalize H23; intros H32.
-apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff in H32; try easy.
-move H32 before H23.
-assert (Hs12z : (0 ≤ rngl_sin (θ1 + θ2))%L). {
-  apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
-  now apply rngl_sin_add_nonneg.
-}
-assert (Hs13z : (0 ≤ rngl_sin (θ1 + θ3))%L). {
-  apply (rngl_lt_le_incl Hor) in Hs1z, Hc1z.
-  now apply rngl_sin_add_nonneg.
-}
-apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
-apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
-now apply (rngl_lt_le_incl Hor).
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-generalize Hs1z; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hs13z; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-apply (rngl_ltb_ge Hor).
-apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
-now apply (rngl_lt_le_incl Hor).
-now apply (rngl_lt_le_incl Hor).
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_8 :
