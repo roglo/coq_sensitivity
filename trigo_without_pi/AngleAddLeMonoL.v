@@ -997,16 +997,32 @@ apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_35 :
+Theorem angle_add_le_mono_l_lemma_37 :
   ∀ θ1 θ2,
-  (rngl_sin θ2 < 0)%L
-  → (0 < rngl_sin θ1)%L
-  → (rngl_cos θ1 ≤ 0)%L
-  → (rngl_cos θ1 < rngl_cos (θ1 + θ2))%L.
+  (0 < rngl_sin θ1)%L
+  → (rngl_sin θ2 < 0)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → angle_add_overflow θ1 θ2 = true.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hzs2 Hzs1 Hc1z.
+intros * Hzs1 Hzs2 Hzc2 Hzs12.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+generalize Hzs12; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+generalize Hzs1; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+apply rngl_ltb_lt.
+destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. 2: {
+  apply (rngl_nle_gt Hor) in Hzc1.
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
+  now apply quadrant_1_quadrant_4_cos_lt_cos_add.
+}
 change_angle_add_r θ2 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs2.
 progress sin_cos_add_sub_right_goal T.
@@ -1024,35 +1040,6 @@ now apply (rngl_mul_pos_pos Hop Hor Hii).
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 apply (rngl_le_0_sub Hop Hor).
 apply rngl_sin_bound.
-Qed.
-
-Theorem angle_add_le_mono_l_lemma_37 :
-  ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → angle_add_overflow θ1 θ2 = true.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hzc2 Hzs12.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-generalize Hzs12; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hzs1; intros H.
-apply (rngl_lt_le_incl Hor) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-apply rngl_ltb_lt.
-destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
-  now apply angle_add_le_mono_l_lemma_35.
-} {
-  apply (rngl_nle_gt Hor) in Hzc1.
-  apply (rngl_lt_le_incl Hor) in Hzs1, Hzc1.
-  now apply quadrant_1_quadrant_4_cos_lt_cos_add.
-}
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_38 :
