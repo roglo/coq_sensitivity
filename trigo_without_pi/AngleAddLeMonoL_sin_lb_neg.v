@@ -1944,21 +1944,4 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_sin_lb_neg :
-  ∀ θ1 θ2 θ3,
-  (rngl_sin (θ1 + θ2) < 0)%L
-  → angle_add_overflow θ1 θ3 = false
-  → (θ2 ≤ θ3)%A
-  → (θ1 + θ2 ≤ θ1 + θ3)%A.
-Proof.
-destruct_ac.
-intros * Hzs12 Haov13 H23.
-destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hzs2]. {
-  now apply angle_add_le_mono_l_sin_lb_neg_sin_2_nonneg.
-} {
-  apply (rngl_nle_gt Hor) in Hzs2.
-  now apply angle_add_le_mono_l_sin_lb_neg_sin_2_neg.
-}
-Qed.
-
 End a.
