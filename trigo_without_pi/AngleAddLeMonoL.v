@@ -997,36 +997,6 @@ apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_31 :
-  ∀ θ1 θ2,
-  (0 < rngl_cos θ1)%L
-  → (rngl_cos (θ1 + θ2) ≤ 0)%L
-  → angle_add_overflow (θ1 - angle_right)%A θ2 = true.
-Proof.
-destruct_ac.
-intros * Hzs1 Hc12z.
-change_angle_add_r θ2 angle_right.
-progress sin_cos_add_sub_right_hyp T Hc12z.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-rewrite rngl_sin_sub_right_r.
-rewrite angle_add_sub_assoc.
-rewrite <- angle_add_sub_swap.
-rewrite rngl_sin_sub_right_r.
-rewrite rngl_cos_sub_right_r.
-generalize Hc12z; intros H.
-apply (rngl_opp_le_compat Hop Hor) in H.
-rewrite (rngl_opp_0 Hop) in H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-generalize Hzs1; intros H.
-apply (rngl_opp_lt_compat Hop Hor) in H.
-rewrite (rngl_opp_0 Hop) in H.
-apply (rngl_nle_gt Hor) in H.
-apply rngl_leb_nle in H.
-now rewrite H.
-Qed.
-
 Theorem angle_add_le_mono_l_lemma_32 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
@@ -1052,13 +1022,34 @@ destruct (rngl_lt_dec Hor (rngl_cos θ3) 0) as [Hc3z| Hzc3]. {
   rewrite <- angle_add_sub_swap.
   rewrite rngl_sin_sub_right_r.
   now apply (rngl_opp_nonneg_nonpos Hop Hor).
-} {
-  apply (rngl_nlt_ge Hor) in Hzc3.
-  exfalso.
-  apply Bool.not_true_iff_false in Haov13.
-  apply Haov13; clear Haov13.
-  now apply angle_add_le_mono_l_lemma_31.
 }
+apply (rngl_nlt_ge Hor) in Hzc3.
+exfalso.
+apply Bool.not_true_iff_false in Haov13.
+apply Haov13; clear Haov13.
+rename θ3 into θ.
+rename θ2 into θ3.
+rename θ into θ2.
+change_angle_add_r θ2 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs13.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+rewrite rngl_sin_sub_right_r.
+rewrite angle_add_sub_assoc.
+rewrite <- angle_add_sub_swap.
+rewrite rngl_sin_sub_right_r.
+rewrite rngl_cos_sub_right_r.
+generalize Hzs13; intros H.
+apply (rngl_opp_le_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+generalize Hs1z; intros H.
+apply (rngl_opp_lt_compat Hop Hor) in H.
+rewrite (rngl_opp_0 Hop) in H.
+apply (rngl_nle_gt Hor) in H.
+apply rngl_leb_nle in H.
+now rewrite H.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_33 :
