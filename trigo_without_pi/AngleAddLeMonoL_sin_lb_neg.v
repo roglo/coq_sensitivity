@@ -1315,10 +1315,10 @@ rewrite angle_add_sub.
 now apply rngl_sin_add_nonneg.
 Qed.
 
-(* todo : make angle_add_le_mono_l_sin_lb_neg_sin_2_neg *)
-Theorem angle_add_le_mono_l_sin_lb_neg :
+Theorem angle_add_le_mono_l_sin_lb_neg_sin_2_neg :
   ∀ θ1 θ2 θ3,
   (rngl_sin (θ1 + θ2) < 0)%L
+  → (rngl_sin θ2 < 0)%L
   → angle_add_overflow θ1 θ3 = false
   → (θ2 ≤ θ3)%A
   → (θ1 + θ2 ≤ θ1 + θ3)%A.
@@ -1330,7 +1330,7 @@ specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzs12 Haov13 H23.
+  intros * Hzs12 Hzs2 Haov13 H23.
   progress unfold angle_leb.
   rewrite (H1 (rngl_sin (θ1 + θ2))).
   rewrite (rngl_leb_refl Hor).
@@ -1339,23 +1339,19 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   do 2 rewrite (H1 (rngl_cos _)).
   apply (rngl_leb_refl Hor).
 }
-intros * Hzs12 Haov13 H23.
-destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hzs2]. {
-  now apply angle_add_le_mono_l_sin_lb_neg_sin_2_nonneg.
-}
+intros * Hzs12 Hzs2 Haov13 H23.
 progress unfold angle_leb in H23.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
 remember (0 ≤? rngl_sin (θ1 + θ3))%L as zs13 eqn:Hzs13.
 symmetry in Hzs3, Hzs13.
 move H23 at bottom.
-apply (rngl_leb_gt Hor) in Hzs12.
+apply (rngl_leb_gt Hor) in Hzs12, Hzs2.
 rewrite Hzs12.
-apply (rngl_leb_gt Hor) in Hzs12.
-apply rngl_leb_nle in Hzs2.
 rewrite Hzs2 in H23.
+apply (rngl_leb_gt Hor) in Hzs12, Hzs2.
 destruct zs3; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
+apply (rngl_leb_gt Hor) in Hzs3.
 apply rngl_leb_le in H23.
 destruct zs13. {
   exfalso.
@@ -1946,6 +1942,23 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem angle_add_le_mono_l_sin_lb_neg :
+  ∀ θ1 θ2 θ3,
+  (rngl_sin (θ1 + θ2) < 0)%L
+  → angle_add_overflow θ1 θ3 = false
+  → (θ2 ≤ θ3)%A
+  → (θ1 + θ2 ≤ θ1 + θ3)%A.
+Proof.
+destruct_ac.
+intros * Hzs12 Haov13 H23.
+destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hzs2]. {
+  now apply angle_add_le_mono_l_sin_lb_neg_sin_2_nonneg.
+} {
+  apply (rngl_nle_gt Hor) in Hzs2.
+  now apply angle_add_le_mono_l_sin_lb_neg_sin_2_neg.
+}
 Qed.
 
 End a.
