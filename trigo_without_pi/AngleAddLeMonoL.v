@@ -997,17 +997,34 @@ apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem angle_add_le_mono_l_lemma_29 :
+Theorem angle_add_le_mono_l_lemma_30 :
   ∀ θ1 θ2,
-  (0 < rngl_sin θ1)%L
-  → (0 ≤ rngl_cos θ1)%L
+  (0 ≤ rngl_sin θ1)%L
   → (rngl_sin θ2 < 0)%L
-  → (rngl_sin (θ1 + θ2) < rngl_sin θ1)%L.
+  → (rngl_cos θ1 < 0)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → angle_add_overflow θ1 θ2 = true.
 Proof.
 destruct_ac.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * Hzs1 Hzc1 Hs2z.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+intros * Hzs1 Hs2z Hc1z Hzs12.
+progress unfold angle_add_overflow.
+progress unfold angle_ltb.
+generalize Hzs12; intros H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+apply rngl_leb_le in Hzs1.
+rewrite Hzs1.
+apply rngl_leb_le in Hzs1.
+apply rngl_ltb_lt.
+change_angle_sub_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hzs1.
+progress sin_cos_add_sub_right_hyp T Hzs12.
+progress sin_cos_add_sub_right_hyp T Hc1z.
+progress sin_cos_add_sub_right_goal T.
+rewrite -> (rngl_add_opp_r Hop).
+apply <- (rngl_lt_0_sub Hop Hor).
 change_angle_add_r θ2 angle_right.
 progress sin_cos_add_sub_right_hyp T Hs2z.
 progress sin_cos_add_sub_right_goal T.
@@ -1028,35 +1045,6 @@ apply (rngl_lt_0_sub Hop Hor).
 apply (rngl_lt_iff Hor).
 split; [ | easy ].
 apply rngl_sin_bound.
-Qed.
-
-Theorem angle_add_le_mono_l_lemma_30 :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (rngl_sin θ2 < 0)%L
-  → (rngl_cos θ1 < 0)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → angle_add_overflow θ1 θ2 = true.
-Proof.
-destruct_ac.
-intros * Hzs1 Hs2z Hc1z Hzs12.
-progress unfold angle_add_overflow.
-progress unfold angle_ltb.
-generalize Hzs12; intros H.
-apply rngl_leb_le in H.
-rewrite H; clear H.
-apply rngl_leb_le in Hzs1.
-rewrite Hzs1.
-apply rngl_leb_le in Hzs1.
-apply rngl_ltb_lt.
-change_angle_sub_r θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hzs1.
-progress sin_cos_add_sub_right_hyp T Hzs12.
-progress sin_cos_add_sub_right_hyp T Hc1z.
-progress sin_cos_add_sub_right_goal T.
-rewrite -> (rngl_add_opp_r Hop).
-apply <- (rngl_lt_0_sub Hop Hor).
-now apply angle_add_le_mono_l_lemma_29.
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_31 :
