@@ -456,15 +456,27 @@ rewrite gc_pow_succ_r.
 rewrite (gc_mul_comm Hic z).
 rewrite (gc_mul_assoc Hop).
 rewrite (gc_modl_mul Hic Hon Hop Hor).
+(**)
+eapply (rngl_le_trans Hor). {
+  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (‖ z ‖)) in IHm. 2: {
+    apply (gc_modl_nonneg Hop Hor).
+  }
+  apply IHm.
+}
+...
 rewrite List.seq_S.
 remember (‖ (P.[S m] * z ^ S m) ‖) as x.
 cbn - [ List.nth List.seq ]; subst x.
-...
+rename a into a₀.
+remember (‖ (P.[S m] * z ^ S m) ‖) as x.
+cbn - [ List.nth ]; subst x.
+rewrite List.fold_left_app.
+cbn - [ List.nth List.seq ].
 rewrite rngl_add_0_l.
 rewrite List_nth_0_cons.
+rewrite List_nth_succ_cons.
 ...
 rewrite List.seq_S.
-rename a into a₀.
 rewrite List.fold_left_app.
 remember (‖ (P.[S m] * z ^ S m) ‖) as x.
 cbn - [ List.nth ]; subst x.
