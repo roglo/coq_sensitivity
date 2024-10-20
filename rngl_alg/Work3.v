@@ -110,8 +110,7 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
-Notation "‖ x ‖" := (gc_modl x) (at level 35, x at level 30) :
-  ring_like_scope.
+Notation "‖ x ‖" := (gc_modl x) (at level 35, x at level 30).
 
 Theorem gc_modl_div_nonneg :
   rngl_has_1 T = true →
@@ -271,6 +270,9 @@ cbn.
 now do 2 rewrite (rngl_add_sub Hos).
 Qed.
 
+Theorem gc_pow_succ_r: ∀ a n, (a ^ S n)%C = (a * a ^ n)%C.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -429,6 +431,30 @@ destruct m. {
   apply (rngl_le_refl Hor).
 }
 specialize (IHm (Nat.lt_0_succ _)).
+destruct P as [| a]; [ easy | ].
+rewrite List_nth_succ_cons in Hz |-*.
+cbn in Hm.
+apply Nat.succ_inj in Hm.
+specialize (IHm P Hm Hz).
+rewrite gc_pow_succ_r.
+rewrite (gc_mul_comm Hic z).
+rewrite (gc_mul_assoc Hop).
+Locate "‖".
+progress unfold gc_modl.
+Theorem gc_modl_mul :
+  ∀ a b, ‖ (a * b) ‖ = (‖ a ‖ * ‖ b ‖)%L.
+Proof.
+intros.
+progress unfold gc_modl.
+cbn.
+progress unfold rl_modl.
+Search ((_ + _)² _ + _)%L.
+About rngl_squ.
+... ...
+rewrite (rngl_add_comm (gim a * gre b)).
+rewrite <- Brahmagupta_Fibonacci_identity.
+...
+Check gc_modl.
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {

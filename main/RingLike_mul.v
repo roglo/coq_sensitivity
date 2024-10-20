@@ -632,6 +632,66 @@ Qed.
 
 (* end (-1) ^ n *)
 
+Theorem Brahmagupta_Fibonacci_identity :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b c d,
+  ((a² + b²) * (c² + d²) = (a * c - b * d)² + (a * d + b * c)²)%L.
+Proof.
+intros Hic Hon Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+rewrite rngl_mul_add_distr_l.
+do 2 rewrite rngl_mul_add_distr_r.
+rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_mul Hic).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+do 2 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite rngl_add_assoc.
+rewrite rngl_add_comm.
+rewrite (rngl_squ_mul Hic).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+f_equal.
+rewrite (rngl_squ_add Hic Hon).
+rewrite (rngl_squ_mul Hic).
+rewrite rngl_add_comm.
+rewrite <- (rngl_add_sub_assoc Hop).
+rewrite <- rngl_add_assoc.
+f_equal.
+rewrite rngl_add_comm.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_comm.
+apply (rngl_sub_move_l Hop).
+rewrite (rngl_squ_mul Hic).
+rewrite (rngl_add_sub Hos).
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite (rngl_mul_comm Hic).
+rewrite rngl_mul_assoc.
+f_equal.
+apply (rngl_mul_comm Hic).
+Qed.
+
+Theorem Brahmagupta_Fibonacci_identity_2 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a b c d,
+  ((a² + b²) * (c² + d²) = (a * c + b * d)² + (a * d - b * c)²)%L.
+Proof.
+intros Hic Hon Hop *.
+specialize (Brahmagupta_Fibonacci_identity Hic Hon Hop a b d c) as H1.
+rewrite (rngl_add_comm ((_ - _)²))%L in H1.
+rewrite (rngl_add_comm d²)%L in H1.
+easy.
+Qed.
+
 End a.
 
 (* to be able to use tactic "ring" *)
