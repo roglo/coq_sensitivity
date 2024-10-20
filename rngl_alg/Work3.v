@@ -457,7 +457,18 @@ rewrite (gc_mul_comm Hic z).
 rewrite (gc_mul_assoc Hop).
 rewrite (gc_modl_mul Hic Hon Hop Hor).
 rewrite List.seq_S.
-cbn.
+remember (‖ (P.[S m] * z ^ S m) ‖) as x.
+cbn - [ List.nth List.seq ]; subst x.
+...
+rewrite rngl_add_0_l.
+rewrite List_nth_0_cons.
+...
+rewrite List.seq_S.
+rename a into a₀.
+rewrite List.fold_left_app.
+remember (‖ (P.[S m] * z ^ S m) ‖) as x.
+cbn - [ List.nth ]; subst x.
+rewrite List_nth_succ_cons.
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
