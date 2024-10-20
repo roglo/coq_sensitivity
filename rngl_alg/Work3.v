@@ -261,6 +261,16 @@ cbn.
 now do 2 rewrite (rngl_add_opp_r Hop).
 Qed.
 
+Theorem gc_add_sub :
+  rngl_has_opp_or_subt T = true →
+  ∀ a b, (a + b - b)%C = a.
+Proof.
+intros Hos *.
+apply eq_gc_eq.
+cbn.
+now do 2 rewrite (rngl_add_sub Hos).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -414,32 +424,11 @@ destruct m. {
   specialize (gc_modl_triangular Hic Hon Hop Hiv Hor) as H1.
   rewrite <- (gc_modl_opp Hop a).
   eapply (rngl_le_trans Hor); [ | apply H1 ].
-  rewrite <- gc_add_assoc.
   rewrite (gc_add_opp_r Hop).
-...
-  rewrite gc_sub_diag.
-...
-  (* ... otherwise we do like that: *)
-  progress unfold gc_modl.
-  cbn.
-  rewrite gre_1, gim_1.
-  do 4 rewrite (rngl_mul_1_r Hon).
-  do 4 rewrite (rngl_mul_0_r Hos).
-  do 2 rewrite (rngl_mul_0_l Hos).
-  do 3 rewrite (rngl_sub_0_r Hos).
-  do 3 rewrite rngl_add_0_r.
-  do 2 rewrite rngl_add_0_l.
-  remember (gre b * gre z - gim b * gim z)%L as x.
-  remember (gim b * gre z + gre b * gim z)%L as y.
-  rewrite <- (rl_modl_opp_l Hop (gre a)).
-  rewrite <- (rl_modl_opp_r Hop _ (gim a)).
-  eapply (rngl_le_trans Hor). 2: {
-    apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
-  }
-  do 2 rewrite (rngl_add_opp_r Hop).
-  do 2 rewrite (rngl_add_sub Hos).
+  rewrite (gc_add_sub Hos).
   apply (rngl_le_refl Hor).
 }
+specialize (IHm (Nat.lt_0_succ _)).
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
