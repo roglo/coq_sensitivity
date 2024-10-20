@@ -10,7 +10,8 @@ Require Import AngleLeSubAdd.
 Require Import AngleAddOverflowLe.
 Require Import TacChangeAngle.
 Require Import AngleAddLeMonoL_sin_lb_nonneg.
-Require Import AngleAddLeMonoL_sin_lb_neg.
+Require Import AngleAddLeMonoL_sin_lb_neg_sin_2_nonneg.
+Require Import AngleAddLeMonoL_sin_lb_neg_sin_2_neg.
 Require Export AngleAddLeMonoL_prop.
 
 Section a.
