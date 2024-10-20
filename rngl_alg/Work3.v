@@ -273,6 +273,22 @@ Qed.
 Theorem gc_pow_succ_r: ∀ a n, (a ^ S n)%C = (a * a ^ n)%C.
 Proof. easy. Qed.
 
+Theorem gc_modl_mul :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, ‖ (a * b) ‖ = (‖ a ‖ * ‖ b ‖)%L.
+Proof.
+intros Hic Hon Hop Hor *.
+progress unfold gc_modl.
+cbn.
+progress unfold rl_modl.
+rewrite (rngl_add_comm (gim a * gre b)).
+rewrite <- (Brahmagupta_Fibonacci_identity Hic Hon Hop).
+apply rl_sqrt_mul; apply (rngl_add_squ_nonneg Hop Hor).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -439,22 +455,7 @@ specialize (IHm P Hm Hz).
 rewrite gc_pow_succ_r.
 rewrite (gc_mul_comm Hic z).
 rewrite (gc_mul_assoc Hop).
-Locate "‖".
-progress unfold gc_modl.
-Theorem gc_modl_mul :
-  ∀ a b, ‖ (a * b) ‖ = (‖ a ‖ * ‖ b ‖)%L.
-Proof.
-intros.
-progress unfold gc_modl.
-cbn.
-progress unfold rl_modl.
-Search ((_ + _)² _ + _)%L.
-About rngl_squ.
-... ...
-rewrite (rngl_add_comm (gim a * gre b)).
-rewrite <- Brahmagupta_Fibonacci_identity.
-...
-Check gc_modl.
+rewrite (gc_modl_mul Hic Hon Hop Hor).
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
