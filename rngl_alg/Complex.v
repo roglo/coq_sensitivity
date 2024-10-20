@@ -86,9 +86,15 @@ Definition gc_opt_one : option (GComplex T) :=
 Definition gc_add (ca cb : GComplex T) :=
   {| gre := gre ca + gre cb; gim := gim ca + gim cb |}.
 
+Definition gc_sub (ca cb : GComplex T) :=
+  {| gre := gre ca - gre cb; gim := gim ca - gim cb |}.
+
 Definition gc_mul (ca cb : GComplex T) :=
   {| gre := (gre ca * gre cb - gim ca * gim cb)%L;
      gim := (gim ca * gre cb + gre ca * gim cb)%L |}.
+
+Definition gc_opp (c : GComplex T) :=
+  {| gre := - gre c; gim := - gim c |}.
 
 Definition gc_opt_opp_or_subt :
   option
@@ -180,10 +186,6 @@ Definition gc_pow_nat {T}
     {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
-
-Definition gc_opp {T} {ro : ring_like_op T} a := mk_gc (- gre a) (- gim a).
-Definition gc_sub {T} {ro : ring_like_op T} (ca cb : GComplex T) :=
-  {| gre := gre ca - gre cb; gim := gim ca - gim cb |}.
 
 Notation "0" := (gc_zero) : gc_scope.
 Notation "1" := (gc_one) : gc_scope.
