@@ -226,18 +226,6 @@ progress unfold rl_modl.
 now rewrite (rngl_squ_opp Hop).
 Qed.
 
-Theorem gc_modl_triangular :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  ∀ a b, (‖ (a + b) ‖ ≤ ‖ a ‖ + ‖ b ‖)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor *.
-apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
-Qed.
-
 Theorem gc_modl_opp :
   rngl_has_opp T = true →
   ∀ a : GComplex T, (‖ - a ‖ = ‖ a ‖)%L.
@@ -268,6 +256,36 @@ intros Hos *.
 apply eq_gc_eq.
 cbn.
 now do 2 rewrite (rngl_add_sub Hos).
+Qed.
+
+Theorem gc_modl_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (‖ (a + b) ‖ ≤ ‖ a ‖ + ‖ b ‖)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor *.
+apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
+Qed.
+
+Theorem gc_modl_triangular_2 :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (‖ a ‖ ≤ ‖ a + b ‖ + ‖ b ‖)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor *.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (gc_modl_triangular Hic Hon Hop Hiv Hor) as H1.
+rewrite <- (gc_modl_opp Hop b).
+eapply (rngl_le_trans Hor); [ | apply H1 ].
+rewrite (gc_add_opp_r Hop).
+rewrite (gc_add_sub Hos).
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem gc_pow_succ_r: ∀ a n, (a ^ S n)%C = (a * a ^ n)%C.
@@ -439,12 +457,7 @@ destruct m. {
   do 2 rewrite (gc_mul_1_r Hon Hos).
   rewrite (gc_mul_0_l Hos).
   rewrite gc_add_0_l.
-  specialize (gc_modl_triangular Hic Hon Hop Hiv Hor) as H1.
-  rewrite <- (gc_modl_opp Hop a).
-  eapply (rngl_le_trans Hor); [ | apply H1 ].
-  rewrite (gc_add_opp_r Hop).
-  rewrite (gc_add_sub Hos).
-  apply (rngl_le_refl Hor).
+  apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
 }
 specialize (IHm (Nat.lt_0_succ _)).
 destruct P as [| a]; [ easy | ].
@@ -477,18 +490,17 @@ replace 1%L with (@gc_one T ro). 2: {
 rewrite (gc_mul_1_r Hon Hos).
 remember (List.fold_right _ _ _) as x.
 replace 1 with (0 + 1) by easy.
-Search (List.fold_left _ (List.seq _ _)).
 specialize fold_left_add_seq_add as H1.
-specialize (H1 (‖ a ‖)%L 0).
-
-About fold_left_add_seq_add.
-rewrite fold_left_add_seq_add.
-...
+specialize (H1 (‖ a ‖)%L 0 sm 1).
+rewrite (H1 (λ c k, ‖ (List.nth k (a :: P) 0)%C * z ^ k ‖)).
+clear H1; cbn - [ gc_pow_nat ].
+rewrite (fold_left_rngl_add_fun_from_0 _ (‖ a ‖)%L).
+rewrite rngl_add_assoc.
 apply (rngl_add_le_compat Hor). {
   rewrite <- (gc_modl_mul Hic Hon Hop Hor).
-  cbn.
-  remember (List.fold_right _ _ _) as x.
-(* ah bin non *)
+  apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
+}
+Search (List.fold_left _ _ _ * _)%L.
 ...
 rewrite List.seq_S.
 remember (‖ (P.[S m] * z ^ S m) ‖) as x.
