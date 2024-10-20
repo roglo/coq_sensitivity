@@ -456,6 +456,8 @@ rewrite gc_pow_succ_r.
 rewrite (gc_mul_comm Hic z).
 rewrite (gc_mul_assoc Hop).
 rewrite (gc_modl_mul Hic Hon Hop Hor).
+rewrite List.seq_S.
+cbn.
 ...
   destruct (le_dec n 1) as [Hn1| Hn1]. {
     destruct n. {
