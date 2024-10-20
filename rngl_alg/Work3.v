@@ -422,7 +422,6 @@ assert (H1 :
   (‖ P.[n] * z ^ n ‖ - ∑ (k = 0, n - 1), ‖ P.[k] * z ^ k ‖ ≤
    ‖ rngl_eval_polyn P z ‖)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
-(**)
   progress unfold rngl_eval_polyn.
   progress unfold iter_seq.
   progress unfold iter_list.
@@ -433,74 +432,81 @@ assert (H1 :
   }
   rewrite <- Nat_succ_sub_succ_r; [ | easy ].
   rewrite Nat.sub_0_r.
-subst n.
-destruct m; [ easy | ].
-rewrite Nat_sub_succ_1 in Hz, Hnz, Hpz |-*.
-clear Hn1.
-symmetry in Hm.
-clear Hpz Hr.
-revert P Hm Hz.
-induction m; intros; [ easy | clear Hnz ].
-destruct m. {
-  clear IHm.
-  cbn.
+  subst n.
+  destruct m; [ easy | ].
+  rewrite Nat_sub_succ_1 in Hz, Hnz, Hpz |-*.
+  clear Hn1.
+  symmetry in Hm.
+  clear Hpz Hr.
+  revert P Hm Hz.
+  induction m; intros; [ easy | clear Hnz ].
+  destruct m. {
+    clear IHm.
+    cbn.
+    rewrite rngl_add_0_l.
+    destruct P as [| a la]; [ easy | cbn ].
+    destruct la as [| b]; [ easy | ].
+    destruct la; [ | easy ].
+    cbn in Hz |-*; clear Hm.
+    (* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
+    replace 1%L with (@gc_one T ro). 2: {
+      apply eq_gc_eq.
+      now rewrite gre_1, gim_1.
+    }
+    do 2 rewrite (gc_mul_1_r Hon Hos).
+    rewrite (gc_mul_0_l Hos).
+    rewrite gc_add_0_l.
+    apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
+  }
+  specialize (IHm (Nat.lt_0_succ _)).
+  destruct P as [| a]; [ easy | ].
+  rewrite List_nth_succ_cons in Hz |-*.
+  cbn in Hm.
+  apply Nat.succ_inj in Hm.
+  specialize (IHm P Hm Hz).
+  rewrite gc_pow_succ_r.
+  rewrite (gc_mul_comm Hic z).
+  rewrite (gc_mul_assoc Hop).
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  eapply (rngl_le_trans Hor). {
+    apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (‖ z ‖)) in IHm. 2: {
+      apply (gc_modl_nonneg Hop Hor).
+    }
+    apply IHm.
+  }
+  rewrite rngl_mul_add_distr_r.
+  remember (S m) as sm.
+  cbn - [ List.nth ].
   rewrite rngl_add_0_l.
-  destruct P as [| a la]; [ easy | cbn ].
-  destruct la as [| b]; [ easy | ].
-  destruct la; [ | easy ].
-  cbn in Hz |-*; clear Hm.
+  rewrite List_nth_0_cons.
   (* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
   replace 1%L with (@gc_one T ro). 2: {
     apply eq_gc_eq.
     now rewrite gre_1, gim_1.
   }
-  do 2 rewrite (gc_mul_1_r Hon Hos).
-  rewrite (gc_mul_0_l Hos).
-  rewrite gc_add_0_l.
-  apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
-}
-specialize (IHm (Nat.lt_0_succ _)).
-destruct P as [| a]; [ easy | ].
-rewrite List_nth_succ_cons in Hz |-*.
-cbn in Hm.
-apply Nat.succ_inj in Hm.
-specialize (IHm P Hm Hz).
-rewrite gc_pow_succ_r.
-rewrite (gc_mul_comm Hic z).
-rewrite (gc_mul_assoc Hop).
-rewrite (gc_modl_mul Hic Hon Hop Hor).
-(**)
-eapply (rngl_le_trans Hor). {
-  apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (‖ z ‖)) in IHm. 2: {
-    apply (gc_modl_nonneg Hop Hor).
+  rewrite (gc_mul_1_r Hon Hos).
+  remember (List.fold_right _ _ _) as x.
+  replace 1 with (0 + 1) by easy.
+  specialize fold_left_add_seq_add as H1.
+  specialize (H1 (‖ a ‖)%L 0 sm 1).
+  rewrite (H1 (λ c k, ‖ (List.nth k (a :: P) 0)%C * z ^ k ‖)).
+  clear H1; cbn - [ gc_pow_nat ].
+  rewrite (fold_left_rngl_add_fun_from_0 _ (‖ a ‖)%L).
+  rewrite rngl_add_assoc.
+  apply (rngl_add_le_compat Hor). {
+    rewrite <- (gc_modl_mul Hic Hon Hop Hor).
+    apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
   }
-  apply IHm.
-}
-rewrite rngl_mul_add_distr_r.
-remember (S m) as sm.
-Search (List.fold_left _ (List.seq _ _)).
-cbn - [ List.nth ].
-rewrite rngl_add_0_l.
-rewrite List_nth_0_cons.
-(* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
-replace 1%L with (@gc_one T ro). 2: {
-  apply eq_gc_eq.
-  now rewrite gre_1, gim_1.
-}
-rewrite (gc_mul_1_r Hon Hos).
-remember (List.fold_right _ _ _) as x.
-replace 1 with (0 + 1) by easy.
-specialize fold_left_add_seq_add as H1.
-specialize (H1 (‖ a ‖)%L 0 sm 1).
-rewrite (H1 (λ c k, ‖ (List.nth k (a :: P) 0)%C * z ^ k ‖)).
-clear H1; cbn - [ gc_pow_nat ].
-rewrite (fold_left_rngl_add_fun_from_0 _ (‖ a ‖)%L).
-rewrite rngl_add_assoc.
-apply (rngl_add_le_compat Hor). {
+  do 2 rewrite fold_iter_list.
+  rewrite (rngl_mul_summation_list_distr_r Hos).
+  apply (rngl_summation_list_le_compat Hor).
+  intros i Hi.
   rewrite <- (gc_modl_mul Hic Hon Hop Hor).
-  apply (gc_modl_triangular_2 Hic Hon Hop Hiv Hor).
+  rewrite <- (gc_mul_assoc Hop).
+  rewrite (gc_mul_comm Hic _ z).
+  rewrite <- gc_pow_succ_r.
+  apply (rngl_le_refl Hor).
 }
-Search (List.fold_left _ _ _ * _)%L.
 ...
 rewrite List.seq_S.
 remember (‖ (P.[S m] * z ^ S m) ‖) as x.

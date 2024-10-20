@@ -715,6 +715,25 @@ apply Hgh.
 flia Hi.
 Qed.
 
+Theorem rngl_summation_list_le_compat {A} :
+  rngl_is_ordered T = true →
+  ∀ l (g h : A → T),
+  (∀ i, i ∈ l → (g i ≤ h i)%L)
+  → (∑ (i ∈ l), g i ≤ ∑ (i ∈ l), h i)%L.
+Proof.
+intros Hor * Hgh.
+induction l as [| a]; intros. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  apply (rngl_le_refl Hor).
+}
+do 2 rewrite rngl_summation_list_cons.
+apply (rngl_add_le_compat Hor); [ now apply Hgh; left | ].
+apply IHl.
+intros i Hi.
+now apply Hgh; right.
+Qed.
+
 Theorem rngl_summation_le_compat :
   rngl_is_ordered T = true →
   ∀ b e g h,
@@ -723,19 +742,13 @@ Theorem rngl_summation_le_compat :
 Proof.
 intros Hor * Hgh.
 unfold iter_seq.
-remember (S e - b) as n eqn:Hn.
-revert b Hn Hgh.
-induction n as [| n IHn]; intros; [ now apply rngl_le_refl | ].
-unfold iter_list; cbn.
-do 2 rewrite rngl_add_0_l.
-rewrite fold_left_rngl_add_fun_from_0.
-remember (g b + _)%L as x.
-rewrite fold_left_rngl_add_fun_from_0.
-subst x.
-apply rngl_add_le_compat; [ easy | apply Hgh; flia Hn | ].
-apply IHn; [ flia Hn | ].
-intros i Hbie.
-apply Hgh; flia Hbie.
+apply (rngl_summation_list_le_compat Hor).
+intros i Hi.
+apply Hgh.
+apply List.in_seq in Hi.
+destruct Hi as (Hbi, Hib).
+split; [ easy | ].
+flia Hbi Hib.
 Qed.
 
 Theorem rngl_summation_filter : ∀ A l f (g : A → T),
