@@ -227,6 +227,40 @@ progress unfold rl_modl.
 now rewrite (rngl_squ_opp Hop).
 Qed.
 
+Theorem gc_modl_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, (‖ (a + b) ‖ ≤ ‖ a ‖ + ‖ b ‖)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor *.
+apply (rl_modl_add_le Hic Hon Hop Hiv Hor).
+Qed.
+
+Theorem gc_modl_opp :
+  rngl_has_opp T = true →
+  ∀ a : GComplex T, (‖ - a ‖ = ‖ a ‖)%L.
+Proof.
+intros Hop *.
+progress unfold gc_modl.
+cbn.
+rewrite (rl_modl_opp_l Hop).
+rewrite (rl_modl_opp_r Hop).
+easy.
+Qed.
+
+Theorem gc_add_opp_r :
+  rngl_has_opp T = true →
+  ∀ a b, (a + - b = a - b)%C.
+Proof.
+intros Hop *.
+apply eq_gc_eq.
+cbn.
+now do 2 rewrite (rngl_add_opp_r Hop).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -370,15 +404,20 @@ destruct m. {
   destruct la; [ | easy ].
   cbn in Hz |-*; clear Hm.
   (* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
-(**)
   replace 1%L with (@gc_one T ro). 2: {
     apply eq_gc_eq.
     now rewrite gre_1, gim_1.
   }
   do 2 rewrite (gc_mul_1_r Hon Hos).
   rewrite (gc_mul_0_l Hos).
-...
   rewrite gc_add_0_l.
+  specialize (gc_modl_triangular Hic Hon Hop Hiv Hor) as H1.
+  rewrite <- (gc_modl_opp Hop a).
+  eapply (rngl_le_trans Hor); [ | apply H1 ].
+  rewrite <- gc_add_assoc.
+  rewrite (gc_add_opp_r Hop).
+...
+  rewrite gc_sub_diag.
 ...
   (* ... otherwise we do like that: *)
   progress unfold gc_modl.

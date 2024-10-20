@@ -181,10 +181,16 @@ Definition gc_pow_nat {T}
     (z : GComplex T) n :=
   @rngl_power (GComplex T) (gc_ring_like_op T) z n.
 
+Definition gc_opp {T} {ro : ring_like_op T} a := mk_gc (- gre a) (- gim a).
+Definition gc_sub {T} {ro : ring_like_op T} (ca cb : GComplex T) :=
+  {| gre := gre ca - gre cb; gim := gim ca - gim cb |}.
+
 Notation "0" := (gc_zero) : gc_scope.
 Notation "1" := (gc_one) : gc_scope.
 Notation "x + y" := (gc_add x y) : gc_scope.
+Notation "x - y" := (gc_sub x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
+Notation "- x" := (gc_opp x) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 Notation "x +ℹ y" := (mk_gc x y) (at level 50) : gc_scope.
 Notation "z ^ n" := (gc_pow_nat z n) : gc_scope.
@@ -222,8 +228,7 @@ f_equal; apply rngl_add_comm.
 Qed.
 
 Theorem gc_add_assoc :
-  let roc := gc_ring_like_op T in
-  ∀ a b c : GComplex T, (a + (b + c))%L = (a + b + c)%L.
+  ∀ a b c : GComplex T, (a + (b + c))%C = (a + b + c)%C.
 Proof.
 intros; cbn.
 progress unfold gc_add; cbn.
@@ -231,8 +236,7 @@ f_equal; apply rngl_add_assoc.
 Qed.
 
 Theorem gc_add_0_l :
-  let roc := gc_ring_like_op T in
-  ∀ a : GComplex T, (0 + a)%L = a.
+  ∀ a : GComplex T, (0 + a)%C = a.
 Proof.
 intros; cbn.
 progress unfold gc_add; cbn.
