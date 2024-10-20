@@ -518,20 +518,21 @@ intros i Hi.
 now rewrite Nat_sub_succ_1.
 Qed.
 
-Theorem fold_left_add_seq_add : ∀ b len i g,
+Theorem fold_left_add_seq_add : ∀ a b len i g,
   List.fold_left (λ (c : T) (j : nat), (c + g i j)%L)
-    (List.seq (b + i) len) 0%L =
+    (List.seq (b + i) len) a =
   List.fold_left (λ (c : T) (j : nat), (c + g i (i + j)%nat)%L)
-    (List.seq b len) 0%L.
+    (List.seq b len) a.
 Proof.
 intros.
-revert b i.
+revert a b i.
 induction len; intros; [ easy | cbn ].
-do 2 rewrite rngl_add_0_l.
 rewrite fold_left_rngl_add_fun_from_0; symmetry.
 rewrite fold_left_rngl_add_fun_from_0; symmetry.
-f_equal; [ now rewrite Nat.add_comm | ].
-now rewrite <- IHlen.
+rewrite Nat.add_comm at 1.
+f_equal.
+rewrite <- Nat.add_succ_l.
+apply IHlen.
 Qed.
 
 Theorem rngl_summation_summation_shift : ∀ g k,

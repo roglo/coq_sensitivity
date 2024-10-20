@@ -463,6 +463,32 @@ eapply (rngl_le_trans Hor). {
   }
   apply IHm.
 }
+rewrite rngl_mul_add_distr_r.
+remember (S m) as sm.
+Search (List.fold_left _ (List.seq _ _)).
+cbn - [ List.nth ].
+rewrite rngl_add_0_l.
+rewrite List_nth_0_cons.
+(* why gc_mul_1_r and rngl_mul_1_r don't work? ... *)
+replace 1%L with (@gc_one T ro). 2: {
+  apply eq_gc_eq.
+  now rewrite gre_1, gim_1.
+}
+rewrite (gc_mul_1_r Hon Hos).
+remember (List.fold_right _ _ _) as x.
+replace 1 with (0 + 1) by easy.
+Search (List.fold_left _ (List.seq _ _)).
+specialize fold_left_add_seq_add as H1.
+specialize (H1 (‖ a ‖)%L 0).
+
+About fold_left_add_seq_add.
+rewrite fold_left_add_seq_add.
+...
+apply (rngl_add_le_compat Hor). {
+  rewrite <- (gc_modl_mul Hic Hon Hop Hor).
+  cbn.
+  remember (List.fold_right _ _ _) as x.
+(* ah bin non *)
 ...
 rewrite List.seq_S.
 remember (‖ (P.[S m] * z ^ S m) ‖) as x.
