@@ -358,10 +358,13 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in HM.
 }
 intros * Hn1 * HM Hz.
+(**)
+remember (List.length P - 1) as n eqn:Hn.
+...
+remember (List.length P) as n eqn:Hn.
 (* must take
    R₀ ​= max(‖a_{n-1}/a_n‖, ‖a_{n-2}/a_n‖^(1/2), .. ‖a₀/a_n‖^(1/n)
  *)
-remember (List.length P) as n eqn:Hn.
 set (R₀ := (1 + M + Max (i = 0, n - 2), (‖ P.[i] ‖ / ‖ P.[n - 1] ‖))%L).
 assert (Hr : (0 < R₀)%L). {
   progress unfold R₀.
