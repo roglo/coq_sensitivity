@@ -508,6 +508,7 @@ assert (H1 :
   apply (rngl_le_refl Hor).
 }
 eapply (rngl_lt_le_trans Hor); [ | apply H1 ].
+apply (rngl_lt_add_lt_sub_r Hop Hor).
 ...
 *)
 
