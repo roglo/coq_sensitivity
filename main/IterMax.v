@@ -84,7 +84,7 @@ intros x Hx.
 now apply Hm; right.
 Qed.
 
-Theorem le_max_list_r :
+Theorem rngl_le_max_list_r :
   rngl_is_ordered T = true →
   ∀ A l (a : A) f,
   (∀ x, x ∈ l → rngl_max 0 (f x) = f x)%L
@@ -102,7 +102,7 @@ intros x Hx.
 now apply Hm; right.
 Qed.
 
-Theorem le_max_seq_r :
+Theorem rngl_le_max_seq_r :
   rngl_is_ordered T = true →
   ∀ b e a f,
   (∀ x, x ∈ List.seq b (S e - b) → rngl_max 0 (f x) = f x)%L
@@ -111,7 +111,7 @@ Theorem le_max_seq_r :
 Proof.
 intros Hor * Hm His.
 progress unfold iter_seq.
-now apply (le_max_list_r Hor).
+now apply (rngl_le_max_list_r Hor).
 Qed.
 
 End a.

@@ -360,6 +360,49 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hn1 * HM Hz.
 (**)
 remember (List.length P - 1) as n eqn:Hn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply Nat.sub_0_le in Hnz.
+  destruct P as [| a]; [ easy | ].
+  cbn in Hn1, Hnz.
+  now apply Nat.nle_gt in Hn1.
+}
+apply Nat.neq_0_lt_0 in Hnz.
+remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
+set (R₀ := (1 + M + rngl_of_nat n * m)%L).
+subst m.
+exists R₀.
+assert (Hr : (0 < R₀)%L). {
+  progress unfold R₀.
+  apply (rngl_lt_le_trans Hor _ 1). {
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    now apply (rngl_lt_le_incl Hor) in HM.
+  }
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat_succ_sub_succ_r; [ | easy ].
+  rewrite Nat.sub_0_r.
+  remember (P.[n]) as d eqn:Hd.
+  destruct n; [ easy | ].
+  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+    rewrite <- rngl_of_nat_0.
+    now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  }
+...
+  clear Hd.
+  clear Hn Hn1 R₀ Hnz.
+  induction n; [ apply (rngl_le_refl Hor) | ].
+  rewrite List.seq_S; cbn.
+  rewrite List.fold_left_app.
+  cbn.
+  eapply (rngl_le_trans Hor); [ apply IHn | ].
+  apply (rngl_le_max_l Hor).
+}
 ...
 remember (List.length P) as n eqn:Hn.
 (* must take
