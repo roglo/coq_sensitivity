@@ -433,6 +433,54 @@ assert (Hr : (0 < R₀)%L). {
     replace 0%C with 0%L in H by easy.
     now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
   }
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  apply (gc_modl_nonneg Hop Hor).
+  apply (rngl_lt_iff Hor).
+  split; [ apply (gc_modl_nonneg Hop Hor) | ].
+  intros H; symmetry in H.
+  replace 0%C with 0%L in H by easy.
+  now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+}
+split; [ easy | ].
+intros z Hrz.
+remember (Max (i = _, _), _) as m eqn:Hm.
+assert (Hzm : (0 < m)%L). {
+  subst m.
+  apply (rngl_lt_iff Hor).
+  split. {
+    eapply (rngl_le_trans Hor). 2: {
+      apply (rngl_le_max_seq_r Hor _ _ 0). 2: {
+        apply List.in_seq.
+        split; [ easy | ].
+        now rewrite Nat.sub_0_r, Nat.add_0_l.
+      }
+      intros i Hi.
+      apply (rngl_max_r_iff Hor).
+      now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+    }
+    now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+  }
+  intros H; symmetry in H.
+Search (Max (_ = _, _), _ = 0)%L.
+...
+assert (H1 : (rngl_of_nat n * m < ‖ z ‖)%L). {
+  eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
+  progress unfold R₀.
+  apply (rngl_le_add_l Hor).
+  apply (rngl_le_trans Hor _ 1). 2: {
+    apply (rngl_le_add_r Hor).
+    now apply (rngl_lt_le_incl Hor) in HM.
+  }
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m < ‖ z ‖)%L). {
+  eapply (rngl_le_lt_trans Hor); [ | apply H1 ].
+  rewrite <- rngl_mul_assoc.
+  rewrite <- (rngl_mul_1_l Hon).
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii). {
+    apply (rngl_mul_pos_pos Hop Hor Hii). 2: {
+...
+    rewrite <- rngl_of_nat_0.
 ...
   clear Hd.
   clear Hn Hn1 R₀ Hnz.
