@@ -307,6 +307,24 @@ rewrite <- (Brahmagupta_Fibonacci_identity Hic Hon Hop).
 apply rl_sqrt_mul; apply (rngl_add_squ_nonneg Hop Hor).
 Qed.
 
+Theorem eq_gc_modl_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a, ‖ a ‖ = 0%L → a = 0%C.
+Proof.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Haz.
+apply (eq_rl_sqrt_0 Hon Hos) in Haz. {
+  apply (rl_integral_modulus_prop Hop Hor Hii) in Haz.
+  now apply eq_gc_eq.
+}
+apply (rngl_add_squ_nonneg Hop Hor).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -387,11 +405,33 @@ assert (Hr : (0 < R₀)%L). {
   rewrite Nat.sub_0_r.
   rewrite <- Nat_succ_sub_succ_r; [ | easy ].
   rewrite Nat.sub_0_r.
+(*
   remember (P.[n]) as d eqn:Hd.
-  destruct n; [ easy | ].
+*)
+  destruct n; [ easy | clear Hnz ].
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     rewrite <- rngl_of_nat_0.
     now apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+  }
+  rewrite fold_iter_list.
+  rewrite fold_iter_seq'; cbn.
+  rewrite Nat.sub_0_r.
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_le_max_seq_r Hor _ _ n). 2: {
+      apply List.in_seq.
+      split; [ easy | ].
+      now rewrite Nat.sub_0_r.
+    }
+    intros m Hm.
+    rewrite Nat.sub_0_r in Hm.
+    apply (rngl_max_r_iff Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (gc_modl_nonneg Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    intros H; symmetry in H.
+    replace 0%C with 0%L in H by easy.
+    now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
   }
 ...
   clear Hd.
