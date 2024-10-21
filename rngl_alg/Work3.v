@@ -461,7 +461,58 @@ assert (Hzm : (0 < m)%L). {
     now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
   }
   intros H; symmetry in H.
-Search (Max (_ = _, _), _ = 0)%L.
+  subst R₀.
+  rewrite H in Hr, Hrz.
+  rewrite (rngl_mul_0_r Hos) in Hr, Hrz.
+  rewrite rngl_add_0_r in Hr, Hrz.
+Theorem eq_rngl_max_list_0 :
+  rngl_is_ordered T = true →
+  ∀ l (f : nat → T),
+  Max (i ∈ l), f i = 0%L
+  → ∀ i, i ∈ l
+  → f i = 0%L.
+Proof.
+intros Hor * Hmz i Hi.
+progress unfold iter_list in Hmz.
+induction l as [| a]; [ easy | ].
+cbn in Hmz.
+...
+rewrite fold_left_fun_from_0 in Hmz.
+destruct Hi as [Hi| Hi]. {
+  subst i.
+  apply IHl.
+...
+intros Hor * Hmz i Hi.
+induction l as [| a]; [ easy | ].
+destruct Hi as [Hi| Hi]. {
+  subst i.
+...
+  rewrite (max_iter_list_cons Hor) in Hmz. 2: {
+    intros j Hj.
+    destruct Hj as [Hj| Hj]. {
+      subst j.
+      apply (rngl_max_r_iff Hor).
+
+...
+
+Theorem eq_rngl_max_seq_0 :
+  ∀ b e (f : nat → T),
+  Max (i = b, e), f i = 0%L
+  → ∀ i, b ≤ i ≤ e → f i = 0%L.
+Proof.
+intros * Hmz i Hi.
+progress unfold iter_seq in Hmz.
+apply (eq_rngl_max_list_0 (List.seq b (S e - b))); [ easy | ].
+apply List.in_seq.
+split; [ easy | ].
+flia Hi.
+Qed.
+... ...
+specialize (eq_rngl_max_seq_0 _ _ _ H) as H1.
+cbn in H1.
+replace 0%C with 0%L in H1 by easy.
+clear H.
+(* ah bin non, faut voir... *)
 ...
 assert (H1 : (rngl_of_nat n * m < ‖ z ‖)%L). {
   eapply (rngl_le_lt_trans Hor); [ | apply Hrz ].
