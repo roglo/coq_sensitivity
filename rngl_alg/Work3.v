@@ -468,14 +468,56 @@ assert (Hzm : (0 < m)%L). {
 Theorem eq_rngl_max_list_0 :
   rngl_is_ordered T = true →
   ∀ l (f : nat → T),
-  Max (i ∈ l), f i = 0%L
+  (∀ i, i ∈ l → (0 ≤ f i)%L)
+  → Max (i ∈ l), f i = 0%L
   → ∀ i, i ∈ l
   → f i = 0%L.
 Proof.
-intros Hor * Hmz i Hi.
+intros Hor * Hzi Hmz i Hi.
 progress unfold iter_list in Hmz.
-induction l as [| a]; [ easy | ].
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
 cbn in Hmz.
+destruct Hi as [Hi| Hi]. {
+  subst i.
+  rewrite (proj2 (rngl_max_r_iff Hor _ _)) in Hmz; [ | now apply Hzi; left ].
+...
+  apply (rngl_le_antisymm Hor). {
+    apply (rngl_nlt_ge Hor).
+    intros H.
+...
+  rewrite (fold_left_op_fun_from_d' 0%L) in Hmz; cycle 1. {
+    intros b Hb.
+    apply (rngl_max_r_iff Hor).
+    apply Hzi.
+...
+  apply (rngl_le_antisymm Hor). {
+    apply (rngl_nlt_ge Hor).
+    intros H.
+    rewrite (proj2 (rngl_max_r_iff Hor _ _)) in Hmz. 2: {
+      now apply (rngl_lt_le_incl Hor) in H.
+    }
+  intros.
+  apply (rngl_max_r_iff Hor).
+...
+  intros; apply rngl_max_l_iff.
+...
+  rewrite fold_iter_list in Hmz.
+Theorem fold_left_max_from_0 : ∀ A a l (f : A → _),
+  List.fold_left (λ c i, max c (f i)) l a =
+  max a (List.fold_left (λ c i, max c (f i)) l 0).
+Proof.
+intros.
+apply fold_left_op_fun_from_d. {
+  now intros; apply max_r.
+} {
+  now intros; rewrite Nat.max_l.
+} {
+  apply Nat.max_assoc.
+}
+Qed.
+  rewrite fold_left_max_from_0 in Hmz.
+  rewrite iter_list_from_0 in Hmz.
 ...
 rewrite fold_left_fun_from_0 in Hmz.
 destruct Hi as [Hi| Hi]. {
