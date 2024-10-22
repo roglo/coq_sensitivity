@@ -473,6 +473,11 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
     now apply (rngl_lt_irrefl Hor) in Hr.
   }
   rewrite <- (gc_modl_1 Hon Hop Hor Hii).
+Search (_ / 1 = _).
+Locate "/".
+Theorem gc_div_1_r : ∀ a, (a / 1)%C = 1%C.
+rewrite <- rngl_div_1_r with (a := 1%C).
+Check gc_div_1_r.
 ...
   rewrite <- (rngl_div_diag Hon Hiq).
 ...
