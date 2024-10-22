@@ -343,6 +343,41 @@ rewrite rngl_add_0_r.
 apply (rl_sqrt_1 Hon Hop Hor Hii).
 Qed.
 
+Theorem gc_div_1_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a, (a / 1)%C = a.
+Proof.
+intros Hon Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  apply eq_gc_eq.
+  do 2 rewrite (H1 (gre _)), (H1 (gim _)).
+  easy.
+}
+intros.
+progress unfold gc_div.
+progress unfold gc_inv.
+cbn.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_div_1_r Hon Hiq Hc1).
+apply eq_gc_eq.
+cbn.
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_div_0_l Hos Hi1); [ | now apply (rngl_1_neq_0_iff Hon) ].
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+easy.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -472,14 +507,13 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
     intros H; rewrite H in Hr.
     now apply (rngl_lt_irrefl Hor) in Hr.
   }
-  rewrite <- (gc_modl_1 Hon Hop Hor Hii).
-Search (_ / 1 = _).
-Locate "/".
-Theorem gc_div_1_r : ∀ a, (a / 1)%C = 1%C.
-rewrite <- rngl_div_1_r with (a := 1%C).
-Check gc_div_1_r.
+  progress unfold gc_modl.
+Search (gre (_ / _)).
 ...
-  rewrite <- (rngl_div_diag Hon Hiq).
+Search (‖ _ ‖ ≤ _)%L.
+  rewrite <- (gc_modl_1 Hon Hop Hor Hii).
+  rewrite <- (gc_div_1_r Hon Hop Hiv 1) at 2.
+  Search (‖ _ ‖ ≤ ‖ _ ‖)%L.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
