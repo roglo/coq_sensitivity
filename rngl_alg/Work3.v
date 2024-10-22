@@ -460,14 +460,41 @@ assert (Hzm : (0 < m)%L). {
     }
     now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
   }
-  intros H; symmetry in H.
+  intros H1; symmetry in H1.
   subst R₀.
-  rewrite H in Hr, Hrz.
+  rewrite H1 in Hr, Hrz.
   rewrite (rngl_mul_0_r Hos) in Hr, Hrz.
   rewrite rngl_add_0_r in Hr, Hrz.
-  specialize (eq_rngl_max_list_0 Hor) as H1.
-  progress unfold iter_seq in H.
-  apply H1 in H.
+  specialize (eq_rngl_max_seq_0 Hor _ _ _ H1) as H2.
+  cbn in H2.
+  progress replace 0%C with 0%L in H2 by easy.
+  assert (H : ∀ i, 0 ≤ i ≤ n - 1 → (0 ≤ ‖ P.[i] ‖ / ‖ P.[n] ‖)%L ). {
+    intros * Hi.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (gc_modl_nonneg Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    intros H; symmetry in H.
+    now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+  }
+  specialize (H2 H); clear H.
+  specialize (H2 0).
+  assert (H : 0 ≤ 0 ≤ n - 1) by easy.
+  specialize (H2 H); clear H.
+  (* lemma ? *)
+  apply (f_equal (rngl_mul (‖ P.[n] ‖))) in H2.
+  rewrite (rngl_mul_0_r Hos) in H2.
+  rewrite (rngl_mul_comm Hic) in H2.
+  rewrite (rngl_div_mul Hon Hiv) in H2. 2: {
+    intros H.
+    now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+  }
+(* ouais bon, y a aucune raison que P.[0] vaille 0 *)
+...
+Search (_ = _ / _)%L.
+apply rngl_
+apply (rngl_div_0_l
+...
   specialize (H1 _ _ _ H).
 ...
 rewrite fold_left_fun_from_0 in Hmz.

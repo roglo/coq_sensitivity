@@ -175,12 +175,12 @@ Qed.
 Theorem eq_rngl_max_list_0 :
   rngl_is_ordered T = true →
   ∀ l (f : nat → T),
-  (∀ i, i ∈ l → (0 ≤ f i)%L)
-  → Max (i ∈ l), f i = 0%L
+  Max (i ∈ l), f i = 0%L
+  → (∀ i, i ∈ l → (0 ≤ f i)%L)
   → ∀ i, i ∈ l
   → f i = 0%L.
 Proof.
-intros Hor * Hzi Hmz i Hi.
+intros Hor * Hmz Hzi i Hi.
 progress unfold iter_list in Hmz.
 revert i Hi.
 induction l as [| a]; intros; [ easy | ].
@@ -204,7 +204,7 @@ destruct Hi as [Hi| Hi]. {
   apply (rngl_le_antisymm Hor); [ easy | ].
   now apply Hzi; left.
 }
-apply IHl; [ now intros; apply Hzi; right | | easy ].
+apply IHl; [ | now intros; apply Hzi; right | easy ].
 rewrite (proj2 (rngl_max_r_iff Hor _ _)) in Hmz; [ | now apply Hzi; left ].
 rewrite (fold_left_rngl_max_fun_from_0 Hor) in Hmz; cycle 1. {
   now apply Hzi; left.
@@ -226,6 +226,25 @@ apply Ham; clear Ham.
 apply (rngl_iter_max_list_nonneg Hor).
 intros b Hb.
 now apply Hzi; right.
+Qed.
+
+Theorem eq_rngl_max_seq_0 :
+  rngl_is_ordered T = true →
+  ∀ b e (f : nat → T),
+  Max (i = b, e), f i = 0%L
+  → (∀ i, b ≤ i ≤ e → (0 ≤ f i)%L)
+  → ∀ i, b ≤ i ≤ e
+  → f i = 0%L.
+Proof.
+intros Hor * Hm Hf i Hi.
+apply (eq_rngl_max_list_0 Hor) with (i := i) in Hm; [ easy | | ]. {
+  intros j Hj.
+  apply Hf.
+  apply List.in_seq in Hj.
+  split; [ easy | flia Hj ].
+}
+apply List.in_seq.
+split; [ easy | flia Hi ].
 Qed.
 
 End a.
