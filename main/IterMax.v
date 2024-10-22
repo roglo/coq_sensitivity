@@ -144,4 +144,88 @@ progress unfold iter_seq.
 now apply (rngl_le_max_list_r Hor).
 Qed.
 
+Theorem rngl_max_list_empty : ∀ A g (l : list A),
+  l = [] → Max (i ∈ l), g i = 0%L.
+Proof.
+intros * Hl.
+now apply iter_list_empty.
+Qed.
+
+Theorem rngl_iter_max_list_nonneg :
+  rngl_is_ordered T = true →
+  ∀ A l (f : A → _),
+  (∀ a, a ∈ l → (0 ≤ f a))%L
+  → (0 ≤ Max (i ∈ l), f i)%L.
+Proof.
+intros Hor * Hf.
+induction l as [| a]. {
+  rewrite rngl_max_list_empty; [ | easy ].
+  apply (rngl_le_refl Hor).
+}
+rewrite (rngl_max_iter_list_cons Hor). {
+  eapply (rngl_le_trans Hor); [ | apply (rngl_le_max_r Hor) ].
+  apply IHl.
+  now intros; apply Hf; right.
+}
+intros b Hi.
+apply (rngl_max_r_iff Hor).
+now apply Hf.
+Qed.
+
+Theorem eq_rngl_max_list_0 :
+  rngl_is_ordered T = true →
+  ∀ l (f : nat → T),
+  (∀ i, i ∈ l → (0 ≤ f i)%L)
+  → Max (i ∈ l), f i = 0%L
+  → ∀ i, i ∈ l
+  → f i = 0%L.
+Proof.
+intros Hor * Hzi Hmz i Hi.
+progress unfold iter_list in Hmz.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hmz.
+destruct Hi as [Hi| Hi]. {
+  subst i.
+  rewrite (proj2 (rngl_max_r_iff Hor _ _)) in Hmz; [ | now apply Hzi; left ].
+  rewrite (fold_left_rngl_max_fun_from_0 Hor) in Hmz; cycle 1. {
+    now apply Hzi; left.
+  } {
+    now intros; apply Hzi; right.
+  }
+  rewrite fold_iter_list in Hmz.
+  remember (Max (i ∈ _), _) as m eqn:Hm in Hmz.
+  progress unfold rngl_max in Hmz.
+  remember (f a ≤? m)%L as am eqn:Ham.
+  symmetry in Ham.
+  destruct am; [ | easy ].
+  move Hmz at top; subst m.
+  apply rngl_leb_le in Ham.
+  apply (rngl_le_antisymm Hor); [ easy | ].
+  now apply Hzi; left.
+}
+apply IHl; [ now intros; apply Hzi; right | | easy ].
+rewrite (proj2 (rngl_max_r_iff Hor _ _)) in Hmz; [ | now apply Hzi; left ].
+rewrite (fold_left_rngl_max_fun_from_0 Hor) in Hmz; cycle 1. {
+  now apply Hzi; left.
+} {
+  now intros; apply Hzi; right.
+}
+rewrite fold_iter_list in Hmz |-*.
+remember (Max (i ∈ _), _) as m eqn:Hm in Hmz.
+progress unfold rngl_max in Hmz.
+remember (f a ≤? m)%L as am eqn:Ham.
+symmetry in Ham.
+destruct am; [ congruence | ].
+apply (rngl_leb_gt Hor) in Ham.
+rewrite Hmz in Ham.
+rewrite Hm in Ham.
+exfalso.
+apply (rngl_nle_gt Hor) in Ham.
+apply Ham; clear Ham.
+apply (rngl_iter_max_list_nonneg Hor).
+intros b Hb.
+now apply Hzi; right.
+Qed.
+
 End a.
