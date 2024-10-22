@@ -325,6 +325,24 @@ apply (eq_rl_sqrt_0 Hon Hos) in Haz. {
 apply (rngl_add_squ_nonneg Hop Hor).
 Qed.
 
+Theorem gc_modl_1 :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ‖ 1 ‖ = 1%L.
+Proof.
+intros Hon Hop Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+progress unfold gc_modl.
+progress unfold rl_modl.
+cbn.
+rewrite (rngl_squ_1 Hon).
+rewrite (rngl_squ_0 Hos).
+rewrite rngl_add_0_r.
+apply (rl_sqrt_1 Hon Hop Hor Hii).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -444,6 +462,19 @@ assert (Hr : (0 < R₀)%L). {
 split; [ easy | ].
 intros z Hrz.
 remember (Max (i = _, _), _) as m eqn:Hm.
+assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
+  apply (rngl_le_trans Hor _ R₀); [ | ]. 2: {
+    now apply (rngl_lt_le_incl Hor) in Hrz.
+  }
+  apply (rngl_le_div_r Hon Hop Hiv Hor); [ easy | ].
+  specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+  rewrite (rngl_div_diag Hon Hiq). 2: {
+    intros H; rewrite H in Hr.
+    now apply (rngl_lt_irrefl Hor) in Hr.
+  }
+  rewrite <- (gc_modl_1 Hon Hop Hor Hii).
+...
+  rewrite <- (rngl_div_diag Hon Hiq).
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
