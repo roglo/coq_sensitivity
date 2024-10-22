@@ -19,7 +19,37 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-Theorem max_iter_list_app :
+Theorem fold_left_rngl_max_fun_from_0 :
+  rngl_is_ordered T = true →
+  ∀ A a l (f : A → _),
+  (0 ≤ a)%L
+  → (∀ b, b ∈ l → (0 ≤ f b)%L)
+  → (List.fold_left (λ c i, rngl_max c (f i)) l a =
+     rngl_max a (List.fold_left (λ c i, rngl_max c (f i)) l 0)%L).
+Proof.
+intros Hor * Ha Hl.
+revert a Ha.
+induction l as [| b]; intros. {
+  cbn.
+  symmetry.
+  now apply (rngl_max_l_iff Hor).
+}
+cbn.
+rewrite IHl; cycle 1. {
+  intros c Hc.
+  now apply Hl; right.
+} {
+  apply (rngl_le_trans Hor _ a); [ easy | ].
+  apply (rngl_le_max_l Hor).
+}
+rewrite <- (rngl_max_assoc Hor).
+f_equal.
+symmetry.
+rewrite (proj2 (rngl_max_r_iff Hor _ _)); [ | now apply Hl; left ].
+now apply IHl; intros; apply Hl; [ right | left ].
+Qed.
+
+Theorem rngl_max_iter_list_app :
   rngl_is_ordered T = true →
   ∀ A (la lb : list A) f,
   (∀ x, x ∈ lb → rngl_max 0 (f x) = f x)
@@ -67,7 +97,7 @@ symmetry.
 now apply Hm; left.
 Qed.
 
-Theorem max_iter_list_cons :
+Theorem rngl_max_iter_list_cons :
   rngl_is_ordered T = true →
   ∀ A a (la : list A) f,
   (∀ x, x ∈ a :: la → rngl_max 0 (f x) = f x)
@@ -75,7 +105,7 @@ Theorem max_iter_list_cons :
 Proof.
 intros Hor * Hm.
 rewrite List_cons_is_app.
-rewrite (max_iter_list_app Hor _ _ _ _). {
+rewrite (rngl_max_iter_list_app Hor _ _ _ _). {
   progress unfold iter_list at 1.
   cbn.
   rewrite Hm; [ easy | now left ].
@@ -94,7 +124,7 @@ Proof.
 intros Hor * Hm Hal.
 revert a Hal.
 induction l as [| b]; intros; [ easy | ].
-rewrite (max_iter_list_cons Hor); [ | easy ].
+rewrite (rngl_max_iter_list_cons Hor); [ | easy ].
 destruct Hal as [Hal| Hal]; [ subst b; apply (rngl_le_max_l Hor) | ].
 eapply (rngl_le_trans Hor); [ | apply (rngl_le_max_r Hor) ].
 apply IHl; [ | easy ].
