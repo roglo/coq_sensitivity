@@ -89,25 +89,19 @@ Definition gc_add (ca cb : GComplex T) :=
 Definition gc_sub (ca cb : GComplex T) :=
   {| gre := gre ca - gre cb; gim := gim ca - gim cb |}.
 
+Definition gc_opp (c : GComplex T) :=
+  {| gre := - gre c; gim := - gim c |}.
+
 Definition gc_mul (ca cb : GComplex T) :=
   {| gre := (gre ca * gre cb - gim ca * gim cb)%L;
      gim := (gim ca * gre cb + gre ca * gim cb)%L |}.
 
-(* to be completed
-Definition gc_div (ca cb : GComplex T) :=
-...
-  let d := (gre c * gre c + gim c * gim cb)%L in
-  mk_gc (gre a / d) (- gim a / d)%L.
-  {| gre := (gre ca * gre cb - gim ca * gim cb)%L;
-     gim := (gim ca * gre cb + gre ca * gim cb)%L |}.
-*)
-
-Definition gc_opp (c : GComplex T) :=
-  {| gre := - gre c; gim := - gim c |}.
-
 Definition gc_inv c :=
   let d := (gre c * gre c + gim c * gim c)%L in
   mk_gc (gre c / d) (- gim c / d)%L.
+
+Definition gc_div (ca cb : GComplex T) :=
+  gc_mul ca (gc_inv cb).
 
 Definition gc_opt_opp_or_subt :
   option
@@ -201,9 +195,7 @@ Notation "1" := (gc_one) : gc_scope.
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x - y" := (gc_sub x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
-(*
 Notation " a / b" := (gc_div a b) : gc_scope.
-*)
 Notation "- x" := (gc_opp x) : gc_scope.
 Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
 Notation "x +ℹ y" := (mk_gc x y) (at level 50) : gc_scope.
