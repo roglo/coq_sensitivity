@@ -444,6 +444,10 @@ assert (Hr : (0 < R₀)%L). {
 split; [ easy | ].
 intros z Hrz.
 remember (Max (i = _, _), _) as m eqn:Hm.
+...
+(* ah, mais, ci-dessous n'est pas forcément vrai, si les
+   P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
+   j'ai l'air d'un con *)
 assert (Hzm : (0 < m)%L). {
   subst m.
   apply (rngl_lt_iff Hor).
