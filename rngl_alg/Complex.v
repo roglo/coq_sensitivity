@@ -195,9 +195,10 @@ Notation "1" := (gc_one) : gc_scope.
 Notation "x + y" := (gc_add x y) : gc_scope.
 Notation "x - y" := (gc_sub x y) : gc_scope.
 Notation "x * y" := (gc_mul x y) : gc_scope.
-Notation " a / b" := (gc_div a b) : gc_scope.
+Notation " x / y" := (gc_div x y) : gc_scope.
 Notation "- x" := (gc_opp x) : gc_scope.
-Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+Notation "x ⁻¹" := (gc_inv x) : gc_scope.
+Notation "'√' x" := (rl_sqrt x) (at level 1, format "√ x") : ring_like_scope.
 Notation "x +ℹ y" := (mk_gc x y) (at level 50) : gc_scope.
 Notation "z ^ n" := (gc_pow_nat z n) : gc_scope.
 
