@@ -40,6 +40,18 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
+Theorem gc_mul_0_r :
+  rngl_has_opp_or_subt T = true →
+  ∀ z : GComplex T, (z * 0 = 0)%C.
+Proof.
+intros Hos *.
+apply eq_gc_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_l.
+easy.
+Qed.
+
 Theorem gc_pow_mul_l :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
@@ -456,6 +468,56 @@ symmetry.
 now apply (gc_modl_inv Hic Hon Hop Hiv Hor).
 Qed.
 
+Theorem gc_div_mul :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, b ≠ 0%C → (a / b * b)%C = a.
+Proof.
+intros Hic Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hbz.
+apply eq_gc_eq.
+cbn.
+do 2 rewrite fold_rngl_squ.
+remember ((gre b)² + (gim b)²)%L as ρ eqn:Hρ.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite (rngl_mul_opp_l Hop).
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+do 2 rewrite rngl_mul_add_distr_r.
+do 2 rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite rngl_add_assoc.
+do 8 rewrite (rngl_mul_mul_swap Hic _ (_ * _⁻¹))%L.
+do 8 rewrite rngl_mul_assoc.
+rewrite <- rngl_mul_add_distr_r.
+do 2 rewrite <- (rngl_mul_sub_distr_r Hop).
+do 3 rewrite <- rngl_mul_add_distr_r.
+rewrite (rngl_mul_mul_swap Hic _ (gim b)).
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_mul_mul_swap Hic _ (gim b) (gre b)).
+rewrite (rngl_sub_add Hop).
+do 4 rewrite <- rngl_mul_assoc.
+do 2 rewrite fold_rngl_squ.
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite <- Hρ.
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_r Hiv).
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  intros H; subst ρ.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  now apply Hbz, eq_gc_eq.
+}
+now do 2 rewrite (rngl_mul_1_r Hon).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -622,6 +684,33 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   }
   now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
 }
+assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
+  eapply (rngl_le_trans Hor); [ | apply H1 ].
+  rewrite <- rngl_mul_assoc.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    intros H; symmetry in H.
+    apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+    apply (f_equal (rngl_mul z)) in H.
+    cbn in H.
+    rewrite (gc_mul_0_r Hos) in H.
+    rewrite (gc_mul_comm Hic) in H.
+    rewrite (gc_div_mul Hic Hon Hop Hiv Hor) in H; [ | easy ].
+    apply eq_gc_eq in H.
+    cbn in H.
+    destruct H as (H, _).
+    now apply (rngl_1_neq_0_iff Hon) in H.
+  }
+  progress unfold R₀.
+  apply (rngl_le_add_l Hor).
+  apply (rngl_le_trans Hor _ 1). {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+  apply (rngl_le_add_r Hor).
+  now apply (rngl_lt_le_incl Hor) in HM.
+}
+clear H1.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,

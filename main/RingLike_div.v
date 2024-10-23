@@ -689,6 +689,17 @@ rewrite <- (rngl_squ_inv Hon Hos Hiv); [ | easy ].
 apply (rngl_squ_mul Hic).
 Qed.
 
+Theorem rngl_div_opp_l :
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a b, (- a / b = - (a / b))%L.
+Proof.
+intros Hop Hiv *.
+progress unfold rngl_div.
+rewrite Hiv.
+apply (rngl_mul_opp_l Hop).
+Qed.
+
 End a.
 
 Arguments rngl_div_add_distr_r {T ro rp} Hiv (a b c)%_L.
