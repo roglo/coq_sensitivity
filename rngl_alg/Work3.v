@@ -518,6 +518,40 @@ rewrite (rngl_div_diag Hon Hiq). 2: {
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
+Theorem gc_summation_triangular :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  let roc := gc_ring_like_op T in
+  ∀ b e (f : nat → GComplex T),
+  (‖ ∑ (i = b, e), f i ‖ ≤ ∑ (i = b, e), ‖ f i ‖)%L.
+Proof.
+intros Hic Hon Hop Hiv Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+progress unfold iter_seq.
+remember (S e - b) as n; clear e Heqn.
+remember (List.seq b n) as l eqn:Hl.
+clear n Hl.
+progress unfold iter_list.
+induction l as [| a] using List.rev_ind. {
+  cbn.
+  rewrite (gc_modl_0 Hon Hop Hor Hii).
+  apply (rngl_le_refl Hor).
+}
+cbn.
+do 2 rewrite List.fold_left_app.
+cbn.
+eapply (rngl_le_trans Hor). {
+  apply (gc_modl_triangular Hic Hon Hop Hiv Hor).
+}
+apply (rngl_add_le_mono_r Hop Hor).
+apply IHl.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -721,73 +755,12 @@ assert
   rewrite Hm.
   rewrite <- (rngl_summation_1 0 (n - 1)); [ | flia Hnz ].
   rewrite (rngl_mul_summation_distr_r Hos).
-Search (‖ ∑ (_ = _, _), _ ‖)%L.
-Theorem gc_summation_triangular :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  let roc := gc_ring_like_op T in
-  ∀ b e (f : nat → GComplex T),
-  (‖ ∑ (i = b, e), f i ‖ ≤ ∑ (i = b, e), ‖ f i ‖)%L.
-Proof.
-intros Hic Hon Hop Hiv Hor Hii.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-progress unfold iter_seq.
-remember (S e - b) as n; clear e Heqn.
-remember (List.seq b n) as l eqn:Hl.
-clear n Hl.
-progress unfold iter_list.
-induction l as [| a]. {
-  cbn.
-  rewrite (gc_modl_0 Hon Hop Hor Hii).
-  apply (rngl_le_refl Hor).
-}
-cbn.
-rewrite gc_add_0_l.
-rewrite rngl_add_0_l.
-rewrite fold_left_rngl_add_fun_from_0.
-specialize (gc_modl_triangular Hic Hon Hop Hiv Hor) as H1.
-specialize (H1 (f a)).
-...
-specialize (H1 (‖ List.fold_left (λ c i, c + ‖ f i ‖) l 0%L ‖)%L).
-...
-eapply (rngl_le_trans Hor). 2: {
-  apply (rngl_add_le_mono_r Hop Hor).
-  apply (gc_modl_nonneg Hop Hor).
-}
-rewrite rngl_add_0_l.
-eapply (rngl_le_trans Hor); [ | apply IHl ].
-...
-progress unfold iter_list.
-remember 0%L as a eqn:Ha.
-apply eq_gc_eq in Ha.
-cbn in Ha.
-destruct Ha as (H1, H2).
-rewrite <- H1.
-clear H1.
-revert a b H2.
-induction n; intros. {
-  cbn.
-  progress unfold gc_modl.
-  progress unfold rl_modl.
-  rewrite H2.
-  rewrite (rngl_squ_0 Hos).
-  rewrite rngl_add_0_r.
-...
-  rewrite (rl_sqrt_squ Hon Hop Hor).
-...
-  apply rngl_abs_le.
-...
-  rewrite (gc_modl_0 Hon Hop Hor Hii).
-  apply (rngl_le_refl Hor).
-}
-cbn.
-rewrite gc_add_0_l.
-rewrite rngl_add_0_l.
+  eapply (rngl_le_trans Hor). {
+    apply (gc_summation_triangular Hic Hon Hop Hiv Hor Hii).
+  }
+  apply (rngl_summation_le_compat Hor).
+  intros i (_, Hi).
+  rewrite (rngl_mul_1_l Hon).
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
