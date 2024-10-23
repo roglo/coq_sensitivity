@@ -767,6 +767,21 @@ destruct fb. {
 }
 Qed.
 
+Theorem rngl_summation_1 :
+  ∀ b e n,
+  n = S e - b
+  → (∑ (i = b, e), 1 = rngl_of_nat n)%L.
+Proof.
+intros * Hn.
+progress unfold iter_seq.
+rewrite <- Hn; clear e Hn.
+revert b.
+induction n; intros; [ easy | cbn ].
+rewrite rngl_summation_list_cons.
+f_equal.
+apply IHn.
+Qed.
+
 Theorem rngl_eval_polyn_is_summation :
   rngl_has_1 T = true →
   rngl_has_opp_or_subt T = true →
