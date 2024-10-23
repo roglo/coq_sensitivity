@@ -643,6 +643,21 @@ assert (Hzz : z ≠ 0%C). {
   now apply (rngl_lt_asymm Hor) in Hr.
 }
 remember (Max (i = _, _), _) as m eqn:Hm.
+assert (Hz1z : (0 < ‖ (1 / z) ‖)%L). {
+  apply (rngl_lt_iff Hor).
+  split; [ apply (gc_modl_nonneg Hop Hor) | ].
+  intros H; symmetry in H.
+  apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+  apply (f_equal (rngl_mul z)) in H.
+  cbn in H.
+  rewrite (gc_mul_0_r Hos) in H.
+  rewrite (gc_mul_comm Hic) in H.
+  rewrite (gc_div_mul Hic Hon Hop Hiv Hor) in H; [ | easy ].
+  apply eq_gc_eq in H.
+  cbn in H.
+  destruct H as (H, _).
+  now apply (rngl_1_neq_0_iff Hon) in H.
+}
 assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
   apply (rngl_le_trans Hor _ R₀); [ | ]. 2: {
     now apply (rngl_lt_le_incl Hor) in Hrz.
@@ -687,30 +702,32 @@ assert (H1 : (‖ 1 / z ‖ * R₀ ≤ ‖ z ‖)%L). {
 assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   eapply (rngl_le_trans Hor); [ | apply H1 ].
   rewrite <- rngl_mul_assoc.
-  apply (rngl_mul_le_mono_pos_l Hop Hor Hii). {
-    apply (rngl_lt_iff Hor).
-    split; [ apply (gc_modl_nonneg Hop Hor) | ].
-    intros H; symmetry in H.
-    apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
-    apply (f_equal (rngl_mul z)) in H.
-    cbn in H.
-    rewrite (gc_mul_0_r Hos) in H.
-    rewrite (gc_mul_comm Hic) in H.
-    rewrite (gc_div_mul Hic Hon Hop Hiv Hor) in H; [ | easy ].
-    apply eq_gc_eq in H.
-    cbn in H.
-    destruct H as (H, _).
-    now apply (rngl_1_neq_0_iff Hon) in H.
-  }
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
   progress unfold R₀.
   apply (rngl_le_add_l Hor).
-  apply (rngl_le_trans Hor _ 1). {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
+  apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
   apply (rngl_le_add_r Hor).
   now apply (rngl_lt_le_incl Hor) in HM.
 }
 clear H1.
+assert
+  (H1 :
+    (‖ 1 / z ‖ *
+        ‖ (∑ (i = 0, n - 1), P.[i] / P.[n] * (1 / z ^ (n - 1 - i))) ‖ ≤
+          ‖ z ‖)%L). {
+  eapply (rngl_le_trans Hor); [ | apply H2 ].
+  rewrite <- rngl_mul_assoc.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  rewrite Hm.
+...
+Search (_ * Max (_ = _, _), _)%L.
+Search ((Max (_ = _, _), _) * _)%L.
+progress unfold iter_seq.
+Search (_ * Max (_ ∈ _), _)%L.
+Search ((Max (_ ∈ _), _) * _)%L.
+progress unfold iter_list.
+Search (_ * List.fold_left _ _ _)%L.
+Search ((List.fold_left _ _ _) * _) %L.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
