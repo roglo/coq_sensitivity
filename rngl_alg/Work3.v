@@ -840,6 +840,12 @@ assert
   rewrite (rngl_div_gc_div Hic Hiv) in Hx.
   rewrite <- Hx; cbn.
   rewrite gc_modl_mul.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+    rewrite (rngl_div_diag Hon Hiq). 2: {
+      intros H; subst x.
+      apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+Search (_ / _ = 0)%L.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
