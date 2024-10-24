@@ -804,9 +804,13 @@ assert
   remember (P.[i] / P.[n])%L as x eqn:Hx.
   remember (@gc_div T ro (@List.nth (GComplex T) i P (@rngl_zero (GComplex T) roc))
     (@List.nth (GComplex T) n P (@rngl_zero (GComplex T) roc))) as y eqn:Hy.
+  move y before x.
+  generalize Hx; intros Hxv.
+  generalize Hy; intros Hyv.
   cbn in Hy.
   cbn in Hx.
-  move y before x.
+  move Hxv before y.
+  move Hyv before Hxv.
 (**)
 (*
   Hx : x = (List.nth i P 0%C / List.nth n P 0%C)%L
@@ -830,6 +834,7 @@ assert
   cbn in Hy.
   progress replace 0%C with 0%L in Hx by easy.
   progress replace 0%C with 0%L in Hy by easy.
+(*
   rewrite (rngl_div_opp_l Hop Hiv) in Hy.
   do 2 rewrite (rngl_mul_opp_r Hop) in Hy.
   rewrite (rngl_sub_opp_r Hop) in Hy.
@@ -838,12 +843,24 @@ assert
   do 2 rewrite fold_rngl_squ in Hy.
   rewrite <- (rngl_div_add_distr_r Hiv) in Hy.
   rewrite <- (rngl_div_sub_distr_r Hop Hiv) in Hy.
-...
+*)
   progress unfold rngl_inv in Hx.
   cbn in Hx.
   progress unfold gc_opt_inv_or_quot in Hx.
-Search (_ / _ + _ / _)%L.
-2: {
+  remember (rngl_opt_inv_or_quot T) as oiq eqn:Hoiq.
+  symmetry in Hoiq.
+  move Hoiq at bottom.
+  generalize Hiv; intros H.
+  progress unfold rngl_has_inv in H.
+  rewrite Hoiq in H.
+  destruct oiq; [ | easy ].
+  destruct s; [ clear H | easy ].
+  rewrite Hic in Hx.
+  cbn in Hx.
+  progress replace 0%C with 0%L in Hx by easy.
+  rewrite <- Hx in Hy. (* ah, enfin ! *)
+  move Hy at top; subst y.
+  clear Hx t Hoiq.
 ...
 Set Printing All.
   progress replace 0%C with 0%L in Hx by easy.
