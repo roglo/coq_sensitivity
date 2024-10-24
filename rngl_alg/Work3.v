@@ -699,7 +699,7 @@ destruct Habr as [Habr| Hbr]; [ now apply eq_gc_eq | ].
 now exfalso; apply Hbz, eq_gc_eq.
 Qed.
 
-Theorem rngl_one_gc :
+Theorem rngl_one_gc_one :
   let roc := gc_ring_like_op T in
   1%L = 1%C.
 Proof.
@@ -709,6 +709,23 @@ progress unfold rngl_one.
 cbn.
 progress unfold gc_opt_one.
 now destruct (rngl_opt_one T).
+Qed.
+
+Theorem rngl_div_gc_inv :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  let roc := gc_ring_like_op T in
+  ∀ a b, (a / b)%L = (a / b)%C.
+Proof.
+intros Hic Hiv.
+intros.
+progress unfold rngl_div.
+progress unfold gc_div.
+progress unfold roc.
+rewrite (rngl_has_inv_gc_has_inv Hic).
+rewrite Hiv.
+cbn.
+now rewrite (rngl_inv_gc_inv Hic Hiv).
 Qed.
 
 (* to be completed
@@ -955,10 +972,11 @@ assert
     apply (gc_modl_nonneg Hop Hor).
   }
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite (rngl_div_gc_inv Hic Hiv).
+  rewrite (gc_modl_div Hic Hon Hop Hiv Hor). 2: {
+Search (_ ^ _ ≠ 0%C).
   progress unfold roc.
-  rewrite rngl_one_gc.
-Search (‖ (_ / _) ‖)%L.
-rewrite gc_modl_div.
+  rewrite rngl_one_gc_one.
 ...
 rewrite (rngl_has_inv_gc_has_inv Hic), Hiv.
   cbn.
