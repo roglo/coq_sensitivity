@@ -806,7 +806,7 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_lt_iff Hor).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     intros H; symmetry in H.
-    replace 0%C with 0%L in H by easy.
+    progress replace 0%C with 0%L in H by easy.
     now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
   }
   apply (rngl_div_nonneg Hon Hop Hiv Hor).
@@ -814,7 +814,7 @@ assert (Hr : (0 < R₀)%L). {
   apply (rngl_lt_iff Hor).
   split; [ apply (gc_modl_nonneg Hop Hor) | ].
   intros H; symmetry in H.
-  replace 0%C with 0%L in H by easy.
+  progress replace 0%C with 0%L in H by easy.
   now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
 }
 split; [ easy | ].
@@ -930,7 +930,7 @@ assert
   remember (P.[i] / P.[n])%L as x eqn:Hx.
   rewrite (rngl_div_gc_div Hic Hiv) in Hx.
   rewrite <- Hx; cbn.
-  rewrite gc_modl_mul.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
   rewrite (rngl_mul_comm Hic).
   destruct (rngl_eq_dec Heo (‖ x ‖) 0) as [Hxz| Hxz]. {
     rewrite Hxz.
@@ -943,6 +943,49 @@ assert
     apply (gc_modl_nonneg Hop Hor).
   }
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  progress unfold rngl_div.
+  progress unfold roc.
+  rewrite (rngl_has_inv_gc_has_inv Hic), Hiv.
+  cbn.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  remember (@rngl_one (GComplex T) _) as y eqn:Hy.
+  progress unfold rngl_one in Hy.
+  cbn in Hy.
+  progress unfold gc_opt_one in Hy.
+  generalize Hon; intros H.
+  progress unfold rngl_has_1 in H.
+  remember (rngl_opt_one T) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [one| ]; [ clear H | easy ].
+...
+  progress unfold gc_ring_like_op in Hy.
+  cbn in Hy.
+...
+  progress unfold rngl_one in Hy.
+cbn in Hy.
+progress unfold gc_opt_one in Hy.
+cbn in Hy.
+
+  progress replace 1%L with 1%C in Hy by easy.
+...
+  progress unfold rngl_one at 1.
+  cbn.
+  progress unfold gc_opt_one.
+  progress unfold rngl_opt_one.
+Set Printing All.
+  cbn.
+...
+  progress unfold gc_ring_like_op.
+  cbn.
+Set Printing All.
+rewrite gc_modl_1.
+  progress replace 1%L with 1%C by easy.
+
+Search (‖ 1 ‖)%L.
+
+Search (‖ (_ / _) ‖)%L.
+rewrite (gc_modl_div Hic Hon Hop Hiv Hor).
+Search (‖ _ ‖ ≤ _)%L.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
