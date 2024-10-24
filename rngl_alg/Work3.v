@@ -735,6 +735,7 @@ intros Hon Hic Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 assert (Hio :
   (rngl_is_integral_domain T ||
@@ -931,11 +932,17 @@ assert
   rewrite <- Hx; cbn.
   rewrite gc_modl_mul.
   rewrite (rngl_mul_comm Hic).
-  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
-    rewrite (rngl_div_diag Hon Hiq). 2: {
-      intros H; subst x.
-      apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
-      apply (gc_eq_div_0_l Hic Hon Hop Hiv Hor) in H; [ | easy ].
+  destruct (rngl_eq_dec Heo (‖ x ‖) 0) as [Hxz| Hxz]. {
+    rewrite Hxz.
+    rewrite (rngl_mul_0_r Hos).
+    apply (rngl_le_refl Hor).
+  }
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_lt_iff Hor).
+    split; [ | easy ].
+    apply (gc_modl_nonneg Hop Hor).
+  }
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
