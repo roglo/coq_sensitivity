@@ -761,6 +761,53 @@ assert
   apply (rngl_summation_le_compat Hor).
   intros i (_, Hi).
   rewrite (rngl_mul_1_l Hon).
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_le_max_seq_r Hor _ _ i). 2: {
+      apply List.in_seq.
+      split; [ easy | ].
+      rewrite Nat.sub_0_r, Nat.add_0_l.
+      now apply Nat.lt_succ_r.
+    }
+    intros j Hj.
+    apply (rngl_max_r_iff Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (gc_modl_nonneg Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    apply not_eq_sym.
+    intros H.
+    now apply eq_gc_modl_0 in H.
+  }
+  rewrite <- (gc_modl_div Hic Hon Hop Hiv Hor); [ | easy ].
+  progress unfold roc.
+  cbn.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  replace 0%C with 0%L by easy.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
+progress unfold gc_div.
+progress unfold rngl_div.
+cbn.
+...
+    progress unfold roc.
+    cbn.
+    progress unfold gc_ring_like_op.
+    cbn.
+    replace 0%C with 0%L by easy.
+cbn.
+progress unfold gc_div.
+cbn.
+progress unfold gc_inv.
+cbn.
+progress unfold rngl_div.
+rewrite Hiv.
+cbn.
+progress unfold rngl_has_inv.
+cbn.
+Print gc_opt_inv_or_quot.
+...
+    remember (P.[i] / P.[n])%L as x eqn:Hx.
+    rewrite rngl_div_diag.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
