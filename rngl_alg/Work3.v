@@ -569,6 +569,46 @@ destruct q; [ | easy ].
 now rewrite Hic.
 Qed.
 
+Theorem rngl_inv_gc_inv :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  let roc := gc_ring_like_op T in
+  ∀ a, a⁻¹%L = a⁻¹%C.
+Proof.
+intros Hic Hiv *.
+progress unfold gc_inv.
+progress unfold rngl_inv.
+cbn.
+progress unfold gc_opt_inv_or_quot.
+cbn.
+remember (rngl_opt_inv_or_quot T) as oiq eqn:Hoiq.
+symmetry in Hoiq.
+move Hoiq at bottom.
+generalize Hiv; intros H.
+progress unfold rngl_has_inv in H.
+rewrite Hoiq in H.
+destruct oiq; [ | easy ].
+destruct s; [ clear H | easy ].
+now rewrite Hic.
+Qed.
+
+Theorem rngl_div_gc_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  let roc := gc_ring_like_op T in
+  ∀ a b, (a / b)%L = (a / b)%C.
+Proof.
+intros Hic Hiv *.
+progress unfold rngl_div.
+progress unfold gc_div.
+progress unfold roc.
+rewrite (rngl_has_inv_gc_has_inv Hic).
+rewrite Hiv.
+cbn.
+f_equal.
+apply (rngl_inv_gc_inv Hic Hiv).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -796,183 +836,10 @@ assert
     now apply eq_gc_modl_0 in H.
   }
   rewrite <- (gc_modl_div Hic Hon Hop Hiv Hor); [ | easy ].
-  progress unfold roc.
-  cbn.
-  progress replace 0%C with 0%L by easy.
-  rewrite (gc_modl_mul Hic Hon Hop Hor).
-  rewrite (rngl_mul_comm Hic).
   remember (P.[i] / P.[n])%L as x eqn:Hx.
-  remember (@gc_div T ro (@List.nth (GComplex T) i P (@rngl_zero (GComplex T) roc))
-    (@List.nth (GComplex T) n P (@rngl_zero (GComplex T) roc))) as y eqn:Hy.
-  move y before x.
-  generalize Hx; intros Hxv.
-  generalize Hy; intros Hyv.
-  cbn in Hy.
-  cbn in Hx.
-  move Hxv before y.
-  move Hyv before Hxv.
-(**)
-(*
-  Hx : x = (List.nth i P 0%C / List.nth n P 0%C)%L
-  Hy : y = (List.nth i P 0 / List.nth n P 0)%C
-  ============================
-*)
-  progress unfold rngl_div in Hx.
-  rewrite (rngl_has_inv_gc_has_inv Hic) in Hx.
-  rewrite Hiv in Hx.
-  progress unfold gc_div in Hy.
-(*
-  Hx : x = (List.nth i P 0%C * (List.nth n P 0%C)⁻¹)%L
-  Hy : y = (List.nth i P 0 * (List.nth n P 0)⁻¹)%C
-  ============================
-*)
-  progress unfold gc_ring_like_op in Hx.
-  cbn in Hx.
-  progress unfold gc_mul in Hx.
-  progress unfold gc_mul in Hy.
-  progress unfold gc_inv in Hy.
-  cbn in Hy.
-  progress replace 0%C with 0%L in Hx by easy.
-  progress replace 0%C with 0%L in Hy by easy.
-(*
-  rewrite (rngl_div_opp_l Hop Hiv) in Hy.
-  do 2 rewrite (rngl_mul_opp_r Hop) in Hy.
-  rewrite (rngl_sub_opp_r Hop) in Hy.
-  rewrite (rngl_add_opp_r Hop) in Hy.
-  do 4 rewrite (rngl_mul_div_assoc Hiv) in Hy.
-  do 2 rewrite fold_rngl_squ in Hy.
-  rewrite <- (rngl_div_add_distr_r Hiv) in Hy.
-  rewrite <- (rngl_div_sub_distr_r Hop Hiv) in Hy.
-*)
-  progress unfold rngl_inv in Hx.
-  cbn in Hx.
-  progress unfold gc_opt_inv_or_quot in Hx.
-  remember (rngl_opt_inv_or_quot T) as oiq eqn:Hoiq.
-  symmetry in Hoiq.
-  move Hoiq at bottom.
-  generalize Hiv; intros H.
-  progress unfold rngl_has_inv in H.
-  rewrite Hoiq in H.
-  destruct oiq; [ | easy ].
-  destruct s; [ clear H | easy ].
-  rewrite Hic in Hx.
-  cbn in Hx.
-  progress replace 0%C with 0%L in Hx by easy.
-  rewrite <- Hx in Hy. (* ah, enfin ! *)
-  move Hy at top; subst y.
-  clear Hx t Hoiq.
-Theorem rngl_div_gc_div :
-  rngl_mul_is_comm T = true →
-  rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
-  ∀ a b, (a / b)%L = (a / b)%C.
-Proof.
-intros Hic Hiv *.
-progress unfold rngl_div.
-progress unfold gc_div.
-progress unfold roc.
-rewrite (rngl_has_inv_gc_has_inv Hic).
-rewrite Hiv.
-cbn.
-f_equal.
-Theorem rngl_inv_gc_inv :
-  let roc := gc_ring_like_op T in
-  ∀ a, a⁻¹%L = a⁻¹%C.
-Proof.
-intros.
-progress unfold gc_inv.
-progress unfold rngl_inv.
-cbn.
-progress unfold gc_opt_inv_or_quot.
-cbn.
-...
-  progress replace 0%C with 0%L in Hx by easy.
-  progress replace 0%C with 0%L in Hy by easy.
-...
-Print rngl_div.
-Print gc_div.
-...
-  remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc.
-  symmetry in Hivc.
-  destruct ivc. 2: {
-    progress unfold rngl_has_inv in Hivc.
-    cbn in Hivc.
-    move Hiv at bottom.
-    progress unfold rngl_has_inv in Hiv.
-    progress unfold gc_opt_inv_or_quot in Hivc.
-    remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq'.
-    symmetry in Hiq'.
-    destruct iq as [iq| ]; [ | easy ].
-    destruct iq; [ | easy ].
-    now rewrite Hic in Hivc.
-  }
-  progress unfold gc_div in Hy.
-  progress unfold rngl_div in Hx.
-  move Hx at bottom.
-  progress unfold roc in Hivc.
-  rewrite Hivc in Hx.
-  move Hy at bottom.
-  progress replace 0%C with 0%L in Hx by easy.
-  cbn in Hx.
-  progress replace 0%C with 0%L in Hx by easy.
-  progress unfold rngl_inv in Hx.
-  cbn in Hx.
-  remember (gc_opt_inv_or_quot T) as iq eqn:Hiq'.
-  symmetry in Hiq'.
-  destruct iq as [q| ]. 2: {
-    move Hiv at bottom.
-    progress unfold rngl_has_inv in Hiv.
-    progress unfold gc_opt_inv_or_quot in Hiq'.
-    rewrite Hic in Hiq'.
-    destruct (rngl_opt_inv_or_quot T) as [q| ]; [ | easy ].
-    now destruct q.
-  }
-  progress unfold gc_opt_inv_or_quot in Hiq'.
-  cbn in Hiq'.
-  remember (rngl_opt_inv_or_quot T) as u eqn:Hu.
-  symmetry in Hu.
-  destruct u; [ | easy ].
-(* bon, chais pas, c'est la merde, mais faut que j'insiste *)
-...
-  destruct q as [q| ]. {
-...
-  rewrite Hiq' in Hiv.
-...
-  progress replace 0%C with 0%L in Hy by easy.
-progress unfold gc_inv in Hy.
-cbn in Hy.
-progress unfold rngl_inv in Hx.
-cbn in Hx.
-...
-  cbn in Hx.
-  cbn in Hy.
-move y before x.
-Set Printing All.
-...
-  apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
-progress unfold gc_div.
-progress unfold rngl_div.
-cbn.
-...
-    progress unfold roc.
-    cbn.
-    progress unfold gc_ring_like_op.
-    cbn.
-    replace 0%C with 0%L by easy.
-cbn.
-progress unfold gc_div.
-cbn.
-progress unfold gc_inv.
-cbn.
-progress unfold rngl_div.
-rewrite Hiv.
-cbn.
-progress unfold rngl_has_inv.
-cbn.
-Print gc_opt_inv_or_quot.
-...
-    remember (P.[i] / P.[n])%L as x eqn:Hx.
-    rewrite rngl_div_diag.
+  rewrite (rngl_div_gc_div Hic Hiv) in Hx.
+  rewrite <- Hx; cbn.
+  rewrite gc_modl_mul.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
