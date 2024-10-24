@@ -552,6 +552,23 @@ apply (rngl_add_le_mono_r Hop Hor).
 apply IHl.
 Qed.
 
+Theorem rngl_has_inv_has_inv_gc :
+  rngl_mul_is_comm T = true →
+  let roc := gc_ring_like_op T in
+  rngl_has_inv (GComplex T) = rngl_has_inv T.
+Proof.
+intros Hic *.
+progress unfold rngl_has_inv.
+cbn.
+progress unfold gc_opt_inv_or_quot.
+cbn.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq'.
+symmetry in Hiq'.
+destruct iq as [q| ]; [ | easy ].
+destruct q; [ | easy ].
+now rewrite Hic.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -781,14 +798,60 @@ assert
   rewrite <- (gc_modl_div Hic Hon Hop Hiv Hor); [ | easy ].
   progress unfold roc.
   cbn.
-  rewrite (gc_modl_mul Hic Hon Hop Hor).
   progress replace 0%C with 0%L by easy.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
   rewrite (rngl_mul_comm Hic).
   remember (P.[i] / P.[n])%L as x eqn:Hx.
   remember (@gc_div T ro (@List.nth (GComplex T) i P (@rngl_zero (GComplex T) roc))
     (@List.nth (GComplex T) n P (@rngl_zero (GComplex T) roc))) as y eqn:Hy.
   cbn in Hy.
   cbn in Hx.
+  move y before x.
+(**)
+(*
+  Hx : x = (List.nth i P 0%C / List.nth n P 0%C)%L
+  Hy : y = (List.nth i P 0 / List.nth n P 0)%C
+  ============================
+*)
+  progress unfold rngl_div in Hx.
+  rewrite (rngl_has_inv_has_inv_gc Hic) in Hx.
+  rewrite Hiv in Hx.
+  progress unfold gc_div in Hy.
+(*
+  Hx : x = (List.nth i P 0%C * (List.nth n P 0%C)⁻¹)%L
+  Hy : y = (List.nth i P 0 * (List.nth n P 0)⁻¹)%C
+  ============================
+*)
+  progress unfold gc_ring_like_op in Hx.
+  cbn in Hx.
+  progress unfold gc_mul in Hx.
+  progress unfold gc_mul in Hy.
+  progress unfold gc_inv in Hy.
+  cbn in Hy.
+  progress replace 0%C with 0%L in Hx by easy.
+  progress replace 0%C with 0%L in Hy by easy.
+  rewrite (rngl_div_opp_l Hop Hiv) in Hy.
+  do 2 rewrite (rngl_mul_opp_r Hop) in Hy.
+  rewrite (rngl_sub_opp_r Hop) in Hy.
+  rewrite (rngl_add_opp_r Hop) in Hy.
+  do 4 rewrite (rngl_mul_div_assoc Hiv) in Hy.
+  do 2 rewrite fold_rngl_squ in Hy.
+  rewrite <- (rngl_div_add_distr_r Hiv) in Hy.
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv) in Hy.
+...
+  progress unfold rngl_inv in Hx.
+  cbn in Hx.
+  progress unfold gc_opt_inv_or_quot in Hx.
+Search (_ / _ + _ / _)%L.
+2: {
+...
+Set Printing All.
+  progress replace 0%C with 0%L in Hx by easy.
+  progress replace 0%C with 0%L in Hy by easy.
+...
+Print rngl_div.
+Print gc_div.
+...
   remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc.
   symmetry in Hivc.
   destruct ivc. 2: {
