@@ -845,7 +845,48 @@ assert
     rewrite (rngl_div_diag Hon Hiq). 2: {
       intros H; subst x.
       apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
-Search (_ / _ = 0)%L.
+Theorem gc_eq_div_0_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  let roc := gc_ring_like_op T in
+  ∀ a b,
+  (a / b)%C = 0%C
+  → b ≠ 0%C
+  → a = 0%L.
+Proof.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Habz Hbz.
+progress unfold gc_div in Habz.
+progress unfold gc_mul in Habz.
+cbn in Habz.
+do 4 rewrite (rngl_mul_div_assoc Hiv) in Habz.
+do 2 rewrite (rngl_mul_opp_r Hop) in Habz.
+do 2 rewrite (rngl_div_opp_l Hop Hiv) in Habz.
+rewrite (rngl_sub_opp_r Hop) in Habz.
+rewrite (rngl_add_opp_r Hop) in Habz.
+rewrite <- (rngl_div_add_distr_r Hiv) in Habz.
+rewrite <- (rngl_div_sub_distr_r Hop Hiv) in Habz.
+progress unfold rngl_div in Habz.
+rewrite Hiv in Habz.
+do 2 rewrite fold_rngl_squ in Habz.
+injection Habz; clear Habz; intros Habi Habr.
+assert (Hrz : ((gre b)² + (gim b)² ≠ 0)%L). {
+  intros H.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  now apply Hbz, eq_gc_eq.
+}
+apply (rngl_eq_mul_0_l Hos Hii) in Habr. 2: {
+  intros H.
+  now apply (rngl_inv_neq_0 Hon Hos Hiv) in H.
+}
+apply (rngl_eq_mul_0_l Hos Hii) in Habi. 2: {
+  intros H.
+  now apply (rngl_inv_neq_0 Hon Hos Hiv) in H.
+}
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
