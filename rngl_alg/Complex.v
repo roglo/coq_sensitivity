@@ -173,6 +173,9 @@ Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
 
 End a.
 
+Arguments gc_opt_opp_or_subt T {ro}.
+Arguments gc_opt_inv_or_quot T {ro rp}.
+
 Definition gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
   ring_like_op (GComplex T) :=
@@ -180,8 +183,8 @@ Definition gc_ring_like_op T
      rngl_add := gc_add;
      rngl_mul := gc_mul;
      rngl_opt_one := gc_opt_one;
-     rngl_opt_opp_or_subt := gc_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := gc_opt_inv_or_quot;
+     rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
+     rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 

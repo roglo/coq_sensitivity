@@ -782,8 +782,70 @@ assert
   progress unfold roc.
   cbn.
   rewrite (gc_modl_mul Hic Hon Hop Hor).
-  replace 0%C with 0%L by easy.
+  progress replace 0%C with 0%L by easy.
   rewrite (rngl_mul_comm Hic).
+  remember (P.[i] / P.[n])%L as x eqn:Hx.
+  remember (@gc_div T ro (@List.nth (GComplex T) i P (@rngl_zero (GComplex T) roc))
+    (@List.nth (GComplex T) n P (@rngl_zero (GComplex T) roc))) as y eqn:Hy.
+  cbn in Hy.
+  cbn in Hx.
+  remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc.
+  symmetry in Hivc.
+  destruct ivc. 2: {
+    progress unfold rngl_has_inv in Hivc.
+    cbn in Hivc.
+    move Hiv at bottom.
+    progress unfold rngl_has_inv in Hiv.
+    progress unfold gc_opt_inv_or_quot in Hivc.
+    remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq'.
+    symmetry in Hiq'.
+    destruct iq as [iq| ]; [ | easy ].
+    destruct iq; [ | easy ].
+    now rewrite Hic in Hivc.
+  }
+  progress unfold gc_div in Hy.
+  progress unfold rngl_div in Hx.
+  move Hx at bottom.
+  progress unfold roc in Hivc.
+  rewrite Hivc in Hx.
+  move Hy at bottom.
+  progress replace 0%C with 0%L in Hx by easy.
+  cbn in Hx.
+  progress replace 0%C with 0%L in Hx by easy.
+  progress unfold rngl_inv in Hx.
+  cbn in Hx.
+  remember (gc_opt_inv_or_quot T) as iq eqn:Hiq'.
+  symmetry in Hiq'.
+  destruct iq as [q| ]. 2: {
+    move Hiv at bottom.
+    progress unfold rngl_has_inv in Hiv.
+    progress unfold gc_opt_inv_or_quot in Hiq'.
+    rewrite Hic in Hiq'.
+    destruct (rngl_opt_inv_or_quot T) as [q| ]; [ | easy ].
+    now destruct q.
+  }
+  progress unfold gc_opt_inv_or_quot in Hiq'.
+  cbn in Hiq'.
+  remember (rngl_opt_inv_or_quot T) as u eqn:Hu.
+  symmetry in Hu.
+  destruct u; [ | easy ].
+(* bon, chais pas, c'est la merde, mais faut que j'insiste *)
+...
+  destruct q as [q| ]. {
+...
+  rewrite Hiq' in Hiv.
+...
+  progress replace 0%C with 0%L in Hy by easy.
+progress unfold gc_inv in Hy.
+cbn in Hy.
+progress unfold rngl_inv in Hx.
+cbn in Hx.
+...
+  cbn in Hx.
+  cbn in Hy.
+move y before x.
+Set Printing All.
+...
   apply (rngl_le_div_r Hon Hop Hiv Hor). 2: {
 progress unfold gc_div.
 progress unfold rngl_div.
