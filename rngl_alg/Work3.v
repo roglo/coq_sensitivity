@@ -699,6 +699,18 @@ destruct Habr as [Habr| Hbr]; [ now apply eq_gc_eq | ].
 now exfalso; apply Hbz, eq_gc_eq.
 Qed.
 
+Theorem rngl_one_gc :
+  let roc := gc_ring_like_op T in
+  1%L = 1%C.
+Proof.
+intros.
+apply eq_gc_eq; cbn.
+progress unfold rngl_one.
+cbn.
+progress unfold gc_opt_one.
+now destruct (rngl_opt_one T).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -943,9 +955,12 @@ assert
     apply (gc_modl_nonneg Hop Hor).
   }
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-  progress unfold rngl_div.
   progress unfold roc.
-  rewrite (rngl_has_inv_gc_has_inv Hic), Hiv.
+  rewrite rngl_one_gc.
+Search (‖ (_ / _) ‖)%L.
+rewrite gc_modl_div.
+...
+rewrite (rngl_has_inv_gc_has_inv Hic), Hiv.
   cbn.
   rewrite (gc_modl_mul Hic Hon Hop Hor).
   remember (@rngl_one (GComplex T) _) as y eqn:Hy.
@@ -980,7 +995,14 @@ Set Printing All.
 Set Printing All.
 rewrite gc_modl_1.
   progress replace 1%L with 1%C by easy.
-
+Set Printing All.
+...
+Set Printing All.
+progress unfold roc.
+progress unfold gc_ring_like_op.
+cbn.
+Set Printing All.
+...
 Search (‖ 1 ‖)%L.
 
 Search (‖ (_ / _) ‖)%L.
