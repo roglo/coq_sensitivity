@@ -552,7 +552,7 @@ apply (rngl_add_le_mono_r Hop Hor).
 apply IHl.
 Qed.
 
-Theorem rngl_has_inv_has_inv_gc :
+Theorem rngl_has_inv_gc_has_inv :
   rngl_mul_is_comm T = true →
   let roc := gc_ring_like_op T in
   rngl_has_inv (GComplex T) = rngl_has_inv T.
@@ -818,7 +818,7 @@ assert
   ============================
 *)
   progress unfold rngl_div in Hx.
-  rewrite (rngl_has_inv_has_inv_gc Hic) in Hx.
+  rewrite (rngl_has_inv_gc_has_inv Hic) in Hx.
   rewrite Hiv in Hx.
   progress unfold gc_div in Hy.
 (*
@@ -861,8 +861,31 @@ assert
   rewrite <- Hx in Hy. (* ah, enfin ! *)
   move Hy at top; subst y.
   clear Hx t Hoiq.
+Theorem rngl_div_gc_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  let roc := gc_ring_like_op T in
+  ∀ a b, (a / b)%L = (a / b)%C.
+Proof.
+intros Hic Hiv *.
+progress unfold rngl_div.
+progress unfold gc_div.
+progress unfold roc.
+rewrite (rngl_has_inv_gc_has_inv Hic).
+rewrite Hiv.
+cbn.
+f_equal.
+Theorem rngl_inv_gc_inv :
+  let roc := gc_ring_like_op T in
+  ∀ a, a⁻¹%L = a⁻¹%C.
+Proof.
+intros.
+progress unfold gc_inv.
+progress unfold rngl_inv.
+cbn.
+progress unfold gc_opt_inv_or_quot.
+cbn.
 ...
-Set Printing All.
   progress replace 0%C with 0%L in Hx by easy.
   progress replace 0%C with 0%L in Hy by easy.
 ...
