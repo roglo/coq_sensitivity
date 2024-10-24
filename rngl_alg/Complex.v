@@ -104,8 +104,9 @@ Definition gc_div (ca cb : GComplex T) :=
   gc_mul ca (gc_inv cb).
 
 Definition gc_opt_opp_or_subt :
-  option
-    ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T)) :=
+    option
+      ((GComplex T → GComplex T) + (GComplex T → GComplex T → GComplex T))
+  :=
   match rngl_opt_opp_or_subt T with
   | Some (inl opp) =>
       Some (inl (λ c, mk_gc (opp (gre c)) (opp (gim c))))
