@@ -885,6 +885,26 @@ do 2 rewrite (rngl_mul_0_r Hos).
 now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
 
+Theorem gc_pow_add_r :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  ∀ a i j, (a ^ (i + j))%C = (a ^ i * a ^ j)%C.
+Proof.
+intros Hon Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros.
+do 3 rewrite <- rngl_pow_gc_pow.
+rewrite <- rngl_mul_gc_mul.
+induction i. {
+  symmetry; cbn.
+  rewrite rngl_one_gc_one.
+  apply (gc_mul_1_l Hon Hos).
+}
+cbn in IHi |-*.
+rewrite IHi.
+now rewrite <- (gc_mul_assoc Hop).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -1175,27 +1195,8 @@ do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
 rewrite (gc_mul_div_assoc Hop Hiv) in H1.
 rewrite (gc_mul_1_r Hon Hos) in H1.
 rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
-Check rngl_pow_add_r.
-Theorem gc_pow_add_r :
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  ∀ a i j, (a ^ (i + j))%C = (a ^ i * a ^ j)%C.
-Proof.
-intros Hon Hop.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-do 3 rewrite <- rngl_pow_gc_pow.
-rewrite <- rngl_mul_gc_mul.
-induction i. {
-  symmetry; cbn.
-  rewrite rngl_one_gc_one.
-  apply (gc_mul_1_l Hon Hos).
-}
-cbn in IHi |-*.
-rewrite IHi.
-now rewrite <- (gc_mul_assoc Hop).
-...
-rewrite <- gc_pow_add_r in H1.
+rewrite <- (gc_pow_add_r Hon Hop) in H1.
+rewrite Nat.sub_add in H1; [ | easy ].
 ...
 Definition gc_ring_like_prop_not_alg_closed
 ...
