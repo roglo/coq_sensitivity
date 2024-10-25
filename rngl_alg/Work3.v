@@ -721,7 +721,7 @@ progress unfold gc_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
-Theorem gc_eq_mul_0_l:
+Theorem gc_eq_mul_0_l :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
