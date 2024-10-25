@@ -144,11 +144,10 @@ now apply (eq_rngl_add_square_0 Hop Hor Hii) in Hab.
 Qed.
 
 Theorem gc_eq_dec :
-  rngl_has_eq_dec T = true →
+  rngl_has_eq_dec_or_order T = true →
   ∀ a b : GComplex T, {a = b} + {a ≠ b}.
 Proof.
-intros Hed.
-specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
+intros Heo.
 intros.
 destruct a as (ra, ia).
 destruct b as (rb, ib).
@@ -168,7 +167,9 @@ Qed.
 
 Definition gc_opt_eq_dec : option (∀ a b : GComplex T, {a = b} + {a ≠ b}) :=
   match Bool.bool_dec (rngl_has_eq_dec T) true with
-  | left Hed => Some (gc_eq_dec Hed)
+  | left Hed =>
+       let Heo := rngl_has_eq_dec_or_is_ordered_l Hed in
+       Some (gc_eq_dec Heo)
   | right _ => None
   end.
 
@@ -861,6 +862,7 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hρ Hθ.
@@ -868,7 +870,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   f_equal; rewrite H1; apply H1.
 }
 intros * Hρ Hθ.
-destruct (gc_eq_dec Hed z gc_zero) as [Hz| Hz]. {
+destruct (gc_eq_dec Heo z gc_zero) as [Hz| Hz]. {
   destruct z as (zr, zi).
   progress unfold gc_zero in Hz.
   injection Hz; clear Hz; intros; subst zr zi.

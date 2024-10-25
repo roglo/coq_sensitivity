@@ -782,6 +782,40 @@ destruct Habi as [Habi| Habi]; [ now apply eq_gc_eq | ].
 now exfalso; apply Hbz, eq_gc_eq.
 Qed.
 
+Theorem gc_pow_nonzero :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a n, a ≠ 0%C → (a ^ n)%C ≠ 0%C.
+Proof.
+intros Hic Hon Hop Hor Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Haz Hanz.
+  apply Haz; clear Haz.
+  apply eq_gc_eq; cbn.
+  split; apply H1.
+}
+intros * Haz Hanz.
+apply Haz; clear Haz.
+induction n. {
+  cbn in Hanz.
+  apply eq_gc_eq in Hanz.
+  rewrite gre_1, gim_1 in Hanz.
+  destruct Hanz as (H, _).
+  now apply (rngl_1_neq_0_iff Hon) in H.
+}
+cbn in Hanz.
+destruct (gc_eq_dec Heo a 0) as [Haz| Haz]; [ easy | exfalso ].
+rewrite (gc_mul_comm Hic) in Hanz.
+apply (gc_eq_mul_0_l Hic Hop Hor Hii) in Hanz; [ | easy ].
+now apply Haz, IHn.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -1029,148 +1063,15 @@ assert
   rewrite (rngl_div_gc_div Hic Hiv).
   rewrite (gc_modl_div Hic Hon Hop Hiv Hor). 2: {
     replace (z ^ (n - 1 - i))%L with (z ^ (n - 1 - i))%C by easy.
-Search (_ ^ _ ≠ 0)%L.
-Theorem gc_pow_nonzero :
-  rngl_mul_is_comm T = true →
-  rngl_has_1 T = true →
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ a n, a ≠ 0%C → (a ^ n)%C ≠ 0%C.
-Proof.
-intros Hic Hon Hop Hor Hii.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Haz Hanz.
-  apply Haz; clear Haz.
-  apply eq_gc_eq; cbn.
-  split; apply H1.
-}
-intros * Haz Hanz.
-apply Haz; clear Haz.
-induction n. {
-  cbn in Hanz.
-  apply eq_gc_eq in Hanz.
-  rewrite gre_1, gim_1 in Hanz.
-  destruct Hanz as (H, _).
-  now apply (rngl_1_neq_0_iff Hon) in H.
-}
-destruct n. {
-  cbn in Hanz.
-  progress replace 1%L with 1%C in Hanz. 2: {
-    symmetry.
-    apply rngl_one_gc_one.
+    now apply (gc_pow_nonzero Hic Hon Hop Hor Hii).
   }
-  now rewrite (gc_mul_1_r Hon Hos) in Hanz.
-}
-remember (S n) as sn; cbn in Hanz; subst sn.
-rewrite <- rngl_mul_gc_mul in Hanz.
-rewrite <- rngl_zero_gc_zero in Hanz.
-...
-apply rngl_integral in Hanz.
-...
-apply (gc_eq_mul_0_l Hic Hop Hor Hii) in Hanz; [ easy | ].
-...
-  subst a.
-  apply eq_gc_eq; cbn.
-  do 2 rewrite (rngl_mul_0_l Hos).
-  rewrite (rngl_sub_0_r Hos).
-  rewrite rngl_add_0_l.
-  easy.
-}
-...
-Search (_ * _ = 0)%L.
-Search (_ * _ = 0)%C.
-Theorem gc_integral:
-  ∀ a b, (a * b)%C = 0%C → a = 0%C ∨ b = 0%C.
-Proof.
-intros * Hab.
-apply eq_gc_eq in Hab.
-cbn in Hab.
-destruct Hab as (Ha, Hb).
-...
-  Hbz : b ≠ 0%C
-  Habi : (gim a * gre b - gre a * gim b)%L = 0%L
-  Habr : (gre a * gre b + gim a * gim b)%L = 0%L
-  Hrz : ((gre b)² + (gim b)²)%L ≠ 0%L
-  ============================
-  gim a = 0%L
-...
-rewrite <- rngl_mul_gc_mul in Hanz.
-rewrite <- rngl_zero_gc_zero in Hanz.
-apply rngl_eq_mul_0_r in Hanz.
-...
-Check rngl_mul_gc_mul.
-...
-Check rngl_div_gc_inv.
-  rngl_mul_is_comm T = true →
-  rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
-  ∀ a b, (a / b)%L = (a / b)%C.
-Proof.
-...
-apply eq_gc_eq in Hanz.
-apply eq_gc_eq.
-cbn in Hanz |-*.
-destruct Hanz as (Hr, Hi).
-... ...
-apply gc_pow_nonzero.
-
-Search (_ ^ _ ≠ 0)%C.
-progress unfold roc.
-apply rngl_pow_nonzero.
   progress unfold roc.
   rewrite rngl_one_gc_one.
-...
-rewrite (rngl_has_inv_gc_has_inv Hic), Hiv.
-  cbn.
-  rewrite (gc_modl_mul Hic Hon Hop Hor).
-  remember (@rngl_one (GComplex T) _) as y eqn:Hy.
-  progress unfold rngl_one in Hy.
-  cbn in Hy.
-  progress unfold gc_opt_one in Hy.
-  generalize Hon; intros H.
-  progress unfold rngl_has_1 in H.
-  remember (rngl_opt_one T) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b as [one| ]; [ clear H | easy ].
-...
-  progress unfold gc_ring_like_op in Hy.
-  cbn in Hy.
-...
-  progress unfold rngl_one in Hy.
-cbn in Hy.
-progress unfold gc_opt_one in Hy.
-cbn in Hy.
-
-  progress replace 1%L with 1%C in Hy by easy.
-...
-  progress unfold rngl_one at 1.
-  cbn.
-  progress unfold gc_opt_one.
-  progress unfold rngl_opt_one.
-Set Printing All.
-  cbn.
-...
-  progress unfold gc_ring_like_op.
-  cbn.
-Set Printing All.
-rewrite gc_modl_1.
-  progress replace 1%L with 1%C by easy.
-Set Printing All.
-...
-Set Printing All.
-progress unfold roc.
-progress unfold gc_ring_like_op.
-cbn.
-Set Printing All.
-...
-Search (‖ 1 ‖)%L.
-
-Search (‖ (_ / _) ‖)%L.
-rewrite (gc_modl_div Hic Hon Hop Hiv Hor).
-Search (‖ _ ‖ ≤ _)%L.
+  rewrite (gc_modl_1 Hon Hop Hor Hii).
+  apply (rngl_le_div_l Hon Hop Hiv Hor). {
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    intros H; symmetry in H.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
