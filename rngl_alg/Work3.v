@@ -1127,10 +1127,17 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
 rewrite rngl_mul_assoc in H1.
 do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
 Theorem gc_mul_div_assoc :
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
   ∀ a b c, (a * (b / c))%C = (a * b / c)%C.
 Proof.
+intros Hop Hiv.
 intros.
 apply eq_gc_eq; cbn.
+rewrite (rngl_div_opp_l Hop Hiv).
+do 4 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_sub_opp_r Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
 remember ((gre c)² + (gim c)²)%L as ρ eqn:Hρ.
 ... ...
