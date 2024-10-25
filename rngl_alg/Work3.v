@@ -821,6 +821,24 @@ Theorem rngl_pow_gc_pow :
   ∀ z n, (z ^ n)%L = (z ^ n)%C.
 Proof. easy. Qed.
 
+Theorem gc_modl_pow :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
+Proof.
+intros Hic Hon Hop Hor Hii *.
+induction n; cbn. {
+  rewrite rngl_one_gc_one.
+  apply (gc_modl_1 Hon Hop Hor Hii).
+}
+rewrite (gc_modl_mul Hic Hon Hop Hor).
+rewrite rngl_pow_gc_pow.
+now rewrite IHn.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -1082,11 +1100,27 @@ assert
   }
   rewrite (rngl_mul_1_l Hon).
   rewrite rngl_pow_gc_pow.
-Theorem gc_modl_pow :
-  ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
-Proof.
-... ...
-rewrite gc_modl_pow.
+  rewrite (gc_modl_pow Hic Hon Hop Hor Hii).
+  apply (rngl_pow_ge_1 Hop Hon Hor).
+  eapply (rngl_le_trans Hor). 2: {
+    apply (rngl_lt_le_incl Hor), Hrz.
+  }
+  progress unfold R₀.
+  rewrite <- rngl_add_assoc.
+  apply (rngl_le_add_r Hor).
+  apply (rngl_add_nonneg_nonneg Hor). {
+    now apply (rngl_lt_le_incl Hor) in HM.
+  }
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_of_nat_nonneg Hon Hop Hor).
+  rewrite Hm.
+  (* lemma *)
+  progress unfold iter_seq.
+  apply (rngl_iter_max_list_nonneg Hor).
+  intros j Hj.
+  now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
+}
+clear H2.
 ...
   progress unfold gc_modl.
   progress unfold rl_modl.
