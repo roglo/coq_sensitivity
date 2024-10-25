@@ -1072,6 +1072,16 @@ assert
     apply (rngl_lt_iff Hor).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     intros H; symmetry in H.
+    apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+    now apply (gc_pow_nonzero Hic Hon Hop Hor Hii) in H.
+  }
+  rewrite (rngl_mul_1_l Hon).
+  progress unfold gc_modl.
+  progress unfold rl_modl.
+  rewrite <- (rl_sqrt_1 Hon Hop Hor Hii).
+  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
