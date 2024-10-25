@@ -1121,13 +1121,20 @@ assert
   now apply (gc_modl_div_nonneg Hon Hop Hiv Hor).
 }
 clear H2.
-...
-  progress unfold gc_modl.
-  progress unfold rl_modl.
-  rewrite <- (rl_sqrt_1 Hon Hop Hor Hii).
-  apply (rl_sqrt_le_rl_sqrt Hon Hop Hor Hii). {
-    apply (rngl_0_le_1 Hon Hop Hor).
-  }
+apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
+  apply (gc_modl_nonneg Hop Hor).
+}
+rewrite rngl_mul_assoc in H1.
+do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
+Theorem gc_mul_div_assoc :
+  ∀ a b c, (a * (b / c))%C = (a * b / c)%C.
+Proof.
+intros.
+apply eq_gc_eq; cbn.
+do 2 rewrite fold_rngl_squ.
+remember ((gre c)² + (gim c)²)%L as ρ eqn:Hρ.
+... ...
+rewrite gc_mul_div_assoc in H1.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
