@@ -993,7 +993,60 @@ induction n. {
 }
 apply IHn; clear IHn.
 cbn in Hanz.
+Theorem gc_eq_mul_0_l:
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (a * b = 0 → b ≠ 0 → a = 0)%C.
+Proof.
+intros Hic Hop Hii.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Hab Hbz.
+apply eq_gc_eq in Hab.
+cbn in Hab.
+destruct Hab as (Habr, Habi).
+rewrite rngl_add_comm in Habi.
+apply (f_equal (rngl_mul (gre b))) in Habr.
+apply (f_equal (rngl_mul (gim b))) in Habi.
+rewrite (rngl_mul_0_r Hos) in Habr, Habi.
+rewrite (rngl_mul_sub_distr_l Hop) in Habr.
+rewrite rngl_mul_add_distr_l in Habi.
+rewrite (rngl_mul_assoc _ (gim a)) in Habr.
+rewrite (rngl_mul_comm Hic _ (gim a)) in Habr.
+rewrite (rngl_mul_comm Hic _ (gim a * _))%L in Habi.
+apply -> (rngl_sub_move_0_r Hop) in Habr.
+rewrite rngl_add_comm in Habi.
+apply (rngl_add_move_0_r Hop) in Habi.
+rewrite Habi in Habr.
+apply (rngl_add_move_0_r Hop) in Habr.
+rewrite (rngl_mul_comm Hic (gre b)) in Habr.
+rewrite (rngl_mul_comm Hic (gim b)) in Habr.
+do 2 rewrite <- rngl_mul_assoc in Habr.
+rewrite <- (rngl_mul_add_distr_l) in Habr.
+do 2 rewrite fold_rngl_squ in Habr.
+apply (rngl_eq_mul_0_l Hos Hii) in Habr; [ | ].
+...
+  rewrite Habr in Habi.
+  rewrite (rngl_mul_0_l Hos) in Habi.
+  rewrite (rngl_mul_0_r Hos) in Habi.
+  now symmetry in Habi.
+...
+Search (_ * _ = 0)%L.
 Search (_ * _ = 0)%C.
+Theorem gc_integral:
+  ∀ a b, (a * b)%C = 0%C → a = 0%C ∨ b = 0%C.
+Proof.
+intros * Hab.
+apply eq_gc_eq in Hab.
+cbn in Hab.
+destruct Hab as (Ha, Hb).
+...
+  Hbz : b ≠ 0%C
+  Habi : (gim a * gre b - gre a * gim b)%L = 0%L
+  Habr : (gre a * gre b + gim a * gim b)%L = 0%L
+  Hrz : ((gre b)² + (gim b)²)%L ≠ 0%L
+  ============================
+  gim a = 0%L
 ...
 rewrite <- rngl_mul_gc_mul in Hanz.
 rewrite <- rngl_zero_gc_zero in Hanz.
