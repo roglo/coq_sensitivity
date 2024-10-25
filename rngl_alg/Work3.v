@@ -816,6 +816,11 @@ apply (gc_eq_mul_0_l Hic Hop Hor Hii) in Hanz; [ | easy ].
 now apply Haz, IHn.
 Qed.
 
+Theorem rngl_pow_gc_pow :
+  let roc := gc_ring_like_op T in
+  ∀ z n, (z ^ n)%L = (z ^ n)%C.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -1076,6 +1081,13 @@ assert
     now apply (gc_pow_nonzero Hic Hon Hop Hor Hii) in H.
   }
   rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_pow_gc_pow.
+Theorem gc_modl_pow :
+  ∀ z n, (‖ z ^ n ‖ = ‖ z ‖ ^ n)%L.
+Proof.
+... ...
+rewrite gc_modl_pow.
+...
   progress unfold gc_modl.
   progress unfold rl_modl.
   rewrite <- (rl_sqrt_1 Hon Hop Hor Hii).
