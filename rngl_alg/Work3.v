@@ -839,6 +839,52 @@ rewrite rngl_pow_gc_pow.
 now rewrite IHn.
 Qed.
 
+Theorem gc_mul_div_assoc :
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ a b c, (a * (b / c))%C = (a * b / c)%C.
+Proof.
+intros Hop Hiv.
+intros.
+apply eq_gc_eq; cbn.
+rewrite (rngl_div_opp_l Hop Hiv).
+do 4 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_sub_opp_r Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
+do 2 rewrite fold_rngl_squ.
+remember ((gre c)² + (gim c)²)%L as ρ eqn:Hρ.
+do 2 rewrite rngl_mul_add_distr_l.
+do 2 rewrite rngl_mul_add_distr_r.
+do 2 rewrite (rngl_mul_sub_distr_l Hop).
+do 2 rewrite (rngl_mul_sub_distr_r Hop).
+do 8 rewrite rngl_mul_assoc.
+do 8 rewrite (rngl_mul_div_assoc Hiv).
+do 2 rewrite (rngl_sub_sub_distr Hop).
+rewrite rngl_add_assoc.
+rewrite (rngl_add_sub_assoc Hop).
+do 4 rewrite <- (rngl_div_add_distr_r Hiv).
+do 4 rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+do 4 rewrite <- (rngl_div_add_distr_r Hiv).
+do 4 rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_add_swap.
+split; [ easy | ].
+rewrite rngl_add_add_swap.
+easy.
+Qed.
+
+Theorem gc_pow_1_r :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  ∀ a, (a ^ 1)%C = a.
+Proof.
+intros Hon Hos *.
+apply eq_gc_eq; cbn.
+rewrite gre_1, gim_1.
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite (rngl_mul_0_r Hos).
+now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -1126,22 +1172,41 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
 }
 rewrite rngl_mul_assoc in H1.
 do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
-Theorem gc_mul_div_assoc :
+rewrite (gc_mul_div_assoc Hop Hiv) in H1.
+rewrite (gc_mul_1_r Hon Hos) in H1.
+rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
+Check rngl_pow_add_r.
+Theorem gc_pow_add_r :
+  rngl_has_1 T = true →
   rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  ∀ a b c, (a * (b / c))%C = (a * b / c)%C.
+  ∀ a i j, (a ^ (i + j))%C = (a ^ i * a ^ j)%C.
 Proof.
-intros Hop Hiv.
+intros Hon Hop.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
-apply eq_gc_eq; cbn.
-rewrite (rngl_div_opp_l Hop Hiv).
-do 4 rewrite (rngl_mul_opp_r Hop).
-do 2 rewrite (rngl_sub_opp_r Hop).
-do 2 rewrite (rngl_add_opp_r Hop).
-do 2 rewrite fold_rngl_squ.
-remember ((gre c)² + (gim c)²)%L as ρ eqn:Hρ.
-... ...
-rewrite gc_mul_div_assoc in H1.
+do 3 rewrite <- rngl_pow_gc_pow.
+rewrite <- rngl_mul_gc_mul.
+induction i. {
+  symmetry; cbn.
+  rewrite rngl_one_gc_one.
+  apply (gc_mul_1_l Hon Hos).
+}
+cbn in IHi |-*.
+rewrite IHi.
+now rewrite <- (gc_mul_assoc Hop).
+...
+rewrite <- gc_pow_add_r in H1.
+...
+Definition gc_ring_like_prop_not_alg_closed
+...
+rewrite <- rngl_pow_add_r in H1.
+Search (_ ^ _ / _)%L.
+Search (_ ^ _ * _)%L.
+Search (_ ^ 1)%L.
+Search (_ ^ 1)%C.
+Check rngl_pow_1_r.
+...
+rewrite <- (gc_pow_1_r Hon z) in H1.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,

@@ -387,14 +387,9 @@ Theorem rngl_pow_add_r :
 Proof.
 intros Hon *.
 induction i; [ symmetry; apply (rngl_mul_1_l Hon) | ].
-destruct i. {
-  cbn in IHi |-*.
-  rewrite IHi.
-  now rewrite (rngl_mul_1_r Hon).
-}
 cbn in IHi |-*.
 rewrite IHi.
-now do 3 rewrite <- rngl_mul_assoc.
+now rewrite <- rngl_mul_assoc.
 Qed.
 
 Theorem rngl_squ_opp :
