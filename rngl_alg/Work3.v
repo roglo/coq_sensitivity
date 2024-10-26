@@ -972,9 +972,16 @@ rewrite (gc_mul_comm Hic).
 now apply (gc_mul_div Hic Hon Hop Hiv Hor).
 Qed.
 
+Context {Hon : rngl_has_1 T = true}.
+Context {Hic : rngl_mul_is_comm T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
+  let rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool
   then
@@ -983,20 +990,15 @@ Theorem gc_opt_alg_closed :
   else not_applicable.
 Proof.
 intros; cbn.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-destruct op; [ | easy ].
+rewrite Hop.
 remember (rngl_has_inv (GComplex T)) as ivc eqn:Hivc; symmetry in Hivc.
 destruct ivc; [ | easy ].
 remember (rngl_has_1 (GComplex T)) as onc eqn:Honc; symmetry in Honc.
 destruct onc; [ cbn | easy ].
 intros la Hla Hl1.
 Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
-  rngl_has_1 T = true →
-  rngl_mul_is_comm T = true →
-  rngl_has_opp T = true →
-  rngl_has_inv T = true →
-  rngl_is_ordered T = true →
   let roc := gc_ring_like_op T in
+  let rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor in
   ∀ P : list (GComplex T),
   1 < length P
   → ∀ M, (0 < M)%L →
@@ -1004,7 +1006,6 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   → ∃ R₀, (0 < R₀)%L ∧
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
-intros Hon Hic Hop Hiv Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1020,11 +1021,11 @@ assert (Hio :
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hn1 * HM Hz.
+  intros roc rpc * Hn1 * HM Hz.
   rewrite H1 in HM.
   now apply (rngl_lt_irrefl Hor) in HM.
 }
-intros * H1len * HM Hz.
+intros roc rpc * H1len * HM Hz.
 (**)
 remember (List.length P - 1) as n eqn:Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1115,6 +1116,10 @@ assert (Hz1z : (0 < ‖ (1 / z) ‖)%L). {
   apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
   apply (f_equal (rngl_mul z)) in H.
   cbn in H.
+(**)
+...
+  rewrite rngl_mul_0_r in H.
+...
   rewrite (gc_mul_0_r Hos) in H.
   rewrite (gc_mul_comm Hic) in H.
   rewrite (gc_div_mul Hic Hon Hop Hiv Hor) in H; [ | easy ].
