@@ -1024,17 +1024,26 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1 in HM.
   now apply (rngl_lt_irrefl Hor) in HM.
 }
-intros * Hn1 * HM Hz.
+intros * H1len * HM Hz.
 (**)
 remember (List.length P - 1) as n eqn:Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   apply Nat.sub_0_le in Hnz.
   destruct P as [| a]; [ easy | ].
-  cbn in Hn1, Hnz.
-  now apply Nat.nle_gt in Hn1.
+  cbn in H1len, Hnz.
+  now apply Nat.nle_gt in H1len.
 }
 apply Nat.neq_0_lt_0 in Hnz.
+(**)
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  move Hn1 at top; subst n.
+  destruct P as [| a]; [ easy | ].
+  destruct P as [| b]; [ easy | ].
+  destruct P; [ | easy ].
+  clear H1len Hn Hnz.
+  cbn in Hz |-*.
+...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.
@@ -1264,7 +1273,6 @@ rewrite (gc_mul_1_r Hon Hos) in H1.
 rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
 rewrite <- (gc_pow_add_r Hon Hop) in H1.
 rewrite Nat.sub_add in H1; [ | easy ].
-rename Hn1 into H1len.
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   move Hn1 at top; subst n.
   destruct P as [| a]; [ easy | ].
