@@ -905,6 +905,68 @@ rewrite IHi.
 now rewrite <- (gc_mul_assoc Hop).
 Qed.
 
+Theorem gc_mul_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ a b, b ≠ 0%C → (a * b / b)%C = a.
+Proof.
+intros Hic Hon Hop Hiv Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+intros * Hbz.
+apply eq_gc_eq; cbn.
+do 2 rewrite fold_rngl_squ.
+remember ((gre b)² + (gim b)²)%L as ρ eqn:Hρ.
+rewrite (rngl_div_opp_l Hop Hiv).
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+do 2 rewrite rngl_mul_add_distr_r.
+do 2 rewrite (rngl_mul_sub_distr_r Hop).
+do 8 rewrite (rngl_mul_div_assoc Hiv).
+rewrite rngl_add_assoc.
+rewrite (rngl_sub_sub_distr Hop).
+do 2 rewrite (rngl_mul_mul_swap Hic _ (gim b) (gre b)).
+rewrite (rngl_sub_add Hop).
+rewrite (rngl_add_sub Hos).
+do 2 rewrite <- (rngl_div_add_distr_r Hiv).
+do 4 rewrite <- rngl_mul_assoc.
+do 2 rewrite fold_rngl_squ.
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite <- Hρ.
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H; subst ρ.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  now apply Hbz, eq_gc_eq.
+}
+rewrite (rngl_mul_div Hi1). 2: {
+  intros H; subst ρ.
+  apply (rl_integral_modulus_prop Hop Hor Hii) in H.
+  now apply Hbz, eq_gc_eq.
+}
+easy.
+Qed.
+
+Theorem gc_pow_div :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  ∀ z n, z ≠ 0%C → n ≠ 0 → (z ^ n / z = z ^ (n - 1))%C.
+Proof.
+intros Hic Hon Hop Hiv Hor.
+intros * Hzz Hnz.
+destruct n; [ easy | clear Hnz; cbn ].
+rewrite Nat.sub_0_r.
+rewrite (gc_mul_comm Hic).
+now apply (gc_mul_div Hic Hon Hop Hiv Hor).
+Qed.
+
 (* to be completed
 Theorem gc_opt_alg_closed :
   let roc := gc_ring_like_op T in
@@ -968,6 +1030,17 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply Nat.nle_gt in Hn1.
 }
 apply Nat.neq_0_lt_0 in Hnz.
+(**)
+rename Hn1 into H1len.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  move Hn1 at top; subst n.
+  destruct P as [| a]; [ easy | ].
+  destruct P as [| b]; [ easy | ].
+  destruct P; [ | easy ].
+  clear Hnz Hn H1len.
+  cbn in Hz.
+  cbn.
+...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.
@@ -1197,6 +1270,26 @@ rewrite (gc_mul_1_r Hon Hos) in H1.
 rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
 rewrite <- (gc_pow_add_r Hon Hop) in H1.
 rewrite Nat.sub_add in H1; [ | easy ].
+rename Hn1 into H1len.
+destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+  move Hn1 at top; subst n.
+  destruct P as [| a]; [ easy | ].
+  destruct P as [| b]; [ easy | ].
+  destruct P; [ | easy ].
+  clear H1len Hn Hnz.
+  cbn in Hz.
+cbn.
+...
+  apply Nat.sub_0_le in Hnz.
+  destruct P as [| a]; [ easy | ].
+  cbn in Hn1, Hnz.
+  now apply Nat.nle_gt in Hn1.
+}
+...
+rewrite (gc_pow_div Hic Hon Hop Hiv Hor) in H1; [ | easy | ]. 2: {
+  flia Hnz Hn Hn1.
+2: {
+Search (_ ^ _ / _).
 ...
 Definition gc_ring_like_prop_not_alg_closed
 ...
