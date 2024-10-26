@@ -1030,17 +1030,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply Nat.nle_gt in Hn1.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-(**)
-rename Hn1 into H1len.
-destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-  move Hn1 at top; subst n.
-  destruct P as [| a]; [ easy | ].
-  destruct P as [| b]; [ easy | ].
-  destruct P; [ | easy ].
-  clear Hnz Hn H1len.
-  cbn in Hz.
-  cbn.
-...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.
@@ -1277,30 +1266,22 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   destruct P as [| b]; [ easy | ].
   destruct P; [ | easy ].
   clear H1len Hn Hnz.
-  cbn in Hz.
-cbn.
-...
-  apply Nat.sub_0_le in Hnz.
-  destruct P as [| a]; [ easy | ].
-  cbn in Hn1, Hnz.
-  now apply Nat.nle_gt in Hn1.
-}
-...
-rewrite (gc_pow_div Hic Hon Hop Hiv Hor) in H1; [ | easy | ]. 2: {
-  flia Hnz Hn Hn1.
-2: {
-Search (_ ^ _ / _).
-...
-Definition gc_ring_like_prop_not_alg_closed
-...
-rewrite <- rngl_pow_add_r in H1.
-Search (_ ^ _ / _)%L.
-Search (_ ^ _ * _)%L.
-Search (_ ^ 1)%L.
-Search (_ ^ 1)%C.
-Check rngl_pow_1_r.
-...
-rewrite <- (gc_pow_1_r Hon z) in H1.
+  cbn in Hz |-*.
+  rewrite (gc_mul_0_l Hos).
+  rewrite gc_add_0_l.
+  rewrite Nat.sub_diag in H1.
+  progress unfold iter_seq in H1.
+  progress unfold iter_list in H1.
+  cbn in H1.
+  rewrite gc_add_0_l in H1.
+  rewrite rngl_one_gc_one in H1.
+  rewrite (gc_mul_1_r Hon Hos) in H1.
+  progress unfold roc in H1.
+  rewrite rngl_one_gc_one in H1.
+  rewrite (rngl_div_gc_div Hic Hiv) in H1.
+  rewrite (rngl_div_gc_div Hic Hiv) in H1.
+  rewrite (gc_div_1_r Hon Hop Hiv) in H1.
+  rewrite (gc_mul_1_r Hon Hos) in H1.
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
