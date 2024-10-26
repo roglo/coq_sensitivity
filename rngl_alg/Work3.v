@@ -592,6 +592,11 @@ destruct s; [ clear H | easy ].
 now rewrite Hic.
 Qed.
 
+Theorem rngl_add_gc_add :
+  let roc := gc_ring_like_op T in
+  ∀ a b, (a + b)%L = (a + b)%C.
+Proof. easy. Qed.
+
 Theorem rngl_mul_gc_mul :
   let roc := gc_ring_like_op T in
   ∀ a b, (a * b)%L = (a * b)%C.
@@ -1282,6 +1287,40 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite (rngl_div_gc_div Hic Hiv) in H1.
   rewrite (gc_div_1_r Hon Hop Hiv) in H1.
   rewrite (gc_mul_1_r Hon Hos) in H1.
+  rewrite Nat.sub_diag in Hm.
+  rewrite iter_seq_only_one in Hm. 2: {
+    apply (rngl_max_r_iff Hor); cbn.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (gc_modl_nonneg Hop Hor).
+    apply (rngl_lt_iff Hor).
+    split; [ apply (gc_modl_nonneg Hop Hor) | ].
+    symmetry; intros H.
+    now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
+  }
+  cbn in Hm.
+  rewrite <- (gc_modl_div Hic Hon Hop Hiv Hor) in Hm; [ | easy ].
+  rewrite (gc_modl_mul Hic Hon Hop Hor) in H1.
+  rewrite <- Hm in H1.
+  rewrite <- (gc_div_mul Hic Hon Hop Hiv Hor a b); [ | easy ].
+  (* lemma *)
+  rewrite (gc_mul_comm Hic _ b).
+  do 2 rewrite <- rngl_mul_gc_mul.
+  rewrite <- rngl_add_gc_add.
+  rewrite <- (rngl_div_gc_div Hic Hiv).
+  rewrite <- (gc_mul_add_distr_l Hop); cbn.
+  rewrite (gc_modl_mul Hic Hon Hop Hor).
+  subst R₀.
+  rewrite rngl_of_nat_1 in Hrz.
+  rewrite (rngl_mul_1_l Hon) in Hrz.
+  rewrite (rngl_add_comm 1) in Hrz.
+  rewrite <- rngl_add_assoc in Hrz.
+  apply (rngl_add_lt_mono_r Hop Hor _ _ (1 + m))%L.
+  eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
+...
+  eapply (rngl_lt_le_trans Hor). 2: {
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    apply (gc_modl_nonneg Hop Hor).
+  }
 ...
 (* ah, mais, ci-dessous n'est pas forcément vrai, si les
    P.[i] sont tous nuls (sauf P.[n] of course). Du coup,
