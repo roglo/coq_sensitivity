@@ -709,12 +709,12 @@ destruct Habr as [Habr| Hbr]; [ now apply eq_gc_eq | ].
 now exfalso; apply Hbz, eq_gc_eq.
 Qed.
 
-Theorem rngl_zero_gc_zero :
+Theorem rngl_0_gc_0 :
   let roc := gc_ring_like_op T in
   0%L = 0%C.
 Proof. now intros; apply eq_gc_eq. Qed.
 
-Theorem rngl_one_gc_one :
+Theorem rngl_1_gc_1 :
   let roc := gc_ring_like_op T in
   1%L = 1%C.
 Proof.
@@ -836,7 +836,7 @@ Theorem gc_modl_pow :
 Proof.
 intros Hic Hon Hop Hor Hii *.
 induction n; cbn. {
-  rewrite rngl_one_gc_one.
+  rewrite rngl_1_gc_1.
   apply (gc_modl_1 Hon Hop Hor Hii).
 }
 rewrite (gc_modl_mul Hic Hon Hop Hor).
@@ -902,7 +902,7 @@ do 3 rewrite <- rngl_pow_gc_pow.
 rewrite <- rngl_mul_gc_mul.
 induction i. {
   symmetry; cbn.
-  rewrite rngl_one_gc_one.
+  rewrite rngl_1_gc_1.
   apply (gc_mul_1_l Hon Hos).
 }
 cbn in IHi |-*.
@@ -1035,7 +1035,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply Nat.nle_gt in H1len.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-(**)
+(*
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   move Hn1 at top; subst n.
   destruct P as [| a]; [ easy | ].
@@ -1044,6 +1044,7 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   clear H1len Hn Hnz.
   cbn in Hz |-*.
 ...
+*)
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.
@@ -1231,7 +1232,7 @@ assert
     now apply (gc_pow_nonzero Hic Hon Hop Hor Hii).
   }
   progress unfold roc.
-  rewrite rngl_one_gc_one.
+  rewrite rngl_1_gc_1.
   rewrite (gc_modl_1 Hon Hop Hor Hii).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_lt_iff Hor).
@@ -1287,10 +1288,10 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   progress unfold iter_list in H1.
   cbn in H1.
   rewrite gc_add_0_l in H1.
-  rewrite rngl_one_gc_one in H1.
+  rewrite rngl_1_gc_1 in H1.
   rewrite (gc_mul_1_r Hon Hos) in H1.
   progress unfold roc in H1.
-  rewrite rngl_one_gc_one in H1.
+  rewrite rngl_1_gc_1 in H1.
   rewrite (rngl_div_gc_div Hic Hiv) in H1.
   rewrite (rngl_div_gc_div Hic Hiv) in H1.
   rewrite (gc_div_1_r Hon Hop Hiv) in H1.
@@ -1309,6 +1310,15 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   rewrite <- (gc_modl_div Hic Hon Hop Hiv Hor) in Hm; [ | easy ].
   rewrite (gc_modl_mul Hic Hon Hop Hor) in H1.
   rewrite <- Hm in H1.
+(**)
+  subst R₀.
+  rewrite rngl_of_nat_1 in Hrz.
+  rewrite (rngl_mul_1_l Hon) in Hrz.
+  rewrite (rngl_add_comm 1) in Hrz.
+  rewrite <- rngl_add_assoc in Hrz.
+  apply (rngl_add_lt_mono_r Hop Hor _ _ (1 + m))%L.
+  eapply (rngl_lt_le_trans Hor); [ apply Hrz | ].
+...
   rewrite <- (gc_div_mul Hic Hon Hop Hiv Hor a b); [ | easy ].
   (* lemma *)
   rewrite (gc_mul_comm Hic _ b).
