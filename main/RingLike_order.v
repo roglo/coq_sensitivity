@@ -368,6 +368,15 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_eq_le_incl :
+  rngl_is_ordered T = true →
+  ∀ a b, a = b → (a ≤ b)%L.
+Proof.
+intros Hor * Hab.
+subst.
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_min_id :
   rngl_is_ordered T = true →
   ∀ a, rngl_min a a = a.
@@ -692,18 +701,6 @@ now destruct (a ≤? b)%L.
 Qed.
 
 (* equality *)
-
-(*
-Theorem rngl_eq_dec :
-  rngl_has_eq_dec T = true →
-  ∀ a b : T, {a = b} + {a ≠ b}.
-Proof.
-intros Hed *.
-progress unfold rngl_has_eq_dec in Hed.
-destruct rngl_opt_eq_dec as [rngl_eq_dec| ]; [ | easy ].
-apply rngl_eq_dec.
-Qed.
-*)
 
 Theorem rngl_eq_dec :
   rngl_has_eq_dec_or_order T = true →

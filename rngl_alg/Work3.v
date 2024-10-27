@@ -1045,6 +1045,32 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   cbn in Hz |-*.
 ...
 *)
+enough (H :
+  ∃ R₀ : T,
+    (0 < R₀)%L
+    ∧ ∀ z : GComplex T, (R₀ < ‖ z ‖)%L →
+      (M < ‖ ∑ (i = 0, length P - 1), P.[i] * z ^ i ‖)%L). {
+  destruct H as (R₀, H).
+  exists R₀.
+  split; [ easy | ].
+  intros z Hrz.
+  destruct H as (Hzr, H).
+  specialize (H z Hrz).
+  eapply (rngl_lt_le_trans Hor); [ apply H | ].
+  apply (rngl_eq_le_incl Hor).
+  progress unfold rngl_eval_polyn.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat_succ_sub_succ_r; [ | flia Hn Hnz ].
+  rewrite Nat.sub_0_r.
+  clear H1len Hn Hz H.
+  induction P as [| a la]; [ easy | ].
+About List_cons_length.
+....
+  rewrite List_cons_length.
+  rewrite List.seq_S.
+...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.

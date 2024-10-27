@@ -427,7 +427,7 @@ split. {
 }
 Qed.
 
-Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
+Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
 Theorem List_cons_is_app : ∀ {A} (a : A) la, a :: la = [a] ++ la.

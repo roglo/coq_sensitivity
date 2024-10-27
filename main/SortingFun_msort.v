@@ -366,7 +366,7 @@ destruct ab. {
   remember (merge_loop rel it la (b :: lb)) as lc eqn:Hlc.
   symmetry in Hlc.
   destruct lc as [| c]; [ easy | ].
-  rewrite List_cons_length, Nat.add_succ_l in Hit.
+  rewrite List_length_cons, Nat.add_succ_l in Hit.
   apply Nat.succ_le_mono in Hit.
   specialize (IHit la (b :: lb) Hit) as H1.
   assert (H : sorted rel la) by now apply sorted_cons in Hla.
@@ -395,7 +395,7 @@ remember (merge_loop rel it (a :: la) lb) as lc eqn:Hlc.
 symmetry in Hlc.
 destruct lc as [| c]; [ easy | ].
 rewrite Nat.add_comm in Hit.
-rewrite List_cons_length in Hit.
+rewrite List_length_cons in Hit.
 rewrite Nat.add_comm in Hit.
 rewrite Nat.add_succ_r in Hit.
 apply Nat.succ_le_mono in Hit.
@@ -735,7 +735,7 @@ Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
 Proof.
 intros * Hant Htra * Hs Hla.
 unfold merge.
-do 2 rewrite List_cons_length.
+do 2 rewrite List_length_cons.
 rewrite Nat.add_succ_r, Nat.add_succ_l.
 assert (H : length l ≤ length la + length lb). {
   apply split_list_length in Hla.

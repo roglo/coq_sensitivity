@@ -554,7 +554,7 @@ rewrite List.length_app.
 rewrite List.length_firstn.
 rewrite <- List_hd_nth_0.
 rewrite fold_mat_ncols.
-rewrite List_cons_length.
+rewrite List_length_cons.
 rewrite List.length_skipn.
 rewrite fold_mat_ncols.
 flia Hkc.
