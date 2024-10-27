@@ -16,7 +16,7 @@ Context {ac : angle_ctx T}.
 
 Definition angle_phony_mul (θ1 θ2 : angle T) := 0%A.
 
-Definition angle_ring_like_op : ring_like_op (angle T) :=
+Instance angle_ring_like_op : ring_like_op (angle T) :=
   {| rngl_zero := 0%A;
      rngl_add := angle_add;
      rngl_mul := angle_phony_mul;
@@ -30,28 +30,21 @@ Definition angle_ring_like_op : ring_like_op (angle T) :=
 Canonical Structure angle_ring_like_op.
 *)
 
-Theorem rngl_angle_add_comm :
-  let roa := angle_ring_like_op in
-  ∀ (a b : angle T), (a + b)%L = (b + a)%L.
+Theorem rngl_angle_add_comm : ∀ (a b : angle T), (a + b)%L = (b + a)%L.
 Proof. apply angle_add_comm. Qed.
 
 Theorem rngl_angle_add_assoc :
-  let roa := angle_ring_like_op in
   ∀ a b c : angle T, (a + (b + c))%L = (a + b + c)%L.
 Proof. apply angle_add_assoc. Qed.
 
-Theorem rngl_angle_add_0_l :
-  let roa := angle_ring_like_op in
-  ∀ a : angle T, (0 + a)%L = a.
+Theorem rngl_angle_add_0_l : ∀ a : angle T, (0 + a)%L = a.
 Proof. apply angle_add_0_l. Qed.
 
 Theorem rngl_angle_mul_assoc :
-  let roa := angle_ring_like_op in
   ∀ a b c : angle T, (a * (b * c))%L = (a * b * c)%L.
 Proof. easy. Qed.
 
 Theorem rngl_angle_mul_add_distr_l :
-  let roa := angle_ring_like_op in
   ∀ a b c : angle T, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 intros; cbn; progress unfold angle_phony_mul.
@@ -59,18 +52,15 @@ symmetry; apply angle_add_0_l.
 Qed.
 
 Theorem rngl_angle_opt_mul_comm :
-  let roa := angle_ring_like_op in
   ∀ a b : angle T, (a * b)%L = (b * a)%L.
 Proof. easy. Qed.
 
 Theorem rngl_angle_opt_add_opp_diag_l :
-  let roa := angle_ring_like_op in
   if rngl_has_opp (angle T) then ∀ a : angle T, (- a + a)%L = 0%L
   else not_applicable.
 Proof. cbn; apply angle_add_opp_diag_l. Qed.
 
-Definition angle_ring_like_prop :
-  let rom := angle_ring_like_op in
+Instance angle_ring_like_prop :
   ring_like_prop (angle T) :=
   {| rngl_mul_is_comm := true;
      rngl_is_integral_domain := false;
