@@ -260,7 +260,6 @@ Theorem gre_summation :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  let roc := gc_ring_like_op T in
   ∀ b e (f : nat → GComplex T),
   gre (∑ (i = b, e), f i)%L = (∑ (i = b, e), gre (f i))%L.
 Proof.
@@ -293,7 +292,6 @@ Theorem gim_summation :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
-  let roc := gc_ring_like_op T in
   ∀ b e (f : nat → GComplex T),
   gim (∑ (i = b, e), f i)%L = (∑ (i = b, e), gim (f i))%L.
 Proof.
@@ -322,9 +320,7 @@ f_equal.
 apply rngl_add_0_l.
 Qed.
 
-Theorem gre_1 :
-  let roc := gc_ring_like_op T in
-  (gre 1 = 1%L).
+Theorem gre_1 : (gre 1 = 1%L).
 Proof.
 intros.
 cbn; progress unfold rngl_one.
@@ -332,9 +328,7 @@ cbn; progress unfold gc_opt_one.
 now destruct (rngl_opt_one T).
 Qed.
 
-Theorem gim_1 :
-  let roc := gc_ring_like_op T in
-  (gim 1 = 0%L).
+Theorem gim_1 : (gim 1 = 0%L).
 Proof.
 intros.
 cbn; progress unfold rngl_one.
@@ -437,28 +431,22 @@ destruct b. {
 }
 Qed.
 
-Theorem gre_rngl_of_nat :
-  let gro := gc_ring_like_op T : ring_like_op (GComplex T) in
-  ∀ n, gre (rngl_of_nat n) = rngl_of_nat n.
+Theorem gre_rngl_of_nat : ∀ n, gre (rngl_of_nat n) = rngl_of_nat n.
 Proof.
 intros.
 induction n; [ easy | ].
 do 2 rewrite rngl_of_nat_succ.
 cbn; rewrite IHn.
 f_equal.
-progress unfold gro.
 now rewrite gre_1.
 Qed.
 
-Theorem gim_rngl_of_nat :
-  let gro := gc_ring_like_op T : ring_like_op (GComplex T) in
-  ∀ n, gim (rngl_of_nat n) = 0%L.
+Theorem gim_rngl_of_nat : ∀ n, gim (rngl_of_nat n) = 0%L.
 Proof.
 intros.
 induction n; [ easy | ].
 rewrite rngl_of_nat_succ.
 cbn; rewrite IHn.
-progress unfold gro.
 rewrite gim_1.
 apply rngl_add_0_l.
 Qed.
