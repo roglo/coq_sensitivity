@@ -230,9 +230,7 @@ rewrite (rngl_abs_1 Hon Hop Hor) in Ha.
 now apply (rngl_abs_le Hop Hor) in Ha.
 Qed.
 
-Theorem gc_add_comm :
-  let roc := gc_ring_like_op T in
-  ∀ a b, (a + b)%L = (b + a)%L.
+Theorem gc_add_comm : ∀ a b : GComplex T, (a + b)%L = (b + a)%L.
 Proof.
 intros; cbn.
 progress unfold gc_add.
@@ -286,7 +284,6 @@ f_equal. {
 Qed.
 
 Theorem gc_opt_mul_1_l :
-  let roc := gc_ring_like_op T in
   rngl_has_opp_or_subt T = true →
   if rngl_has_1 (GComplex T) then ∀ a : GComplex T, (1 * a)%L = a
   else not_applicable.
@@ -315,7 +312,6 @@ now rewrite (rngl_sub_0_r Hos), rngl_add_0_l.
 Qed.
 
 Theorem gc_mul_add_distr_l :
-  let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
   ∀ a b c : GComplex T, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
@@ -336,7 +332,6 @@ split; f_equal. {
 Qed.
 
 Theorem gc_opt_mul_comm :
-  let roc := gc_ring_like_op T in
   if rngl_mul_is_comm T then ∀ a b : GComplex T, (a * b)%L = (b * a)%L
   else not_applicable.
 Proof.
@@ -361,7 +356,6 @@ now rewrite Hic in H1.
 Qed.
 
 Theorem gc_opt_mul_1_r :
-  let roc := gc_ring_like_op T in
   rngl_has_opp_or_subt T = true →
   if rngl_mul_is_comm T then not_applicable
   else if rngl_has_1 (GComplex T) then ∀ a : GComplex T, (a * 1)%L = a
@@ -395,7 +389,6 @@ now rewrite (rngl_sub_0_r Hos), rngl_add_0_r.
 Qed.
 
 Theorem gc_opt_mul_add_distr_r :
-  let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
   if rngl_mul_is_comm T then not_applicable
   else ∀ a b c : GComplex T, ((a + b) * c)%L = (a * c + b * c)%L.
@@ -424,7 +417,6 @@ split; f_equal. {
 Qed.
 
 Theorem gc_opt_add_opp_diag_l :
-  let roc := gc_ring_like_op T in
   rngl_has_opp T = true →
   if rngl_has_opp (GComplex T) then ∀ a : GComplex T, (- a + a)%L = 0%L
   else not_applicable.
@@ -445,7 +437,6 @@ now do 2 rewrite H1.
 Qed.
 
 Theorem gc_opt_add_sub :
-  let roc := gc_ring_like_op T in
   rngl_has_subt T = false →
   if rngl_has_subt (GComplex T) then ∀ a b : GComplex T, (a + b - b)%L = a
   else not_applicable.
@@ -459,7 +450,6 @@ now destruct os.
 Qed.
 
 Theorem gc_opt_sub_add_distr :
-  let roc := gc_ring_like_op T in
   rngl_has_subt T = false →
   if rngl_has_subt (GComplex T) then
     ∀ a b c : GComplex T, (a - (b + c))%L = (a - b - c)%L
@@ -476,7 +466,6 @@ Qed.
 Theorem gc_inv_re :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
   ∀ a : GComplex T, a ≠ 0%L →
   gre a⁻¹ = (gre a / (gre a * gre a + gim a * gim a))%L.
 Proof.
@@ -494,7 +483,6 @@ Qed.
 Theorem gc_inv_im :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
   ∀ a : GComplex T, a ≠ 0%L →
   gim a⁻¹ = (- gim a / (gre a * gre a + gim a * gim a))%L.
 Proof.
@@ -515,7 +503,6 @@ Theorem gc_opt_mul_inv_diag_l :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  let roc := gc_ring_like_op T in
   if (rngl_has_inv (GComplex T) && rngl_has_1 (GComplex T))%bool then
     ∀ a : GComplex T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
@@ -572,7 +559,6 @@ split. {
 Qed.
 
 Theorem gc_opt_mul_inv_diag_r :
-  let roc := gc_ring_like_op T in
   if (rngl_has_inv (GComplex T) && rngl_has_1 (GComplex T) &&
       negb (rngl_mul_is_comm T))%bool then
     ∀ a : GComplex T, a ≠ 0%L → (a / a)%L = 1%L
@@ -592,7 +578,6 @@ now destruct iq.
 Qed.
 
 Theorem gc_opt_mul_div :
-  let roc := gc_ring_like_op T in
   if rngl_has_quot (GComplex T) then
     ∀ a b : GComplex T, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
@@ -607,7 +592,6 @@ now destruct ic.
 Qed.
 
 Theorem gc_opt_mul_quot_r :
-  let roc := gc_ring_like_op T in
   if (rngl_has_quot (GComplex T) && negb (rngl_mul_is_comm T))%bool then
     ∀ a b : GComplex T, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
@@ -1258,19 +1242,6 @@ rewrite (rngl_mul_comm Hic).
 symmetry.
 now apply (rngl_div_mul Hon Hiv).
 Qed.
-
-(*
-End a.
-
-Require Import Rational.
-Import Q.Notations.
-Require Import Qrl.
-
-Compute (
-  let ro := Q_ring_like_op in
-  let rp := Q_ring_like_prop in
-...
-*)
 
 Arguments rl_sqrt_0 {T ro rp rl} Hor Hop Hic Hii.
 
