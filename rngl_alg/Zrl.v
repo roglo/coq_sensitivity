@@ -10,7 +10,7 @@ Notation "x ≤ y" := (x <= y)%Z (at level 70, y at next level) : Z_scope.
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%Z (at level 70, y at next level) :
   Z_scope.
 
-Canonical Structure Z_ring_like_op : ring_like_op Z :=
+Instance Z_ring_like_op : ring_like_op Z :=
   {| rngl_zero := 0%Z;
      rngl_add := Z.add;
      rngl_mul := Z.mul;
@@ -20,16 +20,10 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_eq_dec := Some Z.eq_dec;
      rngl_opt_leb := Some Z.leb |}.
 
-(*
-Global Existing Instance Z_ring_like_op.
-*)
-
 Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
 Proof. now apply Z.eq_mul_0. Qed.
 
-Theorem Z_characteristic_prop :
-  let roz := Z_ring_like_op in
-  ∀ i, rngl_mul_nat 1 (S i) ≠ 0%Z.
+Theorem Z_characteristic_prop : ∀ i, rngl_mul_nat 1 (S i) ≠ 0%Z.
 Proof.
 intros.
 cbn - [ Z.add ].
@@ -206,9 +200,7 @@ Qed.
 
 (* end borrowed code *)
 
-Theorem rngl_mul_nat_Z :
-  let ro := Z_ring_like_op in
-  ∀ z n, rngl_mul_nat z n = (Z.of_nat n * z)%Z.
+Theorem rngl_mul_nat_Z : ∀ z n, rngl_mul_nat z n = (Z.of_nat n * z)%Z.
 Proof.
 intros.
 progress unfold rngl_mul_nat.
@@ -224,7 +216,6 @@ now rewrite <- Nat2Z.inj_succ.
 Qed.
 
 Theorem Z_archimedean :
-  let ro := Z_ring_like_op in
   ∀ a b : Z, (0 < a)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L.
 Proof.
 intros * Ha *.
@@ -239,7 +230,6 @@ now rewrite rngl_mul_nat_Z.
 Qed.
 
 Definition Z_ring_like_ord :=
-  let _ := Z_ring_like_op in
   {| rngl_ord_le_dec := Z_opt_le_dec;
      rngl_ord_le_refl := Z_le_refl;
      rngl_ord_le_antisymm := Z_le_antisymm;
