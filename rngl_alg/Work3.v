@@ -1060,9 +1060,14 @@ enough (H :
   rewrite Nat.sub_0_r.
   clear H1len Hn Hz H.
   f_equal.
-...
   induction P as [| a la]; [ easy | ].
   rewrite List_length_cons.
+  cbn - [ List.nth ].
+  rewrite <- List.seq_shift.
+  rewrite List_fold_left_map.
+...
+Search (List.seq (S _)).
+Search (List.fold_left).
 (**)
 ...
   rewrite List.seq_S.
