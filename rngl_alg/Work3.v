@@ -525,7 +525,6 @@ Theorem gc_summation_triangular :
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  let roc := gc_ring_like_op T in
   ∀ b e (f : nat → GComplex T),
   (‖ ∑ (i = b, e), f i ‖ ≤ ∑ (i = b, e), ‖ f i ‖)%L.
 Proof.
@@ -554,7 +553,6 @@ Qed.
 
 Theorem rngl_has_inv_gc_has_inv :
   rngl_mul_is_comm T = true →
-  let roc := gc_ring_like_op T in
   rngl_has_inv (GComplex T) = rngl_has_inv T.
 Proof.
 intros Hic *.
@@ -572,7 +570,6 @@ Qed.
 Theorem rngl_inv_gc_inv :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
   ∀ a, a⁻¹%L = a⁻¹%C.
 Proof.
 intros Hic Hiv *.
@@ -593,25 +590,21 @@ now rewrite Hic.
 Qed.
 
 Theorem rngl_add_gc_add :
-  let roc := gc_ring_like_op T in
   ∀ a b, (a + b)%L = (a + b)%C.
 Proof. easy. Qed.
 
 Theorem rngl_mul_gc_mul :
-  let roc := gc_ring_like_op T in
   ∀ a b, (a * b)%L = (a * b)%C.
 Proof. easy. Qed.
 
 Theorem rngl_div_gc_div :
   rngl_mul_is_comm T = true →
   rngl_has_inv T = true →
-  let roc := gc_ring_like_op T in
   ∀ a b, (a / b)%L = (a / b)%C.
 Proof.
 intros Hic Hiv *.
 progress unfold rngl_div.
 progress unfold gc_div.
-progress unfold roc.
 rewrite (rngl_has_inv_gc_has_inv Hic).
 rewrite Hiv.
 cbn.
@@ -625,7 +618,6 @@ Theorem gc_eq_div_0_l :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  let roc := gc_ring_like_op T in
   ∀ a b,
   (a / b)%C = 0%C
   → b ≠ 0%C
@@ -709,14 +701,10 @@ destruct Habr as [Habr| Hbr]; [ now apply eq_gc_eq | ].
 now exfalso; apply Hbz, eq_gc_eq.
 Qed.
 
-Theorem rngl_0_gc_0 :
-  let roc := gc_ring_like_op T in
-  0%L = 0%C.
+Theorem rngl_0_gc_0 : 0%L = 0%C.
 Proof. now intros; apply eq_gc_eq. Qed.
 
-Theorem rngl_1_gc_1 :
-  let roc := gc_ring_like_op T in
-  1%L = 1%C.
+Theorem rngl_1_gc_1 : 1%L = 1%C.
 Proof.
 intros.
 apply eq_gc_eq; cbn.
@@ -821,9 +809,7 @@ apply (gc_eq_mul_0_l Hic Hop Hor Hii) in Hanz; [ | easy ].
 now apply Haz, IHn.
 Qed.
 
-Theorem rngl_pow_gc_pow :
-  let roc := gc_ring_like_op T in
-  ∀ z n, (z ^ n)%L = (z ^ n)%C.
+Theorem rngl_pow_gc_pow : ∀ z n, (z ^ n)%L = (z ^ n)%C.
 Proof. easy. Qed.
 
 Theorem gc_modl_pow :
@@ -974,7 +960,6 @@ Qed.
 
 (* to be completed
 Theorem gc_opt_alg_closed :
-  let roc := gc_ring_like_op T in
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
       rngl_has_1 (GComplex T))%bool
   then
@@ -996,7 +981,6 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  let roc := gc_ring_like_op T in
   ∀ P : list (GComplex T),
   1 < length P
   → ∀ M, (0 < M)%L →
@@ -1075,13 +1059,30 @@ enough (H :
   rewrite <- Nat_succ_sub_succ_r; [ | flia Hn Hnz ].
   rewrite Nat.sub_0_r.
   clear H1len Hn Hz H.
+  f_equal.
   induction P as [| a la]; [ easy | ].
   rewrite List_length_cons.
 (**)
   cbn - [ List.nth ].
   rewrite gc_add_0_l.
   rewrite List_nth_0_cons.
-  remember (a * 1%L)%C as x eqn:Hx.
+  rewrite rngl_1_gc_1.
+  rewrite gc_mul_1_r.
+  rewrite rngl_0_gc_0 in IHla.
+...
+  replace 1 with (0 + 1) by easy.
+Check eq_trans.
+eapply eq_trans with (y := 1%L).
+...
+Search (List.fold_left _ (List.seq _ _)).
+rewrite (fold_left_add_seq_add).
+
+  erewrite List_fold_left_ext_in. 2: {
+    intros b c Hb.
+
+  replace 1 with (0 + 1) by easy.
+Search (List.fold_left _ (List.seq _ _)).
+rewrite (fold_left_add_seq_add a).
 ...
   rewrite List.seq_S.
   rewrite List.fold_left_app.

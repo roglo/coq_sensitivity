@@ -178,7 +178,7 @@ End a.
 Arguments gc_opt_opp_or_subt T {ro}.
 Arguments gc_opt_inv_or_quot T {ro rp}.
 
-Definition gc_ring_like_op T
+Instance gc_ring_like_op T
   {ro : ring_like_op T} {rp : ring_like_prop T} {rl : real_like_prop T} :
   ring_like_op (GComplex T) :=
   {| rngl_zero := gc_zero;
@@ -696,7 +696,7 @@ destruct ch. {
 }
 Qed.
 
-Definition gc_ring_like_prop_not_alg_closed
+Instance gc_ring_like_prop_not_alg_closed
   (Hon : rngl_has_1 T = true)
   (Hic : rngl_mul_is_comm T = true)
   (Hop : rngl_has_opp T = true)
