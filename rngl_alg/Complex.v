@@ -606,12 +606,11 @@ now destruct ic.
 Qed.
 
 Theorem gc_characteristic_prop :
-  let roc := gc_ring_like_op T in
   if rngl_has_1 (GComplex T) then
-    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%L
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%C
     else
-      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%L)
-      ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%L
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_mul_nat 1 i ≠ 0%C)
+      ∧ rngl_mul_nat 1 (rngl_characteristic T) = 0%C
   else not_applicable.
 Proof.
 cbn - [ rngl_mul_nat ].
