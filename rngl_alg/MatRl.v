@@ -121,7 +121,7 @@ destruct H1 as [H1| H1]; [ left | right ]. {
 }
 Qed.
 
-Definition mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
+Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
     ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_add := square_matrix_add;
@@ -754,7 +754,7 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
-Definition mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
+Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
     (n : nat) :
   let rom := mat_ring_like_op eq_dec in
   ring_like_prop (square_matrix n T) :=
