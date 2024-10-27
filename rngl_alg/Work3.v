@@ -1060,22 +1060,45 @@ enough (H :
   rewrite Nat.sub_0_r.
   clear H1len Hn Hz H.
   f_equal.
+...
   induction P as [| a la]; [ easy | ].
   rewrite List_length_cons.
 (**)
+...
+  rewrite List.seq_S.
   cbn - [ List.nth ].
+  rewrite List.fold_left_app.
+  cbn - [ List.nth ].
+...
   rewrite gc_add_0_l.
   rewrite List_nth_0_cons.
   rewrite rngl_1_gc_1.
-  rewrite gc_mul_1_r.
+  rewrite (gc_mul_1_r Hon Hos).
   rewrite rngl_0_gc_0 in IHla.
+  rewrite <- rngl_mul_gc_mul.
 ...
+Search (List.fold_left _ _ _ = List.fold_left _ _ _).
+...
+  rewrite fold_iter_list.
+Search (iter_list (List.seq _ _)).
+  erewrite iter_list_eq_compat.
+...
+2: {
+
+  rewrite <- IHla.
   replace 1 with (0 + 1) by easy.
+  rewrite (fold_left_add_seq_add).
+...
+  rewrite List_fold_left_ext_in with
+    (g := λ c i, (c + List
+
+    intros b c Hb.
+...
+rewrite (fold_left_add_seq_add).
 Check eq_trans.
 eapply eq_trans with (y := 1%L).
 ...
 Search (List.fold_left _ (List.seq _ _)).
-rewrite (fold_left_add_seq_add).
 
   erewrite List_fold_left_ext_in. 2: {
     intros b c Hb.
