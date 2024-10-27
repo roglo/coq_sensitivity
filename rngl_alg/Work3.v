@@ -1059,6 +1059,16 @@ enough (H :
   eapply (rngl_lt_le_trans Hor); [ apply H | ].
   apply (rngl_eq_le_incl Hor).
   progress unfold rngl_eval_polyn.
+(*
+  clear H1len Hn Hz H.
+  induction P as [| a la]. {
+    rewrite iter_seq_only_one; cbn; [ | now rewrite gc_add_0_l ].
+    f_equal.
+    apply (gc_mul_0_l Hos).
+  }
+  rewrite List_length_cons.
+  rewrite Nat_sub_succ_1.
+*)
   progress unfold iter_seq.
   progress unfold iter_list.
   rewrite Nat.sub_0_r.
@@ -1066,10 +1076,20 @@ enough (H :
   rewrite Nat.sub_0_r.
   clear H1len Hn Hz H.
   induction P as [| a la]; [ easy | ].
-About List_cons_length.
-....
-  rewrite List_cons_length.
+  rewrite List_length_cons.
+(**)
+  cbn - [ List.nth ].
+  rewrite gc_add_0_l.
+  rewrite List_nth_0_cons.
+  remember (a * 1%L)%C as x eqn:Hx.
+...
   rewrite List.seq_S.
+  rewrite List.fold_left_app.
+  cbn - [ List.nth ].
+  progress replace (List.nth _ _ _) with (List.last (a :: la) 0%C). 2: {
+    rewrite List_last_nth; cbn.
+    now rewrite Nat.sub_0_r.
+  }
 ...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
