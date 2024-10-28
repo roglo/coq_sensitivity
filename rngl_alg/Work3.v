@@ -1353,6 +1353,20 @@ erewrite rngl_summation_eq_compat in H1. 2: {
   rewrite (rngl_div_div Hosc Honc Hivc); [ | easy | ]. 2: {
     now apply (rngl_pow_nonzero Honc).
   }
+  rewrite <- (rngl_pow_1_r Honc z) at 3.
+  rewrite <- (rngl_pow_add_r Honc).
+...
+Require Import QArith.
+Search (_ ^ _ / _ ^ _)%Q.
+Theorem rngl_pow_div_pow :
+  ∀ A (roa : ring_like_op A) (a : A) m n, n ≤ m → (a ^ m / a ^ n = a ^ (m - n))%L.
+...
+  rewrite rngl_pow_div_pow. 2: {
+    flia Hi.
+  progress unfold rngl_div at 2.
+  rewrite Hivc.
+Search (_ ^ _)⁻¹%L.
+}
 ...
 }
 cbn - [ rngl_add rngl_zero ] in H1.
