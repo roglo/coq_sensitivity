@@ -989,7 +989,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor.
-set (rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
+set (rpc := @gc_ring_like_prop_not_alg_closed _ _ _ _ Hon Hic Hop Hiv Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.

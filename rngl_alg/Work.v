@@ -278,7 +278,6 @@ rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
 apply gc_add_0_l.
 intros; cbn.
-set (rop := gc_ring_like_prop_not_alg_closed Hon Hic Hop).
 specialize gc_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
 apply gc_add_0_l.
@@ -310,7 +309,6 @@ rewrite <- IHlen.
 rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1.
 apply gc_add_0_l.
 intros; cbn.
-set (rop := gc_ring_like_prop_not_alg_closed Hon Hic Hop).
 specialize gc_add_comm as H1; cbn in H1.
 rewrite H1; clear H1.
 apply gc_add_0_l.
@@ -470,15 +468,16 @@ destruct_ac.
 intros.
 specialize (@newton_binomial) as H1.
 set (gro := gc_ring_like_op T).
+set (grp := @gc_ring_like_prop_not_alg_closed _ _ _ _ Hon Hic Hop Hiv Hor).
 specialize (H1 (GComplex T)).
-specialize (H1 gro).
-specialize (H1 (gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor)).
+specialize (H1 gro grp).
 assert (Honc : rngl_has_1 (GComplex T) = true). {
   progress unfold rngl_has_1 in Hon.
   progress unfold rngl_has_1.
   cbn.
   progress unfold gc_opt_one.
   clear H1.
+  subst gro grp.
   now destruct (rngl_opt_one T).
 }
 assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {

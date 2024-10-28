@@ -688,13 +688,13 @@ destruct ch. {
 }
 Qed.
 
-Instance gc_ring_like_prop_not_alg_closed
-  (Hon : rngl_has_1 T = true)
-  (Hic : rngl_mul_is_comm T = true)
-  (Hop : rngl_has_opp T = true)
-  (Hiv : rngl_has_inv T = true)
-  (Hor : rngl_is_ordered T = true)
-     : ring_like_prop (GComplex T) :=
+Context {Hon : rngl_has_1 T = true}.
+Context {Hic : rngl_mul_is_comm T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
@@ -724,7 +724,17 @@ Instance gc_ring_like_prop_not_alg_closed
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA |}.
 
+End a.
+
 (* algebraically closed *)
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
 
 Definition gc_modl (z : GComplex T) := rl_modl (gre z) (gim z).
 
