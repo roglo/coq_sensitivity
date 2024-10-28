@@ -24,7 +24,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Hom : rngl_has_opp_or_subt T = true).
+Context (Hos : rngl_has_opp_or_subt T = true).
 
 Theorem fold_left_rngl_add_fun_from_0 : ∀ A a l (f : A → _),
   (List.fold_left (λ c i, c + f i) l a =
@@ -303,7 +303,6 @@ Theorem mul_iter_list_distr_l_test : ∀ A B d
   else iter_list la (λ c i, add c (mul a (f i))) d.
 Proof.
 intros.
-clear Hom.
 rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
   now apply Nat.eqb_eq, List.length_zero_iff_nil in Haz; subst la.
@@ -327,7 +326,6 @@ Theorem mul_iter_list_distr_l : ∀ A B a (la : list B) f
   iter_list la (λ c i, add c (mul a (f i))) (mul a d).
 Proof.
 intros.
-clear Hom.
 unfold iter_list.
 revert d.
 induction la as [| a1]; intros; [ easy | cbn ].
@@ -343,7 +341,6 @@ Theorem mul_iter_list_distr_r : ∀ A B a (la : list B) f
   iter_list la (λ c i, add c (mul (f i) a)) (mul d a).
 Proof.
 intros.
-clear Hom.
 unfold iter_list.
 revert d.
 induction la as [| a1]; intros; [ easy | cbn ].
@@ -784,12 +781,11 @@ Qed.
 
 Theorem rngl_eval_polyn_is_summation :
   rngl_has_1 T = true →
-  rngl_has_opp_or_subt T = true →
   (0 + 0 * 1)%L = 0%L →
   ∀ (la : list T) x,
   (rngl_eval_polyn la x = ∑ (i = 0, length la - 1), la.[i] * x ^ i)%L.
 Proof.
-intros Hon Hos glop.
+intros Hon glop.
 intros.
 progress unfold rngl_eval_polyn.
 induction la as [| a]. {

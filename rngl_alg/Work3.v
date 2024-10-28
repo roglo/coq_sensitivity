@@ -989,6 +989,7 @@ Theorem gc_polyn_modl_tends_to_inf_when_modl_var_tends_to_inf :
     ∀ z : GComplex T, (R₀ < ‖z‖)%L → (M < ‖rngl_eval_polyn P z‖)%L.
 Proof.
 intros Hon Hic Hop Hiv Hor.
+set (rpc := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1008,8 +1009,24 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1 in HM.
   now apply (rngl_lt_irrefl Hor) in HM.
 }
+assert (Hosc : rngl_has_opp_or_subt (GComplex T) = true). {
+  progress unfold rngl_has_opp_or_subt.
+  cbn.
+  progress unfold gc_opt_opp_or_subt.
+  generalize Hop; intros H.
+  progress unfold rngl_has_opp in H.
+  destruct (rngl_opt_opp_or_subt T) as [opp| ]; [ | easy ].
+  now destruct opp.
+}
+assert (Honc : rngl_has_1 (GComplex T) = true). {
+  progress unfold rngl_has_1.
+  cbn.
+  progress unfold gc_opt_one.
+  generalize Hon; intros H.
+  progress unfold rngl_has_1 in H.
+  now destruct (rngl_opt_one T).
+}
 intros * H1len * HM Hz.
-(**)
 remember (List.length P - 1) as n eqn:Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
@@ -1038,111 +1055,16 @@ enough (H :
   exists R₀.
   split; [ easy | ].
   intros z Hrz.
-  destruct H as (Hzr, H).
-  specialize (H z Hrz).
-  eapply (rngl_lt_le_trans Hor); [ apply H | ].
+  destruct H as (Hzr, Hms).
+  specialize (Hms z Hrz).
+  eapply (rngl_lt_le_trans Hor); [ apply Hms | ].
   apply (rngl_eq_le_incl Hor).
-  progress unfold rngl_eval_polyn.
-(*
-  clear H1len Hn Hz H.
-  induction P as [| a la]. {
-    rewrite iter_seq_only_one; cbn; [ | now rewrite gc_add_0_l ].
-    f_equal.
-    apply (gc_mul_0_l Hos).
-  }
-  rewrite List_length_cons.
-  rewrite Nat_sub_succ_1.
-*)
-  progress unfold iter_seq.
-  progress unfold iter_list.
-  rewrite Nat.sub_0_r.
-  rewrite <- Nat_succ_sub_succ_r; [ | flia Hn Hnz ].
-  rewrite Nat.sub_0_r.
-  clear H1len Hn Hz H.
   f_equal.
-  induction P as [| a la]; [ easy | ].
-  rewrite List_length_cons.
-  cbn - [ List.nth ].
-  rewrite <- List.seq_shift.
-  rewrite List_fold_left_map.
-  rewrite List_nth_0_cons.
-  rewrite gc_add_0_l.
-  rewrite rngl_1_gc_1.
-  rewrite (gc_mul_1_r Hon Hos).
-  rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1. {
-    apply gc_add_0_l.
-  } {
-    apply gc_add_0_r.
-  } {
-    apply gc_add_assoc.
-  }
-  rewrite List_fold_left_ext_in with
-      (g := λ c i, (c + la.[i] * (z ^ S i))%L). 2: {
-    intros b c Hb.
-    f_equal.
-    now rewrite List_nth_succ_cons.
-  }
-  (* merde, c'est "S i" *)
-...
-    intros; cbn.
-    rewrite rngl_add_comm.
-    apply rngl_add_0_r.
-  specialize @fold_left_op_fun_from_d as H1.
-  specialize (H1 (GComplex T)).
-...
-Search (List.seq (S _)).
-Search (List.fold_left).
-(**)
-...
-  rewrite List.seq_S.
-  cbn - [ List.nth ].
-  rewrite List.fold_left_app.
-  cbn - [ List.nth ].
-...
-  rewrite gc_add_0_l.
-  rewrite List_nth_0_cons.
-  rewrite rngl_1_gc_1.
-  rewrite (gc_mul_1_r Hon Hos).
-  rewrite rngl_0_gc_0 in IHla.
-  rewrite <- rngl_mul_gc_mul.
-...
-Search (List.fold_left _ _ _ = List.fold_left _ _ _).
-...
-  rewrite fold_iter_list.
-Search (iter_list (List.seq _ _)).
-  erewrite iter_list_eq_compat.
-...
-2: {
-
-  rewrite <- IHla.
-  replace 1 with (0 + 1) by easy.
-  rewrite (fold_left_add_seq_add).
-...
-  rewrite List_fold_left_ext_in with
-    (g := λ c i, (c + List
-
-    intros b c Hb.
-...
-rewrite (fold_left_add_seq_add).
-Check eq_trans.
-eapply eq_trans with (y := 1%L).
-...
-Search (List.fold_left _ (List.seq _ _)).
-
-  erewrite List_fold_left_ext_in. 2: {
-    intros b c Hb.
-
-  replace 1 with (0 + 1) by easy.
-Search (List.fold_left _ (List.seq _ _)).
-rewrite (fold_left_add_seq_add a).
-...
-  rewrite List.seq_S.
-  rewrite List.fold_left_app.
-  cbn - [ List.nth ].
-  progress replace (List.nth _ _ _) with (List.last (a :: la) 0%C). 2: {
-    rewrite List_last_nth; cbn.
-    now rewrite Nat.sub_0_r.
-  }
+  symmetry.
+  apply (rngl_eval_polyn_is_summation Hosc Honc).
+  rewrite rngl_add_0_l.
+  apply (rngl_mul_0_l Hosc).
+}
 ...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
