@@ -830,6 +830,7 @@ rewrite rngl_pow_gc_pow.
 now rewrite IHn.
 Qed.
 
+(*
 Theorem gc_mul_div_assoc :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
@@ -957,6 +958,7 @@ rewrite Nat.sub_0_r.
 rewrite (gc_mul_comm Hic).
 now apply (gc_mul_div Hic Hon Hop Hiv Hor).
 Qed.
+*)
 
 (* to be completed
 Theorem gc_opt_alg_closed :
@@ -1026,6 +1028,16 @@ assert (Honc : rngl_has_1 (GComplex T) = true). {
   progress unfold rngl_has_1 in H.
   now destruct (rngl_opt_one T).
 }
+assert (Hivc : rngl_has_inv (GComplex T) = true). {
+  progress unfold rngl_has_inv.
+  cbn.
+  progress unfold gc_opt_inv_or_quot.
+  rewrite Hic.
+  generalize Hiv; intros H.
+  progress unfold rngl_has_inv in H.
+  destruct (rngl_opt_inv_or_quot T) as [inv| ]; [ | easy ].
+  now destruct inv.
+}
 intros * H1len * HM Hz.
 remember (List.length P - 1) as n eqn:Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1050,7 +1062,7 @@ enough (H :
   ∃ R₀ : T,
     (0 < R₀)%L
     ∧ ∀ z : GComplex T, (R₀ < ‖ z ‖)%L →
-      (M < ‖ ∑ (i = 0, length P - 1), P.[i] * z ^ i ‖)%L). {
+      (M < ‖ ∑ (i = 0, n), P.[i] * z ^ i ‖)%L). {
   destruct H as (R₀, H).
   exists R₀.
   split; [ easy | ].
@@ -1061,11 +1073,11 @@ enough (H :
   apply (rngl_eq_le_incl Hor).
   f_equal.
   symmetry.
+  rewrite Hn.
   apply (rngl_eval_polyn_is_summation Hosc Honc).
   rewrite rngl_add_0_l.
   apply (rngl_mul_0_l Hosc).
 }
-...
 remember (Max (i = 0, n - 1), ‖ P.[i] ‖ / ‖ P.[n] ‖)%L as m.
 set (R₀ := (1 + M + rngl_of_nat n * m)%L).
 subst m.
@@ -1110,7 +1122,6 @@ assert (Hr : (0 < R₀)%L). {
     apply (rngl_lt_iff Hor).
     split; [ apply (gc_modl_nonneg Hop Hor) | ].
     intros H; symmetry in H.
-    progress replace 0%C with 0%L in H by easy.
     now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
   }
   apply (rngl_div_nonneg Hon Hop Hiv Hor).
@@ -1118,7 +1129,6 @@ assert (Hr : (0 < R₀)%L). {
   apply (rngl_lt_iff Hor).
   split; [ apply (gc_modl_nonneg Hop Hor) | ].
   intros H; symmetry in H.
-  progress replace 0%C with 0%L in H by easy.
   now apply (eq_gc_modl_0 Hon Hop Hiv Hor) in H.
 }
 split; [ easy | ].
@@ -1252,7 +1262,6 @@ assert
     replace (z ^ (n - 1 - i))%L with (z ^ (n - 1 - i))%C by easy.
     now apply (gc_pow_nonzero Hic Hon Hop Hor Hii).
   }
-  progress unfold roc.
   rewrite rngl_1_gc_1.
   rewrite (gc_modl_1 Hon Hop Hor Hii).
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
@@ -1290,11 +1299,26 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
 }
 rewrite rngl_mul_assoc in H1.
 do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
+(*
+set (roc := @gc_ring_like_op T ro rp rl).
+*)
+(**)
+do 3 rewrite <- rngl_mul_gc_mul in H1.
+rewrite <- rngl_pow_gc_pow in H1.
+rewrite <- (rngl_div_gc_div Hic Hiv) in H1.
+rewrite <- rngl_1_gc_1 in H1.
+rewrite (rngl_mul_div_assoc Hivc) in H1.
+rewrite (rngl_mul_1_r Honc) in H1.
+rewrite <- (rngl_pow_1_r Honc z) in H1 at 4.
+rewrite <- (rngl_pow_add_r Honc) in H1.
+(*
 rewrite (gc_mul_div_assoc Hop Hiv) in H1.
 rewrite (gc_mul_1_r Hon Hos) in H1.
 rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
 rewrite <- (gc_pow_add_r Hon Hop) in H1.
+*)
 rewrite Nat.sub_add in H1; [ | easy ].
+...
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   move Hn1 at top; subst n.
   destruct P as [| a]; [ easy | ].
