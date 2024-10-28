@@ -468,7 +468,7 @@ destruct_ac.
 intros.
 specialize (@newton_binomial) as H1.
 set (gro := gc_ring_like_op T).
-set (grp := @gc_ring_like_prop_not_alg_closed _ _ _ _ Hon Hic Hop Hiv Hor).
+set (grp := gc_ring_like_prop_not_alg_closed Hon Hic Hop Hiv Hor).
 specialize (H1 (GComplex T)).
 specialize (H1 gro grp).
 assert (Honc : rngl_has_1 (GComplex T) = true). {

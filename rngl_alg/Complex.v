@@ -726,6 +726,8 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
 
 End a.
 
+Arguments gc_ring_like_prop_not_alg_closed {T ro rp rl} Hon Hic Hop Hiv Hor.
+
 (* algebraically closed *)
 
 Section a.
