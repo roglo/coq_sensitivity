@@ -1038,6 +1038,7 @@ assert (Hivc : rngl_has_inv (GComplex T) = true). {
   destruct (rngl_opt_inv_or_quot T) as [inv| ]; [ | easy ].
   now destruct inv.
 }
+assert (Hicc : rngl_mul_is_comm (GComplex T) = true) by easy.
 intros * H1len * HM Hz.
 remember (List.length P - 1) as n eqn:Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1318,6 +1319,20 @@ rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
 rewrite <- (gc_pow_add_r Hon Hop) in H1.
 *)
 rewrite Nat.sub_add in H1; [ | easy ].
+rewrite (rngl_mul_summation_distr_l Hosc) in H1.
+erewrite rngl_summation_eq_compat in H1. 2: {
+  intros i (_, Hi).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hicc (_ / _)).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_div_assoc Hivc).
+  rewrite (rngl_mul_1_r Honc).
+  rewrite (rngl_div_div Hosc Honc Hivc); [ | easy | ]. 2: {
+    apply (rngl_pow_nonzero Honc); [ easy | easy | | easy ].
+    cbn.
+...
+}
+cbn - [ rngl_add rngl_zero ] in H1.
 ...
 destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
   move Hn1 at top; subst n.
