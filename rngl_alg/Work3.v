@@ -1065,6 +1065,30 @@ enough (H :
   cbn - [ List.nth ].
   rewrite <- List.seq_shift.
   rewrite List_fold_left_map.
+  rewrite List_nth_0_cons.
+  rewrite gc_add_0_l.
+  rewrite rngl_1_gc_1.
+  rewrite (gc_mul_1_r Hon Hos).
+  rewrite fold_left_op_fun_from_d with (d := 0%L); cycle 1. {
+    apply gc_add_0_l.
+  } {
+    apply gc_add_0_r.
+  } {
+    apply gc_add_assoc.
+  }
+  rewrite List_fold_left_ext_in with
+      (g := λ c i, (c + la.[i] * (z ^ S i))%L). 2: {
+    intros b c Hb.
+    f_equal.
+    now rewrite List_nth_succ_cons.
+  }
+  (* merde, c'est "S i" *)
+...
+    intros; cbn.
+    rewrite rngl_add_comm.
+    apply rngl_add_0_r.
+  specialize @fold_left_op_fun_from_d as H1.
+  specialize (H1 (GComplex T)).
 ...
 Search (List.seq (S _)).
 Search (List.fold_left).

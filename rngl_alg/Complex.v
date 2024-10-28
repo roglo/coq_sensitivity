@@ -254,6 +254,15 @@ do 2 rewrite rngl_add_0_l.
 now apply eq_gc_eq.
 Qed.
 
+Theorem gc_add_0_r :
+  ∀ a : GComplex T, (a + 0)%C = a.
+Proof.
+intros; cbn.
+progress unfold gc_add; cbn.
+do 2 rewrite rngl_add_0_r.
+now apply eq_gc_eq.
+Qed.
+
 Theorem gc_mul_assoc :
   rngl_has_opp T = true →
   ∀ a b c : GComplex T, (a * (b * c))%C = (a * b * c)%C.
