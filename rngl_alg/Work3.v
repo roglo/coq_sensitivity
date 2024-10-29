@@ -1330,6 +1330,9 @@ rewrite <- (rngl_div_gc_div Hic Hiv) in H1.
 rewrite <- rngl_1_gc_1 in H1.
 rewrite <- rngl_mul_assoc in H1.
 rewrite (rngl_mul_summation_distr_r Hosc) in H1.
+rewrite <- (rngl_pow_1_r Honc z) in H1 at 3.
+rewrite <- (rngl_pow_add_r Honc) in H1.
+rewrite Nat.sub_add in H1.
 erewrite rngl_summation_eq_compat in H1. 2: {
   intros i (_, Hi).
   rewrite (rngl_mul_mul_swap Hicc).
