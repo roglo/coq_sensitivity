@@ -1227,6 +1227,20 @@ assert (H2 : (‖ 1 / z ‖ * rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   now apply (rngl_lt_le_incl Hor) in HM.
 }
 clear H1.
+assert (H1 : (rngl_of_nat n * m ≤ ‖ z ‖)%L). {
+  eapply (rngl_le_trans Hor); [ | apply H2 ].
+(* ah bin non, c'est faux *)
+...
+  eapply (rngl_le_trans Hor); [ | apply H1 ].
+  rewrite <- rngl_mul_assoc.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
+  progress unfold R₀.
+  apply (rngl_le_add_l Hor).
+  apply (rngl_le_trans Hor _ 1); [ apply (rngl_0_le_1 Hon Hop Hor) | ].
+  apply (rngl_le_add_r Hor).
+  now apply (rngl_lt_le_incl Hor) in HM.
+}
+...
 assert
   (H1 :
     (‖ 1 / z ‖ *
