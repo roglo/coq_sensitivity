@@ -1321,53 +1321,26 @@ clear H2.
 apply (rngl_mul_le_mono_nonneg_l Hop Hor (‖ z ^ (n - 1) ‖))%L in H1. 2: {
   apply (gc_modl_nonneg Hop Hor).
 }
-rewrite rngl_mul_assoc in H1.
+rewrite (rngl_mul_comm Hic) in H1.
 do 3 rewrite <- (gc_modl_mul Hic Hon Hop Hor) in H1.
-(*
-set (roc := @gc_ring_like_op T ro rp rl).
-*)
 (**)
 do 3 rewrite <- rngl_mul_gc_mul in H1.
 rewrite <- rngl_pow_gc_pow in H1.
 rewrite <- (rngl_div_gc_div Hic Hiv) in H1.
 rewrite <- rngl_1_gc_1 in H1.
-rewrite (rngl_mul_div_assoc Hivc) in H1.
-rewrite (rngl_mul_1_r Honc) in H1.
-rewrite <- (rngl_pow_1_r Honc z) in H1 at 4.
-rewrite <- (rngl_pow_add_r Honc) in H1.
-(*
-rewrite (gc_mul_div_assoc Hop Hiv) in H1.
-rewrite (gc_mul_1_r Hon Hos) in H1.
-rewrite <- (gc_pow_1_r Hon Hos z) in H1 at 4.
-rewrite <- (gc_pow_add_r Hon Hop) in H1.
-*)
-rewrite Nat.sub_add in H1; [ | easy ].
-rewrite (rngl_mul_summation_distr_l Hosc) in H1.
+rewrite <- rngl_mul_assoc in H1.
+rewrite (rngl_mul_summation_distr_r Hosc) in H1.
 erewrite rngl_summation_eq_compat in H1. 2: {
   intros i (_, Hi).
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hicc (_ / _)).
+  rewrite (rngl_mul_mul_swap Hicc).
   rewrite <- rngl_mul_assoc.
   rewrite (rngl_mul_div_assoc Hivc).
   rewrite (rngl_mul_1_r Honc).
-  rewrite (rngl_div_div Hosc Honc Hivc); [ | easy | ]. 2: {
-    now apply (rngl_pow_nonzero Honc).
-  }
-  rewrite <- (rngl_pow_1_r Honc z) at 3.
-  rewrite <- (rngl_pow_add_r Honc).
-...
-Require Import QArith.
-Search (_ ^ _ / _ ^ _)%Q.
-Theorem rngl_pow_div_pow :
-  ∀ A (roa : ring_like_op A) (a : A) m n, n ≤ m → (a ^ m / a ^ n = a ^ (m - n))%L.
-...
-  rewrite rngl_pow_div_pow. 2: {
-    flia Hi.
-  progress unfold rngl_div at 2.
-  rewrite Hivc.
-Search (_ ^ _)⁻¹%L.
-}
-...
+  rewrite (rngl_pow_div_pow Hicc Honc Hosc Hivc); [ | easy | flia ].
+  rewrite Nat.sub_sub_distr; [ | easy | easy ].
+  rewrite Nat.sub_diag.
+  rewrite Nat.add_0_l.
+  easy.
 }
 cbn - [ rngl_add rngl_zero ] in H1.
 ...

@@ -1221,8 +1221,48 @@ destruct Hab as [Hab| Hab]; [ right | left ]. {
 }
 Qed.
 
+Theorem rngl_pow_div_pow :
+  rngl_mul_is_comm T = true →
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv T = true →
+  ∀ (a : T) m n,
+  (a ≠ 0)%L
+  → n ≤ m
+  → (a ^ m / a ^ n = a ^ (m - n))%L.
+Proof.
+intros Hic Hon Hos Hiv.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ ^ (_ - _)))%L.
+  apply H1.
+}
+intros * Haz Hnm.
+revert m Hnm.
+induction n; intros; cbn. {
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  now rewrite Nat.sub_0_r.
+}
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hnm.
+cbn.
+rewrite (rngl_mul_comm Hic a).
+rewrite (rngl_mul_comm Hic _ (a ^ n)).
+rewrite <- (rngl_div_div Hos Hon Hiv); [ | easy | ]. 2: {
+  apply (rngl_pow_nonzero Hon Hc1 Hos); [ | easy ].
+  rewrite Hi1.
+  apply Bool.orb_true_r.
+}
+rewrite (rngl_mul_div Hi1); [ | easy ].
+now apply IHn.
+Qed.
+
 End a.
 
 Arguments rngl_div_le_mono_pos_r {T ro rp} Hon Hop Hiv Hor Hii (a b c)%_L.
 Arguments rngl_mul_le_mono_pos_l {T ro rp} Hop Hor Hii (a b c)%_L.
 Arguments rngl_mul_le_mono_pos_r {T ro rp} Hop Hor Hii (a b c)%_L.
+Arguments rngl_pow_div_pow {T ro rp} Hic Hon Hos Hiv a%_L (m n)%_nat.
