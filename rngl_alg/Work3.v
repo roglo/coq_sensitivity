@@ -1231,6 +1231,15 @@ assert (H1 : (rngl_of_nat n * m ≤ ‖ z ‖)%L). {
   eapply (rngl_le_trans Hor); [ | apply H2 ].
 (* ah bin non, c'est faux *)
 ...
+(* rien à voir avec le truc courant *)
+Check rngl_archimedean.
+∀ a b : T, (0 < a)%L → ∃ n : nat, (b < rngl_mul_nat a n)%L
+a = π ; b = 3π/2 ;
+il faudrait que 3π/2 < nπ
+bin non puisque nπ vaut π ou 0
+Donc mes angles ne sont pas archimédiens
+(* fin du rien à voir avec le truc courant *)
+...
   eapply (rngl_le_trans Hor); [ | apply H1 ].
   rewrite <- rngl_mul_assoc.
   apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ easy | ].
