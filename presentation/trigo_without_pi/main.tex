@@ -161,7 +161,7 @@
   \end{textblock}
 \end{frame}
 
-\begin{frame}{Division by a natural}
+\begin{frame}{Division of an angle by a natural}
   \begin{textblock}{7}(1,2)
     De Moivre's formula \\
     \hspace{5mm} $(cos \; \theta + i \; sin \; \theta)^n = cos (n
@@ -198,7 +198,7 @@
     computing $1$ divided by $n$ in binary \\
     \hspace{1cm}
     $1 / n = 0.a_1a_2a_3...$
-    \hspace{2cm}$a_i = \left\lfloor \frac{2^i}{n} \right\rfloor
+    \hspace{2cm}$a_k = \left\lfloor \frac{2^k}{n} \right\rfloor
            {\scriptstyle mod \; 2}$
     \only<2->{
       \\
@@ -216,7 +216,7 @@
       \only<2>{and so on...}
       \only<3->{we have \\
         \hspace{1cm}
-        $\displaystyle 0.a_1a_2a_3... = \sum_{i=1}^\infty{\; \frac{a_i}{2^i}}$
+        $\displaystyle 0.a_1a_2a_3... = \sum_{k=1}^\infty{\; \frac{a_k}{2^k}}$
       }
     }
   \end{textblock}
@@ -225,16 +225,29 @@
 \begin{frame}{Trying to define the division of an angle by a natural}
   \begin{textblock}{10}(1,2)
     $\displaystyle \frac{\theta}{n} ::\stackrel{\scriptscriptstyle
-      ?}{=} \sum_{i=1}^\infty{\; \frac{a_i \; \theta}{2^i}}$
-    \hspace{1cm}$a_i = \left\lfloor \frac{2^i}{n} \right\rfloor
+      ?}{=} \sum_{k=1}^\infty{\; \frac{a_k \; \theta}{2^k}}$
+    \hspace{1cm}$a_k = \left\lfloor \frac{2^k}{n} \right\rfloor
            {\scriptstyle mod \; 2}$
-    \only<2->{
+    \only<2>{
       \\
       \vspace{5mm}
-      $\displaystyle \theta_m ::= \left\lfloor \frac{2^m}{n} \right\rfloor
+      $\displaystyle \theta_m ::= \sum_{k=1}^m{\; \frac{a_k \;
+          \theta}{2^k}}$
+    }
+    \only<3>{
+      \\
+      \vspace{5mm}
+      $\displaystyle \theta_m ::= \sum_{k=1}^m{\; \frac{a_k \;
+          \theta}{2^k}} = \left\lfloor \frac{2^m}{n} \right\rfloor
       \frac{\theta}{2^m}$
     }
-    \only<3->{
+    \only<4->{
+      \\
+      \vspace{5mm}
+      $\displaystyle \theta_m ::= \left\lfloor \frac{2^m}{n}
+      \right\rfloor \frac{\theta}{2^m}$
+    }
+    \only<5->{
       \\
       \vspace{5mm}
       Things to prove, and indeed proven in Coq:
@@ -262,7 +275,7 @@
       \vspace{3mm}
       \hspace{5mm}
       if $\displaystyle \theta_1 + \theta_3 \le \theta_2 + \theta_3$ then
-      $\theta_2 \le \theta_3$ \\
+      $\theta_1 \le \theta_2$ \\
     }
   \end{textblock}
 \end{frame}
