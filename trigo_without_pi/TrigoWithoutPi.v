@@ -422,6 +422,7 @@ Notation "θ1 + θ2" := (angle_add θ1 θ2) : angle_scope.
 Notation "θ1 - θ2" := (angle_sub θ1 θ2) : angle_scope.
 Notation "- θ" := (angle_opp θ) : angle_scope.
 Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : angle_scope.
+Notation "θ1 ≠? θ2" := (negb (angle_eqb θ1 θ2)) : angle_scope.
 Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : angle_scope.
 Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : angle_scope.
 Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : angle_scope.

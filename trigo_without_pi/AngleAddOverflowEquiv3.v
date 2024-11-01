@@ -16,7 +16,7 @@ Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
 Definition angle_add_overflow3 θ1 θ2 :=
-  if (θ1 =? 0)%A then false else (- θ1 ≤? θ2)%A.
+  ((θ1 ≠? 0)%A && (- θ1 ≤? θ2)%A)%bool.
 
 Definition angle_add_not_overflow3 θ1 θ2 :=
   θ2 = 0%A ∨ (θ1 < -θ2)%A.
