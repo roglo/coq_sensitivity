@@ -206,13 +206,19 @@ destruct zs1. {
         progress sin_cos_opp_hyp T Hzc2.
         rewrite angle_sub_opp_r in Hzs12 |-*.
 Search (rngl_cos _ < rngl_cos _)%L.
+...
 apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
 now apply (rngl_lt_le_incl Hor) in Hzc1.
+apply rngl_cos_add_nonneg; try easy.
+Check rngl_cos_add_nonneg.
+(* chiasse *)
+...
 About rngl_sin_add_nonneg.
 Search (0 ≤ rngl_cos _)%L.
 apply rngl_cos_lt_rngl_cos_sub with (θ2 := θ2) in Hzs12; try easy.
+apply rngl_cos_add_nonneg.
 rewrite rngl_cos_sub_comm in Hzs12.
-now rewrite angle_add_sub in Hzs12.
+rewrite angle_add_sub in Hzs12.
 ...
         change_angle_add_r θ2 angle_right.
         progress sin_cos_add_sub_right_hyp T Hzs2.
