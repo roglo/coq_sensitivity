@@ -103,6 +103,38 @@ destruct zs1. {
         }
       }
       symmetry.
+      apply (rngl_leb_gt Hor).
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H; symmetry in H.
+      apply eq_rngl_cos_opp_1 in H; subst θ2.
+      cbn in Hs2z, Hzs2.
+      now rewrite Hs2z in Hzs2.
+    }
+    destruct s2z. {
+      apply rngl_ltb_lt.
+      apply (rngl_opp_lt_compat Hop Hor).
+      do 2 rewrite (rngl_opp_involutive Hop).
+      apply (rngl_lt_iff Hor).
+      split; [ apply rngl_cos_bound | ].
+      intros H.
+      apply eq_rngl_cos_1 in H; subst θ2.
+      cbn in Hs2z, Hzs2.
+      now rewrite Hs2z in Hzs2.
+    }
+    exfalso.
+    apply (rngl_leb_gt Hor) in Hzs2, Hs2z.
+    now apply (rngl_lt_asymm Hor) in Hzs2.
+  }
+  remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs12, Hzs2.
+  destruct zs12. {
+    destruct zs2. {
+      apply rngl_leb_le in Hzs1, Hzs2, Hzs12.
+      apply (rngl_leb_gt Hor) in Hs1z.
+      apply (rngl_ltb_ge Hor).
+About rngl_ltb_ge.
 ...
 *)
 
