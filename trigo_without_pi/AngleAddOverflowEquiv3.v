@@ -189,6 +189,31 @@ destruct zs1. {
       apply rngl_leb_le in Hc12.
       apply rngl_ltb_lt.
       apply (rngl_nle_gt Hor) in Hzc1.
+(**)
+      change_angle_sub_l θ1 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hs1z.
+      progress sin_cos_add_sub_straight_hyp T Hzs1.
+      progress sin_cos_add_sub_straight_hyp T Hc12.
+      progress sin_cos_add_sub_straight_hyp T Hzc1.
+      progress sin_cos_add_sub_straight_goal T.
+      rewrite (rngl_add_opp_r Hop).
+      apply (rngl_lt_0_sub Hop Hor).
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+        change_angle_opp θ2.
+        progress sin_cos_opp_hyp T Hzs2.
+        progress sin_cos_opp_hyp T Hc12.
+        progress sin_cos_opp_hyp T Hzc2.
+        rewrite angle_sub_opp_r in Hzs12 |-*.
+(* faut peut-être essayer autre chose que change_angle_opp *)
+...
+        apply quadrant_1_sin_sub_pos_cos_lt; try easy. {
+Search (0 ≤ rngl_cos (_ + _))%L.
+...
+Search (rngl_cos _ < rngl_cos _)%L.
+apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
+Search (rngl_cos (_ + _) < rngl_cos _)%L.
+...
       change_angle_sub_r θ1 angle_right.
       progress sin_cos_add_sub_right_hyp T Hzs12.
       progress sin_cos_add_sub_right_hyp T Hs1z.
