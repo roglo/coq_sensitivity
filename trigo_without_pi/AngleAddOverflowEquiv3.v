@@ -18,6 +18,62 @@ Context {ac : angle_ctx T}.
 Definition angle_add_not_overflow3 θ1 θ2 :=
   θ2 = 0%A ∨ (θ1 < -θ2)%A.
 
+Definition angle_add_overflow3 θ1 θ2 :=
+  if (θ2 =? 0)%A then false else (- θ2 ≤? θ1)%A.
+
+(* to be completed
+Theorem glop :
+  ∀ θ1 θ2, angle_add_not_overflow3 θ1 θ2 ↔ angle_add_overflow3 θ1 θ2 = false.
+Proof.
+intros.
+progress unfold angle_add_overflow3.
+progress unfold angle_add_not_overflow3.
+split; intros H12. {
+  destruct H12 as [H12| H12]. {
+    subst θ2; cbn.
+    progress unfold angle_eqb.
+    cbn.
+    rewrite rngl_eqb_refl.
+About rngl_eqb_refl.
+...
+Search ((_ =? _)%A = true).
+    rewrite angle_eq_refl.
+  intros H21.
+  destruct H12 as [H12| H12]; [ easy | ].
+  destruct H21 as (H2z, H21).
+  now apply angle_nlt_ge in H21.
+} {
+  Search (not (_ ∧ _)).
+...
+*)
+
+(* not working
+Definition angle_add_overflow3 θ1 θ2 :=
+  if (0 <? rngl_sin θ1)%L then
+    if (0 ≤? rngl_sin θ2)%L then false else (rngl_cos θ1 ≤? rngl_cos θ2)%L
+  else if (rngl_sin θ1 <? 0)%L then
+    if (0 ≤? rngl_sin θ2)%L then (rngl_cos θ2 ≤? rngl_cos θ1)%L else true
+  else
+    if (rngl_cos θ1 =? 1)%L then false else (rngl_sin θ2 ≤? 0)%L.
+
+Theorem glop :
+  ∀ θ1 θ2, angle_add_overflow3 θ1 θ2 = false ↔ angle_add_not_overflow3 θ1 θ2.
+Proof.
+intros.
+progress unfold angle_add_overflow3.
+progress unfold angle_add_not_overflow3.
+split; intros H12. {
+  remember (0 <? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+  remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+  symmetry in Hzs1, Hzs2.
+  destruct zs1. {
+    apply rngl_ltb_lt in Hzs1.
+    destruct zs2. {
+      clear H12.
+      apply rngl_leb_le in Hzs2.
+...
+*)
+
 Theorem rngl_sin_nonneg_is_pos :
   ∀ θ,
   θ ≠ 0%A
