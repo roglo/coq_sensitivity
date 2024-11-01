@@ -387,8 +387,12 @@ Theorem angle_add_overflow_if :
   → (θ1 = 0 ∨ θ2 < - θ1)%A.
 Proof.
 intros * Haov.
-apply angle_add_not_overflow_comm in Haov.
-now apply angle_add_not_overflow_equiv3 in Haov.
+rewrite angle_add_overflow_equiv3 in Haov.
+progress unfold angle_add_overflow3 in Haov.
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1; [ now left; apply angle_eqb_eq | right ].
+now apply angle_leb_gt.
 Qed.
 
 Theorem rngl_sin_add_nonneg_sin_nonneg :

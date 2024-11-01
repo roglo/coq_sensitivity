@@ -204,7 +204,7 @@ apply (rngl_lt_le_incl Hor) in Hc1z, Hc2z.
 now apply rngl_sin_add_nonneg.
 Qed.
 
-Theorem angle_add_not_overflow_equiv3 :
+Theorem angle_add_not_overflow_equiv3_1 :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false ↔ angle_add_not_overflow3 θ1 θ2.
 Proof.
@@ -638,6 +638,26 @@ apply (rngl_leb_gt Hor) in Hzs12.
 apply (rngl_ltb_ge Hor).
 apply (rngl_lt_le_incl Hor) in Hzs1, Hsz2.
 apply rngl_cos_le_cos_add; try easy.
+Qed.
+
+Theorem angle_add_overflow_equiv3 :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = angle_add_overflow3 θ1 θ2.
+Proof.
+intros.
+remember (angle_add_overflow3 θ1 θ2) as ov3 eqn:Hov3.
+symmetry in Hov3.
+destruct ov3. 2: {
+  apply angle_add_not_overflow_equiv3_1.
+  now apply angle_add_not_overflow3_not.
+} {
+  apply Bool.not_false_iff_true in Hov3.
+  apply Bool.not_false_iff_true.
+  intros H; apply Hov3; clear Hov3.
+  rename H into Hov3.
+  apply angle_add_not_overflow_equiv3_1 in Hov3.
+  now apply angle_add_not_overflow3_not.
+}
 Qed.
 
 End a.

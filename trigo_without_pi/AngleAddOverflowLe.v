@@ -783,38 +783,6 @@ apply rngl_leb_le in H32.
 apply angle_add_overflow_le_lemma_10 in H12; try easy.
 Qed.
 
-Theorem angle_lt_le_trans :
-  ∀ θ1 θ2 θ3,
-  (θ1 < θ2 → θ2 ≤ θ3 → θ1 < θ3)%A.
-Proof.
-destruct_ac.
-intros * H12 H23.
-progress unfold angle_ltb in H12.
-progress unfold angle_leb in H23.
-progress unfold angle_ltb.
-remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
-remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
-remember (0 ≤? rngl_sin θ3)%L as z3 eqn:Hz3.
-symmetry in Hz1, Hz2, Hz3.
-destruct z1. {
-  apply rngl_leb_le in Hz1.
-  destruct z3; [ | easy ].
-  apply rngl_ltb_lt.
-  apply rngl_leb_le in Hz3.
-  destruct z2; [ | easy ].
-  apply rngl_leb_le in Hz2, H23.
-  apply rngl_ltb_lt in H12.
-  now apply (rngl_le_lt_trans Hor _ (rngl_cos θ2)).
-} {
-  destruct z2; [ easy | ].
-  destruct z3; [ easy | ].
-  apply rngl_ltb_lt in H12.
-  apply rngl_leb_le in H23.
-  apply rngl_ltb_lt.
-  now apply (rngl_lt_le_trans Hor _ (rngl_cos θ2)).
-}
-Qed.
-
 Theorem angle_add_overflow_lt_le :
   ∀ θ θ1 θ2,
   (θ1 < θ)%A
@@ -823,11 +791,16 @@ Theorem angle_add_overflow_lt_le :
 Proof.
 destruct_ac.
 intros * H1 H2.
-apply angle_add_not_overflow_equiv3.
-progress unfold angle_add_not_overflow3.
-destruct (angle_eq_dec θ2 0) as [H2z| H2z]; [ now left | right ].
-apply (angle_lt_le_trans _ θ); [ easy | ].
-now apply angle_le_opp_r.
+rewrite angle_add_overflow_equiv3.
+progress unfold angle_add_overflow3.
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1; [ easy | ].
+apply angle_leb_gt.
+apply (angle_le_lt_trans _ (- θ))%A; [ easy | ].
+apply angle_eqb_neq in Hz1.
+apply angle_lt_opp_r; [ easy | ].
+now rewrite angle_opp_involutive.
 Qed.
 
 Theorem angle_opp_straight : (- angle_straight)%A = angle_straight.

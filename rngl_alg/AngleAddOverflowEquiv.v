@@ -579,29 +579,6 @@ destruct zs. {
 }
 Qed.
 
-Theorem angle_lt_le_incl :
-  ∀ θ1 θ2, (θ1 < θ2 → θ1 ≤ θ2)%A.
-Proof.
-specialize ac_or as Hor.
-intros * H12.
-progress unfold angle_ltb in H12.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ1)%L as z1 eqn:Hz1.
-remember (0 ≤? rngl_sin θ2)%L as z2 eqn:Hz2.
-symmetry in Hz1, Hz2.
-destruct z1. {
-  destruct z2; [ | easy ].
-  apply rngl_ltb_lt in H12.
-  apply rngl_leb_le.
-  now apply (rngl_lt_le_incl Hor).
-} {
-  destruct z2; [ easy | ].
-  apply rngl_ltb_lt in H12.
-  apply rngl_leb_le.
-  now apply (rngl_lt_le_incl Hor).
-}
-Qed.
-
 Theorem angle_div_2_eq_compat :
   ∀ θ1 θ2, (θ1 /₂ = θ2 /₂ → θ1 = θ2)%A.
 Proof.
