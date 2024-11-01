@@ -163,7 +163,37 @@ Search (rngl_cos _ < rngl_cos (_ + _) → _)%L.
       }
       apply (rngl_leb_gt Hor) in Hc12.
       apply rngl_ltb_ge.
+      eapply (rngl_le_trans Hor). 2: {
+        apply (rngl_lt_le_incl Hor) in Hc12.
+        apply Hc12.
+      }
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+        change_angle_add_r θ2 angle_right.
+        progress sin_cos_add_sub_right_hyp T Hzs2.
+        progress sin_cos_add_sub_right_hyp T Hzc2.
+        progress sin_cos_add_sub_right_hyp T Hzs12.
+        progress sin_cos_add_sub_right_hyp T Hc12.
+        progress sin_cos_add_sub_right_goal T.
+...
+      change_angle_add_r θ2 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hc12.
+      progress sin_cos_add_sub_straight_hyp T Hzc2.
+      progress sin_cos_add_sub_straight_goal T.
+      cbn.
+...
+...
+Search (_ → rngl_cos _ < rngl_cos (_ + _))%L.
+...
+      rewrite angle_add_comm.
+      apply rngl_cos_le_cos_add; try easy.
+...
+...
+Search (rngl_sin (_ + _) ≤ rngl_cos _)%L.
 Search (_ → rngl_cos (_ + _) ≤ rngl_cos _)%L.
+Search (rngl_cos (_ + _) < rngl_cos _ → _)%L.
+...
       apply rngl_cos_add_le_cos; try easy.
 ...
 *)
