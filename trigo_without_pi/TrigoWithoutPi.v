@@ -458,21 +458,21 @@ destruct (0 ≤? rngl_sin θ1)%L. {
   destruct (0 ≤? rngl_sin θ2)%L; [ | easy ].
   split; intros H. {
     apply Bool.not_true_iff_false in H.
-    apply (rngl_ltb_ge Hor) in H.
+    apply (rngl_ltb_ge_iff Hor) in H.
     now apply rngl_leb_le.
   }
   apply Bool.not_true_iff_false.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   now apply rngl_leb_le.
 }
 destruct (0 ≤? rngl_sin θ2)%L; [ easy | ].
 split; intros H. {
   apply Bool.not_true_iff_false in H.
-  apply (rngl_ltb_ge Hor) in H.
+  apply (rngl_ltb_ge_iff Hor) in H.
   now apply rngl_leb_le.
 }
 apply Bool.not_true_iff_false.
-apply (rngl_ltb_ge Hor).
+apply rngl_ltb_ge.
 now apply rngl_leb_le.
 Qed.
 
@@ -2123,7 +2123,7 @@ apply rngl_leb_le in Hzs1.
 apply rngl_leb_le in Hzs3.
 rewrite Hzs3 in Haov.
 apply rngl_leb_le in Hzs3.
-apply (rngl_ltb_ge Hor) in Haov.
+apply (rngl_ltb_ge_iff Hor) in Haov.
 apply (rngl_nle_gt Hor) in Hzs2.
 apply Hzs2; clear Hzs2.
 symmetry in Hθ3.

@@ -83,7 +83,7 @@ destruct zs1. {
         apply eq_rngl_sin_0 in Hzs2.
         destruct Hzs2; subst θ2; cbn. {
           transitivity false. {
-            apply (rngl_ltb_ge Hor).
+            apply rngl_ltb_ge.
             apply (rngl_le_refl Hor).
           } {
             symmetry.
@@ -133,8 +133,7 @@ destruct zs1. {
     destruct zs2. {
       apply rngl_leb_le in Hzs1, Hzs2, Hzs12.
       apply (rngl_leb_gt Hor) in Hs1z.
-      apply (rngl_ltb_ge Hor).
-About rngl_ltb_ge.
+      apply rngl_ltb_ge.
 ...
 *)
 
@@ -349,7 +348,7 @@ split; intros H12. {
     destruct sz2; [ | easy ].
     apply rngl_leb_le in Hzs1, Hzs12, Hsz2.
     apply rngl_ltb_lt.
-    apply (rngl_ltb_ge Hor) in H12.
+    apply (rngl_ltb_ge_iff Hor) in H12.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       now apply quadrant_12_quadrant_2_rngl_cos_lt.
     } {
@@ -412,7 +411,7 @@ split; intros H12. {
     now apply quadrant_1_sin_sub_pos_cos_lt.
   }
   apply (rngl_leb_gt Hor) in Hzs1.
-  apply (rngl_ltb_ge Hor) in H12.
+  apply (rngl_ltb_ge_iff Hor) in H12.
   destruct sz2. {
     exfalso.
     apply rngl_leb_le in Hsz2.
@@ -690,7 +689,7 @@ destruct zs1. {
   }
   clear H12.
   apply (rngl_leb_gt Hor) in Hsz2.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   apply rngl_cos_add_le_cos; try easy. {
     right; left.
     intros H; subst θ2.
@@ -755,7 +754,7 @@ destruct zs12. {
   now apply quadrant_1_sin_sub_nonneg_cos_le.
 }
 apply (rngl_leb_gt Hor) in Hzs12.
-apply (rngl_ltb_ge Hor).
+apply rngl_ltb_ge.
 apply (rngl_lt_le_incl Hor) in Hzs1, Hsz2.
 apply rngl_cos_le_cos_add; try easy.
 Qed.

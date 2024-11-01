@@ -354,6 +354,18 @@ split; intros Hab. {
 Qed.
 
 Theorem rngl_ltb_ge :
+  ∀ a b, (b ≤ a → (a <? b) = false)%L.
+Proof.
+intros * Hab.
+progress unfold rngl_le in Hab.
+progress unfold rngl_ltb.
+remember rngl_opt_leb as ol eqn:Hol.
+symmetry in Hol.
+destruct ol as [leb| ]; [ | easy ].
+now apply Bool.negb_false_iff in Hab.
+Qed.
+
+Theorem rngl_ltb_ge_iff :
   rngl_is_ordered T = true →
   ∀ a b, ((a <? b) = false ↔ b ≤ a)%L.
 Proof.

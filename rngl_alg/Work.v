@@ -154,7 +154,7 @@ destruct zs. {
   rewrite Hzsm.
   destruct zsm; [ | easy ].
   apply rngl_leb_le in Hzsm.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   rewrite angle_add_diag in Hzsm |-*.
   rewrite rngl_sin_mul_2_l in Hzsm.
   rewrite rngl_cos_mul_2_l'.

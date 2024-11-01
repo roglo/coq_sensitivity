@@ -398,7 +398,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1)) as [Hzs1| Hs1z]. {
   apply rngl_leb_le in H.
   rewrite H in Haov13 |-*; clear H.
   clear Haov13.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. {
     apply rngl_cos_add_le_cos; try easy.
     now right; right; left.
@@ -461,7 +461,7 @@ generalize Hs1z; intros H.
 apply (rngl_nle_gt Hor) in H.
 apply rngl_leb_nle in H.
 rewrite H in Haov13; clear H.
-apply (rngl_ltb_ge Hor) in Haov13.
+apply (rngl_ltb_ge_iff Hor) in Haov13.
 apply (rngl_le_opp_r Hop Hor) in Haov13.
 move Hzs2 at bottom; move Hzs3 at bottom.
 destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {

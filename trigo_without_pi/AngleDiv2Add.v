@@ -162,7 +162,7 @@ apply rngl_leb_nle in Hzs1, Hzs3.
 rewrite Hzs1, Hzs3 in Haov.
 apply rngl_leb_nle in Hzs1, Hzs3.
 apply (rngl_nle_gt Hor) in Hzs1, Hzs3.
-apply (rngl_ltb_ge Hor) in Haov.
+apply (rngl_ltb_ge_iff Hor) in Haov.
 move Haov at bottom.
 (* changing θ1 into θ1 - angle_straight *)
 remember (θ1 - angle_straight)%A as θ.
@@ -423,7 +423,7 @@ destruct zs1. {
   apply (rngl_leb_gt Hor) in Hzs12.
   apply (rngl_opp_neg_pos Hop Hor) in Hzs12.
   move Hzs12 at bottom.
-  apply (rngl_ltb_ge Hor) in Haov.
+  apply (rngl_ltb_ge_iff Hor) in Haov.
   apply (rngl_opp_le_compat Hop Hor) in Haov.
   move Haov at bottom.
   destruct zs2. {

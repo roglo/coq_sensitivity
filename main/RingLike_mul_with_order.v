@@ -494,13 +494,13 @@ destruct az. {
   remember (0 <? b)%L as zb eqn:Hzb.
   symmetry in Hzb.
   destruct zb; [ now apply rngl_ltb_lt in Hzb | exfalso ].
-  apply (rngl_ltb_ge Hor) in Hzb.
+  apply (rngl_ltb_ge_iff Hor) in Hzb.
   apply (rngl_nle_gt Hor) in Hab.
   apply Hab; clear Hab.
   apply (rngl_mul_nonpos_nonpos Hop Hor); [ | easy ].
   now apply (rngl_lt_le_incl Hor) in Haz.
 }
-apply (rngl_ltb_ge Hor) in Haz.
+apply (rngl_ltb_ge_iff Hor) in Haz.
 right.
 split. {
   apply (rngl_lt_iff Hor).

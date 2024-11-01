@@ -1140,8 +1140,8 @@ destruct ab. {
   rewrite rngl_add_comm in Hab.
   now apply (rngl_lt_opp_l Hop Hor) in Hab.
 } {
-  apply (rngl_ltb_ge Hor) in Hab.
-  apply (rngl_ltb_ge Hor).
+  apply (rngl_ltb_ge_iff Hor) in Hab.
+  apply rngl_ltb_ge.
   apply (rngl_le_opp_r Hop Hor).
   rewrite rngl_add_comm.
   now apply (rngl_le_opp_r Hop Hor).
@@ -1164,8 +1164,8 @@ destruct ab. {
   rewrite rngl_add_comm in Hab.
   now apply (rngl_lt_opp_r Hop Hor) in Hab.
 } {
-  apply (rngl_ltb_ge Hor) in Hab.
-  apply (rngl_ltb_ge Hor).
+  apply (rngl_ltb_ge_iff Hor) in Hab.
+  apply rngl_ltb_ge.
   apply (rngl_le_opp_l Hop Hor).
   rewrite rngl_add_comm.
   now apply (rngl_le_opp_l Hop Hor).

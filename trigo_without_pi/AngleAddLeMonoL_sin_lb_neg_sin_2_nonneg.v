@@ -385,7 +385,7 @@ destruct zs3. {
     generalize Hs13; intros H.
     apply rngl_leb_le in H.
     rewrite H; clear H.
-    apply (rngl_ltb_ge Hor).
+    apply rngl_ltb_ge.
     apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
@@ -571,7 +571,7 @@ destruct zs3. {
       generalize Hzs1; intros H.
       apply rngl_leb_le in H.
       rewrite H; clear H.
-      apply (rngl_ltb_ge Hor).
+      apply rngl_ltb_ge.
       now apply (rngl_le_trans Hor _ 0).
     }
     apply (rngl_nle_gt Hor) in Hc1z.
@@ -593,7 +593,7 @@ destruct zs3. {
     generalize Hc1z; intros H.
     apply rngl_leb_le in H.
     rewrite H; clear H.
-    apply (rngl_ltb_ge Hor).
+    apply rngl_ltb_ge.
     now apply quadrant_1_rngl_cos_add_le_cos_l.
   }
   apply (rngl_nle_gt Hor) in Hs1z.
@@ -631,7 +631,7 @@ destruct zs3. {
   apply rngl_leb_le in Hs1z.
   rewrite Hs1z.
   apply rngl_leb_le in Hs1z.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   now apply quadrant_1_rngl_cos_add_le_cos_l.
 }
 clear H23.

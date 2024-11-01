@@ -517,7 +517,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. 2: {
   generalize Hs13z; intros H.
   apply rngl_leb_le in H.
   rewrite H; clear H.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).
@@ -565,7 +565,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   apply rngl_leb_le in Hzs13.
   rewrite Hzs13.
   apply rngl_leb_le in Hzs13.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   apply angle_le_sub_le_add_l_lemma_1; try easy.
   now apply (rngl_lt_le_incl Hor).
   now apply (rngl_lt_le_incl Hor).

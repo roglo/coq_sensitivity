@@ -499,7 +499,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (rngl_sin _)).
   rewrite (rngl_leb_refl Hor).
   do 2 rewrite (H1 (rngl_cos _)).
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   apply (rngl_le_refl Hor).
 }
 intros * Haov.
@@ -516,8 +516,8 @@ destruct zs2. {
   destruct zs12; [ | easy ].
   destruct zs1; [ | easy ].
   apply rngl_leb_le in Hzs1, Hzs12, Hzs2.
-  apply (rngl_ltb_ge Hor) in Haov.
-  apply (rngl_ltb_ge Hor).
+  apply (rngl_ltb_ge_iff Hor) in Haov.
+  apply rngl_ltb_ge.
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     rewrite angle_add_comm.
     apply rngl_cos_add_le_cos; try easy.
@@ -553,11 +553,11 @@ destruct zs2. {
     destruct zs1; [ | easy ].
     apply rngl_leb_le in Hzs1.
     apply rngl_leb_le in Hzs12.
-    apply (rngl_ltb_ge Hor) in Haov.
+    apply (rngl_ltb_ge_iff Hor) in Haov.
     apply angle_add_overflow_le_lemma_6 in Haov; try easy.
   }
   apply (rngl_leb_gt Hor) in Hzs12.
-  apply (rngl_ltb_ge Hor).
+  apply rngl_ltb_ge.
   destruct zs1. {
     clear Haov.
     apply rngl_leb_le in Hzs1.
@@ -567,7 +567,7 @@ destruct zs2. {
     now rewrite angle_add_comm.
   }
   apply (rngl_leb_gt Hor) in Hzs1.
-  apply (rngl_ltb_ge Hor) in Haov.
+  apply (rngl_ltb_ge_iff Hor) in Haov.
   apply (rngl_nlt_ge Hor).
   intros Hc12.
   apply (rngl_nle_gt Hor) in Hzs12.
@@ -1926,7 +1926,7 @@ destruct s1z. {
       cbn in H12.
       apply Bool.not_false_iff_true in H12.
       apply H12.
-      apply (rngl_ltb_ge Hor).
+      apply rngl_ltb_ge.
       apply rngl_cos_bound.
     }
     apply (rngl_leb_gt Hor) in Hs2z, Hzs2.
