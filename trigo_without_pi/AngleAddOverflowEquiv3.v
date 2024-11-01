@@ -21,31 +21,33 @@ Definition angle_add_not_overflow3 θ1 θ2 :=
 Definition angle_add_overflow3 θ1 θ2 :=
   if (θ2 =? 0)%A then false else (- θ2 ≤? θ1)%A.
 
-(* to be completed
-Theorem glop :
+Theorem angle_add_not_ov3_not :
+  rngl_has_eq_dec T = true →
   ∀ θ1 θ2, angle_add_not_overflow3 θ1 θ2 ↔ angle_add_overflow3 θ1 θ2 = false.
 Proof.
+intros Hed.
 intros.
 progress unfold angle_add_overflow3.
 progress unfold angle_add_not_overflow3.
+remember (θ2 =? 0)%A as tz eqn:Htz.
+symmetry in Htz.
 split; intros H12. {
   destruct H12 as [H12| H12]. {
     subst θ2; cbn.
-    progress unfold angle_eqb.
-    cbn.
-    rewrite rngl_eqb_refl.
-About rngl_eqb_refl.
-...
-Search ((_ =? _)%A = true).
-    rewrite angle_eq_refl.
-  intros H21.
-  destruct H12 as [H12| H12]; [ easy | ].
-  destruct H21 as (H2z, H21).
-  now apply angle_nlt_ge in H21.
-} {
-  Search (not (_ ∧ _)).
-...
-*)
+    progress unfold angle_eqb in Htz.
+    do 2 rewrite (rngl_eqb_refl Hed) in Htz.
+    cbn in Htz.
+    now subst tz.
+  }
+  destruct tz; [ easy | ].
+  now apply angle_leb_gt.
+}
+destruct tz. {
+  apply angle_eqb_eq in Htz.
+  now left.
+}
+now apply angle_leb_gt in H12; right.
+Qed.
 
 (* not working
 Definition angle_add_overflow3 θ1 θ2 :=
