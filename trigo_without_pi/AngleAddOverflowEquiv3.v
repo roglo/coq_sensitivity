@@ -18,6 +18,94 @@ Context {ac : angle_ctx T}.
 Definition angle_add_overflow3 θ1 θ2 :=
   ((θ1 ≠? 0)%A && (- θ1 ≤? θ2)%A)%bool.
 
+(* to be completed
+Theorem angle_add_overflow_equiv3 :
+  ∀ θ1 θ2,
+  angle_add_overflow θ1 θ2 = angle_add_overflow3 θ1 θ2.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite (H1 θ1), (H1 θ2).
+  rewrite angle_add_overflow_0_l; symmetry.
+  progress unfold angle_add_overflow3.
+  progress unfold angle_eqb.
+  cbn.
+  rewrite (proj2 (rngl_eqb_eq Hed _ 1%L) eq_refl).
+  rewrite (proj2 (rngl_eqb_eq Hed _ 0%L) eq_refl).
+  easy.
+}
+intros.
+progress unfold angle_add_overflow.
+progress unfold angle_add_overflow3.
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1. {
+  cbn.
+  apply angle_eqb_eq in Hz1.
+  subst θ1.
+  rewrite angle_add_0_l.
+  apply Bool.not_true_iff_false.
+  apply angle_nlt_ge.
+  apply angle_nonneg.
+}
+apply angle_eqb_neq in Hz1.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+cbn - [ angle_add ].
+rewrite (rngl_leb_opp_r Hop Hor).
+rewrite (rngl_opp_0 Hop).
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (rngl_sin θ1 ≤? 0)%L as s1z eqn:Hs1z.
+symmetry in Hzs1, Hs1z.
+move s1z before zs1.
+destruct zs1. {
+  destruct s1z. {
+    apply rngl_leb_le in Hzs1, Hs1z.
+    apply (rngl_le_antisymm Hor) in Hzs1; [ clear Hs1z | easy ].
+    apply eq_rngl_sin_0 in Hzs1.
+    destruct Hzs1; [ easy | subst θ1 ].
+    clear Hz1.
+    rewrite rngl_sin_add_straight_l.
+    rewrite rngl_cos_add_straight_l.
+    cbn.
+    rewrite (rngl_leb_opp_r Hop Hor).
+    rewrite (rngl_opp_0 Hop).
+    remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+    remember (rngl_sin θ2 ≤? 0)%L as s2z eqn:Hs2z.
+    symmetry in Hzs2, Hs2z.
+    move s2z before zs2.
+    destruct zs2. {
+      destruct s2z. {
+        apply rngl_leb_le in Hzs2, Hs2z.
+        apply (rngl_le_antisymm Hor) in Hzs2; [ clear Hs2z | easy ].
+        apply eq_rngl_sin_0 in Hzs2.
+        destruct Hzs2; subst θ2; cbn. {
+          transitivity false. {
+            apply (rngl_ltb_ge Hor).
+            apply (rngl_le_refl Hor).
+          } {
+            symmetry.
+            apply (rngl_leb_gt Hor).
+            apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+          }
+        }
+        cbn.
+        rewrite (rngl_opp_involutive Hop).
+        transitivity true. {
+          apply rngl_ltb_lt.
+          apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
+        } {
+          symmetry.
+          apply rngl_leb_le.
+          apply (rngl_le_refl Hor).
+        }
+      }
+      symmetry.
+...
+*)
+
 Definition angle_add_not_overflow3 θ1 θ2 :=
   θ2 = 0%A ∨ (θ1 < -θ2)%A.
 
