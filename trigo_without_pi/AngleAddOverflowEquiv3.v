@@ -134,6 +134,37 @@ destruct zs1. {
       apply rngl_leb_le in Hzs1, Hzs2, Hzs12.
       apply (rngl_leb_gt Hor) in Hs1z.
       apply rngl_ltb_ge.
+      apply rngl_cos_add_le_cos; [ | easy | easy | easy ].
+      left.
+      intros H; subst θ1.
+      cbn in Hs1z.
+      now apply (rngl_lt_irrefl Hor) in Hs1z.
+    }
+    apply rngl_leb_le in Hzs1, Hzs12.
+    apply (rngl_leb_gt Hor) in Hs1z, Hzs2.
+(*
+    remember (rngl_cos θ1 <? rngl_cos (θ1 + θ2))%L as c1c12 eqn:Hc1c12.
+    symmetry in Hc1c12.
+    symmetry.
+    destruct c1c12. {
+      apply rngl_ltb_lt in Hc1c12.
+      apply rngl_leb_le.
+Search (rngl_cos _ < rngl_cos (_ + _) → _)%L.
+...
+*)
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+      remember (rngl_cos θ1 ≤? rngl_cos θ2)%L as c12 eqn:Hc12.
+      symmetry in Hc12.
+      destruct c12. {
+        apply rngl_leb_le in Hc12.
+        apply rngl_ltb_lt.
+        apply quadrant_1_quadrant_4_cos_lt_cos_add; try easy.
+        now apply (rngl_le_trans Hor _ (rngl_cos θ1)).
+      }
+      apply (rngl_leb_gt Hor) in Hc12.
+      apply rngl_ltb_ge.
+Search (_ → rngl_cos (_ + _) ≤ rngl_cos _)%L.
+      apply rngl_cos_add_le_cos; try easy.
 ...
 *)
 
