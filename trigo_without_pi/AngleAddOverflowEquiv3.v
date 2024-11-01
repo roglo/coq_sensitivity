@@ -168,20 +168,49 @@ Search (rngl_cos _ < rngl_cos (_ + _) → _)%L.
         apply Hc12.
       }
       destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+        change_angle_opp θ2.
+        progress sin_cos_opp_hyp T Hzs2.
+        progress sin_cos_opp_hyp T Hzs12.
+        progress sin_cos_opp_hyp T Hc12.
+        progress sin_cos_opp_hyp T Hzc2.
+        progress sin_cos_opp_goal T.
+        rewrite rngl_cos_opp.
+Search (_ → rngl_cos _ ≤ rngl_cos _)%L.
+...
+        apply rngl_cos_decr.
+...
+        rewrite rngl_cos_sub_comm.
+        apply quadrant_1_sin_sub_nonneg_cos_le; try easy.
+Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
+...
+        change_angle_add_r θ2 angle_straight.
+        progress sin_cos_add_sub_straight_hyp T Hzs2.
+        progress sin_cos_add_sub_straight_hyp T Hzs12.
+        progress sin_cos_add_sub_straight_hyp T Hc12.
+        progress sin_cos_add_sub_straight_hyp T Hzc2.
+        progress sin_cos_add_sub_straight_goal T.
+        cbn.
+...
         change_angle_add_r θ2 angle_right.
         progress sin_cos_add_sub_right_hyp T Hzs2.
         progress sin_cos_add_sub_right_hyp T Hzc2.
         progress sin_cos_add_sub_right_hyp T Hzs12.
         progress sin_cos_add_sub_right_hyp T Hc12.
         progress sin_cos_add_sub_right_goal T.
+        apply (rngl_lt_le_incl Hor) in Hzs2.
+Search (_ → rngl_sin _ ≤ rngl_sin _)%L.
 ...
-      change_angle_add_r θ2 angle_straight.
-      progress sin_cos_add_sub_straight_hyp T Hzs2.
-      progress sin_cos_add_sub_straight_hyp T Hzs12.
-      progress sin_cos_add_sub_straight_hyp T Hc12.
-      progress sin_cos_add_sub_straight_hyp T Hzc2.
-      progress sin_cos_add_sub_straight_goal T.
-      cbn.
+        apply rngl_sin_sub_nonneg_sin_le_sin; try easy.
+        rewrite angle_sub_add_distr.
+        rewrite angle_sub_sub_swap.
+        rewrite angle_sub_diag.
+        rewrite angle_sub_0_l.
+        cbn.
+        apply (rngl_nle_gt Hor) in Hcc.
+        apply Hcc; clear Hcc; cbn.
+        apply rngl_cos_bound.
+Search (_ → rngl_sin (_ + _) ≤ rngl_sin _)%L.
+...
 ...
 ...
 Search (_ → rngl_cos _ < rngl_cos (_ + _))%L.
