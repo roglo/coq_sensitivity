@@ -3310,22 +3310,6 @@ destruct saz. {
 }
 Qed.
 
-Theorem rngl_sin_add_nonneg :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sin θ1)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_sin (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hzs1 Hzs2 Hcs1 Hcs2.
-cbn.
-apply (rngl_add_nonneg_nonneg Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-Qed.
-
 Theorem rngl_1_add_cos_div_2_nonneg :
   ∀ θ, (0 ≤ (1 + rngl_cos θ) / 2)%L.
 Proof.

@@ -4,6 +4,7 @@ Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
 Require Import TacChangeAngle.
 Require Export AngleAddLeMonoL_prop.
+Require Export AngleLeSubAdd.
 
 Section a.
 

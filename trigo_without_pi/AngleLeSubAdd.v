@@ -21,6 +21,40 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
 
+Theorem rngl_sin_add_nonneg :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L.
+Proof.
+destruct_ac.
+intros * Hzs1 Hzs2 Hcs1 Hcs2.
+cbn.
+apply (rngl_add_nonneg_nonneg Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_mul_nonneg_nonneg Hop Hor).
+Qed.
+
+Theorem rngl_cos_add_nonneg :
+  ∀ θ1 θ2,
+  (rngl_sin θ1 < 0)%L
+  → (0 ≤ rngl_sin θ2)%L
+  → (0 ≤ rngl_cos θ1)%L
+  → (0 ≤ rngl_cos θ2)%L
+  → (0 ≤ rngl_cos (θ1 + θ2))%L.
+Proof.
+destruct_ac.
+intros * Hs1z Hzs2 Hzc1 Hzc2.
+change_angle_add_r θ1 angle_right.
+progress sin_cos_add_sub_right_hyp T Hs1z.
+progress sin_cos_add_sub_right_hyp T Hzc1.
+progress sin_cos_add_sub_right_goal T.
+apply (rngl_lt_le_incl Hor) in Hs1z.
+now apply rngl_sin_add_nonneg.
+Qed.
+
 Theorem rngl_sin_sub_lt_sin_l :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L

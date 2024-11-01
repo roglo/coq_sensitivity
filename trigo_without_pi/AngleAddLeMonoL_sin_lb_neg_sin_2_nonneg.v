@@ -4,6 +4,7 @@ Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
 Require Import TacChangeAngle.
 Require Export AngleAddLeMonoL_prop.
+Require Export AngleLeSubAdd.
 
 Section a.
 
@@ -47,24 +48,6 @@ progress unfold angle_ltb; cbn.
 rewrite (rngl_leb_refl Hor).
 apply rngl_ltb_lt.
 apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
-Qed.
-
-Theorem rngl_cos_add_nonneg :
-  ∀ θ1 θ2,
-  (rngl_sin θ1 < 0)%L
-  → (0 ≤ rngl_sin θ2)%L
-  → (0 ≤ rngl_cos θ1)%L
-  → (0 ≤ rngl_cos θ2)%L
-  → (0 ≤ rngl_cos (θ1 + θ2))%L.
-Proof.
-destruct_ac.
-intros * Hs1z Hzs2 Hzc1 Hzc2.
-change_angle_add_r θ1 angle_right.
-progress sin_cos_add_sub_right_hyp T Hs1z.
-progress sin_cos_add_sub_right_hyp T Hzc1.
-progress sin_cos_add_sub_right_goal T.
-apply (rngl_lt_le_incl Hor) in Hs1z.
-now apply rngl_sin_add_nonneg.
 Qed.
 
 Theorem angle_add_le_mono_l_sin_lb_neg_sin_2_nonneg :
