@@ -13,4 +13,4 @@ RealLike.vo RealLike.glob RealLike.v.beautified RealLike.required_vo: RealLike.v
 SeqAngleIsCauchy.vo SeqAngleIsCauchy.glob SeqAngleIsCauchy.v.beautified SeqAngleIsCauchy.required_vo: SeqAngleIsCauchy.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo TrigoWithoutPi.vo TrigoWithoutPiExt.vo AngleDiv2Add.vo AngleAddLeMonoL.vo
 TacChangeAngle.vo TacChangeAngle.glob TacChangeAngle.v.beautified TacChangeAngle.required_vo: TacChangeAngle.v ../main/RingLike.vo TrigoWithoutPi.vo
 TrigoWithoutPi.vo TrigoWithoutPi.glob TrigoWithoutPi.v.beautified TrigoWithoutPi.required_vo: TrigoWithoutPi.v ../main/Misc1.vo ../main/RingLike.vo RealLike.vo
-TrigoWithoutPiExt.vo TrigoWithoutPiExt.glob TrigoWithoutPiExt.v.beautified TrigoWithoutPiExt.required_vo: TrigoWithoutPiExt.v ../main/Misc1.vo ../main/RingLike.vo TrigoWithoutPi.vo AngleLeSubAdd.vo RealLike.vo TacChangeAngle.vo
+TrigoWithoutPiExt.vo TrigoWithoutPiExt.glob TrigoWithoutPiExt.v.beautified TrigoWithoutPiExt.required_vo: TrigoWithoutPiExt.v ../main/Misc1.vo ../main/RingLike.vo TrigoWithoutPi.vo RealLike.vo TacChangeAngle.vo
