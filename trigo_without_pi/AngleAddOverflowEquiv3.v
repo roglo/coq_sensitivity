@@ -223,6 +223,42 @@ destruct zs1. {
         now apply (rngl_nlt_ge Hor) in Hzs12.
       }
       apply (rngl_nle_gt Hor) in Hzc2.
+      change_angle_add_r θ2 angle_straight.
+      rewrite angle_sub_sub_distr in Hzs12 |-*.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hc12.
+      progress sin_cos_add_sub_straight_hyp T Hzs2.
+      progress sin_cos_add_sub_straight_hyp T Hzc2.
+      progress sin_cos_add_sub_straight_goal T.
+      apply (rngl_add_nonneg_pos Hor); [ | easy ].
+      apply (rngl_lt_le_incl Hor) in Hzs2, Hzc1, Hzc2.
+      now apply rngl_cos_sub_nonneg.
+    }
+    apply (rngl_nle_gt Hor) in Hzc1.
+    apply (rngl_leb_gt Hor) in Hc12.
+    apply rngl_ltb_ge.
+    change_angle_sub_r θ1 angle_right.
+    progress sin_cos_add_sub_right_hyp T Hzs12.
+    progress sin_cos_add_sub_right_hyp T Hs1z.
+    progress sin_cos_add_sub_right_hyp T Hzs1.
+    progress sin_cos_add_sub_right_hyp T Hc12.
+    progress sin_cos_add_sub_right_hyp T Hzc1.
+    progress sin_cos_add_sub_right_goal T.
+...
+    change_angle_add_r θ2 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_hyp T Hc12.
+    progress sin_cos_add_sub_straight_hyp T Hzs2.
+    progress sin_cos_add_sub_straight_goal T.
+...
+Search (rngl_cos _ ≤ rngl_cos _)%L.
+rewrite angle_add_comm.
+apply angle_le_sub_le_add_l_lemma_1; try easy.
+...
+apply angle_add_overflow_le_lemma_2; try easy.
+...
+apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff:
+
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
 now apply (rngl_lt_le_incl Hor) in Hzc1.
