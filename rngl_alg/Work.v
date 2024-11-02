@@ -13,7 +13,6 @@ Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.SeqAngleIsCauchy.
 Require Import Trigo.AngleAddOverflowEquiv3.
 Require Import Trigo.AngleDiv2Add.
-Require Import Trigo.AngleLeSubAdd.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Misc.

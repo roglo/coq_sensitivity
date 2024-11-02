@@ -5,7 +5,6 @@ Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi.
 Require Import TrigoWithoutPiExt.
-Require Import AngleLeSubAdd.
 Require Import TacChangeAngle.
 
 Section a.

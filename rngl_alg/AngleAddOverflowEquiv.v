@@ -4,7 +4,7 @@ Require Import Utf8 ZArith.
 Require Import Main.RingLike.
 Require Import Trigo.RealLike Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddOverflowLe Trigo.AngleAddLeMonoL.
-Require Import Trigo.AngleLeSubAdd Trigo.AngleDiv2Add.
+Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.TacChangeAngle.
 Require Import Complex.
 

@@ -10,7 +10,6 @@ Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleAddOverflowLe.
-Require Export Trigo.AngleLeSubAdd.
 Require Import Complex.
 
 Section a.
