@@ -262,6 +262,15 @@ now apply (rngl_lt_iff Hor) in Hab.
 Qed.
 
 Theorem rngl_nle_gt :
+  ∀ a b, (b < a → ¬ (a ≤ b))%L.
+Proof.
+intros * Hab H1.
+progress unfold rngl_lt in Hab.
+progress unfold rngl_le in H1.
+destruct rngl_opt_leb as [leb| ]; [ congruence | easy ].
+Qed.
+
+Theorem rngl_nle_gt_iff :
   rngl_is_ordered T = true →
   ∀ a b, (¬ (a ≤ b) ↔ b < a)%L.
 Proof.
@@ -287,7 +296,7 @@ intros Hor *.
 split; intros Hab. {
   destruct (rngl_le_dec Hor b a) as [H1| H1]; [ easy | ].
   exfalso; apply Hab.
-  now apply (rngl_nle_gt Hor).
+  now apply (rngl_nle_gt_iff Hor).
 } {
   intros H1.
   apply (rngl_lt_iff Hor) in H1.
@@ -307,7 +316,7 @@ split. {
   now apply (rngl_lt_le_incl Hor).
 } {
   intros H; subst c.
-  now apply (rngl_nle_gt Hor) in Hab.
+  now apply rngl_nle_gt in Hab.
 }
 Qed.
 
@@ -322,7 +331,7 @@ split. {
   now apply (rngl_lt_le_incl Hor).
 } {
   intros H; subst c.
-  now apply (rngl_nle_gt Hor) in Hbc.
+  now apply rngl_nle_gt in Hbc.
 }
 Qed.
 
@@ -349,7 +358,7 @@ split; intros Hab. {
 } {
   apply rngl_leb_nle.
   intros H1.
-  now apply (rngl_nle_gt Hor) in Hab.
+  now apply rngl_nle_gt in Hab.
 }
 Qed.
 
@@ -734,12 +743,12 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
     left.
     now apply (rngl_le_antisymm Hor).
   }
-  apply (rngl_nle_gt Hor) in Hba.
+  apply (rngl_nle_gt_iff Hor) in Hba.
   right.
   intros H; subst b.
   now apply (rngl_lt_irrefl Hor) in Hba.
 }
-apply (rngl_nle_gt Hor) in Hab.
+apply (rngl_nle_gt_iff Hor) in Hab.
 right.
 intros H; subst b.
 now apply (rngl_lt_irrefl Hor) in Hab.
@@ -825,7 +834,7 @@ destruct ab. {
     apply rngl_leb_le in Halb.
     split; [ easy | ].
     intros H.
-    now apply (rngl_nle_gt Hor) in H.
+    now apply rngl_nle_gt in H.
   } {
     now apply (rngl_leb_gt Hor) in Halb.
   }

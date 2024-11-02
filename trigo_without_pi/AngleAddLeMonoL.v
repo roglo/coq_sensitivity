@@ -32,11 +32,11 @@ intros * Haov13 H23.
 destruct (rngl_le_dec Hor 0 (rngl_sin (θ1 + θ2))) as [Hzs12| Hzs12]. {
   now apply angle_add_le_mono_l_sin_lb_nonneg.
 }
-apply (rngl_nle_gt Hor) in Hzs12.
+apply (rngl_nle_gt_iff Hor) in Hzs12.
 destruct (rngl_le_dec Hor 0 (rngl_sin θ2)) as [Hzs2| Hzs2]. {
   now apply angle_add_le_mono_l_sin_lb_neg_sin_2_nonneg.
 } {
-  apply (rngl_nle_gt Hor) in Hzs2.
+  apply (rngl_nle_gt_iff Hor) in Hzs2.
   now apply angle_add_le_mono_l_sin_lb_neg_sin_2_neg.
 }
 Qed.

@@ -751,7 +751,7 @@ induction i; intros; cbn. {
 destruct j. {
   split; [ easy | cbn ].
   intros H; exfalso.
-  apply (rngl_nle_gt Hor) in H; apply H; clear H.
+  apply rngl_nle_gt in H; apply H; clear H.
   eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Haz | ].
   apply (rngl_le_add_r Hor).
   clear IHi.
@@ -1007,7 +1007,7 @@ destruct az. {
   apply rngl_leb_le in Haz.
   destruct bz. {
     apply rngl_leb_le in Hbz.
-    apply (rngl_nle_gt Hor) in Habz.
+    apply rngl_nle_gt in Habz.
     exfalso; apply Habz; clear Habz.
     rewrite <- rngl_add_0_r.
     now apply (rngl_add_le_compat Hor).
@@ -1185,14 +1185,14 @@ specialize (H1 a b Ha).
 destruct H1 as (m, Hm).
 induction m. {
   exfalso; cbn in Hm.
-  apply (rngl_nle_gt Hor) in Hm.
+  apply rngl_nle_gt in Hm.
   apply Hm; clear Hm.
   now apply (rngl_le_trans Hor _ a); apply (rngl_lt_le_incl Hor).
 }
 destruct (rngl_le_dec Hor (rngl_mul_nat a m) b) as [Hba| Hba]. {
   now exists m; rewrite Nat.add_1_r.
 }
-apply (rngl_nle_gt Hor) in Hba.
+apply (rngl_nle_gt_iff Hor) in Hba.
 now apply IHm.
 Qed.
 

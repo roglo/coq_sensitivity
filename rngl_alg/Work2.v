@@ -870,19 +870,19 @@ rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_lt_mul_0_if Hop Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
-  exfalso; apply (rngl_nle_gt Hor) in H; apply H.
+  exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hop Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
-  exfalso; apply (rngl_nle_gt Hor) in H; apply H.
+  exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hop Hor).
 }
 apply (rngl_lt_mul_0_if Hop Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(H, _)| (_, Hzs21)]. {
-  now apply (rngl_nle_gt Hor) in H.
+  now apply rngl_nle_gt in H.
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
-  now apply (rngl_nle_gt Hor) in H.
+  now apply rngl_nle_gt in H.
 }
 do 2 rewrite rngl_cos_mul_2_l' in H12.
 apply (rngl_sub_le_mono_r Hop Hor) in H12.
@@ -976,7 +976,7 @@ destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
-  exfalso; apply (rngl_nle_gt Hor) in H; apply H.
+  exfalso; apply rngl_nle_gt in H; apply H.
   apply (rngl_0_le_2 Hon Hop Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21.
@@ -990,7 +990,7 @@ destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
 destruct Hzs22 as [(H1, _)| (_, Hzs22)]. {
-  now apply (rngl_nle_gt Hor) in H1.
+  now apply rngl_nle_gt in H1.
 }
 apply (rngl_lt_le_incl Hor) in Hzs22.
 now apply (rngl_le_trans Hor _ 0).
@@ -1011,7 +1011,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
     now apply quadrant_1_rngl_cos_add_le_cos_l.
   }
-  apply (rngl_nle_gt Hor) in Hzc2.
+  apply (rngl_nle_gt_iff Hor) in Hzc2.
   change_angle_sub_r θ2 angle_right.
   progress sin_cos_add_sub_right_hyp T Hs2.
   progress sin_cos_add_sub_right_hyp T Hzc2.
@@ -1020,7 +1020,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
   apply (rngl_lt_le_incl Hor) in Hzc2.
   apply rngl_sin_add_nonneg; try easy.
 }
-apply (rngl_nle_gt Hor) in Hzc1.
+apply (rngl_nle_gt_iff Hor) in Hzc1.
 destruct (rngl_eq_dec Heo (rngl_cos θ1) (-1)) as [Hco1| Hco1]. 2: {
   generalize Hzc1; intros H.
   apply (rngl_lt_le_incl Hor) in H.

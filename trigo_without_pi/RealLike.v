@@ -302,7 +302,7 @@ rewrite (rngl_squ_sqrt Hon) in H2. 2: {
   now apply (rngl_le_trans Hor _ a).
 }
 rewrite (rngl_squ_sqrt Hon) in H2; [ | easy ].
-now apply (rngl_nle_gt Hor) in Hab.
+now apply rngl_nle_gt in Hab.
 Qed.
 
 Theorem rl_sqrt_lt_rl_sqrt :
@@ -315,7 +315,7 @@ Theorem rl_sqrt_lt_rl_sqrt :
   → (√ a < √ b)%L.
 Proof.
 intros Hon Hop Hor * Ha Hab.
-apply (rngl_nle_gt Hor).
+apply (rngl_nle_gt_iff Hor).
 intros H1.
 specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
 specialize (H2 √b √b √a √a)%L.
@@ -332,7 +332,7 @@ rewrite (rngl_squ_sqrt Hon) in H2. 2: {
   now apply (rngl_lt_le_incl Hor).
 }
 rewrite (rngl_squ_sqrt Hon) in H2; [ | easy ].
-now apply (rngl_nle_gt Hor) in Hab.
+now apply rngl_nle_gt in Hab.
 Qed.
 
 Theorem rl_sqrt_pos :

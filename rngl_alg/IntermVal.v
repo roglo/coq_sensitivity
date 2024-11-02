@@ -739,7 +739,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
     assert (H : ((a + b) / 2 ≤ x ≤ b)%L) by easy.
     now specialize (H2 H Hx _ _ Habn); clear H.
   }
-  apply (rngl_nle_gt Hor) in Habx.
+  apply (rngl_nle_gt_iff Hor) in Habx.
   destruct H1 as (z & Hz).
   specialize (H2 z Hs).
   assert (Hpz : P z). {
@@ -1126,7 +1126,7 @@ assert (Hfu : ∀ x, (a ≤ x < rngl_min (a + η) b → f x < u)%L). {
     }
     now apply (rngl_le_lt_trans Hor _ (f a)).
   }
-  apply (rngl_nle_gt Hor) in Hfxa.
+  apply (rngl_nle_gt_iff Hor) in Hfxa.
   progress unfold rngl_dist in H2.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in H2. 2: {
      apply (rngl_le_0_sub Hop Hor).
@@ -1222,7 +1222,7 @@ assert (Hfu : ∀ x, (rngl_max a (b - η) < x ≤ b → u < f x)%L). {
     rewrite (rngl_opp_sub_distr Hop) in H2.
     now apply (rngl_sub_lt_mono_l Hop Hor) in H2.
   }
-  apply (rngl_nle_gt Hor) in Hfxb.
+  apply (rngl_nle_gt_iff Hor) in Hfxb.
   now apply (rngl_lt_trans Hor _ (f b)).
 }
 intros H.

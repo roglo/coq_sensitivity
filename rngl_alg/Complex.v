@@ -813,7 +813,7 @@ split. {
     }
     now apply rl_sqrt_nonneg.
   } {
-    apply (rngl_nle_gt Hor) in Hzx.
+    apply (rngl_nle_gt_iff Hor) in Hzx.
     apply (rngl_opp_lt_compat Hop Hor) in Hzx.
     rewrite (rngl_opp_0 Hop) in Hzx.
     rewrite <- (rngl_squ_opp Hop).
@@ -843,7 +843,7 @@ split. {
     apply (le_rl_sqrt_add Hon Hop Hiv Hor).
     apply (rngl_squ_nonneg Hop Hor).
   } {
-    apply (rngl_nle_gt Hor) in Hzx.
+    apply (rngl_nle_gt_iff Hor) in Hzx.
     apply (rngl_le_trans Hor _ 0). {
       now apply (rngl_lt_le_incl Hor).
     }
@@ -1884,7 +1884,7 @@ destruct zs. {
     rewrite Hc.
     apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
   }
-  apply (rngl_nle_gt Hor) in H1.
+  apply rngl_nle_gt in H1.
   apply H1; clear H1.
   rewrite Ha.
   apply rl_sqrt_nonneg.
@@ -2366,7 +2366,7 @@ destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ | easy ].
   apply (rngl_0_le_2 Hon Hop Hor).
 }
-apply (rngl_nle_gt Hor) in H2cz.
+apply (rngl_nle_gt_iff Hor) in H2cz.
 apply (rngl_le_trans Hor _ 0)%L. 2: {
   apply (rngl_0_le_1 Hon Hop Hor).
 }

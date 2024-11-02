@@ -170,7 +170,7 @@ split. {
     now apply (rngl_lt_le_incl Hor) in Hca.
   }
   apply (rngl_sub_lt_mono_r Hop Hor) in HN.
-  now apply (rngl_nle_gt Hor) in HN.
+  now apply rngl_nle_gt in HN.
 } {
   apply (rngl_nlt_ge Hor).
   intros Hbc.
@@ -191,7 +191,7 @@ split. {
   }
   rewrite (rngl_opp_sub_distr Hop) in HN.
   apply (rngl_sub_lt_mono_l Hop Hor) in HN.
-  now apply (rngl_nle_gt Hor) in HN.
+  now apply rngl_nle_gt in HN.
 }
 Qed.
 

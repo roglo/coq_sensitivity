@@ -137,7 +137,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   }
   now apply (H1 _ _ Hzs12 Hzs3 H Hzc3).
 }
-apply (rngl_nle_gt Hor) in Hc3z.
+apply (rngl_nle_gt_iff Hor) in Hc3z.
 change_angle_sub_r θ3 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs3.
 progress sin_cos_add_sub_right_hyp T Hc123.
@@ -150,7 +150,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   apply (rngl_lt_le_incl Hor) in Hc3z.
   now apply (rngl_sin_add_nonneg).
 }
-apply (rngl_nle_gt Hor) in Hc1z.
+apply (rngl_nle_gt_iff Hor) in Hc1z.
 change_angle_sub_r θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
 progress sin_cos_add_sub_right_hyp T Hzs12.
@@ -212,7 +212,7 @@ destruct (rngl_le_dec Hor (rngl_cos θ1) (rngl_cos (θ2 + θ3)))
   rewrite (rngl_mul_comm Hic).
   now apply (rngl_mul_le_mono_nonneg_l Hop Hor).
 }
-apply (rngl_nle_gt Hor) in Hc231.
+apply (rngl_nle_gt_iff Hor) in Hc231.
 move Hc231 before Hs123.
 specialize rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff as H1.
 apply (rngl_lt_le_incl Hor) in Hc1z, Hc231.

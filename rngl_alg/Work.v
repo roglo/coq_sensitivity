@@ -225,7 +225,7 @@ destruct zs. {
   subst x; apply rngl_cos_bound.
 }
 apply (rngl_leb_gt Hor) in Hzs.
-apply (rngl_nle_gt Hor) in Hzs.
+apply rngl_nle_gt in Hzs.
 exfalso.
 apply Hzs; clear Hzs.
 destruct i; [ cbn in Hni; flia Hni Hmi | ].
@@ -1024,7 +1024,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
     split; [ now apply angle_right_div_2_lt | ].
     now apply quadrant_1_angle_lt_3_angle_right_div_2.
   } {
-    apply (rngl_nle_gt Hor) in Hc.
+    apply (rngl_nle_gt_iff Hor) in Hc.
     rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
       now apply (rngl_lt_le_incl Hor) in Hc.
     }
@@ -1035,7 +1035,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
     }
   }
 } {
-  apply (rngl_nle_gt Hor) in Hs.
+  apply (rngl_nle_gt_iff Hor) in Hs.
   rewrite (rngl_abs_nonpos_eq Hop Hor (rngl_sin _)) in Hcz. 2: {
     now apply (rngl_lt_le_incl Hor) in Hs.
   }
@@ -1048,7 +1048,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ)) as [Hs| Hs]. {
       now apply quadrant_4_angle_lt_7_angle_right_div_2.
     }
   }
-  apply (rngl_nle_gt Hor) in Hc.
+  apply (rngl_nle_gt_iff Hor) in Hc.
   rewrite (rngl_abs_nonpos_eq Hop Hor) in Hcz. 2: {
     now apply (rngl_lt_le_incl Hor) in Hc.
   }
@@ -1124,7 +1124,7 @@ apply (rngl_le_antisymm Hor) in Hzs1; [ | easy ].
 apply eq_rngl_sin_0 in Hzs1.
 destruct Hzs1; subst θ1; [ easy | ].
 apply rngl_ltb_lt in H12.
-apply (rngl_nle_gt Hor) in H12.
+apply rngl_nle_gt in H12.
 apply H12, rngl_cos_bound.
 Qed.
 
@@ -1150,7 +1150,7 @@ destruct Hsz as [(H2sz, Hzc)| (Hz2s, Hcz)]. {
   apply (rngl_lt_mul_0_if Hop Hor) in H2sz.
   destruct H2sz as [(H, _)| (_, Hcz)]. {
     exfalso.
-    apply (rngl_nle_gt Hor) in H.
+    apply rngl_nle_gt in H.
     apply H; clear H.
     apply (rngl_0_le_2 Hon Hop Hor).
   }
