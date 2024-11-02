@@ -205,7 +205,24 @@ destruct zs1. {
         progress sin_cos_opp_hyp T Hc12.
         progress sin_cos_opp_hyp T Hzc2.
         rewrite angle_sub_opp_r in Hzs12 |-*.
-Search (rngl_cos _ < rngl_cos _)%L.
+        apply (rngl_lt_iff Hor).
+        split. {
+          apply (rngl_lt_le_incl Hor) in Hzs2, Hzc1.
+          now apply quadrant_1_rngl_cos_add_le_cos_l.
+        }
+        intros H.
+        apply rngl_cos_eq in H.
+        destruct H as [H1| H1]. {
+          apply angle_add_move_l in H1.
+          rewrite angle_sub_diag in H1; subst θ2.
+          cbn in Hzs2.
+          now apply (rngl_lt_irrefl Hor) in Hzs2.
+        }
+        rewrite H1 in Hzs12; cbn in Hzs12.
+        apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs12.
+        now apply (rngl_nlt_ge Hor) in Hzs12.
+      }
+      apply (rngl_nle_gt Hor) in Hzc2.
 ...
 apply rngl_cos_cos_sin_sin_nonneg_sin_lt_cos_lt_iff; try easy.
 now apply (rngl_lt_le_incl Hor) in Hzc1.
