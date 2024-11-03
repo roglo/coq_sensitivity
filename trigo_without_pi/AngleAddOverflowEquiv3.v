@@ -24,6 +24,7 @@ Theorem angle_add_overflow_equiv3 :
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_eq_dec_or_is_ordered_l Hed) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   intros.
@@ -188,7 +189,6 @@ destruct zs1. {
       apply rngl_leb_le in Hc12.
       apply rngl_ltb_lt.
       apply (rngl_nle_gt_iff Hor) in Hzc1.
-(**)
       change_angle_sub_l θ1 angle_straight.
       progress sin_cos_add_sub_straight_hyp T Hzs12.
       progress sin_cos_add_sub_straight_hyp T Hs1z.
@@ -364,8 +364,109 @@ destruct s1z. {
       now apply rngl_nle_gt in Hzs1.
     }
     apply (rngl_nle_gt_iff Hor) in Hzc1.
+    change_angle_add_r θ1 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_hyp T Hs1z.
+    progress sin_cos_add_sub_straight_hyp T Hzs1.
+    progress sin_cos_add_sub_straight_hyp T Hzc1.
+    progress sin_cos_add_sub_straight_goal T.
+    destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+      apply (rngl_nlt_ge Hor).
+      intros Hc21.
+      apply (rngl_nlt_ge Hor) in Hzs12.
+      apply Hzs12; clear Hzs12.
+      apply (rngl_lt_iff Hor).
+      split. {
+        apply (rngl_lt_le_incl Hor) in Hzc1.
+        now apply rngl_sin_add_nonneg.
+      }
+      intros H; symmetry in H.
+      apply eq_rngl_sin_0 in H.
+      destruct H as [H1| H1]. {
+        apply -> angle_add_move_0_r in H1; subst θ1.
+        apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
+        now apply rngl_nle_gt in Hzs1.
+      }
+      apply angle_add_move_r in H1; subst θ1.
+      rewrite rngl_cos_sub_straight_l in Hzc1.
+      apply (rngl_opp_pos_neg Hop Hor) in Hzc1.
+      now apply rngl_nle_gt in Hzc1.
+    }
+    apply (rngl_nle_gt_iff Hor) in Hzc2.
+    change_angle_sub_l θ2 angle_straight.
+    progress sin_cos_add_sub_straight_hyp T Hzs12.
+    progress sin_cos_add_sub_straight_hyp T Hs2z.
+    progress sin_cos_add_sub_straight_hyp T Hzc2.
+    progress sin_cos_add_sub_straight_goal T.
+    rewrite (rngl_add_opp_l Hop).
+    apply (rngl_le_sub_0 Hop Hor).
+    apply (rngl_lt_eq_cases Hor).
+    destruct (rngl_eq_dec Heo (rngl_cos θ1) (rngl_cos θ2)) as [Hc12| Hc12]. {
+      now right.
+    }
+    left.
+    apply (rngl_lt_le_incl Hor) in Hzc1, Hzc2.
+    apply quadrant_1_sin_sub_pos_cos_lt; try easy.
+    apply (rngl_lt_iff Hor).
+    split; [ easy | ].
+    intros H; symmetry in H.
+    apply eq_rngl_sin_0 in H.
+    destruct H as [H1| H1]. {
+      now apply -> angle_sub_move_0_r in H1; subst θ2.
+    }
+    apply angle_sub_move_r in H1; subst θ1.
+    rewrite rngl_sin_add_straight_l in Hzs1.
+    apply (rngl_opp_pos_neg Hop Hor) in Hzs1.
+    now apply rngl_nle_gt in Hzs1.
+  }
+  destruct s2z. {
+    remember (rngl_cos θ2 ≤? rngl_cos θ1)%L as c21 eqn:Hc21.
+    symmetry in Hc21.
+    destruct c21. {
+      apply rngl_leb_le in Hs1z, Hs2z, Hc21.
+      apply (rngl_leb_gt Hor) in Hzs1, Hzs12.
+      apply rngl_ltb_lt.
+      destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hzc1]. {
+        change_angle_opp θ1.
+        progress sin_cos_opp_hyp T Hs1z.
+        progress sin_cos_opp_hyp T Hzs1.
+        progress sin_cos_opp_hyp T Hzc1.
+        progress sin_cos_opp_hyp T Hc21.
+        rewrite angle_add_opp_l in Hzs12.
+        rewrite angle_add_opp_l, rngl_cos_opp.
+        destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
+          apply (rngl_nle_gt_iff Hor).
+          intros Hc121.
+          apply rngl_nle_gt in Hzs12.
+          apply Hzs12; clear Hzs12.
+          apply (rngl_lt_le_incl Hor) in Hzs1.
+          now apply rngl_sin_sub_nonneg.
+        }
+        exfalso.
+        apply (rngl_nle_gt_iff Hor) in Hzc2.
+        change_angle_sub_l θ2 angle_straight.
+        rewrite <- angle_sub_add_distr in Hzs12.
+        progress sin_cos_add_sub_straight_hyp T Hzs12.
+        progress sin_cos_add_sub_straight_hyp T Hs2z.
+        progress sin_cos_add_sub_straight_hyp T Hzc2.
+        progress sin_cos_add_sub_straight_hyp T Hc21.
+        apply rngl_nle_gt in Hzs12.
+        apply Hzs12; clear Hzs12.
+        apply (rngl_lt_le_incl Hor) in Hzs1, Hzc2.
+        now apply rngl_sin_add_nonneg.
+      }
+      apply (rngl_nle_gt_iff Hor) in Hzc1.
 ...
-Search (rngl_cos _ ≤ rngl_cos _)%L.
+Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
+Search (rngl_cos (_ - _) < rngl_cos _)%L.
+...
+      apply (rngl_lt_iff Hor).
+      split. {
+Search (rngl_cos (_ + _) ≤ rngl_cos _)%L.
+apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
+...
+quadrant_1_rngl_cos_add_le_cos_l:
+...
 apply rngl_sin_sub_nonneg.
 ...
 apply rngl_cos_decr; try easy.
