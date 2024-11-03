@@ -11,7 +11,6 @@ Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
 Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.SeqAngleIsCauchy.
-Require Import Trigo.AngleAddOverflowEquiv3.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleDiv2Add.

@@ -3,7 +3,6 @@ Require Import Main.RingLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
 Require Import TacChangeAngle.
-Require Import AngleAddOverflowEquiv3.
 
 Section a.
 
