@@ -224,7 +224,8 @@ rewrite <- rngl_mul_assoc.
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 apply (rngl_mul_nonneg_nonneg Hop Hor). {
   rewrite <- angle_div_2_add_not_overflow. 2: {
-    progress unfold angle_add_overflow.
+    rewrite <- angle_add_overflow_equiv3.
+    progress unfold old_angle_add_overflow.
     rewrite angle_add_comm.
     rewrite angle_add_assoc.
     rewrite angle_sub_add.

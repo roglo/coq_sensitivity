@@ -638,7 +638,8 @@ destruct (lt_dec m 2) as [Hm2| Hm2]. {
   now apply angle_add_overflow_pow2_div_mul_pow2_diag.
 }
 apply Nat.nlt_ge in Hm2.
-progress unfold angle_add_overflow.
+rewrite <- angle_add_overflow_equiv3.
+progress unfold old_angle_add_overflow.
 apply Bool.not_true_iff_false.
 apply angle_nlt_ge.
 rewrite angle_add_mul_r_diag_r.
@@ -1069,7 +1070,8 @@ clear Hov; rename H into Hov.
 assert (∀ m, m < n → (θ ≤ θ + m * θ)%A). {
   intros * Hmn.
   specialize (Hov _ Hmn).
-  progress unfold angle_add_overflow in Hov.
+  rewrite <- angle_add_overflow_equiv3 in Hov.
+  progress unfold old_angle_add_overflow in Hov.
   apply Bool.not_true_iff_false in Hov.
   now apply angle_nlt_ge in Hov.
 }

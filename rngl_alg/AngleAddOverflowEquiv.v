@@ -23,7 +23,8 @@ Theorem angle_add_overflow_opp :
   ∀ θ, θ ≠ 0%A → angle_add_overflow θ (- θ) = true.
 Proof.
 intros * Hz.
-progress unfold angle_add_overflow.
+rewrite <- angle_add_overflow_equiv3.
+progress unfold old_angle_add_overflow.
 rewrite angle_add_opp_r.
 rewrite angle_sub_diag.
 apply angle_lt_iff.
@@ -686,7 +687,8 @@ split; intros H12. {
   symmetry in Hzs12d.
   destruct zs12d; [ | easy ].
   apply rngl_leb_le in Hzs12d.
-  progress unfold angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv3.
+  progress unfold old_angle_add_overflow.
   progress unfold angle_ltb.
   remember (0 ≤? rngl_sin (θ1 + θ2))%L as zs12 eqn:Hzs12.
   remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
@@ -872,7 +874,8 @@ split; intros H12. {
       apply (rngl_nlt_ge Hor) in Hzs12d.
       apply Hzs12d; clear Hzs12d.
       rewrite angle_div_2_add_not_overflow. 2: {
-        progress unfold angle_add_overflow.
+        rewrite <- angle_add_overflow_equiv3.
+        progress unfold old_angle_add_overflow.
         progress unfold angle_ltb.
         progress sin_cos_add_sub_right_goal T.
         generalize Hzs1; intros H.
@@ -889,7 +892,8 @@ split; intros H12. {
       }
       rewrite angle_sub_straight_eq_add_straight.
       rewrite angle_div_2_add_not_overflow. 2: {
-        progress unfold angle_add_overflow.
+        rewrite <- angle_add_overflow_equiv3.
+        progress unfold old_angle_add_overflow.
         progress unfold angle_ltb.
         progress sin_cos_add_sub_straight_goal T.
         rewrite (rngl_leb_0_opp Hop Hor).
@@ -1045,7 +1049,8 @@ split; intros H12. {
     intros Hcc.
     specialize (angle_div_2_add_overflow θ1 θ2) as H1.
     assert (H : angle_add_overflow θ1 θ2 = true). {
-      progress unfold angle_add_overflow.
+      rewrite <- angle_add_overflow_equiv3.
+      progress unfold old_angle_add_overflow.
       progress unfold angle_ltb.
       generalize Hzs12; intros H.
       apply (rngl_leb_gt Hor) in H.
@@ -1109,7 +1114,8 @@ split; intros H12. {
         now apply rngl_sin_add_nonneg.
       }
       assert (Haov : angle_add_overflow θ1 θ2 = false). {
-        progress unfold angle_add_overflow.
+        rewrite <- angle_add_overflow_equiv3.
+        progress unfold old_angle_add_overflow.
         progress unfold angle_ltb.
         generalize Hss; intros H.
         apply rngl_leb_le in H.
@@ -1128,7 +1134,8 @@ split; intros H12. {
       rewrite (rngl_opp_0 Hop) in Hzs12d.
       rewrite <- rngl_sin_add_straight_r in Hzs12d.
       rewrite <- rngl_sin_angle_div_2_add_overflow in Hzs12d. 2: {
-        progress unfold angle_add_overflow.
+        rewrite <- angle_add_overflow_equiv3.
+        progress unfold old_angle_add_overflow.
         rewrite angle_add_sub_assoc.
         rewrite angle_add_sub_swap.
         rewrite <- angle_add_sub_assoc.
@@ -1184,7 +1191,8 @@ split; intros H12. {
     rewrite (rngl_opp_0 Hop).
     rewrite <- rngl_sin_add_straight_r.
     rewrite <- angle_div_2_add_overflow. 2: {
-      progress unfold angle_add_overflow.
+      rewrite <- angle_add_overflow_equiv3.
+      progress unfold old_angle_add_overflow.
       rewrite angle_add_assoc.
       rewrite angle_add_add_swap.
       rewrite <- (angle_add_assoc θ1).

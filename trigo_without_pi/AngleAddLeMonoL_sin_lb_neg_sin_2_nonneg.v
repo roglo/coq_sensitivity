@@ -41,7 +41,8 @@ Theorem angle_add_overflow_straight_straight :
 Proof.
 intros Hc1.
 destruct_ac.
-progress unfold angle_add_overflow.
+rewrite <- angle_add_overflow_equiv3.
+progress unfold old_angle_add_overflow.
 rewrite angle_straight_add_straight.
 progress unfold angle_ltb; cbn.
 rewrite (rngl_leb_refl Hor).
@@ -74,6 +75,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_leb_refl Hor).
 }
 intros * Hzs12 Hzs2 Haov13 H23.
+rewrite <- angle_add_overflow_equiv3 in Haov13.
 progress unfold angle_leb in H23.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
@@ -96,7 +98,9 @@ destruct zs3. {
     apply (rngl_nlt_ge Hor).
     intros Hzs12.
     generalize Hzs13; intros Hzs1.
+    rewrite angle_add_overflow_equiv3 in Haov13.
     apply rngl_sin_add_nonneg_sin_nonneg in Hzs1; try easy.
+    rewrite <- angle_add_overflow_equiv3 in Haov13.
     move Hzs1 after Hzs2.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. 2: {
       apply (rngl_nle_gt_iff Hor) in Hc2z.
@@ -128,7 +132,9 @@ destruct zs3. {
       apply rngl_nle_gt in Hc1z.
       apply Hc1z; clear Hc1z.
       apply (rngl_lt_le_incl Hor).
+      rewrite angle_add_overflow_equiv3 in Haov13.
       apply angle_add_not_overflow_comm in Haov13.
+      rewrite <- angle_add_overflow_equiv3 in Haov13.
       clear - ac Hc1 Haov13 Hc3z Hzs1 Hzs3 Hzs13 Hor Hop Hon Hos.
       rename θ1 into θ2; rename θ3 into θ1.
       rename Hzs1 into Hzs2.
@@ -166,7 +172,7 @@ destruct zs3. {
       symmetry in Hzs2.
       apply (eq_rngl_cos_0) in Hzs2.
       destruct Hzs2; subst θ1. {
-        progress unfold angle_add_overflow in Haov12.
+        progress unfold old_angle_add_overflow in Haov12.
         apply Bool.not_true_iff_false in Haov12.
         apply Haov12; clear Haov12.
         rewrite angle_right_add_right.
@@ -238,6 +244,7 @@ destruct zs3. {
       apply (eq_rngl_cos_0) in Hzs12.
       destruct Hzs12; subst θ2. {
         rewrite angle_right_add_right in Haov12.
+        rewrite angle_add_overflow_equiv3 in Haov12.
         now rewrite angle_add_overflow_straight_straight in Haov12.
       }
       apply rngl_nle_gt in Hc2z.
@@ -358,7 +365,8 @@ destruct zs3. {
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
     apply angle_add_le_mono_l_lemma_3; try easy.
-    progress unfold angle_add_overflow.
+    rewrite <- angle_add_overflow_equiv3.
+    progress unfold old_angle_add_overflow.
     progress unfold angle_ltb.
     generalize Hc1z; intros H.
     apply (rngl_lt_le_incl Hor) in H.
@@ -545,7 +553,8 @@ destruct zs3. {
       apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
       apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
       apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-      progress unfold angle_add_overflow.
+      rewrite <- angle_add_overflow_equiv3.
+      progress unfold old_angle_add_overflow.
       progress unfold angle_ltb.
       generalize Hzs13; intros H.
       apply rngl_leb_le in H.
@@ -567,7 +576,8 @@ destruct zs3. {
     progress sin_cos_add_sub_right_goal T.
     apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
     apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-    progress unfold angle_add_overflow.
+    rewrite <- angle_add_overflow_equiv3.
+    progress unfold old_angle_add_overflow.
     progress unfold angle_ltb.
     generalize Hs13z; intros H.
     apply rngl_leb_le in H.
@@ -603,7 +613,8 @@ destruct zs3. {
   apply rngl_sin_add_nonneg; try easy.
   apply rngl_sin_add_nonneg; try easy.
   apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
-  progress unfold angle_add_overflow.
+  rewrite <- angle_add_overflow_equiv3.
+  progress unfold old_angle_add_overflow.
   progress unfold angle_ltb.
   generalize Hs1z; intros H.
   apply (rngl_sin_add_nonneg θ3) in H; try easy.
@@ -632,7 +643,7 @@ destruct zs13. {
       exfalso.
       apply (Bool.not_true_iff_false) in Haov13.
       apply Haov13.
-      progress unfold angle_add_overflow.
+      progress unfold old_angle_add_overflow.
       progress unfold angle_ltb.
       generalize Hzs13; intros H.
       apply rngl_leb_le in H.
@@ -672,6 +683,7 @@ destruct zs13. {
     apply (rngl_nle_gt_iff Hor) in Hs1z.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzc1| Hc1z]. 2: {
       apply (rngl_nle_gt_iff Hor) in Hc1z.
+      rewrite angle_add_overflow_equiv3 in Haov13.
       apply angle_add_not_overflow_comm in Haov13; try easy.
       exfalso.
       apply Bool.not_true_iff_false in Haov13.
@@ -689,6 +701,7 @@ destruct zs13. {
       intros Hzc12.
       apply Bool.not_true_iff_false in Haov13.
       apply Haov13; clear Haov13.
+      rewrite angle_add_overflow_equiv3.
       apply angle_add_le_mono_l_lemma_11; try easy.
       rewrite <- angle_add_sub_swap.
       rewrite rngl_sin_sub_right_r.
@@ -703,7 +716,7 @@ destruct zs13. {
     rename θ into θ2.
     change_angle_add_r θ2 angle_right.
     progress sin_cos_add_sub_right_hyp T Hzs13.
-    progress unfold angle_add_overflow.
+    progress unfold old_angle_add_overflow.
     progress unfold angle_ltb.
     rewrite rngl_sin_sub_right_r.
     rewrite angle_add_sub_assoc.
@@ -749,7 +762,7 @@ destruct zs13. {
     rename θ2 into θ.
     rename θ3 into θ2.
     rename θ into θ3.
-    progress unfold angle_add_overflow.
+    progress unfold old_angle_add_overflow.
     rewrite <- angle_add_sub_swap.
     progress unfold angle_ltb.
     do 2 rewrite rngl_sin_sub_straight_r.
@@ -797,7 +810,7 @@ destruct zs13. {
     rename θ2 into θ.
     rename θ3 into θ2.
     rename θ into θ3.
-    progress unfold angle_add_overflow.
+    progress unfold old_angle_add_overflow.
     progress unfold angle_ltb.
     generalize Hzs13; intros H.
     apply rngl_leb_le in H.
@@ -851,6 +864,7 @@ destruct zs13. {
   progress sin_cos_add_sub_right_hyp T Hc1z.
   apply Bool.not_true_iff_false in Haov13.
   apply Haov13; clear Haov13.
+  rewrite angle_add_overflow_equiv3.
   apply angle_add_le_mono_l_lemma_11; try easy.
   rewrite rngl_sin_sub_straight_r.
   now apply (rngl_opp_neg_pos Hop Hor).
@@ -904,7 +918,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
         progress sin_cos_add_sub_straight_hyp T Hs1z.
         apply Bool.not_true_iff_false in Haov13.
         apply Haov13; clear Haov13.
-        progress unfold angle_add_overflow.
+        progress unfold old_angle_add_overflow.
         rewrite angle_add_sub_assoc.
         rewrite <- angle_add_sub_swap.
         rewrite angle_sub_sub_swap.
@@ -947,7 +961,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
         progress sin_cos_add_sub_right_hyp T Hs1z.
         apply Bool.not_true_iff_false in Haov13.
         apply Haov13; clear Haov13.
-        progress unfold angle_add_overflow.
+        progress unfold old_angle_add_overflow.
         rewrite angle_add_sub_assoc.
         rewrite <- angle_add_sub_swap.
         rewrite <- angle_sub_add_distr.
@@ -1016,7 +1030,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
     progress sin_cos_add_sub_right_hyp T Hs1z.
     apply Bool.not_true_iff_false in Haov13.
     apply Haov13; clear Haov13.
-    progress unfold angle_add_overflow.
+    progress unfold old_angle_add_overflow.
     rewrite angle_add_sub_assoc.
     rewrite <- angle_add_sub_swap.
     rewrite <- angle_sub_add_distr.
@@ -1058,7 +1072,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3)) as [Hzc3| Hc3z]. {
   progress sin_cos_add_sub_straight_hyp T Hs1z.
   apply Bool.not_true_iff_false in Haov13.
   apply Haov13; clear Haov13.
-  progress unfold angle_add_overflow.
+  progress unfold old_angle_add_overflow.
   rewrite angle_add_sub_assoc.
   rewrite <- angle_add_sub_swap.
   rewrite angle_sub_sub_swap.
@@ -1132,7 +1146,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
       progress sin_cos_add_sub_right_hyp T Hs1z.
       apply Bool.not_true_iff_false in Haov13.
       apply Haov13; clear Haov13.
-      progress unfold angle_add_overflow.
+      progress unfold old_angle_add_overflow.
       progress sin_cos_add_sub_straight_goal T.
       progress sin_cos_add_sub_right_goal T.
       progress unfold angle_ltb.

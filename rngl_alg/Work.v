@@ -135,7 +135,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros * (Hmi, Hni).
 assert (Hnz : n ≠ 0) by flia Hmi.
-progress unfold angle_add_overflow.
+rewrite <- angle_add_overflow_equiv3.
+progress unfold old_angle_add_overflow.
 progress unfold angle_ltb.
 remember (seq_angle_to_div_nat θ n) as u eqn:Hu.
 remember (0 ≤? rngl_sin (u i))%L as zs eqn:Hzs.
