@@ -1185,6 +1185,22 @@ destruct zst; [ | easy ].
 now apply rngl_ltb_lt in Htr.
 Qed.
 
+Theorem rngl_sin_nonneg_is_pos :
+  ∀ θ,
+  θ ≠ 0%A
+  → θ ≠ angle_straight
+  → (0 ≤ rngl_sin θ)%L
+  → (0 < rngl_sin θ)%L.
+Proof.
+intros * Hz Hs Hsz.
+destruct_ac.
+apply (rngl_lt_iff Hor).
+split; [ easy | ].
+intros H; symmetry in H.
+apply eq_rngl_sin_0 in H.
+now destruct H.
+Qed.
+
 Theorem rngl_lt_0_sin :
   ∀ θ,
   (0 < θ < angle_straight)%A
