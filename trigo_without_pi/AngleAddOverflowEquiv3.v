@@ -455,7 +455,27 @@ destruct s1z. {
         apply (rngl_lt_le_incl Hor) in Hzs1, Hzc2.
         now apply rngl_sin_add_nonneg.
       }
+      exfalso.
       apply (rngl_nle_gt_iff Hor) in Hzc1.
+      change_angle_add_r θ1 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hs1z.
+      progress sin_cos_add_sub_straight_hyp T Hzs1.
+      progress sin_cos_add_sub_straight_hyp T Hzc1.
+      progress sin_cos_add_sub_straight_hyp T Hc21.
+      change_angle_sub_l θ2 angle_straight.
+      progress sin_cos_add_sub_straight_hyp T Hzs12.
+      progress sin_cos_add_sub_straight_hyp T Hs2z.
+      progress sin_cos_add_sub_straight_hyp T Hc21.
+      rewrite (rngl_add_opp_l Hop) in Hc21.
+      apply -> (rngl_le_sub_0 Hop Hor) in Hc21.
+      apply rngl_nle_gt in Hzs12.
+      apply Hzs12; clear Hzs12.
+      now apply rngl_sin_sub_nonneg.
+    }
+    apply rngl_leb_le in Hs1z, Hs2z.
+    apply (rngl_leb_gt Hor) in Hzs1, Hzs12, Hc21.
+    apply rngl_ltb_ge.
 ...
 Search (rngl_cos (_ - _) ≤ rngl_cos _)%L.
 Search (rngl_cos (_ - _) < rngl_cos _)%L.
