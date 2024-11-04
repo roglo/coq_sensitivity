@@ -37,7 +37,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_leb_refl Hor).
 }
 intros * Hzs12 Hzs2 Haov13 H23.
-rewrite <- angle_add_overflow_equiv3 in Haov13.
 progress unfold angle_leb in H23.
 progress unfold angle_leb.
 remember (0 ≤? rngl_sin θ3)%L as zs3 eqn:Hzs3.
@@ -67,6 +66,7 @@ destruct zs13. {
     rename Hzs3 into Hzs1.
     rename Hzs13 into Hzs12.
     rename Hs13 into Hs12.
+    rewrite <- angle_add_overflow_equiv3.
     progress unfold old_angle_add_overflow.
     progress unfold angle_ltb.
     generalize Hzs12; intros H.
@@ -129,6 +129,7 @@ destruct zs13. {
     now apply (rngl_lt_le_incl Hor) in Hzs1.
     now apply (rngl_lt_le_incl Hor) in Hc2z.
   }
+  rewrite <- angle_add_overflow_equiv3.
   progress unfold old_angle_add_overflow.
   progress unfold angle_ltb.
   generalize Hzs13; intros H.
@@ -356,7 +357,6 @@ destruct zs13. {
 apply rngl_leb_le.
 apply (rngl_leb_gt Hor) in Hzs13.
 assert (Haov12 : angle_add_overflow θ1 θ2 = false). {
-  rewrite angle_add_overflow_equiv3 in Haov13.
   apply (angle_add_overflow_le _ θ3); [ | easy ].
   progress unfold angle_leb.
   apply (rngl_leb_gt Hor) in Hzs2, Hzs3.
@@ -380,9 +380,10 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
-rewrite <- angle_add_overflow_equiv3.
+rewrite <- angle_add_overflow_equiv3 in Haov13.
 progress unfold old_angle_add_overflow in Haov13.
 progress unfold angle_ltb in Haov13.
+rewrite <- angle_add_overflow_equiv3.
 progress unfold old_angle_add_overflow.
 progress unfold angle_ltb.
 progress sin_cos_add_sub_straight_hyp T Haov13.

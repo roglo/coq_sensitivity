@@ -453,7 +453,6 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   move Hzc1 before Hzs3.
   now apply angle_add_le_mono_l_lemma_1.
 }
-rewrite <- angle_add_overflow_equiv3 in Haov13.
 apply (rngl_nle_gt_iff Hor) in Hc1z.
 move Hc1z before Hzs3.
 destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. 2: {
@@ -604,6 +603,7 @@ destruct Hc13 as [Hc13| Hc13]. {
 }
 apply angle_add_move_l in Hc13.
 subst θ3.
+rewrite <- angle_add_overflow_equiv3 in Haov13.
 progress unfold old_angle_add_overflow in Haov13.
 apply Bool.not_true_iff_false in Haov13.
 apply Haov13; clear Haov13.
