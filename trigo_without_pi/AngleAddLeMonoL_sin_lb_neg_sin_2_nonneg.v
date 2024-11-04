@@ -131,15 +131,12 @@ destruct zs3. {
       apply (rngl_lt_le_incl Hor).
       apply angle_add_not_overflow_comm in Haov13.
       clear - ac Hc1 Haov13 Hc3z Hzs1 Hzs3 Hzs13 Hor Hop Hon Hos.
-(*
-      ...
-*)
-      rewrite <- angle_add_overflow_equiv3 in Haov13.
       rename θ1 into θ2; rename θ3 into θ1.
       rename Hzs1 into Hzs2.
       rename Hzs13 into Hzs12.
       rename Hc3z into Hc1z.
       rename Haov13 into Haov12.
+      (* a lemma, perhaps? *)
       apply (rngl_nle_gt_iff Hor).
       intros Hc2z.
       change_angle_sub_r θ2 angle_right.
@@ -171,6 +168,7 @@ destruct zs3. {
       symmetry in Hzs2.
       apply (eq_rngl_cos_0) in Hzs2.
       destruct Hzs2; subst θ1. {
+        rewrite <- angle_add_overflow_equiv3 in Haov12.
         progress unfold old_angle_add_overflow in Haov12.
         apply Bool.not_true_iff_false in Haov12.
         apply Haov12; clear Haov12.
@@ -363,20 +361,10 @@ destruct zs3. {
     now apply (rngl_lt_le_incl Hor).
     now apply (rngl_lt_le_incl Hor).
     apply angle_add_le_mono_l_lemma_3; try easy.
-    rewrite <- angle_add_overflow_equiv3.
-    progress unfold old_angle_add_overflow.
-    progress unfold angle_ltb.
-    generalize Hc1z; intros H.
-    apply (rngl_lt_le_incl Hor) in H.
-    apply rngl_leb_le in H.
-    rewrite H; clear H.
-    generalize Hs13; intros H.
-    apply rngl_leb_le in H.
-    rewrite H; clear H.
-    apply rngl_ltb_ge.
-    apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
-    now apply (rngl_lt_le_incl Hor).
-    now apply (rngl_lt_le_incl Hor).
+    clear - ac Hs13 Hzs3 Hc1z.
+    apply angle_add_not_overflow_comm.
+    rewrite angle_add_comm in Hs13.
+    now apply rngl_sin_add_nonneg_angle_add_not_overflow.
   }
   apply (rngl_nlt_ge_iff Hor) in Hc3z.
   rename H23 into Hc32.
@@ -551,6 +539,7 @@ destruct zs3. {
       apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
       apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
       apply rngl_cos_cos_sin_sin_nonneg_sin_le_cos_le_iff; try easy.
+(* ... *)
       rewrite <- angle_add_overflow_equiv3.
       progress unfold old_angle_add_overflow.
       progress unfold angle_ltb.
