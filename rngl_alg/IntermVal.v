@@ -620,7 +620,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   split; apply (rngl_le_refl Hor).
 }
 split. {
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros H5.
   progress unfold rngl_is_limit_when_tending_to_inf in Hal.
   specialize (Hal ((an - lim) / 2)%L) as H7.
@@ -645,7 +645,7 @@ split. {
     eapply (rngl_le_trans Hor); [ | apply H6 ].
     now apply (rngl_lt_le_incl Hor).
   }
-  apply (rngl_nlt_ge Hor) in HM.
+  apply rngl_nlt_ge in HM.
   apply HM; clear HM.
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -662,7 +662,7 @@ split. {
   eapply (rngl_le_trans Hor); [ | apply H6 ].
   now apply (rngl_lt_le_incl Hor).
 } {
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros H5.
   progress unfold rngl_is_limit_when_tending_to_inf in Hbl.
   specialize (Hbl ((lim - bn) / 2)%L) as H7.
@@ -688,7 +688,7 @@ split. {
     now apply (rngl_lt_le_incl Hor).
   }
   rewrite (rngl_opp_sub_distr Hop) in HM.
-  apply (rngl_nlt_ge Hor) in HM.
+  apply rngl_nlt_ge in HM.
   apply HM; clear HM.
   apply (rngl_le_div_l Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -751,7 +751,7 @@ destruct (is_upper_bound _ _) as [H1| H1]. {
   }
   assert (H : ((a + b) / 2 ≤ z ≤ b)%L). {
     split; [ | now apply Hs ].
-    apply (rngl_nlt_ge Hor).
+    apply (rngl_nlt_ge_iff Hor).
     intros H3.
     apply Hz; clear Hz.
     intros H4.
@@ -803,7 +803,7 @@ induction n; intros; cbn in Habn. {
   injection Habn; clear Habn; intros; subst an bn.
   intros H.
   apply Hs in H.
-  now apply (rngl_nlt_ge Hor) in H.
+  now apply rngl_nlt_ge in H.
 }
 destruct (is_upper_bound _ _) as [H1| H1]. {
   apply (IHn a ((a + b) / 2)%L H1 Habn).
@@ -961,7 +961,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
     intros c.
     move c before b.
     destruct (is_upper_bound P c) as [H2| H2]; [ | easy ].
-    apply (rngl_nlt_ge Hor).
+    apply (rngl_nlt_ge_iff Hor).
     intros Hc.
     specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
@@ -1019,7 +1019,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
       now apply Nat.pow_gt_lin_r.
     }
     apply H2 in Hy.
-    now apply (rngl_nlt_ge Hor) in Hy.
+    now apply rngl_nlt_ge in Hy.
   } {
     specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
     specialize (Hl Ha Hs Hal Hbl).
@@ -1030,7 +1030,7 @@ destruct (is_upper_bound P lim) as [H1| H1]. {
   destruct H1 as (c, Hc).
   apply Hc; clear Hc.
   intros Hc.
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros Hlc.
   specialize (limit_between_An_and_Bn Hon Hop Hiv Hor a b lim P) as Hl.
   specialize (Hl Ha Hs Hal Hbl).
@@ -1173,7 +1173,7 @@ assert (H : P ((a + rngl_min (a + η) b) / 2)%L). {
   now apply (rngl_lt_add_r Hos Hor).
 }
 apply Hub1 in H.
-now apply (rngl_nlt_ge Hor) in H.
+now apply rngl_nlt_ge in H.
 Qed.
 
 Theorem intermediate_value_prop_2 :
@@ -1237,7 +1237,7 @@ destruct (is_upper_bound P x) as [Hux| Hux]. 2: {
   intros Hpy.
   progress unfold P in Hpy.
   destruct Hpy as (Hayb, Hfy).
-  apply (rngl_nlt_ge Hor); intros Hxy.
+  apply (rngl_nlt_ge_iff Hor); intros Hxy.
   specialize (Hfu y) as H3.
   assert (H : (rngl_max a (b - η) < y ≤ b)%L). {
     split; [ | easy ].
@@ -1255,7 +1255,7 @@ destruct (is_upper_bound P x) as [Hux| Hux]. 2: {
   specialize (H3 H).
   now apply (rngl_lt_asymm Hor) in Hfy.
 }
-apply (rngl_nlt_ge Hor) in H3; apply H3; clear H3.
+apply rngl_nlt_ge in H3; apply H3; clear H3.
 progress unfold x.
 apply (rngl_lt_div_l Hon Hop Hiv Hor). {
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -1411,7 +1411,7 @@ assert
     destruct (is_upper_bound P x) as [Hpx| Hpx]. 2: {
       destruct Hpx as (y & Hy); clear H2.
       apply Hy; clear Hy; intros Hpy.
-      apply (rngl_nlt_ge Hor); intros Hxy.
+      apply (rngl_nlt_ge_iff Hor); intros Hxy.
       destruct (rngl_le_dec Hor y c) as [Hyc| Hyc]. {
         specialize (Hx y) as H2; apply H2; [ | easy ]; clear H2.
         split; [ | easy ].
@@ -1428,7 +1428,7 @@ assert
         now apply Hyc, Hub1.
       }
     }
-    apply (rngl_nlt_ge Hor) in H2; apply H2; clear H2.
+    apply rngl_nlt_ge in H2; apply H2; clear H2.
     progress unfold x.
     apply (rngl_lt_sub_lt_add_l Hop Hor).
     apply (rngl_lt_add_l Hos Hor).
@@ -1478,7 +1478,7 @@ assert
     }
     specialize (H3 H); clear H.
     apply Hub1 in H3.
-    apply (rngl_nlt_ge Hor) in H3.
+    apply rngl_nlt_ge in H3.
     apply H3; clear H3.
     progress unfold x.
     apply (rngl_lt_add_r Hos Hor).
@@ -1515,7 +1515,7 @@ assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
   } {
     apply (rngl_le_lt_trans Hor _ (f a'' - ε)). {
       apply (rngl_sub_le_mono_r Hop Hor).
-      apply (rngl_nlt_ge Hor).
+      apply (rngl_nlt_ge_iff Hor).
       intros H.
       apply Hpa''.
       progress unfold P.
@@ -1550,7 +1550,7 @@ assert (H3 : ∀ ε, (0 < ε → u - ε < f c < u + ε)%L). {
     now apply (rngl_lt_sub_lt_add_l Hop Hor).
   }
 }
-apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge Hor); intros Hu. {
+apply (rngl_le_antisymm Hor); apply (rngl_nlt_ge_iff Hor); intros Hu. {
   specialize (H3 (f c - u)%L).
   assert (H : (0 < f c - u)%L). {
     now apply (rngl_lt_0_sub Hop Hor).

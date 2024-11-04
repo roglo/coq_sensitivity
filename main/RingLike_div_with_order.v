@@ -356,7 +356,7 @@ split; intros Hb. {
     apply (rngl_lt_eq_cases Hor) in Habz.
     destruct Habz as [Habz| Habz]. {
       apply rngl_nle_gt in Habz.
-      apply (rngl_nlt_ge Hor).
+      apply (rngl_nlt_ge_iff Hor).
       intros Hb; apply Habz; clear Habz.
       apply (rngl_mul_nonpos_nonneg Hop Hor); [ | easy ].
       now apply (rngl_lt_le_incl Hor).
@@ -440,15 +440,15 @@ split; intros Hab. {
 } {
   apply (rngl_le_0_sub Hop Hor) in Hab.
   rewrite <- (rngl_mul_sub_distr_r Hop) in Hab.
-  apply (rngl_nlt_ge Hor) in Hab.
-  apply (rngl_nlt_ge Hor).
+  apply rngl_nlt_ge in Hab.
+  apply (rngl_nlt_ge_iff Hor).
   intros H1; apply Hab; clear Hab.
   replace 0%L with (0 * c)%L by apply (rngl_mul_0_l Hos).
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii); [ easy | ].
   apply (rngl_nle_gt_iff Hor).
   intros H2.
   apply -> (rngl_le_0_sub Hop Hor) in H2.
-  now apply (rngl_nlt_ge Hor) in H2.
+  now apply rngl_nlt_ge in H2.
 }
 Qed.
 
@@ -487,7 +487,7 @@ split; intros Hb. {
     apply (rngl_lt_eq_cases Hor) in Habz.
     destruct Habz as [Habz| Habz]. {
       apply rngl_nle_gt in Habz.
-      apply (rngl_nlt_ge Hor).
+      apply (rngl_nlt_ge_iff Hor).
       intros Hb; apply Habz; clear Habz.
       apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
       now apply (rngl_lt_le_incl Hor).
@@ -542,15 +542,15 @@ split; intros Hab. {
 } {
   apply (rngl_le_0_sub Hop Hor) in Hab.
   rewrite <- (rngl_mul_sub_distr_l Hop) in Hab.
-  apply (rngl_nlt_ge Hor) in Hab.
-  apply (rngl_nlt_ge Hor).
+  apply rngl_nlt_ge in Hab.
+  apply (rngl_nlt_ge_iff Hor).
   intros H1; apply Hab; clear Hab.
   replace 0%L with (c * 0)%L by apply (rngl_mul_0_r Hos).
   apply (rngl_mul_lt_mono_pos_l Hop Hor Hii); [ easy | ].
   apply (rngl_nle_gt_iff Hor).
   intros H2.
   apply -> (rngl_le_0_sub Hop Hor) in H2.
-  now apply (rngl_nlt_ge Hor) in H2.
+  now apply rngl_nlt_ge in H2.
 }
 Qed.
 
@@ -755,7 +755,7 @@ destruct (rngl_lt_dec Hor a 0%L) as [H12| H12]. {
   }
   specialize (H1 H); clear H.
   exfalso.
-  apply (rngl_nlt_ge Hor) in H1; apply H1; clear H1.
+  apply rngl_nlt_ge in H1; apply H1; clear H1.
   rewrite (rngl_abs_nonpos_eq Hop Hor). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
@@ -783,7 +783,7 @@ destruct (rngl_lt_dec Hor 0%L a) as [H21| H21]. {
   }
   specialize (H1 H); clear H.
   exfalso.
-  apply (rngl_nlt_ge Hor) in H1; apply H1.
+  apply rngl_nlt_ge in H1; apply H1.
   rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
     now apply (rngl_lt_le_incl Hor).
   }
@@ -794,7 +794,7 @@ destruct (rngl_lt_dec Hor 0%L a) as [H21| H21]. {
   rewrite (rngl_mul_1_r Hon).
   now apply (rngl_lt_add_r Hos Hor).
 }
-apply (rngl_nlt_ge Hor) in H12, H21.
+apply (rngl_nlt_ge_iff Hor) in H12, H21.
 now apply (rngl_le_antisymm Hor).
 Qed.
 
@@ -887,7 +887,7 @@ destruct abz. {
   apply (rngl_leb_gt Hor) in Haz.
   destruct bz; [ now rewrite (rngl_mul_opp_r Hop) | ].
   apply (rngl_leb_gt Hor) in Hbz.
-  apply (rngl_nlt_ge Hor) in Habz.
+  apply rngl_nlt_ge in Habz.
   exfalso; apply Habz; clear Habz.
   apply (rngl_lt_iff Hor).
   split. {
@@ -918,7 +918,7 @@ destruct az. {
   apply (rngl_lt_iff Hor) in Hbz.
   destruct Hbz as (Hbz, Hzb).
   specialize (rngl_mul_nonpos_nonneg Hop Hor _ _ Haz Hbz) as H1.
-  now apply (rngl_nlt_ge Hor) in H1.
+  now apply rngl_nlt_ge in H1.
 }
 apply (rngl_leb_gt Hor) in Haz.
 destruct bz; [ | easy ].
@@ -926,7 +926,7 @@ apply rngl_leb_le in Hbz.
 apply (rngl_lt_iff Hor) in Haz.
 destruct Haz as (Haz, Hza).
 specialize (rngl_mul_nonneg_nonpos Hop Hor _ _ Haz Hbz) as H1.
-now apply (rngl_nlt_ge Hor) in H1.
+now apply rngl_nlt_ge in H1.
 Qed.
 
 Theorem eq_rngl_squ_rngl_abs :
@@ -1045,8 +1045,8 @@ destruct (rngl_le_dec Hor a 0%L) as [Haz| Haz]. {
   now apply (rngl_le_trans Hor a 0%L b).
 }
 apply (rngl_nle_gt_iff Hor) in Haz.
-apply (rngl_nlt_ge Hor) in Hab.
-apply (rngl_nlt_ge Hor).
+apply rngl_nlt_ge in Hab.
+apply (rngl_nlt_ge_iff Hor).
 intros Hba; apply Hab; clear Hab.
 now apply (rngl_mul_lt_mono_nonneg Hop Hor Hii).
 Qed.
@@ -1078,7 +1078,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
   destruct (rngl_lt_dec Hor 0 a)%L as [Hlza| Hlza]. 2: {
-    apply (rngl_nlt_ge Hor) in Hlza.
+    apply (rngl_nlt_ge_iff Hor) in Hlza.
     apply (rngl_le_antisymm Hor) in Hza; [ | easy ].
     subst a.
     destruct (rngl_le_dec Hor 0 b)%L as [Hzb| Hzb]; [ now left | ].
@@ -1093,7 +1093,7 @@ destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
   rewrite <- (rngl_mul_0_l Hos b) in Hab.
   split; [ now apply (rngl_lt_le_incl Hor) | ].
   apply rngl_nle_gt in Hza.
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros Hzb; apply Hza.
   now apply (rngl_mul_le_mono_pos_r Hop Hor Hii) in Hab.
 }

@@ -1085,8 +1085,8 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
 split. {
   intros Hss.
-  apply (rngl_nlt_ge Hor) in Hss.
-  apply (rngl_nlt_ge Hor).
+  apply rngl_nlt_ge in Hss.
+  apply (rngl_nlt_ge_iff Hor).
   intros Hcc; apply Hss; clear Hss.
   apply (rngl_lt_iff Hor).
   split. {
@@ -1301,8 +1301,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
 split. {
   intros Hss.
-  apply (rngl_nlt_ge Hor) in Hss.
-  apply (rngl_nlt_ge Hor).
+  apply rngl_nlt_ge in Hss.
+  apply (rngl_nlt_ge_iff Hor).
   intros Hcc; apply Hss; clear Hss.
   apply (rngl_lt_iff Hor).
   split. {
@@ -1314,7 +1314,7 @@ split. {
       apply (eq_rngl_cos_0) in H.
       destruct H; subst θ1; [ apply rngl_sin_bound | ].
       exfalso.
-      apply (rngl_nlt_ge Hor) in Hzs1.
+      apply rngl_nlt_ge in Hzs1.
       apply Hzs1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
     }
     apply (rngl_nle_gt_iff Hor) in H.
@@ -1329,7 +1329,7 @@ split. {
         apply (eq_rngl_cos_0) in Hcc.
         destruct Hcc; subst θ1; [ apply (rngl_le_refl Hor) | ].
         exfalso.
-        apply (rngl_nlt_ge Hor) in Hzs1.
+        apply rngl_nlt_ge in Hzs1.
         apply Hzs1; clear Hzs1; cbn.
         apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
       }
@@ -1363,7 +1363,7 @@ split. {
       apply (eq_rngl_cos_0) in Hcc.
       destruct Hcc; subst θ2; [ apply (rngl_le_refl Hor) | ].
       exfalso.
-      apply (rngl_nlt_ge Hor) in Hzs2.
+      apply rngl_nlt_ge in Hzs2.
       apply Hzs2, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
     }
     apply rngl_sin_bound.
@@ -1377,7 +1377,7 @@ split. {
       apply rngl_sin_bound.
     }
     exfalso.
-    apply (rngl_nlt_ge Hor) in Hzs2.
+    apply rngl_nlt_ge in Hzs2.
     apply Hzs2, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
   }
   apply (rngl_nle_gt_iff Hor) in H.
@@ -1445,9 +1445,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
      of θ2 must not be greater than the positivity of θ1 *)
   apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite (rngl_sub_0_l Hop).
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros Hcc.
-  apply (rngl_nlt_ge Hor) in Hzs3.
+  apply rngl_nlt_ge in Hzs3.
   apply Hzs3; clear Hzs3.
   subst θ3; cbn.
   (* special case for sin θ2 = 0 *)
@@ -1473,7 +1473,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hzc2]. {
       } {
         subst θ1.
         cbn in Hzc1.
-        apply (rngl_nlt_ge Hor) in Hzc1.
+        apply rngl_nlt_ge in Hzc1.
         apply Hzc1; clear Hzc1.
         apply (rngl_opp_neg_pos Hop Hor).
         apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
@@ -1813,7 +1813,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
   }
   apply (rngl_nle_gt_iff Hor) in Hzc1, Hzc2.
   exfalso.
-  apply (rngl_nlt_ge Hor) in Hzs3.
+  apply rngl_nlt_ge in Hzs3.
   apply Hzs3; clear Hzs3.
   cbn.
   (* special case for sin θ2 = 0 *)
@@ -1859,7 +1859,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
   apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
-apply (rngl_nlt_ge Hor) in Hxy.
+apply (rngl_nlt_ge_iff Hor) in Hxy.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   now apply (rngl_le_0_sub Hop Hor).
 }
@@ -2056,7 +2056,7 @@ Proof.
 destruct_ac.
 intros * H21 Hzs1.
 apply Bool.not_false_iff_true in H21.
-apply (rngl_nlt_ge Hor).
+apply (rngl_nlt_ge_iff Hor).
 intros Hs2z.
 apply H21; clear H21.
 apply angle_leb_gt.
@@ -2337,7 +2337,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
     now apply (rngl_lt_le_incl Hor).
   }
 }
-apply (rngl_nlt_ge Hor) in Hxy.
+apply (rngl_nlt_ge_iff Hor) in Hxy.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   now apply (rngl_le_0_sub Hop Hor).
 }
@@ -2916,7 +2916,7 @@ destruct (rngl_lt_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   }
   apply (rngl_abs_nonneg Hop Hor).
 }
-apply (rngl_nlt_ge Hor) in Hzc1.
+apply (rngl_nlt_ge_iff Hor) in Hzc1.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ1 * _))%L. 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
   apply (rngl_le_0_sub Hop Hor).

@@ -169,7 +169,7 @@ destruct zs. {
       apply eq_rngl_sin_0 in Hxz.
       destruct Hxz as [Hxz| Hxz]. {
         rewrite Hxz in Hx; cbn in Hx; subst x.
-        exfalso; apply (rngl_nlt_ge Hor) in H2.
+        exfalso; apply rngl_nlt_ge in H2.
         apply H2; clear H2.
         rewrite Hxz.
         apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
@@ -758,7 +758,7 @@ symmetry in Hsz.
 destruct sz. {
   exfalso.
   apply rngl_leb_le in Hsz.
-  apply (rngl_nlt_ge Hor) in Hsz.
+  apply rngl_nlt_ge in Hsz.
   apply Hsz; clear Hsz.
   apply (rl_sqrt_half_pos Hc1).
 }
@@ -830,7 +830,7 @@ symmetry in Hsz.
 destruct sz. {
   exfalso.
   apply rngl_leb_le in Hsz.
-  apply (rngl_nlt_ge Hor) in Hsz.
+  apply rngl_nlt_ge in Hsz.
   apply Hsz; clear Hsz.
   apply (rl_sqrt_half_pos Hc1).
 }
@@ -985,7 +985,7 @@ symmetry in Hsz.
 destruct sz. {
   exfalso.
   apply rngl_leb_le in Hsz.
-  apply (rngl_nlt_ge Hor) in Hsz.
+  apply rngl_nlt_ge in Hsz.
   apply Hsz; clear Hsz.
   apply (rl_sqrt_half_pos Hc1).
 }

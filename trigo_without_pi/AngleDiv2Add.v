@@ -108,7 +108,7 @@ destruct zs3. {
     apply Bool.not_true_iff_false in Haov.
     apply angle_nlt_ge in Haov.
     apply (angle_le_rngl_sin_nonneg_sin_nonneg _ _ Haov) in Hzs3.
-    now apply (rngl_nlt_ge Hor) in Hzs3.
+    now apply rngl_nlt_ge in Hzs3.
   }
 }
 apply (rngl_leb_gt Hor) in Hzs3.
@@ -200,7 +200,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1 + rngl_cos θ2))%L
 }
 apply (rngl_nle_gt_iff Hor) in Hc12z.
 exfalso.
-apply (rngl_nlt_ge Hor) in Haov.
+apply rngl_nlt_ge in Haov.
 apply Haov; clear Haov.
 destruct (rngl_le_dec Hor (rngl_cos θ1) 0) as [Hc1z| Hzc1]. {
   (* changing θ1 into angle_straight - θ1 *)
@@ -469,7 +469,7 @@ destruct zs1. {
       rewrite (rngl_sub_0_l Hop) in Haov.
       rewrite (rngl_mul_1_l Hon) in Haov.
       apply (rngl_opp_nonpos_nonneg Hop Hor) in Haov.
-      now apply (rngl_nlt_ge Hor) in Haov.
+      now apply rngl_nlt_ge in Haov.
     } {
       apply rngl_nle_gt in Hzs1.
       exfalso; apply Hzs1; clear Hzs1.
@@ -512,7 +512,7 @@ destruct zs1. {
     move Hzs2 before Hzs1.
     move Hzc1 before Hzs2.
     move Hc2z before Hzc1.
-    apply (rngl_nlt_ge Hor) in Haov.
+    apply rngl_nlt_ge in Haov.
     apply Haov; clear Haov.
     assert (Hc12 : (rngl_cos θ1 < rngl_cos θ2)%L). {
       apply (rngl_nle_gt_iff Hor).
@@ -543,7 +543,7 @@ destruct zs1. {
   move Hzs1 after Hzs2.
   move Hzc1 after Hzs2.
   apply (rngl_le_opp_r Hop Hor) in Haov.
-  apply (rngl_nlt_ge Hor) in Haov.
+  apply rngl_nlt_ge in Haov.
   apply Haov; clear Haov; cbn.
   rewrite <- rngl_add_assoc.
   rewrite rngl_add_comm.
@@ -924,7 +924,7 @@ destruct zs12. {
         subst θ2.
         cbn in Hzs2.
         apply (rngl_opp_nonneg_nonpos Hop Hor) in Hzs2.
-        now apply (rngl_nlt_ge Hor) in Hzs2.
+        now apply rngl_nlt_ge in Hzs2.
       }
       rewrite Hs12.
       cbn.

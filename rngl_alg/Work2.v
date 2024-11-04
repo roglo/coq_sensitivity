@@ -811,7 +811,7 @@ destruct (rngl_lt_dec Hor b 0) as [Hblz| Hbgz]. {
   apply rl_sqrt_nonneg.
   apply rngl_1_add_cos_div_2_nonneg.
 }
-apply (rngl_nlt_ge Hor) in Hbgz.
+apply (rngl_nlt_ge_iff Hor) in Hbgz.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor √_). 2: {
   apply rl_sqrt_nonneg.
@@ -918,23 +918,23 @@ rewrite rngl_sin_mul_2_l in Hzs21, Hzs22.
 rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
-  exfalso; apply (rngl_nlt_ge Hor) in H; apply H.
+  exfalso; apply rngl_nlt_ge in H; apply H.
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 destruct Hzs22 as [(_, Hzs22)| (H, _)]. 2: {
-  exfalso; apply (rngl_nlt_ge Hor) in H; apply H.
+  exfalso; apply rngl_nlt_ge in H; apply H.
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21, Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
-  now apply (rngl_nlt_ge Hor) in H1.
+  now apply rngl_nlt_ge in H1.
 }
 destruct Hzs22 as [(_, Hzs22)| (H1, H2)]. 2: {
   apply (rngl_le_antisymm Hor) in H1; [ | easy ].
   symmetry in H1.
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ2. {
-    exfalso; apply (rngl_nlt_ge Hor) in H2; apply H2.
+    exfalso; apply rngl_nlt_ge in H2; apply H2.
     apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
   }
   apply rngl_cos_bound.
@@ -972,7 +972,7 @@ rewrite <- rngl_mul_assoc in Hzs21, Hzs22.
 apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hzs21.
 apply (rngl_lt_mul_0_if Hop Hor) in Hzs22.
 destruct Hzs21 as [(_, Hzs21)| (H, _)]. 2: {
-  exfalso; apply (rngl_nlt_ge Hor) in H; apply H.
+  exfalso; apply rngl_nlt_ge in H; apply H.
   apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 }
 destruct Hzs22 as [(H, _)| (_, Hzs22)]. {
@@ -986,7 +986,7 @@ destruct Hzs21 as [(_, Hzs21)| (H1, H2)]. 2: {
   symmetry in H1.
   apply eq_rngl_sin_0 in H1.
   destruct H1; subst θ1; [ | easy ].
-  exfalso; apply (rngl_nlt_ge Hor) in H2; apply H2.
+  exfalso; apply rngl_nlt_ge in H2; apply H2.
   apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 }
 destruct Hzs22 as [(H1, _)| (_, Hzs22)]. {

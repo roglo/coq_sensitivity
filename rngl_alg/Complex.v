@@ -1714,7 +1714,7 @@ destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hzc]. {
   apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
   apply (rngl_abs_nonneg Hop Hor).
 }
-apply (rngl_nlt_ge Hor) in Hzc.
+apply (rngl_nlt_ge_iff Hor) in Hzc.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cos θ)) at 1; [ | easy ].
 apply (rngl_squ_lt_abs_lt Hop Hor Hii).
 rewrite (rngl_squ_sqrt Hon). 2: {

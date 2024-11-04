@@ -593,7 +593,7 @@ destruct (rngl_lt_dec Hor (1 - ε² / 2)%L 0) as [Hez| Hze]. {
   apply Nat.le_mul_r.
   now apply Nat.pow_nonzero.
 }
-apply (rngl_nlt_ge Hor) in Hze.
+apply (rngl_nlt_ge_iff Hor) in Hze.
 move Hze after He1.
 enough (H :
   ∃ N, ∀ p q,

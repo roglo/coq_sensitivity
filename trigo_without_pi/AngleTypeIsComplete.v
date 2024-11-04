@@ -396,7 +396,7 @@ destruct (rngl_lt_dec Hor lim c) as [Hlc| Hcl]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor) in HN; [ | easy ].
   now apply (rngl_lt_irrefl Hor) in HN.
 }
-apply (rngl_nlt_ge Hor) in Hcl.
+apply (rngl_nlt_ge_iff Hor) in Hcl.
 destruct (rngl_lt_dec Hor c lim) as [Hlc| Hlc]. {
   exfalso.
   specialize (Hlim (lim - c)%L).
@@ -411,7 +411,7 @@ destruct (rngl_lt_dec Hor c lim) as [Hlc| Hlc]. {
   rewrite (rngl_opp_sub_distr Hop) in HN.
   now apply (rngl_lt_irrefl Hor) in HN.
 }
-apply (rngl_nlt_ge Hor) in Hlc.
+apply (rngl_nlt_ge_iff Hor) in Hlc.
 apply (rngl_le_antisymm Hor _ _ Hlc Hcl).
 Qed.
 

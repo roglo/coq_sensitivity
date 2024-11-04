@@ -289,6 +289,15 @@ split; intros Hab. {
 Qed.
 
 Theorem rngl_nlt_ge :
+  ∀ a b, (b ≤ a → ¬ (a < b))%L.
+Proof.
+intros * Hab H1.
+progress unfold rngl_le in Hab.
+progress unfold rngl_lt in H1.
+destruct rngl_opt_leb as [leb| ]; [ congruence | easy ].
+Qed.
+
+Theorem rngl_nlt_ge_iff :
   rngl_is_ordered T = true →
   ∀ a b, (¬ (a < b) ↔ b ≤ a)%L.
 Proof.
@@ -381,11 +390,11 @@ Proof.
 intros Hor *.
 split; intros Hab. {
   apply rngl_ltb_nlt in Hab.
-  now apply (rngl_nlt_ge Hor) in Hab.
+  now apply (rngl_nlt_ge_iff Hor) in Hab.
 } {
   apply rngl_ltb_nlt.
   intros H1.
-  now apply (rngl_nlt_ge Hor) in Hab.
+  now apply rngl_nlt_ge in Hab.
 }
 Qed.
 
@@ -513,7 +522,7 @@ split; intros H1. {
   destruct ba; [ subst b; apply (rngl_le_refl Hor) | ].
   apply (rngl_leb_gt Hor) in Hab, Hba.
   apply (rngl_lt_le_incl Hor) in Hba.
-  now apply (rngl_nlt_ge Hor) in Hba.
+  now apply rngl_nlt_ge in Hba.
 } {
   destruct ab; [ easy | ].
   apply rngl_leb_le in H1.

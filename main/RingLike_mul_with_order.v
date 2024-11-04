@@ -380,7 +380,7 @@ progress unfold rngl_abs.
 remember (1 ≤? 0)%L as c eqn:Hc; symmetry in Hc.
 destruct c; [ | easy ].
 apply rngl_leb_le in Hc.
-apply (rngl_nlt_ge Hor) in Hc.
+apply rngl_nlt_ge in Hc.
 exfalso; apply Hc.
 apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
 Qed.
@@ -402,7 +402,7 @@ remember (2 ≤? 0)%L as tz eqn:Htz.
 symmetry in Htz.
 destruct tz; [ | easy ].
 apply rngl_leb_le in Htz.
-apply (rngl_nlt_ge Hor) in Htz.
+apply rngl_nlt_ge in Htz.
 exfalso; apply Htz.
 apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
 Qed.
@@ -615,7 +615,7 @@ destruct (rngl_lt_dec Hor 1 (rngl_abs a))%L as [Hx1| Hx1]. {
   apply (rngl_archimedean_ub Har Hor).
   split; [ apply (rngl_0_lt_1 Hon Hop Hc1 Hor) | easy ].
 }
-apply (rngl_nlt_ge Hor) in Hx1.
+apply (rngl_nlt_ge_iff Hor) in Hx1.
 destruct (rngl_eq_dec Heo (rngl_abs a) 1) as [Ha1| Ha1]. {
   exists 1.
   rewrite Ha1; cbn.

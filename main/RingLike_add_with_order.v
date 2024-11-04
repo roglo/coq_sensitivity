@@ -706,7 +706,7 @@ induction i; intros; cbn. {
 destruct j. {
   split; [ easy | cbn ].
   intros H; exfalso.
-  apply (rngl_nlt_ge Hor) in H; apply H; clear H.
+  apply rngl_nlt_ge in H; apply H; clear H.
   eapply (rngl_lt_le_trans Hor); [ apply Haz | ].
   apply (rngl_le_add_r Hor).
   clear IHi.
@@ -996,7 +996,7 @@ destruct abz. {
     now apply -> (rngl_opp_lt_compat Hop Hor).
   }
   apply (rngl_leb_gt Hor) in Hbz.
-  apply (rngl_nlt_ge Hor) in Habz.
+  apply rngl_nlt_ge in Habz.
   exfalso; apply Habz; clear Habz.
   apply (rngl_lt_le_trans Hor _ a); [ easy | ].
   apply (rngl_le_add_r Hor).

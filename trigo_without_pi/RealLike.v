@@ -287,7 +287,7 @@ Theorem rl_sqrt_le_rl_sqrt :
 Proof.
 intros Hon Hop Hor Hii.
 intros * Ha Hab.
-apply (rngl_nlt_ge Hor).
+apply (rngl_nlt_ge_iff Hor).
 intros H1.
 specialize (rngl_mul_lt_mono_nonneg Hop Hor Hii) as H2.
 specialize (H2 √b √a √b √a)%L.

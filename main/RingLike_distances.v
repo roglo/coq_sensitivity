@@ -152,7 +152,7 @@ intros Hop Hor.
 intros * Hi Hlim.
 progress unfold is_limit_when_tending_to_inf in Hlim.
 split. {
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros Hca.
   specialize (Hlim (a - c))%L.
   assert (H : (0 < a - c)%L) by now apply (rngl_lt_0_sub Hop Hor).
@@ -172,7 +172,7 @@ split. {
   apply (rngl_sub_lt_mono_r Hop Hor) in HN.
   now apply rngl_nle_gt in HN.
 } {
-  apply (rngl_nlt_ge Hor).
+  apply (rngl_nlt_ge_iff Hor).
   intros Hbc.
   specialize (Hlim (c - b))%L.
   assert (H : (0 < c - b)%L) by now apply (rngl_lt_0_sub Hop Hor).
