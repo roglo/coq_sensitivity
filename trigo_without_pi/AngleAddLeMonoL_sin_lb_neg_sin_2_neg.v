@@ -80,6 +80,8 @@ destruct zs13. {
     }
     now apply (rngl_lt_le_incl Hor) in Hzs1.
   }
+  (* perhaps a lemma; faut réfléchir *)
+  clear - ac Hzs13 Hor θ2 H23 Hzs12 Hzs2 Heo Hop Hzs3 Hon Hs13 Hc1 Hii.
   rewrite <- angle_add_overflow_equiv3.
   progress unfold old_angle_add_overflow.
   progress unfold angle_ltb.
@@ -405,8 +407,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
   destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. {
     apply Bool.not_true_iff_false in Haov12.
     apply Haov12; clear Haov12.
+    (* perhaps a lemma *)
+    clear - ac Hop Hzs12 Hs1z Hor Hzs1 Hzs2 Hzc2.
     rewrite <- angle_add_overflow_equiv3.
-(* ... *)
     progress unfold old_angle_add_overflow.
     rewrite angle_add_sub_assoc.
     rewrite <- angle_add_sub_swap.
@@ -439,12 +442,16 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1)) as [Hzs1| Hc1z]. {
   progress sin_cos_add_sub_right_hyp T Hc2z.
   apply Bool.not_true_iff_false in Haov12.
   apply Haov12; clear Haov12.
+  rewrite angle_add_sub_swap.
+  rewrite <- angle_sub_sub_distr.
+  rewrite angle_straight_sub_right.
+  (* perhaps a lemma *)
   rewrite <- angle_add_overflow_equiv3.
   progress unfold old_angle_add_overflow.
   rewrite angle_add_sub_assoc.
-  rewrite angle_add_assoc.
   rewrite <- angle_add_sub_swap.
-  rewrite angle_sub_add.
+  rewrite <- angle_sub_add_distr.
+  rewrite angle_right_add_right.
   progress unfold angle_ltb.
   rewrite rngl_sin_sub_straight_r.
   rewrite rngl_sin_sub_right_r.
@@ -522,6 +529,7 @@ rewrite <- angle_sub_sub_distr in Haov12.
 rewrite angle_straight_sub_right in Haov12.
 apply Bool.not_true_iff_false in Haov12.
 apply Haov12; clear Haov12.
+(* perhaps a lemma *)
 rewrite <- angle_add_overflow_equiv3.
 progress unfold old_angle_add_overflow.
 rewrite angle_add_sub_assoc.
