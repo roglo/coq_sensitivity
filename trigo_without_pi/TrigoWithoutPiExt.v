@@ -1015,10 +1015,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply (rngl_le_refl Hor).
 }
 intros * Hzs1 Hzs3.
-rewrite <- angle_add_overflow_equiv3.
-remember (old_angle_add_overflow θ1 θ2) as aov eqn:Haov.
+remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
 symmetry in Haov.
 destruct aov. {
+  rewrite <- angle_add_overflow_equiv3 in Haov.
   progress unfold old_angle_add_overflow in Haov.
   apply angle_leb_gt in Haov.
   remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
@@ -1042,6 +1042,7 @@ destruct aov. {
   apply rngl_sin_sub_nonneg; [ easy | easy | ].
   now apply (rngl_lt_le_incl Hor).
 }
+rewrite <- angle_add_overflow_equiv3 in Haov.
 progress unfold old_angle_add_overflow in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
 apply (rngl_nlt_ge Hor).
@@ -1531,7 +1532,7 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Haov.
-  rewrite <- angle_add_overflow_equiv3 in Haov |-*.
+  rewrite <- angle_add_overflow_equiv3.
   progress unfold old_angle_add_overflow.
   progress unfold angle_ltb.
   rewrite (H1 (rngl_sin _)).
@@ -1810,22 +1811,20 @@ Theorem angle_mul_nat_overflow_succ_l_false :
     angle_add_overflow θ (n * θ) = false.
 Proof.
 intros.
-rewrite <- angle_add_overflow_equiv3.
 split; intros Hn. {
   destruct n. {
     split; [ easy | cbn ].
+    rewrite <- angle_add_overflow_equiv3.
     progress unfold old_angle_add_overflow.
     rewrite angle_add_0_r.
     apply Bool.not_true_iff_false.
     apply angle_lt_irrefl.
   }
   remember (S n) as sn; cbn in Hn; subst sn.
-  rewrite <- angle_add_overflow_equiv3 in Hn.
   now apply Bool.orb_false_iff in Hn.
 } {
   destruct n; [ easy | ].
   remember (S n) as sn; cbn; subst sn.
-  rewrite <- angle_add_overflow_equiv3.
   now apply Bool.orb_false_iff.
 }
 Qed.
@@ -2245,7 +2244,7 @@ Theorem angle_add_not_overflow_move_add :
 Proof.
 destruct_ac.
 intros * H13 H132.
-rewrite <- angle_add_overflow_equiv3 in H13, H132 |-*.
+rewrite <- angle_add_overflow_equiv3 in H132 |-*.
 progress unfold old_angle_add_overflow in H132.
 progress unfold old_angle_add_overflow.
 apply Bool.not_true_iff_false in H132.
@@ -2255,6 +2254,7 @@ apply angle_nlt_ge.
 rewrite angle_add_add_swap in H132.
 rewrite <- angle_add_assoc in H132.
 apply (angle_le_trans _ (θ1 + θ3))%A; [ | apply H132 ].
+rewrite <- angle_add_overflow_equiv3 in H13.
 progress unfold old_angle_add_overflow in H13.
 apply Bool.not_true_iff_false in H13.
 now apply angle_nlt_ge in H13.
