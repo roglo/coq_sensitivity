@@ -278,8 +278,7 @@ Qed.
 Theorem rngl_sin_angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
-  → rngl_sin (angle_div_2 (θ1 + θ2)) =
-     rngl_sin (angle_div_2 θ1 + angle_div_2 θ2).
+  → rngl_sin ((θ1 + θ2) /₂) = rngl_sin (θ1 /₂ + θ2 /₂).
 Proof.
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -1253,8 +1252,7 @@ now rewrite angle_div_2_mul_2.
 Qed.
 
 Theorem angle_mul_nat_overflow_pow_div :
-  ∀ n θ,
-  angle_mul_nat_overflow (2 ^ n) (angle_div_2_pow θ n) = false.
+  ∀ n θ, angle_mul_nat_overflow (2 ^ n) (θ /₂^n) = false.
 Proof.
 destruct_ac.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
