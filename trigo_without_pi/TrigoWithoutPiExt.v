@@ -998,49 +998,53 @@ apply (rngl_leb_gt Hor) in Hzs1, Hs1z.
 now apply (rngl_lt_asymm Hor) in Hzs1.
 Qed.
 
-Theorem rngl_sin_nonneg_add_nonneg :
+Theorem rngl_sin_add_nonneg_angle_add_not_overflow :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 < rngl_sin θ2)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → angle_add_overflow θ1 θ2 = false.
+Proof.
+destruct_ac.
+intros * Hzs1 Hzs2 Hzs3.
+apply Bool.not_true_iff_false.
+intros Haov.
+apply rngl_nle_gt in Hzs2.
+apply Hzs2; clear Hzs2.
+rewrite <- angle_add_overflow_equiv3 in Haov.
+progress unfold old_angle_add_overflow in Haov.
+apply angle_leb_gt in Haov.
+remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
+apply (rngl_nlt_ge_iff Hor).
+intros Hzs2.
+progress unfold angle_leb in Haov.
+apply rngl_leb_le in Hzs1.
+rewrite Hzs1 in Haov.
+apply rngl_leb_le in Hzs1.
+apply rngl_leb_le in Hzs3.
+rewrite Hzs3 in Haov.
+apply rngl_leb_le in Hzs3.
+apply (rngl_leb_gt Hor) in Haov.
+apply rngl_nle_gt in Hzs2.
+apply Hzs2; clear Hzs2.
+symmetry in Hθ3.
+apply angle_add_move_l in Hθ3.
+subst θ2.
+rewrite rngl_sin_sub_anticomm.
+apply (rngl_opp_nonpos_nonneg Hop Hor).
+apply rngl_sin_sub_nonneg; [ easy | easy | ].
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem rngl_sin_add_nonneg_angle_add_not_overflow_sin_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sin θ1)%L
   → (0 ≤ rngl_sin (θ1 + θ2))%L
-  → if angle_add_overflow θ1 θ2 then (rngl_sin θ2 ≤ 0)%L
-     else (0 ≤ rngl_sin θ2)%L.
+  → angle_add_overflow θ1 θ2 = false
+  → (0 ≤ rngl_sin θ2)%L.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
-  intros * Hzs1 Hzs3.
-  rewrite (H1 θ1), (H1 θ2).
-  rewrite angle_add_overflow_0_l.
-  apply (rngl_le_refl Hor).
-}
-intros * Hzs1 Hzs3.
-remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
-symmetry in Haov.
-destruct aov. {
-  rewrite <- angle_add_overflow_equiv3 in Haov.
-  progress unfold old_angle_add_overflow in Haov.
-  apply angle_leb_gt in Haov.
-  remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
-  apply (rngl_nlt_ge_iff Hor).
-  intros Hzs2.
-  progress unfold angle_leb in Haov.
-  apply rngl_leb_le in Hzs1.
-  rewrite Hzs1 in Haov.
-  apply rngl_leb_le in Hzs1.
-  apply rngl_leb_le in Hzs3.
-  rewrite Hzs3 in Haov.
-  apply rngl_leb_le in Hzs3.
-  apply (rngl_leb_gt Hor) in Haov.
-  apply rngl_nle_gt in Hzs2.
-  apply Hzs2; clear Hzs2.
-  symmetry in Hθ3.
-  apply angle_add_move_l in Hθ3.
-  subst θ2.
-  rewrite rngl_sin_sub_anticomm.
-  apply (rngl_opp_nonpos_nonneg Hop Hor).
-  apply rngl_sin_sub_nonneg; [ easy | easy | ].
-  now apply (rngl_lt_le_incl Hor).
-}
+intros * Hzs1 Hzs3 Haov.
 rewrite <- angle_add_overflow_equiv3 in Haov.
 progress unfold old_angle_add_overflow in Haov.
 remember (θ1 + θ2)%A as θ3 eqn:Hθ3.
@@ -1061,6 +1065,35 @@ symmetry in Hθ3.
 apply angle_add_move_l in Hθ3.
 subst θ2.
 now apply rngl_sin_sub_nonneg.
+Qed.
+
+Theorem rngl_sin_nonneg_add_nonneg :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sin θ1)%L
+  → (0 ≤ rngl_sin (θ1 + θ2))%L
+  → if angle_add_overflow θ1 θ2 then (rngl_sin θ2 ≤ 0)%L
+     else (0 ≤ rngl_sin θ2)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros * Hzs1 Hzs3.
+  rewrite (H1 θ1), (H1 θ2).
+  rewrite angle_add_overflow_0_l.
+  apply (rngl_le_refl Hor).
+}
+intros * Hzs1 Hzs3.
+remember (angle_add_overflow θ1 θ2) as aov eqn:Haov.
+symmetry in Haov.
+destruct aov. {
+  apply (rngl_nlt_ge_iff Hor).
+  intros Hzs2.
+  apply Bool.not_false_iff_true in Haov.
+  apply Haov; clear Haov.
+  now apply rngl_sin_add_nonneg_angle_add_not_overflow.
+} {
+  now apply (rngl_sin_add_nonneg_angle_add_not_overflow_sin_nonneg θ1).
+}
 Qed.
 
 (* *)
