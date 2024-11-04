@@ -81,6 +81,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ1))%L as [Hzc1| Hc1z]. {
   progress sin_cos_add_sub_right_hyp T Hzc1.
   progress sin_cos_add_sub_right_hyp T Hzs12.
   progress sin_cos_add_sub_right_hyp T Hs1z.
+  clear - Haov12 ac Hop Hs1z Hor Hzc1 Hzs2 Hc2z Hzs12 Hon Hc1.
   rewrite <- angle_add_overflow_equiv3 in Haov12.
   progress unfold old_angle_add_overflow in Haov12.
   apply Bool.not_true_iff_false in Haov12.
@@ -180,10 +181,10 @@ change_angle_add_r θ1 angle_straight.
 progress sin_cos_add_sub_straight_hyp T Hzs12.
 progress sin_cos_add_sub_straight_hyp T Hs1z.
 progress sin_cos_add_sub_straight_hyp T Hc1z.
-rewrite <- angle_add_overflow_equiv3 in Haov12.
-progress unfold old_angle_add_overflow in Haov12.
 apply Bool.not_true_iff_false in Haov12.
 apply Haov12; clear Haov12.
+rewrite <- angle_add_overflow_equiv3.
+progress unfold old_angle_add_overflow.
 rewrite angle_add_sub_assoc.
 rewrite <- angle_add_sub_swap.
 rewrite <- angle_sub_add_distr.
@@ -523,20 +524,10 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. 2: {
   apply rngl_cos_cos_sin_sin_neg_sin_le_cos_le_iff; try easy.
   apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
   now apply (rngl_lt_le_incl Hor).
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
-  progress unfold angle_ltb.
-  generalize Hs1z; intros H.
-  apply (rngl_lt_le_incl Hor) in H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  generalize Hs13z; intros H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  apply rngl_ltb_ge.
-  apply quadrant_1_rngl_cos_add_le_cos_l; try easy.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
+  clear - ac Hs13z Hc3z Hs1z.
+  apply angle_add_not_overflow_comm.
+  rewrite angle_add_comm in Hs13z.
+  now apply rngl_sin_add_nonneg_angle_add_not_overflow; try easy.
 }
 change_angle_sub_r θ1 angle_right.
 progress sin_cos_add_sub_right_hyp T Hzs1.
@@ -572,24 +563,9 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   apply H1; try easy.
   clear H1.
   apply angle_add_le_mono_l_lemma_1; try easy.
-  rewrite <- angle_add_overflow_equiv3.
-  progress unfold old_angle_add_overflow.
-  progress unfold angle_ltb.
-  generalize Hc1z; intros H.
-  apply (rngl_lt_le_incl Hor) in H.
-  apply rngl_leb_le in H.
-  rewrite H; clear H.
-  apply rngl_leb_le in Hzs13.
-  rewrite Hzs13.
-  apply rngl_leb_le in Hzs13.
-  apply rngl_ltb_ge.
-  apply angle_le_sub_le_add_l_lemma_1; try easy.
-  now apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_incl Hor).
-  rewrite angle_sub_diag.
-  apply rngl_cos_bound.
-  rewrite angle_sub_diag.
-  apply (rngl_le_refl Hor).
+  apply angle_add_not_overflow_comm.
+  rewrite angle_add_comm in Hzs13.
+  now apply rngl_sin_add_nonneg_angle_add_not_overflow.
 }
 apply rngl_leb_nle in Hc3z.
 rewrite Hc3z in H1.
