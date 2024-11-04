@@ -810,15 +810,4 @@ f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem angle_add_overflow_lt_straight_le_straight :
-  ∀ θ1 θ2,
-  (θ1 < angle_straight)%A
-  → (θ2 ≤ angle_straight)%A
-  → angle_add_overflow θ1 θ2 = false.
-Proof.
-intros * H1 H2.
-apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
-now rewrite angle_opp_straight.
-Qed.
-
 End a.
