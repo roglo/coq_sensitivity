@@ -783,31 +783,4 @@ apply rngl_leb_le in H32.
 apply angle_add_overflow_le_lemma_10 in H12; try easy.
 Qed.
 
-Theorem angle_add_overflow_lt_le :
-  ∀ θ θ1 θ2,
-  (θ1 < θ)%A
-  → (θ2 ≤ -θ)%A
-  → angle_add_overflow θ1 θ2 = false.
-Proof.
-destruct_ac.
-intros * H1 H2.
-progress unfold angle_add_overflow.
-remember (θ1 =? 0)%A as z1 eqn:Hz1.
-symmetry in Hz1.
-destruct z1; [ easy | ].
-apply angle_leb_gt.
-apply (angle_le_lt_trans _ (- θ))%A; [ easy | ].
-apply angle_eqb_neq in Hz1.
-apply angle_lt_opp_r; [ easy | ].
-now rewrite angle_opp_involutive.
-Qed.
-
-Theorem angle_opp_straight : (- angle_straight)%A = angle_straight.
-Proof.
-destruct_ac.
-apply eq_angle_eq; cbn.
-f_equal.
-apply (rngl_opp_0 Hop).
-Qed.
-
 End a.

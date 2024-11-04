@@ -3433,6 +3433,14 @@ rewrite Bool.orb_true_iff; right.
 apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 Qed.
 
+Theorem angle_opp_straight : (- angle_straight)%A = angle_straight.
+Proof.
+destruct_ac.
+apply eq_angle_eq; cbn.
+f_equal.
+apply (rngl_opp_0 Hop).
+Qed.
+
 Theorem rngl_sin_nonneg_angle_le_straight :
   ∀ θ, (0 ≤ rngl_sin θ)%L ↔ (θ ≤ angle_straight)%A.
 Proof.
