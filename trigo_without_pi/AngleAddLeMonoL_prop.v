@@ -1,3 +1,4 @@
+Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
@@ -436,6 +437,20 @@ apply angle_le_sub_le_add_l_lemma_1; try easy. {
 }
 Qed.
 
+Theorem angle_add_overflow_opp_r :
+  ∀ θ, θ ≠ 0%A → angle_add_overflow θ (- θ) = true.
+Proof.
+intros * Htz.
+progress unfold angle_add_overflow.
+apply Bool.andb_true_iff.
+split; [ | apply angle_le_refl ].
+apply Bool.not_false_iff_true.
+intros H1.
+apply Htz; clear Htz.
+apply Bool.negb_false_iff in H1.
+now apply angle_eqb_eq in H1.
+Qed.
+
 Theorem angle_add_le_mono_l_lemma_3 :
   ∀ θ1 θ2 θ3,
   angle_add_overflow θ1 θ3 = false
@@ -603,25 +618,15 @@ destruct Hc13 as [Hc13| Hc13]. {
 }
 apply angle_add_move_l in Hc13.
 subst θ3.
-rewrite <- angle_add_overflow_equiv3 in Haov13.
-progress unfold old_angle_add_overflow in Haov13.
+rewrite <- angle_opp_add_distr in Haov13.
 apply Bool.not_true_iff_false in Haov13.
 apply Haov13; clear Haov13.
-rewrite angle_add_sub_assoc.
-rewrite angle_add_opp_r.
-rewrite angle_add_sub.
-rewrite angle_sub_diag.
-progress unfold angle_ltb.
-rewrite rngl_sin_add_right_r.
-rewrite (rngl_leb_refl Hor).
-apply rngl_leb_le in Hzs1.
-rewrite Hzs1.
-apply rngl_leb_le in Hzs1.
-apply rngl_ltb_lt.
-rewrite rngl_cos_add_right_r.
-apply (rngl_lt_opp_l Hop Hor); cbn.
-apply (rngl_add_pos_nonneg Hor); [ easy | ].
-apply (rngl_0_le_1 Hon Hop Hor).
+apply angle_add_overflow_opp_r.
+intros H.
+apply angle_add_move_0_r in H; subst θ1.
+apply rngl_nle_gt in Hc1z.
+apply Hc1z; cbn.
+apply (rngl_opp_1_le_0 Hon Hop Hor).
 Qed.
 
 End a.
