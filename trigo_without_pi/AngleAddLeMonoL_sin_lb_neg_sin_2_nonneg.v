@@ -39,8 +39,8 @@ Theorem angle_add_overflow_straight_straight :
   rngl_characteristic T ≠ 1 →
   angle_add_overflow angle_straight angle_straight = true.
 Proof.
-intros Hc1.
 destruct_ac.
+intros Hc1.
 rewrite <- angle_add_overflow_equiv3.
 progress unfold old_angle_add_overflow.
 rewrite angle_straight_add_straight.
@@ -98,7 +98,6 @@ destruct zs3. {
     intros Hzs12.
     generalize Hzs13; intros Hzs1.
     apply rngl_sin_add_nonneg_sin_nonneg in Hzs1; try easy.
-    rewrite <- angle_add_overflow_equiv3 in Haov13.
     move Hzs1 after Hzs2.
     destruct (rngl_le_dec Hor 0 (rngl_cos θ2)) as [Hzc2| Hc2z]. 2: {
       apply (rngl_nle_gt_iff Hor) in Hc2z.
@@ -130,10 +129,12 @@ destruct zs3. {
       apply rngl_nle_gt in Hc1z.
       apply Hc1z; clear Hc1z.
       apply (rngl_lt_le_incl Hor).
-      rewrite angle_add_overflow_equiv3 in Haov13.
       apply angle_add_not_overflow_comm in Haov13.
-      rewrite <- angle_add_overflow_equiv3 in Haov13.
       clear - ac Hc1 Haov13 Hc3z Hzs1 Hzs3 Hzs13 Hor Hop Hon Hos.
+(*
+      ...
+*)
+      rewrite <- angle_add_overflow_equiv3 in Haov13.
       rename θ1 into θ2; rename θ3 into θ1.
       rename Hzs1 into Hzs2.
       rename Hzs13 into Hzs12.
@@ -242,7 +243,6 @@ destruct zs3. {
       apply (eq_rngl_cos_0) in Hzs12.
       destruct Hzs12; subst θ2. {
         rewrite angle_right_add_right in Haov12.
-        rewrite angle_add_overflow_equiv3 in Haov12.
         now rewrite angle_add_overflow_straight_straight in Haov12.
       }
       apply rngl_nle_gt in Hc2z.
