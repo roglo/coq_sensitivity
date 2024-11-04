@@ -1814,11 +1814,7 @@ intros.
 split; intros Hn. {
   destruct n. {
     split; [ easy | cbn ].
-    rewrite <- angle_add_overflow_equiv3.
-    progress unfold old_angle_add_overflow.
-    rewrite angle_add_0_r.
-    apply Bool.not_true_iff_false.
-    apply angle_lt_irrefl.
+    apply angle_add_overflow_0_r.
   }
   remember (S n) as sn; cbn in Hn; subst sn.
   now apply Bool.orb_false_iff in Hn.
