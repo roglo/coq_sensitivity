@@ -280,6 +280,18 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context (Heb : rngl_has_eq_dec T = true).
 
+(* a l'air compliqué à prouver...
+Theorem lap_quot_mod : ∀ x y, (y ≠ 0 → x = y * (x / y) + x mod y)%lap.
+Proof.
+intros la lb Hlb.
+progress unfold lap_mul.
+progress unfold lap_rem.
+destruct lb as [| b]; [ easy | ].
+clear Hlb.
+Print rlap_quot_rem.
+...
+*)
+
 Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.
 intros; cbn.

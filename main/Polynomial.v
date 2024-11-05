@@ -1216,9 +1216,6 @@ destruct len. {
   now rewrite lap_add_0_l.
 }
 cbn.
-(*
-destruct len; [ now rewrite lap_add_0_l | cbn ].
-*)
 cbn in Hlen; apply Nat.succ_le_mono in Hlen.
 rewrite rngl_add_0_l; f_equal.
 now apply IHla.
@@ -1244,9 +1241,6 @@ induction la as [| a]; intros. {
   now do 2 rewrite lap_add_0_l.
 }
 cbn.
-(*
-induction la as [| a]; intros; [ now do 2 rewrite lap_add_0_l | cbn ].
-*)
 destruct lb as [| b]; [ easy | ].
 cbn in Hab |-*.
 apply Nat.succ_inj in Hab.
@@ -1762,9 +1756,6 @@ destruct Hr as [Hr| Hr]. {
     rewrite Hr in H1.
     cbn in H1.
     rewrite lap_add_0_r in H1.
-(*
-    rewrite Hr, lap_add_0_r in H1.
-*)
     split; [ easy | ].
     apply Bool.orb_true_iff; right.
     rewrite List_last_rev.
@@ -2581,6 +2572,35 @@ Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 
+(* a l'air compliqué à prouver...
+Theorem polyn_quot_mod : ∀ x y, (y ≠ 0 → x = y * (x / y) + x mod y)%pol.
+Proof.
+intros * Hyz.
+progress unfold polyn_quot.
+progress unfold polyn_rem.
+destruct x as (la, Hla).
+destruct y as (lb, Hlb).
+cbn.
+destruct (Sumbool.sumbool_of_bool (rngl_has_1 T)) as [Hon'| ]. 2: {
+  congruence.
+}
+move Hon' before Hon.
+assert (Hon = Hon') by apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+subst Hon'.
+destruct (Sumbool.sumbool_of_bool (rngl_has_inv T)) as [Hiv| ]. {
+  move lb before la.
+  move Hiv before Hed.
+  progress unfold has_polyn_prop in Hla.
+  progress unfold has_polyn_prop in Hlb.
+  progress unfold polyn_add.
+  progress unfold polyn_mul.
+  cbn.
+Search (lap_norm (_ * _)).
+Search (length (lap_norm _)).
+Search lap_quot.
+...
+*)
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm T = true →
   rngl_has_opp T = true →
@@ -2650,7 +2670,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 
-(*
+(* is it provable?
 Theorem polyn_opt_div_mul_distr :
   let _ := polyn_ring_like_op in (* utiliser Instance *)
   if rngl_has_quot (polyn T) then
@@ -2663,10 +2683,47 @@ symmetry in Hqu.
 destruct qu; [ | easy ].
 intros.
 progress unfold rngl_div.
+rewrite Hqu.
 remember (rngl_has_inv (polyn T)) as iv eqn:Hiv.
 symmetry in Hiv.
 destruct iv. {
+  apply rngl_has_quot_has_no_inv in Hqu.
+  congruence.
+}
+progress unfold rngl_quot.
+cbn.
+progress unfold rngl_has_quot in Hqu.
+progress unfold rngl_has_inv in Hiv.
+cbn in Hqu, Hiv.
+remember polyn_opt_inv_or_quot as iq eqn:Hiq.
+symmetry in Hiq.
+destruct iq as [op| ]; [ | easy ].
+destruct op; [ easy | ].
+clear Hqu Hiv.
+progress unfold polyn_opt_inv_or_quot in Hiq.
+destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hop| Hop]. {
+    progress unfold rngl_has_inv in Hiq.
+    destruct (Sumbool.sumbool_of_bool _) as [Hiv| Hiv]. {
+      remember (rngl_opt_inv_or_quot T) as iqt eqn:Hiqt.
+      symmetry in Hiqt.
+      destruct iqt as [iqt| ]; [ | easy ].
+      injection Hiq; clear Hiq; intros; subst p.
+Search (_ / _)%pol.
+Print polyn_quot.
+...
+Print rngl_quot.
+Search rngl_quot.
+...
+ rngl_has_quot_has_no_inv:
+  ∀ {T : Type} {ro : ring_like_op T}, rngl_has_quot T = true → rngl_has_inv T = false
+ progress unfold rngl_inv.
+  cbn.
+Search rngl_has_quot.
+  progress unfold rngl_has_quot in Hqu.
+  progress unfold rngl_has
 Search (_ * _)⁻¹%L.
+rewrite rngl_inv_mul_distr.
 ...
 rewrite rngl_inv_mul_distr.
   rewrite rngl_mul_inv.
