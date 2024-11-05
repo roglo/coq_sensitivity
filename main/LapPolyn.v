@@ -2930,6 +2930,9 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
+(*
+     rngl_opt_div_mul_distr := NA;
+*)
      rngl_opt_integral := lap_opt_integral Hos;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := lap_characteristic_prop;

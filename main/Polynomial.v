@@ -2650,6 +2650,51 @@ destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 
+(*
+Theorem polyn_opt_div_mul_distr :
+  let _ := polyn_ring_like_op in (* utiliser Instance *)
+  if rngl_has_quot (polyn T) then
+    ∀ a b c : polyn T, (a / (b * c))%L = (a / c / b)%L
+  else not_applicable.
+Proof.
+intros rop.
+remember (rngl_has_quot (polyn T)) as qu eqn:Hqu.
+symmetry in Hqu.
+destruct qu; [ | easy ].
+intros.
+progress unfold rngl_div.
+remember (rngl_has_inv (polyn T)) as iv eqn:Hiv.
+symmetry in Hiv.
+destruct iv. {
+Search (_ * _)⁻¹%L.
+...
+rewrite rngl_inv_mul_distr.
+  rewrite rngl_mul_inv.
+  rewrite Hqu.
+...
+progress unfold rngl_has_quot; cbn.
+progress unfold polyn_opt_inv_or_quot.
+progress unfold rngl_div.
+cbn.
+progress unfold rngl_has_inv.
+progress unfold rngl_opt_inv_or_quot; cbn.
+progress unfold polyn_opt_inv_or_quot.
+cbn.
+destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hop| Hop]. {
+    progress unfold rngl_has_inv.
+    destruct (Sumbool.sumbool_of_bool _) as [Hiv| Hiv]. {
+...
+      destruct (rngl_opt_inv_or_quot T); [ | easy ].
+      destruct s; [ | easy ].
+      cbn.
+...
+  cbn.
+...
+now rewrite Bool.andb_false_r.
+...
+*)
+
 Theorem polyn_opt_eqb_eq :
   let rop := polyn_ring_like_op in
   if rngl_has_eq_dec (polyn T) then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
@@ -3254,6 +3299,9 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_diag_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
+(*
+     rngl_opt_div_mul_distr := polyn_opt_div_mul_distr;
+*)
      rngl_opt_integral := polyn_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := polyn_characteristic_prop;

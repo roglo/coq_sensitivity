@@ -550,6 +550,29 @@ rewrite (rngl_mul_1_r Hon).
 now symmetry; apply div_diag.
 Qed.
 
+(*
+Theorem rngl_div_div :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_subt T = true →
+  rngl_has_inv_or_quot T = true →
+  ∀ a b c, (b ≠ 0 → c ≠ 0 → a / b / c = a / (c * b))%L.
+Proof.
+intros Hon Hos Hiq * Hbz Hzc.
+progress unfold rngl_div.
+specialize (rngl_opt_div_mul_distr) as H1.
+progress unfold rngl_div in H1.
+remember (rngl_has_inv T) as iv eqn:Hiv.
+symmetry in Hiv.
+destruct iv. {
+  rewrite <- rngl_mul_assoc; f_equal; symmetry.
+  now apply (rngl_inv_mul_distr Hon Hos Hiv).
+}
+remember (rngl_has_quot T) as qu eqn:Hqu.
+symmetry in Hqu.
+destruct qu; [ symmetry; apply H1 | easy ].
+Qed.
+*)
+
 Theorem rngl_div_div :
   rngl_has_opp_or_subt T = true →
   rngl_has_1 T = true →

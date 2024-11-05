@@ -273,6 +273,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_quot T && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%L → (b * a / b)%L = a
       else not_applicable;
+(*
+    rngl_opt_div_mul_distr :
+      if rngl_has_quot T then ∀ a b c, (a / (b * c) = a / c / b)%L
+      else not_applicable;
+*)
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral_domain then
@@ -415,6 +420,28 @@ intros * Hiv Hon.
 apply Bool.orb_true_iff; right.
 apply rngl_has_inv_and_1_or_quot_iff; left.
 now rewrite Hiv, Hon.
+Qed.
+
+Theorem rngl_has_1_has_inv_or_quot_has_inv_and_1_or_quot :
+  rngl_has_1 T = true →
+  rngl_has_inv_or_quot T = true →
+  rngl_has_inv_and_1_or_quot T = true.
+Proof.
+intros Hon Hiq.
+apply rngl_has_inv_and_1_or_quot_iff.
+rewrite Hon.
+apply rngl_has_inv_or_quot_iff in Hiq.
+destruct Hiq as [H| H]; rewrite H; [ now left | now right ].
+Qed.
+
+Theorem rngl_int_dom_or_inv_1_or_quot_r :
+  rngl_has_1 T = true →
+  rngl_has_inv_or_quot T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true.
+Proof.
+intros Hon Hiq.
+apply Bool.orb_true_iff; right.
+now apply rngl_has_1_has_inv_or_quot_has_inv_and_1_or_quot.
 Qed.
 
 Theorem rngl_has_subt_has_no_opp :
