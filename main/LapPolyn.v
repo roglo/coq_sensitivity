@@ -3536,7 +3536,6 @@ f_equal.
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
 symmetry in Hrlac.
-(**)
 rewrite <- Hrlac.
 rewrite rev_lap_sub; [ | easy ].
 rewrite lap_add_comm.
