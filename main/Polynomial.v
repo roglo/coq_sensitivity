@@ -1835,6 +1835,58 @@ apply rlap_rem_prop in Hqr. 2: {
 rewrite List.length_rev in Hqr; cbn in Hqr; flia Hqr.
 Qed.
 
+(* to be completed
+Theorem lap_div_mod :
+  rngl_has_1 T = true →
+  rngl_mul_is_comm T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ la lb,
+  lap_norm la = la
+  → lap_norm lb = lb
+  → lb ≠ 0%lap
+  → la = (lb * (la / lb) + la mod lb)%lap.
+Proof.
+intros Hon Hic Hop Hiv.
+intros * Hla Hlb Hlbz.
+specialize (lap_quot_rem_prop Hon Hic Hop Hiv) as H1.
+specialize (H1 la lb (la / lb)%lap (la mod lb)%lap).
+assert (H : has_polyn_prop la = true). {
+  progress unfold has_polyn_prop.
+  cbn.
+  remember (List.rev la) as rla eqn:Hrla.
+  symmetry in Hrla.
+  apply List_rev_symm in Hrla.
+  subst la.
+  progress unfold lap_norm in Hla.
+  rewrite List.rev_involutive in Hla.
+  apply List_rev_rev in Hla.
+  rename rla into la.
+  apply Bool.orb_true_iff.
+  destruct la as [| a]; [ now left | right ].
+  cbn; rewrite List.last_last.
+  apply Bool.negb_true_iff.
+  apply Bool.not_true_iff_false.
+  intros H.
+  apply (rngl_eqb_eq Hed) in H.
+  cbn in Hla.
+  subst a.
+  rewrite (rngl_eqb_refl Hed) in Hla.
+  exfalso.
+  specialize (strip_0s_length_le la) as H2.
+  apply Nat.nlt_ge in H2.
+  apply H2; clear H2.
+  now rewrite Hla; cbn.
+}
+specialize (H1 H); clear H.
+assert (H : List.last lb 0%L ≠ 0%L). {
+  intros H2.
+  destruct lb as [| b] using List.rev_ind; [ easy | ].
+  rewrite List.last_last in H2.
+  subst b.
+...
+*)
+
 Theorem lap_subt_diag :
   ∀ la, lap_subt la la = List.repeat 0%L (List.length la).
 Proof.
@@ -2572,8 +2624,8 @@ Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 
-(* a l'air compliqué à prouver...
-Theorem polyn_quot_mod : ∀ x y, (y ≠ 0 → x = y * (x / y) + x mod y)%pol.
+(* to be removed
+Theorem polyn_div_mod : ∀ x y, (y ≠ 0 → x = y * (x / y) + x mod y)%pol.
 Proof.
 intros * Hyz.
 progress unfold polyn_quot.

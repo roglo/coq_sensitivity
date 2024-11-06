@@ -278,19 +278,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context (Heb : rngl_has_eq_dec T = true).
-
-(* a l'air compliqué à prouver...
-Theorem lap_quot_mod : ∀ x y, (y ≠ 0 → x = y * (x / y) + x mod y)%lap.
-Proof.
-intros la lb Hlb.
-progress unfold lap_mul.
-progress unfold lap_rem.
-destruct lb as [| b]; [ easy | ].
-clear Hlb.
-Print rlap_quot_rem.
-...
-*)
+Context (Hed : rngl_has_eq_dec T = true).
 
 Theorem lap_add_0_l : ∀ la, (0 + la)%lap = la.
 Proof.
@@ -641,9 +629,9 @@ cbn in Hll, Hlen.
 apply Nat.succ_inj in Hlen.
 do 2 rewrite if_bool_if_dec in Hll.
 destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
   destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
-    apply (rngl_eqb_eq Heb) in Hbz; subst b.
+    apply (rngl_eqb_eq Hed) in Hbz; subst b.
     f_equal.
     now apply IHlb.
   }
@@ -722,7 +710,7 @@ induction la as [| a]; intros. {
   subst b; cbn.
   rewrite strip_0s_app; cbn.
   remember (strip_0s (List.rev lb)) as lc eqn:Hlc; symmetry in Hlc.
-  rewrite (rngl_eqb_refl Heb).
+  rewrite (rngl_eqb_refl Hed).
   destruct lc as [| c]; [ easy | ].
   assert (H : lap_norm [] = lap_norm lb). {
     unfold lap_norm; cbn.
@@ -746,7 +734,7 @@ induction la as [| a]; intros. {
   destruct lc as [| c]. {
     assert (Hla : ∀ i, List.nth i la 0%L = 0%L). {
       intros i.
-      clear - ro rp Heb Hlc.
+      clear - ro rp Hed Hlc.
       revert i.
       induction la as [| a]; intros; cbn. {
         now rewrite Tauto_match_nat_same.
@@ -758,7 +746,7 @@ induction la as [| a]; intros. {
         destruct lb as [| b]; [ | easy ].
         rewrite if_bool_if_dec in Hlc.
         destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
-        now apply (rngl_eqb_eq Heb) in Haz.
+        now apply (rngl_eqb_eq Hed) in Haz.
       }
       apply IHla.
       cbn in Hlc.
@@ -769,30 +757,30 @@ induction la as [| a]; intros. {
     cbn.
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-      apply (rngl_eqb_eq Heb) in Haz.
+      apply (rngl_eqb_eq Hed) in Haz.
       assert (Hlb : ∀ i, List.nth i lb 0%L = 0%L). {
         intros.
         rewrite <- Hi; cbn.
         destruct i; [ easy | ].
         apply Hla.
       }
-      clear - ro rp Heb Hlb.
+      clear - ro rp Hed Hlb.
       induction lb as [| b]; [ easy | cbn ].
       specialize (Hlb 0) as H1; cbn in H1; subst b.
       rewrite strip_0s_app; cbn.
-      rewrite (rngl_eqb_refl Heb).
+      rewrite (rngl_eqb_refl Hed).
       rewrite <- IHlb; [ easy | ].
       intros i.
       now specialize (Hlb (S i)).
     }
-    apply (rngl_eqb_neq Heb) in Haz.
+    apply (rngl_eqb_neq Hed) in Haz.
     destruct lb as [| b]; [ now specialize (Hi 0); cbn in Hi | cbn ].
     rewrite strip_0s_app; cbn.
     remember (strip_0s (List.rev lb)) as ld eqn:Hld; symmetry in Hld.
     destruct ld as [| d]. {
       rewrite if_bool_if_dec.
       destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
-        apply (rngl_eqb_eq Heb) in Hbz; subst b.
+        apply (rngl_eqb_eq Hed) in Hbz; subst b.
         now specialize (Hi 0).
       }
       f_equal.
@@ -820,7 +808,7 @@ induction la as [| a]; intros. {
   destruct ld as [| d]. {
     rewrite if_bool_if_dec.
     destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
-      apply (rngl_eqb_eq Heb) in Hbz; subst b.
+      apply (rngl_eqb_eq Hed) in Hbz; subst b.
       specialize (IHla lb).
       assert (H : ∀ i : nat, List.nth i la 0%L = List.nth i lb 0%L). {
         intros i.
@@ -1278,9 +1266,9 @@ induction lb as [| b]; intros. {
   induction la as [| a]; [ easy | cbn ].
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
   rewrite Hf.
-  rewrite (rngl_eqb_refl Heb).
+  rewrite (rngl_eqb_refl Hed).
   apply IHla.
 }
 destruct la as [| a]; [ easy | cbn ].
@@ -1291,7 +1279,7 @@ destruct lc as [| c]. {
   cbn.
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
-    apply (rngl_eqb_eq Heb) in Haz.
+    apply (rngl_eqb_eq Hed) in Haz.
     subst a; cbn.
     rewrite List.app_nil_r, Nat.sub_0_r.
     now rewrite strip_0s_app.
@@ -1336,9 +1324,9 @@ induction la as [| a]; intros. {
   induction la as [| a]; [ easy | cbn ].
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
   rewrite Hf.
-  rewrite (rngl_eqb_refl Heb).
+  rewrite (rngl_eqb_refl Hed).
   apply IHla.
 }
 destruct lb as [| b]; [ easy | cbn ].
@@ -1350,7 +1338,7 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec.
   destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
     cbn.
-    apply (rngl_eqb_eq Heb) in Hbz.
+    apply (rngl_eqb_eq Hed) in Hbz.
     subst b; cbn.
     rewrite List.app_nil_r, Hf, Nat.sub_0_r.
     rewrite List_rev_map2; [ | symmetry; apply List.repeat_length ].
@@ -1971,7 +1959,7 @@ move Hop after Hsu.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
-move Hos after Heb.
+move Hos after Hed.
 unfold lap_sub.
 rewrite Hop, Hsu.
 unfold lap_add, lap_subt.
@@ -2038,7 +2026,7 @@ move Hop after Hsu.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
-move Hos after Heb.
+move Hos after Hed.
 unfold lap_subt, lap_add.
 do 2 rewrite List_length_map2.
 do 4 rewrite List.length_app, List.repeat_length.
@@ -2380,7 +2368,7 @@ move Hop after Hsu.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
-move Hos after Heb.
+move Hos after Hed.
 unfold lap_sub.
 rewrite Hop, Hsu.
 apply (lap_subt_add_distr Hsu).
@@ -2726,7 +2714,7 @@ j'investigue dans ce sens d'abord.
 assert (Hos : rngl_has_opp_or_subt T = true). {
   now apply rngl_has_opp_or_subt_iff; right.
 }
-move Hos after Heb.
+move Hos after Hed.
 unfold lap_mul, lap_subt.
 destruct la as [| a]; [ easy | cbn ].
 destruct lb as [| b]. {
@@ -2950,6 +2938,69 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_characteristic_prop := lap_characteristic_prop;
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA |}.
+
+(* to be completed
+Theorem lap_div_mod :
+  ∀ la lb,
+  lap_norm la = la
+  → lb ≠ 0%lap
+  → la = (lb * (la / lb) + la mod lb)%lap.
+Proof.
+intros * Hla Hlb.
+progress unfold lap_quot.
+progress unfold lap_rem.
+remember (rlap_quot_rem _ _) as lqr eqn:Hlqr.
+symmetry in Hlqr.
+destruct lqr as (lq, lr).
+remember (List.rev la) as rla eqn:Hrla.
+remember (List.rev lb) as rlb eqn:Hrlb.
+symmetry in Hrla, Hrlb.
+apply List_rev_symm in Hrla, Hrlb.
+subst la lb.
+progress unfold lap_norm in Hla.
+rewrite List.rev_involutive in Hla.
+apply List_rev_rev in Hla.
+rename rla into la; rename rlb into lb.
+move lb before la; move lq before lb; move lr before lq.
+progress unfold rlap_quot_rem in Hlqr.
+progress unfold rlap_quot_rem_nb_iter in Hlqr.
+revert lq Hlqr.
+induction la as [| a]; intros. {
+  cbn in Hlqr.
+  progress unfold rlap_quot_rem_step in Hlqr.
+  destruct lb as [| b]; injection Hlqr; intros; subst lq lr; cbn; [ easy | ].
+  rewrite lap_mul_0_r.
+  symmetry; apply lap_add_0_l.
+}
+cbn in Hlqr.
+progress unfold rlap_quot_rem_step in Hlqr.
+destruct lb as [| b]. {
+  now injection Hlqr; clear Hlqr; intros; subst lq lr.
+}
+remember (length la <? length lb) as lab eqn:Hlab.
+symmetry in Hlab.
+destruct lab. {
+  injection Hlqr; clear Hlqr; intros; subst lq lr; cbn.
+  rewrite lap_mul_0_r, lap_add_0_l.
+  cbn in Hla.
+  remember (a =? 0)%L as az eqn:Haz.
+  symmetry in Haz.
+  destruct az; [ | easy ].
+  exfalso.
+  apply (rngl_eqb_eq Hed) in Haz; subst a.
+  specialize (strip_0s_length_le la) as H1.
+  apply Nat.nlt_ge in H1.
+  apply H1; clear H1.
+  now rewrite Hla; cbn.
+}
+...
+remember (la / lb)%lap as lq eqn:Hlq.
+remember 
+destruct lb as [| b]; [ easy | ].
+clear Hlb.
+Print rlap_quot_rem.
+...
+*)
 
 (* roots *)
 
