@@ -3323,27 +3323,6 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
-Theorem rev_lap_sub_norm :
-  rngl_has_opp T = true →
-  ∀ la lb,
-  List.rev (la - lb)%lap =
-    ((List.repeat 0%L (List.length lb - List.length la) ++ List.rev la) -
-     (List.repeat 0%L (List.length la - List.length lb) ++ List.rev lb))%lap.
-Proof.
-intros Hop *.
-unfold lap_sub.
-rewrite Hop.
-rewrite rev_lap_add_norm.
-rewrite lap_opp_length.
-f_equal.
-rewrite lap_opp_app_distr.
-rewrite rev_lap_opp.
-f_equal.
-unfold lap_opp.
-rewrite map_opp_repeat.
-now rewrite rngl_opp_0.
-Qed.
-
 Theorem rev_lap_sub : ∀ la lb,
   List.length la = List.length lb
   → (List.rev (la - lb) = List.rev la - List.rev lb)%lap.
@@ -3439,6 +3418,54 @@ rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
 
+Theorem rev_lap_sub_norm :
+  rngl_has_opp_or_subt T = true →
+  ∀ la lb,
+  List.rev (la - lb)%lap =
+    ((List.repeat 0%L (List.length lb - List.length la) ++ List.rev la) -
+     (List.repeat 0%L (List.length la - List.length lb) ++ List.rev lb))%lap.
+Proof.
+intros Hos *.
+unfold lap_sub.
+remember (rngl_has_opp T) as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  rewrite rev_lap_add_norm.
+  rewrite lap_opp_length.
+  f_equal.
+  rewrite lap_opp_app_distr.
+  rewrite rev_lap_opp.
+  f_equal.
+  unfold lap_opp.
+  rewrite map_opp_repeat.
+  now rewrite rngl_opp_0.
+}
+remember (rngl_has_subt T) as su eqn:Hsu.
+symmetry in Hsu.
+destruct su. {
+  progress unfold lap_subt.
+  rewrite List_rev_map2. 2: {
+    do 2 rewrite List.length_app.
+    do 2 rewrite List.repeat_length.
+    flia.
+  }
+  do 2 rewrite List.length_app.
+  do 2 rewrite List.repeat_length.
+  do 2 rewrite List.length_rev.
+  do 2 rewrite Nat.sub_add_distr.
+  do 2 rewrite List.rev_app_distr.
+  do 2 rewrite List.rev_repeat.
+  progress replace (_ - _ + _ - _ - _) with 0 by flia.
+  progress replace (_ - _ + _ - _ - _) with 0 by flia.
+  cbn.
+  do 2 rewrite List.app_nil_r.
+  easy.
+}
+apply rngl_has_opp_or_subt_iff in Hos.
+rewrite Hop, Hsu in Hos.
+now destruct Hos.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_has_1 T = true →
   rngl_mul_is_comm T = true →
@@ -3478,8 +3505,6 @@ rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite List.map_rev.
 replace (b * cq)%L with (b * (a / b))%L by now rewrite Hcq.
-rewrite (rngl_mul_comm Hic b).
-rewrite (rngl_div_mul Hon Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite List.app_assoc.
 rewrite <- List.rev_app_distr.
@@ -3505,6 +3530,8 @@ rewrite lap_add_app_l. 2: {
 rewrite lap_sub_length, List.length_map.
 rewrite Nat.max_l; [ | easy ].
 split; [ | easy ].
+rewrite (rngl_mul_comm Hic b).
+rewrite (rngl_div_mul Hon Hiv _ _ Hbz).
 f_equal.
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
@@ -3818,10 +3845,9 @@ Theorem lap_div_mod :
     List.length lr < List.length lb ∧
     has_polyn_prop lq = true.
 Proof.
-intros Hon Hco Hop Hiv * Ha Hb Hr Hab.
-assert (Hos : rngl_has_opp_or_subt T = true). {
-  now apply rngl_has_opp_or_subt_iff; left.
-}
+intros Hon Hco Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+intros * Ha Hb Hr Hab.
 assert (Hrb : List.length lr < List.length lb). {
   eapply lap_rem_length_lt; [ | | apply Hab ]. {
     now intros H; subst lb.

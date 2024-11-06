@@ -1633,7 +1633,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 
-(* is it provable?
+(* to be completed but is it provable?
 Theorem polyn_opt_div_mul_distr :
   let _ := polyn_ring_like_op in (* utiliser Instance *)
   if rngl_has_quot (polyn T) then
@@ -1641,6 +1641,9 @@ Theorem polyn_opt_div_mul_distr :
   else not_applicable.
 Proof.
 intros rop.
+(*
+specialize polyn_div_mod as H1.
+*)
 remember (rngl_has_quot (polyn T)) as qu eqn:Hqu.
 symmetry in Hqu.
 destruct qu; [ | easy ].
