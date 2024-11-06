@@ -1685,6 +1685,31 @@ destruct (Sumbool.sumbool_of_bool _) as [Hic| Hic]. {
       symmetry in Hpqr.
       destruct pqr as (q, r).
       specialize (H2 q r).
+      destruct (polyn_eq_dec (b * c) 0)%pol as [Hbc| Hbc]. {
+(*
+injection Hbc; clear Hbc; intros H3.
+Search (lap_norm _ = []).
+specialize (proj2 (@all_0_lap_norm_nil T ro Hed _) H3) as H4.
+...
+cbn in H4.
+Search (_ * _ = 0)%lap.
+apply eq_polyn_mul_0 in Hbc.
+*)
+progress unfold polyn_quot.
+        rewrite Hbc in Hpqr.
+        progress unfold polyn_quot_rem in Hpqr.
+        progress unfold polyn_quot in Hpqr.
+        progress unfold polyn_rem in Hpqr.
+        destruct (Sumbool.sumbool_of_bool (rngl_has_1 T)) as [Hon'| Hon']. {
+          move Hon' before Hon.
+          destruct (Sumbool.sumbool_of_bool _) as [Hiv| Hiv]. {
+            cbn in Hpqr.
+            injection Hpqr; clear Hpqr; intros; subst q r.
+            rewrite Hbc.
+cbn.
+injection Hbc; clear Hbc; intros H3.
+specialize (proj2 (@all_0_lap_norm_nil T ro Hed _) H3) as H4.
+...
       assert (H : (b * c)%pol ≠ 0%pol). {
 Search (_ / _)%pol.
 Print polyn_quot.
