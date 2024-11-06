@@ -1667,14 +1667,25 @@ destruct iq as [op| ]; [ | easy ].
 destruct op; [ easy | ].
 clear Hqu Hiv.
 progress unfold polyn_opt_inv_or_quot in Hiq.
-destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]. {
+destruct (Sumbool.sumbool_of_bool _) as [Hic| Hic]. {
   destruct (Sumbool.sumbool_of_bool _) as [Hop| Hop]. {
     progress unfold rngl_has_inv in Hiq.
     destruct (Sumbool.sumbool_of_bool _) as [Hiv| Hiv]. {
+      specialize (polyn_div_mod Hic Hop) as H1.
+      progress unfold rngl_has_inv in H1.
       remember (rngl_opt_inv_or_quot T) as iqt eqn:Hiqt.
       symmetry in Hiqt.
       destruct iqt as [iqt| ]; [ | easy ].
+      destruct iqt; [ | easy ].
+      clear Hiv.
+      specialize (H1 eq_refl).
       injection Hiq; clear Hiq; intros; subst p.
+      specialize (H1 a (b * c))%pol as H2.
+      remember (polyn_quot_rem a (b * c)%pol) as pqr eqn:Hpqr.
+      symmetry in Hpqr.
+      destruct pqr as (q, r).
+      specialize (H2 q r).
+      assert (H : (b * c)%pol ≠ 0%pol). {
 Search (_ / _)%pol.
 Print polyn_quot.
 ...
