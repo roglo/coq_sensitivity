@@ -3536,27 +3536,14 @@ f_equal.
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
 symmetry in Hrlac.
-assert (rla = (rlc + rlac)%lap). {
-  rewrite <- Hrlac, lap_add_comm.
-  symmetry.
-  apply (lap_sub_add Hop).
-  now rewrite Hca.
-}
-subst rla.
-rewrite lap_add_length in Hca.
-symmetry in Hca.
-apply Nat.max_l_iff in Hca.
-apply (f_equal (λ l, List.length l)) in Hrlac.
-rewrite lap_sub_length in Hrlac.
-rewrite lap_add_length in Hrlac.
-rewrite Nat.max_l in Hrlac; [| apply Nat.le_max_l ].
-rewrite Nat.max_l in Hrlac; [ | easy ].
-destruct rlac as [| ac]; intros. {
-  apply List.length_zero_iff_nil in Hrlac; subst rlc; cbn.
-  rewrite lap_add_0_l in Hab.
-  now apply Nat.le_0_r, List.length_zero_iff_nil in Hab; subst rlb.
-}
-now rewrite rev_lap_add.
+(**)
+rewrite <- Hrlac.
+rewrite rev_lap_sub; [ | easy ].
+rewrite lap_add_comm.
+symmetry.
+apply (lap_sub_add Hop).
+do 2 rewrite List.length_rev.
+now rewrite Hca.
 Qed.
 
 Theorem rlap_quot_rem_length :
