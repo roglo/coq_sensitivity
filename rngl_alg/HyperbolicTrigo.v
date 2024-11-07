@@ -578,13 +578,12 @@ apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in H1. 2: {
 now destruct H1; subst c; [ left | right ]; apply eq_hangle_eq.
 Qed.
 
-(* to be completed
 Theorem hangle_add_comm :
   ∀ θ1 θ2, (θ1 + θ2 = θ2 + θ1)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 rewrite (rngl_mul_comm Hic).
 rewrite (rngl_mul_comm Hic (rngl_sinh θ1)).
 f_equal.
@@ -594,17 +593,19 @@ rewrite (rngl_mul_comm Hic (rngl_cosh θ2)).
 easy.
 Qed.
 
+(* to be completed
 Theorem hangle_add_assoc :
   ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 cbn.
 f_equal. {
+...
   rewrite (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_mul_sub_distr_r Hop).
   rewrite rngl_mul_add_distr_l.
