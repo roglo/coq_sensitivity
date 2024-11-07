@@ -639,13 +639,18 @@ Qed.
 
 Theorem hangle_add_opp_r : ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%H.
 Proof. easy. Qed.
+*)
 
+(* to be completed
 Theorem hangle_sub_diag : ∀ θ, (θ - θ = 0)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
-rewrite (rngl_mul_opp_r Hop).
+apply eq_hangle_eq; cbn.
+do 4 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_add_opp_l Hop).
+do 2 rewrite fold_rngl_squ.
+...
 rewrite (rngl_sub_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
 rewrite cosh2_sinh2_1.
