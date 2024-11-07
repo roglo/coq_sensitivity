@@ -241,7 +241,12 @@ apply (rngl_abs_le Hop Hor) in H.
 destruct H as (_, H).
 Search (_ ≤ rngl_abs _)%L.
 About rngl_abs_le.
+apply rngl_le_abs in H.
+rewrite rngl_abs_1 in H.
+easy.
+...
 About rngl_le_abs.
+About rngl_le_abs_diag.
 ...
 Search (1 ≤ _²)%L.
 Search (_² ≤ _²)%L.
