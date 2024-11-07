@@ -508,23 +508,22 @@ Theorem rngl_cos_add :
     (rngl_cos θ1 * rngl_cos θ2 - rngl_sin θ1 * rngl_sin θ2)%L.
 Proof. easy. Qed.
 
+Theorem rngl_sin_add :
+  ∀ θ1 θ2,
+  rngl_sin (θ1 + θ2) =
+    (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L.
+Proof. easy. Qed.
+
 Theorem rngl_cos_sub :
   ∀ θ1 θ2,
   (rngl_cos (θ1 - θ2) =
      rngl_cos θ1 * rngl_cos θ2 + rngl_sin θ1 * rngl_sin θ2)%L.
 Proof.
 destruct_ac.
-intros.
-cbn.
+intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 apply (rngl_sub_opp_r Hop).
 Qed.
-
-Theorem rngl_sin_add :
-  ∀ θ1 θ2,
-  rngl_sin (θ1 + θ2) =
-    (rngl_sin θ1 * rngl_cos θ2 + rngl_cos θ1 * rngl_sin θ2)%L.
-Proof. easy. Qed.
 
 Theorem rngl_sin_sub :
   ∀ θ1 θ2,
@@ -532,8 +531,7 @@ Theorem rngl_sin_sub :
     (rngl_sin θ1 * rngl_cos θ2 - rngl_cos θ1 * rngl_sin θ2)%L.
 Proof.
 destruct_ac.
-intros.
-cbn.
+intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 apply (rngl_add_opp_r Hop).
 Qed.

@@ -1,5 +1,6 @@
 (* experimental
-   hyperbolic angles implemented like trigo without π *)
+   hyperbolic angles implemented like trigo without π
+   but with "x²-y²=1" instead of "x²+y²=1" *)
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
@@ -153,6 +154,7 @@ rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
+(*
 Theorem hangle_opp_prop :
   ∀ a, cosh2_sinh2_prop (- rngl_cosh a) (- rngl_sinh a)%L.
 Proof.
@@ -169,6 +171,24 @@ destruct ic; [ | easy ].
 destruct ed; [ | easy ].
 now do 2 rewrite (rngl_squ_opp Hop).
 Qed.
+*)
+
+Theorem hangle_opp_prop :
+  ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
+Proof.
+intros.
+destruct a as (x, y, Hxy); cbn.
+progress unfold cosh2_sinh2_prop in Hxy |-*.
+remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
+remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
+remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
+remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
+destruct on; [ | easy ].
+destruct op; [ | easy ].
+destruct ic; [ | easy ].
+destruct ed; [ | easy ].
+now rewrite (rngl_squ_opp Hop).
+Qed.
 
 Definition hangle_zero :=
   {| rngl_cosh := 1; rngl_sinh := 0;
@@ -183,8 +203,14 @@ Definition hangle_add a b :=
      rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
      rngl_cosh2_sinh2 := hangle_add_prop a b |}.
 
+(*
 Definition hangle_opp a :=
   {| rngl_cosh := - rngl_cosh a; rngl_sinh := - rngl_sinh a;
+     rngl_cosh2_sinh2 := hangle_opp_prop a |}.
+*)
+
+Definition hangle_opp a :=
+  {| rngl_cosh := rngl_cosh a; rngl_sinh := - rngl_sinh a;
      rngl_cosh2_sinh2 := hangle_opp_prop a |}.
 
 Definition hangle_sub θ1 θ2 := hangle_add θ1 (hangle_opp θ2).
@@ -468,6 +494,7 @@ Theorem rngl_sinh_add :
     (rngl_sinh θ1 * rngl_cosh θ2 + rngl_cosh θ1 * rngl_sinh θ2)%L.
 Proof. easy. Qed.
 
+(*
 Theorem rngl_cosh_sub :
   ∀ θ1 θ2, rngl_cosh (θ1 - θ2) = (- rngl_cosh (θ1 + θ2))%L.
 Proof.
@@ -488,6 +515,29 @@ do 2 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
 rewrite rngl_add_comm.
 now rewrite (rngl_opp_add_distr Hop).
+Qed.
+*)
+
+Theorem rngl_cosh_sub :
+  ∀ θ1 θ2,
+  (rngl_cosh (θ1 - θ2) =
+     rngl_cosh θ1 * rngl_cosh θ2 - rngl_sinh θ1 * rngl_sinh θ2)%L.
+Proof.
+destruct_hc.
+intros; cbn.
+rewrite (rngl_mul_opp_r Hop).
+apply (rngl_add_opp_r Hop).
+Qed.
+
+Theorem rngl_sinh_sub :
+  ∀ θ1 θ2,
+  (rngl_sinh (θ1 - θ2) =
+     rngl_sinh θ1 * rngl_cosh θ2 - rngl_cosh θ1 * rngl_sinh θ2)%L.
+Proof.
+destruct_hc.
+intros; cbn.
+rewrite (rngl_mul_opp_r Hop).
+apply (rngl_add_opp_r Hop).
 Qed.
 
 (* to be completed
@@ -641,26 +691,21 @@ Theorem hangle_add_opp_r : ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%H.
 Proof. easy. Qed.
 *)
 
-(* to be completed
 Theorem hangle_sub_diag : ∀ θ, (θ - θ = 0)%H.
 Proof.
 destruct_hc.
 intros.
 apply eq_hangle_eq; cbn.
-do 4 rewrite (rngl_mul_opp_r Hop).
-do 2 rewrite (rngl_add_opp_l Hop).
-do 2 rewrite fold_rngl_squ.
-...
-rewrite (rngl_sub_opp_r Hop).
+do 2 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
 rewrite cosh2_sinh2_1.
 f_equal.
-rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_comm Hic).
-rewrite (rngl_add_opp_r Hop).
 apply (rngl_sub_diag Hos).
 Qed.
 
+(* to be completed
 Theorem hangle_add_0_l : ∀ θ, (0 + θ = θ)%H.
 Proof.
 destruct_hc.
