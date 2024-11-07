@@ -834,6 +834,21 @@ rewrite <- (rngl_add_0_l 0%L).
 now apply (rngl_add_le_compat Hor).
 Qed.
 
+Theorem rngl_abs_nonneg_eq :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ a, (0 ≤ a)%L → rngl_abs a = a.
+Proof.
+intros Hop Hor * Hza.
+progress unfold rngl_abs.
+remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
+destruct az; [ | easy ].
+apply rngl_leb_le in Haz.
+apply (rngl_le_antisymm Hor _ _ Hza) in Haz.
+subst a.
+apply (rngl_opp_0 Hop).
+Qed.
+
 Theorem rngl_abs_le :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
@@ -900,10 +915,48 @@ split. {
     rewrite <- (rngl_abs_opp Hop Hor).
     apply (rngl_le_abs_diag Hop Hor).
   }
+  rewrite (rngl_abs_nonneg_eq Hop Hor). {
+    now apply (rngl_abs_le Hop Hor) in Hyx.
+  }
+  apply (rngl_le_trans Hor _ (rngl_abs x)); [ | easy ].
+  apply (rngl_abs_nonneg Hop Hor).
+}
+intros Hxy.
+(* well, if x ≤ 0, the hypothesis Hxy has no value, no information,
+   all abs values being greater than any negative value *)
+Inspect 1.
 ...
-    apply (rngl_le_opp_r Hop Hor) in Hyx.
-Inspec
+progress unfold rngl_abs in Hxy.
+remember (y ≤? 0)%L as yz eqn:Hyz; symmetry in Hyz.
+destruct yz. {
+  apply rngl_leb_le in Hyz.
+  apply (rngl_opp_le_compat Hop Hor) in Hxy.
+  rewrite (rngl_opp_involutive Hop) in Hxy.
+  progress unfold rngl_abs.
+  remember (x ≤? 0)%L as xz eqn:Hxz; symmetry in Hxz.
+  destruct xz. {
+    apply rngl_leb_le in Hxz.
+    rewrite (rngl_opp_involutive Hop).
+    left.
 ...
+    apply (rngl_le_trans Hor _ (- x)); [ easy | ].
+...
+    rewrite rngl_add_comm.
+    apply (rngl_le_opp_l Hop Hor).
+Search (- _ ≤ _)%L.
+
+...
+  apply (rngl_le_trans Hor _ (- x)); [ easy | ].
+...
+    } {
+      apply (rngl_le_trans Hor _ 0%L); [ easy | ].
+      apply (rngl_le_trans Hor _ (- y)%L); [ | easy ].
+      apply (rngl_le_0_sub Hop Hor) in Hyz.
+      progress unfold rngl_sub in Hyz.
+      rewrite Hop in Hyz.
+      now rewrite rngl_add_0_l in Hyz.
+...
+
 intros Hop Hor.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
@@ -1031,21 +1084,6 @@ Proof.
 intros Hop Hor *.
 rewrite <- (rngl_abs_opp Hop Hor).
 now rewrite (rngl_opp_sub_distr Hop).
-Qed.
-
-Theorem rngl_abs_nonneg_eq :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ a, (0 ≤ a)%L → rngl_abs a = a.
-Proof.
-intros Hop Hor * Hza.
-progress unfold rngl_abs.
-remember (a ≤? 0)%L as az eqn:Haz; symmetry in Haz.
-destruct az; [ | easy ].
-apply rngl_leb_le in Haz.
-apply (rngl_le_antisymm Hor _ _ Hza) in Haz.
-subst a.
-apply (rngl_opp_0 Hop).
 Qed.
 
 Theorem rngl_abs_nonpos_eq :
