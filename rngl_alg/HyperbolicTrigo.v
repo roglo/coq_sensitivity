@@ -257,7 +257,7 @@ Qed.
 
 (* *)
 
-(* to be completed
+(*
 Theorem hangle_div_2_prop :
   ∀ a (ε := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
   cosh2_sinh2_prop
@@ -336,10 +336,12 @@ Definition hangle_div_2 a :=
   {| rngl_cosh := (ε * rl_sqrt ((1 + rngl_cosh a) / 2))%L;
      rngl_sinh := (rl_sqrt ((1 - rngl_cosh a) / 2))%L;
      rngl_cosh2_sinh2 := hangle_div_2_prop a |}.
+*)
 
 Definition hangle_eqb a b :=
   ((rngl_cosh a =? rngl_cosh b)%L && (rngl_sinh a =? rngl_sinh b)%L)%bool.
 
+(*
 Definition hangle_leb θ1 θ2 :=
   if (0 ≤? rngl_sinh θ1)%L then
     if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ2 ≤? rngl_cosh θ1)%L
@@ -355,6 +357,7 @@ Definition hangle_ltb θ1 θ2 :=
   else
     if (0 ≤? rngl_sinh θ2)%L then false
     else (rngl_cosh θ1 <? rngl_cosh θ2)%L.
+*)
 
 End a.
 
@@ -363,25 +366,29 @@ Delimit Scope hangle_scope with A.
 Bind Scope hangle_scope with hangle.
 
 Notation "0" := hangle_zero : hangle_scope.
-Notation "θ1 + θ2" := (angle_add θ1 θ2) : hangle_scope.
-Notation "θ1 - θ2" := (angle_sub θ1 θ2) : hangle_scope.
-Notation "- θ" := (angle_opp θ) : hangle_scope.
-Notation "θ1 =? θ2" := (angle_eqb θ1 θ2) : hangle_scope.
-Notation "θ1 ≠? θ2" := (negb (angle_eqb θ1 θ2)) : hangle_scope.
-Notation "θ1 ≤? θ2" := (angle_leb θ1 θ2) : hangle_scope.
-Notation "θ1 <? θ2" := (angle_ltb θ1 θ2) : hangle_scope.
-Notation "θ1 ≤ θ2" := (angle_leb θ1 θ2 = true) : hangle_scope.
-Notation "θ1 < θ2" := (angle_ltb θ1 θ2 = true) : hangle_scope.
-Notation "n * θ" := (angle_mul_nat θ n) : hangle_scope.
-Notation "θ /₂" := (angle_div_2 θ) (at level 40) : hangle_scope.
+Notation "θ1 + θ2" := (hangle_add θ1 θ2) : hangle_scope.
+Notation "θ1 - θ2" := (hangle_sub θ1 θ2) : hangle_scope.
+Notation "- θ" := (hangle_opp θ) : hangle_scope.
+Notation "θ1 =? θ2" := (hangle_eqb θ1 θ2) : hangle_scope.
+Notation "θ1 ≠? θ2" := (negb (hangle_eqb θ1 θ2)) : hangle_scope.
+(*
+Notation "θ1 ≤? θ2" := (hangle_leb θ1 θ2) : hangle_scope.
+Notation "θ1 <? θ2" := (hangle_ltb θ1 θ2) : hangle_scope.
+Notation "θ1 ≤ θ2" := (hangle_leb θ1 θ2 = true) : hangle_scope.
+Notation "θ1 < θ2" := (hangle_ltb θ1 θ2 = true) : hangle_scope.
+*)
+Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
+(*
+Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
 Notation "θ1 ≤ θ2 < θ3" :=
-  (angle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
+  (hangle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
-  (angle_leb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+  (hangle_leb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 < θ2 < θ3" :=
-  (angle_ltb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
+  (hangle_ltb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 < θ2 ≤ θ3" :=
-  (angle_ltb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+  (hangle_ltb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+*)
 
 Section a.
 
@@ -391,6 +398,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : hangle_ctx T}.
 
+(*
 Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
 Proof.
 destruct_hc.
@@ -446,43 +454,43 @@ apply Bool.not_true_iff_false.
 apply (rngl_leb_gt Hor).
 now apply rngl_ltb_lt.
 Qed.
+*)
 
-Theorem rngl_cos_add :
+Theorem rngl_cosh_add :
   ∀ θ1 θ2,
   rngl_cosh (θ1 + θ2) =
-    (rngl_cosh θ1 * rngl_cosh θ2 - rngl_sinh θ1 * rngl_sinh θ2)%L.
+    (rngl_cosh θ1 * rngl_cosh θ2 + rngl_sinh θ1 * rngl_sinh θ2)%L.
 Proof. easy. Qed.
 
-Theorem rngl_cos_sub :
-  ∀ θ1 θ2,
-  (rngl_cosh (θ1 - θ2) =
-     rngl_cosh θ1 * rngl_cosh θ2 + rngl_sinh θ1 * rngl_sinh θ2)%L.
-Proof.
-destruct_hc.
-intros.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-apply (rngl_sub_opp_r Hop).
-Qed.
-
-Theorem rngl_sin_add :
+Theorem rngl_sinh_add :
   ∀ θ1 θ2,
   rngl_sinh (θ1 + θ2) =
     (rngl_sinh θ1 * rngl_cosh θ2 + rngl_cosh θ1 * rngl_sinh θ2)%L.
 Proof. easy. Qed.
 
-Theorem rngl_sin_sub :
-  ∀ θ1 θ2,
-  rngl_sinh (θ1 - θ2) =
-    (rngl_sinh θ1 * rngl_cosh θ2 - rngl_cosh θ1 * rngl_sinh θ2)%L.
+Theorem rngl_cosh_sub :
+  ∀ θ1 θ2, rngl_cosh (θ1 - θ2) = (- rngl_cosh (θ1 + θ2))%L.
 Proof.
 destruct_hc.
-intros.
-cbn.
-rewrite (rngl_mul_opp_r Hop).
-apply (rngl_add_opp_r Hop).
+intros; cbn.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite rngl_add_comm.
+now rewrite (rngl_opp_add_distr Hop).
 Qed.
 
+Theorem rngl_sinh_sub :
+  ∀ θ1 θ2, rngl_sinh (θ1 - θ2) = (- rngl_sinh (θ1 + θ2))%L.
+Proof.
+destruct_hc.
+intros; cbn.
+do 2 rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite rngl_add_comm.
+now rewrite (rngl_opp_add_distr Hop).
+Qed.
+
+(* to be completed
 Theorem rngl_add_cos_nonneg_sqrt_mul_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_cosh θ1 + rngl_cosh θ2)%L
@@ -497,6 +505,7 @@ assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cosh θ)%L). {
   apply (rngl_le_sub_le_add_l Hop Hor).
   progress unfold rngl_sub.
   rewrite Hop, rngl_add_0_l.
+...
   apply rngl_cos_bound.
 }
 assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cosh θ)%L). {
@@ -714,7 +723,7 @@ progress unfold hangle_sub.
 rewrite <- hangle_add_assoc.
 rewrite hangle_add_opp_r.
 rewrite hangle_sub_diag.
-apply (angle_add_0_r).
+apply (hangle_add_0_r).
 Qed.
 
 Theorem hangle_sub_add : ∀ θ1 θ2, (θ1 - θ2 + θ2)%A = θ1.
@@ -723,7 +732,7 @@ destruct_hc; intros.
 progress unfold hangle_sub.
 rewrite <- hangle_add_assoc.
 rewrite hangle_add_opp_diag_l.
-apply (angle_add_0_r).
+apply (hangle_add_0_r).
 Qed.
 
 Theorem hangle_opp_add_distr :
@@ -842,7 +851,7 @@ split; intros Ha. {
 Qed.
 
 Theorem rngl_cos_add_straight_l :
-  ∀ θ, rngl_cosh (angle_straight + θ) = (- rngl_cosh θ)%L.
+  ∀ θ, rngl_cosh (hangle_straight + θ) = (- rngl_cosh θ)%L.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -864,7 +873,7 @@ apply (rngl_sub_0_r Hos).
 Qed.
 
 Theorem rngl_cos_add_right_l :
-  ∀ θ, rngl_cosh (angle_right + θ) = (- rngl_sinh θ)%L.
+  ∀ θ, rngl_cosh (hangle_right + θ) = (- rngl_sinh θ)%L.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -884,7 +893,7 @@ apply (rngl_sub_0_l Hop).
 Qed.
 
 Theorem rngl_sin_add_right_l :
-  ∀ θ, rngl_sinh (angle_right + θ) = rngl_cosh θ.
+  ∀ θ, rngl_sinh (hangle_right + θ) = rngl_cosh θ.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -904,7 +913,7 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem rngl_cos_sub_straight_l :
-  ∀ θ, rngl_cosh (angle_straight - θ) = (- rngl_cosh θ)%L.
+  ∀ θ, rngl_cosh (hangle_straight - θ) = (- rngl_cosh θ)%L.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -915,7 +924,7 @@ now rewrite (rngl_sub_0_r Hos).
 Qed.
 
 Theorem rngl_sin_sub_straight_l :
-  ∀ θ, rngl_sinh (angle_straight - θ) = rngl_sinh θ.
+  ∀ θ, rngl_sinh (hangle_straight - θ) = rngl_sinh θ.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -1190,7 +1199,7 @@ apply (rngl_opp_involutive Hop).
 Qed.
 
 Theorem rngl_sin_eq :
-  ∀ θ1 θ2, rngl_sinh θ1 = rngl_sinh θ2 → θ1 = θ2 ∨ θ1 = (angle_straight - θ2)%A.
+  ∀ θ1 θ2, rngl_sinh θ1 = rngl_sinh θ2 → θ1 = θ2 ∨ θ1 = (hangle_straight - θ2)%A.
 Proof.
 destruct_hc.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
@@ -1441,7 +1450,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [Hzc2| Hzc2]. {
   clear H2z.
   assert (Hs21 : (rngl_sinh θ2 < rngl_sinh θ1)%L). {
     apply (rngl_lt_opp_r Hop Hor) in Hcc.
-    remember (angle_straight - θ2)%A as θ eqn:Hθ.
+    remember (hangle_straight - θ2)%A as θ eqn:Hθ.
     symmetry in Hθ.
     apply hangle_sub_move_l in Hθ.
     subst θ2; rename θ into θ2.
@@ -1584,7 +1593,7 @@ easy.
 Qed.
 
 Theorem hangle_right_add_right :
-  (angle_right + hangle_right)%A = hangle_straight.
+  (hangle_right + hangle_right)%A = hangle_straight.
 Proof.
 destruct_hc.
 apply eq_angle_eq; cbn.
@@ -1596,7 +1605,7 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem hangle_straight_add_straight :
-  (angle_straight + hangle_straight = 0)%A.
+  (hangle_straight + hangle_straight = 0)%A.
 Proof.
 destruct_hc.
 apply eq_angle_eq; cbn.
@@ -1611,7 +1620,7 @@ apply rngl_add_0_l.
 Qed.
 
 Theorem hangle_straight_sub_right :
-  (angle_straight - hangle_right)%A = hangle_right.
+  (hangle_straight - hangle_right)%A = hangle_right.
 Proof.
 destruct_hc.
 apply eq_angle_eq; cbn.
@@ -1851,7 +1860,7 @@ split; intros H12. {
 Qed.
 
 Theorem rngl_sin_add_straight_l :
-  ∀ θ, (rngl_sinh (angle_straight + θ) = - rngl_sinh θ)%L.
+  ∀ θ, (rngl_sinh (hangle_straight + θ) = - rngl_sinh θ)%L.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -2045,7 +2054,7 @@ apply (rngl_nle_gt_iff Hor) in Hzc2.
 apply (rngl_nle_gt_iff Hor).
 intros Hcc.
 assert (Hs21 : (rngl_sinh θ1 ≤ rngl_sinh θ2)%L). {
-  remember (angle_straight - θ2)%A as θ eqn:Hθ.
+  remember (hangle_straight - θ2)%A as θ eqn:Hθ.
   symmetry in Hθ.
   apply hangle_sub_move_l in Hθ.
   subst θ2; rename θ into θ2.
@@ -2269,7 +2278,7 @@ destruct (rngl_lt_dec Hor x y) as [Hxy| Hxy]. {
       now apply (rngl_opp_nonpos_nonneg Hop Hor).
     } {
       rewrite hangle_add_assoc.
-      rewrite (angle_add_comm θ1).
+      rewrite (hangle_add_comm θ1).
       rewrite hangle_add_comm.
       do 2 rewrite hangle_add_assoc.
       rewrite hangle_straight_add_straight.
@@ -2731,7 +2740,7 @@ easy.
 Qed.
 
 Theorem rngl_sin_sub_right_l :
-  ∀ θ, rngl_sinh (angle_right - θ) = rngl_cosh θ.
+  ∀ θ, rngl_sinh (hangle_right - θ) = rngl_cosh θ.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -2765,7 +2774,7 @@ apply (rngl_mul_1_r Hon).
 Qed.
 
 Theorem rngl_cos_sub_right_l :
-  ∀ θ, rngl_cosh (angle_right - θ) = rngl_sinh θ.
+  ∀ θ, rngl_cosh (hangle_right - θ) = rngl_sinh θ.
 Proof.
 destruct_hc.
 intros; cbn.
@@ -3344,7 +3353,7 @@ cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
-Theorem hangle_straight_div_2 : (angle_straight /₂ = hangle_right)%A.
+Theorem hangle_straight_div_2 : (hangle_straight /₂ = hangle_right)%A.
 Proof.
 destruct_hc.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -3591,7 +3600,7 @@ Qed.
 
 Theorem hangle_eucl_dist_triangular :
   ∀ θ1 θ2 θ3,
-  (angle_eucl_dist θ1 θ3 ≤ hangle_eucl_dist θ1 θ2 + hangle_eucl_dist θ2 θ3)%L.
+  (hangle_eucl_dist θ1 θ3 ≤ hangle_eucl_dist θ1 θ2 + hangle_eucl_dist θ2 θ3)%L.
 Proof.
 intros *.
 destruct_hc.
@@ -3656,7 +3665,7 @@ Qed.
 
 Theorem hangle_taxi_dist_triangular :
   ∀ θ1 θ2 θ3,
-  (angle_taxi_dist θ1 θ3 ≤ hangle_taxi_dist θ1 θ2 + hangle_taxi_dist θ2 θ3)%L.
+  (hangle_taxi_dist θ1 θ3 ≤ hangle_taxi_dist θ1 θ2 + hangle_taxi_dist θ2 θ3)%L.
 Proof.
 destruct_hc; intros.
 destruct θ1 as (c1, s1, Hcs1).
