@@ -228,8 +228,9 @@ apply (rngl_sub_move_r Hop) in Hcs.
 (* c'est bizarre, ça : ça voudrait dire que cosh ≥ 1 ou cosh ≤ -1
    alors que le cosh normal est juste ≥ 1 *)
 (* quant au sinus hyperbolique, lui, il n'a carrément pas de
-   bornes alors que selon la formule on a s²=c²-1 ce qui donnerait
-   un sinh ≥ -1 *)
+   bornes *)
+(* donc il y a deux possibilités du cosinus hyperbolique :
+   soit supérieur à 1, soit inférieur à -1 *)
 ...
 assert (H : (c² ≤ 1)%L). {
   rewrite <- Hcs.
