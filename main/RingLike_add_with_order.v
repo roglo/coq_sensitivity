@@ -890,151 +890,25 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_le_abs :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ x y, (y ≤ - rngl_abs x ∨ rngl_abs x ≤ y)%L ↔ (x ≤ rngl_abs y)%L.
+  ∀ x y, (x ≤ y ∨ x ≤ -y)%L ↔ (x ≤ rngl_abs y)%L.
 Proof.
 intros Hop Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
-split. {
-  intros Hyx.
-  destruct Hyx as [Hyx| Hyx]. {
-    apply (rngl_opp_le_compat Hop Hor) in Hyx.
-    rewrite (rngl_opp_involutive Hop) in Hyx.
-    apply (rngl_abs_le Hop Hor) in Hyx.
-    rewrite (rngl_opp_involutive Hop) in Hyx.
-    apply (rngl_le_trans Hor _ (- y)); [ easy | ].
-    apply (rngl_le_opp_l Hop Hor).
-    rewrite rngl_add_comm.
-    apply (rngl_le_opp_l Hop Hor).
-    apply (rngl_opp_le_compat Hop Hor).
-    rewrite (rngl_opp_involutive Hop).
-    rewrite <- (rngl_abs_opp Hop Hor).
+split; intros Hxy. {
+  destruct Hxy as [Hxy| Hxy]. {
+    apply (rngl_le_trans Hor _ y); [ easy | ].
     apply (rngl_le_abs_diag Hop Hor).
   }
-  rewrite (rngl_abs_nonneg_eq Hop Hor). {
-    now apply (rngl_abs_le Hop Hor) in Hyx.
-  }
-  apply (rngl_le_trans Hor _ (rngl_abs x)); [ | easy ].
-  apply (rngl_abs_nonneg Hop Hor).
+  apply (rngl_le_trans Hor _ (- y)); [ easy | ].
+  rewrite <- (rngl_abs_opp Hop Hor).
+  apply (rngl_le_abs_diag Hop Hor).
 }
-intros Hxy.
-(* well, if x ≤ 0, the hypothesis Hxy has no value, no information,
-   all abs values being greater than any negative value *)
-Inspect 1.
-...
 progress unfold rngl_abs in Hxy.
-remember (y ≤? 0)%L as yz eqn:Hyz; symmetry in Hyz.
-destruct yz. {
-  apply rngl_leb_le in Hyz.
-  apply (rngl_opp_le_compat Hop Hor) in Hxy.
-  rewrite (rngl_opp_involutive Hop) in Hxy.
-  progress unfold rngl_abs.
-  remember (x ≤? 0)%L as xz eqn:Hxz; symmetry in Hxz.
-  destruct xz. {
-    apply rngl_leb_le in Hxz.
-    rewrite (rngl_opp_involutive Hop).
-    left.
-...
-    apply (rngl_le_trans Hor _ (- x)); [ easy | ].
-...
-    rewrite rngl_add_comm.
-    apply (rngl_le_opp_l Hop Hor).
-Search (- _ ≤ _)%L.
-
-...
-  apply (rngl_le_trans Hor _ (- x)); [ easy | ].
-...
-    } {
-      apply (rngl_le_trans Hor _ 0%L); [ easy | ].
-      apply (rngl_le_trans Hor _ (- y)%L); [ | easy ].
-      apply (rngl_le_0_sub Hop Hor) in Hyz.
-      progress unfold rngl_sub in Hyz.
-      rewrite Hop in Hyz.
-      now rewrite rngl_add_0_l in Hyz.
-...
-
-intros Hop Hor.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
-progress unfold rngl_abs.
-split. {
-  intros Hyx.
-  remember (x ≤? 0)%L as xz eqn:Hxz; symmetry in Hxz.
-  remember (y ≤? 0)%L as yz eqn:Hyz; symmetry in Hyz.
-  destruct Hyx as [Hyx| Hyx]. {
-    destruct xz. {
-      rewrite (rngl_opp_involutive Hop) in Hyx.
-      apply rngl_leb_le in Hxz.
-      destruct yz. {
-        apply rngl_leb_le in Hyz.
-        apply (rngl_le_opp_r Hop Hor).
-        apply (rngl_le_trans Hor _ x); [ | easy ].
-        apply (rngl_le_add_le_sub_l Hop Hor).
-        now rewrite (rngl_sub_diag Hos).
-      }
-      exfalso.
-      apply Bool.not_true_iff_false in Hyz.
-      apply Hyz; clear Hyz.
-      apply rngl_leb_le.
-      now apply (rngl_le_trans Hor _ x).
-    }
-    apply (rngl_leb_gt Hor) in Hxz.
-    apply (rngl_opp_le_compat Hop Hor) in Hyx.
-    rewrite (rngl_opp_involutive Hop) in Hyx.
-    destruct yz; [ now apply rngl_leb_le in Hyz | ].
-    apply (rngl_leb_gt Hor) in Hyz.
-    apply (rngl_le_trans Hor _ (- y)); [ easy | ].
-Search (- _ ≤ _)%L.
-...
-    apply (rngl_opp_le_compat Hop Hor) in Hyx.
-    rewrite (rngl_opp_involutive Hop) in Hyx.
-...
-Search (_ ≤ - _)%L.
-apply (rngl_le_opp_r Hop Hor) in Hyx.
-apply (rngl_lt_le_trans Hor _ x); [ easy | ].
-...
-      apply (rngl_opp_le_compat Hop Hor) in Hyx.
-...
-      apply (rngl_lt_le_trans Hor _ x); [ easy | ].
-
-...
-apply (rngl_opp_le_compat Hop Hor).
-...
-  destruct yz; [ | easy ].
-  apply (rngl_opp_le_compat Hop Hor).
-  now rewrite (rngl_opp_involutive Hop).
-} {
-  intros Hyx.
-  remember (y ≤? 0)%L as yz eqn:Hyz; symmetry in Hyz.
-  destruct yz. {
-    apply rngl_leb_le in Hyz.
-    split. {
-      apply (rngl_opp_le_compat Hop Hor) in Hyx.
-      now rewrite (rngl_opp_involutive Hop) in Hyx.
-    } {
-      apply (rngl_le_trans Hor _ 0%L); [ easy | ].
-      apply (rngl_le_trans Hor _ (- y)%L); [ | easy ].
-      apply (rngl_le_0_sub Hop Hor) in Hyz.
-      progress unfold rngl_sub in Hyz.
-      rewrite Hop in Hyz.
-      now rewrite rngl_add_0_l in Hyz.
-    }
-  }
-  split; [ | easy ].
-  apply (rngl_leb_gt Hor) in Hyz.
-  apply (rngl_lt_le_incl Hor).
-  apply (rngl_le_lt_trans Hor _ 0)%L; [ | easy ].
-  rewrite <- (rngl_opp_0 Hop).
-  apply -> (rngl_opp_le_compat Hop Hor).
-  apply (rngl_lt_le_incl Hor).
-  now apply (rngl_lt_le_trans Hor _ y)%L.
-}
-...
-*)
+destruct (y ≤? 0)%L; [ now right | now left ].
+Qed.
 
 Theorem rngl_abs_lt :
   rngl_has_opp T = true →
