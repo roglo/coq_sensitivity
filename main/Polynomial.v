@@ -1634,6 +1634,8 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 (* to be completed but is it provable?
+   bon, je laisse tomber, mais il faudra qu'un jour, je trouve
+   un contre-exemple, ça sera mieux
 Theorem polyn_opt_div_mul_distr :
   let _ := polyn_ring_like_op in (* utiliser Instance *)
   if rngl_has_quot (polyn T) then
@@ -1686,6 +1688,7 @@ destruct (Sumbool.sumbool_of_bool _) as [Hic| Hic]. {
       destruct pqr as (q, r).
       specialize (H2 q r).
       destruct (polyn_eq_dec (b * c) 0)%pol as [Hbc| Hbc]. {
+clear H2.
 (*
 injection Hbc; clear Hbc; intros H3.
 Search (lap_norm _ = []).
@@ -1695,6 +1698,7 @@ cbn in H4.
 Search (_ * _ = 0)%lap.
 apply eq_polyn_mul_0 in Hbc.
 *)
+rewrite Hbc.
 progress unfold polyn_quot.
         rewrite Hbc in Hpqr.
         progress unfold polyn_quot_rem in Hpqr.
@@ -1705,7 +1709,6 @@ progress unfold polyn_quot.
           destruct (Sumbool.sumbool_of_bool _) as [Hiv| Hiv]. {
             cbn in Hpqr.
             injection Hpqr; clear Hpqr; intros; subst q r.
-            rewrite Hbc.
 cbn.
 injection Hbc; clear Hbc; intros H3.
 specialize (proj2 (@all_0_lap_norm_nil T ro Hed _) H3) as H4.
