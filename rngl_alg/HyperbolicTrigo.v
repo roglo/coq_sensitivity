@@ -217,7 +217,6 @@ rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
-(* to be completed
 Theorem rngl_cos_proj_bound :
   ∀ c s, cosh2_sinh2_prop c s → (c ≤ -1 ∨ 1 ≤ c)%L.
 Proof.
@@ -239,58 +238,16 @@ apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
 }
 apply (rngl_abs_le Hop Hor) in H.
 destruct H as (_, H).
-Search (_ ≤ rngl_abs _)%L.
-About rngl_abs_le.
-apply rngl_le_abs in H.
-rewrite rngl_abs_1 in H.
-easy.
-...
-About rngl_le_abs.
-About rngl_le_abs_diag.
-...
-Search (1 ≤ _²)%L.
-Search (_² ≤ _²)%L.
-Search (rngl_abs _ < rngl_abs _)%L.
-Search (rngl_abs _ ≤ rngl_abs _)%L.
-Search (_ ≤ rngl_abs _)%L.
-Search (rngl_abs _ ≤ _)%L.
-
-...
-Search (rngl_abs _ ≤ rngl_abs _)%L.
-  rewrite (rngl_abs_1 Hon Hop Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite (rngl_abs_1 Hon Hop Hor) in H.
-now apply (rngl_abs_le Hop Hor) in H.
-Qed.
-
-Theorem rngl_sin_proj_bound :
-  ∀ c s, cosh2_sinh2_prop c s → (-1 ≤ s ≤ 1)%L.
-Proof.
-destruct_hc.
-intros * Hcs.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-apply cosh2_sinh2_prop_add_squ in Hcs.
-assert (H : (s² ≤ 1)%L). {
-  rewrite <- Hcs.
-  apply (rngl_le_add_l Hor).
-  apply (rngl_squ_nonneg Hop Hor).
-}
-replace 1%L with 1²%L in H. 2: {
-  apply (rngl_mul_1_l Hon).
-}
-rewrite <- (rngl_squ_abs Hop s) in H.
-rewrite <- (rngl_squ_abs Hop 1%L) in H.
-apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
-  rewrite (rngl_abs_1 Hon Hop Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite (rngl_abs_1 Hon Hop Hor) in H.
-now apply (rngl_abs_le Hop Hor) in H.
+apply (rngl_le_abs Hop Hor) in H.
+destruct H as [H| H]; [ now right | ].
+apply (rngl_le_opp_r Hop Hor) in H.
+rewrite rngl_add_comm in H.
+apply (rngl_le_opp_r Hop Hor) in H.
+now left.
 Qed.
 
 Theorem rngl_cos_bound :
-  ∀ a, (-1 ≤ rngl_cosh a ≤ 1)%L.
+  ∀ a, (rngl_cosh a ≤ - 1 ∨ 1 ≤ rngl_cosh a)%L.
 Proof.
 destruct_hc.
 intros.
@@ -298,17 +255,9 @@ destruct a as (ca, sa, Ha); cbn.
 now apply (rngl_cos_proj_bound ca sa).
 Qed.
 
-Theorem rngl_sin_bound :
-  ∀ a, (-1 ≤ rngl_sinh a ≤ 1)%L.
-Proof.
-destruct_hc.
-intros.
-destruct a as (ca, sa, Ha); cbn.
-now apply (rngl_sin_proj_bound ca sa).
-Qed.
-
 (* *)
 
+(* to be completed
 Theorem hangle_div_2_prop :
   ∀ a (ε := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
   cosh2_sinh2_prop
