@@ -1028,7 +1028,7 @@ rewrite (rngl_opp_involutive Hop).
 now rewrite (rngl_opp_0 Hop).
 Qed.
 
-Theorem rngl_le_abs :
+Theorem rngl_le_abs_diag :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a, (a ≤ rngl_abs a)%L.

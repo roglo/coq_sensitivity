@@ -752,7 +752,7 @@ intros * Hzb.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 apply (rngl_le_trans Hor _ (rngl_abs a)). {
-  apply (rngl_le_abs Hop Hor).
+  apply (rngl_le_abs_diag Hop Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
   apply rl_sqrt_nonneg.

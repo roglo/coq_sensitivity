@@ -217,23 +217,17 @@ rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
+(* to be completed
 Theorem rngl_cos_proj_bound :
-  ∀ c s, cosh2_sinh2_prop c s → (1 ≤ c)%L.
+  ∀ c s, cosh2_sinh2_prop c s → (c ≤ -1 ∨ 1 ≤ c)%L.
 Proof.
 destruct_hc.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hcs.
 apply cosh2_sinh2_prop_add_squ in Hcs.
-apply (rngl_sub_move_r Hop) in Hcs.
-(* c'est bizarre, ça : ça voudrait dire que cosh ≥ 1 ou cosh ≤ -1
-   alors que le cosh normal est juste ≥ 1 *)
-(* quant au sinus hyperbolique, lui, il n'a carrément pas de
-   bornes *)
-(* donc il y a deux possibilités du cosinus hyperbolique :
-   soit supérieur à 1, soit inférieur à -1 *)
-...
-assert (H : (c² ≤ 1)%L). {
-  rewrite <- Hcs.
+assert (H : (1 ≤ c²)%L). {
+  apply (rngl_sub_move_r Hop) in Hcs.
+  rewrite Hcs.
   apply (rngl_le_add_r Hor).
   apply (rngl_squ_nonneg Hop Hor).
 }
@@ -241,6 +235,23 @@ replace 1%L with 1²%L in H by apply (rngl_mul_1_l Hon).
 rewrite <- (rngl_squ_abs Hop c) in H.
 rewrite <- (rngl_squ_abs Hop 1%L) in H.
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii) in H. 2: {
+  apply (rngl_abs_nonneg Hop Hor).
+}
+apply (rngl_abs_le Hop Hor) in H.
+destruct H as (_, H).
+Search (_ ≤ rngl_abs _)%L.
+About rngl_abs_le.
+About rngl_le_abs.
+...
+Search (1 ≤ _²)%L.
+Search (_² ≤ _²)%L.
+Search (rngl_abs _ < rngl_abs _)%L.
+Search (rngl_abs _ ≤ rngl_abs _)%L.
+Search (_ ≤ rngl_abs _)%L.
+Search (rngl_abs _ ≤ _)%L.
+
+...
+Search (rngl_abs _ ≤ rngl_abs _)%L.
   rewrite (rngl_abs_1 Hon Hop Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
@@ -3729,5 +3740,6 @@ split. {
   apply hangle_taxi_dist_triangular.
 }
 Qed.
+*)
 
 End a.

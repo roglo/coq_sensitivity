@@ -212,7 +212,7 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
   apply (rngl_le_add_r Hor).
   apply (rngl_0_le_1 Hon Hop Hor).
 }
-eapply (rngl_le_trans Hor); [ apply (rngl_le_abs Hop Hor) | ].
+eapply (rngl_le_trans Hor); [ apply (rngl_le_abs_diag Hop Hor) | ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply rl_sqrt_nonneg.
