@@ -636,7 +636,6 @@ rewrite (rngl_opp_add_distr Hop).
 now rewrite (rngl_add_opp_r Hop).
 Qed.
 
-(* to be completed
 Theorem hangle_opp_sub_distr :
   ∀ θ1 θ2, (- (θ1 - θ2))%H = (θ2 - θ1)%H.
 Proof.
@@ -648,11 +647,7 @@ do 4 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_sub_distr Hop).
 do 2 rewrite (rngl_mul_comm Hic (rngl_cosh θ1)).
 do 2 rewrite (rngl_mul_comm Hic (rngl_sinh θ1)).
-...
-f_equal.
-rewrite (rngl_mul_opp_r Hop).
-symmetry.
-apply (rngl_add_opp_r Hop).
+easy.
 Qed.
 
 Theorem hangle_opp_involutive : ∀ θ, (- - θ)%H = θ.
@@ -732,6 +727,7 @@ split; intros Ha. {
 }
 Qed.
 
+(* to be completed
 Theorem rngl_cos_add_straight_l :
   ∀ θ, rngl_cosh (hangle_straight + θ) = (- rngl_cosh θ)%L.
 Proof.
