@@ -438,30 +438,6 @@ Theorem rngl_sinh_add :
     (rngl_sinh θ1 * rngl_cosh θ2 + rngl_cosh θ1 * rngl_sinh θ2)%L.
 Proof. easy. Qed.
 
-(* to be completed
-Theorem rngl_cosh_sub :
-  ∀ θ1 θ2, rngl_cosh (θ1 - θ2) = (- rngl_cosh (θ1 + θ2))%L.
-Proof.
-destruct_hc.
-intros; cbn.
-do 2 rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
-rewrite rngl_add_comm.
-now rewrite (rngl_opp_add_distr Hop).
-Qed.
-
-Theorem rngl_sinh_sub :
-  ∀ θ1 θ2, rngl_sinh (θ1 - θ2) = (- rngl_sinh (θ1 + θ2))%L.
-Proof.
-destruct_hc.
-intros; cbn.
-do 2 rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
-rewrite rngl_add_comm.
-now rewrite (rngl_opp_add_distr Hop).
-Qed.
-*)
-
 Theorem rngl_cosh_sub :
   ∀ θ1 θ2,
   (rngl_cosh (θ1 - θ2) =
