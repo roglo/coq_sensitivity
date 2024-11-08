@@ -1,3 +1,5 @@
+(* dividing an angle by 2 and by 2^n *)
+
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc1 Main.RingLike.
