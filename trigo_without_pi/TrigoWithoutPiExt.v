@@ -2,6 +2,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc1 Main.RingLike.
 Require Import TrigoWithoutPi.
+Require Import Angle_order.
 Require Import RealLike.
 Require Import TacChangeAngle.
 

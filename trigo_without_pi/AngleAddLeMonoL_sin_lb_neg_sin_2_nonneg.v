@@ -1,6 +1,7 @@
 Require Import Utf8 Arith.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
+Require Import Angle_order.
 Require Import AngleAddOverflowLe.
 Require Import TacChangeAngle.
 Require Export AngleAddLeMonoL_prop.

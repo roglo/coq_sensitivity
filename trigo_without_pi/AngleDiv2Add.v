@@ -3,6 +3,7 @@ Require Import Utf8 Arith.
 Require Import Main.Misc1 Main.RingLike.
 Require Import RealLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
+Require Import Angle_order.
 Require Import AngleAddOverflowLe.
 Require Import AngleAddLeMonoL.
 Require Import AngleDiv2.

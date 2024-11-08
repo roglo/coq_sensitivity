@@ -3,6 +3,7 @@ Require Import Utf8 Arith.
 Require Import Init.Nat.
 Require Import Main.RingLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
+Require Import Angle_order.
 Require Import TacChangeAngle.
 
 Section a.

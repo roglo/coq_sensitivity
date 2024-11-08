@@ -6,6 +6,7 @@ Require Import Main.Misc1 Main.RingLike.
 Require Import RealLike.
 Require Import TrigoWithoutPi.
 Require Import TrigoWithoutPiExt.
+Require Import Angle_order.
 
 Section a.
 

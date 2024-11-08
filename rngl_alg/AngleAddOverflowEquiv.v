@@ -5,6 +5,7 @@ Require Import Main.RingLike.
 Require Import Trigo.RealLike.
 Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddOverflowLe Trigo.AngleAddLeMonoL.
+Require Import Trigo.Angle_order.
 Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.TacChangeAngle.
