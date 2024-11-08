@@ -620,39 +620,35 @@ rewrite hangle_add_opp_diag_l.
 apply (hangle_add_0_r).
 Qed.
 
-(* to be completed
 Theorem hangle_opp_add_distr :
   ∀ θ1 θ2, (- (θ1 + θ2))%H = (- θ2 - θ1)%H.
 Proof.
 destruct_hc.
 intros.
 apply eq_hangle_eq; cbn.
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_sub_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
+do 2 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_opp_involutive Hop).
 do 2 rewrite (rngl_mul_comm Hic (rngl_cosh θ1)).
 do 2 rewrite (rngl_mul_comm Hic (rngl_sinh θ1)).
 f_equal.
 rewrite (rngl_opp_add_distr Hop).
-rewrite <- (rngl_mul_opp_l Hop).
-rewrite (rngl_mul_opp_r Hop).
-symmetry.
-apply (rngl_add_opp_r Hop).
+now rewrite (rngl_add_opp_r Hop).
 Qed.
 
+(* to be completed
 Theorem hangle_opp_sub_distr :
   ∀ θ1 θ2, (- (θ1 - θ2))%H = (θ2 - θ1)%H.
 Proof.
 destruct_hc.
 intros.
 apply eq_hangle_eq; cbn.
-do 3 rewrite (rngl_mul_opp_r Hop).
-do 2 rewrite (rngl_sub_opp_r Hop).
-rewrite (rngl_add_opp_r Hop).
+do 4 rewrite (rngl_mul_opp_r Hop).
+do 4 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_sub_distr Hop).
 do 2 rewrite (rngl_mul_comm Hic (rngl_cosh θ1)).
 do 2 rewrite (rngl_mul_comm Hic (rngl_sinh θ1)).
+...
 f_equal.
 rewrite (rngl_mul_opp_r Hop).
 symmetry.
