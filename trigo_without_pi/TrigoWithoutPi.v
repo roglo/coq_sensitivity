@@ -319,8 +319,9 @@ Theorem angle_div_2_prop :
     (ε * √((1 + rngl_cos a) / 2))%L
     (√((1 - rngl_cos a) / 2)%L).
 Proof.
-intros.
 destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+intros.
 progress unfold cos2_sin2_prop.
 rewrite Hon, Hop, Hic, Hed.
 apply Bool.orb_true_iff; right.
@@ -357,33 +358,13 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   rewrite rngl_add_0_l.
   apply rngl_cos_bound.
 }
-progress unfold rngl_div.
-rewrite Hiv.
-rewrite <- rngl_mul_add_distr_r.
+rewrite <- (rngl_div_add_distr_r Hiv).
 rewrite (rngl_add_sub_assoc Hop).
 rewrite rngl_add_comm.
 rewrite rngl_add_assoc.
 rewrite (rngl_add_sub Hos).
-apply (rngl_mul_inv_diag_r Hon Hiv).
-specialize rngl_opt_characteristic_prop as H1.
-rewrite Hon in H1.
-remember (rngl_characteristic T =? 0) as cz eqn:Hcz; symmetry in Hcz.
-destruct cz. {
-  specialize (H1 1); cbn in H1.
-  now rewrite rngl_add_0_r in H1.
-}
-destruct H1 as (H1, H2).
-apply Nat.eqb_neq in Hcz.
-remember (rngl_characteristic T) as ch eqn:Hch; symmetry in Hch.
-destruct ch; [ easy | clear Hcz ].
-destruct ch; [ easy | clear Hc1 ].
-destruct ch; [ easy | clear Hc2 ].
-specialize (H1 2).
-cbn in H1.
-rewrite rngl_add_0_r in H1.
-apply H1.
-split; [ easy | ].
-now do 2 apply -> Nat.succ_lt_mono.
+apply (rngl_div_diag Hon Hiq).
+apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.
 
 Definition angle_div_2 a :=
