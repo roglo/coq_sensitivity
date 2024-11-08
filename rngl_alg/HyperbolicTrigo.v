@@ -749,47 +749,6 @@ rewrite (rngl_mul_0_r Hos).
 apply rngl_add_0_r.
 Qed.
 
-(* to be completed
-Theorem rngl_cosh_add_right_l :
-  ∀ θ, rngl_cosh (hangle_right + θ) = (- rngl_sinh θ)%L.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-apply (rngl_sub_0_l Hop).
-Qed.
-
-Theorem rngl_cosh_add_right_r :
-  ∀ θ, rngl_cosh (θ + hangle_right) = (- rngl_sinh θ)%L.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_mul_0_r Hos).
-apply (rngl_sub_0_l Hop).
-Qed.
-
-Theorem rngl_sinh_add_right_l :
-  ∀ θ, rngl_sinh (hangle_right + θ) = rngl_cosh θ.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-apply rngl_add_0_r.
-Qed.
-
-Theorem rngl_sinh_add_right_r :
-  ∀ θ, rngl_sinh (θ + hangle_right) = rngl_cosh θ.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_mul_0_r Hos).
-apply rngl_add_0_l.
-Qed.
-
 Theorem rngl_cosh_sub_straight_l :
   ∀ θ, rngl_cosh (hangle_straight - θ) = (- rngl_cosh θ)%L.
 Proof.
@@ -798,7 +757,7 @@ intros; cbn.
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
-now rewrite (rngl_sub_0_r Hos).
+apply rngl_add_0_r.
 Qed.
 
 Theorem rngl_sinh_sub_straight_l :
@@ -822,7 +781,7 @@ rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_mul_0_r Hos).
-now rewrite (rngl_sub_0_r Hos).
+apply rngl_add_0_r.
 Qed.
 
 Theorem rngl_sinh_sub_straight_r :
@@ -834,9 +793,10 @@ rewrite (rngl_opp_0 Hop).
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_r.
-now rewrite (rngl_mul_1_r Hon).
+f_equal; apply (rngl_mul_1_r Hon).
 Qed.
 
+(* to be completed
 Theorem rngl_sinh_nonneg_cosh_le_sinh_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -863,6 +823,7 @@ destruct zc1. {
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   specialize (cosh2_sinh2_1 θ1) as Hcs1.
   specialize (cosh2_sinh2_1 θ2) as Hcs2.
+...
   apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
   rewrite <- Hcs1, <- Hcs2 in Hc12.
   now apply (rngl_sub_le_mono_l Hop Hor) in Hc12.
