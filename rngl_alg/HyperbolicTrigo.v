@@ -738,7 +738,6 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_r.
 Qed.
 
-(* to be completed
 Theorem rngl_cosh_add_straight_r :
   ∀ θ, rngl_cosh (θ + hangle_straight) = (- rngl_cosh θ)%L.
 Proof.
@@ -747,9 +746,10 @@ intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_mul_0_r Hos).
-apply (rngl_sub_0_r Hos).
+apply rngl_add_0_r.
 Qed.
 
+(* to be completed
 Theorem rngl_cosh_add_right_l :
   ∀ θ, rngl_cosh (hangle_right + θ) = (- rngl_sinh θ)%L.
 Proof.
