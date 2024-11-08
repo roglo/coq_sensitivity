@@ -495,7 +495,6 @@ rewrite (rngl_mul_comm Hic (rngl_cosh θ2)).
 easy.
 Qed.
 
-(* to be completed
 Theorem hangle_add_assoc :
   ∀ θ1 θ2 θ3, (θ1 + (θ2 + θ3) = (θ1 + θ2) + θ3)%H.
 Proof.
@@ -506,29 +505,18 @@ destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 destruct θ3 as (c3, s3, Hcs3).
 cbn.
+do 4 rewrite rngl_mul_add_distr_l.
+do 4 rewrite rngl_mul_add_distr_r.
+do 8 rewrite rngl_mul_assoc.
+do 4 rewrite <- rngl_add_assoc.
 f_equal. {
-...
-  rewrite (rngl_mul_sub_distr_l Hop).
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_r.
-  do 4 rewrite rngl_mul_assoc.
-  do 2 rewrite <- (rngl_sub_add_distr Hos).
   f_equal.
   rewrite rngl_add_comm; symmetry.
   apply rngl_add_assoc.
 } {
-  rewrite (rngl_mul_sub_distr_l Hop).
-  rewrite (rngl_mul_sub_distr_r Hop).
-  rewrite rngl_mul_add_distr_l.
-  rewrite rngl_mul_add_distr_r.
-  do 4 rewrite rngl_mul_assoc.
-  rewrite (rngl_add_sub_assoc Hop).
-  rewrite rngl_add_assoc.
-  rewrite (rngl_add_sub_swap Hop).
   f_equal.
-  symmetry.
-  apply (rngl_add_sub_swap Hop).
+  rewrite rngl_add_comm; symmetry.
+  apply rngl_add_assoc.
 }
 Qed.
 
@@ -541,7 +529,6 @@ Qed.
 
 Theorem hangle_add_opp_r : ∀ θ1 θ2, (θ1 + - θ2 = θ1 - θ2)%H.
 Proof. easy. Qed.
-*)
 
 Theorem hangle_sub_diag : ∀ θ, (θ - θ = 0)%H.
 Proof.
@@ -557,29 +544,27 @@ rewrite (rngl_mul_comm Hic).
 apply (rngl_sub_diag Hos).
 Qed.
 
-(* to be completed
 Theorem hangle_add_0_l : ∀ θ, (0 + θ = θ)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_1_l Hon).
 do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_l.
+now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
 Theorem hangle_add_0_r : ∀ θ, (θ + 0 = θ)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_r.
+now do 2 rewrite rngl_add_0_r.
 Qed.
 
+(* to be completed
 Theorem hangle_sub_0_l :
   ∀ θ, (0 - θ = - θ)%H.
 Proof.
