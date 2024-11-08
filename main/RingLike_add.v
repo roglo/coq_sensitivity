@@ -745,12 +745,7 @@ Qed.
 End a.
 
 Arguments rngl_abs {T ro} a%_L.
-Arguments rngl_add {T ring_like_op} (a b)%_L.
 Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
 Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
 Arguments rngl_min {T ro} (a b)%_L.
-Arguments rngl_mul {T ring_like_op} (a b)%_L.
 Arguments rngl_mul_nat {T ro} a%_L n%_nat.
-Arguments rngl_squ {T ro} x%_L.
-Arguments rngl_sub {T ro} (a b)%_L.
-Arguments rngl_subt {T ro} (a b)%_L.

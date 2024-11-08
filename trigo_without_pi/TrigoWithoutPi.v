@@ -388,8 +388,8 @@ Qed.
 
 Definition angle_div_2 a :=
   let ε := if (0 ≤? rngl_sin a)%L then 1%L else (-1)%L in
-  {| rngl_cos := (ε * rl_sqrt ((1 + rngl_cos a) / 2))%L;
-     rngl_sin := (rl_sqrt ((1 - rngl_cos a) / 2))%L;
+  {| rngl_cos := ε * √((1 + rngl_cos a) / 2)%L;
+     rngl_sin := √((1 - rngl_cos a)%L / 2%L);
      rngl_cos2_sin2 := angle_div_2_prop a |}.
 
 Definition angle_eqb a b :=

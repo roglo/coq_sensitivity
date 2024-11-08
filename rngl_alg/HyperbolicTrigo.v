@@ -283,12 +283,9 @@ Qed.
 
 (* *)
 
-(*
+(* to be completed
 Theorem hangle_div_2_prop :
-  ∀ a (ε := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
-  cosh2_sinh2_prop
-    (ε * √((1 + rngl_cosh a) / 2))%L
-    (√((1 - rngl_cosh a) / 2)%L).
+  ∀ a, cosh2_sinh2_prop (√((rngl_cosh a + 1) / 2)) (√((rngl_cosh a - 1) / 2)).
 Proof.
 intros.
 destruct_hc.
@@ -358,9 +355,8 @@ now do 2 apply -> Nat.succ_lt_mono.
 Qed.
 
 Definition hangle_div_2 a :=
-  let ε := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L in
-  {| rngl_cosh := (ε * rl_sqrt ((1 + rngl_cosh a) / 2))%L;
-     rngl_sinh := (rl_sqrt ((1 - rngl_cosh a) / 2))%L;
+  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
+     rngl_sinh := √((rngl_cosh a - 1) / 2);
      rngl_cosh2_sinh2 := hangle_div_2_prop a |}.
 *)
 

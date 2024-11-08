@@ -74,7 +74,7 @@ Definition rngl_has_quot T {R : ring_like_op T} :=
   | _ => false
   end.
 
-Definition rngl_opp {T} {R : ring_like_op T} a :=
+Definition rngl_opp {T} {ro : ring_like_op T} a :=
   match rngl_opt_opp_or_subt T with
   | Some (inl rngl_opp) => rngl_opp a
   | _ => rngl_zero
@@ -86,13 +86,13 @@ Definition rngl_subt {T} {ro : ring_like_op T} a b :=
   | _ => rngl_zero
   end.
 
-Definition rngl_inv {T} {R : ring_like_op T} a :=
+Definition rngl_inv {T} {ro : ring_like_op T} a :=
   match rngl_opt_inv_or_quot T with
   | Some (inl rngl_inv) => rngl_inv a
   | _ => rngl_zero
   end.
 
-Definition rngl_quot {T} {R : ring_like_op T} a b :=
+Definition rngl_quot {T} {ro : ring_like_op T} a b :=
   match rngl_opt_inv_or_quot T with
   | Some (inr rngl_quot) => rngl_quot a b
   | _ => rngl_zero
@@ -103,18 +103,18 @@ Definition rngl_sub {T} {ro : ring_like_op T} a b :=
   else if rngl_has_subt T then rngl_subt a b
   else rngl_zero.
 
-Definition rngl_div {T} {R : ring_like_op T} a b :=
+Definition rngl_div {T} {ro : ring_like_op T} a b :=
   if rngl_has_inv T then rngl_mul a (rngl_inv b)
   else if rngl_has_quot T then rngl_quot a b
   else rngl_zero.
 
-Definition rngl_le {T} {R : ring_like_op T} a b :=
+Definition rngl_le {T} {ro : ring_like_op T} a b :=
   match rngl_opt_leb with
   | Some rngl_leb => rngl_leb a b = true
   | None => False
   end.
 
-Definition rngl_lt {T} {R : ring_like_op T} a b :=
+Definition rngl_lt {T} {ro : ring_like_op T} a b :=
   match rngl_opt_leb with
   | Some rngl_leb => rngl_leb b a = false
   | None => False
@@ -129,7 +129,7 @@ Definition mul_nat {T} (zero : T) (add : T → T → T) a n :=
 Definition rngl_mul_nat {T} {ro : ring_like_op T} :=
   mul_nat rngl_zero rngl_add.
 
-Definition rngl_squ {T} {ro : ring_like_op T} x := rngl_mul x x.
+Definition rngl_squ {T} {ro : ring_like_op T} a := rngl_mul a a.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
@@ -137,28 +137,43 @@ Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   | S m => rngl_mul a (rngl_power a m)
   end.
 
-Arguments rngl_power {T ro} a%_L n%_nat.
-
 Definition rngl_of_nat {T} {ro : ring_like_op T} a := rngl_mul_nat rngl_one a.
 
-Definition rngl_eqb {T} {R : ring_like_op T} a b :=
+Definition rngl_eqb {T} {ro : ring_like_op T} a b :=
   match rngl_opt_eq_dec with
   | Some rngl_eq_dec =>
       match rngl_eq_dec a b with left _ => true | right _ => false end
   | None => false
   end.
 
-Definition rngl_leb {T} {R : ring_like_op T} a b :=
+Definition rngl_leb {T} {ro : ring_like_op T} a b :=
   match rngl_opt_leb with
   | Some rngl_leb => rngl_leb a b
   | None => false
   end.
 
-Definition rngl_ltb {T} {R : ring_like_op T} a b :=
+Definition rngl_ltb {T} {ro : ring_like_op T} a b :=
   match rngl_opt_leb with
   | Some rngl_leb => negb (rngl_leb b a)
   | None => false
   end.
+
+Arguments rngl_add {T ro} (a b)%_L : rename.
+Arguments rngl_sub {T ro} (a b)%_L.
+Arguments rngl_mul {T ro} (a b)%_L : rename.
+Arguments rngl_div {T ro} (a b)%_L.
+Arguments rngl_opp {T ro} a%_L.
+Arguments rngl_inv {T ro} a%_L.
+Arguments rngl_squ {T ro} a%_L.
+Arguments rngl_power {T ro} a%_L n%_nat.
+Arguments rngl_le {T ro} (a b)%_L.
+Arguments rngl_lt {T ro} (a b)%_L.
+Arguments rngl_eqb {T ro} (a b)%_L.
+Arguments rngl_leb {T ro} (a b)%_L.
+Arguments rngl_ltb {T ro} (a b)%_L.
+
+Arguments rngl_subt {T ro} (a b)%_L.
+Arguments rngl_quot {T ro} (a b)%_L.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
