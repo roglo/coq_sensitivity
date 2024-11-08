@@ -154,25 +154,6 @@ rewrite Hxy'.
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
-(*
-Theorem hangle_opp_prop :
-  ∀ a, cosh2_sinh2_prop (- rngl_cosh a) (- rngl_sinh a)%L.
-Proof.
-intros.
-destruct a as (x, y, Hxy); cbn.
-progress unfold cosh2_sinh2_prop in Hxy |-*.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ | easy ].
-now do 2 rewrite (rngl_squ_opp Hop).
-Qed.
-*)
-
 Theorem hangle_opp_prop :
   ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
 Proof.
@@ -202,12 +183,6 @@ Definition hangle_add a b :=
   {| rngl_cosh := (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L;
      rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
      rngl_cosh2_sinh2 := hangle_add_prop a b |}.
-
-(*
-Definition hangle_opp a :=
-  {| rngl_cosh := - rngl_cosh a; rngl_sinh := - rngl_sinh a;
-     rngl_cosh2_sinh2 := hangle_opp_prop a |}.
-*)
 
 Definition hangle_opp a :=
   {| rngl_cosh := rngl_cosh a; rngl_sinh := - rngl_sinh a;
@@ -344,7 +319,7 @@ Definition hangle_div_2 a :=
 Definition hangle_eqb a b :=
   ((rngl_cosh a =? rngl_cosh b)%L && (rngl_sinh a =? rngl_sinh b)%L)%bool.
 
-(*
+(* to be completed
 Definition hangle_leb θ1 θ2 :=
   if (0 ≤? rngl_sinh θ1)%L then
     if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ2 ≤? rngl_cosh θ1)%L
@@ -374,7 +349,7 @@ Notation "θ1 - θ2" := (hangle_sub θ1 θ2) : hangle_scope.
 Notation "- θ" := (hangle_opp θ) : hangle_scope.
 Notation "θ1 =? θ2" := (hangle_eqb θ1 θ2) : hangle_scope.
 Notation "θ1 ≠? θ2" := (negb (hangle_eqb θ1 θ2)) : hangle_scope.
-(*
+(* to be completed
 Notation "θ1 ≤? θ2" := (hangle_leb θ1 θ2) : hangle_scope.
 Notation "θ1 <? θ2" := (hangle_ltb θ1 θ2) : hangle_scope.
 Notation "θ1 ≤ θ2" := (hangle_leb θ1 θ2 = true) : hangle_scope.
@@ -382,7 +357,7 @@ Notation "θ1 < θ2" := (hangle_ltb θ1 θ2 = true) : hangle_scope.
 *)
 Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
 Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
-(*
+(* to be completed
 Notation "θ1 ≤ θ2 < θ3" :=
   (hangle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
@@ -401,7 +376,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : hangle_ctx T}.
 
-(*
+(* to be completed
 Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
 Proof.
 destruct_hc.
@@ -471,7 +446,7 @@ Theorem rngl_sinh_add :
     (rngl_sinh θ1 * rngl_cosh θ2 + rngl_cosh θ1 * rngl_sinh θ2)%L.
 Proof. easy. Qed.
 
-(*
+(* to be completed
 Theorem rngl_cosh_sub :
   ∀ θ1 θ2, rngl_cosh (θ1 - θ2) = (- rngl_cosh (θ1 + θ2))%L.
 Proof.
@@ -517,75 +492,7 @@ rewrite (rngl_mul_opp_r Hop).
 apply (rngl_add_opp_r Hop).
 Qed.
 
-(* to be completed
-Theorem rngl_add_cos_nonneg_sqrt_mul_le :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_cosh θ1 + rngl_cosh θ2)%L
-  → (√((1 - rngl_cosh θ1) * (1 - rngl_cosh θ2)) ≤
-      √((1 + rngl_cosh θ1) * (1 + rngl_cosh θ2)))%L.
-Proof.
-destruct_hc.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-intros * H12.
-assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cosh θ)%L). {
-  intros.
-  apply (rngl_le_sub_le_add_l Hop Hor).
-  progress unfold rngl_sub.
-  rewrite Hop, rngl_add_0_l.
-...
-  apply rngl_cos_bound.
-}
-assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cosh θ)%L). {
-  intros.
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  rewrite rngl_add_0_l.
-  apply rngl_cos_bound.
-}
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite H1, (H1 √_)%L.
-  apply (rngl_le_refl Hor).
-}
-apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
-  apply rl_sqrt_nonneg.
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-}
-do 2 rewrite fold_rngl_squ.
-rewrite (rngl_squ_sqrt Hon). 2: {
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-}
-rewrite (rngl_squ_sqrt Hon). 2: {
-  now apply (rngl_mul_nonneg_nonneg Hop Hor).
-}
-rewrite (rngl_mul_sub_distr_l Hop).
-rewrite (rngl_mul_1_r Hon).
-rewrite (rngl_mul_sub_distr_r Hop).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_sub_sub_distr Hop).
-rewrite rngl_mul_add_distr_l.
-rewrite (rngl_mul_1_r Hon).
-rewrite rngl_mul_add_distr_r.
-rewrite (rngl_mul_1_l Hon).
-rewrite rngl_add_assoc.
-apply (rngl_add_le_mono_r Hop Hor).
-rewrite <- (rngl_sub_add_distr Hos).
-apply (rngl_le_sub_le_add_r Hop Hor).
-do 2 rewrite <- rngl_add_assoc.
-apply (rngl_le_add_r Hor).
-rewrite rngl_add_assoc.
-rewrite rngl_add_add_swap.
-rewrite rngl_add_assoc.
-rewrite <- rngl_add_assoc.
-rewrite <- (rngl_mul_2_l Hon).
-rewrite <- (rngl_mul_2_l Hon (rngl_cosh θ2)).
-rewrite <- rngl_mul_add_distr_l.
-apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
-apply (rngl_lt_le_incl Hor).
-apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-Qed.
-*)
-
-Theorem eq_rngl_sin_0 :
+Theorem eq_rngl_hsin_0 :
   ∀ θ, rngl_sinh θ = 0%L → θ = 0%H ∨ θ = hangle_straight.
 Proof.
 destruct_hc.
