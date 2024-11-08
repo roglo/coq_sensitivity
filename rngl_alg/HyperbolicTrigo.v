@@ -319,7 +319,6 @@ Definition hangle_div_2 a :=
 Definition hangle_eqb a b :=
   ((rngl_cosh a =? rngl_cosh b)%L && (rngl_sinh a =? rngl_sinh b)%L)%bool.
 
-(* to be completed
 Definition hangle_leb θ1 θ2 :=
   if (0 ≤? rngl_sinh θ1)%L then
     if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ2 ≤? rngl_cosh θ1)%L
@@ -335,7 +334,6 @@ Definition hangle_ltb θ1 θ2 :=
   else
     if (0 ≤? rngl_sinh θ2)%L then false
     else (rngl_cosh θ1 <? rngl_cosh θ2)%L.
-*)
 
 End a.
 
@@ -349,15 +347,12 @@ Notation "θ1 - θ2" := (hangle_sub θ1 θ2) : hangle_scope.
 Notation "- θ" := (hangle_opp θ) : hangle_scope.
 Notation "θ1 =? θ2" := (hangle_eqb θ1 θ2) : hangle_scope.
 Notation "θ1 ≠? θ2" := (negb (hangle_eqb θ1 θ2)) : hangle_scope.
-(* to be completed
 Notation "θ1 ≤? θ2" := (hangle_leb θ1 θ2) : hangle_scope.
 Notation "θ1 <? θ2" := (hangle_ltb θ1 θ2) : hangle_scope.
 Notation "θ1 ≤ θ2" := (hangle_leb θ1 θ2 = true) : hangle_scope.
 Notation "θ1 < θ2" := (hangle_ltb θ1 θ2 = true) : hangle_scope.
-*)
 Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
 Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
-(* to be completed
 Notation "θ1 ≤ θ2 < θ3" :=
   (hangle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 ≤ θ2 ≤ θ3" :=
@@ -366,7 +361,6 @@ Notation "θ1 < θ2 < θ3" :=
   (hangle_ltb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
 Notation "θ1 < θ2 ≤ θ3" :=
   (hangle_ltb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
-*)
 
 Section a.
 
@@ -376,8 +370,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : hangle_ctx T}.
 
-(* to be completed
-Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%A ↔ (θ2 ≤ θ1)%A.
+Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%H ↔ (θ2 ≤ θ1)%H.
 Proof.
 destruct_hc.
 intros.
@@ -405,7 +398,7 @@ apply rngl_ltb_ge.
 now apply rngl_leb_le.
 Qed.
 
-Theorem hangle_nle_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%A ≠ true ↔ (θ2 < θ1)%A.
+Theorem hangle_nle_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%H ≠ true ↔ (θ2 < θ1)%H.
 Proof.
 destruct_hc.
 intros.
@@ -432,7 +425,6 @@ apply Bool.not_true_iff_false.
 apply (rngl_leb_gt Hor).
 now apply rngl_ltb_lt.
 Qed.
-*)
 
 Theorem rngl_cosh_add :
   ∀ θ1 θ2,
