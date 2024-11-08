@@ -283,7 +283,7 @@ Qed.
 
 (* *)
 
-(* to be completed
+(* to be completed, but work only if rngl_cosh a ≥ 1, see below
 Theorem hangle_div_2_prop :
   ∀ a, cosh2_sinh2_prop (√((rngl_cosh a + 1) / 2)) (√((rngl_cosh a - 1) / 2)).
 Proof.
@@ -358,10 +358,20 @@ Definition hangle_div_2 a :=
 *)
 
 (*
+Theorem hangle_div_2_prop :
+  ∀ a (Hzc : (1 ≤ rngl_cosh a)%L),
+  cosh2_sinh2_prop √((rngl_cosh a + 1) / 2) √((rngl_cosh a - 1) / 2).
+
+(* division by 2 only available for cosh ≥ 1 *)
 Definition hangle_div_2 a :=
-  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
-     rngl_sinh := √((rngl_cosh a - 1) / 2);
-     rngl_cosh2_sinh2 := true |}.
+  match (rngl_le_dec hc_or 1 (rngl_cosh a)) with
+  | left Hz1 =>
+      {| rngl_cosh := √((rngl_cosh a + 1) / 2);
+         rngl_sinh := √((rngl_cosh a - 1) / 2);
+         rngl_cosh2_sinh2 := hangle_div_2_prop a Hz1 |}
+  | right _ =>
+      hangle_zero
+  end.
 *)
 
 Definition hangle_eqb a b :=
