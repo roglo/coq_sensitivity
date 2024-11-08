@@ -292,16 +292,6 @@ destruct_hc.
 progress unfold cosh2_sinh2_prop.
 rewrite Hon, Hop, Hic, Hed.
 apply Bool.orb_true_iff; right.
-assert (Hε : (ε² = 1)%L). {
-  progress unfold ε.
-  destruct (0 ≤? _)%L. {
-    apply (rngl_mul_1_l Hon).
-  } {
-    apply (rngl_squ_opp_1 Hon Hop).
-  }
-}
-rewrite (rngl_squ_mul Hic).
-rewrite Hε, (rngl_mul_1_l Hon).
 apply (rngl_eqb_eq Hed).
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -312,8 +302,15 @@ rewrite (rngl_squ_sqrt Hon). 2: {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_sub_le_add_l Hop Hor).
+  apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite (rngl_sub_0_l Hop).
+Check rngl_cos_bound.
+(* ouais, mon cosh peut-être négatif, lui...
+   du coup, ça remet en question cosh2_sinh2_prop
+   et même, peut-être, il faut que cosh ≥ 1 et
+   interdire cosh ≤ -1 *)
+...
+  apply (rngl_le_trans Hor _
   apply rngl_cos_bound.
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
@@ -358,6 +355,13 @@ Definition hangle_div_2 a :=
   {| rngl_cosh := √((rngl_cosh a + 1) / 2);
      rngl_sinh := √((rngl_cosh a - 1) / 2);
      rngl_cosh2_sinh2 := hangle_div_2_prop a |}.
+*)
+
+(*
+Definition hangle_div_2 a :=
+  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
+     rngl_sinh := √((rngl_cosh a - 1) / 2);
+     rngl_cosh2_sinh2 := true |}.
 *)
 
 Definition hangle_eqb a b :=
