@@ -2,6 +2,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Main.Misc1 Main.RingLike.
 Require Import RealLike TrigoWithoutPi TrigoWithoutPiExt.
+Require Import AngleDiv2.
 Require Import AngleDiv2Add.
 Require Import AngleAddLeMonoL.
 
@@ -12,6 +13,8 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+
+Definition seq_angle_to_div_nat θ (n i : nat) := (2 ^ i / n * (θ /₂^i))%A.
 
 Theorem angle_eucl_dist_diag : ∀ θ, angle_eucl_dist θ θ = 0%L.
 Proof.

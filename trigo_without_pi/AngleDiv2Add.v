@@ -5,6 +5,7 @@ Require Import RealLike.
 Require Import TrigoWithoutPi TrigoWithoutPiExt.
 Require Import AngleAddOverflowLe.
 Require Import AngleAddLeMonoL.
+Require Import AngleDiv2.
 Require Import TacChangeAngle.
 
 Section a.
