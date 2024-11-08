@@ -564,17 +564,15 @@ do 2 rewrite (rngl_mul_0_r Hos).
 now do 2 rewrite rngl_add_0_r.
 Qed.
 
-(* to be completed
 Theorem hangle_sub_0_l :
   ∀ θ, (0 - θ = - θ)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_1_l Hon).
 do 2 rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_l.
+now rewrite rngl_add_0_l, rngl_add_0_r.
 Qed.
 
 Theorem hangle_sub_0_r :
@@ -582,28 +580,25 @@ Theorem hangle_sub_0_r :
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_1_r Hon).
 rewrite (rngl_opp_0 Hop).
 do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_r Hos).
-now rewrite rngl_add_0_r.
+now do 2 rewrite rngl_add_0_r.
 Qed.
 
 Theorem hangle_add_opp_diag_l : ∀ θ, (- θ + θ = 0)%H.
 Proof.
 destruct_hc; intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_opp_l Hop).
-progress unfold rngl_sub.
-rewrite Hop.
-rewrite (rngl_opp_involutive Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite rngl_add_comm.
+rewrite (rngl_add_opp_r Hop).
 do 2 rewrite fold_rngl_squ.
-rewrite cosh2_sinh2_1.
-f_equal.
-rewrite (rngl_add_opp_l Hop).
 rewrite (rngl_mul_comm Hic).
-apply (rngl_sub_diag Hos).
+rewrite (rngl_sub_diag Hos).
+now rewrite cosh2_sinh2_1.
 Qed.
 
 Theorem hangle_add_sub : ∀ θ1 θ2, (θ1 + θ2 - θ2)%H = θ1.
@@ -625,12 +620,13 @@ rewrite hangle_add_opp_diag_l.
 apply (hangle_add_0_r).
 Qed.
 
+(* to be completed
 Theorem hangle_opp_add_distr :
   ∀ θ1 θ2, (- (θ1 + θ2))%H = (- θ2 - θ1)%H.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 rewrite (rngl_mul_opp_r Hop).
 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_sub_opp_r Hop).
@@ -650,7 +646,7 @@ Theorem hangle_opp_sub_distr :
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 3 rewrite (rngl_mul_opp_r Hop).
 do 2 rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_r Hop).
@@ -667,7 +663,7 @@ Theorem hangle_opp_involutive : ∀ θ, (- - θ)%H = θ.
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 f_equal.
 apply (rngl_opp_involutive Hop).
 Qed.
@@ -980,10 +976,10 @@ apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in H1. 2: {
   apply (rngl_mul_1_r Hon).
 }
 destruct H1. {
-  left; apply eq_angle_eq.
+  left; apply eq_hangle_eq.
   now rewrite Hθ, H.
 } {
-  right; apply eq_angle_eq.
+  right; apply eq_hangle_eq.
   now rewrite Hθ, H.
 }
 Qed.
@@ -1004,7 +1000,7 @@ apply (eq_rngl_squ_0 Hos) in H1. 2: {
   rewrite Heo, Bool.andb_true_r.
   apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 }
-apply eq_angle_eq.
+apply eq_hangle_eq.
 now rewrite Hθ, H1.
 Qed.
 
@@ -1017,7 +1013,7 @@ intros * Hθ.
 destruct θ as (c, s, Hcs).
 cbn in Hθ |-*.
 subst c.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 f_equal.
 apply (cosh2_sinh2_prop_add_squ) in Hcs.
 rewrite (rngl_squ_opp Hop) in Hcs.
@@ -1048,7 +1044,7 @@ apply (eq_rngl_squ_0 Hos) in H1. 2: {
   rewrite Heo, Bool.andb_true_r.
   apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 }
-apply eq_angle_eq.
+apply eq_hangle_eq.
 now rewrite Hθ, H1.
 Qed.
 
@@ -1060,11 +1056,11 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hcc.
 destruct (rngl_eq_dec Heo (rngl_sinh θ1) (rngl_sinh θ2)) as [Hss| Hss]. {
   left.
-  apply eq_angle_eq.
+  apply eq_hangle_eq.
   now rewrite Hcc, Hss.
 }
 right.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 rewrite Hcc; f_equal.
 cbn.
 specialize (cosh2_sinh2_1 θ1) as H1.
@@ -1096,11 +1092,11 @@ specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 intros * Hss.
 destruct (rngl_eq_dec Heo (rngl_cosh θ1) (rngl_cosh θ2)) as [Hcc| Hcc]. {
   left.
-  apply eq_angle_eq.
+  apply eq_hangle_eq.
   now rewrite Hcc, Hss.
 }
 right.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 rewrite rngl_cos_sub_straight_l.
 rewrite rngl_sin_sub_straight_l.
 rewrite Hss; f_equal.
@@ -1486,7 +1482,7 @@ Theorem hangle_right_add_right :
   (hangle_right + hangle_right)%H = hangle_straight.
 Proof.
 destruct_hc.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_0_l Hos).
 do 2 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_sub_0_l Hop).
@@ -1498,7 +1494,7 @@ Theorem hangle_straight_add_straight :
   (hangle_straight + hangle_straight = 0)%H.
 Proof.
 destruct_hc.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 rewrite (rngl_mul_opp_opp Hop).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
@@ -1513,7 +1509,7 @@ Theorem hangle_straight_sub_right :
   (hangle_straight - hangle_right)%H = hangle_right.
 Proof.
 destruct_hc.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 do 2 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_sub_diag Hos).
@@ -1837,7 +1833,7 @@ intros * H12.
 progress unfold hangle_opp in H12.
 injection H12; clear H12; intros H1 H2.
 apply (rngl_opp_inj Hop) in H1.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 now rewrite H1, H2.
 Qed.
 
@@ -1864,7 +1860,7 @@ Proof.
 destruct_hc.
 intros Hc1 *.
 specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 do 2 rewrite (H1 (rngl_cosh _)).
 now do 2 rewrite (H1 (rngl_sinh _)).
 Qed.
@@ -2691,7 +2687,7 @@ Theorem hangle_sub_opp_r :
 Proof.
 destruct_hc.
 intros.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 now rewrite (rngl_opp_involutive Hop).
 Qed.
 
@@ -2841,7 +2837,7 @@ split; intros H12. {
   apply Bool.andb_true_iff in H12.
   destruct H12 as (Hc12, Hs12).
   apply (rngl_eqb_eq Hed) in Hc12, Hs12.
-  apply eq_angle_eq.
+  apply eq_hangle_eq.
   now rewrite Hc12, Hs12.
 } {
   subst θ2.
@@ -2862,7 +2858,7 @@ split; intros H12. {
 } {
   apply Bool.not_true_iff_false.
   intros H; apply H12; clear H12.
-  apply eq_angle_eq; cbn.
+  apply eq_hangle_eq; cbn.
   apply Bool.andb_true_iff in H.
   destruct H as (Hc, Hs).
   apply (rngl_eqb_eq Hed) in Hc, Hs.
@@ -2929,7 +2925,7 @@ Theorem hangle_div_2_mul_2 :
 Proof.
 intros *.
 destruct_hc.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   do 2 rewrite (H1 (rngl_cosh _)).
@@ -3215,7 +3211,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
   apply H1.
 }
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 rewrite (rngl_leb_refl Hor).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_div_diag Hon Hiq). 2: {
@@ -3238,7 +3234,7 @@ Qed.
 Theorem hangle_opp_0 : (- 0)%H = 0%H.
 Proof.
 destruct_hc.
-apply eq_angle_eq.
+apply eq_hangle_eq.
 cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
@@ -3255,7 +3251,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 hangle_right).
   apply H1.
 }
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 rewrite (rngl_leb_refl Hor).
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_add_opp_r Hop).
@@ -3280,7 +3276,7 @@ Qed.
 Theorem hangle_opp_straight : (- hangle_straight)%H = hangle_straight.
 Proof.
 destruct_hc.
-apply eq_angle_eq; cbn.
+apply eq_hangle_eq; cbn.
 f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
@@ -3461,7 +3457,7 @@ split; intros H12. 2: {
   rewrite Bool.orb_true_iff; right.
   apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 }
-apply eq_angle_eq.
+apply eq_hangle_eq.
 destruct θ1 as (c1, s1, Hcs1).
 destruct θ2 as (c2, s2, Hcs2).
 cbn in H12 |-*.
@@ -3543,7 +3539,7 @@ split; intros H12. {
   apply (eq_rngl_abs_0 Hop) in Hcc, Hss.
   apply -> (rngl_sub_move_0_r Hop) in Hcc.
   apply -> (rngl_sub_move_0_r Hop) in Hss.
-  apply eq_angle_eq.
+  apply eq_hangle_eq.
   now rewrite Hcc, Hss.
 } {
   subst θ2.
