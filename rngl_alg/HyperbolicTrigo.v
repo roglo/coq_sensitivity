@@ -1149,15 +1149,16 @@ Theorem rngl_add_cosh_nonneg_when_sinh_nonneg :
   → (0 ≤ rngl_cosh θ1 + rngl_cosh θ2)%L.
 Proof.
 destruct_hc.
-intros * Hzs1 Hzs2 Hzs3 Hzc1.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hzs3 Hzc1.
   rewrite H1.
   apply (rngl_le_refl Hor).
 }
+intros * Hzs1 Hzs2 Hzs3 Hzc1.
 remember (θ1 + θ2)%H as θ3 eqn:Hθ3.
 destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [Hzc2| Hzc2]. {
   now apply (rngl_add_nonneg_nonneg Hor).
@@ -1222,7 +1223,6 @@ assert (Hs21 : (rngl_sinh θ1 < rngl_sinh θ2)%L). {
   now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_lt_cosh_lt_iff.
 }
 rewrite rngl_add_comm.
-...
 apply
   (rngl_le_lt_trans Hor _
      ((- rngl_cosh θ2) * rngl_sinh θ2 +
@@ -1247,7 +1247,9 @@ apply (rngl_lt_0_sub Hop Hor).
 }
 }
 Qed.
+*)
 
+(* to be completed
 Theorem rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1258,13 +1260,20 @@ Theorem rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub :
 Proof.
 destruct_hc.
 intros * Hzs1 Hzs2.
+...
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cosh θ1) * (1 + rngl_cosh θ2))%L). {
+  clear θ1 θ2 Hzs1 Hzs2.
   intros.
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply (rngl_le_sub_le_add_l Hop Hor).
     progress unfold rngl_sub.
     rewrite Hop, rngl_add_0_l.
-    apply rngl_cosh_bound.
+    apply (rngl_le_trans Hor _ 1). {
+      apply (rngl_opp_1_le_1 Hon Hop Hor).
+    }
+    specialize (rngl_cosh_bound θ1) as H1.
+    destruct H1 as [H1| H1]; [ | easy ].
+...
   } {
     apply (rngl_le_sub_le_add_l Hop Hor).
     progress unfold rngl_sub.
