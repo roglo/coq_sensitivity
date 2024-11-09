@@ -1222,6 +1222,41 @@ assert (Hs21 : (rngl_sinh θ1 < rngl_sinh θ2)%L). {
   apply (rngl_lt_le_incl Hor) in Hzc2.
   now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_lt_cosh_lt_iff.
 }
+(**)
+apply
+  (rngl_le_lt_trans Hor _
+     (rngl_sinh θ1 * - rngl_cosh θ1 +
+      rngl_cosh θ1 * rngl_sinh θ2))%L. {
+  apply (rngl_add_le_mono_r Hop Hor).
+  apply (rngl_mul_le_mono_nonneg_l Hop Hor); [ easy | ].
+  apply (rngl_le_opp_r Hop Hor).
+  rewrite rngl_add_comm.
+  apply (rngl_le_opp_r Hop Hor).
+  now apply (rngl_lt_le_incl Hor).
+}
+rewrite rngl_add_comm.
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_opp_r Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_mul_pos_neg Hop Hor). {
+  rewrite Bool.orb_true_iff; right.
+  now rewrite Heo, Bool.andb_true_r.
+} {
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; symmetry in H.
+  now apply eq_rngl_cosh_0 in H.
+}
+apply (rngl_lt_sub_0 Hop Hor).
+(* ah, putain, ça marche pas mieux *)
+...
+apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
+  rewrite Bool.orb_true_iff; right.
+  now rewrite Heo, Bool.andb_true_r.
+}
+...
 rewrite rngl_add_comm.
 apply
   (rngl_le_lt_trans Hor _
@@ -1241,6 +1276,7 @@ apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
   rewrite Bool.orb_true_iff; right.
   now rewrite Heo, Bool.andb_true_r.
 }
+(* ça marche pas *)
 ...
 apply (rngl_lt_0_sub Hop Hor).
 ...
