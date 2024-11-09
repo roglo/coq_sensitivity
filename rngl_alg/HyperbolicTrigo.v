@@ -461,15 +461,13 @@ apply (rngl_add_opp_r Hop).
 Qed.
 
 Theorem eq_rngl_cosh_0 :
-  ∀ θ, rngl_cosh θ = 0%L → rngl_characteristic T = 1.
+  rngl_characteristic T ≠ 1 →
+  ∀ θ, rngl_cosh θ ≠ 0%L.
 Proof.
 destruct_hc.
+intros Hc1.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  now specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-}
-intros.
-exfalso.
+intros * H.
 specialize (cosh2_sinh2_1 θ) as H1.
 rewrite H in H1.
 rewrite (rngl_squ_0 Hos) in H1.
@@ -1046,14 +1044,13 @@ rewrite <- H1; symmetry.
 apply (rngl_opp_involutive Hop).
 Qed.
 
-(* to be completed
-Theorem rngl_cosh_cosh_sinh_sin_neg_sinh_le_cosh_le_iff :
+Theorem rngl_cosh_cosh_sinh_sinh_neg_sinh_le_cosh_le_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
   → (0 ≤ rngl_sinh θ2)%L
   → (rngl_cosh θ1 ≤ 0)%L
   → (rngl_cosh θ2 ≤ 0)%L
-  → (rngl_sinh θ1 ≤ rngl_sinh θ2)%L ↔ (rngl_cosh θ1 ≤ rngl_cosh θ2)%L.
+  → (rngl_sinh θ1 ≤ rngl_sinh θ2)%L ↔ (rngl_cosh θ2 ≤ rngl_cosh θ1)%L.
 Proof.
 destruct_hc.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -1074,39 +1071,19 @@ split. {
   split. {
     apply (rngl_lt_le_incl Hor) in Hcc.
     specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
-    destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [H| H]. {
-      apply (rngl_le_antisymm Hor) in H; [ | easy ].
-      apply (eq_rngl_cosh_0) in H.
-      easy.
-    }
-    apply (rngl_nle_gt_iff Hor) in H.
-    move H before Hzc1; clear Hzc1; rename H into Hzc1.
-    destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [H| H]. {
-      apply (rngl_le_antisymm Hor) in H; [ | easy ].
-      apply (eq_rngl_cosh_0) in H.
-...
-      destruct H; subst θ2. {
-        apply (rngl_lt_le_incl Hor) in Hzc1.
-        apply (rngl_le_antisymm Hor) in Hcc; [ | easy ].
-        cbn in Hcc.
-        apply (eq_rngl_cosh_0) in Hcc.
-        destruct Hcc; subst θ1; [ apply (rngl_le_refl Hor) | ].
-        exfalso.
-        apply rngl_nlt_ge in Hzs1.
-        apply Hzs1; clear Hzs1; cbn.
-        apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-      }
-      apply rngl_sinh_bound.
-    }
-    apply (rngl_nle_gt_iff Hor) in H.
-    move H before Hzc2; clear Hzc2; rename H into Hzc2.
-    generalize Hzc2; intros H.
-    apply (rngl_leb_gt Hor) in H.
-    rewrite H in H1; clear H.
+    specialize (H1 _ _ Hzs1 Hzs2 Hcc).
     generalize Hzc1; intros H.
-    apply (rngl_leb_gt Hor) in H.
-    now rewrite H in H1; clear H.
+    apply (rngl_lt_eq_cases Hor) in H.
+    destruct H as [H| H]; [ | now apply (eq_rngl_cosh_0 Hc1) in H ].
+    apply (rngl_nle_gt_iff Hor) in H.
+    apply rngl_leb_nle in H.
+    rewrite H in H1; clear H.
+    generalize Hzc2; intros H.
+    apply (rngl_lt_eq_cases Hor) in H.
+    destruct H as [H| H]; [ | now apply (eq_rngl_cosh_0 Hc1) in H ].
+    apply (rngl_nle_gt_iff Hor) in H.
+    apply rngl_leb_nle in H.
+    now rewrite H in H1.
   }
   intros H.
   apply rngl_sinh_eq in H.
@@ -1119,41 +1096,20 @@ split. {
   now apply (rngl_lt_irrefl Hor) in Hcc.
 } {
   intros Hcc.
-  destruct (rngl_le_dec Hor 0 (rngl_cosh θ1)) as [H| H]. {
-    apply (rngl_le_antisymm Hor) in H; [ | easy ].
-    apply (eq_rngl_cosh_0) in H.
-    destruct H; subst θ1. {
-      apply (rngl_le_antisymm Hor) in Hcc; [ | easy ].
-      apply (eq_rngl_cosh_0) in Hcc.
-      destruct Hcc; subst θ2; [ apply (rngl_le_refl Hor) | ].
-      exfalso.
-      apply rngl_nlt_ge in Hzs2.
-      apply Hzs2, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-    }
-    apply rngl_sinh_bound.
-  }
-  apply (rngl_nle_gt_iff Hor) in H.
-  move H before Hzc1; clear Hzc1; rename H into Hzc1.
-  destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [H| H]. {
-    apply (rngl_le_antisymm Hor) in H; [ | easy ].
-    apply (eq_rngl_cosh_0) in H.
-    destruct H; subst θ2. {
-      apply rngl_sinh_bound.
-    }
-    exfalso.
-    apply rngl_nlt_ge in Hzs2.
-    apply Hzs2, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  apply (rngl_nle_gt_iff Hor) in H.
-  move H before Hzc2; clear Hzc2; rename H into Hzc2.
   specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-  specialize (H1 _ _ Hzs1 Hzs2 Hcc).
-  generalize Hzc1; intros H.
-  apply (rngl_leb_gt Hor) in H.
-  rewrite H in H1; clear H.
+  specialize (H1 _ _ Hzs2 Hzs1 Hcc).
   generalize Hzc2; intros H.
-  apply (rngl_leb_gt Hor) in H.
-  now rewrite H in H1; clear H.
+  apply (rngl_lt_eq_cases Hor) in H.
+  destruct H as [H| H]; [ | now apply (eq_rngl_cosh_0 Hc1) in H ].
+  apply (rngl_nle_gt_iff Hor) in H.
+  apply rngl_leb_nle in H.
+  rewrite H in H1; clear H.
+  generalize Hzc1; intros H.
+  apply (rngl_lt_eq_cases Hor) in H.
+  destruct H as [H| H]; [ | now apply (eq_rngl_cosh_0 Hc1) in H ].
+  apply (rngl_nle_gt_iff Hor) in H.
+  apply rngl_leb_nle in H.
+  now rewrite H in H1.
 }
 Qed.
 
@@ -1164,25 +1120,26 @@ Theorem rngl_cosh_cosh_sinh_sin_nonneg_sinh_lt_cosh_lt_iff :
   → (0 ≤ rngl_cosh θ1)%L
   → (0 ≤ rngl_cosh θ2)%L
   → (rngl_sinh θ1 < rngl_sinh θ2)%L
-  ↔ (rngl_cosh θ2 < rngl_cosh θ1)%L.
+  ↔ (rngl_cosh θ1 < rngl_cosh θ2)%L.
 Proof.
 destruct_hc.
 intros * Hzs1 Hzs2 Hzc1 Hzc2.
-split. 2: {
-  intros Hcc.
-  apply rngl_nle_gt in Hcc.
-  apply (rngl_nle_gt_iff Hor).
-  intros Hss; apply Hcc; clear Hcc.
-  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
-} {
+split. {
   intros Hss.
   apply rngl_nle_gt in Hss.
   apply (rngl_nle_gt_iff Hor).
   intros Hcc; apply Hss; clear Hss.
   now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
+} {
+  intros Hcc.
+  apply rngl_nle_gt in Hcc.
+  apply (rngl_nle_gt_iff Hor).
+  intros Hss; apply Hcc; clear Hcc.
+  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
 }
 Qed.
 
+(* to be completed
 Theorem rngl_add_cosh_nonneg_when_sinh_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
