@@ -1387,18 +1387,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 easy.
 Qed.
-
-Theorem hangle_right_add_right :
-  (hangle_right + hangle_right)%H = hangle_straight.
-Proof.
-destruct_hc.
-apply eq_hangle_eq; cbn.
-do 2 rewrite (rngl_mul_0_l Hos).
-do 2 rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_sub_0_l Hop).
-f_equal.
-apply rngl_add_0_l.
-Qed.
+*)
 
 Theorem hangle_straight_add_straight :
   (hangle_straight + hangle_straight = 0)%H.
@@ -1407,25 +1396,9 @@ destruct_hc.
 apply eq_hangle_eq; cbn.
 rewrite (rngl_mul_opp_opp Hop).
 rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-f_equal.
+do 2 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_mul_0_l Hos).
-apply rngl_add_0_l.
-Qed.
-
-Theorem hangle_straight_sub_right :
-  (hangle_straight - hangle_right)%H = hangle_right.
-Proof.
-destruct_hc.
-apply eq_hangle_eq; cbn.
-do 2 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_diag Hos).
-f_equal.
-rewrite (rngl_squ_opp_1 Hon Hop).
-apply rngl_add_0_l.
+now do 2 rewrite rngl_add_0_r.
 Qed.
 
 Theorem hangle_straight_pos :
@@ -1441,6 +1414,7 @@ apply rngl_ltb_lt.
 apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 Qed.
 
+(* to be completed
 Theorem rngl_sinh_nonneg_sinh_nonneg_sinh_nonneg :
   ∀ θ1 θ2,
   θ1 ≠ hangle_straight ∨ θ2 ≠ hangle_straight
@@ -1629,6 +1603,7 @@ rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 subst x y.
 now apply rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub.
 Qed.
+*)
 
 Theorem rngl_sinh_sub_anticomm :
   ∀ θ1 θ2, rngl_sinh (θ1 - θ2) = (- rngl_sinh (θ2 - θ1))%L.
@@ -1667,6 +1642,7 @@ f_equal.
 apply (rngl_mul_1_l Hon).
 Qed.
 
+(* to be completed
 Theorem rngl_sinh_sub_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1701,6 +1677,7 @@ destruct zc1. {
   now apply (rngl_mul_le_compat_nonpos_nonneg Hop Hor).
 }
 Qed.
+*)
 
 Theorem hangle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%H = false ↔ (θ2 < θ1)%H.
 Proof.
@@ -1786,14 +1763,20 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
+(* to be completed
 Theorem hangle_nonneg : ∀ θ, (0 ≤ θ)%H.
 Proof.
 destruct_hc; intros.
 progress unfold hangle_leb.
 cbn.
 rewrite (rngl_leb_refl Hor).
-destruct (0 ≤? rngl_sinh θ)%L; [ | easy ].
+remember (0 ≤? rngl_sinh θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs; [ | easy ].
+apply rngl_leb_le in Hzs.
 apply rngl_leb_le.
+...
+Check rngl_cosh_bound.
 apply rngl_cosh_bound.
 Qed.
 
