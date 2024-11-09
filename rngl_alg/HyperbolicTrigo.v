@@ -368,7 +368,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-Context {ac : hangle_ctx T}.
+Context {hc : hangle_ctx T}.
 
 Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%H ↔ (θ2 ≤ θ1)%H.
 Proof.
@@ -458,6 +458,28 @@ destruct_hc.
 intros; cbn.
 rewrite (rngl_mul_opp_r Hop).
 apply (rngl_add_opp_r Hop).
+Qed.
+
+Theorem eq_rngl_cosh_0 :
+  ∀ θ, rngl_cosh θ = 0%L → rngl_characteristic T = 1.
+Proof.
+destruct_hc.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  now specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+}
+intros.
+exfalso.
+specialize (cosh2_sinh2_1 θ) as H1.
+rewrite H in H1.
+rewrite (rngl_squ_0 Hos) in H1.
+apply (rngl_sub_move_l Hop) in H1.
+rewrite (rngl_sub_0_l Hop) in H1.
+specialize (rngl_squ_nonneg Hop Hor (rngl_sinh θ))%L as H2.
+apply rngl_nlt_ge in H2.
+apply H2; clear H2.
+rewrite H1.
+apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
 Theorem eq_rngl_hsin_0 :
@@ -1051,22 +1073,19 @@ split. {
   apply (rngl_lt_iff Hor).
   split. {
     apply (rngl_lt_le_incl Hor) in Hcc.
-...
     specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
     specialize (H1 _ _ Hzs2 Hzs1 Hcc).
-    destruct (rngl_le_dec Hor 0 (rngl_cosh θ1)) as [H| H]. {
+    destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [H| H]. {
       apply (rngl_le_antisymm Hor) in H; [ | easy ].
       apply (eq_rngl_cosh_0) in H.
-      destruct H; subst θ1; [ apply rngl_sinh_bound | ].
-      exfalso.
-      apply rngl_nlt_ge in Hzs1.
-      apply Hzs1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+      easy.
     }
     apply (rngl_nle_gt_iff Hor) in H.
     move H before Hzc1; clear Hzc1; rename H into Hzc1.
     destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [H| H]. {
       apply (rngl_le_antisymm Hor) in H; [ | easy ].
       apply (eq_rngl_cosh_0) in H.
+...
       destruct H; subst θ2. {
         apply (rngl_lt_le_incl Hor) in Hzc1.
         apply (rngl_le_antisymm Hor) in Hcc; [ | easy ].
