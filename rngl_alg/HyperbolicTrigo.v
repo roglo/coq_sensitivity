@@ -933,6 +933,7 @@ Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
 destruct_hc.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros.
 split; intros Hθ; [ | now subst θ ].
 specialize (cosh2_sinh2_1 θ) as H1.
@@ -942,8 +943,7 @@ apply (rngl_sub_move_l Hop) in H1.
 rewrite (rngl_sub_diag Hos) in H1.
 apply (eq_rngl_squ_0 Hos) in H1. 2: {
   apply Bool.orb_true_iff; right.
-  rewrite Heo, Bool.andb_true_r.
-  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+  now rewrite Heo, Hi1.
 }
 apply eq_hangle_eq.
 now rewrite Hθ, H1.
@@ -954,6 +954,7 @@ Theorem eq_rngl_cosh_opp_1 :
 Proof.
 destruct_hc.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 intros * Hθ.
 destruct θ as (c, s, Hcs).
 cbn in Hθ |-*.
@@ -967,8 +968,7 @@ apply (rngl_sub_move_l Hop) in Hcs.
 rewrite (rngl_sub_diag Hos) in Hcs.
 apply (eq_rngl_squ_0 Hos) in Hcs; [ easy | ].
 apply Bool.orb_true_iff; right.
-rewrite Heo, Bool.andb_true_r.
-apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+now rewrite Heo, Bool.andb_true_r.
 Qed.
 
 Theorem rngl_cosh_eq :
@@ -1152,6 +1152,7 @@ destruct_hc.
 intros * Hzs1 Hzs2 Hzs3 Hzc1.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   rewrite H1.
@@ -1169,7 +1170,6 @@ intros Hcc.
 apply rngl_nlt_ge in Hzs3.
 apply Hzs3; clear Hzs3.
 subst θ3; cbn.
-(* special case for sin θ2 = 0 *)
 destruct (rngl_eq_dec Heo (rngl_sinh θ2) 0) as [H2z| H2z]. {
   rewrite H2z, (rngl_mul_0_r Hos), rngl_add_0_r.
   destruct (rngl_eq_dec Heo (rngl_sinh θ1) 0) as [H1z| H1z]. {
@@ -1179,28 +1179,22 @@ destruct (rngl_eq_dec Heo (rngl_sinh θ2) 0) as [H2z| H2z]. {
       exfalso; apply Hzc2; clear Hzc2; cbn.
       apply (rngl_0_le_1 Hon Hop Hor).
     }
-    clear Hzs2 Hzc2.
-...
-    cbn in Hcc.
     exfalso.
-    destruct H1z as [H1z| H1z]. {
-      subst θ1.
+    clear Hzs2 Hzc2.
+    cbn in Hcc.
+    destruct H1z; subst θ1. {
       rewrite (rngl_opp_involutive Hop) in Hcc.
       cbn in Hcc.
       now apply (rngl_lt_irrefl Hor) in Hcc.
-    } {
-      subst θ1.
-      cbn in Hzc1.
-      apply rngl_nlt_ge in Hzc1.
-      apply Hzc1; clear Hzc1.
-      apply (rngl_opp_neg_pos Hop Hor).
-      apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
     }
+    cbn in Hzc1.
+    apply rngl_nlt_ge in Hzc1.
+    apply Hzc1; clear Hzc1.
+    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
   }
   apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
     rewrite Bool.orb_true_iff; right.
-    rewrite Heo, Bool.andb_true_r.
-    apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+    now rewrite Heo, Bool.andb_true_r.
   }
   apply (rngl_lt_iff Hor).
   split; [ easy | ].
@@ -1212,7 +1206,7 @@ assert (Hzls2 : (0 < rngl_sinh θ2)%L). {
   now apply not_eq_sym.
 }
 clear H2z.
-assert (Hs21 : (rngl_sinh θ2 < rngl_sinh θ1)%L). {
+assert (Hs21 : (rngl_sinh θ1 < rngl_sinh θ2)%L). {
   apply (rngl_lt_opp_r Hop Hor) in Hcc.
   remember (hangle_straight - θ2)%H as θ eqn:Hθ.
   symmetry in Hθ.
@@ -1228,6 +1222,7 @@ assert (Hs21 : (rngl_sinh θ2 < rngl_sinh θ1)%L). {
   now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_lt_cosh_lt_iff.
 }
 rewrite rngl_add_comm.
+...
 apply
   (rngl_le_lt_trans Hor _
      ((- rngl_cosh θ2) * rngl_sinh θ2 +
@@ -1235,19 +1230,20 @@ apply
   apply (rngl_add_le_mono_r Hop Hor).
   apply (rngl_mul_le_mono_pos_r Hop Hor Hii); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
-} {
-  rewrite rngl_add_comm.
-  rewrite (rngl_mul_comm Hic).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_add_opp_r Hop).
-  rewrite <- (rngl_mul_sub_distr_l Hop).
-  rewrite (rngl_mul_comm Hic).
-  apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
-    rewrite Bool.orb_true_iff; right.
-    rewrite Heo, Bool.andb_true_r.
-    apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
-  }
-  now apply (rngl_lt_0_sub Hop Hor).
+}
+rewrite rngl_add_comm.
+rewrite (rngl_mul_comm Hic).
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite <- (rngl_mul_sub_distr_l Hop).
+rewrite (rngl_mul_comm Hic).
+apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
+  rewrite Bool.orb_true_iff; right.
+  now rewrite Heo, Bool.andb_true_r.
+}
+...
+apply (rngl_lt_0_sub Hop Hor).
+...
 }
 }
 Qed.
