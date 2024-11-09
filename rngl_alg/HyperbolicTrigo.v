@@ -796,19 +796,18 @@ rewrite rngl_add_0_r.
 f_equal; apply (rngl_mul_1_r Hon).
 Qed.
 
-(* to be completed
 Theorem rngl_sinh_nonneg_cosh_le_sinh_le :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
   → (0 ≤ rngl_sinh θ2)%L
   → (rngl_cosh θ1 ≤ rngl_cosh θ2)%L
-  → if (0 ≤? rngl_cosh θ1)%L then (rngl_sinh θ2 ≤ rngl_sinh θ1)%L
+  → if (0 ≤? rngl_cosh θ1)%L then (rngl_sinh θ1 ≤ rngl_sinh θ2)%L
     else if (0 ≤? rngl_cosh θ2)%L then (0 ≤ rngl_sinh (θ1 - θ2))%L
-    else (rngl_sinh θ1 ≤ rngl_sinh θ2)%L.
+    else (rngl_sinh θ2 ≤ rngl_sinh θ1)%L.
 Proof.
 destruct_hc.
-intros * Hzs1 Hzs2 Hc12.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+intros * Hzs1 Hzs2 Hc12.
 remember (0 ≤? rngl_cosh θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
 destruct zc1. {
@@ -818,20 +817,14 @@ destruct zc1. {
   }
   rewrite <- (rngl_abs_nonneg_eq Hop Hor _ Hzc1) in Hc12.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ Hzs2).
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ Hzs1).
   apply (rngl_abs_le_squ_le Hop Hor) in Hc12.
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   specialize (cosh2_sinh2_1 θ1) as Hcs1.
   specialize (cosh2_sinh2_1 θ2) as Hcs2.
-(**)
   apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2.
-...
-  apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
-  rewrite Hcs1, Hcs2 in Hc12.
-  apply (rngl_add_le_mono_l Hop Hor) in Hc12.
-...
-  now apply (rngl_sub_le_mono_l Hop Hor) in Hc12.
+  now apply (rngl_sub_le_mono_r Hop Hor).
 }
 apply (rngl_leb_gt Hor) in Hzc1.
 remember (0 ≤? rngl_cosh θ2)%L as zc2 eqn:Hzc2.
@@ -858,14 +851,14 @@ destruct zc2. {
     now apply (rngl_lt_le_incl Hor).
   }
   rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ Hzs1).
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ Hzs2).
   apply (rngl_abs_le_squ_le Hop Hor) in Hc12.
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   specialize (cosh2_sinh2_1 θ1) as Hcs1.
   specialize (cosh2_sinh2_1 θ2) as Hcs2.
-  apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
-  rewrite <- Hcs1, <- Hcs2 in Hc12.
-  now apply (rngl_sub_le_mono_l Hop Hor) in Hc12.
+  apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2.
+  now apply (rngl_sub_le_mono_r Hop Hor).
 }
 Qed.
 
@@ -876,7 +869,7 @@ Theorem rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff :
   → (0 ≤ rngl_cosh θ1)%L
   → (0 ≤ rngl_cosh θ2)%L
   → (rngl_sinh θ1 ≤ rngl_sinh θ2)%L
-  ↔ (rngl_cosh θ2 ≤ rngl_cosh θ1)%L.
+  ↔ (rngl_cosh θ1 ≤ rngl_cosh θ2)%L.
 Proof.
 destruct_hc.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
@@ -890,32 +883,31 @@ split. {
   split. {
     apply (rngl_lt_le_incl Hor) in Hcc.
     specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-    specialize (H1 _ _ Hzs1 Hzs2 Hcc).
-    apply rngl_leb_le in Hzc1.
-    now rewrite Hzc1 in H1.
+    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
+    apply rngl_leb_le in Hzc2.
+    now rewrite Hzc2 in H1.
   }
   intros Hss.
   apply rngl_nle_gt in Hcc.
   apply Hcc; clear Hcc.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cosh θ2)); [ | easy ].
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cosh θ1)); [ | easy ].
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   specialize (cosh2_sinh2_1 θ1) as H1.
-  apply (rngl_add_move_r Hop) in H1.
+  apply (rngl_sub_move_r Hop) in H1.
   rewrite H1; clear H1.
   specialize (cosh2_sinh2_1 θ2) as H1.
-  apply (rngl_add_move_r Hop) in H1.
+  apply (rngl_sub_move_r Hop) in H1.
   rewrite H1, Hss; clear H1.
   apply (rngl_le_refl Hor).
 } {
   intros Hcc.
   specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-  specialize (H1 _ _ Hzs2 Hzs1 Hcc).
-  apply rngl_leb_le in Hzc2.
-  now rewrite Hzc2 in H1.
+  specialize (H1 _ _ Hzs1 Hzs2 Hcc).
+  apply rngl_leb_le in Hzc1.
+  now rewrite Hzc1 in H1.
 }
 Qed.
-*)
 
 Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
