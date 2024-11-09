@@ -824,8 +824,10 @@ destruct zc1. {
   specialize (cosh2_sinh2_1 θ1) as Hcs1.
   specialize (cosh2_sinh2_1 θ2) as Hcs2.
 ...
-  apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.
-  rewrite <- Hcs1, <- Hcs2 in Hc12.
+  apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2 in Hc12.
+  apply (rngl_add_le_mono_l Hop Hor) in Hc12.
+...
   now apply (rngl_sub_le_mono_l Hop Hor) in Hc12.
 }
 apply (rngl_leb_gt Hor) in Hzc1.
@@ -910,32 +912,7 @@ split. {
   now rewrite Hzc2 in H1.
 }
 Qed.
-
-Theorem eq_rngl_cosh_0 :
-  ∀ θ, rngl_cosh θ = 0%L ↔ (θ = hangle_right ∨ θ = - hangle_right)%H.
-Proof.
-destruct_hc.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-intros.
-split; intros Hθ; [ | now destruct Hθ; subst θ ].
-specialize (cosh2_sinh2_1 θ) as H1.
-rewrite Hθ in H1.
-rewrite (rngl_squ_0 Hos) in H1.
-apply (rngl_add_move_l Hop) in H1.
-rewrite (rngl_sub_0_r Hos) in H1.
-rewrite <- (rngl_squ_1 Hon) in H1.
-apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in H1. 2: {
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_mul_1_r Hon).
-}
-destruct H1. {
-  left; apply eq_hangle_eq.
-  now rewrite Hθ, H.
-} {
-  right; apply eq_hangle_eq.
-  now rewrite Hθ, H.
-}
-Qed.
+*)
 
 Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
@@ -946,7 +923,7 @@ split; intros Hθ; [ | now subst θ ].
 specialize (cosh2_sinh2_1 θ) as H1.
 rewrite Hθ in H1.
 rewrite (rngl_squ_1 Hon) in H1.
-apply (rngl_add_move_l Hop) in H1.
+apply (rngl_sub_move_l Hop) in H1.
 rewrite (rngl_sub_diag Hos) in H1.
 apply (eq_rngl_squ_0 Hos) in H1. 2: {
   apply Bool.orb_true_iff; right.
@@ -971,34 +948,12 @@ f_equal.
 apply (cosh2_sinh2_prop_add_squ) in Hcs.
 rewrite (rngl_squ_opp Hop) in Hcs.
 rewrite (rngl_squ_1 Hon) in Hcs.
-apply (rngl_add_sub_eq_l Hos) in Hcs.
+apply (rngl_sub_move_l Hop) in Hcs.
 rewrite (rngl_sub_diag Hos) in Hcs.
-symmetry in Hcs.
 apply (eq_rngl_squ_0 Hos) in Hcs; [ easy | ].
 apply Bool.orb_true_iff; right.
 rewrite Heo, Bool.andb_true_r.
 apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
-Qed.
-
-Theorem eq_rngl_sinh_1 :
-  ∀ θ, rngl_sinh θ = 1%L ↔ θ = hangle_right.
-Proof.
-destruct_hc.
-specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
-intros.
-split; intros Hθ; [ | now subst θ ].
-specialize (cosh2_sinh2_1 θ) as H1.
-rewrite Hθ in H1.
-rewrite (rngl_squ_1 Hon) in H1.
-apply (rngl_add_move_r Hop) in H1.
-rewrite (rngl_sub_diag Hos) in H1.
-apply (eq_rngl_squ_0 Hos) in H1. 2: {
-  apply Bool.orb_true_iff; right.
-  rewrite Heo, Bool.andb_true_r.
-  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
-}
-apply eq_hangle_eq.
-now rewrite Hθ, H1.
 Qed.
 
 Theorem rngl_cosh_eq :
@@ -1018,7 +973,7 @@ rewrite Hcc; f_equal.
 cbn.
 specialize (cosh2_sinh2_1 θ1) as H1.
 specialize (cosh2_sinh2_1 θ2) as H2.
-apply (rngl_add_move_l Hop) in H1, H2.
+apply (rngl_sub_move_l Hop) in H1, H2.
 rewrite Hcc in H1.
 rewrite <- H2 in H1; clear H2.
 apply (eq_rngl_squ_rngl_abs Hop Hor) in H1; cycle 1. {
@@ -1055,7 +1010,7 @@ rewrite rngl_sinh_sub_straight_l.
 rewrite Hss; f_equal.
 specialize (cosh2_sinh2_1 θ1) as H1.
 specialize (cosh2_sinh2_1 θ2) as H2.
-apply (rngl_add_move_r Hop) in H1, H2.
+apply (rngl_sub_move_r Hop) in H1, H2.
 rewrite Hss in H1.
 rewrite <- H2 in H1; clear H2.
 apply (eq_rngl_squ_rngl_abs Hop Hor) in H1; cycle 1. {
@@ -1074,6 +1029,7 @@ rewrite <- H1; symmetry.
 apply (rngl_opp_involutive Hop).
 Qed.
 
+(* to be completed
 Theorem rngl_cosh_cosh_sinh_sin_neg_sinh_le_cosh_le_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1100,6 +1056,7 @@ split. {
   apply (rngl_lt_iff Hor).
   split. {
     apply (rngl_lt_le_incl Hor) in Hcc.
+...
     specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
     specialize (H1 _ _ Hzs2 Hzs1 Hcc).
     destruct (rngl_le_dec Hor 0 (rngl_cosh θ1)) as [H| H]. {
