@@ -3,7 +3,7 @@
    to do. *)
 
 Require Import Main.RingLike.
-Require Import TrigoWithoutPi.
+Require Import Angle.
 
 Ltac change_angle_add_r θ a :=
   remember (θ + a)%A as θ' eqn:Hθ';

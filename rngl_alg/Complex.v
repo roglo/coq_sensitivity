@@ -6,7 +6,7 @@ Import List.ListNotations.
 Require Import Main.Misc Main.RingLike Main.IterAdd.
 Require Import Trigo.TacChangeAngle.
 Require Import Trigo.RealLike.
-Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.Angle_order.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleAddLeMonoL.

@@ -9,7 +9,7 @@ Require Import Main.Misc Main.RingLike.
 Require Import Main.IterMax.
 Require Import Main.IterAdd.
 Require Import Trigo.RealLike.
-Require Import Trigo.TrigoWithoutPi Trigo.TrigoWithoutPiExt.
+Require Import Trigo.Angle Trigo.TrigoWithoutPiExt.
 Require Import Trigo.AngleAddLeMonoL.
 Require Import Trigo.AngleAddOverflowLe.
 Require Import Trigo.AngleTypeIsComplete.
