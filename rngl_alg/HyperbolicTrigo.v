@@ -321,19 +321,19 @@ Definition hangle_eqb a b :=
 
 Definition hangle_leb θ1 θ2 :=
   if (0 ≤? rngl_sinh θ1)%L then
-    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ2 ≤? rngl_cosh θ1)%L
-    else true
+    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 ≤? rngl_cosh θ2)%L
+    else false
   else
-    if (0 ≤? rngl_sinh θ2)%L then false
-    else (rngl_cosh θ1 ≤? rngl_cosh θ2)%L.
+    if (0 ≤? rngl_sinh θ2)%L then true
+    else (rngl_cosh θ2 ≤? rngl_cosh θ1)%L.
 
 Definition hangle_ltb θ1 θ2 :=
   if (0 ≤? rngl_sinh θ1)%L then
-    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ2 <? rngl_cosh θ1)%L
-    else true
+    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 <? rngl_cosh θ2)%L
+    else false
   else
-    if (0 ≤? rngl_sinh θ2)%L then false
-    else (rngl_cosh θ1 <? rngl_cosh θ2)%L.
+    if (0 ≤? rngl_sinh θ2)%L then true
+    else (rngl_cosh θ2 <? rngl_cosh θ1)%L.
 
 End a.
 
@@ -823,6 +823,9 @@ destruct zc1. {
   apply (rngl_squ_le_abs_le Hop Hor Hii).
   specialize (cosh2_sinh2_1 θ1) as Hcs1.
   specialize (cosh2_sinh2_1 θ2) as Hcs2.
+(**)
+  apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2.
 ...
   apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
   rewrite Hcs1, Hcs2 in Hc12.
@@ -1401,6 +1404,8 @@ rewrite (rngl_mul_0_r Hos).
 now do 2 rewrite rngl_add_0_r.
 Qed.
 
+(* I think that, actually, hangle_straight has no meaning:
+   it is on the left curve which is not considered
 Theorem hangle_straight_pos :
   rngl_characteristic T ≠ 1 →
   (0 < hangle_straight)%H.
@@ -1413,6 +1418,7 @@ rewrite (rngl_leb_refl Hor).
 apply rngl_ltb_lt.
 apply (rngl_opp_1_lt_1 Hon Hop Hor Hc1).
 Qed.
+*)
 
 (* to be completed
 Theorem rngl_sinh_nonneg_sinh_nonneg_sinh_nonneg :
@@ -1677,6 +1683,9 @@ destruct zc1. {
   now apply (rngl_mul_le_compat_nonpos_nonneg Hop Hor).
 }
 Qed.
+
+...
+
 *)
 
 Theorem hangle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%H = false ↔ (θ2 < θ1)%H.
