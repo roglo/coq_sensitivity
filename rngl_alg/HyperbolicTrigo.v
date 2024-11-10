@@ -16,10 +16,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
 Definition cosh2_sinh2_prop x y :=
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-      rngl_has_eq_dec T) ||
-   (x² - y² =? 1)%L)%bool = true.
+  (x² - y² =? 1)%L = true.
 
 Record hangle := mk_hangle
   { rngl_cosh : T;
@@ -37,10 +34,10 @@ Class hangle_ctx :=
 
 End a.
 
-Arguments hangle T {ro rp}.
-Arguments mk_hangle {T ro rp} (rngl_cosh rngl_sinh)%_L.
+Arguments hangle T {ro}.
+Arguments mk_hangle {T ro} (rngl_cosh rngl_sinh)%_L.
 Arguments hangle_ctx T {ro rp}.
-Arguments cosh2_sinh2_prop {T ro rp} (x y)%_L.
+Arguments cosh2_sinh2_prop {T ro} (x y)%_L.
 
 Ltac destruct_hc :=
   set (Hic := hc_ic);
@@ -76,16 +73,8 @@ Qed.
 
 Theorem hangle_zero_prop : (cosh2_sinh2_prop 1 0)%L.
 Proof.
+destruct_hc.
 progress unfold cosh2_sinh2_prop.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ cbn | easy ].
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
@@ -95,18 +84,10 @@ Qed.
 
 Theorem hangle_straight_prop : (cosh2_sinh2_prop (-1) 0)%L.
 Proof.
+destruct_hc.
 progress unfold cosh2_sinh2_prop.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ cbn | easy ].
 rewrite (rngl_squ_opp Hop).
 progress unfold rngl_squ.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_sub_0_r Hos).
@@ -119,22 +100,13 @@ Theorem hangle_add_prop :
     (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L
     (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L.
 Proof.
+destruct_hc.
 intros.
 rewrite (rngl_add_comm (rngl_sinh a * _)%L).
 destruct a as (x, y, Hxy).
 destruct b as (x', y', Hxy'); cbn.
 move x' before y; move y' before x'.
 progress unfold cosh2_sinh2_prop in Hxy, Hxy' |-*.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ | easy ].
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-move Hos before Hed.
 cbn in Hxy, Hxy' |-*.
 do 2 rewrite (rngl_squ_add Hic Hon).
 rewrite rngl_add_add_swap.
@@ -157,17 +129,10 @@ Qed.
 Theorem hangle_opp_prop :
   ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
 Proof.
+destruct_hc.
 intros.
 destruct a as (x, y, Hxy); cbn.
 progress unfold cosh2_sinh2_prop in Hxy |-*.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ | easy ].
 now rewrite (rngl_squ_opp Hop).
 Qed.
 
@@ -203,7 +168,6 @@ destruct_hc.
 intros * Hcs.
 progress unfold cosh2_sinh2_prop in Hcs.
 cbn in Hcs.
-rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
@@ -214,7 +178,6 @@ destruct_hc.
 intros.
 destruct θ as (c, s, Hcs); cbn.
 progress unfold cosh2_sinh2_prop in Hcs.
-rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
@@ -266,8 +229,6 @@ destruct_hc.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros.
 progress unfold cosh2_sinh2_prop.
-rewrite Hon, Hop, Hic, Hed.
-apply Bool.orb_true_iff; right.
 apply (rngl_eqb_eq Hed).
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
