@@ -214,9 +214,13 @@
       $1 / 5 = 0.00110011...$ \\
       \vspace{3mm}
       \only<2>{and so on...}
-      \only<3->{we have \\
+      \only<3>{we have \\
         \hspace{1cm}
         $\displaystyle 0.a_1a_2a_3... = \sum_{k=1}^\infty{\; \frac{a_k}{2^k}}$
+      }
+      \only<4->{we have \\
+        \hspace{1cm}
+        $\displaystyle 1 / n = \sum_{k=1}^\infty{\; \frac{a_k}{2^k}}$
       }
     }
   \end{textblock}
@@ -280,14 +284,6 @@
   \end{textblock}
 \end{frame}
 
-\begin{frame}{Source code}
-  github : roglo/coq\_sensitivity \\
-  \begin{itemize}
-  \item compilable by the latest version of Coq (8.20.0)
-  \item work in progress...
-  \end{itemize}
-\end{frame}
-
 \begin{frame}{Conclusion}
     \begin{itemize}
     \item $Angle ::= \{ \; (x, y) \; | \; x^2+y^2=1 \; \}$
@@ -299,6 +295,14 @@
     \item Lie group
     \item $e^{i \theta}$ ?
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Source code}
+  github : roglo/coq\_sensitivity \\
+  \begin{itemize}
+  \item compilable by the latest version of Coq (8.20.0)
+  \item work in progress...
+  \end{itemize}
 \end{frame}
 
 \end{document}
