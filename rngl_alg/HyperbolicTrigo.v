@@ -1922,6 +1922,7 @@ destruct_hc.
 intros * Hzs1 Hzs2 Hzs3 Hzc1.
 rewrite <- rngl_cosh_opp.
 rewrite <- (rngl_cosh_opp θ2).
+...
 apply rngl_add_cosh_nonneg_when_sinh_nonneg. {
   rewrite rngl_sinh_opp.
   now apply (rngl_opp_nonneg_nonpos Hop Hor).
@@ -1938,6 +1939,7 @@ apply rngl_add_cosh_nonneg_when_sinh_nonneg. {
   now rewrite rngl_cosh_opp.
 }
 Qed.
+*)
 
 Theorem rngl_sinh_add_straight_r :
   ∀ θ, (rngl_sinh (θ + hangle_straight) = - rngl_sinh θ)%L.
@@ -1951,6 +1953,7 @@ f_equal.
 apply (rngl_mul_1_r Hon).
 Qed.
 
+(* to be completed
 Theorem rngl_sinh_sub_nonneg_sinh_le_sin :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1968,15 +1971,15 @@ apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cosh θ1)) in Hzs12; [ | easy ].
 rewrite rngl_mul_assoc in Hzs12.
 rewrite fold_rngl_squ in Hzs12.
 specialize (cosh2_sinh2_1 θ1) as H1.
-apply (rngl_add_move_r Hop) in H1.
+apply (rngl_sub_move_r Hop) in H1.
 rewrite H1 in Hzs12; clear H1.
-rewrite (rngl_mul_sub_distr_r Hop) in Hzs12.
+rewrite rngl_mul_add_distr_r in Hzs12.
 rewrite (rngl_mul_1_l Hon) in Hzs12.
-apply (rngl_le_sub_le_add_r Hop Hor) in Hzs12.
+apply (rngl_le_add_le_sub_r Hop Hor) in Hzs12.
 rewrite (rngl_mul_comm Hic) in Hzs12.
 progress unfold rngl_squ in Hzs12.
 do 2 rewrite <- rngl_mul_assoc in Hzs12.
-rewrite <- rngl_mul_add_distr_l in Hzs12.
+rewrite <- (rngl_mul_sub_distr_l Hop) in Hzs12.
 rewrite (rngl_mul_comm Hic (rngl_cosh θ2)) in Hzs12.
 rewrite <- rngl_cosh_sub in Hzs12.
 eapply (rngl_le_trans Hor); [ apply Hzs12 | ].
@@ -1984,6 +1987,7 @@ apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
 apply (rngl_le_0_sub Hop Hor).
+...
 apply rngl_cosh_bound.
 Qed.
 
