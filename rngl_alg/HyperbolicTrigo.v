@@ -1296,7 +1296,6 @@ Theorem rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub :
 Proof.
 destruct_hc.
 intros * Hzs1 Hzs2.
-...
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cosh θ1) * (1 + rngl_cosh θ2))%L). {
   clear θ1 θ2 Hzs1 Hzs2.
   intros.
@@ -1461,6 +1460,7 @@ assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cosh θ)%L). {
   apply (rngl_le_sub_le_add_l Hop Hor).
   progress unfold rngl_sub.
   rewrite Hop, rngl_add_0_l.
+...
   apply rngl_cosh_bound.
 }
 assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cosh θ)%L). {
@@ -1674,6 +1674,10 @@ destruct zc1. {
   rewrite (rngl_add_opp_r Hop).
   apply (rngl_le_0_sub Hop Hor).
   rewrite (rngl_mul_comm Hic).
+  apply (rngl_mul_le_compat_nonneg Hop Hor); try easy.
+(* j'avais inversé cosh θ1 et cosh θ2 dans les hypothèses
+   parce que ça marchait pas, mais là, c'est pas mieux *)
+...
   now apply (rngl_mul_le_compat_nonneg Hop Hor).
 } {
   apply (rngl_leb_gt Hor) in Hzc1.
@@ -1689,9 +1693,6 @@ destruct zc1. {
   now apply (rngl_mul_le_compat_nonpos_nonneg Hop Hor).
 }
 Qed.
-
-...
-
 *)
 
 Theorem hangle_leb_gt : ∀ θ1 θ2, (θ1 ≤? θ2)%H = false ↔ (θ2 < θ1)%H.
@@ -1787,6 +1788,12 @@ cbn.
 rewrite (rngl_leb_refl Hor).
 remember (0 ≤? rngl_sinh θ)%L as zs eqn:Hzs.
 symmetry in Hzs.
+destruct zs. {
+  apply rngl_leb_le in Hzs.
+  apply rngl_leb_le.
+(* y a pas, il faut que rngl_cosh θ soit positif
+   dans la définition de hangle *)
+...
 destruct zs; [ | easy ].
 apply rngl_leb_le in Hzs.
 apply rngl_leb_le.
@@ -1794,10 +1801,11 @@ apply rngl_leb_le.
 Check rngl_cosh_bound.
 apply rngl_cosh_bound.
 Qed.
+*)
 
 Theorem hangle_le_rngl_sinh_nonneg_sinh_nonneg :
   ∀ θ1 θ2,
-  (θ2 ≤ θ1)%H
+  (θ1 ≤ θ2)%H
   → (0 ≤ rngl_sinh θ1)%L
   → (0 ≤ rngl_sinh θ2)%L.
 Proof.
@@ -1815,6 +1823,7 @@ apply (rngl_leb_gt Hor) in Hs2z.
 now rewrite Hs2z.
 Qed.
 
+(* to be completed
 Theorem rngl_add_cosh_neg_when_sinh_nonneg_neg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1824,15 +1833,16 @@ Theorem rngl_add_cosh_neg_when_sinh_nonneg_neg :
   → (rngl_cosh θ1 + rngl_cosh θ2 < 0)%L.
 Proof.
 destruct_hc.
-intros * Hzs1 Hzs2 Hs3z Hzc1.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzs1 Hzs2 Hs3z Hzc1.
   rewrite (H1 (rngl_sinh _)) in Hs3z.
   now apply (rngl_lt_irrefl Hor) in Hs3z.
 }
+intros * Hzs1 Hzs2 Hs3z Hzc1.
 remember (θ1 + θ2)%H as θ3 eqn:Hθ3.
 destruct (rngl_le_dec Hor 0 (rngl_cosh θ2)) as [Hzc2| Hzc2]. {
   apply rngl_nle_gt in Hs3z.
@@ -1859,6 +1869,10 @@ assert (Hs21 : (rngl_sinh θ1 ≤ rngl_sinh θ2)%L). {
   apply -> (rngl_le_0_sub Hop Hor) in Hcc.
   apply (rngl_opp_neg_pos Hop Hor) in Hzc2.
   move Hzc2 before Hzc1.
+apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff; try easy.
+now apply (rngl_lt_le_incl Hor) in Hzc2.
+Search hangle_straight.
+...
   apply (rngl_lt_le_incl Hor) in Hzc2.
   now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
 }
@@ -1887,6 +1901,7 @@ apply (rngl_mul_nonneg_nonneg Hop Hor). {
   now apply (rngl_lt_le_incl Hor).
 }
 Qed.
+*)
 
 Theorem rngl_cosh_opp : ∀ θ, rngl_cosh (- θ) = rngl_cosh θ.
 Proof. easy. Qed.
@@ -1894,6 +1909,7 @@ Proof. easy. Qed.
 Theorem rngl_sinh_opp : ∀ θ, rngl_sinh (- θ) = (- rngl_sinh θ)%L.
 Proof. easy. Qed.
 
+(* to be completed
 Theorem rngl_add_cosh_nonneg_when_sinh_nonpos :
   ∀ θ1 θ2,
   (rngl_sinh θ1 ≤ 0)%L
