@@ -1765,7 +1765,6 @@ Proof.
 destruct_ac.
 intros * Hx1.
 progress unfold cos2_sin2_prop.
-rewrite Hon, Hop, Hic, Hed; cbn.
 apply (rngl_eqb_eq Hed).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_add_le_sub_r Hop Hor).

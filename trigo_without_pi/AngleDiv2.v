@@ -26,8 +26,6 @@ destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros.
 progress unfold cos2_sin2_prop.
-rewrite Hon, Hop, Hic, Hed.
-apply Bool.orb_true_iff; right.
 assert (Hε : (ε² = 1)%L). {
   progress unfold ε.
   destruct (0 ≤? _)%L. {

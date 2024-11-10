@@ -22,11 +22,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
-Definition cos2_sin2_prop x y :=
-  (negb
-     (rngl_has_1 T && rngl_has_opp T && rngl_mul_is_comm T &&
-      rngl_has_eq_dec T) ||
-   (x² + y² =? 1)%L)%bool = true.
+Definition cos2_sin2_prop x y := (x² + y² =? 1)%L = true.
 
 Record angle := mk_angle
   { rngl_cos : T;
@@ -44,8 +40,8 @@ Class angle_ctx :=
 
 End a.
 
-Arguments angle T {ro rp}.
-Arguments mk_angle {T ro rp} (rngl_cos rngl_sin)%_L.
+Arguments angle T {ro}.
+Arguments mk_angle {T ro} (rngl_cos rngl_sin)%_L.
 Arguments angle_ctx T {ro rp}.
 
 Ltac destruct_ac :=
@@ -82,16 +78,8 @@ Qed.
 
 Theorem angle_zero_prop : (cos2_sin2_prop 1 0)%L.
 Proof.
+destruct_ac.
 progress unfold cos2_sin2_prop.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ cbn | easy ].
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
@@ -101,16 +89,8 @@ Qed.
 
 Theorem angle_right_prop : cos2_sin2_prop 0%L 1%L.
 Proof.
+destruct_ac.
 progress unfold cos2_sin2_prop.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ cbn | easy ].
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_squ_0 Hos).
 rewrite (rngl_squ_1 Hon).
 rewrite rngl_add_0_l.
@@ -119,18 +99,10 @@ Qed.
 
 Theorem angle_straight_prop : (cos2_sin2_prop (-1) 0)%L.
 Proof.
+destruct_ac.
 progress unfold cos2_sin2_prop.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ cbn | easy ].
 rewrite (rngl_squ_opp Hop).
 progress unfold rngl_squ.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 rewrite rngl_add_0_r.
@@ -143,20 +115,13 @@ Theorem angle_add_prop :
     (rngl_cos a * rngl_cos b - rngl_sin a * rngl_sin b)%L
     (rngl_sin a * rngl_cos b + rngl_cos a * rngl_sin b)%L.
 Proof.
+destruct_ac.
 intros.
 rewrite (rngl_add_comm (rngl_sin a * _)%L).
 destruct a as (x, y, Hxy).
 destruct b as (x', y', Hxy'); cbn.
 move x' before y; move y' before x'.
 progress unfold cos2_sin2_prop in Hxy, Hxy' |-*.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ | easy ].
 cbn in Hxy, Hxy' |-*.
 rewrite (rngl_squ_add Hic Hon).
 rewrite (rngl_squ_sub Hop Hic Hon).
@@ -178,18 +143,10 @@ Qed.
 
 Theorem angle_opp_prop : ∀ a, cos2_sin2_prop (rngl_cos a) (- rngl_sin a)%L.
 Proof.
+destruct_ac.
 intros.
 destruct a as (x, y, Hxy); cbn.
 progress unfold cos2_sin2_prop in Hxy |-*.
-remember (rngl_has_1 T) as on eqn:Hon; symmetry in Hon.
-remember (rngl_has_opp T) as op eqn:Hop; symmetry in Hop.
-remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
-remember (rngl_has_eq_dec T) as ed eqn:Hed; symmetry in Hed.
-destruct on; [ | easy ].
-destruct op; [ | easy ].
-destruct ic; [ | easy ].
-destruct ed; [ | easy ].
-cbn in Hxy |-*.
 now rewrite (rngl_squ_opp Hop).
 Qed.
 
@@ -227,8 +184,6 @@ Proof.
 destruct_ac.
 intros * Hcs.
 progress unfold cos2_sin2_prop in Hcs.
-cbn in Hcs.
-rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
@@ -239,7 +194,6 @@ destruct_ac.
 intros.
 destruct θ as (c, s, Hcs); cbn.
 progress unfold cos2_sin2_prop in Hcs.
-rewrite Hon, Hop, Hic, Hed in Hcs; cbn in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
