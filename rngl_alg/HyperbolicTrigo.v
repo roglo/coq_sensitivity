@@ -16,7 +16,7 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 
 Definition cosh2_sinh2_prop x y :=
-  (x² - y² =? 1)%L = true.
+  ((x² - y² =? 1)%L && (1 ≤? x)%L)%bool = true.
 
 Record hangle := mk_hangle
   { rngl_cosh : T;
@@ -79,21 +79,11 @@ progress unfold rngl_squ.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 rewrite (rngl_sub_0_r Hos).
-apply (rngl_eqb_refl Hed).
+rewrite (rngl_eqb_refl Hed).
+apply (rngl_leb_refl Hor).
 Qed.
 
-Theorem hangle_straight_prop : (cosh2_sinh2_prop (-1) 0)%L.
-Proof.
-destruct_hc.
-progress unfold cosh2_sinh2_prop.
-rewrite (rngl_squ_opp Hop).
-progress unfold rngl_squ.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-apply (rngl_eqb_refl Hed).
-Qed.
-
+(* to be completed
 Theorem hangle_add_prop :
   ∀ a b,
   cosh2_sinh2_prop
@@ -121,8 +111,23 @@ do 4 rewrite (rngl_squ_mul Hic).
 do 2 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_sub_sub_distr Hop).
 do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
-apply (rngl_eqb_eq Hed) in Hxy'.
+apply Bool.andb_true_iff in Hxy, Hxy'.
+destruct Hxy as (Hxy, Hxyz).
+destruct Hxy' as (Hxy', Hxy'z).
+rewrite (rngl_eqb_eq Hed) in Hxy'.
 rewrite Hxy'.
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite Hxy.
+apply (rngl_eqb_eq Hed) in Hxy.
+apply rngl_leb_le in Hxyz, Hxy'z.
+apply rngl_leb_le.
+...
+apply (rngl_add_nonneg_nonneg Hor). {
+  now apply (rngl_mul_nonneg_nonneg Hop Hor).
+}
+apply (rngl_mul_nonneg_nonneg Hop Hor). {
+  apply (rngl_sub_move_l Hop) in Hxy.
+...
 now do 2 rewrite (rngl_mul_1_r Hon).
 Qed.
 
@@ -3478,6 +3483,7 @@ split. {
   apply hangle_taxi_dist_triangular.
 }
 Qed.
+*)
 *)
 
 End a.
