@@ -39,6 +39,10 @@ Arguments mk_hangle {T ro} (rngl_cosh rngl_sinh)%_L.
 Arguments hangle_ctx T {ro rp}.
 Arguments cosh2_sinh2_prop {T ro} (x y)%_L.
 
+Declare Scope hangle_scope.
+Delimit Scope hangle_scope with H.
+Bind Scope hangle_scope with hangle.
+
 Ltac destruct_hc :=
   set (Hic := hc_ic);
   set (Hop := hc_op);
@@ -57,6 +61,9 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {hc : hangle_ctx T}.
 
+Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
+Proof. easy. Qed.
+
 Theorem eq_hangle_eq : ∀ θ1 θ2,
   (rngl_cosh θ1, rngl_sinh θ1) = (rngl_cosh θ2, rngl_sinh θ2) ↔ θ1 = θ2.
 Proof.
@@ -71,96 +78,6 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem hangle_zero_prop : (cosh2_sinh2_prop 1 0)%L.
-Proof.
-destruct_hc.
-progress unfold cosh2_sinh2_prop.
-progress unfold rngl_squ.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-apply (rngl_eqb_refl Hed).
-Qed.
-
-Theorem hangle_straight_prop : (cosh2_sinh2_prop (-1) 0)%L.
-Proof.
-destruct_hc.
-progress unfold cosh2_sinh2_prop.
-rewrite (rngl_squ_opp Hop).
-progress unfold rngl_squ.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-apply (rngl_eqb_refl Hed).
-Qed.
-
-Theorem hangle_add_prop :
-  ∀ a b,
-  cosh2_sinh2_prop
-    (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L
-    (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L.
-Proof.
-destruct_hc.
-intros.
-rewrite (rngl_add_comm (rngl_sinh a * _)%L).
-destruct a as (x, y, Hxy).
-destruct b as (x', y', Hxy'); cbn.
-move x' before y; move y' before x'.
-progress unfold cosh2_sinh2_prop in Hxy, Hxy' |-*.
-cbn in Hxy, Hxy' |-*.
-do 2 rewrite (rngl_squ_add Hic Hon).
-rewrite rngl_add_add_swap.
-do 2 rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
-do 4 rewrite rngl_mul_assoc.
-rewrite (rngl_mul_mul_swap Hic (2 * x * y')%L).
-rewrite (rngl_mul_mul_swap Hic (2 * x) y')%L.
-rewrite (rngl_mul_mul_swap Hic (2 * x * x') y' y)%L.
-rewrite (rngl_add_sub Hos).
-do 4 rewrite (rngl_squ_mul Hic).
-do 2 rewrite (rngl_add_sub_swap Hop).
-rewrite <- (rngl_sub_sub_distr Hop).
-do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
-apply (rngl_eqb_eq Hed) in Hxy'.
-rewrite Hxy'.
-now do 2 rewrite (rngl_mul_1_r Hon).
-Qed.
-
-Theorem hangle_opp_prop :
-  ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
-Proof.
-destruct_hc.
-intros.
-destruct a as (x, y, Hxy); cbn.
-progress unfold cosh2_sinh2_prop in Hxy |-*.
-now rewrite (rngl_squ_opp Hop).
-Qed.
-
-Definition hangle_zero :=
-  {| rngl_cosh := 1; rngl_sinh := 0;
-     rngl_cosh2_sinh2 := hangle_zero_prop |}%L.
-
-Definition hangle_straight :=
-  {| rngl_cosh := -1; rngl_sinh := 0;
-     rngl_cosh2_sinh2 := hangle_straight_prop |}%L.
-
-Definition hangle_add a b :=
-  {| rngl_cosh := (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L;
-     rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
-     rngl_cosh2_sinh2 := hangle_add_prop a b |}.
-
-Definition hangle_opp a :=
-  {| rngl_cosh := rngl_cosh a; rngl_sinh := - rngl_sinh a;
-     rngl_cosh2_sinh2 := hangle_opp_prop a |}.
-
-Definition hangle_sub θ1 θ2 := hangle_add θ1 (hangle_opp θ2).
-
-Fixpoint hangle_mul_nat a n :=
-  match n with
-  | 0 => hangle_zero
-  | S n' => hangle_add a (hangle_mul_nat a n')
-  end.
-
 Theorem cosh2_sinh2_prop_add_squ :
   ∀ c s, cosh2_sinh2_prop c s → (c² - s² = 1)%L.
 Proof.
@@ -168,16 +85,6 @@ destruct_hc.
 intros * Hcs.
 progress unfold cosh2_sinh2_prop in Hcs.
 cbn in Hcs.
-now apply (rngl_eqb_eq Hed) in Hcs.
-Qed.
-
-Theorem cosh2_sinh2_1 :
-  ∀ θ, ((rngl_cosh θ)² - (rngl_sinh θ)² = 1)%L.
-Proof.
-destruct_hc.
-intros.
-destruct θ as (c, s, Hcs); cbn.
-progress unfold cosh2_sinh2_prop in Hcs.
 now apply (rngl_eqb_eq Hed) in Hcs.
 Qed.
 
@@ -219,7 +126,42 @@ destruct a as (ca, sa, Ha); cbn.
 now apply (rngl_cosh_proj_bound ca sa).
 Qed.
 
-(* *)
+Theorem hangle_add_prop :
+  ∀ a b,
+  cosh2_sinh2_prop
+    (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L
+    (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L.
+Proof.
+destruct_hc.
+intros.
+rewrite (rngl_add_comm (rngl_sinh a * _)%L).
+destruct a as (x, y, Hxy).
+destruct b as (x', y', Hxy'); cbn.
+move x' before y; move y' before x'.
+progress unfold cosh2_sinh2_prop in Hxy, Hxy' |-*.
+cbn in Hxy, Hxy' |-*.
+do 2 rewrite (rngl_squ_add Hic Hon).
+rewrite rngl_add_add_swap.
+do 2 rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop (_ + _ + _))%L.
+do 4 rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (2 * x * y')%L).
+rewrite (rngl_mul_mul_swap Hic (2 * x) y')%L.
+rewrite (rngl_mul_mul_swap Hic (2 * x * x') y' y)%L.
+rewrite (rngl_add_sub Hos).
+do 4 rewrite (rngl_squ_mul Hic).
+do 2 rewrite (rngl_add_sub_swap Hop).
+rewrite <- (rngl_sub_sub_distr Hop).
+do 2 rewrite <- (rngl_mul_sub_distr_l Hop).
+apply (rngl_eqb_eq Hed) in Hxy'.
+rewrite Hxy'.
+now do 2 rewrite (rngl_mul_1_r Hon).
+Qed.
+
+Definition hangle_add a b :=
+  {| rngl_cosh := (rngl_cosh a * rngl_cosh b + rngl_sinh a * rngl_sinh b)%L;
+     rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
+     rngl_cosh2_sinh2 := hangle_add_prop a b |}.
 
 Theorem hangle_nonneg_div_2_prop :
   ∀ a
@@ -350,51 +292,31 @@ Definition hangle_div_2 a :=
          rngl_cosh2_sinh2 := hangle_neg_div_2_prop a Haz |}
   end.
 
-Definition hangle_eqb a b :=
-  ((rngl_cosh a =? rngl_cosh b)%L && (rngl_sinh a =? rngl_sinh b)%L)%bool.
+Theorem hangle_zero_prop : (cosh2_sinh2_prop 1 0)%L.
+Proof.
+destruct_hc.
+progress unfold cosh2_sinh2_prop.
+progress unfold rngl_squ.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+apply (rngl_eqb_refl Hed).
+Qed.
 
-Definition hangle_leb θ1 θ2 :=
-  if (0 ≤? rngl_sinh θ1)%L then
-    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 ≤? rngl_cosh θ2)%L
-    else false
-  else
-    if (0 ≤? rngl_sinh θ2)%L then true
-    else (rngl_cosh θ2 ≤? rngl_cosh θ1)%L.
+Definition hangle_zero :=
+  {| rngl_cosh := 1; rngl_sinh := 0;
+     rngl_cosh2_sinh2 := hangle_zero_prop |}%L.
 
-Definition hangle_ltb θ1 θ2 :=
-  if (0 ≤? rngl_sinh θ1)%L then
-    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 <? rngl_cosh θ2)%L
-    else false
-  else
-    if (0 ≤? rngl_sinh θ2)%L then true
-    else (rngl_cosh θ2 <? rngl_cosh θ1)%L.
+Fixpoint hangle_mul_nat a n :=
+  match n with
+  | 0 => hangle_zero
+  | S n' => hangle_add a (hangle_mul_nat a n')
+  end.
 
 End a.
 
-Declare Scope hangle_scope.
-Delimit Scope hangle_scope with H.
-Bind Scope hangle_scope with hangle.
-
-Notation "0" := hangle_zero : hangle_scope.
-Notation "θ1 + θ2" := (hangle_add θ1 θ2) : hangle_scope.
-Notation "θ1 - θ2" := (hangle_sub θ1 θ2) : hangle_scope.
-Notation "- θ" := (hangle_opp θ) : hangle_scope.
-Notation "θ1 =? θ2" := (hangle_eqb θ1 θ2) : hangle_scope.
-Notation "θ1 ≠? θ2" := (negb (hangle_eqb θ1 θ2)) : hangle_scope.
-Notation "θ1 ≤? θ2" := (hangle_leb θ1 θ2) : hangle_scope.
-Notation "θ1 <? θ2" := (hangle_ltb θ1 θ2) : hangle_scope.
-Notation "θ1 ≤ θ2" := (hangle_leb θ1 θ2 = true) : hangle_scope.
-Notation "θ1 < θ2" := (hangle_ltb θ1 θ2 = true) : hangle_scope.
-Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
 Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
-Notation "θ1 ≤ θ2 < θ3" :=
-  (hangle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
-Notation "θ1 ≤ θ2 ≤ θ3" :=
-  (hangle_leb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
-Notation "θ1 < θ2 < θ3" :=
-  (hangle_ltb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
-Notation "θ1 < θ2 ≤ θ3" :=
-  (hangle_ltb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+Notation "n * θ" := (hangle_mul_nat θ n) : hangle_scope.
 
 Section a.
 
@@ -404,8 +326,15 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {hc : hangle_ctx T}.
 
-Theorem fold_rl_sqrt : rl_nth_root 2 = rl_sqrt.
-Proof. easy. Qed.
+Theorem cosh2_sinh2_1 :
+  ∀ θ, ((rngl_cosh θ)² - (rngl_sinh θ)² = 1)%L.
+Proof.
+destruct_hc.
+intros.
+destruct θ as (c, s, Hcs); cbn.
+progress unfold cosh2_sinh2_prop in Hcs.
+now apply (rngl_eqb_eq Hed) in Hcs.
+Qed.
 
 Theorem rngl_cosh_nonneg_hangle_div_2_mul_2 :
   ∀ a, (0 ≤ rngl_cosh a)%L → (2 * (a /₂))%H = a.
@@ -717,11 +646,92 @@ destruct (rngl_le_dec Hor 0 (rngl_cosh a)) as [Hza| Haz]. {
   now apply rngl_cosh_nonneg_hangle_div_2_mul_2.
 } {
   apply (rngl_nle_gt_iff Hor) in Haz.
-...
-  apply rngl_cosh_neg_hangle_div_2_mul_2.
-...
+  now apply rngl_cosh_neg_hangle_div_2_mul_2.
+}
 Qed.
 *)
+
+Theorem hangle_opp_prop :
+  ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
+Proof.
+destruct_hc.
+intros.
+destruct a as (x, y, Hxy); cbn.
+progress unfold cosh2_sinh2_prop in Hxy |-*.
+now rewrite (rngl_squ_opp Hop).
+Qed.
+
+Theorem hangle_straight_prop : (cosh2_sinh2_prop (-1) 0)%L.
+Proof.
+destruct_hc.
+progress unfold cosh2_sinh2_prop.
+rewrite (rngl_squ_opp Hop).
+progress unfold rngl_squ.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+apply (rngl_eqb_refl Hed).
+Qed.
+
+Definition hangle_straight :=
+  {| rngl_cosh := -1; rngl_sinh := 0;
+     rngl_cosh2_sinh2 := hangle_straight_prop |}%L.
+
+Definition hangle_opp a :=
+  {| rngl_cosh := rngl_cosh a; rngl_sinh := - rngl_sinh a;
+     rngl_cosh2_sinh2 := hangle_opp_prop a |}.
+
+Definition hangle_sub θ1 θ2 := hangle_add θ1 (hangle_opp θ2).
+
+(* *)
+
+Definition hangle_eqb a b :=
+  ((rngl_cosh a =? rngl_cosh b)%L && (rngl_sinh a =? rngl_sinh b)%L)%bool.
+
+Definition hangle_leb θ1 θ2 :=
+  if (0 ≤? rngl_sinh θ1)%L then
+    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 ≤? rngl_cosh θ2)%L
+    else false
+  else
+    if (0 ≤? rngl_sinh θ2)%L then true
+    else (rngl_cosh θ2 ≤? rngl_cosh θ1)%L.
+
+Definition hangle_ltb θ1 θ2 :=
+  if (0 ≤? rngl_sinh θ1)%L then
+    if (0 ≤? rngl_sinh θ2)%L then (rngl_cosh θ1 <? rngl_cosh θ2)%L
+    else false
+  else
+    if (0 ≤? rngl_sinh θ2)%L then true
+    else (rngl_cosh θ2 <? rngl_cosh θ1)%L.
+
+End a.
+
+Notation "0" := hangle_zero : hangle_scope.
+Notation "θ1 + θ2" := (hangle_add θ1 θ2) : hangle_scope.
+Notation "θ1 - θ2" := (hangle_sub θ1 θ2) : hangle_scope.
+Notation "- θ" := (hangle_opp θ) : hangle_scope.
+Notation "θ1 =? θ2" := (hangle_eqb θ1 θ2) : hangle_scope.
+Notation "θ1 ≠? θ2" := (negb (hangle_eqb θ1 θ2)) : hangle_scope.
+Notation "θ1 ≤? θ2" := (hangle_leb θ1 θ2) : hangle_scope.
+Notation "θ1 <? θ2" := (hangle_ltb θ1 θ2) : hangle_scope.
+Notation "θ1 ≤ θ2" := (hangle_leb θ1 θ2 = true) : hangle_scope.
+Notation "θ1 < θ2" := (hangle_ltb θ1 θ2 = true) : hangle_scope.
+Notation "θ1 ≤ θ2 < θ3" :=
+  (hangle_leb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
+Notation "θ1 ≤ θ2 ≤ θ3" :=
+  (hangle_leb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+Notation "θ1 < θ2 < θ3" :=
+  (hangle_ltb θ1 θ2 = true ∧ hangle_ltb θ2 θ3 = true) : hangle_scope.
+Notation "θ1 < θ2 ≤ θ3" :=
+  (hangle_ltb θ1 θ2 = true ∧ hangle_leb θ2 θ3 = true) : hangle_scope.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {hc : hangle_ctx T}.
 
 Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%H ↔ (θ2 ≤ θ1)%H.
 Proof.
