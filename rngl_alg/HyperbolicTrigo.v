@@ -602,22 +602,16 @@ assert (Hz1ac : (0 ≤ - rngl_cosh a + 1)%L). {
   apply (rngl_0_le_1 Hon Hop Hor).
 }
 assert (Hz1sc : (0 ≤ - rngl_cosh a - 1)%L). {
-  rewrite (rngl_add_opp_l Hop) in Hz1ac.
+  clear Hz1ac.
   rewrite (rngl_opp_sub_swap Hop).
-  apply -> (rngl_le_0_sub Hop Hor) in Hz1ac.
   apply (rngl_le_0_sub Hop Hor).
-(* mmm.... non, ça va pas *)
-...
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  rewrite rngl_add_0_l.
   specialize (rngl_cosh_bound a) as H1.
-  destruct H1 as [H1| H1]; [ | easy ].
+  destruct H1 as [H1| H1]; [ easy | ].
   exfalso.
   apply rngl_nlt_ge in H1.
   apply H1; clear H1.
-  apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+  apply (rngl_0_le_1 Hon Hop Hor).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
@@ -625,6 +619,7 @@ rewrite (rngl_squ_sqrt Hon). 2: {
   }
   now rewrite (rngl_mul_0_l Hos).
 }
+rewrite (rngl_squ_opp Hop).
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
@@ -640,6 +635,8 @@ rewrite (rngl_add_sub Hos).
 rewrite <- (rngl_mul_2_r Hon).
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
+rewrite (rngl_mul_1_r Hon).
+...
 rewrite (rngl_mul_1_r Hon); f_equal.
 progress unfold rl_sqrt.
 rewrite rngl_add_comm.
