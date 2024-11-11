@@ -221,7 +221,7 @@ Qed.
 
 (* *)
 
-Theorem hangle_div_2_prop :
+Theorem hangle_nonneg_div_2_prop :
   ∀ a (Hzc : (0 ≤ rngl_cosh a)%L),
   cosh2_sinh2_prop √((rngl_cosh a + 1) / 2) √((rngl_cosh a - 1) / 2).
 Proof.
@@ -267,14 +267,70 @@ apply (rngl_div_diag Hon Hiq).
 apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.
 
+Theorem hangle_neg_div_2_prop :
+  ∀ a (Hcz : ¬ (0 ≤ rngl_cosh a)%L),
+  cosh2_sinh2_prop (- √((- rngl_cosh a + 1) / 2)) √((- rngl_cosh a - 1) / 2).
+Proof.
+destruct_hc.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+intros.
+apply (rngl_nle_gt_iff Hor) in Hcz.
+apply (rngl_lt_le_incl Hor) in Hcz. (* à vérifier *)
+progress unfold cosh2_sinh2_prop.
+apply (rngl_eqb_eq Hed).
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  now rewrite (H1 (_ + _)%L), (H1 1%L).
+}
+rewrite (rngl_squ_opp Hop).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_add_opp_l Hop).
+  apply <- (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_trans Hor _ 0); [ easy | ].
+  apply (rngl_0_le_1 Hon Hop Hor).
+}
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  specialize (rngl_cosh_bound a) as Ha.
+  destruct Ha as [Ha| Ha]. 2: {
+    exfalso.
+    apply rngl_nlt_ge in Ha.
+    apply Ha; clear Ha.
+    apply (rngl_le_lt_trans Hor _ 0); [ easy | ].
+    apply (rngl_0_lt_1 Hon Hop Hc1 Hor).
+  }
+  (* lemma *)
+  rewrite <- (rngl_opp_add_distr Hop).
+  rewrite rngl_add_comm.
+  rewrite (rngl_opp_add_distr Hop).
+  now apply <- (rngl_le_0_sub Hop Hor).
+}
+rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+apply (rngl_div_diag Hon Hiq).
+apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+Qed.
+
 Definition hangle_div_2 a :=
   match (rngl_le_dec hc_or 0 (rngl_cosh a)) with
   | left Hza =>
       {| rngl_cosh := √((rngl_cosh a + 1) / 2);
          rngl_sinh := √((rngl_cosh a - 1) / 2);
-         rngl_cosh2_sinh2 := hangle_div_2_prop a Hza |}
-  | right _ =>
-      hangle_zero
+         rngl_cosh2_sinh2 := hangle_nonneg_div_2_prop a Hza |}
+  | right Haz =>
+      {| rngl_cosh := - √((- rngl_cosh a + 1) / 2);
+         rngl_sinh := √((- rngl_cosh a - 1) / 2);
+         rngl_cosh2_sinh2 := hangle_neg_div_2_prop a Haz |}
   end.
 
 Definition hangle_eqb a b :=
