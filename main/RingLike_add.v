@@ -378,6 +378,16 @@ apply rngl_sub_diag.
 now apply Hop'; left.
 Qed.
 
+Theorem rngl_opp_sub_swap :
+  rngl_has_opp T = true →
+  ∀ a b, (- a - b = - b - a)%L.
+Proof.
+intros Hop *.
+rewrite <- (rngl_opp_add_distr Hop).
+rewrite rngl_add_comm.
+apply (rngl_opp_add_distr Hop).
+Qed.
+
 Theorem rngl_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%L.
 Proof.
 intros n m p; simpl.
