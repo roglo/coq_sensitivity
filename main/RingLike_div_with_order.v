@@ -1211,10 +1211,10 @@ Theorem rngl_le_le_squ :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
   (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
-  ∀ a b, (0 ≤ a ≤ b → a² ≤ b²)%L.
+  ∀ a b, (0 ≤ a → a ≤ b → a² ≤ b²)%L.
 Proof.
 intros Hop Hor Hii.
-intros * (Hza, Hab).
+intros * Hza Hab.
 apply (rngl_abs_le_squ_le Hop Hor).
 rewrite (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor b); [ easy | ].
