@@ -276,59 +276,66 @@ Definition hangle_add a b :=
      rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
      rngl_cosh2_sinh2 := hangle_add_prop a b |}.
 
-(* to be completed
+(* to be completed *)
 Theorem hangle_nonneg_div_2_prop :
-  ∀ a
-    (Hzc : (0 ≤ rngl_cosh a)%L)
-    (ε₂ := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
+  ∀ a (ε := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
   cosh2_sinh2_prop
     (√((rngl_cosh a + 1) / 2))
-    (ε₂ * √((rngl_cosh a - 1) / 2)).
+    (ε * √((rngl_cosh a - 1) / 2)).
 Proof.
 destruct_hc.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 intros.
 progress unfold cosh2_sinh2_prop.
-assert (Hε₂ : (ε₂² = 1)%L). {
-  progress unfold ε₂.
-  destruct (0 ≤? rngl_sinh a)%L. {
-    apply (rngl_mul_1_l Hon).
-  } {
-    apply (rngl_squ_opp_1 Hon Hop).
-  }
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
+  destruct (0 ≤? rngl_sinh a)%L.
+  apply (rngl_mul_1_l Hon).
+  apply (rngl_squ_opp_1 Hon Hop).
 }
 rewrite (rngl_squ_mul Hic).
-rewrite Hε₂.
+rewrite Hε.
 rewrite (rngl_mul_1_l Hon).
-...
-apply (rngl_eqb_eq Hed).
+apply Bool.andb_true_iff.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  now rewrite (H1 (_ + _)%L), (H1 1%L).
+  split. {
+    apply (rngl_eqb_eq Hed).
+    now rewrite (H1 (_ + _)%L), (H1 1%L).
+  }
+  apply rngl_leb_le.
+  rewrite (H1 √_)%L.
+  apply (rngl_le_refl Hor).
+}
+split. 2: {
+  apply rngl_leb_le.
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  rewrite (rngl_mul_0_l Hos).
+  rewrite rngl_add_comm.
+  apply (rngl_le_opp_l Hop Hor).
+  apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
+  apply (rngl_opp_1_le_1 Hon Hop Hor).
+}
+apply (rngl_eqb_eq Hed).
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_le_div_r Hon Hop Hiv Hor). {
+    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  rewrite rngl_add_comm.
+  apply (rngl_le_opp_l Hop Hor).
+  apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
+  apply (rngl_opp_1_le_1 Hon Hop Hor).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
     apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_trans Hor _ (rngl_cosh a)); [ easy | ].
-  apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
-}
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-  }
-  rewrite (rngl_mul_0_l Hos).
-  specialize (rngl_cosh_bound a) as Ha.
-  destruct Ha as [Ha| Ha]. {
-    exfalso.
-    apply rngl_nlt_ge in Ha.
-    apply Ha; clear Ha.
-    apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
-  }
-  now apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cosh_bound.
 }
 rewrite <- (rngl_div_sub_distr_r Hop Hiv).
 rewrite (rngl_sub_sub_distr Hop).
@@ -340,26 +347,17 @@ apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
 Qed.
 
 Definition hangle_div_2 a :=
-  let ε₂ := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L in
-  match (rngl_le_dec hc_or 0 (rngl_cosh a)) with
-  | left Hza =>
-      {| rngl_cosh := √((rngl_cosh a + 1) / 2);
-         rngl_sinh := ε₂ * √((rngl_cosh a - 1) / 2);
-         rngl_cosh2_sinh2 := hangle_nonneg_div_2_prop a Hza |}
-  | right Haz =>
-      hangle_zero
-  end.
-*)
+  let ε := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L in
+  {| rngl_cosh := √((rngl_cosh a + 1) / 2);
+     rngl_sinh := ε * √((rngl_cosh a - 1) / 2);
+     rngl_cosh2_sinh2 := hangle_nonneg_div_2_prop a |}.
 
-(* to be completed
 Fixpoint hangle_mul_nat a n :=
   match n with
   | 0 => hangle_zero
   | S n' => hangle_add a (hangle_mul_nat a n')
   end.
-*)
 
-(* to be completed
 End a.
 
 Notation "θ /₂" := (hangle_div_2 θ) (at level 40) : hangle_scope.
@@ -372,7 +370,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {hc : hangle_ctx T}.
-*)
 
 (* to be completed
 Theorem cosh2_sinh2_1 :
