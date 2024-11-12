@@ -1035,7 +1035,7 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem rngl_sinh_sinh_nonneg_sinh_lt_cosh_lt_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1044,24 +1044,34 @@ Theorem rngl_sinh_sinh_nonneg_sinh_lt_cosh_lt_iff :
   ↔ (rngl_cosh θ1 < rngl_cosh θ2)%L.
 Proof.
 destruct_hc.
-Check rngl_sinh_sinh_nonneg_sinh_le_cosh_le_iff.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2.
+specialize (cosh2_sinh2_1 θ1) as Hcs1.
+specialize (cosh2_sinh2_1 θ2) as Hcs2.
 split. {
   intros Hss.
-  apply rngl_nle_gt in Hss.
-  apply (rngl_nle_gt_iff Hor).
-  intros Hcc; apply Hss; clear Hss.
-...
-  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
+  apply (rngl_lt_lt_squ Hop Hor Hii) in Hss; [ | | easy ]. 2: {
+    apply (rngl_mul_comm Hic).
+  }
+  apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2 in Hss.
+  apply (rngl_sub_lt_mono_r Hop Hor) in Hss.
+  apply (rngl_lt_squ_lt Hop Hor Hii) in Hss; [ easy | | ].
+  apply rngl_cosh_nonneg.
+  apply rngl_cosh_nonneg.
 } {
   intros Hcc.
-  apply rngl_nle_gt in Hcc.
-  apply (rngl_nle_gt_iff Hor).
-  intros Hss; apply Hcc; clear Hcc.
-  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
+  apply (rngl_lt_lt_squ Hop Hor Hii) in Hcc; cycle 1. {
+    apply (rngl_mul_comm Hic).
+  } {
+    apply rngl_cosh_nonneg.
+  }
+  apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2 in Hcc.
+  apply (rngl_add_lt_mono_l Hop Hor) in Hcc.
+  now apply (rngl_lt_squ_lt Hop Hor Hii) in Hcc.
 }
 Qed.
-*)
 
 Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
