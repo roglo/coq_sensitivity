@@ -1214,7 +1214,6 @@ apply Hc1z; clear Hc1z.
 apply (rngl_cosh_pos Hc1).
 Qed.
 
-(* to be completed
 Theorem rngl_cosh_cosh_sinh_sinh_neg_sinh_le_cosh_le_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1257,13 +1256,7 @@ split. {
     now rewrite H in H1.
   }
   intros H.
-  apply rngl_sinh_eq in H.
-  destruct H; subst θ2; [ now apply (rngl_lt_irrefl Hor) in Hcc | ].
-  rewrite rngl_cosh_sub_straight_l in Hcc, Hzc2.
-  apply (rngl_opp_nonpos_nonneg Hop Hor) in Hzc2.
-  apply (rngl_le_antisymm Hor) in Hzc2; [ | easy ].
-  rewrite Hzc2 in Hcc.
-  rewrite (rngl_opp_0 Hop) in Hcc.
+  apply rngl_sinh_eq in H; subst θ2.
   now apply (rngl_lt_irrefl Hor) in Hcc.
 } {
   intros Hcc.
@@ -1347,22 +1340,8 @@ destruct (rngl_eq_dec Heo (rngl_sinh θ2) 0) as [H2z| H2z]. {
   destruct (rngl_eq_dec Heo (rngl_sinh θ1) 0) as [H1z| H1z]. {
     apply (eq_rngl_sinh_0) in H2z, H1z.
     destruct H2z; subst θ2. {
-      apply (rngl_nle_gt_iff Hor) in Hzc2.
-      exfalso; apply Hzc2; clear Hzc2; cbn.
-      apply (rngl_0_le_1 Hon Hop Hor).
+      now apply (rngl_nle_gt_iff Hor) in Hzc2.
     }
-    exfalso.
-    clear Hzs2 Hzc2.
-    cbn in Hcc.
-    destruct H1z; subst θ1. {
-      rewrite (rngl_opp_involutive Hop) in Hcc.
-      cbn in Hcc.
-      now apply (rngl_lt_irrefl Hor) in Hcc.
-    }
-    cbn in Hzc1.
-    apply rngl_nlt_ge in Hzc1.
-    apply Hzc1; clear Hzc1.
-    apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
   }
   apply (rngl_mul_pos_neg Hop Hor); [ | | easy ]. {
     rewrite Bool.orb_true_iff; right.
@@ -1378,6 +1357,7 @@ assert (Hzls2 : (0 < rngl_sinh θ2)%L). {
   now apply not_eq_sym.
 }
 clear H2z.
+...
 assert (Hs21 : (rngl_sinh θ1 < rngl_sinh θ2)%L). {
   apply (rngl_lt_opp_r Hop Hor) in Hcc.
   remember (hangle_straight - θ2)%H as θ eqn:Hθ.
@@ -1568,6 +1548,7 @@ easy.
 Qed.
 *)
 
+(* to be completed
 Theorem hangle_straight_add_straight :
   (hangle_straight + hangle_straight = 0)%H.
 Proof.
