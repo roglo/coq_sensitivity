@@ -585,6 +585,18 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {hc : hangle_ctx T}.
 
+Theorem rngl_characteristic_1_hangle_0 :
+  rngl_characteristic T = 1 →
+  ∀ θ, (θ = 0)%H.
+Proof.
+destruct_hc.
+intros Hc1 *.
+specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+apply eq_hangle_eq.
+do 2 rewrite (H1 (rngl_cosh _)).
+now do 2 rewrite (H1 (rngl_sinh _)).
+Qed.
+
 Theorem hangle_nlt_ge : ∀ θ1 θ2, ¬ (θ1 < θ2)%H ↔ (θ2 ≤ θ1)%H.
 Proof.
 destruct_hc.
@@ -695,12 +707,14 @@ rewrite H1.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
-(* to be completed
-Theorem eq_rngl_sinh_0 :
-  ∀ θ, rngl_sinh θ = 0%L → θ = 0%H ∨ θ = hangle_straight.
+Theorem eq_rngl_sinh_0 : ∀ θ, rngl_sinh θ = 0%L → θ = 0%H.
 Proof.
 destruct_hc.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  intros * Hθ.
+  apply (rngl_characteristic_1_hangle_0 Hc1).
+}
 intros * Hθ.
 destruct θ as (c, s, Hcs).
 cbn in Hθ |-*.
@@ -709,11 +723,17 @@ specialize (cosh2_sinh2_prop_if _ _ Hcs) as H1.
 rewrite (rngl_squ_0 Hos) in H1.
 rewrite (rngl_sub_0_r Hos) in H1.
 rewrite <- (rngl_squ_1 Hon) in H1.
+destruct H1 as (H1, H2).
 apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in H1. 2: {
   rewrite (rngl_mul_1_l Hon).
   apply (rngl_mul_1_r Hon).
 }
-now destruct H1; subst c; [ left | right ]; apply eq_hangle_eq.
+apply eq_hangle_eq; cbn.
+destruct H1; subst c; [ easy | ].
+exfalso.
+apply rngl_nlt_ge in H2.
+apply H2; clear H2.
+apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
 Theorem hangle_add_comm :
@@ -756,8 +776,7 @@ f_equal. {
 }
 Qed.
 
-Theorem hangle_add_opp_l :
-  ∀ θ1 θ2, (- θ1 + θ2 = θ2 - θ1)%H.
+Theorem hangle_add_opp_l : ∀ θ1 θ2, (- θ1 + θ2 = θ2 - θ1)%H.
 Proof.
 intros.
 apply hangle_add_comm.
@@ -963,6 +982,7 @@ split; intros Ha. {
 }
 Qed.
 
+(* to be completed
 Theorem rngl_cosh_add_straight_l :
   ∀ θ, rngl_cosh (hangle_straight + θ) = (- rngl_cosh θ)%L.
 Proof.
@@ -1970,18 +1990,6 @@ destruct zs. {
   apply rngl_ltb_lt in H.
   now apply (rngl_lt_irrefl Hor) in H.
 }
-Qed.
-
-Theorem rngl_characteristic_1_angle_0 :
-  rngl_characteristic T = 1 →
-  ∀ θ, (θ = 0)%H.
-Proof.
-destruct_hc.
-intros Hc1 *.
-specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-apply eq_hangle_eq.
-do 2 rewrite (H1 (rngl_cosh _)).
-now do 2 rewrite (H1 (rngl_sinh _)).
 Qed.
 
 Theorem hangle_le_refl :
