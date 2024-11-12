@@ -533,25 +533,6 @@ Definition hangle_opp a :=
   {| rngl_cosh := rngl_cosh a; rngl_sinh := - rngl_sinh a;
      rngl_cosh2_sinh2 := hangle_opp_prop a |}.
 
-(* to be completed
-Theorem hangle_straight_prop : (cosh2_sinh2_prop (-1) 0)%L.
-Proof.
-destruct_hc.
-progress unfold cosh2_sinh2_prop.
-rewrite (rngl_squ_opp Hop).
-progress unfold rngl_squ.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_sub_0_r Hos).
-apply (rngl_eqb_refl Hed).
-Qed.
-
-Definition hangle_straight :=
-  {| rngl_cosh := -1; rngl_sinh := 0;
-     rngl_cosh2_sinh2 := hangle_straight_prop |}%L.
-*)
-
-(* to be completed
 Definition hangle_sub θ1 θ2 := hangle_add θ1 (hangle_opp θ2).
 
 (* *)
@@ -714,6 +695,7 @@ rewrite H1.
 apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 Qed.
 
+(* to be completed
 Theorem eq_rngl_sinh_0 :
   ∀ θ, rngl_sinh θ = 0%L → θ = 0%H ∨ θ = hangle_straight.
 Proof.
