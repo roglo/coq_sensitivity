@@ -140,7 +140,6 @@ Definition hangle_zero :=
   {| rngl_cosh := 1; rngl_sinh := 0;
      rngl_cosh2_sinh2 := hangle_zero_prop |}%L.
 
-(* to be completed *)
 Theorem hangle_add_prop :
   ∀ a b,
   cosh2_sinh2_prop
@@ -276,7 +275,6 @@ Definition hangle_add a b :=
      rngl_sinh := (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L;
      rngl_cosh2_sinh2 := hangle_add_prop a b |}.
 
-(* to be completed *)
 Theorem hangle_nonneg_div_2_prop :
   ∀ a (ε := (if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L)),
   cosh2_sinh2_prop
@@ -371,7 +369,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {hc : hangle_ctx T}.
 
-(* to be completed
 Theorem cosh2_sinh2_1 :
   ∀ θ, ((rngl_cosh θ)² - (rngl_sinh θ)² = 1)%L.
 Proof.
@@ -379,7 +376,8 @@ destruct_hc.
 intros.
 destruct θ as (c, s, Hcs); cbn.
 progress unfold cosh2_sinh2_prop in Hcs.
-now apply (rngl_eqb_eq Hed) in Hcs.
+apply Bool.andb_true_iff in Hcs.
+now apply (rngl_eqb_eq Hed).
 Qed.
 
 Theorem hangle_div_2_mul_2 :
@@ -407,15 +405,15 @@ do 2 rewrite (rngl_mul_0_r Hos).
 do 2 rewrite (rngl_mul_1_r Hon).
 do 2 rewrite rngl_add_0_r.
 do 2 rewrite fold_rngl_squ.
-set (ε₂ := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L).
-assert (Hε₂ : (ε₂² = 1)%L). {
-  progress unfold ε₂.
+set (ε := if (0 ≤? rngl_sinh a)%L then 1%L else (-1)%L).
+assert (Hε : (ε² = 1)%L). {
+  progress unfold ε.
   destruct (0 ≤? rngl_sinh a)%L.
   apply (rngl_mul_1_l Hon).
   apply (rngl_squ_opp_1 Hon Hop).
 }
 rewrite (rngl_squ_mul Hic).
-rewrite Hε₂.
+rewrite Hε.
 rewrite (rngl_mul_1_l Hon).
 assert (Hz1ac : (0 ≤ rngl_cosh a + 1)%L). {
   apply (rngl_le_sub_le_add_r Hop Hor).
@@ -426,13 +424,7 @@ assert (Hz1ac : (0 ≤ rngl_cosh a + 1)%L). {
 assert (Hz1sc : (0 ≤ rngl_cosh a - 1)%L). {
   apply (rngl_le_add_le_sub_r Hop Hor).
   rewrite rngl_add_0_l.
-  specialize (rngl_cosh_bound a) as H1.
-  destruct H1 as [H1| H1]; [ | easy ].
-  exfalso.
-  apply rngl_nlt_ge in H1.
-  apply H1; clear H1.
-  apply (rngl_lt_le_trans Hor _ 0); [ | easy ].
-  apply (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
+  apply (rngl_cosh_bound a).
 }
 rewrite (rngl_squ_sqrt Hon). 2: {
   apply (rngl_le_div_r Hon Hop Hiv Hor). {
@@ -512,7 +504,7 @@ apply (rngl_sub_move_l Hop) in H1.
 rewrite <- H1.
 rewrite fold_rl_sqrt.
 rewrite (rl_sqrt_squ Hon Hop Hor).
-progress unfold ε₂.
+progress unfold ε.
 remember (0 ≤? rngl_sinh a)%L as saz eqn:Hsaz; symmetry in Hsaz.
 destruct saz. {
   apply rngl_leb_le in Hsaz.
@@ -526,7 +518,6 @@ destruct saz. {
   apply (rngl_mul_1_l Hon).
 }
 Qed.
-*)
 
 Theorem hangle_opp_prop :
   ∀ a, cosh2_sinh2_prop (rngl_cosh a) (- rngl_sinh a)%L.
