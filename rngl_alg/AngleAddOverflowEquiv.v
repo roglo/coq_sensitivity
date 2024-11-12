@@ -306,20 +306,12 @@ remember (0 <? rngl_cos θ1)%L as zc1 eqn:Hzc1.
 symmetry in Hzc1.
 destruct zc1. {
   apply rngl_ltb_lt in Hzc1.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor) in Hc12. 2: {
-    eapply (rngl_le_trans Hor); [ apply (rngl_lt_le_incl Hor), Hzc1 | ].
-    now apply (rngl_lt_le_incl Hor).
-  }
-  specialize (rngl_lt_le_incl Hor _ _ Hzc1) as H.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H) in Hc12; clear H.
-  specialize (rngl_lt_le_incl Hor _ _ Hzs1) as H.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  specialize (rngl_lt_le_incl Hor _ _ Hzs2) as H.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor _ H); clear H.
-  apply (rngl_abs_lt_squ_lt Hop Hor Hii) in Hc12. 2: {
+  apply (rngl_lt_le_incl Hor) in Hzc1.
+  apply (rngl_lt_lt_squ Hop Hor Hii) in Hc12; [ | | easy ]. 2: {
     apply (rngl_mul_comm Hic).
   }
-  apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+  apply (rngl_lt_le_incl Hor) in Hzs1, Hzs2.
+  apply (rngl_lt_squ_lt Hop Hor Hii); [ easy | easy | ].
   specialize (cos2_sin2_1 θ1) as Hcs1.
   specialize (cos2_sin2_1 θ2) as Hcs2.
   apply (rngl_add_sub_eq_r Hos) in Hcs1, Hcs2.

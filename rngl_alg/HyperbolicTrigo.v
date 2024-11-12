@@ -148,10 +148,14 @@ Theorem hangle_add_prop :
     (rngl_sinh a * rngl_cosh b + rngl_cosh a * rngl_sinh b)%L.
 Proof.
 destruct_hc.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros.
+specialize (rngl_cosh_bound a) as Ha.
+specialize (rngl_cosh_bound b) as Hb.
 rewrite (rngl_add_comm (rngl_sinh a * _)%L).
 destruct a as (x, y, Hxy).
 destruct b as (x', y', Hxy'); cbn.
+cbn in Ha, Hb.
 move x' before y; move y' before x'.
 progress unfold cosh2_sinh2_prop in Hxy, Hxy' |-*.
 apply Bool.andb_true_iff in Hxy, Hxy'.
@@ -180,8 +184,52 @@ split. {
 apply rngl_leb_le.
 apply (rngl_eqb_eq Hed) in Hxy, Hxy'.
 apply rngl_leb_le in Hzx, Hzx'.
-(* j'ai bon espoir de le démontrer, même si, je crois, il y a des
-   cas pas faciles *)
+destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
+  assert (Hyx : (y ≤ x)%L). {
+    apply (rngl_le_squ_le Hop Hor Hii); [ easy | easy | ].
+    apply (rngl_sub_move_r Hop) in Hxy.
+    rewrite Hxy.
+    apply (rngl_le_add_l Hor).
+    apply (rngl_0_le_1 Hon Hop Hor).
+  }
+(**)
+  assert (Hyx' : (y' ≤ x')%L). {
+    destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
+      apply (rngl_le_squ_le Hop Hor Hii); [ easy | easy | ].
+      apply (rngl_sub_move_r Hop) in Hxy'.
+      rewrite Hxy'.
+      apply (rngl_le_add_l Hor).
+      apply (rngl_0_le_1 Hon Hop Hor).
+    }
+    apply (rngl_nle_gt_iff Hor) in Hzy'.
+    apply (rngl_lt_le_incl Hor) in Hzy'.
+    now apply (rngl_le_trans Hor _ 0).
+  }
+  destruct (rngl_le_dec Hor 0 y') as [Hzy'| Hzy']. {
+    apply (rngl_le_trans Hor _ (y * y' + y * y')). 2: {
+      apply (rngl_add_le_mono_r Hop Hor).
+      now apply (rngl_mul_le_compat_nonneg Hop Hor).
+    }
+    rewrite <- (rngl_mul_2_l Hon).
+    apply (rngl_mul_nonneg_nonneg Hop Hor).
+    apply (rngl_0_le_2 Hon Hop Hor).
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+  apply (rngl_nle_gt_iff Hor) in Hzy'.
+...
+  apply (rngl_le_trans Hor _ (y * y' + y * y')). 2: {
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply (rngl_le_trans Hor _ 0). {
+      apply (rngl_lt_le_incl Hor) in Hzy'.
+      now apply (rngl_mul_nonneg_nonpos Hop Hor).
+    }
+    now apply (rngl_mul_nonneg_nonneg Hop Hor).
+  }
+  rewrite <- (rngl_mul_2_l Hon).
+  apply (rngl_mul_nonneg_nonneg Hop Hor).
+  apply (rngl_0_le_2 Hon Hop Hor).
+  apply (rngl_mul_nonneg_nonneg Hop Hor); [ easy | ].
+(* crotte de bique, ça marche pas *)
 ...
 Qed.
 

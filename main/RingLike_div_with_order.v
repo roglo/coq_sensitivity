@@ -1194,6 +1194,61 @@ apply (rngl_integral Hos Hio) in Ha.
 now destruct Ha.
 Qed.
 
+Theorem rngl_le_squ_le :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → a² ≤ b² → a ≤ b)%L.
+Proof.
+intros Hop Hor Hii.
+intros * Hza Hzb Hab.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
+now apply (rngl_squ_le_abs_le Hop Hor Hii).
+Qed.
+
+Theorem rngl_le_le_squ :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (0 ≤ a ≤ b → a² ≤ b²)%L.
+Proof.
+intros Hop Hor Hii.
+intros * (Hza, Hab).
+apply (rngl_abs_le_squ_le Hop Hor).
+rewrite (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
+rewrite (rngl_abs_nonneg_eq Hop Hor b); [ easy | ].
+now apply (rngl_le_trans Hor _ a).
+Qed.
+
+Theorem rngl_lt_squ_lt :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (0 ≤ a → 0 ≤ b → a² < b² → a < b)%L.
+Proof.
+intros Hop Hor Hii.
+intros * Hza Hzb Hab.
+rewrite <- (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
+rewrite <- (rngl_abs_nonneg_eq Hop Hor b); [ | easy ].
+now apply (rngl_squ_lt_abs_lt Hop Hor Hii).
+Qed.
+
+Theorem rngl_lt_lt_squ :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true →
+  ∀ a b, (a * b = b * a → 0 ≤ a → a < b → a² < b²)%L.
+Proof.
+intros Hop Hor Hii.
+intros * Habba Hza Hab.
+apply (rngl_abs_lt_squ_lt Hop Hor Hii _ _ Habba).
+rewrite (rngl_abs_nonneg_eq Hop Hor a); [ | easy ].
+rewrite (rngl_abs_nonneg_eq Hop Hor b); [ easy | ].
+apply (rngl_le_trans Hor _ a); [ easy | ].
+now apply (rngl_lt_le_incl Hor) in Hab.
+Qed.
+
 Theorem rngl_squ_eq_cases :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
