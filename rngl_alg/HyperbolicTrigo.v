@@ -1035,6 +1035,34 @@ split. {
 }
 Qed.
 
+(* to be completed
+Theorem rngl_sinh_sinh_nonneg_sinh_lt_cosh_lt_iff :
+  ∀ θ1 θ2,
+  (0 ≤ rngl_sinh θ1)%L
+  → (0 ≤ rngl_sinh θ2)%L
+  → (rngl_sinh θ1 < rngl_sinh θ2)%L
+  ↔ (rngl_cosh θ1 < rngl_cosh θ2)%L.
+Proof.
+destruct_hc.
+Check rngl_sinh_sinh_nonneg_sinh_le_cosh_le_iff.
+intros * Hzs1 Hzs2.
+split. {
+  intros Hss.
+  apply rngl_nle_gt in Hss.
+  apply (rngl_nle_gt_iff Hor).
+  intros Hcc; apply Hss; clear Hss.
+...
+  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
+} {
+  intros Hcc.
+  apply rngl_nle_gt in Hcc.
+  apply (rngl_nle_gt_iff Hor).
+  intros Hss; apply Hcc; clear Hcc.
+  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
+}
+Qed.
+*)
+
 Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
 destruct_hc.
@@ -1136,33 +1164,6 @@ apply rngl_nlt_ge in Hc1z.
 apply Hc1z; clear Hc1z.
 apply (rngl_cosh_pos Hc1).
 Qed.
-
-(* to be completed
-Theorem rngl_cosh_cosh_sinh_sin_nonneg_sinh_lt_cosh_lt_iff :
-  ∀ θ1 θ2,
-  (0 ≤ rngl_sinh θ1)%L
-  → (0 ≤ rngl_sinh θ2)%L
-  → (rngl_sinh θ1 < rngl_sinh θ2)%L
-  ↔ (rngl_cosh θ1 < rngl_cosh θ2)%L.
-Proof.
-destruct_hc.
-intros * Hzs1 Hzs2.
-split. {
-  intros Hss.
-  apply rngl_nle_gt in Hss.
-  apply (rngl_nle_gt_iff Hor).
-  intros Hcc; apply Hss; clear Hss.
-...
-  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
-} {
-  intros Hcc.
-  apply rngl_nle_gt in Hcc.
-  apply (rngl_nle_gt_iff Hor).
-  intros Hss; apply Hcc; clear Hcc.
-  now apply rngl_cosh_cosh_sinh_sin_nonneg_sinh_le_cosh_le_iff.
-}
-Qed.
-*)
 
 Theorem rngl_add_cosh_nonneg :
   ∀ θ1 θ2, (0 ≤ rngl_cosh θ1 + rngl_cosh θ2)%L.
