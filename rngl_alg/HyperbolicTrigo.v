@@ -1004,7 +1004,6 @@ split; intros Ha. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_sinh_sinh_nonneg_sinh_le_cosh_le_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1015,54 +1014,26 @@ Proof.
 destruct_hc.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros * Hzs1 Hzs2.
-split. 2: {
-  intros Hc12.
-  apply (rngl_le_le_squ Hop Hor Hii) in Hc12. 2: {
-    apply rngl_cosh_nonneg.
-  }
-  specialize (cosh2_sinh2_1 θ1) as Hcs1.
-  specialize (cosh2_sinh2_1 θ2) as Hcs2.
-  apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
-  rewrite Hcs1, Hcs2 in Hc12.
-  apply (rngl_add_le_mono_l Hop Hor) in Hc12.
-  now apply (rngl_le_squ_le Hop Hor Hii) in Hc12.
-}
-intros Hss.
-...
+specialize (cosh2_sinh2_1 θ1) as Hcs1.
+specialize (cosh2_sinh2_1 θ2) as Hcs2.
+split. {
   intros Hss.
-  apply rngl_nlt_ge in Hss.
-  apply (rngl_nlt_ge_iff Hor).
-  intros Hcc; apply Hss; clear Hss.
-  apply (rngl_lt_iff Hor).
-  split. {
-    apply (rngl_lt_le_incl Hor) in Hcc.
-    specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-    specialize (H1 _ _ Hzs2 Hzs1 Hcc).
-    apply rngl_leb_le in Hzc2.
-    now rewrite Hzc2 in H1.
-  }
-  intros Hss.
-  apply rngl_nle_gt in Hcc.
-  apply Hcc; clear Hcc.
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-  rewrite <- (rngl_abs_nonneg_eq Hop Hor (rngl_cosh θ1)); [ | easy ].
-  apply (rngl_squ_le_abs_le Hop Hor Hii).
-  specialize (cosh2_sinh2_1 θ1) as H1.
-  apply (rngl_sub_move_r Hop) in H1.
-  rewrite H1; clear H1.
-  specialize (cosh2_sinh2_1 θ2) as H1.
-  apply (rngl_sub_move_r Hop) in H1.
-  rewrite H1, Hss; clear H1.
-  apply (rngl_le_refl Hor).
+  apply (rngl_le_le_squ Hop Hor Hii) in Hss; [ | easy ].
+  apply (rngl_sub_move_l Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2 in Hss.
+  apply (rngl_sub_le_mono_r Hop Hor) in Hss.
+  apply (rngl_le_squ_le Hop Hor Hii) in Hss; [ easy | | ].
+  apply rngl_cosh_nonneg.
+  apply rngl_cosh_nonneg.
 } {
   intros Hcc.
-  specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
-  specialize (H1 _ _ Hzs1 Hzs2 Hcc).
-  apply rngl_leb_le in Hzc1.
-  now rewrite Hzc1 in H1.
+  apply (rngl_le_le_squ Hop Hor Hii) in Hcc; [ | apply rngl_cosh_nonneg ].
+  apply (rngl_sub_move_r Hop) in Hcs1, Hcs2.
+  rewrite Hcs1, Hcs2 in Hcc.
+  apply (rngl_add_le_mono_l Hop Hor) in Hcc.
+  now apply (rngl_le_squ_le Hop Hor Hii) in Hcc.
 }
 Qed.
-*)
 
 Theorem eq_rngl_cosh_1 : ∀ θ, rngl_cosh θ = 1%L ↔ θ = 0%H.
 Proof.
