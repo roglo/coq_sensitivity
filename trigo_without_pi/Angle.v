@@ -2734,9 +2734,13 @@ Qed.
 Theorem angle_eucl_dist_symmetry :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = angle_eucl_dist θ2 θ1.
 Proof.
+destruct_ac.
 intros.
-do 2 rewrite angle_eucl_dist_is_sqrt.
-now rewrite rngl_cos_sub_comm.
+progress unfold angle_eucl_dist.
+progress unfold rl_modl.
+f_equal; rewrite (rngl_squ_sub_comm Hop).
+f_equal; rewrite (rngl_squ_sub_comm Hop).
+easy.
 Qed.
 
 Theorem angle_eucl_dist_separation :

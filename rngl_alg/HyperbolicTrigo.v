@@ -1602,12 +1602,14 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
 }
 now apply (rngl_add_le_mono_l Hop Hor).
 Qed.
+*)
 
 (* euclidean distance *)
 
 Definition hangle_eucl_dist θ1 θ2 :=
   rl_modl (rngl_cosh θ2 - rngl_cosh θ1) (rngl_sinh θ2 - rngl_sinh θ1).
 
+(* not sure
 Theorem hangle_eucl_dist_is_sqrt :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cosh (θ2 - θ1)))%L.
 Proof.
@@ -1636,15 +1638,21 @@ rewrite (rngl_sub_mul_r_diag_l Hon Hop).
 rewrite <- rngl_cosh_sub.
 easy.
 Qed.
+*)
 
 Theorem hangle_eucl_dist_symmetry :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = hangle_eucl_dist θ2 θ1.
 Proof.
+destruct_hc.
 intros.
-do 2 rewrite hangle_eucl_dist_is_sqrt.
-now rewrite rngl_cosh_sub_comm.
+progress unfold hangle_eucl_dist.
+progress unfold rl_modl.
+f_equal; rewrite (rngl_squ_sub_comm Hop).
+f_equal; rewrite (rngl_squ_sub_comm Hop).
+easy.
 Qed.
 
+(* to be completed
 Theorem hangle_eucl_dist_separation :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
