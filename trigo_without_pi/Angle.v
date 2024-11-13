@@ -2746,9 +2746,12 @@ Qed.
 Theorem angle_eucl_dist_separation :
   ∀ θ1 θ2, angle_eucl_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
-destruct_ac; intros *.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_int_dom_or_inv_1_or_quot_r Hon Hiq) as Hii.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo_and_eq_dec Hi1 Hed) as Hid.
+intros *.
 progress unfold angle_eucl_dist.
 progress unfold rl_modl.
 split; intros H12. 2: {
@@ -2756,14 +2759,9 @@ split; intros H12. 2: {
   do 2 rewrite (rngl_sub_diag Hos).
   rewrite (rngl_squ_0 Hos).
   rewrite rngl_add_0_r.
-  apply (rl_sqrt_0 Hon Hop Hor).
-  rewrite Bool.orb_true_iff; right.
-  apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
+  apply (rl_sqrt_0 Hon Hop Hor Hii).
 }
 apply eq_angle_eq.
-destruct θ1 as (c1, s1, Hcs1).
-destruct θ2 as (c2, s2, Hcs2).
-cbn in H12 |-*.
 apply (eq_rl_sqrt_0 Hon Hos) in H12. 2: {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
@@ -2784,7 +2782,7 @@ apply (eq_rngl_squ_0 Hos) in Hc, Hs; cycle 1. {
 }
 apply -> (rngl_sub_move_0_r Hop) in Hc.
 apply -> (rngl_sub_move_0_r Hop) in Hs.
-now subst c2 s2.
+now rewrite Hc, Hs.
 Qed.
 
 Theorem angle_eucl_dist_triangular :
