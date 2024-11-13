@@ -1501,21 +1501,24 @@ cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
-(* to be completed, yes
+(* to be completed, but perhaps need sinh θ1 and sinh θ2
+   to be non-negative
 Theorem hangle_div_2_le_compat :
   ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 /₂ ≤ θ2 /₂)%H.
 Proof.
 destruct_hc.
-intros * H12.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1_hangle_0 Hc1) as H1.
+  intros * H12.
   do 2 rewrite (H1 (_ /₂))%H.
   apply hangle_le_refl.
 }
+intros * H12.
 progress unfold hangle_leb in H12.
 progress unfold hangle_leb.
 cbn.
+(*
 specialize rngl_1_add_cosh_div_2_nonneg as Hzac.
 specialize rngl_1_sub_cosh_div_2_nonneg as Hzsc.
 specialize (rl_sqrt_nonneg ((1 - rngl_cosh θ1) / 2)%L) as H1.
@@ -1528,6 +1531,7 @@ rewrite fold_rl_sqrt in H1.
 specialize (H1 (Hzsc _)).
 apply rngl_leb_le in H1.
 rewrite H1; clear H1.
+*)
 remember (0 ≤? rngl_sinh θ1)%L as zs1 eqn:Hzs1.
 remember (0 ≤? rngl_sinh θ2)%L as zs2 eqn:Hzs2.
 symmetry in Hzs1, Hzs2.
@@ -1538,6 +1542,7 @@ destruct zs1. {
     apply rngl_leb_le in Hzs2.
     apply rngl_leb_le in H12.
     rewrite (rngl_mul_1_l Hon).
+...
     apply rngl_leb_le.
     rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
       now apply rl_sqrt_nonneg.
