@@ -1972,7 +1972,9 @@ rewrite <- (rngl_squ_opp Hop).
 rewrite (rngl_opp_sub_distr Hop).
 now apply rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub.
 Qed.
+*)
 
+(* to be completed... but perhaps false
 Theorem rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_add :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1982,8 +1984,6 @@ Theorem rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_add :
        √((1 - rngl_cosh θ1) * (1 - rngl_cosh θ2)))²%L.
 Proof.
 intros * Hzs1 Hzs2.
-(* proof borrowed from rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_sub
-   and it works: perhaps there is a way to unify these two theorems *)
 destruct_hc.
 assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cosh θ1) * (1 + rngl_cosh θ2))%L). {
   intros.
@@ -1991,12 +1991,14 @@ assert (Ha12 : ∀ θ1 θ2, (0 ≤ (1 + rngl_cosh θ1) * (1 + rngl_cosh θ2))%L)
     apply (rngl_le_sub_le_add_l Hop Hor).
     progress unfold rngl_sub.
     rewrite Hop, rngl_add_0_l.
-    apply rngl_cosh_bound.
+    apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
+    apply (rngl_opp_1_le_1 Hon Hop Hor).
   } {
     apply (rngl_le_sub_le_add_l Hop Hor).
     progress unfold rngl_sub.
     rewrite Hop, rngl_add_0_l.
-    apply rngl_cosh_bound.
+    apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
+    apply (rngl_opp_1_le_1 Hon Hop Hor).
   }
 }
 assert (Hs12 : ∀ θ1 θ2, (0 ≤ (1 - rngl_cosh θ1) * (1 - rngl_cosh θ2))%L). {
@@ -2004,6 +2006,7 @@ assert (Hs12 : ∀ θ1 θ2, (0 ≤ (1 - rngl_cosh θ1) * (1 - rngl_cosh θ2))%L)
   apply (rngl_mul_nonneg_nonneg Hop Hor). {
     apply (rngl_le_add_le_sub_l Hop Hor).
     rewrite rngl_add_0_r.
+...
     apply rngl_cosh_bound.
   } {
     apply (rngl_le_add_le_sub_l Hop Hor).
