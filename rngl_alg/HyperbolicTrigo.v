@@ -1035,7 +1035,6 @@ split. {
 }
 Qed.
 
-(* to be completed *)
 Theorem rngl_sinh_sinh_nonneg_sinh_lt_cosh_lt_iff :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1517,11 +1516,17 @@ Theorem rngl_sinh_sub_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
   → (0 ≤ rngl_sinh θ2)%L
-  → (rngl_cosh θ2 ≤ rngl_cosh θ1)%L
+  → (rngl_cosh θ1 ≤ rngl_cosh θ2)%L
   → (0 ≤ rngl_sinh (θ1 - θ2))%L.
 Proof.
 destruct_hc.
 intros * Hs1 Hs2 Hc12.
+generalize Hc12; intros Hs12.
+apply (rngl_sinh_sinh_nonneg_sinh_le_cosh_le_iff _ _ Hs1 Hs2) in Hs12.
+rewrite rngl_sinh_sub.
+apply (rngl_le_0_sub Hop Hor).
+...
+Search (rngl_sinh (_ - _)).
 specialize rngl_sinh_nonneg_cosh_le_sinh_le as H1.
 ...
 specialize (H1 _ _ Hs2 Hs1 Hc12).
