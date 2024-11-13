@@ -1631,7 +1631,7 @@ symmetry in Hzs.
 destruct zs; apply (rngl_leb_refl Hor).
 Qed.
 
-(* to be completed
+(* to be completed... but it seems to be false
 Theorem hangle_nonneg : ∀ θ, (0 ≤ θ)%H.
 Proof.
 destruct_hc; intros.
@@ -1643,8 +1643,8 @@ symmetry in Hzs.
 destruct zs. {
   apply rngl_leb_le in Hzs.
   apply rngl_leb_le.
-(* y a pas, il faut que rngl_cosh θ soit positif
-   dans la définition de hangle *)
+  apply rngl_cosh_bound.
+}
 ...
 destruct zs; [ | easy ].
 apply rngl_leb_le in Hzs.
@@ -1675,7 +1675,7 @@ apply (rngl_leb_gt Hor) in Hs2z.
 now rewrite Hs2z.
 Qed.
 
-(* to be completed
+(* to be completed... but false because cosh is always positive
 Theorem rngl_add_cosh_neg_when_sinh_nonneg_neg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1761,7 +1761,7 @@ Proof. easy. Qed.
 Theorem rngl_sinh_opp : ∀ θ, rngl_sinh (- θ) = (- rngl_sinh θ)%L.
 Proof. easy. Qed.
 
-(* to be completed
+(* to be completed... but always true since cosh always positive
 Theorem rngl_add_cosh_nonneg_when_sinh_nonpos :
   ∀ θ1 θ2,
   (rngl_sinh θ1 ≤ 0)%L
@@ -1797,17 +1797,18 @@ Qed.
 Theorem rngl_sinh_sub_nonneg_sinh_le_sin :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
-  → (0 ≤ rngl_cosh θ1)%L
   → (0 ≤ rngl_sinh (θ1 - θ2))%L
   → (rngl_sinh θ2 ≤ rngl_sinh θ1)%L.
 Proof.
-destruct_hc; intros * Hzs1 Hcs1 Hzs12.
+destruct_hc; intros * Hzs1 Hzs12.
 cbn in Hzs12.
 rewrite rngl_add_comm in Hzs12.
 rewrite (rngl_mul_opp_r Hop) in Hzs12.
 rewrite (rngl_add_opp_l Hop) in Hzs12.
 apply -> (rngl_le_0_sub Hop Hor) in Hzs12.
-apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cosh θ1)) in Hzs12; [ | easy ].
+apply (rngl_mul_le_mono_nonneg_l Hop Hor (rngl_cosh θ1)) in Hzs12. 2: {
+  apply rngl_cosh_nonneg.
+}
 rewrite rngl_mul_assoc in Hzs12.
 rewrite fold_rngl_squ in Hzs12.
 specialize (cosh2_sinh2_1 θ1) as H1.
@@ -1830,7 +1831,9 @@ apply (rngl_le_0_sub Hop Hor).
 ...
 apply rngl_cosh_bound.
 Qed.
+*)
 
+(* to be completed
 Theorem rngl_sinh_nonneg_sinh_nonneg_sinh_neg :
   ∀ θ1 θ2,
   (θ1 ≤ θ1 + θ2)%H
@@ -1858,7 +1861,8 @@ assert (Hz1ac :  ∀ θ, (0 ≤ 1 + rngl_cosh θ)%L). {
   apply (rngl_le_sub_le_add_l Hop Hor).
   progress unfold rngl_sub.
   rewrite Hop, rngl_add_0_l.
-  apply rngl_cosh_bound.
+  apply (rngl_le_trans Hor _ 1); [ | apply rngl_cosh_bound ].
+  apply (rngl_opp_1_le_1 Hon Hop Hor).
 }
 assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cosh θ)%L). {
   intros.
