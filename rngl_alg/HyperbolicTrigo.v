@@ -269,13 +269,7 @@ destruct (rngl_le_dec Hor 0 y) as [Hzy| Hzy]. {
     now apply (rngl_mul_nonneg_nonneg Hop Hor).
   }
   apply (rngl_nle_gt_iff Hor) in Hzy'.
-(*
-clear - Hzx' Hyx Hzy Hii Hzy' Hxy' hc.
-move Hzy before Hzx'.
-move Hzy' before Hzy.
-destruct_hc.
-lemma for the two cases?
-*)
+  clear - Hzx' Hyx Hzy Hii Hzy' Hxy' hc Hor Hop Hon.
   apply (rngl_le_trans Hor _ (y * x' + y * y')). 2: {
     apply (rngl_add_le_mono_r Hop Hor).
     now apply (rngl_mul_le_mono_nonneg_r Hop Hor).
@@ -1501,144 +1495,10 @@ cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
-(* to be completed, but perhaps need sinh θ1 and sinh θ2
-   to be non-negative
-Theorem hangle_div_2_le_compat :
-  ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 /₂ ≤ θ2 /₂)%H.
-Proof.
-destruct_hc.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_hangle_0 Hc1) as H1.
-  intros * H12.
-  do 2 rewrite (H1 (_ /₂))%H.
-  apply hangle_le_refl.
-}
-intros * H12.
-progress unfold hangle_leb in H12.
-progress unfold hangle_leb.
-cbn.
-(*
-specialize rngl_1_add_cosh_div_2_nonneg as Hzac.
-specialize rngl_1_sub_cosh_div_2_nonneg as Hzsc.
-specialize (rl_sqrt_nonneg ((1 - rngl_cosh θ1) / 2)%L) as H1.
-rewrite fold_rl_sqrt in H1.
-specialize (H1 (Hzsc _)).
-apply rngl_leb_le in H1.
-rewrite H1; clear H1.
-specialize (rl_sqrt_nonneg ((1 - rngl_cosh θ2) / 2)%L) as H1.
-rewrite fold_rl_sqrt in H1.
-specialize (H1 (Hzsc _)).
-apply rngl_leb_le in H1.
-rewrite H1; clear H1.
-*)
-remember (0 ≤? rngl_sinh θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sinh θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs1. {
-  apply rngl_leb_le in Hzs1.
-  rewrite (rngl_mul_1_l Hon).
-  destruct zs2. {
-    apply rngl_leb_le in Hzs2.
-    apply rngl_leb_le in H12.
-    rewrite (rngl_mul_1_l Hon).
-...
-    apply rngl_leb_le.
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-      now apply rl_sqrt_nonneg.
-    }
-    rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
-      now apply rl_sqrt_nonneg.
-    }
-    apply (rngl_squ_le_abs_le Hop Hor Hii).
-    rewrite (rngl_squ_sqrt Hon); [ | easy ].
-    rewrite (rngl_squ_sqrt Hon); [ | easy ].
-    apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-    }
-    rewrite (rngl_div_mul Hon Hiv). 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-    }
-    rewrite (rngl_div_mul Hon Hiv). 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-    }
-    now apply (rngl_add_le_mono_l Hop Hor).
-  }
-  apply rngl_leb_le.
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_1_l Hon).
-  apply (rngl_le_trans Hor _ 0). {
-    apply (rngl_opp_nonpos_nonneg Hop Hor).
-    now apply rl_sqrt_nonneg.
-  } {
-    now apply rl_sqrt_nonneg.
-  }
-}
-apply (rngl_leb_gt Hor) in Hzs1.
-destruct zs2; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzs2.
-apply rngl_leb_le in H12.
-apply rngl_leb_le.
-do 2 rewrite (rngl_mul_opp_l Hop).
-do 2 rewrite (rngl_mul_1_l Hon).
-apply -> (rngl_opp_le_compat Hop Hor).
-rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-  now apply rl_sqrt_nonneg.
-}
-rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
-  now apply rl_sqrt_nonneg.
-}
-apply (rngl_squ_le_abs_le Hop Hor Hii).
-rewrite (rngl_squ_sqrt Hon); [ | easy ].
-rewrite (rngl_squ_sqrt Hon); [ | easy ].
-apply (rngl_mul_le_mono_pos_r Hop Hor Hii) with (c := 2%L). {
-  apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_div_mul Hon Hiv). 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-rewrite (rngl_div_mul Hon Hiv). 2: {
-  apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
-}
-now apply (rngl_add_le_mono_l Hop Hor).
-Qed.
-*)
-
 (* euclidean distance *)
 
 Definition hangle_eucl_dist θ1 θ2 :=
   rl_modl (rngl_cosh θ2 - rngl_cosh θ1) (rngl_sinh θ2 - rngl_sinh θ1).
-
-(* not sure
-Theorem hangle_eucl_dist_is_sqrt :
-  ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = √(2 * (1 - rngl_cosh (θ2 - θ1)))%L.
-Proof.
-destruct_hc.
-intros.
-progress unfold hangle_eucl_dist.
-progress unfold rl_modl.
-f_equal.
-do 2 rewrite (rngl_squ_sub Hop Hic Hon).
-rewrite (rngl_add_add_swap).
-rewrite <- (rngl_add_sub_swap Hop).
-rewrite rngl_add_assoc.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite cosh2_sinh2_1.
-rewrite rngl_add_comm.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite rngl_add_assoc.
-rewrite <- rngl_add_add_swap.
-rewrite cosh2_sinh2_1.
-rewrite (rngl_add_sub_assoc Hop).
-rewrite (rngl_sub_sub_swap Hop).
-rewrite <- (rngl_sub_add_distr Hos).
-do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-rewrite (rngl_sub_mul_r_diag_l Hon Hop).
-rewrite <- rngl_cosh_sub.
-easy.
-Qed.
-*)
 
 Theorem hangle_eucl_dist_symmetry :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = hangle_eucl_dist θ2 θ1.
@@ -1652,7 +1512,6 @@ f_equal; rewrite (rngl_squ_sub_comm Hop).
 easy.
 Qed.
 
-(* to be completed *)
 Theorem hangle_eucl_dist_separation :
   ∀ θ1 θ2, hangle_eucl_dist θ1 θ2 = 0%L ↔ θ1 = θ2.
 Proof.
@@ -1695,7 +1554,6 @@ apply -> (rngl_sub_move_0_r Hop) in Hs.
 now rewrite Hc, Hs.
 Qed.
 
-(* to be completed
 Theorem hangle_eucl_dist_triangular :
   ∀ θ1 θ2 θ3,
   (hangle_eucl_dist θ1 θ3 ≤ hangle_eucl_dist θ1 θ2 + hangle_eucl_dist θ2 θ3)%L.
@@ -1801,6 +1659,5 @@ split. {
   apply hangle_taxi_dist_triangular.
 }
 Qed.
-*)
 
 End a.
