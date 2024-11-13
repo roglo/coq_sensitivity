@@ -1511,12 +1511,12 @@ split; intros H12. {
 }
 Qed.
 
-(* to be completed
+(* to be completed... but is it useful?
 Theorem rngl_sinh_sub_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
   → (0 ≤ rngl_sinh θ2)%L
-  → (rngl_cosh θ1 ≤ rngl_cosh θ2)%L
+  → (rngl_cosh θ2 ≤ rngl_cosh θ1)%L
   → (0 ≤ rngl_sinh (θ1 - θ2))%L.
 Proof.
 destruct_hc.
@@ -1793,7 +1793,7 @@ apply rngl_add_cosh_nonneg_when_sinh_nonneg. {
 Qed.
 *)
 
-(* to be completed
+(* to be completed, but is it useful?
 Theorem rngl_sinh_sub_nonneg_sinh_le_sin :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -1833,7 +1833,7 @@ apply rngl_cosh_bound.
 Qed.
 *)
 
-(* to be completed
+(* to be completed, not sure it's true
 Theorem rngl_sinh_nonneg_sinh_nonneg_sinh_neg :
   ∀ θ1 θ2,
   (θ1 ≤ θ1 + θ2)%H
@@ -2080,7 +2080,9 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 easy.
 Qed.
+*)
 
+(* to be completed, but perhaps false, perhaps useless
 Theorem rngl_sinh_nonneg_sinh_neg_sinh_add_neg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -2204,6 +2206,7 @@ rewrite hangle_add_opp_r.
 rewrite rngl_cosh_opp.
 now apply rngl_sinh_nonneg_sinh_nonneg_add_1_cosh_add_add.
 Qed.
+*)
 
 Theorem hangle_add_add_swap :
   ∀ θ1 θ2 θ3, (θ1 + θ2 + θ3)%H = (θ1 + θ3 + θ2)%H.
@@ -2222,6 +2225,7 @@ progress unfold hangle_sub.
 apply hangle_add_add_swap.
 Qed.
 
+(* to be completed, but is it useful?
 Theorem rngl_sinh_nonneg_sinh_nonneg_add_cosh_nonneg :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -2399,51 +2403,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
 easy.
 Qed.
-
-Theorem rngl_sinh_sub_right_l :
-  ∀ θ, rngl_sinh (hangle_right - θ) = rngl_cosh θ.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_0_l Hos).
-rewrite rngl_add_0_r.
-apply (rngl_mul_1_l Hon).
-Qed.
-
-Theorem rngl_sinh_sub_right_r :
-  ∀ θ, rngl_sinh (θ - hangle_right) = (- rngl_cosh θ)%L.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_0_r Hos).
-rewrite rngl_add_0_l.
-rewrite (rngl_mul_opp_r Hop).
-f_equal.
-apply (rngl_mul_1_r Hon).
-Qed.
-
-Theorem rngl_cosh_sub_right_r :
-  ∀ θ, rngl_cosh (θ - hangle_right) = rngl_sinh θ.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_0_l Hop).
-rewrite (rngl_mul_opp_r Hop).
-rewrite (rngl_opp_involutive Hop).
-apply (rngl_mul_1_r Hon).
-Qed.
-
-Theorem rngl_cosh_sub_right_l :
-  ∀ θ, rngl_cosh (hangle_right - θ) = rngl_sinh θ.
-Proof.
-destruct_hc.
-intros; cbn.
-rewrite (rngl_mul_0_l Hos).
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_sub_opp_r Hop).
-apply rngl_add_0_l.
-Qed.
+*)
 
 Theorem rngl_cosh_sub_comm :
   ∀ θ1 θ2, rngl_cosh (θ1 - θ2) = rngl_cosh (θ2 - θ1).
@@ -2481,6 +2441,7 @@ progress unfold hangle_sub.
 apply hangle_add_assoc.
 Qed.
 
+(* to be completed, but is it useful?
 Theorem rngl_cosh_lt_rngl_cosh_sub :
   ∀ θ1 θ2,
   (0 ≤ rngl_sinh θ1)%L
@@ -2601,6 +2562,7 @@ apply eq_rngl_cosh_1 in H.
 subst θ2.
 now apply (rngl_lt_irrefl Hor) in Hzs2.
 Qed.
+*)
 
 Theorem hangle_eqb_eq :
   ∀ θ1 θ2 : hangle T, (θ1 =? θ2)%H = true ↔ θ1 = θ2.
@@ -2691,9 +2653,8 @@ rewrite hangle_sub_add_distr.
 rewrite hangle_add_comm.
 now rewrite hangle_add_sub.
 Qed.
-*)
 
-(* to be completed
+(* to be completed, but is it useful?
 Theorem rngl_1_add_cosh_div_2_nonneg :
   ∀ θ, (0 ≤ (1 + rngl_cosh θ) / 2)%L.
 Proof.
@@ -2717,7 +2678,9 @@ apply (rngl_le_sub_le_add_l Hop Hor).
 rewrite (rngl_sub_0_l Hop).
 now apply rngl_cosh_bound.
 Qed.
+*)
 
+(* to be completed, but is it useful?
 Theorem rngl_1_sub_cosh_div_2_nonneg :
   ∀ θ, (0 ≤ (1 - rngl_cosh θ) / 2)%L.
 Proof.
@@ -2740,7 +2703,9 @@ rewrite (rngl_div_mul Hon Hiv). 2: {
 apply (rngl_le_0_sub Hop Hor).
 now apply rngl_cosh_bound.
 Qed.
+*)
 
+(* to be completed, but false
 Theorem rngl_sinh_div_2_nonneg : ∀ θ, (0 ≤ rngl_sinh (θ /₂))%L.
 Proof.
 destruct_hc.
@@ -2758,7 +2723,9 @@ apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
 apply (rngl_le_0_sub Hop Hor).
 apply rngl_cosh_bound.
 Qed.
+*)
 
+(*
 Theorem hangle_div_2_le_straight : ∀ θ, (θ /₂ ≤ hangle_straight)%H.
 Proof.
 destruct_hc.
@@ -2814,6 +2781,7 @@ destruct zs. {
   }
 }
 Qed.
+*)
 
 Theorem hangle_add_move_0_r : ∀ θ1 θ2, (θ1 + θ2 = 0 ↔ θ1 = (- θ2))%H.
 Proof.
@@ -2837,7 +2805,7 @@ specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   intros.
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  specialize (rngl_characteristic_1_hangle_0 Hc1) as H1.
   apply H1.
 }
 apply eq_hangle_eq; cbn.
@@ -2868,6 +2836,7 @@ cbn; f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
 
+(*
 Theorem hangle_straight_div_2 : (hangle_straight /₂ = hangle_right)%H.
 Proof.
 destruct_hc.
@@ -2901,7 +2870,9 @@ apply (rl_sqrt_1 Hon Hop Hor).
 rewrite Bool.orb_true_iff; right.
 apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 Qed.
+*)
 
+(*
 Theorem hangle_opp_straight : (- hangle_straight)%H = hangle_straight.
 Proof.
 destruct_hc.
@@ -2909,7 +2880,9 @@ apply eq_hangle_eq; cbn.
 f_equal.
 apply (rngl_opp_0 Hop).
 Qed.
+*)
 
+(*
 Theorem rngl_sinh_nonneg_angle_le_straight :
   ∀ θ, (0 ≤ rngl_sinh θ)%L ↔ (θ ≤ hangle_straight)%H.
 Proof.
@@ -2930,7 +2903,9 @@ destruct zs. {
 apply (rngl_leb_gt Hor) in Hzs.
 now apply rngl_nle_gt in Hzs.
 Qed.
+*)
 
+(* to be completed, yes
 Theorem hangle_div_2_le_compat :
   ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 /₂ ≤ θ2 /₂)%H.
 Proof.
@@ -2938,7 +2913,7 @@ destruct_hc.
 intros * H12.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  specialize (rngl_characteristic_1_hangle_0 Hc1) as H1.
   do 2 rewrite (H1 (_ /₂))%H.
   apply hangle_le_refl.
 }
