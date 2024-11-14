@@ -32,9 +32,15 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
 Definition sc_zero := mk_sc 0 0 0 0.
+Definition sc_one := mk_sc 1 0 0 0.
 
 Definition sc_add a b :=
   mk_sc (sre a + sre b) (sc1 a + sc1 b) (sc2 a + sc2 b) (sc2 a + sc2 b).
+
+Definition sc_sub a b :=
+  mk_sc (sre a - sre b) (sc1 a - sc1 b) (sc2 a - sc2 b) (sc2 a - sc2 b).
+
+Definition sc_opp a := mk_sc (- sre a) (- sc1 a) (- sc2 a) (- sc3 a).
 
 Definition sc_mul a b :=
   mk_sc
@@ -42,40 +48,28 @@ Definition sc_mul a b :=
     (sre a * sc1 b + sc1 a * sre b + sc2 a * sc3 b - sc3 a * sc2 b)
     (sre a * sc2 b + sc1 a * sc3 b + sc2 a * sre b - sc3 a * sc1 b)
     (sre a * sc3 b - sc1 a * sc2 b + sc2 a * sc1 b + sc3 a * sre b).
+
+Definition sc_opt_one := Some sc_one.
+
+Definition sc_opt_opp_or_subt :=
+  match rngl_opt_opp_or_subt T with
+  | Some (inl opp) => Some (inl sc_opp)
+  | Some (inr subt) => Some (inr sc_sub)
+  | None => None
+  end.
+
+Definition sc_opt_inv_or_quot := 5.
+Definition sc_opt_eq_dec := 6.
+Definition sc_opt_leb := 7.
+
 ...
 
-  let a := sre x in
-  let b := sc1 x in
-  let c := sc2 x in
-  let d := sc3 x in
-  let a' := sre y in
-  let b' := sc1 y in
-  let c' := sc2 y in
-  let d' := sc3 y in
-  mk_sc
-    (a * a' - b * b' + c * c' + d * d')
-    (a * b' + b * a' + c * d' - d * c')
-    (a * c' + b * d' + c * a' - d * b')
-    (a * d' - b * c' + c * b' + d * a').
-
-Print sc_mul.
-
-Example toto : ∀ x y, sc_mul x y = sc_zero.
-intros.
-progress unfold sc_mul.
-rename x into a.
-rename y into b.
-...
-
-Instance sc_ring_like_op T
-  {ro : ring_like_op T} {rp : ring_like_prop T} :
-  ring_like_op (SplitComplex T) :=
+Instance sc_ring_like_op : ring_like_op (SplitComplex T) :=
   {| rngl_zero := sc_zero;
      rngl_add := sc_add;
      rngl_mul := sc_mul;
-     rngl_opt_one := gc_opt_one;
-     rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
-     rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
-     rngl_opt_eq_dec := gc_opt_eq_dec;
-     rngl_opt_leb := None |}.
-
+     rngl_opt_one := sc_opt_one;
+     rngl_opt_opp_or_subt := sc_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := sc_opt_inv_or_quot;
+     rngl_opt_eq_dec := sc_opt_eq_dec;
+     rngl_opt_leb := sc_opt_leb |}.
