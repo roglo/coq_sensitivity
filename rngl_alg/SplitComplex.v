@@ -37,8 +37,34 @@ Definition sc_add a b :=
   mk_sc (sre a + sre b) (sc1 a + sc1 b) (sc2 a + sc2 b) (sc2 a + sc2 b).
 
 Definition sc_mul a b :=
-  mk_sc (sre a * sre b - sc1 a * sc1 b + ...)
+  mk_sc
+    (sre a * sre b - sc1 a * sc1 b + sc2 a * sc2 b + sc3 a * sc3 b)
+    (sre a * sc1 b + sc1 a * sre b + sc2 a * sc3 b - sc3 a * sc2 b)
+    (sre a * sc2 b + sc1 a * sc3 b + sc2 a * sre b - sc3 a * sc1 b)
+    (sre a * sc3 b - sc1 a * sc2 b + sc2 a * sc1 b + sc3 a * sre b).
+...
 
+  let a := sre x in
+  let b := sc1 x in
+  let c := sc2 x in
+  let d := sc3 x in
+  let a' := sre y in
+  let b' := sc1 y in
+  let c' := sc2 y in
+  let d' := sc3 y in
+  mk_sc
+    (a * a' - b * b' + c * c' + d * d')
+    (a * b' + b * a' + c * d' - d * c')
+    (a * c' + b * d' + c * a' - d * b')
+    (a * d' - b * c' + c * b' + d * a').
+
+Print sc_mul.
+
+Example toto : ∀ x y, sc_mul x y = sc_zero.
+intros.
+progress unfold sc_mul.
+rename x into a.
+rename y into b.
 ...
 
 Instance sc_ring_like_op T
