@@ -49,6 +49,9 @@ Definition sc_mul a b :=
     (sre a * sc2 b + sc1 a * sc3 b + sc2 a * sre b - sc3 a * sc1 b)
     (sre a * sc3 b - sc1 a * sc2 b + sc2 a * sc1 b + sc3 a * sre b).
 
+Definition sc_inv a b :=
+...
+
 Definition sc_opt_one := Some sc_one.
 
 Definition sc_opt_opp_or_subt :=
@@ -58,11 +61,17 @@ Definition sc_opt_opp_or_subt :=
   | None => None
   end.
 
-Definition sc_opt_inv_or_quot := 5.
-Definition sc_opt_eq_dec := 6.
-Definition sc_opt_leb := 7.
+Definition sc_opt_inv_or_quot :
+  match rngl_opt_opp_or_subt T with
+  | Some (inl inv) => Some (inl sc_inv)
+  | Some (inr quot) => Some (inr sc_div)
+  | None => None
+  end.
 
 ...
+
+Definition sc_opt_eq_dec := 6.
+Definition sc_opt_leb := 7.
 
 Instance sc_ring_like_op : ring_like_op (SplitComplex T) :=
   {| rngl_zero := sc_zero;
