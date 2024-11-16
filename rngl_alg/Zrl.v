@@ -17,6 +17,7 @@ Instance Z_ring_like_op : ring_like_op Z :=
      rngl_opt_one := Some 1%Z;
      rngl_opt_opp_or_subt := Some (inl Z.opp);
      rngl_opt_inv_or_quot := Some (inr Z.quot);
+     rngl_opt_zero_divisors := None;
      rngl_opt_eq_dec := Some Z.eq_dec;
      rngl_opt_leb := Some Z.leb |}.
 
@@ -244,7 +245,6 @@ Definition Z_ring_like_ord :=
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
-     rngl_is_integral_domain := true;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

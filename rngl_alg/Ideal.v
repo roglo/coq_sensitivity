@@ -155,6 +155,11 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
        | None => None
        end;
      rngl_opt_inv_or_quot := None;
+     rngl_opt_zero_divisors :=
+       match rngl_opt_zero_divisors T with
+       | Some f => Some (λ i, f (i_val i))
+       | None => None
+       end;
      rngl_opt_eq_dec := I_opt_eq_dec;
      rngl_opt_leb := I_opt_leb |}.
 
@@ -619,14 +624,22 @@ now specialize (H2 Hab).
 Qed.
 
 Theorem I_opt_integral : let roi := I_ring_like_op in
-  if rngl_is_integral_domain T then
+  if rngl_is_integral_domain (ideal P) then
     ∀ a b : ideal P, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else
-    not_applicable.
+  else not_applicable.
 Proof.
 intros.
-remember (rngl_is_integral_domain T) as it eqn:Hit; symmetry in Hit.
+remember (rngl_is_integral_domain (ideal P)) as it eqn:Hit; symmetry in Hit.
 destruct it; [ | easy ].
+progress unfold rngl_is_integral_domain in Hit.
+remember (rngl_opt_zero_divisors (ideal P)) as ozd eqn:Hozd.
+symmetry in Hozd.
+destruct ozd; [ easy | clear Hit ].
+assert (Hit : rngl_is_integral_domain T = true). {
+  progress unfold rngl_is_integral_domain.
+  cbn in Hozd.
+  now destruct (rngl_opt_zero_divisors T).
+}
 intros * Hab.
 cbn in Hab.
 apply eq_ideal_eq in Hab; cbn in Hab.
@@ -736,7 +749,6 @@ Qed.
 
 Definition I_ring_like_prop : ring_like_prop (ideal P) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := rngl_is_integral_domain T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;

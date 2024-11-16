@@ -7,11 +7,13 @@ Class ring_like_op T :=
     rngl_opt_one : option T;
     rngl_opt_opp_or_subt : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
+    rngl_opt_zero_divisors : option (T → Prop);
     rngl_opt_eq_dec : option (∀ a b : T, {a = b} + {a ≠ b});
     rngl_opt_leb : option (T → T → bool) }.
 
 Arguments rngl_opt_opp_or_subt T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
+Arguments rngl_opt_zero_divisors T {ring_like_op}.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with L.
@@ -72,6 +74,12 @@ Definition rngl_has_quot T {R : ring_like_op T} :=
   match rngl_opt_inv_or_quot T with
   | Some (inr _) => true
   | _ => false
+  end.
+
+Definition rngl_is_integral_domain T {ro : ring_like_op T} :=
+  match rngl_opt_zero_divisors T with
+  | Some _ => false
+  | None => true
   end.
 
 Definition rngl_opp {T} {ro : ring_like_op T} a :=
@@ -238,7 +246,6 @@ Class ring_like_ord T {ro : ring_like_op T} :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
-    rngl_is_integral_domain : bool;
     rngl_is_archimedean : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
@@ -295,7 +302,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
 *)
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
-      if rngl_is_integral_domain then
+      if rngl_is_integral_domain T then
         ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L
       else not_applicable;
     (* when algebraically closed *)
@@ -340,7 +347,6 @@ Definition rngl_has_eq_dec_or_order T {ro : ring_like_op T} :=
 Arguments rngl_mul_is_comm T {ro ring_like_prop}.
 Arguments rngl_characteristic T {ro ring_like_prop}.
 Arguments rngl_is_archimedean T {ro ring_like_prop}.
-Arguments rngl_is_integral_domain T {ro ring_like_prop}.
 
 Section a.
 

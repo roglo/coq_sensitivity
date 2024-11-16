@@ -166,6 +166,7 @@ Definition quad_int_ring_like_op d : ring_like_op (quad_int d) :=
      rngl_opt_one := Some (@qi_one d);
      rngl_opt_opp_or_subt := Some (inl (@qi_opp d));
      rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
+     rngl_opt_zero_divisors := Some (λ _, True);
      rngl_opt_eq_dec := None; (* to be improved, perhaps *)
      rngl_opt_leb := None |}.
 
@@ -1175,7 +1176,6 @@ Compute (
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
-     rngl_is_integral_domain := false;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

@@ -1854,6 +1854,7 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_one := Some 1%QG;
      rngl_opt_opp_or_subt := Some (inl QG_opp);
      rngl_opt_inv_or_quot := Some (inl QG_inv);
+     rngl_opt_zero_divisors := Some (λ _, True);
      rngl_opt_eq_dec := Some QG_eq_dec;
      rngl_opt_leb := Some QG_leb |}.
 
@@ -1871,7 +1872,6 @@ Definition QG_ring_like_ord :=
 
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
-     rngl_is_integral_domain := false;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

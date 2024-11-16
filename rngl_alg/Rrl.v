@@ -53,6 +53,7 @@ Definition CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_one := Some 1%CReal;
      rngl_opt_opp_or_subt := Some (inl CReal_opp);
      rngl_opt_inv_or_quot := Some (inl CReal_inv');
+     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some CReal_eq_dec;
      rngl_opt_leb := None (*Some CRealLe*) |}.
 
@@ -174,7 +175,6 @@ Qed.
 
 Definition CReal_ring_like_prop : ring_like_prop CReal :=
   {| rngl_mul_is_comm := true;
-     rngl_is_integral_domain := false;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -232,6 +232,7 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_opt_one := Some CComplex_one;
      rngl_opt_opp_or_subt := Some (inl CComplex_opp);
      rngl_opt_inv_or_quot := Some (inl CComplex_inv);
+     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None |}.
 
@@ -260,6 +261,7 @@ Definition reals_ring_like_op : ring_like_op R :=
      rngl_opt_one := Some R1;
      rngl_opt_opp_or_subt := Some (inl Ropp);
      rngl_opt_inv_or_quot := Some (inl Rinv);
+     rngl_opt_zero_divisors := None;
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None (*Some Rle*) |}.
 
@@ -319,7 +321,6 @@ Qed.
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   let ro := reals_ring_like_op in
   {| rngl_mul_is_comm := true;
-     rngl_is_integral_domain := true;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;

@@ -129,6 +129,7 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
+     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
 
@@ -759,7 +760,6 @@ Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
   let rom := mat_ring_like_op eq_dec in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
-     rngl_is_integral_domain := false;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic T;

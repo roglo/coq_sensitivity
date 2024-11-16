@@ -1224,6 +1224,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_one := Some polyn_one;
      rngl_opt_opp_or_subt := polyn_opt_opp_or_subt;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
+     rngl_opt_zero_divisors := Some (λ _, True);
      rngl_opt_eq_dec := Some polyn_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -1767,49 +1768,6 @@ intros a b; cbn.
 now destruct (polyn_eq_dec a b).
 Qed.
 
-Theorem polyn_opt_integral :
-  let _ := polyn_ring_like_op in
-  if rngl_is_integral_domain T then
-    ∀ a b : polyn T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
-Proof.
-intros rop; subst rop.
-destruct (Sumbool.sumbool_of_bool (rngl_is_integral_domain T)) as [Hii| Hii];
-  rewrite Hii; [ | easy ].
-intros * Hab.
-cbn in Hab.
-apply (f_equal lap) in Hab.
-cbn in Hab.
-specialize (proj2 (all_0_lap_norm_nil Hed _) Hab) as H1.
-destruct a as (la, pa).
-destruct b as (lb, pb).
-cbn in Hab, H1 |-*.
-enough (H : la = [] ∨ lb = []). {
-  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
-  now apply eq_polyn_eq.
-  now apply eq_polyn_eq.
-}
-apply Bool.orb_true_iff in pa, pb.
-destruct pa as [pa| pa]. {
-  now left; apply is_empty_list_empty in pa.
-}
-destruct pb as [pb| pb]. {
-  now right; apply is_empty_list_empty in pb.
-}
-destruct la as [| a] using List.rev_ind; [ now left | clear IHla ].
-rewrite List.last_last in pa.
-destruct lb as [| b] using List.rev_ind; [ now right | clear IHlb ].
-rewrite List.last_last in pb.
-specialize (last_lap_mul Hos (la ++ [a]) (lb ++ [b])) as H2.
-do 2 rewrite List.last_last in H2.
-rewrite List_last_nth in H2.
-rewrite H1 in H2.
-symmetry in H2.
-apply (rngl_neqb_neq Hed) in pa, pb.
-apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
-now destruct H2.
-Qed.
-
 Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
   rngl_characteristic T = 0
@@ -2341,7 +2299,6 @@ Definition polyn_opt_has_no_subt (_ : True) := 12.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := rngl_is_integral_domain T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;
@@ -2364,7 +2321,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
 (*
      rngl_opt_div_mul_distr := polyn_opt_div_mul_distr;
 *)
-     rngl_opt_integral := polyn_opt_integral;
+     rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := polyn_characteristic_prop;
      rngl_opt_ord := NA;

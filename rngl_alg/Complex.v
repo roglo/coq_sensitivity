@@ -189,6 +189,7 @@ Instance gc_ring_like_op T
      rngl_opt_one := gc_opt_one;
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
+     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -700,7 +701,6 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
   let Hos := rngl_has_opp_has_opp_or_subt Hop in
   let Hsu := rngl_has_opp_has_no_subt Hop in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := false;
      rngl_is_archimedean := true;
      rngl_is_alg_closed := false;
      rngl_characteristic := rngl_characteristic T;

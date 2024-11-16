@@ -529,6 +529,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_opt_one := lap_opt_one;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
+     rngl_opt_zero_divisors := Some (λ _, True);
      rngl_opt_eq_dec := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
      rngl_opt_leb := None |}.
 
@@ -1838,47 +1839,6 @@ cbn.
 apply (last_lap_convol_mul_last Hos); flia.
 Qed.
 
-Theorem lap_opt_integral :
-  rngl_has_opp_or_subt T = true →
-  let rol := lap_ring_like_op in
-  if rngl_is_integral_domain T then
-    ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
-Proof.
-intros Hos rol; subst rol.
-remember (rngl_is_integral_domain T) as it eqn:Hii; symmetry in Hii.
-destruct it; [ | easy ].
-intros la lb Hab.
-cbn in Hab.
-enough (H : la = [] ∨ lb = []). {
-  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
-  easy.
-  easy.
-}
-destruct la as [| a] using List.rev_ind; [ now left | clear IHla ].
-destruct lb as [| b] using List.rev_ind; [ now right | clear IHlb ].
-specialize (last_lap_mul Hos (la ++ [a]) (lb ++ [b])) as H2.
-do 2 rewrite List.last_last in H2.
-rewrite Hab in H2.
-symmetry in H2; cbn in H2.
-apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
-destruct H2 as [H2| H2]. {
-  subst a.
-  unfold lap_mul in Hab; cbn in Hab.
-  destruct la as [| a']; [ now destruct lb | ].
-  cbn in Hab.
-  rewrite List.length_app, Nat.add_1_r in Hab; cbn in Hab.
-  now destruct lb.
-} {
-  subst b.
-  unfold lap_mul in Hab; cbn in Hab.
-  destruct la as [| a']; [ now destruct lb | ].
-  cbn in Hab.
-  rewrite List.length_app, Nat.add_1_r in Hab; cbn in Hab.
-  now destruct lb.
-}
-Qed.
-
 (* *)
 
 Theorem lap_characteristic_prop :
@@ -2910,7 +2870,6 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
     ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm T;
-     rngl_is_integral_domain := rngl_is_integral_domain T;
      rngl_is_archimedean := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
@@ -2933,7 +2892,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
 (*
      rngl_opt_div_mul_distr := NA;
 *)
-     rngl_opt_integral := lap_opt_integral Hos;
+     rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := lap_characteristic_prop;
      rngl_opt_ord := NA;
