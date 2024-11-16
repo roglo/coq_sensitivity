@@ -49,8 +49,12 @@ Definition sc_mul a b :=
     (sre a * sc2 b + sc1 a * sc3 b + sc2 a * sre b - sc3 a * sc1 b)
     (sre a * sc3 b - sc1 a * sc2 b + sc2 a * sc1 b + sc3 a * sre b).
 
-Definition sc_inv a b :=
-...
+(* inversible if the "r" below is not null *)
+Definition sc_inv a :=
+  let r := ((sre a)² + (sc1 a)² - (sc2 a)² - (sc3 a)²)%L in
+  mk_sc (sre a / r) (- sc1 a / r) (- sc2 a / r) (- sc3 a / r).
+
+Definition sc_div a b := sc_mul a (sc_inv b).
 
 Definition sc_opt_one := Some sc_one.
 
@@ -62,16 +66,24 @@ Definition sc_opt_opp_or_subt :=
   end.
 
 Definition sc_opt_inv_or_quot :
-  match rngl_opt_opp_or_subt T with
-  | Some (inl inv) => Some (inl sc_inv)
-  | Some (inr quot) => Some (inr sc_div)
-  | None => None
-  end.
-
-...
+  option
+    ((SplitComplex T → SplitComplex T) +
+     (SplitComplex T → SplitComplex T → SplitComplex T)) := None.
 
 Definition sc_opt_eq_dec := 6.
 Definition sc_opt_leb := 7.
+
+(* y a pas, il faut que je revoie RingLike.v pour permettre
+   de définir la notion d'inverse avec a * a⁻¹ = 1, mais dont
+   la condition soit plus générale que a ≠ 0. En principe, on
+   l'obtient en disant que "a" n'est pas un diviseur de 0.
+     Il faut voir alors quel est ou quels sont les "bons"
+   axiomes à mettre dans ring_like_prop pour donner la
+   bonne propriété d'être un diviseur de zéro.
+     Ça permettrait d'inclure sc_inv au lieu de dire systématiquement
+   None pour ring_opt_inv_or_quot et on pourrait voir pour les
+   matrices, aussi *)
+...
 
 Instance sc_ring_like_op : ring_like_op (SplitComplex T) :=
   {| rngl_zero := sc_zero;
