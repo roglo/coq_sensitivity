@@ -309,7 +309,7 @@ Qed.
 
 Require Import Main.RingLike.
 
-Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
+Instance Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
@@ -350,6 +350,15 @@ rewrite IHi.
 rewrite Nat.Div0.add_mod_idemp_l.
 rewrite Nat.Div0.add_mod_idemp_r.
 easy.
+Qed.
+
+Theorem Zn_integral :
+  ∀ a b : Zn n,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
 Qed.
 
 Theorem Zn_characteristic_prop :
@@ -404,7 +413,7 @@ Definition Zn_ring_like_prop (ro := Zn_ring_like_op n) :
      rngl_opt_mul_inv_diag_r := Zn_opt_mul_inv_diag_r NA n;
      rngl_opt_mul_div := Zn_opt_mul_div NA n;
      rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := Zn_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Zn_characteristic_prop;
      rngl_opt_ord := NA;
@@ -425,7 +434,7 @@ End a.
    5/ the natural 0 (which is not the 0) is absorbing for + and x
  *)
 
-Definition lcm_ring_like_op : ring_like_op nat :=
+Instance lcm_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 1;
      rngl_add := Nat.lcm;
      rngl_mul := Nat.mul;
@@ -451,10 +460,14 @@ symmetry.
 apply Nat.lcm_mul_mono_l.
 Qed.
 
-Theorem lcm_opt_integral : ∀ a b, a * b = 1 → a = 1 ∨ b = 1.
+Theorem lcm_opt_integral :
+  ∀ a b : nat,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
 Proof.
 intros * Hab.
 apply Nat.eq_mul_1 in Hab.
+destruct Hab as (Hab, _).
 now left.
 Qed.
 

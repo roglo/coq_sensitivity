@@ -616,6 +616,16 @@ split; intros Hab. {
 Qed.
 *)
 
+Theorem squ_mat_integral eq_dec n :
+  let rom := @mat_ring_like_op eq_dec n in
+  ∀ a b : square_matrix n T,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Theorem squ_mat_characteristic_prop :
   ∀ eq_dec n,
   let rom := @mat_ring_like_op eq_dec n in
@@ -779,9 +789,9 @@ Instance mat_ring_like_prop (eq_dec : ∀ x y : T, {x = y} + {x ≠ y})
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := squ_mat_integral eq_dec n;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := @squ_mat_characteristic_prop eq_dec n;
+     rngl_opt_characteristic_prop := squ_mat_characteristic_prop eq_dec n;
      rngl_opt_ord := NA;
      rngl_opt_archimedean := NA |}.
 

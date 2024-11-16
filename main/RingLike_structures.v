@@ -82,6 +82,12 @@ Definition rngl_is_integral_domain T {ro : ring_like_op T} :=
   | None => true
   end.
 
+Definition rngl_zero_divisor {T} {ro : ring_like_op T} a :=
+  match rngl_opt_zero_divisors T with
+  | Some f => f a
+  | None => False
+  end.
+
 Definition rngl_opp {T} {ro : ring_like_op T} a :=
   match rngl_opt_opp_or_subt T with
   | Some (inl rngl_opp) => rngl_opp a
@@ -295,16 +301,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if (rngl_has_quot T && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%L → (b * a / b)%L = a
       else not_applicable;
-(*
-    rngl_opt_div_mul_distr :
-      if rngl_has_quot T then ∀ a b c, (a / (b * c) = a / c / b)%L
-      else not_applicable;
-*)
-    (* when has_no_zero_divisors *)
+    (* zero divisors *)
     rngl_opt_integral :
-      if rngl_is_integral_domain T then
-        ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L
-      else not_applicable;
+      ∀ a b, (a * b = 0)%L
+      → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b;
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then

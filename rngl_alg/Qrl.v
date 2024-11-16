@@ -13,7 +13,7 @@ Definition Q_leb (x y : Q) :=
   | right _ => false
   end.
 
-Canonical Structure Q_ring_like_op : ring_like_op Q :=
+Instance Q_ring_like_op : ring_like_op Q :=
   {| rngl_zero := 0%Q;
      rngl_add := Q.add;
      rngl_mul := Q.mul;
@@ -27,6 +27,15 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
 (*
 Global Existing Instance Q_ring_like_op.
 *)
+
+Theorem Q_integral :
+  ∀ a b : Q,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
 
 Theorem Q_characteristic_prop :
   let roq := Q_ring_like_op in
@@ -202,7 +211,7 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := Q_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Q_characteristic_prop;
      rngl_opt_ord := Q_ring_like_ord;

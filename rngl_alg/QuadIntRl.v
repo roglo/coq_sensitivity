@@ -802,6 +802,16 @@ destruct (Z.eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
+Theorem quad_int_integral :
+  let ro := @quad_int_ring_like_op d in
+  ∀ a b : quad_int d,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Theorem quad_int_characteristic_prop :
   let ro := @quad_int_ring_like_op d in
   ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%QI.
@@ -1195,7 +1205,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := quad_int_mul_div;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := quad_int_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := quad_int_characteristic_prop;
      rngl_opt_ord := NA;

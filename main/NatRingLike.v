@@ -7,7 +7,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import Misc RingLike.
 
-Canonical Structure nat_ring_like_op : ring_like_op nat :=
+Instance nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
@@ -24,6 +24,16 @@ Global Existing Instance nat_ring_like_op.
 
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
+
+Theorem Nat_eq_mul_0' :
+  ∀ a b,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+apply Nat.eq_mul_0 in Hab.
+destruct Hab as [Hab| Hab]; [ now left | now right; left ].
+Qed.
 
 Theorem nat_opt_characteristic_prop :
   let ro := nat_ring_like_op in
@@ -155,7 +165,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := Nat_mul_div;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := Nat_eq_mul_0;
+     rngl_opt_integral := Nat_eq_mul_0';
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := nat_opt_characteristic_prop;
      rngl_opt_ord := nat_ring_like_ord;

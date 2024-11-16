@@ -1870,6 +1870,16 @@ Definition QG_ring_like_ord :=
      rngl_ord_mul_le_compat_non_opp := NA;
      rngl_ord_not_le := QG_not_le |}.
 
+Theorem QG_integral :
+  let roq := QG_ring_like_op in
+  ∀ a b : QG,
+  (a * b)%QG = 0%QG
+  → a = 0%QG ∨ b = 0%QG ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
   {| rngl_mul_is_comm := true;
      rngl_is_archimedean := true;
@@ -1891,7 +1901,7 @@ Definition QG_ring_like_prop (ro := QG_ring_like_op) : ring_like_prop QG :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := QG_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := QG_characteristic_prop;
      rngl_opt_ord := QG_ring_like_ord;

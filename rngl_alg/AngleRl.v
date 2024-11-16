@@ -61,6 +61,15 @@ Theorem rngl_angle_opt_add_opp_diag_l :
   else not_applicable.
 Proof. cbn; apply angle_add_opp_diag_l. Qed.
 
+Theorem rngl_angle_integral :
+  ∀ a b : angle T,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Instance angle_ring_like_prop :
   ring_like_prop (angle T) :=
   {| rngl_mul_is_comm := true;
@@ -83,7 +92,7 @@ Instance angle_ring_like_prop :
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := rngl_angle_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := NA;
      rngl_opt_ord := NA;

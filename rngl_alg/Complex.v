@@ -617,6 +617,15 @@ remember (rngl_mul_is_comm T) as ic eqn:Hic; symmetry in Hic.
 now destruct ic.
 Qed.
 
+Theorem gc_integral :
+  ∀ a b : GComplex T,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
 Theorem gc_characteristic_prop :
   if rngl_has_1 (GComplex T) then
     if rngl_characteristic T =? 0 then ∀ i : nat, rngl_mul_nat 1 (S i) ≠ 0%C
@@ -720,7 +729,7 @@ Instance gc_ring_like_prop_not_alg_closed : ring_like_prop (GComplex T) :=
      rngl_opt_mul_inv_diag_r := gc_opt_mul_inv_diag_r;
      rngl_opt_mul_div := gc_opt_mul_div;
      rngl_opt_mul_quot_r := gc_opt_mul_quot_r;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := gc_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := gc_characteristic_prop;
      rngl_opt_ord := NA;

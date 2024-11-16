@@ -623,30 +623,44 @@ destruct rngl_opt_leb as [le| ]. {
 now specialize (H2 Hab).
 Qed.
 
-Theorem I_opt_integral : let roi := I_ring_like_op in
-  if rngl_is_integral_domain (ideal P) then
-    ∀ a b : ideal P, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
-  else not_applicable.
+Theorem I_opt_integral :
+  let roi := I_ring_like_op in
+  ∀ a b : ideal P,
+  (a * b)%L = 0%L
+   → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
 Proof.
-intros.
-remember (rngl_is_integral_domain (ideal P)) as it eqn:Hit; symmetry in Hit.
-destruct it; [ | easy ].
-progress unfold rngl_is_integral_domain in Hit.
-remember (rngl_opt_zero_divisors (ideal P)) as ozd eqn:Hozd.
-symmetry in Hozd.
-destruct ozd; [ easy | clear Hit ].
-assert (Hit : rngl_is_integral_domain T = true). {
-  progress unfold rngl_is_integral_domain.
-  cbn in Hozd.
-  now destruct (rngl_opt_zero_divisors T).
-}
 intros * Hab.
+progress unfold rngl_zero_divisor.
+progress unfold rngl_opt_zero_divisors.
+cbn.
+remember (rngl_opt_zero_divisors T) as ozd eqn:Hozd.
+symmetry in Hozd.
+apply eq_ideal_eq in Hab.
 cbn in Hab.
-apply eq_ideal_eq in Hab; cbn in Hab.
-specialize rngl_opt_integral as H1.
-rewrite Hit in H1.
-specialize (H1 _ _ Hab).
-now destruct H1; [ left | right ]; apply eq_ideal_eq.
+apply rngl_opt_integral in Hab.
+destruct Hab as [Hab| [Hab| Hab]]. {
+  now left; apply eq_ideal_eq.
+} {
+  now right; left; apply eq_ideal_eq.
+}
+destruct ozd as [f| ]. {
+  destruct Hab as [Hab| Hab]. {
+    right; right; left.
+    progress unfold rngl_zero_divisor in Hab.
+    cbn in Hozd.
+    destruct (rngl_opt_zero_divisors T); [ | easy ].
+    now injection Hozd; clear Hozd; intros; subst f.
+  } {
+    right; right; right.
+    progress unfold rngl_zero_divisor in Hab.
+    cbn in Hozd.
+    destruct (rngl_opt_zero_divisors T); [ | easy ].
+    now injection Hozd; clear Hozd; intros; subst f.
+  }
+}
+progress unfold rngl_zero_divisor in Hab.
+rewrite Hozd in Hab.
+now destruct Hab.
 Qed.
 
 Theorem i_val_rngl_mul_nat : let roi := I_ring_like_op in

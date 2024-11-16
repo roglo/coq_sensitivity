@@ -26,6 +26,16 @@ Proof. now apply Z.eq_mul_0. Qed.
 
 Search (_ ÷ _ ÷ _)%Z.
 
+Theorem Z_integral :
+  ∀ a b : Z,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+apply Z_eq_mul_0 in Hab.
+now destruct Hab; [ left | right; left ].
+Qed.
+
 Theorem Z_characteristic_prop : ∀ i, rngl_mul_nat 1 (S i) ≠ 0%Z.
 Proof.
 intros.
@@ -264,7 +274,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := Z.quot_mul;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := Z_eq_mul_0;
+     rngl_opt_integral := Z_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Z_characteristic_prop;
      rngl_opt_ord := Z_ring_like_ord;

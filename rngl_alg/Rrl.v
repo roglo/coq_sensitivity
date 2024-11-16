@@ -46,7 +46,7 @@ Definition CReal_div (x y : CReal) := (x * CReal_inv' y)%CReal.
 
 Notation "x / y" := (CReal_div x y) : CReal_scope.
 
-Definition CReal_ring_like_op : ring_like_op CReal :=
+Instance CReal_ring_like_op : ring_like_op CReal :=
   {| rngl_zero := 0%CReal;
      rngl_add := CReal_plus;
      rngl_mul := CReal_mult;
@@ -153,7 +153,17 @@ rewrite CReal_inv_l in H1.
 now apply CReal_appart_irrefl in H1.
 Qed.
 
-Theorem CReal_characteristic_prop : let ro := CReal_ring_like_op in
+Theorem CReal_integral :
+  ∀ a b : CReal,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
+Theorem CReal_characteristic_prop :
+  let ro := CReal_ring_like_op in
   ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
 Proof.
 intros * H1.
@@ -194,7 +204,7 @@ Definition CReal_ring_like_prop : ring_like_prop CReal :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := NA;
+     rngl_opt_integral := CReal_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := CReal_characteristic_prop;
      rngl_opt_ord := NA;
@@ -254,7 +264,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Reals.
 Require Import Main.RingLike.
 
-Definition reals_ring_like_op : ring_like_op R :=
+Instance reals_ring_like_op : ring_like_op R :=
   {| rngl_zero := R0;
      rngl_add := Rplus;
      rngl_mul := Rmult;
@@ -298,6 +308,16 @@ Proof. intros; now rewrite Rplus_assoc. Qed.
 Theorem Rmult_assoc' : ∀ a b c : R, (a * (b * c))%R = (a * b * c)%R.
 Proof. intros; now rewrite Rmult_assoc. Qed.
 
+Theorem Rintegral :
+  ∀ a b : R,
+  (a * b)%L = 0%L
+  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+Proof.
+intros * Hab.
+apply Rmult_integral in Hab.
+now destruct Hab; [ left | right; left ].
+Qed.
+
 Theorem Rcharacteristic_prop :
   let ror := reals_ring_like_op in
   ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
@@ -340,7 +360,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_integral := Rmult_integral;
+     rngl_opt_integral := Rintegral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := Rcharacteristic_prop;
      rngl_opt_ord := NA;

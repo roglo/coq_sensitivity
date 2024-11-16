@@ -1841,6 +1841,18 @@ Qed.
 
 (* *)
 
+Theorem lap_polyn_integral :
+  let rol := lap_ring_like_op in
+  ∀ la lb : list T,
+  (la * lb)%L = 0%L
+  → la = 0%L ∨ lb = 0%L ∨ rngl_zero_divisor la ∨ rngl_zero_divisor lb.
+Proof.
+intros * Hab.
+now right; right; left.
+Qed.
+
+(* *)
+
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
   if rngl_has_1 (list T) then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -2889,10 +2901,7 @@ Definition lap_ring_like_prop (Hos : rngl_has_opp_or_subt T = true) :
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-(*
-     rngl_opt_div_mul_distr := NA;
-*)
-     rngl_opt_integral := NA;
+     rngl_opt_integral := lap_polyn_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := lap_characteristic_prop;
      rngl_opt_ord := NA;

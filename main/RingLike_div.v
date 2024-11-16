@@ -239,11 +239,22 @@ Theorem rngl_eq_mul_0_l :
   ∀ a b, (a * b = 0)%L → b ≠ 0%L → a = 0%L.
 Proof.
 intros Hos Hii * Hab Hbz.
-specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral_domain. {
-  now apply rngl_integral in Hab; destruct Hab.
+remember (rngl_is_integral_domain T) as id eqn:Hid.
+symmetry in Hid.
+destruct id. {
+  apply rngl_opt_integral in Hab.
+  destruct Hab as [Hab| [Hab| Hab]]; [ easy | easy | ].
+  destruct Hab as [Hab| Hab]. {
+    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_integral_domain in Hid.
+    now destruct (rngl_opt_zero_divisors T).
+  } {
+    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_integral_domain in Hid.
+    now destruct (rngl_opt_zero_divisors T).
+  }
 }
-cbn in Hii; clear rngl_integral.
+cbn in Hii.
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
@@ -280,11 +291,22 @@ destruct ic. {
   rewrite (rngl_mul_comm Hic) in Hab.
   now apply (rngl_eq_mul_0_l Hos Hii) in Hab.
 }
-specialize rngl_opt_integral as rngl_integral.
-destruct rngl_is_integral_domain. {
-  now apply rngl_integral in Hab; destruct Hab.
+remember (rngl_is_integral_domain T) as id eqn:Hid.
+symmetry in Hid.
+destruct id. {
+  apply rngl_opt_integral in Hab.
+  destruct Hab as [Hab| [Hab| Hab]]; [ easy | easy | ].
+  destruct Hab as [Hab| Hab]. {
+    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_integral_domain in Hid.
+    now destruct (rngl_opt_zero_divisors T).
+  } {
+    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_integral_domain in Hid.
+    now destruct (rngl_opt_zero_divisors T).
+  }
 }
-cbn in Hii; clear rngl_integral.
+cbn in Hii.
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.
 destruct iv. {
   assert (Hon : rngl_has_1 T = true). {
