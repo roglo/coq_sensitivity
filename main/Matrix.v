@@ -1162,22 +1162,26 @@ f_equal. {
 }
 Qed.
 
-Theorem mat_mul_0_r : ∀ (M : matrix T) m n,
-  (mZ m n * M)%M = mZ m (mat_ncols M).
+(* to be completed
+Theorem mat_mul_0_r : ∀ (M : matrix T) n p,
+  (M * mZ n p)%M = mZ (mat_nrows M) p.
 Proof.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros.
 progress unfold mat_mul.
 progress unfold mZ.
+progress unfold mat_list_list_mul.
 cbn.
 f_equal.
-rewrite List.repeat_length.
-remember (mat_ncols M) as p.
-clear Heqp.
+remember (mat_nrows M) as m.
+clear Heqm.
 induction m; [ easy | cbn ].
 f_equal. {
-  clear IHm.
-  induction p; [ easy | cbn ].
+  induction n. {
+    cbn.
+    cbn in IHm.
+...
+  induction n; [ easy | cbn ].
   f_equal. {
     clear IHp.
     progress unfold mat_mul_el.
@@ -1224,6 +1228,7 @@ f_equal. {
   now rewrite Nat.sub_0_r.
 }
 Qed.
+*)
 
 (* *)
 
