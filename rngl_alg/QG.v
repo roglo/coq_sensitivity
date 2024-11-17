@@ -1694,7 +1694,7 @@ Proof.
 intros * Ha *.
 exists (Z.to_nat (Z_of_QG (b / a)) + 1)%nat.
 rewrite List_fold_right_QG_add.
-rewrite List_map_repeat.
+rewrite List.map_repeat.
 rewrite Q_mul_nat.
 rewrite Nat2Z.inj_add; cbn.
 destruct (Qlt_le_dec 0 (qg_q b)) as [Hbz| Hbz]. 2: {

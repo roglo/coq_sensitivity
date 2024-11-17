@@ -1257,7 +1257,7 @@ induction lb as [| b]; intros. {
     now rewrite List.repeat_length, List.length_rev.
   }
   rewrite List_rev_map2; [ | symmetry; apply List.repeat_length ].
-  do 2 rewrite List_rev_repeat.
+  do 2 rewrite List.rev_repeat.
   unfold lap_norm.
   rewrite List.rev_involutive, List.length_rev.
   rewrite <- (List.length_rev la).
@@ -1316,7 +1316,7 @@ induction la as [| a]; intros. {
     now rewrite List.repeat_length, List.length_rev.
   }
   rewrite List_rev_map2; [ | apply List.repeat_length ].
-  do 2 rewrite List_rev_repeat.
+  do 2 rewrite List.rev_repeat.
   unfold lap_norm.
   rewrite List.rev_involutive.
   rewrite <- (List.length_rev lb).
@@ -1343,7 +1343,7 @@ destruct lc as [| c]. {
     subst b; cbn.
     rewrite List.app_nil_r, Hf, Nat.sub_0_r.
     rewrite List_rev_map2; [ | symmetry; apply List.repeat_length ].
-    rewrite List_rev_repeat.
+    rewrite List.rev_repeat.
     now rewrite strip_0s_app.
   }
   cbn.
@@ -3250,8 +3250,8 @@ Theorem rev_lap_add_norm : ∀ la lb,
      (List.repeat 0%L (List.length la - List.length lb) ++ List.rev lb))%lap.
 Proof.
 intros.
-rewrite <- (List_rev_repeat _ (List.length lb - _)).
-rewrite <- (List_rev_repeat _ (List.length la - _)).
+rewrite <- (List.rev_repeat (List.length lb - _)).
+rewrite <- (List.rev_repeat (List.length la - _)).
 do 2 rewrite <- List.rev_app_distr.
 rewrite lap_add_norm.
 apply rev_lap_add.
@@ -3303,7 +3303,7 @@ destruct rngl_has_opp. {
 }
 destruct rngl_has_subt. 2: {
   do 2 rewrite List.length_rev.
-  now rewrite List_rev_repeat.
+  now rewrite List.rev_repeat.
 }
 revert lb Hab.
 induction la as [| a]; intros; cbn. {
@@ -3461,7 +3461,7 @@ apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
 remember (a / b)%L as cq eqn:Hcq.
 move b before a.
-cbn; rewrite List_rev_repeat.
+cbn; rewrite List.rev_repeat.
 rewrite (lap_repeat_0_app_is_mul_power_l Hon Hos); [ | easy ].
 rewrite (lap_mul_assoc Hos); cbn.
 rewrite <- (lap_repeat_0_app_is_mul_power_r Hon Hos). 2: {
@@ -3469,18 +3469,18 @@ rewrite <- (lap_repeat_0_app_is_mul_power_r Hon Hos). 2: {
 }
 rewrite (lap_mul_const_r Hos).
 do 2 rewrite List.map_app; cbn.
-rewrite List_map_repeat.
+rewrite List.map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite List.map_rev.
 replace (b * cq)%L with (b * (a / b))%L by now rewrite Hcq.
-rewrite <- List_rev_repeat at 1.
+rewrite <- List.rev_repeat at 1.
 rewrite List.app_assoc.
 rewrite <- List.rev_app_distr.
 remember (List.map _ _ ++ List.repeat _ _) as rlc eqn:Hrlc.
 rewrite rev_lap_sub_norm; [ | easy ].
 rewrite List.length_map.
 remember (List.repeat _ _ ++ _) as x.
-rewrite <- List_rev_repeat.
+rewrite <- List.rev_repeat.
 rewrite <- List.rev_app_distr.
 rewrite <- Hrlc.
 subst x.
@@ -3639,7 +3639,7 @@ apply IHit in Hqr. 2: {
 rewrite Hqrlr', Hqr.
 rewrite lap_add_assoc.
 f_equal; cbn.
-rewrite List_rev_repeat.
+rewrite List.rev_repeat.
 rewrite <- (lap_mul_add_distr_l Hos).
 f_equal.
 rewrite lap_add_comm.

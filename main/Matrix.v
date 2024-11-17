@@ -1097,6 +1097,41 @@ subst la; cbn.
 now destruct i, j.
 Qed.
 
+(* multiplication left and right with zero *)
+
+(* to be completed
+Theorem mat_mul_0_l {m n p} : ∀ (M : matrix T),
+  n = mat_nrows M
+  → p = mat_ncols M
+  → (mZ m n * M)%M = mZ m p.
+Proof.
+intros * Hr Hc.
+progress unfold mat_mul.
+progress unfold mZ.
+cbn.
+f_equal.
+rewrite List.repeat_length.
+Search List.repeat.
+About List.map_repeat.
+About List_map_repeat.
+...
+apply matrix_eq; cycle 1. {
+  apply is_scm_mat_iff.
+Search (mat_ncols (_ * _)).
+  rewrite mat_mul_ncols. 2: {
+    cbn.
+    rewrite List.repeat_length.
+...
+    rewrite List_repeat_length.
+...
+progress unfold mat_mul.
+progress unfold mZ.
+cbn.
+...
+*)
+
+(* *)
+
 Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   n = vect_size V
   → (mI n • V)%M = V.

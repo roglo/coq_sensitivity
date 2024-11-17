@@ -782,7 +782,7 @@ Theorem lap_norm_repeat_0 : ∀ n, lap_norm (List.repeat 0%L n) = [].
 Proof.
 intros.
 unfold lap_norm.
-rewrite List_rev_repeat.
+rewrite List.rev_repeat.
 induction n; [ easy | cbn ].
 now rewrite (rngl_eqb_refl Hed).
 Qed.

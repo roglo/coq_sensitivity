@@ -1735,14 +1735,6 @@ subst n.
 apply List_map_nth_seq.
 Qed.
 
-Theorem List_map_repeat : ∀ A B x n (f : A → B),
-  List.map f (List.repeat x n) = List.repeat (f x) n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-f_equal; apply IHn.
-Qed.
-
 Theorem List_rev_rev :
   ∀ A (la lb : list A), List.rev la = List.rev lb → la = lb.
 Proof.
@@ -1756,15 +1748,6 @@ Theorem List_rev_symm :
 Proof.
 intros * Hab.
 now subst lb; rewrite List.rev_involutive.
-Qed.
-
-Theorem List_rev_repeat : ∀ {A} (x : A) n,
-  List.rev (List.repeat x n) = List.repeat x n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite List.repeat_cons; f_equal.
-apply IHn.
 Qed.
 
 Theorem List_rev_seq_nth :

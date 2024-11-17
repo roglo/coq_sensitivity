@@ -729,6 +729,13 @@ apply (f_equal (@Build_square_matrix n T)) in Ha.
 apply (f_equal (@sm_mat n T)) in Hab.
 cbn in Hab.
 apply (f_equal (mat_mul (sm_mat A)⁻¹)) in Hab.
+Search (_ * mZ _ _)%M.
+Search (mZ _ _ * _)%M.
+About mat_mul_1_l.
+...
+Search mat_mul_0_l.
+...
+rewrite mat_mul_0_r in Hab.
 rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
   now rewrite smat_nrows.
 } {
@@ -736,6 +743,31 @@ rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
 } {
   rewrite mat_inv_ncols.
   cbn.
+  remember (mat_ncols (sm_mat A) =? 0) as cz eqn:Hcz.
+  symmetry in Hcz |-*.
+  destruct cz; [ | easy ].
+  apply Nat.eqb_eq in Hcz.
+  specialize (square_matrix_is_square n A) as H2.
+  progress unfold is_square_matrix in H2.
+  rewrite Hcz in H2.
+  cbn in H2.
+  apply Bool.andb_true_iff in H2.
+  destruct H2 as (H2, H3).
+  now apply Nat.eqb_eq in H2.
+}
+rewrite Ha in Hab.
+Search (mI _ * _)%M.
+rewrite (mat_mul_1_l Hon Hop) in Hab.
+...
+Search ((_ =? _) = true).
+apply Nat.eqb_neq in H2.
+...
+Search (mat_ncols _ = 0).
+Check is_correct_matrix.
+Print is_correct_matrix.
+Print is_square_matrix.
+Search is_square_matrix.
+Search is_correct_matrix.
 ...
 Search (is_square_matrix (sm_mat _)).
 Search (is_square_matrix _ = true).
