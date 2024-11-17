@@ -12,6 +12,52 @@ Require Import Main.Determinant.
 Require Import Main.Comatrix.
 Import matrix_Notations.
 
+(* to be moved to RingLike_mul.v perhaps *)
+Definition is_charac_0_field T {ro : ring_like_op T} {rp : ring_like_prop T}
+  :=
+  (rngl_has_1 T &&
+   rngl_mul_is_comm T &&
+   rngl_has_opp T &&
+   rngl_has_inv T &&
+   rngl_has_eq_dec T &&
+   (rngl_characteristic T =? 0))%bool.
+
+Theorem charac_0_field_iff :
+  ∀ T {ro : ring_like_op T} {rp : ring_like_prop T},
+  charac_0_field T ↔ is_charac_0_field T = true.
+Proof.
+intros.
+progress unfold is_charac_0_field.
+split. {
+  intros cf.
+  rewrite (cf_has_1 cf), (cf_mul_is_comm cf), (cf_has_opp cf).
+  rewrite (cf_has_inv cf), (cf_has_eq_dec cf), (cf_characteristic cf).
+  easy.
+} {
+  intros Hcf.
+  apply Bool.andb_true_iff in Hcf.
+  destruct Hcf as (Hcf, Hc1).
+  apply Nat.eqb_eq in Hc1.
+  apply Bool.andb_true_iff in Hcf.
+  destruct Hcf as (Hcf, Hed).
+  apply Bool.andb_true_iff in Hcf.
+  destruct Hcf as (Hcf, Hiv).
+  apply Bool.andb_true_iff in Hcf.
+  destruct Hcf as (Hcf, Hop).
+  apply Bool.andb_true_iff in Hcf.
+  destruct Hcf as (Hon, Hic).
+  now split.
+}
+Qed.
+
+Theorem square_matrix_is_square :
+  ∀ {T} n (A : square_matrix n T), is_square_matrix (sm_mat A) = true.
+Proof.
+intros.
+destruct A as (A, A_prop); cbn.
+now apply Bool.andb_true_iff in A_prop.
+Qed.
+
 Section a.
 
 Context {T : Type}.
@@ -133,7 +179,9 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
 (*
-     rngl_opt_zero_divisors := Some (λ M, det (sm_mat M) = 0%L); (* à voir *)
+     rngl_opt_zero_divisors :=
+       Some
+         (λ M, if is_charac_0_field T then det (sm_mat M) = 0%L else True);
 *)
      rngl_opt_zero_divisors := Some (λ _, True);
 (**)
@@ -643,13 +691,20 @@ destruct (mat_eq_dec eq_dec (sm_mat B) (sm_mat (smZ n))) as [Hbz| Hbz]. {
   now left; apply square_matrix_eq.
 }
 right.
+remember (is_charac_0_field T) as cf eqn:Hcf.
+symmetry in Hcf.
+destruct cf; [ | now left ].
 destruct (eq_dec (det (sm_mat A)) 0%L) as [Hda| Hda]; [ now left | ].
 destruct (eq_dec (det (sm_mat B)) 0%L) as [Hdb| Hdb]; [ now right | ].
 exfalso.
 specialize mat_mul_inv_diag_l as H1.
-Print charac_0_field.
-(* ah ouais, faut que le type des coefficients des matrices soient
-   des corps commutatifs et de caractéristique nulle *)
+apply charac_0_field_iff in Hcf.
+specialize (H1 Hcf).
+specialize (H1 (sm_mat A)) as Ha.
+specialize (Ha (square_matrix_is_square n A) Hda).
+...
+Search (is_square_matrix (sm_mat _)).
+Search (is_square_matrix _ = true).
 ...
 *)
 now right; right; left.
