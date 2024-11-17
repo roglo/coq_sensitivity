@@ -1099,17 +1099,17 @@ Qed.
 
 (* multiplication left and right with zero *)
 
-Theorem mat_mul_0_l {m n p} : ∀ (M : matrix T),
-  mat_ncols M = p
-  → (mZ m n * M)%M = mZ m p.
+Theorem mat_mul_0_l : ∀ (M : matrix T) m n,
+  (mZ m n * M)%M = mZ m (mat_ncols M).
 Proof.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hc.
+intros.
 progress unfold mat_mul.
 progress unfold mZ.
 cbn.
 f_equal.
-rewrite Hc; clear Hc.
+remember (mat_ncols M) as p.
+clear Heqp.
 rewrite List.repeat_length.
 induction m; [ easy | cbn ].
 f_equal. {
@@ -1162,18 +1162,18 @@ f_equal. {
 }
 Qed.
 
-Theorem mat_mul_0_r {m n p} : ∀ (M : matrix T),
-  mat_ncols M = p
-  → (mZ m n * M)%M = mZ m p.
+Theorem mat_mul_0_r : ∀ (M : matrix T) m n,
+  (mZ m n * M)%M = mZ m (mat_ncols M).
 Proof.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hc.
+intros.
 progress unfold mat_mul.
 progress unfold mZ.
 cbn.
 f_equal.
 rewrite List.repeat_length.
-rewrite Hc; clear Hc.
+remember (mat_ncols M) as p.
+clear Heqp.
 induction m; [ easy | cbn ].
 f_equal. {
   clear IHm.
