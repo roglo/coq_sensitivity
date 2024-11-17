@@ -1099,36 +1099,69 @@ Qed.
 
 (* multiplication left and right with zero *)
 
-(* to be completed
 Theorem mat_mul_0_l {m n p} : ∀ (M : matrix T),
   n = mat_nrows M
   → p = mat_ncols M
   → (mZ m n * M)%M = mZ m p.
 Proof.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hr Hc.
 progress unfold mat_mul.
 progress unfold mZ.
 cbn.
 f_equal.
 rewrite List.repeat_length.
-Search List.repeat.
-About List.map_repeat.
-About List_map_repeat.
-...
-apply matrix_eq; cycle 1. {
-  apply is_scm_mat_iff.
-Search (mat_ncols (_ * _)).
-  rewrite mat_mul_ncols. 2: {
+rewrite <- Hc.
+induction m; [ easy | cbn ].
+f_equal. {
+  clear IHm Hc.
+  induction p; [ easy | cbn ].
+  f_equal. {
+    clear IHp.
+    progress unfold mat_mul_el.
     cbn.
     rewrite List.repeat_length.
-...
-    rewrite List_repeat_length.
-...
-progress unfold mat_mul.
-progress unfold mZ.
-cbn.
-...
-*)
+    apply all_0_rngl_summation_0.
+    intros i Hi.
+    rewrite List.nth_repeat.
+    apply (rngl_mul_0_l Hos).
+  }
+  rewrite <- IHp; clear IHp.
+  rewrite <- (List.seq_shift p).
+  rewrite List.map_map.
+  apply List.map_ext_in.
+  intros i Hi.
+  progress unfold mat_mul_el.
+  cbn.
+  rewrite List.repeat_length.
+  apply iter_seq_eq_compat.
+  intros j Hj.
+  rewrite List.nth_repeat.
+  now do 2 rewrite (rngl_mul_0_l Hos).
+} {
+  rewrite <- IHm; clear IHm.
+  rewrite <- (List.seq_shift m).
+  rewrite List.map_map.
+  apply List.map_ext_in.
+  intros i Hi.
+  apply List.map_ext_in.
+  intros j Hj.
+  move j before i.
+  progress unfold mat_mul_el.
+  cbn.
+  rewrite List.repeat_length.
+  progress unfold mat_ncols.
+  cbn.
+  destruct m; [ easy | cbn ].
+  rewrite List.repeat_length.
+  rewrite Nat.sub_0_r.
+  apply iter_seq_eq_compat.
+  intros k Hk.
+  apply List.in_seq in Hi, Hj.
+  destruct i; [ easy | cbn ].
+  now rewrite Nat.sub_0_r.
+}
+Qed.
 
 (* *)
 

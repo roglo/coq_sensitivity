@@ -732,8 +732,7 @@ apply (f_equal (mat_mul (sm_mat A)⁻¹)) in Hab.
 Search (_ * mZ _ _)%M.
 Search (mZ _ _ * _)%M.
 About mat_mul_1_l.
-...
-Search mat_mul_0_l.
+rewrite mat_mul_0_r in Hab.
 ...
 rewrite mat_mul_0_r in Hab.
 rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
