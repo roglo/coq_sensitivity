@@ -682,6 +682,24 @@ Theorem squ_mat_integral eq_dec n :
 Proof.
 intros * Hab.
 (*
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  left.
+  apply square_matrix_eq; cbn.
+  subst n.
+  cbn - [ rngl_mul ] in Hab.
+  injection Hab; clear Hab; intros Hab.
+  progress unfold mat_list_list_mul in Hab.
+  apply List.map_eq_nil in Hab.
+  apply List_seq_eq_nil in Hab.
+  destruct A as (A & Hap).
+  cbn in Hab |-*.
+  apply Bool.andb_true_iff in Hap.
+  destruct Hap as (_, Hsa).
+  destruct A as (lla).
+  cbn in Hsa, Hab.
+  apply List.length_zero_iff_nil in Hab.
+  now subst lla.
+}
 cbn.
 destruct (mat_eq_dec eq_dec (sm_mat A) (sm_mat (smZ n))) as [Haz| Haz]. {
   now left; apply square_matrix_eq.
@@ -702,6 +720,22 @@ apply charac_0_field_iff in Hcf.
 specialize (H1 Hcf).
 specialize (H1 (sm_mat A)) as Ha.
 specialize (Ha (square_matrix_is_square n A) Hda).
+(*
+Print square_matrix.
+Search (matrix _ → _ → square_matrix _ _).
+apply (f_equal (@Build_square_matrix n T)) in Ha.
+...
+*)
+apply (f_equal (@sm_mat n T)) in Hab.
+cbn in Hab.
+apply (f_equal (mat_mul (sm_mat A)⁻¹)) in Hab.
+rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
+  now rewrite smat_nrows.
+} {
+  now rewrite smat_ncols.
+} {
+  rewrite mat_inv_ncols.
+  cbn.
 ...
 Search (is_square_matrix (sm_mat _)).
 Search (is_square_matrix _ = true).
