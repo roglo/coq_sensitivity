@@ -9,6 +9,7 @@ Require Import Main.Misc.
 Require Import Main.RingLike Main.IterAdd.
 Require Import Main.Matrix.
 Require Import Main.Determinant.
+Require Import Main.Comatrix.
 Import matrix_Notations.
 
 Section a.
@@ -132,7 +133,7 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
 (*
-     rngl_opt_zero_divisors := Some (λ M, det (sm_mat M) = 0%L);
+     rngl_opt_zero_divisors := Some (λ M, det (sm_mat M) = 0%L); (* à voir *)
 *)
      rngl_opt_zero_divisors := Some (λ _, True);
 (**)
@@ -634,11 +635,21 @@ Proof.
 intros * Hab.
 (*
 cbn.
-cbn in Hab.
-injection Hab; clear Hab; intros H1.
-...
-Print mat_mul.
-About mat_mul.
+destruct (mat_eq_dec eq_dec (sm_mat A) (sm_mat (smZ n))) as [Haz| Haz]. {
+  now left; apply square_matrix_eq.
+}
+right.
+destruct (mat_eq_dec eq_dec (sm_mat B) (sm_mat (smZ n))) as [Hbz| Hbz]. {
+  now left; apply square_matrix_eq.
+}
+right.
+destruct (eq_dec (det (sm_mat A)) 0%L) as [Hda| Hda]; [ now left | ].
+destruct (eq_dec (det (sm_mat B)) 0%L) as [Hdb| Hdb]; [ now right | ].
+exfalso.
+specialize mat_mul_inv_diag_l as H1.
+Print charac_0_field.
+(* ah ouais, faut que le type des coefficients des matrices soient
+   des corps commutatifs et de caractéristique nulle *)
 ...
 *)
 now right; right; left.
