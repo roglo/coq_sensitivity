@@ -745,9 +745,11 @@ apply matrix_eq; cycle 1. {
   now apply Nat.neq_0_lt_0.
 } {
   rewrite Hmo; cbn.
+  progress unfold mat_list_list_mul.
   now do 3 rewrite List_length_map_seq.
 } {
   unfold mat_ncols; cbn.
+  progress unfold mat_list_list_mul.
   rewrite (List_map_hd 0); [ | now rewrite length_seq, Hrn ].
   rewrite (List_map_hd 0). 2: {
     rewrite length_seq, Hmo; cbn.
@@ -760,6 +762,7 @@ apply matrix_eq; cycle 1. {
   now do 2 rewrite List_length_map_seq.
 }
 unfold mat_ncols; cbn.
+progress unfold mat_list_list_mul.
 rewrite List_length_map_seq, Hrn, Hmd.
 rewrite (List_map_hd 0). 2: {
   rewrite length_seq.

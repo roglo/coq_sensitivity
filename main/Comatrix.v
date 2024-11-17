@@ -1465,11 +1465,11 @@ destruct (Nat.eq_dec (length ll) 1) as [Hl1| Hl1]. {
   apply is_scm_mat_iff in Hsm.
   unfold mat_ncols in Hsm; cbn - [ List.In ] in Hsm.
   destruct Hsm as (_, Hcl).
-  unfold "*"%M, "×"%M, mat_transp, mat_mul_el, com; cbn.
+  progress unfold "*"%M, "×"%M, mat_transp, mat_mul_el, com; cbn.
   rewrite Hcl; [ cbn | now left ].
+  progress unfold mat_mul_el.
   do 2 rewrite rngl_summation_only_one; cbn.
-  do 2 rewrite (rngl_mul_1_l Hon).
-  now do 2 rewrite (rngl_mul_1_r Hon).
+  now do 3 rewrite (rngl_mul_1_r Hon).
 }
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite List.map_map.

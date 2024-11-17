@@ -396,10 +396,12 @@ Definition mat_add (MA MB : matrix T) : matrix T :=
 Definition mat_mul_el MA MB i k :=
    ∑ (j = 1, mat_ncols MA), mat_el MA i j * mat_el MB j k.
 
+Definition mat_list_list_mul (MA MB : matrix T) : list (list T) :=
+  List.map (λ i, List.map (mat_mul_el MA MB i) (List.seq 1 (mat_ncols MB)))
+    (List.seq 1 (mat_nrows MA)).
+
 Definition mat_mul (MA MB : matrix T) : matrix T :=
-  mk_mat
-    (List.map (λ i, List.map (mat_mul_el MA MB i) (List.seq 1 (mat_ncols MB)))
-       (List.seq 1 (mat_nrows MA))).
+  mk_mat (mat_list_list_mul MA MB).
 
 (* opposite *)
 
@@ -923,6 +925,7 @@ Qed.
 Theorem mat_mul_nrows : ∀ MA MB, mat_nrows (MA * MB) = mat_nrows MA.
 Proof.
 intros; cbn.
+progress unfold mat_list_list_mul.
 now rewrite List_length_map_seq.
 Qed.
 
@@ -931,6 +934,7 @@ Theorem mat_mul_ncols : ∀ MA MB,
   → mat_ncols (MA * MB) = mat_ncols MB.
 Proof.
 intros * Hraz; unfold mat_ncols; cbn.
+progress unfold mat_list_list_mul.
 rewrite (List_map_hd 0). 2: {
   rewrite List.length_seq.
   now apply Nat.neq_0_lt_0.
@@ -947,6 +951,7 @@ Proof.
 intros * Hir Hjc; cbn.
 rewrite mat_mul_nrows in Hir.
 rewrite mat_mul_ncols in Hjc; [ | flia Hir ].
+progress unfold mat_list_list_mul.
 rewrite (List_map_nth' 0). 2: {
   now rewrite List.length_seq; apply Nat_1_le_sub_lt.
 }
@@ -974,6 +979,7 @@ move Hos before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
+progress unfold mat_list_list_mul.
 rewrite mI_nrows.
 destruct M as (ll); cbn in HM |-*.
 f_equal.
@@ -1035,6 +1041,7 @@ move Hos before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
+progress unfold mat_list_list_mul.
 rewrite mI_ncols.
 destruct M as (ll); cbn in HM |-*.
 f_equal.
@@ -1186,6 +1193,7 @@ specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold "*"%M.
 f_equal.
+progress unfold mat_list_list_mul.
 unfold mat_nrows at 5; cbn.
 rewrite List_length_map_seq.
 apply List.map_ext_in.
@@ -1292,6 +1300,7 @@ Proof.
 intros * Hb Hc Hrbz Hcarb Hcrbc Hcbc.
 unfold "*"%M, "+"%M.
 f_equal; cbn.
+progress unfold mat_list_list_mul.
 rewrite List_map2_map_l, List_map2_map_r, List_map2_diag.
 apply List.map_ext_in.
 intros i Hi.
@@ -1368,6 +1377,7 @@ unfold "*"%M, "+"%M.
 f_equal; cbn.
 rewrite List_length_map2.
 do 2 rewrite fold_mat_nrows.
+progress unfold mat_list_list_mul.
 rewrite List_map2_map_l, List_map2_map_r, <- Hrarb, List_map2_diag.
 rewrite Nat.min_id.
 apply List.map_ext_in.
@@ -1515,6 +1525,7 @@ unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite List.length_map; cbn.
 rewrite fold_mat_nrows.
+progress unfold mat_list_list_mul.
 rewrite List.map_map.
 apply List.map_ext_in.
 intros i Hi.
@@ -1576,6 +1587,7 @@ move Hos before Hop.
 apply Nat.neq_0_lt_0 in Hcaz.
 unfold "*"%M, "×"%M; cbn.
 f_equal.
+progress unfold mat_list_list_mul.
 rewrite List.map_map.
 apply List.map_ext_in.
 intros i Hi.
@@ -1680,6 +1692,7 @@ specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold "•"%M, "*"%M; cbn.
 f_equal.
+progress unfold mat_list_list_mul.
 rewrite List.map_map.
 rewrite List_map_map_seq with (d := []).
 rewrite fold_mat_nrows.
@@ -2032,13 +2045,16 @@ split. {
   intros Hab.
   unfold mat_ncols in Hab.
   cbn in Hab |-*.
+  progress unfold mat_list_list_mul.
   rewrite List_length_map_seq.
+  progress unfold mat_list_list_mul in Hab.
   rewrite (List_map_hd 0) in Hab; [ | now rewrite List.length_seq ].
   rewrite List_length_map_seq in Hab.
   now rewrite Hbcr in Hbz.
 } {
   intros lab Hlab.
   unfold mat_ncols; cbn.
+  progress unfold mat_list_list_mul.
   rewrite (List_map_hd 0); [ | now rewrite List.length_seq ].
   rewrite List_length_map_seq.
   cbn in Hlab.
@@ -2123,16 +2139,19 @@ apply matrix_eq; cycle 1. {
   cbn.
   unfold mat_ncols; cbn.
   do 3 rewrite List_length_map_seq.
+  progress unfold mat_list_list_mul.
   rewrite (List_map_hd 0). 2: {
     now rewrite List.length_seq; apply Nat.neq_0_lt_0.
   }
   now rewrite List_length_map_seq.
 } {
   unfold mat_ncols; cbn.
+  progress unfold mat_list_list_mul.
   do 2 rewrite List_length_map_seq.
   rewrite (List_map_hd 0). 2: {
     rewrite List.length_seq.
     unfold mat_ncols; cbn.
+    progress unfold mat_list_list_mul.
     rewrite (List_map_hd 0). 2: {
       rewrite List.length_seq.
       now apply Nat.neq_0_lt_0.
@@ -2556,11 +2575,13 @@ Theorem squ_mat_mul_is_squ : ∀ (MA MB : matrix T),
 Proof.
 intros * Ha Hb Hrab.
 apply is_scm_mat_iff; cbn.
+  progress unfold mat_list_list_mul.
 rewrite List_length_map_seq.
 rewrite (squ_mat_ncols MB); [ | easy ].
 split. {
   intros Hcc.
   unfold mat_ncols in Hcc; cbn in Hcc.
+  progress unfold mat_list_list_mul in Hcc.
   rewrite squ_mat_ncols in Hcc; [ | easy ].
   rewrite <- Hrab in Hcc.
   apply List.length_zero_iff_nil in Hcc.

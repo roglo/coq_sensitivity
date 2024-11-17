@@ -349,6 +349,7 @@ specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
+progress unfold mat_list_list_mul.
 rewrite mA_nrows.
 rewrite List.map_map.
 rewrite <- List.seq_shift with (len := 2 ^ n), List.map_map.
@@ -1085,14 +1086,15 @@ specialize (squ_mat_ncols _ Hs5) as Hc5.
 apply is_scm_mat_iff in Hs5.
 destruct Hs5 as (Hcr5 & Hc5').
 rewrite Hr5 in Hc5, Hc5'.
-unfold mat_mul, mat_add; cbn.
-unfold mat_of_mat_list_list; cbn.
+progress unfold mat_mul, mat_add; cbn.
+progress unfold mat_of_mat_list_list; cbn.
 f_equal.
 do 3 rewrite List.app_nil_r.
 rewrite List.length_app.
-unfold fold_app_in_list, iter_list; cbn.
+progress unfold fold_app_in_list, iter_list; cbn.
 do 2 rewrite length_app_in_list.
 do 4 rewrite fold_mat_nrows.
+progress unfold mat_list_list_mul.
 rewrite Hr1, Hr2, Hr3, Hr4, Nat.max_id.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now move Hnz at top; subst n.

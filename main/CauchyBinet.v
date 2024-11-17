@@ -1533,9 +1533,11 @@ assert (Hab : is_square_matrix (A * B) = true). {
     apply List.In_nth with (d := []) in Hl.
     destruct Hl as (p & Hp & Hl).
     rewrite <- Hl; cbn.
+    progress unfold mat_list_list_mul.
     rewrite (List_map_nth' 0). 2: {
       rewrite List.length_seq.
       cbn in Hp.
+      progress unfold mat_list_list_mul in Hp.
       now rewrite List_length_map_seq in Hp.
     }
     now rewrite List_length_map_seq.
@@ -1551,6 +1553,8 @@ rewrite mat_mul_nrows, Har.
 
 *)
 unfold "*"%M at 1.
+progress unfold mat_list_list_mul.
+cbn.
 unfold mat_mul_el.
 rewrite Har, Hac, Hbc.
 cbn - [ det ].

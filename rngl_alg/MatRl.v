@@ -8,6 +8,7 @@ Import List.ListNotations.
 Require Import Main.Misc.
 Require Import Main.RingLike Main.IterAdd.
 Require Import Main.Matrix.
+Require Import Main.Determinant.
 Import matrix_Notations.
 
 Section a.
@@ -68,6 +69,7 @@ intros.
 apply Bool.andb_true_iff.
 split; [ | apply square_matrix_mul_is_square ].
 apply Nat.eqb_eq; cbn.
+progress unfold mat_list_list_mul.
 rewrite List_length_map_seq.
 apply smat_nrows.
 Qed.
@@ -129,7 +131,11 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
-     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
+(*
+     rngl_opt_zero_divisors := Some (λ M, det (sm_mat M) = 0%L);
+*)
+     rngl_opt_zero_divisors := Some (λ _, True);
+(**)
      rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
 
@@ -354,6 +360,7 @@ move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n; cbn.
   unfold "*"%M; cbn.
+  progress unfold mat_list_list_mul.
   now rewrite Hra, Hrb.
 }
 apply mat_mul_assoc; [ easy | | | ]. {
@@ -412,6 +419,7 @@ move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n; cbn.
   unfold "*"%M, "+"%M; cbn.
+  progress unfold mat_list_list_mul.
   now rewrite Hra.
 }
 apply mat_mul_add_distr_l. {
@@ -497,6 +505,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold "*"%M, "+"%M; cbn.
   rewrite List_length_map2; cbn.
   do 2 rewrite fold_mat_nrows.
+  progress unfold mat_list_list_mul.
   now rewrite Hra.
 }
 apply mat_mul_add_distr_r. {
@@ -618,11 +627,20 @@ Qed.
 
 Theorem squ_mat_integral eq_dec n :
   let rom := @mat_ring_like_op eq_dec n in
-  ∀ a b : square_matrix n T,
-  (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  ∀ A B : square_matrix n T,
+  (A * B)%L = 0%L
+  → A = 0%L ∨ B = 0%L ∨ rngl_zero_divisor A ∨ rngl_zero_divisor B.
 Proof.
 intros * Hab.
+(*
+cbn.
+cbn in Hab.
+injection Hab; clear Hab; intros H1.
+...
+Print mat_mul.
+About mat_mul.
+...
+*)
 now right; right; left.
 Qed.
 
