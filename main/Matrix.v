@@ -1164,44 +1164,58 @@ Qed.
 
 (* to be completed
 Theorem mat_mul_0_r : ∀ (M : matrix T) n p,
-  (M * mZ n p)%M = mZ (mat_nrows M) p.
+  n ≠ 0
+  → (M * mZ n p)%M = mZ (mat_nrows M) p.
 Proof.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
+intros * Hnz.
 progress unfold mat_mul.
 progress unfold mZ.
 progress unfold mat_list_list_mul.
 cbn.
 f_equal.
-remember (mat_nrows M) as m.
-clear Heqm.
-induction m; [ easy | cbn ].
+remember (mat_nrows M) as m eqn:Hm.
+clear Hm.
+destruct n; [ easy | clear Hnz; cbn ].
+destruct m; [ easy | cbn ].
+rewrite List.repeat_length.
 f_equal. {
-  induction n. {
-    cbn.
-    cbn in IHm.
-...
-  induction n; [ easy | cbn ].
+  induction p; [ easy | cbn ].
   f_equal. {
     clear IHp.
     progress unfold mat_mul_el.
     cbn.
-    rewrite List.repeat_length.
     apply all_0_rngl_summation_0.
     intros i Hi.
-    rewrite List.nth_repeat.
-    apply (rngl_mul_0_l Hos).
+    destruct i; [ easy | cbn ].
+    rewrite Nat.sub_0_r.
+    clear Hi.
+    induction i; [ apply (rngl_mul_0_r Hos) | ].
+    rewrite List_nth_repeat.
+    destruct (lt_dec i n); apply (rngl_mul_0_r Hos).
   }
   rewrite <- IHp; clear IHp.
-  rewrite <- (List.seq_shift p).
+  rewrite <- (List.seq_shift p 1).
   rewrite List.map_map.
   apply List.map_ext_in.
   intros i Hi.
   progress unfold mat_mul_el.
   cbn.
-  rewrite List.repeat_length.
   apply iter_seq_eq_compat.
   intros j Hj.
+  rewrite Nat.sub_0_r.
+  f_equal.
+  destruct j; [ easy | ].
+  cbn.
+  rewrite Nat.sub_0_r.
+  apply List.in_seq in Hi.
+  destruct j. {
+    cbn.
+    destruct i; [ easy | ].
+    cbn.
+    rewrite Nat.sub_0_r.
+    f_equal.
+...
   rewrite List.nth_repeat.
   now do 2 rewrite (rngl_mul_0_l Hos).
 } {
