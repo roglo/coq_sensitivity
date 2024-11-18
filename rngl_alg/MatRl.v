@@ -170,7 +170,7 @@ destruct H1 as [H1| H1]; [ left | right ]. {
 }
 Qed.
 
-Definition mat_zero_divisors n (M : square_matrix n T) :=
+Definition mat_is_zero_divisor n (M : square_matrix n T) :=
   if is_charac_0_field T then det (sm_mat M) = 0%L else True.
 
 Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
@@ -182,7 +182,7 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
 (**)
-     rngl_opt_zero_divisors := Some (mat_zero_divisors n);
+     rngl_opt_zero_divisors := Some (mat_is_zero_divisor n);
 (*
      rngl_opt_zero_divisors := Some (λ _, True);
 *)
@@ -654,7 +654,7 @@ destruct (mat_eq_dec eq_dec (sm_mat B) (sm_mat (smZ n))) as [Hbz| Hbz]. {
 }
 right.
 cbn in Haz, Hbz.
-progress unfold mat_zero_divisors.
+progress unfold mat_is_zero_divisor.
 remember (is_charac_0_field T) as cf eqn:Hcf.
 symmetry in Hcf.
 destruct cf; [ | now left ].
