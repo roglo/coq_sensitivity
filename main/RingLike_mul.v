@@ -44,17 +44,33 @@ Theorem rngl_mul_0_r :
   ∀ a, (a * 0 = 0)%L.
 Proof.
 intros Hos *.
-apply (rngl_add_cancel_r Hos _ _ (a * 1)%L).
+apply (rngl_add_cancel_r Hos _ _ (a * a)%L).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
+
+(* if I add the distributivity multiplication/subtraction as an
+   axiom, the same theorem above can be proved using it, which
+   gives two proofs of the same thing, and I don't like that;
+   it is the reason why I didn't add this distributivity in
+   my ring-like axioms when there is subt and not opp.
+Theorem rngl_mul_0_r' :
+  rngl_has_opp_or_subt T = true →
+  (∀ a b c, a * (b - c) = a * b - a * c)%L
+  → ∀ a, (a * 0 = 0)%L.
+Proof.
+intros Hos rngl_mul_sub_distr_l a.
+specialize (rngl_mul_sub_distr_l a a a) as H1.
+now do 2 rewrite (rngl_sub_diag Hos) in H1.
+Qed.
+*)
 
 Theorem rngl_mul_0_l :
   rngl_has_opp_or_subt T = true →
   ∀ a, (0 * a = 0)%L.
 Proof.
-intros Hom a.
-apply (rngl_add_cancel_r Hom _ _ (1 * a)%L).
+intros Hos a.
+apply (rngl_add_cancel_r Hos _ _ (1 * a)%L).
 rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
 Qed.

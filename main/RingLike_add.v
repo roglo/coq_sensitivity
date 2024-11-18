@@ -128,32 +128,12 @@ Theorem rngl_add_cancel_l :
   rngl_has_opp_or_subt T = true →
   ∀ a b c, (a + b = a + c)%L ↔ (b = c)%L.
 Proof.
-intros Hom *.
+intros Hos *.
 split; intros Habc; [ | now subst b ].
-remember (rngl_has_opp T) as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  apply (f_equal (λ x, rngl_sub x a)) in Habc.
-  do 2 rewrite (rngl_add_comm a) in Habc.
-  unfold rngl_sub in Habc.
-  rewrite Hop in Habc.
-  do 2 rewrite <- rngl_add_assoc in Habc.
-  rewrite rngl_add_opp_r in Habc; [ | easy ].
-  rewrite rngl_sub_diag in Habc; [ | easy ].
-  now do 2 rewrite rngl_add_0_r in Habc.
-}
-remember (rngl_has_subt T) as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 c a) as H2.
-  rewrite rngl_add_comm, <- Habc in H2.
-  rewrite rngl_add_comm in H2.
-  now rewrite H1 in H2.
-}
-apply rngl_has_opp_or_subt_iff in Hom.
-destruct Hom; congruence.
+specialize (rngl_add_sub Hos c a) as H1.
+rewrite rngl_add_comm, <- Habc in H1.
+rewrite rngl_add_comm in H1.
+now rewrite (rngl_add_sub Hos) in H1.
 Qed.
 
 Theorem rngl_add_move_l :
