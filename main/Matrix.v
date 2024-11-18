@@ -965,6 +965,15 @@ rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
 easy.
 Qed.
 
+Theorem List_repeat_as_map : ∀ [A] (a : A) n,
+  List.repeat a n = List.map (λ _, a) (List.seq 0 n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal.
+now rewrite <- List.seq_shift, List.map_map.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l {n} : ∀ (M : matrix T),
@@ -1162,7 +1171,6 @@ f_equal. {
 }
 Qed.
 
-(* to be completed
 Theorem mat_mul_0_r : ∀ (M : matrix T) n p,
   n ≠ 0
   → (M * mZ n p)%M = mZ (mat_nrows M) p.
@@ -1180,69 +1188,59 @@ destruct n; [ easy | clear Hnz; cbn ].
 destruct m; [ easy | cbn ].
 rewrite List.repeat_length.
 f_equal. {
-  induction p; [ easy | cbn ].
-  f_equal. {
-    clear IHp.
-    progress unfold mat_mul_el.
-    cbn.
-    apply all_0_rngl_summation_0.
-    intros i Hi.
-    destruct i; [ easy | cbn ].
-    rewrite Nat.sub_0_r.
-    clear Hi.
-    induction i; [ apply (rngl_mul_0_r Hos) | ].
-    rewrite List_nth_repeat.
+  progress unfold mat_mul_el.
+  rewrite List_repeat_as_map at 1.
+  rewrite <- List.seq_shift, List.map_map.
+  apply List.map_ext_in.
+  intros i Hi.
+  apply all_0_rngl_summation_0.
+  intros j Hj.
+  cbn.
+  destruct j; [ easy | cbn ].
+  do 2 rewrite Nat.sub_0_r.
+  clear Hj.
+  destruct j. {
+    rewrite List.nth_repeat.
     destruct (lt_dec i n); apply (rngl_mul_0_r Hos).
   }
-  rewrite <- IHp; clear IHp.
-  rewrite <- (List.seq_shift p 1).
-  rewrite List.map_map.
-  apply List.map_ext_in.
-  intros i Hi.
-  progress unfold mat_mul_el.
+  rewrite List_nth_repeat.
+  destruct (lt_dec j n). {
+    rewrite List.nth_repeat.
+    apply (rngl_mul_0_r Hos).
+  }
   cbn.
-  apply iter_seq_eq_compat.
-  intros j Hj.
-  rewrite Nat.sub_0_r.
-  f_equal.
-  destruct j; [ easy | ].
-  cbn.
-  rewrite Nat.sub_0_r.
-  apply List.in_seq in Hi.
-  destruct j. {
-    cbn.
-    destruct i; [ easy | ].
-    cbn.
-    rewrite Nat.sub_0_r.
-    f_equal.
-...
-  rewrite List.nth_repeat.
-  now do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_r Hos).
 } {
-  rewrite <- IHm; clear IHm.
-  rewrite <- (List.seq_shift m).
-  rewrite List.map_map.
+  rewrite (List_repeat_as_map _ m).
+  do 2 rewrite <- (List.seq_shift m), List.map_map.
   apply List.map_ext_in.
   intros i Hi.
+  rewrite (List_repeat_as_map _ p) at 3.
+  rewrite <- List.seq_shift, List.map_map.
   apply List.map_ext_in.
   intros j Hj.
   move j before i.
   progress unfold mat_mul_el.
-  cbn.
-  rewrite List.repeat_length.
-  progress unfold mat_ncols.
-  cbn.
-  destruct m; [ easy | cbn ].
-  rewrite List.repeat_length.
-  rewrite Nat.sub_0_r.
-  apply iter_seq_eq_compat.
+  apply all_0_rngl_summation_0.
   intros k Hk.
-  apply List.in_seq in Hi, Hj.
-  destruct i; [ easy | cbn ].
-  now rewrite Nat.sub_0_r.
+  cbn.
+  destruct k; [ easy | cbn ].
+  do 2 rewrite Nat.sub_0_r.
+  destruct k. {
+    rewrite List_nth_repeat.
+    destruct (lt_dec j p); apply (rngl_mul_0_r Hos).
+  }
+  rewrite List_nth_repeat.
+  destruct (lt_dec k n). {
+    rewrite List.nth_repeat.
+    apply (rngl_mul_0_r Hos).
+  }
+  cbn.
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_r Hos).
 }
 Qed.
-*)
 
 (* *)
 
@@ -2929,15 +2927,6 @@ rewrite List_map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   rewrite fold_mat_nrows; flia Hib.
 }
 easy.
-Qed.
-
-Theorem List_repeat_as_map : ∀ [A] (a : A) n,
-  List.repeat a n = List.map (λ _, a) (List.seq 0 n).
-Proof.
-intros.
-induction n; [ easy | cbn ].
-f_equal.
-now rewrite <- List.seq_shift, List.map_map.
 Qed.
 
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix T),
