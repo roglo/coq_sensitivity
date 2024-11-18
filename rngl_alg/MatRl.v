@@ -182,9 +182,9 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
 (**)
-     rngl_opt_zero_divisors := Some (mat_is_zero_divisor n);
+     rngl_opt_is_zero_divisor := Some (mat_is_zero_divisor n);
 (*
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
 *)
      rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
@@ -621,7 +621,7 @@ Theorem squ_mat_integral eq_dec n :
   let rom := @mat_ring_like_op eq_dec n in
   ∀ A B : square_matrix n T,
   (A * B)%L = 0%L
-  → A = 0%L ∨ B = 0%L ∨ rngl_zero_divisor A ∨ rngl_zero_divisor B.
+  → A = 0%L ∨ B = 0%L ∨ rngl_is_zero_divisor A ∨ rngl_is_zero_divisor B.
 Proof.
 (**)
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.

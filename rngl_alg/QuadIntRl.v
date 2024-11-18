@@ -166,7 +166,7 @@ Definition quad_int_ring_like_op d : ring_like_op (quad_int d) :=
      rngl_opt_one := Some (@qi_one d);
      rngl_opt_opp_or_subt := Some (inl (@qi_opp d));
      rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := None; (* to be improved, perhaps *)
      rngl_opt_leb := None |}.
 
@@ -806,7 +806,7 @@ Theorem quad_int_integral :
   let ro := @quad_int_ring_like_op d in
   ∀ a b : quad_int d,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.

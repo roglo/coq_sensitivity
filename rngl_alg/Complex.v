@@ -189,7 +189,7 @@ Instance gc_ring_like_op T
      rngl_opt_one := gc_opt_one;
      rngl_opt_opp_or_subt := gc_opt_opp_or_subt T;
      rngl_opt_inv_or_quot := gc_opt_inv_or_quot T;
-     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
+     rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := gc_opt_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -620,7 +620,7 @@ Qed.
 Theorem gc_integral :
   ∀ a b : GComplex T,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.

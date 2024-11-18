@@ -14,7 +14,7 @@ Instance nat_ring_like_op : ring_like_op nat :=
      rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := Some (inr Nat.sub);
      rngl_opt_inv_or_quot := Some (inr Nat.div);
-     rngl_opt_zero_divisors := None;
+     rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := Some Nat.eq_dec;
      rngl_opt_leb := Some Nat.leb |}.
 
@@ -28,7 +28,7 @@ Proof. now intros; apply Nat.eq_mul_0. Qed.
 Theorem Nat_eq_mul_0' :
   ∀ a b,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 apply Nat.eq_mul_0 in Hab.

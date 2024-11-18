@@ -23,7 +23,7 @@ Instance angle_ring_like_op : ring_like_op (angle T) :=
      rngl_opt_one := None;
      rngl_opt_opp_or_subt := Some (inl angle_opp);
      rngl_opt_inv_or_quot := None;
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some (angle_eq_dec);
      rngl_opt_leb := None (* no order: fails on add_le_compat *) |}.
 
@@ -64,7 +64,7 @@ Proof. cbn; apply angle_add_opp_diag_l. Qed.
 Theorem rngl_angle_integral :
   ∀ a b : angle T,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.

@@ -155,8 +155,8 @@ Definition I_ring_like_op : ring_like_op (ideal P) :=
        | None => None
        end;
      rngl_opt_inv_or_quot := None;
-     rngl_opt_zero_divisors :=
-       match rngl_opt_zero_divisors T with
+     rngl_opt_is_zero_divisor :=
+       match rngl_opt_is_zero_divisor T with
        | Some f => Some (λ i, f (i_val i))
        | None => None
        end;
@@ -627,13 +627,13 @@ Theorem I_opt_integral :
   let roi := I_ring_like_op in
   ∀ a b : ideal P,
   (a * b)%L = 0%L
-   → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
-progress unfold rngl_zero_divisor.
-progress unfold rngl_opt_zero_divisors.
+progress unfold rngl_is_zero_divisor.
+progress unfold rngl_opt_is_zero_divisor.
 cbn.
-remember (rngl_opt_zero_divisors T) as ozd eqn:Hozd.
+remember (rngl_opt_is_zero_divisor T) as ozd eqn:Hozd.
 symmetry in Hozd.
 apply eq_ideal_eq in Hab.
 cbn in Hab.
@@ -646,19 +646,19 @@ destruct Hab as [Hab| [Hab| Hab]]. {
 destruct ozd as [f| ]. {
   destruct Hab as [Hab| Hab]. {
     right; right; left.
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     cbn in Hozd.
-    destruct (rngl_opt_zero_divisors T); [ | easy ].
+    destruct (rngl_opt_is_zero_divisor T); [ | easy ].
     now injection Hozd; clear Hozd; intros; subst f.
   } {
     right; right; right.
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     cbn in Hozd.
-    destruct (rngl_opt_zero_divisors T); [ | easy ].
+    destruct (rngl_opt_is_zero_divisor T); [ | easy ].
     now injection Hozd; clear Hozd; intros; subst f.
   }
 }
-progress unfold rngl_zero_divisor in Hab.
+progress unfold rngl_is_zero_divisor in Hab.
 rewrite Hozd in Hab.
 now destruct Hab.
 Qed.

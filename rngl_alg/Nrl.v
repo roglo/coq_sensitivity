@@ -316,7 +316,7 @@ Instance Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_one := Some (Zn_of_nat n 1);
      rngl_opt_opp_or_subt := Some (inl (Zn_opp n));
      rngl_opt_inv_or_quot := Zn_opt_inv_or_quot n;
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some (Zn_eq_dec n);
      rngl_opt_leb := None |}.
 
@@ -355,7 +355,7 @@ Qed.
 Theorem Zn_integral :
   ∀ a b : Zn n,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.
@@ -441,7 +441,7 @@ Instance lcm_ring_like_op : ring_like_op nat :=
      rngl_opt_one := Some 1;
      rngl_opt_opp_or_subt := None;
      rngl_opt_inv_or_quot := None;
-     rngl_opt_zero_divisors := None;
+     rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := Some Nat.eq_dec;
      rngl_opt_leb := None |}.
 
@@ -463,7 +463,7 @@ Qed.
 Theorem lcm_opt_integral :
   ∀ a b : nat,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 apply Nat.eq_mul_1 in Hab.

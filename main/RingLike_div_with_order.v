@@ -133,13 +133,13 @@ destruct id. {
   apply rngl_opt_integral in Hab.
   destruct Hab as [Hab| [Hab| Hab]]; [ now left | now right | ].
   destruct Hab as [Hab| Hab]. {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   } {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   }
 }
 remember (rngl_has_inv T) as iv eqn:Hiv; symmetry in Hiv.

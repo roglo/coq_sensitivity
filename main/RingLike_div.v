@@ -245,13 +245,13 @@ destruct id. {
   apply rngl_opt_integral in Hab.
   destruct Hab as [Hab| [Hab| Hab]]; [ easy | easy | ].
   destruct Hab as [Hab| Hab]. {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   } {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   }
 }
 cbn in Hii.
@@ -297,13 +297,13 @@ destruct id. {
   apply rngl_opt_integral in Hab.
   destruct Hab as [Hab| [Hab| Hab]]; [ easy | easy | ].
   destruct Hab as [Hab| Hab]. {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   } {
-    progress unfold rngl_zero_divisor in Hab.
+    progress unfold rngl_is_zero_divisor in Hab.
     progress unfold rngl_is_integral_domain in Hid.
-    now destruct (rngl_opt_zero_divisors T).
+    now destruct (rngl_opt_is_zero_divisor T).
   }
 }
 cbn in Hii.

@@ -17,7 +17,7 @@ Instance Z_ring_like_op : ring_like_op Z :=
      rngl_opt_one := Some 1%Z;
      rngl_opt_opp_or_subt := Some (inl Z.opp);
      rngl_opt_inv_or_quot := Some (inr Z.quot);
-     rngl_opt_zero_divisors := None;
+     rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := Some Z.eq_dec;
      rngl_opt_leb := Some Z.leb |}.
 
@@ -29,7 +29,7 @@ Search (_ ÷ _ ÷ _)%Z.
 Theorem Z_integral :
   ∀ a b : Z,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 apply Z_eq_mul_0 in Hab.

@@ -53,7 +53,7 @@ Instance CReal_ring_like_op : ring_like_op CReal :=
      rngl_opt_one := Some 1%CReal;
      rngl_opt_opp_or_subt := Some (inl CReal_opp);
      rngl_opt_inv_or_quot := Some (inl CReal_inv');
-     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
+     rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some CReal_eq_dec;
      rngl_opt_leb := None (*Some CRealLe*) |}.
 
@@ -156,7 +156,7 @@ Qed.
 Theorem CReal_integral :
   ∀ a b : CReal,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.
@@ -242,7 +242,7 @@ Definition CComplex_ring_like_op : ring_like_op CComplex :=
      rngl_opt_one := Some CComplex_one;
      rngl_opt_opp_or_subt := Some (inl CComplex_opp);
      rngl_opt_inv_or_quot := Some (inl CComplex_inv);
-     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
+     rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None |}.
 
@@ -271,7 +271,7 @@ Instance reals_ring_like_op : ring_like_op R :=
      rngl_opt_one := Some R1;
      rngl_opt_opp_or_subt := Some (inl Ropp);
      rngl_opt_inv_or_quot := Some (inl Rinv);
-     rngl_opt_zero_divisors := None;
+     rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := None;
      rngl_opt_leb := None (*Some Rle*) |}.
 
@@ -311,7 +311,7 @@ Proof. intros; now rewrite Rmult_assoc. Qed.
 Theorem Rintegral :
   ∀ a b : R,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 apply Rmult_integral in Hab.

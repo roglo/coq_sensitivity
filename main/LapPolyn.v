@@ -529,7 +529,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_opt_one := lap_opt_one;
      rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := None; (*Some (lap_eqb rngl_zero rngl_eqb);*)
      rngl_opt_leb := None |}.
 
@@ -1845,7 +1845,7 @@ Theorem lap_polyn_integral :
   let rol := lap_ring_like_op in
   ∀ la lb : list T,
   (la * lb)%L = 0%L
-  → la = 0%L ∨ lb = 0%L ∨ rngl_zero_divisor la ∨ rngl_zero_divisor lb.
+  → la = 0%L ∨ lb = 0%L ∨ rngl_is_zero_divisor la ∨ rngl_is_zero_divisor lb.
 Proof.
 intros * Hab.
 now right; right; left.

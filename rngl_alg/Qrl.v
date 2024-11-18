@@ -20,7 +20,7 @@ Instance Q_ring_like_op : ring_like_op Q :=
      rngl_opt_one := Some 1%Q;
      rngl_opt_opp_or_subt := Some (inl Q.opp);
      rngl_opt_inv_or_quot := Some (inl Q.inv);
-     rngl_opt_zero_divisors := Some (λ _, True); (* to be improved *)
+     rngl_opt_is_zero_divisor := Some (λ _, True); (* to be improved *)
      rngl_opt_eq_dec := Some Q.eq_dec;
      rngl_opt_leb := Some Q_leb |}.
 
@@ -31,7 +31,7 @@ Global Existing Instance Q_ring_like_op.
 Theorem Q_integral :
   ∀ a b : Q,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.

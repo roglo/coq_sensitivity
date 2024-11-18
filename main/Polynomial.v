@@ -1224,7 +1224,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_one := Some polyn_one;
      rngl_opt_opp_or_subt := polyn_opt_opp_or_subt;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some polyn_eq_dec;
      rngl_opt_leb := None |}.
 
@@ -1943,7 +1943,7 @@ Theorem polyn_integral :
   let rop := polyn_ring_like_op in
   ∀ a b : polyn T,
   (a * b)%L = 0%L
-  → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.

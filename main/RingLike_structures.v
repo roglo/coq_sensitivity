@@ -7,13 +7,13 @@ Class ring_like_op T :=
     rngl_opt_one : option T;
     rngl_opt_opp_or_subt : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
-    rngl_opt_zero_divisors : option (T → Prop);
+    rngl_opt_is_zero_divisor : option (T → Prop);
     rngl_opt_eq_dec : option (∀ a b : T, {a = b} + {a ≠ b});
     rngl_opt_leb : option (T → T → bool) }.
 
 Arguments rngl_opt_opp_or_subt T {ring_like_op}.
 Arguments rngl_opt_inv_or_quot T {ring_like_op}.
-Arguments rngl_opt_zero_divisors T {ring_like_op}.
+Arguments rngl_opt_is_zero_divisor T {ring_like_op}.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with L.
@@ -77,13 +77,13 @@ Definition rngl_has_quot T {R : ring_like_op T} :=
   end.
 
 Definition rngl_is_integral_domain T {ro : ring_like_op T} :=
-  match rngl_opt_zero_divisors T with
+  match rngl_opt_is_zero_divisor T with
   | Some _ => false
   | None => true
   end.
 
-Definition rngl_zero_divisor {T} {ro : ring_like_op T} a :=
-  match rngl_opt_zero_divisors T with
+Definition rngl_is_zero_divisor {T} {ro : ring_like_op T} a :=
+  match rngl_opt_is_zero_divisor T with
   | Some f => f a
   | None => False
   end.
@@ -304,7 +304,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* zero divisors *)
     rngl_opt_integral :
       ∀ a b, (a * b = 0)%L
-      → a = 0%L ∨ b = 0%L ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b;
+      → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b;
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then

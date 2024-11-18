@@ -1854,7 +1854,7 @@ Definition QG_ring_like_op : ring_like_op QG :=
      rngl_opt_one := Some 1%QG;
      rngl_opt_opp_or_subt := Some (inl QG_opp);
      rngl_opt_inv_or_quot := Some (inl QG_inv);
-     rngl_opt_zero_divisors := Some (λ _, True);
+     rngl_opt_is_zero_divisor := Some (λ _, True);
      rngl_opt_eq_dec := Some QG_eq_dec;
      rngl_opt_leb := Some QG_leb |}.
 
@@ -1874,7 +1874,7 @@ Theorem QG_integral :
   let roq := QG_ring_like_op in
   ∀ a b : QG,
   (a * b)%QG = 0%QG
-  → a = 0%QG ∨ b = 0%QG ∨ rngl_zero_divisor a ∨ rngl_zero_divisor b.
+  → a = 0%QG ∨ b = 0%QG ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
 now right; right; left.
