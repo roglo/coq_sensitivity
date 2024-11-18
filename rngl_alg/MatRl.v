@@ -178,13 +178,13 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_one := Some (smI n);
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
-(*
+(**)
      rngl_opt_zero_divisors :=
        Some
          (λ M, if is_charac_0_field T then det (sm_mat M) = 0%L else True);
-*)
+(*
      rngl_opt_zero_divisors := Some (λ _, True);
-(**)
+*)
      rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
 
@@ -680,8 +680,9 @@ Theorem squ_mat_integral eq_dec n :
   (A * B)%L = 0%L
   → A = 0%L ∨ B = 0%L ∨ rngl_zero_divisor A ∨ rngl_zero_divisor B.
 Proof.
+(**)
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Hab.
-(*
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   left.
   apply square_matrix_eq; cbn.
@@ -709,6 +710,7 @@ destruct (mat_eq_dec eq_dec (sm_mat B) (sm_mat (smZ n))) as [Hbz| Hbz]. {
   now left; apply square_matrix_eq.
 }
 right.
+cbn in Haz, Hbz.
 remember (is_charac_0_field T) as cf eqn:Hcf.
 symmetry in Hcf.
 destruct cf; [ | now left ].
@@ -719,60 +721,38 @@ specialize mat_mul_inv_diag_l as H1.
 apply charac_0_field_iff in Hcf.
 specialize (H1 Hcf).
 specialize (H1 (sm_mat A)) as Ha.
+rewrite smat_nrows in Ha.
 specialize (Ha (square_matrix_is_square n A) Hda).
-(*
-Print square_matrix.
-Search (matrix _ → _ → square_matrix _ _).
-apply (f_equal (@Build_square_matrix n T)) in Ha.
-...
-*)
 apply (f_equal (@sm_mat n T)) in Hab.
 cbn in Hab.
 apply (f_equal (mat_mul (sm_mat A)⁻¹)) in Hab.
-Search (_ * mZ _ _)%M.
-Search (mZ _ _ * _)%M.
-About mat_mul_1_l.
-rewrite mat_mul_0_r in Hab.
-...
-rewrite mat_mul_0_r in Hab.
+rewrite (mat_mul_0_r Hos) in Hab; [ | easy ].
+rewrite mat_inv_nrows in Hab.
+rewrite smat_ncols in Hab.
 rewrite (mat_mul_assoc Hop) in Hab; cycle 1. {
   now rewrite smat_nrows.
 } {
   now rewrite smat_ncols.
 } {
   rewrite mat_inv_ncols.
-  cbn.
-  remember (mat_ncols (sm_mat A) =? 0) as cz eqn:Hcz.
-  symmetry in Hcz |-*.
-  destruct cz; [ | easy ].
-  apply Nat.eqb_eq in Hcz.
-  specialize (square_matrix_is_square n A) as H2.
-  progress unfold is_square_matrix in H2.
-  rewrite Hcz in H2.
-  cbn in H2.
-  apply Bool.andb_true_iff in H2.
-  destruct H2 as (H2, H3).
-  now apply Nat.eqb_eq in H2.
+  rewrite smat_nrows.
+  rewrite smat_ncols.
+  remember (n =? 0) as nz eqn:Hnz'.
+  symmetry in Hnz'.
+  destruct nz; [ | easy ].
+  now apply Nat.eqb_eq in Hnz'.
 }
 rewrite Ha in Hab.
-Search (mI _ * _)%M.
-rewrite (mat_mul_1_l Hon Hop) in Hab.
-...
-Search ((_ =? _) = true).
-apply Nat.eqb_neq in H2.
-...
-Search (mat_ncols _ = 0).
-Check is_correct_matrix.
-Print is_correct_matrix.
-Print is_square_matrix.
-Search is_square_matrix.
-Search is_correct_matrix.
-...
-Search (is_square_matrix (sm_mat _)).
-Search (is_square_matrix _ = true).
-...
-*)
+rewrite (mat_mul_1_l Hon Hop) in Hab; [ easy | | ]. {
+  apply square_matrix_is_correct.
+} {
+  symmetry.
+  apply smat_nrows.
+}
+(*
+intros * Hab.
 now right; right; left.
+*)
 Qed.
 
 Theorem squ_mat_characteristic_prop :

@@ -1704,6 +1704,15 @@ Qed.
 
 Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
 
+Theorem mat_inv_nrows : ∀ M, mat_nrows M⁻¹ = mat_ncols M.
+Proof.
+intros.
+unfold mat_inv.
+rewrite mat_mul_scal_l_nrows.
+rewrite mat_transp_nrows.
+apply comatrix_ncols.
+Qed.
+
 Theorem mat_inv_ncols : ∀ M,
   mat_ncols M⁻¹ = if mat_ncols M =? 0 then 0 else mat_nrows M.
 Proof.

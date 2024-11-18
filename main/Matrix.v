@@ -1108,11 +1108,12 @@ Qed.
 
 (* multiplication left and right with zero *)
 
-Theorem mat_mul_0_l : ∀ (M : matrix T) m n,
+Theorem mat_mul_0_l :
+  rngl_has_opp_or_subt T = true →
+  ∀ (M : matrix T) m n,
   (mZ m n * M)%M = mZ m (mat_ncols M).
 Proof.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros.
+intros Hos *.
 progress unfold mat_mul.
 progress unfold mZ.
 cbn.
@@ -1171,12 +1172,13 @@ f_equal. {
 }
 Qed.
 
-Theorem mat_mul_0_r : ∀ (M : matrix T) n p,
+Theorem mat_mul_0_r :
+  rngl_has_opp_or_subt T = true →
+  ∀ (M : matrix T) n p,
   n ≠ 0
   → (M * mZ n p)%M = mZ (mat_nrows M) p.
 Proof.
-specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-intros * Hnz.
+intros Hos * Hnz.
 progress unfold mat_mul.
 progress unfold mZ.
 progress unfold mat_list_list_mul.
