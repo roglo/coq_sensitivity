@@ -54,6 +54,7 @@ Qed.
    gives two proofs of the same thing, and I don't like that;
    it is the reason why I didn't add this distributivity in
    my ring-like axioms when there is subt and not opp.
+*)
 Theorem rngl_mul_0_r' :
   rngl_has_subt T = true →
   (∀ a b c, a * (b - c) = a * b - a * c)%L
@@ -67,10 +68,9 @@ intros rngl_mul_sub_distr_l a.
 specialize rngl_opt_add_sub as H1.
 specialize (rngl_mul_sub_distr_l a a a) as H2.
 progress unfold rngl_sub in H1.
-rewrite Hsu, Hop in H1.
-(**)
 progress unfold rngl_sub in H2.
-rewrite Hsu, Hop in H2.
+rewrite Hsu, Hop in H1, H2.
+(**)
 specialize (H1 0%L a) as H3.
 specialize (H1 0%L (a * a))%L.
 rewrite rngl_add_0_l in H1, H3.
@@ -98,7 +98,7 @@ rewrite H2 in H3.
 apply (f_equal (λ b, rngl_subt b (a * a))) in H3.
 now do 2 rewrite H1 in H3.
 Qed.
-*)
+(**)
 
 Theorem rngl_mul_0_l :
   rngl_has_opp_or_subt T = true →
