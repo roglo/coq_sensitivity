@@ -170,6 +170,9 @@ destruct H1 as [H1| H1]; [ left | right ]. {
 }
 Qed.
 
+Definition mat_zero_divisors n (M : square_matrix n T) :=
+  if is_charac_0_field T then det (sm_mat M) = 0%L else True.
+
 Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
     ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
@@ -179,29 +182,12 @@ Instance mat_ring_like_op (eq_dec : ∀ x y : T, {x = y} + {x ≠ y}) {n} :
      rngl_opt_opp_or_subt := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
 (**)
-     rngl_opt_zero_divisors :=
-       Some
-         (λ M, if is_charac_0_field T then det (sm_mat M) = 0%L else True);
+     rngl_opt_zero_divisors := Some (mat_zero_divisors n);
 (*
      rngl_opt_zero_divisors := Some (λ _, True);
 *)
      rngl_opt_eq_dec := Some (square_matrix_eq_dec eq_dec);
      rngl_opt_leb := None |}.
-
-(*
-Canonical Structure mat_ring_like_op.
-says:
-Warning: Projection value has no head constant:
-match rngl_opt_eqb with
-| Some eqb => Some (square_matrix_eqb eqb)
-| None => None
-end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it.
- [projection-no-head-constant,typechecker]
-*)
-
-(*
-Existing Instance mat_ring_like_op.
-*)
 
 Theorem mat_ncols_of_nat eq_dec {n} : ∀ i,
   let rom := mat_ring_like_op eq_dec in
@@ -220,12 +206,9 @@ Qed.
 
 Theorem sm_mat_of_nat :
   ∀ eq_dec n,
-  let rom := mat_ring_like_op eq_dec in
-  ∀ m,
-  sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
-(*
-  ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
-*)
+  let rom := @mat_ring_like_op eq_dec n in
+  ∀ m, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M.
+(**)
 Proof.
 intros; cbn.
 progress unfold rngl_of_nat.
@@ -249,16 +232,17 @@ rewrite mat_mul_scal_l_add_distr_r.
 now rewrite mat_mul_scal_1_l, IHm.
 Qed.
 
-Theorem mat_el_of_nat_diag {n} : ∀ eq_dec m i,
+Theorem mat_el_of_nat_diag {n} :
+  ∀ eq_dec m i,
   1 ≤ i ≤ n
+(**)
   → mat_el
       (sm_mat
          (@rngl_mul_nat (square_matrix n T) (mat_ring_like_op eq_dec)
             (smI _) m)) i i =
     rngl_of_nat m.
 (*
-  ∀ m i : nat, 1 ≤ i ≤ n →
-  mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+  → mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m.
 *)
 Proof.
 intros * Hin.
@@ -594,13 +578,8 @@ Qed.
 Theorem squ_mat_opt_add_opp_diag_l :
   ∀ {n} eq_dec,
   let rom := mat_ring_like_op eq_dec in
-  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op eq_dec) then
-    ∀ M : square_matrix n T, (- M + M)%L = 0%L
+  if rngl_has_opp (square_matrix n T) then ∀ M : square_matrix n T, (- M + M)%L = 0%L
   else not_applicable.
-(*
-  if rngl_has_opp then ∀ M : square_matrix n T, (- M + M)%L = 0%L
-  else not_applicable.
-*)
 Proof.
 intros.
 remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op eq_dec)) as b
@@ -637,42 +616,6 @@ symmetry; apply Hc.
 apply List_hd_in, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
-
-(*
-Theorem mat_opt_eqb_eq : ∀ eq_dec n,
-  match
-    @rngl_has_eq_dec (square_matrix n T) (@mat_ring_like_op eq_dec n)
-    return Prop
-  with
-  | true =>
-      forall a b : square_matrix n T,
-      iff
-        (@eq bool
-           (@rngl_eqb (square_matrix n T) (@mat_ring_like_op eq_dec n) a b)
-              true)
-           (@eq (square_matrix n T) a b)
-  | false => not_applicable
-  end.
-(*
-  (if square_matrix_eq_dec eq_dec a b then true else false) = true ↔ a = b
-*)
-Proof.
-cbn.
-cbn; intros.
-split; intros Hab. {
-  destruct (square_matrix_eq_dec eq_dec a b) as [H1| H1]; [ | easy ].
-...
-cbn; intros.
-split; intros Hab. {
-  apply mat_eqb_eq in Hab; [ | easy ].
-  now apply square_matrix_eq.
-} {
-  subst b; cbn.
-  unfold square_matrix_eqb.
-  now apply mat_eqb_eq.
-}
-Qed.
-*)
 
 Theorem squ_mat_integral eq_dec n :
   let rom := @mat_ring_like_op eq_dec n in
@@ -711,6 +654,7 @@ destruct (mat_eq_dec eq_dec (sm_mat B) (sm_mat (smZ n))) as [Hbz| Hbz]. {
 }
 right.
 cbn in Haz, Hbz.
+progress unfold mat_zero_divisors.
 remember (is_charac_0_field T) as cf eqn:Hcf.
 symmetry in Hcf.
 destruct cf; [ | now left ].
