@@ -77,20 +77,6 @@ rewrite Hsu, Hop in H2, H3.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)
 *)
-(*
-(* il suffirait de n'avoir que a-a=0 *)
-(* et donc, est-ce a*(b-c)=ab-ac et a-a=0 suffiraient à prouver
-   que a+b-b=a ? *)
-assert (H : ∀ a, rngl_subt a a = 0%L). {
-  intros d.
-  specialize (H2 0 d)%L.
-  now rewrite H1 in H2.
-}
-move H before H2; clear H2; rename H into H2.
-specialize (H3 a 0 0)%L.
-now do 2 rewrite H2 in H3.
-...
-*)
 specialize (H2 0%L a) as H4.
 specialize (H2 0%L (a * a))%L.
 specialize (H3 a a a).
@@ -117,71 +103,14 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
-(*
-assert (H : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)). {
-  rename a into d.
-  intros.
-  specialize (rngl_mul_add_distr_l a (rngl_subt b c) c) as H4.
-  apply (f_equal (λ x, rngl_subt x (a * c)))%L in H4.
-  rewrite H2 in H4.
-  symmetry in H4.
-  rewrite H4; clear H4.
-...
-Check rngl_opt_sub_add_distr.
-specialize (rngl_opt_sub_add_distr) as H4.
-progress unfold rngl_sub in H4.
-rewrite Hsu, Hop in H4.
-specialize (H4 (a * b + a * b) (a * b) (a * c))%L.
-rewrite H2 in H4.
-f_equal; f_equal.
-rewrite H4.
-...
-  f_equal.
-  f_equal.
-  (* b - c + c = b
-     should be true if b ≥ c, but in this context, the order relation is
-     not supposed to be necessarily true *)
-...
-*)
-(*
 specialize (eq_refl (a * 0))%L as H4.
 rewrite <- (H1 0)%L in H4 at 1.
 rewrite H3 in H4.
-(* est-ce que a+a=a implique a=0 ? *)
-Theorem rngl_add_same_eq_same : ∀ a, (a + a = a → a = 0)%L.
-Proof.
-intros * Haa.
-rewrite <- Haa.
-Require Import RingLike_add_with_order.
-Search (_ + _ = 0)%L.
-Check rngl_eq_add_0.
-Theorem glop : ∀ a b, (a + b = 0 → a = 0 ∧ b = 0)%L.
-Proof.
-intros * Hab.
-(* ah bin non, c'est pas vrai *)
-Theorem glip : ∀ a, (a + a = a → a = a - a)%L.
-Proof.
-intros * Haa.
-rewrite <- Haa at 3.
-rewrite rngl_sub_add_distr.
-...
-Search (_ + _ = 0)%nat.
-Check rngl_eq_add_0.
-Theorem eq_rngl_add_0 :
-
-...
-Search (_ + _ = _ → _ = 0)%nat.
-Search (_ + _ = _ ↔ _ = 0)%nat.
-Search (_ = 0 ↔ _ + _ = _)%nat.
-...
+(* Does a+a=a imply a=0 ? *)
+(* Yes, if there is an opposite or a subtraction,
+   Otherwise, mystery... *)
 apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
 rewrite <- (H1 (a * 0))%L in H4 at 4.
-now do 2 rewrite H2 in H4.
-*)
-specialize (H1 (a * 0))%L as H4.
-rewrite <- (H1 0)%L in H4 at 3.
-rewrite H3 in H4.
-apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
 now do 2 rewrite H2 in H4.
 Qed.
 (**)
