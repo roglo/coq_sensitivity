@@ -102,13 +102,12 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
-specialize (H1 (a * a))%L.
-specialize (H3 a 0%L a).
-symmetry in H1.
-rewrite <- (rngl_add_0_l a) in H1 at 2.
-rewrite H3 in H1.
-apply (f_equal (λ b, rngl_subt b (a * a))) in H1.
-now do 2 rewrite H2 in H1.
+specialize (H1 (a * a))%L as H4.
+symmetry in H4.
+rewrite <- (H1 a) in H4 at 2.
+rewrite H3 in H4.
+apply (f_equal (λ b, rngl_subt b (a * a))) in H4.
+now do 2 rewrite H2 in H4.
 Qed.
 (**)
 
