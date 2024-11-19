@@ -49,13 +49,14 @@
     \end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Context}
+\begin{frame}{State of the Art}
   \begin{itemize}
-    \item close to ``rational trigonometry'':  Norman Wildberger,\\ but:
+    \item Close to ``rational trigonometry'': Norman Wildberger
+      (2005),\\ but:
       \begin{itemize}
-      \item angle / spread
-      \item square root / quadrance
-      \item maths / computation
+      \item spread / angle
+      \item quadrance / square root
+      \item computation / maths
       \end{itemize}
     \uncover<2->{
     \item all proofs are in Coq
@@ -228,8 +229,8 @@
 
 \begin{frame}{Trying to define the division of an angle by a natural}
   \begin{textblock}{10}(1,2)
-    $\displaystyle \frac{\theta}{n} ::\stackrel{\scriptscriptstyle
-      ?}{=} \sum_{k=1}^\infty{\; \frac{a_k \; \theta}{2^k}}$
+    $\displaystyle \frac{\theta}{n} ::= \sum_{k=1}^\infty{\; \frac{a_k
+        \; \theta}{2^k}}$
     \hspace{1cm}$a_k = \left\lfloor \frac{2^k}{n} \right\rfloor
            {\scriptstyle mod \; 2}$
     \only<2>{
