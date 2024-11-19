@@ -66,10 +66,21 @@ apply rngl_has_subt_has_no_opp in Hop.
 intros rngl_mul_sub_distr_l a.
 (**)
 specialize rngl_opt_add_sub as H1.
-specialize (rngl_mul_sub_distr_l a a a) as H2.
+specialize (rngl_mul_sub_distr_l) as H2.
+specialize (rngl_mul_add_distr_l a 0%L a) as H2'.
 progress unfold rngl_sub in H1.
 progress unfold rngl_sub in H2.
 rewrite Hsu, Hop in H1, H2.
+specialize (H2 a a a) as H2.
+(*
+specialize (H1 (0 + a) a)%L as H1'.
+rewrite <- H1' in H2'.
+...
+rewrite rngl_add_0_l, rngl_add_0_r in H2'.
+clear H1'.
+specialize (H1 (a * 0) (a * a))%L as H1'.
+rewrite <- H1' in H2'.
+*)
 (**)
 specialize (H1 0%L a) as H3.
 specialize (H1 0%L (a * a))%L.
