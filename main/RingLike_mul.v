@@ -2,6 +2,7 @@
    This file deals with multiplication properties in ring-like structures.
    It defines theorems that do not require an order relation. *)
 
+Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
 Require Import RingLike_structures.
 Require Import RingLike_add.
@@ -77,10 +78,17 @@ rewrite Hsu, Hop in H2, H3.
   H3 : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)
 *)
 (*
-specialize (H3 a 0 0)%L.
 (* il suffirait de n'avoir que a-a=0 *)
 (* et donc, est-ce a*(b-c)=ab-ac et a-a=0 suffiraient à prouver
    que a+b-b=a ? *)
+assert (H : ∀ a, rngl_subt a a = 0%L). {
+  intros d.
+  specialize (H2 0 d)%L.
+  now rewrite H1 in H2.
+}
+move H before H2; clear H2; rename H into H2.
+specialize (H3 a 0 0)%L.
+now do 2 rewrite H2 in H3.
 ...
 *)
 specialize (H2 0%L a) as H4.
@@ -118,7 +126,6 @@ assert (H : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)). {
   rewrite H2 in H4.
   symmetry in H4.
   rewrite H4; clear H4.
-(*
 ...
 Check rngl_opt_sub_add_distr.
 specialize (rngl_opt_sub_add_distr) as H4.
@@ -129,7 +136,6 @@ rewrite H2 in H4.
 f_equal; f_equal.
 rewrite H4.
 ...
-*)
   f_equal.
   f_equal.
   (* b - c + c = b
@@ -137,11 +143,45 @@ rewrite H4.
      not supposed to be necessarily true *)
 ...
 *)
-specialize (H1 (a * a))%L as H4.
-symmetry in H4.
-rewrite <- (H1 a) in H4 at 2.
+(*
+specialize (eq_refl (a * 0))%L as H4.
+rewrite <- (H1 0)%L in H4 at 1.
 rewrite H3 in H4.
-apply (f_equal (λ b, rngl_subt b (a * a))) in H4.
+(* est-ce que a+a=a implique a=0 ? *)
+Theorem rngl_add_same_eq_same : ∀ a, (a + a = a → a = 0)%L.
+Proof.
+intros * Haa.
+rewrite <- Haa.
+Require Import RingLike_add_with_order.
+Search (_ + _ = 0)%L.
+Check rngl_eq_add_0.
+Theorem glop : ∀ a b, (a + b = 0 → a = 0 ∧ b = 0)%L.
+Proof.
+intros * Hab.
+(* ah bin non, c'est pas vrai *)
+Theorem glip : ∀ a, (a + a = a → a = a - a)%L.
+Proof.
+intros * Haa.
+rewrite <- Haa at 3.
+rewrite rngl_sub_add_distr.
+...
+Search (_ + _ = 0)%nat.
+Check rngl_eq_add_0.
+Theorem eq_rngl_add_0 :
+
+...
+Search (_ + _ = _ → _ = 0)%nat.
+Search (_ + _ = _ ↔ _ = 0)%nat.
+Search (_ = 0 ↔ _ + _ = _)%nat.
+...
+apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
+rewrite <- (H1 (a * 0))%L in H4 at 4.
+now do 2 rewrite H2 in H4.
+*)
+specialize (H1 (a * 0))%L as H4.
+rewrite <- (H1 0)%L in H4 at 3.
+rewrite H3 in H4.
+apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
 now do 2 rewrite H2 in H4.
 Qed.
 (**)
