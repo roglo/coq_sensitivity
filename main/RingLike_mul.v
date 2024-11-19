@@ -65,27 +65,22 @@ generalize Hsu; intros Hop.
 apply rngl_has_subt_has_no_opp in Hop.
 intros rngl_mul_sub_distr_l a.
 (**)
-specialize rngl_opt_add_sub as H1.
-specialize (rngl_mul_sub_distr_l) as H2.
-specialize (rngl_mul_add_distr_l a 0%L a) as H2'.
-progress unfold rngl_sub in H1.
+specialize rngl_add_0_l as H1.
+specialize rngl_opt_add_sub as H2.
+specialize (rngl_mul_sub_distr_l) as H3.
 progress unfold rngl_sub in H2.
-rewrite Hsu, Hop in H1, H2.
-specialize (H2 a a a) as H2.
+progress unfold rngl_sub in H3.
+rewrite Hsu, Hop in H2, H3.
 (*
-specialize (H1 (0 + a) a)%L as H1'.
-rewrite <- H1' in H2'.
-...
-rewrite rngl_add_0_l, rngl_add_0_r in H2'.
-clear H1'.
-specialize (H1 (a * 0) (a * a))%L as H1'.
-rewrite <- H1' in H2'.
+  H1 : ∀ a : T, (0 + a)%L = a
+  H2 : ∀ a b : T, rngl_subt (a + b) b = a
+  H3 : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)
 *)
-(**)
-specialize (H1 0%L a) as H3.
-specialize (H1 0%L (a * a))%L.
-rewrite rngl_add_0_l in H1, H3.
-now rewrite H1, H3 in H2.
+specialize (H2 0%L a) as H4.
+specialize (H2 0%L (a * a))%L.
+specialize (H3 a a a).
+rewrite H1 in H2, H4.
+now rewrite H2, H4 in H3.
 Qed.
 
 Theorem rngl_mul_0_r'' :
@@ -97,17 +92,23 @@ generalize Hsu; intros Hop.
 apply rngl_has_subt_has_no_opp in Hop.
 intros.
 (**)
-specialize rngl_opt_add_sub as H1.
-specialize (rngl_mul_add_distr_l a 0%L a) as H2.
-specialize (rngl_add_0_l (a * a))%L as H3.
-progress unfold rngl_sub in H1.
-rewrite Hsu, Hop in H1.
-(**)
-symmetry in H3.
-rewrite <- (rngl_add_0_l a) in H3 at 2.
-rewrite H2 in H3.
-apply (f_equal (λ b, rngl_subt b (a * a))) in H3.
-now do 2 rewrite H1 in H3.
+specialize rngl_add_0_l as H1.
+specialize rngl_opt_add_sub as H2.
+specialize rngl_mul_add_distr_l as H3.
+progress unfold rngl_sub in H2.
+rewrite Hsu, Hop in H2.
+(*
+  H1 : ∀ a : T, (0 + a)%L = a
+  H2 : ∀ a b : T, rngl_subt (a + b) b = a
+  H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
+*)
+specialize (H1 (a * a))%L.
+specialize (H3 a 0%L a).
+symmetry in H1.
+rewrite <- (rngl_add_0_l a) in H1 at 2.
+rewrite H3 in H1.
+apply (f_equal (λ b, rngl_subt b (a * a))) in H1.
+now do 2 rewrite H2 in H1.
 Qed.
 (**)
 
