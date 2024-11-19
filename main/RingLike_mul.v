@@ -76,6 +76,13 @@ rewrite Hsu, Hop in H2, H3.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)
 *)
+(*
+specialize (H3 a 0 0)%L.
+(* il suffirait de n'avoir que a-a=0 *)
+(* et donc, est-ce a*(b-c)=ab-ac et a-a=0 suffiraient à prouver
+   que a+b-b=a ? *)
+...
+*)
 specialize (H2 0%L a) as H4.
 specialize (H2 0%L (a * a))%L.
 specialize (H3 a a a).
@@ -110,7 +117,19 @@ assert (H : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)). {
   apply (f_equal (λ x, rngl_subt x (a * c)))%L in H4.
   rewrite H2 in H4.
   symmetry in H4.
-  rewrite H4.
+  rewrite H4; clear H4.
+(*
+...
+Check rngl_opt_sub_add_distr.
+specialize (rngl_opt_sub_add_distr) as H4.
+progress unfold rngl_sub in H4.
+rewrite Hsu, Hop in H4.
+specialize (H4 (a * b + a * b) (a * b) (a * c))%L.
+rewrite H2 in H4.
+f_equal; f_equal.
+rewrite H4.
+...
+*)
   f_equal.
   f_equal.
   (* b - c + c = b
