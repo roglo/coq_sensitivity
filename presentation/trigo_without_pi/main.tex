@@ -220,41 +220,50 @@
 \end{frame}
 
 \begin{frame}{Trying to define the division of an angle by a natural}
-  \begin{textblock}{10}(1,2)
+  \begin{textblock}{10}(1,1.3)
     $\displaystyle \frac{\theta}{n} ::= \sum_{k=1}^\infty{\; \frac{a_k
         \; \theta}{2^k}}$
     \hspace{1cm}$a_k = \left\lfloor \frac{2^k}{n} \right\rfloor
            {\scriptstyle mod \; 2}$
     \only<2>{
       \\
-      \vspace{5mm}
+      \vspace{4mm}
       $\displaystyle \theta_m ::= \sum_{k=1}^m{\; \frac{a_k \;
           \theta}{2^k}}$
     }
     \only<3>{
       \\
-      \vspace{5mm}
+      \vspace{4mm}
       $\displaystyle \theta_m ::= \sum_{k=1}^m{\; \frac{a_k \;
           \theta}{2^k}} = \left\lfloor \frac{2^m}{n} \right\rfloor
       \frac{\theta}{2^m}$
     }
     \only<4->{
       \\
-      \vspace{5mm}
+      \vspace{4mm}
       $\displaystyle \theta_m ::= \left\lfloor \frac{2^m}{n}
       \right\rfloor \frac{\theta}{2^m}$
     }
     \only<5->{
       \\
-      \vspace{5mm}
+      \vspace{4mm}
       Things to prove, and indeed proven in Coq:
-      \vspace{3mm}
+      \vspace{2mm}
       \begin{itemize}
       \item $(\theta_m)$ is a Cauchy sequence
       \item the set of Angles is complete
       \item if $\displaystyle \lim_{m \rightarrow \infty}{\theta_m} = \theta'$ then
         $n \; \theta' = \theta$
       \end{itemize}
+      \only<6->{
+        \vspace{1mm}
+        \hspace{3cm}
+        \fbox{
+          $ \displaystyle \frac{\theta}{n} ::=\lim_{m \rightarrow
+            \infty} { \left\lfloor \frac{2^m}{n} \right\rfloor
+            \frac{\theta}{2^m} }$
+        }
+      }
     }
   \end{textblock}
 \end{frame}
