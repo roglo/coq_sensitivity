@@ -102,6 +102,22 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
+(*
+assert (H : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)). {
+  rename a into d.
+  intros.
+  specialize (rngl_mul_add_distr_l a (rngl_subt b c) c) as H4.
+  apply (f_equal (λ x, rngl_subt x (a * c)))%L in H4.
+  rewrite H2 in H4.
+  symmetry in H4.
+  rewrite H4.
+  f_equal.
+  f_equal.
+  (* b - c + c = b
+     should be true if b ≥ c, but in this context, the order relation is
+     not supposed to be necessarily true *)
+...
+*)
 specialize (H1 (a * a))%L as H4.
 symmetry in H4.
 rewrite <- (H1 a) in H4 at 2.
