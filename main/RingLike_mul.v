@@ -50,12 +50,11 @@ rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
-(* if I add the distributivity multiplication/subtraction as an
-   axiom, the same theorem above can be proved using it, which
-   gives two proofs of the same thing, and I don't like that;
-   it is the reason why I didn't add this distributivity in
-   my ring-like axioms when there is subt and not opp.
-*)
+(* if I add the distributivity multiplication/subtraction as an axiom,
+   the same theorem above can be proved using it, which gives two
+   proofs of the same thing, and I don't like that; it is the reason
+   why I hesitate to add this distributivity in my ring-like axioms
+   when there is a subtraction but no opposite.  *)
 Theorem rngl_mul_0_r' :
   rngl_has_subt T = true →
   (∀ a b c, a * (b - c) = a * b - a * c)%L
