@@ -104,16 +104,14 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
-specialize (eq_refl (a * 0))%L as H4.
-rewrite <- (H1 0)%L in H4 at 1.
-rewrite H3 in H4.
+specialize (H2 (a * 0) (a * 0))%L as H.
+rewrite <- H3, H1 in H.
+rewrite <- (H1 (a * 0))%L in H at 1.
+now rewrite H2 in H.
 (* Does a+a=a imply a=0 ? *)
 (* Yes, if there is an opposite or a subtraction,
    Otherwise, false. Example: (ℕ, +=lcm, *=* ),
    because ∀ a, lcm a a = a *)
-apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
-rewrite <- (H1 (a * 0))%L in H4 at 4.
-now do 2 rewrite H2 in H4.
 Qed.
 (**)
 
