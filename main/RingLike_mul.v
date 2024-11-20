@@ -55,6 +55,9 @@ Qed.
    proofs of the same thing, and I don't like that; it is the reason
    why I hesitate to add this distributivity in my ring-like axioms
    when there is a subtraction but no opposite.  *)
+
+(* a.0 = a.(b-b) = a.b - a.b = 0
+   (any b can be chosen: a, 0, 1, ...) *)
 Theorem rngl_mul_0_r' :
   rngl_has_subt T = true →
   (∀ a b c, a * (b - c) = a * b - a * c)%L
@@ -78,19 +81,22 @@ rewrite Hsu, Hop in H2, H3.
 *)
 (* it seems that the theorem a-a=0 is sufficient, no need to have
    the full a+b-b=a for all a and b *)
-specialize (H3 a a a) as H.
-(* a.(a - a) = a.a - a.a *)
-rewrite <- (H1 a) in H at 2.
-(* a.(0 + a - a) = a.a - a.a *)
+set (b := 0%L).
+specialize (H3 a b b) as H.
+(* a.(b - b) = a.b - a.b *)
+rewrite <- (H1 b) in H at 1.
+(* a.(0 + b - b) = a.b - a.b *)
 rewrite H2 in H.
-(* a.0 = a.a - a.a *)
-rewrite <- (H1 (a * a))%L in H at 1.
-(* a.0 = 0 + a.a - a.a *)
+(* a.0 = a.b - a.b *)
+rewrite <- (H1 (a * b))%L in H at 1.
+(* a.0 = 0 + a.b - a.b *)
 rewrite H2 in H.
 (* a.0 = 0 *)
 easy.
 Qed.
 
+(* a.0 = a.0 + a.b - a.b = a.(0+b) - a.b = a.b - a.b = 0
+   (any b can be chosen: a, 0, 1, ...) *)
 Theorem rngl_mul_0_r'' :
   rngl_has_subt T = true →
   ∀ a, (a * 0 = 0)%L.
@@ -110,15 +116,16 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
-specialize (H2 (a * 0) (a * 0))%L as H.
+set (b := 0%L).
+specialize (H2 (a * 0) (a * b))%L as H.
 symmetry in H.
-(* a.0 = a.0 + a.0 - a.0 *)
+(* a.0 = a.0 + a.b - a.b *)
 rewrite <- (H3 a) in H at 1.
-(* a.0 = a.(0 + 0) - a.0 *)
+(* a.0 = a.(0 + b) - a.b *)
 rewrite H1 in H.
-(* a.0 = a.0 - a.0 *)
-rewrite <- (H1 (a * 0))%L in H at 2.
-(* a.0 = 0 + a.0 - a.0 *)
+(* a.0 = a.b - a.b *)
+rewrite <- (H1 (a * b))%L in H at 1.
+(* a.0 = 0 + a.b - a.b *)
 rewrite H2 in H.
 (* a.0 = 0 *)
 easy.
