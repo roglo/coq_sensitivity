@@ -76,6 +76,8 @@ rewrite Hsu, Hop in H2, H3.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * rngl_subt b c)%L = rngl_subt (a * b) (a * c)
 *)
+(* it seems that the theorem a-a=0 is sufficient, no need to have
+   the full a+b-b=a for all a and b *)
 specialize (H2 0%L a) as H4.
 specialize (H2 0%L (a * a))%L.
 specialize (H3 a a a).
