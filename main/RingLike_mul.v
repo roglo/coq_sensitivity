@@ -102,6 +102,24 @@ rewrite Hsu, Hop in H2.
   H2 : ∀ a b : T, rngl_subt (a + b) b = a
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
+(* could be proven like this, hopefully being more readable?
+assert (H5 : (a * 0 = a * (0 + 0))%L) by now rewrite rngl_add_0_l; apply eq_refl.
+assert (H6 : (a * 0 = a * 0 + a * 0)%L) by now rewrite <- rngl_mul_add_distr_l.
+clear H5; rename H6 into H5.
+remember (a * 0)%L as b eqn:Hb.
+assert (H6 : (b = b + b)%L) by easy.
+clear H5; rename H6 into H5.
+assert (H6 : (rngl_subt b b = rngl_subt (b + b) b)%L) by now f_equal.
+clear H5; rename H6 into H5.
+assert (H6 : (rngl_subt b b = b)%L) by now rewrite H2 in H5.
+clear H5; rename H6 into H5.
+assert (H6 : (rngl_subt (0 + b) b = b)%L) by now rewrite H1.
+clear H5; rename H6 into H5.
+assert (H6 : (0 = b)%L) by now rewrite H2 in H5.
+clear H5; rename H6 into H5.
+easy.
+... but, ok, let's prove it the usual way:
+*)
 specialize (eq_refl (a * 0))%L as H4.
 rewrite <- (H1 0)%L in H4 at 1.
 rewrite H3 in H4.
