@@ -108,7 +108,8 @@ rewrite <- (H1 0)%L in H4 at 1.
 rewrite H3 in H4.
 (* Does a+a=a imply a=0 ? *)
 (* Yes, if there is an opposite or a subtraction,
-   Otherwise, mystery... *)
+   Otherwise, false. Example: (ℕ, +=lcm, *=* ),
+   because ∀ a, lcm a a = a *)
 apply (f_equal (λ b, rngl_subt b (a * 0))) in H4.
 rewrite <- (H1 (a * 0))%L in H4 at 4.
 now do 2 rewrite H2 in H4.
