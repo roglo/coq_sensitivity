@@ -78,11 +78,17 @@ rewrite Hsu, Hop in H2, H3.
 *)
 (* it seems that the theorem a-a=0 is sufficient, no need to have
    the full a+b-b=a for all a and b *)
-specialize (H2 0%L a) as H4.
-specialize (H2 0%L (a * a))%L.
-specialize (H3 a a a).
-rewrite H1 in H2, H4.
-now rewrite H2, H4 in H3.
+specialize (H3 a a a) as H.
+(* a.(a - a) = a.a - a.a *)
+rewrite <- (H1 a) in H at 2.
+(* a.(0 + a - a) = a.a - a.a *)
+rewrite H2 in H.
+(* a.0 = a.a - a.a *)
+rewrite <- (H1 (a * a))%L in H at 1.
+(* a.0 = 0 + a.a - a.a *)
+rewrite H2 in H.
+(* a.0 = 0 *)
+easy.
 Qed.
 
 Theorem rngl_mul_0_r'' :
@@ -105,9 +111,17 @@ rewrite Hsu, Hop in H2.
   H3 : ∀ a b c : T, (a * (b + c))%L = (a * b + a * c)%L
 *)
 specialize (H2 (a * 0) (a * 0))%L as H.
-rewrite <- H3, H1 in H.
-rewrite <- (H1 (a * 0))%L in H at 1.
-now rewrite H2 in H.
+symmetry in H.
+(* a.0 = a.0 + a.0 - a.0 *)
+rewrite <- (H3 a) in H at 1.
+(* a.0 = a.(0 + 0) - a.0 *)
+rewrite H1 in H.
+(* a.0 = a.0 - a.0 *)
+rewrite <- (H1 (a * 0))%L in H at 2.
+(* a.0 = 0 + a.0 - a.0 *)
+rewrite H2 in H.
+(* a.0 = 0 *)
+easy.
 (* Does a+a=a imply a=0 ? *)
 (* Yes, if there is an opposite or a subtraction,
    Otherwise, false. Example: (ℕ, +=lcm, *=* ),
