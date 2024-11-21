@@ -40,21 +40,6 @@ move rr after rp.
 apply rngl_ord_mul_le_compat_nonpos.
 Qed.
 
-Theorem rngl_mul_le_compat_non_opp :
-  rngl_has_opp T = false →
-  rngl_is_ordered T = true →
-  ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L.
-Proof.
-intros Hop Hor * Hac Hbd.
-specialize rngl_opt_ord as rr.
-rewrite Hor in rr.
-move rr after rp.
-specialize rngl_ord_mul_le_compat_non_opp as H.
-rewrite Hop in H.
-cbn in H.
-now apply H.
-Qed.
-
 Theorem rngl_mul_le_compat_nonpos_nonneg :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →

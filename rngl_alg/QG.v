@@ -1867,7 +1867,6 @@ Definition QG_ring_like_ord :=
      rngl_ord_add_le_compat := QG_add_le_compat;
      rngl_ord_mul_le_compat_nonneg := QG_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := QG_mul_le_compat_nonpos;
-     rngl_ord_mul_le_compat_non_opp := NA;
      rngl_ord_not_le := QG_not_le |}.
 
 Theorem QG_integral :

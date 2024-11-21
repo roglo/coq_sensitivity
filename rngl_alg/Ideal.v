@@ -534,42 +534,6 @@ destruct rngl_opt_leb; [ cbn in H1 | easy ].
 now apply H2.
 Qed.
 
-Theorem I_ord_mul_le_compat_non_opp :
-  let roi := I_ring_like_op in
-  rngl_is_ordered (ideal P) = true →
-  if negb (rngl_has_opp (ideal P)) then
-    ∀ a b c d : ideal P, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
-  else not_applicable.
-Proof.
-intros roi Hor.
-remember (rngl_has_opp (ideal P)) as op eqn:Hop.
-symmetry in Hop.
-destruct op; [ easy | cbn ].
-intros * Hac Hbd.
-specialize rngl_ord_mul_le_compat_non_opp as H2.
-progress unfold rngl_has_opp in Hop.
-progress unfold rngl_has_opp in H2.
-cbn in Hop.
-progress unfold rngl_le in Hac.
-progress unfold rngl_le in Hbd.
-progress unfold rngl_le.
-cbn in Hac, Hbd |-*.
-progress unfold I_opt_leb in Hac.
-progress unfold I_opt_leb in Hbd.
-progress unfold I_opt_leb.
-specialize rngl_opt_ord as H1.
-progress unfold rngl_is_ordered in Hor; cbn in Hor.
-progress unfold I_opt_leb in Hor.
-progress unfold rngl_is_ordered in H1.
-progress unfold rngl_le in H2.
-destruct rngl_opt_leb; [ cbn in H1 | easy ].
-destruct (rngl_opt_opp_or_subt T) as [[os| os]| ]; [ easy | | ]. {
-  now apply H2.
-} {
-  now apply H2.
-}
-Qed.
-
 Theorem I_ord_not_le :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
@@ -726,7 +690,6 @@ Definition I_ring_like_when_ord (Hor : rngl_is_ordered (ideal P) = true) :=
      rngl_ord_add_le_compat := I_ord_add_le_compat Hor;
      rngl_ord_mul_le_compat_nonneg := I_ord_mul_le_compat_nonneg Hor;
      rngl_ord_mul_le_compat_nonpos := I_ord_mul_le_compat_nonpos Hor;
-     rngl_ord_mul_le_compat_non_opp := I_ord_mul_le_compat_non_opp Hor;
      rngl_ord_not_le := I_ord_not_le Hor |}.
 
 Theorem I_ring_like_ord :

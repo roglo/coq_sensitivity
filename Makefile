@@ -1,7 +1,7 @@
 all:
-	cd main; $(MAKE) $(MFLAGS)
-	cd trigo_without_pi; $(MAKE) $(MFLAGS)
-	cd rngl_alg; $(MAKE) $(MFLAGS)
+	-cd main; $(MAKE) $(MFLAGS)
+	-cd trigo_without_pi; $(MAKE) $(MFLAGS)
+	-cd rngl_alg; $(MAKE) $(MFLAGS)
 
 clean:
 	cd main; $(MAKE) clean

@@ -48,16 +48,6 @@ intros * Hbz.
 now apply Nat.div_mul.
 Qed.
 
-Theorem Nat_mul_le_compat_non_opp :
-  ∀ a b c d : nat,
-  (a <=? c) = true → (b <=? d) = true → (a * b <=? c * d) = true.
-Proof.
-intros * Hab Hcd.
-apply Nat.leb_le in Hab, Hcd.
-apply Nat.leb_le.
-now apply Nat.mul_le_mono.
-Qed.
-
 Theorem Nat_not_le :
   ∀ a b : nat, (a <=? b) ≠ true → a ≠ b ∧ (b <=? a) = true.
 Proof.
@@ -158,7 +148,6 @@ Definition nat_ring_like_ord :=
      rngl_ord_add_le_compat := Nat_add_le_compat;
      rngl_ord_mul_le_compat_nonneg := Nat_mul_le_compat_nonneg;
      rngl_ord_mul_le_compat_nonpos := Nat_mul_le_compat_nonpos;
-     rngl_ord_mul_le_compat_non_opp := Nat_mul_le_compat_non_opp;
      rngl_ord_not_le := Nat_not_le |}.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
