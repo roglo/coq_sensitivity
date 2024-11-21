@@ -141,6 +141,15 @@ apply Nat.leb_le.
 now apply Nat.mul_le_mono_nonneg.
 Qed.
 
+Theorem Nat_mul_le_compat_nonpos :
+  ∀ a b c d : nat, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
+Proof.
+intros * (Hza, Hac) (Hzb, Hbd).
+apply Nat.leb_le in Hza, Hac, Hzb, Hbd.
+apply Nat.le_0_r in Hac, Hbd.
+now subst a b.
+Qed.
+
 Definition nat_ring_like_ord :=
   {| rngl_ord_le_dec := Nat_opt_le_dec;
      rngl_ord_le_refl := Nat.leb_refl;
@@ -148,7 +157,7 @@ Definition nat_ring_like_ord :=
      rngl_ord_le_trans := Nat_le_trans;
      rngl_ord_add_le_compat := Nat_add_le_compat;
      rngl_ord_mul_le_compat_nonneg := Nat_mul_le_compat_nonneg;
-     rngl_ord_mul_le_compat_nonpos := NA;
+     rngl_ord_mul_le_compat_nonpos := Nat_mul_le_compat_nonpos;
      rngl_ord_mul_le_compat_non_opp := Nat_mul_le_compat_non_opp;
      rngl_ord_not_le := Nat_not_le |}.
 

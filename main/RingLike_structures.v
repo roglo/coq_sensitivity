@@ -239,9 +239,7 @@ Class ring_like_ord T {ro : ring_like_op T} :=
     rngl_ord_mul_le_compat_nonneg :
       ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L;
     rngl_ord_mul_le_compat_nonpos :
-      if rngl_has_opp T then
-        ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-      else not_applicable;
+      ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L;
     rngl_ord_mul_le_compat_non_opp :
       if negb (rngl_has_opp T) then
         ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L

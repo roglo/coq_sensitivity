@@ -26,8 +26,8 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros  * Hs1z Hs2z Hc1z Hc2z.
 cbn.
 apply (rngl_add_nonneg_pos Hor).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
-now apply (rngl_mul_pos_pos Hop Hor Hii).
+now apply (rngl_mul_nonneg_nonneg Hos Hor).
+now apply (rngl_mul_pos_pos Hos Hor Hii).
 Qed.
 
 Theorem rngl_sin_add_pos_2 :
@@ -43,8 +43,8 @@ specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 intros  * Hs1z Hs2z Hc1z Hc2z.
 cbn.
 apply (rngl_add_pos_nonneg Hor).
-now apply (rngl_mul_pos_pos Hop Hor Hii).
-now apply (rngl_mul_nonneg_nonneg Hop Hor).
+now apply (rngl_mul_pos_pos Hos Hor Hii).
+now apply (rngl_mul_nonneg_nonneg Hos Hor).
 Qed.
 
 Theorem angle_add_le_mono_l_lemma_11 :
@@ -265,7 +265,7 @@ destruct H21 as [H21| H21]. {
         apply (rngl_lt_le_incl Hor) in Hzs1.
         now apply (rngl_mul_nonpos_nonneg Hop Hor).
       }
-      now apply (rngl_mul_pos_pos Hop Hor Hii).
+      now apply (rngl_mul_pos_pos Hos Hor Hii).
     }
     apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_sin θ2)) in Hzs12. 2: {
       easy.
@@ -580,7 +580,7 @@ split. {
   apply (rngl_le_trans Hor _ 0).
   apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
   now apply (rngl_lt_le_incl Hor).
-  apply (rngl_mul_nonneg_nonneg Hop Hor); [ | easy ].
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ | easy ].
   now apply (rngl_lt_le_incl Hor).
 }
 intros Hc13.

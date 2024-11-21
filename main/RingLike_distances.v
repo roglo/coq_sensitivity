@@ -137,7 +137,7 @@ rewrite H1, (Hdsym b a) in H2.
 rewrite <- (rngl_mul_2_l Hon) in H2.
 replace 0%L with (2 * 0)%L in H2 by apply (rngl_mul_0_r Hos).
 apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in H2; [ easy | ].
-apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 Qed.
 
 Theorem rngl_limit_interv :
@@ -221,11 +221,11 @@ assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   intros ε Hε.
   assert (Hε2 : (0 < ε / 2)%L). {
     apply (rngl_mul_lt_mono_pos_r Hop Hor Hii) with (a := 2%L). {
-      apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     rewrite (rngl_mul_0_l Hos).
     rewrite (rngl_div_mul Hon Hiv); [ easy | ].
-    apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   }
   specialize (Hu1 (ε / 2) Hε2)%L.
   specialize (Hu2 (ε / 2) Hε2)%L.
@@ -237,11 +237,11 @@ assert (Hu : is_limit_when_tending_to_inf dist (λ _, lim1) lim2). {
   rewrite Hdsym.
   replace ε with (ε / 2 + ε / 2)%L. 2: {
     apply (rngl_mul_cancel_r Hi1 _ _ 2%L). {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     }
     rewrite rngl_mul_add_distr_r.
     rewrite (rngl_div_mul Hon Hiv). 2: {
-      apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+      apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     }
     symmetry.
     apply (rngl_mul_2_r Hon).
@@ -294,7 +294,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 assert (Hε2 : (0 < ε / 2)%L). {
   apply (rngl_mul_lt_mono_pos_r Hop Hor Hii 2⁻¹%L) in Hε. 2: {
     apply (rngl_0_lt_inv_compat Hon Hop Hiv Hor).
-    apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
   rewrite (rngl_mul_0_l Hos) in Hε.
   now rewrite (rngl_mul_inv_r Hiv) in Hε.
@@ -322,7 +322,7 @@ apply (rngl_lt_le_trans Hor _ (ε / 2 + ε / 2)%L). {
 rewrite <- (rngl_mul_2_r Hon).
 rewrite (rngl_div_mul Hon Hiv).
 apply (rngl_le_refl Hor).
-apply (rngl_2_neq_0 Hon Hop Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 Qed.
 
 End a.

@@ -171,21 +171,21 @@ progress unfold rl_modl.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_add_nonneg_nonneg Hor). {
     apply rl_sqrt_nonneg.
-    apply (rngl_add_squ_nonneg Hop Hor).
+    apply (rngl_add_squ_nonneg Hos Hor).
   } {
     apply rl_sqrt_nonneg.
-    apply (rngl_add_squ_nonneg Hop Hor).
+    apply (rngl_add_squ_nonneg Hos Hor).
   }
 }
 rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
   apply rl_sqrt_nonneg.
-  apply (rngl_add_squ_nonneg Hop Hor).
+  apply (rngl_add_squ_nonneg Hos Hor).
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
 rewrite (rngl_squ_add Hic Hon √_)%L.
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
 apply (rngl_le_sub_le_add_r Hop Hor).
 apply -> (rngl_le_sub_le_add_l Hop Hor).
 do 2 rewrite (rngl_squ_add Hic Hon)%L.
@@ -208,24 +208,24 @@ do 3 rewrite <- rngl_mul_assoc.
 rewrite <- rngl_mul_add_distr_l.
 apply (rngl_mul_le_mono_nonneg_l Hop Hor). {
   apply (rngl_le_trans Hor _ 1)%L.
-  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
   apply (rngl_le_add_r Hor).
-  apply (rngl_0_le_1 Hon Hop Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
 }
 eapply (rngl_le_trans Hor); [ apply (rngl_le_abs_diag Hop Hor) | ].
 rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-  apply (rngl_mul_nonneg_nonneg Hop Hor). {
+  apply (rngl_mul_nonneg_nonneg Hos Hor). {
     apply rl_sqrt_nonneg.
-    apply (rngl_add_squ_nonneg Hop Hor).
+    apply (rngl_add_squ_nonneg Hos Hor).
   } {
     apply rl_sqrt_nonneg.
-    apply (rngl_add_squ_nonneg Hop Hor).
+    apply (rngl_add_squ_nonneg Hos Hor).
   }
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
 rewrite (rngl_squ_mul Hic).
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hop Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
+rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
 (* c'est pas une formule connue, ça ? un truc chinois, chais plus *)
 rewrite (rngl_squ_add Hic Hon).
 do 2 rewrite (rngl_squ_mul Hic).
@@ -247,7 +247,7 @@ rewrite <- (rngl_mul_assoc 2)%L.
 apply (rngl_le_0_sub Hop Hor).
 rewrite (rngl_add_sub_swap Hop).
 rewrite <- (rngl_squ_sub Hop Hic Hon).
-apply (rngl_squ_nonneg Hop Hor).
+apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
 Theorem euclidean_distance_triangular :
@@ -361,7 +361,8 @@ Theorem rl_sqrt_1 :
   rl_sqrt 1%L = 1%L.
 Proof.
 intros Hon Hop Hor Hii.
-specialize (rngl_0_le_1 Hon Hop Hor) as Hz1.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
+specialize (rngl_0_le_1 Hon Hos Hor) as Hz1.
 progress unfold rl_sqrt.
 specialize (rl_nth_root_pow 2 1%L Hz1) as H1.
 rewrite <- (rngl_squ_1 Hon) in H1 at 2.
@@ -373,7 +374,7 @@ apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H1. 2: {
 rewrite (rngl_abs_nonneg_eq Hop Hor) in H1. 2: {
   now apply rl_sqrt_nonneg.
 }
-now rewrite (rngl_abs_1 Hon Hop Hor) in H1.
+now rewrite (rngl_abs_1 Hon Hos Hor) in H1.
 Qed.
 
 Theorem rngl_squ_le_1 :
@@ -383,10 +384,11 @@ Theorem rngl_squ_le_1 :
   ∀ a, (-1 ≤ a ≤ 1)%L → (a² ≤ 1)%L.
 Proof.
 intros Hon Hop Hor.
+specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
 intros * Ha.
 rewrite <- (rngl_squ_1 Hon).
 apply (rngl_abs_le_squ_le Hop Hor).
-rewrite (rngl_abs_1 Hon Hop Hor).
+rewrite (rngl_abs_1 Hon Hos Hor).
 now apply -> (rngl_abs_le Hop Hor).
 Qed.
 

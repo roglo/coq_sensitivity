@@ -513,21 +513,11 @@ Qed.
 Theorem I_ord_mul_le_compat_nonpos :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if rngl_has_opp (ideal P) then
-    ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-  else not_applicable.
+  ∀ a b c d : ideal P, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
 intros roi Hor.
-remember (rngl_has_opp (ideal P)) as op eqn:Hop.
-symmetry in Hop.
-destruct op; [ | easy ].
 intros * Hca Hdb.
 specialize rngl_ord_mul_le_compat_nonpos as H2.
-progress unfold rngl_has_opp in Hop.
-progress unfold rngl_has_opp in H2.
-cbn in Hop.
-destruct (rngl_opt_opp_or_subt T) as [[os| os]| ]; [ | easy | easy ].
-clear Hop.
 progress unfold rngl_le in Hca.
 progress unfold rngl_le in Hdb.
 progress unfold rngl_le.
