@@ -19,17 +19,14 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
 Theorem rngl_mul_le_compat_nonneg :
-  rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
-intros Hop Hor *.
+intros Hor *.
 specialize rngl_opt_ord as rr.
 rewrite Hor in rr.
 move rr after rp.
-specialize rngl_ord_mul_le_compat_nonneg as H.
-rewrite Hop in H.
-apply H.
+apply rngl_ord_mul_le_compat_nonneg.
 Qed.
 
 Theorem rngl_mul_le_compat_nonpos :
@@ -72,7 +69,7 @@ Proof.
 intros Hop Hor * Had Hcd.
 apply (rngl_opp_le_compat Hop Hor).
 do 2 rewrite <- (rngl_mul_opp_r Hop).
-apply (rngl_mul_le_compat_nonneg Hop Hor); [ easy | ].
+apply (rngl_mul_le_compat_nonneg Hor); [ easy | ].
 split.
 now apply (rngl_opp_nonneg_nonpos Hop Hor).
 now apply -> (rngl_opp_le_compat Hop Hor).
@@ -85,7 +82,7 @@ Theorem rngl_mul_nonneg_nonneg :
 Proof.
 intros * Hop Hor * Ha Hb.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
+specialize (rngl_mul_le_compat_nonneg Hor) as H1.
 specialize (H1 0 0 a b)%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
 specialize (H1 H); clear H.
@@ -117,7 +114,7 @@ Theorem rngl_mul_nonneg_nonpos :
 Proof.
 intros * Hop Hor * Ha Hb.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
+specialize (rngl_mul_le_compat_nonneg Hor) as H1.
 specialize (H1 0 0 a (- b))%L.
 assert (H : (0 ≤ 0 ≤ a)%L) by now split; [ apply (rngl_le_refl Hor) | ].
 specialize (H1 H); clear H.
@@ -141,7 +138,7 @@ Theorem rngl_mul_nonpos_nonneg :
 Proof.
 intros * Hop Hor * Ha Hb.
 specialize (rngl_has_opp_has_opp_or_subt Hop) as Hos.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
+specialize (rngl_mul_le_compat_nonneg Hor) as H1.
 specialize (H1 0 0 (- a) b)%L.
 assert (H : (0 ≤ 0 ≤ - a)%L). {
   split; [ apply (rngl_le_refl Hor) | ].
@@ -215,6 +212,15 @@ Theorem rngl_squ_nonneg :
 Proof.
 intros Hop Hor *.
 now apply rngl_mul_diag_nonneg.
+Qed.
+
+Theorem rngl_0_le_squ :
+  rngl_has_opp T = true →
+  rngl_is_ordered T = true →
+  ∀ n, (0 ≤ n * n)%L.
+Proof.
+intros Hop Hor *.
+apply (rngl_squ_nonneg Hop Hor).
 Qed.
 
 Theorem rngl_0_lt_1 :
@@ -525,7 +531,7 @@ Proof.
 intros Hop Hon Hor * Hza.
 induction n; [ apply (rngl_le_refl Hor) | cbn ].
 rewrite <- (rngl_mul_1_l Hon 1%L).
-apply (rngl_mul_le_compat_nonneg Hop Hor). {
+apply (rngl_mul_le_compat_nonneg Hor). {
   split; [ | easy ].
   apply (rngl_0_le_1 Hon Hop Hor).
 } {
@@ -576,7 +582,7 @@ destruct az. {
     rewrite (rngl_opp_0 Hop) in Haz.
     rewrite <- (rngl_mul_opp_opp Hop).
     apply (rngl_lt_le_incl Hor) in Hbz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+    now apply (rngl_mul_le_compat_nonneg Hor).
   }
 } {
   apply (rngl_leb_gt Hor) in Haz.
@@ -586,11 +592,11 @@ destruct az. {
     rewrite (rngl_opp_0 Hop) in Hbz.
     rewrite <- (rngl_mul_opp_opp Hop b).
     apply (rngl_lt_le_incl Hor) in Haz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+    now apply (rngl_mul_le_compat_nonneg Hor).
   } {
     apply (rngl_leb_gt Hor) in Hbz.
     apply (rngl_lt_le_incl Hor) in Haz, Hbz.
-    now apply (rngl_mul_le_compat_nonneg Hop Hor).
+    now apply (rngl_mul_le_compat_nonneg Hor).
   }
 }
 Qed.

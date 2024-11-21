@@ -487,21 +487,11 @@ Qed.
 Theorem I_ord_mul_le_compat_nonneg :
   let roi := I_ring_like_op in
   rngl_is_ordered (ideal P) = true →
-  if rngl_has_opp (ideal P) then
-    ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-  else not_applicable.
+  ∀ a b c d : ideal P, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros roi Hor.
-remember (rngl_has_opp (ideal P)) as op eqn:Hop.
 specialize rngl_ord_mul_le_compat_nonneg as H1.
-symmetry in Hop.
-destruct op; [ | easy ].
 intros * Hac Hbd.
-progress unfold rngl_has_opp in H1.
-progress unfold rngl_has_opp in Hop.
-cbn in Hop.
-destruct rngl_opt_opp_or_subt as [os| ]; [ | easy ].
-destruct os; [ clear Hop | easy ].
 progress unfold rngl_is_ordered in Hor; cbn in Hor.
 progress unfold I_opt_leb in Hor.
 progress unfold rngl_le.

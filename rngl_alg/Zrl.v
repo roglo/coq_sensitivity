@@ -24,8 +24,6 @@ Instance Z_ring_like_op : ring_like_op Z :=
 Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
 Proof. now apply Z.eq_mul_0. Qed.
 
-Search (_ ÷ _ ÷ _)%Z.
-
 Theorem Z_integral :
   ∀ a b : Z,
   (a * b)%L = 0%L

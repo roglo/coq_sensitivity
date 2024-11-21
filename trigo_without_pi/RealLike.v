@@ -307,17 +307,16 @@ Qed.
 
 Theorem rl_sqrt_lt_rl_sqrt :
   rngl_has_1 T = true →
-  rngl_has_opp T = true →
   rngl_is_ordered T = true →
   ∀ a b,
   (0 ≤ a)%L
   → (a < b)%L
   → (√ a < √ b)%L.
 Proof.
-intros Hon Hop Hor * Ha Hab.
+intros Hon Hor * Ha Hab.
 apply (rngl_nle_gt_iff Hor).
 intros H1.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H2.
+specialize (rngl_mul_le_compat_nonneg Hor) as H2.
 specialize (H2 √b √b √a √a)%L.
 assert (H : (0 ≤ √b ≤ √a)%L). {
   split; [ | easy ].

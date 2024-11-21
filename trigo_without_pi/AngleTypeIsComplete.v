@@ -364,7 +364,7 @@ generalize Hε; intros H.
 apply (rngl_lt_le_incl Hor) in H.
 rewrite <- (rngl_abs_nonneg_eq Hop Hor ε H).
 rewrite <- (rl_sqrt_squ Hon Hop Hor ε).
-apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+apply (rl_sqrt_lt_rl_sqrt Hon Hor). {
   apply (rngl_add_squ_nonneg Hop Hor).
 }
 rewrite <- (rngl_mul_div Hi1 ε² 2)%L.

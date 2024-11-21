@@ -86,33 +86,6 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
 Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
   (≺ v, M • v ≻ / ≺ v, v ≻)%L.
 
-Theorem rngl_0_le_squ :
-  rngl_has_opp T = true →
-  rngl_is_ordered T = true →
-  ∀ n, (0 ≤ n * n)%L.
-Proof.
-intros Hop Hor *.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-specialize (Hos (or_introl Hop)).
-move Hos before Hop.
-rewrite <- (rngl_mul_0_r Hos 0).
-destruct (rngl_le_dec Hor 0%L n) as [Hnz| Hnz]. {
-  apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
-    split; [ now apply rngl_le_refl | easy ].
-  } {
-    split; [ now apply rngl_le_refl | easy ].
-  }
-} {
-  apply rngl_mul_le_compat_nonpos; [ easy | easy | | ]. {
-    split; [ | now apply rngl_le_refl ].
-    now apply rngl_not_le in Hnz.
-  } {
-    split; [ | now apply rngl_le_refl ].
-    now apply rngl_not_le in Hnz.
-  }
-}
-Qed.
-
 Definition in_ordered_field :=
   rngl_has_1 T = true ∧
   rngl_mul_is_comm T = true ∧

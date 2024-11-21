@@ -69,7 +69,7 @@ apply rngl_1_sub_cos_div_2_nonneg.
 rewrite <- rl_sqrt_mul; cycle 1.
 apply rngl_1_sub_cos_div_2_nonneg.
 apply rngl_1_add_cos_div_2_nonneg.
-apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor).
+apply (rl_sqrt_lt_rl_sqrt Hon Hor).
 apply (rngl_mul_nonneg_nonneg Hop Hor).
 apply rngl_1_add_cos_div_2_nonneg.
 apply rngl_1_sub_cos_div_2_nonneg.

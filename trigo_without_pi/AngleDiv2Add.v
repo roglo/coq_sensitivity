@@ -1096,7 +1096,7 @@ destruct zs. {
   rewrite <- (rl_sqrt_1 Hon Hop Hor) at 4. 2: {
     now rewrite Bool.orb_true_iff; right.
   }
-  apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+  apply (rl_sqrt_lt_rl_sqrt Hon Hor). {
     apply (rngl_div_nonneg Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hop Hc1 Hor).
     }

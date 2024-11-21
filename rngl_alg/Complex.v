@@ -1975,7 +1975,7 @@ induction n; intros. {
   destruct zs. {
     apply rngl_leb_le in Hzs.
     rewrite (rngl_mul_1_l Hon).
-    apply (rl_sqrt_lt_rl_sqrt Hon Hop Hor). {
+    apply (rl_sqrt_lt_rl_sqrt Hon Hor). {
       apply rngl_1_add_cos_div_2_nonneg.
     }
     apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor Hii). {
@@ -2370,7 +2370,7 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_sub_mul_l_diag_r Hon Hop).
 destruct (rngl_le_dec Hor 0 (2 * x - 1)%L) as [Hz2c| H2cz]. {
   rewrite <- (rngl_mul_1_r Hon 1%L) at 4.
-  apply (rngl_mul_le_compat_nonneg Hop Hor); [ | easy ].
+  apply (rngl_mul_le_compat_nonneg Hor); [ | easy ].
   split; [ easy | ].
   apply (rngl_le_sub_le_add_r Hop Hor).
   rewrite <- (rngl_mul_1_r Hon 2%L) at 2.

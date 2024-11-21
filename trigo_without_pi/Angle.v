@@ -1704,7 +1704,7 @@ destruct zc1. {
   rewrite (rngl_add_opp_r Hop).
   apply (rngl_le_0_sub Hop Hor).
   rewrite (rngl_mul_comm Hic).
-  now apply (rngl_mul_le_compat_nonneg Hop Hor).
+  now apply (rngl_mul_le_compat_nonneg Hor).
 } {
   apply (rngl_leb_gt Hor) in Hzc1.
   remember (0 ≤? rngl_cos θ2)%L as zc2 eqn:Hzc2.

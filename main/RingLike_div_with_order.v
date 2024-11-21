@@ -78,7 +78,7 @@ Proof.
 intros * Hon Hop Hiv Hor * Hbz (Hza, Hab).
 unfold rngl_div.
 rewrite Hiv.
-specialize (rngl_mul_le_compat_nonneg Hop Hor) as H1.
+specialize (rngl_mul_le_compat_nonneg Hor) as H1.
 specialize (H1 a b⁻¹ b b⁻¹)%L.
 assert (H : (0 ≤ a ≤ b)%L) by easy.
 specialize (H1 H); clear H.
