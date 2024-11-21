@@ -242,11 +242,6 @@ Class ring_like_ord T {ro : ring_like_op T} :=
       ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L;
     rngl_ord_not_le : ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L }.
 
-Require Import ZArith.
-Search (_ * _ ≤ _ * _)%Z.
-Search (_ * _ ≤ _ * _).
-Check Nat.mul_le_mono_nonneg.
-
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_is_archimedean : bool;
