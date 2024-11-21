@@ -966,53 +966,6 @@ now apply (gc_mul_div Hic Hon Hop Hiv Hor).
 Qed.
 *)
 
-(* nothing to do with all the work before and after *)
-(* trying to make a new definition of ring_like_ord *)
-Definition new_le a b := ∃ c, b = (a + c)%L.
-
-Theorem new_rngl_ord_le_refl : ∀ a, new_le a a.
-Proof.
-intros.
-exists 0%L; symmetry.
-apply rngl_add_0_r.
-Qed.
-
-Theorem new_rngl_ord_le_antisymm :
-  rngl_has_opp_or_subt T = true →
-  ∀ a b, (new_le a b → new_le b a → a = b)%L.
-Proof.
-intros Hos * Hab Hba.
-destruct Hab as (c1, Hab).
-destruct Hba as (c2, Hba).
-generalize Hba; intros H1.
-rewrite Hab, <- rngl_add_assoc in Hba.
-symmetry in Hba.
-apply (rngl_add_sub_eq_l Hos) in Hba.
-rewrite (rngl_sub_diag Hos) in Hba.
-symmetry in Hba.
-...
-Theorem glop :
-Class ring_like_ord T {ro : ring_like_op T} :=
-  { rngl_ord_le_dec : ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L;
-    rngl_ord_le_refl : ∀ a, (a ≤ a)%L;
-    rngl_ord_le_antisymm : ∀ a b, (a ≤ b → b ≤ a → a = b)%L;
-    rngl_ord_le_trans : ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%L;
-    rngl_ord_add_le_compat : ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L;
-    rngl_ord_mul_le_compat_nonneg :
-      if rngl_has_opp T then
-        ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_ord_mul_le_compat_nonpos :
-      if rngl_has_opp T then
-        ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_ord_mul_le_compat_non_opp :
-      if negb (rngl_has_opp T) then
-        ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
-      else not_applicable;
-    rngl_ord_not_le : ∀ a b, (¬ a ≤ b → a ≠ b ∧ b ≤ a)%L }.
-(* end of nothing to do with all the work before and after *)
-
 (* to be completed
 Theorem gc_opt_alg_closed :
   if (rngl_has_opp T && rngl_has_inv (GComplex T) &&
