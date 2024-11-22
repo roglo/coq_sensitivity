@@ -28,6 +28,10 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
+(*
+Definition exp x := mk_gc (rngl_cos (i * x)) (rngl_sin (i * x)).
+*)
+
 Theorem gc_mul_0_l :
   rngl_has_opp_or_subt T = true →
   ∀ z : GComplex T, (0 * z = 0)%C.
