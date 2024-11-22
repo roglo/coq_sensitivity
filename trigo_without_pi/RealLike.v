@@ -24,7 +24,7 @@ Definition rl_sqrt a := rl_nth_root 2 a.
 End a.
 
 Arguments rl_sqrt {T ro rp rl} a%_L.
-Notation "'√' a" := (rl_sqrt a) (at level 1, format "√ a") : ring_like_scope.
+Notation "'√' a" := (rl_sqrt a) (at level 2, format "√ a").
 
 Section a.
 
@@ -35,7 +35,7 @@ Context {rl : real_like_prop T}.
 
 Theorem rngl_squ_sqrt :
   rngl_has_1 T = true →
-  ∀ a, (0 ≤ a)%L → rngl_squ √a = a.
+  ∀ a, (0 ≤ a)%L → rngl_squ (√a) = a.
 Proof.
 intros Hon *.
 specialize (rl_nth_root_pow 2 a) as H1.
@@ -47,7 +47,7 @@ Qed.
 Theorem rngl_abs_sqrt :
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ a, (0 ≤ a)%L → rngl_abs √a = √a%L.
+  ∀ a, (0 ≤ a)%L → rngl_abs (√a) = (√a)%L.
 Proof.
 intros Hop Hor.
 intros * Haz.
@@ -96,7 +96,7 @@ Theorem rl_sqrt_squ :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_is_ordered T = true →
-  ∀ a, (√(a²))%L = rngl_abs a.
+  ∀ a, (√a²)%L = rngl_abs a.
 Proof.
 intros Hon Hop Hor *.
 progress unfold rngl_squ.
@@ -154,7 +154,7 @@ progress unfold rngl_squ in Ha.
 now rewrite (rngl_mul_0_l Hos) in Ha.
 Qed.
 
-Definition rl_modl x y := √(x² + y²)%L.
+Definition rl_modl x y := (√(x² + y²))%L.
 
 Theorem rl_modl_add_le :
   rngl_mul_is_comm T = true →
@@ -183,7 +183,7 @@ rewrite <- (rngl_abs_nonneg_eq Hop Hor (√_))%L. 2: {
 }
 apply (rngl_squ_le_abs_le Hop Hor Hii).
 rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
-rewrite (rngl_squ_add Hic Hon √_)%L.
+rewrite (rngl_squ_add Hic Hon (√_))%L.
 rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
 rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_add_squ_nonneg Hos Hor) ].
 apply (rngl_le_sub_le_add_r Hop Hor).
@@ -263,7 +263,7 @@ Proof.
 intros Hic Hon Hop Hiv Hor *.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 progress unfold rl_modl.
-rewrite (rngl_add_comm √((x2 - x1)² + (y2 - y1)²))%L.
+rewrite (rngl_add_comm (√((x2 - x1)² + (y2 - y1)²)))%L.
 replace (x3 - x1)%L with ((x3 - x2) + (x2 - x1))%L. 2: {
   rewrite (rngl_add_sub_assoc Hop).
   now rewrite (rngl_sub_add Hop).
@@ -290,7 +290,7 @@ intros * Ha Hab.
 apply (rngl_nlt_ge_iff Hor).
 intros H1.
 specialize (rngl_mul_lt_mono_nonneg Hop Hor Hii) as H2.
-specialize (H2 √b √a √b √a)%L.
+specialize (H2 (√b) (√a) (√b) (√a))%L.
 assert (H : (0 ≤ √b < √a)%L). {
   split; [ | easy ].
   apply rl_sqrt_nonneg.
@@ -317,7 +317,7 @@ intros Hon Hor * Ha Hab.
 apply (rngl_nle_gt_iff Hor).
 intros H1.
 specialize (rngl_mul_le_compat_nonneg Hor) as H2.
-specialize (H2 √b √b √a √a)%L.
+specialize (H2 (√b) (√b) (√a) (√a))%L.
 assert (H : (0 ≤ √b ≤ √a)%L). {
   split; [ | easy ].
   apply rl_sqrt_nonneg.

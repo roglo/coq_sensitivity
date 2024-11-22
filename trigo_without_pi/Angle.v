@@ -350,7 +350,7 @@ assert (Hz1sc : ∀ θ, (0 ≤ 1 - rngl_cos θ)%L). {
 }
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  rewrite H1, (H1 √_)%L.
+  rewrite H1, (H1 (√_))%L.
   apply (rngl_le_refl Hor).
 }
 apply (rngl_square_le_simpl_nonneg Hop Hor Hii). {
@@ -2114,7 +2114,7 @@ rewrite rngl_mul_assoc.
 rewrite (rngl_div_mul Hon Hiv); [ | easy ].
 rewrite <- (rngl_squ_opp Hop).
 rewrite (rngl_squ_opp Hop).
-rewrite (rngl_add_comm √_)%L.
+rewrite (rngl_add_comm (√_))%L.
 remember (- θ2)%A as θ eqn:Hθ.
 symmetry in Hθ.
 rewrite <- angle_opp_involutive in Hθ.

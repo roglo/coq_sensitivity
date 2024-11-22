@@ -1660,6 +1660,20 @@ split. {
 }
 Qed.
 
+End a.
+
+Require Import Trigo.Angle.
+Require Import Trigo.AngleDiv2.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
+Context {hc : hangle_ctx T}.
+
 (* trying to define an exponential *)
 
 Definition rngl_exph (a : hangle T) : T := (rngl_cosh a + rngl_sinh a)%L.
@@ -1682,15 +1696,9 @@ Qed.
 Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
-(* on peut définir e comme étant rngl_exph 1, non ? *)
-(* e = exph 1 *)
-(* e = cosh 1 + sinh 1 *)
-(* sauf que je ne sais pas ce que c'est que 1 dans les
-   angles hyperboliques *)
-(* selon wikipédia cosh 1 = (e²+1)/2e et sinh 1 = (e²-1)/2e *)
-(* oui bon, ça donne e en fonction de e, la belle affaire ! *)
-(* donc si je veux définir 1 comme angle hyperbolique, faut que
-   je définisse e d'abord. Galère *)
+Definition angle_mul_i θ :=
+  let θ2 := (θ /₂)%A in
+  ((rngl_cos θ2 / √(rngl_cos θ))%L, (rngl_sin θ2 / √(rngl_sin θ))%L).
 
 ...
 
