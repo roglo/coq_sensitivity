@@ -1696,9 +1696,85 @@ Qed.
 Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
+(* to be completed
+Theorem angle_mul_i_prop :
+  ∀ θ,
+  (0 < rngl_cos θ)%L
+  → cosh2_sinh2_prop
+      (rngl_cos (θ /₂) / √(rngl_cos θ))
+      (rngl_sin (θ /₂) / √(rngl_cos θ)).
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzc.
+  rewrite H1 in Hzc.
+  now apply (rngl_lt_irrefl Hor) in Hzc.
+}
+intros * Hzc.
+progress unfold cosh2_sinh2_prop.
+apply Bool.andb_true_iff.
+assert (Hzc2 : (0 ≤ rngl_cos (θ /₂) / √(rngl_cos θ))%L). {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    cbn.
+(* ah oui, c'est pas machin / 2 en fait, c'est abs machin / 2,
+   un truc comme ça *)
+...
+Search (0 ≤ rngl_cos (_ /₂))%L.
+...
+}
+split; [ | now apply rngl_leb_le ].
+apply (rngl_eqb_eq Hed).
+cbn.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+symmetry in Hzs.
+destruct zs. {
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+    intros Hcz.
+    apply (rngl_lt_iff Hor) in Hzc.
+    apply (eq_rl_sqrt_0 Hon Hos) in Hcz; [ | easy ].
+    now symmetry in Hcz.
+  }
+  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+    intros Hcz.
+    apply (rngl_lt_iff Hor) in Hzc.
+    apply (eq_rl_sqrt_0 Hon Hos) in Hcz; [ | easy ].
+    now symmetry in Hcz.
+  }
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply rngl_1_add_cos_div_2_nonneg.
+  }
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    now apply (rngl_lt_le_incl Hor) in Hzc.
+  }
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply rngl_1_sub_cos_div_2_nonneg.
+  }
+  do 2 rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite rngl_add_0_l.
+  rewrite <- (rngl_mul_2_r Hon).
+  rewrite (rngl_mul_div Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_div_diag Hon Hiq).
+  intros H.
+  rewrite H in Hzc.
+  now apply (rngl_lt_irrefl Hor) in Hzc.
+}
+
+...
+
 Definition angle_mul_i θ :=
-  let θ2 := (θ /₂)%A in
-  ((rngl_cos θ2 / √(rngl_cos θ))%L, (rngl_sin θ2 / √(rngl_sin θ))%L).
+  mk_hangle
+    (rngl_cos (θ /₂) / √(rngl_cos θ))
+    (rngl_sin (θ /₂) / √(rngl_cos θ))
+    (angle_mul_i_prop θ).
 
 ...
 
@@ -1725,5 +1801,6 @@ Definition rngl_exp (a : T) : T :=
 
 (* bizarre... *)
 ...
+*)
 
 End a.
