@@ -1679,12 +1679,28 @@ rewrite <- rngl_add_assoc.
 easy.
 Qed.
 
-...
+Definition rngl_ln (a : T) := a.
 
-Definition rngl_acosh (a : T) : hangle T.
-apply (mk_hangle a (rngl_ln (a + √(a² - 1)))%L).
-...
+Theorem rngl_acosh_prop :
+  ∀ a, cosh2_sinh2_prop a (rngl_ln (a + √(a² - 1))%L).
+Admitted.
 
-Definition rngl_exp (a : T) : T := (rngl_cosh a + rngl_sinh a)%L.
+Definition rngl_acosh (a : T) : hangle T :=
+  mk_hangle a (rngl_ln (a + √(a² - 1)))%L (rngl_acosh_prop a).
+
+Definition rngl_exp_1 (a : T) : T :=
+  (rngl_cosh (rngl_acosh a) + rngl_sinh (rngl_acosh a))%L.
+
+Definition rngl_exp_2 (a : T) : T :=
+  let b := rngl_acosh a in
+  (rngl_cosh b + rngl_sinh b)%L.
+
+(e^b+e^(-b))/2 + (e^b-e^(-b)/2) = e^b
+
+Definition rngl_exp (a : T) : T :=
+  (a + √(a²-1))%L.
+
+(* bizarre... *)
+...
 
 End a.
