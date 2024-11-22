@@ -1679,11 +1679,26 @@ rewrite <- rngl_add_assoc.
 easy.
 Qed.
 
+Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
+Proof. apply rngl_add_0_r. Qed.
+
+(* on peut définir e comme étant rngl_exph 1, non ? *)
+(* e = exph 1 *)
+(* e = cosh 1 + sinh 1 *)
+(* sauf que je ne sais pas ce que c'est que 1 dans les
+   angles hyperboliques *)
+(* selon wikipédia cosh 1 = (e²+1)/2e et sinh 1 = (e²-1)/2e *)
+(* oui bon, ça donne e en fonction de e, la belle affaire ! *)
+(* donc si je veux définir 1 comme angle hyperbolique, faut que
+   je définisse e d'abord. Galère *)
+
+...
+
 Definition rngl_ln (a : T) := a.
 
 Theorem rngl_acosh_prop :
   ∀ a, cosh2_sinh2_prop a (rngl_ln (a + √(a² - 1))%L).
-Admitted.
+...
 
 Definition rngl_acosh (a : T) : hangle T :=
   mk_hangle a (rngl_ln (a + √(a² - 1)))%L (rngl_acosh_prop a).
