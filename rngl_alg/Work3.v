@@ -1763,3 +1763,57 @@ Definition gc_ring_like_prop T
 *)
      rngl_opt_archimedean := NA |}.
 *)
+
+(* experiment; to be completed if true...
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
+
+Theorem glop :
+  rngl_has_opp_or_subt T = true →
+  ∀ a b, (a - b = b - a)%L → a = b.
+Proof.
+(*
+intros Hos * Hab.
+apply (rngl_sub_compat_l _ _ (b - a))%L in Hab.
+rewrite (rngl_sub_diag Hos) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite rngl_add_comm in Hab.
+rewrite (rngl_sub_add_distr Hos) in Hab.
+...
+*)
+intros Hos * Hab.
+apply (rngl_sub_compat_l _ _ a) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite rngl_add_comm in Hab.
+rewrite (rngl_sub_add_distr Hos) in Hab.
+rewrite (rngl_sub_diag Hos) in Hab.
+symmetry in Hab.
+apply (rngl_sub_compat_l _ _ b) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite rngl_add_assoc in Hab.
+rewrite rngl_add_comm in Hab.
+rewrite (rngl_sub_add_distr Hos) in Hab.
+rewrite (rngl_sub_diag Hos) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+...
+  Hab : (0 - (a + a))%L = (0 - (b + b))%L
+...
+intros Hos * Hab.
+rewrite <- (rngl_add_sub Hos a a) in Hab at 1.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite <- (rngl_add_sub Hos b b) in Hab at 2.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite (rngl_add_comm b a) in Hab.
+Search (_ - _ = _ - _)%L.
+Check rngl_sub_compat_l.
+...
+apply (f_equal (λ c, b + c)%L) in Hab.
+Search (_ + (_ - _))%L.
+...
+*)
