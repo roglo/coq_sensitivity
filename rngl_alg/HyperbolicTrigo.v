@@ -1697,6 +1697,77 @@ Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
 (* to be completed
+
+Definition hangle_of_angle (θ : angle T) : _ → hangle T :=
+  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
+  mk_hangle (rngl_cos θ / r) (rngl_sin θ / r).
+
+Definition rngl_cos_i (θ : angle T) : T :=
+  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
+  (rngl_cos θ / r)%L.
+
+(* should have the property
+     (rngl_cos_i θ)² - (rngl_sin_i θ)² = 1.
+*)
+
+Definition rngl_cos_i (θ : angle T) :=
+  rngl_cosh (hangle_of_angle θ).
+
+...
+
+Print rngl_cos_i.
+
+...
+
+(* should have the property cos (hangle_mul_i θ) = cosh θ *)
+
+Definition hangle_mul_i (θ : hangle T) : _ → angle T :=
+  let r := √((rngl_cosh θ)² + (rngl_sinh θ)²) in
+  mk_angle (rngl_cosh θ / r) (rngl_sinh θ / r).
+
+(* but above, cos (hangle_mul i θ) is
+     cosh θ / r
+   which is not
+     cosh θ
+*)
+
+(* en fait, on ne peut pas avoir cos(iθ)=cosh(θ), puisque cosh va
+   entre 1 et ∞, tandis que cos(iθ), bin si c'est un cosinus, il
+   doit varier entre -1 et 1 *)
+(* donc le cos de iθ, c'est pas un cosinus *)
+(* donc comment faire le lien entre le cos et le cosh ? *)
+(* que veut dire la formule cos(iθ)=cosh(θ) si on veut la typer
+   correctement ? *)
+
+  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
+  (rngl_cos θ / r)%L.
+
+...
+
+Definition angle_mul_i (θ : angle T) :=
+  mk_hangle
+    (rngl_cos θ / √((rngl_cos θ)² - (rngl_sin θ)²))
+    (rngl_sin θ / √((rngl_cos θ)² - (rngl_sin θ)²)).
+
+(* then cosh(iθ)=cos(θ) *)
+(* cosh(iθ) = cosh (cos θ / √(cos² θ - sin² θ))
+
+Definition angle_mul_i (θ : angle T) :=
+  let θ2 :=
+    if (0 ≤? rngl_sin θ)%L then (θ /₂)%A
+    else (- (- θ /₂))%A
+  in
+  match rngl_lt_dec ac_or 0 (rngl_cos θ) with
+  | left Hzc =>
+      mk_hangle
+        (rngl_cos θ2 / √(rngl_cos θ))
+        (rngl_sin θ2 / √(rngl_cos θ))
+        (angle_mul_i_prop θ Hzc)
+  | right _ =>
+      0%H
+  end.
+...
+
 Theorem angle_mul_i_prop :
   ∀ θ,
   (0 < rngl_cos θ)%L
@@ -1769,12 +1840,34 @@ destruct zs. {
 }
 
 ...
+*)
+
+Theorem angle_mul_i_prop :
+  ∀ θ,
+  let θ2 :=
+    if (0 ≤? rngl_sin θ)%L then (θ /₂)%A
+    else (- (- θ /₂))%A
+  in
+  (0 < rngl_cos θ)%L
+  → cosh2_sinh2_prop
+      (rngl_cos θ2 / √(rngl_cos θ))
+      (rngl_sin θ2 / √(rngl_cos θ)).
+...
 
 Definition angle_mul_i θ :=
-  mk_hangle
-    (rngl_cos (θ /₂) / √(rngl_cos θ))
-    (rngl_sin (θ /₂) / √(rngl_cos θ))
-    (angle_mul_i_prop θ).
+  let θ2 :=
+    if (0 ≤? rngl_sin θ)%L then (θ /₂)%A
+    else (- (- θ /₂))%A
+  in
+  match rngl_lt_dec ac_or 0 (rngl_cos θ) with
+  | left Hzc =>
+      mk_hangle
+        (rngl_cos θ2 / √(rngl_cos θ))
+        (rngl_sin θ2 / √(rngl_cos θ))
+        (angle_mul_i_prop θ Hzc)
+  | right _ =>
+      0%H
+  end.
 
 ...
 
