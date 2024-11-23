@@ -1911,6 +1911,37 @@ Definition angle_of_hangle (θ : hangle T) :=
 
 (* to be completed
 
+Theorem glop :
+  ∀ θ, rngl_cos (angle_of_hangle θ) = rngl_cosh θ.
+Proof.
+intros.
+progress unfold angle_of_hangle.
+cbn.
+(*
+  ============================
+  (rngl_cosh θ / √((rngl_cosh θ)² + (rngl_sinh θ)²))%L = rngl_cosh θ
+
+donc, c'est pas la bonne solution.
+angle_of_hangle n'est pas bon.
+*)
+...
+
+Theorem glop :
+  ∀ θ, rngl_cosh (hangle_of_angle θ) = rngl_cos θ.
+Proof.
+destruct_ac.
+intros.
+progress unfold hangle_of_angle.
+destruct (rngl_lt_dec ac_or 0 (rngl_cos θ)) as [Hzc| Hzc]. {
+  cbn.
+  remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+  symmetry in Hzs.
+  destruct zs. {
+    cbn.
+    rewrite Hzs.
+    rewrite (rngl_mul_1_l Hon).
+...
+
 (* should have the property cos (hangle_mul_i θ) = cosh θ *)
 
 (* en fait, on ne peut pas avoir cos(iθ)=cosh(θ), puisque cosh va
