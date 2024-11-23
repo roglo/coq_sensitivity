@@ -1698,9 +1698,34 @@ Proof. apply rngl_add_0_r. Qed.
 
 (* to be completed
 
-Definition hangle_of_angle (θ : angle T) : _ → hangle T :=
+Theorem hangle_of_angle_prop :
+  ∀ θ,
+  (0 < rngl_cos θ)%L
+  -> let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
+    cosh2_sinh2_prop (rngl_cos θ / r) (rngl_sin θ / r).
+Proof.
+destruct_ac.
+intros * Hzc *.
+progress unfold cosh2_sinh2_prop.
+apply Bool.andb_true_iff.
+assert (Hzcr : (0 ≤ rngl_cos θ / r)%L). {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
+    now apply (rngl_lt_le_incl Hor) in Hzc.
+  }
+  subst r.
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_lt_0_sub Hop Hor).
+  specialize (cos2_sin2_1 θ) as H1.
+  apply (rngl_add_sub_eq_l Hos) in H1.
+  rewrite <- H1.
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  rewrite <- (rngl_mul_2_l Hon).
+...
+
+Definition hangle_of_angle (θ : angle T) : hangle T :=
   let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
-  mk_hangle (rngl_cos θ / r) (rngl_sin θ / r).
+  mk_hangle (rngl_cos θ / r) (rngl_sin θ / r)
+    (hangle_of_angle_prop θ).
 
 Definition rngl_cos_i (θ : angle T) : T :=
   let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
