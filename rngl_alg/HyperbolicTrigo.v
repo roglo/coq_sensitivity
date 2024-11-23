@@ -1701,8 +1701,6 @@ Qed.
 Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
-(* to be completed
-
 (* tracing a line from O to the right, less than 45°, we intersect
    the unit circle and the hyperbole once. This is how I convert an
    angle to a hyperbolic angle. *)
@@ -1713,9 +1711,8 @@ Theorem hangle_of_angle_prop :
     else (- (- θ /₂))%A
   in
   (0 < rngl_cos θ)%L
-  → cosh2_sinh2_prop
-      (rngl_cos θ2 / √(rngl_cos θ))
-      (rngl_sin θ2 / √(rngl_cos θ)).
+  → let d := √(rngl_cos θ) in
+     cosh2_sinh2_prop (rngl_cos θ2 / d) (rngl_sin θ2 / d).
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
@@ -1728,8 +1725,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hzc.
 progress unfold cosh2_sinh2_prop.
 apply Bool.andb_true_iff.
-set (r := √(rngl_cos θ)).
-assert (Hzcr : (0 ≤ rngl_cos θ2 / r)%L). {
+set (d := √(rngl_cos θ)).
+assert (Hzcr : (0 ≤ rngl_cos θ2 / d)%L). {
   subst θ2.
   remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
   symmetry in Hzs.
@@ -1739,7 +1736,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / r)%L). {
       apply rl_sqrt_nonneg.
       apply rngl_1_add_cos_div_2_nonneg.
     }
-    subst r.
+    subst d.
     now apply (rl_sqrt_pos Hon Hos Hor).
   } {
     cbn.
@@ -1752,13 +1749,13 @@ assert (Hzcr : (0 ≤ rngl_cos θ2 / r)%L). {
       apply rl_sqrt_nonneg.
       apply rngl_1_add_cos_div_2_nonneg.
     }
-    subst r.
+    subst d.
     now apply (rl_sqrt_pos Hon Hos Hor).
   }
 }
 split; [ | now apply rngl_leb_le ].
 apply (rngl_eqb_eq Hed).
-subst r; cbn.
+subst d; cbn.
 rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
   intros H.
   apply (eq_rl_sqrt_0 Hon Hos) in H; [ | now apply (rngl_lt_le_incl Hor) ].
@@ -1833,96 +1830,88 @@ Definition hangle_of_angle θ :=
   in
   match rngl_lt_dec ac_or 0 (rngl_cos θ) with
   | left Hzc =>
-      mk_hangle
-        (rngl_cos θ2 / √(rngl_cos θ))
-        (rngl_sin θ2 / √(rngl_cos θ))
+      let d := √(rngl_cos θ) in
+      mk_hangle (rngl_cos θ2 / d) (rngl_sin θ2 / d)
         (hangle_of_angle_prop θ Hzc)
   | right _ =>
       0%H
   end.
 
-(* mouais, faut voir à voir, cette définition... *)
-Definition angle_of_hangle (θ : hangle T) :=
-  let θ2 :=
-    if (0 ≤? rngl_sinh θ)%L then (θ /₂)%H
-    else (- (- θ /₂))%H
-  in
-  mk_angle
-    (rngl_cosh θ2 / √(rngl_cosh θ))
-    (rngl_sinh θ2 / √(rngl_cosh θ))
-    true.
-...
-        (angle_of_angle_prop θ Hzc)
-
-...
-
-Theorem hangle_of_angle_prop :
+Theorem angle_of_hangle_prop :
   ∀ θ,
-  (0 < rngl_cos θ)%L
-  -> let r := (√((rngl_cos θ)² - (rngl_sin θ)²) / 2)%L in
-    cosh2_sinh2_prop (rngl_cos θ / r) (rngl_sin θ / r).
+  let d := √((rngl_cosh θ)² + (rngl_sinh θ)²) in
+  let ε := if (0 ≤? rngl_sinh θ)%L then 1%L else (-1)%L in
+  cos2_sin2_prop (rngl_cosh θ / d)%L (ε * rngl_sinh θ / d)%L.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzc *.
-  rewrite H1 in Hzc.
-  now apply (rngl_lt_irrefl Hor) in Hzc.
+  intros.
+  progress unfold cos2_sin2_prop.
+  apply (rngl_eqb_eq Hed).
+  now rewrite (H1 (_ + _)%L), (H1 1%L).
 }
-intros * Hzc *.
-progress unfold cosh2_sinh2_prop.
-apply Bool.andb_true_iff.
-assert (Hzcr : (0 ≤ rngl_cos θ / r)%L). {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-    now apply (rngl_lt_le_incl Hor) in Hzc.
+intros.
+progress unfold cos2_sin2_prop.
+apply (rngl_eqb_eq Hed).
+rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+  intros H; subst d.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+    apply (rngl_add_squ_nonneg Hos Hor).
   }
-  subst r.
-  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (eq_rngl_add_square_0 Hos Hor Hii) in H.
+  destruct H as (Hc, Hs).
+  now apply (eq_rngl_cosh_0 Hc1) in Hc.
+}
+rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
+  intros H; subst d.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+    apply (rngl_add_squ_nonneg Hos Hor).
   }
-  apply (rl_sqrt_pos Hon Hos Hor).
-  apply (rngl_lt_0_sub Hop Hor).
-  specialize (cos2_sin2_1 θ) as H1.
-  apply (rngl_add_sub_eq_l Hos) in H1.
-  rewrite <- H1.
-  apply (rngl_lt_sub_lt_add_r Hop Hor).
-  rewrite <- (rngl_mul_2_l Hon).
-(* ah bin non, tiens... *)
-...
+  apply (eq_rngl_add_square_0 Hos Hor Hii) in H.
+  destruct H as (Hc, Hs).
+  now apply (eq_rngl_cosh_0 Hc1) in Hc.
+}
+rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite (rngl_squ_mul Hic).
+replace ε² with 1%L. 2: {
+  subst ε; symmetry.
+  destruct (0 ≤? rngl_sinh θ)%L; [ apply (rngl_squ_1 Hon) | ].
+  apply (rngl_squ_opp_1 Hon Hop).
+}
+rewrite (rngl_mul_1_l Hon).
+specialize (cosh2_sinh2_1 θ) as H1.
+apply (rngl_sub_move_r Hop) in H1.
+progress unfold d.
+rewrite (rngl_squ_sqrt Hon). 2: {
+  apply (rngl_add_squ_nonneg Hos Hor).
+}
+apply (rngl_div_diag Hon Hiq).
+intros H.
+apply (eq_rngl_add_square_0 Hos Hor Hii) in H.
+destruct H as (Hc, Hs).
+now apply (eq_rngl_cosh_0 Hc1) in Hc.
+Qed.
 
-Definition hangle_of_angle (θ : angle T) : hangle T :=
-  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
-  mk_hangle (rngl_cos θ / r) (rngl_sin θ / r)
-    (hangle_of_angle_prop θ).
+(* cos / sin = cosh / sinh *)
+(* c / ε(sinh) √(1-c²) = cosh / sinh *)
+(* c² / (1 - c²) = (cosh² / sinh² *)
+(* c² = (sinh² - 1) / sinh² * (1 - c²) *)
+(* c² = (ch/sh)² - c² (ch/sh)² *)
+(* c² (1 + (ch/sh)²) = (ch/sh)² *)
+(* c = (ch/sh) / √(1+(ch/sh)²) *)
+(* c = ch / √(ch² + sh²)) *)
+Definition angle_of_hangle (θ : hangle T) :=
+  let d := √((rngl_cosh θ)² + (rngl_sinh θ)²) in
+  let ε := if (0 ≤? rngl_sinh θ)%L then 1%L else (-1)%L in
+  mk_angle (rngl_cosh θ / d) (ε * rngl_sinh θ / d)
+    (angle_of_hangle_prop θ).
 
-Definition rngl_cos_i (θ : angle T) : T :=
-  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
-  (rngl_cos θ / r)%L.
-
-(* should have the property
-     (rngl_cos_i θ)² - (rngl_sin_i θ)² = 1.
-*)
-
-Definition rngl_cos_i (θ : angle T) :=
-  rngl_cosh (hangle_of_angle θ).
-
-...
-
-Print rngl_cos_i.
-
-...
+(* to be completed
 
 (* should have the property cos (hangle_mul_i θ) = cosh θ *)
-
-Definition hangle_mul_i (θ : hangle T) : _ → angle T :=
-  let r := √((rngl_cosh θ)² + (rngl_sinh θ)²) in
-  mk_angle (rngl_cosh θ / r) (rngl_sinh θ / r).
-
-(* but above, cos (hangle_mul i θ) is
-     cosh θ / r
-   which is not
-     cosh θ
-*)
 
 (* en fait, on ne peut pas avoir cos(iθ)=cosh(θ), puisque cosh va
    entre 1 et ∞, tandis que cos(iθ), bin si c'est un cosinus, il
@@ -1931,109 +1920,6 @@ Definition hangle_mul_i (θ : hangle T) : _ → angle T :=
 (* donc comment faire le lien entre le cos et le cosh ? *)
 (* que veut dire la formule cos(iθ)=cosh(θ) si on veut la typer
    correctement ? *)
-
-  let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
-  (rngl_cos θ / r)%L.
-
-...
-
-Definition angle_mul_i (θ : angle T) :=
-  mk_hangle
-    (rngl_cos θ / √((rngl_cos θ)² - (rngl_sin θ)²))
-    (rngl_sin θ / √((rngl_cos θ)² - (rngl_sin θ)²)).
-
-(* then cosh(iθ)=cos(θ) *)
-(* cosh(iθ) = cosh (cos θ / √(cos² θ - sin² θ))
-
-Definition angle_mul_i (θ : angle T) :=
-  let θ2 :=
-    if (0 ≤? rngl_sin θ)%L then (θ /₂)%A
-    else (- (- θ /₂))%A
-  in
-  match rngl_lt_dec ac_or 0 (rngl_cos θ) with
-  | left Hzc =>
-      mk_hangle
-        (rngl_cos θ2 / √(rngl_cos θ))
-        (rngl_sin θ2 / √(rngl_cos θ))
-        (angle_mul_i_prop θ Hzc)
-  | right _ =>
-      0%H
-  end.
-...
-
-Theorem angle_mul_i_prop :
-  ∀ θ,
-  (0 < rngl_cos θ)%L
-  → cosh2_sinh2_prop
-      (rngl_cos (θ /₂) / √(rngl_cos θ))
-      (rngl_sin (θ /₂) / √(rngl_cos θ)).
-Proof.
-destruct_ac.
-specialize (rngl_has_inv_has_inv_or_quot Hiv) as Hiq.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hzc.
-  rewrite H1 in Hzc.
-  now apply (rngl_lt_irrefl Hor) in Hzc.
-}
-intros * Hzc.
-progress unfold cosh2_sinh2_prop.
-apply Bool.andb_true_iff.
-assert (Hzc2 : (0 ≤ rngl_cos (θ /₂) / √(rngl_cos θ))%L). {
-  apply (rngl_div_nonneg Hon Hop Hiv Hor). {
-    cbn.
-(* ah oui, c'est pas machin / 2 en fait, c'est abs machin / 2,
-   un truc comme ça *)
-...
-Search (0 ≤ rngl_cos (_ /₂))%L.
-...
-}
-split; [ | now apply rngl_leb_le ].
-apply (rngl_eqb_eq Hed).
-cbn.
-remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
-symmetry in Hzs.
-destruct zs. {
-  rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
-    intros Hcz.
-    apply (rngl_lt_iff Hor) in Hzc.
-    apply (eq_rl_sqrt_0 Hon Hos) in Hcz; [ | easy ].
-    now symmetry in Hcz.
-  }
-  rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
-    intros Hcz.
-    apply (rngl_lt_iff Hor) in Hzc.
-    apply (eq_rl_sqrt_0 Hon Hos) in Hcz; [ | easy ].
-    now symmetry in Hcz.
-  }
-  rewrite (rngl_squ_sqrt Hon). 2: {
-    apply rngl_1_add_cos_div_2_nonneg.
-  }
-  rewrite (rngl_squ_sqrt Hon). 2: {
-    now apply (rngl_lt_le_incl Hor) in Hzc.
-  }
-  rewrite (rngl_squ_sqrt Hon). 2: {
-    apply rngl_1_sub_cos_div_2_nonneg.
-  }
-  do 2 rewrite <- (rngl_div_sub_distr_r Hop Hiv).
-  rewrite (rngl_sub_sub_distr Hop).
-  rewrite (rngl_add_sub_swap Hop).
-  rewrite (rngl_sub_diag Hos).
-  rewrite rngl_add_0_l.
-  rewrite <- (rngl_mul_2_r Hon).
-  rewrite (rngl_mul_div Hi1). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-  }
-  apply (rngl_div_diag Hon Hiq).
-  intros H.
-  rewrite H in Hzc.
-  now apply (rngl_lt_irrefl Hor) in Hzc.
-}
-
-...
-*)
 
 ...
 
