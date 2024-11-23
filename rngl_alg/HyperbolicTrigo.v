@@ -1704,7 +1704,7 @@ Proof. apply rngl_add_0_r. Qed.
 (* to be completed
 
 (* tracing a line from O to the right, less than 45°, we intersect
-   once the unit circle and the hyperbole. This is how I convert an
+   the unit circle and the hyperbole once. This is how I convert an
    angle to a hyperbolic angle. *)
 Theorem hangle_of_angle_prop :
   ∀ θ,
@@ -1800,17 +1800,31 @@ destruct zs. {
   apply (rngl_div_diag Hon Hiq).
   intros H; rewrite H in Hzc.
   now apply (rngl_lt_irrefl Hor) in Hzc.
-}
-...
-rewrite (rngl_squ_sqrt Hon). 2: {
-  apply (rngl_le_div_r Hon Hop Hiv Hor). {
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+} {
+  cbn.
+  rewrite (rngl_leb_0_opp Hop Hor).
+  apply (rngl_leb_gt Hor) in Hzs.
+  apply (rngl_lt_le_incl Hor) in Hzs.
+  apply rngl_leb_le in Hzs.
+  rewrite Hzs, (rngl_mul_1_l Hon).
+  rewrite (rngl_squ_sqrt Hon). 2: {
+    apply (rngl_le_div_r Hon Hop Hiv Hor). {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_mul_0_l Hos).
+    apply (rngl_le_opp_l Hop Hor).
+    apply rngl_cos_bound.
   }
-  rewrite (rngl_mul_0_l Hos).
-  apply (rngl_le_0_sub Hop Hor).
-  apply rngl_cosh_bound.
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite rngl_add_comm.
+  rewrite (rngl_add_sub Hos).
+  apply (rngl_div_diag Hon Hiq).
+  intros H; rewrite H in Hzc.
+  now apply (rngl_lt_irrefl Hor) in Hzc.
 }
-...
+Qed.
 
 Definition hangle_of_angle θ :=
   let θ2 :=
@@ -1826,6 +1840,19 @@ Definition hangle_of_angle θ :=
   | right _ =>
       0%H
   end.
+
+(* mouais, faut voir à voir, cette définition... *)
+Definition angle_of_hangle (θ : hangle T) :=
+  let θ2 :=
+    if (0 ≤? rngl_sinh θ)%L then (θ /₂)%H
+    else (- (- θ /₂))%H
+  in
+  mk_angle
+    (rngl_cosh θ2 / √(rngl_cosh θ))
+    (rngl_sinh θ2 / √(rngl_cosh θ))
+    true.
+...
+        (angle_of_angle_prop θ Hzc)
 
 ...
 
