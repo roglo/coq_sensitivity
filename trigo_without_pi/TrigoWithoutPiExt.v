@@ -2070,7 +2070,7 @@ destruct H3 as [H3| H3]; [ | easy ].
 clear Hzx; exfalso.
 specialize (H1 (x / 2)%L).
 assert (H : (0 < x / 2)%L). {
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_div_pos Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 specialize (H1 H); clear H.

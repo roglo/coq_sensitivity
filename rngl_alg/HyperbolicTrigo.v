@@ -1696,15 +1696,21 @@ Qed.
 Theorem rngl_exph_0 : rngl_exph 0 = 1%L.
 Proof. apply rngl_add_0_r. Qed.
 
-(* to be completed
+(* to be completed *)
 
 Theorem hangle_of_angle_prop :
   ∀ θ,
   (0 < rngl_cos θ)%L
-  -> let r := √((rngl_cos θ)² - (rngl_sin θ)²) in
+  -> let r := (√((rngl_cos θ)² - (rngl_sin θ)²) / 2)%L in
     cosh2_sinh2_prop (rngl_cos θ / r) (rngl_sin θ / r).
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hzc *.
+  rewrite H1 in Hzc.
+  now apply (rngl_lt_irrefl Hor) in Hzc.
+}
 intros * Hzc *.
 progress unfold cosh2_sinh2_prop.
 apply Bool.andb_true_iff.
@@ -1713,6 +1719,9 @@ assert (Hzcr : (0 ≤ rngl_cos θ / r)%L). {
     now apply (rngl_lt_le_incl Hor) in Hzc.
   }
   subst r.
+  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
   apply (rl_sqrt_pos Hon Hos Hor).
   apply (rngl_lt_0_sub Hop Hor).
   specialize (cos2_sin2_1 θ) as H1.
@@ -1720,6 +1729,7 @@ assert (Hzcr : (0 ≤ rngl_cos θ / r)%L). {
   rewrite <- H1.
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   rewrite <- (rngl_mul_2_l Hon).
+(* ah bin non, tiens... *)
 ...
 
 Definition hangle_of_angle (θ : angle T) : hangle T :=

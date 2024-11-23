@@ -282,7 +282,7 @@ Proof.
 destruct_ac.
 intros Hc1.
 apply (rl_sqrt_pos Hon Hos Hor).
-apply (rngl_div_lt_pos Hon Hop Hiv Hor). {
+apply (rngl_div_pos Hon Hop Hiv Hor). {
   apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 apply (rngl_0_lt_2 Hon Hos Hc1 Hor).

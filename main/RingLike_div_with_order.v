@@ -595,7 +595,7 @@ apply (rngl_lt_iff Hor) in Hb.
 now apply not_eq_sym.
 Qed.
 
-Theorem rngl_div_lt_pos:
+Theorem rngl_div_pos :
   rngl_has_1 T = true →
   rngl_has_opp T = true →
   rngl_has_inv T = true →

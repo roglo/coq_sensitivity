@@ -625,7 +625,7 @@ split. {
   progress unfold rngl_is_limit_when_tending_to_inf in Hal.
   specialize (Hal ((an - lim) / 2)%L) as H7.
   assert (H : (0 < (an - lim) / 2)%L). {
-    apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     now apply (rngl_lt_0_sub Hop Hor).
@@ -667,7 +667,7 @@ split. {
   progress unfold rngl_is_limit_when_tending_to_inf in Hbl.
   specialize (Hbl ((lim - bn) / 2)%L) as H7.
   assert (H : (0 < (lim - bn) / 2)%L). {
-    apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+    apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     now apply (rngl_lt_0_sub Hop Hor).

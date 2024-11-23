@@ -415,7 +415,7 @@ progress unfold is_limit_when_tending_to_inf in H1.
 progress unfold rngl_dist in H1.
 specialize (H1 (ε² / 2))%L.
 assert (Hε2 : (0 < ε² / 2)%L). {
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
   apply (rngl_lt_iff Hor).
@@ -519,7 +519,7 @@ assert (He1 : (1 - ε² / 2 < 1)%L). {
   apply (rngl_lt_sub_lt_add_r Hop Hor).
   apply (rngl_lt_sub_lt_add_l Hop Hor).
   rewrite (rngl_sub_diag Hos).
-  apply (rngl_div_lt_pos Hon Hop Hiv Hor). 2: {
+  apply (rngl_div_pos Hon Hop Hiv Hor). 2: {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   }
   now apply (rngl_mul_pos_pos Hos Hor Hii).
