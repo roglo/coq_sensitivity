@@ -1909,7 +1909,56 @@ Definition angle_of_hangle (θ : hangle T) :=
   mk_angle (rngl_cosh θ / d) (ε * rngl_sinh θ / d)
     (angle_of_hangle_prop θ).
 
+Definition rngl_expc (θ : angle T) := rngl_exph (hangle_of_angle θ).
+
 (* to be completed
+Theorem rngl_expc_add :
+  ∀ a b, rngl_expc (a + b) = (rngl_expc a * rngl_expc b)%L.
+Proof.
+destruct_ac.
+intros.
+progress unfold rngl_expc.
+progress unfold rngl_exph.
+cbn.
+rewrite rngl_mul_add_distr_l.
+do 2 rewrite rngl_mul_add_distr_r.
+progress unfold hangle_of_angle.
+destruct (rngl_lt_dec ac_or 0 (rngl_cos a)) as [Hzca| Hzca]. {
+  cbn - [ angle_add ].
+  destruct (rngl_lt_dec ac_or 0 (rngl_cos b)) as [Hzcb| Hzcb]. {
+    cbn - [ angle_add ].
+    destruct (rngl_lt_dec ac_or 0 (rngl_cos (a + b))) as [Hzcab| Hzcab]. {
+      cbn - [ angle_add ].
+      remember (0 ≤? rngl_sin (a + b))%L as zsab eqn:Hzsab.
+      symmetry in Hzsab.
+      destruct zsab. {
+        remember (0 ≤? rngl_sin a)%L as zsa eqn:Hzsa.
+        symmetry in Hzsa.
+        destruct zsa. {
+          remember (0 ≤? rngl_sin b)%L as zsb eqn:Hzsb.
+          symmetry in Hzsb.
+          destruct zsb. {
+            cbn - [ angle_add ].
+            rewrite Hzsab, Hzsa, Hzsb.
+            do 3 rewrite (rngl_mul_1_l Hon).
+(*
+remember (rngl_cos (a + b)) as cab.
+remember (rngl_cos a) as ca.
+remember (rngl_cos b) as cb.
+*)
+            f_equal. {
+              cbn.
+(* mouais, pas sûr que ça marche *)
+(* d'ailleurs, ça m'étonnerait *)
+...
+        do 2 rewrite <- rngl_add_assoc.
+f_equal.
+rewrite rngl_add_comm.
+rewrite <- rngl_add_assoc.
+easy.
+Qed.
+
+...
 
 Theorem glop :
   ∀ θ, rngl_cos (angle_of_hangle θ) = rngl_cosh θ.
