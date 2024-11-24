@@ -1934,57 +1934,6 @@ Qed.
 
 (* to be completed
 
-Theorem rngl_cos_derivative :
-  is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
-Proof.
-destruct_ac.
-intros θ ε Hε.
-enough (H :
-  ∃ η : T,
-  (0 < η)%L ∧
-  ∀ dθ : angle T,
-    (angle_eucl_dist (θ + dθ) θ < η)%L
-    → (rngl_dist
-         (rngl_dist
-            (rngl_cos (θ + dθ)) (rngl_cos θ) / angle_eucl_dist (θ + dθ) θ)
-            (- rngl_sin θ) <
-       ε)%L). {
-  destruct H as (η & Hzη & H).
-  exists η.
-  split; [ easy | ].
-  intros θ' Hθ'.
-  specialize (H (θ' - θ))%A.
-  rewrite angle_add_sub_assoc in H.
-  rewrite angle_add_sub_swap in H.
-  rewrite angle_sub_diag, angle_add_0_l in H.
-  now specialize (H Hθ').
-}
-enough (H :
-  ∃ η : T,
-  (0 < η)%L ∧
-  ∀ dθ : angle T,
-    (angle_eucl_dist (θ + dθ) θ < η)%L
-    → (rngl_dist
-         (rngl_abs (rngl_cos (θ + dθ) - rngl_cos θ) /
-            rl_modl
-              (rngl_cos (θ + dθ) - rngl_cos θ)
-              (rngl_sin (θ + dθ) - rngl_sin θ))
-         (- rngl_sin θ) <
-       ε)%L). {
-  destruct H as (η & Hzη & H).
-  exists η.
-  split; [ easy | ].
-  intros dθ Hdθ.
-  specialize (H dθ Hdθ)%A.
-  progress unfold rngl_dist at 2.
-  (* lemma *)
-  progress unfold angle_eucl_dist.
-  progress unfold rl_modl.
-  rewrite (rngl_squ_sub_comm Hop).
-  rewrite (rngl_squ_sub_comm Hop (rngl_sin θ)).
-  rewrite fold_rl_modl.
-  easy.
-}
 Theorem rngl_cos_add_cos :
   ∀ p q,
   (rngl_cos p + rngl_cos q =
@@ -1999,9 +1948,10 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros.
-cbn - [ angle_add angle_sub ].
-Search (0 ≤ rngl_cos _ + rngl_cos _)%L.
+Search (rngl_cos _ * rngl_cos _)%L.
+Search (rngl_cos (_ /₂)).
 ...
+cbn - [ angle_add angle_sub ].
 set (ε₁ := if (0 ≤? _)%L then _ else _).
 set (ε₂ := if (0 ≤? _)%L then _ else _).
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
@@ -2083,6 +2033,13 @@ destruct (rngl_eq_dec Heo ε₁ ε₂) as [Hee| Hee]. {
     destruct zsa. {
       destruct zsb. {
         apply rngl_leb_le in Hzsa, Hzsb.
+        destruct (rngl_le_dec Hor 0 (rngl_cos p)) as [Hzcp| Hzcp]. {
+          apply rngl_add_cos_nonneg_when_sin_nonneg; [ | | easy | easy ]. {
+Search (_ ≤ rngl_sin _)%L.
+          apply (rngl_sin_add_nonneg_angle_add_not_overflow_sin_nonneg)
+            with (θ1 := q); [ | now rewrite angle_add_comm | ].
+          apply (rngl_sin_add_nonneg_angle_add_not_overflow_sin_nonneg)
+            with (θ1 := p); [ | easy | ].
 Search (0 ≤ rngl_cos _ + rngl_cos _)%L.
 ...
 rewrite rngl_cos_add.
@@ -2136,6 +2093,59 @@ rewrite (rngl_mul_mul_swap Hic sp sq).
 rewrite <- (rngl_mul_assoc _ cq).
 rewrite <- (rngl_mul_assoc _ sq).
 do 4 rewrite fold_rngl_squ.
+...
+
+Theorem rngl_cos_derivative :
+  is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
+Proof.
+destruct_ac.
+intros θ ε Hε.
+enough (H :
+  ∃ η : T,
+  (0 < η)%L ∧
+  ∀ dθ : angle T,
+    (angle_eucl_dist (θ + dθ) θ < η)%L
+    → (rngl_dist
+         (rngl_dist
+            (rngl_cos (θ + dθ)) (rngl_cos θ) / angle_eucl_dist (θ + dθ) θ)
+            (- rngl_sin θ) <
+       ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  split; [ easy | ].
+  intros θ' Hθ'.
+  specialize (H (θ' - θ))%A.
+  rewrite angle_add_sub_assoc in H.
+  rewrite angle_add_sub_swap in H.
+  rewrite angle_sub_diag, angle_add_0_l in H.
+  now specialize (H Hθ').
+}
+enough (H :
+  ∃ η : T,
+  (0 < η)%L ∧
+  ∀ dθ : angle T,
+    (angle_eucl_dist (θ + dθ) θ < η)%L
+    → (rngl_dist
+         (rngl_abs (rngl_cos (θ + dθ) - rngl_cos θ) /
+            rl_modl
+              (rngl_cos (θ + dθ) - rngl_cos θ)
+              (rngl_sin (θ + dθ) - rngl_sin θ))
+         (- rngl_sin θ) <
+       ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  split; [ easy | ].
+  intros dθ Hdθ.
+  specialize (H dθ Hdθ)%A.
+  progress unfold rngl_dist at 2.
+  (* lemma *)
+  progress unfold angle_eucl_dist.
+  progress unfold rl_modl.
+  rewrite (rngl_squ_sub_comm Hop).
+  rewrite (rngl_squ_sub_comm Hop (rngl_sin θ)).
+  rewrite fold_rl_modl.
+  easy.
+}
 ...
 
 Theorem rngl_cos_sub_cos :
