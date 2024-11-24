@@ -833,7 +833,9 @@ Record charac_0_field :=
 End a.
 
 Arguments rngl_characteristic_1 {T ro rp} Hon Hos Hch x%_L.
+Arguments rngl_mul_assoc {T ro rp} (a b c)%_L : rename.
 Arguments rngl_mul_comm {T ro rp} Hic (a b)%_L.
+Arguments rngl_mul_mul_swap {T ro rp} Hic (a b c)%_L.
 Arguments rngl_mul_0_r {T ro rp} Hom a%_L.
 Arguments rngl_mul_1_r {T ro rp} Hon a%_L.
 Arguments rngl_pow_squ {T ro rp} Hic Hon a%_L n%_nat.

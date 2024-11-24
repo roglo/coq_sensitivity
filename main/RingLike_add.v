@@ -737,5 +737,7 @@ End a.
 Arguments rngl_abs {T ro} a%_L.
 Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
 Arguments rngl_add_sub {T ro rp} Hom (a b)%_L.
+Arguments rngl_add_sub_swap {T ro rp} Hop (a b c)%_L.
 Arguments rngl_min {T ro} (a b)%_L.
 Arguments rngl_mul_nat {T ro} a%_L n%_nat.
+Arguments rngl_sub_add_distr {T ro rp} Hos (a b c)%_L.
