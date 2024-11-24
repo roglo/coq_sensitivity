@@ -1669,6 +1669,9 @@ Require Import Trigo.AngleDiv2.
 Require Import Trigo.AngleDiv2Add.
 Require Import Trigo.AngleDivNat.
 Require Import Trigo.SeqAngleIsCauchy.
+Require Import Trigo.TrigoWithoutPiExt.
+Require Import Trigo.Angle_order.
+Require Import Trigo.AngleAddLeMonoL.
 
 Section a.
 
@@ -1968,11 +1971,69 @@ enough (H :
   rewrite fold_rl_modl.
   easy.
 }
+Theorem rngl_cos_add_cos :
+  ∀ p q,
+  (rngl_cos p + rngl_cos q =
+     2 * rngl_sin ((p + q) /₂) * rngl_sin ((p - q) /₂))%L.
+Proof.
+Admitted.
+
 Theorem rngl_cos_sub_cos :
   ∀ p q,
   (rngl_cos p - rngl_cos q =
      - (2 * rngl_sin ((p + q) /₂) * rngl_sin ((p - q) /₂)))%L.
 Proof.
+destruct_ac.
+intros.
+specialize (rngl_cos_add_cos p (q + angle_straight)) as H1.
+rewrite angle_add_assoc in H1.
+rewrite angle_sub_add_distr in H1.
+rewrite rngl_cos_add_straight_r in H1.
+rewrite (rngl_add_opp_r Hop) in H1.
+(* I need a lemma angle_lt_dec *)
+remember ((p + q) <? angle_straight)%A as pqs eqn:Hpqs.
+symmetry in Hpqs.
+destruct pqs. {
+  rewrite rngl_sin_angle_div_2_add_not_overflow in H1. 2: {
+    (* lemma *)
+    progress unfold angle_add_overflow.
+    apply Bool.andb_false_iff.
+    remember (p + q ≠? 0)%A as pqz eqn:Hpqz.
+    symmetry in Hpqz.
+    destruct pqz; [ right | now left ].
+(* ça va pas, mon <? et mon ≤? dans les angles
+   faut que je corrige ça d'abord *)
+    apply Bool.not_true_iff_false.
+    intros H.
+...
+    (* lemma *)
+    rewrite <- angle_add_overflow_equiv3.
+    progress unfold old_angle_add_overflow.
+    (* lemma *)
+    apply Bool.not_true_iff_false.
+    intros H.
+    apply angle_nle_gt in H.
+    apply H; clear H.
+    (* end lemma *)
+Search (_ ≤ _ + _)%A.
+    (* lemma *)
+    rewrite <- (angle_add_0_r (p + q)) at 1.
+    apply angle_add_le_mono_l.
+...
+    apply angle_le_add_l.
+    apply angle_ltb_ge.
+...
+    rewrite angle_add_overflow_equiv2.
+    progress unfold angle_add_overflow.
+    apply Bool.andb_false_iff.
+
+Search (_ → angle_add_overflow _ _ = false).
+Search (rngl_sin ((_ + _) /₂)).
+...
+rewrite H1; clear H1.
+...
+
+(* for rngl_cos_add_cos *)
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
@@ -2028,6 +2089,11 @@ rewrite <- rl_sqrt_mul; cycle 1. {
   apply (rngl_le_0_sub Hop Hor).
   apply rngl_cos_bound.
 }
+rewrite (rngl_mul_sub_distr_l Hop).
+do 2 rewrite (rngl_mul_sub_distr_r Hop).
+do 2 rewrite (rngl_mul_1_r Hon).
+rewrite (rngl_mul_1_l Hon).
+cbn.
 ...
 rewrite rngl_mul_assoc.
 ...
