@@ -1911,11 +1911,16 @@ Definition angle_of_hangle (θ : hangle T) :=
 
 Definition rngl_expc (θ : angle T) := rngl_exph (hangle_of_angle θ).
 
+(* to be moved to the right place *)
+Theorem fold_rl_modl : ∀ x y, √(x² + y²) = rl_modl x y.
+Proof. easy. Qed.
+
 (* to be completed
 
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
+destruct_ac.
 intros θ ε Hε.
 enough (H :
   ∃ η : T,
@@ -1937,8 +1942,32 @@ enough (H :
   rewrite angle_sub_diag, angle_add_0_l in H.
   now specialize (H Hθ').
 }
-Search (rngl_cos _ + rngl_cos _)%L.
-Search (rngl_sin ((_ + _) /₂)).
+enough (H :
+  ∃ η : T,
+  (0 < η)%L ∧
+  ∀ dθ : angle T,
+    (angle_eucl_dist (θ + dθ) θ < η)%L
+    → (rngl_dist
+         (rngl_abs (rngl_cos (θ + dθ) - rngl_cos θ) /
+            rl_modl
+              (rngl_cos (θ + dθ) - rngl_cos θ)
+              (rngl_sin (θ + dθ) - rngl_sin θ))
+         (- rngl_sin θ) <
+       ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  split; [ easy | ].
+  intros dθ Hdθ.
+  specialize (H dθ Hdθ)%A.
+  progress unfold rngl_dist at 2.
+  (* lemma *)
+  progress unfold angle_eucl_dist.
+  progress unfold rl_modl.
+  rewrite (rngl_squ_sub_comm Hop).
+  rewrite (rngl_squ_sub_comm Hop (rngl_sin θ)).
+  rewrite fold_rl_modl.
+  easy.
+}
 Theorem rngl_cos_sub_cos :
   ∀ p q,
   (rngl_cos p - rngl_cos q =
