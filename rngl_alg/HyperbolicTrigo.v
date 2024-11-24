@@ -1912,6 +1912,105 @@ Definition angle_of_hangle (θ : hangle T) :=
 Definition rngl_expc (θ : angle T) := rngl_exph (hangle_of_angle θ).
 
 (* to be completed
+
+Theorem rngl_cos_derivative :
+  is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
+Proof.
+intros θ ε Hε.
+enough (H :
+  ∃ η : T,
+  (0 < η)%L ∧
+  ∀ dθ : angle T,
+    (angle_eucl_dist (θ + dθ) θ < η)%L
+    → (rngl_dist
+         (rngl_dist
+            (rngl_cos (θ + dθ)) (rngl_cos θ) / angle_eucl_dist (θ + dθ) θ)
+            (- rngl_sin θ) <
+       ε)%L). {
+  destruct H as (η & Hzη & H).
+  exists η.
+  split; [ easy | ].
+  intros θ' Hθ'.
+  specialize (H (θ' - θ))%A.
+  rewrite angle_add_sub_assoc in H.
+  rewrite angle_add_sub_swap in H.
+  rewrite angle_sub_diag, angle_add_0_l in H.
+  now specialize (H Hθ').
+}
+Search (rngl_cos _ + rngl_cos _)%L.
+Search (rngl_sin ((_ + _) /₂)).
+Theorem rngl_cos_sub_cos :
+  ∀ p q,
+  (rngl_cos p - rngl_cos q =
+     - (2 * rngl_sin ((p + q) /₂) * rngl_sin ((p - q) /₂)))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (- _)%L).
+  apply H1.
+}
+intros.
+cbn - [ angle_add ].
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+(* lemma *)
+replace 2%L with (√2 * √2)%L at 1. 2: {
+  rewrite fold_rngl_squ.
+  apply (rngl_squ_sqrt Hon).
+  apply (rngl_0_le_2 Hon Hos Hor).
+}
+do 2 rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic).
+rewrite rngl_mul_assoc.
+rewrite (rngl_mul_comm Hic √2).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  (* lemma *)
+  intros H.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+}
+rewrite (rngl_div_mul Hon Hiv). 2: {
+  (* lemma *)
+  intros H.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
+}
+rewrite <- rl_sqrt_mul; cycle 1. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+} {
+  apply (rngl_le_0_sub Hop Hor).
+  apply rngl_cos_bound.
+}
+...
+rewrite rngl_mul_assoc.
+...
+Print rngl_dist.
+progress unfold rngl_dist.
+enough (H : ...
+...
+Check rngl_cos_add_cos.
+Search (rngl_cos _ - rngl_cos _)%L.
+progress unfold angle_eucl_dist at 1.
+...
+
 Theorem rngl_expc_add :
   ∀ a b, rngl_expc (a + b) = (rngl_expc a * rngl_expc b)%L.
 Proof.
