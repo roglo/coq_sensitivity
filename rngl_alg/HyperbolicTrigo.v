@@ -1939,6 +1939,32 @@ Theorem rngl_cos_add_cos :
   (rngl_cos p + rngl_cos q =
      2 * rngl_cos ((p + q) /₂) * rngl_cos ((p - q) /₂))%L.
 Proof.
+intros.
+replace p with ((p + q) /₂ + (p - q) /₂)%A at 1. 2: {
+  rewrite angle_div_2_add.
+  remember (angle_add_overflow p q) as opq eqn:Hopq.
+  symmetry in Hopq.
+  destruct opq. {
+    replace q with ((p + q) /₂ - (p - q) /₂)%A at 1. 2: {
+      (* lemma *)
+      remember ((p + q) /₂)%A as x.
+      progress unfold angle_sub.
+      rewrite angle_div_2_add.
+      remember (angle_add_overflow p (- q)) as opoq eqn:Hopoq.
+      symmetry in Hopoq.
+      destruct opoq. {
+        move Hopq at bottom.
+        progress unfold angle_add_overflow in Hopoq.
+        progress unfold angle_add_overflow in Hopq.
+        apply Bool.andb_true_iff in Hopoq, Hopq.
+        destruct Hopoq as (Hpz, H1).
+        destruct Hopq as (_, H2).
+...
+        progress unfold angle_leb in H1.
+        progress unfold angle_leb in H2.
+Search (- _ ≤ - _)%A.
+Search (angle_add_overflow _ (- _)).
+...
 destruct_ac.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
@@ -1947,10 +1973,11 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ * _)%L).
   apply H1.
 }
-intros.
+...
 Search (rngl_cos _ * rngl_cos _)%L.
 Search (rngl_cos (_ /₂)).
 ...
+intros.
 cbn - [ angle_add angle_sub ].
 set (ε₁ := if (0 ≤? _)%L then _ else _).
 set (ε₂ := if (0 ≤? _)%L then _ else _).
