@@ -1991,6 +1991,7 @@ Theorem rngl_cos_add_cos :
      2 * rngl_cos ((p + q) /₂) * rngl_cos ((p - q) /₂))%L.
 Proof.
 destruct_ac.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros.
@@ -1999,6 +2000,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 cbn - [ angle_add angle_sub ].
+Search (0 ≤ rngl_cos _ + rngl_cos _)%L.
+...
 set (ε₁ := if (0 ≤? _)%L then _ else _).
 set (ε₂ := if (0 ≤? _)%L then _ else _).
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); cycle 1. {
@@ -2055,47 +2058,78 @@ rewrite <- rl_sqrt_mul; cycle 1. {
   apply (rngl_le_opp_l Hop Hor).
   apply rngl_cos_bound.
 }
+(**)
+destruct (rngl_eq_dec Heo ε₁ ε₂) as [Hee| Hee]. {
+  assert (He1 : (ε = 1)%L). {
+    subst ε; rewrite <- Hee.
+    rewrite fold_rngl_squ.
+    progress unfold ε₁.
+    destruct (0 ≤? rngl_sin (p + q))%L. {
+      apply (rngl_squ_1 Hon).
+    } {
+      rewrite (rngl_squ_opp Hop).
+      apply (rngl_squ_1 Hon).
+    }
+  }
+  rewrite He1.
+  rewrite (rngl_mul_1_r Hon).
+  subst ε.
+  clear He1.
+  rewrite <- (rngl_abs_nonneg_eq Hop Hor (_ + _)). 2: {
+    subst ε₁ ε₂.
+    remember (0 ≤? rngl_sin (p + q))%L as zsa eqn:Hzsa.
+    remember (0 ≤? rngl_sin (p - q))%L as zsb eqn:Hzsb.
+    symmetry in Hzsa, Hzsb.
+    destruct zsa. {
+      destruct zsb. {
+        apply rngl_leb_le in Hzsa, Hzsb.
+Search (0 ≤ rngl_cos _ + rngl_cos _)%L.
+...
 rewrite rngl_cos_add.
 rewrite rngl_cos_sub.
 remember (rngl_cos p) as cp.
 remember (rngl_cos q) as cq.
 remember (rngl_sin p) as sp.
 remember (rngl_sin q) as sq.
-...
-rewrite (rngl_mul_sub_distr_l Hop).
-do 4 rewrite (rngl_mul_sub_distr_r Hop).
-do 3 rewrite rngl_mul_add_distr_l.
-do 3 rewrite (rngl_mul_1_r Hon).
-do 2 rewrite (rngl_mul_1_l Hon).
-do 2 rewrite (rngl_sub_sub_distr Hop).
-do 2 rewrite (rngl_sub_add_distr Hos).
-do 2 rewrite (rngl_add_sub_assoc Hop).
+do 2 rewrite rngl_mul_add_distr_l.
+do 3 rewrite rngl_mul_add_distr_r.
+do 3 rewrite (rngl_mul_sub_distr_r Hop).
+do 3 rewrite (rngl_mul_1_l Hon).
+do 2 rewrite (rngl_mul_1_r Hon).
+do 2 rewrite rngl_add_assoc.
+do 4 rewrite (rngl_add_sub_assoc Hop).
 rewrite rngl_add_assoc.
 do 4 rewrite rngl_mul_assoc.
-rewrite (rngl_add_sub_swap Hop _ (sp * sq)).
-rewrite (rngl_add_sub Hos).
-rewrite <- (rngl_sub_add_distr Hos _ (cp * cq)).
+rewrite <- (rngl_add_sub_swap Hop (1 + cp * cq)).
+rewrite <- (rngl_add_assoc 1).
 rewrite <- (rngl_mul_2_l Hon).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite rngl_add_add_swap.
+rewrite (rngl_sub_add Hop).
 rewrite rngl_mul_assoc.
 rewrite (rngl_mul_comm Hic (sp * sq)).
 rewrite (rngl_mul_mul_swap Hic _ (sp * sq)).
 rewrite rngl_mul_assoc.
-rewrite (rngl_add_sub Hos).
+rewrite (rngl_sub_add Hop).
 rewrite <- (rngl_mul_assoc (cp * cq)).
 rewrite <- (rngl_mul_assoc (sp * sq)).
 do 2 rewrite fold_rngl_squ.
 rewrite <- rngl_mul_assoc.
 rewrite <- (rngl_squ_1 Hon) at 1.
 rewrite <- (rngl_mul_1_r Hon 2).
-rewrite <- (rngl_squ_sub Hop Hic Hon).
-remember (1 - cp * cq)%L as a.
+remember (1 + cp * cq)%L as a.
 remember (sp * sq)%L as b.
+rewrite <- (rngl_squ_add Hic Hon).
 rewrite (rngl_squ_sub_squ Hop).
 rewrite (rngl_mul_comm Hic b).
 rewrite (rngl_add_sub Hos).
-subst a b.
+clear a Heqa.
+remember (cp * cq)%L as a eqn:Ha.
+rewrite (rngl_squ_sub_squ' Hop).
+rewrite (rngl_mul_comm Hic b).
+rewrite (rngl_add_sub Hos).
 ...
-rewrite (rngl_squ_sub Hop Hic Hon).
+rewrite (rngl_squ_add Hic Hon).
 ...
 rewrite (rngl_mul_mul_swap Hic cp cq).
 rewrite (rngl_mul_mul_swap Hic sp sq).

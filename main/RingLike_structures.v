@@ -635,3 +635,6 @@ destruct ab. {
 Qed.
 
 End a.
+
+Arguments rngl_add_assoc {T ro rp} (a b c)%_L : rename.
+Arguments rngl_add_comm {T ro ring_like_prop} (a b)%_L.
