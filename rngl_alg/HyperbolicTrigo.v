@@ -1926,6 +1926,34 @@ intros.
 remember (angle_add_overflow p q) as opq eqn:Hopq.
 remember (angle_add_overflow p (-q)) as opo eqn:Hopo.
 symmetry in Hopq, Hopo.
+(**)
+destruct opq. 2: {
+  destruct opo. 2: {
+    replace p with ((p + q) /₂ + (p - q) /₂)%A at 1. 2: {
+      rewrite angle_div_2_add.
+      rewrite Hopq.
+      replace q with ((p + q) /₂ - (p - q) /₂)%A at 2. 2: {
+        (* lemma ? angle_div_2_sub *)
+        progress unfold angle_sub at 1.
+        rewrite angle_opp_div_2.
+        remember (p - q =? 0)%A as pqz eqn:Hpqz.
+        symmetry in Hpqz.
+        destruct pqz. {
+          apply angle_eqb_eq in Hpqz.
+          apply -> angle_sub_move_0_r in Hpqz.
+          subst q.
+          rewrite angle_sub_diag.
+          rewrite angle_opp_0.
+          rewrite angle_0_div_2.
+          do 2 rewrite angle_add_0_r.
+          rewrite angle_add_diag.
+          rewrite <- angle_mul_nat_div_2. 2: {
+            now cbn; rewrite angle_add_0_r, Hopq.
+          }
+          apply angle_div_2_mul_2.
+        }
+        apply angle_eqb_neq in Hpqz.
+...
 destruct opq. {
   destruct opo. {
 (* chuis dans un cas raté, là *)
