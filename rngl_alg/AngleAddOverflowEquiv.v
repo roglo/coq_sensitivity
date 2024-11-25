@@ -598,16 +598,6 @@ subst θ2.
 now apply angle_lt_irrefl in H12.
 Qed.
 
-Theorem angle_div_2_add_overflow :
-  ∀ θ1 θ2,
-  angle_add_overflow θ1 θ2 = true
-  → ((θ1 + θ2) /₂)%A = (θ1 /₂ + θ2 /₂ + angle_straight)%A.
-Proof.
-intros * Haov.
-rewrite angle_div_2_add.
-now rewrite Haov.
-Qed.
-
 Theorem rngl_sin_pos_lt_straight :
   ∀ θ,
   (0 < rngl_sin θ)%L
