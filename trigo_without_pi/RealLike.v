@@ -156,6 +156,9 @@ Qed.
 
 Definition rl_modl x y := (√(x² + y²))%L.
 
+Theorem fold_rl_modl : ∀ x y, √(x² + y²) = rl_modl x y.
+Proof. easy. Qed.
+
 Theorem rl_modl_add_le :
   rngl_mul_is_comm T = true →
   rngl_has_1 T = true →

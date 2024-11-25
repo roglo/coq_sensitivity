@@ -2565,6 +2565,19 @@ split; intros H12. {
 }
 Qed.
 
+Theorem angle_neqb_neq :
+  ∀ θ1 θ2, (θ1 ≠? θ2)%A = true ↔ θ1 ≠ θ2.
+Proof.
+intros.
+split; intros H12. {
+  apply angle_eqb_neq.
+  now apply Bool.negb_true_iff.
+} {
+  apply Bool.negb_true_iff.
+  now apply angle_eqb_neq.
+}
+Qed.
+
 Theorem angle_eq_dec : ∀ θ1 θ2 : angle T, {θ1 = θ2} + {θ1 ≠ θ2}.
 Proof.
 intros.

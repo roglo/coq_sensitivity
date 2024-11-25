@@ -369,6 +369,70 @@ rewrite Bool.orb_true_iff; right.
 apply (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv).
 Qed.
 
+Theorem angle_opp_div_2 :
+  ∀ θ, (- (θ /₂) = (- θ) /₂ + if (θ =? 0)%A then 0 else angle_straight)%A.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite (H1 (_ + _)%A).
+  apply H1.
+}
+intros.
+assert (Hsz2 : (√(0 / 2) = 0)%L). {
+  rewrite (rngl_div_0_l Hos Hi1). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite (rl_sqrt_0 Hon Hop Hor); [ easy | ].
+  now rewrite Bool.orb_true_iff; right.
+}
+remember (θ =? 0)%A as z eqn:Hz.
+symmetry in Hz.
+destruct z. {
+  apply angle_eqb_eq in Hz; subst.
+  rewrite angle_add_0_r.
+  apply eq_angle_eq; cbn.
+  rewrite (rngl_leb_0_opp Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  rewrite Hsz2.
+  now rewrite (rngl_opp_0 Hop).
+}
+apply angle_eqb_neq in Hz.
+apply eq_angle_eq; cbn.
+do 2 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_0_r Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_leb_0_opp Hop Hor).
+do 2 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_mul_1_r Hon).
+f_equal.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hzs, Hsz.
+destruct zs. {
+  destruct sz. {
+    apply rngl_leb_le in Hzs, Hsz.
+    apply (rngl_le_antisymm Hor) in Hzs; [ clear Hsz | easy ].
+    apply eq_rngl_sin_0 in Hzs.
+    destruct Hzs as [Hzs| Hzs]; [ easy | subst θ ].
+    cbn.
+    rewrite (rngl_add_opp_r Hop).
+    rewrite (rngl_sub_diag Hos).
+    rewrite Hsz2.
+    rewrite (rngl_mul_0_r Hos).
+    symmetry; apply (rngl_opp_0 Hop).
+  }
+  rewrite <- (rngl_mul_opp_l Hop).
+  f_equal; symmetry.
+  apply (rngl_opp_involutive Hop).
+}
+destruct sz; [ now rewrite (rngl_mul_opp_l Hop) | ].
+apply (rngl_leb_gt Hor) in Hzs, Hsz.
+now apply (rngl_lt_asymm Hor) in Hzs.
+Qed.
+
 Theorem angle_div_2_le_compat :
   ∀ θ1 θ2, (θ1 ≤ θ2 → θ1 /₂ ≤ θ2 /₂)%A.
 Proof.
