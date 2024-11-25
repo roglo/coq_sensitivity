@@ -1931,6 +1931,39 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros.
+assert (Hp : ∀ a, (0 ≤ a)%L → (√(a / 2) * 2 * √(a / 2))%L = a). {
+  intros * Ha.
+  replace 2%L with (√2 * √2)%L at 2. 2: {
+    rewrite fold_rngl_squ.
+    apply (rngl_squ_sqrt Hon).
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  rewrite rngl_mul_assoc.
+  rewrite <- rl_sqrt_mul; cycle 1. {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  } {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite (rngl_mul_mul_swap Hic).
+  rewrite <- rngl_mul_assoc.
+  rewrite <- rl_sqrt_mul; cycle 1. {
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  } {
+    apply (rngl_0_le_2 Hon Hos Hor).
+  }
+  rewrite (rngl_div_mul Hon Hiv). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+  rewrite <- rl_sqrt_mul; [ | easy | easy ].
+  rewrite fold_rngl_squ.
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  now apply (rngl_abs_nonneg_eq Hop Hor).
+}
 remember (angle_add_overflow p q) as opq eqn:Hopq.
 remember (angle_add_overflow p (-q)) as opo eqn:Hopo.
 symmetry in Hopq, Hopo.
@@ -1993,41 +2026,8 @@ destruct opq. 2: {
             rewrite (rngl_mul_mul_swap Hic (-1)).
             rewrite (rngl_squ_opp_1 Hon Hop).
             rewrite (rngl_mul_1_l Hon).
-            replace 2%L with (√2 * √2)%L at 2. 2: {
-              rewrite fold_rngl_squ.
-              apply (rngl_squ_sqrt Hon).
-              apply (rngl_0_le_2 Hon Hos Hor).
-            }
-            rewrite rngl_mul_assoc.
-            rewrite <- rl_sqrt_mul; cycle 1. {
-              apply rngl_1_add_cos_div_2_nonneg.
-            } {
-              apply (rngl_0_le_2 Hon Hos Hor).
-            }
-            rewrite (rngl_div_mul Hon Hiv). 2: {
-              apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-            }
-            rewrite (rngl_mul_mul_swap Hic).
-            rewrite <- rngl_mul_assoc.
-            rewrite <- rl_sqrt_mul; cycle 1. {
-              apply rngl_1_add_cos_div_2_nonneg.
-            } {
-              apply (rngl_0_le_2 Hon Hos Hor).
-            }
-            rewrite (rngl_div_mul Hon Hiv). 2: {
-              apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-            }
-            rewrite <- rl_sqrt_mul; cycle 1. {
-              apply (rngl_le_opp_l Hop Hor).
-              apply rngl_cos_bound.
-            } {
-              apply (rngl_le_opp_l Hop Hor).
-              apply rngl_cos_bound.
-            }
-            rewrite fold_rngl_squ.
-            rewrite (rl_sqrt_squ Hon Hop Hor).
-            symmetry; rewrite (rngl_add_comm _ 1).
-            apply (rngl_abs_nonneg_eq Hop Hor).
+            rewrite rngl_add_comm.
+            rewrite Hp; [ easy | ].
             apply (rngl_le_opp_l Hop Hor).
             apply rngl_cos_bound.
           }
@@ -2047,11 +2047,47 @@ destruct opq. 2: {
           destruct Hzsq; subst q. {
             rewrite angle_add_0_r, angle_sub_0_r.
             cbn.
+            remember (0 ≤? rngl_sin p)%L as zsp eqn:Hzsp.
+            symmetry in Hzsp.
+            rewrite rngl_add_comm.
+            destruct zsp. {
+              rewrite (rngl_mul_1_l Hon).
+              rewrite (rngl_mul_comm Hic 2).
+              rewrite Hp; [ easy | ].
+              apply (rngl_le_opp_l Hop Hor).
+              apply rngl_cos_bound.
+            }
+            rewrite (rngl_mul_comm Hic).
+            do 2 rewrite rngl_mul_assoc.
+            rewrite (rngl_mul_mul_swap Hic (-1 * _)).
+            rewrite (rngl_mul_mul_swap Hic (-1)).
+            rewrite (rngl_squ_opp_1 Hon Hop).
+            rewrite (rngl_mul_1_l Hon).
+            rewrite Hp; [ easy | ].
+            apply (rngl_le_opp_l Hop Hor).
+            apply rngl_cos_bound.
+          }
+          cbn.
+          apply (rngl_leb_gt Hor) in Hzps.
+          rewrite (rngl_add_opp_r Hop).
+          rewrite (rngl_opp_0 Hop).
+          do 2 rewrite (rngl_mul_0_r Hos).
+          rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
+          do 2 rewrite (rngl_mul_opp_r Hop).
+          do 2 rewrite (rngl_mul_1_r Hon).
+          rewrite (rngl_leb_0_opp Hop Hor).
+          apply (rngl_leb_gt Hor) in Hzps.
+          rewrite Hzps.
+          rewrite (rngl_add_opp_r Hop).
+          rewrite (rngl_mul_comm Hic).
+          do 2 rewrite rngl_mul_assoc.
+          rewrite (rngl_mul_mul_swap Hic (-1 * _)).
+          rewrite (rngl_mul_mul_swap Hic (-1)).
+          rewrite (rngl_squ_opp_1 Hon Hop).
+          rewrite (rngl_mul_1_l Hon).
+          rewrite Hp.
+(* ah putain, ça marche pas *)
 ...
-  apply angle_nle_gt in Hopo.
-  exfalso; apply Hopo; clear Hopo.
-Search (- _ ≤ _)%A.
-  apply angle_le_opp_r.
 ...
     replace p with ((p + q) /₂ + (p - q) /₂)%A at 1. 2: {
       rewrite angle_div_2_add.
