@@ -526,7 +526,7 @@ destruct (rngl_le_dec Hor 0 (rngl_sin θ1))%L as [Hzs1| Hs1z]. 2: {
   apply angle_add_le_mono_l_lemma_1; try easy; cycle 1.
   now apply (rngl_lt_le_incl Hor).
   clear - ac Hs13z Hc3z Hs1z.
-  apply angle_add_not_overflow_comm.
+  rewrite angle_add_overflow_comm.
   rewrite angle_add_comm in Hs13z.
   now apply rngl_sin_add_nonneg_angle_add_not_overflow; try easy.
 }
@@ -564,7 +564,7 @@ destruct (rngl_le_dec Hor 0 (rngl_cos θ3))%L as [Hzc3| Hc3z]. {
   apply H1; try easy.
   clear H1.
   apply angle_add_le_mono_l_lemma_1; try easy.
-  apply angle_add_not_overflow_comm.
+  rewrite angle_add_overflow_comm.
   rewrite angle_add_comm in Hzs13.
   now apply rngl_sin_add_nonneg_angle_add_not_overflow.
 }

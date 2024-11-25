@@ -179,7 +179,7 @@ Theorem angle_add_le_mono_r :
 Proof.
 intros * H23 H12.
 do 2 rewrite (angle_add_comm _ θ3).
-apply angle_add_not_overflow_comm in H23.
+rewrite angle_add_overflow_comm in H23.
 now apply angle_add_le_mono_l.
 Qed.
 

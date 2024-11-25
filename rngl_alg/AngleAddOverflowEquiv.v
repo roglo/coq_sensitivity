@@ -895,7 +895,7 @@ split; intros H12. {
       rewrite (angle_add_add_swap (θ1 /₂)).
       rewrite rngl_sin_add_right_r.
       rewrite <- angle_div_2_add_not_overflow. 2: {
-        apply angle_add_not_overflow_comm.
+        rewrite angle_add_overflow_comm.
         apply angle_add_overflow_lt_straight_le_straight. {
           (* lemma? cf. rngl_sin_nonneg_angle_le_straight *)
           progress unfold angle_ltb.

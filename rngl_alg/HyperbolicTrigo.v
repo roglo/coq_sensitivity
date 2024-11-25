@@ -1916,7 +1916,190 @@ Definition rngl_expc (θ : angle T) := rngl_exph (hangle_of_angle θ).
 
 (* *)
 
+Theorem rngl_cos_straight : rngl_cos angle_straight = (-1)%L.
+Proof. easy. Qed.
+
+Theorem angle_add_overflow_opp_r_eq :
+  ∀ p q, angle_add_overflow p (- q) = ((q ≠? 0)%A && (q ≤? p)%A)%bool.
+Proof.
+destruct_ac.
+intros.
+rewrite angle_add_overflow_comm.
+progress unfold angle_add_overflow.
+rewrite angle_opp_involutive.
+f_equal.
+(* lemma *)
+f_equal.
+progress unfold angle_eqb.
+cbn.
+f_equal.
+remember (rngl_sin q =? 0)%L as qz eqn:Hqz.
+symmetry in Hqz.
+destruct qz. {
+  apply (rngl_eqb_eq Hed) in Hqz.
+  rewrite Hqz.
+  rewrite (rngl_opp_0 Hop).
+  apply (rngl_eqb_refl Hed).
+}
+apply (rngl_eqb_neq Hed) in Hqz.
+apply (rngl_eqb_neq Hed).
+intros H; apply Hqz; clear Hqz.
+apply (f_equal rngl_opp) in H.
+now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+Qed.
+
 (* to be completed
+Theorem rngl_cos_add_cos :
+  ∀ p q,
+  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+  let c₂ := if (p <? q)%A then angle_straight else 0%A in
+  (rngl_cos p + rngl_cos q =
+     2 * rngl_cos ((p + q) /₂ + c₁) * rngl_cos ((p - q) /₂ + c₂))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _))%L.
+  apply H1.
+}
+intros.
+remember (angle_add_overflow p q) as opq eqn:Hopq.
+remember (angle_add_overflow p (- q)) as opo eqn:Hopo.
+symmetry in Hopq, Hopo.
+rewrite angle_add_overflow_opp_r_eq in Hopo.
+destruct opq. {
+  subst c₁.
+  rewrite rngl_cos_add_straight_r.
+  rewrite (rngl_mul_opp_r Hop).
+  destruct opo. {
+    subst c₂.
+    apply Bool.andb_true_iff in Hopo.
+    destruct Hopo as (Hqz, Hqp).
+Search ((_ ≤? _)%A = false).
+Search ((_ <? _)%A = false).
+...
+    rewrite angle_ltb_ge in Hqp.
+...
+    progress unfold angle_add_overflow in Hopq, Hopo.
+    apply Bool.andb_true_iff in Hopq, Hopo.
+    destruct Hopq as (Hpz, Hopq).
+    destruct Hopo as (_, Hopo).
+    apply angle_neqb_neq in Hpz.
+    progress unfold angle_leb in Hopq, Hopo.
+    cbn in Hopq, Hopo.
+    rewrite (rngl_leb_0_opp Hop Hor) in Hopq, Hopo.
+    rewrite (rngl_leb_0_opp Hop Hor) in Hopo.
+    remember (0 ≤? rngl_sin q)%L as zsq eqn:Hzsq.
+    remember (rngl_sin q ≤? 0)%L as zqs eqn:Hzqs.
+    remember (rngl_sin p ≤? 0)%L as zps eqn:Hzps.
+    symmetry in Hzsq, Hzps, Hzqs.
+    destruct zsq. {
+      destruct zps; [ | easy ].
+      apply rngl_leb_le in Hopq.
+      clear Hopo.
+      destruct zqs. {
+        apply rngl_leb_le in Hzsq, Hzqs, Hzps.
+        apply (rngl_le_antisymm Hor) in Hzsq; [ clear Hzqs | easy ].
+        apply eq_rngl_sin_0 in Hzsq.
+        destruct Hzsq; subst q. {
+          cbn in Hopq.
+          apply rngl_nlt_ge in Hopq.
+          exfalso.
+          apply Hopq; clear Hopq.
+          apply (rngl_lt_iff Hor).
+          split; [ apply rngl_cos_bound | ].
+          intros H.
+          now apply eq_rngl_cos_1 in H.
+        }
+        clear Hopq.
+        rewrite <- angle_add_opp_r.
+        rewrite angle_opp_straight.
+        rewrite rngl_cos_straight.
+        rewrite (rngl_add_opp_r Hop).
+        rewrite rngl_cos_add_straight_r.
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite (rngl_opp_involutive Hop).
+        rewrite <- rngl_mul_assoc.
+        rewrite fold_rngl_squ.
+        rewrite angle_div_2_add_overflow. 2: {
+          (* lemma *)
+          progress unfold angle_add_overflow.
+          apply Bool.andb_true_iff.
+          split; [ now apply angle_neqb_neq | ].
+          apply rngl_sin_nonneg_angle_le_straight; cbn.
+          now apply (rngl_opp_nonneg_nonpos Hop Hor).
+        }
+        rewrite rngl_cos_add_straight_r.
+        rewrite angle_straight_div_2.
+        rewrite rngl_cos_add_right_r.
+        rewrite (rngl_opp_involutive Hop).
+        cbn.
+        rewrite (rngl_squ_sqrt Hon). 2: {
+          apply rngl_1_sub_cos_div_2_nonneg.
+        }
+        rewrite (rngl_mul_comm Hic).
+        rewrite (rngl_div_mul Hon Hiv). 2: {
+          apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+        }
+(* bon, c'est pas bon *)
+...
+Search (rngl_sin (_ /₂))%L.
+Search (_ /₂ + _/₂)%A.
+rewrite <- rngl
+        do 2 rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_opp_involutive Hop).
+...
+        rewrite angle_straight_div_2.
+...
+            rewrite angle_add_0_r, angle_sub_0_r.
+            cbn.
+            remember (0 ≤? rngl_sin p)%L as zsp eqn:Hzsp.
+            symmetry in Hzsp.
+            destruct zsp. {
+              apply rngl_leb_le in Hzsp, Hzps.
+              apply (rngl_le_antisymm Hor) in Hzsp; [ clear Hzps | easy ].
+              apply eq_rngl_sin_0 in Hzsp.
+              destruct Hzsp; subst p. {
+                now apply angle_neqb_neq in Hpz.
+              }
+              cbn.
+              rewrite (rngl_add_opp_l Hop).
+              rewrite (rngl_add_opp_r Hop).
+...
+    rewrite rngl_cos_add_straight_r.
+    rewrite (rngl_mul_opp_r Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_opp_involutive Hop).
+    replace p with ((p + q) /₂ + (p - q) /₂)%A at 1. 2: {
+      rewrite angle_div_2_add.
+      rewrite Hopq.
+      replace q with ((p + q) /₂ - (p - q) /₂)%A at 2. 2: {
+        (* lemma ? angle_div_2_sub *)
+        progress unfold angle_sub at 1.
+        rewrite angle_opp_div_2.
+        remember (p - q =? 0)%A as pqz eqn:Hpqz.
+        symmetry in Hpqz.
+        destruct pqz. {
+          apply angle_eqb_eq in Hpqz.
+          apply -> angle_sub_move_0_r in Hpqz.
+          subst q.
+          rewrite angle_sub_diag.
+          rewrite angle_opp_0.
+          rewrite angle_0_div_2.
+          do 2 rewrite angle_add_0_r.
+          rewrite angle_add_diag.
+          rewrite <- angle_mul_nat_div_2. 2: {
+            cbn; rewrite angle_add_0_r.
+...
+            now cbn; rewrite angle_add_0_r, Hopq.
+          }
+          apply angle_div_2_mul_2.
+        }
+        apply angle_eqb_neq in Hpqz.
+...
+
 Theorem rngl_cos_add_cos :
   ∀ p q,
   (rngl_cos p + rngl_cos q =

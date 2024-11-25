@@ -1211,11 +1211,11 @@ apply angle_div_2_add_not_overflow.
 apply angle_add_overflow_le with (θ2 := θ2). {
   apply angle_div_2_pow_le_diag.
 }
-apply angle_add_not_overflow_comm.
+rewrite angle_add_overflow_comm.
 apply angle_add_overflow_le with (θ2 := θ1). {
   apply angle_div_2_pow_le_diag.
 }
-now apply angle_add_not_overflow_comm.
+now rewrite angle_add_overflow_comm.
 Qed.
 
 Theorem angle_div_2_pow_mul :
@@ -1275,8 +1275,8 @@ split. {
   rewrite Nat.mul_comm.
   rewrite <- angle_mul_nat_assoc.
   rewrite angle_div_2_mul_2.
-  apply angle_add_not_overflow_comm in Han.
-  apply angle_add_not_overflow_comm.
+  rewrite angle_add_overflow_comm in Han.
+  rewrite angle_add_overflow_comm.
   apply (angle_add_overflow_le _ θ); [ | easy ].
   apply angle_div_2_le.
 }

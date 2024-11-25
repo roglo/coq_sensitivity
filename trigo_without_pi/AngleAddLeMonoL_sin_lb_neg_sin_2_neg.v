@@ -336,7 +336,7 @@ now apply (rngl_lt_le_incl Hor).
 now apply (rngl_lt_le_incl Hor).
 (**)
 destruct (rngl_lt_dec Hor 0 (rngl_sin θ1)) as [Hzs1'| Hs1z']. {
-  apply angle_add_not_overflow_comm.
+  rewrite angle_add_overflow_comm.
   apply (rngl_lt_le_incl Hor) in Hzs3, Hzs13.
   rewrite angle_add_comm in Hzs13.
   now apply rngl_sin_add_nonneg_angle_add_not_overflow.

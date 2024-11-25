@@ -58,14 +58,14 @@ generalize Hn2; intros Hn12.
 apply (IHn θ1) in Hn12; [ | easy ].
 apply (angle_le_trans _ (θ1 + n * θ2))%A. {
   apply angle_add_le_mono_l; [ | easy ].
-  apply angle_add_not_overflow_comm.
+  rewrite angle_add_overflow_comm.
   apply (angle_add_overflow_le _ θ2)%A; [ easy | ].
-  now apply angle_add_not_overflow_comm.
+  now rewrite angle_add_overflow_comm.
 } {
   rewrite (angle_add_comm θ1).
   rewrite (angle_add_comm θ2).
   apply angle_add_le_mono_l; [ | easy ].
-  now apply angle_add_not_overflow_comm.
+  now rewrite angle_add_overflow_comm.
 }
 Qed.
 
@@ -136,13 +136,13 @@ apply Bool.orb_false_iff in Hmov.
 destruct Hmov as (Hmov, Hov).
 specialize (IHm _ Hmov) as Hov'.
 cbn.
-apply angle_add_not_overflow_comm.
+rewrite angle_add_overflow_comm.
 apply angle_add_not_overflow_move_add. 2: {
   rewrite <- angle_mul_add_distr_r.
   rewrite Nat.add_comm.
-  now apply angle_add_not_overflow_comm.
+  now rewrite angle_add_overflow_comm.
 }
-now apply angle_add_not_overflow_comm.
+now rewrite angle_add_overflow_comm.
 Qed.
 
 Theorem angle_mul_nat_overflow_true_assoc :
@@ -191,9 +191,9 @@ split; [ | now apply (IHn _ θ2) ].
 remember (S n) as m eqn:Hm.
 clear n Hm; rename m into n.
 clear H2 IHn.
-apply angle_add_not_overflow_comm.
+rewrite angle_add_overflow_comm.
 eapply angle_add_overflow_le; [ apply H12 | ].
-apply angle_add_not_overflow_comm.
+rewrite angle_add_overflow_comm.
 eapply angle_add_overflow_le; [ | apply H2n2 ].
 now apply angle_mul_le_mono_l.
 Qed.
