@@ -1970,6 +1970,41 @@ symmetry in Hopq, Hopo.
 (**)
 destruct opq. 2: {
   destruct opo. 2: {
+destruct (angle_eq_dec q angle_straight) as [Hqs| Hqs]. {
+  subst q.
+  clear Hopo.
+  cbn.
+  rewrite (rngl_opp_0 Hop).
+  rewrite (rngl_add_opp_r Hop).
+  do 2 rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_r, (rngl_sub_0_r Hos).
+  do 2 rewrite (rngl_mul_opp_r Hop).
+  do 2 rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_leb_0_opp Hop Hor).
+  remember (rngl_sin p ≤? 0)%L as sz eqn:Hsz.
+  symmetry in Hsz.
+  destruct sz. {
+    apply rngl_leb_le in Hsz.
+    (* contradictoire avec Hopq *)
+    admit.
+  }
+  apply (rngl_leb_gt Hor) in Hsz.
+replace p with (angle_right)%A.
+cbn.
+(* ah ouais, faut que p≥q, sinon p-q devient "négatif", et
+   la moitié, ça déconne *)
+(* je pourrais prendre cos (abs(p-q)/2) au lieu de cos ((p-q)/2)
+   mais ça la fout mal, non ? C'est quoi, le mieux ? *)
+(* d'ailleurs abs dans les angles, ça n'a pas de sens : les angles
+   sont tous positifs *)
+...
+p=π/2 q=π
+p-q=π/2-π=π/2+π=3π/2
+cos p + cos q = 0 - 1 = -1
+cos ((p + q) / 2) = cos (3π/4) = -√2/2
+cos ((p - q) / 2) = cos (3π/4) = -√2/2
+...
     progress unfold angle_add_overflow in Hopq, Hopo.
     apply Bool.andb_false_iff in Hopq, Hopo.
     remember ((p ≠? 0)%A)%L as pz eqn:Hpz.
@@ -2078,6 +2113,7 @@ destruct opq. 2: {
           rewrite (rngl_leb_0_opp Hop Hor).
           apply (rngl_leb_gt Hor) in Hzps.
           rewrite Hzps.
+          apply (rngl_leb_gt Hor) in Hzps.
           rewrite (rngl_add_opp_r Hop).
           rewrite (rngl_mul_comm Hic).
           do 2 rewrite rngl_mul_assoc.
@@ -2085,6 +2121,7 @@ destruct opq. 2: {
           rewrite (rngl_mul_mul_swap Hic (-1)).
           rewrite (rngl_squ_opp_1 Hon Hop).
           rewrite (rngl_mul_1_l Hon).
+...
           rewrite Hp.
 (* ah putain, ça marche pas *)
 ...
