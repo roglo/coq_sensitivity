@@ -1948,6 +1948,39 @@ apply (f_equal rngl_opp) in H.
 now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
 Qed.
 
+Theorem angle_ltb_ge :
+  ∀ θ1 θ2, (θ2 ≤ θ1)%A ↔ (θ1 <? θ2)%A = false.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+split; intros H21. {
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    apply rngl_leb_le in H21.
+    now apply rngl_ltb_ge.
+  } {
+    destruct zs2; [ easy | ].
+    apply rngl_leb_le in H21.
+    now apply rngl_ltb_ge.
+  }
+} {
+  destruct zs1. {
+    destruct zs2; [ | easy ].
+    apply (rngl_ltb_ge_iff Hor) in H21.
+    now apply rngl_leb_le.
+  } {
+    destruct zs2; [ easy | ].
+    apply (rngl_ltb_ge_iff Hor) in H21.
+    now apply rngl_leb_le.
+  }
+}
+Qed.
+
 (* to be completed
 Theorem rngl_cos_add_cos :
   ∀ p q,
@@ -1976,10 +2009,11 @@ destruct opq. {
     subst c₂.
     apply Bool.andb_true_iff in Hopo.
     destruct Hopo as (Hqz, Hqp).
-Search ((_ ≤? _)%A = false).
-Search ((_ <? _)%A = false).
-...
-    rewrite angle_ltb_ge in Hqp.
+    apply angle_neqb_neq in Hqz.
+    apply angle_ltb_ge in Hqp.
+    rewrite Hqp.
+    apply angle_ltb_ge in Hqp.
+    rewrite angle_add_0_r.
 ...
     progress unfold angle_add_overflow in Hopq, Hopo.
     apply Bool.andb_true_iff in Hopq, Hopo.
