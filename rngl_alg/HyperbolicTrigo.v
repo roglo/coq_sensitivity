@@ -2014,22 +2014,53 @@ destruct opq. {
     rewrite Hqp.
     apply angle_ltb_ge in Hqp.
     rewrite angle_add_0_r.
-...
-    progress unfold angle_add_overflow in Hopq, Hopo.
-    apply Bool.andb_true_iff in Hopq, Hopo.
-    destruct Hopq as (Hpz, Hopq).
-    destruct Hopo as (_, Hopo).
+    generalize Hopq; intros H.
+    progress unfold angle_add_overflow in H.
+    apply Bool.andb_true_iff in H.
+    destruct H as (Hpz, Hpq).
     apply angle_neqb_neq in Hpz.
-    progress unfold angle_leb in Hopq, Hopo.
-    cbn in Hopq, Hopo.
-    rewrite (rngl_leb_0_opp Hop Hor) in Hopq, Hopo.
-    rewrite (rngl_leb_0_opp Hop Hor) in Hopo.
-    remember (0 ≤? rngl_sin q)%L as zsq eqn:Hzsq.
-    remember (rngl_sin q ≤? 0)%L as zqs eqn:Hzqs.
+    progress unfold angle_leb in Hpq, Hqp.
+    cbn in Hpq, Hqp.
+    rewrite (rngl_leb_0_opp Hop Hor) in Hpq.
+    remember (0 ≤? rngl_sin p)%L as zsp eqn:Hzsp.
     remember (rngl_sin p ≤? 0)%L as zps eqn:Hzps.
-    symmetry in Hzsq, Hzps, Hzqs.
-    destruct zsq. {
-      destruct zps; [ | easy ].
+    remember (0 ≤? rngl_sin q)%L as zsq eqn:Hzsq.
+    symmetry in Hzsp, Hzsq, Hzps.
+    move zsp before zps.
+    move zsq before zsp.
+    move Hqz before Hpz.
+    move Hzsp before Hzps.
+    destruct zps. {
+      destruct zsp. {
+        destruct zsq; [ | easy ].
+        apply rngl_leb_le in Hzps, Hzsp.
+        apply (rngl_le_antisymm Hor) in Hzsp; [ clear Hzps | easy ].
+        apply eq_rngl_sin_0 in Hzsp.
+        destruct Hzsp; [ easy | subst p ].
+        rewrite rngl_cos_straight in Hpq, Hqp |-*.
+        apply rngl_leb_le in Hqp, Hpq.
+        apply (rngl_le_antisymm Hor) in Hqp; [ clear Hpq | easy ].
+        apply eq_rngl_cos_opp_1 in Hqp; subst q.
+        rewrite rngl_cos_straight.
+        rewrite angle_straight_add_straight.
+        rewrite angle_sub_diag.
+        rewrite <- (rngl_mul_2_l Hon).
+        rewrite (rngl_mul_opp_r Hop).
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite <- rngl_mul_assoc.
+        rewrite angle_0_div_2; cbn.
+        now rewrite (rngl_mul_1_l Hon).
+      }
+      assert (Hcqp : (rngl_cos q ≤ rngl_cos p)%L). {
+        apply rngl_leb_le.
+        now destruct zsq.
+      }
+      clear zsq Hzsq Hpq Hqp.
+      rewrite angle_div_2_add.
+      rewrite Hopq.
+      rewrite rngl_cos_add_straight_r.
+      rewrite angle_div_2_sub.
+...
       apply rngl_leb_le in Hopq.
       clear Hopo.
       destruct zqs. {

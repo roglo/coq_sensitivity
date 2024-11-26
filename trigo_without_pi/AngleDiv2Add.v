@@ -1049,6 +1049,73 @@ destruct aov. 2: {
 }
 Qed.
 
+Theorem angle_div_2_sub :
+  ∀ θ1 θ2,
+  ((θ1 - θ2) /₂)%A =
+    if (θ2 ≤? θ1)%A then
+      (θ1 /₂ - θ2 /₂)%A
+    else
+      (θ1 /₂ - θ2 /₂ + angle_straight)%A.
+Proof.
+intros.
+specialize (angle_div_2_add θ1 (- θ2)) as H1.
+rewrite angle_add_opp_r in H1.
+rewrite H1; clear H1.
+remember (angle_add_overflow θ1 (- θ2)) as o12 eqn:Ho12.
+symmetry in Ho12.
+rewrite angle_add_overflow_comm in Ho12.
+progress unfold angle_add_overflow in Ho12.
+rewrite angle_opp_involutive in Ho12.
+destruct o12. {
+  apply Bool.andb_true_iff in Ho12.
+  destruct Ho12 as (H2z, H21).
+  rewrite H21.
+  progress unfold angle_sub.
+  rewrite angle_opp_div_2.
+  remember (θ2 =? 0)%A as z2 eqn:Hz2.
+  symmetry in Hz2.
+  rewrite angle_add_assoc.
+  destruct z2; [ | easy ].
+  apply angle_eqb_eq in Hz2.
+  apply angle_neqb_neq in H2z.
+  subst θ2.
+  now rewrite angle_opp_0 in H2z.
+}
+apply Bool.andb_false_iff in Ho12.
+destruct Ho12 as [H2z| H21]. {
+  (* lemma *)
+  apply (f_equal negb) in H2z.
+  rewrite Bool.negb_involutive in H2z.
+  cbn in H2z.
+  apply angle_eqb_eq in H2z.
+  apply (f_equal angle_opp) in H2z.
+  rewrite angle_opp_involutive in H2z.
+  rewrite angle_opp_0 in H2z; subst θ2.
+  rewrite angle_opp_0.
+  rewrite angle_0_div_2.
+  rewrite angle_nonneg.
+  rewrite angle_add_0_r, angle_sub_0_r.
+  easy.
+}
+rewrite H21.
+progress unfold angle_sub.
+rewrite angle_opp_div_2.
+remember (θ2 =? 0)%A as z2 eqn:Hz2.
+symmetry in Hz2.
+destruct z2. {
+  apply angle_eqb_eq in Hz2; subst θ2.
+  apply angle_leb_gt in H21.
+  apply angle_nle_gt in H21.
+  exfalso; apply H21.
+  apply angle_nonneg.
+}
+rewrite angle_add_assoc.
+rewrite <- angle_add_assoc.
+rewrite angle_straight_add_straight.
+symmetry.
+apply angle_add_0_r.
+Qed.
+
 Theorem angle_div_2_add_not_overflow :
   ∀ θ1 θ2,
   angle_add_overflow θ1 θ2 = false
