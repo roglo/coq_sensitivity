@@ -1125,16 +1125,6 @@ rewrite rngl_leb_0_sqrt. 2: {
 now apply rngl_ltb_lt.
 Qed.
 
-Theorem angle_straight_nonneg : (0 ≤ angle_straight)%A.
-Proof.
-destruct_ac.
-progress unfold angle_leb.
-cbn.
-rewrite (rngl_leb_refl Hor).
-apply rngl_leb_le.
-apply (rngl_opp_1_le_1 Hon Hop Hor).
-Qed.
-
 Theorem rngl_acos_bound : ∀ a, (0 ≤ rngl_acos a ≤ angle_straight)%A.
 Proof.
 destruct_ac.

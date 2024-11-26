@@ -1225,6 +1225,37 @@ apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
 now rewrite angle_opp_straight.
 Qed.
 
+(* to be completed
+Theorem angle_add_overflow_gt_straight_ge_straight :
+  ∀ θ1 θ2,
+  (angle_straight < θ1)%A
+  → (angle_straight ≤ θ2)%A
+  → angle_add_overflow θ1 θ2 = true.
+Proof.
+destruct_ac.
+intros * H1 H2.
+progress unfold angle_add_overflow.
+remember (θ1 =? 0)%A as z1 eqn:Hz1.
+symmetry in Hz1.
+destruct z1. {
+  exfalso.
+  apply angle_eqb_eq in Hz1; subst θ1.
+  apply angle_nle_gt in H1.
+  apply H1; clear H1.
+  apply angle_straight_nonneg.
+}
+cbn.
+progress unfold angle_ltb in H1.
+progress unfold angle_leb.
+cbn in H1 |-*.
+rewrite (rngl_leb_refl Hor) in H1.
+rewrite (rngl_leb_0_opp Hop Hor).
+...
+apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
+now rewrite angle_opp_straight.
+Qed.
+*)
+
 Theorem angle_add_overflow_div_2_div_2 :
   ∀ θ1 θ2, angle_add_overflow (θ1 /₂) (θ2 /₂) = false.
 Proof.

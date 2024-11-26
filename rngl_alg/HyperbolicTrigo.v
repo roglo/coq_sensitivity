@@ -2295,11 +2295,13 @@ destruct opq. {
       rewrite angle_add_sub_swap.
       rewrite angle_sub_diag.
       rewrite angle_add_0_l.
+(* go to AngleDiv2Add.v and complete the "to be completed" first *)
+About angle_add_not_overflow_lt_straight_le_straight.
+...
       enough (Hov : angle_add_overflow q q = true). {
 admit.
 }
 Search (_ → angle_add_overflow _ _ = true).
-About angle_add_not_overflow_lt_straight_le_straight.
 ...
         rewrite angle_add_diag.
         apply angle_div_2_mul_2.
