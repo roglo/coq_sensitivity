@@ -2126,6 +2126,13 @@ destruct opq. {
         symmetry.
         apply (rngl_mul_2_l Hon).
       }
+      apply angle_leb_gt in Hqp.
+      rewrite rngl_add_comm.
+      rewrite (rngl_mul_opp_l Hop).
+      (* perhaps there are similarities with the case q≤p, but, well,
+         not so sure; in the meantime, I am going to prove that case
+         the normal way; perhaps, doing it, I find some nice lemmas
+         common to the first case. *)
 ...
           replace q with ((p + q) /₂ - (p - q) /₂)%A at 2. 2: {
             (* lemma ? angle_div_2_sub *)
