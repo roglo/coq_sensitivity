@@ -1214,7 +1214,7 @@ apply angle_lt_opp_r; [ easy | ].
 now rewrite angle_opp_involutive.
 Qed.
 
-Theorem angle_add_overflow_lt_straight_le_straight :
+Theorem angle_add_not_overflow_lt_straight_le_straight :
   ∀ θ1 θ2,
   (θ1 < angle_straight)%A
   → (θ2 ≤ angle_straight)%A
@@ -1236,7 +1236,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply angle_add_overflow_0_l.
 }
 intros.
-apply angle_add_overflow_lt_straight_le_straight.
+apply angle_add_not_overflow_lt_straight_le_straight.
 apply (angle_div_2_lt_straight Hc1).
 apply angle_div_2_le_straight.
 Qed.

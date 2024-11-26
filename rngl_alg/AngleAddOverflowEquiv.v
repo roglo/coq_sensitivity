@@ -896,7 +896,7 @@ split; intros H12. {
       rewrite rngl_sin_add_right_r.
       rewrite <- angle_div_2_add_not_overflow. 2: {
         rewrite angle_add_overflow_comm.
-        apply angle_add_overflow_lt_straight_le_straight. {
+        apply angle_add_not_overflow_lt_straight_le_straight. {
           (* lemma? cf. rngl_sin_nonneg_angle_le_straight *)
           progress unfold angle_ltb.
           generalize Hzs2; intros H.
@@ -1186,7 +1186,7 @@ split; intros H12. {
       split. {
         apply angle_add_le_mono_l. {
           apply (rngl_lt_le_incl Hor) in Hs2z.
-          apply angle_add_overflow_lt_straight_le_straight.
+          apply angle_add_not_overflow_lt_straight_le_straight.
           now apply rngl_sin_pos_lt_straight.
           apply angle_le_refl.
         } {

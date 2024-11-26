@@ -236,7 +236,7 @@ apply (rngl_mul_nonneg_nonneg Hos Hor). {
     apply angle_nle_gt in H1.
     apply H1; clear H1.
     apply angle_add_le_mono_r.
-    apply angle_add_overflow_lt_straight_le_straight.
+    apply angle_add_not_overflow_lt_straight_le_straight.
     progress unfold angle_ltb.
     apply rngl_leb_le in Hzs3.
     rewrite Hzs3; cbn.
