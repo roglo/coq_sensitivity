@@ -1225,7 +1225,6 @@ apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
 now rewrite angle_opp_straight.
 Qed.
 
-(* to be completed
 Theorem angle_add_overflow_gt_straight_ge_straight :
   ∀ θ1 θ2,
   (angle_straight < θ1)%A
@@ -1250,11 +1249,38 @@ progress unfold angle_leb.
 cbn in H1 |-*.
 rewrite (rngl_leb_refl Hor) in H1.
 rewrite (rngl_leb_0_opp Hop Hor).
-...
-apply (angle_add_overflow_lt_le angle_straight); [ easy | ].
-now rewrite angle_opp_straight.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1; [ | clear H1 ]. {
+  apply rngl_ltb_lt in H1.
+  apply rngl_nle_gt in H1.
+  exfalso; apply H1; clear H1.
+  apply rngl_cos_bound.
+}
+apply (rngl_leb_gt Hor) in Hzs1.
+generalize Hzs1; intros H.
+apply (rngl_lt_le_incl Hor) in H.
+apply rngl_leb_le in H.
+rewrite H; clear H.
+destruct zs2; [ | easy ].
+apply rngl_leb_le.
+progress unfold angle_leb in H2.
+cbn in H2.
+rewrite (rngl_leb_refl Hor) in H2.
+rewrite Hzs2 in H2.
+apply rngl_leb_le in H2.
+apply (rngl_nlt_ge_iff Hor).
+intros Hc12.
+apply rngl_nlt_ge in H2.
+apply H2; clear H2.
+apply (rngl_lt_iff Hor).
+split; [ apply rngl_cos_bound | ].
+intros H; symmetry in H.
+apply eq_rngl_cos_opp_1 in H; subst θ2.
+apply rngl_nle_gt in Hc12.
+apply Hc12, rngl_cos_bound.
 Qed.
-*)
 
 Theorem angle_add_overflow_div_2_div_2 :
   ∀ θ1 θ2, angle_add_overflow (θ1 /₂) (θ2 /₂) = false.
