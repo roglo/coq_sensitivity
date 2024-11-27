@@ -2086,24 +2086,37 @@ Qed.
 
 Theorem angle_add_div_2_sub_sub_div_2_add_straight :
   ∀ p q,
-  angle_add_overflow p q = true
-  → (q ≤ p)%A
+  angle_add_overflow p q = (q ≤? p)%A
   → ((p + q) /₂ - (p - q) /₂ + angle_straight)%A = q.
 Proof.
-intros * Hpq Hqp.
+intros * Hpq.
 rewrite angle_div_2_add.
-rewrite Hpq.
 rewrite angle_div_2_sub.
-rewrite Hqp.
-rewrite angle_add_sub_swap.
-rewrite <- angle_add_assoc.
-rewrite angle_straight_add_straight.
-rewrite angle_add_0_r.
-rewrite angle_sub_sub_distr.
-rewrite angle_add_sub_swap.
-rewrite angle_sub_diag, angle_add_0_l.
-rewrite angle_add_diag.
-apply angle_div_2_mul_2.
+rewrite <- Bool.negb_if.
+rewrite Hpq.
+remember (q ≤? p)%A as qp eqn:Hqp.
+symmetry in Hqp.
+destruct qp; cbn. {
+  rewrite (angle_add_sub_swap _ _ (_ - _)).
+  rewrite <- angle_add_assoc.
+  rewrite angle_straight_add_straight.
+  rewrite angle_add_0_r.
+  rewrite angle_sub_sub_distr.
+  rewrite angle_add_sub_swap.
+  rewrite angle_sub_diag.
+  rewrite angle_add_0_l.
+  rewrite angle_add_diag.
+  apply angle_div_2_mul_2.
+} {
+  rewrite angle_sub_add_distr.
+  rewrite angle_sub_add.
+  rewrite angle_sub_sub_distr.
+  rewrite angle_add_sub_swap.
+  rewrite angle_sub_diag.
+  rewrite angle_add_0_l.
+  rewrite angle_add_diag.
+  apply angle_div_2_mul_2.
+}
 Qed.
 
 (* antisym or antisymm ? what is the usual usage
@@ -2266,7 +2279,8 @@ destruct opq. {
         rewrite (rngl_mul_opp_l Hop).
         rewrite (rngl_opp_involutive Hop).
         replace q with ((p + q) /₂ - (p - q) /₂ + angle_straight)%A at 3. 2: {
-          now apply angle_add_div_2_sub_sub_div_2_add_straight.
+          apply angle_add_div_2_sub_sub_div_2_add_straight.
+          congruence.
         }
         rewrite rngl_cos_add_straight_r.
         rewrite (rngl_sub_opp_r Hop).
@@ -2306,8 +2320,8 @@ destruct opq. {
         }
         rewrite <- (rngl_mul_opp_r Hop).
         replace q with ((p + q) /₂ - (p - q) /₂ + angle_straight)%A at 3. 2: {
-(* to be completed *)
-          now apply angle_add_div_2_sub_sub_div_2_add_straight.
+          apply angle_add_div_2_sub_sub_div_2_add_straight.
+          congruence.
         }
         do 2 rewrite rngl_cos_add_straight_r.
         rewrite rngl_cos_add.
