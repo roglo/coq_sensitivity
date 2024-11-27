@@ -2184,6 +2184,9 @@ destruct qp. {
 }
 Qed.
 
+(* I'm not happy of the statement of this theorem which not not really
+   symmetric, nor of the proof itself, using "angle_add_overflow p (- q)" *)
+
 Theorem rngl_cos_add_cos :
   ∀ p q,
   let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
