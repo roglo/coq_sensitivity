@@ -1988,6 +1988,31 @@ Qed.
 (* à revoir *)
 Theorem rngl_cos_add_cos :
   ∀ p q,
+(*
+  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+  let c₂ := if (p <? q)%A then angle_straight else 0%A in
+*)
+  (rngl_cos p + rngl_cos q =
+     2 * rngl_cos ((p + q) /₂) * rngl_cos ((p - q) /₂))%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ * _))%L.
+  apply H1.
+}
+intros.
+rewrite angle_div_2_add, angle_div_2_sub.
+destruct (Bool.bool_dec (angle_add_overflow p q) (q ≤? p)%A) as [Hpq| Hpq]. {
+  rewrite Hpq.
+  remember (q ≤? p)%A as qp eqn:Hqp.
+  symmetry in Hqp.
+  destruct qp. {
+...
+
+Theorem rngl_cos_add_cos :
+  ∀ p q,
   let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
   let c₂ := if (p <? q)%A then angle_straight else 0%A in
   (rngl_cos p + rngl_cos q =
