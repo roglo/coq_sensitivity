@@ -1984,26 +1984,104 @@ split; intros H21. {
 }
 Qed.
 
+(* to be moved to the right place *)
+Theorem rngl_leb_antisym :
+  rngl_is_ordered T = true →
+  ∀ a b, (b ≤? a)%L = negb (a <? b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_leb.
+progress unfold rngl_ltb.
+progress unfold rngl_is_ordered in Hor.
+destruct rngl_opt_leb; [ | easy ].
+symmetry; apply Bool.negb_involutive.
+Qed.
+
+(* to be moved to the right place *)
+Theorem rngl_ltb_antisym :
+  rngl_is_ordered T = true →
+  ∀ a b, (b <? a)%L = negb (a ≤? b)%L.
+Proof.
+intros Hor *.
+progress unfold rngl_leb.
+progress unfold rngl_ltb.
+progress unfold rngl_is_ordered in Hor.
+now destruct rngl_opt_leb.
+Qed.
+
+(* to be moved to the right place *)
+Theorem angle_leb_antisym :
+  ∀ θ1 θ2, (θ2 ≤? θ1)%A = negb (θ1 <? θ2)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  destruct zs2; [ | easy ].
+  now apply rngl_leb_antisym.
+} {
+  destruct zs2; [ easy | ].
+  now apply rngl_leb_antisym.
+}
+Qed.
+
+(* to be moved to the right place *)
+Theorem angle_ltb_antisym :
+  ∀ θ1 θ2, (θ2 <? θ1)%A = negb (θ1 ≤? θ2)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold angle_ltb.
+progress unfold angle_leb.
+remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
+remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
+symmetry in Hzs1, Hzs2.
+destruct zs1. {
+  destruct zs2; [ | easy ].
+  now apply rngl_ltb_antisym.
+} {
+  destruct zs2; [ easy | ].
+  now apply rngl_ltb_antisym.
+}
+Qed.
+
 Theorem angle_add_div_2_add_sub_div_2_add_straight :
   ∀ p q,
-  angle_add_overflow p q = true
-  → (q ≤ p)%A
+  angle_add_overflow p q = (q ≤? p)%A
   → ((p + q) /₂ + (p - q) /₂ + angle_straight)%A = p.
 Proof.
-intros * Hopq Hqp.
+intros * Hpq.
 rewrite angle_div_2_add.
-rewrite Hopq.
 rewrite angle_div_2_sub.
-rewrite Hqp.
-rewrite angle_add_sub_assoc.
-do 2 rewrite angle_add_sub_swap.
-rewrite angle_add_sub.
-rewrite (angle_add_add_swap (_ /₂)).
-rewrite <- angle_add_assoc.
-rewrite angle_straight_add_straight.
-rewrite angle_add_0_r.
-rewrite angle_add_diag.
-apply angle_div_2_mul_2.
+rewrite <- Bool.negb_if.
+rewrite Hpq.
+remember (q ≤? p)%A as qp eqn:Hqp.
+symmetry in Hqp.
+destruct qp; cbn. {
+  rewrite (angle_add_add_swap _ _ (_ - _)).
+  rewrite <- angle_add_assoc.
+  rewrite angle_straight_add_straight.
+  rewrite angle_add_0_r.
+  rewrite angle_add_sub_assoc.
+  rewrite angle_add_add_swap.
+  rewrite angle_add_sub.
+  rewrite angle_add_diag.
+  apply angle_div_2_mul_2.
+} {
+  rewrite angle_add_assoc.
+  rewrite <- angle_add_assoc.
+  rewrite angle_straight_add_straight.
+  rewrite angle_add_0_r.
+  rewrite angle_add_sub_assoc.
+  rewrite angle_add_add_swap.
+  rewrite angle_add_sub.
+  rewrite angle_add_diag.
+  apply angle_div_2_mul_2.
+}
 Qed.
 
 Theorem angle_add_div_2_sub_sub_div_2_add_straight :
@@ -2030,39 +2108,6 @@ Qed.
 
 (* antisym or antisymm ? what is the usual usage
    in Coq library? *)
-
-(* to be moved to the right place *)
-Theorem rngl_leb_antisym :
-  rngl_is_ordered T = true →
-  ∀ a b, (b ≤? a)%L = negb (a <? b)%L.
-Proof.
-intros Hor *.
-progress unfold rngl_leb.
-progress unfold rngl_ltb.
-progress unfold rngl_is_ordered in Hor.
-destruct rngl_opt_leb; [ | easy ].
-symmetry; apply Bool.negb_involutive.
-Qed.
-
-(* to be moved to the right place *)
-Theorem angle_leb_antisym :
-  ∀ θ1 θ2, (θ2 ≤? θ1)%A = negb (θ1 <? θ2)%A.
-Proof.
-destruct_ac.
-intros.
-progress unfold angle_ltb.
-progress unfold angle_leb.
-remember (0 ≤? rngl_sin θ1)%L as zs1 eqn:Hzs1.
-remember (0 ≤? rngl_sin θ2)%L as zs2 eqn:Hzs2.
-symmetry in Hzs1, Hzs2.
-destruct zs1. {
-  destruct zs2; [ | easy ].
-  now apply rngl_leb_antisym.
-} {
-  destruct zs2; [ easy | ].
-  now apply rngl_leb_antisym.
-}
-Qed.
 
 Theorem angle_add_div_2_add_sub_div_2 :
   ∀ p q,
@@ -2209,7 +2254,8 @@ destruct opq. {
       symmetry in Hqp.
       destruct qp. {
         replace p with ((p + q) /₂ + (p - q) /₂ + angle_straight)%A at 1. 2: {
-          now apply angle_add_div_2_add_sub_div_2_add_straight.
+          apply angle_add_div_2_add_sub_div_2_add_straight.
+          congruence.
         }
         rewrite rngl_cos_add_straight_r.
         (* lemma *)
@@ -2351,6 +2397,8 @@ destruct qp. {
 }
 (* to be completed *)
 replace p with ((p + q) /₂ + (p - q) /₂ + angle_straight)%A at 1. 2: {
+  apply angle_add_div_2_add_sub_div_2_add_straight.
+...
   rewrite angle_div_2_add.
   rewrite Hopq.
   rewrite angle_div_2_sub.
