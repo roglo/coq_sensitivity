@@ -2301,10 +2301,12 @@ destruct opq. {
           now apply rngl_leb_le.
         }
         replace p with ((p + q) /₂ + (p - q) /₂ + angle_straight)%A at 1. 2: {
-          now apply angle_add_div_2_add_sub_div_2_add_straight.
+          apply angle_add_div_2_add_sub_div_2_add_straight.
+          congruence.
         }
         rewrite <- (rngl_mul_opp_r Hop).
         replace q with ((p + q) /₂ - (p - q) /₂ + angle_straight)%A at 3. 2: {
+(* to be completed *)
           now apply angle_add_div_2_sub_sub_div_2_add_straight.
         }
         do 2 rewrite rngl_cos_add_straight_r.
@@ -2395,25 +2397,12 @@ destruct qp. {
   do 2 rewrite angle_add_0_r.
   apply rngl_mul_assoc.
 }
-(* to be completed *)
 replace p with ((p + q) /₂ + (p - q) /₂ + angle_straight)%A at 1. 2: {
   apply angle_add_div_2_add_sub_div_2_add_straight.
-...
-  rewrite angle_div_2_add.
-  rewrite Hopq.
-  rewrite angle_div_2_sub.
-  rewrite Hqp.
-  rewrite angle_add_assoc.
-  rewrite <- angle_add_assoc.
-  rewrite angle_straight_add_straight.
-  rewrite angle_add_0_r.
-  rewrite angle_add_sub_assoc.
-  rewrite angle_add_add_swap.
-  rewrite angle_add_sub.
-  rewrite angle_add_diag.
-  apply angle_div_2_mul_2.
+  congruence.
 }
 replace q with ((p + q) /₂ - (p - q) /₂ + angle_straight)%A at 3. 2: {
+(* to be completed *)
   rewrite angle_div_2_add.
   rewrite Hopq.
   rewrite angle_div_2_sub.
