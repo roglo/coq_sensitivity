@@ -2484,6 +2484,10 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
+Theorem fold_old_angle_add_overflow :
+  ∀ θ1 θ2, (θ1 + θ2 <? θ1)%A = old_angle_add_overflow θ1 θ2.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -2563,27 +2567,35 @@ enough (H :
   rewrite angle_add_diag.
   rewrite angle_div_2_add.
 (**)
+  rewrite fold_old_angle_add_overflow.
+  rewrite angle_add_overflow_equiv3.
+...
   remember (angle_add_overflow (θ + dθ) θ) as ov2 eqn:Hov2.
   symmetry in Hov2.
-...
-  remember (angle_add_overflow (2 * θ) dθ) as ov2 eqn:Hov2.
-  symmetry in Hov2.
-  rewrite <- angle_add_diag in Hov2.
   destruct ov2. 2: {
-Search (angle_add_overflow (_ + _)).
-    apply angle_add_not_overflow_move_add in Hov2.
-2: {
 ...
-  rewrite <- angle_mul_nat_div_2. 2: {
-(* ah non, c'est pas forcément vrai, ça *)
+    rewrite angle_add_comm in Hov2.
+    apply angle_add_not_overflow_move_add in Hov2. 2: {
+...
+    rewrite angle_add_overflow_comm in Hov2.
+    rewrite angle_add_diag in Hov2.
+    rewrite Hov2.
+    rewrite angle_add_0_r.
 ...
 Search ((_ * _) /₂)%A.
-Search ((2 * _) /₂)%A.
-  rewrite angle_div_2_mul_2.
-...
-Search ((2 * _ + _)/₂)%A.
-Search ((_ + _)/₂)%A.
+    rewrite <- angle_mul_nat_div_2. 2: {
+      cbn.
+      rewrite angle_add_0_r, Bool.orb_false_r.
+      rewrite <- (angle_mul_1_l θ).
+      apply angle_mul_nat_overflow_distr_add_overflow.
+      cbn - [ angle_mul_nat_overflow ].
+      rewrite <- angle_add_diag in Hov2.
 Search (angle_add_overflow (_ + _)).
+      apply angle_add_not_overflow_move_add in Hov2.
+(* ouais, bon, c'est pas clair *)
+...
+    apply angle_mul_nat_overflow_distr_add_overflow in Hov2.
+    rewrite <- angle_add_diag in Hov2.
 ...
 
 Theorem rngl_cos_sub_cos :
