@@ -2300,6 +2300,39 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 Qed.
 
 (* to be completed
+Theorem rngl_cos_sub_cos :
+  ∀ p q,
+  let c₁ :=
+    if angle_add_overflow (p + q) angle_straight then angle_straight else 0%A
+  in
+  let c₂ :=
+    if (p + q <? angle_straight)%A then angle_straight else 0%A
+  in
+  (rngl_cos p - rngl_cos q =
+     - (2 * rngl_sin ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂)))%L.
+Proof.
+destruct_ac.
+intros.
+remember (angle_add_overflow (p + q) angle_straight) as opq eqn:Hopq.
+symmetry in Hopq.
+subst c₁ c₂.
+destruct opq. {
+  rewrite rngl_sin_add_straight_r.
+  remember (p + q <? angle_straight)%A as pq eqn:Hpq.
+  symmetry in Hpq.
+  destruct pq. {
+    exfalso.
+    apply Bool.not_false_iff_true in Hopq.
+    apply Hopq; clear Hopq.
+    apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
+    apply angle_le_refl.
+  }
+  rewrite angle_add_0_r.
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_opp_involutive Hop).
+...
+
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
@@ -2351,6 +2384,7 @@ enough (H :
   rewrite fold_rl_modl.
   easy.
 }
+(* see rngl_cos p - rngl_cos q *)
 ...
 
 Theorem rngl_cos_sub_cos :
