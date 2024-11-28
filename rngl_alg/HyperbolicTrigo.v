@@ -2557,6 +2557,12 @@ enough (H :
   move η before ε.
   split; [ easy | ].
   intros dθ Hdθ.
+  rewrite angle_eucl_dist_is_sqrt in Hdθ.
+  rewrite angle_sub_add_distr in Hdθ.
+  rewrite angle_sub_diag in Hdθ.
+  rewrite angle_sub_0_l in Hdθ.
+  rewrite rngl_cos_opp in Hdθ.
+...
   specialize (H dθ Hdθ)%A.
   rewrite rngl_cos_sub_cos.
   rewrite rngl_sin_sub_sin.
