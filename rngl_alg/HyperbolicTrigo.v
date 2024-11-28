@@ -2395,7 +2395,6 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_sin_sub_sin :
   ∀ p q,
   let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
@@ -2485,6 +2484,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
