@@ -2153,7 +2153,7 @@ apply Bool.not_true_iff_false in H13.
 now apply angle_nlt_ge in H13.
 Qed.
 
-Theorem angle_add_diag : ∀ θ, (θ + θ = 2 * θ)%A.
+Theorem angle_mul_2_l : ∀ θ, (2 * θ = θ + θ)%A.
 Proof.
 intros; cbn.
 now rewrite angle_add_0_r.

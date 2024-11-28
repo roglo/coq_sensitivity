@@ -1410,7 +1410,7 @@ rewrite angle_mul_1_l.
 apply angle_add_not_overflow_move_add. {
   apply angle_add_overflow_div_2_div_2.
 }
-rewrite angle_add_diag.
+rewrite <- angle_mul_2_l.
 rewrite angle_div_2_mul_2.
 rewrite Nat.mul_comm.
 rewrite <- angle_mul_nat_assoc.

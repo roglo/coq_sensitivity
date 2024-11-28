@@ -2072,7 +2072,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_assoc.
     rewrite angle_add_add_swap.
     rewrite angle_add_sub.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   } {
     rewrite angle_add_assoc.
@@ -2082,7 +2082,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_assoc.
     rewrite angle_add_add_swap.
     rewrite angle_add_sub.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   }
 } {
@@ -2109,7 +2109,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_assoc.
     rewrite angle_add_add_swap.
     rewrite angle_add_sub.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   } {
     rewrite angle_add_assoc.
@@ -2120,7 +2120,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_assoc.
     rewrite angle_add_add_swap.
     rewrite angle_add_sub.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   }
 }
@@ -2151,7 +2151,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_swap.
     rewrite angle_sub_diag.
     rewrite angle_add_0_l.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   } {
     rewrite angle_sub_add_distr.
@@ -2160,7 +2160,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_swap.
     rewrite angle_sub_diag.
     rewrite angle_add_0_l.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   }
 } {
@@ -2188,7 +2188,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_add_sub_swap.
     rewrite angle_sub_diag.
     rewrite angle_add_0_l.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   } {
     rewrite angle_sub_add_distr.
@@ -2197,7 +2197,7 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     rewrite angle_sub_add.
     rewrite angle_sub_diag.
     rewrite angle_add_0_l.
-    rewrite angle_add_diag.
+    rewrite <- angle_mul_2_l.
     apply angle_div_2_mul_2.
   }
 }
@@ -2564,21 +2564,37 @@ enough (H :
   rewrite angle_add_sub.
   rewrite <- angle_add_assoc.
   do 2 rewrite (angle_add_comm dθ).
-  rewrite angle_add_diag.
+  rewrite <- angle_mul_2_l.
   rewrite angle_div_2_add.
 (**)
   rewrite fold_old_angle_add_overflow.
   rewrite angle_add_overflow_equiv3.
-...
+  remember (angle_add_overflow θ dθ) as ov1 eqn:Hov1.
   remember (angle_add_overflow (θ + dθ) θ) as ov2 eqn:Hov2.
-  symmetry in Hov2.
-  destruct ov2. 2: {
+  remember (angle_add_overflow (2 * θ) dθ) as ov3 eqn:Hov3.
+  symmetry in Hov1, Hov2, Hov3.
+  destruct ov1. {
+    rewrite rngl_sin_add_straight_r.
+    destruct ov2. {
+      rewrite rngl_sin_add_straight_r.
+      destruct ov3. {
+        rewrite rngl_sin_add_straight_r.
+        rewrite <- angle_add_assoc.
+        rewrite angle_straight_add_straight.
+        rewrite angle_add_0_r.
+        do 4 rewrite (rngl_mul_opp_r Hop).
+        do 2 rewrite (rngl_opp_involutive Hop).
+        rewrite angle_mul_2_l in Hov3.
+...
+        rewrite <- angle_mul_nat_div_2. 2: {
+Search ((2 * _) /₂)%A.
+Search (rngl_dist _ (- _)).
 ...
     rewrite angle_add_comm in Hov2.
     apply angle_add_not_overflow_move_add in Hov2. 2: {
 ...
     rewrite angle_add_overflow_comm in Hov2.
-    rewrite angle_add_diag in Hov2.
+    rewrite <- angle_mul_2_l in Hov2.
     rewrite Hov2.
     rewrite angle_add_0_r.
 ...
@@ -2589,13 +2605,13 @@ Search ((_ * _) /₂)%A.
       rewrite <- (angle_mul_1_l θ).
       apply angle_mul_nat_overflow_distr_add_overflow.
       cbn - [ angle_mul_nat_overflow ].
-      rewrite <- angle_add_diag in Hov2.
+      rewrite <-<- angle_mul_2_l in Hov2.
 Search (angle_add_overflow (_ + _)).
       apply angle_add_not_overflow_move_add in Hov2.
 (* ouais, bon, c'est pas clair *)
 ...
     apply angle_mul_nat_overflow_distr_add_overflow in Hov2.
-    rewrite <- angle_add_diag in Hov2.
+    rewrite <-<- angle_mul_2_l in Hov2.
 ...
 
 Theorem rngl_cos_sub_cos :
