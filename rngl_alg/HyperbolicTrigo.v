@@ -2562,6 +2562,18 @@ enough (H :
   do 2 rewrite (angle_add_comm dθ).
   rewrite angle_add_diag.
   rewrite angle_div_2_add.
+(**)
+  remember (angle_add_overflow (θ + dθ) θ) as ov2 eqn:Hov2.
+  symmetry in Hov2.
+...
+  remember (angle_add_overflow (2 * θ) dθ) as ov2 eqn:Hov2.
+  symmetry in Hov2.
+  rewrite <- angle_add_diag in Hov2.
+  destruct ov2. 2: {
+Search (angle_add_overflow (_ + _)).
+    apply angle_add_not_overflow_move_add in Hov2.
+2: {
+...
   rewrite <- angle_mul_nat_div_2. 2: {
 (* ah non, c'est pas forcément vrai, ça *)
 ...
