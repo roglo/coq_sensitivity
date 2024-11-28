@@ -2299,40 +2299,103 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
 }
 Qed.
 
-(* to be completed
 Theorem rngl_cos_sub_cos :
   ∀ p q,
-  let c₁ :=
-    if angle_add_overflow (p + q) angle_straight then angle_straight else 0%A
-  in
-  let c₂ :=
-    if (p + q <? angle_straight)%A then angle_straight else 0%A
-  in
+  let c₁ := if angle_add_overflow p q then angle_straight else 0%A in
+  let c₂ := if (p <? q)%A then angle_straight else 0%A in
   (rngl_cos p - rngl_cos q =
      - (2 * rngl_sin ((p + q) /₂ + c₁) * rngl_sin ((p - q) /₂ + c₂)))%L.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (- _))%L.
+  apply H1.
+}
 intros.
-remember (angle_add_overflow (p + q) angle_straight) as opq eqn:Hopq.
-symmetry in Hopq.
-subst c₁ c₂.
-destruct opq. {
-  rewrite rngl_sin_add_straight_r.
-  remember (p + q <? angle_straight)%A as pq eqn:Hpq.
-  symmetry in Hpq.
-  destruct pq. {
-    exfalso.
-    apply Bool.not_false_iff_true in Hopq.
-    apply Hopq; clear Hopq.
-    apply angle_add_not_overflow_lt_straight_le_straight; [ easy | ].
-    apply angle_le_refl.
+rewrite (angle_add_div_2_add_sub_div_2 p q) at 1.
+rewrite (angle_add_div_2_sub_sub_div_2 p q) at 5.
+destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
+  do 2 rewrite rngl_cos_add_straight_r.
+  rewrite rngl_cos_add, rngl_cos_sub.
+  remember ((p + q) /₂)%A as a.
+  remember ((p - q) /₂)%A as b.
+  move b before a.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_opp_sub_distr Hop).
+  rewrite rngl_add_assoc.
+  rewrite (rngl_sub_add Hop).
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_mul_assoc.
+  rewrite <- (rngl_mul_opp_r Hop).
+  f_equal.
+  subst c₁ c₂.
+  rewrite Hpq.
+  remember (q ≤? p)%A as qp eqn:Hqp.
+  symmetry in Hqp.
+  destruct qp. {
+    apply angle_nlt_ge in Hqp.
+    apply Bool.not_true_iff_false in Hqp.
+    rewrite Hqp.
+    rewrite rngl_sin_add_straight_r.
+    rewrite angle_add_0_r.
+    rewrite <- (rngl_mul_opp_l Hop).
+    f_equal.
+    symmetry.
+    apply (rngl_opp_involutive Hop).
+  } {
+    apply Bool.not_true_iff_false in Hqp.
+    apply angle_nle_gt in Hqp.
+    rewrite Hqp.
+    rewrite rngl_sin_add_straight_r.
+    rewrite angle_add_0_r.
+    rewrite <- (rngl_mul_opp_r Hop).
+    f_equal.
+    symmetry.
+    apply (rngl_opp_involutive Hop).
   }
-  rewrite angle_add_0_r.
-  rewrite (rngl_mul_opp_r Hop).
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_opp_involutive Hop).
-...
+} {
+  do 2 rewrite angle_add_0_r.
+  rewrite rngl_cos_add, rngl_cos_sub.
+  remember ((p + q) /₂)%A as a.
+  remember ((p - q) /₂)%A as b.
+  move b before a.
+  rewrite (rngl_sub_add_distr Hos).
+  rewrite (rngl_sub_sub_swap Hop (_ * _)).
+  rewrite (rngl_sub_diag Hos).
+  rewrite (rngl_sub_0_l Hop).
+  rewrite <- (rngl_opp_add_distr Hop).
+  f_equal.
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_mul_assoc.
+  f_equal.
+  subst c₁ c₂.
+  remember (q ≤? p)%A as qp eqn:Hqp.
+  symmetry in Hqp.
+  destruct qp. {
+    apply Bool.not_true_iff_false in Hpq.
+    rewrite Hpq.
+    apply angle_nlt_ge in Hqp.
+    apply Bool.not_true_iff_false in Hqp.
+    rewrite Hqp.
+    now do 2 rewrite angle_add_0_r.
+  } {
+    apply Bool.not_false_iff_true in Hpq.
+    rewrite Hpq.
+    apply Bool.not_true_iff_false in Hqp.
+    apply angle_nle_gt in Hqp.
+    rewrite Hqp.
+    do 2 rewrite rngl_sin_add_straight_r.
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_mul_opp_r Hop).
+    symmetry.
+    apply (rngl_opp_involutive Hop).
+  }
+}
+Qed.
 
+(* to be completed
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.

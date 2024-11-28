@@ -198,6 +198,7 @@ Notation "a * b" := (rngl_mul a b) : ring_like_scope.
 Notation "a / b" := (rngl_div a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
+Notation "- 2" := (rngl_opp (rngl_add rngl_one rngl_one)) : ring_like_scope.
 Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹").
 Notation "a '²'" := (rngl_squ a) (at level 1, format "a ²").
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
