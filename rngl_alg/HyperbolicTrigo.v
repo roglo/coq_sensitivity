@@ -2453,13 +2453,10 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
   remember ((p + q) /₂)%A as a.
   remember ((p - q) /₂)%A as b.
   move b before a.
-...
-  rewrite (rngl_sub_add_distr Hos).
-  rewrite (rngl_sub_sub_swap Hop (_ * _)).
+  rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_add_sub_swap Hop).
   rewrite (rngl_sub_diag Hos).
-  rewrite (rngl_sub_0_l Hop).
-  rewrite <- (rngl_opp_add_distr Hop).
-  f_equal.
+  rewrite rngl_add_0_l.
   rewrite <- (rngl_mul_2_l Hon).
   rewrite <- rngl_mul_assoc.
   f_equal.
@@ -2479,14 +2476,14 @@ destruct (Bool.bool_dec _ _) as [Hpq| Hpq]. {
     apply Bool.not_true_iff_false in Hqp.
     apply angle_nle_gt in Hqp.
     rewrite Hqp.
-    do 2 rewrite rngl_sin_add_straight_r.
+    rewrite rngl_cos_add_straight_r, rngl_sin_add_straight_r.
     rewrite (rngl_mul_opp_l Hop).
     rewrite (rngl_mul_opp_r Hop).
     symmetry.
     apply (rngl_opp_involutive Hop).
   }
 }
-...
+Qed.
 
 Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
@@ -2553,14 +2550,28 @@ enough (H :
        ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
+  move η before ε.
   split; [ easy | ].
   intros dθ Hdθ.
   specialize (H dθ Hdθ)%A.
-rewrite rngl_cos_sub_cos.
+  rewrite rngl_cos_sub_cos.
+  rewrite rngl_sin_sub_sin.
+  rewrite (angle_add_comm θ).
+  rewrite angle_add_sub.
+  rewrite <- angle_add_assoc.
+  do 2 rewrite (angle_add_comm dθ).
+  rewrite angle_add_diag.
+  rewrite angle_div_2_add.
+  rewrite <- angle_mul_nat_div_2. 2: {
+(* ah non, c'est pas forcément vrai, ça *)
 ...
-rewrite rngl_sin_sub_sin.
-rewrite (angle_add_comm θ).
-rewrite angle_add_sub.
+Search ((_ * _) /₂)%A.
+Search ((2 * _) /₂)%A.
+  rewrite angle_div_2_mul_2.
+...
+Search ((2 * _ + _)/₂)%A.
+Search ((_ + _)/₂)%A.
+Search (angle_add_overflow (_ + _)).
 ...
 
 Theorem rngl_cos_sub_cos :
