@@ -2523,6 +2523,29 @@ enough (H :
   rewrite (rngl_sub_opp_r Hop).
   now apply H.
 }
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
+  (rngl_abs
+     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
+     ε)%L). {
+  destruct H as (η & Hη & H).
+  exists η.
+  move η before ε.
+  split; [ easy | ].
+  intros θ Hθ.
+  rewrite rngl_cos_sub_cos.
+  remember (angle_add_overflow θ θ₀) as ov eqn:Hov.
+  remember (θ <? θ₀)%A as tt eqn:Htt.
+  symmetry in Hov, Htt.
+  destruct ov. {
+    destruct tt. {
+      do 2 rewrite rngl_sin_add_straight_r.
+      do 2 rewrite (rngl_mul_opp_r Hop).
+      rewrite (rngl_mul_opp_l Hop).
+      rewrite (rngl_opp_involutive Hop).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_add_opp_l Hop).
 ...
 enough (H :
   ∃ η : T,
