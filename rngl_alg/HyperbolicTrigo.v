@@ -2544,6 +2544,15 @@ enough (H :
       do 2 rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_mul_opp_l Hop).
       rewrite (rngl_opp_involutive Hop).
+...
+Theorem rngl_sin_mul_sin :
+  ∀ a b,
+  (rngl_sin a * rngl_sin b = (rngl_cos (a - b) - rngl_cos (a + b)) / 2)%L.
+...
+rewrite <- rngl_mul_assoc.
+rewrite rngl_sin_mul_sin.
+(* ne fait que revenir en arrière *)
+...
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_l Hop).
       rewrite <- (rngl_add_opp_r Hop).
@@ -2563,6 +2572,7 @@ enough (H :
       rewrite (rngl_mul_opp_r Hop).
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_add_opp_r Hop).
+...
       rewrite angle_div_2_add.
       rewrite Hov.
       rewrite rngl_sin_add_straight_r.
@@ -2575,6 +2585,20 @@ enough (H :
       rewrite (rngl_div_opp_l Hop Hiv).
       rewrite (rngl_sub_opp_r Hop).
       rewrite angle_add_comm.
+      rewrite rngl_sin_add, rngl_sin_sub.
+...
+      remember ((θ + q) /₂)%A as a.
+  remember ((p - q) /₂)%A as b.
+  move b before a.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite (rngl_opp_add_distr Hop).
+  rewrite (rngl_add_sub_assoc Hop).
+  rewrite (rngl_sub_add Hop).
+  rewrite <- (rngl_opp_add_distr Hop).
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_mul_assoc.
+  rewrite <- (rngl_mul_opp_r Hop).
+  f_equal.
 ...
 enough (H :
   ∃ η : T,
