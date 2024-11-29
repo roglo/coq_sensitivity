@@ -73,7 +73,7 @@ Definition is_complete A (dist : A → A → T) :=
 
 Definition is_derivative {A} (da : A → A → T) dist f f' :=
   ∀ a,
-  is_limit_when_tending_to da dist (λ x, dist (f x) (f a) / da x a)%L
+  is_limit_when_tending_to da dist (λ x, (f x - f a) / da x a)%L
     a (f' a).
 
 Definition continuous_at {A B} da db (f : A → B) a :=

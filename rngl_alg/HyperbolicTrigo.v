@@ -2500,16 +2500,21 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1 in Hε.
   now apply (rngl_lt_irrefl Hor) in Hε.
 }
-intros θ ε Hε.
-(* je m'interroge sur cette definition de "is_derivative", parce que
-   ici, j'obtiens un truc bizarre à la fin, un |sin(θ)+t| < ε où "t"
-   est un terme positif. C'est pas possible *)
+intros θ₀ ε Hε.
+enough (H :
+  ∃ η, (0 < η)%L ∧
+  ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
+  (rngl_dist
+     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
+     (- rngl_sin θ₀) < ε)%L). {
+  easy.
+}
 ...
 enough (H :
   ∃ η : T,
   (0 < η)%L ∧
   ∀ dθ : angle T,
-    (angle_eucl_dist (θ + dθ) θ < η)%L
+    (angle_eucl_dist (θ₀ + dθ) θ₀ < η)%L
     → (rngl_dist
          (rngl_dist
             (rngl_cos (θ + dθ)) (rngl_cos θ) / angle_eucl_dist (θ + dθ) θ)
