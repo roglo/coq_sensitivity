@@ -2512,14 +2512,17 @@ enough (H :
 enough (H :
   ∃ η, (0 < η)%L ∧
   ∀ θ, (angle_eucl_dist θ θ₀ < η)%L →
-  (rngl_dist
-     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀)
-     (- rngl_sin θ₀) < ε)%L). {
+  (rngl_abs
+     ((rngl_cos θ - rngl_cos θ₀) / angle_eucl_dist θ θ₀ + rngl_sin θ₀) <
+     ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
   split; [ easy | ].
   intros θ Hθ.
   progress unfold rngl_dist.
+  rewrite (rngl_sub_opp_r Hop).
+  now apply H.
+}
 ...
 enough (H :
   ∃ η : T,
