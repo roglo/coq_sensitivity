@@ -2493,7 +2493,18 @@ Theorem rngl_cos_derivative :
   is_derivative angle_eucl_dist rngl_dist rngl_cos (λ θ, (- rngl_sin θ))%L.
 Proof.
 destruct_ac.
+specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros θ ε Hε.
+  rewrite H1 in Hε.
+  now apply (rngl_lt_irrefl Hor) in Hε.
+}
 intros θ ε Hε.
+(* je m'interroge sur cette definition de "is_derivative", parce que
+   ici, j'obtiens un truc bizarre à la fin, un |sin(θ)+t| < ε où "t"
+   est un terme positif. C'est pas possible *)
+...
 enough (H :
   ∃ η : T,
   (0 < η)%L ∧
@@ -2544,14 +2555,13 @@ enough (H :
   ∃ η : T,
   (0 < η)%L ∧
   ∀ dθ : angle T,
-    (angle_eucl_dist (θ + dθ) θ < η)%L
-    → (rngl_dist
-         (rngl_abs (rngl_cos (θ + dθ) - rngl_cos θ) /
-            rl_modl
-              (rngl_cos (θ + dθ) - rngl_cos θ)
-              (rngl_sin (θ + dθ) - rngl_sin θ))
-         (- rngl_sin θ) <
-       ε)%L). {
+    (1 - η² / 2 < rngl_cos dθ)%L
+  → (rngl_abs
+     (rngl_sin θ +
+      rngl_abs (rngl_cos (θ + dθ) - rngl_cos θ) /
+      rl_modl
+        (rngl_cos (θ + dθ) - rngl_cos θ)
+        (rngl_sin (θ + dθ) - rngl_sin θ)) < ε)%L). {
   destruct H as (η & Hzη & H).
   exists η.
   move η before ε.
@@ -2562,6 +2572,33 @@ enough (H :
   rewrite angle_sub_diag in Hdθ.
   rewrite angle_sub_0_l in Hdθ.
   rewrite rngl_cos_opp in Hdθ.
+  apply (rngl_lt_lt_squ Hop Hor Hii) in Hdθ; cycle 1. {
+    apply (rngl_mul_comm Hic).
+  } {
+    apply rl_sqrt_nonneg.
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_squ_sqrt Hon) in Hdθ. 2: {
+    apply (rngl_mul_nonneg_nonneg Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    apply (rngl_le_0_sub Hop Hor).
+    apply rngl_cos_bound.
+  }
+  rewrite (rngl_mul_comm Hic) in Hdθ.
+  apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hdθ. 2: {
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  }
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hdθ.
+  rewrite rngl_add_comm in Hdθ.
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in Hdθ.
+  progress unfold rngl_dist.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite rngl_add_comm.
+  now apply H.
+}
 ...
   specialize (H dθ Hdθ)%A.
   rewrite rngl_cos_sub_cos.
